@@ -23,6 +23,7 @@ Tổng hợp từ toàn bộ trao đổi, đánh số để nghiệm thu đượ
 | R10 | Chạy được trên **Claude Desktop · Claude CLI · OpenCode CLI** |
 | R11 | Chuẩn hoá, chuyên nghiệp, hiện đại |
 | R12 | Sản phẩm cuối **chất lượng và khớp yêu cầu** — chứng minh được, không tự khai |
+| R13 | **Người duyệt từng bước**: PRD · Architecture · UX Spec · Epics · Stories · Mockups — mỗi bước dừng chờ xác nhận, **trừ khi truyền tham số tự duyệt** |
 
 ---
 
@@ -128,6 +129,45 @@ Không đo thì không biết agent đang tốt hay đang **âm thầm trôi**.
 
 ---
 
+## 4bis. Cổng người duyệt (R13)
+
+Có **hai loại cổng**, chạy nối tiếp — máy kiểm trước để khỏi phí thời gian người:
+
+| | Cổng máy | Cổng người |
+|---|---|---|
+| Kiểm gì | schema hợp lệ, không chu trình phụ thuộc, mọi FR được phủ, story không quá lớn | nội dung có đúng ý không |
+| Ai chạy | tự động | người, bằng lệnh |
+| Trượt thì | dừng, báo lỗi cụ thể | ghi `changes_requested` kèm ghi chú, sinh lại |
+
+### Nguyên tắc: phê duyệt là **trạng thái trên đĩa**, không phải câu hỏi tương tác
+
+Đây là điều kiện để cùng một cơ chế chạy được ở mọi nơi:
+- chạy nền / CI — không có ai ngồi trước màn hình để trả lời;
+- trong phiên chat (Claude Desktop) — agent không thể "đợi" người gõ;
+- người duyệt có thể là **người khác, lúc khác, máy khác**.
+
+Luồng: pipeline chạy tới cổng → ghi `pending` rồi **dừng** → người `approve`/`reject` → chạy lại thì đi tiếp.
+
+### Tám cổng
+
+`prd` → `architecture` → `ux-spec` → `epics` → `stories` → `mockups` → `readiness` (trước khi viết code) → `pre-deploy` (trước khi triển khai)
+
+### Hai bảo đảm
+
+1. **Phê duyệt gắn với nội dung, không gắn với tên cổng.** Bản ghi lưu SHA-256 của artifact; sửa file sau khi duyệt thì phê duyệt tự động hết hiệu lực (`stale`).
+2. **Sửa tầng trên làm mất hiệu lực tầng dưới.** Duyệt lại PRD thì Architecture, UX, Epics, Stories, Mockups đã duyệt đều thành `stale` — chúng được duyệt dựa trên một bản PRD không còn nữa. Thứ tự quyết định so bằng **số thứ tự đơn điệu**, không bằng đồng hồ (bản ghi đi qua git giữa nhiều máy, đồng hồ không đáng tin).
+
+### Tự duyệt
+
+```
+--auto-approve all                  bỏ qua mọi cổng (CI, chạy thử)
+--auto-approve prd,architecture     chỉ bỏ qua cổng đã nêu
+```
+
+Quyết định tự động luôn ghi `decided_by: auto`, để về sau **truy được artifact nào chưa từng có người thật xem qua**.
+
+---
+
 ## 5. Cấu trúc
 
 ```
@@ -200,9 +240,16 @@ aisdlc setup   --project DIR          nạp kit vào dự án
 aisdlc compile --client claude|opencode
 aisdlc doctor                         kiểm tra sau cài
 
-# Bước 2–3
+# Bước 2–3 — dừng ở mỗi cổng chờ người duyệt
 aisdlc plan                           BMAD pipeline → _bmad-output/
+aisdlc plan --auto-approve all        chạy thẳng, không dừng
 aisdlc mockup                         HTML + screenshot + design-contract.json
+
+# Cổng người duyệt (R13)
+aisdlc gates                          bảng trạng thái 8 cổng
+aisdlc review  prd                    mở artifact + checklist review
+aisdlc approve prd [--note "..."]
+aisdlc reject  prd  --note "cần sửa..."   (bắt buộc có ghi chú)
 
 # Bước 4
 aisdlc next                           → story kế tiếp (JSON)
@@ -269,17 +316,17 @@ Dò stack từ `requirements.md` → chọn skill theo `catalog.yaml` → **lọ
 ### Bước 2 — BMAD sinh tài liệu (R4)
 `project-context → prd → architecture → ux → epics-and-stories → sprint-planning`, mỗi pha một cổng. **Tách mỗi story một file** + trích `stories.index.yaml` (`depends_on`, `write_scope`, `FR-xx`, `AR-xx`, `screen_id`, `slice`).
 
-**Xong khi:** mỗi story một file có AC + `write_scope` · index parse được · đồ thị phụ thuộc không chu trình · **mọi FR trong PRD được ít nhất một story phủ** · không story nào vượt ngưỡng kích thước (chống tràn ngữ cảnh).
+**Xong khi:** mỗi story một file có AC + `write_scope` · index parse được · đồ thị phụ thuộc không chu trình · **mọi FR trong PRD được ít nhất một story phủ** · không story nào vượt ngưỡng kích thước (chống tràn ngữ cảnh) · **cổng `prd`, `architecture`, `ux-spec`, `epics`, `stories` đều `approved`** (hoặc tự duyệt tường minh).
 
 ### Bước 3 — Mockup (R5)
 `ux-spec` + `ui-ux-pro-max` → `mockups/{screen}.html` → screenshot → trích `design-contract.json` → map story ↔ `screen_id`.
 
-**Xong khi:** mỗi màn hình trong ux-spec có đúng một mockup mở được · contract hợp lệ schema, không mục treo · mọi story frontend map tới `screen_id` có thật.
+**Xong khi:** mỗi màn hình trong ux-spec có đúng một mockup mở được · contract hợp lệ schema, không mục treo · mọi story frontend map tới `screen_id` có thật · **cổng `mockups` `approved`**.
 
 ### Bước 4 — Coding agent (R6, R7)
 Với mỗi story: phiên mới → nạp story + `design-contract` + `AR-x` → RED → GREEN → VERIFY → commit mang `FR-xx`. Guard chặn tại 3 mốc vòng đời. Sandbox Docker cho test. Wave cho story độc lập.
 
-**Xong khi:** guard **chặn thật** (test: ghi ngoài scope bị từ chối; secret bị từ chối; `git add -A` bị từ chối) · hai story đụng `write_scope` **không** vào cùng wave · chạy hết một epic ≥5 story trên `references/teamflow` · dừng giữa chừng chạy lại tiếp đúng story dở.
+**Xong khi:** guard **chặn thật** (test: ghi ngoài scope bị từ chối; secret bị từ chối; `git add -A` bị từ chối) · hai story đụng `write_scope` **không** vào cùng wave · chạy hết một epic ≥5 story trên `references/teamflow` · dừng giữa chừng chạy lại tiếp đúng story dở · **cổng `readiness` `approved` trước khi story đầu tiên chạy**.
 
 ### Bước 5 — Kiểm định (R8, R12)
 | Loại | Chạy thật bằng |
@@ -303,7 +350,7 @@ Với mỗi story: phiên mới → nạp story + `design-contract` + `AR-x` →
 ### Bước 6 — DevSecOps (R9)
 Dockerfile · compose · CI/CD gắn đúng cổng Bước 5 · SBOM CycloneDX · quét image · k8s/Terraform · metric + log + alert · runbook (triệu chứng → chẩn đoán → xử lý → leo thang) · cổng tiền-triển-khai.
 
-**Xong khi:** `docker build` chạy được · CI **chặn** khi có story fail · SBOM sạch high · runbook đủ 4 mục.
+**Xong khi:** `docker build` chạy được · CI **chặn** khi có story fail · SBOM sạch high · runbook đủ 4 mục · **cổng `pre-deploy` `approved`**.
 
 ---
 
@@ -412,3 +459,4 @@ cli                                                               ~200 LOC
 8. Control plane không bao giờ là daemon.
 9. Client không được tin — mọi đảm bảo nằm harness-side.
 10. Thiếu cơ chế thì **khai báo**, không im lặng giả vờ đủ.
+11. Không bước nào đi tiếp khi cổng phía trước chưa duyệt — trừ khi tự duyệt được truyền tường minh, và khi đó phải ghi lại là `auto`.
