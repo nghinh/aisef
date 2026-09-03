@@ -9,6 +9,28 @@
 
 ---
 
+## Tiến độ (cập nhật 2026-09-04)
+
+| Giai đoạn | Trạng thái |
+|---|---|
+| GĐ-0 Spike | ✅ **xong** — 6/7 spike xanh, S4 (OpenCode) chưa kết luận, không chặn |
+| GĐ-1 Control plane | ✅ **xong** — config · state · fsm · worktree · CLI |
+| GĐ-2 Kit + Setup | ✅ **xong** — catalog · detect_stack · lọc 2 tầng · install · constitution |
+| GĐ-3 Đa client | ⏳ kế tiếp |
+| GĐ-4…GĐ-9 | chưa bắt đầu |
+
+**Mốc demo đã đạt**
+
+* *Mốc 1* — `aisdlc gates` / `approve` / `status` chạy thật.
+* *Mốc 2* — thư mục trống + `docs/requirements.md` → 226 skill được cài
+  (bmad 36 · security 175 · superpowers 10 · ui-ux 5), `CLAUDE.md` +
+  `AGENTS.md` sinh theo stack, `doctor` xanh gồm cả bất biến "không có
+  skill tấn công".
+
+**262 test xanh.**
+
+---
+
 ## 0. Đã xong
 
 | Module | Nội dung | Test |
@@ -17,7 +39,18 @@
 | `aisdlc/kit/security_filter.py` | lọc tầng 1: 818 → 269 keep / 207 offensive / 342 out-of-scope | 11 |
 | `aisdlc/control/approvals.py` | 8 cổng người duyệt, SHA-binding, cascade stale | 19 |
 | `aisdlc/control/scheduler.py` | epic tuần tự, story song song theo đợt | 26 |
-| | | **59 xanh** |
+| `aisdlc/clients/stream.py` | đọc stream-json của Claude Code | 13 |
+| `aisdlc/harness/aria.py` | đối chiếu mockup qua accessibility tree | 16 |
+| `aisdlc/control/worktree.py` | cô lập story song song | 14 |
+| `aisdlc/harness/sandbox.py` | 4 bậc quyền, Docker | 21 |
+| `aisdlc/config.py` | 12 khoá ngưỡng | 21 |
+| `aisdlc/control/state.py` | tiến độ, khoá, resume | 18 |
+| `aisdlc/cli.py` | doctor · gates · review · approve · reject · status · setup | 26 |
+| `aisdlc/kit/detect_stack.py` | dò công nghệ | 17 |
+| `aisdlc/kit/catalog.py` | sổ đăng ký nguồn + ràng buộc license | 17 |
+| `aisdlc/kit/install.py` | cài skill, idempotent | 14 |
+| `aisdlc/kit/constitution.py` | sinh CLAUDE.md / AGENTS.md | 14 |
+| | | **262 xanh** |
 
 ---
 
