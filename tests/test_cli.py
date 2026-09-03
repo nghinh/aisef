@@ -71,9 +71,12 @@ class TestGates(CliTestCase):
         _, out, _ = self.run_cli("gates")
         self.assertIn("Cổng kế tiếp cần xử lý: prd", out)
 
-    def test_flags_missing_artifact(self):
+    def test_flags_missing_artifact_by_name(self):
+        """Nói thiếu file nào, không chỉ nói thiếu — cổng ux-spec có hai
+        file nên "chưa có artifact" không đủ để biết phải làm gì."""
         _, out, _ = self.run_cli("gates")
-        self.assertIn("chưa có artifact", out)
+        self.assertIn("thiếu: prd.md", out)
+        self.assertIn("thiếu: DESIGN.md, EXPERIENCE.md", out)
 
 
 class TestApproveReject(CliTestCase):
@@ -172,6 +175,21 @@ class TestReview(CliTestCase):
         self.run_cli("reject", "prd", "--note", "cần bổ sung NFR")
         _, out, _ = self.run_cli("review", "prd")
         self.assertIn("cần bổ sung NFR", out)
+
+
+class TestPlan(CliTestCase):
+    """Chỉ kiểm phần kiểm đầu vào — chạy pipeline thật tốn tiền, đã kiểm
+    riêng bằng client giả trong `test_plan.py`."""
+
+    def test_rejects_unknown_client(self):
+        code, _, err = self.run_cli("plan", "--client", "khong-co")
+        self.assertEqual(code, EXIT_USAGE)
+        self.assertIn("khong-co", err)
+
+    def test_rejects_unknown_gate_in_auto_approve(self):
+        code, _, err = self.run_cli("plan", "--auto-approve", "prd,bay-gio")
+        self.assertEqual(code, EXIT_USAGE)
+        self.assertIn("bay-gio", err)
 
 
 class TestStatus(CliTestCase):

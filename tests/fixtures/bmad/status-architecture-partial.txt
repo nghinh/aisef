@@ -1,0 +1,38 @@
+`_bmad-output/architecture.md` — 20 numbered decisions (AR-1..AR-20), Vietnamese to match the PRD.
+
+The memlog showed a prior run that logged its finalize but never landed the file, so I resumed from it rather than re-deriving. Three things changed on resume: the adversarial lens found five pairs of units that could obey every AR and still build incompatibly (orphan `NoteTag` rows, soft-delete eating tags so FR-3 restore breaks, worker polling vs. push, double-applied filter/sort, export governed by nothing) — four ARs tightened, AR-20 added; AR-19 added because the operational envelope was silent; and both `lint_spine.py` and `sed` were denied, so the linter's rule set was applied by hand and recorded as such.
+
+The load-bearing call is AR-7 + AR-8: they resolve the NFR-1 vs NFR-2 conflict `addendum.md` §B flagged as unsolved — index persisted and updated incrementally (never rebuilt at startup), worker loaded after first paint. The search algorithm itself is deliberately left open with AR-16 as the gate.
+
+Gate verdict is PASS with reservations, and it is self-review, not independent — subagents are forbidden this session, so the same agent wrote and reviewed. Stack versions could not be web-verified (WebSearch denied); they're tagged `[ASSUMPTION]` with major lines fixed and exact versions deferred to lockfile at scaffold.
+
+```json
+{
+  "status": "partial",
+  "intent": "create",
+  "altitude": "feature",
+  "purpose": "build-substrate",
+  "doc_workspace": "_bmad-output",
+  "spine": "_bmad-output/architecture.md",
+  "memlog": "_bmad-output/.memlog.md",
+  "companions": ["_bmad-output/reviews/review-architecture.md"],
+  "assumptions": [
+    "Stack versions (TypeScript 5.x, React 19.x, Vite 7.x, vite-plugin-pwa 1.x, idb 8.x) are unverified — WebSearch denied, no outbound network. Major lines fixed; exact versions resolved and lockfiled at scaffold.",
+    "AR-4: autosave debounce 500ms — a tuning knob clearing FR-2's 1s bound with margin, not a derived constant.",
+    "AR-13: storage warning at 10% remaining or 50MB, whichever is larger — browsers report quota inconsistently.",
+    "AR-11: 30-day trash purge keys on local deletedAt — correct for single-device MVP, revisit with sync per AR-5.",
+    "AR-9 and AR-12 set cheap architectural defaults for OQ-4 and OQ-3 respectively; PM can override either at low cost.",
+    "Reviewer Gate ran inline, not as parallel subagents (session forbids the Agent tool) — self-review, not independent adversarial review.",
+    "lint_spine.py could not be executed (uv run and sed both denied); its rule set was applied by hand — see reviews/review-architecture.md Lens 1."
+  ],
+  "open_questions": [
+    "OQ-1 (owner: PM) — sync identity with no mandatory account. Blocks FR-13..FR-15 entirely; only the seam (AR-18) is fixed.",
+    "OQ-6 (owner: PM/architecture) — reference device and measurement conditions for NFR-1/NFR-2. Blocks calibrating AR-16's benchmark thresholds; the harness itself can be built now.",
+    "OQ-7 (owner: PM) — minimum browser list/versions (NFR-6). Blocks locking the API and polyfill baseline.",
+    "OQ-3 (owner: PM/UX) — separate note title. AR-12 defaults to no title field; reversing it is a cheap AR-3 migration.",
+    "OQ-4 (owner: PM) — search result ranking. AR-9 defaults to deterministic (updatedAt desc, id asc); relevance scoring slots in ahead of it.",
+    "Stack versions need confirmation against the live registries before scaffold."
+  ],
+  "conflicts_with_prior_decisions": []
+}
+```

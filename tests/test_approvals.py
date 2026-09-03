@@ -30,10 +30,14 @@ class ApprovalTestCase(unittest.TestCase):
         self._tmp.cleanup()
 
     def write(self, gate: Gate, text: str) -> Path:
-        p = self.root / GATE_ARTIFACTS[gate]
-        p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(text, encoding="utf-8")
-        return p
+        """Ghi mọi artifact của cổng. Trả về file chính."""
+        written = []
+        for name in GATE_ARTIFACTS[gate]:
+            p = self.root / name
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(text, encoding="utf-8")
+            written.append(p)
+        return written[0]
 
 
 class TestBasicFlow(ApprovalTestCase):

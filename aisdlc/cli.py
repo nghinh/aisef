@@ -151,8 +151,8 @@ def cmd_gates(args) -> int:
     for gate, status, by in store.summary():
         mark = _GATE_MARK[status]
         who = f"  ({by})" if by else ""
-        artifact = store.artifact_path(gate)
-        exists = "" if artifact.is_file() else "   [chưa có artifact]"
+        missing = [p.name for p in store.artifact_paths(gate) if not p.is_file()]
+        exists = "" if not missing else f"   [thiếu: {', '.join(missing)}]"
         print(f"  {mark} {gate.value:14} {status.value:18}{who}{exists}")
         if pending_first is None and status is not Status.APPROVED:
             pending_first = gate
@@ -177,15 +177,17 @@ def cmd_review(args) -> int:
     """Hiện artifact và những gì cần xem trước khi duyệt."""
     store = _approvals(args)
     gate: Gate = args.gate
-    artifact = store.artifact_path(gate)
+    paths = store.artifact_paths(gate)
     status = store.status(gate)
 
     print(f"Cổng: {gate.value}")
     print(f"Trạng thái: {status.value}")
-    print(f"Artifact: {artifact}")
+    print("Artifact: " + ", ".join(str(p) for p in paths))
 
-    if not artifact.is_file():
-        print("\n✗ chưa có artifact — chạy bước sinh ra nó trước")
+    missing = [p for p in paths if not p.is_file()]
+    if missing:
+        names = ", ".join(p.name for p in missing)
+        print(f"\n✗ chưa có artifact ({names}) — chạy bước sinh ra nó trước")
         return EXIT_NOT_READY
 
     blocking = store.blocking(gate)
@@ -196,11 +198,12 @@ def cmd_review(args) -> int:
     if rec and rec.note:
         print(f"\nGhi chú lần trước ({rec.status}): {rec.note}")
 
-    text = artifact.read_text(encoding="utf-8", errors="replace")
-    print(f"\n— nội dung ({len(text.splitlines())} dòng) —\n")
-    print("\n".join(text.splitlines()[: args.lines]))
-    if len(text.splitlines()) > args.lines:
-        print(f"\n… còn {len(text.splitlines()) - args.lines} dòng. Mở: {artifact}")
+    for artifact in paths:
+        lines = artifact.read_text(encoding="utf-8", errors="replace").splitlines()
+        print(f"\n— {artifact.name} ({len(lines)} dòng) —\n")
+        print("\n".join(lines[: args.lines]))
+        if len(lines) > args.lines:
+            print(f"\n… còn {len(lines) - args.lines} dòng. Mở: {artifact}")
 
     print(f"\nDuyệt:    aisdlc approve {gate.value}")
     print(f"Trả lại:  aisdlc reject  {gate.value} --note \"...\"")
@@ -210,8 +213,9 @@ def cmd_review(args) -> int:
 def cmd_approve(args) -> int:
     store = _approvals(args)
     gate: Gate = args.gate
-    if not store.artifact_path(gate).is_file():
-        print(f"✗ chưa có artifact cho cổng {gate.value}", file=sys.stderr)
+    if not store.has_artifacts(gate):
+        missing = ", ".join(p.name for p in store.artifact_paths(gate) if not p.is_file())
+        print(f"✗ chưa có artifact cho cổng {gate.value}: {missing}", file=sys.stderr)
         return EXIT_NOT_READY
 
     blocking = store.blocking(gate)
@@ -249,7 +253,7 @@ def cmd_auto_approve(args) -> int:
     store = _approvals(args)
     done = []
     for gate in GATE_ORDER:
-        if gate in gates and store.artifact_path(gate).is_file():
+        if gate in gates and store.has_artifacts(gate):
             store.auto_approve(gate)
             done.append(gate.value)
     print(f"tự duyệt: {', '.join(done) if done else '(không cổng nào có artifact)'}")
@@ -417,6 +421,45 @@ def cmd_guard(args) -> int:
     return verdict.exit_code
 
 
+# ------------------------------------------------------------------ lập kế hoạch
+
+
+def cmd_plan(args) -> int:
+    """Chạy chuỗi pha BMAD tới cổng đầu tiên chưa duyệt."""
+    from .clients.compile import ADAPTERS
+    from .phases.plan import run_pipeline
+
+    # Kiểm tham số trước, kiểm môi trường sau: sai tham số thì máy nào
+    # cũng sai, còn thiếu client thì tuỳ máy — trộn hai loại lại sẽ cho mã
+    # thoát đổi theo máy chạy.
+    if args.client not in ADAPTERS:
+        print(f"✗ client không hỗ trợ: {args.client}", file=sys.stderr)
+        return EXIT_USAGE
+    try:
+        gates = parse_auto_approve(args.auto_approve)
+    except ValueError as e:
+        print(f"✗ {e}", file=sys.stderr)
+        return EXIT_USAGE
+
+    adapter = ADAPTERS[args.client]()
+    if not adapter.available():
+        print(f"✗ chưa cài {args.client} trên máy này", file=sys.stderr)
+        return EXIT_NOT_READY
+
+    result = run_pipeline(
+        args.project,
+        adapter,
+        config=Config.load(args.project),
+        auto_approve=gates,
+        force=args.force,
+    )
+    print(result.summary())
+
+    if result.failed_at:
+        return EXIT_USAGE
+    return EXIT_OK if result.complete else EXIT_NOT_READY
+
+
 # ------------------------------------------------------------------ đầu vào
 
 
@@ -462,6 +505,12 @@ def build_parser() -> argparse.ArgumentParser:
     g = sub.add_parser("guard", help="chạy guard trên sự kiện hook (đọc stdin)")
     g.add_argument("kind", choices=sorted(GUARD_MATCHERS))
     g.set_defaults(func=cmd_guard)
+
+    pl = sub.add_parser("plan", help="chạy chuỗi pha BMAD tới cổng chưa duyệt")
+    pl.add_argument("--client", default="claude", help="claude | opencode")
+    pl.add_argument("--auto-approve", default="", help="'all' hoặc danh sách cổng")
+    pl.add_argument("--force", action="store_true", help="chạy lại cả pha đã có artifact")
+    pl.set_defaults(func=cmd_plan)
 
     aa = sub.add_parser("auto-approve", help="tự duyệt (ghi dấu auto)")
     aa.add_argument("gates", help="'all' hoặc danh sách ngăn bởi dấu phẩy")

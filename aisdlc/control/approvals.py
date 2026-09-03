@@ -29,6 +29,11 @@ from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 
+from .state import STATE_FILE
+
+#: Chỉ mục story đã chuẩn hoá — do bộ tách story sinh ra (GĐ-4.3).
+STORIES_INDEX = "stories.index.json"
+
 
 class Gate(str, Enum):
     """Các cổng cần người duyệt, theo đúng thứ tự vòng đời."""
@@ -55,16 +60,24 @@ GATE_ORDER: tuple[Gate, ...] = (
     Gate.PRE_DEPLOY,
 )
 
-#: Artifact chính của mỗi cổng, tương đối so với gốc artifact.
-GATE_ARTIFACTS: dict[Gate, str] = {
-    Gate.PRD: "prd.md",
-    Gate.ARCHITECTURE: "architecture.md",
-    Gate.UX_SPEC: "ux-spec.md",
-    Gate.EPICS: "epics.md",
-    Gate.STORIES: "stories.index.yaml",
-    Gate.MOCKUPS: "design-contract.json",
-    Gate.READINESS: "sprint-status.yaml",
-    Gate.PRE_DEPLOY: "sprint-status.yaml",
+#: Artifact của mỗi cổng, tương đối so với gốc artifact.
+#:
+#: Tên phải khớp **file có thật trên đĩa**, vì phê duyệt gắn với băm nội
+#: dung: trỏ nhầm tên thì băm luôn rỗng và cổng không bao giờ phát hiện
+#: được thay đổi — một cổng vô hại nhìn từ ngoài, nhưng không bảo vệ gì.
+#:
+#: Cổng UX có hai file vì BMAD sinh hai tài liệu tách vai (`DESIGN.md` là
+#: hệ thống thị giác, `EXPERIENCE.md` là luồng và màn hình). Duyệt một file
+#: rồi sửa file kia sẽ lọt.
+GATE_ARTIFACTS: dict[Gate, tuple[str, ...]] = {
+    Gate.PRD: ("prd.md",),
+    Gate.ARCHITECTURE: ("architecture.md",),
+    Gate.UX_SPEC: ("DESIGN.md", "EXPERIENCE.md"),
+    Gate.EPICS: ("epics.md",),
+    Gate.STORIES: (STORIES_INDEX,),
+    Gate.MOCKUPS: ("design-contract.json",),
+    Gate.READINESS: (STATE_FILE,),
+    Gate.PRE_DEPLOY: (STATE_FILE,),
 }
 
 
@@ -131,8 +144,21 @@ class ApprovalStore:
     def _path(self, gate: Gate) -> Path:
         return self.dir / f"{gate.value}.json"
 
+    def artifact_paths(self, gate: Gate) -> list[Path]:
+        return [self.root / name for name in GATE_ARTIFACTS[gate]]
+
     def artifact_path(self, gate: Gate) -> Path:
-        return self.root / GATE_ARTIFACTS[gate]
+        """File chính của cổng — dùng để hiển thị."""
+        return self.artifact_paths(gate)[0]
+
+    def has_artifacts(self, gate: Gate) -> bool:
+        """**Mọi** file của cổng đều đã có chưa."""
+        return all(p.is_file() for p in self.artifact_paths(gate))
+
+    def content_hash(self, gate: Gate) -> str:
+        """Băm gộp toàn bộ file của cổng, theo thứ tự khai báo."""
+        parts = [f"{name}:{sha256_of(self.root / name)}" for name in GATE_ARTIFACTS[gate]]
+        return hashlib.sha256("\n".join(parts).encode()).hexdigest()
 
     def load(self, gate: Gate) -> Approval | None:
         p = self._path(gate)
@@ -167,7 +193,7 @@ class ApprovalStore:
         if rec.status != Status.APPROVED.value:
             return Status.PENDING
 
-        if sha256_of(self.artifact_path(gate)) != rec.artifact_sha256:
+        if self.content_hash(gate) != rec.artifact_sha256:
             return Status.STALE  # nội dung đã đổi kể từ lúc duyệt
         if self._upstream_decided_after(gate, rec.seq):
             return Status.STALE  # tầng trên được quyết lại sau đó
@@ -227,8 +253,8 @@ class ApprovalStore:
 
         rec = Approval(
             gate=gate.value,
-            artifact=GATE_ARTIFACTS[gate],
-            artifact_sha256=sha256_of(self.artifact_path(gate)),
+            artifact=", ".join(GATE_ARTIFACTS[gate]),
+            artifact_sha256=self.content_hash(gate),
             status=status.value,
             seq=self._next_seq(),
             decided_by=by or _current_user(),
