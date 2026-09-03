@@ -17,8 +17,9 @@
 | GĐ-1 Control plane | ✅ **xong** — config · state · fsm · worktree · CLI |
 | GĐ-2 Kit + Setup | ✅ **xong** — catalog · detect_stack · lọc 2 tầng · install · constitution |
 | GĐ-3 Đa client | ✅ **xong** — adapter · guard · compile · báo cáo mất mát |
-| GĐ-4 BMAD pipeline | 🔨 **2/5** — normalizer ✅ · cổng máy ✅ · còn bộ chạy pipeline, tách story, nối cổng người |
-| GĐ-5…GĐ-9 | chưa bắt đầu |
+| GĐ-4 BMAD pipeline | ✅ 5/5 — `aisdlc plan` chạy chuỗi BMAD, dừng đúng từng cổng, tách 12 story từ epics thật |
+| GĐ-5 Mockup | 🔨 đang làm |
+| GĐ-6…GĐ-9 | chưa bắt đầu |
 
 **Mốc demo đã đạt**
 
@@ -140,13 +141,15 @@ aisdlc status
 
 | # | Hạng mục | File | Xong khi |
 |---|---|---|---|
-| 4.1 | Bộ chạy skill BMAD | `phases/plan.py` | Chạy tuần tự `project-context → prd → architecture → ux → epics-and-stories → sprint-planning` |
-| 4.2 | Normalizer | `control/normalize.py` | Markdown BMAD → `stories.index.json`; **đây là ranh giới giữ BMAD là dependency** |
-| 4.3 | Tách story | `phases/story_split.py` | Mỗi story một file `stories/EPIC-xx/STORY-xx-yy.md` |
-| 4.4 | Cổng máy | `control/machine_gate.py` | schema · không chu trình · **mọi FR được ≥1 story phủ** · story không vượt ngưỡng |
-| 4.5 | Nối cổng người | `phases/plan.py` | Dừng ở mỗi cổng; `--auto-approve` hoạt động |
+| 4.1 | Bộ chạy skill BMAD | `phases/plan.py` | ✅ Chạy tuần tự `project-context → prd → architecture → ux → epics-and-stories`. **Bỏ `sprint-planning`**: xếp lịch story là việc có đáp án đúng, tính bằng `control/scheduler` |
+| 4.2 | Normalizer | `control/normalize.py` | ✅ Markdown BMAD → mô hình framework (PRD + epic/story); **ranh giới giữ BMAD là dependency** |
+| 4.3 | Tách story | `phases/story_split.py` | ✅ Mỗi story một file `stories/EPIC-xx/STORY-xx-yy.md` + `stories.index.json` kèm sóng song song |
+| 4.4 | Cổng máy | `control/machine_gate.py` | ✅ schema · không chu trình · **mọi FR được ≥1 story phủ** · story không vượt ngưỡng |
+| 4.5 | Nối cổng người | `phases/plan.py` | ✅ Dừng ở mỗi cổng; `--auto-approve` hoạt động; tự duyệt vẫn ghi lại câu hỏi mở BMAD nêu |
 
 **Mốc demo 4:** `aisdlc plan` từ `docs/requirements.md` thật → đủ 5 artifact + `stories.index.json`, dừng đúng ở từng cổng.
+
+*Đã đạt phần chạy khô:* epics thật → 12 story / 4 epic, cổng máy ĐẠT, sóng song song tính đúng (story cùng epic ghi vào thư mục rời nhau mới được cùng đợt). Còn lại là chạy toàn chuỗi trên agent thật ở GĐ-9.
 
 ---
 

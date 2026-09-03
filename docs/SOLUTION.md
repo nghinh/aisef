@@ -270,7 +270,7 @@ dự-án/
 ├── .aisdlc/worktrees/            cô lập khi chạy song song
 ├── _bmad/custom/*.toml           override agent BMAD
 ├── _bmad-output/                 MỘT gốc artifact
-│   ├── prd.md  architecture.md  ux-spec.md  epics.md
+│   ├── prd.md  architecture.md  DESIGN.md  EXPERIENCE.md  epics.md
 │   ├── stories/EPIC-01/STORY-01-01.md …
 │   ├── stories.index.json        metadata máy đọc
 │   ├── design-contract.json
@@ -363,7 +363,7 @@ aisdlc status                         tiến độ · chi phí · độ trễ ·
 | Bước | Nội dung | Xong khi |
 |---|---|---|
 | **1 Setup** | dò stack → chọn skill theo catalog → lọc security 2 tầng → cài → compile → doctor | `doctor` trả 0 · đếm đúng số skill · **không skill offensive nào lọt** · chạy lại không nhân bản |
-| **2 BMAD** | `project-context → prd → architecture → ux → epics-and-stories → sprint-planning`, mỗi pha một cổng; tách mỗi story một file + `stories.index.json` | index parse được · không chu trình · **mọi FR được ≥1 story phủ** · không story vượt ngưỡng · 5 cổng `approved` |
+| **2 BMAD** | `project-context → prd → architecture → ux → epics-and-stories`, mỗi pha một cổng; rồi **framework** tách mỗi story một file + `stories.index.json` (không dùng `bmad-sprint-planning`: xếp lịch tính được chắc chắn từ phụ thuộc + `write_scope`, không cần model) | index parse được · không chu trình · **mọi FR được ≥1 story phủ** · không story vượt ngưỡng · 5 cổng `approved` |
 | **3 Mockup** | ux-spec + ui-ux-pro-max → HTML → screenshot → `design-contract.json` | mỗi màn hình có đúng một mockup mở được · contract không mục treo · story frontend map tới `screen_id` thật · cổng `mockups` `approved` |
 | **4 Implement** | phiên mới mỗi story · worktree riêng · **map mockup (mục 12bis)** · RED→GREEN→VERIFY · guard 3 mốc · merge tuần tự cuối đợt | guard **chặn thật** (3 test) · hai story đụng scope không cùng đợt · chạy hết 1 epic ≥5 story · dừng giữa chừng resume đúng chỗ · cổng `readiness` `approved` |
 | **5 Verify** | review sâu · unit · SIT · API contract · E2E · UAT · perf · security · mutation | mỗi loại chạy thật, trả kết quả máy đọc · cổng **chặn thật** khi đẩy story lỗi |
