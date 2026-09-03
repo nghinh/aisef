@@ -8,10 +8,10 @@
 | S1 `claude -p` + stream-json | ✅ **XONG** | Có đủ cost, latency, usage, và cả `permission_denials` |
 | S2 Hook chặn trên Claude CLI | ✅ **XONG** | Chặn thật; agent không lách; `acceptEdits` cũng không vượt được |
 | S7 Đối chiếu mockup | ✅ **XONG** | `ariaSnapshot()` cho đối chiếu tất định |
-| S3 Hook trên Claude Desktop | ⏳ chưa | |
-| S4 OpenCode CLI + Desktop | ⏳ chưa | |
-| S5 Worktree + sandbox Docker | ⏳ chưa | |
-| S6 BMAD qua CLI | ⏳ chưa | |
+| S3 Hook trên Claude Desktop | ✅ **XONG** | Desktop đọc `.claude/settings.json` của dự án, **ngay, không cần restart** |
+| S4 OpenCode CLI + Desktop | ⚠️ **CHƯA KẾT LUẬN** | Cơ chế `tool.execute.before` có thật; provider quá chậm để chạy xong ca thử |
+| S5 Worktree + sandbox Docker | ✅ **XONG** | Cô lập đủ ba mặt: git, file, mạng |
+| S6 BMAD qua CLI | ✅ **XONG** | Chạy được; BMAD có sẵn **headless mode** trả JSON có schema |
 
 ---
 
@@ -122,13 +122,122 @@ result    → permission_denials: [{tool_name, tool_use_id, tool_input}]
 
 ---
 
-## Còn lại
+## S3 — Claude Desktop có đọc settings của dự án không
 
-| Spike | Vì sao vẫn cần |
+**Câu hỏi.** Hook chạy được trong Desktop, nhưng đó là hook user-level. Desktop có đọc `.claude/settings.json` của **dự án** không?
+
+**Cách thử.** Tạo `.claude/settings.json` trong repo với một `PreToolUse` chỉ ghi log (luôn exit 0, không chặn gì), rồi gọi một tool Bash ngay trong phiên Desktop đang chạy.
+
+**Kết quả.**
+```
+00:04:10 | project-level hook đã chạy
+```
+
+**Ảnh hưởng thiết kế.**
+
+1. Desktop đọc settings cấp dự án, và **nạp ngay** — không cần khởi động lại phiên. Nghĩa là `aisdlc compile` ghi `.claude/settings.json` xong là guard có hiệu lực liền.
+2. Ba trong bốn bề mặt (Claude Desktop, Claude CLI, và CLI headless) đều gắn được guard **tiền kiểm**. Phương án dự phòng hậu kiểm chỉ còn cần cho OpenCode nếu S4 xấu.
+3. Hook user-level hiện có 12 loại (`PreToolUse`, `PostToolUse`, `SubagentStart/Stop`, `Stop`, `PermissionRequest`, `PostCompact`…) — đủ cho cả ba mốc vòng đời ta cần.
+
+---
+
+## S4 — OpenCode
+
+**Câu hỏi.** `opencode run` trả kết quả kiểu gì? Plugin chặn được tool không? Desktop dùng chung cấu hình?
+
+**Đã xác định.**
+
+* OpenCode có hook `tool.execute.before` — tương đương `PreToolUse`. Plugin viết TypeScript, `import type { Plugin } from "@opencode-ai/plugin"`.
+* Plugin nhận `(input, output)` và **sửa được `output.args`** trước khi tool chạy (ví dụ `rtk.ts` có sẵn trên máy viết lại câu lệnh bash).
+* Máy đã cấu hình 9 provider (Anthropic oauth, OpenAI, Google, 9router…), mặc định `9router/mycombo`.
+* `opencode stats` cho token và chi phí; `opencode export <sessionID>` xuất phiên ra JSON.
+
+**Chưa kết luận được.** Hai lần chạy `opencode run` với ca thử "ghi file ngoài scope" đều không xong trong 60–120 giây (provider `9router/*` phản hồi chậm). Vì thế **chưa chứng minh** được hai điều:
+
+* ném lỗi trong `tool.execute.before` có **chặn** tool hay chỉ ghi log;
+* plugin đặt ở `.opencode/plugin/` cấp dự án có được nạp không.
+
+**Không ghi ✅ khi chưa chứng minh** (bất biến 10). Cách thử tiếp: chạy lại với provider Anthropic oauth trực tiếp thay vì gateway, hoặc dùng `opencode serve` rồi gọi API để tách phần chờ model khỏi phép thử.
+
+**Ảnh hưởng thiết kế.** Chưa có. Nếu hoá ra plugin không chặn được, OpenCode xuống mức **hậu kiểm** và điều đó phải ghi vào compile report, không im lặng.
+
+---
+
+## S5 — Cô lập khi chạy song song
+
+**Câu hỏi.** Worktree có đủ cô lập cho story chạy song song không? Docker chặn được mạng và ghi ngoài phạm vi không?
+
+**Kết quả.**
+
+| Phép thử | Kết quả |
 |---|---|
-| S3 Claude Desktop | Chưa biết Desktop có nạp `.claude/settings.json` của dự án không. Nếu không → khai báo hậu kiểm cho bề mặt đó |
-| S4 OpenCode | Chưa biết `opencode run` trả kết quả kiểu gì, `plugin` gắn guard ra sao, Desktop có dùng chung cấu hình không |
-| S5 Worktree + Docker | Chưa chạy thử hai story song song ở hai worktree rồi merge tuần tự |
-| S6 BMAD qua CLI | Chưa biết cần cài `_bmad/` thế nào để `claude -p` gọi được skill `bmad-prd` |
+| 2 worktree, `write_scope` rời nhau → merge tuần tự | sạch, cả hai thay đổi vào nhánh chính |
+| 2 worktree cùng sửa một file → merge | **conflict**, abort, cây về trạng thái sạch |
+| `--network=none` + `wget example.com` | `bad address` — chặn cả phân giải tên miền |
+| mount chỉ worktree, `cat` đường dẫn ngoài | `No such file or directory` |
+| `--cap-drop=ALL --user 1000:1000` | ghi workspace OK, `touch /etc/nope` bị từ chối |
+| bind mount | file ghi trong container hiện đúng ở host |
 
-**Cổng GĐ-0 hiện tại:** S2 xanh nên mô hình guard tiền kiểm không sụp. Phương án dự phòng hậu kiểm chỉ còn cần cho bề mặt nào S3/S4 cho kết quả xấu.
+**Ảnh hưởng thiết kế.**
+
+1. Quyết định Đ5 đứng vững — worktree cô lập đủ cả ba mặt git, file, mạng.
+2. Conflict **abort được sạch**, nên xử lý "dừng và báo" khả thi: cây không kẹt ở trạng thái nửa merge.
+3. Chạy công cụ verify **trong image** giải quyết luôn việc máy chưa có `pytest`/`semgrep`/`trivy`/`k6`.
+
+**Đã thành code.** `control/worktree.py` + `harness/sandbox.py`, 35 test.
+
+**Một bug do test bắt được:** thư mục worktree nằm trong kho làm `git status` bẩn (`?? .aisdlc/`), phá luôn phép kiểm "cây sạch sau abort". Sửa bằng cách tự đặt `.gitignore` chứa `*` ngay trong thư mục worktree — module tự lo, không bắt người dùng nhớ.
+
+---
+
+## S6 — BMAD qua CLI
+
+**Câu hỏi.** Gọi được skill `bmad-prd` từ `claude -p` không? Cần cài `_bmad/` thế nào?
+
+**Cách thử.** Copy `bmad-prd` vào `.claude/skills/`, viết một `docs/requirements.md` nhỏ (ứng dụng ghi chú), rồi:
+
+```
+claude -p 'headless: true
+Use the bmad-prd skill. intent: "create". Read docs/requirements.md as the brief.
+doc_workspace: _bmad-output ...'
+```
+
+**Kết quả.** Sinh `_bmad-output/prd.md` **33KB**, 13 mục, **64 tham chiếu FR có mã** (`FR-1`…`FR-17`), kèm `.memlog.md`.
+
+**Phát hiện quan trọng nhất của cả GĐ-0: BMAD đã có sẵn headless mode.**
+
+`references/headless.md` của skill quy định: *"Do not ask… Do not greet"*, và kết thúc bằng JSON theo schema trong `assets/headless-schemas.md`:
+
+```json
+{"status": "complete|partial|blocked", "intent": "create",
+ "prd": "...", "assumptions": [], "open_questions": []}
+```
+
+PRD sinh ra có sẵn mục **Câu hỏi mở** với cấu trúc dùng được ngay:
+
+> **OQ-1 (chặn FR-13..FR-15)** — Đồng bộ nhiều thiết bị định danh người dùng bằng cách nào khi tài khoản không bắt buộc? … Chủ: PM. Cần chốt trước khi bước sang kiến trúc.
+
+**Ảnh hưởng thiết kế — lớn.**
+
+1. **Không phải hack gì cả.** BMAD thiết kế sẵn cho runner tự động. Normalizer đọc JSON status thay vì mò trong markdown.
+2. **`status` ánh xạ thẳng vào cổng người duyệt:** `complete` → đủ điều kiện tự duyệt; `partial` + `open_questions[]` → **bắt buộc người xem**, và chính `open_questions` là checklist review; `blocked` → dừng, báo.
+3. **`open_questions` có mã và có phạm vi ảnh hưởng** (`chặn FR-13..FR-15`) → map được sang việc chặn story ở GĐ-4, không cần ta tự nghĩ ra cơ chế.
+4. `assumptions[]` đi thẳng vào evidence — đúng nguyên tắc "ghi lại giả định thay vì bịa".
+5. Skill có phụ thuộc `_bmad/scripts/resolve_customization.py` (chạy bằng `uv`) nhưng **có đường lui**: SKILL.md ghi rõ "nếu script lỗi thì tự hợp nhất ba file TOML". Chạy thử không cần cài `uv`.
+
+---
+
+## Tổng kết GĐ-0
+
+**Cổng GĐ-0: ĐẠT.** Mô hình guard tiền kiểm đứng vững trên cả ba bề mặt Claude. Không có kết quả nào buộc phải sửa kiến trúc.
+
+Một hạng mục còn treo (S4/OpenCode) và nó **không chặn** GĐ-1 → GĐ-3, vì adapter được thiết kế theo giao diện chung; OpenCode chỉ là một hiện thực, và mức bảo đảm của nó sẽ được khai báo trung thực khi biết.
+
+**Điều chỉnh cần đưa vào kế hoạch:**
+
+| Từ spike | Điều chỉnh |
+|---|---|
+| S6 | GĐ-4 dùng **BMAD headless JSON** làm giao diện, không parse markdown mò |
+| S6 | `open_questions[]` trở thành checklist tự sinh của cổng người duyệt |
+| S1 | Ước tính chi phí lại: ~$0.36/phiên chỉ riêng nạp ngữ cảnh nền |
+| S4 | Thêm việc "chạy lại S4 với provider trực tiếp" vào đầu GĐ-3 |
