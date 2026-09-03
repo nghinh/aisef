@@ -1,5 +1,10 @@
 """Tool thật của harness — thứ agent gọi thay vì tự gõ lệnh.
 
+Chỉ có ở đây những việc mà **bằng chứng của lần chạy là thứ cổng đọc**:
+test, lint, sast. Chụp màn hình và đối chiếu mockup do harness tự làm sau
+lượt agent (nếu để agent tự chụp thì nó vừa làm vừa chấm chính mình);
+commit thì agent dùng thẳng `git`, và guard `git-stage` canh ở đó.
+
 Mỗi tool ở đây làm ba việc mà "cứ để agent chạy Bash" không làm được:
 
 1. **Lệnh cố định theo dự án**, không do agent nghĩ ra mỗi lượt. `npm test`
@@ -58,15 +63,6 @@ TOOLS: dict[str, Tool] = {
         "Trước khi commit, khi story chạm tới xác thực, phân quyền, truy vấn "
         "dữ liệu, tải file lên, hoặc bất kỳ dữ liệu nào đến từ người dùng.",
         level=sandbox.Level.READ_ONLY,
-    ),
-    "screenshot": Tool(
-        "screenshot",
-        "Sau khi dựng xong giao diện của story, để đối chiếu với mockup.",
-    ),
-    "git_commit": Tool(
-        "git_commit",
-        "Khi test đã xanh và lint đã sạch. Commit từng phần việc hoàn chỉnh, "
-        "không gộp cả story vào một commit.",
     ),
 }
 
@@ -215,9 +211,6 @@ def describe_tools(project: Path | str, config: Config | None = None) -> str:
     project = Path(project)
     lines = []
     for tool in TOOLS.values():
-        if tool.name in ("screenshot", "git_commit"):
-            cmd = "(harness lo)"
-        else:
-            cmd = command_for(tool.name, project, config) or "(dự án chưa khai)"
+        cmd = command_for(tool.name, project, config) or "(dự án chưa khai)"
         lines.append(f"- `aisdlc tool {tool.name}` → `{cmd}`\n  Khi nào: {tool.when}")
     return "\n".join(lines)

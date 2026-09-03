@@ -710,7 +710,7 @@ def build_parser() -> argparse.ArgumentParser:
     v.set_defaults(func=cmd_verify)
 
     t = sub.add_parser("tool", help="chạy tool của harness và ghi bằng chứng")
-    t.add_argument("name", help="test | lint | sast | screenshot | git_commit")
+    t.add_argument("name", help="test | lint | sast")
     t.add_argument("--story", default="", help="mã story để ghi bằng chứng")
     t.add_argument("--lines", type=int, default=40, help="số dòng output hiển thị")
     t.set_defaults(func=cmd_tool)

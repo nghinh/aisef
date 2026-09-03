@@ -1,6 +1,6 @@
 ---
 name: story-implement
-version: 1
+version: 2
 role: developer
 ---
 # {{ story_id }} — {{ story_title }}
@@ -47,11 +47,16 @@ kể**. Một lần chạy test không được ghi lại thì coi như chưa ch
 2. **XANH** — viết lượng code nhỏ nhất làm test xanh.
 3. **DỌN** — bỏ trùng lặp, đặt lại tên cho đúng, chạy `test` lại.
 4. **KIỂM** — `lint`, và `sast` nếu story chạm tới dữ liệu người dùng,
-   xác thực hay phân quyền. Có giao diện thì `screenshot` để đối chiếu.
-5. **CHỐT** — `git_commit` từng phần việc hoàn chỉnh.
+   xác thực hay phân quyền.
+5. **CHỐT** — `git commit` từng phần việc hoàn chỉnh. Không `git add -A`:
+   commit đúng file mình sửa.
 
 Guard `completion` chặn kết thúc khi test chưa xanh, hoặc khi có file sửa
 **sau** lần chạy test gần nhất. Sửa xong thì chạy lại test.
+
+Giao diện thì **harness tự** mở route thật và đối chiếu với mockup sau khi
+bạn xong — bạn không tự chụp, không tự chấm. Việc của bạn là dựng đủ
+component đã cam kết.
 
 ## Không làm
 

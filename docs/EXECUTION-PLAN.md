@@ -19,8 +19,9 @@
 | GĐ-3 Đa client | ✅ **xong** — adapter · guard · compile · báo cáo mất mát |
 | GĐ-4 BMAD pipeline | ✅ 5/5 — `aisdlc plan` chạy chuỗi BMAD, dừng đúng từng cổng, tách 12 story từ epics thật |
 | GĐ-5 Mockup | ✅ 6/6 — dựng bằng chromium thật, hợp đồng trích từ trang đã render |
-| GĐ-6 Harness + implement | 🔨 đang làm |
-| GĐ-7…GĐ-9 | chưa bắt đầu |
+| GĐ-6 Harness + implement | ✅ 10/10 — `aisdlc run` chạy đợt trên worktree thật, cổng story 5 điều kiện |
+| GĐ-7 Kiểm định | 🔨 đang làm |
+| GĐ-8…GĐ-9 | chưa bắt đầu |
 
 **Mốc demo đã đạt**
 
@@ -179,23 +180,25 @@ Nặng nhất. Tách hai tuần.
 
 | # | Hạng mục | File | Xong khi |
 |---|---|---|---|
-| 6.1 | PromptCatalog | `kit/prompts/`, `harness/prompts.py` | Prompt có version, có test; dựng prompt story từ story + AR-x + design-contract |
-| 6.2 | Tool thật | `harness/tools.py` | `run_test` `run_lint` `run_sast` `git_commit` `screenshot`; mỗi tool có test + **prose "khi nào gọi"** |
-| 6.3 | Sandbox | `harness/sandbox.py` | Docker `--network=none` `--cap-drop=ALL` non-root; **test: tiến trình không ra được mạng** |
-| 6.4 | 7 guard | `harness/guardrails.py` | Mỗi guard một lệnh, trả exit code; **test: từng guard chặn thật** |
-| 6.5 | Quan sát | `harness/observe.py` | Sự kiện có cấu trúc + **cost + latency** vào `evidence/{story}.json` |
-| 6.6 | Định tuyến + subagent | `harness/routing.py`, `subagent.py` | **reviewer ≠ developer** được test |
+| 6.1 | PromptCatalog | `kit/prompts/`, `harness/prompts.py` | ✅ Prompt có version, biến rỗng là lỗi; AR-x chọn bằng mục `Binds:` chứ không phán đoán |
+| 6.2 | Tool thật | `harness/tools.py` | ✅ test · lint · sast, mỗi tool có test + prose "khi nào gọi". Chụp màn hình do harness làm (agent tự chụp là tự chấm mình); commit dùng thẳng `git` + guard `git-stage` |
+| 6.3 | Sandbox | `harness/sandbox.py` | ✅ Docker `--network=none` `--cap-drop=ALL` non-root; test chạy trên docker thật: không ra được mạng, không đọc được ngoài mount |
+| 6.4 | 7 guard | `harness/guardrails.py` | ✅ Đủ 7; mỗi guard một lệnh, exit 2 là chặn; từng guard có test chặn thật |
+| 6.5 | Quan sát | `harness/observe.py` | ✅ `evidence/{story}.jsonl`, `seq` do file cấp (an toàn khi chạy song song), cost + latency lấy từ luồng client |
+| 6.6 | Định tuyến vai | `harness/routing.py` | ✅ `build_spec` **từ chối** `session_id` cho vai rà soát; reviewer READ_ONLY, cấm Write/Edit (gộp `subagent.py` vào đây — không cần hai file cho một việc) |
 
 ### Tuần 7 — vòng lặp story
 
 | # | Hạng mục | File | Xong khi |
 |---|---|---|---|
-| 6.7 | Vòng đời story | `phases/implement.py` | RED→GREEN→VERIFY chạy hết một story backend |
-| 6.7a | **Map mockup — nửa nạp** | `harness/mockup_map.py` | Story có `screen_id` được nạp đúng một lát cắt contract + HTML + ảnh; test: không nạp thừa màn hình khác |
-| 6.7b | **Map mockup — nửa đối chiếu** | `harness/mockup_verify.py` | Dựng app, mở route thật, trích DOM, đối chiếu component; sinh `mockup_map` trong evidence |
-| 6.7c | Cổng khớp mockup | `control/gate.py` | **Test: thiếu một component contract đã hứa → gate FAIL**; `extra` chỉ cảnh báo |
-| 6.8 | Thất bại + retry | `control/retry.py` | `max_retries`; blocked lan theo đồ thị; **phân biệt lỗi hạ tầng ≠ lỗi chất lượng** |
-| 6.9 | `aisdlc run` | `cli.py` | Vòng lặp `next→implement→verify→complete`; `--max-parallel`; `--sequential` |
+| 6.7 | Vòng đời story | `phases/implement.py` | ✅ Một phiên một story; harness tự chạy lại test/lint sau lượt agent |
+| 6.7a | **Map mockup — nửa nạp** | `harness/mockup_map.py` | ✅ Đúng một lát cắt; test kiểm không rò màn hình khác |
+| 6.7b | **Map mockup — nửa đối chiếu** | `harness/mockup_verify.py` | ✅ Chạy dev server, mở route thật bằng chromium, đối chiếu, ghi `mockup_map` |
+| 6.7c | Cổng khớp mockup | `control/gate.py` | ✅ Thiếu component đã hứa → trượt; thừa chỉ cảnh báo; **vùng `data-sample` chỉ cam kết có mục, không cam kết nội dung** |
+| 6.8 | Thất bại + retry | `phases/implement.py` | ✅ Lỗi hạ tầng có hạn mức riêng, không tính vào `max_retries`; lượt sau nhận đúng danh sách mục trượt |
+| 6.9 | `aisdlc run` | `phases/run.py`, `cli.py` | ✅ Epic tuần tự, đợt song song, worktree riêng, merge cuối đợt, resume; `--sequential`, `--epic`, `--no-isolate`. Thêm `aisdlc verify` (hậu kiểm) và `aisdlc tool` |
+
+*Đã đạt phần chạy khô:* điều phối chạy trên kho git + worktree thật với agent giả — story song song đúng đợt, merge tuần tự, dừng đúng chỗ khi trượt, chạy lại tiếp từ chỗ dở. Còn lại là chạy trên agent thật ở GĐ-9.
 
 **Mốc demo 6:** `aisdlc run --epic EPIC-01` chạy hết một epic ≥5 story (trong đó **≥1 story có giao diện**) trên `references/teamflow`; có story chạy song song; story UI sinh được `mockup_map` với `missing: []`; dừng giữa chừng resume đúng chỗ.
 
