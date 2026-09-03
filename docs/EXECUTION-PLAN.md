@@ -19,9 +19,10 @@
 | GĐ-3 Đa client | ✅ **xong** — adapter · guard · compile · báo cáo mất mát |
 | GĐ-4 BMAD pipeline | ✅ 5/5 — `aisdlc plan` chạy chuỗi BMAD, dừng đúng từng cổng, tách 12 story từ epics thật |
 | GĐ-5 Mockup | ✅ 6/6 — dựng bằng chromium thật, hợp đồng trích từ trang đã render |
-| GĐ-6 Harness + implement | ✅ 10/10 — `aisdlc run` chạy đợt trên worktree thật, cổng story 5 điều kiện |
-| GĐ-7 Kiểm định | 🔨 đang làm |
-| GĐ-8…GĐ-9 | chưa bắt đầu |
+| GĐ-6 Harness + implement | ✅ 10/10 — `aisdlc run` chạy đợt trên worktree thật, cổng story 6 điều kiện |
+| GĐ-7 Kiểm định | ✅ — `aisdlc qa` 10 loại; "chưa cấu hình" ≠ "đạt" |
+| GĐ-8 DevSecOps | ✅ — `aisdlc devsecops` + `pre-deploy` |
+| GĐ-9 Đầu-cuối | 🔨 đang làm |
 
 **Mốc demo đã đạt**
 
@@ -208,16 +209,20 @@ Nặng nhất. Tách hai tuần.
 
 | # | Hạng mục | Chạy thật bằng | Xong khi |
 |---|---|---|---|
-| 7.1 | Deep review | agent ngữ cảnh sạch, khác người viết | Trả verdict máy đọc được |
-| 7.2 | Unit/functional | pytest · jest · vitest trong container | Có coverage |
-| 7.3 | SIT | docker-compose dựng phụ thuộc | Chạy được |
-| 7.4 | API contract | schemathesis trên OpenAPI | Chạy được |
-| 7.5 | E2E | Playwright, **đối chiếu màn hình vs mockup** | Chạy được |
-| 7.6 | UAT | kịch bản sinh từ AC | Chạy được |
-| 7.7 | Performance | k6 + Lighthouse, ngưỡng từ NFR | Chạy được |
-| 7.8 | Security | Semgrep + Trivy + secret scan | Chạy được |
-| 7.9 | Mutation | mutmut | Bắt được test giả |
-| 7.10 | Cổng story | `control/gate.py` | **Test: đẩy story lỗi → gate FAIL thật** |
+| 7.1 | Deep review | ✅ `phases/implement.py` — phiên mới, cấm sửa code, trả mục `[chặn]` máy đọc được |
+| 7.2 | Unit/functional | ✅ `verify.unit` (mặc định lấy lệnh test của dự án) |
+| 7.3 | SIT | ✅ `verify.sit`, sandbox có mạng |
+| 7.4 | API contract | ✅ `verify.api-contract` |
+| 7.5 | E2E | ✅ `verify.e2e`; đối chiếu màn hình vs mockup nằm ở cổng story (6.7b) |
+| 7.6 | UAT | ✅ `verify.uat` |
+| 7.7 | Performance | ✅ `verify.perf` |
+| 7.8 | Security | ✅ `verify.security` + `sbom` + `image-scan` |
+| 7.9 | Mutation | ✅ `verify.mutation`, **cộng** phép kiểm rẻ luôn chạy được: test không có khẳng định nào |
+| 7.10 | Cổng story | ✅ `control/gate.py` — 6 điều kiện; test đẩy story có test giả → chặn thật |
+
+**Nguyên tắc của cả GĐ-7:** ba kết quả chứ không phải hai — đạt · không đạt
+· **chưa cấu hình**. Chưa cấu hình chỉ cảnh báo ở mức story, nhưng chặn ở
+cổng trước triển khai, trừ khi được miễn tường minh.
 
 **Mốc demo 7:** cố tình đẩy một story có secret hardcode và test giả → gate chặn, nêu đúng lý do.
 
@@ -227,13 +232,15 @@ Nặng nhất. Tách hai tuần.
 
 | # | Hạng mục | Xong khi |
 |---|---|---|
-| 8.1 | Container | `docker build` chạy, image khởi động được |
-| 8.2 | CI/CD | Workflow gắn đúng cổng GĐ-7; **CI chặn khi có story fail** |
-| 8.3 | SBOM + quét image | CycloneDX hợp lệ, không lỗ hổng high chưa xử lý |
-| 8.4 | IaC | k8s manifest / Terraform sinh ra |
-| 8.5 | Observability | metric + log có cấu trúc + alert rule |
-| 8.6 | Runbook | Đủ 4 mục: triệu chứng → chẩn đoán → xử lý → leo thang |
-| 8.7 | Cổng pre-deploy | Mọi story PASS + smoke test xanh |
+| 8.1 | Container | ✅ model viết Dockerfile + compose, khung prompt cấm root/`latest`/bí mật |
+| 8.2 | CI/CD | ✅ `write_ci_workflow` sinh bằng code, chạy đúng bộ lệnh người chạy |
+| 8.3 | SBOM + quét image | ✅ hai loại kiểm định `sbom`, `image-scan` |
+| 8.4 | IaC | ✅ nằm trong prompt devsecops (`deploy/`), kiểm bằng cổng |
+| 8.5 | Observability | ✅ prompt yêu cầu log có cấu trúc + cảnh báo theo **triệu chứng người dùng** |
+| 8.6 | Runbook | ✅ kiểm đủ 4 mục bằng code |
+| 8.7 | Cổng pre-deploy | ✅ `aisdlc pre-deploy` + `pre-deploy-report.json` để người ký |
+
+**Mốc demo 8:** `aisdlc pre-deploy` trên dự án chưa xong → nêu đúng thứ còn thiếu; đủ điều kiện → mời ký.
 
 ---
 
