@@ -202,7 +202,15 @@ Use the bmad-prd skill. intent: "create". Read docs/requirements.md as the brief
 doc_workspace: _bmad-output ...'
 ```
 
-**Kết quả.** Sinh `_bmad-output/prd.md` **33KB**, 13 mục, **64 tham chiếu FR có mã** (`FR-1`…`FR-17`), kèm `.memlog.md`.
+**Kết quả.** Chạy xong sau 507 giây, 22 lượt, **$1.88**. Sinh 5 artifact:
+
+```
+prd.md 33KB · addendum.md · reconcile-requirements.md · review-self.md · .memlog.md
+tokens: out 33.001 · cache_create 63.619 · cache_read 831.900
+JSON status: {"status": "partial", "intent": "create", ...}
+```
+
+PRD có 13 mục, **64 tham chiếu FR có mã** (`FR-1`…`FR-17`), 7 NFR, 8 câu hỏi mở.
 
 **Phát hiện quan trọng nhất của cả GĐ-0: BMAD đã có sẵn headless mode.**
 
@@ -224,6 +232,9 @@ PRD sinh ra có sẵn mục **Câu hỏi mở** với cấu trúc dùng được
 3. **`open_questions` có mã và có phạm vi ảnh hưởng** (`chặn FR-13..FR-15`) → map được sang việc chặn story ở GĐ-4, không cần ta tự nghĩ ra cơ chế.
 4. `assumptions[]` đi thẳng vào evidence — đúng nguyên tắc "ghi lại giả định thay vì bịa".
 5. Skill có phụ thuộc `_bmad/scripts/resolve_customization.py` (chạy bằng `uv`) nhưng **có đường lui**: SKILL.md ghi rõ "nếu script lỗi thì tự hợp nhất ba file TOML". Chạy thử không cần cài `uv`.
+6. **BMAD tự phát hiện mâu thuẫn trong brief và không tự quyết.** Brief nói "đồng bộ khi có mạng" (cần định danh) lẫn "không bắt buộc tài khoản" (không có định danh). BMAD giữ FR-13..FR-15 nhưng đẩy ra ngoài MVP sau OQ-1, kèm câu "your call to reverse" — thay vì âm thầm cắt một yêu cầu đã nêu, hoặc âm thầm bịa ra mô hình tài khoản. Đúng bất biến 4.
+7. **BMAD tự khai báo thiếu sót của chính nó.** Vì subagent bị tắt, nó ghi ngay đầu `review-self.md`: *"the reviewer pass is self-review, not an independent gate"*. Đúng bất biến 10 — và xác nhận rằng **reviewer ≠ developer phải do framework bảo đảm bằng phiên riêng**, không trông vào skill tự lo.
+8. **Chi phí thấp hơn lo ngại ở S1.** `cache_read` 831.900 token so với `cache_create` 63.619 — prompt caching hoạt động tốt trong một phiên dài. Một PRD hoàn chỉnh hết $1.88. Ước tính $82 ở S1 là cho trường hợp xấu nhất (mỗi phiên nạp lại từ đầu); thực tế nằm giữa, vẫn phải đo trên epic mẫu.
 
 ---
 
