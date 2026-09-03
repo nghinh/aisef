@@ -203,3 +203,250 @@ def parse_prd(text: str) -> PRD:
 
 def parse_prd_file(path: Path | str) -> PRD:
     return parse_prd(Path(path).read_text(encoding="utf-8", errors="replace"))
+
+
+# ----------------------------------------------------------------- epics.md
+
+#: `## Epic 1: Nền tảng ghi chú`
+_EPIC_HEADING = re.compile(r"^##\s+Epic\s+(\d+)\s*[:：]\s*(.+?)\s*$", re.MULTILINE)
+#: `### Story 1.2: Sửa ghi chú` — khuôn cố định trong template BMAD.
+_STORY_HEADING = re.compile(
+    r"^###\s+Story\s+(\d+)\.(\d+)\s*[:：]\s*(.+?)\s*$", re.MULTILINE
+)
+#: Khối tiêu chí chấp nhận kết thúc ở tiêu đề mới hoặc một **nhãn in đậm**
+#: khác — nhưng *không* ở `**When**`/`**Then**`/`**And**`, vốn là thân của
+#: chính tiêu chí. Cắt nhầm ở đó thì mỗi story chỉ còn một tiêu chí cụt.
+_AC_BLOCK = re.compile(
+    r"\*\*Acceptance Criteria\s*[:：]?\*\*\s*\n(.*?)"
+    r"(?=\n#{2,4}\s|\n\s*\*\*(?!Given|When|Then|And)[^\n*]+\*\*\s*[:：]?\s*\n|\Z)",
+    re.DOTALL,
+)
+_GIVEN = re.compile(r"^\s*\*\*Given\*\*", re.IGNORECASE)
+#: `- write_scope: src/notes/, src/db/schema.ts` — kể cả khi in đậm nhãn.
+_META_ITEM = re.compile(
+    r"^[-*]?\s*\*{0,2}(covers|write[_ ]scope|depends[_ ]on)\*{0,2}\s*[:：]\s*(.+?)\s*$",
+    re.MULTILINE | re.IGNORECASE,
+)
+_STORY_REF = re.compile(r"\b(\d+)\.(\d+)\b")
+_ROLE_LINE = re.compile(
+    r"^\s*(?:As an?|Tôi là)\s+(.+?),?\s*$\n"
+    r"^\s*(?:I want|Tôi muốn)\s+(.+?),?\s*$\n"
+    r"^\s*(?:So that|Để)\s+(.+?)\.?\s*$",
+    re.MULTILINE | re.IGNORECASE,
+)
+
+
+def epic_id(n: int | str) -> str:
+    return f"EPIC-{int(n):02d}"
+
+
+def story_id(epic: int | str, seq: int | str) -> str:
+    return f"STORY-{int(epic):02d}-{int(seq):02d}"
+
+
+@dataclass
+class Story:
+    """Một story đã chuẩn hoá — đơn vị công việc của một phiên agent."""
+
+    id: str
+    epic_id: str
+    title: str
+    as_a: str = ""
+    i_want: str = ""
+    so_that: str = ""
+    acceptance_criteria: list[str] = field(default_factory=list)
+    #: Mã FR story này phủ. Cổng máy đối chiếu ngược với PRD.
+    covers: list[str] = field(default_factory=list)
+    #: Đường dẫn story được phép ghi. Guard chặn theo đúng danh sách này,
+    #: và xung đột merge cuối đợt là bằng chứng nó khai sai.
+    write_scope: list[str] = field(default_factory=list)
+    depends_on: list[str] = field(default_factory=list)
+    body: str = ""
+
+    @property
+    def epic_seq(self) -> tuple[int, int]:
+        parts = self.id.split("-")
+        return int(parts[1]), int(parts[2])
+
+    def as_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "epic_id": self.epic_id,
+            "title": self.title,
+            "as_a": self.as_a,
+            "i_want": self.i_want,
+            "so_that": self.so_that,
+            "acceptance_criteria": self.acceptance_criteria,
+            "covers": self.covers,
+            "write_scope": self.write_scope,
+            "depends_on": self.depends_on,
+        }
+
+
+@dataclass
+class Epic:
+    id: str
+    title: str
+    goal: str = ""
+    stories: list[Story] = field(default_factory=list)
+
+
+@dataclass
+class EpicPlan:
+    epics: list[Epic] = field(default_factory=list)
+    #: FR → story, đọc từ mục "FR Coverage Map" nếu BMAD có sinh.
+    coverage_map: dict[str, list[str]] = field(default_factory=dict)
+
+    def stories(self) -> list[Story]:
+        return [s for e in self.epics for s in e.stories]
+
+    def by_id(self, sid: str) -> Story | None:
+        return next((s for s in self.stories() if s.id == sid), None)
+
+
+def _split_ac(block: str) -> list[str]:
+    """Tách khối tiêu chí chấp nhận thành từng tiêu chí.
+
+    Hai khuôn gặp trong thực tế: Given/When/Then nhiều dòng, và gạch đầu
+    dòng. Given mở một tiêu chí mới; ngoài ra mỗi bullet là một tiêu chí.
+    """
+    items: list[str] = []
+    current: list[str] = []
+
+    for raw in block.splitlines():
+        line = raw.strip()
+        if not line or _META_ITEM.match(line):
+            continue  # dòng siêu dữ liệu không phải tiêu chí
+        if _GIVEN.match(line):
+            if current:
+                items.append(" ".join(current))
+            current = [line]
+        elif current:
+            current.append(line)
+        else:
+            m = _BULLET.match(line)
+            items.append(m.group(1) if m else line)
+    if current:
+        items.append(" ".join(current))
+
+    cleaned = [" ".join(i.replace("**", "").split()) for i in items]
+    return [c for c in cleaned if c]
+
+
+def _split_list(text: str) -> list[str]:
+    """`a, b · c` → ['a', 'b', 'c']. Bỏ dấu nháy và in đậm."""
+    parts = re.split(r"[,;·]| và ", text)
+    return [p.strip().strip("`\"'*") for p in parts if p.strip().strip("`\"'*")]
+
+
+def _parse_story_meta(body: str, epic_n: int) -> dict[str, list[str]]:
+    meta: dict[str, list[str]] = {}
+    for m in _META_ITEM.finditer(body):
+        key = m.group(1).lower().replace(" ", "_")
+        values = _split_list(m.group(2))
+        if key == "covers":
+            meta["covers"] = _expand_fr_refs(m.group(2))
+        elif key == "write_scope":
+            meta["write_scope"] = [v for v in values if v.lower() not in ("none", "không")]
+        elif key == "depends_on":
+            meta["depends_on"] = _refs_to_story_ids(m.group(2), epic_n)
+    return meta
+
+
+def _refs_to_story_ids(text: str, default_epic: int) -> list[str]:
+    """`1.1, 2.3` hoặc `STORY-01-01` → mã story chuẩn."""
+    out = []
+    for m in re.finditer(r"STORY-(\d+)-(\d+)", text, re.IGNORECASE):
+        out.append(story_id(m.group(1), m.group(2)))
+    for m in _STORY_REF.finditer(text):
+        sid = story_id(m.group(1), m.group(2))
+        if sid not in out:
+            out.append(sid)
+    return out
+
+
+def _parse_coverage_map(text: str) -> dict[str, list[str]]:
+    """Đọc mục "FR Coverage Map" — bảng hay gạch đầu dòng đều được.
+
+    Mỗi dòng có ít nhất một mã FR và một số hiệu story thì tính là một
+    dòng ánh xạ; không ép khuôn bảng, vì model trình bày mỗi lúc một khác.
+    """
+    m = re.search(r"^#{2,4}\s+FR Coverage Map\s*$", text, re.MULTILINE)
+    if not m:
+        return {}
+    section = text[m.end():]
+    end = re.search(r"^#{2,3}\s+\S", section, re.MULTILINE)
+    if end:
+        section = section[: end.start()]
+
+    mapping: dict[str, list[str]] = {}
+    for line in section.splitlines():
+        frs = _expand_fr_refs(line)
+        if not frs:
+            continue
+        refs = [story_id(a, b) for a, b in _STORY_REF.findall(line)]
+        for fr in frs:
+            mapping.setdefault(fr, [])
+            for r in refs:
+                if r not in mapping[fr]:
+                    mapping[fr].append(r)
+    return mapping
+
+
+def parse_epics(text: str) -> EpicPlan:
+    """`epics.md` của BMAD → epic và story đã chuẩn hoá."""
+    plan = EpicPlan(coverage_map=_parse_coverage_map(text))
+
+    epic_marks = list(_EPIC_HEADING.finditer(text))
+    for i, em in enumerate(epic_marks):
+        epic_n = int(em.group(1))
+        end = epic_marks[i + 1].start() if i + 1 < len(epic_marks) else len(text)
+        section = text[em.end():end]
+        epic = Epic(id=epic_id(epic_n), title=em.group(2).strip())
+
+        story_marks = list(_STORY_HEADING.finditer(section))
+        epic.goal = " ".join(
+            section[: story_marks[0].start() if story_marks else len(section)].split()
+        )[:600]
+
+        for j, sm in enumerate(story_marks):
+            s_end = story_marks[j + 1].start() if j + 1 < len(story_marks) else len(section)
+            body = section[sm.end():s_end]
+            story = Story(
+                id=story_id(epic_n, sm.group(2)),
+                epic_id=epic.id,
+                title=sm.group(3).strip(),
+                body=body.strip(),
+            )
+
+            role = _ROLE_LINE.search(body)
+            if role:
+                story.as_a, story.i_want, story.so_that = (
+                    " ".join(g.split()) for g in role.groups()
+                )
+
+            ac = _AC_BLOCK.search(body)
+            if ac:
+                story.acceptance_criteria = _split_ac(ac.group(1))
+
+            meta = _parse_story_meta(body, epic_n)
+            story.covers = meta.get("covers", [])
+            story.write_scope = meta.get("write_scope", [])
+            story.depends_on = [d for d in meta.get("depends_on", []) if d != story.id]
+
+            epic.stories.append(story)
+        plan.epics.append(epic)
+
+    # Bản đồ phủ là nguồn dự phòng: story không tự khai `covers` thì lấy từ
+    # đó, vì thiếu ánh xạ FR sẽ làm cổng máy chặn cả tập story.
+    for fr, sids in plan.coverage_map.items():
+        for sid in sids:
+            st = plan.by_id(sid)
+            if st and fr not in st.covers:
+                st.covers.append(fr)
+
+    return plan
+
+
+def parse_epics_file(path: Path | str) -> EpicPlan:
+    return parse_epics(Path(path).read_text(encoding="utf-8", errors="replace"))

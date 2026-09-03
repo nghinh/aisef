@@ -96,13 +96,30 @@ PHASES: tuple[Phase, ...] = (
         gate=Gate.EPICS,
         needs=("prd.md", "architecture.md", "EXPERIENCE.md"),
         goal=(
-            "Chia thành epic và story. Mỗi story ghi rõ phạm vi ghi file "
-            "(write_scope), mã FR nó phủ, và tiêu chí chấp nhận."
+            "Chia thành epic và story theo đúng khuôn template "
+            "(`## Epic N: …`, `### Story N.M: …`, Given/When/Then).\n"
+            "Ngay dưới tiêu chí chấp nhận của **mỗi** story, thêm khối:\n"
+            "**Story metadata:**\n"
+            "- covers: FR-x, FR-y   (mã FR trong PRD story này phủ)\n"
+            "- write_scope: đường/dẫn/, đường/dẫn/khác  "
+            "(mọi đường dẫn story được phép ghi, tương đối so với gốc dự án)\n"
+            "- depends_on: N.M hoặc none\n"
+            "Ba dòng này là hợp đồng máy đọc: thiếu thì story bị chặn."
         ),
     ),
 )
 
-PHASE_BY_ID = {p.id: p for p in PHASES}
+#: Bước tách story — do framework tự làm, không gọi model.
+SPLIT_PHASE = Phase(
+    id="stories",
+    skill="(code)",
+    artifacts=GATE_ARTIFACTS[Gate.STORIES],
+    gate=Gate.STORIES,
+    needs=("epics.md",),
+    goal="Tách epics.md thành mỗi story một file + chỉ mục.",
+)
+
+PHASE_BY_ID = {p.id: p for p in (*PHASES, SPLIT_PHASE)}
 
 
 @dataclass
@@ -115,6 +132,8 @@ class PhaseOutcome:
     cost_usd: float = 0.0
     duration_ms: int = 0
     error: str = ""
+    #: Chỉ có ở bước tách story.
+    split: object = None
 
     @property
     def ok(self) -> bool:
@@ -146,6 +165,8 @@ class PhaseOutcome:
             bits.append(self.status.summary())
         if self.error:
             bits.append(f"lỗi: {self.error}")
+        if self.split is not None:
+            bits.append(f"{len(self.split.stories)} story")
         if self.machine_gate and not self.machine_gate.passed:
             bits.append(f"{len(self.machine_gate.errors)} lỗi cổng máy")
         if self.cost_usd:
@@ -269,6 +290,50 @@ def run_phase(
     return out
 
 
+def _pass_gate(
+    approvals: ApprovalStore,
+    gate: Gate,
+    outcome: PhaseOutcome,
+    auto_approve: frozenset[Gate],
+) -> bool:
+    """Cổng này đã thông chưa. False nghĩa là phải dừng chờ người."""
+    if approvals.status(gate) is Status.APPROVED:
+        return True
+    if gate not in auto_approve:
+        return False
+
+    note = "tự duyệt (--auto-approve)"
+    if outcome.needs_human:
+        # Không chặn — người dùng đã chọn tự duyệt. Nhưng ghi lại, vì đây
+        # chính là artifact cần xem lại đầu tiên khi có sự cố.
+        note += (
+            f"; BMAD khai {outcome.status.status} với "
+            f"{len(outcome.status.open_questions)} câu hỏi mở"
+        )
+    approvals.auto_approve(gate, reason=note)
+    rec = approvals.load(gate)
+    rec.machine_checks = outcome.machine_checks()
+    approvals.save(rec)
+    return True
+
+
+def run_split(project: Path, config: Config) -> PhaseOutcome:
+    """Tách `epics.md` thành mỗi story một file. Bước này là **code**, không
+    phải model: chia file và tính sóng chạy song song là việc có đáp án
+    đúng, không phải việc cần phán đoán."""
+    from .story_split import split
+
+    out = PhaseOutcome(phase=SPLIT_PHASE)
+    res = split(project / ARTIFACT_ROOT, config=config)
+    out.ran = True
+    out.split = res
+    if res.error:
+        out.error = res.error
+    else:
+        out.machine_gate = res.gate
+    return out
+
+
 def run_pipeline(
     project: Path | str,
     client: ClientAdapter,
@@ -290,34 +355,20 @@ def run_pipeline(
         if not outcome.ok:
             result.failed_at = phase.id
             return result
-
         if phase.gate is None:
             continue
+        if not _pass_gate(approvals, phase.gate, outcome, auto_approve):
+            result.waiting_on = phase.gate
+            return result
 
-        if approvals.status(phase.gate) is Status.APPROVED:
-            continue
-
-        if phase.gate in auto_approve:
-            note = "tự duyệt (--auto-approve)"
-            if outcome.needs_human:
-                # Không chặn — người dùng đã chọn tự duyệt. Nhưng ghi lại,
-                # vì đây chính xác là artifact cần xem lại khi có sự cố.
-                note += (
-                    f"; BMAD khai {outcome.status.status} với "
-                    f"{len(outcome.status.open_questions)} câu hỏi mở"
-                )
-            approvals.auto_approve(phase.gate, reason=note)
-            approvals.save(_with_checks(approvals, phase.gate, outcome))
-            continue
-
-        result.waiting_on = phase.gate
+    # Tách story chạy mỗi lần: `epics.md` có thể đã được người duyệt sửa,
+    # và file story sinh ra từ nó thì phải theo.
+    outcome = run_split(project, cfg)
+    result.outcomes.append(outcome)
+    if not outcome.ok:
+        result.failed_at = SPLIT_PHASE.id
         return result
+    if not _pass_gate(approvals, Gate.STORIES, outcome, auto_approve):
+        result.waiting_on = Gate.STORIES
 
     return result
-
-
-def _with_checks(store: ApprovalStore, gate: Gate, outcome: PhaseOutcome):
-    """Gắn kết quả kiểm máy vào bản ghi phê duyệt vừa tạo."""
-    rec = store.load(gate)
-    rec.machine_checks = outcome.machine_checks()
-    return rec

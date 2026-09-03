@@ -17,6 +17,7 @@ chưa đạt (cổng chưa duyệt, doctor không đạt) — để CI phân bi�
 from __future__ import annotations
 
 import argparse
+import json
 import shutil
 import subprocess
 import sys
@@ -25,6 +26,7 @@ from pathlib import Path
 from .config import Config, ConfigError
 from .control.approvals import (
     GATE_ORDER,
+    STORIES_INDEX,
     ApprovalStore,
     Gate,
     Status,
@@ -199,6 +201,13 @@ def cmd_review(args) -> int:
         print(f"\nGhi chú lần trước ({rec.status}): {rec.note}")
 
     for artifact in paths:
+        if artifact.name == STORIES_INDEX:
+            from .phases.story_split import describe_index
+
+            data = json.loads(artifact.read_text(encoding="utf-8"))
+            print(f"\n— {len(data.get('stories', []))} story —")
+            print(describe_index(data))
+            continue
         lines = artifact.read_text(encoding="utf-8", errors="replace").splitlines()
         print(f"\n— {artifact.name} ({len(lines)} dòng) —\n")
         print("\n".join(lines[: args.lines]))

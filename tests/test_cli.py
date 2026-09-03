@@ -177,6 +177,27 @@ class TestReview(CliTestCase):
         self.assertIn("cần bổ sung NFR", out)
 
 
+class TestReviewStories(CliTestCase):
+    def test_stories_gate_shows_a_readable_breakdown_not_json(self):
+        """Cổng story để người xem cách chia việc; 350 dòng JSON thì cổng
+        chỉ còn là thủ tục."""
+        import shutil
+
+        from aisdlc.phases.story_split import split
+
+        fix = Path(__file__).resolve().parent / "fixtures" / "bmad"
+        for name in ("epics.md", "prd.md"):
+            shutil.copy(fix / name, self.artifacts / name)
+        split(self.artifacts)
+
+        code, out, _ = self.run_cli("review", "stories")
+        self.assertEqual(code, EXIT_OK)
+        self.assertIn("EPIC-01", out)
+        self.assertIn("đợt 2 (song song)", out)
+        self.assertIn("phủ: FR-1", out)
+        self.assertIn("cổng máy: ĐẠT", out)
+
+
 class TestPlan(CliTestCase):
     """Chỉ kiểm phần kiểm đầu vào — chạy pipeline thật tốn tiền, đã kiểm
     riêng bằng client giả trong `test_plan.py`."""

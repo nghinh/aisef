@@ -26,8 +26,11 @@ from aisdlc.phases.plan import (  # noqa: E402
     run_pipeline,
 )
 
-REAL_PRD = ROOT / "tests" / "fixtures" / "bmad" / "prd.md"
-REAL_ARCH = ROOT / "tests" / "fixtures" / "bmad" / "architecture.md"
+FIX = ROOT / "tests" / "fixtures" / "bmad"
+#: Artifact thật (hoặc đúng khuôn thật) — client giả chép ra để pha sau và
+#: cổng máy làm việc trên dữ liệu có hình dạng thật.
+REAL = {"prd.md": FIX / "prd.md", "architecture.md": FIX / "architecture.md",
+        "epics.md": FIX / "epics.md"}
 
 
 class FakeClient(ClientAdapter):
@@ -82,10 +85,9 @@ class FakeClient(ClientAdapter):
 
     @staticmethod
     def _write(path: Path, phase_id: str) -> None:
-        if path.name == "prd.md" and REAL_PRD.is_file():
-            path.write_text(REAL_PRD.read_text(encoding="utf-8"), encoding="utf-8")
-        elif path.name == "architecture.md" and REAL_ARCH.is_file():
-            path.write_text(REAL_ARCH.read_text(encoding="utf-8"), encoding="utf-8")
+        real = REAL.get(path.name)
+        if real and real.is_file():
+            path.write_text(real.read_text(encoding="utf-8"), encoding="utf-8")
         else:
             path.write_text(f"# {path.stem}\n\nsinh bởi pha {phase_id}\n", encoding="utf-8")
 
@@ -162,9 +164,22 @@ class TestStopsAtGates(PlanTestCase):
 
     def test_auto_approve_runs_straight_through(self):
         r = self.run_plan(FakeClient(), auto_approve=frozenset(Gate))
-        self.assertTrue(r.complete)
-        self.assertEqual(len(r.outcomes), len(PHASES))
+        self.assertTrue(r.complete, r.summary())
+        self.assertEqual(len(r.outcomes), len(PHASES) + 1)  # + bước tách story
         self.assertEqual(self.store.status(Gate.EPICS), Status.APPROVED)
+        self.assertEqual(self.store.status(Gate.STORIES), Status.APPROVED)
+
+    def test_split_produces_one_file_per_story(self):
+        self.run_plan(FakeClient(), auto_approve=frozenset(Gate))
+        files = sorted((self.artifacts / "stories").rglob("STORY-*.md"))
+        self.assertEqual(len(files), 12)
+        self.assertTrue((self.artifacts / "stories.index.json").is_file())
+
+    def test_stops_at_stories_gate_when_not_auto(self):
+        auto = frozenset(Gate) - {Gate.STORIES}
+        r = self.run_plan(FakeClient(), auto_approve=auto)
+        self.assertEqual(r.waiting_on, Gate.STORIES)
+        self.assertTrue((self.artifacts / "stories.index.json").is_file())
 
     def test_auto_approve_subset_stops_at_the_first_gate_not_in_it(self):
         r = self.run_plan(FakeClient(), auto_approve=frozenset({Gate.PRD}))
@@ -193,6 +208,11 @@ class TestRecordsEvidence(PlanTestCase):
     def test_cost_accumulates_across_phases(self):
         r = self.run_plan(FakeClient(), auto_approve=frozenset(Gate))
         self.assertAlmostEqual(r.total_cost_usd, 1.25 * len(PHASES))
+
+    def test_split_step_costs_nothing(self):
+        """Tách story là code, không gọi model."""
+        r = self.run_plan(FakeClient(), auto_approve=frozenset(Gate))
+        self.assertEqual(r.outcomes[-1].cost_usd, 0.0)
 
 
 class TestFailures(PlanTestCase):
