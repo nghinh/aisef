@@ -342,11 +342,17 @@ aisdlc status                         tiến độ · chi phí · độ trễ ·
 |---|---|---|---|
 | Claude CLI | `--settings` hooks → `aisdlc guard …` | tiền kiểm | ✅ cờ có thật |
 | Claude Desktop | `.claude/settings.json` của dự án | tiền kiểm | ⚠️ suy luận — phải test |
-| OpenCode CLI | plugin → `aisdlc guard …` | tiền kiểm | ⚠️ `plugin` có thật, wiring chưa test |
-| OpenCode Desktop | cùng cấu hình dự án với CLI | tiền kiểm | ⚠️ suy luận — phải test |
+| OpenCode CLI | plugin → `aisdlc guard …` | **hậu kiểm** | ✅ quyết định: chấp nhận mức này |
+| OpenCode Desktop | cùng cấu hình dự án với CLI | **hậu kiểm** | ✅ quyết định: chấp nhận mức này |
 | Bất kỳ, nếu hook không gắn được | `aisdlc verify` chạy lại toàn bộ guard | hậu kiểm | ✅ luôn có |
 
-Việc đầu tiên của Tuần 2 là **kiểm chứng wiring hook trên cả 4 bề mặt**; bề mặt nào không gắn được thì khai báo là hậu kiểm, không im lặng (bất biến 10).
+**Quyết định (2026-09-04): OpenCode chạy ở mức hậu kiểm.** Spike S4 không chạy xong được ca thử, và thay vì đầu tư thêm để chứng minh, chủ đầu tư chấp nhận mức bảo đảm thấp hơn cho hai bề mặt OpenCode. Hệ quả cụ thể:
+
+* plugin vẫn được sinh và vẫn gọi đúng bộ guard — nếu nó chặn được thì tốt, nhưng framework **không dựa vào điều đó**;
+* `aisdlc verify` chạy lại toàn bộ guard trên diff của story, nên vi phạm vẫn bị bắt, chỉ là bắt **sau khi đã ghi** thay vì chặn lúc ghi;
+* `compile-report.json` ghi `blocks_at_source: false` cho OpenCode, để mức bảo đảm thật luôn tra được, không phải nhớ.
+
+Đổi lại quyết định này chỉ cần một phép thử thành công: chạy `opencode run` với provider phản hồi nhanh và xem hook có chặn không.
 
 **Phạm vi V1:** 4 bề mặt của Claude Code và OpenCode (mục 2.1). Antigravity hoãn — chưa test được.
 

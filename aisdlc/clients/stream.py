@@ -87,6 +87,11 @@ class RunResult:
     tool_uses: list[ToolUse] = field(default_factory=list)
     denials: list[Denial] = field(default_factory=list)
     hooks: list[HookRun] = field(default_factory=list)
+    #: Thông báo từ hook đã chặn một tool. Lấy từ `tool_result` chứ không
+    #: từ `hook_response`: quan sát trên luồng thật cho thấy Claude Code
+    #: **không** phát `hook_response` cho lần hook chặn — nó đưa thẳng lý
+    #: do vào kết quả tool cho agent đọc.
+    guard_messages: list[str] = field(default_factory=list)
 
     error: str = ""
     raw_result: dict = field(default_factory=dict)
@@ -101,9 +106,28 @@ class RunResult:
         )
 
     @property
+    def guard_blocked(self) -> bool:
+        """True khi **guard của framework** chặn ít nhất một thao tác.
+
+        Đây mới là tín hiệu chất lượng: agent định làm điều bị cấm.
+        """
+        return bool(self.guard_messages) or any(h.blocked for h in self.hooks)
+
+    @property
+    def permission_limited(self) -> bool:
+        """True khi client từ chối một tool vì quyền, không phải vì guard.
+
+        Ví dụ ``WebSearch`` bị chặn trong môi trường không có mạng. Đây là
+        **hạn chế môi trường**, không phải agent làm sai — gộp chung với
+        guard sẽ báo cáo sai bản chất, và dẫn tới quyết định sai về việc
+        có thử lại hay chặn story.
+        """
+        return bool(self.denials) and not self.guard_blocked
+
+    @property
     def was_blocked(self) -> bool:
-        """True khi có ít nhất một tool bị guard chặn."""
-        return bool(self.denials) or any(h.blocked for h in self.hooks)
+        """Có thao tác nào bị từ chối không, bất kể vì lý do gì."""
+        return bool(self.denials) or self.guard_blocked
 
     def evidence(self) -> dict:
         """Phần đưa vào `evidence/{story}.json`."""
@@ -123,6 +147,9 @@ class RunResult:
             "denials": [
                 {"tool": d.tool_name, "path": d.target_path} for d in self.denials
             ],
+            "guard_blocked": self.guard_blocked,
+            "guard_messages": self.guard_messages,
+            "permission_limited": self.permission_limited,
             "error": self.error,
         }
 
@@ -173,6 +200,16 @@ def parse_stream(lines: Iterable[str]) -> RunResult:
             if txt.strip():
                 assistant_text.append(txt)
 
+        elif etype == "user":
+            for block in (ev.get("message", {}) or {}).get("content", []) or []:
+                if not isinstance(block, dict) or block.get("type") != "tool_result":
+                    continue
+                if not block.get("is_error"):
+                    continue
+                body = str(block.get("content") or "")
+                if "hook" in body.lower():
+                    res.guard_messages.append(body[:300])
+
         elif etype == "system" and ev.get("subtype") == "hook_response":
             res.hooks.append(
                 HookRun(
@@ -213,7 +250,15 @@ def parse_stream(lines: Iterable[str]) -> RunResult:
                 )
 
             if ev.get("is_error") or ev.get("api_error_status"):
-                res.error = str(ev.get("api_error_status") or ev.get("subtype") or "error")
+                # Thứ tự có chủ đích. `subtype` vẫn là "success" ngay cả khi
+                # `is_error` là true, nên lấy nó ra sẽ cho thông báo lỗi
+                # "success" — vô nghĩa với người đọc lẫn với logic thử lại.
+                res.error = str(
+                    ev.get("api_error_status")
+                    or ev.get("terminal_reason")
+                    or (ev.get("result") or "").strip()[:200]
+                    or "lỗi không rõ nguyên nhân"
+                )
 
     if not res.text and assistant_text:
         res.text = "\n".join(assistant_text)

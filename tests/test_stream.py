@@ -18,6 +18,7 @@ from aisdlc.clients.stream import parse_file, parse_stream  # noqa: E402
 FIX = ROOT / "tests" / "fixtures"
 MINIMAL = FIX / "stream-minimal.jsonl"
 BLOCKED = FIX / "stream-blocked.jsonl"
+API_ERROR = FIX / "stream-api-error.jsonl"
 
 
 class TestMinimalRun(unittest.TestCase):
@@ -50,6 +51,8 @@ class TestMinimalRun(unittest.TestCase):
 
     def test_nothing_blocked(self):
         self.assertFalse(self.r.was_blocked)
+        self.assertFalse(self.r.guard_blocked)
+        self.assertFalse(self.r.permission_limited)
         self.assertEqual(self.r.denials, [])
 
     def test_evidence_shape(self):
@@ -77,6 +80,17 @@ class TestBlockedRun(unittest.TestCase):
     def test_denial_recorded(self):
         self.assertTrue(self.r.was_blocked)
         self.assertEqual(len(self.r.denials), 1)
+
+    def test_recognised_as_guard_block_not_permission_limit(self):
+        """Guard chặn là lỗi chất lượng; hạn chế quyền thì không."""
+        self.assertTrue(self.r.guard_blocked)
+        self.assertFalse(self.r.permission_limited)
+
+    def test_guard_message_captured_from_tool_result(self):
+        """Claude Code không phát hook_response khi hook chặn — lý do nằm
+        trong tool_result."""
+        self.assertTrue(self.r.guard_messages)
+        self.assertIn("hook", self.r.guard_messages[0].lower())
 
     def test_denial_carries_tool_and_path(self):
         d = self.r.denials[0]
@@ -128,6 +142,43 @@ class TestRobustness(unittest.TestCase):
         self.assertFalse(r.ok)
         self.assertEqual(r.error, "overloaded")
 
+
+
+@unittest.skipUnless(API_ERROR.is_file(), "chưa có fixture lỗi hạ tầng")
+class TestInfrastructureFailure(unittest.TestCase):
+    """Luồng thật của một lượt chạy đứt giữa chừng vì lỗi kết nối."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.r = parse_file(API_ERROR)
+
+    def test_marked_as_failed(self):
+        self.assertFalse(self.r.ok)
+
+    def test_error_message_is_meaningful(self):
+        """`subtype` vẫn là "success" dù is_error=True — lấy nó ra sẽ cho
+        thông báo lỗi "success", vô nghĩa với cả người lẫn logic thử lại."""
+        self.assertEqual(self.r.error, "api_error")
+        self.assertNotEqual(self.r.error, "success")
+
+    def test_not_a_guard_block(self):
+        """Đứt kết nối không phải agent làm sai — không được tính là lỗi
+        chất lượng, vì hai loại này cần quyết định khác nhau."""
+        self.assertFalse(self.r.guard_blocked)
+
+    def test_permission_denials_are_environment_limits(self):
+        """WebSearch bị từ chối vì môi trường, không phải vì guard."""
+        self.assertTrue(self.r.permission_limited)
+        self.assertTrue(any(d.tool_name == "WebSearch" for d in self.r.denials))
+
+    def test_cost_still_recorded_on_failure(self):
+        """Lượt chạy hỏng vẫn tốn tiền — evidence phải ghi lại."""
+        self.assertGreater(self.r.cost_usd, 0)
+
+    def test_evidence_separates_the_two_kinds(self):
+        ev = self.r.evidence()
+        self.assertFalse(ev["guard_blocked"])
+        self.assertTrue(ev["permission_limited"])
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
