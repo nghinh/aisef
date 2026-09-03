@@ -182,3 +182,83 @@ def summarize(results: list[Classification]) -> dict[str, int]:
     for r in results:
         counts[r.verdict.value] += 1
     return counts
+
+
+# ------------------------------------------------------------------ tầng 2
+
+#: Subdomain cần bất kể dự án dùng gì — mọi phần mềm đều có phụ thuộc, bí
+#: mật, và lỗ hổng cần xử lý.
+ALWAYS_RELEVANT = frozenset({
+    "devsecops",
+    "supply-chain-security",
+    "vulnerability-management",
+    "cryptography",
+    "application-security",
+    "compliance-governance",
+    "governance-risk-compliance",
+})
+
+#: Công nghệ nào kéo theo subdomain nào.
+STACK_SUBDOMAINS: dict[str, frozenset[str]] = {
+    # bất kỳ backend nào cũng phơi ra API
+    "backend:*": frozenset({"api-security", "web-application-security"}),
+    "frontend:*": frozenset({"web-application-security"}),
+    "mobile:*": frozenset({"mobile-security"}),
+    "database:*": frozenset({"data-protection", "privacy-compliance"}),
+    "deploy:docker": frozenset({"container-security"}),
+    "deploy:kubernetes": frozenset({"container-security", "zero-trust-architecture"}),
+    "deploy:aws": frozenset({"cloud-security"}),
+    "deploy:gcp": frozenset({"cloud-security"}),
+    "deploy:azure": frozenset({"cloud-security"}),
+    "deploy:serverless": frozenset({"cloud-security"}),
+}
+
+#: Có xác thực người dùng thì cần nhóm định danh.
+AUTH_SUBDOMAINS = frozenset({
+    "identity-access-management",
+    "identity-and-access-management",
+    "identity-security",
+})
+
+#: Từ khoá cho thấy dự án có xác thực.
+AUTH_MARKERS = ("auth", "login", "đăng nhập", "tài khoản", "oauth", "jwt", "sso", "phân quyền")
+
+
+def subdomains_for_stack(stack_dict: dict[str, list[str]], *, requirements_text: str = "") -> set[str]:
+    """Tập subdomain cần cho một dự án cụ thể.
+
+    `stack_dict` là kết quả `detect_stack.Stack.as_dict()`.
+    """
+    wanted = set(ALWAYS_RELEVANT)
+
+    for category, values in stack_dict.items():
+        if category == "undetermined" or not values:
+            continue
+        wanted |= STACK_SUBDOMAINS.get(f"{category}:*", frozenset())
+        for value in values:
+            wanted |= STACK_SUBDOMAINS.get(f"{category}:{value}", frozenset())
+
+    lowered = requirements_text.lower()
+    if any(m in lowered for m in AUTH_MARKERS):
+        wanted |= AUTH_SUBDOMAINS
+
+    return wanted
+
+
+def select_for_stack(
+    results: list[Classification],
+    stack_dict: dict[str, list[str]],
+    *,
+    requirements_text: str = "",
+) -> list[Classification]:
+    """Lọc tầng 2: từ tập đã qua tầng 1, giữ phần hợp với dự án.
+
+    Chỉ xét skill ``KEEP`` — skill tấn công không bao giờ được đưa vào,
+    bất kể stack là gì.
+    """
+    wanted = subdomains_for_stack(stack_dict, requirements_text=requirements_text)
+    return [
+        r
+        for r in results
+        if r.verdict is Verdict.KEEP and r.skill.subdomain.strip().lower() in wanted
+    ]
