@@ -23,6 +23,7 @@ from ..control.design_contract import CONTRACT_FILE, DesignContract, build
 from ..control.experience import Experience, Screen, parse_experience_file
 from ..control.machine_gate import GateResult, check_design_contract
 from ..harness import browser
+from ..harness.prompts import load_catalog
 
 MOCKUP_DIR = "mockups"
 SKILL = "aisdlc-mockup-html"
@@ -85,26 +86,17 @@ def build_prompt(screen: Screen, experience: Experience, artifact_root: Path) ->
         f"- {name}: {experience.component_rules.get(name, '')}".rstrip(": ")
         for name in screen.components
     ]
-    out = MOCKUP_DIR + f"/{screen.id}.html"
-
-    return (
-        f"Use the {SKILL} skill.\n\n"
-        f"Dựng mockup cho **một** màn hình.\n\n"
-        f"screen_id: {screen.id}\n"
-        f"Tên màn hình: {screen.name}\n"
-        f"Mục đích: {screen.purpose}\n"
-        f"Vào từ: {screen.reached_from}\n\n"
-        "Component phải có (theo EXPERIENCE.md) và luật hành vi:\n"
-        + ("\n".join(rules) if rules else "- (tài liệu không nêu)")
-        + "\n\nTrạng thái phải dựng: "
-        + (", ".join(screen.states) if screen.states else "(chỉ trạng thái chính)")
-        + "\n\nĐọc: "
-        + f"{artifact_root.name}/DESIGN.md (token thị giác), "
-        + f"{artifact_root.name}/EXPERIENCE.md (mục Information Architecture, "
-        + "Component Patterns, State Patterns), "
-        + f"{artifact_root.name}/prd.md (nội dung thật để điền).\n"
-        f"Ghi ra đúng một file: {artifact_root.name}/{out}\n\n"
-        "Chỗ nào chưa chốt thì đánh dấu `data-unresolved` chứ đừng tự chọn."
+    return load_catalog().get("mockup-screen").render(
+        {
+            "screen_id": screen.id,
+            "screen_name": screen.name,
+            "purpose": screen.purpose or "(tài liệu không nêu)",
+            "reached_from": screen.reached_from or "(tài liệu không nêu)",
+            "components": "\n".join(rules) or "- (tài liệu không nêu)",
+            "states": ", ".join(screen.states) or "(chỉ trạng thái chính)",
+            "artifact_root": artifact_root.name,
+            "output": f"{artifact_root.name}/{MOCKUP_DIR}/{screen.id}.html",
+        }
     )
 
 

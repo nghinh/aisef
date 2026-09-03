@@ -36,6 +36,10 @@ DEFAULTS: dict[str, Any] = {
     "run.max_retries": 2,
     # chi phí
     "cost.warn_multiple": 3.0,
+    # định tuyến model theo vai — rỗng nghĩa là dùng mặc định của client
+    "route.developer_model": "",
+    "route.reviewer_model": "",
+    "route.designer_model": "",
     # lệnh của dự án — rỗng nghĩa là tự dò từ file có trong dự án
     "tools.test": "",
     "tools.lint": "",
@@ -57,6 +61,9 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "run.timeout_seconds": int,
     "run.max_retries": int,
     "cost.warn_multiple": float,
+    "route.developer_model": str,
+    "route.reviewer_model": str,
+    "route.designer_model": str,
     "tools.test": str,
     "tools.lint": str,
     "tools.sast": str,

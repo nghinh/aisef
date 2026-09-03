@@ -12,7 +12,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.normalize import parse_prd, parse_prd_file  # noqa: E402
+from aisdlc.control.normalize import (  # noqa: E402
+    parse_architecture,
+    parse_architecture_file,
+    parse_prd,
+    parse_prd_file,
+)
 
 PRD_FIXTURE = ROOT / "tests" / "fixtures" / "bmad" / "prd.md"
 
@@ -133,6 +138,58 @@ class TestParsing(unittest.TestCase):
     def test_malformed_range_ignored(self):
         prd = parse_prd("**OQ-1 (chặn FR-9..FR-2)** — dải ngược.\n")
         self.assertEqual(prd.open_questions[0].blocks, ["FR-2", "FR-9"])
+
+
+class TestArchitecture(unittest.TestCase):
+    """Đọc architecture.md thật (26KB, 20 quyết định, do BMAD sinh)."""
+
+    @classmethod
+    def setUpClass(cls):
+        path = ROOT / "tests" / "fixtures" / "bmad" / "architecture.md"
+        if not path.is_file():
+            raise unittest.SkipTest("chưa có fixture architecture.md")
+        cls.arch = parse_architecture_file(path)
+
+    def test_reads_every_decision(self):
+        self.assertEqual(len(self.arch.decisions), 20)
+        self.assertEqual(self.arch.decisions[0].id, "AR-1")
+
+    def test_rule_and_prevents_split(self):
+        d = self.arch.by_id("AR-1")
+        self.assertIn("store/", d.rule)
+        self.assertTrue(d.prevents)
+
+    def test_binds_maps_requirements_to_decisions(self):
+        self.assertIn("FR-2", self.arch.by_id("AR-1").binds)
+
+    def test_selection_is_lookup_not_guesswork(self):
+        """Nạp cả 26KB vào mỗi phiên vừa tốn vừa loãng; để agent tự chọn thì
+        mỗi phiên chọn một kiểu. Mục `Binds:` cho đáp án tất định."""
+        chosen = [d.id for d in self.arch.for_requirements(["FR-5", "FR-6"])]
+        self.assertIn("AR-6", chosen)   # chuẩn hoá văn bản — đúng là của tìm kiếm
+        self.assertNotIn("AR-13", chosen)  # dung lượng — không liên quan
+
+    def test_universal_decisions_always_included(self):
+        """`Binds: all` là luật nền. Coi nó là "không áp cho story nào" sẽ
+        bỏ rơi đúng những luật quan trọng nhất."""
+        chosen = [d.id for d in self.arch.for_requirements(["FR-17"])]
+        self.assertIn("AR-2", chosen)
+        self.assertIn("AR-19", chosen)
+
+    def test_prompt_form_carries_the_rule(self):
+        text = self.arch.by_id("AR-6").as_prompt()
+        self.assertIn("AR-6", text)
+        self.assertIn("Luật:", text)
+
+
+class TestArchitectureRobustness(unittest.TestCase):
+    def test_empty_document(self):
+        self.assertEqual(parse_architecture("# trống\n").decisions, [])
+
+    def test_decision_without_binds_is_universal(self):
+        arch = parse_architecture("### AR-1 — Luật nền\n\n- **Rule:** luôn đúng.\n")
+        self.assertTrue(arch.by_id("AR-1").universal)
+        self.assertEqual([d.id for d in arch.for_requirements(["FR-99"])], ["AR-1"])
 
 
 if __name__ == "__main__":

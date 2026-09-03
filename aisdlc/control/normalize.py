@@ -461,3 +461,83 @@ def parse_epics(text: str) -> EpicPlan:
 
 def parse_epics_file(path: Path | str) -> EpicPlan:
     return parse_epics(Path(path).read_text(encoding="utf-8", errors="replace"))
+
+
+# ---------------------------------------------------------- architecture.md
+
+#: `### AR-1 — Một đường ghi duy nhất`
+_AR_HEADING = re.compile(r"^#{2,4}\s+(AR-\d+)\s*[—–:-]\s*(.+?)\s*$", re.MULTILINE)
+_AR_FIELD = re.compile(r"^[-*]\s*\*\*(Binds|Prevents|Rule)\s*[:：]?\*\*\s*(.+)$", re.MULTILINE)
+
+
+@dataclass
+class Decision:
+    """Một quyết định kiến trúc mà story phải tuân thủ."""
+
+    id: str
+    title: str
+    #: Mã yêu cầu quyết định này ràng buộc — đây là cách chọn đúng quyết
+    #: định cho một story mà không phải đoán.
+    binds: list[str] = field(default_factory=list)
+    #: Quyết định áp cho **mọi** story (`Binds: all`, hoặc không nêu ràng
+    #: buộc nào). Đây là luật nền, không phải luật của một yêu cầu.
+    universal: bool = False
+    prevents: str = ""
+    rule: str = ""
+    text: str = ""
+
+    def as_prompt(self) -> str:
+        parts = [f"**{self.id} — {self.title}**"]
+        if self.rule:
+            parts.append(f"Luật: {self.rule}")
+        if self.prevents:
+            parts.append(f"Ngăn: {self.prevents}")
+        return "\n".join(parts)
+
+
+@dataclass
+class Architecture:
+    decisions: list[Decision] = field(default_factory=list)
+
+    def by_id(self, ar_id: str) -> Decision | None:
+        return next((d for d in self.decisions if d.id == ar_id), None)
+
+    def for_requirements(self, fr_ids: list[str]) -> list[Decision]:
+        """Quyết định ràng buộc bất kỳ yêu cầu nào trong danh sách.
+
+        Nhờ mục ``**Binds:**`` mà việc chọn ngữ cảnh cho story là **tra
+        cứu**, không phải phán đoán: nạp cả tài liệu kiến trúc 26KB vào mỗi
+        phiên vừa tốn vừa loãng, còn để agent tự chọn thì mỗi phiên chọn
+        một kiểu.
+        """
+        want = set(fr_ids)
+        return [d for d in self.decisions if d.universal or (want & set(d.binds))]
+
+
+def parse_architecture(text: str) -> Architecture:
+    arch = Architecture()
+    marks = list(_AR_HEADING.finditer(text))
+    for i, m in enumerate(marks):
+        end = marks[i + 1].start() if i + 1 < len(marks) else len(text)
+        body = text[m.end():end]
+        d = Decision(id=m.group(1), title=m.group(2).strip(), text=body.strip())
+        seen_binds = False
+        for f in _AR_FIELD.finditer(body):
+            seen_binds = seen_binds or f.group(1).lower() == "binds"
+            key, value = f.group(1).lower(), " ".join(f.group(2).split())
+            if key == "binds":
+                d.binds = _expand_fr_refs(value) + re.findall(r"\bAR-\d+\b", value)
+                d.universal = bool(re.search(r"\b(all|mọi story|toàn bộ)\b", value, re.I))
+            elif key == "prevents":
+                d.prevents = value
+            else:
+                d.rule = value
+        # Không nêu ràng buộc nào = luật nền, áp cho mọi story. Coi nó là
+        # "không áp cho story nào" sẽ bỏ rơi đúng những luật quan trọng nhất.
+        d.universal = d.universal or not seen_binds
+        arch.decisions.append(d)
+    return arch
+
+
+def parse_architecture_file(path: Path | str) -> Architecture:
+    return parse_architecture(Path(path).read_text(encoding="utf-8", errors="replace"))
