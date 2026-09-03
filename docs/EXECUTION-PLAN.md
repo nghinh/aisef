@@ -17,7 +17,7 @@
 | GĐ-1 Control plane | ✅ **xong** — config · state · fsm · worktree · CLI |
 | GĐ-2 Kit + Setup | ✅ **xong** — catalog · detect_stack · lọc 2 tầng · install · constitution |
 | GĐ-3 Đa client | ✅ **xong** — adapter · guard · compile · báo cáo mất mát |
-| GĐ-4 BMAD pipeline | ⏳ kế tiếp |
+| GĐ-4 BMAD pipeline | 🔨 **2/5** — normalizer ✅ · cổng máy ✅ · còn bộ chạy pipeline, tách story, nối cổng người |
 | GĐ-5…GĐ-9 | chưa bắt đầu |
 
 **Mốc demo đã đạt**
@@ -33,7 +33,7 @@
   file không được tạo, `permission_denials = 1`. Toàn chuỗi compile → hook
   → guard → chặn đã kiểm chứng trên agent thật.
 
-**341 test xanh.**
+**386 test xanh.**
 
 ---
 
@@ -61,7 +61,9 @@
 | `aisdlc/clients/opencode.py` | chạy opencode run | 2 |
 | `aisdlc/harness/guardrails.py` | 5 guard chặn thật | 42 |
 | `aisdlc/clients/compile.py` | sinh cấu hình client + báo cáo mất mát | 19 |
-| | | **341 xanh** |
+| `aisdlc/control/normalize.py` | BMAD markdown → mô hình framework | 23 |
+| `aisdlc/control/machine_gate.py` | cổng máy, kiểm truy vết hai chiều | 22 |
+| | | **386 xanh** |
 
 ---
 
