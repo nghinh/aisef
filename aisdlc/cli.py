@@ -1,0 +1,337 @@
+"""Giao diện dòng lệnh.
+
+Mọi lệnh đều **gọi-một-lần**: đọc trạng thái trên đĩa, làm việc, ghi lại,
+rồi thoát. Không lệnh nào giả định mình là tiến trình chính, không lệnh
+nào chạy nền. Đó là điều kiện để cùng bộ lệnh này dùng được ở hai chế độ
+(quyết định Đ2):
+
+* **driver-led** — script hoặc CI gọi ``aisdlc run``;
+* **agent-led** — chính agent gọi ``aisdlc next`` / ``verify`` / ``complete``
+  qua Bash, ngay trong phiên chat của Claude Desktop hay OpenCode.
+
+Quy ước mã thoát: ``0`` thành công · ``1`` lỗi dùng sai · ``2`` trạng thái
+chưa đạt (cổng chưa duyệt, doctor không đạt) — để CI phân biệt được
+"hỏng" với "chưa xong".
+"""
+
+from __future__ import annotations
+
+import argparse
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+from .config import Config, ConfigError
+from .control.approvals import (
+    GATE_ORDER,
+    ApprovalStore,
+    Gate,
+    Status,
+    parse_auto_approve,
+)
+from .control.state import StateStore, StoryStatus
+
+ARTIFACT_ROOT = "_bmad-output"
+
+EXIT_OK = 0
+EXIT_USAGE = 1
+EXIT_NOT_READY = 2
+
+#: Ký hiệu trạng thái cổng, đủ để đọc lướt.
+_GATE_MARK = {
+    Status.APPROVED: "✅",
+    Status.PENDING: "⏳",
+    Status.CHANGES_REQUESTED: "✗",
+    Status.STALE: "⚠️",
+}
+
+
+def _artifact_root(args) -> Path:
+    return Path(args.project) / ARTIFACT_ROOT
+
+
+def _approvals(args) -> ApprovalStore:
+    return ApprovalStore(_artifact_root(args))
+
+
+def _state(args) -> StateStore:
+    return StateStore(_artifact_root(args))
+
+
+# ------------------------------------------------------------------ doctor
+
+
+def cmd_doctor(args) -> int:
+    """Kiểm tra môi trường có đủ chạy framework không."""
+    project = Path(args.project)
+    problems: list[str] = []
+    lines: list[str] = []
+
+    def check(label: str, ok: bool, detail: str = "", *, required: bool = True) -> None:
+        mark = "✅" if ok else ("✗" if required else "○")
+        lines.append(f"  {mark} {label}{(' — ' + detail) if detail else ''}")
+        if required and not ok:
+            problems.append(label)
+
+    lines.append("Môi trường:")
+    check("python >= 3.11", sys.version_info >= (3, 11), sys.version.split()[0])
+    check("git", bool(shutil.which("git")))
+
+    claude = shutil.which("claude")
+    check("claude CLI", bool(claude), claude or "không tìm thấy", required=False)
+    opencode = shutil.which("opencode")
+    check("opencode CLI", bool(opencode), opencode or "không tìm thấy", required=False)
+
+    docker_ok = False
+    if shutil.which("docker"):
+        try:
+            docker_ok = subprocess.run(
+                ["docker", "info"], capture_output=True, timeout=10
+            ).returncode == 0
+        except (subprocess.TimeoutExpired, OSError):
+            docker_ok = False
+    check(
+        "docker daemon",
+        docker_ok,
+        "chạy" if docker_ok else "không chạy — sandbox sẽ suy biến, bảo đảm thấp hơn",
+        required=False,
+    )
+
+    lines.append("Dự án:")
+    check("thư mục dự án", project.is_dir(), str(project))
+    req = project / "docs" / "requirements.md"
+    check("docs/requirements.md", req.is_file(), str(req))
+
+    try:
+        cfg = Config.load(project)
+        check("cấu hình", True, cfg.source)
+    except ConfigError as e:
+        check("cấu hình", False, str(e))
+
+    print("\n".join(lines))
+    if problems:
+        print(f"\n✗ thiếu: {', '.join(problems)}")
+        return EXIT_NOT_READY
+    print("\n✅ sẵn sàng")
+    return EXIT_OK
+
+
+# ------------------------------------------------------------------ cổng
+
+
+def cmd_gates(args) -> int:
+    store = _approvals(args)
+    print(f"Cổng phê duyệt — {_artifact_root(args)}\n")
+    pending_first = None
+    for gate, status, by in store.summary():
+        mark = _GATE_MARK[status]
+        who = f"  ({by})" if by else ""
+        artifact = store.artifact_path(gate)
+        exists = "" if artifact.is_file() else "   [chưa có artifact]"
+        print(f"  {mark} {gate.value:14} {status.value:18}{who}{exists}")
+        if pending_first is None and status is not Status.APPROVED:
+            pending_first = gate
+
+    if pending_first:
+        print(f"\nCổng kế tiếp cần xử lý: {pending_first.value}")
+        print(f"  aisdlc review {pending_first.value}")
+        return EXIT_NOT_READY
+    print("\n✅ mọi cổng đã duyệt")
+    return EXIT_OK
+
+
+def _gate_arg(value: str) -> Gate:
+    try:
+        return Gate(value)
+    except ValueError:
+        valid = ", ".join(g.value for g in GATE_ORDER)
+        raise argparse.ArgumentTypeError(f"cổng không hợp lệ: {value}. Hợp lệ: {valid}")
+
+
+def cmd_review(args) -> int:
+    """Hiện artifact và những gì cần xem trước khi duyệt."""
+    store = _approvals(args)
+    gate: Gate = args.gate
+    artifact = store.artifact_path(gate)
+    status = store.status(gate)
+
+    print(f"Cổng: {gate.value}")
+    print(f"Trạng thái: {status.value}")
+    print(f"Artifact: {artifact}")
+
+    if not artifact.is_file():
+        print("\n✗ chưa có artifact — chạy bước sinh ra nó trước")
+        return EXIT_NOT_READY
+
+    blocking = store.blocking(gate)
+    if blocking:
+        print(f"\n⚠️  cổng phía trước chưa duyệt: {', '.join(g.value for g in blocking)}")
+
+    rec = store.load(gate)
+    if rec and rec.note:
+        print(f"\nGhi chú lần trước ({rec.status}): {rec.note}")
+
+    text = artifact.read_text(encoding="utf-8", errors="replace")
+    print(f"\n— nội dung ({len(text.splitlines())} dòng) —\n")
+    print("\n".join(text.splitlines()[: args.lines]))
+    if len(text.splitlines()) > args.lines:
+        print(f"\n… còn {len(text.splitlines()) - args.lines} dòng. Mở: {artifact}")
+
+    print(f"\nDuyệt:    aisdlc approve {gate.value}")
+    print(f"Trả lại:  aisdlc reject  {gate.value} --note \"...\"")
+    return EXIT_OK
+
+
+def cmd_approve(args) -> int:
+    store = _approvals(args)
+    gate: Gate = args.gate
+    if not store.artifact_path(gate).is_file():
+        print(f"✗ chưa có artifact cho cổng {gate.value}", file=sys.stderr)
+        return EXIT_NOT_READY
+
+    blocking = store.blocking(gate)
+    if blocking and not args.force:
+        names = ", ".join(g.value for g in blocking)
+        print(f"✗ cổng phía trước chưa duyệt: {names}", file=sys.stderr)
+        print("  duyệt chúng trước, hoặc dùng --force nếu cố ý bỏ qua", file=sys.stderr)
+        return EXIT_NOT_READY
+
+    rec = store.approve(gate, note=args.note or "")
+    print(f"✅ {gate.value} đã duyệt bởi {rec.decided_by}")
+    return EXIT_OK
+
+
+def cmd_reject(args) -> int:
+    store = _approvals(args)
+    gate: Gate = args.gate
+    try:
+        rec = store.reject(gate, note=args.note)
+    except ValueError as e:
+        print(f"✗ {e}", file=sys.stderr)
+        return EXIT_USAGE
+    print(f"✗ {gate.value} trả lại: {rec.note}")
+    return EXIT_OK
+
+
+def cmd_auto_approve(args) -> int:
+    """Tự duyệt — luôn ghi dấu `auto` để về sau truy được."""
+    try:
+        gates = parse_auto_approve(args.gates)
+    except ValueError as e:
+        print(f"✗ {e}", file=sys.stderr)
+        return EXIT_USAGE
+
+    store = _approvals(args)
+    done = []
+    for gate in GATE_ORDER:
+        if gate in gates and store.artifact_path(gate).is_file():
+            store.auto_approve(gate)
+            done.append(gate.value)
+    print(f"tự duyệt: {', '.join(done) if done else '(không cổng nào có artifact)'}")
+    return EXIT_OK
+
+
+# ------------------------------------------------------------------ trạng thái
+
+
+def cmd_status(args) -> int:
+    state = _state(args).load()
+    cfg = Config.load(args.project)
+
+    if not state.stories:
+        print("Chưa có story nào được đăng ký.")
+        return EXIT_OK
+
+    totals = state.totals()
+    total = len(state.stories)
+    done = totals[StoryStatus.DONE.value]
+
+    print(f"Tiến độ: {done}/{total} story xong")
+    if state.current_epic:
+        print(f"Epic hiện tại: {state.current_epic}")
+    print()
+    for status in StoryStatus:
+        n = totals[status.value]
+        if n:
+            print(f"  {status.value:11} {n}")
+
+    print(f"\nChi phí: ${state.total_cost_usd:.2f}")
+    outliers = state.cost_outliers(cfg["cost.warn_multiple"])
+    if outliers:
+        print(f"⚠️  {len(outliers)} story tốn hơn {cfg['cost.warn_multiple']}× trung vị:")
+        for r in sorted(outliers, key=lambda r: -r.cost_usd)[:5]:
+            print(f"    {r.id:16} ${r.cost_usd:.2f}")
+
+    blocked = state.by_status(StoryStatus.BLOCKED)
+    if blocked:
+        print(f"\n✗ {len(blocked)} story bị chặn:")
+        for r in blocked[:10]:
+            print(f"    {r.id:16} {r.blocked_reason or '(không rõ lý do)'}")
+        return EXIT_NOT_READY
+    return EXIT_OK
+
+
+def cmd_init(args) -> int:
+    """Ghi file cấu hình mặc định để chỉnh."""
+    path = Config.load(args.project).write_template(args.project)
+    print(f"đã ghi {path}")
+    return EXIT_OK
+
+
+# ------------------------------------------------------------------ đầu vào
+
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        prog="aisdlc",
+        description="AI-SDLC — điều phối vòng đời phát triển bằng agent",
+    )
+    p.add_argument("--project", default=".", help="thư mục dự án (mặc định: thư mục hiện tại)")
+    sub = p.add_subparsers(dest="command", required=True)
+
+    sub.add_parser("doctor", help="kiểm tra môi trường").set_defaults(func=cmd_doctor)
+    sub.add_parser("init", help="ghi .ai/config.json mặc định").set_defaults(func=cmd_init)
+    sub.add_parser("gates", help="bảng trạng thái 8 cổng").set_defaults(func=cmd_gates)
+    sub.add_parser("status", help="tiến độ story, chi phí").set_defaults(func=cmd_status)
+
+    r = sub.add_parser("review", help="xem artifact của một cổng")
+    r.add_argument("gate", type=_gate_arg)
+    r.add_argument("--lines", type=int, default=60, help="số dòng hiển thị")
+    r.set_defaults(func=cmd_review)
+
+    a = sub.add_parser("approve", help="duyệt một cổng")
+    a.add_argument("gate", type=_gate_arg)
+    a.add_argument("--note", default="")
+    a.add_argument("--force", action="store_true", help="duyệt dù cổng trước chưa xong")
+    a.set_defaults(func=cmd_approve)
+
+    j = sub.add_parser("reject", help="trả lại một cổng kèm ghi chú")
+    j.add_argument("gate", type=_gate_arg)
+    j.add_argument("--note", required=True, help="cần sửa gì — bắt buộc")
+    j.set_defaults(func=cmd_reject)
+
+    aa = sub.add_parser("auto-approve", help="tự duyệt (ghi dấu auto)")
+    aa.add_argument("gates", help="'all' hoặc danh sách ngăn bởi dấu phẩy")
+    aa.set_defaults(func=cmd_auto_approve)
+
+    return p
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    try:
+        return args.func(args)
+    except ConfigError as e:
+        print(f"✗ cấu hình: {e}", file=sys.stderr)
+        return EXIT_USAGE
+    except KeyboardInterrupt:
+        print("\nđã huỷ", file=sys.stderr)
+        return EXIT_USAGE
+    except Exception as e:  # noqa: BLE001 — biên ngoài cùng: báo rõ, không nuốt
+        print(f"✗ {type(e).__name__}: {e}", file=sys.stderr)
+        return EXIT_USAGE
+
+
+if __name__ == "__main__":
+    sys.exit(main())
