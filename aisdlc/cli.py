@@ -710,6 +710,19 @@ def cmd_predeploy(args) -> int:
     return EXIT_OK
 
 
+def cmd_report(args) -> int:
+    """Sinh báo cáo nghiệm thu từ bằng chứng đã có."""
+    from .phases.report import build, write
+
+    report = build(args.project)
+    path = write(args.project, out=args.out or None)
+    print(f"Báo cáo: {path}")
+    print(f"  yêu cầu chưa phủ: {len(report.uncovered)}")
+    print(f"  story có bằng chứng: {len(report.stories)}")
+    print(f"  tổng chi phí: ${report.total_cost_usd:.2f}")
+    return EXIT_OK if not report.uncovered else EXIT_NOT_READY
+
+
 # ------------------------------------------------------------------ đầu vào
 
 
@@ -804,6 +817,10 @@ def build_parser() -> argparse.ArgumentParser:
     pd = sub.add_parser("pre-deploy", help="chấm cổng trước triển khai")
     pd.add_argument("--skip-qa", action="store_true", help="bỏ qua bộ kiểm định (chỉ để soi nhanh)")
     pd.set_defaults(func=cmd_predeploy)
+
+    rp = sub.add_parser("report", help="báo cáo nghiệm thu từ bằng chứng")
+    rp.add_argument("--out", default="", help="đường dẫn file ra")
+    rp.set_defaults(func=cmd_report)
 
     aa = sub.add_parser("auto-approve", help="tự duyệt (ghi dấu auto)")
     aa.add_argument("gates", help="'all' hoặc danh sách ngăn bởi dấu phẩy")
