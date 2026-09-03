@@ -109,6 +109,29 @@ def cmd_doctor(args) -> int:
     except ConfigError as e:
         check("cấu hình", False, str(e))
 
+    skills_dir = project / ".claude" / "skills"
+    if skills_dir.is_dir():
+        from .kit.security_filter import Verdict, classify_all
+
+        installed = [d for d in skills_dir.iterdir() if d.is_dir()]
+        lines.append("Skill đã cài:")
+        check("có skill", bool(installed), f"{len(installed)} thư mục")
+
+        # Bất biến: skill tấn công không bao giờ được có mặt trong dự án.
+        offensive = [
+            c.skill.name
+            for c in classify_all(skills_dir)
+            if c.verdict is Verdict.OFFENSIVE
+        ]
+        check(
+            "không có skill tấn công",
+            not offensive,
+            "sạch" if not offensive else f"LỌT: {', '.join(offensive[:5])}",
+        )
+    else:
+        lines.append("Skill đã cài:")
+        check("đã chạy setup", False, "chưa — chạy: aisdlc setup", required=False)
+
     print("\n".join(lines))
     if problems:
         print(f"\n✗ thiếu: {', '.join(problems)}")
@@ -279,6 +302,53 @@ def cmd_init(args) -> int:
     return EXIT_OK
 
 
+# ------------------------------------------------------------------ setup
+
+
+def cmd_setup(args) -> int:
+    """Dò stack rồi nạp skill phù hợp vào dự án."""
+    from .kit import install
+    from .kit.detect_stack import detect_file
+
+    project = Path(args.project)
+    req = project / "docs" / "requirements.md"
+    if not req.is_file():
+        print(f"✗ không có {req}", file=sys.stderr)
+        print("  đây là đầu vào duy nhất của dự án — tạo nó trước", file=sys.stderr)
+        return EXIT_NOT_READY
+
+    references = Path(args.references).resolve()
+    if not references.is_dir():
+        print(f"✗ không có thư mục nguồn: {references}", file=sys.stderr)
+        return EXIT_NOT_READY
+
+    stack = detect_file(req)
+    print(f"Stack dò được: {stack.summary()}")
+    if stack.undetermined:
+        print(f"  ⚠️  chưa xác định: {', '.join(stack.undetermined)}")
+        print("     — pha kiến trúc sẽ quyết; không đoán ở đây")
+
+    text = req.read_text(encoding="utf-8", errors="replace")
+    plan_ = install.plan(project, stack, references_root=references, requirements_text=text)
+    print()
+    print(plan_.summary())
+
+    if args.dry_run:
+        print("\n(dry-run — chưa ghi gì)")
+        return EXIT_OK
+
+    report = install.apply(plan_, project)
+    print(f"\n{report.summary()}")
+
+    cfg_path = project / ".ai" / "config.json"
+    if not cfg_path.is_file():
+        Config.load(project).write_template(project)
+        print(f"đã ghi {cfg_path}")
+
+    print(f"\n✅ xong. Kiểm tra: aisdlc --project {args.project} doctor")
+    return EXIT_OK
+
+
 # ------------------------------------------------------------------ đầu vào
 
 
@@ -289,6 +359,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument("--project", default=".", help="thư mục dự án (mặc định: thư mục hiện tại)")
     sub = p.add_subparsers(dest="command", required=True)
+
+    s = sub.add_parser("setup", help="dò stack và nạp skill vào dự án")
+    s.add_argument("--references", default="references", help="thư mục chứa kho skill đã clone")
+    s.add_argument("--dry-run", action="store_true", help="chỉ in kế hoạch, không ghi")
+    s.set_defaults(func=cmd_setup)
 
     sub.add_parser("doctor", help="kiểm tra môi trường").set_defaults(func=cmd_doctor)
     sub.add_parser("init", help="ghi .ai/config.json mặc định").set_defaults(func=cmd_init)
