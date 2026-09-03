@@ -1,0 +1,11 @@
+- main:
+  - heading "Đăng nhập" [level=1]
+  - text: Email
+  - textbox "Email"
+  - text: Mật khẩu
+  - textbox "Mật khẩu"
+  - checkbox "Ghi nhớ đăng nhập"
+  - text: Ghi nhớ đăng nhập
+  - button "Đăng nhập"
+  - link "Quên mật khẩu?":
+    - /url: /forgot

@@ -1,0 +1,42 @@
+{
+  "source": "app-bad.html",
+  "snapshot": "- main:\n  - heading \"Đăng nhập\" [level=1]\n  - text: Email\n  - textbox \"Email\"\n  - text: Mật khẩu\n  - textbox \"Mật khẩu\"\n  - button \"Đăng nhập\"\n  - link \"Quên mật khẩu?\":\n    - /url: /forgot\n  - button \"Đăng nhập bằng Google\"",
+  "nodes": [
+    {
+      "role": "main",
+      "name": ""
+    },
+    {
+      "role": "heading",
+      "name": "Đăng nhập"
+    },
+    {
+      "role": "text",
+      "name": ""
+    },
+    {
+      "role": "textbox",
+      "name": "Email"
+    },
+    {
+      "role": "text",
+      "name": ""
+    },
+    {
+      "role": "textbox",
+      "name": "Mật khẩu"
+    },
+    {
+      "role": "button",
+      "name": "Đăng nhập"
+    },
+    {
+      "role": "link",
+      "name": "Quên mật khẩu?"
+    },
+    {
+      "role": "button",
+      "name": "Đăng nhập bằng Google"
+    }
+  ]
+}

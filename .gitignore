@@ -12,3 +12,7 @@ build/
 
 # repo tham chiếu clone ngoài — không commit
 references/
+
+# spike: phụ thuộc cài tạm, không commit
+spike/**/node_modules/
+spike/**/package-lock.json

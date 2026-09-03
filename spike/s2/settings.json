@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [{"type": "command", "command": "python3 /Users/nghinh/Downloads/projects/ai-sdlc/spike/s2/guard.py"}]
+      }
+    ]
+  }
+}
