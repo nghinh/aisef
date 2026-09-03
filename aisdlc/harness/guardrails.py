@@ -252,10 +252,22 @@ def check_diff_scope(changed: list[str], scope: list[str]) -> Verdict:
     )
 
 
-#: Đường dẫn do **harness** ghi, không phải agent: bằng chứng, worktree.
-#: Không loại chúng ra thì chính việc ghi bằng chứng của một story lại bị
-#: tính là story đó ghi ra ngoài phạm vi — guard tự tố cáo mình.
-HARNESS_OWNED = ("_bmad-output/evidence", ".aisdlc")
+#: Đường dẫn do **harness** ghi trong lúc chạy, không phải agent: bằng
+#: chứng, trạng thái đợt, bản ghi phê duyệt, worktree. Không loại chúng ra
+#: thì chính việc harness ghi trạng thái lại bị tính là story ghi ra ngoài
+#: phạm vi — guard tự tố cáo mình và mọi story đều trượt.
+#:
+#: Cố ý **không** loại cả `_bmad-output`: tài liệu kế hoạch (PRD, kiến
+#: trúc, epic, hợp đồng thị giác, chỉ mục story) là thứ agent sửa trộm thì
+#: phải lộ ra — sửa `stories.index.json` là sửa chính phạm vi ràng buộc nó.
+HARNESS_OWNED = (
+    "_bmad-output/evidence",
+    "_bmad-output/approvals",
+    "_bmad-output/sprint-status.json",
+    "_bmad-output/sprint-status.json.lock",
+    "_bmad-output/compile-report.json",
+    ".aisdlc",
+)
 
 
 def changed_files(project_root: str, *, ignore: tuple[str, ...] = HARNESS_OWNED) -> list[str]:

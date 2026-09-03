@@ -534,6 +534,109 @@ def cmd_mockup(args) -> int:
     return EXIT_NOT_READY
 
 
+# ------------------------------------------------------------------ hiện thực
+
+
+def _client(args):
+    """Adapter đã kiểm tên và tình trạng cài đặt. None nếu không dùng được."""
+    from .clients.compile import ADAPTERS
+
+    if args.client not in ADAPTERS:
+        print(f"✗ client không hỗ trợ: {args.client}", file=sys.stderr)
+        return None, EXIT_USAGE
+    adapter = ADAPTERS[args.client]()
+    if not adapter.available():
+        print(f"✗ chưa cài {args.client} trên máy này", file=sys.stderr)
+        return None, EXIT_NOT_READY
+    return adapter, EXIT_OK
+
+
+def cmd_run(args) -> int:
+    """Chạy đợt: epic tuần tự, trong epic chạy song song theo đợt."""
+    from .control.approvals import Gate
+    from .phases.run import run_sprint
+
+    store = _approvals(args)
+    if store.status(Gate.STORIES) is not Status.APPROVED and not args.force:
+        print("✗ cổng stories chưa duyệt — người phải xem cách chia việc trước",
+              file=sys.stderr)
+        print("  aisdlc review stories", file=sys.stderr)
+        return EXIT_NOT_READY
+
+    adapter, code = _client(args)
+    if adapter is None:
+        return code
+
+    report = run_sprint(
+        args.project,
+        adapter,
+        config=Config.load(args.project),
+        only_epic=args.epic,
+        sequential=args.sequential,
+        isolate=not args.no_isolate,
+    )
+    print(report.summary())
+    if report.error:
+        return EXIT_USAGE
+    return EXIT_OK if report.ok else EXIT_NOT_READY
+
+
+def cmd_verify(args) -> int:
+    """Chạy lại toàn bộ guard trên cây làm việc — hậu kiểm.
+
+    Đây là lớp bảo đảm cho client không gắn được hook tiền kiểm: vi phạm
+    vẫn bị bắt, chỉ là bắt **sau khi đã ghi** thay vì chặn lúc ghi.
+    """
+    from .harness.guardrails import changed_files, check_completion, check_diff_scope
+    from .harness.observe import EvidenceStore
+
+    project = Path(args.project).resolve()
+    scope = [p.strip() for p in args.write_scope.split(",") if p.strip()]
+    problems = []
+
+    changed = changed_files(str(project))
+    print(f"Thay đổi trong cây: {len(changed)} file")
+    if scope:
+        v = check_diff_scope(changed, scope)
+        print(("  ✅ " if v.allowed else "  ✗ ") + (v.reason or "nằm trong phạm vi"))
+        if not v.allowed:
+            problems.append("phạm vi ghi")
+    else:
+        print("  ○ chưa truyền --write-scope, bỏ qua kiểm phạm vi")
+
+    if args.story:
+        evidence = EvidenceStore(_artifact_root(args)).read(args.story)
+        v = check_completion(evidence)
+        print(("  ✅ " if v.allowed else "  ✗ ") + (v.reason or "test xanh, không sửa gì sau đó"))
+        if not v.allowed:
+            problems.append("test")
+
+    if problems:
+        print(f"\n✗ hậu kiểm không đạt: {', '.join(problems)}", file=sys.stderr)
+        return EXIT_NOT_READY
+    print("\n✅ hậu kiểm đạt")
+    return EXIT_OK
+
+
+def cmd_tool(args) -> int:
+    """Chạy một tool của harness và ghi bằng chứng."""
+    from .harness.tools import TOOLS, run_tool
+
+    res = run_tool(
+        args.name,
+        args.project,
+        story_id=args.story,
+        artifact_root=_artifact_root(args) if args.story else None,
+        config=Config.load(args.project),
+    )
+    print(res.summary())
+    if res.tail():
+        print(res.tail(args.lines))
+    if res.skipped:
+        return EXIT_NOT_READY
+    return EXIT_OK if res.ok else EXIT_NOT_READY
+
+
 # ------------------------------------------------------------------ đầu vào
 
 
@@ -592,6 +695,25 @@ def build_parser() -> argparse.ArgumentParser:
     mk.add_argument("--force", action="store_true", help="dựng lại cả màn hình đã có")
     mk.add_argument("--only", default="", help="chỉ dựng các screen_id này")
     mk.set_defaults(func=cmd_mockup)
+
+    r2 = sub.add_parser("run", help="chạy đợt: epic tuần tự, story song song")
+    r2.add_argument("--client", default="claude", help="claude | opencode")
+    r2.add_argument("--epic", default="", help="chỉ chạy một epic")
+    r2.add_argument("--sequential", action="store_true", help="tắt chạy song song")
+    r2.add_argument("--no-isolate", action="store_true", help="chạy thẳng trong dự án, không worktree")
+    r2.add_argument("--force", action="store_true", help="chạy dù cổng stories chưa duyệt")
+    r2.set_defaults(func=cmd_run)
+
+    v = sub.add_parser("verify", help="chạy lại guard trên cây làm việc (hậu kiểm)")
+    v.add_argument("--write-scope", default="", help="phạm vi ghi của story, ngăn bởi dấu phẩy")
+    v.add_argument("--story", default="", help="mã story để kiểm bằng chứng test")
+    v.set_defaults(func=cmd_verify)
+
+    t = sub.add_parser("tool", help="chạy tool của harness và ghi bằng chứng")
+    t.add_argument("name", help="test | lint | sast | screenshot | git_commit")
+    t.add_argument("--story", default="", help="mã story để ghi bằng chứng")
+    t.add_argument("--lines", type=int, default=40, help="số dòng output hiển thị")
+    t.set_defaults(func=cmd_tool)
 
     aa = sub.add_parser("auto-approve", help="tự duyệt (ghi dấu auto)")
     aa.add_argument("gates", help="'all' hoặc danh sách ngăn bởi dấu phẩy")

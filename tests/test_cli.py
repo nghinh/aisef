@@ -250,6 +250,56 @@ class TestPlan(CliTestCase):
         self.assertIn("bay-gio", err)
 
 
+class TestToolCommand(CliTestCase):
+    def test_unknown_tool_is_a_clear_error(self):
+        code, _, err = self.run_cli("tool", "khong-co")
+        self.assertEqual(code, EXIT_USAGE)
+        self.assertIn("khong-co", err)
+
+    def test_project_without_a_command_says_so(self):
+        code, out, _ = self.run_cli("tool", "test")
+        self.assertEqual(code, EXIT_NOT_READY)
+        self.assertIn("chưa khai lệnh", out)
+
+    def test_runs_and_records_evidence(self):
+        (self.project / ".ai").mkdir()
+        (self.project / ".ai" / "config.json").write_text(
+            '{"tools.test": "true"}', encoding="utf-8")
+        code, out, _ = self.run_cli("tool", "test", "--story", "STORY-01-01")
+        self.assertEqual(code, EXIT_OK)
+        self.assertIn("✅ test", out)
+
+        from aisdlc.harness.observe import EvidenceStore
+
+        self.assertTrue(EvidenceStore(self.artifacts).read("STORY-01-01").tests_green())
+
+
+class TestVerifyCommand(CliTestCase):
+    def test_clean_tree_passes(self):
+        code, out, _ = self.run_cli("verify")
+        self.assertEqual(code, EXIT_OK)
+        self.assertIn("hậu kiểm đạt", out)
+
+    def test_story_without_tests_fails_post_hoc(self):
+        """Lớp bảo đảm cho client không gắn được hook tiền kiểm."""
+        code, out, _ = self.run_cli("verify", "--story", "STORY-01-01")
+        self.assertEqual(code, EXIT_NOT_READY)
+        self.assertIn("chưa có lần chạy test", out)
+
+
+class TestRunCommand(CliTestCase):
+    def test_refuses_before_the_stories_gate(self):
+        """Người phải xem cách chia việc trước khi máy bắt đầu viết code."""
+        code, _, err = self.run_cli("run")
+        self.assertEqual(code, EXIT_NOT_READY)
+        self.assertIn("cổng stories", err)
+
+    def test_rejects_unknown_client(self):
+        code, _, err = self.run_cli("run", "--client", "khong-co", "--force")
+        self.assertEqual(code, EXIT_USAGE)
+        self.assertIn("khong-co", err)
+
+
 class TestStatus(CliTestCase):
     def test_empty(self):
         code, out, _ = self.run_cli("status")
