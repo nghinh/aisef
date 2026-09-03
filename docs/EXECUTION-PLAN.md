@@ -16,8 +16,9 @@
 | GĐ-0 Spike | ✅ **xong** — 6/7 spike xanh, S4 (OpenCode) chưa kết luận, không chặn |
 | GĐ-1 Control plane | ✅ **xong** — config · state · fsm · worktree · CLI |
 | GĐ-2 Kit + Setup | ✅ **xong** — catalog · detect_stack · lọc 2 tầng · install · constitution |
-| GĐ-3 Đa client | ⏳ kế tiếp |
-| GĐ-4…GĐ-9 | chưa bắt đầu |
+| GĐ-3 Đa client | ✅ **xong** — adapter · guard · compile · báo cáo mất mát |
+| GĐ-4 BMAD pipeline | ⏳ kế tiếp |
+| GĐ-5…GĐ-9 | chưa bắt đầu |
 
 **Mốc demo đã đạt**
 
@@ -27,7 +28,12 @@
   `AGENTS.md` sinh theo stack, `doctor` xanh gồm cả bất biến "không có
   skill tấn công".
 
-**262 test xanh.**
+* *Mốc 3* — `aisdlc compile` sinh `.claude/settings.json`; chạy `claude -p`
+  thật với nó thì guard **chặn được** một agent cố ghi ra ngoài phạm vi:
+  file không được tạo, `permission_denials = 1`. Toàn chuỗi compile → hook
+  → guard → chặn đã kiểm chứng trên agent thật.
+
+**341 test xanh.**
 
 ---
 
@@ -50,7 +56,12 @@
 | `aisdlc/kit/catalog.py` | sổ đăng ký nguồn + ràng buộc license | 17 |
 | `aisdlc/kit/install.py` | cài skill, idempotent | 14 |
 | `aisdlc/kit/constitution.py` | sinh CLAUDE.md / AGENTS.md | 14 |
-| | | **262 xanh** |
+| `aisdlc/clients/base.py` | giao diện adapter + khai báo năng lực | 12 |
+| `aisdlc/clients/claude_code.py` | chạy claude -p | 8 |
+| `aisdlc/clients/opencode.py` | chạy opencode run | 2 |
+| `aisdlc/harness/guardrails.py` | 5 guard chặn thật | 42 |
+| `aisdlc/clients/compile.py` | sinh cấu hình client + báo cáo mất mát | 19 |
+| | | **341 xanh** |
 
 ---
 
