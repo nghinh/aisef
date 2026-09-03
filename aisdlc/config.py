@@ -36,6 +36,10 @@ DEFAULTS: dict[str, Any] = {
     "run.max_retries": 2,
     # chi phí
     "cost.warn_multiple": 3.0,
+    # ứng dụng của dự án — để mở route thật lúc đối chiếu với mockup
+    "app.dev_command": "",
+    "app.base_url": "http://localhost:5173",
+    "app.ready_timeout_seconds": 60,
     # định tuyến model theo vai — rỗng nghĩa là dùng mặc định của client
     "route.developer_model": "",
     "route.reviewer_model": "",
@@ -61,6 +65,9 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "run.timeout_seconds": int,
     "run.max_retries": int,
     "cost.warn_multiple": float,
+    "app.dev_command": str,
+    "app.base_url": str,
+    "app.ready_timeout_seconds": int,
     "route.developer_model": str,
     "route.reviewer_model": str,
     "route.designer_model": str,

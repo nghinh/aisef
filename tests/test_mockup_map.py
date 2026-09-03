@@ -1,0 +1,247 @@
+"""Map mockup — hai nửa: nạp lát cắt, rồi đối chiếu route thật.
+
+Nửa đối chiếu chạy thật: dựng một "ứng dụng" tĩnh bằng `http.server`, mở
+route bằng chromium, đọc cây accessibility. Không giả lập chỗ nào, vì cái
+cần chứng minh chính là chuỗi đó chạy được.
+"""
+
+from __future__ import annotations
+
+import shutil
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from aisdlc.config import DEFAULTS, Config  # noqa: E402
+from aisdlc.control.design_contract import load  # noqa: E402
+from aisdlc.control.experience import parse_experience_file  # noqa: E402
+from aisdlc.harness import browser  # noqa: E402
+from aisdlc.harness.mockup_map import load_for_story, load_slice, prompt_section  # noqa: E402
+from aisdlc.harness.mockup_verify import (  # noqa: E402
+    AppServer,
+    concrete_route,
+    verify_screens,
+)
+from aisdlc.harness.observe import MOCKUP_MAP, EvidenceStore  # noqa: E402
+from aisdlc.phases.mockup import extract  # noqa: E402
+
+FIX = ROOT / "tests" / "fixtures"
+BROWSER_REASON = browser.availability(ROOT)
+
+
+def build_contract(root: Path):
+    (root / "mockups").mkdir(parents=True, exist_ok=True)
+    for p in (FIX / "mockups").glob("*.html"):
+        shutil.copy(p, root / "mockups" / p.name)
+    extract(root, parse_experience_file(FIX / "bmad" / "EXPERIENCE.md"))
+    return load(root)
+
+
+@unittest.skipIf(BROWSER_REASON, f"không dựng được mockup: {BROWSER_REASON}")
+class TestLoadHalf(unittest.TestCase):
+    """6.7a — nạp đúng một màn hình, không hơn."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = tempfile.TemporaryDirectory()
+        cls.root = Path(cls._tmp.name)
+        cls.contract = build_contract(cls.root)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._tmp.cleanup()
+
+    def test_loads_only_the_named_screen(self):
+        text = prompt_section(
+            load_for_story(self.contract, ["danh-sach"], artifact_root=self.root)[0]
+        )
+        self.assertIn("danh-sach", text)
+        for other in ("thung-rac", "cai-dat", "the"):
+            self.assertNotIn(other, text)
+
+    def test_slice_carries_route_and_components(self):
+        sl = load_slice(self.contract, "danh-sach", artifact_root=self.root)
+        text = sl.as_prompt()
+        self.assertIn("`/`", text)
+        self.assertIn("Ghi chú mới", text)
+
+    def test_slice_points_at_mockup_and_screenshot(self):
+        sl = load_slice(self.contract, "danh-sach", artifact_root=self.root)
+        self.assertTrue(sl.mockup_path.is_file())
+        self.assertTrue(sl.screenshot_path.is_file())
+
+    def test_sample_data_is_not_a_commitment(self):
+        """Nội dung ví dụ trong `[data-sample]` không được thành cam kết —
+        ứng dụng thật hiển thị dữ liệu khác, cổng sẽ đỏ mãi mãi."""
+        sl = load_slice(self.contract, "danh-sach", artifact_root=self.root)
+        names = [c.name for c in sl.screen.components]
+        self.assertNotIn("Đặt lịch khám răng 2 phút trước", names)
+        self.assertIn("link", sl.screen.data_roles)
+        self.assertIn("Vùng dữ liệu", sl.as_prompt())
+
+    def test_validation_constraints_go_into_the_prompt(self):
+        text = load_slice(self.contract, "danh-sach", artifact_root=self.root).as_prompt()
+        self.assertIn("maxlength=120", text)
+
+    def test_unknown_screen_is_reported_not_silently_empty(self):
+        slices, missing = load_for_story(
+            self.contract, ["danh-sach", "khong-co"], artifact_root=self.root
+        )
+        self.assertEqual(len(slices), 1)
+        self.assertEqual(missing, ["khong-co"])
+
+    def test_story_without_screens_says_so(self):
+        text = prompt_section([])
+        self.assertIn("không dựng màn hình nào", text)
+
+
+class TestRouteRewrite(unittest.TestCase):
+    def test_params_get_a_sample_value(self):
+        self.assertEqual(concrete_route("/note/:id"), "/note/1")
+        self.assertEqual(concrete_route("/blog/[slug]/edit"), "/blog/1/edit")
+
+    def test_plain_route_untouched(self):
+        self.assertEqual(concrete_route("/settings"), "/settings")
+
+
+@unittest.skipIf(BROWSER_REASON, f"không dựng được mockup: {BROWSER_REASON}")
+class TestVerifyHalf(unittest.TestCase):
+    """6.7b/6.7c — mở route thật, đối chiếu, và cổng phải chặn khi thiếu."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        self.artifacts = self.root / "_bmad-output"
+        self.contract = build_contract(self.artifacts)
+        self.app = self.root / "app"
+        self.app.mkdir()
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def serve(self, body: str) -> Config:
+        # `<meta charset>` không phải chi tiết vụn: thiếu nó thì trình duyệt
+        # giải mã UTF-8 thành latin-1 và mọi tên gọi tiếng Việt lệch — trang
+        # hỏng thật với người dùng, và cổng phát hiện đúng.
+        page = (
+            "<!doctype html><html lang=vi><head><meta charset=\"utf-8\">"
+            "<title>App</title></head><body>" + body + "</body></html>"
+        )
+        (self.app / "index.html").write_text(page, encoding="utf-8")
+        port = _free_port()
+        return Config({
+            **DEFAULTS,
+            "app.dev_command": f"{sys.executable} -m http.server {port} --directory {self.app}",
+            "app.base_url": f"http://127.0.0.1:{port}",
+            "app.ready_timeout_seconds": 20,
+        })
+
+    def run_verify(self, cfg: Config):
+        return verify_screens(
+            self.root, self.contract, ["danh-sach"],
+            config=cfg, story_id="STORY-01-01", artifact_root=self.artifacts,
+        )
+
+    def test_app_that_honours_the_contract_passes(self):
+        cfg = self.serve(
+            '<input type="search" aria-label="Tìm ghi chú">'
+            "<button>Ghi chú mới</button>"
+            '<ul><li><a href="#">Ghi chú thật từ cơ sở dữ liệu</a></li></ul>'
+        )
+        res = self.run_verify(cfg)
+        self.assertTrue(res.passed, res.summary())
+
+    def test_missing_component_fails_the_gate(self):
+        """Thiếu một component đã hứa → cổng chặn. Đây là lý do cả hai nửa
+        tồn tại."""
+        cfg = self.serve(
+            '<input type="search" aria-label="Tìm ghi chú">'
+            '<ul><li><a href="#">Một ghi chú</a></li></ul>'
+        )
+        res = self.run_verify(cfg)
+        self.assertFalse(res.passed)
+        self.assertIn("Ghi chú mới", res.summary())
+
+    def test_extra_component_only_warns(self):
+        cfg = self.serve(
+            '<input type="search" aria-label="Tìm ghi chú">'
+            "<button>Ghi chú mới</button><button>Sắp xếp</button>"
+            '<ul><li><a href="#">Một ghi chú</a></li></ul>'
+        )
+        res = self.run_verify(cfg)
+        self.assertTrue(res.passed)
+        self.assertIn("Sắp xếp", res.summary())
+
+    def test_different_data_content_is_not_a_failure(self):
+        """Ứng dụng hiển thị ghi chú thật, không phải ghi chú mẫu — đúng
+        như mong đợi, và không được coi là lệch hợp đồng."""
+        cfg = self.serve(
+            '<input type="search" aria-label="Tìm ghi chú">'
+            "<button>Ghi chú mới</button>"
+            '<ul><li><a href="#">Hoàn toàn khác mockup</a></li></ul>'
+        )
+        self.assertTrue(self.run_verify(cfg).passed)
+
+    def test_empty_data_region_is_a_failure(self):
+        """Không so tên ở vùng dữ liệu, nhưng vẫn phải có mục — nếu không
+        thì một danh sách rỗng cũng "đạt"."""
+        cfg = self.serve(
+            '<input type="search" aria-label="Tìm ghi chú">'
+            "<button>Ghi chú mới</button>"
+        )
+        res = self.run_verify(cfg)
+        self.assertFalse(res.passed)
+        self.assertIn("vùng dữ liệu", res.summary())
+
+    def test_evidence_records_the_comparison(self):
+        cfg = self.serve("trống")
+        self.run_verify(cfg)
+        e = EvidenceStore(self.artifacts).read("STORY-01-01").last(MOCKUP_MAP)
+        self.assertIsNotNone(e)
+        self.assertFalse(e.ok)
+        self.assertEqual(e.detail["screen_id"], "danh-sach")
+        self.assertTrue(e.detail["missing"])
+
+    def test_no_dev_command_is_reported_not_passed(self):
+        """Không mở được ứng dụng thì **không** phải là đạt."""
+        res = verify_screens(
+            self.root, self.contract, ["danh-sach"],
+            config=Config({**DEFAULTS, "app.base_url": f"http://127.0.0.1:{_free_port()}"}),
+        )
+        self.assertFalse(res.passed)
+        self.assertIn("app.dev_command", res.unavailable)
+
+    def test_story_without_screens_needs_no_app(self):
+        res = verify_screens(self.root, self.contract, [], config=Config(dict(DEFAULTS)))
+        self.assertTrue(res.passed)
+        self.assertEqual(res.results, [])
+
+
+class TestAppServer(unittest.TestCase):
+    def test_url_join(self):
+        s = AppServer("", "http://x:3000", cwd=Path("."))
+        self.assertEqual(s.url_for("/note/1"), "http://x:3000/note/1")
+        self.assertEqual(s.url_for("/"), "http://x:3000/")
+
+    def test_dev_server_that_dies_is_reported(self):
+        s = AppServer(f"{sys.executable} -c 'raise SystemExit(3)'",
+                      f"http://127.0.0.1:{_free_port()}", cwd=Path("."), ready_timeout=10)
+        why = s.start()
+        s.stop()
+        self.assertIn("thoát sớm", why)
+
+
+def _free_port() -> int:
+    import socket
+
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

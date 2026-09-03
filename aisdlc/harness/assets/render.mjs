@@ -38,8 +38,20 @@ for (const job of input.jobs ?? []) {
   const errors = [];
   page.on('pageerror', (e) => errors.push(String(e)));
   try {
-    await page.goto(pathToFileURL(resolve(job.html)).href, { waitUntil: 'load' });
+    // Mockup mở bằng file://, ứng dụng thật mở bằng http:// — cùng một
+    // đường trích, để hai bên so bằng cùng thước đo.
+    const target = job.url ?? pathToFileURL(resolve(job.html)).href;
+    await page.goto(target, { waitUntil: job.url ? 'networkidle' : 'load' });
     const snapshot = await page.locator('body').ariaSnapshot();
+
+    // Vùng dữ liệu mẫu: hàng danh sách, thẻ, kết quả tìm kiếm. Tên gọi ở
+    // đây đến từ nội dung ví dụ, không phải cam kết giao diện — ứng dụng
+    // thật sẽ hiển thị dữ liệu khác. So theo tên sẽ đỏ mãi mãi, và một cổng
+    // đỏ mãi mãi thì bị tắt.
+    const samples = [];
+    for (const region of await page.locator('[data-sample]').all()) {
+      samples.push(await region.ariaSnapshot());
+    }
 
     const meta = await page.evaluate(() => {
       const metaOf = (n) => document.querySelector(`meta[name="${n}"]`)?.content ?? '';
@@ -68,9 +80,10 @@ for (const job of input.jobs ?? []) {
     if (job.png) {
       await page.screenshot({ path: job.png, fullPage: true });
     }
-    screens.push({ id: job.id, html: job.html, png: job.png ?? '', snapshot, ...meta, console_errors: errors });
+    screens.push({ id: job.id, html: job.html ?? '', url: job.url ?? '', png: job.png ?? '',
+                   snapshot, sample_snapshots: samples, ...meta, console_errors: errors });
   } catch (e) {
-    screens.push({ id: job.id, html: job.html, error: String(e), console_errors: errors });
+    screens.push({ id: job.id, html: job.html ?? '', url: job.url ?? '', error: String(e), console_errors: errors });
   } finally {
     await page.close();
   }

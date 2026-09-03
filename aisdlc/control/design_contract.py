@@ -35,7 +35,11 @@ class ScreenContract:
     purpose: str = ""
     mockup: str = ""
     screenshot: str = ""
+    #: Khung giao diện — cam kết theo (vai trò, tên gọi).
     components: list[Component] = field(default_factory=list)
+    #: Vai trò xuất hiện trong vùng dữ liệu mẫu. Ứng dụng thật hiển thị dữ
+    #: liệu khác, nên chỉ cam kết **có mặt**, không cam kết tên gọi.
+    data_roles: list[str] = field(default_factory=list)
     fields: list[dict] = field(default_factory=list)
     states: list[str] = field(default_factory=list)
     #: Chỗ mockup tự khai là chưa chốt (`data-unresolved`). Còn mục nào thì
@@ -52,6 +56,7 @@ class ScreenContract:
             "mockup": self.mockup,
             "screenshot": self.screenshot,
             "components": [{"role": c.role, "name": c.name} for c in self.components],
+            "data_roles": self.data_roles,
             "fields": self.fields,
             "states": self.states,
             "unresolved": self.unresolved,
@@ -71,6 +76,7 @@ class ScreenContract:
                 Component(c.get("role", ""), c.get("name", ""))
                 for c in data.get("components", [])
             ],
+            data_roles=data.get("data_roles", []),
             fields=data.get("fields", []),
             states=data.get("states", []),
             unresolved=data.get("unresolved", []),
@@ -167,7 +173,14 @@ def _one(screen: Screen, rendered, root: Path) -> ScreenContract:
     out.route = rendered.route
     out.mockup = _rel(root, rendered.html)
     out.screenshot = _rel(root, rendered.png)
-    out.components = parse_aria_snapshot(rendered.snapshot)
+    everything = parse_aria_snapshot(rendered.snapshot)
+    in_samples = [
+        c for snap in getattr(rendered, "sample_snapshots", []) or []
+        for c in parse_aria_snapshot(snap)
+    ]
+    sample_set = set(in_samples)
+    out.components = [c for c in everything if c not in sample_set]
+    out.data_roles = sorted({c.role for c in in_samples})
     out.fields = rendered.fields
     out.unresolved = list(rendered.unresolved)
     if rendered.console_errors:

@@ -28,10 +28,14 @@ def _node_paths(project: Path) -> list[Path]:
 class RenderedScreen:
     id: str
     html: str = ""
+    url: str = ""
     png: str = ""
     route: str = ""
     title: str = ""
     snapshot: str = ""
+    #: Snapshot của từng vùng `[data-sample]` — nội dung ví dụ, không phải
+    #: cam kết. Trừ ra khỏi hợp đồng để cổng không đỏ vì dữ liệu khác nhau.
+    sample_snapshots: list[str] = field(default_factory=list)
     fields: list[dict] = field(default_factory=list)
     unresolved: list[str] = field(default_factory=list)
     console_errors: list[str] = field(default_factory=list)
@@ -124,10 +128,12 @@ def render(
             RenderedScreen(
                 id=raw.get("id", ""),
                 html=raw.get("html", ""),
+                url=raw.get("url", ""),
                 png=raw.get("png", ""),
                 route=raw.get("route", ""),
                 title=raw.get("title", ""),
                 snapshot=raw.get("snapshot", ""),
+                sample_snapshots=raw.get("sample_snapshots", []) or [],
                 fields=raw.get("fields", []),
                 unresolved=raw.get("unresolved", []),
                 console_errors=raw.get("console_errors", []),

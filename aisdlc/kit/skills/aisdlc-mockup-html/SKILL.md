@@ -57,7 +57,19 @@ của dự án này, còn skill là kiến thức chung.
 5. **Nội dung thật.** Lấy từ PRD và EXPERIENCE. Không lorem ipsum, không
    "Item 1 / Item 2".
 
-6. **Trạng thái**: dựng trạng thái chính. Trạng thái nào EXPERIENCE.md nêu
+6. **Đánh dấu vùng dữ liệu** bằng `data-sample` — hàng danh sách, thẻ kết
+   quả, mọi thứ ứng dụng thật sẽ vẽ ra từ dữ liệu:
+
+   ```html
+   <ul data-sample="danh sách ghi chú lấy từ Kho cục bộ"> … </ul>
+   ```
+
+   Bên trong vùng này, hợp đồng chỉ ghi nhận **có kiểu phần tử gì**, không
+   ghi nhận tên gọi — vì ứng dụng thật hiển thị dữ liệu khác. Không đánh
+   dấu thì "Đặt lịch khám răng" trở thành cam kết, cổng sẽ đỏ mãi mãi, và
+   một cổng đỏ mãi mãi thì bị tắt.
+
+7. **Trạng thái**: dựng trạng thái chính. Trạng thái nào EXPERIENCE.md nêu
    là load-bearing (rỗng, lỗi, đang tải) thì dựng thêm trong cùng file,
    mỗi trạng thái một `<section>` có tiêu đề rõ.
 

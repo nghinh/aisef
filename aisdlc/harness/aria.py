@@ -51,6 +51,10 @@ class MapResult:
     actual: list[Component] = field(default_factory=list)
     missing: list[Component] = field(default_factory=list)
     extra: list[Component] = field(default_factory=list)
+    #: Vai trò hợp đồng hứa có trong vùng dữ liệu nhưng ứng dụng không dựng
+    #: mục nào. So theo tên ở vùng này là vô nghĩa (dữ liệu khác nhau), còn
+    #: không so gì thì bỏ lọt cả một danh sách rỗng.
+    missing_data_roles: list[str] = field(default_factory=list)
 
     @property
     def matched(self) -> int:
@@ -63,7 +67,7 @@ class MapResult:
         Ứng dụng thật được phép có thêm phần tử hợp lý (nút phụ, banner),
         nhưng **không được thiếu** thứ hợp đồng đã hứa.
         """
-        return not self.missing
+        return not self.missing and not self.missing_data_roles
 
     def to_evidence(self) -> dict:
         return {
@@ -72,6 +76,7 @@ class MapResult:
             "contract_components": len(self.contract),
             "matched": self.matched,
             "missing": [str(c) for c in self.missing],
+            "missing_data_roles": self.missing_data_roles,
             "extra": [str(c) for c in self.extra],
             "passed": self.passed,
         }
@@ -81,6 +86,11 @@ class MapResult:
         parts = [f"{self.screen_id or 'screen'}: {verdict} ({self.matched}/{len(self.contract)})"]
         if self.missing:
             parts.append("  thiếu: " + ", ".join(str(c) for c in self.missing))
+        if self.missing_data_roles:
+            parts.append(
+                "  vùng dữ liệu không dựng mục nào kiểu: "
+                + ", ".join(self.missing_data_roles)
+            )
         if self.extra:
             parts.append("  thừa (cảnh báo): " + ", ".join(str(c) for c in self.extra))
         return "\n".join(parts)
@@ -110,6 +120,7 @@ def compare(
     *,
     screen_id: str = "",
     route: str = "",
+    data_roles: list[str] | None = None,
 ) -> MapResult:
     """So hợp đồng với thực tế.
 
@@ -118,6 +129,7 @@ def compare(
     người đánh giá thị giác, không phải của cổng tất định.
     """
     want, have = set(contract), set(actual)
+    roles_present = {c.role for c in actual}
     return MapResult(
         screen_id=screen_id,
         route=route,
@@ -125,6 +137,7 @@ def compare(
         actual=list(actual),
         missing=[c for c in contract if c not in have],
         extra=[c for c in actual if c not in want],
+        missing_data_roles=[r for r in (data_roles or []) if r not in roles_present],
     )
 
 
@@ -134,6 +147,7 @@ def compare_snapshots(
     *,
     screen_id: str = "",
     route: str = "",
+    data_roles: list[str] | None = None,
 ) -> MapResult:
     """Tiện ích: đối chiếu trực tiếp hai chuỗi aria snapshot."""
     return compare(
@@ -141,4 +155,5 @@ def compare_snapshots(
         parse_aria_snapshot(actual_snapshot),
         screen_id=screen_id,
         route=route,
+        data_roles=data_roles,
     )
