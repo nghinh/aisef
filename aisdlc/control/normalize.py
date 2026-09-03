@@ -22,6 +22,8 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .experience import slugify
+
 #: `#### FR-1: Tạo ghi chú`
 _FR_HEADING = re.compile(r"^#{2,5}\s+(FR-\d+)\s*[:：]\s*(.+?)\s*$", re.MULTILINE)
 
@@ -224,7 +226,7 @@ _AC_BLOCK = re.compile(
 _GIVEN = re.compile(r"^\s*\*\*Given\*\*", re.IGNORECASE)
 #: `- write_scope: src/notes/, src/db/schema.ts` — kể cả khi in đậm nhãn.
 _META_ITEM = re.compile(
-    r"^[-*]?\s*\*{0,2}(covers|write[_ ]scope|depends[_ ]on)\*{0,2}\s*[:：]\s*(.+?)\s*$",
+    r"^[-*]?\s*\*{0,2}(covers|write[_ ]scope|depends[_ ]on|screens?)\*{0,2}\s*[:：]\s*(.+?)\s*$",
     re.MULTILINE | re.IGNORECASE,
 )
 _STORY_REF = re.compile(r"\b(\d+)\.(\d+)\b")
@@ -261,6 +263,9 @@ class Story:
     #: và xung đột merge cuối đợt là bằng chứng nó khai sai.
     write_scope: list[str] = field(default_factory=list)
     depends_on: list[str] = field(default_factory=list)
+    #: Màn hình story này dựng (mã trong EXPERIENCE.md). Rỗng = story không
+    #: có giao diện; bước map mockup bỏ qua nó.
+    screens: list[str] = field(default_factory=list)
     body: str = ""
 
     @property
@@ -280,6 +285,7 @@ class Story:
             "covers": self.covers,
             "write_scope": self.write_scope,
             "depends_on": self.depends_on,
+            "screens": self.screens,
         }
 
 
@@ -350,6 +356,10 @@ def _parse_story_meta(body: str, epic_n: int) -> dict[str, list[str]]:
             meta["write_scope"] = [v for v in values if v.lower() not in ("none", "không")]
         elif key == "depends_on":
             meta["depends_on"] = _refs_to_story_ids(m.group(2), epic_n)
+        elif key in ("screen", "screens"):
+            meta["screens"] = [
+                slugify(v) for v in values if v.lower() not in ("none", "không")
+            ]
     return meta
 
 
@@ -433,6 +443,7 @@ def parse_epics(text: str) -> EpicPlan:
             story.covers = meta.get("covers", [])
             story.write_scope = meta.get("write_scope", [])
             story.depends_on = [d for d in meta.get("depends_on", []) if d != story.id]
+            story.screens = meta.get("screens", [])
 
             epic.stories.append(story)
         plan.epics.append(epic)

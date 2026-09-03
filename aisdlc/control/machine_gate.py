@@ -163,6 +163,70 @@ def check_stories(
     return r
 
 
+def check_design_contract(
+    contract,
+    experience,
+    stories: list | None = None,
+) -> GateResult:
+    """Kiểm hợp đồng thị giác trước khi mời người duyệt mockup.
+
+    Ba câu hỏi, đều có đáp án tất định:
+
+    1. Mọi màn hình trong EXPERIENCE.md có mockup dựng được không?
+    2. Còn chỗ nào mockup tự khai là **chưa chốt** không?
+    3. Story giao diện có trỏ tới màn hình **có thật** không?
+
+    Câu 3 quan trọng vì lúc viết code, agent nạp hợp đồng theo ``screen_id``
+    lấy từ story. Mã sai thì nó nạp rỗng và dựng giao diện theo phán đoán —
+    đúng thứ bước map mockup sinh ra để ngăn.
+    """
+    r = GateResult("cổng máy: mockup")
+
+    if not experience.screens:
+        r.errors.append("EXPERIENCE.md không liệt kê màn hình nào")
+        return r
+
+    missing = [s.id for s in experience.screens if contract.by_id(s.id) is None]
+    if missing:
+        r.errors.append(f"màn hình chưa có trong hợp đồng: {', '.join(missing)}")
+
+    for screen in contract.screens:
+        if screen.error:
+            r.errors.append(f"{screen.id}: {screen.error}")
+            continue
+        if screen.unresolved:
+            r.errors.append(
+                f"{screen.id}: mockup còn {len(screen.unresolved)} chỗ chưa chốt — "
+                f"{screen.unresolved[0][:120]}"
+            )
+        if not screen.route:
+            r.errors.append(
+                f"{screen.id}: mockup không khai route (thẻ meta aisdlc-route) — "
+                "không đối chiếu được với ứng dụng thật"
+            )
+        if not screen.components:
+            r.warnings.append(f"{screen.id}: mockup không có component nào kiểm được")
+
+    extra = [s.id for s in contract.screens if experience.by_id(s.id) is None]
+    if extra:
+        r.warnings.append(f"hợp đồng có màn hình không nằm trong EXPERIENCE.md: {', '.join(extra)}")
+
+    if stories is not None:
+        known = set(contract.ids) | set(experience.ids)
+        for story in stories:
+            unknown = [sid for sid in getattr(story, "screens", []) if sid not in known]
+            if unknown:
+                r.errors.append(
+                    f"{story.id}: trỏ tới màn hình không có thật: {', '.join(unknown)}"
+                )
+        used = {sid for st in stories for sid in getattr(st, "screens", [])}
+        orphan = [s.id for s in experience.screens if s.id not in used]
+        if orphan:
+            r.warnings.append(f"màn hình chưa story nào dựng: {', '.join(orphan)}")
+
+    return r
+
+
 def check_all(results: list[GateResult]) -> GateResult:
     """Gộp nhiều kết quả cổng thành một."""
     combined = GateResult("cổng máy")

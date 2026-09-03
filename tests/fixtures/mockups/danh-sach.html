@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="aisdlc-screen" content="danh-sach">
+<meta name="aisdlc-route" content="/">
+<title>Danh sách — Ghi chú cục bộ</title>
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; margin: 0; background: #FBFAF7; color: #1B1A17; }
+  header { display: flex; gap: .75rem; align-items: center; padding: .75rem 1rem;
+           border-bottom: 1px solid #E4E0D8; }
+  input[type=search] { flex: 1; padding: .5rem .75rem; border: 1px solid #D6D1C6;
+                       border-radius: 8px; font: inherit; }
+  button { padding: .5rem .9rem; border: 0; border-radius: 8px; background: #1B1A17;
+           color: #FBFAF7; font: inherit; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { border-bottom: 1px solid #EEEBE4; }
+  li a { display: block; padding: .85rem 1rem; color: inherit; text-decoration: none; }
+  time { display: block; font-size: .8rem; opacity: .6; }
+  .offline { padding: .35rem 1rem; background: #F4EFE2; font-size: .85rem; }
+</style></head>
+<body>
+<div class="offline" role="status">Đang ngoại tuyến — thay đổi vẫn được lưu trên máy</div>
+<header>
+  <label for="q" hidden>Tìm ghi chú</label>
+  <input id="q" name="q" type="search" placeholder="Tìm ghi chú" maxlength="120" aria-label="Tìm ghi chú">
+  <button type="button">Ghi chú mới</button>
+</header>
+<main>
+  <h1 hidden>Ghi chú</h1>
+  <ul>
+    <li><a href="#">Đặt lịch khám răng<time>2 phút trước</time></a></li>
+    <li><a href="#">Danh sách mua tuần này<time>hôm qua</time></a></li>
+    <li><a href="#">Ý tưởng bài viết về ngoại tuyến<time>3 ngày trước</time></a></li>
+  </ul>
+</main>
+</body></html>

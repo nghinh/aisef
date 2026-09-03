@@ -1,0 +1,120 @@
+"""Đọc EXPERIENCE.md — nguồn danh sách màn hình.
+
+Kiểm trên hai tài liệu: fixture tiếng Việt của bộ test, và **mẫu do chính
+BMAD ship kèm** (`assets/experience-example-shadcn.md`). Mẫu của BMAD là
+thứ định nghĩa hình dạng thật; đọc được nó nghĩa là bộ đọc không bám vào
+cách viết riêng của fixture.
+"""
+
+from __future__ import annotations
+
+import sys
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from aisdlc.control.experience import (  # noqa: E402
+    parse_experience,
+    parse_experience_file,
+    slugify,
+)
+
+FIX = ROOT / "tests" / "fixtures" / "bmad" / "EXPERIENCE.md"
+BMAD_SAMPLE = (
+    ROOT / "references" / "bmad-method" / "src" / "bmm-skills" / "plan"
+    / "bmad-ux" / "assets" / "experience-example-shadcn.md"
+)
+
+
+class TestSlug(unittest.TestCase):
+    def test_ascii(self):
+        self.assertEqual(slugify("Project detail"), "project-detail")
+
+    def test_vietnamese_diacritics_removed(self):
+        self.assertEqual(slugify("Thùng rác"), "thung-rac")
+        self.assertEqual(slugify("Đăng nhập"), "dang-nhap")
+
+    def test_never_empty(self):
+        self.assertEqual(slugify("///"), "screen")
+
+
+class TestParseFixture(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.exp = parse_experience_file(FIX)
+
+    def test_screens_in_document_order(self):
+        self.assertEqual(
+            self.exp.ids,
+            ["danh-sach", "soan-thao", "tim-kiem", "the", "thung-rac", "cai-dat"],
+        )
+
+    def test_screen_carries_purpose_and_entry_point(self):
+        s = self.exp.by_id("tim-kiem")
+        self.assertIn("toàn văn", s.purpose)
+        self.assertIn("Ô tìm", s.reached_from)
+
+    def test_components_attached_by_scope_column(self):
+        self.assertIn("Ô soạn thảo", self.exp.by_id("soan-thao").components)
+        self.assertNotIn("Ô soạn thảo", self.exp.by_id("danh-sach").components)
+
+    def test_global_components_attach_everywhere(self):
+        for screen in self.exp.screens:
+            self.assertIn("Chỉ báo ngoại tuyến", screen.components)
+
+    def test_states_attached(self):
+        self.assertIn("Không tìm thấy", self.exp.by_id("tim-kiem").states)
+        self.assertNotIn("Không tìm thấy", self.exp.by_id("cai-dat").states)
+
+    def test_component_rules_kept_for_the_mockup_prompt(self):
+        self.assertIn("1 giây", self.exp.component_rules["Ô soạn thảo"])
+
+
+class TestParseBmadSample(unittest.TestCase):
+    """Mẫu của chính BMAD — hình dạng thật, không phải cách viết của ta."""
+
+    @classmethod
+    def setUpClass(cls):
+        if not BMAD_SAMPLE.is_file():
+            raise unittest.SkipTest("chưa clone references/bmad-method")
+        cls.exp = parse_experience_file(BMAD_SAMPLE)
+
+    def test_reads_the_information_architecture_table(self):
+        self.assertEqual(
+            self.exp.ids, ["today", "projects", "project-detail", "search", "settings"]
+        )
+
+    def test_behaviour_prose_does_not_leak_into_scope(self):
+        """Luật của `Task row` chứa chữ "Click anywhere on row" — quét cả
+        dòng thì "anywhere" biến nó thành component của mọi màn hình."""
+        self.assertNotIn("Task row", self.exp.by_id("settings").components)
+        self.assertIn("Task row", self.exp.by_id("today").components)
+
+    def test_global_component_still_attaches_everywhere(self):
+        for screen in self.exp.screens:
+            self.assertIn("Command palette", screen.components)
+
+
+class TestRobustness(unittest.TestCase):
+    def test_no_information_architecture_section(self):
+        self.assertEqual(parse_experience("# Trống\n\nkhông có bảng nào.\n").screens, [])
+
+    def test_duplicate_surface_kept_once(self):
+        text = (
+            "## Information Architecture\n\n"
+            "| Surface | Reached from | Purpose |\n|---|---|---|\n"
+            "| Home | mở app | trang đầu |\n| Home | menu | trang đầu |\n"
+        )
+        self.assertEqual(parse_experience(text).ids, ["home"])
+
+    def test_table_without_all_columns(self):
+        text = "## Screens\n\n| Surface |\n|---|\n| Home |\n"
+        s = parse_experience(text).by_id("home")
+        self.assertEqual(s.name, "Home")
+        self.assertEqual(s.purpose, "")
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

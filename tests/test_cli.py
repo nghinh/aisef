@@ -198,6 +198,43 @@ class TestReviewStories(CliTestCase):
         self.assertIn("cổng máy: ĐẠT", out)
 
 
+class TestMockupCommand(CliTestCase):
+    def test_rejects_unknown_client(self):
+        code, _, err = self.run_cli("mockup", "--client", "khong-co")
+        self.assertEqual(code, EXIT_USAGE)
+        self.assertIn("khong-co", err)
+
+    def test_without_experience_file(self):
+        code, out, _ = self.run_cli("mockup")
+        self.assertEqual(code, EXIT_USAGE)
+        self.assertIn("EXPERIENCE.md", out)
+
+    def test_review_mockups_shows_screens_and_index_link(self):
+        import shutil
+
+        from aisdlc.control.design_contract import CONTRACT_FILE
+        from aisdlc.control.experience import parse_experience_file
+        from aisdlc.harness import browser
+        from aisdlc.phases.mockup import extract
+
+        if browser.availability(self.project):
+            self.skipTest("chưa dựng được mockup trên máy này")
+
+        fix = Path(__file__).resolve().parent / "fixtures"
+        shutil.copy(fix / "bmad" / "EXPERIENCE.md", self.artifacts / "EXPERIENCE.md")
+        (self.artifacts / "mockups").mkdir()
+        for p in (fix / "mockups").glob("*.html"):
+            shutil.copy(p, self.artifacts / "mockups" / p.name)
+        extract(self.artifacts, parse_experience_file(self.artifacts / "EXPERIENCE.md"))
+        self.assertTrue((self.artifacts / CONTRACT_FILE).is_file())
+
+        code, out, _ = self.run_cli("review", "mockups")
+        self.assertEqual(code, EXIT_OK)
+        self.assertIn("index.html", out)
+        self.assertIn("cam kết:", out)
+        self.assertIn("chưa chốt", out)      # tim-kiem cố ý còn OQ-4
+
+
 class TestPlan(CliTestCase):
     """Chỉ kiểm phần kiểm đầu vào — chạy pipeline thật tốn tiền, đã kiểm
     riêng bằng client giả trong `test_plan.py`."""

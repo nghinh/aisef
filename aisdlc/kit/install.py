@@ -28,6 +28,10 @@ from .skills import Skill, scan
 #: Nơi skill nằm trong dự án đích. Đây là đường dẫn Claude Code đọc.
 SKILLS_DIR = ".claude/skills"
 
+#: Skill do chính framework viết — nằm trong repo, không phải kho ngoài,
+#: nên không cần ghim commit hay xét giấy phép.
+OWN_SKILLS = Path(__file__).resolve().parent / "skills"
+
 #: File đánh dấu skill do framework cài — để dọn lần sau mà không đụng
 #: skill người dùng tự thêm.
 MARKER = ".aisdlc-managed"
@@ -141,6 +145,14 @@ def plan(
     refs = Path(references_root)
     result = InstallPlan()
     seen_names: set[str] = set()
+
+    # Skill của framework đứng trước: chúng định nghĩa hợp đồng của framework,
+    # nên khi trùng tên với kho ngoài thì bản của ta phải thắng.
+    for skill in scan(OWN_SKILLS) if OWN_SKILLS.is_dir() else []:
+        seen_names.add(skill.name)
+        result.skills.append(
+            PlannedSkill(skill.name, "aisdlc", skill.path, "skill của framework")
+        )
 
     for source in cat.sources:
         chosen, skip_reason = _select_from_source(source, refs, stack, requirements_text)

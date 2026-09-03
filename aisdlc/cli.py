@@ -32,6 +32,7 @@ from .control.approvals import (
     Status,
     parse_auto_approve,
 )
+from .control.design_contract import CONTRACT_FILE
 from .control.state import StateStore, StoryStatus
 from .harness.guardrails import GUARD_MATCHERS
 
@@ -98,6 +99,16 @@ def cmd_doctor(args) -> int:
         "docker daemon",
         docker_ok,
         "chạy" if docker_ok else "không chạy — sandbox sẽ suy biến, bảo đảm thấp hơn",
+        required=False,
+    )
+
+    from .harness.browser import availability as browser_availability
+
+    browser_why = browser_availability(project)
+    check(
+        "playwright + chromium",
+        not browser_why,
+        "sẵn sàng" if not browser_why else f"{browser_why} — không trích được hợp đồng mockup",
         required=False,
     )
 
@@ -201,6 +212,13 @@ def cmd_review(args) -> int:
         print(f"\nGhi chú lần trước ({rec.status}): {rec.note}")
 
     for artifact in paths:
+        if artifact.name == CONTRACT_FILE:
+            from .phases.mockup import describe_contract
+
+            data = json.loads(artifact.read_text(encoding="utf-8"))
+            print(f"\n— {len(data.get('screens', []))} màn hình —\n")
+            print(describe_contract(data, artifact.parent))
+            continue
         if artifact.name == STORIES_INDEX:
             from .phases.story_split import describe_index
 
@@ -469,6 +487,48 @@ def cmd_plan(args) -> int:
     return EXIT_OK if result.complete else EXIT_NOT_READY
 
 
+def cmd_mockup(args) -> int:
+    """Dựng mockup cho từng màn hình rồi trích hợp đồng thị giác."""
+    from .clients.compile import ADAPTERS
+    from .control.approvals import Gate
+    from .phases.mockup import generate
+    from .phases.plan import ARTIFACT_ROOT, _pass_gate
+
+    if args.client not in ADAPTERS:
+        print(f"✗ client không hỗ trợ: {args.client}", file=sys.stderr)
+        return EXIT_USAGE
+    try:
+        gates = parse_auto_approve(args.auto_approve)
+    except ValueError as e:
+        print(f"✗ {e}", file=sys.stderr)
+        return EXIT_USAGE
+
+    adapter = ADAPTERS[args.client]()
+    if not adapter.available():
+        print(f"✗ chưa cài {args.client} trên máy này", file=sys.stderr)
+        return EXIT_NOT_READY
+
+    res = generate(
+        args.project,
+        adapter,
+        config=Config.load(args.project),
+        force=args.force,
+        only=[s.strip() for s in args.only.split(",") if s.strip()] or None,
+    )
+    print(res.summary())
+
+    if res.error or res.failed:
+        return EXIT_USAGE
+    if not res.ok:
+        return EXIT_NOT_READY
+
+    store = ApprovalStore(_artifact_root(args))
+    if _pass_gate(store, Gate.MOCKUPS, res, gates):
+        return EXIT_OK
+    print(f"\n⏸ chờ người duyệt: {Gate.MOCKUPS.value}\n   aisdlc review mockups")
+    return EXIT_NOT_READY
+
+
 # ------------------------------------------------------------------ đầu vào
 
 
@@ -520,6 +580,13 @@ def build_parser() -> argparse.ArgumentParser:
     pl.add_argument("--auto-approve", default="", help="'all' hoặc danh sách cổng")
     pl.add_argument("--force", action="store_true", help="chạy lại cả pha đã có artifact")
     pl.set_defaults(func=cmd_plan)
+
+    mk = sub.add_parser("mockup", help="dựng mockup từng màn hình + hợp đồng thị giác")
+    mk.add_argument("--client", default="claude", help="claude | opencode")
+    mk.add_argument("--auto-approve", default="", help="'all' hoặc danh sách cổng")
+    mk.add_argument("--force", action="store_true", help="dựng lại cả màn hình đã có")
+    mk.add_argument("--only", default="", help="chỉ dựng các screen_id này")
+    mk.set_defaults(func=cmd_mockup)
 
     aa = sub.add_parser("auto-approve", help="tự duyệt (ghi dấu auto)")
     aa.add_argument("gates", help="'all' hoặc danh sách ngăn bởi dấu phẩy")

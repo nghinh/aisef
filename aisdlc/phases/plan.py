@@ -293,10 +293,14 @@ def run_phase(
 def _pass_gate(
     approvals: ApprovalStore,
     gate: Gate,
-    outcome: PhaseOutcome,
+    outcome,
     auto_approve: frozenset[Gate],
 ) -> bool:
-    """Cổng này đã thông chưa. False nghĩa là phải dừng chờ người."""
+    """Cổng này đã thông chưa. False nghĩa là phải dừng chờ người.
+
+    ``outcome`` chỉ cần có ``needs_human`` và ``machine_checks()`` — bước
+    mockup dùng lại đúng hàm này.
+    """
     if approvals.status(gate) is Status.APPROVED:
         return True
     if gate not in auto_approve:
@@ -306,15 +310,19 @@ def _pass_gate(
     if outcome.needs_human:
         # Không chặn — người dùng đã chọn tự duyệt. Nhưng ghi lại, vì đây
         # chính là artifact cần xem lại đầu tiên khi có sự cố.
-        note += (
-            f"; BMAD khai {outcome.status.status} với "
-            f"{len(outcome.status.open_questions)} câu hỏi mở"
-        )
+        note += f"; {_why_human(outcome)}"
     approvals.auto_approve(gate, reason=note)
     rec = approvals.load(gate)
     rec.machine_checks = outcome.machine_checks()
     approvals.save(rec)
     return True
+
+
+def _why_human(outcome) -> str:
+    status = getattr(outcome, "status", None)
+    if status is not None and getattr(status, "parsed", False):
+        return f"BMAD khai {status.status} với {len(status.open_questions)} câu hỏi mở"
+    return "bước này luôn cần người nhìn"
 
 
 def run_split(project: Path, config: Config) -> PhaseOutcome:

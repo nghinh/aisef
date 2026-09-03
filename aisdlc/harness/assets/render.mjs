@@ -1,0 +1,80 @@
+// Dựng mockup trong trình duyệt thật rồi trích hợp đồng thị giác.
+//
+// Vì sao phải mở trình duyệt thay vì đọc HTML bằng regex: hợp đồng phải là
+// thứ người dùng **thấy được**. Nút bị CSS ẩn, nhãn gắn sai `for`, vai trò
+// ARIA bị ghi đè — regex đều không thấy, còn accessibility tree thì thấy.
+// Đây cũng đúng cách bước 6.7b đối chiếu ứng dụng thật, nên hai bên so
+// bằng cùng một thước đo.
+//
+// Đầu vào: JSON qua stdin — { jobs: [{ id, html, png }], viewport }
+// Đầu ra:  JSON qua stdout — { screens: [...] } hoặc { error }
+import { pathToFileURL } from 'node:url';
+import { resolve, join } from 'node:path';
+import { readFileSync } from 'node:fs';
+
+const input = JSON.parse(readFileSync(0, 'utf8'));
+const viewport = input.viewport ?? { width: 1280, height: 900 };
+
+// ESM không đọc NODE_PATH, nên đường dẫn playwright phải truyền vào tường
+// minh: script này nằm trong repo framework, còn playwright cài ở dự án.
+const entry = input.playwright
+  ? pathToFileURL(join(input.playwright, 'playwright', 'index.js')).href
+  : 'playwright';
+// playwright là gói CommonJS: nạp qua ESM thì API nằm trong `default`.
+const mod = await import(entry);
+const { chromium } = mod.chromium ? mod : mod.default;
+
+let browser;
+try {
+  browser = await chromium.launch();
+} catch (e) {
+  console.log(JSON.stringify({ error: `không mở được chromium: ${e.message}` }));
+  process.exit(3);
+}
+
+const screens = [];
+for (const job of input.jobs ?? []) {
+  const page = await browser.newPage({ viewport });
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  try {
+    await page.goto(pathToFileURL(resolve(job.html)).href, { waitUntil: 'load' });
+    const snapshot = await page.locator('body').ariaSnapshot();
+
+    const meta = await page.evaluate(() => {
+      const metaOf = (n) => document.querySelector(`meta[name="${n}"]`)?.content ?? '';
+      const fields = [...document.querySelectorAll('input, textarea, select')].map((el) => ({
+        name: el.name || el.id || '',
+        type: (el.getAttribute('type') || el.tagName).toLowerCase(),
+        label: (el.labels?.[0]?.textContent || el.getAttribute('aria-label') || el.placeholder || '').trim(),
+        required: el.hasAttribute('required'),
+        pattern: el.getAttribute('pattern') || '',
+        min: el.getAttribute('min') || '',
+        max: el.getAttribute('max') || '',
+        maxlength: el.getAttribute('maxlength') || '',
+      }));
+      return {
+        route: metaOf('aisdlc-route'),
+        screenId: metaOf('aisdlc-screen'),
+        title: document.title || '',
+        fields,
+        // Chỗ mockup tự khai là chưa chốt — cổng máy chặn nếu còn sót.
+        unresolved: [...document.querySelectorAll('[data-unresolved]')].map(
+          (el) => el.getAttribute('data-unresolved') || el.textContent.trim().slice(0, 120),
+        ),
+      };
+    });
+
+    if (job.png) {
+      await page.screenshot({ path: job.png, fullPage: true });
+    }
+    screens.push({ id: job.id, html: job.html, png: job.png ?? '', snapshot, ...meta, console_errors: errors });
+  } catch (e) {
+    screens.push({ id: job.id, html: job.html, error: String(e), console_errors: errors });
+  } finally {
+    await page.close();
+  }
+}
+
+await browser.close();
+console.log(JSON.stringify({ screens }, null, 2));
