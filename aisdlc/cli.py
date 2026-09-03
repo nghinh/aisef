@@ -340,6 +340,11 @@ def cmd_setup(args) -> int:
     report = install.apply(plan_, project)
     print(f"\n{report.summary()}")
 
+    from .kit.constitution import write_for_project
+
+    written = write_for_project(project, project.resolve().name, stack)
+    print("quy tắc: " + ", ".join(p.name for p in written))
+
     cfg_path = project / ".ai" / "config.json"
     if not cfg_path.is_file():
         Config.load(project).write_template(project)
