@@ -31,6 +31,7 @@ from .control.approvals import (
     parse_auto_approve,
 )
 from .control.state import StateStore, StoryStatus
+from .harness.guardrails import GUARD_MATCHERS
 
 ARTIFACT_ROOT = "_bmad-output"
 
@@ -354,6 +355,68 @@ def cmd_setup(args) -> int:
     return EXIT_OK
 
 
+# ------------------------------------------------------------------ compile
+
+
+def cmd_compile(args) -> int:
+    """Sinh cấu hình client từ một nguồn duy nhất."""
+    from .clients.compile import ADAPTERS, compile_for, write_compile_report
+
+    clients = sorted(ADAPTERS) if args.client == "all" else [args.client]
+    aisdlc_bin = args.bin or str((Path(__file__).resolve().parent.parent / "bin" / "aisdlc"))
+
+    reports = []
+    for client in clients:
+        try:
+            r = compile_for(client, args.project, aisdlc_bin=aisdlc_bin)
+        except ValueError as e:
+            print(f"✗ {e}", file=sys.stderr)
+            return EXIT_USAGE
+        reports.append(r)
+        print(r.summary())
+
+    path = write_compile_report(args.project, reports)
+    print(f"\nbáo cáo: {path}")
+
+    if any(not r.blocks_at_source for r in reports):
+        print("\n⚠️  có client chỉ kiểm được sau — mức bảo đảm thấp hơn, đã ghi vào báo cáo")
+    return EXIT_OK
+
+
+# ------------------------------------------------------------------ guard
+
+
+def cmd_guard(args) -> int:
+    """Chạy một guard trên sự kiện hook đọc từ stdin.
+
+    Client gọi lệnh này tại mốc vòng đời. Thoát 2 là chặn, và lý do đi ra
+    stderr — Claude Code chuyển stderr vào kết quả tool cho agent đọc, nên
+    lý do phải nói được agent cần sửa gì.
+    """
+    import json
+
+    from .harness.guardrails import run_guard
+
+    try:
+        raw = sys.stdin.read()
+        event = json.loads(raw) if raw.strip() else {}
+    except json.JSONDecodeError:
+        # Không đọc được sự kiện thì cho qua: guard hỏng không được biến
+        # thành thứ chặn mọi thao tác của agent.
+        print("guard: không phân tích được sự kiện, bỏ qua", file=sys.stderr)
+        return EXIT_OK
+
+    try:
+        verdict = run_guard(args.kind, event, project_root=str(Path(args.project).resolve()))
+    except ValueError as e:
+        print(f"guard: {e}", file=sys.stderr)
+        return EXIT_OK
+
+    if not verdict.allowed:
+        print(verdict.reason, file=sys.stderr)
+    return verdict.exit_code
+
+
 # ------------------------------------------------------------------ đầu vào
 
 
@@ -390,6 +453,15 @@ def build_parser() -> argparse.ArgumentParser:
     j.add_argument("gate", type=_gate_arg)
     j.add_argument("--note", required=True, help="cần sửa gì — bắt buộc")
     j.set_defaults(func=cmd_reject)
+
+    c = sub.add_parser("compile", help="sinh cấu hình client (hook, plugin)")
+    c.add_argument("--client", default="all", help="claude | opencode | all")
+    c.add_argument("--bin", default="", help="đường dẫn lệnh aisdlc dùng trong hook")
+    c.set_defaults(func=cmd_compile)
+
+    g = sub.add_parser("guard", help="chạy guard trên sự kiện hook (đọc stdin)")
+    g.add_argument("kind", choices=sorted(GUARD_MATCHERS))
+    g.set_defaults(func=cmd_guard)
 
     aa = sub.add_parser("auto-approve", help="tự duyệt (ghi dấu auto)")
     aa.add_argument("gates", help="'all' hoặc danh sách ngăn bởi dấu phẩy")
