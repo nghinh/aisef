@@ -252,8 +252,19 @@ def check_diff_scope(changed: list[str], scope: list[str]) -> Verdict:
     )
 
 
-def changed_files(project_root: str) -> list[str]:
-    """File đã đổi so với HEAD, kể cả file mới chưa theo dõi."""
+#: Đường dẫn do **harness** ghi, không phải agent: bằng chứng, worktree.
+#: Không loại chúng ra thì chính việc ghi bằng chứng của một story lại bị
+#: tính là story đó ghi ra ngoài phạm vi — guard tự tố cáo mình.
+HARNESS_OWNED = ("_bmad-output/evidence", ".aisdlc")
+
+
+def changed_files(project_root: str, *, ignore: tuple[str, ...] = HARNESS_OWNED) -> list[str]:
+    """File đã đổi so với HEAD, kể cả file mới chưa theo dõi.
+
+    Bỏ qua phần harness tự ghi. Phần còn lại của ``_bmad-output`` **không**
+    được bỏ qua: agent sửa PRD hay hợp đồng thị giác giữa lúc viết code là
+    chuyện phải lộ ra.
+    """
     import subprocess
 
     try:
@@ -271,8 +282,12 @@ def changed_files(project_root: str) -> list[str]:
 
     out: list[str] = []
     for entry in proc.stdout.split("\0"):
-        if len(entry) > 3:
-            out.append(entry[3:])
+        if len(entry) <= 3:
+            continue
+        path = entry[3:]
+        if any(_within(path, skip) for skip in ignore):
+            continue
+        out.append(path)
     return out
 
 

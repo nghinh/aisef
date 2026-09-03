@@ -16,6 +16,7 @@ minh guard chặn thật — khai xanh trước là tự lừa mình về mức 
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 import time
@@ -69,6 +70,7 @@ class OpenCodeAdapter(ClientAdapter):
                 capture_output=True,
                 text=True,
                 timeout=spec.timeout_seconds,
+                env={**os.environ, **spec.env} if spec.env else None,
                 stdin=subprocess.DEVNULL,
             )
         except subprocess.TimeoutExpired:

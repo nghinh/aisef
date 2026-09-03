@@ -242,6 +242,31 @@ class TestDiffScope(unittest.TestCase):
     def test_changes_without_declared_scope_block(self):
         self.assertFalse(check_diff_scope(["a.py"], []).allowed)
 
+    def test_harness_own_files_are_not_the_story_writing_out_of_scope(self):
+        """Ghi bằng chứng là việc của harness. Tính nó vào diff của story
+        thì guard tự tố cáo chính mình, và mọi story đều trượt."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            (root / "src").mkdir()
+            (root / "src" / "a.py").write_text("x = 1\n", encoding="utf-8")
+            ev = root / "_bmad-output" / "evidence"
+            ev.mkdir(parents=True)
+            (ev / "STORY-01-01.jsonl").write_text("{}\n", encoding="utf-8")
+            changed = changed_files(str(root))
+            self.assertIn("src/a.py", changed)
+            self.assertTrue(check_diff_scope(changed, ["src"]).allowed)
+
+    def test_agent_editing_the_prd_still_shows_up(self):
+        """Chỉ phần harness tự ghi được miễn; sửa PRD giữa lúc viết code là
+        chuyện phải lộ ra."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            (root / "_bmad-output").mkdir()
+            (root / "_bmad-output" / "prd.md").write_text("sửa trộm\n", encoding="utf-8")
+            self.assertIn("_bmad-output/prd.md", changed_files(str(root)))
+
     def test_reads_real_git_status(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

@@ -62,6 +62,10 @@ class RunSpec:
     extra_dirs: list[Path] = field(default_factory=list)
     settings_file: Path | None = None
     session_id: str = ""
+    #: Biến môi trường thêm vào tiến trình client. Guard chạy trong hook là
+    #: tiến trình con của client, nên phạm vi ghi và mã story tới được guard
+    #: qua đúng đường này.
+    env: dict[str, str] = field(default_factory=dict)
 
 
 class ClientAdapter(ABC):

@@ -13,6 +13,7 @@ Mọi cờ dùng ở đây đã kiểm chứng bằng thực nghiệm (spike S1,
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -84,6 +85,7 @@ class ClaudeCodeAdapter(ClientAdapter):
                 capture_output=True,
                 text=True,
                 timeout=spec.timeout_seconds,
+                env={**os.environ, **spec.env} if spec.env else None,
                 stdin=subprocess.DEVNULL,  # không có: CLI chờ stdin 3s mỗi lần
             )
         except subprocess.TimeoutExpired:
