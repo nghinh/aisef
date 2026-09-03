@@ -22,6 +22,8 @@ import shlex
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
+from .observe import TOOL_RUN
+
 ENV_WRITE_SCOPE = "AISDLC_WRITE_SCOPE"
 ENV_STORY_ID = "AISDLC_STORY_ID"
 
@@ -218,16 +220,116 @@ def check_injection(content: str) -> Verdict:
 # ------------------------------------------------------------ điều phối
 
 
+# ------------------------------------------------------------ phạm vi diff
+
+
+def check_diff_scope(changed: list[str], scope: list[str]) -> Verdict:
+    """Chặn khi file **ngoài phạm vi** đã bị đổi.
+
+    `write-scope` chặn từng thao tác ghi mà harness nhìn thấy. Guard này
+    hỏi câu khác: sau tất cả những gì đã xảy ra, cây làm việc có đúng
+    phạm vi không. Nó bắt được cả đường đi vòng — script tự sinh file, lệnh
+    di chuyển file, hoặc client không gắn được hook tiền kiểm (OpenCode ở
+    mức hậu kiểm) — vì nó đọc kết quả chứ không đọc ý định.
+    """
+    if not changed:
+        return ALLOW
+    if not scope:
+        return Verdict(
+            False,
+            f"story chưa khai write_scope nhưng đã đổi {len(changed)} file: "
+            f"{', '.join(changed[:5])}",
+        )
+
+    outside = [c for c in changed if not any(_within(c, s) for s in scope)]
+    if not outside:
+        return ALLOW
+    return Verdict(
+        False,
+        f"{len(outside)} file bị đổi ngoài write_scope ({', '.join(scope)}): "
+        f"{', '.join(outside[:5])}. Hoàn nguyên chúng, hoặc dừng lại và báo "
+        f"rằng phạm vi story khai thiếu.",
+    )
+
+
+def changed_files(project_root: str) -> list[str]:
+    """File đã đổi so với HEAD, kể cả file mới chưa theo dõi."""
+    import subprocess
+
+    try:
+        proc = subprocess.run(
+            ["git", "status", "--porcelain", "-z", "--untracked-files=all"],
+            cwd=project_root or ".",
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return []
+    if proc.returncode != 0:
+        return []
+
+    out: list[str] = []
+    for entry in proc.stdout.split("\0"):
+        if len(entry) > 3:
+            out.append(entry[3:])
+    return out
+
+
+# ------------------------------------------------------------ hoàn thành
+
+
+def check_completion(evidence) -> Verdict:
+    """Chặn agent kết thúc khi test chưa xanh cho **đoạn code hiện tại**.
+
+    Ba câu hỏi, theo thứ tự nghiêm dần:
+
+    1. Có lần chạy test nào chưa? Chưa chạy mà tuyên bố xong là tự khai.
+    2. Lần gần nhất có xanh không?
+    3. Có file nào sửa **sau** lần chạy đó không? Test xanh trước khi sửa
+       không nói gì về đoạn vừa viết — đây là kiểu "xanh" hay gặp nhất khi
+       agent vội kết thúc.
+    """
+    last = evidence.last(TOOL_RUN, "test")
+    if last is None:
+        return Verdict(
+            False,
+            "chưa có lần chạy test nào cho story này. Chạy `aisdlc tool test` "
+            "rồi mới kết thúc — bằng chứng nằm ở kết quả chạy, không ở lời kể.",
+        )
+    if not last.ok:
+        tail = str(last.detail.get("tail") or "")[:400]
+        return Verdict(
+            False,
+            "lần chạy test gần nhất còn đỏ, chưa được kết thúc story.\n" + tail,
+        )
+
+    stale = evidence.stale_since_last_test()
+    if stale:
+        return Verdict(
+            False,
+            f"{len(stale)} file đã sửa sau lần chạy test gần nhất "
+            f"({', '.join(stale[:5])}). Chạy lại test rồi mới kết thúc.",
+        )
+    return ALLOW
+
+
 def scope_from_env(env: dict[str, str] | None = None) -> list[str]:
     raw = (env or os.environ).get(ENV_WRITE_SCOPE, "")
     return [p.strip() for p in raw.split(",") if p.strip()]
 
 
+def story_from_env(env: dict[str, str] | None = None) -> str:
+    return (env or os.environ).get(ENV_STORY_ID, "")
+
+
 def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
-              project_root: str = "") -> Verdict:
+              project_root: str = "", artifact_root: str = "") -> Verdict:
     """Chạy một guard trên sự kiện hook của client.
 
     ``event`` theo hình dạng Claude Code gửi: ``tool_name`` và ``tool_input``.
+    Hai guard cuối cần trạng thái ngoài (git, bằng chứng); phần **quyết
+    định** của chúng vẫn là hàm thuần, chỗ này chỉ đi lấy dữ liệu.
     """
     tool_input = event.get("tool_input") or {}
     file_path = str(tool_input.get("file_path") or tool_input.get("path") or "")
@@ -244,6 +346,17 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
         return check_git_stage(command)
     if kind == "destructive":
         return check_destructive(command)
+    if kind == "diff-scope":
+        return check_diff_scope(changed_files(project_root), scope_from_env(env))
+    if kind == "completion":
+        story = story_from_env(env)
+        if not story or not artifact_root:
+            # Không biết đang làm story nào thì không kết luận được. Chặn ở
+            # đây sẽ chặn cả những lượt chạy ngoài vòng đời story.
+            return ALLOW
+        from .observe import EvidenceStore
+
+        return check_completion(EvidenceStore(artifact_root).read(story))
     raise ValueError(f"guard không tồn tại: {kind}")
 
 
@@ -254,6 +367,8 @@ GUARD_MATCHERS: dict[str, tuple[str, str]] = {
     "injection": ("PreToolUse", "Write|Edit"),
     "git-stage": ("PreToolUse", "Bash"),
     "destructive": ("PreToolUse", "Bash"),
+    "diff-scope": ("PostToolUse", "Write|Edit|NotebookEdit|Bash"),
+    "completion": ("Stop", ""),
 }
 
 

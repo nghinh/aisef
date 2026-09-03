@@ -153,5 +153,12 @@ class TestTemplate(ConfigTestCase):
         self.assertEqual(Config.load(self.root, env={})["coverage.min"], DEFAULTS["coverage.min"])
 
 
+class TestMembership(unittest.TestCase):
+    def test_in_operator(self):
+        cfg = Config(dict(DEFAULTS))
+        self.assertIn("run.max_turns", cfg)
+        self.assertNotIn("khong-co", cfg)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

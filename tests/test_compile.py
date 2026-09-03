@@ -67,10 +67,26 @@ class TestClaudeSettings(CompileTestCase):
 
 
 class TestOpenCodePlugin(CompileTestCase):
-    def test_calls_same_guards(self):
+    def test_calls_every_tool_guard_at_its_own_moment(self):
+        """Guard theo mốc, không đổ hết vào `tool.execute.before`.
+
+        `completion` hỏi "test đã xanh cho đoạn code hiện tại chưa" — hỏi
+        trước **mỗi** thao tác thì nó chặn cả lần chạy test đầu tiên, và
+        một guard chặn mọi thứ sẽ bị gỡ ngay trong ngày.
+        """
         src = build_opencode_plugin(self.project, "/bin/aisdlc")
-        for kind in GUARD_MATCHERS:
-            self.assertIn(f'"{kind}"', src)
+        before = src.split("const AFTER")[0]
+        after = src.split("const AFTER")[1].split("const BIN")[0]
+        for kind, (event, _) in GUARD_MATCHERS.items():
+            if event == "PreToolUse":
+                self.assertIn(f'"{kind}"', before, kind)
+            elif event == "PostToolUse":
+                self.assertIn(f'"{kind}"', after, kind)
+            else:
+                self.assertNotIn(f'"{kind}"', src, kind)
+
+    def test_post_tool_guard_wired(self):
+        self.assertIn("tool.execute.after", build_opencode_plugin(self.project, "/bin/aisdlc"))
 
     def test_treats_exit_two_as_block(self):
         """Cùng quy ước mã thoát với Claude Code."""

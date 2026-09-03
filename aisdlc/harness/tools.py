@@ -1,0 +1,223 @@
+"""Tool thật của harness — thứ agent gọi thay vì tự gõ lệnh.
+
+Mỗi tool ở đây làm ba việc mà "cứ để agent chạy Bash" không làm được:
+
+1. **Lệnh cố định theo dự án**, không do agent nghĩ ra mỗi lượt. `npm test`
+   hay `pytest -q` là quyết định của dự án, không phải chỗ để phán đoán.
+2. **Chạy trong sandbox** — cùng bậc quyền cho mọi story, mọi máy.
+3. **Ghi bằng chứng.** Đây mới là điểm chính: cổng story và guard
+   `completion` đọc bằng chứng chứ không đọc lời agent kể. Không có bản ghi
+   thì coi như chưa chạy.
+
+Mỗi tool kèm một câu "khi nào gọi" — chuỗi này đi thẳng vào prompt, vì tool
+không có mô tả dùng đúng lúc thì agent sẽ gọi sai lúc.
+"""
+
+from __future__ import annotations
+
+import json
+import shlex
+from dataclasses import dataclass, field
+from pathlib import Path
+
+from ..config import Config
+from . import sandbox
+from .observe import EvidenceStore
+
+#: Lệnh mặc định theo dấu hiệu trong dự án. Cặp (test, lint, sast).
+_STACK_COMMANDS: list[tuple[str, dict[str, str]]] = [
+    ("pyproject.toml", {"test": "pytest -q", "lint": "ruff check .", "sast": "bandit -q -r ."}),
+    ("setup.py", {"test": "pytest -q", "lint": "ruff check .", "sast": "bandit -q -r ."}),
+    ("go.mod", {"test": "go test ./...", "lint": "go vet ./...", "sast": "gosec ./..."}),
+    ("Cargo.toml", {"test": "cargo test", "lint": "cargo clippy -- -D warnings", "sast": "cargo audit"}),
+    ("pubspec.yaml", {"test": "flutter test", "lint": "flutter analyze", "sast": ""}),
+    ("composer.json", {"test": "composer test", "lint": "composer lint", "sast": ""}),
+    ("Gemfile", {"test": "bundle exec rspec", "lint": "bundle exec rubocop", "sast": "bundle exec brakeman -q"}),
+]
+
+
+@dataclass
+class Tool:
+    name: str
+    when: str          # khi nào gọi — đi vào prompt
+    level: sandbox.Level = sandbox.Level.WORKSPACE_WRITE
+
+
+TOOLS: dict[str, Tool] = {
+    "test": Tool(
+        "test",
+        "Sau mỗi lần sửa code, và bắt buộc trước khi tuyên bố story xong. "
+        "Chạy trước khi viết code để thấy test đỏ (RED) rồi mới viết cho xanh.",
+    ),
+    "lint": Tool(
+        "lint",
+        "Trước khi commit. Lỗi lint là lỗi phải sửa, không phải gợi ý.",
+    ),
+    "sast": Tool(
+        "sast",
+        "Trước khi commit, khi story chạm tới xác thực, phân quyền, truy vấn "
+        "dữ liệu, tải file lên, hoặc bất kỳ dữ liệu nào đến từ người dùng.",
+        level=sandbox.Level.READ_ONLY,
+    ),
+    "screenshot": Tool(
+        "screenshot",
+        "Sau khi dựng xong giao diện của story, để đối chiếu với mockup.",
+    ),
+    "git_commit": Tool(
+        "git_commit",
+        "Khi test đã xanh và lint đã sạch. Commit từng phần việc hoàn chỉnh, "
+        "không gộp cả story vào một commit.",
+    ),
+}
+
+
+@dataclass
+class ToolResult:
+    name: str
+    ok: bool
+    exit_code: int = 0
+    stdout: str = ""
+    stderr: str = ""
+    duration_ms: int = 0
+    skipped: str = ""      # lý do không chạy được (không có lệnh cho stack này)
+    degraded: bool = False
+    detail: dict = field(default_factory=dict)
+
+    @property
+    def ran(self) -> bool:
+        return not self.skipped
+
+    def summary(self) -> str:
+        if self.skipped:
+            return f"{self.name}: bỏ qua — {self.skipped}"
+        mark = "✅" if self.ok else "✗"
+        extra = " (sandbox suy biến)" if self.degraded else ""
+        return f"{mark} {self.name} — thoát {self.exit_code}, {self.duration_ms}ms{extra}"
+
+    def tail(self, lines: int = 40) -> str:
+        """Phần cuối output — chỗ lỗi thường nằm."""
+        text = (self.stdout + "\n" + self.stderr).strip()
+        return "\n".join(text.splitlines()[-lines:])
+
+
+def detect_commands(project: Path | str) -> dict[str, str]:
+    """Lệnh test/lint/sast của dự án, dò từ file có thật trên đĩa."""
+    project = Path(project)
+    pkg = project / "package.json"
+    if pkg.is_file():
+        return _from_package_json(pkg)
+    for marker, commands in _STACK_COMMANDS:
+        if (project / marker).is_file():
+            return dict(commands)
+    return {"test": "", "lint": "", "sast": ""}
+
+
+def _from_package_json(path: Path) -> dict[str, str]:
+    """Chỉ khai lệnh script **thật sự có**.
+
+    `npm test` khi package.json không định nghĩa script `test` sẽ thoát khác
+    0 vì lý do sai — cổng sẽ báo "test đỏ" trong khi thực ra dự án chưa có
+    test. Hai chuyện đó cần được phân biệt.
+    """
+    try:
+        scripts = json.loads(path.read_text(encoding="utf-8")).get("scripts") or {}
+    except (json.JSONDecodeError, OSError):
+        scripts = {}
+    out = {"test": "", "lint": "", "sast": "npm audit --omit=dev"}
+    if "test" in scripts:
+        out["test"] = "npm test --silent"
+    if "lint" in scripts:
+        out["lint"] = "npm run lint --silent"
+    elif "typecheck" in scripts:
+        out["lint"] = "npm run typecheck --silent"
+    return out
+
+
+def command_for(name: str, project: Path | str, config: Config | None = None) -> str:
+    """Lệnh cho một tool: cấu hình thắng, dò tự động là dự phòng."""
+    if config is not None:
+        key = f"tools.{name}"
+        if key in config:
+            configured = str(config[key]).strip()
+            if configured:
+                return configured
+    return detect_commands(project).get(name, "")
+
+
+def run_tool(
+    name: str,
+    project: Path | str,
+    *,
+    story_id: str = "",
+    artifact_root: Path | str | None = None,
+    config: Config | None = None,
+    extra_args: list[str] | None = None,
+) -> ToolResult:
+    """Chạy một tool trong sandbox và ghi bằng chứng."""
+    if name not in TOOLS:
+        raise ValueError(f"tool không tồn tại: {name}. Có: {', '.join(sorted(TOOLS))}")
+
+    project = Path(project)
+    cfg = config or Config.load(project)
+    command = command_for(name, project, cfg)
+    if not command:
+        res = ToolResult(name=name, ok=False, skipped="dự án chưa khai lệnh cho tool này")
+        _record(res, story_id, artifact_root)
+        return res
+
+    argv = shlex.split(command) + (extra_args or [])
+    sb = sandbox.run(
+        sandbox.SandboxSpec(
+            workspace=project,
+            cmd=argv,
+            level=TOOLS[name].level,
+            image=cfg["sandbox.image"],
+            timeout_seconds=cfg["run.timeout_seconds"],
+            allow_degraded=cfg["sandbox.allow_degraded"],
+        )
+    )
+    res = ToolResult(
+        name=name,
+        ok=sb.ok,
+        exit_code=sb.exit_code,
+        stdout=sb.stdout,
+        stderr=sb.stderr,
+        duration_ms=sb.duration_ms,
+        degraded=sb.degraded,
+        detail={"command": command, **sb.to_evidence()},
+    )
+    _record(res, story_id, artifact_root)
+    return res
+
+
+def _record(res: ToolResult, story_id: str, artifact_root) -> None:
+    """Ghi bằng chứng. Không có story_id thì không ghi — tool chạy ngoài
+    ngữ cảnh story (ví dụ người gõ tay) không nên làm bẩn hồ sơ story."""
+    if not story_id or artifact_root is None:
+        return
+    EvidenceStore(artifact_root).tool_run(
+        story_id,
+        res.name,
+        ok=res.ok,
+        duration_ms=res.duration_ms,
+        detail={
+            "exit_code": res.exit_code,
+            "skipped": res.skipped,
+            "degraded": res.degraded,
+            "tail": res.tail(20),
+            **res.detail,
+        },
+    )
+
+
+def describe_tools(project: Path | str, config: Config | None = None) -> str:
+    """Bảng tool cho prompt: tên, lệnh thật, và **khi nào gọi**."""
+    project = Path(project)
+    lines = []
+    for tool in TOOLS.values():
+        if tool.name in ("screenshot", "git_commit"):
+            cmd = "(harness lo)"
+        else:
+            cmd = command_for(tool.name, project, config) or "(dự án chưa khai)"
+        lines.append(f"- `aisdlc tool {tool.name}` → `{cmd}`\n  Khi nào: {tool.when}")
+    return "\n".join(lines)

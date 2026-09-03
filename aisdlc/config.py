@@ -36,6 +36,10 @@ DEFAULTS: dict[str, Any] = {
     "run.max_retries": 2,
     # chi phí
     "cost.warn_multiple": 3.0,
+    # lệnh của dự án — rỗng nghĩa là tự dò từ file có trong dự án
+    "tools.test": "",
+    "tools.lint": "",
+    "tools.sast": "",
     # sandbox
     "sandbox.image": "alpine:latest",
     "sandbox.allow_degraded": True,
@@ -53,6 +57,9 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "run.timeout_seconds": int,
     "run.max_retries": int,
     "cost.warn_multiple": float,
+    "tools.test": str,
+    "tools.lint": str,
+    "tools.sast": str,
     "sandbox.image": str,
     "sandbox.allow_degraded": bool,
 }
@@ -152,6 +159,11 @@ class Config:
 
     def get(self, key: str, default: Any = None) -> Any:
         return self.values.get(key, default)
+
+    def __contains__(self, key: object) -> bool:
+        """Không có hàm này thì `key in config` rơi về duyệt theo chỉ số
+        nguyên và báo lỗi khoá "0" — sai chỗ và khó lần ra."""
+        return key in self.values
 
     def write_template(self, project_root: Path | str = ".") -> Path:
         """Ghi file cấu hình mặc định để người dùng chỉnh."""

@@ -50,7 +50,16 @@ class CompileReport:
         for p in self.written:
             lines.append(f"  ghi {p}")
         if self.guards_wired:
-            lines.append(f"  guard tiền kiểm: {', '.join(self.guards_wired)}")
+            # Không gọi hết là "tiền kiểm": `diff-scope` chạy sau mỗi thao
+            # tác và `completion` chạy lúc agent định dừng. Gộp chung sẽ báo
+            # sai mức bảo đảm mà client thật sự cho.
+            pre = [g for g in self.guards_wired if GUARD_MATCHERS[g][0] == "PreToolUse"]
+            after = [g for g in self.guards_wired if g not in pre]
+            if pre:
+                lines.append(f"  guard chặn trước thao tác: {', '.join(pre)}")
+            if after:
+                moments = ", ".join(f"{g} ({GUARD_MATCHERS[g][0]})" for g in after)
+                lines.append(f"  guard chặn tại mốc khác: {moments}")
         if self.guards_post_hoc:
             lines.append(f"  ⚠️  guard chỉ hậu kiểm: {', '.join(self.guards_post_hoc)}")
             lines.append("     — chặn không xảy ra lúc ghi; `aisdlc verify` kiểm lại sau")
@@ -85,28 +94,41 @@ def build_opencode_plugin(project: Path, aisdlc_bin: str) -> str:
 
     Spike S4 chưa chứng minh được việc ném lỗi ở đây có **chặn** tool hay
     chỉ ghi log, nên plugin vẫn được sinh nhưng năng lực khai là hậu kiểm.
+
+    Guard được chia theo mốc, không đổ hết vào một chỗ. `completion` hỏi
+    "test đã xanh cho đoạn code hiện tại chưa" — hỏi câu đó trước **mỗi**
+    thao tác thì nó chặn cả lần chạy test đầu tiên, và một guard chặn mọi
+    thứ sẽ bị gỡ ngay trong ngày. Nó thuộc về `aisdlc verify`.
     """
-    kinds = ", ".join(f'"{k}"' for k in sorted(GUARD_MATCHERS))
+    pre = [k for k, (event, _) in sorted(GUARD_MATCHERS.items()) if event == "PreToolUse"]
+    post = [k for k, (event, _) in sorted(GUARD_MATCHERS.items()) if event == "PostToolUse"]
     return f"""// {GENERATED_NOTE}
 import type {{ Plugin }} from "@opencode-ai/plugin"
 
-const GUARDS = [{kinds}]
+const BEFORE = [{", ".join(f'"{k}"' for k in pre)}]
+const AFTER = [{", ".join(f'"{k}"' for k in post)}]
 const BIN = {json.dumps(aisdlc_bin)}
 const PROJECT = {json.dumps(str(project))}
 
+async function guard($, kinds, event) {{
+  for (const kind of kinds) {{
+    const res = await $`${{BIN}} --project ${{PROJECT}} guard ${{kind}}`
+      .stdin(event).quiet().nothrow()
+    if (res.exitCode === 2) {{
+      throw new Error(String(res.stderr).trim() || `guard ${{kind}} đã chặn thao tác này`)
+    }}
+  }}
+}}
+
 export const AisdlcGuardPlugin: Plugin = async ({{ $ }}) => ({{
   "tool.execute.before": async (input, output) => {{
-    const event = JSON.stringify({{
+    await guard($, BEFORE, JSON.stringify({{
       tool_name: input?.tool,
       tool_input: output?.args ?? {{}},
-    }})
-    for (const kind of GUARDS) {{
-      const res = await $`${{BIN}} --project ${{PROJECT}} guard ${{kind}}`
-        .stdin(event).quiet().nothrow()
-      if (res.exitCode === 2) {{
-        throw new Error(String(res.stderr).trim() || `guard ${{kind}} đã chặn thao tác này`)
-      }}
-    }}
+    }}))
+  }},
+  "tool.execute.after": async (input, output) => {{
+    await guard($, AFTER, JSON.stringify({{ tool_name: input?.tool, tool_input: {{}} }}))
   }},
 }})
 """

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -10,9 +12,13 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisdlc.harness.guardrails import (  # noqa: E402
+    ENV_STORY_ID,
     ENV_WRITE_SCOPE,
     GUARD_MATCHERS,
+    changed_files,
+    check_completion,
     check_destructive,
+    check_diff_scope,
     check_git_stage,
     check_injection,
     check_secrets,
@@ -20,6 +26,7 @@ from aisdlc.harness.guardrails import (  # noqa: E402
     run_guard,
     scope_from_env,
 )
+from aisdlc.harness.observe import EvidenceStore  # noqa: E402
 
 
 class TestWriteScope(unittest.TestCase):
@@ -190,7 +197,12 @@ class TestDispatch(unittest.TestCase):
             run_guard("khong-co", {})
 
     def test_empty_event_is_allowed(self):
-        for kind in GUARD_MATCHERS:
+        """Guard tiền kiểm đọc *sự kiện*: sự kiện rỗng thì không có gì để
+        chặn. Hai guard `diff-scope` và `completion` không đọc sự kiện mà
+        đọc trạng thái (cây git, bằng chứng), nên không thuộc luật này."""
+        for kind, (event, _) in GUARD_MATCHERS.items():
+            if event != "PreToolUse":
+                continue
             with self.subTest(guard=kind):
                 self.assertTrue(run_guard(kind, {}, env={ENV_WRITE_SCOPE: "src"}).allowed)
 
@@ -202,6 +214,98 @@ class TestDispatch(unittest.TestCase):
         """Claude Code coi mã 2 là chặn (kiểm chứng ở spike S2)."""
         self.assertEqual(run_guard("git-stage", {"tool_input": {"command": "git add -A"}}).exit_code, 2)
         self.assertEqual(run_guard("git-stage", {"tool_input": {"command": "git status"}}).exit_code, 0)
+
+
+class TestDiffScope(unittest.TestCase):
+    """Guard hậu kiểm: đọc *kết quả* trên cây làm việc, không đọc ý định.
+
+    Đây là guard duy nhất còn hiệu lực khi client không gắn được hook tiền
+    kiểm (OpenCode ở mức hậu kiểm) — nó bắt cả đường đi vòng: script tự
+    sinh file, lệnh di chuyển file.
+    """
+
+    def test_all_inside_scope(self):
+        self.assertTrue(check_diff_scope(["src/api/a.py", "src/api/b.py"], ["src/api"]).allowed)
+
+    def test_file_outside_scope_blocks(self):
+        v = check_diff_scope(["src/api/a.py", "src/web/x.ts"], ["src/api"])
+        self.assertFalse(v.allowed)
+        self.assertIn("src/web/x.ts", v.reason)
+
+    def test_path_segment_not_string_prefix(self):
+        """`src/apidocs` không nằm trong `src/api`."""
+        self.assertFalse(check_diff_scope(["src/apidocs/x.md"], ["src/api"]).allowed)
+
+    def test_nothing_changed_is_allowed(self):
+        self.assertTrue(check_diff_scope([], []).allowed)
+
+    def test_changes_without_declared_scope_block(self):
+        self.assertFalse(check_diff_scope(["a.py"], []).allowed)
+
+    def test_reads_real_git_status(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            (root / "src").mkdir()
+            (root / "src" / "a.py").write_text("x = 1\n", encoding="utf-8")
+            (root / "ngoai-pham-vi.txt").write_text("x\n", encoding="utf-8")
+            changed = changed_files(str(root))
+            self.assertIn("src/a.py", changed)
+            self.assertIn("ngoai-pham-vi.txt", changed)
+            self.assertFalse(check_diff_scope(changed, ["src"]).allowed)
+
+
+class TestCompletion(unittest.TestCase):
+    """Guard chốt chặn cuối: không cho tuyên bố xong khi test chưa xanh."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.store = EvidenceStore(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def verdict(self):
+        return check_completion(self.store.read("S-01"))
+
+    def test_never_ran_tests(self):
+        v = self.verdict()
+        self.assertFalse(v.allowed)
+        self.assertIn("chưa có lần chạy test", v.reason)
+
+    def test_last_run_red(self):
+        self.store.tool_run("S-01", "test", ok=False, detail={"tail": "2 failed"})
+        v = self.verdict()
+        self.assertFalse(v.allowed)
+        self.assertIn("2 failed", v.reason)
+
+    def test_green_and_nothing_touched_after(self):
+        self.store.file_change("S-01", "src/a.py")
+        self.store.tool_run("S-01", "test", ok=True)
+        self.assertTrue(self.verdict().allowed)
+
+    def test_code_touched_after_the_green_run(self):
+        """Kiểu "xanh" hay gặp nhất khi agent vội: xanh trước, sửa sau."""
+        self.store.tool_run("S-01", "test", ok=True)
+        self.store.file_change("S-01", "src/b.py")
+        v = self.verdict()
+        self.assertFalse(v.allowed)
+        self.assertIn("src/b.py", v.reason)
+
+    def test_outside_a_story_the_guard_stays_out_of_the_way(self):
+        """Không biết story nào thì không kết luận được — chặn ở đây sẽ chặn
+        cả những lượt chạy ngoài vòng đời story."""
+        v = run_guard("completion", {}, env={}, artifact_root=self._tmp.name)
+        self.assertTrue(v.allowed)
+
+    def test_runs_through_run_guard_with_story_env(self):
+        v = run_guard(
+            "completion",
+            {},
+            env={ENV_STORY_ID: "S-01"},
+            artifact_root=self._tmp.name,
+        )
+        self.assertFalse(v.allowed)
 
 
 if __name__ == "__main__":

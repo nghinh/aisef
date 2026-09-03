@@ -438,7 +438,12 @@ def cmd_guard(args) -> int:
         return EXIT_OK
 
     try:
-        verdict = run_guard(args.kind, event, project_root=str(Path(args.project).resolve()))
+        verdict = run_guard(
+            args.kind,
+            event,
+            project_root=str(Path(args.project).resolve()),
+            artifact_root=str(_artifact_root(args)),
+        )
     except ValueError as e:
         print(f"guard: {e}", file=sys.stderr)
         return EXIT_OK
