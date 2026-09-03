@@ -23,6 +23,11 @@ thêm nút cho đẹp.
 
 Một lượt chạy dựng **đúng một màn hình**. Không dựng kèm màn hình khác.
 
+Nếu dự án có sẵn skill `ui-ux-pro-max`, `design-system` hoặc `ui-styling`
+thì dùng chúng cho phần nghề thị giác — nhịp, thang chữ, trạng thái tương
+tác. Nhưng **`DESIGN.md` thắng khi mâu thuẫn**: nó là quyết định đã chốt
+của dự án này, còn skill là kiến thức chung.
+
 ## Bắt buộc
 
 1. **Hai thẻ meta** trong `<head>` — máy đọc chúng để nối mockup với màn

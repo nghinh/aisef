@@ -18,8 +18,9 @@
 | GĐ-2 Kit + Setup | ✅ **xong** — catalog · detect_stack · lọc 2 tầng · install · constitution |
 | GĐ-3 Đa client | ✅ **xong** — adapter · guard · compile · báo cáo mất mát |
 | GĐ-4 BMAD pipeline | ✅ 5/5 — `aisdlc plan` chạy chuỗi BMAD, dừng đúng từng cổng, tách 12 story từ epics thật |
-| GĐ-5 Mockup | 🔨 đang làm |
-| GĐ-6…GĐ-9 | chưa bắt đầu |
+| GĐ-5 Mockup | ✅ 6/6 — dựng bằng chromium thật, hợp đồng trích từ trang đã render |
+| GĐ-6 Harness + implement | 🔨 đang làm |
+| GĐ-7…GĐ-9 | chưa bắt đầu |
 
 **Mốc demo đã đạt**
 
@@ -157,14 +158,16 @@ aisdlc status
 
 | # | Hạng mục | File | Xong khi |
 |---|---|---|---|
-| 5.1 | Skill sinh mockup | `kit/skills/aisdlc-mockup-html/` | Ghép `ui-ux-pro-max` + `design-system` |
-| 5.2 | Bộ sinh | `phases/mockup.py` | Mỗi màn hình một HTML mở được + `index.html` |
-| 5.3 | Chụp ảnh | `phases/mockup.py` | Playwright qua `npx`, không cần cài toàn cục |
-| 5.4 | Trích contract | `control/design_contract.py` | HTML → route · component · nhãn · validation |
-| 5.5 | Đối chiếu | `control/machine_gate.py` | Mọi màn hình ux-spec có mockup; **không mục `unresolved`**; story frontend map tới `screen_id` thật |
-| 5.6 | Chuẩn bị cho bước map | `control/design_contract.py` | Contract tra được **theo từng `screen_id`** (lát cắt riêng, không phải cả file) — đầu vào của 6.7a |
+| 5.1 | Skill sinh mockup | `kit/skills/aisdlc-mockup-html/` | ✅ Skill của framework; dùng `ui-ux-pro-max`/`design-system` cho phần nghề, `DESIGN.md` thắng khi mâu thuẫn |
+| 5.2 | Bộ sinh | `phases/mockup.py` | ✅ Mỗi màn hình một phiên, một HTML + `index.html` cho người duyệt |
+| 5.3 | Chụp ảnh | `harness/browser.py` | ✅ Playwright qua `node_modules` của dự án; thiếu thì cổng trượt, không im lặng |
+| 5.4 | Trích contract | `control/design_contract.py` | ✅ Trang **đã render** → route · component (aria) · nhãn · ràng buộc nhập liệu |
+| 5.5 | Đối chiếu | `control/machine_gate.py` | ✅ Mọi màn hình có mockup · **không mục `unresolved`** · có route · story trỏ `screen_id` có thật |
+| 5.6 | Chuẩn bị cho bước map | `control/design_contract.py` | ✅ `slice_for(screen_id)` trả đúng một màn hình — đầu vào của 6.7a |
 
 **Mốc demo 5:** mở `mockups/index.html` xem được toàn bộ màn hình; `design-contract.json` hợp lệ.
+
+*Đã đạt phần chạy khô:* 6 mockup fixture → chromium thật → hợp đồng đủ 6 màn hình; cổng chặn đúng ba lỗi cố ý (thiếu route, còn `data-unresolved`, thiếu file).
 
 ---
 
