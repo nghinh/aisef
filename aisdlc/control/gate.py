@@ -12,7 +12,8 @@ Năm điều kiện, mỗi điều kiện trả lời được bằng dữ liệ
 2. lint sạch;
 3. thay đổi nằm trong ``write_scope``;
 4. màn hình khớp hợp đồng thị giác (chỉ story có giao diện);
-5. rà soát độc lập không còn mục chặn.
+5. rà soát độc lập không còn mục chặn;
+6. không có test giả — test không khẳng định gì làm điều kiện 1 rỗng nghĩa.
 """
 
 from __future__ import annotations
@@ -110,6 +111,16 @@ def evaluate(
                     + ", ".join(first.get("missing", []) + first.get("missing_data_roles", []))
                 )
             gate.checks.append(Check("map mockup", not failed, detail))
+
+    fake = evidence.last(TOOL_RUN, "qa:fake-tests")
+    if fake is not None and not fake.ok:
+        files = fake.detail.get("files") or []
+        gate.checks.append(
+            Check("test thật", False,
+                  f"{len(files)} test không có khẳng định nào: {', '.join(files[:3])}")
+        )
+    else:
+        gate.checks.append(Check("test thật", True))
 
     if not review_ran:
         gate.checks.append(Check("rà soát", False, "chưa rà soát độc lập"))

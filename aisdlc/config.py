@@ -36,6 +36,18 @@ DEFAULTS: dict[str, Any] = {
     "run.max_retries": 2,
     # chi phí
     "cost.warn_multiple": 3.0,
+    # lệnh kiểm định — rỗng nghĩa là "chưa cấu hình", KHÔNG phải "đạt"
+    "verify.sit": "",
+    "verify.api-contract": "",
+    "verify.e2e": "",
+    "verify.uat": "",
+    "verify.perf": "",
+    "verify.security": "",
+    "verify.mutation": "",
+    "verify.unit": "",
+    #: Loại được miễn tường minh, ngăn bởi dấu phẩy. Miễn phải là quyết
+    #: định có người ký, không phải hệ quả của việc quên cấu hình.
+    "verify.waived": "",
     # ứng dụng của dự án — để mở route thật lúc đối chiếu với mockup
     "app.dev_command": "",
     "app.base_url": "http://localhost:5173",
@@ -65,6 +77,15 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "run.timeout_seconds": int,
     "run.max_retries": int,
     "cost.warn_multiple": float,
+    "verify.sit": str,
+    "verify.api-contract": str,
+    "verify.e2e": str,
+    "verify.uat": str,
+    "verify.perf": str,
+    "verify.security": str,
+    "verify.mutation": str,
+    "verify.unit": str,
+    "verify.waived": str,
     "app.dev_command": str,
     "app.base_url": str,
     "app.ready_timeout_seconds": int,

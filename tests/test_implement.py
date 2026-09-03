@@ -69,7 +69,10 @@ class ScriptedClient(ClientAdapter):
         for rel in self.writes:
             path = Path(spec.workdir) / rel
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text("x = 1\n", encoding="utf-8")
+            # File test thì viết như một file test — nội dung quyết định
+            # phép kiểm "test giả" có bắt được hay không.
+            body = "def test_x():\n    pass\n" if "test_" in path.name else "x = 1\n"
+            path.write_text(body, encoding="utf-8")
         return RunResult(ok=True, text="xong", cost_usd=1.0)
 
 
@@ -193,6 +196,14 @@ class TestFailureKinds(ImplementTestCase):
 
         out = self.implement(NoReview())
         self.assertFalse(out.done)
+
+
+class TestFakeTestDetection(ImplementTestCase):
+    def test_story_that_writes_an_assertionless_test_is_blocked(self):
+        """Mốc demo 7: đẩy một story có test giả → cổng chặn, nêu đúng lý do."""
+        out = self.implement(ScriptedClient(writes=("src/tests/test_a.py",)))
+        self.assertFalse(out.done)
+        self.assertIn("test thật", out.summary())
 
 
 class TestContext(ImplementTestCase):

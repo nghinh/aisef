@@ -637,6 +637,39 @@ def cmd_tool(args) -> int:
     return EXIT_OK if res.ok else EXIT_NOT_READY
 
 
+def cmd_qa(args) -> int:
+    """Chạy bộ kiểm định của dự án.
+
+    Mặc định chấm ở mức **trước triển khai**: loại chưa cấu hình cũng chặn,
+    vì "chưa chạy" không phải là "đạt". `--story-level` hạ xuống mức story,
+    nơi thiếu công cụ chỉ là cảnh báo.
+    """
+    from .kit.detect_stack import detect_file
+    from .phases.qa import run_suite
+
+    project = Path(args.project)
+    has_ui = True
+    req = project / "docs" / "requirements.md"
+    if req.is_file():
+        has_ui = detect_file(req).has_ui
+
+    report = run_suite(
+        project,
+        config=Config.load(project),
+        only=[k.strip() for k in args.only.split(",") if k.strip()] or None,
+        has_ui=has_ui,
+        story_id=args.story,
+        artifact_root=_artifact_root(args) if args.story else None,
+    )
+    print(report.summary())
+
+    ok = report.passed if args.story_level else report.release_ready
+    if ok:
+        print("\n✅ kiểm định đạt")
+        return EXIT_OK
+    return EXIT_NOT_READY
+
+
 # ------------------------------------------------------------------ đầu vào
 
 
@@ -714,6 +747,13 @@ def build_parser() -> argparse.ArgumentParser:
     t.add_argument("--story", default="", help="mã story để ghi bằng chứng")
     t.add_argument("--lines", type=int, default=40, help="số dòng output hiển thị")
     t.set_defaults(func=cmd_tool)
+
+    q = sub.add_parser("qa", help="chạy bộ kiểm định (unit · sit · e2e · bảo mật …)")
+    q.add_argument("--only", default="", help="chỉ chạy các loại này")
+    q.add_argument("--story", default="", help="mã story để ghi bằng chứng")
+    q.add_argument("--story-level", action="store_true",
+                   help="chấm ở mức story: thiếu công cụ chỉ cảnh báo")
+    q.set_defaults(func=cmd_qa)
 
     aa = sub.add_parser("auto-approve", help="tự duyệt (ghi dấu auto)")
     aa.add_argument("gates", help="'all' hoặc danh sách ngăn bởi dấu phẩy")

@@ -300,6 +300,25 @@ class TestRunCommand(CliTestCase):
         self.assertIn("khong-co", err)
 
 
+class TestQaCommand(CliTestCase):
+    def test_unconfigured_blocks_release_level(self):
+        """Mặc định là mức trước triển khai: chưa chạy thì không phải đạt."""
+        code, out, _ = self.run_cli("qa")
+        self.assertEqual(code, EXIT_NOT_READY)
+        self.assertIn("chưa cấu hình", out)
+
+    def test_story_level_only_warns(self):
+        code, _, _ = self.run_cli("qa", "--story-level")
+        self.assertEqual(code, EXIT_OK)
+
+    def test_red_check_fails_even_at_story_level(self):
+        (self.project / ".ai").mkdir()
+        (self.project / ".ai" / "config.json").write_text(
+            '{"verify.unit": "false"}', encoding="utf-8")
+        code, out, _ = self.run_cli("qa", "--only", "unit", "--story-level")
+        self.assertEqual(code, EXIT_NOT_READY)
+
+
 class TestStatus(CliTestCase):
     def test_empty(self):
         code, out, _ = self.run_cli("status")

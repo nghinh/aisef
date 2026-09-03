@@ -32,6 +32,7 @@ from ..harness.observe import EvidenceStore
 from ..harness.prompts import Catalog, load_catalog
 from ..harness.routing import DEVELOPER, REVIEWER, ROLES, build_spec
 from ..harness.tools import describe_tools, run_tool
+from .qa import find_fake_tests
 
 #: Lỗi thuộc về hạ tầng, không thuộc về chất lượng công việc.
 INFRA_ERRORS = ("api_error", "overloaded", "quá ", "không chạy được", "connection")
@@ -192,6 +193,14 @@ def run_attempt(
         run_tool(tool, workdir, story_id=story.id,
                  artifact_root=artifact_root, config=config)
 
+    # Test luôn xanh vì không khẳng định gì tệ hơn không có test: nó làm
+    # cổng "test xanh" mất hết ý nghĩa. Kiểm rẻ, nên chạy mỗi lượt.
+    changed_now = changed_files(str(workdir))
+    fake = find_fake_tests(workdir, changed_now)
+    evidence.tool_run(
+        story.id, "qa:fake-tests", ok=not fake, detail={"files": fake}
+    )
+
     if story.screens and contract:
         mockup_verify.verify_screens(
             workdir, contract, story.screens,
@@ -212,7 +221,7 @@ def run_attempt(
     attempt.gate = story_gate.evaluate(
         story.id,
         evidence.read(story.id),
-        changed=changed_files(str(workdir)),
+        changed=changed_now,
         write_scope=list(story.write_scope),
         screens=list(story.screens),
         review_blocking=attempt.review_findings,

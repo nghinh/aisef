@@ -119,6 +119,22 @@ class TestMockupMap(GateTestCase):
         self.assertTrue(self.gate(screens=["danh-sach"]).passed)
 
 
+class TestFakeTests(GateTestCase):
+    def test_assertionless_test_fails_the_gate(self):
+        """Test luôn xanh làm điều kiện "test xanh" mất hết ý nghĩa."""
+        self.green_story()
+        self.store.tool_run("S-01", "qa:fake-tests", ok=False,
+                            detail={"files": ["tests/test_a.py"]})
+        g = self.gate()
+        self.assertFalse(g.passed)
+        self.assertIn("tests/test_a.py", g.feedback())
+
+    def test_clean_tests_pass(self):
+        self.green_story()
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})
+        self.assertTrue(self.gate().passed)
+
+
 class TestReview(GateTestCase):
     def test_blocking_finding_fails(self):
         self.green_story()
