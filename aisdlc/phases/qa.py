@@ -62,6 +62,12 @@ KINDS: dict[str, Kind] = {
                      why="Quét mã, phụ thuộc và bí mật lọt vào kho."),
     "mutation": Kind("mutation", "Kiểm đột biến",
                      why="Bắt test luôn xanh dù code hỏng — thứ tệ hơn không có test."),
+    "sbom": Kind("sbom", "Kê khai thành phần (SBOM)", level=sandbox.Level.READ_ONLY,
+                 why="Không biết mình chạy thư viện nào thì không trả lời được câu "
+                     "'chúng ta có dính lỗ hổng đó không'."),
+    "image-scan": Kind("image-scan", "Quét image triển khai",
+                       level=sandbox.Level.WORKSPACE_NETWORK,
+                       why="Lỗ hổng phần lớn nằm ở tầng nền của image, không nằm ở mã ta viết."),
 }
 
 #: Lệnh mặc định khi dự án không khai. Chỉ đặt cho loại có công cụ gần như
@@ -69,6 +75,12 @@ KINDS: dict[str, Kind] = {
 _DEFAULTS: dict[str, dict[str, str]] = {
     "python": {"security": "bandit -q -r .", "mutation": "mutmut run"},
     "node": {"e2e": "npx playwright test", "mutation": "npx stryker run"},
+}
+
+#: Lệnh không phụ thuộc stack — chỉ dùng khi công cụ có trên máy.
+_UNIVERSAL: dict[str, str] = {
+    "sbom": "syft . -o cyclonedx-json=sbom.json",
+    "image-scan": "trivy fs --exit-code 1 --severity HIGH,CRITICAL .",
 }
 
 _TEST_FILE = re.compile(r"(^|/)(tests?|__tests__)/|(^|/)test_[^/]+\.py$|\.(test|spec)\.[jt]sx?$")
@@ -156,7 +168,18 @@ def command_for_kind(kind_id: str, project: Path, config: Config | None) -> str:
     marker = "node" if (project / "package.json").is_file() else (
         "python" if (project / "pyproject.toml").is_file() else ""
     )
-    return _DEFAULTS.get(marker, {}).get(kind_id, "")
+    default = _DEFAULTS.get(marker, {}).get(kind_id, "")
+    if default:
+        return default
+
+    # Công cụ chung chỉ dùng khi thật sự có trên máy: khai một lệnh không
+    # tồn tại thì loại đó "chạy và đỏ", báo sai bản chất — nó chưa cấu hình.
+    import shutil as _shutil
+
+    universal = _UNIVERSAL.get(kind_id, "")
+    if universal and _shutil.which(universal.split()[0]):
+        return universal
+    return ""
 
 
 def find_fake_tests(project: Path | str, files: list[str] | None = None) -> list[str]:

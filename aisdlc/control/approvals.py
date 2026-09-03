@@ -29,10 +29,11 @@ from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 
-from .state import STATE_FILE
-
 #: Chỉ mục story đã chuẩn hoá — do bộ tách story sinh ra (GĐ-4.3).
 STORIES_INDEX = "stories.index.json"
+
+#: Kết quả chấm cổng trước triển khai — thứ người đọc trước khi ký.
+PRE_DEPLOY_REPORT = "pre-deploy-report.json"
 
 
 class Gate(str, Enum):
@@ -76,8 +77,11 @@ GATE_ARTIFACTS: dict[Gate, tuple[str, ...]] = {
     Gate.EPICS: ("epics.md",),
     Gate.STORIES: (STORIES_INDEX,),
     Gate.MOCKUPS: ("design-contract.json",),
-    Gate.READINESS: (STATE_FILE,),
-    Gate.PRE_DEPLOY: (STATE_FILE,),
+    # Hai cổng cuối **không** gắn vào `sprint-status.json`: file đó đổi
+    # sau mỗi story, nên phê duyệt vừa ký đã thành `stale` — cổng trở thành
+    # thứ báo động liên tục rồi bị bỏ qua.
+    Gate.READINESS: (STORIES_INDEX, "design-contract.json"),
+    Gate.PRE_DEPLOY: (PRE_DEPLOY_REPORT,),
 }
 
 

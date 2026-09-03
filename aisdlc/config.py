@@ -45,6 +45,8 @@ DEFAULTS: dict[str, Any] = {
     "verify.security": "",
     "verify.mutation": "",
     "verify.unit": "",
+    "verify.sbom": "",
+    "verify.image-scan": "",
     #: Loại được miễn tường minh, ngăn bởi dấu phẩy. Miễn phải là quyết
     #: định có người ký, không phải hệ quả của việc quên cấu hình.
     "verify.waived": "",
@@ -85,6 +87,8 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "verify.security": str,
     "verify.mutation": str,
     "verify.unit": str,
+    "verify.sbom": str,
+    "verify.image-scan": str,
     "verify.waived": str,
     "app.dev_command": str,
     "app.base_url": str,

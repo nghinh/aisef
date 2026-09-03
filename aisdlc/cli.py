@@ -670,6 +670,46 @@ def cmd_qa(args) -> int:
     return EXIT_NOT_READY
 
 
+def cmd_devsecops(args) -> int:
+    """Sinh quy trình CI (code) và bộ khung vận hành (model)."""
+    from .phases.deploy import generate
+
+    adapter, code = _client(args)
+    if adapter is None:
+        return code
+
+    report = generate(
+        args.project,
+        adapter,
+        config=Config.load(args.project),
+        aisdlc_bin=args.bin or str((Path(__file__).resolve().parent.parent / "bin" / "aisdlc")),
+        force=args.force,
+    )
+    print(report.summary())
+    return EXIT_OK if report.ok else EXIT_NOT_READY
+
+
+def cmd_predeploy(args) -> int:
+    """Chấm cổng trước triển khai."""
+    from .control.approvals import Gate
+    from .kit.detect_stack import detect_file
+    from .phases.deploy import pre_deploy
+
+    project = Path(args.project)
+    req = project / "docs" / "requirements.md"
+    has_ui = detect_file(req).has_ui if req.is_file() else True
+
+    report = pre_deploy(project, config=Config.load(project), has_ui=has_ui,
+                        skip_qa=args.skip_qa)
+    print(report.summary())
+    path = report.write(_artifact_root(args))
+    print(f"\nbáo cáo: {path}")
+    if not report.passed:
+        return EXIT_NOT_READY
+    print(f"Duyệt để triển khai: aisdlc approve {Gate.PRE_DEPLOY.value}")
+    return EXIT_OK
+
+
 # ------------------------------------------------------------------ đầu vào
 
 
@@ -754,6 +794,16 @@ def build_parser() -> argparse.ArgumentParser:
     q.add_argument("--story-level", action="store_true",
                    help="chấm ở mức story: thiếu công cụ chỉ cảnh báo")
     q.set_defaults(func=cmd_qa)
+
+    d = sub.add_parser("devsecops", help="sinh CI + Dockerfile + triển khai + runbook")
+    d.add_argument("--client", default="claude", help="claude | opencode")
+    d.add_argument("--bin", default="", help="đường dẫn lệnh aisdlc dùng trong CI")
+    d.add_argument("--force", action="store_true", help="sinh lại dù đã có")
+    d.set_defaults(func=cmd_devsecops)
+
+    pd = sub.add_parser("pre-deploy", help="chấm cổng trước triển khai")
+    pd.add_argument("--skip-qa", action="store_true", help="bỏ qua bộ kiểm định (chỉ để soi nhanh)")
+    pd.set_defaults(func=cmd_predeploy)
 
     aa = sub.add_parser("auto-approve", help="tự duyệt (ghi dấu auto)")
     aa.add_argument("gates", help="'all' hoặc danh sách ngăn bởi dấu phẩy")
