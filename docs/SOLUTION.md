@@ -359,15 +359,73 @@ Việc đầu tiên của Tuần 2 là **kiểm chứng wiring hook trên cả 4
 | **1 Setup** | dò stack → chọn skill theo catalog → lọc security 2 tầng → cài → compile → doctor | `doctor` trả 0 · đếm đúng số skill · **không skill offensive nào lọt** · chạy lại không nhân bản |
 | **2 BMAD** | `project-context → prd → architecture → ux → epics-and-stories → sprint-planning`, mỗi pha một cổng; tách mỗi story một file + `stories.index.json` | index parse được · không chu trình · **mọi FR được ≥1 story phủ** · không story vượt ngưỡng · 5 cổng `approved` |
 | **3 Mockup** | ux-spec + ui-ux-pro-max → HTML → screenshot → `design-contract.json` | mỗi màn hình có đúng một mockup mở được · contract không mục treo · story frontend map tới `screen_id` thật · cổng `mockups` `approved` |
-| **4 Implement** | phiên mới mỗi story · worktree riêng · RED→GREEN→VERIFY · guard 3 mốc · merge tuần tự cuối đợt | guard **chặn thật** (3 test) · hai story đụng scope không cùng đợt · chạy hết 1 epic ≥5 story · dừng giữa chừng resume đúng chỗ · cổng `readiness` `approved` |
+| **4 Implement** | phiên mới mỗi story · worktree riêng · **map mockup (mục 12bis)** · RED→GREEN→VERIFY · guard 3 mốc · merge tuần tự cuối đợt | guard **chặn thật** (3 test) · hai story đụng scope không cùng đợt · chạy hết 1 epic ≥5 story · dừng giữa chừng resume đúng chỗ · cổng `readiness` `approved` |
 | **5 Verify** | review sâu · unit · SIT · API contract · E2E · UAT · perf · security · mutation | mỗi loại chạy thật, trả kết quả máy đọc · cổng **chặn thật** khi đẩy story lỗi |
 | **6 Ship** | container · CI/CD · SBOM · IaC · observability · runbook | `docker build` chạy · CI chặn khi story fail · SBOM sạch high · runbook đủ 4 mục · cổng `pre-deploy` `approved` |
 
-**Cổng story (Bước 4–5) — PASS chỉ khi đủ bốn, mỗi thứ là bằng chứng chạy thật:**
+**Cổng story (Bước 4–5) — PASS chỉ khi đủ, mỗi thứ là bằng chứng chạy thật:**
 1. Test xanh, coverage ≥ ngưỡng
 2. Review APPROVED bởi agent khác người viết
 3. Security 0 phát hiện high/critical
 4. Truy vết: commit mang `FR-xx`, nối được code ↔ story ↔ requirement
+5. **Khớp mockup** — chỉ áp cho story có `screen_id` (mục 12bis)
+
+---
+
+## 12bis. Map với mockup — bước bắt buộc của story có giao diện
+
+Story nào có `screen_id` phải đi qua **hai nửa** của bước map. Thiếu nửa nào cũng không tính là xong.
+
+### Nửa trước khi code — nạp hợp đồng thị giác
+
+Prompt của story được bổ sung, không phải để tham khảo mà là ràng buộc:
+
+| Nạp gì | Từ đâu |
+|---|---|
+| Lát cắt contract của đúng màn hình đó | `design-contract.json#screens[screen_id]` |
+| Mockup HTML | `mockups/{screen_id}.html` |
+| Ảnh chụp mockup | `mockups/screenshots/{screen_id}.png` |
+| Danh sách component bắt buộc, route, nhãn, quy tắc validation | trích từ contract |
+
+Nạp **đúng một màn hình**, không nạp cả contract — giữ ngân sách ngữ cảnh (mục 14).
+
+### Nửa sau khi code — đối chiếu màn hình thật
+
+1. Dựng ứng dụng, mở **route thật** bằng Playwright.
+2. Trích DOM / accessibility tree.
+3. Đối chiếu từng component trong contract: có mặt không · nhãn đúng không · route đúng không.
+4. Chụp ảnh màn hình thật, đặt cạnh ảnh mockup trong evidence.
+5. Reviewer nhìn cặp ảnh và ghi nhận xét.
+
+### Ba mức đối chiếu — và vì sao chỉ một mức được chặn
+
+| Mức | Cách làm | Vai trò |
+|---|---|---|
+| **Cấu trúc** | component trong contract có mặt trong DOM thật | **CHẶN** — tất định, lặp lại được |
+| Thị giác bằng model | reviewer nhìn hai ảnh, ghi nhận xét | cảnh báo, không chặn |
+| ~~Pixel diff~~ | so ảnh từng điểm ảnh | **không dùng** |
+
+Không dùng pixel diff vì mockup HTML tĩnh và ứng dụng thật không bao giờ trùng từng điểm ảnh; gate kiểu đó đỏ liên tục, rồi người ta tắt nó đi — một cổng bị tắt còn tệ hơn không có cổng.
+
+### Kết quả ghi vào evidence
+
+```json
+"mockup_map": {
+  "screen_id": "SCREEN-03",
+  "route": "/login",
+  "contract_components": 7,
+  "matched": 7,
+  "missing": [],
+  "extra": ["banner-promo"],
+  "screenshot_mockup": "mockups/screenshots/SCREEN-03.png",
+  "screenshot_actual": "_bmad-output/evidence/shots/STORY-01-04.png",
+  "visual_note": "bố cục khớp; nút Sign In nằm phải thay vì trái"
+}
+```
+
+**Luật cổng:** `missing` rỗng → PASS. `extra` chỉ cảnh báo — ứng dụng thật được phép có thêm phần tử hợp lý, nhưng **không được thiếu** thứ contract đã hứa.
+
+**Khi mockup mâu thuẫn tài liệu:** thứ tự sự thật là architecture > ux-spec > design-contract. Gặp mâu thuẫn thì **dừng và báo**, không tự chọn.
 
 ---
 
@@ -517,3 +575,4 @@ aisdlc/control/scheduler.py     epic tuần tự, story song song theo đợt
 10. Thiếu cơ chế thì **khai báo**, không im lặng giả vờ đủ.
 11. Không bước nào đi tiếp khi cổng phía trước chưa duyệt — trừ khi tự duyệt tường minh, và phải ghi là `auto`.
 12. Story song song **luôn** ở worktree riêng; merge tuần tự.
+13. Story có `screen_id` **luôn** đi qua hai nửa của bước map mockup; thiếu component contract đã hứa thì không PASS.

@@ -23,7 +23,7 @@
 
 ## GĐ-0 · Spike kiểm chứng (3 ngày) — làm trước mọi thứ
 
-Mục đích duy nhất: **giết các giả định còn lại**. Code spike vứt đi được, chỉ giữ kết luận.
+Mục đích duy nhất: **giết các giả định còn lại** (7 spike). Code spike vứt đi được, chỉ giữ kết luận.
 
 | # | Spike | Câu hỏi phải trả lời | Xong khi |
 |---|---|---|---|
@@ -33,6 +33,7 @@ Mục đích duy nhất: **giết các giả định còn lại**. Code spike v�
 | S4 | OpenCode CLI + Desktop | `opencode run` đọc kết quả kiểu gì? `plugin` gắn guard được không? Desktop dùng chung cấu hình? | Kết luận cho cả 2 bề mặt |
 | S5 | Worktree + sandbox | `git worktree` + chạy test trong Docker `--network=none`, mount chỉ worktree | Chạy được 2 story song song, 2 worktree, merge tuần tự sạch |
 | S6 | BMAD qua CLI | Gọi được skill `bmad-prd` từ `claude -p` không? Cần cài `_bmad/` thế nào? | Sinh được một `prd.md` thật từ `docs/requirements.md` |
+| S7 | Đối chiếu mockup | Playwright trích được DOM/accessibility tree của app đang chạy không? Đối chiếu với contract có tất định không? | Chạy trên một trang mẫu: liệt kê đúng component, phát hiện đúng component bị thiếu |
 
 **Đầu ra GĐ-0:** `docs/SPIKE-REPORT.md` — mỗi spike một mục: câu hỏi · cách thử · kết quả · ảnh hưởng tới thiết kế.
 
@@ -112,6 +113,7 @@ aisdlc status
 | 5.3 | Chụp ảnh | `phases/mockup.py` | Playwright qua `npx`, không cần cài toàn cục |
 | 5.4 | Trích contract | `control/design_contract.py` | HTML → route · component · nhãn · validation |
 | 5.5 | Đối chiếu | `control/machine_gate.py` | Mọi màn hình ux-spec có mockup; **không mục `unresolved`**; story frontend map tới `screen_id` thật |
+| 5.6 | Chuẩn bị cho bước map | `control/design_contract.py` | Contract tra được **theo từng `screen_id`** (lát cắt riêng, không phải cả file) — đầu vào của 6.7a |
 
 **Mốc demo 5:** mở `mockups/index.html` xem được toàn bộ màn hình; `design-contract.json` hợp lệ.
 
@@ -136,11 +138,14 @@ Nặng nhất. Tách hai tuần.
 
 | # | Hạng mục | File | Xong khi |
 |---|---|---|---|
-| 6.7 | Vòng đời story | `phases/implement.py` | RED→GREEN→VERIFY; map design-contract nếu có UI |
+| 6.7 | Vòng đời story | `phases/implement.py` | RED→GREEN→VERIFY chạy hết một story backend |
+| 6.7a | **Map mockup — nửa nạp** | `harness/mockup_map.py` | Story có `screen_id` được nạp đúng một lát cắt contract + HTML + ảnh; test: không nạp thừa màn hình khác |
+| 6.7b | **Map mockup — nửa đối chiếu** | `harness/mockup_verify.py` | Dựng app, mở route thật, trích DOM, đối chiếu component; sinh `mockup_map` trong evidence |
+| 6.7c | Cổng khớp mockup | `control/gate.py` | **Test: thiếu một component contract đã hứa → gate FAIL**; `extra` chỉ cảnh báo |
 | 6.8 | Thất bại + retry | `control/retry.py` | `max_retries`; blocked lan theo đồ thị; **phân biệt lỗi hạ tầng ≠ lỗi chất lượng** |
 | 6.9 | `aisdlc run` | `cli.py` | Vòng lặp `next→implement→verify→complete`; `--max-parallel`; `--sequential` |
 
-**Mốc demo 6:** `aisdlc run --epic EPIC-01` chạy hết một epic ≥5 story trên `references/teamflow`, có story chạy song song, dừng giữa chừng resume đúng chỗ.
+**Mốc demo 6:** `aisdlc run --epic EPIC-01` chạy hết một epic ≥5 story (trong đó **≥1 story có giao diện**) trên `references/teamflow`; có story chạy song song; story UI sinh được `mockup_map` với `missing: []`; dừng giữa chừng resume đúng chỗ.
 
 ---
 
