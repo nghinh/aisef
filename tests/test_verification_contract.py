@@ -62,6 +62,25 @@ class TestSuyRa(unittest.TestCase):
         ))
         self.assertIn("perf", got)
 
+    def test_nguong_khung_hinh_cung_la_hieu_nang(self):
+        """"rớt khung hình", "bài đo", "ở quy mô N" đều là ngưỡng hiệu
+        năng mà không dùng chữ "hiệu năng".
+
+        Đo trên e9: TCCN 3 của STORY-01-04 đòi "bài đo AR-16 xác nhận
+        ngưỡng ... ở quy mô này" và không khớp dấu hiệu nào — cổng
+        `readiness` im lặng, rồi story bí ở lượt rà soát sau khi đã tiêu
+        $10,49.
+        """
+        for cum in (
+            "danh sách không rớt khung hình khi cuộn",
+            "bài đo AR-16 xác nhận ngưỡng vẫn đạt ở quy mô 10.000",
+            "thông lượng ghi đạt 500 bản ghi/giây",
+        ):
+            with self.subTest(cum=cum):
+                self.assertIn("perf", verification_contract(
+                    story(acceptance_criteria=[f"Then {cum}"])
+                ), cum)
+
     def test_story_tu_khai_thi_lay_ban_khai(self):
         """Người lập kế hoạch biết thứ code không suy ra được."""
         got = verification_contract(story(

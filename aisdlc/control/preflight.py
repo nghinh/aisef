@@ -124,7 +124,16 @@ _VERIFY_MARKERS: dict[str, tuple[str, ...]] = {
     "verify.api-contract": ("hợp đồng api", "api contract", "contract test", "openapi"),
     "verify.accessibility": ("trợ năng", "accessibility", "a11y", "wcag", "screen reader"),
     "verify.migration": ("migration", "di trú", "nâng cấp schema", "onupgradeneeded"),
-    "verify.perf": ("hiệu năng", "performance", "p95", "p99", "độ trễ", "latency"),
+    # "rớt khung hình", "bài đo", "ở quy mô N" đều là ngưỡng hiệu năng mà
+    # không dùng chữ "hiệu năng". Đo trên e9: TCCN 3 của STORY-01-04 đòi
+    # "bài đo AR-16 xác nhận ngưỡng ... ở quy mô này" và không khớp dấu
+    # hiệu nào — cổng `readiness` im lặng, rồi story bí ở lượt rà soát
+    # sau khi đã tiêu $10,49.
+    "verify.perf": (
+        "hiệu năng", "performance", "p95", "p99", "độ trễ", "latency",
+        "khung hình", "fps", "bài đo", "benchmark", "ở quy mô",
+        "thông lượng", "throughput",
+    ),
 }
 
 #: Dấu hiệu story chạm mặt bảo mật. Rộng hơn nhóm trên có chủ đích: sót
