@@ -326,7 +326,7 @@ Bốn lỗi thật chỉ lộ ra khi chạy thật, đã sửa:
     trình duyệt một lần là trượt cổng phạm vi.
 
 Đây chính là giá trị của việc chạy thật: mười bốn lỗi trên đều **không** lộ
-ra trong 760 test, vì test nào cũng dựng sẵn đúng điều kiện mà thực tế
+ra trong 761 test, vì test nào cũng dựng sẵn đúng điều kiện mà thực tế
 không tự có.
 
 ### Chạy thật — dựng mockup 5 màn hình
