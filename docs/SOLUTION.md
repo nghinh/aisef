@@ -534,7 +534,15 @@ Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏn
 | 5 Guardrails | test: mỗi guard **chặn thật** ở đúng mốc |
 | 6 Observability | mỗi evidence có cost + latency; `status` hiện tổng; eval phát hiện được trôi |
 
-**Theo R1–R14:** mỗi R có ít nhất một test hoặc artifact chứng minh.
+**Theo R1–R14:** mỗi R có ít nhất một test hoặc artifact chứng minh — bảng
+đầy đủ ở `docs/REQUIREMENTS-EVIDENCE.md`, kèm một test đọc chính bảng đó và
+trượt khi có dòng trỏ tới lớp test không còn tồn tại.
+
+**Ai viết báo cáo:** `aisdlc report` sinh `docs/ACCEPTANCE-REPORT.md` từ
+artifact và bằng chứng trên đĩa. Không mục nào viết tay — một báo cáo
+nghiệm thu viết tay chỉ chứng minh người viết tin là mình đúng. Mục sandbox
+ghi mức cách ly **quan sát được**, nên chạy suy biến thì báo cáo nói suy
+biến.
 
 **Đầu-cuối:** một dự án thật từ `docs/requirements.md` tới ứng dụng chạy được, với: mọi FR truy vết tới code và test · coverage ≥ ngưỡng · 0 high security · mockup khớp màn hình thật · chi phí và thời gian đo được từng story.
 
