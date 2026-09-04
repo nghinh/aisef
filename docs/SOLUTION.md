@@ -503,7 +503,28 @@ Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏn
 - Chỉ nạp code trong `write_scope` và các file nó import trực tiếp.
 - Reviewer là phiên riêng, ngữ cảnh sạch → **nhân đôi chi phí mỗi story**; đây là cái giá của "reviewer ≠ developer" và không cắt được.
 
-**Bắt buộc:** ghi `cost` + `latency` vào mỗi `evidence/{story}.json`, cộng dồn theo epic. **Đo trên một epic mẫu trước khi chạy toàn bộ** — con số thật của dự án bạn không suy ra được từ lý thuyết.
+**Bắt buộc:** ghi `cost` + `latency` vào mỗi `evidence/{story}.jsonl`, cộng dồn theo epic. **Đo trên một epic mẫu trước khi chạy toàn bộ** — con số thật của dự án bạn không suy ra được từ lý thuyết.
+
+**Số đo thật** (dự án ghi chú, PRD 33KB · kiến trúc 26KB · UX 41KB, Claude Code):
+
+| Việc | Chi phí | Thời gian |
+|---|---|---|
+| `project-context` | $1.52 | ~2 phút |
+| `prd` | $1.88 | ~8 phút |
+| `architecture` | $2.78 | ~8 phút |
+| `ux` (DESIGN + EXPERIENCE) | $3.71 | ~10 phút |
+| `epics` (18 story) | $4.45 | ~12 phút |
+| **mockup, mỗi màn hình** | **$1.5–2.3** | 3–5 phút |
+| story backend, mỗi lượt thử | $2–2.7 | 6–15 phút |
+
+Hai điều số này dạy:
+
+* **Lập kế hoạch không rẻ** — ~$14 trước khi viết dòng code nào, và với dự
+  án nhỏ đó là phần đắt nhất. Vì thế chi phí pha lập kế hoạch cũng phải vào
+  bằng chứng, không chỉ chi phí story.
+* **Mockup đắt hơn tưởng** ($2/màn) vì mỗi màn đọc lại DESIGN + EXPERIENCE +
+  PRD. Dự án 20 màn hình là ~$40 — đủ để đáng cân nhắc dựng theo đợt và
+  duyệt sớm, thay vì dựng hết rồi mới xem.
 
 ---
 
