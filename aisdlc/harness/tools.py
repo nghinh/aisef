@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import json
 import shlex
+import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -236,11 +237,26 @@ def _record(res: ToolResult, story_id: str, artifact_root) -> None:
     )
 
 
+def aisdlc_command() -> str:
+    """Lệnh gọi framework mà agent gõ được **thật**.
+
+    Prompt in ra `aisdlc tool test` là vô dụng nếu `aisdlc` không nằm trên
+    PATH của phiên agent — nó sẽ nhận "command not found", rồi tự chạy
+    pytest bằng tay, và lần chạy đó không vào bằng chứng. Ưu tiên tên trên
+    PATH, không có thì dùng đường dẫn tuyệt đối của chính kho này.
+    """
+    found = shutil.which("aisdlc")
+    if found:
+        return "aisdlc"
+    return str(Path(__file__).resolve().parent.parent.parent / "bin" / "aisdlc")
+
+
 def describe_tools(project: Path | str, config: Config | None = None) -> str:
     """Bảng tool cho prompt: tên, lệnh thật, và **khi nào gọi**."""
     project = Path(project)
+    binary = aisdlc_command()
     lines = []
     for tool in TOOLS.values():
         cmd = command_for(tool.name, project, config) or "(dự án chưa khai)"
-        lines.append(f"- `aisdlc tool {tool.name}` → `{cmd}`\n  Khi nào: {tool.when}")
+        lines.append(f"- `{binary} tool {tool.name}` → `{cmd}`\n  Khi nào: {tool.when}")
     return "\n".join(lines)

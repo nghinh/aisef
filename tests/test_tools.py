@@ -15,6 +15,7 @@ from aisdlc.config import DEFAULTS, Config  # noqa: E402
 from aisdlc.harness.observe import TOOL_RUN, EvidenceStore  # noqa: E402
 from aisdlc.harness.tools import (  # noqa: E402
     TOOLS,
+    aisdlc_command,
     command_for,
     image_for,
     describe_tools,
@@ -162,6 +163,21 @@ class TestDescription(ToolTestCase):
         """Tool không có mô tả dùng đúng lúc thì agent sẽ gọi sai lúc."""
         for tool in TOOLS.values():
             self.assertTrue(len(tool.when) > 30, tool.name)
+
+    def test_prompt_names_a_command_the_agent_can_actually_run(self):
+        """`aisdlc tool test` là vô dụng nếu `aisdlc` không nằm trên PATH
+        của phiên agent: nó nhận "command not found", tự chạy pytest bằng
+        tay, và lần chạy đó không vào bằng chứng."""
+        import os
+        import shutil
+
+        binary = aisdlc_command()
+        if binary != "aisdlc":
+            self.assertTrue(os.path.isfile(binary), binary)
+            self.assertTrue(os.access(binary, os.X_OK), binary)
+        else:
+            self.assertTrue(shutil.which("aisdlc"))
+        self.assertIn(binary, describe_tools(self.project, self.cfg))
 
     def test_prompt_table_shows_the_real_command(self):
         self.write("pyproject.toml", "")

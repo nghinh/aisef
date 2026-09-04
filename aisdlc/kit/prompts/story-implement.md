@@ -1,6 +1,6 @@
 ---
 name: story-implement
-version: 2
+version: 3
 role: developer
 ---
 # {{ story_id }} — {{ story_title }}
@@ -34,9 +34,10 @@ story, không sửa bằng cách đi vòng.
 
 ## Công cụ
 
-Gọi công cụ, đừng tự gõ lệnh tương đương: chỉ những lần chạy qua công cụ
-mới được ghi vào bằng chứng, và **cổng đọc bằng chứng chứ không đọc lời
-kể**. Một lần chạy test không được ghi lại thì coi như chưa chạy.
+Gọi công cụ **bằng đúng đường dẫn dưới đây**, đừng tự gõ lệnh tương đương:
+chỉ những lần chạy qua công cụ mới được ghi vào bằng chứng, và **cổng đọc
+bằng chứng chứ không đọc lời kể**. Một lần chạy test không được ghi lại thì
+coi như chưa chạy.
 
 {{ tools }}
 
