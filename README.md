@@ -83,6 +83,21 @@ Client nào không gắn được guard tiền kiểm (OpenCode hiện ở mức
 `aisdlc verify` chạy lại toàn bộ trên diff, và báo cáo ghi rõ mức bảo đảm
 thấp hơn thay vì im lặng.
 
+## Khi cổng chặn
+
+Cổng chặn là framework đang làm việc, không phải framework hỏng. Ba ca hay
+gặp và cách xử đúng:
+
+| Cổng báo | Nghĩa là | Làm gì |
+|---|---|---|
+| `mockup còn N chỗ chưa chốt` | mockup gặp câu hỏi chưa ai trả lời và **đánh dấu** thay vì tự quyết | trả lời câu hỏi (thường nằm ở `open_questions` của PRD/UX), sửa tài liệu, dựng lại mockup |
+| `story đụng vào yêu cầu đang bị câu hỏi mở chặn` | epic gán một FR mà PRD ghi là chưa quyết được | trả lời câu hỏi, hoặc bỏ FR đó khỏi story |
+| `merge đụng …` | hai story cùng sửa một file | `write_scope` khai sai — sửa ở story, **không** gỡ conflict cho xong |
+
+`--force` có ở `approve` và `run` cho trường hợp cố ý bỏ qua. Dùng nó là
+một quyết định, và nó được ghi lại: bản ghi phê duyệt giữ ghi chú, báo cáo
+nghiệm thu hiện đúng trạng thái từng cổng.
+
 ## Chạy song song
 
 Epic chạy tuần tự. Trong một epic, hai story chỉ được cùng đợt khi **hết
