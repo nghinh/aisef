@@ -77,6 +77,26 @@ class TestParseEpics(unittest.TestCase):
         plan = parse_epics(stripped)
         self.assertEqual(plan.by_id("STORY-02-02").covers, ["FR-7"])
 
+    def test_screens_are_slugified_ids(self):
+        """Story giao diện phải trỏ tới mã màn hình có thật trong
+        EXPERIENCE.md — đây là đầu vào của bước map mockup."""
+        self.assertEqual(self.plan.by_id("STORY-02-01").screens, ["tim-kiem"])
+        self.assertEqual(self.plan.by_id("STORY-01-02").screens, [])
+
+    def test_screens_reach_the_index(self):
+        import json
+        import shutil
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in ("epics.md", "prd.md"):
+                shutil.copy(FIX / name, root / name)
+            split(root)
+            data = json.loads((root / "stories.index.json").read_text(encoding="utf-8"))
+            row = next(s for s in data["stories"] if s["id"] == "STORY-01-01")
+            self.assertEqual(row["screens"], ["danh-sach", "soan-thao"])
+
     def test_story_does_not_depend_on_itself(self):
         for s in self.plan.stories():
             self.assertNotIn(s.id, s.depends_on)

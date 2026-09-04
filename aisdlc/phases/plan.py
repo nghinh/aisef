@@ -104,7 +104,9 @@ PHASES: tuple[Phase, ...] = (
             "- write_scope: đường/dẫn/, đường/dẫn/khác  "
             "(mọi đường dẫn story được phép ghi, tương đối so với gốc dự án)\n"
             "- depends_on: N.M hoặc none\n"
-            "Ba dòng này là hợp đồng máy đọc: thiếu thì story bị chặn."
+            "- screens: mã màn hình trong EXPERIENCE.md story này dựng, "
+            "hoặc none nếu story không có giao diện\n"
+            "Bốn dòng này là hợp đồng máy đọc: thiếu thì story bị chặn."
         ),
     ),
 )

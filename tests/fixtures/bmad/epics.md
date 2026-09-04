@@ -68,6 +68,7 @@ So that tôi ghi lại được ý nghĩ trước khi quên.
 - covers: FR-1
 - write_scope: src/notes/, src/db/
 - depends_on: none
+- screens: danh-sach, soan-thao
 
 ### Story 1.2: Lưu tự động khi soạn
 
@@ -120,6 +121,7 @@ So that tôi mở lại được thứ đã viết.
 - covers: FR-4
 - write_scope: src/list/
 - depends_on: 1.1
+- screens: danh-sach
 
 ## Epic 2: Tìm kiếm
 
@@ -142,6 +144,7 @@ So that tôi không phải cuộn tay.
 - covers: FR-5, FR-6
 - write_scope: src/search/
 - depends_on: 1.4
+- screens: tim-kiem
 
 ### Story 2.2: Trình bày kết quả tìm kiếm
 
