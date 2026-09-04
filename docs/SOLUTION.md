@@ -406,7 +406,7 @@ Prompt của story được bổ sung, không phải để tham khảo mà là r
 |---|---|
 | Lát cắt contract của đúng màn hình đó | `design-contract.json#screens[screen_id]` |
 | Mockup HTML | `mockups/{screen_id}.html` |
-| Ảnh chụp mockup | `mockups/screenshots/{screen_id}.png` |
+| Ảnh chụp mockup | `mockups/{screen_id}.png` |
 | Danh sách component bắt buộc, route, nhãn, quy tắc validation | trích từ contract |
 
 Nạp **đúng một màn hình**, không nạp cả contract — giữ ngân sách ngữ cảnh (mục 14).
@@ -423,11 +423,19 @@ Nạp **đúng một màn hình**, không nạp cả contract — giữ ngân s�
 
 | Mức | Cách làm | Vai trò |
 |---|---|---|
-| **Cấu trúc** | component trong contract có mặt trong DOM thật | **CHẶN** — tất định, lặp lại được |
+| **Cấu trúc** | component trong contract có mặt trong cây accessibility thật | **CHẶN** — tất định, lặp lại được |
 | Thị giác bằng model | reviewer nhìn hai ảnh, ghi nhận xét | cảnh báo, không chặn |
 | ~~Pixel diff~~ | so ảnh từng điểm ảnh | **không dùng** |
 
 Không dùng pixel diff vì mockup HTML tĩnh và ứng dụng thật không bao giờ trùng từng điểm ảnh; gate kiểu đó đỏ liên tục, rồi người ta tắt nó đi — một cổng bị tắt còn tệ hơn không có cổng.
+
+**Dữ liệu mẫu tách khỏi khung giao diện.** Cùng lý do đó, hàng danh sách
+trong mockup mang nội dung ví dụ mà ứng dụng thật không bao giờ hiển thị
+lại. Mockup đánh dấu vùng đó bằng `data-sample`; hợp đồng tách
+`components` (cam kết theo **vai trò + tên gọi**) khỏi `data_roles` (chỉ
+cam kết **có mục thuộc kiểu đó**). Không tách thì "Đặt lịch khám răng" trở
+thành cam kết và cổng đỏ vĩnh viễn; tách quá tay thì một danh sách rỗng
+cũng "đạt" — nên vùng dữ liệu rỗng vẫn là trượt.
 
 ### Kết quả ghi vào evidence
 
@@ -439,7 +447,8 @@ Không dùng pixel diff vì mockup HTML tĩnh và ứng dụng thật không bao
   "matched": 7,
   "missing": [],
   "extra": ["banner-promo"],
-  "screenshot_mockup": "mockups/screenshots/SCREEN-03.png",
+  "missing_data_roles": [],
+  "screenshot_mockup": "mockups/SCREEN-03.png",
   "screenshot_actual": "_bmad-output/evidence/shots/STORY-01-04.png",
   "visual_note": "bố cục khớp; nút Sign In nằm phải thay vì trái"
 }
