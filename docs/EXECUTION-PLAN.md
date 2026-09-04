@@ -22,7 +22,7 @@
 | GĐ-6 Harness + implement | ✅ 10/10 — `aisdlc run` chạy đợt trên worktree thật, cổng story 6 điều kiện |
 | GĐ-7 Kiểm định | ✅ — `aisdlc qa` 10 loại; "chưa cấu hình" ≠ "đạt" |
 | GĐ-8 DevSecOps | ✅ — `aisdlc devsecops` + `pre-deploy` |
-| GĐ-9 Đầu-cuối | 🔨 đang làm |
+| GĐ-9 Đầu-cuối | 🔨 **chuỗi lập kế hoạch chạy hết trên agent thật; vòng lặp story chạy thật và chặn đúng chỗ**. Còn lại: mockup thật, một epic chạy trọn, báo cáo nghiệm thu đầy đủ |
 
 **Mốc demo đã đạt**
 
