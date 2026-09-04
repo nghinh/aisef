@@ -298,8 +298,20 @@ Bốn lỗi thật chỉ lộ ra khi chạy thật, đã sửa:
    mã FR + có số hiệu story" nên gán FR-13 cho story 1.2, rồi cổng máy chặn
    cả 18 story vì một câu văn xuôi.
 
-Đây chính là giá trị của việc chạy thật: bảy lỗi trên đều **không** lộ ra
-trong 742 test, vì test nào cũng dựng sẵn đúng điều kiện mà thực tế không
+8. **`aisdlc run` đòi sai cổng** — chỉ đòi `stories`, nên story khai
+   `screens` vẫn chạy được khi chưa có mockup nào, rồi trượt vì "chưa đối
+   chiếu" sau khi đã tiêu tiền viết xong code. Nay đòi `readiness`.
+9. **Phụ thuộc cài đặt bị tính vào diff của story** — `node_modules`,
+   `dist` xuất hiện vì story **chạy**, không phải vì story **viết**; tính
+   vào phạm vi thì mọi story cài phụ thuộc đều trượt.
+10. **Hợp đồng thị giác gộp mọi trạng thái** — mockup thật dựng "Mở nguội",
+    "Tìm kiếm chưa sẵn sàng", "Có kết quả" cạnh nhau trong một file (đúng
+    như skill yêu cầu), nhưng ứng dụng thật ở một thời điểm chỉ ở **một**
+    trạng thái. Gộp hết thì không màn hình nào khớp nổi. Nay mockup khai
+    `data-state="primary"` và `data-annotation`.
+
+Đây chính là giá trị của việc chạy thật: mười lỗi trên đều **không** lộ ra
+trong 749 test, vì test nào cũng dựng sẵn đúng điều kiện mà thực tế không
 tự có.
 
 ### Chạy thật — hiện thực một story trên agent thật
