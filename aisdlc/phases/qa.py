@@ -105,6 +105,11 @@ class KindResult:
     detail: str = ""
     duration_ms: int = 0
     skipped: str = ""
+    #: Lệnh có, nhưng môi trường chưa dựng nên nó không chạy nổi. Khác
+    #: hẳn "test đỏ": test không trượt, nó chưa từng chạy. Gộp hai thứ
+    #: lại thì báo cáo nói sai chỗ cần sửa — đo trên e9, `pre-deploy`
+    #: báo "✗ unit" trong khi thật ra gốc dự án chưa `npm ci` bao giờ.
+    unrunnable: str = ""
 
     @property
     def configured(self) -> bool:
@@ -113,6 +118,8 @@ class KindResult:
     def line(self) -> str:
         if self.skipped:
             return f"  ○ {self.kind.id:12} {self.skipped}"
+        if self.unrunnable:
+            return f"  ⚠ {self.kind.id:12} không chạy được — {self.unrunnable}"
         mark = "✅" if self.ok else "✗"
         extra = f" — {self.detail}" if self.detail and not self.ok else ""
         return f"  {mark} {self.kind.id:12} {self.kind.title}{extra}"
@@ -126,7 +133,13 @@ class QaReport:
 
     @property
     def failed(self) -> list[KindResult]:
-        return [r for r in self.results if r.ran and not r.ok]
+        """Loại đã chạy và đỏ. **Không** gồm loại không chạy nổi: chúng
+        vẫn chặn, nhưng qua `unrunnable`, với lý do đúng."""
+        return [r for r in self.results if r.ran and not r.ok and not r.unrunnable]
+
+    @property
+    def unrunnable(self) -> list[KindResult]:
+        return [r for r in self.results if r.unrunnable and r.kind.id not in self.waived]
 
     @property
     def unconfigured(self) -> list[KindResult]:
@@ -135,7 +148,7 @@ class QaReport:
     @property
     def passed(self) -> bool:
         """Đạt ở mức story: không có loại nào chạy mà đỏ, không có test giả."""
-        return not self.failed and not self.fake_tests
+        return not self.failed and not self.unrunnable and not self.fake_tests
 
     @property
     def release_ready(self) -> bool:
@@ -149,6 +162,12 @@ class QaReport:
             lines.append(f"  ✗ test giả: {len(self.fake_tests)} test không có khẳng định nào")
             for t in self.fake_tests[:5]:
                 lines.append(f"      {t}")
+        if self.unrunnable:
+            lines.append(
+                "\n⚠️  không chạy được: "
+                + ", ".join(r.kind.id for r in self.unrunnable)
+                + " — môi trường chưa dựng, không phải test đỏ"
+            )
         if self.unconfigured:
             lines.append(
                 "\n⚠️  chưa cấu hình: "
@@ -244,6 +263,28 @@ def _project_files(project: Path) -> list[str]:
     return out
 
 
+#: Dấu hiệu "công cụ không nạp được", không phải "test đỏ". 127 là mã
+#: POSIX cho lệnh không tìm thấy; phần còn lại là cách các hệ chạy khác
+#: nói cùng một chuyện. Gộp hai loại lại thì báo cáo chỉ sai chỗ cần sửa:
+#: người đọc đi sửa test trong khi thứ hỏng là môi trường.
+_MISSING_TOOL = (
+    "command not found",
+    "not found",
+    "cannot find module",
+    "module_not_found",
+    "no such file or directory",
+    "is not recognized as an internal or external command",
+)
+
+
+def _unrunnable_reason(exit_code: int, detail: str) -> str:
+    low = detail.lower()
+    hit = next((m for m in _MISSING_TOOL if m in low), "")
+    if exit_code != 127 and not hit:
+        return ""
+    return "công cụ chưa cài hoặc không nạp được — dựng môi trường rồi chạy lại"
+
+
 def run_suite(
     project: Path | str,
     *,
@@ -267,6 +308,14 @@ def run_suite(
         if only and kind.id not in only:
             continue
         result = KindResult(kind=kind)
+        if kind.id in waived:
+            # Miễn là **quyết định của người**, đã ghi lại. Vẫn chạy rồi
+            # vẫn đếm là trượt thì miễn chẳng có nghĩa gì, và báo cáo tự
+            # mâu thuẫn: dòng dưới ghi "miễn tường minh" trong khi dòng
+            # trên ghi ✗.
+            result.skipped = "miễn tường minh (verify.waived)"
+            report.results.append(result)
+            continue
         if kind.needs_ui and not has_ui:
             result.skipped = "dự án không có giao diện"
             report.results.append(result)
@@ -294,7 +343,13 @@ def run_suite(
         result.ran = True
         result.ok = sb.ok
         result.duration_ms = sb.duration_ms
-        result.detail = "\n".join((sb.stdout + "\n" + sb.stderr).strip().splitlines()[-5:])
+        # Dò dấu hiệu trên đầu ra **đầy đủ**, không phải phần đã cắt:
+        # "Cannot find module" nằm ở đầu stack trace còn `detail` chỉ giữ
+        # 5 dòng cuối. Đo trên e9: sau bản vá đầu tiên, `mutation` vẫn bị
+        # đếm là test đỏ đúng vì chỗ này.
+        day_du = (sb.stdout + "\n" + sb.stderr).strip()
+        result.detail = "\n".join(day_du.splitlines()[-5:])
+        result.unrunnable = _unrunnable_reason(getattr(sb, "exit_code", 0), day_du)
         report.results.append(result)
         if store:
             store.tool_run(

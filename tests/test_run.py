@@ -368,6 +368,38 @@ class TestTransaction(RunTestCase):
                          "story đã merge thì không chạy lại")
 
 
+class TestDonWorktree(RunTestCase):
+    """Worktree nằm trong cây dự án — công cụ của dự án nhìn thấy chúng.
+
+    Lỗi 35, đo trên e9: `vitest` ở gốc dự án quét vào
+    `.aisdlc/worktrees/STORY-01-04/` và nhặt test của story đang dở, rồi
+    cổng trước triển khai báo "unit đỏ". Test không đỏ — nó đọc nhầm cây.
+    `.gitignore` che được git, nhưng vitest/eslint/tsc không đọc nó khi
+    tìm tệp.
+    """
+
+    def worktree(self, sid="STORY-01-01"):
+        return self.project / ".aisdlc" / "worktrees" / sid
+
+    def test_story_truot_khong_de_lai_thu_muc_trong_cay_du_an(self):
+        self.run_sprint(Agent(fail={"STORY-01-01"}))
+        self.assertFalse(self.worktree().exists(),
+                         "worktree của story trượt phải được gỡ")
+
+    def test_cong_viec_do_dang_van_con_trong_nhanh(self):
+        """Gỡ thư mục không được làm mất công việc: nhánh giữ nó."""
+        self.run_sprint(Agent(out_of_scope={"STORY-01-01"}))
+        nhanh = subprocess.run(
+            ["git", "branch", "--list", "story/STORY-01-01"],
+            cwd=self.project, capture_output=True, text=True, check=True,
+        ).stdout
+        self.assertIn("story/STORY-01-01", nhanh)
+
+    def test_story_xong_cung_khong_de_lai_thu_muc(self):
+        self.run_sprint(Agent())
+        self.assertFalse(self.worktree().exists())
+
+
 class TestIsolationOff(RunTestCase):
     def test_no_isolate_runs_in_the_project_itself(self):
         report = self.run_sprint(Agent(), only_epic="EPIC-02", isolate=False)

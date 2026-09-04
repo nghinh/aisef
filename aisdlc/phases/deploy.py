@@ -32,6 +32,10 @@ from ..control.state import StateStore, StoryStatus
 from .qa import QaReport, run_suite
 
 CI_PATH = ".github/workflows/aisdlc.yml"
+
+#: Cách CI cài framework. Để người dùng đổi được khi họ phát hành nội bộ
+#: hoặc dùng bản từ git.
+INSTALL_SPEC = "ai-sdlc"
 RUNBOOK_PATH = "docs/RUNBOOK.md"
 
 #: Bốn mục một runbook phải có. Thiếu mục nào cũng làm nó vô dụng đúng lúc
@@ -164,17 +168,28 @@ def pre_deploy(
     return report
 
 
-def write_ci_workflow(project: Path | str, *, aisdlc_bin: str = "aisdlc") -> Path:
+def write_ci_workflow(
+    project: Path | str,
+    *,
+    aisdlc_bin: str = "aisdlc",
+    install_spec: str = INSTALL_SPEC,
+) -> Path:
     """Sinh quy trình CI nối đúng các cổng đã có.
 
     CI chạy lại **cùng bộ lệnh** người chạy trên máy mình. Viết một quy
     trình riêng cho CI là cách chắc chắn để hai bên trôi khỏi nhau, rồi
     "chạy được trên máy tôi" thành một cuộc tranh luận thay vì một sự thật
     kiểm được.
+
+    ``aisdlc_bin`` mặc định là tên lệnh trên PATH, **không** phải đường
+    dẫn tuyệt đối của máy sinh ra tệp: đường ấy không tồn tại trên máy
+    chạy CI, và quy trình hỏng ngay bước đầu.
     """
     path = Path(project) / CI_PATH
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(_CI_TEMPLATE.format(bin=aisdlc_bin), encoding="utf-8")
+    path.write_text(
+        _CI_TEMPLATE.format(bin=aisdlc_bin, install=install_spec), encoding="utf-8"
+    )
     return path
 
 
@@ -196,6 +211,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      # Đường dẫn tuyệt đối của máy sinh ra quy trình này không tồn tại
+      # trên máy chạy CI. Cài rồi gọi từ PATH.
+      - name: Cài AI-SDLC
+        run: pip install --quiet {install}
 
       - name: Môi trường
         run: {bin} doctor
@@ -245,7 +265,10 @@ class DevSecOpsReport:
     def summary(self) -> str:
         if self.error:
             return f"devsecops: ✗ {self.error}"
-        lines = [f"devsecops: sinh {len(self.generated)} tạo tác"]
+        # Đếm cả quy trình CI: nó cũng là một tạo tác sinh ra, và in "sinh
+        # 2" rồi liệt kê 3 dòng làm người đọc nghi ngờ cả phần còn lại.
+        n = len(self.generated) + (1 if self.ci_path else 0)
+        lines = [f"devsecops: sinh {n} tạo tác"]
         if self.ci_path:
             lines.append(f"  ✅ {CI_PATH}")
         for name in self.generated:
@@ -272,7 +295,10 @@ def generate(
     """Sinh quy trình CI (bằng code) và bộ khung vận hành (bằng model)."""
     from ..kit.detect_stack import detect_file
 
-    project = Path(project)
+    # `resolve()`: prompt dùng `project.name`, và `Path(".").name` là
+    # chuỗi rỗng. CLI đã tuyệt đối hoá ở cửa vào, nhưng hàm này gọi được
+    # thẳng từ mã khác — chỗ duy nhất cần `.name` thì tự lo lấy.
+    project = Path(project).resolve()
     cfg = config or Config.load(project)
     report = DevSecOpsReport()
     report.ci_path = write_ci_workflow(project, aisdlc_bin=aisdlc_bin)

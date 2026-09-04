@@ -782,11 +782,48 @@ def cmd_devsecops(args) -> int:
         args.project,
         adapter,
         config=Config.load(args.project),
-        aisdlc_bin=args.bin or str((Path(__file__).resolve().parent.parent / "bin" / "aisdlc")),
+        # Mặc định là **tên lệnh trên PATH**, không phải đường dẫn tuyệt
+        # đối của máy này: quy trình CI sinh ra sẽ chạy trên máy khác.
+        aisdlc_bin=args.bin or "aisdlc",
         force=args.force,
     )
     print(report.summary())
     return EXIT_OK if report.ok else EXIT_NOT_READY
+
+
+def _project_has_ui(project: Path) -> bool:
+    """Dự án này có giao diện không — hỏi thứ đã **quyết**, không phải
+    thứ được **gợi ý**.
+
+    `detect_file(requirements.md)` chỉ đọc tài liệu yêu cầu ban đầu, nơi
+    người viết thường không nêu tên framework. Tới lúc chấm cổng trước
+    triển khai thì kiến trúc đã chốt và màn hình đã dựng — dùng chúng.
+    Đo trên e9: ứng dụng 5 màn hình bị báo "dự án không có giao diện", và
+    `e2e`/`accessibility` bị bỏ qua với một lý do sai sự thật.
+    """
+    from .kit.detect_stack import detect_file
+
+    root = project / "_bmad-output"
+    contract = root / "design-contract.json"
+    if contract.is_file():
+        try:
+            raw = json.loads(contract.read_text(encoding="utf-8"))
+            if raw.get("screens"):
+                return True
+        except (OSError, json.JSONDecodeError):
+            pass
+
+    index = root / STORIES_INDEX
+    if index.is_file():
+        try:
+            raw = json.loads(index.read_text(encoding="utf-8"))
+            if any(s.get("screens") for s in raw.get("stories", [])):
+                return True
+        except (OSError, json.JSONDecodeError):
+            pass
+
+    req = project / "docs" / "requirements.md"
+    return detect_file(req).has_ui if req.is_file() else True
 
 
 def cmd_predeploy(args) -> int:
@@ -796,8 +833,7 @@ def cmd_predeploy(args) -> int:
     from .phases.deploy import pre_deploy
 
     project = Path(args.project)
-    req = project / "docs" / "requirements.md"
-    has_ui = detect_file(req).has_ui if req.is_file() else True
+    has_ui = _project_has_ui(project)
 
     report = pre_deploy(project, config=Config.load(project), has_ui=has_ui,
                         skip_qa=args.skip_qa)
@@ -931,6 +967,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    # Tuyệt đối hoá **một lần, ở cửa vào**. Mặc định `--project .` làm
+    # `Path(".").name` thành chuỗi rỗng, và mỗi pha lại dùng nó một kiểu:
+    # báo cáo nghiệm thu ra tiêu đề cụt, prompt devsecops trượt vì biến
+    # rỗng. Vá từng chỗ dùng là vá triệu chứng — chín chỗ trong mã làm
+    # `Path(project)` mà không resolve, và chỗ thứ mười sẽ lại hỏng.
+    args.project = str(Path(args.project).resolve())
     try:
         return args.func(args)
     except ConfigError as e:

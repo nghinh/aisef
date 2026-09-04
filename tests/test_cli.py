@@ -422,5 +422,42 @@ class TestInit(CliTestCase):
         self.assertIn("config.json", out)
 
 
+class TestDuongDanDuAn(unittest.TestCase):
+    """`--project .` phải thành đường dẫn tuyệt đối ngay ở cửa vào.
+
+    `Path(".").name` là chuỗi rỗng, và mỗi pha dùng nó một kiểu: báo cáo
+    nghiệm thu ra tiêu đề cụt (lỗi 22), prompt `devsecops` trượt vì biến
+    rỗng (lỗi 30). Chín chỗ trong mã làm `Path(project)` mà không
+    resolve — vá từng chỗ dùng là vá triệu chứng, chỗ thứ mười sẽ lại
+    hỏng.
+    """
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.project = Path(self._tmp.name) / "du-an-cua-toi"
+        (self.project / "_bmad-output").mkdir(parents=True)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_chay_tu_trong_thu_muc_du_an_van_ra_dung_ten(self):
+        import os
+
+        cwd = os.getcwd()
+        os.chdir(self.project)
+        try:
+            out = io.StringIO()
+            with redirect_stdout(out), redirect_stderr(io.StringIO()):
+                main(["report"])
+        finally:
+            os.chdir(cwd)
+
+        text = (self.project / "docs" / "ACCEPTANCE-REPORT.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("# Báo cáo nghiệm thu — du-an-cua-toi", text)
+
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

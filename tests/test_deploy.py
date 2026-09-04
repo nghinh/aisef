@@ -233,3 +233,65 @@ class TestGenerate(DeployTestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestTenDuAn(unittest.TestCase):
+    """Prompt `devsecops` dùng `project.name`; `Path(".").name` là rỗng.
+
+    Lỗi 30, tìm được trong 45 giây đầu chạy bước 6 trên dự án thật:
+    `PromptError: devsecops: biến rỗng project_name`. Cùng gốc với lỗi 22
+    ở báo cáo nghiệm thu — vá một chỗ dùng không đủ.
+    """
+
+    def test_duong_dan_tuong_doi_van_ra_ten_that(self):
+        import os
+        import tempfile
+
+        from aisdlc.phases.deploy import build_prompt
+
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp) / "ten-du-an"
+            d.mkdir()
+            cwd = os.getcwd()
+            os.chdir(d)
+            try:
+                body = build_prompt(Path(".").resolve(), "node")
+            finally:
+                os.chdir(cwd)
+        self.assertIn("ten-du-an", body)
+
+
+class TestQuyTrinhCI(unittest.TestCase):
+    """Quy trình CI phải chạy được trên **máy khác**.
+
+    Lỗi 31: `aisdlc devsecops` ghim đường dẫn tuyệt đối của máy sinh ra nó
+    (`/Users/.../bin/aisdlc`) và không có bước nào cài framework — quy
+    trình hỏng ngay bước đầu trên GitHub Actions.
+    """
+
+    def test_khong_ghim_duong_dan_tuyet_doi_va_co_buoc_cai(self):
+        import tempfile
+
+        from aisdlc.phases.deploy import write_ci_workflow
+
+        with tempfile.TemporaryDirectory() as tmp:
+            body = write_ci_workflow(tmp).read_text(encoding="utf-8")
+
+        self.assertIn("pip install", body)
+        self.assertNotIn("/Users/", body)
+        self.assertNotIn("/home/", body)
+        for lenh in ("aisdlc doctor", "aisdlc verify", "aisdlc qa", "aisdlc gates"):
+            self.assertIn(f"run: {lenh}", body)
+
+    def test_dem_dung_so_tao_tac(self):
+        """In "sinh 2" rồi liệt kê 3 dòng làm người đọc nghi ngờ cả phần
+        còn lại của báo cáo."""
+        from pathlib import Path as _P
+
+        from aisdlc.phases.deploy import DevSecOpsReport
+
+        r = DevSecOpsReport(generated=["Dockerfile", "docs/RUNBOOK.md"],
+                            ci_path=_P(".github/workflows/aisdlc.yml"))
+        head = r.summary().splitlines()[0]
+        self.assertIn("3 tạo tác", head)
+        self.assertEqual(sum(1 for l in r.summary().splitlines() if "✅" in l), 3)

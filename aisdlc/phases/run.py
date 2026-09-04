@@ -191,6 +191,27 @@ def run_epic(
                 wave=wave,
             )
 
+        # Gỡ worktree của story **trượt** trước khi thoát. Chúng nằm
+        # trong cây dự án, và `.gitignore` chỉ che được git: vitest,
+        # eslint, tsc đều quét thẳng thư mục và nhặt phải test của story
+        # đang dở. Đo trên e9, cổng trước triển khai báo "unit đỏ" vì
+        # đúng chuyện này — test không đỏ, nó đọc nhầm cây.
+        #
+        # Chốt phần còn dở vào nhánh trước khi gỡ: nhánh giữ công việc,
+        # thư mục thì không cần giữ — `create` dựng lại được từ nhánh khi
+        # cần xem lại.
+        if worktrees is not None:
+            for o in wave.outcomes:
+                if o.done:
+                    continue
+                story = plan.stories.get(o.story_id)
+                worktrees.commit_story(
+                    o.story_id,
+                    f"{o.story_id}: dở dang, chốt để không mất",
+                    paths=list(story.write_scope) if story else None,
+                )
+                worktrees.remove(o.story_id, delete_branch=False)
+
         if not all(o.done for o in wave.outcomes):
             report.stopped_at = f"{epic_id} · đợt {index}"
             return False
@@ -224,6 +245,7 @@ def run_epic(
                 worktrees.remove(sid)
                 n = journal.read(sid).attempt_no
                 journal.record(sid, JEntry(step="attempt.committed", attempt=n))
+
     return True
 
 

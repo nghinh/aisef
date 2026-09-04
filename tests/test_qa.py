@@ -182,3 +182,135 @@ class TestKinds(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestKhongChayDuoc(unittest.TestCase):
+    """"Không chạy được" khác "test đỏ".
+
+    Lỗi 33, đo trên e9: gốc dự án chưa từng `npm ci` — mọi story chạy
+    trong worktree riêng, mỗi worktree tự cài. `pre-deploy` báo
+    "✗ unit — vitest: command not found" thành **test trượt**. Test không
+    trượt; nó chưa từng chạy, và chỗ cần sửa là môi trường chứ không phải
+    bộ test.
+    """
+
+    def kq(self, detail, exit_code=127):
+        from aisdlc.phases.qa import KINDS, KindResult, _unrunnable_reason
+
+        r = KindResult(kind=KINDS["unit"], ran=True, ok=False, detail=detail)
+        r.unrunnable = _unrunnable_reason(exit_code, detail)
+        return r
+
+    def test_nhan_dung_moi_cach_bao_thieu_cong_cu(self):
+        """127 là mã POSIX; phần còn lại là cách các hệ khác nói cùng một
+        chuyện. Lỗi 37: `mutation` sập với stack trace Node thô
+        (`MODULE_NOT_FOUND`) và bị đếm là test đỏ."""
+        from aisdlc.phases.qa import _unrunnable_reason
+
+        for ma, chi_tiet in (
+            (127, "sh: vitest: command not found"),
+            (1, "Error: Cannot find module 'stryker'"),
+            (1, "MODULE_NOT_FOUND"),
+            (1, "'stryker' is not recognized as an internal or external command"),
+        ):
+            with self.subTest(chi_tiet=chi_tiet):
+                self.assertTrue(_unrunnable_reason(ma, chi_tiet), chi_tiet)
+
+        self.assertFalse(_unrunnable_reason(1, "3 tests failed: expected 2 got 3"))
+
+    def test_do_tren_dau_ra_day_du_khong_phai_phan_da_cat(self):
+        """`Cannot find module` nằm ở **đầu** stack trace; `detail` chỉ giữ
+        5 dòng cuối. Dò trên phần đã cắt thì mất hẳn dấu hiệu — đúng lý do
+        `mutation` vẫn bị đếm là test đỏ sau bản vá đầu tiên."""
+        from aisdlc.phases.qa import _unrunnable_reason
+
+        day_du = (
+            "Error: Cannot find module 'stryker'\n"
+            "    at Module._resolveFilename\n"
+            "    at Module._load\n"
+            "  paths: [\n"
+            "    '/Users/x/.npm/_npx/abc/node_modules/stryker/bin/stryker'\n"
+            "  ]\n"
+            "}\n"
+            "\n"
+            "Node.js v26.0.0"
+        )
+        duoi = "\n".join(day_du.splitlines()[-5:])
+        self.assertFalse(_unrunnable_reason(1, duoi), "5 dòng cuối mất dấu hiệu")
+        self.assertTrue(_unrunnable_reason(1, day_du))
+
+    def test_khong_bi_in_thanh_dau_thap(self):
+        r = self.kq("sh: vitest: command not found")
+        self.assertIn("không chạy được", r.line())
+        self.assertNotIn("✗", r.line())
+
+    def test_van_chan_nhung_khong_bi_dem_la_test_do(self):
+        from aisdlc.phases.qa import QaReport
+
+        rep = QaReport(results=[self.kq("sh: vitest: command not found")])
+        self.assertEqual(rep.failed, [], "không phải test đỏ")
+        self.assertEqual(len(rep.unrunnable), 1)
+        self.assertFalse(rep.passed, "vẫn không đạt — chưa chạy thì chưa kiểm")
+        self.assertIn("môi trường chưa dựng", rep.summary())
+
+    def test_test_do_that_van_la_test_do(self):
+        from aisdlc.phases.qa import QaReport
+
+        rep = QaReport(results=[self.kq("3 tests failed", exit_code=1)])
+        self.assertEqual(len(rep.failed), 1)
+        self.assertEqual(rep.unrunnable, [])
+
+
+class TestCoGiaoDien(unittest.TestCase):
+    """Lỗi 34: ứng dụng 5 màn hình bị báo "dự án không có giao diện"."""
+
+    def test_hop_dong_thi_giac_la_bang_chung_co_giao_dien(self):
+        import json
+        import tempfile
+
+        from aisdlc.cli import _project_has_ui
+
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp)
+            (p / "_bmad-output").mkdir()
+            self.assertTrue(_project_has_ui(p), "không có gì để bác bỏ → mặc định có")
+
+            (p / "docs").mkdir()
+            (p / "docs" / "requirements.md").write_text("một CLI thuần", encoding="utf-8")
+            self.assertFalse(_project_has_ui(p))
+
+            (p / "_bmad-output" / "design-contract.json").write_text(
+                json.dumps({"screens": [{"id": "notes-list"}]}), encoding="utf-8"
+            )
+            self.assertTrue(_project_has_ui(p), "hợp đồng thị giác thắng gợi ý ban đầu")
+
+
+class TestMienTuongMinh(unittest.TestCase):
+    """Lỗi 36: miễn mà vẫn chạy và vẫn đếm là trượt.
+
+    Báo cáo tự mâu thuẫn — dòng dưới ghi "miễn tường minh: e2e" trong khi
+    dòng trên ghi "✗ e2e". Miễn là quyết định của người, đã ghi lại; vẫn
+    đếm nó là trượt thì miễn chẳng có nghĩa gì.
+    """
+
+    def test_loai_duoc_mien_khong_chay_va_khong_dem(self):
+        import tempfile
+
+        from aisdlc.config import DEFAULTS, Config
+        from aisdlc.phases.qa import run_suite
+
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = Config({
+                **DEFAULTS,
+                "verify.waived": "e2e,accessibility",
+                "verify.e2e": "chac-chan-khong-co-lenh-nay",
+            })
+            rep = run_suite(tmp, config=cfg, only=["e2e"], has_ui=True)
+
+        e2e = rep.results[0]
+        self.assertTrue(e2e.skipped)
+        self.assertIn("miễn tường minh", e2e.skipped)
+        self.assertFalse(e2e.ran, "miễn thì không chạy")
+        self.assertEqual(rep.failed, [])
+        self.assertEqual(rep.unconfigured, [], "miễn không phải là chưa cấu hình")
+

@@ -172,8 +172,13 @@ class WorktreeManager:
         if not _git(path, "status", "--porcelain", check=False).stdout.strip():
             return False  # agent đã tự commit hết
 
-        if paths:
-            _git(path, "add", "--", *paths)
+        # Chỉ stage đường dẫn **có thật**: story khai một tệp rồi không
+        # tạo ra nó là chuyện thường, nhất là khi nó trượt giữa chừng, và
+        # `git add` với pathspec không khớp thì gãy cả lệnh. Bỏ đường
+        # rỗng không nới lỏng gì — vẫn không phải `add -A`.
+        co_that = [p for p in (paths or []) if (path / p).exists()]
+        if co_that:
+            _git(path, "add", "--", *co_that)
         else:
             _git(path, "add", "-u")  # không khai phạm vi: chỉ file đã theo dõi
         if not _git(path, "diff", "--cached", "--name-only", check=False).stdout.strip():
