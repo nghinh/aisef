@@ -314,6 +314,30 @@ Bốn lỗi thật chỉ lộ ra khi chạy thật, đã sửa:
 trong 749 test, vì test nào cũng dựng sẵn đúng điều kiện mà thực tế không
 tự có.
 
+### Chạy thật — dựng mockup 5 màn hình
+
+`aisdlc mockup` trên `EXPERIENCE.md` thật: **5 màn, $9.22, 15–25 phút**.
+Mỗi mockup 28–34KB, đủ hai thẻ meta, không lỗi JavaScript, mọi phần tử
+tương tác có tên gọi, ràng buộc nhập liệu nằm ở thuộc tính HTML.
+
+Cổng **chặn** với 52 chỗ `data-unresolved` — và đó là kết quả đúng:
+
+* 21 chỗ quy về hai câu hỏi UX chưa ai trả lời (dark mode; tên sản phẩm mà
+  PRD ghi "cần xác nhận");
+* **31 chỗ còn lại là lỗ hổng mới** mà việc dựng mockup phát hiện trong
+  chính `DESIGN.md` — thiếu trạng thái "gỡ thẻ" cho `tag-chip` mà FR-8 đòi,
+  không bề mặt nào chứa nổi thông báo ghi hỏng, màn `tags` cần một hàng
+  quản lý thẻ mà đặc tả không định nghĩa.
+
+Hai bài học đưa thẳng vào code:
+
+1. Cổng cũ in một dòng mỗi màn với trích đoạn đầu — năm dòng giống hệt
+   nhau. Nay gom theo **mã câu hỏi**, nên người duyệt thấy "trả lời 2 câu là
+   mở khoá 21 chỗ" thay vì một bức tường.
+2. Mockup dựng nhiều trạng thái cạnh nhau nên chú thích của chính tài liệu
+   ("Mở nguội", "notes-list — các trạng thái") lọt vào hợp đồng. Nay có quy
+   ước `data-state="primary"` và `data-annotation`.
+
 ### Chạy thật — hiện thực một story trên agent thật
 
 Story `STORY-01-01` chạy trong worktree riêng, guard bật đầy đủ:
