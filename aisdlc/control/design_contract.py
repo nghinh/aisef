@@ -173,14 +173,24 @@ def _one(screen: Screen, rendered, root: Path) -> ScreenContract:
     out.route = rendered.route
     out.mockup = _rel(root, rendered.html)
     out.screenshot = _rel(root, rendered.png)
-    everything = parse_aria_snapshot(rendered.snapshot)
+    # Một file mockup thường dựng nhiều trạng thái cạnh nhau, nhưng ứng
+    # dụng thật ở một thời điểm chỉ ở **một** trạng thái. Gộp hết thì không
+    # màn hình thật nào khớp nổi, và cổng đỏ vì lý do sai.
+    primary = getattr(rendered, "primary_snapshot", "") or rendered.snapshot
+    everything = parse_aria_snapshot(primary)
     in_samples = [
         c for snap in getattr(rendered, "sample_snapshots", []) or []
         for c in parse_aria_snapshot(snap)
     ]
-    sample_set = set(in_samples)
-    out.components = [c for c in everything if c not in sample_set]
-    out.data_roles = sorted({c.role for c in in_samples})
+    ignored = set(in_samples) | {
+        c for snap in getattr(rendered, "annotation_snapshots", []) or []
+        for c in parse_aria_snapshot(snap)
+    }
+    out.components = [c for c in everything if c not in ignored]
+    out.data_roles = sorted({c.role for c in in_samples if c in set(everything)}) or sorted(
+        {c.role for c in in_samples}
+    )
+    out.states = list(getattr(rendered, "declared_states", []) or []) or out.states
     out.fields = rendered.fields
     out.unresolved = list(rendered.unresolved)
     if rendered.console_errors:

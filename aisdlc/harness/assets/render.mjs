@@ -53,6 +53,27 @@ for (const job of input.jobs ?? []) {
       samples.push(await region.ariaSnapshot());
     }
 
+    // Chú thích của chính tài liệu mockup: tiêu đề trạng thái, ghi chú cho
+    // người đọc. Ứng dụng thật không bao giờ dựng chúng, nên chúng không
+    // phải cam kết.
+    const annotations = [];
+    for (const region of await page.locator('[data-annotation]').all()) {
+      annotations.push(await region.ariaSnapshot());
+    }
+
+    // Một file mockup thường dựng nhiều trạng thái cạnh nhau, nhưng ứng
+    // dụng thật ở một thời điểm chỉ ở **một** trạng thái. Gộp hết vào hợp
+    // đồng thì không có màn hình thật nào khớp nổi. Lấy trạng thái chính.
+    const primaryLocator = (await page.locator('[data-state="primary"]').count())
+      ? page.locator('[data-state="primary"]').first()
+      : ((await page.locator('[data-state]').count())
+          ? page.locator('[data-state]').first()
+          : null);
+    const primary = primaryLocator ? await primaryLocator.ariaSnapshot() : '';
+    const states = await page.evaluate(() =>
+      [...document.querySelectorAll('[data-state]')].map((el) => el.getAttribute('data-state')),
+    );
+
     const meta = await page.evaluate(() => {
       const metaOf = (n) => document.querySelector(`meta[name="${n}"]`)?.content ?? '';
       const fields = [...document.querySelectorAll('input, textarea, select')].map((el) => ({
@@ -81,7 +102,9 @@ for (const job of input.jobs ?? []) {
       await page.screenshot({ path: job.png, fullPage: true });
     }
     screens.push({ id: job.id, html: job.html ?? '', url: job.url ?? '', png: job.png ?? '',
-                   snapshot, sample_snapshots: samples, ...meta, console_errors: errors });
+                   snapshot, sample_snapshots: samples, annotation_snapshots: annotations,
+                   primary_snapshot: primary, declared_states: states,
+                   ...meta, console_errors: errors });
   } catch (e) {
     screens.push({ id: job.id, html: job.html ?? '', url: job.url ?? '', error: String(e), console_errors: errors });
   } finally {

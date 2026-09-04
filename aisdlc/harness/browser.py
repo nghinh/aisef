@@ -36,6 +36,12 @@ class RenderedScreen:
     #: Snapshot của từng vùng `[data-sample]` — nội dung ví dụ, không phải
     #: cam kết. Trừ ra khỏi hợp đồng để cổng không đỏ vì dữ liệu khác nhau.
     sample_snapshots: list[str] = field(default_factory=list)
+    #: Vùng chú thích của chính tài liệu mockup — không phải cam kết.
+    annotation_snapshots: list[str] = field(default_factory=list)
+    #: Snapshot của **một** trạng thái chính. Rỗng khi mockup không khai
+    #: `data-state`; khi đó hợp đồng lấy cả trang.
+    primary_snapshot: str = ""
+    declared_states: list[str] = field(default_factory=list)
     fields: list[dict] = field(default_factory=list)
     unresolved: list[str] = field(default_factory=list)
     console_errors: list[str] = field(default_factory=list)
@@ -134,6 +140,9 @@ def render(
                 title=raw.get("title", ""),
                 snapshot=raw.get("snapshot", ""),
                 sample_snapshots=raw.get("sample_snapshots", []) or [],
+                annotation_snapshots=raw.get("annotation_snapshots", []) or [],
+                primary_snapshot=raw.get("primary_snapshot", "") or "",
+                declared_states=raw.get("declared_states", []) or [],
                 fields=raw.get("fields", []),
                 unresolved=raw.get("unresolved", []),
                 console_errors=raw.get("console_errors", []),

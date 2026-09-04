@@ -69,9 +69,28 @@ của dự án này, còn skill là kiến thức chung.
    dấu thì "Đặt lịch khám răng" trở thành cam kết, cổng sẽ đỏ mãi mãi, và
    một cổng đỏ mãi mãi thì bị tắt.
 
-7. **Trạng thái**: dựng trạng thái chính. Trạng thái nào EXPERIENCE.md nêu
-   là load-bearing (rỗng, lỗi, đang tải) thì dựng thêm trong cùng file,
-   mỗi trạng thái một `<section>` có tiêu đề rõ.
+7. **Trạng thái**: mỗi trạng thái một `<section data-state="tên">`, và
+   trạng thái mặc định của màn hình mang `data-state="primary"`:
+
+   ```html
+   <section data-state="primary"> … màn hình lúc bình thường … </section>
+   <section data-state="rỗng"> … chưa có ghi chú nào … </section>
+   ```
+
+   Hợp đồng chỉ lấy **trạng thái chính**. Ứng dụng thật ở một thời điểm chỉ
+   ở một trạng thái; gộp cả "rỗng" lẫn "có kết quả" vào cam kết thì không
+   màn hình thật nào khớp nổi, và cổng đỏ vì lý do sai.
+
+8. **Chú thích của tài liệu** — tiêu đề trạng thái, ghi chú giải thích cho
+   người đọc — đánh dấu `data-annotation`:
+
+   ```html
+   <h2 data-annotation>Trạng thái: mở nguội</h2>
+   ```
+
+   Ứng dụng thật không bao giờ dựng những chữ này, nên chúng không phải
+   cam kết. Không đánh dấu thì cổng sẽ đòi ứng dụng phải có một tiêu đề
+   tên "Trạng thái: mở nguội".
 
 ## Chỗ chưa chốt
 
@@ -94,6 +113,7 @@ chưa chốt tốn gấp đôi — một lần làm, một lần làm lại.
 
 ## Xong khi
 
-File `mockups/{screen_id}.html` mở được ngoại tuyến, có hai thẻ meta, mọi
-phần tử tương tác đều có tên, và mọi ràng buộc nhập liệu đều nằm ở thuộc
-tính HTML.
+File `mockups/{screen_id}.html` mở được ngoại tuyến, có hai thẻ meta, có
+đúng một `data-state="primary"`, mọi phần tử tương tác đều có tên, mọi
+ràng buộc nhập liệu nằm ở thuộc tính HTML, vùng dữ liệu mang `data-sample`
+và chú thích mang `data-annotation`.

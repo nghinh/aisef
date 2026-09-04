@@ -100,6 +100,17 @@ class TestExtractContract(MockupTestCase):
         self.assertIn("Tìm ghi chú", names)
         self.assertNotIn("Ghi chú", names)
 
+    def test_only_the_primary_state_is_a_commitment(self):
+        """Ứng dụng thật ở một thời điểm chỉ ở **một** trạng thái. Gộp cả
+        "rỗng" lẫn "có kết quả" vào cam kết thì không màn hình thật nào
+        khớp nổi, và cổng đỏ vì lý do sai."""
+        contract, _ = extract(self.root, self.exp)
+        screen = contract.by_id("danh-sach")
+        names = [c.name for c in screen.components]
+        self.assertIn("Ghi chú mới", names)
+        self.assertNotIn("Trạng thái: có ghi chú", names)   # chú thích tài liệu
+        self.assertIn("primary", screen.states)
+
     def test_validation_attributes_captured(self):
         contract, _ = extract(self.root, self.exp)
         field = contract.by_id("danh-sach").fields[0]
