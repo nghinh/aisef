@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisdlc.control.design_contract import CONTRACT_FILE, load  # noqa: E402
-from aisdlc.control.experience import parse_experience_file  # noqa: E402
+from aisdlc.control.experience import parse_experience, parse_experience_file  # noqa: E402
 from aisdlc.control.machine_gate import check_design_contract  # noqa: E402
 from aisdlc.control.normalize import Story  # noqa: E402
 from aisdlc.harness import browser  # noqa: E402
@@ -144,6 +144,27 @@ class TestGate(MockupTestCase):
         self.fix_search_screen()
         _, gate = extract(self.root, self.exp)
         self.assertTrue(gate.passed, gate.summary())
+
+    def test_unresolved_items_are_grouped_by_question(self):
+        """52 chỗ chưa chốt trên 5 màn thường quy về 4–5 câu hỏi. Liệt kê
+        từng chỗ thì người duyệt thấy một bức tường; gom lại thì thấy đúng
+        việc phải làm."""
+        from aisdlc.control.design_contract import DesignContract, ScreenContract
+
+        contract = DesignContract(screens=[
+            ScreenContract(id="a", route="/a", unresolved=[
+                "UX-OQ-1: dark mode?", "UX-OQ-2: tên sản phẩm?"]),
+            ScreenContract(id="b", route="/b", unresolved=[
+                "UX-OQ-1: dark mode?", "DESIGN.md thiếu bề mặt báo lỗi"]),
+        ])
+        exp = parse_experience(
+            "## Information Architecture\n\n| Surface |\n|---|\n| a |\n| b |\n"
+        )
+        gate = check_design_contract(contract, exp)
+        blob = gate.summary()
+        self.assertIn("4 chỗ chưa chốt", blob)
+        self.assertIn("UX-OQ-1 (2 chỗ)", blob)
+        self.assertIn("thiếu bề mặt báo lỗi", blob)   # ví dụ cho nhóm không mã
 
     def test_missing_mockup_blocks(self):
         (self.root / "mockups" / "cai-dat.html").unlink()
