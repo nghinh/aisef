@@ -24,7 +24,7 @@ from ..clients.base import ClientAdapter
 from ..config import Config
 from ..control import gate as story_gate
 from ..control.design_contract import DesignContract, load as load_contract
-from ..control.normalize import Architecture, Story
+from ..control.normalize import Architecture, Story, with_lockfiles
 from ..harness import mockup_verify
 from ..harness.guardrails import (
     ENV_BASE_REF,
@@ -143,6 +143,38 @@ def _story_fallback(story: Story) -> str:
     return "\n".join(lines)
 
 
+#: Tệp khai phụ thuộc. Story nào cũng có thể cần thêm một gói — không cho
+#: chạm thì nó bí, và cái bí ấy tốn cả hạn mức lượt thử mới lộ ra.
+MANIFESTS = (
+    "package.json", "pyproject.toml", "requirements.txt", "requirements.in",
+    "Cargo.toml", "go.mod", "Gemfile", "composer.json",
+)
+
+
+def effective_write_scope(story: Story, project: Path) -> list[str]:
+    """Phạm vi ghi có hiệu lực: story khai, cộng tệp khai phụ thuộc.
+
+    BMAD liệt kê tệp mã nguồn vào ``write_scope``; nó không nghĩ tới việc
+    story sẽ phải khai một gói. Nhưng tiêu chí chấp nhận thì có — "test
+    trên ``fake-indexeddb``", "lockfile được commit" — và lúc ấy story
+    không thoả nổi tiêu chí của chính mình. Đo trên e9: hai story liên
+    tiếp bí đúng vì chuyện này, $20 cho tám lượt không lượt nào qua.
+
+    Chỉ thêm tệp **thật sự có** trong dự án: thêm bừa thì phạm vi rộng ra
+    mà không đổi được gì, còn danh sách phạm vi in cho agent đọc thì dài
+    thêm những dòng vô nghĩa.
+
+    Cố ý **không** đụng tới phạm vi mà bộ lập lịch dùng để chia đợt: ở đó
+    câu hỏi khác — hai story có giẫm chân nhau không — và nếu tính cả
+    manifest thì mọi story đều giẫm nhau, chạy song song mất sạch.
+    """
+    scope = list(story.write_scope)
+    for name in MANIFESTS:
+        if name not in scope and (project / name).is_file():
+            scope.append(name)
+    return with_lockfiles(scope)
+
+
 def run_attempt(
     story: Story,
     *,
@@ -180,8 +212,9 @@ def run_attempt(
     )
     # Guard chạy trong hook — tiến trình con của client — nên phạm vi ghi
     # và mã story chỉ tới được nó qua môi trường.
+    scope = effective_write_scope(story, project)
     spec.env = {
-        ENV_WRITE_SCOPE: ",".join(story.write_scope),
+        ENV_WRITE_SCOPE: ",".join(scope),
         ENV_STORY_ID: story.id,
         ENV_BASE_REF: base_ref,
     }
@@ -231,7 +264,7 @@ def run_attempt(
         story.id,
         evidence.read(story.id),
         changed=changed_now,
-        write_scope=list(story.write_scope),
+        write_scope=scope,
         screens=list(story.screens),
         review_blocking=attempt.review_findings,
     )
@@ -333,7 +366,7 @@ def review_story(
     # `completion` lại chặn nó dừng khi test đang đỏ — đúng lúc nó có
     # nhiều thứ để báo cáo nhất.
     spec.env = {
-        ENV_WRITE_SCOPE: ",".join(story.write_scope),
+        ENV_WRITE_SCOPE: ",".join(effective_write_scope(story, project)),
         ENV_BASE_REF: base_ref,
     }
 
@@ -373,48 +406,125 @@ def _head_of(repo: Path) -> str:
     return proc.stdout.strip() if proc.returncode == 0 else ""
 
 
-def deadlock_reason(attempts: list[Attempt]) -> str:
-    """Thế bí: hai lượt liền cùng một mục chặn. Rỗng nếu chưa bí.
+def deadlock_reason(attempts: list[Attempt], write_scope: list[str] | None = None) -> str:
+    """Thế bí: hai lượt liền chặn vì cùng một chuyện. Rỗng nếu chưa bí.
 
     Người rà soát chặn lại đúng chỗ cũ nghĩa là lượt vừa rồi không dịch
     chuyển được gì — và lượt sau, với cùng ngữ cảnh và cùng feedback,
     cũng sẽ không. Thường là mâu thuẫn nằm ngoài tầm agent: tiêu chí
-    chấp nhận đòi một thứ mà ``write_scope`` cấm, hoặc hai tiêu chí đá
-    nhau. Agent làm đúng chỉ dẫn — dừng và báo phạm vi khai thiếu —
-    nhưng không ai đọc lời báo đó, nên vòng lặp cứ chạy hết hạn mức.
+    chấp nhận đòi một thứ mà ``write_scope`` cấm.
 
-    Đo trên e9: 4 lượt y hệt nhau cho STORY-01-01, $9,85, cùng một câu
-    "TCCN 1 đòi lockfile được commit; kho không có".
+    So bằng **độ tương đồng**, không bằng chuỗi y hệt. Người rà soát là
+    một model: cùng một khiếm khuyết được nó viết lại bằng từ khác mỗi
+    lượt. Đo trên e9, STORY-01-02 bị chặn 4 lượt vì đúng một chuyện —
+    `fake-indexeddb` không được khai trong `package.json` — mà không cặp
+    diễn đạt nào trùng nhau, nên bộ dò so chuỗi im lặng suốt và story
+    đốt hết hạn mức: $10,39.
     """
     if len(attempts) < 2:
         return ""
     cuoi, truoc = attempts[-1], attempts[-2]
     if cuoi.infra or truoc.infra:
         return ""
-    a, b = _finding_keys(cuoi), _finding_keys(truoc)
-    if not a or a != b:
+    if not cuoi.review_findings or not truoc.review_findings:
         return ""
-    return (
-        "bí: hai lượt liền bị chặn y hệt — "
+    if not _same_complaint(cuoi.review_findings, truoc.review_findings):
+        return ""
+
+    reason = (
+        "bí: hai lượt liền bị chặn vì cùng một chuyện — "
         + "; ".join(cuoi.review_findings[:2])
-        + ". Thử lại không gỡ được: sửa tiêu chí chấp nhận hoặc write_scope "
-        "của story rồi chạy lại."
+    )
+    ngoai = _paths_outside(cuoi.review_findings, write_scope or [])
+    if ngoai:
+        return (
+            f"{reason}. Mục chặn trỏ tới {', '.join(ngoai)} — không nằm "
+            f"trong write_scope của story, nên agent không sửa được dù có "
+            f"thử bao nhiêu lượt. Nới write_scope hoặc sửa tiêu chí chấp "
+            f"nhận rồi chạy lại."
+        )
+    return (
+        f"{reason}. Thử lại không gỡ được: sửa tiêu chí chấp nhận hoặc "
+        f"write_scope của story rồi chạy lại."
     )
 
 
-def _finding_keys(attempt: Attempt) -> set[str]:
-    """Mục chặn rút về khoá so sánh được.
+#: Hai mục chặn là "cùng một chuyện" khi chúng chia nhau **danh từ riêng**
+#: — tên tệp, tên gói, định danh — chứ không khi văn bản giống nhau.
+#: Người rà soát là một model: cùng một khiếm khuyết được nó viết lại bằng
+#: từ khác mỗi lượt, nên so văn bản thì không bao giờ khớp. Nhưng
+#: `fake-indexeddb` và `package.json` thì lượt nào nó cũng phải nhắc.
+#:
+#: Đòi **hai** danh từ riêng chung, không phải một: chỉ chung `package.json`
+#: thì "thiếu khai X" và "khai sai Y" cũng khớp — mà đó là có dịch chuyển,
+#: không phải bí. Hệ số phủ đi kèm loại nốt trường hợp mục chặn dài nhắc
+#: qua loa tới thứ mục kia nói chính.
+SAME_COMPLAINT_NOUNS = 2
+SAME_COMPLAINT_OVERLAP = 0.4
 
-    Bỏ số dòng và khoảng trắng: cùng một khiếm khuyết được báo ở dòng
-    246 rồi 307 sau khi agent sửa chỗ khác vẫn là cùng một thế bí.
+
+def _same_complaint(a: list[str], b: list[str]) -> bool:
+    """Có mục chặn nào của lượt này nói cùng chuyện với lượt trước không."""
+    for x in (_tokens(i) for i in a):
+        for y in (_tokens(j) for j in b):
+            if not x or not y:
+                continue
+            if x == y:
+                return True  # lặp nguyên văn thì khỏi bàn
+            chung = x & y
+            if len(_rieng(chung)) < SAME_COMPLAINT_NOUNS:
+                continue
+            if len(chung) / min(len(x), len(y)) >= SAME_COMPLAINT_OVERLAP:
+                return True
+    return False
+
+
+def _rieng(tokens: set[str]) -> set[str]:
+    """Danh từ riêng: có dấu phân cách của định danh, đủ dài để không phải
+    dấu câu dính vào từ."""
+    return {t for t in tokens if len(t) >= 4 and any(c in t for c in "./-_@")}
+
+
+#: Từ xuất hiện ở gần như mọi mục chặn nên không phân biệt được gì.
+_NHIEU = frozenset(
+    "chặn blocker block và or không có là của một các cả cho khi thì mà "
+    "nhưng nó này đó ở trong ngoài với từ đến được bị phải nào đâu nữa "
+    "the a an is are not no this that it".split()
+)
+
+
+def _tokens(finding: str) -> set[str]:
+    """Rút mục chặn về tập từ so được. Bỏ số dòng và từ quá phổ biến."""
+    import re as _re
+
+    # Bỏ số dòng, giữ mọi số khác: "TCCN 1" và "TCCN 7" là hai chuyện
+    # khác nhau, gộp chúng lại thì bộ dò báo bí trong khi có dịch chuyển.
+    low = _re.sub(r":\d+", " ", finding.lower())
+    words = _re.findall(r"[\w./@-]+", low)
+    return {
+        w for w in words
+        if w not in _NHIEU and (len(w) >= 2 or w.isdigit())
+    }
+
+
+def _paths_outside(findings: list[str], scope: list[str]) -> list[str]:
+    """Tệp mà mục chặn nhắc tới nhưng story không được ghi.
+
+    Đây là câu trả lời cụ thể cho "vì sao thử lại cũng vô ích", và nó
+    đọc ra từ dữ liệu đã có chứ không đoán.
     """
     import re as _re
 
-    out = set()
-    for f in attempt.review_findings:
-        k = _re.sub(r":\d+", ":", f.lower())
-        out.add(" ".join(k.split())[:120])
-    return out
+    from ..harness.guardrails import _within
+
+    out: list[str] = []
+    for f in findings:
+        for m in _re.findall(r"[\w./-]+\.[a-z]{2,4}\b", f):
+            if m in out or "/" not in m and "." not in m:
+                continue
+            if not any(_within(m, s) for s in scope):
+                out.append(m)
+    return out[:3]
 
 
 def implement_story(
@@ -478,7 +588,7 @@ def implement_story(
                 return outcome
             continue  # không tính vào hạn mức chất lượng
 
-        van = deadlock_reason(outcome.attempts)
+        van = deadlock_reason(outcome.attempts, effective_write_scope(story, project))
         if van:
             outcome.blocked_reason = van
             return outcome

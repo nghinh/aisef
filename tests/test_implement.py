@@ -262,6 +262,80 @@ class TestRetry(ImplementTestCase):
         self.assertEqual(out.quality_attempts, 2, "phải dừng ở lượt 2, không chạy tới 6")
         self.assertIn("sửa tiêu chí chấp nhận hoặc write_scope", out.blocked_reason)
 
+    def test_bi_nhan_ra_du_nguoi_ra_soat_doi_cach_dien_dat(self):
+        """Người rà soát là một model: cùng một khiếm khuyết được viết lại
+        bằng từ khác mỗi lượt. So chuỗi y hệt thì không bao giờ khớp.
+
+        Bốn mục chặn dưới đây là **nguyên văn** bốn lượt của STORY-01-02
+        trên e9 — cùng một chuyện (`fake-indexeddb` không được khai trong
+        `package.json`), không cặp nào trùng chữ, nên bộ dò so chuỗi im
+        suốt và story đốt hết hạn mức: $10,39.
+        """
+        from aisdlc.phases.implement import deadlock_reason
+
+        muc = [
+            "[chặn] package.json / src/store/db.test.ts:1 — `fake-indexeddb` "
+            "không được khai ở đâu cả; `npm ls` báo `extraneous`, lockfile có "
+            "0 lần nhắc tới nó.",
+            "[chặn] package.json — `fake-indexeddb` không được khai ở đâu cả; "
+            "nó chỉ tình cờ có mặt",
+            "[chặn] package.json — `fake-indexeddb` không được khai ở đâu cả, "
+            "`npm ci` là mất sạch bằng chứng của TCCN 7",
+        ]
+
+        class Lan:
+            infra = False
+
+            def __init__(self, f):
+                self.review_findings = [f]
+
+        scope = ["src/domain/note.ts", "src/store/db.ts", "src/store/db.test.ts"]
+        for i in range(1, len(muc)):
+            with self.subTest(cap=f"{i}-{i + 1}"):
+                ly_do = deadlock_reason([Lan(muc[i - 1]), Lan(muc[i])], scope)
+                self.assertTrue(ly_do, "phải nhận ra là cùng một chuyện")
+                self.assertIn("package.json", ly_do)
+                self.assertIn("không nằm trong write_scope", ly_do)
+
+    def test_hai_khiem_khuyet_khac_nhau_tren_cung_tep_khong_phai_bi(self):
+        """Cùng tệp nhưng khác khiếm khuyết nghĩa là có dịch chuyển."""
+        from aisdlc.phases.implement import deadlock_reason
+
+        class Lan:
+            infra = False
+
+            def __init__(self, f):
+                self.review_findings = [f]
+
+        self.assertFalse(deadlock_reason(
+            [Lan("[chặn] package.json — thiếu khai fake-indexeddb"),
+             Lan("[chặn] package.json — khai sai phiên bản vitest")],
+            ["src"],
+        ))
+        self.assertFalse(deadlock_reason(
+            [Lan("[chặn] src/store/db.ts — không xử lý hết quota"),
+             Lan("[chặn] src/domain/note.ts — rev không tăng đúng 1")],
+            ["src"],
+        ))
+
+    def test_pham_vi_ghi_co_tep_khai_phu_thuoc(self):
+        """Story nào cũng có thể cần thêm một gói.
+
+        BMAD chỉ liệt kê tệp mã nguồn vào `write_scope`, nhưng tiêu chí
+        chấp nhận thì đòi "test trên `fake-indexeddb`", "lockfile được
+        commit". Không cho chạm tệp khai phụ thuộc thì story không thoả
+        nổi tiêu chí của chính nó — hai story liên tiếp trên e9 bí đúng
+        vì chuyện này, $20 cho tám lượt không lượt nào qua.
+        """
+        from aisdlc.phases.implement import effective_write_scope
+
+        (self.project / "package.json").write_text("{}", encoding="utf-8")
+        scope = effective_write_scope(self.story, self.project)
+        self.assertIn("package.json", scope)
+        self.assertIn("package-lock.json", scope)
+        self.assertIn("src", scope)          # phần story tự khai còn nguyên
+        self.assertNotIn("Cargo.toml", scope)  # dự án không có thì không thêm
+
     def test_muc_chan_doi_thi_van_thu_tiep(self):
         """Chặn ở chỗ khác nghĩa là lượt vừa rồi có dịch chuyển — thử tiếp."""
         class DoiMuc(ScriptedClient):
