@@ -154,6 +154,23 @@ class TestHarnessEvidence(ReportTestCase):
         self.assertIn("settings.json", build(self.project).harness["5 Guardrail"])
 
 
+class TestPreDeploySection(ReportTestCase):
+    def test_absent_when_never_scored(self):
+        self.assertIn("Chưa chấm", build(self.project).markdown())
+
+    def test_reads_the_report_that_was_signed(self):
+        from aisdlc.control.approvals import PRE_DEPLOY_REPORT
+
+        (self.artifacts / PRE_DEPLOY_REPORT).write_text(json.dumps({
+            "passed": False,
+            "checks": [{"name": "runbook", "passed": False, "detail": "thiếu mục: leo thang"}],
+            "qa": {"release_ready": False, "failed": ["unit"], "unconfigured": ["perf"]},
+        }, ensure_ascii=False), encoding="utf-8")
+        text = build(self.project).markdown()
+        self.assertIn("leo thang", text)
+        self.assertIn("chưa cấu hình = perf", text)
+
+
 class TestOutput(ReportTestCase):
     def test_written_to_docs(self):
         path = write(self.project)

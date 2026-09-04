@@ -19,7 +19,13 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from ..control.approvals import GATE_ORDER, STORIES_INDEX, ApprovalStore, Status
+from ..control.approvals import (
+    GATE_ORDER,
+    PRE_DEPLOY_REPORT,
+    STORIES_INDEX,
+    ApprovalStore,
+    Status,
+)
 from ..control.normalize import parse_prd_file
 from ..control.state import StateStore
 from ..harness.observe import AGENT_RUN, MOCKUP_MAP, TOOL_RUN, EvidenceStore
@@ -49,6 +55,8 @@ class Report:
     stories: list[dict] = field(default_factory=list)
     phases: list[dict] = field(default_factory=list)
     harness: dict[str, str] = field(default_factory=dict)
+    #: Kết quả cổng trước triển khai, nếu đã chấm.
+    pre_deploy: dict = field(default_factory=dict)
     total_cost_usd: float = 0.0
 
     @property
@@ -104,6 +112,23 @@ class Report:
         lines += ["", "## 4. Sáu nhóm harness", "", "| Nhóm | Bằng chứng |", "|---|---|"]
         for group, proof in self.harness.items():
             lines.append(f"| {group} | {proof} |")
+
+        lines += ["", "## 5. Cổng trước triển khai", ""]
+        if not self.pre_deploy:
+            lines.append("_Chưa chấm — chạy `aisdlc pre-deploy`._")
+        else:
+            lines += ["| Mục | Kết quả |", "|---|---|"]
+            for c in self.pre_deploy.get("checks", []):
+                mark = "✅" if c.get("passed") else "✗"
+                lines.append(f"| {c.get('name')} | {mark} {c.get('detail', '')} |")
+            qa = self.pre_deploy.get("qa") or {}
+            if qa:
+                unconf = ", ".join(qa.get("unconfigured", [])) or "—"
+                failed = ", ".join(qa.get("failed", [])) or "—"
+                lines += [
+                    "",
+                    f"Kiểm định: không đạt = {failed} · chưa cấu hình = {unconf}",
+                ]
         return "\n".join(lines) + "\n"
 
 
@@ -176,6 +201,13 @@ def build(project: Path | str) -> Report:
         p["cost"] for p in report.phases
     )
     report.harness = _harness_evidence(project, root, evidence)
+
+    pre_deploy_file = root / PRE_DEPLOY_REPORT
+    if pre_deploy_file.is_file():
+        try:
+            report.pre_deploy = json.loads(pre_deploy_file.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            report.pre_deploy = {}
     return report
 
 
