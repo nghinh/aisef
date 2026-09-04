@@ -42,7 +42,7 @@
   vào nhánh chính (2 lượt, $9,76). Trước đó nó trượt 4 lần liên tiếp — mỗi
   lần vì một lỗi thật khác nhau của harness, xem mục 15–22 dưới.
 
-**774 test xanh.**
+**776 test xanh.**
 
 ---
 
@@ -374,9 +374,18 @@ Bốn lỗi thật chỉ lộ ra khi chạy thật, đã sửa:
     từ chối thì **nói ra**.
 22. **Tiêu đề báo cáo nghiệm thu cụt** — CLI mặc định `--project .`, mà
     `Path(".").name` là chuỗi rỗng.
+23. **Guard tiêm mã chỉ biết Python** — trên dự án TypeScript, đúng loại
+    dự án framework vừa chạy thật, `execSync(\`rm -rf ${dir}\`)` đi qua
+    sạch trong khi báo cáo vẫn ghi "7 guard đã nối". Guard có mặt mà không
+    bao giờ nổ là "chưa cấu hình bị đếm là đạt", chỉ khó thấy hơn. Nay tách
+    mẫu theo họ ngôn ngữ — gộp lại thì `{` của object tuỳ chọn JS bị đọc
+    thành nội suy f-string và chặn oan `execFileSync('git', [...], { cwd })`,
+    đúng dạng **an toàn** guard lẽ ra phải khuyến khích. Kiểm chứng trên
+    agent thật: `PreToolUse:Write` chặn, `permission_denials=1`, tệp không
+    được tạo.
 
-Đây chính là giá trị của việc chạy thật: hai mươi hai lỗi trên đều
-**không** lộ ra trong 774 test, vì test nào cũng dựng sẵn đúng điều kiện mà
+Đây chính là giá trị của việc chạy thật: hai mươi ba lỗi trên đều
+**không** lộ ra trong 776 test, vì test nào cũng dựng sẵn đúng điều kiện mà
 thực tế không tự có.
 
 Đáng chú ý: **lỗi 17, 18 và 21 không làm chậm gì cả — chúng làm báo cáo nói
