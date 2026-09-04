@@ -40,6 +40,32 @@ class CliTestCase(unittest.TestCase):
         return p
 
 
+class TestEveryCommandIsUsable(unittest.TestCase):
+    """Lỗi khai đối số chỉ lộ ra lúc người dùng gõ lệnh — trừ khi có test."""
+
+    def commands(self) -> list[str]:
+        from aisdlc.cli import build_parser
+
+        parser = build_parser()
+        actions = [a for a in parser._actions if hasattr(a, "choices") and a.choices]
+        return sorted(actions[0].choices) if actions else []
+
+    def test_at_least_the_six_steps_exist(self):
+        for name in ("setup", "plan", "mockup", "run", "qa", "devsecops",
+                     "pre-deploy", "report", "gates", "guard", "verify", "tool"):
+            self.assertIn(name, self.commands())
+
+    def test_help_works_for_every_command(self):
+        from aisdlc.cli import build_parser
+
+        for name in self.commands():
+            with self.subTest(command=name):
+                with self.assertRaises(SystemExit) as e:
+                    with redirect_stdout(io.StringIO()):
+                        build_parser().parse_args([name, "--help"])
+                self.assertEqual(e.exception.code, 0)
+
+
 class TestDoctor(CliTestCase):
     def test_passes_on_valid_project(self):
         code, out, _ = self.run_cli("doctor")
