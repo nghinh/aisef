@@ -287,38 +287,52 @@ dự-án/
 
 ## 10. Bộ lệnh
 
-```
-# Setup
-aisdlc setup   --project DIR
-aisdlc compile --client claude|opencode
-aisdlc doctor
+Đây là bộ lệnh **đã hiện thực** (`aisdlc --help`), không phải bản phác.
 
-# Tài liệu & mockup — dừng ở mỗi cổng
-aisdlc plan    [--auto-approve all|<danh sách>]
-aisdlc mockup
+```
+# Chuẩn bị
+aisdlc doctor                         môi trường: python · git · client · docker · playwright
+aisdlc setup   [--references DIR]     dò stack, nạp skill, sinh CLAUDE.md + AGENTS.md
+aisdlc init                           ghi .ai/config.json mặc định
+aisdlc compile [--client claude|opencode|all]   sinh hook/plugin từ một nguồn guard duy nhất
+
+# Bước 2 — tài liệu, dừng ở mỗi cổng
+aisdlc plan    [--auto-approve all|<danh sách>] [--force]
+        project-context → prd → architecture → ux → epics → tách story
+
+# Bước 3 — mockup
+aisdlc mockup  [--only <screen_id>] [--force]
 
 # Cổng người duyệt
 aisdlc gates                          bảng trạng thái 8 cổng
-aisdlc review  <gate>                 artifact + checklist
-aisdlc approve <gate> [--note ...]
+aisdlc review  <gate>                 artifact, trình bày theo loại cổng
+aisdlc approve <gate> [--note ...] [--force]
 aisdlc reject  <gate>  --note "..."   (bắt buộc ghi chú)
+aisdlc auto-approve all|<danh sách>   luôn ghi dấu `auto`
 
-# Hiện thực
-aisdlc next                           story kế tiếp
-aisdlc implement <story> --client X
-aisdlc verify   <story>               chạy test/scan THẬT
-aisdlc complete <story>
-aisdlc run --epic E | --all  --client X  [--max-parallel 3] [--sequential]
+# Bước 4 — hiện thực
+aisdlc run     [--epic E] [--sequential] [--no-isolate] [--force]
+aisdlc tool    test|lint|sast [--story S]      agent gọi qua đây để có bằng chứng
+aisdlc verify  [--write-scope ...] [--story S] hậu kiểm guard trên cây làm việc
 
-# Guard — client gọi vào tại mốc vòng đời
-aisdlc guard write-scope|diff-scope|secret|git-stage|destructive ...
+# Bước 5 — kiểm định
+aisdlc qa      [--only <loại>] [--story S] [--story-level]
 
-# Kiểm định & giao hàng
-aisdlc review  <story>                reviewer ≠ developer
-aisdlc test    --kind unit|sit|e2e|uat|perf|api|mutation
-aisdlc ship
-aisdlc status                         tiến độ · chi phí · độ trễ · tỷ lệ trượt gate
+# Bước 6 — giao hàng
+aisdlc devsecops [--bin PATH] [--force]        CI (code) + Dockerfile/IaC/runbook (model)
+aisdlc pre-deploy [--skip-qa]                  chấm cổng cuối, ghi báo cáo để người ký
+
+# Guard — client gọi vào tại mốc vòng đời (do `compile` nối sẵn)
+aisdlc guard write-scope|diff-scope|secret|git-stage|destructive|injection|completion
+
+# Theo dõi
+aisdlc status                         tiến độ · chi phí · story tốn bất thường
+aisdlc report  [--out FILE]           báo cáo nghiệm thu từ bằng chứng
 ```
+
+Không có `aisdlc next` / `implement` / `complete` như bản phác: vòng lặp
+story nằm trong `run`, và tách nhỏ ra thành ba lệnh chỉ tạo thêm ba chỗ
+cho trạng thái lệch nhau.
 
 ---
 
