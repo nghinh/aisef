@@ -293,9 +293,27 @@ Bốn lỗi thật chỉ lộ ra khi chạy thật, đã sửa:
    vào bằng chứng, rồi guard `completion` chặn nó kết thúc vì "chưa chạy
    test bao giờ".
 
-Đây chính là giá trị của việc chạy thật: sáu lỗi trên đều **không** lộ ra
+7. **Bản đồ phủ nhận nhầm câu văn xuôi** — dòng thật của BMAD là
+   "FR-13 → KHÔNG CÓ STORY. … Khớp nối AR-18 ở Story 1.2"; parser thấy "có
+   mã FR + có số hiệu story" nên gán FR-13 cho story 1.2, rồi cổng máy chặn
+   cả 18 story vì một câu văn xuôi.
+
+Đây chính là giá trị của việc chạy thật: bảy lỗi trên đều **không** lộ ra
 trong 742 test, vì test nào cũng dựng sẵn đúng điều kiện mà thực tế không
 tự có.
+
+### Chạy thật lần 2 — chuỗi lập kế hoạch chạy hết
+
+Sau khi sửa, `aisdlc plan` đi hết chuỗi trên `epics.md` thật (1078 dòng,
+BMAD sinh, $4.45 cho pha epics):
+
+* **18 story / 5 epic**, mỗi story một file, `covers` · `write_scope` ·
+  `depends_on` · `screens` đọc được hết;
+* cổng máy **ĐẠT**, và trước đó nó đã chặn đúng một lần vì một story đụng
+  vào FR-13 — yêu cầu đang bị OQ-1 chặn;
+* truy vết: 14/17 FR có story phủ; ba FR còn lại (FR-13..FR-15) chính là
+  phần PRD ghi rõ là ngoài phạm vi MVP;
+* pipeline dừng đúng ở cổng `stories` chờ người duyệt.
 
 ---
 
