@@ -310,9 +310,17 @@ Bốn lỗi thật chỉ lộ ra khi chạy thật, đã sửa:
     trạng thái. Gộp hết thì không màn hình nào khớp nổi. Nay mockup khai
     `data-state="primary"` và `data-annotation`.
 
-Đây chính là giá trị của việc chạy thật: mười lỗi trên đều **không** lộ ra
-trong 749 test, vì test nào cũng dựng sẵn đúng điều kiện mà thực tế không
-tự có.
+11. **Bộ bắt test giả bỏ sót file chưa commit** — `git ls-files` trơn chỉ
+    thấy file đã theo dõi, mà test giả vừa viết xong thì chưa nằm trong chỉ
+    mục git; đó đúng là lúc cần bắt nó nhất.
+12. **Skill trong dự án cũ hơn kho framework** — dự án giữ một **bản sao**
+    skill từ lần `setup`; sửa skill mà không cài lại thì agent vẫn chạy bản
+    cũ. Lộ ra khi dựng lại mockup mất $2.56 mà vẫn theo quy ước cũ. `doctor`
+    nay so bản sao với bản gốc.
+
+Đây chính là giá trị của việc chạy thật: mười hai lỗi trên đều **không** lộ
+ra trong 757 test, vì test nào cũng dựng sẵn đúng điều kiện mà thực tế
+không tự có.
 
 ### Chạy thật — dựng mockup 5 màn hình
 
