@@ -299,7 +299,16 @@ def review_story(
     """
     changed = changed_files(str(workdir), base_ref=base_ref)
     if not changed:
-        return ["không có thay đổi nào để rà soát"]
+        # Nói đúng hai khả năng. "Không có gì để rà" thường không phải
+        # agent lười: hay gặp hơn là công việc của story đã nằm trên
+        # nhánh chính rồi — worktree rẽ từ đó nên diff rỗng — và lúc ấy
+        # lời khuyên "sửa write_scope" dẫn người đọc đi sai đường.
+        return [
+            "không có thay đổi nào để rà soát: hoặc lượt chạy không viết "
+            "gì, hoặc công việc của story đã nằm trên nhánh chính rồi "
+            "(worktree rẽ từ đó nên diff rỗng). Kiểm nhánh chính trước; "
+            "nếu công việc đã ở đó thì story này xong rồi."
+        ]
 
     context = build_context(
         story,
