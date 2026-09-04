@@ -215,8 +215,12 @@ def _project_files(project: Path) -> list[str]:
     import subprocess
 
     try:
+        # `--others --exclude-standard` để thấy cả file **chưa commit**:
+        # test giả vừa viết xong thì chưa nằm trong chỉ mục git, mà đó đúng
+        # là lúc cần bắt nó nhất.
         proc = subprocess.run(
-            ["git", "-C", str(project), "ls-files"],
+            ["git", "-C", str(project), "ls-files",
+             "--cached", "--others", "--exclude-standard"],
             capture_output=True, text=True, timeout=30,
         )
         if proc.returncode == 0:

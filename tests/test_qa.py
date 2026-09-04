@@ -157,10 +157,18 @@ class TestFakeTests(QaTestCase):
 
     def test_git_decides_what_belongs_to_the_project(self):
         subprocess.run(["git", "init", "-q"], cwd=self.project, check=True)
+        self.write(".gitignore", "bo-qua/\n")
         self.write("tests/test_a.py", "def test_x():\n    pass\n")
         subprocess.run(["git", "add", "tests"], cwd=self.project, check=True)
         self.write("bo-qua/test_b.py", "def test_y():\n    pass\n")
         self.assertEqual(find_fake_tests(self.project), ["tests/test_a.py"])
+
+    def test_uncommitted_test_is_still_checked(self):
+        """Test giả vừa viết xong thì chưa nằm trong chỉ mục git — mà đó
+        đúng là lúc cần bắt nó nhất."""
+        subprocess.run(["git", "init", "-q"], cwd=self.project, check=True)
+        self.write("tests/test_moi.py", "def test_x():\n    pass\n")
+        self.assertEqual(find_fake_tests(self.project), ["tests/test_moi.py"])
 
 
 class TestKinds(unittest.TestCase):
