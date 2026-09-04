@@ -170,6 +170,24 @@ def cmd_doctor(args) -> int:
             for c in classify_all(skills_dir)
             if c.verdict is Verdict.OFFENSIVE
         ]
+        # Skill của framework nằm trong kho framework; dự án giữ một bản
+        # sao. Sửa skill mà không cài lại thì agent vẫn chạy bản cũ, và
+        # cách duy nhất phát hiện là ngồi so từng file.
+        from .kit.install import OWN_SKILLS
+
+        stale = []
+        for own in sorted(OWN_SKILLS.glob("*/SKILL.md")) if OWN_SKILLS.is_dir() else []:
+            copied = skills_dir / own.parent.name / "SKILL.md"
+            if copied.is_file() and copied.read_bytes() != own.read_bytes():
+                stale.append(own.parent.name)
+        check(
+            "skill framework cập nhật",
+            not stale,
+            "khớp bản gốc" if not stale
+            else f"cũ hơn kho: {', '.join(stale)} — chạy `aisdlc setup`",
+            required=False,
+        )
+
         check(
             "không có skill tấn công",
             not offensive,

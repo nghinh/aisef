@@ -85,6 +85,33 @@ class TestDoctor(CliTestCase):
         self.assertEqual(code, EXIT_OK)
 
 
+class TestDoctorSkillFreshness(CliTestCase):
+    def test_stale_framework_skill_is_flagged(self):
+        """Skill của framework nằm trong kho framework; dự án giữ một bản
+        sao. Sửa skill mà không cài lại thì agent vẫn chạy bản cũ, và cách
+        duy nhất phát hiện là ngồi so từng file."""
+        from aisdlc.kit.install import OWN_SKILLS
+
+        own = next(OWN_SKILLS.glob("*/SKILL.md"))
+        copied = self.project / ".claude" / "skills" / own.parent.name / "SKILL.md"
+        copied.parent.mkdir(parents=True)
+        copied.write_text("bản cũ\n", encoding="utf-8")
+
+        _, out, _ = self.run_cli("doctor")
+        self.assertIn("cũ hơn kho", out)
+        self.assertIn(own.parent.name, out)
+
+    def test_matching_copy_passes(self):
+        from aisdlc.kit.install import OWN_SKILLS
+
+        own = next(OWN_SKILLS.glob("*/SKILL.md"))
+        copied = self.project / ".claude" / "skills" / own.parent.name / "SKILL.md"
+        copied.parent.mkdir(parents=True)
+        copied.write_bytes(own.read_bytes())
+        _, out, _ = self.run_cli("doctor")
+        self.assertIn("khớp bản gốc", out)
+
+
 class TestGates(CliTestCase):
     def test_lists_all_eight_gates(self):
         code, out, _ = self.run_cli("gates")
