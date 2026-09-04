@@ -324,10 +324,16 @@ def check_completion(evidence) -> Verdict:
     """
     last = evidence.last(TOOL_RUN, "test")
     if last is None:
+        # Nói đúng lệnh gõ được. Guard chặn bằng một chỉ dẫn không chạy được
+        # thì agent kẹt: nó không dừng được, cũng không làm được điều được
+        # bảo — và cứ thế đốt hết số lượt.
+        from .tools import aisdlc_command
+
         return Verdict(
             False,
-            "chưa có lần chạy test nào cho story này. Chạy `aisdlc tool test` "
-            "rồi mới kết thúc — bằng chứng nằm ở kết quả chạy, không ở lời kể.",
+            f"chưa có lần chạy test nào cho story này. Chạy `{aisdlc_command()} "
+            f"tool test` rồi mới kết thúc — bằng chứng nằm ở kết quả chạy, "
+            f"không ở lời kể.",
         )
     if not last.ok:
         tail = str(last.detail.get("tail") or "")[:400]
@@ -338,10 +344,13 @@ def check_completion(evidence) -> Verdict:
 
     stale = evidence.stale_since_last_test()
     if stale:
+        from .tools import aisdlc_command
+
         return Verdict(
             False,
             f"{len(stale)} file đã sửa sau lần chạy test gần nhất "
-            f"({', '.join(stale[:5])}). Chạy lại test rồi mới kết thúc.",
+            f"({', '.join(stale[:5])}). Chạy lại `{aisdlc_command()} tool test` "
+            f"rồi mới kết thúc.",
         )
     return ALLOW
 

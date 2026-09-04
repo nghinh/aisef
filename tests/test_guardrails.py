@@ -326,6 +326,26 @@ class TestCompletion(unittest.TestCase):
         self.assertFalse(v.allowed)
         self.assertIn("chưa có lần chạy test", v.reason)
 
+    def test_the_instruction_is_a_command_that_actually_runs(self):
+        """Guard chặn bằng một chỉ dẫn không chạy được thì agent kẹt: nó
+        không dừng được, cũng không làm được điều được bảo, và cứ thế đốt
+        hết số lượt."""
+        import os
+
+        from aisdlc.harness.tools import aisdlc_command
+
+        binary = aisdlc_command()
+        self.assertIn(f"{binary} tool test", self.verdict().reason)
+        if binary != "aisdlc":
+            self.assertTrue(os.access(binary, os.X_OK))
+
+    def test_stale_message_also_names_the_command(self):
+        self.store.tool_run("S-01", "test", ok=True)
+        self.store.file_change("S-01", "src/b.py")
+        from aisdlc.harness.tools import aisdlc_command
+
+        self.assertIn(f"{aisdlc_command()} tool test", self.verdict().reason)
+
     def test_last_run_red(self):
         self.store.tool_run("S-01", "test", ok=False, detail={"tail": "2 failed"})
         v = self.verdict()
