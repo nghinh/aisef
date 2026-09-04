@@ -410,9 +410,17 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
     content = str(tool_input.get("content") or tool_input.get("new_string") or "")
     command = str(tool_input.get("command") or "")
 
+    # Cây phải soi là cây agent đang đứng, không phải cây lúc biên dịch
+    # hook. Story chạy trong worktree riêng, còn hook được ghi vào
+    # `.claude/settings.json` một lần với `--project` là gốc dự án — dùng
+    # nó thì guard đi đọc `git status` của cây khác, thấy toàn bộ tài liệu
+    # kế hoạch chưa commit và chặn mọi thao tác. `--porcelain` luôn trả
+    # đường dẫn tính từ gốc repo nên đứng ở thư mục con cũng đúng.
+    root = str(event.get("cwd") or "") or project_root
+
     if kind == "write-scope":
         return check_write_scope(
-            file_path, effective_scope(env), project_root=project_root
+            file_path, effective_scope(env), project_root=root
         )
     if kind == "secret":
         return check_secrets(content)
@@ -423,7 +431,7 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
     if kind == "destructive":
         return check_destructive(command)
     if kind == "diff-scope":
-        return check_diff_scope(changed_files(project_root), scope_from_env(env))
+        return check_diff_scope(changed_files(root), scope_from_env(env))
     if kind == "completion":
         story = story_from_env(env)
         if not story or not artifact_root:

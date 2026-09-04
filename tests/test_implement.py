@@ -42,6 +42,7 @@ class ScriptedClient(ClientAdapter):
                  fail_first=0, fail_error="api_error"):
         self.writes = list(writes)
         self.review = review
+        self.review_envs: list[dict] = []
         self.fail_first = fail_first
         self.fail_error = fail_error
         self.calls: list[str] = []
@@ -56,8 +57,7 @@ class ScriptedClient(ClientAdapter):
     def run(self, spec: RunSpec) -> RunResult:
         is_review = "Rà soát" in spec.prompt
         self.calls.append("review" if is_review else "develop")
-        if not is_review:
-            self.envs.append(dict(spec.env))
+        (self.review_envs if is_review else self.envs).append(dict(spec.env))
 
         if self.fail_first > 0 and not is_review:
             self.fail_first -= 1
@@ -121,6 +121,20 @@ class TestHappyPath(ImplementTestCase):
         c = ScriptedClient()
         self.implement(c)
         self.assertEqual(c.calls, ["develop", "review"])
+
+    def test_reviewer_gets_scope_but_not_story_id(self):
+        """Người rà soát cần **phạm vi**, không cần **mã story**.
+
+        Thiếu phạm vi: `diff-scope` rơi vào nhánh "chưa khai phạm vi mà
+        đã đổi file" và chặn mọi lệnh Bash — người rà soát đốt hết lượt
+        để vật lộn với guard thay vì đọc code. Có mã story: guard
+        `completion` chặn nó *dừng* khi test đang đỏ, đúng lúc nó có
+        nhiều thứ đáng báo cáo nhất.
+        """
+        c = ScriptedClient()
+        self.implement(c)
+        self.assertEqual(c.review_envs[0].get(ENV_WRITE_SCOPE), "src")
+        self.assertNotIn(ENV_STORY_ID, c.review_envs[0])
 
     def test_guard_context_reaches_the_client_environment(self):
         """Guard chạy trong hook — tiến trình con của client. Không truyền

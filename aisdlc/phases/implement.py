@@ -267,6 +267,13 @@ def review_story(
         workdir=workdir,
         config=config,
     )
+    # Phạm vi ghi — nhưng **không** mã story. Không truyền phạm vi thì
+    # guard `diff-scope` rơi vào nhánh "chưa khai phạm vi mà đã đổi file"
+    # và chặn mọi lệnh Bash của người rà soát; truyền mã story thì guard
+    # `completion` lại chặn nó dừng khi test đang đỏ — đúng lúc nó có
+    # nhiều thứ để báo cáo nhất.
+    spec.env = {ENV_WRITE_SCOPE: ",".join(story.write_scope)}
+
     result = client.run(spec)
     EvidenceStore(artifact_root).agent_run(story.id, result, name=f"{story.id}-review")
 

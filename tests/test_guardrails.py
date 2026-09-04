@@ -207,6 +207,37 @@ class TestDispatch(unittest.TestCase):
             with self.subTest(guard=kind):
                 self.assertTrue(run_guard(kind, {}, env={ENV_WRITE_SCOPE: "src"}).allowed)
 
+    def test_diff_scope_soi_cay_agent_dang_dung(self):
+        """`cwd` của sự kiện thắng `--project`.
+
+        Hook nằm trong `.claude/settings.json`, biên dịch một lần với
+        `--project` là gốc dự án; nhưng story chạy trong worktree riêng.
+        Lấy gốc dự án thì guard đọc `git status` của cây khác — thấy tài
+        liệu kế hoạch chưa commit và chặn mọi lệnh Bash của agent.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "du-an"
+            work = Path(tmp) / "worktree"
+            for d in (root, work):
+                d.mkdir()
+                subprocess.run(["git", "init", "-q"], cwd=d, check=True)
+            # Gốc dự án bẩn: tài liệu kế hoạch chưa commit.
+            (root / "prd.md").write_text("ngoai pham vi", encoding="utf-8")
+            # Worktree sạch trong phạm vi story.
+            (work / "src").mkdir()
+            (work / "src" / "x.py").write_text("x = 1", encoding="utf-8")
+
+            env = {ENV_WRITE_SCOPE: "src"}
+            event = {"tool_input": {"command": "ls"}, "cwd": str(work)}
+            self.assertTrue(
+                run_guard("diff-scope", event, env=env, project_root=str(root)).allowed
+            )
+            # Không có `cwd` thì mới lùi về `--project` — và chặn đúng.
+            self.assertFalse(
+                run_guard("diff-scope", {"tool_input": {}}, env=env,
+                          project_root=str(root)).allowed
+            )
+
     def test_every_guard_has_a_matcher(self):
         for kind in ("write-scope", "secret", "injection", "git-stage", "destructive"):
             self.assertIn(kind, GUARD_MATCHERS)
