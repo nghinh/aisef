@@ -286,6 +286,16 @@ Bốn lỗi thật chỉ lộ ra khi chạy thật, đã sửa:
    lần đứt kết nối, trong khi vòng lặp story đã có cơ chế này.
 4. **Ảnh sandbox `alpine` trơn** — `npm test` trong đó đỏ vì thiếu công cụ
    chứ không phải vì code sai.
+5. **Chi phí lập kế hoạch không vào bằng chứng** — báo cáo nghiệm thu hiện
+   $0.00 trong khi lượt chạy tốn $7.92; với dự án nhỏ đó là phần đắt nhất.
+6. **Prompt gọi `aisdlc tool test`** trong khi `aisdlc` không nằm trên PATH
+   của phiên agent — agent sẽ tự chạy pytest bằng tay, lần chạy đó không
+   vào bằng chứng, rồi guard `completion` chặn nó kết thúc vì "chưa chạy
+   test bao giờ".
+
+Đây chính là giá trị của việc chạy thật: sáu lỗi trên đều **không** lộ ra
+trong 742 test, vì test nào cũng dựng sẵn đúng điều kiện mà thực tế không
+tự có.
 
 ---
 
