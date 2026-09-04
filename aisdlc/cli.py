@@ -566,11 +566,17 @@ def cmd_run(args) -> int:
     from .control.approvals import Gate
     from .phases.run import run_sprint
 
+    # Cổng `readiness` chứ không phải `stories`: nó gắn vào **cả** chỉ mục
+    # story lẫn hợp đồng thị giác. Chỉ đòi `stories` thì một story khai
+    # `screens` vẫn chạy được khi chưa có mockup nào — rồi trượt ở cổng vì
+    # "chưa đối chiếu", sau khi đã tiêu tiền viết xong code.
     store = _approvals(args)
-    if store.status(Gate.STORIES) is not Status.APPROVED and not args.force:
-        print("✗ cổng stories chưa duyệt — người phải xem cách chia việc trước",
-              file=sys.stderr)
-        print("  aisdlc review stories", file=sys.stderr)
+    blocking = [g.value for g in store.blocking(Gate.READINESS)]
+    if store.status(Gate.READINESS) is not Status.APPROVED:
+        blocking.append(Gate.READINESS.value)
+    if blocking and not args.force:
+        print(f"✗ cổng chưa duyệt: {', '.join(blocking)}", file=sys.stderr)
+        print(f"  aisdlc review {blocking[0]}", file=sys.stderr)
         return EXIT_NOT_READY
 
     adapter, code = _client(args)

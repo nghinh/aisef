@@ -314,11 +314,14 @@ class TestVerifyCommand(CliTestCase):
 
 
 class TestRunCommand(CliTestCase):
-    def test_refuses_before_the_stories_gate(self):
-        """Người phải xem cách chia việc trước khi máy bắt đầu viết code."""
+    def test_refuses_before_the_readiness_gate(self):
+        """Cổng `readiness` gắn vào **cả** chỉ mục story lẫn hợp đồng thị
+        giác. Chỉ đòi `stories` thì một story khai `screens` vẫn chạy được
+        khi chưa có mockup nào — rồi trượt vì "chưa đối chiếu", sau khi đã
+        tiêu tiền viết xong code."""
         code, _, err = self.run_cli("run")
         self.assertEqual(code, EXIT_NOT_READY)
-        self.assertIn("cổng stories", err)
+        self.assertIn("readiness", err)
 
     def test_rejects_unknown_client(self):
         code, _, err = self.run_cli("run", "--client", "khong-co", "--force")
