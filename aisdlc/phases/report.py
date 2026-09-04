@@ -209,10 +209,7 @@ def _harness_evidence(project: Path, root: Path, evidence: EvidenceStore) -> dic
             bool(ev and ev.of(TOOL_RUN)),
             f"{len(ev.of(TOOL_RUN)) if ev else 0} lần chạy tool được ghi",
         ),
-        "3 Sandbox": yes(
-            bool(ev and any(e.detail.get("isolation") for e in ev.of(TOOL_RUN))),
-            "tool chạy qua sandbox, mức cách ly ghi trong bằng chứng",
-        ),
+        "3 Sandbox": _isolation_note(ev),
         "4 Điều phối": yes(
             (root / STORIES_INDEX).is_file(),
             "chỉ mục story có đợt chạy song song tính sẵn",
@@ -226,6 +223,26 @@ def _harness_evidence(project: Path, root: Path, evidence: EvidenceStore) -> dic
             f"evidence/ có {len(any_story)} story, kèm chi phí và độ trễ",
         ),
     }
+
+
+def _isolation_note(ev) -> str:
+    """Mức cách ly **quan sát được**, không phải mức mong muốn.
+
+    Báo "có sandbox" khi thực tế chạy thẳng trên máy là đúng loại tự khai
+    mà cả framework này sinh ra để chống.
+    """
+    if ev is None:
+        return "chưa có bằng chứng"
+    levels = {
+        str(e.detail.get("isolation"))
+        for e in ev.of(TOOL_RUN)
+        if e.detail.get("isolation")
+    }
+    if not levels:
+        return "chưa có bằng chứng"
+    degraded = any(e.detail.get("degraded") for e in ev.of(TOOL_RUN))
+    note = "mức cách ly quan sát được: " + ", ".join(sorted(levels))
+    return note + (" — **suy biến**, không có container" if degraded else "")
 
 
 def write(project: Path | str, *, out: Path | str | None = None) -> Path:

@@ -130,6 +130,24 @@ class TestHarnessEvidence(ReportTestCase):
         self.assertEqual(len(harness), 6)
         self.assertIn("chưa có bằng chứng", harness["5 Guardrail"])
 
+    def test_isolation_reports_what_actually_happened(self):
+        """Báo "có sandbox" khi thực tế chạy thẳng trên máy là đúng loại tự
+        khai mà cả framework này sinh ra để chống."""
+        store = EvidenceStore(self.artifacts)
+        store.tool_run("STORY-01-01", "test", ok=True,
+                       detail={"isolation": "subprocess", "degraded": True})
+        note = build(self.project).harness["3 Sandbox"]
+        self.assertIn("subprocess", note)
+        self.assertIn("suy biến", note)
+
+    def test_isolation_with_a_container(self):
+        EvidenceStore(self.artifacts).tool_run(
+            "STORY-01-01", "test", ok=True,
+            detail={"isolation": "docker/WORKSPACE_WRITE", "degraded": False})
+        note = build(self.project).harness["3 Sandbox"]
+        self.assertIn("docker", note)
+        self.assertNotIn("suy biến", note)
+
     def test_present_evidence_names_the_artifact(self):
         (self.project / ".claude").mkdir()
         (self.project / ".claude" / "settings.json").write_text("{}", encoding="utf-8")
