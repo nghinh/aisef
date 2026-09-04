@@ -258,7 +258,34 @@ Một dự án thật, quy mô nhỏ nhưng đủ hình dạng: **3 epic · ~15 
 | 6 nhóm harness | Cả sáu ô có bằng chứng chạy (mục 16 SOLUTION) |
 | R1–R14 | Mỗi R có ≥1 test hoặc artifact chứng minh |
 
-**Đầu ra:** `docs/ACCEPTANCE-REPORT.md` — bằng chứng cho từng dòng trên.
+**Đầu ra:** `docs/ACCEPTANCE-REPORT.md` — sinh bằng `aisdlc report`, mọi số
+đọc từ artifact và bằng chứng trên đĩa.
+
+### Chạy thật lần 1 — những gì nó dạy
+
+Chạy `aisdlc plan` trên một dự án trống (chỉ có `docs/requirements.md`),
+client thật, không giả lập:
+
+| Pha | Kết quả | Chi phí |
+|---|---|---|
+| project-context | `complete`, 10 câu hỏi mở, 11 giả định | $1.52 |
+| prd | bỏ qua (đã có từ spike S6) | — |
+| architecture | bỏ qua (đã có) | — |
+| ux | `partial`, 5 câu hỏi mở → tự duyệt **có ghi lại** lý do | $3.71 |
+| epics | **api_error** giữa chừng | $2.69 |
+
+Bốn lỗi thật chỉ lộ ra khi chạy thật, đã sửa:
+
+1. **Guard chặn cả BMAD ghi PRD** — ngoài story không có `write_scope`, mà
+   phạm vi rỗng nghĩa là chặn. Cách duy nhất để chạy tiếp sẽ là tắt guard ở
+   nửa đầu vòng đời.
+2. **Bảng màn hình đọc sai cột** — BMAD sinh `screen_id | Route | Đến từ |
+   Mục đích`, khác thứ tự trong mẫu của chính nó; đọc theo thứ tự thì route
+   mất hẳn.
+3. **Pha lập kế hoạch không thử lại khi lỗi hạ tầng** — mất $2.69 vì một
+   lần đứt kết nối, trong khi vòng lặp story đã có cơ chế này.
+4. **Ảnh sandbox `alpine` trơn** — `npm test` trong đó đỏ vì thiếu công cụ
+   chứ không phải vì code sai.
 
 ---
 
