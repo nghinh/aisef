@@ -133,7 +133,9 @@ class Report:
 
 
 def build(project: Path | str) -> Report:
-    project = Path(project)
+    # `resolve()` trước khi lấy tên: CLI mặc định `--project .`, và
+    # `Path(".").name` là chuỗi rỗng — báo cáo ra tiêu đề cụt.
+    project = Path(project).resolve()
     root = project / "_bmad-output"
     report = Report(project=project.name)
 

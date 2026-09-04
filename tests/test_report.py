@@ -177,6 +177,19 @@ class TestOutput(ReportTestCase):
         self.assertTrue(path.is_file())
         self.assertIn("Báo cáo nghiệm thu", path.read_text(encoding="utf-8"))
 
+    def test_tieu_de_co_ten_du_an_ke_ca_khi_chay_tai_cho(self):
+        """CLI mặc định `--project .`, và `Path(".").name` là chuỗi rỗng —
+        báo cáo ra "# Báo cáo nghiệm thu — " cụt lủn."""
+        import os
+
+        cwd = os.getcwd()
+        os.chdir(self.project)
+        try:
+            text = build(".").markdown()
+        finally:
+            os.chdir(cwd)
+        self.assertIn(f"# Báo cáo nghiệm thu — {self.project.name}", text)
+
     def test_custom_path(self):
         out = self.project / "bao-cao.md"
         self.assertEqual(write(self.project, out=out), out)
