@@ -24,6 +24,7 @@ from aisdlc.harness.guardrails import (  # noqa: E402
     check_injection,
     check_secrets,
     check_write_scope,
+    fork_point,
     run_guard,
     scope_from_env,
 )
@@ -167,6 +168,84 @@ class TestInjection(unittest.TestCase):
 
     def test_subprocess_list_allowed(self):
         self.assertTrue(check_injection('subprocess.run(["rm", path])').allowed)
+
+
+class TestChangedFilesBase(unittest.TestCase):
+    """Agent tự commit thì cổng vẫn phải thấy công việc.
+
+    Thiết kế khuyến khích agent commit từng phần — merge chỉ thấy thứ đã
+    commit. Nhưng ba cổng (phạm vi ghi, test-thật, rà soát) cùng đọc
+    `changed_files`; so với HEAD thì sau commit chúng thấy rỗng và cùng
+    lúc mất tác dụng.
+    """
+
+    def repo(self, tmp: str) -> Path:
+        d = Path(tmp)
+        subprocess.run(["git", "init", "-q"], cwd=d, check=True)
+        subprocess.run(["git", "config", "user.email", "t@t"], cwd=d, check=True)
+        subprocess.run(["git", "config", "user.name", "t"], cwd=d, check=True)
+        (d / "goc.txt").write_text("goc", encoding="utf-8")
+        subprocess.run(["git", "add", "goc.txt"], cwd=d, check=True)
+        subprocess.run(["git", "commit", "-qm", "goc"], cwd=d, check=True)
+        return d
+
+    def test_commit_cua_agent_van_nam_trong_tam_nhin(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            d = self.repo(tmp)
+            base = subprocess.run(
+                ["git", "rev-parse", "HEAD"], cwd=d,
+                capture_output=True, text=True, check=True,
+            ).stdout.strip()
+
+            (d / "src").mkdir()
+            (d / "src" / "moi.py").write_text("x = 1", encoding="utf-8")
+            subprocess.run(["git", "add", "src/moi.py"], cwd=d, check=True)
+            subprocess.run(["git", "commit", "-qm", "agent tu commit"], cwd=d, check=True)
+
+            self.assertEqual(changed_files(str(d)), [], "so với HEAD: mù")
+            self.assertEqual(changed_files(str(d), base_ref=base), ["src/moi.py"])
+
+    def test_khong_trung_lap_khi_vua_commit_vua_con_do(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            d = self.repo(tmp)
+            base = subprocess.run(
+                ["git", "rev-parse", "HEAD"], cwd=d,
+                capture_output=True, text=True, check=True,
+            ).stdout.strip()
+            (d / "a.py").write_text("a", encoding="utf-8")
+            subprocess.run(["git", "add", "a.py"], cwd=d, check=True)
+            subprocess.run(["git", "commit", "-qm", "a"], cwd=d, check=True)
+            (d / "a.py").write_text("a sua tiep", encoding="utf-8")  # commit rồi sửa tiếp
+            (d / "b.py").write_text("b", encoding="utf-8")  # chưa theo dõi
+
+            got = changed_files(str(d), base_ref=base)
+            self.assertEqual(sorted(got), ["a.py", "b.py"])
+
+    def test_fork_point_khong_tinh_cong_viec_story_khac(self):
+        """Story trước merge vào nhánh chính giữa lúc story sau đang chạy:
+        so với đầu nhánh thì công việc story trước bị tính sang story sau.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            d = self.repo(tmp)
+            main = subprocess.run(
+                ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=d,
+                capture_output=True, text=True, check=True,
+            ).stdout.strip()
+            subprocess.run(["git", "checkout", "-qb", "story/b"], cwd=d, check=True)
+            (d / "cua-b.py").write_text("b", encoding="utf-8")
+            subprocess.run(["git", "add", "cua-b.py"], cwd=d, check=True)
+            subprocess.run(["git", "commit", "-qm", "b"], cwd=d, check=True)
+
+            # story A merge vào nhánh chính sau khi B đã rẽ
+            subprocess.run(["git", "checkout", "-q", main], cwd=d, check=True)
+            (d / "cua-a.py").write_text("a", encoding="utf-8")
+            subprocess.run(["git", "add", "cua-a.py"], cwd=d, check=True)
+            subprocess.run(["git", "commit", "-qm", "a"], cwd=d, check=True)
+            subprocess.run(["git", "checkout", "-q", "story/b"], cwd=d, check=True)
+
+            base = fork_point(str(d), main)
+            self.assertTrue(base)
+            self.assertEqual(changed_files(str(d), base_ref=base), ["cua-b.py"])
 
 
 class TestDispatch(unittest.TestCase):

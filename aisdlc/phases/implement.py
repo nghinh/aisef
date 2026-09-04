@@ -26,7 +26,13 @@ from ..control import gate as story_gate
 from ..control.design_contract import DesignContract, load as load_contract
 from ..control.normalize import Architecture, Story
 from ..harness import mockup_verify
-from ..harness.guardrails import ENV_STORY_ID, ENV_WRITE_SCOPE, changed_files
+from ..harness.guardrails import (
+    ENV_BASE_REF,
+    ENV_STORY_ID,
+    ENV_WRITE_SCOPE,
+    changed_files,
+    fork_point,
+)
 from ..harness.mockup_map import load_for_story, prompt_section
 from ..harness.observe import EvidenceStore
 from ..harness.prompts import Catalog, load_catalog
@@ -150,6 +156,7 @@ def run_attempt(
     contract: DesignContract | None,
     number: int,
     feedback: str = "",
+    base_ref: str = "",
 ) -> Attempt:
     """Một lượt: agent viết code, rồi harness tự kiểm."""
     attempt = Attempt(number=number)
@@ -176,6 +183,7 @@ def run_attempt(
     spec.env = {
         ENV_WRITE_SCOPE: ",".join(story.write_scope),
         ENV_STORY_ID: story.id,
+        ENV_BASE_REF: base_ref,
     }
 
     result = client.run(spec)
@@ -195,7 +203,7 @@ def run_attempt(
 
     # Test luôn xanh vì không khẳng định gì tệ hơn không có test: nó làm
     # cổng "test xanh" mất hết ý nghĩa. Kiểm rẻ, nên chạy mỗi lượt.
-    changed_now = changed_files(str(workdir))
+    changed_now = changed_files(str(workdir), base_ref=base_ref)
     fake = find_fake_tests(workdir, changed_now)
     evidence.tool_run(
         story.id, "qa:fake-tests", ok=not fake, detail={"files": fake}
@@ -210,6 +218,7 @@ def run_attempt(
     attempt.review_findings = review_story(
         story,
         workdir=workdir,
+        base_ref=base_ref,
         project=project,
         artifact_root=artifact_root,
         client=client,
@@ -234,6 +243,7 @@ def review_story(
     story: Story,
     *,
     workdir: Path,
+    base_ref: str = "",
     project: Path,
     artifact_root: Path,
     client: ClientAdapter,
@@ -246,7 +256,7 @@ def review_story(
     Trả về danh sách mục ``[chặn]``. Người viết đã tin code mình đúng; hỏi
     lại chính phiên đó chỉ nhận lại cùng niềm tin.
     """
-    changed = changed_files(str(workdir))
+    changed = changed_files(str(workdir), base_ref=base_ref)
     if not changed:
         return ["không có thay đổi nào để rà soát"]
 
@@ -272,7 +282,10 @@ def review_story(
     # và chặn mọi lệnh Bash của người rà soát; truyền mã story thì guard
     # `completion` lại chặn nó dừng khi test đang đỏ — đúng lúc nó có
     # nhiều thứ để báo cáo nhất.
-    spec.env = {ENV_WRITE_SCOPE: ",".join(story.write_scope)}
+    spec.env = {
+        ENV_WRITE_SCOPE: ",".join(story.write_scope),
+        ENV_BASE_REF: base_ref,
+    }
 
     result = client.run(spec)
     EvidenceStore(artifact_root).agent_run(story.id, result, name=f"{story.id}-review")
@@ -292,6 +305,22 @@ def blocking_findings(text: str) -> list[str]:
         if low.startswith("[chặn]") or low.startswith("[blocker]") or low.startswith("[block]"):
             out.append(stripped)
     return out
+
+
+def _head_of(repo: Path) -> str:
+    """SHA đầu nhánh chính. Rỗng nếu không đọc được — guard mất một phần
+    tầm nhìn thì tệ, nhưng chặn cả story vì không đọc được git còn tệ hơn.
+    """
+    import subprocess
+
+    try:
+        proc = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=repo, capture_output=True, text=True, timeout=10,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return ""
+    return proc.stdout.strip() if proc.returncode == 0 else ""
 
 
 def implement_story(
@@ -319,6 +348,15 @@ def implement_story(
     infra_budget = max_retries + 1  # lỗi hạ tầng có hạn mức riêng
     feedback = ""
 
+    # Điểm story rẽ khỏi nhánh chính. Tính một lần, trước lượt đầu: agent
+    # sẽ commit trong worktree, và mọi cổng phải nhìn công việc từ mốc này
+    # chứ không từ HEAD đang chạy theo nó. Chạy thẳng trong dự án
+    # (`--no-isolate`) thì không có nhánh riêng, rỗng là đúng.
+    base_ref = ""
+    if workdir != project:
+        head = _head_of(project)
+        base_ref = fork_point(str(workdir), head) if head else ""
+
     while True:
         attempt = run_attempt(
             story,
@@ -332,6 +370,7 @@ def implement_story(
             contract=contract,
             number=outcome.quality_attempts + 1,
             feedback=feedback,
+            base_ref=base_ref,
         )
         outcome.attempts.append(attempt)
 

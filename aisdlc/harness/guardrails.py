@@ -26,6 +26,7 @@ from .observe import TOOL_RUN
 
 ENV_WRITE_SCOPE = "AISDLC_WRITE_SCOPE"
 ENV_STORY_ID = "AISDLC_STORY_ID"
+ENV_BASE_REF = "AISDLC_BASE_REF"
 
 #: Phạm vi ghi khi **không** ở trong một story: các pha lập kế hoạch và
 #: dựng mockup. Chúng có phạm vi cố định và biết trước, nên guard vẫn có
@@ -291,18 +292,13 @@ HARNESS_OWNED = (
 )
 
 
-def changed_files(project_root: str, *, ignore: tuple[str, ...] = HARNESS_OWNED) -> list[str]:
-    """File đã đổi so với HEAD, kể cả file mới chưa theo dõi.
-
-    Bỏ qua phần harness tự ghi. Phần còn lại của ``_bmad-output`` **không**
-    được bỏ qua: agent sửa PRD hay hợp đồng thị giác giữa lúc viết code là
-    chuyện phải lộ ra.
-    """
+def _git_lines(project_root: str, args: list[str]) -> list[str]:
+    """Chạy một lệnh git trả kết quả phân tách bằng NUL. Lỗi thì rỗng."""
     import subprocess
 
     try:
         proc = subprocess.run(
-            ["git", "status", "--porcelain", "-z", "--untracked-files=all"],
+            ["git", *args],
             cwd=project_root or ".",
             capture_output=True,
             text=True,
@@ -312,16 +308,68 @@ def changed_files(project_root: str, *, ignore: tuple[str, ...] = HARNESS_OWNED)
         return []
     if proc.returncode != 0:
         return []
+    return [e for e in proc.stdout.split("\0") if e]
+
+
+def changed_files(
+    project_root: str,
+    *,
+    ignore: tuple[str, ...] = HARNESS_OWNED,
+    base_ref: str = "",
+) -> list[str]:
+    """Công việc story đã làm: file đổi so với **điểm rẽ nhánh**, kể cả
+    file mới chưa theo dõi.
+
+    Không có ``base_ref`` thì chỉ so với ``HEAD`` — và đó là chỗ sập.
+    Agent được khuyến khích tự commit từng phần (merge chỉ thấy thứ đã
+    commit), nên sau vài commit thì "so với HEAD" trả về gần như rỗng.
+    Ba cổng cùng đọc danh sách này: phạm vi ghi thành đạt vô điều kiện,
+    test-thật không còn gì để kiểm, và người rà soát nhận một diff rỗng
+    rồi phải tự mò cả repo — vừa mù vừa tốn. So với điểm rẽ nhánh thì
+    công việc đã commit vẫn nằm trong tầm nhìn.
+
+    Bỏ qua phần harness tự ghi. Phần còn lại của ``_bmad-output`` **không**
+    được bỏ qua: agent sửa PRD hay hợp đồng thị giác giữa lúc viết code là
+    chuyện phải lộ ra.
+    """
+    paths: list[str] = []
+    seen: set[str] = set()
+
+    # `git status` cho cả file chưa theo dõi — thứ `git diff` không thấy.
+    for entry in _git_lines(
+        project_root, ["status", "--porcelain", "-z", "--untracked-files=all"]
+    ):
+        if len(entry) > 3:
+            paths.append(entry[3:])
+
+    # `git diff <base>` so **cây làm việc** với điểm rẽ nhánh, nên phủ cả
+    # phần đã commit lẫn phần còn dở.
+    if base_ref:
+        paths += _git_lines(project_root, ["diff", "--name-only", "-z", base_ref])
 
     out: list[str] = []
-    for entry in proc.stdout.split("\0"):
-        if len(entry) <= 3:
+    for path in paths:
+        if path in seen:
             continue
-        path = entry[3:]
+        seen.add(path)
         if any(_within(path, skip) or skip in Path(path).parts for skip in ignore):
             continue
         out.append(path)
     return out
+
+
+def fork_point(workdir: str, upstream: str) -> str:
+    """Điểm nhánh story rẽ khỏi nhánh chính. Rỗng nếu không tính được.
+
+    Dùng ``merge-base`` chứ không dùng thẳng đầu nhánh chính: trong một
+    đợt, story trước có thể đã merge vào nhánh chính khi story sau đang
+    chạy — so với đầu nhánh thì công việc của story trước bị tính sang
+    story sau.
+    """
+    if not upstream:
+        return ""
+    got = _git_lines(workdir, ["merge-base", "HEAD", upstream])
+    return got[0].strip() if got else ""
 
 
 # ------------------------------------------------------------ hoàn thành
@@ -380,6 +428,10 @@ def story_from_env(env: dict[str, str] | None = None) -> str:
     return (env or os.environ).get(ENV_STORY_ID, "")
 
 
+def base_from_env(env: dict[str, str] | None = None) -> str:
+    return (env or os.environ).get(ENV_BASE_REF, "")
+
+
 def effective_scope(env: dict[str, str] | None = None) -> list[str]:
     """Phạm vi ghi đang có hiệu lực.
 
@@ -431,7 +483,9 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
     if kind == "destructive":
         return check_destructive(command)
     if kind == "diff-scope":
-        return check_diff_scope(changed_files(root), scope_from_env(env))
+        return check_diff_scope(
+            changed_files(root, base_ref=base_from_env(env)), scope_from_env(env)
+        )
     if kind == "completion":
         story = story_from_env(env)
         if not story or not artifact_root:

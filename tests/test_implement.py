@@ -21,7 +21,11 @@ from aisdlc.clients.base import Capability, ClientAdapter, RunSpec, Support  # n
 from aisdlc.clients.stream import RunResult  # noqa: E402
 from aisdlc.config import DEFAULTS, Config  # noqa: E402
 from aisdlc.control.normalize import Story, parse_architecture_file  # noqa: E402
-from aisdlc.harness.guardrails import ENV_STORY_ID, ENV_WRITE_SCOPE  # noqa: E402
+from aisdlc.harness.guardrails import (  # noqa: E402
+    ENV_BASE_REF,
+    ENV_STORY_ID,
+    ENV_WRITE_SCOPE,
+)
 from aisdlc.harness.observe import AGENT_RUN, EvidenceStore  # noqa: E402
 from aisdlc.phases.implement import (  # noqa: E402
     blocking_findings,
@@ -43,6 +47,7 @@ class ScriptedClient(ClientAdapter):
         self.writes = list(writes)
         self.review = review
         self.review_envs: list[dict] = []
+        self.review_prompts: list[str] = []
         self.fail_first = fail_first
         self.fail_error = fail_error
         self.calls: list[str] = []
@@ -58,6 +63,8 @@ class ScriptedClient(ClientAdapter):
         is_review = "Rà soát" in spec.prompt
         self.calls.append("review" if is_review else "develop")
         (self.review_envs if is_review else self.envs).append(dict(spec.env))
+        if is_review:
+            self.review_prompts.append(spec.prompt)
 
         if self.fail_first > 0 and not is_review:
             self.fail_first -= 1
@@ -121,6 +128,59 @@ class TestHappyPath(ImplementTestCase):
         c = ScriptedClient()
         self.implement(c)
         self.assertEqual(c.calls, ["develop", "review"])
+
+    def test_cong_nhin_thay_cong_viec_agent_da_commit(self):
+        """Agent commit trong worktree thì ba cổng vẫn phải thấy diff.
+
+        Không có mốc rẽ nhánh, `changed_files` so với HEAD và trả rỗng —
+        phạm vi ghi đạt vô điều kiện, test-thật không kiểm gì, người rà
+        soát nhận diff rỗng rồi phải mò cả repo.
+        """
+        for cmd in (
+            ["git", "config", "user.email", "t@t"],
+            ["git", "config", "user.name", "t"],
+        ):
+            subprocess.run(cmd, cwd=self.project, check=True)
+        (self.project / "goc.txt").write_text("goc", encoding="utf-8")
+        subprocess.run(["git", "add", "goc.txt"], cwd=self.project, check=True)
+        subprocess.run(["git", "commit", "-qm", "goc"], cwd=self.project, check=True)
+
+        work = self.project / ".aisdlc" / "worktrees" / "STORY-01-01"
+        subprocess.run(
+            ["git", "worktree", "add", "-q", str(work), "-b", "story/x"],
+            cwd=self.project, check=True,
+        )
+
+        class Committer(ScriptedClient):
+            """Agent tử tế: viết xong thì commit, đúng như prompt bảo."""
+
+            def run(self, spec):
+                r = super().run(spec)
+                if "Rà soát" not in spec.prompt:
+                    subprocess.run(["git", "add", "src"], cwd=spec.workdir, check=False)
+                    subprocess.run(
+                        ["git", "commit", "-qm", "xong"], cwd=spec.workdir, check=False
+                    )
+                return r
+
+        c = Committer()
+        try:
+            self.implement(c, workdir=work)
+            self.assertTrue(c.envs[0].get(ENV_BASE_REF), "chưa tính được mốc rẽ nhánh")
+            self.assertEqual(
+                subprocess.run(
+                    ["git", "status", "--porcelain"], cwd=work,
+                    capture_output=True, text=True, check=True,
+                ).stdout.strip(),
+                "",
+                "agent phải đã commit hết — nếu không, test này không kiểm gì",
+            )
+            self.assertIn("src/a.py", c.review_prompts[0])
+        finally:
+            subprocess.run(
+                ["git", "worktree", "remove", "--force", str(work)],
+                cwd=self.project, check=False,
+            )
 
     def test_reviewer_gets_scope_but_not_story_id(self):
         """Người rà soát cần **phạm vi**, không cần **mã story**.
