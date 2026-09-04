@@ -248,19 +248,33 @@ class TestRetry(ImplementTestCase):
         out = self.implement(c)
         self.assertFalse(out.done)
         self.assertEqual(out.quality_attempts, 2)   # lần đầu + 1 lần thử lại
-        self.assertIn("bí", out.blocked_reason)
+        self.assertIn("đã thử", out.blocked_reason)
 
     def test_bi_thi_dung_som_thay_vi_dot_het_han_muc(self):
-        """Hai lượt liền cùng một mục chặn thì thử tiếp vô nghĩa.
+        """Lặp lại **và** trỏ ra ngoài phạm vi ghi thì thử tiếp vô nghĩa.
 
-        Thường là mâu thuẫn ngoài tầm agent — tiêu chí chấp nhận đòi thứ
-        `write_scope` cấm. Đo trên e9: 4 lượt y hệt nhau, $9,85, cùng một
-        câu về lockfile không được commit.
+        Đo trên e9: 4 lượt y hệt nhau, $9,85, cùng một câu về lockfile
+        không được commit — tệp mà story không được phép chạm.
         """
-        c = ScriptedClient(review="[chặn] src/a.py:1 — mất dữ liệu khi lưu")
+        c = ScriptedClient(
+            review="[chặn] ../khac/thu-vien.py:1 — thiếu khai `mot-goi-nao-do`"
+        )
         out = self.implement(c, config=self.config(**{"run.max_retries": 5}))
         self.assertEqual(out.quality_attempts, 2, "phải dừng ở lượt 2, không chạy tới 6")
-        self.assertIn("sửa tiêu chí chấp nhận hoặc write_scope", out.blocked_reason)
+        self.assertIn("không nằm trong write_scope", out.blocked_reason)
+
+    def test_lap_lai_trong_pham_vi_la_chua_sua_khong_phai_khong_sua_duoc(self):
+        """Mục chặn lặp lại nhưng tệp nằm trong phạm vi thì vẫn thử tiếp.
+
+        Đo trên e9: STORY-01-02 trượt hai lượt rồi qua ở lượt 3, còn
+        STORY-01-04 bị chặn hai lượt liền vì cùng một vi phạm AR-7 trên
+        `src/app/list-notes.ts` — tệp nằm ngay trong phạm vi của nó. Dừng
+        ở đó là cắt ngang một story còn cứu được.
+        """
+        c = ScriptedClient(review="[chặn] src/a.py:1 — mất dữ liệu khi lưu")
+        out = self.implement(c, config=self.config(**{"run.max_retries": 3}))
+        self.assertEqual(out.quality_attempts, 4, "hạn mức lượt thử phải chạy hết")
+        self.assertIn("đã thử", out.blocked_reason)
 
     def test_bi_nhan_ra_du_nguoi_ra_soat_doi_cach_dien_dat(self):
         """Người rà soát là một model: cùng một khiếm khuyết được viết lại
@@ -335,6 +349,19 @@ class TestRetry(ImplementTestCase):
         self.assertIn("package-lock.json", scope)
         self.assertIn("src", scope)          # phần story tự khai còn nguyên
         self.assertNotIn("Cargo.toml", scope)  # dự án không có thì không thêm
+
+    def test_muc_chan_duoc_luu_vao_bang_chung(self):
+        """Bản tóm tắt in ra màn hình cắt ngắn mục chặn. Muốn biết hai lượt
+        có bị chặn vì cùng một chuyện không thì phải đọc được nguyên văn —
+        thiếu chỗ này thì lối duy nhất là mò nhật ký phiên."""
+        self.implement(ScriptedClient(review="[chặn] src/a.py:1 — mất dữ liệu"))
+        ghi = [
+            e for e in EvidenceStore(self.artifacts).read("STORY-01-01").events
+            if e.name == "review"
+        ]
+        self.assertTrue(ghi)
+        self.assertIn("mất dữ liệu", ghi[0].detail["findings"][0])
+        self.assertFalse(ghi[0].ok)
 
     def test_muc_chan_doi_thi_van_thu_tiep(self):
         """Chặn ở chỗ khác nghĩa là lượt vừa rồi có dịch chuyển — thử tiếp."""

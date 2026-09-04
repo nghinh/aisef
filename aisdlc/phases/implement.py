@@ -259,6 +259,16 @@ def run_attempt(
         catalog=catalog,
         architecture=architecture,
     )
+    # Mục chặn phải nằm trong bằng chứng, không chỉ trong bản tóm tắt in
+    # ra màn hình — bản tóm tắt cắt ngắn, và khi cần biết lượt này với
+    # lượt trước có bị chặn vì cùng một chuyện không thì phải đọc được
+    # nguyên văn. Thiếu chỗ này thì lối duy nhất là mò nhật ký phiên.
+    evidence.tool_run(
+        story.id,
+        "review",
+        ok=not attempt.review_findings,
+        detail={"findings": attempt.review_findings, "attempt": number},
+    )
 
     attempt.gate = story_gate.evaluate(
         story.id,
@@ -431,21 +441,22 @@ def deadlock_reason(attempts: list[Attempt], write_scope: list[str] | None = Non
     if not _same_complaint(cuoi.review_findings, truoc.review_findings):
         return ""
 
-    reason = (
+    # Lặp lại **và** trỏ ra ngoài phạm vi ghi mới là bí. Trong phạm vi thì
+    # đó là "chưa sửa", không phải "không sửa được" — và đo trên e9,
+    # STORY-01-02 qua ở lượt 3 sau hai lượt trượt, còn STORY-01-04 bị chặn
+    # hai lượt liền vì cùng một vi phạm AR-7 trên `src/app/list-notes.ts`,
+    # tệp nằm ngay trong phạm vi của nó. Dừng ở đó là cắt ngang một story
+    # còn cứu được; cứ để hạn mức lượt thử làm việc của nó.
+    ngoai = _paths_outside(cuoi.review_findings, write_scope or [])
+    if not ngoai:
+        return ""
+    return (
         "bí: hai lượt liền bị chặn vì cùng một chuyện — "
         + "; ".join(cuoi.review_findings[:2])
-    )
-    ngoai = _paths_outside(cuoi.review_findings, write_scope or [])
-    if ngoai:
-        return (
-            f"{reason}. Mục chặn trỏ tới {', '.join(ngoai)} — không nằm "
-            f"trong write_scope của story, nên agent không sửa được dù có "
-            f"thử bao nhiêu lượt. Nới write_scope hoặc sửa tiêu chí chấp "
-            f"nhận rồi chạy lại."
-        )
-    return (
-        f"{reason}. Thử lại không gỡ được: sửa tiêu chí chấp nhận hoặc "
-        f"write_scope của story rồi chạy lại."
+        + f". Mục chặn trỏ tới {', '.join(ngoai)} — không nằm trong "
+        f"write_scope của story, nên agent không sửa được dù có thử bao "
+        f"nhiêu lượt. Nới write_scope hoặc sửa tiêu chí chấp nhận rồi "
+        f"chạy lại."
     )
 
 
