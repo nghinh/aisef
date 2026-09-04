@@ -29,7 +29,7 @@ from pathlib import Path
 from ..config import Config
 from ..harness import sandbox
 from ..harness.observe import EvidenceStore
-from ..harness.tools import command_for
+from ..harness.tools import command_for, image_for
 
 
 @dataclass(frozen=True)
@@ -274,7 +274,7 @@ def run_suite(
                 workspace=project,
                 cmd=shlex.split(command),
                 level=kind.level,
-                image=cfg["sandbox.image"],
+                image=image_for(project, cfg),
                 timeout_seconds=cfg["run.timeout_seconds"],
                 allow_degraded=cfg["sandbox.allow_degraded"],
             )

@@ -111,6 +111,7 @@ def cmd_doctor(args) -> int:
     )
 
     from .harness.browser import availability as browser_availability
+    from .harness.tools import image_for
 
     browser_why = browser_availability(project)
     check(
@@ -122,6 +123,17 @@ def cmd_doctor(args) -> int:
 
     lines.append("Dự án:")
     check("thư mục dự án", project.is_dir(), str(project))
+    try:
+        image = image_for(project, Config.load(project))
+    except ConfigError:
+        image = "?"
+    check(
+        "ảnh sandbox",
+        image != "alpine:latest",
+        image + (" — không có công cụ của stack nào, test sẽ đỏ vì thiếu công cụ"
+                 if image == "alpine:latest" else " (hợp stack)"),
+        required=False,
+    )
     req = project / "docs" / "requirements.md"
     check("docs/requirements.md", req.is_file(), str(req))
 
@@ -466,25 +478,20 @@ def cmd_guard(args) -> int:
 
 def cmd_plan(args) -> int:
     """Chạy chuỗi pha BMAD tới cổng đầu tiên chưa duyệt."""
-    from .clients.compile import ADAPTERS
     from .phases.plan import run_pipeline
 
     # Kiểm tham số trước, kiểm môi trường sau: sai tham số thì máy nào
     # cũng sai, còn thiếu client thì tuỳ máy — trộn hai loại lại sẽ cho mã
     # thoát đổi theo máy chạy.
-    if args.client not in ADAPTERS:
-        print(f"✗ client không hỗ trợ: {args.client}", file=sys.stderr)
-        return EXIT_USAGE
     try:
         gates = parse_auto_approve(args.auto_approve)
     except ValueError as e:
         print(f"✗ {e}", file=sys.stderr)
         return EXIT_USAGE
 
-    adapter = ADAPTERS[args.client]()
-    if not adapter.available():
-        print(f"✗ chưa cài {args.client} trên máy này", file=sys.stderr)
-        return EXIT_NOT_READY
+    adapter, code = _client(args)
+    if adapter is None:
+        return code
 
     result = run_pipeline(
         args.project,
@@ -502,24 +509,19 @@ def cmd_plan(args) -> int:
 
 def cmd_mockup(args) -> int:
     """Dựng mockup cho từng màn hình rồi trích hợp đồng thị giác."""
-    from .clients.compile import ADAPTERS
     from .control.approvals import Gate
     from .phases.mockup import generate
-    from .phases.plan import ARTIFACT_ROOT, _pass_gate
+    from .phases.plan import _pass_gate
 
-    if args.client not in ADAPTERS:
-        print(f"✗ client không hỗ trợ: {args.client}", file=sys.stderr)
-        return EXIT_USAGE
     try:
         gates = parse_auto_approve(args.auto_approve)
     except ValueError as e:
         print(f"✗ {e}", file=sys.stderr)
         return EXIT_USAGE
 
-    adapter = ADAPTERS[args.client]()
-    if not adapter.available():
-        print(f"✗ chưa cài {args.client} trên máy này", file=sys.stderr)
-        return EXIT_NOT_READY
+    adapter, code = _client(args)
+    if adapter is None:
+        return code
 
     res = generate(
         args.project,

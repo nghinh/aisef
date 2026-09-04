@@ -62,8 +62,9 @@ DEFAULTS: dict[str, Any] = {
     "tools.test": "",
     "tools.lint": "",
     "tools.sast": "",
-    # sandbox
-    "sandbox.image": "alpine:latest",
+    # sandbox — ảnh rỗng nghĩa là tự chọn theo stack của dự án
+    "sandbox.image": "",
+    "sandbox.tools_network": False,
     "sandbox.allow_degraded": True,
 }
 
@@ -100,6 +101,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "tools.lint": str,
     "tools.sast": str,
     "sandbox.image": str,
+    "sandbox.tools_network": bool,
     "sandbox.allow_degraded": bool,
 }
 

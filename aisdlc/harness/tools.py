@@ -29,6 +29,31 @@ from ..config import Config
 from . import sandbox
 from .observe import EvidenceStore
 
+#: Ảnh sandbox theo stack. `alpine` không có node hay python, nên chạy
+#: `npm test` trong đó sẽ đỏ vì **thiếu công cụ**, không phải vì code sai —
+#: và một cổng báo đỏ vì lý do sai sẽ bị bỏ qua trong hai ngày.
+STACK_IMAGES: list[tuple[str, str]] = [
+    ("package.json", "node:22-alpine"),
+    ("pyproject.toml", "python:3.12-alpine"),
+    ("setup.py", "python:3.12-alpine"),
+    ("go.mod", "golang:1.23-alpine"),
+    ("Cargo.toml", "rust:1-alpine"),
+    ("composer.json", "php:8-cli-alpine"),
+    ("Gemfile", "ruby:3-alpine"),
+]
+
+
+def image_for(project: Path | str, config: Config | None = None) -> str:
+    """Ảnh sandbox: cấu hình thắng, rồi tới ảnh hợp stack, rồi mặc định."""
+    if config is not None and str(config.get("sandbox.image", "")).strip():
+        return str(config["sandbox.image"]).strip()
+    project = Path(project)
+    for marker, image in STACK_IMAGES:
+        if (project / marker).is_file():
+            return image
+    return sandbox.DEFAULT_IMAGE
+
+
 #: Lệnh mặc định theo dấu hiệu trong dự án. Cặp (test, lint, sast).
 _STACK_COMMANDS: list[tuple[str, dict[str, str]]] = [
     ("pyproject.toml", {"test": "pytest -q", "lint": "ruff check .", "sast": "bandit -q -r ."}),
@@ -162,12 +187,17 @@ def run_tool(
         return res
 
     argv = shlex.split(command) + (extra_args or [])
+    level = TOOLS[name].level
+    if cfg["sandbox.tools_network"] and level is not sandbox.Level.READ_ONLY:
+        # Dự án phải cài phụ thuộc trước khi chạy test được. Mở mạng là
+        # quyết định của dự án, khai tường minh, không phải mặc định.
+        level = sandbox.Level.WORKSPACE_NETWORK
     sb = sandbox.run(
         sandbox.SandboxSpec(
             workspace=project,
             cmd=argv,
-            level=TOOLS[name].level,
-            image=cfg["sandbox.image"],
+            level=level,
+            image=image_for(project, cfg),
             timeout_seconds=cfg["run.timeout_seconds"],
             allow_degraded=cfg["sandbox.allow_degraded"],
         )

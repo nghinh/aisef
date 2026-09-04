@@ -32,6 +32,7 @@ from ..control.approvals import GATE_ARTIFACTS, ApprovalStore, Gate, Status
 from ..control.bmad_status import HeadlessStatus, parse_headless_status
 from ..control.machine_gate import GateResult, check_prd
 from ..control.normalize import parse_prd_file
+from .implement import is_infrastructure_error
 
 ARTIFACT_ROOT = "_bmad-output"
 
@@ -134,6 +135,9 @@ class PhaseOutcome:
     cost_usd: float = 0.0
     duration_ms: int = 0
     error: str = ""
+    #: Số lần phải chạy lại vì lỗi hạ tầng (mạng, quá giờ) — không phải lỗi
+    #: chất lượng, nhưng vẫn tốn tiền nên phải hiện ra.
+    infra_retries: int = 0
     #: Chỉ có ở bước tách story.
     split: object = None
 
@@ -171,6 +175,8 @@ class PhaseOutcome:
             bits.append(f"{len(self.split.stories)} story")
         if self.machine_gate and not self.machine_gate.passed:
             bits.append(f"{len(self.machine_gate.errors)} lỗi cổng máy")
+        if self.infra_retries:
+            bits.append(f"{self.infra_retries} lần chạy lại vì lỗi hạ tầng")
         if self.cost_usd:
             bits.append(f"${self.cost_usd:.2f}")
         return " · ".join(bits)
@@ -257,21 +263,30 @@ def run_phase(
         out.error = f"thiếu đầu vào: {', '.join(missing_inputs)}"
         return out
 
-    result = client.run(
-        RunSpec(
-            prompt=build_prompt(phase),
-            workdir=project,
-            max_turns=config["run.max_turns"],
-            timeout_seconds=config["run.timeout_seconds"],
-        )
+    spec = RunSpec(
+        prompt=build_prompt(phase),
+        workdir=project,
+        max_turns=config["run.max_turns"],
+        timeout_seconds=config["run.timeout_seconds"],
     )
-    out.ran = True
-    out.cost_usd = result.cost_usd
-    out.duration_ms = result.duration_ms
 
-    if not result.ok:
-        out.error = result.error or "lượt chạy thất bại"
-        return out
+    # Lỗi hạ tầng thì thử lại, và **không** tính là pha thất bại: một lần
+    # đứt kết nối giữa chừng đã tiêu $2.69 mà không sinh ra gì, bỏ luôn thì
+    # lần chạy sau phải trả lại từ đầu.
+    budget = config["run.max_retries"] + 1
+    while True:
+        result = client.run(spec)
+        out.ran = True
+        out.cost_usd += result.cost_usd
+        out.duration_ms += result.duration_ms
+        if result.ok:
+            break
+        error = result.error or "lượt chạy thất bại"
+        budget -= 1
+        if budget <= 0 or not is_infrastructure_error(error):
+            out.error = error
+            return out
+        out.infra_retries += 1
 
     out.status = parse_headless_status(result.text)
 

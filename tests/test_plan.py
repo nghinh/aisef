@@ -222,7 +222,36 @@ class TestFailures(PlanTestCase):
         self.assertEqual(r.failed_at, "prd")
         self.assertIn("không thấy", r.outcomes[-1].error)
 
-    def test_run_failure_stops_the_pipeline(self):
+    def test_infrastructure_error_is_retried_not_abandoned(self):
+        """Một lần đứt kết nối đã tiêu tiền mà không sinh ra gì; bỏ luôn
+        thì lần chạy sau phải trả lại từ đầu."""
+
+        class Flaky(FakeClient):
+            def __init__(self):
+                super().__init__()
+                self.left = 1
+
+            def run(self, spec):
+                if self.left:
+                    self.left -= 1
+                    self.calls.append("hỏng")
+                    return RunResult(ok=False, error="api_error", cost_usd=0.5)
+                return super().run(spec)
+
+        c = Flaky()
+        r = self.run_plan(c)
+        self.assertEqual(r.waiting_on, Gate.PRD)
+        self.assertEqual(r.outcomes[0].infra_retries, 1)
+        self.assertAlmostEqual(r.outcomes[0].cost_usd, 1.75)  # cả lượt hỏng
+
+    def test_quality_failure_is_not_retried(self):
+        """Chạy lại một lượt đã hỏng vì nội dung chỉ tốn tiền lần nữa."""
+        c = FakeClient(skip={"project-context"})
+        r = self.run_plan(c)
+        self.assertEqual(r.failed_at, "project-context")
+        self.assertEqual(c.calls.count("project-context"), 1)
+
+    def test_run_failure_stops_after_the_budget(self):
         r = self.run_plan(FakeClient(fail={"project-context"}))
         self.assertEqual(r.failed_at, "project-context")
         self.assertIn("api_error", r.outcomes[-1].error)

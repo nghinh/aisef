@@ -16,6 +16,7 @@ from aisdlc.harness.observe import TOOL_RUN, EvidenceStore  # noqa: E402
 from aisdlc.harness.tools import (  # noqa: E402
     TOOLS,
     command_for,
+    image_for,
     describe_tools,
     detect_commands,
     run_tool,
@@ -77,6 +78,28 @@ class TestDetectCommands(ToolTestCase):
     def test_empty_config_value_falls_back_to_detection(self):
         self.write("pyproject.toml", "")
         self.assertEqual(command_for("test", self.project, self.cfg), "pytest -q")
+
+
+class TestSandboxImage(ToolTestCase):
+    """`alpine` không có node hay python: chạy `npm test` trong đó sẽ đỏ vì
+    **thiếu công cụ**, không phải vì code sai — và một cổng báo đỏ vì lý do
+    sai sẽ bị bỏ qua trong hai ngày."""
+
+    def test_image_follows_the_stack(self):
+        self.write("package.json", "{}")
+        self.assertEqual(image_for(self.project, self.cfg), "node:22-alpine")
+
+    def test_python_stack(self):
+        self.write("pyproject.toml", "")
+        self.assertEqual(image_for(self.project, self.cfg), "python:3.12-alpine")
+
+    def test_config_wins(self):
+        self.write("package.json", "{}")
+        cfg = Config({**DEFAULTS, "sandbox.image": "cong-ty/ci:2024"})
+        self.assertEqual(image_for(self.project, cfg), "cong-ty/ci:2024")
+
+    def test_unknown_stack_falls_back(self):
+        self.assertEqual(image_for(self.project, self.cfg), "alpine:latest")
 
 
 class TestRunTool(ToolTestCase):

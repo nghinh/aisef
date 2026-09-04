@@ -111,6 +111,8 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 | Bậc quyền | `READ_ONLY` → `WORKSPACE_WRITE` → `WORKSPACE_NETWORK` → `PRIVILEGED_TEST` |
 | Bộ thực thi | Docker: `--network=none` mặc định · `--cap-drop=ALL` · non-root · chỉ mount worktree của story |
 | Công cụ verify | chạy **trong image**, không cài lên máy host (giải quyết việc thiếu pytest/semgrep/trivy/k6) |
+| Ảnh | chọn theo stack dự án (`node:22-alpine`, `python:3.12-alpine`…), cấu hình đè được. `alpine` trơn không có công cụ nào, chạy `npm test` trong đó sẽ đỏ vì **thiếu công cụ** chứ không phải vì code sai — `doctor` cảnh báo đúng chỗ này |
+| Mạng cho tool | tắt mặc định; dự án cần cài phụ thuộc thì khai `sandbox.tools_network` tường minh |
 | Suy biến | Không có Docker → subprocess giới hạn + **ghi rõ mức bảo đảm thấp hơn** vào evidence |
 
 ### 5.4 Orchestration logic

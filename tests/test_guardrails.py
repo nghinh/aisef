@@ -19,6 +19,7 @@ from aisdlc.harness.guardrails import (  # noqa: E402
     check_completion,
     check_destructive,
     check_diff_scope,
+    effective_scope,
     check_git_stage,
     check_injection,
     check_secrets,
@@ -214,6 +215,33 @@ class TestDispatch(unittest.TestCase):
         """Claude Code coi mã 2 là chặn (kiểm chứng ở spike S2)."""
         self.assertEqual(run_guard("git-stage", {"tool_input": {"command": "git add -A"}}).exit_code, 2)
         self.assertEqual(run_guard("git-stage", {"tool_input": {"command": "git status"}}).exit_code, 0)
+
+
+class TestEffectiveScope(unittest.TestCase):
+    """Ngoài story vẫn phải có phạm vi — nếu không, guard chặn cả BMAD ghi
+    PRD, và cách duy nhất để chạy tiếp là tắt guard ở nửa đầu vòng đời."""
+
+    def test_planning_scope_when_no_story(self):
+        scope = effective_scope({})
+        self.assertIn("_bmad-output", scope)
+        self.assertTrue(check_write_scope("_bmad-output/prd.md", scope).allowed)
+
+    def test_planning_scope_still_blocks_source_code(self):
+        self.assertFalse(
+            check_write_scope("src/app.ts", effective_scope({})).allowed
+        )
+
+    def test_story_without_declared_scope_still_blocks(self):
+        """Quên truyền biến môi trường không được biến guard thành đồ
+        trang trí."""
+        scope = effective_scope({ENV_STORY_ID: "S-01"})
+        self.assertEqual(scope, [])
+        self.assertFalse(check_write_scope("_bmad-output/prd.md", scope).allowed)
+
+    def test_declared_scope_wins(self):
+        self.assertEqual(
+            effective_scope({ENV_WRITE_SCOPE: "src/a, src/b"}), ["src/a", "src/b"]
+        )
 
 
 class TestDiffScope(unittest.TestCase):

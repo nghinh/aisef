@@ -27,6 +27,11 @@ from .observe import TOOL_RUN
 ENV_WRITE_SCOPE = "AISDLC_WRITE_SCOPE"
 ENV_STORY_ID = "AISDLC_STORY_ID"
 
+#: Phạm vi ghi khi **không** ở trong một story: các pha lập kế hoạch và
+#: dựng mockup. Chúng có phạm vi cố định và biết trước, nên guard vẫn có
+#: nghĩa — thay vì phải tắt đi ở nửa vòng đời.
+PLANNING_SCOPE = ("_bmad-output", "docs")
+
 
 @dataclass(frozen=True)
 class Verdict:
@@ -350,6 +355,23 @@ def story_from_env(env: dict[str, str] | None = None) -> str:
     return (env or os.environ).get(ENV_STORY_ID, "")
 
 
+def effective_scope(env: dict[str, str] | None = None) -> list[str]:
+    """Phạm vi ghi đang có hiệu lực.
+
+    Trong một story: đúng phạm vi story khai, và **rỗng thì chặn** — quên
+    truyền biến môi trường không được biến guard thành đồ trang trí.
+
+    Ngoài story (pha lập kế hoạch, dựng mockup): phạm vi cố định của
+    framework. Không có nhánh này thì guard chặn cả BMAD ghi PRD, và cách
+    duy nhất để chạy tiếp là tắt guard ở nửa đầu vòng đời — nửa mà tài
+    liệu quyết định mọi thứ phía sau.
+    """
+    scope = scope_from_env(env)
+    if scope or story_from_env(env):
+        return scope
+    return list(PLANNING_SCOPE)
+
+
 def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
               project_root: str = "", artifact_root: str = "") -> Verdict:
     """Chạy một guard trên sự kiện hook của client.
@@ -364,7 +386,9 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
     command = str(tool_input.get("command") or "")
 
     if kind == "write-scope":
-        return check_write_scope(file_path, scope_from_env(env), project_root=project_root)
+        return check_write_scope(
+            file_path, effective_scope(env), project_root=project_root
+        )
     if kind == "secret":
         return check_secrets(content)
     if kind == "injection":
