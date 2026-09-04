@@ -261,6 +261,19 @@ class TestMockupCommand(CliTestCase):
         self.assertIn("chưa chốt", out)      # tim-kiem cố ý còn OQ-4
 
 
+class TestStatusExitCode(CliTestCase):
+    def test_failed_story_makes_status_not_ready(self):
+        """Một story trượt cổng mà lệnh trả 0 thì CI báo xanh trên một
+        sprint đang hỏng."""
+        store = StateStore(self.artifacts)
+        store.register("S-01", "E-01")
+        store.transition("S-01", StoryStatus.RUNNING)
+        store.transition("S-01", StoryStatus.FAILED, reason="cổng không đạt")
+        code, out, _ = self.run_cli("status")
+        self.assertEqual(code, EXIT_NOT_READY)
+        self.assertIn("cổng không đạt", out)
+
+
 class TestPlan(CliTestCase):
     """Chỉ kiểm phần kiểm đầu vào — chạy pipeline thật tốn tiền, đã kiểm
     riêng bằng client giả trong `test_plan.py`."""

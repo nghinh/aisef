@@ -351,11 +351,13 @@ def cmd_status(args) -> int:
         for r in sorted(outliers, key=lambda r: -r.cost_usd)[:5]:
             print(f"    {r.id:16} ${r.cost_usd:.2f}")
 
-    blocked = state.by_status(StoryStatus.BLOCKED)
-    if blocked:
-        print(f"\n✗ {len(blocked)} story bị chặn:")
-        for r in blocked[:10]:
-            print(f"    {r.id:16} {r.blocked_reason or '(không rõ lý do)'}")
+    # `failed` cũng là chưa sẵn sàng, không chỉ `blocked`: một story trượt
+    # cổng mà lệnh trả 0 thì CI báo xanh trên một sprint đang hỏng.
+    stuck = state.by_status(StoryStatus.BLOCKED) + state.by_status(StoryStatus.FAILED)
+    if stuck:
+        print(f"\n✗ {len(stuck)} story chưa qua được:")
+        for r in stuck[:10]:
+            print(f"    {r.id:16} {r.status:8} {r.blocked_reason or '(không rõ lý do)'}")
         return EXIT_NOT_READY
     return EXIT_OK
 
