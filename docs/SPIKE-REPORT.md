@@ -9,7 +9,7 @@
 | S2 Hook chặn trên Claude CLI | ✅ **XONG** | Chặn thật; agent không lách; `acceptEdits` cũng không vượt được |
 | S7 Đối chiếu mockup | ✅ **XONG** | `ariaSnapshot()` cho đối chiếu tất định |
 | S3 Hook trên Claude Desktop | ✅ **XONG** | Desktop đọc `.claude/settings.json` của dự án, **ngay, không cần restart** |
-| S4 OpenCode CLI + Desktop | ⚠️ **CHƯA KẾT LUẬN** | Cơ chế `tool.execute.before` có thật; provider quá chậm để chạy xong ca thử |
+| S4 OpenCode CLI + Desktop | ⚠️ **CHƯA KẾT LUẬN → đã quyết** | Cơ chế `tool.execute.before` có thật; provider quá chậm để chạy xong ca thử. **Quyết định của chủ đầu tư: chấp nhận OpenCode ở mức hậu kiểm** — plugin vẫn sinh, `aisdlc verify` chạy lại guard trên diff, `compile-report.json` ghi `blocks_at_source: false` |
 | S5 Worktree + sandbox Docker | ✅ **XONG** | Cô lập đủ ba mặt: git, file, mạng |
 | S6 BMAD qua CLI | ✅ **XONG** | Chạy được; BMAD có sẵn **headless mode** trả JSON có schema |
 
@@ -251,4 +251,4 @@ Một hạng mục còn treo (S4/OpenCode) và nó **không chặn** GĐ-1 → G
 | S6 | GĐ-4 dùng **BMAD headless JSON** làm giao diện, không parse markdown mò |
 | S6 | `open_questions[]` trở thành checklist tự sinh của cổng người duyệt |
 | S1 | Ước tính chi phí lại: ~$0.36/phiên chỉ riêng nạp ngữ cảnh nền |
-| S4 | Thêm việc "chạy lại S4 với provider trực tiếp" vào đầu GĐ-3 |
+| S4 | ~~Chạy lại với provider trực tiếp~~ → **đã quyết: chấp nhận mức hậu kiểm**. Năng lực được khai `POST_HOC` trong adapter, và mọi báo cáo compile đều nói rõ mức bảo đảm thấp hơn |
