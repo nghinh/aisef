@@ -473,15 +473,28 @@ def security_review(
     return parse_security(result.text)
 
 
+#: Mở đầu mục chặn thường.
+_BLOCK_TAGS = ("[chặn]", "[blocker]", "[block]")
+#: Mở đầu mục **bế tắc**: người rà soát đã kiểm chứng rằng tiêu chí không
+#: thoả được từ trong phạm vi story. Hai model độc lập cùng kết luận
+#: story sai — thử tiếp là đốt tiền vào chỗ không có lối ra.
+_STUCK_TAGS = ("[bế tắc]", "[be tac]", "[stuck]", "[blocked-by-plan]")
+
+
 def blocking_findings(text: str) -> list[str]:
-    """Lọc mục `[chặn]` khỏi báo cáo rà soát."""
+    """Lọc mục `[chặn]` và `[bế tắc]` khỏi báo cáo rà soát."""
     out = []
     for line in (text or "").splitlines():
         stripped = line.strip().lstrip("-*• ").strip()
         low = stripped.lower()
-        if low.startswith("[chặn]") or low.startswith("[blocker]") or low.startswith("[block]"):
+        if low.startswith(_BLOCK_TAGS) or low.startswith(_STUCK_TAGS):
             out.append(stripped)
     return out
+
+
+def plan_defects(findings: list[str]) -> list[str]:
+    """Mục người rà soát đánh dấu là bế tắc do kế hoạch, không do code."""
+    return [f for f in findings if f.strip().lower().startswith(_STUCK_TAGS)]
 
 
 def _head_of(repo: Path) -> str:
@@ -682,6 +695,19 @@ def implement_story(
                 outcome.blocked_reason = f"lỗi hạ tầng lặp lại: {attempt.error}"
                 return outcome
             continue  # không tính vào hạn mức chất lượng
+
+        # Người rà soát đã **tự kiểm chứng** rằng tiêu chí không thoả được
+        # từ trong phạm vi story. Hai model độc lập cùng kết luận story
+        # sai; lượt thứ ba sẽ nhận cùng ngữ cảnh và cho cùng kết quả.
+        loi_ke_hoach = plan_defects(attempt.review_findings)
+        if loi_ke_hoach:
+            outcome.blocked_reason = (
+                "bế tắc do kế hoạch, người rà soát đã kiểm chứng: "
+                + "; ".join(loi_ke_hoach[:2])
+                + ". Sửa tiêu chí chấp nhận hoặc write_scope của story rồi "
+                "chạy lại — thử tiếp không gỡ được."
+            )
+            return outcome
 
         van = deadlock_reason(outcome.attempts, effective_write_scope(story, project))
         if van:

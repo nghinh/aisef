@@ -1,6 +1,6 @@
 ---
 name: story-review
-version: 2
+version: 3
 role: reviewer
 ---
 # Rà soát {{ story_id }} — {{ story_title }}
@@ -40,6 +40,28 @@ Không sửa code. Chỉ báo cáo.
    cần làm gì không.
 6. **Bảo mật** — dữ liệu từ người dùng đi tới đâu, có được kiểm ở biên tin
    cậy không.
+
+## Hai thứ **không** thuộc phần bạn chấm
+
+**Loại kiểm định dự án chưa cấu hình.** Story khai nó phải qua `e2e` hay
+`accessibility` mà dự án chưa cấu hình công cụ — đó là chỗ trống của dự
+án, harness đã ghi ra rồi. Chặn story vì nó là chặn người viết vì một
+việc họ không làm được, và story ấy không bao giờ qua nổi.
+
+**Tiêu chí không thoả được từ trong phạm vi story.** Nếu người viết đã
+khai một tiêu chí không thoả được — vì thứ cần sửa nằm ngoài `write_scope`,
+hoặc vì hai tiêu chí đá nhau — thì việc của bạn là **kiểm chứng lời khai
+đó**, không phải chặn họ lần nữa. Lời khai đúng thì mở đầu dòng bằng
+`[bế tắc]` thay vì `[chặn]`:
+
+```
+[bế tắc] TCCN 1 — cần chỉ mục trên `updatedAt` trong `src/store/db.ts`,
+         nằm ngoài write_scope của story. Đã kiểm chứng: đúng.
+```
+
+`[bế tắc]` dừng vòng lặp ngay và đưa việc cho người, thay vì đốt hết lượt
+thử vào một chỗ không có lối ra. Chỉ dùng khi bạn đã **tự kiểm chứng**,
+không phải khi chỉ thấy người viết nói thế.
 
 ## Trả về
 

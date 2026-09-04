@@ -271,6 +271,31 @@ class TestRetry(ImplementTestCase):
         self.assertEqual(out.quality_attempts, 2, "phải dừng ở lượt 2, không chạy tới 6")
         self.assertIn("không nằm trong write_scope", out.blocked_reason)
 
+    def test_be_tac_do_ke_hoach_thi_dung_ngay_o_luot_dau(self):
+        """Hai model độc lập cùng kết luận story sai thì thử tiếp là đốt
+        tiền vào chỗ không có lối ra.
+
+        Đo trên e9, STORY-01-04: người viết khai TCCN 1 không thoả được
+        (cần chỉ mục trong `src/store/db.ts`, ngoài phạm vi), người rà
+        soát xác nhận "lời khai ĐÚNG SỰ THẬT, đã kiểm chứng" — rồi vòng
+        lặp vẫn chạy thêm hai lượt nữa. Bốn lượt, $49,12 cho một story.
+        """
+        c = ScriptedClient(review=(
+            "[bế tắc] TCCN 1 — cần chỉ mục trên `updatedAt` trong "
+            "`src/store/db.ts`, ngoài write_scope. Đã kiểm chứng: đúng."
+        ))
+        out = self.implement(c, config=self.config(**{"run.max_retries": 5}))
+        self.assertEqual(out.quality_attempts, 1, "phải dừng ngay lượt đầu")
+        self.assertIn("bế tắc do kế hoạch", out.blocked_reason)
+        self.assertIn("src/store/db.ts", out.blocked_reason)
+
+    def test_muc_chan_thuong_van_duoc_thu_lai(self):
+        """`[chặn]` là lỗi code — sửa được, nên vẫn thử tiếp."""
+        c = ScriptedClient(review="[chặn] src/a.py:1 — quên xử lý null")
+        out = self.implement(c, config=self.config(**{"run.max_retries": 2}))
+        self.assertGreater(out.quality_attempts, 1)
+        self.assertNotIn("bế tắc do kế hoạch", out.blocked_reason)
+
     def test_lap_lai_trong_pham_vi_la_chua_sua_khong_phai_khong_sua_duoc(self):
         """Mục chặn lặp lại nhưng tệp nằm trong phạm vi thì vẫn thử tiếp.
 
