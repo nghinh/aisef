@@ -230,6 +230,13 @@ _META_ITEM = re.compile(
     re.MULTILINE | re.IGNORECASE,
 )
 _STORY_REF = re.compile(r"\b(\d+)\.(\d+)\b")
+#: Dòng bản đồ phủ nói rõ **không** có story. Bỏ qua chúng: dòng thật của
+#: BMAD là "FR-13 → KHÔNG CÓ STORY. … Khớp nối AR-18 ở Story 1.2", và nếu
+#: chỉ nhìn "có mã FR + có số hiệu story" thì FR-13 bị gán cho story 1.2 —
+#: rồi cổng máy chặn cả tập story vì một câu văn xuôi.
+_NO_STORY = re.compile(
+    r"(không có story|chưa có story|no story|ngoài phạm vi|out of scope|n/a)", re.I
+)
 _ROLE_LINE = re.compile(
     r"^\s*(?:As an?|Tôi là)\s+(.+?),?\s*$\n"
     r"^\s*(?:I want|Tôi muốn)\s+(.+?),?\s*$\n"
@@ -392,7 +399,7 @@ def _parse_coverage_map(text: str) -> dict[str, list[str]]:
     mapping: dict[str, list[str]] = {}
     for line in section.splitlines():
         frs = _expand_fr_refs(line)
-        if not frs:
+        if not frs or _NO_STORY.search(line):
             continue
         refs = [story_id(a, b) for a, b in _STORY_REF.findall(line)]
         for fr in frs:

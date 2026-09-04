@@ -70,6 +70,23 @@ class TestParseEpics(unittest.TestCase):
     def test_coverage_map_read(self):
         self.assertEqual(self.plan.coverage_map["FR-7"], ["STORY-02-02"])
 
+    def test_no_story_lines_are_not_a_mapping(self):
+        """Dòng thật của BMAD: "FR-13 → KHÔNG CÓ STORY. … Khớp nối AR-18 ở
+        Story 1.2". Chỉ nhìn "có mã FR + có số hiệu story" thì FR-13 bị gán
+        cho story 1.2, rồi cổng máy chặn cả tập story vì một câu văn xuôi."""
+        text = (
+            "## FR Coverage Map\n\n"
+            "FR-1 → Story 1.1\n"
+            "FR-13 → KHÔNG CÓ STORY. Ngoài phạm vi MVP, chặn bởi OQ-1. "
+            "Khớp nối AR-18 ở Story 1.2.\n\n"
+            "## Epic 1: X\n\n### Story 1.1: A\n\n**Acceptance Criteria:**\n- a\n\n"
+            "### Story 1.2: B\n\n**Acceptance Criteria:**\n- b\n"
+        )
+        plan = parse_epics(text)
+        self.assertEqual(plan.coverage_map.get("FR-1"), ["STORY-01-01"])
+        self.assertIsNone(plan.coverage_map.get("FR-13"))
+        self.assertEqual(plan.by_id("STORY-01-02").covers, [])
+
     def test_coverage_map_fills_missing_covers(self):
         """Story quên khai `covers` vẫn truy được FR nhờ bản đồ phủ."""
         text = (FIX / "epics.md").read_text(encoding="utf-8")
