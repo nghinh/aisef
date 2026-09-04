@@ -318,8 +318,15 @@ Bốn lỗi thật chỉ lộ ra khi chạy thật, đã sửa:
     cũ. Lộ ra khi dựng lại mockup mất $2.56 mà vẫn theo quy ước cũ. `doctor`
     nay so bản sao với bản gốc.
 
-Đây chính là giá trị của việc chạy thật: mười hai lỗi trên đều **không** lộ
-ra trong 757 test, vì test nào cũng dựng sẵn đúng điều kiện mà thực tế
+13. **Ràng buộc nhập liệu lấy cả trang** — một ô tìm kiếm dựng lại ở 11
+    trạng thái thành 11 ràng buộc giống hệt nhau; người đọc hợp đồng không
+    biết đó là một hay mười một ô.
+14. **Tạo tác của công cụ bị tính vào diff** — agent mở trình duyệt để xem
+    trang thì Playwright MCP để lại `.playwright-mcp/` ở gốc worktree; mở
+    trình duyệt một lần là trượt cổng phạm vi.
+
+Đây chính là giá trị của việc chạy thật: mười bốn lỗi trên đều **không** lộ
+ra trong 760 test, vì test nào cũng dựng sẵn đúng điều kiện mà thực tế
 không tự có.
 
 ### Chạy thật — dựng mockup 5 màn hình
