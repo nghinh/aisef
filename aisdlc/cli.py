@@ -124,16 +124,29 @@ def cmd_doctor(args) -> int:
     lines.append("Dự án:")
     check("thư mục dự án", project.is_dir(), str(project))
     try:
-        image = image_for(project, Config.load(project))
+        cfg_for_sandbox = Config.load(project)
+        image = image_for(project, cfg_for_sandbox)
+        use_docker = cfg_for_sandbox["sandbox.use_docker"]
     except ConfigError:
-        image = "?"
-    check(
-        "ảnh sandbox",
-        image != "alpine:latest",
-        image + (" — không có công cụ của stack nào, test sẽ đỏ vì thiếu công cụ"
-                 if image == "alpine:latest" else " (hợp stack)"),
-        required=False,
-    )
+        image, use_docker = "?", True
+    if not use_docker:
+        # Đã tắt Docker thì bàn về ảnh là vô nghĩa; thứ người cần biết là
+        # công cụ chạy thẳng trên máy, tức mức bảo đảm thấp hơn.
+        check(
+            "cách ly sandbox",
+            False,
+            "đã tắt Docker (sandbox.use_docker=false) — công cụ chạy thẳng "
+            "trên máy, bằng chứng ghi degraded",
+            required=False,
+        )
+    else:
+        check(
+            "ảnh sandbox",
+            image != "alpine:latest",
+            image + (" — không có công cụ của stack nào, test sẽ đỏ vì thiếu công cụ"
+                     if image == "alpine:latest" else " (hợp stack)"),
+            required=False,
+        )
     req = project / "docs" / "requirements.md"
     check("docs/requirements.md", req.is_file(), str(req))
 
