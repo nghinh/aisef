@@ -196,14 +196,49 @@ def check_destructive(command: str) -> Verdict:
 
 # ------------------------------------------------------------ tiêm mã
 
+#: Mỗi rủi ro có **hai** mẫu, một cho mỗi họ ngôn ngữ framework gặp thật.
+#: Guard chỉ biết mẫu Python thì trên dự án TypeScript nó có mặt mà không
+#: bao giờ nổ — cùng loại sai với "chưa cấu hình bị đếm là đạt", và tệ hơn
+#: vì báo cáo vẫn ghi "7 guard đã nối".
+#:
+#: Tách theo họ chứ không gộp một mẫu chung, vì dấu hiệu nội suy khác nhau
+#: và gộp lại thì chúng bắt chéo nhau: `{` chỉ có nghĩa nội suy khi chuỗi
+#: có tiền tố `f` của Python, còn trong JS nó là object tuỳ chọn — mẫu gộp
+#: chặn oan `execFileSync('git', ['ls-files'], { cwd })`, đúng dạng **an
+#: toàn** mà guard lẽ ra phải khuyến khích.
+#:
+#: Chỗ khó riêng của JS là `exec(`: `re.exec(s)` của RegExp phổ biến hơn
+#: nhiều so với `child_process.exec`. Phân biệt bằng **đối số**: chỉ nổ khi
+#: ngay sau ngoặc là chuỗi hoặc template. `re.exec(bien)` truyền biến nên
+#: không dính; đổi lại bỏ sót `exec(chuoi_da_ghep_san)` — thà bỏ sót còn
+#: hơn chặn oan mọi lần dùng biểu thức chính quy.
+_SQL = r"\b(select|insert|update|delete)\b"
+_SHELL_PY = r"os\.system|subprocess\.\w+|commands\.getoutput"
+_SHELL_JS = (
+    r"execSync|execFileSync|spawnSync|child_process\.\w+|\bexec|\bspawn"
+)
+
 INJECTION_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("nối chuỗi vào câu SQL", re.compile(
-        r"""(?i)(execute|query|cursor\.execute|db\.raw)\s*\(\s*f?['"].*\b"""
-        r"""(select|insert|update|delete)\b.*(\{|\+|%s\s*%|\$\{)"""
+        rf"""(?i)(execute|query|cursor\.execute|\braw|prepare)\s*\("""
+        rf"""\s*f['"].*{_SQL}.*\{{"""
     )),
-    ("chèn HTML thô", re.compile(r"dangerouslySetInnerHTML|\.innerHTML\s*=")),
+    ("nối chuỗi vào câu SQL", re.compile(
+        rf"""(?i)(execute|query|\braw|prepare)\s*\(\s*['"`].*{_SQL}"""
+        rf""".*(\$\{{|\+|%s\s*%)"""
+    )),
+    ("chèn HTML thô", re.compile(
+        r"dangerouslySetInnerHTML|\.(inner|outer)HTML\s*=|"
+        r"\.insertAdjacentHTML\s*\(|document\.write(ln)?\s*\("
+    )),
     ("shell với chuỗi ghép", re.compile(
-        r"(?i)(os\.system|subprocess\.\w+)\s*\(\s*f?['\"].*(\{|\+)"
+        rf"""(?i)({_SHELL_PY})\s*\(\s*(f['"].*\{{|['"].*\+)"""
+    )),
+    ("shell với chuỗi ghép", re.compile(
+        rf"""(?i)({_SHELL_JS})\s*\(\s*['"`].*(\$\{{|\+)"""
+    )),
+    ("dựng mã từ chuỗi ghép", re.compile(
+        r"""(?i)(\beval|new\s+Function)\s*\(\s*(f['"].*\{|['"`].*(\$\{|\+))"""
     )),
 ]
 

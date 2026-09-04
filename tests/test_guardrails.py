@@ -169,6 +169,49 @@ class TestInjection(unittest.TestCase):
     def test_subprocess_list_allowed(self):
         self.assertTrue(check_injection('subprocess.run(["rm", path])').allowed)
 
+    def test_no_ts_thi_guard_cung_phai_no(self):
+        """Guard chỉ biết mẫu Python thì trên dự án TypeScript nó có mặt mà
+        không bao giờ nổ — và báo cáo vẫn ghi "7 guard đã nối".
+        """
+        for code in (
+            "execSync(`rm -rf ${dir}`)",
+            "exec(`git checkout ${branch}`)",
+            'child_process.exec("ls " + dir)',
+            "spawn(`sh -c ${cmd}`)",
+            "db.query(`SELECT * FROM notes WHERE id = ${id}`)",
+            "knex.raw(`select * from t where a=${a}`)",
+            'conn.execute("DELETE FROM t WHERE k=" + k)',
+            "el.outerHTML = user",
+            'el.insertAdjacentHTML("beforeend", html)',
+            "document.write(x)",
+            "eval(`return ${expr}`)",
+            "new Function(`return ${e}`)",
+        ):
+            with self.subTest(code=code):
+                self.assertFalse(check_injection(code).allowed)
+
+    def test_ts_dung_dan_khong_bi_chan_oan(self):
+        """Chặn oan đắt ngang bỏ sót: mỗi lần chặn tốn nguyên một lượt model.
+
+        `execFileSync` với đối số dạng mảng là dạng **an toàn** — nó không
+        đi qua shell. Mẫu gộp chung hai họ ngôn ngữ chặn đúng nó, vì `{`
+        của object tuỳ chọn bị đọc thành nội suy f-string.
+        """
+        for code in (
+            r"const m = /^(\w+)-(\d+)$/.exec(id)",
+            "if (RE_TAG.exec(line)) return true",
+            'execFileSync("git", ["ls-files", "--", "package-lock.json"], { cwd: root })',
+            'execFileSync("npx", ["vite", "build", "--outDir", out], { stdio: "inherit" })',
+            'const rows = await db.query("SELECT * FROM notes WHERE id = $1", [id])',
+            "const q = sql`select * from notes where id = ${id}`",
+            "console.log(`đã lưu ${n} ghi chú`)",
+            "const p = spawn(cmd, args)",
+            "el.textContent = user",
+            'const cls = `flex ${active ? "on" : "off"}`',
+        ):
+            with self.subTest(code=code):
+                self.assertTrue(check_injection(code).allowed, code)
+
 
 class TestChangedFilesBase(unittest.TestCase):
     """Agent tự commit thì cổng vẫn phải thấy công việc.
