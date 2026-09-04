@@ -23,6 +23,7 @@ from ..control.design_contract import CONTRACT_FILE, DesignContract, build
 from ..control.experience import Experience, Screen, parse_experience_file
 from ..control.machine_gate import GateResult, check_design_contract
 from ..harness import browser
+from ..harness.observe import EvidenceStore
 from ..harness.prompts import load_catalog
 
 MOCKUP_DIR = "mockups"
@@ -154,6 +155,7 @@ def generate(
             )
         )
         res.cost_usd += run.cost_usd
+        EvidenceStore(root).agent_run(f"mockup-{screen.id}", run, name=screen.id)
         if not run.ok:
             res.failed[screen.id] = run.error or "lượt chạy thất bại"
             continue

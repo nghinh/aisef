@@ -37,12 +37,17 @@ class Row:
         return bool(self.stories)
 
 
+#: Bằng chứng không thuộc về story nào: pha lập kế hoạch và dựng mockup.
+PHASE_PREFIXES = ("plan-", "mockup-")
+
+
 @dataclass
 class Report:
     project: str = ""
     traceability: list[Row] = field(default_factory=list)
     gates: list[tuple[str, str, str]] = field(default_factory=list)
     stories: list[dict] = field(default_factory=list)
+    phases: list[dict] = field(default_factory=list)
     harness: dict[str, str] = field(default_factory=dict)
     total_cost_usd: float = 0.0
 
@@ -83,6 +88,17 @@ class Report:
                 f"| {s['id']} | {s['status']} | {s['runs']} | ${s['cost']:.2f} | "
                 f"{s['duration_ms'] / 1000:.0f}s | {s['mockup']} |"
             )
+        if self.phases:
+            lines += [
+                "", "### Chi phí lập kế hoạch và mockup", "",
+                "| Pha | Lượt | Chi phí | Thời gian |", "|---|---|---|---|",
+            ]
+            for ph in self.phases:
+                lines.append(
+                    f"| {ph['id']} | {ph['runs']} | ${ph['cost']:.2f} | "
+                    f"{ph['duration_ms'] / 1000:.0f}s |"
+                )
+
         lines += ["", f"**Tổng chi phí:** ${self.total_cost_usd:.2f}"]
 
         lines += ["", "## 4. Sáu nhóm harness", "", "| Nhóm | Bằng chứng |", "|---|---|"]
@@ -129,7 +145,19 @@ def build(project: Path | str) -> Report:
         )
 
     state = StateStore(root).load()
-    for sid in sorted(set(list(state.stories) + evidence.stories())):
+    for sid in sorted(evidence.stories()):
+        if not sid.startswith(PHASE_PREFIXES):
+            continue
+        ev = evidence.read(sid)
+        report.phases.append({
+            "id": sid,
+            "runs": len(ev.of(AGENT_RUN)),
+            "cost": ev.total_cost_usd,
+            "duration_ms": ev.total_duration_ms,
+        })
+
+    story_ids = [s for s in evidence.stories() if not s.startswith(PHASE_PREFIXES)]
+    for sid in sorted(set(list(state.stories) + story_ids)):
         ev = evidence.read(sid)
         maps = ev.of(MOCKUP_MAP)
         mockup = "—"
@@ -144,7 +172,9 @@ def build(project: Path | str) -> Report:
             "duration_ms": ev.total_duration_ms,
             "mockup": mockup,
         })
-    report.total_cost_usd = sum(s["cost"] for s in report.stories)
+    report.total_cost_usd = sum(s["cost"] for s in report.stories) + sum(
+        p["cost"] for p in report.phases
+    )
     report.harness = _harness_evidence(project, root, evidence)
     return report
 
@@ -163,7 +193,7 @@ def _harness_evidence(project: Path, root: Path, evidence: EvidenceStore) -> dic
     """Sáu nhóm harness — mỗi nhóm phải chỉ ra được một artifact có thật."""
     from ..harness.prompts import load_catalog
 
-    any_story = evidence.stories()
+    any_story = [s for s in evidence.stories() if not s.startswith(PHASE_PREFIXES)]
     ev = evidence.read(any_story[0]) if any_story else None
 
     def yes(cond, proof, missing="chưa có bằng chứng"):

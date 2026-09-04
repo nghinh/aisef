@@ -100,6 +100,30 @@ class TestOperations(ReportTestCase):
         self.assertEqual(rows["STORY-01-02"], "—")
 
 
+class TestPlanningCost(ReportTestCase):
+    def test_planning_runs_are_not_stories(self):
+        """Chỉ ghi chi phí story thì tổng thiếu mất phần đắt nhất của
+        những dự án nhỏ — lập kế hoạch tốn $7.92 trong lượt chạy thật."""
+        store = EvidenceStore(self.artifacts)
+        store.record("plan-prd", Event(kind="agent_run", cost_usd=1.88))
+        store.record("mockup-danh-sach", Event(kind="agent_run", cost_usd=0.4))
+        store.record("STORY-01-01", Event(kind="agent_run", cost_usd=1.0))
+
+        report = build(self.project)
+        self.assertEqual([s["id"] for s in report.stories], ["STORY-01-01"])
+        self.assertEqual(sorted(p["id"] for p in report.phases),
+                         ["mockup-danh-sach", "plan-prd"])
+        self.assertAlmostEqual(report.total_cost_usd, 3.28)
+
+    def test_phase_table_in_the_markdown(self):
+        EvidenceStore(self.artifacts).record("plan-ux", Event(kind="agent_run", cost_usd=3.71))
+        self.assertIn("Chi phí lập kế hoạch", build(self.project).markdown())
+
+    def test_planning_runs_do_not_count_as_harness_story_evidence(self):
+        EvidenceStore(self.artifacts).record("plan-ux", Event(kind="agent_run", cost_usd=1.0))
+        self.assertIn("chưa có bằng chứng", build(self.project).harness["2 Tool"])
+
+
 class TestHarnessEvidence(ReportTestCase):
     def test_missing_evidence_is_said_plainly(self):
         harness = build(self.project).harness

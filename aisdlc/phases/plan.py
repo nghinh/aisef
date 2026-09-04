@@ -31,6 +31,7 @@ from ..config import Config
 from ..control.approvals import GATE_ARTIFACTS, ApprovalStore, Gate, Status
 from ..control.bmad_status import HeadlessStatus, parse_headless_status
 from ..control.machine_gate import GateResult, check_prd
+from ..harness.observe import EvidenceStore
 from ..control.normalize import parse_prd_file
 from .implement import is_infrastructure_error
 
@@ -274,11 +275,16 @@ def run_phase(
     # đứt kết nối giữa chừng đã tiêu $2.69 mà không sinh ra gì, bỏ luôn thì
     # lần chạy sau phải trả lại từ đầu.
     budget = config["run.max_retries"] + 1
+    evidence = EvidenceStore(project / ARTIFACT_ROOT)
     while True:
         result = client.run(spec)
         out.ran = True
         out.cost_usd += result.cost_usd
         out.duration_ms += result.duration_ms
+        # Chi phí lập kế hoạch cũng là chi phí. Chỉ ghi chi phí story thì
+        # tổng trong báo cáo nghiệm thu thiếu mất phần đắt nhất của những
+        # dự án nhỏ.
+        evidence.agent_run(f"plan-{phase.id}", result, name=phase.id)
         if result.ok:
             break
         error = result.error or "lượt chạy thất bại"
