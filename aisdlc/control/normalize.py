@@ -73,6 +73,57 @@ class OpenQuestion:
     blocks: list[str] = field(default_factory=list)
 
 
+#: Lockfile đi theo manifest của nó. Trình quản lý gói ghi lockfile như
+#: **hệ quả** của mọi thay đổi phụ thuộc — khai manifest mà không khai
+#: lockfile là khai nửa một cặp bất khả phân.
+#:
+#: Đo trên e9: TCCN 1 của STORY-01-01 đòi "lockfile được commit", nhưng
+#: `write_scope` chỉ có `package.json`. Guard chặn ghi lockfile, agent làm
+#: đúng chỉ dẫn — hoàn nguyên nó rồi báo phạm vi khai thiếu — người rà
+#: soát chặn đúng vì TCCN 1 không đạt, và vòng lặp thử lại 4 lần y hệt
+#: nhau, $9,85 cho một thế bí không lối ra.
+LOCKFILES: dict[str, tuple[str, ...]] = {
+    "package.json": ("package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lockb"),
+    "pyproject.toml": ("poetry.lock", "uv.lock", "pdm.lock"),
+    "requirements.in": ("requirements.txt",),
+    "Cargo.toml": ("Cargo.lock",),
+    "go.mod": ("go.sum",),
+    "Gemfile": ("Gemfile.lock",),
+    "composer.json": ("composer.lock",),
+}
+
+
+def is_lockfile(path: str) -> bool:
+    """Đường dẫn này là lockfile do `with_lockfiles` thêm vào?
+
+    Ngưỡng "story chạm quá nhiều nơi" đo **story tự khai to tới đâu**.
+    Lockfile là hệ quả tự động của manifest, nên đếm chúng vào ngưỡng sẽ
+    biến một bản vá đúng thành lỗi cổng.
+    """
+    name = path.rstrip("/").rsplit("/", 1)[-1]
+    return any(name in locks for locks in LOCKFILES.values())
+
+
+def with_lockfiles(scope: list[str]) -> list[str]:
+    """Thêm lockfile của mọi manifest có trong phạm vi.
+
+    Thêm **cả họ** lockfile của manifest đó chứ không đoán trình quản lý
+    gói đang dùng: thừa một đường dẫn trong phạm vi không nới lỏng gì đáng
+    kể — file không tồn tại thì không ai ghi được — còn đoán sai thì story
+    lại bí đúng như cũ.
+    """
+    have = set(scope)
+    out = list(scope)
+    for path in scope:
+        name = path.rstrip("/").rsplit("/", 1)[-1]
+        prefix = path[: len(path) - len(name)]
+        for lock in LOCKFILES.get(name, ()):
+            if prefix + lock not in have:
+                have.add(prefix + lock)
+                out.append(prefix + lock)
+    return out
+
+
 @dataclass
 class PRD:
     requirements: list[Requirement] = field(default_factory=list)
@@ -448,7 +499,7 @@ def parse_epics(text: str) -> EpicPlan:
 
             meta = _parse_story_meta(body, epic_n)
             story.covers = meta.get("covers", [])
-            story.write_scope = meta.get("write_scope", [])
+            story.write_scope = with_lockfiles(meta.get("write_scope", []))
             story.depends_on = [d for d in meta.get("depends_on", []) if d != story.id]
             story.screens = meta.get("screens", [])
 

@@ -364,6 +364,50 @@ def _head_of(repo: Path) -> str:
     return proc.stdout.strip() if proc.returncode == 0 else ""
 
 
+def deadlock_reason(attempts: list[Attempt]) -> str:
+    """Thế bí: hai lượt liền cùng một mục chặn. Rỗng nếu chưa bí.
+
+    Người rà soát chặn lại đúng chỗ cũ nghĩa là lượt vừa rồi không dịch
+    chuyển được gì — và lượt sau, với cùng ngữ cảnh và cùng feedback,
+    cũng sẽ không. Thường là mâu thuẫn nằm ngoài tầm agent: tiêu chí
+    chấp nhận đòi một thứ mà ``write_scope`` cấm, hoặc hai tiêu chí đá
+    nhau. Agent làm đúng chỉ dẫn — dừng và báo phạm vi khai thiếu —
+    nhưng không ai đọc lời báo đó, nên vòng lặp cứ chạy hết hạn mức.
+
+    Đo trên e9: 4 lượt y hệt nhau cho STORY-01-01, $9,85, cùng một câu
+    "TCCN 1 đòi lockfile được commit; kho không có".
+    """
+    if len(attempts) < 2:
+        return ""
+    cuoi, truoc = attempts[-1], attempts[-2]
+    if cuoi.infra or truoc.infra:
+        return ""
+    a, b = _finding_keys(cuoi), _finding_keys(truoc)
+    if not a or a != b:
+        return ""
+    return (
+        "bí: hai lượt liền bị chặn y hệt — "
+        + "; ".join(cuoi.review_findings[:2])
+        + ". Thử lại không gỡ được: sửa tiêu chí chấp nhận hoặc write_scope "
+        "của story rồi chạy lại."
+    )
+
+
+def _finding_keys(attempt: Attempt) -> set[str]:
+    """Mục chặn rút về khoá so sánh được.
+
+    Bỏ số dòng và khoảng trắng: cùng một khiếm khuyết được báo ở dòng
+    246 rồi 307 sau khi agent sửa chỗ khác vẫn là cùng một thế bí.
+    """
+    import re as _re
+
+    out = set()
+    for f in attempt.review_findings:
+        k = _re.sub(r":\d+", ":", f.lower())
+        out.add(" ".join(k.split())[:120])
+    return out
+
+
 def implement_story(
     story: Story,
     *,
@@ -424,6 +468,11 @@ def implement_story(
                 outcome.blocked_reason = f"lỗi hạ tầng lặp lại: {attempt.error}"
                 return outcome
             continue  # không tính vào hạn mức chất lượng
+
+        van = deadlock_reason(outcome.attempts)
+        if van:
+            outcome.blocked_reason = van
+            return outcome
 
         if outcome.quality_attempts > max_retries:
             outcome.blocked_reason = (

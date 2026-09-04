@@ -248,6 +248,34 @@ class TestRetry(ImplementTestCase):
         out = self.implement(c)
         self.assertFalse(out.done)
         self.assertEqual(out.quality_attempts, 2)   # lần đầu + 1 lần thử lại
+        self.assertIn("bí", out.blocked_reason)
+
+    def test_bi_thi_dung_som_thay_vi_dot_het_han_muc(self):
+        """Hai lượt liền cùng một mục chặn thì thử tiếp vô nghĩa.
+
+        Thường là mâu thuẫn ngoài tầm agent — tiêu chí chấp nhận đòi thứ
+        `write_scope` cấm. Đo trên e9: 4 lượt y hệt nhau, $9,85, cùng một
+        câu về lockfile không được commit.
+        """
+        c = ScriptedClient(review="[chặn] src/a.py:1 — mất dữ liệu khi lưu")
+        out = self.implement(c, config=self.config(**{"run.max_retries": 5}))
+        self.assertEqual(out.quality_attempts, 2, "phải dừng ở lượt 2, không chạy tới 6")
+        self.assertIn("sửa tiêu chí chấp nhận hoặc write_scope", out.blocked_reason)
+
+    def test_muc_chan_doi_thi_van_thu_tiep(self):
+        """Chặn ở chỗ khác nghĩa là lượt vừa rồi có dịch chuyển — thử tiếp."""
+        class DoiMuc(ScriptedClient):
+            lan = 0
+
+            def run(self, spec):
+                if "Rà soát" in spec.prompt:
+                    DoiMuc.lan += 1
+                    self.review = f"[chặn] src/a.py:1 — khiếm khuyết số {DoiMuc.lan}"
+                return super().run(spec)
+
+        DoiMuc.lan = 0
+        out = self.implement(DoiMuc(), config=self.config(**{"run.max_retries": 2}))
+        self.assertEqual(out.quality_attempts, 3)
         self.assertIn("đã thử", out.blocked_reason)
 
     def test_out_of_scope_write_fails_the_gate(self):

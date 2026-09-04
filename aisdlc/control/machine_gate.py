@@ -18,7 +18,7 @@ import re
 from dataclasses import dataclass, field
 
 from ..config import DEFAULTS, Config
-from .normalize import PRD
+from .normalize import PRD, is_lockfile
 from .scheduler import CycleError, Story, build_waves
 
 
@@ -130,7 +130,11 @@ def check_stories(
             )
 
     max_paths = cfg["story.max_write_scope_paths"]
-    too_wide = [s.id for s in stories if len(s.write_scope) > max_paths]
+    too_wide = [
+        s.id
+        for s in stories
+        if len([p for p in s.write_scope if not is_lockfile(p)]) > max_paths
+    ]
     if too_wide:
         r.errors.append(
             f"story chạm quá nhiều nơi (> {max_paths} đường dẫn): {', '.join(too_wide)}"
