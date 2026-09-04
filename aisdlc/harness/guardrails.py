@@ -274,6 +274,10 @@ VENDOR_PATHS = (
     "node_modules", ".venv", "venv", "vendor", "target", "dist", "build",
     "__pycache__", ".pytest_cache", ".ruff_cache", ".next", ".turbo",
     "coverage", ".gradle", "Pods",
+    # Tạo tác của chính công cụ agent dùng để làm việc: ảnh chụp, trace,
+    # báo cáo. Chúng ở gốc dự án nhưng không phải sản phẩm của story —
+    # tính vào phạm vi thì mở trình duyệt một lần là trượt cổng.
+    ".playwright-mcp", "playwright-report", "test-results", ".nyc_output",
 )
 
 HARNESS_OWNED = (

@@ -304,6 +304,21 @@ class TestDiffScope(unittest.TestCase):
             self.assertEqual(changed, ["src/a.ts"])
             self.assertTrue(check_diff_scope(changed, ["src"]).allowed)
 
+    def test_tool_artifacts_are_not_the_story_writing_out_of_scope(self):
+        """Agent mở trình duyệt để xem trang thì Playwright MCP để lại
+        `.playwright-mcp/` ở gốc. Tính vào phạm vi thì mở trình duyệt một
+        lần là trượt cổng."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            (root / "src").mkdir()
+            (root / "src" / "a.ts").write_text("export const x = 1\n", encoding="utf-8")
+            shot = root / ".playwright-mcp"
+            shot.mkdir()
+            (shot / "page.png").write_bytes(b"x")
+            changed = changed_files(str(root))
+            self.assertEqual(changed, ["src/a.ts"])
+
     def test_agent_editing_the_prd_still_shows_up(self):
         """Chỉ phần harness tự ghi được miễn; sửa PRD giữa lúc viết code là
         chuyện phải lộ ra."""
