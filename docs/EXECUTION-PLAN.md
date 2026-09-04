@@ -302,6 +302,23 @@ Bốn lỗi thật chỉ lộ ra khi chạy thật, đã sửa:
 trong 742 test, vì test nào cũng dựng sẵn đúng điều kiện mà thực tế không
 tự có.
 
+### Chạy thật — hiện thực một story trên agent thật
+
+Story `STORY-01-01` chạy trong worktree riêng, guard bật đầy đủ:
+
+* agent viết **test trước** rồi mới viết code, mọi file nằm trong
+  `write_scope` — guard không phải chặn lần nào;
+* code nó viết dẫn chiếu đúng bốn quyết định kiến trúc mà bộ chọn ngữ cảnh
+  đưa vào prompt (AR-1 một đường ghi · AR-2 hướng phụ thuộc · AR-5 `rev`
+  thay đồng hồ · AR-15 không nuốt lỗi) — bằng chứng rằng chọn AR theo mục
+  `Binds:` là **tra cứu** chứ không phải trang trí;
+* test nó viết có ca patch `socket` để chứng minh tạo ghi chú chạy được khi
+  mất mạng hoàn toàn — đúng tiêu chí chấp nhận, không phải test giả;
+* lượt 1 **hết số lượt** (31/30, $2.74) vì kẹt ở guard `completion`: guard
+  bảo chạy `aisdlc tool test` mà `aisdlc` không có trên PATH của phiên;
+* harness tự chạy lại test sau lượt agent và bắt được một lần trượt mà
+  agent không thấy → story vào lượt thử thứ hai, đúng thiết kế.
+
 ### Chạy thật lần 2 — chuỗi lập kế hoạch chạy hết
 
 Sau khi sửa, `aisdlc plan` đi hết chuỗi trên `epics.md` thật (1078 dòng,
