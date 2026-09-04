@@ -100,6 +100,12 @@ Gặp chỗ chưa quyết được thì **đánh dấu, đừng tự chọn**:
 <div data-unresolved="OQ-3: ghi chú có tiêu đề riêng hay lấy dòng đầu?">
 ```
 
+Chỗ chưa chốt ứng với một câu hỏi mở đã có mã trong PRD hoặc EXPERIENCE thì
+**mở đầu bằng đúng mã đó** (`OQ-3:`, `UX-OQ-1:`). Cổng gom các chỗ chưa chốt
+theo mã: 52 chỗ trên 5 màn thường quy về 4–5 câu hỏi, và người duyệt cần
+thấy con số đó chứ không phải một bức tường. Không dẫn mã thì mỗi chỗ trở
+thành một việc riêng lẻ không tra được.
+
 Cổng máy sẽ chặn khi còn dấu này. Đó là chủ ý: dựng code theo một màn hình
 chưa chốt tốn gấp đôi — một lần làm, một lần làm lại.
 

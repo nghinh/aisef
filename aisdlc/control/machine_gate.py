@@ -14,6 +14,7 @@ Phân biệt hai mức, vì hai mức cần hành động khác nhau:
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 
 from ..config import DEFAULTS, Config
@@ -190,15 +191,12 @@ def check_design_contract(
     if missing:
         r.errors.append(f"màn hình chưa có trong hợp đồng: {', '.join(missing)}")
 
+    unresolved: list[tuple[str, str]] = []
     for screen in contract.screens:
         if screen.error:
             r.errors.append(f"{screen.id}: {screen.error}")
             continue
-        if screen.unresolved:
-            r.errors.append(
-                f"{screen.id}: mockup còn {len(screen.unresolved)} chỗ chưa chốt — "
-                f"{screen.unresolved[0][:120]}"
-            )
+        unresolved += [(screen.id, item) for item in screen.unresolved]
         if not screen.route:
             r.errors.append(
                 f"{screen.id}: mockup không khai route (thẻ meta aisdlc-route) — "
@@ -214,6 +212,30 @@ def check_design_contract(
                 )
         if not screen.components:
             r.warnings.append(f"{screen.id}: mockup không có component nào kiểm được")
+
+    if unresolved:
+        # Gom theo **câu hỏi**, không theo chỗ đánh dấu. 52 chỗ chưa chốt
+        # trên 5 màn thường quy về 4–5 câu hỏi; liệt kê từng chỗ thì người
+        # duyệt thấy một bức tường, còn gom lại thì thấy đúng việc phải làm.
+        by_question: dict[str, int] = {}
+        for _, item in unresolved:
+            m = re.search(r"\b(?:UX-)?OQ-\d+\b", item)
+            key = m.group(0) if m else "không gắn mã câu hỏi"
+            by_question[key] = by_question.get(key, 0) + 1
+        listed = " · ".join(
+            f"{q} ({n} chỗ)" for q, n in sorted(by_question.items(), key=lambda x: -x[1])
+        )
+        r.errors.append(
+            f"mockup còn {len(unresolved)} chỗ chưa chốt trên "
+            f"{len({s for s, _ in unresolved})} màn hình, quy về "
+            f"{len(by_question)} câu hỏi: {listed}. Trả lời chúng trong PRD/UX "
+            f"rồi dựng lại mockup — dựng code theo màn hình chưa chốt tốn gấp đôi."
+        )
+        # Chỗ không dẫn mã câu hỏi thì người duyệt không tra được nó thuộc
+        # về đâu; nêu vài ví dụ để họ biết đang nhìn cái gì.
+        loose = [item for _, item in unresolved if not re.search(r"\b(?:UX-)?OQ-\d+\b", item)]
+        for item in loose[:3]:
+            r.warnings.append(f"chưa chốt, không dẫn mã câu hỏi: {item[:140]}")
 
     extra = [s.id for s in contract.screens if experience.by_id(s.id) is None]
     if extra:
