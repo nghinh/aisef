@@ -19,6 +19,7 @@ from pathlib import Path
 from ..config import DEFAULTS, Config
 from ..control.approvals import STORIES_INDEX
 from ..control.machine_gate import GateResult, check_stories
+from ..control.preflight import STORY_NOT_EXECUTABLE, check_stories_executable
 from ..control.normalize import (
     EpicPlan,
     PRD,
@@ -202,6 +203,25 @@ def split(
         story_fr_map={s.id: s.covers for s in stories},
         story_ac_count={s.id: len(s.acceptance_criteria) for s in stories},
     )
+
+    # Story chạy được không — tính bằng code, trước khi tiêu đồng nào.
+    # Chấm ở đây chứ không trong `check_stories`: phép kiểm cần tiêu chí
+    # chấp nhận và danh sách màn hình, mà tầng lập lịch không mang theo.
+    for pf in check_stories_executable(stories, project=root.parent, config=config):
+        if pf.story_defects:
+            res.gate.errors.append(
+                f"{STORY_NOT_EXECUTABLE} {pf.story_id}: "
+                + "; ".join(m.line() for m in pf.story_defects)
+            )
+        if pf.provisioning_gaps:
+            # Chưa chặn: pha dựng mockup và việc cấu hình công cụ đều diễn
+            # ra **sau** cổng này. Chặn ở đây là bắt người sửa thứ chưa tới
+            # lượt. Cổng `readiness` và bước ngay trước khi gọi model mới
+            # chặn thật.
+            res.gate.warnings.append(
+                f"{pf.story_id} còn thiếu để chạy được: "
+                + "; ".join(m.line() for m in pf.provisioning_gaps)
+            )
 
     res.index_path = write_index(root, res, config)
     return res

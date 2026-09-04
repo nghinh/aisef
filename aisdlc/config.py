@@ -45,6 +45,8 @@ DEFAULTS: dict[str, Any] = {
     "verify.security": "",
     "verify.mutation": "",
     "verify.unit": "",
+    "verify.accessibility": "",
+    "verify.migration": "",
     "verify.sbom": "",
     "verify.image-scan": "",
     #: Loại được miễn tường minh, ngăn bởi dấu phẩy. Miễn phải là quyết
@@ -58,6 +60,8 @@ DEFAULTS: dict[str, Any] = {
     "route.developer_model": "",
     "route.reviewer_model": "",
     "route.designer_model": "",
+    # Nhà cung cấp phân tích ảnh hưởng cho người rà soát (P0.3).
+    "review.impact_provider": "",
     # lệnh của dự án — rỗng nghĩa là tự dò từ file có trong dự án
     "tools.test": "",
     "tools.lint": "",
@@ -89,6 +93,8 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "verify.security": str,
     "verify.mutation": str,
     "verify.unit": str,
+    "verify.accessibility": str,
+    "verify.migration": str,
     "verify.sbom": str,
     "verify.image-scan": str,
     "verify.waived": str,
@@ -98,6 +104,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "route.developer_model": str,
     "route.reviewer_model": str,
     "route.designer_model": str,
+    "review.impact_provider": str,
     "tools.test": str,
     "tools.lint": str,
     "tools.sast": str,

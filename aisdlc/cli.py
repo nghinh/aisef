@@ -283,9 +283,40 @@ def cmd_review(args) -> int:
         if len(lines) > args.lines:
             print(f"\n… còn {len(lines) - args.lines} dòng. Mở: {artifact}")
 
+    if gate is Gate.READINESS:
+        for line in _preflight_lines(args):
+            print(line)
+
     print(f"\nDuyệt:    aisdlc approve {gate.value}")
     print(f"Trả lại:  aisdlc reject  {gate.value} --note \"...\"")
     return EXIT_OK
+
+
+def _preflight_lines(args) -> list[str]:
+    """Story nào chưa chạy được — tính bằng code, ngay trước cổng người.
+
+    Cổng `readiness` là mốc cuối trước khi tiêu tiền. Ở đây mockup đã dựng
+    và công cụ đã cấu hình xong, nên **cả hai** loại thiếu đều chặn được:
+    story hỏng lẫn dự án chưa cấu hình.
+    """
+    from .control.preflight import STORY_NOT_EXECUTABLE, check_stories_executable
+    from .phases.run import load_plan
+
+    project = Path(args.project).resolve()
+    plan = load_plan(_artifact_root(args))
+    if plan.error or not plan.stories:
+        return []
+    res = check_stories_executable(
+        list(plan.stories.values()), project=project, config=Config.load(args.project)
+    )
+    xau = [pf for pf in res if not pf.executable]
+    if not xau:
+        return [f"\n✅ {len(res)} story đều chạy được"]
+    out = [f"\n✗ {len(xau)}/{len(res)} story chưa chạy được:"]
+    for pf in xau:
+        out.append(f"  {STORY_NOT_EXECUTABLE} {pf.story_id}")
+        out += [f"    - {m.line()}" for m in pf.missing]
+    return out
 
 
 def cmd_approve(args) -> int:
@@ -302,6 +333,17 @@ def cmd_approve(args) -> int:
         print(f"✗ cổng phía trước chưa duyệt: {names}", file=sys.stderr)
         print("  duyệt chúng trước, hoặc dùng --force nếu cố ý bỏ qua", file=sys.stderr)
         return EXIT_NOT_READY
+
+    if gate is Gate.READINESS and not args.force:
+        lines = _preflight_lines(args)
+        if any("✗" in ln for ln in lines):
+            print("\n".join(lines), file=sys.stderr)
+            print(
+                "\n✗ không duyệt được: còn story chưa chạy được. Sửa rồi duyệt "
+                "lại, hoặc --force nếu cố ý.",
+                file=sys.stderr,
+            )
+            return EXIT_NOT_READY
 
     rec = store.approve(gate, note=args.note or "")
     print(f"✅ {gate.value} đã duyệt bởi {rec.decided_by}")

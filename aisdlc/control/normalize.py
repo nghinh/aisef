@@ -82,6 +82,13 @@ class OpenQuestion:
 #: đúng chỉ dẫn — hoàn nguyên nó rồi báo phạm vi khai thiếu — người rà
 #: soát chặn đúng vì TCCN 1 không đạt, và vòng lặp thử lại 4 lần y hệt
 #: nhau, $9,85 cho một thế bí không lối ra.
+#: Tệp khai phụ thuộc. Story nào cũng có thể cần thêm một gói — không cho
+#: chạm thì nó bí, và cái bí ấy tốn cả hạn mức lượt thử mới lộ ra.
+MANIFESTS = (
+    "package.json", "pyproject.toml", "requirements.txt", "requirements.in",
+    "Cargo.toml", "go.mod", "Gemfile", "composer.json",
+)
+
 LOCKFILES: dict[str, tuple[str, ...]] = {
     "package.json": ("package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lockb"),
     "pyproject.toml": ("poetry.lock", "uv.lock", "pdm.lock"),
@@ -91,6 +98,30 @@ LOCKFILES: dict[str, tuple[str, ...]] = {
     "Gemfile": ("Gemfile.lock",),
     "composer.json": ("composer.lock",),
 }
+
+
+def effective_write_scope(story: Story, project: Path) -> list[str]:
+    """Phạm vi ghi có hiệu lực: story khai, cộng tệp khai phụ thuộc.
+
+    BMAD liệt kê tệp mã nguồn vào ``write_scope``; nó không nghĩ tới việc
+    story sẽ phải khai một gói. Nhưng tiêu chí chấp nhận thì có — "test
+    trên ``fake-indexeddb``", "lockfile được commit" — và lúc ấy story
+    không thoả nổi tiêu chí của chính mình. Đo trên e9: hai story liên
+    tiếp bí đúng vì chuyện này, $20 cho tám lượt không lượt nào qua.
+
+    Chỉ thêm tệp **thật sự có** trong dự án: thêm bừa thì phạm vi rộng ra
+    mà không đổi được gì, còn danh sách phạm vi in cho agent đọc thì dài
+    thêm những dòng vô nghĩa.
+
+    Cố ý **không** đụng tới phạm vi mà bộ lập lịch dùng để chia đợt: ở đó
+    câu hỏi khác — hai story có giẫm chân nhau không — và nếu tính cả
+    manifest thì mọi story đều giẫm nhau, chạy song song mất sạch.
+    """
+    scope = list(story.write_scope)
+    for name in MANIFESTS:
+        if name not in scope and (project / name).is_file():
+            scope.append(name)
+    return with_lockfiles(scope)
 
 
 def is_lockfile(path: str) -> bool:

@@ -318,6 +318,7 @@ VENDOR_PATHS = (
 
 HARNESS_OWNED = (
     "_bmad-output/evidence",
+    "_bmad-output/journal",
     "_bmad-output/approvals",
     "_bmad-output/sprint-status.json",
     "_bmad-output/sprint-status.json.lock",

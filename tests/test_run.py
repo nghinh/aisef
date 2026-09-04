@@ -253,6 +253,119 @@ class TestResume(RunTestCase):
         self.assertIs(self.state().stories["STORY-01-02"].state, StoryStatus.DONE)
 
 
+class TestPreflight(RunTestCase):
+    """Story không chạy được phải bị chặn **trước** khi model được gọi.
+
+    Cổng `stories` đã chấm cùng phép kiểm, nhưng cấu hình dự án đổi được
+    sau khi cổng ấy duyệt — và mỗi đồng tiêu cho một story không thể qua
+    là tiêu vào chỗ không có lối ra.
+    """
+
+    def index_with(self, **over):
+        raw = json.loads((self.artifacts / "stories.index.json").read_text())
+        for s in raw["stories"]:
+            if s["id"] == "STORY-01-01":
+                s.update(over)
+        (self.artifacts / "stories.index.json").write_text(
+            json.dumps(raw, ensure_ascii=False), encoding="utf-8"
+        )
+
+    def test_story_ui_thieu_trinh_duyet_thi_chan_truoc_khi_goi_model(self):
+        self.index_with(screens=["notes-list"])
+        agent = Agent()
+        self.run_sprint(agent)
+        self.assertNotIn("STORY-01-01", agent.stories, "model không được gọi")
+        rec = self.state().stories["STORY-01-01"]
+        self.assertIs(rec.state, StoryStatus.BLOCKED)
+        self.assertIn("STORY_NOT_EXECUTABLE", rec.blocked_reason)
+        self.assertIn("browser", rec.blocked_reason)
+
+    def test_story_khai_thieu_write_scope_thi_chan_truoc_khi_goi_model(self):
+        self.index_with(
+            acceptance_criteria=["Then `src/khac/thieu.py` sinh ra báo cáo"],
+        )
+        agent = Agent()
+        self.run_sprint(agent)
+        self.assertNotIn("STORY-01-01", agent.stories, "model không được gọi")
+        self.assertIn(
+            "src/khac/thieu.py", self.state().stories["STORY-01-01"].blocked_reason
+        )
+
+    def test_thieu_cong_cu_test_thi_chan_truoc_khi_goi_model(self):
+        agent = Agent()
+        self.run_sprint(agent, config=self.config(**{"tools.test": ""}))
+        self.assertEqual(agent.stories, [])
+        self.assertIn("tools.test", self.state().stories["STORY-01-01"].blocked_reason)
+
+    def test_story_du_dieu_kien_van_chay_binh_thuong(self):
+        agent = Agent()
+        report = self.run_sprint(agent)
+        self.assertTrue(report.ok, report.summary())
+        self.assertIn("STORY-01-01", agent.stories)
+
+
+class TestTransaction(RunTestCase):
+    """Lượt chạy story là một giao dịch — nhật ký sống sót qua tiến trình."""
+
+    def journal(self, sid="STORY-01-01"):
+        from aisdlc.control.journal import JournalStore
+
+        return JournalStore(self.artifacts).read(sid)
+
+    def test_story_xong_ghi_du_moc_toi_attempt_committed(self):
+        self.run_sprint(Agent())
+        steps = self.journal().steps()
+        for moc in ("attempt.started", "worktree.created", "status.running",
+                    "verification.completed", "review.completed",
+                    "commit.created", "merge.completed", "attempt.committed"):
+            self.assertIn(moc, steps, steps)
+
+    def test_story_truot_dong_giao_dich_ngay_khong_no_gi(self):
+        self.run_sprint(Agent(fail={"STORY-01-01"}))
+        j = self.journal()
+        self.assertIn("attempt.committed", j.steps())
+        self.assertNotIn("merge.completed", j.steps())
+        self.assertEqual(j.open_attempt(), 0)
+
+    def test_tien_trinh_chet_giua_chung_thi_luot_sau_don_va_khong_de_running(self):
+        """Mô phỏng đúng thứ đã xảy ra: tiến trình bị giết sau khi story
+        chuyển sang `running`, để lại nhật ký dở và trạng thái kẹt."""
+        from aisdlc.control.journal import Entry, JournalStore
+
+        js = JournalStore(self.artifacts)
+        js.record("STORY-01-01", Entry(step="attempt.started", attempt=1))
+        js.record("STORY-01-01", Entry(step="worktree.created", attempt=1))
+        js.record("STORY-01-01", Entry(step="status.running", attempt=1))
+        st = StateStore(self.artifacts)
+        st.register("STORY-01-01", "EPIC-01", wave=1)
+        st.transition("STORY-01-01", StoryStatus.RUNNING)
+
+        report = self.run_sprint(Agent())
+        self.assertTrue(report.reconciled, "phải dọn dấu vết lượt trước")
+        self.assertIn("↺", report.summary())
+        self.assertIsNot(self.state().stories["STORY-01-01"].state, StoryStatus.RUNNING)
+        self.assertTrue(report.ok, report.summary())
+
+    def test_merge_xong_nhung_so_ghi_failed_thi_duoc_dua_ve_done(self):
+        """Đã xảy ra trên e9: worktree merge, wave sau khởi động, sổ vẫn
+        `failed`, và chạy lại chỉ thấy diff rỗng."""
+        from aisdlc.control.journal import Entry, JournalStore
+
+        js = JournalStore(self.artifacts)
+        js.record("STORY-01-01", Entry(step="attempt.started", attempt=1))
+        js.record("STORY-01-01", Entry(step="merge.completed", attempt=1))
+        st = StateStore(self.artifacts)
+        st.register("STORY-01-01", "EPIC-01", wave=1)
+        st.transition("STORY-01-01", StoryStatus.RUNNING)
+        st.transition("STORY-01-01", StoryStatus.FAILED)
+
+        agent = Agent()
+        self.run_sprint(agent)
+        self.assertIs(self.state().stories["STORY-01-01"].state, StoryStatus.DONE)
+        self.assertNotIn("STORY-01-01", agent.stories,
+                         "story đã merge thì không chạy lại")
+
+
 class TestIsolationOff(RunTestCase):
     def test_no_isolate_runs_in_the_project_itself(self):
         report = self.run_sprint(Agent(), only_epic="EPIC-02", isolate=False)

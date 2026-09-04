@@ -27,7 +27,14 @@ from ..clients.base import ClientAdapter
 from ..config import Config
 from ..control.approvals import STORIES_INDEX
 from ..control.design_contract import load as load_contract
+from ..control.journal import (
+    Entry as JEntry,
+    JournalStore,
+    StoryRunTransaction,
+    reconcile_all,
+)
 from ..control.normalize import Story, parse_architecture_file
+from ..control.preflight import STORY_NOT_EXECUTABLE, check_story
 from ..control.state import StateStore, StoryStatus, TransitionError
 from ..control.worktree import GitError, WorktreeManager
 from ..harness.prompts import load_catalog
@@ -94,6 +101,9 @@ class RunReport:
     waves: list[WaveReport] = field(default_factory=list)
     stopped_at: str = ""
     error: str = ""
+    #: Story được dọn dấu vết lượt chạy trước. In ra, không nuốt: người
+    #: đọc cần biết harness vừa sửa trạng thái của story nào và vì sao.
+    reconciled: list = field(default_factory=list)
 
     @property
     def outcomes(self) -> list[StoryOutcome]:
@@ -111,6 +121,8 @@ class RunReport:
         if self.error:
             return f"chạy đợt: ✗ {self.error}"
         lines = []
+        for r in self.reconciled:
+            lines.append(f"↺ {r.line()}")
         for w in self.waves:
             head = f"{w.epic_id} · đợt {w.index}"
             if len(w.outcomes) > 1:
@@ -183,6 +195,7 @@ def run_epic(
             return False
 
         if worktrees is not None:
+            journal = JournalStore(artifact_root)
             done_ids = [o.story_id for o in wave.outcomes if o.done]
             for sid in done_ids:
                 story = plan.stories.get(sid)
@@ -191,13 +204,25 @@ def run_epic(
                     f"{sid}: {story.title if story else ''}".strip(": "),
                     paths=list(story.write_scope) if story else None,
                 )
+                journal.record(sid, JEntry(step="commit.created",
+                                           attempt=journal.read(sid).attempt_no))
             for result in worktrees.merge_wave(done_ids):
                 if not result.merged:
                     wave.merge_conflicts[result.story_id] = result.conflicts
                     report.stopped_at = f"{epic_id} · đợt {index} (merge)"
                     return False
+                # Mốc không quay lại được: công việc đã ra ngoài tầm giao
+                # dịch. Ghi **ngay** sau khi merge, trước cả việc dọn
+                # worktree — chết giữa hai bước này thì lần chạy sau phải
+                # đọc được rằng đã merge, không thì nó chạy lại một story
+                # đã xong và chỉ thấy diff rỗng.
+                n = journal.read(result.story_id).attempt_no
+                journal.record(result.story_id,
+                               JEntry(step="merge.completed", attempt=n))
             for sid in done_ids:
                 worktrees.remove(sid)
+                n = journal.read(sid).attempt_no
+                journal.record(sid, JEntry(step="attempt.committed", attempt=n))
     return True
 
 
@@ -218,29 +243,67 @@ def _run_wave(
 ) -> None:
     def one(story_id: str) -> StoryOutcome:
         story = plan.stories[story_id]
-        workdir = project
-        if worktrees is not None:
-            workdir = worktrees.create(story_id).path
 
-        _safe_transition(state, story_id, StoryStatus.RUNNING)
-        outcome = implement_story(
-            story,
-            project=project,
-            workdir=workdir,
-            artifact_root=artifact_root,
-            client=client,
-            config=config,
-            catalog=catalog,
-            architecture=architecture,
-            contract=contract,
-        )
-        _safe_transition(state, story_id, StoryStatus.VERIFYING, cost=outcome.cost_usd)
-        _safe_transition(
-            state,
-            story_id,
-            StoryStatus.DONE if outcome.done else StoryStatus.FAILED,
-            reason=outcome.blocked_reason,
-        )
+        # Chặn **trước** khi mở worktree và gọi model. Cổng `stories` đã
+        # chấm cùng phép kiểm này, nhưng cấu hình dự án đổi được sau khi
+        # cổng ấy duyệt — và một story không chạy được thì mọi đồng tiêu
+        # cho nó là tiêu vào chỗ không thể qua.
+        pf = check_story(story, project=project, config=config)
+        if not pf.executable:
+            out = StoryOutcome(story_id=story_id)
+            out.blocked_reason = (
+                f"{STORY_NOT_EXECUTABLE}: "
+                + "; ".join(m.line() for m in pf.missing)
+            )
+            _safe_transition(state, story_id, StoryStatus.BLOCKED,
+                             reason=out.blocked_reason)
+            return out
+
+        # Một lượt chạy là **một giao dịch**. Nhật ký nằm trên đĩa nên
+        # nó sống sót qua cả tiến trình bị giết — đó mới là lúc cần nó.
+        with StoryRunTransaction(story_id, artifact_root=artifact_root) as tx:
+            workdir = project
+            if worktrees is not None:
+                workdir = worktrees.create(story_id).path
+                tx.record("worktree.created", path=str(workdir),
+                          undo={"worktree.remove": story_id})
+
+            _safe_transition(state, story_id, StoryStatus.RUNNING)
+            tx.record("status.running", undo={"status.reset": "pending"})
+
+            outcome = implement_story(
+                story,
+                project=project,
+                workdir=workdir,
+                artifact_root=artifact_root,
+                client=client,
+                config=config,
+                catalog=catalog,
+                architecture=architecture,
+                contract=contract,
+            )
+            tx.record(
+                "verification.completed",
+                ok=outcome.done,
+                attempts=outcome.quality_attempts,
+                cost_usd=round(outcome.cost_usd, 4),
+            )
+            tx.record("review.completed", blocked=[
+                f for a in outcome.attempts for f in a.review_findings
+            ][:5])
+
+            _safe_transition(state, story_id, StoryStatus.VERIFYING,
+                             cost=outcome.cost_usd)
+            _safe_transition(
+                state,
+                story_id,
+                StoryStatus.DONE if outcome.done else StoryStatus.FAILED,
+                reason=outcome.blocked_reason,
+            )
+            # Story trượt: giao dịch đóng ngay, không nợ gì. Story xong
+            # còn nợ commit và merge — đóng ở cuối đợt.
+            if not outcome.done:
+                tx.commit()
         return outcome
 
     workers = max(1, min(config["run.max_parallel"], len(story_ids)))
@@ -296,6 +359,16 @@ def run_sprint(
             return report
 
     state = StateStore(artifact_root)
+
+    # Dọn dấu vết lượt chạy trước bị giết, **trước** khi làm gì khác.
+    # Không có bước này thì story kẹt `running` vĩnh viễn và không lệnh
+    # nào gỡ ra được; còn story đã merge mà sổ ghi `failed` sẽ bị chạy
+    # lại trên một worktree rẽ từ nhánh đã chứa sẵn công việc — diff rỗng,
+    # không bao giờ qua được.
+    report.reconciled = reconcile_all(
+        artifact_root=artifact_root, state=state, worktrees=worktrees
+    )
+
     epics = [only_epic] if only_epic else (plan.epic_order or sorted(plan.waves))
     unknown = [e for e in epics if e not in plan.waves]
     if unknown:

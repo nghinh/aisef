@@ -24,7 +24,7 @@ from ..clients.base import ClientAdapter
 from ..config import Config
 from ..control import gate as story_gate
 from ..control.design_contract import DesignContract, load as load_contract
-from ..control.normalize import Architecture, Story, with_lockfiles
+from ..control.normalize import Architecture, Story, effective_write_scope
 from ..harness import mockup_verify
 from ..harness.guardrails import (
     ENV_BASE_REF,
@@ -141,38 +141,6 @@ def _story_fallback(story: Story) -> str:
     lines = [f"# {story.id}: {story.title}", "", "## Tiêu chí chấp nhận", ""]
     lines += [f"{i}. {ac}" for i, ac in enumerate(story.acceptance_criteria, 1)]
     return "\n".join(lines)
-
-
-#: Tệp khai phụ thuộc. Story nào cũng có thể cần thêm một gói — không cho
-#: chạm thì nó bí, và cái bí ấy tốn cả hạn mức lượt thử mới lộ ra.
-MANIFESTS = (
-    "package.json", "pyproject.toml", "requirements.txt", "requirements.in",
-    "Cargo.toml", "go.mod", "Gemfile", "composer.json",
-)
-
-
-def effective_write_scope(story: Story, project: Path) -> list[str]:
-    """Phạm vi ghi có hiệu lực: story khai, cộng tệp khai phụ thuộc.
-
-    BMAD liệt kê tệp mã nguồn vào ``write_scope``; nó không nghĩ tới việc
-    story sẽ phải khai một gói. Nhưng tiêu chí chấp nhận thì có — "test
-    trên ``fake-indexeddb``", "lockfile được commit" — và lúc ấy story
-    không thoả nổi tiêu chí của chính mình. Đo trên e9: hai story liên
-    tiếp bí đúng vì chuyện này, $20 cho tám lượt không lượt nào qua.
-
-    Chỉ thêm tệp **thật sự có** trong dự án: thêm bừa thì phạm vi rộng ra
-    mà không đổi được gì, còn danh sách phạm vi in cho agent đọc thì dài
-    thêm những dòng vô nghĩa.
-
-    Cố ý **không** đụng tới phạm vi mà bộ lập lịch dùng để chia đợt: ở đó
-    câu hỏi khác — hai story có giẫm chân nhau không — và nếu tính cả
-    manifest thì mọi story đều giẫm nhau, chạy song song mất sạch.
-    """
-    scope = list(story.write_scope)
-    for name in MANIFESTS:
-        if name not in scope and (project / name).is_file():
-            scope.append(name)
-    return with_lockfiles(scope)
 
 
 def run_attempt(
