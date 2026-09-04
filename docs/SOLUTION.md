@@ -477,6 +477,19 @@ Không để chữ "ngưỡng" chung chung. Mặc định trong `.ai/config.json
 | `cost.warn_multiple` | `3.0` | cảnh báo khi story tốn > 3× trung vị |
 | `security.block_severities` | `["critical","high"]` | mức chặn merge |
 
+Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏng cụ thể:
+
+| Khoá | Mặc định | Vì sao có |
+|---|---|---|
+| `tools.test` · `tools.lint` · `tools.sast` | `""` (tự dò) | lệnh là quyết định của dự án; rỗng thì dò từ file có thật |
+| `verify.*` (10 loại) | `""` | rỗng nghĩa là **chưa cấu hình**, không phải "đạt" |
+| `verify.waived` | `""` | miễn phải là quyết định có người ký, không phải hệ quả của việc quên |
+| `sandbox.image` | `""` (theo stack) | `alpine` trơn không có công cụ nào; test đỏ vì thiếu công cụ chứ không vì code sai |
+| `sandbox.tools_network` | `false` | dự án cần cài phụ thuộc mới mở mạng, và phải khai tường minh |
+| `sandbox.use_docker` | `true` | tắt được cho toolchain gắn với máy chủ, nhưng luôn ghi `degraded` |
+| `app.dev_command` · `app.base_url` | `""` · `localhost:5173` | để mở **route thật** lúc đối chiếu mockup |
+| `route.<vai>_model` | `""` | chọn model theo vai; rỗng thì theo mặc định của client |
+
 ---
 
 ## 14. Chi phí
