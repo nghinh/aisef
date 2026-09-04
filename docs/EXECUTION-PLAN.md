@@ -319,6 +319,31 @@ Story `STORY-01-01` chạy trong worktree riêng, guard bật đầy đủ:
 * harness tự chạy lại test sau lượt agent và bắt được một lần trượt mà
   agent không thấy → story vào lượt thử thứ hai, đúng thiết kế.
 
+**Kết cục: story bị chặn, và bị chặn vì đúng lý do.** Sau hai lượt ($4.06):
+
+```
+STORY-01-01: CHƯA XONG
+  ✅ test   ✅ lint   ✅ phạm vi ghi   ✅ test thật
+  ✗ map mockup — chưa đối chiếu: danh-sach, soan-thao
+  ✗ rà soát — [chặn] toàn bộ story hiện thực bằng Python + sqlite3, trong
+    khi kiến trúc chốt TypeScript 5 strict / React 19 / Vite 7 / IndexedDB
+```
+
+Mục chặn thứ hai là **người rà soát độc lập bắt được, không phải cổng máy**.
+Và nó bắt đúng một lỗi của *người vận hành*: `.ai/config.json` của lượt thử
+khai `tools.test = python3 -m unittest`, agent theo cái gợi ý công cụ đó
+thay vì theo kiến trúc. Không có phiên rà soát riêng — cấm sửa code, ngữ
+cảnh sạch — thì một story "test xanh, lint sạch, đúng phạm vi" đã được tính
+là xong, với ngôn ngữ sai hoàn toàn.
+
+Đây là bất biến 6 ("người viết code không tự duyệt code") hoạt động trên
+tiền thật, không phải trên test.
+
+Mục chặn thứ nhất cũng đúng: story khai `screens` nhưng dự án chưa có
+mockup nào, nên không có gì để đối chiếu. Chính vì ca này mà `aisdlc run`
+được sửa để đòi cổng `readiness` — cổng gắn vào **cả** chỉ mục story lẫn
+hợp đồng thị giác — thay vì chỉ đòi `stories`.
+
 ### Chạy thật lần 2 — chuỗi lập kế hoạch chạy hết
 
 Sau khi sửa, `aisdlc plan` đi hết chuỗi trên `epics.md` thật (1078 dòng,
