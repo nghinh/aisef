@@ -224,6 +224,30 @@ class StateStore:
             if story_id not in st.stories:
                 st.stories[story_id] = StoryRecord(id=story_id, epic_id=epic_id, wave=wave)
 
+    def reset_for_retry(self, story_id: str) -> bool:
+        """Đưa story chưa xong về ``pending`` để chạy lại. True nếu có đổi.
+
+        Chạy lại là lối vào hợp lệ, nhưng máy trạng thái không có cạnh nào
+        đi thẳng từ ``failed`` hay từ ``running`` bỏ dở sang ``running``.
+        Không mở lối này thì mọi lần chuyển của lượt chạy lại đều bị từ
+        chối — và vì `_safe_transition` nuốt lỗi, story vẫn chạy, vẫn
+        merge, mà bản ghi đứng nguyên ở lần thất bại cũ, chi phí lượt mới
+        không vào sổ.
+
+        ``running``/``verifying`` còn sót là của tiến trình đã chết: lượt
+        chạy mới thu hồi chúng. ``done`` thì không đụng — xong là xong.
+        """
+        with self.transaction() as st:
+            rec = st.stories.get(story_id)
+            if rec is None or rec.state is StoryStatus.DONE:
+                return False
+            if rec.state is StoryStatus.PENDING:
+                return False
+            rec.status = StoryStatus.PENDING.value
+            rec.blocked_reason = ""
+            rec.updated_at = _now()
+            return True
+
     def transition(
         self,
         story_id: str,

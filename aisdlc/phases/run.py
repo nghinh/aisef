@@ -18,6 +18,7 @@ chạy lại.
 from __future__ import annotations
 
 import json
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -161,6 +162,11 @@ def run_epic(
             if state.load().stories[sid].state is StoryStatus.DONE:
                 wave.skipped.append(sid)  # chạy lại thì tiếp từ chỗ dở
             else:
+                # Về `pending` trước: không có cạnh nào đi thẳng từ
+                # `failed`, hay từ `running` mà tiến trình đã chết, sang
+                # `running`. Bỏ bước này thì lượt chạy lại làm hết việc
+                # nhưng mọi lần ghi trạng thái đều bị từ chối và nuốt.
+                state.reset_for_retry(sid)
                 todo.append(sid)
 
         if todo:
@@ -253,8 +259,10 @@ def _safe_transition(state: StateStore, story_id: str, to: StoryStatus, **kw) ->
     """
     try:
         state.transition(story_id, to, cost_usd=kw.get("cost", 0.0), reason=kw.get("reason", ""))
-    except TransitionError:
-        pass
+    except TransitionError as e:
+        # Nói ra. Nuốt im lặng đã che một lỗi thật: story chạy lại xong,
+        # merge xong, mà bản ghi vẫn đứng ở lần thất bại cũ.
+        print(f"trạng thái {story_id}: {e}", file=sys.stderr)
 
 
 def run_sprint(

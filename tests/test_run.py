@@ -223,6 +223,35 @@ class TestResume(RunTestCase):
         self.assertNotIn("STORY-01-01", agent.stories)  # đã xong từ lượt trước
         self.assertIn("STORY-01-02", agent.stories)
 
+    def test_chay_lai_story_that_bai_thi_ban_ghi_phai_theo_kip(self):
+        """Làm xong mà sổ vẫn ghi `failed` là báo cáo nói dối.
+
+        Máy trạng thái không có cạnh từ `failed` sang `running`, và
+        `_safe_transition` nuốt lỗi — nên lượt chạy lại làm hết việc,
+        merge xong, mở đợt sau, mà bản ghi đứng nguyên ở lần thất bại cũ
+        và chi phí lượt mới không vào sổ. Quan sát thật trên e9.
+        """
+        self.run_sprint(Agent(fail={"STORY-01-02"}))
+        truoc = self.state().stories["STORY-01-02"]
+        self.assertIs(truoc.state, StoryStatus.FAILED)
+        self.assertTrue(truoc.blocked_reason)
+
+        self.run_sprint(Agent())
+        sau = self.state().stories["STORY-01-02"]
+        self.assertIs(sau.state, StoryStatus.DONE, "làm xong rồi thì sổ phải ghi done")
+        self.assertFalse(sau.blocked_reason, "lý do chặn cũ phải được xoá")
+        self.assertGreater(sau.cost_usd, truoc.cost_usd, "chi phí lượt mới phải vào sổ")
+
+    def test_story_bo_do_vi_tien_trinh_chet_duoc_thu_hoi(self):
+        """`running` còn sót là của tiến trình đã chết, không phải đang chạy."""
+        self.run_sprint(Agent(fail={"STORY-01-02"}))
+        st = StateStore(self.artifacts)
+        with st.transaction() as raw:
+            raw.stories["STORY-01-02"].status = StoryStatus.RUNNING.value
+
+        self.run_sprint(Agent())
+        self.assertIs(self.state().stories["STORY-01-02"].state, StoryStatus.DONE)
+
 
 class TestIsolationOff(RunTestCase):
     def test_no_isolate_runs_in_the_project_itself(self):
