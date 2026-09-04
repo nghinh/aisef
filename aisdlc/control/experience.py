@@ -38,10 +38,25 @@ def slugify(name: str) -> str:
     return text or "screen"
 
 
+#: Tên cột có thể gặp, theo vai trò. BMAD viết bảng bằng ngôn ngữ của dự
+#: án, nên không thể trông vào **thứ tự** cột: một lần chạy thật đã cho ra
+#: bảng `screen_id | Route | Đến từ | Mục đích` — đọc theo thứ tự thì
+#: "Đến từ" bị lấy làm mục đích và route mất hẳn.
+_COLUMNS: dict[str, tuple[str, ...]] = {
+    "id": ("screen_id", "screen id", "id", "mã màn hình", "mã"),
+    "name": ("surface", "screen", "màn hình", "tên", "name"),
+    "route": ("route", "đường dẫn", "path", "url"),
+    "reached_from": ("reached from", "đến từ", "vào từ", "entry", "lối vào", "reached"),
+    "purpose": ("purpose", "mục đích", "vai trò", "description", "mô tả"),
+}
+
+
 @dataclass
 class Screen:
     id: str
     name: str
+    #: Đường dẫn màn hình này sẽ có trong ứng dụng, nếu tài liệu khai.
+    route: str = ""
     reached_from: str = ""
     purpose: str = ""
     #: Component nêu trong bảng Component Patterns có nhắc tới màn hình này.
@@ -53,6 +68,7 @@ class Screen:
         return {
             "id": self.id,
             "name": self.name,
+            "route": self.route,
             "reached_from": self.reached_from,
             "purpose": self.purpose,
             "components": self.components,
@@ -109,20 +125,52 @@ def _strip_markup(text: str) -> str:
     return " ".join(text.replace("`", "").replace("**", "").split())
 
 
+def _column_map(header: list[str]) -> dict[str, int]:
+    """Vai trò → chỉ số cột, đọc từ hàng tiêu đề."""
+    out: dict[str, int] = {}
+    for i, cell in enumerate(header):
+        label = _strip_markup(cell).lower()
+        for role, names in _COLUMNS.items():
+            if role in out:
+                continue
+            if any(label == n or label.startswith(n) for n in names):
+                out[role] = i
+                break
+    return out
+
+
+def _cell(row: list[str], index: int | None) -> str:
+    if index is None or index >= len(row):
+        return ""
+    return _strip_markup(row[index])
+
+
 def parse_experience(text: str) -> Experience:
     """`EXPERIENCE.md` → danh sách màn hình đã chuẩn hoá."""
     exp = Experience()
 
     for table in _tables_in_section(text, _IA_HEADINGS):
-        for row in table[1:] if len(table) > 1 else []:
-            name = _strip_markup(row[0])
-            if not name or name.lower() in ("surface", "screen", "màn hình"):
+        if not table:
+            continue
+        cols = _column_map(table[0])
+        # Bảng không có tiêu đề nhận ra được: quay về thứ tự cũ.
+        if not cols:
+            cols = {"name": 0, "reached_from": 1, "purpose": 2}
+            rows = table
+        else:
+            rows = table[1:]
+
+        for row in rows:
+            name = _cell(row, cols.get("name")) or _cell(row, cols.get("id"))
+            ident = _cell(row, cols.get("id")) or name
+            if not ident or ident.lower() in ("surface", "screen", "màn hình", "screen_id"):
                 continue
             screen = Screen(
-                id=slugify(name),
-                name=name,
-                reached_from=_strip_markup(row[1]) if len(row) > 1 else "",
-                purpose=_strip_markup(row[2]) if len(row) > 2 else "",
+                id=slugify(ident),
+                name=name or ident,
+                route=_cell(row, cols.get("route")),
+                reached_from=_cell(row, cols.get("reached_from")),
+                purpose=_cell(row, cols.get("purpose")),
             )
             if not exp.by_id(screen.id):
                 exp.screens.append(screen)

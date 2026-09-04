@@ -97,6 +97,36 @@ class TestParseBmadSample(unittest.TestCase):
             self.assertIn("Command palette", screen.components)
 
 
+class TestRealBmadOutput(unittest.TestCase):
+    """Bảng do BMAD sinh trong một lượt chạy thật: `screen_id | Route |
+    Đến từ | Mục đích`. Đọc theo **thứ tự** cột thì "Đến từ" bị lấy làm
+    mục đích và route mất hẳn — nên phải đọc theo tiêu đề."""
+
+    TEXT = (
+        "## Information Architecture\n\n"
+        "| `screen_id` | Route | Đến từ | Mục đích |\n|---|---|---|---|\n"
+        "| `notes-list` | `/` | Mở ứng dụng | Danh sách Ghi chú |\n"
+        "| `note-editor` | `/note/:id` | Chạm hàng ghi chú | Đọc và sửa một Ghi chú |\n"
+    )
+
+    def setUp(self):
+        self.exp = parse_experience(self.TEXT)
+
+    def test_ids_from_the_id_column(self):
+        self.assertEqual(self.exp.ids, ["notes-list", "note-editor"])
+
+    def test_route_captured(self):
+        self.assertEqual(self.exp.by_id("note-editor").route, "/note/:id")
+
+    def test_purpose_is_not_the_entry_point(self):
+        s = self.exp.by_id("notes-list")
+        self.assertEqual(s.purpose, "Danh sách Ghi chú")
+        self.assertEqual(s.reached_from, "Mở ứng dụng")
+
+    def test_header_row_is_not_a_screen(self):
+        self.assertNotIn("screen-id", self.exp.ids)
+
+
 class TestRobustness(unittest.TestCase):
     def test_no_information_architecture_section(self):
         self.assertEqual(parse_experience("# Trống\n\nkhông có bảng nào.\n").screens, [])

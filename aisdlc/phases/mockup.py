@@ -92,6 +92,11 @@ def build_prompt(screen: Screen, experience: Experience, artifact_root: Path) ->
             "screen_name": screen.name,
             "purpose": screen.purpose or "(tài liệu không nêu)",
             "reached_from": screen.reached_from or "(tài liệu không nêu)",
+            "route": (
+                f"`{screen.route}` — đặt đúng chuỗi này vào thẻ meta aisdlc-route"
+                if screen.route
+                else "(tài liệu không khai — tự chọn đường dẫn hợp lý và khai vào meta)"
+            ),
             "components": "\n".join(rules) or "- (tài liệu không nêu)",
             "states": ", ".join(screen.states) or "(chỉ trạng thái chính)",
             "artifact_root": artifact_root.name,

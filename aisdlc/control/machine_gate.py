@@ -204,6 +204,14 @@ def check_design_contract(
                 f"{screen.id}: mockup không khai route (thẻ meta aisdlc-route) — "
                 "không đối chiếu được với ứng dụng thật"
             )
+        else:
+            declared = experience.by_id(screen.id)
+            if declared is not None and declared.route and declared.route != screen.route:
+                # Không chặn: một trong hai đúng, và người duyệt biết cái nào.
+                r.warnings.append(
+                    f"{screen.id}: route mockup ({screen.route}) khác route trong "
+                    f"EXPERIENCE.md ({declared.route})"
+                )
         if not screen.components:
             r.warnings.append(f"{screen.id}: mockup không có component nào kiểm được")
 

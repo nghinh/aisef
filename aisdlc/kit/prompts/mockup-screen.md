@@ -1,6 +1,6 @@
 ---
 name: mockup-screen
-version: 1
+version: 2
 role: designer
 ---
 Use the aisdlc-mockup-html skill.
@@ -11,6 +11,7 @@ screen_id: {{ screen_id }}
 Tên màn hình: {{ screen_name }}
 Mục đích: {{ purpose }}
 Vào từ: {{ reached_from }}
+Route: {{ route }}
 
 Component phải có (theo EXPERIENCE.md) và luật hành vi:
 {{ components }}
