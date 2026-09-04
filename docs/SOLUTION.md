@@ -396,6 +396,17 @@ cho trạng thái lệch nhau.
 
 ## 12bis. Map với mockup — bước bắt buộc của story có giao diện
 
+**Mockup còn là một lớp kiểm định đặc tả.** Lượt chạy thật (5 màn, $9.22)
+sinh ra 52 chỗ `data-unresolved`, và 31 chỗ trong đó **không** thuộc câu
+hỏi mở nào đã biết — chúng là lỗ hổng agent phát hiện khi cố dựng: `tag-chip`
+không có trạng thái "gỡ thẻ" mà FR-8 đòi; không bề mặt nào trong
+`DESIGN.md.Components` chứa nổi thông báo ghi hỏng; màn `tags` cần một hàng
+quản lý thẻ mà đặc tả không định nghĩa.
+
+Đó là những thứ chỉ lộ ra khi có người (hoặc agent) phải dựng thật. Phát
+hiện chúng ở bước mockup rẻ hơn nhiều so với phát hiện ở bước viết code —
+và rẻ hơn rất nhiều so với phát hiện sau khi giao hàng.
+
 Story nào có `screen_id` phải đi qua **hai nửa** của bước map. Thiếu nửa nào cũng không tính là xong.
 
 ### Nửa trước khi code — nạp hợp đồng thị giác
