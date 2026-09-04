@@ -37,7 +37,12 @@
   file không được tạo, `permission_denials = 1`. Toàn chuỗi compile → hook
   → guard → chặn đã kiểm chứng trên agent thật.
 
-**386 test xanh.**
+* *Mốc 4* — một story đi trọn bảy cổng trên agent thật: `STORY-01-01` của
+  e9 qua test · lint · phạm vi ghi · test-thật · rà soát độc lập, rồi merge
+  vào nhánh chính (2 lượt, $9,76). Trước đó nó trượt 4 lần liên tiếp — mỗi
+  lần vì một lỗi thật khác nhau của harness, xem mục 15–22 dưới.
+
+**774 test xanh.**
 
 ---
 
@@ -325,9 +330,61 @@ Bốn lỗi thật chỉ lộ ra khi chạy thật, đã sửa:
     trang thì Playwright MCP để lại `.playwright-mcp/` ở gốc worktree; mở
     trình duyệt một lần là trượt cổng phạm vi.
 
-Đây chính là giá trị của việc chạy thật: mười bốn lỗi trên đều **không** lộ
-ra trong 761 test, vì test nào cũng dựng sẵn đúng điều kiện mà thực tế
-không tự có.
+15. **Guard soi nhầm cây** — hook được biên dịch một lần vào
+    `.claude/settings.json` với `--project` là gốc dự án, nhưng story chạy
+    trong worktree riêng. `diff-scope` đi đọc `git status` của cây khác,
+    thấy 600 file tài liệu kế hoạch chưa commit và chặn **mọi** lệnh Bash.
+    Người viết vật lộn 61 lượt rồi chạm `max_turns`. Nay lấy `cwd` từ chính
+    sự kiện hook.
+16. **Người rà soát không nhận `write_scope`** — chỉ lượt của người viết
+    đặt `spec.env`. `scope_from_env` rỗng đẩy `diff-scope` vào nhánh "chưa
+    khai phạm vi mà đã đổi file", chặn mọi lệnh Bash của người rà soát. Nay
+    truyền phạm vi, nhưng **không** truyền mã story: mã story kích guard
+    `completion`, chặn người rà soát dừng lại khi test đang đỏ — đúng lúc
+    nó có nhiều thứ đáng báo cáo nhất.
+17. **Ba cổng cùng mù sau khi agent commit** — `changed_files` so cây làm
+    việc với `HEAD`, mà prompt khuyến khích agent tự commit từng phần vì
+    merge chỉ thấy thứ đã commit. Đo trên e9: **0 file so với HEAD, 11 file
+    so với điểm rẽ nhánh**. Phạm vi ghi đạt vô điều kiện, test-thật không
+    còn gì để kiểm, người rà soát nhận diff rỗng rồi phải mò cả repo — 43
+    và 51 lượt, $4,5 mỗi phiên. Nay so với `merge-base`, không với đầu
+    nhánh: story trước có thể đã merge khi story sau đang chạy.
+18. **Cờ `guard_blocked` khớp chữ "hook"** — nó bật khi thấy chuỗi con
+    "hook" trong bất kỳ `tool_result` lỗi nào. Dự án React nói về hook suốt
+    ngày; "Invalid hook call" là thông báo thường gặp. Cờ sai đi thẳng vào
+    báo cáo nghiệm thu và đã tốn một vòng chẩn đoán đuổi theo lần chặn
+    không có thật. Nay nhận theo đúng định dạng hook của Claude Code, và
+    `guard_messages` được lưu vào bằng chứng.
+19. **Người rà soát chỉ nhận danh sách tên file** — phải Read từng cái để
+    tự dựng lại diff, thứ harness đã biết sẵn. Nay đưa thẳng
+    `git diff <base>` kèm `--stat`.
+20. **Story tự mâu thuẫn, vòng lặp không nhận ra** — TCCN 1 đòi "lockfile
+    được commit", `write_scope` chỉ khai `package.json`. Guard chặn ghi
+    ngoài phạm vi, agent làm **đúng** chỉ dẫn (hoàn nguyên lockfile rồi báo
+    phạm vi khai thiếu), người rà soát chặn **đúng** vì TCCN 1 không đạt.
+    Không mắt xích nào sai, kết quả vẫn là 4 lượt y hệt nhau và $9,85.
+    Hai chỗ sửa: lockfile đi theo manifest của nó (7 cặp; không đếm vào
+    ngưỡng "chạm quá nhiều nơi" vì đó là hệ quả tự động), và vòng lặp dừng
+    khi hai lượt liền cùng một mục chặn.
+21. **Chạy lại story `failed` thì bản ghi không theo kịp** — máy trạng thái
+    không có cạnh `failed → running`, và `_safe_transition` nuốt lỗi bằng
+    `except TransitionError: pass`. Story chạy lại xong, merge xong, wave
+    sau khởi động — mà `aisdlc status` vẫn báo "failed", và $9,76 chi phí
+    lượt mới không vào sổ. Nay về `pending` trước khi chạy, và bước nhảy bị
+    từ chối thì **nói ra**.
+22. **Tiêu đề báo cáo nghiệm thu cụt** — CLI mặc định `--project .`, mà
+    `Path(".").name` là chuỗi rỗng.
+
+Đây chính là giá trị của việc chạy thật: hai mươi hai lỗi trên đều
+**không** lộ ra trong 774 test, vì test nào cũng dựng sẵn đúng điều kiện mà
+thực tế không tự có.
+
+Đáng chú ý: **lỗi 17, 18 và 21 không làm chậm gì cả — chúng làm báo cáo nói
+sai.** Cùng một nguồn gốc: chỗ nào nuốt lỗi hoặc suy ra trạng thái bằng
+phép xấp xỉ, chỗ đó nói dối. Chi phí thật của guard đo được là **110 ms mỗi
+thao tác** (khởi động Python) và **0,03 s** cho `git status` trên 12.873
+file — tức 26 giây cho cả một story. Cái đắt chưa bao giờ là guard, mà là
+guard chặn oan và cổng chấm mù.
 
 ### Chạy thật — dựng mockup 5 màn hình
 
