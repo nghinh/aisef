@@ -265,6 +265,17 @@ def check_diff_scope(changed: list[str], scope: list[str]) -> Verdict:
 #: Cố ý **không** loại cả `_bmad-output`: tài liệu kế hoạch (PRD, kiến
 #: trúc, epic, hợp đồng thị giác, chỉ mục story) là thứ agent sửa trộm thì
 #: phải lộ ra — sửa `stories.index.json` là sửa chính phạm vi ràng buộc nó.
+#: Phụ thuộc cài đặt và tạo tác build. Chúng xuất hiện vì story **chạy**,
+#: không phải vì story **viết** — tính vào phạm vi thì mọi story cài phụ
+#: thuộc đều trượt, và cách duy nhất chạy tiếp là nới phạm vi đến mức guard
+#: không còn nghĩa gì. Dự án có `.gitignore` đúng thì git đã loại sẵn;
+#: danh sách này là lưới an toàn cho lúc `.gitignore` chưa kịp có.
+VENDOR_PATHS = (
+    "node_modules", ".venv", "venv", "vendor", "target", "dist", "build",
+    "__pycache__", ".pytest_cache", ".ruff_cache", ".next", ".turbo",
+    "coverage", ".gradle", "Pods",
+)
+
 HARNESS_OWNED = (
     "_bmad-output/evidence",
     "_bmad-output/approvals",
@@ -272,6 +283,7 @@ HARNESS_OWNED = (
     "_bmad-output/sprint-status.json.lock",
     "_bmad-output/compile-report.json",
     ".aisdlc",
+    *VENDOR_PATHS,
 )
 
 
@@ -302,7 +314,7 @@ def changed_files(project_root: str, *, ignore: tuple[str, ...] = HARNESS_OWNED)
         if len(entry) <= 3:
             continue
         path = entry[3:]
-        if any(_within(path, skip) for skip in ignore):
+        if any(_within(path, skip) or skip in Path(path).parts for skip in ignore):
             continue
         out.append(path)
     return out

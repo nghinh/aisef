@@ -285,6 +285,25 @@ class TestDiffScope(unittest.TestCase):
             self.assertIn("src/a.py", changed)
             self.assertTrue(check_diff_scope(changed, ["src"]).allowed)
 
+    def test_installed_dependencies_are_not_the_story_writing_out_of_scope(self):
+        """`node_modules` xuất hiện vì story **chạy**, không phải vì story
+        **viết**. Tính vào phạm vi thì mọi story cài phụ thuộc đều trượt, và
+        cách duy nhất chạy tiếp là nới phạm vi đến mức guard hết nghĩa."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            (root / "src").mkdir()
+            (root / "src" / "a.ts").write_text("export const x = 1\n", encoding="utf-8")
+            deep = root / "node_modules" / "react" / "lib"
+            deep.mkdir(parents=True)
+            (deep / "index.js").write_text("module.exports = {}\n", encoding="utf-8")
+            (root / "dist").mkdir()
+            (root / "dist" / "bundle.js").write_text("//\n", encoding="utf-8")
+
+            changed = changed_files(str(root))
+            self.assertEqual(changed, ["src/a.ts"])
+            self.assertTrue(check_diff_scope(changed, ["src"]).allowed)
+
     def test_agent_editing_the_prd_still_shows_up(self):
         """Chỉ phần harness tự ghi được miễn; sửa PRD giữa lúc viết code là
         chuyện phải lộ ra."""
