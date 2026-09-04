@@ -60,6 +60,13 @@ KINDS: dict[str, Kind] = {
                  why="Ngưỡng lấy từ NFR; không có số thì 'nhanh' là ý kiến."),
     "security": Kind("security", "Bảo mật", level=sandbox.Level.READ_ONLY,
                      why="Quét mã, phụ thuộc và bí mật lọt vào kho."),
+    "accessibility": Kind("accessibility", "Trợ năng", needs_ui=True,
+                          level=sandbox.Level.WORKSPACE_NETWORK,
+                          why="Người dùng bàn phím và trình đọc màn hình cũng là "
+                              "người dùng; thiếu tên gọi thì màn hình không dùng được."),
+    "migration": Kind("migration", "Di trú dữ liệu",
+                      why="Nâng cấp lược đồ sai thì dữ liệu người dùng mất, và "
+                          "không có đường lùi."),
     "mutation": Kind("mutation", "Kiểm đột biến",
                      why="Bắt test luôn xanh dù code hỏng — thứ tệ hơn không có test."),
     "sbom": Kind("sbom", "Kê khai thành phần (SBOM)", level=sandbox.Level.READ_ONLY,

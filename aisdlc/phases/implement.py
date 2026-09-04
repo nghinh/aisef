@@ -24,6 +24,10 @@ from ..clients.base import ClientAdapter
 from ..config import Config
 from ..control import gate as story_gate
 from ..control.design_contract import DesignContract, load as load_contract
+from ..control.impact import analyse as analyse_impact
+from ..control.preflight import verification_contract
+from ..control.security import SecurityReport
+from ..control.security import parse as parse_security
 from ..control.normalize import Architecture, Story, effective_write_scope
 from ..harness import mockup_verify
 from ..harness.guardrails import (
@@ -36,9 +40,9 @@ from ..harness.guardrails import (
 from ..harness.mockup_map import load_for_story, prompt_section
 from ..harness.observe import EvidenceStore
 from ..harness.prompts import Catalog, load_catalog
-from ..harness.routing import DEVELOPER, REVIEWER, ROLES, build_spec
+from ..harness.routing import DEVELOPER, REVIEWER, ROLES, SECURITY, build_spec
 from ..harness.tools import describe_tools, run_tool
-from .qa import find_fake_tests
+from .qa import find_fake_tests, run_suite
 
 #: Lỗi thuộc về hạ tầng, không thuộc về chất lượng công việc.
 INFRA_ERRORS = ("api_error", "overloaded", "quá ", "không chạy được", "connection")
@@ -58,6 +62,7 @@ class Attempt:
     cost_usd: float = 0.0
     gate: story_gate.StoryGate | None = None
     review_findings: list[str] = field(default_factory=list)
+    security: SecurityReport | None = None
 
 
 @dataclass
@@ -210,6 +215,25 @@ def run_attempt(
         story.id, "qa:fake-tests", ok=not fake, detail={"files": fake}
     )
 
+    # Hợp đồng kiểm định của story: chạy đúng những loại nó phải qua.
+    # Không phải pha mới — cùng bộ máy `run_suite`, chỉ giới hạn phạm vi.
+    # `verify.X` để trống vẫn là **chưa cấu hình**, không phải đạt: đó là
+    # điều `run_suite` đã phân biệt sẵn, và cổng đọc lại đúng như thế.
+    hop_dong = [
+        k for k in verification_contract(story)
+        if k not in ("mockup-map", "unit", "security")
+    ]
+    if hop_dong:
+        run_suite(
+            workdir,
+            config=config,
+            only=hop_dong,
+            has_ui=bool(story.screens),
+            story_id=story.id,
+            artifact_root=artifact_root,
+            changed=changed_now,
+        )
+
     if story.screens and contract:
         mockup_verify.verify_screens(
             workdir, contract, story.screens,
@@ -238,13 +262,41 @@ def run_attempt(
         detail={"findings": attempt.review_findings, "attempt": number},
     )
 
+    if config.get("security.semantic_review", True):
+        attempt.security = security_review(
+            story,
+            workdir=workdir,
+            base_ref=base_ref,
+            project=project,
+            artifact_root=artifact_root,
+            client=client,
+            config=config,
+            catalog=catalog,
+            architecture=architecture,
+        )
+        evidence.tool_run(
+            story.id,
+            "security",
+            ok=not (attempt.security.error
+                    or attempt.security.blocking(config["security.block_severities"])),
+            detail={
+                "findings": [f.line() for f in attempt.security.findings],
+                "filtered": len(attempt.security.filtered),
+                "error": attempt.security.error,
+                "attempt": number,
+            },
+        )
+
     attempt.gate = story_gate.evaluate(
         story.id,
         evidence.read(story.id),
         changed=changed_now,
         write_scope=scope,
         screens=list(story.screens),
+        contract=verification_contract(story),
         review_blocking=attempt.review_findings,
+        security=attempt.security,
+        block_severities=config["security.block_severities"],
     )
     attempt.ok = attempt.gate.passed
     return attempt
@@ -330,6 +382,12 @@ def review_story(
         config=config,
     )
     context["diff_summary"] = review_diff(str(workdir), changed, base_ref=base_ref)
+    # Ảnh hưởng của thay đổi: người rà soát nhận diff rồi vẫn phải tự dò
+    # ai gọi, test nào phủ — đo trên e9 là 22–68 lượt, mỗi lượt thử lại
+    # làm lại từ đầu. Đưa sẵn thì nó bắt đầu từ chỗ xa hơn.
+    context["impact"] = analyse_impact(
+        workdir, changed, command=str(config.get("review.impact_provider", "") or "")
+    ).as_prompt()
 
     spec = build_spec(
         REVIEWER,
@@ -355,6 +413,64 @@ def review_story(
         # Không rà soát được thì **không** coi như sạch.
         return [f"rà soát không chạy được: {result.error}"]
     return blocking_findings(result.text)
+
+
+def security_review(
+    story: Story,
+    *,
+    workdir: Path,
+    base_ref: str,
+    project: Path,
+    artifact_root: Path,
+    client: ClientAdapter,
+    config: Config,
+    catalog: Catalog,
+    architecture: Architecture | None,
+) -> SecurityReport:
+    """Rà soát bảo mật theo ngữ nghĩa — **phiên riêng**, chỉ đọc.
+
+    Không gộp vào lượt rà soát chung: một phiên phải giữ hai bộ câu hỏi
+    khác nhau trong đầu thì bộ nào cũng bị làm qua loa, và bảo mật là bộ
+    thường bị bỏ trước.
+
+    Phiên này đọc mã do agent khác vừa viết — **dữ liệu không tin được**.
+    Nó không có quyền ghi (vai `security` cấm Write/Edit), và không nhận
+    biến môi trường nào của story: mã story đang chạy không việc gì phải
+    tới tay nó. Cách ly khỏi bí mật của máy thì cần sandbox thật, không
+    làm được ở tầng ngôn ngữ — đó là giới hạn, và nó được ghi ra thay vì
+    giấu đi.
+    """
+    changed = changed_files(str(workdir), base_ref=base_ref)
+    if not changed:
+        return SecurityReport(error="không có thay đổi nào để rà")
+
+    context = build_context(
+        story,
+        project=project,
+        artifact_root=artifact_root,
+        architecture=architecture,
+        contract=None,
+        config=config,
+    )
+    context["diff_summary"] = review_diff(str(workdir), changed, base_ref=base_ref)
+    context["impact"] = analyse_impact(
+        workdir, changed, command=str(config.get("review.impact_provider", "") or "")
+    ).as_prompt()
+
+    spec = build_spec(
+        SECURITY,
+        catalog.get(ROLES[SECURITY].prompt),
+        context,
+        workdir=workdir,
+        config=config,
+    )
+    result = client.run(spec)
+    EvidenceStore(artifact_root).agent_run(
+        story.id, result, name=f"{story.id}-security"
+    )
+    if not result.ok:
+        return SecurityReport(error=f"không chạy được: {result.error}")
+    return parse_security(result.text)
 
 
 def blocking_findings(text: str) -> list[str]:

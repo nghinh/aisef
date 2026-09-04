@@ -22,6 +22,7 @@ from .sandbox import Level
 
 DEVELOPER = "developer"
 REVIEWER = "reviewer"
+SECURITY = "security"
 DESIGNER = "designer"
 
 
@@ -54,6 +55,17 @@ ROLES: dict[str, Role] = {
         # không còn ai rà soát nữa.
         disallowed_tools=("Write", "Edit", "NotebookEdit"),
         note="Rà soát độc lập, phiên mới, không sửa gì.",
+    ),
+    SECURITY: Role(
+        id=SECURITY,
+        prompt="story-security-review",
+        level=Level.READ_ONLY,
+        may_resume=False,
+        # Cùng lý do như người rà soát, cộng thêm một lý do riêng: nó đọc
+        # code do agent khác viết, tức **dữ liệu không tin được**. Cho nó
+        # quyền ghi là mở đúng đường mà nó đang đi tìm.
+        disallowed_tools=("Write", "Edit", "NotebookEdit"),
+        note="Rà soát bảo mật theo ngữ nghĩa, phiên mới, không sửa gì.",
     ),
     DESIGNER: Role(
         id=DESIGNER,

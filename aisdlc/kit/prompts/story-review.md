@@ -1,6 +1,6 @@
 ---
 name: story-review
-version: 1
+version: 2
 role: reviewer
 ---
 # Rà soát {{ story_id }} — {{ story_title }}
@@ -22,6 +22,10 @@ Không sửa code. Chỉ báo cáo.
 ## Thay đổi cần rà
 
 {{ diff_summary }}
+
+## Thay đổi này chạm tới đâu
+
+{{ impact }}
 
 ## Rà theo thứ tự này
 

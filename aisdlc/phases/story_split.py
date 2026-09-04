@@ -19,7 +19,11 @@ from pathlib import Path
 from ..config import DEFAULTS, Config
 from ..control.approvals import STORIES_INDEX
 from ..control.machine_gate import GateResult, check_stories
-from ..control.preflight import STORY_NOT_EXECUTABLE, check_stories_executable
+from ..control.preflight import (
+    STORY_NOT_EXECUTABLE,
+    check_stories_executable,
+    verification_contract,
+)
 from ..control.normalize import (
     EpicPlan,
     PRD,
@@ -109,6 +113,19 @@ def render_story(story: Story, prd: PRD | None) -> str:
         out.append("_(chưa khai — cổng máy sẽ chặn)_")
     out.append("")
 
+    hop_dong = verification_contract(story)
+    if hop_dong:
+        out += [
+            "## Xong nghĩa là gì",
+            "",
+            "Story này phải qua các loại kiểm định sau. Loại chưa cấu hình "
+            "trên dự án **không** được tính là đạt — nó là chỗ trống, và "
+            "cổng sẽ nói ra.",
+            "",
+        ]
+        out += [f"- `{k}`" for k in hop_dong]
+        out.append("")
+
     if story.depends_on:
         out += ["## Phụ thuộc", ""] + [f"- {d}" for d in story.depends_on] + [""]
 
@@ -188,6 +205,12 @@ def split(
     prd = parse_prd_file(prd_path) if prd_path.is_file() else None
 
     written: set[Path] = set()
+    # Chốt hợp đồng kiểm định trước khi ghi: chỉ mục và tệp story phải
+    # nói cùng một thứ, và phần điều phối đọc chỉ mục.
+    for story in stories:
+        if not story.verification_contract:
+            story.verification_contract = verification_contract(story)
+
     for story in stories:
         path = story_file(root, story)
         path.parent.mkdir(parents=True, exist_ok=True)

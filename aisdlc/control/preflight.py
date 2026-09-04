@@ -57,6 +57,24 @@ class Need:
         out = f"{self.capability} — {self.evidence}"
         return f"{out}. {self.remedy}" if self.remedy else out
 
+    @property
+    def blocks_run(self) -> bool:
+        """Thiếu cái này thì story **không chạy nổi**, hay chỉ là chạy
+        xong mà thiếu bằng chứng?
+
+        Không có trình duyệt thì story giao diện không dựng được màn nào
+        — chặn. Không có `verify.accessibility` thì nó vẫn viết được
+        code; cái thiếu là bằng chứng nghiệm thu, và cổng story đã ghi
+        đúng "chưa cấu hình — không tính là đạt", còn cổng trước triển
+        khai thì chặn thật. Chặn ở đây nữa là chặn hai lần cho một
+        chuyện, và làm khung không dùng được ngay từ story giao diện đầu
+        tiên.
+        """
+        if self.capability.startswith("verify."):
+            return False
+        # Bản dựng sẵn vẫn chạy khi không cấu hình nhà cung cấp riêng.
+        return self.capability != "code-intelligence"
+
 
 @dataclass
 class Preflight:
@@ -66,6 +84,13 @@ class Preflight:
 
     @property
     def executable(self) -> bool:
+        """Chạy nổi không. Thiếu **bằng chứng nghiệm thu** không tính vào
+        đây — cổng story và cổng trước triển khai lo phần đó."""
+        return not [m for m in self.missing if m.blocks_run]
+
+    @property
+    def complete(self) -> bool:
+        """Đủ cả năng lực chạy lẫn năng lực nghiệm thu."""
         return not self.missing
 
     @property
@@ -223,6 +248,42 @@ def _first_marker(text: str, markers: tuple[str, ...]) -> str:
 # ------------------------------------------------------------ suy ra
 
 
+#: Loại kiểm định gắn với một dấu hiệu cấu trúc, không phải câu chữ.
+#: Story có màn hình thì **luôn** phải qua trợ năng và map mockup: một
+#: màn hình không dùng được bằng bàn phím là màn hình hỏng, dù mọi tiêu
+#: chí chấp nhận đều xanh.
+STRUCTURAL_CONTRACT = {
+    "screens": ("unit", "e2e", "accessibility", "mockup-map"),
+}
+
+#: Loại kiểm định mọi story đều phải qua. Ngắn có chủ đích: hợp đồng dài
+#: cho mọi story thì không loại nào được coi trọng.
+BASE_CONTRACT = ("unit",)
+
+
+def verification_contract(story: Story) -> list[str]:
+    """Loại kiểm định story này phải qua.
+
+    Story tự khai thì lấy bản khai — người lập kế hoạch biết thứ code
+    không suy ra được. Không khai thì suy bằng code từ cùng những dấu
+    hiệu mà `required_capabilities` dùng, để hai bên không bao giờ nói
+    khác nhau.
+    """
+    if story.verification_contract:
+        return list(dict.fromkeys(story.verification_contract))
+
+    out = list(BASE_CONTRACT)
+    if story.screens:
+        out += list(STRUCTURAL_CONTRACT["screens"])
+    text = _text_of(story)
+    for cap, markers in _VERIFY_MARKERS.items():
+        if _first_marker(text, markers):
+            out.append(cap.split(".", 1)[1])
+    if _first_marker(text, _SECURITY_MARKERS):
+        out.append("security")
+    return list(dict.fromkeys(out))
+
+
 def required_capabilities(story: Story, *, project: Path | None = None) -> list[Need]:
     """Năng lực story này cần, suy ra từ chính nội dung story.
 
@@ -254,18 +315,17 @@ def required_capabilities(story: Story, *, project: Path | None = None) -> list[
     needs.append(Need("tools.lint", "mọi story đều bị chấm bằng lint",
                       "cấu hình `tools.lint`"))
 
-    # 3. Loại kiểm định tiêu chí chấp nhận gọi tên.
-    for cap, markers in _VERIFY_MARKERS.items():
-        hit = _first_marker(text, markers)
-        if hit:
-            needs.append(Need(cap, f'tiêu chí chấp nhận nhắc "{hit}"',
-                              f"cấu hình `{cap}`"))
-
-    # 4. Bảo mật.
-    hit = _first_marker(text, _SECURITY_MARKERS)
-    if hit:
-        needs.append(Need("verify.security", f'tiêu chí chấp nhận nhắc "{hit}"',
-                          "cấu hình `verify.security`"))
+    # 3. Loại kiểm định trong hợp đồng của story. Một nguồn duy nhất, để
+    #    cổng và hợp đồng không bao giờ nói khác nhau.
+    khai = bool(story.verification_contract)
+    for kind in verification_contract(story):
+        if kind == "mockup-map":
+            continue  # đã tính ở mục 1 theo từng màn hình
+        vi_sao = (
+            "story khai trong `verification_contract`" if khai
+            else _why_kind(story, kind)
+        )
+        needs.append(Need(f"verify.{kind}", vi_sao, f"cấu hình `verify.{kind}`"))
 
     # 5. Mạng lúc chạy kiểm.
     hit = _first_marker(text, _NETWORK_MARKERS)
@@ -286,17 +346,33 @@ def required_capabilities(story: Story, *, project: Path | None = None) -> list[
     roots -= set(MANIFESTS)
     if hit:
         needs.append(Need("code-intelligence", f'tiêu chí chấp nhận nhắc "{hit}"',
-                          "cấu hình `review.impact_provider`"))
+                          "cấu hình `review.impact_provider` — không có thì vẫn chạy "
+            "bản dựng sẵn, nhưng nó dò theo tên nên thô hơn nhiều"))
     elif len(roots) >= IMPACT_MODULE_THRESHOLD:
         needs.append(Need(
             "code-intelligence",
             f"phạm vi ghi chạm {len(roots)} module gốc: {', '.join(sorted(roots))}",
-            "cấu hình `review.impact_provider`",
+            "cấu hình `review.impact_provider` — không có thì vẫn chạy "
+            "bản dựng sẵn, nhưng nó dò theo tên nên thô hơn nhiều",
         ))
 
     # 7. Tệp và gói tiêu chí chấp nhận gọi tên.
     needs += _needs_from_names(story, project)
     return needs
+
+
+def _why_kind(story: Story, kind: str) -> str:
+    """Vì sao loại kiểm này có trong hợp đồng — nói ra chỗ đã kích nó."""
+    if kind in BASE_CONTRACT:
+        return "mọi story đều phải qua"
+    if story.screens and kind in STRUCTURAL_CONTRACT["screens"]:
+        return f"story dựng màn hình `{story.screens[0]}`"
+    text = _text_of(story)
+    markers = _VERIFY_MARKERS.get(f"verify.{kind}")
+    hit = _first_marker(text, markers) if markers else ""
+    if not hit and kind == "security":
+        hit = _first_marker(text, _SECURITY_MARKERS)
+    return f'tiêu chí chấp nhận nhắc "{hit}"' if hit else "suy ra từ nội dung story"
 
 
 def _needs_from_names(story: Story, project: Path | None) -> list[Need]:
@@ -431,8 +507,21 @@ def provisioned(
     if config.get("sandbox.tools_network"):
         have.add("network")
 
+    # Kiểm thử đơn vị chạy qua `tools.test` — harness gọi nó mỗi lượt và
+    # cổng `completion` chặn agent kết thúc khi nó đỏ. Đòi thêm
+    # `verify.unit` là bắt cấu hình hai lần cho cùng một việc, và nó làm
+    # **mọi** story thành không chạy được.
+    if str(config.get("tools.test", "")).strip():
+        have.add("verify.unit")
+
     if str(config.get("review.impact_provider", "")).strip():
         have.add("code-intelligence")
+
+    # Rà soát bảo mật theo ngữ nghĩa của chính harness **là** một cách cấp
+    # năng lực này. Đòi thêm `verify.security` khi nó đã bật là bắt cấu
+    # hình hai lần cho cùng một việc.
+    if config.get("security.semantic_review", True):
+        have.add("verify.security")
 
     if contract_screens is None:
         contract_screens = _contract_screens(project)

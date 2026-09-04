@@ -69,6 +69,8 @@ class Agent(ClientAdapter):
         return {c: Support.NATIVE for c in Capability}
 
     def run(self, spec: RunSpec) -> RunResult:
+        if "Rà soát bảo mật" in spec.prompt:
+            return RunResult(ok=True, text="không có phát hiện bảo mật", cost_usd=0.1)
         if "Rà soát" in spec.prompt:
             return RunResult(ok=True, text="không có mục chặn", cost_usd=0.1)
 

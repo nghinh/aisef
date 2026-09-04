@@ -21,6 +21,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from ..harness.guardrails import check_completion, check_diff_scope
+from .security import DEFAULT_BLOCKING
 from ..harness.observe import MOCKUP_MAP, TOOL_RUN, Evidence
 
 
@@ -68,8 +69,11 @@ def evaluate(
     changed: list[str],
     write_scope: list[str],
     screens: list[str],
+    contract: list[str] | None = None,
     review_blocking: list[str] | None = None,
     review_ran: bool = True,
+    security=None,
+    block_severities=None,
 ) -> StoryGate:
     """Chấm một story từ bằng chứng đã ghi."""
     gate = StoryGate(story_id=story_id)
@@ -121,6 +125,43 @@ def evaluate(
         )
     else:
         gate.checks.append(Check("test thật", True))
+
+    # Hợp đồng kiểm định của story. Loại chưa cấu hình được ghi là **chưa
+    # cấu hình**, không phải đạt — nó chặn ở cổng trước triển khai, và ở
+    # đây nó phải hiện ra để người đọc biết chỗ trống nằm đâu.
+    for kind in contract or []:
+        if kind in ("unit", "mockup-map", "security"):
+            continue  # đã có mục riêng ở trên
+        ran = evidence.last(TOOL_RUN, kind)
+        if ran is None:
+            gate.checks.append(Check(
+                kind, True, "chưa cấu hình — không tính là đạt", skipped=True
+            ))
+        elif ran.detail.get("skipped"):
+            gate.checks.append(Check(
+                kind, True, str(ran.detail["skipped"]), skipped=True
+            ))
+        else:
+            gate.checks.append(Check(
+                kind, ran.ok, "" if ran.ok else str(ran.detail.get("tail", ""))[:200]
+            ))
+
+    # Bảo mật: chưa chạy thì **chưa cấu hình**, không phải đạt. Bỏ mục
+    # này khi không có kết quả sẽ làm cổng im lặng ở đúng chỗ nó phải
+    # nói to nhất.
+    if security is None:
+        gate.checks.append(
+            Check("bảo mật", True, "chưa cấu hình rà soát bảo mật", skipped=True)
+        )
+    elif security.error:
+        gate.checks.append(Check("bảo mật", False, security.error))
+    else:
+        chan = security.blocking(block_severities or DEFAULT_BLOCKING)
+        gate.checks.append(Check(
+            "bảo mật",
+            not chan,
+            "" if not chan else f"{len(chan)} mục chặn: {chan[0].line()[:200]}",
+        ))
 
     if not review_ran:
         gate.checks.append(Check("rà soát", False, "chưa rà soát độc lập"))

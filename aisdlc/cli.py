@@ -309,12 +309,15 @@ def _preflight_lines(args) -> list[str]:
     res = check_stories_executable(
         list(plan.stories.values()), project=project, config=Config.load(args.project)
     )
-    xau = [pf for pf in res if not pf.executable]
+    # Cổng người: đòi **đủ**, kể cả năng lực nghiệm thu. Đây là mốc
+    # cuối trước khi tiêu tiền, và người duyệt cần thấy chỗ trống.
+    xau = [pf for pf in res if not pf.complete]
     if not xau:
         return [f"\n✅ {len(res)} story đều chạy được"]
-    out = [f"\n✗ {len(xau)}/{len(res)} story chưa chạy được:"]
+    out = [f"\n✗ {len(xau)}/{len(res)} story chưa đủ điều kiện:"]
     for pf in xau:
-        out.append(f"  {STORY_NOT_EXECUTABLE} {pf.story_id}")
+        nhan = STORY_NOT_EXECUTABLE if not pf.executable else "THIẾU BẰNG CHỨNG"
+        out.append(f"  {nhan} {pf.story_id}")
         out += [f"    - {m.line()}" for m in pf.missing]
     return out
 

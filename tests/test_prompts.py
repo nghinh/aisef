@@ -42,6 +42,7 @@ STORY_CTX = {
     "mockup_section": "màn hình danh-sach",
     "tools": "- aisdlc tool test",
     "diff_summary": "3 file đổi",
+    "impact": "_Chưa có phân tích ảnh hưởng_",
 }
 
 

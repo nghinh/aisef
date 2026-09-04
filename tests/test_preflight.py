@@ -161,9 +161,10 @@ class TestKhongBaoOan(PreflightTestCase):
         ]))
         self.assertNotIn("verify.security", self.caps(pf))
 
-        pf = self.check(self.story(acceptance_criteria=[
-            "Then token phiên hết hạn sau 30 phút"
-        ]))
+        pf = self.check(
+            self.story(acceptance_criteria=["Then token phiên hết hạn sau 30 phút"]),
+            **{"security.semantic_review": False},
+        )
         self.assertIn("verify.security", self.caps(pf))
 
     def test_tep_o_thu_muc_khac_van_tinh_la_da_co(self):
@@ -270,11 +271,21 @@ class TestVerificationTypes(PreflightTestCase):
 
 class TestSecurityAndNetwork(PreflightTestCase):
     def test_story_cham_bao_mat_doi_kiem_dinh_bao_mat(self):
+        """Tắt rà soát ngữ nghĩa thì phải có `verify.security` cấu hình."""
         for cum in ("băm mật khẩu người dùng", "chống XSS trên ô nhập",
                     "token phiên hết hạn sau 30 phút"):
             with self.subTest(cum=cum):
-                pf = self.check(self.story(acceptance_criteria=[f"Then {cum}"]))
+                pf = self.check(
+                    self.story(acceptance_criteria=[f"Then {cum}"]),
+                    **{"security.semantic_review": False},
+                )
                 self.assertIn("verify.security", self.caps(pf))
+
+    def test_ra_soat_ngu_nghia_bat_thi_da_du(self):
+        """Nó **là** một cách cấp năng lực này — đòi thêm `verify.security`
+        là bắt cấu hình hai lần cho cùng một việc."""
+        pf = self.check(self.story(acceptance_criteria=["Then chống XSS trên ô nhập"]))
+        self.assertNotIn("verify.security", self.caps(pf))
 
     def test_story_can_mang_doi_mo_mang_cho_sandbox(self):
         pf = self.check(self.story(
@@ -324,6 +335,7 @@ class TestProvisioned(PreflightTestCase):
             "sandbox.tools_network": True,
         }))
         self.assertIn("verify.e2e", got)
+        self.assertIn("verify.security", got)   # rà soát ngữ nghĩa bật sẵn
         self.assertIn("browser", got)
         self.assertIn("network", got)
         self.assertIn("mockup-map:notes-list", got)
@@ -364,6 +376,53 @@ class TestHaiMucCham(PreflightTestCase):
             screens=["notes-list"],
             acceptance_criteria=["Then `src/khac/moi.ts` sinh ra báo cáo"],
         ))
+        self.assertFalse(pf.executable)
+
+
+class TestRanhGioiChanChay(PreflightTestCase):
+    """"Không chạy nổi" khác "chạy được nhưng thiếu bằng chứng".
+
+    Không có trình duyệt thì story giao diện không dựng được màn nào —
+    chặn. Không có `verify.accessibility` thì nó vẫn viết được code; cái
+    thiếu là bằng chứng nghiệm thu, và cổng story đã ghi "chưa cấu hình
+    — không tính là đạt" còn cổng trước triển khai thì chặn thật. Chặn ở
+    cả hai chỗ là chặn hai lần cho một chuyện, và làm khung không dùng
+    được ngay từ story giao diện đầu tiên.
+    """
+
+    def ui(self, **cfg):
+        return self.check(self.story(screens=["notes-list"]), **cfg)
+
+    def du_trinh_duyet(self):
+        self.contract("notes-list")
+        return {
+            "app.dev_command": "npm run dev",
+            "app.base_url": "http://localhost:5199",
+        }
+
+    def test_thieu_trinh_duyet_thi_khong_chay_noi(self):
+        pf = self.ui()
+        self.assertFalse(pf.executable)
+        self.assertFalse(pf.complete)
+
+    def test_thieu_kiem_dinh_thi_van_chay_noi_nhung_chua_du(self):
+        pf = self.ui(**self.du_trinh_duyet())
+        self.assertTrue(pf.executable, pf.summary())
+        self.assertFalse(pf.complete)
+        self.assertTrue({m.capability for m in pf.missing} & {
+            "verify.e2e", "verify.accessibility"
+        })
+
+    def test_thieu_nha_cung_cap_anh_huong_van_chay_noi(self):
+        """Bản dựng sẵn vẫn chạy khi không cấu hình nhà cung cấp riêng."""
+        pf = self.check(self.story(
+            write_scope=["src/a.ts", "api/b.ts", "worker/c.ts", "shared/d.ts"],
+        ))
+        self.assertIn("code-intelligence", self.caps(pf))
+        self.assertTrue(pf.executable)
+
+    def test_thieu_cong_cu_test_thi_khong_chay_noi(self):
+        pf = self.check(self.story(), **{"tools.test": ""})
         self.assertFalse(pf.executable)
 
 

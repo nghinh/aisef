@@ -43,9 +43,12 @@ class ScriptedClient(ClientAdapter):
     id = "scripted"
 
     def __init__(self, *, writes=("src/a.py",), review="không có mục chặn",
+                 security="không có phát hiện bảo mật",
                  fail_first=0, fail_error="api_error"):
         self.writes = list(writes)
         self.review = review
+        self.security = security
+        self.security_envs: list[dict] = []
         self.review_envs: list[dict] = []
         self.review_prompts: list[str] = []
         self.fail_first = fail_first
@@ -60,7 +63,12 @@ class ScriptedClient(ClientAdapter):
         return {c: Support.NATIVE for c in Capability}
 
     def run(self, spec: RunSpec) -> RunResult:
-        is_review = "Rà soát" in spec.prompt
+        is_security = "Rà soát bảo mật" in spec.prompt
+        is_review = "Rà soát" in spec.prompt and not is_security
+        if is_security:
+            self.calls.append("security")
+            self.security_envs.append(dict(spec.env))
+            return RunResult(ok=True, text=self.security, cost_usd=0.2)
         self.calls.append("review" if is_review else "develop")
         (self.review_envs if is_review else self.envs).append(dict(spec.env))
         if is_review:
@@ -127,7 +135,7 @@ class TestHappyPath(ImplementTestCase):
     def test_developer_then_reviewer(self):
         c = ScriptedClient()
         self.implement(c)
-        self.assertEqual(c.calls, ["develop", "review"])
+        self.assertEqual(c.calls, ["develop", "review", "security"])
 
     def test_cong_nhin_thay_cong_viec_agent_da_commit(self):
         """Agent commit trong worktree thì ba cổng vẫn phải thấy diff.
@@ -238,7 +246,7 @@ class TestHappyPath(ImplementTestCase):
     def test_cost_recorded_per_run(self):
         out = self.implement(ScriptedClient())
         runs = EvidenceStore(self.artifacts).read("STORY-01-01").of(AGENT_RUN)
-        self.assertEqual(len(runs), 2)          # viết + rà soát
+        self.assertEqual(len(runs), 3)   # viết + rà soát + rà soát bảo mật
         self.assertAlmostEqual(out.cost_usd, 1.0)  # chỉ lượt viết tính vào attempt
 
 

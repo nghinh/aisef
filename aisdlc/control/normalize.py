@@ -355,6 +355,11 @@ class Story:
     #: Màn hình story này dựng (mã trong EXPERIENCE.md). Rỗng = story không
     #: có giao diện; bước map mockup bỏ qua nó.
     screens: list[str] = field(default_factory=list)
+    #: Loại kiểm định story này phải qua. Story tự khai thì lấy bản khai;
+    #: không khai thì suy ra bằng code. Không phải một pha mới — chỉ là
+    #: nói rõ "xong" nghĩa là gì cho **story này**, thay vì để mặc định
+    #: chung cho mọi story.
+    verification_contract: list[str] = field(default_factory=list)
     body: str = ""
 
     @property
@@ -373,6 +378,7 @@ class Story:
             "acceptance_criteria": self.acceptance_criteria,
             "covers": self.covers,
             "write_scope": self.write_scope,
+            "verification_contract": self.verification_contract,
             "depends_on": self.depends_on,
             "screens": self.screens,
         }
@@ -441,6 +447,8 @@ def _parse_story_meta(body: str, epic_n: int) -> dict[str, list[str]]:
         values = _split_list(m.group(2))
         if key == "covers":
             meta["covers"] = _expand_fr_refs(m.group(2))
+        elif key == "verification_contract":
+            meta["verification_contract"] = [v.strip().lower() for v in values if v.strip()]
         elif key == "write_scope":
             meta["write_scope"] = [v for v in values if v.lower() not in ("none", "không")]
         elif key == "depends_on":
@@ -533,6 +541,7 @@ def parse_epics(text: str) -> EpicPlan:
             story.write_scope = with_lockfiles(meta.get("write_scope", []))
             story.depends_on = [d for d in meta.get("depends_on", []) if d != story.id]
             story.screens = meta.get("screens", [])
+            story.verification_contract = meta.get("verification_contract", [])
 
             epic.stories.append(story)
         plan.epics.append(epic)

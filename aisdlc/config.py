@@ -25,6 +25,8 @@ DEFAULTS: dict[str, Any] = {
     # chất lượng
     "coverage.min": 0.85,
     "security.block_severities": ["critical", "high"],
+    # Rà soát bảo mật theo ngữ nghĩa, chạy cùng pha kiểm định.
+    "security.semantic_review": True,
     # kích thước story — chống tràn ngữ cảnh trong một phiên
     "story.max_acceptance_criteria": 8,
     "story.max_write_scope_paths": 10,
@@ -77,6 +79,7 @@ DEFAULTS: dict[str, Any] = {
 _TYPES: dict[str, type | tuple[type, ...]] = {
     "coverage.min": float,
     "security.block_severities": list,
+    "security.semantic_review": bool,
     "story.max_acceptance_criteria": int,
     "story.max_write_scope_paths": int,
     "story.max_context_tokens": int,

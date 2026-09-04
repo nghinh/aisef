@@ -72,6 +72,7 @@ def load_plan(artifact_root: Path | str) -> Plan:
             epic_id=raw.get("epic_id", ""),
             title=raw.get("title", ""),
             acceptance_criteria=raw.get("acceptance_criteria", []),
+            verification_contract=raw.get("verification_contract", []),
             covers=raw.get("covers", []),
             write_scope=raw.get("write_scope", []),
             depends_on=raw.get("depends_on", []),
