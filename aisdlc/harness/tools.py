@@ -201,6 +201,7 @@ def run_tool(
             image=image_for(project, cfg),
             timeout_seconds=cfg["run.timeout_seconds"],
             allow_degraded=cfg["sandbox.allow_degraded"],
+            use_docker=cfg["sandbox.use_docker"],
         )
     )
     res = ToolResult(

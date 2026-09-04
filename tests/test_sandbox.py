@@ -167,5 +167,32 @@ class TestDegradedMode(unittest.TestCase):
             sb.docker_available = original
 
 
+class TestDockerCanBeTurnedOff(unittest.TestCase):
+    """Có dự án mà bộ công cụ chỉ chạy đúng trên máy này — phụ thuộc có
+    binary biên dịch theo kiến trúc máy chủ, cài trên host rồi chạy trong
+    container Linux thì hỏng. Tắt được, nhưng **phải** hiện ra là mức bảo
+    đảm thấp hơn."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.ws = Path(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_runs_degraded_and_says_so(self):
+        r = run(SandboxSpec(workspace=self.ws, cmd=["true"], use_docker=False))
+        self.assertTrue(r.ok)
+        self.assertTrue(r.degraded)
+        self.assertNotIn("docker", r.isolation)
+        self.assertTrue(r.to_evidence()["degraded"])
+
+    def test_refusing_to_degrade_still_refuses(self):
+        with self.assertRaises(RuntimeError) as e:
+            run(SandboxSpec(workspace=self.ws, cmd=["true"],
+                            use_docker=False, allow_degraded=False))
+        self.assertIn("cấu hình tắt Docker", str(e.exception))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

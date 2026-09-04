@@ -62,6 +62,12 @@ class SandboxSpec:
     #: Cho phép suy biến về subprocess khi không có Docker. Đặt False khi
     #: cách ly là bắt buộc và thà hỏng còn hơn chạy không có bảo đảm.
     allow_degraded: bool = True
+    #: Dùng Docker hay không. Đặt False khi bộ công cụ của dự án chỉ chạy
+    #: đúng trên máy này — ví dụ phụ thuộc có binary biên dịch theo kiến
+    #: trúc máy chủ, cài trên host rồi chạy trong container Linux thì hỏng.
+    #: Kết quả vẫn ghi `degraded=True`: mức bảo đảm thấp hơn phải hiện ra,
+    #: không được im lặng (bất biến 10).
+    use_docker: bool = True
 
 
 @dataclass
@@ -134,13 +140,14 @@ def run(spec: SandboxSpec) -> SandboxResult:
     if not spec.cmd:
         raise ValueError("cmd rỗng")
 
-    if docker_available():
+    if spec.use_docker and docker_available():
         return _run_docker(spec)
 
     if not spec.allow_degraded:
         raise RuntimeError(
-            "cần cách ly bằng Docker nhưng daemon không chạy; "
-            "đặt allow_degraded=True nếu chấp nhận mức bảo đảm thấp hơn"
+            "cần cách ly bằng Docker nhưng "
+            + ("cấu hình tắt Docker" if not spec.use_docker else "daemon không chạy")
+            + "; đặt allow_degraded=True nếu chấp nhận mức bảo đảm thấp hơn"
         )
     return _run_degraded(spec)
 

@@ -277,6 +277,7 @@ def run_suite(
                 image=image_for(project, cfg),
                 timeout_seconds=cfg["run.timeout_seconds"],
                 allow_degraded=cfg["sandbox.allow_degraded"],
+                use_docker=cfg["sandbox.use_docker"],
             )
         )
         result.ran = True

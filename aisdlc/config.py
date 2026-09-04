@@ -65,6 +65,7 @@ DEFAULTS: dict[str, Any] = {
     # sandbox — ảnh rỗng nghĩa là tự chọn theo stack của dự án
     "sandbox.image": "",
     "sandbox.tools_network": False,
+    "sandbox.use_docker": True,
     "sandbox.allow_degraded": True,
 }
 
@@ -102,6 +103,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "tools.sast": str,
     "sandbox.image": str,
     "sandbox.tools_network": bool,
+    "sandbox.use_docker": bool,
     "sandbox.allow_degraded": bool,
 }
 
