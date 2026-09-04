@@ -117,6 +117,14 @@ class TestExtractContract(MockupTestCase):
         self.assertEqual(field["type"], "search")
         self.assertEqual(field["maxlength"], "120")
 
+    def test_fields_come_from_the_primary_state_only(self):
+        """Một ô tìm kiếm dựng lại ở 11 trạng thái sẽ thành 11 ràng buộc
+        giống hệt nhau — người đọc hợp đồng không biết đó là một hay mười
+        một ô."""
+        contract, _ = extract(self.root, self.exp)
+        names = [f["name"] for f in contract.by_id("danh-sach").fields]
+        self.assertEqual(names, ["q"])
+
     def test_slice_is_one_screen_only(self):
         """Bước viết code chỉ được nạp lát cắt một màn hình."""
         contract, _ = extract(self.root, self.exp)

@@ -74,9 +74,15 @@ for (const job of input.jobs ?? []) {
       [...document.querySelectorAll('[data-state]')].map((el) => el.getAttribute('data-state')),
     );
 
+    // Trường nhập lấy trong phạm vi trạng thái chính. Lấy cả trang thì một
+    // ô tìm kiếm dựng lại ở 11 trạng thái sẽ thành 11 ràng buộc giống nhau.
     const meta = await page.evaluate(() => {
       const metaOf = (n) => document.querySelector(`meta[name="${n}"]`)?.content ?? '';
-      const fields = [...document.querySelectorAll('input, textarea, select')].map((el) => ({
+      const scope =
+        document.querySelector('[data-state="primary"]') ??
+        document.querySelector('[data-state]') ??
+        document;
+      const fields = [...scope.querySelectorAll('input, textarea, select')].map((el) => ({
         name: el.name || el.id || '',
         type: (el.getAttribute('type') || el.tagName).toLowerCase(),
         label: (el.labels?.[0]?.textContent || el.getAttribute('aria-label') || el.placeholder || '').trim(),
