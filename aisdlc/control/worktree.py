@@ -134,15 +134,19 @@ class WorktreeManager:
 
     # ------------------------------------------------------------ hợp nhất
 
-    def commit_story(self, story_id: str, message: str = "") -> bool:
+    def commit_story(
+        self, story_id: str, message: str = "", *, paths: list[str] | None = None
+    ) -> bool:
         """Chốt công việc còn dở trong worktree của story.
 
         Agent được khuyến khích tự commit từng phần, nhưng phần còn dở thì
         harness chốt: merge chỉ nhìn thấy thứ đã commit, nên bỏ bước này
         thì story "xong" mà công việc không sang được nhánh chính.
 
-        An toàn vì đã qua cổng: `diff-scope` vừa xác nhận mọi thay đổi nằm
-        trong `write_scope`, nên `add -A` ở đây không quét được gì lạ.
+        Stage **đúng phạm vi ghi của story**, không `add -A` (bất biến 5).
+        `diff-scope` vừa xác nhận cây nằm trong phạm vi nên hai cách cho
+        cùng kết quả — nhưng chỉ khi guard đã chạy. Stage theo phạm vi thì
+        đúng cả khi nó chưa chạy, và đó mới là điều bất biến bảo vệ.
         """
         path = self.path_for(story_id)
         if not path.is_dir():
@@ -150,7 +154,12 @@ class WorktreeManager:
         if not _git(path, "status", "--porcelain", check=False).stdout.strip():
             return False  # agent đã tự commit hết
 
-        _git(path, "add", "-A")
+        if paths:
+            _git(path, "add", "--", *paths)
+        else:
+            _git(path, "add", "-u")  # không khai phạm vi: chỉ file đã theo dõi
+        if not _git(path, "diff", "--cached", "--name-only", check=False).stdout.strip():
+            return False
         _git(path, "commit", "-q", "-m", message or f"{story_id}: hoàn tất")
         return True
 

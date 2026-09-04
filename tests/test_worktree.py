@@ -160,5 +160,31 @@ class TestParallelMerge(WorktreeTestCase):
         self.assertFalse(r.scope_was_misdeclared)
 
 
+class TestCommitStory(WorktreeTestCase):
+    """Harness chốt phần agent để dở — merge chỉ thấy thứ đã commit."""
+
+    def test_commits_only_inside_write_scope(self):
+        """Bất biến 5: không `git add -A`. Stage theo phạm vi thì đúng cả
+        khi guard chưa kịp chạy — và đó mới là thứ bất biến bảo vệ."""
+        wt = self.wm.create("S-01")
+        (wt.path / "src" / "a.py").write_text("x = 1\n", encoding="utf-8")
+        (wt.path / "rac.txt").write_text("không thuộc story\n", encoding="utf-8")
+
+        self.assertTrue(self.wm.commit_story("S-01", "S-01: xong", paths=["src"]))
+        tracked = subprocess.run(
+            ["git", "-C", str(wt.path), "show", "--name-only", "--format=", "HEAD"],
+            capture_output=True, text=True,
+        ).stdout.split()
+        self.assertIn("src/a.py", tracked)
+        self.assertNotIn("rac.txt", tracked)
+
+    def test_nothing_to_commit(self):
+        self.wm.create("S-02")
+        self.assertFalse(self.wm.commit_story("S-02", paths=["src"]))
+
+    def test_unknown_story(self):
+        self.assertFalse(self.wm.commit_story("S-99", paths=["src"]))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
