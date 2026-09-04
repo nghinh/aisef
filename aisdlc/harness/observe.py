@@ -223,6 +223,9 @@ class EvidenceStore:
                     "session_id": result.session_id,
                     "turns": result.num_turns,
                     "guard_blocked": result.guard_blocked,
+                    # Cờ không nói được guard nào chặn vì gì. Thiếu chỗ
+                    # này thì lần sau lại phải đi mò nhật ký phiên.
+                    "guard_messages": list(result.guard_messages)[:5],
                     "permission_limited": result.permission_limited,
                     "error": result.error,
                 },

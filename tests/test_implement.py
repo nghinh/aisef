@@ -182,6 +182,37 @@ class TestHappyPath(ImplementTestCase):
                 cwd=self.project, check=False,
             )
 
+    def test_nguoi_ra_soat_nhan_diff_that_khong_chi_ten_file(self):
+        """Danh sách tên file bắt người rà soát dựng lại thứ harness đã
+        biết — đo trên e9 là 31–43 lượt cho một story nhỏ."""
+        from aisdlc.phases.implement import review_diff
+
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp)
+            for cmd in (
+                ["git", "init", "-q"],
+                ["git", "config", "user.email", "t@t"],
+                ["git", "config", "user.name", "t"],
+            ):
+                subprocess.run(cmd, cwd=d, check=True)
+            (d / "goc.txt").write_text("goc\n", encoding="utf-8")
+            subprocess.run(["git", "add", "-A"], cwd=d, check=True)
+            subprocess.run(["git", "commit", "-qm", "goc"], cwd=d, check=True)
+            base = subprocess.run(
+                ["git", "rev-parse", "HEAD"], cwd=d,
+                capture_output=True, text=True, check=True,
+            ).stdout.strip()
+            (d / "a.py").write_text("def cong(a, b):\n    return a - b\n", encoding="utf-8")
+            subprocess.run(["git", "add", "-A"], cwd=d, check=True)
+            subprocess.run(["git", "commit", "-qm", "them"], cwd=d, check=True)
+
+            got = review_diff(str(d), ["a.py"], base_ref=base)
+            self.assertIn("return a - b", got, "diff phải có nội dung, không chỉ tên")
+            self.assertIn("- a.py", got)
+
+            # Không có mốc rẽ nhánh thì lùi về danh sách tên, không nổ.
+            self.assertEqual(review_diff(str(d), ["a.py"]), "- a.py")
+
     def test_reviewer_gets_scope_but_not_story_id(self):
         """Người rà soát cần **phạm vi**, không cần **mã story**.
 

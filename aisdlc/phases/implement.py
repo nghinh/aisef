@@ -239,6 +239,47 @@ def run_attempt(
     return attempt
 
 
+#: Trần ký tự cho diff đưa vào prompt rà soát. Đủ cho một story đúng cỡ;
+#: vượt trần thì story quá to, và cắt ở đây tốt hơn là tràn ngữ cảnh.
+REVIEW_DIFF_CHARS = 60_000
+
+
+def review_diff(workdir: str, changed: list[str], *, base_ref: str = "") -> str:
+    """Diff thật để rà soát, lùi về danh sách tên file khi không lấy được.
+
+    Đưa mỗi tên file thì người rà soát phải tự đọc lại từng cái — đo trên
+    e9 là 31–43 lượt và 12 phút cho một story nhỏ, phần lớn tiêu vào việc
+    dựng lại thứ harness đã biết. Diff không thay việc đọc code xung
+    quanh, nó chỉ bỏ bớt đoạn mò mẫm ban đầu.
+    """
+    names = "\n".join(f"- {c}" for c in changed[:50])
+    if not base_ref:
+        return names
+    lines = _git_lines_text(workdir, ["diff", "--stat", base_ref])
+    body = _git_lines_text(workdir, ["diff", base_ref])
+    if not body:
+        return names
+    if len(body) > REVIEW_DIFF_CHARS:
+        body = body[:REVIEW_DIFF_CHARS] + "\n… (diff bị cắt, đọc thẳng file phần còn lại)"
+    ket = [names, ""]
+    if lines:
+        ket += ["```", lines.strip(), "```", ""]
+    ket += ["```diff", body, "```"]
+    return "\n".join(ket)
+
+
+def _git_lines_text(workdir: str, args: list[str]) -> str:
+    import subprocess
+
+    try:
+        proc = subprocess.run(
+            ["git", *args], cwd=workdir, capture_output=True, text=True, timeout=30
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return ""
+    return proc.stdout if proc.returncode == 0 else ""
+
+
 def review_story(
     story: Story,
     *,
@@ -268,7 +309,7 @@ def review_story(
         contract=None,
         config=config,
     )
-    context["diff_summary"] = "\n".join(f"- {c}" for c in changed[:50])
+    context["diff_summary"] = review_diff(str(workdir), changed, base_ref=base_ref)
 
     spec = build_spec(
         REVIEWER,

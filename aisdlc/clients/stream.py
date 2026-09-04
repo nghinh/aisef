@@ -24,8 +24,20 @@ chặn tool, kèm cả nội dung agent định ghi. Đó là bằng chứng má
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from typing import Iterable
+
+
+#: Dấu nhận biết thông báo **của hook**, không phải mọi lỗi tool có chữ
+#: "hook". Tìm chuỗi con "hook" là quá rộng: dự án React nói về hook suốt
+#: ngày, và một `grep` hỏng trên `useEffect` đủ làm cờ `guard_blocked`
+#: bật lên. Cờ sai ở đây đi thẳng vào báo cáo nghiệm thu và làm người đọc
+#: đuổi theo lỗi không tồn tại.
+GUARD_MESSAGE = re.compile(
+    r"(?:Pre|Post)ToolUse:\S*\s+hook\b|\bStop:?\s*hook\b|\bhook error\b",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -207,7 +219,7 @@ def parse_stream(lines: Iterable[str]) -> RunResult:
                 if not block.get("is_error"):
                     continue
                 body = str(block.get("content") or "")
-                if "hook" in body.lower():
+                if GUARD_MESSAGE.search(body):
                     res.guard_messages.append(body[:300])
 
         elif etype == "system" and ev.get("subtype") == "hook_response":

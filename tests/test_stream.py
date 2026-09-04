@@ -92,6 +92,36 @@ class TestBlockedRun(unittest.TestCase):
         self.assertTrue(self.r.guard_messages)
         self.assertIn("hook", self.r.guard_messages[0].lower())
 
+    def test_chu_hook_trong_loi_thuong_khong_phai_guard_chan(self):
+        """Cờ `guard_blocked` phải nhận **thông báo của hook**, không phải
+        mọi lỗi tool có chữ "hook".
+
+        Dự án React nói về hook suốt ngày. Nhận diện bằng chuỗi con thì
+        một `grep` hỏng trên `useEffect` cũng làm cờ bật, và cờ đó đi
+        thẳng vào báo cáo nghiệm thu — người đọc đuổi theo lỗi không có
+        thật. Đã mất một vòng chẩn đoán vì đúng chuyện này.
+        """
+        import json as _json
+
+        def chay(body):
+            return parse_stream([
+                _json.dumps({"type": "user", "message": {"content": [
+                    {"type": "tool_result", "is_error": True, "content": body},
+                ]}}),
+                _json.dumps({"type": "result", "subtype": "success"}),
+            ])
+
+        that = chay("PreToolUse:Bash hook error: [aisdlc guard destructive]: chặn")
+        self.assertTrue(that.guard_blocked)
+        self.assertEqual(len(that.guard_messages), 1)
+
+        for gia in (
+            "React hook useEffect gọi sai thứ tự",
+            "Invalid hook call. Hooks can only be called inside a component.",
+        ):
+            with self.subTest(body=gia):
+                self.assertFalse(chay(gia).guard_blocked)
+
     def test_denial_carries_tool_and_path(self):
         d = self.r.denials[0]
         self.assertEqual(d.tool_name, "Write")
