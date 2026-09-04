@@ -166,3 +166,63 @@ class TestCombine(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestChuoiHoanToan(unittest.TestCase):
+    """Epic bị xâu thành chuỗi thì máy chạy song song không với tới được.
+
+    Đo trên e9: BMAD khai mỗi story phụ thuộc story ngay trước, cả 7 story
+    của EPIC-01 thành 7 đợt. Máy chia đợt có, được kiểm bằng test đơn vị,
+    và **không bao giờ chạy** — một năng lực đã tuyên bố mà không quan sát
+    được lần nào.
+    """
+
+    def st(self, sid, deps=(), epic="EPIC-01", scope=("src/a.py",)):
+        return Story(id=sid, epic_id=epic, title=sid,
+                     depends_on=tuple(deps), write_scope=tuple(scope))
+
+    def test_canh_bao_khi_moi_story_mot_dot(self):
+        stories = [
+            self.st("S-1"),
+            self.st("S-2", ["S-1"], scope=("src/b.py",)),
+            self.st("S-3", ["S-2"], scope=("src/c.py",)),
+            self.st("S-4", ["S-3"], scope=("src/d.py",)),
+        ]
+        r = check_stories(stories)
+        self.assertTrue(r.passed, r.errors)
+        self.assertTrue(any("xâu thành chuỗi" in w for w in r.warnings))
+        self.assertTrue(any("EPIC-01" in w for w in r.warnings))
+
+    def test_khong_canh_bao_khi_co_story_song_song(self):
+        stories = [
+            self.st("S-1"),
+            self.st("S-2", ["S-1"], scope=("src/b.py",)),
+            self.st("S-3", ["S-1"], scope=("src/c.py",)),
+            self.st("S-4", ["S-2", "S-3"], scope=("src/d.py",)),
+        ]
+        r = check_stories(stories)
+        self.assertFalse(any("xâu thành chuỗi" in w for w in r.warnings))
+
+    def test_epic_qua_nho_thi_khong_ket_luan(self):
+        """Hai story nối nhau không nói lên gì về thói quen lập kế hoạch."""
+        stories = [self.st("S-1"), self.st("S-2", ["S-1"], scope=("src/b.py",))]
+        r = check_stories(stories)
+        self.assertFalse(any("xâu thành chuỗi" in w for w in r.warnings))
+
+    def test_theo_tung_epic_khong_phai_ca_tap(self):
+        """Epic chạy tuần tự với nhau; song song chỉ có nghĩa **trong** một
+        epic. Tính trên cả tập thì con số ra khác và không nói lên gì."""
+        stories = [
+            self.st("S-1", epic="EPIC-01"),
+            self.st("S-2", ["S-1"], epic="EPIC-01", scope=("src/b.py",)),
+            self.st("S-3", ["S-2"], epic="EPIC-01", scope=("src/c.py",)),
+            self.st("T-1", epic="EPIC-02", scope=("api/a.py",)),
+            self.st("T-2", ["T-1"], epic="EPIC-02", scope=("api/b.py",)),
+            self.st("T-3", ["T-1"], epic="EPIC-02", scope=("api/c.py",)),
+        ]
+        r = check_stories(stories)
+        canh = [w for w in r.warnings if "xâu thành chuỗi" in w]
+        self.assertEqual(len(canh), 1)
+        self.assertIn("EPIC-01", canh[0])
+        self.assertNotIn("EPIC-02", canh[0])
+

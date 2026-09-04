@@ -130,6 +130,41 @@ def check_stories(
                 f"story quá lớn sẽ tràn ngữ cảnh trong một phiên"
             )
 
+    # Kế hoạch tuyến tính hoàn toàn: mỗi story một đợt. Có thể đúng —
+    # nhưng cũng là dấu hiệu người lập kế hoạch xâu chuỗi theo thói quen
+    # thay vì theo phụ thuộc thật, và khi ấy toàn bộ khả năng chạy song
+    # song thành không với tới được. Cảnh báo chứ không chặn: đây là fact
+    # để người đọc hỏi lại, không phải kết luận máy tự tin.
+    # Epic nào bị xâu thành chuỗi hoàn toàn — mỗi story một đợt. Có thể
+    # đúng, nhưng cũng là dấu hiệu người lập kế hoạch xâu theo thói quen
+    # thay vì theo phụ thuộc thật, và khi ấy toàn bộ khả năng chạy song
+    # song thành không với tới được.
+    #
+    # Kiểm **theo từng epic**, vì đó là đơn vị mà bộ điều phối chia đợt:
+    # epic chạy tuần tự với nhau, story chạy song song trong một epic.
+    # Tính trên cả tập thì con số ra khác và không nói lên điều gì.
+    #
+    # Cảnh báo chứ không chặn: đây là fact để người đọc hỏi lại, không
+    # phải kết luận máy tự tin.
+    if not r.errors:
+        chuoi = []
+        for epic in sorted({s.epic_id for s in stories if s.epic_id}):
+            trong = [s for s in stories if s.epic_id == epic]
+            if len(trong) < 3:
+                continue
+            try:
+                dot = build_waves(trong)
+            except (CycleError, ValueError, KeyError):
+                continue
+            if len(dot) == len(trong):
+                chuoi.append(f"{epic} ({len(trong)} story)")
+        if chuoi:
+            r.warnings.append(
+                "epic bị xâu thành chuỗi hoàn toàn, không story nào chạy song "
+                f"song được: {', '.join(chuoi)} — xem lại `depends_on`, chỉ khai "
+                "khi story sau thật sự cần **kết quả** của story trước"
+            )
+
     max_paths = cfg["story.max_write_scope_paths"]
     too_wide = [
         s.id
