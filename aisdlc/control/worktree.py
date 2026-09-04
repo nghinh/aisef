@@ -47,6 +47,24 @@ def _git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProc
     return proc
 
 
+def main_repo(path: Path | str) -> Path:
+    """Kho chính của một đường dẫn, kể cả khi đang đứng trong worktree.
+
+    Story chạy trong worktree riêng, nhưng bằng chứng và trạng thái phải
+    ghi về **một gốc artifact duy nhất** (bất biến 2). Nếu không, mỗi story
+    ghi vào gốc riêng của nó và cổng đọc ở gốc chính sẽ không thấy gì.
+    """
+    path = Path(path).resolve()
+    proc = subprocess.run(
+        ["git", "-C", str(path), "rev-parse", "--path-format=absolute", "--git-common-dir"],
+        capture_output=True, text=True,
+    )
+    if proc.returncode != 0 or not proc.stdout.strip():
+        return path
+    common = Path(proc.stdout.strip())
+    return common.parent if common.name == ".git" else path
+
+
 def safe_slug(story_id: str) -> str:
     """Biến id story thành mảnh tên nhánh/thư mục an toàn."""
     slug = _SAFE.sub("-", story_id).strip("-")

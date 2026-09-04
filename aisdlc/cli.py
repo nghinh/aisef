@@ -52,7 +52,15 @@ _GATE_MARK = {
 
 
 def _artifact_root(args) -> Path:
-    return Path(args.project) / ARTIFACT_ROOT
+    """Gốc artifact — **một** gốc cho cả dự án (bất biến 2).
+
+    Agent chạy trong worktree của story, nên `--project .` ở đó trỏ vào
+    worktree. Ghi bằng chứng vào đấy thì cổng đọc ở gốc chính không thấy
+    gì, và story "chưa từng chạy test" dù nó vừa chạy.
+    """
+    from .control.worktree import main_repo
+
+    return main_repo(args.project) / ARTIFACT_ROOT
 
 
 def _approvals(args) -> ApprovalStore:
@@ -620,13 +628,19 @@ def cmd_verify(args) -> int:
 
 def cmd_tool(args) -> int:
     """Chạy một tool của harness và ghi bằng chứng."""
-    from .harness.tools import TOOLS, run_tool
+    import os
 
+    from .harness.guardrails import ENV_STORY_ID
+    from .harness.tools import run_tool
+
+    # Agent không cần biết mã story của chính nó: harness đã đặt vào môi
+    # trường khi mở phiên.
+    story = args.story or os.environ.get(ENV_STORY_ID, "")
     res = run_tool(
         args.name,
         args.project,
-        story_id=args.story,
-        artifact_root=_artifact_root(args) if args.story else None,
+        story_id=story,
+        artifact_root=_artifact_root(args) if story else None,
         config=Config.load(args.project),
     )
     print(res.summary())

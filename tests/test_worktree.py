@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisdlc.control.worktree import (  # noqa: E402
+    main_repo,
     GitError,
     WorktreeManager,
     safe_slug,
@@ -158,6 +159,22 @@ class TestParallelMerge(WorktreeTestCase):
         self.commit_in(a.path, "src/a.py", "a\n", "FR-01: A")
         r = self.wm.merge_story("S-A")
         self.assertFalse(r.scope_was_misdeclared)
+
+
+class TestMainRepo(WorktreeTestCase):
+    def test_from_the_repo_itself(self):
+        self.assertEqual(main_repo(self.repo), self.repo.resolve())
+
+    def test_from_inside_a_worktree(self):
+        """Bất biến 2 — một gốc artifact. Agent chạy trong worktree, nhưng
+        bằng chứng phải ghi về gốc chính, nếu không cổng đọc ở gốc chính
+        sẽ thấy story "chưa từng chạy test" dù nó vừa chạy."""
+        wt = self.wm.create("S-77")
+        self.assertEqual(main_repo(wt.path), self.repo.resolve())
+
+    def test_outside_git_returns_the_path(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(main_repo(tmp), Path(tmp).resolve())
 
 
 class TestCommitStory(WorktreeTestCase):
