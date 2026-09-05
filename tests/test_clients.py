@@ -204,3 +204,40 @@ class TestKhongThuaHuongPhienCha(unittest.TestCase):
             got = (Path(tmp) / "env.txt").read_text(encoding="utf-8")
         self.assertNotIn("CLAUDECODE=", got)
         self.assertIn("AISDLC_STORY_ID=S", got)
+
+
+class TestOpenCodeLuongJson(unittest.TestCase):
+    """`opencode run --format json` (đo 2026-09-05): tool_use, tokens, cost, text."""
+
+    LINES = [
+        '{"type":"step_start","timestamp":1,"sessionID":"ses_1","part":{"type":"step-start"}}',
+        '{"type":"tool_use","timestamp":2,"sessionID":"ses_1","part":{"type":"tool","tool":"read","callID":"call_1","state":{"status":"completed","input":{"filePath":"/p/package.json"},"output":"..."}}}',
+        '{"type":"tool_use","timestamp":3,"sessionID":"ses_1","part":{"type":"tool","tool":"write","callID":"call_2","state":{"status":"error","input":{"filePath":"/p/x.py"},"output":"Write bị chặn: injection"}}}',
+        '{"type":"step_finish","timestamp":4,"sessionID":"ses_1","part":{"type":"step-finish","tokens":{"total":48888,"input":29851,"output":93,"reasoning":0,"cache":{"write":0,"read":18944}},"cost":0}}',
+        'banner không phải json',
+        '{"type":"text","timestamp":5,"sessionID":"ses_1","part":{"type":"text","text":"OK"}}',
+        '{"type":"step_finish","timestamp":6,"sessionID":"ses_1","part":{"type":"step-finish","tokens":{"total":49066,"input":2469,"output":5,"reasoning":0,"cache":{"write":0,"read":46592}},"cost":0.0012}}',
+    ]
+
+    def test_parse(self):
+        from aisdlc.clients.opencode import parse_json_events
+        r = parse_json_events(self.LINES)
+        self.assertEqual([t.name for t in r.tool_uses], ["Read", "Write"])
+        self.assertEqual(r.tool_uses[0].input["filePath"], "/p/package.json")
+        self.assertEqual(r.text, "OK")
+        self.assertEqual(r.num_turns, 2)
+        self.assertEqual((r.input_tokens, r.output_tokens, r.cache_read_tokens), (32320, 98, 65536))
+        self.assertAlmostEqual(r.cost_usd, 0.0012)
+        self.assertEqual(r.session_id, "ses_1")
+        self.assertIn("injection", r.guard_messages[0])
+
+    def test_command_has_json_format(self):
+        cmd = OpenCodeAdapter().build_command(RunSpec(prompt="p", workdir=Path(".")))
+        self.assertIn("--format", cmd)
+        self.assertEqual(cmd[cmd.index("--format") + 1], "json")
+
+    def test_capabilities_now_native(self):
+        from aisdlc.clients.base import Capability, Support
+        caps = OpenCodeAdapter().capabilities()
+        self.assertIs(caps[Capability.MACHINE_OUTPUT], Support.NATIVE)
+        self.assertIs(caps[Capability.COST_REPORTING], Support.NATIVE)

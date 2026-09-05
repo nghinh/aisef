@@ -298,4 +298,9 @@ def describe_tools(project: Path | str, config: Config | None = None) -> str:
     for tool in TOOLS.values():
         cmd = command_for(tool.name, project, config) or "(dự án chưa khai)"
         lines.append(f"- `{binary} tool {tool.name}` → `{cmd}`\n  Khi nào: {tool.when}")
+    lines.append(
+        f"- `{binary} doc <gói> --topic <chủ đề>` → tài liệu thật của thư viện (context7, có cache)\n"
+        "  Khi nào: không chắc tên API hay hành vi thư viện — tra, đừng đoán (luật 12). "
+        "Thêm `--story <mã>` để lần tra được ghi vào bằng chứng."
+    )
     return "\n".join(lines)

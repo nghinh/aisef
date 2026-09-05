@@ -552,3 +552,51 @@ class TestDoctorHookTroDungDuAn(CliTestCase):
         self._hook(str(self.project))
         code, out, _ = self.run_cli("doctor")
         self.assertIn("✅ hook trỏ đúng dự án", out)
+
+
+class TestDoctorCoverageHint(CliTestCase):
+    def test_test_command_without_coverage_is_named(self):
+        import json
+        (self.project / ".ai").mkdir(exist_ok=True)
+        (self.project / ".ai" / "config.json").write_text(json.dumps({"tools.test": "node --test src/*.test.js"}), encoding="utf-8")
+        code, out, _ = self.run_cli("doctor")
+        self.assertIn("lệnh test in coverage", out)
+        self.assertIn("chưa cấu hình", out)
+
+    def test_with_coverage_flag_is_green(self):
+        import json
+        (self.project / ".ai").mkdir(exist_ok=True)
+        (self.project / ".ai" / "config.json").write_text(json.dumps({"tools.test": "node --test --experimental-test-coverage src/*.test.js"}), encoding="utf-8")
+        code, out, _ = self.run_cli("doctor")
+        self.assertIn("✅ lệnh test in coverage", out)
+
+
+class TestLenhDoc(CliTestCase):
+    """S2: `aisdlc doc` in tài liệu và ghi `doc_lookup` khi có --story."""
+
+    def test_records_evidence_for_story(self):
+        import json, os
+        from unittest import mock
+        from aisdlc.kit import docs as D
+        from aisdlc.harness.observe import NOTE, EvidenceStore
+        with tempfile.TemporaryDirectory() as cache, mock.patch.dict(os.environ, {D.ENV_DOCS: cache}), \
+             mock.patch.object(D, "_get", lambda url, fetch=None: json.dumps({"results": [{"id": "/x/y", "title": "Y"}]}) if "/search?" in url else "tài liệu Y"):
+            code, out, _ = self.run_cli("doc", "y", "--topic", "hooks", "--story", "S-1")
+        self.assertEqual(code, 0, out)
+        self.assertIn("tài liệu Y", out)
+        e = EvidenceStore(self.project / "_bmad-output").read("S-1").last(NOTE, "doc_lookup")
+        self.assertEqual(e.detail["library"], "/x/y")
+
+    def test_prompt_tools_mention_the_command(self):
+        from aisdlc.harness.tools import describe_tools
+        self.assertIn("doc <gói>", describe_tools(self.project))
+
+
+class TestLenhChange(CliTestCase):
+    def test_change_command_prints_next_steps(self):
+        (self.project / "docs").mkdir(exist_ok=True)
+        (self.project / "docs" / "requirements.md").write_text("# YC\n", encoding="utf-8")
+        code, out, _ = self.run_cli("change", "FR-2", "Thêm nút hoàn tác")
+        self.assertEqual(code, 0, out)
+        self.assertIn("STORY-CH-01", out)
+        self.assertIn("write_scope", out)

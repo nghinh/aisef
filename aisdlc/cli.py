@@ -217,6 +217,16 @@ def cmd_doctor(args) -> int:
     try:
         cfg = Config.load(project)
         check("cấu hình", True, cfg.source)
+        lenh = str(cfg.get("tools.test", "") or "")
+        if lenh:
+            co_cov = any(k in lenh for k in ("--coverage", "--cov", "--experimental-test-coverage", "c8 ", "nyc "))
+            check(
+                "lệnh test in coverage", co_cov,
+                "cổng `coverage.min` đọc được số" if co_cov else
+                f"`tools.test` = `{lenh}` không in coverage → mục coverage của cổng sẽ là **chưa cấu hình** "
+                "(thêm `--coverage` / `--cov` / `--experimental-test-coverage`)",
+                required=False,
+            )
     except ConfigError as e:
         check("cấu hình", False, str(e))
 
@@ -995,6 +1005,49 @@ def cmd_skill(args) -> int:
     return EXIT_OK
 
 
+def cmd_change(args) -> int:
+    """Vòng đời thay đổi: ghi yêu cầu đổi, đánh stale PRD trở xuống, sinh story delta."""
+    from .control.change import apply
+
+    try:
+        r = apply(Path(args.project), args.requirement, args.description)
+    except (ValueError, OSError) as e:
+        print(f"change: {e}", file=sys.stderr)
+        return EXIT_NOT_READY
+    print(f"Đã ghi thay đổi {r.requirement} → story delta {r.story_id} ({r.story_file.name})")
+    print("  PRD: " + ("đã đánh dấu — cổng prd và các cổng sau thành stale" if r.prd_marked else "chưa có prd.md — cổng sẽ chạy từ đầu"))
+    print("Việc tiếp theo:")
+    for b in r.next_steps:
+        print(f"  - {b}")
+    return EXIT_OK
+
+
+def cmd_doc(args) -> int:
+    """Tra tài liệu thư viện theo yêu cầu (luật 12) — context7 qua HTTP, có cache.
+    Có `--story` thì ghi bằng chứng `doc_lookup`: cổng và báo cáo biết agent
+    đã tra gì thay vì bịa."""
+    from .kit.docs import DocError, lookup
+
+    try:
+        d = lookup(args.package, args.topic or "", tokens=args.tokens)
+    except DocError as e:
+        print(f"doc: {e}", file=sys.stderr)
+        return EXIT_NOT_READY
+    except OSError as e:
+        print(f"doc: không gọi được context7 ({e}) — làm việc theo tài liệu đã có, đừng đoán tên API", file=sys.stderr)
+        return EXIT_NOT_READY
+    print(f"# {d.title or d.library} — {d.topic or 'tổng quan'} ({'cache' if d.cached else 'context7'}: {d.library})\n")
+    print(d.text)
+    if args.story:
+        from .harness.observe import NOTE, Event, EvidenceStore
+
+        EvidenceStore(_artifact_root(args)).record(args.story, Event(
+            kind=NOTE, name="doc_lookup",
+            detail={"package": args.package, "library": d.library, "topic": d.topic, "chars": len(d.text), "cached": d.cached},
+        ))
+    return EXIT_OK
+
+
 def cmd_report(args) -> int:
     """Sinh báo cáo nghiệm thu từ bằng chứng đã có."""
     from .phases.report import build, write
@@ -1030,6 +1083,18 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("init", help="ghi .ai/config.json mặc định").set_defaults(func=cmd_init)
     sub.add_parser("gates", help="bảng trạng thái 8 cổng").set_defaults(func=cmd_gates)
     sub.add_parser("status", help="tiến độ story, chi phí").set_defaults(func=cmd_status)
+    ch = sub.add_parser("change", help="thay đổi sau phát hành: ghi FR, stale PRD trở xuống, sinh story delta")
+    ch.add_argument("requirement", help="mã yêu cầu, ví dụ FR-3")
+    ch.add_argument("description", help="mô tả thay đổi — thành tiêu chí chấp nhận của story delta")
+    ch.set_defaults(func=cmd_change)
+
+    dc = sub.add_parser("doc", help="tra tài liệu thư viện theo yêu cầu (context7, có cache)")
+    dc.add_argument("package", help="tên gói/thư viện, ví dụ vitest, react, fastapi")
+    dc.add_argument("--topic", default="", help="chủ đề cần tra, ví dụ coverage, hooks")
+    dc.add_argument("--tokens", type=int, default=2500)
+    dc.add_argument("--story", default="", help="ghi bằng chứng doc_lookup cho story này")
+    dc.set_defaults(func=cmd_doc)
+
     sk = sub.add_parser("skill", help="sổ đăng ký skill: dựng, soi, định tuyến thử")
     sk.add_argument("--story", default="", help="in skill được định tuyến cho story này")
     sk.set_defaults(func=cmd_skill)

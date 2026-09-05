@@ -868,3 +868,33 @@ class TestCompletionKhongChayDuoc(unittest.TestCase):
             st = EvidenceStore(tmp)
             st.tool_run("S", "test", ok=False, detail={"unrunnable": "công cụ chưa cài"})
             self.assertTrue(check_completion(st.read("S")).allowed)
+
+
+class TestLuat6MaQuyTrinhTrongNguon(unittest.TestCase):
+    """S3: số hiệu story/epic không được nằm trong mã nguồn; test và tài liệu thì được."""
+
+    def test_source_with_story_id_is_blocked(self):
+        from aisdlc.harness.guardrails import check_process_refs
+        v = check_process_refs("// STORY-01-02: thêm nút\nexport const x = 1\n", "src/notes.ts")
+        self.assertFalse(v.allowed)
+        self.assertIn("STORY-01-02", v.reason)
+        self.assertFalse(check_process_refs("# EPIC-03\n", "src/app.py").allowed)
+
+    def test_tests_docs_and_artifacts_are_allowed(self):
+        from aisdlc.harness.guardrails import check_process_refs
+        self.assertTrue(check_process_refs("test('AC-STORY-01-01-2: rỗng', () => {})", "src/a.test.js").allowed)
+        self.assertTrue(check_process_refs("def test_AC_STORY_01_01_1(): pass", "tests/test_a.py").allowed)
+        self.assertTrue(check_process_refs("STORY-01-01 xong", "docs/notes.md").allowed)
+        self.assertTrue(check_process_refs("STORY-01-01", "_bmad-output/x.json").allowed)
+
+    def test_clean_source_passes(self):
+        from aisdlc.harness.guardrails import check_process_refs
+        self.assertTrue(check_process_refs("export const story = 'truyện'\n", "src/x.ts").allowed)
+
+    def test_wired_as_guard(self):
+        from aisdlc.harness.guardrails import GUARD_MATCHERS, run_guard
+        self.assertEqual(GUARD_MATCHERS["process-ref"], ("PreToolUse", "Write|Edit"))
+        v = run_guard("process-ref", {"cwd": "/tmp/x", "tool_name": "Write",
+                                      "tool_input": {"file_path": "src/a.ts", "content": "// EPIC-01"}},
+                      project_root="/tmp/x", env={})
+        self.assertFalse(v.allowed)

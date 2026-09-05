@@ -34,6 +34,53 @@ from .stream import RunResult
 BINARY = "opencode"
 
 
+_TOOL_NAMES = {"read": "Read", "write": "Write", "edit": "Edit", "bash": "Bash", "glob": "Glob",
+               "grep": "Grep", "list": "LS", "webfetch": "WebFetch", "todowrite": "TodoWrite", "skill": "Skill"}
+
+
+def parse_json_events(lines) -> RunResult:
+    """Luồng `opencode run --format json` → `RunResult` chuẩn. Dòng không phải
+    JSON (banner, cảnh báo) bị bỏ qua, không ném."""
+    import json as _json
+
+    from .stream import ToolUse
+
+    res = RunResult()
+    texts: list[str] = []
+    for line in lines:
+        line = line.strip()
+        if not line.startswith("{"):
+            continue
+        try:
+            ev = _json.loads(line)
+        except ValueError:
+            continue
+        part = ev.get("part") or {}
+        kind = ev.get("type")
+        if kind == "text":
+            texts.append(str(part.get("text") or ""))
+        elif kind == "tool_use":
+            ten = str(part.get("tool") or "")
+            state = part.get("state") or {}
+            res.tool_uses.append(ToolUse(name=_TOOL_NAMES.get(ten.lower(), ten), tool_use_id=str(part.get("callID") or ""),
+                                         input=dict(state.get("input") or {})))
+            if state.get("status") == "error":
+                res.guard_messages.append(str(state.get("output") or state.get("error") or "")[:300])
+        elif kind == "step_finish":
+            res.num_turns += 1
+            tk = part.get("tokens") or {}
+            res.input_tokens += int(tk.get("input") or 0)
+            res.output_tokens += int(tk.get("output") or 0)
+            cache = tk.get("cache") or {}
+            res.cache_read_tokens += int(cache.get("read") or 0)
+            res.cache_creation_tokens += int(cache.get("write") or 0)
+            res.cost_usd += float(part.get("cost") or 0.0)
+        if ev.get("sessionID") and not res.session_id:
+            res.session_id = str(ev["sessionID"])
+    res.text = "".join(texts)
+    return res
+
+
 class OpenCodeAdapter(ClientAdapter):
     id = "opencode"
 
@@ -49,7 +96,7 @@ class OpenCodeAdapter(ClientAdapter):
             # Bằng chứng `par` STORY-02-01: cost=0, turns=0 cả bốn phiên. `--format
             # json` có trong `--help` nhưng chưa được chứng minh — tới lúc đó, nói
             # thật là không có. (task nâng cấp đã mở, xem ACTION-PLAN đợt 2)
-            Capability.MACHINE_OUTPUT: Support.UNSUPPORTED,
+            Capability.MACHINE_OUTPUT: Support.NATIVE,     # --format json, đo 2026-09-05
             Capability.PRE_TOOL_GUARD: Support.NATIVE,     # chứng minh 2026-09-05, xem docstring
             Capability.TOOL_ALLOWLIST: Support.EMULATED,  # emulated by: guardrails.check_role_tool
             Capability.DIR_ALLOWLIST: Support.UNSUPPORTED,  # không có cờ tương đương
@@ -57,7 +104,7 @@ class OpenCodeAdapter(ClientAdapter):
             Capability.MODEL_ROUTING: Support.NATIVE,       # --model
             # `opencode stats` tồn tại nhưng không có mã nào gọi và ghi vào bằng
             # chứng; evidence thật ghi cost=0. Không mã mô phỏng → không khai mô phỏng.
-            Capability.COST_REPORTING: Support.UNSUPPORTED,
+            Capability.COST_REPORTING: Support.NATIVE,     # step_finish.cost/tokens — số của nhà cung cấp
             Capability.TURN_LIMIT: Support.UNSUPPORTED,     # dùng timeout thay
         }
 
@@ -75,6 +122,8 @@ class OpenCodeAdapter(ClientAdapter):
         cmd = [self.binary, "run", "--dir", str(spec.workdir), spec.prompt]
         if spec.model:
             cmd += ["--model", spec.model]
+        cmd.insert(2, "--format")
+        cmd.insert(3, "json")
         return cmd
 
     def run(self, spec: RunSpec) -> RunResult:
@@ -99,12 +148,13 @@ class OpenCodeAdapter(ClientAdapter):
         except OSError as e:
             return RunResult(ok=False, error=f"không chạy được: {e}")
 
-        # OpenCode không phát luồng sự kiện có cấu trúc như Claude Code.
-        # Chỉ lấy được văn bản và mã thoát; cost phải hỏi riêng qua `stats`.
-        return RunResult(
-            ok=proc.returncode == 0,
-            text=proc.stdout,
-            duration_ms=int((time.monotonic() - started) * 1000),
-            error="" if proc.returncode == 0 else (proc.stderr.strip()[:500] or "exit != 0"),
-            raw_result={"returncode": proc.returncode},
-        )
+        # `--format json` (đo 2026-09-05, OpenCode 1.18.26): mỗi dòng một sự kiện
+        # `step_start` / `text` / `tool_use` (part.tool, state.input/output) /
+        # `step_finish` (tokens, cost). Cost là số nhà cung cấp báo — 9router
+        # báo 0, đó là sự thật của nhà cung cấp, không phải của harness.
+        res = parse_json_events(proc.stdout.splitlines())
+        res.ok = proc.returncode == 0
+        res.duration_ms = int((time.monotonic() - started) * 1000)
+        res.error = "" if proc.returncode == 0 else (proc.stderr.strip()[:500] or "exit != 0")
+        res.raw_result = {"returncode": proc.returncode, **res.raw_result}
+        return res

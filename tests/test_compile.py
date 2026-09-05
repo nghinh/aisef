@@ -187,7 +187,10 @@ class TestCompileFor(CompileTestCase):
         r = compile_for("opencode", self.project)
         self.assertFalse(any("pre_tool_guard" in d for d in r.degradations))
         self.assertTrue(any("turn_limit" in d for d in r.degradations))
-        self.assertTrue(any("machine_output" in d for d in r.degradations))
+        # 2026-09-05: `--format json` đo được → machine_output NATIVE; chỗ kém còn
+        # lại là tool_allowlist (giả lập bằng guard), và đó vẫn phải được khai.
+        self.assertFalse(any("machine_output" in d for d in r.degradations), r.degradations)
+        self.assertTrue(any("tool_allowlist" in d for d in r.degradations), r.degradations)
 
     def test_claude_has_no_degradations(self):
         self.assertEqual(compile_for("claude", self.project).degradations, [])

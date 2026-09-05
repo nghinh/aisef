@@ -257,6 +257,33 @@ INJECTION_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
 ]
 
 
+#: Luật 6 hiến pháp: không ghi số hiệu story/epic vào mã nguồn. Ngoại lệ có
+#: chủ đích: tệp test (mã `AC-<story>-<i>` **phải** nằm trong tên test — G5),
+#: tài liệu, artifact của harness.
+_PROCESS_REF = re.compile(r"\b(?:STORY|EPIC)-\d+(?:-\d+)?\b")
+_REF_ALLOWED_DIRS = ("docs/", "_bmad-output/", ".ai/", ".claude/", ".opencode/", ".aisdlc/", "bench/")
+_REF_ALLOWED_SUFFIX = (".md", ".txt", ".json", ".yaml", ".yml", ".csv")
+
+
+def check_process_refs(content: str, path: str) -> Verdict:
+    """Luật 6: mã tham chiếu quy trình (`STORY-01-02`, `EPIC-01`) không được
+    nằm trong mã nguồn. Test và tài liệu được phép — test còn bắt buộc mang
+    mã tiêu chí."""
+    from ..control.impact import is_test_path
+
+    rel = path.replace("\\", "/").lstrip("./")
+    if any(seg in rel for seg in _REF_ALLOWED_DIRS) or rel.endswith(_REF_ALLOWED_SUFFIX) or is_test_path(rel):
+        return ALLOW
+    hit = _PROCESS_REF.search(content or "")
+    if not hit:
+        return ALLOW
+    return Verdict(
+        False,
+        f"luật 6: mã quy trình `{hit.group(0)}` trong mã nguồn ({rel}). Comment giải thích "
+        f"*vì sao*, không phải *việc này thuộc phiếu nào* — bỏ số hiệu ra khỏi nguồn.",
+    )
+
+
 def check_injection(content: str) -> Verdict:
     if not content:
         return ALLOW
@@ -624,6 +651,8 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
         return check_secrets(content)
     if kind == "injection":
         return check_injection(content)
+    if kind == "process-ref":
+        return check_process_refs(content, str(tool_input.get("file_path") or ""))
     if kind == "git-stage":
         return check_git_stage(command)
     if kind == "destructive":
@@ -715,6 +744,7 @@ GUARD_MATCHERS: dict[str, tuple[str, str]] = {
     "write-scope": ("PreToolUse", "Write|Edit|NotebookEdit"),
     "secret": ("PreToolUse", "Write|Edit"),
     "injection": ("PreToolUse", "Write|Edit"),
+    "process-ref": ("PreToolUse", "Write|Edit"),
     "git-stage": ("PreToolUse", "Bash"),
     "destructive": ("PreToolUse", "Bash"),
     "diff-scope": ("PostToolUse", "Write|Edit|NotebookEdit|Bash"),

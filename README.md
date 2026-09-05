@@ -67,6 +67,23 @@ Chạy nhanh không cần người duyệt: `aisdlc plan --auto-approve all`. Ph
 tự động **luôn** được ghi dấu `auto` để về sau truy được tài liệu nào chưa
 từng có người thật xem.
 
+## Sau khi có code
+
+```bash
+aisdlc doc vitest --topic coverage --story STORY-01-02
+```
+
+Tra tài liệu thật của thư viện (context7, có cache) thay vì đoán tên API; có
+`--story` thì lần tra vào bằng chứng. Khi yêu cầu đổi sau phát hành:
+
+```bash
+aisdlc change FR-3 "Slug phải giữ dấu gạch dưới"
+```
+
+Ghi vào `docs/requirements.md`, đánh dấu PRD (cổng `prd` và các cổng sau
+thành stale), sinh story delta `STORY-CH-01` với `covers=[FR-3]` — story cũ
+giữ nguyên `DONE`.
+
 ## Cổng
 
 Tám cổng, mỗi cổng hai lớp. **Cổng máy** chạy trước — nó bắt được thứ máy
@@ -95,7 +112,7 @@ sau. Client nào không gắn được guard tiền kiểm thì `aisdlc verify` 
 lại toàn bộ trên diff, và `aisdlc compile` ghi rõ mức bảo đảm thấp hơn
 vào báo cáo thay vì im lặng — năng lực là thứ được **khai và kiểm**, mặc
 định là "chưa chứng minh", không phải "chắc là được". Trong V1, OpenCode
-là client **hạng hai**: guard chặn được, nhưng chi phí và số lượt không đo
+là client **hạng hai** theo quyết định V1: guard chặn được (hợp quy 5/5), và từ 2026-09-05 `--format json` cho luồng máy đọc được (tool, token, cost theo nhà cung cấp) — chưa lên hạng nhất vì chưa đủ số lần hợp quy hook ổn định; chi phí trước đó không đo
 được từ harness; nó không chặn phát hành.
 
 ## Hợp quy client

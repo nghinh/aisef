@@ -99,14 +99,17 @@ def run_claude(project: Path, workdir: Path, prompt: str, story: str, *, reviewe
 
 
 def run_opencode(project: Path, workdir: Path, prompt: str, story: str, *, reviewer=False):
-    cmd = ["opencode", "run", "--dir", str(workdir), "--model", OPENCODE_MODEL, prompt]
+    cmd = ["opencode", "run", "--format", "json", "--dir", str(workdir), "--model", OPENCODE_MODEL, prompt]
     proc = subprocess.run(cmd, cwd=workdir, capture_output=True, text=True, timeout=TIMEOUT,
                           env=env_for(project, workdir, story, reviewer=reviewer),
                           stdin=subprocess.DEVNULL)
     _keep(project, story, proc.stdout + "\n--- stderr ---\n" + proc.stderr)
-    # OpenCode không phát luồng sự kiện: tool dùng phải đoán từ văn bản
-    # (hạng hai V1 — được ghi rõ, không giả vờ đo được).
-    return Run(proc.stdout, 0.0, [], opencode_tools(proc.stderr))
+    # Từ 2026-09-05: `--format json` → tool đọc từ luồng sự kiện; bản in
+    # stderr chỉ còn là dự phòng khi luồng rỗng.
+    from aisdlc.clients.opencode import parse_json_events
+    r = parse_json_events(proc.stdout.splitlines())
+    tools = [t.name for t in r.tool_uses] or opencode_tools(proc.stderr)
+    return Run(r.text or proc.stdout, r.cost_usd, [], tools)
 
 
 _ANSI = re.compile(r"\x1b\[[0-9;]*m")
