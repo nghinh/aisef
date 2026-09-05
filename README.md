@@ -101,7 +101,7 @@ Bảy guard, mỗi guard là một lệnh trả mã thoát, nối vào ba mốc 
 
 | Mốc | Guard |
 |---|---|
-| trước mỗi tool | `write-scope` · `destructive` · `secret` · `git-stage` · `injection` |
+| trước mỗi tool | `write-scope` · `destructive` · `secret` · `git-stage` · `injection` · `process-ref` (luật 6: không mã story/epic trong nguồn) |
 | sau mỗi tool | `diff-scope` |
 | khi agent định dừng | `completion` |
 

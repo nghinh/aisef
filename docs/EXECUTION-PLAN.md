@@ -205,7 +205,7 @@ Nặng nhất. Tách hai tuần.
 | 6.1 | PromptCatalog | `kit/prompts/`, `harness/prompts.py` | ✅ Prompt có version, biến rỗng là lỗi; AR-x chọn bằng mục `Binds:` chứ không phán đoán |
 | 6.2 | Tool thật | `harness/tools.py` | ✅ test · lint · sast, mỗi tool có test + prose "khi nào gọi". Chụp màn hình do harness làm (agent tự chụp là tự chấm mình); commit dùng thẳng `git` + guard `git-stage` |
 | 6.3 | Sandbox | `harness/sandbox.py` | ✅ Docker `--network=none` `--cap-drop=ALL` non-root; test chạy trên docker thật: không ra được mạng, không đọc được ngoài mount |
-| 6.4 | 7 guard | `harness/guardrails.py` | ✅ Đủ 7; mỗi guard một lệnh, exit 2 là chặn; từng guard có test chặn thật |
+| 6.4 | 8 guard | `harness/guardrails.py` | ✅ Đủ 8 (thêm `process-ref` luật 6, 2026-09-05); mỗi guard một lệnh, exit 2 là chặn; từng guard có test chặn thật; `doctor` báo hook biên dịch thiếu guard mới |
 | 6.5 | Quan sát | `harness/observe.py` | ✅ `evidence/{story}.jsonl`, `seq` do file cấp (an toàn khi chạy song song), cost + latency lấy từ luồng client |
 | 6.6 | Định tuyến vai | `harness/routing.py` | ✅ `build_spec` **từ chối** `session_id` cho vai rà soát; reviewer READ_ONLY, cấm Write/Edit (gộp `subagent.py` vào đây — không cần hai file cho một việc) |
 

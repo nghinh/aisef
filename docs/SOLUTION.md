@@ -132,6 +132,7 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 | before commit | `secret` | khoá/mật khẩu/token |
 | before commit | `git-stage` | `git add -A` |
 | before commit | `injection` | SQL nối chuỗi, `dangerouslySetInnerHTML` |
+| before commit | `process-ref` | mã `STORY-…`/`EPIC-…` trong mã nguồn (luật 6); test và tài liệu được phép |
 | on stop | `completion` | kết thúc khi test chưa xanh |
 
 Mỗi guard là **một lệnh độc lập trả exit code** → nối được vào mọi client.
@@ -325,7 +326,7 @@ aisdlc devsecops [--bin PATH] [--force]        CI (code) + Dockerfile/IaC/runboo
 aisdlc pre-deploy [--skip-qa]                  chấm cổng cuối, ghi báo cáo để người ký
 
 # Guard — client gọi vào tại mốc vòng đời (do `compile` nối sẵn)
-aisdlc guard write-scope|diff-scope|secret|git-stage|destructive|injection|completion
+aisdlc guard write-scope|diff-scope|secret|git-stage|destructive|injection|process-ref|completion
 
 # Theo dõi
 aisdlc status                         tiến độ · chi phí · story tốn bất thường
@@ -630,7 +631,7 @@ aisdlc/control/scheduler.py     epic tuần tự, story song song theo đợt
 | 2 | `clients/` + `compile` + golden test | — |
 | 3 | `phases/plan` + normalizer + story splitter | 3 skill BMAD pipeline |
 | 4 | `phases/mockup` + contract extract | 2 skill mockup |
-| 5–6 | `harness/` 6 nhóm + `guardrails` 7 guard | PromptCatalog · 3 agent |
+| 5–6 | `harness/` 6 nhóm + `guardrails` 8 guard | PromptCatalog · 3 agent |
 | 7 | `harness/observe.py` · `control/gate.py` · `phases/qa.py` | kiểm định theo hợp đồng story |
 | 8 | `phases/deploy.py` | DevSecOps · runbook · cổng trước triển khai |
 | 9 | chạy đầu-cuối trên dự án mẫu | hiệu chỉnh |
