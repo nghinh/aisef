@@ -192,9 +192,30 @@ def run_attempt(
         ENV_BASE_REF: base_ref,
     }
 
+    # Cách ly là thứ **phải kiểm**, không phải thứ giả định. Worktree ngăn
+    # story giẫm lên nhau, nhưng không có gì cấm agent `cd` ra ngoài rồi
+    # commit thẳng vào thân cây. Đã gặp thật: một lượt OpenCode đưa
+    # `src/reverse-words.js` lên `main` trong khi nhánh story đứng yên —
+    # cổng chỉ báo "diff rỗng", còn code lạ thì đã nằm trên trunk.
+    truoc = _head_of(project) if workdir != project else ""
+
     result = client.run(spec)
     attempt.cost_usd = result.cost_usd
     evidence.agent_run(story.id, result, name=f"{story.id}#{number}")
+
+    sau = _head_of(project) if workdir != project else ""
+    if truoc and sau != truoc:
+        attempt.error = (
+            f"lượt chạy đã đổi nhánh chính của dự án ({truoc[:8]} → {sau[:8]}). "
+            f"Story phải làm việc trong worktree riêng; công việc trên thân cây "
+            f"không qua cổng nào cả. Hoàn nguyên rồi chạy lại."
+        )
+        attempt.infra = True
+        evidence.tool_run(
+            story.id, "cách ly", ok=False,
+            detail={"truoc": truoc, "sau": sau, "attempt": number},
+        )
+        return attempt
 
     if not result.ok:
         attempt.error = result.error or "lượt chạy thất bại"

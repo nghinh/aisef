@@ -89,9 +89,12 @@ Bảy guard, mỗi guard là một lệnh trả mã thoát, nối vào ba mốc 
 | khi agent định dừng | `completion` |
 
 Guard nằm ở phía framework, không ở phía client — client không được tin.
-Client nào không gắn được guard tiền kiểm (OpenCode hiện ở mức này) thì
-`aisdlc verify` chạy lại toàn bộ trên diff, và báo cáo ghi rõ mức bảo đảm
-thấp hơn thay vì im lặng.
+Cả Claude Code và OpenCode đều đã **chứng minh bằng phép thử trên agent
+thật** rằng guard chặn *trước* khi tool chạy, chứ không phải phát hiện
+sau. Client nào không gắn được guard tiền kiểm thì `aisdlc verify` chạy
+lại toàn bộ trên diff, và `aisdlc compile` ghi rõ mức bảo đảm thấp hơn
+vào báo cáo thay vì im lặng — năng lực là thứ được **khai và kiểm**, mặc
+định là "chưa chứng minh", không phải "chắc là được".
 
 ## Khi cổng chặn
 

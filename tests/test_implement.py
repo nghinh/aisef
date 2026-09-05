@@ -521,3 +521,88 @@ class TestFindings(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestCachLyThanCay(ImplementTestCase):
+    """Lỗi 40. Worktree ngăn story giẫm lên nhau, nhưng **không** có gì cấm
+    agent `cd` ra ngoài rồi commit thẳng vào thân cây.
+
+    Đã gặp thật: một lượt OpenCode đưa `src/reverse-words.js` lên `main`
+    (commit `d583696`, giữ ở thẻ `bang-chung-loi-40` của dự án thử) trong
+    khi nhánh story đứng yên. Cổng chỉ thấy "diff rỗng" nên story trượt vì
+    lý do sai — còn code chưa qua cổng nào thì đã nằm trên trunk.
+    """
+
+    def setUp(self):
+        super().setUp()
+        subprocess.run(["git", "config", "user.email", "t@t.t"],
+                       cwd=self.project, check=True)
+        subprocess.run(["git", "config", "user.name", "T"],
+                       cwd=self.project, check=True)
+        subprocess.run(["git", "commit", "-q", "--allow-empty", "-m", "nen"],
+                       cwd=self.project, check=True)
+        self.workdir = self.project / "cay-story"
+        self.workdir.mkdir()
+
+    def head(self) -> str:
+        return subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.project,
+                              capture_output=True, text=True).stdout.strip()
+
+    class PhaCachLy(ClientAdapter):
+        """Agent commit thẳng vào thân cây, đúng như lượt OpenCode đã làm."""
+
+        id = "pha-cach-ly"
+
+        def __init__(self, project):
+            self.project = project
+
+        def available(self) -> bool:
+            return True
+
+        def capabilities(self):
+            return {c: Support.NATIVE for c in Capability}
+
+        def build_command(self, spec):
+            return ["true"]
+
+        def run(self, spec: RunSpec) -> RunResult:
+            tep = self.project / "len-thang-trunk.py"
+            if not tep.exists():          # chỉ phiên lập trình mới commit
+                tep.write_text("x = 1\n")
+                for cmd in (["git", "add", "len-thang-trunk.py"],
+                            ["git", "commit", "-q", "-m", "lạc"]):
+                    subprocess.run(cmd, cwd=self.project, check=True)
+            return RunResult(ok=True, text="xong")
+
+    def test_doi_nhanh_chinh_thi_luot_chay_that_bai(self):
+        truoc = self.head()
+        out = self.implement(self.PhaCachLy(self.project), workdir=self.workdir)
+        self.assertFalse(out.done)
+        self.assertIn("đổi nhánh chính", out.attempts[0].error)
+        self.assertNotEqual(self.head(), truoc)
+
+    def test_ghi_vao_bang_chung_de_ve_sau_truy_duoc(self):
+        self.implement(self.PhaCachLy(self.project), workdir=self.workdir)
+        ev = EvidenceStore(self.artifacts).read(self.story.id)
+        muc = [e for e in ev.events if e.name == "cách ly"]
+        self.assertTrue(muc, "phải có bản ghi cách ly bị phá")
+        self.assertFalse(muc[0].ok)
+        self.assertNotEqual(muc[0].detail["truoc"], muc[0].detail["sau"])
+
+    def test_tinh_la_loi_ha_tang_khong_phai_loi_chat_luong(self):
+        """Không tiêu hạn mức thử lại chất lượng: story chưa hề được chấm."""
+        out = self.implement(self.PhaCachLy(self.project), workdir=self.workdir)
+        self.assertTrue(out.attempts[0].infra)
+
+    def test_khong_doi_thi_khong_bao_gi(self):
+        """Agent ngoan không được nhận cảnh báo — guard giả là guard bị gỡ."""
+        out = self.implement(ScriptedClient(), workdir=self.workdir)
+        ev = EvidenceStore(self.artifacts).read(self.story.id)
+        self.assertEqual([e for e in ev.events if e.name == "cách ly"], [])
+        self.assertNotIn("đổi nhánh chính", out.attempts[0].error or "")
+
+    def test_chay_thang_trong_du_an_thi_khong_kiem(self):
+        """`--no-isolate` là cố ý làm việc trên thân cây; kiểm ở đó sẽ
+        chặn mọi lượt chạy hợp lệ."""
+        out = self.implement(self.PhaCachLy(self.project), workdir=self.project)
+        self.assertNotIn("đổi nhánh chính", out.attempts[0].error or "")

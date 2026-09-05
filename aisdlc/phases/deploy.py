@@ -214,8 +214,20 @@ jobs:
 
       # Đường dẫn tuyệt đối của máy sinh ra quy trình này không tồn tại
       # trên máy chạy CI. Cài rồi gọi từ PATH.
+      #
+      # `{install}` phải là thứ pip thật sự cài được: tên gói trên PyPI
+      # nếu đã phát hành, hoặc `git+https://…` / đường dẫn tới bản sao kho
+      # nguồn nếu chưa. Đổi bằng `--install-spec` khi sinh lại.
       - name: Cài AI-SDLC
         run: pip install --quiet {install}
+
+      # Kho skill (~93 MB) không nằm trong gói. Cache lại để mỗi lượt CI
+      # không phải clone lần nữa.
+      - name: Cache kho skill
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ai-sdlc/references
+          key: aisdlc-references-${{{{ hashFiles('.ai/config.json') }}}}
 
       - name: Môi trường
         run: {bin} doctor
@@ -290,6 +302,7 @@ def generate(
     *,
     config: Config | None = None,
     aisdlc_bin: str = "aisdlc",
+    install_spec: str = INSTALL_SPEC,
     force: bool = False,
 ) -> DevSecOpsReport:
     """Sinh quy trình CI (bằng code) và bộ khung vận hành (bằng model)."""
@@ -301,7 +314,9 @@ def generate(
     project = Path(project).resolve()
     cfg = config or Config.load(project)
     report = DevSecOpsReport()
-    report.ci_path = write_ci_workflow(project, aisdlc_bin=aisdlc_bin)
+    report.ci_path = write_ci_workflow(
+        project, aisdlc_bin=aisdlc_bin, install_spec=install_spec
+    )
 
     have = [name for name in REQUIRED_ARTIFACTS if (project / name).is_file()]
     if len(have) == len(REQUIRED_ARTIFACTS) and not force:

@@ -102,11 +102,23 @@ def build_opencode_plugin(project: Path, aisdlc_bin: str) -> str:
     """
     pre = [k for k, (event, _) in sorted(GUARD_MATCHERS.items()) if event == "PreToolUse"]
     post = [k for k, (event, _) in sorted(GUARD_MATCHERS.items()) if event == "PostToolUse"]
+    # Claude Code lọc tool bằng chính chuỗi này trong `settings.json`;
+    # OpenCode không có cơ chế tương đương nên plugin phải tự lọc. Bỏ bước
+    # này thì mọi guard chạy trên mọi tool: `write-scope` sẽ chấm cả `glob`
+    # (tham số `path: "."`) rồi chặn thao tác **chỉ đọc**, và agent kẹt.
+    #
+    # Khớp không phân biệt hoa thường, có neo hai đầu: tên tool của
+    # OpenCode viết thường (`write`, `edit`, `bash`), và không neo thì
+    # `todowrite` cũng dính vào `Write`.
+    matchers = "{ " + ", ".join(
+        f'"{k}": /^({m})$/i' for k, (_, m) in sorted(GUARD_MATCHERS.items()) if m
+    ) + " }"
     return f"""// {GENERATED_NOTE}
 import type {{ Plugin }} from "@opencode-ai/plugin"
 
 const BEFORE = [{", ".join(f'"{k}"' for k in pre)}]
 const AFTER = [{", ".join(f'"{k}"' for k in post)}]
+const MATCH = {matchers}
 const BIN = {json.dumps(aisdlc_bin)}
 const PROJECT = {json.dumps(str(project))}
 
@@ -114,9 +126,10 @@ const PROJECT = {json.dumps(str(project))}
 // đầu vào bằng cách chuyển hướng từ một giá trị nội suy. Gọi sai thì mọi
 // lần gọi tool đều ném TypeError — trông như guard chặn, thật ra là guard
 // chưa từng chạy.
-async function guard($, kinds, event) {{
+async function guard($, kinds, tool, event) {{
   const input = new Blob([event])
   for (const kind of kinds) {{
+    if (!MATCH[kind]?.test(tool ?? "")) continue
     const res = await $`${{BIN}} --project ${{PROJECT}} guard ${{kind}} < ${{input}}`
       .quiet().nothrow()
     if (res.exitCode === 2) {{
@@ -134,14 +147,14 @@ export const AisdlcGuardPlugin: Plugin = async ({{ $, directory, worktree }}) =>
   const CWD = directory || worktree || PROJECT
   return {{
     "tool.execute.before": async (input, output) => {{
-      await guard($, BEFORE, JSON.stringify({{
+      await guard($, BEFORE, input?.tool, JSON.stringify({{
         cwd: CWD,
         tool_name: input?.tool,
         tool_input: output?.args ?? {{}},
       }}))
     }},
     "tool.execute.after": async (input, output) => {{
-      await guard($, AFTER, JSON.stringify({{
+      await guard($, AFTER, input?.tool, JSON.stringify({{
         cwd: CWD, tool_name: input?.tool, tool_input: {{}},
       }}))
     }},

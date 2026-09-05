@@ -17,6 +17,7 @@ from aisdlc.control.approvals import GATE_ARTIFACTS, ApprovalStore, Gate  # noqa
 from aisdlc.control.state import StateStore, StoryStatus  # noqa: E402
 from aisdlc.phases.deploy import (  # noqa: E402
     CI_PATH,
+    INSTALL_SPEC,
     RUNBOOK_PATH,
     RUNBOOK_SECTIONS,
     check_runbook,
@@ -295,3 +296,37 @@ class TestQuyTrinhCI(unittest.TestCase):
         head = r.summary().splitlines()[0]
         self.assertIn("3 tạo tác", head)
         self.assertEqual(sum(1 for l in r.summary().splitlines() if "✅" in l), 3)
+
+
+class TestInstallSpecDoiDuoc(unittest.TestCase):
+    """Gói chưa lên PyPI thì `pip install ai-sdlc` trong CI sẽ hỏng. Quy
+    trình sinh ra phải cho trỏ sang thứ pip cài được thật."""
+
+    def test_mac_dinh_la_ten_goi(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = write_ci_workflow(tmp)
+            self.assertIn(f"pip install --quiet {INSTALL_SPEC}",
+                          path.read_text(encoding="utf-8"))
+
+    def test_doi_sang_git_url(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            spec = "git+https://github.com/ai-sdlc/ai-sdlc@v0.1.0"
+            noi_dung = write_ci_workflow(tmp, install_spec=spec).read_text(
+                encoding="utf-8")
+            self.assertIn(f"pip install --quiet {spec}", noi_dung)
+            self.assertNotIn(f"pip install --quiet {INSTALL_SPEC}\n", noi_dung)
+
+    def test_cache_kho_skill_de_ci_khong_clone_lai_moi_luot(self):
+        """93 MB skill không nằm trong gói; không cache thì mỗi lượt CI
+        clone lại năm kho."""
+        with tempfile.TemporaryDirectory() as tmp:
+            noi_dung = write_ci_workflow(tmp).read_text(encoding="utf-8")
+            self.assertIn("actions/cache@v4", noi_dung)
+            self.assertIn("~/.cache/ai-sdlc/references", noi_dung)
+
+    def test_yaml_van_hop_le_sau_khi_them_cache(self):
+        """`${{ }}` của GitHub Actions đi qua `str.format` — dễ vỡ."""
+        with tempfile.TemporaryDirectory() as tmp:
+            noi_dung = write_ci_workflow(tmp).read_text(encoding="utf-8")
+            self.assertIn("${{ hashFiles('.ai/config.json') }}", noi_dung)
+            self.assertNotIn("{{{", noi_dung)

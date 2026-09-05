@@ -95,6 +95,46 @@ class TestOpenCodePlugin(CompileTestCase):
     def test_hooks_the_right_event(self):
         self.assertIn("tool.execute.before", build_opencode_plugin(self.project, "/bin/aisdlc"))
 
+    def test_loc_tool_theo_dung_matcher_nhu_claude(self):
+        """Lỗi 41. `settings.json` của Claude Code mang matcher, nên Claude
+        chỉ gọi guard cho tool khớp. OpenCode không có cơ chế ấy — plugin
+        phải tự lọc, nếu không thì **mọi guard chạy trên mọi tool**.
+
+        Đo trên agent thật: `write-scope` chấm luôn `glob` (tham số
+        `path: "."`), chặn một thao tác chỉ đọc, và agent kẹt cả lượt.
+        """
+        src = build_opencode_plugin(self.project, "/bin/aisdlc")
+        for kind, (_, matcher) in GUARD_MATCHERS.items():
+            if matcher:
+                self.assertIn(f'"{kind}": /^({matcher})$/i', src, kind)
+        self.assertIn("if (!MATCH[kind]?.test(tool ?? \"\")) continue", src)
+
+    def test_matcher_co_neo_hai_dau_va_khong_phan_biet_hoa_thuong(self):
+        """Tên tool của OpenCode viết thường (`write`, `bash`) nên phải bỏ
+        phân biệt hoa thường; và phải neo hai đầu, nếu không `todowrite`
+        cũng dính vào `Write`."""
+        src = build_opencode_plugin(self.project, "/bin/aisdlc")
+        dong = next(d for d in src.splitlines() if d.startswith("const MATCH"))
+        import re as _re
+        mau = _re.findall(r"/\^\(([^)]+)\)\$/i", dong)
+        self.assertEqual(len(mau), sum(1 for _, m in GUARD_MATCHERS.values() if m))
+        for m in mau:
+            with self.subTest(matcher=m):
+                r = _re.compile(f"^({m})$", _re.I)
+                self.assertIsNone(r.match("todowrite"))
+                self.assertIsNone(r.match("glob"))
+                self.assertIsNone(r.match("read"))
+
+    def test_guard_chi_doc_khong_bi_chan(self):
+        """Ba tool chỉ đọc phải đi qua sạch mọi guard tiền kiểm."""
+        src = build_opencode_plugin(self.project, "/bin/aisdlc")
+        dong = next(d for d in src.splitlines() if d.startswith("const MATCH"))
+        import re as _re
+        for tool in ("glob", "grep", "read", "webfetch", "todowrite"):
+            for m in _re.findall(r"/\^\(([^)]+)\)\$/i", dong):
+                with self.subTest(tool=tool, matcher=m):
+                    self.assertIsNone(_re.compile(f"^({m})$", _re.I).match(tool))
+
     def test_khong_goi_stdin_nhu_mot_ham(self):
         """Lỗi 39. `$` của OpenCode là Bun shell: `BunShellPromise.stdin` là
         một `WritableStream` **chỉ đọc**, không phải hàm.

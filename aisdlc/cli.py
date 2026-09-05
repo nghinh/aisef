@@ -36,6 +36,7 @@ from .control.design_contract import CONTRACT_FILE
 from .control.state import StateStore, StoryStatus
 from .harness.guardrails import GUARD_MATCHERS
 from .harness.tools import aisdlc_command
+from .phases.deploy import INSTALL_SPEC as DEPLOY_INSTALL_SPEC
 
 ARTIFACT_ROOT = "_bmad-output"
 
@@ -798,6 +799,7 @@ def cmd_devsecops(args) -> int:
         # Mặc định là **tên lệnh trên PATH**, không phải đường dẫn tuyệt
         # đối của máy này: quy trình CI sinh ra sẽ chạy trên máy khác.
         aisdlc_bin=args.bin or "aisdlc",
+        install_spec=args.install_spec,
         force=args.force,
     )
     print(report.summary())
@@ -961,6 +963,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     d = sub.add_parser("devsecops", help="sinh CI + Dockerfile + triển khai + runbook")
     d.add_argument("--client", default="claude", help="claude | opencode")
+    d.add_argument("--install-spec", default=DEPLOY_INSTALL_SPEC,
+                   help="thứ CI sẽ `pip install` — tên gói PyPI, git+URL, "
+                        "hay đường dẫn tới bản sao kho nguồn")
     d.add_argument("--bin", default="", help="đường dẫn lệnh aisdlc dùng trong CI")
     d.add_argument("--force", action="store_true", help="sinh lại dù đã có")
     d.set_defaults(func=cmd_devsecops)
