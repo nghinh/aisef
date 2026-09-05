@@ -151,7 +151,7 @@ def build_context(
             "\n\n".join(d.as_prompt() for d in rules)
             or "(kiến trúc không nêu quyết định nào ràng buộc story này)"
         ),
-        "write_scope": "\n".join(f"- `{p}`" for p in story.write_scope) or "(chưa khai)",
+        "write_scope": _write_scope_lines(story, project),
         "mockup_section": prompt_section(slices),
         "tools": describe_tools(project, config),
     }
@@ -231,6 +231,19 @@ def skills_used(result) -> list[str]:
         if tu.name == "Skill":
             out.append(str((tu.input or {}).get("skill") or (tu.input or {}).get("name") or "?"))
     return out
+
+
+def _write_scope_lines(story: Story, project: Path) -> str:
+    """Phạm vi ghi cho prompt: story khai + phần harness cấp thêm vì hợp đồng
+    kiểm định (lỗi 21) — agent phải thấy đúng phạm vi mà guard áp."""
+    from ..control.normalize import verification_paths
+
+    lines = [f"- `{p}`" for p in story.write_scope]
+    them = [p for p in verification_paths(story, project) if p not in story.write_scope]
+    if them:
+        lines.append("- _(harness cấp thêm vì hợp đồng kiểm định đòi)_")
+        lines += [f"- `{p}`" for p in them]
+    return "\n".join(lines) or "(chưa khai)"
 
 
 def _story_fallback(story: Story) -> str:

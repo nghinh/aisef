@@ -130,7 +130,53 @@ def effective_write_scope(story: Story, project: Path) -> list[str]:
     for name in MANIFESTS:
         if name not in scope and (project / name).is_file():
             scope.append(name)
+    for path in verification_paths(story, project):
+        if path not in scope:
+            scope.append(path)
     return with_lockfiles(scope)
+
+
+#: Loại kiểm định → khoá cấu hình chứa lệnh chạy nó.
+_VERIFY_COMMAND_KEY = {"unit": "tools.test"}
+
+
+def verification_paths(story: Story, project: Path, config=None) -> list[str]:
+    """Thư mục/tệp test mà **hợp đồng kiểm định của story** đòi — suy từ lệnh
+    kiểm định của dự án (`verify.e2e` = `npx playwright test tests/e2e` →
+    `tests/e2e`), chỉ lấy đường dẫn **có thật**.
+
+    Lỗi 21 (e9 2026-09-05, hai story liên tiếp): story khai `e2e` và
+    `accessibility` nhưng write_scope chỉ có `src/**`; guard chặn ghi
+    `tests/`, người rà soát đánh dấu bế tắc kế hoạch, $30 cho hai story mà
+    lỗi nằm ở chỗ harness *đòi* test rồi *cấm* viết test. Harness đòi gì
+    thì tự cấp phạm vi cho cái đó.
+    """
+    kinds = [k.strip().lower() for k in (story.verification_contract or []) if k.strip()]
+    if not kinds:
+        return []
+    if config is None:
+        from ..config import Config
+
+        try:
+            config = Config.load(project)
+        except Exception:  # noqa: BLE001 — không có config thì không suy gì
+            return []
+    out: list[str] = []
+    for kind in kinds:
+        key = _VERIFY_COMMAND_KEY.get(kind, f"verify.{kind}")
+        try:
+            cmd = str(config[key] or "")
+        except KeyError:
+            continue
+        for tok in cmd.replace("'", " ").replace('"', " ").split():
+            if tok.startswith("-") or "/" not in tok:
+                continue
+            rel = tok.strip("./").rstrip("/")
+            if not rel or rel.startswith("..") or rel.startswith("node_modules"):
+                continue
+            if (project / rel).exists() and rel not in out:
+                out.append(rel)
+    return out
 
 
 def is_lockfile(path: str) -> bool:

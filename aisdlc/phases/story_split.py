@@ -31,6 +31,7 @@ from ..control.normalize import (
     Story,
     parse_epics_file,
     parse_prd_file,
+    verification_paths,
 )
 from ..control.scheduler import CycleError, UnknownDependencyError
 from ..control.scheduler import Story as SchedStory
@@ -87,7 +88,7 @@ def to_scheduler(stories: list[Story]) -> list[SchedStory]:
     ]
 
 
-def render_story(story: Story, prd: PRD | None) -> str:
+def render_story(story: Story, prd: PRD | None, root: Path | None = None) -> str:
     """Sinh nội dung file story — bản hợp đồng agent đọc trước khi viết code."""
     out = [f"# {story.id}: {story.title}", ""]
 
@@ -108,6 +109,10 @@ def render_story(story: Story, prd: PRD | None) -> str:
     out += ["## Phạm vi được ghi", ""]
     if story.write_scope:
         out += [f"- `{p}`" for p in story.write_scope]
+        them = verification_paths(story, root.parent) if root is not None else []
+        if them:
+            out += ["", "Harness cấp thêm vì hợp đồng kiểm định của story đòi (lỗi 21):"]
+            out += [f"- `{p}`" for p in them]
         out += [
             "",
             "Guard chặn mọi thao tác ghi ngoài danh sách này. Cần ghi chỗ khác "
@@ -218,7 +223,7 @@ def split(
     for story in stories:
         path = story_file(root, story)
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(render_story(story, prd), encoding="utf-8")
+        path.write_text(render_story(story, prd, root), encoding="utf-8")
         written.add(path)
     res.files = sorted(written)
     res.removed = _prune(root, written)
