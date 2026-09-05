@@ -196,6 +196,8 @@ thẩm quyền; slot chưa khai ở đó hiện thành `?` trong bằng chứng)
 | `tools` | `config` | developer |
 | `skills` | `router` | developer |
 | **`index`** | **`ledger`** | developer (ADR-004 R6) — lát cắt chỉ mục bằng chứng của epic chứa story: một dòng mỗi story, trần `context.max_index_chars`. **Chỉ mục, không phải lịch sử**: chi tiết tra bằng `aisdlc evidence <id>` |
+| **`preservation`** | **`ledger`** | developer, reviewer, security (ADR-004 R4) — hành vi VERIFIED của **story khác** mà phạm vi ghi của story chạm tệp (`complexity.verified_touched`): id · story sở hữu · nguồn kiểm. Tính **một lần** trước phiên developer, ba vai nhận cùng bản (bất biến #9: reviewer nhận từ sổ, không từ developer); cổng "bảo toàn" chấm đúng danh sách ấy trên ứng viên. Trần `context.max_preservation_chars` chỉ cắt phần in ra |
+| **`validation`** | **`ledger`** | developer, reviewer, security (ADR-004 R4) — thứ harness **sẽ chạy lại** ở ứng viên: số test bảo toàn, `qa:<kind>` (hợp đồng story + kiểm định đã xác minh bị chạm), màn hình (của story + bị chạm). Cùng hàm `validation_targets` cấp cho slot và cho `run_attempt`, nên thứ in ra và thứ chạy không bao giờ là hai danh sách |
 
 ---
 

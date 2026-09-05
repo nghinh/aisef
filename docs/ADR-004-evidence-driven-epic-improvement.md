@@ -1,6 +1,6 @@
 # ADR-004 — Cải tiến liên tục theo bằng chứng ở cấp epic (đối chiếu Harness-of-Harness)
 
-**Trạng thái:** PROPOSED, trừ **R2 · R5 · R6 · R7 = ACCEPTED** (2026-09-05, số đo §6: B0 và B4 hồi cứu trên evidence thật của e9 và `par`, 0 agent). **R1 · R8** hiện thực, unit xanh, chờ đo trên agent thật (§6). R3 · R4 · R9 chưa hiện thực. Ngày 2026-09-05.
+**Trạng thái:** PROPOSED, trừ **R2 · R5 · R6 · R7 = ACCEPTED** (2026-09-05, số đo §6: B0 và B4 hồi cứu trên evidence thật của e9 và `par`, 0 agent). **R1 · R8 · R4** hiện thực, unit xanh, chờ đo trên agent thật (§6). R3 · R9 chưa hiện thực. Ngày 2026-09-05, cập nhật 2026-09-06.
 **Nguồn đối chiếu:** paper *Harness-of-Harness: Multi-Day Autonomous Software Development with Continual Improvement* (arXiv 2609.01481v1, Shanghai AI Lab) và repo `Flesymeb/HarnessOfHarness` — repo tại thời điểm đọc chỉ có README + tài sản trình diễn (58 commit, MIT, "HoH-lite sẽ công bố"), **không có mã**; mọi cơ chế dưới đây lấy từ paper.
 **Ràng buộc giữ nguyên:** sáu nhóm harness hiện có, evidence-first, reviewer ≠ developer, bảo đảm phía harness, worktree cách ly, cổng người, CLI gọi-một-lần/không daemon, không tin client. Không dùng HoH làm runtime. Không tự sửa framework: mọi thay đổi vẫn qua test, benchmark, ADR/evidence và cổng người/phát hành.
 
@@ -290,6 +290,91 @@ chưa đo trên `par`.** (2026-09-05)
   không trả JSON nên trong unit mỗi vai rà soát tốn thêm đúng 1 lượt —
   đúng thiết kế; agent thật đọc prompt mới phải không cần lượt ấy, và đó
   chính là thứ B7 phải chứng minh trước khi R8 chuyển ACCEPTED.
+
+### R4 — Preservation / Validation trong gói bàn giao + cổng "bảo toàn" (2026-09-06, unit + mutation trên client giả, 0 agent)
+
+**Hiện thực.** `implement.build_context` thêm hai slot nguồn `ledger`:
+
+* `preservation` = hành vi VERIFIED của **story khác** mà `write_scope` của
+  story chạm tệp — phép giao tệp **tái dùng** `complexity.verified_touched`
+  (R5), không có bản thứ hai. Mỗi dòng: id · story sở hữu · nguồn kiểm
+  (`test_id` / `qa:<kind>` / màn hình, đọc từ `ledger.behaviors[id].source`).
+  Sổ được **chiếu lại từ evidence** mỗi lượt (`ledger.build`, 1,1 s trên
+  e9) chứ không đọc `ledger.json`: tệp ấy chỉ `aisdlc report` làm mới, nên
+  trong một lần `run` qua cả epic story sau sẽ không thấy hành vi story
+  trước vừa xác minh. Danh sách tính **một lần trước phiên developer** và
+  truyền nguyên cho reviewer, security và cổng (`build_context(...,
+  preservation=)`) — tính lại sau phiên thì sổ đã đổi theo bằng chứng của
+  chính lượt ấy và ba vai nói về ba danh sách; test
+  `test_ba_vai_nhan_cung_mot_danh_sach_tu_harness` khoá điều này.
+* `validation` = thứ harness **chạy lại** ở ứng viên: số test bảo toàn
+  (tên đã ở slot trên, không chép lại — e9 01-07 có 27 test id), `qa:<kind>`
+  (hợp đồng story ∪ kiểm định đã xác minh bị chạm), màn hình (story ∪ bị
+  chạm). `validation_targets()` cấp cùng lúc cho slot và cho `run_attempt`
+  (`run_suite(only=…)`, `verify_screens(…)`), nên thứ in cho agent và thứ
+  thật sự chạy là một danh sách.
+* Không thêm slot `targets`: ADR chỉ đòi hai slot; tiêu chí story đã ở
+  `story_contract`, GAP/REOPENED của story đã ở `index` (V/G/R).
+* Knob `context.max_preservation_chars` = 1500, áp cho cả hai slot; **chỉ
+  cắt phần in ra** — cổng vẫn chấm đủ danh sách (test riêng).
+* Cổng `gate.evaluate(preservation=)` thêm mục **bảo toàn**, ba kết cục:
+  test mang mã / `qa:<kind>` / `mockup_map` **ở đúng SHA ứng viên** đỏ →
+  FAILED; không có bằng chứng ở ứng viên (test bị xoá/đổi tên, qa bỏ qua,
+  màn chưa đối chiếu, bằng chứng ở bản khác) → UNRUNNABLE — không kiểm được
+  không phải đạt; còn lại PASSED. Rỗng → NOT_APPLICABLE, chỗ gọi cũ không
+  đổi kết cục. `FR`/`NFR` chấm theo cùng luật với sổ: đỏ khi một tiêu chí
+  của story sở hữu đỏ.
+* **REOPENED không ghi tay.** Cổng đọc đúng `tool_run test` /
+  `qa:<kind>` / `mockup_map` mà `ledger.build()` cũng đọc; nhánh "story
+  khác chỉ bị chấm tiêu chí thực sự thấy test" của `_observe_tests` (R2)
+  suy `REOPENED` với `regressed_by = <story đang chấm>#<lượt>@<sha>` từ chính
+  bằng chứng ấy. Ghi thêm `BEHAVIOR` ở cổng là ghi hai lần cùng một sự thật
+  và tạo chỗ cho hai bản lệch nhau. Mutation test kiểm cả hai đầu: cổng ✗
+  **và** sổ `REOPENED` + `cross_reopens` đúng thủ phạm.
+* Prompt: `story-implement@5`, `story-review@5`, `story-security-review@3`
+  thêm hai mục ngắn. Phát hiện kèm: `_bmad-output/reviews` (harness ghi)
+  chưa nằm trong `HARNESS_OWNED` — lộ khi hai story chạy chung một cây
+  (`--no-isolate`): tệp lời rà soát của story trước thành "ngoài phạm vi
+  ghi" của story sau. Đã thêm.
+
+**Số đo (c) — prompt_chars trước/sau, cùng kịch bản trên client giả**
+(`tests/test_preservation.py`: story A xanh 1 tiêu chí + FR-1 + `qa:fake-tests`,
+story B chạm cùng `src/`; đo bằng `agent_run.prompt_chars` và slot của
+`handoff`; docker tắt để runner giả in tên test `pytest -v`):
+
+| vai | trước (370ea23) | sau | Δ do R4 | Δ % | phần khung prompt | phần slot |
+|---|---|---|---|---|---|---|
+| developer | 4 125 | 4 837 | +544 | **+13,2 %** | +332 | +212 (`preservation` 180 · `validation` 32) |
+| reviewer | 3 702 | 4 091 | +389 | +10,5 % | +177 | +212 |
+| security | 4 017 | 4 328 | +411 | +10,5 % | +199 | +212 |
+
+Δ do R4 = khung + slot, đối chiếu với số đo thô: developer thô +712, trong
+đó 168 là slot `tools` in đường dẫn tuyệt đối `bin/aisdlc` của worktree dài
+hơn kho chính (4 dòng × 42) — không phải R4; security thô +311 vì ở bản
+370ea23 tệp lời rà soát `_bmad-output/reviews/STORY-01-02-review*.md` (đã
+ghi trước phiên bảo mật) lọt vào `diff_summary`/`impact` của chính phiên
+ấy (+100) — lỗi `HARNESS_OWNED` nói trên, nay đã đóng nên số "sau" không
+có phần ấy. Bản nháp đầu là +22 % (validation chép lại từng test id, khung
+dài); rút xuống bằng cách đếm test thay vì liệt kê và rút khung. Trên e9
+(prompt developer ≈ 13,5k) cùng lượng thêm này là ≈ +4 %; với 31 hành vi
+của 01-07 slot chạm trần 1 500 → tối đa ≈ +13,6 %. Test
+`test_hai_slot_moi_khong_qua_15_phan_tram_prompt` giữ ngân sách cho lần
+sửa prompt sau.
+
+**AC (a)** đạt (`test_story_cham_tep_cua_hanh_vi_verified_thi_slot_neu_dung_hanh_vi_va_test_id`):
+slot có đúng `AC-STORY-01-01-1` + `FR-1` kèm test id, không có hành vi của
+chính story. **AC (b)** đạt trên client giả
+(`test_cong_bao_toan_chan_va_so_ghi_reopened_dung_thu_pham`): B ghi đè
+`src/a.py`, test của A đỏ → cổng "bảo toàn" ✗ nêu đúng test, sổ
+`AC-STORY-01-01-1` và `FR-1` REOPENED với `regressed_by = STORY-01-02#1@…`,
+`cross_reopens` = 2; chạy sạch → ✅ và `reopen_events = 0` (nửa "không ✗
+oan" của B3). Cổng unit 7 phép ở `TestCongBaoToan`.
+
+**Chưa đo:** B3 trên `par` với agent thật (mutation có chủ đích và "không
+✗ oan trên chạy sạch" ở dogfood), và (c) trên dogfood/e9 01-05 — cần lượt
+agent, cùng lô với R1 (d) và R8 (B7). Chưa có story nào của e9/`par` có
+`mockup:*`/`qa:e2e` VERIFIED bị story sau chạm, nên nhánh `verify_screens`
+cho màn hình bảo toàn mới chỉ xanh ở unit (`test_qa_va_mockup_theo_cung_ba_ket_cuc`).
 
 ### R2 — Sổ hành vi (`control/ledger.py`) · **B0 hồi cứu, 0 agent**
 
