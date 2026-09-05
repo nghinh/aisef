@@ -17,7 +17,9 @@ Hai điều được giữ chặt ở đây:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -31,7 +33,7 @@ from ..control.acceptance import ac_code
 from ..control.design_contract import DesignContract, load as load_contract
 from ..control.impact import analyse as analyse_impact
 from ..control.preflight import verification_contract
-from ..control.security import SecurityReport
+from ..control.security import SEVERITIES, SecurityReport
 from ..control.security import parse as parse_security
 from ..control.normalize import Architecture, Story, effective_write_scope
 from ..harness import mockup_verify
@@ -573,6 +575,89 @@ def review_story(
 
     Trả về danh sách mục ``[chặn]``. Người viết đã tin code mình đúng; hỏi
     lại chính phiên đó chỉ nhận lại cùng niềm tin.
+
+    Chữ ký giữ nguyên cho luồng gọi cũ; bản máy đọc lấy ở `review_story_v2`.
+    """
+    return review_story_v2(
+        story, workdir=workdir, base_ref=base_ref, project=project,
+        artifact_root=artifact_root, client=client, config=config,
+        catalog=catalog, architecture=architecture, number=number,
+        candidate=candidate,
+    )[0]
+
+
+def _review_session(
+    client: ClientAdapter, spec, *, store: EvidenceStore, story_id: str,
+    artifact_root: Path, workdir: Path, name: str, role: str, number: int,
+):
+    """Một phiên rà soát: chạy, ghi bằng chứng, hoàn nguyên cây nếu bị sửa.
+
+    Ghi nguyên văn **sau** khi đã so cây: artifact có thể nằm trong chính
+    cây làm việc (không cách ly) và tệp lời rà soát không phải là "người
+    rà soát sửa cây".
+    """
+    truoc = _tree_snapshot(workdir)
+    result = client.run(spec)
+    store.agent_run(story_id, result, name=name, prompt_chars=len(spec.prompt))
+    da_sua = _revert_reviewer_writes(workdir, truoc, _tree_snapshot(workdir))
+    persist_verdict(artifact_root, story_id, role, number, result)
+    return result, da_sua
+
+
+def _with_schema(client: ClientAdapter, spec, result, *, store: EvidenceStore,
+                 story_id: str, artifact_root: Path, workdir: Path, role: str,
+                 number: int):
+    """Đòi khối JSON theo schema; thiếu thì hỏi lại **đúng một lần** (R8).
+
+    Trả `(text, verdict)`: `text` là lời được dùng làm bản người đọc — lượt
+    hai nếu lượt ấy đúng schema, còn không thì lời lượt đầu.
+    """
+    verdict = review_verdict(result.text)
+    if verdict is not None:
+        return result.text, verdict
+    lai, da_sua = _review_session(
+        client, replace(spec, prompt=spec.prompt + SCHEMA_REMINDER), store=store,
+        story_id=story_id, artifact_root=artifact_root, workdir=workdir,
+        name=f"{story_id}-{role}-retry", role=f"{role}-retry", number=number,
+    )
+    lech = _candidate_moved(workdir, store.candidate)
+    if lech:
+        # Lượt hỏi lại cũng bị soi ứng viên (R1): đổi bản thì lời không tính.
+        store.tool_run(story_id, f"{role}:candidate", ok=False,
+                       detail={"expected": store.candidate, "got": lech,
+                               "attempt": number, "retry": True})
+        return result.text, None
+    if da_sua:
+        # Lượt hỏi lại cũng bị bất biến "rà soát không ghi cây" soi; bỏ lời
+        # của nó, và nói ra — hoàn nguyên im lặng thì không ai biết.
+        store.tool_run(
+            story_id, f"{role}:immutable", ok=False,
+            detail={"changed": da_sua[:20], "retry": True},
+        )
+    if da_sua or not lai.ok:
+        return result.text, None
+    verdict = review_verdict(lai.text)
+    return (lai.text, verdict) if verdict is not None else (result.text, None)
+
+
+def review_story_v2(
+    story: Story,
+    *,
+    workdir: Path,
+    base_ref: str = "",
+    project: Path,
+    artifact_root: Path,
+    client: ClientAdapter,
+    config: Config,
+    catalog: Catalog,
+    architecture: Architecture | None,
+    number: int = 0,
+    candidate: str = "",
+) -> tuple[list[str], Verdict | None]:
+    """Như `review_story`, nhưng trả kèm bản máy đọc (`behavior_id`…).
+
+    Luồng sổ hành vi (R2) đọc `note:review:verdict` trong bằng chứng để ghi
+    GAP nguồn `reviewer`; ở đây chỉ cần trả ra cho người gọi nào cần.
     """
     changed = changed_files(str(workdir), base_ref=base_ref)
     if not changed:
@@ -585,7 +670,7 @@ def review_story(
             "gì, hoặc công việc của story đã nằm trên nhánh chính rồi "
             "(worktree rẽ từ đó nên diff rỗng). Kiểm nhánh chính trước; "
             "nếu công việc đã ở đó thì story này xong rồi."
-        ]
+        ], None
 
     context = build_context(
         story,
@@ -638,14 +723,10 @@ def review_story(
     }
 
     _attach_settings(spec, project)
-    truoc = _tree_snapshot(workdir)
-    result = client.run(spec)
-    store.agent_run(story.id, result, name=f"{story.id}-review",
-                    prompt_chars=len(spec.prompt))
-    da_sua = _revert_reviewer_writes(workdir, truoc, _tree_snapshot(workdir))
-    # Ghi sau khi đã so cây: artifact có thể nằm trong chính cây làm việc
-    # (không cách ly) và tệp lời rà soát không phải là "người rà soát sửa cây".
-    persist_verdict(artifact_root, story.id, "review", number, result)
+    result, da_sua = _review_session(
+        client, spec, store=store, story_id=story.id, artifact_root=artifact_root,
+        workdir=workdir, name=f"{story.id}-review", role="review", number=number,
+    )
     if da_sua:
         store.tool_run(
             story.id, "review:immutable", ok=False, detail={"changed": da_sua[:20]},
@@ -654,7 +735,7 @@ def review_story(
             "[chặn] người rà soát đã sửa cây làm việc "
             f"({', '.join(da_sua[:3])}) — đã hoàn nguyên; lượt rà soát này không "
             "được tính. Rà soát là báo cáo, không phải sửa."
-        ]
+        ], None
 
     lech = _candidate_moved(workdir, candidate)
     if lech:
@@ -667,12 +748,41 @@ def review_story(
             f"[chặn] ứng viên đổi trong phiên rà soát ({candidate[:7]} → {lech[:7]}) — "
             "lượt rà soát này không được tính. Rà soát đọc bản đã đóng băng, "
             "không tạo bản mới."
-        ]
+        ], None
 
     if not result.ok:
         # Không rà soát được thì **không** coi như sạch.
-        return [f"rà soát không chạy được: {result.error}"]
-    return blocking_findings(result.text)
+        return [f"rà soát không chạy được: {result.error}"], None
+
+    text, verdict = _with_schema(
+        client, spec, result, store=store, story_id=story.id,
+        artifact_root=artifact_root, workdir=workdir, role="review", number=number,
+    )
+    return _reconcile(story.id, store, text, verdict, role="review"), verdict
+
+
+def _reconcile(story_id: str, ev: EvidenceStore, text: str,
+               verdict: Verdict | None, *, role: str) -> list[str]:
+    """Đối chiếu bản máy đọc với bản người đọc, ghi bằng chứng, trả **hợp**."""
+    tu_van_ban = blocking_findings(text)
+    if verdict is None:
+        # Hai lượt đều không có schema: dùng văn bản như trước R8, và nói
+        # ra là đã phải lùi — im lặng thì lần sau không ai biết để sửa prompt.
+        ev.record(story_id, Event(kind=NOTE, name=f"{role}:no-schema", ok=False,
+                                  detail={"findings": tu_van_ban, "retried": True}))
+        return tu_van_ban
+    tu_json = verdict.blocking()
+    hop, lech = merge_findings(tu_van_ban, tu_json)
+    if lech:
+        ev.record(story_id, Event(
+            kind=NOTE, name=f"{role}:mismatch", ok=False,
+            detail={"text": tu_van_ban, "json": tu_json},
+        ))
+    ev.record(story_id, Event(
+        kind=NOTE, name=f"{role}:verdict", ok=not hop,
+        detail={"verdict": verdict.verdict, "findings": verdict.findings},
+    ))
+    return hop
 
 
 def security_review(
@@ -740,13 +850,10 @@ def security_review(
         ENV_DISALLOWED_TOOLS: ",".join(ROLES[SECURITY].disallowed_tools),
     }
     _attach_settings(spec, project)
-    truoc = _tree_snapshot(workdir)
-    result = client.run(spec)
-    store.agent_run(
-        story.id, result, name=f"{story.id}-security", prompt_chars=len(spec.prompt)
+    result, da_sua = _review_session(
+        client, spec, store=store, story_id=story.id, artifact_root=artifact_root,
+        workdir=workdir, name=f"{story.id}-security", role="security", number=number,
     )
-    da_sua = _revert_reviewer_writes(workdir, truoc, _tree_snapshot(workdir))
-    persist_verdict(artifact_root, story.id, "security", number, result)
     if da_sua:
         store.tool_run(
             story.id, "security:immutable", ok=False, detail={"changed": da_sua[:20]},
@@ -762,7 +869,49 @@ def security_review(
         )
     if not result.ok:
         return SecurityReport(error=f"không chạy được: {result.error}")
-    return parse_security(result.text)
+
+    text, verdict = _with_schema(
+        client, spec, result, store=store, story_id=story.id,
+        artifact_root=artifact_root, workdir=workdir, role="security", number=number,
+    )
+    return _reconcile_security(story.id, store, text, verdict)
+
+
+def _reconcile_security(story_id: str, ev: EvidenceStore, text: str,
+                        verdict: Verdict | None) -> SecurityReport:
+    """Cùng luật với `_reconcile`, nhưng đơn vị là mức nghiêm trọng.
+
+    Mục JSON không có trong văn bản được đưa lại qua `parse_security` để
+    đúng một bộ lọc nhiễu chấm cả hai nguồn.
+    """
+    rep = parse_security(text)
+    if verdict is None:
+        ev.record(story_id, Event(kind=NOTE, name="security:no-schema", ok=False,
+                                  detail={"findings": [f.line() for f in rep.findings],
+                                          "retried": True}))
+        return rep
+
+    tu_van_ban = [f.line() for f in rep.findings + rep.filtered]
+    tu_json = [f"[{f['severity']}] " + _finding_body(f)
+               for f in verdict.findings if f.get("severity")]
+    hop, lech = merge_findings(tu_van_ban, tu_json)
+    them = hop[len(tu_van_ban):]
+    if them:
+        bo_sung = parse_security("\n".join(them))
+        rep.findings.extend(bo_sung.findings)
+        rep.filtered.extend(bo_sung.filtered)
+        rep.findings.sort(key=lambda f: -f.rank)
+    # Khối JSON hợp lệ **là** báo cáo đúng định dạng: lỗi "sai định dạng"
+    # của bản văn bản không còn đúng nữa.
+    rep.error = ""
+    if lech:
+        ev.record(story_id, Event(kind=NOTE, name="security:mismatch", ok=False,
+                                  detail={"text": tu_van_ban, "json": tu_json}))
+    ev.record(story_id, Event(
+        kind=NOTE, name="security:verdict", ok=not rep.blocking(),
+        detail={"verdict": verdict.verdict, "findings": verdict.findings},
+    ))
+    return rep
 
 
 #: Mở đầu mục chặn thường.
@@ -829,6 +978,132 @@ def blocking_findings(text: str) -> list[str]:
 def plan_defects(findings: list[str]) -> list[str]:
     """Mục người rà soát đánh dấu là bế tắc do kế hoạch, không do code."""
     return [f for f in findings if f.strip().lower().startswith(_STUCK_TAGS)]
+
+
+# --- Bản máy đọc của lời rà soát (ADR-004 R8) -------------------------------
+#
+# Văn bản là bản người đọc; khối JSON là bản máy đọc. Hai bản phải khớp — và
+# khi lệch thì **hợp** hai nguồn chứ không nới lỏng: một mục chặn bị mất vì
+# model quên chép sang JSON thì cổng cũng mất luôn, và đó là kiểu hỏng im
+# lặng tệ nhất.
+
+#: Kết luận hợp lệ. Ngoài ba giá trị này là sai schema.
+VERDICTS = ("pass", "block", "stuck")
+#: Thẻ trong JSON tương ứng hai loại mục chặn của văn bản.
+_JSON_BLOCK_TAGS = ("chặn", "chan", "block", "blocker")
+_JSON_STUCK_TAGS = ("bế tắc", "be tac", "stuck", "blocked-by-plan")
+
+#: Nhắc lại schema khi lượt đầu không có khối JSON. Đúng **một** lần: lần
+#: hai vẫn thiếu thì model ấy không làm được, thử tiếp là đốt tiền.
+SCHEMA_REMINDER = (
+    "\n\n---\n\n**Thiếu khối JSON theo schema.** Lượt trước bạn trả lời bằng "
+    "văn bản nhưng không kèm khối JSON máy đọc được, nên cổng không đọc được "
+    "kết luận của bạn. Trả lời **lại** đầy đủ như yêu cầu ở trên, và kết thúc "
+    "bằng đúng một khối ```json``` theo schema đã nêu. Bản JSON và bản văn "
+    "bản phải khớp nhau.\n"
+)
+
+_decoder = json.JSONDecoder()
+
+
+@dataclass
+class Verdict:
+    """Bản máy đọc của một báo cáo rà soát."""
+
+    verdict: str
+    findings: list[dict] = field(default_factory=list)
+
+    def blocking(self) -> list[str]:
+        """Mục chặn/bế tắc, viết đúng dạng dòng của bản văn bản."""
+        out = []
+        for f in self.findings:
+            if f["tag"] in _JSON_STUCK_TAGS:
+                out.append("[bế tắc] " + _finding_body(f))
+            elif f["tag"] in _JSON_BLOCK_TAGS:
+                out.append("[chặn] " + _finding_body(f))
+        if self.verdict != "pass" and not out:
+            # Kết luận nói chặn mà không nêu mục nào: giữ kết luận, đừng
+            # cho qua. Không tin client — kể cả khi nó tự mâu thuẫn.
+            tag = "[bế tắc]" if self.verdict == "stuck" else "[chặn]"
+            out.append(f"{tag} người rà soát kết luận `{self.verdict}` "
+                       "nhưng không nêu mục nào trong khối JSON")
+        return out
+
+
+def _finding_body(f: dict) -> str:
+    """`{file}:{line} — {why}` — cùng dạng với dòng người rà soát tự viết."""
+    where = f.get("file") or ""
+    if where and f.get("line"):
+        where += f":{f['line']}"
+    why = f.get("why") or ""
+    return f"{where} — {why}".strip(" —") if where else why
+
+
+def review_verdict(text: str) -> Verdict | None:
+    """Khối JSON đầu tiên có `verdict` hợp lệ; mục sai schema bỏ, không sập.
+
+    Cùng cách làm với `kit/skill_scan.parse_verdicts`, nhưng dùng
+    `raw_decode`: nó tự dừng đúng chỗ JSON kết thúc nên chữ thừa phía sau
+    (và hàng rào ```json) không làm hỏng việc.
+    """
+    for m in re.finditer(r"\{", text or ""):
+        try:
+            data, _ = _decoder.raw_decode(text, m.start())
+        except ValueError:
+            continue
+        if not isinstance(data, dict) or "verdict" not in data:
+            continue
+        ket = str(data.get("verdict", "")).strip().lower()
+        if ket not in VERDICTS:
+            return None
+        out = []
+        for item in data.get("findings") or []:
+            if not isinstance(item, dict):
+                continue
+            tag = str(item.get("tag", "")).strip().lower()
+            sev = str(item.get("severity", "")).strip().lower()
+            if not tag and sev not in SEVERITIES:
+                continue
+            f = {
+                "tag": tag,
+                "file": str(item.get("file", ""))[:200],
+                "line": str(item.get("line", "") or "")[:10],
+                "why": str(item.get("why", ""))[:500],
+                "behavior_id": str(item.get("behavior_id", ""))[:80],
+            }
+            if sev in SEVERITIES:
+                f["severity"] = sev
+            out.append(f)
+        return Verdict(ket, out)
+    return None
+
+
+def _finding_key(line: str) -> tuple[str, str]:
+    """Khoá đối chiếu giữa hai bản: (loại thẻ, tệp).
+
+    Không so nguyên văn: bản JSON và bản văn bản không bao giờ trùng từng
+    chữ, nhưng cùng nói về một chỗ trong một tệp thì là một mục.
+    """
+    m = re.match(r"\s*\[([^\]]*)\]\s*(\S*)", line or "")
+    if not m:
+        return ("", "")
+    tag = m.group(1).strip().lower()
+    loai = tag
+    if tag in _JSON_STUCK_TAGS:
+        loai = "stuck"
+    elif tag in _JSON_BLOCK_TAGS:
+        loai = "block"
+    tep = m.group(2).strip().rstrip(":,;")
+    tep = re.sub(r":\d+(-\d+)?$", "", tep)
+    return (loai, tep)
+
+
+def merge_findings(text_items: list[str], json_items: list[str]) -> tuple[list[str], bool]:
+    """Hợp hai nguồn và nói có lệch không. Văn bản trước, JSON bù vào sau."""
+    khoa_text = {_finding_key(x) for x in text_items}
+    khoa_json = {_finding_key(x) for x in json_items}
+    them = [x for x in json_items if _finding_key(x) not in khoa_text]
+    return text_items + them, khoa_text != khoa_json
 
 
 

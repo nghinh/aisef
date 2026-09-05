@@ -1,6 +1,6 @@
 ---
 name: story-security-review
-version: 1
+version: 2
 role: security
 ---
 # Rà soát bảo mật {{ story_id }} — {{ story_title }}
@@ -88,3 +88,29 @@ loại lỗ hổng nói chung:
 Không có gì thì viết đúng một dòng: `không có phát hiện bảo mật`.
 
 Đừng đoán để lấp chỗ trống. Một báo cáo trống là kết quả hợp lệ.
+
+## Và kết thúc bằng một khối JSON
+
+Các dòng ở trên là **bản người đọc**; khối JSON dưới đây là **bản máy
+đọc** — cổng story đọc nó. Hai bản phải **khớp nhau**: mục nào có ở trên
+thì phải có trong JSON, và ngược lại. Lệch nhau thì harness lấy hợp hai
+bên (không bỏ mục nào) và ghi lại là bạn đã trả lời không nhất quán.
+
+Đúng một khối, đặt ở cuối, không giải thích thêm sau nó:
+
+```json
+{
+  "verdict": "pass|block|stuck",
+  "findings": [
+    {"tag": "chặn", "severity": "high", "file": "src/api/note.ts", "line": 42,
+     "why": "id lấy thẳng từ query, không kiểm chủ sở hữu",
+     "behavior_id": "FR-3"}
+  ]
+}
+```
+
+* `verdict`: `block` nếu có mục `critical`/`high`, `pass` nếu không; `stuck`
+  chỉ khi không thể sửa được từ trong phạm vi ghi của story.
+* `severity`: đúng mức bạn đã dùng ở dòng văn bản tương ứng.
+* `behavior_id`: hành vi bị ảnh hưởng nếu chỉ được (`AC-<story>-<n>`,
+  `FR-x`, `qa:e2e`); không chắc thì để `""` — đừng đoán.
