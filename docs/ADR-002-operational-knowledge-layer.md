@@ -222,3 +222,7 @@ hình vẫn abstain. Đây là điều kiện để A/B ADR-003 #1 đo được 
 Taxonomy 20×178 · agent runtime mới · MCP để phục vụ skill · nạp toàn bộ
 `SKILL.md` vào prompt · để model quyết định trạng thái vòng đời · chưng
 cất tự động không có người duyệt.
+
+## 6.3 Tầng ngữ nghĩa trên tầng heuristic (S6, đo 2026-09-05)
+
+`registry.verify_structure` bắt câu tiêm theo mẫu và bí mật; `kit/skill_scan.py` hỏi một phiên model chỉ đọc, không tool, cho từng lô 8 SKILL.md. Đo trên e9: 153 skill, 20 lô, $5,01; **0 `injection`, 8 `suspicious`** với trích dẫn đúng chỗ (mở rộng quyền Domain Admins / sudo NOPASSWD, tắt kiểm host key, xuất khoá GPG riêng, «do not pause to check in with your human partner», tự cài phụ thuộc) — tầng regex không thấy mục nào trong 8. Quy tắc: `injection` → `rejected` (router không mời, sống qua `refresh`); `suspicious` → cảnh báo trong `verified.gaps`, người đọc quyết. Phán đoán giao model, đảm bảo (lô, schema, sổ, bằng chứng `skill-scan#n`) là code.
