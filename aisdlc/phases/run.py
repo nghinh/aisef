@@ -170,10 +170,21 @@ def run_epic(
         report.waves.append(wave)
 
         todo = []
+        can_merge_lai = []
         for sid in wave_ids:
             state.register(sid, epic_id, wave=index)
             if state.load().stories[sid].state is StoryStatus.DONE:
-                wave.skipped.append(sid)  # chạy lại thì tiếp từ chỗ dở
+                # DONE được ghi khi story qua cổng, **trước** bước merge.
+                # Merge đụng thì story đứng lại ở DONE-nhưng-chưa-merge, và
+                # lượt sau bỏ qua nó vĩnh viễn: công việc nằm trên nhánh
+                # story, không ai đưa vào, không ai báo. Nhật ký phân biệt
+                # được — `merge.completed` chỉ ghi sau khi merge thật.
+                if worktrees is not None and not JournalStore(
+                    artifact_root
+                ).read(sid).merged():
+                    can_merge_lai.append(sid)
+                else:
+                    wave.skipped.append(sid)  # chạy lại thì tiếp từ chỗ dở
             else:
                 # Về `pending` trước: không có cạnh nào đi thẳng từ
                 # `failed`, hay từ `running` mà tiến trình đã chết, sang
@@ -219,6 +230,9 @@ def run_epic(
         if worktrees is not None:
             journal = JournalStore(artifact_root)
             done_ids = [o.story_id for o in wave.outcomes if o.done]
+            # Story đã xong từ lượt trước nhưng chưa merge: chỉ merge lại,
+            # **không** commit lại — công việc của nó đã nằm trên nhánh
+            # story rồi, và worktree có thể đã bị dọn.
             for sid in done_ids:
                 story = plan.stories.get(sid)
                 worktrees.commit_story(
@@ -228,7 +242,7 @@ def run_epic(
                 )
                 journal.record(sid, JEntry(step="commit.created",
                                            attempt=journal.read(sid).attempt_no))
-            for result in worktrees.merge_wave(done_ids):
+            for result in worktrees.merge_wave(can_merge_lai + done_ids):
                 if not result.merged:
                     wave.merge_conflicts[result.story_id] = result.conflicts
                     report.stopped_at = f"{epic_id} · đợt {index} (merge)"
@@ -241,7 +255,7 @@ def run_epic(
                 n = journal.read(result.story_id).attempt_no
                 journal.record(result.story_id,
                                JEntry(step="merge.completed", attempt=n))
-            for sid in done_ids:
+            for sid in can_merge_lai + done_ids:
                 worktrees.remove(sid)
                 n = journal.read(sid).attempt_no
                 journal.record(sid, JEntry(step="attempt.committed", attempt=n))

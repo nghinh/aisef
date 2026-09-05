@@ -22,7 +22,10 @@ sys.path.insert(0, str(ROOT))
 from aisdlc.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
 from aisdlc.clients.stream import RunResult  # noqa: E402
 from aisdlc.config import DEFAULTS, Config  # noqa: E402
+from aisdlc.control.journal import Entry as JEntry  # noqa: E402
+from aisdlc.control.journal import JournalStore  # noqa: E402
 from aisdlc.control.state import StateStore, StoryStatus  # noqa: E402
+from aisdlc.control.worktree import WorktreeManager  # noqa: E402
 from aisdlc.phases.run import load_plan, run_sprint  # noqa: E402
 
 INDEX = {
@@ -415,3 +418,71 @@ class TestIsolationOff(RunTestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestMergeDungRoiChayLai(RunTestCase):
+    """Lỗi 42. `DONE` được ghi khi story qua cổng — **trước** bước merge.
+
+    Merge đụng thì story đứng lại ở DONE-nhưng-chưa-merge. Lượt chạy sau
+    thấy DONE và bỏ qua, nên công việc nằm mãi trên nhánh story: không ai
+    đưa vào nhánh chính, không ai báo, và `aisdlc status` nói story xong.
+
+    Gặp thật trên `par` khi merge STORY-02-01 đụng một tệp chưa theo dõi
+    ở cây chính: story `XONG`, `main` không đổi, chạy lại báo "đã xong từ
+    trước, bỏ qua".
+    """
+
+    def sinh_story_da_xong_nhung_chua_merge(self, sid="STORY-01-01"):
+        """Dựng đúng hiện trạng ấy: nhánh story có việc, sổ ghi DONE, nhật
+        ký **không** có `merge.completed`."""
+        wt = WorktreeManager(self.project)
+        w = wt.create(sid)
+        # Ghi đúng trong `write_scope` của story, nếu không `commit_story`
+        # không stage gì và nhánh rỗng — rồi merge báo "already up to date"
+        # và phép thử đo nhầm chuyện khác.
+        (Path(w.path) / "src" / "core").mkdir(parents=True, exist_ok=True)
+        (Path(w.path) / "src" / "core" / "a.py").write_text("x = 1\n", encoding="utf-8")
+        wt.commit_story(sid, f"{sid}: việc", paths=["src/core"])
+        wt.remove(sid)
+
+        j = JournalStore(self.artifacts)
+        j.record(sid, JEntry(step="attempt.started", attempt=1))
+        j.record(sid, JEntry(step="commit.created", attempt=1))
+        # Lượt chạy **kết thúc gọn** — không phải bị giết giữa chừng, nếu
+        # không thì reconciler sẽ hoàn nguyên nó và ta đo nhầm chuyện khác.
+        j.record(sid, JEntry(step="attempt.committed", attempt=1))
+
+        st = StateStore(self.artifacts)
+        st.register(sid, "EPIC-01", wave=1)
+        for b in (StoryStatus.RUNNING, StoryStatus.VERIFYING, StoryStatus.DONE):
+            st.transition(sid, b)
+        return sid
+
+    def head_co(self, path: str) -> bool:
+        r = subprocess.run(["git", "ls-tree", "--name-only", "HEAD", path],
+                           cwd=self.project, capture_output=True, text=True)
+        return bool(r.stdout.strip())
+
+    def test_khong_bo_qua_story_da_xong_ma_chua_merge(self):
+        sid = self.sinh_story_da_xong_nhung_chua_merge()
+        self.assertFalse(self.head_co("src/core/a.py"), "tiền đề: chưa có trên main")
+
+        self.run_sprint(Agent(), only_epic="EPIC-01")
+
+        self.assertTrue(self.head_co("src/core/a.py"),
+                        "công việc phải được merge vào nhánh chính")
+
+    def test_khong_hien_thuc_lai_story_da_xong(self):
+        """Chỉ merge lại, không chạy agent lần nữa — công việc đã có sẵn."""
+        sid = self.sinh_story_da_xong_nhung_chua_merge()
+        agent = Agent()
+        self.run_sprint(agent, only_epic="EPIC-01")
+        self.assertNotIn(sid, agent.stories)
+
+    def test_da_merge_roi_thi_van_bo_qua(self):
+        """Guard giả là guard bị gỡ: story đã merge không được đụng lại."""
+        sid = self.sinh_story_da_xong_nhung_chua_merge()
+        JournalStore(self.artifacts).record(
+            sid, JEntry(step="merge.completed", attempt=1))
+        r = self.run_sprint(Agent(), only_epic="EPIC-01")
+        self.assertIn(sid, r.waves[0].skipped)
