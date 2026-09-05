@@ -9,11 +9,11 @@
 
 ---
 
-## Tiến độ (cập nhật 2026-09-04)
+## Tiến độ (cập nhật 2026-09-05)
 
 | Giai đoạn | Trạng thái |
 |---|---|
-| GĐ-0 Spike | ✅ **xong** — 6/7 spike xanh, S4 (OpenCode) chưa kết luận, không chặn |
+| GĐ-0 Spike | ✅ **xong** — 7/7; S4 (OpenCode) kết luận 2026-09-05: guard chặn tại nguồn, có phép thử trên agent thật |
 | GĐ-1 Control plane | ✅ **xong** — config · state · fsm · worktree · CLI |
 | GĐ-2 Kit + Setup | ✅ **xong** — catalog · detect_stack · lọc 2 tầng · install · constitution |
 | GĐ-3 Đa client | ✅ **xong** — adapter · guard · compile · báo cáo mất mát |
@@ -22,7 +22,7 @@
 | GĐ-6 Harness + implement | ✅ 10/10 — `aisdlc run` chạy đợt trên worktree thật, cổng story 6 điều kiện |
 | GĐ-7 Kiểm định | ✅ — `aisdlc qa` 10 loại; "chưa cấu hình" ≠ "đạt" |
 | GĐ-8 DevSecOps | ✅ — `aisdlc devsecops` + `pre-deploy` |
-| GĐ-9 Đầu-cuối | 🔨 **chuỗi lập kế hoạch chạy hết trên agent thật; vòng lặp story chạy thật và chặn đúng chỗ**. Còn lại: mockup thật, một epic chạy trọn, báo cáo nghiệm thu đầy đủ |
+| GĐ-9 Đầu-cuối | 🔨 **một epic đã chạy trọn trên cả hai client** (`par`: 3 story song song bằng Claude, 1 story bằng OpenCode, đều merge vào main). Còn lại: mockup thật trong một dự án có giao diện, báo cáo nghiệm thu đầy đủ, và một lượt đầu-cuối từ `requirements.md` tới `pre-deploy` không can thiệp tay |
 
 **Mốc demo đã đạt**
 
@@ -42,7 +42,23 @@
   vào nhánh chính (2 lượt, $9,76). Trước đó nó trượt 4 lần liên tiếp — mỗi
   lần vì một lỗi thật khác nhau của harness, xem mục 15–22 dưới.
 
-**776 test xanh.**
+* *Mốc 5* — ba story chạy **song song** trong một epic, cả ba xong ngay lượt
+  đầu, merge tuần tự không đụng, $3,14 (`par`, 2026-09-05). R14 kiểm chứng
+  đầu-cuối trên agent thật.
+
+* *Mốc 6* — framework **cài được**: `pip install ai-sdlc` trong venv sạch,
+  `aisdlc setup` tự lấy 5 kho skill về cache người dùng (93 MB, 14 s), cài
+  120 skill, `doctor` xanh, guard chặn thật từ bản đã cài.
+
+* *Mốc 7* — một story do agent **OpenCode** hiện thực trọn vẹn: qua bảy
+  cổng, commit đúng nhánh story, merge vào nhánh chính, 18 test của dự án
+  xanh (`par` STORY-02-01). R10 hết là lời khai. Bốn lỗi phải vá mới tới
+  được đây — 39 (plugin gọi `.stdin()` không tồn tại nên guard chưa từng
+  chạy), 41 (plugin gọi mọi guard cho mọi tool), 40 (OpenCode tự dò gốc dự
+  án nên model làm việc trên thân cây), 42 (story XONG mà merge đụng thì
+  mất luôn công việc).
+
+**966 test xanh.**
 
 ---
 
