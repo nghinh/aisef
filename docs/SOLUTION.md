@@ -378,6 +378,9 @@ aisdlc status                         tiến độ · chi phí · story tốn b�
 aisdlc report  [--out FILE]           báo cáo nghiệm thu + sổ hành vi (`ledger.json`, `INDEX.md`)
 aisdlc evidence <id> [--story S]      lịch sử một story hoặc một hành vi
                                       (STORY-01-04 · AC-STORY-01-04-2 · FR-3 · qa:e2e · mockup:notes-list)
+aisdlc issues [--format md|csv] [--epic E] [--status gap,reopened] [--out FILE]
+                                      bảng gap/hồi quy từ sổ → `ISSUES.md|csv` (ADR-004 R12);
+                                      chỉ tệp, không tạo issue ở tracker nào
 ```
 
 `report` chiếu bằng chứng thành **sổ hành vi** (ADR-004 R2): mỗi tiêu chí,

@@ -374,6 +374,32 @@ def cmd_evidence(args) -> int:
     return EXIT_OK
 
 
+def cmd_issues(args) -> int:
+    """Bảng gap/hồi quy ra tệp (ADR-004 R12).
+
+    Chỉ là một cách **đọc** sổ: không tạo issue ở đâu, không gọi mạng, không
+    chạm cổng. Ai muốn đưa lên GitHub/Jira thì cầm CSV đi — kho này không
+    biết tracker của dự án, và không nên biết.
+    """
+    from ..control import ledger as ledger_mod
+
+    statuses = {s.strip().lower() for s in args.status.split(",") if s.strip()}
+    unknown = statuses - {ledger_mod.VERIFIED, ledger_mod.GAP, ledger_mod.REOPENED}
+    if unknown or not statuses:
+        # Gõ sai trạng thái mà vẫn xuất tệp rỗng là lừa người đọc "không còn gap".
+        print(f"✗ --status không hợp lệ: {', '.join(sorted(unknown)) or '(rỗng)'}. "
+              f"Hợp lệ: gap, reopened, verified", file=sys.stderr)
+        return EXIT_USAGE
+    root = _artifact_root(args)
+    rows = ledger_mod.build(root).issues(epic=args.epic, statuses=statuses)
+    path = Path(args.out) if args.out else root / f"ISSUES.{args.format}"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(ledger_mod.issues_text(rows, args.format), encoding="utf-8")
+    reopened = sum(1 for r in rows if r["status"] == ledger_mod.REOPENED)
+    print(f"{path} · {len(rows)} hành vi ({reopened} hồi quy)")
+    return EXIT_OK
+
+
 def cmd_report(args) -> int:
     """Sinh báo cáo nghiệm thu từ bằng chứng đã có."""
     from ..control import ledger as ledger_mod

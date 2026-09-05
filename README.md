@@ -62,6 +62,7 @@ aisdlc devsecops                    # CI + Dockerfile + triển khai + runbook
 aisdlc pre-deploy                   # cổng cuối
 aisdlc report                       # báo cáo nghiệm thu + sổ hành vi + INDEX.md
 aisdlc evidence STORY-01-04         # lịch sử một story hay một hành vi (AC-…, FR-…, qa:e2e)
+aisdlc issues --format csv          # bảng gap/hồi quy từ sổ hành vi → _bmad-output/ISSUES.csv
 ```
 
 Chạy nhanh không cần người duyệt: `aisdlc plan --auto-approve all`. Phê duyệt
