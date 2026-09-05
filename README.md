@@ -115,6 +115,10 @@ vào báo cáo thay vì im lặng — năng lực là thứ được **khai và 
 là client **hạng hai** theo quyết định V1: guard chặn được (hợp quy 7/7), và từ 2026-09-05 `--format json` cho luồng máy đọc được (tool, token, cost theo nhà cung cấp) — chưa lên hạng nhất vì chưa đủ số lần hợp quy hook ổn định; chi phí trước đó không đo
 được từ harness; nó không chặn phát hành.
 
+## Lỗi thật đã gặp
+
+Mười lăm lỗi tìm bằng đo trên agent thật, xếp theo sáu lớp nguyên nhân kèm phép hồi quy: `docs/FAILURE-TAXONOMY.md`. Lỗi mới thì thêm một dòng vào đó cùng commit với test.
+
 ## Hợp quy client
 
 Hook và plugin là tạo tác **biên dịch ra** — đúng cú pháp không có nghĩa là
