@@ -358,17 +358,25 @@ cho trạng thái lệch nhau.
 |---|---|---|---|
 | Claude CLI | `--settings` hooks → `aisdlc guard …` | tiền kiểm | ✅ cờ có thật |
 | Claude Desktop | `.claude/settings.json` của dự án | tiền kiểm | ⚠️ suy luận — phải test |
-| OpenCode CLI | plugin → `aisdlc guard …` | **hậu kiểm** | ✅ quyết định: chấp nhận mức này |
-| OpenCode Desktop | cùng cấu hình dự án với CLI | **hậu kiểm** | ✅ quyết định: chấp nhận mức này |
+| OpenCode CLI | plugin → `aisdlc guard …` | tiền kiểm | ✅ chứng minh 2026-09-05 trên agent thật; quan sát chi phí/lượt: chưa |
+| OpenCode Desktop | cùng cấu hình dự án với CLI | tiền kiểm | ⚠️ suy luận từ CLI — chưa test riêng |
 | Bất kỳ, nếu hook không gắn được | `aisdlc verify` chạy lại toàn bộ guard | hậu kiểm | ✅ luôn có |
 
-**Quyết định (2026-09-04): OpenCode chạy ở mức hậu kiểm.** Spike S4 không chạy xong được ca thử, và thay vì đầu tư thêm để chứng minh, chủ đầu tư chấp nhận mức bảo đảm thấp hơn cho hai bề mặt OpenCode. Hệ quả cụ thể:
+**Quyết định (2026-09-05, thay quyết định 2026-09-04): OpenCode là client hạng hai trong V1.**
+Phép thử trên agent thật (opencode 1.18.26) đã chứng minh plugin **chặn tại
+nguồn** cho cả tool bash lẫn tool ghi tệp — nên hàng "hậu kiểm" ở bảng trên
+không còn đúng cho guard. Cái còn thiếu là **quan sát**: OpenCode không phát
+luồng sự kiện có cấu trúc, nên chi phí, số lượt và giới hạn lượt không đo
+được từ harness (`turn_limit: unsupported`, `machine_output` chưa chứng
+minh). Hệ quả:
 
-* plugin vẫn được sinh và vẫn gọi đúng bộ guard — nếu nó chặn được thì tốt, nhưng framework **không dựa vào điều đó**;
-* `aisdlc verify` chạy lại toàn bộ guard trên diff của story, nên vi phạm vẫn bị bắt, chỉ là bắt **sau khi đã ghi** thay vì chặn lúc ghi;
-* `compile-report.json` ghi `blocks_at_source: false` cho OpenCode, để mức bảo đảm thật luôn tra được, không phải nhớ.
-
-Đổi lại quyết định này chỉ cần một phép thử thành công: chạy `opencode run` với provider phản hồi nhanh và xem hook có chặn không.
+* OpenCode chạy được trọn story (STORY-02-01 của `par`, qua bảy cổng, merge
+  vào main) và được hỗ trợ — nhưng `compile --client opencode` ghi rõ "hạng
+  hai V1: chi phí/lượt không đo được";
+* hợp quy client (`docs/CONFORMANCE.md`) chạy cả hai client, nhưng **điều
+  kiện phát hành chỉ đọc cột Claude**; OpenCode không chặn phát hành;
+* nâng hạng nhất sau release, khi `--format json` được chứng minh và bộ hợp
+  quy hook chạy ổn định qua nhiều phiên bản.
 
 **Phạm vi V1:** 4 bề mặt của Claude Code và OpenCode (mục 2.1). Antigravity hoãn — chưa test được.
 

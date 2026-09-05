@@ -30,6 +30,7 @@ from ..control.security import SecurityReport
 from ..control.security import parse as parse_security
 from ..control.normalize import Architecture, Story, effective_write_scope
 from ..harness import mockup_verify
+from ..clients.compile import guard_expected
 from ..harness.guardrails import (
     ENV_DISALLOWED_TOOLS,
     ENV_WORKDIR,
@@ -205,6 +206,7 @@ def run_attempt(
     # cổng chỉ báo "diff rỗng", còn code lạ thì đã nằm trên trunk.
     truoc = _head_of(project) if workdir != project else ""
 
+    _attach_settings(spec, project)
     result = client.run(spec)
     attempt.cost_usd = result.cost_usd
     evidence.agent_run(story.id, result, name=f"{story.id}#{number}")
@@ -325,6 +327,7 @@ def run_attempt(
         review_blocking=attempt.review_findings,
         security=attempt.security,
         block_severities=config["security.block_severities"],
+        guard_expected=guard_expected(project, getattr(client, "id", "")),
     )
     attempt.ok = attempt.gate.passed
     return attempt
@@ -436,6 +439,7 @@ def review_story(
         ENV_DISALLOWED_TOOLS: ",".join(ROLES[REVIEWER].disallowed_tools),
     }
 
+    _attach_settings(spec, project)
     result = client.run(spec)
     EvidenceStore(artifact_root).agent_run(story.id, result, name=f"{story.id}-review")
 
@@ -503,6 +507,7 @@ def security_review(
         ENV_WORKDIR: str(workdir),
         ENV_DISALLOWED_TOOLS: ",".join(ROLES[SECURITY].disallowed_tools),
     }
+    _attach_settings(spec, project)
     result = client.run(spec)
     EvidenceStore(artifact_root).agent_run(
         story.id, result, name=f"{story.id}-security"
@@ -535,6 +540,29 @@ def plan_defects(findings: list[str]) -> list[str]:
     """Mục người rà soát đánh dấu là bế tắc do kế hoạch, không do code."""
     return [f for f in findings if f.strip().lower().startswith(_STUCK_TAGS)]
 
+
+
+#: Cấu hình hook mà `aisdlc compile` sinh cho Claude Code.
+CLAUDE_SETTINGS = Path(".claude") / "settings.json"
+
+
+def _attach_settings(spec, project: Path) -> None:
+    """Truyền tệp hook **tường minh** cho client, thay vì trông vào việc nó
+    tự tìm thấy.
+
+    Claude Code đọc `.claude/settings.json` của cây nó đang đứng. Story
+    chạy trong worktree, và worktree chỉ có thư mục ấy nếu dự án **commit**
+    nó. Dự án `.gitignore` `.claude/` sẽ chạy mọi story với zero guard —
+    và bằng chứng trông y hệt agent ngoan, vì không có gì để ghi. e9 và
+    par đều commit `.claude/`, nên lỗ hổng này chưa lộ; đó là may, không
+    phải thiết kế.
+
+    Adapter không hỗ trợ cờ (OpenCode) bỏ qua trường này — plugin của nó
+    nạp theo đường khác, đã chứng minh.
+    """
+    path = Path(project) / CLAUDE_SETTINGS
+    if path.is_file():
+        spec.settings_file = path
 
 def _head_of(repo: Path) -> str:
     """SHA đầu nhánh chính. Rỗng nếu không đọc được — guard mất một phần

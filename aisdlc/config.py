@@ -73,6 +73,10 @@ DEFAULTS: dict[str, Any] = {
     "sandbox.tools_network": False,
     "sandbox.use_docker": True,
     "sandbox.allow_degraded": True,
+    # Cổng trước triển khai **không** chấp nhận suy biến (kiểm định chạy
+    # ngoài Docker) trừ khi có lý do khai tường minh ở đây; lý do được ghi
+    # vào `pre-deploy.json`. `run` thường vẫn theo `sandbox.allow_degraded`.
+    "sandbox.pre_deploy_degraded_waiver": "",
 }
 
 #: Kiểu mong đợi, để bắt lỗi cấu hình sớm thay vì để nó nổ giữa chừng.
@@ -115,6 +119,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "sandbox.tools_network": bool,
     "sandbox.use_docker": bool,
     "sandbox.allow_degraded": bool,
+    "sandbox.pre_deploy_degraded_waiver": str,
 }
 
 

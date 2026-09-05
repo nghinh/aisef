@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -476,3 +477,27 @@ class TestStatusNoiRoChuaMerge(CliTestCase):
         code, out, _ = self.run_cli("status")
         self.assertIn("xong nhưng chưa merge", out)
         self.assertIn("S-01", out)
+
+
+class TestDoctorHookTrongWorktree(CliTestCase):
+    def _hook(self):
+        (self.project / ".claude").mkdir(exist_ok=True)
+        (self.project / ".claude" / "settings.json").write_text("{}", encoding="utf-8")
+
+    def test_chua_commit_thi_canh_bao_noi_ro_lop_dang_dua_vao(self):
+        self._hook()
+        subprocess.run(["git", "init", "-q"], cwd=self.project, check=True)
+        code, out, _ = self.run_cli("doctor")
+        self.assertIn("hook trong worktree", out)
+        self.assertIn("chưa commit", out)
+        self.assertIn("--settings", out)
+
+    def test_da_commit_thi_xanh(self):
+        self._hook()
+        subprocess.run(["git", "init", "-q"], cwd=self.project, check=True)
+        subprocess.run(["git", "config", "user.email", "t@t"], cwd=self.project, check=True)
+        subprocess.run(["git", "config", "user.name", "t"], cwd=self.project, check=True)
+        subprocess.run(["git", "add", ".claude/settings.json"], cwd=self.project, check=True)
+        subprocess.run(["git", "commit", "-qm", "hook"], cwd=self.project, check=True)
+        code, out, _ = self.run_cli("doctor")
+        self.assertIn("đã commit", out)

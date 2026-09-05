@@ -384,20 +384,31 @@ và designer, **sau** khi có thước (đợt 3 cho bộ mẫu diff thật củ
 
 ---
 
-## Quyết định cần chủ đầu tư
+## Quyết định của chủ đầu tư (chốt 2026-09-05)
 
-1. **PyPI** — tên gói, tài khoản, lúc nào phát hành (R1).
-2. **Ngân sách agent** — duyệt $120–180 cho toàn kế hoạch, hoặc chỉ tới
-   đợt 4 ($90–130).
-3. **OpenCode là hạng nhất hay hạng hai** — hạng nhất nghĩa là hợp quy
-   chạy cả hai client mỗi tuần và `--format json` là bắt buộc; hạng hai
-   nghĩa là ghi rõ "hỗ trợ, bảo đảm thấp hơn" và không chặn phát hành vì
-   nó.
-4. **Docker bắt buộc hay không** cho `pre-deploy` — hiện `allow_degraded`
-   mặc định `True`; đề xuất `pre-deploy` từ chối suy biến trừ khi khai
-   tường minh, còn `run` giữ mặc định.
+1. **PyPI** — tên `ai-sdlc`; publish khi **hoàn tất đợt 4**, không public
+   sớm hơn; tài khoản **tổ chức/team**, không dùng cá nhân nếu có lựa chọn.
+   → R1 giữ `INSTALL_SPEC = "ai-sdlc"`; tới lúc publish CI của dự án đích
+   dùng `--install-spec git+https://…@<tag>`.
+2. **Ngân sách agent** — duyệt **$120–180** toàn kế hoạch. Không tự bó
+   xuống nếu chất lượng cần thêm lượt review/test.
+3. **OpenCode = hạng hai cho V1** — ghi rõ mức bảo đảm thấp hơn, **không
+   chặn phát hành**. Nâng hạng nhất sau release khi `--format json` + hợp
+   quy hook đủ chắc. Hệ quả trong kế hoạch:
+   * G6: hợp quy OpenCode vẫn chạy nhưng là **thông tin**, không phải điều
+     kiện phát hành; điều kiện phát hành chỉ đọc cột Claude của
+     `CONFORMANCE.md`;
+   * G11: `MACHINE_OUTPUT` của OpenCode hạ về `UNSUPPORTED` cho đúng sự
+     thật tới khi `--format json` được chứng minh;
+   * `compile --client opencode` in dòng "hạng hai V1: chi phí/lượt không
+     đo được, không chặn phát hành" — SOLUTION §11 và README ghi cùng câu.
+4. **Docker ở `pre-deploy`** — mặc định **không cho suy biến**. Chỉ cho
+   phép khi có khai báo tường minh `sandbox.pre_deploy_degraded_waiver =
+   "<lý do>"` và lý do được **ghi vào `pre-deploy.json`** (bằng chứng của
+   cổng). `run` thường giữ `sandbox.allow_degraded = True`. → Đã cài
+   cùng ngày, xem commit.
 
----
+Thứ tự 5 đợt được duyệt nguyên: G4 + G11 sớm, rồi G6/G7/G5/G8.
 
 ## Đo tiến độ
 

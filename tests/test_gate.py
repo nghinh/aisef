@@ -157,3 +157,45 @@ class TestFeedback(GateTestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestGuardCoChay(unittest.TestCase):
+    """G4 mảnh 2. Hook sinh ra ≠ hook chạy: worktree không có `.claude/`
+    thì story chạy với zero guard và bằng chứng trông y hệt agent ngoan.
+    Nay guard tự ghi, nên "chưa từng đánh giá thao tác ghi nào" đo được."""
+
+    def setUp(self):
+        import tempfile
+        self._tmp = tempfile.TemporaryDirectory()
+        self.store = EvidenceStore(self._tmp.name)
+        self.store.tool_run("S-01", "test", ok=True)
+        self.store.tool_run("S-01", "lint", ok=True)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def gate(self, expected):
+        return evaluate("S-01", self.store.read("S-01"), changed=["src/a.py"],
+                        write_scope=["src"], screens=[], guard_expected=expected)
+
+    def muc(self, g):
+        return next(c for c in g.checks if c.name == "guard có chạy")
+
+    def test_khong_ky_vong_thi_bo_qua_co_ly_do(self):
+        m = self.muc(self.gate(False))
+        self.assertTrue(m.skipped)
+        self.assertIn("chưa biên dịch", m.detail)
+
+    def test_ky_vong_ma_khong_dau_vet_thi_truot(self):
+        m = self.muc(self.gate(True))
+        self.assertFalse(m.passed)
+        self.assertIn("hook không tới được worktree", m.detail)
+
+    def test_mot_file_change_la_du(self):
+        self.store.file_change("S-01", "src/a.py")
+        self.assertTrue(self.muc(self.gate(True)).passed)
+
+    def test_mot_lan_chan_cung_la_du(self):
+        from aisdlc.harness.observe import GUARD_BLOCK, Event
+        self.store.record("S-01", Event(kind=GUARD_BLOCK, name="secret", ok=False))
+        self.assertTrue(self.muc(self.gate(True)).passed)

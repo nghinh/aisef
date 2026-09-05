@@ -49,17 +49,22 @@ class Check:
     name: str
     passed: bool
     detail: str = ""
+    #: Không kết luận được (bỏ qua có lý do) — hiện bằng ○, không phải ✅:
+    #: "chưa biết" và "đạt" không được mang cùng một ký hiệu.
+    skipped: bool = False
 
     def line(self) -> str:
-        return f"  {'✅' if self.passed else '✗'} {self.name}" + (
-            f" — {self.detail}" if self.detail else ""
-        )
+        mark = "○" if self.skipped else ("✅" if self.passed else "✗")
+        return f"  {mark} {self.name}" + (f" — {self.detail}" if self.detail else "")
 
 
 @dataclass
 class PreDeployReport:
     checks: list[Check] = field(default_factory=list)
     qa: QaReport | None = None
+    #: Lý do chấp nhận suy biến, nếu có — là bằng chứng của cổng, nên ghi
+    #: ra đĩa cùng kết quả chứ không chỉ nằm trong cấu hình.
+    degraded_waiver: str = ""
 
     @property
     def passed(self) -> bool:
@@ -69,14 +74,17 @@ class PreDeployReport:
         return {
             "passed": self.passed,
             "checks": [
-                {"name": c.name, "passed": c.passed, "detail": c.detail} for c in self.checks
+                {"name": c.name, "passed": c.passed, "detail": c.detail,
+                 "skipped": c.skipped} for c in self.checks
             ],
             "qa": None if self.qa is None else {
                 "release_ready": self.qa.release_ready,
                 "failed": [r.kind.id for r in self.qa.failed],
                 "unconfigured": [r.kind.id for r in self.qa.unconfigured],
+                "degraded": [r.kind.id for r in self.qa.degraded],
                 "fake_tests": self.qa.fake_tests,
             },
+            "degraded_waiver": self.degraded_waiver,
         }
 
     def write(self, artifact_root: Path | str) -> Path:
@@ -98,6 +106,28 @@ class PreDeployReport:
         if self.qa and not self.qa.release_ready:
             lines.append(self.qa.summary())
         return "\n".join(lines)
+
+
+def _isolation_check(report: PreDeployReport, cfg: Config) -> Check:
+    """Kiểm định có chạy trong Docker không, và nếu không thì có được phép không."""
+    degraded = [r.kind.id for r in report.qa.degraded] if report.qa else []
+    if not degraded:
+        if report.qa and not any(r.ran for r in report.qa.results):
+            return Check("cách ly", True, "không có lần chạy nào để biết", skipped=True)
+        return Check("cách ly", True, "kiểm định chạy trong Docker")
+    waiver = str(cfg.get("sandbox.pre_deploy_degraded_waiver", "") or "").strip()
+    if waiver:
+        report.degraded_waiver = waiver
+        return Check(
+            "cách ly", True,
+            f"suy biến ({', '.join(degraded)}) — chấp nhận theo khai báo: {waiver}",
+        )
+    return Check(
+        "cách ly", False,
+        f"{', '.join(degraded)} chạy ngoài Docker. Cổng trước triển khai không "
+        f"chấp nhận suy biến; dựng Docker, hoặc khai lý do ở "
+        f"`sandbox.pre_deploy_degraded_waiver` để ghi vào bằng chứng.",
+    )
 
 
 def check_runbook(path: Path) -> Check:
@@ -166,6 +196,17 @@ def pre_deploy(
                 report.qa.release_ready,
                 "" if report.qa.release_ready else "xem chi tiết bên dưới",
             )
+        )
+        # Quyết định 2026-09-05: cổng trước triển khai **không** chấp nhận
+        # kiểm định chạy ngoài Docker, trừ khi có lý do khai tường minh —
+        # và lý do ấy ghi vào báo cáo cổng, vì đó là bằng chứng người ký
+        # cổng phải nhìn thấy. Bộ kiểm định vẫn chạy (suy biến) để người
+        # đọc có kết quả; chỉ phán quyết là khác.
+        report.checks.append(_isolation_check(report, cfg))
+
+    if skip_qa:
+        report.checks.append(
+            Check("cách ly", True, "bỏ qua cùng bộ kiểm định", skipped=True)
         )
 
     dockerfile = project / "Dockerfile"

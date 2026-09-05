@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 
 from ..harness.guardrails import check_completion, check_diff_scope
 from .security import DEFAULT_BLOCKING
-from ..harness.observe import MOCKUP_MAP, TOOL_RUN, Evidence
+from ..harness.observe import FILE_CHANGE, MOCKUP_MAP, TOOL_RUN, Evidence
 
 
 @dataclass
@@ -74,9 +74,31 @@ def evaluate(
     review_ran: bool = True,
     security=None,
     block_severities=None,
+    guard_expected: bool = False,
 ) -> StoryGate:
     """Chấm một story từ bằng chứng đã ghi."""
     gate = StoryGate(story_id=story_id)
+
+    # Hook sinh ra ≠ hook chạy. Claude Code chỉ đọc `.claude/settings.json`
+    # của cây nó đứng; worktree không có thư mục ấy (dự án không commit) thì
+    # story chạy với zero guard — và bằng chứng trông y hệt agent ngoan, vì
+    # không có gì để ghi. Nay guard tự ghi `GUARD_BLOCK`/`FILE_CHANGE`, nên
+    # "guard chưa từng đánh giá một thao tác ghi nào" là điều đo được.
+    if not guard_expected:
+        gate.checks.append(Check(
+            "guard có chạy", True, "chưa biên dịch hook cho client này — không kỳ vọng",
+            skipped=True,
+        ))
+    else:
+        dau_vet = len(evidence.guard_blocks) + len(evidence.of(FILE_CHANGE))
+        gate.checks.append(Check(
+            "guard có chạy", dau_vet > 0,
+            "" if dau_vet else (
+                "guard chưa đánh giá thao tác ghi nào trong phiên — hook không "
+                "tới được worktree? (.claude/ chưa commit, hoặc --settings không "
+                "được truyền). Story không ghi gì cũng rơi vào đây, và đó là đúng."
+            ),
+        ))
 
     completion = check_completion(evidence)
     gate.checks.append(Check("test", completion.allowed, completion.reason.split("\n")[0]))

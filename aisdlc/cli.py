@@ -152,6 +152,26 @@ def cmd_doctor(args) -> int:
     req = project / "docs" / "requirements.md"
     check("docs/requirements.md", req.is_file(), str(req))
 
+    # Hook sinh ra ≠ hook chạy. Story chạy trong worktree; worktree chỉ có
+    # `.claude/` nếu dự án commit nó. Harness nay truyền `--settings` tường
+    # minh (G4), nhưng thứ đó chỉ được chứng minh bằng hợp quy — ở đây nói
+    # thẳng tình trạng để người đọc biết mình đang dựa vào lớp nào.
+    hook = project / ".claude" / "settings.json"
+    if hook.is_file():
+        tracked = subprocess.run(
+            ["git", "-C", str(project), "ls-files", "--error-unmatch", str(hook)],
+            capture_output=True, text=True,
+        ).returncode == 0
+        check(
+            "hook trong worktree",
+            tracked,
+            "`.claude/settings.json` đã commit — worktree tự có hook" if tracked else
+            "`.claude/settings.json` chưa commit — worktree không có hook; harness "
+            "truyền `--settings` tường minh, cổng story mục \"guard có chạy\" sẽ "
+            "trượt nếu hook không tới",
+            required=False,
+        )
+
     try:
         cfg = Config.load(project)
         check("cấu hình", True, cfg.source)

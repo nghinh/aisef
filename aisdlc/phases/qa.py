@@ -110,6 +110,9 @@ class KindResult:
     #: lại thì báo cáo nói sai chỗ cần sửa — đo trên e9, `pre-deploy`
     #: báo "✗ unit" trong khi thật ra gốc dự án chưa `npm ci` bao giờ.
     unrunnable: str = ""
+    #: Chạy ngoài Docker (suy biến). Kết quả vẫn tính, nhưng mức cách ly
+    #: thấp hơn phải hiện ra — cổng trước triển khai đọc cờ này.
+    degraded: bool = False
 
     @property
     def configured(self) -> bool:
@@ -136,6 +139,11 @@ class QaReport:
         """Loại đã chạy và đỏ. **Không** gồm loại không chạy nổi: chúng
         vẫn chặn, nhưng qua `unrunnable`, với lý do đúng."""
         return [r for r in self.results if r.ran and not r.ok and not r.unrunnable]
+
+    @property
+    def degraded(self) -> list[KindResult]:
+        """Loại đã chạy nhưng ngoài Docker."""
+        return [r for r in self.results if r.ran and r.degraded]
 
     @property
     def unrunnable(self) -> list[KindResult]:
@@ -343,6 +351,7 @@ def run_suite(
         result.ran = True
         result.ok = sb.ok
         result.duration_ms = sb.duration_ms
+        result.degraded = bool(getattr(sb, "degraded", False))
         # Dò dấu hiệu trên đầu ra **đầy đủ**, không phải phần đã cắt:
         # "Cannot find module" nằm ở đầu stack trace còn `detail` chỉ giữ
         # 5 dòng cuối. Đo trên e9: sau bản vá đầu tiên, `mutation` vẫn bị

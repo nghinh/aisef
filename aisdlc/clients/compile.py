@@ -47,6 +47,13 @@ class CompileReport:
 
     def summary(self) -> str:
         lines = [f"client: {self.client}"]
+        if self.client == "opencode":
+            # Quyết định 2026-09-05: hạng hai trong V1. Guard chặn được (đã
+            # chứng minh), nhưng chi phí và số lượt không đo được từ harness.
+            lines.append(
+                "  hạng hai V1: chi phí/lượt không đo được từ harness — "
+                "được hỗ trợ, không chặn phát hành"
+            )
         for p in self.written:
             lines.append(f"  ghi {p}")
         if self.guards_wired:
@@ -220,3 +227,24 @@ def write_compile_report(project: Path | str, reports: list[CompileReport]) -> P
     }
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return path
+
+
+def guard_expected(project: Path | str, client_id: str) -> bool:
+    """Dự án này có **kỳ vọng** guard chạy trong phiên của client này không.
+
+    Câu trả lời nằm trong `compile-report.json`: client đã được biên dịch
+    hook và khai `blocks_at_source` thì mỗi phiên developer phải để lại ít
+    nhất một dấu vết guard. Chưa biên dịch thì không kỳ vọng — và cổng
+    nói "chưa biên dịch", không giả vờ đã kiểm.
+    """
+    path = Path(project) / "_bmad-output" / "compile-report.json"
+    if not path.is_file():
+        return False
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    for c in data.get("clients", []):
+        if c.get("client") == client_id:
+            return bool(c.get("blocks_at_source"))
+    return False

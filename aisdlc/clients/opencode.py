@@ -46,13 +46,18 @@ class OpenCodeAdapter(ClientAdapter):
     def capabilities(self) -> dict[Capability, Support]:
         return {
             Capability.HEADLESS: Support.NATIVE,            # opencode run
-            Capability.MACHINE_OUTPUT: Support.EMULATED,    # qua export <sessionID>
+            # Bằng chứng `par` STORY-02-01: cost=0, turns=0 cả bốn phiên. `--format
+            # json` có trong `--help` nhưng chưa được chứng minh — tới lúc đó, nói
+            # thật là không có. (task nâng cấp đã mở, xem ACTION-PLAN đợt 2)
+            Capability.MACHINE_OUTPUT: Support.UNSUPPORTED,
             Capability.PRE_TOOL_GUARD: Support.NATIVE,     # chứng minh 2026-09-05, xem docstring
-            Capability.TOOL_ALLOWLIST: Support.EMULATED,    # qua permission config
+            Capability.TOOL_ALLOWLIST: Support.EMULATED,  # emulated by: guardrails.check_role_tool
             Capability.DIR_ALLOWLIST: Support.UNSUPPORTED,  # không có cờ tương đương
             Capability.SUBAGENT: Support.NATIVE,            # opencode agent
             Capability.MODEL_ROUTING: Support.NATIVE,       # --model
-            Capability.COST_REPORTING: Support.EMULATED,    # qua opencode stats
+            # `opencode stats` tồn tại nhưng không có mã nào gọi và ghi vào bằng
+            # chứng; evidence thật ghi cost=0. Không mã mô phỏng → không khai mô phỏng.
+            Capability.COST_REPORTING: Support.UNSUPPORTED,
             Capability.TURN_LIMIT: Support.UNSUPPORTED,     # dùng timeout thay
         }
 

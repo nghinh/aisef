@@ -55,6 +55,7 @@ class ScriptedClient(ClientAdapter):
         self.fail_error = fail_error
         self.calls: list[str] = []
         self.envs: list[dict] = []
+        self.settings_files: list = []
 
     def available(self) -> bool:
         return True
@@ -63,6 +64,7 @@ class ScriptedClient(ClientAdapter):
         return {c: Support.NATIVE for c in Capability}
 
     def run(self, spec: RunSpec) -> RunResult:
+        self.settings_files.append(spec.settings_file)
         is_security = "Rà soát bảo mật" in spec.prompt
         is_review = "Rà soát" in spec.prompt and not is_security
         if is_security:
@@ -645,3 +647,73 @@ class TestVaiRaSoatKhaiToolBiCam(ImplementTestCase):
         for env in client.security_envs:
             self.assertNotIn("AISDLC_STORY_ID", env)
             self.assertIn("AISDLC_WRITE_SCOPE", env)
+
+
+class TestTruyenHookTuongMinh(ImplementTestCase):
+    """G4 mảnh 1. Hook Claude Code chỉ chạy nếu `.claude/settings.json` nằm
+    trong worktree, tức dự án đã commit nó. Dự án `.gitignore` `.claude/`
+    chạy story với zero guard, và bằng chứng trông y hệt agent ngoan.
+    `RunSpec.settings_file` có, adapter hỗ trợ `--settings`, nhưng không
+    nơi nào đặt — hai dự án thử đều commit `.claude/` nên chưa lộ."""
+
+    def test_co_tep_thi_ca_ba_vai_deu_nhan(self):
+        (self.project / ".claude").mkdir()
+        (self.project / ".claude" / "settings.json").write_text("{}", encoding="utf-8")
+        client = ScriptedClient()
+        self.implement(client)
+        self.assertGreaterEqual(len(client.settings_files), 3)
+        for f in client.settings_files:
+            self.assertEqual(Path(f), self.project / ".claude" / "settings.json")
+
+    def test_khong_co_tep_thi_de_trong_khong_bia(self):
+        client = ScriptedClient()
+        self.implement(client)
+        self.assertTrue(client.settings_files)
+        for f in client.settings_files:
+            self.assertFalse(f, "không có tệp mà vẫn truyền đường dẫn là bịa")
+
+
+class TestKyVongGuardTheoBaoCaoBienDich(ImplementTestCase):
+    """Kỳ vọng guard đọc từ `compile-report.json`: client đã biên dịch hook
+    và khai chặn tại nguồn thì phiên developer phải để lại dấu vết."""
+
+    def bao_cao(self, client_id, blocks):
+        import json
+        (self.artifacts / "compile-report.json").write_text(json.dumps({
+            "clients": [{"client": client_id, "written": [], "guards_wired": [],
+                         "guards_post_hoc": [], "blocks_at_source": blocks,
+                         "degradations": []}]}), encoding="utf-8")
+
+    def muc(self, out):
+        return next(c for c in out.attempts[-1].gate.checks if c.name == "guard có chạy")
+
+    def test_chua_bien_dich_thi_khong_doi(self):
+        out = self.implement(ScriptedClient())
+        self.assertTrue(self.muc(out).skipped)
+
+    def test_da_bien_dich_ma_agent_ghi_khong_qua_guard_thi_truot(self):
+        """Agent giả ghi thẳng ra đĩa — đúng hình dạng của một phiên mà hook
+        không tới được."""
+        self.bao_cao("scripted", True)
+        out = self.implement(ScriptedClient())
+        self.assertFalse(self.muc(out).passed)
+        self.assertFalse(out.done)
+
+    def test_da_bien_dich_va_guard_ghi_dau_vet_thi_qua(self):
+        self.bao_cao("scripted", True)
+        client = ScriptedClient()
+        goc = client.run
+
+        def run_va_ghi(spec):
+            r = goc(spec)
+            if spec.env.get("AISDLC_STORY_ID"):
+                EvidenceStore(self.artifacts).file_change(spec.env["AISDLC_STORY_ID"], "src/a.py")
+            return r
+        client.run = run_va_ghi
+        out = self.implement(client)
+        self.assertTrue(self.muc(out).passed)
+
+    def test_client_khac_trong_bao_cao_thi_khong_doi(self):
+        self.bao_cao("claude", True)
+        out = self.implement(ScriptedClient())
+        self.assertTrue(self.muc(out).skipped)

@@ -369,3 +369,64 @@ class TestXongPhaiLaDaMerge(DeployTestCase):
         report = pre_deploy(self.project, config=self.config(), skip_qa=True)
         muc = next(c for c in report.checks if c.name == "mọi story xong")
         self.assertTrue(muc.passed, muc.detail)
+
+
+class TestPreDeployKhongChapNhanSuyBien(DeployTestCase):
+    """Quyết định 2026-09-05: cổng trước triển khai **không** chấp nhận
+    kiểm định chạy ngoài Docker, trừ khi có lý do khai tường minh — và lý
+    do ấy ghi vào `pre-deploy.json`. `run` thường vẫn theo
+    `sandbox.allow_degraded`.
+    """
+
+    def cau_hinh(self, **over):
+        # Tắt Docker để đường suy biến là tất định, không phụ thuộc máy.
+        return self.config(**{"verify.unit": "true", "sandbox.use_docker": False,
+                              "sandbox.allow_degraded": True, **over})
+
+    def muc(self, report, ten):
+        return next(c for c in report.checks if c.name == ten)
+
+    def test_suy_bien_khong_waiver_thi_chan(self):
+        self.approve_everything(); self.finish_a_story()
+        report = pre_deploy(self.project, config=self.cau_hinh())
+        m = self.muc(report, "cách ly")
+        self.assertFalse(m.passed)
+        self.assertIn("ngoài Docker", m.detail)
+        self.assertIn("sandbox.pre_deploy_degraded_waiver", m.detail)
+        self.assertFalse(report.passed)
+
+    def test_co_waiver_thi_qua_va_ghi_vao_bang_chung(self):
+        self.approve_everything(); self.finish_a_story()
+        ly_do = "máy CI chưa có Docker, xem ticket OPS-12"
+        report = pre_deploy(self.project, config=self.cau_hinh(
+            **{"sandbox.pre_deploy_degraded_waiver": ly_do}))
+        m = self.muc(report, "cách ly")
+        self.assertTrue(m.passed)
+        self.assertIn(ly_do, m.detail)
+        self.assertEqual(report.degraded_waiver, ly_do)
+        import json
+        data = json.loads(report.write(self.artifacts).read_text(encoding="utf-8"))
+        self.assertEqual(data["degraded_waiver"], ly_do)
+        self.assertIn("unit", data["qa"]["degraded"])
+
+    def test_bo_qua_kiem_dinh_thi_muc_cach_ly_cung_bo_qua(self):
+        report = pre_deploy(self.project, config=self.cau_hinh(), skip_qa=True)
+        m = self.muc(report, "cách ly")
+        self.assertTrue(m.skipped)
+
+    def test_khong_co_lan_chay_nao_thi_khong_ket_luan(self):
+        """Mọi loại chưa cấu hình → không biết có suy biến hay không; nói
+        thế, đừng nói "trong Docker"."""
+        self.approve_everything(); self.finish_a_story()
+        report = pre_deploy(self.project, config=self.config(
+            **{"sandbox.use_docker": False}))
+        m = self.muc(report, "cách ly")
+        self.assertTrue(m.skipped)
+        self.assertIn("không có lần chạy nào", m.detail)
+
+    def test_run_thuong_van_cho_suy_bien(self):
+        """Quyết định chỉ chạm cổng trước triển khai."""
+        from aisdlc.phases.qa import run_suite
+        rep = run_suite(self.project, config=self.cau_hinh(), has_ui=False)
+        self.assertEqual([r.kind.id for r in rep.degraded], ["unit"])
+        self.assertTrue(rep.release_ready or rep.failed == [])
