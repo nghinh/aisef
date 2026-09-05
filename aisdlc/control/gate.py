@@ -21,7 +21,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from ..harness.guardrails import check_completion, check_diff_scope
+from .acceptance import ac_code, missing as ac_missing
 from .outcome import Check, Outcome
+from .tdd import red_before_green
 from .security import DEFAULT_BLOCKING
 from ..harness.observe import MOCKUP_MAP, TOOL_RUN, Evidence
 
@@ -61,6 +63,9 @@ def evaluate(
     security=None,
     block_severities=None,
     guard_expected: bool = False,
+    acceptance: int = 0,
+    coverage_min: float | None = None,
+    added_tests: list[str] | None = None,
 ) -> StoryGate:
     """Chấm một story từ bằng chứng đã ghi."""
     gate = StoryGate(story_id=story_id)
@@ -132,6 +137,62 @@ def evaluate(
         )
     else:
         gate.checks.append(Check("test thật", True))
+
+    # Tiêu chí có test (G5): mã `AC-<story>-<i>` phải nằm trong tên một test
+    # của lần chạy xanh cuối — tên đọc từ output runner, không từ lời agent.
+    # Không đọc được tên test là **chưa cấu hình** reporter, không phải lỗi
+    # story và không phải đạt.
+    xanh = [e for e in evidence.of(TOOL_RUN, "test") if e.ok]
+    last_green = xanh[-1] if xanh else None
+    if acceptance <= 0:
+        gate.checks.append(Check("tiêu chí có test", Outcome.NOT_APPLICABLE, "story không khai tiêu chí"))
+    elif last_green is None:
+        gate.checks.append(Check("tiêu chí có test", False, "chưa có lần test xanh"))
+    elif not last_green.detail.get("test_format"):
+        gate.checks.append(Check(
+            "tiêu chí có test", Outcome.UNCONFIGURED,
+            str(last_green.detail.get("test_note") or "")
+            or "không đọc được tên test từ output runner — dùng reporter in tên "
+               "(`node --test`, `vitest --reporter=verbose`, `pytest -v`)",
+        ))
+    else:
+        thieu = ac_missing(story_id, acceptance, list(last_green.detail.get("test_ids") or []))
+        gate.checks.append(Check(
+            "tiêu chí có test", not thieu,
+            "" if not thieu else
+            f"chưa có test mang mã {', '.join(ac_code(story_id, i) for i in thieu)} — "
+            f"mỗi tiêu chí cần ít nhất một test đặt tên theo mã của nó",
+        ))
+
+    # coverage.min (G10b): số đọc từ output runner. Không có số là runner
+    # chưa bật coverage — nói đúng chỗ sửa, không tính là đạt.
+    if coverage_min is not None:
+        cov = last_green.detail.get("coverage") if last_green else None
+        if last_green is None:
+            gate.checks.append(Check("coverage", Outcome.UNCONFIGURED, "chưa có lần test xanh để đo"))
+        elif cov is None:
+            gate.checks.append(Check(
+                "coverage", Outcome.UNCONFIGURED,
+                "runner chưa in coverage — thêm `--coverage` (vitest/c8) hoặc `--cov` (pytest) vào lệnh test",
+            ))
+        else:
+            nguong = coverage_min * 100
+            gate.checks.append(Check(
+                "coverage", float(cov) >= nguong,
+                f"{float(cov):.0f}%" if float(cov) >= nguong else f"{float(cov):.0f}% < {nguong:.0f}%",
+            ))
+
+    # TDD (G8): story thêm test thì phải có một lần đỏ trước lần xanh cuối.
+    if added_tests is not None:
+        if not added_tests:
+            gate.checks.append(Check("TDD", Outcome.NOT_APPLICABLE, "story không thêm test"))
+        else:
+            gate.checks.append(Check(
+                "TDD", red_before_green(evidence),
+                "" if red_before_green(evidence) else
+                f"test xanh ngay lần đầu — chưa chứng minh nó kiểm được gì "
+                f"({', '.join(added_tests[:3])}). Viết test trước, chạy thấy đỏ, rồi mới viết code.",
+            ))
 
     # Hợp đồng kiểm định của story. Loại chưa cấu hình được ghi là **chưa
     # cấu hình**, không phải đạt — nó chặn ở cổng trước triển khai, và ở

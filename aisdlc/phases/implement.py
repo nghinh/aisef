@@ -24,6 +24,8 @@ from pathlib import Path
 from ..clients.base import ClientAdapter
 from ..config import Config
 from ..control import gate as story_gate
+from ..control import tdd
+from ..control.acceptance import ac_code
 from ..control.design_contract import DesignContract, load as load_contract
 from ..control.impact import analyse as analyse_impact
 from ..control.preflight import verification_contract
@@ -42,7 +44,7 @@ from ..harness.guardrails import (
     fork_point,
 )
 from ..harness.mockup_map import load_for_story, prompt_section
-from ..harness.observe import EvidenceStore
+from ..harness.observe import EvidenceStore, NOTE, Event
 from ..harness.prompts import Catalog, load_catalog
 from ..harness.routing import DEVELOPER, REVIEWER, ROLES, SECURITY, build_spec
 from ..harness.tools import describe_tools, run_tool
@@ -151,7 +153,7 @@ def build_context(
 
 def _story_fallback(story: Story) -> str:
     lines = [f"# {story.id}: {story.title}", "", "## Tiêu chí chấp nhận", ""]
-    lines += [f"{i}. {ac}" for i, ac in enumerate(story.acceptance_criteria, 1)]
+    lines += [f"{i}. [{ac_code(story.id, i)}] {ac}" for i, ac in enumerate(story.acceptance_criteria, 1)]
     return "\n".join(lines)
 
 
@@ -330,6 +332,9 @@ def run_attempt(
         security=attempt.security,
         block_severities=config["security.block_severities"],
         guard_expected=guard_expected(project, getattr(client, "id", "")),
+        acceptance=len(story.acceptance_criteria),
+        coverage_min=float(config["coverage.min"]),
+        added_tests=tdd.added_tests(workdir, base_ref=base_ref, changed=changed_now, story_id=story.id),
     )
     attempt.ok = attempt.gate.passed
     return attempt
@@ -421,6 +426,17 @@ def review_story(
     context["impact"] = analyse_impact(
         workdir, changed, command=str(config.get("review.impact_provider", "") or "")
     ).as_prompt()
+    # Test có sẵn bị bớt ca (G8): đưa cho người rà soát, không tự chặn —
+    # "cập nhật kỳ vọng" là hợp lệ, "xoá cho xanh" thì không; đó là phán đoán.
+    mat = tdd.test_delta(workdir, base_ref=base_ref, changed=changed)
+    EvidenceStore(artifact_root).record(
+        story.id, Event(kind=NOTE, name="qa:test-delta", ok=not mat, detail={"files": mat})
+    )
+    if mat:
+        context["impact"] += (
+            "\n\n**Test có sẵn bị bớt ca** — hỏi vì sao, đừng mặc định là hợp lệ: "
+            + "; ".join(mat)
+        )
 
     spec = build_spec(
         REVIEWER,

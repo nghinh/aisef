@@ -29,8 +29,9 @@ Không sửa code. Chỉ báo cáo.
 
 ## Rà theo thứ tự này
 
-1. **Tiêu chí chấp nhận** — từng tiêu chí một, chỉ ra test nào phủ nó. Tiêu
-   chí không có test phủ là thiếu sót, dù code trông có vẻ làm được.
+1. **Tiêu chí chấp nhận** — máy đã đối chiếu mã `AC-…` với tên test, nên
+   đừng đếm lại. Việc của bạn là phần cần phán đoán: test mang mã ấy có
+   **kiểm đúng điều tiêu chí nói** không, hay chỉ mang tên cho qua cổng.
 2. **Test có kiểm thật không** — test luôn xanh dù code hỏng thì tệ hơn
    không có test, vì nó tạo cảm giác an toàn giả. Thử hình dung bỏ một
    dòng code đi: test nào đỏ lên?

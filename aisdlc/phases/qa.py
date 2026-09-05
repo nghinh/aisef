@@ -92,7 +92,7 @@ _UNIVERSAL: dict[str, str] = {
 }
 
 _TEST_FILE = re.compile(r"(^|/)(tests?|__tests__)/|(^|/)test_[^/]+\.py$|\.(test|spec)\.[jt]sx?$")
-_TEST_FUNC = re.compile(r"^\s*(def test_|it\(|test\(|func Test)", re.MULTILINE)
+from ..control.tdd import TEST_FUNC as _TEST_FUNC  # noqa: E402 — một regex, một chỗ
 _ASSERTION = re.compile(
     r"\bassert\b|\bexpect\s*\(|\bshould\b|assert[A-Z]\w+\(|\.to(Be|Equal|Have|Throw)"
 )

@@ -45,6 +45,10 @@ coi như chưa chạy.
 
 1. **ĐỎ** — viết test cho tiêu chí chấp nhận **trước**, chạy `test`, thấy
    nó đỏ. Test xanh ngay từ đầu nghĩa là nó chưa kiểm điều đang cần kiểm.
+   Mỗi tiêu chí có mã `AC-…` ở đầu dòng; mã ấy phải nằm trong **tên** ít
+   nhất một test — `test('AC-STORY-01-01-2: chuỗi rỗng …')`,
+   `def test_AC_STORY_01_01_2_chuoi_rong()`. Cổng máy đọc tên test từ
+   output runner và đối chiếu từng mã; lần đỏ đầu tiên cũng được ghi lại.
 2. **XANH** — viết lượng code nhỏ nhất làm test xanh.
 3. **DỌN** — bỏ trùng lặp, đặt lại tên cho đúng, chạy `test` lại.
 4. **KIỂM** — `lint`, và `sast` nếu story chạm tới dữ liệu người dùng,
@@ -70,6 +74,6 @@ component đã cam kết.
 
 ## Xong khi
 
-Mọi tiêu chí chấp nhận có test phủ và test xanh · lint sạch · thay đổi nằm
+Mọi tiêu chí chấp nhận có test **mang mã của nó** và test xanh · lint sạch · thay đổi nằm
 trọn trong phạm vi được ghi · giao diện (nếu có) dựng đủ component mockup
 đã cam kết.

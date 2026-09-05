@@ -197,3 +197,22 @@ class TestOutput(ReportTestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestTieuChiCoTestTrongBaoCao(ReportTestCase):
+    def test_column_counts_from_last_green_run(self):
+        from aisdlc.harness.observe import EvidenceStore
+        self.write_index([{"id": "S-1", "epic_id": "E", "title": "t", "covers": ["FR-1"],
+                           "acceptance_criteria": ["a", "b"], "screens": []}])
+        ev = EvidenceStore(self.artifacts)
+        ev.tool_run("S-1", "test", ok=True, detail={"test_format": "node-spec", "test_ids": ["AC-S-1-1: a"]})
+        rep = build(self.project)
+        self.assertEqual(next(s for s in rep.stories if s["id"] == "S-1")["ac"], "1/2")
+        self.assertIn("| TCCN có test |", rep.markdown())
+
+    def test_unreadable_names_show_unknown_not_full(self):
+        from aisdlc.harness.observe import EvidenceStore
+        self.write_index([{"id": "S-1", "epic_id": "E", "title": "t", "covers": [],
+                           "acceptance_criteria": ["a"], "screens": []}])
+        EvidenceStore(self.artifacts).tool_run("S-1", "test", ok=True, detail={"test_format": "", "test_ids": []})
+        self.assertEqual(next(s for s in build(self.project).stories if s["id"] == "S-1")["ac"], "?/1")

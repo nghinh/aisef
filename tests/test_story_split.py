@@ -251,3 +251,13 @@ class TestSplitFailures(SplitTestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestMaTieuChiTrongStory(unittest.TestCase):
+    def test_each_criterion_carries_its_code(self):
+        from aisdlc.control.normalize import Story
+        from aisdlc.phases.story_split import render_story
+        st = Story(id="STORY-01-02", epic_id="E-01", title="t", acceptance_criteria=["rỗng", "đảo từ"])
+        text = render_story(st, None)
+        self.assertIn("1. [AC-STORY-01-02-1] rỗng", text)
+        self.assertIn("2. [AC-STORY-01-02-2] đảo từ", text)

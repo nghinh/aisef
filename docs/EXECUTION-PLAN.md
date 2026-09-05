@@ -581,6 +581,10 @@ Bước tiếp: **đợt 1 — G4** truyền `--settings` tường minh + nhịp
 | G7 một kiểu `Outcome` (`control/outcome.py`): 6 kết cục, 3 câu hỏi (`blocks`/`counts_as_done`/`must_be_named`), một bảng ký hiệu; `Check` dùng chung cho `gate` + `deploy`, `KindResult.outcome`; hết `skipped=True` chung chung | 8 | — (refactor thuần, cổng không đổi hành vi: 196 test cũ xanh) | | ✅ |
 | Parser output runner (`harness/testlog.py`): node `spec`/`tap`, vitest verbose/mặc định, pytest `-v`/`-q`, coverage pytest-cov/istanbul; không nhận ra → `test_ids=[]`, không đoán | 13 + 1 | Fixture là output **thật** của `par` (node 26), `e9` (vitest 5), pytest 9.1; ghi vào `tool_run test.detail.test_ids/failed_ids/coverage` qua `tools._record` | `tests/fixtures/testlog/` | ✅ |
 
+| G5 hợp đồng tiêu chí ↔ test (`control/acceptance.py`): mã `AC-<story>-<i>` in vào story `.md` và prompt; cổng "tiêu chí có test" đọc `test_ids` của lần xanh cuối — thiếu → FAILED nêu đúng mã; không đọc được tên test → UNCONFIGURED nêu reporter cần bật; báo cáo cột "TCCN có test" `k/n` (`?/n` khi chưa đọc được); prompt rà soát bỏ việc đếm, giữ phần phán đoán | 13 | **chờ**: chạy lại 1 story `par` — agent đặt tên test theo mã mà không cần nhắc thêm? đo tỉ lệ tuân thủ, dưới 100 % thì sửa prompt, không hạ cổng | | 🔨 |
+| G10b `coverage.min` thật: số từ output runner; không có số → UNCONFIGURED "thêm `--coverage`/`--cov`"; thấp hơn → FAILED `60% < 85%` | 4 | — | | ✅ |
+| G8 TDD kiểm được (`control/tdd.py`): story thêm test (tệp mới hoặc dòng mới mang `AC-…`) mà không có lần `test` đỏ trước lần xanh cuối → mục "TDD" FAILED; refactor không thêm test → không áp dụng; test có sẵn bớt ca → ghi `qa:test-delta` + đưa vào ngữ cảnh người rà soát, không tự chặn | 14 | **chờ** cùng lượt `par` của G5 | | 🔨 |
+
 **Đợt OKL (ADR-002 — tầng tri thức vận hành, sau paper Repo-To-Skill):**
 
 | Hạng mục | Unit test | Kiểm thật | Bằng chứng | Trạng thái |

@@ -110,7 +110,7 @@ Cột "Chứng minh" là điều kiện để mục đó chuyển ACCEPTED.
 | # | Ý tưởng | Nguồn | Hiện có | Quyết định | Vì sao | Chứng minh |
 |---|---|---|---|---|---|---|
 | 1 | Router phân cấp + progressive disclosure, nối vào phiên agent | Paper §routing; AREX router | Router có, **chưa nối vào prompt** | **ADOPT** — nối `route()` vào prompt developer (mục "Kỹ năng có sẵn", tên + `use_when` + đường dẫn); ghi `skills_offered` + `abstained` vào `AGENT_RUN.detail`; `skills_used` = tên tool `Skill` trong luồng | Không nối thì cả tầng không có tác dụng, và **không đo được gì** — đây là tiền đề của mọi mục còn lại | A/B trên `par` (4 story × 2 nhánh có/không mục kỹ năng): `skills_used`/phiên, chi phí, số lượt, cổng qua. Quy tắc: bật mặc định chỉ khi cổng qua ≥ baseline và chi phí ≤ +15 % |
-| 2 | Kiểm **chạy được** trước khi nhận (repo-native tests/CLI/smoke) | Paper §verify | Chỉ kiểm cấu trúc | **ADAPT** — `verified` đòi thêm: mọi `scripts/*` khai trong SKILL.md chạy `--help`/selfcheck exit 0 trong sandbox READ_ONLY; ghi `Verification.checks[]` | Paper: "No skill is admitted on the strength of its sources alone" — cấu trúc đúng ≠ dùng được, cùng lớp lỗi với hook biên dịch đúng cú pháp mà client không chạy (G6) | Unit test: skill có script hỏng → ở lại `candidate`; đỏ khi hoàn nguyên. Số: X/Y skill trong registry lên `verified` sau kiểm chạy |
+| 2 | Kiểm **chạy được** trước khi nhận (repo-native tests/CLI/smoke) | Paper §verify | Chỉ kiểm cấu trúc | **ADAPT (mức V1: biên dịch được)** — `verified` đòi thêm: mọi tệp trong `scripts/` phải parse được (`py_compile`, `sh -n`, `node --check`); ghi `Verification.checks[]`. Chạy thật (`--help` trong sandbox) để sau — §5.2 nói vì sao | Paper: "No skill is admitted on the strength of its sources alone" — cấu trúc đúng ≠ dùng được, cùng lớp lỗi với hook biên dịch đúng cú pháp mà client không chạy (G6) | Unit test: skill có script hỏng → ở lại `candidate`; đỏ khi hoàn nguyên. Số: bao nhiêu skill của `par`/`e9` rớt vì script không parse được |
 | 3 | Construction record R | Paper §distill | — | **PROPOSED** (giữ ADR-002 §5) | Chỉ có nghĩa khi có chưng cất; chưng cất ~$40/kho theo paper, còn baseline dùng skill của ta là 11/86 phiên — chưa đáng | Sau khi #1 đo xong |
 | 4 | Provenance / version / freshness | AREX metadata + refresh | Có: `commit`, `license`, `stale` khi commit đổi, `Registry.refresh` | **KEEP** — không thêm cơ chế | Đủ; catalog ghim commit là "version" | — |
 | 5 | Confidence + abstain | Paper §routing | Có: điểm + rationale + abstain; paper cũng **không** dùng ngưỡng số | **KEEP**; thêm `abstained` vào telemetry (thuộc #1) | Đúng như paper | — |
@@ -160,14 +160,19 @@ Cột "Chứng minh" là điều kiện để mục đó chuyển ACCEPTED.
 - Test: prompt có mục khi router chọn, không có khi abstain; evidence ghi
   đúng; đỏ khi hoàn nguyên. `aisdlc status` in tỉ lệ `used/offered`.
 
-### 5.2 #2 Kiểm chạy được
-- `registry.verify_structure` → `verify(skill_dir, *, run_scripts=True)`:
-  với mỗi tệp trong `scripts/` có shebang hoặc `.py/.sh`, chạy `--help`
-  (hoặc `selfcheck` nếu có) qua `sandbox.run(level=READ_ONLY, timeout=30)`;
-  exit ≠ 0 → lỗi "script không chạy được: …". `Verification.checks`
-  liệt kê `structure`, `links`, `secrets`, `injection`, `scripts:<n>`.
-- Test: skill với `scripts/hong.sh` (`exit 1`) → `candidate` + lý do;
-  skill không có `scripts/` → chỉ có 4 check đầu.
+### 5.2 #2 Kiểm scripts trước khi nhận — mức V1: **biên dịch được**, không chạy
+- Số đo đổi quyết định: `par` có 120 skill / **148** tệp scripts, `e9` 156 /
+  **201** (phần lớn `agent.py` của cybersecurity-skills). Chạy `--help` từng
+  tệp trong sandbox với timeout 30 s là tới ~100 phút ở trường hợp xấu, và
+  chạy script bên thứ ba trên host khi không có Docker là điều harness
+  không được làm. Vì thế V1 kiểm **cú pháp**: `.py` → `py_compile`, `.sh` →
+  `sh -n`, `.js/.mjs` → `node --check` (không có node thì không kết luận).
+- `registry.verify_structure` thêm check `scripts: <n> tệp biên dịch được`;
+  hỏng → gap `✗ scripts không biên dịch được: …` → ở lại `candidate`.
+- Đây là mức thấp hơn paper ("assertion-backed cases … smoke scripts") và
+  được ghi rõ là `ponytail:` — nâng lên smoke `--help` trong sandbox khi có
+  hạng mục đo riêng và Docker là điều kiện tiên quyết.
+- Test: `scripts/run.py` chứa `def (:` → không `ok`; script lành → có check.
 
 ### 5.3 #9 HANDOFF
 - `observe.HANDOFF = "handoff"`; `EvidenceStore.handoff(story, *, frm, to,

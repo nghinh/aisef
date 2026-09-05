@@ -76,6 +76,10 @@ class Check:
     def __post_init__(self) -> None:
         if isinstance(self.outcome, bool):
             self.outcome = Outcome.PASSED if self.outcome else Outcome.FAILED
+        # Bất biến: kết cục không phải PASSED luôn mang lý do — điền ngay ở
+        # đây để `detail` (JSON, feedback, báo cáo) và `line()` cùng nói một điều.
+        if not self.detail and self.outcome is not Outcome.PASSED:
+            self.detail = DEFAULT_REASON.get(self.outcome, "")
 
     @property
     def passed(self) -> bool:
@@ -86,12 +90,8 @@ class Check:
     def skipped(self) -> bool:
         return self.outcome in (Outcome.UNCONFIGURED, Outcome.NOT_APPLICABLE, Outcome.WAIVED)
 
-    def reason(self) -> str:
-        return self.detail or DEFAULT_REASON.get(self.outcome, "")
-
     def line(self) -> str:
-        r = self.detail if self.outcome is Outcome.PASSED else self.reason()
-        return f"  {self.outcome.mark} {self.name}" + (f" — {r}" if r else "")
+        return f"  {self.outcome.mark} {self.name}" + (f" — {self.detail}" if self.detail else "")
 
     def as_dict(self) -> dict:
         return {"name": self.name, "outcome": self.outcome.value, "passed": self.passed,

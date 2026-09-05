@@ -190,3 +190,31 @@ class TestTrenSkillThat(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestScriptsPhaiBienDichDuoc(unittest.TestCase):
+    """ADR-003 #2: SKILL.md đúng mà script hỏng thì chưa được `verified`."""
+
+    def _skill(self, tmp, script: str, name="kn"):
+        from pathlib import Path
+        d = Path(tmp) / name
+        (d / "scripts").mkdir(parents=True)
+        (d / "SKILL.md").write_text(f"---\nname: {name}\ndescription: thử\n---\n# {name}\n", encoding="utf-8")
+        (d / "scripts" / "run.py").write_text(script, encoding="utf-8")
+        return d
+
+    def test_broken_script_keeps_it_out(self):
+        import tempfile
+        from aisdlc.kit.registry import verify_structure
+        with tempfile.TemporaryDirectory() as tmp:
+            v = verify_structure(self._skill(tmp, "def (:\n"))
+        self.assertFalse(v.ok)
+        self.assertTrue(any("scripts không biên dịch" in g for g in v.gaps), v.gaps)
+
+    def test_good_script_is_counted(self):
+        import tempfile
+        from aisdlc.kit.registry import verify_structure
+        with tempfile.TemporaryDirectory() as tmp:
+            v = verify_structure(self._skill(tmp, "print('ok')\n"))
+        self.assertTrue(v.ok, v.gaps)
+        self.assertIn("scripts: 1 tệp biên dịch được", v.checks)

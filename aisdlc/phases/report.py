@@ -88,13 +88,13 @@ class Report:
 
         lines += [
             "", "## 3. Vận hành từng story", "",
-            "| Story | Trạng thái | Lượt agent | Chi phí | Thời gian | Map mockup |",
-            "|---|---|---|---|---|---|",
+            "| Story | Trạng thái | Lượt agent | Chi phí | Thời gian | Map mockup | TCCN có test |",
+            "|---|---|---|---|---|---|---|",
         ]
         for s in self.stories:
             lines.append(
                 f"| {s['id']} | {s['status']} | {s['runs']} | ${s['cost']:.2f} | "
-                f"{s['duration_ms'] / 1000:.0f}s | {s['mockup']} |"
+                f"{s['duration_ms'] / 1000:.0f}s | {s['mockup']} | {s.get('ac', '—')} |"
             )
         if self.phases:
             lines += [
@@ -141,6 +141,7 @@ def build(project: Path | str) -> Report:
 
     index = _read_index(root)
     story_screens = {s["id"]: s.get("screens", []) for s in index.get("stories", [])}
+    story_ac = {s["id"]: len(s.get("acceptance_criteria") or []) for s in index.get("stories", [])}
     fr_to_stories: dict[str, list[str]] = {}
     for story in index.get("stories", []):
         for fr in story.get("covers", []):
@@ -198,6 +199,7 @@ def build(project: Path | str) -> Report:
             "cost": ev.total_cost_usd,
             "duration_ms": ev.total_duration_ms,
             "mockup": mockup,
+            "ac": _ac_cell(sid, story_ac.get(sid, 0), ev),
         })
     report.total_cost_usd = sum(s["cost"] for s in report.stories) + sum(
         p["cost"] for p in report.phases
@@ -211,6 +213,20 @@ def build(project: Path | str) -> Report:
         except json.JSONDecodeError:
             report.pre_deploy = {}
     return report
+
+
+def _ac_cell(sid: str, n: int, ev) -> str:
+    """`k/n` tiêu chí có test mang mã, từ lần test xanh cuối. Không đọc
+    được tên test thì `?/n` — chưa biết, không phải đủ."""
+    from ..control.acceptance import missing as ac_missing
+
+    if n <= 0:
+        return "—"
+    xanh = [e for e in ev.of(TOOL_RUN, "test") if e.ok]
+    if not xanh or not xanh[-1].detail.get("test_format"):
+        return f"?/{n}"
+    thieu = ac_missing(sid, n, list(xanh[-1].detail.get("test_ids") or []))
+    return f"{n - len(thieu)}/{n}"
 
 
 def _read_index(root: Path) -> dict:

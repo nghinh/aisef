@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..config import DEFAULTS, Config
+from ..control.acceptance import ac_code
 from ..control.approvals import STORIES_INDEX
 from ..control.machine_gate import GateResult, check_stories
 from ..control.preflight import (
@@ -96,7 +97,7 @@ def render_story(story: Story, prd: PRD | None) -> str:
         ]
 
     out += ["## Tiêu chí chấp nhận", ""]
-    out += [f"{i}. {ac}" for i, ac in enumerate(story.acceptance_criteria, 1)] or [
+    out += [f"{i}. [{ac_code(story.id, i)}] {ac}" for i, ac in enumerate(story.acceptance_criteria, 1)] or [
         "_(chưa có — cổng máy sẽ chặn)_"
     ]
     out.append("")
