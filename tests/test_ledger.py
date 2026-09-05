@@ -350,3 +350,55 @@ class TestCliEvidence(LedgerTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestUngVienChuaLanded(LedgerTestCase):
+    """Xanh ở ứng viên chưa vào nhánh chính không phải VERIFIED (ADR-004 R1×R2).
+
+    Đo 2026-09-06 trên client giả của R3: lượt story sửa trượt cổng — test
+    xanh trong worktree, reviewer chặn — vẫn làm hành vi gốc VERIFIED.
+    """
+
+    def setUp(self):
+        super().setUp()
+        from aisdlc.control.journal import Entry, JournalStore
+        self.index([{"id": "STORY-01-01", "epic_id": "EPIC-01",
+                     "acceptance_criteria": ["a"], "covers": ["FR-1"]}])
+        self.journal = JournalStore(self.root)
+        self.Entry = Entry
+
+    def freeze(self, sha, *, attempt=1, committed=False):
+        self.journal.record("STORY-01-01", self.Entry(step="candidate.frozen", attempt=attempt,
+                                                       data={"sha": sha}))
+        if committed:
+            self.journal.record("STORY-01-01", self.Entry(step="attempt.committed", attempt=attempt))
+
+    def test_xanh_o_ung_vien_bi_cong_tra_ve_khong_thanh_verified(self):
+        self.freeze("aaa1111")
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)], candidate="aaa1111")
+        led = L.build(self.root)
+        self.assertEqual(led.behaviors["AC-STORY-01-01-1"].status, L.GAP)
+        self.assertEqual(led.behaviors["FR-1"].status, L.GAP)
+        self.assertIn("chưa landed", led.behaviors["AC-STORY-01-01-1"].source.get("why", ""))
+        self.assertEqual(led.summary()["unlanded_green"], 2)
+
+    def test_landed_roi_thi_verified_va_do_o_ung_vien_chua_landed_van_tinh(self):
+        self.freeze("aaa1111")
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)], candidate="aaa1111")
+        self.freeze("bbb2222", committed=True)
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)], candidate="bbb2222")
+        led = L.build(self.root)
+        self.assertEqual(led.behaviors["AC-STORY-01-01-1"].status, L.VERIFIED)
+        self.assertEqual(led.behaviors["AC-STORY-01-01-1"].candidate, "bbb2222")
+        # Lượt sau làm đỏ ở ứng viên chưa landed: vẫn là hồi quy — không tin client.
+        self.freeze("ccc3333", attempt=2)
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)],
+                       failed=[ac_test("STORY-01-01", 1)], attempt=2, candidate="ccc3333")
+        led = L.build(self.root)
+        self.assertEqual(led.behaviors["AC-STORY-01-01-1"].status, L.REOPENED)
+
+    def test_bang_chung_khong_co_nhat_ky_hay_khong_co_candidate_van_tinh_nhu_cu(self):
+        # Không nhật ký (QA cấp dự án) hoặc evidence cũ không khai bản: giữ luật cũ.
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])
+        self.assertEqual(L.build(self.root).behaviors["AC-STORY-01-01-1"].status, L.VERIFIED)
+

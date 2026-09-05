@@ -453,6 +453,7 @@ của một lượt story sửa *trượt cổng* (test xanh trong worktree, rev
 chặn) vẫn làm hành vi gốc VERIFIED trong sổ dù code chưa merge — sổ ghi
 "quan sát cuối cùng", không hỏi bản ấy đã lên nhánh chính chưa. R1 có
 `candidate` cho việc này; sổ chưa lọc theo nó.
+  **Đã sửa 2026-09-06** (gộp đợt 2, `control/ledger.py`): sổ đọc nhật ký R1 — ứng viên chỉ *landed* khi giao dịch đóng băng nó kết thúc bằng `attempt.committed`/`merge.completed`; xanh ở ứng viên chưa landed **không** thành VERIFIED (đếm vào `unlanded_green` trong summary, hành vi chưa có thì ghi GAP với lý do), đỏ vẫn tính là hồi quy. Bằng chứng không có nhật ký (QA cấp dự án, mốc vòng) hoặc không khai bản giữ luật cũ. Test: `tests/test_ledger.py::TestUngVienChuaLanded`.
 
 **Chưa đo (B1):** e9 EPIC-01 với agent thật — ΔVERIFIED, REOPENED → 0,
 chi phí/vòng so với story trung bình. Rủi ro đã thấy trước: 18 GAP của e9
