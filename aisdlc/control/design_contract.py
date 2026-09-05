@@ -45,6 +45,13 @@ class ScreenContract:
     #: Chỗ mockup tự khai là chưa chốt (`data-unresolved`). Còn mục nào thì
     #: cổng chặn: dựng code theo một màn hình chưa chốt là làm lại hai lần.
     unresolved: list[str] = field(default_factory=list)
+    #: Mockup không khai `data-state="primary"` → hợp đồng lấy **cả trang**.
+    #: Trang dựng nhiều trạng thái cạnh nhau thì cả trang không bao giờ khớp
+    #: một màn hình thật (e9 note-editor 2026-09-05: 32 component, 4 lần
+    #: "Thêm thẻ", story đốt $28 qua 4 lượt mà không thể qua cổng).
+    whole_page: bool = False
+    #: Số component trùng (vai trò, tên) đã gộp — dấu vết của nhiều trạng thái.
+    duplicates: int = 0
     error: str = ""
 
     def as_dict(self) -> dict:
@@ -60,6 +67,8 @@ class ScreenContract:
             "fields": self.fields,
             "states": self.states,
             "unresolved": self.unresolved,
+            "whole_page": self.whole_page,
+            "duplicates": self.duplicates,
             "error": self.error,
         }
 
@@ -80,6 +89,8 @@ class ScreenContract:
             fields=data.get("fields", []),
             states=data.get("states", []),
             unresolved=data.get("unresolved", []),
+            whole_page=bool(data.get("whole_page", False)),
+            duplicates=int(data.get("duplicates", 0) or 0),
             error=data.get("error", ""),
         )
 
@@ -186,7 +197,16 @@ def _one(screen: Screen, rendered, root: Path) -> ScreenContract:
         c for snap in getattr(rendered, "annotation_snapshots", []) or []
         for c in parse_aria_snapshot(snap)
     }
-    out.components = [c for c in everything if c not in ignored]
+    unique: list[Component] = []
+    for c in everything:
+        if c in ignored:
+            continue
+        if c in unique:
+            out.duplicates += 1
+        else:
+            unique.append(c)
+    out.components = unique
+    out.whole_page = not getattr(rendered, "primary_snapshot", "")
     out.data_roles = sorted({c.role for c in in_samples if c in set(everything)}) or sorted(
         {c.role for c in in_samples}
     )

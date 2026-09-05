@@ -237,6 +237,18 @@ def check_design_contract(
             r.errors.append(f"{screen.id}: {screen.error}")
             continue
         unresolved += [(screen.id, item) for item in screen.unresolved]
+        if screen.whole_page and screen.duplicates:
+            # Đo 2026-09-05 (e9 note-editor): mockup bỏ quên `data-state`, hợp
+            # đồng ôm cả trang gồm 4 trạng thái → story không thể qua bước map
+            # mockup, đốt $28 qua 4 lượt. Chặn ở đây rẻ hơn nhiều.
+            r.errors.append(
+                f"{screen.id}: mockup không đánh dấu `data-state=\"primary\"` nên hợp đồng "
+                f"lấy cả trang — {len(screen.components)} component, {screen.duplicates} chỗ "
+                f"trùng, tức nhiều trạng thái dựng cạnh nhau. Ứng dụng thật ở một thời điểm "
+                f"chỉ ở một trạng thái nên bước map mockup sẽ không bao giờ khớp. Đánh dấu "
+                f"trạng thái theo skill aisdlc-mockup-html (mục 7) rồi chạy `aisdlc mockup` "
+                f"(không --force: chỉ trích lại hợp đồng)"
+            )
         if not screen.route:
             r.errors.append(
                 f"{screen.id}: mockup không khai route (thẻ meta aisdlc-route) — "
