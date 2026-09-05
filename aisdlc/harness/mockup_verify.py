@@ -15,6 +15,8 @@ Ba mức đối chiếu, và chỉ dùng hai:
 
 from __future__ import annotations
 
+import os
+import signal
 import socket
 import subprocess
 import time
@@ -77,8 +79,21 @@ class AppServer:
 
     def start(self) -> str:
         """Chuỗi rỗng nếu sẵn sàng; ngược lại là lý do không chạy được."""
+        if self.proc is not None and self.proc.poll() is None:
+            return ""  # chính mình đã dựng (gọi start() lần hai qua `with`)
         if self.already_running():
-            return ""  # người dùng đang chạy sẵn — dùng luôn, đừng chạy thêm
+            if not self.command:
+                return ""  # dự án không khai dev_command: người dùng tự chạy app, dùng luôn
+            # Có dev_command mà cổng đã có người trả lời thì không nhận vơ
+            # (lỗi 15, đo 2026-09-05 trên e9): vite của một worktree đã gỡ vẫn
+            # giữ cổng 5199, cổng map mockup của hai lượt sau "mở app" và thấy
+            # trang trống — chấm sai app, story trượt. Thứ đang trả lời ở cổng
+            # này không phải app harness vừa dựng từ worktree của story.
+            return (
+                f"cổng {self.base_url} đang có tiến trình khác trả lời "
+                f"({occupant(self.base_url)}) — không phải app của story này; "
+                "dừng nó hoặc đổi `app.base_url`"
+            )
         if not self.command:
             return (
                 "dự án chưa khai `app.dev_command` nên không mở được ứng dụng "
@@ -94,6 +109,7 @@ class AppServer:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
+                start_new_session=True,  # để stop() giết được cả nhóm
             )
         except OSError as e:
             return f"không chạy được `{self.command}`: {e}"
@@ -112,11 +128,14 @@ class AppServer:
         if self.proc is None:
             return
         if self.proc.poll() is None:
-            self.proc.terminate()
+            # Giết cả nhóm tiến trình: `npm run dev` chết mà `node vite` con
+            # sống sót thì cổng còn bị giữ và `.vite/` được ghi lại vào
+            # worktree đã gỡ (lỗi 13 + 15).
+            _signal_group(self.proc, signal.SIGTERM)
             try:
                 self.proc.wait(timeout=10)
             except subprocess.TimeoutExpired:
-                self.proc.kill()  # dev server hay bỏ qua SIGTERM
+                _signal_group(self.proc, signal.SIGKILL)  # dev server hay bỏ qua SIGTERM
                 self.proc.wait(timeout=5)
         # Đóng ống: một đợt 15 story mà mỗi story rò một mô tả tệp thì tới
         # story thứ n sẽ hỏng vì lý do chẳng liên quan gì tới story đó.
@@ -126,6 +145,40 @@ class AppServer:
 
     def url_for(self, route: str) -> str:
         return urljoin(self.base_url, route.lstrip("/"))
+
+
+def _signal_group(proc: subprocess.Popen, sig: int) -> None:
+    try:
+        os.killpg(os.getpgid(proc.pid), sig)
+    except (ProcessLookupError, PermissionError, OSError):
+        try:
+            proc.send_signal(sig)
+        except ProcessLookupError:
+            pass
+
+
+def occupant(url: str) -> str:
+    """Ai đang giữ cổng — để thông báo chỉ đúng tiến trình, không bắt đoán."""
+    from urllib.parse import urlparse
+
+    port = urlparse(url).port
+    if not port:
+        return "không rõ"
+    try:
+        out = subprocess.run(["lsof", "-nP", "-t", "-i", f":{port}"], capture_output=True,
+                             text=True, timeout=5).stdout.split()
+    except (OSError, subprocess.SubprocessError):
+        return "không rõ"
+    if not out:
+        return "không rõ"
+    pid = out[0]
+    try:
+        cwd = subprocess.run(["lsof", "-a", "-d", "cwd", "-p", pid, "-Fn"], capture_output=True,
+                             text=True, timeout=5).stdout
+        where = next((l[1:] for l in cwd.splitlines() if l.startswith("n")), "")
+    except (OSError, subprocess.SubprocessError):
+        where = ""
+    return f"pid {pid}" + (f", cwd {where}" if where else "")
 
 
 def _responds(url: str, *, timeout: float = 2) -> bool:
