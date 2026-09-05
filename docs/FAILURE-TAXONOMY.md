@@ -28,7 +28,12 @@ Chi tiết từng lỗi (lộ ra ở đâu, sửa gì): `docs/STATUS-2026-09-05.
 2. **Chạy song song nhiều bản chép dự án**: `rsync` mang theo `.git/worktrees`
    và `.aisdlc/worktrees` còn sót; dev server của lượt trước giữ cổng chung.
    Trước mỗi lượt: `git worktree prune`, xoá thư mục sót, `lsof -i :<cổng>`.
-3. **Không giết tiến trình cha có pipe stdout** — con `claude` chết theo vì
+3. **Không commit lên nhánh chính của dự án đang có lượt chạy.** Harness kiểm
+   bất biến «main không đổi trong lượt» và huỷ lượt (e9 01-06, $12,22 bỏ) —
+   đúng luật, nhưng là tiền mất vì người điều phối chạy song song ẩu. Mọi
+   sửa phía chủ dự án (kế hoạch, mockup, duyệt cổng) làm *trước* hoặc *giữa*
+   hai lượt, không làm *trong*.
+4. **Không giết tiến trình cha có pipe stdout** — con `claude` chết theo vì
    EPIPE giữa chừng và bằng chứng cụt. Giết cả cây, từ lá lên.
 
 ## Khi thêm lỗi mới
