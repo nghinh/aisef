@@ -53,7 +53,7 @@ class Agent(ClientAdapter):
     id = "fake"
 
     def __init__(self, *, fail: set[str] | None = None, out_of_scope: set[str] | None = None,
-                 overlap_ms: int = 0):
+                 overlap_ms: int = 0, meet: set[str] | None = None):
         self.fail = fail or set()
         self.out_of_scope = out_of_scope or set()
         self.lock = threading.Lock()
@@ -64,6 +64,14 @@ class Agent(ClientAdapter):
         #: micro giây thì hầu như không bao giờ thấy chồng lấn, kể cả khi
         #: nó có thật.
         self.overlap_ms = overlap_ms
+        #: Các story phải **gặp nhau** trong lượt chạy: mỗi story trong tập
+        #: này đứng chờ ở rào cho tới khi tất cả cùng tới. Song song thật thì
+        #: rào mở ngay; tuần tự thì story đầu chờ đến hết giờ và rào vỡ. Khác
+        #: `overlap_ms`: không phụ thuộc đồng hồ, nên không đổi màu theo tải
+        #: máy (P0-2: 300 ms chồng lấn thua một `git worktree add` dưới tải).
+        self.meet = meet or set()
+        self.barrier = threading.Barrier(len(self.meet), timeout=20) if self.meet else None
+        self.met = False
 
     def available(self) -> bool:
         return True
@@ -85,6 +93,12 @@ class Agent(ClientAdapter):
             self.concurrent += 1
             self.max_concurrent = max(self.max_concurrent, self.concurrent)
         try:
+            if self.barrier is not None and story_id in self.meet:
+                try:
+                    self.barrier.wait()
+                    self.met = True
+                except threading.BrokenBarrierError:
+                    pass  # tuần tự: ghi nhận bằng `met` = False
             if self.overlap_ms:
                 time.sleep(self.overlap_ms / 1000)
             if story_id in self.fail:
@@ -166,9 +180,23 @@ class TestOrchestration(RunTestCase):
         self.assertEqual(agent.stories[-1], "STORY-02-01")
 
     def test_independent_stories_run_in_parallel(self):
-        agent = Agent(overlap_ms=300)
+        """Đợt 1 của EPIC-01 có hai story độc lập; chúng phải gặp nhau ở rào.
+
+        Trước 2026-09-05 phép này đo chồng lấn 300 ms bằng đồng hồ: dưới
+        tải, dựng worktree cho story thứ hai lâu hơn 300 ms và phép đổi màu
+        dù bộ điều phối vẫn song song (P0-2, 1/33 lần). Rào không có đồng hồ.
+        """
+        agent = Agent(meet={"STORY-01-02", "STORY-01-03"})
         report = self.run_sprint(agent, only_epic="EPIC-01")
+        self.assertTrue(agent.met, report.summary())
         self.assertGreaterEqual(agent.max_concurrent, 2, report.summary())
+
+    def test_sequential_run_breaks_the_barrier(self):
+        """Phép rào phải đỏ khi không song song — nếu không nó không đo gì."""
+        agent = Agent(meet={"STORY-01-02", "STORY-01-03"})
+        agent.barrier = threading.Barrier(2, timeout=1)
+        self.run_sprint(agent, only_epic="EPIC-01", sequential=True)
+        self.assertFalse(agent.met)
 
     def test_sequential_flag_disables_parallelism(self):
         agent = Agent()

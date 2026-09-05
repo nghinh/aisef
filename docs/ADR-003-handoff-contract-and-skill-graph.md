@@ -198,6 +198,8 @@ Cột "Chứng minh" là điều kiện để mục đó chuyển ACCEPTED.
 
 Ngân sách: A/B #1 par ≈ $5,5; e9 ≈ $43 (off $22,01 + on $20,93) — trong $120–180 đã duyệt cho đợt 4 tính cả R2.
 
+**Chủ đầu tư chốt 2026-09-05 (tối):** chấp nhận kết quả; `skills.offer` = off; chưa mở Skill Graph; chỉ xem xét lại khi có benchmark chứng minh skill thực sự được dùng *và* tạo gain.
+
 **Quyết định 2026-09-05 (sau A/B e9):** #1 giữ trạng thái *cơ chế có, mặc định tắt*. Hai dự án, sáu lượt developer nhận mục kỹ năng (kể cả skill cửa ngõ giao diện chấm 10/10 cho story có màn hình), không lượt nào gọi tool `Skill`. Mục kỹ năng vô hại về chi phí nhưng không đổi hành vi; mở rộng thêm (skill graph, chưng cất kho) là xây trên giả định chưa có bằng chứng. Việc kế tiếp nếu muốn đi tiếp: đo một cơ chế khác — nạp thẳng nội dung SKILL.md vào ngữ cảnh (không qua tool) — trên cùng cặp story, trước khi bàn tới đồ thị.
 
 ---
