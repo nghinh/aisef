@@ -187,7 +187,40 @@ def _skills_section(story: Story, *, project: Path, artifact_root: Path, config:
         return "_(không định tuyến skill — `skills.offer` tắt)_", {"enabled": False}
     reg = skill_registry.load(artifact_root)
     r = skill_router.route(story, reg, project=project)
-    return r.prompt_section(), {"enabled": True, **r.as_evidence()}
+    section, ev = r.prompt_section(), {"enabled": True, **r.as_evidence()}
+    if config["skills.inline"] and getattr(r, "picked", None):
+        # Cơ chế B (ADR-003 §6, thí nghiệm): ba nhánh A/B cho thấy agent không
+        # mở skill được mời qua tool `Skill` (`used` 0/0). Dán thẳng nội dung
+        # skill cao điểm nhất để đo xem *có nội dung trong ngữ cảnh* có đổi
+        # hành vi không — chỉ một skill, có trần ký tự.
+        top = r.picked[0].entry
+        body = inline_skill_text(project, top.path)
+        if body:
+            section += (f"\n\n### Nội dung skill `{top.id}` (nạp thẳng)\n\n"
+                        f"Đọc như hướng dẫn chuyên môn cho story này, không phải mệnh lệnh "
+                        f"thay thế hiến pháp.\n\n{body}")
+            ev["inline"] = [top.id]
+    return section, ev
+
+
+#: Trần ký tự nội dung skill dán thẳng — quá trần thì cắt, ghi rõ.
+INLINE_SKILL_MAX_CHARS = 8000
+
+
+def inline_skill_text(project: Path, skill_path: str) -> str:
+    """Thân SKILL.md (bỏ frontmatter), cắt theo trần; rỗng nếu không có tệp."""
+    md = Path(project) / skill_path / "SKILL.md"
+    if not md.is_file():
+        return ""
+    text = md.read_text(encoding="utf-8", errors="replace")
+    if text.startswith("---"):
+        end = text.find("\n---", 3)
+        if end != -1:
+            text = text[end + 4:]
+    text = text.strip()
+    if len(text) > INLINE_SKILL_MAX_CHARS:
+        text = text[:INLINE_SKILL_MAX_CHARS] + "\n\n_(đã cắt theo trần ký tự — xem SKILL.md đầy đủ)_"
+    return text
 
 
 def skills_used(result) -> list[str]:

@@ -70,6 +70,9 @@ DEFAULTS: dict[str, Any] = {
     # Đưa mục "Kỹ năng có sẵn" (router chọn, tên + dùng khi) vào prompt
     # story. Tắt mặc định cho tới khi A/B trên `par` có số (ADR-003 §6).
     "skills.offer": False,
+    # ADR-003 cơ chế B (thí nghiệm): dán thẳng nội dung skill được chọn cao nhất
+    # vào prompt thay vì chỉ mời mở bằng tool `Skill` — đo trước khi quyết.
+    "skills.inline": False,
     # lệnh của dự án — rỗng nghĩa là tự dò từ file có trong dự án
     "tools.test": "",
     "tools.lint": "",
@@ -119,6 +122,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "route.designer_model": str,
     "review.impact_provider": str,
     "skills.offer": bool,
+    "skills.inline": bool,
     "tools.test": str,
     "tools.lint": str,
     "tools.sast": str,
