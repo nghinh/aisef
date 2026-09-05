@@ -554,4 +554,15 @@ Chạy song song được: GĐ-2 và GĐ-3 (khác vùng); GĐ-5 và phần harne
 
 ## Việc kế tiếp
 
-**GĐ-0, S1** — chạy `claude -p` một task nhỏ, ghi lại cấu trúc `stream-json`, xác định lấy cost/latency ở đâu.
+Theo `docs/ACTION-PLAN-2026-09-05.md` (5 đợt, xuất phát từ
+`docs/DEEP-REVIEW-2026-09-05.md`). Đợt 0 xong (G1 G2 G3, commit `297282e`).
+Bước tiếp: **đợt 1 — G4** truyền `--settings` tường minh + nhịp tim guard,
+đo trước/sau trên `par` với `.claude/` gỡ khỏi git.
+
+| Hạng mục | Unit test | Kiểm thật | Bằng chứng | Trạng thái |
+|---|---|---|---|---|
+| G1 G2 G3 | 21 | — (guard thuần) | `297282e` | ✅ |
+| G4 | | `par` trước/sau | | |
+| G11 | | — | | |
+| G12 | | `par` di trú, 2 client | | |
+| G10a | | — | | |
