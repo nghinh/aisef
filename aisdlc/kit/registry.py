@@ -15,6 +15,7 @@ phải model. Skill `candidate`/`stale`/`rejected` **không được định tuy
 from __future__ import annotations
 
 import json
+import os
 import re
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
@@ -220,6 +221,40 @@ def _listish(v) -> list[str]:
     return [str(v).strip()] if v else []
 
 
+_SCRIPT_SUFFIX = (".py", ".sh", ".js", ".mjs")
+
+
+def _scripts(skill_dir: Path) -> list[Path]:
+    d = skill_dir / "scripts"
+    if not d.is_dir():
+        return []
+    return sorted(p for p in d.rglob("*") if p.is_file() and p.suffix in _SCRIPT_SUFFIX)[:50]
+
+
+def script_broken(path: Path, skill_dir: Path) -> str:
+    """Đường dẫn tương đối nếu script không biên dịch được, "" nếu ổn.
+    Không chạy script — chỉ parse."""
+    import shutil
+    import subprocess
+
+    rel = str(path.relative_to(skill_dir))
+    try:
+        if path.suffix == ".py":
+            # compile() thuần, không ghi .pyc: py_compile cần chỗ ghi cfile.
+            compile(path.read_text(encoding="utf-8", errors="replace"), str(path), "exec")
+            return ""
+        if path.suffix == ".sh":
+            cmd = ["sh", "-n", str(path)]
+        elif shutil.which("node"):
+            cmd = ["node", "--check", str(path)]
+        else:
+            return ""                       # không có node: không kết luận
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
+        return "" if r.returncode == 0 else rel
+    except (SyntaxError, ValueError, OSError, subprocess.SubprocessError):
+        return rel
+
+
 def verify_structure(skill_dir: Path) -> Verification:
     """Kiểm cấu trúc — code, không model. Gap ghi ra, không giấu."""
     v = Verification(at=_now(), by="structural")
@@ -264,6 +299,19 @@ def verify_structure(skill_dir: Path) -> Verification:
             break
     else:
         v.checks.append("không có bí mật, không có câu tiêm")
+
+    # scripts/ phải ít nhất **biên dịch được** — SKILL.md đúng mà script hỏng
+    # thì skill không dùng được, cùng lớp lỗi với hook đúng cú pháp mà client
+    # không chạy (G6). Paper đòi chạy thật; đây là mức an toàn không cần Docker.
+    # ponytail: chỉ kiểm cú pháp, không chạy — 201 tệp trên e9, chạy thật cần
+    # sandbox + ngân sách thời gian; nâng lên smoke `--help` khi có hạng mục đo.
+    scripts = _scripts(skill_dir)
+    if scripts:
+        hong = [rel for rel in (script_broken(p, skill_dir) for p in scripts) if rel]
+        if hong:
+            v.gaps.append(f"✗ scripts không biên dịch được: {', '.join(hong[:3])}")
+        else:
+            v.checks.append(f"scripts: {len(scripts)} tệp biên dịch được")
 
     skill = load_skill(skill_dir)
     if skill is not None:

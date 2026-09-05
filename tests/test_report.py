@@ -216,3 +216,17 @@ class TestTieuChiCoTestTrongBaoCao(ReportTestCase):
                            "acceptance_criteria": ["a"], "screens": []}])
         EvidenceStore(self.artifacts).tool_run("S-1", "test", ok=True, detail={"test_format": "", "test_ids": []})
         self.assertEqual(next(s for s in build(self.project).stories if s["id"] == "S-1")["ac"], "?/1")
+
+
+class TestChuoiBanGiaoTrongBaoCao(ReportTestCase):
+    def test_chain_from_handoff_events(self):
+        from aisdlc.harness.observe import EvidenceStore
+        self.write_index([{"id": "S-1", "epic_id": "E", "title": "t", "covers": [], "acceptance_criteria": [], "screens": []}])
+        ev = EvidenceStore(self.artifacts)
+        ev.handoff("S-1", frm="plan", to="developer", attempt=1, slots={"story_contract": ("artifact", 10)})
+        ev.handoff("S-1", frm="developer", to="reviewer", attempt=1, slots={"diff_summary": ("git", 5)})
+        ev.handoff("S-1", frm="gate", to="developer", attempt=2, slots={"story_contract": ("artifact+gate+review", 12)})
+        rep = build(self.project)
+        self.assertEqual(next(s for s in rep.stories if s["id"] == "S-1")["handoffs"],
+                         "developer#1 → reviewer#1 → developer#2")
+        self.assertIn("- S-1: developer#1 → reviewer#1 → developer#2", rep.markdown())

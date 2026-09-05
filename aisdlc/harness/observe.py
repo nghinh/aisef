@@ -35,6 +35,7 @@ GUARD_BLOCK = "guard_block"    # guard chặn một thao tác
 GUARD_SEEN = "guard_seen"      # hook tới được phiên này (ghi một lần mỗi story)
 MOCKUP_MAP = "mockup_map"      # đối chiếu màn hình thật với mockup
 NOTE = "note"
+HANDOFF = "handoff"            # gói bàn giao: vai nào nhận slot nào, từ nguồn nào
 
 
 @dataclass
@@ -209,6 +210,18 @@ class EvidenceStore:
                   detail=detail or {}),
         )
 
+    def handoff(self, story_id: str, *, frm: str, to: str, attempt: int,
+                slots: dict[str, tuple[str, int]]) -> Event:
+        """Gói bàn giao cho một vai: slot nào, từ nguồn nào, bao nhiêu ký tự.
+        Trả lời được "người rà soát đã thấy gì" từ đĩa — và cho máy kiểm bất
+        biến: gói cho reviewer/security không có lời của developer."""
+        return self.record(
+            story_id,
+            Event(kind=HANDOFF, name=f"{frm}->{to}",
+                  detail={"from": frm, "to": to, "attempt": attempt,
+                          "slots": {k: {"source": s, "chars": n} for k, (s, n) in slots.items()}}),
+        )
+
     def file_change(self, story_id: str, path: str, *, detail: dict | None = None) -> Event:
         return self.record(
             story_id,
@@ -216,7 +229,8 @@ class EvidenceStore:
                   detail={"path": path, **(detail or {})}),
         )
 
-    def agent_run(self, story_id: str, result, *, name: str = "", prompt_chars: int = 0) -> Event:
+    def agent_run(self, story_id: str, result, *, name: str = "", prompt_chars: int = 0,
+                  skills: dict | None = None) -> Event:
         """Ghi lại một lượt gọi model từ `RunResult` — chi phí và độ trễ
         lấy từ luồng client, không tự đoán."""
         return self.record(
@@ -245,6 +259,8 @@ class EvidenceStore:
                     "guard_messages": list(result.guard_messages)[:5],
                     "permission_limited": result.permission_limited,
                     "error": result.error,
+                    # Skill được mời / được mở — đo, không đoán (ADR-003 #1).
+                    "skills": skills or {},
                 },
             ),
         )

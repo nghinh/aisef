@@ -28,7 +28,7 @@ from ..control.approvals import (
 )
 from ..control.normalize import parse_prd_file
 from ..control.state import StateStore
-from ..harness.observe import AGENT_RUN, MOCKUP_MAP, TOOL_RUN, EvidenceStore
+from ..harness.observe import AGENT_RUN, HANDOFF, MOCKUP_MAP, TOOL_RUN, EvidenceStore
 
 
 @dataclass
@@ -96,6 +96,10 @@ class Report:
                 f"| {s['id']} | {s['status']} | {s['runs']} | ${s['cost']:.2f} | "
                 f"{s['duration_ms'] / 1000:.0f}s | {s['mockup']} | {s.get('ac', '—')} |"
             )
+        chuoi = [s for s in self.stories if s.get("handoffs")]
+        if chuoi:
+            lines += ["", "Chuỗi bàn giao (từ bằng chứng `handoff`, mỗi vai một phiên mới):", ""]
+            lines += [f"- {s['id']}: {s['handoffs']}" for s in chuoi]
         if self.phases:
             lines += [
                 "", "### Chi phí lập kế hoạch và mockup", "",
@@ -200,6 +204,9 @@ def build(project: Path | str) -> Report:
             "duration_ms": ev.total_duration_ms,
             "mockup": mockup,
             "ac": _ac_cell(sid, story_ac.get(sid, 0), ev),
+            "handoffs": " → ".join(
+                f"{e.detail.get('to')}#{e.detail.get('attempt')}" for e in ev.of(HANDOFF)
+            ),
         })
     report.total_cost_usd = sum(s["cost"] for s in report.stories) + sum(
         p["cost"] for p in report.phases

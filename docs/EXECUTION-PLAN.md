@@ -585,6 +585,14 @@ Bước tiếp: **đợt 1 — G4** truyền `--settings` tường minh + nhịp
 | G10b `coverage.min` thật: số từ output runner; không có số → UNCONFIGURED "thêm `--coverage`/`--cov`"; thấp hơn → FAILED `60% < 85%` | 4 | — | | ✅ |
 | G8 TDD kiểm được (`control/tdd.py`): story thêm test (tệp mới hoặc dòng mới mang `AC-…`) mà không có lần `test` đỏ trước lần xanh cuối → mục "TDD" FAILED; refactor không thêm test → không áp dụng; test có sẵn bớt ca → ghi `qa:test-delta` + đưa vào ngữ cảnh người rà soát, không tự chặn | 14 | **chờ** cùng lượt `par` của G5 | | 🔨 |
 
+**ADR-003 (đối chiếu Repo-To-Skill / AREX-Skill / Swarm — 3 mục ADOPT/ADAPT, còn lại KEEP/REJECT/PROPOSED có lý do):**
+
+| Hạng mục | Unit test | Kiểm thật | Bằng chứng | Trạng thái |
+|---|---|---|---|---|
+| #1 router vào prompt (`skills.offer`, mặc định tắt) + telemetry `skills.offered/abstained/used` trong `AGENT_RUN` — `used` đọc từ luồng `tool_use` `Skill` | 4 | **chờ A/B** trên `par` 4 story × {tắt, bật}: `used/offered`, $/story, lượt, cổng qua (ADR-003 §6) | | 🔨 |
+| #2 scripts của skill phải **biên dịch được** trước khi `verified` (`py_compile`-tương-đương, `sh -n`, `node --check`) | 2 | `par`: 120 skill, 83 có scripts, **1** rớt; `e9`: 156 / 119 / **1** — cùng một skill (`building-vulnerability-dashboard-with-defectdojo`, `scripts/process.py` không parse được); 1,1–1,5 s cho cả bộ | | ✅ |
+| #9 `HANDOFF` evidence: vai nào nhận slot nào từ nguồn nào; bất biến máy kiểm — gói reviewer/security không có nguồn `agent`, slot chưa khai nguồn hiện `?`; báo cáo in chuỗi bàn giao | 6 | — (bất biến, không phải số đo) | | ✅ |
+
 **Đợt OKL (ADR-002 — tầng tri thức vận hành, sau paper Repo-To-Skill):**
 
 | Hạng mục | Unit test | Kiểm thật | Bằng chứng | Trạng thái |

@@ -25,6 +25,8 @@ from ..clients.base import ClientAdapter
 from ..config import Config
 from ..control import gate as story_gate
 from ..control import tdd
+from ..kit import registry as skill_registry
+from ..kit import router as skill_router
 from ..control.acceptance import ac_code
 from ..control.design_contract import DesignContract, load as load_contract
 from ..control.impact import analyse as analyse_impact
@@ -137,7 +139,10 @@ def build_context(
     if contract and story.screens:
         slices, _ = load_for_story(contract, story.screens, artifact_root=artifact_root)
 
+    skills, skills_ev = _skills_section(story, project=project, artifact_root=artifact_root, config=config)
     return {
+        "_skills": skills_ev,
+        "skills": skills,
         "story_id": story.id,
         "story_title": story.title,
         "story_contract": contract_text,
@@ -149,6 +154,49 @@ def build_context(
         "mockup_section": prompt_section(slices),
         "tools": describe_tools(project, config),
     }
+
+
+#: Slot nào của prompt đến từ đâu. Gói cho reviewer/security **không** được
+#: có nguồn `agent` — đó là bất biến máy kiểm (ADR-003 #9). Slot mới mà chưa
+#: khai ở đây hiện thành `?` trong bằng chứng, không lặng lẽ thành hợp lệ.
+SLOT_SOURCE = {
+    "story_id": "artifact", "story_title": "artifact", "story_contract": "artifact",
+    "architecture_rules": "artifact", "write_scope": "artifact", "mockup_section": "artifact",
+    "tools": "config", "skills": "router", "diff_summary": "git", "impact": "code",
+}
+
+
+def handoff_slots(context: dict, *, feedback: bool = False) -> dict[str, tuple[str, int]]:
+    """{slot: (nguồn, số ký tự)} — khoá bắt đầu bằng `_` là nội bộ, không phải slot."""
+    out = {}
+    for k, v in context.items():
+        if k.startswith("_"):
+            continue
+        src = SLOT_SOURCE.get(k, "?")
+        if k == "story_contract" and feedback:
+            src = "artifact+gate+review"   # lượt sau: có mục "Lượt trước chưa đạt"
+        out[k] = (src, len(str(v)))
+    return out
+
+
+def _skills_section(story: Story, *, project: Path, artifact_root: Path, config: Config | None) -> tuple[str, dict]:
+    """Mục "Kỹ năng có sẵn" + bằng chứng định tuyến. Router là tín hiệu, không
+    phải cổng: abstain thì prompt nói rõ là không có, tắt thì nói là tắt."""
+    if not (config and config["skills.offer"]):
+        return "_(không định tuyến skill — `skills.offer` tắt)_", {"enabled": False}
+    reg = skill_registry.load(artifact_root)
+    r = skill_router.route(story, reg, project=project)
+    return r.prompt_section(), {"enabled": True, **r.as_evidence()}
+
+
+def skills_used(result) -> list[str]:
+    """Skill agent đã mở, đọc từ luồng `tool_use` (tool `Skill`). Client không
+    phát luồng → rỗng, và `skills_measurable` ở capability nói vì sao."""
+    out = []
+    for tu in getattr(result, "tool_uses", None) or []:
+        if tu.name == "Skill":
+            out.append(str((tu.input or {}).get("skill") or (tu.input or {}).get("name") or "?"))
+    return out
 
 
 def _story_fallback(story: Story) -> str:
@@ -185,6 +233,8 @@ def run_attempt(
         config=config,
         feedback=feedback,
     )
+    evidence.handoff(story.id, frm="plan" if number == 1 else "gate", to=DEVELOPER,
+                     attempt=number, slots=handoff_slots(context, feedback=bool(feedback)))
     spec = build_spec(
         DEVELOPER,
         catalog.get(ROLES[DEVELOPER].prompt),
@@ -212,8 +262,10 @@ def run_attempt(
     _attach_settings(spec, project)
     result = client.run(spec)
     attempt.cost_usd = result.cost_usd
-    evidence.agent_run(story.id, result, name=f"{story.id}#{number}",
-                       prompt_chars=len(spec.prompt))
+    evidence.agent_run(
+        story.id, result, name=f"{story.id}#{number}", prompt_chars=len(spec.prompt),
+        skills={**context.get("_skills", {}), "used": skills_used(result)},
+    )
 
     sau = _head_of(project) if workdir != project else ""
     if truoc and sau != truoc:
@@ -284,6 +336,7 @@ def run_attempt(
         config=config,
         catalog=catalog,
         architecture=architecture,
+        number=number,
     )
     # Mục chặn phải nằm trong bằng chứng, không chỉ trong bản tóm tắt in
     # ra màn hình — bản tóm tắt cắt ngắn, và khi cần biết lượt này với
@@ -307,6 +360,7 @@ def run_attempt(
             config=config,
             catalog=catalog,
             architecture=architecture,
+            number=number,
         )
         evidence.tool_run(
             story.id,
@@ -392,6 +446,7 @@ def review_story(
     config: Config,
     catalog: Catalog,
     architecture: Architecture | None,
+    number: int = 0,
 ) -> list[str]:
     """Rà soát độc lập — **phiên mới**, không sửa được gì.
 
@@ -438,6 +493,8 @@ def review_story(
             + "; ".join(mat)
         )
 
+    EvidenceStore(artifact_root).handoff(story.id, frm=DEVELOPER, to=REVIEWER, attempt=number,
+                                         slots=handoff_slots(context))
     spec = build_spec(
         REVIEWER,
         catalog.get(ROLES[REVIEWER].prompt),
@@ -490,6 +547,7 @@ def security_review(
     config: Config,
     catalog: Catalog,
     architecture: Architecture | None,
+    number: int = 0,
 ) -> SecurityReport:
     """Rà soát bảo mật theo ngữ nghĩa — **phiên riêng**, chỉ đọc.
 
@@ -521,6 +579,8 @@ def security_review(
         workdir, changed, command=str(config.get("review.impact_provider", "") or "")
     ).as_prompt()
 
+    EvidenceStore(artifact_root).handoff(story.id, frm=REVIEWER, to=SECURITY, attempt=number,
+                                         slots=handoff_slots(context))
     spec = build_spec(
         SECURITY,
         catalog.get(ROLES[SECURITY].prompt),

@@ -41,6 +41,10 @@ coi như chưa chạy.
 
 {{ tools }}
 
+## Kỹ năng có sẵn
+
+{{ skills }}
+
 ## Trình tự bắt buộc
 
 1. **ĐỎ** — viết test cho tiêu chí chấp nhận **trước**, chạy `test`, thấy

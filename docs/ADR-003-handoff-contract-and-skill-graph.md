@@ -190,7 +190,7 @@ Cột "Chứng minh" là điều kiện để mục đó chuyển ACCEPTED.
 | Mục | Baseline (đã có) | Số đo sau | Ngưỡng ACCEPT |
 |---|---|---|---|
 | #1 | e9: 11 Skill/86 phiên; par: 0 mục kỹ năng | par 4 story × {off, on}: `used/offered`, $/story, lượt, cổng qua | cổng qua ≥ baseline **và** $ ≤ +15 %; nếu `used` = 0 thì tắt mặc định và ghi lý do |
-| #2 | registry hiện tại: X `verified` chỉ bằng cấu trúc | X' sau kiểm chạy; danh sách skill rớt | không có ngưỡng — mục này là *đúng đắn*, không phải *hiệu quả* |
+| #2 | `par` 120 skill (83 có scripts), `e9` 156 (119) — `verified` chỉ bằng cấu trúc | **đã đo 2026-09-05**: mỗi bộ rớt **1** skill, cùng một cái (`building-vulnerability-dashboard-with-defectdojo/scripts/process.py` không parse được); cả bộ 1,1–1,5 s | không có ngưỡng — mục này là *đúng đắn*, không phải *hiệu quả*; số nhỏ nói rằng nguồn hiện tại sạch, không nói rằng kiểm là thừa |
 | #9 | không có sự kiện | 100 % lượt có HANDOFF; 0 slot nguồn `agent` ở reviewer/security | bất biến, không phải số đo |
 | #7 | — | số cụm finding lặp trên par + e9 | ≥ 1 cụm đáng viết thành skill → mở ADR-002 §5.2 |
 

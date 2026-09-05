@@ -64,6 +64,9 @@ DEFAULTS: dict[str, Any] = {
     "route.designer_model": "",
     # Nhà cung cấp phân tích ảnh hưởng cho người rà soát (P0.3).
     "review.impact_provider": "",
+    # Đưa mục "Kỹ năng có sẵn" (router chọn, tên + dùng khi) vào prompt
+    # story. Tắt mặc định cho tới khi A/B trên `par` có số (ADR-003 §6).
+    "skills.offer": False,
     # lệnh của dự án — rỗng nghĩa là tự dò từ file có trong dự án
     "tools.test": "",
     "tools.lint": "",
@@ -111,6 +114,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "route.reviewer_model": str,
     "route.designer_model": str,
     "review.impact_provider": str,
+    "skills.offer": bool,
     "tools.test": str,
     "tools.lint": str,
     "tools.sast": str,

@@ -770,3 +770,24 @@ class TestNguoiRaSoatKhongDuocSuaCay(ImplementTestCase):
         self.assertTrue(out.done)
         ev = EvidenceStore(self.artifacts).read(self.story.id)
         self.assertFalse(any(e.name == "review:immutable" for e in ev.events))
+
+
+class TestGoiBanGiaoDuocGhi(ImplementTestCase):
+    """ADR-003 #9: mỗi vai nhận một gói được ghi lại; gói của reviewer/security
+    không có slot nguồn `agent` hay `?`."""
+
+    def test_handoffs_recorded_for_every_role(self):
+        from aisdlc.harness.observe import HANDOFF
+        client = ScriptedClient()
+        self.implement(client)
+        ev = EvidenceStore(self.artifacts).read(self.story.id)
+        chuoi = [(e.detail["to"], e.detail["attempt"]) for e in ev.of(HANDOFF)]
+        self.assertIn(("developer", 1), chuoi)
+        if client.review_prompts:                       # rà soát có chạy thì phải có gói
+            self.assertIn(("reviewer", 1), chuoi)
+        for e in ev.of(HANDOFF):
+            if e.detail["to"] in ("reviewer", "security"):
+                nguon = {k: v["source"] for k, v in e.detail["slots"].items()}
+                self.assertNotIn("agent", nguon.values(), nguon)
+                self.assertNotIn("?", nguon.values(), nguon)
+                self.assertIn("diff_summary", nguon)
