@@ -7,7 +7,7 @@ triệu chứng mới xuất hiện, người sửa hỏi đúng câu hỏi trư
 
 Chi tiết từng lỗi (lộ ra ở đâu, sửa gì): `docs/STATUS-2026-09-05.md` §2.4.
 
-## Bảy lớp nguyên nhân
+## Tám lớp nguyên nhân
 
 | Lớp | Câu hỏi phải hỏi | Lỗi | Phép hồi quy |
 |---|---|---|---|
@@ -17,6 +17,7 @@ Chi tiết từng lỗi (lộ ra ở đâu, sửa gì): `docs/STATUS-2026-09-05.
 | **D. Quy ước máy đòi mà không nói ra cho agent** | "Cổng đòi điều này ở đâu trong ngữ cảnh story? Nếu không có, agent chỉ có thể đoán." | 12 mockup không đánh dấu `data-state` (cổng máy không kiểm quy ước của chính skill) · 14 bản ghi hạt giống `1` cho route có tham số · 21 đòi test e2e/a11y nhưng cấm ghi `tests/` | `test_design_contract_states` · `test_mockup_map_seed` · `test_write_scope_verify` |
 | **E. Phân loại kết cục sai — "không chạy được" bị coi là "trượt", "chưa cấu hình" bị coi là "đạt"** | "Kết cục này thuộc sáu loại nào? Ai đặt tên cho nó?" | 2 completion chặn vô hạn khi chưa khai test · 8 MODULE_NOT_FOUND coi là test đỏ · 9 cổng tìm tên trần bỏ qua `qa:<kind>` · 17 "mọi story xong" khi story trong kế hoạch chưa từng chạy · 18 báo cáo lấy lịch sử (mọi lần) thay vì trạng thái mới nhất | `test_guardrails` (skipped/unrunnable → ALLOW) · `test_tools` (unrunnable) · `test_gate` (`qa:<kind>`) · `test_deploy.TestPlannedButNeverRun` · `test_report_mockup_cell` |
 | **G. Bằng chứng không đọc lại được** | "Kết luận này người đọc kiểm lại bằng gì? Nguyên văn nằm ở đâu?" | 16 lời người rà soát không lưu, mục nhiều dòng cụt ở dòng đầu | `test_findings` (persist_verdict, nối dòng) |
+| **H. Cổng chấm trạng thái, không chấm thay đổi — không có mốc "trước" do máy ghi** | "Kết quả này so với **trước khi story chạm vào** thì sao? Mốc ấy ai ghi, ghi ở đâu?" | (hồi cứu B0, ADR-004 §6 R2, trên evidence e9 — không phải lỗi đánh số) STORY-01-05 và 01-06 làm đỏ tiêu chí của 01-04 giữa lượt rồi tự sửa, không để lại dấu vết; và khi không tự sửa thì cổng chỉ nói "test đỏ", không phân biệt test mới đang đỏ (TDD) với test có sẵn vừa hỏng | `test_gate.TestKhongLamDoTestCoSan` · `test_implement.TestBaselineTruocKhiSua` (ADR-004 R9) |
 | **F. Hình dạng dữ liệu giữa hai bên khác nhau** | "Khoá/định dạng bên gửi có đúng là khoá bên nhận đọc không? Đã đo trên bên gửi thật chưa?" | 10 OpenCode gửi `filePath`, guard đọc `file_path` · 1 worktree không có cấu hình client · 7 cấu hình client bị tính là file story · 3 reviewer sửa cây qua Bash · 5 router suy năng lực từ chữ · 19 parser PRD chỉ nhận tiêu đề khối tiêu chí tiếng Anh, agent viết tiếng Việt · 20 preflight coi `a.b` bất kỳ là tệp | `test_guardrails` (`filePath`/`newString`, HARNESS_OWNED) · `test_worktree` (`_carry_client_config`) · `test_implement` (snapshot/hoàn nguyên) · `test_router` (khai năng lực) · `test_prd_headings` · `test_preflight.TestDottedNamesAreNotFiles` |
 
 ## Ba bài học vận hành đi kèm

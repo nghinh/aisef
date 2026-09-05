@@ -192,7 +192,7 @@ def run_tool(
     command = command_for(name, project, cfg)
     if not command:
         res = ToolResult(name=name, ok=False, skipped="dự án chưa khai lệnh cho tool này")
-        _record(res, story_id, artifact_root, candidate)
+        record(res, story_id, artifact_root, candidate)
         return res
 
     argv = shlex.split(command) + (extra_args or [])
@@ -224,7 +224,7 @@ def run_tool(
     )
     if not sb.ok:
         res.unrunnable = unrunnable_reason(name, sb.exit_code, sb.stdout + "\n" + sb.stderr)
-    _record(res, story_id, artifact_root, candidate)
+    record(res, story_id, artifact_root, candidate)
     return res
 
 
@@ -256,9 +256,21 @@ def unrunnable_reason(name: str, exit_code: int, output: str) -> str:
     return f"công cụ chưa cài hoặc không nạp được ({hit or 'exit 127'}) — dựng môi trường hoặc sửa lệnh rồi chạy lại"
 
 
-def _record(res: ToolResult, story_id: str, artifact_root, candidate: str = "") -> None:
+#: Tên bản ghi của baseline (ADR-004 R9) — bộ test chạy ở candidate cha
+#: **trước** phiên developer. Không ghi là `test`: guard `completion`, TDD
+#: `red_before_green`, mục "tiêu chí có test" và sổ hành vi đều đọc
+#: `tool_run test` như "lần test của lượt này", và một baseline đỏ sẵn sẽ
+#: chặn Stop, làm TDD đạt oan, và bị sổ quy thành hồi quy do story gây ra.
+BASELINE_RUN = "test:baseline"
+
+
+def record(res: ToolResult, story_id: str, artifact_root, candidate: str = "",
+           *, name: str = "", extra: dict | None = None) -> None:
     """Ghi bằng chứng. Không có story_id thì không ghi — tool chạy ngoài
-    ngữ cảnh story (ví dụ người gõ tay) không nên làm bẩn hồ sơ story."""
+    ngữ cảnh story (ví dụ người gõ tay) không nên làm bẩn hồ sơ story.
+
+    ``name`` ghi dưới tên khác tên tool (baseline ghi `test:baseline`);
+    ``extra`` là khoá thêm vào `detail`. Hình dạng bản ghi vẫn ở một chỗ."""
     if not story_id or artifact_root is None:
         return
     detail = {
@@ -275,8 +287,9 @@ def _record(res: ToolResult, story_id: str, artifact_root, candidate: str = "") 
         from .testlog import parse as parse_testlog
 
         detail.update(parse_testlog(res.stdout + "\n" + res.stderr).to_evidence())
+    detail.update(extra or {})
     EvidenceStore(artifact_root, candidate=candidate).tool_run(
-        story_id, res.name, ok=res.ok, duration_ms=res.duration_ms, detail=detail,
+        story_id, name or res.name, ok=res.ok, duration_ms=res.duration_ms, detail=detail,
     )
 
 

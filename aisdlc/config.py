@@ -67,6 +67,11 @@ DEFAULTS: dict[str, Any] = {
     #: Loại được miễn tường minh, ngăn bởi dấu phẩy. Miễn phải là quyết
     #: định có người ký, không phải hệ quả của việc quên cấu hình.
     "verify.waived": "",
+    # Baseline trước khi sửa (ADR-004 R9): harness chạy bộ test ở candidate
+    # cha **trước** phiên developer đầu tiên, để cổng "không làm đỏ test có
+    # sẵn" so được tên test xanh trước/sau. Tắt khi bộ test quá chậm — tắt
+    # thì mục cổng là "không áp dụng: tắt bởi cấu hình", không phải đạt.
+    "verify.baseline": True,
     # ứng dụng của dự án — để mở route thật lúc đối chiếu với mockup
     "app.dev_command": "",
     "app.base_url": "http://localhost:5173",
@@ -126,6 +131,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "verify.sbom": str,
     "verify.image-scan": str,
     "verify.waived": str,
+    "verify.baseline": bool,
     "app.dev_command": str,
     "app.base_url": str,
     "app.ready_timeout_seconds": int,

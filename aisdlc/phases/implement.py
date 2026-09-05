@@ -54,7 +54,8 @@ from ..harness.mockup_map import load_for_story, prompt_section
 from ..harness.observe import EvidenceStore, NOTE, Event
 from ..harness.prompts import Catalog, load_catalog
 from ..harness.routing import DEVELOPER, REVIEWER, ROLES, SECURITY, build_spec
-from ..harness.tools import describe_tools, run_tool
+from ..harness.testlog import MAX_IDS, parse as parse_testlog
+from ..harness.tools import BASELINE_RUN, describe_tools, record as record_tool, run_tool
 from .qa import find_fake_tests, run_suite
 
 #: Lỗi thuộc về hạ tầng, không thuộc về chất lượng công việc.
@@ -481,6 +482,37 @@ def run_attempt(
     )
     attempt.ok = attempt.gate.passed
     return attempt
+
+
+def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Config) -> None:
+    """Chạy bộ test ở **candidate cha** trước khi developer sửa gì (ADR-004 R9).
+
+    HoH bảo developer "establish a baseline before editing"; ở đây harness
+    làm, vì lời developer không phải bằng chứng. Ghi dưới tên `test:baseline`
+    (xem `tools.BASELINE_RUN` vì sao không phải `test`), kèm `parent` = HEAD
+    lúc chạy và `red_before` = test đã đỏ sẵn — cổng không tính chúng là hồi
+    quy, và người đọc thấy ngay vì sao.
+
+    Chạy **một lần cho cả story**, trước lượt đầu, không phải mỗi lượt: lượt 2
+    mà lấy ứng viên lượt 1 làm mốc thì test lượt 1 vừa làm đỏ thành "đỏ sẵn",
+    và lượt 2 xoá nó đi là qua cổng sạch. Mốc là trạng thái trước khi story
+    chạm vào — và chi phí là một lần chạy test mỗi story, không phải mỗi lượt.
+
+    Không có lệnh test thì bản ghi mang `skipped` (cổng đọc thành chưa cấu
+    hình), không phải baseline xanh. Tắt bằng `verify.baseline` thì ghi rõ là
+    tắt, để cổng nói "không áp dụng" chứ không im.
+    """
+    if not config.get("verify.baseline", True):
+        EvidenceStore(artifact_root).tool_run(story.id, BASELINE_RUN, ok=False, detail={
+            "baseline": True, "disabled": True,
+            "skipped": "tắt bởi cấu hình `verify.baseline`",
+        })
+        return
+    res = run_tool("test", workdir, config=config)   # story_id rỗng: ghi bên dưới, dưới tên riêng
+    log = parse_testlog(res.stdout + "\n" + res.stderr)
+    record_tool(res, story.id, artifact_root, name=BASELINE_RUN, extra={
+        "baseline": True, "parent": head_sha(workdir), "red_before": log.failed[:MAX_IDS],
+    })
 
 
 def freeze_candidate(
@@ -1372,6 +1404,9 @@ def implement_story(
     if workdir != project:
         head = head_sha(project)
         base_ref = fork_point(str(workdir), head) if head else ""
+
+    # Mốc test trước khi story chạm vào — một lần, trước lượt đầu (ADR-004 R9).
+    run_baseline(story, workdir=workdir, artifact_root=root, config=cfg)
 
     while True:
         attempt = run_attempt(

@@ -1,6 +1,6 @@
 # ADR-004 — Cải tiến liên tục theo bằng chứng ở cấp epic (đối chiếu Harness-of-Harness)
 
-**Trạng thái:** PROPOSED, trừ **R2 · R5 · R6 · R7 = ACCEPTED** (2026-09-05, số đo §6: B0 và B4 hồi cứu trên evidence thật của e9 và `par`, 0 agent). **R1 · R8** hiện thực, unit xanh, chờ đo trên agent thật (§6). R3 · R4 · R9 chưa hiện thực. Ngày 2026-09-05.
+**Trạng thái:** PROPOSED, trừ **R2 · R5 · R6 · R7 = ACCEPTED** (2026-09-05, số đo §6: B0 và B4 hồi cứu trên evidence thật của e9 và `par`, 0 agent). **R1 · R8 · R9** hiện thực, unit xanh, chờ đo trên agent thật (§6). R3 · R4 chưa hiện thực. Ngày 2026-09-05, cập nhật 2026-09-06.
 **Nguồn đối chiếu:** paper *Harness-of-Harness: Multi-Day Autonomous Software Development with Continual Improvement* (arXiv 2609.01481v1, Shanghai AI Lab) và repo `Flesymeb/HarnessOfHarness` — repo tại thời điểm đọc chỉ có README + tài sản trình diễn (58 commit, MIT, "HoH-lite sẽ công bố"), **không có mã**; mọi cơ chế dưới đây lấy từ paper.
 **Ràng buộc giữ nguyên:** sáu nhóm harness hiện có, evidence-first, reviewer ≠ developer, bảo đảm phía harness, worktree cách ly, cổng người, CLI gọi-một-lần/không daemon, không tin client. Không dùng HoH làm runtime. Không tự sửa framework: mọi thay đổi vẫn qua test, benchmark, ADR/evidence và cổng người/phát hành.
 
@@ -290,6 +290,65 @@ chưa đo trên `par`.** (2026-09-05)
   không trả JSON nên trong unit mỗi vai rà soát tốn thêm đúng 1 lượt —
   đúng thiết kế; agent thật đọc prompt mới phải không cần lượt ấy, và đó
   chính là thứ B7 phải chứng minh trước khi R8 chuyển ACCEPTED.
+
+**R9 — baseline trước khi sửa: hiện thực, unit xanh, chưa đo trên agent
+thật.** (2026-09-06)
+
+* `implement.run_baseline` chạy `tools.test` của dự án ở HEAD worktree
+  **trước phiên developer đầu tiên** và ghi `tool_run test:baseline` với
+  `detail.baseline=True`, `detail.parent` (SHA HEAD lúc chạy, rỗng nếu
+  không đọc được), `detail.red_before` (test đã đỏ sẵn), tên test theo
+  `harness/testlog.py` (thêm `skipped_ids` — bỏ qua không phải xanh) và
+  `duration_ms` của sự kiện. **Không** mang `detail.candidate`: ứng viên
+  chưa đóng băng. Tái dùng `run_tool` + `tools.record` (công khai hoá
+  `_record`, thêm `name`/`extra`), không có đường ghi thứ hai.
+* Hai chỗ **lệch** so với câu chữ §2 R9, cả hai có lý do đo được:
+  1. Tên bản ghi là `test:baseline`, không phải `test` + cờ. Guard
+     `completion`, `tdd.red_before_green`, mục "tiêu chí có test", sổ R2
+     (`_observe_tests` chỉ nhận `name == "test"`) và `report` đều đọc
+     `tool_run test` như "lần test của lượt": một baseline đỏ sẵn (test
+     của story khác đang hỏng) sẽ chặn Stop tới hết lượt (lớp E trong
+     `FAILURE-TAXONOMY`), làm TDD "đỏ trước xanh" đạt oan, và bị sổ quy
+     thành hồi quy do story này gây ra — trước khi nó viết một dòng. Đổi
+     tên thì không chỗ nào phải thêm điều kiện lọc.
+  2. Chạy **một lần mỗi story** (trong `implement_story`, trước vòng lượt),
+     không phải mỗi lượt trong `run_attempt`. Mỗi lượt thì lượt 2 lấy ứng
+     viên lượt 1 làm mốc: test lượt 1 vừa làm đỏ thành "đỏ sẵn", lượt 2
+     xoá nó là qua cổng sạch. Mốc là trạng thái trước khi story chạm vào,
+     và chi phí là +1 lần chạy test mỗi story (B8 nói mỗi lượt — rẻ hơn).
+* Cổng thêm mục **không làm đỏ test có sẵn** (`gate._baseline_check`, ngay
+  sau mục "test"): test xanh ở baseline mà đỏ hoặc **mất** ở lần test mới
+  nhất mang đúng `detail.candidate` → ✗ nêu đúng tên (tối đa 5 tên + số
+  còn lại). Mất test cũng là ✗: story chưa có chỗ khai "xoá test", nên
+  không suy được thì không cho qua và nói rõ vì sao. Kết cục khi không so
+  được, theo bất biến: chưa khai lệnh test hoặc reporter không in tên → ○
+  chưa cấu hình (không đạt, không chặn, phải hiện); baseline hoặc lần test
+  ứng viên **không chạy được** → ⚠ không chạy được (chặn với lý do môi
+  trường); tắt bởi `verify.baseline` hoặc harness không ghi baseline nào
+  (chạy tay, nhật ký cũ) → – không áp dụng, có lý do. Test đỏ sẵn ở
+  baseline: ✅ kèm "n test đã đỏ sẵn, không tính: …". Danh sách bị cắt ở
+  `MAX_IDS` = 500 thì chỉ so đỏ, không kết luận "mất" — nói ra.
+* Hồi quy vào feedback lượt sau qua đường có sẵn: `gate.feedback()` liệt
+  kê mục ✗ kèm `detail`, nên tên test hồi quy nằm trong mục "Lượt trước
+  chưa đạt" của prompt developer lượt kế — có test chứng minh.
+* Knob `verify.baseline` (bool, mặc định `true`) — tắt khi bộ test quá
+  chậm; tắt thì harness vẫn ghi một `test:baseline` mang `disabled` để
+  cổng nói "tắt bởi cấu hình", không im.
+* **Số đo trên test giả** (`tests/test_implement.py::TestBaselineTruocKhiSua`,
+  bộ test giả in dạng `pytest -v` từ một tệp developer giả ghi đè): baseline
+  10 xanh → sau lượt 9 xanh + `test_10` đỏ → cổng ✗ nêu đúng
+  `tests/test_a.py::test_10`, không nêu `test_9`; 10 xanh + `test_11` mới
+  đỏ → mục này ✅, mục "test" ✗ (TDD); baseline 9 xanh + `test_10` đỏ sẵn và
+  vẫn đỏ → ✅, `red_before = [test_10]`; xoá `test_10` → ✗ "mất 1 test";
+  hai lượt thử → đúng 1 `test:baseline` + 2 `test`; tắt knob → 1 lần chạy
+  test thay vì 2, mục cổng –. Cổng: 12 phép ở `tests/test_gate.py`. Bộ
+  đầy đủ: **1 341 test, OK** (skipped 56; 171 phép của gate/implement/
+  testlog/config/candidate chạy 865 s vì mỗi `run_tool` đi qua Docker).
+* **Chưa đo (B8 nửa `par`):** thời gian baseline thật trên `par`/e9 (bộ
+  `node --test` ~1 s, vitest e9 lâu hơn — `duration_ms` đã có chỗ ghi), và
+  liệu tên test hồi quy trong feedback có làm giảm số lượt so với "test
+  đỏ" chung chung hay không. Sổ R2 **cố ý** không đọc `test:baseline`: nó
+  là quan sát về bản cha, đã có trong bằng chứng của story trước.
 
 ### R2 — Sổ hành vi (`control/ledger.py`) · **B0 hồi cứu, 0 agent**
 
