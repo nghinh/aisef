@@ -17,10 +17,21 @@ chính nó.**
 ## Cài
 
 ```bash
-git clone <repo> ai-sdlc && cd ai-sdlc
-./references/clone.sh          # nạp kho skill tham chiếu (một lần)
+pip install ai-sdlc
+```
+
+Hoặc chạy từ bản sao kho nguồn:
+
+```bash
+git clone <repo> ai-sdlc && cd ai-sdlc && pip install -e .
 python3 -m unittest discover -s tests -q
 ```
+
+Kho skill tham chiếu **không cần clone tay**: `aisdlc setup` tự lấy về
+`~/.cache/ai-sdlc/references` đúng commit mà `aisdlc/kit/catalog.json`
+ghim (khoảng 93 MB, một lần cho mọi dự án). Máy ngoại tuyến hoặc CI trỏ
+sang chỗ khác bằng `AISDLC_REFERENCES=/duong/dan`, hoặc dùng
+`aisdlc setup --no-fetch` để chỉ xài những gì đã có trên đĩa.
 
 Không có phụ thuộc Python nào ngoài thư viện chuẩn. Tuỳ chọn:
 `docker` (cách ly khi chạy test), `playwright` (trích hợp đồng thị giác
@@ -30,30 +41,29 @@ vẫn kiểm được.
 ## Sáu bước
 
 ```bash
-export A=/duong/dan/ai-sdlc/bin/aisdlc
 cd /duong/dan/du-an-cua-ban
 
-$A doctor                       # môi trường có đủ chưa
-$A setup                        # dò stack, nạp skill, sinh CLAUDE.md + AGENTS.md
-$A compile                      # nối guard vào client (hook / plugin)
+aisdlc doctor                       # môi trường có đủ chưa
+aisdlc setup                        # dò stack, nạp skill, sinh CLAUDE.md + AGENTS.md
+aisdlc compile                      # nối guard vào client (hook / plugin)
 
-$A plan                         # PRD → kiến trúc → UX → epic → story
-$A gates                        # xem cổng nào đang chờ người
-$A review prd                   # đọc artifact
-$A approve prd                  # duyệt
+aisdlc plan                         # PRD → kiến trúc → UX → epic → story
+aisdlc gates                        # xem cổng nào đang chờ người
+aisdlc review prd                   # đọc artifact
+aisdlc approve prd                  # duyệt
 
-$A mockup                       # mỗi màn hình một HTML + hợp đồng thị giác
-$A approve mockups
-$A approve readiness
+aisdlc mockup                       # mỗi màn hình một HTML + hợp đồng thị giác
+aisdlc approve mockups
+aisdlc approve readiness
 
-$A run                          # hiện thực: epic tuần tự, story song song
-$A qa                           # bộ kiểm định
-$A devsecops                    # CI + Dockerfile + triển khai + runbook
-$A pre-deploy                   # cổng cuối
-$A report                       # báo cáo nghiệm thu từ bằng chứng
+aisdlc run                          # hiện thực: epic tuần tự, story song song
+aisdlc qa                           # bộ kiểm định
+aisdlc devsecops                    # CI + Dockerfile + triển khai + runbook
+aisdlc pre-deploy                   # cổng cuối
+aisdlc report                       # báo cáo nghiệm thu từ bằng chứng
 ```
 
-Chạy nhanh không cần người duyệt: `$A plan --auto-approve all`. Phê duyệt
+Chạy nhanh không cần người duyệt: `aisdlc plan --auto-approve all`. Phê duyệt
 tự động **luôn** được ghi dấu `auto` để về sau truy được tài liệu nào chưa
 từng có người thật xem.
 

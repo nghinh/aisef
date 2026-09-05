@@ -35,6 +35,7 @@ from .control.approvals import (
 from .control.design_contract import CONTRACT_FILE
 from .control.state import StateStore, StoryStatus
 from .harness.guardrails import GUARD_MATCHERS
+from .harness.tools import aisdlc_command
 
 ARTIFACT_ROOT = "_bmad-output"
 
@@ -447,9 +448,19 @@ def cmd_setup(args) -> int:
         print("  đây là đầu vào duy nhất của dự án — tạo nó trước", file=sys.stderr)
         return EXIT_NOT_READY
 
-    references = Path(args.references).resolve()
+    from .kit import fetch
+
+    references = (
+        Path(args.references).resolve() if args.references else fetch.default_root()
+    )
+    if not args.no_fetch:
+        print(f"Nguồn skill: {references}")
+        bao = fetch.ensure(references)
+        print(bao.summary())
+        print()
     if not references.is_dir():
         print(f"✗ không có thư mục nguồn: {references}", file=sys.stderr)
+        print("  chạy lại không kèm --no-fetch để tự lấy về", file=sys.stderr)
         return EXIT_NOT_READY
 
     stack = detect_file(req)
@@ -492,7 +503,9 @@ def cmd_compile(args) -> int:
     from .clients.compile import ADAPTERS, compile_for, write_compile_report
 
     clients = sorted(ADAPTERS) if args.client == "all" else [args.client]
-    aisdlc_bin = args.bin or str((Path(__file__).resolve().parent.parent / "bin" / "aisdlc"))
+    # Không tự đoán đường dẫn: `aisdlc_command` đã biết ưu tiên tên trên PATH
+    # (bản cài thật) rồi mới lùi về `bin/aisdlc` của kho nguồn.
+    aisdlc_bin = args.bin or aisdlc_command()
 
     reports = []
     for client in clients:
@@ -871,7 +884,9 @@ def build_parser() -> argparse.ArgumentParser:
     sub = p.add_subparsers(dest="command", required=True)
 
     s = sub.add_parser("setup", help="dò stack và nạp skill vào dự án")
-    s.add_argument("--references", default="references", help="thư mục chứa kho skill đã clone")
+    s.add_argument("--references", default="", help="thư mục chứa kho skill (mặc định: cache người dùng)")
+    s.add_argument("--no-fetch", action="store_true",
+                   help="không tự lấy nguồn về; chỉ dùng những gì đã có trên đĩa")
     s.add_argument("--dry-run", action="store_true", help="chỉ in kế hoạch, không ghi")
     s.set_defaults(func=cmd_setup)
 

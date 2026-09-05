@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-sdlc"
+version = "0.1.0"
+description = "Khung SDLC cho agent: đầu vào là docs/requirements.md, đầu ra là code đã qua cổng kiểm"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = []          # toàn bộ khung chạy bằng thư viện chuẩn
+
+[project.scripts]
+aisdlc = "aisdlc.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["aisdlc*"]
+
+[tool.setuptools.package-data]
+# Prompt, luật, skill và script trình duyệt là *dữ liệu chạy*, không phải tài
+# liệu: thiếu chúng thì `aisdlc run` chết ở lần gọi agent đầu tiên.
+"aisdlc" = ["kit/prompts/*", "kit/rules/*", "kit/skills/**/*", "kit/*.json", "harness/assets/*"]
