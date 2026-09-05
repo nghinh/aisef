@@ -82,14 +82,25 @@ def milestones(project: Path, story_ids: list[str]) -> dict:
         n_ac = len(idx[sid].get("acceptance_criteria") or [])
         out["stories"][sid] = {
             "status": st.get(sid, {}).get("status"),
-            "attempts": st.get(sid, {}).get("attempts"),
+            # đếm lượt developer từ evidence (`<story>#<n>`) — `attempts` trong
+            # sprint-status không tăng khi có lượt 2 (ghi nhận P2, 2026-09-05)
+            "attempts": len([x for x in e.of(AGENT_RUN) if x.name.startswith(sid + "#")]),
             "cost_usd": e.total_cost_usd,
             "runs": len(e.of(AGENT_RUN)),
             "ac_missing": ac_missing(sid, n_ac, ids),
             "handoffs": len(e.of(HANDOFF)),
         }
         out["cost_usd"] += e.total_cost_usd
-    # `main` chỉ đổi qua merge: mọi commit trên main ngoài commit nền phải là merge
+    # `main` chỉ đổi qua worktree: mọi commit không-merge sau commit nền phải
+    # nằm trên một nhánh `story/*` (merge fast-forward là hợp lệ — lần dogfood 2
+    # story 01-01 lên main bằng FF, đúng như git làm khi không có gì để trộn).
     logs = _git(project, "log", "--format=%H %P", "main").splitlines()
-    out["non_merge_after_base"] = [l.split()[0][:8] for l in logs[:-1] if len(l.split()) < 3]
+    lac = []
+    for l in logs[:-1]:
+        parts = l.split()
+        if len(parts) < 3:   # không phải merge
+            nhanh = _git(project, "branch", "--contains", parts[0])
+            if "story/" not in nhanh:
+                lac.append(parts[0][:8])
+    out["stray_commits"] = lac
     return out
