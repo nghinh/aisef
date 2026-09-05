@@ -78,6 +78,9 @@ class Worktree:
     story_id: str
     path: Path
     branch: str
+    #: Nhánh chính đã được mang vào lúc nối lại, hoặc "" nếu không cần.
+    #: Ghi ra để người đọc biết worktree này đứng trên nền nào.
+    refreshed_from: str = ""
 
 
 @dataclass
@@ -116,21 +119,76 @@ class WorktreeManager:
         return f"{BRANCH_PREFIX}{safe_slug(story_id)}"
 
     def create(self, story_id: str, *, base: str | None = None) -> Worktree:
-        """Tạo worktree cho story. Idempotent: đã có thì trả về cái đang có."""
+        """Tạo worktree cho story. Idempotent: đã có thì trả về cái đang có.
+
+        Nhánh có sẵn thì **mang nhánh chính vào trước khi giao cho agent**.
+        Không làm thế thì story chạy lại vẫn đứng trên trunk lúc nó rẽ ra:
+        bản sửa cấu hình, bản vá công cụ, và công việc của story đã merge
+        ở đợt trước đều không tới nơi. Đo trên dự án `par`:
+        `story/STORY-01-01` rẽ từ `e0a6b4e`, bản vá lệnh test nằm ở
+        `963dae3`, và story trượt vì đúng cái lỗi đã được sửa trên main.
+
+        Merge chứ không rebase: rebase viết lại lịch sử agent đã commit,
+        và conflict giữa chừng một chuỗi commit thì không ai gỡ nổi.
+        """
         path, branch = self.path_for(story_id), self.branch_for(story_id)
         if path.exists():
             return Worktree(story_id, path, branch)
 
         self._ensure_root()
+        co_san = self._branch_exists(branch)
         args = ["worktree", "add", "-q"]
-        if self._branch_exists(branch):
+        if co_san:
             args += [str(path), branch]  # nhánh có sẵn — nối lại, không tạo mới
         else:
             args += [str(path), "-b", branch]
             if base:
                 args.append(base)
         _git(self.repo, *args)
-        return Worktree(story_id, path, branch)
+
+        # Tính trước rồi mới dựng: `Worktree` là bất biến, và giữ nó bất
+        # biến đáng hơn một dòng ngắn.
+        mang_vao = self.refresh(story_id, base=base) if co_san else ""
+        return Worktree(story_id, path, branch, refreshed_from=mang_vao)
+
+    def refresh(self, story_id: str, *, base: str | None = None) -> str:
+        """Mang nhánh chính vào nhánh story. Trả tên nhánh nguồn, hoặc "".
+
+        Conflict thì abort và **ném lỗi**: story đứng trên trunk cũ mà cứ
+        chạy tiếp là làm việc trên nền sai, và giấu chuyện đó đi thì lỗi
+        chỉ hiện ra ở lần merge cuối đợt, xa chỗ gây ra nó.
+        """
+        path = self.path_for(story_id)
+        goc = base or self._current_branch()
+        if not goc or not path.is_dir():
+            return ""
+        # Đã chứa đầu nhánh chính rồi thì không cần merge — tránh đẻ ra
+        # một commit merge rỗng mỗi lần chạy lại.
+        dau = _git(self.repo, "rev-parse", goc, check=False).stdout.strip()
+        if dau and _git(
+            path, "merge-base", "--is-ancestor", dau, "HEAD", check=False
+        ).returncode == 0:
+            return ""
+
+        proc = _git(path, "merge", "--no-edit", goc, check=False)
+        if proc.returncode == 0:
+            return goc
+        dung = [
+            l.strip()
+            for l in _git(path, "diff", "--name-only", "--diff-filter=U",
+                          check=False).stdout.splitlines()
+            if l.strip()
+        ]
+        _git(path, "merge", "--abort", check=False)
+        raise GitError(
+            f"{story_id}: không mang được `{goc}` vào nhánh story — đụng "
+            f"{', '.join(dung[:5]) or 'không rõ file'}. Nhánh story đã rẽ quá "
+            f"xa; gỡ nhánh rồi chạy lại, hoặc hợp nhất bằng tay."
+        )
+
+    def _current_branch(self) -> str:
+        out = _git(self.repo, "rev-parse", "--abbrev-ref", "HEAD", check=False).stdout.strip()
+        return "" if out in ("", "HEAD") else out
 
     def remove(self, story_id: str, *, delete_branch: bool = False) -> None:
         """Gỡ worktree. Không xoá nhánh trừ khi được yêu cầu — công việc

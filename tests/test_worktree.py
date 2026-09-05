@@ -205,3 +205,60 @@ class TestCommitStory(WorktreeTestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestNhanhStoryKhongBiCu(WorktreeTestCase):
+    """Nối lại nhánh có sẵn phải mang nhánh chính vào trước.
+
+    Lỗi 38, đo trên dự án `par`: chạy lại sau khi sửa `.ai/config.json` và
+    `package.json` trên main, `create` nối lại nhánh story cũ nên bản sửa
+    không tới worktree. Ba story trượt vì đúng cái lỗi đã được vá — mất
+    $9,56 và một vòng chẩn đoán.
+    """
+
+    def tien_main(self, ten="moi.txt", noi_dung="x"):
+        (self.repo / ten).write_text(noi_dung, encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=self.repo, check=True)
+        subprocess.run(["git", "commit", "-qm", f"main: {ten}"], cwd=self.repo, check=True)
+
+    def test_noi_lai_nhanh_cu_thi_mang_main_vao(self):
+        wt = self.wm.create("S-01")
+        (wt.path / "cua-story.txt").write_text("s", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=wt.path, check=True)
+        subprocess.run(["git", "commit", "-qm", "story"], cwd=wt.path, check=True)
+        self.wm.remove("S-01")
+
+        self.tien_main("sua-cau-hinh.txt", "đã sửa")
+        lai = self.wm.create("S-01")
+
+        self.assertTrue((lai.path / "sua-cau-hinh.txt").is_file(),
+                        "bản sửa trên main phải tới được worktree")
+        self.assertTrue((lai.path / "cua-story.txt").is_file(),
+                        "công việc của story không được mất")
+        self.assertTrue(lai.refreshed_from, "phải ghi lại đã mang nhánh nào vào")
+
+    def test_nhanh_moi_khong_can_mang_gi(self):
+        wt = self.wm.create("S-02")
+        self.assertEqual(wt.refreshed_from, "", "nhánh mới đã rẽ từ main rồi")
+
+    def test_khong_de_ra_commit_merge_rong(self):
+        """Chạy lại khi main không tiến thì không được đẻ commit thừa."""
+        self.wm.create("S-03")
+        self.wm.remove("S-03")
+        lai = self.wm.create("S-03")
+        self.assertEqual(lai.refreshed_from, "")
+
+    def test_dung_nhau_thi_bao_chu_khong_chay_tiep(self):
+        """Story đứng trên trunk cũ mà cứ chạy là làm việc trên nền sai;
+        giấu đi thì lỗi chỉ hiện ở lần merge cuối đợt, xa chỗ gây ra."""
+        wt = self.wm.create("S-04")
+        (wt.path / "chung.txt").write_text("bản của story", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=wt.path, check=True)
+        subprocess.run(["git", "commit", "-qm", "story sửa"], cwd=wt.path, check=True)
+        self.wm.remove("S-04")
+
+        self.tien_main("chung.txt", "bản của main")
+        with self.assertRaises(GitError) as e:
+            self.wm.create("S-04")
+        self.assertIn("chung.txt", str(e.exception))
+
