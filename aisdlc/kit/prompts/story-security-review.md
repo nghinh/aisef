@@ -1,6 +1,6 @@
 ---
 name: story-security-review
-version: 2
+version: 3
 role: security
 ---
 # Rà soát bảo mật {{ story_id }} — {{ story_title }}
@@ -28,6 +28,15 @@ Không sửa code. Chỉ báo cáo.
 ## Thay đổi này chạm tới đâu
 
 {{ impact }}
+
+## Hành vi phải giữ · phải xanh ở ứng viên
+
+Cùng danh sách người rà soát nhận, từ sổ hành vi. Mục nào chạm xác thực,
+phân quyền hay dữ liệu người dùng mà diff đi qua thì kiểm nó còn đúng không.
+
+{{ preservation }}
+
+{{ validation }}
 
 ## Tìm gì
 

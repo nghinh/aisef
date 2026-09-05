@@ -85,6 +85,18 @@ Ghi vào `docs/requirements.md`, đánh dấu PRD (cổng `prd` và các cổng 
 thành stale), sinh story delta `STORY-CH-01` với `covers=[FR-3]` — story cũ
 giữ nguyên `DONE`.
 
+```bash
+aisdlc improve --epic EPIC-01 --max-loops 3      # [--auto] không dừng ở cổng người
+```
+
+Vòng cải tiến theo bằng chứng (ADR-004 R3): QA → sổ hành vi → **một** story
+sửa cho một hành vi GAP/REOPENED (`STORY-RP-01` trong `EPIC-RP-01`, sinh bằng
+code) → `run` như story thường → QA → mốc `loops[]` + `LOOP-REPORT-<n>.md`.
+Dừng bằng code: hết gap, đủ `improve.max_loops`, cải thiện biên ≤ 0
+`improve.flat_loops` vòng liền, vượt `improve.cost_cap_usd`, hay story sửa bế
+tắc kế hoạch (trả người kèm lời reviewer). Trước mỗi vòng ≥ 2 cần
+`aisdlc approve improve` trừ `--auto`.
+
 ## Cổng
 
 Tám cổng, mỗi cổng hai lớp. **Cổng máy** chạy trước — nó bắt được thứ máy

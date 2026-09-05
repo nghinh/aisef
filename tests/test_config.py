@@ -44,6 +44,7 @@ class TestDefaults(ConfigTestCase):
             "story.max_write_scope_paths",
             "run.max_parallel", "run.max_turns", "run.timeout_seconds",
             "run.max_retries", "cost.warn_multiple", "security.block_severities",
+            "verify.baseline",
         ):
             self.assertIn(key, c.values, key)
 

@@ -42,6 +42,8 @@ STORY_CTX = {
     "mockup_section": "màn hình danh-sach",
     "tools": "- aisdlc tool test",
     "index": "- STORY-01-01 · done · abc1234 · V3 G0 R0 · evidence/STORY-01-01.jsonl",
+    "preservation": "- `AC-STORY-01-00-1` · STORY-01-00 · test `src/x.test.ts > AC-STORY-01-00-1`",
+    "validation": "- test bảo toàn: `src/x.test.ts > AC-STORY-01-00-1`",
     "skills": "- `x` — dùng khi: y",
     "diff_summary": "3 file đổi",
     "impact": "_Chưa có phân tích ảnh hưởng_",

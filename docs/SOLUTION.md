@@ -164,6 +164,8 @@ Chạy nối tiếp — **máy kiểm trước** để khỏi phí thời gian n
 Điều kiện để chạy được ở mọi nơi: CI không có người trả lời; agent trong phiên chat không thể "đợi"; người duyệt có thể ở **máy khác, lúc khác**.
 
 **Tám cổng:** `prd` → `architecture` → `ux-spec` → `epics` → `stories` → `mockups` → `readiness` → `pre-deploy`
+(cộng cổng `improve` của vòng cải tiến — ADR-004 R3 — đứng **ngoài** thứ tự này: nó lặp mỗi vòng,
+gắn băm mọi `LOOP-REPORT-*.md`, và dự án chưa chạy `improve` không bị nó chặn)
 
 **Hai bảo đảm:**
 1. Phê duyệt gắn với **SHA-256 nội dung**. Sửa artifact → tự thành `stale`.
@@ -190,6 +192,21 @@ phép kiểm mà thuộc bản khác thì không được dùng để chấm, v�
 nhau. Người rà soát và rà soát bảo mật cũng bị so `git rev-parse HEAD` sau
 phiên: đổi ứng viên thì lượt rà soát không được tính (hoàn nguyên cây
 không thấy một `git commit`). Phép hợp quy **C8** đo đúng chuỗi này.
+
+### Baseline trước khi sửa — mục **không làm đỏ test có sẵn** (ADR-004 R9)
+
+Trước phiên developer đầu tiên của một story, harness chạy `tools.test` ở
+HEAD worktree và ghi `tool_run test:baseline` (tên test, `red_before`,
+`parent`; **không** có `candidate` vì ứng viên chưa đóng băng). Sau khi
+đóng băng, cổng so tên test xanh ở baseline với lần test mới nhất mang
+đúng `candidate`: xanh trước mà đỏ hoặc **mất** sau là ✗ nêu đúng tên —
+test mới của story đang đỏ (TDD) không tính, test đã đỏ sẵn không tính và
+được nói ra. Không so được thì kết cục theo bất biến: chưa khai lệnh /
+reporter không in tên → ○, không chạy được → ⚠, tắt bởi `verify.baseline`
+→ –. Chạy một lần mỗi story, không mỗi lượt: lấy ứng viên lượt trước làm
+mốc thì test lượt trước vừa làm đỏ thành "đỏ sẵn" và lượt sau xoá nó là qua
+cổng sạch. Ghi dưới tên riêng, không phải `test`, để guard `completion`,
+TDD và sổ hành vi không đọc nhầm nó thành lần test của lượt.
 
 ---
 
@@ -338,6 +355,16 @@ aisdlc verify  [--write-scope ...] [--story S] hậu kiểm guard trên cây là
 
 # Bước 5 — kiểm định
 aisdlc qa      [--only <loại>] [--story S] [--story-level]
+
+# Vòng cải tiến epic theo bằng chứng (ADR-004 R3) — sau khi epic đã chạy
+aisdlc improve --epic E [--max-loops N] [--auto] [--client c] [--force]
+        QA cấp dự án → sổ hành vi → **một** story sửa cho một GAP/REOPENED
+        (STORY-RP-nn trong EPIC-RP-<E>, sinh bằng code) → `run` (worktree, cổng,
+        reviewer ≠ developer) → QA → mốc `loops[]` + LOOP-REPORT-<n>.md → vòng sau.
+        Dừng bằng code: hết gap · đủ improve.max_loops · biên ≤ 0 improve.flat_loops
+        vòng liền · vượt improve.cost_cap_usd · bế tắc kế hoạch (trả người).
+        Cổng người `improve` trước mỗi vòng ≥ 2 (aisdlc review/approve improve) trừ --auto.
+        Không daemon: chạy lại tiếp từ mốc cuối trong sổ.
 
 # Bước 6 — giao hàng
 aisdlc devsecops [--bin PATH] [--force]        CI (code) + Dockerfile/IaC/runbook (model)
@@ -526,7 +553,11 @@ Không để chữ "ngưỡng" chung chung. Mặc định trong `.ai/config.json
 | `story.max_screen_states` | 8 | Tổng trạng thái màn hình (EXPERIENCE.md) một story phải dựng. Vượt → cổng `stories` chặn với chỉ dẫn chẻ; `run` từ chối. Đo 2026-09-05 e9: 11 và 18 trạng thái đều chạm `max_turns` lượt đầu, 4–8 lượt |
 | `story.max_complexity` | `16.0` | **Điểm cỡ story** tổng hợp (ADR-004 R5, `control/complexity.py`): trạng thái màn hình ×1 + tiêu chí ×1 + đường dẫn write_scope ×0,5 (không tính manifest/lockfile) + fan-in phụ thuộc ×1 + story láng giềng có hành vi VERIFIED bị chạm ×0 (ledger; chỉ ghi để hiệu chuẩn, chưa tính điểm — ADR-004 §6 R5). Vượt **hoặc** vượt `max_screen_states` → cổng `stories` chặn kèm gợi ý chẻ tất định, `run` từ chối trước khi gọi model; story đã xong bỏ qua. Hiệu chuẩn B4 hồi cứu 23 story thật: Spearman(điểm, lượt developer lượt đầu) = 0,88; 16 tách e9 01-04 (23,5) và 01-05 (18,0) khỏi 01-03 (6,5) và `par` (3,0). `run` tự ghi `_bmad-output/complexity.json` sau mỗi story và `aisdlc doctor` cảnh báo khi ngưỡng lệch dữ liệu |
 | ~~`story.max_context_tokens`~~ | — | **gỡ 2026-09-05**: chưa từng có mã đọc. Thay bằng `prompt_chars` ghi vào evidence mỗi lượt gọi model; `aisdlc status` cảnh báo story nạp > 3× trung vị |
+| `improve.max_loops` | `3` | số vòng `aisdlc improve` tối đa cho một epic, đếm từ `loops[]` của sổ hành vi (chạy lại không đếm lại từ 0). HoH chạy 70 vòng không có điều kiện dừng; ở đây trần là code (ADR-004 R3) |
+| `improve.flat_loops` | `2` | dừng khi cải thiện biên Δverified − Δreopened (hai mốc `loops[]` liên tiếp) ≤ 0 chừng này vòng liền — vòng sau nhận cùng gap, cùng ngữ cảnh, sẽ cho cùng kết quả |
+| `improve.cost_cap_usd` | `0` | trần tổng chi phí các vòng của epic, đọc từ bằng chứng story sửa; `0` = không giới hạn |
 | `context.max_index_chars` | `2000` | trần ký tự cho slot `index` — lát cắt chỉ mục bằng chứng của epic nạp vào prompt developer. Chỉ mục, **không** phải lịch sử: agent cần chi tiết thì gọi `aisdlc evidence <id>` (ADR-004 R6). e9 EPIC-01 đo được 497 ký tự |
+| `context.max_preservation_chars` | `1500` | trần ký tự cho hai slot R4 `preservation` (hành vi VERIFIED của story khác mà story này chạm tệp: id · story · nguồn kiểm) và `validation` (thứ harness chạy lại ở ứng viên). Cắt chỉ cắt phần **in ra**; cổng "bảo toàn" vẫn chấm đủ danh sách — không kiểm được là UNRUNNABLE, đỏ là FAILED và sổ ghi REOPENED (ADR-004 R4). Đo trên test giả: hai slot +212 ký tự, prompt developer +13,2 % (ADR-004 §6 R4) |
 | `run.max_parallel` | `3` | số story song song trong một đợt |
 | `run.max_turns` | `40` | vòng lặp tối đa của một phiên story |
 | `run.timeout_seconds` | `1800` | 30 phút cho một story |
@@ -541,6 +572,7 @@ Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏn
 | `tools.test` · `tools.lint` · `tools.sast` | `""` (tự dò) | lệnh là quyết định của dự án; rỗng thì dò từ file có thật |
 | `verify.*` (10 loại) | `""` | rỗng nghĩa là **chưa cấu hình**, không phải "đạt" |
 | `verify.waived` | `""` | miễn phải là quyết định có người ký, không phải hệ quả của việc quên |
+| `verify.baseline` | `true` | chạy bộ test ở candidate cha **trước** phiên developer đầu tiên của story (ADR-004 R9) để cổng "không làm đỏ test có sẵn" so được tên test; tắt khi bộ test quá chậm — tắt thì mục cổng là – "tắt bởi cấu hình", không phải đạt |
 | `sandbox.image` | `""` (theo stack) | `alpine` trơn không có công cụ nào; test đỏ vì thiếu công cụ chứ không vì code sai |
 | `sandbox.tools_network` | `false` | dự án cần cài phụ thuộc mới mở mạng, và phải khai tường minh |
 | `sandbox.use_docker` | `true` | tắt được cho toolchain gắn với máy chủ, nhưng luôn ghi `degraded` |

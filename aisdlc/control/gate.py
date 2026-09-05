@@ -13,7 +13,12 @@ Năm điều kiện, mỗi điều kiện trả lời được bằng dữ liệ
 3. thay đổi nằm trong ``write_scope``;
 4. màn hình khớp hợp đồng thị giác (chỉ story có giao diện);
 5. rà soát độc lập không còn mục chặn;
-6. không có test giả — test không khẳng định gì làm điều kiện 1 rỗng nghĩa.
+6. không có test giả — test không khẳng định gì làm điều kiện 1 rỗng nghĩa;
+7. bảo toàn (ADR-004 R4) — hành vi VERIFIED của story khác mà story này
+   chạm tệp vẫn xanh ở đúng ứng viên; không kiểm được thì nói là không
+   kiểm được, không nói là đạt.
+8. không làm đỏ test có sẵn — test xanh ở baseline (trước khi story chạm
+   vào) phải còn xanh và còn tồn tại ở ứng viên (ADR-004 R9).
 """
 
 from __future__ import annotations
@@ -21,11 +26,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from ..harness.guardrails import check_completion, check_diff_scope
-from .acceptance import ac_code, missing as ac_missing
+from .acceptance import ac_code, coverage as ac_coverage, missing as ac_missing
 from .outcome import Check, Outcome
 from .tdd import red_before_green
 from .security import DEFAULT_BLOCKING
 from ..harness.observe import MOCKUP_MAP, TOOL_RUN, Evidence
+from ..harness.testlog import MAX_IDS
+from ..harness.tools import BASELINE_RUN
 
 
 @dataclass
@@ -66,6 +73,88 @@ def _stale_candidates(evidence: Evidence, candidate: str) -> list[str]:
     return sorted({s for s in moi_nhat.values() if s != candidate})
 
 
+def _ten(tests: list[str], n: int = 5) -> str:
+    return ", ".join(tests[:n]) + (f" (+{len(tests) - n})" if len(tests) > n else "")
+
+
+def _baseline_check(evidence: Evidence, candidate: str) -> Check:
+    """Mục "không làm đỏ test có sẵn" (ADR-004 R9).
+
+    Mục "test" chỉ nói lần chạy cuối xanh hay đỏ. Đỏ vì test **mới** của
+    story (TDD, đang đỏ đúng nghĩa) và đỏ vì test **có sẵn** vừa bị làm hỏng
+    trông y hệt nhau ở đó — mà cách sửa khác nhau, và cái thứ hai là hồi quy
+    cần gọi đúng tên. Nên so hai danh sách tên: test xanh ở baseline (harness
+    chạy trước phiên developer, `test:baseline`) với lần test mới nhất ở ứng
+    viên. Xanh trước mà đỏ hoặc mất sau → hồi quy, nêu tên. Test đã đỏ sẵn ở
+    baseline không tính — nói ra là không tính.
+
+    Kết cục theo đúng bất biến: không có baseline vì **chưa khai lệnh test**
+    hay reporter **không in tên** là chưa cấu hình (không đạt, không chặn,
+    phải hiện ra); baseline **không chạy được** (công cụ chưa cài) là không
+    chạy được (chặn với lý do môi trường, không phải "story làm đỏ"); tắt
+    bởi `verify.baseline` hay harness không ghi baseline nào là không áp
+    dụng, có nói lý do. Test **mất** là hồi quy: xoá hay đổi tên test có sẵn
+    phải là quyết định khai trong story, mà story chưa có chỗ khai — không
+    suy được thì không cho qua, và nói rõ vì sao.
+    """
+    ten = "không làm đỏ test có sẵn"
+    goc = evidence.last(TOOL_RUN, BASELINE_RUN)
+    if goc is None:
+        return Check(ten, Outcome.NOT_APPLICABLE,
+                     "harness không ghi baseline nào (chạy tay, nhật ký cũ) — không so được")
+    if goc.detail.get("disabled"):
+        return Check(ten, Outcome.NOT_APPLICABLE, "tắt bởi cấu hình `verify.baseline`")
+    if goc.detail.get("skipped"):
+        return Check(ten, Outcome.UNCONFIGURED, f"không có baseline: {goc.detail['skipped']}")
+    if goc.detail.get("unrunnable"):
+        return Check(ten, Outcome.UNRUNNABLE,
+                     f"baseline không chạy được ({goc.detail['unrunnable']}) — không so được test có sẵn")
+    if not goc.detail.get("test_format"):
+        return Check(ten, Outcome.UNCONFIGURED, str(goc.detail.get("test_note") or "")
+                     or "không đọc được tên test ở baseline — dùng reporter in tên "
+                        "(`node --test`, `vitest --reporter=verbose`, `pytest -v`)")
+
+    # Lần test ở ứng viên: sau baseline, và đúng bản đang chấm (có candidate
+    # thì không nhận lần chạy tay không khai bản).
+    sau = [e for e in evidence.of(TOOL_RUN, "test")
+           if e.seq > goc.seq and (not candidate or e.detail.get("candidate") == candidate)]
+    if not sau:
+        return Check(ten, False, "chưa có lần test nào ở ứng viên sau baseline — không so được")
+    moi = sau[-1]
+    if moi.detail.get("unrunnable"):
+        return Check(ten, Outcome.UNRUNNABLE,
+                     f"lần test ở ứng viên không chạy được ({moi.detail['unrunnable']}) — không so được")
+    if not moi.detail.get("test_format"):
+        return Check(ten, Outcome.UNCONFIGURED, str(moi.detail.get("test_note") or "")
+                     or "không đọc được tên test ở ứng viên — dùng reporter in tên")
+
+    goc_ids = list(goc.detail.get("test_ids") or [])
+    khong_xanh = set(goc.detail.get("failed_ids") or []) | set(goc.detail.get("skipped_ids") or [])
+    xanh_goc = [t for t in goc_ids if t not in khong_xanh]
+    do = set(moi.detail.get("failed_ids") or [])
+    con = set(moi.detail.get("test_ids") or [])
+    lam_do = [t for t in xanh_goc if t in do]
+    # ponytail: testlog cắt danh sách ở MAX_IDS — bộ test lớn hơn thế thì
+    # "mất" không kết luận được (tên có thể nằm ngoài phần cắt), chỉ so đỏ.
+    cat = len(goc_ids) >= MAX_IDS or len(con) >= MAX_IDS
+    mat = [] if cat else [t for t in xanh_goc if t not in con]
+    if lam_do or mat:
+        loi = []
+        if lam_do:
+            loi.append(f"làm đỏ {len(lam_do)} test xanh ở baseline: {_ten(lam_do)}")
+        if mat:
+            loi.append(f"mất {len(mat)} test có ở baseline: {_ten(mat)} — xoá hay đổi tên "
+                       "test có sẵn phải là quyết định khai trong story; bằng chứng không "
+                       "suy được nên tính là hồi quy")
+        return Check(ten, False, "; ".join(loi))
+    do_san = list(goc.detail.get("red_before") or goc.detail.get("failed_ids") or [])
+    if do_san:
+        return Check(ten, True, f"{len(do_san)} test đã đỏ sẵn ở baseline, không tính: {_ten(do_san)}")
+    if cat:
+        return Check(ten, True, f"danh sách test bị cắt ở {MAX_IDS} tên — chỉ so được test đỏ, không so được test mất")
+    return Check(ten, True)
+
+
 def evaluate(
     story_id: str,
     evidence: Evidence,
@@ -83,6 +172,7 @@ def evaluate(
     coverage_min: float | None = None,
     added_tests: list[str] | None = None,
     candidate: str = "",
+    preservation: list[dict] | None = None,
 ) -> StoryGate:
     """Chấm một story từ bằng chứng đã ghi.
 
@@ -90,6 +180,10 @@ def evaluate(
     bằng chứng ghi ở bản khác **không được dùng để chấm**, và cổng nói ra
     điều đó thay vì im lặng chấm bằng số liệu của mã đã không còn. Rỗng =
     không kiểm (chạy tay, nhật ký cũ).
+
+    ``preservation`` là hành vi VERIFIED của story khác mà story này chạm
+    tệp (ADR-004 R4, `implement.preservation_items`). Rỗng = không áp dụng,
+    nên chỗ gọi cũ không đổi kết cục.
     """
     gate = StoryGate(story_id=story_id)
 
@@ -138,6 +232,7 @@ def evaluate(
         gate.checks.append(Check("test", Outcome.UNRUNNABLE, str(last_test.detail["unrunnable"])))
     else:
         gate.checks.append(Check("test", completion.allowed, completion.reason.split("\n")[0]))
+    gate.checks.append(_baseline_check(evidence, candidate))
 
     lint = evidence.last(TOOL_RUN, "lint")
     if lint is None:
@@ -288,4 +383,79 @@ def evaluate(
             )
         )
 
+    gate.checks.append(_preservation_check(evidence, preservation or [], candidate))
     return gate
+
+
+def _preservation_check(evidence: Evidence, preservation: list[dict], candidate: str) -> Check:
+    """Mục "bảo toàn" (ADR-004 R4): hành vi VERIFIED của story khác mà story
+    này chạm tệp phải **còn xanh ở đúng ứng viên này**.
+
+    Ba kết cục, không có kết cục thứ tư. Đỏ → FAILED; sổ hành vi tự suy
+    REOPENED (`regressed_by` = story này) từ chính bằng chứng cổng đang đọc,
+    nên không ghi tay lần hai. Không có bằng chứng ở ứng viên — test không
+    mang mã, `qa` bỏ qua, màn chưa đối chiếu — → UNRUNNABLE: "không kiểm
+    được" không phải "đạt". Còn lại → PASSED.
+
+    Bằng chứng phải **mang đúng SHA**: sự kiện không khai bản (`for_candidate`
+    giữ lại) không được dùng ở đây, vì mục này hỏi đúng câu "bản này có làm
+    hỏng không", và một lần chạy không rõ bản nào không trả lời được.
+    """
+    if not preservation:
+        return Check("bảo toàn", Outcome.NOT_APPLICABLE,
+                     "story không chạm hành vi VERIFIED nào của story khác")
+
+    def at_candidate(kind: str, name: str):
+        runs = [e for e in evidence.of(kind, name)
+                if not candidate or str(e.detail.get("candidate") or "") == candidate]
+        return runs[-1] if runs else None
+
+    test = at_candidate(TOOL_RUN, "test")
+    ids = ([str(t) for t in test.detail.get("test_ids") or []]
+           if test is not None and test.detail.get("test_format") else [])
+    failed = {str(t) for t in test.detail.get("failed_ids") or []} if test is not None else set()
+
+    do, thieu = [], []
+    for it in preservation:
+        bid, kind, owner = str(it.get("id") or ""), str(it.get("kind") or ""), str(it.get("story") or "")
+        if kind == "ac":
+            i = int(bid.rsplit("-", 1)[-1]) if bid.rsplit("-", 1)[-1].isdigit() else 0
+            tests = ac_coverage(owner, i, ids).get(i, []) if i else []
+        elif kind in ("fr", "nfr"):
+            # Yêu cầu xanh khi tiêu chí của story sở hữu xanh — cùng luật với sổ.
+            tests = [t for t in ids if f"AC-{owner}-" in t.replace("_", "-")]
+        elif kind == "qa":
+            ran = at_candidate(TOOL_RUN, bid)
+            if ran is None or ran.detail.get("skipped"):
+                thieu.append(bid)
+            elif not ran.ok:
+                do.append(bid)
+            continue
+        elif kind == "mockup":
+            m = at_candidate(MOCKUP_MAP, bid.split(":", 1)[-1])
+            if m is None:
+                thieu.append(bid)
+            elif not m.ok:
+                do.append(bid)
+            continue
+        else:
+            thieu.append(bid)
+            continue
+        if not tests:
+            thieu.append(bid)
+            continue
+        red = [t for t in tests if t in failed]
+        if red:
+            do.append(f"{bid} ({red[0]})")
+
+    if do:
+        return Check("bảo toàn", Outcome.FAILED,
+                     f"hồi quy: {', '.join(do[:3])}{'…' if len(do) > 3 else ''} — hành vi đã "
+                     "VERIFIED của story khác đỏ ở ứng viên này; sửa code cho nó xanh lại, "
+                     "không sửa test của nó")
+    if thieu:
+        return Check("bảo toàn", Outcome.UNRUNNABLE,
+                     f"chưa kiểm được ở ứng viên {candidate[:7] or 'này'}: "
+                     f"{', '.join(thieu[:3])}{'…' if len(thieu) > 3 else ''} — không có test "
+                     "mang mã / kiểm định bỏ qua / màn chưa đối chiếu; không kiểm được không phải đạt")
+    return Check("bảo toàn", True, f"{len(preservation)} hành vi của story khác còn xanh")

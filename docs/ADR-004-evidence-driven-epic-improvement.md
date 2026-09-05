@@ -1,6 +1,6 @@
 # ADR-004 — Cải tiến liên tục theo bằng chứng ở cấp epic (đối chiếu Harness-of-Harness)
 
-**Trạng thái:** PROPOSED, trừ **R2 · R5 · R6 · R7 = ACCEPTED** (2026-09-05, số đo §6: B0 và B4 hồi cứu trên evidence thật của e9 và `par`, 0 agent). **R1 · R8** hiện thực, unit xanh, chờ đo trên agent thật (§6). R3 · R4 · R9 chưa hiện thực. Ngày 2026-09-05.
+**Trạng thái:** PROPOSED, trừ **R2 · R5 · R6 · R7 = ACCEPTED** (2026-09-05, số đo §6: B0 và B4 hồi cứu trên evidence thật của e9 và `par`, 0 agent). **R1 · R3 · R4 · R8 · R9** hiện thực, unit xanh, chờ đo trên agent thật (§6). Ngày 2026-09-06.
 **Nguồn đối chiếu:** paper *Harness-of-Harness: Multi-Day Autonomous Software Development with Continual Improvement* (arXiv 2609.01481v1, Shanghai AI Lab) và repo `Flesymeb/HarnessOfHarness` — repo tại thời điểm đọc chỉ có README + tài sản trình diễn (58 commit, MIT, "HoH-lite sẽ công bố"), **không có mã**; mọi cơ chế dưới đây lấy từ paper.
 **Ràng buộc giữ nguyên:** sáu nhóm harness hiện có, evidence-first, reviewer ≠ developer, bảo đảm phía harness, worktree cách ly, cổng người, CLI gọi-một-lần/không daemon, không tin client. Không dùng HoH làm runtime. Không tự sửa framework: mọi thay đổi vẫn qua test, benchmark, ADR/evidence và cổng người/phát hành.
 
@@ -97,6 +97,7 @@ Ký hiệu: **P0** = nền tảng, làm trước và đo; **P1** = tạo giá tr
 **R10 — Planner agent cho story sửa** (chỉ khi R3 đo được gain nhưng story sinh bằng code quá thô): agent viết lại tiêu đề/tiêu chí story sửa từ gap + preservation, vẫn qua cổng `stories` và cổng cỡ.
 **R11 — Vòng cấp dự án nhiều epic** (T vòng qua nhiều epic) — sau khi R3 ổn trên một epic.
 **R12 — Xuất issue table** (GitHub Issues/CSV) từ ledger — tiện theo dõi, không ảnh hưởng cổng.
+**R13 — Lượt kiểm-lại trên ứng viên đã đóng băng** (`aisdlc run --story S --verify-only`): không mở phiên developer; ứng viên = HEAD nhánh story; chạy lại đúng các phép kiểm có bằng chứng ✗/thiếu ở ứng viên ấy (rà soát/bảo mật đã ✅ ở cùng SHA thì giữ, theo luật stale của R1). Cần vì: e9 STORY-01-07 2026-09-06 trượt lượt 3 chỉ vì e2e nhạy tải máy, ứng viên `a60612e` đo lại 10/10 xanh (§6). Không nới cổng: vẫn chấm đủ, chỉ không trả tiền cho việc dựng lại mã đã có.
 
 ---
 
@@ -258,6 +259,19 @@ cảnh báo, Spearman) + `tests/test_run.py` 2 phép (chặn ở `run`, bảng h
 chuẩn được ghi sau khi story xong). Bộ đầy đủ: **1 256 test, OK**
 (skipped 56).
 
+**R1 · R8 — đo trên agent thật, e9 STORY-01-07 chạy lại 2026-09-06 01:03–02:14 (Claude, $28,76, 3 lượt thử).**
+
+| lượt | developer | ứng viên | review (lượt · $) | JSON review | security (lượt · $) | JSON security | kết cục cổng |
+|---|---|---|---|---|---|---|---|
+| 1 | 47 lượt · $4,43 | `689af33` | 32 · $4,27 | có, `block` | 6 · $0,79 | có, `pass` | ✗ rà soát |
+| 2 | 57 · $5,53 | `37ec429` | 44 · $5,82 | có, `block` | 9 · $1,12 | có, `pass` | ✗ rà soát |
+| 3 | 25 · $2,60 | `a60612e` | 18 · $2,83 | có, `pass` | 8 · $1,37 | có, `pass` | ✗ e2e |
+
+* R1: nhật ký có `changes.detected → candidate.frozen` mỗi lượt, mọi bằng chứng sau phiên developer (lint, test, `qa:*`, mockup_map, rà soát, bảo mật) mang đúng SHA của lượt; mục "bằng chứng đúng candidate" ✅ ở cả 3 lượt; không lượt rà soát nào bị huỷ vì đổi HEAD. Không có phiên agent nào thêm — AC (d) "không tăng lượt/chi phí" **đạt** trên story này (chi phí thêm = 3 lần `git commit`).
+* R8 / B7: 6/6 phiên rà soát trả khối JSON đúng schema ngay lượt đầu, **0** lần hỏi lại (`review:no-schema`/`*-retry` không xuất hiện); 0 `review:mismatch` — bản văn bản và bản máy đọc khớp theo khoá (thẻ, tệp). Chi phí thêm của R8 trên agent thật = 0 lượt.
+* Kết cục story: **trượt** sau 3 lượt (`run.max_retries` = 2). Lượt 3 rà soát ✅, bảo mật ✅, chỉ e2e ✗ ở `tests/e2e/autosave.spec.ts:210` ("Đã lưu đứng ít nhất 800 ms", test của STORY-01-06). Đo lại ngay sau đó trên đúng ứng viên `a60612e` (worktree tách riêng, cùng node_modules, load 17): **10/10 e2e xanh, 15,3 s**. Lúc cổng chạy, máy đang gánh ba bộ test đầy đủ của ba luồng ADR-004 + Docker (load 40–150). Kết luận: trượt vì môi trường đo, không vì mã; harness chấm đúng theo bằng chứng nó có, và bằng chứng ấy đúng cho thời điểm ấy.
+* Điều thiếu lộ ra (ghi thành P2 R13 ở §2): **không có cách chạy lại phép kiểm trên ứng viên đã đóng băng** mà không mở phiên developer mới — R1 đã làm cho việc ấy có nghĩa (bằng chứng rà soát ở `a60612e` vẫn hợp lệ), nhưng `aisdlc run` chỉ biết "lượt mới = developer mới". Giá của khoảng trống này hôm nay: một lượt developer nữa (~$10–15) để dựng lại thứ đã có.
+
 **R8 — schema bắt buộc + retry cho đầu ra rà soát: hiện thực, unit xanh,
 chưa đo trên `par`.** (2026-09-05)
 
@@ -290,6 +304,236 @@ chưa đo trên `par`.** (2026-09-05)
   không trả JSON nên trong unit mỗi vai rà soát tốn thêm đúng 1 lượt —
   đúng thiết kế; agent thật đọc prompt mới phải không cần lượt ấy, và đó
   chính là thứ B7 phải chứng minh trước khi R8 chuyển ACCEPTED.
+
+### R4 — Preservation / Validation trong gói bàn giao + cổng "bảo toàn" (2026-09-06, unit + mutation trên client giả, 0 agent)
+
+**Hiện thực.** `implement.build_context` thêm hai slot nguồn `ledger`:
+
+* `preservation` = hành vi VERIFIED của **story khác** mà `write_scope` của
+  story chạm tệp — phép giao tệp **tái dùng** `complexity.verified_touched`
+  (R5), không có bản thứ hai. Mỗi dòng: id · story sở hữu · nguồn kiểm
+  (`test_id` / `qa:<kind>` / màn hình, đọc từ `ledger.behaviors[id].source`).
+  Sổ được **chiếu lại từ evidence** mỗi lượt (`ledger.build`, 1,1 s trên
+  e9) chứ không đọc `ledger.json`: tệp ấy chỉ `aisdlc report` làm mới, nên
+  trong một lần `run` qua cả epic story sau sẽ không thấy hành vi story
+  trước vừa xác minh. Danh sách tính **một lần trước phiên developer** và
+  truyền nguyên cho reviewer, security và cổng (`build_context(...,
+  preservation=)`) — tính lại sau phiên thì sổ đã đổi theo bằng chứng của
+  chính lượt ấy và ba vai nói về ba danh sách; test
+  `test_ba_vai_nhan_cung_mot_danh_sach_tu_harness` khoá điều này.
+* `validation` = thứ harness **chạy lại** ở ứng viên: số test bảo toàn
+  (tên đã ở slot trên, không chép lại — e9 01-07 có 27 test id), `qa:<kind>`
+  (hợp đồng story ∪ kiểm định đã xác minh bị chạm), màn hình (story ∪ bị
+  chạm). `validation_targets()` cấp cùng lúc cho slot và cho `run_attempt`
+  (`run_suite(only=…)`, `verify_screens(…)`), nên thứ in cho agent và thứ
+  thật sự chạy là một danh sách.
+* Không thêm slot `targets`: ADR chỉ đòi hai slot; tiêu chí story đã ở
+  `story_contract`, GAP/REOPENED của story đã ở `index` (V/G/R).
+* Knob `context.max_preservation_chars` = 1500, áp cho cả hai slot; **chỉ
+  cắt phần in ra** — cổng vẫn chấm đủ danh sách (test riêng).
+* Cổng `gate.evaluate(preservation=)` thêm mục **bảo toàn**, ba kết cục:
+  test mang mã / `qa:<kind>` / `mockup_map` **ở đúng SHA ứng viên** đỏ →
+  FAILED; không có bằng chứng ở ứng viên (test bị xoá/đổi tên, qa bỏ qua,
+  màn chưa đối chiếu, bằng chứng ở bản khác) → UNRUNNABLE — không kiểm được
+  không phải đạt; còn lại PASSED. Rỗng → NOT_APPLICABLE, chỗ gọi cũ không
+  đổi kết cục. `FR`/`NFR` chấm theo cùng luật với sổ: đỏ khi một tiêu chí
+  của story sở hữu đỏ.
+* **REOPENED không ghi tay.** Cổng đọc đúng `tool_run test` /
+  `qa:<kind>` / `mockup_map` mà `ledger.build()` cũng đọc; nhánh "story
+  khác chỉ bị chấm tiêu chí thực sự thấy test" của `_observe_tests` (R2)
+  suy `REOPENED` với `regressed_by = <story đang chấm>#<lượt>@<sha>` từ chính
+  bằng chứng ấy. Ghi thêm `BEHAVIOR` ở cổng là ghi hai lần cùng một sự thật
+  và tạo chỗ cho hai bản lệch nhau. Mutation test kiểm cả hai đầu: cổng ✗
+  **và** sổ `REOPENED` + `cross_reopens` đúng thủ phạm.
+* Prompt: `story-implement@5`, `story-review@5`, `story-security-review@3`
+  thêm hai mục ngắn. Phát hiện kèm: `_bmad-output/reviews` (harness ghi)
+  chưa nằm trong `HARNESS_OWNED` — lộ khi hai story chạy chung một cây
+  (`--no-isolate`): tệp lời rà soát của story trước thành "ngoài phạm vi
+  ghi" của story sau. Đã thêm.
+
+**Số đo (c) — prompt_chars trước/sau, cùng kịch bản trên client giả**
+(`tests/test_preservation.py`: story A xanh 1 tiêu chí + FR-1 + `qa:fake-tests`,
+story B chạm cùng `src/`; đo bằng `agent_run.prompt_chars` và slot của
+`handoff`; docker tắt để runner giả in tên test `pytest -v`):
+
+| vai | trước (370ea23) | sau | Δ do R4 | Δ % | phần khung prompt | phần slot |
+|---|---|---|---|---|---|---|
+| developer | 4 125 | 4 837 | +544 | **+13,2 %** | +332 | +212 (`preservation` 180 · `validation` 32) |
+| reviewer | 3 702 | 4 091 | +389 | +10,5 % | +177 | +212 |
+| security | 4 017 | 4 328 | +411 | +10,5 % | +199 | +212 |
+
+Δ do R4 = khung + slot, đối chiếu với số đo thô: developer thô +712, trong
+đó 168 là slot `tools` in đường dẫn tuyệt đối `bin/aisdlc` của worktree dài
+hơn kho chính (4 dòng × 42) — không phải R4; security thô +311 vì ở bản
+370ea23 tệp lời rà soát `_bmad-output/reviews/STORY-01-02-review*.md` (đã
+ghi trước phiên bảo mật) lọt vào `diff_summary`/`impact` của chính phiên
+ấy (+100) — lỗi `HARNESS_OWNED` nói trên, nay đã đóng nên số "sau" không
+có phần ấy. Bản nháp đầu là +22 % (validation chép lại từng test id, khung
+dài); rút xuống bằng cách đếm test thay vì liệt kê và rút khung. Trên e9
+(prompt developer ≈ 13,5k) cùng lượng thêm này là ≈ +4 %; với 31 hành vi
+của 01-07 slot chạm trần 1 500 → tối đa ≈ +13,6 %. Test
+`test_hai_slot_moi_khong_qua_15_phan_tram_prompt` giữ ngân sách cho lần
+sửa prompt sau.
+
+**AC (a)** đạt (`test_story_cham_tep_cua_hanh_vi_verified_thi_slot_neu_dung_hanh_vi_va_test_id`):
+slot có đúng `AC-STORY-01-01-1` + `FR-1` kèm test id, không có hành vi của
+chính story. **AC (b)** đạt trên client giả
+(`test_cong_bao_toan_chan_va_so_ghi_reopened_dung_thu_pham`): B ghi đè
+`src/a.py`, test của A đỏ → cổng "bảo toàn" ✗ nêu đúng test, sổ
+`AC-STORY-01-01-1` và `FR-1` REOPENED với `regressed_by = STORY-01-02#1@…`,
+`cross_reopens` = 2; chạy sạch → ✅ và `reopen_events = 0` (nửa "không ✗
+oan" của B3). Cổng unit 7 phép ở `TestCongBaoToan`.
+
+**Chưa đo:** B3 trên `par` với agent thật (mutation có chủ đích và "không
+✗ oan trên chạy sạch" ở dogfood), và (c) trên dogfood/e9 01-05 — cần lượt
+agent, cùng lô với R1 (d) và R8 (B7). Chưa có story nào của e9/`par` có
+`mockup:*`/`qa:e2e` VERIFIED bị story sau chạm, nên nhánh `verify_screens`
+cho màn hình bảo toàn mới chỉ xanh ở unit (`test_qa_va_mockup_theo_cung_ba_ket_cuc`).
+
+### R3 — Vòng cải tiến epic (`phases/improve.py`, `aisdlc improve`) · hiện thực 2026-09-06, unit xanh, **B1 chưa đo**
+
+**Ghép, không thêm pha.** Mỗi vòng: `qa.run_suite` ở HEAD (bằng chứng ghi
+dưới mốc `evidence/loop-<n>.jsonl` — sổ đọc nó, `since = loop-n` đúng
+schema §4, nhưng **không** dựng dòng chỉ mục cho nó) → `ledger.build()` →
+GAP/REOPENED mà story sở hữu thuộc epic (REOPENED trước, rồi theo id) →
+**một** story sửa sinh bằng code → `run.run_epic(EPIC-RP-<E>)` → QA lại →
+`ledger.snapshot("loop-n", cost)` → vòng sau. `run.py`/`implement.py`
+không đổi một dòng; story sửa đi qua đúng tiền kiểm của story thường (cỡ
+R5, năng lực, phạm vi) ở `run_epic`.
+
+**Một story sửa mỗi vòng = một hành vi.** B1 đòi chi phí ≤ 1 story trung
+bình/vòng, và một hành vi là đơn vị nhỏ nhất cổng chấm được. Story sửa
+`STORY-RP-nn` (`control/change.register_story`, cùng cơ chế với
+`STORY-CH-nn`): tiêu đề nêu hành vi + trạng thái + story sở hữu; tiêu chí
+= chính hành vi, **giữ id gốc** trong câu (`AC-STORY-01-04-1 xanh lại: …`)
+và tệp story dặn test phải mang cả mã mới lẫn mã gốc — sổ khớp lại theo
+mã gốc, cổng chấm theo mã mới; `write_scope` = phạm vi story sở hữu +
+`verification_paths`; `verification_contract` = hợp đồng story sở hữu
+(+ `<kind>` với gap `qa:<kind>`, + màn hình với gap `mockup:`);
+`depends_on` rỗng; chỉ mục thêm `repair_of`, `loop`, `preservation`
+(`complexity.verified_touched`, ghi vào tệp story mục "Bảo toàn" — R4 nạp
+vào slot), `source`. Đợt của `EPIC-RP-<E>` chỉ gồm story của vòng này;
+story sửa **chưa xong** của cùng hành vi được chạy lại thay vì đẻ bản sao.
+
+**Điều kiện dừng đọc từ đĩa, không từ bộ nhớ tiến trình** — nên một lần
+gọi chạy tối đa `max_loops` vòng rồi thoát, chạy lại tiếp từ mốc cuối:
+(1) hết gap thuộc epic; (2) số vòng của epic trong `loops[]` ≥
+`improve.max_loops` (đếm **cả** lần gọi trước — gọi lại với cùng
+`--max-loops` không tốn thêm vòng nào); (3) Δverified − Δreopened ≤ 0 trong
+`improve.flat_loops` vòng liền, đọc từ hai mốc liên tiếp; (4) tổng
+`cost_usd` các vòng của epic > `improve.cost_cap_usd` (chi phí = hiệu
+`total_cost_usd` bằng chứng của story sửa trước/sau vòng); (5) `plan_defects`
+trên lời rà soát của story sửa → dừng, `stopped` mang nguyên lời reviewer.
+Cổng người `improve` chặn trước vòng ≥ 2 trừ `--auto`.
+
+**Hai chỗ lệch với phác thảo §2/§4, có số:**
+
+* *Δ tính trên hành vi thuộc epic, không phải toàn sổ.* Bản đầu dùng
+  `Ledger.metrics()` (Δ toàn cục, R7): trên client giả, một vòng **không
+  sửa gì** vẫn ra V+1 vì chính story sửa đẻ thêm hành vi (`AC-STORY-RP-01-1`
+  xanh, `qa:fake-tests` xanh) — điều kiện (3) không bao giờ tới, chỉ còn
+  `max_loops` giữ. Mốc `loops[]` nay ghi thêm `epic`, `epic_verified`,
+  `epic_gap`, `epic_reopened`, `story`, `behavior`; R7 vẫn đọc cột toàn cục.
+  Mốc xuất phát `loop-0` được ghi khi sổ rỗng, khi sổ đã đổi giữa hai lần
+  gọi, hoặc khi mốc cuối thuộc epic khác — để "hai mốc liên tiếp" luôn cùng
+  epic và Δ không gộp việc của story thường chạy giữa chừng.
+* *Cổng `improve` đứng ngoài `GATE_ORDER`.* §4 đặt nó giữa `readiness` và
+  `pre-deploy`; làm thế thì `blocking(pre-deploy)` đòi duyệt `improve` ở
+  mọi dự án chưa từng chạy vòng nào. Nó là `Gate.IMPROVE` trong enum,
+  artifact là mẫu glob `LOOP-REPORT-*.md` (băm gộp mọi báo cáo → vòng mới
+  làm phê duyệt cũ `stale` → duyệt **mỗi** vòng, không duyệt một lần cho
+  cả chuỗi), `blocking()` rỗng, băm tám cổng cũ không đổi (có test).
+
+**Số đo trên client giả** (`tests/test_improve.py`, 22 phép, kho git thật,
+không Docker, ~25 s). Gap xuất phát là loại có thật ở HEAD đã merge — bộ
+test xanh nhưng *chưa có test mang mã* (chính 18 gap của e9); test đỏ trên
+main không tới được vòng này vì cổng story đã chặn trước merge. Kết quả:
+2 GAP → vòng 1 đóng `AC-…-1`, vòng 2 đóng `AC-…-2`, vòng 3 dừng "không còn
+GAP/REOPENED"; mỗi vòng Δ = +1, $1.40 (developer 1,0 + reviewer 0,1 + bảo
+mật 0,1 + hai lượt hỏi lại schema R8 0,2 — từ bằng chứng), `loops[] =
+[loop-0, loop-1, loop-2]`, hai `LOOP-REPORT`; story sửa **qua cổng của nó
+mà không đóng gap** (test chỉ mang mã mới) → Δ toàn sổ dương nhưng Δ epic
+= 0, dừng sau đúng 2 vòng phẳng; story sửa trượt → vòng sau chạy lại chính
+`STORY-RP-01`, chỉ mục không có bản sao; trần $1 → dừng sau vòng 1 ($1.40);
+`[bế tắc]` → dừng sau vòng 1, `stopped` chứa `src/store/db.ts` của
+reviewer, không thử tiếp; không `--auto` → dừng chờ cổng sau vòng 1,
+duyệt rồi gọi lại → vòng 2, báo cáo vòng 2 làm cổng `stale`; gọi lại với
+cùng `max_loops` → 0 vòng; sổ đổi giữa hai lần gọi → mốc `loop-0` mới.
+Bất biến (b): mỗi `STORY-RP-nn` có `worktree.created` + `merge.completed`
+trong nhật ký và `handoff developer→reviewer` trong bằng chứng.
+
+Một điều đo được và **chưa** sửa (thuộc R2, không thuộc R3): bằng chứng
+của một lượt story sửa *trượt cổng* (test xanh trong worktree, reviewer
+chặn) vẫn làm hành vi gốc VERIFIED trong sổ dù code chưa merge — sổ ghi
+"quan sát cuối cùng", không hỏi bản ấy đã lên nhánh chính chưa. R1 có
+`candidate` cho việc này; sổ chưa lọc theo nó.
+  **Đã sửa 2026-09-06** (gộp đợt 2, `control/ledger.py`): sổ đọc nhật ký R1 — ứng viên chỉ *landed* khi giao dịch đóng băng nó kết thúc bằng `attempt.committed`/`merge.completed`; xanh ở ứng viên chưa landed **không** thành VERIFIED (đếm vào `unlanded_green` trong summary, hành vi chưa có thì ghi GAP với lý do), đỏ vẫn tính là hồi quy. Bằng chứng không có nhật ký (QA cấp dự án, mốc vòng) hoặc không khai bản giữ luật cũ. Test: `tests/test_ledger.py::TestUngVienChuaLanded`.
+
+**Chưa đo (B1):** e9 EPIC-01 với agent thật — ΔVERIFIED, REOPENED → 0,
+chi phí/vòng so với story trung bình. Rủi ro đã thấy trước: 18 GAP của e9
+01-01/02/03 cùng một gốc (vitest không in tên test) — story sửa cho
+`AC-STORY-01-01-1` có `write_scope` của 01-01, còn chỗ sửa là cấu hình
+reporter ngoài phạm vi → kỳ vọng dừng ở (5) và trả người; đó là kết cục
+đúng của thiết kế, và là thứ R10 (planner agent) mới nới được.
+
+**R9 — baseline trước khi sửa: hiện thực, unit xanh, chưa đo trên agent
+thật.** (2026-09-06)
+
+* `implement.run_baseline` chạy `tools.test` của dự án ở HEAD worktree
+  **trước phiên developer đầu tiên** và ghi `tool_run test:baseline` với
+  `detail.baseline=True`, `detail.parent` (SHA HEAD lúc chạy, rỗng nếu
+  không đọc được), `detail.red_before` (test đã đỏ sẵn), tên test theo
+  `harness/testlog.py` (thêm `skipped_ids` — bỏ qua không phải xanh) và
+  `duration_ms` của sự kiện. **Không** mang `detail.candidate`: ứng viên
+  chưa đóng băng. Tái dùng `run_tool` + `tools.record` (công khai hoá
+  `_record`, thêm `name`/`extra`), không có đường ghi thứ hai.
+* Hai chỗ **lệch** so với câu chữ §2 R9, cả hai có lý do đo được:
+  1. Tên bản ghi là `test:baseline`, không phải `test` + cờ. Guard
+     `completion`, `tdd.red_before_green`, mục "tiêu chí có test", sổ R2
+     (`_observe_tests` chỉ nhận `name == "test"`) và `report` đều đọc
+     `tool_run test` như "lần test của lượt": một baseline đỏ sẵn (test
+     của story khác đang hỏng) sẽ chặn Stop tới hết lượt (lớp E trong
+     `FAILURE-TAXONOMY`), làm TDD "đỏ trước xanh" đạt oan, và bị sổ quy
+     thành hồi quy do story này gây ra — trước khi nó viết một dòng. Đổi
+     tên thì không chỗ nào phải thêm điều kiện lọc.
+  2. Chạy **một lần mỗi story** (trong `implement_story`, trước vòng lượt),
+     không phải mỗi lượt trong `run_attempt`. Mỗi lượt thì lượt 2 lấy ứng
+     viên lượt 1 làm mốc: test lượt 1 vừa làm đỏ thành "đỏ sẵn", lượt 2
+     xoá nó là qua cổng sạch. Mốc là trạng thái trước khi story chạm vào,
+     và chi phí là +1 lần chạy test mỗi story (B8 nói mỗi lượt — rẻ hơn).
+* Cổng thêm mục **không làm đỏ test có sẵn** (`gate._baseline_check`, ngay
+  sau mục "test"): test xanh ở baseline mà đỏ hoặc **mất** ở lần test mới
+  nhất mang đúng `detail.candidate` → ✗ nêu đúng tên (tối đa 5 tên + số
+  còn lại). Mất test cũng là ✗: story chưa có chỗ khai "xoá test", nên
+  không suy được thì không cho qua và nói rõ vì sao. Kết cục khi không so
+  được, theo bất biến: chưa khai lệnh test hoặc reporter không in tên → ○
+  chưa cấu hình (không đạt, không chặn, phải hiện); baseline hoặc lần test
+  ứng viên **không chạy được** → ⚠ không chạy được (chặn với lý do môi
+  trường); tắt bởi `verify.baseline` hoặc harness không ghi baseline nào
+  (chạy tay, nhật ký cũ) → – không áp dụng, có lý do. Test đỏ sẵn ở
+  baseline: ✅ kèm "n test đã đỏ sẵn, không tính: …". Danh sách bị cắt ở
+  `MAX_IDS` = 500 thì chỉ so đỏ, không kết luận "mất" — nói ra.
+* Hồi quy vào feedback lượt sau qua đường có sẵn: `gate.feedback()` liệt
+  kê mục ✗ kèm `detail`, nên tên test hồi quy nằm trong mục "Lượt trước
+  chưa đạt" của prompt developer lượt kế — có test chứng minh.
+* Knob `verify.baseline` (bool, mặc định `true`) — tắt khi bộ test quá
+  chậm; tắt thì harness vẫn ghi một `test:baseline` mang `disabled` để
+  cổng nói "tắt bởi cấu hình", không im.
+* **Số đo trên test giả** (`tests/test_implement.py::TestBaselineTruocKhiSua`,
+  bộ test giả in dạng `pytest -v` từ một tệp developer giả ghi đè): baseline
+  10 xanh → sau lượt 9 xanh + `test_10` đỏ → cổng ✗ nêu đúng
+  `tests/test_a.py::test_10`, không nêu `test_9`; 10 xanh + `test_11` mới
+  đỏ → mục này ✅, mục "test" ✗ (TDD); baseline 9 xanh + `test_10` đỏ sẵn và
+  vẫn đỏ → ✅, `red_before = [test_10]`; xoá `test_10` → ✗ "mất 1 test";
+  hai lượt thử → đúng 1 `test:baseline` + 2 `test`; tắt knob → 1 lần chạy
+  test thay vì 2, mục cổng –. Cổng: 12 phép ở `tests/test_gate.py`. Bộ
+  đầy đủ: **1 341 test, OK** (skipped 56; 171 phép của gate/implement/
+  testlog/config/candidate chạy 865 s vì mỗi `run_tool` đi qua Docker).
+* **Chưa đo (B8 nửa `par`):** thời gian baseline thật trên `par`/e9 (bộ
+  `node --test` ~1 s, vitest e9 lâu hơn — `duration_ms` đã có chỗ ghi), và
+  liệu tên test hồi quy trong feedback có làm giảm số lượt so với "test
+  đỏ" chung chung hay không. Sổ R2 **cố ý** không đọc `test:baseline`: nó
+  là quan sát về bản cha, đã có trong bằng chứng của story trước.
 
 ### R2 — Sổ hành vi (`control/ledger.py`) · **B0 hồi cứu, 0 agent**
 

@@ -854,3 +854,139 @@ class TestHarnessKhaiGocDuAn(ImplementTestCase):
         self.assertTrue(client.specs, "không có lượt nào")
         for spec in client.specs:
             self.assertEqual(spec.env.get(ENV_PROJECT), str(self.project), spec.env)
+
+
+from aisdlc.control.outcome import Outcome  # noqa: E402
+from aisdlc.harness.guardrails import head_sha  # noqa: E402
+from aisdlc.harness.observe import TOOL_RUN  # noqa: E402
+
+
+class TestBaselineTruocKhiSua(ImplementTestCase):
+    """ADR-004 R9. Harness chạy bộ test **trước** phiên developer và ghi tên
+    test; cổng so với lần test ở ứng viên để gọi đúng tên hồi quy trong lượt.
+
+    "Bộ test" giả là một lệnh in output dạng `pytest -v` từ `src/ket-qua.txt`
+    — tệp mà developer giả ghi đè, nên kết quả đổi theo lượt như test thật.
+    """
+
+    LENH = 'sh -c "cat src/ket-qua.txt; ! grep -q FAILED src/ket-qua.txt"'
+    TEN = "không làm đỏ test có sẵn"
+
+    @staticmethod
+    def ket_qua(xanh, do=()):
+        lines = [f"tests/test_a.py::test_{i} PASSED" for i in xanh]
+        lines += [f"tests/test_a.py::test_{i} FAILED" for i in do]
+        return "\n".join(lines) + "\n"
+
+    def setUp(self):
+        super().setUp()
+        for cmd in (["git", "config", "user.email", "t@t"], ["git", "config", "user.name", "t"]):
+            subprocess.run(cmd, cwd=self.project, check=True)
+        (self.project / "src").mkdir()
+        self.truoc(self.ket_qua(range(1, 11)))
+
+    def truoc(self, text):
+        """Trạng thái **có sẵn** trước khi story chạm vào — đã commit."""
+        (self.project / "src" / "ket-qua.txt").write_text(text, encoding="utf-8")
+        subprocess.run(["git", "add", "src"], cwd=self.project, check=True)
+        subprocess.run(["git", "commit", "-qm", "goc"], cwd=self.project, check=True)
+
+    class DoiKetQua(ScriptedClient):
+        """Developer giả: phiên developer ghi đè kết quả test theo kịch bản."""
+
+        def __init__(self, sau, **kw):
+            super().__init__(writes=(), **kw)
+            self.sau = sau
+
+        def run(self, spec):
+            r = super().run(spec)
+            if spec.env.get(ENV_STORY_ID):
+                (Path(spec.workdir) / "src" / "ket-qua.txt").write_text(self.sau, encoding="utf-8")
+            return r
+
+    def chay(self, sau, **over):
+        cfg = self.config(**{"tools.test": self.LENH, "run.max_retries": 0, **over})
+        return self.implement(self.DoiKetQua(sau), config=cfg)
+
+    def muc(self, out):
+        return next(c for c in out.attempts[-1].gate.checks if c.name == self.TEN)
+
+    def evidence(self):
+        return EvidenceStore(self.artifacts).read(self.story.id)
+
+    def test_baseline_muoi_xanh_sau_luot_chin_xanh_mot_do_thi_neu_dung_ten(self):
+        out = self.chay(self.ket_qua(range(1, 10), do=[10]))
+        self.assertFalse(out.done, out.summary())
+        m = self.muc(out)
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("tests/test_a.py::test_10", m.detail)
+        self.assertNotIn("test_9", m.detail)
+
+    def test_test_moi_do_do_developer_viet_khong_phai_hoi_quy(self):
+        """TDD đỏ đúng nghĩa: mục "test" đỏ, mục này không."""
+        out = self.chay(self.ket_qua(range(1, 11), do=[11]))
+        self.assertIs(self.muc(out).outcome, Outcome.PASSED)
+        self.assertIn("test", [c.name for c in out.attempts[-1].gate.failures])
+
+    def test_do_san_o_baseline_van_do_sau_luot_thi_khong_phai_hoi_quy(self):
+        self.truoc(self.ket_qua(range(1, 10), do=[10]))
+        out = self.chay(self.ket_qua(range(1, 10), do=[10]))
+        m = self.muc(out)
+        self.assertIs(m.outcome, Outcome.PASSED)
+        self.assertIn("test_10", m.detail)
+        goc = self.evidence().last(TOOL_RUN, "test:baseline")
+        self.assertEqual(goc.detail["red_before"], ["tests/test_a.py::test_10"])
+        self.assertTrue(goc.detail["baseline"])
+        self.assertNotIn("candidate", goc.detail, "ứng viên chưa đóng băng lúc chạy baseline")
+        self.assertEqual(goc.detail["parent"], head_sha(self.project))
+
+    def test_mat_test_co_san_la_hoi_quy(self):
+        out = self.chay(self.ket_qua(range(1, 10)))
+        m = self.muc(out)
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("mất 1 test", m.detail)
+        self.assertIn("tests/test_a.py::test_10", m.detail)
+
+    def test_hoi_quy_vao_feedback_luot_sau(self):
+        class Ghi(self.DoiKetQua):
+            prompts: list = []
+
+            def run(self, spec):
+                if spec.env.get(ENV_STORY_ID):
+                    Ghi.prompts.append(spec.prompt)
+                return super().run(spec)
+
+        Ghi.prompts = []
+        cfg = self.config(**{"tools.test": self.LENH, "run.max_retries": 1})
+        self.implement(Ghi(self.ket_qua(range(1, 10), do=[10])), config=cfg)
+        self.assertEqual(len(Ghi.prompts), 2)
+        self.assertIn(self.TEN, Ghi.prompts[1])
+        self.assertIn("tests/test_a.py::test_10", Ghi.prompts[1])
+
+    def test_chi_phi_them_la_mot_lan_chay_test_moi_story(self):
+        """Baseline chạy một lần trước lượt đầu, không mỗi lượt: hai lượt thử
+        → 1 baseline + 2 lần test ứng viên, và thời gian được ghi để đo."""
+        cfg = self.config(**{"tools.test": self.LENH, "run.max_retries": 1})
+        self.implement(self.DoiKetQua(self.ket_qua(range(1, 10), do=[10])), config=cfg)
+        ev = self.evidence()
+        self.assertEqual(len(ev.of(TOOL_RUN, "test:baseline")), 1)
+        self.assertEqual(len(ev.of(TOOL_RUN, "test")), 2)
+        self.assertGreaterEqual(ev.last(TOOL_RUN, "test:baseline").duration_ms, 0)
+
+    def test_tat_bang_cau_hinh_thi_khong_chay_va_cong_noi_ro(self):
+        lenh = 'sh -c "echo 1 >> src/dem.txt; cat src/ket-qua.txt"'
+        out = self.chay(self.ket_qua(range(1, 11)),
+                        **{"tools.test": lenh, "verify.baseline": False})
+        m = self.muc(out)
+        self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
+        self.assertIn("verify.baseline", m.detail)
+        self.assertEqual(
+            (self.project / "src" / "dem.txt").read_text(encoding="utf-8").count("1"), 1,
+            "tắt thì chỉ còn lần test sau đóng băng",
+        )
+
+    def test_chua_khai_lenh_test_thi_baseline_la_chua_cau_hinh(self):
+        out = self.chay(self.ket_qua(range(1, 11)), **{"tools.test": ""})
+        m = self.muc(out)
+        self.assertIs(m.outcome, Outcome.UNCONFIGURED)
+        self.assertIn("chưa khai", m.detail)

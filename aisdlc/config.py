@@ -44,6 +44,24 @@ DEFAULTS: dict[str, Any] = {
     # Chỉ mục thay cho việc đổ lịch sử: agent cần chi tiết thì gọi
     # `aisdlc evidence <id>`, không nạp sẵn cả sổ.
     "context.max_index_chars": 2000,
+    # Trần ký tự cho hai slot R4 (`preservation`, `validation`) — hành vi
+    # VERIFIED của story khác mà story này chạm tệp, và thứ phải xanh ở ứng
+    # viên. Chỉ id + nguồn kiểm, không có lịch sử: đo trên sổ e9, STORY-01-07
+    # chạm 31 hành vi của 3 story — đổ hết vào prompt là quá 15 % ngân sách B5.
+    # Cổng "bảo toàn" vẫn kiểm **đủ** danh sách, cắt chỉ là cắt phần in ra.
+    "context.max_preservation_chars": 1500,
+    # vòng cải tiến epic theo bằng chứng (ADR-004 R3). HoH chạy T = 70 vòng
+    # không có điều kiện dừng; ở đây mọi điều kiện dừng là code và ba số này
+    # là trần. Đếm theo epic từ `loops[]` của sổ hành vi — chạy lại
+    # `aisdlc improve` tiếp từ vòng cuối, không đếm lại từ 0.
+    "improve.max_loops": 3,
+    # dừng khi cải thiện biên (Δverified − Δreopened giữa hai mốc `loops[]`
+    # liên tiếp) ≤ 0 chừng này vòng liền: vòng sau nhận cùng gap, cùng ngữ
+    # cảnh, sẽ cho cùng kết quả.
+    "improve.flat_loops": 2,
+    # trần tổng chi phí (USD) các vòng của một epic; 0 = không giới hạn.
+    # Chi phí đọc từ bằng chứng của story sửa, không từ lời client.
+    "improve.cost_cap_usd": 0.0,
     # điều phối
     "run.max_parallel": 3,
     "run.max_turns": 40,
@@ -67,6 +85,11 @@ DEFAULTS: dict[str, Any] = {
     #: Loại được miễn tường minh, ngăn bởi dấu phẩy. Miễn phải là quyết
     #: định có người ký, không phải hệ quả của việc quên cấu hình.
     "verify.waived": "",
+    # Baseline trước khi sửa (ADR-004 R9): harness chạy bộ test ở candidate
+    # cha **trước** phiên developer đầu tiên, để cổng "không làm đỏ test có
+    # sẵn" so được tên test xanh trước/sau. Tắt khi bộ test quá chậm — tắt
+    # thì mục cổng là "không áp dụng: tắt bởi cấu hình", không phải đạt.
+    "verify.baseline": True,
     # ứng dụng của dự án — để mở route thật lúc đối chiếu với mockup
     "app.dev_command": "",
     "app.base_url": "http://localhost:5173",
@@ -108,6 +131,10 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "story.max_screen_states": int,
     "story.max_complexity": float,
     "context.max_index_chars": int,
+    "context.max_preservation_chars": int,
+    "improve.max_loops": int,
+    "improve.flat_loops": int,
+    "improve.cost_cap_usd": float,
     "run.max_parallel": int,
     "run.max_turns": int,
     "run.timeout_seconds": int,
@@ -126,6 +153,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "verify.sbom": str,
     "verify.image-scan": str,
     "verify.waived": str,
+    "verify.baseline": bool,
     "app.dev_command": str,
     "app.base_url": str,
     "app.ready_timeout_seconds": int,
@@ -205,6 +233,11 @@ def _validate(values: dict[str, Any]) -> None:
             raise ConfigError(f"{key} phải >= 1")
     if values["run.max_retries"] < 0:
         raise ConfigError("run.max_retries phải >= 0")
+    for key in ("improve.max_loops", "improve.flat_loops"):
+        if values[key] < 1:
+            raise ConfigError(f"{key} phải >= 1")
+    if values["improve.cost_cap_usd"] < 0:
+        raise ConfigError("improve.cost_cap_usd phải >= 0 (0 = không giới hạn)")
     if values["cost.warn_multiple"] <= 1.0:
         raise ConfigError("cost.warn_multiple phải > 1 thì cảnh báo mới có nghĩa")
 

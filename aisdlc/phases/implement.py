@@ -54,8 +54,9 @@ from ..harness.mockup_map import load_for_story, prompt_section
 from ..harness.observe import EvidenceStore, NOTE, Event
 from ..harness.prompts import Catalog, load_catalog
 from ..harness.routing import DEVELOPER, REVIEWER, ROLES, SECURITY, build_spec
-from ..harness.tools import describe_tools, run_tool
-from .qa import find_fake_tests, run_suite
+from ..harness.testlog import MAX_IDS, parse as parse_testlog
+from ..harness.tools import BASELINE_RUN, describe_tools, record as record_tool, run_tool
+from .qa import KINDS, find_fake_tests, run_suite
 
 #: Lỗi thuộc về hạ tầng, không thuộc về chất lượng công việc.
 INFRA_ERRORS = ("api_error", "overloaded", "quá ", "không chạy được", "connection")
@@ -126,8 +127,15 @@ def build_context(
     contract: DesignContract | None,
     config: Config | None,
     feedback: str = "",
+    preservation: list[dict] | None = None,
 ) -> dict:
-    """Ngữ cảnh cho prompt story — chọn bằng tra cứu, không bằng phán đoán."""
+    """Ngữ cảnh cho prompt story — chọn bằng tra cứu, không bằng phán đoán.
+
+    ``preservation`` là danh sách hành vi phải giữ đã tính sẵn (R4). Truyền
+    vào để reviewer/security nhận **đúng** danh sách developer đã nhận: tính
+    lại sau phiên developer thì sổ đã đổi theo bằng chứng của chính lượt ấy,
+    và ba vai nói về ba danh sách khác nhau. `None` = tính từ sổ.
+    """
     story_file = artifact_root / "stories" / story.epic_id / f"{story.id}.md"
     contract_text = (
         story_file.read_text(encoding="utf-8", errors="replace")
@@ -147,9 +155,16 @@ def build_context(
         slices, _ = load_for_story(contract, story.screens, artifact_root=artifact_root)
 
     skills, skills_ev = _skills_section(story, project=project, artifact_root=artifact_root, config=config)
+    led = _ledger(artifact_root)
+    if preservation is None:
+        preservation = preservation_items(story, project=project, ledger=led)
+    cap = int(config["context.max_preservation_chars"]) if config else 1500
     return {
         "_skills": skills_ev,
+        "_preservation": preservation,
         "skills": skills,
+        "preservation": preservation_text(preservation, max_chars=cap),
+        "validation": validation_text(story, preservation, max_chars=cap),
         "story_id": story.id,
         "story_title": story.title,
         "story_contract": contract_text,
@@ -160,11 +175,27 @@ def build_context(
         "write_scope": _write_scope_lines(story, project),
         "mockup_section": prompt_section(slices),
         "tools": describe_tools(project, config),
-        "index": _index_slice(story, artifact_root, config),
+        "index": _index_slice(story, artifact_root, config, ledger=led),
     }
 
 
-def _index_slice(story: Story, artifact_root: Path, config: Config | None) -> str:
+def _ledger(artifact_root: Path):
+    """Sổ hành vi chiếu từ bằng chứng **hiện có** — không đọc `ledger.json`.
+
+    Tệp ấy chỉ được `aisdlc report` làm mới; trong một lần `run` qua cả
+    epic, story sau sẽ không thấy hành vi story trước vừa xác minh. Chiếu
+    lại từ evidence mất 1,1 s trên e9 (4,3 MB) — rẻ hơn một hồi quy bị bỏ
+    sót. Sổ hỏng hay chưa có thì `None`, không làm hỏng lượt chạy.
+    """
+    from ..control import ledger as ledger_mod
+
+    try:
+        return ledger_mod.build(artifact_root)
+    except OSError:
+        return None
+
+
+def _index_slice(story: Story, artifact_root: Path, config: Config | None, *, ledger=None) -> str:
     """Lát cắt chỉ mục bằng chứng của epic chứa story (ADR-004 R6).
 
     Progressive disclosure: prompt nhận **một dòng mỗi story** — trạng thái,
@@ -172,14 +203,109 @@ def _index_slice(story: Story, artifact_root: Path, config: Config | None) -> st
     Lịch sử nằm ở `aisdlc evidence <id>`, tra khi cần. Sổ hỏng hay chưa có
     thì slot rỗng có lời giải thích, không làm hỏng lượt chạy.
     """
-    from ..control import ledger as ledger_mod
-
     cap = int(config["context.max_index_chars"]) if config else 2000
-    try:
-        text = ledger_mod.build(artifact_root).epic_slice(story.epic_id, max_chars=cap)
-    except OSError:
-        text = ""
+    led = ledger if ledger is not None else _ledger(artifact_root)
+    text = led.epic_slice(story.epic_id, max_chars=cap) if led is not None else ""
     return text or "_(chưa có bằng chứng nào cho epic này)_"
+
+
+# --- Hành vi phải giữ và thứ phải xanh ở ứng viên (ADR-004 R4) ----------------
+#
+# HoH đưa Preservation + Validation Requirements vào tài liệu phát triển mỗi
+# vòng. Ở đây chúng là hai slot **máy tính từ sổ hành vi**, cùng một danh
+# sách cho developer, reviewer và security — không vai nào nhận lời vai kia
+# (ADR-003 #9) — và cổng "bảo toàn" (`control/gate.py`) chấm đúng danh sách
+# ấy trên ứng viên đã đóng băng.
+
+
+def preservation_items(story: Story, *, project: Path, ledger) -> list[dict]:
+    """Hành vi VERIFIED của **story khác** mà phạm vi ghi của story này chạm tệp.
+
+    Phép giao tệp là của `complexity.verified_touched` (R5): một luật, hai
+    chỗ dùng, không có bản thứ hai để lệch nhau. Mỗi mục mang đúng thứ cổng
+    cần để kiểm lại ở ứng viên — id, loại, story sở hữu, nguồn kiểm (test
+    id / `qa:<kind>` / màn hình) — lấy từ `ledger.behaviors[id].source`.
+    """
+    from ..control.complexity import read_scopes, verified_touched
+
+    if ledger is None:
+        return []
+    out = []
+    for bid in verified_touched(story, ledger.as_dict(), read_scopes(project)):
+        b = ledger.behaviors[bid]
+        out.append({"id": bid, "kind": b.kind, "story": b.story, "source": dict(b.source)})
+    return out
+
+
+def _source_line(item: dict) -> str:
+    src = item.get("source") or {}
+    if src.get("test_id"):
+        return f"test `{src['test_id']}`"
+    if src.get("qa_kind"):
+        return f"`qa:{src['qa_kind']}`"
+    if src.get("screen"):
+        return f"màn hình `{src['screen']}`"
+    if src.get("story"):
+        return "qua tiêu chí của story"
+    return f"`aisdlc evidence {item.get('id', '')}`"
+
+
+def _cap(text: str, max_chars: int) -> str:
+    if len(text) > max_chars:
+        return text[:max_chars].rstrip() + "\n_(đã cắt theo trần ký tự — `aisdlc evidence <id>`)_"
+    return text
+
+
+def preservation_text(items: list[dict], *, max_chars: int) -> str:
+    """Slot `preservation`: một dòng mỗi hành vi — id · story sở hữu · nguồn.
+
+    Chỉ id và nguồn, không lịch sử (progressive disclosure, R6). Cắt theo
+    trần chỉ cắt phần **in ra**; cổng vẫn chấm đủ danh sách — agent bị cắt
+    mất một mục thì có dòng cuối bảo nó tra `aisdlc evidence`.
+    """
+    if not items:
+        return "_(không chạm hành vi VERIFIED nào của story khác)_"
+    return _cap("\n".join(
+        f"- `{it['id']}` · {it.get('story') or '?'} · {_source_line(it)}" for it in items
+    ), max_chars)
+
+
+def validation_text(story: Story, items: list[dict], *, max_chars: int) -> str:
+    """Slot `validation`: thứ **harness sẽ chạy lại** trên ứng viên và cổng đọc.
+
+    Liệt kê để agent biết trước cái gì bị chấm, không phải để nó tự chấm:
+    `qa:<kind>` (hợp đồng của story + kiểm định đã xác minh bị chạm), màn
+    hình (của story + của story khác bị chạm). Test bảo toàn chỉ **đếm**:
+    tên đã nằm ở slot `preservation`, chép lại là trả ngân sách B5 hai lần
+    (e9 01-07: 27 test id).
+    """
+    kinds, screens = validation_targets(story, items)
+    tests = {it["source"]["test_id"] for it in items if (it.get("source") or {}).get("test_id")}
+    lines = []
+    if tests:
+        lines.append(f"- {len(tests)} test bảo toàn nêu ở mục trên")
+    if kinds:
+        lines.append("- kiểm định: " + ", ".join(f"`qa:{k}`" for k in kinds))
+    if screens:
+        lines.append("- màn hình khớp mockup: " + ", ".join(f"`{s}`" for s in screens))
+    return _cap("\n".join(lines), max_chars) or "_(chỉ cổng chuẩn: test, lint, phạm vi ghi)_"
+
+
+def validation_targets(story: Story, items: list[dict]) -> tuple[list[str], list[str]]:
+    """(loại kiểm định, màn hình) harness phải chạy ở ứng viên — của story
+    cộng phần bảo toàn. Cùng một hàm cho slot và cho `run_attempt`, để thứ
+    in cho agent và thứ thật sự chạy không bao giờ là hai danh sách."""
+    kinds = [k for k in verification_contract(story) if k not in ("mockup-map", "unit", "security")]
+    screens = list(story.screens)
+    for it in items:
+        src = it.get("source") or {}
+        # Chỉ loại `run_suite` chạy được; `qa:fake-tests` là của `run_attempt`,
+        # lượt nào cũng ghi, nên cổng vẫn thấy nó ở ứng viên mà không cần liệt kê.
+        if it.get("kind") == "qa" and src.get("qa_kind") in KINDS and src["qa_kind"] not in kinds:
+            kinds.append(str(src["qa_kind"]))
+        if it.get("kind") == "mockup" and src.get("screen") and src["screen"] not in screens:
+            screens.append(str(src["screen"]))
+    return kinds, screens
 
 
 #: Slot nào của prompt đến từ đâu. Gói cho reviewer/security **không** được
@@ -189,7 +315,7 @@ SLOT_SOURCE = {
     "story_id": "artifact", "story_title": "artifact", "story_contract": "artifact",
     "architecture_rules": "artifact", "write_scope": "artifact", "mockup_section": "artifact",
     "tools": "config", "skills": "router", "diff_summary": "git", "impact": "code",
-    "index": "ledger",
+    "index": "ledger", "preservation": "ledger", "validation": "ledger",
 }
 
 
@@ -308,6 +434,10 @@ def run_attempt(
     )
     evidence.handoff(story.id, frm="plan" if number == 1 else "gate", to=DEVELOPER,
                      attempt=number, slots=handoff_slots(context, feedback=bool(feedback)))
+    # R4: danh sách hành vi phải giữ chốt **một lần** ở đây, trước phiên
+    # developer; reviewer, security và cổng nhận đúng bản này — tính lại sau
+    # phiên thì sổ đã đổi theo bằng chứng của chính lượt này.
+    preservation = list(context.get("_preservation") or [])
     spec = build_spec(
         DEVELOPER,
         catalog.get(ROLES[DEVELOPER].prompt),
@@ -389,25 +519,25 @@ def run_attempt(
     # Không phải pha mới — cùng bộ máy `run_suite`, chỉ giới hạn phạm vi.
     # `verify.X` để trống vẫn là **chưa cấu hình**, không phải đạt: đó là
     # điều `run_suite` đã phân biệt sẵn, và cổng đọc lại đúng như thế.
-    hop_dong = [
-        k for k in verification_contract(story)
-        if k not in ("mockup-map", "unit", "security")
-    ]
+    # R4: cộng thêm kiểm định và màn hình của hành vi phải giữ — cổng "bảo
+    # toàn" chỉ chấm được thứ đã chạy ở ứng viên này, và "không chạy" thì
+    # nó nói UNRUNNABLE chứ không nói đạt.
+    hop_dong, man_hinh = validation_targets(story, preservation)
     if hop_dong:
         run_suite(
             workdir,
             config=config,
             only=hop_dong,
-            has_ui=bool(story.screens),
+            has_ui=bool(man_hinh),
             story_id=story.id,
             artifact_root=artifact_root,
             changed=changed_now,
             candidate=attempt.candidate,
         )
 
-    if story.screens and contract:
+    if man_hinh and contract:
         mockup_verify.verify_screens(
-            workdir, contract, story.screens,
+            workdir, contract, man_hinh,
             config=config, story_id=story.id, artifact_root=artifact_root,
             candidate=attempt.candidate,
         )
@@ -424,6 +554,7 @@ def run_attempt(
         architecture=architecture,
         number=number,
         candidate=attempt.candidate,
+        preservation=preservation,
     )
     # Mục chặn phải nằm trong bằng chứng, không chỉ trong bản tóm tắt in
     # ra màn hình — bản tóm tắt cắt ngắn, và khi cần biết lượt này với
@@ -449,6 +580,7 @@ def run_attempt(
             architecture=architecture,
             number=number,
             candidate=attempt.candidate,
+            preservation=preservation,
         )
         evidence.tool_run(
             story.id,
@@ -478,9 +610,48 @@ def run_attempt(
         coverage_min=float(config["coverage.min"]),
         added_tests=tdd.added_tests(workdir, base_ref=base_ref, changed=changed_now, story_id=story.id),
         candidate=attempt.candidate,
+        preservation=preservation,
     )
     attempt.ok = attempt.gate.passed
+    # Kết cục cổng đi vào bằng chứng, mang SHA ứng viên: sổ hành vi (R2) coi
+    # "qua cổng ở ứng viên này" là dấu landed ở mức lượt — implement không
+    # merge, và `attempt.committed` đóng giao dịch kể cả khi trượt.
+    evidence.record(story.id, Event(
+        kind=NOTE, name="gate:verdict", ok=attempt.ok,
+        detail={"failures": [c.name for c in attempt.gate.failures][:20], "attempt": number},
+    ))
     return attempt
+
+
+def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Config) -> None:
+    """Chạy bộ test ở **candidate cha** trước khi developer sửa gì (ADR-004 R9).
+
+    HoH bảo developer "establish a baseline before editing"; ở đây harness
+    làm, vì lời developer không phải bằng chứng. Ghi dưới tên `test:baseline`
+    (xem `tools.BASELINE_RUN` vì sao không phải `test`), kèm `parent` = HEAD
+    lúc chạy và `red_before` = test đã đỏ sẵn — cổng không tính chúng là hồi
+    quy, và người đọc thấy ngay vì sao.
+
+    Chạy **một lần cho cả story**, trước lượt đầu, không phải mỗi lượt: lượt 2
+    mà lấy ứng viên lượt 1 làm mốc thì test lượt 1 vừa làm đỏ thành "đỏ sẵn",
+    và lượt 2 xoá nó đi là qua cổng sạch. Mốc là trạng thái trước khi story
+    chạm vào — và chi phí là một lần chạy test mỗi story, không phải mỗi lượt.
+
+    Không có lệnh test thì bản ghi mang `skipped` (cổng đọc thành chưa cấu
+    hình), không phải baseline xanh. Tắt bằng `verify.baseline` thì ghi rõ là
+    tắt, để cổng nói "không áp dụng" chứ không im.
+    """
+    if not config.get("verify.baseline", True):
+        EvidenceStore(artifact_root).tool_run(story.id, BASELINE_RUN, ok=False, detail={
+            "baseline": True, "disabled": True,
+            "skipped": "tắt bởi cấu hình `verify.baseline`",
+        })
+        return
+    res = run_tool("test", workdir, config=config)   # story_id rỗng: ghi bên dưới, dưới tên riêng
+    log = parse_testlog(res.stdout + "\n" + res.stderr)
+    record_tool(res, story.id, artifact_root, name=BASELINE_RUN, extra={
+        "baseline": True, "parent": head_sha(workdir), "red_before": log.failed[:MAX_IDS],
+    })
 
 
 def freeze_candidate(
@@ -590,6 +761,7 @@ def review_story(
     architecture: Architecture | None,
     number: int = 0,
     candidate: str = "",
+    preservation: list[dict] | None = None,
 ) -> list[str]:
     """Rà soát độc lập — **phiên mới**, không sửa được gì.
 
@@ -602,7 +774,7 @@ def review_story(
         story, workdir=workdir, base_ref=base_ref, project=project,
         artifact_root=artifact_root, client=client, config=config,
         catalog=catalog, architecture=architecture, number=number,
-        candidate=candidate,
+        candidate=candidate, preservation=preservation,
     )[0]
 
 
@@ -673,6 +845,7 @@ def review_story_v2(
     architecture: Architecture | None,
     number: int = 0,
     candidate: str = "",
+    preservation: list[dict] | None = None,
 ) -> tuple[list[str], Verdict | None]:
     """Như `review_story`, nhưng trả kèm bản máy đọc (`behavior_id`…).
 
@@ -699,6 +872,7 @@ def review_story_v2(
         architecture=architecture,
         contract=None,
         config=config,
+        preservation=preservation,
     )
     context["diff_summary"] = review_diff(str(workdir), changed, base_ref=base_ref)
     # Ảnh hưởng của thay đổi: người rà soát nhận diff rồi vẫn phải tự dò
@@ -818,6 +992,7 @@ def security_review(
     architecture: Architecture | None,
     number: int = 0,
     candidate: str = "",
+    preservation: list[dict] | None = None,
 ) -> SecurityReport:
     """Rà soát bảo mật theo ngữ nghĩa — **phiên riêng**, chỉ đọc.
 
@@ -843,6 +1018,7 @@ def security_review(
         architecture=architecture,
         contract=None,
         config=config,
+        preservation=preservation,
     )
     context["diff_summary"] = review_diff(str(workdir), changed, base_ref=base_ref)
     context["impact"] = analyse_impact(
@@ -1372,6 +1548,9 @@ def implement_story(
     if workdir != project:
         head = head_sha(project)
         base_ref = fork_point(str(workdir), head) if head else ""
+
+    # Mốc test trước khi story chạm vào — một lần, trước lượt đầu (ADR-004 R9).
+    run_baseline(story, workdir=workdir, artifact_root=root, config=cfg)
 
     while True:
         attempt = run_attempt(

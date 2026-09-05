@@ -60,26 +60,79 @@ def apply(project: Path, requirement: str, description: str, *, today: date | No
         prd_marked = True
 
     # 2. story delta
-    idx_path = root / "stories.index.json"
-    idx = json.loads(idx_path.read_text(encoding="utf-8")) if idx_path.is_file() else {"version": 1, "epics": [], "stories": [], "waves": {}}
-    n = 1 + sum(1 for s in idx.get("stories", []) if str(s.get("id", "")).startswith("STORY-CH-"))
+    n = 1 + sum(1 for s in read_index(root).get("stories", [])
+                if str(s.get("id", "")).startswith("STORY-CH-"))
     sid = f"STORY-CH-{n:02d}"
     story = Story(id=sid, epic_id=EPIC_ID, title=description.strip().split("\n")[0][:80],
                   acceptance_criteria=[description.strip()], covers=[requirement],
                   verification_contract=["unit"])
-    if not any(e.get("id") == EPIC_ID for e in idx.setdefault("epics", [])):
-        idx["epics"].append({"id": EPIC_ID, "title": EPIC_TITLE})
-    from ..phases.story_split import render_story, story_file
-    path = story_file(root, story)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(render_story(story, None), encoding="utf-8")
-    idx.setdefault("stories", []).append(story.as_dict() | {"file": str(path.relative_to(root))})
-    idx.setdefault("waves", {}).setdefault(EPIC_ID, []).append([sid])
-    idx_path.write_text(json.dumps(idx, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    StateStore(root).register(sid, EPIC_ID, wave=len(idx["waves"][EPIC_ID]))
+    path = register_story(root, story, epic_title=EPIC_TITLE)
 
     return ChangeResult(sid, path, requirement, prd_marked, [
         f"khai `write_scope` cho {sid} trong `{path.relative_to(project)}` và chỉ mục",
         "duyệt lại cổng `prd` (và các cổng sau) — chúng đã thành stale",
         f"chạy `aisdlc run --epic {EPIC_ID}`",
     ])
+
+
+def read_index(root: Path) -> dict:
+    """`stories.index.json`, hoặc bộ khung rỗng khi dự án chưa tách story."""
+    idx_path = Path(root) / "stories.index.json"
+    if not idx_path.is_file():
+        return {"version": 1, "epics": [], "stories": [], "waves": {}}
+    return json.loads(idx_path.read_text(encoding="utf-8"))
+
+
+def register_story(
+    root: Path,
+    story: Story,
+    *,
+    epic_title: str,
+    extra: dict | None = None,
+    body: str = "",
+    wave: list[str] | None = None,
+) -> Path:
+    """Story **phát sinh** (thay đổi sau phát hành, story sửa của vòng cải
+    tiến): ghi tệp story, đưa vào `stories.index.json` đúng định dạng
+    `story_split` để `run_epic` đọc được, và đăng ký sổ trạng thái.
+
+    Story đã có trong chỉ mục thì thay bản ghi — vòng cải tiến chạy lại
+    một story sửa chưa xong. `extra` là các khoá ngoài `Story.as_dict()`
+    (`repair_of`, `loop`, `preservation`); `body` nối vào cuối tệp story.
+    `wave`: đợt của epic chỉ gồm những story này (vòng cải tiến chạy đúng
+    một story mỗi vòng); không truyền thì nối thêm một đợt `[story]`.
+    """
+    from ..phases.story_split import render_story, story_file
+
+    root = Path(root)
+    idx = read_index(root)
+    epics = idx.setdefault("epics", [])
+    if not any(e.get("id") == story.epic_id for e in epics):
+        epics.append({"id": story.epic_id, "title": epic_title})
+
+    text = render_story(story, None)
+    if body:
+        # Trước dòng chân "sinh tự động từ epics.md": phần thêm là nội dung
+        # story, không phải ghi chú sau chân trang.
+        head, sep, tail = text.rpartition("\n---\n")
+        text = head + body + sep + tail if sep else text + body
+    path = story_file(root, story)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+    rec = story.as_dict() | {"file": str(path.relative_to(root))} | (extra or {})
+    stories = idx.setdefault("stories", [])
+    pos = next((i for i, s in enumerate(stories) if s.get("id") == story.id), None)
+    if pos is None:
+        stories.append(rec)
+    else:
+        stories[pos] = rec
+    waves = idx.setdefault("waves", {})
+    if wave is not None:
+        waves[story.epic_id] = [list(wave)]
+    else:
+        waves.setdefault(story.epic_id, []).append([story.id])
+    (root / "stories.index.json").write_text(
+        json.dumps(idx, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    StateStore(root).register(story.id, story.epic_id, wave=len(waves[story.epic_id]))
+    return path

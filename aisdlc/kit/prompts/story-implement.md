@@ -1,6 +1,6 @@
 ---
 name: story-implement
-version: 4
+version: 5
 role: developer
 ---
 # {{ story_id }} — {{ story_title }}
@@ -40,6 +40,21 @@ sử: cần chi tiết một story hay một hành vi thì gọi `aisdlc evidenc
 Hành vi đã VERIFIED của story khác là thứ bạn không được làm hỏng.
 
 {{ index }}
+
+## Hành vi phải giữ
+
+Của story khác, đã VERIFIED, chạm phạm vi ghi của bạn (id · story · nguồn
+kiểm). Làm đỏ là hồi quy: cổng "bảo toàn" chặn, sổ ghi REOPENED. Chi tiết:
+`aisdlc evidence <id>`.
+
+{{ preservation }}
+
+## Phải xanh ở ứng viên
+
+Harness tự chạy lại trên bản bạn để lại. Không sửa, đổi tên hay bớt ca
+test trong danh sách để "cho xanh".
+
+{{ validation }}
 
 ## Công cụ
 

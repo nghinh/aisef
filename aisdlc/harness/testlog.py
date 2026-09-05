@@ -55,6 +55,9 @@ class TestLog:
             "test_format": self.format,
             "test_ids": self.test_ids[:MAX_IDS],
             "failed_ids": self.failed[:MAX_IDS],
+            # Cổng R9 cần biết test nào **xanh** ở baseline: bỏ qua không
+            # phải xanh, và không có danh sách này thì nó bị tính là xanh.
+            "skipped_ids": self.skipped[:MAX_IDS],
             "coverage": self.coverage,
         }
         if self.note:

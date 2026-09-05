@@ -372,6 +372,10 @@ HARNESS_OWNED = (
     "_bmad-output/sprint-status.json",
     "_bmad-output/sprint-status.json.lock",
     "_bmad-output/compile-report.json",
+    # Nguyên văn lời rà soát (`implement.persist_verdict`) — harness ghi, không
+    # phải agent. Lộ khi hai story chạy chung một cây (`--no-isolate`): tệp
+    # của story trước hiện thành "ngoài phạm vi ghi" của story sau.
+    "_bmad-output/reviews",
     ".aisdlc",
     # Cấu hình client harness chép vào worktree (`WorktreeManager._carry_client_config`)
     # — dự án không gitignore `.claude/` thì nó hiện là tệp chưa theo dõi và guard
