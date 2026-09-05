@@ -350,6 +350,10 @@ aisdlc auto-approve all|<danh sách>   luôn ghi dấu `auto`
 
 # Bước 4 — hiện thực
 aisdlc run     [--epic E] [--sequential] [--no-isolate] [--force]
+aisdlc run     --verify-only --story S [--client c]   kiểm lại ứng viên đã đóng băng (ADR-004 R13):
+        không mở phiên developer; ứng viên = HEAD nhánh story; chạy lại đúng phép kiểm ✗/thiếu
+        ở SHA ấy, giữ rà soát/bảo mật cùng SHA; cổng chấm đủ; đạt → merge như thường, trượt →
+        failed không ăn run.max_retries. Dùng khi trượt vì môi trường đo (e2e nhạy tải máy).
 aisdlc tool    test|lint|sast [--story S]      agent gọi qua đây để có bằng chứng
 aisdlc verify  [--write-scope ...] [--story S] hậu kiểm guard trên cây làm việc
 

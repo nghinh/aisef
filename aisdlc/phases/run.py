@@ -20,7 +20,7 @@ from __future__ import annotations
 import json
 import sys
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from ..clients.base import ClientAdapter
@@ -39,7 +39,7 @@ from ..control.preflight import STORY_NOT_EXECUTABLE, check_story, screen_owners
 from ..control.state import StateStore, StoryStatus, TransitionError
 from ..control.worktree import GitError, WorktreeManager
 from ..harness.prompts import load_catalog
-from .implement import StoryOutcome, implement_story
+from .implement import StoryOutcome, implement_story, verify_only as verify_only_story
 from .plan import ARTIFACT_ROOT
 
 
@@ -156,8 +156,14 @@ def run_epic(
     worktrees: WorktreeManager | None,
     artifact_root: Path,
     report: RunReport,
+    verify_only: bool = False,
 ) -> bool:
-    """Chạy hết một epic. False nghĩa là phải dừng cả đợt."""
+    """Chạy hết một epic. False nghĩa là phải dừng cả đợt.
+
+    ``verify_only``: lượt kiểm-lại (ADR-004 R13) — không mở phiên developer,
+    chấm lại ứng viên ở HEAD nhánh story; mọi thứ còn lại (worktree, cổng,
+    merge, `done`, nhật ký) đi **đúng đường này**, không có đường riêng.
+    """
     architecture = None
     arch_file = artifact_root / "architecture.md"
     if arch_file.is_file():
@@ -199,7 +205,7 @@ def run_epic(
                 project=project, client=client, config=config, state=state,
                 worktrees=worktrees, artifact_root=artifact_root,
                 architecture=architecture, contract=contract, catalog=catalog,
-                wave=wave,
+                wave=wave, verify_only=verify_only,
             )
 
         # Gỡ worktree của story **trượt** trước khi thoát. Chúng nằm
@@ -283,6 +289,7 @@ def _run_wave(
     contract,
     catalog,
     wave: WaveReport,
+    verify_only: bool = False,
 ) -> None:
     owned = screen_owners(plan.stories.values())
     fan_in = complexity.fan_in_counts(plan.stories.values())
@@ -313,14 +320,17 @@ def _run_wave(
         with StoryRunTransaction(story_id, artifact_root=artifact_root) as tx:
             workdir = project
             if worktrees is not None:
-                workdir = worktrees.create(story_id).path
+                # Kiểm lại thì **không** mang nhánh chính vào: ứng viên là
+                # HEAD nhánh story, đúng bản đã được chấm và rà soát.
+                workdir = worktrees.create(story_id, refresh=not verify_only).path
                 tx.record("worktree.created", path=str(workdir),
                           undo={"worktree.remove": story_id})
 
             _safe_transition(state, story_id, StoryStatus.RUNNING)
             tx.record("status.running", undo={"status.reset": "pending"})
 
-            outcome = implement_story(
+            chay = verify_only_story if verify_only else implement_story
+            outcome = chay(
                 story,
                 project=project,
                 workdir=workdir,
@@ -343,11 +353,13 @@ def _run_wave(
             # Hiệu chuẩn cổng cỡ story (ADR-004 R5): điểm dự đoán ↔ lượt
             # developer thật. Ghi ở đây vì đây là chỗ đầu tiên biết cả hai,
             # và evidence của story vừa được viết xong. Hỏng thì bỏ qua —
-            # một bảng hiệu chuẩn không đáng làm mất một lượt chạy.
-            try:
-                complexity.record(artifact_root, story, score=co, config=config)
-            except OSError as e:
-                print(f"hiệu chuẩn cỡ story {story_id}: {e}", file=sys.stderr)
+            # một bảng hiệu chuẩn không đáng làm mất một lượt chạy. Lượt
+            # kiểm-lại không có lượt developer nào để hiệu chuẩn.
+            if not verify_only:
+                try:
+                    complexity.record(artifact_root, story, score=co, config=config)
+                except OSError as e:
+                    print(f"hiệu chuẩn cỡ story {story_id}: {e}", file=sys.stderr)
 
             _safe_transition(state, story_id, StoryStatus.VERIFYING,
                              cost=outcome.cost_usd, attempts=outcome.quality_attempts)
@@ -442,4 +454,65 @@ def run_sprint(
             worktrees=worktrees, artifact_root=artifact_root, report=report,
         ):
             break
+    return report
+
+
+def run_verify_only(
+    project: Path | str,
+    client: ClientAdapter,
+    *,
+    story_id: str,
+    config: Config | None = None,
+) -> RunReport:
+    """Lượt kiểm-lại một story trên ứng viên đã đóng băng (ADR-004 R13).
+
+    Không mở phiên developer. Đi qua `run_epic` với kế hoạch thu về một đợt
+    một story, để merge, `done`, `attempt.committed` và dọn worktree là
+    **cùng một mã** với lượt thường — không phải bản chép có thể lệch.
+
+    Từ chối bằng code khi không có gì để kiểm lại: story chưa từng có ứng
+    viên (không có nhánh story hay mốc `candidate.frozen`), hay đã `done`.
+    """
+    project = Path(project)
+    artifact_root = project / ARTIFACT_ROOT
+    cfg = config or Config.load(project)
+    report = RunReport()
+    plan = load_plan(artifact_root)
+    if plan.error:
+        report.error = plan.error
+        return report
+    story = plan.stories.get(story_id)
+    if story is None:
+        report.error = f"story không có trong kế hoạch: {story_id}"
+        return report
+    try:
+        worktrees = WorktreeManager(project)
+    except GitError as e:
+        report.error = f"{e} — kiểm lại cần kho git: ứng viên là HEAD nhánh story"
+        return report
+
+    state = StateStore(artifact_root)
+    report.reconciled = reconcile_all(
+        artifact_root=artifact_root, state=state, worktrees=worktrees
+    )
+    rec = state.load().stories.get(story_id)
+    if rec is not None and rec.state is StoryStatus.DONE:
+        report.error = f"{story_id} đã xong — không có gì để kiểm lại"
+        return report
+    journal = JournalStore(artifact_root).read(story_id)
+    if not worktrees.has_branch(story_id) or not journal.reached("candidate.frozen"):
+        report.error = (
+            f"{story_id}: chưa có ứng viên để kiểm lại — cần một lượt developer "
+            f"đã đóng băng ứng viên trên nhánh `{worktrees.branch_for(story_id)}` "
+            f"(chạy `aisdlc run` trước)"
+        )
+        return report
+
+    mot = replace(plan, waves={story.epic_id: [[story_id]]})
+    run_epic(
+        story.epic_id, mot,
+        project=project, client=client, config=cfg, state=state,
+        worktrees=worktrees, artifact_root=artifact_root, report=report,
+        verify_only=True,
+    )
     return report

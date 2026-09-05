@@ -57,6 +57,7 @@ aisdlc approve mockups
 aisdlc approve readiness
 
 aisdlc run                          # hiện thực: epic tuần tự, story song song
+aisdlc run --verify-only --story STORY-01-07   # kiểm lại ứng viên đã đóng băng, không mở phiên developer
 aisdlc qa                           # bộ kiểm định
 aisdlc devsecops                    # CI + Dockerfile + triển khai + runbook
 aisdlc pre-deploy                   # cổng cuối
@@ -96,6 +97,16 @@ Dừng bằng code: hết gap, đủ `improve.max_loops`, cải thiện biên �
 `improve.flat_loops` vòng liền, vượt `improve.cost_cap_usd`, hay story sửa bế
 tắc kế hoạch (trả người kèm lời reviewer). Trước mỗi vòng ≥ 2 cần
 `aisdlc approve improve` trừ `--auto`.
+
+```bash
+aisdlc run --verify-only --story STORY-01-07
+```
+
+Story trượt chỉ vì môi trường đo (e2e nhạy tải máy) thì không cần trả tiền
+cho một phiên developer để dựng lại mã đã có (ADR-004 R13): lượt kiểm-lại
+lấy ứng viên ở HEAD nhánh story, chạy lại đúng phép kiểm ✗/thiếu ở SHA ấy,
+giữ rà soát và bảo mật đã có ở cùng SHA, chấm đủ cổng; đạt thì merge như lượt
+thường, trượt thì `failed` và không ăn vào `run.max_retries`.
 
 ## Cổng
 
