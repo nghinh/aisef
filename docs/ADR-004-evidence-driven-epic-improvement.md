@@ -1,0 +1,153 @@
+# ADR-004 — Cải tiến liên tục theo bằng chứng ở cấp epic (đối chiếu Harness-of-Harness)
+
+**Trạng thái:** PROPOSED — bộ yêu cầu nâng cấp, chưa hiện thực. Ngày 2026-09-05.
+**Nguồn đối chiếu:** paper *Harness-of-Harness: Multi-Day Autonomous Software Development with Continual Improvement* (arXiv 2609.01481v1, Shanghai AI Lab) và repo `Flesymeb/HarnessOfHarness` — repo tại thời điểm đọc chỉ có README + tài sản trình diễn (58 commit, MIT, "HoH-lite sẽ công bố"), **không có mã**; mọi cơ chế dưới đây lấy từ paper.
+**Ràng buộc giữ nguyên:** sáu nhóm harness hiện có, evidence-first, reviewer ≠ developer, bảo đảm phía harness, worktree cách ly, cổng người, CLI gọi-một-lần/không daemon, không tin client. Không dùng HoH làm runtime. Không tự sửa framework: mọi thay đổi vẫn qua test, benchmark, ADR/evidence và cổng người/phát hành.
+
+Ghi chú tên module: trong kho này bằng chứng nằm ở `harness/observe.py` (EvidenceStore, không có `control/evidence.py`), ngữ cảnh prompt dựng ở `phases/implement.py::build_context` (không có `harness/context.py`). Các yêu cầu dưới đây trỏ đúng tệp thật.
+
+---
+
+## 1. HoH nói gì, và V2 đang có gì
+
+### 1.1 Cốt lõi của HoH (từ paper)
+
+Một vòng = ba vai **Planner** (đọc spec 𝒮 + evidence ℰ₍t−1₎ + artifact A₍t−1₎ chỉ đọc → tài liệu phát triển D_t), **Developer** (A₍t−1₎ + D_t → ứng viên A_t), **QA Tester** (A_t **đóng băng, chỉ đọc** + Runtime tất định → ℰ_t). Trạng thái chuyển qua vòng: (A₍t−1₎, ℰ₍t−1₎) → (A_t, ℰ_t). Evidence ghi *verified behavior*, *gaps* (chưa đạt, hồi quy, thiếu bằng chứng), *reopened issues*. Planner sinh **Update Targets** (bounded, locally complete), **Preservation** (hành vi đã xác minh phải giữ) và **Validation Requirements** (tiêu chí kiểm được, black-box + white-box). Quy tắc chấp nhận: *"A criterion is verified only when candidate-bound records support the required behavior"*. Ngữ cảnh: **progressive disclosure** — chỉ mục ngắn có phân loại, chi tiết nạp khi cần. Kết quả: GameCraft-Bench 49,58 → 71,52 (HoH@3); ablation: bỏ plan update −8,13, bỏ evidence feedback −6,28, bỏ warm-start −7,85 (và tốn token hơn). Fusepoint 70 vòng: 81 issue, 65 đóng, **17 reopened**. Paper **không** có điều kiện dừng, không có schema evidence/issue, không nêu SHA/snapshot cụ thể, không có cổng cỡ task theo số đo.
+
+### 1.2 V2 đã có (tái sử dụng được)
+
+| Khái niệm HoH | V2 hiện có | Mức |
+|---|---|---|
+| Ba vai, tách quyền đọc/ghi | developer / reviewer / security mỗi vai một **phiên mới** (`harness/routing.py`), reviewer không ghi (snapshot + hoàn nguyên, `implement.py::_revert_reviewer_writes`), guard phía harness | ✅ mạnh hơn HoH (guard, không chỉ quy ước) |
+| Evidence candidate-bound | `harness/observe.py`: 8 loại sự kiện theo story, `qa:<kind>`, `mockup_map`, `handoff`; `control/gate.py::evaluate` đọc evidence, không tin lời agent; `Outcome` sáu kết cục | ✅ ở **cấp story**; chưa có ở cấp hành vi/epic |
+| Frozen candidate | worktree + `changed_files(base_ref)`; reviewer bất biến | ◐ **không có SHA**: thứ tự journal hiện là `changes.detected → verification.completed → review.completed → commit.created → merge.completed` — ứng viên được commit **sau** khi kiểm; bằng chứng không gắn vào một commit |
+| Vòng lặp evidence → re-plan | lượt thử trong story (`run.max_retries`, feedback "Lượt trước chưa đạt"), bế tắc kế hoạch do reviewer kiểm chứng → trả về người; `aisdlc change FR-x` → `STORY-CH-nn` | ◐ chỉ **trong** story hoặc bằng tay; **không có vòng epic** QA → evidence → story sửa → kiểm lại |
+| Preservation / regression | `control/impact.py` (tệp đổi → module/test ảnh hưởng), `tdd.red_before_green`, `qa:test-delta` cho reviewer | ◐ có "bề mặt hồi quy" cho reviewer, **không** có danh sách hành vi phải giữ và không đo được "đã đúng rồi lại hỏng" |
+| Trạng thái hành vi VERIFIED/GAP/REOPENED | `Outcome` cho từng phép kiểm; `control/acceptance.py` nối `AC-<story>-<i>` ↔ tên test | ✗ không có sổ hành vi theo thời gian |
+| Cổng cỡ task | `story.max_acceptance_criteria`, `max_write_scope_paths`, **`max_screen_states`** (P2-12, hiệu chuẩn e9) | ◐ một chiều (trạng thái màn hình); chưa có điểm tổng hợp + hiệu chuẩn tự ghi |
+| Progressive disclosure | `build_context` chọn slot theo story (handoff ghi slot + số ký tự); `aisdlc doc` nạp tài liệu khi cần | ◐ chưa có chỉ mục evidence dự án; báo cáo nghiệm thu là trang tĩnh |
+| Metrics | chi phí, lượt, attempts, TCCN có test, map mockup | ✗ không có tăng trưởng năng lực đã xác minh, hồi quy, gap đã đóng, cải thiện biên |
+| Runtime tất định: schema + retry | `skill_scan` kiểm JSON; reviewer trả văn bản có thẻ `[chặn]`/`[bế tắc]` (lỗi 16 vừa sửa) | ◐ chưa có schema bắt buộc + retry cho reviewer/security |
+
+### 1.3 Gap chính (điều HoH chứng minh mà V2 chưa có)
+
+1. **Không có vòng cải tiến cấp epic.** Khi epic "xong", V2 dừng; hồi quy do story sau gây cho story trước chỉ lộ ở `qa`/`pre-deploy` và không tự sinh việc sửa. Ablation của HoH cho thấy chính vòng evidence→plan là nguồn tăng (−6 đến −8 điểm khi bỏ).
+2. **Bằng chứng không gắn commit.** Không có "candidate SHA" thì không nói được "bằng chứng này thuộc bản nào", và không có khái niệm *stale*.
+3. **Không có sổ hành vi.** Không phân biệt được "chưa từng đạt" với "đã đạt rồi hỏng" — con số 17/81 reopened của Fusepoint là thứ V2 không đo nổi.
+4. **Preservation không phải hợp đồng.** Developer lượt sau không được bảo "những hành vi này phải còn"; reviewer chỉ có bề mặt hồi quy theo tệp.
+5. **Cỡ story một chiều.** Đo hôm nay: story 11–18 trạng thái chạm `max_turns`; nhưng story 0 màn hình 14 tệp cũng 61 lượt/16 lượt developer (01-01). Cần điểm tổng hợp có hiệu chuẩn.
+
+---
+
+## 2. Yêu cầu nâng cấp
+
+Ký hiệu: **P0** = nền tảng, làm trước và đo; **P1** = tạo giá trị đo được sau P0; **P2** = chỉ khi P0/P1 chứng minh. Mỗi mục: rationale · module ảnh hưởng · tiêu chí chấp nhận (AC).
+
+### P0
+
+**R1 — Frozen Candidate SHA.**
+*Rationale:* HoH đóng băng A_t khi thu evidence; V2 commit sau khi kiểm nên evidence không trỏ được vào một bản. Không có SHA thì "stale" không định nghĩa được.
+*Module:* `control/journal.py` (đổi thứ tự: `commit.created` **trước** `verification.completed`; thêm bước `candidate.frozen` mang SHA), `phases/implement.py::run_attempt` (commit worktree ngay khi phiên developer kết thúc, ghi `candidate_sha`; mọi `tool_run`/`agent_run`/`mockup_map` sau đó mang `detail.candidate`), `harness/observe.py` (trường `candidate` trong `Event.detail`, `Evidence.for_candidate(sha)`), `control/gate.py` (mục mới "bằng chứng đúng candidate": mọi phép kiểm phải có `candidate == sha`; khác → UNRUNNABLE "stale"), `phases/qa.py`/`deploy.py` (QA cấp dự án ghi `candidate = HEAD` của main), reviewer/security (`implement.py`): sau phiên, `git rev-parse HEAD` của worktree phải bằng SHA, khác → lượt rà soát không tính.
+*AC:* (a) unit: evidence ghi ở SHA khác → cổng ✗ "stale", cùng SHA → ✅; (b) phép hợp quy **C8**: sửa một tệp trong worktree *sau* khi test đã chạy → cổng story trượt với lý do stale, không phải "test đỏ"; (c) `ACCEPTANCE-REPORT` in SHA candidate của từng story; (d) không tăng số lượt/chi phí trên dogfood `par` (mốc 3/3, ≤ 2×$3,14).
+
+**R2 — Sổ hành vi (ledger) với VERIFIED / GAP / REOPENED.**
+*Rationale:* HoH ghi verified/gaps/reopened; V2 chỉ có kết cục theo phép kiểm. Sổ hành vi là thứ để đo hồi quy và cải tiến.
+*Module:* `harness/observe.py` thêm loại sự kiện `BEHAVIOR` (`{id, status, candidate, source, prev}`); mới `control/ledger.py` (**phép chiếu** từ evidence hiện có, không phải kho mới): id hành vi = `AC-<story>-<i>` (qua `control/acceptance.py`), `FR-x`/`NFR-x` (qua `covers`), `qa:<kind>`, `mockup:<screen>`; trạng thái suy bằng code: test id xanh ở candidate → VERIFIED; đỏ/thiếu/unrunnable → GAP; VERIFIED trước đó rồi GAP ở candidate sau → **REOPENED** (kèm `regressed_by = story/candidate`); tệp `_bmad-output/ledger.json` + lịch sử `history[]` mỗi hành vi; `phases/report.py` đọc ledger.
+*AC:* (a) unit: chuỗi evidence xanh → đỏ → xanh cho cùng AC sinh VERIFIED → REOPENED → VERIFIED với `regressed_by` đúng; (b) chạy lại trên evidence thật của e9 hôm nay (không cần agent): ledger tái dựng được lịch sử 01-04/01-05 và đếm được số REOPENED ≥ 0 với nguồn cụ thể; (c) không có hành vi nào VERIFIED mà không có `candidate`; (d) `aisdlc report` có cột trạng thái hành vi.
+
+**R3 — Vòng cải tiến epic có giới hạn (`aisdlc improve --epic E --max-loops N`).**
+*Rationale:* đây là cơ chế HoH chứng minh tạo gain; nhưng HoH không có điều kiện dừng — V2 phải có, bằng code.
+*Module:* mới `phases/improve.py` **ghép** từ thứ có sẵn: `qa.run_suite` (thu evidence cấp dự án) → `ledger` (GAP/REOPENED thuộc epic) → **sinh story sửa bằng code** (`control/change.py` mở rộng: `STORY-RP-nn` trong `EPIC-RP-<E>`; mỗi story sửa = một hành vi GAP/REOPENED: acceptance = chính hành vi ấy, `write_scope` = tệp của story gốc + `verification_paths`, `verification_contract` = nguồn của hành vi, `preservation` = R4) → `run.run_epic` (phiên mới, worktree, cổng, reviewer — **không đổi**) → QA lại → ledger → vòng sau. Điều kiện dừng bằng code: (1) không còn GAP/REOPENED thuộc epic; (2) đủ `improve.max_loops`; (3) cải thiện biên ≤ 0 trong `improve.flat_loops` vòng liên tiếp (Δverified − Δreopened); (4) vượt `improve.cost_cap_usd`; (5) story sửa bị bế tắc kế hoạch → dừng, trả người. Mỗi vòng ghi `LOOP-REPORT-<n>.md` và cần cổng người `improve` trước vòng 2 trừ khi `--auto` (vẫn bị chặn bởi 1–5).
+*AC:* (a) unit với client giả: 2 GAP → vòng 1 sửa 1, vòng 2 sửa 1, vòng 3 dừng vì "không còn gap"; flat-loops dừng đúng; cost cap dừng đúng; (b) bất biến: mọi story sửa chạy qua `run_epic` (worktree, cổng, reviewer khác developer) — kiểm bằng evidence `handoff`; (c) benchmark B1 (§5) trên e9 EPIC-01.
+
+**R4 — Preservation Constraints, Update Targets, Validation Requirements trong gói bàn giao.**
+*Rationale:* HoH đưa ba thứ này vào D_t; V2 chỉ có tiêu chí story + luật kiến trúc + impact theo tệp.
+*Module:* `phases/implement.py::build_context` thêm slot `preservation` (nguồn `ledger`): hành vi VERIFIED có tệp giao với `effective_write_scope` của story hoặc nằm trong `impact.builtin(...)` của thay đổi trước; slot `validation` = test id / `qa:<kind>` / màn hình phải xanh ở candidate; `SLOT_SOURCE` + `handoff` ghi hai slot; reviewer và security nhận cùng slot (không nhận lời developer — bất biến ADR-003 #9); `control/gate.py` thêm mục "bảo toàn": mọi hành vi trong `preservation` vẫn VERIFIED ở candidate, không thì FAILED và ledger ghi REOPENED.
+*AC:* (a) unit: story chạm tệp của hành vi VERIFIED → slot có đúng hành vi đó, kèm test id; (b) mutation test có chủ đích trên `par`: story sửa làm đỏ test của story trước → cổng "bảo toàn" ✗ + ledger REOPENED `regressed_by` đúng story; (c) prompt_chars tăng ≤ 15 % (đo bằng `handoff`) với cùng kết cục cổng trên dogfood.
+
+**R5 — Story Complexity Gate v2 (trước coding, có hiệu chuẩn).**
+*Rationale:* P2-12 chỉ đo trạng thái màn hình; số đo hôm nay còn cho thấy scope 14 tệp và 7 tiêu chí cũng làm story dài. HoH không có cổng này (chỉ "bounded, locally complete" theo phán đoán planner) — V2 làm bằng code.
+*Module:* `control/preflight.py::story_size_defect` → `control/complexity.py`: điểm = trạng thái màn hình (đã có) + tiêu chí + tệp trong scope + số hành vi VERIFIED bị chạm (ledger) + fan-in phụ thuộc; ngưỡng `story.max_complexity`; **bảng hiệu chuẩn tự ghi** `_bmad-output/complexity.json`: điểm dự đoán ↔ lượt developer lượt đầu / attempts thật (từ evidence) — `doctor` cảnh báo khi ngưỡng lệch dữ liệu; gợi ý chẻ tất định (theo màn hình/trạng thái, hoặc theo cụm tiêu chí) đưa vào `stories.gate.json` (memo epics đã có).
+*AC:* (a) hồi cứu trên 23 story thật (e9 18 + par 5): điểm dự đoán tương quan dương với lượt developer lượt đầu (Spearman ≥ 0,5) và tách được 01-04/01-05 khỏi 01-03/par; (b) unit: story vượt ngưỡng bị chặn ở cổng `stories` **và** ở `run`; story đã xong bỏ qua; (c) hiệu chuẩn cập nhật sau mỗi story xong.
+
+### P1
+
+**R6 — Progressive disclosure cho trạng thái/evidence dự án.**
+*Rationale:* HoH: chỉ mục ngắn có phân loại, chi tiết khi cần. V2 nạp story contract + kiến trúc + mockup + impact; chưa có chỉ mục evidence và sẽ tràn nếu R2/R4 đổ cả lịch sử vào prompt.
+*Module:* `control/ledger.py::index()` sinh `_bmad-output/INDEX.md` (≤ 1 dòng/story: trạng thái, candidate, VERIFIED/GAP/REOPENED, đường dẫn evidence); `build_context` chỉ nạp lát cắt epic của chỉ mục + `preservation` của story; CLI `aisdlc evidence <story|behavior-id>` để agent tra khi cần (ghi `note:evidence_lookup` như `doc_lookup`); trần ký tự cho slot mới.
+*AC:* (a) prompt_chars developer không vượt +15 % so với hôm nay trên `par` và e9 01-05; (b) unit: chỉ mục ≤ N dòng, tra một hành vi trả đúng lịch sử; (c) cổng giữ nguyên kết cục trên dogfood.
+
+**R7 — Metrics cải tiến liên tục.**
+*Rationale:* không đo thì không biết vòng lặp có tạo gain hay chỉ đốt tiền (HoH đo bằng benchmark điểm; V2 cần metric nội tại).
+*Module:* `control/ledger.py` snapshot mỗi vòng/mỗi story xong; `phases/report.py` thêm: *verified capability growth* (số hành vi VERIFIED duy nhất theo thời gian), *reopened regressions* (số và tỷ lệ trên hành vi VERIFIED), *resolved gaps*, *marginal improvement per loop* = (ΔVERIFIED − ΔREOPENED) / $ vòng; `LOOP-REPORT` in bảng này.
+*AC:* (a) unit từ ledger giả; (b) chạy trên evidence e9 thật hôm nay cho ra bảng có số; (c) R3 dùng đúng metric này làm điều kiện dừng.
+
+**R8 — Schema bắt buộc + retry cho đầu ra rà soát.**
+*Rationale:* HoH "outputs that violate the required schema trigger a retry"; lỗi 16 hôm nay cho thấy văn bản tự do của reviewer mất thông tin.
+*Module:* `phases/implement.py::review_story/security_review`: prompt đòi khối JSON `{"verdict": "pass|block|stuck", "findings": [{"tag","file","line","why","behavior_id"}]}` bên cạnh văn bản; parser (như `skill_scan.parse_verdicts`); thiếu/sai schema → retry **một** lần rồi mới "rà soát không chạy được"; `persist_verdict` giữ nguyên văn (đã có).
+*AC:* unit: đầu ra thiếu JSON → retry đúng 1 lần; JSON có `behavior_id` → ledger ghi GAP với nguồn `reviewer`; hồi quy trên `par`: số lượt rà soát không đổi.
+
+**R9 — Baseline trước khi sửa (shift-left bằng harness, không bằng lời dặn).**
+*Rationale:* HoH bảo developer "establish a baseline before editing"; V2 đã có `tdd.red_before_green` cho test mới. Bổ sung: harness chạy bộ test **trước** phiên developer (ở candidate cha) và ghi `baseline` test ids; sau phiên so với test ids ở candidate → hồi quy trong lượt lộ ngay, vào feedback lượt sau.
+*Module:* `phases/implement.py::run_attempt` (một `tool_run test` với `detail.baseline=True` trước khi gọi model), `harness/testlog.py` (đã có test ids), `control/gate.py` (mục "không làm đỏ test có sẵn" — tách khỏi "test").
+*AC:* unit: baseline xanh 10 test, sau lượt 9 xanh + 1 đỏ → cổng nêu đúng tên test hồi quy; chi phí thêm = một lần chạy test.
+
+### P2
+
+**R10 — Planner agent cho story sửa** (chỉ khi R3 đo được gain nhưng story sinh bằng code quá thô): agent viết lại tiêu đề/tiêu chí story sửa từ gap + preservation, vẫn qua cổng `stories` và cổng cỡ.
+**R11 — Vòng cấp dự án nhiều epic** (T vòng qua nhiều epic) — sau khi R3 ổn trên một epic.
+**R12 — Xuất issue table** (GitHub Issues/CSV) từ ledger — tiện theo dõi, không ảnh hưởng cổng.
+
+---
+
+## 3. Không áp dụng (và vì sao)
+
+| Ý tưởng HoH | Không áp dụng vì |
+|---|---|
+| HoH/HoH-lite làm runtime | repo chưa có mã; và V2 đã có harness mạnh hơn ở guard/cổng — chỉ hấp thụ pattern |
+| Vòng lặp không có điều kiện dừng (T = 70) | vi phạm kỷ luật ngân sách; R3 bắt buộc dừng bằng code |
+| Planner LLM tự chọn scope mỗi vòng | "cần đảm bảo → viết code": story sửa sinh tất định từ gap; agent chỉ vào ở R10 sau khi đo |
+| QA Tester LLM là thẩm quyền chấp nhận | V2 chấp nhận bằng máy (test id, qa kind, mockup map) + reviewer độc lập; QA agent chỉ là *nguồn evidence thêm*, không thay cổng |
+| Warm-start trong cùng phiên / bộ nhớ dài | phá fresh-session per story; V2 warm-start bằng git (artifact) + ledger (evidence) là đủ và kiểm được |
+| Developer self-test làm tiêu chí "sẵn sàng" | lời developer không phải bằng chứng; baseline làm bằng harness (R9) |
+| Module bộ nhớ riêng | progressive disclosure bằng chỉ mục + tra cứu (R6), đúng như HoH cũng chọn |
+| Framework tự sửa từ evidence | mọi thay đổi framework vẫn qua test/benchmark/ADR/cổng người; ledger chỉ sửa **dự án**, không sửa harness |
+
+---
+
+## 4. ADR / contract / schema cần thêm hoặc sửa
+
+- **ADR-004** (tệp này) → ACCEPTED từng mục khi có số đo §5.
+- **ADR-003** sửa: bảng slot bàn giao thêm `preservation`, `validation`, `index` với nguồn `ledger`; bất biến #9 mở rộng: reviewer nhận `preservation` từ ledger, không từ developer.
+- **Schema `ledger.json`**: `{"version":1, "behaviors": {"<id>": {"kind":"ac|fr|nfr|qa|mockup", "status":"verified|gap|reopened", "candidate":"<sha>", "since":"<story>#<attempt>|loop-n", "source":{"test_id"|"qa_kind"|"screen"|"reviewer"}, "history":[{"at","status","candidate","story","source"}]}}, "loops":[{"n","at","verified","gap","reopened","cost_usd"}]}`.
+- **Evidence Event**: `detail.candidate` bắt buộc cho `tool_run test/qa:*`, `mockup_map`, `agent_run` vai review/security; loại mới `behavior`.
+- **Journal**: thứ tự bước mới `attempt.started → worktree.created → status.running → changes.detected → candidate.frozen(sha) → verification.completed → review.completed → merge.completed → attempt.committed`; `commit.created` trở thành `candidate.frozen`.
+- **`stories.index.json`**: story thêm `repair_of` (hành vi), `loop`, `preservation` (danh sách id); waves cho `EPIC-RP-<E>`.
+- **Config**: `improve.max_loops` (3), `improve.flat_loops` (2), `improve.cost_cap_usd`, `story.max_complexity`, `context.max_preservation_chars`.
+- **CLI**: `aisdlc improve --epic E [--max-loops N] [--auto]`, `aisdlc evidence <id>`, `aisdlc report` mở rộng.
+- **Cổng người mới `improve`** trong `control/approvals.py` (giữa `readiness` và `pre-deploy`): duyệt tiếp tục vòng ≥ 2.
+- **Hợp quy**: phép **C8** (stale candidate) vào `docs/CONFORMANCE.md`.
+
+---
+
+## 5. Test và benchmark để chứng minh giá trị so với baseline
+
+Baseline hôm nay (đã có số): e9 EPIC-01 — 01-04 8 lượt/$79,67; 01-05 xong sau sửa kế hoạch, tổng ≈ $51; số hồi quy **không đo được** (không có ledger); dogfood `par` 3/3, $5,79; prompt_chars developer ≈ 13,5k (off) / 22,4k (inline).
+
+| Mã | Nâng cấp | Cách đo | Đạt khi |
+|---|---|---|---|
+| B0 | R2 hồi cứu | Chạy `ledger` trên evidence e9 + par hiện có (0 agent) | Tái dựng được lịch sử VERIFIED/GAP/REOPENED của 01-04, 01-05, 01-06 với nguồn; đếm được REOPENED thật |
+| B1 | R3 vòng epic | e9 EPIC-01 sau khi 7/7: `improve --max-loops 3` so với không chạy | ΔVERIFIED > 0 hoặc REOPENED → 0 với chi phí ≤ 1 story trung bình/vòng; dừng đúng điều kiện; mọi story sửa có `handoff` reviewer≠developer |
+| B2 | R1 SHA | unit + hợp quy C8 trên Claude và OpenCode | C8 ✅ hai cột; dogfood par không tăng lượt |
+| B3 | R4 bảo toàn | mutation có chủ đích trên `par` (story sửa làm đỏ test story trước) | cổng "bảo toàn" ✗, ledger REOPENED `regressed_by` đúng; không có ✗ oan trên chạy sạch |
+| B4 | R5 hiệu chuẩn | hồi cứu 23 story thật + dogfood | Spearman(điểm, lượt developer lượt đầu) ≥ 0,5; 0 story ≤ ngưỡng chạm `max_turns` ở par |
+| B5 | R6 ngữ cảnh | `handoff` prompt_chars trước/sau trên par + e9 01-05 | ≤ +15 %, cổng cùng kết cục |
+| B6 | R7 metrics | ledger e9 thật | bảng growth / reopened / resolved / marginal có số, khớp tay đếm |
+| B7 | R8 schema | unit + par | retry đúng 1 lần; số lượt rà soát không đổi |
+| B8 | R9 baseline | unit + par | hồi quy trong lượt được gọi tên; +1 lần chạy test/lượt |
+
+Thứ tự làm: R1 → R2 (B0) → R4 → R3 (B1) → R5 (B4) → R6/R7 → R8/R9 → P2. Mỗi bước một ADR-004 §6 "số đo" trước khi bước sau.
+
+## 6. Số đo (điền khi hiện thực)
+
+_(trống — mục nào ACCEPTED phải có số ở đây)_
