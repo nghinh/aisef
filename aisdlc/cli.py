@@ -918,6 +918,37 @@ def cmd_predeploy(args) -> int:
     return EXIT_OK
 
 
+def cmd_skill(args) -> int:
+    """Dựng và soi sổ đăng ký skill (ADR-002). Chỉ đọc — không sửa dự án."""
+    from .kit import registry as R
+    from .kit import router as RT
+    from .phases.run import load_plan
+
+    project = Path(args.project)
+    reg = R.refresh(project, _artifact_root(args))
+    by = reg.by_status()
+    print(f"Sổ skill: {len(reg.entries)} bản ghi")
+    for st in R.STATUSES:
+        if by[st]:
+            print(f"  {st:10} {by[st]}")
+    rej = [e for e in reg.entries.values() if e.status == R.REJECTED]
+    if rej:
+        print("\n✗ bị loại (không định tuyến):")
+        for e in rej[:10]:
+            print(f"    {e.id:50} {'; '.join(e.verified.gaps[:1])}")
+
+    if args.story:
+        plan = load_plan(_artifact_root(args))
+        st = plan.stories.get(args.story)
+        if st is None:
+            print(f"\nkhông có story {args.story} trong kế hoạch", file=sys.stderr)
+            return EXIT_NOT_READY
+        r = RT.route(st, reg, project=project)
+        print(f"\nĐịnh tuyến cho {args.story} — {st.title}:")
+        print("  " + r.prompt_section().replace(chr(10), chr(10) + "  "))
+    return EXIT_OK
+
+
 def cmd_report(args) -> int:
     """Sinh báo cáo nghiệm thu từ bằng chứng đã có."""
     from .phases.report import build, write
@@ -953,6 +984,9 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("init", help="ghi .ai/config.json mặc định").set_defaults(func=cmd_init)
     sub.add_parser("gates", help="bảng trạng thái 8 cổng").set_defaults(func=cmd_gates)
     sub.add_parser("status", help="tiến độ story, chi phí").set_defaults(func=cmd_status)
+    sk = sub.add_parser("skill", help="sổ đăng ký skill: dựng, soi, định tuyến thử")
+    sk.add_argument("--story", default="", help="in skill được định tuyến cho story này")
+    sk.set_defaults(func=cmd_skill)
 
     r = sub.add_parser("review", help="xem artifact của một cổng")
     r.add_argument("gate", type=_gate_arg)

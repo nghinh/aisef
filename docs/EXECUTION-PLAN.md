@@ -569,3 +569,13 @@ Bước tiếp: **đợt 1 — G4** truyền `--settings` tường minh + nhịp
 | G11 test meta | 3 | — | | ✅ |
 | G12 `VERIFIED`, `DONE` chỉ sau merge | 11 | SAU-2 trên `par`: `verified → done` sau `merge.completed`; `status` 5/5 done, không `verified` sót. Di trú sổ cũ: unit test (par không có sổ cũ cần di trú) | | ✅ |
 | G10a gỡ `max_context_tokens`, đo `prompt_chars` | 5 | — | | ✅ |
+
+**Đợt OKL (ADR-002 — tầng tri thức vận hành, sau paper Repo-To-Skill):**
+
+| Hạng mục | Unit test | Kiểm thật | Bằng chứng | Trạng thái |
+|---|---|---|---|---|
+| ADR-002 + đo e9 (156 skill, 11 lần gọi/4 skill) | — | e9 evidence | `docs/ADR-002` | ✅ |
+| Registry + vòng đời 5 trạng thái + verify cấu trúc | 15 | dựng trên 156 skill thật e9; 3 skill có bí mật → rejected | `skill-registry.json` | ✅ |
+| Router hai-tín-hiệu + abstain + progressive disclosure | 12 | e9: abstain 13/18 (catalog security không có skill app ghi chú — đúng); lộ & sửa 2 va chạm keyword (crypto-migration↔schema, "performative"↔perf) | `aisdlc skill --story` | ✅ |
+| Kích hoạt: router → prompt story + telemetry `skills_offered`/`skills_used` | | **chưa** — cần kiểm agent thật | | ⏳ đợt sau |
+| Chưng cất + học từ trace (ADR §5) | | | | ⏳ đợt 2 (PROPOSED) |

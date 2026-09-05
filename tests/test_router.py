@@ -1,0 +1,127 @@
+"""Định tuyến skill cho story (ADR-002 đợt 1).
+
+Tín hiệu quan trọng nhất để test: router **biết từ chối**. Paper ghi 2/20
+task hỏng vì skill nhồi nhầm; đo trên e9, khớp một-từ-khoá làm story schema
+IndexedDB khớp skill mật-mã-hậu-lượng-tử. Nên luật "hai tín hiệu độc lập"
+và abstain là thứ phải giữ.
+"""
+
+from __future__ import annotations
+
+import sys
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from aisdlc.control.normalize import Story  # noqa: E402
+from aisdlc.kit import router  # noqa: E402
+from aisdlc.kit.registry import Registry, SkillEntry, Verification  # noqa: E402
+
+
+def entry(id, caps=(), *, tags=(), subdomain="", status="verified", use_when="", desc="skill"):
+    return SkillEntry(
+        id=id, source="demo", path=f".claude/skills/{id}", description=desc,
+        use_when=use_when, subdomain=subdomain, tags=list(tags),
+        capabilities=list(caps), status=status,
+        verified=Verification(at="now", by="structural"),
+    )
+
+
+def reg(*entries) -> Registry:
+    return Registry(entries={e.id: e for e in entries})
+
+
+def story(**kw):
+    base = dict(id="S-01", epic_id="E-01", title="Story",
+                acceptance_criteria=["Then chuyện xảy ra"], write_scope=["src/a.ts"])
+    base.update(kw)
+    return Story(**base)
+
+
+class TestBietTuChoi(unittest.TestCase):
+    def test_khong_skill_nao_khop_thi_abstain(self):
+        r = router.route(story(), reg(entry("bao-mat", ["security"])))
+        self.assertTrue(r.abstained)
+        self.assertEqual(r.ids(), [])
+
+    def test_mot_tin_hieu_khong_du(self):
+        """Khớp đúng một năng lực (keyword-only) không được chọn — luật §4.2."""
+        s = story(acceptance_criteria=["Then p95 dưới 200ms"])  # cần perf
+        r = router.route(s, reg(entry("chi-perf", ["perf"])))
+        self.assertTrue(r.abstained)
+        self.assertIsNotNone(r.best_rejected)   # có điểm, nhưng một tín hiệu
+
+    def test_hai_tin_hieu_thi_chon(self):
+        s = story(acceptance_criteria=["Then p95 dưới 200ms ở quy mô 10.000"],
+                  title="đo hiệu năng perf")
+        r = router.route(s, reg(entry("do-perf", ["perf"], tags=["perf", "benchmark"],
+                                      subdomain="performance")))
+        self.assertFalse(r.abstained)
+        self.assertEqual(r.ids(), ["do-perf"])
+
+    def test_registry_rong_thi_abstain(self):
+        self.assertTrue(router.route(story(), reg()).abstained)
+
+    def test_chi_xet_skill_routable(self):
+        s = story(acceptance_criteria=["Then p95 dưới 200ms"], title="perf benchmark")
+        good = entry("do-perf", ["perf"], tags=["perf"], subdomain="performance")
+        cand = entry("moi", ["perf"], tags=["perf"], subdomain="performance", status="candidate")
+        r = router.route(s, reg(good, cand))
+        self.assertEqual(r.ids(), ["do-perf"])  # candidate không được xét
+
+
+class TestChonDung(unittest.TestCase):
+    def test_skill_framework_theo_pha_luon_du_dieu_kien(self):
+        s = story(screens=["notes-list"])
+        r = router.route(s, reg(entry("aisdlc-mockup-html", ["ui"])), phase="mockup")
+        self.assertIn("aisdlc-mockup-html", r.ids())
+
+    def test_ton_trong_tran_so_luong(self):
+        s = story(acceptance_criteria=["Then bảo mật xác thực injection auth"],
+                  title="security auth")
+        skills = [entry(f"s{i}", ["security"], tags=["security", "auth", "injection"],
+                        subdomain="authentication") for i in range(6)]
+        r = router.route(s, reg(*skills), limit=2)
+        self.assertEqual(len(r.picked), 2)
+
+    def test_xep_diem_cao_truoc(self):
+        s = story(screens=["x"], acceptance_criteria=["Then kịch bản e2e và trợ năng wcag"],
+                  title="giao diện accessibility")
+        it = router.route(s, reg(
+            entry("nhieu", ["ui", "accessibility"], tags=["accessibility", "wcag", "aria"],
+                  subdomain="accessibility"),
+            entry("it", ["ui"], tags=["ui"]),
+        ))
+        self.assertEqual(it.picked[0].entry.id, "nhieu")
+
+
+class TestRaChoAgent(unittest.TestCase):
+    def test_prompt_abstain_bao_lam_theo_hien_phap(self):
+        sec = router.route(story(), reg(entry("x", ["security"]))).prompt_section()
+        self.assertIn("Không có skill", sec)
+        self.assertIn("hiến pháp", sec)
+
+    def test_prompt_khong_dan_noi_dung_skill(self):
+        """Progressive disclosure: chỉ tên, dùng-khi, đường dẫn — agent mở khi cần."""
+        s = story(acceptance_criteria=["Then bảo mật auth injection"], title="security auth")
+        e = entry("bao-mat", ["security"], tags=["security", "auth", "injection"],
+                  subdomain="authentication", use_when="khi chạm dữ liệu người dùng")
+        sec = router.route(s, reg(e)).prompt_section()
+        self.assertIn("bao-mat", sec)
+        self.assertIn("khi chạm dữ liệu người dùng", sec)
+        self.assertIn(".claude/skills/bao-mat", sec)
+        self.assertIn("khi tới bước", sec)  # nhắc mở muộn
+
+    def test_evidence_ghi_da_xet_bao_nhieu_va_nguong(self):
+        s = story(acceptance_criteria=["Then p95 dưới 200ms"])
+        ev = router.route(s, reg(entry("chi-perf", ["perf"]))).as_evidence()
+        self.assertTrue(ev["abstained"])
+        self.assertEqual(ev["considered"], 1)
+        self.assertEqual(ev["threshold"], router.DEFAULT_THRESHOLD)
+        self.assertIsNotNone(ev["best_rejected"])   # để đo precision sau
+
+
+if __name__ == "__main__":
+    unittest.main()
