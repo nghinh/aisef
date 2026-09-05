@@ -333,7 +333,7 @@ def _run_wave(
             ][:5])
 
             _safe_transition(state, story_id, StoryStatus.VERIFYING,
-                             cost=outcome.cost_usd)
+                             cost=outcome.cost_usd, attempts=outcome.quality_attempts)
             # Qua cổng ≠ xong. Có worktree thì còn nợ merge — `verified`,
             # và `done` chỉ ghi ở cuối đợt sau `merge.completed`. Không cách
             # ly thì không có bước merge: `done` ngay.
@@ -363,7 +363,8 @@ def _safe_transition(state: StateStore, story_id: str, to: StoryStatus, **kw) ->
     hợp lệ đáng ghi vào log, không đáng làm mất công việc đã làm.
     """
     try:
-        state.transition(story_id, to, cost_usd=kw.get("cost", 0.0), reason=kw.get("reason", ""))
+        state.transition(story_id, to, cost_usd=kw.get("cost", 0.0), reason=kw.get("reason", ""),
+                         attempts=kw.get("attempts", 0))
     except TransitionError as e:
         # Nói ra. Nuốt im lặng đã che một lỗi thật: story chạy lại xong,
         # merge xong, mà bản ghi vẫn đứng ở lần thất bại cũ.

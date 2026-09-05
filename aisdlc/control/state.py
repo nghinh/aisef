@@ -292,8 +292,14 @@ class StateStore:
         duration_ms: int = 0,
         evidence: str = "",
         worktree: str = "",
+        attempts: int = 0,
     ) -> StoryRecord:
-        """Chuyển trạng thái, từ chối bước nhảy không hợp lệ."""
+        """Chuyển trạng thái, từ chối bước nhảy không hợp lệ.
+
+        `attempts` là **số lượt developer** của lần chạy này, cộng dồn vào
+        bản ghi. Trước đây đếm mỗi lần `run` chạm story (vào RUNNING) — dogfood
+        01-02 hai lượt mà ghi 1, e9 01-05 bốn lượt mà ghi 1 (P2-11).
+        """
         with self.transaction() as st:
             rec = st.stories.get(story_id)
             if rec is None:
@@ -304,8 +310,8 @@ class StateStore:
             if to is not current and to not in ALLOWED[current]:
                 raise TransitionError(f"{story_id}: {current.value} → {to.value} không hợp lệ")
 
-            if to is StoryStatus.RUNNING and current is not StoryStatus.RUNNING:
-                rec.attempts += 1
+            if attempts:
+                rec.attempts += attempts
 
             rec.status = to.value
             rec.updated_at = _now()
