@@ -95,6 +95,29 @@ class TestOpenCodePlugin(CompileTestCase):
     def test_hooks_the_right_event(self):
         self.assertIn("tool.execute.before", build_opencode_plugin(self.project, "/bin/aisdlc"))
 
+    def test_khong_goi_stdin_nhu_mot_ham(self):
+        """Lỗi 39. `$` của OpenCode là Bun shell: `BunShellPromise.stdin` là
+        một `WritableStream` **chỉ đọc**, không phải hàm.
+
+        Bản sinh cũ gọi `.stdin(event)` → mọi lần gọi tool đều ném
+        TypeError. Nhìn từ ngoài giống guard đang chặn; thật ra guard chưa
+        chạy lần nào, và OpenCode không hiện thực nổi một story.
+        """
+        src = build_opencode_plugin(self.project, "/bin/aisdlc")
+        ma = "\n".join(d for d in src.splitlines() if not d.lstrip().startswith("//"))
+        self.assertNotIn(".stdin(", ma)
+        self.assertIn("< ${input}", ma)
+
+    def test_gui_cwd_cua_phien_khong_phai_goc_du_an(self):
+        """Lỗi 15, phiên bản OpenCode. Agent chạy story đứng trong
+        `.aisdlc/worktrees/<story>`; guard soi gốc dự án sẽ thấy toàn bộ
+        file kế hoạch là "ghi ngoài phạm vi" và chặn sạch mọi thao tác."""
+        src = build_opencode_plugin(self.project, "/bin/aisdlc")
+        self.assertIn("cwd: CWD", src)
+        self.assertIn("directory || worktree || PROJECT", src)
+        # cả hai mốc đều phải gửi, không chỉ mốc trước.
+        self.assertEqual(src.count("cwd: CWD"), 2)
+
 
 class TestCompileFor(CompileTestCase):
     def test_claude_writes_settings(self):
@@ -109,16 +132,22 @@ class TestCompileFor(CompileTestCase):
     def test_claude_blocks_at_source(self):
         self.assertTrue(compile_for("claude", self.project).blocks_at_source)
 
-    def test_opencode_declared_post_hoc(self):
-        """S4 chưa chứng minh guard chặn → phải báo là hậu kiểm."""
+    def test_opencode_chan_tai_nguon_sau_khi_da_chung_minh(self):
+        """Khai `NATIVE` ngày 2026-09-05, có hai phép thử trên agent thật:
+        `rm -rf` không xoá được tệp, và `Write` chứa `os.system` ghép chuỗi
+        không để lại tệp nào. Xem docstring `clients/opencode.py`."""
         r = compile_for("opencode", self.project)
-        self.assertFalse(r.blocks_at_source)
-        self.assertEqual(sorted(r.guards_post_hoc), sorted(GUARD_MATCHERS))
-        self.assertEqual(r.guards_wired, [])
+        self.assertTrue(r.blocks_at_source)
+        self.assertEqual(r.guards_post_hoc, [])
+        self.assertEqual(sorted(r.guards_wired), sorted(GUARD_MATCHERS))
 
-    def test_opencode_reports_degradations(self):
+    def test_opencode_van_bao_cac_muc_thuc_su_kem(self):
+        """Chặn được không có nghĩa là ngang Claude Code: OpenCode vẫn
+        không giới hạn được số lượt và không phát luồng sự kiện."""
         r = compile_for("opencode", self.project)
-        self.assertTrue(any("pre_tool_guard" in d for d in r.degradations))
+        self.assertFalse(any("pre_tool_guard" in d for d in r.degradations))
+        self.assertTrue(any("turn_limit" in d for d in r.degradations))
+        self.assertTrue(any("machine_output" in d for d in r.degradations))
 
     def test_claude_has_no_degradations(self):
         self.assertEqual(compile_for("claude", self.project).degradations, [])
@@ -139,9 +168,11 @@ class TestCompileFor(CompileTestCase):
         self.assertEqual(first, (self.project / ".claude" / "settings.json").read_text(encoding="utf-8"))
 
     def test_warning_message_is_actionable(self):
+        """Không còn guard hậu kiểm thì đừng doạ người bằng chữ "hậu kiểm";
+        nhưng các mục kém thật vẫn phải nêu tên."""
         r = compile_for("opencode", self.project)
-        self.assertIn("hậu kiểm", r.summary())
-        self.assertIn("verify", r.summary())
+        self.assertNotIn("hậu kiểm", r.summary())
+        self.assertIn("turn_limit", r.summary())
 
 
 class TestCompileReport(CompileTestCase):
@@ -152,7 +183,7 @@ class TestCompileReport(CompileTestCase):
 
         by_client = {c["client"]: c for c in data["clients"]}
         self.assertTrue(by_client["claude"]["blocks_at_source"])
-        self.assertFalse(by_client["opencode"]["blocks_at_source"])
+        self.assertTrue(by_client["opencode"]["blocks_at_source"])
 
     def test_report_lists_written_files(self):
         path = write_compile_report(self.project, [compile_for("claude", self.project)])

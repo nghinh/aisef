@@ -1,17 +1,23 @@
 """Chạy agent bằng OpenCode CLI.
 
-**Khai báo thận trọng có chủ đích.** Spike S4 chưa chạy xong được ca thử
-(provider trong môi trường thử phản hồi quá chậm), nên hai điều sau vẫn
-chưa được chứng minh:
+**Đã chứng minh chặn thật** (2026-09-05, opencode 1.18.26, model
+``9router/mycombo``, agent đứng trong thư mục con của dự án):
 
-* ném lỗi trong hook ``tool.execute.before`` có **chặn** tool hay chỉ ghi log;
-* plugin đặt ở ``.opencode/plugin/`` cấp dự án có được nạp không.
+* ``rm -rf /tmp/moi-thu-nghiem`` → tool báo failed bằng đúng stderr của
+  guard, và tệp trong thư mục đó **vẫn còn** sau lượt chạy;
+* ``Write ping.py`` chứa ``os.system(f"ping -c 1 {host}")`` → tool báo
+  failed bằng đúng stderr của guard, và **không có tệp nào ra đĩa**.
 
-Vì thế ``PRE_TOOL_GUARD`` khai là ``POST_HOC``, không phải ``NATIVE``.
-Framework sẽ chạy lại toàn bộ guard ở bước verify và ghi mức bảo đảm thấp
-hơn vào evidence. Nâng lên ``NATIVE`` chỉ khi có phép thử chạy xong chứng
-minh guard chặn thật — khai xanh trước là tự lừa mình về mức an toàn
-đang có.
+Phép thử thứ hai cần thiết vì phép thử ghi khoá API trước đó vô giá trị:
+model tự từ chối trước khi gọi tool, nên nó chứng minh model ngoan chứ
+không chứng minh guard chặn. Ca thử phải là thứ model sẵn sàng làm.
+
+Cũng đã xác nhận plugin ở ``.opencode/plugin/`` cấp dự án được nạp khi
+agent chạy từ thư mục con — đúng tình huống worktree của story.
+
+Vì thế ``PRE_TOOL_GUARD`` khai ``NATIVE``. Hai mục còn lại vẫn hạ mức
+thật: OpenCode không có giới hạn lượt và không phát luồng sự kiện có cấu
+trúc, nên chi phí phải hỏi riêng.
 """
 
 from __future__ import annotations
@@ -41,7 +47,7 @@ class OpenCodeAdapter(ClientAdapter):
         return {
             Capability.HEADLESS: Support.NATIVE,            # opencode run
             Capability.MACHINE_OUTPUT: Support.EMULATED,    # qua export <sessionID>
-            Capability.PRE_TOOL_GUARD: Support.POST_HOC,    # S4 chưa chứng minh
+            Capability.PRE_TOOL_GUARD: Support.NATIVE,     # chứng minh 2026-09-05, xem docstring
             Capability.TOOL_ALLOWLIST: Support.EMULATED,    # qua permission config
             Capability.DIR_ALLOWLIST: Support.UNSUPPORTED,  # không có cờ tương đương
             Capability.SUBAGENT: Support.NATIVE,            # opencode agent

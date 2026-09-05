@@ -38,15 +38,29 @@ class TestCapabilityDeclaration(unittest.TestCase):
         """S2 đã chứng minh hook chặn thật."""
         self.assertTrue(ClaudeCodeAdapter().guards_block_at_source())
 
-    def test_opencode_declared_post_hoc_until_proven(self):
-        """S4 chưa chứng minh guard chặn → khai POST_HOC, không khai NATIVE."""
+    def test_opencode_chan_that_da_co_phep_thu(self):
+        """Nâng POST_HOC → NATIVE ngày 2026-09-05.
+
+        Hai phép thử trên agent thật (opencode 1.18.26, `9router/mycombo`),
+        agent đứng trong thư mục con của dự án:
+        - `rm -rf <thư mục có tệp>`: tool báo failed bằng stderr của guard,
+          tệp **vẫn còn** → chặn trước, không phải phát hiện sau;
+        - `Write ping.py` chứa `os.system(f"... {host}")`: tool báo failed,
+          **không có tệp nào** ra đĩa.
+
+        Phép thử đầu tiên tôi làm (ghi khoá API) là vô giá trị: model tự từ
+        chối trước khi gọi tool, nên nó chứng minh model ngoan chứ không
+        chứng minh guard chặn.
+        """
         oc = OpenCodeAdapter()
-        self.assertIs(oc.supports(Capability.PRE_TOOL_GUARD), Support.POST_HOC)
-        self.assertFalse(oc.guards_block_at_source())
+        self.assertIs(oc.supports(Capability.PRE_TOOL_GUARD), Support.NATIVE)
+        self.assertTrue(oc.guards_block_at_source())
 
     def test_degradations_are_reported(self):
+        """Chặn được rồi thì không kê `pre_tool_guard` vào danh sách kém
+        nữa — nhưng những mục kém thật vẫn phải nêu."""
         degradations = OpenCodeAdapter().degradations()
-        self.assertTrue(any("pre_tool_guard" in d for d in degradations))
+        self.assertFalse(any("pre_tool_guard" in d for d in degradations))
         self.assertTrue(any("dir_allowlist" in d for d in degradations))
 
     def test_claude_has_no_degradations(self):

@@ -110,27 +110,43 @@ const AFTER = [{", ".join(f'"{k}"' for k in post)}]
 const BIN = {json.dumps(aisdlc_bin)}
 const PROJECT = {json.dumps(str(project))}
 
+// Shell của OpenCode là Bun shell: nó **không** có `.stdin(...)`, chỉ nhận
+// đầu vào bằng cách chuyển hướng từ một giá trị nội suy. Gọi sai thì mọi
+// lần gọi tool đều ném TypeError — trông như guard chặn, thật ra là guard
+// chưa từng chạy.
 async function guard($, kinds, event) {{
+  const input = new Blob([event])
   for (const kind of kinds) {{
-    const res = await $`${{BIN}} --project ${{PROJECT}} guard ${{kind}}`
-      .stdin(event).quiet().nothrow()
+    const res = await $`${{BIN}} --project ${{PROJECT}} guard ${{kind}} < ${{input}}`
+      .quiet().nothrow()
     if (res.exitCode === 2) {{
       throw new Error(String(res.stderr).trim() || `guard ${{kind}} đã chặn thao tác này`)
     }}
   }}
 }}
 
-export const AisdlcGuardPlugin: Plugin = async ({{ $ }}) => ({{
-  "tool.execute.before": async (input, output) => {{
-    await guard($, BEFORE, JSON.stringify({{
-      tool_name: input?.tool,
-      tool_input: output?.args ?? {{}},
-    }}))
-  }},
-  "tool.execute.after": async (input, output) => {{
-    await guard($, AFTER, JSON.stringify({{ tool_name: input?.tool, tool_input: {{}} }}))
-  }},
-}})
+// `worktree` là cây agent đang thật sự đứng — khi chạy story nó là
+// .aisdlc/worktrees/<story>, không phải PROJECT. Guard soi nhầm cây thì
+// nó thấy toàn bộ file kế hoạch là "thay đổi ngoài phạm vi" và chặn sạch.
+export const AisdlcGuardPlugin: Plugin = async ({{ $, directory, worktree }}) => {{
+  // `directory` là cwd của phiên — tương ứng đúng với `cwd` mà hook của
+  // Claude Code gửi. `worktree` là gốc cây git, chỉ dùng khi thiếu.
+  const CWD = directory || worktree || PROJECT
+  return {{
+    "tool.execute.before": async (input, output) => {{
+      await guard($, BEFORE, JSON.stringify({{
+        cwd: CWD,
+        tool_name: input?.tool,
+        tool_input: output?.args ?? {{}},
+      }}))
+    }},
+    "tool.execute.after": async (input, output) => {{
+      await guard($, AFTER, JSON.stringify({{
+        cwd: CWD, tool_name: input?.tool, tool_input: {{}},
+      }}))
+    }},
+  }}
+}}
 """
 
 
