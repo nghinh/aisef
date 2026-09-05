@@ -573,13 +573,18 @@ def check_story(
     project: Path,
     config: Config | None = None,
     have: set[str] | None = None,
+    owned: dict[str, str] | None = None,
 ) -> Preflight:
-    """Story này chạy được không. Không gọi model."""
+    """Story này chạy được không. Không gọi model.
+
+    ``owned``: màn hình → story dựng nó đầu tiên (xem ``screen_owners``);
+    dùng để đo cỡ story. Không có thì mọi màn hình story chạm đều tính.
+    """
     cfg = config or Config(dict(DEFAULTS))
     got = have if have is not None else provisioned(project, cfg)
     out = Preflight(story.id)
     out.needs = required_capabilities(story, project=project)
-    qua_lon = story_size_defect(story, project=project, config=cfg)
+    qua_lon = story_size_defect(story, project=project, config=cfg, owned=owned)
     if qua_lon is not None:
         out.needs.append(qua_lon)
         out.missing.append(qua_lon)
@@ -600,15 +605,37 @@ def check_story(
     return out
 
 
-def story_size_defect(story: Story, *, project: Path, config: Config | None = None) -> Need | None:
+def screen_owners(stories) -> dict[str, str]:
+    """Màn hình → story **dựng nó đầu tiên** (theo thứ tự kế hoạch).
+
+    Story sau chạm lại màn hình có sẵn (thêm một nút) không gánh cả số
+    trạng thái của màn ấy: e9 STORY-01-05 chạm `notes-list` (11 trạng thái,
+    01-04 đã dựng) và dựng `note-editor` (7) — đo lại sau khi sửa lỗi
+    12/14/15, nó xong phần máy trong 72 lượt; gánh 18 thì bị chặn oan.
+    """
+    owners: dict[str, str] = {}
+    for s in stories:
+        for sid in getattr(s, "screens", []) or []:
+            owners.setdefault(sid, s.id)
+    return owners
+
+
+def story_size_defect(
+    story: Story,
+    *,
+    project: Path,
+    config: Config | None = None,
+    owned: dict[str, str] | None = None,
+) -> Need | None:
     """Story giao diện quá lớn cho **một phiên** — chẻ trước khi vào coding agent.
 
-    Đo 2026-09-05 trên e9: STORY-01-04 (1 màn, 11 trạng thái) chạm
-    `max_turns` ở lượt đầu (89 lượt) và cần 8 lượt, $79,67; STORY-01-05
-    (2 màn, 18 trạng thái) chạm `max_turns` (91) ở lượt đầu của cả hai
-    nhánh A/B. Story không màn hình cùng dự án: 57–61 lượt, 1–3 lượt.
-    Số trạng thái lấy từ EXPERIENCE.md — có ở cổng `stories`, trước cả
-    mockup — nên chặn được từ lúc lập kế hoạch (P2-12).
+    Đo 2026-09-05 trên e9: STORY-01-04 (dựng `notes-list`, 11 trạng thái)
+    chạm `max_turns` ở lượt đầu (89 lượt) và cần 8 lượt, $79,67. Story
+    không màn hình cùng dự án: 57–61 lượt, 1–3 lượt. STORY-01-05 dựng
+    `note-editor` (7) + chạm `notes-list`: 72 lượt sau khi framework hết
+    lỗi. Số trạng thái lấy từ EXPERIENCE.md — có ở cổng `stories`, trước cả
+    mockup — nên chặn được từ lúc lập kế hoạch (P2-12). Màn hình story
+    khác đã dựng tính 1 (chạm lại), không tính cả số trạng thái.
     """
     if not story.screens:
         return None
@@ -618,7 +645,8 @@ def story_size_defect(story: Story, *, project: Path, config: Config | None = No
     per: list[tuple[str, int]] = []
     for sid in story.screens:
         scr = exp.by_id(sid) if exp is not None else None
-        per.append((sid, max(1, len(scr.states)) if scr is not None else 1))
+        cua_minh = owned is None or owned.get(sid, story.id) == story.id
+        per.append((sid, max(1, len(scr.states)) if (scr is not None and cua_minh) else 1))
     total = sum(n for _, n in per)
     if total <= limit:
         return None
@@ -656,8 +684,10 @@ def check_stories_executable(
     """Chấm cả tập story. Cấp năng lực đọc một lần, dùng cho mọi story."""
     cfg = config or Config(dict(DEFAULTS))
     got = provisioned(Path(project), cfg)
+    owned = screen_owners(stories)
     return [
-        check_story(s, project=Path(project), config=cfg, have=got) for s in stories
+        check_story(s, project=Path(project), config=cfg, have=got, owned=owned)
+        for s in stories
     ]
 
 
@@ -668,6 +698,7 @@ __all__ = [
     "Preflight",
     "STORY_NOT_EXECUTABLE",
     "check_stories_executable",
+    "screen_owners",
     "story_size_defect",
     "check_story",
     "provisioned",

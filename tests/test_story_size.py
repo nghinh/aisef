@@ -48,6 +48,18 @@ class TestStorySize(unittest.TestCase):
         self.assertFalse(pf.executable)
         self.assertTrue(any(m.capability == "size" for m in pf.story_defects))
 
+    def test_touching_a_screen_built_by_an_earlier_story_counts_one(self):
+        """01-05 chạm notes-list (11, của 01-04) và dựng note-editor (7): 8, không chặn."""
+        s4 = story(["notes-list"]); s4.id = "STORY-01-04"
+        s5 = story(["notes-list", "note-editor"])
+        owned = preflight.screen_owners([s4, s5])
+        self.assertEqual(owned, {"notes-list": "STORY-01-04", "note-editor": "STORY-01-05"})
+        with mock.patch.object(preflight, "_experience", return_value=exp(**{"notes-list": 11, "note-editor": 7})):
+            self.assertIsNone(preflight.story_size_defect(s5, project=Path("."), config=self.cfg, owned=owned))
+            d4 = preflight.story_size_defect(s4, project=Path("."), config=self.cfg, owned=owned)
+        self.assertIsNotNone(d4)
+        self.assertIn("11 trạng thái", d4.evidence)
+
     def test_small_ui_story_passes(self):
         with mock.patch.object(preflight, "_experience", return_value=exp(**{"tags": 4})):
             self.assertIsNone(preflight.story_size_defect(story(["tags"]), project=Path("."), config=self.cfg))

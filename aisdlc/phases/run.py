@@ -34,7 +34,7 @@ from ..control.journal import (
     reconcile_all,
 )
 from ..control.normalize import Story, parse_architecture_file
-from ..control.preflight import STORY_NOT_EXECUTABLE, check_story
+from ..control.preflight import STORY_NOT_EXECUTABLE, check_story, screen_owners
 from ..control.state import StateStore, StoryStatus, TransitionError
 from ..control.worktree import GitError, WorktreeManager
 from ..harness.prompts import load_catalog
@@ -288,7 +288,8 @@ def _run_wave(
         # chấm cùng phép kiểm này, nhưng cấu hình dự án đổi được sau khi
         # cổng ấy duyệt — và một story không chạy được thì mọi đồng tiêu
         # cho nó là tiêu vào chỗ không thể qua.
-        pf = check_story(story, project=project, config=config)
+        pf = check_story(story, project=project, config=config,
+                         owned=screen_owners(plan.stories.values()))
         if not pf.executable:
             out = StoryOutcome(story_id=story_id)
             out.blocked_reason = (
