@@ -19,6 +19,7 @@ from .implement import (
     cmd_devsecops,
     cmd_evidence,
     cmd_improve,
+    cmd_issues,
     cmd_predeploy,
     cmd_qa,
     cmd_report,
@@ -170,6 +171,15 @@ def build_parser() -> argparse.ArgumentParser:
     ev.add_argument("id", help="mã story (STORY-01-04) hoặc mã hành vi (AC-STORY-01-04-2, FR-3, qa:e2e, mockup:notes-list)")
     ev.add_argument("--story", default="", help="ghi bằng chứng evidence_lookup cho story này")
     ev.set_defaults(func=cmd_evidence)
+
+    iss = sub.add_parser("issues", help="xuất bảng gap/hồi quy từ sổ hành vi ra tệp "
+                                        "(ADR-004 R12) — để theo dõi, không chạm cổng")
+    iss.add_argument("--format", default="md", choices=("md", "csv"))
+    iss.add_argument("--epic", default="", help="chỉ hành vi thuộc epic này, ví dụ EPIC-01")
+    iss.add_argument("--status", default="gap,reopened",
+                     help="trạng thái lấy, ngăn bởi dấu phẩy: gap · reopened · verified")
+    iss.add_argument("--out", default="", help="tệp ra (mặc định _bmad-output/ISSUES.md|csv)")
+    iss.set_defaults(func=cmd_issues)
 
     rp = sub.add_parser("report", help="báo cáo nghiệm thu từ bằng chứng")
     rp.add_argument("--out", default="", help="đường dẫn file ra")

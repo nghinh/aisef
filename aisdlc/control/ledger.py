@@ -33,6 +33,8 @@ tên test; ghi mọi lần quan sát thì sổ to hơn bằng chứng nó chiế
 
 from __future__ import annotations
 
+import csv
+import io
 import json
 import re
 import time
@@ -59,6 +61,11 @@ STORIES_INDEX = "stories.index.json"
 VERIFIED = "verified"
 GAP = "gap"
 REOPENED = "reopened"
+
+#: Cột của bảng gap/hồi quy (R12) — Markdown và CSV dùng cùng một thứ tự,
+#: để một tệp đọc bằng mắt và một tệp đọc bằng máy không kể hai chuyện khác nhau.
+ISSUE_COLUMNS = ("id", "kind", "status", "story", "regressed_by", "source", "why",
+                 "candidate", "since", "changes")
 
 #: Bằng chứng không thuộc story nào — pha lập kế hoạch, dựng mockup, quét skill.
 PHASE_PREFIXES = ("plan-", "mockup-", "skill-")
@@ -277,6 +284,31 @@ class Ledger:
             "loops": loops,
         }
 
+    def issues(self, *, epic: str = "", statuses=(GAP, REOPENED)) -> list[dict]:
+        """R12 — một dòng mỗi hành vi chưa xanh, để theo dõi ngoài kho.
+
+        Hồi quy lên đầu: "đã đúng rồi hỏng" là thứ người đọc bảng này cần
+        thấy trước, còn gap thì cổng story đã kể rồi. `changes` là số lần đổi
+        trạng thái — một hành vi lật qua lật lại nhiều lần là dấu hiệu story
+        sửa đang giẫm lên nhau, không suy được từ trạng thái hiện tại.
+        """
+        want = set(statuses)
+        rows = []
+        for b in sorted(self.behaviors.values(),
+                        key=lambda b: (b.status != REOPENED, b.story, b.id)):
+            if b.status not in want or (epic and self.epic_of(b.story) != epic):
+                continue
+            src = b.source
+            rows.append({
+                "id": b.id, "kind": b.kind, "status": b.status, "story": b.story,
+                "regressed_by": b.regressed_by,
+                "source": str(src.get("test_id") or src.get("screen")
+                              or (f"qa:{src['qa_kind']}" if src.get("qa_kind") else "")),
+                "why": str(src.get("why") or ""),
+                "candidate": b.candidate[:7], "since": b.since, "changes": len(b.history),
+            })
+        return rows
+
     def snapshot(self, loop_label: str, cost_usd: float = 0.0) -> dict:
         """Chốt một mốc (vòng cải tiến, hoặc lần chạy) vào `loops[]`."""
         s = self.summary()
@@ -363,6 +395,24 @@ class Ledger:
         if len(text) > max_chars:
             text = text[:max_chars].rstrip() + "\n_(đã cắt theo trần ký tự — `aisdlc evidence <id>`)_"
         return text
+
+
+def issues_text(rows: list[dict], fmt: str) -> str:
+    """Bảng R12 thành Markdown hay CSV chuẩn (`csv`, để tracker nào cũng nhập được)."""
+    if fmt == "csv":
+        buf = io.StringIO()
+        w = csv.DictWriter(buf, fieldnames=ISSUE_COLUMNS, lineterminator="\n")
+        w.writeheader()
+        w.writerows(rows)
+        return buf.getvalue()
+    cell = lambda v: str(v).replace("|", "\\|").replace("\n", " ")  # noqa: E731
+    return "\n".join([
+        f"# Gap / hồi quy · {len(rows)} hành vi",
+        "",
+        "| " + " | ".join(ISSUE_COLUMNS) + " |",
+        "|" + "---|" * len(ISSUE_COLUMNS),
+        *("| " + " | ".join(cell(r[c]) for c in ISSUE_COLUMNS) + " |" for r in rows),
+    ]) + "\n"
 
 
 # ---------------------------------------------------------------- dựng sổ

@@ -36,6 +36,14 @@ class LedgerTestCase(unittest.TestCase):
     def tearDown(self):
         self._tmp.cleanup()
 
+    def run_cli(self, *args: str) -> tuple[int, str, str]:
+        from aisdlc.cli import main
+
+        out, err = io.StringIO(), io.StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            code = main(["--project", str(self.root.parent), *args])
+        return code, out.getvalue(), err.getvalue()
+
     def index(self, stories):
         (self.root / L.STORIES_INDEX).write_text(
             json.dumps({"stories": stories}, ensure_ascii=False), encoding="utf-8"
@@ -301,14 +309,6 @@ class TestSlotIndexTrongPrompt(LedgerTestCase):
 
 
 class TestCliEvidence(LedgerTestCase):
-    def run_cli(self, *args: str) -> tuple[int, str, str]:
-        from aisdlc.cli import main
-
-        out, err = io.StringIO(), io.StringIO()
-        with redirect_stdout(out), redirect_stderr(err):
-            code = main(["--project", str(self.root.parent), *args])
-        return code, out.getvalue(), err.getvalue()
-
     def seed(self):
         self.index([{"id": "STORY-01-01", "epic_id": "EPIC-01",
                      "acceptance_criteria": ["a"]},
@@ -346,6 +346,75 @@ class TestCliEvidence(LedgerTestCase):
         notes = [e for e in self.store.read("STORY-01-02").events if e.name == "evidence_lookup"]
         self.assertEqual(len(notes), 1)
         self.assertEqual(notes[0].detail["id"], "AC-STORY-01-01-1")
+
+
+class TestXuatBangGap(LedgerTestCase):
+    """`aisdlc issues` (ADR-004 R12): sổ ra bảng để theo dõi ngoài kho.
+
+    Bảng là phép chiếu thứ hai của cùng một sổ — nó không được nói khác
+    `aisdlc evidence`: cùng thủ phạm, cùng nguồn kiểm, cùng số lần đổi.
+    """
+
+    def seed(self):
+        self.index([
+            {"id": "STORY-01-01", "epic_id": "EPIC-01", "acceptance_criteria": ["a"]},
+            {"id": "STORY-01-02", "epic_id": "EPIC-01", "acceptance_criteria": ["b", "c"]},
+            {"id": "STORY-02-01", "epic_id": "EPIC-02", "acceptance_criteria": ["d"]},
+        ])
+        t1 = ac_test("STORY-01-01", 1)
+        self.run_tests("STORY-01-01", ids=[t1])
+        # 01-02 làm đỏ tiêu chí của 01-01, và chính nó thiếu test cho tiêu chí 2.
+        self.run_tests("STORY-01-02", ids=[t1, ac_test("STORY-01-02", 1)],
+                       failed=[t1], attempt=2, candidate="deadbeefcafe")
+        self.store.tool_run("STORY-02-01", "qa:e2e", ok=False, detail={"tail": "đỏ"})
+
+    def test_mac_dinh_xuat_md_gap_va_hoi_quy_hoi_quy_len_dau(self):
+        self.seed()
+        code, out, _ = self.run_cli("issues")
+        self.assertEqual(code, 0)
+        path = self.root / "ISSUES.md"
+        self.assertIn(str(path), out)
+        text = path.read_text(encoding="utf-8")
+        rows = [l for l in text.splitlines() if l.startswith("| AC-") or l.startswith("| qa:")]
+        self.assertEqual(len(rows), 3)                         # 01-01-1 · 01-02-2 · qa:e2e
+        self.assertTrue(rows[0].startswith("| AC-STORY-01-01-1 | ac | reopened | STORY-01-01 "
+                                           "| STORY-01-02#2@deadbee | src/x.ts"))
+        self.assertIn("| 2 |", rows[0])                        # verified → reopened: 2 lần đổi
+        self.assertIn("| AC-STORY-01-02-2 | ac | gap | STORY-01-02 |  |  | chưa có test mang mã", text)
+        self.assertIn("| qa:e2e | qa | gap | STORY-02-01 |  | qa:e2e |", text)
+        self.assertNotIn("| verified |", text)
+
+    def test_csv_chuan_doc_lai_duoc_cung_cot_voi_md(self):
+        import csv
+
+        self.seed()
+        self.run_cli("issues", "--format", "csv")
+        with (self.root / "ISSUES.csv").open(encoding="utf-8", newline="") as f:
+            rows = list(csv.DictReader(f))
+        self.assertEqual(tuple(rows[0].keys()), L.ISSUE_COLUMNS)
+        self.assertEqual(rows[0]["regressed_by"], "STORY-01-02#2@deadbee")
+        self.assertEqual({r["status"] for r in rows}, {"reopened", "gap"})
+
+    def test_loc_epic_va_trang_thai(self):
+        self.seed()
+        out = self.root / "x.md"
+        self.run_cli("issues", "--epic", "EPIC-02", "--out", str(out))
+        text = out.read_text(encoding="utf-8")
+        self.assertIn("qa:e2e", text)
+        self.assertNotIn("STORY-01-", text)
+
+        self.run_cli("issues", "--status", "reopened", "--out", str(out))
+        self.assertIn("· 1 hành vi", out.read_text(encoding="utf-8"))
+
+        self.run_cli("issues", "--status", "verified,gap", "--out", str(out))
+        self.assertIn("| AC-STORY-01-02-1 | ac | verified |", out.read_text(encoding="utf-8"))
+
+    def test_trang_thai_sai_thi_bao_loi_khong_xuat_tep_rong(self):
+        self.seed()
+        code, _, err = self.run_cli("issues", "--status", "gap,done")
+        self.assertEqual(code, 1)
+        self.assertIn("done", err)
+        self.assertFalse((self.root / "ISSUES.md").exists())
 
 
 if __name__ == "__main__":
