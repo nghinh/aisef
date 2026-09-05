@@ -510,6 +510,7 @@ Không để chữ "ngưỡng" chung chung. Mặc định trong `.ai/config.json
 | `story.max_acceptance_criteria` | `8` | quá thì Bước 2 buộc chẻ nhỏ |
 | `story.max_write_scope_paths` | `10` | story chạm quá nhiều nơi là dấu hiệu quá lớn |
 | `story.max_screen_states` | 8 | Tổng trạng thái màn hình (EXPERIENCE.md) một story phải dựng. Vượt → cổng `stories` chặn với chỉ dẫn chẻ; `run` từ chối. Đo 2026-09-05 e9: 11 và 18 trạng thái đều chạm `max_turns` lượt đầu, 4–8 lượt |
+| `story.max_complexity` | `16.0` | **Điểm cỡ story** tổng hợp (ADR-004 R5, `control/complexity.py`): trạng thái màn hình ×1 + tiêu chí ×1 + đường dẫn write_scope ×0,5 (không tính manifest/lockfile) + fan-in phụ thuộc ×1 + hành vi VERIFIED bị chạm ×0,5 (ledger, tuỳ chọn). Vượt **hoặc** vượt `max_screen_states` → cổng `stories` chặn kèm gợi ý chẻ tất định, `run` từ chối trước khi gọi model; story đã xong bỏ qua. Hiệu chuẩn B4 hồi cứu 23 story thật: Spearman(điểm, lượt developer lượt đầu) = 0,88; 16 tách e9 01-04 (23,5) và 01-05 (18,0) khỏi 01-03 (6,5) và `par` (3,0). `run` tự ghi `_bmad-output/complexity.json` sau mỗi story và `aisdlc doctor` cảnh báo khi ngưỡng lệch dữ liệu |
 | ~~`story.max_context_tokens`~~ | — | **gỡ 2026-09-05**: chưa từng có mã đọc. Thay bằng `prompt_chars` ghi vào evidence mỗi lượt gọi model; `aisdlc status` cảnh báo story nạp > 3× trung vị |
 | `run.max_parallel` | `3` | số story song song trong một đợt |
 | `run.max_turns` | `40` | vòng lặp tối đa của một phiên story |

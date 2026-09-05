@@ -1,6 +1,6 @@
 # ADR-004 — Cải tiến liên tục theo bằng chứng ở cấp epic (đối chiếu Harness-of-Harness)
 
-**Trạng thái:** PROPOSED — bộ yêu cầu nâng cấp, chưa hiện thực. Ngày 2026-09-05.
+**Trạng thái:** PROPOSED — bộ yêu cầu nâng cấp. Ngày 2026-09-05. **R5 ACCEPTED** (hiện thực + số đo B4 ở §6); các mục còn lại chưa hiện thực.
 **Nguồn đối chiếu:** paper *Harness-of-Harness: Multi-Day Autonomous Software Development with Continual Improvement* (arXiv 2609.01481v1, Shanghai AI Lab) và repo `Flesymeb/HarnessOfHarness` — repo tại thời điểm đọc chỉ có README + tài sản trình diễn (58 commit, MIT, "HoH-lite sẽ công bố"), **không có mã**; mọi cơ chế dưới đây lấy từ paper.
 **Ràng buộc giữ nguyên:** sáu nhóm harness hiện có, evidence-first, reviewer ≠ developer, bảo đảm phía harness, worktree cách ly, cổng người, CLI gọi-một-lần/không daemon, không tin client. Không dùng HoH làm runtime. Không tự sửa framework: mọi thay đổi vẫn qua test, benchmark, ADR/evidence và cổng người/phát hành.
 
@@ -24,7 +24,7 @@ Một vòng = ba vai **Planner** (đọc spec 𝒮 + evidence ℰ₍t−1₎ + a
 | Vòng lặp evidence → re-plan | lượt thử trong story (`run.max_retries`, feedback "Lượt trước chưa đạt"), bế tắc kế hoạch do reviewer kiểm chứng → trả về người; `aisdlc change FR-x` → `STORY-CH-nn` | ◐ chỉ **trong** story hoặc bằng tay; **không có vòng epic** QA → evidence → story sửa → kiểm lại |
 | Preservation / regression | `control/impact.py` (tệp đổi → module/test ảnh hưởng), `tdd.red_before_green`, `qa:test-delta` cho reviewer | ◐ có "bề mặt hồi quy" cho reviewer, **không** có danh sách hành vi phải giữ và không đo được "đã đúng rồi lại hỏng" |
 | Trạng thái hành vi VERIFIED/GAP/REOPENED | `Outcome` cho từng phép kiểm; `control/acceptance.py` nối `AC-<story>-<i>` ↔ tên test | ✗ không có sổ hành vi theo thời gian |
-| Cổng cỡ task | `story.max_acceptance_criteria`, `max_write_scope_paths`, **`max_screen_states`** (P2-12, hiệu chuẩn e9) | ◐ một chiều (trạng thái màn hình); chưa có điểm tổng hợp + hiệu chuẩn tự ghi |
+| Cổng cỡ task | `story.max_acceptance_criteria`, `max_write_scope_paths`, `max_screen_states` (P2-12) + **`story.max_complexity`** (R5: `control/complexity.py`, hiệu chuẩn tự ghi `complexity.json`) | ✅ năm chiều, có gợi ý chẻ tất định và cảnh báo lệch ngưỡng ở `doctor` |
 | Progressive disclosure | `build_context` chọn slot theo story (handoff ghi slot + số ký tự); `aisdlc doc` nạp tài liệu khi cần | ◐ chưa có chỉ mục evidence dự án; báo cáo nghiệm thu là trang tĩnh |
 | Metrics | chi phí, lượt, attempts, TCCN có test, map mockup | ✗ không có tăng trưởng năng lực đã xác minh, hồi quy, gap đã đóng, cải thiện biên |
 | Runtime tất định: schema + retry | `skill_scan` kiểm JSON; reviewer trả văn bản có thẻ `[chặn]`/`[bế tắc]` (lỗi 16 vừa sửa) | ◐ chưa có schema bắt buộc + retry cho reviewer/security |
@@ -35,7 +35,7 @@ Một vòng = ba vai **Planner** (đọc spec 𝒮 + evidence ℰ₍t−1₎ + a
 2. **Bằng chứng không gắn commit.** Không có "candidate SHA" thì không nói được "bằng chứng này thuộc bản nào", và không có khái niệm *stale*.
 3. **Không có sổ hành vi.** Không phân biệt được "chưa từng đạt" với "đã đạt rồi hỏng" — con số 17/81 reopened của Fusepoint là thứ V2 không đo nổi.
 4. **Preservation không phải hợp đồng.** Developer lượt sau không được bảo "những hành vi này phải còn"; reviewer chỉ có bề mặt hồi quy theo tệp.
-5. **Cỡ story một chiều.** Đo hôm nay: story 11–18 trạng thái chạm `max_turns`; nhưng story 0 màn hình 14 tệp cũng 61 lượt/16 lượt developer (01-01). Cần điểm tổng hợp có hiệu chuẩn.
+5. ~~**Cỡ story một chiều.**~~ Đo hôm nay: story 11–18 trạng thái chạm `max_turns`; nhưng story 0 màn hình 14 tệp cũng 61 lượt/16 lượt developer (01-01). Cần điểm tổng hợp có hiệu chuẩn. — **đã đóng bằng R5**, số đo §6.
 
 ---
 
@@ -168,3 +168,92 @@ SHA 7 ký tự; phép hợp quy **C8** (tất định, $0).
 
 Chưa có (cần lượt agent thật): AC (d) *không tăng số lượt/chi phí trên dogfood
 `par`* và bảng hợp quy C8 trên hai client — B2 chỉ mới xanh ở nửa unit.
+
+### R5 — Story Complexity Gate v2 (B4, hồi cứu 2026-09-05, 0 agent, $0)
+
+**Hiện thực:** `control/complexity.py` (điểm + gợi ý chẻ + bảng hiệu chuẩn),
+`control/preflight.py::story_size_defect` gọi sang đó, ngưỡng
+`story.max_complexity` = 16,0 (`story.max_screen_states` = 8 giữ nguyên và
+vẫn chặn riêng), `phases/run.py` ghi `_bmad-output/complexity.json` sau
+`verification.completed`, `phases/story_split.py` đưa gợi ý chẻ vào
+`stories.gate.json` khoá `splits`, `aisdlc doctor` cảnh báo lệch ngưỡng.
+
+**Điểm** = trạng thái màn hình ×1 + tiêu chí chấp nhận ×1 + đường dẫn
+`write_scope` ×0,5 (không tính manifest/lockfile) + fan-in phụ thuộc ×1 +
+hành vi VERIFIED bị chạm ×0,5 (đọc `ledger.json` nếu có, thiếu thì 0).
+Trạng thái màn hình giữ đúng luật `screen_owners`: màn story khác đã dựng
+tính 1.
+
+**Dữ liệu:** 23 story thật (e9 18 + `par` 5), chỉ đọc, từ `stories.index.json`,
+`EXPERIENCE.md`, `evidence/*.jsonl`. "Lượt đầu" = `turns` của `agent_run`
+`<story>#1` **đầu tiên** trong sổ bằng chứng.
+
+| dự án | story | trạng thái | tiêu chí | scope | fan-in | **điểm** | lượt đầu | lượt thử | chạm `max_turns` |
+|---|---|---|---|---|---|---|---|---|---|
+| e9 | 01-01 | 0 | 7 | 9 | 1 | 12,5 | 61 | 4 | có (trần 60 lúc ấy) |
+| e9 | 01-02 | 0 | 7 | 10 | 2 | 14,0 | 42 | 4 | không |
+| e9 | 01-03 | 0 | 4 | 3 | 1 | 6,5 | 57 | 1 | không |
+| e9 | **01-04** | 9 | 7 | 13 | 1 | **23,5** | 89 / 90 | 4 | không (89 < 90; $79,67) |
+| e9 | **01-05** | 5 | 7 | 10 | 1 | **18,0** | 91 | 4 | **có** |
+| e9 | 01-06 | 1 | 7 | 6 | 2 | 13,0 | 84 | 3 | không |
+| e9 | 01-07 | 2 | 6 | 4 | 2 | 12,0 | — | — | chưa chạy |
+| e9 | 02-01 | 0 | 4 | 2 | 1 | 6,0 | — | — | chưa chạy |
+| e9 | 02-02 | 0 | 5 | 5 | 2 | 9,5 | — | — | chưa chạy |
+| e9 | 02-03 | 1 | 8 | 10 | 1 | 15,0 | — | — | chưa chạy |
+| e9 | 02-04 | 1 | 6 | 6 | 1 | 11,0 | — | — | chưa chạy |
+| e9 | 03-01 | 1 | 7 | 8 | 1 | 13,0 | — | — | chưa chạy |
+| e9 | 03-02 | 1 | 7 | 9 | 2 | 14,5 | — | — | chưa chạy |
+| e9 | 03-03 | 4 | 7 | 7 | 1 | 15,5 | — | — | chưa chạy |
+| e9 | 04-01 | 2 | 7 | 8 | 1 | 14,0 | — | — | chưa chạy |
+| e9 | 04-02 | 3 | 7 | 7 | 1 | 14,5 | — | — | chưa chạy |
+| e9 | 05-01 | 5 | 7 | 6 | 1 | 16,0 | — | — | chưa chạy |
+| e9 | 05-02 | 2 | 7 | 6 | 0 | 12,0 | — | — | chưa chạy |
+| par | 01-01 | 0 | 2 | 2 | 0 | 3,0 | 24 | 2 | không |
+| par | 01-02 | 0 | 2 | 2 | 0 | 3,0 | 41 | 2 | **có** (trần 40) |
+| par | 01-03 | 0 | 2 | 2 | 0 | 3,0 | 37 | 1 | không |
+| par | 02-01 | 0 | 2 | 2 | 0 | 3,0 | (0) | 2 | client không báo `turns` |
+| par | 03-01 | 0 | 2 | 2 | 0 | 3,0 | 8 | 1 | không |
+
+**Spearman(điểm, lượt developer lượt đầu) = 0,88** trên n = 10 story có số
+lượt (loại `par` STORY-02-01 vì `turns = 0` — client không báo, không phải
+"nhanh"). Kể cả nó vào mẫu thì ρ = 0,89. Ngưỡng AC là ≥ 0,5 → **đạt**.
+
+**Tách được 01-04/01-05 khỏi 01-03 và `par`:** ngưỡng 16 chặn đúng hai
+story ấy (23,5 và 18,0) và không chạm 01-01 (12,5), 01-02 (14,0), 01-03
+(6,5), 01-06 (13,0) hay `par` (3,0). Trên cả 18 story e9 nó chỉ chặn hai
+story ấy; story sát ngưỡng nhất chưa chạy là 05-01 (16,0, đúng bằng ngưỡng
+nên không chặn). Ngưỡng 15 sẽ chặn thêm 03-03 và 05-01, ngưỡng 18 mất
+01-05 — 16 là khoảng rộng nhất còn tách đúng.
+
+**Nói thật phần không khớp.** Hai lần chạm `max_turns` nằm **dưới** ngưỡng:
+
+* e9 01-01 (điểm 12,5) chạm trần ở 61 lượt — nhưng trần lúc ấy là 60, còn
+  trần hiện tại là 90. Ở cấu hình hôm nay lần chạy đó không chạm.
+* `par` 01-02 (điểm 3,0) chạm trần ở 41 lượt với `run.max_turns` = 40;
+  cùng story ấy xong trong 17, 20, 21, 24 lượt ở bốn lần chạy khác. Đây là
+  phương sai phiên cộng trần thấp, không phải cỡ story: một story hai tệp,
+  hai tiêu chí không chẻ nhỏ hơn được.
+
+Nghĩa là AC (b) của B4 — *"0 story ≤ ngưỡng chạm `max_turns` ở `par`"* —
+**không đạt theo nghĩa đen** trên dữ liệu lịch sử, và cách sửa đúng là
+`run.max_turns` của `par`, không phải hạ `story.max_complexity` (hạ xuống 3
+thì chặn cả 23 story). Cổng ghi nhận: điểm cỡ nói được story nào **luôn
+luôn** đắt, không nói được lượt nào **xui**.
+
+**Cũng đo được, và là lý do có cổng v2:** chiều màn hình một mình bỏ sót
+e9 01-01 — 0 màn hình, 9 đường dẫn, 7 tiêu chí, 61 lượt lượt đầu và 4 lượt
+thử; điểm 12,5 xếp nó trên 01-03 (6,5, 57 lượt/1 lượt thử) đúng thứ tự chi
+phí thật.
+
+**Hiệu chuẩn tự ghi.** `_bmad-output/complexity.json` giữ mỗi story một
+dòng {điểm, từng thành phần, ngưỡng lúc chấm, lượt đầu, số lượt thử, có
+chạm `max_turns`}. `aisdlc doctor` cảnh báo khi ≥ 2 story dưới ngưỡng mà
+chạm `max_turns` ("ngưỡng quá cao") hoặc ≥ 2 story trên ngưỡng mà xong
+ngay lượt đầu dưới nửa trần ("ngưỡng quá thấp"). Một story lệch không đủ
+kết luận — đúng như hai trường hợp ở trên.
+
+**Test:** `tests/test_story_size.py` 30 phép (từng thành phần điểm, story
+đã xong bỏ qua, hai ngưỡng, gợi ý chẻ ba lối, hiệu chuẩn ghi/đọc, doctor
+cảnh báo, Spearman) + `tests/test_run.py` 2 phép (chặn ở `run`, bảng hiệu
+chuẩn được ghi sau khi story xong). Bộ đầy đủ: **1 256 test, OK**
+(skipped 56).

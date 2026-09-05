@@ -160,6 +160,21 @@ def cmd_doctor(args) -> int:
                 f"thiếu {', '.join(thieu)} — framework có guard mới sau lần biên dịch; chạy `aisdlc compile --client {c.get('client')}`",
             )
 
+    # Ngưỡng cỡ story chỉ đáng tin chừng nào nó còn khớp dữ liệu thật
+    # (ADR-004 R5). Bảng hiệu chuẩn do `run` tự ghi sau mỗi story.
+    from ..control import complexity
+
+    rows = complexity.load_calibration(project / "_bmad-output")
+    if rows:
+        lech_nguong = complexity.divergence(rows)
+        check(
+            "ngưỡng cỡ story khớp dữ liệu", not lech_nguong,
+            f"{len(rows)} story đã đo, không thấy lệch" if not lech_nguong else
+            "; ".join(lech_nguong) + " — chỉnh `story.max_complexity` trong "
+            "`.ai/config.json` hoặc xem lại trọng số ở `control/complexity.py`",
+            required=False,
+        )
+
     lech = _hook_paths_elsewhere(project)
     if lech is not None:
         check(

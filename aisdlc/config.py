@@ -34,6 +34,12 @@ DEFAULTS: dict[str, Any] = {
     # trạng thái màn hình một story phải dựng (P2-12): đo 2026-09-05 trên e9,
     # story 11 và 18 trạng thái đều chạm max_turns ở lượt đầu và cần 4–8 lượt
     "story.max_screen_states": 8,
+    # điểm cỡ story tổng hợp (ADR-004 R5) — trạng thái màn hình + tiêu chí +
+    # phạm vi ghi + fan-in + hành vi VERIFIED bị chạm. Hiệu chuẩn B4 hồi cứu
+    # 23 story thật (Spearman 0,88 trên 10 story có số lượt): 16 tách đúng hai
+    # story đắt nhất (e9 01-04 23,5 và 01-05 18,0) khỏi phần còn lại (≤ 15,5).
+    # Xem `control/complexity.py` và ADR-004 §6 R5.
+    "story.max_complexity": 16.0,
     # điều phối
     "run.max_parallel": 3,
     "run.max_turns": 40,
@@ -96,6 +102,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "story.max_acceptance_criteria": int,
     "story.max_write_scope_paths": int,
     "story.max_screen_states": int,
+    "story.max_complexity": float,
     "run.max_parallel": int,
     "run.max_turns": int,
     "run.timeout_seconds": int,

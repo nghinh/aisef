@@ -325,6 +325,33 @@ class TestPreflight(RunTestCase):
             "src/khac/thieu.py", self.state().stories["STORY-01-01"].blocked_reason
         )
 
+    def test_story_qua_co_thi_chan_truoc_khi_goi_model(self):
+        """ADR-004 R5: điểm cỡ vượt `story.max_complexity` → không tiêu đồng nào.
+
+        Cổng `stories` đã chấm cùng phép kiểm; đây là lần chặn thứ hai, vì
+        kế hoạch sửa được sau khi cổng ấy duyệt.
+        """
+        self.index_with(acceptance_criteria=[f"Then điều {i}" for i in range(20)])
+        agent = Agent()
+        self.run_sprint(agent)
+        self.assertNotIn("STORY-01-01", agent.stories, "model không được gọi")
+        rec = self.state().stories["STORY-01-01"]
+        self.assertIs(rec.state, StoryStatus.BLOCKED)
+        self.assertIn("story.max_complexity", rec.blocked_reason)
+        self.assertIn("chẻ theo cụm tiêu chí", rec.blocked_reason)
+
+    def test_story_xong_thi_ghi_bang_hieu_chuan_co_story(self):
+        """Ngưỡng chỉ đáng tin khi có bảng đối chiếu điểm ↔ lượt thật."""
+        from aisdlc.control import complexity
+
+        self.run_sprint(Agent())
+        rows = complexity.load_calibration(self.artifacts)
+        self.assertIn("STORY-01-01", rows)
+        row = rows["STORY-01-01"]
+        self.assertEqual(row["threshold"], DEFAULTS["story.max_complexity"])
+        self.assertIn("write_scope", row["components"])
+        self.assertEqual(row["attempts"], 1)
+
     def test_thieu_cong_cu_test_thi_chan_truoc_khi_goi_model(self):
         agent = Agent()
         self.run_sprint(agent, config=self.config(**{"tools.test": ""}))
