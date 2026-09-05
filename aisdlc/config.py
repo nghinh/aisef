@@ -44,6 +44,12 @@ DEFAULTS: dict[str, Any] = {
     # Chỉ mục thay cho việc đổ lịch sử: agent cần chi tiết thì gọi
     # `aisdlc evidence <id>`, không nạp sẵn cả sổ.
     "context.max_index_chars": 2000,
+    # Trần ký tự cho hai slot R4 (`preservation`, `validation`) — hành vi
+    # VERIFIED của story khác mà story này chạm tệp, và thứ phải xanh ở ứng
+    # viên. Chỉ id + nguồn kiểm, không có lịch sử: đo trên sổ e9, STORY-01-07
+    # chạm 31 hành vi của 3 story — đổ hết vào prompt là quá 15 % ngân sách B5.
+    # Cổng "bảo toàn" vẫn kiểm **đủ** danh sách, cắt chỉ là cắt phần in ra.
+    "context.max_preservation_chars": 1500,
     # điều phối
     "run.max_parallel": 3,
     "run.max_turns": 40,
@@ -108,6 +114,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "story.max_screen_states": int,
     "story.max_complexity": float,
     "context.max_index_chars": int,
+    "context.max_preservation_chars": int,
     "run.max_parallel": int,
     "run.max_turns": int,
     "run.timeout_seconds": int,

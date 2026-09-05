@@ -13,7 +13,10 @@ Năm điều kiện, mỗi điều kiện trả lời được bằng dữ liệ
 3. thay đổi nằm trong ``write_scope``;
 4. màn hình khớp hợp đồng thị giác (chỉ story có giao diện);
 5. rà soát độc lập không còn mục chặn;
-6. không có test giả — test không khẳng định gì làm điều kiện 1 rỗng nghĩa.
+6. không có test giả — test không khẳng định gì làm điều kiện 1 rỗng nghĩa;
+7. bảo toàn (ADR-004 R4) — hành vi VERIFIED của story khác mà story này
+   chạm tệp vẫn xanh ở đúng ứng viên; không kiểm được thì nói là không
+   kiểm được, không nói là đạt.
 """
 
 from __future__ import annotations
@@ -21,7 +24,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from ..harness.guardrails import check_completion, check_diff_scope
-from .acceptance import ac_code, missing as ac_missing
+from .acceptance import ac_code, coverage as ac_coverage, missing as ac_missing
 from .outcome import Check, Outcome
 from .tdd import red_before_green
 from .security import DEFAULT_BLOCKING
@@ -83,6 +86,7 @@ def evaluate(
     coverage_min: float | None = None,
     added_tests: list[str] | None = None,
     candidate: str = "",
+    preservation: list[dict] | None = None,
 ) -> StoryGate:
     """Chấm một story từ bằng chứng đã ghi.
 
@@ -90,6 +94,10 @@ def evaluate(
     bằng chứng ghi ở bản khác **không được dùng để chấm**, và cổng nói ra
     điều đó thay vì im lặng chấm bằng số liệu của mã đã không còn. Rỗng =
     không kiểm (chạy tay, nhật ký cũ).
+
+    ``preservation`` là hành vi VERIFIED của story khác mà story này chạm
+    tệp (ADR-004 R4, `implement.preservation_items`). Rỗng = không áp dụng,
+    nên chỗ gọi cũ không đổi kết cục.
     """
     gate = StoryGate(story_id=story_id)
 
@@ -288,4 +296,79 @@ def evaluate(
             )
         )
 
+    gate.checks.append(_preservation_check(evidence, preservation or [], candidate))
     return gate
+
+
+def _preservation_check(evidence: Evidence, preservation: list[dict], candidate: str) -> Check:
+    """Mục "bảo toàn" (ADR-004 R4): hành vi VERIFIED của story khác mà story
+    này chạm tệp phải **còn xanh ở đúng ứng viên này**.
+
+    Ba kết cục, không có kết cục thứ tư. Đỏ → FAILED; sổ hành vi tự suy
+    REOPENED (`regressed_by` = story này) từ chính bằng chứng cổng đang đọc,
+    nên không ghi tay lần hai. Không có bằng chứng ở ứng viên — test không
+    mang mã, `qa` bỏ qua, màn chưa đối chiếu — → UNRUNNABLE: "không kiểm
+    được" không phải "đạt". Còn lại → PASSED.
+
+    Bằng chứng phải **mang đúng SHA**: sự kiện không khai bản (`for_candidate`
+    giữ lại) không được dùng ở đây, vì mục này hỏi đúng câu "bản này có làm
+    hỏng không", và một lần chạy không rõ bản nào không trả lời được.
+    """
+    if not preservation:
+        return Check("bảo toàn", Outcome.NOT_APPLICABLE,
+                     "story không chạm hành vi VERIFIED nào của story khác")
+
+    def at_candidate(kind: str, name: str):
+        runs = [e for e in evidence.of(kind, name)
+                if not candidate or str(e.detail.get("candidate") or "") == candidate]
+        return runs[-1] if runs else None
+
+    test = at_candidate(TOOL_RUN, "test")
+    ids = ([str(t) for t in test.detail.get("test_ids") or []]
+           if test is not None and test.detail.get("test_format") else [])
+    failed = {str(t) for t in test.detail.get("failed_ids") or []} if test is not None else set()
+
+    do, thieu = [], []
+    for it in preservation:
+        bid, kind, owner = str(it.get("id") or ""), str(it.get("kind") or ""), str(it.get("story") or "")
+        if kind == "ac":
+            i = int(bid.rsplit("-", 1)[-1]) if bid.rsplit("-", 1)[-1].isdigit() else 0
+            tests = ac_coverage(owner, i, ids).get(i, []) if i else []
+        elif kind in ("fr", "nfr"):
+            # Yêu cầu xanh khi tiêu chí của story sở hữu xanh — cùng luật với sổ.
+            tests = [t for t in ids if f"AC-{owner}-" in t.replace("_", "-")]
+        elif kind == "qa":
+            ran = at_candidate(TOOL_RUN, bid)
+            if ran is None or ran.detail.get("skipped"):
+                thieu.append(bid)
+            elif not ran.ok:
+                do.append(bid)
+            continue
+        elif kind == "mockup":
+            m = at_candidate(MOCKUP_MAP, bid.split(":", 1)[-1])
+            if m is None:
+                thieu.append(bid)
+            elif not m.ok:
+                do.append(bid)
+            continue
+        else:
+            thieu.append(bid)
+            continue
+        if not tests:
+            thieu.append(bid)
+            continue
+        red = [t for t in tests if t in failed]
+        if red:
+            do.append(f"{bid} ({red[0]})")
+
+    if do:
+        return Check("bảo toàn", Outcome.FAILED,
+                     f"hồi quy: {', '.join(do[:3])}{'…' if len(do) > 3 else ''} — hành vi đã "
+                     "VERIFIED của story khác đỏ ở ứng viên này; sửa code cho nó xanh lại, "
+                     "không sửa test của nó")
+    if thieu:
+        return Check("bảo toàn", Outcome.UNRUNNABLE,
+                     f"chưa kiểm được ở ứng viên {candidate[:7] or 'này'}: "
+                     f"{', '.join(thieu[:3])}{'…' if len(thieu) > 3 else ''} — không có test "
+                     "mang mã / kiểm định bỏ qua / màn chưa đối chiếu; không kiểm được không phải đạt")
+    return Check("bảo toàn", True, f"{len(preservation)} hành vi của story khác còn xanh")

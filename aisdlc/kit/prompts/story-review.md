@@ -1,6 +1,6 @@
 ---
 name: story-review
-version: 4
+version: 5
 role: reviewer
 ---
 # Rà soát {{ story_id }} — {{ story_title }}
@@ -26,6 +26,17 @@ Không sửa code. Chỉ báo cáo.
 ## Thay đổi này chạm tới đâu
 
 {{ impact }}
+
+## Hành vi phải giữ
+
+Từ sổ hành vi, không từ người viết. Test mang mã của một mục dưới đây bị
+sửa, đổi tên hay bớt ca để qua cổng là mục `[chặn]`.
+
+{{ preservation }}
+
+## Phải xanh ở ứng viên
+
+{{ validation }}
 
 ## Rà theo thứ tự này
 
