@@ -191,7 +191,7 @@ trong worktree git riêng; merge tuần tự cuối đợt. Conflict lúc merge 
 
 ```
 aisdlc/
-  cli.py            bộ lệnh, mọi lệnh gọi-một-lần, không daemon
+  cli/              bộ lệnh chia theo pha, mọi lệnh gọi-một-lần, không daemon
   config.py         ngưỡng và cấu hình, có kiểu, có kiểm
   clients/          Claude Code · OpenCode; năng lực được **khai**, không giả định
   control/          cổng, phê duyệt, xếp lịch, worktree, chuẩn hoá tài liệu BMAD

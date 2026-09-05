@@ -76,7 +76,7 @@ suy luận; **REC** = khuyến nghị.
 | Registry: `SkillEntry` (provenance `commit`, `license`, `status`, `verified`), vòng đời `candidate→verified→active→stale→rejected`, **không** có cạnh vào `verified` mà không qua kiểm, không có cạnh ra khỏi `rejected`; `stale` khi commit đổi hoặc thư mục mất | `kit/registry.py` |
 | Kiểm cấu trúc trước khi nhận: frontmatter, tên = thư mục, link tương đối tồn tại, không secret, không câu injection, lọc offensive | `kit/registry.py:verify_structure` |
 | Router hai tín hiệu (paper §4.2 từ chối keyword-only), **abstain**, ngưỡng 3 / tối đa 3, skill framework theo pha, chỉ đưa tên/`use_when`/đường dẫn (progressive disclosure) | `kit/router.py` |
-| Lệnh `aisdlc skill [--story]` | `cli.py:961` |
+| Lệnh `aisdlc skill [--story]` | `cli/harness.py:cmd_skill` |
 | Baseline đã đo: e9 **11 lượt gọi Skill / 86 phiên**; router trên 18 story e9: abstain 13/18 sau khi sửa dương tính giả (ADR-002 §1, §6) | `docs/ADR-002` |
 
 **Chưa có:** router chưa nối vào prompt story; chưa có telemetry

@@ -76,7 +76,7 @@
 | `aisdlc/harness/sandbox.py` | 4 bậc quyền, Docker | 21 |
 | `aisdlc/config.py` | 12 khoá ngưỡng | 21 |
 | `aisdlc/control/state.py` | tiến độ, khoá, resume | 18 |
-| `aisdlc/cli.py` | doctor · gates · review · approve · reject · status · setup | 26 |
+| `aisdlc/cli/` | doctor · gates · review · approve · reject · status · setup | 26 |
 | `aisdlc/kit/detect_stack.py` | dò công nghệ | 17 |
 | `aisdlc/kit/catalog.py` | sổ đăng ký nguồn + ràng buộc license | 17 |
 | `aisdlc/kit/install.py` | cài skill, idempotent | 14 |
@@ -120,7 +120,7 @@ Mục đích duy nhất: **giết các giả định còn lại** (7 spike). Cod
 | 1.2 | Kho trạng thái | `control/state.py` | `sprint-status.json` ghi nguyên tử, khoá file chống hai tiến trình; test 2 tiến trình ghi đồng thời không hỏng |
 | 1.3 | Vòng đời story | `control/fsm.py` | `pending→running→verifying→done\|blocked`; chuyển sai trạng thái bị từ chối; test đủ nhánh |
 | 1.4 | Cô lập worktree | `control/worktree.py` | tạo/xoá worktree, merge tuần tự, **phát hiện conflict → dừng và báo**; test trên repo tạm |
-| 1.5 | Khung CLI | `aisdlc/cli.py`, `bin/aisdlc` | `doctor` `gates` `review` `approve` `reject` `status` chạy thật |
+| 1.5 | Khung CLI | `aisdlc/cli/`, `bin/aisdlc` | `doctor` `gates` `review` `approve` `reject` `status` chạy thật |
 
 **Mốc demo 1:** duyệt được một cổng bằng lệnh, thấy bảng trạng thái.
 
@@ -218,7 +218,7 @@ Nặng nhất. Tách hai tuần.
 | 6.7b | **Map mockup — nửa đối chiếu** | `harness/mockup_verify.py` | ✅ Chạy dev server, mở route thật bằng chromium, đối chiếu, ghi `mockup_map` |
 | 6.7c | Cổng khớp mockup | `control/gate.py` | ✅ Thiếu component đã hứa → trượt; thừa chỉ cảnh báo; **vùng `data-sample` chỉ cam kết có mục, không cam kết nội dung** |
 | 6.8 | Thất bại + retry | `phases/implement.py` | ✅ Lỗi hạ tầng có hạn mức riêng, không tính vào `max_retries`; lượt sau nhận đúng danh sách mục trượt |
-| 6.9 | `aisdlc run` | `phases/run.py`, `cli.py` | ✅ Epic tuần tự, đợt song song, worktree riêng, merge cuối đợt, resume; `--sequential`, `--epic`, `--no-isolate`. Thêm `aisdlc verify` (hậu kiểm) và `aisdlc tool` |
+| 6.9 | `aisdlc run` | `phases/run.py`, `cli/implement.py` | ✅ Epic tuần tự, đợt song song, worktree riêng, merge cuối đợt, resume; `--sequential`, `--epic`, `--no-isolate`. Thêm `aisdlc verify` (hậu kiểm) và `aisdlc tool` |
 
 *Đã đạt phần chạy khô:* điều phối chạy trên kho git + worktree thật với agent giả — story song song đúng đợt, merge tuần tự, dừng đúng chỗ khi trượt, chạy lại tiếp từ chỗ dở. Còn lại là chạy trên agent thật ở GĐ-9.
 
@@ -621,7 +621,7 @@ Bước tiếp: **đợt 1 — G4** truyền `--settings` tường minh + nhịp
 | S2 `aisdlc doc <gói> --topic <chủ đề> [--story]` — context7 qua HTTP (`/api/v1/search`, `/api/v1/<id>?type=txt&topic=`), cache `~/.cache/ai-sdlc/docs/`, bằng chứng `doc_lookup`; prompt developer nhắc lệnh trong bảng tool | 6 | đo tay 2026-09-05: `vitest`/`coverage` trả tài liệu thật kèm nguồn; không cần khoá | | ✅ |
 | S4 `aisdlc change FR-x "mô tả"` — ghi vào `docs/requirements.md`, đánh dấu `prd.md` → cổng PRD và các cổng sau tự `stale` (cascade sẵn có), sinh `STORY-CH-nn` trong `EPIC-CH` với `covers=[FR-x]`, `write_scope` trống để người khai; story cũ giữ `DONE` | 4 | — | | ✅ |
 | S6 quét skill ngoài theo tiêm prompt | — | lớp heuristic đã có trong `registry.verify_structure` (câu tiêm, bí mật, offensive): e9 loại 3/156, par 2/120; quét bằng agent (prompt `story-security-review` chế độ tài liệu) **hoãn** — chi phí ~156 phiên, làm khi có ngân sách riêng | | ◐ |
-| S5 chia `cli.py` | — | hoãn tới khi không còn lượt agent nào chạy (hook nhập `aisdlc.cli` mỗi lần gọi; đổi bố cục giữa chừng là cửa sổ lỗi thật) | | ⬜ |
+| S5 chia `cli.py` | — | thuần cơ học: gói `aisdlc/cli/` (`_common` · `doctor` · `plan` · `implement` · `harness` · `parser`), `__init__` xuất lại mọi tên cũ nên `from aisdlc.cli import main` không đổi; `--help` của 23 lệnh diff rỗng trước/sau | | ✅ |
 
 **Đợt OKL (ADR-002 — tầng tri thức vận hành, sau paper Repo-To-Skill):**
 

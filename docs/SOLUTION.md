@@ -261,7 +261,7 @@ aisdlc/                          framework, một package Python
 ├── clients/                     R10
 │   ├── base.py  claude_code.py  opencode.py  compile.py
 ├── phases/                      setup · plan · mockup · implement · verify · ship
-└── cli.py
+└── cli/                         bộ lệnh, một tệp mỗi pha (parser · plan · implement · harness · doctor)
 ```
 
 **Sinh ra trong dự án đích:**
