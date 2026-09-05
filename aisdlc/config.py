@@ -49,7 +49,9 @@ DEFAULTS: dict[str, Any] = {
     # viên. Chỉ id + nguồn kiểm, không có lịch sử: đo trên sổ e9, STORY-01-07
     # chạm 31 hành vi của 3 story — đổ hết vào prompt là quá 15 % ngân sách B5.
     # Cổng "bảo toàn" vẫn kiểm **đủ** danh sách, cắt chỉ là cắt phần in ra.
-    "context.max_preservation_chars": 1500,
+    # 1 200, không phải 1 500: B5 hồi cứu e9 (ADR-004 §6 R4) đo developer
+    # +17,5 % prompt với trần 1 500 — vượt trần 15 %; bớt ≈ 300 ký tự về ≈ 15 %.
+    "context.max_preservation_chars": 1200,
     # vòng cải tiến epic theo bằng chứng (ADR-004 R3). HoH chạy T = 70 vòng
     # không có điều kiện dừng; ở đây mọi điều kiện dừng là code và ba số này
     # là trần. Đếm theo epic từ `loops[]` của sổ hành vi — chạy lại

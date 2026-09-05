@@ -132,7 +132,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   cắt chỉ mục epic, trần `context.max_index_chars` = 2000), `preservation`
   (hành vi VERIFIED của story khác bị chạm tệp: id · story · nguồn kiểm) và
   `validation` (thứ harness chạy lại ở ứng viên), trần
-  `context.max_preservation_chars` = 1500 chỉ cắt phần in ra. Tính một lần
+  `context.max_preservation_chars` = 1 200 chỉ cắt phần in ra. Tính một lần
   trước phiên developer, ba vai nhận cùng bản. Prompt developer +13,2 % trên
   test giả, ≈ +4 % trên e9 (ADR-004 §6 R4/R6).
 - **Rà soát trả JSON có schema** (ADR-004 R8): thiếu/sai → hỏi lại **đúng một
@@ -208,7 +208,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 | `story.max_screen_states` | `8` | P2-12 |
 | `story.max_complexity` | `16.0` | ADR-004 R5 |
 | `context.max_index_chars` | `2000` | ADR-004 R6 |
-| `context.max_preservation_chars` | `1500` | ADR-004 R4 |
+| `context.max_preservation_chars` | `1 200` | ADR-004 R4 |
 | `improve.max_loops` · `improve.flat_loops` · `improve.cost_cap_usd` | `3` · `2` · `0.0` | ADR-004 R3 |
 | `verify.baseline` | `true` | ADR-004 R9 |
 | `skills.inline` | `false` | ADR-003 §6 |

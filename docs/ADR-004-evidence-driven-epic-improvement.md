@@ -732,3 +732,5 @@ chi phí của một vòng là quyết định của người điều phối, kh
 `evidence/`), nên `build()` mang nó sang từ sổ cũ. Không làm thế thì một lần
 `aisdlc report` — vốn chiếu lại sổ mỗi lần chạy — sẽ xoá sạch mốc mà vòng R3
 vừa chốt; có test riêng cho đúng điều này.
+
+**Quyết định sau B5 (2026-09-06 06:25):** hạ mặc định `context.max_preservation_chars` 1 500 → 1 200 để Δ developer về ≈ +15 %; chưa đo lại trên agent thật — story kế trên e9 sẽ cho số.
