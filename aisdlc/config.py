@@ -50,6 +50,18 @@ DEFAULTS: dict[str, Any] = {
     # chạm 31 hành vi của 3 story — đổ hết vào prompt là quá 15 % ngân sách B5.
     # Cổng "bảo toàn" vẫn kiểm **đủ** danh sách, cắt chỉ là cắt phần in ra.
     "context.max_preservation_chars": 1500,
+    # vòng cải tiến epic theo bằng chứng (ADR-004 R3). HoH chạy T = 70 vòng
+    # không có điều kiện dừng; ở đây mọi điều kiện dừng là code và ba số này
+    # là trần. Đếm theo epic từ `loops[]` của sổ hành vi — chạy lại
+    # `aisdlc improve` tiếp từ vòng cuối, không đếm lại từ 0.
+    "improve.max_loops": 3,
+    # dừng khi cải thiện biên (Δverified − Δreopened giữa hai mốc `loops[]`
+    # liên tiếp) ≤ 0 chừng này vòng liền: vòng sau nhận cùng gap, cùng ngữ
+    # cảnh, sẽ cho cùng kết quả.
+    "improve.flat_loops": 2,
+    # trần tổng chi phí (USD) các vòng của một epic; 0 = không giới hạn.
+    # Chi phí đọc từ bằng chứng của story sửa, không từ lời client.
+    "improve.cost_cap_usd": 0.0,
     # điều phối
     "run.max_parallel": 3,
     "run.max_turns": 40,
@@ -115,6 +127,9 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "story.max_complexity": float,
     "context.max_index_chars": int,
     "context.max_preservation_chars": int,
+    "improve.max_loops": int,
+    "improve.flat_loops": int,
+    "improve.cost_cap_usd": float,
     "run.max_parallel": int,
     "run.max_turns": int,
     "run.timeout_seconds": int,
@@ -212,6 +227,11 @@ def _validate(values: dict[str, Any]) -> None:
             raise ConfigError(f"{key} phải >= 1")
     if values["run.max_retries"] < 0:
         raise ConfigError("run.max_retries phải >= 0")
+    for key in ("improve.max_loops", "improve.flat_loops"):
+        if values[key] < 1:
+            raise ConfigError(f"{key} phải >= 1")
+    if values["improve.cost_cap_usd"] < 0:
+        raise ConfigError("improve.cost_cap_usd phải >= 0 (0 = không giới hạn)")
     if values["cost.warn_multiple"] <= 1.0:
         raise ConfigError("cost.warn_multiple phải > 1 thì cảnh báo mới có nghĩa")
 

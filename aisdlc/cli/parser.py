@@ -18,6 +18,7 @@ from .harness import cmd_compile, cmd_doc, cmd_guard, cmd_init, cmd_setup, cmd_s
 from .implement import (
     cmd_devsecops,
     cmd_evidence,
+    cmd_improve,
     cmd_predeploy,
     cmd_qa,
     cmd_report,
@@ -122,6 +123,17 @@ def build_parser() -> argparse.ArgumentParser:
     r2.add_argument("--no-isolate", action="store_true", help="chạy thẳng trong dự án, không worktree")
     r2.add_argument("--force", action="store_true", help="chạy dù cổng stories chưa duyệt")
     r2.set_defaults(func=cmd_run)
+
+    im = sub.add_parser("improve", help="vòng cải tiến epic theo bằng chứng: QA → sổ hành vi → "
+                                        "một story sửa → run → QA; dừng bằng code (ADR-004 R3)")
+    im.add_argument("--epic", required=True, help="epic cần cải tiến, ví dụ EPIC-01")
+    im.add_argument("--max-loops", type=int, default=0,
+                    help="số vòng tối đa cho epic, tính cả vòng đã chạy (mặc định improve.max_loops)")
+    im.add_argument("--auto", action="store_true",
+                    help="không dừng ở cổng người `improve` trước vòng ≥ 2 (5 điều kiện dừng vẫn chặn)")
+    im.add_argument("--client", default="claude", help="claude | opencode")
+    im.add_argument("--force", action="store_true", help="chạy dù cổng readiness chưa duyệt")
+    im.set_defaults(func=cmd_improve)
 
     v = sub.add_parser("verify", help="chạy lại guard trên cây làm việc (hậu kiểm)")
     v.add_argument("--write-scope", default="", help="phạm vi ghi của story, ngăn bởi dấu phẩy")

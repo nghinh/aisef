@@ -1,6 +1,6 @@
 # ADR-004 — Cải tiến liên tục theo bằng chứng ở cấp epic (đối chiếu Harness-of-Harness)
 
-**Trạng thái:** PROPOSED, trừ **R2 · R5 · R6 · R7 = ACCEPTED** (2026-09-05, số đo §6: B0 và B4 hồi cứu trên evidence thật của e9 và `par`, 0 agent). **R1 · R8 · R4** hiện thực, unit xanh, chờ đo trên agent thật (§6). R3 · R9 chưa hiện thực. Ngày 2026-09-05, cập nhật 2026-09-06.
+**Trạng thái:** PROPOSED, trừ **R2 · R5 · R6 · R7 = ACCEPTED** (2026-09-05, số đo §6: B0 và B4 hồi cứu trên evidence thật của e9 và `par`, 0 agent). **R1 · R3 · R4 · R8 · R9** hiện thực, unit xanh, chờ đo trên agent thật (§6). Ngày 2026-09-06.
 **Nguồn đối chiếu:** paper *Harness-of-Harness: Multi-Day Autonomous Software Development with Continual Improvement* (arXiv 2609.01481v1, Shanghai AI Lab) và repo `Flesymeb/HarnessOfHarness` — repo tại thời điểm đọc chỉ có README + tài sản trình diễn (58 commit, MIT, "HoH-lite sẽ công bố"), **không có mã**; mọi cơ chế dưới đây lấy từ paper.
 **Ràng buộc giữ nguyên:** sáu nhóm harness hiện có, evidence-first, reviewer ≠ developer, bảo đảm phía harness, worktree cách ly, cổng người, CLI gọi-một-lần/không daemon, không tin client. Không dùng HoH làm runtime. Không tự sửa framework: mọi thay đổi vẫn qua test, benchmark, ADR/evidence và cổng người/phát hành.
 
@@ -375,6 +375,91 @@ oan" của B3). Cổng unit 7 phép ở `TestCongBaoToan`.
 agent, cùng lô với R1 (d) và R8 (B7). Chưa có story nào của e9/`par` có
 `mockup:*`/`qa:e2e` VERIFIED bị story sau chạm, nên nhánh `verify_screens`
 cho màn hình bảo toàn mới chỉ xanh ở unit (`test_qa_va_mockup_theo_cung_ba_ket_cuc`).
+
+### R3 — Vòng cải tiến epic (`phases/improve.py`, `aisdlc improve`) · hiện thực 2026-09-06, unit xanh, **B1 chưa đo**
+
+**Ghép, không thêm pha.** Mỗi vòng: `qa.run_suite` ở HEAD (bằng chứng ghi
+dưới mốc `evidence/loop-<n>.jsonl` — sổ đọc nó, `since = loop-n` đúng
+schema §4, nhưng **không** dựng dòng chỉ mục cho nó) → `ledger.build()` →
+GAP/REOPENED mà story sở hữu thuộc epic (REOPENED trước, rồi theo id) →
+**một** story sửa sinh bằng code → `run.run_epic(EPIC-RP-<E>)` → QA lại →
+`ledger.snapshot("loop-n", cost)` → vòng sau. `run.py`/`implement.py`
+không đổi một dòng; story sửa đi qua đúng tiền kiểm của story thường (cỡ
+R5, năng lực, phạm vi) ở `run_epic`.
+
+**Một story sửa mỗi vòng = một hành vi.** B1 đòi chi phí ≤ 1 story trung
+bình/vòng, và một hành vi là đơn vị nhỏ nhất cổng chấm được. Story sửa
+`STORY-RP-nn` (`control/change.register_story`, cùng cơ chế với
+`STORY-CH-nn`): tiêu đề nêu hành vi + trạng thái + story sở hữu; tiêu chí
+= chính hành vi, **giữ id gốc** trong câu (`AC-STORY-01-04-1 xanh lại: …`)
+và tệp story dặn test phải mang cả mã mới lẫn mã gốc — sổ khớp lại theo
+mã gốc, cổng chấm theo mã mới; `write_scope` = phạm vi story sở hữu +
+`verification_paths`; `verification_contract` = hợp đồng story sở hữu
+(+ `<kind>` với gap `qa:<kind>`, + màn hình với gap `mockup:`);
+`depends_on` rỗng; chỉ mục thêm `repair_of`, `loop`, `preservation`
+(`complexity.verified_touched`, ghi vào tệp story mục "Bảo toàn" — R4 nạp
+vào slot), `source`. Đợt của `EPIC-RP-<E>` chỉ gồm story của vòng này;
+story sửa **chưa xong** của cùng hành vi được chạy lại thay vì đẻ bản sao.
+
+**Điều kiện dừng đọc từ đĩa, không từ bộ nhớ tiến trình** — nên một lần
+gọi chạy tối đa `max_loops` vòng rồi thoát, chạy lại tiếp từ mốc cuối:
+(1) hết gap thuộc epic; (2) số vòng của epic trong `loops[]` ≥
+`improve.max_loops` (đếm **cả** lần gọi trước — gọi lại với cùng
+`--max-loops` không tốn thêm vòng nào); (3) Δverified − Δreopened ≤ 0 trong
+`improve.flat_loops` vòng liền, đọc từ hai mốc liên tiếp; (4) tổng
+`cost_usd` các vòng của epic > `improve.cost_cap_usd` (chi phí = hiệu
+`total_cost_usd` bằng chứng của story sửa trước/sau vòng); (5) `plan_defects`
+trên lời rà soát của story sửa → dừng, `stopped` mang nguyên lời reviewer.
+Cổng người `improve` chặn trước vòng ≥ 2 trừ `--auto`.
+
+**Hai chỗ lệch với phác thảo §2/§4, có số:**
+
+* *Δ tính trên hành vi thuộc epic, không phải toàn sổ.* Bản đầu dùng
+  `Ledger.metrics()` (Δ toàn cục, R7): trên client giả, một vòng **không
+  sửa gì** vẫn ra V+1 vì chính story sửa đẻ thêm hành vi (`AC-STORY-RP-01-1`
+  xanh, `qa:fake-tests` xanh) — điều kiện (3) không bao giờ tới, chỉ còn
+  `max_loops` giữ. Mốc `loops[]` nay ghi thêm `epic`, `epic_verified`,
+  `epic_gap`, `epic_reopened`, `story`, `behavior`; R7 vẫn đọc cột toàn cục.
+  Mốc xuất phát `loop-0` được ghi khi sổ rỗng, khi sổ đã đổi giữa hai lần
+  gọi, hoặc khi mốc cuối thuộc epic khác — để "hai mốc liên tiếp" luôn cùng
+  epic và Δ không gộp việc của story thường chạy giữa chừng.
+* *Cổng `improve` đứng ngoài `GATE_ORDER`.* §4 đặt nó giữa `readiness` và
+  `pre-deploy`; làm thế thì `blocking(pre-deploy)` đòi duyệt `improve` ở
+  mọi dự án chưa từng chạy vòng nào. Nó là `Gate.IMPROVE` trong enum,
+  artifact là mẫu glob `LOOP-REPORT-*.md` (băm gộp mọi báo cáo → vòng mới
+  làm phê duyệt cũ `stale` → duyệt **mỗi** vòng, không duyệt một lần cho
+  cả chuỗi), `blocking()` rỗng, băm tám cổng cũ không đổi (có test).
+
+**Số đo trên client giả** (`tests/test_improve.py`, 22 phép, kho git thật,
+không Docker, ~25 s). Gap xuất phát là loại có thật ở HEAD đã merge — bộ
+test xanh nhưng *chưa có test mang mã* (chính 18 gap của e9); test đỏ trên
+main không tới được vòng này vì cổng story đã chặn trước merge. Kết quả:
+2 GAP → vòng 1 đóng `AC-…-1`, vòng 2 đóng `AC-…-2`, vòng 3 dừng "không còn
+GAP/REOPENED"; mỗi vòng Δ = +1, $1.40 (developer 1,0 + reviewer 0,1 + bảo
+mật 0,1 + hai lượt hỏi lại schema R8 0,2 — từ bằng chứng), `loops[] =
+[loop-0, loop-1, loop-2]`, hai `LOOP-REPORT`; story sửa **qua cổng của nó
+mà không đóng gap** (test chỉ mang mã mới) → Δ toàn sổ dương nhưng Δ epic
+= 0, dừng sau đúng 2 vòng phẳng; story sửa trượt → vòng sau chạy lại chính
+`STORY-RP-01`, chỉ mục không có bản sao; trần $1 → dừng sau vòng 1 ($1.40);
+`[bế tắc]` → dừng sau vòng 1, `stopped` chứa `src/store/db.ts` của
+reviewer, không thử tiếp; không `--auto` → dừng chờ cổng sau vòng 1,
+duyệt rồi gọi lại → vòng 2, báo cáo vòng 2 làm cổng `stale`; gọi lại với
+cùng `max_loops` → 0 vòng; sổ đổi giữa hai lần gọi → mốc `loop-0` mới.
+Bất biến (b): mỗi `STORY-RP-nn` có `worktree.created` + `merge.completed`
+trong nhật ký và `handoff developer→reviewer` trong bằng chứng.
+
+Một điều đo được và **chưa** sửa (thuộc R2, không thuộc R3): bằng chứng
+của một lượt story sửa *trượt cổng* (test xanh trong worktree, reviewer
+chặn) vẫn làm hành vi gốc VERIFIED trong sổ dù code chưa merge — sổ ghi
+"quan sát cuối cùng", không hỏi bản ấy đã lên nhánh chính chưa. R1 có
+`candidate` cho việc này; sổ chưa lọc theo nó.
+
+**Chưa đo (B1):** e9 EPIC-01 với agent thật — ΔVERIFIED, REOPENED → 0,
+chi phí/vòng so với story trung bình. Rủi ro đã thấy trước: 18 GAP của e9
+01-01/02/03 cùng một gốc (vitest không in tên test) — story sửa cho
+`AC-STORY-01-01-1` có `write_scope` của 01-01, còn chỗ sửa là cấu hình
+reporter ngoài phạm vi → kỳ vọng dừng ở (5) và trả người; đó là kết cục
+đúng của thiết kế, và là thứ R10 (planner agent) mới nới được.
 
 ### R2 — Sổ hành vi (`control/ledger.py`) · **B0 hồi cứu, 0 agent**
 
