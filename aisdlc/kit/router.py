@@ -42,6 +42,14 @@ FRAMEWORK_BY_PHASE: dict[str, tuple[str, ...]] = {
     "mockup": ("aisdlc-mockup-html",),
 }
 
+#: Skill **cửa ngõ** giao diện: mời cho mọi story có màn hình ở pha implement,
+#: theo chính sách chứ không theo chữ. Lý do đo được (e9 2026-09-05): story
+#: viết tiếng Việt, skill `ui-ux` mô tả tiếng Anh, không khai năng lực → hai
+#: tín hiệu không bao giờ đủ, và ứng dụng 5 màn hình không được mời skill
+#: giao diện nào. `ui-ux-pro-max` tự định tuyến tiếp tới skill con (progressive
+#: disclosure) nên chỉ cần mời một cửa.
+UI_ENTRY_SKILLS: tuple[str, ...] = ("ui-ux-pro-max",)
+
 #: Từ quá chung để làm tín hiệu — khớp chúng chỉ tạo nhiễu.
 _STOP = frozenset({
     "the", "and", "for", "with", "when", "then", "given", "user", "data", "file",
@@ -139,6 +147,11 @@ def score(entry: SkillEntry, story: Story, *, phase: str = "implement",
         pick.score += W_FRAMEWORK
         pick.framework = True
         pick.rationale.append(f"skill của framework cho pha `{phase}`")
+
+    if story.screens and phase == "implement" and entry.id in UI_ENTRY_SKILLS:
+        pick.score += W_FRAMEWORK
+        pick.framework = True
+        pick.rationale.append(f"skill cửa ngõ giao diện — story có màn hình ({', '.join(story.screens[:2])})")
 
     for kind in (contract or []):
         if kind in caps:

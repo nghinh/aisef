@@ -203,6 +203,20 @@ chưa đo được "skill được dùng". Muốn đo vế sau cần một dự 
 thật (ví dụ cài `ui-ux` rồi chạy story giao diện), và đó là việc có chi phí,
 để sau khi xong đợt 4.
 
+### 6.2 Skill cửa ngõ giao diện — chính sách, không phải chữ (2026-09-05)
+
+Cài nguồn `ui-ux` vào bản chép e9 (5 skill, sau khi sửa `has_ui` — ứng dụng
+"chạy trong trình duyệt" không nêu framework bị `setup` coi là không có giao
+diện): router **vẫn abstain** cho story giao diện, vì skill `ui-ux` không
+khai năng lực và story tiếng Việt không khớp chữ mô tả tiếng Anh — hai tín
+hiệu không bao giờ đủ. Quyết định: mở rộng cơ chế "skill framework theo pha"
+(§4) — `UI_ENTRY_SKILLS = ("ui-ux-pro-max",)` được mời cho **mọi story có màn
+hình ở pha implement**, có lý do in ra; nó tự định tuyến tiếp tới skill con
+(progressive disclosure). Miền `ui-ux` được suy năng lực trong bảng cho phép
+(`ui`, `accessibility`, `design`) như `cybersecurity`. Kết quả trên e9-ux:
+STORY-01-05/04-01 được mời `ui-ux-pro-max` + `ui-styling`; story không màn
+hình vẫn abstain. Đây là điều kiện để A/B ADR-003 #1 đo được "skill được dùng".
+
 ## 7. Không làm
 
 Taxonomy 20×178 · agent runtime mới · MCP để phục vụ skill · nạp toàn bộ

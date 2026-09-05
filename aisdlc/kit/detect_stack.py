@@ -85,7 +85,11 @@ class Stack:
 
     @property
     def has_ui(self) -> bool:
-        return bool(self.frontend or self.mobile)
+        # "Nhắc tới web mà không nêu framework" đã được ghi là `undetermined:
+        # frontend` — đó vẫn là ứng dụng có giao diện. Không tính nó thì
+        # `setup` bỏ nguồn `ui-ux` với lý do sai (e9: ứng dụng React 5 màn
+        # hình, requirements viết "chạy trong trình duyệt", 2026-09-05).
+        return bool(self.frontend or self.mobile or "frontend" in self.undetermined)
 
     def as_dict(self) -> dict[str, list[str]]:
         return {

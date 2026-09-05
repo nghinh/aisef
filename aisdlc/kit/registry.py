@@ -189,6 +189,7 @@ _DOMAIN_CAPS: dict[str, frozenset[str]] = {
     # được đề nghị skill mã hoá đầu-cuối (đo 2026-09-05). Năng lực giao diện
     # phải đến từ skill khai miền giao diện, không từ chữ.
     "cybersecurity": frozenset({"security", "review"}),
+    "ui-ux": frozenset({"ui", "accessibility", "design"}),
 }
 
 

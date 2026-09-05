@@ -154,3 +154,25 @@ class TestManHinhKhongPhaiTuKhoa(unittest.TestCase):
         e = entry("security-review", ["security"], tags=[]); e.domain = "cybersecurity"
         s = self.story(); s.verification_contract = ["unit", "security"]
         self.assertTrue(router.route(s, reg(e)).abstained)
+
+
+class TestSkillCuaNgoGiaoDien(unittest.TestCase):
+    """Story có màn hình → mời `ui-ux-pro-max` theo chính sách (không theo chữ);
+    story không có màn hình → không."""
+
+    def test_ui_story_gets_the_entry_skill(self):
+        e = entry("ui-ux-pro-max", [], tags=[]); e.domain = "ui-ux"
+        s = Story(id="S", epic_id="E", title="Tạo ghi chú mới bằng một thao tác", screens=["note-editor"])
+        r = router.route(s, reg(e))
+        self.assertEqual([p.entry.id for p in r.picked], ["ui-ux-pro-max"])
+        self.assertIn("cửa ngõ", r.picked[0].rationale[0])
+
+    def test_story_without_screen_does_not(self):
+        e = entry("ui-ux-pro-max", [], tags=[]); e.domain = "ui-ux"
+        s = Story(id="S", epic_id="E", title="kebabCase", screens=[])
+        self.assertTrue(router.route(s, reg(e)).abstained)
+
+    def test_only_in_implement_phase(self):
+        e = entry("ui-ux-pro-max", [], tags=[]); e.domain = "ui-ux"
+        s = Story(id="S", epic_id="E", title="t", screens=["x"])
+        self.assertTrue(router.route(s, reg(e), phase="review").abstained)

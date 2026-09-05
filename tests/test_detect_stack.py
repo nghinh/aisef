@@ -150,3 +150,15 @@ class TestOnRealCorpus(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestWebKhongNeuFrameworkVanLaGiaoDien(unittest.TestCase):
+    def test_browser_app_without_framework_name_has_ui(self):
+        from aisdlc.kit.detect_stack import detect
+        s = detect("Ứng dụng ghi chú chạy trong trình duyệt, lưu cục bộ, không cần máy chủ.")
+        self.assertIn("frontend", s.undetermined)
+        self.assertTrue(s.has_ui)
+
+    def test_pure_backend_still_has_no_ui(self):
+        from aisdlc.kit.detect_stack import detect
+        self.assertFalse(detect("Dịch vụ xử lý hàng đợi bằng Python, lưu PostgreSQL.").has_ui)
