@@ -164,3 +164,53 @@ class TestDurability(ApprovalTestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestStorySuaKhongLamStaleCongStories(unittest.TestCase):
+    """Story sửa (`STORY-RP-*`, ADR-004 R3) do cổng `improve` quản, không phải cổng `stories`.
+
+    Đo e9 2026-09-06 05:44: vòng 1 thêm hai story sửa vào chỉ mục → `stories` và
+    `readiness` đã duyệt thành stale → lần gọi `improve` kế bị chính vòng trước chặn.
+    """
+
+    def setUp(self):
+        import json
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        self.store = ApprovalStore(self.root)
+        self.json = json
+        self.index = {"stories": [{"id": "STORY-01-01", "epic_id": "EPIC-01", "write_scope": ["src"]}],
+                      "epics": [{"id": "EPIC-01"}]}
+        self.ghi(self.index)
+        for g in GATE_ORDER:
+            if g is Gate.STORIES:
+                break
+            (self.root / GATE_ARTIFACTS[g][0]).write_text("x", encoding="utf-8")
+            self.store.approve(g, by="t")
+        self.store.approve(Gate.STORIES, by="t")
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def ghi(self, data):
+        (self.root / "stories.index.json").write_text(self.json.dumps(data, ensure_ascii=False, indent=1),
+                                                       encoding="utf-8")
+
+    def test_them_story_sua_khong_stale(self):
+        self.assertIs(self.store.status(Gate.STORIES), Status.APPROVED)
+        data = self.json.loads(self.json.dumps(self.index))
+        data["stories"].append({"id": "STORY-RP-01", "epic_id": "EPIC-RP-EPIC-01", "repair_of": "AC-STORY-01-01-1"})
+        data["epics"].append({"id": "EPIC-RP-EPIC-01"})
+        self.ghi(data)
+        self.assertIs(self.store.status(Gate.STORIES), Status.APPROVED)
+        # Đã có story sửa rồi mà đổi story **thật** thì vẫn stale — băm lọc chỉ bỏ story sửa.
+        self.store.approve(Gate.STORIES, by="t")
+        data["stories"][0]["write_scope"] = ["src", "tests"]
+        self.ghi(data)
+        self.assertIs(self.store.status(Gate.STORIES), Status.STALE)
+
+    def test_doi_story_that_van_stale_khi_chua_co_story_sua(self):
+        data = self.json.loads(self.json.dumps(self.index)); data["stories"][0]["write_scope"] = ["lib"]
+        self.ghi(data)
+        self.assertIs(self.store.status(Gate.STORIES), Status.STALE)
+
