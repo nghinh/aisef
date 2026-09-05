@@ -397,7 +397,12 @@ minh). Hệ quả:
 
 **Cổng story (Bước 4–5) — PASS chỉ khi đủ, mỗi thứ là bằng chứng chạy thật:**
 1. Test xanh, coverage ≥ ngưỡng
-2. Review APPROVED bởi agent khác người viết
+2. Review APPROVED bởi agent khác người viết — báo cáo trả **hai bản**:
+   văn bản có thẻ `[chặn]`/`[bế tắc]` cho người đọc, và một khối JSON
+   (`verdict` + `findings` mang `behavior_id`) cho máy đọc. Thiếu khối JSON
+   thì harness hỏi lại **đúng một lần** rồi mới lùi về đọc văn bản; hai bản
+   lệch nhau thì lấy **hợp** hai nguồn và ghi note `review:mismatch` — không
+   nới lỏng cổng vì model quên chép một mục sang JSON (ADR-004 R8)
 3. Security 0 phát hiện high/critical
 4. Truy vết: commit mang `FR-xx`, nối được code ↔ story ↔ requirement
 5. **Khớp mockup** — chỉ áp cho story có `screen_id` (mục 12bis)

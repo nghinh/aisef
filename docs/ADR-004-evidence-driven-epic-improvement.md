@@ -150,4 +150,35 @@ Thứ tự làm: R1 → R2 (B0) → R4 → R3 (B1) → R5 (B4) → R6/R7 → R8/
 
 ## 6. Số đo (điền khi hiện thực)
 
-_(trống — mục nào ACCEPTED phải có số ở đây)_
+**R8 — schema bắt buộc + retry cho đầu ra rà soát: hiện thực, unit xanh,
+chưa đo trên `par`.** (2026-09-05)
+
+* Prompt `story-review@4` và `story-security-review@2` đòi thêm một khối
+  JSON ở cuối (`verdict` + `findings` mang `tag`/`file`/`line`/`why`/
+  `behavior_id`, bảo mật thêm `severity`); phần văn bản có thẻ `[chặn]`/
+  `[bế tắc]` giữ nguyên — bản người đọc và bản máy đọc, hai bản phải khớp.
+* `implement.py::review_verdict` lấy khối JSON đầu tiên có `verdict` bằng
+  `json.JSONDecoder.raw_decode` (bền hơn cách cắt dần của
+  `skill_scan.parse_verdicts`: hàng rào ```json và chữ thừa hai đầu không
+  làm hỏng việc); mục sai schema bỏ, không sập.
+* Thiếu/sai schema → hỏi lại **đúng một lần** (`SCHEMA_REMINDER` nối vào
+  chính prompt cũ), ghi thêm một `agent_run` tên `<story>-review-retry` /
+  `<story>-security-retry` (chi phí vào bằng chứng) và một bản nguyên văn
+  `reviews/<story>-review-retry-<lượt>.md`. Lần hai vẫn thiếu → dùng văn
+  bản như trước, note `review:no-schema`.
+* Xung đột JSON ↔ văn bản: **hợp** hai nguồn (khoá đối chiếu = thẻ + tệp),
+  note `review:mismatch`. Không nới lỏng: JSON `pass` mà văn bản có `[chặn]`
+  thì vẫn chặn, và `verdict` khác `pass` mà không nêu mục nào cũng thành
+  một mục chặn.
+* `behavior_id` ra ngoài qua note `review:verdict` / `security:verdict`
+  (`detail={"verdict", "findings"}`) — đầu vào cho sổ hành vi R2 nguồn
+  `reviewer`. `review_story` giữ nguyên chữ ký; bản máy đọc lấy ở
+  `review_story_v2 -> (findings, verdict)`. `persist_verdict` không đổi.
+* **Unit:** 17 test ở `tests/test_findings.py` (JSON hợp lệ không hỏi lại ·
+  thiếu JSON hỏi lại đúng 1 lần · hai lượt đều thiếu thì dùng văn bản ·
+  lệch thì hợp hai nguồn · bảo mật với `severity` + lọc nhiễu) + 2 test
+  vòng đời ở `tests/test_implement.py`. Toàn bộ bộ test xanh.
+* **Chưa đo (B7):** số lượt rà soát trên `par` với agent thật. Client giả
+  không trả JSON nên trong unit mỗi vai rà soát tốn thêm đúng 1 lượt —
+  đúng thiết kế; agent thật đọc prompt mới phải không cần lượt ấy, và đó
+  chính là thứ B7 phải chứng minh trước khi R8 chuyển ACCEPTED.

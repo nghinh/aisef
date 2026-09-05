@@ -1,6 +1,6 @@
 ---
 name: story-review
-version: 3
+version: 4
 role: reviewer
 ---
 # Rà soát {{ story_id }} — {{ story_title }}
@@ -77,3 +77,31 @@ Mỗi phát hiện một mục, xếp nặng trước:
 Không có gì đáng chặn thì nói thẳng "không có mục chặn" — đừng nặn ra
 phát hiện cho đủ số. Nhưng cũng đừng bỏ qua mục chặn vì ngại: cổng story
 đọc báo cáo này để quyết định cho qua hay không.
+
+## Và kết thúc bằng một khối JSON
+
+Phần văn bản ở trên là **bản người đọc**; khối JSON dưới đây là **bản máy
+đọc** — cổng story đọc nó. Hai bản phải **khớp nhau**: mục nào có trong
+văn bản thì phải có trong JSON, và ngược lại. Lệch nhau thì harness lấy
+hợp hai bên (không bỏ mục nào) và ghi lại là bạn đã trả lời không nhất
+quán.
+
+Đúng một khối, đặt ở cuối, không giải thích thêm sau nó:
+
+```json
+{
+  "verdict": "pass|block|stuck",
+  "findings": [
+    {"tag": "chặn", "file": "src/ui/app-shell.tsx", "line": 190,
+     "why": "phần nối dây của TCCN 1 không có test nào chạm tới",
+     "behavior_id": "AC-STORY-01-05-1"}
+  ]
+}
+```
+
+* `verdict`: `block` nếu có mục `[chặn]`, `stuck` nếu có mục `[bế tắc]`,
+  `pass` nếu không có mục nào trong hai loại đó.
+* `tag`: `chặn` | `bế tắc` | `nên sửa` — đúng thẻ bạn đã dùng ở bản văn bản.
+* `behavior_id`: hành vi mà mục này làm hỏng, nếu chỉ được: mã tiêu chí
+  `AC-<story>-<n>`, mã yêu cầu `FR-x`, hay loại kiểm định `qa:e2e`. Không
+  chắc thì để `""` — đừng đoán.

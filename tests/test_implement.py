@@ -26,7 +26,7 @@ from aisdlc.harness.guardrails import (  # noqa: E402
     ENV_STORY_ID,
     ENV_WRITE_SCOPE,
 )
-from aisdlc.harness.observe import AGENT_RUN, EvidenceStore  # noqa: E402
+from aisdlc.harness.observe import AGENT_RUN, NOTE, EvidenceStore  # noqa: E402
 from aisdlc.phases.implement import (  # noqa: E402
     blocking_findings,
     build_context,
@@ -139,9 +139,16 @@ class TestHappyPath(ImplementTestCase):
         self.assertEqual(len(out.attempts), 1)
 
     def test_developer_then_reviewer(self):
+        """Client giả trả văn bản **không** kèm khối JSON, nên mỗi vai rà
+        soát tốn thêm đúng một lượt hỏi lại schema (R8). Đó chính là hành vi
+        cần: thiếu bản máy đọc thì hỏi lại một lần rồi mới lùi về văn bản.
+        Agent thật đọc prompt mới sẽ trả JSON ngay lượt đầu và không có lượt
+        thêm nào."""
         c = ScriptedClient()
         self.implement(c)
-        self.assertEqual(c.calls, ["develop", "review", "security"])
+        self.assertEqual(
+            c.calls, ["develop", "review", "review", "security", "security"]
+        )
 
     def test_cong_nhin_thay_cong_viec_agent_da_commit(self):
         """Agent commit trong worktree thì ba cổng vẫn phải thấy diff.
@@ -252,7 +259,15 @@ class TestHappyPath(ImplementTestCase):
     def test_cost_recorded_per_run(self):
         out = self.implement(ScriptedClient())
         runs = EvidenceStore(self.artifacts).read("STORY-01-01").of(AGENT_RUN)
-        self.assertEqual(len(runs), 3)   # viết + rà soát + rà soát bảo mật
+        # viết + rà soát + hỏi lại schema + bảo mật + hỏi lại schema: client
+        # giả không trả khối JSON nên mỗi vai rà soát tốn thêm đúng 1 lượt
+        # (R8), và lượt hỏi lại phải nằm trong bằng chứng để cộng chi phí.
+        self.assertEqual(len(runs), 5)
+        self.assertEqual(
+            [r.name for r in runs][1:],
+            ["STORY-01-01-review", "STORY-01-01-review-retry",
+             "STORY-01-01-security", "STORY-01-01-security-retry"],
+        )
         self.assertAlmostEqual(out.cost_usd, 1.0)  # chỉ lượt viết tính vào attempt
 
 
@@ -505,6 +520,34 @@ class TestContext(ImplementTestCase):
             architecture=None, contract=None, config=self.config(),
         )
         self.assertIn("không dựng màn hình nào", ctx["mockup_section"])
+
+
+class TestSchemaRaSoat(ImplementTestCase):
+    """R8 nối vào vòng đời thật: agent trả đúng schema thì không tốn lượt thêm."""
+
+    JSON_SACH = '\n\n```json\n{"verdict": "pass", "findings": []}\n```\n'
+
+    def test_json_hop_le_thi_khong_hoi_lai(self):
+        c = ScriptedClient(review="không có mục chặn" + self.JSON_SACH,
+                           security="không có phát hiện bảo mật" + self.JSON_SACH)
+        out = self.implement(c)
+        self.assertTrue(out.done, out.summary())
+        self.assertEqual(c.calls, ["develop", "review", "security"])
+
+    def test_behavior_id_di_vao_bang_chung_cho_so_hanh_vi(self):
+        c = ScriptedClient(review=(
+            "- [chặn] src/a.py:1 — mất dữ liệu khi lưu\n\n"
+            '```json\n{"verdict": "block", "findings": [{"tag": "chặn", '
+            '"file": "src/a.py", "line": 1, "why": "mất dữ liệu khi lưu", '
+            '"behavior_id": "AC-STORY-01-01-1"}]}\n```\n'
+        ))
+        self.implement(c)
+        notes = {e.name: e.detail
+                 for e in EvidenceStore(self.artifacts).read("STORY-01-01").of(NOTE)}
+        self.assertEqual(notes["review:verdict"]["verdict"], "block")
+        self.assertEqual(notes["review:verdict"]["findings"][0]["behavior_id"],
+                         "AC-STORY-01-01-1")
+        self.assertNotIn("review:mismatch", notes)
 
 
 class TestFindings(unittest.TestCase):
