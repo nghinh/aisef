@@ -178,8 +178,12 @@ def run_tool(
     artifact_root: Path | str | None = None,
     config: Config | None = None,
     extra_args: list[str] | None = None,
+    candidate: str = "",
 ) -> ToolResult:
-    """Chạy một tool trong sandbox và ghi bằng chứng."""
+    """Chạy một tool trong sandbox và ghi bằng chứng.
+
+    ``candidate`` là SHA bản đang kiểm — đóng vào bằng chứng để cổng biết
+    kết quả này thuộc bản nào (ADR-004 R1)."""
     if name not in TOOLS:
         raise ValueError(f"tool không tồn tại: {name}. Có: {', '.join(sorted(TOOLS))}")
 
@@ -188,7 +192,7 @@ def run_tool(
     command = command_for(name, project, cfg)
     if not command:
         res = ToolResult(name=name, ok=False, skipped="dự án chưa khai lệnh cho tool này")
-        _record(res, story_id, artifact_root)
+        _record(res, story_id, artifact_root, candidate)
         return res
 
     argv = shlex.split(command) + (extra_args or [])
@@ -220,7 +224,7 @@ def run_tool(
     )
     if not sb.ok:
         res.unrunnable = unrunnable_reason(name, sb.exit_code, sb.stdout + "\n" + sb.stderr)
-    _record(res, story_id, artifact_root)
+    _record(res, story_id, artifact_root, candidate)
     return res
 
 
@@ -252,7 +256,7 @@ def unrunnable_reason(name: str, exit_code: int, output: str) -> str:
     return f"công cụ chưa cài hoặc không nạp được ({hit or 'exit 127'}) — dựng môi trường hoặc sửa lệnh rồi chạy lại"
 
 
-def _record(res: ToolResult, story_id: str, artifact_root) -> None:
+def _record(res: ToolResult, story_id: str, artifact_root, candidate: str = "") -> None:
     """Ghi bằng chứng. Không có story_id thì không ghi — tool chạy ngoài
     ngữ cảnh story (ví dụ người gõ tay) không nên làm bẩn hồ sơ story."""
     if not story_id or artifact_root is None:
@@ -271,7 +275,7 @@ def _record(res: ToolResult, story_id: str, artifact_root) -> None:
         from .testlog import parse as parse_testlog
 
         detail.update(parse_testlog(res.stdout + "\n" + res.stderr).to_evidence())
-    EvidenceStore(artifact_root).tool_run(
+    EvidenceStore(artifact_root, candidate=candidate).tool_run(
         story_id, res.name, ok=res.ok, duration_ms=res.duration_ms, detail=detail,
     )
 

@@ -150,4 +150,21 @@ Thứ tự làm: R1 → R2 (B0) → R4 → R3 (B1) → R5 (B4) → R6/R7 → R8/
 
 ## 6. Số đo (điền khi hiện thực)
 
-_(trống — mục nào ACCEPTED phải có số ở đây)_
+**R1 — Frozen Candidate SHA: hiện thực, unit xanh, chưa đo agent** (2026-09-05).
+
+Đã có: thứ tự nhật ký mới (`changes.detected → candidate.frozen(sha) →
+verification.completed → review.completed → merge.completed`, `commit.created`
+biến mất khỏi `STEPS`, tên cũ vẫn đọc được cho nhật ký đã ghi); harness commit
+worktree **ngay khi phiên developer kết thúc** (`implement.freeze_candidate`,
+không có gì để commit thì ứng viên = HEAD; `--no-isolate` không commit); mọi
+bằng chứng sau đóng băng mang `detail.candidate` (đóng dấu một chỗ ở
+`EvidenceStore`); `Evidence.for_candidate(sha)` + thuộc tính `candidate`; mục
+cổng **bằng chứng đúng candidate** (`gate.evaluate(candidate=…)`, rỗng =
+không kiểm nên chỗ gọi cũ không đổi hành vi); reviewer/security bị so
+`git rev-parse HEAD` sau phiên, lệch → lượt không tính +
+`tool_run review:candidate|security:candidate ok=False`; QA cấp dự án ghi
+`candidate = HEAD` (`qa.run_suite`, vào cả `pre-deploy.json`); `report` in cột
+SHA 7 ký tự; phép hợp quy **C8** (tất định, $0).
+
+Chưa có (cần lượt agent thật): AC (d) *không tăng số lượt/chi phí trên dogfood
+`par`* và bảng hợp quy C8 trên hai client — B2 chỉ mới xanh ở nửa unit.

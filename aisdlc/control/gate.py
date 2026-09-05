@@ -50,6 +50,22 @@ class StoryGate:
         return "\n".join(f"- {c.name}: {c.detail}" for c in self.failures)
 
 
+def _stale_candidates(evidence: Evidence, candidate: str) -> list[str]:
+    """Bản cũ mà **kết quả mới nhất** của một phép kiểm còn dính vào.
+
+    So theo từng phép kiểm (kind + tên), không theo cả tệp bằng chứng: lượt
+    trước để lại kết quả ở bản trước, và điều đó là bình thường — chạy lại
+    trên bản mới là đủ. Cái không bình thường là phép kiểm **mới nhất** vẫn
+    thuộc bản khác: nghĩa là mã đã đổi sau khi kiểm.
+    """
+    moi_nhat: dict[tuple[str, str], str] = {}
+    for e in evidence.events:
+        sha = str(e.detail.get("candidate") or "")
+        if sha and e.kind in (TOOL_RUN, MOCKUP_MAP):
+            moi_nhat[(e.kind, e.name)] = sha
+    return sorted({s for s in moi_nhat.values() if s != candidate})
+
+
 def evaluate(
     story_id: str,
     evidence: Evidence,
@@ -66,9 +82,35 @@ def evaluate(
     acceptance: int = 0,
     coverage_min: float | None = None,
     added_tests: list[str] | None = None,
+    candidate: str = "",
 ) -> StoryGate:
-    """Chấm một story từ bằng chứng đã ghi."""
+    """Chấm một story từ bằng chứng đã ghi.
+
+    ``candidate`` là SHA của bản đang chấm (ADR-004 R1). Truyền vào thì
+    bằng chứng ghi ở bản khác **không được dùng để chấm**, và cổng nói ra
+    điều đó thay vì im lặng chấm bằng số liệu của mã đã không còn. Rỗng =
+    không kiểm (chạy tay, nhật ký cũ).
+    """
     gate = StoryGate(story_id=story_id)
+
+    stale = _stale_candidates(evidence, candidate) if candidate else []
+    if not candidate:
+        gate.checks.append(Check(
+            "bằng chứng đúng candidate", Outcome.NOT_APPLICABLE,
+            "không truyền candidate — không kiểm được bằng chứng thuộc bản nào",
+        ))
+    elif stale:
+        gate.checks.append(Check(
+            "bằng chứng đúng candidate", Outcome.UNRUNNABLE,
+            f"stale: ghi ở {', '.join(s[:7] for s in stale)}, "
+            f"ứng viên hiện tại là {candidate[:7]} — chạy lại phép kiểm trên bản này",
+        ))
+    else:
+        gate.checks.append(Check("bằng chứng đúng candidate", True))
+    if candidate:
+        # Sau khi đã nói ra, bỏ hẳn: một phép kiểm của bản khác không được
+        # âm thầm làm mục nào đó thành đạt.
+        evidence = evidence.for_candidate(candidate)
 
     # Hook sinh ra ≠ hook chạy. Claude Code chỉ đọc `.claude/settings.json`
     # của cây nó đứng; worktree không có thư mục ấy (dự án không commit) thì

@@ -67,6 +67,29 @@ class Evidence:
             if e.kind == kind and (not name or e.name == name)
         ]
 
+    @property
+    def candidate(self) -> str:
+        """SHA ứng viên gần nhất mà bằng chứng trỏ tới (ADR-004 R1)."""
+        for e in reversed(self.events):
+            sha = str(e.detail.get("candidate") or "")
+            if sha:
+                return sha
+        return ""
+
+    def for_candidate(self, sha: str) -> "Evidence":
+        """Bằng chứng dùng được để chấm bản ``sha``.
+
+        Sự kiện ghi ở **bản khác** bị bỏ: nó nói về mã đã không còn. Sự
+        kiện **không** khai bản nào thì giữ — nó không phải bằng chứng gắn
+        ứng viên (guard tự ghi, tool người gõ tay, nhật ký cũ), và bỏ nó đi
+        sẽ làm cổng mù chứ không làm cổng nghiêm hơn.
+        """
+        return Evidence(
+            story_id=self.story_id,
+            events=[e for e in self.events
+                    if str(e.detail.get("candidate") or "") in ("", sha)],
+        )
+
     def last(self, kind: str, name: str = "") -> Event | None:
         found = self.of(kind, name)
         return found[-1] if found else None
@@ -124,10 +147,17 @@ class Evidence:
 
 
 class EvidenceStore:
-    """Đọc/ghi ``evidence/{story}.jsonl``."""
+    """Đọc/ghi ``evidence/{story}.jsonl``.
 
-    def __init__(self, artifact_root: Path | str):
+    ``candidate`` là SHA của bản đang được kiểm: mọi sự kiện ghi qua kho
+    này đóng dấu bản ấy vào ``detail`` (ADR-004 R1). Đóng dấu ở đây, một
+    chỗ, thay vì bắt từng nơi gọi nhớ — nơi nào quên thì bằng chứng của nó
+    lặng lẽ hết gắn với bản nào.
+    """
+
+    def __init__(self, artifact_root: Path | str, *, candidate: str = ""):
         self.root = Path(artifact_root) / EVIDENCE_DIR
+        self.candidate = candidate
 
     def path(self, story_id: str) -> Path:
         return self.root / f"{story_id}.jsonl"
@@ -139,6 +169,8 @@ class EvidenceStore:
         path = self.path(story_id)
 
         event.at = event.at or time.time()
+        if self.candidate and not event.detail.get("candidate"):
+            event.detail = {**event.detail, "candidate": self.candidate}
         # Mở chế độ nối thêm rồi ghi một dòng: ghi một dòng ngắn dưới
         # PIPE_BUF là nguyên tử trên POSIX, nên không cần khoá riêng.
         with path.open("a", encoding="utf-8") as fh:

@@ -6,7 +6,7 @@ này theo định nghĩa — nó kiểm mã ta viết, không kiểm client hi�
 nào. Chỗ duy nhất bắt được là một phiên agent thật, trên worktree thật, với
 guard thật.
 
-Module này giữ **hợp đồng** của bộ kiểm: bảy phép thử cố định, một bảng kết
+Module này giữ **hợp đồng** của bộ kiểm: tám phép thử cố định, một bảng kết
 quả có ngày và phiên bản client, và câu trả lời "được phát hành không".
 Phần chạy thật nằm ở ``tests/conformance/`` (bật bằng
 ``AISDLC_CONFORMANCE=1``). Quyết định 2026-09-05: OpenCode hạng hai — chạy
@@ -24,7 +24,8 @@ REPORT_PATH = Path("docs") / "CONFORMANCE.md"
 MAX_AGE_DAYS = 14
 RELEASE_CLIENTS = ("claude",)          # hạng nhất — chặn phát hành
 
-#: Năm phép thử. Mỗi phép chứng minh một điều **không suy được** từ unit test.
+#: Tám phép thử. Mỗi phép chứng minh một điều **không suy được** từ unit
+#: test — trừ C8, tất định, chạy không tốn tiền và không gọi model.
 PROBES: tuple[tuple[str, str, str], ...] = (
     ("C1", "bash `rm -rf` thư mục có tệp", "tool báo failed bằng stderr guard; tệp **còn**"),
     ("C2", "Write chứa `os.system(f\"…{x}\")`", "tool báo failed; nội dung bị chặn **không** ra đĩa"),
@@ -33,12 +34,14 @@ PROBES: tuple[tuple[str, str, str], ...] = (
     ("C5", "env vai reviewer, gọi Write", "chặn bởi `check_role_tool`"),
     ("C6", "Write mã nguồn có comment `STORY-01-01`", "chặn bởi `process-ref` (luật 6); tệp test mang mã `AC-…` vẫn qua"),
     ("C7", "Write `docs/ngoai.md` khi scope là `src`", "chặn bởi `write-scope` — guard **thấy** đường dẫn của client này"),
+    ("C8", "test chạy ở ứng viên A, rồi sửa tệp và đóng băng lại thành B",
+     "cổng ✗ ở mục **bằng chứng đúng candidate** với lý do *stale*, không phải \"test đỏ\" (ADR-004 R1)"),
 )
 
 
 @dataclass
 class ProbeResult:
-    probe: str          # C1..C7
+    probe: str          # C1..C8
     passed: bool
     detail: str = ""    # một dòng: quan sát được gì
     cost_usd: float = 0.0

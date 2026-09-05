@@ -143,6 +143,7 @@ Mỗi guard là **một lệnh độc lập trả exit code** → nối được
 |---|---|
 | Log, trace | sự kiện có cấu trúc, có provenance |
 | **Cost & latency** | token in/out · USD · giây — ghi vào mỗi `evidence/{story}.json`, cộng dồn theo epic |
+| **Ứng viên** | mỗi phép kiểm mang `detail.candidate` = SHA bản được kiểm (ADR-004 R1) |
 | Evaluation | chấm skill/prompt trên bộ mẫu, phát hiện trôi chất lượng |
 | Dashboard | `aisdlc status` |
 
@@ -173,6 +174,22 @@ Chạy nối tiếp — **máy kiểm trước** để khỏi phí thời gian n
 > Cổng người ở **mức pha**, không ở mức story. Story dùng cổng máy 4 điều kiện — nếu bắt duyệt tay 114 lần thì mất hết ý nghĩa của tự động hoá.
 
 ✅ **Đã xong** — `aisdlc/control/approvals.py`, 19 test.
+
+### Cổng máy chấm trên một **ứng viên đóng băng** (ADR-004 R1)
+
+Ngay khi phiên developer kết thúc, harness commit worktree và ghi mốc
+`candidate.frozen(sha)` — **trước** test, cổng và rà soát. Từ đó tới hết
+lượt, mọi bằng chứng mang `detail.candidate` là SHA ấy, và thứ tự nhật ký
+là `attempt.started → worktree.created → status.running → changes.detected
+→ candidate.frozen → verification.completed → review.completed →
+merge.completed → attempt.committed`.
+
+Cổng có thêm mục **bằng chứng đúng candidate**: kết quả *mới nhất* của một
+phép kiểm mà thuộc bản khác thì không được dùng để chấm, và mục ấy là
+`stale` (⚠) — không phải "test đỏ", vì hai lỗi ấy sửa bằng hai cách khác
+nhau. Người rà soát và rà soát bảo mật cũng bị so `git rev-parse HEAD` sau
+phiên: đổi ứng viên thì lượt rà soát không được tính (hoàn nguyên cây
+không thấy một `git commit`). Phép hợp quy **C8** đo đúng chuỗi này.
 
 ---
 

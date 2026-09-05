@@ -45,7 +45,9 @@ from ..harness.guardrails import (
     ENV_WRITE_SCOPE,
     changed_files,
     fork_point,
+    head_sha,
 )
+from ..control.journal import Entry as JEntry, JournalStore
 from ..harness.mockup_map import load_for_story, prompt_section
 from ..harness.observe import EvidenceStore, NOTE, Event
 from ..harness.prompts import Catalog, load_catalog
@@ -75,6 +77,8 @@ class Attempt:
     gate: story_gate.StoryGate | None = None
     review_findings: list[str] = field(default_factory=list)
     security: SecurityReport | None = None
+    #: SHA ứng viên đã đóng băng — mọi bằng chứng của lượt này trỏ vào nó.
+    candidate: str = ""
 
 
 @dataclass
@@ -305,7 +309,7 @@ def run_attempt(
     # commit thẳng vào thân cây. Đã gặp thật: một lượt OpenCode đưa
     # `src/reverse-words.js` lên `main` trong khi nhánh story đứng yên —
     # cổng chỉ báo "diff rỗng", còn code lạ thì đã nằm trên trunk.
-    truoc = _head_of(project) if workdir != project else ""
+    truoc = head_sha(project) if workdir != project else ""
 
     _attach_settings(spec, project)
     result = client.run(spec)
@@ -315,7 +319,7 @@ def run_attempt(
         skills={**context.get("_skills", {}), "used": skills_used(result)},
     )
 
-    sau = _head_of(project) if workdir != project else ""
+    sau = head_sha(project) if workdir != project else ""
     if truoc and sau != truoc:
         attempt.error = (
             f"lượt chạy đã đổi nhánh chính của dự án ({truoc[:8]} → {sau[:8]}). "
@@ -335,15 +339,25 @@ def run_attempt(
         attempt.infra = is_infrastructure_error(attempt.error)
         return attempt
 
+    # Phiên developer đã kết thúc: **đóng băng ứng viên ngay**, trước khi
+    # kiểm bất cứ thứ gì (ADR-004 R1). Kiểm trước rồi mới chốt thì bằng
+    # chứng không trỏ vào bản nào cả, và "stale" không định nghĩa được.
+    changed_now = changed_files(str(workdir), base_ref=base_ref)
+    attempt.candidate = freeze_candidate(
+        workdir, story=story, scope=scope, isolated=workdir != project,
+        evidence=evidence, artifact_root=artifact_root, number=number,
+        changed=changed_now,
+    )
+    evidence.candidate = attempt.candidate
+
     # Harness tự chạy lại test và lint: bằng chứng phải do harness ghi, và
     # agent có thể đã "quên" chạy lần cuối sau khi sửa.
     for tool in ("test", "lint"):
-        run_tool(tool, workdir, story_id=story.id,
-                 artifact_root=artifact_root, config=config)
+        run_tool(tool, workdir, story_id=story.id, artifact_root=artifact_root,
+                 config=config, candidate=attempt.candidate)
 
     # Test luôn xanh vì không khẳng định gì tệ hơn không có test: nó làm
     # cổng "test xanh" mất hết ý nghĩa. Kiểm rẻ, nên chạy mỗi lượt.
-    changed_now = changed_files(str(workdir), base_ref=base_ref)
     fake = find_fake_tests(workdir, changed_now)
     evidence.tool_run(
         story.id, "qa:fake-tests", ok=not fake, detail={"files": fake}
@@ -366,12 +380,14 @@ def run_attempt(
             story_id=story.id,
             artifact_root=artifact_root,
             changed=changed_now,
+            candidate=attempt.candidate,
         )
 
     if story.screens and contract:
         mockup_verify.verify_screens(
             workdir, contract, story.screens,
             config=config, story_id=story.id, artifact_root=artifact_root,
+            candidate=attempt.candidate,
         )
 
     attempt.review_findings = review_story(
@@ -385,6 +401,7 @@ def run_attempt(
         catalog=catalog,
         architecture=architecture,
         number=number,
+        candidate=attempt.candidate,
     )
     # Mục chặn phải nằm trong bằng chứng, không chỉ trong bản tóm tắt in
     # ra màn hình — bản tóm tắt cắt ngắn, và khi cần biết lượt này với
@@ -409,6 +426,7 @@ def run_attempt(
             catalog=catalog,
             architecture=architecture,
             number=number,
+            candidate=attempt.candidate,
         )
         evidence.tool_run(
             story.id,
@@ -437,9 +455,63 @@ def run_attempt(
         acceptance=len(story.acceptance_criteria),
         coverage_min=float(config["coverage.min"]),
         added_tests=tdd.added_tests(workdir, base_ref=base_ref, changed=changed_now, story_id=story.id),
+        candidate=attempt.candidate,
     )
     attempt.ok = attempt.gate.passed
     return attempt
+
+
+def freeze_candidate(
+    workdir: Path,
+    *,
+    story: Story,
+    scope: list[str],
+    isolated: bool,
+    evidence: EvidenceStore,
+    artifact_root: Path,
+    number: int,
+    changed: list[str],
+) -> str:
+    """Chốt công việc của phiên developer thành **một bản** và trả SHA của nó.
+
+    Đây là điểm HoH gọi là *frozen candidate*: từ đây tới hết lượt, không
+    gì được sửa cây nữa, và mọi phép kiểm nói về đúng bản này. Trước ADR-004
+    R1 harness commit **sau** khi kiểm và rà soát — bằng chứng không trỏ
+    vào bản nào, nên "test này chạy trên mã nào" không có câu trả lời.
+
+    Không có gì để commit thì ứng viên là HEAD hiện tại (agent đã tự chốt).
+    Chạy thẳng trong dự án (`--no-isolate`) thì **không** commit: không có
+    nhánh riêng, và commit vào thân cây người dùng không phải việc của một
+    lượt thử.
+    """
+    from ..control.worktree import GitError, commit_paths
+
+    loi = ""
+    if isolated:
+        try:
+            commit_paths(Path(workdir), f"{story.id}: ứng viên lượt {number}", paths=scope)
+        except GitError as e:
+            loi = str(e)
+    sha = head_sha(workdir)
+
+    journal = JournalStore(artifact_root)
+    # Số hiệu **của giao dịch đang mở**, không phải số lượt thử trong story:
+    # `open_attempt()` đóng một lượt bằng cách so số hiệu, nên ghi số khác
+    # vào đây sẽ để lại một lượt "chưa đóng" và lần chạy sau đi dọn oan.
+    giao_dich = journal.read(story.id).attempt_no or number
+    journal.record(story.id, JEntry(
+        step="changes.detected", attempt=giao_dich,
+        data={"luot": number, "files": changed[:50], "count": len(changed)}))
+    journal.record(story.id, JEntry(
+        step="candidate.frozen", attempt=giao_dich,
+        data={"luot": number, "sha": sha, "error": loi}))
+    if loi or not sha:
+        # Không chốt được thì bằng chứng phía sau gắn vào một bản **không**
+        # chứa công việc. Nói ra ở bằng chứng; im lặng ở đây là để lại một
+        # cổng chấm trên nền cát.
+        evidence.tool_run(story.id, "candidate:frozen", ok=False,
+                          detail={"error": loi or "không đọc được HEAD", "attempt": number})
+    return sha
 
 
 #: Trần ký tự cho diff đưa vào prompt rà soát. Đủ cho một story đúng cỡ;
@@ -495,6 +567,7 @@ def review_story(
     catalog: Catalog,
     architecture: Architecture | None,
     number: int = 0,
+    candidate: str = "",
 ) -> list[str]:
     """Rà soát độc lập — **phiên mới**, không sửa được gì.
 
@@ -532,7 +605,8 @@ def review_story(
     # Test có sẵn bị bớt ca (G8): đưa cho người rà soát, không tự chặn —
     # "cập nhật kỳ vọng" là hợp lệ, "xoá cho xanh" thì không; đó là phán đoán.
     mat = tdd.test_delta(workdir, base_ref=base_ref, changed=changed)
-    EvidenceStore(artifact_root).record(
+    store = EvidenceStore(artifact_root, candidate=candidate)
+    store.record(
         story.id, Event(kind=NOTE, name="qa:test-delta", ok=not mat, detail={"files": mat})
     )
     if mat:
@@ -541,8 +615,8 @@ def review_story(
             + "; ".join(mat)
         )
 
-    EvidenceStore(artifact_root).handoff(story.id, frm=DEVELOPER, to=REVIEWER, attempt=number,
-                                         slots=handoff_slots(context))
+    store.handoff(story.id, frm=DEVELOPER, to=REVIEWER, attempt=number,
+                  slots=handoff_slots(context))
     spec = build_spec(
         REVIEWER,
         catalog.get(ROLES[REVIEWER].prompt),
@@ -566,20 +640,33 @@ def review_story(
     _attach_settings(spec, project)
     truoc = _tree_snapshot(workdir)
     result = client.run(spec)
-    EvidenceStore(artifact_root).agent_run(story.id, result, name=f"{story.id}-review",
-                                           prompt_chars=len(spec.prompt))
+    store.agent_run(story.id, result, name=f"{story.id}-review",
+                    prompt_chars=len(spec.prompt))
     da_sua = _revert_reviewer_writes(workdir, truoc, _tree_snapshot(workdir))
     # Ghi sau khi đã so cây: artifact có thể nằm trong chính cây làm việc
     # (không cách ly) và tệp lời rà soát không phải là "người rà soát sửa cây".
     persist_verdict(artifact_root, story.id, "review", number, result)
     if da_sua:
-        EvidenceStore(artifact_root).tool_run(
+        store.tool_run(
             story.id, "review:immutable", ok=False, detail={"changed": da_sua[:20]},
         )
         return [
             "[chặn] người rà soát đã sửa cây làm việc "
             f"({', '.join(da_sua[:3])}) — đã hoàn nguyên; lượt rà soát này không "
             "được tính. Rà soát là báo cáo, không phải sửa."
+        ]
+
+    lech = _candidate_moved(workdir, candidate)
+    if lech:
+        # Hoàn nguyên chỉ đưa **cây** về như cũ; một `git commit` thì nó không
+        # thấy. Ứng viên đã đổi nghĩa là người rà soát vừa đọc một bản khác
+        # bản được chấm — lượt rà soát ấy không nói gì về ứng viên.
+        store.tool_run(story.id, "review:candidate", ok=False,
+                       detail={"expected": candidate, "got": lech, "attempt": number})
+        return [
+            f"[chặn] ứng viên đổi trong phiên rà soát ({candidate[:7]} → {lech[:7]}) — "
+            "lượt rà soát này không được tính. Rà soát đọc bản đã đóng băng, "
+            "không tạo bản mới."
         ]
 
     if not result.ok:
@@ -600,6 +687,7 @@ def security_review(
     catalog: Catalog,
     architecture: Architecture | None,
     number: int = 0,
+    candidate: str = "",
 ) -> SecurityReport:
     """Rà soát bảo mật theo ngữ nghĩa — **phiên riêng**, chỉ đọc.
 
@@ -631,8 +719,9 @@ def security_review(
         workdir, changed, command=str(config.get("review.impact_provider", "") or "")
     ).as_prompt()
 
-    EvidenceStore(artifact_root).handoff(story.id, frm=REVIEWER, to=SECURITY, attempt=number,
-                                         slots=handoff_slots(context))
+    store = EvidenceStore(artifact_root, candidate=candidate)
+    store.handoff(story.id, frm=REVIEWER, to=SECURITY, attempt=number,
+                  slots=handoff_slots(context))
     spec = build_spec(
         SECURITY,
         catalog.get(ROLES[SECURITY].prompt),
@@ -653,16 +742,24 @@ def security_review(
     _attach_settings(spec, project)
     truoc = _tree_snapshot(workdir)
     result = client.run(spec)
-    EvidenceStore(artifact_root).agent_run(
+    store.agent_run(
         story.id, result, name=f"{story.id}-security", prompt_chars=len(spec.prompt)
     )
     da_sua = _revert_reviewer_writes(workdir, truoc, _tree_snapshot(workdir))
     persist_verdict(artifact_root, story.id, "security", number, result)
     if da_sua:
-        EvidenceStore(artifact_root).tool_run(
+        store.tool_run(
             story.id, "security:immutable", ok=False, detail={"changed": da_sua[:20]},
         )
         return SecurityReport(error=f"người rà soát bảo mật đã sửa cây làm việc ({', '.join(da_sua[:3])}) — đã hoàn nguyên, lượt này không được tính")
+    lech = _candidate_moved(workdir, candidate)
+    if lech:
+        store.tool_run(story.id, "security:candidate", ok=False,
+                       detail={"expected": candidate, "got": lech, "attempt": number})
+        return SecurityReport(
+            error=f"ứng viên đổi trong phiên rà soát bảo mật ({candidate[:7]} → "
+                  f"{lech[:7]}) — lượt này không được tính"
+        )
     if not result.ok:
         return SecurityReport(error=f"không chạy được: {result.error}")
     return parse_security(result.text)
@@ -814,20 +911,15 @@ def _revert_reviewer_writes(workdir: Path, truoc: dict, sau: dict) -> list[str]:
     return doi
 
 
-def _head_of(repo: Path) -> str:
-    """SHA đầu nhánh chính. Rỗng nếu không đọc được — guard mất một phần
-    tầm nhìn thì tệ, nhưng chặn cả story vì không đọc được git còn tệ hơn.
-    """
-    import subprocess
+def _candidate_moved(workdir: Path, candidate: str) -> str:
+    """HEAD hiện tại nếu nó đã rời khỏi ứng viên; "" nếu còn đúng bản ấy.
 
-    try:
-        proc = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            cwd=repo, capture_output=True, text=True, timeout=10,
-        )
-    except (OSError, subprocess.TimeoutExpired):
+    Không kiểm được (chưa đóng băng, hoặc không đọc được git) thì trả "":
+    một lượt rà soát bị huỷ oan vì harness mù còn tệ hơn."""
+    if not candidate:
         return ""
-    return proc.stdout.strip() if proc.returncode == 0 else ""
+    bay_gio = head_sha(workdir)
+    return bay_gio if bay_gio and bay_gio != candidate else ""
 
 
 def deadlock_reason(attempts: list[Attempt], write_scope: list[str] | None = None) -> str:
@@ -983,7 +1075,7 @@ def implement_story(
     # (`--no-isolate`) thì không có nhánh riêng, rỗng là đúng.
     base_ref = ""
     if workdir != project:
-        head = _head_of(project)
+        head = head_sha(project)
         base_ref = fork_point(str(workdir), head) if head else ""
 
     while True:

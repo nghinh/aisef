@@ -350,9 +350,23 @@ class TestTransaction(RunTestCase):
         self.run_sprint(Agent())
         steps = self.journal().steps()
         for moc in ("attempt.started", "worktree.created", "status.running",
+                    "changes.detected", "candidate.frozen",
                     "verification.completed", "review.completed",
-                    "commit.created", "merge.completed", "attempt.committed"):
+                    "merge.completed", "attempt.committed"):
             self.assertIn(moc, steps, steps)
+
+    def test_ung_vien_dong_bang_truoc_khi_kiem(self):
+        """ADR-004 R1: `candidate.frozen` đứng trước mọi bước kiểm — bằng
+        chứng chỉ có nghĩa khi nó trỏ vào một bản cụ thể."""
+        self.run_sprint(Agent())
+        steps = self.journal().steps()
+        self.assertLess(steps.index("candidate.frozen"),
+                        steps.index("verification.completed"), steps)
+        self.assertLess(steps.index("changes.detected"),
+                        steps.index("candidate.frozen"), steps)
+        self.assertNotIn("commit.created", steps)
+        sha = self.journal().last("candidate.frozen").data.get("sha")
+        self.assertTrue(sha, "mốc đóng băng phải mang SHA")
 
     def test_story_truot_dong_giao_dich_ngay_khong_no_gi(self):
         self.run_sprint(Agent(fail={"STORY-01-01"}))

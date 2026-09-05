@@ -62,6 +62,8 @@ class PreDeployReport:
             "checks": [c.as_dict() for c in self.checks],
             "qa": None if self.qa is None else {
                 "release_ready": self.qa.release_ready,
+                # Bản mà bộ kiểm định cấp dự án đã chạy trên đó (ADR-004 R1).
+                "candidate": self.qa.candidate,
                 "failed": [r.kind.id for r in self.qa.failed],
                 "unconfigured": [r.kind.id for r in self.qa.unconfigured],
                 "degraded": [r.kind.id for r in self.qa.degraded],

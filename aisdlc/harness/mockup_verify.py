@@ -215,8 +215,12 @@ def verify_screens(
     config: Config | None = None,
     story_id: str = "",
     artifact_root: Path | str | None = None,
+    candidate: str = "",
 ) -> VerifyResult:
-    """Mở từng route thật và đối chiếu với hợp đồng."""
+    """Mở từng route thật và đối chiếu với hợp đồng.
+
+    ``candidate`` là SHA bản đang kiểm — màn hình đối chiếu ở bản nào thì
+    bằng chứng nói bản ấy (ADR-004 R1)."""
     project = Path(project)
     cfg = config or Config.load(project)
     out = VerifyResult()
@@ -251,7 +255,8 @@ def verify_screens(
         out.unavailable = rendered.unavailable
         return out
 
-    store = EvidenceStore(artifact_root) if (story_id and artifact_root) else None
+    store = (EvidenceStore(artifact_root, candidate=candidate)
+             if (story_id and artifact_root) else None)
     for screen in screens:
         got = rendered.by_id(screen.id)
         if got is None or got.error:

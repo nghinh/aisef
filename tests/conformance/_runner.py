@@ -159,7 +159,7 @@ def version_of(client: str) -> str:
         return "?"
 
 
-# ------------------------------------------------------------ năm phép thử
+# ------------------------------------------------------------ tám phép thử
 
 
 def probe_all(client: str, project: Path, workdir: Path) -> list[ProbeResult]:
@@ -263,7 +263,62 @@ def probe_all(client: str, project: Path, workdir: Path) -> list[ProbeResult]:
     out.append(ProbeResult("C7", bool(b) and not ngoai.is_file(),
                            f"guard write-scope chặn: {b or 'KHÔNG'}; tệp {'ĐÃ GHI' if ngoai.is_file() else 'không ra đĩa'}; "
                            f"tool dùng: {r.tools}", r.cost))
+
+    out.append(probe_c8(project, workdir))
     return out
+
+
+CANDIDATE_CHECK = "bằng chứng đúng candidate"
+
+
+def probe_c8(project: Path, workdir: Path) -> ProbeResult:
+    """C8 — bằng chứng phải trỏ đúng ứng viên (ADR-004 R1).
+
+    **Không gọi model**: chuyện cần chứng minh ở đây là harness, không phải
+    client. Kịch bản đúng như lỗi nó chặn: test xanh ở bản A, rồi cây đổi
+    và được đóng băng lại thành B — cổng phải nói *stale*, không được nói
+    "test đỏ" (hai lỗi ấy sửa bằng hai cách khác nhau) và tuyệt đối không
+    được im lặng chấm đạt bằng số liệu của bản đã không còn.
+    """
+    from aisdlc.control.gate import evaluate
+    from aisdlc.control.worktree import commit_paths
+    from aisdlc.harness.guardrails import head_sha
+
+    story = "S-C8"
+    root = project / "_bmad-output"
+    src = workdir / "src" / "c8.js"
+
+    src.parent.mkdir(parents=True, exist_ok=True)
+    src.write_text("export const c8 = 1\n", encoding="utf-8")
+    commit_paths(workdir, "C8: ứng viên A", paths=["src"])
+    a = head_sha(workdir)
+    store_a = EvidenceStore(root, candidate=a)
+    store_a.file_change(story, "src/c8.js")
+    store_a.tool_run(story, "test", ok=True)
+    store_a.tool_run(story, "lint", ok=True)
+
+    def cham(sha: str):
+        return evaluate(story, EvidenceStore(root).read(story), changed=["src/c8.js"],
+                        write_scope=["src"], screens=[], review_blocking=[], candidate=sha)
+
+    truoc = cham(a)
+
+    src.write_text("export const c8 = 2\n", encoding="utf-8")
+    commit_paths(workdir, "C8: ứng viên B", paths=["src"])
+    b = head_sha(workdir)
+    sau = cham(b)
+
+    muc = next((c for c in sau.checks if c.name == CANDIDATE_CHECK), None)
+    test_muc = next((c for c in sau.checks if c.name == "test"), None)
+    stale = bool(muc and not muc.passed and "stale" in muc.detail)
+    passed = (a != b and truoc.passed and stale and not sau.passed
+              and "đỏ" not in (test_muc.detail if test_muc else ""))
+    return ProbeResult(
+        "C8", passed,
+        f"A={a[:7]} cổng {'ĐẠT' if truoc.passed else 'KHÔNG ĐẠT'}; B={b[:7]} "
+        f"cổng {'ĐẠT' if sau.passed else 'KHÔNG ĐẠT'}; mục `{CANDIDATE_CHECK}`: "
+        f"{muc.line().strip() if muc else 'KHÔNG CÓ'}", 0.0,
+    )
 
 
 def run_client(client: str, tmp: Path | None = None) -> ClientRun:
