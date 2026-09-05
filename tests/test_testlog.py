@@ -95,5 +95,5 @@ class TestCoverageVaLa(unittest.TestCase):
 
     def test_evidence_shape(self):
         ev = parse(fx("node-test-fail")).to_evidence()
-        self.assertEqual(set(ev), {"test_format", "test_ids", "failed_ids", "coverage"})
+        self.assertEqual(set(ev), {"test_format", "test_ids", "failed_ids", "skipped_ids", "coverage"})
         self.assertEqual(ev["failed_ids"], ["AC-STORY-01-01-3: thất bại"])

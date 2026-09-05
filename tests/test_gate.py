@@ -322,3 +322,129 @@ class TestHopDongDocTenQa(GateTestCase):
         self.assertIs(muc["e2e"].outcome, Outcome.PASSED)
         self.assertIs(muc["accessibility"].outcome, Outcome.FAILED)
         self.assertFalse(g.passed)
+
+
+class TestKhongLamDoTestCoSan(GateTestCase):
+    """ADR-004 R9: test xanh ở baseline mà đỏ hoặc mất ở ứng viên là hồi quy,
+    và cổng phải nêu **đúng tên** — không phải "test đỏ" chung chung, vì đỏ
+    do test mới của story (TDD) và đỏ do làm hỏng test có sẵn sửa khác nhau."""
+
+    TEN = "không làm đỏ test có sẵn"
+
+    def baseline(self, ids, failed=(), skipped=(), **detail):
+        self.store.tool_run("S-01", "test:baseline", ok=not failed, detail={
+            "baseline": True, "test_format": "pytest", "test_ids": list(ids),
+            "failed_ids": list(failed), "skipped_ids": list(skipped),
+            "red_before": list(failed), **detail,
+        })
+
+    def ung_vien(self, ids, failed=(), sha="aaa", **detail):
+        store = EvidenceStore(self._tmp.name, candidate=sha)
+        store.file_change("S-01", "src/a.py")
+        store.tool_run("S-01", "test", ok=not failed, detail={
+            "test_format": "pytest", "test_ids": list(ids), "failed_ids": list(failed), **detail,
+        })
+        store.tool_run("S-01", "lint", ok=True)
+
+    def muc(self, g):
+        return next(c for c in g.checks if c.name == self.TEN)
+
+    def test_muoi_xanh_roi_chin_xanh_mot_do_thi_neu_dung_ten(self):
+        ids = [f"tests/test_a.py::test_{i}" for i in range(1, 11)]
+        self.baseline(ids)
+        self.ung_vien(ids, failed=[ids[9]])
+        g = self.gate(candidate="aaa")
+        m = self.muc(g)
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("tests/test_a.py::test_10", m.detail)
+        self.assertNotIn("test_9", m.detail)
+        self.assertIn("test_10", g.feedback(), "tên test hồi quy phải vào feedback lượt sau")
+
+    def test_test_moi_do_cua_story_khong_phai_hoi_quy(self):
+        """TDD: test mới đang đỏ là đúng nghĩa; mục "test" đỏ, mục này không."""
+        ids = [f"t{i}" for i in range(10)]
+        self.baseline(ids)
+        self.ung_vien(ids + ["t_moi"], failed=["t_moi"])
+        g = self.gate(candidate="aaa")
+        self.assertIs(self.muc(g).outcome, Outcome.PASSED)
+        self.assertIn("test", [c.name for c in g.failures])
+
+    def test_do_san_o_baseline_va_van_do_thi_khong_tinh(self):
+        self.baseline(["t1", "t2"], failed=["t2"])
+        self.ung_vien(["t1", "t2"], failed=["t2"])
+        m = self.muc(self.gate(candidate="aaa"))
+        self.assertIs(m.outcome, Outcome.PASSED)
+        self.assertIn("đã đỏ sẵn", m.detail)
+        self.assertIn("t2", m.detail)
+
+    def test_bo_qua_o_baseline_khong_phai_xanh(self):
+        """Test skip ở baseline mà đỏ hay mất ở ứng viên chưa chứng minh được
+        story làm hỏng gì — nó chưa từng xanh."""
+        self.baseline(["t1", "t2"], skipped=["t2"])
+        self.ung_vien(["t1"])
+        self.assertIs(self.muc(self.gate(candidate="aaa")).outcome, Outcome.PASSED)
+
+    def test_mat_test_co_san_la_hoi_quy_va_noi_vi_sao(self):
+        self.baseline(["t1", "t2", "t3"])
+        self.ung_vien(["t1", "t3"])
+        m = self.muc(self.gate(candidate="aaa"))
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("mất 1 test", m.detail)
+        self.assertIn("t2", m.detail)
+        self.assertIn("khai trong story", m.detail)
+
+    def test_khong_co_baseline_thi_khong_ap_dung_co_ly_do(self):
+        self.green_story()
+        m = self.muc(self.gate())
+        self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
+        self.assertIn("không ghi baseline", m.detail)
+
+    def test_tat_boi_cau_hinh_la_khong_ap_dung_khong_phai_dat(self):
+        self.store.tool_run("S-01", "test:baseline", ok=False,
+                            detail={"baseline": True, "disabled": True,
+                                    "skipped": "tắt bởi cấu hình `verify.baseline`"})
+        self.green_story()
+        m = self.muc(self.gate())
+        self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
+        self.assertIn("verify.baseline", m.detail)
+        self.assertIsNot(m.outcome, Outcome.PASSED)
+
+    def test_chua_khai_lenh_test_la_chua_cau_hinh_khong_phai_baseline_xanh(self):
+        self.store.tool_run("S-01", "test:baseline", ok=False,
+                            detail={"baseline": True, "skipped": "dự án chưa khai lệnh cho tool này"})
+        self.green_story()
+        m = self.muc(self.gate())
+        self.assertIs(m.outcome, Outcome.UNCONFIGURED)
+        self.assertTrue(m.outcome.must_be_named)
+        self.assertFalse(m.outcome.counts_as_done)
+
+    def test_baseline_khong_chay_duoc_la_moi_truong_khong_phai_story(self):
+        self.store.tool_run("S-01", "test:baseline", ok=False,
+                            detail={"baseline": True, "unrunnable": "công cụ chưa cài (module_not_found)"})
+        self.green_story()
+        m = self.muc(self.gate())
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("module_not_found", m.detail)
+
+    def test_reporter_khong_in_ten_thi_chua_cau_hinh_kem_cho_sua(self):
+        self.baseline([], test_format="", test_note="vitest reporter mặc định không in tên test — thêm `--reporter=verbose`")
+        self.green_story()
+        m = self.muc(self.gate())
+        self.assertIs(m.outcome, Outcome.UNCONFIGURED)
+        self.assertIn("--reporter=verbose", m.detail)
+
+    def test_chi_so_voi_lan_test_dung_ung_vien(self):
+        """Lần test ở bản khác không được dùng để chấm bản này."""
+        self.baseline(["t1"])
+        self.ung_vien(["t1"], sha="bbb")
+        m = self.muc(self.gate(candidate="aaa"))
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("chưa có lần test nào ở ứng viên", m.detail)
+
+    def test_lan_test_truoc_baseline_khong_duoc_tinh(self):
+        """Lịch sử của lần chạy trước không phải "ứng viên": chỉ so lần sau mốc."""
+        self.store.tool_run("S-01", "test", ok=False,
+                            detail={"test_format": "pytest", "test_ids": ["t1"], "failed_ids": ["t1"]})
+        self.baseline(["t1"])
+        self.ung_vien(["t1"])
+        self.assertIs(self.muc(self.gate(candidate="aaa")).outcome, Outcome.PASSED)

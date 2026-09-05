@@ -193,6 +193,21 @@ nhau. Người rà soát và rà soát bảo mật cũng bị so `git rev-parse 
 phiên: đổi ứng viên thì lượt rà soát không được tính (hoàn nguyên cây
 không thấy một `git commit`). Phép hợp quy **C8** đo đúng chuỗi này.
 
+### Baseline trước khi sửa — mục **không làm đỏ test có sẵn** (ADR-004 R9)
+
+Trước phiên developer đầu tiên của một story, harness chạy `tools.test` ở
+HEAD worktree và ghi `tool_run test:baseline` (tên test, `red_before`,
+`parent`; **không** có `candidate` vì ứng viên chưa đóng băng). Sau khi
+đóng băng, cổng so tên test xanh ở baseline với lần test mới nhất mang
+đúng `candidate`: xanh trước mà đỏ hoặc **mất** sau là ✗ nêu đúng tên —
+test mới của story đang đỏ (TDD) không tính, test đã đỏ sẵn không tính và
+được nói ra. Không so được thì kết cục theo bất biến: chưa khai lệnh /
+reporter không in tên → ○, không chạy được → ⚠, tắt bởi `verify.baseline`
+→ –. Chạy một lần mỗi story, không mỗi lượt: lấy ứng viên lượt trước làm
+mốc thì test lượt trước vừa làm đỏ thành "đỏ sẵn" và lượt sau xoá nó là qua
+cổng sạch. Ghi dưới tên riêng, không phải `test`, để guard `completion`,
+TDD và sổ hành vi không đọc nhầm nó thành lần test của lượt.
+
 ---
 
 ## 7. Chạy song song và cô lập (R14) — phần dễ sai nhất
@@ -557,6 +572,7 @@ Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏn
 | `tools.test` · `tools.lint` · `tools.sast` | `""` (tự dò) | lệnh là quyết định của dự án; rỗng thì dò từ file có thật |
 | `verify.*` (10 loại) | `""` | rỗng nghĩa là **chưa cấu hình**, không phải "đạt" |
 | `verify.waived` | `""` | miễn phải là quyết định có người ký, không phải hệ quả của việc quên |
+| `verify.baseline` | `true` | chạy bộ test ở candidate cha **trước** phiên developer đầu tiên của story (ADR-004 R9) để cổng "không làm đỏ test có sẵn" so được tên test; tắt khi bộ test quá chậm — tắt thì mục cổng là – "tắt bởi cấu hình", không phải đạt |
 | `sandbox.image` | `""` (theo stack) | `alpine` trơn không có công cụ nào; test đỏ vì thiếu công cụ chứ không vì code sai |
 | `sandbox.tools_network` | `false` | dự án cần cài phụ thuộc mới mở mạng, và phải khai tường minh |
 | `sandbox.use_docker` | `true` | tắt được cho toolchain gắn với máy chủ, nhưng luôn ghi `degraded` |
