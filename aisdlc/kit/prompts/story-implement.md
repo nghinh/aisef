@@ -1,6 +1,6 @@
 ---
 name: story-implement
-version: 5
+version: 6
 role: developer
 ---
 # {{ story_id }} — {{ story_title }}
@@ -98,6 +98,9 @@ component đã cam kết.
 * Không thêm phụ thuộc mới trừ khi story yêu cầu; nói trước, đừng cài rồi
   báo sau.
 * Không chạm file ngoài phạm vi, kể cả để "sửa luôn cho gọn".
+* Không đổi tiêu đề test có sẵn: harness ghi mốc tên test **trước** khi bạn
+  vào, tiêu đề khác đi là "mất test" và lượt trượt. Cần gắn mã tiêu chí thì
+  thêm tiền tố `AC_…:` trước tiêu đề cũ, giữ nguyên phần còn lại.
 * Không tuyên bố xong khi còn tiêu chí chấp nhận chưa có test phủ.
 
 ## Xong khi
