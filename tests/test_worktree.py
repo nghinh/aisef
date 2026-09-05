@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisdlc.control.worktree import (  # noqa: E402
+    _git,
     main_repo,
     GitError,
     WorktreeManager,
@@ -69,6 +70,17 @@ class TestLifecycle(WorktreeTestCase):
         self.assertTrue(wt.path.is_dir())
         self.assertEqual(wt.branch, "story/S-01")
         self.assertIn("story/S-01", git(self.repo, "branch", "--list", "story/S-01"))
+
+    def test_stray_dir_is_not_a_worktree(self):
+        """Lỗi 13: thư mục còn sót (`.vite/` của vite sống sót) không phải
+        worktree — phải dọn và tạo thật, không trả về thư mục thường."""
+        stray = self.wm.path_for("S-01")
+        (stray / ".vite").mkdir(parents=True)
+        (stray / ".vite" / "deps.json").write_text("{}", encoding="utf-8")
+        wt = self.wm.create("S-01")
+        self.assertTrue((wt.path / ".git").exists())
+        self.assertFalse((wt.path / ".vite").exists())
+        self.assertIn(str(wt.path), _git(self.repo, "worktree", "list").stdout)
 
     def test_create_is_idempotent(self):
         a = self.wm.create("S-01")
