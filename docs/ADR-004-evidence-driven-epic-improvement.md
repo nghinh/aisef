@@ -97,6 +97,7 @@ Ký hiệu: **P0** = nền tảng, làm trước và đo; **P1** = tạo giá tr
 **R10 — Planner agent cho story sửa** (chỉ khi R3 đo được gain nhưng story sinh bằng code quá thô): agent viết lại tiêu đề/tiêu chí story sửa từ gap + preservation, vẫn qua cổng `stories` và cổng cỡ.
 **R11 — Vòng cấp dự án nhiều epic** (T vòng qua nhiều epic) — sau khi R3 ổn trên một epic.
 **R12 — Xuất issue table** (GitHub Issues/CSV) từ ledger — tiện theo dõi, không ảnh hưởng cổng.
+**R13 — Lượt kiểm-lại trên ứng viên đã đóng băng** (`aisdlc run --story S --verify-only`): không mở phiên developer; ứng viên = HEAD nhánh story; chạy lại đúng các phép kiểm có bằng chứng ✗/thiếu ở ứng viên ấy (rà soát/bảo mật đã ✅ ở cùng SHA thì giữ, theo luật stale của R1). Cần vì: e9 STORY-01-07 2026-09-06 trượt lượt 3 chỉ vì e2e nhạy tải máy, ứng viên `a60612e` đo lại 10/10 xanh (§6). Không nới cổng: vẫn chấm đủ, chỉ không trả tiền cho việc dựng lại mã đã có.
 
 ---
 
@@ -257,6 +258,19 @@ kết luận — đúng như hai trường hợp ở trên.
 cảnh báo, Spearman) + `tests/test_run.py` 2 phép (chặn ở `run`, bảng hiệu
 chuẩn được ghi sau khi story xong). Bộ đầy đủ: **1 256 test, OK**
 (skipped 56).
+
+**R1 · R8 — đo trên agent thật, e9 STORY-01-07 chạy lại 2026-09-06 01:03–02:14 (Claude, $28,76, 3 lượt thử).**
+
+| lượt | developer | ứng viên | review (lượt · $) | JSON review | security (lượt · $) | JSON security | kết cục cổng |
+|---|---|---|---|---|---|---|---|
+| 1 | 47 lượt · $4,43 | `689af33` | 32 · $4,27 | có, `block` | 6 · $0,79 | có, `pass` | ✗ rà soát |
+| 2 | 57 · $5,53 | `37ec429` | 44 · $5,82 | có, `block` | 9 · $1,12 | có, `pass` | ✗ rà soát |
+| 3 | 25 · $2,60 | `a60612e` | 18 · $2,83 | có, `pass` | 8 · $1,37 | có, `pass` | ✗ e2e |
+
+* R1: nhật ký có `changes.detected → candidate.frozen` mỗi lượt, mọi bằng chứng sau phiên developer (lint, test, `qa:*`, mockup_map, rà soát, bảo mật) mang đúng SHA của lượt; mục "bằng chứng đúng candidate" ✅ ở cả 3 lượt; không lượt rà soát nào bị huỷ vì đổi HEAD. Không có phiên agent nào thêm — AC (d) "không tăng lượt/chi phí" **đạt** trên story này (chi phí thêm = 3 lần `git commit`).
+* R8 / B7: 6/6 phiên rà soát trả khối JSON đúng schema ngay lượt đầu, **0** lần hỏi lại (`review:no-schema`/`*-retry` không xuất hiện); 0 `review:mismatch` — bản văn bản và bản máy đọc khớp theo khoá (thẻ, tệp). Chi phí thêm của R8 trên agent thật = 0 lượt.
+* Kết cục story: **trượt** sau 3 lượt (`run.max_retries` = 2). Lượt 3 rà soát ✅, bảo mật ✅, chỉ e2e ✗ ở `tests/e2e/autosave.spec.ts:210` ("Đã lưu đứng ít nhất 800 ms", test của STORY-01-06). Đo lại ngay sau đó trên đúng ứng viên `a60612e` (worktree tách riêng, cùng node_modules, load 17): **10/10 e2e xanh, 15,3 s**. Lúc cổng chạy, máy đang gánh ba bộ test đầy đủ của ba luồng ADR-004 + Docker (load 40–150). Kết luận: trượt vì môi trường đo, không vì mã; harness chấm đúng theo bằng chứng nó có, và bằng chứng ấy đúng cho thời điểm ấy.
+* Điều thiếu lộ ra (ghi thành P2 R13 ở §2): **không có cách chạy lại phép kiểm trên ứng viên đã đóng băng** mà không mở phiên developer mới — R1 đã làm cho việc ấy có nghĩa (bằng chứng rà soát ở `a60612e` vẫn hợp lệ), nhưng `aisdlc run` chỉ biết "lượt mới = developer mới". Giá của khoảng trống này hôm nay: một lượt developer nữa (~$10–15) để dựng lại thứ đã có.
 
 **R8 — schema bắt buộc + retry cho đầu ra rà soát: hiện thực, unit xanh,
 chưa đo trên `par`.** (2026-09-05)
