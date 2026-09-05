@@ -58,13 +58,19 @@ class TestTransitions(StateTestCase):
         self.store.transition("S-01", StoryStatus.FAILED)
         self.store.transition("S-01", StoryStatus.PENDING)
         rec = self.store.transition("S-01", StoryStatus.RUNNING)
-        self.assertEqual(rec.attempts, 2)
+        self.assertEqual(rec.status, StoryStatus.RUNNING.value)
 
-    def test_attempts_increment_only_on_entering_running(self):
+    def test_attempts_count_developer_runs_not_run_touches(self):
+        """P2-11: hai lần `run` chạm story không phải hai lượt developer."""
         self.store.register("S-01")
         self.store.transition("S-01", StoryStatus.RUNNING)
-        self.store.transition("S-01", StoryStatus.VERIFYING)
-        self.assertEqual(self.store.load().stories["S-01"].attempts, 1)
+        self.store.transition("S-01", StoryStatus.VERIFYING, attempts=4)
+        self.store.transition("S-01", StoryStatus.FAILED)
+        self.store.transition("S-01", StoryStatus.PENDING)
+        self.store.transition("S-01", StoryStatus.RUNNING)
+        self.assertEqual(self.store.load().stories["S-01"].attempts, 4)
+        self.store.transition("S-01", StoryStatus.VERIFYING, attempts=1)
+        self.assertEqual(self.store.load().stories["S-01"].attempts, 5)
 
     def test_blocked_records_reason(self):
         self.store.register("S-01")
