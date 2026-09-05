@@ -31,6 +31,7 @@ from ..control.security import parse as parse_security
 from ..control.normalize import Architecture, Story, effective_write_scope
 from ..harness import mockup_verify
 from ..harness.guardrails import (
+    ENV_WORKDIR,
     ENV_BASE_REF,
     ENV_STORY_ID,
     ENV_WRITE_SCOPE,
@@ -58,6 +59,9 @@ class Attempt:
     number: int
     ok: bool = False
     infra: bool = False
+    #: Hỏng đến mức thử lại cũng vô nghĩa — ví dụ cách ly đã vỡ: worktree
+    #: của lượt sau sẽ rẽ từ thân cây đã bẩn, nên chỉ tiêu tiền thêm.
+    fatal: bool = False
     error: str = ""
     cost_usd: float = 0.0
     gate: story_gate.StoryGate | None = None
@@ -190,6 +194,7 @@ def run_attempt(
         ENV_WRITE_SCOPE: ",".join(scope),
         ENV_STORY_ID: story.id,
         ENV_BASE_REF: base_ref,
+        ENV_WORKDIR: str(workdir),
     }
 
     # Cách ly là thứ **phải kiểm**, không phải thứ giả định. Worktree ngăn
@@ -210,7 +215,8 @@ def run_attempt(
             f"Story phải làm việc trong worktree riêng; công việc trên thân cây "
             f"không qua cổng nào cả. Hoàn nguyên rồi chạy lại."
         )
-        attempt.infra = True
+        attempt.infra = True   # story chưa hề được chấm
+        attempt.fatal = True   # nhưng thử lại cũng vô nghĩa
         evidence.tool_run(
             story.id, "cách ly", ok=False,
             detail={"truoc": truoc, "sau": sau, "attempt": number},
@@ -425,6 +431,7 @@ def review_story(
     spec.env = {
         ENV_WRITE_SCOPE: ",".join(effective_write_scope(story, project)),
         ENV_BASE_REF: base_ref,
+        ENV_WORKDIR: str(workdir),
     }
 
     result = client.run(spec)
@@ -708,6 +715,10 @@ def implement_story(
         outcome.attempts.append(attempt)
 
         if attempt.ok:
+            return outcome
+
+        if attempt.fatal:
+            outcome.blocked_reason = attempt.error
             return outcome
 
         if attempt.infra:

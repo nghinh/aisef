@@ -57,7 +57,17 @@ class OpenCodeAdapter(ClientAdapter):
         }
 
     def build_command(self, spec: RunSpec) -> list[str]:
-        cmd = [self.binary, "run", spec.prompt]
+        # `--dir` chứ không chỉ `cwd=`: OpenCode dò gốc dự án riêng, và với
+        # worktree nằm trong `<dự án>/.aisdlc/worktrees/` nó đi ngược lên
+        # tới gốc dự án rồi **nói với model rằng đó là nơi làm việc**. Model
+        # sau đó đọc/ghi bằng đường dẫn tuyệt đối vào gốc dự án và đặt
+        # `workdir` của từng lệnh bash ở đó — công việc rơi thẳng lên thân
+        # cây, worktree vẫn trống. Đo được trong bản ghi phiên:
+        #
+        #   {"tool":"read","input":{"filePath":"/…/par/src/reverse-words.js"}}
+        #   {"tool":"bash","input":{"command":"git add … && git commit …",
+        #                           "workdir":"/…/par"}}
+        cmd = [self.binary, "run", "--dir", str(spec.workdir), spec.prompt]
         if spec.model:
             cmd += ["--model", spec.model]
         return cmd

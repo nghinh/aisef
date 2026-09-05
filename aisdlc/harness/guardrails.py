@@ -27,6 +27,10 @@ from .observe import TOOL_RUN
 ENV_WRITE_SCOPE = "AISDLC_WRITE_SCOPE"
 ENV_STORY_ID = "AISDLC_STORY_ID"
 ENV_BASE_REF = "AISDLC_BASE_REF"
+#: Cây làm việc của story. Harness **biết** đường này — chính nó dựng
+#: worktree — nên không việc gì phải hỏi client. Client báo sai (hoặc
+#: model tự đặt `workdir` khác) thì guard vẫn soi đúng cây.
+ENV_WORKDIR = "AISDLC_WORKDIR"
 
 #: Phạm vi ghi khi **không** ở trong một story: các pha lập kế hoạch và
 #: dựng mockup. Chúng có phạm vi cố định và biết trước, nên guard vẫn có
@@ -464,6 +468,11 @@ def story_from_env(env: dict[str, str] | None = None) -> str:
     return (env or os.environ).get(ENV_STORY_ID, "")
 
 
+def workdir_from_env(env: dict[str, str] | None = None) -> str:
+    """Cây làm việc do harness khai. Rỗng nghĩa là không chạy trong story."""
+    return (env or os.environ).get(ENV_WORKDIR, "")
+
+
 def base_from_env(env: dict[str, str] | None = None) -> str:
     return (env or os.environ).get(ENV_BASE_REF, "")
 
@@ -485,6 +494,31 @@ def effective_scope(env: dict[str, str] | None = None) -> list[str]:
     return list(PLANNING_SCOPE)
 
 
+def _escaped_workdir(tool_input: dict, root: str) -> Verdict | None:
+    """Lệnh có tự chỉ định thư mục nằm ngoài cây agent đang đứng không.
+
+    Trả ``None`` khi không có gì để nói — không có `workdir`, không biết
+    cây gốc, hoặc `workdir` nằm trong cây. Cách ly bằng worktree chỉ có
+    giá trị khi không ai bước ra được khỏi nó.
+    """
+    wd = str(tool_input.get("workdir") or tool_input.get("cwd") or "")
+    if not wd or not root:
+        return None
+    try:
+        trong = Path(wd).resolve()
+        cay = Path(root).resolve()
+    except OSError:
+        return None
+    if trong == cay or cay in trong.parents:
+        return None
+    return Verdict(
+        False,
+        f"lệnh tự chỉ định thư mục {wd}, nằm ngoài cây đang làm việc ({root}). "
+        f"Story chỉ được làm việc trong worktree của nó — công việc đặt ra "
+        f"ngoài không qua cổng nào cả. Bỏ tham số thư mục đi và chạy lại.",
+    )
+
+
 def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
               project_root: str = "", artifact_root: str = "") -> Verdict:
     """Chạy một guard trên sự kiện hook của client.
@@ -504,7 +538,23 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
     # nó thì guard đi đọc `git status` của cây khác, thấy toàn bộ tài liệu
     # kế hoạch chưa commit và chặn mọi thao tác. `--porcelain` luôn trả
     # đường dẫn tính từ gốc repo nên đứng ở thư mục con cũng đúng.
-    root = str(event.get("cwd") or "") or project_root
+    # Thứ tự tin cậy: cây harness khai → cây client báo → cây lúc biên
+    # dịch hook. Bản khai của harness đứng trước vì nó là **sự thật**:
+    # client có thể báo gốc dự án thay vì worktree, và model của OpenCode
+    # còn tự đặt `workdir` cho từng lệnh.
+    root = workdir_from_env(env) or str(event.get("cwd") or "") or project_root
+
+    # Tool `bash` của OpenCode nhận `workdir` riêng cho **từng lệnh**, và
+    # model tự đặt nó — đã gặp thật: story chạy trong worktree nhưng lệnh
+    # `git add … && git commit` mang `workdir` là gốc dự án, nên công việc
+    # rơi thẳng lên `main` mà không cổng nào thấy (worktree vẫn trống,
+    # diff rỗng, story trượt vì lý do sai).
+    #
+    # Kiểm ở đây, tại tầng điều phối, nên nó áp cho **mọi** guard và mọi
+    # client: guard nào chạy trước cũng chặn được. Đi xuống thư mục con
+    # thì vẫn cho — thoát ra khỏi cây mới là chuyện.
+    if (thoat := _escaped_workdir(tool_input, root)):
+        return thoat
 
     if kind == "write-scope":
         return check_write_scope(

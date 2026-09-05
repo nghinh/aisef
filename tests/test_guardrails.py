@@ -11,7 +11,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.harness.guardrails import (  # noqa: E402
+from aisdlc.harness.guardrails import (
+    ENV_WORKDIR,  # noqa: E402
     ENV_STORY_ID,
     ENV_WRITE_SCOPE,
     GUARD_MATCHERS,
@@ -570,3 +571,85 @@ class TestCompletion(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestThoatKhoiCayLamViec(unittest.TestCase):
+    """Lỗi 40. Tool `bash` của OpenCode nhận `workdir` riêng cho **từng
+    lệnh**, và model tự đặt nó.
+
+    Bản ghi phiên của lượt hỏng:
+
+        {"tool":"bash","state":{"input":{
+           "command":"git add \"src/reverse-words.js\" … && git commit -m …",
+           "workdir":"/…/scratchpad/par"}}}
+
+    `workdir` là gốc dự án, không phải worktree của story. Nên công việc
+    rơi thẳng lên `main`: worktree vẫn trống, diff rỗng, story trượt vì lý
+    do sai, còn code chưa qua cổng nào thì đã nằm trên thân cây.
+    """
+
+    def guard(self, kind, *, cwd="/tmp/cay", **ti):
+        return run_guard(kind, {"cwd": cwd, "tool_name": "bash",
+                                "tool_input": {"command": "ls", **ti}})
+
+    def test_chan_khi_workdir_ra_ngoai_cay(self):
+        v = self.guard("git-stage", workdir="/tmp/noi-khac")
+        self.assertFalse(v.allowed)
+        self.assertIn("nằm ngoài cây đang làm việc", v.reason)
+
+    def test_chan_ca_khi_ra_gocdu_an_la_cha_cua_cay(self):
+        """Gốc dự án là **cha** của worktree — đúng ca đã gặp thật."""
+        v = self.guard("destructive", cwd="/tmp/par/.aisdlc/worktrees/S1",
+                       workdir="/tmp/par")
+        self.assertFalse(v.allowed)
+
+    def test_cho_di_xuong_thu_muc_con(self):
+        self.assertTrue(self.guard("git-stage", workdir="/tmp/cay/src").allowed)
+
+    def test_chinh_cay_do_thi_cho(self):
+        self.assertTrue(self.guard("git-stage", workdir="/tmp/cay").allowed)
+
+    def test_khong_khai_workdir_thi_khong_noi_gi(self):
+        """Claude Code không có tham số này — guard phải im lặng."""
+        self.assertTrue(self.guard("git-stage").allowed)
+
+    def test_ap_cho_moi_guard_khong_chi_mot_cai(self):
+        """Đặt ở tầng điều phối nên guard nào chạy trước cũng chặn được."""
+        for kind in ("write-scope", "secret", "injection", "git-stage",
+                     "destructive"):
+            with self.subTest(guard=kind):
+                self.assertFalse(
+                    self.guard(kind, workdir="/tmp/noi-khac").allowed, kind)
+
+    def test_ban_khai_cua_harness_thang_loi_khai_cua_client(self):
+        """Client có thể báo **gốc dự án** thay vì worktree — OpenCode làm
+        đúng thế. Harness thì biết chắc: chính nó dựng worktree.
+
+        Không có thứ tự tin cậy này thì `cwd` do client gửi là gốc dự án,
+        `workdir` model tự đặt cũng là gốc dự án, hai cái bằng nhau, và
+        guard kết luận "không có gì thoát ra" trong khi công việc đang rơi
+        thẳng lên thân cây.
+        """
+        v = run_guard(
+            "git-stage",
+            {"cwd": "/tmp/par", "tool_name": "bash",
+             "tool_input": {"command": "git commit -m x", "workdir": "/tmp/par"}},
+            env={ENV_WORKDIR: "/tmp/par/.aisdlc/worktrees/S1"},
+        )
+        self.assertFalse(v.allowed)
+        self.assertIn("/tmp/par/.aisdlc/worktrees/S1", v.reason)
+
+    def test_khong_khai_thi_lui_ve_loi_client(self):
+        v = run_guard("git-stage", {
+            "cwd": "/tmp/cay", "tool_name": "bash",
+            "tool_input": {"command": "ls", "workdir": "/tmp/noi-khac"}}, env={})
+        self.assertFalse(v.allowed)
+        self.assertIn("/tmp/cay", v.reason)
+
+    def test_client_goi_tham_so_do_la_cwd_thi_van_bat(self):
+        """Không phải client nào cũng đặt tên `workdir`."""
+        v = run_guard("git-stage", {
+            "cwd": "/tmp/cay", "tool_name": "bash",
+            "tool_input": {"command": "ls", "cwd": "/tmp/noi-khac"},
+        })
+        self.assertFalse(v.allowed)

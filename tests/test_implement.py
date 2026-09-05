@@ -606,3 +606,12 @@ class TestCachLyThanCay(ImplementTestCase):
         chặn mọi lượt chạy hợp lệ."""
         out = self.implement(self.PhaCachLy(self.project), workdir=self.project)
         self.assertNotIn("đổi nhánh chính", out.attempts[0].error or "")
+
+
+class TestCachLyVoLaDungHan(TestCachLyThanCay):
+    def test_khong_thu_lai_khi_cach_ly_da_vo(self):
+        """Worktree của lượt sau rẽ từ thân cây đã bẩn — thử lại chỉ tiêu
+        thêm tiền và làm hỏng sâu hơn."""
+        out = self.implement(self.PhaCachLy(self.project), workdir=self.workdir)
+        self.assertEqual(len(out.attempts), 1)
+        self.assertIn("đổi nhánh chính", out.blocked_reason)

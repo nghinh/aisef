@@ -117,6 +117,20 @@ class TestOpenCodeCommand(unittest.TestCase):
         )
         self.assertIn("--model", cmd)
 
+    def test_bao_thang_cay_lam_viec_cho_opencode(self):
+        """Lỗi 40. `cwd=` của tiến trình con là **không đủ**: OpenCode dò
+        gốc dự án riêng, thấy worktree nằm trong `<dự án>/.aisdlc/`, đi
+        ngược lên tới gốc dự án rồi nói với model rằng đó là nơi làm việc.
+
+        Model sau đó đọc/ghi bằng đường dẫn tuyệt đối vào gốc dự án và đặt
+        `workdir` cho từng lệnh bash ở đó — công việc rơi thẳng lên thân
+        cây trong khi worktree vẫn trống. Đã tái hiện ba lần trên `par`.
+        """
+        wt = Path("/du/an/.aisdlc/worktrees/STORY-01-01")
+        cmd = OpenCodeAdapter().build_command(RunSpec(prompt="p", workdir=wt))
+        self.assertIn("--dir", cmd)
+        self.assertEqual(cmd[cmd.index("--dir") + 1], str(wt))
+
 
 class TestGuardRails(unittest.TestCase):
     def test_missing_binary_returns_error_not_crash(self):
