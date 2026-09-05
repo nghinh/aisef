@@ -23,8 +23,8 @@ def run(client, *cells, version="1.0", at="2026-09-05T00:00:00+00:00"):
 
 class TestBangDocLaiDuoc(unittest.TestCase):
     def test_vong_tron_markdown(self):
-        rep = C.Report(runs=[run("claude", True, True, True, True, True),
-                             run("opencode", True, False, True, True, True)],
+        rep = C.Report(runs=[run("claude", *[True] * len(C.PROBES)),
+                             run("opencode", True, False, *[True] * (len(C.PROBES) - 2))],
                        generated="2026-09-05")
         back = C.parse(rep.to_markdown())
         self.assertEqual(back.generated, "2026-09-05")
@@ -34,7 +34,7 @@ class TestBangDocLaiDuoc(unittest.TestCase):
         self.assertEqual(back.run_for("opencode").cell("C2"), "✗")
 
     def test_bang_neu_ro_opencode_khong_chan_phat_hanh(self):
-        md = C.Report(runs=[run("claude", *[True] * 5)]).to_markdown()
+        md = C.Report(runs=[run("claude", *[True] * len(C.PROBES))]).to_markdown()
         self.assertIn("không chặn phát hành", md)
         self.assertIn("bằng chứng", md)
 
@@ -44,15 +44,15 @@ class TestDuocPhatHanhKhong(unittest.TestCase):
         return C.Report(runs=list(runs), generated=generated)
 
     def test_claude_du_va_moi_thi_duoc(self):
-        ok, why = C.release_ready(self.rep(run("claude", *[True] * 5)), today=date(2026, 9, 10))
+        ok, why = C.release_ready(self.rep(run("claude", *[True] * len(C.PROBES))), today=date(2026, 9, 10))
         self.assertTrue(ok, why)
 
     def test_bang_cu_hon_14_ngay_thi_khong(self):
-        ok, why = C.release_ready(self.rep(run("claude", *[True] * 5)), today=date(2026, 9, 25))
+        ok, why = C.release_ready(self.rep(run("claude", *[True] * len(C.PROBES))), today=date(2026, 9, 25))
         self.assertFalse(ok); self.assertIn("cũ", why)
 
     def test_claude_co_o_do_thi_khong(self):
-        ok, why = C.release_ready(self.rep(run("claude", True, False, True, True, True)),
+        ok, why = C.release_ready(self.rep(run("claude", True, False, *[True] * (len(C.PROBES) - 2))),
                                   today=date(2026, 9, 6))
         self.assertFalse(ok); self.assertIn("C2", why)
 
@@ -62,12 +62,12 @@ class TestDuocPhatHanhKhong(unittest.TestCase):
 
     def test_opencode_do_khong_chan(self):
         """Quyết định 2026-09-05: OpenCode hạng hai."""
-        ok, _ = C.release_ready(self.rep(run("claude", *[True] * 5), run("opencode", *[False] * 5)),
+        ok, _ = C.release_ready(self.rep(run("claude", *[True] * len(C.PROBES)), run("opencode", *[False] * len(C.PROBES))),
                                 today=date(2026, 9, 6))
         self.assertTrue(ok)
 
     def test_chua_co_cot_claude_thi_khong(self):
-        ok, why = C.release_ready(self.rep(run("opencode", *[True] * 5)), today=date(2026, 9, 6))
+        ok, why = C.release_ready(self.rep(run("opencode", *[True] * len(C.PROBES))), today=date(2026, 9, 6))
         self.assertFalse(ok); self.assertIn("claude", why)
 
 

@@ -6,7 +6,7 @@ này theo định nghĩa — nó kiểm mã ta viết, không kiểm client hi�
 nào. Chỗ duy nhất bắt được là một phiên agent thật, trên worktree thật, với
 guard thật.
 
-Module này giữ **hợp đồng** của bộ kiểm: năm phép thử cố định, một bảng kết
+Module này giữ **hợp đồng** của bộ kiểm: sáu phép thử cố định, một bảng kết
 quả có ngày và phiên bản client, và câu trả lời "được phát hành không".
 Phần chạy thật nằm ở ``tests/conformance/`` (bật bằng
 ``AISDLC_CONFORMANCE=1``). Quyết định 2026-09-05: OpenCode hạng hai — chạy
@@ -31,12 +31,13 @@ PROBES: tuple[tuple[str, str, str], ...] = (
     ("C3", "`glob`/`read` trong worktree", "đi qua, không guard nào chặn"),
     ("C4", "từ worktree: `pwd; git branch --show-current`", "trả worktree và nhánh story"),
     ("C5", "env vai reviewer, gọi Write", "chặn bởi `check_role_tool`"),
+    ("C6", "Write mã nguồn có comment `STORY-01-01`", "chặn bởi `process-ref` (luật 6); tệp test mang mã `AC-…` vẫn qua"),
 )
 
 
 @dataclass
 class ProbeResult:
-    probe: str          # C1..C5
+    probe: str          # C1..C6
     passed: bool
     detail: str = ""    # một dòng: quan sát được gì
     cost_usd: float = 0.0

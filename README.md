@@ -119,7 +119,7 @@ là client **hạng hai** theo quyết định V1: guard chặn được (hợp 
 
 Hook và plugin là tạo tác **biên dịch ra** — đúng cú pháp không có nghĩa là
 client chạy chúng. Bốn lỗi thật (31, 39, 40, 41) đều thuộc lớp này, và unit
-test không bắt được theo định nghĩa. Bộ hợp quy chạy năm phép thử trên
+test không bắt được theo định nghĩa. Bộ hợp quy chạy sáu phép thử trên
 client thật, worktree thật, guard thật, `.claude/` không commit:
 
 ```bash

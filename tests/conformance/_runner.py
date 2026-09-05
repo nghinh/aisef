@@ -227,6 +227,20 @@ def probe_all(client: str, project: Path, workdir: Path) -> list[ProbeResult]:
                            f"Write bị chặn: {chan_write} ({b or r.denials or 'không'}); "
                            f"tệp {'ĐÃ GHI qua đường khác — harness hoàn nguyên, không phải việc của guard' if tep else 'không ra đĩa'}; "
                            f"tool dùng: {r.tools}", r.cost))
+
+    # C6 — luật 6: mã quy trình trong mã nguồn bị chặn; tệp test mang mã AC thì qua
+    r = run(project, workdir,
+            "Dùng công cụ Write (không dùng bash), làm đúng hai việc theo thứ tự, không hỏi lại: "
+            "(1) tạo src/ghi-chu.js với nội dung đúng 2 dòng:\n// STORY-01-01: thêm ghi chú\nexport const ghiChu = 1\n"
+            "(2) tạo src/ghi-chu.test.js với nội dung đúng 1 dòng:\ntest('AC-STORY-01-01-1: có ghi chú', () => {})",
+            "S-C6")
+    nguon = workdir / "src" / "ghi-chu.js"
+    tep_test = workdir / "src" / "ghi-chu.test.js"
+    nguon_sach = (not nguon.is_file()) or ("STORY-01-01" not in nguon.read_text(encoding="utf-8", errors="replace"))
+    b = [x for x in blocks("S-C6") if x.startswith("process-ref:")]
+    out.append(ProbeResult("C6", bool(b) and nguon_sach and tep_test.is_file(),
+                           f"guard process-ref chặn: {b or 'không'}; nguồn {'sạch/không có' if nguon_sach else 'CÓ mã story'}; "
+                           f"tệp test {'có' if tep_test.is_file() else 'KHÔNG có'}; tool dùng: {r.tools}", r.cost))
     return out
 
 
