@@ -501,3 +501,31 @@ class TestDoctorHookTrongWorktree(CliTestCase):
         subprocess.run(["git", "commit", "-qm", "hook"], cwd=self.project, check=True)
         code, out, _ = self.run_cli("doctor")
         self.assertIn("đã commit", out)
+
+
+class TestStatusCanhBaoNguCanhPhinh(CliTestCase):
+    """G10a. Thay knob `story.max_context_tokens` (chưa từng có mã đọc) bằng
+    đo thật: `prompt_chars` trong evidence, cảnh báo story vượt 3× trung vị."""
+
+    def test_story_nap_gap_ba_bi_goi_ten(self):
+        from aisdlc.clients.stream import RunResult
+        from aisdlc.harness.observe import EvidenceStore
+        store = StateStore(self.artifacts)
+        ev = EvidenceStore(self.artifacts)
+        for sid, chars in (("S-01", 10_000), ("S-02", 11_000), ("S-03", 12_000), ("S-04", 90_000)):
+            store.register(sid, "E-01")
+            ev.agent_run(sid, RunResult(ok=True, text="x"), name=f"{sid}#1", prompt_chars=chars)
+        code, out, _ = self.run_cli("status")
+        self.assertIn("nạp ngữ cảnh hơn", out)
+        self.assertIn("S-04", out)
+        self.assertNotIn("S-02", out.split("nạp ngữ cảnh")[1].split("\n\n")[0] if "nạp ngữ cảnh" in out else "")
+
+    def test_it_hon_ba_story_thi_khong_ket_luan(self):
+        from aisdlc.clients.stream import RunResult
+        from aisdlc.harness.observe import EvidenceStore
+        store = StateStore(self.artifacts); ev = EvidenceStore(self.artifacts)
+        for sid, chars in (("S-01", 1_000), ("S-02", 90_000)):
+            store.register(sid, "E-01")
+            ev.agent_run(sid, RunResult(ok=True, text="x"), name=f"{sid}#1", prompt_chars=chars)
+        code, out, _ = self.run_cli("status")
+        self.assertNotIn("nạp ngữ cảnh hơn", out)

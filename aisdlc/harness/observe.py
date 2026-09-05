@@ -208,7 +208,7 @@ class EvidenceStore:
                   detail={"path": path, **(detail or {})}),
         )
 
-    def agent_run(self, story_id: str, result, *, name: str = "") -> Event:
+    def agent_run(self, story_id: str, result, *, name: str = "", prompt_chars: int = 0) -> Event:
         """Ghi lại một lượt gọi model từ `RunResult` — chi phí và độ trễ
         lấy từ luồng client, không tự đoán."""
         return self.record(
@@ -228,6 +228,9 @@ class EvidenceStore:
                 detail={
                     "session_id": result.session_id,
                     "turns": result.num_turns,
+                    # Kích thước ngữ cảnh nạp — đo thật, thay cho knob
+                    # `story.max_context_tokens` chưa từng có mã đọc.
+                    "prompt_chars": prompt_chars,
                     "guard_blocked": result.guard_blocked,
                     # Cờ không nói được guard nào chặn vì gì. Thiếu chỗ
                     # này thì lần sau lại phải đi mò nhật ký phiên.

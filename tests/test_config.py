@@ -41,7 +41,7 @@ class TestDefaults(ConfigTestCase):
         c = Config.load(self.root, env={})
         for key in (
             "coverage.min", "story.max_acceptance_criteria",
-            "story.max_write_scope_paths", "story.max_context_tokens",
+            "story.max_write_scope_paths",
             "run.max_parallel", "run.max_turns", "run.timeout_seconds",
             "run.max_retries", "cost.warn_multiple", "security.block_severities",
         ):
@@ -162,3 +162,40 @@ class TestMembership(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestKhoaDaGo(unittest.TestCase):
+    """Knob không có mã đọc là lời hứa suông. Gỡ thì phải có di trú: dự án
+    cũ nạp được, có cảnh báo, không lỗi."""
+
+    def setUp(self):
+        import tempfile
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        (self.root / ".ai").mkdir()
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_khoa_da_go_khong_lam_vo_du_an_cu(self):
+        import contextlib, io
+        (self.root / ".ai" / "config.json").write_text(
+            '{"story.max_context_tokens": 40000, "run.max_turns": 12}', encoding="utf-8")
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            c = Config.load(self.root)
+        self.assertEqual(c["run.max_turns"], 12)
+        self.assertNotIn("story.max_context_tokens", c)
+        self.assertIn("không còn tác dụng", err.getvalue())
+        self.assertIn("prompt_chars", err.getvalue())
+
+    def test_khoa_la_van_la_loi(self):
+        (self.root / ".ai" / "config.json").write_text('{"story.max_ctx": 1}', encoding="utf-8")
+        with self.assertRaises(ConfigError):
+            Config.load(self.root)
+
+    def test_moi_khoa_da_go_deu_co_ly_do_co_ngay(self):
+        from aisdlc.config import RETIRED
+        for k, why in RETIRED.items():
+            self.assertRegex(why, r"^20\d\d-\d\d-\d\d", k)
+            self.assertNotIn(k, DEFAULTS, f"{k} vừa gỡ vừa còn trong DEFAULTS")

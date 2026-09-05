@@ -209,7 +209,8 @@ def run_attempt(
     _attach_settings(spec, project)
     result = client.run(spec)
     attempt.cost_usd = result.cost_usd
-    evidence.agent_run(story.id, result, name=f"{story.id}#{number}")
+    evidence.agent_run(story.id, result, name=f"{story.id}#{number}",
+                       prompt_chars=len(spec.prompt))
 
     sau = _head_of(project) if workdir != project else ""
     if truoc and sau != truoc:
@@ -441,7 +442,8 @@ def review_story(
 
     _attach_settings(spec, project)
     result = client.run(spec)
-    EvidenceStore(artifact_root).agent_run(story.id, result, name=f"{story.id}-review")
+    EvidenceStore(artifact_root).agent_run(story.id, result, name=f"{story.id}-review",
+                                           prompt_chars=len(spec.prompt))
 
     if not result.ok:
         # Không rà soát được thì **không** coi như sạch.
@@ -510,7 +512,7 @@ def security_review(
     _attach_settings(spec, project)
     result = client.run(spec)
     EvidenceStore(artifact_root).agent_run(
-        story.id, result, name=f"{story.id}-security"
+        story.id, result, name=f"{story.id}-security", prompt_chars=len(spec.prompt)
     )
     if not result.ok:
         return SecurityReport(error=f"không chạy được: {result.error}")

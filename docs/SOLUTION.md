@@ -488,7 +488,7 @@ Không để chữ "ngưỡng" chung chung. Mặc định trong `.ai/config.json
 | `coverage.min` | `0.85` | coverage tối thiểu để story PASS |
 | `story.max_acceptance_criteria` | `8` | quá thì Bước 2 buộc chẻ nhỏ |
 | `story.max_write_scope_paths` | `10` | story chạm quá nhiều nơi là dấu hiệu quá lớn |
-| `story.max_context_tokens` | `40000` | ước tính ngữ cảnh phải nạp; vượt thì chẻ nhỏ |
+| ~~`story.max_context_tokens`~~ | — | **gỡ 2026-09-05**: chưa từng có mã đọc. Thay bằng `prompt_chars` ghi vào evidence mỗi lượt gọi model; `aisdlc status` cảnh báo story nạp > 3× trung vị |
 | `run.max_parallel` | `3` | số story song song trong một đợt |
 | `run.max_turns` | `40` | vòng lặp tối đa của một phiên story |
 | `run.timeout_seconds` | `1800` | 30 phút cho một story |
@@ -515,7 +515,7 @@ Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏn
 
 Đ1 (mỗi story một phiên sạch) đánh đổi token lấy sự đơn giản. Phải đo, không đoán.
 
-**Ngữ cảnh nạp mỗi story:** hiến pháp + architecture (phần liên quan) + story + design-contract (nếu có UI) + code trong `write_scope`. Đây là lý do có `story.max_context_tokens`.
+**Ngữ cảnh nạp mỗi story:** hiến pháp + architecture (phần liên quan) + story + design-contract (nếu có UI) + code trong `write_scope`. Kích thước nạp thật được ghi vào evidence (`prompt_chars`), không đặt ngưỡng trước.
 
 **Giảm chi phí:**
 - Chỉ nạp phần architecture mà `arch_refs` của story trỏ tới, không nạp cả file.

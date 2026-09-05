@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -30,7 +31,6 @@ DEFAULTS: dict[str, Any] = {
     # kích thước story — chống tràn ngữ cảnh trong một phiên
     "story.max_acceptance_criteria": 8,
     "story.max_write_scope_paths": 10,
-    "story.max_context_tokens": 40000,
     # điều phối
     "run.max_parallel": 3,
     "run.max_turns": 40,
@@ -86,7 +86,6 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "security.semantic_review": bool,
     "story.max_acceptance_criteria": int,
     "story.max_write_scope_paths": int,
-    "story.max_context_tokens": int,
     "run.max_parallel": int,
     "run.max_turns": int,
     "run.timeout_seconds": int,
@@ -120,6 +119,18 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "sandbox.use_docker": bool,
     "sandbox.allow_degraded": bool,
     "sandbox.pre_deploy_degraded_waiver": str,
+}
+
+
+#: Khoá đã gỡ, kèm lý do. Gặp trong `.ai/config.json` thì **cảnh báo rồi bỏ
+#: qua**, không lỗi: dự án cũ phải nạp được. Một knob không có mã đọc là một
+#: lời hứa suông — đúng lớp "chưa cấu hình ≠ đạt" áp cho cấu hình.
+RETIRED: dict[str, str] = {
+    "story.max_context_tokens": (
+        "2026-09-05 — chưa từng có mã đọc; thay bằng `prompt_chars` ghi vào "
+        "evidence của mỗi lượt gọi model, `aisdlc status` cảnh báo story vượt "
+        "3× trung vị"
+    ),
 }
 
 
@@ -190,6 +201,11 @@ class Config:
                 loaded = json.loads(path.read_text(encoding="utf-8"))
             except json.JSONDecodeError as e:
                 raise ConfigError(f"{path} không phải JSON hợp lệ: {e}") from e
+            retired = sorted(k for k in loaded if k in RETIRED)
+            for k in retired:
+                print(f"cấu hình: `{k}` không còn tác dụng ({RETIRED[k]}) — xoá khỏi {path}",
+                      file=sys.stderr)
+                loaded.pop(k)
             unknown = sorted(set(loaded) - set(DEFAULTS))
             if unknown:
                 raise ConfigError(f"khoá không nhận ra trong {path}: {', '.join(unknown)}")

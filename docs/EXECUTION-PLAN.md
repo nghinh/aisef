@@ -563,9 +563,9 @@ Bước tiếp: **đợt 1 — G4** truyền `--settings` tường minh + nhịp
 |---|---|---|---|---|
 | G1 G2 G3 | 21 | — (guard thuần) | `297282e` | ✅ |
 | QĐ4 pre-deploy không suy biến | 5 | — (cổng thuần) | | ✅ |
-| G4 mảnh 1 `settings_file` | 2 | `par` trước/sau — đang chạy | | 🔨 |
+| G4 mảnh 1 `settings_file` | 2 | `par` **trước** (wheel e7b618e, `.claude/` không commit): story XONG, 6 phiên, `guard_block=0, file_change=0` — zero guard, trông hoàn hảo. **Sau**: đang chạy | task b8ewhps0n | 🔨 |
 | G4 mảnh 2 cổng "guard có chạy" | 8 | cùng lượt với mảnh 1 | | 🔨 |
 | G4 mảnh 3 `doctor` hook trong worktree | 2 | — (kiểm tĩnh) | | ✅ |
 | G11 test meta | 3 | — | | ✅ |
 | G12 | | `par` di trú, 2 client | | |
-| G10a | | — | | |
+| G10a gỡ `max_context_tokens`, đo `prompt_chars` | 5 | — | | ✅ |

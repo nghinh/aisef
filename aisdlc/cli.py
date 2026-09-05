@@ -448,6 +448,27 @@ def cmd_status(args) -> int:
         for r in sorted(outliers, key=lambda r: -r.cost_usd)[:5]:
             print(f"    {r.id:16} ${r.cost_usd:.2f}")
 
+    # Ngữ cảnh nạp mỗi story — đo thật từ evidence, thay cho knob
+    # `story.max_context_tokens` chưa từng có mã đọc. Cùng ngưỡng 3× trung
+    # vị như chi phí: story nạp gấp ba story khác là dấu hiệu chẻ sai.
+    from .harness.observe import AGENT_RUN, EvidenceStore
+
+    ev_store = EvidenceStore(_artifact_root(args))
+    nap = {}
+    for sid in ev_store.stories():
+        sizes = [int(e.detail.get("prompt_chars") or 0)
+                 for e in ev_store.read(sid).of(AGENT_RUN)]
+        if any(sizes):
+            nap[sid] = max(sizes)
+    if len(nap) >= 3:
+        trung_vi = sorted(nap.values())[len(nap) // 2]
+        phinh = {k: v for k, v in nap.items() if v > cfg["cost.warn_multiple"] * trung_vi}
+        if phinh:
+            print(f"⚠️  {len(phinh)} story nạp ngữ cảnh hơn {cfg['cost.warn_multiple']}× trung vị "
+                  f"({trung_vi:,} ký tự):")
+            for k, v in sorted(phinh.items(), key=lambda kv: -kv[1])[:5]:
+                print(f"    {k:16} {v:,} ký tự")
+
     # `failed` cũng là chưa sẵn sàng, không chỉ `blocked`: một story trượt
     # cổng mà lệnh trả 0 thì CI báo xanh trên một sprint đang hỏng.
     stuck = state.by_status(StoryStatus.BLOCKED) + state.by_status(StoryStatus.FAILED)
