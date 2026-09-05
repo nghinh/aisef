@@ -31,6 +31,9 @@ DEFAULTS: dict[str, Any] = {
     # kích thước story — chống tràn ngữ cảnh trong một phiên
     "story.max_acceptance_criteria": 8,
     "story.max_write_scope_paths": 10,
+    # trạng thái màn hình một story phải dựng (P2-12): đo 2026-09-05 trên e9,
+    # story 11 và 18 trạng thái đều chạm max_turns ở lượt đầu và cần 4–8 lượt
+    "story.max_screen_states": 8,
     # điều phối
     "run.max_parallel": 3,
     "run.max_turns": 40,
@@ -89,6 +92,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "security.semantic_review": bool,
     "story.max_acceptance_criteria": int,
     "story.max_write_scope_paths": int,
+    "story.max_screen_states": int,
     "run.max_parallel": int,
     "run.max_turns": int,
     "run.timeout_seconds": int,

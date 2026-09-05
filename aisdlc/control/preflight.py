@@ -579,6 +579,10 @@ def check_story(
     got = have if have is not None else provisioned(project, cfg)
     out = Preflight(story.id)
     out.needs = required_capabilities(story, project=project)
+    qua_lon = story_size_defect(story, project=project, config=cfg)
+    if qua_lon is not None:
+        out.needs.append(qua_lon)
+        out.missing.append(qua_lon)
 
     for need in out.needs:
         cap = need.capability
@@ -594,6 +598,53 @@ def check_story(
         if cap not in got:
             out.missing.append(need)
     return out
+
+
+def story_size_defect(story: Story, *, project: Path, config: Config | None = None) -> Need | None:
+    """Story giao diện quá lớn cho **một phiên** — chẻ trước khi vào coding agent.
+
+    Đo 2026-09-05 trên e9: STORY-01-04 (1 màn, 11 trạng thái) chạm
+    `max_turns` ở lượt đầu (89 lượt) và cần 8 lượt, $79,67; STORY-01-05
+    (2 màn, 18 trạng thái) chạm `max_turns` (91) ở lượt đầu của cả hai
+    nhánh A/B. Story không màn hình cùng dự án: 57–61 lượt, 1–3 lượt.
+    Số trạng thái lấy từ EXPERIENCE.md — có ở cổng `stories`, trước cả
+    mockup — nên chặn được từ lúc lập kế hoạch (P2-12).
+    """
+    if not story.screens:
+        return None
+    cfg = config or Config(dict(DEFAULTS))
+    limit = int(cfg["story.max_screen_states"])
+    exp = _experience(project)
+    per: list[tuple[str, int]] = []
+    for sid in story.screens:
+        scr = exp.by_id(sid) if exp is not None else None
+        per.append((sid, max(1, len(scr.states)) if scr is not None else 1))
+    total = sum(n for _, n in per)
+    if total <= limit:
+        return None
+    detail = ", ".join(f"`{sid}` {n}" for sid, n in per)
+    return Need(
+        "size",
+        f"story dựng {len(per)} màn hình với {total} trạng thái ({detail}), "
+        f"vượt `story.max_screen_states` = {limit}",
+        "chẻ story: trạng thái chính của mỗi màn là một story, các trạng thái "
+        "phụ (rỗng, lỗi, offline, focus…) thành story sau; hoặc mỗi màn một story",
+        kind="story",
+    )
+
+
+def _experience(project: Path | None):
+    if project is None:
+        return None
+    from .experience import parse_experience_file
+
+    path = Path(project) / "_bmad-output" / "EXPERIENCE.md"
+    if not path.is_file():
+        return None
+    try:
+        return parse_experience_file(path)
+    except (OSError, ValueError):
+        return None
 
 
 def check_stories_executable(
@@ -617,6 +668,7 @@ __all__ = [
     "Preflight",
     "STORY_NOT_EXECUTABLE",
     "check_stories_executable",
+    "story_size_defect",
     "check_story",
     "provisioned",
     "required_capabilities",

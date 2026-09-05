@@ -36,6 +36,9 @@ from ..control.scheduler import CycleError, UnknownDependencyError
 from ..control.scheduler import Story as SchedStory
 from ..control.scheduler import plan_epics
 
+#: Kết quả cổng stories lần gần nhất — đầu vào cho prompt epics lần sau (P2-12).
+GATE_MEMO = "stories.gate.json"
+
 STORIES_DIR = "stories"
 
 
@@ -248,6 +251,14 @@ def split(
             )
 
     res.index_path = write_index(root, res, config)
+    # Ghi lại để lần `plan` sau đưa vào prompt của bước epics: story bị
+    # chặn vì quá lớn thì người chẻ phải là agent lập kế hoạch, và nó chỉ
+    # chẻ đúng khi biết cổng đã nói gì (P2-12).
+    (root / GATE_MEMO).write_text(
+        json.dumps({"errors": res.gate.errors, "warnings": res.gate.warnings},
+                   ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
     return res
 
 

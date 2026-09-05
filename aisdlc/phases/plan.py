@@ -23,6 +23,8 @@ BMAD dừng ở chỗ sinh ra epic và story; xếp lịch là việc của fram
 
 from __future__ import annotations
 
+import json
+
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -220,7 +222,7 @@ class PipelineResult:
         return "\n".join(lines)
 
 
-def build_prompt(phase: Phase) -> str:
+def build_prompt(phase: Phase, project: Path | None = None) -> str:
     """Dựng prompt headless cho một pha.
 
     ``headless: true`` là cờ BMAD tự định nghĩa để bật chế độ không hỏi và
@@ -231,6 +233,7 @@ def build_prompt(phase: Phase) -> str:
     inputs = ["docs/requirements.md (yêu cầu gốc)"]
     inputs += [f"{ARTIFACT_ROOT}/{n}" for n in phase.needs]
     outputs = ", ".join(f"{ARTIFACT_ROOT}/{n}" for n in phase.artifacts)
+    memo = _stories_gate_memo(project) if phase.gate is Gate.EPICS else ""
 
     return (
         "headless: true\n\n"
@@ -242,6 +245,29 @@ def build_prompt(phase: Phase) -> str:
         "Không hỏi lại. Giả định nào phải tự suy thì ghi vào assumptions; "
         "chỗ nào cần người quyết thì ghi vào open_questions — đừng tự chọn "
         "rồi im lặng. Kết thúc bằng JSON status theo schema headless."
+        + memo
+    )
+
+
+def _stories_gate_memo(project: Path | None) -> str:
+    """Cổng stories lần trước nói gì — để agent chẻ story cho đúng (P2-12)."""
+    if project is None:
+        return ""
+    from .story_split import GATE_MEMO
+
+    path = Path(project) / ARTIFACT_ROOT / GATE_MEMO
+    if not path.is_file():
+        return ""
+    try:
+        errors = json.loads(path.read_text(encoding="utf-8")).get("errors") or []
+    except (OSError, ValueError):
+        return ""
+    if not errors:
+        return ""
+    return (
+        "\n\nCổng máy `stories` lần trước KHÔNG ĐẠT. Sửa đúng những điểm này khi "
+        "viết lại epics/story (story quá lớn thì chẻ, không nới ngưỡng):\n"
+        + "\n".join(f"- {e}" for e in errors)
     )
 
 
@@ -270,7 +296,7 @@ def run_phase(
         return out
 
     spec = RunSpec(
-        prompt=build_prompt(phase),
+        prompt=build_prompt(phase, project=project),
         workdir=project,
         max_turns=config["run.max_turns"],
         timeout_seconds=config["run.timeout_seconds"],
