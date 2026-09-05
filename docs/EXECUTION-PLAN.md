@@ -589,7 +589,7 @@ Bước tiếp: **đợt 1 — G4** truyền `--settings` tường minh + nhịp
 
 | Hạng mục | Unit test | Kiểm thật | Bằng chứng | Trạng thái |
 |---|---|---|---|---|
-| #1 router vào prompt (`skills.offer`, mặc định tắt) + telemetry `skills.offered/abstained/used` trong `AGENT_RUN` — `used` đọc từ luồng `tool_use` `Skill` | 4 | **chờ A/B** trên `par` 4 story × {tắt, bật}: `used/offered`, $/story, lượt, cổng qua (ADR-003 §6) | | 🔨 |
+| #1 router vào prompt (`skills.offer`, mặc định tắt) + telemetry `skills.offered/abstained/used` trong `AGENT_RUN` — `used` đọc từ luồng `tool_use` `Skill` | 4 | A/B `par` EPIC-04 (2 story × {tắt, bật}) đang chạy; **trước đó đo lại router**: e9 chọn 8/18, cả 8 sai → sửa gốc (năng lực phải khai, màn hình chỉ cho miền giao diện, chữ không tự đủ) → 0/20 — abstain đúng với catalog hiện tại (ADR-002 §6.1) | | 🔨 |
 | #2 scripts của skill phải **biên dịch được** trước khi `verified` (`py_compile`-tương-đương, `sh -n`, `node --check`) | 2 | `par`: 120 skill, 83 có scripts, **1** rớt; `e9`: 156 / 119 / **1** — cùng một skill (`building-vulnerability-dashboard-with-defectdojo`, `scripts/process.py` không parse được); 1,1–1,5 s cho cả bộ | | ✅ |
 | #9 `HANDOFF` evidence: vai nào nhận slot nào từ nguồn nào; bất biến máy kiểm — gói reviewer/security không có nguồn `agent`, slot chưa khai nguồn hiện `?`; báo cáo in chuỗi bàn giao | 6 | — (bất biến, không phải số đo) | | ✅ |
 

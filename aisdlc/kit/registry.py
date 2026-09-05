@@ -179,8 +179,16 @@ def _now() -> str:
 #: "end-to-end" là nói trong ngữ cảnh an ninh, không phải khai năng lực đo
 #: hiệu năng hay chạy e2e-test. Đây là "structured metadata > prose", áp cho
 #: đúng nguồn ta có metadata (109 skill security khai `domain`).
+#: Nguồn không khai `domain` trong frontmatter nhưng miền thì rõ — không có
+#: dòng này thì tín hiệu "story có màn hình" không bao giờ tới skill giao diện.
+_SOURCE_DOMAIN = {"ui-ux": "ui-ux"}
+
 _DOMAIN_CAPS: dict[str, frozenset[str]] = {
-    "cybersecurity": frozenset({"security", "review", "ui"}),
+    # Không có "ui": 21/109 skill cybersecurity của e9 bị suy ra "ui" từ chữ
+    # "screen"/"interface" trong mô tả, và một story điều hướng bàn phím
+    # được đề nghị skill mã hoá đầu-cuối (đo 2026-09-05). Năng lực giao diện
+    # phải đến từ skill khai miền giao diện, không từ chữ.
+    "cybersecurity": frozenset({"security", "review"}),
 }
 
 
@@ -350,12 +358,20 @@ def build(project: Path | str, *, catalog: Catalog | None = None,
             e = SkillEntry(
                 id=d.name, source=source, path=str(d.relative_to(project)),
                 description=desc, use_when=_use_when(fm, desc),
-                domain=str(fm.get("domain", "")), subdomain=str(fm.get("subdomain", "")),
+                domain=str(fm.get("domain", "")) or _SOURCE_DOMAIN.get(source, ""),
+                subdomain=str(fm.get("subdomain", "")),
                 tags=_listish(fm.get("tags")),
                 commit=src.commit if src else "",
                 license=str(fm.get("license") or (src.license if src and src.license else "NO_LICENSE")),
             )
-            e.capabilities = sorted(set(_capabilities_of(e.text(), domain=e.domain)))
+            # Năng lực phải **khai** — frontmatter `capabilities:` hoặc miền có
+            # bảng cho phép (cybersecurity). Suy từ chữ cho skill không khai miền
+            # là keyword-matching đội lốt hợp đồng: đo trên e9 (2026-09-05),
+            # `receiving-code-review` (superpowers) bị suy ra `perf` + `ui` và
+            # được chọn cho 5/18 story vì "phải qua kiểm định perf".
+            khai = _listish(fm.get("capabilities"))
+            theo_mien = _capabilities_of(e.text(), domain=e.domain) if e.domain.strip().lower() in _DOMAIN_CAPS else []
+            e.capabilities = sorted(set(khai) | set(theo_mien))
             ver = verify_structure(d)
             old = prev.get(e.id)
             if old is not None:

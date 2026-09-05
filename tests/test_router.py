@@ -125,3 +125,32 @@ class TestRaChoAgent(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestManHinhKhongPhaiTuKhoa(unittest.TestCase):
+    """Đo 2026-09-05 trên e9: story điều hướng bàn phím (có màn hình) được đề
+    nghị skill mã hoá đầu-cuối — vì skill ấy bị suy ra năng lực "ui" từ chữ,
+    và "màn hình + một chữ" được đếm là hai tín hiệu. Cả hai đường đều đóng."""
+
+    def story(self):
+        return Story(id="S-9", epic_id="E", title="Keyboard navigation of the notes list with messaging",
+                     acceptance_criteria=["Given the list, When arrow keys, Then focus moves"],
+                     screens=["danh-sach"], verification_contract=["unit"])
+
+    def test_cyber_skill_with_inferred_ui_is_not_offered_for_a_screen(self):
+        e = entry("implementing-end-to-end-encryption-for-messaging", ["security", "ui"],
+                  tags=["cryptography", "encryption", "messaging"])
+        e.domain = "cybersecurity"
+        r = router.route(self.story(), reg(e))
+        self.assertTrue(r.abstained, [p.line() for p in r.picked])
+
+    def test_ui_domain_skill_needs_two_words_besides_the_screen(self):
+        it = entry("ui-mot-chu", ["ui"], tags=["messaging"]); it.domain = "ui-ux"
+        nhieu = entry("ui-hai-chu", ["ui"], tags=["keyboard", "navigation", "messaging"]); nhieu.domain = "ui-ux"
+        r = router.route(self.story(), reg(it, nhieu))
+        self.assertEqual([p.entry.id for p in r.picked], ["ui-hai-chu"])
+
+    def test_contract_alone_is_still_one_signal(self):
+        e = entry("security-review", ["security"], tags=[]); e.domain = "cybersecurity"
+        s = self.story(); s.verification_contract = ["unit", "security"]
+        self.assertTrue(router.route(s, reg(e)).abstained)

@@ -51,21 +51,32 @@ _STOP = frozenset({
 _TOKEN = re.compile(r"[a-zA-ZÀ-ỹ][a-zA-ZÀ-ỹ0-9_-]{2,}")
 
 
+#: Miền giao diện — chỉ skill khai một trong các miền này mới ăn tín hiệu
+#: "story có màn hình". Suy từ chữ thì skill mã hoá cũng thành skill giao diện.
+UI_DOMAINS = frozenset({"ui", "ux", "ui-ux", "ui/ux", "design", "frontend", "accessibility"})
+
+
 @dataclass
 class Pick:
     entry: SkillEntry
     score: int
     rationale: list[str] = field(default_factory=list)
     framework: bool = False
+    strong: int = 0        # contract / need — tín hiệu từ hợp đồng story, không từ chữ
+    screen: bool = False
+    token_hits: int = 0
 
     @property
     def eligible(self) -> bool:
-        """Paper §4.2 loại thẳng khớp **một** tín hiệu (keyword-only,
-        dependency-only). Đo trên e9: một chữ "migration" chung làm story
-        schema-IndexedDB khớp skill mật-mã-hậu-lượng-tử. Nên một skill chỉ
-        được chọn khi có **hai** tín hiệu độc lập — hoặc là skill framework
-        gọi đích danh theo pha."""
-        return self.framework or len(self.rationale) >= 2
+        """Paper §4.2 loại thẳng khớp keyword-only. Đo trên e9: một chữ
+        "migration" làm story schema-IndexedDB khớp skill mật-mã-hậu-lượng-tử;
+        "màn hình + một chữ" làm story điều hướng bàn phím khớp skill mã hoá
+        đầu-cuối. Nên vẫn là **hai** tín hiệu độc lập — nhưng màn hình chỉ
+        tính cho skill miền giao diện, và "màn hình + một chữ" không phải hai."""
+        # Chữ chỉ là một tín hiệu khi đi cùng hợp đồng story; đi cùng màn hình
+        # (mọi story giao diện đều có) thì phải ≥ 2 chữ.
+        tok = 1 if (self.token_hits >= 2 or (self.token_hits >= 1 and self.strong >= 1)) else 0
+        return self.framework or (self.strong + int(self.screen) + tok) >= 2
 
     def line(self) -> str:
         return f"{self.entry.id} ({self.score}): {'; '.join(self.rationale)}"
@@ -132,15 +143,18 @@ def score(entry: SkillEntry, story: Story, *, phase: str = "implement",
     for kind in (contract or []):
         if kind in caps:
             pick.score += W_CONTRACT
+            pick.strong += 1
             pick.rationale.append(f"story phải qua kiểm định `{kind}`")
 
     for need in (needs or []):
         if need in caps:
             pick.score += W_NEED
+            pick.strong += 1
             pick.rationale.append(f"story cần năng lực `{need}`")
 
-    if story.screens and "ui" in caps:
+    if story.screens and "ui" in caps and entry.domain.strip().lower() in UI_DOMAINS:
         pick.score += W_SCREEN
+        pick.screen = True
         pick.rationale.append(f"story có màn hình ({', '.join(story.screens[:2])})")
 
     weak = _tokens(" ".join(story.acceptance_criteria) + " " + story.title)
@@ -148,6 +162,7 @@ def score(entry: SkillEntry, story: Story, *, phase: str = "implement",
     if hits:
         add = min(W_TOKEN * len(hits), W_TOKEN_CAP)
         pick.score += add
+        pick.token_hits = len(hits)
         pick.rationale.append(f"tiêu chí nhắc tới: {', '.join(hits[:4])}")
     return pick
 

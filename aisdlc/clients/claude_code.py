@@ -49,6 +49,11 @@ from .stream import RunResult, parse_stream
 BINARY = "claude"
 
 
+def clean_env() -> dict[str, str]:
+    """Môi trường cho tiến trình `claude` con: bỏ mọi `CLAUDE*` của phiên cha."""
+    return {k: v for k, v in os.environ.items() if not k.startswith("CLAUDE")}
+
+
 class ClaudeCodeAdapter(ClientAdapter):
     id = "claude"
 
@@ -98,6 +103,10 @@ class ClaudeCodeAdapter(ClientAdapter):
         return cmd
 
     def run(self, spec: RunSpec) -> RunResult:
+        """Chạy một lượt. Môi trường con **không** thừa hưởng `CLAUDE*` của
+        tiến trình gọi: harness chạy từ bên trong một phiên Claude là chuyện
+        có thật, và phiên con thừa hưởng cờ của phiên cha thì tự chuyển sang
+        Bash thay vì Read/Write (hợp quy C3, 2026-09-05)."""
         if not self.available():
             return RunResult(ok=False, error=f"không tìm thấy lệnh {self.binary}")
         if not Path(spec.workdir).is_dir():
@@ -110,7 +119,7 @@ class ClaudeCodeAdapter(ClientAdapter):
                 capture_output=True,
                 text=True,
                 timeout=spec.timeout_seconds,
-                env={**os.environ, **spec.env} if spec.env else None,
+                env={**clean_env(), **spec.env},
                 stdin=subprocess.DEVNULL,  # không có: CLI chờ stdin 3s mỗi lần
             )
         except subprocess.TimeoutExpired:

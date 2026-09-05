@@ -169,6 +169,40 @@ danh sách story + finding; vào `candidate`. Đây là chỗ paper không có.
   precision đo được (skill được đề xuất mà không dùng = nhiễu; skill dùng
   mà không được đề xuất = thiếu).
 
+### 6.1 Đo lại 2026-09-05 — router đợt 1 chọn **sai** toàn bộ
+
+Chạy router HEAD trên registry cũ của `e9` (18 story): **chọn 8/18**, và cả
+8 đều là dương tính giả:
+
+- `receiving-code-review` (superpowers) được chọn cho 5 story vì "story phải
+  qua kiểm định `perf`" — skill ấy bị **suy** năng lực `perf` và `ui` từ chữ
+  "performance"/"screen" trong mô tả; nó nói về việc *nhận* nhận xét rà soát.
+- `detecting-typosquatting-packages` cho 4 story vì "màn hình + chữ `npm`";
+  `performing-web-application-vulnerability-triage` vì "màn hình + chữ `web`".
+- Thêm một ca đo tay: story điều hướng bàn phím được đề nghị
+  `implementing-end-to-end-encryption-for-messaging` (màn hình + chữ
+  `messaging`).
+
+Ba lỗi gốc, ba sửa (`kit/registry.py`, `kit/router.py`):
+
+1. Năng lực chỉ được **khai** (frontmatter `capabilities:`) hoặc suy trong
+   bảng cho phép của miền đã khai (`cybersecurity` → `security`, `review`;
+   **bỏ** `ui`). Skill không khai miền thì không suy gì từ chữ.
+2. Tín hiệu "story có màn hình" chỉ tính cho skill khai miền giao diện
+   (`UI_DOMAINS`); nguồn `ui-ux` không khai miền thì nhận miền mặc định.
+3. "Màn hình + một chữ" không phải hai tín hiệu: chữ chỉ tính khi đi cùng
+   hợp đồng story, hoặc ≥ 2 chữ khi đi cùng màn hình.
+
+Sau sửa: `e9` **0/20** story được chọn (kể cả hai story thử thêm: điều hướng
+bàn phím, rate-limiting đăng nhập với hợp đồng `security`). Đó là kết quả
+đúng với catalog hiện tại — không có skill nào về ghi chú offline, điều hướng
+bàn phím hay rate-limiting; 87 skill `security` khớp hợp đồng nhưng không
+khớp nội dung. Hệ quả cho A/B ADR-003 #1: trên `par`/`e9` hai nhánh chỉ khác
+nhau ở câu "không có skill đủ khớp" — đo được "mục kỹ năng không gây hại",
+chưa đo được "skill được dùng". Muốn đo vế sau cần một dự án có skill khớp
+thật (ví dụ cài `ui-ux` rồi chạy story giao diện), và đó là việc có chi phí,
+để sau khi xong đợt 4.
+
 ## 7. Không làm
 
 Taxonomy 20×178 · agent runtime mới · MCP để phục vụ skill · nạp toàn bộ

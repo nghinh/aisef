@@ -218,3 +218,42 @@ class TestScriptsPhaiBienDichDuoc(unittest.TestCase):
             v = verify_structure(self._skill(tmp, "print('ok')\n"))
         self.assertTrue(v.ok, v.gaps)
         self.assertIn("scripts: 1 tệp biên dịch được", v.checks)
+
+
+class TestMienTheoNguon(unittest.TestCase):
+    def test_ui_ux_source_gets_a_ui_domain_when_frontmatter_has_none(self):
+        from aisdlc.kit.registry import _SOURCE_DOMAIN
+        self.assertEqual(_SOURCE_DOMAIN["ui-ux"], "ui-ux")
+
+
+class TestNangLucPhaiKhai(unittest.TestCase):
+    """Skill không khai miền thì không được suy năng lực từ chữ."""
+
+    def _build(self, tmp, name, frontmatter_extra="", body=""):
+        import json
+        from pathlib import Path
+        from aisdlc.kit.catalog import Catalog
+        from aisdlc.kit.registry import build
+        d = Path(tmp) / ".claude" / "skills" / name
+        d.mkdir(parents=True)
+        (d / "SKILL.md").write_text(f"---\nname: {name}\ndescription: Improve performance of the screen and review flow\n{frontmatter_extra}---\n# {name}\n{body}", encoding="utf-8")
+        return build(Path(tmp), catalog=Catalog.load()).entries[name]
+
+    def test_no_domain_means_no_inferred_capabilities(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            e = self._build(tmp, "receiving-code-review")
+        self.assertEqual(e.capabilities, [])
+
+    def test_declared_capabilities_are_kept(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            e = self._build(tmp, "toi-uu", "capabilities: [perf]\n")
+        self.assertEqual(e.capabilities, ["perf"])
+
+    def test_cyber_domain_keeps_its_allowed_inferred_set(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            e = self._build(tmp, "kiem-bao-mat", "domain: cybersecurity\ntags: [security, authentication]\n")
+        self.assertIn("security", e.capabilities)
+        self.assertNotIn("ui", e.capabilities)

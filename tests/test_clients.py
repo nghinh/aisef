@@ -172,3 +172,35 @@ class TestTimeoutIsInfrastructureError(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestKhongThuaHuongPhienCha(unittest.TestCase):
+    """Hợp quy C3: phiên con thừa hưởng `CLAUDE*` của phiên cha thì tự chuyển
+    sang Bash. Harness phải bỏ các biến ấy khi gọi client."""
+
+    def test_claude_vars_are_dropped_but_anthropic_kept(self):
+        import os
+        from unittest import mock
+        from aisdlc.clients.claude_code import clean_env
+        with mock.patch.dict(os.environ, {"CLAUDECODE": "1", "CLAUDE_CODE_ENTRYPOINT": "x", "ANTHROPIC_API_KEY": "k"}):
+            env = clean_env()
+        self.assertNotIn("CLAUDECODE", env)
+        self.assertNotIn("CLAUDE_CODE_ENTRYPOINT", env)
+        self.assertEqual(env["ANTHROPIC_API_KEY"], "k")
+
+    def test_child_process_really_gets_the_clean_env(self):
+        import os, stat, tempfile
+        from pathlib import Path
+        from unittest import mock
+        from aisdlc.clients.base import RunSpec
+        from aisdlc.clients.claude_code import ClaudeCodeAdapter
+        with tempfile.TemporaryDirectory() as tmp:
+            fake = Path(tmp) / "claude-gia"
+            fake.write_text("#!/bin/sh\nenv > \"$PWD/env.txt\"\n", encoding="utf-8")
+            fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
+            a = ClaudeCodeAdapter(binary=str(fake))
+            with mock.patch.dict(os.environ, {"CLAUDECODE": "1"}):
+                a.run(RunSpec(prompt="x", workdir=Path(tmp), env={"AISDLC_STORY_ID": "S"}))
+            got = (Path(tmp) / "env.txt").read_text(encoding="utf-8")
+        self.assertNotIn("CLAUDECODE=", got)
+        self.assertIn("AISDLC_STORY_ID=S", got)
