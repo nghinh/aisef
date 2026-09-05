@@ -190,10 +190,8 @@ def verify_screens(
             out.unavailable = why
             return out
 
-        jobs = [
-            {"id": s.id, "url": server.url_for(concrete_route(s.route or "/"))}
-            for s in screens
-        ]
+        urls = {s.id: server.url_for(concrete_route(s.route or "/")) for s in screens}
+        jobs = [{"id": s.id, "url": urls[s.id]} for s in screens]
         rendered = browser.render(jobs, project=project)
 
     if rendered.unavailable:
@@ -218,10 +216,15 @@ def verify_screens(
             )
         out.results.append(result)
         if store:
-            store.record(
-                story_id,
-                _event(result, got.error if got else "không mở được route"),
-            )
+            error = got.error if got else "không mở được route"
+            if (got is not None and not got.error and screen.components
+                    and not result.matched and not getattr(result, "extra", None)):
+                # Không khớp gì và cũng không thừa gì = trang trống. Với route
+                # có tham số, gần như chắc là thiếu bản ghi hạt giống `1`.
+                error = f"trang không dựng component nào tại {urls[screen.id]}"
+                if concrete_route(screen.route or "/") != (screen.route or "/"):
+                    error += " — route có tham số: môi trường dev cần bản ghi mã `1` (hạt giống)"
+            store.record(story_id, _event(result, error))
     return out
 
 
