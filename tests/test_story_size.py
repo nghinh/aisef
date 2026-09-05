@@ -89,6 +89,18 @@ class TestComponents(unittest.TestCase):
         scopes = {"STORY-01-04": ["src/a.ts"], "STORY-01-05": ["src/b.ts"]}
         s = story([], scope=("src/a.ts",), sid="STORY-01-06")
         self.assertEqual(complexity.verified_touched(s, ledger, scopes), ["AC-STORY-01-04-1"])
+        # Điểm đếm theo story láng giềng, không theo hành vi: 31 hành vi của 3
+        # story không đắt gấp 31 lần một hành vi (đo e9 STORY-01-07, 2026-09-06).
+        nhieu = {"behaviors": {f"AC-STORY-01-0{k}-{i}": {"status": "VERIFIED", "story": f"STORY-01-0{k}"}
+                               for k in (4, 5, 6) for i in range(1, 8)}}
+        nhieu["behaviors"].update({f"FR-{i}": {"status": "VERIFIED", "story": "STORY-01-04"} for i in range(10)})
+        scopes3 = {f"STORY-01-0{k}": ["src/a.ts"] for k in (4, 5, 6)}
+        with mock.patch.object(complexity, "read_scopes", return_value=scopes3):
+            # 31 hành vi, trừ 7 của chính STORY-01-06 (story đang chấm) = 24, thuộc 2 láng giềng.
+            self.assertEqual(len(complexity.verified_touched(s, nhieu, scopes3)), 24)
+            comp = complexity.score_story(s, ledger=nhieu).get("verified_touched")
+            self.assertEqual(comp.count, 2)
+            self.assertEqual(comp.points, 2 * complexity.VERIFIED_TOUCHED_WEIGHT)
         # Chạy lại chính story sở hữu: hành vi của nó là mục tiêu, không phải thứ phải giữ.
         s5 = story([], scope=("src/b.ts",), sid="STORY-01-05")
         self.assertEqual(complexity.verified_touched(s5, ledger, scopes), [])
@@ -104,8 +116,8 @@ class TestComponents(unittest.TestCase):
                 "AC-STORY-01-04-1": {"status": "VERIFIED", "story": "STORY-01-04"}}}), encoding="utf-8")
             s = story([], scope=("src/a.ts",), sid="STORY-01-06")
             self.assertEqual(complexity.read_scopes(d), {"STORY-01-04": ["src/a.ts"]})
-            self.assertEqual(
-                complexity.score_story(s, project=Path(d)).get("verified_touched").points, 0.5)
+            comp = complexity.score_story(s, project=Path(d)).get("verified_touched")
+            self.assertEqual((comp.count, comp.points), (1, complexity.VERIFIED_TOUCHED_WEIGHT))
 
     def test_missing_ledger_scores_zero_not_a_guess(self):
         """Sổ hành vi là việc của R2 — thiếu thì chiều này = 0, không bịa."""

@@ -59,9 +59,19 @@ WRITE_SCOPE_WEIGHT = 0.5
 #: Một story phụ thuộc vào story này. Fan-in cao nghĩa là sai ở đây lan ra
 #: nhiều chỗ, nên phiên phải cẩn thận hơn.
 FAN_IN_WEIGHT = 1.0
-#: Một hành vi đã VERIFIED mà phạm vi ghi của story chạm vào (ledger, R2).
-#: Nửa trọng số: đây là chi phí *giữ cho khỏi hỏng*, rẻ hơn dựng mới.
-VERIFIED_TOUCHED_WEIGHT = 0.5
+#: Một **story láng giềng** có hành vi đã VERIFIED mà phạm vi ghi của story
+#: này chạm vào (ledger, R2). Đếm theo story sở hữu, không theo hành vi: đo
+#: 2026-09-06 trên e9, STORY-01-07 chạm 31 hành vi của 3 story (01-04/05/06)
+#: — đếm hành vi thì +15,5 điểm, một story 12,5 bị chặn oan ở 28,0.
+#:
+#: Trọng số **0 cho tới khi hiệu chuẩn được**: bảng B4 (Spearman 0,88) dựng
+#: trên các story chạy khi sổ còn rỗng, nên chiều này chưa góp một điểm nào
+#: vào tương quan ấy. Bật 0,5 thử trên sổ thật e9 (2026-09-06) thì ba story
+#: sát ngưỡng (02-03 15,0 → 17,0; 03-03 15,5 → 17,0; 05-01 16,0 → 17,5) bị
+#: chặn bằng một trọng số chưa có số lượt nào chứng minh. Thành phần vẫn
+#: được đếm và ghi vào `complexity.json` để hiệu chuẩn khi đủ story vừa có
+#: sổ vừa có số lượt (xem `divergence`); lúc ấy đặt trọng số bằng số đo.
+VERIFIED_TOUCHED_WEIGHT = 0.0
 
 #: Tên tệp hiệu chuẩn tự ghi, trong `_bmad-output/`.
 CALIBRATION_FILE = "complexity.json"
@@ -281,6 +291,9 @@ def score_story(
     if ledger is None:
         ledger = read_ledger(project)
     touched = verified_touched(story, ledger, read_scopes(project))
+    behaviors = (ledger or {}).get("behaviors") or {}
+    # Hành vi không ghi story sở hữu (bản ghi cũ, tự tay) đếm riêng từng cái.
+    owners = {str(behaviors.get(b, {}).get("story") or b) for b in touched}
 
     return Score(story.id, (
         Component("screen_states", states, SCREEN_STATE_WEIGHT,
@@ -289,8 +302,9 @@ def score_story(
         Component("write_scope", len(scope), WRITE_SCOPE_WEIGHT,
                   ", ".join(f"`{p}`" for p in scope[:4]) + ("…" if len(scope) > 4 else "")),
         Component("fan_in", int(fan_in), FAN_IN_WEIGHT),
-        Component("verified_touched", len(touched), VERIFIED_TOUCHED_WEIGHT,
-                  ", ".join(touched[:4]) + ("…" if len(touched) > 4 else "")),
+        Component("verified_touched", len(owners), VERIFIED_TOUCHED_WEIGHT,
+                  f"{len(touched)} hành vi: " + ", ".join(touched[:4])
+                  + ("…" if len(touched) > 4 else "") if touched else ""),
     ))
 
 

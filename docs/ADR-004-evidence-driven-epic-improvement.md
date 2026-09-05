@@ -180,7 +180,7 @@ vẫn chặn riêng), `phases/run.py` ghi `_bmad-output/complexity.json` sau
 
 **Điểm** = trạng thái màn hình ×1 + tiêu chí chấp nhận ×1 + đường dẫn
 `write_scope` ×0,5 (không tính manifest/lockfile) + fan-in phụ thuộc ×1 +
-hành vi VERIFIED bị chạm ×0,5 (đọc `ledger.json` nếu có, thiếu thì 0).
+story láng giềng có hành vi VERIFIED bị chạm ×**0** (đọc `ledger.json` nếu có; đếm theo story sở hữu và chỉ **ghi** vào bảng hiệu chuẩn, chưa tính điểm — đo 2026-09-06 trên sổ thật e9: 01-07 chạm 31 hành vi của 3 story, đếm hành vi ×0,5 thì bị chặn oan ở 28,0; đếm láng giềng ×0,5 thì ba story sát ngưỡng 02-03/03-03/05-01 lên 17,0–17,5 và bị chặn bằng trọng số chưa có số lượt nào chứng minh, vì bảng B4 dựng khi sổ còn rỗng. Bật trọng số khi đủ story vừa có sổ vừa có lượt, thiếu thì 0).
 Trạng thái màn hình giữ đúng luật `screen_owners`: màn story khác đã dựng
 tính 1.
 
