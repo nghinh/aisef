@@ -60,6 +60,10 @@ REOPENED = "reopened"
 
 #: Bằng chứng không thuộc story nào — pha lập kế hoạch, dựng mockup, quét skill.
 PHASE_PREFIXES = ("plan-", "mockup-", "skill-")
+#: Bằng chứng cấp dự án của vòng cải tiến (ADR-004 R3): `evidence/loop-<n>.jsonl`.
+#: Là **mốc**, không phải story: sổ đọc nó (hành vi có `since = loop-n`)
+#: nhưng không dựng dòng chỉ mục cho nó.
+LOOP_PREFIX = "loop-"
 
 _ATTEMPT = re.compile(r"#(\d+)$")
 _EPIC_FROM_ID = re.compile(r"^STORY-(\d+)-")
@@ -195,6 +199,10 @@ class Ledger:
             "cross_reopens": len(self.cross_reopens),
         }
 
+    def epic_of(self, story_id: str) -> str:
+        line = self.stories.get(story_id)
+        return (line.epic if line else "") or _epic_of(story_id)
+
     def for_story(self, story_id: str) -> list[Behavior]:
         """Hành vi *của* story: tiêu chí và yêu cầu nó phủ, cộng hành vi mà
         chính bằng chứng của nó đặt trạng thái lần đầu."""
@@ -291,7 +299,7 @@ class Ledger:
         """
         by_epic: dict[str, list[StoryLine]] = {}
         for line in self.stories.values():
-            by_epic.setdefault(line.epic or _epic_of(line.id), []).append(line)
+            by_epic.setdefault(self.epic_of(line.id), []).append(line)
         out: list[str] = []
         for epic in sorted(by_epic):
             stories = sorted(by_epic[epic], key=lambda s: s.id)
@@ -375,7 +383,8 @@ def build(artifact_root: Path | str) -> Ledger:
     for sid in store.stories():
         if sid.startswith(PHASE_PREFIXES):
             continue
-        led.stories.setdefault(sid, StoryLine(id=sid))
+        if not sid.startswith(LOOP_PREFIX):
+            led.stories.setdefault(sid, StoryLine(id=sid))
         for e in store.read(sid).events:
             events.append((e.at, sid, e.seq, e))
     # Thứ tự thời gian **giữa** các story: `seq` chỉ có nghĩa trong một tệp.
@@ -387,7 +396,7 @@ def build(artifact_root: Path | str) -> Ledger:
         n = attempts[sid]
         # R1 do luồng khác làm; evidence cũ không có candidate và đó là hợp lệ.
         cand = str(e.detail.get("candidate") or "")
-        if cand:
+        if cand and sid in led.stories:
             led.stories[sid].candidate = cand
 
         if e.kind == BEHAVIOR:

@@ -47,6 +47,12 @@ class Gate(str, Enum):
     MOCKUPS = "mockups"
     READINESS = "readiness"        # chốt trước khi bắt đầu viết code
     PRE_DEPLOY = "pre-deploy"      # chốt trước khi triển khai
+    #: Cổng của vòng cải tiến epic (ADR-004 R3): duyệt **tiếp tục** vòng ≥ 2
+    #: sau khi đọc báo cáo vòng vừa xong. Cố ý **không** nằm trong
+    #: `GATE_ORDER`: nó không phải một tầng của vòng đời — dự án chưa từng
+    #: chạy `improve` không được vì nó mà kẹt ở `pre-deploy`, và nó lặp lại
+    #: mỗi vòng chứ không duyệt một lần.
+    IMPROVE = "improve"
 
 
 #: Thứ tự vòng đời. Duyệt lại một cổng làm mọi cổng phía sau thành stale.
@@ -82,6 +88,10 @@ GATE_ARTIFACTS: dict[Gate, tuple[str, ...]] = {
     # thứ báo động liên tục rồi bị bỏ qua.
     Gate.READINESS: (STORIES_INDEX, "design-contract.json"),
     Gate.PRE_DEPLOY: (PRE_DEPLOY_REPORT,),
+    # Mẫu glob: mỗi vòng một báo cáo, số vòng không biết trước. Băm gộp
+    # **mọi** báo cáo, nên vòng mới làm phê duyệt cũ thành `stale` — người
+    # phải đọc báo cáo mới rồi mới duyệt vòng kế.
+    Gate.IMPROVE: ("LOOP-REPORT-*.md",),
 }
 
 
@@ -149,7 +159,13 @@ class ApprovalStore:
         return self.dir / f"{gate.value}.json"
 
     def artifact_paths(self, gate: Gate) -> list[Path]:
-        return [self.root / name for name in GATE_ARTIFACTS[gate]]
+        out: list[Path] = []
+        for name in GATE_ARTIFACTS[gate]:
+            # Mẫu glob không khớp gì thì vẫn trả chính mẫu, để "thiếu" gọi
+            # được tên tệp thay vì im lặng.
+            matched = sorted(self.root.glob(name)) if any(c in name for c in "*?[") else []
+            out += matched or [self.root / name]
+        return out
 
     def artifact_path(self, gate: Gate) -> Path:
         """File chính của cổng — dùng để hiển thị."""
@@ -161,7 +177,7 @@ class ApprovalStore:
 
     def content_hash(self, gate: Gate) -> str:
         """Băm gộp toàn bộ file của cổng, theo thứ tự khai báo."""
-        parts = [f"{name}:{sha256_of(self.root / name)}" for name in GATE_ARTIFACTS[gate]]
+        parts = [f"{p.relative_to(self.root)}:{sha256_of(p)}" for p in self.artifact_paths(gate)]
         return hashlib.sha256("\n".join(parts).encode()).hexdigest()
 
     def load(self, gate: Gate) -> Approval | None:
@@ -205,6 +221,8 @@ class ApprovalStore:
 
     def _upstream_decided_after(self, gate: Gate, seq: int) -> bool:
         """True nếu có cổng phía trước được quyết định sau cổng này."""
+        if gate not in GATE_ORDER:
+            return False  # cổng ngoài vòng đời (`improve`) không có tầng trên
         idx = GATE_ORDER.index(gate)
         return any(
             (rec := self.load(up)) is not None and rec.seq > seq
@@ -214,7 +232,7 @@ class ApprovalStore:
     def _next_seq(self) -> int:
         """Số thứ tự kế tiếp trong phạm vi store."""
         highest = 0
-        for g in GATE_ORDER:
+        for g in Gate:
             rec = self.load(g)
             if rec:
                 highest = max(highest, rec.seq)
@@ -222,6 +240,8 @@ class ApprovalStore:
 
     def blocking(self, gate: Gate) -> list[Gate]:
         """Các cổng phải xử lý xong trước khi `gate` được phép chạy."""
+        if gate not in GATE_ORDER:
+            return []
         idx = GATE_ORDER.index(gate)
         return [g for g in GATE_ORDER[:idx] if self.status(g) is not Status.APPROVED]
 

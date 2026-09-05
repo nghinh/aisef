@@ -87,15 +87,13 @@ def cmd_status(args) -> int:
     return EXIT_OK
 
 
-def cmd_run(args) -> int:
-    """Chạy đợt: epic tuần tự, trong epic chạy song song theo đợt."""
+def _readiness_blocked(args) -> bool:
+    """Cổng `readiness` chứ không phải `stories`: nó gắn vào **cả** chỉ mục
+    story lẫn hợp đồng thị giác. Chỉ đòi `stories` thì một story khai
+    `screens` vẫn chạy được khi chưa có mockup nào — rồi trượt ở cổng vì
+    "chưa đối chiếu", sau khi đã tiêu tiền viết xong code."""
     from ..control.approvals import Gate
-    from ..phases.run import run_sprint
 
-    # Cổng `readiness` chứ không phải `stories`: nó gắn vào **cả** chỉ mục
-    # story lẫn hợp đồng thị giác. Chỉ đòi `stories` thì một story khai
-    # `screens` vẫn chạy được khi chưa có mockup nào — rồi trượt ở cổng vì
-    # "chưa đối chiếu", sau khi đã tiêu tiền viết xong code.
     store = _approvals(args)
     blocking = [g.value for g in store.blocking(Gate.READINESS)]
     if store.status(Gate.READINESS) is not Status.APPROVED:
@@ -103,6 +101,15 @@ def cmd_run(args) -> int:
     if blocking and not args.force:
         print(f"✗ cổng chưa duyệt: {', '.join(blocking)}", file=sys.stderr)
         print(f"  aisdlc review {blocking[0]}", file=sys.stderr)
+        return True
+    return False
+
+
+def cmd_run(args) -> int:
+    """Chạy đợt: epic tuần tự, trong epic chạy song song theo đợt."""
+    from ..phases.run import run_sprint
+
+    if _readiness_blocked(args):
         return EXIT_NOT_READY
 
     adapter, code = _client(args)
@@ -116,6 +123,34 @@ def cmd_run(args) -> int:
         only_epic=args.epic,
         sequential=args.sequential,
         isolate=not args.no_isolate,
+    )
+    print(report.summary())
+    if report.error:
+        return EXIT_USAGE
+    return EXIT_OK if report.ok else EXIT_NOT_READY
+
+
+def cmd_improve(args) -> int:
+    """Vòng cải tiến epic theo bằng chứng (ADR-004 R3).
+
+    Một lần gọi chạy tối đa `--max-loops` vòng rồi thoát; chạy lại tiếp
+    từ mốc `loops[]` cuối trong sổ hành vi — không daemon.
+    """
+    from ..phases.improve import improve
+
+    if _readiness_blocked(args):
+        return EXIT_NOT_READY
+    adapter, code = _client(args)
+    if adapter is None:
+        return code
+
+    project = Path(args.project)
+    report = improve(
+        project, adapter, args.epic,
+        config=Config.load(project),
+        max_loops=args.max_loops,
+        auto=args.auto,
+        has_ui=_project_has_ui(project),
     )
     print(report.summary())
     if report.error:

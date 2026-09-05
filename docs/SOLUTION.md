@@ -164,6 +164,8 @@ Chạy nối tiếp — **máy kiểm trước** để khỏi phí thời gian n
 Điều kiện để chạy được ở mọi nơi: CI không có người trả lời; agent trong phiên chat không thể "đợi"; người duyệt có thể ở **máy khác, lúc khác**.
 
 **Tám cổng:** `prd` → `architecture` → `ux-spec` → `epics` → `stories` → `mockups` → `readiness` → `pre-deploy`
+(cộng cổng `improve` của vòng cải tiến — ADR-004 R3 — đứng **ngoài** thứ tự này: nó lặp mỗi vòng,
+gắn băm mọi `LOOP-REPORT-*.md`, và dự án chưa chạy `improve` không bị nó chặn)
 
 **Hai bảo đảm:**
 1. Phê duyệt gắn với **SHA-256 nội dung**. Sửa artifact → tự thành `stale`.
@@ -338,6 +340,16 @@ aisdlc verify  [--write-scope ...] [--story S] hậu kiểm guard trên cây là
 
 # Bước 5 — kiểm định
 aisdlc qa      [--only <loại>] [--story S] [--story-level]
+
+# Vòng cải tiến epic theo bằng chứng (ADR-004 R3) — sau khi epic đã chạy
+aisdlc improve --epic E [--max-loops N] [--auto] [--client c] [--force]
+        QA cấp dự án → sổ hành vi → **một** story sửa cho một GAP/REOPENED
+        (STORY-RP-nn trong EPIC-RP-<E>, sinh bằng code) → `run` (worktree, cổng,
+        reviewer ≠ developer) → QA → mốc `loops[]` + LOOP-REPORT-<n>.md → vòng sau.
+        Dừng bằng code: hết gap · đủ improve.max_loops · biên ≤ 0 improve.flat_loops
+        vòng liền · vượt improve.cost_cap_usd · bế tắc kế hoạch (trả người).
+        Cổng người `improve` trước mỗi vòng ≥ 2 (aisdlc review/approve improve) trừ --auto.
+        Không daemon: chạy lại tiếp từ mốc cuối trong sổ.
 
 # Bước 6 — giao hàng
 aisdlc devsecops [--bin PATH] [--force]        CI (code) + Dockerfile/IaC/runbook (model)
@@ -526,6 +538,9 @@ Không để chữ "ngưỡng" chung chung. Mặc định trong `.ai/config.json
 | `story.max_screen_states` | 8 | Tổng trạng thái màn hình (EXPERIENCE.md) một story phải dựng. Vượt → cổng `stories` chặn với chỉ dẫn chẻ; `run` từ chối. Đo 2026-09-05 e9: 11 và 18 trạng thái đều chạm `max_turns` lượt đầu, 4–8 lượt |
 | `story.max_complexity` | `16.0` | **Điểm cỡ story** tổng hợp (ADR-004 R5, `control/complexity.py`): trạng thái màn hình ×1 + tiêu chí ×1 + đường dẫn write_scope ×0,5 (không tính manifest/lockfile) + fan-in phụ thuộc ×1 + story láng giềng có hành vi VERIFIED bị chạm ×0 (ledger; chỉ ghi để hiệu chuẩn, chưa tính điểm — ADR-004 §6 R5). Vượt **hoặc** vượt `max_screen_states` → cổng `stories` chặn kèm gợi ý chẻ tất định, `run` từ chối trước khi gọi model; story đã xong bỏ qua. Hiệu chuẩn B4 hồi cứu 23 story thật: Spearman(điểm, lượt developer lượt đầu) = 0,88; 16 tách e9 01-04 (23,5) và 01-05 (18,0) khỏi 01-03 (6,5) và `par` (3,0). `run` tự ghi `_bmad-output/complexity.json` sau mỗi story và `aisdlc doctor` cảnh báo khi ngưỡng lệch dữ liệu |
 | ~~`story.max_context_tokens`~~ | — | **gỡ 2026-09-05**: chưa từng có mã đọc. Thay bằng `prompt_chars` ghi vào evidence mỗi lượt gọi model; `aisdlc status` cảnh báo story nạp > 3× trung vị |
+| `improve.max_loops` | `3` | số vòng `aisdlc improve` tối đa cho một epic, đếm từ `loops[]` của sổ hành vi (chạy lại không đếm lại từ 0). HoH chạy 70 vòng không có điều kiện dừng; ở đây trần là code (ADR-004 R3) |
+| `improve.flat_loops` | `2` | dừng khi cải thiện biên Δverified − Δreopened (hai mốc `loops[]` liên tiếp) ≤ 0 chừng này vòng liền — vòng sau nhận cùng gap, cùng ngữ cảnh, sẽ cho cùng kết quả |
+| `improve.cost_cap_usd` | `0` | trần tổng chi phí các vòng của epic, đọc từ bằng chứng story sửa; `0` = không giới hạn |
 | `context.max_index_chars` | `2000` | trần ký tự cho slot `index` — lát cắt chỉ mục bằng chứng của epic nạp vào prompt developer. Chỉ mục, **không** phải lịch sử: agent cần chi tiết thì gọi `aisdlc evidence <id>` (ADR-004 R6). e9 EPIC-01 đo được 497 ký tự |
 | `run.max_parallel` | `3` | số story song song trong một đợt |
 | `run.max_turns` | `40` | vòng lặp tối đa của một phiên story |
