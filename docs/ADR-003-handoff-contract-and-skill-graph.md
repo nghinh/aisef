@@ -191,12 +191,14 @@ Cột "Chứng minh" là điều kiện để mục đó chuyển ACCEPTED.
 
 | Mục | Baseline (đã có) | Số đo sau | Ngưỡng ACCEPT |
 |---|---|---|---|
-| #1 | e9: 11 Skill/86 phiên; par: 0 mục kỹ năng | par 4 story × {off, on}: `used/offered`, $/story, lượt, cổng qua | cổng qua ≥ baseline **và** $ ≤ +15 %; nếu `used` = 0 thì tắt mặc định và ghi lý do |
+| #1 | e9: 11 Skill/86 phiên; par: 0 mục kỹ năng | **par** 4 story × {off, on}: $ +0,7 %, `used` 0/0 (catalog không khớp). **e9 STORY-01-05** (2026-09-05, cùng commit `9feea6d`, cùng skill `ui-ux-pro-max` trên đĩa, chỉ khác `skills.offer`, 2 lượt/nhánh): off — developer 91+73 lượt, $22,01, `used` 0/0; on — developer 91+34 lượt, $16,94, offered `ui-ux-pro-max` (10) + `ui-styling` (5), `used` **0/0**; lượt 1 cả hai nhánh chạm `max_turns`; nhánh off bị lỗi 15 (vite ma giữ cổng) làm cổng chấm sai nên **không so được cổng và $**, chỉ so `used` | cổng qua ≥ baseline **và** $ ≤ +15 %; nếu `used` = 0 thì tắt mặc định và ghi lý do → **`used` = 0 ở 2 dự án, 6 lượt developer có mục kỹ năng: giữ `skills.offer` mặc định tắt**, không mở rộng skill graph (§7) cho tới khi có cơ chế khác được đo là agent thực sự mở skill |
 | #2 | `par` 120 skill (83 có scripts), `e9` 156 (119) — `verified` chỉ bằng cấu trúc | **đã đo 2026-09-05**: mỗi bộ rớt **1** skill, cùng một cái (`building-vulnerability-dashboard-with-defectdojo/scripts/process.py` không parse được); cả bộ 1,1–1,5 s | không có ngưỡng — mục này là *đúng đắn*, không phải *hiệu quả*; số nhỏ nói rằng nguồn hiện tại sạch, không nói rằng kiểm là thừa |
 | #9 | không có sự kiện | 100 % lượt có HANDOFF; 0 slot nguồn `agent` ở reviewer/security | bất biến, không phải số đo |
 | #7 | — | số cụm finding lặp trên par + e9 | ≥ 1 cụm đáng viết thành skill → mở ADR-002 §5.2 |
 
-Ngân sách: A/B #1 ≈ $4 (trong $120–180 đã duyệt).
+Ngân sách: A/B #1 par ≈ $5,5; e9 ≈ $43 (off $22,01 + on $20,93) — trong $120–180 đã duyệt cho đợt 4 tính cả R2.
+
+**Quyết định 2026-09-05 (sau A/B e9):** #1 giữ trạng thái *cơ chế có, mặc định tắt*. Hai dự án, sáu lượt developer nhận mục kỹ năng (kể cả skill cửa ngõ giao diện chấm 10/10 cho story có màn hình), không lượt nào gọi tool `Skill`. Mục kỹ năng vô hại về chi phí nhưng không đổi hành vi; mở rộng thêm (skill graph, chưng cất kho) là xây trên giả định chưa có bằng chứng. Việc kế tiếp nếu muốn đi tiếp: đo một cơ chế khác — nạp thẳng nội dung SKILL.md vào ngữ cảnh (không qua tool) — trên cùng cặp story, trước khi bàn tới đồ thị.
 
 ---
 
