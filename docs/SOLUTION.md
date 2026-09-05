@@ -102,7 +102,7 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 ### 5.2 Tools
 | Hạng mục | Hiện thực |
 |---|---|
-| Tool thật | `harness/tools.py` — `read_file` `write_file` `run_test` `run_lint` `run_sast` `run_scan` `git_commit` `screenshot` |
+| Tool thật | `harness/tools.py` — ba tool có bằng chứng `test` · `lint` · `sast` (agent gọi `aisdlc tool <tên> --story S`; lệnh từ `tools.*` hoặc tự dò), phân biệt **không chạy được** với đỏ (lỗi 8); `test:baseline` là lần test do harness ghi trước phiên developer (ADR-004 R9). Đọc/ghi tệp là tool của client (guard chặn); commit ứng viên do harness làm (`phases/implement.py::freeze_candidate`); route thật/ảnh chụp qua `harness/browser.py` |
 | MCP | không có — quyết định V1: không MCP thường trú; playwright dùng qua CLI trong `harness/browser.py`, tra cứu tài liệu theo yêu cầu là việc đợt 5 (`aisdlc doc`) |
 | **Prose quanh tool** | mỗi tool có mục "khi nào gọi / cách đọc kết quả / khi nào KHÔNG gọi" |
 
@@ -121,22 +121,26 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 |---|---|
 | Định tuyến model | `harness/routing.py` — theo vai; **reviewer ≠ developer** |
 | Sinh sub-agent | không có — mỗi vai là một phiên riêng do harness gọi (`harness/routing.py`); xem ADR-003 #15 |
-| Bàn giao | `next` → `implement` → `verify` → `review` → `complete` |
+| Bàn giao | gói ngữ cảnh mỗi vai dựng từ slot có **nguồn khai** (`phases/implement.py::SLOT_SOURCE`, ghi vào bằng chứng `handoff`): `story_id` · `story_title` · `story_contract` · `architecture_rules` · `write_scope` · `mockup_section` (artifact) · `tools` (config) · `skills` (router) · `diff_summary` (git) · `impact` (code) · `index` · `preservation` · `validation` (ledger — ADR-004 R4/R6). Reviewer/security không nhận slot nguồn `agent` (ADR-003 #9). Không có `next`/`implement`/`complete`: vòng lặp story nằm trong `run` |
 | Luật kích hoạt | `control/state.py` (FSM `PENDING → RUNNING → VERIFYING → VERIFIED → DONE`) + `control/scheduler.py` (đợt theo phụ thuộc và phạm vi ghi) ✅ **đã xong** |
 
 ### 5.5 Guardrails / Hooks
-| Mốc | Guard | Chặn gì |
+| Mốc (hook · matcher) | Guard | Chặn gì |
 |---|---|---|
-| before tool call | `write-scope` | ghi ngoài phạm vi story |
-| before tool call | `destructive` | `rm -rf`, `git reset --hard`, `checkout --` |
-| after file edit | `diff-scope` | file không liên quan bị chạm |
-| before commit | `secret` | khoá/mật khẩu/token |
-| before commit | `git-stage` | `git add -A` |
-| before commit | `injection` | SQL nối chuỗi, `dangerouslySetInnerHTML` |
-| before commit | `process-ref` | mã `STORY-…`/`EPIC-…` trong mã nguồn (luật 6); test và tài liệu được phép |
-| on stop | `completion` | kết thúc khi test chưa xanh |
+| `PreToolUse` · `Write\|Edit\|NotebookEdit` | `write-scope` | ghi ngoài phạm vi story |
+| `PreToolUse` · `Write\|Edit` | `secret` | khoá/mật khẩu/token |
+| `PreToolUse` · `Write\|Edit` | `injection` | SQL nối chuỗi, `dangerouslySetInnerHTML` |
+| `PreToolUse` · `Write\|Edit` | `process-ref` | mã `STORY-…`/`EPIC-…` trong mã nguồn (luật 6); test và tài liệu được phép |
+| `PreToolUse` · `Bash` | `git-stage` | `git add -A` |
+| `PreToolUse` · `Bash` | `destructive` | `rm -rf`, `git reset --hard`, `checkout --` |
+| `PostToolUse` · `Write\|Edit\|NotebookEdit\|Bash` | `diff-scope` | file không liên quan bị chạm |
+| `Stop` | `completion` | kết thúc khi test chưa xanh — **cho dừng** khi test không chạy được hay chưa khai lệnh, kết cục ghi ở cổng (lỗi 2, 8) |
 
 Mỗi guard là **một lệnh độc lập trả exit code** → nối được vào mọi client.
+Tên và mốc có một nguồn duy nhất `harness/guardrails.py` (`GUARD_MATCHERS`);
+`compile` sinh hook/plugin từ đó, `doctor` nhắc biên dịch lại khi hook đang
+nối thiếu guard mới. OpenCode gửi `filePath`/`newString` — guard đọc cả hai
+dạng khoá (lỗi 10).
 
 ### 5.6 Observability
 | Hạng mục | Hiện thực |
@@ -144,8 +148,10 @@ Mỗi guard là **một lệnh độc lập trả exit code** → nối được
 | Log, trace | sự kiện có cấu trúc, có provenance |
 | **Cost & latency** | token in/out · USD · giây — ghi vào mỗi `evidence/{story}.json`, cộng dồn theo epic |
 | **Ứng viên** | mỗi phép kiểm mang `detail.candidate` = SHA bản được kiểm (ADR-004 R1) |
-| Evaluation | chấm skill/prompt trên bộ mẫu, phát hiện trôi chất lượng |
-| Dashboard | `aisdlc status` |
+| **Sổ hành vi** | `control/ledger.py` — phép chiếu từ evidence, không phải kho mới: mỗi tiêu chí / FR / `qa:<kind>` / màn hình có trạng thái VERIFIED · GAP · REOPENED (`regressed_by`); chỉ ứng viên đã *landed* (nhật ký `merge.completed`/`attempt.committed`) mới thành VERIFIED. `ledger.json` + `INDEX.md` + mốc `loops[]`; metrics (tăng trưởng, hồi quy, gap đóng, cải thiện biên/$) ở phần 5 báo cáo (ADR-004 R2/R6/R7) |
+| Bàn giao & phán quyết | `handoff` (slot · nguồn · số ký tự, `prompt_chars`), `review:verdict`/`security:verdict` (JSON), `gate:verdict`; lời rà soát nguyên văn ở `_bmad-output/reviews/<story>-<vai>-<lượt>.md` (lỗi 16) |
+| Evaluation | chưa có bộ eval riêng cho skill/prompt; trôi chất lượng đo bằng kho dogfood `tests/dogfood/` (mốc lượt/chi phí) và hợp quy client `tests/conformance/` |
+| Dashboard | `aisdlc status` · `aisdlc report` · `aisdlc evidence <id>` |
 
 ---
 
@@ -155,7 +161,7 @@ Chạy nối tiếp — **máy kiểm trước** để khỏi phí thời gian n
 
 | | Cổng máy | Cổng người (R13) |
 |---|---|---|
-| Kiểm | schema · không chu trình · mọi FR được phủ · story không quá lớn · 4 điều kiện story gate | nội dung có đúng ý không |
+| Kiểm | schema · không chu trình · mọi FR được phủ · story không quá lớn (mục 13) · cổng story (mục 12) | nội dung có đúng ý không |
 | Ai chạy | tự động | người, bằng lệnh |
 | Trượt thì | dừng, báo lỗi cụ thể | ghi `changes_requested` + ghi chú, sinh lại |
 
@@ -278,23 +284,21 @@ Ba luật, thứ tự có chủ đích: subdomain tấn công → chặn; độn
 ```
 aisdlc/                          framework, một package Python
 ├── kit/                         NHÓM 1 — nội dung chuẩn hoá (nguồn canonical)
-│   ├── catalog.json             sổ đăng ký skill + pin version + lý do chọn
-│   ├── constitution/            → CLAUDE.md · AGENTS.md · GEMINI.md
-│   ├── skills/  agents/  prompts/  hooks/  mcp/
-│   ├── skills.py                ✅ đọc SKILL.md (stdlib, không cần PyYAML)
-│   └── security_filter.py       ✅ lọc tầng 1
+│   ├── catalog.json             sổ đăng ký nguồn skill + pin + lý do chọn
+│   ├── prompts/  rules/  skills/    prompt có version · luật · skill tự viết
+│   ├── skills.py  catalog.py  fetch.py  install.py  detect_stack.py  constitution.py
+│   ├── security_filter.py  registry.py  router.py  skill_scan.py  docs.py
 ├── harness/                     NHÓM 2–6 — harness là code
-│   ├── tools.py  sandbox.py  routing.py
-│   ├── guardrails.py  observe.py  eval.py  context.py
+│   ├── tools.py  sandbox.py  routing.py  prompts.py  browser.py
+│   ├── guardrails.py  observe.py  testlog.py  aria.py  mockup_map.py  mockup_verify.py
 ├── control/                     điều phối nhiều story
-│   ├── approvals.py             ✅ cổng người duyệt
-│   ├── scheduler.py             ✅ đợt song song
-│   ├── state.py                 sprint-status, khoá file, resume
-│   ├── worktree.py              cô lập song song (mục 7)
-│   ├── evidence.py  gate.py
+│   ├── approvals.py  scheduler.py  state.py  worktree.py  journal.py
+│   ├── gate.py  machine_gate.py  outcome.py  acceptance.py  tdd.py  security.py
+│   ├── ledger.py  complexity.py  preflight.py  impact.py  change.py
+│   ├── normalize.py  bmad_status.py  design_contract.py  experience.py  conformance.py
 ├── clients/                     R10
-│   ├── base.py  claude_code.py  opencode.py  compile.py
-├── phases/                      setup · plan · mockup · implement · verify · ship
+│   ├── base.py  claude_code.py  opencode.py  compile.py  stream.py
+├── phases/                      plan · story_split · mockup · implement · run · improve · qa · deploy · report
 └── cli/                         bộ lệnh, một tệp mỗi pha (parser · plan · implement · harness · doctor)
 ```
 
@@ -330,16 +334,23 @@ dự-án/
 ```
 # Chuẩn bị
 aisdlc doctor                         môi trường: python · git · client · docker · playwright
-aisdlc setup   [--references DIR]     dò stack, nạp skill, sinh CLAUDE.md + AGENTS.md
+aisdlc setup   [--references DIR] [--no-fetch] [--dry-run]   dò stack, nạp skill, sinh CLAUDE.md + AGENTS.md
 aisdlc init                           ghi .ai/config.json mặc định
-aisdlc compile [--client claude|opencode|all]   sinh hook/plugin từ một nguồn guard duy nhất
+aisdlc compile [--client claude|opencode|all] [--bin PATH]   sinh hook/plugin từ một nguồn guard duy nhất
+
+# Tri thức vận hành (ADR-002 / ADR-003)
+aisdlc skill   [--story S]            sổ đăng ký skill: dựng, soi, định tuyến thử cho một story
+aisdlc skill   --scan [--client c] [--batch N]   quét SKILL.md bằng model (chỉ đọc, không tool):
+                                      injection → rejected, suspicious → cảnh báo trong sổ
+aisdlc doc     <package> [--topic T] [--tokens N] [--story S]   tra tài liệu thư viện
+                                      (context7, có cache), ghi bằng chứng doc_lookup
 
 # Bước 2 — tài liệu, dừng ở mỗi cổng
-aisdlc plan    [--auto-approve all|<danh sách>] [--force]
+aisdlc plan    [--client c] [--auto-approve all|<danh sách>] [--force]
         project-context → prd → architecture → ux → epics → tách story
 
 # Bước 3 — mockup
-aisdlc mockup  [--only <screen_id>] [--force]
+aisdlc mockup  [--client c] [--only <screen_id>] [--force]
 
 # Cổng người duyệt
 aisdlc gates                          bảng trạng thái 8 cổng
@@ -349,7 +360,7 @@ aisdlc reject  <gate>  --note "..."   (bắt buộc ghi chú)
 aisdlc auto-approve all|<danh sách>   luôn ghi dấu `auto`
 
 # Bước 4 — hiện thực
-aisdlc run     [--epic E] [--sequential] [--no-isolate] [--force]
+aisdlc run     [--client c] [--epic E] [--sequential] [--no-isolate] [--force]
 aisdlc tool    test|lint|sast [--story S]      agent gọi qua đây để có bằng chứng
 aisdlc verify  [--write-scope ...] [--story S] hậu kiểm guard trên cây làm việc
 
@@ -367,8 +378,13 @@ aisdlc improve --epic E [--max-loops N] [--auto] [--client c] [--force]
         Không daemon: chạy lại tiếp từ mốc cuối trong sổ.
 
 # Bước 6 — giao hàng
-aisdlc devsecops [--bin PATH] [--force]        CI (code) + Dockerfile/IaC/runbook (model)
+aisdlc devsecops [--client c] [--install-spec X] [--bin PATH] [--force]
+                                               CI (code) + Dockerfile/IaC/runbook (model)
 aisdlc pre-deploy [--skip-qa]                  chấm cổng cuối, ghi báo cáo để người ký
+
+# Sau phát hành — vòng đời thay đổi
+aisdlc change  FR-x "mô tả"           ghi FR, stale PRD trở xuống, sinh story delta
+                                      STORY-CH-nn trong EPIC-CH (sinh bằng code)
 
 # Guard — client gọi vào tại mốc vòng đời (do `compile` nối sẵn)
 aisdlc guard write-scope|diff-scope|secret|git-stage|destructive|injection|process-ref|completion
@@ -406,7 +422,7 @@ cho trạng thái lệch nhau.
 |---|---|---|
 | Ai gọi | script / CI | chính agent, qua Bash tool |
 | Bề mặt | `claude -p` · `opencode run` · cron · CI | **Claude Desktop · Claude CLI · OpenCode Desktop · OpenCode TUI/Web** |
-| Lệnh | `aisdlc run --client X` | `aisdlc next` → làm → `aisdlc verify S` → `aisdlc complete S` |
+| Lệnh | `aisdlc run --client X` | cùng bộ lệnh: trong phiên do `run` mở, agent gọi `aisdlc tool` · `aisdlc verify` · `aisdlc doc` · `aisdlc evidence` qua Bash; guard nối qua hook |
 
 `run` chỉ là vòng lặp gọi lại chính các lệnh đơn — **không có code riêng cho mỗi chế độ**.
 
@@ -451,17 +467,32 @@ minh). Hệ quả:
 | **5 Verify** | review sâu · unit · SIT · API contract · E2E · UAT · perf · security · mutation | mỗi loại chạy thật, trả kết quả máy đọc · cổng **chặn thật** khi đẩy story lỗi |
 | **6 Ship** | container · CI/CD · SBOM · IaC · observability · runbook | `docker build` chạy · CI chặn khi story fail · SBOM sạch high · runbook đủ 4 mục · cổng `pre-deploy` `approved` |
 
-**Cổng story (Bước 4–5) — PASS chỉ khi đủ, mỗi thứ là bằng chứng chạy thật:**
-1. Test xanh, coverage ≥ ngưỡng
-2. Review APPROVED bởi agent khác người viết — báo cáo trả **hai bản**:
-   văn bản có thẻ `[chặn]`/`[bế tắc]` cho người đọc, và một khối JSON
-   (`verdict` + `findings` mang `behavior_id`) cho máy đọc. Thiếu khối JSON
-   thì harness hỏi lại **đúng một lần** rồi mới lùi về đọc văn bản; hai bản
-   lệch nhau thì lấy **hợp** hai nguồn và ghi note `review:mismatch` — không
-   nới lỏng cổng vì model quên chép một mục sang JSON (ADR-004 R8)
-3. Security 0 phát hiện high/critical
-4. Truy vết: commit mang `FR-xx`, nối được code ↔ story ↔ requirement
-5. **Khớp mockup** — chỉ áp cho story có `screen_id` (mục 12bis)
+**Cổng story (Bước 4–5) — `control/gate.py` `evaluate`, chấm trên ứng viên
+đóng băng; mỗi mục là bằng chứng chạy thật, sáu kết cục (`control/outcome.py`):**
+
+| Mục | Đọc gì | Khi không có bằng chứng |
+|---|---|---|
+| `bằng chứng đúng candidate` | kết quả *mới nhất* của mỗi phép kiểm mang đúng SHA ứng viên (ADR-004 R1) | ⚠ stale — không phải "đỏ"; không truyền SHA → – |
+| `guard có chạy` | guard đã đánh giá ít nhất một thao tác ghi trong phiên | ✗ hook không tới worktree; chưa biên dịch hook → – |
+| `test` | lần test cuối xanh **và** sau lần sửa tệp cuối (`completion`) | ✗; không chạy được → ⚠ |
+| `không làm đỏ test có sẵn` | tên test xanh ở `test:baseline` còn xanh **và còn tồn tại** ở ứng viên (ADR-004 R9; đổi tên giữ tiêu đề lá không tính là mất — lỗi 24) | ○ reporter không in tên; ⚠ baseline không chạy được; – tắt bởi `verify.baseline` |
+| `lint` | lần lint cuối | ✗ chưa chạy; ○ chưa cấu hình |
+| `phạm vi ghi` | tệp đổi ⊆ `write_scope` hiệu lực (+ thư mục test của kiểm định story đòi — lỗi 21) | ✗ |
+| `map mockup` | mỗi `screen_id` có một lần đối chiếu và `missing` rỗng (mục 12bis) | ✗; story không giao diện → – |
+| `test thật` | `qa:fake-tests`: không test nào rỗng khẳng định | ✗ |
+| `tiêu chí có test` | mỗi `AC-<story>-<i>` nằm trong tên một test ở lần xanh cuối (G5) | ○ reporter không in tên |
+| `coverage` | số đọc từ output runner ≥ `coverage.min` | ○ runner không in coverage |
+| `TDD` | story thêm test thì có một lần đỏ trước lần xanh cuối | – story không thêm test |
+| `<kind>` theo hợp đồng kiểm định | `qa:<kind>` rồi mới tên trần (lỗi 9): e2e · accessibility · perf … | ○ chưa cấu hình |
+| `bảo mật` | phiên rà soát bảo mật riêng không còn mức trong `security.block_severities` | ○ chưa cấu hình |
+| `rà soát` | phiên rà soát độc lập không còn `[chặn]`. Trả **hai bản**: văn bản có thẻ `[chặn]`/`[bế tắc]` và khối JSON (`verdict` + `findings` mang `behavior_id`); thiếu JSON hỏi lại **đúng một lần** rồi mới đọc văn bản; hai bản lệch thì lấy **hợp**, ghi note `review:mismatch` — không nới cổng vì model quên chép (ADR-004 R8) | ✗ chưa rà soát |
+| `bảo toàn` | hành vi VERIFIED của story khác mà story này chạm tệp còn xanh ở đúng ứng viên; FR hỏi story **đã xác minh** nó (`via`, lỗi 23) (ADR-004 R4) | ⚠ không kiểm được ≠ đạt; – không chạm hành vi nào |
+
+Ký hiệu: ✗ FAILED · ⚠ UNRUNNABLE · ○ UNCONFIGURED · – NOT_APPLICABLE. ✗ và ⚠
+chặn story; ○ không chặn story nhưng phải hiện ra và chặn ở `pre-deploy`.
+Truy vết code ↔ story ↔ FR không phải một mục cổng: nó nằm ở `covers` của
+story (sổ hành vi chiếu `FR-x` từ tiêu chí) và nhánh `story/<id>`; harness
+không kiểm nội dung commit message.
 
 ---
 
@@ -551,6 +582,9 @@ Không để chữ "ngưỡng" chung chung. Mặc định trong `.ai/config.json
 | `coverage.min` | `0.85` | coverage tối thiểu — số đọc từ output runner; không có số thì mục cổng là **chưa cấu hình**, không đạt không trượt |
 | `tools.test` | theo stack | lệnh test; muốn `coverage.min` có nghĩa thì lệnh phải **in coverage**: `node --test --experimental-test-coverage`, `vitest run --coverage`, `pytest --cov` — harness không tự thêm cờ |
 | `skills.offer` | `false` | đưa mục "Kỹ năng có sẵn" (router chọn) vào prompt story; bật sau khi A/B có số (ADR-003 §6) |
+| `skills.inline` | `false` | thí nghiệm ADR-003 cơ chế B: dán thân SKILL.md của skill cao điểm nhất vào prompt (trần 8 000 ký tự). A/B n = 1 không thấy gain — giữ tắt (ADR-003 §6) |
+| `security.semantic_review` | `true` | phiên rà soát bảo mật theo ngữ nghĩa (vai `security`) chạy cùng pha kiểm định |
+| `review.impact_provider` | `""` | nhà cung cấp phân tích ảnh hưởng cho người rà soát; rỗng thì dùng `control/impact.py` |
 | `story.max_acceptance_criteria` | `8` | quá thì Bước 2 buộc chẻ nhỏ |
 | `story.max_write_scope_paths` | `10` | story chạm quá nhiều nơi là dấu hiệu quá lớn |
 | `story.max_screen_states` | 8 | Tổng trạng thái màn hình (EXPERIENCE.md) một story phải dựng. Vượt → cổng `stories` chặn với chỉ dẫn chẻ; `run` từ chối. Đo 2026-09-05 e9: 11 và 18 trạng thái đều chạm `max_turns` lượt đầu, 4–8 lượt |
@@ -573,14 +607,16 @@ Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏn
 | Khoá | Mặc định | Vì sao có |
 |---|---|---|
 | `tools.test` · `tools.lint` · `tools.sast` | `""` (tự dò) | lệnh là quyết định của dự án; rỗng thì dò từ file có thật |
-| `verify.*` (10 loại) | `""` | rỗng nghĩa là **chưa cấu hình**, không phải "đạt" |
+| `verify.*` (12 loại: `unit` · `sit` · `api-contract` · `e2e` · `uat` · `perf` · `security` · `mutation` · `accessibility` · `migration` · `sbom` · `image-scan`) | `""` | rỗng nghĩa là **chưa cấu hình**, không phải "đạt"; thư mục test suy từ lệnh được cấp thêm vào phạm vi ghi của story đòi loại ấy (lỗi 21) |
 | `verify.waived` | `""` | miễn phải là quyết định có người ký, không phải hệ quả của việc quên |
 | `verify.baseline` | `true` | chạy bộ test ở candidate cha **trước** phiên developer đầu tiên của story (ADR-004 R9) để cổng "không làm đỏ test có sẵn" so được tên test; tắt khi bộ test quá chậm — tắt thì mục cổng là – "tắt bởi cấu hình", không phải đạt |
 | `sandbox.image` | `""` (theo stack) | `alpine` trơn không có công cụ nào; test đỏ vì thiếu công cụ chứ không vì code sai |
 | `sandbox.tools_network` | `false` | dự án cần cài phụ thuộc mới mở mạng, và phải khai tường minh |
 | `sandbox.use_docker` | `true` | tắt được cho toolchain gắn với máy chủ, nhưng luôn ghi `degraded` |
-| `app.dev_command` · `app.base_url` | `""` · `localhost:5173` | để mở **route thật** lúc đối chiếu mockup |
-| `route.<vai>_model` | `""` | chọn model theo vai; rỗng thì theo mặc định của client |
+| `sandbox.allow_degraded` | `true` | `run` chấp nhận kiểm định ngoài Docker khi không có Docker, ghi `degraded` vào bằng chứng |
+| `sandbox.pre_deploy_degraded_waiver` | `""` | cổng `pre-deploy` **không** nhận suy biến (QĐ4) trừ khi có lý do khai ở đây; lý do ghi vào `pre-deploy.json` |
+| `app.dev_command` · `app.base_url` · `app.ready_timeout_seconds` | `""` · `http://localhost:5173` · `60` | để mở **route thật** lúc đối chiếu mockup; cổng đã có người trả lời thì từ chối, không nhận vơ (lỗi 15) |
+| `route.developer_model` · `route.reviewer_model` · `route.designer_model` | `""` | chọn model theo vai; rỗng thì theo mặc định của client |
 
 ---
 

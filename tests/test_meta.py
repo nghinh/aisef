@@ -120,3 +120,72 @@ class TestTaiLieuTroVaoMaCoThat(unittest.TestCase):
                 with self.subTest(doc=doc, path=ref):
                     self.assertTrue((ROOT / rel).exists() or (ROOT / (rel + ".py")).exists(),
                                     f"{doc} nhắc `{ref}` nhưng không có trong cây mã")
+
+
+class TestSolutionKhopMa(unittest.TestCase):
+    """P1-6 mở rộng (2026-09-06): SOLUTION nêu lệnh CLI, knob cấu hình, mục cổng
+    story, bước nhật ký, slot bàn giao, guard và cổng người — mỗi thứ phải khớp
+    **tên** trong mã. Danh sách đọc từ mã, không chép tay vào test: thêm một
+    lệnh/knob/mục mà quên tài liệu thì test đỏ, không phải người đọc phát hiện
+    sau. Hai đợt ADR-004 lệch 6 chỗ (tool giả, `next/complete`, guard "before
+    commit", 6 knob thiếu, cổng story 5 mục thay vì 15, `verify.*` 10 thay vì 12)
+    mà test cũ chỉ bắt đường dẫn tệp."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.text = (ROOT / "docs/SOLUTION.md").read_text(encoding="utf-8")
+
+    def _co(self, name: str) -> bool:
+        return f"`{name}`" in self.text or f"**{name}**" in self.text
+
+    def test_moi_lenh_cli_co_trong_bo_lenh(self):
+        import argparse
+        from aisdlc.cli.parser import build_parser
+        sub = next(a for a in build_parser()._actions if isinstance(a, argparse._SubParsersAction))
+        self.assertGreaterEqual(len(sub.choices), 20)
+        for cmd in sub.choices:
+            with self.subTest(cmd=cmd):
+                self.assertRegex(self.text, rf"(?m)^aisdlc {re.escape(cmd)}(\s|$)",
+                                 f"`aisdlc {cmd}` có trong parser nhưng không có ở SOLUTION §10")
+
+    def test_moi_knob_cau_hinh_co_trong_bang_nguong(self):
+        from aisdlc.config import DEFAULTS
+        gop = {"verify.waived", "verify.baseline"}
+        for key in DEFAULTS:
+            with self.subTest(key=key):
+                if key.startswith("verify.") and key not in gop:
+                    # 12 loại kiểm định gộp một dòng `verify.*`, nhưng tên loại phải có
+                    kind = key.split(".", 1)[1]
+                    self.assertTrue("`verify.*`" in self.text and f"`{kind}`" in self.text,
+                                    f"loại kiểm định `{kind}` không có ở dòng `verify.*` SOLUTION §13")
+                else:
+                    self.assertTrue(self._co(key), f"knob `{key}` có trong DEFAULTS nhưng không có ở SOLUTION §13")
+
+    def test_moi_muc_cong_story_co_trong_bang_cong(self):
+        src = (PKG / "control" / "gate.py").read_text(encoding="utf-8")
+        names = set(re.findall(r'Check\(\s*"([^"]+)"', src)) | set(re.findall(r'^\s*ten = "([^"]+)"', src, re.M))
+        self.assertGreaterEqual(len(names), 10, "regex lệch với gate.py")
+        for name in sorted(names):
+            with self.subTest(muc=name):
+                self.assertTrue(self._co(name), f"mục cổng `{name}` có trong gate.py nhưng không có ở SOLUTION §12")
+
+    def test_thu_tu_nhat_ky_dung_nhu_ma(self):
+        from aisdlc.control.journal import STEPS
+        gon = re.sub(r"\s+", " ", self.text)
+        self.assertIn(" → ".join(STEPS), gon, "thứ tự `STEPS` ở SOLUTION §6 lệch `control/journal.py`")
+
+    def test_moi_slot_ban_giao_co_trong_tai_lieu(self):
+        from aisdlc.phases.implement import SLOT_SOURCE
+        for slot in SLOT_SOURCE:
+            with self.subTest(slot=slot):
+                self.assertTrue(self._co(slot), f"slot `{slot}` có trong SLOT_SOURCE nhưng không có ở SOLUTION §5.4")
+
+    def test_moi_guard_va_cong_nguoi_co_ten_trong_tai_lieu(self):
+        from aisdlc.control.approvals import Gate
+        from aisdlc.harness.guardrails import GUARD_MATCHERS
+        for g in GUARD_MATCHERS:
+            with self.subTest(guard=g):
+                self.assertTrue(self._co(g), f"guard `{g}` không có ở SOLUTION §5.5")
+        for g in Gate:
+            with self.subTest(gate=g.value):
+                self.assertTrue(self._co(g.value), f"cổng người `{g.value}` không có ở SOLUTION §6")
