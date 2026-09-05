@@ -402,11 +402,62 @@ chính story. **AC (b)** đạt trên client giả
 `cross_reopens` = 2; chạy sạch → ✅ và `reopen_events = 0` (nửa "không ✗
 oan" của B3). Cổng unit 7 phép ở `TestCongBaoToan`.
 
-**Chưa đo:** B3 trên `par` với agent thật (mutation có chủ đích và "không
-✗ oan trên chạy sạch" ở dogfood), và (c) trên dogfood/e9 01-05 — cần lượt
-agent, cùng lô với R1 (d) và R8 (B7). Chưa có story nào của e9/`par` có
-`mockup:*`/`qa:e2e` VERIFIED bị story sau chạm, nên nhánh `verify_screens`
-cho màn hình bảo toàn mới chỉ xanh ở unit (`test_qa_va_mockup_theo_cung_ba_ket_cuc`).
+**B3 trên `par`, agent thật (2026-09-06, `tests/dogfood/test_par_mutation.py`,
+Claude, $3,72 cả hai story).** Story A = `STORY-01-01` (`slugify`, nối `-`)
+chạy tới `done`; story B = `STORY-01-04` "Slug nối bằng gạch dưới": FR-4
+hợp lệ về sản phẩm ("đổi FR-1 về dấu nối: `_` để slug dùng được làm tên
+biến/tên tệp"), phạm vi ghi `src/slugify.js` + `src/slugify-underscore.test.js`
+— trùng tệp mã của A, **không** có test của A; tiêu chí ghim
+`slugify('Hello World') === 'hello_world'` khi không truyền thêm tham số,
+nên không cài đặt nào thoả B mà 5 test `AC-STORY-01-01-1` của A
+(`hello-world`) còn xanh. Story không nhắc gì tới test của A.
+
+| | A `STORY-01-01` | B `STORY-01-04` |
+|---|---|---|
+| lượt developer · turn | 1 · 15 | 1 · 30 — guard `completion` chặn Stop 3 lần, agent lật `slugify.js` 3 lần, **không** chạm `slugify.test.js`, không chạm `max_turns` |
+| chi phí dev / review / security | $0,58 / $0,85 / $0,25 | $1,23 / $0,53 / $0,29 |
+| baseline R9 | ○ chưa có test | ✅ 6 test xanh ở `f1f2ac6` |
+| cổng | ✅ | ✗ 6 mục: test · **không làm đỏ test có sẵn** · tiêu chí có test · TDD · rà soát · **bảo toàn** |
+| mục "bảo toàn" | – không chạm story nào | ✗ `AC-STORY-01-01-1 (AC-STORY-01-01-1: chữ thường và nối bằng dấu gạch ngang)`, `FR-1 (…)` |
+| mục "không làm đỏ test có sẵn" | ○ | ✗ "làm đỏ 5 test xanh ở baseline: …chữ thường và nối bằng dấu gạch ngang, …bỏ dấu tiếng Việt về ASCII, …ký tự không phải chữ hay số…, …gộp dấu nối liên tiếp…, …ký tự ngoài ASCII…" |
+| reviewer | ✅ | `[bế tắc]` `behavior_id = AC-STORY-01-01-1`: tự chạy `npm test`, chỉ đúng `src/slugify.test.js:7`, kết luận "hai tiêu chí đòi hai giá trị cho cùng lời gọi — việc của người: rút điều khoản dấu nối của FR-1 khỏi sổ bảo toàn rồi cấp `slugify.test.js` vào write_scope" → `plan_defects` → story `failed` sau lượt 1, **không đốt lượt 2** |
+| sổ `ledger.build()` | AC-1, AC-2, FR-1 VERIFIED @`25c3e34` | `AC-STORY-01-01-1`, `FR-1` **REOPENED**, `regressed_by = STORY-01-04#1`, `candidate = 516d81d`, `cross_reopens = 2` |
+| merge | FF lên main | **không** — main giữ `f1f2ac6` |
+
+AC (b) đạt trên agent thật: cả hai cổng mới ✗ nêu đúng tên test của A, sổ
+REOPENED đúng thủ phạm, không merge; lời feedback cho lượt sau (không xảy
+ra vì reviewer bế tắc) có tên test ở ba mục. Nửa "không ✗ oan trên chạy
+sạch" với agent thật: e9 01-07 lần 4 (cổng ✅ 16 mục kể cả bảo toàn và
+baseline, STATUS §2.9). `AISDLC_DOGFOOD_REUSE=1` chạy lại chỉ B từ bản chụp
+`par-mutation.A` (≈ $2). Dữ liệu nói thêm ba điều:
+
+* `regressed_by` **không mang `@sha`**: lần đỏ đầu tiên của test A là lần
+  `aisdlc tool test` agent tự chạy giữa phiên (chưa đóng băng); lần đỏ ở
+  ứng viên `516d81d` sau đó không đổi trạng thái nên chỉ cập nhật
+  `candidate`. Đúng hợp đồng R2 (`[@candidate]` tuỳ chọn), SHA tra được ở
+  `candidate` — không sửa.
+* **Lỗi 26** — cùng lần chạy giữa phiên ấy làm `AC-STORY-01-04-1/2`, `FR-4`
+  của B **VERIFIED** dù B trượt và chưa merge (`verified = 5`): `build()`
+  coi sự kiện không mang candidate là landed (luật cho bằng chứng trước
+  R1), trong khi với story đã đóng băng thì sự kiện không mang candidate
+  chính là lần chạy **trước** khi đóng băng. Story sau chạm `src/slugify.js`
+  sẽ phải "bảo toàn" một test chưa từng lên main → UNRUNNABLE oan. Sửa:
+  story có `candidate.frozen` → chỉ SHA landed mới tính; không nhật ký /
+  chưa từng đóng băng → như cũ. Trên `par-mutation` sau sửa: B 0 VERIFIED
+  (3 GAP), A không đổi, `unlanded_green` 5 → 34.
+* **Lỗi 27** — danh sách bảo toàn cho **lượt 2** tính từ sổ đã có B#1 chỉ
+  còn `[AC-STORY-01-01-2, qa:fake-tests]`: `verified_touched` bỏ REOPENED,
+  nên hành vi B vừa làm hỏng biến mất khỏi slot và khỏi mục "bảo toàn" của
+  lượt sau (mục ấy sẽ ✅ "1 hành vi còn xanh" trong khi test A còn đỏ; chỉ
+  R9 và mục "test" còn giữ). Sửa: REOPENED có `regressed_by` bắt đầu bằng
+  chính story → vẫn phải giữ; REOPENED do story khác → không, để khỏi ✗
+  oan. Sau sửa lượt 2 nhận `[AC-STORY-01-01-1, AC-STORY-01-01-2, FR-1,
+  qa:fake-tests]`.
+
+**Chưa đo:** (c) prompt_chars trên dogfood/e9 01-05 với agent thật. Chưa có
+story nào của e9/`par` có `mockup:*`/`qa:e2e` VERIFIED bị story sau chạm,
+nên nhánh `verify_screens` cho màn hình bảo toàn mới chỉ xanh ở unit
+(`test_qa_va_mockup_theo_cung_ba_ket_cuc`).
 
 ### R3 — Vòng cải tiến epic (`phases/improve.py`, `aisdlc improve`) · hiện thực 2026-09-06, unit xanh, **B1 chưa đo**
 

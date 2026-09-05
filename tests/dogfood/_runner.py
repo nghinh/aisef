@@ -34,13 +34,13 @@ def _git(cwd: Path, *args: str) -> str:
     return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True).stdout.strip()
 
 
-def make_project(name: str) -> Path:
-    """Chép đầu vào, `git init`, commit nền, biên dịch hook Claude (không commit)."""
+def make_project(name: str, *, src: str = "") -> Path:
+    """Chép đầu vào (`src`, mặc định cùng tên), `git init`, commit nền, biên dịch hook Claude (không commit)."""
     from aisdlc.clients.compile import compile_for, write_compile_report
 
     dst = KEEP_DIR / name
     shutil.rmtree(dst, ignore_errors=True)
-    shutil.copytree(INPUTS / name, dst)
+    shutil.copytree(INPUTS / (src or name), dst)
     subprocess.run(["git", "init", "-q", "-b", "main"], cwd=dst, check=True)
     subprocess.run(["git", "config", "user.email", "dogfood@aisdlc"], cwd=dst, check=True)
     subprocess.run(["git", "config", "user.name", "dogfood"], cwd=dst, check=True)
