@@ -270,6 +270,8 @@ chuẩn được ghi sau khi story xong). Bộ đầy đủ: **1 256 test, OK**
 
 Baseline R9 chạy trước phiên developer: 440 test id ở bản cha, 0 đỏ sẵn; slot R4 vào bàn giao: `preservation` 1 552 ký tự (chạm trần), `validation` 138, `index` 506.
 
+**Lần chạy 4 (04:45–05:20, sau sửa lỗi 23/24 + đổi lời AC-1): 01-07 XONG ở lượt 1** — developer 23 lượt $1,55 (làm tiếp trên nhánh story còn ứng viên cũ), rà soát 43 lượt $5,50 JSON `pass`, bảo mật 12 lượt $1,47, cổng ✅ đủ 16 mục kể cả *bảo toàn* (30 hành vi của story khác còn xanh ở `c4ac358`) và *không làm đỏ test có sẵn*; merge vào main. **EPIC-01 7/7.** Tổng 01-07 qua 4 lần chạy ≈ $58 (lượt 1 bế tắc phạm vi, lần 2 tải máy, lần 3 lỗi 23/24, lần 4 xong); tổng e9 $495,90.
+
 Hai lỗi thật của đợt 2 lộ ra ngay lượt đầu trên agent thật, sửa cùng đêm (commit sau 0eb65ee):
 * **Lỗi 23 (R4):** cổng hỏi test mang mã của story *sở hữu* FR (01-01, story không có test mang mã), trong khi sổ xác minh FR-11 *qua* 01-05 (`source.story`). Sổ và cổng dùng hai luật → sổ nói VERIFIED, cổng nói không kiểm được. Sửa: mục bảo toàn mang `via` = story đã xác minh, cổng hỏi đúng story ấy (test `test_fr_hoi_story_da_xac_minh_no_khong_hoi_story_so_huu`).
 * **Lỗi 24 (R9):** đổi tên test giữ nguyên tiêu đề lá bị đọc thành "mất test". Chính lỗi 23 xui developer làm việc ấy (gắn mã vào test của story khác để cổng hết kêu). Sửa: cùng tiêu đề lá còn ở ứng viên → "đổi tên", không phải mất; xoá thật vẫn bị bắt (test `test_doi_ten_test_giu_tieu_de_la_khong_phai_mat`).
