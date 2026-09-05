@@ -486,6 +486,7 @@ Không để chữ "ngưỡng" chung chung. Mặc định trong `.ai/config.json
 | Khoá | Mặc định | Ý nghĩa |
 |---|---|---|
 | `coverage.min` | `0.85` | coverage tối thiểu — số đọc từ output runner; không có số thì mục cổng là **chưa cấu hình**, không đạt không trượt |
+| `tools.test` | theo stack | lệnh test; muốn `coverage.min` có nghĩa thì lệnh phải **in coverage**: `node --test --experimental-test-coverage`, `vitest run --coverage`, `pytest --cov` — harness không tự thêm cờ |
 | `skills.offer` | `false` | đưa mục "Kỹ năng có sẵn" (router chọn) vào prompt story; bật sau khi A/B có số (ADR-003 §6) |
 | `story.max_acceptance_criteria` | `8` | quá thì Bước 2 buộc chẻ nhỏ |
 | `story.max_write_scope_paths` | `10` | story chạm quá nhiều nơi là dấu hiệu quá lớn |

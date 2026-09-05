@@ -593,6 +593,17 @@ Bước tiếp: **đợt 1 — G4** truyền `--settings` tường minh + nhịp
 | #2 scripts của skill phải **biên dịch được** trước khi `verified` (`py_compile`-tương-đương, `sh -n`, `node --check`) | 2 | `par`: 120 skill, 83 có scripts, **1** rớt; `e9`: 156 / 119 / **1** — cùng một skill (`building-vulnerability-dashboard-with-defectdojo`, `scripts/process.py` không parse được); 1,1–1,5 s cho cả bộ | | ✅ |
 | #9 `HANDOFF` evidence: vai nào nhận slot nào từ nguồn nào; bất biến máy kiểm — gói reviewer/security không có nguồn `agent`, slot chưa khai nguồn hiện `?`; báo cáo in chuỗi bàn giao | 6 | — (bất biến, không phải số đo) | | ✅ |
 
+**Bước 0 + đợt 4 (sau STATUS 2026-09-05):**
+
+| Hạng mục | Unit test | Kiểm thật | Bằng chứng | Trạng thái |
+|---|---|---|---|---|
+| P0-1 hook ghim đường dẫn tuyệt đối → `AISDLC_PROJECT` từ harness (3 vai), guard ưu tiên env, `doctor` mục "hook trỏ đúng dự án" | 4 | A/B `par-A`/`par-B`: 4 lượt trượt "guard có chạy" sai, bằng chứng nằm ở `par` gốc — nguyên nhân; kiểm lại qua dogfood (dự án dựng ở `.dogfood/`, hook biên dịch tại chỗ) | | ✅ |
+| P0-2 test song song flaky | — | không tái hiện: 20/20 riêng + bộ đầy đủ 1 155 OK có log trọn vẹn | log scratch | ◐ hạ P2, giữ mở |
+| R4 tài liệu khớp mã: 5 đường dẫn lệch trong SOLUTION (`kit/agents/`, `kit/mcp/`, `control/fsm.py`, `phases/ship`, `phases/verify`) + test meta chặn tái diễn | 1 | — | | ✅ |
+| R1 chuẩn bị PyPI: `uv build` wheel+sdist, `twine check` PASS, `release.yml` trusted publishing, README "Phát hành" | — | việc tay còn lại: tài khoản tổ chức tạo project + khai publisher, rồi `git tag v0.1.0` | `dist/` (ignore) | ◐ chờ chủ đầu tư |
+| R5 kho dogfood `tests/dogfood/par` (đầu vào từ commit nền `9adfb59`, hook biên dịch tại chỗ, mốc $3,14 / 3 story lượt đầu, `main` chỉ đổi qua merge) | — | đang chạy lần 1 (`AISDLC_DOGFOOD=1`) | `.dogfood/par` | 🔨 |
+| R2 e9 EPIC-01 đầu-cuối: `verify.e2e` + `verify.accessibility` **thật** (playwright + axe, 2/2 xanh trên main trước khi chạy), không miễn; 4 story còn lại (01-04..01-07) | — | đang chạy | `e9/_bmad-output` | 🔨 |
+
 **Đợt OKL (ADR-002 — tầng tri thức vận hành, sau paper Repo-To-Skill):**
 
 | Hạng mục | Unit test | Kiểm thật | Bằng chứng | Trạng thái |

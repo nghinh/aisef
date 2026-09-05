@@ -1,7 +1,9 @@
 # ADR-003 — Bàn giao có hợp đồng và đồ thị kỹ năng: đối chiếu Repo-To-Skill, AREX-Skill, OpenAI Swarm
 
-**Trạng thái:** PROPOSED — từng mục ADOPT/ADAPT chuyển ACCEPTED khi có test
-đỏ-khi-hoàn-nguyên **và** số đo so với baseline (§6). Mở rộng ADR-002.
+**Trạng thái:** #2 và #9 **ACCEPTED** (test đỏ-khi-hoàn-nguyên + số đo §6, 2026-09-05);
+#1 **PROPOSED** — cơ chế đã cài, mặc định tắt; A/B `par` chỉ chứng minh vô hại
+(+0,7 % chi phí khi abstain), "được dùng" chờ dự án có skill khớp (R2 e9 + `ui-ux`).
+Mở rộng ADR-002.
 **Ngày:** 2026-09-05. **Yêu cầu:** "chỉ bổ sung những gì thực sự tạo thêm giá
 trị, không tạo subsystem trùng lặp, không thay đổi các bất biến cốt lõi".
 
