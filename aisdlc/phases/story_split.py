@@ -239,7 +239,11 @@ def split(
     # Story chạy được không — tính bằng code, trước khi tiêu đồng nào.
     # Chấm ở đây chứ không trong `check_stories`: phép kiểm cần tiêu chí
     # chấp nhận và danh sách màn hình, mà tầng lập lịch không mang theo.
+    splits: dict[str, str] = {}
     for pf in check_stories_executable(stories, project=root.parent, config=config):
+        for m in pf.story_defects:
+            if m.capability == "size" and m.remedy:
+                splits[pf.story_id] = m.remedy
         if pf.story_defects:
             res.gate.errors.append(
                 f"{STORY_NOT_EXECUTABLE} {pf.story_id}: "
@@ -259,8 +263,12 @@ def split(
     # Ghi lại để lần `plan` sau đưa vào prompt của bước epics: story bị
     # chặn vì quá lớn thì người chẻ phải là agent lập kế hoạch, và nó chỉ
     # chẻ đúng khi biết cổng đã nói gì (P2-12).
+    # `splits`: cách chẻ **tất định** cho từng story quá cỡ (ADR-004 R5) —
+    # nêu riêng ra để bước epics lần sau đọc thẳng, không phải bới câu chữ
+    # trong dòng lỗi.
     (root / GATE_MEMO).write_text(
-        json.dumps({"errors": res.gate.errors, "warnings": res.gate.warnings},
+        json.dumps({"errors": res.gate.errors, "warnings": res.gate.warnings,
+                    "splits": splits},
                    ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )

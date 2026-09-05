@@ -23,6 +23,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..config import DEFAULTS, Config
+from . import complexity
 from .normalize import (
     LOCKFILES,
     MANIFESTS,
@@ -585,11 +586,14 @@ def check_story(
     have: set[str] | None = None,
     owned: dict[str, str] | None = None,
     done: set[str] | None = None,
+    fan_in: int = 0,
 ) -> Preflight:
     """Story này chạy được không. Không gọi model.
 
     ``owned``: màn hình → story dựng nó đầu tiên (xem ``screen_owners``);
     dùng để đo cỡ story. Không có thì mọi màn hình story chạm đều tính.
+    ``fan_in``: số story phụ thuộc vào story này (xem
+    ``complexity.fan_in_counts``) — một chiều của điểm cỡ.
     ``done``: story đã xong — cỡ story là phép kiểm **trước khi vào coding
     agent**; story đã qua cổng rồi thì chẻ nó không còn nghĩa gì (e9
     STORY-01-04 xong sau 8 lượt, cổng stories chặn lại cả kế hoạch vì nó).
@@ -599,10 +603,12 @@ def check_story(
     out = Preflight(story.id)
     out.needs = required_capabilities(story, project=project)
     qua_lon = None if (done and story.id in done) else story_size_defect(
-        story, project=project, config=cfg, owned=owned)
+        story, project=project, config=cfg, owned=owned, fan_in=fan_in)
     if qua_lon is not None:
+        # Chỉ vào `needs`: vòng dưới thấy `size` không nằm trong năng lực
+        # đã cấp và tự đưa nó sang `missing`. Thêm ở cả hai chỗ thì cổng in
+        # cùng một lỗi hai lần — đo trên kế hoạch thật e9.
         out.needs.append(qua_lon)
-        out.missing.append(qua_lon)
 
     for need in out.needs:
         cap = need.capability
@@ -641,53 +647,51 @@ def story_size_defect(
     project: Path,
     config: Config | None = None,
     owned: dict[str, str] | None = None,
+    fan_in: int = 0,
 ) -> Need | None:
-    """Story giao diện quá lớn cho **một phiên** — chẻ trước khi vào coding agent.
+    """Story quá lớn cho **một phiên** — chẻ trước khi vào coding agent.
 
-    Đo 2026-09-05 trên e9: STORY-01-04 (dựng `notes-list`, 11 trạng thái)
-    chạm `max_turns` ở lượt đầu (89 lượt) và cần 8 lượt, $79,67. Story
-    không màn hình cùng dự án: 57–61 lượt, 1–3 lượt. STORY-01-05 dựng
-    `note-editor` (7) + chạm `notes-list`: 72 lượt sau khi framework hết
-    lỗi. Số trạng thái lấy từ EXPERIENCE.md — có ở cổng `stories`, trước cả
-    mockup — nên chặn được từ lúc lập kế hoạch (P2-12). Màn hình story
-    khác đã dựng tính 1 (chạm lại), không tính cả số trạng thái.
+    Hai ngưỡng, và vượt **một trong hai** là chặn:
+
+    * `story.max_screen_states` (P2-12, giữ nguyên): trạng thái màn hình
+      story dựng đầu tiên. Đo 2026-09-05 trên e9 — STORY-01-04 (dựng
+      `notes-list`) chạm `max_turns` ở lượt đầu và cần 8 lượt, $79,67.
+    * `story.max_complexity` (ADR-004 R5): điểm tổng hợp năm chiều, xem
+      `control/complexity.py` — chiều màn hình một mình bỏ sót story
+      không giao diện mà vẫn 61 lượt (e9 01-01, 9 đường dẫn, 7 tiêu chí).
+
+    Điểm và cách chẻ đều **tất định**: cùng dữ liệu cho cùng kết luận, và
+    thông báo mang theo từng thành phần để người đọc kiểm lại được.
     """
-    if not story.screens:
-        return None
     cfg = config or Config(dict(DEFAULTS))
-    limit = int(cfg["story.max_screen_states"])
     exp = _experience(project)
-    per: list[tuple[str, int]] = []
-    for sid in story.screens:
-        scr = exp.by_id(sid) if exp is not None else None
-        cua_minh = owned is None or owned.get(sid, story.id) == story.id
-        per.append((sid, max(1, len(scr.states)) if (scr is not None and cua_minh) else 1))
-    total = sum(n for _, n in per)
-    if total <= limit:
+    sc = complexity.score_story(story, project=project, experience=exp,
+                                owned=owned, fan_in=fan_in)
+
+    states = sc.get("screen_states")
+    state_limit = int(cfg["story.max_screen_states"])
+    score_limit = float(cfg["story.max_complexity"])
+    qua_man = bool(story.screens) and states.count > state_limit
+    qua_diem = sc.total > score_limit
+    if not (qua_man or qua_diem):
         return None
-    detail = ", ".join(f"`{sid}` {n}" for sid, n in per)
+
+    ly_do = []
+    if qua_man:
+        ly_do.append(f"{states.count} trạng thái màn hình ({states.evidence}) "
+                     f"vượt `story.max_screen_states` = {state_limit}")
+    if qua_diem:
+        ly_do.append(f"điểm cỡ {sc.explain()} vượt `story.max_complexity` = {score_limit:g}")
     return Need(
         "size",
-        f"story dựng {len(per)} màn hình với {total} trạng thái ({detail}), "
-        f"vượt `story.max_screen_states` = {limit}",
-        "chẻ story: trạng thái chính của mỗi màn là một story, các trạng thái "
-        "phụ (rỗng, lỗi, offline, focus…) thành story sau; hoặc mỗi màn một story",
+        "; ".join(ly_do),
+        complexity.split_suggestion(story, sc, experience=exp, owned=owned),
         kind="story",
     )
 
 
 def _experience(project: Path | None):
-    if project is None:
-        return None
-    from .experience import parse_experience_file
-
-    path = Path(project) / "_bmad-output" / "EXPERIENCE.md"
-    if not path.is_file():
-        return None
-    try:
-        return parse_experience_file(path)
-    except (OSError, ValueError):
-        return None
+    return complexity.read_experience(project)
 
 
 def check_stories_executable(
@@ -700,9 +704,11 @@ def check_stories_executable(
     cfg = config or Config(dict(DEFAULTS))
     got = provisioned(Path(project), cfg)
     owned = screen_owners(stories)
+    fan_in = complexity.fan_in_counts(stories)
     done = _done_stories(Path(project))
     return [
-        check_story(s, project=Path(project), config=cfg, have=got, owned=owned, done=done)
+        check_story(s, project=Path(project), config=cfg, have=got, owned=owned,
+                    done=done, fan_in=fan_in.get(s.id, 0))
         for s in stories
     ]
 

@@ -25,6 +25,7 @@ from pathlib import Path
 
 from ..clients.base import ClientAdapter
 from ..config import Config
+from ..control import complexity
 from ..control.approvals import STORIES_INDEX
 from ..control.design_contract import load as load_contract
 from ..control.journal import (
@@ -281,15 +282,20 @@ def _run_wave(
     catalog,
     wave: WaveReport,
 ) -> None:
+    owned = screen_owners(plan.stories.values())
+    fan_in = complexity.fan_in_counts(plan.stories.values())
+
     def one(story_id: str) -> StoryOutcome:
         story = plan.stories[story_id]
+        co = complexity.score_story(story, project=project, owned=owned,
+                                    fan_in=fan_in.get(story_id, 0))
 
         # Chặn **trước** khi mở worktree và gọi model. Cổng `stories` đã
         # chấm cùng phép kiểm này, nhưng cấu hình dự án đổi được sau khi
         # cổng ấy duyệt — và một story không chạy được thì mọi đồng tiêu
         # cho nó là tiêu vào chỗ không thể qua.
-        pf = check_story(story, project=project, config=config,
-                         owned=screen_owners(plan.stories.values()))
+        pf = check_story(story, project=project, config=config, owned=owned,
+                         fan_in=fan_in.get(story_id, 0))
         if not pf.executable:
             out = StoryOutcome(story_id=story_id)
             out.blocked_reason = (
@@ -332,6 +338,14 @@ def _run_wave(
             tx.record("review.completed", blocked=[
                 f for a in outcome.attempts for f in a.review_findings
             ][:5])
+            # Hiệu chuẩn cổng cỡ story (ADR-004 R5): điểm dự đoán ↔ lượt
+            # developer thật. Ghi ở đây vì đây là chỗ đầu tiên biết cả hai,
+            # và evidence của story vừa được viết xong. Hỏng thì bỏ qua —
+            # một bảng hiệu chuẩn không đáng làm mất một lượt chạy.
+            try:
+                complexity.record(artifact_root, story, score=co, config=config)
+            except OSError as e:
+                print(f"hiệu chuẩn cỡ story {story_id}: {e}", file=sys.stderr)
 
             _safe_transition(state, story_id, StoryStatus.VERIFYING,
                              cost=outcome.cost_usd, attempts=outcome.quality_attempts)
