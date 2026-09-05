@@ -205,6 +205,25 @@ def cmd_doctor(args) -> int:
             required=False,
         )
 
+    # Guard framework thêm sau lần `compile` cuối thì hook cũ không biết —
+    # ví dụ `process-ref` (luật 6, 2026-09-05). Không kiểm thì guard mới chỉ
+    # có trong mã, không có trong phiên agent nào.
+    rep = project / "_bmad-output" / "compile-report.json"
+    if rep.is_file():
+        from .harness.guardrails import GUARD_MATCHERS
+
+        try:
+            data = json.loads(rep.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            data = {}
+        for c in data.get("clients", []):
+            thieu = sorted(set(GUARD_MATCHERS) - set(c.get("guards_wired") or []) - set(c.get("guards_post_hoc") or []))
+            check(
+                f"hook {c.get('client')} đủ guard", not thieu,
+                f"{len(GUARD_MATCHERS)} guard" if not thieu else
+                f"thiếu {', '.join(thieu)} — framework có guard mới sau lần biên dịch; chạy `aisdlc compile --client {c.get('client')}`",
+            )
+
     lech = _hook_paths_elsewhere(project)
     if lech is not None:
         check(

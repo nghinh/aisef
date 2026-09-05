@@ -600,3 +600,16 @@ class TestLenhChange(CliTestCase):
         self.assertEqual(code, 0, out)
         self.assertIn("STORY-CH-01", out)
         self.assertIn("write_scope", out)
+
+
+class TestDoctorHookThieuGuard(CliTestCase):
+    def test_old_compile_report_names_missing_guards(self):
+        import json
+        out_dir = self.project / "_bmad-output"; out_dir.mkdir(exist_ok=True)
+        (out_dir / "compile-report.json").write_text(json.dumps({"clients": [{"client": "claude", "written": [],
+            "guards_wired": ["completion", "destructive", "diff-scope", "git-stage", "injection", "secret", "write-scope"],
+            "guards_post_hoc": [], "blocks_at_source": True, "degradations": []}]}), encoding="utf-8")
+        code, out, _ = self.run_cli("doctor")
+        self.assertIn("hook claude đủ guard", out)
+        self.assertIn("process-ref", out)
+        self.assertIn("aisdlc compile", out)
