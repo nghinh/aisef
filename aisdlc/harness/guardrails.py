@@ -265,14 +265,22 @@ _REF_ALLOWED_DIRS = ("docs/", "_bmad-output/", ".ai/", ".claude/", ".opencode/",
 _REF_ALLOWED_SUFFIX = (".md", ".txt", ".json", ".yaml", ".yml", ".csv")
 
 
-def check_process_refs(content: str, path: str) -> Verdict:
+def check_process_refs(content: str, path: str, *, project_root: str = "") -> Verdict:
     """Luật 6: mã tham chiếu quy trình (`STORY-01-02`, `EPIC-01`) không được
     nằm trong mã nguồn. Test và tài liệu được phép — test còn bắt buộc mang
-    mã tiêu chí."""
+    mã tiêu chí. So thư mục trên đường dẫn **tương đối với gốc**: đường dẫn
+    tuyệt đối của worktree chứa `.aisdlc/worktrees/` và khớp nhầm bảng cho
+    phép (hợp quy C6 trên OpenCode, 2026-09-05)."""
     from ..control.impact import is_test_path
 
-    rel = path.replace("\\", "/").lstrip("./")
-    if any(seg in rel for seg in _REF_ALLOWED_DIRS) or rel.endswith(_REF_ALLOWED_SUFFIX) or is_test_path(rel):
+    rel = path.replace("\\", "/")
+    if project_root:
+        try:
+            rel = str(Path(rel).resolve().relative_to(Path(project_root).resolve()))
+        except ValueError:
+            pass
+    rel = rel.lstrip("./")
+    if any(rel.startswith(seg) for seg in _REF_ALLOWED_DIRS) or rel.endswith(_REF_ALLOWED_SUFFIX) or is_test_path(rel):
         return ALLOW
     hit = _PROCESS_REF.search(content or "")
     if not hit:
@@ -608,8 +616,11 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
     định** của chúng vẫn là hàm thuần, chỗ này chỉ đi lấy dữ liệu.
     """
     tool_input = event.get("tool_input") or {}
-    file_path = str(tool_input.get("file_path") or tool_input.get("path") or "")
-    content = str(tool_input.get("content") or tool_input.get("new_string") or "")
+    # Claude Code gửi `file_path`; OpenCode gửi `filePath` (đo hợp quy C6
+    # 2026-09-05: guard thấy đường dẫn rỗng → write-scope cho qua như "không
+    # phải thao tác lên file"). Tên khoá là chuyện của client, không phải của luật.
+    file_path = str(tool_input.get("file_path") or tool_input.get("filePath") or tool_input.get("path") or "")
+    content = str(tool_input.get("content") or tool_input.get("new_string") or tool_input.get("newString") or "")
     command = str(tool_input.get("command") or "")
 
     # Cây phải soi là cây agent đang đứng, không phải cây lúc biên dịch
@@ -652,7 +663,7 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
     if kind == "injection":
         return check_injection(content)
     if kind == "process-ref":
-        return check_process_refs(content, str(tool_input.get("file_path") or ""))
+        return check_process_refs(content, file_path, project_root=root)
     if kind == "git-stage":
         return check_git_stage(command)
     if kind == "destructive":

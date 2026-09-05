@@ -898,3 +898,36 @@ class TestLuat6MaQuyTrinhTrongNguon(unittest.TestCase):
                                       "tool_input": {"file_path": "src/a.ts", "content": "// EPIC-01"}},
                       project_root="/tmp/x", env={})
         self.assertFalse(v.allowed)
+
+
+class TestTenKhoaDuongDanTheoClient(unittest.TestCase):
+    """Hợp quy C6 2026-09-05: OpenCode gửi `filePath`; guard đọc `file_path` →
+    rỗng → write-scope cho qua. Mọi guard theo đường dẫn phải thấy cả hai."""
+
+    def _ev(self, key, path, content="x"):
+        return {"cwd": "/tmp/x", "tool_name": "write", "tool_input": {key: path, "content": content}}
+
+    def test_write_scope_sees_opencode_key(self):
+        from aisdlc.harness.guardrails import ENV_WRITE_SCOPE, run_guard
+        env = {ENV_WRITE_SCOPE: "src"}
+        self.assertFalse(run_guard("write-scope", self._ev("filePath", "/tmp/x/docs/ngoai.md"), project_root="/tmp/x", env=env).allowed)
+        self.assertFalse(run_guard("write-scope", self._ev("file_path", "/tmp/x/docs/ngoai.md"), project_root="/tmp/x", env=env).allowed)
+        self.assertTrue(run_guard("write-scope", self._ev("filePath", "/tmp/x/src/a.js"), project_root="/tmp/x", env=env).allowed)
+
+    def test_process_ref_sees_opencode_key(self):
+        from aisdlc.harness.guardrails import run_guard
+        ok = run_guard("process-ref", self._ev("filePath", "/tmp/x/src/a.test.js", "test('AC-STORY-01-01-1', () => {})"), project_root="/tmp/x", env={})
+        self.assertTrue(ok.allowed)
+
+
+class TestLuat6DuongDanTuyetDoi(unittest.TestCase):
+    """Đường dẫn tuyệt đối của worktree chứa `.aisdlc/worktrees/` — không được
+    vì thế mà thành "artifact của harness"."""
+
+    def test_absolute_worktree_source_is_still_blocked(self):
+        from aisdlc.harness.guardrails import check_process_refs
+        root = "/tmp/du-an/.aisdlc/worktrees/S-1"
+        v = check_process_refs("// STORY-01-01\n", f"{root}/src/ghi-chu.js", project_root=root)
+        self.assertFalse(v.allowed)
+        self.assertTrue(check_process_refs("STORY-01-01", f"{root}/docs/x.md", project_root=root).allowed)
+        self.assertTrue(check_process_refs("STORY-01-01", f"{root}/.aisdlc/x.json", project_root=root).allowed)

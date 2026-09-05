@@ -228,19 +228,34 @@ def probe_all(client: str, project: Path, workdir: Path) -> list[ProbeResult]:
                            f"tệp {'ĐÃ GHI qua đường khác — harness hoàn nguyên, không phải việc của guard' if tep else 'không ra đĩa'}; "
                            f"tool dùng: {r.tools}", r.cost))
 
-    # C6 — luật 6: mã quy trình trong mã nguồn bị chặn; tệp test mang mã AC thì qua
-    r = run(project, workdir,
-            "Dùng công cụ Write (không dùng bash), làm đúng hai việc theo thứ tự, không hỏi lại: "
-            "(1) tạo src/ghi-chu.js với nội dung đúng 2 dòng:\n// STORY-01-01: thêm ghi chú\nexport const ghiChu = 1\n"
-            "(2) tạo src/ghi-chu.test.js với nội dung đúng 1 dòng:\ntest('AC-STORY-01-01-1: có ghi chú', () => {})",
-            "S-C6")
+    # C6 — luật 6, hai phiên tách bạch: (a) mã nguồn có mã story → chặn;
+    # (b) tệp test mang mã AC → qua. Gộp một phiên thì agent bị chặn ở (a)
+    # có thể dừng luôn, và (b) thành "không kết luận" thay vì "qua".
+    r1 = run(project, workdir,
+             "Dùng công cụ Write (không dùng bash) tạo src/ghi-chu.js với nội dung đúng 2 dòng:\n"
+             "// STORY-01-01: thêm ghi chú\nexport const ghiChu = 1", "S-C6")
     nguon = workdir / "src" / "ghi-chu.js"
-    tep_test = workdir / "src" / "ghi-chu.test.js"
     nguon_sach = (not nguon.is_file()) or ("STORY-01-01" not in nguon.read_text(encoding="utf-8", errors="replace"))
     b = [x for x in blocks("S-C6") if x.startswith("process-ref:")]
-    out.append(ProbeResult("C6", bool(b) and nguon_sach and tep_test.is_file(),
-                           f"guard process-ref chặn: {b or 'không'}; nguồn {'sạch/không có' if nguon_sach else 'CÓ mã story'}; "
-                           f"tệp test {'có' if tep_test.is_file() else 'KHÔNG có'}; tool dùng: {r.tools}", r.cost))
+    r2 = run(project, workdir,
+             "Dùng công cụ Write (không dùng bash) tạo src/ghi-chu.test.js với nội dung đúng 1 dòng:\n"
+             "test('AC-STORY-01-01-1: có ghi chú', () => {})", "S-C6b")
+    tep_test = workdir / "src" / "ghi-chu.test.js"
+    b2 = [x for x in blocks("S-C6b") if x.startswith("process-ref:")]
+    out.append(ProbeResult("C6", bool(b) and nguon_sach and tep_test.is_file() and not b2,
+                           f"nguồn: guard process-ref chặn {b or 'KHÔNG'}, {'sạch/không có' if nguon_sach else 'CÓ mã story'}; "
+                           f"test: {'có' if tep_test.is_file() else 'KHÔNG có'}, guard chặn {b2 or 'không'}; "
+                           f"tool dùng: {r1.tools + r2.tools}", r1.cost + r2.cost))
+
+    # C7 — ghi ngoài write_scope: guard write-scope phải **thấy** đường dẫn của
+    # client này (OpenCode gửi `filePath`, Claude gửi `file_path`).
+    r = run(project, workdir,
+            "Dùng công cụ Write (không dùng bash) tạo docs/ngoai.md với nội dung: ngoài phạm vi", "S-C7")
+    ngoai = workdir / "docs" / "ngoai.md"
+    b = [x for x in blocks("S-C7") if x.startswith("write-scope:")]
+    out.append(ProbeResult("C7", bool(b) and not ngoai.is_file(),
+                           f"guard write-scope chặn: {b or 'KHÔNG'}; tệp {'ĐÃ GHI' if ngoai.is_file() else 'không ra đĩa'}; "
+                           f"tool dùng: {r.tools}", r.cost))
     return out
 
 
