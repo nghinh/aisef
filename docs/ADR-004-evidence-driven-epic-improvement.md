@@ -497,6 +497,8 @@ chặn) vẫn làm hành vi gốc VERIFIED trong sổ dù code chưa merge — s
 
 Dừng đúng điều kiện (2): đủ `improve.max_loops`. Bất biến (b) giữ: cả hai story sửa có `worktree.created`, `handoff developer→reviewer→security`, `merge.completed`; cổng đủ 16 mục, *bảo toàn* 33 hành vi story khác còn xanh. Sổ toàn dự án 42 → 46 VERIFIED, 18 → 16 GAP, 0 REOPENED. Dự báo "dừng ở bế tắc vì reporter" **sai**: gap của 01-01 là test không mang mã, developer gắn mã trong phạm vi được (`vite.config.ts` thuộc write_scope 01-01). Cả hai vòng trượt lượt 1 ở *không làm đỏ test có sẵn* ("mất 1 test": developer đổi cả tiêu đề lá khi gắn mã) rồi lượt 2 trả tên cũ, chỉ thêm mã — feedback R9 làm đúng việc, giá ≈ $3–5 mỗi vòng. Chi phí một vòng ≈ $8,5 ≈ 1/5 story trung bình EPIC-01 ($70) → AC "≤ 1 story/vòng" đạt; cải thiện biên +1/vòng, chưa thấy phẳng.
 
+**Lỗi 25 (R3 × cổng người), lộ khi gọi `improve` lần hai (05:44):** story sửa ghi vào `stories.index.json` làm phê duyệt `stories`/`readiness` stale → lần gọi kế bị chặn bởi chính vòng trước. Sửa: `approvals._artifact_hash` băm chỉ mục chuẩn hoá và bỏ `STORY-RP-*`/`EPIC-RP-*` (story sửa do cổng `improve` quản); một lần duyệt lại cho dự án đã có phê duyệt cũ (e9 làm 05:5x). Test `TestStorySuaKhongLamStaleCongStories`.
+
 **Chưa đo:** đường cong nhiều vòng hơn (còn 15 gap; kỳ vọng phẳng khi tới các gap cần route/màn hình của story sau), và B3/B5/B6 trên `par`.
 
 **Chưa đo (B1):** e9 EPIC-01 với agent thật — ΔVERIFIED, REOPENED → 0,
