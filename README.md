@@ -117,7 +117,7 @@ là client **hạng hai** theo quyết định V1: guard chặn được (hợp 
 
 ## Lỗi thật đã gặp
 
-Mười tám lỗi tìm bằng đo trên agent thật, xếp theo bảy lớp nguyên nhân kèm phép hồi quy: `docs/FAILURE-TAXONOMY.md`. Lỗi mới thì thêm một dòng vào đó cùng commit với test.
+Mười chín lỗi tìm bằng đo trên agent thật, xếp theo bảy lớp nguyên nhân kèm phép hồi quy: `docs/FAILURE-TAXONOMY.md`. Lỗi mới thì thêm một dòng vào đó cùng commit với test.
 
 ## Hợp quy client
 

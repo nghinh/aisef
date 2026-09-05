@@ -32,8 +32,17 @@ _NFR_ITEM = re.compile(
     r"^[-*]\s+\*\*(NFR-\d+)\s*[—–-]\s*(.+?)\.?\*\*\s*(.*)$", re.MULTILINE
 )
 
+#: Tiêu đề khối tiêu chí — agent viết bằng tiếng Anh hoặc tiếng Việt tuỳ lượt
+#: (lỗi 19, 2026-09-05: lượt `plan` thứ hai viết "Hệ quả kiểm chứng được" và
+#: cổng PRD loại cả 14 FR vì parser chỉ biết "Consequences (testable)").
+_CONSEQUENCES_HEAD = (
+    r"(?:Consequences\s*\(testable\)|Testable consequences|Acceptance criteria"
+    r"|Hệ quả kiểm chứng được|Hệ quả \(kiểm chứng được\)|Tiêu chí kiểm chứng(?: được)?"
+    r"|Tiêu chí chấp nhận)"
+)
 _CONSEQUENCES = re.compile(
-    r"\*\*Consequences \(testable\)\s*[:：]\*\*\s*\n(.*?)(?=\n#{2,5}\s|\n\*\*|\Z)",
+    r"\*\*" + _CONSEQUENCES_HEAD + r"\s*[:：]\*\*\s*\n(.*?)(?=\n#{2,5}\s|\n\*\*|\Z)",
+    re.IGNORECASE |
     re.DOTALL,
 )
 _BULLET = re.compile(r"^[-*]\s+(.+?)\s*$", re.MULTILINE)
