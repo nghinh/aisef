@@ -122,6 +122,31 @@ phát hành của chính kho này đọc bảng đó bằng code
 hai trong V1 — có cột, không chặn. CI: `.github/workflows/conformance.yml`
 chạy tuần.
 
+## Phát hành
+
+Gói tên `ai-sdlc`, phát hành khi hoàn tất đợt 4 (quyết định 2026-09-05).
+Điều kiện đọc bằng lệnh, không bằng cảm giác:
+
+```bash
+python3 -m unittest discover -s tests -q && AISDLC_RELEASE=1 python3 -m unittest tests.test_release_gate -q
+```
+
+```bash
+uv build && uvx twine check dist/*
+```
+
+`.github/workflows/release.yml` publish bằng *trusted publishing* khi đẩy tag
+`v*` — không có token nào trong kho. Việc làm **một lần bằng tay**, bằng tài
+khoản tổ chức: tạo project `ai-sdlc` trên PyPI và khai trusted publisher
+(kho này · workflow `release.yml` · environment `pypi`). Sau đó:
+
+```bash
+git tag v0.1.0 && git push --tags
+```
+
+Kho hồi quy dogfood (`tests/dogfood/`, bật bằng `AISDLC_DOGFOOD=1`) dựng lại
+dự án thử `par` từ đầu vào trong kho và so với mốc đã đo — chạy trước mỗi tag.
+
 ## Khi cổng chặn
 
 Cổng chặn là framework đang làm việc, không phải framework hỏng. Ba ca hay

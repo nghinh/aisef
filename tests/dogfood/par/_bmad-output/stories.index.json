@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "epics": [
+    {
+      "id": "EPIC-01",
+      "title": "Ba hàm chuỗi"
+    }
+  ],
+  "stories": [
+    {
+      "id": "STORY-01-01",
+      "epic_id": "EPIC-01",
+      "title": "Đưa chuỗi về slug",
+      "as_a": "người dùng thư viện",
+      "i_want": "gọi `slugify`",
+      "so_that": "khỏi tự viết",
+      "acceptance_criteria": [
+        "Given một chuỗi bất kỳ, When gọi `slugify`, Then kết quả đúng đặc tả FR ở docs/requirements.md",
+        "Given chuỗi rỗng, When gọi `slugify`, Then không ném lỗi"
+      ],
+      "covers": [
+        "FR-1"
+      ],
+      "write_scope": [
+        "src/slugify.js",
+        "src/slugify.test.js"
+      ],
+      "depends_on": [],
+      "screens": [],
+      "verification_contract": [
+        "unit"
+      ],
+      "file": "stories/STORY-01-01.md"
+    },
+    {
+      "id": "STORY-01-02",
+      "epic_id": "EPIC-01",
+      "title": "Cắt chuỗi có dấu ba chấm",
+      "as_a": "người dùng thư viện",
+      "i_want": "gọi `truncate`",
+      "so_that": "khỏi tự viết",
+      "acceptance_criteria": [
+        "Given một chuỗi bất kỳ, When gọi `truncate`, Then kết quả đúng đặc tả FR ở docs/requirements.md",
+        "Given chuỗi rỗng, When gọi `truncate`, Then không ném lỗi"
+      ],
+      "covers": [
+        "FR-2"
+      ],
+      "write_scope": [
+        "src/truncate.js",
+        "src/truncate.test.js"
+      ],
+      "depends_on": [],
+      "screens": [],
+      "verification_contract": [
+        "unit"
+      ],
+      "file": "stories/STORY-01-02.md"
+    },
+    {
+      "id": "STORY-01-03",
+      "epic_id": "EPIC-01",
+      "title": "Đếm số từ",
+      "as_a": "người dùng thư viện",
+      "i_want": "gọi `wordCount`",
+      "so_that": "khỏi tự viết",
+      "acceptance_criteria": [
+        "Given một chuỗi bất kỳ, When gọi `wordCount`, Then kết quả đúng đặc tả FR ở docs/requirements.md",
+        "Given chuỗi rỗng, When gọi `wordCount`, Then không ném lỗi"
+      ],
+      "covers": [
+        "FR-3"
+      ],
+      "write_scope": [
+        "src/word-count.js",
+        "src/word-count.test.js"
+      ],
+      "depends_on": [],
+      "screens": [],
+      "verification_contract": [
+        "unit"
+      ],
+      "file": "stories/STORY-01-03.md"
+    }
+  ],
+  "waves": {
+    "EPIC-01": [
+      [
+        "STORY-01-01",
+        "STORY-01-02",
+        "STORY-01-03"
+      ]
+    ]
+  }
+}

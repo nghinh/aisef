@@ -791,3 +791,23 @@ class TestGoiBanGiaoDuocGhi(ImplementTestCase):
                 self.assertNotIn("agent", nguon.values(), nguon)
                 self.assertNotIn("?", nguon.values(), nguon)
                 self.assertIn("diff_summary", nguon)
+
+
+class TestHarnessKhaiGocDuAn(ImplementTestCase):
+    def test_every_role_gets_the_project_root_in_env(self):
+        from aisdlc.harness.guardrails import ENV_PROJECT
+
+        class Ghi(ScriptedClient):
+            def __init__(self):
+                super().__init__()
+                self.specs = []
+
+            def run(self, spec):
+                self.specs.append(spec)
+                return super().run(spec)
+
+        client = Ghi()
+        self.implement(client)
+        self.assertTrue(client.specs, "không có lượt nào")
+        for spec in client.specs:
+            self.assertEqual(spec.env.get(ENV_PROJECT), str(self.project), spec.env)

@@ -824,3 +824,14 @@ class TestNhipTimVaBashGhiFile(unittest.TestCase):
         for _ in range(3):
             record_outcome("diff-scope", self.bash(), ALLOW, env=self.env, artifact_root=str(self.root))
         self.assertEqual(len(self.store.read("S-01").of("file_change")), 1)
+
+
+class TestGocDuAnTuEnv(unittest.TestCase):
+    """P0-1: hook ghim `--project` tuyệt đối; dự án chép/di chuyển thì guard ghi
+    bằng chứng vào dự án cũ. Harness khai gốc qua env, env thắng."""
+
+    def test_env_wins_over_compiled_project(self):
+        from aisdlc.harness.guardrails import ENV_PROJECT, project_root_from
+        self.assertEqual(project_root_from({ENV_PROJECT: "/b"}, "/a"), "/b")
+        self.assertEqual(project_root_from({}, "/a"), "/a")
+        self.assertEqual(project_root_from({ENV_PROJECT: "  "}, "/a"), "/a")

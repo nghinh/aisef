@@ -529,3 +529,26 @@ class TestStatusCanhBaoNguCanhPhinh(CliTestCase):
             ev.agent_run(sid, RunResult(ok=True, text="x"), name=f"{sid}#1", prompt_chars=chars)
         code, out, _ = self.run_cli("status")
         self.assertNotIn("nạp ngữ cảnh hơn", out)
+
+
+class TestDoctorHookTroDungDuAn(CliTestCase):
+    """P0-1: hook trỏ sang dự án khác phải là ✗ — guard sẽ ghi bằng chứng sai chủ."""
+
+    def _hook(self, project_path: str):
+        import json
+        (self.project / ".claude").mkdir(exist_ok=True)
+        (self.project / ".claude" / "settings.json").write_text(json.dumps({"hooks": {"Stop": [
+            {"matcher": "", "hooks": [{"type": "command", "command": f"aisdlc --project {project_path} guard completion"}]}]}}),
+            encoding="utf-8")
+
+    def test_lech_thi_do(self):
+        self._hook("/tmp/du-an-khac")
+        code, out, _ = self.run_cli("doctor")
+        self.assertIn("hook trỏ đúng dự án", out)
+        self.assertIn("/tmp/du-an-khac", out)
+        self.assertIn("compile", out)
+
+    def test_khop_thi_xanh(self):
+        self._hook(str(self.project))
+        code, out, _ = self.run_cli("doctor")
+        self.assertIn("✅ hook trỏ đúng dự án", out)

@@ -19,3 +19,4 @@ spike/**/package-lock.json
 
 # tạo tác của lượt hợp quy client (giữ để tra, không commit)
 .conformance/
+.dogfood/

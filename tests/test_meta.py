@@ -104,3 +104,19 @@ class TestNangLucKhaiEmulatedPhaiCoMaMoPhong(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestTaiLieuTroVaoMaCoThat(unittest.TestCase):
+    """R4: SOLUTION/README nhắc `kit/agents/`, `kit/mcp/`, `control/fsm.py`,
+    `phases/ship`… không tồn tại. Tài liệu nêu đường dẫn nào thì đường dẫn ấy
+    phải có thật — không thì bảng kiến trúc là lời kể."""
+
+    def test_moi_duong_dan_module_trong_tai_lieu_ton_tai(self):
+        rx = re.compile(r"`((?:aisdlc/)?(?:kit|harness|control|phases|clients)/[A-Za-z0-9_./-]+)`")
+        for doc in ("docs/SOLUTION.md", "README.md"):
+            text = (ROOT / doc).read_text(encoding="utf-8")
+            for ref in sorted(set(rx.findall(text))):
+                rel = (ref if ref.startswith("aisdlc/") else "aisdlc/" + ref).rstrip("/")
+                with self.subTest(doc=doc, path=ref):
+                    self.assertTrue((ROOT / rel).exists() or (ROOT / (rel + ".py")).exists(),
+                                    f"{doc} nhắc `{ref}` nhưng không có trong cây mã")

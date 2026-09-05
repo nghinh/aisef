@@ -37,6 +37,10 @@ ENV_WORKDIR = "AISDLC_WORKDIR"
 #: được code. Cấm ở guard thì mọi client đều cấm, và Claude có thêm một
 #: lớp phòng khi cờ bị bỏ quên.
 ENV_DISALLOWED_TOOLS = "AISDLC_DISALLOWED_TOOLS"
+#: Gốc dự án — harness khai qua env. Hook biên dịch ghim `--project` tuyệt
+#: đối; dự án bị chép/di chuyển thì guard vẫn chạy nhưng ghi bằng chứng vào
+#: dự án cũ (đo A/B `par-A` 2026-09-05: 4 lượt trượt "guard có chạy" sai).
+ENV_PROJECT = "AISDLC_PROJECT"
 
 #: Phạm vi ghi khi **không** ở trong một story: các pha lập kế hoạch và
 #: dựng mockup. Chúng có phạm vi cố định và biết trước, nên guard vẫn có
@@ -469,6 +473,12 @@ def check_completion(evidence) -> Verdict:
             f"rồi mới kết thúc.",
         )
     return ALLOW
+
+
+def project_root_from(env: dict[str, str] | None, fallback: str) -> str:
+    """Gốc dự án cho guard: env của harness thắng, `--project` biên dịch là dự phòng."""
+    goc = (env if env is not None else os.environ).get(ENV_PROJECT, "").strip()
+    return goc or fallback
 
 
 def scope_from_env(env: dict[str, str] | None = None) -> list[str]:

@@ -95,14 +95,14 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 |---|---|
 | Hiến pháp kỹ thuật | `kit/constitution/` → compile ra `CLAUDE.md` · `AGENTS.md` · `GEMINI.md` |
 | Skill files | `kit/skills/` — 12 tự viết + import có pin: BMAD 22, superpowers 10, ui-ux 7, security (mục 8), karpathy 1 |
-| Sub-agent prompts | `kit/agents/` — 13 agent |
+| Vai agent | `harness/routing.py` — 4 vai (developer · reviewer · security · designer), mỗi vai một phiên mới, prompt trong `kit/prompts/`; không có thư mục agent riêng |
 | PromptCatalog | `kit/prompts/` — prompt vận hành từng pha, có version, có test |
 
 ### 5.2 Tools
 | Hạng mục | Hiện thực |
 |---|---|
 | Tool thật | `harness/tools.py` — `read_file` `write_file` `run_test` `run_lint` `run_sast` `run_scan` `git_commit` `screenshot` |
-| MCP | `kit/mcp/` — context7 · serena · playwright ở chế độ **cli/on-demand**, không bật mặc định |
+| MCP | không có — quyết định V1: không MCP thường trú; playwright dùng qua CLI trong `harness/browser.py`, tra cứu tài liệu theo yêu cầu là việc đợt 5 (`aisdlc doc`) |
 | **Prose quanh tool** | mỗi tool có mục "khi nào gọi / cách đọc kết quả / khi nào KHÔNG gọi" |
 
 ### 5.3 Sandboxes & execution environments
@@ -121,7 +121,7 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 | Định tuyến model | `harness/routing.py` — theo vai; **reviewer ≠ developer** |
 | Sinh sub-agent | không có — mỗi vai là một phiên riêng do harness gọi (`harness/routing.py`); xem ADR-003 #15 |
 | Bàn giao | `next` → `implement` → `verify` → `review` → `complete` |
-| Luật kích hoạt | `control/fsm.py` + `control/scheduler.py` ✅ **đã xong** |
+| Luật kích hoạt | `control/state.py` (FSM `PENDING → RUNNING → VERIFYING → VERIFIED → DONE`) + `control/scheduler.py` (đợt theo phụ thuộc và phạm vi ghi) ✅ **đã xong** |
 
 ### 5.5 Guardrails / Hooks
 | Mốc | Guard | Chặn gì |
@@ -630,8 +630,8 @@ aisdlc/control/scheduler.py     epic tuần tự, story song song theo đợt
 | 3 | `phases/plan` + normalizer + story splitter | 3 skill BMAD pipeline |
 | 4 | `phases/mockup` + contract extract | 2 skill mockup |
 | 5–6 | `harness/` 6 nhóm + `guardrails` 7 guard | PromptCatalog · 3 agent |
-| 7 | `evidence` · `gate` · `phases/verify` | 5 agent kiểm định |
-| 8 | `phases/ship` | 3 agent DevSecOps · runbook |
+| 7 | `harness/observe.py` · `control/gate.py` · `phases/qa.py` | kiểm định theo hợp đồng story |
+| 8 | `phases/deploy.py` | DevSecOps · runbook · cổng trước triển khai |
 | 9 | chạy đầu-cuối trên dự án mẫu | hiệu chỉnh |
 
 **≈ 9 tuần.** Bản 1 ghi 8 tuần vì quên phần viết nội dung (12 skill + 13 agent prompt).

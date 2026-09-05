@@ -53,6 +53,24 @@ _GATE_MARK = {
 }
 
 
+def _hook_paths_elsewhere(project: Path) -> list[str] | None:
+    """Đường dẫn dự án ghi trong hook/plugin biên dịch mà **khác** dự án này.
+    None khi không có hook nào để so."""
+    import re as _re
+
+    goc = project.resolve()
+    thay: list[str] = []
+    hook = project / ".claude" / "settings.json"
+    if hook.is_file():
+        thay += _re.findall(r"--project\s+(\S+)\s+guard", hook.read_text(encoding="utf-8", errors="replace"))
+    plugin = project / ".opencode" / "plugin" / "aisdlc-guard.ts"
+    if plugin.is_file():
+        thay += _re.findall(r'const PROJECT = "([^"]+)"', plugin.read_text(encoding="utf-8", errors="replace"))
+    if not thay:
+        return None
+    return sorted({p for p in thay if Path(p).resolve() != goc})
+
+
 def _artifact_root(args) -> Path:
     """Gốc artifact — **một** gốc cho cả dự án (bất biến 2).
 
@@ -185,6 +203,15 @@ def cmd_doctor(args) -> int:
             "truyền `--settings` tường minh, cổng story mục \"guard có chạy\" sẽ "
             "trượt nếu hook không tới",
             required=False,
+        )
+
+    lech = _hook_paths_elsewhere(project)
+    if lech is not None:
+        check(
+            "hook trỏ đúng dự án", not lech,
+            "đường dẫn `--project`/`PROJECT` trong hook khớp thư mục này" if not lech else
+            f"hook trỏ sang {', '.join(lech[:2])} — dự án bị chép/di chuyển? guard sẽ ghi bằng "
+            "chứng vào dự án ấy; chạy `aisdlc compile` lại",
         )
 
     try:
@@ -600,7 +627,13 @@ def cmd_guard(args) -> int:
     """
     import json
 
-    from .harness.guardrails import record_outcome, run_guard
+    from .control.worktree import main_repo
+    from .harness.guardrails import project_root_from, record_outcome, run_guard
+
+    # Gốc dự án: harness khai qua env; `--project` biên dịch chỉ là dự phòng —
+    # dự án bị chép/di chuyển thì hook vẫn ghim đường dẫn cũ (P0-1, 2026-09-05).
+    goc = Path(project_root_from(None, str(args.project))).resolve()
+    artifact_root = main_repo(goc) / ARTIFACT_ROOT
 
     try:
         raw = sys.stdin.read()
@@ -615,8 +648,8 @@ def cmd_guard(args) -> int:
         verdict = run_guard(
             args.kind,
             event,
-            project_root=str(Path(args.project).resolve()),
-            artifact_root=str(_artifact_root(args)),
+            project_root=str(goc),
+            artifact_root=str(artifact_root),
         )
     except ValueError as e:
         print(f"guard: {e}", file=sys.stderr)
@@ -626,9 +659,7 @@ def cmd_guard(args) -> int:
     # `guard_blocked` và `FILE_CHANGE` không còn phụ thuộc client có phát
     # luồng sự kiện hay không. Ghi hỏng không được làm hỏng phán quyết.
     try:
-        record_outcome(
-            args.kind, event, verdict, artifact_root=str(_artifact_root(args))
-        )
+        record_outcome(args.kind, event, verdict, artifact_root=str(artifact_root))
     except OSError as e:
         print(f"guard: không ghi được bằng chứng ({e})", file=sys.stderr)
 

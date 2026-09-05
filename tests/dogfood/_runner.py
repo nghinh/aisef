@@ -1,0 +1,92 @@
+"""Kho hồi quy dogfood (R5): dựng lại dự án thử **từ đầu vào trong kho**, chạy
+thật, so với mốc. Không dùng bản scratch — bản scratch không lặp lại được.
+
+Bật bằng ``AISDLC_DOGFOOD=1`` (tốn tiền thật: `par` EPIC-01 ≈ $3–6).
+Đầu vào của `par` là 4 tệp ở commit `9adfb59` của dự án thử + cấu hình
+(`.claude/` **không** commit — đúng kịch bản G4). Mốc so sánh (đo 2026-09-05,
+3 story song song, Claude): 3/3 qua ở lượt đầu, $3,14.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(ROOT))
+
+ENABLED = os.environ.get("AISDLC_DOGFOOD") == "1"
+KEEP_DIR = Path(os.environ.get("AISDLC_DOGFOOD_DIR") or (ROOT / ".dogfood"))
+INPUTS = Path(__file__).parent
+
+#: Mốc `par` EPIC-01 — đo 2026-09-05 (commit `f0342e9`, 3 story, wave 1).
+PAR_BASELINE_USD = 3.14
+
+
+def _git(cwd: Path, *args: str) -> str:
+    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True).stdout.strip()
+
+
+def make_project(name: str) -> Path:
+    """Chép đầu vào, `git init`, commit nền, biên dịch hook Claude (không commit)."""
+    from aisdlc.clients.compile import compile_for, write_compile_report
+
+    dst = KEEP_DIR / name
+    shutil.rmtree(dst, ignore_errors=True)
+    shutil.copytree(INPUTS / name, dst)
+    subprocess.run(["git", "init", "-q", "-b", "main"], cwd=dst, check=True)
+    subprocess.run(["git", "config", "user.email", "dogfood@aisdlc"], cwd=dst, check=True)
+    subprocess.run(["git", "config", "user.name", "dogfood"], cwd=dst, check=True)
+    subprocess.run(["git", "add", "-A"], cwd=dst, check=True)
+    subprocess.run(["git", "commit", "-qm", "nền: đầu vào dogfood"], cwd=dst, check=True)
+    rep = compile_for("claude", dst, aisdlc_bin=str(ROOT / "bin" / "aisdlc"))
+    write_compile_report(dst, [rep])
+    return dst
+
+
+def clean_env() -> dict[str, str]:
+    """Không thừa hưởng `CLAUDE*` của phiên gọi (hợp quy C3)."""
+    return {k: v for k, v in os.environ.items() if not k.startswith("CLAUDE")}
+
+
+def run_epic(project: Path, epic: str, *, client: str = "claude") -> str:
+    proc = subprocess.run(
+        [str(ROOT / "bin" / "aisdlc"), "run", "--epic", epic, "--client", client, "--force"],
+        cwd=project, capture_output=True, text=True, env=clean_env(), timeout=3600,
+    )
+    (project / "_bmad-output" / "dogfood-run.log").write_text(proc.stdout + "\n--- stderr ---\n" + proc.stderr, encoding="utf-8")
+    return proc.stdout
+
+
+def milestones(project: Path, story_ids: list[str]) -> dict:
+    """Đọc từ đĩa: trạng thái, số lượt, chi phí, merge, mã tiêu chí, HANDOFF."""
+    from aisdlc.harness.observe import AGENT_RUN, HANDOFF, TOOL_RUN, EvidenceStore
+    from aisdlc.control.acceptance import missing as ac_missing
+
+    root = project / "_bmad-output"
+    st = json.loads((root / "sprint-status.json").read_text(encoding="utf-8"))["stories"]
+    idx = {s["id"]: s for s in json.loads((root / "stories.index.json").read_text(encoding="utf-8"))["stories"]}
+    ev = EvidenceStore(root)
+    out = {"stories": {}, "cost_usd": 0.0}
+    for sid in story_ids:
+        e = ev.read(sid)
+        xanh = [x for x in e.of(TOOL_RUN, "test") if x.ok]
+        ids = list(xanh[-1].detail.get("test_ids") or []) if xanh else []
+        n_ac = len(idx[sid].get("acceptance_criteria") or [])
+        out["stories"][sid] = {
+            "status": st.get(sid, {}).get("status"),
+            "attempts": st.get(sid, {}).get("attempts"),
+            "cost_usd": e.total_cost_usd,
+            "runs": len(e.of(AGENT_RUN)),
+            "ac_missing": ac_missing(sid, n_ac, ids),
+            "handoffs": len(e.of(HANDOFF)),
+        }
+        out["cost_usd"] += e.total_cost_usd
+    # `main` chỉ đổi qua merge: mọi commit trên main ngoài commit nền phải là merge
+    logs = _git(project, "log", "--format=%H %P", "main").splitlines()
+    out["non_merge_after_base"] = [l.split()[0][:8] for l in logs[:-1] if len(l.split()) < 3]
+    return out

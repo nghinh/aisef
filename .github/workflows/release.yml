@@ -1,0 +1,48 @@
+# Phát hành lên PyPI khi đẩy tag `v*` — dùng *trusted publishing* (OIDC),
+# không có token nào nằm trong kho hay trong secrets. Quyết định 2026-09-05:
+# tên gói `ai-sdlc`, tài khoản tổ chức; publish khi hoàn tất đợt 4.
+#
+# Việc phải làm một lần bằng tay (không tự động hoá được): trên PyPI, tài
+# khoản tổ chức tạo project `ai-sdlc` và thêm "trusted publisher" trỏ tới
+# kho này, workflow `release.yml`, environment `pypi`. Sau đó `git tag v0.1.0
+# && git push --tags` là đủ.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Kiểm phát hành (unit + bảng hợp quy còn mới)
+        run: |
+          python -m unittest discover -s tests -q
+          AISDLC_RELEASE=1 python -m unittest tests.test_release_gate -q
+      - name: Build
+        run: |
+          python -m pip install --upgrade build twine
+          python -m build
+          python -m twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write   # OIDC cho trusted publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

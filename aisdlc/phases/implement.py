@@ -38,6 +38,7 @@ from ..harness import mockup_verify
 from ..clients.compile import guard_expected
 from ..harness.guardrails import (
     ENV_DISALLOWED_TOOLS,
+    ENV_PROJECT,
     ENV_WORKDIR,
     ENV_BASE_REF,
     ENV_STORY_ID,
@@ -250,6 +251,7 @@ def run_attempt(
         ENV_STORY_ID: story.id,
         ENV_BASE_REF: base_ref,
         ENV_WORKDIR: str(workdir),
+        ENV_PROJECT: str(project),
     }
 
     # Cách ly là thứ **phải kiểm**, không phải thứ giả định. Worktree ngăn
@@ -511,6 +513,7 @@ def review_story(
         ENV_WRITE_SCOPE: ",".join(effective_write_scope(story, project)),
         ENV_BASE_REF: base_ref,
         ENV_WORKDIR: str(workdir),
+        ENV_PROJECT: str(project),
         ENV_DISALLOWED_TOOLS: ",".join(ROLES[REVIEWER].disallowed_tools),
     }
 
@@ -595,6 +598,7 @@ def security_review(
         ENV_WRITE_SCOPE: ",".join(effective_write_scope(story, project)),
         ENV_BASE_REF: base_ref,
         ENV_WORKDIR: str(workdir),
+        ENV_PROJECT: str(project),
         ENV_DISALLOWED_TOOLS: ",".join(ROLES[SECURITY].disallowed_tools),
     }
     _attach_settings(spec, project)
