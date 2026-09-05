@@ -79,6 +79,34 @@ class TestComponents(unittest.TestCase):
         self.assertEqual(complexity.score_story(s, ledger=ledger).get("verified_touched").points,
                          complexity.VERIFIED_TOUCHED_WEIGHT)
 
+    def test_ledger_records_name_the_owner_story_not_files(self):
+        """Sổ R2 ghi `story` sở hữu; tệp tra qua write_scope của story ấy."""
+        ledger = {"behaviors": {
+            "AC-STORY-01-04-1": {"status": "VERIFIED", "story": "STORY-01-04"},
+            "AC-STORY-01-04-2": {"status": "GAP", "story": "STORY-01-04"},
+            "AC-STORY-01-05-1": {"status": "VERIFIED", "story": "STORY-01-05"},
+        }}
+        scopes = {"STORY-01-04": ["src/a.ts"], "STORY-01-05": ["src/b.ts"]}
+        s = story([], scope=("src/a.ts",), sid="STORY-01-06")
+        self.assertEqual(complexity.verified_touched(s, ledger, scopes), ["AC-STORY-01-04-1"])
+        # Chạy lại chính story sở hữu: hành vi của nó là mục tiêu, không phải thứ phải giữ.
+        s5 = story([], scope=("src/b.ts",), sid="STORY-01-05")
+        self.assertEqual(complexity.verified_touched(s5, ledger, scopes), [])
+        # Không có chỉ mục → không tra được tệp → 0, không bịa.
+        self.assertEqual(complexity.verified_touched(s, ledger), [])
+
+    def test_scopes_come_from_stories_index(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d) / "_bmad-output"; root.mkdir()
+            (root / "stories.index.json").write_text(json.dumps({"stories": [
+                {"id": "STORY-01-04", "write_scope": ["src/a.ts"]}]}), encoding="utf-8")
+            (root / "ledger.json").write_text(json.dumps({"behaviors": {
+                "AC-STORY-01-04-1": {"status": "VERIFIED", "story": "STORY-01-04"}}}), encoding="utf-8")
+            s = story([], scope=("src/a.ts",), sid="STORY-01-06")
+            self.assertEqual(complexity.read_scopes(d), {"STORY-01-04": ["src/a.ts"]})
+            self.assertEqual(
+                complexity.score_story(s, project=Path(d)).get("verified_touched").points, 0.5)
+
     def test_missing_ledger_scores_zero_not_a_guess(self):
         """Sổ hành vi là việc của R2 — thiếu thì chiều này = 0, không bịa."""
         with tempfile.TemporaryDirectory() as d:

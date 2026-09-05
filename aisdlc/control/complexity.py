@@ -183,28 +183,55 @@ def _within(path: str, scope: str) -> bool:
     return len(p) >= len(s) and p[: len(s)] == s
 
 
-def verified_touched(story: Story, ledger: dict | None) -> list[str]:
-    """Hành vi đã VERIFIED mà phạm vi ghi của story chạm vào.
+def verified_touched(story: Story, ledger: dict | None,
+                     scopes: dict[str, list[str]] | None = None) -> list[str]:
+    """Hành vi đã VERIFIED của **story khác** mà phạm vi ghi của story này chạm vào.
 
-    Sổ hành vi là việc của R2 (luồng khác). Đọc **tuỳ chọn**: không có tệp,
-    hoặc có mà chưa ghi đường dẫn cho hành vi nào, thì chiều này = 0 —
-    thiếu dữ liệu không được biến thành điểm bịa.
+    Sổ hành vi (R2, `control/ledger.py`) ghi story *sở hữu* hành vi, không
+    ghi tệp — tệp là phạm vi ghi của story ấy, tra qua ``scopes`` (id →
+    write_scope, đọc từ `stories.index.json`). Bản ghi có sẵn `files` /
+    `write_scope` vẫn được đọc. Thiếu sổ, thiếu chỉ mục, hay hành vi không
+    tra được tệp thì chiều này = 0 — thiếu dữ liệu không được biến thành
+    điểm bịa. Hành vi của chính story (chạy lại) không tính: đó là mục tiêu
+    của nó, không phải thứ nó phải giữ.
     """
     if not isinstance(ledger, dict):
         return []
     scope = scope_paths(story)
     if not scope:
         return []
+    scopes = scopes or {}
     out: list[str] = []
     for bid, rec in (ledger.get("behaviors") or {}).items():
         if not isinstance(rec, dict) or str(rec.get("status", "")).lower() != "verified":
             continue
-        files = rec.get("files") or rec.get("write_scope") or []
+        owner = str(rec.get("story") or "")
+        if owner == story.id:
+            continue
+        files = rec.get("files") or rec.get("write_scope") or scopes.get(owner) or []
         if isinstance(files, str):
             files = [files]
         if any(_within(str(f), s) or _within(s, str(f)) for f in files for s in scope):
             out.append(str(bid))
     return sorted(out)
+
+
+def read_scopes(project: Path | str | None) -> dict[str, list[str]]:
+    """id → write_scope từ `_bmad-output/stories.index.json`; thiếu thì rỗng."""
+    if project is None:
+        return {}
+    path = Path(project) / "_bmad-output" / "stories.index.json"
+    if not path.is_file():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    items = data.get("stories", []) if isinstance(data, dict) else data
+    if isinstance(items, dict):
+        items = list(items.values())
+    return {str(s.get("id")): list(s.get("write_scope") or [])
+            for s in items if isinstance(s, dict) and s.get("id")}
 
 
 def read_experience(project: Path | str | None):
@@ -253,7 +280,7 @@ def score_story(
     scope = scope_paths(story)
     if ledger is None:
         ledger = read_ledger(project)
-    touched = verified_touched(story, ledger)
+    touched = verified_touched(story, ledger, read_scopes(project))
 
     return Score(story.id, (
         Component("screen_states", states, SCREEN_STATE_WEIGHT,
