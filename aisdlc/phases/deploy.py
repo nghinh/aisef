@@ -123,6 +123,16 @@ def check_runbook(path: Path) -> Check:
     return Check("runbook", True)
 
 
+
+def _planned_but_never_run(artifact_root: Path, registered: set[str]) -> list[str]:
+    """Mã story trong `stories.index.json` không có bản ghi trạng thái nào."""
+    from .run import load_plan
+
+    plan = load_plan(artifact_root)
+    if plan.error:
+        return []  # không có kế hoạch đọc được thì không kết luận gì thêm
+    return [sid for sid in plan.stories if sid not in registered]
+
 def pre_deploy(
     project: Path | str,
     *,
@@ -150,9 +160,16 @@ def pre_deploy(
             r.id for r in state.stories.values()
             if r.state not in (StoryStatus.DONE, StoryStatus.VERIFIED)
         ]
+        # Story có trong kế hoạch mà chưa từng được đăng ký thì không "xong":
+        # e9 2026-09-05, 01-06/01-07 chưa chạy bao giờ mà cổng ghi ✅ vì chỉ
+        # đếm bản ghi trạng thái. Chưa chạy ≠ đạt.
+        chua_chay = _planned_but_never_run(artifact_root, set(state.stories))
+        not_done += chua_chay
         detail = ""
         if not_done:
             detail = f"{len(not_done)} chưa xong: {', '.join(not_done[:5])}"
+            if chua_chay:
+                detail += f" (chưa từng chạy: {', '.join(chua_chay[:5])})"
         if chua_merge:
             detail += ("; " if detail else "") + (
                 f"{len(chua_merge)} xong nhưng chưa merge: {', '.join(chua_merge[:5])}"

@@ -31,6 +31,22 @@ from ..control.state import StateStore
 from ..harness.observe import AGENT_RUN, HANDOFF, MOCKUP_MAP, TOOL_RUN, EvidenceStore
 
 
+def mockup_cell(maps) -> str:
+    """Ô "Map mockup" của một story: **kết quả mới nhất của từng màn hình**.
+
+    Trước 2026-09-05 ô này đòi *mọi* lần đối chiếu từng đạt — story qua cổng
+    ở lượt cuối vẫn bị ✗ vì các lượt trước trượt (e9 STORY-01-05: done, map
+    3/3 ở lượt cuối, báo cáo ghi ✗). Lịch sử nằm ở evidence; báo cáo nói
+    trạng thái hiện tại.
+    """
+    if not maps:
+        return "✗"
+    latest: dict[str, bool] = {}
+    for m in maps:
+        latest[m.name] = bool(m.ok)
+    return "✅" if all(latest.values()) else "✗"
+
+
 @dataclass
 class Row:
     requirement: str
@@ -191,10 +207,7 @@ def build(project: Path | str) -> Report:
     story_ids = [s for s in evidence.stories() if not s.startswith(PHASE_PREFIXES)]
     for sid in sorted(set(list(state.stories) + story_ids)):
         ev = evidence.read(sid)
-        maps = ev.of(MOCKUP_MAP)
-        mockup = "—"
-        if story_screens.get(sid):
-            mockup = "✅" if maps and all(m.ok for m in maps) else "✗"
+        mockup = mockup_cell(ev.of(MOCKUP_MAP)) if story_screens.get(sid) else "—"
         record = state.stories.get(sid)
         report.stories.append({
             "id": sid,

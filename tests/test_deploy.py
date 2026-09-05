@@ -430,3 +430,27 @@ class TestPreDeployKhongChapNhanSuyBien(DeployTestCase):
         rep = run_suite(self.project, config=self.cau_hinh(), has_ui=False)
         self.assertEqual([r.kind.id for r in rep.degraded], ["unit"])
         self.assertTrue(rep.release_ready or rep.failed == [])
+
+
+class TestPlannedButNeverRun(DeployTestCase):
+    """Lỗi 17: story trong kế hoạch chưa từng chạy mà cổng ghi "mọi story xong" ✅."""
+
+    def test_unregistered_planned_story_blocks(self):
+        import json
+
+        from aisdlc.phases.deploy import pre_deploy
+
+        self.approve_everything()
+        self.finish_a_story()  # STORY-01-01 done
+        (self.artifacts / "stories.index.json").write_text(json.dumps({
+            "stories": [
+                {"id": "STORY-01-01", "epic_id": "EPIC-01", "title": "a", "write_scope": ["src"], "depends_on": []},
+                {"id": "STORY-01-02", "epic_id": "EPIC-01", "title": "b", "write_scope": ["src"], "depends_on": []},
+            ],
+            "waves": {"EPIC-01": [["STORY-01-01"], ["STORY-01-02"]]},
+        }), encoding="utf-8")
+        report = pre_deploy(self.project, config=self.config(), skip_qa=True)
+        check = next(c for c in report.checks if c.name == "mọi story xong")
+        self.assertFalse(check.passed, check.detail)
+        self.assertIn("chưa từng chạy", check.detail)
+        self.assertIn("STORY-01-02", check.detail)
