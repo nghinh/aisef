@@ -199,3 +199,10 @@ class TestGuardCoChay(unittest.TestCase):
         from aisdlc.harness.observe import GUARD_BLOCK, Event
         self.store.record("S-01", Event(kind=GUARD_BLOCK, name="secret", ok=False))
         self.assertTrue(self.muc(self.gate(True)).passed)
+
+    def test_nhip_tim_la_du_du_khong_ghi_gi(self):
+        """Phiên chỉ dùng Bash và không bị chặn: hook vẫn tới, và đó là
+        điều mục này hỏi."""
+        from aisdlc.harness.observe import GUARD_SEEN, Event
+        self.store.record("S-01", Event(kind=GUARD_SEEN, name="git-stage"))
+        self.assertTrue(self.muc(self.gate(True)).passed)

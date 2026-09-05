@@ -563,9 +563,9 @@ Bước tiếp: **đợt 1 — G4** truyền `--settings` tường minh + nhịp
 |---|---|---|---|---|
 | G1 G2 G3 | 21 | — (guard thuần) | `297282e` | ✅ |
 | QĐ4 pre-deploy không suy biến | 5 | — (cổng thuần) | | ✅ |
-| G4 mảnh 1 `settings_file` | 2 | `par` **trước** (wheel e7b618e, `.claude/` không commit): story XONG, 6 phiên, `guard_block=0, file_change=0` — zero guard, trông hoàn hảo. **Sau**: đang chạy | task b8ewhps0n | 🔨 |
-| G4 mảnh 2 cổng "guard có chạy" | 8 | cùng lượt với mảnh 1 | | 🔨 |
+| G4 mảnh 1 `settings_file` | 2 | `par`, `.claude/` không commit. **Trước** (wheel e7b618e): story XONG, 6 phiên, 0 sự kiện guard. Đầu dò A–D: worktree không cờ → 0; `--settings` tệp/json → 2; gốc dự án → 2 | docstring `claude_code.py` | ✅ |
+| G4 mảnh 2 cổng "guard có chạy" | 13 | Lượt "sau" đầu tiên báo trượt **sai**: hook chạy 17 lần nhưng agent ghi file chỉ bằng Bash → sửa: nhịp tim `GUARD_SEEN` + `diff-scope` ghi `FILE_CHANGE` theo mtime. **SAU-2**: XONG lần 1, $0,50, evidence `guard_seen=1, file_change=1` | docstring `claude_code.py` | ✅ |
 | G4 mảnh 3 `doctor` hook trong worktree | 2 | — (kiểm tĩnh) | | ✅ |
 | G11 test meta | 3 | — | | ✅ |
-| G12 | | `par` di trú, 2 client | | |
+| G12 `VERIFIED`, `DONE` chỉ sau merge | 11 | SAU-2 trên `par`: `verified → done` sau `merge.completed`; `status` 5/5 done, không `verified` sót. Di trú sổ cũ: unit test (par không có sổ cũ cần di trú) | | ✅ |
 | G10a gỡ `max_context_tokens`, đo `prompt_chars` | 5 | — | | ✅ |

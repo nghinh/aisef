@@ -225,3 +225,8 @@ class TestCanMerge(unittest.TestCase):
 
     def test_nhat_ky_trong_thi_khong(self):
         self.assertFalse(Journal(story_id="S-01").needs_merge)
+
+    def test_nhat_ky_cu_thieu_worktree_created_nhung_co_commit_created(self):
+        """`commit.created` chỉ xảy ra trong worktree — đủ để biết phải merge."""
+        self.assertTrue(self.journal("attempt.started", "commit.created",
+                                     "attempt.committed").needs_merge)

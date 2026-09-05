@@ -751,7 +751,65 @@ class TestGuardTuGhiBangChung(unittest.TestCase):
                        env={ENV_WRITE_SCOPE: "src"}, artifact_root=str(self.root))
         self.assertEqual(self.store.stories(), [])
 
-    def test_guard_khac_cho_qua_thi_khong_ghi_gi(self):
+    def test_guard_khac_cho_qua_thi_chi_ghi_nhip_tim(self):
+        """Cho qua và không phải write-scope/diff-scope: không có gì để ghi
+        ngoài nhịp tim "hook tới được" (một lần)."""
         record_outcome("git-stage", {"tool_name": "Bash", "tool_input": {"command": "ls"}},
                        ALLOW, env=self.env, artifact_root=str(self.root))
-        self.assertEqual(self.store.stories(), [])
+        ev = self.store.read("S-01")
+        self.assertEqual([e.kind for e in ev.events], ["guard_seen"])
+
+
+class TestNhipTimVaBashGhiFile(unittest.TestCase):
+    """Đo trên `par` lượt "sau" của G4: hook chạy 17 lần, agent ghi file
+    **chỉ bằng Bash**, evidence trống → cổng "guard có chạy" báo trượt sai.
+    Hai sự thật cần hai sự kiện: hook tới được (`GUARD_SEEN`, một lần) và
+    file đổi sau lần test cuối (`FILE_CHANGE` từ `diff-scope`, theo mtime)."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        self.repo = self.root / "cay"; self.repo.mkdir()
+        subprocess.run(["git", "init", "-q"], cwd=self.repo, check=True)
+        self.store = EvidenceStore(self.root)
+        self.env = {ENV_STORY_ID: "S-01", ENV_WRITE_SCOPE: "src", ENV_WORKDIR: str(self.repo)}
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def bash(self, cmd="ls"):
+        return {"cwd": str(self.repo), "tool_name": "Bash", "tool_input": {"command": cmd}}
+
+    def test_moi_lan_guard_chay_ghi_nhip_tim_dung_mot_lan(self):
+        for _ in range(3):
+            record_outcome("git-stage", self.bash(), ALLOW, env=self.env, artifact_root=str(self.root))
+        ev = self.store.read("S-01")
+        self.assertEqual(len(ev.of("guard_seen")), 1)
+        self.assertTrue(ev.guard_reached)
+
+    def test_bash_ghi_file_sau_test_thi_diff_scope_ghi_file_change(self):
+        import time
+        self.store.tool_run("S-01", "test", ok=True)
+        time.sleep(0.05)
+        (self.repo / "src").mkdir(); (self.repo / "src" / "a.py").write_text("x = 1\n")
+        record_outcome("diff-scope", self.bash("echo > src/a.py"), ALLOW,
+                       env=self.env, artifact_root=str(self.root))
+        ev = self.store.read("S-01")
+        self.assertEqual(ev.stale_since_last_test(), ["src/a.py"])
+        self.assertFalse(check_completion(ev).allowed)
+
+    def test_file_doi_truoc_lan_test_khong_bi_coi_la_cu(self):
+        import time
+        (self.repo / "src").mkdir(); (self.repo / "src" / "a.py").write_text("x = 1\n")
+        time.sleep(0.05)
+        self.store.tool_run("S-01", "test", ok=True)
+        record_outcome("diff-scope", self.bash(), ALLOW, env=self.env, artifact_root=str(self.root))
+        self.assertEqual(self.store.read("S-01").stale_since_last_test(), [])
+
+    def test_khong_ghi_trung_cung_file(self):
+        import time
+        self.store.tool_run("S-01", "test", ok=True); time.sleep(0.05)
+        (self.repo / "src").mkdir(); (self.repo / "src" / "a.py").write_text("x\n")
+        for _ in range(3):
+            record_outcome("diff-scope", self.bash(), ALLOW, env=self.env, artifact_root=str(self.root))
+        self.assertEqual(len(self.store.read("S-01").of("file_change")), 1)

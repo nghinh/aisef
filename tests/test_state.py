@@ -194,3 +194,68 @@ class TestConcurrency(StateTestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestVerifiedTruocDone(unittest.TestCase):
+    """G12. `done` ghi lúc qua cổng, trước merge, là nguồn của lỗi 42: merge
+    đụng thì story "xong" mà code kẹt trên nhánh story. `verified` tách hai
+    câu hỏi "qua cổng chưa" và "lên nhánh chính chưa"."""
+
+    def setUp(self):
+        import tempfile
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        self.store = StateStore(self.root)
+        self.store.register("S-01", "E-01")
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def toi(self, *steps):
+        for st in steps:
+            self.store.transition("S-01", st)
+
+    def test_qua_cong_roi_merge_roi_moi_done(self):
+        self.toi(StoryStatus.RUNNING, StoryStatus.VERIFYING, StoryStatus.VERIFIED)
+        self.assertIs(self.store.load().stories["S-01"].state, StoryStatus.VERIFIED)
+        self.toi(StoryStatus.DONE)
+        self.assertIs(self.store.load().stories["S-01"].state, StoryStatus.DONE)
+
+    def test_khong_cach_ly_thi_verifying_sang_done_thang(self):
+        self.toi(StoryStatus.RUNNING, StoryStatus.VERIFYING, StoryStatus.DONE)
+        self.assertIs(self.store.load().stories["S-01"].state, StoryStatus.DONE)
+
+    def test_merge_dung_da_sua_thi_ve_pending_de_merge_lai(self):
+        self.toi(StoryStatus.RUNNING, StoryStatus.VERIFYING, StoryStatus.VERIFIED,
+                 StoryStatus.PENDING)
+
+    def test_verified_khong_mo_khoa_story_phu_thuoc(self):
+        self.assertFalse(StoryStatus.VERIFIED.satisfies_dependents)
+        self.assertFalse(StoryStatus.VERIFIED.terminal)
+
+    def test_reset_for_retry_khong_dung_vao_verified(self):
+        """Đó là công việc đã qua cổng đang chờ merge, không phải lượt dở."""
+        self.toi(StoryStatus.RUNNING, StoryStatus.VERIFYING, StoryStatus.VERIFIED)
+        self.assertFalse(self.store.reset_for_retry("S-01"))
+        self.assertIs(self.store.load().stories["S-01"].state, StoryStatus.VERIFIED)
+
+    def test_so_cu_done_chua_merge_doc_len_thanh_verified(self):
+        """Di trú: dự án chạy trước G12 có `done` mà nhật ký nói chưa merge."""
+        from aisdlc.control.journal import Entry, JournalStore
+        self.toi(StoryStatus.RUNNING, StoryStatus.VERIFYING, StoryStatus.DONE)
+        j = JournalStore(self.root)
+        for s in ("attempt.started", "worktree.created", "commit.created", "attempt.committed"):
+            j.record("S-01", Entry(step=s, attempt=1))
+        self.assertIs(self.store.load().stories["S-01"].state, StoryStatus.VERIFIED)
+        # và ghi xuống đĩa một lần — lần đọc sau không cần nhật ký nữa
+        import json
+        raw = json.loads((self.root / "sprint-status.json").read_text(encoding="utf-8"))
+        self.assertEqual(raw["stories"]["S-01"]["status"], "verified")
+
+    def test_so_cu_done_da_merge_giu_nguyen(self):
+        from aisdlc.control.journal import Entry, JournalStore
+        self.toi(StoryStatus.RUNNING, StoryStatus.VERIFYING, StoryStatus.DONE)
+        j = JournalStore(self.root)
+        for s in ("attempt.started", "worktree.created", "merge.completed", "attempt.committed"):
+            j.record("S-01", Entry(step=s, attempt=1))
+        self.assertIs(self.store.load().stories["S-01"].state, StoryStatus.DONE)

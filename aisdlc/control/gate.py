@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 
 from ..harness.guardrails import check_completion, check_diff_scope
 from .security import DEFAULT_BLOCKING
-from ..harness.observe import FILE_CHANGE, MOCKUP_MAP, TOOL_RUN, Evidence
+from ..harness.observe import MOCKUP_MAP, TOOL_RUN, Evidence
 
 
 @dataclass
@@ -90,10 +90,9 @@ def evaluate(
             skipped=True,
         ))
     else:
-        dau_vet = len(evidence.guard_blocks) + len(evidence.of(FILE_CHANGE))
         gate.checks.append(Check(
-            "guard có chạy", dau_vet > 0,
-            "" if dau_vet else (
+            "guard có chạy", evidence.guard_reached,
+            "" if evidence.guard_reached else (
                 "guard chưa đánh giá thao tác ghi nào trong phiên — hook không "
                 "tới được worktree? (.claude/ chưa commit, hoặc --settings không "
                 "được truyền). Story không ghi gì cũng rơi vào đây, và đó là đúng."

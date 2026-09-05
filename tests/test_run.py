@@ -447,6 +447,7 @@ class TestMergeDungRoiChayLai(RunTestCase):
 
         j = JournalStore(self.artifacts)
         j.record(sid, JEntry(step="attempt.started", attempt=1))
+        j.record(sid, JEntry(step="worktree.created", attempt=1))  # lượt thật luôn có
         j.record(sid, JEntry(step="commit.created", attempt=1))
         # Lượt chạy **kết thúc gọn** — không phải bị giết giữa chừng, nếu
         # không thì reconciler sẽ hoàn nguyên nó và ta đo nhầm chuyện khác.
@@ -486,3 +487,56 @@ class TestMergeDungRoiChayLai(RunTestCase):
             sid, JEntry(step="merge.completed", attempt=1))
         r = self.run_sprint(Agent(), only_epic="EPIC-01")
         self.assertIn(sid, r.waves[0].skipped)
+
+
+class TestDoneChiSauMerge(RunTestCase):
+    """Bất biến G12: trong `sprint-status.json`, `done` không bao giờ đứng
+    trước `merge.completed` của nhật ký."""
+
+    def test_merge_dung_thi_verified_khong_phai_done(self):
+        """Hai story cùng đợt cố ý chạm một tệp → merge story thứ hai đụng."""
+        from aisdlc.control.worktree import WorktreeManager
+        # STORY-01-02 (src/a) và STORY-01-03 (src/b) cùng đợt 2. Ép đụng bằng
+        # cách để agent giả của 01-03 cũng ghi vào src/a/STORY-01-02.py.
+        class Dung(Agent):
+            def run(self, spec):
+                r = super().run(spec)
+                if spec.env.get("AISDLC_STORY_ID") == "STORY-01-03":
+                    p = Path(spec.workdir) / "src" / "a" / "STORY-01-02.py"
+                    p.parent.mkdir(parents=True, exist_ok=True)
+                    p.write_text("# đụng\n", encoding="utf-8")
+                return r
+        # cho 01-03 quyền ghi src/a để guard `phạm vi ghi` không chặn trước.
+        # Hai story **cùng đợt** (đợt 2 của INDEX) và cùng rẽ từ một gốc:
+        # 01-02 merge trước, 01-03 mang cùng đường dẫn nội dung khác → đụng.
+        idx = json.loads((self.artifacts / "stories.index.json").read_text(encoding="utf-8"))
+        for st in idx["stories"]:
+            if st["id"] == "STORY-01-03":
+                st["write_scope"] = ["src/b", "src/a"]
+        (self.artifacts / "stories.index.json").write_text(json.dumps(idx), encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=self.project, check=True)
+        subprocess.run(["git", "commit", "-qm", "ép đụng"], cwd=self.project, check=True)
+
+        r = self.run_sprint(Dung(), only_epic="EPIC-01")
+        st = self.state()
+        self.assertIn("STORY-01-03", [w for wv in r.waves for w in wv.merge_conflicts])
+        self.assertIs(st.stories["STORY-01-03"].state, StoryStatus.VERIFIED)
+        self.assertIs(st.stories["STORY-01-02"].state, StoryStatus.DONE)
+
+    def test_done_sau_merge_completed_theo_thu_tu_ghi(self):
+        from aisdlc.control.journal import JournalStore
+        self.run_sprint(Agent(), only_epic="EPIC-01")
+        st = self.state()
+        for sid, rec in st.stories.items():
+            with self.subTest(story=sid):
+                self.assertIs(rec.state, StoryStatus.DONE)
+                j = JournalStore(self.artifacts).read(sid)
+                self.assertTrue(j.merged(), f"{sid} done mà nhật ký chưa merge")
+
+    def test_khong_cach_ly_thi_done_ngay(self):
+        """`--no-isolate` không có bước merge → `done` ngay, không qua
+        `verified`. Chỉ nhìn story đầu: ở chế độ này story sau thấy file
+        chưa commit của story trước và trượt `phạm vi ghi` — hạn chế có
+        sẵn của chạy không cách ly, không thuộc G12."""
+        self.run_sprint(Agent(), only_epic="EPIC-01", isolate=False)
+        self.assertIs(self.state().stories["STORY-01-01"].state, StoryStatus.DONE)

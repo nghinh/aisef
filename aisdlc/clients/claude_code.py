@@ -9,6 +9,31 @@ Mọi cờ dùng ở đây đã kiểm chứng bằng thực nghiệm (spike S1,
 * ``--settings`` gắn hook, và hook trả mã 2 **chặn thật** tool — kể cả khi
   chạy với ``--permission-mode acceptEdits``;
 * ``< /dev/null`` là bắt buộc, nếu không CLI chờ stdin ba giây mỗi lần gọi.
+
+**Hook có tới được worktree không** (đo 2026-09-05 trên `par`, claude CLI,
+`.claude/` **không** commit nên worktree không có thư mục ấy; mỗi biến thể
+một phiên `-p` bảo agent Write một tệp; đếm sự kiện guard tự ghi):
+
+=====  ==============================  ==========  ====
+Biến   cwd / cờ                        guard ghi   tệp
+=====  ==============================  ==========  ====
+A      worktree, ``--settings <tệp>``  2           có
+B      worktree, ``--settings <json>`` 2           có
+C      gốc dự án (có ``.claude/``)     2           có
+D      worktree, không cờ              **0**       có
+=====  ==============================  ==========  ====
+
+D là hình dạng của mọi lượt chạy trước G4: story chạy trọn, tệp ghi ra,
+**không một guard nào chạy**, và bằng chứng trông y hệt agent ngoan. Vì
+thế `implement.py` luôn truyền ``--settings`` (``_attach_settings``), và
+cổng story có mục "guard có chạy" đọc nhịp tim ``GUARD_SEEN`` — hai lớp,
+lớp sau bắt được lớp trước hỏng.
+
+Bài học đắt hơn: lượt kiểm đầu tiên sau khi có ``--settings`` vẫn báo
+"guard không chạy" — bản ghi phiên cho thấy hook chạy 17 lần nhưng agent
+ghi file **chỉ bằng Bash**, nên ``write-scope`` (Write|Edit) không được
+gọi và không có gì để ghi. Từ đó guard ghi nhịp tim riêng, và
+``diff-scope`` ghi ``FILE_CHANGE`` cho tệp có mtime mới hơn lần test cuối.
 """
 
 from __future__ import annotations

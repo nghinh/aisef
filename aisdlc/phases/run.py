@@ -173,18 +173,17 @@ def run_epic(
         can_merge_lai = []
         for sid in wave_ids:
             state.register(sid, epic_id, wave=index)
-            if state.load().stories[sid].state is StoryStatus.DONE:
-                # DONE được ghi khi story qua cổng, **trước** bước merge.
-                # Merge đụng thì story đứng lại ở DONE-nhưng-chưa-merge, và
-                # lượt sau bỏ qua nó vĩnh viễn: công việc nằm trên nhánh
-                # story, không ai đưa vào, không ai báo. Nhật ký phân biệt
-                # được — `merge.completed` chỉ ghi sau khi merge thật.
-                if worktrees is not None and not JournalStore(
-                    artifact_root
-                ).read(sid).merged():
+            trang_thai = state.load().stories[sid].state
+            if trang_thai is StoryStatus.DONE:
+                wave.skipped.append(sid)  # chạy lại thì tiếp từ chỗ dở
+            elif trang_thai is StoryStatus.VERIFIED:
+                # Qua cổng rồi, chưa lên nhánh chính (merge đụng ở lượt trước,
+                # người đã sửa). Chỉ merge lại — công việc đã nằm trên nhánh
+                # story, và worktree có thể đã bị dọn.
+                if worktrees is not None:
                     can_merge_lai.append(sid)
                 else:
-                    wave.skipped.append(sid)  # chạy lại thì tiếp từ chỗ dở
+                    wave.skipped.append(sid)
             else:
                 # Về `pending` trước: không có cạnh nào đi thẳng từ
                 # `failed`, hay từ `running` mà tiến trình đã chết, sang
@@ -255,6 +254,10 @@ def run_epic(
                 n = journal.read(result.story_id).attempt_no
                 journal.record(result.story_id,
                                JEntry(step="merge.completed", attempt=n))
+                # `done` chỉ được ghi **sau** dòng trên. Bất biến của G12:
+                # trong `sprint-status.json`, `done` không bao giờ đứng trước
+                # `merge.completed` của nhật ký.
+                _safe_transition(state, result.story_id, StoryStatus.DONE)
             for sid in can_merge_lai + done_ids:
                 worktrees.remove(sid)
                 n = journal.read(sid).attempt_no
@@ -331,12 +334,14 @@ def _run_wave(
 
             _safe_transition(state, story_id, StoryStatus.VERIFYING,
                              cost=outcome.cost_usd)
-            _safe_transition(
-                state,
-                story_id,
-                StoryStatus.DONE if outcome.done else StoryStatus.FAILED,
-                reason=outcome.blocked_reason,
-            )
+            # Qua cổng ≠ xong. Có worktree thì còn nợ merge — `verified`,
+            # và `done` chỉ ghi ở cuối đợt sau `merge.completed`. Không cách
+            # ly thì không có bước merge: `done` ngay.
+            if outcome.done:
+                qua_cong = StoryStatus.DONE if worktrees is None else StoryStatus.VERIFIED
+            else:
+                qua_cong = StoryStatus.FAILED
+            _safe_transition(state, story_id, qua_cong, reason=outcome.blocked_reason)
             # Story trượt: giao dịch đóng ngay, không nợ gì. Story xong
             # còn nợ commit và merge — đóng ở cuối đợt.
             if not outcome.done:

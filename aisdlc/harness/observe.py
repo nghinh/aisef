@@ -32,6 +32,7 @@ TOOL_RUN = "tool_run"          # chạy test/lint/sast/screenshot…
 FILE_CHANGE = "file_change"    # agent ghi file
 AGENT_RUN = "agent_run"        # một lượt gọi model
 GUARD_BLOCK = "guard_block"    # guard chặn một thao tác
+GUARD_SEEN = "guard_seen"      # hook tới được phiên này (ghi một lần mỗi story)
 MOCKUP_MAP = "mockup_map"      # đối chiếu màn hình thật với mockup
 NOTE = "note"
 
@@ -76,6 +77,13 @@ class Evidence:
     @property
     def total_duration_ms(self) -> int:
         return sum(e.duration_ms for e in self.events)
+
+    @property
+    def guard_reached(self) -> bool:
+        """Hook có tới được phiên của story này không — bất kỳ dấu vết guard
+        nào cũng đủ. Đo trên `par`: worktree không có `.claude/` và không
+        `--settings` → 0 dấu vết dù story chạy trọn; có `--settings` → có."""
+        return bool(self.of(GUARD_SEEN) or self.of(GUARD_BLOCK) or self.of(FILE_CHANGE))
 
     @property
     def guard_blocks(self) -> list[Event]:

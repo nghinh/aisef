@@ -421,15 +421,9 @@ def cmd_status(args) -> int:
     done = totals[StoryStatus.DONE.value]
 
     print(f"Tiến độ: {done}/{total} story xong")
-    # "Xong" ghi lúc qua cổng, **trước** merge. Merge đụng thì story đứng ở
-    # xong-nhưng-chưa-merge, và không nói ra thì người đọc tưởng code đã
-    # lên nhánh chính.
-    from .control.journal import JournalStore
-
-    chua_merge = [
-        r.id for r in state.by_status(StoryStatus.DONE)
-        if JournalStore(_artifact_root(args)).read(r.id).needs_merge
-    ]
+    # `verified` = qua cổng, chưa lên nhánh chính (merge đụng ở lượt trước).
+    # Không nói ra thì người đọc tưởng code đã ở main.
+    chua_merge = [r.id for r in state.by_status(StoryStatus.VERIFIED)]
     if chua_merge:
         print(f"⚠️  {len(chua_merge)} story xong nhưng chưa merge vào nhánh chính: "
               f"{', '.join(chua_merge[:5])} — chạy lại `aisdlc run` để merge")

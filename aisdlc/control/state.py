@@ -40,6 +40,11 @@ class StoryStatus(str, Enum):
     PENDING = "pending"
     RUNNING = "running"
     VERIFYING = "verifying"
+    #: Qua cổng, **chưa** lên nhánh chính. Trước 2026-09-05 trạng thái này
+    #: không tồn tại: `done` được ghi lúc qua cổng, trước merge — merge đụng
+    #: thì story "xong" mà code kẹt trên nhánh story, và không ai biết
+    #: (lỗi 42). Giờ `done` chỉ được ghi **sau** `merge.completed`.
+    VERIFIED = "verified"
     DONE = "done"
     BLOCKED = "blocked"
     FAILED = "failed"
@@ -59,7 +64,14 @@ class StoryStatus(str, Enum):
 ALLOWED: dict[StoryStatus, frozenset[StoryStatus]] = {
     StoryStatus.PENDING: frozenset({StoryStatus.RUNNING, StoryStatus.BLOCKED}),
     StoryStatus.RUNNING: frozenset({StoryStatus.VERIFYING, StoryStatus.FAILED, StoryStatus.BLOCKED}),
-    StoryStatus.VERIFYING: frozenset({StoryStatus.DONE, StoryStatus.FAILED, StoryStatus.BLOCKED}),
+    # `verifying → done` thẳng chỉ dành cho chạy không cách ly (`--no-isolate`):
+    # không có nhánh riêng thì không có bước merge. Có worktree thì `run.py`
+    # đi qua `verified`.
+    StoryStatus.VERIFYING: frozenset({
+        StoryStatus.VERIFIED, StoryStatus.DONE, StoryStatus.FAILED, StoryStatus.BLOCKED,
+    }),
+    # merge xong → done; merge đụng và người đã sửa → về pending để merge lại
+    StoryStatus.VERIFIED: frozenset({StoryStatus.DONE, StoryStatus.PENDING, StoryStatus.BLOCKED}),
     # thất bại còn lượt thử thì quay lại pending
     StoryStatus.FAILED: frozenset({StoryStatus.PENDING, StoryStatus.BLOCKED}),
     StoryStatus.BLOCKED: frozenset({StoryStatus.PENDING}),
@@ -185,12 +197,32 @@ class StateStore:
         stories = {
             sid: StoryRecord(**rec) for sid, rec in (raw.get("stories") or {}).items()
         }
+        self._migrate_done_before_merge(stories)
         return SprintState(
             stories=stories,
             current_epic=raw.get("current_epic", ""),
             started_at=raw.get("started_at", _now()),
             updated_at=raw.get("updated_at", _now()),
         )
+
+    def _migrate_done_before_merge(self, stories: dict[str, StoryRecord]) -> None:
+        """Sổ cũ ghi `done` lúc qua cổng, trước merge. Story `done` mà nhật
+        ký nói chưa merge là `verified` theo nghĩa mới — sửa lúc đọc, một
+        lần, để mọi nơi hỏi trạng thái đều thấy cùng một sự thật."""
+        from .journal import JournalStore  # tránh vòng import
+
+        doi = False
+        store = JournalStore(self.root)
+        for sid, rec in stories.items():
+            if rec.state is StoryStatus.DONE and store.read(sid).needs_merge:
+                rec.status = StoryStatus.VERIFIED.value
+                rec.updated_at = _now()
+                doi = True
+        if doi:
+            payload = json.loads(self.path.read_text(encoding="utf-8"))
+            payload["stories"] = {sid: asdict(r) for sid, r in stories.items()}
+            self.path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
+                                 encoding="utf-8")
 
     def save(self, state: SprintState) -> None:
         state.updated_at = _now()
@@ -239,7 +271,9 @@ class StateStore:
         """
         with self.transaction() as st:
             rec = st.stories.get(story_id)
-            if rec is None or rec.state is StoryStatus.DONE:
+            # `verified` là công việc **đã qua cổng**, đang chờ merge — không
+            # phải lượt dở. Đưa nó về pending là chạy lại một story đã xong.
+            if rec is None or rec.state in (StoryStatus.DONE, StoryStatus.VERIFIED):
                 return False
             if rec.state is StoryStatus.PENDING:
                 return False

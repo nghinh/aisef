@@ -102,7 +102,10 @@ class Journal:
         trong dự án (`--no-isolate`) thì không có bước merge, và cũng không
         có `worktree.created`, nên trả False là đúng.
         """
-        return self.reached("worktree.created") and not self.merged()
+        # `commit.created` chỉ xảy ra trong nhánh worktree (run.py), nên nó
+        # cũng là bằng chứng có worktree — cho nhật ký cũ thiếu bước đầu.
+        co_worktree = self.reached("worktree.created") or self.reached("commit.created")
+        return co_worktree and not self.merged()
 
     @property
     def attempt_no(self) -> int:
@@ -334,8 +337,12 @@ def _to_done(state, story_id: str) -> None:
     cur = state.load().stories[story_id].state
     if cur is StoryStatus.DONE:
         return
+    if cur is StoryStatus.VERIFIED:
+        state.transition(story_id, StoryStatus.DONE)
+        return
     if cur is not StoryStatus.VERIFYING:
         state.reset_for_retry(story_id)
         state.transition(story_id, StoryStatus.RUNNING)
         state.transition(story_id, StoryStatus.VERIFYING)
+    state.transition(story_id, StoryStatus.VERIFIED)
     state.transition(story_id, StoryStatus.DONE)

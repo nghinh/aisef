@@ -639,11 +639,20 @@ def record_outcome(
     story = story_from_env(env)
     if not story or not artifact_root:
         return
-    from .observe import GUARD_BLOCK, EvidenceStore, Event
+    from .observe import GUARD_BLOCK, GUARD_SEEN, TOOL_RUN, EvidenceStore, Event
 
     store = EvidenceStore(artifact_root)
     tool_input = event.get("tool_input") or {}
     tool = str(event.get("tool_name") or "")
+    hien_co = store.read(story)
+
+    # Nhịp tim: một lần mỗi story. Đo trên `par`: phiên chỉ dùng Bash để
+    # ghi file thì không có Write/Edit nào đi qua `write-scope`, và không có
+    # gì bị chặn — evidence trống dù hook chạy 17 lần. "Hook tới được" phải
+    # là sự kiện riêng, không suy từ sự kiện khác.
+    if not hien_co.of(GUARD_SEEN):
+        store.record(story, Event(kind=GUARD_SEEN, name=kind, detail={"tool": tool}))
+
     if not verdict.allowed:
         store.record(story, Event(
             kind=GUARD_BLOCK, name=kind, ok=False,
@@ -654,6 +663,24 @@ def record_outcome(
         path = str(tool_input.get("file_path") or tool_input.get("path") or "")
         if path:
             store.file_change(story, path, detail={"tool": tool})
+        return
+    if kind == "diff-scope":
+        # Guard duy nhất nhìn thấy file do **Bash** đổi. Chỉ ghi file có
+        # mtime mới hơn lần `test` gần nhất: đó đúng là định nghĩa "sửa sau
+        # lần test cuối" mà guard `completion` cần, và không ghi trùng file
+        # đã đổi từ trước.
+        last = hien_co.last(TOOL_RUN, "test")
+        moc = last.at if last else 0.0
+        root = workdir_from_env(env) or str(event.get("cwd") or "")
+        da_ghi = {str(e.detail.get("path") or e.name) for e in hien_co.of("file_change")
+                  if e.seq > (last.seq if last else 0)}
+        for rel in changed_files(root, base_ref=base_from_env(env)) if root else []:
+            try:
+                mtime = (Path(root) / rel).stat().st_mtime
+            except OSError:
+                continue
+            if mtime > moc and rel not in da_ghi:
+                store.file_change(story, rel, detail={"tool": tool})
 
 
 #: Guard nào gắn vào mốc nào, và khớp tool nào.
