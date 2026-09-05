@@ -439,3 +439,19 @@ class TestBatch(PreflightTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestDottedNamesAreNotFiles(PreflightTestCase):
+    """Lỗi 20: `tools.lint`, `Note.text` trong tiêu chí không phải tệp chưa tồn tại."""
+
+    def test_config_and_property_keys_are_not_write_needs(self):
+        s = self.story(acceptance_criteria=[
+            "Then `tools.lint` được chạy và `Note.text` được cập nhật, `save.done` phát ra",
+        ])
+        pf = self.check(s)
+        self.assertFalse([m for m in pf.missing if m.capability.startswith("write:")], [m.line() for m in pf.missing])
+
+    def test_real_source_path_is_still_a_write_need(self):
+        s = self.story(acceptance_criteria=["Then tệp `src/ui/new-screen.tsx` được tạo"])
+        pf = self.check(s)
+        self.assertTrue(any(m.capability == "write:src/ui/new-screen.tsx" for m in pf.missing), [m.line() for m in pf.missing])
