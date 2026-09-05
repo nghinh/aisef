@@ -60,6 +60,15 @@ class TestStorySize(unittest.TestCase):
         self.assertIsNotNone(d4)
         self.assertIn("11 trạng thái", d4.evidence)
 
+    def test_done_story_is_not_measured(self):
+        """Cổng cỡ story là phép kiểm trước execution: story đã xong thì bỏ qua."""
+        with mock.patch.object(preflight, "_experience", return_value=exp(**{"notes-list": 11})):
+            s4 = story(["notes-list"])
+            pf = preflight.check_story(s4, project=Path("."), config=self.cfg, done={"STORY-99-99"})
+            self.assertTrue(any(m.capability == "size" for m in pf.story_defects))
+            pf = preflight.check_story(s4, project=Path("."), config=self.cfg, done={"STORY-99-99", s4.id})
+        self.assertFalse(any(m.capability == "size" for m in pf.story_defects))
+
     def test_small_ui_story_passes(self):
         with mock.patch.object(preflight, "_experience", return_value=exp(**{"tags": 4})):
             self.assertIsNone(preflight.story_size_defect(story(["tags"]), project=Path("."), config=self.cfg))

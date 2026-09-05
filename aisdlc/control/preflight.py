@@ -574,17 +574,22 @@ def check_story(
     config: Config | None = None,
     have: set[str] | None = None,
     owned: dict[str, str] | None = None,
+    done: set[str] | None = None,
 ) -> Preflight:
     """Story này chạy được không. Không gọi model.
 
     ``owned``: màn hình → story dựng nó đầu tiên (xem ``screen_owners``);
     dùng để đo cỡ story. Không có thì mọi màn hình story chạm đều tính.
+    ``done``: story đã xong — cỡ story là phép kiểm **trước khi vào coding
+    agent**; story đã qua cổng rồi thì chẻ nó không còn nghĩa gì (e9
+    STORY-01-04 xong sau 8 lượt, cổng stories chặn lại cả kế hoạch vì nó).
     """
     cfg = config or Config(dict(DEFAULTS))
     got = have if have is not None else provisioned(project, cfg)
     out = Preflight(story.id)
     out.needs = required_capabilities(story, project=project)
-    qua_lon = story_size_defect(story, project=project, config=cfg, owned=owned)
+    qua_lon = None if (done and story.id in done) else story_size_defect(
+        story, project=project, config=cfg, owned=owned)
     if qua_lon is not None:
         out.needs.append(qua_lon)
         out.missing.append(qua_lon)
@@ -685,10 +690,24 @@ def check_stories_executable(
     cfg = config or Config(dict(DEFAULTS))
     got = provisioned(Path(project), cfg)
     owned = screen_owners(stories)
+    done = _done_stories(Path(project))
     return [
-        check_story(s, project=Path(project), config=cfg, have=got, owned=owned)
+        check_story(s, project=Path(project), config=cfg, have=got, owned=owned, done=done)
         for s in stories
     ]
+
+
+def _done_stories(project: Path) -> set[str]:
+    """Story đã `done`/`verified` theo sprint-status — không có thì rỗng."""
+    from .state import StateStore, StoryStatus
+
+    root = project / "_bmad-output"
+    try:
+        st = StateStore(root).load()
+    except Exception:  # noqa: BLE001 — chưa có trạng thái thì không ai xong
+        return set()
+    return {sid for sid, r in st.stories.items()
+            if r.state in (StoryStatus.DONE, StoryStatus.VERIFIED)}
 
 
 __all__ = [
