@@ -402,11 +402,71 @@ chính story. **AC (b)** đạt trên client giả
 `cross_reopens` = 2; chạy sạch → ✅ và `reopen_events = 0` (nửa "không ✗
 oan" của B3). Cổng unit 7 phép ở `TestCongBaoToan`.
 
+**B5 hồi cứu trên e9 (2026-09-06, chỉ đọc `evidence/STORY-01-07.jsonl` +
+`STORY-RP-01/02.jsonl`, 0 agent, $0).** 01-07 chạy bốn lần; `handoff` ghi
+`chars` từng slot và `agent_run` ghi `prompt_chars` ở **mọi** lần, kể cả
+lần cũ, nên tách được phần khung prompt (= `prompt_chars` − Σ slot) khỏi
+phần slot mà không cần chạy lại gì:
+
+| lần chạy (giờ máy) | slot nguồn `ledger` trong bàn giao | khung developer / reviewer / security |
+|---|---|---|
+| 1 · 09-05 23:41 – 00:13, 1 lượt | — | 2 484 / 1 184 / 1 465 |
+| 2 · 09-06 01:04 – 02:05, 3 lượt | `index` 500–506 (R6) | 2 796 / 1 661 / 1 876 |
+| 3 · 03:20 – 03:52, 2 lượt | + `preservation` 1 552 · `validation` 138 (R4) | 3 128 / 1 838 / 2 075 |
+| 4 · 04:21 – 04:37, 1 lượt | như lần 3 | như lần 3 |
+
+Khung không đổi giữa các lượt của cùng lần chạy, và bước nhảy 2→3
+(+332 / +177 / +199) **trùng đúng** cột "phần khung" đo bằng unit ở bảng
+trên — hai phép đo độc lập cho cùng một số. So lượt 1 của lần 2 với lượt 1
+của lần 3 (cùng `story_contract` 3 121, `index` 506 ± 6):
+
+| vai | trước R4 (lần 2 #1) | sau R4 (lần 3 #1) | Δ thô | Δ do R4 = khung + slot | **Δ % do R4** | phần không phải R4 |
+|---|---|---|---|---|---|---|
+| developer | 11 537 | 13 565 | +2 028 | +332 + 1 690 = +2 022 | **+17,5 %** | `index` +6 |
+| reviewer | 51 258 | 71 158 | +19 900 | +177 + 1 690 = +1 867 | +3,6 % | `diff_summary` +18 002 · `impact` +31 |
+| security | 51 473 | 71 395 | +19 922 | +199 + 1 690 = +1 889 | +3,7 % | như reviewer |
+
+Kết luận: trần +15 % **không đạt ở vai developer** trên 01-07 — +17,5 %
+so với lượt 1, và vẫn +15,7 % nếu lấy mẫu số là prompt lượt 3 của lần 2
+(12 868, đã có phản hồi cổng/rà soát). Reviewer/security đạt dư vì mẫu số
+của họ là `diff_summary` 43–61k. Ước lượng "≈ +13,6 % tối đa" ở trên sai
+mẫu số: prompt developer thật của e9 lúc chưa có R4 là 11,5k, không phải
+13,5k. Phần lớn số thêm là `preservation` chạm trần (1 552 = 1 500 + ghi
+chú cắt); với 30 hành vi bảo toàn nó chạm trần ở **mọi** lượt về sau
+(01-07 lần 3/4, RP-01, RP-02 đều 1 552), nên trên e9 giá của R4 là hằng số
+≈ 2 020 ký tự mỗi lượt developer, không tăng theo epic. Về dưới trần với
+mẫu số này cần bớt ≈ 290 ký tự: `context.max_preservation_chars` ≈ 1 200,
+hoặc rút khung (+332 → ≤ 40). Chưa làm — đó là việc của lượt sửa prompt
+sau; ghi ở đây để không phải đo lại.
+
+Story sửa của vòng cải tiến (RP-01/02) chỉ có bản "sau": slot R4 chiếm
+14,6 % / 14,4 % prompt developer lượt 1 (1 690 / 11 607 và 11 758) — tỉ
+trọng, không phải Δ, vì hai story ấy chưa từng chạy không có R4.
+
+Điều bằng chứng **không** cho suy: chi phí token/USD do R4. `agent_run`
+ghi `prompt_chars` và tổng token, không tách token đầu vào theo slot; số
+lượt và USD giữa bốn lần chạy khác nhau vì lý do khác (bế tắc phạm vi, tải
+máy, lỗi 23/24), nên không quy phần nào cho R4 được.
+
 **Chưa đo:** B3 trên `par` với agent thật (mutation có chủ đích và "không
-✗ oan trên chạy sạch" ở dogfood), và (c) trên dogfood/e9 01-05 — cần lượt
-agent, cùng lô với R1 (d) và R8 (B7). Chưa có story nào của e9/`par` có
-`mockup:*`/`qa:e2e` VERIFIED bị story sau chạm, nên nhánh `verify_screens`
-cho màn hình bảo toàn mới chỉ xanh ở unit (`test_qa_va_mockup_theo_cung_ba_ket_cuc`).
+✗ oan trên chạy sạch" ở dogfood) — cần lượt agent, cùng lô với R1 (d) và
+R8 (B7). Chưa có story nào của e9/`par` có `mockup:*`/`qa:e2e` VERIFIED
+bị story sau chạm, nên nhánh `verify_screens` cho màn hình bảo toàn mới
+chỉ xanh ở unit (`test_qa_va_mockup_theo_cung_ba_ket_cuc`).
+
+### R12 — Xuất bảng gap/hồi quy (`aisdlc issues`) · hiện thực 2026-09-06, unit xanh, 0 agent
+
+`Ledger.issues(epic=, statuses=)` là phép chiếu thứ hai của cùng sổ (không
+kho mới): một dòng mỗi hành vi chưa xanh — id · loại · trạng thái · story
+sở hữu · `regressed_by` · nguồn kiểm (test id / `qa:<kind>` / màn hình) ·
+lý do · candidate · `since` · số lần đổi trạng thái; hồi quy xếp trước gap.
+`issues_text()` ra Markdown hoặc CSV chuẩn (`csv`), cùng cột; mặc định
+`_bmad-output/ISSUES.md|csv`, lọc `--epic` / `--status`. Chỉ tệp — không
+tạo issue ở tracker nào, không chạm cổng. 4 test ở `tests/test_ledger.py::TestXuatBangGap`.
+Khói trên e9 (chỉ đọc, 2026-09-06 06:00): 64 hành vi → 14 dòng gap, 0 reopened
+(38 lần hồi quy trong lịch sử đều đã đóng), 13 thuộc EPIC-01 — 13 tiêu chí của
+01-01/02/03 "không đọc được tên test từ output runner" (bằng chứng trước khi
+có reporter) và `qa:mutation` ở mốc `loop-0`.
 
 ### R3 — Vòng cải tiến epic (`phases/improve.py`, `aisdlc improve`) · hiện thực 2026-09-06, unit xanh, **B1 chưa đo**
 
