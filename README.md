@@ -110,7 +110,7 @@ phê duyệt hết hiệu lực, và sửa tầng trên làm mọi tầng dướ
 
 ## Guard
 
-Bảy guard, mỗi guard là một lệnh trả mã thoát, nối vào ba mốc vòng đời:
+Tám guard, mỗi guard là một lệnh trả mã thoát, nối vào ba mốc vòng đời:
 
 | Mốc | Guard |
 |---|---|
@@ -130,7 +130,7 @@ là client **hạng hai** theo quyết định V1: guard chặn được (hợp 
 
 ## Lỗi thật đã gặp
 
-Hai mươi mốt lỗi tìm bằng đo trên agent thật, xếp theo bảy lớp nguyên nhân kèm phép hồi quy: `docs/FAILURE-TAXONOMY.md`. Lỗi mới thì thêm một dòng vào đó cùng commit với test.
+Hai mươi lăm lỗi tìm bằng đo trên agent thật, xếp theo mười một lớp nguyên nhân kèm phép hồi quy: `docs/FAILURE-TAXONOMY.md`. Lỗi mới thì thêm một dòng vào đó cùng commit với test. Thay đổi theo phiên bản, kèm việc phải làm khi nâng cấp: `CHANGELOG.md`.
 
 ## Hợp quy client
 
