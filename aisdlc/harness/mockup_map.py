@@ -45,6 +45,18 @@ class ScreenSlice:
         ]
         if s.purpose:
             lines.append(f"Mục đích: {s.purpose}")
+        # Quy ước cổng phải nói ra, không để agent đoán (lỗi 14, e9 note-editor
+        # 2026-09-05: cổng mở `/note/1`, app không có ghi chú `1`, trang trống,
+        # story trượt 2 lượt mà không biết vì sao).
+        from .mockup_verify import concrete_route
+
+        if s.route and concrete_route(s.route) != s.route:
+            lines.append(
+                f"Cổng map mockup sẽ mở `{concrete_route(s.route)}` (tham số động thay "
+                f"bằng `1`). Môi trường dev (`app.dev_command`) phải có sẵn bản ghi mã "
+                f"`1` cho route này — dữ liệu hạt giống — nếu không cổng thấy trang "
+                f"trống và story không qua được."
+            )
 
         lines += ["", "Component **phải có** (vai trò + tên gọi, đúng như mockup):"]
         for c in s.components[:MAX_LISTED]:

@@ -1,0 +1,37 @@
+"""Lỗi 14: cổng mở `/note/1` nhưng không ai bảo developer phải có bản ghi `1`.
+
+Quy ước của cổng phải nằm trong ngữ cảnh story, không để agent đoán.
+"""
+
+from __future__ import annotations
+
+import sys
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from aisdlc.control.design_contract import ScreenContract  # noqa: E402
+from aisdlc.harness.aria import Component  # noqa: E402
+from aisdlc.harness.mockup_map import ScreenSlice  # noqa: E402
+
+
+def slice_for(route: str) -> ScreenSlice:
+    return ScreenSlice(ScreenContract(id="s", name="S", route=route,
+                                      components=[Component("button", "Xoá")]))
+
+
+class TestSeedConvention(unittest.TestCase):
+    def test_param_route_names_seed_record(self):
+        text = slice_for("/note/:id").as_prompt()
+        self.assertIn("`/note/1`", text)
+        self.assertIn("hạt giống", text)
+
+    def test_plain_route_says_nothing_about_seed(self):
+        text = slice_for("/").as_prompt()
+        self.assertNotIn("hạt giống", text)
+
+
+if __name__ == "__main__":
+    unittest.main()
