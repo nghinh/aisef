@@ -1,13 +1,13 @@
 # Phân loại lỗi thật — để không tái diễn
 
-Mười lăm lỗi tìm được trong ngày 2026-09-05, **tất cả bằng đo trên agent
+Mười sáu lỗi tìm được trong ngày 2026-09-05, **tất cả bằng đo trên agent
 thật**, không lỗi nào bằng đọc code. Mỗi lỗi có một phép hồi quy đỏ khi
 hoàn nguyên; bảng này nhóm chúng theo *lớp nguyên nhân* để lần sau, khi một
 triệu chứng mới xuất hiện, người sửa hỏi đúng câu hỏi trước.
 
 Chi tiết từng lỗi (lộ ra ở đâu, sửa gì): `docs/STATUS-2026-09-05.md` §2.4.
 
-## Sáu lớp nguyên nhân
+## Bảy lớp nguyên nhân
 
 | Lớp | Câu hỏi phải hỏi | Lỗi | Phép hồi quy |
 |---|---|---|---|
@@ -16,6 +16,7 @@ Chi tiết từng lỗi (lộ ra ở đâu, sửa gì): `docs/STATUS-2026-09-05.
 | **C. Vòng đời tiến trình** | "Ai giết con của tiến trình này khi cha chết?" | 15 `npm` chết, `node vite` sống giữ cổng (gốc của 13) | `test_mockup_map.test_stop_kills_whole_process_group` |
 | **D. Quy ước máy đòi mà không nói ra cho agent** | "Cổng đòi điều này ở đâu trong ngữ cảnh story? Nếu không có, agent chỉ có thể đoán." | 12 mockup không đánh dấu `data-state` (cổng máy không kiểm quy ước của chính skill) · 14 bản ghi hạt giống `1` cho route có tham số | `test_design_contract_states` · `test_mockup_map_seed` |
 | **E. Phân loại kết cục sai — "không chạy được" bị coi là "trượt", "chưa cấu hình" bị coi là "đạt"** | "Kết cục này thuộc sáu loại nào? Ai đặt tên cho nó?" | 2 completion chặn vô hạn khi chưa khai test · 8 MODULE_NOT_FOUND coi là test đỏ · 9 cổng tìm tên trần bỏ qua `qa:<kind>` | `test_guardrails` (skipped/unrunnable → ALLOW) · `test_tools` (unrunnable) · `test_gate` (`qa:<kind>`) |
+| **G. Bằng chứng không đọc lại được** | "Kết luận này người đọc kiểm lại bằng gì? Nguyên văn nằm ở đâu?" | 16 lời người rà soát không lưu, mục nhiều dòng cụt ở dòng đầu | `test_findings` (persist_verdict, nối dòng) |
 | **F. Hình dạng dữ liệu giữa hai bên khác nhau** | "Khoá/định dạng bên gửi có đúng là khoá bên nhận đọc không? Đã đo trên bên gửi thật chưa?" | 10 OpenCode gửi `filePath`, guard đọc `file_path` · 1 worktree không có cấu hình client · 7 cấu hình client bị tính là file story · 3 reviewer sửa cây qua Bash · 5 router suy năng lực từ chữ | `test_guardrails` (`filePath`/`newString`, HARNESS_OWNED) · `test_worktree` (`_carry_client_config`) · `test_implement` (snapshot/hoàn nguyên) · `test_router` (khai năng lực) |
 
 ## Ba bài học vận hành đi kèm
