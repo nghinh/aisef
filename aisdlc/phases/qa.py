@@ -29,6 +29,7 @@ from pathlib import Path
 from ..control.outcome import DEFAULT_REASON, Outcome
 from ..config import Config
 from ..harness import sandbox
+from ..harness.guardrails import head_sha
 from ..harness.observe import EvidenceStore
 from ..harness.tools import command_for, image_for, unrunnable_reason
 
@@ -148,6 +149,9 @@ class QaReport:
     results: list[KindResult] = field(default_factory=list)
     fake_tests: list[str] = field(default_factory=list)
     waived: list[str] = field(default_factory=list)
+    #: SHA bản được kiểm — bằng chứng không gắn bản thì không nói được nó
+    #: chứng minh cho mã nào (ADR-004 R1).
+    candidate: str = ""
 
     @property
     def failed(self) -> list[KindResult]:
@@ -299,15 +303,23 @@ def run_suite(
     story_id: str = "",
     artifact_root: Path | str | None = None,
     changed: list[str] | None = None,
+    candidate: str = "",
 ) -> QaReport:
-    """Chạy bộ kiểm định."""
+    """Chạy bộ kiểm định.
+
+    ``candidate`` là SHA bản đang kiểm (ADR-004 R1). Không truyền thì lấy
+    HEAD của chính cây đang chạy: QA cấp dự án cũng phải trả lời được "kết
+    quả này thuộc bản nào", không chỉ QA trong story.
+    """
     project = Path(project)
     cfg = config or Config.load(project)
+    candidate = candidate or head_sha(project)
     waived = [
         w.strip() for w in str(cfg.get("verify.waived", "") or "").split(",") if w.strip()
     ]
-    report = QaReport(waived=waived)
-    store = EvidenceStore(artifact_root) if (story_id and artifact_root) else None
+    report = QaReport(waived=waived, candidate=candidate)
+    store = (EvidenceStore(artifact_root, candidate=candidate)
+             if (story_id and artifact_root) else None)
 
     for kind in KINDS.values():
         if only and kind.id not in only:

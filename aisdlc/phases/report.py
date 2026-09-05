@@ -104,13 +104,14 @@ class Report:
 
         lines += [
             "", "## 3. Vận hành từng story", "",
-            "| Story | Trạng thái | Lượt agent | Chi phí | Thời gian | Map mockup | TCCN có test |",
-            "|---|---|---|---|---|---|---|",
+            "| Story | Trạng thái | Candidate | Lượt agent | Chi phí | Thời gian | Map mockup | TCCN có test |",
+            "|---|---|---|---|---|---|---|---|",
         ]
         for s in self.stories:
             lines.append(
-                f"| {s['id']} | {s['status']} | {s['runs']} | ${s['cost']:.2f} | "
-                f"{s['duration_ms'] / 1000:.0f}s | {s['mockup']} | {s.get('ac', '—')} |"
+                f"| {s['id']} | {s['status']} | {s.get('candidate') or '—'} | {s['runs']} | "
+                f"${s['cost']:.2f} | {s['duration_ms'] / 1000:.0f}s | {s['mockup']} | "
+                f"{s.get('ac', '—')} |"
             )
         chuoi = [s for s in self.stories if s.get("handoffs")]
         if chuoi:
@@ -212,6 +213,9 @@ def build(project: Path | str) -> Report:
         report.stories.append({
             "id": sid,
             "status": record.status if record else "?",
+            # Bản mà bằng chứng của story trỏ vào (ADR-004 R1) — không có
+            # thì báo cáo phải nói là không có, không im lặng.
+            "candidate": ev.candidate[:7],
             "runs": len(ev.of(AGENT_RUN)),
             "cost": ev.total_cost_usd,
             "duration_ms": ev.total_duration_ms,

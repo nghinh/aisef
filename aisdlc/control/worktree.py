@@ -47,6 +47,32 @@ def _git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProc
     return proc
 
 
+def commit_paths(path: Path, message: str, *, paths: list[str] | None = None) -> bool:
+    """Chốt phần còn dở của một cây làm việc. False nghĩa là không có gì để chốt.
+
+    Stage **đúng phạm vi ghi**, không `add -A` (bất biến 5). `diff-scope`
+    thường đã xác nhận cây nằm trong phạm vi nên hai cách cho cùng kết quả —
+    nhưng chỉ khi guard đã chạy. Stage theo phạm vi thì đúng cả khi nó chưa
+    chạy, và đó mới là điều bất biến bảo vệ.
+    """
+    if not _git(path, "status", "--porcelain", check=False).stdout.strip():
+        return False  # agent đã tự commit hết
+
+    # Chỉ stage đường dẫn **có thật**: story khai một tệp rồi không tạo ra
+    # nó là chuyện thường, nhất là khi nó trượt giữa chừng, và `git add`
+    # với pathspec không khớp thì gãy cả lệnh. Bỏ đường rỗng không nới lỏng
+    # gì — vẫn không phải `add -A`.
+    co_that = [p for p in (paths or []) if (path / p).exists()]
+    if co_that:
+        _git(path, "add", "--", *co_that)
+    else:
+        _git(path, "add", "-u")  # không khai phạm vi: chỉ file đã theo dõi
+    if not _git(path, "diff", "--cached", "--name-only", check=False).stdout.strip():
+        return False
+    _git(path, "commit", "-q", "-m", message)
+    return True
+
+
 def main_repo(path: Path | str) -> Path:
     """Kho chính của một đường dẫn, kể cả khi đang đứng trong worktree.
 
@@ -260,22 +286,7 @@ class WorktreeManager:
         path = self.path_for(story_id)
         if not path.is_dir():
             return False
-        if not _git(path, "status", "--porcelain", check=False).stdout.strip():
-            return False  # agent đã tự commit hết
-
-        # Chỉ stage đường dẫn **có thật**: story khai một tệp rồi không
-        # tạo ra nó là chuyện thường, nhất là khi nó trượt giữa chừng, và
-        # `git add` với pathspec không khớp thì gãy cả lệnh. Bỏ đường
-        # rỗng không nới lỏng gì — vẫn không phải `add -A`.
-        co_that = [p for p in (paths or []) if (path / p).exists()]
-        if co_that:
-            _git(path, "add", "--", *co_that)
-        else:
-            _git(path, "add", "-u")  # không khai phạm vi: chỉ file đã theo dõi
-        if not _git(path, "diff", "--cached", "--name-only", check=False).stdout.strip():
-            return False
-        _git(path, "commit", "-q", "-m", message or f"{story_id}: hoàn tất")
-        return True
+        return commit_paths(path, message or f"{story_id}: hoàn tất", paths=paths)
 
     def merge_story(self, story_id: str, *, into: str | None = None) -> MergeResult:
         """Merge nhánh story vào nhánh chính.

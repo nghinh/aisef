@@ -463,6 +463,16 @@ def fork_point(workdir: str, upstream: str) -> str:
     return got[0].strip() if got else ""
 
 
+def head_sha(workdir: str | Path) -> str:
+    """SHA của HEAD. Rỗng nếu không đọc được git.
+
+    Rỗng phải là **không kiểm được**, không phải "khác bản": mất tầm nhìn
+    git thì chặn cả story còn tệ hơn.
+    """
+    got = _git_lines(str(workdir), ["rev-parse", "HEAD"])
+    return got[0].strip() if got else ""
+
+
 # ------------------------------------------------------------ hoàn thành
 
 

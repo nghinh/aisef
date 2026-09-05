@@ -34,14 +34,20 @@ JOURNAL_DIR = "journal"
 
 #: Các mốc của một lượt chạy, đúng thứ tự. Danh sách này là hợp đồng: đọc
 #: nhật ký rồi so với nó là biết lượt chạy dừng ở đâu và còn nợ gì.
+#:
+#: ``candidate.frozen`` mang SHA của ứng viên và đứng **trước** mọi bước
+#: kiểm (ADR-004 R1): bằng chứng chỉ có nghĩa khi nó trỏ vào một bản cụ
+#: thể. Trước đây bước này tên ``commit.created`` và nằm *sau*
+#: ``review.completed`` — ứng viên được chốt sau khi đã chấm, nên không
+#: nói được "bằng chứng này thuộc bản nào".
 STEPS = (
     "attempt.started",
     "worktree.created",
     "status.running",
     "changes.detected",
+    "candidate.frozen",
     "verification.completed",
     "review.completed",
-    "commit.created",
     "merge.completed",
     "attempt.committed",
 )
@@ -102,8 +108,10 @@ class Journal:
         trong dự án (`--no-isolate`) thì không có bước merge, và cũng không
         có `worktree.created`, nên trả False là đúng.
         """
-        # `commit.created` chỉ xảy ra trong nhánh worktree (run.py), nên nó
+        # `commit.created` (tên cũ) chỉ xảy ra trong nhánh worktree, nên nó
         # cũng là bằng chứng có worktree — cho nhật ký cũ thiếu bước đầu.
+        # `candidate.frozen` **không** dùng được ở đây: nó được ghi cả khi
+        # chạy thẳng trong dự án (`--no-isolate`), nơi không có gì để merge.
         co_worktree = self.reached("worktree.created") or self.reached("commit.created")
         return co_worktree and not self.merged()
 

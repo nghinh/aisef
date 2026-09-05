@@ -232,6 +232,10 @@ def run_epic(
             # Story đã xong từ lượt trước nhưng chưa merge: chỉ merge lại,
             # **không** commit lại — công việc của nó đã nằm trên nhánh
             # story rồi, và worktree có thể đã bị dọn.
+            # Ứng viên đã được đóng băng ngay sau phiên developer (ADR-004
+            # R1) nên ở đây thường không còn gì để chốt. Vẫn gọi: phần dư
+            # nào sót lại phải sang được nhánh chính, và bước này không ghi
+            # nhật ký nữa — `candidate.frozen` mới là mốc chốt bản.
             for sid in done_ids:
                 story = plan.stories.get(sid)
                 worktrees.commit_story(
@@ -239,8 +243,6 @@ def run_epic(
                     f"{sid}: {story.title if story else ''}".strip(": "),
                     paths=list(story.write_scope) if story else None,
                 )
-                journal.record(sid, JEntry(step="commit.created",
-                                           attempt=journal.read(sid).attempt_no))
             for result in worktrees.merge_wave(can_merge_lai + done_ids):
                 if not result.merged:
                     wave.merge_conflicts[result.story_id] = result.conflicts

@@ -211,7 +211,7 @@ class TestCanMerge(unittest.TestCase):
 
     def test_co_worktree_ma_chua_merge_thi_can_merge(self):
         self.assertTrue(self.journal(
-            "attempt.started", "worktree.created", "commit.created", "attempt.committed"
+            "attempt.started", "worktree.created", "candidate.frozen", "attempt.committed"
         ).needs_merge)
 
     def test_da_merge_thi_khong(self):
@@ -227,6 +227,8 @@ class TestCanMerge(unittest.TestCase):
         self.assertFalse(Journal(story_id="S-01").needs_merge)
 
     def test_nhat_ky_cu_thieu_worktree_created_nhung_co_commit_created(self):
-        """`commit.created` chỉ xảy ra trong worktree — đủ để biết phải merge."""
+        """`commit.created` là **tên cũ** của mốc chốt bản (ADR-004 R1 đổi
+        thành `candidate.frozen`); nó chỉ xảy ra trong worktree, nên nhật ký
+        đã ghi trên đĩa vẫn phải đọc ra "còn nợ merge"."""
         self.assertTrue(self.journal("attempt.started", "commit.created",
                                      "attempt.committed").needs_merge)
