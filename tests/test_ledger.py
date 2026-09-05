@@ -472,6 +472,28 @@ class TestUngVienChuaLanded(LedgerTestCase):
         led = L.build(self.root)
         self.assertEqual(led.behaviors["AC-STORY-01-01-1"].status, L.REOPENED)
 
+    def test_xanh_truoc_khi_dong_bang_khong_thanh_verified(self):
+        """Lỗi 26 (par B3, 2026-09-06): agent tự chạy test giữa phiên — bằng chứng
+        mang story id nhưng chưa có candidate — xanh ở đó làm 3 hành vi của story
+        **trượt**, chưa merge, thành VERIFIED; story sau chạm tệp phải "bảo toàn"
+        thứ chưa từng lên main."""
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])   # giữa phiên
+        self.freeze("aaa1111")
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)], candidate="aaa1111")
+        self.status("failed")
+        led = L.build(self.root)
+        self.assertEqual(led.behaviors["AC-STORY-01-01-1"].status, L.GAP)
+        self.assertEqual(led.behaviors["FR-1"].status, L.GAP)
+        self.assertEqual(led.summary()["unlanded_green"], 4)
+        # Đỏ giữa phiên vẫn tính — không tin client.
+        self.status("done")
+        self.assertEqual(L.build(self.root).behaviors["AC-STORY-01-01-1"].status, L.VERIFIED)
+        self.journal.record("STORY-01-01", self.Entry(step="merge.completed", attempt=1))
+        self.freeze("bbb2222", attempt=2)
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)],
+                       failed=[ac_test("STORY-01-01", 1)], attempt=2)   # giữa phiên lượt 2
+        self.assertEqual(L.build(self.root).behaviors["AC-STORY-01-01-1"].status, L.REOPENED)
+
     def test_bang_chung_khong_co_nhat_ky_hay_khong_co_candidate_van_tinh_nhu_cu(self):
         # Không nhật ký (QA cấp dự án) hoặc evidence cũ không khai bản: giữ luật cũ.
         self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])

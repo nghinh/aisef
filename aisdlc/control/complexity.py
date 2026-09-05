@@ -203,7 +203,8 @@ def verified_touched(story: Story, ledger: dict | None,
     `write_scope` vẫn được đọc. Thiếu sổ, thiếu chỉ mục, hay hành vi không
     tra được tệp thì chiều này = 0 — thiếu dữ liệu không được biến thành
     điểm bịa. Hành vi của chính story (chạy lại) không tính: đó là mục tiêu
-    của nó, không phải thứ nó phải giữ.
+    của nó, không phải thứ nó phải giữ. Hành vi REOPENED mà `regressed_by`
+    là chính story này **có** tính — nó vừa làm hỏng thì nó phải sửa lại.
     """
     if not isinstance(ledger, dict):
         return []
@@ -213,7 +214,18 @@ def verified_touched(story: Story, ledger: dict | None,
     scopes = scopes or {}
     out: list[str] = []
     for bid, rec in (ledger.get("behaviors") or {}).items():
-        if not isinstance(rec, dict) or str(rec.get("status", "")).lower() != "verified":
+        if not isinstance(rec, dict):
+            continue
+        status = str(rec.get("status", "")).lower()
+        # REOPENED **do chính story này** vẫn là thứ nó phải giữ: bỏ khỏi danh
+        # sách thì lượt 2 nhận cổng "bảo toàn" ✅ trong khi test của story
+        # trước còn đỏ — đo par B3 2026-09-06: lượt 2 chỉ còn AC-01-01-2, mất
+        # AC-01-01-1 và FR-1 mà lượt 1 vừa làm hỏng. REOPENED do story khác
+        # thì không: story này không làm hỏng nó, chấm nó là ✗ oan.
+        if status != "verified" and not (
+            status == "reopened"
+            and str(rec.get("regressed_by") or "").startswith(story.id + "#")
+        ):
             continue
         owner = str(rec.get("story") or "")
         if owner == story.id:

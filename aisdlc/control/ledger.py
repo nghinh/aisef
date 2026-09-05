@@ -470,9 +470,14 @@ def build(artifact_root: Path | str) -> Ledger:
         n = attempts[sid]
         # R1 do luồng khác làm; evidence cũ không có candidate và đó là hợp lệ.
         cand = str(e.detail.get("candidate") or "")
-        # Story có nhật ký: ứng viên phải nằm trong tập đã landed. Không có
-        # nhật ký (QA cấp dự án, mốc vòng) thì candidate là HEAD nhánh chính.
-        landed = not cand or sid not in landed_of or cand in landed_of[sid]
+        # Story đã có ứng viên đóng băng (R1): chỉ SHA đã landed mới tính, và
+        # sự kiện **không mang** candidate của nó là lần agent tự chạy giữa
+        # phiên, trước khi đóng băng — xanh ở đó chưa vào nhánh chính. Lỗi 26
+        # (par B3, 2026-09-06): story trượt, chưa merge, mà 3 hành vi của nó
+        # VERIFIED nhờ đúng lần chạy ấy. Không nhật ký / chưa từng đóng băng
+        # (QA cấp dự án, mốc vòng, bằng chứng trước R1) → candidate là HEAD
+        # nhánh chính, tính như cũ.
+        landed = cand in landed_of[sid] if sid in landed_of else True
         if cand and sid in led.stories:
             led.stories[sid].candidate = cand
 
@@ -513,7 +518,8 @@ def _landed_candidates(root: Path) -> dict[str, set[str]]:
     STORY-01-07 2026-09-06: nhật ký kết bằng `attempt.committed` mà story
     `failed`). Chỉ story **có** nhật ký mới xuất hiện trong bản đồ — thiếu
     nhật ký nghĩa là bằng chứng không thuộc một lượt thử nào (QA cấp dự án,
-    mốc vòng), không phải "chưa landed".
+    mốc vòng), không phải "chưa landed". Story có nhật ký nhưng **chưa từng
+    đóng băng** (chạy trước R1) cũng không có trong bản đồ — cùng lý do.
     """
     store = JournalStore(root)
     status = {sid: str(rec.get("status") or "")
@@ -530,7 +536,8 @@ def _landed_candidates(root: Path) -> dict[str, set[str]]:
                 landed.add(cur)
         if cur and status.get(sid) in ("done", "verified"):
             landed.add(cur)
-        out[sid] = landed
+        if cur:
+            out[sid] = landed
     return out
 
 

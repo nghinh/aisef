@@ -107,6 +107,21 @@ class TestComponents(unittest.TestCase):
         # Không có chỉ mục → không tra được tệp → 0, không bịa.
         self.assertEqual(complexity.verified_touched(s, ledger), [])
 
+    def test_reopened_do_chinh_story_van_phai_giu(self):
+        """Lỗi 27 (par B3, 2026-09-06): lượt 1 của STORY-01-06 làm AC-01-04-1 REOPENED;
+        lượt 2 phải còn thấy nó. REOPENED do story khác thì không phải việc của nó."""
+        ledger = {"behaviors": {
+            "AC-STORY-01-04-1": {"status": "reopened", "story": "STORY-01-04",
+                                 "regressed_by": "STORY-01-06#1@abc1234"},
+            "AC-STORY-01-04-2": {"status": "reopened", "story": "STORY-01-04",
+                                 "regressed_by": "STORY-01-05#2"},
+            "AC-STORY-01-04-3": {"status": "verified", "story": "STORY-01-04"},
+        }}
+        scopes = {"STORY-01-04": ["src/a.ts"]}
+        s = story([], scope=("src/a.ts",), sid="STORY-01-06")
+        self.assertEqual(complexity.verified_touched(s, ledger, scopes),
+                         ["AC-STORY-01-04-1", "AC-STORY-01-04-3"])
+
     def test_scopes_come_from_stories_index(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d) / "_bmad-output"; root.mkdir()
