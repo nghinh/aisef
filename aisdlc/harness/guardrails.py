@@ -338,6 +338,12 @@ HARNESS_OWNED = (
     "_bmad-output/sprint-status.json.lock",
     "_bmad-output/compile-report.json",
     ".aisdlc",
+    # Cấu hình client harness chép vào worktree (`WorktreeManager._carry_client_config`)
+    # — dự án không gitignore `.claude/` thì nó hiện là tệp chưa theo dõi và guard
+    # `diff-scope` chặn mọi lệnh vì "ngoài phạm vi ghi" (dogfood par 2026-09-05:
+    # 3/3 story trượt "phạm vi ghi" vì đúng tệp này).
+    ".claude/settings.json",
+    ".opencode",
     *VENDOR_PATHS,
 )
 
@@ -449,6 +455,11 @@ def check_completion(evidence) -> Verdict:
             f"tool test` rồi mới kết thúc — bằng chứng nằm ở kết quả chạy, "
             f"không ở lời kể.",
         )
+    if last.detail.get("unrunnable"):
+        # Không chạy được ≠ đỏ: agent không sửa được môi trường/lệnh test
+        # (ngoài phạm vi ghi), chặn Stop chỉ đốt lượt. Cổng story ghi
+        # UNRUNNABLE và vẫn chặn — với lý do đúng.
+        return ALLOW
     if last.detail.get("skipped"):
         # Chưa cấu hình ≠ đỏ. Chặn ở đây thì agent không sửa được gì (lệnh
         # test là việc của dự án) và chỉ đốt lượt — đo ở hợp quy: Stop bị

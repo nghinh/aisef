@@ -99,6 +99,10 @@ class ToolResult:
     ok: bool
     exit_code: int = 0
     stdout: str = ""
+    #: Công cụ không nạp được (MODULE_NOT_FOUND, command not found…) — không
+    #: phải test đỏ. Dogfood par 2026-09-05: `node --test src/` đỏ vì lệnh sai,
+    #: guard `completion` chặn Stop ~10 lần mỗi lượt, 3 story đốt $17.
+    unrunnable: str = ""
     stderr: str = ""
     duration_ms: int = 0
     skipped: str = ""      # lý do không chạy được (không có lệnh cho stack này)
@@ -214,8 +218,38 @@ def run_tool(
         degraded=sb.degraded,
         detail={"command": command, **sb.to_evidence()},
     )
+    if not sb.ok:
+        res.unrunnable = unrunnable_reason(name, sb.exit_code, sb.stdout + "\n" + sb.stderr)
     _record(res, story_id, artifact_root)
     return res
+
+
+#: Dấu hiệu "công cụ không nạp được", không phải "test đỏ". 127 là mã POSIX
+#: cho lệnh không tìm thấy; phần còn lại là cách các hệ chạy khác nói cùng
+#: một chuyện. Gộp hai loại lại thì báo cáo chỉ sai chỗ cần sửa.
+MISSING_TOOL = (
+    "command not found",
+    "not found",
+    "cannot find module",
+    "module_not_found",
+    "no such file or directory",
+    "is not recognized as an internal or external command",
+)
+
+
+def unrunnable_reason(name: str, exit_code: int, output: str) -> str:
+    """Lý do một dòng nếu lần chạy là "không chạy được"; "" nếu là kết quả thật.
+    Với `test`, chỉ kết luận khi **không test nào xanh** — một test đỏ có
+    thông báo "not found" vẫn là test đỏ."""
+    low = output.lower()
+    hit = next((m for m in MISSING_TOOL if m in low), "")
+    if exit_code != 127 and not hit:
+        return ""
+    if name == "test":
+        from .testlog import parse as parse_testlog
+        if parse_testlog(output).passed:
+            return ""
+    return f"công cụ chưa cài hoặc không nạp được ({hit or 'exit 127'}) — dựng môi trường hoặc sửa lệnh rồi chạy lại"
 
 
 def _record(res: ToolResult, story_id: str, artifact_root) -> None:
@@ -226,6 +260,7 @@ def _record(res: ToolResult, story_id: str, artifact_root) -> None:
     detail = {
         "exit_code": res.exit_code,
         "skipped": res.skipped,
+        "unrunnable": res.unrunnable,
         "degraded": res.degraded,
         "tail": res.tail(20),
         **res.detail,

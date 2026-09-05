@@ -30,7 +30,7 @@ from ..control.outcome import DEFAULT_REASON, Outcome
 from ..config import Config
 from ..harness import sandbox
 from ..harness.observe import EvidenceStore
-from ..harness.tools import command_for, image_for
+from ..harness.tools import command_for, image_for, unrunnable_reason
 
 
 @dataclass(frozen=True)
@@ -286,26 +286,8 @@ def _project_files(project: Path) -> list[str]:
     return out
 
 
-#: Dấu hiệu "công cụ không nạp được", không phải "test đỏ". 127 là mã
-#: POSIX cho lệnh không tìm thấy; phần còn lại là cách các hệ chạy khác
-#: nói cùng một chuyện. Gộp hai loại lại thì báo cáo chỉ sai chỗ cần sửa:
-#: người đọc đi sửa test trong khi thứ hỏng là môi trường.
-_MISSING_TOOL = (
-    "command not found",
-    "not found",
-    "cannot find module",
-    "module_not_found",
-    "no such file or directory",
-    "is not recognized as an internal or external command",
-)
-
-
 def _unrunnable_reason(exit_code: int, detail: str) -> str:
-    low = detail.lower()
-    hit = next((m for m in _MISSING_TOOL if m in low), "")
-    if exit_code != 127 and not hit:
-        return ""
-    return "công cụ chưa cài hoặc không nạp được — dựng môi trường rồi chạy lại"
+    return unrunnable_reason("", exit_code, detail)
 
 
 def run_suite(

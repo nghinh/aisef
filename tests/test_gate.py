@@ -296,3 +296,29 @@ class TestTDD(GateTestCase):
     def test_caller_that_cannot_know_adds_no_check(self):
         self.green_story()
         self.assertNotIn("TDD", [c.name for c in self.gate().checks])
+
+
+class TestTestKhongChayDuoc(GateTestCase):
+    def test_gate_names_the_environment_not_the_story(self):
+        self.store.file_change("S-01", "src/a.py")
+        self.store.tool_run("S-01", "test", ok=False, detail={"unrunnable": "công cụ chưa cài hoặc không nạp được (module_not_found)"})
+        self.store.tool_run("S-01", "lint", ok=True)
+        g = self.gate()
+        m = next(c for c in g.checks if c.name == "test")
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE)
+        self.assertFalse(g.passed)
+        self.assertIn("không nạp được", g.feedback())
+
+
+class TestHopDongDocTenQa(GateTestCase):
+    """e9 R2: `qa:accessibility` xanh trong evidence mà cổng ghi "chưa cấu hình"."""
+
+    def test_qa_prefixed_runs_count(self):
+        self.green_story()
+        self.store.tool_run("S-01", "qa:e2e", ok=True)
+        self.store.tool_run("S-01", "qa:accessibility", ok=False, detail={"tail": "1 failed"})
+        g = self.gate(contract=["unit", "e2e", "accessibility"])
+        muc = {c.name: c for c in g.checks}
+        self.assertIs(muc["e2e"].outcome, Outcome.PASSED)
+        self.assertIs(muc["accessibility"].outcome, Outcome.FAILED)
+        self.assertFalse(g.passed)

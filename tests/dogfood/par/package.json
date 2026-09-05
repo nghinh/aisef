@@ -2,5 +2,8 @@
   "name": "chuoi",
   "version": "0.0.0",
   "type": "module",
-  "scripts": { "test": "node --test", "lint": "node --check src/slugify.js && node --check src/truncate.js && node --check src/word-count.js" }
+  "scripts": {
+    "test": "ls src/*.test.js >/dev/null 2>&1 && node --test src/*.test.js",
+    "lint": "node --check src/*.js"
+  }
 }

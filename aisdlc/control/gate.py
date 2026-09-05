@@ -91,7 +91,11 @@ def evaluate(
         ))
 
     completion = check_completion(evidence)
-    gate.checks.append(Check("test", completion.allowed, completion.reason.split("\n")[0]))
+    last_test = evidence.last(TOOL_RUN, "test")
+    if last_test is not None and last_test.detail.get("unrunnable"):
+        gate.checks.append(Check("test", Outcome.UNRUNNABLE, str(last_test.detail["unrunnable"])))
+    else:
+        gate.checks.append(Check("test", completion.allowed, completion.reason.split("\n")[0]))
 
     lint = evidence.last(TOOL_RUN, "lint")
     if lint is None:
@@ -200,7 +204,10 @@ def evaluate(
     for kind in contract or []:
         if kind in ("unit", "mockup-map", "security"):
             continue  # đã có mục riêng ở trên
-        ran = evidence.last(TOOL_RUN, kind)
+        # `run_suite` ghi `qa:<kind>`; tên trần là của lần chạy tay/`aisdlc tool`.
+        # e9 2026-09-05: e2e/perf/accessibility chạy thật và xanh mà cổng báo
+        # "chưa cấu hình" vì chỉ tìm tên trần.
+        ran = evidence.last(TOOL_RUN, f"qa:{kind}") or evidence.last(TOOL_RUN, kind)
         if ran is None:
             gate.checks.append(Check(kind, Outcome.UNCONFIGURED))
         elif ran.detail.get("skipped"):

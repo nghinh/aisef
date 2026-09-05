@@ -2,8 +2,11 @@
 thật, so với mốc. Không dùng bản scratch — bản scratch không lặp lại được.
 
 Bật bằng ``AISDLC_DOGFOOD=1`` (tốn tiền thật: `par` EPIC-01 ≈ $3–6).
-Đầu vào của `par` là 4 tệp ở commit `9adfb59` của dự án thử + cấu hình
-(`.claude/` **không** commit — đúng kịch bản G4). Mốc so sánh (đo 2026-09-05,
+Đầu vào của `par`: kế hoạch ở commit `9adfb59` của dự án thử, `package.json` +
+`.ai/config.json` ở `963dae3` (lệnh test đã sửa — lần dogfood đầu lấy bản
+`node --test src/` đỏ vì MODULE_NOT_FOUND, ba story đốt $17 trong vòng lặp
+guard `completion`). `.claude/` **không** commit và **không** gitignore — đúng
+kịch bản G4 và kịch bản cấu hình client bị chép vào worktree. Mốc so sánh (đo 2026-09-05,
 3 story song song, Claude): 3/3 qua ở lượt đầu, $3,14.
 """
 

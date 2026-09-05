@@ -835,3 +835,36 @@ class TestGocDuAnTuEnv(unittest.TestCase):
         self.assertEqual(project_root_from({ENV_PROJECT: "/b"}, "/a"), "/b")
         self.assertEqual(project_root_from({}, "/a"), "/a")
         self.assertEqual(project_root_from({ENV_PROJECT: "  "}, "/a"), "/a")
+
+
+class TestCauHinhClientKhongPhaiThayDoiCuaStory(unittest.TestCase):
+    """`.claude/settings.json`/`.opencode/` do harness chép vào worktree không được
+    tính là file story đổi — dogfood par: 3/3 story trượt "phạm vi ghi" vì nó."""
+
+    def test_changed_files_ignores_carried_client_config(self):
+        import subprocess, tempfile
+        from pathlib import Path
+        from aisdlc.harness.guardrails import changed_files, check_diff_scope
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp)
+            subprocess.run(["git", "init", "-q"], cwd=p, check=True)
+            subprocess.run(["git", "config", "user.email", "t@t"], cwd=p, check=True)
+            subprocess.run(["git", "config", "user.name", "t"], cwd=p, check=True)
+            (p / "src").mkdir(); (p / "src" / "a.js").write_text("1", encoding="utf-8")
+            subprocess.run(["git", "add", "-A"], cwd=p, check=True)
+            subprocess.run(["git", "commit", "-qm", "nền"], cwd=p, check=True)
+            (p / ".claude").mkdir(); (p / ".claude" / "settings.json").write_text("{}", encoding="utf-8")
+            (p / ".opencode" / "plugin").mkdir(parents=True); (p / ".opencode" / "plugin" / "g.ts").write_text("//", encoding="utf-8")
+            (p / "src" / "b.js").write_text("2", encoding="utf-8")
+            changed = changed_files(str(p))
+        self.assertEqual(changed, ["src/b.js"])
+        self.assertTrue(check_diff_scope(changed, ["src"]).allowed)
+
+
+class TestCompletionKhongChayDuoc(unittest.TestCase):
+    def test_unrunnable_test_lets_the_agent_stop(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            st = EvidenceStore(tmp)
+            st.tool_run("S", "test", ok=False, detail={"unrunnable": "công cụ chưa cài"})
+            self.assertTrue(check_completion(st.read("S")).allowed)

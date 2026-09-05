@@ -202,3 +202,27 @@ class TestDescription(ToolTestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestKhongChayDuocKhacDo(ToolTestCase):
+    """Dogfood par: `node --test src/` → MODULE_NOT_FOUND bị coi là test đỏ,
+    guard completion chặn Stop ~10 lần/lượt, 3 story đốt $17."""
+
+    def run_test_tool(self, command: str):
+        cfg = Config({**DEFAULTS, "tools.test": command, "sandbox.allow_degraded": True})
+        return run_tool("test", self.project, story_id="S-01", artifact_root=self.artifacts, config=cfg)
+
+    def test_module_not_found_is_unrunnable(self):
+        res = self.run_test_tool("sh -c 'echo \"Error: Cannot find module x\"; echo \"code: MODULE_NOT_FOUND\" >&2; exit 1'")
+        self.assertFalse(res.ok)
+        self.assertIn("không nạp được", res.unrunnable)
+        e = EvidenceStore(self.artifacts).read("S-01").last(TOOL_RUN, "test")
+        self.assertTrue(e.detail["unrunnable"])
+
+    def test_red_test_mentioning_not_found_is_still_red(self):
+        from pathlib import Path
+        (Path(self.project) / "out.txt").write_text(
+            "✔ AC-S-1: có (1ms)\n✖ AC-S-2: element not found (2ms)\nℹ tests 2\nℹ pass 1\nℹ fail 1\n", encoding="utf-8")
+        res = self.run_test_tool("sh -c 'cat out.txt; exit 1'")
+        self.assertFalse(res.ok)
+        self.assertEqual(res.unrunnable, "")
