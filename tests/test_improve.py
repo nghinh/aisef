@@ -90,8 +90,12 @@ class Fixer(ClientAdapter):
             self.fixed.add(rec["repair_of"])
         # Test mới mang mã của story sửa **và** mã gốc; `fix=False` chỉ có
         # test mang mã mới — story qua cổng của nó mà không đóng gap nào.
-        lines = ["TAP version 13", f"ok 1 - {tap_name(f'AC-{sid}-1')}"]
-        for i, bid in enumerate(sorted(self.fixed), 2):
+        # Runner thật không quên test cũ: giữ test có sẵn ở baseline (R9 chấm
+        # "mất test" là hồi quy) và test của mọi story sửa trước (R4 đòi hành
+        # vi VERIFIED của story khác còn xanh ở ứng viên).
+        lines = ["TAP version 13", f"ok 1 - {BASE_TEST}"]
+        truoc = [x for x in dict.fromkeys(self.develop_calls) if x != sid]
+        for i, bid in enumerate([f"AC-{x}-1" for x in truoc] + [f"AC-{sid}-1"] + sorted(self.fixed), 2):
             lines.append(f"ok {i} - {tap_name(bid)}")
         script = Path(spec.workdir) / TEST_SCRIPT
         script.parent.mkdir(parents=True, exist_ok=True)
@@ -103,6 +107,10 @@ class Fixer(ClientAdapter):
         return RunResult(ok=True, text="xong", cost_usd=1.0)
 
 
+#: Test có sẵn trước khi vòng sửa chạm vào — baseline R9 phải chạy được.
+BASE_TEST = "src/core/x.test.js > khởi động"
+
+
 class ImproveTestCase(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
@@ -112,6 +120,10 @@ class ImproveTestCase(unittest.TestCase):
                     ["git", "config", "user.name", "t"]):
             subprocess.run(cmd, cwd=self.project, check=True)
         (self.project / "README.md").write_text("dự án\n", encoding="utf-8")
+        script = self.project / TEST_SCRIPT
+        script.parent.mkdir(parents=True, exist_ok=True)
+        script.write_text(f"#!/bin/sh\necho 'TAP version 13'\necho 'ok 1 - {BASE_TEST}'\nexit 0\n",
+                          encoding="utf-8")
         self.artifacts = self.project / "_bmad-output"
         self.artifacts.mkdir()
         (self.artifacts / "stories.index.json").write_text(
@@ -120,7 +132,7 @@ class ImproveTestCase(unittest.TestCase):
         # của STORY-01-01 → hai tiêu chí là GAP "chưa có test mang mã".
         EvidenceStore(self.artifacts).tool_run(
             "STORY-01-01", "test", ok=True,
-            detail={"test_format": "node-tap", "test_ids": ["src/core/x.test.js > khởi động"],
+            detail={"test_format": "node-tap", "test_ids": [BASE_TEST],
                     "failed_ids": []},
         )
         subprocess.run(["git", "add", "-A"], cwd=self.project, check=True)
@@ -197,7 +209,9 @@ class TestVongSuaGap(ImproveTestCase):
         self.assertEqual(rp["epic_id"], "EPIC-RP-01")
         self.assertEqual(rp["repair_of"], "AC-STORY-01-01-1")
         self.assertEqual(rp["loop"], "loop-1")
-        self.assertEqual(rp["write_scope"], ["src/core"])
+        # `src/core` của story gốc + đường harness cấp cho hợp đồng kiểm định (lỗi 21), nằm trong đó.
+        self.assertEqual(rp["write_scope"][0], "src/core")
+        self.assertTrue(all(p.startswith("src/core") for p in rp["write_scope"]), rp["write_scope"])
         self.assertEqual(rp["depends_on"], [])
         self.assertEqual(rp["verification_contract"], ["unit"])
         self.assertEqual(len(rp["acceptance_criteria"]), 1)

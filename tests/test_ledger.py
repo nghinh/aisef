@@ -370,8 +370,14 @@ class TestUngVienChuaLanded(LedgerTestCase):
     def freeze(self, sha, *, attempt=1, committed=False):
         self.journal.record("STORY-01-01", self.Entry(step="candidate.frozen", attempt=attempt,
                                                        data={"sha": sha}))
+        # `attempt.committed` chỉ đóng giao dịch (có cả khi trượt); landed là `merge.completed`.
+        self.journal.record("STORY-01-01", self.Entry(step="attempt.committed", attempt=attempt))
         if committed:
-            self.journal.record("STORY-01-01", self.Entry(step="attempt.committed", attempt=attempt))
+            self.journal.record("STORY-01-01", self.Entry(step="merge.completed", attempt=attempt))
+
+    def status(self, value):
+        (self.root / "sprint-status.json").write_text(
+            json.dumps({"stories": {"STORY-01-01": {"status": value}}}), encoding="utf-8")
 
     def test_xanh_o_ung_vien_bi_cong_tra_ve_khong_thanh_verified(self):
         self.freeze("aaa1111")
@@ -400,5 +406,26 @@ class TestUngVienChuaLanded(LedgerTestCase):
     def test_bang_chung_khong_co_nhat_ky_hay_khong_co_candidate_van_tinh_nhu_cu(self):
         # Không nhật ký (QA cấp dự án) hoặc evidence cũ không khai bản: giữ luật cũ.
         self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])
+        self.assertEqual(L.build(self.root).behaviors["AC-STORY-01-01-1"].status, L.VERIFIED)
+
+    def test_story_done_thi_ung_vien_cuoi_landed_du_khong_merge(self):
+        # Chạy thẳng trong dự án (`--no-isolate`): không có merge, nhưng story đã done.
+        self.freeze("aaa1111")
+        self.freeze("bbb2222", attempt=2)
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)], candidate="aaa1111")
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)], attempt=2, candidate="bbb2222")
+        self.status("failed")
+        self.assertEqual(L.build(self.root).behaviors["AC-STORY-01-01-1"].status, L.GAP)
+        self.status("done")
+        led = L.build(self.root)
+        self.assertEqual(led.behaviors["AC-STORY-01-01-1"].status, L.VERIFIED)
+        self.assertEqual(led.behaviors["AC-STORY-01-01-1"].candidate, "bbb2222")
+
+    def test_qua_cong_o_ung_vien_thi_landed_du_chua_merge(self):
+        from aisdlc.harness.observe import Event, NOTE
+        self.freeze("aaa1111")
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)], candidate="aaa1111")
+        self.store.record("STORY-01-01", Event(kind=NOTE, name="gate:verdict", ok=True,
+                                               detail={"candidate": "aaa1111"}))
         self.assertEqual(L.build(self.root).behaviors["AC-STORY-01-01-1"].status, L.VERIFIED)
 

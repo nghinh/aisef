@@ -43,6 +43,7 @@ from ..harness.observe import (
     BEHAVIOR,
     EVIDENCE_DIR,
     MOCKUP_MAP,
+    NOTE,
     TOOL_RUN,
     AGENT_RUN,
     EvidenceStore,
@@ -407,6 +408,12 @@ def build(artifact_root: Path | str) -> Ledger:
     events.sort(key=lambda t: (t[0], t[1], t[2]))
 
     landed_of = _landed_candidates(root)
+    # Qua cổng ở ứng viên nào thì ứng viên ấy landed ở mức lượt (`note
+    # gate:verdict ok=True`, do `implement.run_attempt` ghi): implement không
+    # merge, và story chạy qua `implement_story` trực tiếp không có nhật ký merge.
+    for _at, sid, _seq, e in events:
+        if e.kind == NOTE and e.name == "gate:verdict" and e.ok and e.detail.get("candidate"):
+            landed_of.setdefault(sid, set()).add(str(e.detail["candidate"]))
     attempts: dict[str, int] = {}
     for at, sid, _seq, e in events:
         attempts[sid] = _attempt(e, sid, attempts.get(sid, 0))
@@ -449,13 +456,19 @@ def build(artifact_root: Path | str) -> Ledger:
 def _landed_candidates(root: Path) -> dict[str, set[str]]:
     """Story → tập SHA ứng viên đã landed, đọc từ nhật ký (ADR-004 R1).
 
-    Một ứng viên landed khi giao dịch đóng băng nó kết thúc bằng
-    `attempt.committed` (hoặc `merge.completed`); ứng viên đóng băng rồi bị
-    cổng trả về không có mặt ở đây. Chỉ story **có** nhật ký mới xuất hiện
-    trong bản đồ — thiếu nhật ký nghĩa là bằng chứng không thuộc một lượt
-    thử nào (QA cấp dự án, mốc vòng), không phải "chưa landed".
+    Một ứng viên landed khi sau lúc đóng băng nó có `merge.completed`, hoặc
+    khi nó là ứng viên **cuối** của một story đã `done`/`verified` (chạy
+    thẳng trong dự án thì không có merge). `attempt.committed` **không**
+    phải dấu thành công — nó đóng giao dịch kể cả khi story trượt (e9
+    STORY-01-07 2026-09-06: nhật ký kết bằng `attempt.committed` mà story
+    `failed`). Chỉ story **có** nhật ký mới xuất hiện trong bản đồ — thiếu
+    nhật ký nghĩa là bằng chứng không thuộc một lượt thử nào (QA cấp dự án,
+    mốc vòng), không phải "chưa landed".
     """
     store = JournalStore(root)
+    status = {sid: str(rec.get("status") or "")
+              for sid, rec in (_read_json(root / "sprint-status.json").get("stories") or {}).items()
+              if isinstance(rec, dict)}
     out: dict[str, set[str]] = {}
     for path in sorted(store.root.glob("*.jsonl")):
         sid = path.stem
@@ -463,8 +476,10 @@ def _landed_candidates(root: Path) -> dict[str, set[str]]:
         for en in store.read(sid).entries:
             if en.step == "candidate.frozen":
                 cur = str((en.data or {}).get("sha") or "")
-            elif en.step in ("attempt.committed", "merge.completed") and cur:
+            elif en.step == "merge.completed" and cur:
                 landed.add(cur)
+        if cur and status.get(sid) in ("done", "verified"):
+            landed.add(cur)
         out[sid] = landed
     return out
 

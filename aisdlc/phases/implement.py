@@ -613,6 +613,13 @@ def run_attempt(
         preservation=preservation,
     )
     attempt.ok = attempt.gate.passed
+    # Kết cục cổng đi vào bằng chứng, mang SHA ứng viên: sổ hành vi (R2) coi
+    # "qua cổng ở ứng viên này" là dấu landed ở mức lượt — implement không
+    # merge, và `attempt.committed` đóng giao dịch kể cả khi trượt.
+    evidence.record(story.id, Event(
+        kind=NOTE, name="gate:verdict", ok=attempt.ok,
+        detail={"failures": [c.name for c in attempt.gate.failures][:20], "attempt": number},
+    ))
     return attempt
 
 
