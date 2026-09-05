@@ -1,0 +1,352 @@
+"""Sổ hành vi — VERIFIED / GAP / REOPENED chiếu từ bằng chứng (ADR-004 R2/R6/R7).
+
+Điều sổ này phải chứng minh được, và cổng story hôm nay không: phân biệt
+"chưa từng đạt" với "đã đạt rồi hỏng". Vì thế test trung tâm ở đây là một
+chuỗi thời gian, không phải một ảnh chụp.
+"""
+
+from __future__ import annotations
+
+import io
+import json
+import sys
+import tempfile
+import unittest
+from contextlib import redirect_stdout, redirect_stderr
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from aisdlc.control import ledger as L  # noqa: E402
+from aisdlc.harness.observe import Event, EvidenceStore, MOCKUP_MAP  # noqa: E402
+
+
+def ac_test(story: str, i: int) -> str:
+    return f"src/x.ts > nhóm > AC-{story}-{i}: mô tả"
+
+
+class LedgerTestCase(unittest.TestCase):
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name) / "_bmad-output"
+        self.root.mkdir(parents=True)
+        self.store = EvidenceStore(self.root)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def index(self, stories):
+        (self.root / L.STORIES_INDEX).write_text(
+            json.dumps({"stories": stories}, ensure_ascii=False), encoding="utf-8"
+        )
+
+    def run_tests(self, story: str, *, ids, failed=(), attempt=1, candidate="", ok=None):
+        self.store.tool_run(
+            story, "test",
+            ok=(not failed) if ok is None else ok,
+            detail={
+                "test_format": "vitest", "test_ids": list(ids),
+                "failed_ids": list(failed), "attempt": attempt,
+                **({"candidate": candidate} if candidate else {}),
+            },
+        )
+
+
+class TestChuoiThoiGian(LedgerTestCase):
+    def setUp(self):
+        super().setUp()
+        self.index([
+            {"id": "STORY-01-01", "epic_id": "EPIC-01",
+             "acceptance_criteria": ["a"], "covers": ["FR-1"]},
+            {"id": "STORY-01-02", "epic_id": "EPIC-01", "acceptance_criteria": ["b"]},
+        ])
+
+    def test_xanh_do_xanh_thanh_verified_reopened_verified(self):
+        """Chuỗi HoH: đúng → hỏng → sửa. Cái ở giữa **không** phải GAP."""
+        t1 = ac_test("STORY-01-01", 1)
+        self.run_tests("STORY-01-01", ids=[t1])
+        # Story sau chạy cùng bộ test và làm đỏ tiêu chí của story trước.
+        self.run_tests("STORY-01-02", ids=[t1, ac_test("STORY-01-02", 1)],
+                       failed=[t1], attempt=2, candidate="deadbeefcafe")
+        self.run_tests("STORY-01-02", ids=[t1, ac_test("STORY-01-02", 1)], attempt=3)
+
+        led = L.build(self.root)
+        b = led.behaviors["AC-STORY-01-01-1"]
+        self.assertEqual([h["status"] for h in b.history],
+                         [L.VERIFIED, L.REOPENED, L.VERIFIED])
+        self.assertEqual(b.status, L.VERIFIED)
+
+    def test_regressed_by_chi_dung_story_va_luot_lam_hong(self):
+        t1 = ac_test("STORY-01-01", 1)
+        self.run_tests("STORY-01-01", ids=[t1])
+        self.run_tests("STORY-01-02", ids=[t1], failed=[t1], attempt=2,
+                       candidate="deadbeefcafe")
+
+        led = L.build(self.root)
+        b = led.behaviors["AC-STORY-01-01-1"]
+        self.assertEqual(b.status, L.REOPENED)
+        self.assertEqual(b.regressed_by, "STORY-01-02#2@deadbee")
+        # Hồi quy liên story là con số HoH đo; đỏ lại trong lượt của chính
+        # mình chỉ là TDD, không được lẫn vào đây.
+        self.assertEqual(led.summary()["cross_reopens"], 2)   # tiêu chí + FR-1
+        self.assertEqual(
+            {c["id"] for c in led.cross_reopens}, {"AC-STORY-01-01-1", "FR-1"})
+        self.assertEqual(led.cross_reopens[0]["verified_by"], "STORY-01-01")
+
+    def test_do_lai_trong_luot_cua_chinh_minh_khong_tinh_lien_story(self):
+        t1 = ac_test("STORY-01-01", 1)
+        self.run_tests("STORY-01-01", ids=[t1])
+        self.run_tests("STORY-01-01", ids=[t1], failed=[t1], attempt=2)
+        led = L.build(self.root)
+        # tiêu chí **và** FR story phủ đều hỏng lại — nhưng do chính nó
+        self.assertEqual(led.summary()["reopened"], 2)
+        self.assertEqual(led.summary()["cross_reopens"], 0)
+
+    def test_gap_roi_xanh_la_resolved_khong_phai_reopened(self):
+        # Lượt đầu chưa có test nào mang mã → GAP, không phải "chưa biết".
+        self.run_tests("STORY-01-01", ids=["src/x.ts > không mang mã nào"], ok=True)
+        led = L.build(self.root)
+        self.assertEqual(led.behaviors["AC-STORY-01-01-1"].status, L.GAP)
+        self.assertEqual(led.summary()["resolved"], 0)
+
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)], attempt=2)
+        led = L.build(self.root)
+        b = led.behaviors["AC-STORY-01-01-1"]
+        self.assertEqual(b.status, L.VERIFIED)
+        self.assertEqual([h["status"] for h in b.history], [L.GAP, L.VERIFIED])
+        self.assertEqual(led.summary()["resolved"], 2)   # tiêu chí + FR-1
+        self.assertEqual(led.summary()["reopen_events"], 0)
+
+    def test_lich_su_chi_ghi_khi_trang_thai_doi(self):
+        """e9 có ~100 lần chạy test × ~280 tên; ghi mọi quan sát thì sổ to
+        hơn bằng chứng nó chiếu ra."""
+        for i in range(10):
+            self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)], attempt=i + 1)
+        led = L.build(self.root)
+        self.assertEqual(len(led.behaviors["AC-STORY-01-01-1"].history), 1)
+
+
+class TestNguonHanhVi(LedgerTestCase):
+    def test_bon_nguon_deu_thanh_hanh_vi(self):
+        self.index([{"id": "STORY-01-01", "epic_id": "EPIC-01",
+                     "acceptance_criteria": ["a"], "covers": ["FR-2", "NFR-1"]}])
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])
+        self.store.tool_run("STORY-01-01", "qa:e2e", ok=False, detail={"tail": "đỏ"})
+        self.store.record("STORY-01-01", Event(
+            kind=MOCKUP_MAP, name="notes-list", ok=False, detail={"missing": ["nút"]}))
+
+        led = L.build(self.root)
+        self.assertEqual(led.behaviors["AC-STORY-01-01-1"].status, L.VERIFIED)
+        self.assertEqual(led.behaviors["FR-2"].kind, "fr")
+        self.assertEqual(led.behaviors["NFR-1"].kind, "nfr")
+        self.assertEqual(led.behaviors["qa:e2e"].status, L.GAP)
+        self.assertEqual(led.behaviors["mockup:notes-list"].status, L.GAP)
+
+    def test_khong_doc_duoc_ten_test_la_gap_khong_phai_dat(self):
+        """Cùng luật với cổng: chưa cấu hình reporter ≠ tiêu chí đã đạt."""
+        self.index([{"id": "STORY-01-01", "acceptance_criteria": ["a", "b"]}])
+        self.store.tool_run("STORY-01-01", "test", ok=True, detail={"tail": "3 passed"})
+        led = L.build(self.root)
+        self.assertEqual(led.summary()["gap"], 2)
+        self.assertIn("không đọc được", led.behaviors["AC-STORY-01-01-1"].source["why"])
+
+    def test_bo_test_chay_mot_phan_khong_bien_story_khac_thanh_gap(self):
+        """Lần chạy không thấy story kia thì nó im lặng, không kết tội."""
+        self.index([
+            {"id": "STORY-01-01", "acceptance_criteria": ["a"]},
+            {"id": "STORY-01-02", "acceptance_criteria": ["b"]},
+        ])
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])
+        led = L.build(self.root)
+        self.assertNotIn("AC-STORY-01-02-1", led.behaviors)
+
+    def test_su_kien_behavior_do_pha_khac_ghi_cung_vao_so(self):
+        self.index([{"id": "STORY-01-01", "acceptance_criteria": ["a"]}])
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])
+        self.store.behavior("STORY-01-01", id="AC-STORY-01-01-1", status="gap",
+                            candidate="abc1234", source={"reviewer": "chặn"})
+        led = L.build(self.root)
+        b = led.behaviors["AC-STORY-01-01-1"]
+        self.assertEqual(b.status, L.REOPENED)
+        self.assertEqual(b.source["reviewer"], "chặn")
+
+    def test_evidence_cu_khong_co_candidate_van_chieu_duoc(self):
+        """R1 do luồng khác làm; bằng chứng hôm nay không có SHA."""
+        self.index([{"id": "STORY-01-01", "acceptance_criteria": ["a"]}])
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])
+        led = L.build(self.root)
+        self.assertEqual(led.behaviors["AC-STORY-01-01-1"].candidate, "")
+        self.assertEqual(led.summary()["verified"], 1)
+
+
+class TestMetrics(LedgerTestCase):
+    def fake(self) -> L.Ledger:
+        led = L.Ledger(root=self.root)
+        led.observe("AC-S-1", "ac", ok=True, at=1.0, story="S", attempt=1)
+        led.observe("AC-S-2", "ac", ok=False, at=2.0, story="S", attempt=1)
+        led.snapshot("loop-1", cost_usd=2.0)
+        led.observe("AC-S-2", "ac", ok=True, at=3.0, story="S2", attempt=1)
+        led.observe("AC-S-1", "ac", ok=False, at=4.0, story="S2", attempt=2)
+        led.snapshot("loop-2", cost_usd=4.0)
+        return led
+
+    def test_growth_reopened_resolved(self):
+        m = self.fake().metrics()
+        self.assertEqual([g["verified"] for g in m["growth"]], [1, 2])
+        self.assertEqual(m["ever_verified"], 2)
+        self.assertEqual(m["resolved"], 1)
+        self.assertEqual(m["reopen_events"], 1)
+        self.assertEqual(m["reopen_rate"], 0.5)
+
+    def test_cai_thien_bien_giua_hai_moc(self):
+        loops = self.fake().metrics()["loops"]
+        self.assertEqual(loops[0]["marginal"], (1 - 0) / 2.0)
+        # vòng 2: VERIFIED 1→1 (một cái đóng, một cái hỏng), REOPENED 0→1
+        self.assertEqual(loops[1]["d_verified"], 0)
+        self.assertEqual(loops[1]["d_reopened"], 1)
+        self.assertEqual(loops[1]["marginal"], (0 - 1) / 4.0)
+
+    def test_khong_co_chi_phi_thi_khong_co_mau_so(self):
+        led = L.Ledger(root=self.root)
+        led.observe("AC-S-1", "ac", ok=True, at=1.0, story="S")
+        led.snapshot("loop-1", cost_usd=0.0)
+        self.assertIsNone(led.metrics()["loops"][0]["marginal"])
+
+    def test_moc_vong_khong_bi_mat_khi_chieu_lai(self):
+        """`aisdlc report` chiếu lại sổ mỗi lần; mốc mà vòng cải tiến vừa
+        chốt là thứ duy nhất không suy lại được, nên phải sống sót."""
+        self.index([{"id": "STORY-01-01", "acceptance_criteria": ["a"]}])
+        led = L.build(self.root)
+        led.snapshot("loop-1", cost_usd=3.0)
+        led.write(self.root)
+        self.assertEqual([lo["n"] for lo in L.build(self.root).loops], ["loop-1"])
+
+    def test_snapshot_ghi_vao_ledger_json(self):
+        led = self.fake()
+        led.write(self.root)
+        data = json.loads((self.root / L.LEDGER_FILE).read_text(encoding="utf-8"))
+        self.assertEqual(data["version"], L.VERSION)
+        self.assertEqual([lo["n"] for lo in data["loops"]], ["loop-1", "loop-2"])
+        self.assertIn("history", data["behaviors"]["AC-S-1"])
+
+
+class TestChiMuc(LedgerTestCase):
+    def build_two_epics(self) -> L.Ledger:
+        self.index([
+            {"id": "STORY-01-01", "epic_id": "EPIC-01", "acceptance_criteria": ["a"]},
+            {"id": "STORY-01-02", "epic_id": "EPIC-01", "acceptance_criteria": ["b"]},
+            {"id": "STORY-02-01", "epic_id": "EPIC-02", "acceptance_criteria": ["c"]},
+        ])
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])
+        return L.build(self.root)
+
+    def test_toi_da_mot_dong_moi_story_va_mot_dong_moi_epic(self):
+        led = self.build_two_epics()
+        lines = led.index_lines()
+        self.assertEqual(len(lines), 3 + 2)          # 3 story + 2 epic
+        self.assertEqual(sum(1 for l in lines if l.startswith("## ")), 2)
+
+    def test_dong_story_co_du_trang_thai_candidate_so_hanh_vi_va_duong_dan(self):
+        led = self.build_two_epics()
+        line = next(l for l in led.index_lines() if "STORY-01-01" in l)
+        self.assertIn("V1 G0 R0", line)
+        self.assertIn("evidence/STORY-01-01.jsonl", line)
+
+    def test_index_ghi_ra_file(self):
+        led = self.build_two_epics()
+        path = led.index(self.root)
+        self.assertTrue(path.name == L.INDEX_FILE)
+        self.assertIn("EPIC-02", path.read_text(encoding="utf-8"))
+
+    def test_lat_cat_epic_chi_lay_epic_do_va_co_tran(self):
+        led = self.build_two_epics()
+        slice_ = led.epic_slice("EPIC-01")
+        self.assertIn("STORY-01-02", slice_)
+        self.assertNotIn("STORY-02-01", slice_)
+        cut = led.epic_slice("EPIC-01", max_chars=40)
+        self.assertLessEqual(len(cut), 40 + 80)      # phần cắt có ghi chú
+        self.assertIn("đã cắt", cut)
+
+
+class TestSlotIndexTrongPrompt(LedgerTestCase):
+    def test_slot_index_co_nguon_ledger_va_ton_tran(self):
+        from aisdlc.config import Config
+        from aisdlc.control.normalize import Story
+        from aisdlc.phases.implement import SLOT_SOURCE, build_context, handoff_slots
+
+        self.assertEqual(SLOT_SOURCE["index"], "ledger")
+        self.index([{"id": "STORY-01-01", "epic_id": "EPIC-01",
+                     "acceptance_criteria": ["a"]}])
+        for i in range(30):
+            self.store.tool_run(f"STORY-01-{i:02d}", "test", ok=True,
+                                detail={"tail": "x" * 50})
+
+        story = Story(id="STORY-01-01", epic_id="EPIC-01", title="t")
+        cfg = Config.load(self.root.parent)
+        cfg.values["context.max_index_chars"] = 120
+        ctx = build_context(story, project=self.root.parent, artifact_root=self.root,
+                            architecture=None, contract=None, config=cfg)
+        self.assertLessEqual(len(ctx["index"]), 120 + 80)
+        self.assertEqual(handoff_slots(ctx)["index"][0], "ledger")
+
+    def test_chua_co_bang_chung_thi_slot_noi_that(self):
+        from aisdlc.control.normalize import Story
+        from aisdlc.phases.implement import build_context
+
+        story = Story(id="STORY-09-01", epic_id="EPIC-09", title="t")
+        ctx = build_context(story, project=self.root.parent, artifact_root=self.root,
+                            architecture=None, contract=None, config=None)
+        self.assertIn("chưa có bằng chứng", ctx["index"])
+
+
+class TestCliEvidence(LedgerTestCase):
+    def run_cli(self, *args: str) -> tuple[int, str, str]:
+        from aisdlc.cli import main
+
+        out, err = io.StringIO(), io.StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            code = main(["--project", str(self.root.parent), *args])
+        return code, out.getvalue(), err.getvalue()
+
+    def seed(self):
+        self.index([{"id": "STORY-01-01", "epic_id": "EPIC-01",
+                     "acceptance_criteria": ["a"]},
+                    {"id": "STORY-01-02", "epic_id": "EPIC-01",
+                     "acceptance_criteria": ["b"]}])
+        t1 = ac_test("STORY-01-01", 1)
+        self.run_tests("STORY-01-01", ids=[t1])
+        self.run_tests("STORY-01-02", ids=[t1, ac_test("STORY-01-02", 1)],
+                       failed=[t1], attempt=2)
+
+    def test_tra_mot_hanh_vi_in_ra_lich_su(self):
+        self.seed()
+        code, out, _ = self.run_cli("evidence", "AC-STORY-01-01-1")
+        self.assertEqual(code, 0)
+        self.assertIn("REOPENED", out)
+        self.assertIn("STORY-01-02#2", out)
+        self.assertEqual(out.count("verified"), 1)   # dòng lịch sử đầu tiên
+
+    def test_tra_mot_story_in_dong_chi_muc_va_hanh_vi_cua_no(self):
+        self.seed()
+        code, out, _ = self.run_cli("evidence", "STORY-01-01")
+        self.assertEqual(code, 0)
+        self.assertIn("evidence/STORY-01-01.jsonl", out)
+        self.assertIn("AC-STORY-01-01-1", out)
+
+    def test_id_khong_co_thi_bao_khong_biet_chu_khong_im(self):
+        self.seed()
+        code, _, err = self.run_cli("evidence", "AC-KHONG-CO-1")
+        self.assertEqual(code, 2)
+        self.assertIn("không có story hay hành vi", err)
+
+    def test_co_story_thi_ghi_bang_chung_evidence_lookup(self):
+        self.seed()
+        self.run_cli("evidence", "AC-STORY-01-01-1", "--story", "STORY-01-02")
+        notes = [e for e in self.store.read("STORY-01-02").events if e.name == "evidence_lookup"]
+        self.assertEqual(len(notes), 1)
+        self.assertEqual(notes[0].detail["id"], "AC-STORY-01-01-1")
+
+
+if __name__ == "__main__":
+    unittest.main()

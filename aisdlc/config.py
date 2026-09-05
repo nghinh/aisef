@@ -40,6 +40,10 @@ DEFAULTS: dict[str, Any] = {
     # story đắt nhất (e9 01-04 23,5 và 01-05 18,0) khỏi phần còn lại (≤ 15,5).
     # Xem `control/complexity.py` và ADR-004 §6 R5.
     "story.max_complexity": 16.0,
+    # Trần ký tự cho lát cắt chỉ mục bằng chứng nạp vào prompt (ADR-004 R6).
+    # Chỉ mục thay cho việc đổ lịch sử: agent cần chi tiết thì gọi
+    # `aisdlc evidence <id>`, không nạp sẵn cả sổ.
+    "context.max_index_chars": 2000,
     # điều phối
     "run.max_parallel": 3,
     "run.max_turns": 40,
@@ -103,6 +107,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "story.max_write_scope_paths": int,
     "story.max_screen_states": int,
     "story.max_complexity": float,
+    "context.max_index_chars": int,
     "run.max_parallel": int,
     "run.max_turns": int,
     "run.timeout_seconds": int,

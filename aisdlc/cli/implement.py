@@ -295,8 +295,53 @@ def cmd_predeploy(args) -> int:
     return EXIT_OK
 
 
+def cmd_evidence(args) -> int:
+    """Tra một story hoặc một hành vi trong sổ hành vi (ADR-004 R6).
+
+    Đây là nửa sau của progressive disclosure: prompt chỉ nhận **chỉ mục**,
+    còn lịch sử nằm ở đây, tra khi cần chứ không nạp sẵn.
+    """
+    from ..control import ledger as ledger_mod
+
+    root = _artifact_root(args)
+    led = ledger_mod.build(root)
+    target = args.id
+
+    def show(b) -> None:
+        print(f"\n{b.id} [{b.kind}] — {b.status.upper()}"
+              + (f" · candidate {b.candidate[:7]}" if b.candidate else "")
+              + (f" · hồi quy do {b.regressed_by}" if b.regressed_by else ""))
+        for h in b.history:
+            src = h.get("source") or {}
+            note = src.get("test_id") or src.get("why") or src.get("screen") or src.get("qa_kind") or ""
+            print(f"  {h['status']:<9} {h.get('story', ''):<14} {str(note)[:90]}")
+
+    if target in led.stories:
+        line = led.stories[target]
+        v, g, r = led.counts_for(target)
+        print(f"{line.id} · {line.status} · candidate {line.candidate[:7] or '—'} · "
+              f"V{v} G{g} R{r} · {line.evidence_path}")
+        for b in sorted(led.for_story(target), key=lambda b: b.id):
+            show(b)
+    elif target in led.behaviors:
+        show(led.behaviors[target])
+    else:
+        print(f"✗ không có story hay hành vi nào tên {target} trong sổ. "
+              f"Xem `{root.name}/INDEX.md` (aisdlc report sinh lại).", file=sys.stderr)
+        return EXIT_NOT_READY
+
+    if args.story:
+        from ..harness.observe import NOTE, Event, EvidenceStore
+
+        EvidenceStore(root).record(args.story, Event(
+            kind=NOTE, name="evidence_lookup", detail={"id": target},
+        ))
+    return EXIT_OK
+
+
 def cmd_report(args) -> int:
     """Sinh báo cáo nghiệm thu từ bằng chứng đã có."""
+    from ..control import ledger as ledger_mod
     from ..phases.report import build, write
 
     report = build(args.project)
@@ -305,4 +350,12 @@ def cmd_report(args) -> int:
     print(f"  yêu cầu chưa phủ: {len(report.uncovered)}")
     print(f"  story có bằng chứng: {len(report.stories)}")
     print(f"  tổng chi phí: ${report.total_cost_usd:.2f}")
+
+    # Sổ hành vi + chỉ mục: chiếu lại từ bằng chứng mỗi lần, không tích luỹ.
+    led = ledger_mod.build(_artifact_root(args))
+    s = led.summary()
+    print(f"  sổ hành vi: {s['verified']} verified · {s['gap']} gap · "
+          f"{s['reopened']} reopened (đóng lại {s['resolved']}, "
+          f"hồi quy liên story {s['cross_reopens']})")
+    print(f"  {led.write(_artifact_root(args))}\n  {led.index(_artifact_root(args))}")
     return EXIT_OK if not report.uncovered else EXIT_NOT_READY

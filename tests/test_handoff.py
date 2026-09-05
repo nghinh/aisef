@@ -35,7 +35,9 @@ class TestNguonSlot(unittest.TestCase):
                          "artifact+gate+review")
 
     def test_every_declared_source_is_a_machine_or_artifact(self):
-        self.assertTrue(set(SLOT_SOURCE.values()) <= {"artifact", "config", "router", "git", "code"})
+        # `ledger` là phép chiếu từ evidence — máy, không phải lời agent.
+        self.assertTrue(set(SLOT_SOURCE.values())
+                        <= {"artifact", "config", "router", "git", "code", "ledger"})
 
 
 class TestSuKienHandoff(unittest.TestCase):

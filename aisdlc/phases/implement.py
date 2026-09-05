@@ -160,7 +160,26 @@ def build_context(
         "write_scope": _write_scope_lines(story, project),
         "mockup_section": prompt_section(slices),
         "tools": describe_tools(project, config),
+        "index": _index_slice(story, artifact_root, config),
     }
+
+
+def _index_slice(story: Story, artifact_root: Path, config: Config | None) -> str:
+    """Lát cắt chỉ mục bằng chứng của epic chứa story (ADR-004 R6).
+
+    Progressive disclosure: prompt nhận **một dòng mỗi story** — trạng thái,
+    candidate, số hành vi VERIFIED/GAP/REOPENED — chứ không nhận lịch sử.
+    Lịch sử nằm ở `aisdlc evidence <id>`, tra khi cần. Sổ hỏng hay chưa có
+    thì slot rỗng có lời giải thích, không làm hỏng lượt chạy.
+    """
+    from ..control import ledger as ledger_mod
+
+    cap = int(config["context.max_index_chars"]) if config else 2000
+    try:
+        text = ledger_mod.build(artifact_root).epic_slice(story.epic_id, max_chars=cap)
+    except OSError:
+        text = ""
+    return text or "_(chưa có bằng chứng nào cho epic này)_"
 
 
 #: Slot nào của prompt đến từ đâu. Gói cho reviewer/security **không** được
@@ -170,6 +189,7 @@ SLOT_SOURCE = {
     "story_id": "artifact", "story_title": "artifact", "story_contract": "artifact",
     "architecture_rules": "artifact", "write_scope": "artifact", "mockup_section": "artifact",
     "tools": "config", "skills": "router", "diff_summary": "git", "impact": "code",
+    "index": "ledger",
 }
 
 

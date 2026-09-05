@@ -45,6 +45,7 @@ from .harness import cmd_compile, cmd_doc, cmd_guard, cmd_init, cmd_setup, cmd_s
 from .implement import (
     _project_has_ui,
     cmd_devsecops,
+    cmd_evidence,
     cmd_predeploy,
     cmd_qa,
     cmd_report,
@@ -79,6 +80,7 @@ __all__ = [
     "cmd_devsecops",
     "cmd_doc",
     "cmd_doctor",
+    "cmd_evidence",
     "cmd_gates",
     "cmd_guard",
     "cmd_init",

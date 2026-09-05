@@ -1,6 +1,6 @@
 ---
 name: story-implement
-version: 3
+version: 4
 role: developer
 ---
 # {{ story_id }} — {{ story_title }}
@@ -31,6 +31,15 @@ story, không sửa bằng cách đi vòng.
 ## Giao diện
 
 {{ mockup_section }}
+
+## Trạng thái epic
+
+Một dòng mỗi story trong epic này: trạng thái · candidate · số hành vi
+VERIFIED/GAP/REOPENED · tệp bằng chứng. Đây là **chỉ mục**, không phải lịch
+sử: cần chi tiết một story hay một hành vi thì gọi `aisdlc evidence <id>`.
+Hành vi đã VERIFIED của story khác là thứ bạn không được làm hỏng.
+
+{{ index }}
 
 ## Công cụ
 

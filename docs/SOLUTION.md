@@ -348,8 +348,17 @@ aisdlc guard write-scope|diff-scope|secret|git-stage|destructive|injection|proce
 
 # Theo dõi
 aisdlc status                         tiến độ · chi phí · story tốn bất thường
-aisdlc report  [--out FILE]           báo cáo nghiệm thu từ bằng chứng
+aisdlc report  [--out FILE]           báo cáo nghiệm thu + sổ hành vi (`ledger.json`, `INDEX.md`)
+aisdlc evidence <id> [--story S]      lịch sử một story hoặc một hành vi
+                                      (STORY-01-04 · AC-STORY-01-04-2 · FR-3 · qa:e2e · mockup:notes-list)
 ```
+
+`report` chiếu bằng chứng thành **sổ hành vi** (ADR-004 R2): mỗi tiêu chí,
+yêu cầu, loại kiểm định và màn hình là một hành vi có trạng thái
+VERIFIED / GAP / **REOPENED** — cái cuối là "đã đúng rồi hỏng", thứ mà cổng
+story không nói được. `INDEX.md` là chỉ mục một dòng mỗi story; prompt
+developer nhận **lát cắt epic** của chỉ mục ấy (slot `index`, trần
+`context.max_index_chars`), còn lịch sử tra bằng `aisdlc evidence`.
 
 Không có `aisdlc next` / `implement` / `complete` như bản phác: vòng lặp
 story nằm trong `run`, và tách nhỏ ra thành ba lệnh chỉ tạo thêm ba chỗ
@@ -517,6 +526,7 @@ Không để chữ "ngưỡng" chung chung. Mặc định trong `.ai/config.json
 | `story.max_screen_states` | 8 | Tổng trạng thái màn hình (EXPERIENCE.md) một story phải dựng. Vượt → cổng `stories` chặn với chỉ dẫn chẻ; `run` từ chối. Đo 2026-09-05 e9: 11 và 18 trạng thái đều chạm `max_turns` lượt đầu, 4–8 lượt |
 | `story.max_complexity` | `16.0` | **Điểm cỡ story** tổng hợp (ADR-004 R5, `control/complexity.py`): trạng thái màn hình ×1 + tiêu chí ×1 + đường dẫn write_scope ×0,5 (không tính manifest/lockfile) + fan-in phụ thuộc ×1 + hành vi VERIFIED bị chạm ×0,5 (ledger, tuỳ chọn). Vượt **hoặc** vượt `max_screen_states` → cổng `stories` chặn kèm gợi ý chẻ tất định, `run` từ chối trước khi gọi model; story đã xong bỏ qua. Hiệu chuẩn B4 hồi cứu 23 story thật: Spearman(điểm, lượt developer lượt đầu) = 0,88; 16 tách e9 01-04 (23,5) và 01-05 (18,0) khỏi 01-03 (6,5) và `par` (3,0). `run` tự ghi `_bmad-output/complexity.json` sau mỗi story và `aisdlc doctor` cảnh báo khi ngưỡng lệch dữ liệu |
 | ~~`story.max_context_tokens`~~ | — | **gỡ 2026-09-05**: chưa từng có mã đọc. Thay bằng `prompt_chars` ghi vào evidence mỗi lượt gọi model; `aisdlc status` cảnh báo story nạp > 3× trung vị |
+| `context.max_index_chars` | `2000` | trần ký tự cho slot `index` — lát cắt chỉ mục bằng chứng của epic nạp vào prompt developer. Chỉ mục, **không** phải lịch sử: agent cần chi tiết thì gọi `aisdlc evidence <id>` (ADR-004 R6). e9 EPIC-01 đo được 497 ký tự |
 | `run.max_parallel` | `3` | số story song song trong một đợt |
 | `run.max_turns` | `40` | vòng lặp tối đa của một phiên story |
 | `run.timeout_seconds` | `1800` | 30 phút cho một story |
