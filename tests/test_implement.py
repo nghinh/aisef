@@ -615,3 +615,33 @@ class TestCachLyVoLaDungHan(TestCachLyThanCay):
         out = self.implement(self.PhaCachLy(self.project), workdir=self.workdir)
         self.assertEqual(len(out.attempts), 1)
         self.assertIn("đổi nhánh chính", out.blocked_reason)
+
+
+class TestVaiRaSoatKhaiToolBiCam(ImplementTestCase):
+    """Cấm tool theo vai phải tới được guard — tức phải nằm trong `spec.env`,
+    không chỉ trong `spec.disallowed_tools` (cờ mà OpenCode bỏ qua)."""
+
+    def test_reviewer_va_security_khai_tool_bi_cam(self):
+        client = ScriptedClient()
+        self.implement(client)
+        self.assertTrue(client.review_envs, "phải có phiên rà soát")
+        self.assertTrue(client.security_envs, "phải có phiên bảo mật")
+        for env in client.review_envs + client.security_envs:
+            self.assertEqual(env.get("AISDLC_DISALLOWED_TOOLS"), "Write,Edit,NotebookEdit")
+
+    def test_developer_khong_bi_cam(self):
+        client = ScriptedClient()
+        self.implement(client)
+        dev = [e for e in client.envs if e.get("AISDLC_STORY_ID")]
+        self.assertTrue(dev)
+        for env in dev:
+            self.assertNotIn("AISDLC_DISALLOWED_TOOLS", env)
+
+    def test_security_van_khong_mang_ma_story(self):
+        """Mã story kích hoạt guard `completion` — người rà soát bảo mật
+        không được mang nó, dù nay có env."""
+        client = ScriptedClient()
+        self.implement(client)
+        for env in client.security_envs:
+            self.assertNotIn("AISDLC_STORY_ID", env)
+            self.assertIn("AISDLC_WRITE_SCOPE", env)

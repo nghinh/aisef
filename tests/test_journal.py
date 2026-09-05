@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisdlc.control.journal import (  # noqa: E402
+    Journal,
     ABORTED,
     RECONCILED,
     STEPS,
@@ -196,3 +197,31 @@ class TestJournalIsMachineReadable(JournalTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestCanMerge(unittest.TestCase):
+    """`DONE` ghi lúc qua cổng, trước merge — riêng trạng thái không trả
+    lời được "code đã lên nhánh chính chưa". Nhật ký thì trả lời được."""
+
+    def journal(self, *steps):
+        j = Journal(story_id="S-01")
+        for i, s in enumerate(steps, 1):
+            j.entries.append(Entry(step=s, attempt=1, seq=i))
+        return j
+
+    def test_co_worktree_ma_chua_merge_thi_can_merge(self):
+        self.assertTrue(self.journal(
+            "attempt.started", "worktree.created", "commit.created", "attempt.committed"
+        ).needs_merge)
+
+    def test_da_merge_thi_khong(self):
+        self.assertFalse(self.journal(
+            "attempt.started", "worktree.created", "merge.completed", "attempt.committed"
+        ).needs_merge)
+
+    def test_chay_thang_trong_du_an_thi_khong_co_buoc_merge(self):
+        """`--no-isolate`: không có worktree, không có gì để merge."""
+        self.assertFalse(self.journal("attempt.started", "attempt.committed").needs_merge)
+
+    def test_nhat_ky_trong_thi_khong(self):
+        self.assertFalse(Journal(story_id="S-01").needs_merge)

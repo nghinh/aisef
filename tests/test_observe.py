@@ -122,3 +122,17 @@ class TestCostAndLatency(EvidenceTestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestGuardBlocks(unittest.TestCase):
+    def test_doc_lai_duoc_nhung_lan_guard_chan(self):
+        import tempfile
+        from aisdlc.harness.observe import GUARD_BLOCK, Event, EvidenceStore
+        with tempfile.TemporaryDirectory() as tmp:
+            st = EvidenceStore(tmp)
+            st.record("S-01", Event(kind=GUARD_BLOCK, name="write-scope", ok=False,
+                                    detail={"tool": "Write", "reason": "ngoài phạm vi"}))
+            st.tool_run("S-01", "test", ok=True)
+            ev = st.read("S-01")
+            self.assertEqual([e.name for e in ev.guard_blocks], ["write-scope"])
+            self.assertIn("guard_block=1", ev.summary())

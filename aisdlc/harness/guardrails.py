@@ -31,6 +31,12 @@ ENV_BASE_REF = "AISDLC_BASE_REF"
 #: worktree — nên không việc gì phải hỏi client. Client báo sai (hoặc
 #: model tự đặt `workdir` khác) thì guard vẫn soi đúng cây.
 ENV_WORKDIR = "AISDLC_WORKDIR"
+#: Tool vai này bị cấm, cách nhau bằng dấu phẩy. Claude Code có
+#: `--disallowed-tools`; OpenCode khai "emulated qua permission config"
+#: nhưng không có mã nào sinh config ấy — người rà soát trên OpenCode ghi
+#: được code. Cấm ở guard thì mọi client đều cấm, và Claude có thêm một
+#: lớp phòng khi cờ bị bỏ quên.
+ENV_DISALLOWED_TOOLS = "AISDLC_DISALLOWED_TOOLS"
 
 #: Phạm vi ghi khi **không** ở trong một story: các pha lập kế hoạch và
 #: dựng mockup. Chúng có phạm vi cố định và biết trước, nên guard vẫn có
@@ -468,6 +474,26 @@ def story_from_env(env: dict[str, str] | None = None) -> str:
     return (env or os.environ).get(ENV_STORY_ID, "")
 
 
+def disallowed_from_env(env: dict[str, str] | None = None) -> list[str]:
+    raw = (env or os.environ).get(ENV_DISALLOWED_TOOLS, "")
+    return [t.strip() for t in raw.split(",") if t.strip()]
+
+
+def check_role_tool(tool_name: str, disallowed: list[str]) -> Verdict:
+    """Vai này có được gọi tool này không. Khớp không phân biệt hoa thường:
+    Claude gọi `Write`, OpenCode gọi `write`."""
+    if not tool_name or not disallowed:
+        return ALLOW
+    cam = {t.lower() for t in disallowed}
+    if tool_name.lower() not in cam:
+        return ALLOW
+    return Verdict(
+        False,
+        f"vai này không được dùng tool {tool_name} — nó rà soát, không sửa. "
+        f"Báo cáo phát hiện thay vì tự chữa.",
+    )
+
+
 def workdir_from_env(env: dict[str, str] | None = None) -> str:
     """Cây làm việc do harness khai. Rỗng nghĩa là không chạy trong story."""
     return (env or os.environ).get(ENV_WORKDIR, "")
@@ -556,6 +582,13 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
     if (thoat := _escaped_workdir(tool_input, root)):
         return thoat
 
+    # Vai rà soát mà sửa được code thì nó thành lượt viết thứ hai, và không
+    # còn ai rà soát nữa. Kiểm ở tầng điều phối để mọi guard, mọi client
+    # đều chặn — không trông vào cờ dòng lệnh của từng client.
+    vai = check_role_tool(str(event.get("tool_name") or ""), disallowed_from_env(env))
+    if not vai.allowed:
+        return vai
+
     if kind == "write-scope":
         return check_write_scope(
             file_path, effective_scope(env), project_root=root
@@ -582,6 +615,45 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
 
         return check_completion(EvidenceStore(artifact_root).read(story))
     raise ValueError(f"guard không tồn tại: {kind}")
+
+
+def record_outcome(
+    kind: str,
+    event: dict,
+    verdict: Verdict,
+    *,
+    env: dict[str, str] | None = None,
+    artifact_root: str = "",
+) -> None:
+    """Guard tự ghi vào bằng chứng — nguồn duy nhất không phụ thuộc client.
+
+    Hai lỗ hổng cùng một gốc: (1) `guard_blocked` chỉ trích từ luồng sự kiện
+    của Claude Code, nên trên OpenCode nó luôn False dù guard chặn thật —
+    đo trên `par`: 4 lần chặn, bằng chứng ghi False cả bốn; (2) sự kiện
+    `FILE_CHANGE` có mô hình, có test, nhưng **không ai ghi**, nên luật
+    "file sửa sau lần test cuối" của guard `completion` chưa từng chạy.
+
+    Ghi ở đây, vì guard là điểm mà mọi client đều đi qua. Không có mã story
+    (phiên rà soát cố ý không mang nó) thì không ghi — tránh làm bẩn hồ sơ.
+    """
+    story = story_from_env(env)
+    if not story or not artifact_root:
+        return
+    from .observe import GUARD_BLOCK, EvidenceStore, Event
+
+    store = EvidenceStore(artifact_root)
+    tool_input = event.get("tool_input") or {}
+    tool = str(event.get("tool_name") or "")
+    if not verdict.allowed:
+        store.record(story, Event(
+            kind=GUARD_BLOCK, name=kind, ok=False,
+            detail={"tool": tool, "reason": verdict.reason[:300]},
+        ))
+        return
+    if kind == "write-scope":
+        path = str(tool_input.get("file_path") or tool_input.get("path") or "")
+        if path:
+            store.file_change(story, path, detail={"tool": tool})
 
 
 #: Guard nào gắn vào mốc nào, và khớp tool nào.

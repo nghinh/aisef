@@ -77,6 +77,12 @@ class Evidence:
     def total_duration_ms(self) -> int:
         return sum(e.duration_ms for e in self.events)
 
+    @property
+    def guard_blocks(self) -> list[Event]:
+        """Những lần guard chặn, do **chính guard** ghi — không phụ thuộc
+        client có phát luồng sự kiện hay không."""
+        return self.of(GUARD_BLOCK)
+
     def tests_green(self) -> bool:
         """Lần chạy test gần nhất có xanh không."""
         last = self.last(TOOL_RUN, "test")

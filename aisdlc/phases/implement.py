@@ -31,6 +31,7 @@ from ..control.security import parse as parse_security
 from ..control.normalize import Architecture, Story, effective_write_scope
 from ..harness import mockup_verify
 from ..harness.guardrails import (
+    ENV_DISALLOWED_TOOLS,
     ENV_WORKDIR,
     ENV_BASE_REF,
     ENV_STORY_ID,
@@ -432,6 +433,7 @@ def review_story(
         ENV_WRITE_SCOPE: ",".join(effective_write_scope(story, project)),
         ENV_BASE_REF: base_ref,
         ENV_WORKDIR: str(workdir),
+        ENV_DISALLOWED_TOOLS: ",".join(ROLES[REVIEWER].disallowed_tools),
     }
 
     result = client.run(spec)
@@ -492,6 +494,15 @@ def security_review(
         workdir=workdir,
         config=config,
     )
+    # Cùng tổ hợp đã chứng minh trên e9 cho người rà soát: phạm vi để
+    # `diff-scope` không chặn mọi lệnh Bash, cây làm việc để guard soi đúng
+    # cây, tool bị cấm để mọi client đều cấm — và **không** mã story.
+    spec.env = {
+        ENV_WRITE_SCOPE: ",".join(effective_write_scope(story, project)),
+        ENV_BASE_REF: base_ref,
+        ENV_WORKDIR: str(workdir),
+        ENV_DISALLOWED_TOOLS: ",".join(ROLES[SECURITY].disallowed_tools),
+    }
     result = client.run(spec)
     EvidenceStore(artifact_root).agent_run(
         story.id, result, name=f"{story.id}-security"

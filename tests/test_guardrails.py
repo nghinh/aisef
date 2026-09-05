@@ -12,6 +12,10 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisdlc.harness.guardrails import (
+    ALLOW,
+    ENV_DISALLOWED_TOOLS,
+    Verdict,
+    record_outcome,
     ENV_WORKDIR,  # noqa: E402
     ENV_STORY_ID,
     ENV_WRITE_SCOPE,
@@ -653,3 +657,101 @@ class TestThoatKhoiCayLamViec(unittest.TestCase):
             "tool_input": {"command": "ls", "cwd": "/tmp/noi-khac"},
         })
         self.assertFalse(v.allowed)
+
+
+class TestCamToolTheoVai(unittest.TestCase):
+    """Người rà soát mà sửa được code thì nó thành lượt viết thứ hai.
+
+    Claude Code có `--disallowed-tools`. OpenCode khai `TOOL_ALLOWLIST:
+    EMULATED "qua permission config"` — nhưng không có mã nào sinh config
+    ấy, nên người rà soát trên OpenCode **ghi được**. Cấm ở guard thì mọi
+    client đều cấm, và Claude có thêm một lớp phòng khi cờ bị bỏ quên.
+    """
+
+    def guard(self, tool, kind="write-scope", env=None):
+        return run_guard(kind, {
+            "cwd": "/tmp/cay", "tool_name": tool,
+            "tool_input": {"file_path": "/tmp/cay/src/a.py", "content": "x"},
+        }, env=env if env is not None else {
+            ENV_DISALLOWED_TOOLS: "Write,Edit,NotebookEdit",
+            ENV_WRITE_SCOPE: "src",
+        })
+
+    def test_vai_ra_soat_khong_duoc_ghi(self):
+        v = self.guard("Write")
+        self.assertFalse(v.allowed)
+        self.assertIn("không được dùng tool Write", v.reason)
+
+    def test_ten_tool_viet_thuong_cua_opencode_cung_bi_cam(self):
+        self.assertFalse(self.guard("write").allowed)
+        self.assertFalse(self.guard("edit").allowed)
+
+    def test_tool_doc_van_duoc(self):
+        for tool in ("Read", "Grep", "Glob", "Bash"):
+            with self.subTest(tool=tool):
+                self.assertTrue(self.guard(tool, kind="git-stage").allowed)
+
+    def test_khong_khai_thi_khong_cam(self):
+        """Vai lập trình không có biến này — không được chặn Write."""
+        self.assertTrue(self.guard("Write", env={ENV_WRITE_SCOPE: "src"}).allowed)
+
+    def test_ap_o_tang_dieu_phoi_nen_guard_nao_cung_chan(self):
+        for kind in ("write-scope", "secret", "injection"):
+            with self.subTest(guard=kind):
+                self.assertFalse(self.guard("Write", kind=kind).allowed)
+
+
+class TestGuardTuGhiBangChung(unittest.TestCase):
+    """Hai lỗ hổng cùng gốc, đo được:
+
+    - `guard_blocked` trích từ luồng sự kiện Claude Code; trên OpenCode nó
+      luôn False dù guard chặn thật (`par`: 4 lần chặn, bằng chứng ghi
+      False cả bốn).
+    - `FILE_CHANGE` có mô hình, có test, nhưng **không ai ghi** — luật
+      "file sửa sau lần test cuối" của guard `completion` chưa từng chạy
+      ngoài test.
+
+    Guard là điểm mọi client đều đi qua, nên ghi ở đó.
+    """
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        self.store = EvidenceStore(self.root)
+        self.env = {ENV_STORY_ID: "S-01", ENV_WRITE_SCOPE: "src"}
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def su_kien(self, tool="Write", path="src/a.py"):
+        return {"cwd": "/tmp/cay", "tool_name": tool,
+                "tool_input": {"file_path": path, "content": "x"}}
+
+    def test_chan_thi_ghi_guard_block(self):
+        v = Verdict(False, "ngoài phạm vi")
+        record_outcome("write-scope", self.su_kien(path="khac/b.py"), v,
+                       env=self.env, artifact_root=str(self.root))
+        ev = self.store.read("S-01")
+        self.assertEqual(len(ev.guard_blocks), 1)
+        self.assertEqual(ev.guard_blocks[0].name, "write-scope")
+        self.assertEqual(ev.guard_blocks[0].detail["tool"], "Write")
+
+    def test_cho_ghi_thi_ghi_file_change_va_luat_3_song_lai(self):
+        """Không có bước này thì `stale_since_last_test()` luôn rỗng."""
+        self.store.tool_run("S-01", "test", ok=True)
+        record_outcome("write-scope", self.su_kien(), ALLOW,
+                       env=self.env, artifact_root=str(self.root))
+        ev = self.store.read("S-01")
+        self.assertEqual(ev.stale_since_last_test(), ["src/a.py"])
+        self.assertFalse(check_completion(ev).allowed)
+
+    def test_khong_co_ma_story_thi_khong_ghi(self):
+        """Phiên rà soát cố ý không mang mã story — không được làm bẩn hồ sơ."""
+        record_outcome("write-scope", self.su_kien(), Verdict(False, "x"),
+                       env={ENV_WRITE_SCOPE: "src"}, artifact_root=str(self.root))
+        self.assertEqual(self.store.stories(), [])
+
+    def test_guard_khac_cho_qua_thi_khong_ghi_gi(self):
+        record_outcome("git-stage", {"tool_name": "Bash", "tool_input": {"command": "ls"}},
+                       ALLOW, env=self.env, artifact_root=str(self.root))
+        self.assertEqual(self.store.stories(), [])

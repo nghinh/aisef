@@ -401,6 +401,18 @@ def cmd_status(args) -> int:
     done = totals[StoryStatus.DONE.value]
 
     print(f"Tiến độ: {done}/{total} story xong")
+    # "Xong" ghi lúc qua cổng, **trước** merge. Merge đụng thì story đứng ở
+    # xong-nhưng-chưa-merge, và không nói ra thì người đọc tưởng code đã
+    # lên nhánh chính.
+    from .control.journal import JournalStore
+
+    chua_merge = [
+        r.id for r in state.by_status(StoryStatus.DONE)
+        if JournalStore(_artifact_root(args)).read(r.id).needs_merge
+    ]
+    if chua_merge:
+        print(f"⚠️  {len(chua_merge)} story xong nhưng chưa merge vào nhánh chính: "
+              f"{', '.join(chua_merge[:5])} — chạy lại `aisdlc run` để merge")
     if state.current_epic:
         print(f"Epic hiện tại: {state.current_epic}")
     print()
@@ -538,7 +550,7 @@ def cmd_guard(args) -> int:
     """
     import json
 
-    from .harness.guardrails import run_guard
+    from .harness.guardrails import record_outcome, run_guard
 
     try:
         raw = sys.stdin.read()
@@ -559,6 +571,16 @@ def cmd_guard(args) -> int:
     except ValueError as e:
         print(f"guard: {e}", file=sys.stderr)
         return EXIT_OK
+
+    # Guard tự ghi bằng chứng: chỗ duy nhất mọi client đều đi qua, nên
+    # `guard_blocked` và `FILE_CHANGE` không còn phụ thuộc client có phát
+    # luồng sự kiện hay không. Ghi hỏng không được làm hỏng phán quyết.
+    try:
+        record_outcome(
+            args.kind, event, verdict, artifact_root=str(_artifact_root(args))
+        )
+    except OSError as e:
+        print(f"guard: không ghi được bằng chứng ({e})", file=sys.stderr)
 
     if not verdict.allowed:
         print(verdict.reason, file=sys.stderr)

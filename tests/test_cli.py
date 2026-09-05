@@ -461,3 +461,18 @@ class TestDuongDanDuAn(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestStatusNoiRoChuaMerge(CliTestCase):
+    def test_xong_nhung_chua_merge_duoc_goi_ten(self):
+        from aisdlc.control.journal import Entry, JournalStore
+        store = StateStore(self.artifacts)
+        store.register("S-01", "E-01")
+        for b in (StoryStatus.RUNNING, StoryStatus.VERIFYING, StoryStatus.DONE):
+            store.transition("S-01", b)
+        j = JournalStore(self.artifacts)
+        for s in ("attempt.started", "worktree.created", "commit.created", "attempt.committed"):
+            j.record("S-01", Entry(step=s, attempt=1))
+        code, out, _ = self.run_cli("status")
+        self.assertIn("xong nhưng chưa merge", out)
+        self.assertIn("S-01", out)

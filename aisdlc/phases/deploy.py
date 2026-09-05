@@ -28,6 +28,7 @@ from ..control.approvals import (
     Gate,
     Status,
 )
+from ..control.journal import JournalStore
 from ..control.state import StateStore, StoryStatus
 from .qa import QaReport, run_suite
 
@@ -129,12 +130,23 @@ def pre_deploy(
         not_done = [
             r.id for r in state.stories.values() if r.state is not StoryStatus.DONE
         ]
-        report.checks.append(
-            Check(
-                "mọi story xong",
-                not not_done,
-                "" if not not_done else f"{len(not_done)} chưa xong: {', '.join(not_done[:5])}",
+        # `DONE` ghi lúc qua cổng, **trước** merge. Triển khai là triển khai
+        # nhánh chính — story xong mà code còn kẹt trên nhánh story thì với
+        # cổng này nó chưa xong.
+        journal = JournalStore(artifact_root)
+        chua_merge = [
+            r.id for r in state.stories.values()
+            if r.state is StoryStatus.DONE and journal.read(r.id).needs_merge
+        ]
+        detail = ""
+        if not_done:
+            detail = f"{len(not_done)} chưa xong: {', '.join(not_done[:5])}"
+        if chua_merge:
+            detail += ("; " if detail else "") + (
+                f"{len(chua_merge)} xong nhưng chưa merge: {', '.join(chua_merge[:5])}"
             )
+        report.checks.append(
+            Check("mọi story xong", not not_done and not chua_merge, detail)
         )
 
     approvals = ApprovalStore(artifact_root)

@@ -94,6 +94,17 @@ class Journal:
         return self.last(step) is not None
 
     @property
+    def needs_merge(self) -> bool:
+        """Story đã có worktree (tức phải merge) nhưng chưa merge.
+
+        `DONE` được ghi lúc qua cổng, trước merge — nên riêng trạng thái
+        không trả lời được câu "code đã lên nhánh chính chưa". Chạy thẳng
+        trong dự án (`--no-isolate`) thì không có bước merge, và cũng không
+        có `worktree.created`, nên trả False là đúng.
+        """
+        return self.reached("worktree.created") and not self.merged()
+
+    @property
     def attempt_no(self) -> int:
         return max((e.attempt for e in self.entries), default=0)
 

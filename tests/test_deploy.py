@@ -330,3 +330,42 @@ class TestInstallSpecDoiDuoc(unittest.TestCase):
             noi_dung = write_ci_workflow(tmp).read_text(encoding="utf-8")
             self.assertIn("${{ hashFiles('.ai/config.json') }}", noi_dung)
             self.assertNotIn("{{{", noi_dung)
+
+
+class TestXongPhaiLaDaMerge(DeployTestCase):
+    """Lỗi 42, nhìn từ cổng trước triển khai. `DONE` ghi lúc qua cổng,
+    **trước** merge; story xong mà code còn kẹt trên nhánh story thì với
+    cổng này nó chưa xong — triển khai là triển khai nhánh chính."""
+
+    def nhat_ky(self, *steps):
+        from aisdlc.control.journal import Entry, JournalStore
+        j = JournalStore(self.artifacts)
+        for s in steps:
+            j.record("STORY-01-01", Entry(step=s, attempt=1))
+
+    def test_xong_nhung_chua_merge_thi_chan(self):
+        self.approve_everything()
+        self.finish_a_story()
+        self.nhat_ky("attempt.started", "worktree.created", "commit.created",
+                     "attempt.committed")
+        report = pre_deploy(self.project, config=self.config(), skip_qa=True)
+        self.assertFalse(report.passed)
+        self.assertIn("xong nhưng chưa merge", report.summary())
+        self.assertIn("STORY-01-01", report.summary())
+
+    def test_da_merge_thi_qua_muc_nay(self):
+        self.approve_everything()
+        self.finish_a_story()
+        self.nhat_ky("attempt.started", "worktree.created", "merge.completed",
+                     "attempt.committed")
+        report = pre_deploy(self.project, config=self.config(), skip_qa=True)
+        muc = next(c for c in report.checks if c.name == "mọi story xong")
+        self.assertTrue(muc.passed, muc.detail)
+
+    def test_khong_co_nhat_ky_thi_khong_doi_merge(self):
+        """Chạy `--no-isolate` hay dữ liệu cũ: không worktree, không đòi merge."""
+        self.approve_everything()
+        self.finish_a_story()
+        report = pre_deploy(self.project, config=self.config(), skip_qa=True)
+        muc = next(c for c in report.checks if c.name == "mọi story xong")
+        self.assertTrue(muc.passed, muc.detail)
