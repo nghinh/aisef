@@ -259,6 +259,8 @@ cảnh báo, Spearman) + `tests/test_run.py` 2 phép (chặn ở `run`, bảng h
 chuẩn được ghi sau khi story xong). Bộ đầy đủ: **1 256 test, OK**
 (skipped 56).
 
+**Gộp đợt 2 (2026-09-06 03:05, master 658997c):** suite đầy đủ trên master **1 384 test OK, 4 skip** (1 608 s); hợp quy chạy lại hai client **16/16** với C8 mới (Claude $1,08, OpenCode $0) — C8 trên agent thật: A đạt, B stale ✗ đúng mục `bằng chứng đúng candidate`, cả hai client.
+
 **R1 · R8 — đo trên agent thật, e9 STORY-01-07 chạy lại 2026-09-06 01:03–02:14 (Claude, $28,76, 3 lượt thử).**
 
 | lượt | developer | ứng viên | review (lượt · $) | JSON review | security (lượt · $) | JSON security | kết cục cổng |
