@@ -8,7 +8,7 @@ from pathlib import Path
 
 from ..config import Config
 from ..harness.tools import aisdlc_command
-from ._common import ARTIFACT_ROOT, EXIT_NOT_READY, EXIT_OK, EXIT_USAGE, _artifact_root
+from ._common import ARTIFACT_ROOT, EXIT_NOT_READY, EXIT_OK, EXIT_USAGE, _artifact_root, _client
 
 
 def cmd_init(args) -> int:
@@ -161,6 +161,20 @@ def cmd_skill(args) -> int:
     from ..phases.run import load_plan
 
     project = Path(args.project)
+    if getattr(args, "scan", False):
+        from ..kit import skill_scan
+
+        adapter, rc = _client(args)
+        if adapter is None:
+            return rc
+        R.refresh(project, _artifact_root(args))
+        rep = skill_scan.scan(project, _artifact_root(args), adapter,
+                              config=Config.load(project), batch=args.batch)
+        print(rep.summary())
+        for v in rep.flagged:
+            print(f"  {v.risk:10} {v.id:45} {v.why[:90]}")
+        if rep.error:
+            return EXIT_NOT_READY
     reg = R.refresh(project, _artifact_root(args))
     by = reg.by_status()
     print(f"Sổ skill: {len(reg.entries)} bản ghi")

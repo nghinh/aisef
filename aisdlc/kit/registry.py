@@ -425,5 +425,10 @@ def load(artifact_root: Path | str) -> Registry:
 def refresh(project: Path | str, artifact_root: Path | str, *, catalog: Catalog | None = None) -> Registry:
     """Dựng lại giữ lịch sử, ghi xuống đĩa. Gọi sau `setup` và trước `run`."""
     reg = build(project, catalog=catalog, previous=load(artifact_root))
+    # Kết luận quét ngữ nghĩa (S6) sống qua các lần dựng lại: dựng lại là
+    # đọc lại cấu trúc, không phải xoá đi một phán quyết đã trả tiền để có.
+    from . import skill_scan
+
+    skill_scan.apply(reg, skill_scan.load(artifact_root))
     save(reg, artifact_root)
     return reg

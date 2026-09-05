@@ -70,6 +70,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     sk = sub.add_parser("skill", help="sổ đăng ký skill: dựng, soi, định tuyến thử")
     sk.add_argument("--story", default="", help="in skill được định tuyến cho story này")
+    sk.add_argument("--scan", action="store_true",
+                    help="quét SKILL.md bằng model (chỉ đọc, không tool) tìm chỉ dẫn tiêm — S6")
+    sk.add_argument("--client", default="claude", help="claude | opencode (cho --scan)")
+    sk.add_argument("--batch", type=int, default=8, help="số skill mỗi phiên quét")
     sk.set_defaults(func=cmd_skill)
 
     r = sub.add_parser("review", help="xem artifact của một cổng")
