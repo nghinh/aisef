@@ -181,9 +181,21 @@ Cột "Chứng minh" là điều kiện để mục đó chuyển ACCEPTED.
   attempt, slots: dict[str, tuple[str, int]], truncated: list[str])`.
 - Ghi ở `run_attempt` (→developer), `review_story` (→reviewer),
   `security_review` (→security). Nguồn hợp lệ: `artifact`, `git`, `code`,
-  `gate`, `review`, `config`, `router`. Bất biến (test): với `to ∈ {reviewer,
-  security}` không slot nào có nguồn `agent`.
+  `gate`, `review`, `config`, `router`, `ledger`. Bất biến (test): với
+  `to ∈ {reviewer, security}` không slot nào có nguồn `agent`.
 - `report.py` mục "Chuỗi bàn giao" mỗi story.
+
+Bảng slot của gói bàn giao (`phases/implement.py::SLOT_SOURCE` là bản có
+thẩm quyền; slot chưa khai ở đó hiện thành `?` trong bằng chứng):
+
+| Slot | Nguồn | Vào prompt vai |
+|---|---|---|
+| `story_id` · `story_title` · `story_contract` · `architecture_rules` · `write_scope` · `mockup_section` | `artifact` | developer, reviewer, security |
+| `diff_summary` | `git` | reviewer, security |
+| `impact` | `code` | reviewer, security |
+| `tools` | `config` | developer |
+| `skills` | `router` | developer |
+| **`index`** | **`ledger`** | developer (ADR-004 R6) — lát cắt chỉ mục bằng chứng của epic chứa story: một dòng mỗi story, trần `context.max_index_chars`. **Chỉ mục, không phải lịch sử**: chi tiết tra bằng `aisdlc evidence <id>` |
 
 ---
 

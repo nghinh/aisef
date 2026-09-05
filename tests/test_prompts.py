@@ -41,6 +41,7 @@ STORY_CTX = {
     "write_scope": "src/notes/",
     "mockup_section": "màn hình danh-sach",
     "tools": "- aisdlc tool test",
+    "index": "- STORY-01-01 · done · abc1234 · V3 G0 R0 · evidence/STORY-01-01.jsonl",
     "skills": "- `x` — dùng khi: y",
     "diff_summary": "3 file đổi",
     "impact": "_Chưa có phân tích ảnh hưởng_",

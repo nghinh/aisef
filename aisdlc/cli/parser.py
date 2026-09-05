@@ -17,6 +17,7 @@ from .doctor import cmd_doctor
 from .harness import cmd_compile, cmd_doc, cmd_guard, cmd_init, cmd_setup, cmd_skill
 from .implement import (
     cmd_devsecops,
+    cmd_evidence,
     cmd_predeploy,
     cmd_qa,
     cmd_report,
@@ -152,6 +153,11 @@ def build_parser() -> argparse.ArgumentParser:
     pd = sub.add_parser("pre-deploy", help="chấm cổng trước triển khai")
     pd.add_argument("--skip-qa", action="store_true", help="bỏ qua bộ kiểm định (chỉ để soi nhanh)")
     pd.set_defaults(func=cmd_predeploy)
+
+    ev = sub.add_parser("evidence", help="tra lịch sử một story hoặc một hành vi trong sổ")
+    ev.add_argument("id", help="mã story (STORY-01-04) hoặc mã hành vi (AC-STORY-01-04-2, FR-3, qa:e2e, mockup:notes-list)")
+    ev.add_argument("--story", default="", help="ghi bằng chứng evidence_lookup cho story này")
+    ev.set_defaults(func=cmd_evidence)
 
     rp = sub.add_parser("report", help="báo cáo nghiệm thu từ bằng chứng")
     rp.add_argument("--out", default="", help="đường dẫn file ra")

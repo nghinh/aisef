@@ -36,6 +36,7 @@ GUARD_SEEN = "guard_seen"      # hook tới được phiên này (ghi một lầ
 MOCKUP_MAP = "mockup_map"      # đối chiếu màn hình thật với mockup
 NOTE = "note"
 HANDOFF = "handoff"            # gói bàn giao: vai nào nhận slot nào, từ nguồn nào
+BEHAVIOR = "behavior"          # trạng thái một hành vi: verified | gap | reopened
 
 
 @dataclass
@@ -220,6 +221,22 @@ class EvidenceStore:
             Event(kind=HANDOFF, name=f"{frm}->{to}",
                   detail={"from": frm, "to": to, "attempt": attempt,
                           "slots": {k: {"source": s, "chars": n} for k, (s, n) in slots.items()}}),
+        )
+
+    def behavior(self, story_id: str, *, id: str, status: str, candidate: str = "",
+                 source: dict | None = None, prev: str = "") -> Event:
+        """Trạng thái một hành vi, do một pha *kết luận* được (rà soát chỉ ra
+        gap, cổng bảo toàn thấy hồi quy).
+
+        Sổ hành vi (`control/ledger.py`) đọc cả sự kiện này lẫn suy từ bằng
+        chứng cũ — nên ghi ở đây là **thêm nguồn**, không phải nguồn duy
+        nhất, và không ghi cũng không mất gì đã đo được.
+        """
+        return self.record(
+            story_id,
+            Event(kind=BEHAVIOR, name=id, ok=(status == "verified"),
+                  detail={"id": id, "status": status, "candidate": candidate,
+                          "source": source or {}, "prev": prev}),
         )
 
     def file_change(self, story_id: str, path: str, *, detail: dict | None = None) -> Event:

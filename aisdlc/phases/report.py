@@ -4,13 +4,16 @@ Mọi con số ở đây đọc từ artifact và bằng chứng trên đĩa. Kh
 được viết bằng tay, vì một báo cáo nghiệm thu viết tay chỉ chứng minh
 người viết tin là mình đúng.
 
-Bốn phần, đúng bốn câu hỏi người duyệt hỏi:
+Năm phần, đúng năm câu hỏi người duyệt hỏi:
 
 * **Truy vết** — mỗi yêu cầu trong PRD đi tới story nào, story đó động vào
   file nào, và có test không.
 * **Chất lượng** — cổng nào đạt, loại kiểm định nào đã chạy.
 * **Vận hành** — mỗi story tốn bao nhiêu tiền, bao lâu, mấy lượt.
 * **Harness** — sáu nhóm có bằng chứng chạy thật hay chưa.
+* **Cải tiến** — sổ hành vi (`control/ledger.py`): năng lực đã xác minh,
+  hồi quy, gap đã đóng, cải thiện biên. Đây là câu hỏi cổng story không
+  trả lời được, vì cổng chấm **một** story ở **một** thời điểm.
 """
 
 from __future__ import annotations
@@ -26,6 +29,7 @@ from ..control.approvals import (
     ApprovalStore,
     Status,
 )
+from ..control import ledger
 from ..control.normalize import parse_prd_file
 from ..control.state import StateStore
 from ..harness.observe import AGENT_RUN, HANDOFF, MOCKUP_MAP, TOOL_RUN, EvidenceStore
@@ -74,6 +78,8 @@ class Report:
     #: Kết quả cổng trước triển khai, nếu đã chấm.
     pre_deploy: dict = field(default_factory=dict)
     total_cost_usd: float = 0.0
+    #: Số của sổ hành vi (ADR-004 R2/R7) — chiếu từ cùng bằng chứng.
+    ledger: dict = field(default_factory=dict)
 
     @property
     def uncovered(self) -> list[str]:
@@ -104,13 +110,14 @@ class Report:
 
         lines += [
             "", "## 3. Vận hành từng story", "",
-            "| Story | Trạng thái | Lượt agent | Chi phí | Thời gian | Map mockup | TCCN có test |",
-            "|---|---|---|---|---|---|---|",
+            "| Story | Trạng thái | Lượt agent | Chi phí | Thời gian | Map mockup | TCCN có test | Hành vi (V/G/R) |",
+            "|---|---|---|---|---|---|---|---|",
         ]
         for s in self.stories:
             lines.append(
                 f"| {s['id']} | {s['status']} | {s['runs']} | ${s['cost']:.2f} | "
-                f"{s['duration_ms'] / 1000:.0f}s | {s['mockup']} | {s.get('ac', '—')} |"
+                f"{s['duration_ms'] / 1000:.0f}s | {s['mockup']} | {s.get('ac', '—')} | "
+                f"{s.get('behaviors', '—')} |"
             )
         chuoi = [s for s in self.stories if s.get("handoffs")]
         if chuoi:
@@ -133,7 +140,9 @@ class Report:
         for group, proof in self.harness.items():
             lines.append(f"| {group} | {proof} |")
 
-        lines += ["", "## 5. Cổng trước triển khai", ""]
+        lines += self._ledger_section()
+
+        lines += ["", "## 6. Cổng trước triển khai", ""]
         if not self.pre_deploy:
             lines.append("_Chưa chấm — chạy `aisdlc pre-deploy`._")
         else:
@@ -151,6 +160,51 @@ class Report:
                 ]
         return "\n".join(lines) + "\n"
 
+    def _ledger_section(self) -> list[str]:
+        """Phần 5 — cải tiến liên tục (ADR-004 R7).
+
+        Bốn số, tất cả chiếu từ cùng bằng chứng của phần 3: năng lực đã xác
+        minh tăng bao nhiêu, bao nhiêu cái từng đúng rồi hỏng, bao nhiêu gap
+        đã đóng, và mỗi đô la mua được bao nhiêu hành vi ròng.
+        """
+        m = self.ledger
+        if not m:
+            return ["", "## 5. Cải tiến liên tục (sổ hành vi)", "",
+                    "_Chưa có bằng chứng nào để chiếu thành hành vi._"]
+        lines = [
+            "", "## 5. Cải tiến liên tục (sổ hành vi)", "",
+            "| Số đo | Giá trị |", "|---|---|",
+            f"| Năng lực đã xác minh (VERIFIED hiện tại) | {m['verified']} |",
+            f"| Từng xác minh (growth, duy nhất theo thời gian) | {m['ever_verified']} |",
+            f"| GAP | {m['gap']} |",
+            f"| REOPENED (đang hỏng lại) | {m['reopened']} |",
+            f"| Lần hồi quy / tỷ lệ trên hành vi từng xác minh | "
+            f"{m['reopen_events']} · {m['reopen_rate']:.2f} |",
+            f"| Hồi quy **liên story** (story sau làm hỏng story trước) | {m['cross_reopens']} |",
+            f"| Gap đã đóng (resolved) | {m['resolved']} |",
+        ]
+        cross = m.get("cross_reopen_list") or []
+        if cross:
+            lines += ["", "Hồi quy liên story, kèm nguồn:", ""]
+            lines += [
+                f"- `{c['id']}` xanh ở {c['verified_by']} → đỏ lại ở {c['regressed_by']}"
+                for c in cross[:10]
+            ]
+        loops = m.get("loops") or []
+        if loops:
+            lines += [
+                "", "| Vòng | VERIFIED | GAP | REOPENED | ΔV | ΔR | $ | Cải thiện biên |",
+                "|---|---|---|---|---|---|---|---|",
+            ]
+            for lo in loops:
+                marg = "—" if lo["marginal"] is None else f"{lo['marginal']:.2f}/\\$"
+                lines.append(
+                    f"| {lo['n']} | {lo['verified']} | {lo['gap']} | {lo['reopened']} | "
+                    f"{lo['d_verified']:+d} | {lo['d_reopened']:+d} | "
+                    f"${float(lo.get('cost_usd') or 0):.2f} | {marg} |"
+                )
+        return lines
+
 
 def build(project: Path | str) -> Report:
     # `resolve()` vì hàm này gọi được thẳng từ mã khác, không chỉ qua CLI
@@ -166,6 +220,9 @@ def build(project: Path | str) -> Report:
     for story in index.get("stories", []):
         for fr in story.get("covers", []):
             fr_to_stories.setdefault(fr, []).append(story["id"])
+
+    led = ledger.build(root)
+    report.ledger = led.metrics() if led.behaviors else {}
 
     evidence = EvidenceStore(root)
     tested_stories = {
@@ -217,6 +274,7 @@ def build(project: Path | str) -> Report:
             "duration_ms": ev.total_duration_ms,
             "mockup": mockup,
             "ac": _ac_cell(sid, story_ac.get(sid, 0), ev),
+            "behaviors": _behavior_cell(led, sid),
             "handoffs": " → ".join(
                 f"{e.detail.get('to')}#{e.detail.get('attempt')}" for e in ev.of(HANDOFF)
             ),
@@ -233,6 +291,13 @@ def build(project: Path | str) -> Report:
         except json.JSONDecodeError:
             report.pre_deploy = {}
     return report
+
+
+def _behavior_cell(led, sid: str) -> str:
+    """Ô "Hành vi": `V/G/R` của story. `R > 0` là thứ báo cáo cũ không nói
+    được — story qua cổng mà vẫn để lại một hành vi từng đúng nay hỏng."""
+    v, g, r = led.counts_for(sid)
+    return "—" if not (v or g or r) else f"{v}/{g}/{r}"
 
 
 def _ac_cell(sid: str, n: int, ev) -> str:

@@ -34,6 +34,10 @@ DEFAULTS: dict[str, Any] = {
     # trạng thái màn hình một story phải dựng (P2-12): đo 2026-09-05 trên e9,
     # story 11 và 18 trạng thái đều chạm max_turns ở lượt đầu và cần 4–8 lượt
     "story.max_screen_states": 8,
+    # Trần ký tự cho lát cắt chỉ mục bằng chứng nạp vào prompt (ADR-004 R6).
+    # Chỉ mục thay cho việc đổ lịch sử: agent cần chi tiết thì gọi
+    # `aisdlc evidence <id>`, không nạp sẵn cả sổ.
+    "context.max_index_chars": 2000,
     # điều phối
     "run.max_parallel": 3,
     "run.max_turns": 40,
@@ -96,6 +100,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "story.max_acceptance_criteria": int,
     "story.max_write_scope_paths": int,
     "story.max_screen_states": int,
+    "context.max_index_chars": int,
     "run.max_parallel": int,
     "run.max_turns": int,
     "run.timeout_seconds": int,

@@ -60,7 +60,8 @@ aisdlc run                          # hiện thực: epic tuần tự, story son
 aisdlc qa                           # bộ kiểm định
 aisdlc devsecops                    # CI + Dockerfile + triển khai + runbook
 aisdlc pre-deploy                   # cổng cuối
-aisdlc report                       # báo cáo nghiệm thu từ bằng chứng
+aisdlc report                       # báo cáo nghiệm thu + sổ hành vi + INDEX.md
+aisdlc evidence STORY-01-04         # lịch sử một story hay một hành vi (AC-…, FR-…, qa:e2e)
 ```
 
 Chạy nhanh không cần người duyệt: `aisdlc plan --auto-approve all`. Phê duyệt

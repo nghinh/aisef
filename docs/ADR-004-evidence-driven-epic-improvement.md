@@ -1,6 +1,7 @@
 # ADR-004 — Cải tiến liên tục theo bằng chứng ở cấp epic (đối chiếu Harness-of-Harness)
 
-**Trạng thái:** PROPOSED — bộ yêu cầu nâng cấp, chưa hiện thực. Ngày 2026-09-05.
+**Trạng thái:** PROPOSED, trừ **R2 · R6 · R7 = ACCEPTED** (2026-09-05, số đo
+§6: B0 hồi cứu trên evidence thật của e9 và `par`, 0 agent). Ngày 2026-09-05.
 **Nguồn đối chiếu:** paper *Harness-of-Harness: Multi-Day Autonomous Software Development with Continual Improvement* (arXiv 2609.01481v1, Shanghai AI Lab) và repo `Flesymeb/HarnessOfHarness` — repo tại thời điểm đọc chỉ có README + tài sản trình diễn (58 commit, MIT, "HoH-lite sẽ công bố"), **không có mã**; mọi cơ chế dưới đây lấy từ paper.
 **Ràng buộc giữ nguyên:** sáu nhóm harness hiện có, evidence-first, reviewer ≠ developer, bảo đảm phía harness, worktree cách ly, cổng người, CLI gọi-một-lần/không daemon, không tin client. Không dùng HoH làm runtime. Không tự sửa framework: mọi thay đổi vẫn qua test, benchmark, ADR/evidence và cổng người/phát hành.
 
@@ -150,4 +151,108 @@ Thứ tự làm: R1 → R2 (B0) → R4 → R3 (B1) → R5 (B4) → R6/R7 → R8/
 
 ## 6. Số đo (điền khi hiện thực)
 
-_(trống — mục nào ACCEPTED phải có số ở đây)_
+### R2 — Sổ hành vi (`control/ledger.py`) · **B0 hồi cứu, 0 agent**
+
+Hiện thực: `control/ledger.py` là **phép chiếu** từ `evidence/` — không có
+sự kiện nào chỉ nó ghi được, xoá `ledger.json` rồi dựng lại phải ra đúng
+cái cũ (trừ `loops[]`, xem R7). `build(artifact_root)` đọc mọi `evidence/*.jsonl`, sắp theo
+`(at, story, seq)` — `seq` chỉ có nghĩa **trong** một tệp — rồi suy trạng
+thái bằng code. Bốn nguồn: tên test ở `tool_run test` (qua
+`control/acceptance.py`) → `AC-<story>-<i>`; `covers` của story →
+`FR-x`/`NFR-x`; `tool_run` tên `qa:<kind>` → `qa:<kind>`; `mockup_map` →
+`mockup:<màn>`. Lịch sử chỉ ghi khi **đổi** trạng thái (e9 có ~100 lần chạy
+× ~280 tên test; ghi mọi quan sát thì sổ to hơn bằng chứng nó chiếu ra) —
+kết quả: `ledger.json` 57 KB cho 4,3 MB `evidence/`, tức 1,3 %; dựng lại mất
+1,1 s.
+`harness/observe.py` thêm loại `BEHAVIOR` + `EvidenceStore.behavior(...)`
+để pha sau ghi thêm nguồn — sổ đọc cả hai, và không ghi cũng không mất gì.
+
+Hai luật chống kết tội oan, cả hai đo được: (1) lần chạy test **không đọc
+được tên** là GAP với lý do, không phải "đạt" — cùng luật với cổng; (2) một
+lần chạy chỉ chấm tiêu chí của story khác **khi thực sự thấy test của story
+ấy**, nên bộ test chạy một phần không biến story không liên quan thành hồi quy.
+
+| Kho | Hành vi | VERIFIED | GAP | REOPENED (hiện tại) | Gap đã đóng | Lần hồi quy | **Hồi quy liên story** |
+|---|---|---|---|---|---|---|---|
+| e9 `_bmad-output` (6 story có bằng chứng / 18 trong chỉ mục) | 49 | 31 | 18 | 0 | 47 | 19 | **6** |
+| `par` (5 story) | 16 | 1 | 15 | 0 | 0 | 0 | 0 |
+
+e9 theo loại: 39 `ac` · 4 `fr` · 4 `qa` · 2 `mockup` (0 `nfr` — PRD e9 không
+có NFR nào được story `covers`).
+
+**REOPENED thật, có nguồn** (hành vi xanh ở story A, đỏ lại trong bằng chứng
+của story B ≠ A — đúng con số HoH đo 17/81 ở Fusepoint):
+
+| Hành vi | Xanh ở | Đỏ lại ở |
+|---|---|---|
+| `AC-STORY-01-04-1` | STORY-01-04 | STORY-01-05#1 |
+| `AC-STORY-01-04-3` | STORY-01-04 | STORY-01-05#1 |
+| `FR-4` | STORY-01-04 | STORY-01-05#1 |
+| `AC-STORY-01-04-1` | STORY-01-05 | STORY-01-06#1 |
+| `AC-STORY-01-04-3` | STORY-01-05 | STORY-01-06#1 |
+| `FR-4` | STORY-01-05 | STORY-01-06#1 |
+
+Nguồn của cả hai lần: cùng một test đỏ,
+`src/store/notes.test.ts > Đọc danh sách theo cửa sổ, không quét toàn kho
+(AC-STORY-01-04-1, AC-STORY-01-04-3, AR-7, AR-9)` — `aisdlc evidence
+AC-STORY-01-04-1` in ra đúng chuỗi gap → verified → reopened → verified →
+reopened → verified kèm tên test của từng bước.
+
+Đọc được ba điều mà báo cáo hôm qua không nói được:
+
+1. **STORY-01-05 và STORY-01-06 mỗi story làm đỏ tiêu chí của STORY-01-04**
+   ở lượt đầu, rồi tự sửa trong cùng lượt. Cả hai story vẫn qua cổng và vẫn
+   `done`; hồi quy chỉ tồn tại *giữa chừng* và **không để lại dấu vết nào**
+   trong `ACCEPTANCE-REPORT` cũ. Đây chính là gap §1.3 #3.
+2. **STORY-01-01/02/03 không có một tiêu chí nào được xác minh** (18 GAP,
+   lý do đồng nhất: `vitest` reporter mặc định không in tên test). Ba story
+   `done` với 0/7, 0/7, 0/4 tiêu chí có bằng chứng — trước sổ này con số ấy
+   nằm trong ô `?/n` của báo cáo và không ai cộng lại. `par` cũng vậy: 15/16
+   hành vi GAP, chỉ `qa:fake-tests` xanh.
+3. Tổng 19 lần hồi quy, nhưng **13 trong số đó là đỏ-lại trong chính lượt
+   của story mình** — TDD bình thường, không phải hồi quy. Vì thế sổ tách
+   `reopen_events` khỏi `cross_reopens`; chỉ số thứ hai mới so được với HoH.
+
+Hai lỗi quy kết oan **bị chính B0 bắt** và đã sửa trước khi chốt số: (a)
+`regressed_by` từng ghi story *sở hữu* tiêu chí thay vì story *làm hỏng* nó
+— nay `observe()` tách `story` (quan sát) khỏi `owner` (sở hữu); (b) trạng
+thái `FR-x` từng đọc `ok` của **cả lần chạy**, nên một lần chạy đỏ vì story
+khác biến `FR-1`/`FR-11` của STORY-01-05 thành hồi quy — nay yêu cầu chỉ đỏ
+khi **tiêu chí của chính nó** đỏ. Con số trước khi sửa là 36 lần / 8 liên
+story; sau khi sửa là 19 / 6. VERIFIED và GAP không đổi.
+
+Chưa suy được từ bằng chứng hôm nay: **candidate rỗng cho mọi hành vi** (R1
+đang làm ở luồng khác) — nên `ledger.json` ghi `candidate: ""` và cột
+candidate của `INDEX.md` là `—`. AC-(c) của R2 ("không hành vi nào VERIFIED
+mà không có candidate") **chưa đạt được** và chỉ đạt sau R1; sổ đã sẵn chỗ
+(`detail.candidate` đọc ở mọi sự kiện, rỗng là hợp lệ với bằng chứng cũ).
+
+### R6 — Progressive disclosure (chỉ mục + `aisdlc evidence`)
+
+`Ledger.index()` sinh `_bmad-output/INDEX.md`: **một dòng mỗi story**
+(trạng thái · candidate 7 ký tự · V/G/R · đường dẫn evidence) + một dòng mỗi
+epic. e9: 23 dòng cho 18 story / 5 epic; `par`: 8 dòng cho 5 story / 3 epic.
+`build_context` thêm slot `index` (nguồn `ledger`) = **lát cắt epic chứa
+story**, trần `context.max_index_chars` (mặc định 2000) — e9 EPIC-01 là 8
+dòng / 497 ký tự, tức ~3,7 % prompt developer hôm nay (13,5k), trong ngưỡng
++15 % của B5. Lịch sử **không** vào prompt: `aisdlc evidence <story|hành vi>`
+in đường đời đầy đủ khi cần, và ghi `note:evidence_lookup` như `doc_lookup`.
+`story-implement` lên v4 với mục "Trạng thái epic".
+
+### R7 — Metrics cải tiến liên tục
+
+`Ledger.metrics()` + phần 5 của `ACCEPTANCE-REPORT`: *verified capability
+growth* (số hành vi duy nhất từng VERIFIED theo thời gian — e9 31 điểm),
+*reopened* (19 lần · tỷ lệ 0,61 trên hành vi từng xác minh · 6 liên story),
+*resolved gaps* (47), và *marginal improvement* = (ΔVERIFIED − ΔREOPENED)/$
+giữa hai mốc `loops[]` (`Ledger.snapshot(label, cost)`). Không có chi phí thì
+`marginal` là `None`, không phải 0 — không mẫu số thì không có tỷ số.
+Trên e9 hôm nay `loops[]` rỗng: các lượt chạy cũ không chốt mốc nào, nên cột
+biên chỉ có số từ R3 trở đi. B6 đạt phần "bảng có số"; phần "marginal" phải
+đợi vòng đầu tiên của R3.
+
+`loops[]` là phần **duy nhất** của sổ không suy được từ bằng chứng (mốc và
+chi phí của một vòng là quyết định của người điều phối, không nằm trong
+`evidence/`), nên `build()` mang nó sang từ sổ cũ. Không làm thế thì một lần
+`aisdlc report` — vốn chiếu lại sổ mỗi lần chạy — sẽ xoá sạch mốc mà vòng R3
+vừa chốt; có test riêng cho đúng điều này.
