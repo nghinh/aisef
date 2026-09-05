@@ -487,6 +487,18 @@ chặn) vẫn làm hành vi gốc VERIFIED trong sổ dù code chưa merge — s
 `candidate` cho việc này; sổ chưa lọc theo nó.
   **Đã sửa 2026-09-06** (gộp đợt 2, `control/ledger.py`): sổ đọc nhật ký R1 — ứng viên chỉ *landed* khi giao dịch đóng băng nó kết thúc bằng `attempt.committed`/`merge.completed`; xanh ở ứng viên chưa landed **không** thành VERIFIED (đếm vào `unlanded_green` trong summary, hành vi chưa có thì ghi GAP với lý do), đỏ vẫn tính là hồi quy. Bằng chứng không có nhật ký (QA cấp dự án, mốc vòng) hoặc không khai bản giữ luật cũ. Test: `tests/test_ledger.py::TestUngVienChuaLanded`.
 
+**B1 đo thật (2026-09-06 04:0x–05:0x, `aisdlc improve --epic EPIC-01 --max-loops 2 --auto --client claude`, trần $80):**
+
+| vòng | story sửa | hành vi | lượt thử | developer (lượt) | chi phí | Δverified − Δreopened | gap epic |
+|---|---|---|---|---|---|---|---|
+| 0 | — (QA + sổ) | — | — | — | $0 | — | 17 |
+| 1 | STORY-RP-01 | AC-STORY-01-01-1 | 2 | 42 + 16 | $8,87 | **+1** (R = 0) | 17 → 16 |
+| 2 | STORY-RP-02 | AC-STORY-01-01-2 | 2 | 26 + 13 | $8,09 | **+1** (R = 0) | 16 → 15 |
+
+Dừng đúng điều kiện (2): đủ `improve.max_loops`. Bất biến (b) giữ: cả hai story sửa có `worktree.created`, `handoff developer→reviewer→security`, `merge.completed`; cổng đủ 16 mục, *bảo toàn* 33 hành vi story khác còn xanh. Sổ toàn dự án 42 → 46 VERIFIED, 18 → 16 GAP, 0 REOPENED. Dự báo "dừng ở bế tắc vì reporter" **sai**: gap của 01-01 là test không mang mã, developer gắn mã trong phạm vi được (`vite.config.ts` thuộc write_scope 01-01). Cả hai vòng trượt lượt 1 ở *không làm đỏ test có sẵn* ("mất 1 test": developer đổi cả tiêu đề lá khi gắn mã) rồi lượt 2 trả tên cũ, chỉ thêm mã — feedback R9 làm đúng việc, giá ≈ $3–5 mỗi vòng. Chi phí một vòng ≈ $8,5 ≈ 1/5 story trung bình EPIC-01 ($70) → AC "≤ 1 story/vòng" đạt; cải thiện biên +1/vòng, chưa thấy phẳng.
+
+**Chưa đo:** đường cong nhiều vòng hơn (còn 15 gap; kỳ vọng phẳng khi tới các gap cần route/màn hình của story sau), và B3/B5/B6 trên `par`.
+
 **Chưa đo (B1):** e9 EPIC-01 với agent thật — ΔVERIFIED, REOPENED → 0,
 chi phí/vòng so với story trung bình. Rủi ro đã thấy trước: 18 GAP của e9
 01-01/02/03 cùng một gốc (vitest không in tên test) — story sửa cho
