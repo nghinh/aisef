@@ -349,6 +349,25 @@ class TestKhongLamDoTestCoSan(GateTestCase):
     def muc(self, g):
         return next(c for c in g.checks if c.name == self.TEN)
 
+    def test_doi_ten_test_giu_tieu_de_la_khong_phai_mat(self):
+        """e9 01-07 lượt 2: bốn test có sẵn được thêm mã `AC_STORY_01_01_6:` — không phải xoá."""
+        goc = ["src/ui/app-shell.tsx > Lớp token (TCCN 4, 6) > mọi màu có biến CSS",
+               "src/ui/app-shell.tsx > Lớp token (TCCN 4, 6) > mọi bậc spacing có biến CSS",
+               "tests/test_a.py::test_1"]
+        moi = ["src/ui/app-shell.tsx > Lớp token (TCCN 4, 6) > AC_STORY_01_01_6: mọi màu có biến CSS",
+               "src/ui/app-shell.tsx > Lớp token (TCCN 4, 6) > AC_STORY_01_01_6: mọi bậc spacing có biến CSS",
+               "tests/test_a.py::test_1"]
+        self.baseline(goc)
+        self.ung_vien(moi)
+        m = self.muc(self.gate(candidate="aaa"))
+        self.assertIs(m.outcome, Outcome.PASSED, m.detail)
+        self.assertIn("đổi tên", m.detail)
+        # Xoá thật (tiêu đề lá biến mất) vẫn là hồi quy.
+        self.ung_vien(moi[:1] + ["tests/test_a.py::test_1"])
+        m = self.muc(self.gate(candidate="aaa"))
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("mọi bậc spacing", m.detail)
+
     def test_muoi_xanh_roi_chin_xanh_mot_do_thi_neu_dung_ten(self):
         ids = [f"tests/test_a.py::test_{i}" for i in range(1, 11)]
         self.baseline(ids)

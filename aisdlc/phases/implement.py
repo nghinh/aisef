@@ -233,7 +233,12 @@ def preservation_items(story: Story, *, project: Path, ledger) -> list[dict]:
     out = []
     for bid in verified_touched(story, ledger.as_dict(), read_scopes(project)):
         b = ledger.behaviors[bid]
-        out.append({"id": bid, "kind": b.kind, "story": b.story, "source": dict(b.source)})
+        # FR/NFR được sổ xác minh **qua tiêu chí của một story** (`source.story`)
+        # — không nhất thiết là story sở hữu: e9 FR-11 sở hữu bởi 01-01 (test
+        # không mang mã) nhưng xanh qua 01-05. Cổng phải hỏi đúng story ấy,
+        # không thì đòi test mà sổ chưa từng thấy (01-07 lượt 1, 2026-09-06).
+        out.append({"id": bid, "kind": b.kind, "story": b.story, "source": dict(b.source),
+                    "via": str(b.source.get("story") or b.story)})
     return out
 
 

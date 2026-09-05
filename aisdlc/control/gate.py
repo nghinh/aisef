@@ -77,6 +77,14 @@ def _ten(tests: list[str], n: int = 5) -> str:
     return ", ".join(tests[:n]) + (f" (+{len(tests) - n})" if len(tests) > n else "")
 
 
+def _la(test_id: str) -> str:
+    """Tiêu đề lá của một test id: phần sau dấu `>` cuối, bỏ mã `AC_…:` đứng đầu."""
+    la = test_id.rsplit(">", 1)[-1].strip()
+    if ":" in la and la.split(":", 1)[0].replace("_", "-").upper().startswith("AC-"):
+        la = la.split(":", 1)[1].strip()
+    return la
+
+
 def _baseline_check(evidence: Evidence, candidate: str) -> Check:
     """Mục "không làm đỏ test có sẵn" (ADR-004 R9).
 
@@ -137,7 +145,14 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
     # ponytail: testlog cắt danh sách ở MAX_IDS — bộ test lớn hơn thế thì
     # "mất" không kết luận được (tên có thể nằm ngoài phần cắt), chỉ so đỏ.
     cat = len(goc_ids) >= MAX_IDS or len(con) >= MAX_IDS
-    mat = [] if cat else [t for t in xanh_goc if t not in con]
+    # Đổi tên ≠ mất: cùng tiêu đề lá (phần sau dấu `>` cuối) còn ở ứng viên
+    # thì test vẫn đó, chỉ mang tên nhóm/mã khác. e9 01-07 lượt 2 (2026-09-06):
+    # developer thêm mã `AC_STORY_01_01_6:` vào bốn test có sẵn để đóng GAP
+    # của story khác — cổng đọc thành "mất 4 test". Xoá thật thì tiêu đề lá
+    # cũng mất, vẫn bị bắt.
+    la_con = {_la(t) for t in con}
+    doi_ten = [] if cat else [t for t in xanh_goc if t not in con and _la(t) in la_con]
+    mat = [] if cat else [t for t in xanh_goc if t not in con and _la(t) not in la_con]
     if lam_do or mat:
         loi = []
         if lam_do:
@@ -148,6 +163,8 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
                        "suy được nên tính là hồi quy")
         return Check(ten, False, "; ".join(loi))
     do_san = list(goc.detail.get("red_before") or goc.detail.get("failed_ids") or [])
+    if doi_ten:
+        return Check(ten, True, f"{len(doi_ten)} test đổi tên nhưng còn tiêu đề lá, không tính là mất: {_ten(doi_ten)}")
     if do_san:
         return Check(ten, True, f"{len(do_san)} test đã đỏ sẵn ở baseline, không tính: {_ten(do_san)}")
     if cat:
@@ -422,8 +439,10 @@ def _preservation_check(evidence: Evidence, preservation: list[dict], candidate:
             i = int(bid.rsplit("-", 1)[-1]) if bid.rsplit("-", 1)[-1].isdigit() else 0
             tests = ac_coverage(owner, i, ids).get(i, []) if i else []
         elif kind in ("fr", "nfr"):
-            # Yêu cầu xanh khi tiêu chí của story sở hữu xanh — cùng luật với sổ.
-            tests = [t for t in ids if f"AC-{owner}-" in t.replace("_", "-")]
+            # Yêu cầu xanh khi tiêu chí của story **đã xác minh nó** xanh — cùng
+            # luật với sổ (`source.story`), không phải story sở hữu trên giấy.
+            via = str(it.get("via") or owner)
+            tests = [t for t in ids if f"AC-{via}-" in t.replace("_", "-")]
         elif kind == "qa":
             ran = at_candidate(TOOL_RUN, bid)
             if ran is None or ran.detail.get("skipped"):

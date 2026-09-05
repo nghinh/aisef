@@ -261,6 +261,20 @@ chuẩn được ghi sau khi story xong). Bộ đầy đủ: **1 256 test, OK**
 
 **Gộp đợt 2 (2026-09-06 03:05, master 658997c):** suite đầy đủ trên master **1 384 test OK, 4 skip** (1 608 s); hợp quy chạy lại hai client **16/16** với C8 mới (Claude $1,08, OpenCode $0) — C8 trên agent thật: A đạt, B stale ✗ đúng mục `bằng chứng đúng candidate`, cả hai client.
 
+**R4 · R9 — đo trên agent thật, e9 STORY-01-07 chạy lại lần 3 (2026-09-06 03:25–04:20, $17,88, 2 lượt thử, máy rảnh).**
+
+| lượt | ứng viên | rà soát | bảo mật | e2e | bảo toàn (R4) | không làm đỏ test có sẵn (R9) | kết cục |
+|---|---|---|---|---|---|---|---|
+| 1 | `a60612e` (không đổi so với lần trước — developer 18 lượt, không sửa gì) | ✅ JSON `pass` | ✅ | ✅ (10/10 — xác nhận lỗi 22 là tải máy) | ⚠ **UNRUNNABLE oan**: `FR-11` "không có test mang mã" | ✅ | ✗ chỉ vì bảo toàn |
+| 2 | `8e0a5fd` | ✗ 2 chặn + `[bế tắc]` AC-1 vế menu | ✅ | ✅ | ✅ 30 hành vi còn xanh | ✗ **"mất 4 test"** — thực ra developer đổi tên để gắn mã `AC_STORY_01_01_6:` | ✗, dừng epic vì bế tắc kế hoạch |
+
+Baseline R9 chạy trước phiên developer: 440 test id ở bản cha, 0 đỏ sẵn; slot R4 vào bàn giao: `preservation` 1 552 ký tự (chạm trần), `validation` 138, `index` 506.
+
+Hai lỗi thật của đợt 2 lộ ra ngay lượt đầu trên agent thật, sửa cùng đêm (commit sau 0eb65ee):
+* **Lỗi 23 (R4):** cổng hỏi test mang mã của story *sở hữu* FR (01-01, story không có test mang mã), trong khi sổ xác minh FR-11 *qua* 01-05 (`source.story`). Sổ và cổng dùng hai luật → sổ nói VERIFIED, cổng nói không kiểm được. Sửa: mục bảo toàn mang `via` = story đã xác minh, cổng hỏi đúng story ấy (test `test_fr_hoi_story_da_xac_minh_no_khong_hoi_story_so_huu`).
+* **Lỗi 24 (R9):** đổi tên test giữ nguyên tiêu đề lá bị đọc thành "mất test". Chính lỗi 23 xui developer làm việc ấy (gắn mã vào test của story khác để cổng hết kêu). Sửa: cùng tiêu đề lá còn ở ứng viên → "đổi tên", không phải mất; xoá thật vẫn bị bắt (test `test_doi_ten_test_giu_tieu_de_la_khong_phai_mat`).
+* Bế tắc kế hoạch lượt 2 là thật ở mức tiêu chí: AC-1 đòi "menu là lối duy nhất *tới*" ba màn hình chưa có route (FR-3/10/16, story sau). Chủ dự án sửa lời tiêu chí (e9 1597e3d). Reviewer trả JSON `block` nhưng văn bản có `[bế tắc]` → harness dừng epic theo văn bản: đúng luật hợp (không nới), và đúng việc — tiêu chí không thoả được trong phạm vi là việc của người.
+
 **R1 · R8 — đo trên agent thật, e9 STORY-01-07 chạy lại 2026-09-06 01:03–02:14 (Claude, $28,76, 3 lượt thử).**
 
 | lượt | developer | ứng viên | review (lượt · $) | JSON review | security (lượt · $) | JSON security | kết cục cổng |

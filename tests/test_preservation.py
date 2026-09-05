@@ -63,6 +63,19 @@ class TestCongBaoToan(GateTestCase):
         })
         self.store.tool_run("S-01", "lint", ok=True, detail={"candidate": self.SHA})
 
+    def test_fr_hoi_story_da_xac_minh_no_khong_hoi_story_so_huu(self):
+        """e9 FR-11: sở hữu bởi 01-01 (test không mang mã) nhưng sổ xác minh qua 01-05.
+
+        Hỏi story sở hữu thì không bao giờ có test → UNRUNNABLE oan (01-07 lượt 1,
+        2026-09-06); hỏi đúng story đã xác minh thì test có và xanh → đạt.
+        """
+        self.chay_test(ids=["tests/test_b.py::test_AC_STORY_01_05_1"])
+        via = [{"id": "FR-11", "kind": "fr", "story": "STORY-01-01", "via": "STORY-01-05",
+                "source": {"story": "STORY-01-05"}}]
+        self.assertIs(self.muc(preservation=via).outcome, Outcome.PASSED)
+        chu = [{"id": "FR-11", "kind": "fr", "story": "STORY-01-01", "source": {"story": "STORY-01-05"}}]
+        self.assertIs(self.muc(preservation=chu).outcome, Outcome.UNRUNNABLE)
+
     def test_khong_truyen_thi_khong_ap_dung(self):
         self.green_story()
         m = self.muc()
