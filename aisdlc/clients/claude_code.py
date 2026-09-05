@@ -10,6 +10,17 @@ Mọi cờ dùng ở đây đã kiểm chứng bằng thực nghiệm (spike S1,
   chạy với ``--permission-mode acceptEdits``;
 * ``< /dev/null`` là bắt buộc, nếu không CLI chờ stdin ba giây mỗi lần gọi.
 
+**Cách ly khỏi cấu hình toàn cục của người dùng** (đo 2026-09-05, Claude Code
+2.1.236, hợp quy C3/C4 trượt sau khi máy chủ bật ``permissions.defaultMode:
+"auto"`` trong ``~/.claude/settings.json``): phiên con thừa hưởng chế độ ấy
+thì **mất Glob/Grep** và được dặn "ưu tiên Bash" — tức ghi tệp bằng heredoc
+và né sạch guard ``Write|Edit``; MCP của người dùng (Google Drive…) và hook
+toàn cục cũng lọt vào phiên. Harness không tin client thì càng không tin
+cấu hình máy: chế độ cố định ``acceptEdits``, tool kê tường minh
+(``DEFAULT_TOOLS``), chỉ nạp settings dự án + ``--settings`` của harness,
+không MCP ngoài. Đo lại cùng ngày: Glob/Grep có, MCP 0, hook người dùng 0,
+guard write-scope vẫn chặn.
+
 **Hook có tới được worktree không** (đo 2026-09-05 trên `par`, claude CLI,
 `.claude/` **không** commit nên worktree không có thư mục ấy; mỗi biến thể
 một phiên `-p` bảo agent Write một tệp; đếm sự kiện guard tự ghi):
@@ -48,6 +59,14 @@ from .stream import RunResult, parse_stream
 
 BINARY = "claude"
 
+#: Chế độ quyền cố định cho phiên con — không để chế độ toàn cục của máy quyết.
+PERMISSION_MODE = "acceptEdits"
+#: Tool được phép khi vai không kê riêng. `acceptEdits` tự duyệt Write/Edit
+#: trong thư mục làm việc nhưng Bash thì phải kê, không thì `-p` từ chối
+#: và agent không chạy nổi `aisdlc tool test`. `--disallowed-tools` của vai
+#: (reviewer/security) vẫn thắng danh sách này.
+DEFAULT_TOOLS = ("Read", "Write", "Edit", "Glob", "Grep", "Bash", "NotebookEdit")
+
 
 def clean_env() -> dict[str, str]:
     """Môi trường cho tiến trình `claude` con: bỏ mọi `CLAUDE*` của phiên cha."""
@@ -83,6 +102,9 @@ class ClaudeCodeAdapter(ClientAdapter):
             "-p", spec.prompt,
             "--output-format", "stream-json",
             "--verbose",
+            "--permission-mode", PERMISSION_MODE,
+            "--setting-sources", "project,local",
+            "--strict-mcp-config",
         ]
         if spec.system_prompt:
             cmd += ["--append-system-prompt", spec.system_prompt]
@@ -90,8 +112,7 @@ class ClaudeCodeAdapter(ClientAdapter):
             cmd += ["--model", spec.model]
         if spec.max_turns:
             cmd += ["--max-turns", str(spec.max_turns)]
-        if spec.allowed_tools:
-            cmd += ["--allowed-tools", *spec.allowed_tools]
+        cmd += ["--allowed-tools", *(spec.allowed_tools or DEFAULT_TOOLS)]
         if spec.disallowed_tools:
             cmd += ["--disallowed-tools", *spec.disallowed_tools]
         if spec.settings_file:

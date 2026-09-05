@@ -99,6 +99,10 @@ class RunResult:
     tool_uses: list[ToolUse] = field(default_factory=list)
     denials: list[Denial] = field(default_factory=list)
     hooks: list[HookRun] = field(default_factory=list)
+    #: Mọi đoạn văn assistant theo thứ tự. `text` chỉ là câu chốt — mà câu
+    #: chốt có thể là trả lời cho hook Stop chứ không phải cho việc (hợp quy
+    #: C4 trượt vì thế, 2026-09-05).
+    texts: list[str] = field(default_factory=list)
     #: Thông báo từ hook đã chặn một tool. Lấy từ `tool_result` chứ không
     #: từ `hook_response`: quan sát trên luồng thật cho thấy Claude Code
     #: **không** phát `hook_response` cho lần hook chặn — nó đưa thẳng lý
@@ -272,6 +276,7 @@ def parse_stream(lines: Iterable[str]) -> RunResult:
                     or "lỗi không rõ nguyên nhân"
                 )
 
+    res.texts = assistant_text
     if not res.text and assistant_text:
         res.text = "\n".join(assistant_text)
 

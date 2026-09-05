@@ -18,6 +18,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 
+from aisdlc.clients.base import RunSpec  # noqa: E402
+from aisdlc.clients.claude_code import ClaudeCodeAdapter  # noqa: E402
 from aisdlc.clients.compile import compile_for, write_compile_report  # noqa: E402
 from aisdlc.clients.stream import parse_stream  # noqa: E402
 from aisdlc.control.conformance import ClientRun, ProbeResult, Report  # noqa: E402
@@ -84,8 +86,11 @@ def env_for(project: Path, workdir: Path, story: str, *, reviewer: bool = False)
 
 
 def run_claude(project: Path, workdir: Path, prompt: str, story: str, *, reviewer=False):
-    cmd = ["claude", "-p", prompt, "--output-format", "stream-json", "--verbose",
-           "--max-turns", "6", "--settings", str(project / ".claude" / "settings.json")]
+    # Đúng dòng lệnh harness dùng (cách ly cấu hình máy, tool kê tường minh) —
+    # tự dựng thì đo một thứ khác với thứ chạy thật.
+    cmd = ClaudeCodeAdapter().build_command(RunSpec(
+        prompt=prompt, workdir=workdir, max_turns=6,
+        settings_file=project / ".claude" / "settings.json"))
     # Không bật `--disallowed-tools` ở đây: C5 đo tầng guard (`check_role_tool`
     # qua env), không đo tầng native — bật cờ thì Write biến mất khỏi danh sách
     # tool và guard không bao giờ được gọi. Harness thật bật cả hai lớp.
@@ -94,7 +99,9 @@ def run_claude(project: Path, workdir: Path, prompt: str, story: str, *, reviewe
                           stdin=subprocess.DEVNULL)
     _keep(project, story, proc.stdout + "\n--- stderr ---\n" + proc.stderr)
     r = parse_stream(proc.stdout.splitlines())
-    return Run(r.text, r.cost_usd, [d.tool_name for d in r.denials],
+    # Cả phiên, không chỉ câu chốt: hook Stop có thể bắt agent chạy test rồi
+    # câu chốt nói về test chứ không về việc (C4, 2026-09-05).
+    return Run("\n".join([*r.texts, r.text]), r.cost_usd, [d.tool_name for d in r.denials],
                [t.name for t in r.tool_uses])
 
 

@@ -104,6 +104,22 @@ class TestClaudeCommand(unittest.TestCase):
         cmd = self.a.build_command(self.spec(max_turns=40))
         self.assertIn("40", cmd)
 
+    def test_isolated_from_user_config(self):
+        """Đo 2026-09-05: `defaultMode: auto` toàn cục làm phiên con mất
+        Glob/Grep và né guard bằng Bash; MCP + hook người dùng lọt vào."""
+        cmd = self.a.build_command(self.spec())
+        self.assertEqual(cmd[cmd.index("--permission-mode") + 1], "acceptEdits")
+        self.assertEqual(cmd[cmd.index("--setting-sources") + 1], "project,local")
+        self.assertIn("--strict-mcp-config", cmd)
+        tools = cmd[cmd.index("--allowed-tools") + 1:]
+        for t in ("Glob", "Grep", "Bash", "Write"):
+            self.assertIn(t, tools)
+
+    def test_explicit_allowlist_replaces_default(self):
+        cmd = self.a.build_command(self.spec(allowed_tools=["Read"]))
+        self.assertEqual(cmd[cmd.index("--allowed-tools") + 1], "Read")
+        self.assertNotIn("Bash", cmd)
+
 
 class TestOpenCodeCommand(unittest.TestCase):
     def test_run_subcommand(self):

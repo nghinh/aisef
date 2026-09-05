@@ -112,7 +112,7 @@ sau. Client nào không gắn được guard tiền kiểm thì `aisdlc verify` 
 lại toàn bộ trên diff, và `aisdlc compile` ghi rõ mức bảo đảm thấp hơn
 vào báo cáo thay vì im lặng — năng lực là thứ được **khai và kiểm**, mặc
 định là "chưa chứng minh", không phải "chắc là được". Trong V1, OpenCode
-là client **hạng hai** theo quyết định V1: guard chặn được (hợp quy 5/5), và từ 2026-09-05 `--format json` cho luồng máy đọc được (tool, token, cost theo nhà cung cấp) — chưa lên hạng nhất vì chưa đủ số lần hợp quy hook ổn định; chi phí trước đó không đo
+là client **hạng hai** theo quyết định V1: guard chặn được (hợp quy 7/7), và từ 2026-09-05 `--format json` cho luồng máy đọc được (tool, token, cost theo nhà cung cấp) — chưa lên hạng nhất vì chưa đủ số lần hợp quy hook ổn định; chi phí trước đó không đo
 được từ harness; nó không chặn phát hành.
 
 ## Hợp quy client

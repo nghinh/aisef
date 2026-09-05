@@ -60,6 +60,7 @@ OpenCode còn có `serve` (server headless) + `attach`/`web` — nhiều client 
 | **Cost / token** | usage trong stream-json | **`stats`** | ✅ |
 | Phiên, resume | `--session-id`, `--resume` | `session` | ✅ |
 | Giới hạn vòng lặp | `--max-turns` | — | ✅ Claude; OpenCode dùng timeout |
+| **Cách ly cấu hình máy** | `--permission-mode acceptEdits` + `--allowed-tools` kê tường minh + `--setting-sources project,local` + `--strict-mcp-config` | plugin dự án — chưa đo | ✅ Claude, đo 2026-09-05: `defaultMode: auto` toàn cục làm phiên con **mất Glob/Grep** và ghi bằng Bash heredoc né guard `Write\|Edit`; MCP + hook người dùng lọt vào. Sau cờ: Glob có, MCP 0, hook người dùng 0, guard vẫn chặn |
 
 Hạ tầng: `docker` daemon **đang chạy** · `git worktree` dùng được · `npx` có.
 Chưa có: `pytest`, `semgrep`, `trivy`, `k6` → **chạy trong container**, không cài lên máy (mục 6).
