@@ -198,6 +198,15 @@ Cột "Chứng minh" là điều kiện để mục đó chuyển ACCEPTED.
 
 Ngân sách: A/B #1 par ≈ $5,5; e9 ≈ $43 (off $22,01 + on $20,93) — trong $120–180 đã duyệt cho đợt 4 tính cả R2.
 
+**Cơ chế B đo 2026-09-05 (ngân sách mở):** cờ `skills.inline` dán thân SKILL.md của skill cao điểm nhất vào prompt (trần 8k). A/B trên STORY-01-05 tại kế hoạch đã sửa `b95936b`, hai nhánh song song, 2 lượt/nhánh, n = 1:
+
+| Nhánh | Prompt (ký tự) | Lượt developer | $ developer | $ tổng | Cổng lượt 2 | Rà soát lượt 2 |
+|---|---|---|---|---|---|---|
+| off | 13 526 | 91 (max_turns) + 71 | 22,53 | 27,68 | e2e ✗ (2 fail) | 1 [chặn] |
+| inline `ui-ux-pro-max` | 22 351 | 91 (max_turns) + 33 | 16,73 | 22,09 | máy ✅ hết (kể cả TDD) | 3 [chặn] |
+
+Cả hai trượt sau 2 lượt. Inline rẻ hơn ~$5,6 và lượt 2 ngắn hơn (33 so với 71), qua hết cổng máy, nhưng người rà soát chặn nhiều hơn (3 so với 1); cùng story ở cùng base, lượt thật trên e9 xong ở 1 lượt/72 lượt hội thoại — **phương sai một mẫu lớn hơn hiệu ứng**. Kết luận: chưa có bằng chứng *gain*; giữ `skills.inline` = off. Muốn quyết thật cần n ≥ 3 mỗi nhánh (≈ $150), chỉ làm khi chủ đầu tư muốn mở lại mục này.
+
 **Chủ đầu tư chốt 2026-09-05 (tối):** chấp nhận kết quả; `skills.offer` = off; chưa mở Skill Graph; chỉ xem xét lại khi có benchmark chứng minh skill thực sự được dùng *và* tạo gain.
 
 **Quyết định 2026-09-05 (sau A/B e9):** #1 giữ trạng thái *cơ chế có, mặc định tắt*. Hai dự án, sáu lượt developer nhận mục kỹ năng (kể cả skill cửa ngõ giao diện chấm 10/10 cho story có màn hình), không lượt nào gọi tool `Skill`. Mục kỹ năng vô hại về chi phí nhưng không đổi hành vi; mở rộng thêm (skill graph, chưng cất kho) là xây trên giả định chưa có bằng chứng. Việc kế tiếp nếu muốn đi tiếp: đo một cơ chế khác — nạp thẳng nội dung SKILL.md vào ngữ cảnh (không qua tool) — trên cùng cặp story, trước khi bàn tới đồ thị.
