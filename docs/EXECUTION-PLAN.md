@@ -567,8 +567,19 @@ Bước tiếp: **đợt 1 — G4** truyền `--settings` tường minh + nhịp
 | G4 mảnh 2 cổng "guard có chạy" | 13 | Lượt "sau" đầu tiên báo trượt **sai**: hook chạy 17 lần nhưng agent ghi file chỉ bằng Bash → sửa: nhịp tim `GUARD_SEEN` + `diff-scope` ghi `FILE_CHANGE` theo mtime. **SAU-2**: XONG lần 1, $0,50, evidence `guard_seen=1, file_change=1` | docstring `claude_code.py` | ✅ |
 | G4 mảnh 3 `doctor` hook trong worktree | 2 | — (kiểm tĩnh) | | ✅ |
 | G11 test meta | 3 | — | | ✅ |
+| G6 hợp quy client — `tests/conformance/`, `control/conformance.py`, `test_release_gate`, CI tuần | 12 | **Lần 1** (2026-09-05): Claude 3/5, OpenCode 1/5 — lộ 3 lỗi thật + 2 tiêu chí sai (ba dòng dưới). **Lần 2**: Claude **5/5**, $1,25; OpenCode 4/5 rồi **5/5** sau khi đọc đúng dòng `✗ Write … failed`. Bảng hai cột xanh, log thô giữ ở `.conformance/` | `docs/CONFORMANCE.md` | ✅ |
+| G6 phát hiện 1 — worktree **mang** `.claude/settings.json` + `.opencode/` chưa commit (`WorktreeManager._carry_client_config`) | 2 | Hợp quy lần 1: OpenCode C1 `rm -rf` chạy thật, tệp mất, `.opencode/` không có trong worktree → guard không tới. Đây là G4 cho OpenCode, sửa ở harness nên client nào cũng hưởng | `docs/CONFORMANCE.md` lần 2 | ✅ |
+| G6 phát hiện 2 — guard `completion` chặn Stop vô hạn khi dự án **chưa cấu hình** test | 1 | Hợp quy lần 1: Stop bị chặn 2 lần/phép trên dự án không khai lệnh test, agent đốt hết lượt. Sửa: `skipped` → cho dừng, cổng story vẫn ghi "chưa cấu hình" (D4 — bốn kết cục gộp hai) | log thô `.conformance/claude/…/S-C2.log` | ✅ |
+| G6 phát hiện 3 — bộ chạy: giữ tạo tác `.conformance/`, đọc `tool_uses` thay vì lời agent, lọc `completion` khỏi guard-tool, không thừa hưởng `CLAUDE_*` của phiên cha, chi phí sống qua lần ghép | 3 | C3 lần 1 trượt **giả**: phiên con thừa hưởng env của phiên Claude đang chạy bộ hợp quy → tự chuyển sang Bash. C2 lần 1 trượt **giả**: guard đã chặn, agent viết lại bản an toàn — tiêu chí "không tệp" sai, đúng là "nội dung bị chặn không ra đĩa" | | ✅ |
 | G12 `VERIFIED`, `DONE` chỉ sau merge | 11 | SAU-2 trên `par`: `verified → done` sau `merge.completed`; `status` 5/5 done, không `verified` sót. Di trú sổ cũ: unit test (par không có sổ cũ cần di trú) | | ✅ |
 | G10a gỡ `max_context_tokens`, đo `prompt_chars` | 5 | — | | ✅ |
+
+**Đợt 3 — cổng kiểm được theo tiêu chí:**
+
+| Hạng mục | Unit test | Kiểm thật | Bằng chứng | Trạng thái |
+|---|---|---|---|---|
+| G7 một kiểu `Outcome` (`control/outcome.py`): 6 kết cục, 3 câu hỏi (`blocks`/`counts_as_done`/`must_be_named`), một bảng ký hiệu; `Check` dùng chung cho `gate` + `deploy`, `KindResult.outcome`; hết `skipped=True` chung chung | 8 | — (refactor thuần, cổng không đổi hành vi: 196 test cũ xanh) | | ✅ |
+| Parser output runner (`harness/testlog.py`): node `spec`/`tap`, vitest verbose/mặc định, pytest `-v`/`-q`, coverage pytest-cov/istanbul; không nhận ra → `test_ids=[]`, không đoán | 13 + 1 | Fixture là output **thật** của `par` (node 26), `e9` (vitest 5), pytest 9.1; ghi vào `tool_run test.detail.test_ids/failed_ids/coverage` qua `tools._record` | `tests/fixtures/testlog/` | ✅ |
 
 **Đợt OKL (ADR-002 — tầng tri thức vận hành, sau paper Repo-To-Skill):**
 

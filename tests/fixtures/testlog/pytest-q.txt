@@ -1,0 +1,14 @@
+..Fs                                                                     [100%]
+=================================== FAILURES ===================================
+___________________ TestNhom.test_AC_STORY_01_01_3_that_bai ____________________
+
+self = <test_ac.TestNhom object at 0x109695d10>
+
+>   def test_AC_STORY_01_01_3_that_bai(self): assert 1 == 2
+                                              ^^^^^^^^^^^^^
+E   assert 1 == 2
+
+test_ac.py:5: AssertionError
+=========================== short test summary info ============================
+FAILED test_ac.py::TestNhom::test_AC_STORY_01_01_3_that_bai - assert 1 == 2
+1 failed, 2 passed, 1 skipped in 0.01s

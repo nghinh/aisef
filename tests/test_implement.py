@@ -65,8 +65,12 @@ class ScriptedClient(ClientAdapter):
 
     def run(self, spec: RunSpec) -> RunResult:
         self.settings_files.append(spec.settings_file)
-        is_security = "Rà soát bảo mật" in spec.prompt
-        is_review = "Rà soát" in spec.prompt and not is_security
+        # Phân loại theo **dòng đầu**: prompt developer lượt 2 mang feedback
+        # của reviewer ("[chặn] … Rà soát là báo cáo"), nên dò chuỗi trong
+        # toàn prompt sẽ nhận nhầm phiên developer là phiên review.
+        dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
+        is_security = dau.startswith("# Rà soát bảo mật")
+        is_review = dau.startswith("# Rà soát") and not is_security
         if is_security:
             self.calls.append("security")
             self.security_envs.append(dict(spec.env))
@@ -717,3 +721,52 @@ class TestKyVongGuardTheoBaoCaoBienDich(ImplementTestCase):
         self.bao_cao("claude", True)
         out = self.implement(ScriptedClient())
         self.assertTrue(self.muc(out).skipped)
+
+
+class TestNguoiRaSoatKhongDuocSuaCay(ImplementTestCase):
+    """Đo hợp quy 2026-09-05: cấm `Write` ở guard bị lách trên **cả hai
+    client** bằng Bash (`echo > tệp`) — Bash thì không cấm được vì người rà
+    soát cần chạy test. Lớp hai: chụp cây trước/sau phiên rà soát, khác thì
+    hoàn nguyên, ghi bằng chứng, và lượt rà soát không được tính."""
+
+    class ReviewerGhi(ScriptedClient):
+        def run(self, spec):
+            r = super().run(spec)
+            dau = spec.prompt.lstrip().splitlines()[0]
+            if dau.startswith("# Rà soát") and not dau.startswith("# Rà soát bảo mật"):
+                (Path(spec.workdir) / "src" / "reviewer-da-ghi.py").write_text("x\n")
+            return r
+
+    class SecurityGhi(ScriptedClient):
+        def run(self, spec):
+            r = super().run(spec)
+            if spec.prompt.lstrip().startswith("# Rà soát bảo mật"):
+                (Path(spec.workdir) / "src" / "a.py").write_text("bi sua\n")
+            return r
+
+    def _init_git(self):
+        subprocess.run(["git", "config", "user.email", "t@t"], cwd=self.project, check=True)
+        subprocess.run(["git", "config", "user.name", "t"], cwd=self.project, check=True)
+
+    def test_reviewer_ghi_tep_moi_thi_hoan_nguyen_va_khong_tinh(self):
+        self._init_git()
+        out = self.implement(self.ReviewerGhi())
+        self.assertFalse((self.project / "src" / "reviewer-da-ghi.py").exists(), "phải hoàn nguyên")
+        chan = out.attempts[-1].review_findings
+        self.assertTrue(any("đã sửa cây làm việc" in f for f in chan), chan)
+        ev = EvidenceStore(self.artifacts).read(self.story.id)
+        self.assertTrue(any(e.name == "review:immutable" and not e.ok for e in ev.events))
+
+    def test_security_sua_tep_co_san_thi_hoan_nguyen(self):
+        self._init_git()
+        out = self.implement(self.SecurityGhi())
+        # src/a.py do developer giả viết ("x = 1"); security sửa → phải về như cũ
+        self.assertEqual((self.project / "src" / "a.py").read_text(), "x = 1\n")
+        self.assertIn("đã sửa cây làm việc", out.attempts[-1].security.error)
+
+    def test_reviewer_ngoan_khong_bi_dung(self):
+        self._init_git()
+        out = self.implement(ScriptedClient())
+        self.assertTrue(out.done)
+        ev = EvidenceStore(self.artifacts).read(self.story.id)
+        self.assertFalse(any(e.name == "review:immutable" for e in ev.events))

@@ -28,6 +28,7 @@ from ..control.approvals import (
     Gate,
     Status,
 )
+from ..control.outcome import Check, Outcome
 from ..control.state import StateStore, StoryStatus
 from .qa import QaReport, run_suite
 
@@ -41,20 +42,6 @@ RUNBOOK_PATH = "docs/RUNBOOK.md"
 #: Bốn mục một runbook phải có. Thiếu mục nào cũng làm nó vô dụng đúng lúc
 #: cần nhất — lúc 3 giờ sáng, với người trực chưa từng đọc hệ này.
 RUNBOOK_SECTIONS = ("triệu chứng", "chẩn đoán", "xử lý", "leo thang")
-
-
-@dataclass
-class Check:
-    name: str
-    passed: bool
-    detail: str = ""
-    #: Không kết luận được (bỏ qua có lý do) — hiện bằng ○, không phải ✅:
-    #: "chưa biết" và "đạt" không được mang cùng một ký hiệu.
-    skipped: bool = False
-
-    def line(self) -> str:
-        mark = "○" if self.skipped else ("✅" if self.passed else "✗")
-        return f"  {mark} {self.name}" + (f" — {self.detail}" if self.detail else "")
 
 
 @dataclass
@@ -72,10 +59,7 @@ class PreDeployReport:
     def as_dict(self) -> dict:
         return {
             "passed": self.passed,
-            "checks": [
-                {"name": c.name, "passed": c.passed, "detail": c.detail,
-                 "skipped": c.skipped} for c in self.checks
-            ],
+            "checks": [c.as_dict() for c in self.checks],
             "qa": None if self.qa is None else {
                 "release_ready": self.qa.release_ready,
                 "failed": [r.kind.id for r in self.qa.failed],
@@ -112,7 +96,7 @@ def _isolation_check(report: PreDeployReport, cfg: Config) -> Check:
     degraded = [r.kind.id for r in report.qa.degraded] if report.qa else []
     if not degraded:
         if report.qa and not any(r.ran for r in report.qa.results):
-            return Check("cách ly", True, "không có lần chạy nào để biết", skipped=True)
+            return Check("cách ly", Outcome.UNCONFIGURED, "không có lần chạy nào để biết")
         return Check("cách ly", True, "kiểm định chạy trong Docker")
     waiver = str(cfg.get("sandbox.pre_deploy_degraded_waiver", "") or "").strip()
     if waiver:
@@ -204,7 +188,7 @@ def pre_deploy(
 
     if skip_qa:
         report.checks.append(
-            Check("cách ly", True, "bỏ qua cùng bộ kiểm định", skipped=True)
+            Check("cách ly", Outcome.NOT_APPLICABLE, "bỏ qua cùng bộ kiểm định")
         )
 
     dockerfile = project / "Dockerfile"

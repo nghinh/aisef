@@ -21,23 +21,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from ..harness.guardrails import check_completion, check_diff_scope
+from .outcome import Check, Outcome
 from .security import DEFAULT_BLOCKING
 from ..harness.observe import MOCKUP_MAP, TOOL_RUN, Evidence
-
-
-@dataclass
-class Check:
-    name: str
-    passed: bool
-    detail: str = ""
-    #: Điều kiện không áp dụng cho story này (ví dụ story không có giao diện).
-    skipped: bool = False
-
-    def line(self) -> str:
-        if self.skipped:
-            return f"  ○ {self.name} — {self.detail or 'không áp dụng'}"
-        mark = "✅" if self.passed else "✗"
-        return f"  {mark} {self.name}" + (f" — {self.detail}" if self.detail else "")
 
 
 @dataclass
@@ -47,11 +33,11 @@ class StoryGate:
 
     @property
     def passed(self) -> bool:
-        return all(c.passed or c.skipped for c in self.checks)
+        return not any(c.outcome.blocks for c in self.checks)
 
     @property
     def failures(self) -> list[Check]:
-        return [c for c in self.checks if not (c.passed or c.skipped)]
+        return [c for c in self.checks if c.outcome.blocks]
 
     def summary(self) -> str:
         head = f"cổng story {self.story_id}: {'ĐẠT' if self.passed else 'KHÔNG ĐẠT'}"
@@ -86,8 +72,8 @@ def evaluate(
     # "guard chưa từng đánh giá một thao tác ghi nào" là điều đo được.
     if not guard_expected:
         gate.checks.append(Check(
-            "guard có chạy", True, "chưa biên dịch hook cho client này — không kỳ vọng",
-            skipped=True,
+            "guard có chạy", Outcome.NOT_APPLICABLE,
+            "chưa biên dịch hook cho client này — không kỳ vọng",
         ))
     else:
         gate.checks.append(Check(
@@ -107,7 +93,7 @@ def evaluate(
         gate.checks.append(Check("lint", False, "chưa chạy lint lần nào"))
     elif lint.detail.get("skipped"):
         gate.checks.append(
-            Check("lint", True, str(lint.detail["skipped"]), skipped=True)
+            Check("lint", Outcome.UNCONFIGURED, str(lint.detail["skipped"]))
         )
     else:
         gate.checks.append(
@@ -118,7 +104,7 @@ def evaluate(
     gate.checks.append(Check("phạm vi ghi", scope.allowed, scope.reason))
 
     if not screens:
-        gate.checks.append(Check("map mockup", True, "story không có giao diện", skipped=True))
+        gate.checks.append(Check("map mockup", Outcome.NOT_APPLICABLE, "story không có giao diện"))
     else:
         maps = {e.name: e for e in evidence.of(MOCKUP_MAP)}
         missing_runs = [s for s in screens if s not in maps]
@@ -155,13 +141,9 @@ def evaluate(
             continue  # đã có mục riêng ở trên
         ran = evidence.last(TOOL_RUN, kind)
         if ran is None:
-            gate.checks.append(Check(
-                kind, True, "chưa cấu hình — không tính là đạt", skipped=True
-            ))
+            gate.checks.append(Check(kind, Outcome.UNCONFIGURED))
         elif ran.detail.get("skipped"):
-            gate.checks.append(Check(
-                kind, True, str(ran.detail["skipped"]), skipped=True
-            ))
+            gate.checks.append(Check(kind, Outcome.UNCONFIGURED, str(ran.detail["skipped"])))
         else:
             gate.checks.append(Check(
                 kind, ran.ok, "" if ran.ok else str(ran.detail.get("tail", ""))[:200]
@@ -172,7 +154,7 @@ def evaluate(
     # nói to nhất.
     if security is None:
         gate.checks.append(
-            Check("bảo mật", True, "chưa cấu hình rà soát bảo mật", skipped=True)
+            Check("bảo mật", Outcome.UNCONFIGURED, "chưa cấu hình rà soát bảo mật")
         )
     elif security.error:
         gate.checks.append(Check("bảo mật", False, security.error))

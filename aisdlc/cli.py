@@ -156,6 +156,21 @@ def cmd_doctor(args) -> int:
     # `.claude/` nếu dự án commit nó. Harness nay truyền `--settings` tường
     # minh (G4), nhưng thứ đó chỉ được chứng minh bằng hợp quy — ở đây nói
     # thẳng tình trạng để người đọc biết mình đang dựa vào lớp nào.
+    plugin = project / ".opencode" / "plugin" / "aisdlc-guard.ts"
+    if plugin.is_file():
+        tracked = subprocess.run(
+            ["git", "-C", str(project), "ls-files", "--error-unmatch", str(plugin)],
+            capture_output=True, text=True,
+        ).returncode == 0
+        check(
+            "plugin OpenCode trong worktree",
+            tracked,
+            "`.opencode/plugin` đã commit — worktree tự có plugin" if tracked else
+            "`.opencode/plugin` chưa commit — worktree KHÔNG có plugin, OpenCode chạy "
+            "story với zero guard (đo hợp quy 2026-09-05); commit `.opencode/` hoặc "
+            "không dùng OpenCode cho `run`",
+            required=False,
+        )
     hook = project / ".claude" / "settings.json"
     if hook.is_file():
         tracked = subprocess.run(

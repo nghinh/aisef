@@ -262,3 +262,26 @@ class TestNhanhStoryKhongBiCu(WorktreeTestCase):
             self.wm.create("S-04")
         self.assertIn("chung.txt", str(e.exception))
 
+
+
+class TestCauHinhClientVaoWorktree(WorktreeTestCase):
+    """`.claude/settings.json` và `.opencode/` chưa commit vẫn phải có
+    trong worktree — không thì guard không tới (hợp quy OpenCode C1)."""
+
+    def test_untracked_client_config_is_carried(self):
+        (self.repo / ".gitignore").write_text(".claude/\n.opencode/\n", encoding="utf-8")
+        git(self.repo, "add", ".gitignore")
+        git(self.repo, "commit", "-qm", "ignore client config")
+        (self.repo / ".claude").mkdir()
+        (self.repo / ".claude" / "settings.json").write_text("{}", encoding="utf-8")
+        (self.repo / ".opencode" / "plugin").mkdir(parents=True)
+        (self.repo / ".opencode" / "plugin" / "aisdlc-guard.ts").write_text("// g", encoding="utf-8")
+        wt = self.wm.create("S-01")
+        self.assertTrue((wt.path / ".claude" / "settings.json").is_file())
+        self.assertTrue((wt.path / ".opencode" / "plugin" / "aisdlc-guard.ts").is_file())
+        # Không làm bẩn cây: vẫn gitignore, không có gì để commit.
+        self.assertEqual(git(wt.path, "status", "--porcelain").strip(), "")
+
+    def test_nothing_to_carry_is_fine(self):
+        wt = self.wm.create("S-02")
+        self.assertFalse((wt.path / ".opencode").exists())

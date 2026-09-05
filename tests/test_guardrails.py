@@ -518,6 +518,17 @@ class TestCompletion(unittest.TestCase):
         self.assertFalse(v.allowed)
         self.assertIn("chưa có lần chạy test", v.reason)
 
+    def test_unconfigured_test_command_does_not_trap_the_agent(self):
+        """Dự án chưa khai lệnh test: `tool test` ghi ok=False + skipped.
+        Đó không phải "đỏ" — chặn Stop thì agent kẹt đến hết lượt (đo ở
+        hợp quy C2/C3). Cho dừng; cổng story tự ghi "chưa cấu hình"."""
+        self.store.tool_run("S-01", "test", ok=False,
+                            detail={"skipped": "dự án chưa khai lệnh cho tool này"})
+        self.assertTrue(self.verdict().allowed)
+        # Còn đỏ thật thì vẫn chặn.
+        self.store.tool_run("S-01", "test", ok=False, detail={"tail": "1 failed"})
+        self.assertFalse(self.verdict().allowed)
+
     def test_the_instruction_is_a_command_that_actually_runs(self):
         """Guard chặn bằng một chỉ dẫn không chạy được thì agent kẹt: nó
         không dừng được, cũng không làm được điều được bảo, và cứ thế đốt

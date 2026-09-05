@@ -72,9 +72,10 @@ class Agent(ClientAdapter):
         return {c: Support.NATIVE for c in Capability}
 
     def run(self, spec: RunSpec) -> RunResult:
-        if "Rà soát bảo mật" in spec.prompt:
+        dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
+        if dau.startswith("# Rà soát bảo mật"):
             return RunResult(ok=True, text="không có phát hiện bảo mật", cost_usd=0.1)
-        if "Rà soát" in spec.prompt:
+        if dau.startswith("# Rà soát"):
             return RunResult(ok=True, text="không có mục chặn", cost_usd=0.1)
 
         story_id = spec.env.get("AISDLC_STORY_ID", "")

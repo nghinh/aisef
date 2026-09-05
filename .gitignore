@@ -16,3 +16,6 @@ references/
 # spike: phụ thuộc cài tạm, không commit
 spike/**/node_modules/
 spike/**/package-lock.json
+
+# tạo tác của lượt hợp quy client (giữ để tra, không commit)
+.conformance/

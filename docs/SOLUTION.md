@@ -119,7 +119,7 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 | Hạng mục | Hiện thực |
 |---|---|
 | Định tuyến model | `harness/routing.py` — theo vai; **reviewer ≠ developer** |
-| Sinh sub-agent | `harness/subagent.py` |
+| Sinh sub-agent | không có — mỗi vai là một phiên riêng do harness gọi (`harness/routing.py`); xem ADR-003 #15 |
 | Bàn giao | `next` → `implement` → `verify` → `review` → `complete` |
 | Luật kích hoạt | `control/fsm.py` + `control/scheduler.py` ✅ **đã xong** |
 
@@ -248,7 +248,7 @@ aisdlc/                          framework, một package Python
 │   ├── skills.py                ✅ đọc SKILL.md (stdlib, không cần PyYAML)
 │   └── security_filter.py       ✅ lọc tầng 1
 ├── harness/                     NHÓM 2–6 — harness là code
-│   ├── tools.py  sandbox.py  routing.py  subagent.py
+│   ├── tools.py  sandbox.py  routing.py
 │   ├── guardrails.py  observe.py  eval.py  context.py
 ├── control/                     điều phối nhiều story
 │   ├── approvals.py             ✅ cổng người duyệt

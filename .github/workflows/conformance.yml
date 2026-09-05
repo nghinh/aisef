@@ -1,0 +1,35 @@
+# Hợp quy client — chạy tạo tác biên dịch trên client THẬT (lớp lỗi D2:
+# hook/plugin sinh ra đúng cú pháp mà chưa từng chạy). Theo lịch tuần và
+# khi gọi tay. Cột claude quyết định phát hành; OpenCode hạng hai V1.
+name: conformance
+on:
+  schedule:
+    - cron: "0 3 * * 1"     # thứ hai hằng tuần, 03:00 UTC
+  workflow_dispatch:
+jobs:
+  claude:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      AISDLC_CONFORMANCE: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Cài Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Năm phép thử trên claude
+        run: python3 -m unittest tests.conformance.test_claude -v
+      - name: Kiểm điều kiện phát hành từ bảng
+        run: AISDLC_RELEASE=1 python3 -m unittest tests.test_release_gate -v
+      - name: Giữ bảng làm bằng chứng
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CONFORMANCE.md
+          path: docs/CONFORMANCE.md

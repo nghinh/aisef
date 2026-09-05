@@ -1,0 +1,9 @@
+
+ RUN  v5.0.0 /w9
+
+
+ Test Files  7 passed (7)
+      Tests  86 passed (86)
+   Start at  11:17:54
+   Duration  6.62s (tests 74%, transform 14%, import 11%, worker 1%)
+

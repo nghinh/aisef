@@ -26,6 +26,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from ..control.outcome import DEFAULT_REASON, Outcome
 from ..config import Config
 from ..harness import sandbox
 from ..harness.observe import EvidenceStore
@@ -118,14 +119,28 @@ class KindResult:
     def configured(self) -> bool:
         return self.ran or not self.skipped
 
-    def line(self) -> str:
+    @property
+    def outcome(self) -> Outcome:
         if self.skipped:
-            return f"  ○ {self.kind.id:12} {self.skipped}"
+            return Outcome.UNCONFIGURED
         if self.unrunnable:
-            return f"  ⚠ {self.kind.id:12} không chạy được — {self.unrunnable}"
-        mark = "✅" if self.ok else "✗"
+            return Outcome.UNRUNNABLE
+        if not self.ran:
+            return Outcome.UNCONFIGURED
+        return Outcome.PASSED if self.ok else Outcome.FAILED
+
+    def line(self, *, waived: bool = False) -> str:
+        o = self.outcome
+        if waived and o.must_be_named:
+            o = Outcome.WAIVED
+        if o is Outcome.UNCONFIGURED:
+            return f"  {o.mark} {self.kind.id:12} {self.skipped or DEFAULT_REASON[o]}"
+        if o is Outcome.UNRUNNABLE:
+            return f"  {o.mark} {self.kind.id:12} không chạy được — {self.unrunnable}"
+        if o is Outcome.WAIVED:
+            return f"  {o.mark} {self.kind.id:12} miễn tường minh ({self.skipped or self.unrunnable})"
         extra = f" — {self.detail}" if self.detail and not self.ok else ""
-        return f"  {mark} {self.kind.id:12} {self.kind.title}{extra}"
+        return f"  {o.mark} {self.kind.id:12} {self.kind.title}{extra}"
 
 
 @dataclass
@@ -165,7 +180,7 @@ class QaReport:
 
     def summary(self) -> str:
         lines = ["Kiểm định:"]
-        lines += [r.line() for r in self.results]
+        lines += [r.line(waived=r.kind.id in self.waived) for r in self.results]
         if self.fake_tests:
             lines.append(f"  ✗ test giả: {len(self.fake_tests)} test không có khẳng định nào")
             for t in self.fake_tests[:5]:

@@ -1,0 +1,95 @@
+
+ RUN  v5.0.0 /w9
+
+ ✓ src/ui/app-shell.tsx > Vỏ ứng dụng (TCCN 3, 5) > vẽ được vỏ đầy đủ mà không cần mạng hay bản cập nhật 195ms
+ ✓ src/domain/id.test.ts > ULID sinh ở client (TCCN 2) > dài đúng 26 ký tự, chỉ dùng bảng chữ Crockford 20ms
+ ✓ src/domain/id.test.ts > ULID sinh ở client (TCCN 2) > mang mốc thời gian ở 10 ký tự đầu, giải mã lại đúng 0ms
+ ✓ src/domain/id.test.ts > ULID sinh ở client (TCCN 2) > mốc thời gian lớn hơn thì chuỗi sắp xếp sau — sắp xếp được theo thời gian 1ms
+ ✓ src/domain/id.test.ts > ULID sinh ở client (TCCN 2) > cùng một mili giây vẫn cho id khác nhau — không cần điều phối 13ms
+ ✓ src/domain/id.test.ts > ULID sinh ở client (TCCN 2) > từ chối mốc thời gian không mã hoá được, thay vì cắt cụt im lặng 1ms
+ ✓ src/domain/note.test.ts > Bản ghi Note (TCCN 2) > mang đúng bộ trường khớp nối đồng bộ, không thừa không thiếu 8ms
+ ✓ src/domain/note.test.ts > Bản ghi Note (TCCN 2) > không có trường tiêu đề riêng (AR-12) 1ms
+ ✓ src/domain/note.test.ts > Bản ghi Note (TCCN 2) > giữ nội dung nguyên văn — không cắt, không chuẩn hoá, không escape 0ms
+ ✓ src/domain/note.test.ts > Bản ghi Note (TCCN 2) > sinh ra với rev nguyên, chưa xoá, updatedAt là epoch mili giây đưa vào 4ms
+ ✓ src/domain/note.test.ts > rev là thước đo "mới hơn" duy nhất (TCCN 3) > mỗi lần ghi đè tăng rev đúng 1 1ms
+ ✓ src/domain/note.test.ts > rev là thước đo "mới hơn" duy nhất (TCCN 3) > ghi đè cập nhật nội dung và updatedAt, giữ nguyên id và deviceId 1ms
+ ✓ src/domain/note.test.ts > rev là thước đo "mới hơn" duy nhất (TCCN 3) > không đường mã nào so sánh updatedAt để phán quyết bản nào mới hơn (AR-5) 16ms
+ ✓ src/main.tsx > AR-14 — lời mời tải lại nối vào vỏ (TCCN 5) > vẽ vỏ ngay, chưa mời tải lại 2ms
+ ✓ src/main.tsx > AR-14 — lời mời tải lại nối vào vỏ (TCCN 5) > đăng ký có nối chỗ nhận tin bản mới nằm chờ 0ms
+ ✓ src/main.tsx > AR-14 — lời mời tải lại nối vào vỏ (TCCN 5) > bản mới nằm chờ thì vỏ vẽ lại kèm lời mời, chưa cướp trang 1ms
+ ✓ src/main.tsx > AR-14 — lời mời tải lại nối vào vỏ (TCCN 5) > chỉ khi người dùng bấm mới trao quyền cho bản mới 1ms
+ ✓ src/ui/app-shell.tsx > Vỏ ứng dụng (TCCN 3, 5) > im lặng khi chưa có bản mới 7ms
+ ✓ src/ui/app-shell.tsx > Vỏ ứng dụng (TCCN 3, 5) > mời tải lại khi có bản mới đang chờ 1ms
+ ✓ src/ui/app-shell.tsx > Lớp token thị giác (TCCN 4, 6) > mọi màu trong DESIGN.md có biến CSS đúng giá trị 3ms
+ ✓ src/ui/app-shell.tsx > Lớp token thị giác (TCCN 4, 6) > mọi bậc spacing và bo góc có biến CSS 8ms
+ ✓ src/ui/app-shell.tsx > Lớp token thị giác (TCCN 4, 6) > mọi vai chữ có biến CSS 7ms
+ ✓ src/ui/app-shell.tsx > Lớp token thị giác (TCCN 4, 6) > bảng chữ là bảng chữ hệ thống, không tải font ngoài 1ms
+ ✓ src/ui/app-shell.tsx > Lớp token thị giác (TCCN 4, 6) > mọi chữ thật sự dùng bảng chữ đó, không chỉ khai nó ra 1ms
+ ✓ src/ui/app-shell.tsx > Lớp token thị giác (TCCN 4, 6) > token -dark được định nghĩa nhưng chưa nối vào bộ chọn nào 1ms
+ ✓ src/store/notes.test.ts > Một thao tác, đúng một giao dịch readwrite (TCCN 5) > tạo mới mở đúng một giao dịch readwrite 22ms
+ ✓ src/store/notes.test.ts > Một thao tác, đúng một giao dịch readwrite (TCCN 5) > ghi đè đọc bản cũ rồi ghi bản mới vẫn nằm trong một giao dịch 6ms
+ ✓ src/store/notes.test.ts > Một thao tác, đúng một giao dịch readwrite (TCCN 5) > không tầng nào ngoài store/ mở giao dịch IndexedDB 4ms
+ ✓ src/store/notes.test.ts > Ghi chú sống sót qua tải lại (TCCN 1, 2) > ghi rồi đóng kho, mở lại vẫn dựng lại được nguyên vẹn 5ms
+ ✓ src/store/notes.test.ts > Ghi chú sống sót qua tải lại (TCCN 1, 2) > id ghi xuống kho là ULID 26 ký tự sinh ở client 9ms
+ ✓ src/store/notes.test.ts > rev tăng đúng 1 mỗi lần ghi (TCCN 3, 7) > ghi đè liên tiếp cho rev 1, 2, 3, 4 và updatedAt đi theo 7ms
+ ✓ src/store/notes.test.ts > Ghi thất bại nói rõ thất bại và lý do (TCCN 6, 7) > kho bị thu hồi: trả về thất bại, không ném ra ngoài 3ms
+ ✓ src/store/notes.test.ts > Ghi thất bại nói rõ thất bại và lý do (TCCN 6, 7) > giao dịch bị huỷ trước khi commit: thất bại, và kho không đổi 1ms
+ ✓ src/store/notes.test.ts > Ghi thất bại nói rõ thất bại và lý do (TCCN 6, 7) > ghi đè ghi chú không còn trong kho là thất bại có lý do 2ms
+ ✓ src/store/notes.test.ts > Ghi thất bại nói rõ thất bại và lý do (TCCN 6, 7) > mọi lý do là câu tiếng Việt đọc được, không phải tên lỗi kỹ thuật 1ms
+ ✓ src/store/notes.test.ts > Ghi thất bại nói rõ thất bại và lý do (TCCN 6, 7) > hết chỗ và khoá xung đột có lý do riêng, không dồn vào câu chung 1ms
+ ✓ src/store/notes.test.ts > Ghi thất bại nói rõ thất bại và lý do (TCCN 6, 7) > không đường mã nào chỉ ghi log rồi đi tiếp 2ms
+ ✓ src/store/notes.test.ts > Người nghe được báo sau khi giao dịch commit (TCCN 1) > ghi thành công thì báo một lần; ghi hỏng thì không báo 4ms
+ ✓ src/store/notes.test.ts > Người nghe hỏng không làm hỏng lần ghi đã commit (TCCN 6) > người nghe ném lỗi: lần ghi vẫn là thành công, và chữ vẫn nằm trong kho 3ms
+ ✓ src/store/notes.test.ts > Người nghe hỏng không làm hỏng lần ghi đã commit (TCCN 6) > người nghe ném lỗi không cướp tin của người nghe kế tiếp 2ms
+ ✓ src/store/db.test.ts > Kho giả của bộ test là phụ thuộc đã khai (TCCN 7) > fake-indexeddb khai ở package.json và bị ghim trong lockfile 5ms
+ ✓ src/store/db.test.ts > Kho được tạo ở phiên bản schema có số (TCCN 1) > trình duyệt chưa từng mở: tạo kho ở phiên bản 1 với bảng Note 9ms
+ ✓ src/store/db.test.ts > Kho được tạo ở phiên bản schema có số (TCCN 1) > phiên bản schema đúng bằng số bậc migration đã khai 1ms
+ ✓ src/store/db.test.ts > Migration tiến chạy trên kho đã có dữ liệu (TCCN 4) > nâng phiên bản: bậc mới chạy, dữ liệu cũ còn nguyên 8ms
+ ✓ src/store/db.test.ts > Migration tiến chạy trên kho đã có dữ liệu (TCCN 4) > chỉ chạy những bậc còn thiếu, không chạy lại bậc đã qua 2ms
+ ✓ src/store/db.test.ts > Migration tiến chạy trên kho đã có dữ liệu (TCCN 4) > không tệp nguồn nào xoá kho để "làm sạch" 3ms
+ ✓ src/store/db.test.ts > deviceId sinh một lần rồi lưu lại (TCCN 1) > lần khởi động đầu sinh deviceId và ghi vào kho 9ms
+ ✓ src/store/db.test.ts > deviceId sinh một lần rồi lưu lại (TCCN 1) > mở lại kho trả về đúng deviceId cũ, không sinh cái mới 2ms
+ ✓ src/store/db.test.ts > Nâng schema khi tab cũ còn giữ kết nối (TCCN 4) > kết nối cũ nhường đường, lần nâng phiên bản chạy tới nơi 3ms
+ ✓ src/store/db.test.ts > Nâng schema khi tab cũ còn giữ kết nối (TCCN 4) > kết nối không nhường đường: lần nâng báo lỗi chứ không treo 4ms
+ ✓ src/store/db.test.ts > Mở kho thất bại nói rõ lý do, không ném lỗi thô (TCCN 6) > mở được thì gói kho vào kết quả thành công 1ms
+ ✓ src/store/db.test.ts > Mở kho thất bại nói rõ lý do, không ném lỗi thô (TCCN 6) > kho đã ở phiên bản mới hơn mã đang chạy: thất bại có lý do đọc được 1ms
+ ✓ src/store/db.test.ts > Mở kho thất bại nói rõ lý do, không ném lỗi thô (TCCN 6) > tab cũ chặn lần nâng: thất bại có lý do, không ném và không treo 1ms
+ ✓ src/store/db.test.ts > Mở kho thất bại nói rõ lý do, không ném lỗi thô (TCCN 6) > mọi lý do là câu tiếng Việt đọc được, không phải tên lỗi kỹ thuật 0ms
+ ✓ src/store/db.test.ts > Mở kho thất bại nói rõ lý do, không ném lỗi thô (TCCN 6) > tab chặn, kho quá mới và hết chỗ có lý do riêng, không dồn vào câu chung 1ms
+ ✓ vite.config.ts > AR-2 — hướng phụ thuộc một chiều (TCCN 2) > cho phép ui import app 3ms
+ ✓ vite.config.ts > AR-2 — hướng phụ thuộc một chiều (TCCN 2) > cho phép app import domain, store, search 1ms
+ ✓ vite.config.ts > AR-2 — hướng phụ thuộc một chiều (TCCN 2) > cho phép store import domain 0ms
+ ✓ vite.config.ts > AR-2 — hướng phụ thuộc một chiều (TCCN 2) > chặn domain import store 1ms
+ ✓ vite.config.ts > AR-2 — hướng phụ thuộc một chiều (TCCN 2) > chặn store import ngược lên ui 1ms
+ ✓ vite.config.ts > AR-2 — hướng phụ thuộc một chiều (TCCN 2) > chặn search import app 0ms
+ ✓ vite.config.ts > AR-2 — hướng phụ thuộc một chiều (TCCN 2) > chặn domain, store, search import React 0ms
+ ✓ vite.config.ts > AR-2 — hướng phụ thuộc một chiều (TCCN 2) > vẫn cho ui và app import React 0ms
+ ✓ vite.config.ts > AR-2 — hướng phụ thuộc một chiều (TCCN 2) > nêu đúng tệp vi phạm trong thông báo lỗi 0ms
+ ✓ vite.config.ts > AR-2 — hướng phụ thuộc một chiều (TCCN 2) > chặn cả khi import trỏ thẳng vào thư mục tầng 1ms
+ ✓ vite.config.ts > AR-2 — hướng phụ thuộc một chiều (TCCN 2) > chặn cả import gốc tuyệt đối `/src/<tầng>/…` 0ms
+ ✓ vite.config.ts > AR-2 — hướng phụ thuộc một chiều (TCCN 2) > bỏ qua tệp ngoài bốn tầng 0ms
+ ✓ vite.config.ts > AR-2 — hướng phụ thuộc một chiều (TCCN 2) > vi phạm làm hỏng lệnh dựng, không chỉ là cảnh báo 2ms
+ ✓ vite.config.ts > AR-14 — service worker chờ, không tự cướp trang (TCCN 5) > đăng ký ở chế độ mời tải lại 1ms
+ ✓ vite.config.ts > AR-14 — service worker chờ, không tự cướp trang (TCCN 5) > không bao giờ tự skipWaiting hay clientsClaim 0ms
+ ✓ vite.config.ts > TCCN 1 — nền dự án > tsconfig bật strict 0ms
+ ✓ vite.config.ts > TCCN 1 — nền dự án > mọi phụ thuộc ghim phiên bản chính xác, không dải 1ms
+ ✓ vite.config.ts > TCCN 1 — nền dự án > lockfile được commit làm nguồn sự thật về phiên bản 21ms
+ ✓ vite.config.ts > TCCN 1 — nền dự án > lockfile ghim đúng những phiên bản package.json khai 2ms
+ ✓ vite.config.ts > Tạo tác build production (TCCN 3, 4, 5, 7) > là bản dựng production thật, không phải bản dev đội lốt 1ms
+ ✓ vite.config.ts > Tạo tác build production (TCCN 3, 4, 5, 7) > là tệp tĩnh thuần, không thành phần phía server 3ms
+ ✓ vite.config.ts > Tạo tác build production (TCCN 3, 4, 5, 7) > vỏ được gắn vào trang và đăng ký service worker 2ms
+ ✓ vite.config.ts > Tạo tác build production (TCCN 3, 4, 5, 7) > service worker precache toàn bộ vỏ ứng dụng 1ms
+ ✓ vite.config.ts > Tạo tác build production (TCCN 3, 4, 5, 7) > tải lại khi mất mạng vẫn ra vỏ ứng dụng, không lỗi mạng 0ms
+ ✓ vite.config.ts > Tạo tác build production (TCCN 3, 4, 5, 7) > service worker không bao giờ tự skipWaiting 1ms
+ ✓ vite.config.ts > Tạo tác build production (TCCN 3, 4, 5, 7) > tài sản có băm trong tên 1ms
+ ✓ vite.config.ts > Tạo tác build production (TCCN 3, 4, 5, 7) > index.html và service worker không được cache lâu 1ms
+ ✓ vite.config.ts > Tạo tác build production (TCCN 3, 4, 5, 7) > không có lệnh gọi mạng nào lúc chạy — không CDN, không font ngoài 2ms
+ ✓ vite.config.ts > AR-2 — vi phạm tầng làm hỏng lệnh dựng (TCCN 2) > lệnh dựng thất bại và nêu đúng tệp vi phạm 131ms
+ ✓ vite.config.ts > AR-2 — vi phạm tầng làm hỏng lệnh dựng (TCCN 2) > lệnh dựng thất bại với import gốc tuyệt đối `/src/<tầng>/…` 4ms
+ ✓ vite.config.ts > AR-2 — vi phạm tầng làm hỏng lệnh dựng (TCCN 2) > bắt cả tệp mồ côi, không chỉ tệp nằm trong đồ thị dựng 3ms
+
+ Test Files  7 passed (7)
+      Tests  86 passed (86)
+   Start at  11:18:03
+   Duration  6.38s (tests 67%, transform 16%, import 14%, worker 3%)
+

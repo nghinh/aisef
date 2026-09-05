@@ -101,6 +101,10 @@ class MergeResult:
         return bool(self.conflicts)
 
 
+#: Cấu hình client mà `compile` sinh ra và dự án có thể không commit.
+CLIENT_CONFIG = (".claude/settings.json", ".opencode")
+
+
 class WorktreeManager:
     """Tạo, dọn và hợp nhất worktree của story."""
 
@@ -145,11 +149,31 @@ class WorktreeManager:
             if base:
                 args.append(base)
         _git(self.repo, *args)
+        self._carry_client_config(path)
 
         # Tính trước rồi mới dựng: `Worktree` là bất biến, và giữ nó bất
         # biến đáng hơn một dòng ngắn.
         mang_vao = self.refresh(story_id, base=base) if co_san else ""
         return Worktree(story_id, path, branch, refreshed_from=mang_vao)
+
+    def _carry_client_config(self, path: Path) -> list[str]:
+        """Chép cấu hình client do `compile` sinh vào worktree khi nó chưa
+        được commit. Claude nhận `--settings` tường minh, nhưng OpenCode chỉ
+        đọc `.opencode/` của thư mục nó chạy — không chép thì guard không
+        tới. Đo ở hợp quy 2026-09-05: OpenCode C1 `rm -rf` chạy thật, tệp
+        mất, vì worktree không có plugin."""
+        chep = []
+        for rel in CLIENT_CONFIG:
+            src, dst = self.repo / rel, path / rel
+            if not src.exists() or dst.exists():
+                continue
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            if src.is_dir():
+                shutil.copytree(src, dst)
+            else:
+                shutil.copy2(src, dst)
+            chep.append(rel)
+        return chep
 
     def refresh(self, story_id: str, *, base: str | None = None) -> str:
         """Mang nhánh chính vào nhánh story. Trả tên nhánh nguồn, hoặc "".

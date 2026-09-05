@@ -445,6 +445,12 @@ def check_completion(evidence) -> Verdict:
             f"tool test` rồi mới kết thúc — bằng chứng nằm ở kết quả chạy, "
             f"không ở lời kể.",
         )
+    if last.detail.get("skipped"):
+        # Chưa cấu hình ≠ đỏ. Chặn ở đây thì agent không sửa được gì (lệnh
+        # test là việc của dự án) và chỉ đốt lượt — đo ở hợp quy: Stop bị
+        # chặn hai lần liền trên dự án không khai lệnh test. Cổng story vẫn
+        # ghi "unit chưa cấu hình", không tính là đạt.
+        return ALLOW
     if not last.ok:
         tail = str(last.detail.get("tail") or "")[:400]
         return Verdict(

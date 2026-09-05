@@ -98,6 +98,30 @@ vào báo cáo thay vì im lặng — năng lực là thứ được **khai và 
 là client **hạng hai**: guard chặn được, nhưng chi phí và số lượt không đo
 được từ harness; nó không chặn phát hành.
 
+## Hợp quy client
+
+Hook và plugin là tạo tác **biên dịch ra** — đúng cú pháp không có nghĩa là
+client chạy chúng. Bốn lỗi thật (31, 39, 40, 41) đều thuộc lớp này, và unit
+test không bắt được theo định nghĩa. Bộ hợp quy chạy năm phép thử trên
+client thật, worktree thật, guard thật, `.claude/` không commit:
+
+```bash
+AISDLC_CONFORMANCE=1 python3 -m unittest tests.conformance -v
+```
+
+Kết quả ghép vào `docs/CONFORMANCE.md` — mỗi ô là một phiên agent, đọc từ
+đĩa (tệp còn/mất), từ luồng `tool_use` và bằng chứng guard tự ghi, không từ
+lời agent. Dự án thử và log thô từng phép giữ ở `.conformance/<client>/`
+(đổi bằng `AISDLC_CONFORMANCE_DIR`) để tra lại một ô ✗ mà không phải đoán.
+Bộ chạy **không** thừa hưởng biến `CLAUDE_*` của phiên gọi nó — chạy hợp
+quy từ bên trong một phiên Claude là chuyện có thật, và phiên con thừa hưởng
+cờ của phiên cha thì đo sai. Cổng
+phát hành của chính kho này đọc bảng đó bằng code
+(`AISDLC_RELEASE=1 python3 -m unittest tests.test_release_gate`): cột
+`claude` phải đủ năm ô ✅ và bảng không cũ hơn 14 ngày. OpenCode là hạng
+hai trong V1 — có cột, không chặn. CI: `.github/workflows/conformance.yml`
+chạy tuần.
+
 ## Khi cổng chặn
 
 Cổng chặn là framework đang làm việc, không phải framework hỏng. Ba ca hay

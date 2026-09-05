@@ -18,6 +18,7 @@ Hai điều được giữ chặt ở đây:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import subprocess
 from pathlib import Path
 
 from ..clients.base import ClientAdapter
@@ -441,9 +442,20 @@ def review_story(
     }
 
     _attach_settings(spec, project)
+    truoc = _tree_snapshot(workdir)
     result = client.run(spec)
     EvidenceStore(artifact_root).agent_run(story.id, result, name=f"{story.id}-review",
                                            prompt_chars=len(spec.prompt))
+    da_sua = _revert_reviewer_writes(workdir, truoc, _tree_snapshot(workdir))
+    if da_sua:
+        EvidenceStore(artifact_root).tool_run(
+            story.id, "review:immutable", ok=False, detail={"changed": da_sua[:20]},
+        )
+        return [
+            "[chặn] người rà soát đã sửa cây làm việc "
+            f"({', '.join(da_sua[:3])}) — đã hoàn nguyên; lượt rà soát này không "
+            "được tính. Rà soát là báo cáo, không phải sửa."
+        ]
 
     if not result.ok:
         # Không rà soát được thì **không** coi như sạch.
@@ -510,10 +522,17 @@ def security_review(
         ENV_DISALLOWED_TOOLS: ",".join(ROLES[SECURITY].disallowed_tools),
     }
     _attach_settings(spec, project)
+    truoc = _tree_snapshot(workdir)
     result = client.run(spec)
     EvidenceStore(artifact_root).agent_run(
         story.id, result, name=f"{story.id}-security", prompt_chars=len(spec.prompt)
     )
+    da_sua = _revert_reviewer_writes(workdir, truoc, _tree_snapshot(workdir))
+    if da_sua:
+        EvidenceStore(artifact_root).tool_run(
+            story.id, "security:immutable", ok=False, detail={"changed": da_sua[:20]},
+        )
+        return SecurityReport(error=f"người rà soát bảo mật đã sửa cây làm việc ({', '.join(da_sua[:3])}) — đã hoàn nguyên, lượt này không được tính")
     if not result.ok:
         return SecurityReport(error=f"không chạy được: {result.error}")
     return parse_security(result.text)
@@ -565,6 +584,63 @@ def _attach_settings(spec, project: Path) -> None:
     path = Path(project) / CLAUDE_SETTINGS
     if path.is_file():
         spec.settings_file = path
+
+
+def _tree_snapshot(workdir: Path) -> dict[str, bytes | None]:
+    """Ảnh chụp cây làm việc: đường dẫn → nội dung của mọi tệp git thấy là
+    đã đổi hoặc chưa theo dõi (None nếu quá lớn để giữ). Bỏ qua thứ harness
+    tự ghi (`_bmad-output/`, `.aisdlc/`): bằng chứng của chính phiên này
+    được ghi trong lúc phiên chạy, tính vào là dương tính giả."""
+    from ..harness.guardrails import HARNESS_OWNED
+    out: dict[str, bytes | None] = {}
+    try:
+        r = subprocess.run(["git", "status", "--porcelain", "-z", "-uall"],
+                           cwd=workdir, capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return out
+    for item in r.stdout.split("\0"):
+        if len(item) < 4:
+            continue
+        rel = item[3:]
+        if rel.startswith((".aisdlc/", *[f"{h}/" for h in HARNESS_OWNED])) or rel in HARNESS_OWNED:
+            continue
+        p = Path(workdir) / rel
+        try:
+            out[rel] = p.read_bytes() if p.is_file() and p.stat().st_size <= 5_000_000 else None
+        except OSError:
+            out[rel] = None
+    return out
+
+
+def _revert_reviewer_writes(workdir: Path, truoc: dict, sau: dict) -> list[str]:
+    """Người rà soát mà sửa được code thì nó thành lượt viết thứ hai.
+
+    Cấm `Write`/`Edit` ở guard là lớp một; đo hợp quy 2026-09-05 cho thấy
+    lớp ấy bị lách **trên cả hai client** bằng Bash (`echo > tệp`) — và Bash
+    thì không cấm được, người rà soát cần nó để chạy test. Nên lớp hai là
+    hoàn nguyên: mọi khác biệt của cây sau phiên rà soát bị đưa về như
+    trước, ghi lại, và lượt rà soát ấy **không được tính** — cùng cơ chế
+    "hoàn nguyên hạt thô" của worktree.
+    """
+    doi = sorted({k for k in sau if k not in truoc or sau[k] != truoc[k]}
+                 | {k for k in truoc if k not in sau})
+    if not doi:
+        return []
+    for rel in doi:
+        p = Path(workdir) / rel
+        if rel in truoc and truoc[rel] is not None:
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_bytes(truoc[rel])           # tệp đã đổi hoặc chưa theo dõi: trả nội dung
+        elif rel in truoc:
+            subprocess.run(["git", "checkout", "--", rel], cwd=workdir,
+                           capture_output=True, timeout=30)   # quá lớn để chụp: nhờ git
+        elif p.exists():
+            try:
+                p.unlink()                       # tệp mới do người rà soát tạo
+            except OSError:
+                pass
+    return doi
+
 
 def _head_of(repo: Path) -> str:
     """SHA đầu nhánh chính. Rỗng nếu không đọc được — guard mất một phần

@@ -132,6 +132,20 @@ class TestRunTool(ToolTestCase):
         self.assertTrue(e.ok)
         self.assertEqual(e.detail["command"], "true")
 
+    def test_test_ids_and_coverage_land_in_evidence(self):
+        """Output runner → tên test + coverage trong bằng chứng, không chỉ `tail`."""
+        from pathlib import Path
+        # Lệnh chạy trong sandbox (có thể là Docker): chỉ thấy workspace,
+        # nên đặt output mẫu vào dự án chứ không trỏ đường dẫn máy chủ.
+        fx = Path(__file__).parent / "fixtures" / "testlog" / "node-test-fail.txt"
+        (Path(self.project) / "out.txt").write_text(fx.read_text(encoding="utf-8"), encoding="utf-8")
+        self.run_test_tool("sh -c 'cat out.txt; echo \"TOTAL 10 1 90%\"; exit 1'")
+        e = EvidenceStore(self.artifacts).read("S-01").last(TOOL_RUN, "test")
+        self.assertEqual(e.detail["test_format"], "node-spec")
+        self.assertIn("AC-STORY-01-01-1: chuỗi rỗng trả về rỗng", e.detail["test_ids"])
+        self.assertEqual(e.detail["failed_ids"], ["AC-STORY-01-01-3: thất bại"])
+        self.assertEqual(e.detail["coverage"], 90.0)
+
     def test_failure_is_recorded_too(self):
         self.run_test_tool("false")
         self.assertFalse(EvidenceStore(self.artifacts).read("S-01").tests_green())

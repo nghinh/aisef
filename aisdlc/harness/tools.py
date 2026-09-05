@@ -223,18 +223,21 @@ def _record(res: ToolResult, story_id: str, artifact_root) -> None:
     ngữ cảnh story (ví dụ người gõ tay) không nên làm bẩn hồ sơ story."""
     if not story_id or artifact_root is None:
         return
+    detail = {
+        "exit_code": res.exit_code,
+        "skipped": res.skipped,
+        "degraded": res.degraded,
+        "tail": res.tail(20),
+        **res.detail,
+    }
+    if res.name == "test" and not res.skipped:
+        # Tên test nào chạy, xanh/đỏ, coverage — cổng tiêu chí (G5) và
+        # `coverage.min` (G10b) đọc từ đây, không đọc lại stdout.
+        from .testlog import parse as parse_testlog
+
+        detail.update(parse_testlog(res.stdout + "\n" + res.stderr).to_evidence())
     EvidenceStore(artifact_root).tool_run(
-        story_id,
-        res.name,
-        ok=res.ok,
-        duration_ms=res.duration_ms,
-        detail={
-            "exit_code": res.exit_code,
-            "skipped": res.skipped,
-            "degraded": res.degraded,
-            "tail": res.tail(20),
-            **res.detail,
-        },
+        story_id, res.name, ok=res.ok, duration_ms=res.duration_ms, detail=detail,
     )
 
 

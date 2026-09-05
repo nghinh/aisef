@@ -1,0 +1,28 @@
+✔ đảo thứ tự từ và chuẩn hoá khoảng trắng giữa từ (1.756959ms)
+✔ chuỗi rỗng hoặc toàn khoảng trắng trả về chuỗi rỗng (0.681583ms)
+✔ chữ thường và nối bằng dấu gạch ngang (2.416708ms)
+✔ khoảng trắng liên tiếp và ký tự lạ gộp thành một gạch (2.552791ms)
+✔ bỏ dấu tiếng Việt về ASCII (0.393417ms)
+✔ giữ chữ số (0.185709ms)
+✔ không để gạch thừa ở đầu hoặc cuối (0.189458ms)
+✔ chuỗi rỗng trả về chuỗi rỗng (0.149875ms)
+✔ chuỗi toàn ký tự bị loại trả về chuỗi rỗng (0.168208ms)
+✔ chữ ngoài bảng Latin không lọt ký tự non-ASCII (0.157708ms)
+✔ mỗi từ viết hoa chữ đầu, phần còn lại viết thường (1.504792ms)
+✔ chuỗi rỗng trả về chuỗi rỗng (0.143917ms)
+✔ chuỗi ngắn hơn hoặc bằng n giữ nguyên (1.011292ms)
+✔ chuỗi dài hơn n bị cắt, kết quả tối đa n ký tự và tận cùng bằng … (0.081792ms)
+✔ chuỗi rỗng không ném lỗi (0.061875ms)
+✔ n bằng 0 hoặc âm cho chuỗi rỗng (0.059208ms)
+✔ n bằng 1 chỉ còn dấu ba chấm (0.063333ms)
+✔ không cắt đôi ký tự ngoài BMP (0.065709ms)
+✔ đếm từ, khoảng trắng liên tiếp tính là một (2.096542ms)
+✔ chuỗi rỗng hoặc toàn khoảng trắng: 0, không ném lỗi (0.184583ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 209.038625

@@ -1,0 +1,37 @@
+✔ AC-STORY-01-01-1: chuỗi rỗng trả về rỗng (0.797458ms)
+✔ AC-STORY-01-01-2: đảo từ (0.069167ms)
+▶ nhóm
+  ✖ AC-STORY-01-01-3: thất bại (0.748958ms)
+  ﹣ bỏ qua (0.047625ms) # chưa làm
+✖ nhóm (0.960541ms)
+ℹ tests 4
+ℹ suites 1
+ℹ pass 2
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 111.497375
+
+✖ failing tests:
+
+test at x.test.js:5:3
+✖ AC-STORY-01-01-3: thất bại (0.748958ms)
+  AssertionError [ERR_ASSERTION]: 1 == 2
+      at TestContext.<anonymous> (/w/x.test.js:5:51)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at node:internal/test_runner/test:1617:71
+      at node:internal/per_context/primordials:466:82
+      at new Promise (<anonymous>)
+      at new SafePromise (node:internal/per_context/primordials:435:3)
+      at node:internal/per_context/primordials:466:9
+      at Array.map (<anonymous>) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 2,
+    operator: '==',
+    diff: 'simple'
+  }
