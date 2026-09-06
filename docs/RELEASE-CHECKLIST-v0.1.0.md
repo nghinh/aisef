@@ -16,7 +16,7 @@ nhật lần cuối: **xem dòng "Cập nhật" cuối tệp**.
 | 7 | README / CHANGELOG / STATUS / SOLUTION khớp mã | `python3 -m unittest tests.test_meta tests.test_docs -q` (CLI, knob, mục cổng, STEPS, slot đọc từ mã) | ✅ xanh ở `d64dd90`; chạy lại sau A2 |
 | 8 | Known limitations ghi rõ | README "Giới hạn đã biết của v0.1.0"; CHANGELOG "Khi nâng cấp" | ✅ (danh sách bên dưới) |
 | 9 | Cổng phát hành trả 0 | `AISDLC_RELEASE=1 AISDLC_ACCEPTANCE=<e9> python3 -m unittest tests.test_release_gate -q` | ✅ 06/09 14:2x: 2 test OK (bảng hợp quy đủ + mới; nghiệm thu e9 đạt, duyệt đúng bản, miễn có lý do) |
-| 10 | Tag `v0.1.0` → `release.yml` publish (trusted publisher) → `pip install aisef==0.1.0` venv sạch | chủ đầu tư tag sau khi nhận checklist này; tôi kiểm venv sạch | ⬜ **không tag trước khi 1–9 xanh** |
+| 10 | Tag `v0.1.0` → `release.yml` publish (trusted publisher) → `pip install aisef==0.1.0` venv sạch | `git tag v0.1.0 && git push origin v0.1.0`; lần chạy `release` 34020915941 (build + publish `success`); `curl https://pypi.org/pypi/aisef/json` | ✅ 15:07 06/09 |
 
 ## Known limitations còn lại (khai trong README)
 
@@ -40,4 +40,32 @@ nhật lần cuối: **xem dòng "Cập nhật" cuối tệp**.
 Bài học sơ bộ: hai lớp phòng thủ độc lập (cổng máy vs model-judge) không thay
 nhau được — dữ liệu cho ADR-005 V10.
 
-Cập nhật: 2026-09-06 14:3x — dòng 1, 2, 9 xanh; còn dòng 10 (tag) chờ chủ đầu tư.
+## Phát hành — số liệu chốt
+
+| | |
+|---|---|
+| Tag | `v0.1.0` → commit **`a083a49`** (annotated, kèm điều kiện và giới hạn) |
+| Gói | `aisef 0.1.0` trên PyPI: `aisef-0.1.0-py3-none-any.whl` + `aisef-0.1.0.tar.gz` |
+| Cách publish | GitHub Actions `release.yml`, trusted publishing (OIDC), environment `pypi` — không token trong kho |
+| Lần chạy | `release` 34020915941: job `build` (suite + twine) ✅, job `publish` ✅, 15:07 06/09 |
+| Cài sạch sau publish | `python3 -m venv` → `pip install aisef==0.1.0` → `aisdlc setup` 152 skill → `aisdlc doctor` **✅ sẵn sàng** (○ playwright, ○ ảnh sandbox — công cụ tuỳ chọn chưa cài, không đỏ) |
+| Kho | `nghinh/ai-sdlc` (private), nhánh mặc định `master` = mã phát hành; nhánh `readme-truoc-phat-hanh` giữ commit README có trước |
+
+**Hai lỗi CI Linux bắt được trước khi publish** (lỗi 29–30, STATUS §2.4): `Path.glob("src/**")`
+chỉ khớp thư mục ở Python ≤ 3.12 nên bản đồ mã rỗng đúng ở nửa số bản được hỗ trợ; và một
+phép kiểm CLI đo môi trường (máy không có `claude` thì mã thoát khác). Cả hai sửa ở `a083a49`
+trước khi tag lại — tag đầu trỏ vào bản chưa sửa đã được xoá, không có gì publish từ nó.
+
+## Backlog sau phát hành
+
+| Việc | Vì sao hoãn |
+|---|---|
+| Hợp quy C11/C12 (agent cố gian, lỗi cài sẵn) | mã + unit test xong ở nhánh `worktree-agent-ada8e46…`; chạy thật mới xong hai ca thì hết credit. Không gộp trước v0.1.0 vì thêm phép vào bảng sẽ làm cổng đòi đủ 12 cột |
+| Coverage e9 lên ≥ 0,85 | 84,16 % là sự thật của corpus nghiệm thu; không đổi ngưỡng để phát hành |
+| Môi trường cho `mutation` và `image-scan` | cần cài stryker và một máy quét không đòi đăng nhập |
+| S1 — cách ly credential cho agent trong container | giữ blocked, không workaround làm yếu cách ly |
+| Quan sát được của OpenCode | nâng claim chỉ khi có đầu ra máy đọc ổn định |
+| A/B bản đồ mã và skill | ≈ $70, không quyết định tính đúng |
+| Đo lại lợi ích vòng cải tiến theo luật nop control | ba vòng "+1" cũ không tính dưới luật mới |
+
+Cập nhật: 2026-09-06 15:1x — **RELEASED**. Mười dòng xanh.

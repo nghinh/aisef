@@ -4,7 +4,13 @@ Ghi theo **sáu nhóm harness** (`docs/SOLUTION.md` §5), không theo ADR hay
 ngày. Mỗi dòng có chỗ đọc lại; số lỗi trỏ `docs/STATUS-2026-09-05.md` §2.4
 và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epic-improvement.md` §6.
 
-## v0.1.0 — chưa phát hành
+## v0.1.0 — phát hành 2026-09-06
+
+**Đã phát hành:** tag `v0.1.0` = `a083a49`, gói `aisef 0.1.0` trên PyPI (wheel +
+sdist, trusted publishing từ `release.yml`, không token trong kho). Kiểm sau
+publish: `pip install aisef==0.1.0` trong venv sạch → `aisdlc setup` (152 skill)
+→ `aisdlc doctor` **✅ sẵn sàng**. Điều kiện phát hành và giới hạn đã biết:
+`docs/RELEASE-CHECKLIST-v0.1.0.md`.
 
 Phiên bản trong `pyproject.toml` là `0.1.0`; chưa có bản nào trước nó. Mục
 này ghi những gì đổi từ mốc `04eee9b` (đầu ngày 2026-09-05, trạng thái ở
@@ -402,7 +408,7 @@ Gỡ: `story.max_context_tokens` (chưa từng có mã đọc; `RETIRED`, cảnh
 
 ### Lỗi thật tìm bằng đo trong đợt này
 
-28 lỗi, không lỗi nào bằng đọc code; bảng và lớp nguyên nhân ở
+30 lỗi, không lỗi nào bằng đọc code; bảng và lớp nguyên nhân ở
 `docs/FAILURE-TAXONOMY.md`, chi tiết ở STATUS §2.4. Lỗi 22 (e2e nhạy tải máy)
 đóng bằng R13 `run --story S --verify-only --repeat`; 26/27 (sổ/bảo toàn, đo
 trên `par` agent thật) và 28 (băm chỉ mục quên `waves` của epic sửa) sửa kèm
