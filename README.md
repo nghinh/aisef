@@ -24,7 +24,8 @@ Hoặc chạy từ bản sao kho nguồn:
 
 ```bash
 git clone <repo> ai-sdlc && cd ai-sdlc && pip install -e .
-python3 -m unittest discover -s tests -q
+python3 -m unittest discover -s tests -q   # vài phút, không mở container (tests/__init__.py)
+AISDLC_TEST_DOCKER=1 python3 -m unittest tests.test_sandbox tests.test_tools -q   # thêm test Docker thật
 ```
 
 Kho skill tham chiếu **không cần clone tay**: `aisdlc setup` tự lấy về

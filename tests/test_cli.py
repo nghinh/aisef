@@ -13,6 +13,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+import tests  # noqa: E402,F401 — HostProvider vào chỗ docker, không mở container (tests/__init__.py)
+
 from aisdlc.cli import EXIT_NOT_READY, EXIT_OK, EXIT_USAGE, main  # noqa: E402
 from aisdlc.control.state import StateStore, StoryStatus  # noqa: E402
 

@@ -1,7 +1,9 @@
-"""Kiểm chứng cách ly sandbox — chạy Docker thật khi có daemon."""
+"""Kiểm chứng cách ly sandbox — Docker thật ở lớp `needs_docker`
+(`AISDLC_TEST_DOCKER=1`), phần còn lại không cần daemon."""
 
 from __future__ import annotations
 
+import os
 import sys
 import tempfile
 import unittest
@@ -10,27 +12,25 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from tests import needs_docker  # noqa: E402
 from aisdlc.harness.sandbox import (  # noqa: E402
     DEFAULT_IMAGE,
     PROVIDERS,
     DockerProvider,
     FakeProvider,
     Guarantee,
+    HostProvider,
     Level,
     LocalProvider,
     SandboxResult,
     SandboxSpec,
     _run_docker,
     build_docker_args,
-    docker_available,
     missing_guarantees,
     run,
     select_provider,
     using,
 )
-
-HAS_DOCKER = docker_available()
-needs_docker = unittest.skipUnless(HAS_DOCKER, "docker daemon không chạy")
 
 
 class TestLevels(unittest.TestCase):
@@ -149,6 +149,9 @@ class TestIsolation(unittest.TestCase):
 
 
 class TestDegradedMode(unittest.TestCase):
+    """Đường lùi **thật** của Docker: suite đặt `HostProvider` vào chỗ `docker`
+    (`tests/__init__.py`), nên ở đây trả `DockerProvider` về rồi giả daemon tắt."""
+
     def test_refuses_when_isolation_required(self):
         """Thà hỏng còn hơn chạy mà giả vờ có cách ly."""
         import aisdlc.harness.sandbox as sb
@@ -156,7 +159,7 @@ class TestDegradedMode(unittest.TestCase):
         original = sb.docker_available
         sb.docker_available = lambda: False
         try:
-            with tempfile.TemporaryDirectory() as d:
+            with using(DockerProvider()), tempfile.TemporaryDirectory() as d:
                 with self.assertRaises(RuntimeError):
                     sb.run(sb.SandboxSpec(workspace=Path(d), cmd=["true"], allow_degraded=False))
         finally:
@@ -168,7 +171,7 @@ class TestDegradedMode(unittest.TestCase):
         original = sb.docker_available
         sb.docker_available = lambda: False
         try:
-            with tempfile.TemporaryDirectory() as d:
+            with using(DockerProvider()), tempfile.TemporaryDirectory() as d:
                 r = sb.run(sb.SandboxSpec(workspace=Path(d), cmd=["echo", "hi"]))
                 self.assertTrue(r.degraded)
                 self.assertEqual(r.isolation, "local/WORKSPACE_WRITE")
@@ -176,6 +179,46 @@ class TestDegradedMode(unittest.TestCase):
                 self.assertIn("hi", r.stdout)
         finally:
             sb.docker_available = original
+
+
+class TestProviderMacDinhCuaSuite(unittest.TestCase):
+    """A2 kế hoạch phát hành: suite đơn vị không mở container. `tests/__init__.py`
+    đặt `HostProvider` vào chỗ `docker` khi không `AISDLC_TEST_DOCKER=1`; gỡ ra
+    thì chọn lại Docker/Local như dự án thật; tên `host`/`fake` không phải lựa
+    chọn của dự án."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.ws = Path(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    @unittest.skipIf(os.environ.get("AISDLC_TEST_DOCKER") == "1", "đang chạy Docker thật")
+    def test_mac_dinh_chay_tren_host_khong_suy_bien(self):
+        r = run(SandboxSpec(workspace=self.ws, cmd=["echo", "hi"]))
+        self.assertTrue(r.ok, r.stderr)
+        self.assertFalse(r.degraded)
+        self.assertEqual(r.isolation, "host/WORKSPACE_WRITE")
+        self.assertIn("hi", r.stdout)
+
+    def test_go_dang_ky_thi_chon_docker_hoac_local(self):
+        with using(DockerProvider()):
+            prov, _ = select_provider(SandboxSpec(workspace=self.ws, cmd=["true"]))
+        self.assertIn(prov.id, ("docker", "local"))
+
+    def test_host_khai_native_nhu_fake_nhung_chay_that(self):
+        for lv in Level:
+            self.assertEqual(missing_guarantees(HostProvider(), lv), [])
+        r = HostProvider().run(SandboxSpec(workspace=self.ws, cmd=["sh", "-c", "echo x > da-chay"]))
+        self.assertTrue(r.ok)
+        self.assertTrue((self.ws / "da-chay").exists())
+
+    def test_du_an_that_khai_host_hay_fake_bi_tu_choi(self):
+        for ten in ("host", "fake"):
+            with self.subTest(ten=ten), self.assertRaises(ValueError) as e:
+                select_provider(SandboxSpec(workspace=self.ws, cmd=["true"], provider=ten))
+            self.assertIn("không tồn tại", str(e.exception))
 
 
 class TestDockerCanBeTurnedOff(unittest.TestCase):

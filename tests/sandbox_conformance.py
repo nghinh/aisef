@@ -121,15 +121,17 @@ def run_probe(provider: str, probe: Probe, ws: Path) -> Cell:
 
 def generate() -> tuple[str, dict[str, dict[str, Cell]]]:
     """Chạy S1–S5 trên mọi provider có mặt; trả (markdown, ô)."""
-    providers = [p for p in ("docker", "local") if sandbox.resolve_provider(p).available()]
-    cells: dict[str, dict[str, Cell]] = {p: {} for p in providers}
-    with tempfile.TemporaryDirectory() as d:
+    # Suite đơn vị đặt `HostProvider` vào chỗ `docker` (tests/__init__.py);
+    # hợp quy phải đo Docker thật, không đo giả lập — trả provider thật về.
+    with sandbox.using(sandbox.DockerProvider()), tempfile.TemporaryDirectory() as d:
+        providers = [p for p in ("docker", "local") if sandbox.resolve_provider(p).available()]
+        cells: dict[str, dict[str, Cell]] = {p: {} for p in providers}
         ws = Path(d) / "workspace"
         ws.mkdir()
         for p in providers:
             for probe in PROBES:
                 cells[p][probe.id] = run_probe(p, probe, ws)
-    return to_markdown(cells), cells
+        return to_markdown(cells), cells
 
 
 def _cell(c: Cell | None) -> str:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -11,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from tests import needs_docker  # noqa: E402 — HostProvider vào chỗ docker (tests/__init__.py)
 from aisdlc.config import DEFAULTS, Config  # noqa: E402
 from aisdlc.harness.observe import TOOL_RUN, EvidenceStore  # noqa: E402
 from aisdlc.harness.tools import (  # noqa: E402
@@ -200,6 +202,46 @@ class TestProviderGia(ToolTestCase):
         self.assertTrue(res.degraded)
         self.assertEqual(res.detail["missing"], ["network_none", "non_root", "secrets_absent"])
         self.assertIn("network_none", res.summary())
+
+
+class TestSuiteKhongMoContainer(ToolTestCase):
+    """A2 kế hoạch phát hành: `run_tool` với cấu hình mặc định của dự án
+    (`sandbox.provider = docker`) chạy trên `HostProvider` trong suite đơn vị —
+    không container, không suy biến, bằng chứng ghi thật `host/…`. Đỏ khi hoàn
+    nguyên `tests/__init__.py`."""
+
+    @unittest.skipIf(os.environ.get("AISDLC_TEST_DOCKER") == "1", "đang chạy Docker thật")
+    def test_cau_hinh_mac_dinh_chay_tren_host(self):
+        res = run_tool("test", self.project, story_id="S-01", artifact_root=self.artifacts,
+                       config=Config({**DEFAULTS, "tools.test": "true"}))
+        self.assertTrue(res.ok)
+        self.assertFalse(res.degraded)
+        self.assertEqual(res.detail["isolation"], "host/WORKSPACE_WRITE")
+        e = EvidenceStore(self.artifacts).read("S-01").last(TOOL_RUN, "test")
+        self.assertEqual(e.detail["isolation"], "host/WORKSPACE_WRITE")
+
+
+@needs_docker
+class TestRunToolQuaDockerThat(ToolTestCase):
+    """Docker thật, bật bằng `AISDLC_TEST_DOCKER=1`: `run_tool` end-to-end qua
+    container — bằng chứng ghi `docker/…`, và lệnh đỏ trong container vẫn là
+    test đỏ, không phải "không chạy được"."""
+
+    def test_xanh_trong_container_khong_suy_bien(self):
+        res = run_tool("test", self.project, story_id="S-01", artifact_root=self.artifacts,
+                       config=Config({**DEFAULTS, "tools.test": "true"}))
+        self.assertTrue(res.ok, res.stderr)
+        self.assertFalse(res.degraded)
+        self.assertEqual(res.detail["isolation"], "docker/WORKSPACE_WRITE")
+        self.assertEqual(res.detail["provider_error"], "")
+
+    def test_do_trong_container_van_la_test_do(self):
+        res = run_tool("test", self.project, config=Config(
+            {**DEFAULTS, "tools.test": "sh -c 'echo 1 failed; exit 1'"}))
+        self.assertFalse(res.ok)
+        self.assertEqual(res.exit_code, 1)
+        self.assertEqual(res.unrunnable, "")
+        self.assertEqual(res.detail["isolation"], "docker/WORKSPACE_WRITE")
 
 
 class TestDescription(ToolTestCase):

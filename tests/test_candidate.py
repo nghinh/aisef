@@ -18,6 +18,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+import tests  # noqa: E402,F401 — HostProvider vào chỗ docker, không mở container (tests/__init__.py)
+
 from aisdlc.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
 from aisdlc.clients.stream import RunResult  # noqa: E402
 from aisdlc.config import DEFAULTS, Config  # noqa: E402

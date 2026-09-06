@@ -25,7 +25,8 @@ trước khi chạy lệnh nào.
 Ba provider: ``docker`` (mặc định), ``local`` (chạy thẳng, mọi bảo đảm
 UNSUPPORTED), ``fake`` (cho test, trả kết quả theo kịch bản). Backend ngoài
 khai ``"mô-đun:Lớp"`` ở ``sandbox.provider``. Không có session, không có
-daemon: một lệnh, một lần chạy.
+daemon: một lệnh, một lần chạy. ``host`` (chạy thật trên máy, khai NATIVE)
+chỉ suite đơn vị dùng — ``tests/__init__.py`` — không phải lựa chọn của dự án.
 
 Bảo đảm của Docker đã kiểm bằng lần chạy thật, xem
 ``docs/SANDBOX-CONFORMANCE.md`` (S1–S5, sinh bởi
@@ -278,6 +279,24 @@ class FakeProvider:
             return SandboxResult(exit_code=0)
         out = self.outputs.pop(0) if len(self.outputs) > 1 else self.outputs[0]
         return SandboxResult(**{k: v for k, v in vars(out).items()})
+
+
+class HostProvider(LocalProvider):
+    """**Chỉ cho test đơn vị** — giả lập cách ly. Chạy lệnh thật bằng
+    subprocess trên máy như ``local``, nhưng khai mọi bảo đảm NATIVE nên kết
+    quả không ``degraded`` dù không có container. Chấp nhận vì suite đơn vị
+    kiểm **luật của harness** (bằng chứng ghi gì, cổng đọc gì, "không chạy
+    được ≠ đỏ"), không kiểm Docker; Docker thật đo ở test đánh dấu
+    ``needs_docker`` (``AISDLC_TEST_DOCKER=1``) và hợp quy S1–S5. Mỗi
+    container mất 6–18 s trên máy đo, suite đầy đủ 25–60 phút — đó là lý do
+    nó tồn tại (kế hoạch phát hành A2). Không nằm trong ``PROVIDERS``:
+    ``sandbox.provider = "host"`` trong dự án bị từ chối như tên lạ;
+    ``tests/__init__.py`` đặt nó vào chỗ ``docker``."""
+
+    id = "host"
+
+    def guarantees(self, level: Level) -> dict[Guarantee, Support]:
+        return {g: Support.NATIVE for g in Guarantee}
 
 
 #: Provider theo tên. Test đăng ký `fake` qua `using()`; backend ngoài đi
