@@ -148,3 +148,16 @@ class TestBoChayHopQuyPhanMay(unittest.TestCase):
         for pid, what, proves in C.PROBES:
             with self.subTest(probe=pid):
                 self.assertNotIn("|", what + proves)
+
+    def test_het_gio_la_ket_cuc_cua_phep_thu_khong_nem_xuyen_bang(self):
+        """2026-09-06: OpenCode treo ở C4 → `TimeoutExpired` ném xuyên `probe_all`,
+        cột OpenCode giữ số cũ, C9/C10 thành "—". Hết giờ phải thành một ô ✗
+        có lý do, và bản ghi thô vẫn được giữ để tra."""
+        import tempfile
+        from unittest import mock
+        from tests.conformance import _runner as R
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(R, "TIMEOUT", 1):
+            proc = R._run(["sleep", "5"], Path(d), Path(d), "S-T", reviewer=False)
+            self.assertEqual(proc.returncode, -1)
+            self.assertEqual(proc.stderr, "quá 1s")
+            self.assertIn("quá 1s", R._raw(Path(d), "S-T"))

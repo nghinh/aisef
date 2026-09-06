@@ -85,6 +85,22 @@ def env_for(project: Path, workdir: Path, story: str, *, reviewer: bool = False)
 # ------------------------------------------------------------ chạy client
 
 
+def _run(cmd, project: Path, workdir: Path, story: str, *, reviewer: bool) -> subprocess.CompletedProcess:
+    """Một phiên client. Hết giờ là **kết cục của phép thử** (✗ "quá 420s"),
+    không phải lý do vứt cả bảng: 2026-09-06 OpenCode treo ở C4 làm
+    `TimeoutExpired` ném xuyên `probe_all`, cột OpenCode giữ số cũ và C9/C10
+    thành "—" — bảng trông như chưa chạy thay vì nói đã treo ở đâu."""
+    try:
+        proc = subprocess.run(cmd, cwd=workdir, capture_output=True, text=True, timeout=TIMEOUT,
+                              env=env_for(project, workdir, story, reviewer=reviewer),
+                              stdin=subprocess.DEVNULL)
+    except subprocess.TimeoutExpired as e:
+        proc = subprocess.CompletedProcess(cmd, -1, (e.stdout or b"").decode("utf-8", "replace") if isinstance(e.stdout, bytes) else (e.stdout or ""),
+                                           f"quá {TIMEOUT}s")
+    _keep(project, story, proc.stdout + "\n--- stderr ---\n" + proc.stderr)
+    return proc
+
+
 def run_claude(project: Path, workdir: Path, prompt: str, story: str, *, reviewer=False):
     # Đúng dòng lệnh harness dùng (cách ly cấu hình máy, tool kê tường minh) —
     # tự dựng thì đo một thứ khác với thứ chạy thật.
@@ -94,10 +110,7 @@ def run_claude(project: Path, workdir: Path, prompt: str, story: str, *, reviewe
     # Không bật `--disallowed-tools` ở đây: C5 đo tầng guard (`check_role_tool`
     # qua env), không đo tầng native — bật cờ thì Write biến mất khỏi danh sách
     # tool và guard không bao giờ được gọi. Harness thật bật cả hai lớp.
-    proc = subprocess.run(cmd, cwd=workdir, capture_output=True, text=True, timeout=TIMEOUT,
-                          env=env_for(project, workdir, story, reviewer=reviewer),
-                          stdin=subprocess.DEVNULL)
-    _keep(project, story, proc.stdout + "\n--- stderr ---\n" + proc.stderr)
+    proc = _run(cmd, project, workdir, story, reviewer=reviewer)
     r = parse_stream(proc.stdout.splitlines())
     # Cả phiên, không chỉ câu chốt: hook Stop có thể bắt agent chạy test rồi
     # câu chốt nói về test chứ không về việc (C4, 2026-09-05).
@@ -107,10 +120,7 @@ def run_claude(project: Path, workdir: Path, prompt: str, story: str, *, reviewe
 
 def run_opencode(project: Path, workdir: Path, prompt: str, story: str, *, reviewer=False):
     cmd = ["opencode", "run", "--format", "json", "--dir", str(workdir), "--model", OPENCODE_MODEL, prompt]
-    proc = subprocess.run(cmd, cwd=workdir, capture_output=True, text=True, timeout=TIMEOUT,
-                          env=env_for(project, workdir, story, reviewer=reviewer),
-                          stdin=subprocess.DEVNULL)
-    _keep(project, story, proc.stdout + "\n--- stderr ---\n" + proc.stderr)
+    proc = _run(cmd, project, workdir, story, reviewer=reviewer)
     # Từ 2026-09-05: `--format json` → tool đọc từ luồng sự kiện; bản in
     # stderr chỉ còn là dự phòng khi luồng rỗng.
     from aisdlc.clients.opencode import parse_json_events
