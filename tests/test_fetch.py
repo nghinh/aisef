@@ -1,7 +1,7 @@
 """Lấy nguồn skill về — điều kiện để bản cài bằng pip dùng được `setup`.
 
 Lỗi gốc: `setup` đòi `references/` nằm sẵn trong dự án. Người cài bằng
-`pip install ai-sdlc` không có thư mục đó, nên `setup` chết ở dòng đầu và
+`pip install aisef` không có thư mục đó, nên `setup` chết ở dòng đầu và
 cả khung không chạy được lần nào.
 """
 

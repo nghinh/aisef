@@ -15,7 +15,7 @@ người, worktree, guard, hợp quy) mô tả ở `docs/SOLUTION.md`; không l�
 **Điều kiện phát hành** (`docs/STATUS-2026-09-05.md` §5, `docs/EXECUTION-PLAN.md` đợt 4 R1):
 100 % unit xanh · `docs/CONFORMANCE.md` ≤ 14 ngày không ô ✗ · `par` chạy
 lại đạt mốc dogfood · e9 EPIC-01 xong với báo cáo có tiêu chí → test id · `pip
-install ai-sdlc` trong venv sạch → `setup` → `doctor` xanh. Tag `v0.1.0` chờ
+install aisef` trong venv sạch → `setup` → `doctor` xanh. Tag `v0.1.0` chờ
 chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine check`.
 
 ### Khi nâng cấp — việc người dùng phải làm

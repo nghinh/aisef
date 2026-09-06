@@ -36,7 +36,7 @@ CI_PATH = ".github/workflows/aisdlc.yml"
 
 #: Cách CI cài framework. Để người dùng đổi được khi họ phát hành nội bộ
 #: hoặc dùng bản từ git.
-INSTALL_SPEC = "ai-sdlc"
+INSTALL_SPEC = "aisef"          # tên gói PyPI; module/lệnh vẫn `aisdlc`
 RUNBOOK_PATH = "docs/RUNBOOK.md"
 
 #: Bốn mục một runbook phải có. Thiếu mục nào cũng làm nó vô dụng đúng lúc

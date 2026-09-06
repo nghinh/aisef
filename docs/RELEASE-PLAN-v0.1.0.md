@@ -53,7 +53,7 @@ Thứ tự thực thi: A1–A5 → B6 (xong) → B1/B2 → C-a → D1/D2/D4. Kh�
 | `CONFORMANCE.md` ≤ 14 ngày, không ô ✗ | ✅ 06/09, C1–C10 | OpenCode C9 "không kết luận" ghi rõ là hạng hai — không chặn |
 | `par` chạy lại đạt mốc | ✅ 3/3 $5,79 ≤ 2×$3,14 (dòng cũ trong STATUS ghi "chờ P0-1" đã lỗi thời) | cập nhật STATUS |
 | `e9` EPIC-01 xong, báo cáo có TCCN → test id, accessibility không UNCONFIGURED | ✅ 7/7, QA ✅ | pre-deploy còn ✗ vì phạm vi kế hoạch là 5 epic — **cần quyết định phạm vi nghiệm thu** (mục 3, đợt C) |
-| `pip install ai-sdlc` venv sạch → setup → doctor xanh | ◐ wheel + sdist build, twine PASS | tài khoản tổ chức PyPI + trusted publisher (việc của chủ đầu tư), tag, publish, kiểm venv sạch |
+| `pip install aisef` venv sạch → setup → doctor xanh | ◐ wheel + sdist build, twine PASS | tài khoản tổ chức PyPI + trusted publisher (việc của chủ đầu tư), tag, publish, kiểm venv sạch |
 
 ### 1.4 Vấn đề tồn tại còn mở (sau khi đóng những mục đã xong)
 
@@ -125,7 +125,7 @@ Hai lựa chọn, tôi khuyến nghị **C-a**:
 | D2 | `uv build` + `twine check`; cài wheel vào venv sạch → `aisdlc setup` → `aisdlc doctor` xanh (không Docker: doctor phải nói "local provider, 5 bảo đảm thiếu", không đỏ) | tôi | log kèm trong STATUS |
 | D3 | Tạo project PyPI (tài khoản tổ chức) + trusted publisher (GitHub Actions) | **chủ đầu tư** | publisher hiện trong PyPI |
 | D4 | Cổng phát hành bằng lệnh: suite xanh + `CONFORMANCE.md` ≤ 14 ngày không ô ✗ + STATUS §5 đủ ✅ | tôi | lệnh trả 0 |
-| D5 | `git tag v0.1.0`, workflow publish, kiểm `pip install ai-sdlc==0.1.0` venv sạch | chủ đầu tư tag, tôi kiểm | §5 dòng cuối ✅ |
+| D5 | `git tag v0.1.0`, workflow publish, kiểm `pip install aisef==0.1.0` venv sạch | chủ đầu tư tag, tôi kiểm | §5 dòng cuối ✅ |
 | D6 | Trang trạng thái phát hành + ghi nhận giới hạn đã biết: OpenCode hạng hai, S1 blocked, mutation cần môi trường, repo_map tắt mặc định nếu A/B chưa thắng | tôi | artifact cập nhật |
 
 ### Đợt E — sau phát hành (không chặn)

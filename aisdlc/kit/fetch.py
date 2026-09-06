@@ -2,7 +2,7 @@
 
 Trước đây `aisdlc setup` đòi thư mục ``references/`` đã clone sẵn nằm cạnh
 dự án. Điều đó chỉ đúng khi framework chạy từ bản sao kho nguồn: người cài
-bằng ``pip install ai-sdlc`` không có cách nào có được thư mục ấy, và
+bằng ``pip install aisef`` không có cách nào có được thư mục ấy, và
 ``setup`` dừng ngay ở dòng đầu.
 
 Nguồn skill là tài sản của **framework**, không phải của dự án đích — nên

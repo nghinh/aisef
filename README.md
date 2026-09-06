@@ -17,7 +17,7 @@ chính nó.**
 ## Cài
 
 ```bash
-pip install ai-sdlc
+pip install aisef
 ```
 
 Hoặc chạy từ bản sao kho nguồn:
@@ -170,7 +170,7 @@ chạy tuần.
 
 ## Phát hành
 
-Gói tên `ai-sdlc`, phát hành khi hoàn tất đợt 4 (quyết định 2026-09-05).
+Gói phân phối tên **`aisef`** trên PyPI (module Python và lệnh vẫn là `aisdlc`), phát hành khi hoàn tất đợt 4 (quyết định 2026-09-05).
 Điều kiện đọc bằng lệnh, không bằng cảm giác:
 
 ```bash
@@ -188,7 +188,7 @@ uv build && uvx twine check dist/*
 
 `.github/workflows/release.yml` publish bằng *trusted publishing* khi đẩy tag
 `v*` — không có token nào trong kho. Việc làm **một lần bằng tay**, bằng tài
-khoản tổ chức: tạo project `ai-sdlc` trên PyPI và khai trusted publisher
+khoản tổ chức: tạo project `aisef` trên PyPI và khai trusted publisher
 (kho này · workflow `release.yml` · environment `pypi`). Sau đó:
 
 ```bash

@@ -300,7 +300,7 @@ class TestQuyTrinhCI(unittest.TestCase):
 
 
 class TestInstallSpecDoiDuoc(unittest.TestCase):
-    """Gói chưa lên PyPI thì `pip install ai-sdlc` trong CI sẽ hỏng. Quy
+    """Gói chưa lên PyPI thì `pip install aisef` trong CI sẽ hỏng. Quy
     trình sinh ra phải cho trỏ sang thứ pip cài được thật."""
 
     def test_mac_dinh_la_ten_goi(self):

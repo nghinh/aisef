@@ -1,9 +1,9 @@
 # Phát hành lên PyPI khi đẩy tag `v*` — dùng *trusted publishing* (OIDC),
 # không có token nào nằm trong kho hay trong secrets. Quyết định 2026-09-05:
-# tên gói `ai-sdlc`, tài khoản tổ chức; publish khi hoàn tất đợt 4.
+# tên gói `aisef` (module/lệnh vẫn `aisdlc`), tài khoản tổ chức; publish khi hoàn tất đợt 4.
 #
 # Việc phải làm một lần bằng tay (không tự động hoá được): trên PyPI, tài
-# khoản tổ chức tạo project `ai-sdlc` và thêm "trusted publisher" trỏ tới
+# khoản tổ chức tạo project `aisef` và thêm "trusted publisher" trỏ tới
 # kho này, workflow `release.yml`, environment `pypi`. Sau đó `git tag v0.1.0
 # && git push --tags` là đủ.
 name: release

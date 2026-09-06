@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ai-sdlc"
+name = "aisef"             # tên gói phân phối (PyPI); module và lệnh vẫn là `aisdlc`
 version = "0.1.0"
 description = "Khung SDLC cho agent: đầu vào là docs/requirements.md, đầu ra là code đã qua cổng kiểm"
 readme = "README.md"
