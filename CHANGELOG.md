@@ -388,6 +388,8 @@ Gỡ: `story.max_context_tokens` (chưa từng có mã đọc; `RETIRED`, cảnh
 
 ### Lỗi thật tìm bằng đo trong đợt này
 
-25 lỗi, không lỗi nào bằng đọc code; bảng và lớp nguyên nhân ở
-`docs/FAILURE-TAXONOMY.md`, chi tiết ở STATUS §2.4. Chưa sửa: lỗi 22 (e2e nhạy
-tải máy — cần R13 `run --story S --verify-only`, STATUS P1-13).
+28 lỗi, không lỗi nào bằng đọc code; bảng và lớp nguyên nhân ở
+`docs/FAILURE-TAXONOMY.md`, chi tiết ở STATUS §2.4. Lỗi 22 (e2e nhạy tải máy)
+đóng bằng R13 `run --story S --verify-only --repeat`; 26/27 (sổ/bảo toàn, đo
+trên `par` agent thật) và 28 (băm chỉ mục quên `waves` của epic sửa) sửa kèm
+test đỏ-khi-hoàn-nguyên.
