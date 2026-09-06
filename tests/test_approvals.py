@@ -196,6 +196,20 @@ class TestStorySuaKhongLamStaleCongStories(unittest.TestCase):
         (self.root / "stories.index.json").write_text(self.json.dumps(data, ensure_ascii=False, indent=1),
                                                        encoding="utf-8")
 
+    def test_dot_chay_cua_epic_sua_doi_moi_vong_khong_stale(self):
+        """Lỗi 28 (e9 06:50): vòng 4/5 thay `waves["EPIC-RP-01"]` → stale lại
+        dù lỗi 25 đã lọc story/epic sửa. Đổi đợt chạy của epic **thật** vẫn stale."""
+        data = self.json.loads(self.json.dumps(self.index))
+        data["waves"] = {"EPIC-01": [["STORY-01-01"]], "EPIC-RP-01": [["STORY-RP-04"]]}
+        self.ghi(data)
+        self.store.approve(Gate.STORIES, by="t")
+        data["waves"]["EPIC-RP-01"] = [["STORY-RP-05"]]
+        self.ghi(data)
+        self.assertIs(self.store.status(Gate.STORIES), Status.APPROVED)
+        data["waves"]["EPIC-01"] = [["STORY-01-01"], ["STORY-01-02"]]
+        self.ghi(data)
+        self.assertIs(self.store.status(Gate.STORIES), Status.STALE)
+
     def test_them_story_sua_khong_stale(self):
         self.assertIs(self.store.status(Gate.STORIES), Status.APPROVED)
         data = self.json.loads(self.json.dumps(self.index))

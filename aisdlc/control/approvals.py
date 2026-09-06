@@ -142,6 +142,11 @@ def _artifact_hash(path: Path) -> str:
         if isinstance(loc.get(key), list):
             loc[key] = [x for x in loc[key]
                         if not (isinstance(x, dict) and str(x.get("id", "")).startswith(REPAIR_PREFIX))]
+    # Đợt chạy của epic sửa cũng đổi mỗi vòng (`register_story(wave=[sid])`):
+    # lỗi 28, e9 2026-09-06 06:50 — vòng 4/5 làm `stories`/`readiness` stale
+    # lần nữa dù lỗi 25 đã lọc story/epic. Lọc cùng một tiền tố, cùng lý do.
+    if isinstance(loc.get("waves"), dict):
+        loc["waves"] = {k: v for k, v in loc["waves"].items() if not str(k).startswith(REPAIR_PREFIX)}
     return hashlib.sha256(json.dumps(loc, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
 
 
