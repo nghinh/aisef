@@ -63,6 +63,15 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 
 ### 2 · Tools
 
+- `aisdlc tool` có cấu trúc (ADR-005 V11 A): tóm tắt `testlog` (xanh/đỏ/bỏ qua,
+  ≤ 20 tên test đỏ) **trước** `tail`, rồi "(lược N/M dòng — toàn văn:
+  `_bmad-output/evidence/<story>-<tool>-<seq>.log`)" khi output dài hơn
+  `--lines`; `record()` ghi tệp log ấy khi output > 20 dòng, `tail` trong
+  evidence vẫn 20 dòng.
+- Che bí mật trong bằng chứng (ADR-005 V1): `tail`, log toàn văn và `qa:*`
+  đi qua `guardrails.scrub_secrets` → `[REDACTED]`, `detail.redacted` = số chỗ
+  che; thêm mẫu `AWS_SECRET_ACCESS_KEY=…` và `Bearer …`. Đo trước trên 42 tệp
+  evidence e9/`par`: 0 khớp — vá phòng ngừa, `_bmad-output` được commit.
 - **Mới** `aisdlc doc <package> [--topic] [--story]`: tra tài liệu thư viện qua
   context7, cache trên đĩa, bằng chứng `doc_lookup` (ACTION-PLAN S2).
 - **Mới** `aisdlc evidence <id>`: lịch sử một story hoặc một hành vi
@@ -202,6 +211,13 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 
 ### 6 · Observability
 
+- **Mới** `agent_run.detail.exit_status` ∈ {ok, max_turns, timeout, cost,
+  context, permission, infra, error} (`clients/stream.py::exit_status_of`,
+  ADR-005 V11 B); `Attempt.infra` và vòng thử lại `plan` đọc cùng
+  `INFRA_STATUSES` thay cho bảng chuỗi `INFRA_ERRORS` (đã gỡ) — lượt `429`
+  hạn mức API từng bị tính là lỗi chất lượng (e9 RP-05). `aisdlc status` in
+  "Lượt agent: ok n · max_turns n · … · chưa ghi n". Đếm trên e9: max_turns
+  4 lượt/3 story, khớp đếm tay ADR-004 §6 trong phạm vi EPIC-01.
 - **Mới sổ hành vi** `control/ledger.py` (ADR-004 R2): phép chiếu từ
   `evidence/` — `AC-<story>-<i>` (tên test), `FR-x`/`NFR-x` (`covers`),
   `qa:<kind>`, `mockup:<màn>` → VERIFIED · GAP · REOPENED với `regressed_by`;

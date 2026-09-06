@@ -112,6 +112,13 @@ class TestCostAndLatency(EvidenceTestCase):
         self.assertGreater(e.cost_usd, 0)
         self.assertEqual(e.detail["error"], "api_error")
 
+    def test_ket_cuc_chuan_hoa_duoc_ghi(self):
+        """ADR-005 V11 (B): `status` đếm theo `exit_status`, không dò lại chuỗi `error`."""
+        self.store.agent_run("S-01", parse_file(FIX / "stream-api-error.jsonl"))
+        self.assertEqual(self.store.read("S-01").last(AGENT_RUN).detail["exit_status"], "infra")
+        self.store.agent_run("S-02", parse_file(FIX / "stream-minimal.jsonl"))
+        self.assertEqual(self.store.read("S-02").last(AGENT_RUN).detail["exit_status"], "ok")
+
     def test_totals_accumulate(self):
         self.store.record("S-01", Event(kind=AGENT_RUN, cost_usd=1.5, duration_ms=100))
         self.store.record("S-01", Event(kind=AGENT_RUN, cost_usd=0.5, duration_ms=200))

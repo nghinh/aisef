@@ -38,6 +38,7 @@ from ..control.security import parse as parse_security
 from ..control.normalize import Architecture, Story, effective_write_scope
 from ..harness import mockup_verify
 from ..clients.compile import guard_expected
+from ..clients.stream import INFRA_STATUSES, exit_status_of
 from ..harness.guardrails import (
     ENV_DISALLOWED_TOOLS,
     ENV_PROJECT,
@@ -57,15 +58,6 @@ from ..harness.routing import DEVELOPER, REVIEWER, ROLES, SECURITY, build_spec
 from ..harness.testlog import MAX_IDS, parse as parse_testlog
 from ..harness.tools import BASELINE_RUN, describe_tools, record as record_tool, run_tool
 from .qa import KINDS, find_fake_tests, run_suite
-
-#: Lỗi thuộc về hạ tầng, không thuộc về chất lượng công việc.
-INFRA_ERRORS = ("api_error", "overloaded", "quá ", "không chạy được", "connection")
-
-
-def is_infrastructure_error(error: str) -> bool:
-    low = (error or "").lower()
-    return any(marker in low for marker in INFRA_ERRORS)
-
 
 @dataclass
 class Attempt:
@@ -504,7 +496,7 @@ def run_attempt(
 
     if not result.ok:
         attempt.error = result.error or "lượt chạy thất bại"
-        attempt.infra = is_infrastructure_error(attempt.error)
+        attempt.infra = exit_status_of(result) in INFRA_STATUSES
         return attempt
 
     # Phiên developer đã kết thúc: **đóng băng ứng viên ngay**, trước khi

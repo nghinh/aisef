@@ -660,3 +660,54 @@ class TestDoctorHookThieuGuard(CliTestCase):
         self.assertIn("hook claude đủ guard", out)
         self.assertIn("process-ref", out)
         self.assertIn("aisdlc compile", out)
+
+
+class TestToolCoCauTruc(CliTestCase):
+    """ADR-005 V11 (A): kết luận máy đọc **trước** tail, khai cắt và trỏ toàn văn —
+    agent không phải tự chạy lại runner để biết test nào đỏ (lượt bị đốt vào
+    `Bash: pytest` sau một `aisdlc tool test` trên stream dogfood)."""
+
+    def config(self, command: str) -> None:
+        (self.project / ".ai").mkdir(exist_ok=True)
+        (self.project / ".ai" / "config.json").write_text(
+            '{"tools.test": "%s", "sandbox.use_docker": false}' % command, encoding="utf-8")
+
+    def test_ten_test_do_nam_trong_nam_dong_dau(self):
+        self.config("sh -c 'seq 1 60; echo tests/test_a.py::test_x FAILED; "
+                    "echo tests/test_a.py::test_y PASSED; exit 1'")
+        code, out, _ = self.run_cli("tool", "test", "--story", "STORY-01-01")
+        self.assertEqual(code, EXIT_NOT_READY)
+        dau = out.splitlines()[:5]
+        self.assertIn("1 xanh · 1 đỏ · 0 bỏ qua (pytest)", dau)
+        self.assertTrue(any("✗ tests/test_a.py::test_x" in line for line in dau), dau)
+
+    def test_output_dai_khai_cat_va_tro_toan_van(self):
+        self.config("seq 1 500")
+        code, out, _ = self.run_cli("tool", "test", "--story", "STORY-01-01", "--lines", "40")
+        self.assertIn("(lược 460/500 dòng — toàn văn: ", out)
+        path = out.split("toàn văn: ")[1].split(")")[0]
+        self.assertTrue((self.project / path).is_file(), path)
+        self.assertEqual(len((self.project / path).read_text(encoding="utf-8").splitlines()), 500)
+
+    def test_output_ngan_khong_co_dong_luoc(self):
+        self.config("seq 1 10")
+        _, out, _ = self.run_cli("tool", "test", "--story", "STORY-01-01")
+        self.assertNotIn("lược", out)
+
+
+class TestStatusDemKetCuc(CliTestCase):
+    """ADR-005 V11 (B): `status` đếm lượt theo `exit_status` harness chuẩn hoá
+    lúc ghi; bản ghi cũ không có khoá là "chưa ghi", không suy đoán thay."""
+
+    def test_dem_theo_exit_status(self):
+        from aisdlc.clients.stream import RunResult
+        from aisdlc.harness.observe import AGENT_RUN, Event, EvidenceStore
+        StateStore(self.artifacts).register("S-01", "E-01")
+        ev = EvidenceStore(self.artifacts)
+        ev.agent_run("S-01", RunResult(ok=False, error="max_turns"), name="S-01#1")
+        ev.agent_run("S-01", RunResult(ok=True, text="x"), name="S-01#2")
+        ev.record("S-01", Event(kind=AGENT_RUN, name="S-01-cu"))
+        _, out, _ = self.run_cli("status")
+        line = next(l for l in out.splitlines() if l.startswith("Lượt agent: "))
+        for phan in ("max_turns 1", "ok 1", "chưa ghi 1"):
+            self.assertIn(phan, line)

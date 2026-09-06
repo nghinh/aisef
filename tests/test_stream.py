@@ -6,6 +6,7 @@ thường và một lượt bị guard chặn.
 
 from __future__ import annotations
 
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -13,7 +14,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.clients.stream import parse_file, parse_stream  # noqa: E402
+from aisdlc.clients.stream import (  # noqa: E402
+    EXIT_STATUSES,
+    RunResult,
+    exit_status_of,
+    parse_file,
+    parse_stream,
+)
 
 FIX = ROOT / "tests" / "fixtures"
 MINIMAL = FIX / "stream-minimal.jsonl"
@@ -209,6 +216,70 @@ class TestInfrastructureFailure(unittest.TestCase):
         ev = self.r.evidence()
         self.assertFalse(ev["guard_blocked"])
         self.assertTrue(ev["permission_limited"])
+
+
+class TestExitStatus(unittest.TestCase):
+    """ADR-005 V11 (B): một bảng kết cục cho mọi client — `aisdlc status`
+    đếm theo nó, vòng thử lại đọc nó thay vì dò chuỗi `error`."""
+
+    def ket_cuc(self, result_event: dict) -> str:
+        return exit_status_of(parse_stream([json.dumps({"type": "result", **result_event})]))
+
+    def test_ok_tu_luong_that(self):
+        self.assertEqual(exit_status_of(parse_file(MINIMAL)), "ok")
+
+    def test_infra_tu_luong_that(self):
+        self.assertEqual(exit_status_of(parse_file(API_ERROR)), "infra")
+
+    def test_max_turns_theo_hinh_dang_e9(self):
+        """e9 01-01 lượt 1 (61/60): `subtype` lỗi, `terminal_reason` max_turns."""
+        self.assertEqual(self.ket_cuc({"subtype": "error_max_turns", "is_error": True,
+                                       "terminal_reason": "max_turns", "num_turns": 61}), "max_turns")
+
+    def test_max_turns_thang_ha_tang(self):
+        """Lượt chạm trần thường kèm thông báo lỗi — xếp vào hạ tầng là thử lại miễn phí."""
+        self.assertEqual(self.ket_cuc({"subtype": "error_max_turns", "is_error": True,
+                                       "terminal_reason": "max_turns",
+                                       "result": "API Error: connection reset"}), "max_turns")
+
+    def test_timeout_do_client_cat(self):
+        self.assertEqual(exit_status_of(RunResult(ok=False, error="quá 1800s")), "timeout")
+
+    def test_cost(self):
+        self.assertEqual(self.ket_cuc({"subtype": "error_max_budget_usd", "is_error": True}), "cost")
+
+    def test_context(self):
+        self.assertEqual(self.ket_cuc({
+            "subtype": "success", "is_error": True, "api_error_status": 400,
+            "result": "API Error: 400 prompt is too long: 210000 tokens > 200000 maximum",
+        }), "context")
+
+    def test_tien_trinh_chet_giua_chung_la_ha_tang(self):
+        self.assertEqual(exit_status_of(parse_stream([])), "infra")
+
+    def test_permission(self):
+        self.assertEqual(self.ket_cuc({
+            "subtype": "error_during_execution", "is_error": True,
+            "permission_denials": [{"tool_name": "Bash", "tool_use_id": "t1", "tool_input": {}}],
+        }), "permission")
+
+    def test_error_khi_khong_biet_gi_hon(self):
+        self.assertEqual(self.ket_cuc({"subtype": "error_during_execution", "is_error": True}), "error")
+        self.assertEqual(exit_status_of(RunResult(ok=False, error="test đỏ")), "error")
+
+    def test_bang_dong_va_moi_gia_tri_deu_sinh_duoc(self):
+        sinh = {
+            exit_status_of(parse_file(MINIMAL)), exit_status_of(parse_file(API_ERROR)),
+            exit_status_of(parse_stream([])),
+            exit_status_of(RunResult(ok=False, error="quá 1s")),
+            exit_status_of(RunResult(ok=False, error="lạ")),
+            self.ket_cuc({"subtype": "error_max_turns", "is_error": True}),
+            self.ket_cuc({"subtype": "error_max_budget_usd", "is_error": True}),
+            self.ket_cuc({"subtype": "success", "is_error": True, "result": "prompt is too long"}),
+            self.ket_cuc({"subtype": "error_during_execution", "is_error": True,
+                          "permission_denials": [{"tool_name": "Bash", "tool_use_id": "t", "tool_input": {}}]}),
+        }
+        self.assertEqual(sinh, set(EXIT_STATUSES))
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

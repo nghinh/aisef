@@ -29,7 +29,7 @@ from pathlib import Path
 from ..control.outcome import DEFAULT_REASON, Outcome
 from ..config import Config
 from ..harness import sandbox
-from ..harness.guardrails import head_sha
+from ..harness.guardrails import head_sha, scrub_secrets
 from ..harness.observe import EvidenceStore
 from ..harness.tools import command_for, image_for, unrunnable_reason
 
@@ -370,7 +370,9 @@ def run_suite(
         # "Cannot find module" nằm ở đầu stack trace còn `detail` chỉ giữ
         # 5 dòng cuối. Đo trên e9: sau bản vá đầu tiên, `mutation` vẫn bị
         # đếm là test đỏ đúng vì chỗ này.
-        day_du = (sb.stdout + "\n" + sb.stderr).strip()
+        # Che bí mật **trước** khi cắt (ADR-005 V1): `tail` đi vào
+        # `_bmad-output`, thư mục được commit theo dự án.
+        day_du, che = scrub_secrets((sb.stdout + "\n" + sb.stderr).strip())
         result.detail = "\n".join(day_du.splitlines()[-5:])
         result.unrunnable = _unrunnable_reason(
             getattr(sb, "exit_code", 0), day_du, getattr(sb, "provider_error", ""))
@@ -378,7 +380,8 @@ def run_suite(
         if store:
             store.tool_run(
                 story_id, f"qa:{kind.id}", ok=sb.ok, duration_ms=sb.duration_ms,
-                detail={"command": command, "tail": result.detail[:500]},
+                detail={"command": command, "tail": result.detail[:500],
+                        **({"redacted": che} if che else {})},
             )
 
     report.fake_tests = find_fake_tests(project, changed)

@@ -127,6 +127,11 @@ SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("token GitHub", re.compile(r"\bgh[pousr]_[A-Za-z0-9]{30,}")),
     ("khoá riêng tư", re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----")),
     ("token Slack", re.compile(r"\bxox[baprs]-[A-Za-z0-9\-]{10,}")),
+    # Hai mẫu thêm cho ADR-005 V1: khoá bí mật AWS (đúng 40 ký tự base64) và
+    # token Bearer — hai thứ hay lọt vào stdout của test tích hợp chứ không
+    # vào mã nguồn, nên bộ mẫu cũ (nhắm mã nguồn) chưa từng cần.
+    ("khoá bí mật AWS", re.compile(r"\bAWS_SECRET_ACCESS_KEY\s*[=:]\s*['\"]?[A-Za-z0-9/+=]{40}\b")),
+    ("token Bearer", re.compile(r"\bBearer\s+[A-Za-z0-9._\-]{20,}")),
     ("gán mật khẩu", re.compile(
         r"(?i)\b(password|passwd|pwd|pw|secret|api[_-]?key|access[_-]?token)\s*[=:]\s*"
         r"['\"][^'\"\s{}$]{8,}['\"]"
@@ -162,6 +167,26 @@ def check_secrets(content: str) -> Verdict:
                     f"hoặc kho bí mật, đừng viết thẳng vào mã nguồn.",
                 )
     return ALLOW
+
+
+REDACTED = "[REDACTED]"
+
+
+def scrub_secrets(text: str) -> tuple[str, int]:
+    """Che mọi chuỗi khớp `SECRET_PATTERNS` bằng `[REDACTED]`; trả (văn bản, số chỗ che).
+
+    Dùng cho **bằng chứng** — stdout/stderr của test/lint/qa ghi vào
+    `_bmad-output`, thư mục được commit theo dự án (ADR-005 V1). Khác
+    `check_secrets`, không bỏ qua dòng "giữ chỗ": che nhầm một ví dụ là vô
+    hại, còn bỏ sót một khoá thật thì nó đã nằm trong lịch sử git.
+    """
+    if not text:
+        return text, 0
+    total = 0
+    for _, pattern in SECRET_PATTERNS:
+        text, n = pattern.subn(REDACTED, text)
+        total += n
+    return text, total
 
 
 # ------------------------------------------------------------ lệnh shell

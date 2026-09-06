@@ -35,7 +35,7 @@ from ..control.bmad_status import HeadlessStatus, parse_headless_status
 from ..control.machine_gate import GateResult, check_prd
 from ..harness.observe import EvidenceStore
 from ..control.normalize import parse_prd_file
-from .implement import is_infrastructure_error
+from ..clients.stream import INFRA_STATUSES, exit_status_of
 
 ARTIFACT_ROOT = "_bmad-output"
 
@@ -320,7 +320,8 @@ def run_phase(
             break
         error = result.error or "lượt chạy thất bại"
         budget -= 1
-        if budget <= 0 or not is_infrastructure_error(error):
+        # Cùng bảng kết cục với vòng thử lại story (ADR-005 V11 B).
+        if budget <= 0 or exit_status_of(result) not in INFRA_STATUSES:
             out.error = error
             return out
         out.infra_retries += 1

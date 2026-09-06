@@ -186,7 +186,10 @@ Song song được: đợt 1 các V độc lập từng tệp (V1 `tools.py`, V2
 
 | V | Trạng thái | Số |
 |---|---|---|
-| V1 | chưa | — |
+| V1 | **xong** — T1 | **Trước:** 42 tệp `evidence/*.jsonl` (e9 + `par`/`par-A`/`par-B`) grep theo `SECRET_PATTERNS`: **0** khớp, cả toàn tệp lẫn riêng `detail.tail` — lỗ chưa từng rò, bản vá là phòng ngừa, evidence cũ không sửa. **Sau:** mọi `tail`, log toàn văn và `qa:*` đi qua `guardrails.scrub_secrets` (thêm 2 mẫu `AWS_SECRET_ACCESS_KEY=…` 40 ký tự và `Bearer …` — hai thứ lọt vào stdout test tích hợp chứ không vào mã nguồn); unit: stdout có AWS/`ghp_`/Bearer → `tail` 3 `[REDACTED]`, `detail.redacted = 3`; stdout sạch → không đổi, không có khoá `redacted`. |
+| V11 (A) | xong mã — **chưa đo** T12(A) | `aisdlc tool` in theo thứ tự: tóm tắt `testlog` (xanh/đỏ/bỏ qua + ≤ 20 tên test đỏ, ở 5 dòng đầu) → `tail` → "(lược N/M dòng — toàn văn: `_bmad-output/evidence/<story>-<tool>-<seq>.log`)"; log chỉ ghi khi output > 20 dòng và đã che; `tail` trong evidence vẫn 20 dòng (B5). Unit: 500 dòng → "lược 460/500", tệp log 500 dòng; output ngắn → không có dòng lược. Số "Bash chạy thẳng runner sau `aisdlc tool test`: N → 0" cần stream dogfood trên agent thật — chưa chạy. |
+| V11 (B) | **xong** — T12(B) | `AGENT_RUN.detail.exit_status` ∈ {ok, max_turns, timeout, cost, context, permission, infra, error} (`clients/stream.py::exit_status_of`, hàm thuần); `Attempt.infra` và vòng thử lại `plan` đọc cùng `INFRA_STATUSES` = {timeout, infra} — bảng `INFRA_ERRORS` cũ đã gỡ. Đo trên evidence e9 chỉ-đọc (bản ghi cũ không có khoá → suy bằng đúng `exit_status_of` trên `(ok, error)` đã ghi, đối chiếu `turns ≥ trần`): **max_turns 4 lượt / 3 story** — 01-01#1 (61/60), 01-05#1 **và** #3 (91/90), RP-05#1 (91/90); trong phạm vi bảng ADR-004 §6 (EPIC-01) là **2 story, bằng đếm tay** (01-01, 01-05) — ADR-004 ghi 01-05 "có" nhưng không nêu lần #3. `par`/`par-A`/`par-B`: 01-02#1 41/40, bằng đếm tay. Ba lượt RP-05 còn lại là `429` (hạn mức API): bảng cũ tính là lỗi chất lượng (đốt một lượt thử), lượt thật từ nay ra `infra` nhờ `api_error_status`. `aisdlc status` in "Lượt agent: ok n · max_turns n · … · chưa ghi n". |
+| V11 (C) | chưa | `aisdlc stuck` — luồng khác, làm sau khi đo. |
 | V2 | chưa | — |
 | V3 | chưa | — |
 | V4 | chưa | — |

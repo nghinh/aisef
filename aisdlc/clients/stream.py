@@ -170,6 +170,51 @@ class RunResult:
         }
 
 
+#: Kết cục một lượt, chuẩn hoá qua mọi client (ADR-005 V11 B). Danh sách
+#: đóng: `aisdlc status` đếm theo nó, `Attempt.infra` đọc nó thay vì dò chuỗi.
+EXIT_STATUSES = ("ok", "max_turns", "timeout", "cost", "context", "permission", "infra", "error")
+
+#: Kết cục **không phải lỗi của agent** — thử lại không tính vào hạn mức
+#: chất lượng (`run.max_retries`), có hạn mức hạ tầng riêng.
+INFRA_STATUSES = ("timeout", "infra")
+
+
+def exit_status_of(res: RunResult) -> str:
+    """Suy kết cục từ `subtype`/`terminal_reason`/`stop_reason`/`error`. Hàm
+    thuần: chỉ đọc `res`, không biết `max_turns` cấu hình — trần lượt là thứ
+    client tự báo (`terminal_reason: max_turns`, e9 01-01 61/60, 01-05 91/90).
+
+    Thứ tự có chủ đích: trần lượt trước hạ tầng — lượt chạm trần thường kèm
+    thông báo lỗi, xếp nó vào "hạ tầng" thì story ngốn lượt được thử lại
+    miễn phí. Client cắt vì hết giờ báo "quá <n>s" (`claude_code.run`,
+    `opencode.run`); không có sự kiện `result` là tiến trình chết giữa chừng.
+    """
+    if res.ok:
+        return "ok"
+    raw = res.raw_result or {}
+    err = (res.error or "").lower()
+    why = " ".join(
+        [str(raw.get(k) or "") for k in ("subtype", "terminal_reason", "stop_reason")]
+        + [str(raw.get("result") or "")[:300], err]
+    ).lower()
+    if "max_turns" in why:
+        return "max_turns"
+    if err.startswith("quá "):
+        return "timeout"
+    if "budget" in why or "max_cost" in why:
+        return "cost"
+    if any(m in why for m in ("prompt is too long", "context window", "context_length", "max_tokens")):
+        return "context"
+    if raw.get("api_error_status") or any(
+        m in why for m in ("api_error", "overloaded", "connection",
+                           "không chạy được", "không có sự kiện result")
+    ):
+        return "infra"
+    if res.permission_limited:
+        return "permission"
+    return "error"
+
+
 def _collect_assistant_tools(event: dict, out: list[ToolUse]) -> str:
     """Gom tool_use và text từ một sự kiện assistant."""
     text_parts = []

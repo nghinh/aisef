@@ -62,11 +62,21 @@ def cmd_status(args) -> int:
 
     ev_store = EvidenceStore(_artifact_root(args))
     nap = {}
+    ket_cuc: dict[str, int] = {}
     for sid in ev_store.stories():
-        sizes = [int(e.detail.get("prompt_chars") or 0)
-                 for e in ev_store.read(sid).of(AGENT_RUN)]
+        runs = ev_store.read(sid).of(AGENT_RUN)
+        sizes = [int(e.detail.get("prompt_chars") or 0) for e in runs]
         if any(sizes):
             nap[sid] = max(sizes)
+        for e in runs:
+            k = str(e.detail.get("exit_status") or "chưa ghi")
+            ket_cuc[k] = ket_cuc.get(k, 0) + 1
+    # Kết cục từng lượt gọi model (ADR-005 V11 B) — đếm theo `exit_status`
+    # harness chuẩn hoá lúc ghi. Lượt ghi trước khoá này là "chưa ghi":
+    # không suy đoán thay bằng chứng cũ.
+    if ket_cuc:
+        print("Lượt agent: " + " · ".join(
+            f"{k} {n}" for k, n in sorted(ket_cuc.items(), key=lambda kv: -kv[1])))
     if len(nap) >= 3:
         trung_vi = sorted(nap.values())[len(nap) // 2]
         phinh = {k: v for k, v in nap.items() if v > cfg["cost.warn_multiple"] * trung_vi}
@@ -235,11 +245,39 @@ def cmd_tool(args) -> int:
         config=Config.load(args.project),
     )
     print(res.summary())
-    if res.tail():
+    # Thứ tự có chủ đích (ADR-005 V11 A): kết luận máy đọc **trước** tail —
+    # tên test đỏ ở 5 dòng đầu, agent không phải tự chạy lại runner để tìm.
+    full = res.output()[0]
+    if res.name == "test" and res.ran:
+        from ..harness.testlog import parse as parse_testlog
+
+        log = parse_testlog(full)
+        if log.format:
+            print(f"{len(log.passed)} xanh · {len(log.failed)} đỏ · "
+                  f"{len(log.skipped)} bỏ qua ({log.format})")
+            for tid in log.failed[:20]:
+                print(f"  ✗ {tid}")
+            if len(log.failed) > 20:
+                print(f"  … và {len(log.failed) - 20} test đỏ nữa")
+    if full:
         print(res.tail(args.lines))
+    total = len(full.splitlines())
+    if total > args.lines:
+        # Khai cắt: agent biết mình chưa thấy hết, và biết toàn văn ở đâu.
+        toan_van = f" — toàn văn: {_rel(res.log, args.project)}" if res.log else ""
+        print(f"(lược {total - args.lines}/{total} dòng{toan_van})")
     if res.skipped:
         return EXIT_NOT_READY
     return EXIT_OK if res.ok else EXIT_NOT_READY
+
+
+def _rel(path: str, project) -> str:
+    """Đường dẫn ngắn khi tệp nằm trong dự án; tuyệt đối khi không (agent
+    chạy trong worktree, sổ bằng chứng ở gốc chính)."""
+    try:
+        return str(Path(path).resolve().relative_to(Path(project).resolve()))
+    except ValueError:
+        return path
 
 
 def cmd_qa(args) -> int:

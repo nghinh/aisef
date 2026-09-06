@@ -354,3 +354,19 @@ class TestMienTuongMinh(unittest.TestCase):
         self.assertEqual(rep.failed, [])
         self.assertEqual(rep.unconfigured, [], "miễn không phải là chưa cấu hình")
 
+
+class TestCheBiMat(QaTestCase):
+    def test_bi_mat_trong_output_kiem_dinh_bi_che(self):
+        """ADR-005 V1: `tail` của `qa:*` cũng đi vào `_bmad-output` được commit."""
+        cfg = self.config(**{
+            "verify.unit": "sh -c 'echo token=ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789; exit 1'",
+            "sandbox.use_docker": False,
+        })
+        r = run_suite(self.project, config=cfg, only=["unit"], has_ui=False,
+                      story_id="S-01", artifact_root=self.artifacts)
+        self.assertNotIn("ghp_", r.results[0].detail)
+        self.assertIn("[REDACTED]", r.results[0].detail)
+        e = EvidenceStore(self.artifacts).read("S-01").last(TOOL_RUN, "qa:unit")
+        self.assertEqual(e.detail["redacted"], 1)
+        self.assertNotIn("ghp_", e.detail["tail"])
+
