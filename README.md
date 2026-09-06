@@ -39,6 +39,12 @@ Không có phụ thuộc Python nào ngoài thư viện chuẩn. Tuỳ chọn:
 từ mockup) — thiếu thì framework **nói thẳng là thiếu** chứ không giả vờ
 vẫn kiểm được.
 
+## Hướng dẫn dùng từng bước
+
+Người mới bắt đầu đọc `docs/HUONG-DAN-SU-DUNG.md`: chuẩn bị máy, cài, viết
+`docs/requirements.md`, cấu hình lệnh test, đi hết tám cổng, đọc kết cục cổng,
+xử lý sự cố, bảng lệnh và bảng khoá cấu hình đầy đủ.
+
 ## Sáu bước
 
 ```bash
