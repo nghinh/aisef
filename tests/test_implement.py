@@ -1142,3 +1142,24 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         m = self.muc(out)
         self.assertIs(m.outcome, Outcome.UNRUNNABLE)
         self.assertIn("SHA cha", m.detail)
+
+    def test_gate_input_ghi_ngay_truoc_verdict_va_replay_ra_cung_ket_cuc(self):
+        """ADR-005 V4: đầu vào cổng nằm trong bằng chứng; replay bằng luật hiện
+        tại cho đúng mục chặn đã ghi."""
+        from aisdlc.control import replay as R
+
+        out = self.chay(self.GIA)
+        ev = self.evidence()
+        vao, ra = ev.last(NOTE, "gate:input"), ev.last(NOTE, "gate:verdict")
+        self.assertEqual(ra.seq, vao.seq + 1, "đầu vào ghi ngay trước phán quyết")
+        self.assertEqual(vao.detail["attempt"], ra.detail["attempt"])
+        for k in ("changed", "write_scope", "screens", "contract", "review_blocking", "security",
+                  "block_severities", "guard_expected", "acceptance", "coverage_min",
+                  "added_tests", "candidate", "preservation"):
+            self.assertIn(k, vao.detail, k)
+        self.assertEqual(vao.detail["candidate"], out.attempts[-1].candidate)
+        self.assertEqual(vao.detail["added_tests"], ["tests/test_ac.sh"])
+        [r] = R.replay(ev)
+        self.assertEqual(r.now, ra.detail["failures"])
+        self.assertEqual(r.changed(), [])
+

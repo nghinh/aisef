@@ -576,6 +576,28 @@ def _nop_at(ev: Evidence, sha: str) -> bool:
     return not e.detail.get("skipped") or ("files" in e.detail and not e.detail["files"])
 
 
+def _security_as_dict(rep: SecurityReport | None) -> dict | None:
+    """Báo cáo bảo mật dưới dạng ghi được — cùng hình với `tool_run security`,
+    nên `_security_from_evidence` đọc lại được y nguyên."""
+    if rep is None:
+        return None
+    return {"findings": [f.line() for f in rep.findings], "error": rep.error}
+
+
+def _record_gate_input(evidence: EvidenceStore, story_id: str, *, attempt: int, **kw) -> None:
+    """Ghi **đầu vào** cổng (ADR-005 V4): mọi kwargs của `gate.evaluate` JSON-hoá,
+    ngay trước khi chấm. Cổng thuần trên `Evidence` + 13 kwargs; kwargs chỉ
+    sống trong lượt chạy, nên trước đây mọi sửa luật cổng chỉ kiểm được bằng
+    unit hoặc trả tiền cho một lượt agent (0/17 lỗi chấm sai bắt được trước).
+    Có bản ghi này, `aisdlc gate --replay` chấm lại lượt cũ bằng mã hiện tại,
+    $0, tất định — không gọi model: lời reviewer/security đã nằm trong đây."""
+    detail = {**kw, "security": _security_as_dict(kw.get("security")), "attempt": attempt}
+    evidence.record(story_id, Event(
+        kind=NOTE, name="gate:input",
+        detail=json.loads(json.dumps(detail, ensure_ascii=False, default=str)),
+    ))
+
+
 def _security_from_evidence(e: Event) -> SecurityReport:
     """Dựng lại báo cáo bảo mật từ `tool_run security` — dòng `[mức] nội dung`
     là đúng dạng `parse` đọc, nên một bộ lọc nhiễu chấm cả bản sống lẫn
@@ -813,9 +835,7 @@ def verify_candidate(
                 },
             )
 
-    attempt.gate = story_gate.evaluate(
-        sid,
-        evidence.read(sid),
+    dau_vao = dict(
         changed=changed,
         write_scope=scope,
         screens=list(story.screens),
@@ -830,6 +850,10 @@ def verify_candidate(
         candidate=sha,
         preservation=preservation,
     )
+    # Đầu vào ghi **trước** khi đọc bằng chứng để chấm: replay dựng lại đúng
+    # tập sự kiện cổng đã thấy bằng cách cắt ở seq của bản ghi này (V4).
+    _record_gate_input(evidence, sid, attempt=number, **dau_vao)
+    attempt.gate = story_gate.evaluate(sid, evidence.read(sid), **dau_vao)
     attempt.ok = attempt.gate.passed
     # Kết cục cổng đi vào bằng chứng, mang SHA ứng viên: sổ hành vi (R2) coi
     # "qua cổng ở ứng viên này" là dấu landed ở mức lượt — implement không

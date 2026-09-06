@@ -166,6 +166,9 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   thêm/sửa → `tools.test` ghi `test:nop` mang `candidate`; `--verify-only` giữ
   khi đã có kết quả ở SHA. `run_baseline` ghi thêm `base_ref` để cổng biết
   baseline của lượt chạy lại đứng ở bản của chính story.
+- **Đầu vào cổng vào bằng chứng** (ADR-005 V4): `note gate:input` = 13 kwargs
+  của `gate.evaluate` ngay trước `gate:verdict`; `aisdlc gate --replay` chấm lại
+  lượt cũ bằng luật hiện tại, không gọi model (`control/replay.py`).
 - **Đổi hành vi — băm `stories.index.json`** (lỗi 25): chuẩn hoá JSON, bỏ
   story/epic sửa; phê duyệt `stories`/`readiness` cũ stale một lần.
 - **Mới** `aisdlc change FR-x "mô tả"`: ghi FR, stale PRD trở xuống, sinh story
@@ -280,7 +283,8 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   `candidate = HEAD`; báo cáo in cột SHA 7 ký tự (R1).
 - Loại sự kiện mới `BEHAVIOR`; `HANDOFF` (có từ ADR-003) ghi thêm ba slot
   `ledger` và `prompt_chars` thay cho knob đã gỡ; note mới
-  `review:verdict`/`security:verdict` (JSON), `gate:verdict`, `evidence_lookup`, `doc_lookup`; `tool_run test:nop` (V3).
+  `review:verdict`/`security:verdict` (JSON), `gate:input` (ADR-005 V4),
+  `gate:verdict`, `evidence_lookup`, `doc_lookup`; `tool_run test:nop` (V3).
 - Báo cáo: ô Map mockup lấy kết quả **mới nhất** từng màn (lỗi 18); cột tiêu
   chí có test `n/n`; SHA ứng viên.
 - OpenCode `--format json` → `MACHINE_OUTPUT`/`COST_REPORTING` NATIVE (vẫn hạng
@@ -314,8 +318,8 @@ Gỡ: `story.max_context_tokens` (chưa từng có mã đọc; `RETIRED`, cảnh
 
 `aisdlc improve` · `aisdlc evidence` · `aisdlc ctx` · `aisdlc doc` · `aisdlc change` ·
 `aisdlc skill --scan` · `aisdlc guard process-ref` · `aisdlc run --verify-only
---story S [--repeat K]`. Gói `aisdlc/cli/` tách từ một tệp `cli.py` (S5), không
-đổi hành vi.
+--story S [--repeat K]` · `aisdlc gate --replay` (ADR-005 V4). Gói `aisdlc/cli/` tách từ
+một tệp `cli.py` (S5), không đổi hành vi.
 
 ### Lỗi thật tìm bằng đo trong đợt này
 

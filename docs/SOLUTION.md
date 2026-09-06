@@ -150,7 +150,7 @@ dạng khoá (lỗi 10).
 | **Cost & latency** | token in/out · USD · giây — ghi vào mỗi `evidence/{story}.json`, cộng dồn theo epic |
 | **Ứng viên** | mỗi phép kiểm mang `detail.candidate` = SHA bản được kiểm (ADR-004 R1) |
 | **Sổ hành vi** | `control/ledger.py` — phép chiếu từ evidence, không phải kho mới: mỗi tiêu chí / FR / `qa:<kind>` / màn hình có trạng thái VERIFIED · GAP · REOPENED (`regressed_by`); chỉ ứng viên đã *landed* (nhật ký `merge.completed`/`attempt.committed`) mới thành VERIFIED. `ledger.json` + `INDEX.md` + mốc `loops[]`; metrics (tăng trưởng, hồi quy, gap đóng, cải thiện biên/$) ở phần 5 báo cáo (ADR-004 R2/R6/R7) |
-| Bàn giao & phán quyết | `handoff` (slot · nguồn · số ký tự, `prompt_chars`), `review:verdict`/`security:verdict` (JSON), `gate:verdict`; lời rà soát nguyên văn ở `_bmad-output/reviews/<story>-<vai>-<lượt>.md` (lỗi 16) |
+| Bàn giao & phán quyết | `handoff` (slot · nguồn · số ký tự, `prompt_chars`), `review:verdict`/`security:verdict` (JSON), `gate:input` (13 kwargs của `gate.evaluate` JSON-hoá, ghi ngay trước phán quyết — `aisdlc gate --replay` chấm lại lượt cũ bằng luật mới, ADR-005 V4), `gate:verdict`; lời rà soát nguyên văn ở `_bmad-output/reviews/<story>-<vai>-<lượt>.md` (lỗi 16) |
 | **Kết cục lượt** | `agent_run.detail.exit_status` ∈ ok · max_turns · timeout · cost · context · permission · infra · error — `clients/stream.py::exit_status_of`, một bảng cho cả vòng thử lại (`INFRA_STATUSES` = timeout, infra không ăn `run.max_retries`) lẫn `aisdlc status` ("Lượt agent: …", bản ghi cũ là "chưa ghi"); `tool_run.detail.redacted` = số bí mật đã che trong `tail`/log (ADR-005 V1/V11 B) |
 | Evaluation | chưa có bộ eval riêng cho skill/prompt; trôi chất lượng đo bằng kho dogfood `tests/dogfood/` (mốc lượt/chi phí) và hợp quy client `tests/conformance/` |
 | Dashboard | `aisdlc status` · `aisdlc report` · `aisdlc evidence <id>` |
@@ -414,6 +414,13 @@ aisdlc ctx [--story S | --file F] [--budget N]   bản đồ mã quanh phạm vi
 aisdlc issues [--format md|csv] [--epic E] [--status gap,reopened] [--out FILE]
                                       bảng gap/hồi quy từ sổ → `ISSUES.md|csv` (ADR-004 R12);
                                       chỉ tệp, không tạo issue ở tracker nào
+aisdlc gate    --replay <story> [--attempt n] | --all
+                                      chấm lại cổng story trên bằng chứng đã ghi (ADR-005 V4):
+                                      cắt bằng chứng ở `gate:input` của lượt, gọi `gate.evaluate`
+                                      của mã **hiện tại**, in bảng từng mục so với `gate:verdict`
+                                      đã ghi. Luật hợp trên lời reviewer/security **đã ghi** —
+                                      không gọi model, $0. Lượt trước V4 (không có `gate:input`)
+                                      → "không replay được", không đoán
 ```
 
 `report` chiếu bằng chứng thành **sổ hành vi** (ADR-004 R2): mỗi tiêu chí,
