@@ -94,6 +94,17 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 - Knob mới `sandbox.pre_deploy_degraded_waiver` (`""`): `pre-deploy` không
   nhận kiểm định ngoài Docker trừ khi có lý do khai; lý do vào `pre-deploy.json`
   (quyết định 4, STATUS §2.1). `sandbox.allow_degraded` (`true`) chỉ áp cho `run`.
+- **`ExecutionProvider` + `Guarantee`** (ADR-005 V5, `harness/sandbox.py`): bậc quyền
+  khai **cần** (`Level.requires()`), provider khai **có** (`guarantees(level)` →
+  `Support`); thiếu → `degraded` kèm **tên bảo đảm thiếu** (`SandboxResult.missing`
+  vào evidence, cột "cách ly" của `pre-deploy`, `doctor`); `allow_degraded=False`
+  từ chối lúc chọn provider, lệnh chưa chạy. Provider: `docker` · `local` · `fake`
+  (test `qa`/`tools` không Docker) · `"mô-đun:Lớp"` qua knob `sandbox.provider`.
+  `provider_error` tách lỗi hạ tầng (docker thoát 125: daemon, kéo image) khỏi lệnh
+  đỏ → tool báo "không chạy được". `docs/SANDBOX-CONFORMANCE.md` S1–S5 chạy thật,
+  mỗi provider một cột (`python3 -m tests.sandbox_conformance`). Sửa hai lỗi:
+  `_run_degraded` mất PATH khi `env` khác rỗng (ADR-005 §9); timeout Docker giết
+  CLI mà container `sleep` chạy tiếp (S5 lộ) — nay `docker rm -f` theo tên.
 - `AISDLC_PROJECT` truyền từ harness cho cả ba vai; guard đọc env trước (P0-1).
 
 ### 4 · Orchestration logic
@@ -213,6 +224,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 | `verify.baseline` | `true` | ADR-004 R9 |
 | `skills.inline` | `false` | ADR-003 §6 |
 | `sandbox.pre_deploy_degraded_waiver` | `""` | quyết định 4 |
+| `sandbox.provider` | `"docker"` | ADR-005 V5 |
 
 Gỡ: `story.max_context_tokens` (chưa từng có mã đọc; `RETIRED`, cảnh báo rồi bỏ qua).
 

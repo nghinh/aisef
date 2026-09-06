@@ -395,6 +395,18 @@ class TestPreDeployKhongChapNhanSuyBien(DeployTestCase):
         self.assertIn("sandbox.pre_deploy_degraded_waiver", m.detail)
         self.assertFalse(report.passed)
 
+    def test_suy_bien_neu_ten_bao_dam_thieu(self):
+        """ADR-005 V5: "ngoài Docker" chưa nói mất gì; cột cách ly và
+        `pre-deploy.json` nêu tên bảo đảm thiếu."""
+        self.approve_everything(); self.finish_a_story()
+        report = pre_deploy(self.project, config=self.cau_hinh())
+        m = self.muc(report, "cách ly")
+        for g in ("network_none", "non_root", "secrets_absent"):
+            self.assertIn(g, m.detail)
+        import json
+        data = json.loads(report.write(self.artifacts).read_text(encoding="utf-8"))
+        self.assertEqual(data["qa"]["missing"]["unit"], ["network_none", "non_root", "secrets_absent"])
+
     def test_co_waiver_thi_qua_va_ghi_vao_bang_chung(self):
         self.approve_everything(); self.finish_a_story()
         ly_do = "máy CI chưa có Docker, xem ticket OPS-12"

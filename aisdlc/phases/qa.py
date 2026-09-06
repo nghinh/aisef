@@ -115,6 +115,9 @@ class KindResult:
     #: Chạy ngoài Docker (suy biến). Kết quả vẫn tính, nhưng mức cách ly
     #: thấp hơn phải hiện ra — cổng trước triển khai đọc cờ này.
     degraded: bool = False
+    #: Tên bảo đảm bậc này cần mà provider thiếu (`sandbox.Guarantee`) —
+    #: "suy biến" không nói thiếu gì thì cổng không nói được đang tin gì.
+    missing: list[str] = field(default_factory=list)
 
     @property
     def configured(self) -> bool:
@@ -290,8 +293,8 @@ def _project_files(project: Path) -> list[str]:
     return out
 
 
-def _unrunnable_reason(exit_code: int, detail: str) -> str:
-    return unrunnable_reason("", exit_code, detail)
+def _unrunnable_reason(exit_code: int, detail: str, provider_error: str = "") -> str:
+    return unrunnable_reason("", exit_code, detail, provider_error=provider_error)
 
 
 def run_suite(
@@ -355,19 +358,22 @@ def run_suite(
                 timeout_seconds=cfg["run.timeout_seconds"],
                 allow_degraded=cfg["sandbox.allow_degraded"],
                 use_docker=cfg["sandbox.use_docker"],
+                provider=cfg["sandbox.provider"],
             )
         )
         result.ran = True
         result.ok = sb.ok
         result.duration_ms = sb.duration_ms
         result.degraded = bool(getattr(sb, "degraded", False))
+        result.missing = list(getattr(sb, "missing", []))
         # Dò dấu hiệu trên đầu ra **đầy đủ**, không phải phần đã cắt:
         # "Cannot find module" nằm ở đầu stack trace còn `detail` chỉ giữ
         # 5 dòng cuối. Đo trên e9: sau bản vá đầu tiên, `mutation` vẫn bị
         # đếm là test đỏ đúng vì chỗ này.
         day_du = (sb.stdout + "\n" + sb.stderr).strip()
         result.detail = "\n".join(day_du.splitlines()[-5:])
-        result.unrunnable = _unrunnable_reason(getattr(sb, "exit_code", 0), day_du)
+        result.unrunnable = _unrunnable_reason(
+            getattr(sb, "exit_code", 0), day_du, getattr(sb, "provider_error", ""))
         report.results.append(result)
         if store:
             store.tool_run(

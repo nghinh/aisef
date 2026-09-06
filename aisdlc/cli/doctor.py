@@ -79,23 +79,36 @@ def cmd_doctor(args) -> int:
 
     lines.append("Dự án:")
     check("thư mục dự án", project.is_dir(), str(project))
+    from ..harness import sandbox as _sandbox
+
     try:
         cfg_for_sandbox = Config.load(project)
         image = image_for(project, cfg_for_sandbox)
-        use_docker = cfg_for_sandbox["sandbox.use_docker"]
+        spec = _sandbox.SandboxSpec(
+            workspace=project, cmd=["true"],
+            use_docker=cfg_for_sandbox["sandbox.use_docker"],
+            provider=cfg_for_sandbox["sandbox.provider"],
+        )
     except ConfigError:
-        image, use_docker = "?", True
-    if not use_docker:
-        # Đã tắt Docker thì bàn về ảnh là vô nghĩa; thứ người cần biết là
-        # công cụ chạy thẳng trên máy, tức mức bảo đảm thấp hơn.
+        image, spec = "?", _sandbox.SandboxSpec(workspace=project, cmd=["true"])
+    # Provider đang dùng và bảo đảm nó khai (ADR-005 V5): người đọc biết
+    # bằng chứng sắp ghi `degraded` vì **thiếu gì**, trước khi chạy story nào.
+    try:
+        prov, missing = _sandbox.select_provider(spec)
+    except (RuntimeError, ValueError, ImportError, AttributeError) as e:
+        prov, missing = None, []
+        check("sandbox provider", False, str(e), required=False)
+    if prov is not None:
+        co = sorted(g.value for g, s in prov.guarantees(spec.level).items() if s.blocks_at_source)
         check(
-            "cách ly sandbox",
-            False,
-            "đã tắt Docker (sandbox.use_docker=false) — công cụ chạy thẳng "
-            "trên máy, bằng chứng ghi degraded",
+            "sandbox provider", not missing,
+            f"{prov.id} — bảo đảm ở {spec.level.value}: {', '.join(co) or 'không có'}"
+            + (f"; THIẾU {', '.join(missing)} — công cụ chạy ngoài cách ly, bằng chứng ghi degraded"
+               if missing else ""),
             required=False,
         )
-    else:
+    if prov is not None and prov.id == "docker":
+        # Chỉ Docker mới bàn về ảnh; provider khác chạy công cụ của máy.
         check(
             "ảnh sandbox",
             image != "alpine:latest",

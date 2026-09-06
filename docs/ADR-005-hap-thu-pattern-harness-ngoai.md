@@ -191,6 +191,7 @@ Song song được: đợt 1 các V độc lập từng tệp (V1 `tools.py`, V2
 | V3 | chưa | — |
 | V4 | chưa | — |
 | R13 | đang (W8) | — |
-| V5–V13 | chưa | — |
+| V5 | hiện thực 2026-09-06 (X5), chờ số `par` | `test_sandbox` 23 → 45 xanh (8 Docker thật); `qa.run_suite`/`run_tool` chạy trên `FakeProvider` không Docker (test_qa +3, test_tools +2, test_deploy +1). `docs/SANDBOX-CONFORMANCE.md` S1–S5 chạy thật: **Docker 5/5** (S1 `bad address`, S2 `Read-only file system`, S3 `Permission denied`, S4 env sạch canary, S5 exit 124 + 0 container còn lại), **Local 2/5** (S3/S5 đạt nhờ hoàn cảnh máy — bảng ghi rõ provider khai `unsupported`; S1 ✗ vì máy không có `wget`, không kết luận). `pre-deploy` cột "cách ly" và `doctor` nêu tên bảo đảm thiếu (`network_none, non_root, secrets_absent`). Hai lỗi sửa có test đỏ khi hoàn nguyên: `_run_degraded` mất PATH (`env` khác rỗng → 127); timeout Docker để container `sleep 9999` chạy tiếp (S5 lộ, nay `docker rm -f` theo tên). **Chưa đo:** `par` diff `gate:verdict` (gate không đọc sandbox — `control/gate.py` không import; cần lượt agent để chốt) và `duration_ms` `tool_run test` ±5 % (cùng `_run_docker`, thêm `--name` + 0 lệnh khi không timeout — kỳ vọng 0 %). |
+| V6–V13 | chưa | — |
 
 Phát hiện phụ trong lúc đọc, cần sửa dù không thuộc V nào: `sandbox.py:189` `env={**spec.env} or None` mất PATH khi env khác rỗng (chưa ai truyền — sửa trước V5); `impact.builtin` không giảm trọng tên phổ biến (3 dòng, đo bằng số tệp `callers` trên diff e9); `REQUIREMENTS-EVIDENCE.md` còn ghi "cổng 6 điều kiện" trong khi mã có 16.

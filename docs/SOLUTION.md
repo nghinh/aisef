@@ -110,11 +110,12 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 | Hạng mục | Hiện thực |
 |---|---|
 | Bậc quyền | `READ_ONLY` → `WORKSPACE_WRITE` → `WORKSPACE_NETWORK` → `PRIVILEGED_TEST` |
-| Bộ thực thi | Docker: `--network=none` mặc định · `--cap-drop=ALL` · non-root · chỉ mount worktree của story |
+| Bộ thực thi | `ExecutionProvider` (ADR-005 V5, `harness/sandbox.py`): `docker` mặc định (`--network=none` theo bậc · `--cap-drop=ALL` · non-root · chỉ mount worktree của story · `-e` chỉ mang `spec.env`) · `local` (chạy thẳng) · `fake` (test, không Docker) · backend ngoài `"mô-đun:Lớp"` qua knob `sandbox.provider`. Một lệnh một lần chạy, không session |
+| Bảo đảm có tên | `Guarantee` = `network_none` · `read_only_fs` · `non_root` · `no_host_mount` · `secrets_absent`. Bậc khai **cần** (`Level.requires()`), provider khai **có** (`guarantees(level)` → `Support` native/emulated/post_hoc/unsupported của `clients/base.py`, đọc tên thật). Kiểm bằng lần chạy thật: `docs/SANDBOX-CONFORMANCE.md` S1–S5, mỗi provider một cột (`python3 -m tests.sandbox_conformance`) |
 | Công cụ verify | chạy **trong image**, không cài lên máy host (giải quyết việc thiếu pytest/semgrep/trivy/k6) |
 | Ảnh | chọn theo stack dự án (`node:22-alpine`, `python:3.12-alpine`…), cấu hình đè được. `alpine` trơn không có công cụ nào, chạy `npm test` trong đó sẽ đỏ vì **thiếu công cụ** chứ không phải vì code sai — `doctor` cảnh báo đúng chỗ này |
 | Mạng cho tool | tắt mặc định; dự án cần cài phụ thuộc thì khai `sandbox.tools_network` tường minh |
-| Suy biến | Không có Docker → subprocess giới hạn + **ghi rõ mức bảo đảm thấp hơn** vào evidence |
+| Suy biến | Provider thiếu bảo đảm bậc cần → `degraded=True` **kèm tên bảo đảm thiếu** (`SandboxResult.missing` vào evidence, cột "cách ly" của `pre-deploy`, `doctor`); `allow_degraded=False` từ chối **lúc chọn provider**, lệnh chưa chạy. Lỗi hạ tầng (daemon, kéo image — docker thoát 125) ghi `provider_error`; tool báo "không chạy được", không "test đỏ" |
 
 ### 5.4 Orchestration logic
 | Hạng mục | Hiện thực |
@@ -618,6 +619,7 @@ Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏn
 | `sandbox.tools_network` | `false` | dự án cần cài phụ thuộc mới mở mạng, và phải khai tường minh |
 | `sandbox.use_docker` | `true` | tắt được cho toolchain gắn với máy chủ, nhưng luôn ghi `degraded` |
 | `sandbox.allow_degraded` | `true` | `run` chấp nhận kiểm định ngoài Docker khi không có Docker, ghi `degraded` vào bằng chứng |
+| `sandbox.provider` | `"docker"` | provider chạy lệnh (ADR-005 V5): `docker` · `local` · `"mô-đun:Lớp"` cho backend ngoài cùng hợp đồng `harness/sandbox.py::ExecutionProvider`; thiếu bảo đảm nào thì bằng chứng ghi tên bảo đảm ấy (`missing`). `sandbox.use_docker=false` tương đương `local` |
 | `sandbox.pre_deploy_degraded_waiver` | `""` | cổng `pre-deploy` **không** nhận suy biến (QĐ4) trừ khi có lý do khai ở đây; lý do ghi vào `pre-deploy.json` |
 | `app.dev_command` · `app.base_url` · `app.ready_timeout_seconds` | `""` · `http://localhost:5173` · `60` | để mở **route thật** lúc đối chiếu mockup; cổng đã có người trả lời thì từ chối, không nhận vơ (lỗi 15) |
 | `route.developer_model` · `route.reviewer_model` · `route.designer_model` | `""` | chọn model theo vai; rỗng thì theo mặc định của client |

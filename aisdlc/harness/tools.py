@@ -117,7 +117,8 @@ class ToolResult:
         if self.skipped:
             return f"{self.name}: bỏ qua — {self.skipped}"
         mark = "✅" if self.ok else "✗"
-        extra = " (sandbox suy biến)" if self.degraded else ""
+        thieu = ", ".join(self.detail.get("missing") or [])
+        extra = f" (sandbox suy biến — thiếu {thieu or 'bảo đảm'})" if self.degraded else ""
         return f"{mark} {self.name} — thoát {self.exit_code}, {self.duration_ms}ms{extra}"
 
     def tail(self, lines: int = 40) -> str:
@@ -210,6 +211,7 @@ def run_tool(
             timeout_seconds=cfg["run.timeout_seconds"],
             allow_degraded=cfg["sandbox.allow_degraded"],
             use_docker=cfg["sandbox.use_docker"],
+            provider=cfg["sandbox.provider"],
         )
     )
     res = ToolResult(
@@ -223,7 +225,10 @@ def run_tool(
         detail={"command": command, **sb.to_evidence()},
     )
     if not sb.ok:
-        res.unrunnable = unrunnable_reason(name, sb.exit_code, sb.stdout + "\n" + sb.stderr)
+        res.unrunnable = unrunnable_reason(
+            name, sb.exit_code, sb.stdout + "\n" + sb.stderr,
+            provider_error=sb.provider_error,
+        )
     record(res, story_id, artifact_root, candidate)
     return res
 
@@ -241,10 +246,13 @@ MISSING_TOOL = (
 )
 
 
-def unrunnable_reason(name: str, exit_code: int, output: str) -> str:
+def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error: str = "") -> str:
     """Lý do một dòng nếu lần chạy là "không chạy được"; "" nếu là kết quả thật.
     Với `test`, chỉ kết luận khi **không test nào xanh** — một test đỏ có
-    thông báo "not found" vẫn là test đỏ."""
+    thông báo "not found" vẫn là test đỏ. ``provider_error`` là lỗi hạ tầng
+    sandbox (daemon, kéo image) — lệnh chưa từng chạy, kết luận ngay."""
+    if provider_error:
+        return f"hạ tầng sandbox lỗi ({provider_error}) — lệnh chưa chạy; kiểm daemon/image rồi chạy lại"
     low = output.lower()
     hit = next((m for m in MISSING_TOOL if m in low), "")
     if exit_code != 127 and not hit:
