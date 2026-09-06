@@ -20,8 +20,10 @@ thẳng là nó thô.
 from __future__ import annotations
 
 import json
+import math
 import re
 import subprocess
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -202,12 +204,88 @@ def _run_command(
 
 
 #: Tên xuất khẩu, theo họ ngôn ngữ. Cố ý chỉ bắt **khai báo xuất khẩu**:
-#: biến cục bộ không đáng dò tham chiếu toàn kho.
+#: biến cục bộ không đáng dò tham chiếu toàn kho. Nhóm 1 = loại, nhóm 2 = tên.
 _EXPORTS = (
-    re.compile(r"^\s*export\s+(?:default\s+)?(?:async\s+)?"
-               r"(?:function|class|const|let|var|interface|type|enum)\s+(\w+)", re.M),
-    re.compile(r"^\s*(?:public\s+|def\s+|class\s+|func\s+|fn\s+)(\w+)", re.M),
+    # `[ \t]*` chứ không `\s*`: `\s` nuốt cả dòng trống phía trước và số
+    # dòng của định nghĩa lệch đi chừng ấy dòng.
+    re.compile(r"^[ \t]*export\s+(?:default\s+)?(?:async\s+)?"
+               r"(function|class|const|let|var|interface|type|enum)\s+(\w+)", re.M),
+    re.compile(r"^[ \t]*(?:public\s+|async\s+)?(def|class|func|fn)\s+(\w+)", re.M),
 )
+
+#: Tên ngắn hơn chừng này không đáng dò: `id`, `run`, `get` dính khắp kho.
+MIN_NAME_LEN = 4
+#: Tên định nghĩa ở nhiều hơn chừng này tệp là tên phổ biến (`save`,
+#: `render`) — Aider giảm trọng ×0,1; trước đây `builtin` để chúng lấp đầy
+#: `callers` rồi cắt lặng ở MAX_PER_KIND (ADR-005 §9, phát hiện 5).
+COMMON_DEFS = 5
+
+
+def _read(path: Path) -> str | None:
+    if not path.is_file() or path.suffix not in SOURCE_EXT:
+        return None
+    try:
+        return path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+
+
+def symbols(project: Path | str, files=None) -> dict[str, list[tuple[str, int, str]]]:
+    """{tệp: [(tên, dòng, loại)]} — tên xuất khẩu của từng tệp.
+
+    Bỏ tên `_private` (Aider: không đáng dò ngoài tệp) và tên ngắn hơn
+    `MIN_NAME_LEN`. ``files`` là đường dẫn tương đối; ``None`` = cả kho.
+    """
+    project = Path(project)
+    out: dict[str, list[tuple[str, int, str]]] = {}
+    for rel in (files if files is not None else _rel_files(project)):
+        body = _read(project / rel)
+        if body is None:
+            continue
+        found = []
+        for pat in _EXPORTS:
+            for m in pat.finditer(body):
+                kind, name = m.group(1), m.group(2)
+                if len(name) < MIN_NAME_LEN or name.startswith("_"):
+                    continue
+                found.append((name, body.count("\n", 0, m.start()) + 1, kind))
+        if found:
+            out[rel] = sorted(set(found), key=lambda t: t[1])
+    return out
+
+
+def refs(project: Path | str, names, files=None) -> dict[str, dict[str, int]]:
+    """{tên: {tệp: số lần nhắc}} — **một** lượt quét kho cho mọi tên.
+
+    Nhận nhiều tên một lần thay vì một tên mỗi lần gọi: 50 tên × 500 tệp
+    quét lại từng tên là 25 000 lần đọc, gộp lại còn 500.
+    """
+    project = Path(project)
+    names = sorted({n for n in names if n}, key=len, reverse=True)
+    out: dict[str, dict[str, int]] = {n: {} for n in names}
+    if not names:
+        return out
+    pat = re.compile(r"\b(?:" + "|".join(re.escape(n) for n in names) + r")\b")
+    for rel in (files if files is not None else _rel_files(project)):
+        body = _read(project / rel)
+        if body is None:
+            continue
+        for name, k in Counter(pat.findall(body)).items():
+            out[name][rel] = k
+    return out
+
+
+def weights(project: Path | str, names, files=None) -> dict[str, float]:
+    """Trọng số mỗi tên theo ba luật của Aider: `_private` → 0, định nghĩa ở
+    > `COMMON_DEFS` tệp → ×0,1, còn lại 1. Luật thứ ba (√số lần nhắc) áp ở
+    chỗ cộng điểm, không ở đây."""
+    defs: Counter = Counter()
+    for syms in symbols(project, files).values():
+        defs.update({n for n, _, _ in syms})
+    return {
+        n: 0.0 if n.startswith("_") else (0.1 if defs[n] > COMMON_DEFS else 1.0)
+        for n in names
+    }
 
 
 def builtin(project: Path | str, changed: list[str]) -> ImpactReport:
@@ -217,75 +295,55 @@ def builtin(project: Path | str, changed: list[str]) -> ImpactReport:
     thấy — nhưng chạy được ngay, không cài gì, và trả lời đúng câu hỏi
     đắt nhất: **tên nào vừa đổi mà không test nào nhắc tới**. Khuôn thất
     bại lặp lại nhiều nhất trên e9 chính là loại đó.
+
+    Điểm một tệp = Σ trọng số(tên) × √(số lần nhắc); tệp dưới 1 điểm (chỉ
+    dính tên phổ biến) bị bỏ, phần còn lại xếp theo điểm rồi mới cắt ở
+    `MAX_PER_KIND` — tên `save`/`render` không còn đẩy tệp gọi thật ra
+    khỏi danh sách.
     """
     project = Path(project)
     rep = ImpactReport(source="dựng sẵn (dò theo tên)", degraded=True)
-    doi = {c for c in changed}
+    doi = set(changed)
 
-    names: set[str] = set()
-    for rel in changed:
-        f = project / rel
-        if not f.is_file() or f.suffix not in SOURCE_EXT:
-            continue
-        try:
-            body = f.read_text(encoding="utf-8", errors="replace")
-        except OSError:
-            continue
-        for pat in _EXPORTS:
-            names |= {m for m in pat.findall(body) if len(m) >= 4}
+    names = sorted({n for syms in symbols(project, changed).values() for n, _, _ in syms})
     if not names:
         rep.note = "không thấy tên xuất khẩu nào trong tệp đã đổi"
         return rep
-    rep.changed_symbols = sorted(names)
+    rep.changed_symbols = names
 
-    callers: set[str] = set()
-    tests: set[str] = set()
+    files = list(_rel_files(project))
+    w = weights(project, names, files)
+    score: dict[str, float] = defaultdict(float)
     nhac: set[str] = set()      # tên được test nhắc tới
-    for f in _source_files(project):
-        rel = str(f.relative_to(project))
-        if rel in doi:
-            continue
-        try:
-            body = f.read_text(encoding="utf-8", errors="replace")
-        except OSError:
-            continue
-        hit = {n for n in names if re.search(rf"\b{re.escape(n)}\b", body)}
-        if not hit:
-            continue
-        if is_test_path(rel):
-            tests.add(rel)
-            nhac |= hit
-        else:
-            callers.add(rel)
+    for name, per_file in refs(project, names, files).items():
+        for rel, n in per_file.items():
+            # Chính tệp vừa sửa không phải "nơi dùng" của chính nó; test
+            # **trong** diff thì tính — story hay viết test cạnh code.
+            if rel in doi and not is_test_path(rel):
+                continue
+            score[rel] += w[name] * math.sqrt(n)
+            if is_test_path(rel):
+                nhac.add(name)
 
-    # Test **trong** diff cũng tính: story hay viết test cạnh code.
-    for rel in changed:
-        if not is_test_path(rel):
-            continue
-        f = project / rel
-        if not f.is_file():
-            continue
-        try:
-            body = f.read_text(encoding="utf-8", errors="replace")
-        except OSError:
-            continue
-        hit = {n for n in names if re.search(rf"\b{re.escape(n)}\b", body)}
-        if hit:
-            tests.add(rel)
-            nhac |= hit
-
-    rep.callers = sorted(callers)
-    rep.related_tests = sorted(tests)
-    rep.untested_symbols = sorted(names - nhac)
+    kept = sorted((rel for rel, s in score.items() if s >= 1.0), key=lambda r: (-score[r], r))
+    rep.callers = [r for r in kept if not is_test_path(r)]
+    rep.related_tests = [r for r in kept if is_test_path(r)]
+    rep.untested_symbols = sorted(set(names) - nhac)
     return rep
+
+
+def _rel_files(project: Path):
+    """Đường dẫn tương đối (posix) của mọi tệp mã nguồn trong kho."""
+    for f in _source_files(project):
+        yield f.relative_to(project).as_posix()
 
 
 def _source_files(project: Path):
     bo_qua = {
         "node_modules", ".git", "dist", "build", "__pycache__", ".venv",
-        "venv", "target", ".next", "coverage", "_bmad-output", ".aisdlc",
+        "venv", "target", ".next", "coverage", "_bmad-output", ".aisdlc", ".claude",
     }
-    for f in project.rglob("*"):
+    for f in sorted(project.rglob("*")):
         if not f.is_file() or f.suffix not in SOURCE_EXT:
             continue
         if bo_qua & set(f.parts):
@@ -294,9 +352,13 @@ def _source_files(project: Path):
 
 
 __all__ = [
+    "COMMON_DEFS",
     "MAX_PER_KIND",
     "ImpactReport",
     "analyse",
     "builtin",
     "is_test_path",
+    "refs",
+    "symbols",
+    "weights",
 ]

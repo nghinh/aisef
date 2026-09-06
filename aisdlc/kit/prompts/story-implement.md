@@ -1,6 +1,6 @@
 ---
 name: story-implement
-version: 6
+version: 7
 role: developer
 ---
 # {{ story_id }} — {{ story_title }}
@@ -27,6 +27,8 @@ Guard chặn mọi thao tác ghi ngoài phạm vi này, ngay lúc ghi. Nếu b�
 mình **cần** ghi chỗ khác thì đừng tìm đường lách: dừng lại, nói rõ cần
 thêm đường dẫn nào và vì sao. Phạm vi khai thiếu là lỗi của story, sửa ở
 story, không sửa bằng cách đi vòng.
+
+{{ repo_map }}
 
 ## Giao diện
 

@@ -16,6 +16,7 @@ from ._common import EXIT_USAGE, _gate_arg
 from .doctor import cmd_doctor
 from .harness import cmd_compile, cmd_doc, cmd_guard, cmd_init, cmd_setup, cmd_skill
 from .implement import (
+    cmd_ctx,
     cmd_devsecops,
     cmd_evidence,
     cmd_improve,
@@ -176,6 +177,13 @@ def build_parser() -> argparse.ArgumentParser:
     ev.add_argument("id", help="mã story (STORY-01-04) hoặc mã hành vi (AC-STORY-01-04-2, FR-3, qa:e2e, mockup:notes-list)")
     ev.add_argument("--story", default="", help="ghi bằng chứng evidence_lookup cho story này")
     ev.set_defaults(func=cmd_evidence)
+
+    cx = sub.add_parser("ctx", help="bản đồ mã quanh phạm vi ghi của một story — đầy đủ, không cắt "
+                                    "(ADR-005 V7; slot `repo_map` của prompt là bản có trần)")
+    cx.add_argument("--story", default="", help="mã story (mặc định: AISDLC_STORY_ID của phiên)")
+    cx.add_argument("--file", default="", help="vẽ quanh một tệp/thư mục thay vì phạm vi story")
+    cx.add_argument("--budget", type=int, default=0, help="trần ký tự; 0 = không cắt")
+    cx.set_defaults(func=cmd_ctx)
 
     iss = sub.add_parser("issues", help="xuất bảng gap/hồi quy từ sổ hành vi ra tệp "
                                         "(ADR-004 R12) — để theo dõi, không chạm cổng")

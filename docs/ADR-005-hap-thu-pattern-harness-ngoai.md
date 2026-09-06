@@ -191,6 +191,21 @@ Song song được: đợt 1 các V độc lập từng tệp (V1 `tools.py`, V2
 | V3 | chưa | — |
 | V4 | chưa | — |
 | R13 | đang (W8) | — |
-| V5–V13 | chưa | — |
+| V5–V6 | chưa | — |
+| V7 | **hiện thực, tắt mặc định** — chờ A/B T8 (≈ $40, người điều phối) | hồi cứu $0 dưới đây; A/B chưa đo |
+| V8–V13 | chưa | — |
+
+**V7 — hồi cứu $0 lỗi 21 (T8 phần a), 2026-09-06.** Cây e9 tại `2424265` (commit cuối của 01-04 trên `main`, cha của commit đầu 01-05 `b82b304`), giải nén bằng `git archive` — không chạm worktree. Scope BMAD của 01-05 lúc ấy: 8 đường dẫn `src/**` (4 có thật: `route.ts`, `store/notes.ts`, `app-shell.tsx`, `notes-list-screen.tsx`), hợp đồng `unit · e2e · accessibility · mockup-map`, `.ai/config.json` đã có `verify.e2e` / `verify.accessibility`; trên đĩa có `tests/e2e/smoke.spec.ts` và `tests/a11y/axe.spec.ts`.
+
+| Cách vẽ | `tests/e2e/*.spec.ts` lộ? | Ở mục | Ký tự |
+|---|---|---|---|
+| (A) hạt giống như harness hôm nay = `effective_write_scope` ∪ `verification_paths` ∪ 48 định danh story | **có** (cả `tests/a11y/axe.spec.ts`), cả bản đầy đủ lẫn bản cắt 2 000 | (a) skeleton — vì `verification_paths` đã **cấp** `tests/e2e`, `tests/a11y` vào phạm vi | đầy đủ 3 119 · cắt 1 969 |
+| (B) phạm vi **trước** sửa lỗi 21 = chỉ `src/**` BMAD khai + định danh | **không** | — (mục (c) chỉ liệt kê `src/store/notes.test.ts`) | 3 000 |
+
+Kết luận **khác** với giả định ở §3 V7: bản đồ theo tham chiếu tên **không** tự lộ lỗi 21. Hai spec e2e/a11y tại SHA ấy là hộp đen — `page.goto('/')`, locator `main`, axe — không nhắc một tên xuất khẩu nào của `src`, nên (c) không có gì để bắt. Thứ lộ `tests/e2e` là `verification_paths` (chính bản sửa lỗi 21, đã có), và repo map chỉ **in** cái đó ra cho agent thấy ở mục (a). Giá trị còn lại của V7 với lỗi 21 là làm phần cấp thêm hiện **có tên tệp** (`smoke.spec.ts`, `axe.spec.ts`) thay vì chỉ tên thư mục ở slot `write_scope` — chưa đo là nó đổi được lượt nào. Thời gian: 137 ms cho ba lần vẽ (đầy đủ + cắt + src-only) trên 36 tệp mã ở load 32 (440 ms khi load 147).
+
+`prompt_chars` giả định: 2 000 / 11 537 = **+17,3 %** > trần 15 % (B5) → **đề xuất ngân sách A/B là 1 500** (+13,0 %); knob mặc định vẫn 0. Bản cắt 2 000 của 01-05 dừng giữa mục (b) (lân cận), chưa tới mục (c) — nghĩa là với 1 500 cũng mất mục test; nếu A/B cho thấy (c) đáng giá hơn (b) thì đảo thứ tự (c) trước (b) là sửa một dòng.
+
+Phát hiện phụ khi hồi cứu: `impact._EXPORTS` dùng `^\s*` nên `\s` nuốt dòng trống phía trước và số dòng định nghĩa lệch (e9 `notes.ts` báo dòng 30/60/74 trống) — sửa thành `^[ \t]*`; `impact.builtin` trước/sau giảm trọng trên diff e9 01-05 (cây hiện tại, 8 tệp): `callers` 7 → 5, `related_tests` 1 → 1, `untested_symbols` 27 → 27 — e9 (36 tệp mã) **không có** tên nào định nghĩa ở > 5 tệp, nên ×0,1 không đổi gì; √n chỉ đổi thứ tự (`bench/bench.ts` nhắc nhiều nhất lên đầu); 2 tệp bớt đi là `.claude/skills/**/scripts/process.py` — skill của agent lọt vào `callers`, nay `_source_files` bỏ `.claude/` như `node_modules`. Luật ×0,1 có tác dụng đo được trên fixture (`test_do_truoc_sau_so_tep_callers`: 22 tệp → 1, tệp gọi thật từ thứ 22 lên thứ 1) — kho nào nhiều `render`/`save` mới thấy nó trên diff thật.
 
 Phát hiện phụ trong lúc đọc, cần sửa dù không thuộc V nào: `sandbox.py:189` `env={**spec.env} or None` mất PATH khi env khác rỗng (chưa ai truyền — sửa trước V5); `impact.builtin` không giảm trọng tên phổ biến (3 dòng, đo bằng số tệp `callers` trên diff e9); `REQUIREMENTS-EVIDENCE.md` còn ghi "cổng 6 điều kiện" trong khi mã có 16.

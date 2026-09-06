@@ -17,10 +17,14 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisdlc.control.impact import (  # noqa: E402
+    COMMON_DEFS,
     ImpactReport,
     analyse,
     builtin,
     is_test_path,
+    refs,
+    symbols,
+    weights,
 )
 
 
@@ -87,8 +91,10 @@ class TestBuiltin(ImpactTestCase):
     def test_bo_qua_thu_muc_phu_thuoc(self):
         self.du_an()
         self.write("node_modules/x/index.ts", "registerSW()\n")
+        self.write(".claude/skills/x/scripts/process.py", "registerSW()\n")   # skill của agent, không phải mã dự án
         r = builtin(self.p, ["src/main.ts"])
         self.assertNotIn("node_modules/x/index.ts", r.callers)
+        self.assertEqual(r.callers, ["src/ui/app.ts"])
 
     def test_khong_co_ten_xuat_khau_thi_noi_thang(self):
         self.write("src/rong.ts", "const cucBo = 1\n")
@@ -101,6 +107,57 @@ class TestBuiltin(ImpactTestCase):
         biết mức tin cậy."""
         self.du_an()
         self.assertTrue(builtin(self.p, ["src/main.ts"]).degraded)
+
+
+class TestGiamTrong(ImpactTestCase):
+    """Ba luật của Aider (ADR-005 V7): tên định nghĩa ở > 5 tệp ×0,1,
+    `_private` bỏ, đếm √n. Trước đây `save`/`render` lấp `callers` rồi bị
+    cắt lặng ở 12 mục — tệp gọi thật rơi ra ngoài danh sách."""
+
+    def kho_ten_pho_bien(self):
+        self.write("src/main.ts", "export function render() {}\nexport function watchNotes() {}\n")
+        for i in range(COMMON_DEFS + 1):
+            self.write(f"src/w{i}.ts", "export function render() {}\n")
+        for i in range(15):
+            self.write(f"src/chi-render-{i:02}.ts", "render()\n")
+        self.write("src/goi-that.ts", "watchNotes()\n")
+
+    def test_ten_o_sau_tep_khong_lot_callers(self):
+        self.kho_ten_pho_bien()
+        r = builtin(self.p, ["src/main.ts"])
+        self.assertEqual(r.callers, ["src/goi-that.ts"])
+
+    def test_do_truoc_sau_so_tep_callers(self):
+        """Không giảm trọng: 22 tệp, tệp gọi thật đứng sau 15 tệp `chi-render-*`
+        và 6 tệp `w*` → rơi ngoài 12 mục; có giảm trọng: 1 tệp, đúng tệp."""
+        self.kho_ten_pho_bien()
+        khong_giam = {rel for per in refs(self.p, ["render", "watchNotes"]).values() for rel in per}
+        khong_giam = sorted(khong_giam - {"src/main.ts"})
+        self.assertEqual(len(khong_giam), 15 + COMMON_DEFS + 1 + 1)
+        self.assertGreater(khong_giam.index("src/goi-that.ts"), 12)
+        self.assertEqual(len(builtin(self.p, ["src/main.ts"]).callers), 1)
+
+    def test_trong_so_theo_ba_luat(self):
+        self.kho_ten_pho_bien()
+        w = weights(self.p, ["render", "watchNotes", "_rieng"])
+        self.assertEqual(w, {"render": 0.1, "watchNotes": 1.0, "_rieng": 0.0})
+
+    def test_symbols_bo_private_va_ten_ngan(self):
+        self.write("src/x.py", "def _rieng():\n    pass\ndef ok():\n    pass\nclass KhoLuu:\n    pass\n")
+        self.assertEqual(symbols(self.p, ["src/x.py"]), {"src/x.py": [("KhoLuu", 5, "class")]})
+
+    def test_refs_dem_so_lan_mot_luot_quet(self):
+        self.write("src/a.ts", "export function luuKho() {}\n")
+        self.write("src/b.ts", "luuKho(); luuKho()\n")
+        self.assertEqual(refs(self.p, ["luuKho"])["luuKho"], {"src/a.ts": 1, "src/b.ts": 2})
+
+    def test_can_bac_hai_xep_truoc(self):
+        """√n: tệp nhắc 100 lần đứng trước tệp nhắc 1 lần, nhưng chỉ hơn 10
+        lần điểm chứ không 100 — không đè được tên có trọng số đầy."""
+        self.write("src/main.ts", "export function watchNotes() {}\n")
+        self.write("src/nhieu.ts", "watchNotes()\n" * 100)
+        self.write("src/it.ts", "watchNotes()\n")
+        self.assertEqual(builtin(self.p, ["src/main.ts"]).callers, ["src/nhieu.ts", "src/it.ts"])
 
 
 class TestProviderNgoai(ImpactTestCase):

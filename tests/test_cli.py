@@ -383,6 +383,54 @@ class TestRunCommand(CliTestCase):
         self.assertIn("--no-isolate", err)
 
 
+class TestCtxCommand(CliTestCase):
+    """`aisdlc ctx` (ADR-005 V7): bản đồ đầy đủ, và ghi `ctx_lookup` khi gọi
+    trong phiên có `AISDLC_STORY_ID`."""
+
+    def setUp(self):
+        super().setUp()
+        (self.project / "src").mkdir()
+        (self.project / "src" / "a.ts").write_text("export function taoGhiChu() {}\n", encoding="utf-8")
+        (self.project / "src" / "b.ts").write_text("taoGhiChu()\n", encoding="utf-8")
+
+    def test_file_ve_quanh_mot_tep(self):
+        code, out, _ = self.run_cli("ctx", "--file", "src/a.ts")
+        self.assertEqual(code, EXIT_OK)
+        self.assertIn("export function taoGhiChu() …", out)
+        self.assertIn("`src/b.ts` · taoGhiChu", out)
+        self.assertNotIn("đã cắt", out)
+
+    def test_budget_cat_va_chi_cho_tra(self):
+        code, out, _ = self.run_cli("ctx", "--file", "src", "--budget", "120")
+        self.assertEqual(code, EXIT_OK)
+        self.assertLessEqual(len(out.rstrip("\n")), 120)
+        self.assertIn("đã cắt", out)
+
+    def test_khong_story_khong_file_la_loi_dung_cach(self):
+        code, _, err = self.run_cli("ctx")
+        self.assertEqual(code, EXIT_USAGE)
+        self.assertIn("--story", err)
+
+    def test_story_chua_co_chi_muc_thi_noi_ra(self):
+        code, _, err = self.run_cli("ctx", "--story", "STORY-01-01")
+        self.assertEqual(code, EXIT_NOT_READY)
+        self.assertIn("STORY-01-01", err)
+
+    def test_trong_phien_thi_ghi_ctx_lookup(self):
+        import json
+        import os
+        from unittest import mock
+
+        with mock.patch.dict(os.environ, {"AISDLC_STORY_ID": "STORY-01-09"}):
+            code, out, _ = self.run_cli("ctx", "--file", "src/a.ts")
+        self.assertEqual(code, EXIT_OK)
+        ev = (self.artifacts / "evidence" / "STORY-01-09.jsonl").read_text(encoding="utf-8")
+        rec = [json.loads(l) for l in ev.splitlines() if "ctx_lookup" in l]
+        self.assertEqual(len(rec), 1)
+        self.assertEqual(rec[0]["detail"]["file"], "src/a.ts")
+        self.assertGreater(rec[0]["detail"]["chars"], 0)
+
+
 class TestQaCommand(CliTestCase):
     def test_unconfigured_blocks_release_level(self):
         """Mặc định là mức trước triển khai: chưa chạy thì không phải đạt."""
