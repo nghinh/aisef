@@ -13,7 +13,9 @@ im lặng chạy như thể vẫn đủ (bất biến 10).
 
 from __future__ import annotations
 
+import os
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -66,6 +68,56 @@ class RunSpec:
     #: tiến trình con của client, nên phạm vi ghi và mã story tới được guard
     #: qua đúng đường này.
     env: dict[str, str] = field(default_factory=dict)
+    #: Tiền tố biến của máy được cho qua **thêm** (`clients.env_allow`).
+    #: Mặc định rỗng: ngoài `ENV_KEEP`/`ENV_KEEP_PREFIXES` không gì qua.
+    env_allow: list[str] = field(default_factory=list)
+
+
+# ------------------------------------------------------------ môi trường con
+
+#: Biến của máy được giữ **nguyên tên** cho tiến trình client — đủ để một CLI
+#: chạy (tìm lệnh, thư mục nhà, locale, tmp, chứng chỉ), không hơn.
+ENV_KEEP = frozenset({"PATH", "HOME", "LANG", "TERM", "TMPDIR", "SHELL", "USER", "LOGNAME",
+                      "SSL_CERT_FILE"})
+#: Tiền tố được giữ: locale, khoá/URL model của Claude, biến harness đặt cho
+#: guard. `CLAUDE*` của phiên cha **không** có ở đây — hợp quy C3 đo phiên con
+#: thừa hưởng chúng thì tự chuyển sang Bash và né guard Write/Edit (lỗi 4).
+ENV_KEEP_PREFIXES = ("LC_", "ANTHROPIC_", "AISDLC_")
+#: Git trong phiên agent không được cầm credential của máy: không hỏi
+#: terminal, askpass luôn thất bại, và `credential.helper=` rỗng **xoá** danh
+#: sách helper đã khai ở system/global — osxkeychain không được hỏi (đo
+#: 2026-09-06, git 2.53: helper giả không được gọi, `could not read
+#: Username`). Ba biến `GIT_CONFIG_*` đi cùng nhau: có COUNT mà thiếu
+#: KEY/VALUE thì git chết. Push/merge là việc của harness
+#: (`worktree.merge_story`) — tiến trình harness không nhận bộ này, chỉ
+#: tiến trình client.
+GIT_NO_CREDENTIALS: dict[str, str] = {
+    "GIT_TERMINAL_PROMPT": "0",
+    "GIT_ASKPASS": "/usr/bin/false",
+    "GIT_CONFIG_COUNT": "1",
+    "GIT_CONFIG_KEY_0": "credential.helper",
+    "GIT_CONFIG_VALUE_0": "",
+}
+
+
+def child_env(spec_env: dict[str, str], *, allow_prefixes: Iterable[str] = ()) -> dict[str, str]:
+    """Môi trường cho tiến trình client: **allowlist**, không phải `os.environ`
+    bớt đi vài thứ (ADR-005 V2).
+
+    Trước: OpenCode nhận trọn `os.environ` (63 biến trên máy đo), Claude chỉ
+    bị bỏ `CLAUDE*`; OpenCode từng ghi secret của máy ra log của nó. Agent
+    không cầm thứ nó không cần: giữ `ENV_KEEP` + `ENV_KEEP_PREFIXES` + tiền
+    tố dự án khai ở `clients.env_allow`, cộng bộ vô hiệu credential git, rồi
+    `spec_env` của harness đè lên trên. Giới hạn đã biết: token model của
+    Claude nằm trong Keychain/OAuth của máy, harness không có broker — phiên
+    con vẫn xác thực bằng tài khoản của máy.
+    """
+    # Tiền tố rỗng mở toang mọi biến — bỏ, không phải lỗi cấu hình đáng chết.
+    prefixes = tuple(p for p in (*ENV_KEEP_PREFIXES, *allow_prefixes) if p)
+    env = {k: v for k, v in os.environ.items() if k in ENV_KEEP or k.startswith(prefixes)}
+    env.update(GIT_NO_CREDENTIALS)
+    env.update(spec_env)
+    return env
 
 
 class ClientAdapter(ABC):

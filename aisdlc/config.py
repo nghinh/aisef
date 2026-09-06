@@ -147,6 +147,16 @@ DEFAULTS: dict[str, Any] = {
     # ngoài Docker) trừ khi có lý do khai tường minh ở đây; lý do được ghi
     # vào `pre-deploy.json`. `run` thường vẫn theo `sandbox.allow_degraded`.
     "sandbox.pre_deploy_degraded_waiver": "",
+    # Tiền tố biến môi trường của máy được cho qua vào tiến trình client, ngoài
+    # allowlist cố định (`clients.base.ENV_KEEP`: PATH HOME LANG LC_* TERM TMPDIR
+    # SHELL USER LOGNAME SSL_CERT_FILE + `ANTHROPIC_*` + `AISDLC_*`). Mặc định
+    # rỗng (ADR-005 V2): agent không cầm thứ nó không cần, và cái nó cần thì dự
+    # án khai tường minh — provider của OpenCode đọc khoá từ biến riêng thì khai
+    # tiền tố ấy; CI xác thực Claude bằng `CLAUDE_CODE_OAUTH_TOKEN` thì khai tên
+    # ấy (tên đầy đủ cũng là một tiền tố). Đo 2026-09-06 với `9router/mycombo`
+    # (khoá nằm ở `~/.local/share/opencode/auth.json`, config chỉ đọc `{env:HOME}`):
+    # OpenCode chạy đủ hợp quy với danh sách rỗng.
+    "clients.env_allow": [],
 }
 
 #: Kiểu mong đợi, để bắt lỗi cấu hình sớm thay vì để nó nổ giữa chừng.
@@ -203,6 +213,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "sandbox.allow_degraded": bool,
     "sandbox.provider": str,
     "sandbox.pre_deploy_degraded_waiver": str,
+    "clients.env_allow": list,
 }
 
 

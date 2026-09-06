@@ -191,12 +191,23 @@ def scrub_secrets(text: str) -> tuple[str, int]:
 
 # ------------------------------------------------------------ lệnh shell
 
+#: `git` có thể mang cờ toàn cục trước lệnh con: `-C <dir>`, `-c k=v`, `--no-pager`.
+_GIT = r"\bgit\b(?:\s+-[Cc]\s+\S+|\s+-\S+)*\s+"
+
 #: Lệnh phá huỷ — chặn thẳng, kể cả khi agent nghĩ nó đang dọn dẹp.
 DESTRUCTIVE_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("git reset --hard", re.compile(r"\bgit\s+reset\s+(--\S+\s+)*--hard\b")),
     ("git checkout bỏ thay đổi", re.compile(r"\bgit\s+checkout\s+--\s")),
     ("git clean", re.compile(r"\bgit\s+clean\b.*-[a-z]*f")),
-    ("git push --force", re.compile(r"\bgit\s+push\b.*(--force\b|-f\b)")),
+    # ADR-005 V2: **mọi** dạng push (kể cả `--dry-run`, vì nó vẫn xác thực với
+    # remote) và đổi remote. Push/merge là việc của harness sau cổng
+    # (`worktree.merge_story`); agent chỉ commit trên nhánh story.
+    ("git push — push/merge là việc của harness sau cổng", re.compile(_GIT + r"push\b")),
+    ("git remote add/set-url — remote là của harness", re.compile(_GIT + r"remote\s+(?:add|set-url)\b")),
+    # Bộ `GIT_NO_CREDENTIALS` (clients/base.py) xoá helper; agent không được
+    # bật lại bằng `-c credential.helper=…` hay gọi thẳng `git credential(-osxkeychain)`.
+    ("git credential — phiên agent không cầm credential của máy",
+     re.compile(_GIT + r"credential(?:-\w+)?\b|\bgit\b.*\s-c\s*credential\.")),
     ("xoá đệ quy", re.compile(r"\brm\s+(-\w*\s+)*-\w*[rR]\w*f|\brm\s+-fr\b")),
     ("git stash bỏ việc", re.compile(r"\bgit\s+stash\s+(drop|clear)\b")),
 ]

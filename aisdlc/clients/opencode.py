@@ -22,13 +22,12 @@ trúc, nên chi phí phải hỏi riêng.
 
 from __future__ import annotations
 
-import os
 import shutil
 import subprocess
 import time
 from pathlib import Path
 
-from .base import Capability, ClientAdapter, RunSpec, Support
+from .base import Capability, ClientAdapter, RunSpec, Support, child_env
 from .stream import RunResult
 
 BINARY = "opencode"
@@ -140,7 +139,10 @@ class OpenCodeAdapter(ClientAdapter):
                 capture_output=True,
                 text=True,
                 timeout=spec.timeout_seconds,
-                env={**os.environ, **spec.env} if spec.env else None,
+                # Allowlist, không phải `os.environ` (ADR-005 V2): OpenCode từng
+                # nhận trọn môi trường máy và ghi secret ra log của nó. Provider
+                # đọc khoá từ biến riêng thì dự án khai `clients.env_allow`.
+                env=child_env(spec.env, allow_prefixes=spec.env_allow),
                 stdin=subprocess.DEVNULL,
             )
         except subprocess.TimeoutExpired:

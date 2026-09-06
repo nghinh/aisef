@@ -192,34 +192,143 @@ if __name__ == "__main__":
 
 class TestKhongThuaHuongPhienCha(unittest.TestCase):
     """Hợp quy C3: phiên con thừa hưởng `CLAUDE*` của phiên cha thì tự chuyển
-    sang Bash. Harness phải bỏ các biến ấy khi gọi client."""
+    sang Bash. Từ ADR-005 V2 môi trường con là **allowlist** (`child_env`):
+    không chỉ `CLAUDE*` mà mọi biến ngoài danh sách đều vắng (hợp quy C9)."""
 
     def test_claude_vars_are_dropped_but_anthropic_kept(self):
         import os
         from unittest import mock
-        from aisdlc.clients.claude_code import clean_env
+        from aisdlc.clients.base import child_env
         with mock.patch.dict(os.environ, {"CLAUDECODE": "1", "CLAUDE_CODE_ENTRYPOINT": "x", "ANTHROPIC_API_KEY": "k"}):
-            env = clean_env()
+            env = child_env({})
         self.assertNotIn("CLAUDECODE", env)
         self.assertNotIn("CLAUDE_CODE_ENTRYPOINT", env)
         self.assertEqual(env["ANTHROPIC_API_KEY"], "k")
 
+    def test_bien_ngoai_allowlist_vang_bien_trong_thi_co(self):
+        import os
+        from unittest import mock
+        from aisdlc.clients.base import ENV_KEEP, child_env
+        may = {"NGHI_CANARY_TOKEN": "bí mật", "FAKE_SECRET_TOKEN": "x", "NINEROUTER_API_KEY": "k9",
+               "PATH": "/bin", "HOME": "/h", "LC_ALL": "C", "ANTHROPIC_BASE_URL": "u", "AISDLC_PROJECT": "/p"}
+        with mock.patch.dict(os.environ, may, clear=True):
+            env = child_env({"AISDLC_STORY_ID": "S"})
+        for k in ("NGHI_CANARY_TOKEN", "FAKE_SECRET_TOKEN", "NINEROUTER_API_KEY"):
+            self.assertNotIn(k, env)
+        for k in ("PATH", "HOME", "LC_ALL", "ANTHROPIC_BASE_URL", "AISDLC_PROJECT", "AISDLC_STORY_ID"):
+            self.assertIn(k, env)
+        self.assertIn("SSL_CERT_FILE", ENV_KEEP)
+
+    def test_tien_to_cau_hinh_duoc_qua_tien_to_rong_khong_mo_toang(self):
+        import os
+        from unittest import mock
+        from aisdlc.clients.base import child_env
+        may = {"NINEROUTER_API_KEY": "k9", "NGHI_CANARY_TOKEN": "x", "PATH": "/bin"}
+        with mock.patch.dict(os.environ, may, clear=True):
+            co = child_env({}, allow_prefixes=["NINEROUTER_"])
+            rong = child_env({}, allow_prefixes=[""])
+        self.assertEqual(co.get("NINEROUTER_API_KEY"), "k9")
+        self.assertNotIn("NGHI_CANARY_TOKEN", co)
+        self.assertNotIn("NGHI_CANARY_TOKEN", rong, "tiền tố rỗng không được mở mọi biến")
+
+    def test_git_khong_hoi_credential_va_harness_khong_bi_lay(self):
+        import os
+        from aisdlc.clients.base import GIT_NO_CREDENTIALS, child_env
+        env = child_env({})
+        for k, v in GIT_NO_CREDENTIALS.items():
+            self.assertEqual(env.get(k), v, k)
+        self.assertEqual(env["GIT_CONFIG_KEY_0"], "credential.helper")
+        self.assertEqual(env["GIT_CONFIG_VALUE_0"], "")
+        # Bộ này chỉ vào tiến trình client; git của harness (`worktree._git`,
+        # không truyền `env=`) đọc `os.environ` — không được bị đổi.
+        self.assertNotIn("GIT_CONFIG_COUNT", os.environ)
+
+    def _fake(self, tmp):
+        import stat
+        from pathlib import Path
+        fake = Path(tmp) / "client-gia"
+        fake.write_text("#!/bin/sh\nenv > \"$PWD/env.txt\"\n", encoding="utf-8")
+        fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
+        return fake
+
     def test_child_process_really_gets_the_clean_env(self):
-        import os, stat, tempfile
+        import os, tempfile
         from pathlib import Path
         from unittest import mock
         from aisdlc.clients.base import RunSpec
         from aisdlc.clients.claude_code import ClaudeCodeAdapter
-        with tempfile.TemporaryDirectory() as tmp:
-            fake = Path(tmp) / "claude-gia"
-            fake.write_text("#!/bin/sh\nenv > \"$PWD/env.txt\"\n", encoding="utf-8")
-            fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
-            a = ClaudeCodeAdapter(binary=str(fake))
-            with mock.patch.dict(os.environ, {"CLAUDECODE": "1"}):
-                a.run(RunSpec(prompt="x", workdir=Path(tmp), env={"AISDLC_STORY_ID": "S"}))
-            got = (Path(tmp) / "env.txt").read_text(encoding="utf-8")
-        self.assertNotIn("CLAUDECODE=", got)
-        self.assertIn("AISDLC_STORY_ID=S", got)
+        from aisdlc.clients.opencode import OpenCodeAdapter
+        for adapter in (ClaudeCodeAdapter, OpenCodeAdapter):
+            with self.subTest(client=adapter.id), tempfile.TemporaryDirectory() as tmp:
+                a = adapter(binary=str(self._fake(tmp)))
+                with mock.patch.dict(os.environ, {"CLAUDECODE": "1", "NGHI_CANARY_TOKEN": "bí mật",
+                                                  "NINEROUTER_API_KEY": "k9"}):
+                    a.run(RunSpec(prompt="x", workdir=Path(tmp), env={"AISDLC_STORY_ID": "S"}))
+                    a.run(RunSpec(prompt="x", workdir=Path(tmp), env={"AISDLC_STORY_ID": "S"},
+                                  env_allow=["NINEROUTER_"]))
+                    khai = (Path(tmp) / "env.txt").read_text(encoding="utf-8")
+                    a.run(RunSpec(prompt="x", workdir=Path(tmp), env={"AISDLC_STORY_ID": "S"}))
+                    got = (Path(tmp) / "env.txt").read_text(encoding="utf-8")
+                self.assertNotIn("CLAUDECODE=", got)
+                self.assertNotIn("NGHI_CANARY_TOKEN=", got)
+                self.assertNotIn("NINEROUTER_API_KEY=", got)
+                self.assertIn("AISDLC_STORY_ID=S", got)
+                self.assertIn("GIT_TERMINAL_PROMPT=0", got)
+                self.assertIn("NINEROUTER_API_KEY=k9", khai, "`env_allow` của spec phải tới tiến trình")
+
+    def test_build_spec_mang_env_allow_tu_cau_hinh(self):
+        from pathlib import Path
+        from aisdlc.config import DEFAULTS, Config
+        from aisdlc.harness.prompts import Prompt
+        from aisdlc.harness.routing import ROLES, DEVELOPER, build_spec
+        cfg = Config({**DEFAULTS, "clients.env_allow": ["NINEROUTER_"]})
+        role = ROLES[DEVELOPER]
+        prompt = Prompt(name=role.prompt, version=1, role=DEVELOPER, body="x")
+        spec = build_spec(DEVELOPER, prompt, {}, workdir=Path("."), config=cfg)
+        self.assertEqual(spec.env_allow, ["NINEROUTER_"])
+        self.assertEqual(DEFAULTS["clients.env_allow"], [])
+
+
+class TestGitKhongCamCredentialCuaMay(unittest.TestCase):
+    """ADR-005 V2, phần git. Remote giả trả 401 và ghi lại yêu cầu có mang
+    `Authorization` không; helper `store` được gieo sẵn token cho remote ấy.
+    Env thường: git gửi token (đối chứng — fixture *có thể* lộ). Env con
+    (`GIT_NO_CREDENTIALS`): helper không được hỏi, push thất bại vì auth."""
+
+    def test_env_con_khong_gui_token_env_thuong_thi_gui(self):
+        import os, subprocess, tempfile
+        from pathlib import Path
+        from unittest import mock
+        from aisdlc.clients.base import child_env
+        from tests.conformance._runner import seed_fake_credential, start_fake_remote
+        with tempfile.TemporaryDirectory() as d:
+            repo = Path(d) / "r"
+            repo.mkdir()
+            # HOME riêng + không đọc config hệ thống: không đụng osxkeychain của máy.
+            base = {"PATH": os.environ["PATH"], "HOME": d, "GIT_CONFIG_NOSYSTEM": "1"}
+            subprocess.run(["git", "init", "-q", "-b", "main"], cwd=repo, env=base, check=True)
+            subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q",
+                            "--allow-empty", "-m", "x"], cwd=repo, env=base, check=True)
+            srv, url = start_fake_remote()
+            try:
+                seed_fake_credential(repo, url)
+                doi_chung = subprocess.run(["git", "push", url, "HEAD"], cwd=repo, env=base,
+                                           capture_output=True, text=True, timeout=60)
+                self.assertNotEqual(doi_chung.returncode, 0)
+                self.assertTrue(any(srv.seen), "đối chứng: helper `store` phải gửi token, không thì fixture vô nghĩa")
+                srv.seen.clear()
+
+                with mock.patch.dict(os.environ, base, clear=True):
+                    env = child_env({})
+                con = subprocess.run(["git", "push", url, "HEAD"], cwd=repo, env=env,
+                                     capture_output=True, text=True, timeout=60)
+            finally:
+                srv.shutdown()
+                srv.server_close()
+        self.assertNotEqual(con.returncode, 0)
+        self.assertTrue(srv.seen, "push phải tới remote (thất bại vì auth, không phải vì mạng)")
+        self.assertFalse(any(srv.seen), "env con: không yêu cầu nào được mang Authorization")
+        self.assertIn("could not read Username", con.stderr)
 
 
 class TestOpenCodeLuongJson(unittest.TestCase):

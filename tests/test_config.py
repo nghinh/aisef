@@ -44,9 +44,16 @@ class TestDefaults(ConfigTestCase):
             "story.max_write_scope_paths",
             "run.max_parallel", "run.max_turns", "run.timeout_seconds",
             "run.max_retries", "cost.warn_multiple", "security.block_severities",
-            "verify.baseline",
+            "verify.baseline", "clients.env_allow",
         ):
             self.assertIn(key, c.values, key)
+
+    def test_env_allow_mac_dinh_rong_va_la_danh_sach(self):
+        """ADR-005 V2: không khai thì không biến nào của máy qua thêm."""
+        c = Config.load(self.root, env={})
+        self.assertEqual(c["clients.env_allow"], [])
+        c = Config.load(self.root, env={"AISDLC_CLIENTS_ENV_ALLOW": "NINEROUTER_, OPENAI_"})
+        self.assertEqual(c["clients.env_allow"], ["NINEROUTER_", "OPENAI_"])
 
     def test_unknown_key_raises(self):
         with self.assertRaises(KeyError):

@@ -115,6 +115,7 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 | Công cụ verify | chạy **trong image**, không cài lên máy host (giải quyết việc thiếu pytest/semgrep/trivy/k6) |
 | Ảnh | chọn theo stack dự án (`node:22-alpine`, `python:3.12-alpine`…), cấu hình đè được. `alpine` trơn không có công cụ nào, chạy `npm test` trong đó sẽ đỏ vì **thiếu công cụ** chứ không phải vì code sai — `doctor` cảnh báo đúng chỗ này |
 | Mạng cho tool | tắt mặc định; dự án cần cài phụ thuộc thì khai `sandbox.tools_network` tường minh |
+| Môi trường tiến trình client | **allowlist** (`clients/base.py::child_env`, ADR-005 V2), không phải `os.environ` bớt vài thứ: `PATH HOME LANG LC_* TERM TMPDIR SHELL USER LOGNAME SSL_CERT_FILE` + `ANTHROPIC_*` + `AISDLC_*` + tiền tố khai ở `clients.env_allow`; `CLAUDE*` của phiên cha và mọi secret khác của máy vắng (hợp quy C9). Kèm bộ vô hiệu credential git (`GIT_TERMINAL_PROMPT=0`, `GIT_ASKPASS=/usr/bin/false`, `GIT_CONFIG_COUNT/KEY_0/VALUE_0` xoá `credential.helper`) — osxkeychain không được hỏi trong phiên agent (C10); git của harness chạy tiến trình riêng, không nhận bộ này. Giới hạn đã biết: token model của Claude ở Keychain/OAuth của máy, không có broker |
 | Suy biến | Provider thiếu bảo đảm bậc cần → `degraded=True` **kèm tên bảo đảm thiếu** (`SandboxResult.missing` vào evidence, cột "cách ly" của `pre-deploy`, `doctor`); `allow_degraded=False` từ chối **lúc chọn provider**, lệnh chưa chạy. Lỗi hạ tầng (daemon, kéo image — docker thoát 125) ghi `provider_error`; tool báo "không chạy được", không "test đỏ" |
 
 ### 5.4 Orchestration logic
@@ -133,7 +134,7 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 | `PreToolUse` · `Write\|Edit` | `injection` | SQL nối chuỗi, `dangerouslySetInnerHTML` |
 | `PreToolUse` · `Write\|Edit` | `process-ref` | mã `STORY-…`/`EPIC-…` trong mã nguồn (luật 6); test và tài liệu được phép |
 | `PreToolUse` · `Bash` | `git-stage` | `git add -A` |
-| `PreToolUse` · `Bash` | `destructive` | `rm -rf`, `git reset --hard`, `checkout --` |
+| `PreToolUse` · `Bash` | `destructive` | `rm -rf`, `git reset --hard`, `checkout --`; **mọi** `git push` (kể cả `--dry-run`), `git remote add/set-url`, `git credential*`/`-c credential.helper=` — push/merge là việc của harness sau cổng (ADR-005 V2, hợp quy C10) |
 | `PostToolUse` · `Write\|Edit\|NotebookEdit\|Bash` | `diff-scope` | file không liên quan bị chạm |
 | `Stop` | `completion` | kết thúc khi test chưa xanh — **cho dừng** khi test không chạy được hay chưa khai lệnh, kết cục ghi ở cổng (lỗi 2, 8) |
 
@@ -651,6 +652,7 @@ Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏn
 | `sandbox.pre_deploy_degraded_waiver` | `""` | cổng `pre-deploy` **không** nhận suy biến (QĐ4) trừ khi có lý do khai ở đây; lý do ghi vào `pre-deploy.json` |
 | `app.dev_command` · `app.base_url` · `app.ready_timeout_seconds` | `""` · `http://localhost:5173` · `60` | để mở **route thật** lúc đối chiếu mockup; cổng đã có người trả lời thì từ chối, không nhận vơ (lỗi 15) |
 | `route.developer_model` · `route.reviewer_model` · `route.designer_model` | `""` | chọn model theo vai; rỗng thì theo mặc định của client |
+| `clients.env_allow` | `[]` | tiền tố biến môi trường của máy được cho qua **thêm** vào tiến trình client, ngoài allowlist cố định (§5.3). Rỗng nghĩa là không gì qua thêm; provider của OpenCode đọc khoá từ biến riêng, hay CI xác thực Claude bằng `CLAUDE_CODE_OAUTH_TOKEN`, thì khai tường minh (tên đầy đủ cũng là tiền tố). Đo 2026-09-06: `9router/mycombo` giữ khoá ở `auth.json` của OpenCode, không cần khai (ADR-005 §9 V2) |
 
 ---
 

@@ -171,9 +171,29 @@ class TestDestructive(unittest.TestCase):
         self.assertFalse(check_destructive("git stash drop").allowed)
 
     def test_normal_commands_allowed(self):
-        for cmd in ("git status", "git commit -m 'FR-01: x'", "pytest", "rm build/tmp.txt"):
+        for cmd in ("git status", "git commit -m 'FR-01: x'", "pytest", "rm build/tmp.txt",
+                    "git commit -m 'push notification'", "git remote -v", "git remote show origin",
+                    "git fetch origin", "git log --oneline", "git config user.name"):
             with self.subTest(cmd=cmd):
                 self.assertTrue(check_destructive(cmd).allowed)
+
+    def test_git_push_moi_dang_bi_chan_ke_ca_dry_run(self):
+        """ADR-005 V2: push/merge là việc của harness sau cổng, không phải của
+        agent — kể cả `--dry-run` (vẫn xác thực với remote)."""
+        for cmd in ("git push", "git push origin HEAD", "git push --dry-run", "git push -u origin story/x",
+                    "git -C w push", "git --no-pager push origin main", "cd w && git push origin HEAD",
+                    "git -c credential.helper=osxkeychain push origin main"):
+            with self.subTest(cmd=cmd):
+                v = check_destructive(cmd)
+                self.assertFalse(v.allowed)
+                self.assertIn("harness", v.reason)
+
+    def test_git_remote_va_credential_bi_chan(self):
+        for cmd in ("git remote add origin https://x/y.git", "git remote set-url origin git@x:y.git",
+                    "git credential fill", "git credential-osxkeychain get",
+                    "git -c credential.helper=store fetch origin", "git -C w -c credential.helper= fetch"):
+            with self.subTest(cmd=cmd):
+                self.assertFalse(check_destructive(cmd).allowed)
 
 
 class TestInjection(unittest.TestCase):

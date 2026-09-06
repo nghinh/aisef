@@ -142,4 +142,5 @@ def build_spec(
         timeout_seconds=cfg["run.timeout_seconds"] if cfg else 1800,
         disallowed_tools=list(role.disallowed_tools),
         session_id=session_id,
+        env_allow=list(cfg["clients.env_allow"]) if cfg else [],
     )

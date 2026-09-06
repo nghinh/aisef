@@ -31,6 +31,13 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 - **Xoá `story.max_context_tokens`** khỏi `.ai/config.json` — khoá đã gỡ, nạp
   vẫn được nhưng cảnh báo mỗi lần chạy (`config.RETIRED`). Khoá mới đều có
   mặc định, không cần thêm.
+- **Tiến trình client chỉ nhận allowlist biến môi trường** (ADR-005 V2):
+  provider của OpenCode đọc khoá từ biến riêng (không phải `auth.json`), hay
+  CI xác thực Claude bằng `CLAUDE_CODE_OAUTH_TOKEN`, thì khai tiền tố/tên vào
+  `clients.env_allow` — không khai thì phiên agent không thấy biến ấy và client
+  báo thiếu xác thực. `9router/mycombo` trên máy đo không cần khai gì. Agent
+  cũng **không còn** `git push`/đổi remote/hỏi credential được — push là việc
+  của harness sau cổng; story cũ có bước push trong prompt riêng thì bỏ.
 - **Lệnh test phải in tên test** (`vitest --reporter=verbose`, `pytest -v`,
   `node --test`): ba mục cổng `tiêu chí có test`, `bảo toàn`, `không làm đỏ
   test có sẵn` đọc tên từ output runner; không in thì ○ chưa cấu hình, không
@@ -98,8 +105,19 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 ### 3 · Sandboxes & execution environments
 
 - Phiên con Claude **cách ly cấu hình máy**: `--permission-mode acceptEdits`,
-  tool kê tường minh, `--setting-sources project,local`, `--strict-mcp-config`,
-  `clean_env()` bỏ `CLAUDE_*` của phiên cha (lỗi 4, 11; hợp quy C3/C4).
+  tool kê tường minh, `--setting-sources project,local`, `--strict-mcp-config`
+  (lỗi 4, 11; hợp quy C3/C4).
+- **Môi trường tiến trình client là allowlist** (`clients/base.py::child_env`,
+  ADR-005 V2) cho cả Claude lẫn OpenCode — trước đó OpenCode nhận trọn
+  `os.environ` (63 biến trên máy đo) và Claude chỉ bị bỏ `CLAUDE*`. Giữ
+  `PATH HOME LANG LC_* TERM TMPDIR SHELL USER LOGNAME SSL_CERT_FILE` +
+  `ANTHROPIC_*` + `AISDLC_*` + `clients.env_allow`; kèm bộ vô hiệu credential
+  git (`GIT_TERMINAL_PROMPT=0`, `GIT_ASKPASS=/usr/bin/false`,
+  `GIT_CONFIG_COUNT=1` xoá `credential.helper`) — osxkeychain không được hỏi
+  trong phiên agent; git của harness (`worktree.merge_story`) không nhận bộ này.
+  Hợp quy **C9** (canary ngoài allowlist vắng trong bản ghi phiên, log OpenCode
+  0 khớp) và **C10** (`git push` bị guard chặn; remote giả đòi auth không nhận
+  `Authorization`) — `docs/CONFORMANCE.md`, ADR-005 §9 V2.
 - Cấu hình client harness chép vào worktree (`.claude/settings.json`,
   `.opencode`) và `_bmad-output/reviews/` là **harness-owned** — không tính là
   tệp story đổi (lỗi 1, 7; ADR-004 §6 R4).
@@ -243,6 +261,10 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   `blocking` (YAGNI). `Check("lint", True)` cũ không đổi.
 - Hợp quy client: phép **C6** (luật 6), **C7** (ghi ngoài scope), **C8** (ứng
   viên stale) — 16/16 hai client 2026-09-06 (`docs/CONFORMANCE.md`).
+- `destructive` chặn **mọi** `git push` (không chỉ `--force`; kể cả `--dry-run`),
+  `git remote add/set-url`, `git credential*` và `-c credential.helper=` — thông
+  điệp nói push/merge là việc của harness sau cổng (ADR-005 V2; hợp quy C10).
+  Regex nhận cờ toàn cục trước lệnh con (`git -C w push`, `git -c k=v push`).
 
 ### 6 · Observability
 
@@ -295,6 +317,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 | `skills.inline` | `false` | ADR-003 §6 |
 | `sandbox.pre_deploy_degraded_waiver` | `""` | quyết định 4 |
 | `sandbox.provider` | `"docker"` | ADR-005 V5 |
+| `clients.env_allow` | `[]` | ADR-005 V2 |
 
 Gỡ: `story.max_context_tokens` (chưa từng có mã đọc; `RETIRED`, cảnh báo rồi bỏ qua).
 

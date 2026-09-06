@@ -32,6 +32,10 @@ class TestBangDocLaiDuoc(unittest.TestCase):
         self.assertTrue(back.run_for("claude").passed)
         self.assertFalse(back.run_for("opencode").passed)
         self.assertEqual(back.run_for("opencode").cell("C2"), "✗")
+        # C10 là mã hai chữ số đầu tiên — regex đọc lại `C\d` thì mất nó và
+        # cột claude thành "thiếu C10" dù bảng ghi ✅.
+        self.assertEqual(back.run_for("claude").cell("C10"), "✅")
+        self.assertEqual(back.run_for("claude").results[-1].detail, "C10 quan sát")
 
     def test_bang_neu_ro_opencode_khong_chan_phat_hanh(self):
         md = C.Report(runs=[run("claude", *[True] * len(C.PROBES))]).to_markdown()
@@ -105,12 +109,42 @@ class TestBoChayHopQuyPhanMay(unittest.TestCase):
         self.assertEqual(R.opencode_tools(text), ["Bash", "Read", "Write", "Write", "Glob"])
 
     def test_session_env_is_not_inherited(self):
+        """Bộ hợp quy dùng đúng `child_env` của harness: `CLAUDE*` và canary
+        ngoài allowlist vắng, `ANTHROPIC_*` và biến vô hiệu credential git có."""
         import os
         from unittest import mock
         from tests.conformance import _runner as R
         with mock.patch.dict(os.environ, {"CLAUDECODE": "1", "CLAUDE_CODE_ENTRYPOINT": "x",
-                                          "ANTHROPIC_API_KEY": "k"}):
+                                          "ANTHROPIC_API_KEY": "k", "NGHI_CANARY_TOKEN": "c"}):
             env = R.env_for(Path("/p"), Path("/p/w"), "S-1")
         self.assertNotIn("CLAUDECODE", env)
         self.assertNotIn("CLAUDE_CODE_ENTRYPOINT", env)
+        self.assertNotIn("NGHI_CANARY_TOKEN", env)
         self.assertEqual(env["ANTHROPIC_API_KEY"], "k")
+        self.assertEqual(env["GIT_TERMINAL_PROMPT"], "0")
+        self.assertEqual(env["AISDLC_STORY_ID"], "S-1")
+
+    def test_remote_gia_tra_401_va_ghi_authorization(self):
+        import http.client
+        from tests.conformance import _runner as R
+        srv, url = R.start_fake_remote()
+        try:
+            for headers in ({}, {"Authorization": "Basic Zzp0"}):
+                conn = http.client.HTTPConnection("127.0.0.1", srv.server_address[1], timeout=10)
+                conn.request("GET", "/x.git/info/refs?service=git-receive-pack", headers=headers)
+                resp = conn.getresponse()
+                self.assertEqual(resp.status, 401)
+                resp.read()
+                conn.close()
+        finally:
+            srv.shutdown()
+            srv.server_close()
+        self.assertTrue(url.startswith("http://127.0.0.1:"))
+        self.assertEqual(srv.seen, [False, True])
+
+    def test_moi_phep_thu_khong_co_ky_tu_ong_trong_bang(self):
+        """`|` trong ô làm vỡ bảng markdown và regex đọc lại (`env | sort` ở C9
+        từng làm cột claude thành "thiếu C9" dù ô ghi ✅)."""
+        for pid, what, proves in C.PROBES:
+            with self.subTest(probe=pid):
+                self.assertNotIn("|", what + proves)
