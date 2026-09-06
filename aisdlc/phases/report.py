@@ -32,6 +32,7 @@ from ..control.approvals import (
 from ..control import ledger
 from ..control.gate import CHECK_NAMES, qualification_table
 from ..control.normalize import parse_prd_file
+from ..control.outcome import Outcome
 from ..control.state import StateStore
 from ..harness.observe import AGENT_RUN, HANDOFF, MOCKUP_MAP, TOOL_RUN, EvidenceStore
 
@@ -100,10 +101,19 @@ class Report:
             "| Yêu cầu | Tiêu đề | Story phủ | Có bằng chứng test |",
             "|---|---|---|---|",
         ]
+        # Phạm vi nghiệm thu (pre-deploy --epic, QĐ C-a): yêu cầu chỉ có story
+        # ngoài phạm vi thì nói "ngoài phạm vi", không phải "—" (chưa có gì).
+        ngoai = set((self.pre_deploy.get("scope") or {}).get("outside") or [])
         for row in self.traceability:
+            if row.tested:
+                cell = "✅"
+            elif row.stories and ngoai and all(s in ngoai for s in row.stories):
+                cell = "ngoài phạm vi"
+            else:
+                cell = "—"
             lines.append(
                 f"| {row.requirement} | {row.title[:60]} | "
-                f"{', '.join(row.stories) or '—'} | {'✅' if row.tested else '—'} |"
+                f"{', '.join(row.stories) or '—'} | {cell} |"
             )
         if self.uncovered:
             lines += ["", f"**Chưa phủ:** {', '.join(self.uncovered)}"]
@@ -171,7 +181,12 @@ class Report:
                 ]
             lines += ["| Mục | Kết quả |", "|---|---|"]
             for c in self.pre_deploy.get("checks", []):
-                mark = "✅" if c.get("passed") else "✗"
+                # Dấu theo **kết cục**, không theo "không chặn": mục – không áp
+                # dụng hay ◇ miễn mà in ✅ là tự khai đạt thứ chưa kiểm.
+                try:
+                    mark = Outcome(str(c.get("outcome") or "")).mark
+                except ValueError:
+                    mark = "✅" if c.get("passed") else "✗"
                 lines.append(f"| {c.get('name')} | {mark} {c.get('detail', '')} |")
             qa = self.pre_deploy.get("qa") or {}
             if qa:

@@ -170,6 +170,46 @@ class TestPreDeploySection(ReportTestCase):
         self.assertIn("leo thang", text)
         self.assertIn("chưa cấu hình = perf", text)
 
+    def test_dau_theo_ket_cuc_khong_theo_khong_chan(self):
+        """Mục – không áp dụng / ◇ miễn không được in ✅ (QĐ C-a, QĐ5 2026-09-06)."""
+        from aisdlc.control.approvals import PRE_DEPLOY_REPORT
+
+        (self.artifacts / PRE_DEPLOY_REPORT).write_text(json.dumps({
+            "passed": True,
+            "checks": [
+                {"name": "phạm vi", "outcome": "passed", "passed": True, "detail": "EPIC-01: 7 story"},
+                {"name": "ngoài phạm vi nghiệm thu", "outcome": "not-applicable", "passed": True,
+                 "detail": "16 story không chấm"},
+                {"name": "miễn tường minh", "outcome": "waived", "passed": True, "detail": "mutation — lý do"},
+                {"name": "runbook", "passed": False, "detail": "thiếu"},
+            ],
+            "scope": {"epic": "EPIC-01", "stories": ["STORY-01-01"], "outside": ["STORY-02-01"]},
+        }, ensure_ascii=False), encoding="utf-8")
+        text = build(self.project).markdown()
+        self.assertIn("| phạm vi | ✅ EPIC-01: 7 story |", text)
+        self.assertIn("| ngoài phạm vi nghiệm thu | – 16 story không chấm |", text)
+        self.assertIn("| miễn tường minh | ◇ mutation — lý do |", text)
+        self.assertIn("| runbook | ✗ thiếu |", text)
+        self.assertIn("Phạm vi nghiệm thu: **EPIC-01**", text)
+        self.assertIn("Ngoài phạm vi (chưa nghiệm thu): 1 story", text)
+
+    def test_yeu_cau_chi_co_story_ngoai_pham_vi_thi_noi_ngoai_pham_vi(self):
+        from aisdlc.control.approvals import PRE_DEPLOY_REPORT
+
+        self.write_index([{"id": "STORY-02-01", "epic_id": "EPIC-02", "covers": ["FR-1"]}])
+        (self.artifacts / PRE_DEPLOY_REPORT).write_text(json.dumps({
+            "passed": True, "checks": [],
+            "scope": {"epic": "EPIC-01", "stories": [], "outside": ["STORY-02-01"]},
+        }), encoding="utf-8")
+        text = build(self.project).markdown()
+        row = next(l for l in text.splitlines() if l.startswith("| FR-1 |"))
+        self.assertTrue(row.endswith("| STORY-02-01 | ngoài phạm vi |"), row)
+        # Không có phạm vi thì vẫn "—" như cũ.
+        (self.artifacts / PRE_DEPLOY_REPORT).unlink()
+        text = build(self.project).markdown()
+        row = next(l for l in text.splitlines() if l.startswith("| FR-1 |"))
+        self.assertTrue(row.endswith("| STORY-02-01 | — |"), row)
+
 
 class TestCongStoryChungNhan(ReportTestCase):
     """ADR-005 V9: báo cáo in "mục cổng có đủ 3 control: n/N" đọc từ bảng
