@@ -117,6 +117,13 @@ class SandboxSpec:
     #: Tên provider (``docker`` · ``local`` · ``fake`` · ``"mô-đun:Lớp"``).
     #: Rỗng = ``docker``, hạ xuống ``local`` khi ``use_docker=False``.
     provider: str = ""
+    #: Thư mục gắn thêm vào workspace: `đường tương đối trong workspace →
+    #: đường trên máy`. Cho worktree sạch dựng từ SHA (ADR-005 V6): nó không
+    #: có `node_modules`/venv — chúng không nằm trong git — nên mượn của dự án
+    #: như cây thường vẫn có. Docker: bind mount cùng mode với workspace; suy
+    #: biến: symlink trong workspace (chỉ khi chỗ ấy còn trống). Chỉ dùng cho
+    #: cây tạm harness sở hữu — symlink là dấu vết trên cây.
+    mounts: dict[str, Path] = field(default_factory=dict)
 
 
 @dataclass
@@ -189,6 +196,8 @@ def build_docker_args(spec: SandboxSpec, *, name: str = "") -> list[str]:
     ]
     if name:
         args += ["--name", name]
+    for rel, src in spec.mounts.items():
+        args += ["-v", f"{Path(src).resolve()}:/workspace/{rel}:{mount_mode}"]
 
     if not spec.level.networked:
         args += ["--network=none"]
@@ -414,8 +423,19 @@ def _run_docker(spec: SandboxSpec) -> SandboxResult:
     )
 
 
+def _link_mounts(spec: SandboxSpec) -> None:
+    """Không có bind mount ngoài Docker: symlink vào workspace thay thế.
+    Chỗ đã có gì (dự án commit `node_modules`? thì đó là của họ) — không đè."""
+    for rel, src in spec.mounts.items():
+        dst = Path(spec.workspace) / rel
+        if not dst.exists() and not dst.is_symlink():
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            dst.symlink_to(Path(src).resolve())
+
+
 def _run_degraded(spec: SandboxSpec) -> SandboxResult:
     """Chạy thẳng trên máy. Không có cách ly — chỉ giới hạn thư mục làm việc."""
+    _link_mounts(spec)
     started = time.monotonic()
     try:
         proc = subprocess.run(

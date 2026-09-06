@@ -370,3 +370,77 @@ class TestCheBiMat(QaTestCase):
         self.assertEqual(e.detail["redacted"], 1)
         self.assertNotIn("ghp_", e.detail["tail"])
 
+class TestCayKiemSach(QaTestCase):
+    """ADR-005 V6: kiểm định cấp dự án chạy ở worktree sạch dựng từ SHA.
+
+    Harbor dừng env agent rồi chạy verifier ở chỗ tách; ta chạy trên cây
+    agent vừa sửa, nơi `node_modules/.bin/vitest`, `pytest.ini`, `conftest.py`
+    có thể là shim. Fixture: `tests/run.sh` **trong git** gọi
+    `node_modules/.bin/vitest` (tệp giả, không theo dõi — "vitest thật" của
+    dự án, mượn vào cây sạch); rồi cây làm việc bị ghi đè `tests/run.sh`
+    bằng shim in "ok". QA ở cây sạch phải chạy bản trong git → tool trong
+    `node_modules`; shim bị bỏ qua vì worktree lấy từ SHA.
+    """
+
+    def git(self, *args: str) -> str:
+        p = subprocess.run(["git", "-C", str(self.project), *args],
+                           capture_output=True, text=True, check=True)
+        return p.stdout.strip()
+
+    def setUp(self):
+        super().setUp()
+        self.git("init", "-q")
+        self.git("config", "user.email", "t@t")
+        self.git("config", "user.name", "t")
+        self.write(".gitignore", "node_modules/\n")
+        self.write("tests/run.sh", "sh node_modules/.bin/vitest\n")
+        self.git("add", "-A")
+        self.git("commit", "-qm", "test thật")
+        self.sha = self.git("rev-parse", "HEAD")
+        self.write("node_modules/.bin/vitest", "echo 'vitest that: 1 failed'\nexit 1\n")
+        self.write("tests/run.sh", "echo ok\n")  # agent ghi đè trong cây, không commit
+
+    def cfg(self, **over):
+        return self.config(**{"verify.unit": "sh tests/run.sh", "sandbox.use_docker": False, **over})
+
+    def test_shim_trong_cay_bi_bo_qua_tool_trong_node_modules_van_chay(self):
+        r = run_suite(self.project, config=self.cfg(), only=["unit"], has_ui=False,
+                      story_id="S-01", artifact_root=self.artifacts)
+        unit = r.results[0]
+        self.assertTrue(unit.ran)
+        self.assertFalse(unit.ok, "shim in 'ok' không được tính")
+        self.assertIn("vitest that", unit.detail)
+        self.assertEqual(r.tree, "worktree-tạm")
+        self.assertEqual(r.clean_tree, self.sha)
+        e = EvidenceStore(self.artifacts).read("S-01").last(TOOL_RUN, "qa:unit")
+        self.assertEqual(e.detail["clean_tree"], self.sha)
+        self.assertEqual(e.detail["tree"], "worktree-tạm")
+        self.assertIn("cây kiểm: worktree-tạm", r.summary())
+
+    def test_worktree_tam_duoc_go_sau_khi_kiem(self):
+        run_suite(self.project, config=self.cfg(), only=["unit"], has_ui=False)
+        self.assertEqual(len(self.git("worktree", "list").splitlines()), 1)
+        root = self.project / ".aisdlc" / "worktrees"
+        self.assertEqual([p.name for p in root.iterdir() if p.is_dir()], [])
+
+    def test_tat_knob_thi_chay_cay_agent_va_noi_ra(self):
+        r = run_suite(self.project, config=self.cfg(**{"verify.clean_tree": False}),
+                      only=["unit"], has_ui=False)
+        self.assertTrue(r.results[0].ok, "shim chạy — đó là điều tắt knob chấp nhận, có ghi")
+        self.assertEqual(r.tree, "cây agent")
+        self.assertEqual(r.clean_tree, "")
+
+    def test_muc_story_giu_cay_worktree(self):
+        r = run_suite(self.project, config=self.cfg(), only=["unit"], has_ui=False, clean=False)
+        self.assertTrue(r.results[0].ok)
+        self.assertEqual(r.tree, "cây agent")
+
+    def test_khong_co_git_thi_chay_cay_dang_dung_va_noi_ly_do(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "t.sh").write_text("echo ok\n", encoding="utf-8")
+            r = run_suite(d, config=self.config(**{"verify.unit": "sh t.sh", "sandbox.use_docker": False}),
+                          only=["unit"], has_ui=False)
+        self.assertTrue(r.results[0].ok)
+        self.assertTrue(r.tree.startswith("cây agent"), r.tree)
+        self.assertIn("git", r.tree)
+

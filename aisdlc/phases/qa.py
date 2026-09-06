@@ -23,15 +23,25 @@ nhưng nó chậm và thường chưa được cài; phép kiểm này rẻ và 
 from __future__ import annotations
 
 import re
+from contextlib import ExitStack
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..control.outcome import DEFAULT_REASON, Outcome
+from ..control.worktree import GitError, WorktreeManager
 from ..config import Config
 from ..harness import sandbox
 from ..harness.guardrails import head_sha, scrub_secrets
 from ..harness.observe import EvidenceStore
 from ..harness.tools import command_for, image_for, unrunnable_reason
+
+#: Nhãn cây đã chạy kiểm định — vào bằng chứng và `pre-deploy.json`.
+TREE_CLEAN = "worktree-tạm"
+TREE_AGENT = "cây agent"
+
+#: Thư mục phụ thuộc không nằm trong git — worktree sạch mượn của dự án.
+#: ponytail: chỉ gốc dự án; monorepo có `packages/*/node_modules` thì thêm sau.
+DEPS_DIRS = ("node_modules", ".venv", "venv")
 
 
 @dataclass(frozen=True)
@@ -155,6 +165,10 @@ class QaReport:
     #: SHA bản được kiểm — bằng chứng không gắn bản thì không nói được nó
     #: chứng minh cho mã nào (ADR-004 R1).
     candidate: str = ""
+    #: Cây đã chạy: `worktree-tạm` dựng từ `clean_tree` (ADR-005 V6) hay
+    #: `cây agent` (kèm lý do khi không dựng được). Mức bảo đảm phải hiện ra.
+    tree: str = ""
+    clean_tree: str = ""
 
     @property
     def failed(self) -> list[KindResult]:
@@ -206,6 +220,9 @@ class QaReport:
             )
         if self.waived:
             lines.append(f"miễn tường minh: {', '.join(self.waived)}")
+        if self.tree:
+            lines.append(f"cây kiểm: {self.tree}"
+                         + (f" từ {self.clean_tree[:7]}" if self.clean_tree else ""))
         return "\n".join(lines)
 
 
@@ -297,6 +314,28 @@ def _unrunnable_reason(exit_code: int, detail: str, provider_error: str = "") ->
     return unrunnable_reason("", exit_code, detail, provider_error=provider_error)
 
 
+def _verification_tree(
+    stack: ExitStack, project: Path, sha: str, *, clean: bool,
+) -> tuple[Path, str, str, dict[str, Path]]:
+    """Cây để **chạy** kiểm định: worktree tạm từ ``sha`` (ADR-005 V6) hay
+    chính cây đang đứng. Trả ``(workspace, nhãn cây, SHA cây sạch, mounts)``.
+
+    Không dựng được (không git, chưa có commit, SHA lạ) thì chạy trên cây
+    đang đứng **và nói ra** trong nhãn — không chạy được ≠ trượt, và giảm
+    bảo đảm không được im lặng (bất biến 10). Worktree do ``stack`` gỡ.
+    """
+    if not clean:
+        return project, TREE_AGENT, "", {}
+    if not sha:
+        return project, f"{TREE_AGENT} (không có git/HEAD để dựng worktree sạch)", "", {}
+    try:
+        cay = stack.enter_context(WorktreeManager(project).temporary(sha))
+    except GitError as e:
+        return project, f"{TREE_AGENT} (không dựng được worktree sạch: {e})", "", {}
+    mounts = {d: project / d for d in DEPS_DIRS if (project / d).is_dir()}
+    return cay, TREE_CLEAN, sha, mounts
+
+
 def run_suite(
     project: Path | str,
     *,
@@ -307,12 +346,27 @@ def run_suite(
     artifact_root: Path | str | None = None,
     changed: list[str] | None = None,
     candidate: str = "",
+    clean: bool = True,
 ) -> QaReport:
     """Chạy bộ kiểm định.
 
     ``candidate`` là SHA bản đang kiểm (ADR-004 R1). Không truyền thì lấy
     HEAD của chính cây đang chạy: QA cấp dự án cũng phải trả lời được "kết
     quả này thuộc bản nào", không chỉ QA trong story.
+
+    ``clean`` (ADR-005 V6, mặc định bật và còn cần `verify.clean_tree`): các
+    lệnh chạy trong **worktree tạm dựng từ ``candidate``**, không phải cây
+    đang đứng. Harbor dừng env agent rồi chạy verifier ở container tách; ở
+    đây cây agent vừa sửa có thể mang shim `node_modules/.bin/vitest`,
+    `pytest.ini`, `conftest.py` chưa commit — worktree từ SHA không có
+    chúng. `node_modules`/`.venv` của dự án được gắn vào (Docker: bind
+    mount; suy biến: symlink) như cây thường vẫn có. Giá: tệp **không theo
+    dõi** mà test cần (`.env.test`, fixture sinh tay) cũng vắng — commit
+    chúng, hoặc tắt `verify.clean_tree`; tắt thì `tree = "cây agent"`, ghi
+    vào bằng chứng và `pre-deploy.json`. Mức story (`verify_candidate`)
+    truyền ``clean=False``: cây worktree đã đóng băng, guard write-scope đã
+    chặn ngoài phạm vi. `find_fake_tests` vẫn đọc cây đang đứng: test giả
+    vừa viết chưa commit là đúng lúc phải bắt.
     """
     project = Path(project)
     cfg = config or Config.load(project)
@@ -324,65 +378,71 @@ def run_suite(
     store = (EvidenceStore(artifact_root, candidate=candidate)
              if (story_id and artifact_root) else None)
 
-    for kind in KINDS.values():
-        if only and kind.id not in only:
-            continue
-        result = KindResult(kind=kind)
-        if kind.id in waived:
-            # Miễn là **quyết định của người**, đã ghi lại. Vẫn chạy rồi
-            # vẫn đếm là trượt thì miễn chẳng có nghĩa gì, và báo cáo tự
-            # mâu thuẫn: dòng dưới ghi "miễn tường minh" trong khi dòng
-            # trên ghi ✗.
-            result.skipped = "miễn tường minh (verify.waived)"
-            report.results.append(result)
-            continue
-        if kind.needs_ui and not has_ui:
-            result.skipped = "dự án không có giao diện"
-            report.results.append(result)
-            continue
-
-        command = command_for_kind(kind.id, project, cfg)
-        if not command:
-            result.skipped = "chưa cấu hình lệnh (verify.%s)" % kind.id
-            report.results.append(result)
-            continue
-
-        import shlex
-
-        sb = sandbox.run(
-            sandbox.SandboxSpec(
-                workspace=project,
-                cmd=shlex.split(command),
-                level=kind.level,
-                image=image_for(project, cfg),
-                timeout_seconds=cfg["run.timeout_seconds"],
-                allow_degraded=cfg["sandbox.allow_degraded"],
-                use_docker=cfg["sandbox.use_docker"],
-                provider=cfg["sandbox.provider"],
-            )
+    with ExitStack() as stack:
+        cay, report.tree, report.clean_tree, mounts = _verification_tree(
+            stack, project, candidate, clean=clean and bool(cfg.get("verify.clean_tree", True)),
         )
-        result.ran = True
-        result.ok = sb.ok
-        result.duration_ms = sb.duration_ms
-        result.degraded = bool(getattr(sb, "degraded", False))
-        result.missing = list(getattr(sb, "missing", []))
-        # Dò dấu hiệu trên đầu ra **đầy đủ**, không phải phần đã cắt:
-        # "Cannot find module" nằm ở đầu stack trace còn `detail` chỉ giữ
-        # 5 dòng cuối. Đo trên e9: sau bản vá đầu tiên, `mutation` vẫn bị
-        # đếm là test đỏ đúng vì chỗ này.
-        # Che bí mật **trước** khi cắt (ADR-005 V1): `tail` đi vào
-        # `_bmad-output`, thư mục được commit theo dự án.
-        day_du, che = scrub_secrets((sb.stdout + "\n" + sb.stderr).strip())
-        result.detail = "\n".join(day_du.splitlines()[-5:])
-        result.unrunnable = _unrunnable_reason(
-            getattr(sb, "exit_code", 0), day_du, getattr(sb, "provider_error", ""))
-        report.results.append(result)
-        if store:
-            store.tool_run(
-                story_id, f"qa:{kind.id}", ok=sb.ok, duration_ms=sb.duration_ms,
-                detail={"command": command, "tail": result.detail[:500],
-                        **({"redacted": che} if che else {})},
+        for kind in KINDS.values():
+            if only and kind.id not in only:
+                continue
+            result = KindResult(kind=kind)
+            if kind.id in waived:
+                # Miễn là **quyết định của người**, đã ghi lại. Vẫn chạy rồi
+                # vẫn đếm là trượt thì miễn chẳng có nghĩa gì, và báo cáo tự
+                # mâu thuẫn: dòng dưới ghi "miễn tường minh" trong khi dòng
+                # trên ghi ✗.
+                result.skipped = "miễn tường minh (verify.waived)"
+                report.results.append(result)
+                continue
+            if kind.needs_ui and not has_ui:
+                result.skipped = "dự án không có giao diện"
+                report.results.append(result)
+                continue
+
+            command = command_for_kind(kind.id, project, cfg)
+            if not command:
+                result.skipped = "chưa cấu hình lệnh (verify.%s)" % kind.id
+                report.results.append(result)
+                continue
+
+            import shlex
+
+            sb = sandbox.run(
+                sandbox.SandboxSpec(
+                    workspace=cay,
+                    cmd=shlex.split(command),
+                    level=kind.level,
+                    image=image_for(project, cfg),
+                    timeout_seconds=cfg["run.timeout_seconds"],
+                    allow_degraded=cfg["sandbox.allow_degraded"],
+                    use_docker=cfg["sandbox.use_docker"],
+                    provider=cfg["sandbox.provider"],
+                    mounts=mounts,
+                )
             )
+            result.ran = True
+            result.ok = sb.ok
+            result.duration_ms = sb.duration_ms
+            result.degraded = bool(getattr(sb, "degraded", False))
+            result.missing = list(getattr(sb, "missing", []))
+            # Dò dấu hiệu trên đầu ra **đầy đủ**, không phải phần đã cắt:
+            # "Cannot find module" nằm ở đầu stack trace còn `detail` chỉ giữ
+            # 5 dòng cuối. Đo trên e9: sau bản vá đầu tiên, `mutation` vẫn bị
+            # đếm là test đỏ đúng vì chỗ này.
+            # Che bí mật **trước** khi cắt (ADR-005 V1): `tail` đi vào
+            # `_bmad-output`, thư mục được commit theo dự án.
+            day_du, che = scrub_secrets((sb.stdout + "\n" + sb.stderr).strip())
+            result.detail = "\n".join(day_du.splitlines()[-5:])
+            result.unrunnable = _unrunnable_reason(
+                getattr(sb, "exit_code", 0), day_du, getattr(sb, "provider_error", ""))
+            report.results.append(result)
+            if store:
+                store.tool_run(
+                    story_id, f"qa:{kind.id}", ok=sb.ok, duration_ms=sb.duration_ms,
+                    detail={"command": command, "tail": result.detail[:500],
+                            "tree": report.tree, "clean_tree": report.clean_tree,
+                            **({"redacted": che} if che else {})},
+                )
 
     report.fake_tests = find_fake_tests(project, changed)
     if store and report.fake_tests:

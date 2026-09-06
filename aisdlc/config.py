@@ -103,6 +103,16 @@ DEFAULTS: dict[str, Any] = {
     # sẵn" so được tên test xanh trước/sau. Tắt khi bộ test quá chậm — tắt
     # thì mục cổng là "không áp dụng: tắt bởi cấu hình", không phải đạt.
     "verify.baseline": True,
+    # Kiểm định cấp dự án (`aisdlc qa`, `pre-deploy`, `improve`) chạy ở worktree
+    # sạch dựng từ SHA đang chấm (ADR-005 V6, theo Harbor: dừng env agent rồi
+    # chạy verifier ở chỗ tách): shim `node_modules/.bin/*`, `conftest.py`,
+    # `pytest.ini` chưa commit không tới được cây kiểm; `node_modules`/venv mượn
+    # của dự án. Giá phải trả: tệp **không theo dõi** mà test cần (`.env.test`,
+    # fixture sinh tay) cũng không có ở đó — commit chúng, hoặc tắt khoá này
+    # khi thật cần; tắt thì bằng chứng ghi `tree = "cây agent"`, không im lặng.
+    # Mức story (`run`) giữ cây worktree: đã đóng băng và guard write-scope
+    # đã chặn ngoài phạm vi — không đọc khoá này.
+    "verify.clean_tree": True,
     # ứng dụng của dự án — để mở route thật lúc đối chiếu với mockup
     "app.dev_command": "",
     "app.base_url": "http://localhost:5173",
@@ -174,6 +184,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "verify.image-scan": str,
     "verify.waived": str,
     "verify.baseline": bool,
+    "verify.clean_tree": bool,
     "app.dev_command": str,
     "app.base_url": str,
     "app.ready_timeout_seconds": int,

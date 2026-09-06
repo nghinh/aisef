@@ -405,6 +405,27 @@ class TestLoiHaTangKhacLenhDo(unittest.TestCase):
         ten = calls[0][calls[0].index("--name") + 1]
         self.assertIn(["docker", "rm", "-f", ten], calls)
 
+class TestMounts(unittest.TestCase):
+    """ADR-005 V6: worktree sạch từ SHA không có `node_modules`/venv — mượn của dự án."""
+
+    def test_docker_bind_mount_cung_mode_voi_workspace(self):
+        s = SandboxSpec(workspace=Path("/tmp"), cmd=["true"],
+                        mounts={"node_modules": Path("/du-an/node_modules")})
+        self.assertIn("/du-an/node_modules:/workspace/node_modules:rw", build_docker_args(s))
+        s.level = Level.READ_ONLY
+        self.assertIn("/du-an/node_modules:/workspace/node_modules:ro", build_docker_args(s))
+
+    def test_suy_bien_symlink_vao_workspace(self):
+        with tempfile.TemporaryDirectory() as d:
+            ws, src = Path(d) / "ws", Path(d) / "src"
+            ws.mkdir()
+            src.mkdir()
+            (src / "x").write_text("1", encoding="utf-8")
+            r = run(SandboxSpec(workspace=ws, cmd=["cat", "node_modules/x"], use_docker=False,
+                                mounts={"node_modules": src}))
+            self.assertEqual(r.stdout.strip(), "1")
+            self.assertTrue((ws / "node_modules").is_symlink())
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

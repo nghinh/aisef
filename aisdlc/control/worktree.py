@@ -20,6 +20,9 @@ from __future__ import annotations
 import re
 import shutil
 import subprocess
+import tempfile
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -275,6 +278,32 @@ class WorktreeManager:
         if not self.root.is_dir():
             return []
         return sorted(p.name for p in self.root.iterdir() if p.is_dir())
+
+    @contextmanager
+    def temporary(self, sha: str, *, label: str = "qa") -> Iterator[Path]:
+        """Worktree **tách** (detached) tạm ở đúng ``sha``; gỡ khi ra khỏi
+        ``with``, kể cả khi bên trong ném lỗi.
+
+        Cho kiểm định cấp dự án (ADR-005 V6): cây chấm dựng lại từ SHA, không
+        phải cây làm việc mà agent (hay người) vừa sửa — shim
+        `node_modules/.bin/*`, `pytest.ini`, `conftest.py` chưa commit thì
+        không tới được đây. Không tạo nhánh: kiểm xong không có gì để giữ.
+        Thư mục tạo bằng ``mkdtemp`` nên hai lần gọi cùng SHA không đụng nhau.
+        """
+        self._ensure_root()
+        path = Path(tempfile.mkdtemp(prefix=f"{label}-{sha[:7]}-", dir=self.root))
+        try:
+            _git(self.repo, "worktree", "add", "-q", "--detach", str(path), sha)
+        except GitError:
+            shutil.rmtree(path, ignore_errors=True)
+            raise
+        try:
+            yield path
+        finally:
+            _git(self.repo, "worktree", "remove", "--force", str(path), check=False)
+            if path.exists():
+                shutil.rmtree(path, ignore_errors=True)
+            _git(self.repo, "worktree", "prune", check=False)
 
     # ------------------------------------------------------------ hợp nhất
 

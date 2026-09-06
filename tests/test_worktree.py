@@ -297,3 +297,32 @@ class TestCauHinhClientVaoWorktree(WorktreeTestCase):
     def test_nothing_to_carry_is_fine(self):
         wt = self.wm.create("S-02")
         self.assertFalse((wt.path / ".opencode").exists())
+
+
+class TestWorktreeTam(WorktreeTestCase):
+    """ADR-005 V6: worktree tách tạm ở đúng SHA, gỡ khi xong — kể cả khi lỗi."""
+
+    def test_dung_sha_khong_phai_cay_va_go_sau_with(self):
+        sha = git(self.repo, "rev-parse", "HEAD").strip()
+        (self.repo / "src" / "base.py").write_text("VERSION = 2\n", encoding="utf-8")  # cây bẩn
+        with self.wm.temporary(sha) as p:
+            self.assertTrue((p / ".git").exists())
+            self.assertEqual((p / "src" / "base.py").read_text(encoding="utf-8"), "VERSION = 1\n",
+                             "từ SHA, không từ cây đang sửa")
+            self.assertEqual(git(p, "rev-parse", "HEAD").strip(), sha)
+            self.assertEqual(git(p, "branch", "--show-current").strip(), "", "tách, không tạo nhánh")
+        self.assertFalse(p.exists())
+        self.assertEqual(len(git(self.repo, "worktree", "list").strip().splitlines()), 1)
+
+    def test_loi_ben_trong_van_go(self):
+        sha = git(self.repo, "rev-parse", "HEAD").strip()
+        with self.assertRaises(RuntimeError):
+            with self.wm.temporary(sha) as p:
+                raise RuntimeError("giữa chừng")
+        self.assertFalse(p.exists())
+
+    def test_sha_la_thi_nem_loi_khong_de_rac(self):
+        with self.assertRaises(GitError):
+            with self.wm.temporary("0000000"):
+                pass
+        self.assertEqual([d.name for d in self.wm.root.iterdir() if d.is_dir()], [])

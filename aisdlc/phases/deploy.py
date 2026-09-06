@@ -64,6 +64,10 @@ class PreDeployReport:
                 "release_ready": self.qa.release_ready,
                 # Bản mà bộ kiểm định cấp dự án đã chạy trên đó (ADR-004 R1).
                 "candidate": self.qa.candidate,
+                # Cây đã chạy: worktree sạch từ SHA (ADR-005 V6) hay cây agent —
+                # người ký cổng phải thấy được mức bảo đảm này.
+                "tree": self.qa.tree,
+                "clean_tree": self.qa.clean_tree,
                 "failed": [r.kind.id for r in self.qa.failed],
                 "unconfigured": [r.kind.id for r in self.qa.unconfigured],
                 "degraded": [r.kind.id for r in self.qa.degraded],

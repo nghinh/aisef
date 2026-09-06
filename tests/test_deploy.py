@@ -444,6 +444,35 @@ class TestPreDeployKhongChapNhanSuyBien(DeployTestCase):
         self.assertTrue(rep.release_ready or rep.failed == [])
 
 
+class TestPreDeployGhiCayKiem(DeployTestCase):
+    """ADR-005 V6: `pre-deploy.json` ghi **cây** đã chạy kiểm định — worktree
+    sạch từ SHA hay cây agent — vì đó là mức bảo đảm người ký cổng phải thấy."""
+
+    def test_cay_sach_tu_head_khi_co_git(self):
+        import json
+        import subprocess
+
+        def git(*a):
+            return subprocess.run(["git", "-C", str(self.project), *a],
+                                  capture_output=True, text=True, check=True).stdout.strip()
+
+        git("init", "-q"); git("config", "user.email", "t@t"); git("config", "user.name", "t")
+        git("add", "-A"); git("commit", "-qm", "đầu")
+        sha = git("rev-parse", "HEAD")
+        self.approve_everything(); self.finish_a_story()
+        report = pre_deploy(self.project, config=self.config(
+            **{"verify.unit": "true", "sandbox.use_docker": False}))
+        data = json.loads(report.write(self.artifacts).read_text(encoding="utf-8"))
+        self.assertEqual(data["qa"]["tree"], "worktree-tạm")
+        self.assertEqual(data["qa"]["clean_tree"], sha)
+
+    def test_khong_git_thi_noi_la_cay_agent(self):
+        self.approve_everything(); self.finish_a_story()
+        report = pre_deploy(self.project, config=self.config(
+            **{"verify.unit": "true", "sandbox.use_docker": False}))
+        self.assertTrue(report.as_dict()["qa"]["tree"].startswith("cây agent"))
+
+
 class TestPlannedButNeverRun(DeployTestCase):
     """Lỗi 17: story trong kế hoạch chưa từng chạy mà cổng ghi "mọi story xong" ✅."""
 
