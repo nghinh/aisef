@@ -27,6 +27,12 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("ids", nargs="*")
     r.add_argument("--client", default="claude")
     r.add_argument("--attempts", type=int, default=3)
+    r.add_argument("--bare", action="store_true", help="control group: cùng prompt, không guard/env AISEF")
+    b = sub.add_parser("run-both", help="interleaved: AISEF rồi bare cho mỗi task, --attempts lượt (cần AISEF_BENCH=1)")
+    b.add_argument("ids", nargs="*")
+    b.add_argument("--client", default="claude")
+    b.add_argument("--attempts", type=int, default=3)
+    b.add_argument("--shuffle", action="store_true", help="xáo thứ tự task")
     sub.add_parser("report", help="báo cáo Markdown từ .bench/results.jsonl")
     e = sub.add_parser("export", help="xuất một task ra thư mục định dạng Harbor")
     e.add_argument("id")
@@ -55,7 +61,21 @@ def main(argv: list[str] | None = None) -> int:
             print("đặt AISEF_BENCH=1 — chạy client thật tốn tiền", file=sys.stderr)
             return 1
         from aisef.clients.compile import ADAPTERS
-        res = [x for t in pick for x in R.run(t, ADAPTERS[a.client](), attempts=a.attempts)]
+        res = [x for t in pick for x in R.run(t, ADAPTERS[a.client](), attempts=a.attempts, bare=a.bare)]
+        print(R.report(res, tasks))
+    elif a.cmd == "run-both":
+        if not R.ENABLED:
+            print("đặt AISEF_BENCH=1 — chạy client thật tốn tiền", file=sys.stderr)
+            return 1
+        import random
+        from aisef.clients.compile import ADAPTERS
+        order = list(pick)
+        if a.shuffle:
+            random.shuffle(order)
+        res = []
+        for t in order:
+            res += R.run(t, ADAPTERS[a.client](), attempts=a.attempts, bare=False)
+            res += R.run(t, ADAPTERS[a.client](), attempts=a.attempts, bare=True)
         print(R.report(res, tasks))
     elif a.cmd == "report":
         print(R.report(R.load_results(), tasks))

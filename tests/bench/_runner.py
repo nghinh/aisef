@@ -212,29 +212,38 @@ def _prompt(task: Task, ws: Path, cfg: Config) -> str:
     )
 
 
-def run(task: Task, client: ClientAdapter, attempts: int = 3) -> list[Result]:
+def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = False) -> list[Result]:
+    condition = f"{client.id}-bare" if bare else client.id
     out: list[Result] = []
     for n in range(1, attempts + 1):
         if task.invalid_reason or not task.validated.get("gold_pass"):
-            out.append(Result(task.id, client.id, n, INVALID, error=task.invalid_reason or "chưa validate"))
+            out.append(Result(task.id, condition, n, INVALID, error=task.invalid_reason or "chưa validate"))
             continue
-        ws = materialize(task, KEEP_DIR / "run" / client.id / task.id / f"a{n}", tests=task.tests_visible)
+        ws = materialize(task, KEEP_DIR / "run" / condition / task.id / f"a{n}", tests=task.tests_visible)
         base = head_sha(ws)
         root = ws / "_bmad-output"
-        write_compile_report(ws, [compile_for(client.id, ws, aisef_bin=str(ROOT / "bin" / "aisef"))])
+        if not bare:
+            write_compile_report(ws, [compile_for(client.id, ws, aisef_bin=str(ROOT / "bin" / "aisef"))])
         store = EvidenceStore(root)
         store.record(task.id, Event(kind=NOTE, name="mode",
-                                    detail={"mode": "bench", "client": client.id, "attempt": n, "base": base}))
+                                    detail={"mode": "bench", "client": condition, "attempt": n,
+                                            "base": base, "bare": bare}))
         cfg = Config.load(ws)
         prompt = _prompt(task, ws, cfg)
-        settings = ws / ".claude" / "settings.json"
-        spec = RunSpec(
-            prompt=prompt, workdir=ws, max_turns=cfg["run.max_turns"],
-            timeout_seconds=cfg["run.timeout_seconds"],
-            settings_file=settings if settings.is_file() else None,
-            env={ENV_WRITE_SCOPE: ",".join(task.write_scope), ENV_STORY_ID: task.id,
-                 ENV_BASE_REF: base, ENV_WORKDIR: str(ws), ENV_PROJECT: str(ws)},
-        )
+        if bare:
+            spec = RunSpec(
+                prompt=prompt, workdir=ws, max_turns=cfg["run.max_turns"],
+                timeout_seconds=cfg["run.timeout_seconds"],
+            )
+        else:
+            settings = ws / ".claude" / "settings.json"
+            spec = RunSpec(
+                prompt=prompt, workdir=ws, max_turns=cfg["run.max_turns"],
+                timeout_seconds=cfg["run.timeout_seconds"],
+                settings_file=settings if settings.is_file() else None,
+                env={ENV_WRITE_SCOPE: ",".join(task.write_scope), ENV_STORY_ID: task.id,
+                     ENV_BASE_REF: base, ENV_WORKDIR: str(ws), ENV_PROJECT: str(ws)},
+            )
         result = client.run(spec)
         store.agent_run(task.id, result, name=f"{task.id}#{n}", prompt_chars=len(prompt))
 
@@ -250,7 +259,7 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3) -> list[Result]:
         _git(ws, "commit", "-qm", f"{task.id}: ứng viên lượt {n}", check=False)   # không có gì để chốt = HEAD
         cand = head_sha(ws)
         res = run_tool("test", ws, story_id=task.id, artifact_root=root, config=cfg, candidate=cand)
-        out.append(_grade(task, client.id, n, result, res, ws, base, cand, len(store.read(task.id).guard_blocks)))
+        out.append(_grade(task, condition, n, result, res, ws, base, cand, len(store.read(task.id).guard_blocks)))
     KEEP_DIR.mkdir(parents=True, exist_ok=True)
     with (KEEP_DIR / "results.jsonl").open("a", encoding="utf-8") as fh:
         for r in out:
@@ -323,6 +332,37 @@ def report(results: list[Result], tasks: list[Task] | None = None) -> str:
     if n:
         lines += ["", f"**pass@1** {p1 / n:.2f} · **pass@k** {pk / n:.2f} · **ổn định** {stable}/{n} · "
                       f"**cost ≤ 2× lịch sử** {cost_ok}/{cost_n}"]
+    clients = sorted({cl for _, cl in groups})
+    bare_pairs = [(cl.replace("-bare", ""), cl) for cl in clients if cl.endswith("-bare")]
+    for base_cl, bare_cl in bare_pairs:
+        if base_cl not in clients:
+            continue
+        lines += ["", f"## So sánh {base_cl} (AISEF) vs {bare_cl} (bare)", "",
+                  "| task | AISEF pass@1 | bare pass@1 | delta | AISEF $/lượt | bare $/lượt | guard chặn |",
+                  "|---|---|---|---|---|---|---|"]
+        a_p1 = a_cost = b_p1 = b_cost = 0
+        a_n = b_n = a_guard = 0
+        for tid in sorted({t for t, _ in groups}):
+            a_rs = groups.get((tid, base_cl), [])
+            b_rs = groups.get((tid, bare_cl), [])
+            if not a_rs or not b_rs or all(x.outcome == INVALID for x in a_rs + b_rs):
+                continue
+            ap = sum(x.outcome == PASS for x in a_rs) / len(a_rs)
+            bp = sum(x.outcome == PASS for x in b_rs) / len(b_rs)
+            ac = sum(x.cost_usd for x in a_rs) / len(a_rs)
+            bc = sum(x.cost_usd for x in b_rs) / len(b_rs)
+            gb = sum(x.guard_block for x in a_rs)
+            a_p1 += ap; b_p1 += bp; a_cost += ac; b_cost += bc; a_guard += gb
+            a_n += 1; b_n += 1
+            d = ap - bp
+            lines.append(f"| {tid} | {ap:.2f} | {bp:.2f} | {d:+.2f} | {ac:.2f} | {bc:.2f} | {gb} |")
+        if a_n:
+            lines += ["",
+                f"**AISEF pass@1** {a_p1 / a_n:.2f} vs **bare pass@1** {b_p1 / b_n:.2f} "
+                f"(delta {(a_p1 - b_p1) / a_n:+.2f})",
+                f"**AISEF $/lượt trung bình** {a_cost / a_n:.2f} vs **bare** {b_cost / b_n:.2f} "
+                f"(tỉ lệ {a_cost / b_cost:.2f}× nếu bare > 0)" if b_cost else "",
+                f"**Guard chặn tổng** {a_guard} lần trên {a_n} task"]
     bad = [t for t in tasks or [] if t.invalid_reason or t.flaky_ids]
     if bad:
         lines += ["", "## Task loại / test chập chờn", ""]
