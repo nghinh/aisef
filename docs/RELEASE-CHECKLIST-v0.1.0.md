@@ -7,7 +7,7 @@ nhật lần cuối: **xem dòng "Cập nhật" cuối tệp**.
 
 | # | Điều kiện | Cách kiểm | Trạng thái |
 |---|---|---|---|
-| 1 | Suite đơn vị 100 % xanh, **lặp lại được không cần Docker** | `python3 -m unittest discover -s tests -q` | ✅ 06/09 14:18 trên master `cb35ad9`: **1 671 test, 191 s, OK**, 17 skip (10 Docker đánh dấu · 2 dogfood · 2 hợp quy · 1 bench · 2 cổng phát hành/khác) |
+| 1 | Suite đơn vị 100 % xanh, **lặp lại được không cần Docker** | `python3 -m unittest discover -s tests -q` | ✅ 06/09 14:18 trên master `cb35ad9`: **1 671 test, 191 s, OK**, 17 skip có tên (10 `AISDLC_TEST_DOCKER` · 2 cổng phát hành · 2 dogfood · 2 hợp quy · 1 bench) |
 | 2 | Test Docker/hợp quy sandbox riêng xanh | `AISDLC_TEST_DOCKER=1 python3 -m unittest tests.test_sandbox tests.test_tools -q` | ✅ 06/09 14:21: **88 test, 93 s, OK** (2 skip); S1–S5 Docker 5/5 đo sáng 06/09 |
 | 3 | Hợp quy Claude không ô ✗, bảng ≤ 14 ngày | `docs/CONFORMANCE.md`; cổng ở dòng 9 đọc bảng bằng code | ✅ C1–C10 Claude 10/10 (06/09, $1,66). **C11/C12 hoãn**: mã và unit test xong ở nhánh `worktree-agent-ada8e46…` nhưng phép chạy thật mới xong C11(a)/(b) thì hết credit — không gộp vào master vì thêm phép vào bảng sẽ làm cổng đòi đủ 12 cột |
 | 4 | `par` đạt mốc dogfood | `AISDLC_DOGFOOD=1 python3 -m unittest tests.dogfood -q` (đo 06/09: 3/3, $5,79 ≤ 2 × $3,14) | ✅ |
