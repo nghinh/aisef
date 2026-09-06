@@ -42,6 +42,27 @@ class CliTestCase(unittest.TestCase):
         p.write_text(text, encoding="utf-8")
         return p
 
+    def stub_client(self, name: str = "claude"):
+        """Adapter luôn `available()` cho lệnh cần client — phép kiểm nào đo
+        *lệnh* thì không được phụ thuộc máy chạy có cài `claude` hay không."""
+        import contextlib
+        import unittest.mock as mock
+
+        from aisdlc.clients.compile import ADAPTERS
+
+        that = ADAPTERS[name]
+
+        class Stub(that):                     # giữ nguyên id/năng lực đã khai
+            def available(self) -> bool:
+                return True
+
+        @contextlib.contextmanager
+        def _ctx():
+            with mock.patch.dict(ADAPTERS, {name: Stub}):
+                yield
+
+        return _ctx()
+
 
 class TestEveryCommandIsUsable(unittest.TestCase):
     """Lỗi khai đối số chỉ lộ ra lúc người dùng gõ lệnh — trừ khi có test."""
@@ -295,7 +316,15 @@ class TestMockupCommand(CliTestCase):
         self.assertIn("khong-co", err)
 
     def test_without_experience_file(self):
-        code, out, _ = self.run_cli("mockup")
+        """Thiếu artifact đầu vào là lỗi gọi lệnh (1), không phải "chưa sẵn sàng".
+
+        Lệnh dựng mockup mở phiên agent nên nó tra client **trước**; máy không
+        cài `claude` thì dừng ở đó với mã 2 và phép kiểm này đo môi trường chứ
+        không đo lệnh (CI Linux 2026-09-06: 2 != 1). Cắm adapter giả để chỉ còn
+        một biến: có EXPERIENCE.md hay không.
+        """
+        with self.stub_client():
+            code, out, _ = self.run_cli("mockup")
         self.assertEqual(code, EXIT_USAGE)
         self.assertIn("EXPERIENCE.md", out)
 

@@ -118,6 +118,20 @@ class TestBanDoQuanhPhamVi(ContextTestCase):
         self.assertIn("`src/store.ts`", repo_map(self.p, ["src"]).split("Lân cận")[0])
         self.assertIn("`src/ui/app.ts`", repo_map(self.p, ["src/**"]).split("Lân cận")[0])
 
+    def test_hai_dau_sao_cho_cung_ket_qua_tren_moi_ban_python(self):
+        """`src/**` và `src/**/*` phải ra cùng tệp.
+
+        `Path.glob("src/**")` chỉ khớp **thư mục** ở Python ≤ 3.12; 3.13 mới
+        cho khớp cả tệp. Gói khai hỗ trợ từ 3.11, nên phạm vi ghi viết kiểu
+        `src/**` sẽ cho bản đồ rỗng ở nửa số bản được hỗ trợ nếu không chuẩn
+        hoá (CI Linux 3.12 bắt được 2026-09-06, máy đo 3.14 thì không).
+        """
+        self.du_an()
+        sao = repo_map(self.p, ["src/**"]).split("Lân cận")[0]
+        sao_tep = repo_map(self.p, ["src/**/*"]).split("Lân cận")[0]
+        self.assertEqual(sao, sao_tep)
+        self.assertIn("`src/ui/app.ts`", sao)
+
     def test_ten_tep_khop_dinh_danh_story_xep_truoc(self):
         """Aider: tệp có tên khớp định danh được nhắc ×10 — `notes-list` trong
         story đẩy `notes-list.ts` lên trước tệp gọi nhiều hơn."""

@@ -162,7 +162,12 @@ def _split_seeds(project: Path, seeds: list[str]) -> tuple[list[str], set[str]]:
         elif p.is_dir():
             hits = [f for f in sorted(p.rglob("*")) if f.is_file()]
         elif any(c in s for c in "*?["):
-            hits = [f for f in sorted(project.glob(s)) if f.is_file()]
+            # `src/**` chỉ khớp **thư mục** ở Python ≤ 3.12 (3.13 mới cho khớp
+            # cả tệp) — phạm vi ghi viết kiểu ấy thì bản đồ rỗng trên đúng
+            # những phiên bản gói này khai hỗ trợ (CI Linux 3.12, 2026-09-06).
+            # Chuẩn hoá về `**/*`: cùng kết quả trên 3.11 → 3.14.
+            pat = s + "/*" if s.endswith("**") else s
+            hits = [f for f in sorted(project.glob(pat)) if f.is_file()]
         else:
             if len(s) >= MIN_IDENT:
                 idents.add(s.lower())
