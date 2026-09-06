@@ -1,4 +1,4 @@
-# Kế hoạch thực thi
+# Kế hoạch thực thi — AISEF (AI Software Engineering Framework)
 
 **Căn cứ:** `docs/SOLUTION.md` v2 (đã duyệt).
 **Nguyên tắc lập lịch:**

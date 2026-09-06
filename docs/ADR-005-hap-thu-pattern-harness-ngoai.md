@@ -1,4 +1,4 @@
-# ADR-005 — Hấp thụ pattern từ harness/benchmark bên ngoài, giữ 6 nhóm harness
+# ADR-005 (AISEF) — Hấp thụ pattern từ harness/benchmark bên ngoài, giữ 6 nhóm harness
 
 **Trạng thái:** ACCEPTED bởi chủ đầu tư 2026-09-06 07:10 ("đồng ý với các đề xuất, chia các task song song"); từng V lên ACCEPTED-đo khi có số ở §9. Đợt hiện thực 1 (07:15): X1 V1+V11(A,B) · X2 V2+C9/C10 · X3 V3+V4 · X4 V9 · X5 V5 · X6 R13 `--repeat` + V6 · X7 V8 · X8 V7 (mỗi luồng một worktree; V10 C11/C12 và V12 chờ V3/V5).
 **Nguồn đối chiếu (đọc mã thật, không chỉ README):** Harbor 0.22.0, Terminal-Bench, SWE-agent, SWE-ReX, Aider, Agentless (+ arXiv 2407.01489), Inspect AI, BERBench, RepoAgentBench, agent-sandbox; đối chứng thêm: Anthropic `init-firewall.sh`, OpenAI Codex sandbox, harden-runner, SWE-smith. Năm báo cáo đọc chi tiết nằm ở `scratchpad/research/*.md` (harbor-tbench, swe-agent-rex, aider-agentless, inspect-ai, bench-sandbox); ADR này là bản tổng hợp có quyết định.

@@ -1,5 +1,8 @@
 # Hướng dẫn sử dụng AISEF
 
+**AISEF** là viết tắt của **AI Software Engineering Framework**. Gói cài, module
+Python và lệnh gõ đều tên `aisef`.
+
 Hướng dẫn này viết cho người **chưa từng dùng** framework, và cố gắng không
 bỏ qua bước nào. Mỗi phần có: gõ lệnh gì, chờ bao lâu, màn hình hiện gì, và
 làm gì khi nó không hiện như vậy.

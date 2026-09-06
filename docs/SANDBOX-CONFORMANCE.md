@@ -1,4 +1,4 @@
-# Hợp quy sandbox
+# Hợp quy sandbox — AISEF
 
 Sinh bởi `python3 -m tests.sandbox_conformance`, ngày **2026-09-06**. Mỗi ô là **một lần chạy thật** trên provider ấy (kèm thời gian); không ô nào suy từ khai báo. Docker chạy khi daemon có (`docker info`); Local luôn chạy — cột Local ✗ ở S1–S4 là điều bảng này phải nói ra: chạy thẳng trên máy không bảo đảm gì (bất biến 10).
 

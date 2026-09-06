@@ -1,4 +1,4 @@
-# Changelog
+# Changelog — AISEF (AI Software Engineering Framework)
 
 Ghi theo **sáu nhóm harness** (`docs/SOLUTION.md` §5), không theo ADR hay
 ngày. Mỗi dòng có chỗ đọc lại; số lỗi trỏ `docs/STATUS-2026-09-05.md` §2.4

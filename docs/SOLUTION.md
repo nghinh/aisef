@@ -1,4 +1,4 @@
-# AISEF Framework — Giải pháp tổng thể
+# AISEF (AI Software Engineering Framework) — Giải pháp tổng thể
 
 **Trạng thái:** bản chốt để duyệt trước khi thực thi diện rộng.
 **Phiên bản:** 2 — viết lại sau khi rà soát, sửa 12 vấn đề của bản 1 (mục 17).

@@ -1,4 +1,4 @@
-# Phân loại lỗi thật — để không tái diễn
+# Phân loại lỗi thật của AISEF — để không tái diễn
 
 Hai mươi lăm lỗi tìm được trong hai ngày 2026-09-05 → 06 — 21 trong ngày
 05/09, và 22–25 đêm 05→06/09 khi đo hai đợt ADR-004 trên agent thật (e9

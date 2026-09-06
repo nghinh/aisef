@@ -58,7 +58,8 @@ class Constitution:
         parts = [
             f"# Quy tắc kỹ thuật — {project_name}",
             "",
-            "> Sinh bởi `aisef setup`. **Không sửa tay** — sửa ở",
+            "> Sinh bởi `aisef setup` (AISEF — AI Software Engineering Framework).",
+            "> **Không sửa tay** — sửa ở",
             "> `aisef/kit/rules/` rồi chạy lại, nếu không lần cài sau sẽ đè mất.",
             "",
             self.principles.strip(),

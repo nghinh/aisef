@@ -1,4 +1,6 @@
-# Đánh giá 360° bản hiện tại và lộ trình lên bản sau
+# AISEF — đánh giá 360° bản hiện tại và lộ trình lên bản sau
+
+AISEF = **AI Software Engineering Framework**.
 
 Ngày 2026-09-06. Bản đang có: **`aisef 0.1.0`** trên PyPI, và **0.2.0** đã sẵn
 trong kho (đổi tên `aisdlc` → `aisef`, sửa lỗi 31). Mọi con số dưới đây đọc từ

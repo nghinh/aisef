@@ -1,6 +1,8 @@
-# AISEF
+# AISEF — AI Software Engineering Framework
 
-Khung phát triển phần mềm bằng agent. Đầu vào của mỗi dự án là **một file**
+Khung phát triển phần mềm bằng agent. Tên đầy đủ là **AI Software Engineering
+Framework**, viết tắt **AISEF**; gói trên PyPI, module Python và lệnh đều là
+`aisef`. Đầu vào của mỗi dự án là **một file**
 `docs/requirements.md`; đầu ra là một ứng dụng chạy được, kèm bằng chứng
 cho từng bước.
 

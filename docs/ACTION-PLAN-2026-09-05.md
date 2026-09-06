@@ -1,4 +1,4 @@
-# Kế hoạch hành động — sau deep review 2026-09-05
+# Kế hoạch hành động AISEF — sau deep review 2026-09-05
 
 Nguồn: `docs/DEEP-REVIEW-2026-09-05.md`. Mục tiêu duy nhất của kế hoạch:
 đóng 8 lớp lỗi D1–D8 bằng **cơ chế**, không bằng vá từng lỗi, và chứng

@@ -1,4 +1,4 @@
-# Checklist phát hành v0.1.0 — gói `aisef`
+# Checklist phát hành AISEF v0.1.0 — gói `aisef`
 
 > Lịch sử: v0.1.0 phát hành với lệnh `aisdlc`; 0.2.0 đổi hết về `aisef`. Các
 > lệnh trong tệp này đã viết theo tên mới.

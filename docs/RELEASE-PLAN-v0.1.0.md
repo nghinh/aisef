@@ -1,4 +1,4 @@
-# Kế hoạch phát hành v0.1.0 — hiện trạng 06/09 12:00 và việc còn lại
+# Kế hoạch phát hành AISEF v0.1.0 — hiện trạng 06/09 12:00 và việc còn lại
 
 Bản này trả lời ba câu: dự án đang ở đâu, còn gì trước khi phát hành, làm theo thứ tự nào. Mọi số có chỗ đọc lại: `docs/STATUS-2026-09-05.md`, `docs/ADR-004…md` §6, `docs/ADR-005…md` §9, `docs/CONFORMANCE.md`, `docs/SANDBOX-CONFORMANCE.md`, `CHANGELOG.md`, evidence e9/par trong scratchpad.
 

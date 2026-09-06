@@ -1,4 +1,4 @@
-# Hợp quy client
+# Hợp quy client — AISEF
 
 Sinh bởi `AISEF_CONFORMANCE=1 python3 -m unittest tests.conformance`, ngày **2026-09-06**. Bảng này là **bằng chứng**, không phải lời khai: mỗi ô là một phiên agent thật trên worktree thật với guard thật.
 

@@ -1,4 +1,4 @@
-# ADR-004 — Cải tiến liên tục theo bằng chứng ở cấp epic (đối chiếu Harness-of-Harness)
+# ADR-004 (AISEF) — Cải tiến liên tục theo bằng chứng ở cấp epic (đối chiếu Harness-of-Harness)
 
 **Trạng thái:** PROPOSED, trừ **R2 · R5 · R6 · R7 = ACCEPTED** (2026-09-05, số đo §6: B0 và B4 hồi cứu trên evidence thật của e9 và `par`, 0 agent). **R1 · R3 · R4 · R8 · R9** hiện thực, unit xanh, chờ đo trên agent thật (§6). Ngày 2026-09-06.
 **Nguồn đối chiếu:** paper *Harness-of-Harness: Multi-Day Autonomous Software Development with Continual Improvement* (arXiv 2609.01481v1, Shanghai AI Lab) và repo `Flesymeb/HarnessOfHarness` — repo tại thời điểm đọc chỉ có README + tài sản trình diễn (58 commit, MIT, "HoH-lite sẽ công bố"), **không có mã**; mọi cơ chế dưới đây lấy từ paper.
