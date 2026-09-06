@@ -1,0 +1,62 @@
+{
+  "results": {
+    "tool": {
+      "name": "vitest"
+    },
+    "summary": {
+      "tests": 4,
+      "passed": 2,
+      "failed": 1,
+      "pending": 0,
+      "skipped": 1,
+      "other": 0,
+      "start": 1788654135944,
+      "stop": 1788654137589
+    },
+    "tests": [
+      {
+        "name": "AC-STORY-01-01-1: chuỗi rỗng trả về rỗng",
+        "duration": 0.673334000000068,
+        "status": "passed",
+        "message": "",
+        "trace": "",
+        "rawStatus": "pass",
+        "type": "unit",
+        "filePath": "src/dao.test.ts",
+        "retries": 0
+      },
+      {
+        "name": "AC-STORY-01-01-2: đảo từ",
+        "duration": 0.09220899999991161,
+        "status": "passed",
+        "message": "",
+        "trace": "",
+        "rawStatus": "pass",
+        "type": "unit",
+        "filePath": "src/dao.test.ts",
+        "retries": 0
+      },
+      {
+        "name": "AC-STORY-01-01-3: thất bại",
+        "duration": 5.559625000000096,
+        "status": "failed",
+        "message": "expected 1 to be 2 // Object.is equality",
+        "rawStatus": "fail",
+        "type": "unit",
+        "filePath": "src/dao.test.ts",
+        "retries": 0
+      },
+      {
+        "name": "bỏ qua",
+        "duration": 0,
+        "status": "skipped",
+        "message": "",
+        "trace": "",
+        "rawStatus": "skip",
+        "type": "unit",
+        "filePath": "src/dao.test.ts",
+        "retries": 0
+      }
+    ]
+  }
+}

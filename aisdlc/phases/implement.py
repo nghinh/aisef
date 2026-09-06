@@ -726,7 +726,10 @@ def verify_candidate(
     # merge, và `attempt.committed` đóng giao dịch kể cả khi trượt.
     evidence.record(sid, Event(
         kind=NOTE, name="gate:verdict", ok=attempt.ok,
-        detail={"failures": [c.name for c in attempt.gate.failures][:20], "attempt": number},
+        detail={"failures": [c.name for c in attempt.gate.failures][:20], "attempt": number,
+                # Hợp đồng chấm (ADR-005 V9): mỗi mục mang `kind` và con trỏ
+                # `evidence` — replay/bench đọc từ đây, không đọc lại summary.
+                "checks": [c.as_dict() for c in attempt.gate.checks]},
     ))
     return attempt
 

@@ -1,0 +1,69 @@
+{
+    "reportFormat": "CTRF",
+    "specVersion": "0.0.0",
+    "timestamp": "2026-09-06T00:19:12.359941+00:00",
+    "generatedBy": "pytest",
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "9.1.1"
+        },
+        "summary": {
+            "tests": 4,
+            "passed": 2,
+            "failed": 1,
+            "skipped": 1,
+            "pending": 0,
+            "other": 0,
+            "start": 1788653952344,
+            "stop": 1788653952359
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_ac.py::test_AC_STORY_01_01_1_chuoi_rong",
+                "status": "passed",
+                "duration": 0,
+                "start": 1788653952348,
+                "stop": 1788653952348,
+                "retries": 0,
+                "file_path": "test_ac.py"
+            },
+            {
+                "name": "test_ac.py::test_AC_STORY_01_01_2_dao_tu",
+                "status": "passed",
+                "duration": 0,
+                "start": 1788653952349,
+                "stop": 1788653952349,
+                "retries": 0,
+                "file_path": "test_ac.py"
+            },
+            {
+                "name": "test_ac.py::TestNhom::test_AC_STORY_01_01_3_that_bai",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 10,
+                "start": 1788653952349,
+                "stop": 1788653952359,
+                "retries": 0,
+                "file_path": "test_ac.py",
+                "trace": "self = <test_ac.TestNhom object at 0x1071a8a50>\n\n    def test_AC_STORY_01_01_3_that_bai(self):\n>       assert 1 == 2\nE       assert 1 == 2\n\ntest_ac.py:14: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_ac.py::TestNhom::test_bo_qua",
+                "status": "skipped",
+                "duration": 0,
+                "start": 1788653952359,
+                "stop": 1788653952359,
+                "retries": 0,
+                "file_path": "test_ac.py",
+                "trace": "('/private/tmp/ctrf-work/py/test_ac.py', 16, 'Skipped: ch\u01b0a l\u00e0m')"
+            }
+        ]
+    }
+}

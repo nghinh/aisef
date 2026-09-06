@@ -16,7 +16,7 @@ UNCONFIGURED/UNRUNNABLE không bao giờ mang cùng ký hiệu với PASSED.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 
 
@@ -63,15 +63,32 @@ DEFAULT_REASON = {
 }
 
 
+#: Loại mục cổng (ADR-005 V9, theo Inspect `Score`/TB rubric). Đóng: mục
+#: mới phải chọn một — ai chấm mục này? Máy tất định (test/lint/coverage),
+#: máy so cấu trúc (phạm vi, tên test, DOM), rà soát bảo mật, model làm giám
+#: khảo, hay người. `human` chưa mục nào dùng; giữ tên cho waiver per-check
+#: nếu có story thật cần (ADR-005 §3 P2).
+CHECK_KINDS = ("deterministic", "structural", "security", "model-judge", "human")
+
+
 @dataclass
 class Check:
     """Một mục của cổng. `outcome` nhận cả bool cho chỗ chỉ có đạt/không:
     `Check("lint", lint.ok)` — còn chỗ nào không phải đạt/không thì phải
-    nói rõ là gì, không có `skipped=True` chung chung nữa."""
+    nói rõ là gì, không có `skipped=True` chung chung nữa.
+
+    `kind` và `evidence` là hợp đồng chấm tối thiểu (ADR-005 V9): `kind` một
+    trong `CHECK_KINDS`; `evidence` là **con trỏ** — `seq` của sự kiện mục đã
+    đọc để kết luận, không chép nội dung (nội dung nằm ở `evidence/*.jsonl`).
+    Rỗng nghĩa là mục suy từ tham số truyền vào (`gate.evaluate` kwargs) chứ
+    không từ sự kiện — và chỗ gọi phải nói rỗng. Không có `blocking`: chặn
+    hay không là việc của `Outcome.blocks`, chưa mục nào advisory (YAGNI)."""
 
     name: str
     outcome: Outcome
     detail: str = ""
+    kind: str = ""
+    evidence: list[int] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         if isinstance(self.outcome, bool):
@@ -95,4 +112,5 @@ class Check:
 
     def as_dict(self) -> dict:
         return {"name": self.name, "outcome": self.outcome.value, "passed": self.passed,
-                "skipped": self.skipped, "detail": self.detail}
+                "skipped": self.skipped, "detail": self.detail,
+                "kind": self.kind, "evidence": list(self.evidence)}

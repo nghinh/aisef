@@ -197,6 +197,30 @@ def cmd_doctor(args) -> int:
                 "(thêm `--coverage` / `--cov` / `--experimental-test-coverage`)",
                 required=False,
             )
+            # Tên test đọc được không (ADR-005 V9)? Có bằng chứng thì tin bằng
+            # chứng: lần `tool_run test` gần nhất ghi `test_format`; chưa có
+            # thì đoán từ cờ lệnh. e9/par: 220/377 lần test không đọc được tên.
+            from ..harness.observe import TOOL_RUN, EvidenceStore
+
+            store = EvidenceStore(project / "_bmad-output")
+            lan = [e for sid in store.stories() for e in store.read(sid).of(TOOL_RUN)
+                   if e.name in ("test", "test:baseline") and not e.detail.get("skipped")]
+            if lan:
+                doc_ten = bool(lan[-1].detail.get("test_format"))
+                vi = f"lần test gần nhất ghi test_format={lan[-1].detail.get('test_format') or ''!r}"
+            else:
+                doc_ten = any(k in lenh for k in ("-v", "--verbose", "--reporter=verbose",
+                                                  "--test-reporter", "node --test", "ctrf"))
+                vi = "chưa có bằng chứng — đoán từ cờ lệnh"
+            check(
+                "lệnh test in tên test", doc_ten,
+                f"cổng đọc được tên test ({vi})" if doc_ten else
+                f"{vi} → mục `tiêu chí có test`/`không làm đỏ test có sẵn` là **chưa cấu hình**. "
+                "Dùng reporter in tên hoặc CTRF: pytest `-v` hay `pip install pytest-json-ctrf` + "
+                "`pytest --ctrf /dev/stdout`; vitest `--reporter=verbose` hay `vitest-ctrf-json-reporter` "
+                "(in `vitest-ctrf/report.json` ra stdout, giữ mã thoát); node `--test-reporter=spec|tap`",
+                required=False,
+            )
     except ConfigError as e:
         check("cấu hình", False, str(e))
 
