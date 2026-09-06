@@ -1,0 +1,89 @@
+{
+  "_comment": "Sổ đăng ký nguồn skill. Commit lấy từ references/PINS.md (clone 2026-09-03). Trường redistribute quyết định skill có được COPY vào dự án đích hay không — nguồn không có license thì không.",
+  "sources": [
+    {
+      "id": "bmad",
+      "repo": "https://github.com/bmad-code-org/bmad-method",
+      "commit": "891c0abbc1128f318e098a566f925155022aef12",
+      "license": "MIT",
+      "redistribute": true,
+      "local_path": "references/bmad-method",
+      "skill_roots": [
+        "src/bmm-skills/plan",
+        "src/bmm-skills/ship",
+        "src/bmm-skills/agents",
+        "src/core-skills"
+      ],
+      "selection": "all",
+      "role": "Kernel phương pháp luận: PRD, kiến trúc, UX, epic/story, sprint, code review, e2e test, retrospective. Có headless mode trả JSON có schema."
+    },
+    {
+      "id": "superpowers",
+      "repo": "https://github.com/obra/superpowers",
+      "commit": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797",
+      "license": "MIT",
+      "redistribute": true,
+      "local_path": "references/superpowers",
+      "skill_roots": ["skills"],
+      "selection": "allowlist",
+      "allowlist": [
+        "test-driven-development",
+        "systematic-debugging",
+        "verification-before-completion",
+        "subagent-driven-development",
+        "dispatching-parallel-agents",
+        "writing-plans",
+        "executing-plans",
+        "requesting-code-review",
+        "receiving-code-review",
+        "using-git-worktrees"
+      ],
+      "role": "Kỷ luật thực thi: TDD, gỡ lỗi có hệ thống, xác minh trước khi tuyên bố xong, điều phối sub-agent, worktree."
+    },
+    {
+      "id": "ui-ux",
+      "repo": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+      "commit": "58c220ff9d02be80523b06c03471925c52e8ab5d",
+      "license": "MIT",
+      "redistribute": true,
+      "local_path": "references/ui-ux-pro-max",
+      "skill_roots": [".claude/skills"],
+      "selection": "allowlist",
+      "allowlist": [
+        "ui-ux-pro-max",
+        "design",
+        "design-system",
+        "ui-styling",
+        "brand"
+      ],
+      "requires": ["frontend_or_mobile"],
+      "role": "Thiết kế giao diện và hệ thống thiết kế; dùng cho bước mockup và story có UI.",
+      "notes": "Bỏ banner-design và slides — ngoài phạm vi SDLC. Bản trong cli/assets là bản sao, không dùng."
+    },
+    {
+      "id": "security",
+      "repo": "https://github.com/mukul975/anthropic-cybersecurity-skills",
+      "commit": "54a798831d2266a3ca61ce68a7acb80b81160d57",
+      "license": "Apache-2.0",
+      "redistribute": true,
+      "local_path": "references/cybersecurity-skills",
+      "skill_roots": ["skills"],
+      "selection": "filtered",
+      "filter": "aisef.kit.security_filter",
+      "role": "Bảo mật ứng dụng. Kho có 818 skill, phần lớn là SOC/forensics/ICS/red-team — phải lọc hai tầng trước khi cài.",
+      "notes": "Tầng 1 loại tấn công và ngoài phạm vi (818 → 269). Tầng 2 chọn theo stack dự án."
+    },
+    {
+      "id": "karpathy",
+      "repo": "https://github.com/multica-ai/andrej-karpathy-skills",
+      "commit": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+      "license": null,
+      "redistribute": false,
+      "local_path": "references/karpathy-skills",
+      "skill_roots": ["skills"],
+      "selection": "reference_only",
+      "role": "Nguyên tắc kỹ thuật, dùng làm nguồn tham chiếu khi soạn hiến pháp của framework.",
+      "notes": "KHÔNG có file LICENSE trong kho — mặc định là all rights reserved. Không sao chép vào dự án đích. Nguyên tắc được diễn đạt lại bằng ngôn ngữ của framework trong kit/constitution/, có ghi nguồn."
+    }
+  ]
+}

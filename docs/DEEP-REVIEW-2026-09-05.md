@@ -1,4 +1,4 @@
-# Deep review — AI-SDLC, 2026-09-05
+# Deep review — AISEF, 2026-09-05
 
 Rà toàn bộ framework theo từng lớp, sau khi hai dự án thử (`e9`: 7 story
 có giao diện, 77 phiên agent, $262; `par`: 4 story, 2 client) và 42 lỗi
@@ -82,7 +82,7 @@ chung: **chuyển trạng thái phải do bước nhật ký dẫn**, không do 
 | UX | 7 | Mockup → hợp đồng trích từ trang **đã dựng** → đối chiếu cây accessibility của màn hình thật (FACT `aria.py`). Đây là phần ít framework nào có. Trừ: `accessibility` chưa chạy lần nào; playwright tuỳ chọn. |
 | QA | 5 | Xem điểm yếu 2. Điểm cộng: bất biến "chưa cấu hình ≠ đạt", "không chạy được ≠ trượt" đã có mã và test. |
 | Bảo mật | 6 | Guard bí mật/tiêm, rà soát bảo mật ngữ nghĩa phiên riêng coi diff là dữ liệu không tin (FACT prompt), lọc skill hai tầng. Trừ: `tools.sast` mặc định rỗng; SBOM/quét image chưa thấy chạy; agent trên host; skill ngoài chưa kiểm tiêm prompt. |
-| DevSecOps | 5 | Sinh CI + Dockerfile + runbook (runbook có kiểm cấu trúc), cổng trước triển khai 7 mục. Trừ: CI gọi `pip install ai-sdlc` — gói chưa phát hành; không có gói bằng chứng phát hành; không có rollback; IaC ngoài phạm vi. |
+| DevSecOps | 5 | Sinh CI + Dockerfile + runbook (runbook có kiểm cấu trúc), cổng trước triển khai 7 mục. Trừ: CI gọi `pip install aisef` — gói chưa phát hành; không có gói bằng chứng phát hành; không có rollback; IaC ngoài phạm vi. |
 | Quan sát | 5 | Xem điểm yếu 1. Cộng: chi phí theo story, cảnh báo 3× trung vị, ghi `degraded` khi sandbox suy biến và báo cáo nêu ra (FACT `report.py:_isolation_note`). |
 | Đa client | 6 | Một nguồn compile ra hai client, khai năng lực có kỷ luật chứng minh. Trừ: OpenCode mù chi phí; `TOOL_ALLOWLIST: EMULATED "qua permission config"` nhưng **không có mã sinh config đó** — người rà soát trên OpenCode ghi được (FACT; đã vá hôm nay); không có bộ kiểm hợp quy. |
 | DX | 6 | `doctor`/`setup`/`status`/`gates` nói được người cần làm gì; guard chặn kèm lệnh gõ được. Trừ: 20 lệnh con; hai knob cấu hình chết; không có `explain`/`resume` tường minh; log phiên agent không lộ ra khi story trượt. |
@@ -112,7 +112,7 @@ chung: **chuyển trạng thái phải do bước nhật ký dẫn**, không do 
 
 | # | Lớp lỗi | Bằng chứng | Hậu quả | Cơ chế loại bỏ cả lớp |
 |---|---|---|---|---|
-| D1 | **Còn tin client cho thứ harness đã biết** | Lỗi 15 (cwd), 40 (`workdir` do model đặt), 41 (matcher), `settings_file` không truyền | Guard soi nhầm cây, hoặc không chạy, mà bằng chứng trông y hệt "agent ngoan" | Harness **khai** qua env (`AISDLC_WORKDIR` ✅, `AISDLC_DISALLOWED_TOOLS` ✅ hôm nay); truyền `--settings` tường minh (P0 chờ kiểm trên agent thật); "nhịp tim guard": phiên developer không có một lần guard đánh giá nào → cờ đỏ |
+| D1 | **Còn tin client cho thứ harness đã biết** | Lỗi 15 (cwd), 40 (`workdir` do model đặt), 41 (matcher), `settings_file` không truyền | Guard soi nhầm cây, hoặc không chạy, mà bằng chứng trông y hệt "agent ngoan" | Harness **khai** qua env (`AISEF_WORKDIR` ✅, `AISEF_DISALLOWED_TOOLS` ✅ hôm nay); truyền `--settings` tường minh (P0 chờ kiểm trên agent thật); "nhịp tim guard": phiên developer không có một lần guard đánh giá nào → cờ đỏ |
 | D2 | **Tạo tác sinh ra nhưng chưa từng thực thi** | Lỗi 31 (CI hardcode path), 39 (`.stdin()`), 41 (matcher), OpenCode `TOOL_ALLOWLIST` khai emulated nhưng không có mã | Bảo đảm tồn tại trên giấy | Bộ kiểm hợp quy client chạy trên client thật (P1) + test meta "mỗi mức khai `EMULATED` phải trỏ tới mã mô phỏng" |
 | D3 | **Trạng thái ghi trước điểm không quay lại** | Lỗi 21, 42; `pre_deploy` chỉ nhìn `DONE` | Story "xong" mà code chưa lên main; CI xanh trên sprint hỏng | Chuyển trạng thái do bước nhật ký dẫn: `needs_merge` ✅ hôm nay ở `status`/`pre-deploy`; bước tiếp: `DONE` chỉ sau `merge.completed` (P1, đổi FSM) |
 | D4 | **Bốn kết cục bị gộp làm hai** | Lỗi 33, 36, 37 | Thiếu công cụ = trượt; waived vẫn chạy | Một kiểu `Outcome{passed, failed, unrunnable, unconfigured, waived}` dùng chung `qa`/`gate`/`report` (P1 refactor) |
@@ -130,7 +130,7 @@ STRENGTHEN · REFACTOR · ADD · REMOVE · EXP.
 
 | # | Cải tiến | Loại | Value | Cplx | Risk | Ưu tiên |
 |---|---|---|---|---|---|---|
-| E1 | Cấm tool theo vai ở harness (`AISDLC_DISALLOWED_TOOLS`) | STRENGTHEN | High | Low | Low | **P0 ✅** |
+| E1 | Cấm tool theo vai ở harness (`AISEF_DISALLOWED_TOOLS`) | STRENGTHEN | High | Low | Low | **P0 ✅** |
 | E2 | Guard tự ghi `GUARD_BLOCK` + `FILE_CHANGE` — hồi sinh luật 3 `completion`, hết mù trên OpenCode | STRENGTHEN | High | Low | Low | **P0 ✅** |
 | E3 | "Xong" phải là "đã merge" ở `status`/`pre-deploy` | STRENGTHEN | High | Low | Low | **P0 ✅** |
 | E4 | Truyền `--settings` tường minh cho Claude + nhịp tim guard | STRENGTHEN | Critical | Low | Med | **P0** (chờ kiểm trên agent thật) |
@@ -226,7 +226,7 @@ parser output test runner theo stack (node:test/vitest/pytest — tối thiểu
 tên test). DoD: báo cáo nghiệm thu có bảng FR → TCCN → test id.
 
 **G6. Bộ kiểm hợp quy client** (E6). File mới `tests/conformance/` chạy
-bằng cờ `AISDLC_CONFORMANCE=1`, một job CI theo lịch. Năm phép thử trên
+bằng cờ `AISEF_CONFORMANCE=1`, một job CI theo lịch. Năm phép thử trên
 mỗi client thật: (a) `rm -rf` bị chặn, tệp còn; (b) Write chứa
 `os.system(f"…{x}")` bị chặn, không tệp; (c) `glob`/`read` đi qua; (d) từ
 worktree, `pwd` và `git branch --show-current` là worktree/nhánh story;
@@ -264,11 +264,11 @@ có ít nhất một caller ngoài `observe.py` và `tests/`.
 
 * Sandbox tiến trình agent (D8) — spike: Claude Code trong container với
   OAuth token mount, worktree mount, `--network` chỉ tới API.
-* Tra cứu tài liệu theo yêu cầu (`aisdlc doc <package>` gọi context7 CLI
+* Tra cứu tài liệu theo yêu cầu (`aisef doc <package>` gọi context7 CLI
   hoặc cache cục bộ) — cho luật 12.
 * Guard "mã tham chiếu quy trình" (luật 6): chặn `STORY-\d+-\d+` trong
   tệp nguồn ngoài `docs/`.
-* Vòng đời thay đổi sau phát hành: `aisdlc change <FR>` → đánh stale đúng
+* Vòng đời thay đổi sau phát hành: `aisef change <FR>` → đánh stale đúng
   tầng, sinh story delta.
 * Chia `cli.py` theo pha (thuần cơ học).
 
@@ -313,7 +313,7 @@ có ít nhất một caller ngoài `observe.py` và `tests/`.
 ## J. Ngôi sao dẫn đường
 
 **Khác gì BMAD + skill + MCP + coding agent ghép lại?** Bốn thứ đó cộng
-lại cho ra một cỗ máy *sinh* tốt. Thứ chúng không có, và AI-SDLC có (hoặc
+lại cho ra một cỗ máy *sinh* tốt. Thứ chúng không có, và AISEF có (hoặc
 đang tiến tới), là **chuỗi bằng chứng không cắt**: yêu cầu → quyết định
 kiến trúc có mã → story có phạm vi và hợp đồng kiểm định → worktree có
 guard → cổng đọc bằng chứng do harness ghi → merge có nhật ký → báo cáo

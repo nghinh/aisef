@@ -17,8 +17,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.normalize import parse_epics, parse_epics_file  # noqa: E402
-from aisdlc.phases.story_split import split, story_file  # noqa: E402
+from aisef.control.normalize import parse_epics, parse_epics_file  # noqa: E402
+from aisef.phases.story_split import split, story_file  # noqa: E402
 
 FIX = ROOT / "tests" / "fixtures" / "bmad"
 
@@ -255,8 +255,8 @@ if __name__ == "__main__":
 
 class TestMaTieuChiTrongStory(unittest.TestCase):
     def test_each_criterion_carries_its_code(self):
-        from aisdlc.control.normalize import Story
-        from aisdlc.phases.story_split import render_story
+        from aisef.control.normalize import Story
+        from aisef.phases.story_split import render_story
         st = Story(id="STORY-01-02", epic_id="E-01", title="t", acceptance_criteria=["rỗng", "đảo từ"])
         text = render_story(st, None)
         self.assertIn("1. [AC-STORY-01-02-1] rỗng", text)

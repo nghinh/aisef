@@ -3,8 +3,8 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "aisef"             # tên gói phân phối (PyPI); module và lệnh vẫn là `aisdlc`
-version = "0.1.0"
+name = "aisef"             # gói, module và lệnh cùng một tên từ 0.2.0
+version = "0.2.0"
 description = "Khung SDLC cho agent: đầu vào là docs/requirements.md, đầu ra là code đã qua cổng kiểm"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -12,12 +12,16 @@ license = "MIT"
 dependencies = []          # toàn bộ khung chạy bằng thư viện chuẩn
 
 [project.scripts]
-aisdlc = "aisdlc.cli:main"
+aisef = "aisef.cli:main"
+# Bí danh **tạm** của 0.1.0: hook đã biên dịch trong dự án cũ gọi `aisdlc …`,
+# gãy đột ngột thì người dùng không biết vì sao. Nó cảnh báo rồi chạy tiếp, và
+# sẽ bị gỡ ở 0.3.0.
+aisdlc = "aisef.cli:main_deprecated_alias"
 
 [tool.setuptools.packages.find]
-include = ["aisdlc*"]
+include = ["aisef*"]
 
 [tool.setuptools.package-data]
 # Prompt, luật, skill và script trình duyệt là *dữ liệu chạy*, không phải tài
-# liệu: thiếu chúng thì `aisdlc run` chết ở lần gọi agent đầu tiên.
-"aisdlc" = ["kit/prompts/*", "kit/rules/*", "kit/skills/**/*", "kit/*.json", "harness/assets/*"]
+# liệu: thiếu chúng thì `aisef run` chết ở lần gọi agent đầu tiên.
+"aisef" = ["kit/prompts/*", "kit/rules/*", "kit/skills/**/*", "kit/*.json", "harness/assets/*"]

@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.clients.stream import (  # noqa: E402
+from aisef.clients.stream import (  # noqa: E402
     EXIT_STATUSES,
     RunResult,
     exit_status_of,
@@ -118,7 +118,7 @@ class TestBlockedRun(unittest.TestCase):
                 _json.dumps({"type": "result", "subtype": "success"}),
             ])
 
-        that = chay("PreToolUse:Bash hook error: [aisdlc guard destructive]: chặn")
+        that = chay("PreToolUse:Bash hook error: [aisef guard destructive]: chặn")
         self.assertTrue(that.guard_blocked)
         self.assertEqual(len(that.guard_messages), 1)
 
@@ -219,7 +219,7 @@ class TestInfrastructureFailure(unittest.TestCase):
 
 
 class TestExitStatus(unittest.TestCase):
-    """ADR-005 V11 (B): một bảng kết cục cho mọi client — `aisdlc status`
+    """ADR-005 V11 (B): một bảng kết cục cho mọi client — `aisef status`
     đếm theo nó, vòng thử lại đọc nó thay vì dò chuỗi `error`."""
 
     def ket_cuc(self, result_event: dict) -> str:

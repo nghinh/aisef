@@ -15,9 +15,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.control.normalize import Story  # noqa: E402
-from aisdlc.harness.context import HEADING, prompt_section, repo_map, seeds_for  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.control.normalize import Story  # noqa: E402
+from aisef.harness.context import HEADING, prompt_section, repo_map, seeds_for  # noqa: E402
 
 
 class ContextTestCase(unittest.TestCase):
@@ -110,7 +110,7 @@ class TestBanDoQuanhPhamVi(ContextTestCase):
         for budget in (200, 500, 900):
             out = repo_map(self.p, ["src/a.ts"], budget, story_id="STORY-01-05")
             self.assertLessEqual(len(out), budget)
-            self.assertIn("đã cắt — `aisdlc ctx --story STORY-01-05`", out)
+            self.assertIn("đã cắt — `aisef ctx --story STORY-01-05`", out)
         self.assertNotIn("đã cắt", repo_map(self.p, ["src/a.ts"], 0))
 
     def test_thu_muc_va_glob_la_pham_vi(self):
@@ -185,7 +185,7 @@ class TestHatGiongVaMucPrompt(ContextTestCase):
         sec = prompt_section("bản đồ")
         self.assertTrue(sec.startswith(HEADING))
         self.assertIn("không phải chân lý", sec)
-        self.assertIn("aisdlc ctx --story", sec)
+        self.assertIn("aisef ctx --story", sec)
 
 
 if __name__ == "__main__":

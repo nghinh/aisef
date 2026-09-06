@@ -15,11 +15,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
-from aisdlc.clients.stream import RunResult  # noqa: E402
-from aisdlc.config import Config, DEFAULTS  # noqa: E402
-from aisdlc.control.approvals import GATE_ARTIFACTS, ApprovalStore, Gate, Status  # noqa: E402
-from aisdlc.phases.plan import (  # noqa: E402
+from aisef.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
+from aisef.clients.stream import RunResult  # noqa: E402
+from aisef.config import Config, DEFAULTS  # noqa: E402
+from aisef.control.approvals import GATE_ARTIFACTS, ApprovalStore, Gate, Status  # noqa: E402
+from aisef.phases.plan import (  # noqa: E402
     ARTIFACT_ROOT,
     PHASES,
     build_prompt,
@@ -295,7 +295,7 @@ class TestFailures(PlanTestCase):
 class TestSummary(PlanTestCase):
     def test_waiting_summary_tells_the_next_command(self):
         text = self.run_plan(FakeClient()).summary()
-        self.assertIn("aisdlc review prd", text)
+        self.assertIn("aisef review prd", text)
 
     def test_failure_summary_shows_machine_gate_errors(self):
         class BadPrd(FakeClient):

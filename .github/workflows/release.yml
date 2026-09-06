@@ -1,6 +1,6 @@
 # Phát hành lên PyPI khi đẩy tag `v*` — dùng *trusted publishing* (OIDC),
 # không có token nào nằm trong kho hay trong secrets. Quyết định 2026-09-05:
-# tên gói `aisef` (module/lệnh vẫn `aisdlc`), tài khoản tổ chức; publish khi hoàn tất đợt 4.
+# tên gói `aisef` (module/lệnh vẫn `aisef`), tài khoản tổ chức; publish khi hoàn tất đợt 4.
 #
 # Việc phải làm một lần bằng tay (không tự động hoá được): trên PyPI, tài
 # khoản tổ chức tạo project `aisef` và thêm "trusted publisher" trỏ tới
@@ -23,7 +23,7 @@ jobs:
       - name: Kiểm phát hành (unit + bảng hợp quy còn mới)
         run: |
           python -m unittest discover -s tests -q
-          AISDLC_RELEASE=1 python -m unittest tests.test_release_gate -q
+          AISEF_RELEASE=1 python -m unittest tests.test_release_gate -q
       - name: Build
         run: |
           python -m pip install --upgrade build twine

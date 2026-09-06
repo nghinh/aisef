@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.normalize import parse_prd  # noqa: E402
+from aisef.control.normalize import parse_prd  # noqa: E402
 
 VI = """## Yêu cầu chức năng
 

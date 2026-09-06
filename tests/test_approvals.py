@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.approvals import (  # noqa: E402
+from aisef.control.approvals import (  # noqa: E402
     GATE_ARTIFACTS,
     GATE_ORDER,
     ApprovalStore,

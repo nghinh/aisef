@@ -1,6 +1,6 @@
 """Bộ chạy bench (ADR-005 V8) — validate ×k, chạy một client, báo cáo, xuất Harbor.
 
-Khuôn `tests/dogfood/_runner.py`. Phần cần agent bật bằng ``AISDLC_BENCH=1``.
+Khuôn `tests/dogfood/_runner.py`. Phần cần agent bật bằng ``AISEF_BENCH=1``.
 
 **Cách ly lịch sử.** Không dùng `WorktreeManager`: worktree thấy mọi ref
 `story/*`, tức là thấy gold. Mỗi trạng thái là `git archive <base>` bung vào
@@ -19,7 +19,7 @@ suy biến vì ảnh `python:3.12-alpine` không có git mà unit kho cần git)
 `isolation` ghi vào kết quả, không giấu.
 
 **run.** Một phiên client với guard như hợp quy (`compile_for` + `--settings`,
-env `AISDLC_*`), `note mode=bench` trong bằng chứng, không reviewer/security,
+env `AISEF_*`), `note mode=bench` trong bằng chứng, không reviewer/security,
 không merge, không `sprint-status`. Sau phiên: hoàn nguyên tệp test agent
 chạm (`changed_files ∩ is_test_path`), áp `tests.patch`, commit tạm để có SHA
 ứng viên, chạy test ở SHA ấy (bằng chứng mang `candidate`), chấm
@@ -42,20 +42,20 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.clients.base import ClientAdapter, RunSpec  # noqa: E402
-from aisdlc.clients.compile import compile_for, write_compile_report  # noqa: E402
-from aisdlc.config import Config  # noqa: E402
-from aisdlc.control.impact import is_test_path  # noqa: E402
-from aisdlc.harness.guardrails import (  # noqa: E402
+from aisef.clients.base import ClientAdapter, RunSpec  # noqa: E402
+from aisef.clients.compile import compile_for, write_compile_report  # noqa: E402
+from aisef.config import Config  # noqa: E402
+from aisef.control.impact import is_test_path  # noqa: E402
+from aisef.harness.guardrails import (  # noqa: E402
     ENV_BASE_REF, ENV_PROJECT, ENV_STORY_ID, ENV_WORKDIR, ENV_WRITE_SCOPE, changed_files, head_sha,
 )
-from aisdlc.harness.observe import NOTE, Event, EvidenceStore  # noqa: E402
-from aisdlc.harness.testlog import parse as parse_testlog  # noqa: E402
-from aisdlc.harness.tools import describe_tools, image_for, run_tool  # noqa: E402
+from aisef.harness.observe import NOTE, Event, EvidenceStore  # noqa: E402
+from aisef.harness.testlog import parse as parse_testlog  # noqa: E402
+from aisef.harness.tools import describe_tools, image_for, run_tool  # noqa: E402
 
 from ._mine import KEEP_DIR, Task, _git  # noqa: E402
 
-ENABLED = os.environ.get("AISDLC_BENCH") == "1"
+ENABLED = os.environ.get("AISEF_BENCH") == "1"
 PASS, FAIL, INVALID, UNRUNNABLE = "PASS", "FAIL", "INVALID", "UNRUNNABLE"
 
 #: Lịch sử của lượt gốc — không vào bản chép.
@@ -67,9 +67,9 @@ _STRIP = ("_bmad-output/evidence", "_bmad-output/journal", "_bmad-output/reviews
 def repo_for(task: Task) -> Path:
     if task.source == "bug":
         return ROOT
-    e9 = os.environ.get("AISDLC_BENCH_E9", "")
+    e9 = os.environ.get("AISEF_BENCH_E9", "")
     if not e9:
-        raise RuntimeError("task story cần AISDLC_BENCH_E9 = đường dẫn dự án e9 (chỉ đọc)")
+        raise RuntimeError("task story cần AISEF_BENCH_E9 = đường dẫn dự án e9 (chỉ đọc)")
     return Path(e9)
 
 
@@ -114,7 +114,7 @@ def materialize(task: Task, dest: Path | str, *, tests: bool = False, gold: bool
     # patch là "ngoài thư mục" và lặng lẽ bỏ qua với mã thoát 0 (đo 2026-09-06:
     # bug-13 F2P = 0 vì test hồi quy chưa từng được áp).
     _git(dest, "init", "-q", "-b", "main")
-    _git(dest, "config", "user.email", "bench@aisdlc")
+    _git(dest, "config", "user.email", "bench@aisef")
     _git(dest, "config", "user.name", "bench")
     (dest / ".git" / "info" / "exclude").write_text("node_modules/\n", encoding="utf-8")
     if tests:
@@ -221,7 +221,7 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3) -> list[Result]:
         ws = materialize(task, KEEP_DIR / "run" / client.id / task.id / f"a{n}", tests=task.tests_visible)
         base = head_sha(ws)
         root = ws / "_bmad-output"
-        write_compile_report(ws, [compile_for(client.id, ws, aisdlc_bin=str(ROOT / "bin" / "aisdlc"))])
+        write_compile_report(ws, [compile_for(client.id, ws, aisef_bin=str(ROOT / "bin" / "aisef"))])
         store = EvidenceStore(root)
         store.record(task.id, Event(kind=NOTE, name="mode",
                                     detail={"mode": "bench", "client": client.id, "attempt": n, "base": base}))
@@ -246,7 +246,7 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3) -> list[Result]:
                 (ws / p).unlink(missing_ok=True)
         if not task.tests_visible:
             apply_patch(ws, task.dir / "tests.patch")
-        _git(ws, "add", "-A", "--", ".", ":(exclude)_bmad-output", ":(exclude).claude", ":(exclude).aisdlc")
+        _git(ws, "add", "-A", "--", ".", ":(exclude)_bmad-output", ":(exclude).claude", ":(exclude).aisef")
         _git(ws, "commit", "-qm", f"{task.id}: ứng viên lượt {n}", check=False)   # không có gì để chốt = HEAD
         cand = head_sha(ws)
         res = run_tool("test", ws, story_id=task.id, artifact_root=root, config=cfg, candidate=cand)
@@ -355,10 +355,10 @@ cd /app
 _TASK_TOML = """version = "1.0"
 
 [metadata]
-author_name = "AI-SDLC bench (ADR-005 V8)"
+author_name = "AISEF bench (ADR-005 V8)"
 difficulty = "medium"
 category = "software-engineering"
-tags = ["aisdlc", "{source}"]
+tags = ["aisef", "{source}"]
 
 [verifier]
 timeout_sec = 1800.0

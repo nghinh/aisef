@@ -1,4 +1,4 @@
-# Hướng dẫn sử dụng AI-SDLC (gói `aisef`, lệnh `aisdlc`)
+# Hướng dẫn sử dụng AISEF
 
 Hướng dẫn này viết cho người **chưa từng dùng** framework, và cố gắng không
 bỏ qua bước nào. Mỗi phần có: gõ lệnh gì, chờ bao lâu, màn hình hiện gì, và
@@ -18,13 +18,13 @@ Quy ước đọc:
 2. [Chuẩn bị máy](#2-chuẩn-bị-máy)
 3. [Cài đặt](#3-cài-đặt)
 4. [Tạo dự án và viết đầu vào](#4-tạo-dự-án-và-viết-đầu-vào)
-5. [`aisdlc setup` — nạp skill, sinh luật](#5-aisdlc-setup--nạp-skill-sinh-luật)
+5. [`aisef setup` — nạp skill, sinh luật](#5-aisef-setup--nạp-skill-sinh-luật)
 6. [Cấu hình `.ai/config.json`](#6-cấu-hình-aiconfigjson)
-7. [`aisdlc compile` và `aisdlc doctor`](#7-aisdlc-compile-và-aisdlc-doctor)
-8. [Bước lập kế hoạch: `aisdlc plan`](#8-bước-lập-kế-hoạch-aisdlc-plan)
+7. [`aisef compile` và `aisef doctor`](#7-aisef-compile-và-aisef-doctor)
+8. [Bước lập kế hoạch: `aisef plan`](#8-bước-lập-kế-hoạch-aisef-plan)
 9. [Bước mockup (dự án có giao diện)](#9-bước-mockup-dự-án-có-giao-diện)
 10. [Đọc cổng story: sáu kết cục](#10-đọc-cổng-story-sáu-kết-cục)
-11. [Bước hiện thực: `aisdlc run`](#11-bước-hiện-thực-aisdlc-run)
+11. [Bước hiện thực: `aisef run`](#11-bước-hiện-thực-aisef-run)
 12. [Kiểm định, đóng gói, nghiệm thu](#12-kiểm-định-đóng-gói-nghiệm-thu)
 13. [Vòng cải tiến và thay đổi sau phát hành](#13-vòng-cải-tiến-và-thay-đổi-sau-phát-hành)
 14. [Chi phí thật và cách giảm](#14-chi-phí-thật-và-cách-giảm)
@@ -57,7 +57,7 @@ Vì thế có **hai loại cổng**:
 Phê duyệt là **trạng thái trên đĩa**, không phải câu trả lời trong một phiên
 chat. Nó gắn với **băm nội dung** của tài liệu: sửa tài liệu sau khi duyệt thì
 phê duyệt tự hết hiệu lực (`stale`), và duyệt lại tầng trên làm mọi tầng dưới
-thành `stale`. Bạn không cần nhớ điều này — `aisdlc gates` luôn nói.
+thành `stale`. Bạn không cần nhớ điều này — `aisef gates` luôn nói.
 
 Ba câu bất biến, gặp lại nhiều lần trong hướng dẫn:
 
@@ -74,7 +74,7 @@ Bốn thứ, chỉ **hai** là bắt buộc.
 | Thứ | Bắt buộc? | Kiểm bằng | Thiếu thì sao |
 |---|---|---|---|
 | Python ≥ 3.11 | **có** | `python3 --version` | không cài được gói |
-| `git` | **có** | `git --version` | không chạy được `aisdlc run` (mỗi story cần một worktree riêng) |
+| `git` | **có** | `git --version` | không chạy được `aisef run` (mỗi story cần một worktree riêng) |
 | Một client agent: `claude` (khuyến nghị) hoặc `opencode` | **có, để chạy agent** | `claude --version` | các lệnh gọi agent dừng với mã 2 và câu "chưa cài claude trên máy này" |
 | Docker | không | `docker info` | test chạy thẳng trên máy; framework ghi rõ là **suy biến** kèm tên bảo đảm thiếu |
 | Playwright + Chromium | không, trừ khi dự án có giao diện | `npx playwright --version` | không trích được hợp đồng thị giác từ mockup |
@@ -103,19 +103,23 @@ pip install aisef
 Kiểm tra cài được:
 
 ```bash
-aisdlc --help
+aisef --help
 ```
 
-Bạn phải thấy danh sách lệnh con (`setup`, `doctor`, `plan`, `run`, …). Lưu ý:
-gói tên **`aisef`**, còn lệnh và module Python tên **`aisdlc`** — không có
-`--version`, muốn biết môi trường thì dùng `aisdlc doctor`.
+Bạn phải thấy danh sách lệnh con (`setup`, `doctor`, `plan`, `run`, …). Gói,
+module Python và lệnh đều tên `aisef`. Không có `--version`; muốn biết môi
+trường thì dùng `aisef doctor`.
+
+Nếu bạn từng cài bản 0.1.0 (lệnh khi đó tên `aisdlc`): bí danh cũ vẫn chạy tới
+0.3.0 nhưng in cảnh báo. Sau khi nâng cấp, chạy `aisef compile` trong từng dự
+án để hook trỏ đúng tên mới.
 
 Framework **không có phụ thuộc Python nào** ngoài thư viện chuẩn.
 
 Bản dành cho người muốn sửa framework:
 
 ```bash
-git clone <repo> ai-sdlc && cd ai-sdlc && pip install -e .
+git clone <repo> aisef && cd aisef && pip install -e .
 python3 -m unittest discover -s tests -q
 ```
 
@@ -179,10 +183,10 @@ Ba lời khuyên cho tệp này:
 
 ---
 
-## 5. `aisdlc setup` — nạp skill, sinh luật
+## 5. `aisef setup` — nạp skill, sinh luật
 
 ```bash
-aisdlc setup
+aisef setup
 ```
 
 Lệnh này: dò công nghệ dự án từ `docs/requirements.md`, chọn skill phù hợp từ
@@ -190,23 +194,23 @@ danh mục, **lọc bỏ skill tấn công**, cài chúng vào dự án, sinh `C
 `AGENTS.md` (luật mà agent phải theo), và ghi `.ai/config.json` mặc định.
 
 Lần đầu chạy trên một máy, nó tải kho skill tham chiếu về
-`~/.cache/ai-sdlc/references` (khoảng 93 MB, dùng chung cho mọi dự án). Máy
+`~/.cache/aisef/references` (khoảng 93 MB, dùng chung cho mọi dự án). Máy
 không có mạng:
 
 ```bash
-aisdlc setup --no-fetch          # chỉ dùng thứ đã có trên đĩa
-AISDLC_REFERENCES=/duong/dan aisdlc setup   # trỏ sang kho đã tải sẵn
+aisef setup --no-fetch          # chỉ dùng thứ đã có trên đĩa
+AISEF_REFERENCES=/duong/dan aisef setup   # trỏ sang kho đã tải sẵn
 ```
 
 Muốn xem trước, không ghi gì:
 
 ```bash
-aisdlc setup --dry-run
+aisef setup --dry-run
 ```
 
 Kết thúc bạn sẽ thấy dòng tổng kết dạng `cài mới 152 · giữ nguyên 0 · gỡ 0`,
 dòng `quy tắc: CLAUDE.md, AGENTS.md`, và đường dẫn `.ai/config.json` vừa ghi.
-Chạy lại `aisdlc setup` **không** nhân bản skill.
+Chạy lại `aisef setup` **không** nhân bản skill.
 
 Lưu ý quan trọng: `.ai/config.json` sinh ra với **mọi lệnh để trống**
 (`tools.test`, `tools.lint`, `verify.*`). Framework cố ý không đoán lệnh test
@@ -282,10 +286,10 @@ Toàn bộ khoá có ở [§17](#17-tra-cứu-toàn-bộ-khoá-cấu-hình).
 
 ---
 
-## 7. `aisdlc compile` và `aisdlc doctor`
+## 7. `aisef compile` và `aisef doctor`
 
 ```bash
-aisdlc compile
+aisef compile
 ```
 
 Sinh hook/plugin cho client, tức là nối **tám guard** của framework vào phiên
@@ -315,10 +319,10 @@ Cuối lệnh nó in một báo cáo năng lực, ví dụ:
 framework ghi đúng mức bảo đảm nó đạt được thay vì giả vờ. Guard chính (chặn
 ghi sai phạm vi, chặn lệnh phá huỷ) vẫn chạy.
 
-Chạy `aisdlc compile` lại mỗi khi nâng cấp gói.
+Chạy `aisef compile` lại mỗi khi nâng cấp gói.
 
 ```bash
-aisdlc doctor
+aisef doctor
 ```
 
 Đọc từng dòng như sau:
@@ -332,10 +336,10 @@ Dòng cuối cùng là kết luận: `✅ sẵn sàng` hoặc danh sách thứ c
 
 ---
 
-## 8. Bước lập kế hoạch: `aisdlc plan`
+## 8. Bước lập kế hoạch: `aisef plan`
 
 ```bash
-aisdlc plan
+aisef plan
 ```
 
 Lệnh này chạy **năm pha liên tiếp**, mỗi pha là một phiên agent và dừng lại ở
@@ -355,7 +359,7 @@ Mọi tệp nằm trong thư mục `_bmad-output/` của dự án.
 Khi lệnh dừng, xem cổng nào đang chờ:
 
 ```bash
-aisdlc gates
+aisef gates
 ```
 
 Bảng hiện tám cổng, ví dụ ở một dự án vừa tạo:
@@ -371,7 +375,7 @@ Bảng hiện tám cổng, ví dụ ở một dự án vừa tạo:
   ⏳ pre-deploy     pending              [thiếu: pre-deploy-report.json]
 
 Cổng kế tiếp cần xử lý: prd
-  aisdlc review prd
+  aisef review prd
 ```
 
 Bốn trạng thái: `pending` (chờ), `approved` (đã duyệt), `stale` (đã duyệt nhưng
@@ -381,21 +385,21 @@ trả lại kèm ghi chú). Dòng cuối luôn nói việc kế tiếp.
 Đọc tài liệu của một cổng:
 
 ```bash
-aisdlc review prd
-aisdlc review prd --lines 200      # xem nhiều dòng hơn
+aisef review prd
+aisef review prd --lines 200      # xem nhiều dòng hơn
 ```
 
 Duyệt, hoặc trả lại kèm lý do:
 
 ```bash
-aisdlc approve prd --note "đã đọc, đồng ý phạm vi"
-aisdlc reject prd --note "thiếu yêu cầu xoá mềm; bổ sung FR về thùng rác"
+aisef approve prd --note "đã đọc, đồng ý phạm vi"
+aisef reject prd --note "thiếu yêu cầu xoá mềm; bổ sung FR về thùng rác"
 ```
 
 Rồi chạy tiếp:
 
 ```bash
-aisdlc plan
+aisef plan
 ```
 
 Lệnh `plan` luôn **chạy tiếp từ chỗ đang dở**, không làm lại pha đã có tài liệu.
@@ -418,7 +422,7 @@ Bạn nên đọc gì ở từng cổng:
 Chạy nhanh, không dừng ở cổng nào (chỉ nên dùng khi thử nghiệm):
 
 ```bash
-aisdlc plan --auto-approve all
+aisef plan --auto-approve all
 ```
 
 Phê duyệt tự động **luôn** bị đánh dấu `auto`, để sau này biết tài liệu nào
@@ -431,7 +435,7 @@ chưa từng có người thật đọc.
 Bỏ qua phần này nếu dự án không có giao diện.
 
 ```bash
-aisdlc mockup
+aisef mockup
 ```
 
 Mỗi màn hình trong `EXPERIENCE.md` thành một tệp HTML, được chụp màn hình, rồi
@@ -440,16 +444,16 @@ phải khớp. Chi phí thật khoảng 1,5–2,3 đô la mỗi màn hình, nên
 hãy dựng theo đợt:
 
 ```bash
-aisdlc mockup --only man-hinh-danh-sach,man-hinh-soan-thao
-aisdlc mockup --force --only man-hinh-danh-sach      # dựng lại một màn
+aisef mockup --only man-hinh-danh-sach,man-hinh-soan-thao
+aisef mockup --force --only man-hinh-danh-sach      # dựng lại một màn
 ```
 
 Duyệt hai cổng còn lại:
 
 ```bash
-aisdlc review mockups
-aisdlc approve mockups
-aisdlc approve readiness
+aisef review mockups
+aisef approve mockups
+aisef approve readiness
 ```
 
 `readiness` là cổng chốt cuối cùng trước khi viết code — sau nó là tiền thật
@@ -497,10 +501,10 @@ tên test.
 
 ---
 
-## 11. Bước hiện thực: `aisdlc run`
+## 11. Bước hiện thực: `aisef run`
 
 ```bash
-aisdlc run
+aisef run
 ```
 
 Chuyện xảy ra với **mỗi** story:
@@ -518,15 +522,15 @@ Chuyện xảy ra với **mỗi** story:
 Các dạng chạy:
 
 ```bash
-aisdlc run --epic EPIC-01        # chỉ một epic
-aisdlc run --sequential          # tắt chạy song song (dễ đọc log hơn)
-aisdlc run --force               # chạy dù cổng stories chưa duyệt (chỉ để thử)
+aisef run --epic EPIC-01        # chỉ một epic
+aisef run --sequential          # tắt chạy song song (dễ đọc log hơn)
+aisef run --force               # chạy dù cổng stories chưa duyệt (chỉ để thử)
 ```
 
 Xem tiến độ và chi phí bất cứ lúc nào (lệnh này **không** tốn tiền):
 
 ```bash
-aisdlc status
+aisef status
 ```
 
 Dự án chưa chạy story nào thì nó nói thẳng `Chưa có story nào được đăng ký.`
@@ -550,8 +554,8 @@ Chi phí: $254.11
 **Khi một story trượt**, làm theo thứ tự này:
 
 ```bash
-aisdlc evidence STORY-01-03           # lịch sử: mục nào ✗, vì sao
-aisdlc gate STORY-01-03               # chấm lại trên bằng chứng đã ghi, không gọi model
+aisef evidence STORY-01-03           # lịch sử: mục nào ✗, vì sao
+aisef gate STORY-01-03               # chấm lại trên bằng chứng đã ghi, không gọi model
 ```
 
 Rồi phân loại:
@@ -560,7 +564,7 @@ Rồi phân loại:
   tiền cho một phiên viết code mới, chỉ kiểm lại đúng bản đã có:
 
   ```bash
-  aisdlc run --verify-only --story STORY-01-03 --repeat 3
+  aisef run --verify-only --story STORY-01-03 --repeat 3
   ```
 
   `--repeat 3` chạy mỗi phép kiểm ba lần; nếu kết quả đổi giữa các lần thì cổng
@@ -575,8 +579,8 @@ Rồi phân loại:
 Muốn xem agent đang được cho những gì:
 
 ```bash
-aisdlc ctx --story STORY-01-03        # bản đồ mã quanh phạm vi ghi
-aisdlc skill --story STORY-01-03      # skill được định tuyến cho story
+aisef ctx --story STORY-01-03        # bản đồ mã quanh phạm vi ghi
+aisef skill --story STORY-01-03      # skill được định tuyến cho story
 ```
 
 ---
@@ -584,7 +588,7 @@ aisdlc skill --story STORY-01-03      # skill được định tuyến cho story
 ## 12. Kiểm định, đóng gói, nghiệm thu
 
 ```bash
-aisdlc qa
+aisef qa
 ```
 
 Chạy toàn bộ loại kiểm định đã khai: `unit`, `sit`, `api-contract`, `e2e`,
@@ -592,14 +596,14 @@ Chạy toàn bộ loại kiểm định đã khai: `unit`, `sit`, `api-contract`
 `image-scan`. Loại chưa khai lệnh hiện ○ và **không** được tính là đạt.
 
 ```bash
-aisdlc qa --only unit,e2e             # chạy vài loại
-aisdlc qa --story STORY-01-03         # ghi bằng chứng cho một story
+aisef qa --only unit,e2e             # chạy vài loại
+aisef qa --story STORY-01-03         # ghi bằng chứng cho một story
 ```
 
 Sinh tạo tác vận hành:
 
 ```bash
-aisdlc devsecops
+aisef devsecops
 ```
 
 Sinh quy trình CI, `Dockerfile`, cấu hình triển khai và `docs/RUNBOOK.md`.
@@ -609,7 +613,7 @@ mục nào thì cổng cuối chặn.
 Cổng cuối:
 
 ```bash
-aisdlc pre-deploy
+aisef pre-deploy
 ```
 
 Nó chấm: mọi story đã xong, mọi cổng người đã duyệt, bộ kiểm định đạt, kiểm
@@ -618,7 +622,7 @@ Nó chấm: mọi story đã xong, mọi cổng người đã duyệt, bộ ki�
 Nghiệm thu **một phần** dự án (ví dụ chỉ epic đầu tiên):
 
 ```bash
-aisdlc pre-deploy --epic EPIC-01
+aisef pre-deploy --epic EPIC-01
 ```
 
 Story ngoài phạm vi khai được liệt kê là "ngoài phạm vi nghiệm thu" — **không
@@ -626,20 +630,20 @@ xong, cũng không thiếu**. Đây không phải nới cổng, mà là bắt b�
 đang nghiệm thu cái gì; phạm vi được ghi vào báo cáo và phê duyệt gắn với nó.
 
 ```bash
-aisdlc approve pre-deploy --note "nghiệm thu EPIC-01 theo báo cáo ngày …"
-aisdlc report
+aisef approve pre-deploy --note "nghiệm thu EPIC-01 theo báo cáo ngày …"
+aisef report
 ```
 
-`aisdlc report` sinh `docs/ACCEPTANCE-REPORT.md`: bảng truy vết yêu cầu → story
+`aisef report` sinh `docs/ACCEPTANCE-REPORT.md`: bảng truy vết yêu cầu → story
 → có test hay chưa, bảng cổng, chi phí, và sổ hành vi.
 
 Tra một thứ cụ thể:
 
 ```bash
-aisdlc evidence FR-3                  # đường đời một yêu cầu
-aisdlc evidence AC-STORY-01-02-1      # một tiêu chí chấp nhận
-aisdlc evidence qa:e2e                # một loại kiểm định
-aisdlc issues --format csv            # bảng gap/hồi quy ra tệp
+aisef evidence FR-3                  # đường đời một yêu cầu
+aisef evidence AC-STORY-01-02-1      # một tiêu chí chấp nhận
+aisef evidence qa:e2e                # một loại kiểm định
+aisef issues --format csv            # bảng gap/hồi quy ra tệp
 ```
 
 ---
@@ -649,7 +653,7 @@ aisdlc issues --format csv            # bảng gap/hồi quy ra tệp
 **Vòng cải tiến** đóng dần các khoảng trống (GAP) mà sổ hành vi ghi lại:
 
 ```bash
-aisdlc improve --epic EPIC-01 --max-loops 3
+aisef improve --epic EPIC-01 --max-loops 3
 ```
 
 Mỗi vòng: chạy kiểm định → đọc sổ hành vi → sinh **một** story sửa cho **một**
@@ -657,13 +661,13 @@ hành vi đang GAP → chạy story ấy như story thường → chạy lại k
 `LOOP-REPORT-<n>.md`. Vòng dừng bằng code khi: hết gap, đủ số vòng, hai vòng
 liền không cải thiện, vượt trần chi phí, hoặc story sửa bế tắc vì kế hoạch.
 
-Trước mỗi vòng từ thứ hai, framework dừng lại hỏi bạn (`aisdlc approve improve`);
+Trước mỗi vòng từ thứ hai, framework dừng lại hỏi bạn (`aisef approve improve`);
 thêm `--auto` để không dừng.
 
 **Thay đổi yêu cầu sau khi đã phát hành**:
 
 ```bash
-aisdlc change FR-3 "Slug phải giữ dấu gạch dưới"
+aisef change FR-3 "Slug phải giữ dấu gạch dưới"
 ```
 
 Lệnh ghi thay đổi vào `docs/requirements.md`, đánh dấu cổng `prd` và mọi cổng
@@ -706,15 +710,15 @@ Cách giảm:
 |---|---|---|
 | `✗ chưa cài claude trên máy này`, lệnh trả mã 2 | máy chưa có client agent | cài client, chạy `claude --version` cho tới khi được |
 | `✗ không có docs/requirements.md` | chưa có đầu vào | tạo tệp theo [§4](#4-tạo-dự-án-và-viết-đầu-vào) |
-| `aisdlc gates` báo `stale` | tài liệu đổi sau khi duyệt, hoặc tầng trên vừa được duyệt lại | đọc lại rồi `aisdlc approve <cổng>` |
+| `aisef gates` báo `stale` | tài liệu đổi sau khi duyệt, hoặc tầng trên vừa được duyệt lại | đọc lại rồi `aisef approve <cổng>` |
 | Cổng `stories` không cho chạy | cổng máy đã bắt lỗi kế hoạch | đọc lý do, sửa `stories.index.json`, duyệt lại |
 | Mục cổng ○ `coverage` | lệnh test không in số coverage | thêm `--coverage` (vitest/c8) hoặc `--cov` (pytest) vào `tools.test` |
 | Mục cổng ○ `tiêu chí có test` | runner không in tên test | thêm `--reporter=verbose` (vitest) hoặc `-v` (pytest) |
-| Mục cổng ✗ `test có kiểm được story` | test chỉ gắn mã vào test có sẵn | yêu cầu story viết test mới cho tiêu chí; nếu test cũ thật sự đã chứng minh đủ thì khai truy vết: `aisdlc evidence <mã> --link "<tên test>" --why "…"` |
+| Mục cổng ✗ `test có kiểm được story` | test chỉ gắn mã vào test có sẵn | yêu cầu story viết test mới cho tiêu chí; nếu test cũ thật sự đã chứng minh đủ thì khai truy vết: `aisef evidence <mã> --link "<tên test>" --why "…"` |
 | Mục cổng ⚠ kèm "không chạy được" | thiếu công cụ hoặc môi trường | dựng môi trường rồi chạy lại; **không** đổi ngưỡng để cho qua |
 | Kiểm định báo "suy biến" | chạy ngoài Docker, thiếu vài bảo đảm | dựng Docker; hoặc khai `sandbox.pre_deploy_degraded_waiver` với lý do thật |
 | `Port ... is already in use` khi chạy e2e | một tiến trình dev cũ còn sống | tìm và tắt nó (`lsof -nP -i :5199`), rồi chạy lại |
-| Story `blocked` sau nhiều lượt | thường là kế hoạch sai, không phải code sai | đọc `aisdlc evidence <story>`, sửa story/phạm vi ghi, duyệt lại cổng `stories` |
+| Story `blocked` sau nhiều lượt | thường là kế hoạch sai, không phải code sai | đọc `aisef evidence <story>`, sửa story/phạm vi ghi, duyệt lại cổng `stories` |
 | Merge conflict cuối đợt | hai story khai `write_scope` chồng nhau | đó là tín hiệu kế hoạch sai — tách phạm vi rồi chạy lại |
 | Chi phí một story cao bất thường | story quá lớn cho một phiên | chẻ story; ngưỡng kích cỡ ở `story.max_complexity` |
 
@@ -730,55 +734,55 @@ Mọi lệnh nhận `--project <thư mục>` (mặc định: thư mục hiện t
 **Chuẩn bị**
 
 ```bash
-aisdlc doctor                              # kiểm môi trường
-aisdlc setup [--references DIR] [--no-fetch] [--dry-run]
-aisdlc init                                # ghi .ai/config.json mặc định
-aisdlc compile [--client claude|opencode|all] [--bin PATH]
+aisef doctor                              # kiểm môi trường
+aisef setup [--references DIR] [--no-fetch] [--dry-run]
+aisef init                                # ghi .ai/config.json mặc định
+aisef compile [--client claude|opencode|all] [--bin PATH]
 ```
 
 **Lập kế hoạch và cổng người**
 
 ```bash
-aisdlc plan [--client c] [--auto-approve all|<danh sách>] [--force]
-aisdlc mockup [--client c] [--only <screen_id>] [--force]
-aisdlc gates
-aisdlc review <cổng> [--lines N]
-aisdlc approve <cổng> [--note "..."] [--force]
-aisdlc reject <cổng> --note "..."
-aisdlc auto-approve all|<danh sách>
+aisef plan [--client c] [--auto-approve all|<danh sách>] [--force]
+aisef mockup [--client c] [--only <screen_id>] [--force]
+aisef gates
+aisef review <cổng> [--lines N]
+aisef approve <cổng> [--note "..."] [--force]
+aisef reject <cổng> --note "..."
+aisef auto-approve all|<danh sách>
 ```
 
 **Hiện thực**
 
 ```bash
-aisdlc run [--client c] [--epic E] [--sequential] [--no-isolate] [--force]
-aisdlc run --verify-only --story S [--repeat K]
-aisdlc improve --epic E [--max-loops N] [--auto] [--client c] [--force]
-aisdlc tool test|lint|sast [--story S] [--lines N]
-aisdlc verify [--write-scope ...] [--story S]
-aisdlc gate <story> [--attempt n] | --all | --replay
-aisdlc guard <tên guard>                   # framework tự gọi qua hook
+aisef run [--client c] [--epic E] [--sequential] [--no-isolate] [--force]
+aisef run --verify-only --story S [--repeat K]
+aisef improve --epic E [--max-loops N] [--auto] [--client c] [--force]
+aisef tool test|lint|sast [--story S] [--lines N]
+aisef verify [--write-scope ...] [--story S]
+aisef gate <story> [--attempt n] | --all | --replay
+aisef guard <tên guard>                   # framework tự gọi qua hook
 ```
 
 **Kiểm định và phát hành**
 
 ```bash
-aisdlc qa [--only <loại>] [--story S] [--story-level]
-aisdlc devsecops [--client c] [--install-spec X] [--bin PATH] [--force]
-aisdlc pre-deploy [--skip-qa] [--epic E]
+aisef qa [--only <loại>] [--story S] [--story-level]
+aisef devsecops [--client c] [--install-spec X] [--bin PATH] [--force]
+aisef pre-deploy [--skip-qa] [--epic E]
 ```
 
 **Quan sát**
 
 ```bash
-aisdlc status
-aisdlc report [--out FILE]
-aisdlc evidence <id> [--story S] [--link TEST --why "..." --by ai]
-aisdlc issues [--format md|csv] [--epic E] [--status gap,reopened] [--out FILE]
-aisdlc ctx [--story S | --file F] [--budget N]
-aisdlc skill [--story S] [--scan --client c --batch N]
-aisdlc doc <gói> [--topic T] [--story S]
-aisdlc change FR-x "mô tả"
+aisef status
+aisef report [--out FILE]
+aisef evidence <id> [--story S] [--link TEST --why "..." --by ai]
+aisef issues [--format md|csv] [--epic E] [--status gap,reopened] [--out FILE]
+aisef ctx [--story S | --file F] [--budget N]
+aisef skill [--story S] [--scan --client c --batch N]
+aisef doc <gói> [--topic T] [--story S]
+aisef change FR-x "mô tả"
 ```
 
 ---

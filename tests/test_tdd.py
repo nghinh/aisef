@@ -7,8 +7,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from aisdlc.control.tdd import added_tests, red_before_green, test_delta
-from aisdlc.harness.observe import EvidenceStore
+from aisef.control.tdd import added_tests, red_before_green, test_delta
+from aisef.harness.observe import EvidenceStore
 
 
 def git(repo: Path, *args: str) -> str:

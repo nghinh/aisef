@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 40
     env:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      AISDLC_CONFORMANCE: "1"
+      AISEF_CONFORMANCE: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -26,7 +26,7 @@ jobs:
       - name: Năm phép thử trên claude
         run: python3 -m unittest tests.conformance.test_claude -v
       - name: Kiểm điều kiện phát hành từ bảng
-        run: AISDLC_RELEASE=1 python3 -m unittest tests.test_release_gate -v
+        run: AISEF_RELEASE=1 python3 -m unittest tests.test_release_gate -v
       - name: Giữ bảng làm bằng chứng
         if: always()
         uses: actions/upload-artifact@v4

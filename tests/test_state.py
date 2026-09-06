@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.state import (  # noqa: E402
+from aisef.control.state import (  # noqa: E402
     STATE_FILE,
     SprintState,
     StateStore,
@@ -122,7 +122,7 @@ class TestCostOutliers(StateTestCase):
     def test_uses_median_not_mean(self):
         """Một story cực đắt sẽ kéo trung bình lên và tự che chính nó."""
         st = SprintState()
-        from aisdlc.control.state import StoryRecord
+        from aisef.control.state import StoryRecord
 
         for i, cost in enumerate([0.4, 0.5, 0.45, 0.5, 9.0]):
             st.stories[f"S-{i}"] = StoryRecord(id=f"S-{i}", cost_usd=cost)
@@ -130,7 +130,7 @@ class TestCostOutliers(StateTestCase):
         self.assertEqual([r.cost_usd for r in outliers], [9.0])
 
     def test_too_few_samples_gives_nothing(self):
-        from aisdlc.control.state import StoryRecord
+        from aisef.control.state import StoryRecord
 
         st = SprintState(stories={"a": StoryRecord(id="a", cost_usd=99.0)})
         self.assertEqual(st.cost_outliers(3.0), [])
@@ -172,7 +172,7 @@ class TestConcurrency(StateTestCase):
         script = textwrap.dedent(f"""
             import sys
             sys.path.insert(0, {str(ROOT)!r})
-            from aisdlc.control.state import StateStore, StoryStatus
+            from aisef.control.state import StateStore, StoryStatus
             store = StateStore({str(self.root)!r})
             sid = sys.argv[1]
             store.register(sid, "E-01")
@@ -247,7 +247,7 @@ class TestVerifiedTruocDone(unittest.TestCase):
 
     def test_so_cu_done_chua_merge_doc_len_thanh_verified(self):
         """Di trú: dự án chạy trước G12 có `done` mà nhật ký nói chưa merge."""
-        from aisdlc.control.journal import Entry, JournalStore
+        from aisef.control.journal import Entry, JournalStore
         self.toi(StoryStatus.RUNNING, StoryStatus.VERIFYING, StoryStatus.DONE)
         j = JournalStore(self.root)
         for s in ("attempt.started", "worktree.created", "commit.created", "attempt.committed"):
@@ -259,7 +259,7 @@ class TestVerifiedTruocDone(unittest.TestCase):
         self.assertEqual(raw["stories"]["S-01"]["status"], "verified")
 
     def test_so_cu_done_da_merge_giu_nguyen(self):
-        from aisdlc.control.journal import Entry, JournalStore
+        from aisef.control.journal import Entry, JournalStore
         self.toi(StoryStatus.RUNNING, StoryStatus.VERIFYING, StoryStatus.DONE)
         j = JournalStore(self.root)
         for s in ("attempt.started", "worktree.created", "merge.completed", "attempt.committed"):

@@ -17,12 +17,12 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.control import complexity, preflight  # noqa: E402
-from aisdlc.control.experience import Experience, Screen  # noqa: E402
-from aisdlc.control.normalize import Story  # noqa: E402
-from aisdlc.phases.plan import PHASES, build_prompt  # noqa: E402
-from aisdlc.phases.story_split import GATE_MEMO  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.control import complexity, preflight  # noqa: E402
+from aisef.control.experience import Experience, Screen  # noqa: E402
+from aisef.control.normalize import Story  # noqa: E402
+from aisef.phases.plan import PHASES, build_prompt  # noqa: E402
+from aisef.phases.story_split import GATE_MEMO  # noqa: E402
 
 
 def exp(**states):
@@ -300,7 +300,7 @@ class TestCalibrationTable(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
 
     def evidence(self, story_id, runs):
-        from aisdlc.harness.observe import AGENT_RUN, Event, EvidenceStore
+        from aisef.harness.observe import AGENT_RUN, Event, EvidenceStore
 
         store = EvidenceStore(self.root)
         for name, turns, err in runs:
@@ -359,7 +359,7 @@ class TestCalibrationTable(unittest.TestCase):
     def test_doctor_reports_the_divergence(self):
         import argparse
 
-        from aisdlc.cli import doctor
+        from aisef.cli import doctor
 
         (self.root / complexity.CALIBRATION_FILE).write_text(json.dumps({
             "version": 1,

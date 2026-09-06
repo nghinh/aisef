@@ -9,7 +9,7 @@
 | S2 Hook chặn trên Claude CLI | ✅ **XONG** | Chặn thật; agent không lách; `acceptEdits` cũng không vượt được |
 | S7 Đối chiếu mockup | ✅ **XONG** | `ariaSnapshot()` cho đối chiếu tất định |
 | S3 Hook trên Claude Desktop | ✅ **XONG** | Desktop đọc `.claude/settings.json` của dự án, **ngay, không cần restart** |
-| S4 OpenCode CLI + Desktop | ⚠️ **CHƯA KẾT LUẬN → đã quyết** | Cơ chế `tool.execute.before` có thật; provider quá chậm để chạy xong ca thử. **Quyết định của chủ đầu tư: chấp nhận OpenCode ở mức hậu kiểm** — plugin vẫn sinh, `aisdlc verify` chạy lại guard trên diff, `compile-report.json` ghi `blocks_at_source: false` |
+| S4 OpenCode CLI + Desktop | ⚠️ **CHƯA KẾT LUẬN → đã quyết** | Cơ chế `tool.execute.before` có thật; provider quá chậm để chạy xong ca thử. **Quyết định của chủ đầu tư: chấp nhận OpenCode ở mức hậu kiểm** — plugin vẫn sinh, `aisef verify` chạy lại guard trên diff, `compile-report.json` ghi `blocks_at_source: false` |
 | S5 Worktree + sandbox Docker | ✅ **XONG** | Cô lập đủ ba mặt: git, file, mạng |
 | S6 BMAD qua CLI | ✅ **XONG** | Chạy được; BMAD có sẵn **headless mode** trả JSON có schema |
 
@@ -49,7 +49,7 @@ Sự kiện `result` (cuối cùng) chứa đủ mọi thứ cần:
 2. **Chi phí nền cao hơn dự đoán.** Task chỉ trả lời "OK" mà tốn **$0.36**, do `cacheCreationInputTokens: 36256` — nạp `CLAUDE.md` và ngữ cảnh dự án. Ước tính thô: 114 story × 2 phiên (dev + reviewer) × ~$0.36 nền ≈ **$82 chỉ riêng phần nạp ngữ cảnh**, chưa tính nội dung story. Phải đo lại trên epic mẫu, và ưu tiên tái dùng prefix để chuyển từ `cache_creation` sang `cache_read`.
 3. Luôn thêm `< /dev/null`, nếu không CLI chờ stdin 3 giây mỗi lần gọi.
 
-**Đã thành code.** `aisdlc/clients/stream.py` + `tests/test_stream.py` (13 test), fixture là luồng thật.
+**Đã thành code.** `aisef/clients/stream.py` + `tests/test_stream.py` (13 test), fixture là luồng thật.
 
 ---
 
@@ -118,7 +118,7 @@ result    → permission_denials: [{tool_name, tool_use_id, tool_input}]
 4. Bỏ node `text:` thuần và node không tên — component không có tên gọi thì không kiểm chứng được, và đó cũng là dấu hiệu vấn đề a11y.
 5. Playwright + chromium **đã có sẵn trên máy**, không phải tải.
 
-**Đã thành code.** `aisdlc/harness/aria.py` + `tests/test_aria.py` (16 test), fixture là snapshot thật từ chromium.
+**Đã thành code.** `aisef/harness/aria.py` + `tests/test_aria.py` (16 test), fixture là snapshot thật từ chromium.
 
 ---
 
@@ -135,7 +135,7 @@ result    → permission_denials: [{tool_name, tool_use_id, tool_input}]
 
 **Ảnh hưởng thiết kế.**
 
-1. Desktop đọc settings cấp dự án, và **nạp ngay** — không cần khởi động lại phiên. Nghĩa là `aisdlc compile` ghi `.claude/settings.json` xong là guard có hiệu lực liền.
+1. Desktop đọc settings cấp dự án, và **nạp ngay** — không cần khởi động lại phiên. Nghĩa là `aisef compile` ghi `.claude/settings.json` xong là guard có hiệu lực liền.
 2. Ba trong bốn bề mặt (Claude Desktop, Claude CLI, và CLI headless) đều gắn được guard **tiền kiểm**. Phương án dự phòng hậu kiểm chỉ còn cần cho OpenCode nếu S4 xấu.
 3. Hook user-level hiện có 12 loại (`PreToolUse`, `PostToolUse`, `SubagentStart/Stop`, `Stop`, `PermissionRequest`, `PostCompact`…) — đủ cho cả ba mốc vòng đời ta cần.
 
@@ -186,7 +186,7 @@ result    → permission_denials: [{tool_name, tool_use_id, tool_input}]
 
 **Đã thành code.** `control/worktree.py` + `harness/sandbox.py`, 35 test.
 
-**Một bug do test bắt được:** thư mục worktree nằm trong kho làm `git status` bẩn (`?? .aisdlc/`), phá luôn phép kiểm "cây sạch sau abort". Sửa bằng cách tự đặt `.gitignore` chứa `*` ngay trong thư mục worktree — module tự lo, không bắt người dùng nhớ.
+**Một bug do test bắt được:** thư mục worktree nằm trong kho làm `git status` bẩn (`?? .aisef/`), phá luôn phép kiểm "cây sạch sau abort". Sửa bằng cách tự đặt `.gitignore` chứa `*` ngay trong thư mục worktree — module tự lo, không bắt người dùng nhớ.
 
 ---
 

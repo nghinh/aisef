@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.config import CONFIG_PATH, DEFAULTS, Config, ConfigError  # noqa: E402
+from aisef.config import CONFIG_PATH, DEFAULTS, Config, ConfigError  # noqa: E402
 
 
 class ConfigTestCase(unittest.TestCase):
@@ -52,7 +52,7 @@ class TestDefaults(ConfigTestCase):
         """ADR-005 V2: không khai thì không biến nào của máy qua thêm."""
         c = Config.load(self.root, env={})
         self.assertEqual(c["clients.env_allow"], [])
-        c = Config.load(self.root, env={"AISDLC_CLIENTS_ENV_ALLOW": "NINEROUTER_, OPENAI_"})
+        c = Config.load(self.root, env={"AISEF_CLIENTS_ENV_ALLOW": "NINEROUTER_, OPENAI_"})
         self.assertEqual(c["clients.env_allow"], ["NINEROUTER_", "OPENAI_"])
 
     def test_unknown_key_raises(self):
@@ -91,24 +91,24 @@ class TestProjectFile(ConfigTestCase):
 class TestEnvOverride(ConfigTestCase):
     def test_env_beats_file(self):
         self.write({"run.max_parallel": 5})
-        c = Config.load(self.root, env={"AISDLC_RUN_MAX_PARALLEL": "9"})
+        c = Config.load(self.root, env={"AISEF_RUN_MAX_PARALLEL": "9"})
         self.assertEqual(c["run.max_parallel"], 9)
 
     def test_float_from_env(self):
-        c = Config.load(self.root, env={"AISDLC_COVERAGE_MIN": "0.7"})
+        c = Config.load(self.root, env={"AISEF_COVERAGE_MIN": "0.7"})
         self.assertEqual(c["coverage.min"], 0.7)
 
     def test_bool_from_env(self):
-        c = Config.load(self.root, env={"AISDLC_SANDBOX_ALLOW_DEGRADED": "false"})
+        c = Config.load(self.root, env={"AISEF_SANDBOX_ALLOW_DEGRADED": "false"})
         self.assertFalse(c["sandbox.allow_degraded"])
 
     def test_list_from_env(self):
-        c = Config.load(self.root, env={"AISDLC_SECURITY_BLOCK_SEVERITIES": "critical, high, medium"})
+        c = Config.load(self.root, env={"AISEF_SECURITY_BLOCK_SEVERITIES": "critical, high, medium"})
         self.assertEqual(c["security.block_severities"], ["critical", "high", "medium"])
 
     def test_bad_env_value_rejected(self):
         with self.assertRaises(ConfigError):
-            Config.load(self.root, env={"AISDLC_RUN_MAX_PARALLEL": "nhiều"})
+            Config.load(self.root, env={"AISEF_RUN_MAX_PARALLEL": "nhiều"})
 
 
 class TestValidation(ConfigTestCase):
@@ -203,7 +203,7 @@ class TestKhoaDaGo(unittest.TestCase):
             Config.load(self.root)
 
     def test_moi_khoa_da_go_deu_co_ly_do_co_ngay(self):
-        from aisdlc.config import RETIRED
+        from aisef.config import RETIRED
         for k, why in RETIRED.items():
             self.assertRegex(why, r"^20\d\d-\d\d-\d\d", k)
             self.assertNotIn(k, DEFAULTS, f"{k} vừa gỡ vừa còn trong DEFAULTS")

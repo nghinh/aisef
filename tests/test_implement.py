@@ -19,18 +19,18 @@ sys.path.insert(0, str(ROOT))
 
 import tests  # noqa: E402,F401 — HostProvider vào chỗ docker, không mở container (tests/__init__.py)
 
-from aisdlc.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
-from aisdlc.clients.stream import RunResult  # noqa: E402
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.control.normalize import Story, parse_architecture_file  # noqa: E402
-from aisdlc.harness.guardrails import (  # noqa: E402
+from aisef.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
+from aisef.clients.stream import RunResult  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.control.normalize import Story, parse_architecture_file  # noqa: E402
+from aisef.harness.guardrails import (  # noqa: E402
     ENV_BASE_REF,
     ENV_STORY_ID,
     ENV_WRITE_SCOPE,
 )
-from aisdlc.clients.stream import INFRA_STATUSES, exit_status_of  # noqa: E402
-from aisdlc.harness.observe import AGENT_RUN, NOTE, EvidenceStore  # noqa: E402
-from aisdlc.phases.implement import (  # noqa: E402
+from aisef.clients.stream import INFRA_STATUSES, exit_status_of  # noqa: E402
+from aisef.harness.observe import AGENT_RUN, NOTE, EvidenceStore  # noqa: E402
+from aisef.phases.implement import (  # noqa: E402
     blocking_findings,
     build_context,
     implement_story,
@@ -168,7 +168,7 @@ class TestHappyPath(ImplementTestCase):
         subprocess.run(["git", "add", "goc.txt"], cwd=self.project, check=True)
         subprocess.run(["git", "commit", "-qm", "goc"], cwd=self.project, check=True)
 
-        work = self.project / ".aisdlc" / "worktrees" / "STORY-01-01"
+        work = self.project / ".aisef" / "worktrees" / "STORY-01-01"
         subprocess.run(
             ["git", "worktree", "add", "-q", str(work), "-b", "story/x"],
             cwd=self.project, check=True,
@@ -208,7 +208,7 @@ class TestHappyPath(ImplementTestCase):
     def test_nguoi_ra_soat_nhan_diff_that_khong_chi_ten_file(self):
         """Danh sách tên file bắt người rà soát dựng lại thứ harness đã
         biết — đo trên e9 là 31–43 lượt cho một story nhỏ."""
-        from aisdlc.phases.implement import review_diff
+        from aisef.phases.implement import review_diff
 
         with tempfile.TemporaryDirectory() as tmp:
             d = Path(tmp)
@@ -341,7 +341,7 @@ class TestRetry(ImplementTestCase):
         `package.json`), không cặp nào trùng chữ, nên bộ dò so chuỗi im
         suốt và story đốt hết hạn mức: $10,39.
         """
-        from aisdlc.phases.implement import deadlock_reason
+        from aisef.phases.implement import deadlock_reason
 
         muc = [
             "[chặn] package.json / src/store/db.test.ts:1 — `fake-indexeddb` "
@@ -369,7 +369,7 @@ class TestRetry(ImplementTestCase):
 
     def test_hai_khiem_khuyet_khac_nhau_tren_cung_tep_khong_phai_bi(self):
         """Cùng tệp nhưng khác khiếm khuyết nghĩa là có dịch chuyển."""
-        from aisdlc.phases.implement import deadlock_reason
+        from aisef.phases.implement import deadlock_reason
 
         class Lan:
             infra = False
@@ -397,7 +397,7 @@ class TestRetry(ImplementTestCase):
         nổi tiêu chí của chính nó — hai story liên tiếp trên e9 bí đúng
         vì chuyện này, $20 cho tám lượt không lượt nào qua.
         """
-        from aisdlc.phases.implement import effective_write_scope
+        from aisef.phases.implement import effective_write_scope
 
         (self.project / "package.json").write_text("{}", encoding="utf-8")
         scope = effective_write_scope(self.story, self.project)
@@ -527,7 +527,7 @@ class TestContext(ImplementTestCase):
     def test_ban_do_ma_tat_mac_dinh_thi_slot_rong(self):
         """ADR-005 V7: `context.max_repo_map_chars` = 0 cho tới khi A/B có số —
         slot rỗng, bàn giao ghi `repo_map: (code, 0)`."""
-        from aisdlc.phases.implement import handoff_slots
+        from aisef.phases.implement import handoff_slots
 
         (self.project / "src").mkdir()
         (self.project / "src" / "a.ts").write_text("export function taoGhiChu() {}\n", encoding="utf-8")
@@ -539,7 +539,7 @@ class TestContext(ImplementTestCase):
         self.assertEqual(handoff_slots(ctx)["repo_map"], ("code", 0))
 
     def test_ban_do_ma_bat_thi_co_muc_va_ghi_ban_giao(self):
-        from aisdlc.phases.implement import handoff_slots
+        from aisef.phases.implement import handoff_slots
 
         (self.project / "src").mkdir()
         (self.project / "src" / "a.ts").write_text("export function taoGhiChu() {}\n", encoding="utf-8")
@@ -722,15 +722,15 @@ class TestVaiRaSoatKhaiToolBiCam(ImplementTestCase):
         self.assertTrue(client.review_envs, "phải có phiên rà soát")
         self.assertTrue(client.security_envs, "phải có phiên bảo mật")
         for env in client.review_envs + client.security_envs:
-            self.assertEqual(env.get("AISDLC_DISALLOWED_TOOLS"), "Write,Edit,NotebookEdit")
+            self.assertEqual(env.get("AISEF_DISALLOWED_TOOLS"), "Write,Edit,NotebookEdit")
 
     def test_developer_khong_bi_cam(self):
         client = ScriptedClient()
         self.implement(client)
-        dev = [e for e in client.envs if e.get("AISDLC_STORY_ID")]
+        dev = [e for e in client.envs if e.get("AISEF_STORY_ID")]
         self.assertTrue(dev)
         for env in dev:
-            self.assertNotIn("AISDLC_DISALLOWED_TOOLS", env)
+            self.assertNotIn("AISEF_DISALLOWED_TOOLS", env)
 
     def test_security_van_khong_mang_ma_story(self):
         """Mã story kích hoạt guard `completion` — người rà soát bảo mật
@@ -738,8 +738,8 @@ class TestVaiRaSoatKhaiToolBiCam(ImplementTestCase):
         client = ScriptedClient()
         self.implement(client)
         for env in client.security_envs:
-            self.assertNotIn("AISDLC_STORY_ID", env)
-            self.assertIn("AISDLC_WRITE_SCOPE", env)
+            self.assertNotIn("AISEF_STORY_ID", env)
+            self.assertIn("AISEF_WRITE_SCOPE", env)
 
 
 class TestTruyenHookTuongMinh(ImplementTestCase):
@@ -799,8 +799,8 @@ class TestKyVongGuardTheoBaoCaoBienDich(ImplementTestCase):
 
         def run_va_ghi(spec):
             r = goc(spec)
-            if spec.env.get("AISDLC_STORY_ID"):
-                EvidenceStore(self.artifacts).file_change(spec.env["AISDLC_STORY_ID"], "src/a.py")
+            if spec.env.get("AISEF_STORY_ID"):
+                EvidenceStore(self.artifacts).file_change(spec.env["AISEF_STORY_ID"], "src/a.py")
             return r
         client.run = run_va_ghi
         out = self.implement(client)
@@ -866,7 +866,7 @@ class TestGoiBanGiaoDuocGhi(ImplementTestCase):
     không có slot nguồn `agent` hay `?`."""
 
     def test_handoffs_recorded_for_every_role(self):
-        from aisdlc.harness.observe import HANDOFF
+        from aisef.harness.observe import HANDOFF
         client = ScriptedClient()
         self.implement(client)
         ev = EvidenceStore(self.artifacts).read(self.story.id)
@@ -884,7 +884,7 @@ class TestGoiBanGiaoDuocGhi(ImplementTestCase):
 
 class TestHarnessKhaiGocDuAn(ImplementTestCase):
     def test_every_role_gets_the_project_root_in_env(self):
-        from aisdlc.harness.guardrails import ENV_PROJECT
+        from aisef.harness.guardrails import ENV_PROJECT
 
         class Ghi(ScriptedClient):
             def __init__(self):
@@ -902,9 +902,9 @@ class TestHarnessKhaiGocDuAn(ImplementTestCase):
             self.assertEqual(spec.env.get(ENV_PROJECT), str(self.project), spec.env)
 
 
-from aisdlc.control.outcome import Outcome  # noqa: E402
-from aisdlc.harness.guardrails import head_sha  # noqa: E402
-from aisdlc.harness.observe import TOOL_RUN  # noqa: E402
+from aisef.control.outcome import Outcome  # noqa: E402
+from aisef.harness.guardrails import head_sha  # noqa: E402
+from aisef.harness.observe import TOOL_RUN  # noqa: E402
 
 
 class TestBaselineTruocKhiSua(ImplementTestCase):
@@ -1105,7 +1105,7 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         self.assertEqual(nop.detail["files"], ["tests/test_ac.sh"])
         self.assertEqual(nop.detail["parent"], head_sha(self.project))
         self.assertIn(self.AC, nop.detail["failed_ids"])
-        self.assertFalse((self.project / ".aisdlc" / "worktrees" / "STORY-01-01-nop").exists())
+        self.assertFalse((self.project / ".aisef" / "worktrees" / "STORY-01-01-nop").exists())
         nhanh = subprocess.run(["git", "branch", "--list", "story/STORY-01-01-nop"],
                                cwd=self.project, capture_output=True, text=True).stdout
         self.assertEqual(nhanh.strip(), "", "nhánh tạm phải được xoá")
@@ -1148,7 +1148,7 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
     def test_gate_input_ghi_ngay_truoc_verdict_va_replay_ra_cung_ket_cuc(self):
         """ADR-005 V4: đầu vào cổng nằm trong bằng chứng; replay bằng luật hiện
         tại cho đúng mục chặn đã ghi."""
-        from aisdlc.control import replay as R
+        from aisef.control import replay as R
 
         out = self.chay(self.GIA)
         ev = self.evidence()

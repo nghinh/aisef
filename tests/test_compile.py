@@ -11,14 +11,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.clients.compile import (  # noqa: E402
+from aisef.clients.compile import (  # noqa: E402
     ADAPTERS,
     build_claude_settings,
     build_opencode_plugin,
     compile_for,
     write_compile_report,
 )
-from aisdlc.harness.guardrails import GUARD_MATCHERS  # noqa: E402
+from aisef.harness.guardrails import GUARD_MATCHERS  # noqa: E402
 
 
 class CompileTestCase(unittest.TestCase):
@@ -32,7 +32,7 @@ class CompileTestCase(unittest.TestCase):
 
 class TestClaudeSettings(CompileTestCase):
     def settings(self) -> dict:
-        return build_claude_settings(self.project, "/usr/local/bin/aisdlc")
+        return build_claude_settings(self.project, "/usr/local/bin/aisef")
 
     def test_shape_matches_verified_format(self):
         """Định dạng này đã kiểm chứng chặn thật ở spike S2."""
@@ -74,7 +74,7 @@ class TestOpenCodePlugin(CompileTestCase):
         trước **mỗi** thao tác thì nó chặn cả lần chạy test đầu tiên, và
         một guard chặn mọi thứ sẽ bị gỡ ngay trong ngày.
         """
-        src = build_opencode_plugin(self.project, "/bin/aisdlc")
+        src = build_opencode_plugin(self.project, "/bin/aisef")
         before = src.split("const AFTER")[0]
         after = src.split("const AFTER")[1].split("const BIN")[0]
         for kind, (event, _) in GUARD_MATCHERS.items():
@@ -86,14 +86,14 @@ class TestOpenCodePlugin(CompileTestCase):
                 self.assertNotIn(f'"{kind}"', src, kind)
 
     def test_post_tool_guard_wired(self):
-        self.assertIn("tool.execute.after", build_opencode_plugin(self.project, "/bin/aisdlc"))
+        self.assertIn("tool.execute.after", build_opencode_plugin(self.project, "/bin/aisef"))
 
     def test_treats_exit_two_as_block(self):
         """Cùng quy ước mã thoát với Claude Code."""
-        self.assertIn("exitCode === 2", build_opencode_plugin(self.project, "/bin/aisdlc"))
+        self.assertIn("exitCode === 2", build_opencode_plugin(self.project, "/bin/aisef"))
 
     def test_hooks_the_right_event(self):
-        self.assertIn("tool.execute.before", build_opencode_plugin(self.project, "/bin/aisdlc"))
+        self.assertIn("tool.execute.before", build_opencode_plugin(self.project, "/bin/aisef"))
 
     def test_loc_tool_theo_dung_matcher_nhu_claude(self):
         """Lỗi 41. `settings.json` của Claude Code mang matcher, nên Claude
@@ -103,7 +103,7 @@ class TestOpenCodePlugin(CompileTestCase):
         Đo trên agent thật: `write-scope` chấm luôn `glob` (tham số
         `path: "."`), chặn một thao tác chỉ đọc, và agent kẹt cả lượt.
         """
-        src = build_opencode_plugin(self.project, "/bin/aisdlc")
+        src = build_opencode_plugin(self.project, "/bin/aisef")
         for kind, (_, matcher) in GUARD_MATCHERS.items():
             if matcher:
                 self.assertIn(f'"{kind}": /^({matcher})$/i', src, kind)
@@ -113,7 +113,7 @@ class TestOpenCodePlugin(CompileTestCase):
         """Tên tool của OpenCode viết thường (`write`, `bash`) nên phải bỏ
         phân biệt hoa thường; và phải neo hai đầu, nếu không `todowrite`
         cũng dính vào `Write`."""
-        src = build_opencode_plugin(self.project, "/bin/aisdlc")
+        src = build_opencode_plugin(self.project, "/bin/aisef")
         dong = next(d for d in src.splitlines() if d.startswith("const MATCH"))
         import re as _re
         mau = _re.findall(r"/\^\(([^)]+)\)\$/i", dong)
@@ -127,7 +127,7 @@ class TestOpenCodePlugin(CompileTestCase):
 
     def test_guard_chi_doc_khong_bi_chan(self):
         """Ba tool chỉ đọc phải đi qua sạch mọi guard tiền kiểm."""
-        src = build_opencode_plugin(self.project, "/bin/aisdlc")
+        src = build_opencode_plugin(self.project, "/bin/aisef")
         dong = next(d for d in src.splitlines() if d.startswith("const MATCH"))
         import re as _re
         for tool in ("glob", "grep", "read", "webfetch", "todowrite"):
@@ -143,16 +143,16 @@ class TestOpenCodePlugin(CompileTestCase):
         TypeError. Nhìn từ ngoài giống guard đang chặn; thật ra guard chưa
         chạy lần nào, và OpenCode không hiện thực nổi một story.
         """
-        src = build_opencode_plugin(self.project, "/bin/aisdlc")
+        src = build_opencode_plugin(self.project, "/bin/aisef")
         ma = "\n".join(d for d in src.splitlines() if not d.lstrip().startswith("//"))
         self.assertNotIn(".stdin(", ma)
         self.assertIn("< ${input}", ma)
 
     def test_gui_cwd_cua_phien_khong_phai_goc_du_an(self):
         """Lỗi 15, phiên bản OpenCode. Agent chạy story đứng trong
-        `.aisdlc/worktrees/<story>`; guard soi gốc dự án sẽ thấy toàn bộ
+        `.aisef/worktrees/<story>`; guard soi gốc dự án sẽ thấy toàn bộ
         file kế hoạch là "ghi ngoài phạm vi" và chặn sạch mọi thao tác."""
-        src = build_opencode_plugin(self.project, "/bin/aisdlc")
+        src = build_opencode_plugin(self.project, "/bin/aisef")
         self.assertIn("cwd: CWD", src)
         self.assertIn("directory || worktree || PROJECT", src)
         # cả hai mốc đều phải gửi, không chỉ mốc trước.
@@ -167,7 +167,7 @@ class TestCompileFor(CompileTestCase):
 
     def test_opencode_writes_plugin(self):
         compile_for("opencode", self.project)
-        self.assertTrue((self.project / ".opencode" / "plugin" / "aisdlc-guard.ts").is_file())
+        self.assertTrue((self.project / ".opencode" / "plugin" / "aisef-guard.ts").is_file())
 
     def test_claude_blocks_at_source(self):
         self.assertTrue(compile_for("claude", self.project).blocks_at_source)

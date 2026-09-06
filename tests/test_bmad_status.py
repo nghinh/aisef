@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.bmad_status import parse_headless_status  # noqa: E402
+from aisef.control.bmad_status import parse_headless_status  # noqa: E402
 
 REAL = ROOT / "tests" / "fixtures" / "bmad" / "status-architecture-partial.txt"
 

@@ -8,7 +8,7 @@ from pathlib import Path
 from . import _runner as R
 
 
-@unittest.skipUnless(R.ENABLED and shutil.which("claude"), "AISDLC_CONFORMANCE=1 và có `claude`")
+@unittest.skipUnless(R.ENABLED and shutil.which("claude"), "AISEF_CONFORMANCE=1 và có `claude`")
 class TestClaudeHopQuy(unittest.TestCase):
     """Hạng nhất: cột này quyết định phát hành."""
 

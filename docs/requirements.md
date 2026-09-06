@@ -1,5 +1,5 @@
 <!--
-CANONICAL REQUIREMENTS — AI-SDLC Engineering Framework (AI-SEF)
+CANONICAL REQUIREMENTS — AISEF Engineering Framework (AI-SEF)
 Hợp nhất 2026-09-03 từ:
   - Bản đầu bài đầy đủ (54 mục): docs/requirements/full-brief.md
   - Bản chi tiết §12/§12A (bổ sung sau): docs/requirements/section-12-12A-detailed.md
@@ -8,11 +8,11 @@ Quy tắc: §12 ngắn trong bản đầy đủ được THAY bằng §12/§12A 
 Đây là source of truth cho traceability (North-Star §4). Không sửa nội dung gốc; chỉ hợp nhất.
 -->
 
-# ĐẦU BÀI XÂY DỰNG AI-SDLC ENGINEERING FRAMEWORK
+# ĐẦU BÀI XÂY DỰNG AISEF ENGINEERING FRAMEWORK
 
 ## 1. Tên bài toán
 
-**Nghiên cứu, thiết kế và xây dựng AI-SDLC Engineering Framework phục vụ phát triển phần mềm end-to-end bằng AI Coding Agents**
+**Nghiên cứu, thiết kế và xây dựng AISEF Engineering Framework phục vụ phát triển phần mềm end-to-end bằng AI Coding Agents**
 
 Tên gọi tạm thời: **AI Software Engineering Factory – AI-SEF**.
 
@@ -443,7 +443,7 @@ https://github.com/bmad-code-org/bmad-method
 
 **Vai trò dự kiến**
 
-Methodology Core của toàn bộ AI-SDLC Framework.
+Methodology Core của toàn bộ AISEF Framework.
 
 Phải nghiên cứu đặc biệt:
 
@@ -814,7 +814,7 @@ Trong quá trình nghiên cứu, đơn vị thực hiện bắt buộc phải ti
 
 - autonomous coding agents;
 - agent harness;
-- AI-SDLC;
+- AISEF;
 - software factory;
 - specification-driven development;
 - context engineering;
@@ -1095,7 +1095,7 @@ Thực hiện theo thứ tự:
                  ↓
 8. Gap Analysis
                  ↓
-9. Define AI-SDLC principles
+9. Define AISEF principles
                  ↓
 10. Design Target Architecture
                  ↓
@@ -1429,7 +1429,7 @@ DeepSeek Harness hiện cũng hỗ trợ cả in-process và out-of-process suba
 
 ---
 
-# 21. Canonical AI-SDLC Workflow
+# 21. Canonical AISEF Workflow
 
 Framework phải chuẩn hóa workflow tối thiểu:
 
@@ -1971,7 +1971,7 @@ Không log secrets hoặc sensitive prompt content ngoài policy.
 
 ---
 
-# 28. AI-SDLC Dashboard
+# 28. AISEF Dashboard
 
 Xây dựng dashboard cho:
 
@@ -2496,39 +2496,39 @@ Các adapter có thể generate `.claude`, `.opencode`, `.agents`... từ `.ai`.
 
 ---
 
-# 45. AI-SDLC CLI
+# 45. AISEF CLI
 
 Xây dựng CLI thống nhất, ví dụ:
 
 ```text
-aisdlc init
-aisdlc analyze
-aisdlc plan
-aisdlc design
-aisdlc architect
-aisdlc secure
-aisdlc decompose
-aisdlc readiness
-aisdlc build
-aisdlc review
-aisdlc verify
-aisdlc release
-aisdlc deploy
-aisdlc operate
-aisdlc retro
-aisdlc doctor
-aisdlc eval
+aisef init
+aisef analyze
+aisef plan
+aisef design
+aisef architect
+aisef secure
+aisef decompose
+aisef readiness
+aisef build
+aisef review
+aisef verify
+aisef release
+aisef deploy
+aisef operate
+aisef retro
+aisef doctor
+aisef eval
 ```
 
 CLI phải abstract platform phía dưới.
 
 Ví dụ:
 
-`aisdlc build --agent claude`
+`aisef build --agent claude`
 
-`aisdlc build --agent opencode`
+`aisef build --agent opencode`
 
-`aisdlc build --agent antigravity`
+`aisef build --agent antigravity`
 
 nhưng output/process semantics phải tương đương.
 
@@ -2612,13 +2612,13 @@ Một project chỉ được coi là hoàn thành khi:
 
 ### D2. Reference Architecture
 
-Kiến trúc AI-SDLC Framework.
+Kiến trúc AISEF Framework.
 
 ### D3. Canonical Meta-Model
 
 Agent/Skill/Prompt/Workflow/Policy/Hook/MCP/Artifact definitions.
 
-### D4. AI-SDLC Methodology
+### D4. AISEF Methodology
 
 Quy trình end-to-end.
 
@@ -2674,7 +2674,7 @@ Benchmark/regression.
 
 Agent traces/metrics/dashboard.
 
-### D17. AI-SDLC CLI
+### D17. AISEF CLI
 
 Project bootstrap/orchestration.
 
@@ -2904,7 +2904,7 @@ Và trải nghiệm lý tưởng đối với một dự án mới là:
 ```text
 requirements.md
        ↓
-aisdlc init
+aisef init
        ↓
 AI phân tích và chuẩn hóa yêu cầu
        ↓

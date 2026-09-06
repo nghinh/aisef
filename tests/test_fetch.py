@@ -17,8 +17,8 @@ from tempfile import TemporaryDirectory
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.kit import fetch  # noqa: E402
-from aisdlc.kit.catalog import Catalog, Source  # noqa: E402
+from aisef.kit import fetch  # noqa: E402
+from aisef.kit.catalog import Catalog, Source  # noqa: E402
 
 
 def git(*args, cwd=None):
@@ -58,7 +58,7 @@ class TestNoiCatNguon(unittest.TestCase):
                 os.environ.pop("XDG_CACHE_HOME", None)
                 if cu is not None:
                     os.environ["XDG_CACHE_HOME"] = cu
-            self.assertEqual(got, Path(tmp).resolve() / "ai-sdlc" / "references")
+            self.assertEqual(got, Path(tmp).resolve() / "aisef" / "references")
 
     def test_bien_moi_truong_de_ci_tro_sang_cho_khac(self):
         os.environ[fetch.ENV_REFS] = "/tmp/refs-cua-ci"
@@ -71,8 +71,8 @@ class TestNoiCatNguon(unittest.TestCase):
         """`_dir_of` và `Source.roots` phải đồng ý, nếu không lấy về xong
         vẫn báo "không có nguồn"."""
         s = nguon("http://x", "abc")
-        root = Path("/c/ai-sdlc/references")
-        self.assertEqual(fetch._dir_of(s, root), Path("/c/ai-sdlc/references/thu"))
+        root = Path("/c/aisef/references")
+        self.assertEqual(fetch._dir_of(s, root), Path("/c/aisef/references/thu"))
         self.assertTrue(str(s.roots(root)[0]).startswith(str(fetch._dir_of(s, root))))
 
 

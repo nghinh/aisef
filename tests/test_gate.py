@@ -10,9 +10,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.outcome import Outcome
-from aisdlc.control.gate import evaluate  # noqa: E402
-from aisdlc.harness.observe import MOCKUP_MAP, NOTE, EvidenceStore, Event  # noqa: E402
+from aisef.control.outcome import Outcome
+from aisef.control.gate import evaluate  # noqa: E402
+from aisef.harness.observe import MOCKUP_MAP, NOTE, EvidenceStore, Event  # noqa: E402
 
 
 class GateTestCase(unittest.TestCase):
@@ -243,14 +243,14 @@ class TestGuardCoChay(unittest.TestCase):
         self.assertTrue(self.muc(self.gate(True)).passed)
 
     def test_mot_lan_chan_cung_la_du(self):
-        from aisdlc.harness.observe import GUARD_BLOCK, Event
+        from aisef.harness.observe import GUARD_BLOCK, Event
         self.store.record("S-01", Event(kind=GUARD_BLOCK, name="secret", ok=False))
         self.assertTrue(self.muc(self.gate(True)).passed)
 
     def test_nhip_tim_la_du_du_khong_ghi_gi(self):
         """Phiên chỉ dùng Bash và không bị chặn: hook vẫn tới, và đó là
         điều mục này hỏi."""
-        from aisdlc.harness.observe import GUARD_SEEN, Event
+        from aisef.harness.observe import GUARD_SEEN, Event
         self.store.record("S-01", Event(kind=GUARD_SEEN, name="git-stage"))
         self.assertTrue(self.muc(self.gate(True)).passed)
 

@@ -31,12 +31,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.gate import CHECK_KIND, CHECK_NAMES, CONTROLS, evaluate, qualification_table  # noqa: E402
-from aisdlc.control.outcome import CHECK_KINDS, Outcome  # noqa: E402
-from aisdlc.control.security import Finding, SecurityReport  # noqa: E402
-from aisdlc.harness.observe import GUARD_SEEN, MOCKUP_MAP, TOOL_RUN, Event, EvidenceStore  # noqa: E402
+from aisef.control.gate import CHECK_KIND, CHECK_NAMES, CONTROLS, evaluate, qualification_table  # noqa: E402
+from aisef.control.outcome import CHECK_KINDS, Outcome  # noqa: E402
+from aisef.control.security import Finding, SecurityReport  # noqa: E402
+from aisef.harness.observe import GUARD_SEEN, MOCKUP_MAP, TOOL_RUN, Event, EvidenceStore  # noqa: E402
 
-GATE_PY = ROOT / "aisdlc" / "control" / "gate.py"
+GATE_PY = ROOT / "aisef" / "control" / "gate.py"
 
 
 class Muc(unittest.TestCase):

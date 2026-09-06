@@ -16,7 +16,7 @@ Chốt ưu tiên phát hành v0.1.0 nhanh, **không nới invariant/gate**:
 | 6 | S1 giữ BLOCKED/degraded, không workaround; release notes/capability matrix khai rõ | ghi ở D6 |
 | 7 | OpenCode hạng hai; C9 không kết luận không chặn | ghi ở D6 |
 | 8 | P1-4 coverage: không biến UNCONFIGURED thành PASS; cấu hình nếu đơn giản, không thì tài liệu + visibility | ✅ e9: `@vitest/coverage-v8` 5.0.0 + `--coverage` trong `npm test`; harness đọc **84,16 %** (dưới `coverage.min` 0,85 — story kế của e9 sẽ ✗ đúng); README ghi luật |
-| 9 | PyPI sau A + C-a: build + twine, cài venv sạch, setup + doctor, cổng phát hành trả 0; **không tag trước khi xanh** | ✅ D2: gói đổi tên `aisef` (12:0x, chủ đầu tư đã tạo project + trusted publisher), build + twine PASS, venv sạch → `aisdlc setup` → `doctor` "sẵn sàng"; D4 chờ A3 |
+| 9 | PyPI sau A + C-a: build + twine, cài venv sạch, setup + doctor, cổng phát hành trả 0; **không tag trước khi xanh** | ✅ D2: gói đổi tên `aisef` (12:0x, chủ đầu tư đã tạo project + trusted publisher), build + twine PASS, venv sạch → `aisef setup` → `doctor` "sẵn sàng"; D4 chờ A3 |
 | 10 | DoD: unit 100 % không cần Docker · Docker conformance riêng xanh · Claude conformance không ✗ · par đạt mốc · e9 EPIC-01 7/7 + QA + pre-deploy scoped đạt (waiver tường minh cho UNRUNNABLE) · wheel/sdist cài sạch · README/CHANGELOG/STATUS/SOLUTION khớp mã · known limitations ghi rõ | D6 |
 
 Thứ tự thực thi: A1–A5 → B6 (xong) → B1/B2 → C-a → D1/D2/D4. Không chạy thêm story e9 chỉ để tăng bằng chứng.
@@ -35,7 +35,7 @@ Thứ tự thực thi: A1–A5 → B6 (xong) → B1/B2 → C-a → D1/D2/D4. Kh�
 | ADR-002 tri thức vận hành | xong, đo trên e9 |
 | ADR-003 bàn giao/skills | xong phần đo; `skills.offer`/`inline` tắt vì không thấy gain (n=1) |
 | ADR-004 (HoH) | R1–R9 + R13 hiện thực; R2/R5/R6/R7 ACCEPTED có số; R1/R4/R8/R9 đo trên agent thật; B0–B7 đo; vòng improve B1 5 vòng: +1/+1/+1 rồi −1/−2, dừng đúng `flat_loops` |
-| ADR-005 (10 repo ngoài) | 7/8 luồng đợt 1 đã gộp: V1 scrub, V2 env allowlist + git credential, V3 nop control hai cấp, V4 `gate:input` + `aisdlc gate --replay`, V5 provider/guarantee, V6 QA sạch, V7 repo_map (tắt mặc định), V9 contract cổng 16 mục × 3 control, V11(A,B) tool output/exit_status, R13 `--repeat`; đang gộp: V8 bench (X7) |
+| ADR-005 (10 repo ngoài) | 7/8 luồng đợt 1 đã gộp: V1 scrub, V2 env allowlist + git credential, V3 nop control hai cấp, V4 `gate:input` + `aisef gate --replay`, V5 provider/guarantee, V6 QA sạch, V7 repo_map (tắt mặc định), V9 contract cổng 16 mục × 3 control, V11(A,B) tool output/exit_status, R13 `--repeat`; đang gộp: V8 bench (X7) |
 | Tài liệu | SOLUTION đối chiếu mã có test meta (CLI, knob, mục cổng, STEPS, slot, guard); CHANGELOG v0.1.0 theo sáu nhóm; taxonomy 11 lớp |
 
 ### 1.2 Dogfood
@@ -87,7 +87,7 @@ Thứ tự thực thi: A1–A5 → B6 (xong) → B1/B2 → C-a → D1/D2/D4. Kh�
 | # | Việc | Ai | Xong khi |
 |---|---|---|---|
 | A1 | ✅ Gộp X7 (V8 bench) `7668a90`: 18 task lỗi kho, 15/15 VALID trên task đo được (bug-15 nhạy tải, bug-6 chưa đo vì Docker ~1 giờ) | tôi | master có 8/8 |
-| A2 | **HostProvider mặc định cho unit test** (`tests/__init__.py` đặt vào chỗ `docker`; test Docker thật đánh dấu `needs_docker`, bật `AISDLC_TEST_DOCKER=1`; giữ 10 test Docker thật + hợp quy S1–S5). **Đo tuần tự** (trước: bản `99971cf` Docker, load 12–27; sau: HostProvider, load 4–7): `test_tools` 77 → 0 s · `test_qa` 30 → 2 s · `test_implement` 1 213 → 19 s · `test_run` 1 088 → 58 s · `test_candidate` 99 → 4 s · `test_deploy` 1 → 1 s · `test_improve` 23 → 19 s · `test_preservation` 5 → 3 s; **8 module 2 536 s → 106 s**; suite đầy đủ trên cây rebase `798c503`: 1 668 test, 167 s, skipped 69, 1 đỏ có sẵn trên master (`test_preservation::test_chay_sach_thi_khong_co_chan_oan`, đỏ cả trên master sạch lẫn baseline Docker — không phải do A2) | 1 subagent | ✅ suite < 5 phút (167 s); số test 1 624 → 1 631 (+7 test cơ chế, chưa tính master); `test_sandbox::TestProviderMacDinhCuaSuite` + `test_tools::TestSuiteKhongMoContainer` đỏ khi bỏ đăng ký |
+| A2 | **HostProvider mặc định cho unit test** (`tests/__init__.py` đặt vào chỗ `docker`; test Docker thật đánh dấu `needs_docker`, bật `AISEF_TEST_DOCKER=1`; giữ 10 test Docker thật + hợp quy S1–S5). **Đo tuần tự** (trước: bản `99971cf` Docker, load 12–27; sau: HostProvider, load 4–7): `test_tools` 77 → 0 s · `test_qa` 30 → 2 s · `test_implement` 1 213 → 19 s · `test_run` 1 088 → 58 s · `test_candidate` 99 → 4 s · `test_deploy` 1 → 1 s · `test_improve` 23 → 19 s · `test_preservation` 5 → 3 s; **8 module 2 536 s → 106 s**; suite đầy đủ trên cây rebase `798c503`: 1 668 test, 167 s, skipped 69, 1 đỏ có sẵn trên master (`test_preservation::test_chay_sach_thi_khong_co_chan_oan`, đỏ cả trên master sạch lẫn baseline Docker — không phải do A2) | 1 subagent | ✅ suite < 5 phút (167 s); số test 1 624 → 1 631 (+7 test cơ chế, chưa tính master); `test_sandbox::TestProviderMacDinhCuaSuite` + `test_tools::TestSuiteKhongMoContainer` đỏ khi bỏ đăng ký |
 | A3 | Suite đầy đủ trên master, **một suite một lúc**, load < 20 | tôi | `OK`, số test ghi vào STATUS §5 |
 | A4 | `test_meta` khớp mã sau 8 luồng (CLI, knob, mục cổng 16, STEPS, slot, guard) | tôi | xanh; SOLUTION §10/§12/§13 cập nhật |
 | A5 | STATUS §2.10 đợt X + §5, CHANGELOG chốt mục v0.1.0, artifact trạng thái | tôi | trang trạng thái cập nhật |
@@ -110,7 +110,7 @@ Hai lựa chọn, tôi khuyến nghị **C-a**:
 
 | | C-a: phạm vi v0.1.0 = EPIC-01 | C-b: cả 5 epic |
 |---|---|---|
-| Việc | thêm `aisdlc pre-deploy --epic E` (pre-deploy chấm "mọi story xong" trong phạm vi khai; story ngoài phạm vi liệt kê là "ngoài phạm vi nghiệm thu", không phải "chưa xong"); chạy qa → devsecops → pre-deploy → report cho EPIC-01 | chạy EPIC-02..05 (11 story) trên framework đã gộp, rồi nghiệm thu |
+| Việc | thêm `aisef pre-deploy --epic E` (pre-deploy chấm "mọi story xong" trong phạm vi khai; story ngoài phạm vi liệt kê là "ngoài phạm vi nghiệm thu", không phải "chưa xong"); chạy qa → devsecops → pre-deploy → report cho EPIC-01 | chạy EPIC-02..05 (11 story) trên framework đã gộp, rồi nghiệm thu |
 | Chi phí | ≈ $0 + 2 giờ | ≈ $400–600, 1–2 ngày máy, nhiều lượt trượt/chẻ story (cổng cỡ R5 chặn 3 story sát ngưỡng) |
 | Bằng chứng cho release | 7/7 story có SHA, sổ hành vi, hợp quy, bench từ chính e9 | thêm app đầy đủ; giá trị đo thêm chủ yếu cho R5/B1 |
 | Rủi ro | pre-deploy phải nói rõ phạm vi để không thành "cổng đã nới" | ngân sách/thời gian; không đổi điều kiện §5 |
@@ -122,7 +122,7 @@ Hai lựa chọn, tôi khuyến nghị **C-a**:
 | # | Việc | Ai | Xong khi |
 |---|---|---|---|
 | D1 | Chốt CHANGELOG (mục "Khi nâng cấp": compile lại hook, duyệt lại `stories`/`readiness` một lần, `verify.baseline` +1 lần test, prompt version), README, phiên bản | tôi | test meta docs xanh |
-| D2 | `uv build` + `twine check`; cài wheel vào venv sạch → `aisdlc setup` → `aisdlc doctor` xanh (không Docker: doctor phải nói "local provider, 5 bảo đảm thiếu", không đỏ) | tôi | log kèm trong STATUS |
+| D2 | `uv build` + `twine check`; cài wheel vào venv sạch → `aisef setup` → `aisef doctor` xanh (không Docker: doctor phải nói "local provider, 5 bảo đảm thiếu", không đỏ) | tôi | log kèm trong STATUS |
 | D3 | Tạo project PyPI (tài khoản tổ chức) + trusted publisher (GitHub Actions) | **chủ đầu tư** | publisher hiện trong PyPI |
 | D4 | Cổng phát hành bằng lệnh: suite xanh + `CONFORMANCE.md` ≤ 14 ngày không ô ✗ + STATUS §5 đủ ✅ | tôi | lệnh trả 0 |
 | D5 | `git tag v0.1.0`, workflow publish, kiểm `pip install aisef==0.1.0` venv sạch | chủ đầu tư tag, tôi kiểm | §5 dòng cuối ✅ |

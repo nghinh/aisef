@@ -1,4 +1,4 @@
-"""`aisdlc doc` — tra tài liệu theo yêu cầu, có cache, không bịa (S2)."""
+"""`aisef doc` — tra tài liệu theo yêu cầu, có cache, không bịa (S2)."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from aisdlc.kit import docs as D
+from aisef.kit import docs as D
 
 SEARCH = json.dumps({"results": [{"id": "/other/vitest-plugin", "title": "Vitest Plugin"},
                                   {"id": "/vitest-dev/vitest", "title": "Vitest"}]})

@@ -72,11 +72,11 @@ suy luận; **REC** = khuyến nghị.
 | Đã có | Ở đâu |
 |---|---|
 | Đọc skill 3 lớp (`SKILL.md` + `references/` + `scripts/`), frontmatter không PyYAML | `kit/skills.py` |
-| Nguồn ghim commit, license, tải về `~/.cache/ai-sdlc/references` | `kit/catalog.json`, `kit/fetch.py` |
+| Nguồn ghim commit, license, tải về `~/.cache/aisef/references` | `kit/catalog.json`, `kit/fetch.py` |
 | Registry: `SkillEntry` (provenance `commit`, `license`, `status`, `verified`), vòng đời `candidate→verified→active→stale→rejected`, **không** có cạnh vào `verified` mà không qua kiểm, không có cạnh ra khỏi `rejected`; `stale` khi commit đổi hoặc thư mục mất | `kit/registry.py` |
 | Kiểm cấu trúc trước khi nhận: frontmatter, tên = thư mục, link tương đối tồn tại, không secret, không câu injection, lọc offensive | `kit/registry.py:verify_structure` |
 | Router hai tín hiệu (paper §4.2 từ chối keyword-only), **abstain**, ngưỡng 3 / tối đa 3, skill framework theo pha, chỉ đưa tên/`use_when`/đường dẫn (progressive disclosure) | `kit/router.py` |
-| Lệnh `aisdlc skill [--story]` | `cli/harness.py:cmd_skill` |
+| Lệnh `aisef skill [--story]` | `cli/harness.py:cmd_skill` |
 | Baseline đã đo: e9 **11 lượt gọi Skill / 86 phiên**; router trên 18 story e9: abstain 13/18 sau khi sửa dương tính giả (ADR-002 §1, §6) | `docs/ADR-002` |
 
 **Chưa có:** router chưa nối vào prompt story; chưa có telemetry
@@ -117,7 +117,7 @@ Cột "Chứng minh" là điều kiện để mục đó chuyển ACCEPTED.
 | 4 | Provenance / version / freshness | AREX metadata + refresh | Có: `commit`, `license`, `stale` khi commit đổi, `Registry.refresh` | **KEEP** — không thêm cơ chế | Đủ; catalog ghim commit là "version" | — |
 | 5 | Confidence + abstain | Paper §routing | Có: điểm + rationale + abstain; paper cũng **không** dùng ngưỡng số | **KEEP**; thêm `abstained` vào telemetry (thuộc #1) | Đúng như paper | — |
 | 6 | Taxonomy 20 area / 178 family | AREX | — | **REJECT** | Miền của ta là pha SDLC × stack; `domain/subdomain` trong registry đã đủ; taxonomy to là chi phí bảo trì, không phải giá trị | — |
-| 7 | Học từ failure/recovery để đề xuất skill | Yêu cầu chủ đầu tư (paper **không** làm) | Evidence có `review_findings`, `[bế tắc]`, `GUARD_BLOCK`, `deadlock` | **PROPOSED → thí nghiệm offline** — `aisdlc skill propose`: gom finding lặp ở ≥2 story thành bản nháp SKILL.md `candidate`, provenance = id sự kiện; **không bao giờ** tự lên `active` | Đây là chỗ AI-SEF vượt paper, nhưng phải có khuôn lặp thật trước đã | Chạy offline trên evidence `par` + `e9` hiện có; ADOPT chỉ khi ra ≥1 cụm mà người đọc thấy đáng viết thành skill |
+| 7 | Học từ failure/recovery để đề xuất skill | Yêu cầu chủ đầu tư (paper **không** làm) | Evidence có `review_findings`, `[bế tắc]`, `GUARD_BLOCK`, `deadlock` | **PROPOSED → thí nghiệm offline** — `aisef skill propose`: gom finding lặp ở ≥2 story thành bản nháp SKILL.md `candidate`, provenance = id sự kiện; **không bao giờ** tự lên `active` | Đây là chỗ AI-SEF vượt paper, nhưng phải có khuôn lặp thật trước đã | Chạy offline trên evidence `par` + `e9` hiện có; ADOPT chỉ khi ra ≥1 cụm mà người đọc thấy đáng viết thành skill |
 
 ### Hướng 2 — Handoff / Multi-agent Orchestration
 
@@ -160,7 +160,7 @@ Cột "Chứng minh" là điều kiện để mục đó chuyển ACCEPTED.
   (Claude); OpenCode: `[]` + `skills_measurable=false`.
 - Cấu hình `skills.offer` (mặc định **off** cho tới khi A/B xong).
 - Test: prompt có mục khi router chọn, không có khi abstain; evidence ghi
-  đúng; đỏ khi hoàn nguyên. `aisdlc status` in tỉ lệ `used/offered`.
+  đúng; đỏ khi hoàn nguyên. `aisef status` in tỉ lệ `used/offered`.
 
 ### 5.2 #2 Kiểm scripts trước khi nhận — mức V1: **biên dịch được**, không chạy
 - Số đo đổi quyết định: `par` có 120 skill / **148** tệp scripts, `e9` 156 /
@@ -193,10 +193,10 @@ thẩm quyền; slot chưa khai ở đó hiện thành `?` trong bằng chứng)
 | `story_id` · `story_title` · `story_contract` · `architecture_rules` · `write_scope` · `mockup_section` | `artifact` | developer, reviewer, security |
 | `diff_summary` | `git` | reviewer, security |
 | `impact` | `code` | reviewer, security |
-| **`repo_map`** | **`code`** | developer, reviewer, security (ADR-005 V7) — bản đồ mã quanh phạm vi ghi (`harness/context.py`): skeleton tệp trong phạm vi, tệp gọi/được import 1 bước, test nhắc tên; ba vai nhận cùng bản vẽ trên `project`, không vai nào nhận từ lời vai kia. Trần `context.max_repo_map_chars` (mặc định **0 = tắt** tới khi A/B T8 có số); bản đầy đủ `aisdlc ctx --story S` |
+| **`repo_map`** | **`code`** | developer, reviewer, security (ADR-005 V7) — bản đồ mã quanh phạm vi ghi (`harness/context.py`): skeleton tệp trong phạm vi, tệp gọi/được import 1 bước, test nhắc tên; ba vai nhận cùng bản vẽ trên `project`, không vai nào nhận từ lời vai kia. Trần `context.max_repo_map_chars` (mặc định **0 = tắt** tới khi A/B T8 có số); bản đầy đủ `aisef ctx --story S` |
 | `tools` | `config` | developer |
 | `skills` | `router` | developer |
-| **`index`** | **`ledger`** | developer (ADR-004 R6) — lát cắt chỉ mục bằng chứng của epic chứa story: một dòng mỗi story, trần `context.max_index_chars`. **Chỉ mục, không phải lịch sử**: chi tiết tra bằng `aisdlc evidence <id>` |
+| **`index`** | **`ledger`** | developer (ADR-004 R6) — lát cắt chỉ mục bằng chứng của epic chứa story: một dòng mỗi story, trần `context.max_index_chars`. **Chỉ mục, không phải lịch sử**: chi tiết tra bằng `aisef evidence <id>` |
 | **`preservation`** | **`ledger`** | developer, reviewer, security (ADR-004 R4) — hành vi VERIFIED của **story khác** mà phạm vi ghi của story chạm tệp (`complexity.verified_touched`): id · story sở hữu · nguồn kiểm. Tính **một lần** trước phiên developer, ba vai nhận cùng bản (bất biến #9: reviewer nhận từ sổ, không từ developer); cổng "bảo toàn" chấm đúng danh sách ấy trên ứng viên. Trần `context.max_preservation_chars` chỉ cắt phần in ra |
 | **`validation`** | **`ledger`** | developer, reviewer, security (ADR-004 R4) — thứ harness **sẽ chạy lại** ở ứng viên: số test bảo toàn, `qa:<kind>` (hợp đồng story + kiểm định đã xác minh bị chạm), màn hình (của story + bị chạm). Cùng hàm `validation_targets` cấp cho slot và cho `run_attempt`, nên thứ in ra và thứ chạy không bao giờ là hai danh sách |
 

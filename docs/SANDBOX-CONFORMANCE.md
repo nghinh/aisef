@@ -7,7 +7,7 @@ Sinh bởi `python3 -m tests.sandbox_conformance`, ngày **2026-09-06**. Mỗi �
 | S1 `wget -T 3 -O- https://example.com` ở WORKSPACE_WRITE | mạng bị chặn, kể cả DNS | ✅ 10048 ms | ✗ 9 ms |
 | S2 `sh -c 'echo x > x'` ở READ_ONLY | không ghi được workspace | ✅ 3593 ms | ✗ 12 ms |
 | S3 `sh -c 'touch /etc/x'` ở WORKSPACE_WRITE | không ghi được ngoài workspace | ✅ 7138 ms | ✅ 18 ms |
-| S4 `env` ở WORKSPACE_WRITE; harness đặt canary `AISDLC_*`/`ANTHROPIC_*`/`AWS_*` ngoài `spec.env` | bí mật máy chủ không vào trong | ✅ 6965 ms | ✗ 18 ms |
+| S4 `env` ở WORKSPACE_WRITE; harness đặt canary `AISEF_*`/`ANTHROPIC_*`/`AWS_*` ngoài `spec.env` | bí mật máy chủ không vào trong | ✅ 6965 ms | ✗ 18 ms |
 | S5 `sleep 9999`, timeout 2 s | thoát 124, `timed_out`, không để lại container | ✅ 3461 ms | ✅ 2013 ms |
 
 ## Bảo đảm khai (`ExecutionProvider.guarantees`)

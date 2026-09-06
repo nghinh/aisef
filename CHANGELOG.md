@@ -4,12 +4,56 @@ Ghi theo **sáu nhóm harness** (`docs/SOLUTION.md` §5), không theo ADR hay
 ngày. Mỗi dòng có chỗ đọc lại; số lỗi trỏ `docs/STATUS-2026-09-05.md` §2.4
 và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epic-improvement.md` §6.
 
+## v0.2.0 — chưa phát hành
+
+**Đổi tên: gói, module và lệnh cùng là `aisef`.** 0.1.0 cài bằng `pip install
+aisef` nhưng gõ `aisdlc` — hai tên cho một thứ, phải giải thích ở mọi trang tài
+liệu. Từ bản này chỉ còn một tên.
+
+| Cũ (0.1.0) | Mới (0.2.0) |
+|---|---|
+| lệnh `aisdlc` | lệnh **`aisef`** (bí danh `aisdlc` còn chạy, in cảnh báo, gỡ ở 0.3.0) |
+| module `aisdlc/` | `aisef/` |
+| biến môi trường `AISDLC_*` | `AISEF_*` (`AISEF_TEST_DOCKER`, `AISEF_RELEASE`, `AISEF_CONFORMANCE`, `AISEF_STORY_ID`, `AISEF_PROJECT`, …) |
+| cache `~/.cache/ai-sdlc/{references,docs}` | `~/.cache/aisef/{references,docs}` |
+| worktree `.aisdlc/worktrees/` | `.aisef/worktrees/` |
+| dấu skill `.aisdlc-managed` | `.aisef-managed` (dấu cũ **vẫn được đọc**) |
+| thẻ meta mockup `aisdlc-screen`/`aisdlc-route` | `aisef-screen`/`aisef-route` (thẻ cũ **vẫn đọc được**) |
+| quy trình CI sinh ra `.github/workflows/aisdlc.yml` | `aisef.yml` |
+
+Ba chỗ **giữ nguyên** có lý do: tên kho GitHub `nghinh/ai-sdlc` (trusted
+publisher của PyPI gắn theo tên kho — đổi là mất quyền publish cho tới khi khai
+lại), task benchmark trong `tests/bench/tasks/` (patch áp vào commit **trước**
+lần đổi tên nên phải giữ đường dẫn cũ; `_mine.SRC_PREFIXES` nhận cả hai), và
+fixture ghi lại phiên agent thật trong `tests/fixtures/`.
+
+### Khi nâng cấp lên 0.2.0 — việc phải làm
+
+- **`aisef compile` trong từng dự án**: hook cũ gọi lệnh `aisdlc` và đặt biến
+  `AISDLC_*`. Bí danh giữ cho hook cũ chạy tới 0.3.0, nhưng đừng dựa vào nó.
+- **Đổi biến môi trường trong script/CI của bạn**: `AISDLC_*` → `AISEF_*`. Tên
+  cũ **không** còn được đọc.
+- **Kho skill tham chiếu tải lại một lần** vì cache đổi chỗ
+  (`~/.cache/aisef/references`); muốn dùng lại bản cũ thì `mv ~/.cache/ai-sdlc
+  ~/.cache/aisef`.
+- **Worktree đang dở của bản cũ** nằm ở `.aisdlc/worktrees/`: chạy `git worktree
+  prune` rồi xoá thư mục ấy sau khi story đang chạy kết thúc.
+
+### Sửa lỗi
+
+- **Hook của bản cài từ wheel không chạy guard nào** (lỗi 31, đo trên venv sạch
+  2026-09-06): `aisef_command()` lùi về `<site-packages>/bin/aisef` — đường dẫn
+  chỉ tồn tại trong kho nguồn — nên `aisef compile` ghi vào hook một lệnh không
+  có thật và mọi guard im lặng không chạy. Nay kiểm tồn tại rồi mới trả, không
+  có thì dùng `<python đang chạy> -m aisef.cli`. Ba phép kiểm mới trong
+  `tests/test_tools.py::TestLenhGoiFramework`.
+
 ## v0.1.0 — phát hành 2026-09-06
 
 **Đã phát hành:** tag `v0.1.0` = `a083a49`, gói `aisef 0.1.0` trên PyPI (wheel +
 sdist, trusted publishing từ `release.yml`, không token trong kho). Kiểm sau
-publish: `pip install aisef==0.1.0` trong venv sạch → `aisdlc setup` (152 skill)
-→ `aisdlc doctor` **✅ sẵn sàng**. Điều kiện phát hành và giới hạn đã biết:
+publish: `pip install aisef==0.1.0` trong venv sạch → `aisef setup` (152 skill)
+→ `aisef doctor` **✅ sẵn sàng**. Điều kiện phát hành và giới hạn đã biết:
 `docs/RELEASE-CHECKLIST-v0.1.0.md`.
 
 Phiên bản trong `pyproject.toml` là `0.1.0`; chưa có bản nào trước nó. Mục
@@ -26,18 +70,18 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 
 ### Khi nâng cấp — việc người dùng phải làm
 
-- **`aisdlc compile` lại** trong mỗi dự án: guard thứ 8 `process-ref` và biến
-  `AISDLC_PROJECT` (guard ưu tiên env, `--project` chỉ dự phòng — lỗi 6/P0-1)
-  chỉ vào hook sau khi biên dịch lại; `aisdlc doctor` báo khi hook cũ thiếu
+- **`aisef compile` lại** trong mỗi dự án: guard thứ 8 `process-ref` và biến
+  `AISEF_PROJECT` (guard ưu tiên env, `--project` chỉ dự phòng — lỗi 6/P0-1)
+  chỉ vào hook sau khi biên dịch lại; `aisef doctor` báo khi hook cũ thiếu
   guard hoặc trỏ sang dự án khác.
 - **Duyệt lại `stories` và `readiness` một lần**: cách băm `stories.index.json`
   đổi (chuẩn hoá JSON, bỏ `STORY-RP-*`/`EPIC-RP-*` ở `stories`/`epics` **và
-  `waves`**) nên phê duyệt đã ký trước bản này hiện `stale` ở `aisdlc gates` —
+  `waves`**) nên phê duyệt đã ký trước bản này hiện `stale` ở `aisef gates` —
   đúng một lần, không phải lỗi (lỗi 25/28; `control/approvals.py::_artifact_hash`).
 - **`verify.waived` khác rỗng thì phải có `verify.waiver_reason`** (phạm vi,
-  ngày, người ký): `aisdlc pre-deploy` nay chặn mục "miễn tường minh" khi miễn
+  ngày, người ký): `aisef pre-deploy` nay chặn mục "miễn tường minh" khi miễn
   không lý do; loại miễn hiện ◇, không ✅ (QĐ5 2026-09-06). Dự án chỉ nghiệm thu
-  một epic: `aisdlc pre-deploy --epic E` rồi `aisdlc approve pre-deploy` — phê
+  một epic: `aisef pre-deploy --epic E` rồi `aisef approve pre-deploy` — phê
   duyệt gắn với phạm vi khai.
 - **Xoá `story.max_context_tokens`** khỏi `.ai/config.json` — khoá đã gỡ, nạp
   vẫn được nhưng cảnh báo mỗi lần chạy (`config.RETIRED`). Khoá mới đều có
@@ -58,7 +102,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   trước phiên developer (không mỗi lượt). Bộ test chậm thì tắt; mục cổng thành
   – "tắt bởi cấu hình", không phải đạt.
 - Nhật ký story cũ có bước `commit.created` vẫn đọc được (`Journal.needs_merge`);
-  lượt đang dở lúc nâng cấp được `aisdlc run` hoà giải (`journal.reconcile_all`).
+  lượt đang dở lúc nâng cấp được `aisef run` hoà giải (`journal.reconcile_all`).
 - Prompt lên version (`story-implement@6`, `story-review@5`,
   `story-security-review@3`): bằng chứng `agent_run` ghi version, so sánh chi
   phí giữa hai bản phải tách theo version.
@@ -72,7 +116,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   JSON `verdict` + `findings[behavior_id]` bên cạnh văn bản (R8); mục bảo toàn (R4).
 - Hiến pháp: luật 6 — không mã `STORY-…`/`EPIC-…` trong mã nguồn (guard
   `process-ref` kiểm; `docs/ACTION-PLAN-2026-09-05.md` S3).
-- `aisdlc skill --scan`: quét SKILL.md bằng phiên model **chỉ đọc, không tool**,
+- `aisef skill --scan`: quét SKILL.md bằng phiên model **chỉ đọc, không tool**,
   8 skill/lô, JSON kiểm schema; `injection` → `rejected` sống qua `refresh`,
   `suspicious` → cảnh báo trong sổ. Đo e9: 153 skill, $5,01, 0 injection / 8
   suspicious có trích dẫn (STATUS §2.8).
@@ -81,7 +125,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 
 ### 2 · Tools
 
-- `aisdlc tool` có cấu trúc (ADR-005 V11 A): tóm tắt `testlog` (xanh/đỏ/bỏ qua,
+- `aisef tool` có cấu trúc (ADR-005 V11 A): tóm tắt `testlog` (xanh/đỏ/bỏ qua,
   ≤ 20 tên test đỏ) **trước** `tail`, rồi "(lược N/M dòng — toàn văn:
   `_bmad-output/evidence/<story>-<tool>-<seq>.log`)" khi output dài hơn
   `--lines`; `record()` ghi tệp log ấy khi output > 20 dòng, `tail` trong
@@ -90,9 +134,9 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   đi qua `guardrails.scrub_secrets` → `[REDACTED]`, `detail.redacted` = số chỗ
   che; thêm mẫu `AWS_SECRET_ACCESS_KEY=…` và `Bearer …`. Đo trước trên 42 tệp
   evidence e9/`par`: 0 khớp — vá phòng ngừa, `_bmad-output` được commit.
-- **Mới** `aisdlc doc <package> [--topic] [--story]`: tra tài liệu thư viện qua
+- **Mới** `aisef doc <package> [--topic] [--story]`: tra tài liệu thư viện qua
   context7, cache trên đĩa, bằng chứng `doc_lookup` (ACTION-PLAN S2).
-- **Mới** `aisdlc evidence <id>`: lịch sử một story hoặc một hành vi
+- **Mới** `aisef evidence <id>`: lịch sử một story hoặc một hành vi
   (`AC-…`, `FR-x`, `qa:<kind>`, `mockup:<màn>`), ghi `note:evidence_lookup`
   (ADR-004 R6).
 - `run_tool` phân loại **không chạy được** (exit 127, MODULE_NOT_FOUND, không
@@ -110,7 +154,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   vitest-ctrf-json-reporter, jest/playwright…): khối `{"results":{"tests":[…]}}`
   ở bất kỳ đâu trong output (`pytest --ctrf=/dev/stdout`), id ghép
   `file > suite > tên` khi reporter tách; pending/other tính là bỏ qua. Hai
-  fixture thật ở `tests/fixtures/testlog/ctrf-*.json`. `aisdlc doctor` mục
+  fixture thật ở `tests/fixtures/testlog/ctrf-*.json`. `aisef doctor` mục
   "lệnh test in tên test": tin bằng chứng (`test_format` lần test gần nhất),
   chưa có thì đoán từ cờ lệnh; gợi `-v`/`--reporter=verbose`/CTRF (ADR-005 V9).
 
@@ -123,7 +167,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   ADR-005 V2) cho cả Claude lẫn OpenCode — trước đó OpenCode nhận trọn
   `os.environ` (63 biến trên máy đo) và Claude chỉ bị bỏ `CLAUDE*`. Giữ
   `PATH HOME LANG LC_* TERM TMPDIR SHELL USER LOGNAME SSL_CERT_FILE` +
-  `ANTHROPIC_*` + `AISDLC_*` + `clients.env_allow`; kèm bộ vô hiệu credential
+  `ANTHROPIC_*` + `AISEF_*` + `clients.env_allow`; kèm bộ vô hiệu credential
   git (`GIT_TERMINAL_PROMPT=0`, `GIT_ASKPASS=/usr/bin/false`,
   `GIT_CONFIG_COUNT=1` xoá `credential.helper`) — osxkeychain không được hỏi
   trong phiên agent; git của harness (`worktree.merge_story`) không nhận bộ này.
@@ -134,7 +178,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   `.opencode`) và `_bmad-output/reviews/` là **harness-owned** — không tính là
   tệp story đổi (lỗi 1, 7; ADR-004 §6 R4).
 - `WorktreeManager.create` kiểm `path/.git`; thư mục sót trong
-  `.aisdlc/worktrees/` bị dọn + `worktree prune` rồi tạo thật (lỗi 13).
+  `.aisef/worktrees/` bị dọn + `worktree prune` rồi tạo thật (lỗi 13).
 - `AppServer.start` từ chối cổng đã có người trả lời (nêu pid/cwd); `stop` giết
   cả nhóm tiến trình (`start_new_session` + `killpg`) (lỗi 15).
 - Knob mới `sandbox.pre_deploy_degraded_waiver` (`""`): `pre-deploy` không
@@ -151,9 +195,9 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   mỗi provider một cột (`python3 -m tests.sandbox_conformance`). Sửa hai lỗi:
   `_run_degraded` mất PATH khi `env` khác rỗng (ADR-005 §9); timeout Docker giết
   CLI mà container `sleep` chạy tiếp (S5 lộ) — nay `docker rm -f` theo tên.
-- `AISDLC_PROJECT` truyền từ harness cho cả ba vai; guard đọc env trước (P0-1).
+- `AISEF_PROJECT` truyền từ harness cho cả ba vai; guard đọc env trước (P0-1).
 - **Kiểm định cấp dự án chạy ở worktree sạch từ SHA** (ADR-005 V6, theo
-  Harbor): `qa.run_suite(clean=True)` — `aisdlc qa`, `pre-deploy`, `improve`
+  Harbor): `qa.run_suite(clean=True)` — `aisef qa`, `pre-deploy`, `improve`
   chạy lệnh trong `git worktree` tách tạm dựng từ SHA đang chấm
   (`WorktreeManager.temporary`), `node_modules`/`.venv` của dự án gắn vào
   (`SandboxSpec.mounts`: Docker bind mount, suy biến symlink), gỡ sau. Shim
@@ -165,7 +209,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 - **Tests — suite đơn vị không mở container** (kế hoạch phát hành A2):
   `HostProvider` (`harness/sandbox.py`, chỉ cho test: chạy thật trên máy, khai
   NATIVE) được `tests/__init__.py` đặt vào chỗ `docker` khi không có
-  `AISDLC_TEST_DOCKER=1`; module chạm sandbox `import tests`. Đo tuần tự trên
+  `AISEF_TEST_DOCKER=1`; module chạm sandbox `import tests`. Đo tuần tự trên
   máy đo (load 4–7): 8 module 2 536 s → 106 s (`test_implement` 1 213 → 19 s,
   `test_run` 1 088 → 58 s, `test_tools` 77 → 0 s); suite đầy đủ 1 668 test
   167 s. Docker thật ở test đánh dấu `needs_docker` (`test_sandbox
@@ -174,19 +218,19 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 
 ### 4 · Orchestration logic
 
-- **`aisdlc run --story S --verify-only --repeat K`** (ADR-004 R13 + ADR-005
+- **`aisef run --story S --verify-only --repeat K`** (ADR-004 R13 + ADR-005
   §3, lỗi 22): mỗi phép kiểm chạy lại chạy K lần trên cùng SHA
   (`implement._repeat_runs`/`_repeat_note`); `note verify-only.repeat
   {flaky_ids, stable_red, flaky_checks}`; cổng ghi ⚠ UNRUNNABLE "không ổn
   định: <tên>" thay vì ✗ khi test đổi kết cục giữa các lần
   (`gate._khong_on_dinh`), đỏ mọi lần vẫn ✗. K = 1 là hành vi cũ.
 
-- **`aisdlc pre-deploy --epic E`** (QĐ C-a 2026-09-06, `phases/deploy.py::_scope`):
+- **`aisef pre-deploy --epic E`** (QĐ C-a 2026-09-06, `phases/deploy.py::_scope`):
   cổng **scope-aware, không nới** — chỉ chấm "mọi story xong" trên story của
   epic khai; story ngoài phạm vi thành mục "ngoài phạm vi nghiệm thu"
   (– NOT_APPLICABLE, nêu tên: không xong, không thiếu); phạm vi ghi vào
   `pre-deploy-report.json` (`scope{epic, stories, outside}`) nên băm phê duyệt
-  `pre-deploy` đổi theo phạm vi; `aisdlc report` in phạm vi ở §6. v0.1.0 nghiệm
+  `pre-deploy` đổi theo phạm vi; `aisef report` in phạm vi ở §6. v0.1.0 nghiệm
   thu e9 **EPIC-01** bằng cách này; EPIC-02..05 chưa nghiệm thu.
 
 - **Vòng improve — hàng đợi sửa tự động** (QĐ B6 2026-09-06,
@@ -195,7 +239,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   → `mockup`; lý do dừng nêu gap ngoài hàng đợi thay vì "hết gap". Story sửa
   phải viết **test mới mang mã** (đối chứng nop V3 chấm ✗ khi gắn mã vào test
   có sẵn); gap chỉ thiếu truy vết thì **không** thành story sửa — người rà soát
-  trả `[bế tắc] truy vết: <test id>`, báo cáo vòng chỉ sang `aisdlc evidence
+  trả `[bế tắc] truy vết: <test id>`, báo cáo vòng chỉ sang `aisef evidence
   --link` (sửa siêu dữ liệu, không giả thành cải tiến chức năng).
 
 - **Đổi hành vi — thứ tự nhật ký** (`control/journal.py::STEPS`, ADR-004 R1):
@@ -206,7 +250,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   developer kết thúc**, trước test/cổng/rà soát (`implement.freeze_candidate`;
   `--no-isolate` không commit). Reviewer/security bị so `git rev-parse HEAD` sau
   phiên; lệch → lượt không tính.
-- **Mới** `aisdlc improve --epic E [--max-loops N] [--auto] [--client] [--force]`
+- **Mới** `aisef improve --epic E [--max-loops N] [--auto] [--client] [--force]`
   (`phases/improve.py`, ADR-004 R3): QA cấp dự án → sổ hành vi → **một** story
   sửa `STORY-RP-nn` trong `EPIC-RP-<E>` sinh bằng code → `run` (worktree, cổng,
   reviewer ≠ developer) → QA → mốc `loops[]` + `LOOP-REPORT-<n>.md`. Dừng bằng
@@ -223,11 +267,11 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   khi đã có kết quả ở SHA. `run_baseline` ghi thêm `base_ref` để cổng biết
   baseline của lượt chạy lại đứng ở bản của chính story.
 - **Đầu vào cổng vào bằng chứng** (ADR-005 V4): `note gate:input` = 13 kwargs
-  của `gate.evaluate` ngay trước `gate:verdict`; `aisdlc gate --replay` chấm lại
+  của `gate.evaluate` ngay trước `gate:verdict`; `aisef gate --replay` chấm lại
   lượt cũ bằng luật hiện tại, không gọi model (`control/replay.py`).
 - **Đổi hành vi — băm `stories.index.json`** (lỗi 25): chuẩn hoá JSON, bỏ
   story/epic sửa; phê duyệt `stories`/`readiness` cũ stale một lần.
-- **Mới** `aisdlc change FR-x "mô tả"`: ghi FR, stale PRD trở xuống, sinh story
+- **Mới** `aisef change FR-x "mô tả"`: ghi FR, stale PRD trở xuống, sinh story
   delta `STORY-CH-nn` trong `EPIC-CH` (ACTION-PLAN S4).
 - **Cổng cỡ story v2** (ADR-004 R5, `control/complexity.py`): điểm = trạng thái
   màn hình + tiêu chí + 0,5 × đường dẫn scope + fan-in (+ láng giềng VERIFIED
@@ -258,7 +302,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   preflight chỉ coi đuôi tệp thật là đường dẫn (lỗi 20); mockup-map nói rõ
   route sẽ mở và bản ghi hạt giống `1` (lỗi 14).
 - `pre-deploy`: story trong kế hoạch **chưa từng chạy** không phải "xong" (lỗi 17).
-- Router: năng lực phải khai, không suy từ chữ (lỗi 5); `aisdlc skill --story S`
+- Router: năng lực phải khai, không suy từ chữ (lỗi 5); `aisef skill --story S`
   in kết quả định tuyến.
 
 - **Mới slot `repo_map`** (ADR-005 V7, `harness/context.py`, nguồn `code`, cả
@@ -269,7 +313,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   có số; `context.map_provider` cắm lệnh ngoài (stdin JSON → stdout). Prompt
   `story-implement@7` · `story-review@6` · `story-security-review@4` có mục
   "Bản đồ mã quanh phạm vi — gợi ý tĩnh, không phải chân lý", chỉ hiện khi slot
-  khác rỗng. **Mới** `aisdlc ctx --story S | --file F [--budget N]`: bản đầy đủ,
+  khác rỗng. **Mới** `aisef ctx --story S | --file F [--budget N]`: bản đầy đủ,
   ghi `note:ctx_lookup` khi gọi trong phiên. Hồi cứu $0 lỗi 21 ở ADR-005 §9:
   bản đồ **không** tự lộ `tests/e2e` khi phạm vi chỉ `src/**` — spec e2e của e9
   không nhắc tên nào của `src`; thứ lộ nó là `verification_paths` (sửa lỗi 21).
@@ -282,7 +326,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 ### 5 · Guardrails / hooks
 
 - **Guard thứ 8 `process-ref`** (`PreToolUse` · `Write|Edit`): mã story/epic
-  trong mã nguồn; test và tài liệu được phép. Cần `aisdlc compile` lại.
+  trong mã nguồn; test và tài liệu được phép. Cần `aisef compile` lại.
 - `completion` **cho dừng** khi test không chạy được hoặc chưa khai lệnh —
   kết cục ghi ở cổng, không chặn Stop vô hạn (lỗi 2, 8).
 - Guard đọc cả `filePath`/`newString` (OpenCode) lẫn `file_path`/`content`
@@ -322,7 +366,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 ### 6 · Observability
 
 - **Truy vết người khai** (`control/ledger.py::TRACE_FILE`, QĐ B6 2026-09-06):
-  `aisdlc evidence <AC> --link "<test id>" --why … [--by]` ghi
+  `aisef evidence <AC> --link "<test id>" --why … [--by]` ghi
   `traceability.json` {test_id, why, by, at}; sổ hành vi coi test ấy là test
   của tiêu chí **nhưng vẫn đòi nó xanh ở ứng viên đã landed** — nguồn ghi
   `via: traceability, by, why` để ai đọc cũng thấy đây là khai, không phải đo.
@@ -336,7 +380,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   context, permission, infra, error} (`clients/stream.py::exit_status_of`,
   ADR-005 V11 B); `Attempt.infra` và vòng thử lại `plan` đọc cùng
   `INFRA_STATUSES` thay cho bảng chuỗi `INFRA_ERRORS` (đã gỡ) — lượt `429`
-  hạn mức API từng bị tính là lỗi chất lượng (e9 RP-05). `aisdlc status` in
+  hạn mức API từng bị tính là lỗi chất lượng (e9 RP-05). `aisef status` in
   "Lượt agent: ok n · max_turns n · … · chưa ghi n". Đếm trên e9: max_turns
   4 lượt/3 story, khớp đếm tay ADR-004 §6 trong phạm vi EPIC-01.
 - **Mới sổ hành vi** `control/ledger.py` (ADR-004 R2): phép chiếu từ
@@ -362,11 +406,11 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   hai V1 — SOLUTION §11).
 - Kho hồi quy chạy lại được từ kho: `tests/dogfood/` (`par`, mốc 3/3 lượt đầu,
   ≤ 2 × $3,14) và `tests/conformance/` (10 phép, hai client); release gate
-  `AISDLC_RELEASE=1 tests.test_release_gate`.
+  `AISEF_RELEASE=1 tests.test_release_gate`.
 - **Mới** `tests/bench/` (ADR-005 V8, Benchmark Factory): task từ hai mỏ —
   lỗi thật của kho (`tests/bench/tasks/`, commit; commit sửa tìm bằng
   `git log -S<tên test>`, base = cha, test hồi quy giữ, nguồn hoàn nguyên) và
-  story e9 `done` (sinh lúc chạy từ `AISDLC_BENCH_E9`, base = `test:baseline.parent`
+  story e9 `done` (sinh lúc chạy từ `AISEF_BENCH_E9`, base = `test:baseline.parent`
   hoặc commit `main` trước lượt đầu, test = `is_test_path`, gold = phần còn lại).
   Lint rò: SHA, URL, `STORY-RP-*`, tên commit sửa. `validate` ×3 trên bản chép
   `git archive` (một ref — worktree thấy `story/*` = gold): F2P/P2P theo tên,
@@ -374,10 +418,10 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   phiên client, guard như hợp quy, `note mode=bench`, hoàn nguyên test agent
   chạm rồi áp test ẩn, chấm ở ứng viên đóng băng. `report` pass@1/pass@k/ổn
   định/cost so lịch sử; `export` thư mục Harbor (adapter ngoài). Số đo: ADR-005 §9.
-- `aisdlc doctor`: hook trỏ đúng dự án, hook thiếu guard mới, ngưỡng cỡ story
+- `aisef doctor`: hook trỏ đúng dự án, hook thiếu guard mới, ngưỡng cỡ story
   lệch dữ liệu, gợi ý lệnh test in coverage, gợi reporter in tên/CTRF (V9).
 
-### Knob cấu hình mới (mặc định) — `aisdlc/config.py::DEFAULTS`, ý nghĩa ở SOLUTION §13
+### Knob cấu hình mới (mặc định) — `aisef/config.py::DEFAULTS`, ý nghĩa ở SOLUTION §13
 
 | Khoá | Mặc định | Từ |
 |---|---|---|
@@ -398,13 +442,13 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 
 Gỡ: `story.max_context_tokens` (chưa từng có mã đọc; `RETIRED`, cảnh báo rồi bỏ qua).
 
-### Lệnh CLI mới — `aisdlc/cli/parser.py`, bộ lệnh đủ ở SOLUTION §10
+### Lệnh CLI mới — `aisef/cli/parser.py`, bộ lệnh đủ ở SOLUTION §10
 
-`aisdlc improve` · `aisdlc evidence` · `aisdlc ctx` · `aisdlc doc` · `aisdlc change` ·
-`aisdlc skill --scan` · `aisdlc guard process-ref` · `aisdlc run --verify-only
---story S [--repeat K]` · `aisdlc gate --replay` (ADR-005 V4) · `aisdlc pre-deploy
---epic E` (QĐ C-a) · `aisdlc evidence <AC> --link TEST --why …` (QĐ B6). Gói
-`aisdlc/cli/` tách từ một tệp `cli.py` (S5), không đổi hành vi.
+`aisef improve` · `aisef evidence` · `aisef ctx` · `aisef doc` · `aisef change` ·
+`aisef skill --scan` · `aisef guard process-ref` · `aisef run --verify-only
+--story S [--repeat K]` · `aisef gate --replay` (ADR-005 V4) · `aisef pre-deploy
+--epic E` (QĐ C-a) · `aisef evidence <AC> --link TEST --why …` (QĐ B6). Gói
+`aisef/cli/` tách từ một tệp `cli.py` (S5), không đổi hành vi.
 
 ### Lỗi thật tìm bằng đo trong đợt này
 

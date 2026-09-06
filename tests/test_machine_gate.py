@@ -9,10 +9,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.control.machine_gate import check_all, check_prd, check_stories  # noqa: E402
-from aisdlc.control.normalize import PRD, OpenQuestion, Requirement, parse_prd_file  # noqa: E402
-from aisdlc.control.scheduler import Story  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.control.machine_gate import check_all, check_prd, check_stories  # noqa: E402
+from aisef.control.normalize import PRD, OpenQuestion, Requirement, parse_prd_file  # noqa: E402
+from aisef.control.scheduler import Story  # noqa: E402
 
 PRD_FIXTURE = ROOT / "tests" / "fixtures" / "bmad" / "prd.md"
 

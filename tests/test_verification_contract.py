@@ -14,14 +14,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control import gate as story_gate  # noqa: E402
-from aisdlc.control.normalize import Story  # noqa: E402
-from aisdlc.control.preflight import (  # noqa: E402
+from aisef.control import gate as story_gate  # noqa: E402
+from aisef.control.normalize import Story  # noqa: E402
+from aisef.control.preflight import (  # noqa: E402
     BASE_CONTRACT,
     verification_contract,
 )
-from aisdlc.harness.observe import AGENT_RUN, TOOL_RUN, Evidence, Event  # noqa: E402
-from aisdlc.phases.qa import KINDS  # noqa: E402
+from aisef.harness.observe import AGENT_RUN, TOOL_RUN, Evidence, Event  # noqa: E402
+from aisef.phases.qa import KINDS  # noqa: E402
 
 
 def story(**kw):
@@ -163,7 +163,7 @@ class TestCong(unittest.TestCase):
 
 class TestGhiVaoStory(unittest.TestCase):
     def test_hop_dong_hien_trong_tep_story_cho_agent_doc(self):
-        from aisdlc.phases.story_split import render_story
+        from aisef.phases.story_split import render_story
 
         body = render_story(story(screens=["notes-list"]), None)
         self.assertIn("Xong nghĩa là gì", body)

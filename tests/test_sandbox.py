@@ -1,5 +1,5 @@
 """Kiểm chứng cách ly sandbox — Docker thật ở lớp `needs_docker`
-(`AISDLC_TEST_DOCKER=1`), phần còn lại không cần daemon."""
+(`AISEF_TEST_DOCKER=1`), phần còn lại không cần daemon."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from tests import needs_docker  # noqa: E402
-from aisdlc.harness.sandbox import (  # noqa: E402
+from aisef.harness.sandbox import (  # noqa: E402
     DEFAULT_IMAGE,
     PROVIDERS,
     DockerProvider,
@@ -154,7 +154,7 @@ class TestDegradedMode(unittest.TestCase):
 
     def test_refuses_when_isolation_required(self):
         """Thà hỏng còn hơn chạy mà giả vờ có cách ly."""
-        import aisdlc.harness.sandbox as sb
+        import aisef.harness.sandbox as sb
 
         original = sb.docker_available
         sb.docker_available = lambda: False
@@ -166,7 +166,7 @@ class TestDegradedMode(unittest.TestCase):
             sb.docker_available = original
 
     def test_degraded_is_flagged(self):
-        import aisdlc.harness.sandbox as sb
+        import aisef.harness.sandbox as sb
 
         original = sb.docker_available
         sb.docker_available = lambda: False
@@ -183,7 +183,7 @@ class TestDegradedMode(unittest.TestCase):
 
 class TestProviderMacDinhCuaSuite(unittest.TestCase):
     """A2 kế hoạch phát hành: suite đơn vị không mở container. `tests/__init__.py`
-    đặt `HostProvider` vào chỗ `docker` khi không `AISDLC_TEST_DOCKER=1`; gỡ ra
+    đặt `HostProvider` vào chỗ `docker` khi không `AISEF_TEST_DOCKER=1`; gỡ ra
     thì chọn lại Docker/Local như dự án thật; tên `host`/`fake` không phải lựa
     chọn của dự án."""
 
@@ -194,7 +194,7 @@ class TestProviderMacDinhCuaSuite(unittest.TestCase):
     def tearDown(self):
         self._tmp.cleanup()
 
-    @unittest.skipIf(os.environ.get("AISDLC_TEST_DOCKER") == "1", "đang chạy Docker thật")
+    @unittest.skipIf(os.environ.get("AISEF_TEST_DOCKER") == "1", "đang chạy Docker thật")
     def test_mac_dinh_chay_tren_host_khong_suy_bien(self):
         r = run(SandboxSpec(workspace=self.ws, cmd=["echo", "hi"]))
         self.assertTrue(r.ok, r.stderr)
@@ -278,7 +278,7 @@ class TestBacKhaiYeuCauProviderKhaiNangLuc(unittest.TestCase):
                 self.assertEqual(missing_guarantees(DockerProvider(), lv), [])
 
     def test_docker_khai_that_no_host_mount_unsupported(self):
-        from aisdlc.clients.base import Support
+        from aisef.clients.base import Support
 
         self.assertIs(DockerProvider().guarantees(Level.READ_ONLY)[Guarantee.NO_HOST_MOUNT],
                       Support.UNSUPPORTED)
@@ -340,7 +340,7 @@ class TestChonProviderTruocKhiChay(unittest.TestCase):
             select_provider(SandboxSpec(workspace=self.ws, cmd=["true"], provider="khong-co"))
 
     def test_import_path_cho_backend_ngoai(self):
-        ten = "aisdlc.harness.sandbox:FakeProvider"
+        ten = "aisef.harness.sandbox:FakeProvider"
         try:
             prov, missing = select_provider(SandboxSpec(workspace=self.ws, cmd=["true"], provider=ten))
             self.assertEqual(prov.id, "fake")
@@ -412,7 +412,7 @@ class TestLoiHaTangKhacLenhDo(unittest.TestCase):
         proc = CompletedProcess(args=[], returncode=125, stdout="",
                                 stderr="Unable to find image 'x:y' locally\n"
                                        "docker: Error response from daemon: pull access denied\n")
-        with patch("aisdlc.harness.sandbox.subprocess.run", return_value=proc):
+        with patch("aisef.harness.sandbox.subprocess.run", return_value=proc):
             r = _run_docker(self.spec(image="x:y"))
         self.assertEqual(r.exit_code, 125)
         self.assertIn("pull access denied", r.provider_error)
@@ -423,7 +423,7 @@ class TestLoiHaTangKhacLenhDo(unittest.TestCase):
         from unittest.mock import patch
 
         proc = CompletedProcess(args=[], returncode=1, stdout="1 failed", stderr="")
-        with patch("aisdlc.harness.sandbox.subprocess.run", return_value=proc):
+        with patch("aisef.harness.sandbox.subprocess.run", return_value=proc):
             r = _run_docker(self.spec())
         self.assertEqual(r.provider_error, "")
 
@@ -441,7 +441,7 @@ class TestLoiHaTangKhacLenhDo(unittest.TestCase):
                 raise sp.TimeoutExpired(args, 2)
             return sp.CompletedProcess(args, 0)
 
-        with patch("aisdlc.harness.sandbox.subprocess.run", side_effect=gia):
+        with patch("aisef.harness.sandbox.subprocess.run", side_effect=gia):
             r = _run_docker(self.spec(timeout_seconds=2))
         self.assertTrue(r.timed_out)
         self.assertEqual(r.exit_code, 124)

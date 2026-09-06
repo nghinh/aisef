@@ -16,12 +16,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.design_contract import CONTRACT_FILE, load  # noqa: E402
-from aisdlc.control.experience import parse_experience, parse_experience_file  # noqa: E402
-from aisdlc.control.machine_gate import check_design_contract  # noqa: E402
-from aisdlc.control.normalize import Story  # noqa: E402
-from aisdlc.harness import browser  # noqa: E402
-from aisdlc.phases.mockup import (  # noqa: E402
+from aisef.control.design_contract import CONTRACT_FILE, load  # noqa: E402
+from aisef.control.experience import parse_experience, parse_experience_file  # noqa: E402
+from aisef.control.machine_gate import check_design_contract  # noqa: E402
+from aisef.control.normalize import Story  # noqa: E402
+from aisef.harness import browser  # noqa: E402
+from aisef.phases.mockup import (  # noqa: E402
     MockupResult,
     build_prompt,
     extract,
@@ -53,9 +53,9 @@ class MockupTestCase(unittest.TestCase):
         p = self.root / "mockups" / "tim-kiem.html"
         text = p.read_text(encoding="utf-8")
         text = text.replace(
-            '<meta name="aisdlc-screen" content="tim-kiem">',
-            '<meta name="aisdlc-screen" content="tim-kiem">\n'
-            '<meta name="aisdlc-route" content="/search">',
+            '<meta name="aisef-screen" content="tim-kiem">',
+            '<meta name="aisef-screen" content="tim-kiem">\n'
+            '<meta name="aisef-route" content="/search">',
         )
         text = text[: text.index("<p data-unresolved")] + "</body></html>\n"
         p.write_text(text, encoding="utf-8")
@@ -66,7 +66,7 @@ class TestPrompt(unittest.TestCase):
         exp = parse_experience_file(EXPERIENCE)
         p = build_prompt(exp.by_id("tim-kiem"), exp, Path("/x/_bmad-output"))
         self.assertIn("screen_id: tim-kiem", p)
-        self.assertIn("aisdlc-mockup-html", p)
+        self.assertIn("aisef-mockup-html", p)
         self.assertIn("mockups/tim-kiem.html", p)
         self.assertNotIn("Thùng rác", p)  # không rò màn hình khác
 
@@ -125,6 +125,22 @@ class TestExtractContract(MockupTestCase):
         names = [f["name"] for f in contract.by_id("danh-sach").fields]
         self.assertEqual(names, ["q"])
 
+    def test_the_meta_cua_ban_cu_van_doc_duoc(self):
+        """Mockup do 0.1.0 dựng mang thẻ `aisdlc-screen`/`aisdlc-route`.
+
+        Đổi tên ở 0.2.0 mà chỉ đọc tên mới thì mọi dự án đã dựng mockup bằng
+        bản cũ bị cổng map mockup báo "không khai route" — trong khi chúng khai
+        đúng. Bản dựng đọc tên mới trước, tên cũ sau.
+        """
+        p = self.root / "mockups" / "the.html"
+        p.write_text(p.read_text(encoding="utf-8")
+                     .replace("aisef-screen", "aisdlc-screen")
+                     .replace("aisef-route", "aisdlc-route"), encoding="utf-8")
+        contract, _ = extract(self.root, self.exp)
+        man = contract.by_id("the")
+        self.assertIsNotNone(man, "màn hình mang thẻ tên cũ phải vẫn được nhận")
+        self.assertTrue(man.route, "route khai bằng thẻ tên cũ phải đọc được")
+
     def test_slice_is_one_screen_only(self):
         """Bước viết code chỉ được nạp lát cắt một màn hình."""
         contract, _ = extract(self.root, self.exp)
@@ -157,7 +173,7 @@ class TestGate(MockupTestCase):
         """52 chỗ chưa chốt trên 5 màn thường quy về 4–5 câu hỏi. Liệt kê
         từng chỗ thì người duyệt thấy một bức tường; gom lại thì thấy đúng
         việc phải làm."""
-        from aisdlc.control.design_contract import DesignContract, ScreenContract
+        from aisef.control.design_contract import DesignContract, ScreenContract
 
         contract = DesignContract(screens=[
             ScreenContract(id="a", route="/a", unresolved=[
@@ -226,7 +242,7 @@ class TestBrowserUnavailable(unittest.TestCase):
     def test_missing_browser_is_a_gate_error_not_a_silent_pass(self):
         """Thiếu trình duyệt thì hợp đồng không tồn tại — cổng phải trượt,
         không được coi như đạt."""
-        import aisdlc.phases.mockup as mod
+        import aisef.phases.mockup as mod
 
         real = mod.browser.render
         mod.browser.render = lambda *a, **k: browser.RenderResult(unavailable="chưa cài playwright")

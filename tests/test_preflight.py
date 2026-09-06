@@ -16,9 +16,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.control.normalize import Story  # noqa: E402
-from aisdlc.control.preflight import (  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.control.normalize import Story  # noqa: E402
+from aisef.control.preflight import (  # noqa: E402
     STORY_NOT_EXECUTABLE,
     check_stories_executable,
     check_story,

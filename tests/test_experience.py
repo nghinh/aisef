@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.experience import (  # noqa: E402
+from aisef.control.experience import (  # noqa: E402
     parse_experience,
     parse_experience_file,
     slugify,

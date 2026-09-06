@@ -14,8 +14,8 @@ from tempfile import TemporaryDirectory
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.kit import registry as R  # noqa: E402
-from aisdlc.kit.catalog import Catalog, Source  # noqa: E402
+from aisef.kit import registry as R  # noqa: E402
+from aisef.kit.catalog import Catalog, Source  # noqa: E402
 
 
 def make_skill(root: Path, name: str, *, source: str = "demo", fm: str = "",
@@ -24,7 +24,7 @@ def make_skill(root: Path, name: str, *, source: str = "demo", fm: str = "",
     (d / "references").mkdir(parents=True, exist_ok=True)
     front = fm or f"name: {name}\ndescription: skill {name}\n"
     (d / "SKILL.md").write_text(f"---\n{front}---\n\n# {name}\n\n{body}\n", encoding="utf-8")
-    (d / ".aisdlc-managed").write_text(f"source={source}\nreason=test\n", encoding="utf-8")
+    (d / ".aisef-managed").write_text(f"source={source}\nreason=test\n", encoding="utf-8")
     for rel, content in (extra or {}).items():
         (d / rel).write_text(content, encoding="utf-8")
     return d
@@ -205,7 +205,7 @@ class TestScriptsPhaiBienDichDuoc(unittest.TestCase):
 
     def test_broken_script_keeps_it_out(self):
         import tempfile
-        from aisdlc.kit.registry import verify_structure
+        from aisef.kit.registry import verify_structure
         with tempfile.TemporaryDirectory() as tmp:
             v = verify_structure(self._skill(tmp, "def (:\n"))
         self.assertFalse(v.ok)
@@ -213,7 +213,7 @@ class TestScriptsPhaiBienDichDuoc(unittest.TestCase):
 
     def test_good_script_is_counted(self):
         import tempfile
-        from aisdlc.kit.registry import verify_structure
+        from aisef.kit.registry import verify_structure
         with tempfile.TemporaryDirectory() as tmp:
             v = verify_structure(self._skill(tmp, "print('ok')\n"))
         self.assertTrue(v.ok, v.gaps)
@@ -222,7 +222,7 @@ class TestScriptsPhaiBienDichDuoc(unittest.TestCase):
 
 class TestMienTheoNguon(unittest.TestCase):
     def test_ui_ux_source_gets_a_ui_domain_when_frontmatter_has_none(self):
-        from aisdlc.kit.registry import _SOURCE_DOMAIN
+        from aisef.kit.registry import _SOURCE_DOMAIN
         self.assertEqual(_SOURCE_DOMAIN["ui-ux"], "ui-ux")
 
 
@@ -232,8 +232,8 @@ class TestNangLucPhaiKhai(unittest.TestCase):
     def _build(self, tmp, name, frontmatter_extra="", body=""):
         import json
         from pathlib import Path
-        from aisdlc.kit.catalog import Catalog
-        from aisdlc.kit.registry import build
+        from aisef.kit.catalog import Catalog
+        from aisef.kit.registry import build
         d = Path(tmp) / ".claude" / "skills" / name
         d.mkdir(parents=True)
         (d / "SKILL.md").write_text(f"---\nname: {name}\ndescription: Improve performance of the screen and review flow\n{frontmatter_extra}---\n# {name}\n{body}", encoding="utf-8")

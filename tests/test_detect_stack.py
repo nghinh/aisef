@@ -9,8 +9,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.kit.detect_stack import Stack, detect  # noqa: E402
-from aisdlc.kit.security_filter import (  # noqa: E402
+from aisef.kit.detect_stack import Stack, detect  # noqa: E402
+from aisef.kit.security_filter import (  # noqa: E402
     ALWAYS_RELEVANT,
     Classification,
     Verdict,
@@ -18,7 +18,7 @@ from aisdlc.kit.security_filter import (  # noqa: E402
     select_for_stack,
     subdomains_for_stack,
 )
-from aisdlc.kit.skills import Skill  # noqa: E402
+from aisef.kit.skills import Skill  # noqa: E402
 
 CORPUS = ROOT / "references" / "cybersecurity-skills" / "skills"
 
@@ -154,11 +154,11 @@ if __name__ == "__main__":
 
 class TestWebKhongNeuFrameworkVanLaGiaoDien(unittest.TestCase):
     def test_browser_app_without_framework_name_has_ui(self):
-        from aisdlc.kit.detect_stack import detect
+        from aisef.kit.detect_stack import detect
         s = detect("Ứng dụng ghi chú chạy trong trình duyệt, lưu cục bộ, không cần máy chủ.")
         self.assertIn("frontend", s.undetermined)
         self.assertTrue(s.has_ui)
 
     def test_pure_backend_still_has_no_ui(self):
-        from aisdlc.kit.detect_stack import detect
+        from aisef.kit.detect_stack import detect
         self.assertFalse(detect("Dịch vụ xử lý hàng đợi bằng Python, lưu PostgreSQL.").has_ui)

@@ -8,10 +8,10 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 
-from aisdlc.config import DEFAULTS, Config
-from aisdlc.control.normalize import Story
-from aisdlc.harness.observe import HANDOFF, EvidenceStore
-from aisdlc.phases.implement import SLOT_SOURCE, _skills_section, handoff_slots, skills_used
+from aisef.config import DEFAULTS, Config
+from aisef.control.normalize import Story
+from aisef.harness.observe import HANDOFF, EvidenceStore
+from aisef.phases.implement import SLOT_SOURCE, _skills_section, handoff_slots, skills_used
 
 REVIEW_CTX = {"story_id": "S", "story_title": "t", "story_contract": "c", "architecture_rules": "a",
               "write_scope": "src", "mockup_section": "m", "tools": "x", "skills": "k",
@@ -54,8 +54,8 @@ class TestSuKienHandoff(unittest.TestCase):
 class TestSkillTelemetry(unittest.TestCase):
     def test_used_read_from_tool_uses(self):
         r = SimpleNamespace(tool_uses=[SimpleNamespace(name="Read", input={}),
-                                       SimpleNamespace(name="Skill", input={"skill": "aisdlc-mockup-html"})])
-        self.assertEqual(skills_used(r), ["aisdlc-mockup-html"])
+                                       SimpleNamespace(name="Skill", input={"skill": "aisef-mockup-html"})])
+        self.assertEqual(skills_used(r), ["aisef-mockup-html"])
 
     def test_no_stream_means_empty_not_guess(self):
         self.assertEqual(skills_used(SimpleNamespace()), [])

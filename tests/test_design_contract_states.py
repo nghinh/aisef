@@ -15,9 +15,9 @@ from types import SimpleNamespace
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.design_contract import ScreenContract, build  # noqa: E402
-from aisdlc.control.experience import Experience, Screen  # noqa: E402
-from aisdlc.control.machine_gate import check_design_contract  # noqa: E402
+from aisef.control.design_contract import ScreenContract, build  # noqa: E402
+from aisef.control.experience import Experience, Screen  # noqa: E402
+from aisef.control.machine_gate import check_design_contract  # noqa: E402
 
 ONE_STATE = (ROOT / "tests" / "fixtures" / "aria" / "mockup.txt").read_text(encoding="utf-8")
 GALLERY = ONE_STATE + ONE_STATE  # hai trạng thái dựng cạnh nhau, không đánh dấu

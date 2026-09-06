@@ -10,7 +10,7 @@ from . import _runner as R
 STORIES = ["STORY-01-01", "STORY-01-02", "STORY-01-03"]
 
 
-@unittest.skipUnless(R.ENABLED and shutil.which("claude"), "AISDLC_DOGFOOD=1 và có `claude`")
+@unittest.skipUnless(R.ENABLED and shutil.which("claude"), "AISEF_DOGFOOD=1 và có `claude`")
 class TestParEpic01(unittest.TestCase):
     def test_moc(self):
         project = R.make_project("par")

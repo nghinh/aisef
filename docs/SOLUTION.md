@@ -1,4 +1,4 @@
-# AI-SDLC Framework — Giải pháp tổng thể
+# AISEF Framework — Giải pháp tổng thể
 
 **Trạng thái:** bản chốt để duyệt trước khi thực thi diện rộng.
 **Phiên bản:** 2 — viết lại sau khi rà soát, sửa 12 vấn đề của bản 1 (mục 17).
@@ -36,9 +36,9 @@ Phân loại theo **chế độ chạy**, không theo tên sản phẩm — vì 
 
 | Bề mặt | Có trên máy | Chế độ | Control plane vào bằng |
 |---|---|---|---|
-| Claude Desktop | `/Applications/Claude.app` ✅ | agent-led | agent gọi `aisdlc` qua Bash tool |
+| Claude Desktop | `/Applications/Claude.app` ✅ | agent-led | agent gọi `aisef` qua Bash tool |
 | Claude CLI | `claude` 2.1.236 ✅ | cả hai | tương tác: qua Bash · headless: `claude -p` |
-| OpenCode Desktop | `/Applications/OpenCode.app` ✅ | agent-led | agent gọi `aisdlc` qua Bash tool |
+| OpenCode Desktop | `/Applications/OpenCode.app` ✅ | agent-led | agent gọi `aisef` qua Bash tool |
 | OpenCode CLI | `opencode` ✅ | cả hai | TUI/web: qua Bash · headless: `opencode run` |
 
 OpenCode còn có `serve` (server headless) + `attach`/`web` — nhiều client nối vào một server. Hữu ích về sau, **không cần cho V1**.
@@ -102,20 +102,20 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 ### 5.2 Tools
 | Hạng mục | Hiện thực |
 |---|---|
-| Tool thật | `harness/tools.py` — ba tool có bằng chứng `test` · `lint` · `sast` (agent gọi `aisdlc tool <tên> --story S`; lệnh từ `tools.*` hoặc tự dò), phân biệt **không chạy được** với đỏ (lỗi 8); `test:baseline` là lần test do harness ghi trước phiên developer (ADR-004 R9); `harness/testlog.py` đọc tên test từ năm định dạng — node `spec`/`tap`, vitest verbose, `pytest -v`, **CTRF** JSON (ADR-005 V9; `doctor` gợi reporter khi bằng chứng ghi `test_format=""`). Đọc/ghi tệp là tool của client (guard chặn); commit ứng viên do harness làm (`phases/implement.py::freeze_candidate`); route thật/ảnh chụp qua `harness/browser.py`. Đầu ra `aisdlc tool` có cấu trúc (ADR-005 V11 A): tóm tắt `testlog` (xanh/đỏ/bỏ qua, ≤ 20 tên test đỏ) → `tail` → "(lược N/M dòng — toàn văn: `_bmad-output/evidence/<story>-<tool>-<seq>.log`)" khi output dài hơn `--lines`; `tail` trong evidence giữ 20 dòng, toàn văn ở tệp `.log` chỉ ghi khi có cắt. `tail`, log và `qa:*` đều đã che bí mật `[REDACTED]` (`guardrails.scrub_secrets`, ADR-005 V1) |
-| MCP | không có — quyết định V1: không MCP thường trú; playwright dùng qua CLI trong `harness/browser.py`, tra cứu tài liệu theo yêu cầu là việc đợt 5 (`aisdlc doc`) |
+| Tool thật | `harness/tools.py` — ba tool có bằng chứng `test` · `lint` · `sast` (agent gọi `aisef tool <tên> --story S`; lệnh từ `tools.*` hoặc tự dò), phân biệt **không chạy được** với đỏ (lỗi 8); `test:baseline` là lần test do harness ghi trước phiên developer (ADR-004 R9); `harness/testlog.py` đọc tên test từ năm định dạng — node `spec`/`tap`, vitest verbose, `pytest -v`, **CTRF** JSON (ADR-005 V9; `doctor` gợi reporter khi bằng chứng ghi `test_format=""`). Đọc/ghi tệp là tool của client (guard chặn); commit ứng viên do harness làm (`phases/implement.py::freeze_candidate`); route thật/ảnh chụp qua `harness/browser.py`. Đầu ra `aisef tool` có cấu trúc (ADR-005 V11 A): tóm tắt `testlog` (xanh/đỏ/bỏ qua, ≤ 20 tên test đỏ) → `tail` → "(lược N/M dòng — toàn văn: `_bmad-output/evidence/<story>-<tool>-<seq>.log`)" khi output dài hơn `--lines`; `tail` trong evidence giữ 20 dòng, toàn văn ở tệp `.log` chỉ ghi khi có cắt. `tail`, log và `qa:*` đều đã che bí mật `[REDACTED]` (`guardrails.scrub_secrets`, ADR-005 V1) |
+| MCP | không có — quyết định V1: không MCP thường trú; playwright dùng qua CLI trong `harness/browser.py`, tra cứu tài liệu theo yêu cầu là việc đợt 5 (`aisef doc`) |
 | **Prose quanh tool** | mỗi tool có mục "khi nào gọi / cách đọc kết quả / khi nào KHÔNG gọi" |
 
 ### 5.3 Sandboxes & execution environments
 | Hạng mục | Hiện thực |
 |---|---|
 | Bậc quyền | `READ_ONLY` → `WORKSPACE_WRITE` → `WORKSPACE_NETWORK` → `PRIVILEGED_TEST` |
-| Bộ thực thi | `ExecutionProvider` (ADR-005 V5, `harness/sandbox.py`): `docker` mặc định (`--network=none` theo bậc · `--cap-drop=ALL` · non-root · chỉ mount worktree của story · `-e` chỉ mang `spec.env`) · `local` (chạy thẳng) · `fake` (test, kịch bản) · backend ngoài `"mô-đun:Lớp"` qua knob `sandbox.provider`. Một lệnh một lần chạy, không session. **Suite đơn vị không mở container**: `tests/__init__.py` đặt `HostProvider` (chạy thật trên máy, khai NATIVE — giả lập cách ly, chỉ cho test) vào chỗ `docker`, vì test đơn vị kiểm luật của harness chứ không kiểm Docker; `python3 -m unittest discover -s tests -q` chạy vài phút thay vì 25–60. Docker thật ở test đánh dấu `needs_docker` (`AISDLC_TEST_DOCKER=1 python3 -m unittest tests.test_sandbox tests.test_tools`) và hợp quy S1–S5; `host`/`fake` không phải lựa chọn của dự án (`doctor` từ chối tên ấy) |
+| Bộ thực thi | `ExecutionProvider` (ADR-005 V5, `harness/sandbox.py`): `docker` mặc định (`--network=none` theo bậc · `--cap-drop=ALL` · non-root · chỉ mount worktree của story · `-e` chỉ mang `spec.env`) · `local` (chạy thẳng) · `fake` (test, kịch bản) · backend ngoài `"mô-đun:Lớp"` qua knob `sandbox.provider`. Một lệnh một lần chạy, không session. **Suite đơn vị không mở container**: `tests/__init__.py` đặt `HostProvider` (chạy thật trên máy, khai NATIVE — giả lập cách ly, chỉ cho test) vào chỗ `docker`, vì test đơn vị kiểm luật của harness chứ không kiểm Docker; `python3 -m unittest discover -s tests -q` chạy vài phút thay vì 25–60. Docker thật ở test đánh dấu `needs_docker` (`AISEF_TEST_DOCKER=1 python3 -m unittest tests.test_sandbox tests.test_tools`) và hợp quy S1–S5; `host`/`fake` không phải lựa chọn của dự án (`doctor` từ chối tên ấy) |
 | Bảo đảm có tên | `Guarantee` = `network_none` · `read_only_fs` · `non_root` · `no_host_mount` · `secrets_absent`. Bậc khai **cần** (`Level.requires()`), provider khai **có** (`guarantees(level)` → `Support` native/emulated/post_hoc/unsupported của `clients/base.py`, đọc tên thật). Kiểm bằng lần chạy thật: `docs/SANDBOX-CONFORMANCE.md` S1–S5, mỗi provider một cột (`python3 -m tests.sandbox_conformance`) |
 | Công cụ verify | chạy **trong image**, không cài lên máy host (giải quyết việc thiếu pytest/semgrep/trivy/k6) |
 | Ảnh | chọn theo stack dự án (`node:22-alpine`, `python:3.12-alpine`…), cấu hình đè được. `alpine` trơn không có công cụ nào, chạy `npm test` trong đó sẽ đỏ vì **thiếu công cụ** chứ không phải vì code sai — `doctor` cảnh báo đúng chỗ này |
 | Mạng cho tool | tắt mặc định; dự án cần cài phụ thuộc thì khai `sandbox.tools_network` tường minh |
-| Môi trường tiến trình client | **allowlist** (`clients/base.py::child_env`, ADR-005 V2), không phải `os.environ` bớt vài thứ: `PATH HOME LANG LC_* TERM TMPDIR SHELL USER LOGNAME SSL_CERT_FILE` + `ANTHROPIC_*` + `AISDLC_*` + tiền tố khai ở `clients.env_allow`; `CLAUDE*` của phiên cha và mọi secret khác của máy vắng (hợp quy C9). Kèm bộ vô hiệu credential git (`GIT_TERMINAL_PROMPT=0`, `GIT_ASKPASS=/usr/bin/false`, `GIT_CONFIG_COUNT/KEY_0/VALUE_0` xoá `credential.helper`) — osxkeychain không được hỏi trong phiên agent (C10); git của harness chạy tiến trình riêng, không nhận bộ này. Giới hạn đã biết: token model của Claude ở Keychain/OAuth của máy, không có broker |
+| Môi trường tiến trình client | **allowlist** (`clients/base.py::child_env`, ADR-005 V2), không phải `os.environ` bớt vài thứ: `PATH HOME LANG LC_* TERM TMPDIR SHELL USER LOGNAME SSL_CERT_FILE` + `ANTHROPIC_*` + `AISEF_*` + tiền tố khai ở `clients.env_allow`; `CLAUDE*` của phiên cha và mọi secret khác của máy vắng (hợp quy C9). Kèm bộ vô hiệu credential git (`GIT_TERMINAL_PROMPT=0`, `GIT_ASKPASS=/usr/bin/false`, `GIT_CONFIG_COUNT/KEY_0/VALUE_0` xoá `credential.helper`) — osxkeychain không được hỏi trong phiên agent (C10); git của harness chạy tiến trình riêng, không nhận bộ này. Giới hạn đã biết: token model của Claude ở Keychain/OAuth của máy, không có broker |
 | Suy biến | Provider thiếu bảo đảm bậc cần → `degraded=True` **kèm tên bảo đảm thiếu** (`SandboxResult.missing` vào evidence, cột "cách ly" của `pre-deploy`, `doctor`); `allow_degraded=False` từ chối **lúc chọn provider**, lệnh chưa chạy. Lỗi hạ tầng (daemon, kéo image — docker thoát 125) ghi `provider_error`; tool báo "không chạy được", không "test đỏ" |
 
 ### 5.4 Orchestration logic
@@ -151,10 +151,10 @@ dạng khoá (lỗi 10).
 | **Cost & latency** | token in/out · USD · giây — ghi vào mỗi `evidence/{story}.json`, cộng dồn theo epic |
 | **Ứng viên** | mỗi phép kiểm mang `detail.candidate` = SHA bản được kiểm (ADR-004 R1) |
 | **Sổ hành vi** | `control/ledger.py` — phép chiếu từ evidence, không phải kho mới: mỗi tiêu chí / FR / `qa:<kind>` / màn hình có trạng thái VERIFIED · GAP · REOPENED (`regressed_by`); chỉ ứng viên đã *landed* (nhật ký `merge.completed`/`attempt.committed`) mới thành VERIFIED. `ledger.json` + `INDEX.md` + mốc `loops[]`; metrics (tăng trưởng, hồi quy, gap đóng, cải thiện biên/$) ở phần 5 báo cáo (ADR-004 R2/R6/R7) |
-| Bàn giao & phán quyết | `handoff` (slot · nguồn · số ký tự, `prompt_chars`), `review:verdict`/`security:verdict` (JSON), `gate:input` (13 kwargs của `gate.evaluate` JSON-hoá, ghi ngay trước phán quyết — `aisdlc gate --replay` chấm lại lượt cũ bằng luật mới, ADR-005 V4), `gate:verdict`; lời rà soát nguyên văn ở `_bmad-output/reviews/<story>-<vai>-<lượt>.md` (lỗi 16) |
-| **Kết cục lượt** | `agent_run.detail.exit_status` ∈ ok · max_turns · timeout · cost · context · permission · infra · error — `clients/stream.py::exit_status_of`, một bảng cho cả vòng thử lại (`INFRA_STATUSES` = timeout, infra không ăn `run.max_retries`) lẫn `aisdlc status` ("Lượt agent: …", bản ghi cũ là "chưa ghi"); `tool_run.detail.redacted` = số bí mật đã che trong `tail`/log (ADR-005 V1/V11 B) |
+| Bàn giao & phán quyết | `handoff` (slot · nguồn · số ký tự, `prompt_chars`), `review:verdict`/`security:verdict` (JSON), `gate:input` (13 kwargs của `gate.evaluate` JSON-hoá, ghi ngay trước phán quyết — `aisef gate --replay` chấm lại lượt cũ bằng luật mới, ADR-005 V4), `gate:verdict`; lời rà soát nguyên văn ở `_bmad-output/reviews/<story>-<vai>-<lượt>.md` (lỗi 16) |
+| **Kết cục lượt** | `agent_run.detail.exit_status` ∈ ok · max_turns · timeout · cost · context · permission · infra · error — `clients/stream.py::exit_status_of`, một bảng cho cả vòng thử lại (`INFRA_STATUSES` = timeout, infra không ăn `run.max_retries`) lẫn `aisef status` ("Lượt agent: …", bản ghi cũ là "chưa ghi"); `tool_run.detail.redacted` = số bí mật đã che trong `tail`/log (ADR-005 V1/V11 B) |
 | Evaluation | `tests/bench/` (ADR-005 V8): task từ 25 lỗi thật của kho (commit) + story e9 done (sinh lúc chạy); `validate` ×3 trên bản chép `git archive` một ref, F2P/P2P theo tên, flaky loại và nêu tên; `run` → pass@1/pass@k/ổn định/cost so lịch sử; `export` Harbor. Trôi chất lượng còn đo bằng dogfood `tests/dogfood/` (mốc lượt/chi phí) và hợp quy client `tests/conformance/` |
-| Dashboard | `aisdlc status` · `aisdlc report` · `aisdlc evidence <id>` |
+| Dashboard | `aisef status` · `aisef report` · `aisef evidence <id>` |
 
 ---
 
@@ -184,7 +184,7 @@ gắn băm mọi `LOOP-REPORT-*.md`, và dự án chưa chạy `improve` không 
 
 > Cổng người ở **mức pha**, không ở mức story. Story dùng cổng máy 4 điều kiện — nếu bắt duyệt tay 114 lần thì mất hết ý nghĩa của tự động hoá.
 
-✅ **Đã xong** — `aisdlc/control/approvals.py`, 19 test.
+✅ **Đã xong** — `aisef/control/approvals.py`, 19 test.
 
 ### Cổng máy chấm trên một **ứng viên đóng băng** (ADR-004 R1)
 
@@ -229,7 +229,7 @@ Epic **luôn tuần tự** (epic sau dựa vào schema/API epic trước). Trong
 
 Điều kiện 2 hay bị bỏ quên và là nguyên nhân hỏng khó lần nhất. So đường dẫn theo **đoạn**, không theo tiền tố chuỗi — `src/api` và `src/apidocs` là hai vùng khác nhau. Story không khai `write_scope` bị coi là **chạm mọi thứ**.
 
-✅ **Đã xong** — `aisdlc/control/scheduler.py`, 26 test. Ví dụ thật: 9 story → **5 lượt** thay vì 9.
+✅ **Đã xong** — `aisef/control/scheduler.py`, 26 test. Ví dụ thật: 9 story → **5 lượt** thay vì 9.
 
 ### 7.2 Cô lập — không đủ nếu chỉ chia đợt
 
@@ -244,8 +244,8 @@ Chia đợt tránh được đụng *nội dung file*, nhưng ba thứ sau vẫn
 **Giải: mỗi story trong đợt chạy trong git worktree riêng.**
 
 ```
-.aisdlc/worktrees/S-01-02/     git worktree + nhánh story/S-01-02
-.aisdlc/worktrees/S-01-03/     git worktree + nhánh story/S-01-03
+.aisef/worktrees/S-01-02/     git worktree + nhánh story/S-01-02
+.aisef/worktrees/S-01-03/     git worktree + nhánh story/S-01-03
 ```
 
 - Worktree chia sẻ `.git`, không sao chép lịch sử → tạo nhanh, tốn ít đĩa.
@@ -260,7 +260,7 @@ Xử lý: **dừng, ghi vào evidence, báo người** — không tự gỡ. Đ�
 
 ### 7.4 Mặc định
 
-`--max-parallel 3`. Tăng thì nhanh hơn nhưng dễ chạm hạn mức model và tải máy; đo bằng `aisdlc status` rồi chỉnh.
+`--max-parallel 3`. Tăng thì nhanh hơn nhưng dễ chạm hạn mức model và tải máy; đo bằng `aisef status` rồi chỉnh.
 
 ---
 
@@ -278,14 +278,14 @@ Ba luật, thứ tự có chủ đích: subdomain tấn công → chặn; độn
 
 **Tầng 2 — theo stack dự án.** 269 → 20–30. Dự án Python+React+Postgres+Docker chỉ cần `container-security`, `api-security`, `web-application-security`, `devsecops`, `cryptography`, `supply-chain-security`; không cần 56 skill `cloud-security` cho hạ tầng không dùng.
 
-✅ **Tầng 1 đã xong** — `aisdlc/kit/security_filter.py`, 14 test. Tầng 2 cần `detect_stack`.
+✅ **Tầng 1 đã xong** — `aisef/kit/security_filter.py`, 14 test. Tầng 2 cần `detect_stack`.
 
 ---
 
 ## 9. Cấu trúc
 
 ```
-aisdlc/                          framework, một package Python
+aisef/                          framework, một package Python
 ├── kit/                         NHÓM 1 — nội dung chuẩn hoá (nguồn canonical)
 │   ├── catalog.json             sổ đăng ký nguồn skill + pin + lý do chọn
 │   ├── prompts/  rules/  skills/    prompt có version · luật · skill tự viết
@@ -312,7 +312,7 @@ dự-án/
 ├── docs/requirements.md          đầu vào duy nhất
 ├── .ai/                          canonical (compile từ kit)
 ├── .claude/  .opencode/          generated — không sửa tay
-├── .aisdlc/worktrees/            cô lập khi chạy song song
+├── .aisef/worktrees/            cô lập khi chạy song song
 ├── _bmad/custom/*.toml           override agent BMAD
 ├── _bmad-output/                 MỘT gốc artifact
 │   ├── prd.md  architecture.md  DESIGN.md  EXPERIENCE.md  epics.md
@@ -332,39 +332,39 @@ dự-án/
 
 ## 10. Bộ lệnh
 
-Đây là bộ lệnh **đã hiện thực** (`aisdlc --help`), không phải bản phác.
+Đây là bộ lệnh **đã hiện thực** (`aisef --help`), không phải bản phác.
 
 ```
 # Chuẩn bị
-aisdlc doctor                         môi trường: python · git · client · docker · playwright
-aisdlc setup   [--references DIR] [--no-fetch] [--dry-run]   dò stack, nạp skill, sinh CLAUDE.md + AGENTS.md
-aisdlc init                           ghi .ai/config.json mặc định
-aisdlc compile [--client claude|opencode|all] [--bin PATH]   sinh hook/plugin từ một nguồn guard duy nhất
+aisef doctor                         môi trường: python · git · client · docker · playwright
+aisef setup   [--references DIR] [--no-fetch] [--dry-run]   dò stack, nạp skill, sinh CLAUDE.md + AGENTS.md
+aisef init                           ghi .ai/config.json mặc định
+aisef compile [--client claude|opencode|all] [--bin PATH]   sinh hook/plugin từ một nguồn guard duy nhất
 
 # Tri thức vận hành (ADR-002 / ADR-003)
-aisdlc skill   [--story S]            sổ đăng ký skill: dựng, soi, định tuyến thử cho một story
-aisdlc skill   --scan [--client c] [--batch N]   quét SKILL.md bằng model (chỉ đọc, không tool):
+aisef skill   [--story S]            sổ đăng ký skill: dựng, soi, định tuyến thử cho một story
+aisef skill   --scan [--client c] [--batch N]   quét SKILL.md bằng model (chỉ đọc, không tool):
                                       injection → rejected, suspicious → cảnh báo trong sổ
-aisdlc doc     <package> [--topic T] [--tokens N] [--story S]   tra tài liệu thư viện
+aisef doc     <package> [--topic T] [--tokens N] [--story S]   tra tài liệu thư viện
                                       (context7, có cache), ghi bằng chứng doc_lookup
 
 # Bước 2 — tài liệu, dừng ở mỗi cổng
-aisdlc plan    [--client c] [--auto-approve all|<danh sách>] [--force]
+aisef plan    [--client c] [--auto-approve all|<danh sách>] [--force]
         project-context → prd → architecture → ux → epics → tách story
 
 # Bước 3 — mockup
-aisdlc mockup  [--client c] [--only <screen_id>] [--force]
+aisef mockup  [--client c] [--only <screen_id>] [--force]
 
 # Cổng người duyệt
-aisdlc gates                          bảng trạng thái 8 cổng
-aisdlc review  <gate>                 artifact, trình bày theo loại cổng
-aisdlc approve <gate> [--note ...] [--force]
-aisdlc reject  <gate>  --note "..."   (bắt buộc ghi chú)
-aisdlc auto-approve all|<danh sách>   luôn ghi dấu `auto`
+aisef gates                          bảng trạng thái 8 cổng
+aisef review  <gate>                 artifact, trình bày theo loại cổng
+aisef approve <gate> [--note ...] [--force]
+aisef reject  <gate>  --note "..."   (bắt buộc ghi chú)
+aisef auto-approve all|<danh sách>   luôn ghi dấu `auto`
 
 # Bước 4 — hiện thực
-aisdlc run     [--client c] [--epic E] [--sequential] [--no-isolate] [--force]
-aisdlc run     --verify-only --story S [--client c] [--repeat K]   kiểm lại ứng viên đã đóng băng (ADR-004 R13):
+aisef run     [--client c] [--epic E] [--sequential] [--no-isolate] [--force]
+aisef run     --verify-only --story S [--client c] [--repeat K]   kiểm lại ứng viên đã đóng băng (ADR-004 R13):
         không mở phiên developer; ứng viên = HEAD nhánh story; chạy lại đúng phép kiểm ✗/thiếu
         ở SHA ấy, giữ rà soát/bảo mật cùng SHA; cổng chấm đủ; đạt → merge như thường, trượt →
         failed không ăn run.max_retries. Dùng khi trượt vì môi trường đo (e2e nhạy tải máy).
@@ -372,56 +372,56 @@ aisdlc run     --verify-only --story S [--client c] [--repeat K]   kiểm lại 
         test đổi kết cục giữa các lần → `note verify-only.repeat {flaky_ids, stable_red, flaky_checks}`,
         mục cổng ⚠ UNRUNNABLE "không ổn định: <tên>" — không chạy được ổn định ≠ trượt ≠ đạt;
         đỏ ở mọi lần → ✗ như thường. K = 1 (mặc định) là hành vi cũ.
-aisdlc tool    test|lint|sast [--story S] [--lines N]  agent gọi qua đây để có bằng chứng;
+aisef tool    test|lint|sast [--story S] [--lines N]  agent gọi qua đây để có bằng chứng;
         in tên test đỏ trước tail, khai "(lược N/M dòng — toàn văn: …log)" khi cắt
-aisdlc verify  [--write-scope ...] [--story S] hậu kiểm guard trên cây làm việc
+aisef verify  [--write-scope ...] [--story S] hậu kiểm guard trên cây làm việc
 
 # Bước 5 — kiểm định
-aisdlc qa      [--only <loại>] [--story S] [--story-level]
+aisef qa      [--only <loại>] [--story S] [--story-level]
         Cấp dự án (qa · pre-deploy · improve) chạy ở **worktree sạch dựng từ SHA** (ADR-005 V6,
         knob verify.clean_tree): shim node_modules/.bin, conftest.py, pytest.ini chưa commit không
         tới được cây kiểm; node_modules/.venv của dự án được gắn vào. Bằng chứng ghi
         `tree = worktree-tạm | cây agent` + `clean_tree = <sha>`; mức story giữ cây worktree.
 
 # Vòng cải tiến epic theo bằng chứng (ADR-004 R3) — sau khi epic đã chạy
-aisdlc improve --epic E [--max-loops N] [--auto] [--client c] [--force]
+aisef improve --epic E [--max-loops N] [--auto] [--client c] [--force]
         QA cấp dự án → sổ hành vi → **một** story sửa cho một GAP/REOPENED
         (STORY-RP-nn trong EPIC-RP-<E>, sinh bằng code) → `run` (worktree, cổng,
         reviewer ≠ developer) → QA → mốc `loops[]` + LOOP-REPORT-<n>.md → vòng sau.
         Dừng bằng code: hết gap · đủ improve.max_loops · biên ≤ 0 improve.flat_loops
         vòng liền · vượt improve.cost_cap_usd · bế tắc kế hoạch (trả người).
-        Cổng người `improve` trước mỗi vòng ≥ 2 (aisdlc review/approve improve) trừ --auto.
+        Cổng người `improve` trước mỗi vòng ≥ 2 (aisef review/approve improve) trừ --auto.
         Không daemon: chạy lại tiếp từ mốc cuối trong sổ.
 
 # Bước 6 — giao hàng
-aisdlc devsecops [--client c] [--install-spec X] [--bin PATH] [--force]
+aisef devsecops [--client c] [--install-spec X] [--bin PATH] [--force]
                                                CI (code) + Dockerfile/IaC/runbook (model)
-aisdlc pre-deploy [--skip-qa] [--epic E]       chấm cổng cuối, ghi báo cáo để người ký; --epic khai
+aisef pre-deploy [--skip-qa] [--epic E]       chấm cổng cuối, ghi báo cáo để người ký; --epic khai
                                                phạm vi nghiệm thu: story ngoài epic nêu tên là "ngoài
                                                phạm vi" (không xong, không thiếu) — cổng scope-aware,
                                                không nới (QĐ C-a 2026-09-06)
 
 # Sau phát hành — vòng đời thay đổi
-aisdlc change  FR-x "mô tả"           ghi FR, stale PRD trở xuống, sinh story delta
+aisef change  FR-x "mô tả"           ghi FR, stale PRD trở xuống, sinh story delta
                                       STORY-CH-nn trong EPIC-CH (sinh bằng code)
 
 # Guard — client gọi vào tại mốc vòng đời (do `compile` nối sẵn)
-aisdlc guard write-scope|diff-scope|secret|git-stage|destructive|injection|process-ref|completion
+aisef guard write-scope|diff-scope|secret|git-stage|destructive|injection|process-ref|completion
 
 # Theo dõi
-aisdlc status                         tiến độ · chi phí · story tốn bất thường
-aisdlc report  [--out FILE]           báo cáo nghiệm thu + sổ hành vi (`ledger.json`, `INDEX.md`)
-aisdlc evidence <id> [--story S]      lịch sử một story hoặc một hành vi
+aisef status                         tiến độ · chi phí · story tốn bất thường
+aisef report  [--out FILE]           báo cáo nghiệm thu + sổ hành vi (`ledger.json`, `INDEX.md`)
+aisef evidence <id> [--story S]      lịch sử một story hoặc một hành vi
     [--link TEST_ID --why ...]        khai truy vết: test có sẵn chứng minh hành vi — sửa siêu dữ
                                       liệu, không phải story sửa; sổ vẫn đòi test xanh ở ứng viên
                                       đã landed (`traceability.json`, QĐ B6 2026-09-06)
                                       (STORY-01-04 · AC-STORY-01-04-2 · FR-3 · qa:e2e · mockup:notes-list)
-aisdlc ctx [--story S | --file F] [--budget N]   bản đồ mã quanh phạm vi ghi, đầy đủ (ADR-005 V7);
+aisef ctx [--story S | --file F] [--budget N]   bản đồ mã quanh phạm vi ghi, đầy đủ (ADR-005 V7);
                                       prompt chỉ nhận bản có trần `context.max_repo_map_chars`
-aisdlc issues [--format md|csv] [--epic E] [--status gap,reopened] [--out FILE]
+aisef issues [--format md|csv] [--epic E] [--status gap,reopened] [--out FILE]
                                       bảng gap/hồi quy từ sổ → `ISSUES.md|csv` (ADR-004 R12);
                                       chỉ tệp, không tạo issue ở tracker nào
-aisdlc gate    --replay <story> [--attempt n] | --all
+aisef gate    --replay <story> [--attempt n] | --all
                                       chấm lại cổng story trên bằng chứng đã ghi (ADR-005 V4):
                                       cắt bằng chứng ở `gate:input` của lượt, gọi `gate.evaluate`
                                       của mã **hiện tại**, in bảng từng mục so với `gate:verdict`
@@ -429,10 +429,10 @@ aisdlc gate    --replay <story> [--attempt n] | --all
                                       không gọi model, $0. Lượt trước V4 (không có `gate:input`)
                                       → "không replay được", không đoán
 
-# Bench (ADR-005 V8) — việc của người phát triển harness, không nối vào `aisdlc`
+# Bench (ADR-005 V8) — việc của người phát triển harness, không nối vào `aisef`
 python3 -m tests.bench mine [--e9 DIR]           task lỗi kho → tests/bench/tasks/ (commit); story e9 → .bench/tasks/
 python3 -m tests.bench validate [ID…] [--runs 3] base+test đỏ · base+test+gold xanh · test chập chờn loại, nêu tên
-python3 -m tests.bench run --client c [--attempts 3] [ID…]   AISDLC_BENCH=1; guard như hợp quy, `note mode=bench`
+python3 -m tests.bench run --client c [--attempts 3] [ID…]   AISEF_BENCH=1; guard như hợp quy, `note mode=bench`
 python3 -m tests.bench report | export ID --out DIR          pass@1/pass@k/ổn định/cost so lịch sử · thư mục Harbor
 ```
 
@@ -441,9 +441,9 @@ yêu cầu, loại kiểm định và màn hình là một hành vi có trạng 
 VERIFIED / GAP / **REOPENED** — cái cuối là "đã đúng rồi hỏng", thứ mà cổng
 story không nói được. `INDEX.md` là chỉ mục một dòng mỗi story; prompt
 developer nhận **lát cắt epic** của chỉ mục ấy (slot `index`, trần
-`context.max_index_chars`), còn lịch sử tra bằng `aisdlc evidence`.
+`context.max_index_chars`), còn lịch sử tra bằng `aisef evidence`.
 
-Không có `aisdlc next` / `implement` / `complete` như bản phác: vòng lặp
+Không có `aisef next` / `implement` / `complete` như bản phác: vòng lặp
 story nằm trong `run`, và tách nhỏ ra thành ba lệnh chỉ tạo thêm ba chỗ
 cho trạng thái lệch nhau.
 
@@ -451,7 +451,7 @@ cho trạng thái lệch nhau.
 
 ## 11. Đa client (R10)
 
-**Nội dung:** `kit/` → `aisdlc compile` → `.claude/` · `.opencode/`. Bắt buộc deterministic · idempotent · golden round-trip test · **khai báo loss** khi client thiếu cơ chế.
+**Nội dung:** `kit/` → `aisef compile` → `.claude/` · `.opencode/`. Bắt buộc deterministic · idempotent · golden round-trip test · **khai báo loss** khi client thiếu cơ chế.
 
 **Điều khiển:** cùng bộ lệnh, hai chế độ — đây là lý do Đ2 (CLI gọi-một-lần, không daemon) là quyết định đúng: thêm bề mặt mới **không phải sửa kiến trúc**.
 
@@ -459,7 +459,7 @@ cho trạng thái lệch nhau.
 |---|---|---|
 | Ai gọi | script / CI | chính agent, qua Bash tool |
 | Bề mặt | `claude -p` · `opencode run` · cron · CI | **Claude Desktop · Claude CLI · OpenCode Desktop · OpenCode TUI/Web** |
-| Lệnh | `aisdlc run --client X` | cùng bộ lệnh: trong phiên do `run` mở, agent gọi `aisdlc tool` · `aisdlc verify` · `aisdlc doc` · `aisdlc evidence` qua Bash; guard nối qua hook |
+| Lệnh | `aisef run --client X` | cùng bộ lệnh: trong phiên do `run` mở, agent gọi `aisef tool` · `aisef verify` · `aisef doc` · `aisef evidence` qua Bash; guard nối qua hook |
 
 `run` chỉ là vòng lặp gọi lại chính các lệnh đơn — **không có code riêng cho mỗi chế độ**.
 
@@ -467,11 +467,11 @@ cho trạng thái lệch nhau.
 
 | Bề mặt | Cách nối | Mức | Đã kiểm chứng |
 |---|---|---|---|
-| Claude CLI | `--settings` hooks → `aisdlc guard …` | tiền kiểm | ✅ cờ có thật |
+| Claude CLI | `--settings` hooks → `aisef guard …` | tiền kiểm | ✅ cờ có thật |
 | Claude Desktop | `.claude/settings.json` của dự án | tiền kiểm | ⚠️ suy luận — phải test |
-| OpenCode CLI | plugin → `aisdlc guard …` | tiền kiểm | ✅ chứng minh 2026-09-05 trên agent thật; quan sát chi phí/lượt: chưa |
+| OpenCode CLI | plugin → `aisef guard …` | tiền kiểm | ✅ chứng minh 2026-09-05 trên agent thật; quan sát chi phí/lượt: chưa |
 | OpenCode Desktop | cùng cấu hình dự án với CLI | tiền kiểm | ⚠️ suy luận từ CLI — chưa test riêng |
-| Bất kỳ, nếu hook không gắn được | `aisdlc verify` chạy lại toàn bộ guard | hậu kiểm | ✅ luôn có |
+| Bất kỳ, nếu hook không gắn được | `aisef verify` chạy lại toàn bộ guard | hậu kiểm | ✅ luôn có |
 
 **Quyết định (2026-09-05, thay quyết định 2026-09-04): OpenCode là client hạng hai trong V1.**
 Phép thử trên agent thật (opencode 1.18.26) đã chứng minh plugin **chặn tại
@@ -639,14 +639,14 @@ Không để chữ "ngưỡng" chung chung. Mặc định trong `.ai/config.json
 | `story.max_acceptance_criteria` | `8` | quá thì Bước 2 buộc chẻ nhỏ |
 | `story.max_write_scope_paths` | `10` | story chạm quá nhiều nơi là dấu hiệu quá lớn |
 | `story.max_screen_states` | 8 | Tổng trạng thái màn hình (EXPERIENCE.md) một story phải dựng. Vượt → cổng `stories` chặn với chỉ dẫn chẻ; `run` từ chối. Đo 2026-09-05 e9: 11 và 18 trạng thái đều chạm `max_turns` lượt đầu, 4–8 lượt |
-| `story.max_complexity` | `16.0` | **Điểm cỡ story** tổng hợp (ADR-004 R5, `control/complexity.py`): trạng thái màn hình ×1 + tiêu chí ×1 + đường dẫn write_scope ×0,5 (không tính manifest/lockfile) + fan-in phụ thuộc ×1 + story láng giềng có hành vi VERIFIED bị chạm ×0 (ledger; chỉ ghi để hiệu chuẩn, chưa tính điểm — ADR-004 §6 R5). Vượt **hoặc** vượt `max_screen_states` → cổng `stories` chặn kèm gợi ý chẻ tất định, `run` từ chối trước khi gọi model; story đã xong bỏ qua. Hiệu chuẩn B4 hồi cứu 23 story thật: Spearman(điểm, lượt developer lượt đầu) = 0,88; 16 tách e9 01-04 (23,5) và 01-05 (18,0) khỏi 01-03 (6,5) và `par` (3,0). `run` tự ghi `_bmad-output/complexity.json` sau mỗi story và `aisdlc doctor` cảnh báo khi ngưỡng lệch dữ liệu |
-| ~~`story.max_context_tokens`~~ | — | **gỡ 2026-09-05**: chưa từng có mã đọc. Thay bằng `prompt_chars` ghi vào evidence mỗi lượt gọi model; `aisdlc status` cảnh báo story nạp > 3× trung vị |
-| `improve.max_loops` | `3` | số vòng `aisdlc improve` tối đa cho một epic, đếm từ `loops[]` của sổ hành vi (chạy lại không đếm lại từ 0). HoH chạy 70 vòng không có điều kiện dừng; ở đây trần là code (ADR-004 R3) |
+| `story.max_complexity` | `16.0` | **Điểm cỡ story** tổng hợp (ADR-004 R5, `control/complexity.py`): trạng thái màn hình ×1 + tiêu chí ×1 + đường dẫn write_scope ×0,5 (không tính manifest/lockfile) + fan-in phụ thuộc ×1 + story láng giềng có hành vi VERIFIED bị chạm ×0 (ledger; chỉ ghi để hiệu chuẩn, chưa tính điểm — ADR-004 §6 R5). Vượt **hoặc** vượt `max_screen_states` → cổng `stories` chặn kèm gợi ý chẻ tất định, `run` từ chối trước khi gọi model; story đã xong bỏ qua. Hiệu chuẩn B4 hồi cứu 23 story thật: Spearman(điểm, lượt developer lượt đầu) = 0,88; 16 tách e9 01-04 (23,5) và 01-05 (18,0) khỏi 01-03 (6,5) và `par` (3,0). `run` tự ghi `_bmad-output/complexity.json` sau mỗi story và `aisef doctor` cảnh báo khi ngưỡng lệch dữ liệu |
+| ~~`story.max_context_tokens`~~ | — | **gỡ 2026-09-05**: chưa từng có mã đọc. Thay bằng `prompt_chars` ghi vào evidence mỗi lượt gọi model; `aisef status` cảnh báo story nạp > 3× trung vị |
+| `improve.max_loops` | `3` | số vòng `aisef improve` tối đa cho một epic, đếm từ `loops[]` của sổ hành vi (chạy lại không đếm lại từ 0). HoH chạy 70 vòng không có điều kiện dừng; ở đây trần là code (ADR-004 R3) |
 | `improve.flat_loops` | `2` | dừng khi cải thiện biên Δverified − Δreopened (hai mốc `loops[]` liên tiếp) ≤ 0 chừng này vòng liền — vòng sau nhận cùng gap, cùng ngữ cảnh, sẽ cho cùng kết quả |
 | `improve.cost_cap_usd` | `0` | trần tổng chi phí các vòng của epic, đọc từ bằng chứng story sửa; `0` = không giới hạn |
-| `context.max_index_chars` | `2000` | trần ký tự cho slot `index` — lát cắt chỉ mục bằng chứng của epic nạp vào prompt developer. Chỉ mục, **không** phải lịch sử: agent cần chi tiết thì gọi `aisdlc evidence <id>` (ADR-004 R6). e9 EPIC-01 đo được 497 ký tự |
+| `context.max_index_chars` | `2000` | trần ký tự cho slot `index` — lát cắt chỉ mục bằng chứng của epic nạp vào prompt developer. Chỉ mục, **không** phải lịch sử: agent cần chi tiết thì gọi `aisef evidence <id>` (ADR-004 R6). e9 EPIC-01 đo được 497 ký tự |
 | `context.max_preservation_chars` | `1 200` | trần ký tự cho hai slot R4 `preservation` (hành vi VERIFIED của story khác mà story này chạm tệp: id · story · nguồn kiểm) và `validation` (thứ harness chạy lại ở ứng viên). Cắt chỉ cắt phần **in ra**; cổng "bảo toàn" vẫn chấm đủ danh sách — không kiểm được là UNRUNNABLE, đỏ là FAILED và sổ ghi REOPENED (ADR-004 R4). Đo trên test giả: hai slot +212 ký tự, prompt developer +13,2 % (ADR-004 §6 R4) |
-| `context.max_repo_map_chars` | `0` | trần ký tự cho slot `repo_map` (ADR-005 V7, `harness/context.py`): skeleton tệp trong phạm vi ghi (Python `ast`, TS/JS chữ ký) → tệp gọi/được import 1 bước → test nhắc tên, cấp cho cả ba vai. **0 = tắt** cho tới khi A/B T8 đạt (trung vị lượt developer −20 % **và** cổng cùng kết cục): Aider không công bố số đo nào cho repo map, còn 2 000 ký tự trên baseline B5 11 537 là +17 % (vượt trần 15 %) — khi bật, thử 1 500 (+13 %). Hồi cứu e9 01-05 tại SHA `2424265`: bản đầy đủ 3 119 ký tự, ADR-005 §9. Bản đầy đủ tra bằng `aisdlc ctx --story S` |
+| `context.max_repo_map_chars` | `0` | trần ký tự cho slot `repo_map` (ADR-005 V7, `harness/context.py`): skeleton tệp trong phạm vi ghi (Python `ast`, TS/JS chữ ký) → tệp gọi/được import 1 bước → test nhắc tên, cấp cho cả ba vai. **0 = tắt** cho tới khi A/B T8 đạt (trung vị lượt developer −20 % **và** cổng cùng kết cục): Aider không công bố số đo nào cho repo map, còn 2 000 ký tự trên baseline B5 11 537 là +17 % (vượt trần 15 %) — khi bật, thử 1 500 (+13 %). Hồi cứu e9 01-05 tại SHA `2424265`: bản đầy đủ 3 119 ký tự, ADR-005 §9. Bản đầy đủ tra bằng `aisef ctx --story S` |
 | `context.map_provider` | `""` | lệnh ngoài vẽ bản đồ (tree-sitter, serena — cắm sau, không thêm gói): stdin JSON `{project, seeds, budget}` → stdout văn bản, cùng kiểu `review.impact_provider`. Rỗng = dựng sẵn stdlib; lệnh hỏng thì lùi về dựng sẵn và slot nói rõ là thô |
 | `run.max_parallel` | `3` | số story song song trong một đợt |
 | `run.max_turns` | `40` | vòng lặp tối đa của một phiên story |
@@ -664,7 +664,7 @@ Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏn
 | `verify.waived` | `""` | miễn phải là quyết định có người ký, không phải hệ quả của việc quên |
 | `verify.waiver_reason` | `""` | lý do miễn (phạm vi, ngày, người ký) — `pre-deploy` đòi có khi `verify.waived` khác rỗng và ghi vào `pre-deploy-report.json`; loại miễn hiện ◇ WAIVED, không bao giờ thành ✅ (QĐ5 2026-09-06: `mutation` của e9 UNRUNNABLE ở môi trường nghiệm thu, không cài công cụ để làm đẹp) |
 | `verify.baseline` | `true` | chạy bộ test ở candidate cha **trước** phiên developer đầu tiên của story (ADR-004 R9) để cổng "không làm đỏ test có sẵn" so được tên test; tắt khi bộ test quá chậm — tắt thì mục cổng là – "tắt bởi cấu hình", không phải đạt |
-| `verify.clean_tree` | `true` | kiểm định **cấp dự án** (`aisdlc qa`, `pre-deploy`, `improve`) chạy ở `git worktree` tạm dựng từ SHA đang chấm (ADR-005 V6, theo Harbor: verifier chạy tách khỏi env agent): shim `node_modules/.bin/*`, `conftest.py`, `pytest.ini` chưa commit không tới được cây kiểm; `node_modules`/`.venv` của dự án được gắn vào (Docker bind mount, suy biến symlink). Giá: tệp **không theo dõi** mà test cần (`.env.test`, fixture sinh tay) cũng vắng — commit chúng, hoặc tắt khoá này; tắt thì bằng chứng và `pre-deploy.json` ghi `tree = "cây agent"`, không im lặng. Mức story (`run`) giữ cây worktree đã đóng băng, không đọc khoá này |
+| `verify.clean_tree` | `true` | kiểm định **cấp dự án** (`aisef qa`, `pre-deploy`, `improve`) chạy ở `git worktree` tạm dựng từ SHA đang chấm (ADR-005 V6, theo Harbor: verifier chạy tách khỏi env agent): shim `node_modules/.bin/*`, `conftest.py`, `pytest.ini` chưa commit không tới được cây kiểm; `node_modules`/`.venv` của dự án được gắn vào (Docker bind mount, suy biến symlink). Giá: tệp **không theo dõi** mà test cần (`.env.test`, fixture sinh tay) cũng vắng — commit chúng, hoặc tắt khoá này; tắt thì bằng chứng và `pre-deploy.json` ghi `tree = "cây agent"`, không im lặng. Mức story (`run`) giữ cây worktree đã đóng băng, không đọc khoá này |
 | `verify.nop` | `true` | nop control cấp 2 (ADR-005 V3): sau khi đóng băng ứng viên, chạy `tools.test` một lần ở SHA cha với tệp test của story chép vào (`test:nop`) để cổng "test có kiểm được story" thấy test mang mã đỏ khi không có mã của story; +1 lần chạy test mỗi lượt. Tắt khi bộ test quá chậm — tắt thì mục cổng là – "tắt bởi cấu hình", không phải đạt; cấp 1 ($0) vẫn chấm |
 | `sandbox.image` | `""` (theo stack) | `alpine` trơn không có công cụ nào; test đỏ vì thiếu công cụ chứ không vì code sai |
 | `sandbox.tools_network` | `false` | dự án cần cài phụ thuộc mới mở mạng, và phải khai tường minh |
@@ -745,7 +745,7 @@ Hai điều số này dạy:
 đầy đủ ở `docs/REQUIREMENTS-EVIDENCE.md`, kèm một test đọc chính bảng đó và
 trượt khi có dòng trỏ tới lớp test không còn tồn tại.
 
-**Ai viết báo cáo:** `aisdlc report` sinh `docs/ACCEPTANCE-REPORT.md` từ
+**Ai viết báo cáo:** `aisef report` sinh `docs/ACCEPTANCE-REPORT.md` từ
 artifact và bằng chứng trên đĩa. Không mục nào viết tay — một báo cáo
 nghiệm thu viết tay chỉ chứng minh người viết tin là mình đúng. Mục sandbox
 ghi mức cách ly **quan sát được**, nên chạy suy biến thì báo cáo nói suy
@@ -781,10 +781,10 @@ Ghi lại để không lặp lại:
 **Đã xong** (59 test xanh):
 
 ```
-aisdlc/kit/skills.py            đọc SKILL.md, stdlib
-aisdlc/kit/security_filter.py   lọc tầng 1: 818 → 269/207/342
-aisdlc/control/approvals.py     8 cổng người duyệt
-aisdlc/control/scheduler.py     epic tuần tự, story song song theo đợt
+aisef/kit/skills.py            đọc SKILL.md, stdlib
+aisef/kit/security_filter.py   lọc tầng 1: 818 → 269/207/342
+aisef/control/approvals.py     8 cổng người duyệt
+aisef/control/scheduler.py     epic tuần tự, story song song theo đợt
 ```
 
 **Còn lại** — tách rõ code và nội dung, vì hai loại việc này không thay thế nhau:

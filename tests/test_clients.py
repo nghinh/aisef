@@ -10,9 +10,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.clients.base import Capability, RunSpec, Support  # noqa: E402
-from aisdlc.clients.claude_code import ClaudeCodeAdapter  # noqa: E402
-from aisdlc.clients.opencode import OpenCodeAdapter  # noqa: E402
+from aisef.clients.base import Capability, RunSpec, Support  # noqa: E402
+from aisef.clients.claude_code import ClaudeCodeAdapter  # noqa: E402
+from aisef.clients.opencode import OpenCodeAdapter  # noqa: E402
 
 ADAPTERS = [ClaudeCodeAdapter(), OpenCodeAdapter()]
 
@@ -135,14 +135,14 @@ class TestOpenCodeCommand(unittest.TestCase):
 
     def test_bao_thang_cay_lam_viec_cho_opencode(self):
         """Lỗi 40. `cwd=` của tiến trình con là **không đủ**: OpenCode dò
-        gốc dự án riêng, thấy worktree nằm trong `<dự án>/.aisdlc/`, đi
+        gốc dự án riêng, thấy worktree nằm trong `<dự án>/.aisef/`, đi
         ngược lên tới gốc dự án rồi nói với model rằng đó là nơi làm việc.
 
         Model sau đó đọc/ghi bằng đường dẫn tuyệt đối vào gốc dự án và đặt
         `workdir` cho từng lệnh bash ở đó — công việc rơi thẳng lên thân
         cây trong khi worktree vẫn trống. Đã tái hiện ba lần trên `par`.
         """
-        wt = Path("/du/an/.aisdlc/worktrees/STORY-01-01")
+        wt = Path("/du/an/.aisef/worktrees/STORY-01-01")
         cmd = OpenCodeAdapter().build_command(RunSpec(prompt="p", workdir=wt))
         self.assertIn("--dir", cmd)
         self.assertEqual(cmd[cmd.index("--dir") + 1], str(wt))
@@ -198,7 +198,7 @@ class TestKhongThuaHuongPhienCha(unittest.TestCase):
     def test_claude_vars_are_dropped_but_anthropic_kept(self):
         import os
         from unittest import mock
-        from aisdlc.clients.base import child_env
+        from aisef.clients.base import child_env
         with mock.patch.dict(os.environ, {"CLAUDECODE": "1", "CLAUDE_CODE_ENTRYPOINT": "x", "ANTHROPIC_API_KEY": "k"}):
             env = child_env({})
         self.assertNotIn("CLAUDECODE", env)
@@ -208,21 +208,21 @@ class TestKhongThuaHuongPhienCha(unittest.TestCase):
     def test_bien_ngoai_allowlist_vang_bien_trong_thi_co(self):
         import os
         from unittest import mock
-        from aisdlc.clients.base import ENV_KEEP, child_env
+        from aisef.clients.base import ENV_KEEP, child_env
         may = {"NGHI_CANARY_TOKEN": "bí mật", "FAKE_SECRET_TOKEN": "x", "NINEROUTER_API_KEY": "k9",
-               "PATH": "/bin", "HOME": "/h", "LC_ALL": "C", "ANTHROPIC_BASE_URL": "u", "AISDLC_PROJECT": "/p"}
+               "PATH": "/bin", "HOME": "/h", "LC_ALL": "C", "ANTHROPIC_BASE_URL": "u", "AISEF_PROJECT": "/p"}
         with mock.patch.dict(os.environ, may, clear=True):
-            env = child_env({"AISDLC_STORY_ID": "S"})
+            env = child_env({"AISEF_STORY_ID": "S"})
         for k in ("NGHI_CANARY_TOKEN", "FAKE_SECRET_TOKEN", "NINEROUTER_API_KEY"):
             self.assertNotIn(k, env)
-        for k in ("PATH", "HOME", "LC_ALL", "ANTHROPIC_BASE_URL", "AISDLC_PROJECT", "AISDLC_STORY_ID"):
+        for k in ("PATH", "HOME", "LC_ALL", "ANTHROPIC_BASE_URL", "AISEF_PROJECT", "AISEF_STORY_ID"):
             self.assertIn(k, env)
         self.assertIn("SSL_CERT_FILE", ENV_KEEP)
 
     def test_tien_to_cau_hinh_duoc_qua_tien_to_rong_khong_mo_toang(self):
         import os
         from unittest import mock
-        from aisdlc.clients.base import child_env
+        from aisef.clients.base import child_env
         may = {"NINEROUTER_API_KEY": "k9", "NGHI_CANARY_TOKEN": "x", "PATH": "/bin"}
         with mock.patch.dict(os.environ, may, clear=True):
             co = child_env({}, allow_prefixes=["NINEROUTER_"])
@@ -233,7 +233,7 @@ class TestKhongThuaHuongPhienCha(unittest.TestCase):
 
     def test_git_khong_hoi_credential_va_harness_khong_bi_lay(self):
         import os
-        from aisdlc.clients.base import GIT_NO_CREDENTIALS, child_env
+        from aisef.clients.base import GIT_NO_CREDENTIALS, child_env
         env = child_env({})
         for k, v in GIT_NO_CREDENTIALS.items():
             self.assertEqual(env.get(k), v, k)
@@ -255,32 +255,32 @@ class TestKhongThuaHuongPhienCha(unittest.TestCase):
         import os, tempfile
         from pathlib import Path
         from unittest import mock
-        from aisdlc.clients.base import RunSpec
-        from aisdlc.clients.claude_code import ClaudeCodeAdapter
-        from aisdlc.clients.opencode import OpenCodeAdapter
+        from aisef.clients.base import RunSpec
+        from aisef.clients.claude_code import ClaudeCodeAdapter
+        from aisef.clients.opencode import OpenCodeAdapter
         for adapter in (ClaudeCodeAdapter, OpenCodeAdapter):
             with self.subTest(client=adapter.id), tempfile.TemporaryDirectory() as tmp:
                 a = adapter(binary=str(self._fake(tmp)))
                 with mock.patch.dict(os.environ, {"CLAUDECODE": "1", "NGHI_CANARY_TOKEN": "bí mật",
                                                   "NINEROUTER_API_KEY": "k9"}):
-                    a.run(RunSpec(prompt="x", workdir=Path(tmp), env={"AISDLC_STORY_ID": "S"}))
-                    a.run(RunSpec(prompt="x", workdir=Path(tmp), env={"AISDLC_STORY_ID": "S"},
+                    a.run(RunSpec(prompt="x", workdir=Path(tmp), env={"AISEF_STORY_ID": "S"}))
+                    a.run(RunSpec(prompt="x", workdir=Path(tmp), env={"AISEF_STORY_ID": "S"},
                                   env_allow=["NINEROUTER_"]))
                     khai = (Path(tmp) / "env.txt").read_text(encoding="utf-8")
-                    a.run(RunSpec(prompt="x", workdir=Path(tmp), env={"AISDLC_STORY_ID": "S"}))
+                    a.run(RunSpec(prompt="x", workdir=Path(tmp), env={"AISEF_STORY_ID": "S"}))
                     got = (Path(tmp) / "env.txt").read_text(encoding="utf-8")
                 self.assertNotIn("CLAUDECODE=", got)
                 self.assertNotIn("NGHI_CANARY_TOKEN=", got)
                 self.assertNotIn("NINEROUTER_API_KEY=", got)
-                self.assertIn("AISDLC_STORY_ID=S", got)
+                self.assertIn("AISEF_STORY_ID=S", got)
                 self.assertIn("GIT_TERMINAL_PROMPT=0", got)
                 self.assertIn("NINEROUTER_API_KEY=k9", khai, "`env_allow` của spec phải tới tiến trình")
 
     def test_build_spec_mang_env_allow_tu_cau_hinh(self):
         from pathlib import Path
-        from aisdlc.config import DEFAULTS, Config
-        from aisdlc.harness.prompts import Prompt
-        from aisdlc.harness.routing import ROLES, DEVELOPER, build_spec
+        from aisef.config import DEFAULTS, Config
+        from aisef.harness.prompts import Prompt
+        from aisef.harness.routing import ROLES, DEVELOPER, build_spec
         cfg = Config({**DEFAULTS, "clients.env_allow": ["NINEROUTER_"]})
         role = ROLES[DEVELOPER]
         prompt = Prompt(name=role.prompt, version=1, role=DEVELOPER, body="x")
@@ -299,7 +299,7 @@ class TestGitKhongCamCredentialCuaMay(unittest.TestCase):
         import os, subprocess, tempfile
         from pathlib import Path
         from unittest import mock
-        from aisdlc.clients.base import child_env
+        from aisef.clients.base import child_env
         from tests.conformance._runner import seed_fake_credential, start_fake_remote
         with tempfile.TemporaryDirectory() as d:
             repo = Path(d) / "r"
@@ -345,7 +345,7 @@ class TestOpenCodeLuongJson(unittest.TestCase):
     ]
 
     def test_parse(self):
-        from aisdlc.clients.opencode import parse_json_events
+        from aisef.clients.opencode import parse_json_events
         r = parse_json_events(self.LINES)
         self.assertEqual([t.name for t in r.tool_uses], ["Read", "Write"])
         self.assertEqual(r.tool_uses[0].input["filePath"], "/p/package.json")
@@ -362,7 +362,7 @@ class TestOpenCodeLuongJson(unittest.TestCase):
         self.assertEqual(cmd[cmd.index("--format") + 1], "json")
 
     def test_capabilities_now_native(self):
-        from aisdlc.clients.base import Capability, Support
+        from aisef.clients.base import Capability, Support
         caps = OpenCodeAdapter().capabilities()
         self.assertIs(caps[Capability.MACHINE_OUTPUT], Support.NATIVE)
         self.assertIs(caps[Capability.COST_REPORTING], Support.NATIVE)

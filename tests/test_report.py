@@ -11,9 +11,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.state import StateStore, StoryStatus  # noqa: E402
-from aisdlc.harness.observe import MOCKUP_MAP, EvidenceStore, Event  # noqa: E402
-from aisdlc.phases.report import build, write  # noqa: E402
+from aisef.control.state import StateStore, StoryStatus  # noqa: E402
+from aisef.harness.observe import MOCKUP_MAP, EvidenceStore, Event  # noqa: E402
+from aisef.phases.report import build, write  # noqa: E402
 
 FIX = ROOT / "tests" / "fixtures" / "bmad"
 
@@ -159,7 +159,7 @@ class TestPreDeploySection(ReportTestCase):
         self.assertIn("Chưa chấm", build(self.project).markdown())
 
     def test_reads_the_report_that_was_signed(self):
-        from aisdlc.control.approvals import PRE_DEPLOY_REPORT
+        from aisef.control.approvals import PRE_DEPLOY_REPORT
 
         (self.artifacts / PRE_DEPLOY_REPORT).write_text(json.dumps({
             "passed": False,
@@ -172,7 +172,7 @@ class TestPreDeploySection(ReportTestCase):
 
     def test_dau_theo_ket_cuc_khong_theo_khong_chan(self):
         """Mục – không áp dụng / ◇ miễn không được in ✅ (QĐ C-a, QĐ5 2026-09-06)."""
-        from aisdlc.control.approvals import PRE_DEPLOY_REPORT
+        from aisef.control.approvals import PRE_DEPLOY_REPORT
 
         (self.artifacts / PRE_DEPLOY_REPORT).write_text(json.dumps({
             "passed": True,
@@ -194,7 +194,7 @@ class TestPreDeploySection(ReportTestCase):
         self.assertIn("Ngoài phạm vi (chưa nghiệm thu): 1 story", text)
 
     def test_yeu_cau_chi_co_story_ngoai_pham_vi_thi_noi_ngoai_pham_vi(self):
-        from aisdlc.control.approvals import PRE_DEPLOY_REPORT
+        from aisef.control.approvals import PRE_DEPLOY_REPORT
 
         self.write_index([{"id": "STORY-02-01", "epic_id": "EPIC-02", "covers": ["FR-1"]}])
         (self.artifacts / PRE_DEPLOY_REPORT).write_text(json.dumps({
@@ -216,7 +216,7 @@ class TestCongStoryChungNhan(ReportTestCase):
     test, không phải câu "cổng 6 điều kiện" kể tay."""
 
     def test_so_doc_tu_bang_qualification(self):
-        from aisdlc.control.gate import CHECK_NAMES, qualification_table
+        from aisef.control.gate import CHECK_NAMES, qualification_table
 
         report = build(self.project)
         self.assertEqual(set(report.qualification), set(CHECK_NAMES))
@@ -225,8 +225,8 @@ class TestCongStoryChungNhan(ReportTestCase):
         self.assertNotIn("6 điều kiện", report.markdown())
 
     def test_khong_co_thu_muc_tests_thi_in_dau_hoi_khong_in_0(self):
-        from aisdlc.control.gate import CHECK_NAMES
-        from aisdlc.phases.report import Report
+        from aisef.control.gate import CHECK_NAMES
+        from aisef.phases.report import Report
 
         text = Report(project="x", qualification={}).markdown()
         self.assertIn(f"mục cổng có đủ 3 control: ?/{len(CHECK_NAMES)}", text)
@@ -262,7 +262,7 @@ if __name__ == "__main__":
 
 class TestTieuChiCoTestTrongBaoCao(ReportTestCase):
     def test_column_counts_from_last_green_run(self):
-        from aisdlc.harness.observe import EvidenceStore
+        from aisef.harness.observe import EvidenceStore
         self.write_index([{"id": "S-1", "epic_id": "E", "title": "t", "covers": ["FR-1"],
                            "acceptance_criteria": ["a", "b"], "screens": []}])
         ev = EvidenceStore(self.artifacts)
@@ -272,7 +272,7 @@ class TestTieuChiCoTestTrongBaoCao(ReportTestCase):
         self.assertIn("| TCCN có test |", rep.markdown())
 
     def test_unreadable_names_show_unknown_not_full(self):
-        from aisdlc.harness.observe import EvidenceStore
+        from aisef.harness.observe import EvidenceStore
         self.write_index([{"id": "S-1", "epic_id": "E", "title": "t", "covers": [],
                            "acceptance_criteria": ["a"], "screens": []}])
         EvidenceStore(self.artifacts).tool_run("S-1", "test", ok=True, detail={"test_format": "", "test_ids": []})
@@ -281,7 +281,7 @@ class TestTieuChiCoTestTrongBaoCao(ReportTestCase):
 
 class TestChuoiBanGiaoTrongBaoCao(ReportTestCase):
     def test_chain_from_handoff_events(self):
-        from aisdlc.harness.observe import EvidenceStore
+        from aisef.harness.observe import EvidenceStore
         self.write_index([{"id": "S-1", "epic_id": "E", "title": "t", "covers": [], "acceptance_criteria": [], "screens": []}])
         ev = EvidenceStore(self.artifacts)
         ev.handoff("S-1", frm="plan", to="developer", attempt=1, slots={"story_contract": ("artifact", 10)})

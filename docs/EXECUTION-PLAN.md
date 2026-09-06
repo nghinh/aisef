@@ -17,22 +17,22 @@
 | GĐ-1 Control plane | ✅ **xong** — config · state · fsm · worktree · CLI |
 | GĐ-2 Kit + Setup | ✅ **xong** — catalog · detect_stack · lọc 2 tầng · install · constitution |
 | GĐ-3 Đa client | ✅ **xong** — adapter · guard · compile · báo cáo mất mát |
-| GĐ-4 BMAD pipeline | ✅ 5/5 — `aisdlc plan` chạy chuỗi BMAD, dừng đúng từng cổng, tách 12 story từ epics thật |
+| GĐ-4 BMAD pipeline | ✅ 5/5 — `aisef plan` chạy chuỗi BMAD, dừng đúng từng cổng, tách 12 story từ epics thật |
 | GĐ-5 Mockup | ✅ 6/6 — dựng bằng chromium thật, hợp đồng trích từ trang đã render |
-| GĐ-6 Harness + implement | ✅ 10/10 — `aisdlc run` chạy đợt trên worktree thật, cổng story 6 điều kiện |
-| GĐ-7 Kiểm định | ✅ — `aisdlc qa` 10 loại; "chưa cấu hình" ≠ "đạt" |
-| GĐ-8 DevSecOps | ✅ — `aisdlc devsecops` + `pre-deploy` |
+| GĐ-6 Harness + implement | ✅ 10/10 — `aisef run` chạy đợt trên worktree thật, cổng story 6 điều kiện |
+| GĐ-7 Kiểm định | ✅ — `aisef qa` 10 loại; "chưa cấu hình" ≠ "đạt" |
+| GĐ-8 DevSecOps | ✅ — `aisef devsecops` + `pre-deploy` |
 | GĐ-9 Đầu-cuối | 🔨 **một epic đã chạy trọn trên cả hai client** (`par`: 3 story song song bằng Claude, 1 story bằng OpenCode, đều merge vào main). Còn lại: mockup thật trong một dự án có giao diện, báo cáo nghiệm thu đầy đủ, và một lượt đầu-cuối từ `requirements.md` tới `pre-deploy` không can thiệp tay |
 
 **Mốc demo đã đạt**
 
-* *Mốc 1* — `aisdlc gates` / `approve` / `status` chạy thật.
+* *Mốc 1* — `aisef gates` / `approve` / `status` chạy thật.
 * *Mốc 2* — thư mục trống + `docs/requirements.md` → 226 skill được cài
   (bmad 36 · security 175 · superpowers 10 · ui-ux 5), `CLAUDE.md` +
   `AGENTS.md` sinh theo stack, `doctor` xanh gồm cả bất biến "không có
   skill tấn công".
 
-* *Mốc 3* — `aisdlc compile` sinh `.claude/settings.json`; chạy `claude -p`
+* *Mốc 3* — `aisef compile` sinh `.claude/settings.json`; chạy `claude -p`
   thật với nó thì guard **chặn được** một agent cố ghi ra ngoài phạm vi:
   file không được tạo, `permission_denials = 1`. Toàn chuỗi compile → hook
   → guard → chặn đã kiểm chứng trên agent thật.
@@ -46,8 +46,8 @@
   đầu, merge tuần tự không đụng, $3,14 (`par`, 2026-09-05). R14 kiểm chứng
   đầu-cuối trên agent thật.
 
-* *Mốc 6* — framework **cài được**: `pip install ai-sdlc` trong venv sạch,
-  `aisdlc setup` tự lấy 5 kho skill về cache người dùng (93 MB, 14 s), cài
+* *Mốc 6* — framework **cài được**: `pip install aisef` trong venv sạch,
+  `aisef setup` tự lấy 5 kho skill về cache người dùng (93 MB, 14 s), cài
   120 skill, `doctor` xanh, guard chặn thật từ bản đã cài.
 
 * *Mốc 7* — một story do agent **OpenCode** hiện thực trọn vẹn: qua bảy
@@ -66,28 +66,28 @@
 
 | Module | Nội dung | Test |
 |---|---|---|
-| `aisdlc/kit/skills.py` | đọc `SKILL.md`, parser frontmatter stdlib | 3 |
-| `aisdlc/kit/security_filter.py` | lọc tầng 1: 818 → 269 keep / 207 offensive / 342 out-of-scope | 11 |
-| `aisdlc/control/approvals.py` | 8 cổng người duyệt, SHA-binding, cascade stale | 19 |
-| `aisdlc/control/scheduler.py` | epic tuần tự, story song song theo đợt | 26 |
-| `aisdlc/clients/stream.py` | đọc stream-json của Claude Code | 13 |
-| `aisdlc/harness/aria.py` | đối chiếu mockup qua accessibility tree | 16 |
-| `aisdlc/control/worktree.py` | cô lập story song song | 14 |
-| `aisdlc/harness/sandbox.py` | 4 bậc quyền, Docker | 21 |
-| `aisdlc/config.py` | 12 khoá ngưỡng | 21 |
-| `aisdlc/control/state.py` | tiến độ, khoá, resume | 18 |
-| `aisdlc/cli/` | doctor · gates · review · approve · reject · status · setup | 26 |
-| `aisdlc/kit/detect_stack.py` | dò công nghệ | 17 |
-| `aisdlc/kit/catalog.py` | sổ đăng ký nguồn + ràng buộc license | 17 |
-| `aisdlc/kit/install.py` | cài skill, idempotent | 14 |
-| `aisdlc/kit/constitution.py` | sinh CLAUDE.md / AGENTS.md | 14 |
-| `aisdlc/clients/base.py` | giao diện adapter + khai báo năng lực | 12 |
-| `aisdlc/clients/claude_code.py` | chạy claude -p | 8 |
-| `aisdlc/clients/opencode.py` | chạy opencode run | 2 |
-| `aisdlc/harness/guardrails.py` | 5 guard chặn thật | 42 |
-| `aisdlc/clients/compile.py` | sinh cấu hình client + báo cáo mất mát | 19 |
-| `aisdlc/control/normalize.py` | BMAD markdown → mô hình framework | 23 |
-| `aisdlc/control/machine_gate.py` | cổng máy, kiểm truy vết hai chiều | 22 |
+| `aisef/kit/skills.py` | đọc `SKILL.md`, parser frontmatter stdlib | 3 |
+| `aisef/kit/security_filter.py` | lọc tầng 1: 818 → 269 keep / 207 offensive / 342 out-of-scope | 11 |
+| `aisef/control/approvals.py` | 8 cổng người duyệt, SHA-binding, cascade stale | 19 |
+| `aisef/control/scheduler.py` | epic tuần tự, story song song theo đợt | 26 |
+| `aisef/clients/stream.py` | đọc stream-json của Claude Code | 13 |
+| `aisef/harness/aria.py` | đối chiếu mockup qua accessibility tree | 16 |
+| `aisef/control/worktree.py` | cô lập story song song | 14 |
+| `aisef/harness/sandbox.py` | 4 bậc quyền, Docker | 21 |
+| `aisef/config.py` | 12 khoá ngưỡng | 21 |
+| `aisef/control/state.py` | tiến độ, khoá, resume | 18 |
+| `aisef/cli/` | doctor · gates · review · approve · reject · status · setup | 26 |
+| `aisef/kit/detect_stack.py` | dò công nghệ | 17 |
+| `aisef/kit/catalog.py` | sổ đăng ký nguồn + ràng buộc license | 17 |
+| `aisef/kit/install.py` | cài skill, idempotent | 14 |
+| `aisef/kit/constitution.py` | sinh CLAUDE.md / AGENTS.md | 14 |
+| `aisef/clients/base.py` | giao diện adapter + khai báo năng lực | 12 |
+| `aisef/clients/claude_code.py` | chạy claude -p | 8 |
+| `aisef/clients/opencode.py` | chạy opencode run | 2 |
+| `aisef/harness/guardrails.py` | 5 guard chặn thật | 42 |
+| `aisef/clients/compile.py` | sinh cấu hình client + báo cáo mất mát | 19 |
+| `aisef/control/normalize.py` | BMAD markdown → mô hình framework | 23 |
+| `aisef/control/machine_gate.py` | cổng máy, kiểm truy vết hai chiều | 22 |
 | | | **386 xanh** |
 
 ---
@@ -116,18 +116,18 @@ Mục đích duy nhất: **giết các giả định còn lại** (7 spike). Cod
 
 | # | Hạng mục | File | Xong khi |
 |---|---|---|---|
-| 1.1 | Cấu hình + ngưỡng | `aisdlc/config.py`, `.ai/config.json` | 10 khoá mục 13 SOLUTION có mặc định; override được; test đọc/ghi |
+| 1.1 | Cấu hình + ngưỡng | `aisef/config.py`, `.ai/config.json` | 10 khoá mục 13 SOLUTION có mặc định; override được; test đọc/ghi |
 | 1.2 | Kho trạng thái | `control/state.py` | `sprint-status.json` ghi nguyên tử, khoá file chống hai tiến trình; test 2 tiến trình ghi đồng thời không hỏng |
 | 1.3 | Vòng đời story | `control/fsm.py` | `pending→running→verifying→done\|blocked`; chuyển sai trạng thái bị từ chối; test đủ nhánh |
 | 1.4 | Cô lập worktree | `control/worktree.py` | tạo/xoá worktree, merge tuần tự, **phát hiện conflict → dừng và báo**; test trên repo tạm |
-| 1.5 | Khung CLI | `aisdlc/cli/`, `bin/aisdlc` | `doctor` `gates` `review` `approve` `reject` `status` chạy thật |
+| 1.5 | Khung CLI | `aisef/cli/`, `bin/aisef` | `doctor` `gates` `review` `approve` `reject` `status` chạy thật |
 
 **Mốc demo 1:** duyệt được một cổng bằng lệnh, thấy bảng trạng thái.
 
 ```bash
-aisdlc gates
-aisdlc approve prd --note "ok"
-aisdlc status
+aisef gates
+aisef approve prd --note "ok"
+aisef status
 ```
 
 ---
@@ -141,7 +141,7 @@ aisdlc status
 | 2.3 | Lọc security tầng 2 | `kit/security_filter.py` (mở rộng) | 269 → 20–30 theo stack; test: dự án Python+React không nhận skill `cloud-security` của AWS |
 | 2.4 | Hiến pháp | `kit/constitution/`, `kit/constitution.py` | Sinh `CLAUDE.md` + `AGENTS.md` từ nguồn chung; test golden |
 | 2.5 | Bộ cài | `kit/install.py` | Cài vào dự án trống; **idempotent** (chạy 2 lần không nhân bản); test đếm đúng số skill |
-| 2.6 | `aisdlc setup` + `doctor` | `phases/setup.py` | `doctor` trả 0; **test bất biến: không skill offensive nào trong dự án đích** |
+| 2.6 | `aisef setup` + `doctor` | `phases/setup.py` | `doctor` trả 0; **test bất biến: không skill offensive nào trong dự án đích** |
 
 **Mốc demo 2:** một thư mục trống + `requirements.md` → dự án đã nạp đủ skill/agent/hook.
 
@@ -157,7 +157,7 @@ aisdlc status
 | 3.4 | Compiler | `clients/compile.py` | `kit/` → `.claude/` + `.opencode/`; **deterministic, idempotent**; golden round-trip test |
 | 3.5 | Khai báo loss | `clients/report.py` | Bề mặt nào không gắn được hook → ghi vào compile report, **không im lặng** |
 
-**Mốc demo 3:** `aisdlc compile --client claude` và `--client opencode` ra artifact đúng định dạng; golden test chặn trôi.
+**Mốc demo 3:** `aisef compile --client claude` và `--client opencode` ra artifact đúng định dạng; golden test chặn trôi.
 
 ---
 
@@ -171,7 +171,7 @@ aisdlc status
 | 4.4 | Cổng máy | `control/machine_gate.py` | ✅ schema · không chu trình · **mọi FR được ≥1 story phủ** · story không vượt ngưỡng |
 | 4.5 | Nối cổng người | `phases/plan.py` | ✅ Dừng ở mỗi cổng; `--auto-approve` hoạt động; tự duyệt vẫn ghi lại câu hỏi mở BMAD nêu |
 
-**Mốc demo 4:** `aisdlc plan` từ `docs/requirements.md` thật → đủ 5 artifact + `stories.index.json`, dừng đúng ở từng cổng.
+**Mốc demo 4:** `aisef plan` từ `docs/requirements.md` thật → đủ 5 artifact + `stories.index.json`, dừng đúng ở từng cổng.
 
 *Đã đạt phần chạy khô:* epics thật → 12 story / 4 epic, cổng máy ĐẠT, sóng song song tính đúng (story cùng epic ghi vào thư mục rời nhau mới được cùng đợt). Còn lại là chạy toàn chuỗi trên agent thật ở GĐ-9.
 
@@ -181,7 +181,7 @@ aisdlc status
 
 | # | Hạng mục | File | Xong khi |
 |---|---|---|---|
-| 5.1 | Skill sinh mockup | `kit/skills/aisdlc-mockup-html/` | ✅ Skill của framework; dùng `ui-ux-pro-max`/`design-system` cho phần nghề, `DESIGN.md` thắng khi mâu thuẫn |
+| 5.1 | Skill sinh mockup | `kit/skills/aisef-mockup-html/` | ✅ Skill của framework; dùng `ui-ux-pro-max`/`design-system` cho phần nghề, `DESIGN.md` thắng khi mâu thuẫn |
 | 5.2 | Bộ sinh | `phases/mockup.py` | ✅ Mỗi màn hình một phiên, một HTML + `index.html` cho người duyệt |
 | 5.3 | Chụp ảnh | `harness/browser.py` | ✅ Playwright qua `node_modules` của dự án; thiếu thì cổng trượt, không im lặng |
 | 5.4 | Trích contract | `control/design_contract.py` | ✅ Trang **đã render** → route · component (aria) · nhãn · ràng buộc nhập liệu |
@@ -218,11 +218,11 @@ Nặng nhất. Tách hai tuần.
 | 6.7b | **Map mockup — nửa đối chiếu** | `harness/mockup_verify.py` | ✅ Chạy dev server, mở route thật bằng chromium, đối chiếu, ghi `mockup_map` |
 | 6.7c | Cổng khớp mockup | `control/gate.py` | ✅ Thiếu component đã hứa → trượt; thừa chỉ cảnh báo; **vùng `data-sample` chỉ cam kết có mục, không cam kết nội dung** |
 | 6.8 | Thất bại + retry | `phases/implement.py` | ✅ Lỗi hạ tầng có hạn mức riêng, không tính vào `max_retries`; lượt sau nhận đúng danh sách mục trượt |
-| 6.9 | `aisdlc run` | `phases/run.py`, `cli/implement.py` | ✅ Epic tuần tự, đợt song song, worktree riêng, merge cuối đợt, resume; `--sequential`, `--epic`, `--no-isolate`. Thêm `aisdlc verify` (hậu kiểm) và `aisdlc tool` |
+| 6.9 | `aisef run` | `phases/run.py`, `cli/implement.py` | ✅ Epic tuần tự, đợt song song, worktree riêng, merge cuối đợt, resume; `--sequential`, `--epic`, `--no-isolate`. Thêm `aisef verify` (hậu kiểm) và `aisef tool` |
 
 *Đã đạt phần chạy khô:* điều phối chạy trên kho git + worktree thật với agent giả — story song song đúng đợt, merge tuần tự, dừng đúng chỗ khi trượt, chạy lại tiếp từ chỗ dở. Còn lại là chạy trên agent thật ở GĐ-9.
 
-**Mốc demo 6:** `aisdlc run --epic EPIC-01` chạy hết một epic ≥5 story (trong đó **≥1 story có giao diện**) trên `references/teamflow`; có story chạy song song; story UI sinh được `mockup_map` với `missing: []`; dừng giữa chừng resume đúng chỗ.
+**Mốc demo 6:** `aisef run --epic EPIC-01` chạy hết một epic ≥5 story (trong đó **≥1 story có giao diện**) trên `references/teamflow`; có story chạy song song; story UI sinh được `mockup_map` với `missing: []`; dừng giữa chừng resume đúng chỗ.
 
 ---
 
@@ -259,9 +259,9 @@ cổng trước triển khai, trừ khi được miễn tường minh.
 | 8.4 | IaC | ✅ nằm trong prompt devsecops (`deploy/`), kiểm bằng cổng |
 | 8.5 | Observability | ✅ prompt yêu cầu log có cấu trúc + cảnh báo theo **triệu chứng người dùng** |
 | 8.6 | Runbook | ✅ kiểm đủ 4 mục bằng code |
-| 8.7 | Cổng pre-deploy | ✅ `aisdlc pre-deploy` + `pre-deploy-report.json` để người ký |
+| 8.7 | Cổng pre-deploy | ✅ `aisef pre-deploy` + `pre-deploy-report.json` để người ký |
 
-**Mốc demo 8:** `aisdlc pre-deploy` trên dự án chưa xong → nêu đúng thứ còn thiếu; đủ điều kiện → mời ký.
+**Mốc demo 8:** `aisef pre-deploy` trên dự án chưa xong → nêu đúng thứ còn thiếu; đủ điều kiện → mời ký.
 
 ---
 
@@ -279,12 +279,12 @@ Một dự án thật, quy mô nhỏ nhưng đủ hình dạng: **3 epic · ~15 
 | 6 nhóm harness | Cả sáu ô có bằng chứng chạy (mục 16 SOLUTION) |
 | R1–R14 | Mỗi R có ≥1 test hoặc artifact chứng minh |
 
-**Đầu ra:** `docs/ACCEPTANCE-REPORT.md` — sinh bằng `aisdlc report`, mọi số
+**Đầu ra:** `docs/ACCEPTANCE-REPORT.md` — sinh bằng `aisef report`, mọi số
 đọc từ artifact và bằng chứng trên đĩa.
 
 ### Chạy thật lần 1 — những gì nó dạy
 
-Chạy `aisdlc plan` trên một dự án trống (chỉ có `docs/requirements.md`),
+Chạy `aisef plan` trên một dự án trống (chỉ có `docs/requirements.md`),
 client thật, không giả lập:
 
 | Pha | Kết quả | Chi phí |
@@ -309,7 +309,7 @@ Bốn lỗi thật chỉ lộ ra khi chạy thật, đã sửa:
    chứ không phải vì code sai.
 5. **Chi phí lập kế hoạch không vào bằng chứng** — báo cáo nghiệm thu hiện
    $0.00 trong khi lượt chạy tốn $7.92; với dự án nhỏ đó là phần đắt nhất.
-6. **Prompt gọi `aisdlc tool test`** trong khi `aisdlc` không nằm trên PATH
+6. **Prompt gọi `aisef tool test`** trong khi `aisef` không nằm trên PATH
    của phiên agent — agent sẽ tự chạy pytest bằng tay, lần chạy đó không
    vào bằng chứng, rồi guard `completion` chặn nó kết thúc vì "chưa chạy
    test bao giờ".
@@ -319,7 +319,7 @@ Bốn lỗi thật chỉ lộ ra khi chạy thật, đã sửa:
    mã FR + có số hiệu story" nên gán FR-13 cho story 1.2, rồi cổng máy chặn
    cả 18 story vì một câu văn xuôi.
 
-8. **`aisdlc run` đòi sai cổng** — chỉ đòi `stories`, nên story khai
+8. **`aisef run` đòi sai cổng** — chỉ đòi `stories`, nên story khai
    `screens` vẫn chạy được khi chưa có mockup nào, rồi trượt vì "chưa đối
    chiếu" sau khi đã tiêu tiền viết xong code. Nay đòi `readiness`.
 9. **Phụ thuộc cài đặt bị tính vào diff của story** — `node_modules`,
@@ -385,7 +385,7 @@ Bốn lỗi thật chỉ lộ ra khi chạy thật, đã sửa:
 21. **Chạy lại story `failed` thì bản ghi không theo kịp** — máy trạng thái
     không có cạnh `failed → running`, và `_safe_transition` nuốt lỗi bằng
     `except TransitionError: pass`. Story chạy lại xong, merge xong, wave
-    sau khởi động — mà `aisdlc status` vẫn báo "failed", và $9,76 chi phí
+    sau khởi động — mà `aisef status` vẫn báo "failed", và $9,76 chi phí
     lượt mới không vào sổ. Nay về `pending` trước khi chạy, và bước nhảy bị
     từ chối thì **nói ra**.
 22. **Tiêu đề báo cáo nghiệm thu cụt** — CLI mặc định `--project .`, mà
@@ -413,7 +413,7 @@ guard chặn oan và cổng chấm mù.
 
 ### Chạy thật — dựng mockup 5 màn hình
 
-`aisdlc mockup` trên `EXPERIENCE.md` thật: **5 màn, $9.22, 15–25 phút**.
+`aisef mockup` trên `EXPERIENCE.md` thật: **5 màn, $9.22, 15–25 phút**.
 Mỗi mockup 28–34KB, đủ hai thẻ meta, không lỗi JavaScript, mọi phần tử
 tương tác có tên gọi, ràng buộc nhập liệu nằm ở thuộc tính HTML.
 
@@ -448,7 +448,7 @@ Story `STORY-01-01` chạy trong worktree riêng, guard bật đầy đủ:
 * test nó viết có ca patch `socket` để chứng minh tạo ghi chú chạy được khi
   mất mạng hoàn toàn — đúng tiêu chí chấp nhận, không phải test giả;
 * lượt 1 **hết số lượt** (31/30, $2.74) vì kẹt ở guard `completion`: guard
-  bảo chạy `aisdlc tool test` mà `aisdlc` không có trên PATH của phiên;
+  bảo chạy `aisef tool test` mà `aisef` không có trên PATH của phiên;
 * harness tự chạy lại test sau lượt agent và bắt được một lần trượt mà
   agent không thấy → story vào lượt thử thứ hai, đúng thiết kế.
 
@@ -473,13 +473,13 @@ là xong, với ngôn ngữ sai hoàn toàn.
 tiền thật, không phải trên test.
 
 Mục chặn thứ nhất cũng đúng: story khai `screens` nhưng dự án chưa có
-mockup nào, nên không có gì để đối chiếu. Chính vì ca này mà `aisdlc run`
+mockup nào, nên không có gì để đối chiếu. Chính vì ca này mà `aisef run`
 được sửa để đòi cổng `readiness` — cổng gắn vào **cả** chỉ mục story lẫn
 hợp đồng thị giác — thay vì chỉ đòi `stories`.
 
 ### Chạy thật lần 2 — chuỗi lập kế hoạch chạy hết
 
-Sau khi sửa, `aisdlc plan` đi hết chuỗi trên `epics.md` thật (1078 dòng,
+Sau khi sửa, `aisef plan` đi hết chuỗi trên `epics.md` thật (1078 dòng,
 BMAD sinh, $4.45 cho pha epics):
 
 * **18 story / 5 epic**, mỗi story một file, `covers` · `write_scope` ·
@@ -598,13 +598,13 @@ Bước tiếp: **đợt 1 — G4** truyền `--settings` tường minh + nhịp
 
 | Hạng mục | Unit test | Kiểm thật | Bằng chứng | Trạng thái |
 |---|---|---|---|---|
-| P0-1 hook ghim đường dẫn tuyệt đối → `AISDLC_PROJECT` từ harness (3 vai), guard ưu tiên env, `doctor` mục "hook trỏ đúng dự án" | 4 | A/B `par-A`/`par-B`: 4 lượt trượt "guard có chạy" sai, bằng chứng nằm ở `par` gốc — nguyên nhân; kiểm lại qua dogfood (dự án dựng ở `.dogfood/`, hook biên dịch tại chỗ) | | ✅ |
+| P0-1 hook ghim đường dẫn tuyệt đối → `AISEF_PROJECT` từ harness (3 vai), guard ưu tiên env, `doctor` mục "hook trỏ đúng dự án" | 4 | A/B `par-A`/`par-B`: 4 lượt trượt "guard có chạy" sai, bằng chứng nằm ở `par` gốc — nguyên nhân; kiểm lại qua dogfood (dự án dựng ở `.dogfood/`, hook biên dịch tại chỗ) | | ✅ |
 | P0-2 test song song flaky | — | không tái hiện: 20/20 riêng + bộ đầy đủ 1 155 OK có log trọn vẹn | log scratch | ◐ hạ P2, giữ mở |
 | R4 tài liệu khớp mã: 5 đường dẫn lệch trong SOLUTION (`kit/agents/`, `kit/mcp/`, `control/fsm.py`, `phases/ship`, `phases/verify`) + test meta chặn tái diễn | 1 | — | | ✅ |
 | R1 chuẩn bị PyPI: `uv build` wheel+sdist, `twine check` PASS, `release.yml` trusted publishing, README "Phát hành" | — | việc tay còn lại: tài khoản tổ chức tạo project + khai publisher, rồi `git tag v0.1.0` | `dist/` (ignore) | ◐ chờ chủ đầu tư |
 | R5 kho dogfood `tests/dogfood/par` (đầu vào từ commit nền, hook biên dịch tại chỗ, mốc $3,14 / 3 story lượt đầu, `main` chỉ đổi qua merge) | — | **Lần 1 (2026-09-05): 0/3, $17,3** — hai nguyên nhân, cả hai đáng tiền: (1) đầu vào lấy `tools.test = node --test src/` ở commit trước bản vá → MODULE_NOT_FOUND bị coi là *test đỏ*, guard `completion` chặn Stop ~10 lần/lượt, 28–42 lượt/phiên (lỗi kit + lỗi phân loại); (2) `.claude/settings.json` harness chép vào worktree bị tính là "file ngoài phạm vi ghi" khi dự án không gitignore `.claude/` → 3/3 trượt "phạm vi ghi" (lỗi harness thật, chưa từng lộ vì `par`/`e9` đều ignore). Điểm sáng: reviewer tự kiểm chứng và gọi đúng tên "[bế tắc] .ai/config.json (tools.test)"; `main` không đổi ngoài merge; 01-02 đặt tên test đúng mã 2/2 | `.dogfood/par` | ✅ **lần 2** (sau sửa): **3/3 xong**, $5,63 (≤ 2 × $3,14), tiêu chí có test mang mã 6/6, HANDOFF đủ, 0 guard block sai, `main` chỉ đổi qua worktree (01-01 FF, còn lại merge); 2/3 qua lượt đầu — 01-02 lượt 2 vì reviewer bắt lỗi thật (`slice` vỡ cặp thay thế UTF-16) |
 | Sửa từ dogfood: `tools.run_tool` phân loại **không chạy được** (exit 127 / MODULE_NOT_FOUND / command not found, và với `test`: không test nào xanh) → `detail.unrunnable`; guard `completion` cho dừng; cổng "test" ghi UNRUNNABLE (chặn, đúng lý do); `HARNESS_OWNED` += `.claude/settings.json`, `.opencode` | 6 | dogfood lần 2: 3/3, không còn vòng lặp completion, không còn "phạm vi ghi" giả | `.dogfood/par` | ✅ |
-| R3 hợp quy lần cuối trước tag | — | **2026-09-05 13:33** sau toàn bộ sửa trong ngày: Claude **5/5** ($1,07) · OpenCode **5/5**; `AISDLC_RELEASE=1 … test_release_gate` xanh | `docs/CONFORMANCE.md` | ✅ |
+| R3 hợp quy lần cuối trước tag | — | **2026-09-05 13:33** sau toàn bộ sửa trong ngày: Claude **5/5** ($1,07) · OpenCode **5/5**; `AISEF_RELEASE=1 … test_release_gate` xanh | `docs/CONFORMANCE.md` | ✅ |
 | R2 e9 EPIC-01 đầu-cuối: `verify.e2e` + `verify.accessibility` **thật** (playwright + axe), không miễn; 4 story còn lại (01-04..01-07) | 1 | **Lượt 1** (STORY-01-04, $7,25): mọi mục máy ✅ kể cả "tiêu chí có test", TDD; evidence có `qa:e2e` ✅ `qa:perf` ✅ `qa:accessibility` ✅ — **lần đầu accessibility chạy thật** — nhưng cổng in "chưa cấu hình" vì tìm tên trần (lỗi 9, đã sửa). Reviewer kiểm chứng bế tắc: AC-3 đòi bài đo AR-16 mà `bench/` ngoài write_scope → sửa kế hoạch (thêm `bench/` vào scope), chạy lại | `e9/_bmad-output` | 🔨 **Lượt 2** ($10,16): reviewer bắt 2 lỗi UX thật ở lần 1 (grid phình, focus kéo ngược) — lần 2 sửa xong, rồi bế tắc kiểm chứng: `package.json` ngoài scope — **nguyên nhân là R2 prep của tôi** (`tests/` playwright bị `vitest run` nhặt; phiên bản cài `^` trái quy ước ghim). Sửa gốc trên `main` (vitest exclude `tests/**`, ghim, `--reporter=verbose`), chạy lượt 3 từ nhánh story còn nguyên công việc |
 | R2 **lượt 3** (14:29 → 16:39): STORY-01-04 **done** sau 8 lượt tổng ($79,67; map mockup + rà soát thật, e2e/accessibility PASSED thật); STORY-01-05 **trượt** 4 lượt ($28,21) — mọi lượt cùng một mục ✗ map mockup vì **lỗi 12** (mockup không đánh dấu trạng thái), không phải vì agent; EPIC-01 tới nay **$157,30** (4/5 story). Quyết định: dừng R2 ở 01-05 theo kỷ luật ngân sách; đo nốt 01-05 bằng A/B ADR-003 #1 (2 lượt/nhánh) trên hợp đồng đã sửa | 1 | sprint-status e9; evidence STORY-01-05 (4 `mockup_map` passed=false, missing = tiêu đề gallery + 4× combobox) | `docs/STATUS-2026-09-05.md` | ✅ A/B xong 18:22 (hàng #1 A/B e9); cả hai nhánh trượt 01-05 sau 2 lượt — nhánh on trượt vì rà soát chặn 2 mục + bế tắc kế hoạch (reviewer kiểm chứng), máy ✅ hết kể cả map mockup 3/3 |
 
@@ -616,10 +616,10 @@ Bước tiếp: **đợt 1 — G4** truyền `--settings` tường minh + nhịp
 | S3 guard luật 6 (`process-ref`): `STORY-\d+-\d+`/`EPIC-\d+` trong mã nguồn bị chặn ở Write/Edit; test, docs, artifact, `bench/` được phép (test còn **phải** mang mã `AC-…`) | 4 | phép hợp quy **C6** thêm vào bộ (Write nguồn có `// STORY-01-01` bị chặn, tệp test mang `AC-…` vẫn qua) — đang chạy trên hai client | `docs/CONFORMANCE.md` | ✅ |
 | OpenCode `--format json` → `MACHINE_OUTPUT`/`COST_REPORTING` NATIVE (chip `task_a7530bf6`): parser `tool_use`/`step_finish`/`text`, tool có tên chuẩn, tokens + cost (số của nhà cung cấp — 9router báo 0) | 3 | đo trên OpenCode 1.18.26 với `read`; hợp quy lần sau đọc tool từ luồng thay vì bản in | | ✅ |
 | P1-4 `doctor` mục "lệnh test in coverage" | 2 | — | | ✅ |
-| **Lỗi 10** (từ C6): OpenCode gửi `filePath`, guard đọc `file_path`/`path` → guard theo đường dẫn trên OpenCode thấy rỗng, write-scope cho qua. Sửa `run_guard` (+`newString`); luật 6 so đường dẫn **tương đối gốc** (tuyệt đối của worktree chứa `.aisdlc/` khớp nhầm bảng cho phép) | 3 | hợp quy OpenCode **7/7** sau sửa (C6 chặn nguồn, cho tệp test; C7 chặn ghi ngoài scope) | `docs/CONFORMANCE.md` | ✅ |
+| **Lỗi 10** (từ C6): OpenCode gửi `filePath`, guard đọc `file_path`/`path` → guard theo đường dẫn trên OpenCode thấy rỗng, write-scope cho qua. Sửa `run_guard` (+`newString`); luật 6 so đường dẫn **tương đối gốc** (tuyệt đối của worktree chứa `.aisef/` khớp nhầm bảng cho phép) | 3 | hợp quy OpenCode **7/7** sau sửa (C6 chặn nguồn, cho tệp test; C7 chặn ghi ngoài scope) | `docs/CONFORMANCE.md` | ✅ |
 | **Lỗi 11** (từ C3/C4, lần chạy 15:10): máy bật `permissions.defaultMode: "auto"` toàn cục → phiên con Claude mất Glob/Grep, được dặn ưu tiên Bash (heredoc né guard `Write\|Edit`), MCP + hook người dùng lọt vào; adapter chưa từng truyền `--permission-mode`. Sửa: adapter cố định `acceptEdits`, kê tool tường minh, `--setting-sources project,local`, `--strict-mcp-config`; runner dùng đúng `build_command`; C4 đọc cả phiên | 3 | đo cờ trên phiên thật (Glob có, MCP 0, hook người dùng 0, guard vẫn chặn); hợp quy Claude **7/7** ($1,16) | `docs/CONFORMANCE.md`, `docs/SOLUTION.md` §2.2 | ✅ |
 | **Lỗi 12** (từ R2 lượt 3, STORY-01-05): mockup bỏ quên `data-state`/`data-annotation` → hợp đồng ôm cả trang (32 component, trùng 4 lần), map mockup không thể khớp, story đốt $28 qua 4 lượt; cổng máy mockup không kiểm quy ước của chính skill. Sửa: hợp đồng gộp trùng + cờ `whole_page`/`duplicates`; `check_design_contract` chặn khi cả trang có trùng, chỉ cách sửa; e9 sửa mockup phía chủ dự án + trích lại | 2 | unit `tests/test_design_contract_states.py`; e9 trích lại: note-editor 32 → 3 component, gate bắt thêm tags/trash/settings-data (3/5 mockup cùng lỗi) | `docs/STATUS-2026-09-05.md` §2.4 | ✅ |
-| **Lỗi 13** (từ A/B nhánh on): `WorktreeManager.create` trả về thư mục thường khi `.aisdlc/worktrees/<story>` còn sót (`.vite/` của vite sống sót) → agent làm trong repo chính, diff-scope chặn mọi Bash. Sửa: kiểm `path/.git`, dọn thư mục lạ + `worktree prune` rồi tạo thật | 2 | unit `test_stray_dir_is_not_a_worktree`; A/B nhánh on chạy lại sạch | `docs/STATUS-2026-09-05.md` §2.4 | ✅ |
+| **Lỗi 13** (từ A/B nhánh on): `WorktreeManager.create` trả về thư mục thường khi `.aisef/worktrees/<story>` còn sót (`.vite/` của vite sống sót) → agent làm trong repo chính, diff-scope chặn mọi Bash. Sửa: kiểm `path/.git`, dọn thư mục lạ + `worktree prune` rồi tạo thật | 2 | unit `test_stray_dir_is_not_a_worktree`; A/B nhánh on chạy lại sạch | `docs/STATUS-2026-09-05.md` §2.4 | ✅ |
 | **Lỗi 14** (từ A/B nhánh off): cổng mở `/note/1` theo quy ước hạt giống `1` mà ngữ cảnh story không nói (tìm thấy khi truy trang trống nhánh off; trang trống thật ra do lỗi 15 — on2 qua 3/3 — nhưng quy ước vẫn phải nói ra). Sửa: `ScreenSlice.as_prompt` nêu route cổng sẽ mở + yêu cầu bản ghi `1`; `verify_screens` gọi tên trang trống + gợi ý hạt giống | 2 | unit `tests/test_mockup_map_seed.py`; A/B chạy lại 01-05 sẽ cho biết developer có seed không | `docs/STATUS-2026-09-05.md` §2.4 | ✅ |
 | **Lỗi 15** (từ A/B, `lsof`): `AppServer` nhận vơ thứ đang trả lời ở cổng và không giết nhóm tiến trình → vite ma của worktree e9 đã gỡ giữ 5199, cổng map mockup của nhánh off chấm nhầm app (trang trống). Sửa: từ chối cổng có người (nêu pid/cwd), `start_new_session` + `killpg` | 2 | unit `TestAppServerTrust` (từ chối; giết cả nhóm); nhánh on2 chạy sau khi dọn ma | `docs/STATUS-2026-09-05.md` §2.4 | ✅ |
 | **P2-12 cổng cỡ story** (quyết định chủ đầu tư 05/09): `story.max_screen_states`=8; preflight `story_size_defect` chặn ở cổng `stories` và ở `run`; `stories.gate.json` → prompt epics lần sau. Hiệu chuẩn: e9 01-04 (11 trạng thái) 89 lượt/8 attempts, 01-05 (18) 91 lượt cả hai nhánh; story 0 trạng thái 57–61 lượt | 2 | unit `tests/test_story_size.py` (5); đo trên agent: lần `plan` tới | `docs/SOLUTION.md` cấu hình | ✅ code · ⏳ đo |
@@ -638,16 +638,16 @@ Bước tiếp: **đợt 1 — G4** truyền `--settings` tường minh + nhịp
 | **P2-12 đo trên plan thật** (e9-plan, $16,68): 21 story, cổng cỡ không chặn story nào, lớn nhất = 8; memo chưa kích hoạt (không có lỗi cỡ) — gate đúng đắn trên dữ liệu thật, chưa có mẫu agent chẻ theo memo | 2 | `e9-plan/_bmad-output/stories.gate.json`, evidence plan-* | STATUS §2.8 | ✅ đo |
 | **Lỗi 21** (01-06 trượt cùng kiểu 01-05): harness đòi e2e/accessibility nhưng cấm ghi `tests/` → bế tắc kế hoạch giả. Sửa: `verification_paths` cấp thư mục test suy từ lệnh verify vào phạm vi có hiệu lực, hiện trong story file + prompt | 1 | `tests/test_write_scope_verify.py` (5); 01-06 chạy lại sau sửa | `docs/FAILURE-TAXONOMY.md` lớp D | ✅ |
 | **ADR-004 PROPOSED** (đối chiếu Harness-of-Harness, arXiv 2609.01481): gap analysis + 12 yêu cầu P0/P1/P2 (SHA candidate, ledger VERIFIED/GAP/REOPENED, vòng epic có điều kiện dừng, preservation/validation slot, cổng cỡ v2 có hiệu chuẩn, chỉ mục evidence, metrics, schema reviewer, baseline) + 8 ý không áp dụng + schema/ADR/CLI + 9 benchmark B0–B8 so với baseline hôm nay | 2 | `docs/ADR-004-evidence-driven-epic-improvement.md` | — | 📝 đề xuất |
-| **ADR-004 chủ đầu tư duyệt** (23:20): đợt 1 song song 4 worktree — W1 R1 SHA, W2 R2/R6/R7 + B0, W3 R5 + B4, W4 R8; đợt 2 sau gộp: R4, R3 (`aisdlc improve`), R9; gộp master chỉ khi e9 không còn lượt chạy | 1 | master 6e225ca + 2f1e0bb/370ea23 (sửa sau gộp) | ADR-004 §6 | ✅ đợt 1 |
-| **ADR-004 đợt 2** (2026-09-06 01:00): W5 R4 slot bảo toàn + cổng, W6 R9 baseline trước phiên, W7 R3 `aisdlc improve` có điều kiện dừng; sau gộp: B1 trên e9 EPIC-01, B7 lượt rà soát, C8 hai client | 1 | master 658997c (gộp qua nhánh int-wave2, 1 381 test) | ADR-004 §5 | ✅ gộp; B7 ✅ (6/6 JSON, 0 hỏi lại); C8 ✅ 16/16; B1 ✅ 2 vòng +1/+1 verified, $16,97, 0 hồi quy |
+| **ADR-004 chủ đầu tư duyệt** (23:20): đợt 1 song song 4 worktree — W1 R1 SHA, W2 R2/R6/R7 + B0, W3 R5 + B4, W4 R8; đợt 2 sau gộp: R4, R3 (`aisef improve`), R9; gộp master chỉ khi e9 không còn lượt chạy | 1 | master 6e225ca + 2f1e0bb/370ea23 (sửa sau gộp) | ADR-004 §6 | ✅ đợt 1 |
+| **ADR-004 đợt 2** (2026-09-06 01:00): W5 R4 slot bảo toàn + cổng, W6 R9 baseline trước phiên, W7 R3 `aisef improve` có điều kiện dừng; sau gộp: B1 trên e9 EPIC-01, B7 lượt rà soát, C8 hai client | 1 | master 658997c (gộp qua nhánh int-wave2, 1 381 test) | ADR-004 §5 | ✅ gộp; B7 ✅ (6/6 JSON, 0 hỏi lại); C8 ✅ 16/16; B1 ✅ 2 vòng +1/+1 verified, $16,97, 0 hồi quy |
 | **ADR-004 đợt 3** (2026-09-06 06:00, song song với improve vòng 3–8 trên e9): W8 R13 `--verify-only`, W9 R12 xuất issue + B5 hồi cứu e9, W10 B3 mutation `par` agent thật, W11 CHANGELOG v0.1.0 + taxonomy lỗi 22–25 + đối chiếu SOLUTION | 1 | master f324dca (W9 82c66f6/26afe54, W11 8ceeb99, W10 c2526dd, W8 edbd08c) | ADR-004 §5 | ✅ gộp; B3 ✅ $3,72; B5 → trần slot 1 200; lỗi 25–27 sửa |
 | **ADR-005 PROPOSED** (2026-09-06 07:xx): nghiên cứu 10 repo (Harbor, Terminal-Bench, SWE-agent, SWE-ReX, Aider, Agentless, Inspect, BERBench, RepoAgentBench, agent-sandbox) × 7 hướng → V1–V13, T1–T13, thứ tự 4 đợt; P0 = scrub bí mật, env allowlist, nop control, gate replay | 1 | `docs/ADR-005-hap-thu-pattern-harness-ngoai.md` | ADR-005 | ✅ duyệt 07:10 |
 | **ADR-005 đợt 1** (2026-09-06 07:15, 8 luồng song song): X1 V1 scrub + V11 tool/exit_status · X2 V2 env allowlist + C9/C10 · X3 V3 nop + V4 replay · X4 V9 Check/qualification/CTRF · X5 V5 provider/guarantee · X6 R13 --repeat + V6 QA sạch · X7 V8 bench · X8 V7 repo_map; sau gộp: suite đầy đủ, A/B V7 ($40), bench run ($30–150), V10/V12 | 1 | master 661994d = X5 c27c8ee · X4 0bf7630 · X1 948015b/4809ce5 · X8 679aa81 · X6 e8c7b9e/661994d · X2 a0918a9 (C1–C10: Claude 10/10, OpenCode 9/10) · X3 6876153/96f30ab · X7 a779eb2/7668a90 (bench 18 task, 15/15 VALID đo được) | ADR-005 §7 | ✅ 8/8 gộp 06/09 11:1x |
 | **Phát hành v0.1.0 — quyết định 06/09 11:00** (`docs/RELEASE-PLAN-v0.1.0.md` §0): C-a nghiệm thu EPIC-01 (`pre-deploy --epic`), B6 không nới V3 (hàng đợi improve bỏ `qa:*`, truy vết `evidence --link`), waiver có lý do (`verify.waiver_reason`), B4/B5 hoãn, coverage e9 84,16 %, lỗi 28 | 1 | e1766fc · 8623b7e · 2473ebb · 8de8be5; e9 `pre-deploy --epic EPIC-01` ĐẠT 11:29, cổng duyệt; wheel + twine PASS, venv sạch setup/doctor ✅ | RELEASE-PLAN §0, STATUS §2.10 | ◐ chờ A2 (FakeProvider) → suite đầy đủ → tag (chủ đầu tư) |
-| S2 `aisdlc doc <gói> --topic <chủ đề> [--story]` — context7 qua HTTP (`/api/v1/search`, `/api/v1/<id>?type=txt&topic=`), cache `~/.cache/ai-sdlc/docs/`, bằng chứng `doc_lookup`; prompt developer nhắc lệnh trong bảng tool | 6 | đo tay 2026-09-05: `vitest`/`coverage` trả tài liệu thật kèm nguồn; không cần khoá | | ✅ |
-| S4 `aisdlc change FR-x "mô tả"` — ghi vào `docs/requirements.md`, đánh dấu `prd.md` → cổng PRD và các cổng sau tự `stale` (cascade sẵn có), sinh `STORY-CH-nn` trong `EPIC-CH` với `covers=[FR-x]`, `write_scope` trống để người khai; story cũ giữ `DONE` | 4 | — | | ✅ |
-| S6 quét skill ngoài theo tiêm prompt | — | lớp heuristic đã có trong `registry.verify_structure` (câu tiêm, bí mật, offensive): e9 loại 3/156, par 2/120; quét bằng agent **đã làm 2026-09-05 tối** (`aisdlc skill --scan`, `kit/skill_scan.py`): 153 skill / 20 lô / $5,01 (8 skill/lô, không phải 156 phiên); 0 injection, 8 suspicious có trích dẫn (tầng regex không thấy mục nào), 4 unit test | STATUS §2.8 | ✅ |
-| S5 chia `cli.py` | — | thuần cơ học: gói `aisdlc/cli/` (`_common` · `doctor` · `plan` · `implement` · `harness` · `parser`), `__init__` xuất lại mọi tên cũ nên `from aisdlc.cli import main` không đổi; `--help` của 23 lệnh diff rỗng trước/sau | | ✅ |
+| S2 `aisef doc <gói> --topic <chủ đề> [--story]` — context7 qua HTTP (`/api/v1/search`, `/api/v1/<id>?type=txt&topic=`), cache `~/.cache/aisef/docs/`, bằng chứng `doc_lookup`; prompt developer nhắc lệnh trong bảng tool | 6 | đo tay 2026-09-05: `vitest`/`coverage` trả tài liệu thật kèm nguồn; không cần khoá | | ✅ |
+| S4 `aisef change FR-x "mô tả"` — ghi vào `docs/requirements.md`, đánh dấu `prd.md` → cổng PRD và các cổng sau tự `stale` (cascade sẵn có), sinh `STORY-CH-nn` trong `EPIC-CH` với `covers=[FR-x]`, `write_scope` trống để người khai; story cũ giữ `DONE` | 4 | — | | ✅ |
+| S6 quét skill ngoài theo tiêm prompt | — | lớp heuristic đã có trong `registry.verify_structure` (câu tiêm, bí mật, offensive): e9 loại 3/156, par 2/120; quét bằng agent **đã làm 2026-09-05 tối** (`aisef skill --scan`, `kit/skill_scan.py`): 153 skill / 20 lô / $5,01 (8 skill/lô, không phải 156 phiên); 0 injection, 8 suspicious có trích dẫn (tầng regex không thấy mục nào), 4 unit test | STATUS §2.8 | ✅ |
+| S5 chia `cli.py` | — | thuần cơ học: gói `aisef/cli/` (`_common` · `doctor` · `plan` · `implement` · `harness` · `parser`), `__init__` xuất lại mọi tên cũ nên `from aisef.cli import main` không đổi; `--help` của 23 lệnh diff rỗng trước/sau | | ✅ |
 
 **Đợt OKL (ADR-002 — tầng tri thức vận hành, sau paper Repo-To-Skill):**
 
@@ -655,6 +655,6 @@ Bước tiếp: **đợt 1 — G4** truyền `--settings` tường minh + nhịp
 |---|---|---|---|---|
 | ADR-002 + đo e9 (156 skill, 11 lần gọi/4 skill) | — | e9 evidence | `docs/ADR-002` | ✅ |
 | Registry + vòng đời 5 trạng thái + verify cấu trúc | 15 | dựng trên 156 skill thật e9; 3 skill có bí mật → rejected | `skill-registry.json` | ✅ |
-| Router hai-tín-hiệu + abstain + progressive disclosure | 12 | e9: abstain 13/18 (catalog security không có skill app ghi chú — đúng); lộ & sửa 2 va chạm keyword (crypto-migration↔schema, "performative"↔perf) | `aisdlc skill --story` | ✅ |
+| Router hai-tín-hiệu + abstain + progressive disclosure | 12 | e9: abstain 13/18 (catalog security không có skill app ghi chú — đúng); lộ & sửa 2 va chạm keyword (crypto-migration↔schema, "performative"↔perf) | `aisef skill --story` | ✅ |
 | Kích hoạt: router → prompt story + telemetry `skills_offered`/`skills_used` | | **chưa** — cần kiểm agent thật | | ⏳ đợt sau |
 | Chưng cất + học từ trace (ADR §5) | | | | ⏳ đợt 2 (PROPOSED) |

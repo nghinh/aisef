@@ -12,7 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.normalize import (  # noqa: E402
+from aisef.control.normalize import (  # noqa: E402
     parse_architecture,
     parse_architecture_file,
     parse_prd,

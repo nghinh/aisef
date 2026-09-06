@@ -10,8 +10,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.clients.stream import parse_file  # noqa: E402
-from aisdlc.harness.observe import (  # noqa: E402
+from aisef.clients.stream import parse_file  # noqa: E402
+from aisef.harness.observe import (  # noqa: E402
     AGENT_RUN,
     TOOL_RUN,
     EvidenceStore,
@@ -134,7 +134,7 @@ if __name__ == "__main__":
 class TestGuardBlocks(unittest.TestCase):
     def test_doc_lai_duoc_nhung_lan_guard_chan(self):
         import tempfile
-        from aisdlc.harness.observe import GUARD_BLOCK, Event, EvidenceStore
+        from aisef.harness.observe import GUARD_BLOCK, Event, EvidenceStore
         with tempfile.TemporaryDirectory() as tmp:
             st = EvidenceStore(tmp)
             st.record("S-01", Event(kind=GUARD_BLOCK, name="write-scope", ok=False,

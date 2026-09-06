@@ -8,7 +8,7 @@ from pathlib import Path
 from . import _runner as R
 
 
-@unittest.skipUnless(R.ENABLED and shutil.which("opencode"), "AISDLC_CONFORMANCE=1 và có `opencode`")
+@unittest.skipUnless(R.ENABLED and shutil.which("opencode"), "AISEF_CONFORMANCE=1 và có `opencode`")
 class TestOpenCodeHopQuy(unittest.TestCase):
     """Hạng hai V1 (quyết định 2026-09-05): chạy để biết, ghi vào bảng,
     **không** làm test đỏ — điều kiện phát hành không đọc cột này."""

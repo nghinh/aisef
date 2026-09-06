@@ -1,4 +1,7 @@
-# Checklist phát hành v0.1.0 — gói `aisef` (module/lệnh `aisdlc`)
+# Checklist phát hành v0.1.0 — gói `aisef`
+
+> Lịch sử: v0.1.0 phát hành với lệnh `aisdlc`; 0.2.0 đổi hết về `aisef`. Các
+> lệnh trong tệp này đã viết theo tên mới.
 
 Mỗi dòng là một điều kiện của Definition of Done (quyết định chủ đầu tư
 2026-09-06 11:00, `docs/RELEASE-PLAN-v0.1.0.md` §0 mục 10) kèm **lệnh hoặc
@@ -7,15 +10,15 @@ nhật lần cuối: **xem dòng "Cập nhật" cuối tệp**.
 
 | # | Điều kiện | Cách kiểm | Trạng thái |
 |---|---|---|---|
-| 1 | Suite đơn vị 100 % xanh, **lặp lại được không cần Docker** | `python3 -m unittest discover -s tests -q` | ✅ 06/09 14:18 trên master `cb35ad9`: **1 671 test, 191 s, OK**, 17 skip có tên (10 `AISDLC_TEST_DOCKER` · 2 cổng phát hành · 2 dogfood · 2 hợp quy · 1 bench) |
-| 2 | Test Docker/hợp quy sandbox riêng xanh | `AISDLC_TEST_DOCKER=1 python3 -m unittest tests.test_sandbox tests.test_tools -q` | ✅ 06/09 14:21: **88 test, 93 s, OK** (2 skip); S1–S5 Docker 5/5 đo sáng 06/09 |
+| 1 | Suite đơn vị 100 % xanh, **lặp lại được không cần Docker** | `python3 -m unittest discover -s tests -q` | ✅ 06/09 14:18 trên master `cb35ad9`: **1 671 test, 191 s, OK**, 17 skip có tên (10 `AISEF_TEST_DOCKER` · 2 cổng phát hành · 2 dogfood · 2 hợp quy · 1 bench) |
+| 2 | Test Docker/hợp quy sandbox riêng xanh | `AISEF_TEST_DOCKER=1 python3 -m unittest tests.test_sandbox tests.test_tools -q` | ✅ 06/09 14:21: **88 test, 93 s, OK** (2 skip); S1–S5 Docker 5/5 đo sáng 06/09 |
 | 3 | Hợp quy Claude không ô ✗, bảng ≤ 14 ngày | `docs/CONFORMANCE.md`; cổng ở dòng 9 đọc bảng bằng code | ✅ C1–C10 Claude 10/10 (06/09, $1,66). **C11/C12 hoãn**: mã và unit test xong ở nhánh `worktree-agent-ada8e46…` nhưng phép chạy thật mới xong C11(a)/(b) thì hết credit — không gộp vào master vì thêm phép vào bảng sẽ làm cổng đòi đủ 12 cột |
-| 4 | `par` đạt mốc dogfood | `AISDLC_DOGFOOD=1 python3 -m unittest tests.dogfood -q` (đo 06/09: 3/3, $5,79 ≤ 2 × $3,14) | ✅ |
-| 5 | e9 EPIC-01 7/7, QA đạt, `pre-deploy --epic EPIC-01` đạt hoặc chỉ waiver tường minh cho loại UNRUNNABLE | `AISDLC_ACCEPTANCE=<e9> AISDLC_RELEASE=1 python3 -m unittest tests.test_release_gate`; `e9/_bmad-output/pre-deploy-report.json` (`passed`, `scope`, `waivers`), `approvals/pre-deploy.json` | ✅ ĐẠT 11:29 06/09, cổng duyệt theo phạm vi; miễn có lý do: sit/api-contract/uat (không áp dụng), mutation, image-scan (không chạy được) |
-| 6 | Wheel/sdist hợp lệ, cài venv sạch → `setup` → `doctor` | `uv build && uvx twine check dist/*`; venv sạch `pip install dist/aisef-0.1.0-py3-none-any.whl` → `aisdlc setup` → `aisdlc doctor` | ✅ 12:1x 06/09 (`doctor` "✅ sẵn sàng") |
+| 4 | `par` đạt mốc dogfood | `AISEF_DOGFOOD=1 python3 -m unittest tests.dogfood -q` (đo 06/09: 3/3, $5,79 ≤ 2 × $3,14) | ✅ |
+| 5 | e9 EPIC-01 7/7, QA đạt, `pre-deploy --epic EPIC-01` đạt hoặc chỉ waiver tường minh cho loại UNRUNNABLE | `AISEF_ACCEPTANCE=<e9> AISEF_RELEASE=1 python3 -m unittest tests.test_release_gate`; `e9/_bmad-output/pre-deploy-report.json` (`passed`, `scope`, `waivers`), `approvals/pre-deploy.json` | ✅ ĐẠT 11:29 06/09, cổng duyệt theo phạm vi; miễn có lý do: sit/api-contract/uat (không áp dụng), mutation, image-scan (không chạy được) |
+| 6 | Wheel/sdist hợp lệ, cài venv sạch → `setup` → `doctor` | `uv build && uvx twine check dist/*`; venv sạch `pip install dist/aisef-0.1.0-py3-none-any.whl` → `aisef setup` → `aisef doctor` | ✅ 12:1x 06/09 (`doctor` "✅ sẵn sàng") |
 | 7 | README / CHANGELOG / STATUS / SOLUTION khớp mã | `python3 -m unittest tests.test_meta tests.test_docs -q` (CLI, knob, mục cổng, STEPS, slot đọc từ mã) | ✅ xanh ở `d64dd90`; chạy lại sau A2 |
 | 8 | Known limitations ghi rõ | README "Giới hạn đã biết của v0.1.0"; CHANGELOG "Khi nâng cấp" | ✅ (danh sách bên dưới) |
-| 9 | Cổng phát hành trả 0 | `AISDLC_RELEASE=1 AISDLC_ACCEPTANCE=<e9> python3 -m unittest tests.test_release_gate -q` | ✅ 06/09 14:2x: 2 test OK (bảng hợp quy đủ + mới; nghiệm thu e9 đạt, duyệt đúng bản, miễn có lý do) |
+| 9 | Cổng phát hành trả 0 | `AISEF_RELEASE=1 AISEF_ACCEPTANCE=<e9> python3 -m unittest tests.test_release_gate -q` | ✅ 06/09 14:2x: 2 test OK (bảng hợp quy đủ + mới; nghiệm thu e9 đạt, duyệt đúng bản, miễn có lý do) |
 | 10 | Tag `v0.1.0` → `release.yml` publish (trusted publisher) → `pip install aisef==0.1.0` venv sạch | `git tag v0.1.0 && git push origin v0.1.0`; lần chạy `release` 34020915941 (build + publish `success`); `curl https://pypi.org/pypi/aisef/json` | ✅ 15:07 06/09 |
 
 ## Known limitations còn lại (khai trong README)
@@ -48,8 +51,8 @@ nhau được — dữ liệu cho ADR-005 V10.
 | Gói | `aisef 0.1.0` trên PyPI: `aisef-0.1.0-py3-none-any.whl` + `aisef-0.1.0.tar.gz` |
 | Cách publish | GitHub Actions `release.yml`, trusted publishing (OIDC), environment `pypi` — không token trong kho |
 | Lần chạy | `release` 34020915941: job `build` (suite + twine) ✅, job `publish` ✅, 15:07 06/09 |
-| Cài sạch sau publish | `python3 -m venv` → `pip install aisef==0.1.0` → `aisdlc setup` 152 skill → `aisdlc doctor` **✅ sẵn sàng** (○ playwright, ○ ảnh sandbox — công cụ tuỳ chọn chưa cài, không đỏ) |
-| Kho | `nghinh/ai-sdlc` (private), nhánh mặc định `master` = mã phát hành; nhánh `readme-truoc-phat-hanh` giữ commit README có trước |
+| Cài sạch sau publish | `python3 -m venv` → `pip install aisef==0.1.0` → `aisef setup` 152 skill → `aisef doctor` **✅ sẵn sàng** (○ playwright, ○ ảnh sandbox — công cụ tuỳ chọn chưa cài, không đỏ) |
+| Kho | `nghinh/aisef` (private), nhánh mặc định `master` = mã phát hành; nhánh `readme-truoc-phat-hanh` giữ commit README có trước |
 
 **Hai lỗi CI Linux bắt được trước khi publish** (lỗi 29–30, STATUS §2.4): `Path.glob("src/**")`
 chỉ khớp thư mục ở Python ≤ 3.12 nên bản đồ mã rỗng đúng ở nửa số bản được hỗ trợ; và một

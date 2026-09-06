@@ -15,10 +15,10 @@ chỗ AI-SEF đang thiếu thật.
 
 | Đại lượng | Số |
 |---|---|
-| Skill cài vào `.claude/skills` | **156** (security 109 · bmad 36 · superpowers 10 · aisdlc 1) |
+| Skill cài vào `.claude/skills` | **156** (security 109 · bmad 36 · superpowers 10 · aisef 1) |
 | Tổng `SKILL.md` | 1,3 MB; frontmatter client nạp mỗi phiên ≈ **111k ký tự** |
 | Lần tool `Skill` được gọi, cả 86 phiên | **11**, đúng **4** skill |
-| 4 skill đó | `bmad-project-context` `bmad-ux` `bmad-create-epics-and-stories` `aisdlc-mockup-html` — tất cả đều được **prompt của harness gọi đích danh** |
+| 4 skill đó | `bmad-project-context` `bmad-ux` `bmad-create-epics-and-stories` `aisef-mockup-html` — tất cả đều được **prompt của harness gọi đích danh** |
 | Skill security (109) và superpowers (10) được dùng | **0** |
 
 Kết luận không cần suy diễn: *cài theo stack* không sinh ra sử dụng; *prompt
@@ -30,13 +30,13 @@ vì không có sự kiện `skill_use` (review D5).
 
 | Cơ chế của paper | AI-SEF đã có | Khoảng trống thật | Quyết định |
 |---|---|---|---|
-| Skill ba tầng `SKILL.md` / `references/` / `scripts/`, chỉ `SKILL.md` đọc trước | `kit/skills.py` đọc `SKILL.md`; skill nhập từ 4 nguồn có frontmatter **không đồng nhất** | Không có bản ghi chuẩn hoá: provenance chỉ là `source=` trong `.aisdlc-managed`, không commit, không license, không "dùng khi nào" | **ADD** registry chuẩn hoá (§4.1) — không đổi định dạng skill nguồn |
+| Skill ba tầng `SKILL.md` / `references/` / `scripts/`, chỉ `SKILL.md` đọc trước | `kit/skills.py` đọc `SKILL.md`; skill nhập từ 4 nguồn có frontmatter **không đồng nhất** | Không có bản ghi chuẩn hoá: provenance chỉ là `source=` trong `.aisef-managed`, không commit, không license, không "dùng khi nào" | **ADD** registry chuẩn hoá (§4.1) — không đổi định dạng skill nguồn |
 | Router hai cấp area → family → graph, agent tự đi | `setup` chọn skill theo stack (một lần, mức dự án) | Không có định tuyến **mức story/pha**, và bằng chứng nói agent không tự đi | **ADD** router harness-side (§4.2), **đưa vào prompt** như mục "Skill cho story này" — chỗ duy nhất đã chứng minh sinh ra sử dụng |
 | Confidence + evidence + rationale cho mỗi gán; không có ngưỡng số | — | Không có abstain | **ADD** confidence có ngưỡng, `NO-SKILL` khi không đủ; là **tín hiệu**, không phải cổng (review D6) |
-| Chưng cất 4 bước scope→ground→construct→verify; verify bằng test/CLI/smoke của kho nguồn; record R giữ evidence + gap | `fetch.py` ghim commit; `security_filter` phân loại | Không có đường sinh skill từ kho/tài liệu, không có record | **ADD đợt 2** `aisdlc skill distill` (§5) — model dựng, code kiểm; record là bằng chứng |
+| Chưng cất 4 bước scope→ground→construct→verify; verify bằng test/CLI/smoke của kho nguồn; record R giữ evidence + gap | `fetch.py` ghim commit; `security_filter` phân loại | Không có đường sinh skill từ kho/tài liệu, không có record | **ADD đợt 2** `aisef skill distill` (§5) — model dựng, code kiểm; record là bằng chứng |
 | Vòng đời ngầm: candidate → verified → active; không có stale/rejected | `doctor` kiểm skill offensive | Không có trạng thái, không có "stale khi upstream đổi" | **ADD** FSM 5 trạng thái (§4.3), stale theo commit catalog |
 | Progressive disclosure: entry skill tóm tắt, mở đúng nhánh | Client nạp **toàn bộ** mô tả 156 skill | 111k ký tự/phiên cho 4 skill dùng | **STRENGTHEN**: prompt chỉ mang skill được định tuyến (tên + dùng-khi + cách mở); `setup` cài theo **tập định tuyến của dự án** thay vì cả nguồn (§4.4) |
-| Không có học từ trace sau triển khai (paper thừa nhận) | Evidence có review findings, deadlock, `[bế tắc]`, `untested_symbols` | — | **ADD đợt 2** `aisdlc skill propose` từ khuôn lặp trong evidence (§5.2) — đây là chỗ AI-SEF vượt paper |
+| Không có học từ trace sau triển khai (paper thừa nhận) | Evidence có review findings, deadlock, `[bế tắc]`, `untested_symbols` | — | **ADD đợt 2** `aisef skill propose` từ khuôn lặp trong evidence (§5.2) — đây là chỗ AI-SEF vượt paper |
 | Đo: paired vs không-skill, 4 benchmark | Không có eval skill | Không biết skill nào có ích | **ADD** telemetry `skills_offered`/`skills_used` + A/B trên `par`/`e9` (§6) |
 | Taxonomy 20 area × 178 family, LLM-assisted | — | Không cần: catalog 5 nguồn, ≤ 300 skill | **KHÔNG lấy** — quá cỡ cho bài toán |
 | DisCo agent, hai chế độ creator/researcher | Vai `developer/reviewer/security/designer` | — | **KHÔNG lấy** — thêm vai `curator` cho chưng cất là đủ, không thêm agent runtime |
@@ -59,7 +59,7 @@ vì không có sự kiện `skill_use` (review D5).
 
 ### 4.1 Registry — `_bmad-output/skill-registry.json`
 
-Dựng bởi `kit/registry.build(project)` từ `.claude/skills/*` + `.aisdlc-managed`
+Dựng bởi `kit/registry.build(project)` từ `.claude/skills/*` + `.aisef-managed`
 + `catalog.json`. Một bản ghi:
 
 ```
@@ -92,7 +92,7 @@ Routing = {picked: [(entry, score, rationale)], abstained: bool, considered: int
 của story (+3/khớp) · khớp với `required_capabilities` (+3) · story có
 `screens` ↔ skill có capability `ui` (+2) · trùng token giữa tiêu chí chấp
 nhận và `tags`/`subdomain` (+1/token, tối đa +3) · skill của framework
-(`aisdlc-*`) đúng pha (+5). Chỉ skill `status ∈ {verified, active}` được
+(`aisef-*`) đúng pha (+5). Chỉ skill `status ∈ {verified, active}` được
 xét. Ngưỡng `skills.route_threshold = 3`, tối đa `skills.route_max = 3`.
 Dưới ngưỡng → `abstained = true`, prompt ghi rõ "không có skill nào đủ
 khớp — làm theo hiến pháp". Rationale ghi vào evidence `skills_offered`.
@@ -138,18 +138,18 @@ bỏ qua luật / chạy lệnh sau" (mẫu tiêm — cùng lớp với prompt
 
 ## 5. Đợt 2 — đề xuất (PROPOSED)
 
-### 5.1 Chưng cất `aisdlc skill distill <kho|tài liệu|paper> --for <mục đích>`
+### 5.1 Chưng cất `aisef skill distill <kho|tài liệu|paper> --for <mục đích>`
 
 Vai mới `curator` (prompt `skill-distill.md`, phiên riêng, chỉ ghi vào
 `_bmad-output/skills-candidates/<id>/`). Bốn bước như paper nhưng **verify
 là code**: scope/ground/construct do model; verify = §4.5 + chạy
 `scripts/*` nếu có với fixture nhỏ + kiểm mọi claim có trích dẫn tới
 `references/`. Record `construction.json` giữ evidence, checks, gaps. Vào
-registry ở `candidate`; người duyệt (`aisdlc skill approve`) mới lên
+registry ở `candidate`; người duyệt (`aisef skill approve`) mới lên
 `verified`. Không có bước người thì skill chưng cất không bao giờ được
 định tuyến — tri thức vận hành sai còn tệ hơn không có.
 
-### 5.2 Học từ trace `aisdlc skill propose`
+### 5.2 Học từ trace `aisef skill propose`
 
 Nguồn: evidence có sẵn — review findings lặp qua ≥ 3 story (cùng danh từ
 riêng, cùng cơ chế `_same_complaint`), `[bế tắc]`, `untested_symbols` lặp,

@@ -10,7 +10,7 @@ from types import SimpleNamespace as NS
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.phases.report import mockup_cell  # noqa: E402
+from aisef.phases.report import mockup_cell  # noqa: E402
 
 
 class TestMockupCell(unittest.TestCase):

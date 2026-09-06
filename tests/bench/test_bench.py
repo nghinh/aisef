@@ -1,7 +1,7 @@
 """Bench V8 — mine/lint/validate/run/report/export trên **dự án giả** (kịch bản
 TAP như `tests/test_improve.py`) + fixture lỗi kho thật.
 
-Không cần `AISDLC_BENCH=1`: dự án giả chạy trong giây. Phần chạy unit thật của
+Không cần `AISEF_BENCH=1`: dự án giả chạy trong giây. Phần chạy unit thật của
 kho (validate ×3 task lỗi 13) mới cần cờ; client thật không có ở đây.
 """
 
@@ -18,12 +18,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.clients.base import ClientAdapter  # noqa: E402
-from aisdlc.clients.stream import RunResult  # noqa: E402
-from aisdlc.control.impact import is_test_path  # noqa: E402
-from aisdlc.control.journal import Entry as JEntry  # noqa: E402
-from aisdlc.control.journal import JournalStore  # noqa: E402
-from aisdlc.harness.observe import AGENT_RUN, NOTE, TOOL_RUN, Event, EvidenceStore  # noqa: E402
+from aisef.clients.base import ClientAdapter  # noqa: E402
+from aisef.clients.stream import RunResult  # noqa: E402
+from aisef.control.impact import is_test_path  # noqa: E402
+from aisef.control.journal import Entry as JEntry  # noqa: E402
+from aisef.control.journal import JournalStore  # noqa: E402
+from aisef.harness.observe import AGENT_RUN, NOTE, TOOL_RUN, Event, EvidenceStore  # noqa: E402
 
 from . import _mine as M  # noqa: E402
 from . import _runner as R  # noqa: E402
@@ -111,17 +111,17 @@ class BenchCase(unittest.TestCase):
         self.e9 = tmp / "e9"
         self.e9.mkdir()
         self.shas = make_e9(self.e9)
-        self._env, self._keep = os.environ.get("AISDLC_BENCH_E9"), R.KEEP_DIR
-        os.environ["AISDLC_BENCH_E9"] = str(self.e9)
+        self._env, self._keep = os.environ.get("AISEF_BENCH_E9"), R.KEEP_DIR
+        os.environ["AISEF_BENCH_E9"] = str(self.e9)
         R.KEEP_DIR = tmp / "bench"
         self.tasks = {t.id: t for t in M.mine_stories(self.e9, tmp / "tasks")}
 
     def tearDown(self):
         R.KEEP_DIR = self._keep
         if self._env is None:
-            os.environ.pop("AISDLC_BENCH_E9", None)
+            os.environ.pop("AISEF_BENCH_E9", None)
         else:
-            os.environ["AISDLC_BENCH_E9"] = self._env
+            os.environ["AISEF_BENCH_E9"] = self._env
         self._tmp.cleanup()
 
 
@@ -302,14 +302,16 @@ class TestMineBugsThat(unittest.TestCase):
                 self.assertEqual(t.invalid_reason, "")
                 self.assertTrue(all(is_test_path(p) for p in patch_paths(t.read("tests.patch"))))
                 gold = patch_paths(t.read("gold.patch"))
-                self.assertTrue(gold and all(p.startswith("aisdlc/") for p in gold), gold)
+                # Task đào từ commit **trước** lần đổi tên 0.2.0 sửa
+                # `aisdlc/…`; sau lần ấy là `aisef/…` (xem `_mine.SRC_PREFIXES`).
+                self.assertTrue(gold and all(p.startswith(M.SRC_PREFIXES) for p in gold), gold)
                 self.assertEqual(sh(ROOT, "git", "rev-parse", t.fix_commit + "^"), t.base)
                 subject = sh(ROOT, "git", "log", "-1", "--format=%s", t.fix_commit)
                 self.assertEqual(M.lint_prompt(t.read("prompt.md"), forbid=(subject,)), [])
                 self.assertTrue(t.tests_visible)
         self.assertEqual(self.tasks["bug-13"].verify, "python3 -m unittest -v tests.test_worktree")
 
-    @unittest.skipUnless(R.ENABLED, "AISDLC_BENCH=1: chạy unit thật của kho ×3 ở hai trạng thái")
+    @unittest.skipUnless(R.ENABLED, "AISEF_BENCH=1: chạy unit thật của kho ×3 ở hai trạng thái")
     def test_validate_loi_13_do_o_base_xanh_o_gold(self):
         keep, R.KEEP_DIR = R.KEEP_DIR, Path(self._tmp.name) / "bench"
         try:

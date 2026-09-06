@@ -16,18 +16,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.control.design_contract import load  # noqa: E402
-from aisdlc.control.experience import parse_experience_file  # noqa: E402
-from aisdlc.harness import browser  # noqa: E402
-from aisdlc.harness.mockup_map import load_for_story, load_slice, prompt_section  # noqa: E402
-from aisdlc.harness.mockup_verify import (  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.control.design_contract import load  # noqa: E402
+from aisef.control.experience import parse_experience_file  # noqa: E402
+from aisef.harness import browser  # noqa: E402
+from aisef.harness.mockup_map import load_for_story, load_slice, prompt_section  # noqa: E402
+from aisef.harness.mockup_verify import (  # noqa: E402
     AppServer,
     concrete_route,
     verify_screens,
 )
-from aisdlc.harness.observe import MOCKUP_MAP, EvidenceStore  # noqa: E402
-from aisdlc.phases.mockup import extract  # noqa: E402
+from aisef.harness.observe import MOCKUP_MAP, EvidenceStore  # noqa: E402
+from aisef.phases.mockup import extract  # noqa: E402
 
 FIX = ROOT / "tests" / "fixtures"
 BROWSER_REASON = browser.availability(ROOT)
@@ -227,7 +227,7 @@ class TestAppServerTrust(unittest.TestCase):
     def test_refuses_foreign_responder(self):
         from unittest import mock
 
-        from aisdlc.harness import mockup_verify as mv
+        from aisef.harness import mockup_verify as mv
 
         s = AppServer("echo x", "http://127.0.0.1:1", cwd=Path("."))
         with mock.patch.object(mv, "_responds", return_value=True), \

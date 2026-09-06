@@ -9,7 +9,7 @@ hình và ý nghĩa. Docker thật chỉ ở test đánh dấu `needs_docker` v�
 S1–S5, bật tường minh như hợp quy/dogfood:
 
     python3 -m unittest discover -s tests -q                      # nhanh, không Docker
-    AISDLC_TEST_DOCKER=1 python3 -m unittest tests.test_sandbox tests.test_tools -q
+    AISEF_TEST_DOCKER=1 python3 -m unittest tests.test_sandbox tests.test_tools -q
 
 `unittest discover -s tests` **không** nạp gói này (start dir là top level),
 nên module nào chạm sandbox thì `import tests` — một dòng, import là đủ.
@@ -21,14 +21,14 @@ from __future__ import annotations
 import os
 import unittest
 
-from aisdlc.harness import sandbox
+from aisef.harness import sandbox
 
-DOCKER = os.environ.get("AISDLC_TEST_DOCKER") == "1"
+DOCKER = os.environ.get("AISEF_TEST_DOCKER") == "1"
 
 #: Test cần Docker thật. Chỉ hỏi daemon khi đã bật — `docker info` mất
 #: gần một giây, không trả cho mỗi lần import.
 needs_docker = unittest.skipUnless(
-    DOCKER and sandbox.docker_available(), "bật bằng AISDLC_TEST_DOCKER=1 (cần daemon)"
+    DOCKER and sandbox.docker_available(), "bật bằng AISEF_TEST_DOCKER=1 (cần daemon)"
 )
 
 if not DOCKER:

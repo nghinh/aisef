@@ -15,8 +15,8 @@ sys.path.insert(0, str(ROOT))
 
 import tests  # noqa: E402,F401 — HostProvider vào chỗ docker, không mở container (tests/__init__.py)
 
-from aisdlc.cli import EXIT_NOT_READY, EXIT_OK, EXIT_USAGE, main  # noqa: E402
-from aisdlc.control.state import StateStore, StoryStatus  # noqa: E402
+from aisef.cli import EXIT_NOT_READY, EXIT_OK, EXIT_USAGE, main  # noqa: E402
+from aisef.control.state import StateStore, StoryStatus  # noqa: E402
 
 
 class CliTestCase(unittest.TestCase):
@@ -48,7 +48,7 @@ class CliTestCase(unittest.TestCase):
         import contextlib
         import unittest.mock as mock
 
-        from aisdlc.clients.compile import ADAPTERS
+        from aisef.clients.compile import ADAPTERS
 
         that = ADAPTERS[name]
 
@@ -68,7 +68,7 @@ class TestEveryCommandIsUsable(unittest.TestCase):
     """Lỗi khai đối số chỉ lộ ra lúc người dùng gõ lệnh — trừ khi có test."""
 
     def commands(self) -> list[str]:
-        from aisdlc.cli import build_parser
+        from aisef.cli import build_parser
 
         parser = build_parser()
         actions = [a for a in parser._actions if hasattr(a, "choices") and a.choices]
@@ -80,7 +80,7 @@ class TestEveryCommandIsUsable(unittest.TestCase):
             self.assertIn(name, self.commands())
 
     def test_help_works_for_every_command(self):
-        from aisdlc.cli import build_parser
+        from aisef.cli import build_parser
 
         for name in self.commands():
             with self.subTest(command=name):
@@ -127,7 +127,7 @@ class TestDoctorTenTest(CliTestCase):
 
     def test_bang_chung_thang_co_lenh(self):
         """Lệnh trông "câm" nhưng bằng chứng ghi `test_format` → tin bằng chứng."""
-        from aisdlc.harness.observe import EvidenceStore
+        from aisef.harness.observe import EvidenceStore
         self.cau_hinh("pytest")
         EvidenceStore(self.artifacts).tool_run("S-01", "test", ok=True, detail={"test_format": "ctrf"})
         _, out, _ = self.run_cli("doctor")
@@ -135,7 +135,7 @@ class TestDoctorTenTest(CliTestCase):
         self.assertIn("'ctrf'", out)
 
     def test_bang_chung_rong_thi_goi_du_lenh_in_ten(self):
-        from aisdlc.harness.observe import EvidenceStore
+        from aisef.harness.observe import EvidenceStore
         self.cau_hinh("pytest -v")
         EvidenceStore(self.artifacts).tool_run("S-01", "test", ok=True, detail={"test_format": ""})
         _, out, _ = self.run_cli("doctor")
@@ -148,7 +148,7 @@ class TestDoctorSkillFreshness(CliTestCase):
         """Skill của framework nằm trong kho framework; dự án giữ một bản
         sao. Sửa skill mà không cài lại thì agent vẫn chạy bản cũ, và cách
         duy nhất phát hiện là ngồi so từng file."""
-        from aisdlc.kit.install import OWN_SKILLS
+        from aisef.kit.install import OWN_SKILLS
 
         own = next(OWN_SKILLS.glob("*/SKILL.md"))
         copied = self.project / ".claude" / "skills" / own.parent.name / "SKILL.md"
@@ -160,7 +160,7 @@ class TestDoctorSkillFreshness(CliTestCase):
         self.assertIn(own.parent.name, out)
 
     def test_matching_copy_passes(self):
-        from aisdlc.kit.install import OWN_SKILLS
+        from aisef.kit.install import OWN_SKILLS
 
         own = next(OWN_SKILLS.glob("*/SKILL.md"))
         copied = self.project / ".claude" / "skills" / own.parent.name / "SKILL.md"
@@ -274,7 +274,7 @@ class TestReview(CliTestCase):
         code, out, _ = self.run_cli("review", "prd")
         self.assertEqual(code, EXIT_OK)
         self.assertIn("dòng một", out)
-        self.assertIn("aisdlc approve prd", out)
+        self.assertIn("aisef approve prd", out)
 
     def test_truncates_long_artifact(self):
         self.write_artifact("prd.md", "\n".join(f"dòng {i}" for i in range(200)))
@@ -294,7 +294,7 @@ class TestReviewStories(CliTestCase):
         chỉ còn là thủ tục."""
         import shutil
 
-        from aisdlc.phases.story_split import split
+        from aisef.phases.story_split import split
 
         fix = Path(__file__).resolve().parent / "fixtures" / "bmad"
         for name in ("epics.md", "prd.md"):
@@ -331,10 +331,10 @@ class TestMockupCommand(CliTestCase):
     def test_review_mockups_shows_screens_and_index_link(self):
         import shutil
 
-        from aisdlc.control.design_contract import CONTRACT_FILE
-        from aisdlc.control.experience import parse_experience_file
-        from aisdlc.harness import browser
-        from aisdlc.phases.mockup import extract
+        from aisef.control.design_contract import CONTRACT_FILE
+        from aisef.control.experience import parse_experience_file
+        from aisef.harness import browser
+        from aisef.phases.mockup import extract
 
         if browser.availability(self.project):
             self.skipTest("chưa dựng được mockup trên máy này")
@@ -401,7 +401,7 @@ class TestToolCommand(CliTestCase):
         self.assertEqual(code, EXIT_OK)
         self.assertIn("✅ test", out)
 
-        from aisdlc.harness.observe import EvidenceStore
+        from aisef.harness.observe import EvidenceStore
 
         self.assertTrue(EvidenceStore(self.artifacts).read("STORY-01-01").tests_green())
 
@@ -462,8 +462,8 @@ class TestRunCommand(CliTestCase):
 
 
 class TestCtxCommand(CliTestCase):
-    """`aisdlc ctx` (ADR-005 V7): bản đồ đầy đủ, và ghi `ctx_lookup` khi gọi
-    trong phiên có `AISDLC_STORY_ID`."""
+    """`aisef ctx` (ADR-005 V7): bản đồ đầy đủ, và ghi `ctx_lookup` khi gọi
+    trong phiên có `AISEF_STORY_ID`."""
 
     def setUp(self):
         super().setUp()
@@ -499,7 +499,7 @@ class TestCtxCommand(CliTestCase):
         import os
         from unittest import mock
 
-        with mock.patch.dict(os.environ, {"AISDLC_STORY_ID": "STORY-01-09"}):
+        with mock.patch.dict(os.environ, {"AISEF_STORY_ID": "STORY-01-09"}):
             code, out, _ = self.run_cli("ctx", "--file", "src/a.ts")
         self.assertEqual(code, EXIT_OK)
         ev = (self.artifacts / "evidence" / "STORY-01-09.jsonl").read_text(encoding="utf-8")
@@ -605,7 +605,7 @@ if __name__ == "__main__":
 
 class TestStatusNoiRoChuaMerge(CliTestCase):
     def test_xong_nhung_chua_merge_duoc_goi_ten(self):
-        from aisdlc.control.journal import Entry, JournalStore
+        from aisef.control.journal import Entry, JournalStore
         store = StateStore(self.artifacts)
         store.register("S-01", "E-01")
         for b in (StoryStatus.RUNNING, StoryStatus.VERIFYING, StoryStatus.DONE):
@@ -647,8 +647,8 @@ class TestStatusCanhBaoNguCanhPhinh(CliTestCase):
     đo thật: `prompt_chars` trong evidence, cảnh báo story vượt 3× trung vị."""
 
     def test_story_nap_gap_ba_bi_goi_ten(self):
-        from aisdlc.clients.stream import RunResult
-        from aisdlc.harness.observe import EvidenceStore
+        from aisef.clients.stream import RunResult
+        from aisef.harness.observe import EvidenceStore
         store = StateStore(self.artifacts)
         ev = EvidenceStore(self.artifacts)
         for sid, chars in (("S-01", 10_000), ("S-02", 11_000), ("S-03", 12_000), ("S-04", 90_000)):
@@ -660,8 +660,8 @@ class TestStatusCanhBaoNguCanhPhinh(CliTestCase):
         self.assertNotIn("S-02", out.split("nạp ngữ cảnh")[1].split("\n\n")[0] if "nạp ngữ cảnh" in out else "")
 
     def test_it_hon_ba_story_thi_khong_ket_luan(self):
-        from aisdlc.clients.stream import RunResult
-        from aisdlc.harness.observe import EvidenceStore
+        from aisef.clients.stream import RunResult
+        from aisef.harness.observe import EvidenceStore
         store = StateStore(self.artifacts); ev = EvidenceStore(self.artifacts)
         for sid, chars in (("S-01", 1_000), ("S-02", 90_000)):
             store.register(sid, "E-01")
@@ -677,7 +677,7 @@ class TestDoctorHookTroDungDuAn(CliTestCase):
         import json
         (self.project / ".claude").mkdir(exist_ok=True)
         (self.project / ".claude" / "settings.json").write_text(json.dumps({"hooks": {"Stop": [
-            {"matcher": "", "hooks": [{"type": "command", "command": f"aisdlc --project {project_path} guard completion"}]}]}}),
+            {"matcher": "", "hooks": [{"type": "command", "command": f"aisef --project {project_path} guard completion"}]}]}}),
             encoding="utf-8")
 
     def test_lech_thi_do(self):
@@ -711,13 +711,13 @@ class TestDoctorCoverageHint(CliTestCase):
 
 
 class TestLenhDoc(CliTestCase):
-    """S2: `aisdlc doc` in tài liệu và ghi `doc_lookup` khi có --story."""
+    """S2: `aisef doc` in tài liệu và ghi `doc_lookup` khi có --story."""
 
     def test_records_evidence_for_story(self):
         import json, os
         from unittest import mock
-        from aisdlc.kit import docs as D
-        from aisdlc.harness.observe import NOTE, EvidenceStore
+        from aisef.kit import docs as D
+        from aisef.harness.observe import NOTE, EvidenceStore
         with tempfile.TemporaryDirectory() as cache, mock.patch.dict(os.environ, {D.ENV_DOCS: cache}), \
              mock.patch.object(D, "_get", lambda url, fetch=None: json.dumps({"results": [{"id": "/x/y", "title": "Y"}]}) if "/search?" in url else "tài liệu Y"):
             code, out, _ = self.run_cli("doc", "y", "--topic", "hooks", "--story", "S-1")
@@ -727,7 +727,7 @@ class TestLenhDoc(CliTestCase):
         self.assertEqual(e.detail["library"], "/x/y")
 
     def test_prompt_tools_mention_the_command(self):
-        from aisdlc.harness.tools import describe_tools
+        from aisef.harness.tools import describe_tools
         self.assertIn("doc <gói>", describe_tools(self.project))
 
 
@@ -751,13 +751,13 @@ class TestDoctorHookThieuGuard(CliTestCase):
         code, out, _ = self.run_cli("doctor")
         self.assertIn("hook claude đủ guard", out)
         self.assertIn("process-ref", out)
-        self.assertIn("aisdlc compile", out)
+        self.assertIn("aisef compile", out)
 
 
 class TestToolCoCauTruc(CliTestCase):
     """ADR-005 V11 (A): kết luận máy đọc **trước** tail, khai cắt và trỏ toàn văn —
     agent không phải tự chạy lại runner để biết test nào đỏ (lượt bị đốt vào
-    `Bash: pytest` sau một `aisdlc tool test` trên stream dogfood)."""
+    `Bash: pytest` sau một `aisef tool test` trên stream dogfood)."""
 
     def config(self, command: str) -> None:
         (self.project / ".ai").mkdir(exist_ok=True)
@@ -792,8 +792,8 @@ class TestStatusDemKetCuc(CliTestCase):
     lúc ghi; bản ghi cũ không có khoá là "chưa ghi", không suy đoán thay."""
 
     def test_dem_theo_exit_status(self):
-        from aisdlc.clients.stream import RunResult
-        from aisdlc.harness.observe import AGENT_RUN, Event, EvidenceStore
+        from aisef.clients.stream import RunResult
+        from aisef.harness.observe import AGENT_RUN, Event, EvidenceStore
         StateStore(self.artifacts).register("S-01", "E-01")
         ev = EvidenceStore(self.artifacts)
         ev.agent_run("S-01", RunResult(ok=False, error="max_turns"), name="S-01#1")

@@ -10,9 +10,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.control.normalize import Story, effective_write_scope, verification_paths  # noqa: E402
-from aisdlc.phases.story_split import render_story  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.control.normalize import Story, effective_write_scope, verification_paths  # noqa: E402
+from aisef.phases.story_split import render_story  # noqa: E402
 
 
 class TestVerificationPaths(unittest.TestCase):

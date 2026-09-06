@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.worktree import (  # noqa: E402
+from aisef.control.worktree import (  # noqa: E402
     _git,
     main_repo,
     GitError,
@@ -287,10 +287,10 @@ class TestCauHinhClientVaoWorktree(WorktreeTestCase):
         (self.repo / ".claude").mkdir()
         (self.repo / ".claude" / "settings.json").write_text("{}", encoding="utf-8")
         (self.repo / ".opencode" / "plugin").mkdir(parents=True)
-        (self.repo / ".opencode" / "plugin" / "aisdlc-guard.ts").write_text("// g", encoding="utf-8")
+        (self.repo / ".opencode" / "plugin" / "aisef-guard.ts").write_text("// g", encoding="utf-8")
         wt = self.wm.create("S-01")
         self.assertTrue((wt.path / ".claude" / "settings.json").is_file())
-        self.assertTrue((wt.path / ".opencode" / "plugin" / "aisdlc-guard.ts").is_file())
+        self.assertTrue((wt.path / ".opencode" / "plugin" / "aisef-guard.ts").is_file())
         # Không làm bẩn cây: vẫn gitignore, không có gì để commit.
         self.assertEqual(git(wt.path, "status", "--porcelain").strip(), "")
 

@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control import conformance as C  # noqa: E402
+from aisef.control import conformance as C  # noqa: E402
 
 
 def run(client, *cells, version="1.0", at="2026-09-05T00:00:00+00:00"):
@@ -92,7 +92,7 @@ class TestChiPhiKhongMatKhiGhep(unittest.TestCase):
     """Ghép cột client thứ hai đọc lại bảng: chi phí cột đầu phải còn."""
 
     def test_cost_survives_roundtrip(self):
-        from aisdlc.control import conformance as C
+        from aisef.control import conformance as C
         r = C.ClientRun(client="claude", version="1")
         r.results = [C.ProbeResult("C1", True, "d", 0.31), C.ProbeResult("C2", True, "d", 0.29)]
         rep2 = C.parse(C.Report(runs=[r]).to_markdown())
@@ -122,7 +122,7 @@ class TestBoChayHopQuyPhanMay(unittest.TestCase):
         self.assertNotIn("NGHI_CANARY_TOKEN", env)
         self.assertEqual(env["ANTHROPIC_API_KEY"], "k")
         self.assertEqual(env["GIT_TERMINAL_PROMPT"], "0")
-        self.assertEqual(env["AISDLC_STORY_ID"], "S-1")
+        self.assertEqual(env["AISEF_STORY_ID"], "S-1")
 
     def test_remote_gia_tra_401_va_ghi_authorization(self):
         import http.client

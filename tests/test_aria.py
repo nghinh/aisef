@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.harness.aria import (  # noqa: E402
+from aisef.harness.aria import (  # noqa: E402
     Component,
     compare,
     compare_snapshots,

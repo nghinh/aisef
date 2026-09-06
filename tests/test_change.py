@@ -1,4 +1,4 @@
-"""`aisdlc change` — vòng đời thay đổi sau phát hành (S4)."""
+"""`aisef change` — vòng đời thay đổi sau phát hành (S4)."""
 
 from __future__ import annotations
 
@@ -8,8 +8,8 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from aisdlc.control.approvals import ApprovalStore, Gate, Status
-from aisdlc.control.change import apply
+from aisef.control.approvals import ApprovalStore, Gate, Status
+from aisef.control.change import apply
 
 
 class TestChange(unittest.TestCase):

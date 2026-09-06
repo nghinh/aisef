@@ -6,7 +6,7 @@ import json
 import unittest
 from pathlib import Path
 
-from aisdlc.harness.testlog import parse
+from aisef.harness.testlog import parse
 
 FIX = Path(__file__).parent / "fixtures" / "testlog"
 

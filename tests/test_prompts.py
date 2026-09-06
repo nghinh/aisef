@@ -15,14 +15,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.harness.prompts import (  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.harness.prompts import (  # noqa: E402
     PROMPT_DIR,
     Prompt,
     PromptError,
     load_catalog,
 )
-from aisdlc.harness.routing import (  # noqa: E402
+from aisef.harness.routing import (  # noqa: E402
     DEVELOPER,
     REVIEWER,
     ROLES,
@@ -31,7 +31,7 @@ from aisdlc.harness.routing import (  # noqa: E402
     build_spec,
     role_of,
 )
-from aisdlc.harness.sandbox import Level  # noqa: E402
+from aisef.harness.sandbox import Level  # noqa: E402
 
 STORY_CTX = {
     "story_id": "STORY-01-01",
@@ -40,7 +40,7 @@ STORY_CTX = {
     "architecture_rules": "AR-1 …",
     "write_scope": "src/notes/",
     "mockup_section": "màn hình danh-sach",
-    "tools": "- aisdlc tool test",
+    "tools": "- aisef tool test",
     "index": "- STORY-01-01 · done · abc1234 · V3 G0 R0 · evidence/STORY-01-01.jsonl",
     "preservation": "- `AC-STORY-01-00-1` · STORY-01-00 · test `src/x.test.ts > AC-STORY-01-00-1`",
     "validation": "- test bảo toàn: `src/x.test.ts > AC-STORY-01-00-1`",
@@ -156,7 +156,7 @@ class TestSlotBanDoMa(unittest.TestCase):
             self.assertIn("repo_map", self.catalog.get(name).slots, name)
 
     def test_slot_rong_thi_khong_co_muc(self):
-        from aisdlc.phases.implement import ALLOW_EMPTY
+        from aisef.phases.implement import ALLOW_EMPTY
         text = self.catalog.get("story-implement").render({**STORY_CTX, "repo_map": ""}, allow_empty=ALLOW_EMPTY)
         self.assertNotIn("Bản đồ mã", text)
         self.assertNotIn("{{", text)

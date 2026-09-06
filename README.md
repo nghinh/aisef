@@ -1,4 +1,4 @@
-# AI-SDLC
+# AISEF
 
 Khung phát triển phần mềm bằng agent. Đầu vào của mỗi dự án là **một file**
 `docs/requirements.md`; đầu ra là một ứng dụng chạy được, kèm bằng chứng
@@ -23,16 +23,16 @@ pip install aisef
 Hoặc chạy từ bản sao kho nguồn:
 
 ```bash
-git clone <repo> ai-sdlc && cd ai-sdlc && pip install -e .
+git clone <repo> aisef && cd aisef && pip install -e .
 python3 -m unittest discover -s tests -q   # vài phút, không mở container (tests/__init__.py)
-AISDLC_TEST_DOCKER=1 python3 -m unittest tests.test_sandbox tests.test_tools -q   # thêm test Docker thật
+AISEF_TEST_DOCKER=1 python3 -m unittest tests.test_sandbox tests.test_tools -q   # thêm test Docker thật
 ```
 
-Kho skill tham chiếu **không cần clone tay**: `aisdlc setup` tự lấy về
-`~/.cache/ai-sdlc/references` đúng commit mà `aisdlc/kit/catalog.json`
+Kho skill tham chiếu **không cần clone tay**: `aisef setup` tự lấy về
+`~/.cache/aisef/references` đúng commit mà `aisef/kit/catalog.json`
 ghim (khoảng 93 MB, một lần cho mọi dự án). Máy ngoại tuyến hoặc CI trỏ
-sang chỗ khác bằng `AISDLC_REFERENCES=/duong/dan`, hoặc dùng
-`aisdlc setup --no-fetch` để chỉ xài những gì đã có trên đĩa.
+sang chỗ khác bằng `AISEF_REFERENCES=/duong/dan`, hoặc dùng
+`aisef setup --no-fetch` để chỉ xài những gì đã có trên đĩa.
 
 Không có phụ thuộc Python nào ngoài thư viện chuẩn. Tuỳ chọn:
 `docker` (cách ly khi chạy test), `playwright` (trích hợp đồng thị giác
@@ -50,44 +50,44 @@ xử lý sự cố, bảng lệnh và bảng khoá cấu hình đầy đủ.
 ```bash
 cd /duong/dan/du-an-cua-ban
 
-aisdlc doctor                       # môi trường có đủ chưa
-aisdlc setup                        # dò stack, nạp skill, sinh CLAUDE.md + AGENTS.md
-aisdlc compile                      # nối guard vào client (hook / plugin)
+aisef doctor                       # môi trường có đủ chưa
+aisef setup                        # dò stack, nạp skill, sinh CLAUDE.md + AGENTS.md
+aisef compile                      # nối guard vào client (hook / plugin)
 
-aisdlc plan                         # PRD → kiến trúc → UX → epic → story
-aisdlc gates                        # xem cổng nào đang chờ người
-aisdlc review prd                   # đọc artifact
-aisdlc approve prd                  # duyệt
+aisef plan                         # PRD → kiến trúc → UX → epic → story
+aisef gates                        # xem cổng nào đang chờ người
+aisef review prd                   # đọc artifact
+aisef approve prd                  # duyệt
 
-aisdlc mockup                       # mỗi màn hình một HTML + hợp đồng thị giác
-aisdlc approve mockups
-aisdlc approve readiness
+aisef mockup                       # mỗi màn hình một HTML + hợp đồng thị giác
+aisef approve mockups
+aisef approve readiness
 
-aisdlc run                          # hiện thực: epic tuần tự, story song song
-aisdlc run --verify-only --story STORY-01-07   # kiểm lại ứng viên đã đóng băng, không mở phiên developer
-aisdlc qa                           # bộ kiểm định
-aisdlc devsecops                    # CI + Dockerfile + triển khai + runbook
-aisdlc pre-deploy                   # cổng cuối
-aisdlc report                       # báo cáo nghiệm thu + sổ hành vi + INDEX.md
-aisdlc evidence STORY-01-04         # lịch sử một story hay một hành vi (AC-…, FR-…, qa:e2e)
-aisdlc issues --format csv          # bảng gap/hồi quy từ sổ hành vi → _bmad-output/ISSUES.csv
+aisef run                          # hiện thực: epic tuần tự, story song song
+aisef run --verify-only --story STORY-01-07   # kiểm lại ứng viên đã đóng băng, không mở phiên developer
+aisef qa                           # bộ kiểm định
+aisef devsecops                    # CI + Dockerfile + triển khai + runbook
+aisef pre-deploy                   # cổng cuối
+aisef report                       # báo cáo nghiệm thu + sổ hành vi + INDEX.md
+aisef evidence STORY-01-04         # lịch sử một story hay một hành vi (AC-…, FR-…, qa:e2e)
+aisef issues --format csv          # bảng gap/hồi quy từ sổ hành vi → _bmad-output/ISSUES.csv
 ```
 
-Chạy nhanh không cần người duyệt: `aisdlc plan --auto-approve all`. Phê duyệt
+Chạy nhanh không cần người duyệt: `aisef plan --auto-approve all`. Phê duyệt
 tự động **luôn** được ghi dấu `auto` để về sau truy được tài liệu nào chưa
 từng có người thật xem.
 
 ## Sau khi có code
 
 ```bash
-aisdlc doc vitest --topic coverage --story STORY-01-02
+aisef doc vitest --topic coverage --story STORY-01-02
 ```
 
 Tra tài liệu thật của thư viện (context7, có cache) thay vì đoán tên API; có
 `--story` thì lần tra vào bằng chứng. Khi yêu cầu đổi sau phát hành:
 
 ```bash
-aisdlc change FR-3 "Slug phải giữ dấu gạch dưới"
+aisef change FR-3 "Slug phải giữ dấu gạch dưới"
 ```
 
 Ghi vào `docs/requirements.md`, đánh dấu PRD (cổng `prd` và các cổng sau
@@ -95,7 +95,7 @@ thành stale), sinh story delta `STORY-CH-01` với `covers=[FR-3]` — story c�
 giữ nguyên `DONE`.
 
 ```bash
-aisdlc improve --epic EPIC-01 --max-loops 3      # [--auto] không dừng ở cổng người
+aisef improve --epic EPIC-01 --max-loops 3      # [--auto] không dừng ở cổng người
 ```
 
 Vòng cải tiến theo bằng chứng (ADR-004 R3): QA → sổ hành vi → **một** story
@@ -104,10 +104,10 @@ code) → `run` như story thường → QA → mốc `loops[]` + `LOOP-REPORT-<
 Dừng bằng code: hết gap, đủ `improve.max_loops`, cải thiện biên ≤ 0
 `improve.flat_loops` vòng liền, vượt `improve.cost_cap_usd`, hay story sửa bế
 tắc kế hoạch (trả người kèm lời reviewer). Trước mỗi vòng ≥ 2 cần
-`aisdlc approve improve` trừ `--auto`.
+`aisef approve improve` trừ `--auto`.
 
 ```bash
-aisdlc run --verify-only --story STORY-01-07
+aisef run --verify-only --story STORY-01-07
 ```
 
 Story trượt chỉ vì môi trường đo (e2e nhạy tải máy) thì không cần trả tiền
@@ -140,8 +140,8 @@ Tám guard, mỗi guard là một lệnh trả mã thoát, nối vào ba mốc v
 Guard nằm ở phía framework, không ở phía client — client không được tin.
 Cả Claude Code và OpenCode đều đã **chứng minh bằng phép thử trên agent
 thật** rằng guard chặn *trước* khi tool chạy, chứ không phải phát hiện
-sau. Client nào không gắn được guard tiền kiểm thì `aisdlc verify` chạy
-lại toàn bộ trên diff, và `aisdlc compile` ghi rõ mức bảo đảm thấp hơn
+sau. Client nào không gắn được guard tiền kiểm thì `aisef verify` chạy
+lại toàn bộ trên diff, và `aisef compile` ghi rõ mức bảo đảm thấp hơn
 vào báo cáo thay vì im lặng — năng lực là thứ được **khai và kiểm**, mặc
 định là "chưa chứng minh", không phải "chắc là được". Trong V1, OpenCode
 là client **hạng hai** theo quyết định V1: guard chặn được (hợp quy 7/7), và từ 2026-09-05 `--format json` cho luồng máy đọc được (tool, token, cost theo nhà cung cấp) — chưa lên hạng nhất vì chưa đủ số lần hợp quy hook ổn định; chi phí trước đó không đo
@@ -159,32 +159,32 @@ test không bắt được theo định nghĩa. Bộ hợp quy chạy bảy phé
 client thật, worktree thật, guard thật, `.claude/` không commit:
 
 ```bash
-AISDLC_CONFORMANCE=1 python3 -m unittest tests.conformance -v
+AISEF_CONFORMANCE=1 python3 -m unittest tests.conformance -v
 ```
 
 Kết quả ghép vào `docs/CONFORMANCE.md` — mỗi ô là một phiên agent, đọc từ
 đĩa (tệp còn/mất), từ luồng `tool_use` và bằng chứng guard tự ghi, không từ
 lời agent. Dự án thử và log thô từng phép giữ ở `.conformance/<client>/`
-(đổi bằng `AISDLC_CONFORMANCE_DIR`) để tra lại một ô ✗ mà không phải đoán.
+(đổi bằng `AISEF_CONFORMANCE_DIR`) để tra lại một ô ✗ mà không phải đoán.
 Bộ chạy **không** thừa hưởng biến `CLAUDE_*` của phiên gọi nó — chạy hợp
 quy từ bên trong một phiên Claude là chuyện có thật, và phiên con thừa hưởng
 cờ của phiên cha thì đo sai. Cổng
 phát hành của chính kho này đọc bảng đó bằng code
-(`AISDLC_RELEASE=1 python3 -m unittest tests.test_release_gate`): cột
+(`AISEF_RELEASE=1 python3 -m unittest tests.test_release_gate`): cột
 `claude` phải đủ năm ô ✅ và bảng không cũ hơn 14 ngày. OpenCode là hạng
 hai trong V1 — có cột, không chặn. CI: `.github/workflows/conformance.yml`
 chạy tuần.
 
 ## Phát hành
 
-Gói phân phối tên **`aisef`** trên PyPI (module Python và lệnh vẫn là `aisdlc`), phát hành khi hoàn tất đợt 4 (quyết định 2026-09-05).
+Gói, module Python và lệnh cùng tên **`aisef`** (từ 0.2.0; 0.1.0 cài `aisef` nhưng gõ `aisdlc` — bí danh cũ còn chạy tới 0.3.0, có cảnh báo).
 Điều kiện đọc bằng lệnh, không bằng cảm giác:
 
 ```bash
-python3 -m unittest discover -s tests -q && AISDLC_RELEASE=1 AISDLC_ACCEPTANCE=<dự án nghiệm thu> python3 -m unittest tests.test_release_gate -q
+python3 -m unittest discover -s tests -q && AISEF_RELEASE=1 AISEF_ACCEPTANCE=<dự án nghiệm thu> python3 -m unittest tests.test_release_gate -q
 ```
 
-`AISDLC_ACCEPTANCE` trỏ vào dự án dogfood đã nghiệm thu (v0.1.0: `e9`, phạm vi
+`AISEF_ACCEPTANCE` trỏ vào dự án dogfood đã nghiệm thu (v0.1.0: `e9`, phạm vi
 EPIC-01): cổng đọc `pre-deploy-report.json` (đạt, có phạm vi, miễn có lý do)
 và phê duyệt `pre-deploy` trên đúng bản ấy. Không đặt thì bỏ qua có nêu tên —
 không tính là đạt.
@@ -202,7 +202,7 @@ khoản tổ chức: tạo project `aisef` trên PyPI và khai trusted publisher
 git tag v0.1.0 && git push --tags
 ```
 
-Kho hồi quy dogfood (`tests/dogfood/`, bật bằng `AISDLC_DOGFOOD=1`) dựng lại
+Kho hồi quy dogfood (`tests/dogfood/`, bật bằng `AISEF_DOGFOOD=1`) dựng lại
 dự án thử `par` từ đầu vào trong kho và so với mốc đã đo — chạy trước mỗi tag.
 
 ### Giới hạn đã biết của v0.1.0
@@ -210,7 +210,7 @@ dự án thử `par` từ đầu vào trong kho và so với mốc đã đo — 
 Khai ở đây vì mọi claim phải có bằng chứng; thứ chưa chứng minh gọi là chưa
 chứng minh (quyết định chủ đầu tư 2026-09-06, `docs/RELEASE-PLAN-v0.1.0.md` §0):
 
-- **Phạm vi nghiệm thu dogfood là EPIC-01 của `e9`** (7 story, `aisdlc
+- **Phạm vi nghiệm thu dogfood là EPIC-01 của `e9`** (7 story, `aisef
   pre-deploy --epic EPIC-01`). EPIC-02..05 (16 story) chưa chạy — báo cáo ghi
   "ngoài phạm vi", không phải "xong". `e9` chưa phải sản phẩm được nghiệm thu
   hoàn chỉnh; nó là corpus nghiệm thu của framework.
@@ -253,7 +253,7 @@ trong worktree git riêng; merge tuần tự cuối đợt. Conflict lúc merge 
 ## Cấu trúc
 
 ```
-aisdlc/
+aisef/
   cli/              bộ lệnh chia theo pha, mọi lệnh gọi-một-lần, không daemon
   config.py         ngưỡng và cấu hình, có kiểu, có kiểm
   clients/          Claude Code · OpenCode; năng lực được **khai**, không giả định

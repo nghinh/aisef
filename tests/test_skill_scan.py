@@ -11,11 +11,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
-from aisdlc.clients.stream import RunResult  # noqa: E402
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.kit import registry as R  # noqa: E402
-from aisdlc.kit import skill_scan as S  # noqa: E402
+from aisef.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
+from aisef.clients.stream import RunResult  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.kit import registry as R  # noqa: E402
+from aisef.kit import skill_scan as S  # noqa: E402
 
 NOISY = """Tôi đã đọc cả ba skill. Kết luận:
 

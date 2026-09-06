@@ -20,16 +20,16 @@ sys.path.insert(0, str(ROOT))
 
 import tests  # noqa: E402,F401 — HostProvider vào chỗ docker, không mở container (tests/__init__.py)
 
-from aisdlc.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
-from aisdlc.clients.stream import RunResult  # noqa: E402
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.control.gate import evaluate  # noqa: E402
-from aisdlc.control.journal import STEPS, JournalStore  # noqa: E402
-from aisdlc.control.normalize import Story  # noqa: E402
-from aisdlc.control.outcome import Outcome  # noqa: E402
-from aisdlc.harness.guardrails import head_sha  # noqa: E402
-from aisdlc.harness.observe import AGENT_RUN, TOOL_RUN, EvidenceStore  # noqa: E402
-from aisdlc.phases.implement import implement_story  # noqa: E402
+from aisef.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
+from aisef.clients.stream import RunResult  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.control.gate import evaluate  # noqa: E402
+from aisef.control.journal import STEPS, JournalStore  # noqa: E402
+from aisef.control.normalize import Story  # noqa: E402
+from aisef.control.outcome import Outcome  # noqa: E402
+from aisef.harness.guardrails import head_sha  # noqa: E402
+from aisef.harness.observe import AGENT_RUN, TOOL_RUN, EvidenceStore  # noqa: E402
+from aisef.phases.implement import implement_story  # noqa: E402
 
 CANDIDATE = "bằng chứng đúng candidate"
 
@@ -202,7 +202,7 @@ class WorktreeCase(unittest.TestCase):
         subprocess.run(["git", "commit", "-qm", "goc"], cwd=self.project, check=True)
         self.artifacts = self.project / "_bmad-output"
         self.artifacts.mkdir()
-        self.work = self.project / ".aisdlc" / "worktrees" / "STORY-01-01"
+        self.work = self.project / ".aisef" / "worktrees" / "STORY-01-01"
         subprocess.run(["git", "worktree", "add", "-q", str(self.work), "-b", "story/x"],
                        cwd=self.project, check=True)
         self.story = Story(
@@ -247,7 +247,7 @@ class TestFreeze(WorktreeCase):
         """Số hiệu lượt của mốc mới phải là của giao dịch đang mở, nếu
         không `open_attempt()` để lại một lượt "chưa đóng" và lần chạy sau
         đi dọn một story đã xong."""
-        from aisdlc.control.journal import StoryRunTransaction
+        from aisef.control.journal import StoryRunTransaction
 
         with StoryRunTransaction(self.story.id, artifact_root=self.artifacts) as tx:
             self.implement(Client())
@@ -317,7 +317,7 @@ class TestHopQuyC8(WorktreeCase):
 
 class TestQaCandidate(unittest.TestCase):
     def test_run_suite_ghi_ban_cua_du_an(self):
-        from aisdlc.phases.qa import run_suite
+        from aisef.phases.qa import run_suite
 
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp)
@@ -340,7 +340,7 @@ class TestQaCandidate(unittest.TestCase):
 
 class TestReportCandidate(unittest.TestCase):
     def test_bao_cao_in_sha_bay_ky_tu(self):
-        from aisdlc.phases import report as report_mod
+        from aisef.phases import report as report_mod
 
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp)

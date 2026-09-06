@@ -1,6 +1,6 @@
-"""Hợp quy client — chạy trên client thật. Bật: ``AISDLC_CONFORMANCE=1``.
+"""Hợp quy client — chạy trên client thật. Bật: ``AISEF_CONFORMANCE=1``.
 
-    AISDLC_CONFORMANCE=1 python3 -m unittest tests.conformance -v
+    AISEF_CONFORMANCE=1 python3 -m unittest tests.conformance -v
 
-Kết quả ghép vào ``docs/CONFORMANCE.md``. Xem ``aisdlc/control/conformance.py``.
+Kết quả ghép vào ``docs/CONFORMANCE.md``. Xem ``aisef/control/conformance.py``.
 """

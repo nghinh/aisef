@@ -2,7 +2,7 @@
 ``docs/SANDBOX-CONFORMANCE.md`` (ADR-005 V5, T6).
 
     python3 -m tests.sandbox_conformance
-    AISDLC_SANDBOX_CONFORMANCE=1 python3 -m unittest tests.sandbox_conformance
+    AISEF_SANDBOX_CONFORMANCE=1 python3 -m unittest tests.sandbox_conformance
 
 Mỗi ô là một lần chạy thật, kèm thời gian; không ô nào suy từ khai báo.
 Docker chạy khi daemon có (``docker info``); Local luôn chạy — và cột Local
@@ -28,16 +28,16 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.harness import sandbox  # noqa: E402
-from aisdlc.harness.sandbox import Guarantee, Level, SandboxResult, SandboxSpec  # noqa: E402
+from aisef.harness import sandbox  # noqa: E402
+from aisef.harness.sandbox import Guarantee, Level, SandboxResult, SandboxSpec  # noqa: E402
 
-ENABLED = os.environ.get("AISDLC_SANDBOX_CONFORMANCE") == "1"
+ENABLED = os.environ.get("AISEF_SANDBOX_CONFORMANCE") == "1"
 DOC = ROOT / "docs" / "SANDBOX-CONFORMANCE.md"
 
 #: Harness đặt canary vào môi trường máy chủ, **ngoài** `spec.env` — S4 hỏi
 #: chúng có lọt vào trong không.
-CANARY = {"AISDLC_CANARY": "hoang-yen", "ANTHROPIC_CANARY": "hoang-yen", "AWS_CANARY": "hoang-yen"}
-PREFIXES = ("AISDLC_", "ANTHROPIC_", "AWS_")
+CANARY = {"AISEF_CANARY": "hoang-yen", "ANTHROPIC_CANARY": "hoang-yen", "AWS_CANARY": "hoang-yen"}
+PREFIXES = ("AISEF_", "ANTHROPIC_", "AWS_")
 
 
 @dataclass(frozen=True)
@@ -68,7 +68,7 @@ PROBES: list[Probe] = [
     Probe("S3", "`sh -c 'touch /etc/x'` ở WORKSPACE_WRITE", "không ghi được ngoài workspace",
           ["sh", "-c", "touch /etc/x"], Level.WORKSPACE_WRITE,
           Guarantee.NON_ROOT, lambda r, ws: not r.ok and not Path("/etc/x").exists()),
-    Probe("S4", "`env` ở WORKSPACE_WRITE; harness đặt canary `AISDLC_*`/`ANTHROPIC_*`/`AWS_*` ngoài `spec.env`",
+    Probe("S4", "`env` ở WORKSPACE_WRITE; harness đặt canary `AISEF_*`/`ANTHROPIC_*`/`AWS_*` ngoài `spec.env`",
           "bí mật máy chủ không vào trong",
           ["env"], Level.WORKSPACE_WRITE, Guarantee.SECRETS_ABSENT, _no_canary),
     Probe("S5", "`sleep 9999`, timeout 2 s", "thoát 124, `timed_out`, không để lại container",
@@ -86,7 +86,7 @@ class Cell:
 
 def _leftover_containers() -> list[str]:
     try:
-        out = subprocess.run(["docker", "ps", "-q", "--filter", "name=aisdlc-"],
+        out = subprocess.run(["docker", "ps", "-q", "--filter", "name=aisef-"],
                              capture_output=True, text=True, timeout=30).stdout
     except (OSError, subprocess.TimeoutExpired):
         return []
@@ -168,7 +168,7 @@ def to_markdown(cells: dict[str, dict[str, Cell]]) -> str:
     return "\n".join(out) + "\n"
 
 
-@unittest.skipUnless(ENABLED, "bật bằng AISDLC_SANDBOX_CONFORMANCE=1")
+@unittest.skipUnless(ENABLED, "bật bằng AISEF_SANDBOX_CONFORMANCE=1")
 class TestHopQuySandbox(unittest.TestCase):
     def test_s1_s5_moi_provider_mot_cot_chay_that(self):
         md, cells = generate()

@@ -10,10 +10,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
-from aisdlc.clients.stream import RunResult  # noqa: E402
-from aisdlc.harness.observe import NOTE, EvidenceStore  # noqa: E402
-from aisdlc.phases.implement import (  # noqa: E402
+from aisef.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
+from aisef.clients.stream import RunResult  # noqa: E402
+from aisef.harness.observe import NOTE, EvidenceStore  # noqa: E402
+from aisef.phases.implement import (  # noqa: E402
     REVIEWS_DIR,
     _reconcile,
     _reconcile_security,

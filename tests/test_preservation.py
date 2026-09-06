@@ -20,12 +20,12 @@ sys.path.insert(0, str(ROOT))
 import tests  # noqa: E402,F401 — HostProvider vào chỗ docker, không mở container (tests/__init__.py)
 sys.path.insert(0, str(ROOT / "tests"))
 
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.control import ledger as L  # noqa: E402
-from aisdlc.control.normalize import Story  # noqa: E402
-from aisdlc.control.outcome import Outcome  # noqa: E402
-from aisdlc.harness.observe import AGENT_RUN, HANDOFF, MOCKUP_MAP, Event, EvidenceStore  # noqa: E402
-from aisdlc.phases.implement import (  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.control import ledger as L  # noqa: E402
+from aisef.control.normalize import Story  # noqa: E402
+from aisef.control.outcome import Outcome  # noqa: E402
+from aisef.harness.observe import AGENT_RUN, HANDOFF, MOCKUP_MAP, Event, EvidenceStore  # noqa: E402
+from aisef.phases.implement import (  # noqa: E402
     SLOT_SOURCE,
     build_context,
     handoff_slots,
@@ -222,7 +222,7 @@ class TestHoiQuyCoChuDich(VongDoiHaiStory):
 
         def run(self, spec):
             r = super().run(spec)
-            if spec.env.get("AISDLC_STORY_ID"):
+            if spec.env.get("AISEF_STORY_ID"):
                 (Path(spec.workdir) / "src" / "a.py").write_text("x = 2\n", encoding="utf-8")
             return r
 

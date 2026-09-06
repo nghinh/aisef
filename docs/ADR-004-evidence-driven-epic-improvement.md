@@ -21,11 +21,11 @@ Một vòng = ba vai **Planner** (đọc spec 𝒮 + evidence ℰ₍t−1₎ + a
 | Ba vai, tách quyền đọc/ghi | developer / reviewer / security mỗi vai một **phiên mới** (`harness/routing.py`), reviewer không ghi (snapshot + hoàn nguyên, `implement.py::_revert_reviewer_writes`), guard phía harness | ✅ mạnh hơn HoH (guard, không chỉ quy ước) |
 | Evidence candidate-bound | `harness/observe.py`: 8 loại sự kiện theo story, `qa:<kind>`, `mockup_map`, `handoff`; `control/gate.py::evaluate` đọc evidence, không tin lời agent; `Outcome` sáu kết cục | ✅ ở **cấp story**; chưa có ở cấp hành vi/epic |
 | Frozen candidate | worktree + `changed_files(base_ref)`; reviewer bất biến | ◐ **không có SHA**: thứ tự journal hiện là `changes.detected → verification.completed → review.completed → commit.created → merge.completed` — ứng viên được commit **sau** khi kiểm; bằng chứng không gắn vào một commit |
-| Vòng lặp evidence → re-plan | lượt thử trong story (`run.max_retries`, feedback "Lượt trước chưa đạt"), bế tắc kế hoạch do reviewer kiểm chứng → trả về người; `aisdlc change FR-x` → `STORY-CH-nn` | ◐ chỉ **trong** story hoặc bằng tay; **không có vòng epic** QA → evidence → story sửa → kiểm lại |
+| Vòng lặp evidence → re-plan | lượt thử trong story (`run.max_retries`, feedback "Lượt trước chưa đạt"), bế tắc kế hoạch do reviewer kiểm chứng → trả về người; `aisef change FR-x` → `STORY-CH-nn` | ◐ chỉ **trong** story hoặc bằng tay; **không có vòng epic** QA → evidence → story sửa → kiểm lại |
 | Preservation / regression | `control/impact.py` (tệp đổi → module/test ảnh hưởng), `tdd.red_before_green`, `qa:test-delta` cho reviewer | ◐ có "bề mặt hồi quy" cho reviewer, **không** có danh sách hành vi phải giữ và không đo được "đã đúng rồi lại hỏng" |
 | Trạng thái hành vi VERIFIED/GAP/REOPENED | `Outcome` cho từng phép kiểm; `control/acceptance.py` nối `AC-<story>-<i>` ↔ tên test | ✗ không có sổ hành vi theo thời gian |
 | Cổng cỡ task | `story.max_acceptance_criteria`, `max_write_scope_paths`, `max_screen_states` (P2-12) + **`story.max_complexity`** (R5: `control/complexity.py`, hiệu chuẩn tự ghi `complexity.json`) | ✅ năm chiều, có gợi ý chẻ tất định và cảnh báo lệch ngưỡng ở `doctor` |
-| Progressive disclosure | `build_context` chọn slot theo story (handoff ghi slot + số ký tự); `aisdlc doc` nạp tài liệu khi cần | ◐ chưa có chỉ mục evidence dự án; báo cáo nghiệm thu là trang tĩnh |
+| Progressive disclosure | `build_context` chọn slot theo story (handoff ghi slot + số ký tự); `aisef doc` nạp tài liệu khi cần | ◐ chưa có chỉ mục evidence dự án; báo cáo nghiệm thu là trang tĩnh |
 | Metrics | chi phí, lượt, attempts, TCCN có test, map mockup | ✗ không có tăng trưởng năng lực đã xác minh, hồi quy, gap đã đóng, cải thiện biên |
 | Runtime tất định: schema + retry | `skill_scan` kiểm JSON; reviewer trả văn bản có thẻ `[chặn]`/`[bế tắc]` (lỗi 16 vừa sửa) | ◐ chưa có schema bắt buộc + retry cho reviewer/security |
 
@@ -53,9 +53,9 @@ Ký hiệu: **P0** = nền tảng, làm trước và đo; **P1** = tạo giá tr
 **R2 — Sổ hành vi (ledger) với VERIFIED / GAP / REOPENED.**
 *Rationale:* HoH ghi verified/gaps/reopened; V2 chỉ có kết cục theo phép kiểm. Sổ hành vi là thứ để đo hồi quy và cải tiến.
 *Module:* `harness/observe.py` thêm loại sự kiện `BEHAVIOR` (`{id, status, candidate, source, prev}`); mới `control/ledger.py` (**phép chiếu** từ evidence hiện có, không phải kho mới): id hành vi = `AC-<story>-<i>` (qua `control/acceptance.py`), `FR-x`/`NFR-x` (qua `covers`), `qa:<kind>`, `mockup:<screen>`; trạng thái suy bằng code: test id xanh ở candidate → VERIFIED; đỏ/thiếu/unrunnable → GAP; VERIFIED trước đó rồi GAP ở candidate sau → **REOPENED** (kèm `regressed_by = story/candidate`); tệp `_bmad-output/ledger.json` + lịch sử `history[]` mỗi hành vi; `phases/report.py` đọc ledger.
-*AC:* (a) unit: chuỗi evidence xanh → đỏ → xanh cho cùng AC sinh VERIFIED → REOPENED → VERIFIED với `regressed_by` đúng; (b) chạy lại trên evidence thật của e9 hôm nay (không cần agent): ledger tái dựng được lịch sử 01-04/01-05 và đếm được số REOPENED ≥ 0 với nguồn cụ thể; (c) không có hành vi nào VERIFIED mà không có `candidate`; (d) `aisdlc report` có cột trạng thái hành vi.
+*AC:* (a) unit: chuỗi evidence xanh → đỏ → xanh cho cùng AC sinh VERIFIED → REOPENED → VERIFIED với `regressed_by` đúng; (b) chạy lại trên evidence thật của e9 hôm nay (không cần agent): ledger tái dựng được lịch sử 01-04/01-05 và đếm được số REOPENED ≥ 0 với nguồn cụ thể; (c) không có hành vi nào VERIFIED mà không có `candidate`; (d) `aisef report` có cột trạng thái hành vi.
 
-**R3 — Vòng cải tiến epic có giới hạn (`aisdlc improve --epic E --max-loops N`).**
+**R3 — Vòng cải tiến epic có giới hạn (`aisef improve --epic E --max-loops N`).**
 *Rationale:* đây là cơ chế HoH chứng minh tạo gain; nhưng HoH không có điều kiện dừng — V2 phải có, bằng code.
 *Module:* mới `phases/improve.py` **ghép** từ thứ có sẵn: `qa.run_suite` (thu evidence cấp dự án) → `ledger` (GAP/REOPENED thuộc epic) → **sinh story sửa bằng code** (`control/change.py` mở rộng: `STORY-RP-nn` trong `EPIC-RP-<E>`; mỗi story sửa = một hành vi GAP/REOPENED: acceptance = chính hành vi ấy, `write_scope` = tệp của story gốc + `verification_paths`, `verification_contract` = nguồn của hành vi, `preservation` = R4) → `run.run_epic` (phiên mới, worktree, cổng, reviewer — **không đổi**) → QA lại → ledger → vòng sau. Điều kiện dừng bằng code: (1) không còn GAP/REOPENED thuộc epic; (2) đủ `improve.max_loops`; (3) cải thiện biên ≤ 0 trong `improve.flat_loops` vòng liên tiếp (Δverified − Δreopened); (4) vượt `improve.cost_cap_usd`; (5) story sửa bị bế tắc kế hoạch → dừng, trả người. Mỗi vòng ghi `LOOP-REPORT-<n>.md` và cần cổng người `improve` trước vòng 2 trừ khi `--auto` (vẫn bị chặn bởi 1–5).
 *AC:* (a) unit với client giả: 2 GAP → vòng 1 sửa 1, vòng 2 sửa 1, vòng 3 dừng vì "không còn gap"; flat-loops dừng đúng; cost cap dừng đúng; (b) bất biến: mọi story sửa chạy qua `run_epic` (worktree, cổng, reviewer khác developer) — kiểm bằng evidence `handoff`; (c) benchmark B1 (§5) trên e9 EPIC-01.
@@ -74,7 +74,7 @@ Ký hiệu: **P0** = nền tảng, làm trước và đo; **P1** = tạo giá tr
 
 **R6 — Progressive disclosure cho trạng thái/evidence dự án.**
 *Rationale:* HoH: chỉ mục ngắn có phân loại, chi tiết khi cần. V2 nạp story contract + kiến trúc + mockup + impact; chưa có chỉ mục evidence và sẽ tràn nếu R2/R4 đổ cả lịch sử vào prompt.
-*Module:* `control/ledger.py::index()` sinh `_bmad-output/INDEX.md` (≤ 1 dòng/story: trạng thái, candidate, VERIFIED/GAP/REOPENED, đường dẫn evidence); `build_context` chỉ nạp lát cắt epic của chỉ mục + `preservation` của story; CLI `aisdlc evidence <story|behavior-id>` để agent tra khi cần (ghi `note:evidence_lookup` như `doc_lookup`); trần ký tự cho slot mới.
+*Module:* `control/ledger.py::index()` sinh `_bmad-output/INDEX.md` (≤ 1 dòng/story: trạng thái, candidate, VERIFIED/GAP/REOPENED, đường dẫn evidence); `build_context` chỉ nạp lát cắt epic của chỉ mục + `preservation` của story; CLI `aisef evidence <story|behavior-id>` để agent tra khi cần (ghi `note:evidence_lookup` như `doc_lookup`); trần ký tự cho slot mới.
 *AC:* (a) prompt_chars developer không vượt +15 % so với hôm nay trên `par` và e9 01-05; (b) unit: chỉ mục ≤ N dòng, tra một hành vi trả đúng lịch sử; (c) cổng giữ nguyên kết cục trên dogfood.
 
 **R7 — Metrics cải tiến liên tục.**
@@ -97,7 +97,7 @@ Ký hiệu: **P0** = nền tảng, làm trước và đo; **P1** = tạo giá tr
 **R10 — Planner agent cho story sửa** (chỉ khi R3 đo được gain nhưng story sinh bằng code quá thô): agent viết lại tiêu đề/tiêu chí story sửa từ gap + preservation, vẫn qua cổng `stories` và cổng cỡ.
 **R11 — Vòng cấp dự án nhiều epic** (T vòng qua nhiều epic) — sau khi R3 ổn trên một epic.
 **R12 — Xuất issue table** (GitHub Issues/CSV) từ ledger — tiện theo dõi, không ảnh hưởng cổng.
-**R13 — Lượt kiểm-lại trên ứng viên đã đóng băng** (`aisdlc run --story S --verify-only`) — **hiện thực 2026-09-06, unit xanh trên client giả, chưa đo agent thật (§6)**: không mở phiên developer; ứng viên = HEAD nhánh story; chạy lại đúng các phép kiểm có bằng chứng ✗/thiếu ở ứng viên ấy (rà soát/bảo mật đã ✅ ở cùng SHA thì giữ, theo luật stale của R1). Cần vì: e9 STORY-01-07 2026-09-06 trượt lượt 3 chỉ vì e2e nhạy tải máy, ứng viên `a60612e` đo lại 10/10 xanh (§6). Không nới cổng: vẫn chấm đủ, chỉ không trả tiền cho việc dựng lại mã đã có.
+**R13 — Lượt kiểm-lại trên ứng viên đã đóng băng** (`aisef run --story S --verify-only`) — **hiện thực 2026-09-06, unit xanh trên client giả, chưa đo agent thật (§6)**: không mở phiên developer; ứng viên = HEAD nhánh story; chạy lại đúng các phép kiểm có bằng chứng ✗/thiếu ở ứng viên ấy (rà soát/bảo mật đã ✅ ở cùng SHA thì giữ, theo luật stale của R1). Cần vì: e9 STORY-01-07 2026-09-06 trượt lượt 3 chỉ vì e2e nhạy tải máy, ứng viên `a60612e` đo lại 10/10 xanh (§6). Không nới cổng: vẫn chấm đủ, chỉ không trả tiền cho việc dựng lại mã đã có.
 
 ---
 
@@ -125,7 +125,7 @@ Ký hiệu: **P0** = nền tảng, làm trước và đo; **P1** = tạo giá tr
 - **Journal**: thứ tự bước mới `attempt.started → worktree.created → status.running → changes.detected → candidate.frozen(sha) → verification.completed → review.completed → merge.completed → attempt.committed`; `commit.created` trở thành `candidate.frozen`.
 - **`stories.index.json`**: story thêm `repair_of` (hành vi), `loop`, `preservation` (danh sách id); waves cho `EPIC-RP-<E>`.
 - **Config**: `improve.max_loops` (3), `improve.flat_loops` (2), `improve.cost_cap_usd`, `story.max_complexity`, `context.max_preservation_chars`.
-- **CLI**: `aisdlc improve --epic E [--max-loops N] [--auto]`, `aisdlc evidence <id>`, `aisdlc report` mở rộng; `aisdlc run --story S --verify-only [--client c]` (R13).
+- **CLI**: `aisef improve --epic E [--max-loops N] [--auto]`, `aisef evidence <id>`, `aisef report` mở rộng; `aisef run --story S --verify-only [--client c]` (R13).
 - **Cổng người mới `improve`** trong `control/approvals.py` (giữa `readiness` và `pre-deploy`): duyệt tiếp tục vòng ≥ 2.
 - **Hợp quy**: phép **C8** (stale candidate) vào `docs/CONFORMANCE.md`.
 
@@ -151,7 +151,7 @@ Thứ tự làm: R1 → R2 (B0) → R4 → R3 (B1) → R5 (B4) → R6/R7 → R8/
 
 ## 6. Số đo (điền khi hiện thực)
 
-**R13 — Lượt kiểm-lại trên ứng viên đã đóng băng (`aisdlc run --story S --verify-only`): hiện thực 2026-09-06, unit xanh trên client giả, chưa đo agent thật.**
+**R13 — Lượt kiểm-lại trên ứng viên đã đóng băng (`aisef run --story S --verify-only`): hiện thực 2026-09-06, unit xanh trên client giả, chưa đo agent thật.**
 
 * Đường đi: `run.run_verify_only` → `run_epic(verify_only=True)` với kế hoạch thu về **một đợt một story** → `_run_wave` tạo lại worktree từ nhánh story mà **không** mang nhánh chính vào (`WorktreeManager.create(refresh=False)` — một commit merge là một bản mới, mọi bằng chứng cũ thành stale) → `implement.verify_only` (cùng chữ ký `implement_story`, gọi thay thế) → merge, `done`, `attempt.committed`, dọn worktree **cùng mã** với lượt thường. Không có đường riêng để lệch.
 * `implement.verify_candidate(reuse=…)`: nửa sau của `run_attempt` (đóng băng xong → test/lint → `qa:*` → mockup → rà soát → bảo mật → cổng → `gate:verdict`) tách ra; `run_attempt` gọi với `reuse=False` (chạy đủ như trước), lượt kiểm-lại gọi `reuse=True`. Luật giữ/chạy: test · lint · `qa:fake-tests` · `qa:<kind>` · `mockup:<screen>` **giữ** khi bằng chứng *mới nhất* của phép ấy mang đúng SHA và xanh thật (không `skipped`, không `unrunnable` — hai thứ ấy chạy lại rẻ và có thể đã đổi); rà soát/bảo mật **giữ** khi có `agent_run <story>-review|-security` **và** `tool_run review|security` cùng SHA — kể cả kết luận chặn: người rà soát đã nói về đúng bản này, hỏi lại là trả tiền cho cùng câu trả lời, muốn qua thì phải đổi mã, tức một lượt developer. Mốc là `tool_run review` chứ không phải `note review:verdict`: bản ghi ấy là đúng đầu vào cổng đã dùng và có cả khi model không trả JSON (client giả, nhật ký trước R8).
@@ -188,7 +188,7 @@ Chưa có (cần lượt agent thật): AC (d) *không tăng số lượt/chi ph
 `story.max_complexity` = 16,0 (`story.max_screen_states` = 8 giữ nguyên và
 vẫn chặn riêng), `phases/run.py` ghi `_bmad-output/complexity.json` sau
 `verification.completed`, `phases/story_split.py` đưa gợi ý chẻ vào
-`stories.gate.json` khoá `splits`, `aisdlc doctor` cảnh báo lệch ngưỡng.
+`stories.gate.json` khoá `splits`, `aisef doctor` cảnh báo lệch ngưỡng.
 
 **Điểm** = trạng thái màn hình ×1 + tiêu chí chấp nhận ×1 + đường dẫn
 `write_scope` ×0,5 (không tính manifest/lockfile) + fan-in phụ thuộc ×1 +
@@ -259,7 +259,7 @@ phí thật.
 
 **Hiệu chuẩn tự ghi.** `_bmad-output/complexity.json` giữ mỗi story một
 dòng {điểm, từng thành phần, ngưỡng lúc chấm, lượt đầu, số lượt thử, có
-chạm `max_turns`}. `aisdlc doctor` cảnh báo khi ≥ 2 story dưới ngưỡng mà
+chạm `max_turns`}. `aisef doctor` cảnh báo khi ≥ 2 story dưới ngưỡng mà
 chạm `max_turns` ("ngưỡng quá cao") hoặc ≥ 2 story trên ngưỡng mà xong
 ngay lượt đầu dưới nửa trần ("ngưỡng quá thấp"). Một story lệch không đủ
 kết luận — đúng như hai trường hợp ở trên.
@@ -299,7 +299,7 @@ Hai lỗi thật của đợt 2 lộ ra ngay lượt đầu trên agent thật, 
 * R1: nhật ký có `changes.detected → candidate.frozen` mỗi lượt, mọi bằng chứng sau phiên developer (lint, test, `qa:*`, mockup_map, rà soát, bảo mật) mang đúng SHA của lượt; mục "bằng chứng đúng candidate" ✅ ở cả 3 lượt; không lượt rà soát nào bị huỷ vì đổi HEAD. Không có phiên agent nào thêm — AC (d) "không tăng lượt/chi phí" **đạt** trên story này (chi phí thêm = 3 lần `git commit`).
 * R8 / B7: 6/6 phiên rà soát trả khối JSON đúng schema ngay lượt đầu, **0** lần hỏi lại (`review:no-schema`/`*-retry` không xuất hiện); 0 `review:mismatch` — bản văn bản và bản máy đọc khớp theo khoá (thẻ, tệp). Chi phí thêm của R8 trên agent thật = 0 lượt.
 * Kết cục story: **trượt** sau 3 lượt (`run.max_retries` = 2). Lượt 3 rà soát ✅, bảo mật ✅, chỉ e2e ✗ ở `tests/e2e/autosave.spec.ts:210` ("Đã lưu đứng ít nhất 800 ms", test của STORY-01-06). Đo lại ngay sau đó trên đúng ứng viên `a60612e` (worktree tách riêng, cùng node_modules, load 17): **10/10 e2e xanh, 15,3 s**. Lúc cổng chạy, máy đang gánh ba bộ test đầy đủ của ba luồng ADR-004 + Docker (load 40–150). Kết luận: trượt vì môi trường đo, không vì mã; harness chấm đúng theo bằng chứng nó có, và bằng chứng ấy đúng cho thời điểm ấy.
-* Điều thiếu lộ ra (ghi thành P2 R13 ở §2): **không có cách chạy lại phép kiểm trên ứng viên đã đóng băng** mà không mở phiên developer mới — R1 đã làm cho việc ấy có nghĩa (bằng chứng rà soát ở `a60612e` vẫn hợp lệ), nhưng `aisdlc run` chỉ biết "lượt mới = developer mới". Giá của khoảng trống này hôm nay: một lượt developer nữa (~$10–15) để dựng lại thứ đã có.
+* Điều thiếu lộ ra (ghi thành P2 R13 ở §2): **không có cách chạy lại phép kiểm trên ứng viên đã đóng băng** mà không mở phiên developer mới — R1 đã làm cho việc ấy có nghĩa (bằng chứng rà soát ở `a60612e` vẫn hợp lệ), nhưng `aisef run` chỉ biết "lượt mới = developer mới". Giá của khoảng trống này hôm nay: một lượt developer nữa (~$10–15) để dựng lại thứ đã có.
 
 **R8 — schema bắt buộc + retry cho đầu ra rà soát: hiện thực, unit xanh,
 chưa đo trên `par`.** (2026-09-05)
@@ -343,7 +343,7 @@ chưa đo trên `par`.** (2026-09-05)
   (R5), không có bản thứ hai. Mỗi dòng: id · story sở hữu · nguồn kiểm
   (`test_id` / `qa:<kind>` / màn hình, đọc từ `ledger.behaviors[id].source`).
   Sổ được **chiếu lại từ evidence** mỗi lượt (`ledger.build`, 1,1 s trên
-  e9) chứ không đọc `ledger.json`: tệp ấy chỉ `aisdlc report` làm mới, nên
+  e9) chứ không đọc `ledger.json`: tệp ấy chỉ `aisef report` làm mới, nên
   trong một lần `run` qua cả epic story sau sẽ không thấy hành vi story
   trước vừa xác minh. Danh sách tính **một lần trước phiên developer** và
   truyền nguyên cho reviewer, security và cổng (`build_context(...,
@@ -392,7 +392,7 @@ story B chạm cùng `src/`; đo bằng `agent_run.prompt_chars` và slot của
 | security | 4 017 | 4 328 | +411 | +10,5 % | +199 | +212 |
 
 Δ do R4 = khung + slot, đối chiếu với số đo thô: developer thô +712, trong
-đó 168 là slot `tools` in đường dẫn tuyệt đối `bin/aisdlc` của worktree dài
+đó 168 là slot `tools` in đường dẫn tuyệt đối `bin/aisef` của worktree dài
 hơn kho chính (4 dòng × 42) — không phải R4; security thô +311 vì ở bản
 370ea23 tệp lời rà soát `_bmad-output/reviews/STORY-01-02-review*.md` (đã
 ghi trước phiên bảo mật) lọt vào `diff_summary`/`impact` của chính phiên
@@ -465,7 +465,7 @@ R8 (B7). Chưa có story nào của e9/`par` có `mockup:*`/`qa:e2e` VERIFIED
 bị story sau chạm, nên nhánh `verify_screens` cho màn hình bảo toàn mới
 chỉ xanh ở unit (`test_qa_va_mockup_theo_cung_ba_ket_cuc`).
 
-### R12 — Xuất bảng gap/hồi quy (`aisdlc issues`) · hiện thực 2026-09-06, unit xanh, 0 agent
+### R12 — Xuất bảng gap/hồi quy (`aisef issues`) · hiện thực 2026-09-06, unit xanh, 0 agent
 
 `Ledger.issues(epic=, statuses=)` là phép chiếu thứ hai của cùng sổ (không
 kho mới): một dòng mỗi hành vi chưa xanh — id · loại · trạng thái · story
@@ -505,11 +505,11 @@ AC (b) đạt trên agent thật: cả hai cổng mới ✗ nêu đúng tên tes
 REOPENED đúng thủ phạm, không merge; lời feedback cho lượt sau (không xảy
 ra vì reviewer bế tắc) có tên test ở ba mục. Nửa "không ✗ oan trên chạy
 sạch" với agent thật: e9 01-07 lần 4 (cổng ✅ 16 mục kể cả bảo toàn và
-baseline, STATUS §2.9). `AISDLC_DOGFOOD_REUSE=1` chạy lại chỉ B từ bản chụp
+baseline, STATUS §2.9). `AISEF_DOGFOOD_REUSE=1` chạy lại chỉ B từ bản chụp
 `par-mutation.A` (≈ $2). Dữ liệu nói thêm ba điều:
 
 * `regressed_by` **không mang `@sha`**: lần đỏ đầu tiên của test A là lần
-  `aisdlc tool test` agent tự chạy giữa phiên (chưa đóng băng); lần đỏ ở
+  `aisef tool test` agent tự chạy giữa phiên (chưa đóng băng); lần đỏ ở
   ứng viên `516d81d` sau đó không đổi trạng thái nên chỉ cập nhật
   `candidate`. Đúng hợp đồng R2 (`[@candidate]` tuỳ chọn), SHA tra được ở
   `candidate` — không sửa.
@@ -536,7 +536,7 @@ story nào của e9/`par` có `mockup:*`/`qa:e2e` VERIFIED bị story sau chạm
 nên nhánh `verify_screens` cho màn hình bảo toàn mới chỉ xanh ở unit
 (`test_qa_va_mockup_theo_cung_ba_ket_cuc`).
 
-### R3 — Vòng cải tiến epic (`phases/improve.py`, `aisdlc improve`) · hiện thực 2026-09-06, unit xanh, **B1 chưa đo**
+### R3 — Vòng cải tiến epic (`phases/improve.py`, `aisef improve`) · hiện thực 2026-09-06, unit xanh, **B1 chưa đo**
 
 **Ghép, không thêm pha.** Mỗi vòng: `qa.run_suite` ở HEAD (bằng chứng ghi
 dưới mốc `evidence/loop-<n>.jsonl` — sổ đọc nó, `since = loop-n` đúng
@@ -615,7 +615,7 @@ chặn) vẫn làm hành vi gốc VERIFIED trong sổ dù code chưa merge — s
 `candidate` cho việc này; sổ chưa lọc theo nó.
   **Đã sửa 2026-09-06** (gộp đợt 2, `control/ledger.py`): sổ đọc nhật ký R1 — ứng viên chỉ *landed* khi giao dịch đóng băng nó kết thúc bằng `attempt.committed`/`merge.completed`; xanh ở ứng viên chưa landed **không** thành VERIFIED (đếm vào `unlanded_green` trong summary, hành vi chưa có thì ghi GAP với lý do), đỏ vẫn tính là hồi quy. Bằng chứng không có nhật ký (QA cấp dự án, mốc vòng) hoặc không khai bản giữ luật cũ. Test: `tests/test_ledger.py::TestUngVienChuaLanded`.
 
-**B1 đo thật (2026-09-06 04:0x–05:0x, `aisdlc improve --epic EPIC-01 --max-loops 2 --auto --client claude`, trần $80):**
+**B1 đo thật (2026-09-06 04:0x–05:0x, `aisef improve --epic EPIC-01 --max-loops 2 --auto --client claude`, trần $80):**
 
 | vòng | story sửa | hành vi | lượt thử | developer (lượt) | chi phí | Δverified − Δreopened | gap epic |
 |---|---|---|---|---|---|---|---|
@@ -637,7 +637,7 @@ Dừng đúng điều kiện (2): đủ `improve.max_loops`. Bất biến (b) gi
 
 Dừng: "cải thiện biên ≤ 0 trong 2 vòng liền (loop-4, loop-5)" — `improve.flat_loops` = 2 làm đúng việc, trước khi chạm `max_loops` 8 và trần $150. Tổng B1 5 vòng ≈ $46: ba vòng đầu +1/vòng ($3–9), hai vòng sau âm ($11–15) khi hành vi còn lại không còn là "test thiếu mã" mà là `qa:*` cấp dự án và tiêu chí cần màn hình/route của story sau. Bài học cho R3: (a) thứ tự chọn gap nên ưu tiên `ac` có test id rõ trước `qa:*`; (b) một story sửa `qa:e2e` là bài toán khác hẳn (không có test AC để gắn) — cân nhắc loại `qa:*` khỏi hàng đợi sửa tự động, để người quyết (ghi P2, đo khi có bench). Sổ toàn dự án sau 5 vòng: 46 → 44 VERIFIED (hai hành vi bị lượt trượt làm đỏ, chưa ai chữa — chính là việc của vòng kế nếu mở lại).
 
-**QĐ B6 (chủ đầu tư, 2026-09-06 11:00) — hiện thực cùng ngày, unit xanh, chưa chạy lại vòng thật:** (a) `qa:*` cấp dự án **ra khỏi** hàng đợi sửa tự động (`improve.repair_queue`), thứ tự REOPENED → `ac` → `fr`/`nfr` → `mockup`; lý do dừng nêu gap ngoài hàng đợi. (b) **Không nới V3**: cách RP-02/03/04 đóng gap (gắn mã story vào test có sẵn) không được tính — test vẫn xanh khi bỏ phần cài đặt của story sửa; story sửa phải tạo/đổi một hành vi chứng minh bằng đối chứng nop (story body nói rõ). (c) Gap chỉ thiếu truy vết (test có sẵn đã chứng minh đủ) **không** thành story sửa: người rà soát trả `[bế tắc] truy vết: <test id>`, harness xử lý như sửa siêu dữ liệu — `aisdlc evidence <AC> --link TEST --why …` ghi `traceability.json`, sổ vẫn đòi test ấy xanh ở ứng viên landed, nguồn ghi `via: traceability`. Hệ quả cho B1: ba vòng "+1" đầu **không tái hiện được** dưới luật mới (chúng là (b)); số đo R3 hợp lệ còn lại là: dừng đúng điều kiện, chi phí/vòng, 0 hồi quy — gain thật phải đo lại trên gap loại (a)/(c) sau v0.1.0 (một smoke loop nếu rẻ).
+**QĐ B6 (chủ đầu tư, 2026-09-06 11:00) — hiện thực cùng ngày, unit xanh, chưa chạy lại vòng thật:** (a) `qa:*` cấp dự án **ra khỏi** hàng đợi sửa tự động (`improve.repair_queue`), thứ tự REOPENED → `ac` → `fr`/`nfr` → `mockup`; lý do dừng nêu gap ngoài hàng đợi. (b) **Không nới V3**: cách RP-02/03/04 đóng gap (gắn mã story vào test có sẵn) không được tính — test vẫn xanh khi bỏ phần cài đặt của story sửa; story sửa phải tạo/đổi một hành vi chứng minh bằng đối chứng nop (story body nói rõ). (c) Gap chỉ thiếu truy vết (test có sẵn đã chứng minh đủ) **không** thành story sửa: người rà soát trả `[bế tắc] truy vết: <test id>`, harness xử lý như sửa siêu dữ liệu — `aisef evidence <AC> --link TEST --why …` ghi `traceability.json`, sổ vẫn đòi test ấy xanh ở ứng viên landed, nguồn ghi `via: traceability`. Hệ quả cho B1: ba vòng "+1" đầu **không tái hiện được** dưới luật mới (chúng là (b)); số đo R3 hợp lệ còn lại là: dừng đúng điều kiện, chi phí/vòng, 0 hồi quy — gain thật phải đo lại trên gap loại (a)/(c) sau v0.1.0 (một smoke loop nếu rẻ).
 
 **Chưa đo:** đường cong nhiều vòng hơn (còn 15 gap; kỳ vọng phẳng khi tới các gap cần route/màn hình của story sau), và B3/B5/B6 trên `par`.
 
@@ -750,7 +750,7 @@ của story B ≠ A — đúng con số HoH đo 17/81 ở Fusepoint):
 
 Nguồn của cả hai lần: cùng một test đỏ,
 `src/store/notes.test.ts > Đọc danh sách theo cửa sổ, không quét toàn kho
-(AC-STORY-01-04-1, AC-STORY-01-04-3, AR-7, AR-9)` — `aisdlc evidence
+(AC-STORY-01-04-1, AC-STORY-01-04-3, AR-7, AR-9)` — `aisef evidence
 AC-STORY-01-04-1` in ra đúng chuỗi gap → verified → reopened → verified →
 reopened → verified kèm tên test của từng bước.
 
@@ -783,7 +783,7 @@ candidate của `INDEX.md` là `—`. AC-(c) của R2 ("không hành vi nào VER
 mà không có candidate") **chưa đạt được** và chỉ đạt sau R1; sổ đã sẵn chỗ
 (`detail.candidate` đọc ở mọi sự kiện, rỗng là hợp lệ với bằng chứng cũ).
 
-### R6 — Progressive disclosure (chỉ mục + `aisdlc evidence`)
+### R6 — Progressive disclosure (chỉ mục + `aisef evidence`)
 
 `Ledger.index()` sinh `_bmad-output/INDEX.md`: **một dòng mỗi story**
 (trạng thái · candidate 7 ký tự · V/G/R · đường dẫn evidence) + một dòng mỗi
@@ -791,7 +791,7 @@ epic. e9: 23 dòng cho 18 story / 5 epic; `par`: 8 dòng cho 5 story / 3 epic.
 `build_context` thêm slot `index` (nguồn `ledger`) = **lát cắt epic chứa
 story**, trần `context.max_index_chars` (mặc định 2000) — e9 EPIC-01 là 8
 dòng / 497 ký tự, tức ~3,7 % prompt developer hôm nay (13,5k), trong ngưỡng
-+15 % của B5. Lịch sử **không** vào prompt: `aisdlc evidence <story|hành vi>`
++15 % của B5. Lịch sử **không** vào prompt: `aisef evidence <story|hành vi>`
 in đường đời đầy đủ khi cần, và ghi `note:evidence_lookup` như `doc_lookup`.
 `story-implement` lên v4 với mục "Trạng thái epic".
 
@@ -810,7 +810,7 @@ biên chỉ có số từ R3 trở đi. B6 đạt phần "bảng có số"; ph�
 `loops[]` là phần **duy nhất** của sổ không suy được từ bằng chứng (mốc và
 chi phí của một vòng là quyết định của người điều phối, không nằm trong
 `evidence/`), nên `build()` mang nó sang từ sổ cũ. Không làm thế thì một lần
-`aisdlc report` — vốn chiếu lại sổ mỗi lần chạy — sẽ xoá sạch mốc mà vòng R3
+`aisef report` — vốn chiếu lại sổ mỗi lần chạy — sẽ xoá sạch mốc mà vòng R3
 vừa chốt; có test riêng cho đúng điều này.
 
 **Quyết định sau B5 (2026-09-06 06:25):** hạ mặc định `context.max_preservation_chars` 1 500 → 1 200 để Δ developer về ≈ +15 %; chưa đo lại trên agent thật — story kế trên e9 sẽ cho số.

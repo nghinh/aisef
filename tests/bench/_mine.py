@@ -26,7 +26,7 @@ không tách sạch; lỗi 22 không có mã — cả ba bỏ, nêu tên ở `SK
 mang lý do nhưng **không** ghi prompt.
 
 Task lỗi kho commit vào `tests/bench/tasks/` (mã của kho). Task story sinh
-lúc chạy từ e9 (`AISDLC_BENCH_E9`, chỉ đọc) vào `.bench/tasks/` — nội dung
+lúc chạy từ e9 (`AISEF_BENCH_E9`, chỉ đọc) vào `.bench/tasks/` — nội dung
 dự án thử không vào kho.
 """
 
@@ -43,22 +43,24 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.config import Config  # noqa: E402
-from aisdlc.control.impact import is_test_path  # noqa: E402
-from aisdlc.control.journal import JournalStore  # noqa: E402
-from aisdlc.harness.observe import AGENT_RUN, TOOL_RUN, EvidenceStore  # noqa: E402
-from aisdlc.harness.tools import BASELINE_RUN  # noqa: E402
+from aisef.config import Config  # noqa: E402
+from aisef.control.impact import is_test_path  # noqa: E402
+from aisef.control.journal import JournalStore  # noqa: E402
+from aisef.harness.observe import AGENT_RUN, TOOL_RUN, EvidenceStore  # noqa: E402
+from aisef.harness.tools import BASELINE_RUN  # noqa: E402
 
 #: Task lỗi kho — mã của kho, commit được.
 TASKS_DIR = Path(__file__).resolve().parent / "tasks"
 #: Tạo tác bench (task story, bản chép, kết quả) — gitignore.
-KEEP_DIR = Path(os.environ.get("AISDLC_BENCH_DIR") or (ROOT / ".bench"))
+KEEP_DIR = Path(os.environ.get("AISEF_BENCH_DIR") or (ROOT / ".bench"))
 #: Story tốn hơn mức này trong lịch sử thì vẫn ghi nhưng đánh dấu `too_big`:
 #: 01-04 $184/17 lượt developer — 3 lượt × 2 client ≈ $1 000, không lặp được.
 TOO_BIG_USD = 100.0
 
 #: Đường dẫn không phải mã của task: tạo tác harness, cấu hình client, tài liệu.
-_NOT_CODE = ("docs/", "_bmad-output/", ".claude/", ".opencode/", ".ai/", ".aisdlc/", ".github/")
+#: Thư mục nguồn của framework, gồm tên trước 0.2.0 — xem `invalid_reason`.
+SRC_PREFIXES = ("aisef/", "aisdlc/")
+_NOT_CODE = ("docs/", "_bmad-output/", ".claude/", ".opencode/", ".ai/", ".aisef/", ".github/")
 _NOT_CODE_NAMES = ("README.md", "CHANGELOG.md", ".gitignore")
 
 
@@ -269,7 +271,7 @@ class Bug:
 
 BUGS: tuple[Bug, ...] = (
     Bug("13", "test_stray_dir_is_not_a_worktree",
-        "`WorktreeManager.create` coi thư mục có sẵn trong `.aisdlc/worktrees/` là worktree có sẵn: một tiến trình "
+        "`WorktreeManager.create` coi thư mục có sẵn trong `.aisef/worktrees/` là worktree có sẵn: một tiến trình "
         "dev server sống sót sau khi gỡ worktree ghi lại `.vite/` vào đúng chỗ, lần chạy sau agent làm việc trong một "
         "thư mục thường nằm trong repo chính, guard diff-scope so với repo chính và chặn mọi Bash (16 lần, developer "
         "chạy 40 phút không làm được gì)."),
@@ -297,12 +299,12 @@ BUGS: tuple[Bug, ...] = (
         "ứng viên nào đã vào nhánh chính — cùng lớp J: hai luật cho một sự thật."),
     Bug("26-27", "test_xanh_truoc_khi_dong_bang_khong_thanh_verified",
         "26: Sổ hành vi coi bằng chứng không mang candidate là landed; với story đã đóng băng thì đó là lần "
-        "`aisdlc tool test` agent tự chạy giữa phiên — xanh ở đó làm 3 hành vi của story trượt, chưa merge thành "
+        "`aisef tool test` agent tự chạy giữa phiên — xanh ở đó làm 3 hành vi của story trượt, chưa merge thành "
         "VERIFIED. 27: `verified_touched` bỏ hành vi REOPENED → lượt 2 của chính story gây hồi quy không còn thấy hành "
         "vi nó vừa làm hỏng trong slot lẫn mục \"bảo toàn\" (mục ấy ✅ trong khi test story trước còn đỏ)."),
     Bug("25", "TestStorySuaKhongLamStaleCongStories",
         "Vòng cải tiến ghi story sửa vào `stories.index.json` → cổng người `stories`/`readiness` đã duyệt thành stale, "
-        "lần gọi `aisdlc improve` kế bị chính vòng trước chặn (exit 2)."),
+        "lần gọi `aisef improve` kế bị chính vòng trước chặn (exit 2)."),
     Bug("16", "TestPersistVerdict",
         "Lời người rà soát không được lưu nguyên văn; mục `[chặn]`/`[bế tắc]` nhiều dòng chỉ giữ dòng đầu → lý do bế "
         "tắc trong sprint-status cụt ở \"— không.\", bằng chứng chặn story mà người đọc không kiểm lại được."),
@@ -345,15 +347,15 @@ SKIPPED_BUGS = {
     "22": "không có mã: bằng chứng đúng, môi trường đo sai (lớp I) — không có gì để hoàn nguyên",
 }
 
-_BUG_PROMPT = """# Lỗi kho AI-SDLC — #{id}
+_BUG_PROMPT = """# Lỗi kho AISEF — #{id}
 
 Triệu chứng đo trên agent thật (không phải suy từ mã):
 
 - {symptom}
 
 Kiểm: `{verify}` — test hồi quy đang đỏ ở kho này. Sửa **nguồn** trong
-`aisdlc/` cho test xanh; không sửa, không đổi tên, không xoá test. Chạy
-`aisdlc tool test` để lần chạy vào bằng chứng.
+`aisef/` cho test xanh; không sửa, không đổi tên, không xoá test. Chạy
+`aisef tool test` để lần chạy vào bằng chứng.
 """
 
 
@@ -369,7 +371,7 @@ def mine_bugs(repo_root: Path | str, out_dir: Path | str = TASKS_DIR, bugs: tupl
     out = Path(out_dir)
     tasks = []
     for bug in bugs:
-        task = Task(id=f"bug-{bug.id}", source="bug", tests_visible=True, write_scope=["aisdlc"])
+        task = Task(id=f"bug-{bug.id}", source="bug", tests_visible=True, write_scope=["aisef"])
         tests: list[str] = []
         src: list[str] = []
         sha = _find_commit(repo, bug.key)
@@ -380,8 +382,12 @@ def mine_bugs(repo_root: Path | str, out_dir: Path | str = TASKS_DIR, bugs: tupl
             task.base = _git(repo, "rev-parse", sha + "^")
             tests, src = split_paths(_git(repo, "show", "--format=", "--name-only", sha).splitlines())
             mods = sorted(p[:-3].replace("/", ".") for p in tests if re.fullmatch(r"tests/test_\w+\.py", p))
-            if not tests or not mods or not any(p.startswith("aisdlc/") for p in src):
-                task.invalid_reason = "commit không tách được nguồn/test (thiếu test unit hoặc thiếu nguồn aisdlc/)"
+            # Kho mang cả lịch sử **trước** lần đổi tên `aisdlc` → `aisef`
+            # (0.2.0): commit cũ sửa `aisdlc/…`, commit mới sửa `aisef/…`.
+            # Mỏ task đào cả hai thời kỳ nên phải nhận cả hai tiền tố.
+            if not tests or not mods or not any(p.startswith(SRC_PREFIXES) for p in src):
+                task.invalid_reason = ("commit không tách được nguồn/test "
+                                       "(thiếu test unit hoặc thiếu nguồn aisef/)")
             task.verify = "python3 -m unittest -v " + " ".join(mods)
         prompt = _BUG_PROMPT.format(id=bug.id, symptom=bug.symptom, verify=task.verify)
         loi = lint_prompt(prompt, forbid=(_git(repo, "log", "-1", "--format=%s", sha) if sha else "",))

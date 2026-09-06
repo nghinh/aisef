@@ -10,8 +10,8 @@ Kỳ vọng (AC (b) của R4 + R9): cổng "bảo toàn" / "không làm đỏ te
 ✗ nêu đúng test của A; `ledger.build()` cho `AC-STORY-01-01-1` REOPENED
 với `regressed_by = STORY-01-04#n@sha`; **không** merge.
 
-Bật bằng ``AISDLC_DOGFOOD=1`` (≈ $5–10). Cây sau story A được chụp lại
-(`par-mutation.A`); ``AISDLC_DOGFOOD_REUSE=1`` chạy lại chỉ story B từ bản
+Bật bằng ``AISEF_DOGFOOD=1`` (≈ $5–10). Cây sau story A được chụp lại
+(`par-mutation.A`); ``AISEF_DOGFOOD_REUSE=1`` chạy lại chỉ story B từ bản
 chụp ấy (≈ $3–5) — chạy lại A chỉ để đo B là đốt tiền vô ích.
 """
 
@@ -63,16 +63,16 @@ def _main_head(project: Path) -> str:
 
 
 def _evidence(project: Path, sid: str):
-    from aisdlc.harness.observe import EvidenceStore
+    from aisef.harness.observe import EvidenceStore
     return EvidenceStore(project / "_bmad-output").read(sid)
 
 
-@unittest.skipUnless(R.ENABLED and shutil.which("claude"), "AISDLC_DOGFOOD=1 và có `claude`")
+@unittest.skipUnless(R.ENABLED and shutil.which("claude"), "AISEF_DOGFOOD=1 và có `claude`")
 class TestParMutation(unittest.TestCase):
     def _story_a(self) -> Path:
         snap = R.KEEP_DIR / SNAPSHOT
         project = R.KEEP_DIR / "par-mutation"
-        if os.environ.get("AISDLC_DOGFOOD_REUSE") == "1" and snap.is_dir():
+        if os.environ.get("AISEF_DOGFOOD_REUSE") == "1" and snap.is_dir():
             shutil.rmtree(project, ignore_errors=True)
             shutil.copytree(snap, project, symlinks=True)
             return project
@@ -88,11 +88,11 @@ class TestParMutation(unittest.TestCase):
         return project
 
     def test_hoi_quy_lien_story_bi_bat(self):
-        from aisdlc.control import ledger as L
-        from aisdlc.control.gate import _baseline_check, _preservation_check
-        from aisdlc.harness.observe import AGENT_RUN, NOTE, TOOL_RUN
-        from aisdlc.phases.implement import preservation_items
-        from aisdlc.phases.run import load_plan
+        from aisef.control import ledger as L
+        from aisef.control.gate import _baseline_check, _preservation_check
+        from aisef.harness.observe import AGENT_RUN, NOTE, TOOL_RUN
+        from aisef.phases.implement import preservation_items
+        from aisef.phases.run import load_plan
 
         project = self._story_a()
         root = project / "_bmad-output"

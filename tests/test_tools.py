@@ -7,17 +7,18 @@ import os
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from tests import needs_docker  # noqa: E402 — HostProvider vào chỗ docker (tests/__init__.py)
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.harness.observe import TOOL_RUN, EvidenceStore  # noqa: E402
-from aisdlc.harness.tools import (  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.harness.observe import TOOL_RUN, EvidenceStore  # noqa: E402
+from aisef.harness.tools import (  # noqa: E402
     TOOLS,
-    aisdlc_command,
+    aisef_command,
     command_for,
     image_for,
     describe_tools,
@@ -179,7 +180,7 @@ class TestProviderGia(ToolTestCase):
     sandbox thành `unrunnable`, không thành test đỏ."""
 
     def test_loi_ha_tang_la_khong_chay_duoc_khong_phai_test_do(self):
-        from aisdlc.harness import sandbox
+        from aisef.harness import sandbox
 
         fake = sandbox.FakeProvider([sandbox.SandboxResult(
             125, stderr="docker: Error response from daemon: pull access denied",
@@ -204,13 +205,36 @@ class TestProviderGia(ToolTestCase):
         self.assertIn("network_none", res.summary())
 
 
+class TestLenhGoiFramework(unittest.TestCase):
+    """`aisef_command()` là thứ đi vào hook và vào prompt — trỏ sai thì guard
+    không chạy mà **không ai báo gì**."""
+
+    def test_uu_tien_ten_tren_path(self):
+        with mock.patch("shutil.which", return_value="/usr/local/bin/aisef"):
+            self.assertEqual(aisef_command(), "aisef")
+
+    def test_khong_co_tren_path_thi_dung_bin_cua_kho(self):
+        with mock.patch("shutil.which", return_value=None):
+            got = aisef_command()
+        self.assertTrue(got.endswith("bin/aisef"), got)
+        self.assertTrue(Path(got).is_file(), "đường dẫn trả về phải tồn tại")
+
+    def test_ban_cai_tu_wheel_lui_ve_python_m(self):
+        """Wheel không mang `bin/`. Trước 0.2.0 chỗ này trả `<site-packages>/bin/aisef`
+        — không tồn tại — nên hook im lặng không chạy guard nào."""
+        with mock.patch("shutil.which", return_value=None), \
+             mock.patch.object(Path, "is_file", return_value=False):
+            got = aisef_command()
+        self.assertEqual(got, f"{sys.executable} -m aisef.cli")
+
+
 class TestSuiteKhongMoContainer(ToolTestCase):
     """A2 kế hoạch phát hành: `run_tool` với cấu hình mặc định của dự án
     (`sandbox.provider = docker`) chạy trên `HostProvider` trong suite đơn vị —
     không container, không suy biến, bằng chứng ghi thật `host/…`. Đỏ khi hoàn
     nguyên `tests/__init__.py`."""
 
-    @unittest.skipIf(os.environ.get("AISDLC_TEST_DOCKER") == "1", "đang chạy Docker thật")
+    @unittest.skipIf(os.environ.get("AISEF_TEST_DOCKER") == "1", "đang chạy Docker thật")
     def test_cau_hinh_mac_dinh_chay_tren_host(self):
         res = run_tool("test", self.project, story_id="S-01", artifact_root=self.artifacts,
                        config=Config({**DEFAULTS, "tools.test": "true"}))
@@ -223,7 +247,7 @@ class TestSuiteKhongMoContainer(ToolTestCase):
 
 @needs_docker
 class TestRunToolQuaDockerThat(ToolTestCase):
-    """Docker thật, bật bằng `AISDLC_TEST_DOCKER=1`: `run_tool` end-to-end qua
+    """Docker thật, bật bằng `AISEF_TEST_DOCKER=1`: `run_tool` end-to-end qua
     container — bằng chứng ghi `docker/…`, và lệnh đỏ trong container vẫn là
     test đỏ, không phải "không chạy được"."""
 
@@ -251,18 +275,18 @@ class TestDescription(ToolTestCase):
             self.assertTrue(len(tool.when) > 30, tool.name)
 
     def test_prompt_names_a_command_the_agent_can_actually_run(self):
-        """`aisdlc tool test` là vô dụng nếu `aisdlc` không nằm trên PATH
+        """`aisef tool test` là vô dụng nếu `aisef` không nằm trên PATH
         của phiên agent: nó nhận "command not found", tự chạy pytest bằng
         tay, và lần chạy đó không vào bằng chứng."""
         import os
         import shutil
 
-        binary = aisdlc_command()
-        if binary != "aisdlc":
+        binary = aisef_command()
+        if binary != "aisef":
             self.assertTrue(os.path.isfile(binary), binary)
             self.assertTrue(os.access(binary, os.X_OK), binary)
         else:
-            self.assertTrue(shutil.which("aisdlc"))
+            self.assertTrue(shutil.which("aisef"))
         self.assertIn(binary, describe_tools(self.project, self.cfg))
 
     def test_prompt_table_shows_the_real_command(self):
@@ -351,7 +375,7 @@ class TestCheBiMatVaLogToanVan(ToolTestCase):
 
     def test_ten_log_baseline_khong_co_dau_hai_cham(self):
         """`test:baseline` → `-test-baseline-`: tên tệp phải mở được ở mọi hệ."""
-        from aisdlc.harness.tools import BASELINE_RUN, ToolResult, record
+        from aisef.harness.tools import BASELINE_RUN, ToolResult, record
         res = ToolResult(name="test", ok=True, stdout="\n".join(map(str, range(30))))
         path = record(res, "S-01", self.artifacts, name=BASELINE_RUN)
         self.assertEqual(Path(path).name, "S-01-test-baseline-1.log")

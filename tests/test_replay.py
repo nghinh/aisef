@@ -19,11 +19,11 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.cli import EXIT_NOT_READY, EXIT_OK, EXIT_USAGE, main  # noqa: E402
-from aisdlc.control import replay as R  # noqa: E402
-from aisdlc.control.gate import StoryGate, evaluate  # noqa: E402
-from aisdlc.control.outcome import Check, Outcome  # noqa: E402
-from aisdlc.harness.observe import NOTE, Event, EvidenceStore  # noqa: E402
+from aisef.cli import EXIT_NOT_READY, EXIT_OK, EXIT_USAGE, main  # noqa: E402
+from aisef.control import replay as R  # noqa: E402
+from aisef.control.gate import StoryGate, evaluate  # noqa: E402
+from aisef.control.outcome import Check, Outcome  # noqa: E402
+from aisef.harness.observe import NOTE, Event, EvidenceStore  # noqa: E402
 
 SID = "STORY-01-01"
 SHA = "0123456789abcdef0123456789abcdef01234567"

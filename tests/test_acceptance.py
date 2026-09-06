@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from aisdlc.control.acceptance import ac_code, codes, coverage, missing
+from aisef.control.acceptance import ac_code, codes, coverage, missing
 
 
 class TestMa(unittest.TestCase):

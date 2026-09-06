@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.harness.guardrails import (
+from aisef.harness.guardrails import (
     ALLOW,
     ENV_DISALLOWED_TOOLS,
     Verdict,
@@ -34,7 +34,7 @@ from aisdlc.harness.guardrails import (
     scope_from_env,
     scrub_secrets,
 )
-from aisdlc.harness.observe import EvidenceStore  # noqa: E402
+from aisef.harness.observe import EvidenceStore  # noqa: E402
 
 
 class TestWriteScope(unittest.TestCase):
@@ -575,19 +575,19 @@ class TestCompletion(unittest.TestCase):
         hết số lượt."""
         import os
 
-        from aisdlc.harness.tools import aisdlc_command
+        from aisef.harness.tools import aisef_command
 
-        binary = aisdlc_command()
+        binary = aisef_command()
         self.assertIn(f"{binary} tool test", self.verdict().reason)
-        if binary != "aisdlc":
+        if binary != "aisef":
             self.assertTrue(os.access(binary, os.X_OK))
 
     def test_stale_message_also_names_the_command(self):
         self.store.tool_run("S-01", "test", ok=True)
         self.store.file_change("S-01", "src/b.py")
-        from aisdlc.harness.tools import aisdlc_command
+        from aisef.harness.tools import aisef_command
 
-        self.assertIn(f"{aisdlc_command()} tool test", self.verdict().reason)
+        self.assertIn(f"{aisef_command()} tool test", self.verdict().reason)
 
     def test_last_run_red(self):
         self.store.tool_run("S-01", "test", ok=False, detail={"tail": "2 failed"})
@@ -654,7 +654,7 @@ class TestThoatKhoiCayLamViec(unittest.TestCase):
 
     def test_chan_ca_khi_ra_gocdu_an_la_cha_cua_cay(self):
         """Gốc dự án là **cha** của worktree — đúng ca đã gặp thật."""
-        v = self.guard("destructive", cwd="/tmp/par/.aisdlc/worktrees/S1",
+        v = self.guard("destructive", cwd="/tmp/par/.aisef/worktrees/S1",
                        workdir="/tmp/par")
         self.assertFalse(v.allowed)
 
@@ -689,10 +689,10 @@ class TestThoatKhoiCayLamViec(unittest.TestCase):
             "git-stage",
             {"cwd": "/tmp/par", "tool_name": "bash",
              "tool_input": {"command": "git commit -m x", "workdir": "/tmp/par"}},
-            env={ENV_WORKDIR: "/tmp/par/.aisdlc/worktrees/S1"},
+            env={ENV_WORKDIR: "/tmp/par/.aisef/worktrees/S1"},
         )
         self.assertFalse(v.allowed)
-        self.assertIn("/tmp/par/.aisdlc/worktrees/S1", v.reason)
+        self.assertIn("/tmp/par/.aisef/worktrees/S1", v.reason)
 
     def test_khong_khai_thi_lui_ve_loi_client(self):
         v = run_guard("git-stage", {
@@ -871,7 +871,7 @@ class TestGocDuAnTuEnv(unittest.TestCase):
     bằng chứng vào dự án cũ. Harness khai gốc qua env, env thắng."""
 
     def test_env_wins_over_compiled_project(self):
-        from aisdlc.harness.guardrails import ENV_PROJECT, project_root_from
+        from aisef.harness.guardrails import ENV_PROJECT, project_root_from
         self.assertEqual(project_root_from({ENV_PROJECT: "/b"}, "/a"), "/b")
         self.assertEqual(project_root_from({}, "/a"), "/a")
         self.assertEqual(project_root_from({ENV_PROJECT: "  "}, "/a"), "/a")
@@ -884,7 +884,7 @@ class TestCauHinhClientKhongPhaiThayDoiCuaStory(unittest.TestCase):
     def test_changed_files_ignores_carried_client_config(self):
         import subprocess, tempfile
         from pathlib import Path
-        from aisdlc.harness.guardrails import changed_files, check_diff_scope
+        from aisef.harness.guardrails import changed_files, check_diff_scope
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp)
             subprocess.run(["git", "init", "-q"], cwd=p, check=True)
@@ -914,25 +914,25 @@ class TestLuat6MaQuyTrinhTrongNguon(unittest.TestCase):
     """S3: số hiệu story/epic không được nằm trong mã nguồn; test và tài liệu thì được."""
 
     def test_source_with_story_id_is_blocked(self):
-        from aisdlc.harness.guardrails import check_process_refs
+        from aisef.harness.guardrails import check_process_refs
         v = check_process_refs("// STORY-01-02: thêm nút\nexport const x = 1\n", "src/notes.ts")
         self.assertFalse(v.allowed)
         self.assertIn("STORY-01-02", v.reason)
         self.assertFalse(check_process_refs("# EPIC-03\n", "src/app.py").allowed)
 
     def test_tests_docs_and_artifacts_are_allowed(self):
-        from aisdlc.harness.guardrails import check_process_refs
+        from aisef.harness.guardrails import check_process_refs
         self.assertTrue(check_process_refs("test('AC-STORY-01-01-2: rỗng', () => {})", "src/a.test.js").allowed)
         self.assertTrue(check_process_refs("def test_AC_STORY_01_01_1(): pass", "tests/test_a.py").allowed)
         self.assertTrue(check_process_refs("STORY-01-01 xong", "docs/notes.md").allowed)
         self.assertTrue(check_process_refs("STORY-01-01", "_bmad-output/x.json").allowed)
 
     def test_clean_source_passes(self):
-        from aisdlc.harness.guardrails import check_process_refs
+        from aisef.harness.guardrails import check_process_refs
         self.assertTrue(check_process_refs("export const story = 'truyện'\n", "src/x.ts").allowed)
 
     def test_wired_as_guard(self):
-        from aisdlc.harness.guardrails import GUARD_MATCHERS, run_guard
+        from aisef.harness.guardrails import GUARD_MATCHERS, run_guard
         self.assertEqual(GUARD_MATCHERS["process-ref"], ("PreToolUse", "Write|Edit"))
         v = run_guard("process-ref", {"cwd": "/tmp/x", "tool_name": "Write",
                                       "tool_input": {"file_path": "src/a.ts", "content": "// EPIC-01"}},
@@ -948,26 +948,26 @@ class TestTenKhoaDuongDanTheoClient(unittest.TestCase):
         return {"cwd": "/tmp/x", "tool_name": "write", "tool_input": {key: path, "content": content}}
 
     def test_write_scope_sees_opencode_key(self):
-        from aisdlc.harness.guardrails import ENV_WRITE_SCOPE, run_guard
+        from aisef.harness.guardrails import ENV_WRITE_SCOPE, run_guard
         env = {ENV_WRITE_SCOPE: "src"}
         self.assertFalse(run_guard("write-scope", self._ev("filePath", "/tmp/x/docs/ngoai.md"), project_root="/tmp/x", env=env).allowed)
         self.assertFalse(run_guard("write-scope", self._ev("file_path", "/tmp/x/docs/ngoai.md"), project_root="/tmp/x", env=env).allowed)
         self.assertTrue(run_guard("write-scope", self._ev("filePath", "/tmp/x/src/a.js"), project_root="/tmp/x", env=env).allowed)
 
     def test_process_ref_sees_opencode_key(self):
-        from aisdlc.harness.guardrails import run_guard
+        from aisef.harness.guardrails import run_guard
         ok = run_guard("process-ref", self._ev("filePath", "/tmp/x/src/a.test.js", "test('AC-STORY-01-01-1', () => {})"), project_root="/tmp/x", env={})
         self.assertTrue(ok.allowed)
 
 
 class TestLuat6DuongDanTuyetDoi(unittest.TestCase):
-    """Đường dẫn tuyệt đối của worktree chứa `.aisdlc/worktrees/` — không được
+    """Đường dẫn tuyệt đối của worktree chứa `.aisef/worktrees/` — không được
     vì thế mà thành "artifact của harness"."""
 
     def test_absolute_worktree_source_is_still_blocked(self):
-        from aisdlc.harness.guardrails import check_process_refs
-        root = "/tmp/du-an/.aisdlc/worktrees/S-1"
+        from aisef.harness.guardrails import check_process_refs
+        root = "/tmp/du-an/.aisef/worktrees/S-1"
         v = check_process_refs("// STORY-01-01\n", f"{root}/src/ghi-chu.js", project_root=root)
         self.assertFalse(v.allowed)
         self.assertTrue(check_process_refs("STORY-01-01", f"{root}/docs/x.md", project_root=root).allowed)
-        self.assertTrue(check_process_refs("STORY-01-01", f"{root}/.aisdlc/x.json", project_root=root).allowed)
+        self.assertTrue(check_process_refs("STORY-01-01", f"{root}/.aisef/x.json", project_root=root).allowed)

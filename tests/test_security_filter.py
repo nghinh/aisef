@@ -13,13 +13,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.kit.security_filter import (  # noqa: E402
+from aisef.kit.security_filter import (  # noqa: E402
     OFFENSIVE_SUBDOMAINS,
     Verdict,
     classify,
     classify_all,
 )
-from aisdlc.kit.skills import Skill, parse_frontmatter  # noqa: E402
+from aisef.kit.skills import Skill, parse_frontmatter  # noqa: E402
 
 SKILLS_DIR = ROOT / "references" / "cybersecurity-skills" / "skills"
 

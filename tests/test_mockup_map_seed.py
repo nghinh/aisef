@@ -12,9 +12,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.design_contract import ScreenContract  # noqa: E402
-from aisdlc.harness.aria import Component  # noqa: E402
-from aisdlc.harness.mockup_map import ScreenSlice  # noqa: E402
+from aisef.control.design_contract import ScreenContract  # noqa: E402
+from aisef.harness.aria import Component  # noqa: E402
+from aisef.harness.mockup_map import ScreenSlice  # noqa: E402
 
 
 def slice_for(route: str) -> ScreenSlice:

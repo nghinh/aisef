@@ -13,9 +13,9 @@ sys.path.insert(0, str(ROOT))
 
 import tests  # noqa: E402,F401 — HostProvider vào chỗ docker, không mở container (tests/__init__.py)
 
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.harness.observe import TOOL_RUN, EvidenceStore  # noqa: E402
-from aisdlc.phases.qa import KINDS, command_for_kind, find_fake_tests, run_suite  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.harness.observe import TOOL_RUN, EvidenceStore  # noqa: E402
+from aisef.phases.qa import KINDS, command_for_kind, find_fake_tests, run_suite  # noqa: E402
 
 
 class QaTestCase(unittest.TestCase):
@@ -114,7 +114,7 @@ class TestProviderGia(QaTestCase):
     biến, kịch bản quyết định xanh/đỏ — và bậc quyền của loại vẫn tới provider."""
 
     def test_do_theo_kich_ban_khong_suy_bien(self):
-        from aisdlc.harness import sandbox
+        from aisef.harness import sandbox
 
         fake = sandbox.FakeProvider([sandbox.SandboxResult(1, stdout="1 failed")])
         cfg = self.config(**{"verify.unit": "npm test", "sandbox.provider": "fake"})
@@ -130,7 +130,7 @@ class TestProviderGia(QaTestCase):
         self.assertIs(fake.calls[0].level, sandbox.Level.WORKSPACE_WRITE)
 
     def test_loi_ha_tang_la_khong_chay_duoc(self):
-        from aisdlc.harness import sandbox
+        from aisef.harness import sandbox
 
         fake = sandbox.FakeProvider([sandbox.SandboxResult(
             125, stderr="docker: Error response from daemon: pull access denied",
@@ -237,7 +237,7 @@ class TestKhongChayDuoc(unittest.TestCase):
     """
 
     def kq(self, detail, exit_code=127):
-        from aisdlc.phases.qa import KINDS, KindResult, _unrunnable_reason
+        from aisef.phases.qa import KINDS, KindResult, _unrunnable_reason
 
         r = KindResult(kind=KINDS["unit"], ran=True, ok=False, detail=detail)
         r.unrunnable = _unrunnable_reason(exit_code, detail)
@@ -247,7 +247,7 @@ class TestKhongChayDuoc(unittest.TestCase):
         """127 là mã POSIX; phần còn lại là cách các hệ khác nói cùng một
         chuyện. Lỗi 37: `mutation` sập với stack trace Node thô
         (`MODULE_NOT_FOUND`) và bị đếm là test đỏ."""
-        from aisdlc.phases.qa import _unrunnable_reason
+        from aisef.phases.qa import _unrunnable_reason
 
         for ma, chi_tiet in (
             (127, "sh: vitest: command not found"),
@@ -264,7 +264,7 @@ class TestKhongChayDuoc(unittest.TestCase):
         """`Cannot find module` nằm ở **đầu** stack trace; `detail` chỉ giữ
         5 dòng cuối. Dò trên phần đã cắt thì mất hẳn dấu hiệu — đúng lý do
         `mutation` vẫn bị đếm là test đỏ sau bản vá đầu tiên."""
-        from aisdlc.phases.qa import _unrunnable_reason
+        from aisef.phases.qa import _unrunnable_reason
 
         day_du = (
             "Error: Cannot find module 'stryker'\n"
@@ -287,7 +287,7 @@ class TestKhongChayDuoc(unittest.TestCase):
         self.assertNotIn("✗", r.line())
 
     def test_van_chan_nhung_khong_bi_dem_la_test_do(self):
-        from aisdlc.phases.qa import QaReport
+        from aisef.phases.qa import QaReport
 
         rep = QaReport(results=[self.kq("sh: vitest: command not found")])
         self.assertEqual(rep.failed, [], "không phải test đỏ")
@@ -296,7 +296,7 @@ class TestKhongChayDuoc(unittest.TestCase):
         self.assertIn("môi trường chưa dựng", rep.summary())
 
     def test_test_do_that_van_la_test_do(self):
-        from aisdlc.phases.qa import QaReport
+        from aisef.phases.qa import QaReport
 
         rep = QaReport(results=[self.kq("3 tests failed", exit_code=1)])
         self.assertEqual(len(rep.failed), 1)
@@ -310,7 +310,7 @@ class TestCoGiaoDien(unittest.TestCase):
         import json
         import tempfile
 
-        from aisdlc.cli import _project_has_ui
+        from aisef.cli import _project_has_ui
 
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp)
@@ -338,8 +338,8 @@ class TestMienTuongMinh(unittest.TestCase):
     def test_loai_duoc_mien_khong_chay_va_khong_dem(self):
         import tempfile
 
-        from aisdlc.config import DEFAULTS, Config
-        from aisdlc.phases.qa import run_suite
+        from aisef.config import DEFAULTS, Config
+        from aisef.phases.qa import run_suite
 
         with tempfile.TemporaryDirectory() as tmp:
             cfg = Config({
@@ -422,7 +422,7 @@ class TestCayKiemSach(QaTestCase):
     def test_worktree_tam_duoc_go_sau_khi_kiem(self):
         run_suite(self.project, config=self.cfg(), only=["unit"], has_ui=False)
         self.assertEqual(len(self.git("worktree", "list").splitlines()), 1)
-        root = self.project / ".aisdlc" / "worktrees"
+        root = self.project / ".aisef" / "worktrees"
         self.assertEqual([p.name for p in root.iterdir() if p.is_dir()], [])
 
     def test_tat_knob_thi_chay_cay_agent_va_noi_ra(self):

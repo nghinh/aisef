@@ -1,4 +1,4 @@
-"""Vòng cải tiến epic theo bằng chứng (ADR-004 R3) — `aisdlc improve`.
+"""Vòng cải tiến epic theo bằng chứng (ADR-004 R3) — `aisef improve`.
 
 Chạy trên kho git thật với client giả: điều phải chứng minh là vòng **ghép**
 đúng thứ có sẵn (QA → sổ → story sửa → `run_epic` → sổ) và **dừng bằng
@@ -25,14 +25,14 @@ sys.path.insert(0, str(ROOT))
 
 import tests  # noqa: E402,F401 — HostProvider vào chỗ docker, không mở container (tests/__init__.py)
 
-from aisdlc.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
-from aisdlc.clients.stream import RunResult  # noqa: E402
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.control import ledger as L  # noqa: E402
-from aisdlc.control.approvals import GATE_ORDER, ApprovalStore, Gate, Status  # noqa: E402
-from aisdlc.control.journal import JournalStore  # noqa: E402
-from aisdlc.harness.observe import HANDOFF, EvidenceStore  # noqa: E402
-from aisdlc.phases.improve import improve  # noqa: E402
+from aisef.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
+from aisef.clients.stream import RunResult  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.control import ledger as L  # noqa: E402
+from aisef.control.approvals import GATE_ORDER, ApprovalStore, Gate, Status  # noqa: E402
+from aisef.control.journal import JournalStore  # noqa: E402
+from aisef.harness.observe import HANDOFF, EvidenceStore  # noqa: E402
+from aisef.phases.improve import improve  # noqa: E402
 
 BEHAVIORS = ("AC-STORY-01-01-1", "AC-STORY-01-01-2")
 TEST_SCRIPT = "src/core/suite.sh"
@@ -81,7 +81,7 @@ class Fixer(ClientAdapter):
         if dau.startswith("# Rà soát"):
             return RunResult(ok=True, text=self.review, cost_usd=0.1)
 
-        sid = spec.env["AISDLC_STORY_ID"]
+        sid = spec.env["AISEF_STORY_ID"]
         self.develop_calls.append(sid)
         if self.fail_first > 0:
             self.fail_first -= 1
@@ -225,7 +225,7 @@ class TestVongSuaGap(ImproveTestCase):
         text = (self.artifacts / rp["file"]).read_text(encoding="utf-8")
         self.assertIn("[AC-STORY-RP-01-1]", text)
         self.assertIn("## Sửa hành vi", text)
-        self.assertIn("aisdlc evidence AC-STORY-01-01-1", text)
+        self.assertIn("aisef evidence AC-STORY-01-01-1", text)
         # story gốc không bị đụng
         self.assertTrue(any(s["id"] == "STORY-01-01" for s in idx["stories"]))
 
@@ -347,7 +347,7 @@ class TestChayLai(ImproveTestCase):
         """Story thường chạy giữa hai lần `improve` không được tính vào Δ của vòng."""
         c = Fixer(self.artifacts)
         self.improve(c, max_loops=1)
-        EvidenceStore(self.artifacts).tool_run(   # ai đó chạy `aisdlc tool test` tay
+        EvidenceStore(self.artifacts).tool_run(   # ai đó chạy `aisef tool test` tay
             "STORY-01-01", "test", ok=True,
             detail={"test_format": "node-tap", "test_ids": [tap_name(b) for b in BEHAVIORS],
                     "failed_ids": []},
@@ -367,7 +367,7 @@ class TestLoiVao(ImproveTestCase):
         import io
         from contextlib import redirect_stderr, redirect_stdout
 
-        from aisdlc.cli import EXIT_NOT_READY, main
+        from aisef.cli import EXIT_NOT_READY, main
 
         out, err = io.StringIO(), io.StringIO()
         with redirect_stdout(out), redirect_stderr(err):
@@ -380,9 +380,9 @@ class TestLoiVao(ImproveTestCase):
         self.assertEqual(cfg["improve.max_loops"], 3)
         self.assertEqual(cfg["improve.flat_loops"], 2)
         self.assertEqual(cfg["improve.cost_cap_usd"], 0.0)
-        from aisdlc.config import ConfigError
+        from aisef.config import ConfigError
         with self.assertRaises(ConfigError):
-            Config.load(self.project, env={"AISDLC_IMPROVE_MAX_LOOPS": "0"})
+            Config.load(self.project, env={"AISEF_IMPROVE_MAX_LOOPS": "0"})
 
 
 class TestCongImprove(unittest.TestCase):
@@ -417,7 +417,7 @@ class TestCongImprove(unittest.TestCase):
         mọi dự án đang chạy phải duyệt lại — không được."""
         (self.root / "prd.md").write_text("# PRD\n", encoding="utf-8")
         import hashlib
-        from aisdlc.control.approvals import sha256_of
+        from aisef.control.approvals import sha256_of
         cu = hashlib.sha256(f"prd.md:{sha256_of(self.root / 'prd.md')}".encode()).hexdigest()
         self.assertEqual(self.store.content_hash(Gate.PRD), cu)
 
@@ -431,7 +431,7 @@ class TestHangDoiSuaTuDong(ImproveTestCase):
     chí có verifier cụ thể đi trước; story sửa phải viết test mới mang mã."""
 
     def test_thu_tu_hang_doi_va_qa_dung_ngoai(self):
-        from aisdlc.phases.improve import repair_queue
+        from aisef.phases.improve import repair_queue
 
         led = L.Ledger()
         for bid, kind in (("qa:e2e", "qa"), ("mockup:m", "mockup"), ("FR-1", "fr"),
@@ -460,7 +460,7 @@ class TestHangDoiSuaTuDong(ImproveTestCase):
         body = next(self.artifacts.rglob("STORY-RP-01.md")).read_text(encoding="utf-8")
         self.assertIn("đối chứng nop", body)
         self.assertIn("Không** gắn mã vào test có sẵn", body)
-        self.assertIn(f"aisdlc evidence {BEHAVIORS[0]} --link", body)
+        self.assertIn(f"aisef evidence {BEHAVIORS[0]} --link", body)
 
     def test_be_tac_truy_vet_thi_bao_cao_chi_cach_sua_sieu_du_lieu(self):
         r = self.improve(Fixer(self.artifacts, review=f"[bế tắc] truy vết: {BASE_TEST}"),
@@ -468,5 +468,5 @@ class TestHangDoiSuaTuDong(ImproveTestCase):
         self.assertEqual(len(r.loops), 1)
         self.assertIn("truy vết", r.loops[0].stuck)
         report = r.loops[0].report_path.read_text(encoding="utf-8")
-        self.assertIn(f"aisdlc evidence {BEHAVIORS[0]} --link", report)
+        self.assertIn(f"aisef evidence {BEHAVIORS[0]} --link", report)
         self.assertIn("không phải** cải tiến chức năng", report)

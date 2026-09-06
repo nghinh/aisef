@@ -18,8 +18,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control import ledger as L  # noqa: E402
-from aisdlc.harness.observe import Event, EvidenceStore, MOCKUP_MAP  # noqa: E402
+from aisef.control import ledger as L  # noqa: E402
+from aisef.harness.observe import Event, EvidenceStore, MOCKUP_MAP  # noqa: E402
 
 
 def ac_test(story: str, i: int) -> str:
@@ -37,7 +37,7 @@ class LedgerTestCase(unittest.TestCase):
         self._tmp.cleanup()
 
     def run_cli(self, *args: str) -> tuple[int, str, str]:
-        from aisdlc.cli import main
+        from aisef.cli import main
 
         out, err = io.StringIO(), io.StringIO()
         with redirect_stdout(out), redirect_stderr(err):
@@ -222,7 +222,7 @@ class TestMetrics(LedgerTestCase):
         self.assertIsNone(led.metrics()["loops"][0]["marginal"])
 
     def test_moc_vong_khong_bi_mat_khi_chieu_lai(self):
-        """`aisdlc report` chiếu lại sổ mỗi lần; mốc mà vòng cải tiến vừa
+        """`aisef report` chiếu lại sổ mỗi lần; mốc mà vòng cải tiến vừa
         chốt là thứ duy nhất không suy lại được, nên phải sống sót."""
         self.index([{"id": "STORY-01-01", "acceptance_criteria": ["a"]}])
         led = L.build(self.root)
@@ -279,9 +279,9 @@ class TestChiMuc(LedgerTestCase):
 
 class TestSlotIndexTrongPrompt(LedgerTestCase):
     def test_slot_index_co_nguon_ledger_va_ton_tran(self):
-        from aisdlc.config import Config
-        from aisdlc.control.normalize import Story
-        from aisdlc.phases.implement import SLOT_SOURCE, build_context, handoff_slots
+        from aisef.config import Config
+        from aisef.control.normalize import Story
+        from aisef.phases.implement import SLOT_SOURCE, build_context, handoff_slots
 
         self.assertEqual(SLOT_SOURCE["index"], "ledger")
         self.index([{"id": "STORY-01-01", "epic_id": "EPIC-01",
@@ -299,8 +299,8 @@ class TestSlotIndexTrongPrompt(LedgerTestCase):
         self.assertEqual(handoff_slots(ctx)["index"][0], "ledger")
 
     def test_chua_co_bang_chung_thi_slot_noi_that(self):
-        from aisdlc.control.normalize import Story
-        from aisdlc.phases.implement import build_context
+        from aisef.control.normalize import Story
+        from aisef.phases.implement import build_context
 
         story = Story(id="STORY-09-01", epic_id="EPIC-09", title="t")
         ctx = build_context(story, project=self.root.parent, artifact_root=self.root,
@@ -349,10 +349,10 @@ class TestCliEvidence(LedgerTestCase):
 
 
 class TestXuatBangGap(LedgerTestCase):
-    """`aisdlc issues` (ADR-004 R12): sổ ra bảng để theo dõi ngoài kho.
+    """`aisef issues` (ADR-004 R12): sổ ra bảng để theo dõi ngoài kho.
 
     Bảng là phép chiếu thứ hai của cùng một sổ — nó không được nói khác
-    `aisdlc evidence`: cùng thủ phạm, cùng nguồn kiểm, cùng số lần đổi.
+    `aisef evidence`: cùng thủ phạm, cùng nguồn kiểm, cùng số lần đổi.
     """
 
     def seed(self):
@@ -430,7 +430,7 @@ class TestUngVienChuaLanded(LedgerTestCase):
 
     def setUp(self):
         super().setUp()
-        from aisdlc.control.journal import Entry, JournalStore
+        from aisef.control.journal import Entry, JournalStore
         self.index([{"id": "STORY-01-01", "epic_id": "EPIC-01",
                      "acceptance_criteria": ["a"], "covers": ["FR-1"]}])
         self.journal = JournalStore(self.root)
@@ -513,7 +513,7 @@ class TestUngVienChuaLanded(LedgerTestCase):
         self.assertEqual(led.behaviors["AC-STORY-01-01-1"].candidate, "bbb2222")
 
     def test_qua_cong_o_ung_vien_thi_landed_du_chua_merge(self):
-        from aisdlc.harness.observe import Event, NOTE
+        from aisef.harness.observe import Event, NOTE
         self.freeze("aaa1111")
         self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)], candidate="aaa1111")
         self.store.record("STORY-01-01", Event(kind=NOTE, name="gate:verdict", ok=True,
@@ -523,7 +523,7 @@ class TestUngVienChuaLanded(LedgerTestCase):
 
 
 class TestTruyVetNguoiKhai(LedgerTestCase):
-    """`aisdlc evidence <AC> --link` (QĐ B6 2026-09-06): sửa siêu dữ liệu —
+    """`aisef evidence <AC> --link` (QĐ B6 2026-09-06): sửa siêu dữ liệu —
     tên test có sẵn chứng minh tiêu chí. Sổ vẫn đòi test ấy xanh ở ứng viên
     đã landed; không ai ghi thẳng VERIFIED."""
 

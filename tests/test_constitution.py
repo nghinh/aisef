@@ -10,12 +10,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.kit.constitution import (  # noqa: E402
+from aisef.kit.constitution import (  # noqa: E402
     CLIENT_FILES,
     Constitution,
     write_for_project,
 )
-from aisdlc.kit.detect_stack import detect
+from aisef.kit.detect_stack import detect
 
 
 class TestRender(unittest.TestCase):

@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.impact import (  # noqa: E402
+from aisef.control.impact import (  # noqa: E402
     COMMON_DEFS,
     ImpactReport,
     analyse,
@@ -236,7 +236,7 @@ class TestReviewerNhanDuoc(unittest.TestCase):
     def test_impact_di_vao_prompt_ra_soat(self):
         import tempfile
 
-        from aisdlc.harness.prompts import load_catalog
+        from aisef.harness.prompts import load_catalog
 
         prompt = load_catalog().get("story-review")
         self.assertIn("{{ impact }}", prompt.body)

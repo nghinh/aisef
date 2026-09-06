@@ -12,13 +12,13 @@ sys.path.insert(0, str(ROOT))
 
 import tests  # noqa: E402,F401 — HostProvider vào chỗ docker, không mở container (tests/__init__.py)
 
-from aisdlc.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
-from aisdlc.clients.stream import RunResult  # noqa: E402
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.control.approvals import GATE_ARTIFACTS, ApprovalStore, Gate  # noqa: E402
-from aisdlc.control.outcome import Outcome  # noqa: E402
-from aisdlc.control.state import StateStore, StoryStatus  # noqa: E402
-from aisdlc.phases.deploy import (  # noqa: E402
+from aisef.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
+from aisef.clients.stream import RunResult  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.control.approvals import GATE_ARTIFACTS, ApprovalStore, Gate  # noqa: E402
+from aisef.control.outcome import Outcome  # noqa: E402
+from aisef.control.state import StateStore, StoryStatus  # noqa: E402
+from aisef.phases.deploy import (  # noqa: E402
     CI_PATH,
     INSTALL_SPEC,
     RUNBOOK_PATH,
@@ -128,7 +128,7 @@ class TestRunbook(unittest.TestCase):
 
 class TestCiWorkflow(DeployTestCase):
     def test_written_where_github_looks(self):
-        path = write_ci_workflow(self.project, aisdlc_bin="aisdlc")
+        path = write_ci_workflow(self.project, aisef_bin="aisef")
         self.assertEqual(path, self.project / CI_PATH)
         self.assertTrue(path.is_file())
 
@@ -137,7 +137,7 @@ class TestCiWorkflow(DeployTestCase):
         trôi khỏi nhau."""
         text = write_ci_workflow(self.project).read_text(encoding="utf-8")
         for command in ("doctor", "verify", "qa", "gates", "status"):
-            self.assertIn(f"aisdlc {command}", text)
+            self.assertIn(f"aisef {command}", text)
 
 
 class TestPreDeployGate(DeployTestCase):
@@ -170,7 +170,7 @@ class TestPreDeployGate(DeployTestCase):
     def test_running_stories_does_not_stale_the_readiness_approval(self):
         """`sprint-status.json` đổi sau mỗi story. Gắn cổng vào nó thì phê
         duyệt vừa ký đã thành `stale` và cổng bị bỏ qua."""
-        from aisdlc.control.approvals import Status
+        from aisef.control.approvals import Status
 
         self.approve_everything()
         self.finish_a_story()
@@ -251,7 +251,7 @@ class TestTenDuAn(unittest.TestCase):
         import os
         import tempfile
 
-        from aisdlc.phases.deploy import build_prompt
+        from aisef.phases.deploy import build_prompt
 
         with tempfile.TemporaryDirectory() as tmp:
             d = Path(tmp) / "ten-du-an"
@@ -268,15 +268,15 @@ class TestTenDuAn(unittest.TestCase):
 class TestQuyTrinhCI(unittest.TestCase):
     """Quy trình CI phải chạy được trên **máy khác**.
 
-    Lỗi 31: `aisdlc devsecops` ghim đường dẫn tuyệt đối của máy sinh ra nó
-    (`/Users/.../bin/aisdlc`) và không có bước nào cài framework — quy
+    Lỗi 31: `aisef devsecops` ghim đường dẫn tuyệt đối của máy sinh ra nó
+    (`/Users/.../bin/aisef`) và không có bước nào cài framework — quy
     trình hỏng ngay bước đầu trên GitHub Actions.
     """
 
     def test_khong_ghim_duong_dan_tuyet_doi_va_co_buoc_cai(self):
         import tempfile
 
-        from aisdlc.phases.deploy import write_ci_workflow
+        from aisef.phases.deploy import write_ci_workflow
 
         with tempfile.TemporaryDirectory() as tmp:
             body = write_ci_workflow(tmp).read_text(encoding="utf-8")
@@ -284,7 +284,7 @@ class TestQuyTrinhCI(unittest.TestCase):
         self.assertIn("pip install", body)
         self.assertNotIn("/Users/", body)
         self.assertNotIn("/home/", body)
-        for lenh in ("aisdlc doctor", "aisdlc verify", "aisdlc qa", "aisdlc gates"):
+        for lenh in ("aisef doctor", "aisef verify", "aisef qa", "aisef gates"):
             self.assertIn(f"run: {lenh}", body)
 
     def test_dem_dung_so_tao_tac(self):
@@ -292,10 +292,10 @@ class TestQuyTrinhCI(unittest.TestCase):
         còn lại của báo cáo."""
         from pathlib import Path as _P
 
-        from aisdlc.phases.deploy import DevSecOpsReport
+        from aisef.phases.deploy import DevSecOpsReport
 
         r = DevSecOpsReport(generated=["Dockerfile", "docs/RUNBOOK.md"],
-                            ci_path=_P(".github/workflows/aisdlc.yml"))
+                            ci_path=_P(".github/workflows/aisef.yml"))
         head = r.summary().splitlines()[0]
         self.assertIn("3 tạo tác", head)
         self.assertEqual(sum(1 for l in r.summary().splitlines() if "✅" in l), 3)
@@ -325,7 +325,7 @@ class TestInstallSpecDoiDuoc(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             noi_dung = write_ci_workflow(tmp).read_text(encoding="utf-8")
             self.assertIn("actions/cache@v4", noi_dung)
-            self.assertIn("~/.cache/ai-sdlc/references", noi_dung)
+            self.assertIn("~/.cache/aisef/references", noi_dung)
 
     def test_yaml_van_hop_le_sau_khi_them_cache(self):
         """`${{ }}` của GitHub Actions đi qua `str.format` — dễ vỡ."""
@@ -341,7 +341,7 @@ class TestXongPhaiLaDaMerge(DeployTestCase):
     cổng này nó chưa xong — triển khai là triển khai nhánh chính."""
 
     def nhat_ky(self, *steps):
-        from aisdlc.control.journal import Entry, JournalStore
+        from aisef.control.journal import Entry, JournalStore
         j = JournalStore(self.artifacts)
         for s in steps:
             j.record("STORY-01-01", Entry(step=s, attempt=1))
@@ -441,7 +441,7 @@ class TestPreDeployKhongChapNhanSuyBien(DeployTestCase):
 
     def test_run_thuong_van_cho_suy_bien(self):
         """Quyết định chỉ chạm cổng trước triển khai."""
-        from aisdlc.phases.qa import run_suite
+        from aisef.phases.qa import run_suite
         rep = run_suite(self.project, config=self.cau_hinh(), has_ui=False)
         self.assertEqual([r.kind.id for r in rep.degraded], ["unit"])
         self.assertTrue(rep.release_ready or rep.failed == [])
@@ -482,7 +482,7 @@ class TestPlannedButNeverRun(DeployTestCase):
     def test_unregistered_planned_story_blocks(self):
         import json
 
-        from aisdlc.phases.deploy import pre_deploy
+        from aisef.phases.deploy import pre_deploy
 
         self.approve_everything()
         self.finish_a_story()  # STORY-01-01 done
@@ -506,7 +506,7 @@ class TestPhamViNghiemThu(DeployTestCase):
 
     def ready(self, index: dict):
         import json
-        from aisdlc.control.approvals import GATE_ARTIFACTS
+        from aisef.control.approvals import GATE_ARTIFACTS
 
         self.approve_everything()
         self.finish_a_story()
@@ -570,7 +570,7 @@ class TestPhamViNghiemThu(DeployTestCase):
 
     def test_pham_vi_doi_thi_bam_phe_duyet_doi(self):
         """Duyệt `pre-deploy` cho EPIC-01 không dùng lại được cho cả kế hoạch."""
-        from aisdlc.control.approvals import Status
+        from aisef.control.approvals import Status
 
         self.ready(self.INDEX)
         pre_deploy(self.project, config=self.config(), skip_qa=True, epic="EPIC-01").write(self.artifacts)

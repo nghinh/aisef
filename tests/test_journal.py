@@ -17,7 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.journal import (  # noqa: E402
+from aisef.control.journal import (  # noqa: E402
     Journal,
     ABORTED,
     RECONCILED,
@@ -28,7 +28,7 @@ from aisdlc.control.journal import (  # noqa: E402
     reconcile_all,
     reconcile_story,
 )
-from aisdlc.control.state import StateStore, StoryStatus  # noqa: E402
+from aisef.control.state import StateStore, StoryStatus  # noqa: E402
 
 
 class JournalTestCase(unittest.TestCase):
@@ -109,7 +109,7 @@ class TestReconcile(JournalTestCase):
         return dict(artifact_root=self.root, state=self.state, worktrees=worktrees)
 
     def test_tien_trinh_chet_thi_khong_de_running_vinh_vien(self):
-        """Đã xảy ra: `aisdlc status` báo `running` mãi, không lệnh nào gỡ."""
+        """Đã xảy ra: `aisef status` báo `running` mãi, không lệnh nào gỡ."""
         self.rec("attempt.started")
         self.rec("status.running")
         self.to(StoryStatus.RUNNING)

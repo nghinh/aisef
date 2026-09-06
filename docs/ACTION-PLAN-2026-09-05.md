@@ -100,7 +100,7 @@ lộ khi có người tình cờ đọc.
 **Cơ chế.** Hai test đọc chính mã nguồn:
 
 1. `test_observe_kinds_have_producers`: với mỗi hằng `kind` trong
-   `observe.py`, phải có ít nhất một tệp trong `aisdlc/` (ngoài
+   `observe.py`, phải có ít nhất một tệp trong `aisef/` (ngoài
    `observe.py`) tham chiếu nó. Tạm loại trừ `NOTE` nếu cố ý.
 2. `test_emulated_capabilities_name_their_mechanism`: mỗi
    `Support.EMULATED` trong `clients/*.py` phải kèm chú thích
@@ -173,7 +173,7 @@ báo story có prompt > 3× trung vị (cùng cơ chế với chi phí).
 chưa từng chạy trên client. Unit test không bắt được lớp này theo định
 nghĩa.
 
-**Cơ chế.** `tests/conformance/` chạy khi `AISDLC_CONFORMANCE=1`, mỗi
+**Cơ chế.** `tests/conformance/` chạy khi `AISEF_CONFORMANCE=1`, mỗi
 client một lớp test, cùng **5 phép thử** — đúng những phép đã dùng tay
 ngày 2026-09-05:
 
@@ -335,7 +335,7 @@ loại trừ đúng bằng điều kiện "diff thêm test". Story sửa test c�
 
 | # | Việc | Chi tiết | Ước lượng |
 |---|---|---|---|
-| R1 | **Đưa gói lên PyPI** | Quyết định của chủ đầu tư: tên `ai-sdlc` (kiểm còn trống), tài khoản, token trong CI. Tới lúc đó CI sinh ra dùng `--install-spec git+https://…@<tag>`. | 0,5 ngày + quyết định |
+| R1 | **Đưa gói lên PyPI** | Quyết định của chủ đầu tư: tên `aisef` (kiểm còn trống), tài khoản, token trong CI. Tới lúc đó CI sinh ra dùng `--install-spec git+https://…@<tag>`. | 0,5 ngày + quyết định |
 | R2 | **GĐ-9 đầu-cuối trên dự án có giao diện** | Chạy nốt EPIC-01 của `e9` (4 story, ước $40–60) với toàn bộ cơ chế đợt 1–3; rồi `qa` (cấu hình `e2e` + `accessibility` thật bằng playwright + axe), `devsecops`, `pre-deploy`, `report`. Đây là lần đầu `accessibility` và `mutation` chạy được. | 1,5 ngày + $60–90 |
 | R3 | **Hợp quy lần 1** | Chạy G6 trên hai client, ghi `CONFORMANCE.md`. | 0,5 ngày + $2 |
 | R4 | **Tài liệu đúng sự thật** | SOLUTION §5.1 liệt kê `kit/agents/` 13 agent và `kit/mcp/` — không tồn tại; §11 "OpenCode hậu kiểm" đã lỗi thời; §13 bảng knob; README mục guard. Sửa cho khớp mã, không thêm. | 1 ngày |
@@ -347,7 +347,7 @@ loại trừ đúng bằng điều kiện "diff thêm test". Story sửa test c�
 * `par` chạy lại trên hai client đạt mốc R5;
 * `e9` EPIC-01 xong, `ACCEPTANCE-REPORT.md` có bảng TCCN → test id, mục
   `accessibility` là PASSED hoặc FAILED — **không** phải UNCONFIGURED;
-* `pip install ai-sdlc` trong venv sạch → `setup` → `doctor` xanh.
+* `pip install aisef` trong venv sạch → `setup` → `doctor` xanh.
 
 ---
 
@@ -356,9 +356,9 @@ loại trừ đúng bằng điều kiện "diff thêm test". Story sửa test c�
 | # | Việc | Cơ chế | Ước lượng |
 |---|---|---|---|
 | S1 | **Spike sandbox tiến trình agent** (D8) | Claude Code trong container: mount worktree + thư mục cấu hình đăng nhập chỉ-đọc, `--network` chỉ tới API, `--cap-drop=ALL`. Đo: có chạy được `-p`? độ trễ? OAuth còn hiệu lực? Kết quả quyết định có thành mặc định hay không — **không** hứa trước. | 2 ngày |
-| S2 | **Tra cứu tài liệu theo yêu cầu** (luật 12) | `aisdlc doc <gói>` gọi context7 CLI hoặc cache cục bộ; prompt developer nhắc lệnh; evidence ghi `doc_lookup`. Không MCP thường trú. | 1,5 ngày |
+| S2 | **Tra cứu tài liệu theo yêu cầu** (luật 12) | `aisef doc <gói>` gọi context7 CLI hoặc cache cục bộ; prompt developer nhắc lệnh; evidence ghi `doc_lookup`. Không MCP thường trú. | 1,5 ngày |
 | S3 | **Guard luật 6** | Chặn `STORY-\d+-\d+`/`EPIC-\d+` trong tệp nguồn ngoài `docs/`, `_bmad-output/`, tệp test. | 0,5 ngày |
-| S4 | **Vòng đời thay đổi sau phát hành** | `aisdlc change FR-x "mô tả"`: đánh stale đúng tầng (PRD → xuống), sinh story delta có `covers=[FR-x]`, giữ story cũ `DONE`. Cascade stale đã có; thiếu đường vào có tên. | 2 ngày |
+| S4 | **Vòng đời thay đổi sau phát hành** | `aisef change FR-x "mô tả"`: đánh stale đúng tầng (PRD → xuống), sinh story delta có `covers=[FR-x]`, giữ story cũ `DONE`. Cascade stale đã có; thiếu đường vào có tên. | 2 ngày |
 | S5 | **Chia `cli.py`** | Thuần cơ học: `cli/` với một tệp mỗi pha; không đổi hành vi; test CLI hiện có là lưới an toàn. | 1 ngày |
 | S6 | **Kiểm nội dung skill ngoài theo tiêm prompt** | Quét 120 skill đã cài bằng chính `story-security-review` ở chế độ "tài liệu": dòng nào bảo agent bỏ qua luật, gọi mạng, đọc bí mật → chặn cài, ghi vào `catalog.json` `quarantine`. Chạy một lần mỗi commit ghim. | 1 ngày |
 
@@ -386,9 +386,9 @@ và designer, **sau** khi có thước (đợt 3 cho bộ mẫu diff thật củ
 
 ## Quyết định của chủ đầu tư (chốt 2026-09-05)
 
-1. **PyPI** — tên `ai-sdlc`; publish khi **hoàn tất đợt 4**, không public
+1. **PyPI** — tên `aisef`; publish khi **hoàn tất đợt 4**, không public
    sớm hơn; tài khoản **tổ chức/team**, không dùng cá nhân nếu có lựa chọn.
-   → R1 giữ `INSTALL_SPEC = "ai-sdlc"`; tới lúc publish CI của dự án đích
+   → R1 giữ `INSTALL_SPEC = "aisef"`; tới lúc publish CI của dự án đích
    dùng `--install-spec git+https://…@<tag>`.
 2. **Ngân sách agent** — duyệt **$120–180** toàn kế hoạch. Không tự bó
    xuống nếu chất lượng cần thêm lượt review/test.

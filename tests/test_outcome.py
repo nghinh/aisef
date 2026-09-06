@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import unittest
 
-from aisdlc.control.outcome import MARK, Check, Outcome
-from aisdlc.control.gate import StoryGate
-from aisdlc.phases.qa import KINDS, KindResult
+from aisef.control.outcome import MARK, Check, Outcome
+from aisef.control.gate import StoryGate
+from aisef.phases.qa import KINDS, KindResult
 
 
 class TestBangKyHieu(unittest.TestCase):
@@ -47,7 +47,7 @@ class TestCheck(unittest.TestCase):
         """ADR-005 V9: hợp đồng chấm tối thiểu — `Check("lint", True)` cũ vẫn
         chạy, `as_dict()` luôn có hai khoá để `gate:verdict`/pre-deploy/report
         cùng hình dạng."""
-        from aisdlc.control.outcome import CHECK_KINDS
+        from aisef.control.outcome import CHECK_KINDS
         c = Check("lint", True)
         self.assertEqual((c.kind, c.evidence), ("", []))
         d = Check("test", False, "đỏ", kind="deterministic", evidence=[3, 5]).as_dict()

@@ -15,9 +15,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control.normalize import Story  # noqa: E402
-from aisdlc.kit import router  # noqa: E402
-from aisdlc.kit.registry import Registry, SkillEntry, Verification  # noqa: E402
+from aisef.control.normalize import Story  # noqa: E402
+from aisef.kit import router  # noqa: E402
+from aisef.kit.registry import Registry, SkillEntry, Verification  # noqa: E402
 
 
 def entry(id, caps=(), *, tags=(), subdomain="", status="verified", use_when="", desc="skill"):
@@ -75,8 +75,8 @@ class TestBietTuChoi(unittest.TestCase):
 class TestChonDung(unittest.TestCase):
     def test_skill_framework_theo_pha_luon_du_dieu_kien(self):
         s = story(screens=["notes-list"])
-        r = router.route(s, reg(entry("aisdlc-mockup-html", ["ui"])), phase="mockup")
-        self.assertIn("aisdlc-mockup-html", r.ids())
+        r = router.route(s, reg(entry("aisef-mockup-html", ["ui"])), phase="mockup")
+        self.assertIn("aisef-mockup-html", r.ids())
 
     def test_ton_trong_tran_so_luong(self):
         s = story(acceptance_criteria=["Then bảo mật xác thực injection auth"],

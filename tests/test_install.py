@@ -10,9 +10,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.kit import install  # noqa: E402
-from aisdlc.kit.detect_stack import detect  # noqa: E402
-from aisdlc.kit.install import MARKER, SKILLS_DIR, InstallPlan, PlannedSkill  # noqa: E402
+from aisef.kit import install  # noqa: E402
+from aisef.kit.detect_stack import detect  # noqa: E402
+from aisef.kit.install import MARKER, SKILLS_DIR, InstallPlan, PlannedSkill  # noqa: E402
 
 REFERENCES = ROOT / "references"
 needs_refs = unittest.skipUnless(REFERENCES.is_dir(), "chưa clone references/")
@@ -73,6 +73,36 @@ class TestApply(InstallTestCase):
         r = install.apply(p2, self.project)
         self.assertEqual(r.removed, ["b"])
         self.assertFalse((self.skills_dir / "b").exists())
+
+    def test_skill_cai_boi_ban_cu_van_duoc_nhan_la_cua_framework(self):
+        """Đổi tên `aisdlc` → `aisef` (0.2.0) không được để lại rác của 0.1.0.
+
+        Skill cài bằng bản cũ mang dấu `.aisdlc-managed`. Nếu bản mới chỉ nhận
+        dấu mới thì chúng thành "skill người dùng" và nằm lại trên đĩa mãi.
+        """
+        from aisef.kit.install import MARKER_LEGACY
+
+        install.apply(InstallPlan(skills=[
+            PlannedSkill("a", "src", self.fake_skill("a"), "test"),
+            PlannedSkill("cu", "src", self.fake_skill("cu"), "test"),
+        ]), self.project)
+        cu = self.skills_dir / "cu"
+        (cu / MARKER).rename(cu / MARKER_LEGACY)          # như bản 0.1.0 để lại
+
+        r = install.apply(InstallPlan(skills=[
+            PlannedSkill("a", "src", self.fake_skill("a"), "test")]), self.project)
+        self.assertEqual(r.removed, ["cu"])
+        self.assertFalse(cu.exists())
+
+    def test_dau_cu_khong_lam_skill_bi_cai_lai(self):
+        """Cùng nội dung + dấu cũ = không đổi; không thì mỗi lần chạy đều chép lại."""
+        from aisef.kit.install import MARKER_LEGACY
+
+        plan = InstallPlan(skills=[PlannedSkill("a", "src", self.fake_skill("a"), "test")])
+        install.apply(plan, self.project)
+        (self.skills_dir / "a" / MARKER).rename(self.skills_dir / "a" / MARKER_LEGACY)
+        r = install.apply(plan, self.project)
+        self.assertEqual(r.unchanged, ["a"])
 
     def test_does_not_touch_user_skills(self):
         """Skill người dùng tự thêm (không có dấu) phải được giữ nguyên."""
@@ -146,7 +176,7 @@ class TestEndToEnd(InstallTestCase):
         p = install.plan(self.project, detect(text),
                          references_root=REFERENCES, requirements_text=text)
         install.apply(p, self.project)
-        from aisdlc.kit.skills import scan
+        from aisef.kit.skills import scan
 
         found = scan(self.skills_dir)
         self.assertGreater(len(found), 50)

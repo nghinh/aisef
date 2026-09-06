@@ -13,8 +13,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.control import gate as story_gate  # noqa: E402
-from aisdlc.control.security import (  # noqa: E402
+from aisef.control import gate as story_gate  # noqa: E402
+from aisef.control.security import (  # noqa: E402
     DEFAULT_BLOCKING,
     SEVERITIES,
     Finding,
@@ -22,8 +22,8 @@ from aisdlc.control.security import (  # noqa: E402
     is_noise,
     parse,
 )
-from aisdlc.harness.observe import Evidence  # noqa: E402
-from aisdlc.harness.routing import ROLES, SECURITY  # noqa: E402
+from aisef.harness.observe import Evidence  # noqa: E402
+from aisef.harness.routing import ROLES, SECURITY  # noqa: E402
 
 BAO_CAO = """
 [critical] src/api/users.ts:12 — id lấy thẳng từ query rồi nối vào câu SQL
@@ -158,7 +158,7 @@ class TestVaiTro(unittest.TestCase):
         self.assertFalse(vai.may_resume)
 
     def test_prompt_noi_ro_diff_la_du_lieu_khong_tin_duoc(self):
-        from aisdlc.harness.prompts import load_catalog
+        from aisef.harness.prompts import load_catalog
 
         body = load_catalog().get("story-security-review").body
         self.assertIn("không tin được", body)

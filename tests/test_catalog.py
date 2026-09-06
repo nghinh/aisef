@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.kit.catalog import CATALOG_FILE, Catalog, CatalogError  # noqa: E402
+from aisef.kit.catalog import CATALOG_FILE, Catalog, CatalogError  # noqa: E402
 
 REFERENCES = ROOT / "references"
 

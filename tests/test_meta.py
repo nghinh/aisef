@@ -3,7 +3,7 @@ thấy, vì chúng là lỗi **vắng mặt**:
 
 * D5 — bằng chứng có mô hình nhưng không ai sinh. `FILE_CHANGE` và
   `GUARD_BLOCK` có hằng, có test, và suốt hai tuần không có một dòng nào
-  trong `aisdlc/` ghi chúng; luật "file sửa sau lần test cuối" của guard
+  trong `aisef/` ghi chúng; luật "file sửa sau lần test cuối" của guard
   `completion` chưa từng chạy ngoài test.
 * D2 — năng lực khai `EMULATED` mà không có mã mô phỏng. OpenCode khai
   `TOOL_ALLOWLIST: EMULATED "qua permission config"`, không có mã nào sinh
@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-PKG = ROOT / "aisdlc"
+PKG = ROOT / "aisef"
 
 
 def _sources(exclude: set[str] = frozenset()) -> dict[Path, str]:
@@ -60,7 +60,7 @@ class TestMoiLoaiBangChungDeuCoNguoiSinh(unittest.TestCase):
                 )
                 self.assertTrue(
                     used,
-                    f"{const} có mô hình nhưng không tệp nào trong aisdlc/ ghi nó — "
+                    f"{const} có mô hình nhưng không tệp nào trong aisef/ ghi nó — "
                     f"guard hay cổng đọc loại này sẽ luôn thấy rỗng",
                 )
 
@@ -93,8 +93,8 @@ class TestNangLucKhaiEmulatedPhaiCoMaMoPhong(unittest.TestCase):
                         m, f"{path.name}:{line_no} khai EMULATED mà không có "
                            f"`# emulated by: <module>.<func>`: {line.strip()}"
                     )
-                    module = importlib.import_module(f"aisdlc.harness.{m.group(1)}") \
-                        if not m.group(1).startswith("aisdlc") \
+                    module = importlib.import_module(f"aisef.harness.{m.group(1)}") \
+                        if not m.group(1).startswith("aisef") \
                         else importlib.import_module(m.group(1))
                     self.assertTrue(
                         callable(getattr(module, m.group(2), None)),
@@ -112,11 +112,11 @@ class TestTaiLieuTroVaoMaCoThat(unittest.TestCase):
     phải có thật — không thì bảng kiến trúc là lời kể."""
 
     def test_moi_duong_dan_module_trong_tai_lieu_ton_tai(self):
-        rx = re.compile(r"`((?:aisdlc/)?(?:kit|harness|control|phases|clients)/[A-Za-z0-9_./-]+)`")
+        rx = re.compile(r"`((?:aisef/)?(?:kit|harness|control|phases|clients)/[A-Za-z0-9_./-]+)`")
         for doc in ("docs/SOLUTION.md", "README.md"):
             text = (ROOT / doc).read_text(encoding="utf-8")
             for ref in sorted(set(rx.findall(text))):
-                rel = (ref if ref.startswith("aisdlc/") else "aisdlc/" + ref).rstrip("/")
+                rel = (ref if ref.startswith("aisef/") else "aisef/" + ref).rstrip("/")
                 with self.subTest(doc=doc, path=ref):
                     self.assertTrue((ROOT / rel).exists() or (ROOT / (rel + ".py")).exists(),
                                     f"{doc} nhắc `{ref}` nhưng không có trong cây mã")
@@ -140,16 +140,16 @@ class TestSolutionKhopMa(unittest.TestCase):
 
     def test_moi_lenh_cli_co_trong_bo_lenh(self):
         import argparse
-        from aisdlc.cli.parser import build_parser
+        from aisef.cli.parser import build_parser
         sub = next(a for a in build_parser()._actions if isinstance(a, argparse._SubParsersAction))
         self.assertGreaterEqual(len(sub.choices), 20)
         for cmd in sub.choices:
             with self.subTest(cmd=cmd):
-                self.assertRegex(self.text, rf"(?m)^aisdlc {re.escape(cmd)}(\s|$)",
-                                 f"`aisdlc {cmd}` có trong parser nhưng không có ở SOLUTION §10")
+                self.assertRegex(self.text, rf"(?m)^aisef {re.escape(cmd)}(\s|$)",
+                                 f"`aisef {cmd}` có trong parser nhưng không có ở SOLUTION §10")
 
     def test_moi_knob_cau_hinh_co_trong_bang_nguong(self):
-        from aisdlc.config import DEFAULTS
+        from aisef.config import DEFAULTS
         gop = {"verify.waived", "verify.waiver_reason", "verify.baseline", "verify.clean_tree",
                "verify.nop"}
         for key in DEFAULTS:
@@ -171,19 +171,19 @@ class TestSolutionKhopMa(unittest.TestCase):
                 self.assertTrue(self._co(name), f"mục cổng `{name}` có trong gate.py nhưng không có ở SOLUTION §12")
 
     def test_thu_tu_nhat_ky_dung_nhu_ma(self):
-        from aisdlc.control.journal import STEPS
+        from aisef.control.journal import STEPS
         gon = re.sub(r"\s+", " ", self.text)
         self.assertIn(" → ".join(STEPS), gon, "thứ tự `STEPS` ở SOLUTION §6 lệch `control/journal.py`")
 
     def test_moi_slot_ban_giao_co_trong_tai_lieu(self):
-        from aisdlc.phases.implement import SLOT_SOURCE
+        from aisef.phases.implement import SLOT_SOURCE
         for slot in SLOT_SOURCE:
             with self.subTest(slot=slot):
                 self.assertTrue(self._co(slot), f"slot `{slot}` có trong SLOT_SOURCE nhưng không có ở SOLUTION §5.4")
 
     def test_moi_guard_va_cong_nguoi_co_ten_trong_tai_lieu(self):
-        from aisdlc.control.approvals import Gate
-        from aisdlc.harness.guardrails import GUARD_MATCHERS
+        from aisef.control.approvals import Gate
+        from aisef.harness.guardrails import GUARD_MATCHERS
         for g in GUARD_MATCHERS:
             with self.subTest(guard=g):
                 self.assertTrue(self._co(g), f"guard `{g}` không có ở SOLUTION §5.5")

@@ -12,8 +12,8 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.phases import implement as I  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.phases import implement as I  # noqa: E402
 
 
 class TestInline(unittest.TestCase):

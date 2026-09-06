@@ -21,16 +21,16 @@ sys.path.insert(0, str(ROOT))
 
 import tests  # noqa: E402,F401 — HostProvider vào chỗ docker, không mở container (tests/__init__.py)
 
-from aisdlc.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
-from aisdlc.clients.stream import RunResult  # noqa: E402
-from aisdlc.config import DEFAULTS, Config  # noqa: E402
-from aisdlc.control.journal import Entry as JEntry  # noqa: E402
-from aisdlc.control.journal import JournalStore  # noqa: E402
-from aisdlc.control.outcome import Outcome  # noqa: E402
-from aisdlc.control.state import StateStore, StoryStatus  # noqa: E402
-from aisdlc.control.worktree import WorktreeManager  # noqa: E402
-from aisdlc.harness.observe import AGENT_RUN, NOTE, TOOL_RUN, EvidenceStore  # noqa: E402
-from aisdlc.phases.run import load_plan, run_sprint, run_verify_only  # noqa: E402
+from aisef.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
+from aisef.clients.stream import RunResult  # noqa: E402
+from aisef.config import DEFAULTS, Config  # noqa: E402
+from aisef.control.journal import Entry as JEntry  # noqa: E402
+from aisef.control.journal import JournalStore  # noqa: E402
+from aisef.control.outcome import Outcome  # noqa: E402
+from aisef.control.state import StateStore, StoryStatus  # noqa: E402
+from aisef.control.worktree import WorktreeManager  # noqa: E402
+from aisef.harness.observe import AGENT_RUN, NOTE, TOOL_RUN, EvidenceStore  # noqa: E402
+from aisef.phases.run import load_plan, run_sprint, run_verify_only  # noqa: E402
 
 INDEX = {
     "epics": [{"id": "EPIC-01"}, {"id": "EPIC-02"}],
@@ -90,8 +90,8 @@ class Agent(ClientAdapter):
         if dau.startswith("# Rà soát"):
             return RunResult(ok=True, text="không có mục chặn", cost_usd=0.1)
 
-        story_id = spec.env.get("AISDLC_STORY_ID", "")
-        scope = spec.env.get("AISDLC_WRITE_SCOPE", "src").split(",")[0]
+        story_id = spec.env.get("AISEF_STORY_ID", "")
+        scope = spec.env.get("AISEF_WRITE_SCOPE", "src").split(",")[0]
         with self.lock:
             self.stories.append(story_id)
             self.concurrent += 1
@@ -160,7 +160,7 @@ class TestPlanLoading(RunTestCase):
 
     def test_missing_index_is_a_clear_error(self):
         (self.artifacts / "stories.index.json").unlink()
-        self.assertIn("aisdlc plan", load_plan(self.artifacts).error)
+        self.assertIn("aisef plan", load_plan(self.artifacts).error)
 
     def test_broken_index(self):
         (self.artifacts / "stories.index.json").write_text("{ hỏng", encoding="utf-8")
@@ -346,7 +346,7 @@ class TestPreflight(RunTestCase):
 
     def test_story_xong_thi_ghi_bang_hieu_chuan_co_story(self):
         """Ngưỡng chỉ đáng tin khi có bảng đối chiếu điểm ↔ lượt thật."""
-        from aisdlc.control import complexity
+        from aisef.control import complexity
 
         self.run_sprint(Agent())
         rows = complexity.load_calibration(self.artifacts)
@@ -373,7 +373,7 @@ class TestTransaction(RunTestCase):
     """Lượt chạy story là một giao dịch — nhật ký sống sót qua tiến trình."""
 
     def journal(self, sid="STORY-01-01"):
-        from aisdlc.control.journal import JournalStore
+        from aisef.control.journal import JournalStore
 
         return JournalStore(self.artifacts).read(sid)
 
@@ -409,7 +409,7 @@ class TestTransaction(RunTestCase):
     def test_tien_trinh_chet_giua_chung_thi_luot_sau_don_va_khong_de_running(self):
         """Mô phỏng đúng thứ đã xảy ra: tiến trình bị giết sau khi story
         chuyển sang `running`, để lại nhật ký dở và trạng thái kẹt."""
-        from aisdlc.control.journal import Entry, JournalStore
+        from aisef.control.journal import Entry, JournalStore
 
         js = JournalStore(self.artifacts)
         js.record("STORY-01-01", Entry(step="attempt.started", attempt=1))
@@ -428,7 +428,7 @@ class TestTransaction(RunTestCase):
     def test_merge_xong_nhung_so_ghi_failed_thi_duoc_dua_ve_done(self):
         """Đã xảy ra trên e9: worktree merge, wave sau khởi động, sổ vẫn
         `failed`, và chạy lại chỉ thấy diff rỗng."""
-        from aisdlc.control.journal import Entry, JournalStore
+        from aisef.control.journal import Entry, JournalStore
 
         js = JournalStore(self.artifacts)
         js.record("STORY-01-01", Entry(step="attempt.started", attempt=1))
@@ -449,14 +449,14 @@ class TestDonWorktree(RunTestCase):
     """Worktree nằm trong cây dự án — công cụ của dự án nhìn thấy chúng.
 
     Lỗi 35, đo trên e9: `vitest` ở gốc dự án quét vào
-    `.aisdlc/worktrees/STORY-01-04/` và nhặt test của story đang dở, rồi
+    `.aisef/worktrees/STORY-01-04/` và nhặt test của story đang dở, rồi
     cổng trước triển khai báo "unit đỏ". Test không đỏ — nó đọc nhầm cây.
     `.gitignore` che được git, nhưng vitest/eslint/tsc không đọc nó khi
     tìm tệp.
     """
 
     def worktree(self, sid="STORY-01-01"):
-        return self.project / ".aisdlc" / "worktrees" / sid
+        return self.project / ".aisef" / "worktrees" / sid
 
     def test_story_truot_khong_de_lai_thu_muc_trong_cay_du_an(self):
         self.run_sprint(Agent(fail={"STORY-01-01"}))
@@ -499,7 +499,7 @@ class TestMergeDungRoiChayLai(RunTestCase):
 
     Merge đụng thì story đứng lại ở DONE-nhưng-chưa-merge. Lượt chạy sau
     thấy DONE và bỏ qua, nên công việc nằm mãi trên nhánh story: không ai
-    đưa vào nhánh chính, không ai báo, và `aisdlc status` nói story xong.
+    đưa vào nhánh chính, không ai báo, và `aisef status` nói story xong.
 
     Gặp thật trên `par` khi merge STORY-02-01 đụng một tệp chưa theo dõi
     ở cây chính: story `XONG`, `main` không đổi, chạy lại báo "đã xong từ
@@ -569,13 +569,13 @@ class TestDoneChiSauMerge(RunTestCase):
 
     def test_merge_dung_thi_verified_khong_phai_done(self):
         """Hai story cùng đợt cố ý chạm một tệp → merge story thứ hai đụng."""
-        from aisdlc.control.worktree import WorktreeManager
+        from aisef.control.worktree import WorktreeManager
         # STORY-01-02 (src/a) và STORY-01-03 (src/b) cùng đợt 2. Ép đụng bằng
         # cách để agent giả của 01-03 cũng ghi vào src/a/STORY-01-02.py.
         class Dung(Agent):
             def run(self, spec):
                 r = super().run(spec)
-                if spec.env.get("AISDLC_STORY_ID") == "STORY-01-03":
+                if spec.env.get("AISEF_STORY_ID") == "STORY-01-03":
                     p = Path(spec.workdir) / "src" / "a" / "STORY-01-02.py"
                     p.parent.mkdir(parents=True, exist_ok=True)
                     p.write_text("# đụng\n", encoding="utf-8")
@@ -598,7 +598,7 @@ class TestDoneChiSauMerge(RunTestCase):
         self.assertIs(st.stories["STORY-01-02"].state, StoryStatus.DONE)
 
     def test_done_sau_merge_completed_theo_thu_tu_ghi(self):
-        from aisdlc.control.journal import JournalStore
+        from aisef.control.journal import JournalStore
         self.run_sprint(Agent(), only_epic="EPIC-01")
         st = self.state()
         for sid, rec in st.stories.items():
