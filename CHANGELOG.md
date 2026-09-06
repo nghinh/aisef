@@ -25,9 +25,14 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   chỉ vào hook sau khi biên dịch lại; `aisdlc doctor` báo khi hook cũ thiếu
   guard hoặc trỏ sang dự án khác.
 - **Duyệt lại `stories` và `readiness` một lần**: cách băm `stories.index.json`
-  đổi (chuẩn hoá JSON, bỏ `STORY-RP-*`/`EPIC-RP-*`) nên phê duyệt đã ký trước
-  bản này hiện `stale` ở `aisdlc gates` — đúng một lần, không phải lỗi (lỗi 25;
-  `control/approvals.py::_artifact_hash`).
+  đổi (chuẩn hoá JSON, bỏ `STORY-RP-*`/`EPIC-RP-*` ở `stories`/`epics` **và
+  `waves`**) nên phê duyệt đã ký trước bản này hiện `stale` ở `aisdlc gates` —
+  đúng một lần, không phải lỗi (lỗi 25/28; `control/approvals.py::_artifact_hash`).
+- **`verify.waived` khác rỗng thì phải có `verify.waiver_reason`** (phạm vi,
+  ngày, người ký): `aisdlc pre-deploy` nay chặn mục "miễn tường minh" khi miễn
+  không lý do; loại miễn hiện ◇, không ✅ (QĐ5 2026-09-06). Dự án chỉ nghiệm thu
+  một epic: `aisdlc pre-deploy --epic E` rồi `aisdlc approve pre-deploy` — phê
+  duyệt gắn với phạm vi khai.
 - **Xoá `story.max_context_tokens`** khỏi `.ai/config.json` — khoá đã gỡ, nạp
   vẫn được nhưng cảnh báo mỗi lần chạy (`config.RETIRED`). Khoá mới đều có
   mặc định, không cần thêm.
