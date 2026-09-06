@@ -4,7 +4,7 @@ Bản này trả lời ba câu: dự án đang ở đâu, còn gì trước khi 
 
 ## 1. Hiện trạng
 
-### 1.1 Framework (master `d6656f0`, 133 commit từ sáng 05/09)
+### 1.1 Framework (master `96f30ab`, 136 commit từ sáng 05/09)
 
 | Mặt | Trạng thái |
 |---|---|
@@ -16,7 +16,7 @@ Bản này trả lời ba câu: dự án đang ở đâu, còn gì trước khi 
 | ADR-002 tri thức vận hành | xong, đo trên e9 |
 | ADR-003 bàn giao/skills | xong phần đo; `skills.offer`/`inline` tắt vì không thấy gain (n=1) |
 | ADR-004 (HoH) | R1–R9 + R13 hiện thực; R2/R5/R6/R7 ACCEPTED có số; R1/R4/R8/R9 đo trên agent thật; B0–B7 đo; vòng improve B1 5 vòng: +1/+1/+1 rồi −1/−2, dừng đúng `flat_loops` |
-| ADR-005 (10 repo ngoài) | 6/8 luồng đợt 1 đã gộp: V1 scrub, V2 env allowlist + git credential, V5 provider/guarantee, V6 QA sạch, V7 repo_map (tắt mặc định), V9 contract cổng 15 mục × 3 control, V11(A,B) tool output/exit_status, R13 `--repeat`; đang gộp: V3 nop + V4 replay (X3), V8 bench (X7) |
+| ADR-005 (10 repo ngoài) | 7/8 luồng đợt 1 đã gộp: V1 scrub, V2 env allowlist + git credential, V3 nop control hai cấp, V4 `gate:input` + `aisdlc gate --replay`, V5 provider/guarantee, V6 QA sạch, V7 repo_map (tắt mặc định), V9 contract cổng 16 mục × 3 control, V11(A,B) tool output/exit_status, R13 `--repeat`; đang gộp: V8 bench (X7) |
 | Tài liệu | SOLUTION đối chiếu mã có test meta (CLI, knob, mục cổng, STEPS, slot, guard); CHANGELOG v0.1.0 theo sáu nhóm; taxonomy 11 lớp |
 
 ### 1.2 Dogfood
@@ -53,7 +53,7 @@ Bản này trả lời ba câu: dự án đang ở đâu, còn gì trước khi 
 
 ## 2. Việc còn lại trước khi phát hành — tóm tắt
 
-1. Đóng đợt X (X3, X7), suite đầy đủ xanh, tài liệu khớp mã. **Chặn release.**
+1. Đóng đợt X (còn X7), suite đầy đủ xanh, tài liệu khớp mã. **Chặn release.**
 2. Suite hết phụ thuộc Docker (FakeProvider mặc định). **Chặn release** — vì "100 % unit xanh" phải lặp lại được trên máy không có Docker rảnh.
 3. Quyết định phạm vi nghiệm thu e9 cho v0.1.0 (EPIC-01 hay cả 5 epic) và làm pre-deploy chấm đúng phạm vi ấy. **Chặn release** (cần quyết định của chủ đầu tư).
 4. Số đo còn thiếu để các V/R lên ACCEPTED có số (không chặn release, nhưng nên có trước khi tuyên bố năng lực): T3/T4 (X3), T8 A/B repo map, T9 bench run, V10 C11/C12, T5 flake.
@@ -67,7 +67,7 @@ Bản này trả lời ba câu: dự án đang ở đâu, còn gì trước khi 
 
 | # | Việc | Ai | Xong khi |
 |---|---|---|---|
-| A1 | Gộp X3 (V3 nop + V4 replay) và X7 (V8 bench) sau khi hai luồng rebase và xanh module | tôi | master có 8/8; `git worktree list` = 1 |
+| A1 | Gộp X7 (V8 bench) sau khi rebase và xanh module (X3 đã gộp 96f30ab) | tôi | master có 8/8; `git worktree list` = 1 |
 | A2 | **FakeProvider mặc định cho unit test**: `tests/` dùng `sandbox.using(FakeProvider)`/`AISDLC_TEST_PROVIDER=fake`; test cần Docker thật đánh dấu `@docker` như hợp quy; giữ ≥ 8 test Docker thật (S1–S5 + tools/qa) | 1 subagent | suite đầy đủ < 5 phút trên máy không có Docker rảnh; số test không giảm; test đỏ khi hoàn nguyên FakeProvider |
 | A3 | Suite đầy đủ trên master, **một suite một lúc**, load < 20 | tôi | `OK`, số test ghi vào STATUS §5 |
 | A4 | `test_meta` khớp mã sau 8 luồng (CLI, knob, mục cổng 16, STEPS, slot, guard) | tôi | xanh; SOLUTION §10/§12/§13 cập nhật |
