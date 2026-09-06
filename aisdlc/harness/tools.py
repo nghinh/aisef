@@ -28,7 +28,12 @@ from pathlib import Path
 
 from ..config import Config
 from . import sandbox
+from .guardrails import scrub_secrets
 from .observe import EvidenceStore
+
+#: Số dòng cuối ghi vào `detail.tail`. Không nâng lên: `tail` đi vào prompt
+#: của cổng và guard (ngân sách B5); toàn văn nằm ở tệp `.log` cạnh sổ.
+TAIL_LINES = 20
 
 #: Ảnh sandbox theo stack. `alpine` không có node hay python, nên chạy
 #: `npm test` trong đó sẽ đỏ vì **thiếu công cụ**, không phải vì code sai —
@@ -108,6 +113,9 @@ class ToolResult:
     skipped: str = ""      # lý do không chạy được (không có lệnh cho stack này)
     degraded: bool = False
     detail: dict = field(default_factory=dict)
+    #: Tệp log toàn văn (đã che bí mật) khi output dài hơn `TAIL_LINES` và
+    #: có story để ghi — `aisdlc tool` in đường dẫn này ở dòng "lược".
+    log: str = ""
 
     @property
     def ran(self) -> bool:
@@ -120,10 +128,15 @@ class ToolResult:
         extra = " (sandbox suy biến)" if self.degraded else ""
         return f"{mark} {self.name} — thoát {self.exit_code}, {self.duration_ms}ms{extra}"
 
+    def output(self) -> tuple[str, int]:
+        """(stdout + stderr đã che bí mật, số chỗ che). Mọi thứ in ra hay ghi
+        lại đi qua đây — che **trước** khi cắt, để một khoá nằm vắt qua mép
+        `tail` không lọt nửa sau (ADR-005 V1)."""
+        return scrub_secrets((self.stdout + "\n" + self.stderr).strip())
+
     def tail(self, lines: int = 40) -> str:
         """Phần cuối output — chỗ lỗi thường nằm."""
-        text = (self.stdout + "\n" + self.stderr).strip()
-        return "\n".join(text.splitlines()[-lines:])
+        return "\n".join(self.output()[0].splitlines()[-lines:])
 
 
 def detect_commands(project: Path | str) -> dict[str, str]:
@@ -224,7 +237,7 @@ def run_tool(
     )
     if not sb.ok:
         res.unrunnable = unrunnable_reason(name, sb.exit_code, sb.stdout + "\n" + sb.stderr)
-    record(res, story_id, artifact_root, candidate)
+    res.log = record(res, story_id, artifact_root, candidate)
     return res
 
 
@@ -265,32 +278,49 @@ BASELINE_RUN = "test:baseline"
 
 
 def record(res: ToolResult, story_id: str, artifact_root, candidate: str = "",
-           *, name: str = "", extra: dict | None = None) -> None:
+           *, name: str = "", extra: dict | None = None) -> str:
     """Ghi bằng chứng. Không có story_id thì không ghi — tool chạy ngoài
     ngữ cảnh story (ví dụ người gõ tay) không nên làm bẩn hồ sơ story.
 
     ``name`` ghi dưới tên khác tên tool (baseline ghi `test:baseline`);
-    ``extra`` là khoá thêm vào `detail`. Hình dạng bản ghi vẫn ở một chỗ."""
+    ``extra`` là khoá thêm vào `detail`. Hình dạng bản ghi vẫn ở một chỗ.
+
+    Trả đường dẫn tệp log toàn văn `evidence/<story>-<tool>-<seq>.log` khi
+    output dài hơn `TAIL_LINES` (ADR-005 V11 A), "" khi không có gì bị cắt.
+    Cả `tail` lẫn log đều đã che bí mật (V1); `detail.redacted` = số chỗ che."""
     if not story_id or artifact_root is None:
-        return
+        return ""
+    full, redacted = res.output()
+    lines = full.splitlines()
     detail = {
         "exit_code": res.exit_code,
         "skipped": res.skipped,
         "unrunnable": res.unrunnable,
         "degraded": res.degraded,
-        "tail": res.tail(20),
+        "tail": "\n".join(lines[-TAIL_LINES:]),
         **res.detail,
     }
+    if redacted:
+        detail["redacted"] = redacted
     if res.name == "test" and not res.skipped:
         # Tên test nào chạy, xanh/đỏ, coverage — cổng tiêu chí (G5) và
         # `coverage.min` (G10b) đọc từ đây, không đọc lại stdout.
         from .testlog import parse as parse_testlog
 
-        detail.update(parse_testlog(res.stdout + "\n" + res.stderr).to_evidence())
+        detail.update(parse_testlog(full).to_evidence())
     detail.update(extra or {})
-    EvidenceStore(artifact_root, candidate=candidate).tool_run(
+    store = EvidenceStore(artifact_root, candidate=candidate)
+    event = store.tool_run(
         story_id, name or res.name, ok=res.ok, duration_ms=res.duration_ms, detail=detail,
     )
+    if len(lines) <= TAIL_LINES:
+        return ""
+    # Toàn văn cạnh sổ bằng chứng, tên mang `seq` để khớp đúng bản ghi;
+    # `:` của `test:baseline` đổi thành `-` vì tên tệp phải mở được ở mọi hệ.
+    log = store.path(story_id).with_name(
+        f"{story_id}-{(name or res.name).replace(':', '-')}-{event.seq}.log")
+    log.write_text(full + "\n", encoding="utf-8")
+    return str(log)
 
 
 def aisdlc_command() -> str:

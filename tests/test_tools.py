@@ -226,3 +226,60 @@ class TestKhongChayDuocKhacDo(ToolTestCase):
         res = self.run_test_tool("sh -c 'cat out.txt; exit 1'")
         self.assertFalse(res.ok)
         self.assertEqual(res.unrunnable, "")
+
+
+class TestCheBiMatVaLogToanVan(ToolTestCase):
+    """ADR-005 V1 + V11 (A). `tail` đi vào `_bmad-output`, thư mục được commit
+    theo dự án — bí mật phải bị che **trước** khi ghi; output dài thì toàn văn
+    nằm ở tệp `.log` cạnh sổ, còn `tail` vẫn 20 dòng (ngân sách prompt B5)."""
+
+    AWS = "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+    GH = "ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    BEARER = "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.abcdefghijklmnop"
+
+    def run_test_tool(self, command: str):
+        # Không Docker: điều cần kiểm là che/cắt, không phải sandbox.
+        cfg = Config({**DEFAULTS, "tools.test": command, "sandbox.use_docker": False})
+        return run_tool("test", self.project, story_id="S-01",
+                        artifact_root=self.artifacts, config=cfg)
+
+    def last(self):
+        return EvidenceStore(self.artifacts).read("S-01").last(TOOL_RUN, "test")
+
+    def test_bi_mat_trong_stdout_bi_che_va_dem(self):
+        res = self.run_test_tool(
+            f"sh -c 'echo {self.AWS}; echo {self.GH}; echo \"{self.BEARER}\"; exit 1'")
+        e = self.last()
+        self.assertEqual(e.detail["redacted"], 3)
+        self.assertEqual(e.detail["tail"].count("[REDACTED]"), 3)
+        for lo in ("wJalrXUtnFEMI", "ghp_", "eyJhbGci"):
+            self.assertNotIn(lo, e.detail["tail"])
+            self.assertNotIn(lo, res.tail())   # thứ agent thấy cũng đã che
+
+    def test_stdout_sach_thi_khong_doi(self):
+        self.run_test_tool("sh -c 'echo xanh sạch'")
+        e = self.last()
+        self.assertNotIn("redacted", e.detail)
+        self.assertEqual(e.detail["tail"], "xanh sạch")
+
+    def test_output_dai_co_log_toan_van_da_che_tail_van_20_dong(self):
+        res = self.run_test_tool(f"sh -c 'seq 1 500; echo {self.GH}; exit 1'")
+        e = self.last()
+        self.assertEqual(len(e.detail["tail"].splitlines()), 20)
+        self.assertTrue(res.log.endswith(f"S-01-test-{e.seq}.log"), res.log)
+        log = Path(res.log).read_text(encoding="utf-8")
+        self.assertEqual(len(log.splitlines()), 501)
+        self.assertIn("[REDACTED]", log)
+        self.assertNotIn("ghp_", log)
+
+    def test_output_ngan_thi_khong_co_log(self):
+        res = self.run_test_tool("seq 1 20")
+        self.assertEqual(res.log, "")
+        self.assertEqual(list(self.artifacts.glob("evidence/*.log")), [])
+
+    def test_ten_log_baseline_khong_co_dau_hai_cham(self):
+        """`test:baseline` → `-test-baseline-`: tên tệp phải mở được ở mọi hệ."""
+        from aisdlc.harness.tools import BASELINE_RUN, ToolResult, record
+        res = ToolResult(name="test", ok=True, stdout="\n".join(map(str, range(30))))
+        path = record(res, "S-01", self.artifacts, name=BASELINE_RUN)
+        self.assertEqual(Path(path).name, "S-01-test-baseline-1.log")

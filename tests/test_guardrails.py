@@ -32,6 +32,7 @@ from aisdlc.harness.guardrails import (
     fork_point,
     run_guard,
     scope_from_env,
+    scrub_secrets,
 )
 from aisdlc.harness.observe import EvidenceStore  # noqa: E402
 
@@ -112,6 +113,25 @@ class TestSecrets(unittest.TestCase):
 
     def test_clean_content_allowed(self):
         self.assertTrue(check_secrets("def cong(a, b):\n    return a + b\n").allowed)
+
+    def test_scrub_che_va_dem(self):
+        """ADR-005 V1: che thay vì chặn — cho bằng chứng đã sinh, không phải mã sắp ghi."""
+        text, n = scrub_secrets(
+            "a\nAWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\n"
+            "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.abcdefghijklmnop\nb")
+        self.assertEqual(n, 2)
+        self.assertEqual(text.count("[REDACTED]"), 2)
+        self.assertNotIn("wJalr", text)
+        self.assertNotIn("eyJhbGci", text)
+
+    def test_scrub_khong_bo_qua_dong_giu_cho(self):
+        """Khác `check_secrets`: che nhầm ví dụ là vô hại, bỏ sót khoá thật thì
+        nó đã nằm trong lịch sử git."""
+        self.assertEqual(scrub_secrets('password = "your-password-here-1"')[1], 1)
+
+    def test_scrub_sach_thi_nguyen_ven(self):
+        self.assertEqual(scrub_secrets("def cong(a, b):\n    return a + b\n"),
+                         ("def cong(a, b):\n    return a + b\n", 0))
 
 
 class TestGitStage(unittest.TestCase):
