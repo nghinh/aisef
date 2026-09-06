@@ -8,15 +8,15 @@ Chốt ưu tiên phát hành v0.1.0 nhanh, **không nới invariant/gate**:
 
 | # | Quyết định | Tiến độ |
 |---|---|---|
-| 1 | **C-a**: nghiệm thu v0.1.0 = EPIC-01; `pre-deploy --epic E` scope-aware; story ngoài phạm vi báo "ngoài phạm vi nghiệm thu" (không DONE, không thiếu); report/release notes nói rõ EPIC-01 là corpus nghiệm thu, e9 chưa phải sản phẩm nghiệm thu đủ | ✅ mã + 5 test (`e1766fc`); chạy trên e9 → xem §C |
+| 1 | **C-a**: nghiệm thu v0.1.0 = EPIC-01; `pre-deploy --epic E` scope-aware; story ngoài phạm vi báo "ngoài phạm vi nghiệm thu" (không DONE, không thiếu); report/release notes nói rõ EPIC-01 là corpus nghiệm thu, e9 chưa phải sản phẩm nghiệm thu đủ | ✅ mã + 5 test (`e1766fc`); **e9 `pre-deploy --epic EPIC-01` ĐẠT 11:29** (7 story, 16 ngoài phạm vi, QA unit/e2e/perf/security/a11y/migration/sbom ✅ ở `918291c`), cổng `pre-deploy` duyệt theo phạm vi; báo cáo §1 ghi FR của epic khác là "ngoài phạm vi" |
 | 2 | Đợt A chặn release, làm trước mọi benchmark tốn tiền; suite đầy đủ 100 % xanh, tuần tự, trên master | A1 ✅ (X7 gộp `7668a90`) · A2 đang đo · A3–A5 chờ A2 |
 | 3 | Đợt B không chặn release trừ khi lộ lỗi correctness; B1/B2 trước; B3/T5 nếu còn giờ; **B4 A/B repo-map và B5 bench lớn hoãn sau v0.1.0**, `repo_map` OFF; B7 coverage: cấu hình và thử, không giả PASS | B1 ✅ (X3: V3 hồi cứu 1 story cùng tên + 3 đổi tên; V4 0/12 replay được) · B2 đang chạy · B4/B5 hoãn |
 | 4 | **B6 không nới V3**: gắn mã vào test có sẵn không tính; story sửa phải có hành vi chứng minh bằng đối chứng; gap chỉ thiếu truy vết → sửa siêu dữ liệu bằng harness, không story sửa; `qa:*` ra khỏi hàng đợi tự động; không chạy lại nhiều vòng trước release | ✅ mã + 8 test (`e1766fc`); ADR-004 §6 R3 ghi hệ quả cho B1 |
-| 5 | Mutation UNRUNNABLE của e9: không cài Stryker; waiver có lý do, phạm vi EPIC-01, provenance; không thành PASS; release notes ghi known limitation | ✅ `verify.waiver_reason` + mục ◇ (`e1766fc`); e9 khai ở §C |
+| 5 | Mutation UNRUNNABLE của e9: không cài Stryker; waiver có lý do, phạm vi EPIC-01, provenance; không thành PASS; release notes ghi known limitation | ✅ `verify.waiver_reason` + mục ◇ (`e1766fc`); e9 miễn sit/api-contract/uat (không áp dụng: local-first, không API) + mutation + image-scan (docker scout đòi đăng nhập) có lý do, hiện ◇ |
 | 6 | S1 giữ BLOCKED/degraded, không workaround; release notes/capability matrix khai rõ | ghi ở D6 |
 | 7 | OpenCode hạng hai; C9 không kết luận không chặn | ghi ở D6 |
-| 8 | P1-4 coverage: không biến UNCONFIGURED thành PASS; cấu hình nếu đơn giản, không thì tài liệu + visibility | B7 |
-| 9 | PyPI sau A + C-a: build + twine, cài venv sạch, setup + doctor, cổng phát hành trả 0; **không tag trước khi xanh** | D1–D4 |
+| 8 | P1-4 coverage: không biến UNCONFIGURED thành PASS; cấu hình nếu đơn giản, không thì tài liệu + visibility | ✅ e9: `@vitest/coverage-v8` 5.0.0 + `--coverage` trong `npm test`; harness đọc **84,16 %** (dưới `coverage.min` 0,85 — story kế của e9 sẽ ✗ đúng); README ghi luật |
+| 9 | PyPI sau A + C-a: build + twine, cài venv sạch, setup + doctor, cổng phát hành trả 0; **không tag trước khi xanh** | D2 build + twine PASS 11:29 (`ai_sdlc-0.1.0`); venv sạch → xem D2; D4 chờ A3 |
 | 10 | DoD: unit 100 % không cần Docker · Docker conformance riêng xanh · Claude conformance không ✗ · par đạt mốc · e9 EPIC-01 7/7 + QA + pre-deploy scoped đạt (waiver tường minh cho UNRUNNABLE) · wheel/sdist cài sạch · README/CHANGELOG/STATUS/SOLUTION khớp mã · known limitations ghi rõ | D6 |
 
 Thứ tự thực thi: A1–A5 → B6 (xong) → B1/B2 → C-a → D1/D2/D4. Không chạy thêm story e9 chỉ để tăng bằng chứng.
