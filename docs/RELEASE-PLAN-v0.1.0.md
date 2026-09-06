@@ -16,7 +16,7 @@ Chốt ưu tiên phát hành v0.1.0 nhanh, **không nới invariant/gate**:
 | 6 | S1 giữ BLOCKED/degraded, không workaround; release notes/capability matrix khai rõ | ghi ở D6 |
 | 7 | OpenCode hạng hai; C9 không kết luận không chặn | ghi ở D6 |
 | 8 | P1-4 coverage: không biến UNCONFIGURED thành PASS; cấu hình nếu đơn giản, không thì tài liệu + visibility | ✅ e9: `@vitest/coverage-v8` 5.0.0 + `--coverage` trong `npm test`; harness đọc **84,16 %** (dưới `coverage.min` 0,85 — story kế của e9 sẽ ✗ đúng); README ghi luật |
-| 9 | PyPI sau A + C-a: build + twine, cài venv sạch, setup + doctor, cổng phát hành trả 0; **không tag trước khi xanh** | D2 build + twine PASS 11:29 (`ai_sdlc-0.1.0`); venv sạch → xem D2; D4 chờ A3 |
+| 9 | PyPI sau A + C-a: build + twine, cài venv sạch, setup + doctor, cổng phát hành trả 0; **không tag trước khi xanh** | ✅ D2: gói đổi tên `aisef` (12:0x, chủ đầu tư đã tạo project + trusted publisher), build + twine PASS, venv sạch → `aisdlc setup` → `doctor` "sẵn sàng"; D4 chờ A3 |
 | 10 | DoD: unit 100 % không cần Docker · Docker conformance riêng xanh · Claude conformance không ✗ · par đạt mốc · e9 EPIC-01 7/7 + QA + pre-deploy scoped đạt (waiver tường minh cho UNRUNNABLE) · wheel/sdist cài sạch · README/CHANGELOG/STATUS/SOLUTION khớp mã · known limitations ghi rõ | D6 |
 
 Thứ tự thực thi: A1–A5 → B6 (xong) → B1/B2 → C-a → D1/D2/D4. Không chạy thêm story e9 chỉ để tăng bằng chứng.
