@@ -171,6 +171,27 @@ class TestPreDeploySection(ReportTestCase):
         self.assertIn("chưa cấu hình = perf", text)
 
 
+class TestCongStoryChungNhan(ReportTestCase):
+    """ADR-005 V9: báo cáo in "mục cổng có đủ 3 control: n/N" đọc từ bảng
+    test, không phải câu "cổng 6 điều kiện" kể tay."""
+
+    def test_so_doc_tu_bang_qualification(self):
+        from aisdlc.control.gate import CHECK_NAMES, qualification_table
+
+        report = build(self.project)
+        self.assertEqual(set(report.qualification), set(CHECK_NAMES))
+        du = sum(all(v.values()) for v in qualification_table().values())
+        self.assertIn(f"mục cổng có đủ 3 control: {du}/{len(CHECK_NAMES)}", report.markdown())
+        self.assertNotIn("6 điều kiện", report.markdown())
+
+    def test_khong_co_thu_muc_tests_thi_in_dau_hoi_khong_in_0(self):
+        from aisdlc.control.gate import CHECK_NAMES
+        from aisdlc.phases.report import Report
+
+        text = Report(project="x", qualification={}).markdown()
+        self.assertIn(f"mục cổng có đủ 3 control: ?/{len(CHECK_NAMES)}", text)
+
+
 class TestOutput(ReportTestCase):
     def test_written_to_docs(self):
         path = write(self.project)

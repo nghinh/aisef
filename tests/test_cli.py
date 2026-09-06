@@ -86,6 +86,40 @@ class TestDoctor(CliTestCase):
         self.assertEqual(code, EXIT_OK)
 
 
+class TestDoctorTenTest(CliTestCase):
+    """ADR-005 V9: `doctor` nói cổng có đọc được tên test không — tin bằng
+    chứng khi có, đoán từ cờ lệnh khi chưa — và gợi reporter/CTRF."""
+
+    def cau_hinh(self, lenh: str) -> None:
+        import json as _json
+        (self.project / ".ai").mkdir(exist_ok=True)
+        (self.project / ".ai" / "config.json").write_text(_json.dumps({"tools.test": lenh}), encoding="utf-8")
+
+    def test_lenh_khong_in_ten_thi_goi_ctrf(self):
+        self.cau_hinh("pytest")
+        _, out, _ = self.run_cli("doctor")
+        self.assertIn("lệnh test in tên test", out)
+        self.assertIn("pytest-json-ctrf", out)
+        self.assertIn("đoán từ cờ lệnh", out)
+
+    def test_bang_chung_thang_co_lenh(self):
+        """Lệnh trông "câm" nhưng bằng chứng ghi `test_format` → tin bằng chứng."""
+        from aisdlc.harness.observe import EvidenceStore
+        self.cau_hinh("pytest")
+        EvidenceStore(self.artifacts).tool_run("S-01", "test", ok=True, detail={"test_format": "ctrf"})
+        _, out, _ = self.run_cli("doctor")
+        self.assertIn("cổng đọc được tên test", out)
+        self.assertIn("'ctrf'", out)
+
+    def test_bang_chung_rong_thi_goi_du_lenh_in_ten(self):
+        from aisdlc.harness.observe import EvidenceStore
+        self.cau_hinh("pytest -v")
+        EvidenceStore(self.artifacts).tool_run("S-01", "test", ok=True, detail={"test_format": ""})
+        _, out, _ = self.run_cli("doctor")
+        self.assertIn("chưa cấu hình", out)
+        self.assertIn("CTRF", out)
+
+
 class TestDoctorSkillFreshness(CliTestCase):
     def test_stale_framework_skill_is_flagged(self):
         """Skill của framework nằm trong kho framework; dự án giữ một bản

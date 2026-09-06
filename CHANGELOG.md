@@ -78,6 +78,13 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 - `harness/testlog.py`: đọc tên test từ node `spec`/`tap`, vitest, pytest;
   `test_ids`/`failed_ids`/`skipped_ids`, coverage; cắt ở `MAX_IDS` = 500 và nói
   ra khi cắt.
+- `harness/testlog.py` đọc **CTRF** (ctrf.io JSON — pytest-json-ctrf,
+  vitest-ctrf-json-reporter, jest/playwright…): khối `{"results":{"tests":[…]}}`
+  ở bất kỳ đâu trong output (`pytest --ctrf=/dev/stdout`), id ghép
+  `file > suite > tên` khi reporter tách; pending/other tính là bỏ qua. Hai
+  fixture thật ở `tests/fixtures/testlog/ctrf-*.json`. `aisdlc doctor` mục
+  "lệnh test in tên test": tin bằng chứng (`test_format` lần test gần nhất),
+  chưa có thì đoán từ cờ lệnh; gợi `-v`/`--reporter=verbose`/CTRF (ADR-005 V9).
 
 ### 3 · Sandboxes & execution environments
 
@@ -180,6 +187,16 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   `via` — R4, lỗi 23), `tiêu chí có test` (G5), `coverage` (G10b), `TDD` (G8),
   `test thật`, `guard có chạy`; hợp đồng kiểm định đọc `qa:<kind>` trước tên
   trần (lỗi 9). Cổng ghi `gate:verdict` vào bằng chứng.
+- **Hợp đồng chấm tối thiểu** (ADR-005 V9): `Check.kind` (deterministic ·
+  structural · security · model-judge · human — `outcome.CHECK_KINDS`,
+  `gate.CHECK_KIND` một chỗ) và `Check.evidence` (con trỏ `seq` sự kiện đã đọc;
+  12/15 mục trỏ, `phạm vi ghi`/`bảo mật`/`rà soát` rỗng vì suy từ tham số);
+  `gate.CHECK_NAMES` danh sách đóng 15 tên (14 mục + họ `<kind>`);
+  `tests/test_gate_qualification.py` mỗi tên 3 control positive · negative ·
+  env + test meta (tên lạ trong `gate.py`, thiếu control, `CHECK_KIND` lệch);
+  `gate.qualification_table()` đọc AST tệp test; `gate:verdict` ghi `checks[]`
+  đủ `kind`/`evidence`; báo cáo in "mục cổng có đủ 3 control: 15/15". Không có
+  `blocking` (YAGNI). `Check("lint", True)` cũ không đổi.
 - Hợp quy client: phép **C6** (luật 6), **C7** (ghi ngoài scope), **C8** (ứng
   viên stale) — 16/16 hai client 2026-09-06 (`docs/CONFORMANCE.md`).
 
@@ -210,7 +227,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   ≤ 2 × $3,14) và `tests/conformance/` (8 phép, hai client); release gate
   `AISDLC_RELEASE=1 tests.test_release_gate`.
 - `aisdlc doctor`: hook trỏ đúng dự án, hook thiếu guard mới, ngưỡng cỡ story
-  lệch dữ liệu, gợi ý lệnh test in coverage.
+  lệch dữ liệu, gợi ý lệnh test in coverage, gợi reporter in tên/CTRF (V9).
 
 ### Knob cấu hình mới (mặc định) — `aisdlc/config.py::DEFAULTS`, ý nghĩa ở SOLUTION §13
 

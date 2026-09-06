@@ -30,6 +30,7 @@ from ..control.approvals import (
     Status,
 )
 from ..control import ledger
+from ..control.gate import CHECK_NAMES, qualification_table
 from ..control.normalize import parse_prd_file
 from ..control.state import StateStore
 from ..harness.observe import AGENT_RUN, HANDOFF, MOCKUP_MAP, TOOL_RUN, EvidenceStore
@@ -80,6 +81,9 @@ class Report:
     total_cost_usd: float = 0.0
     #: Số của sổ hành vi (ADR-004 R2/R7) — chiếu từ cùng bằng chứng.
     ledger: dict = field(default_factory=dict)
+    #: Bảng chứng nhận mục cổng story (ADR-005 V9): tên → control đã có.
+    #: Rỗng khi không có `tests/` (bản cài từ wheel) — in `?`, không in 0.
+    qualification: dict = field(default_factory=dict)
 
     @property
     def uncovered(self) -> list[str]:
@@ -135,6 +139,14 @@ class Report:
                 )
 
         lines += ["", f"**Tổng chi phí:** ${self.total_cost_usd:.2f}"]
+
+        # Cổng story chấm được bao nhiêu mục là **đã chứng nhận** (positive ·
+        # negative · env) — đọc từ bảng test, không phải "cổng N điều kiện" kể.
+        du = sum(all(v.values()) for v in self.qualification.values())
+        tong = len(self.qualification) or len(CHECK_NAMES)
+        lines += ["", f"**Cổng story:** mục cổng có đủ 3 control: "
+                      f"{du if self.qualification else '?'}/{tong} "
+                      f"(`tests/test_gate_qualification.py`; `?` = không có thư mục `tests/`)"]
 
         lines += ["", "## 4. Sáu nhóm harness", "", "| Nhóm | Bằng chứng |", "|---|---|"]
         for group, proof in self.harness.items():
@@ -286,6 +298,7 @@ def build(project: Path | str) -> Report:
         p["cost"] for p in report.phases
     )
     report.harness = _harness_evidence(project, root, evidence)
+    report.qualification = qualification_table()
 
     pre_deploy_file = root / PRE_DEPLOY_REPORT
     if pre_deploy_file.is_file():

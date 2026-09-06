@@ -26,6 +26,6 @@ rữa được.
 | R9 | DevSecOps | `tests/test_deploy.py::TestCiWorkflow` · `tests/test_deploy.py::TestPreDeployGate` | CI sinh bằng code; cổng cuối chấm từ trạng thái thật |
 | R10 | Bốn bề mặt Claude/OpenCode | `tests/test_clients.py::TestCapabilityDeclaration` · `tests/test_compile.py::TestOpenCodePlugin` | năng lực **khai** chứ không giả định. OpenCode nâng lên chặn-tại-nguồn ngày 2026-09-05 sau khi có phép thử trên agent thật; STORY-02-01 của dự án `par` do agent OpenCode hiện thực trọn vẹn, qua cổng, merge vào main |
 | R11 | Chuẩn hoá, chuyên nghiệp | `tests/test_constitution.py` · `docs/SOLUTION.md` · `docs/EXECUTION-PLAN.md` | hiến pháp sinh giống nhau cho mọi client; quyết định có nơi tra |
-| R12 | Chất lượng chứng minh được | `tests/test_gate.py` · `tests/test_report.py::TestTraceability` | cổng story 6 điều kiện đọc từ bằng chứng; báo cáo nêu thẳng FR chưa phủ |
+| R12 | Chất lượng chứng minh được | `tests/test_gate.py` · `tests/test_gate_qualification.py` · `tests/test_report.py::TestTraceability` | cổng story 15 mục (`gate.CHECK_NAMES`) đọc từ bằng chứng, mỗi mục có 3 control (positive · negative · env, ADR-005 V9); báo cáo nêu thẳng FR chưa phủ |
 | R13 | Người duyệt từng bước | `tests/test_approvals.py` · `tests/test_plan.py::TestStopsAtGates` | phê duyệt gắn với băm nội dung; sửa tầng trên làm tầng dưới `stale` |
 | R14 | Epic tuần tự, story song song | `tests/test_scheduler.py` · `tests/test_run.py::TestOrchestration` | cùng đợt chỉ khi hết phụ thuộc **và** phạm vi ghi rời nhau |

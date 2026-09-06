@@ -102,7 +102,7 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 ### 5.2 Tools
 | Hạng mục | Hiện thực |
 |---|---|
-| Tool thật | `harness/tools.py` — ba tool có bằng chứng `test` · `lint` · `sast` (agent gọi `aisdlc tool <tên> --story S`; lệnh từ `tools.*` hoặc tự dò), phân biệt **không chạy được** với đỏ (lỗi 8); `test:baseline` là lần test do harness ghi trước phiên developer (ADR-004 R9). Đọc/ghi tệp là tool của client (guard chặn); commit ứng viên do harness làm (`phases/implement.py::freeze_candidate`); route thật/ảnh chụp qua `harness/browser.py` |
+| Tool thật | `harness/tools.py` — ba tool có bằng chứng `test` · `lint` · `sast` (agent gọi `aisdlc tool <tên> --story S`; lệnh từ `tools.*` hoặc tự dò), phân biệt **không chạy được** với đỏ (lỗi 8); `test:baseline` là lần test do harness ghi trước phiên developer (ADR-004 R9); `harness/testlog.py` đọc tên test từ năm định dạng — node `spec`/`tap`, vitest verbose, `pytest -v`, **CTRF** JSON (ADR-005 V9; `doctor` gợi reporter khi bằng chứng ghi `test_format=""`). Đọc/ghi tệp là tool của client (guard chặn); commit ứng viên do harness làm (`phases/implement.py::freeze_candidate`); route thật/ảnh chụp qua `harness/browser.py` |
 | MCP | không có — quyết định V1: không MCP thường trú; playwright dùng qua CLI trong `harness/browser.py`, tra cứu tài liệu theo yêu cầu là việc đợt 5 (`aisdlc doc`) |
 | **Prose quanh tool** | mỗi tool có mục "khi nào gọi / cách đọc kết quả / khi nào KHÔNG gọi" |
 
@@ -498,6 +498,19 @@ chặn story; ○ không chặn story nhưng phải hiện ra và chặn ở `pr
 Truy vết code ↔ story ↔ FR không phải một mục cổng: nó nằm ở `covers` của
 story (sổ hành vi chiếu `FR-x` từ tiêu chí) và nhánh `story/<id>`; harness
 không kiểm nội dung commit message.
+
+**Hợp đồng chấm tối thiểu (ADR-005 V9).** Mỗi `Check` (`control/outcome.py`)
+mang `kind` — ai chấm: `deterministic` · `structural` · `security` ·
+`model-judge` · `human` (`outcome.CHECK_KINDS`; bảng `gate.CHECK_KIND` một chỗ)
+— và `evidence`: con trỏ `seq` của sự kiện mục đã đọc, không chép nội dung;
+mục suy từ tham số (`phạm vi ghi`, `bảo mật`, `rà soát`) trỏ rỗng và nói rỗng.
+Tên mục là danh sách **đóng** `gate.CHECK_NAMES` (15 tên: 14 mục trên + họ
+`<kind>`; nop control V3 sẽ là 16). Mỗi tên có **ba control** ở
+`tests/test_gate_qualification.py` — positive (bằng chứng tốt → ✅/–), negative
+hay mutant (bằng chứng xấu → ✗), env (môi trường/cấu hình không kết luận được →
+⚠/○ có tên) — và `gate.qualification_table()` đọc tệp ấy bằng AST; báo cáo
+nghiệm thu in "mục cổng có đủ 3 control: n/N", `gate:verdict` ghi `checks[]`
+với `kind`/`evidence`. Không có `blocking`: chặn hay không là `Outcome.blocks`.
 
 ---
 

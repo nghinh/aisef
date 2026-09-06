@@ -9,10 +9,18 @@ Bốn định dạng có thật trong các dự án thử: `node --test` reporte
 `pytest -v`. Không nhận ra → `format=""`, `test_ids=[]`, và cổng ghi
 "không đọc được tên test" (UNCONFIGURED) — **không** đoán, không tính là
 đạt. Fixture là output thật, ở `tests/fixtures/testlog/`.
+
+Định dạng thứ năm là **CTRF** (ctrf.io — JSON chung cho pytest-json-ctrf,
+vitest-ctrf-json-reporter, jest/playwright…; ADR-005 V9): một khối JSON
+`{"results": {"tests": [{name, status, suite?, filePath?}]}}` ở bất kỳ đâu
+trong output (`pytest --ctrf /dev/stdout`, hay `cat` tệp reporter ghi ra).
+Regex bốn định dạng trên giữ làm dự phòng; e9/`par` hôm nay 220/377 lần
+`tool_run test` không đọc được tên (`test_format=""`) — `doctor` gợi reporter.
 """
 
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass, field
 
@@ -74,7 +82,10 @@ def parse(text: str) -> TestLog:
             if m:
                 log.coverage = float(m.group(1))
                 break
-    if any("TAP version" in l for l in lines[:5]):
+    ctrf = _ctrf_object(text or "")
+    if ctrf is not None:
+        _ctrf(ctrf, log)
+    elif any("TAP version" in l for l in lines[:5]):
         _node_tap(lines, log)
     elif any(l.strip().startswith("ℹ tests") for l in lines) or any(_SPEC.match(l) for l in lines):
         _node_spec(lines, log)
@@ -90,6 +101,43 @@ def _add(log: TestLog, name: str, mark: str) -> None:
     if not name:
         return
     {"pass": log.passed, "fail": log.failed, "skip": log.skipped}[mark].append(name)
+
+
+def _ctrf_object(text: str) -> dict | None:
+    """Khối JSON CTRF trong output — cả tệp trần (`cat report.json`) lẫn chen
+    giữa text của runner (`pytest --ctrf /dev/stdout`). Chỉ nhận vật thể có
+    `results.tests` là danh sách; JSON khác (mảng, object lạ) bỏ qua."""
+    if '"results"' not in text:
+        return None
+    dec = json.JSONDecoder()
+    # ponytail: thử từng `{"` — output có nhiều object JSON lạ thì O(n²);
+    # log test thật ≤ vài trăm KB nên chưa cần cắt.
+    for m in re.finditer(r'\{\s*"', text):
+        try:
+            obj, _ = dec.raw_decode(text, m.start())
+        except ValueError:
+            continue
+        if isinstance(obj, dict) and isinstance((obj.get("results") or {}).get("tests"), list):
+            return obj
+    return None
+
+
+def _ctrf(data: dict, log: TestLog) -> None:
+    """CTRF: `name` + `status` (passed · failed · skipped · pending · other).
+    Id ghép `<filePath> > <suite> > <name>` khi reporter tách phần ấy ra
+    (vitest) và tên chưa chứa nó; pytest đã in `a.py::test_x` thì giữ nguyên
+    — cùng hình dạng với reporter văn bản, nên `_la()` ở cổng vẫn đọc được."""
+    log.format = "ctrf"
+    for t in data["results"]["tests"]:
+        if not isinstance(t, dict):
+            continue
+        name = str(t.get("name") or "")
+        for phan in (t.get("suite"), t.get("filePath") or t.get("file_path")):
+            if phan and str(phan) not in name:
+                name = f"{phan} > {name}"
+        # pending/other không phải xanh: tính là bỏ qua để baseline R9 không
+        # coi nó là test xanh có sẵn.
+        _add(log, name, {"passed": "pass", "failed": "fail"}.get(str(t.get("status")), "skip"))
 
 
 def _node_spec(lines: list[str], log: TestLog) -> None:

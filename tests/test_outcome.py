@@ -43,6 +43,18 @@ class TestCheck(unittest.TestCase):
         self.assertFalse(c.outcome.counts_as_done)
         self.assertEqual(c.as_dict()["outcome"], "unconfigured")
 
+    def test_kind_va_evidence_mac_dinh_rong_va_xuat_ra_dict(self):
+        """ADR-005 V9: hợp đồng chấm tối thiểu — `Check("lint", True)` cũ vẫn
+        chạy, `as_dict()` luôn có hai khoá để `gate:verdict`/pre-deploy/report
+        cùng hình dạng."""
+        from aisdlc.control.outcome import CHECK_KINDS
+        c = Check("lint", True)
+        self.assertEqual((c.kind, c.evidence), ("", []))
+        d = Check("test", False, "đỏ", kind="deterministic", evidence=[3, 5]).as_dict()
+        self.assertEqual((d["kind"], d["evidence"]), ("deterministic", [3, 5]))
+        self.assertTrue({"kind", "evidence"} <= set(c.as_dict()))
+        self.assertEqual(len(CHECK_KINDS), 5)
+
     def test_story_gate_blocks_only_on_blocking_outcomes(self):
         g = StoryGate("S-1", checks=[Check("a", Outcome.UNCONFIGURED), Check("b", Outcome.NOT_APPLICABLE)])
         self.assertTrue(g.passed)
