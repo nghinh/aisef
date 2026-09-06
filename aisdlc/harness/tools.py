@@ -284,6 +284,13 @@ def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error:
 #: chặn Stop, làm TDD đạt oan, và bị sổ quy thành hồi quy do story gây ra.
 BASELINE_RUN = "test:baseline"
 
+#: Tên bản ghi của nop control (ADR-005 V3) — bộ test chạy ở **SHA cha** với
+#: tệp test của story chép vào, **sau** khi đóng băng ứng viên (mang
+#: `candidate`). Cùng lý do không ghi là `test`: kết quả mong đợi của nó là
+#: **đỏ**, và một lần `test` đỏ sẽ chặn Stop, làm TDD đạt oan, bị sổ quy
+#: thành hồi quy.
+NOP_RUN = "test:nop"
+
 
 def record(res: ToolResult, story_id: str, artifact_root, candidate: str = "",
            *, name: str = "", extra: dict | None = None) -> str:

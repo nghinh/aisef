@@ -513,3 +513,187 @@ class TestKhongLamDoTestCoSan(GateTestCase):
         self.baseline(["t1"])
         self.ung_vien(["t1"])
         self.assertIs(self.muc(self.gate(candidate="aaa")).outcome, Outcome.PASSED)
+
+
+class TestTestCoKiemDuocStory(GateTestCase):
+    """ADR-005 V3 nop control: test mang mã tiêu chí phải **đỏ khi không có mã
+    của story**. Cấp 1 ($0) so với `test:baseline`; cấp 2 đọc `test:nop` —
+    bộ test chạy ở SHA cha với tệp test của story chép vào."""
+
+    TEN = "test có kiểm được story"
+    AC = "tests/test_a.py::test_AC_S_01_1_x"       # mang mã AC-S-01-1 của story S-01
+
+    def baseline(self, ids, failed=(), skipped=(), **detail):
+        self.store.tool_run("S-01", "test:baseline", ok=not failed, detail={
+            "baseline": True, "test_format": "pytest", "test_ids": list(ids),
+            "failed_ids": list(failed), "skipped_ids": list(skipped), **detail,
+        })
+
+    def ung_vien(self, ids, failed=(), sha="aaa", **detail):
+        store = EvidenceStore(self._tmp.name, candidate=sha)
+        store.file_change("S-01", "src/a.py")
+        store.tool_run("S-01", "test", ok=not failed, detail={
+            "test_format": "pytest", "test_ids": list(ids), "failed_ids": list(failed), **detail,
+        })
+        store.tool_run("S-01", "lint", ok=True)
+
+    def nop(self, ids=None, failed=(), sha="aaa", ok=None, files=("tests/test_a.py",), **detail):
+        d = {"nop": True, "parent": "cha0000", "files": list(files), **detail}
+        if ids is not None:
+            d.update({"test_format": "pytest", "test_ids": list(ids), "failed_ids": list(failed)})
+        EvidenceStore(self._tmp.name, candidate=sha).tool_run(
+            "S-01", "test:nop", ok=(not failed) if ok is None else ok, detail=d)
+
+    def muc(self, g):
+        return next(c for c in g.checks if c.name == self.TEN)
+
+    def cham(self, **kw):
+        return self.muc(self.gate(candidate="aaa", acceptance=1, **kw))
+
+    # ---- cấp 1
+    def test_gan_ma_vao_test_co_san_la_that_bai_neu_ten(self):
+        """Test mang mã đã xanh ở baseline với đúng tên — xanh trước khi story
+        viết dòng nào. Cấp 2 đỏ cũng không cứu: cấp 1 đã đủ kết luận."""
+        self.baseline([self.AC, "t1"])
+        self.ung_vien([self.AC, "t1"])
+        self.nop([self.AC, "t1"], failed=[self.AC])
+        m = self.cham()
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("gắn mã vào test có sẵn", m.detail)
+        self.assertIn(self.AC, m.detail)
+        self.assertNotIn("t1", m.detail.replace(self.AC, ""))
+
+    def test_doi_ten_test_co_san_de_gan_ma_van_that_bai_va_noi_vi_sao(self):
+        """R9 coi đổi tên giữ tiêu đề lá là không mất; ở đây nó là "mã tiêu chí
+        thành một cái tên" — test xanh ở baseline dưới tên cũ."""
+        cu, moi = "src/a.ts > s > làm việc", "src/a.ts > s > AC_S_01_1: làm việc"
+        self.baseline([cu, "t1"])
+        self.ung_vien([moi, "t1"])
+        m = self.cham()
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("đổi tên test có sẵn", m.detail)
+        self.assertIn(moi, m.detail)
+        self.assertIn("test mới", m.detail)
+
+    def test_test_moi_trung_tieu_de_la_voi_test_con_nguyen_ten_khong_bi_bat_oan(self):
+        """Test có sẵn còn nguyên tên ở ứng viên → test mang mã là test **khác**;
+        cấp 1 để yên, cấp 2 quyết."""
+        cu, moi = "src/a.ts > s > làm việc", "src/a.ts > s > AC_S_01_1: làm việc"
+        self.baseline([cu])
+        self.ung_vien([cu, moi])
+        self.nop([cu, moi], failed=[moi])
+        self.assertIs(self.cham().outcome, Outcome.PASSED)
+
+    def test_baseline_o_ban_cua_chinh_story_thi_cap_1_khong_so_cap_2_quyet(self):
+        """Lượt chạy lại: baseline đứng ở ứng viên cũ (e9 01-07 lần chạy 3), mọi
+        test của story đã xanh sẵn — không phải "gắn mã vào test có sẵn"."""
+        self.baseline([self.AC, "t1"], parent="bbb", base_ref="aaa0")
+        self.ung_vien([self.AC, "t1"])
+        self.nop(["t1"])
+        m = self.cham()
+        self.assertIs(m.outcome, Outcome.PASSED, m.detail)
+        self.assertIn("cấp 1 không so được", m.detail)
+        self.assertIn("chạy lại", m.detail)
+        # cùng dữ liệu, baseline ở điểm rẽ → cấp 1 bắt
+        self.baseline([self.AC, "t1"], parent="aaa0", base_ref="aaa0")
+        self.assertIs(self.cham().outcome, Outcome.FAILED)
+
+    # ---- cấp 2
+    def test_xanh_o_sha_cha_la_test_khong_kiem_duoc_gi(self):
+        self.baseline(["t1"])
+        self.ung_vien([self.AC, "t1"])
+        self.nop([self.AC, "t1"])
+        g = self.gate(candidate="aaa", acceptance=1)
+        m = self.muc(g)
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("xanh cả khi không có mã của story", m.detail)
+        self.assertIn(self.AC, m.detail)
+        self.assertIn("cha0000"[:7], m.detail)
+        self.assertIn(self.AC, g.feedback(), "tên test phải vào feedback lượt sau")
+
+    def test_do_hoac_khong_ton_tai_o_sha_cha_la_dat(self):
+        self.baseline(["t1"])
+        self.ung_vien([self.AC, "t1"])
+        self.nop(["t1"])                            # lỗi import ở SHA cha: test không tồn tại
+        m = self.cham()
+        self.assertIs(m.outcome, Outcome.PASSED)
+        self.assertIn("đỏ hoặc không tồn tại", m.detail)
+        self.nop([self.AC, "t1"], failed=[self.AC])   # có mặt nhưng đỏ
+        self.assertIs(self.cham().outcome, Outcome.PASSED)
+
+    def test_nop_lay_lan_moi_nhat_o_dung_ung_vien(self):
+        self.baseline(["t1"])
+        self.ung_vien([self.AC, "t1"])
+        self.nop([self.AC, "t1"], sha="bbb")          # bản khác: không dùng để chấm bản này
+        m = self.cham()
+        self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
+        self.assertIn("không chạy nop", m.detail)
+
+    def test_chua_co_test_mang_ma_xanh_o_ung_vien_thi_khong_co_gi_de_kiem(self):
+        self.baseline(["t1"])
+        self.ung_vien(["t1", "t2"])
+        self.nop(["t1", "t2"])
+        m = self.cham()
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("tiêu chí có test", m.detail)
+
+    def test_khong_chay_duoc_la_moi_truong_khong_phai_story(self):
+        self.baseline(["t1"])
+        self.ung_vien([self.AC])
+        self.nop(ok=False, unrunnable="công cụ chưa cài (module_not_found)")
+        m = self.cham()
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("module_not_found", m.detail)
+
+    def test_loi_import_o_sha_cha_khong_phai_khong_chay_duoc(self):
+        """Runner báo "cannot find module" vì thiếu module **của story** nhưng
+        vẫn in được tên test khác → là đỏ hợp lệ, không phải môi trường."""
+        self.baseline(["t1"])
+        self.ung_vien([self.AC, "t1"])
+        self.nop(["t1"], ok=False, unrunnable="công cụ chưa cài (cannot find module)")
+        self.assertIs(self.cham().outcome, Outcome.PASSED)
+
+    def test_khong_them_sua_test_thi_khong_ap_dung(self):
+        self.baseline(["t1"])
+        self.ung_vien([self.AC, "t1"])
+        self.nop(ok=False, files=[], skipped="story không thêm/sửa tệp test")
+        m = self.cham()
+        self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
+        self.assertIn("không thêm/sửa", m.detail)
+
+    def test_chua_khai_lenh_test_la_chua_cau_hinh(self):
+        self.ung_vien([self.AC])
+        self.nop(ok=False, skipped="dự án chưa khai lệnh cho tool này")
+        self.assertIs(self.cham().outcome, Outcome.UNCONFIGURED)
+
+    def test_tat_boi_cau_hinh_la_khong_ap_dung_khong_phai_dat(self):
+        self.ung_vien([self.AC])
+        self.nop(ok=False, disabled=True, skipped="tắt bởi cấu hình `verify.nop`")
+        m = self.cham()
+        self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
+        self.assertIn("verify.nop", m.detail)
+
+    def test_khong_co_nop_thi_khong_ap_dung_co_ly_do(self):
+        self.green_story()
+        m = self.muc(self.gate())
+        self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
+        self.assertIn("không chạy nop", m.detail)
+
+    def test_reporter_khong_in_ten_thi_chi_ket_luan_khi_ca_bo_xanh(self):
+        store = EvidenceStore(self._tmp.name, candidate="aaa")
+        store.tool_run("S-01", "test", ok=True)
+        store.tool_run("S-01", "lint", ok=True)
+        self.nop(ok=True)
+        m = self.cham()
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("bộ test xanh ở SHA cha", m.detail)
+        self.nop(ok=False)
+        m = self.cham()
+        self.assertIs(m.outcome, Outcome.UNCONFIGURED)
+        self.assertIn("reporter", m.detail)
+
+    def test_dung_ngay_sau_muc_tdd(self):
+        self.green_story()
+        names = [c.name for c in self.gate(added_tests=["tests/x.py"]).checks]
+        self.assertEqual(names[names.index("TDD") + 1], self.TEN)
+

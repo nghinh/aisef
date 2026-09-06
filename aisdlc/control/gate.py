@@ -19,6 +19,11 @@ Năm điều kiện, mỗi điều kiện trả lời được bằng dữ liệ
    kiểm được, không nói là đạt.
 8. không làm đỏ test có sẵn — test xanh ở baseline (trước khi story chạm
    vào) phải còn xanh và còn tồn tại ở ứng viên (ADR-004 R9).
+9. test có kiểm được story (nop control, ADR-005 V3) — test mang mã tiêu
+   chí phải **đỏ khi không có mã của story**: không xanh sẵn ở baseline
+   (cấp 1, $0) và đỏ hoặc không tồn tại ở SHA cha với tệp test chép vào
+   (cấp 2, một lần sandbox). Xanh cả hai nơi là một cái tên, không phải
+   một phép kiểm.
 
 Danh sách **đóng** tên mục là `CHECK_NAMES`; mỗi mục có `kind` (ai chấm —
 `CHECK_KIND`) và `evidence` (seq sự kiện đã đọc); mỗi tên có ba control ở
@@ -39,7 +44,7 @@ from .tdd import red_before_green
 from .security import DEFAULT_BLOCKING
 from ..harness.observe import FILE_CHANGE, GUARD_BLOCK, GUARD_SEEN, MOCKUP_MAP, NOTE, TOOL_RUN, Event, Evidence
 from ..harness.testlog import MAX_IDS
-from ..harness.tools import BASELINE_RUN
+from ..harness.tools import BASELINE_RUN, NOP_RUN
 
 #: Tên mục cổng story — danh sách **đóng** (ADR-005 V9). Mọi `Check(...)` trong
 #: tệp này phải dùng tên ở đây (test meta grep AST), và mỗi tên có ba control
@@ -293,6 +298,120 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
     return Check(ten, True, evidence=doc)
 
 
+def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate: str) -> Check:
+    """Mục "test có kiểm được story" — nop control (ADR-005 V3).
+
+    Câu hỏi của Terminal-Bench (nop < 1), BERBench (`base_fail`) và Agentless
+    (reproduction test): **không có mã của story thì test của story phải
+    đỏ**. `TDD` chỉ hỏi "có một lần đỏ bất kỳ trước lần xanh cuối" — một lần
+    đỏ vì lỗi cú pháp cũng qua. Ở đây hỏi thẳng hai cấp, cấp rẻ trước:
+
+    **Cấp 1 ($0, từ `test:baseline` R9):** test mang `AC-<story>-i` xanh ở
+    ứng viên mà đã xanh ở baseline — cùng tên, hoặc tên cũ mất và tiêu đề
+    lá (`_la`) còn nguyên, tức đổi tên để gắn mã — là "gắn mã vào test có
+    sẵn" (lỗi 23 → 24: developer gắn mã vào bốn test có sẵn để cổng thôi
+    kêu): nó xanh **trước khi story viết dòng nào**, nên không kiểm được gì
+    của story. Không nới cho trường hợp "story chỉ sửa/đổi tên test có sẵn"
+    dù thân test có thể đã đổi: bằng chứng $0 chỉ thấy tên, mã tiêu chí là
+    hợp đồng theo **tên** (mục *tiêu chí có test*), và cấp 2 — thứ nhìn
+    được thân test — không phải lúc nào cũng chạy (`verify.nop` tắt, không
+    dựng được SHA cha). Nới ở đây là để lọt đúng lớp lỗi V3 sinh ra để
+    bắt; cách sửa rẻ (một lượt): viết test **mới** mang mã, giữ test có sẵn
+    nguyên tên. Không bắt oan: test mới trùng tiêu đề lá với test có sẵn
+    **còn nguyên tên** ở ứng viên là hai test khác nhau — để cấp 2 xét.
+    Baseline của lượt chạy lại đứng ở bản của chính story (`parent` ≠
+    `base_ref`, e9 01-07 lần chạy 3) thì mọi test của story đã xanh sẵn —
+    cấp 1 không so được, nói ra, cấp 2 quyết (worktree ở đúng điểm rẽ).
+
+    **Cấp 2 (`test:nop`, harness chạy sau đóng băng):** ở SHA cha với tệp
+    test story thêm/sửa chép vào, test mang mã phải **đỏ hoặc không tồn
+    tại** — lỗi import ở SHA cha là đỏ, và là hợp lệ. Xanh → FAILED nêu tên.
+    Kết cục khác theo bất biến: nop không chạy được → UNRUNNABLE; reporter
+    không in tên (chỉ biết bộ test đỏ, không biết của ai) → UNCONFIGURED;
+    story không thêm/sửa tệp test, tắt bởi `verify.nop`, hay harness không
+    ghi nop nào (nhật ký trước V3) → NOT_APPLICABLE có lý do.
+    """
+    ten = "test có kiểm được story"
+    goc = evidence.last(TOOL_RUN, BASELINE_RUN)
+    sau = [e for e in evidence.of(TOOL_RUN, "test")
+           if (goc is None or e.seq > goc.seq)
+           and (not candidate or e.detail.get("candidate") == candidate)]
+    moi = sau[-1] if sau else None
+
+    # Test mang mã tiêu chí **xanh** ở ứng viên — đối tượng của cả hai cấp.
+    ac: list[str] = []
+    if moi is not None and moi.detail.get("test_format") and acceptance > 0:
+        do = set(moi.detail.get("failed_ids") or []) | set(moi.detail.get("skipped_ids") or [])
+        xanh_moi = [t for t in moi.detail.get("test_ids") or [] if t not in do]
+        for tests in ac_coverage(story_id, acceptance, xanh_moi).values():
+            ac.extend(t for t in tests if t not in ac)
+
+    # ---- cấp 1
+    cap1 = ""
+    if ac and goc is not None and goc.detail.get("test_format"):
+        re_nhanh, cha = str(goc.detail.get("base_ref") or ""), str(goc.detail.get("parent") or "")
+        if re_nhanh and cha and re_nhanh != cha:
+            cap1 = (f"cấp 1 không so được: baseline chạy ở {cha[:7]} — bản của chính story "
+                    f"(lượt chạy lại), không phải điểm rẽ {re_nhanh[:7]}")
+        else:
+            goc_ids = list(goc.detail.get("test_ids") or [])
+            khong_xanh = set(goc.detail.get("failed_ids") or []) | set(goc.detail.get("skipped_ids") or [])
+            xanh_goc = {t for t in goc_ids if t not in khong_xanh}
+            con = set(moi.detail.get("test_ids") or [])
+            gan = [t for t in ac if t in xanh_goc]
+            cat = len(goc_ids) >= MAX_IDS or len(con) >= MAX_IDS
+            la_mat = set() if cat else {_la(t) for t in xanh_goc if t not in con}
+            doi = [t for t in ac if t not in goc_ids and _la(t) in la_mat]
+            loi = []
+            if gan:
+                loi.append(f"gắn mã vào test có sẵn: {len(gan)} test mang mã tiêu chí đã xanh ở "
+                           f"baseline với đúng tên này — xanh trước khi story viết dòng nào: {_ten(gan)}")
+            if doi:
+                loi.append(f"đổi tên test có sẵn để mang mã: {len(doi)} test đã xanh ở baseline dưới "
+                           f"tên cũ — mã tiêu chí thành một cái tên, không phải một phép kiểm: {_ten(doi)}")
+            if loi:
+                return Check(ten, False, "; ".join(loi) + ". Viết test mới cho tiêu chí, giữ test có sẵn nguyên tên")
+
+    # ---- cấp 2
+    nop = evidence.last(TOOL_RUN, NOP_RUN)
+    if nop is None:
+        return Check(ten, Outcome.NOT_APPLICABLE,
+                     "harness không chạy nop nào (chạy tay, nhật ký trước ADR-005 V3) — không so được")
+    d = nop.detail
+    if d.get("disabled"):
+        return Check(ten, Outcome.NOT_APPLICABLE, "tắt bởi cấu hình `verify.nop`")
+    if d.get("skipped"):
+        if "files" in d and not d["files"]:
+            return Check(ten, Outcome.NOT_APPLICABLE, "story không thêm/sửa tệp test")
+        return Check(ten, Outcome.UNCONFIGURED, f"không có nop: {d['skipped']}")
+    if d.get("unrunnable") and not d.get("test_format"):
+        return Check(ten, Outcome.UNRUNNABLE,
+                     f"nop ở SHA cha không chạy được ({d['unrunnable']}) — không so được")
+    cha = str(d.get("parent") or "")[:7] or "cha"
+    if moi is None:
+        return Check(ten, False, "chưa có lần test nào ở ứng viên — chưa biết test nào xanh để so với SHA cha")
+    if d.get("test_format") and moi.detail.get("test_format") and acceptance > 0:
+        if not ac:
+            return Check(ten, False, "chưa có test nào mang mã tiêu chí xanh ở ứng viên — không có gì "
+                                     "để kiểm ở SHA cha (xem mục tiêu chí có test)")
+        khong = set(d.get("failed_ids") or []) | set(d.get("skipped_ids") or [])
+        xanh_nop = {t for t in d.get("test_ids") or [] if t not in khong}
+        van_xanh = [t for t in ac if t in xanh_nop]
+        if van_xanh:
+            return Check(ten, False, f"test không kiểm được gì — xanh cả khi không có mã của story "
+                                     f"(SHA cha {cha}): {_ten(van_xanh)}")
+        return Check(ten, True, f"{len(ac)} test mang mã tiêu chí đỏ hoặc không tồn tại ở SHA cha {cha}"
+                                + (f"; {cap1}" if cap1 else ""))
+    if nop.ok:
+        return Check(ten, False, f"bộ test xanh ở SHA cha {cha} với tệp test của story chép vào — "
+                                 f"test của story không kiểm được gì ({_ten(list(d.get('files') or []), 3)})")
+    if acceptance <= 0:
+        return Check(ten, True, f"bộ test đỏ ở SHA cha {cha} — story không khai tiêu chí, không so theo mã")
+    return Check(ten, Outcome.UNCONFIGURED,
+                 "không đọc được tên test — chỉ biết bộ test đỏ ở SHA cha, không biết có phải test của "
+                 "story; dùng reporter in tên (`node --test`, `vitest --reporter=verbose`, `pytest -v`)")
+
+
 def evaluate(
     story_id: str,
     evidence: Evidence,
@@ -500,6 +619,8 @@ def evaluate(
                 f"({', '.join(added_tests[:3])}). Viết test trước, chạy thấy đỏ, rồi mới viết code.",
                 evidence=[e.seq for e in evidence.of(TOOL_RUN, "test")],   # thứ tự đỏ/xanh đọc trên cả dãy
             ))
+    # Nop control (ADR-005 V3) ngay sau TDD: cùng câu hỏi, hỏi thẳng hơn.
+    gate.checks.append(_nop_check(evidence, story_id, acceptance=acceptance, candidate=candidate))
 
     # Hợp đồng kiểm định của story. Loại chưa cấu hình được ghi là **chưa
     # cấu hình**, không phải đạt — nó chặn ở cổng trước triển khai, và ở

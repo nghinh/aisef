@@ -161,6 +161,11 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 - **Mới cổng người `improve`** (`Gate.IMPROVE`): ngoài `GATE_ORDER`, artifact là
   glob `LOOP-REPORT-*.md` — duyệt **mỗi** vòng ≥ 2 trừ `--auto`; dự án chưa
   chạy `improve` không bị nó chặn `pre-deploy` (ADR-004 §6 R3).
+- **Nop control** (ADR-005 V3, `implement.run_nop`, gọi từ `verify_candidate`
+  ngay sau đóng băng): worktree tạm ở SHA cha (điểm rẽ) + chép tệp test story
+  thêm/sửa → `tools.test` ghi `test:nop` mang `candidate`; `--verify-only` giữ
+  khi đã có kết quả ở SHA. `run_baseline` ghi thêm `base_ref` để cổng biết
+  baseline của lượt chạy lại đứng ở bản của chính story.
 - **Đổi hành vi — băm `stories.index.json`** (lỗi 25): chuẩn hoá JSON, bỏ
   story/epic sửa; phê duyệt `stories`/`readiness` cũ stale một lần.
 - **Mới** `aisdlc change FR-x "mô tả"`: ghi FR, stale PRD trở xuống, sinh story
@@ -241,6 +246,13 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   `gate.qualification_table()` đọc AST tệp test; `gate:verdict` ghi `checks[]`
   đủ `kind`/`evidence`; báo cáo in "mục cổng có đủ 3 control: 15/15". Không có
   `blocking` (YAGNI). `Check("lint", True)` cũ không đổi.
+- **Mục cổng `test có kiểm được story`** (ADR-005 V3, ngay sau `TDD`): test
+  mang `AC-<story>-i` phải đỏ khi không có mã của story — cấp 1 $0 so với
+  `test:baseline` (xanh sẵn cùng tên hoặc đổi tên để gắn mã → ✗ nêu tên; lượt
+  chạy lại `parent` ≠ `base_ref` thì không so), cấp 2 đọc `test:nop` (xanh ở SHA
+  cha → ✗; không chạy được ⚠; không in tên ○; không thêm test / tắt / nhật ký
+  cũ –). Hồi cứu e9: 01-07 lần chạy 3 (40 test xanh sẵn — lượt chạy lại) và
+  RP-02/03/04 (gắn mã vào test có sẵn) sẽ ✗ (ADR-005 §9 V3).
 - Hợp quy client: phép **C6** (luật 6), **C7** (ghi ngoài scope), **C8** (ứng
   viên stale) — 16/16 hai client 2026-09-06 (`docs/CONFORMANCE.md`).
 
@@ -268,8 +280,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   `candidate = HEAD`; báo cáo in cột SHA 7 ký tự (R1).
 - Loại sự kiện mới `BEHAVIOR`; `HANDOFF` (có từ ADR-003) ghi thêm ba slot
   `ledger` và `prompt_chars` thay cho knob đã gỡ; note mới
-  `review:verdict`/`security:verdict` (JSON), `gate:verdict`,
-  `evidence_lookup`, `doc_lookup`.
+  `review:verdict`/`security:verdict` (JSON), `gate:verdict`, `evidence_lookup`, `doc_lookup`; `tool_run test:nop` (V3).
 - Báo cáo: ô Map mockup lấy kết quả **mới nhất** từng màn (lỗi 18); cột tiêu
   chí có test `n/n`; SHA ứng viên.
 - OpenCode `--format json` → `MACHINE_OUTPUT`/`COST_REPORTING` NATIVE (vẫn hạng
@@ -292,6 +303,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 | `improve.max_loops` · `improve.flat_loops` · `improve.cost_cap_usd` | `3` · `2` · `0.0` | ADR-004 R3 |
 | `verify.baseline` | `true` | ADR-004 R9 |
 | `verify.clean_tree` | `true` | ADR-005 V6 |
+| `verify.nop` | `true` | ADR-005 V3 |
 | `skills.inline` | `false` | ADR-003 §6 |
 | `sandbox.pre_deploy_degraded_waiver` | `""` | quyết định 4 |
 | `sandbox.provider` | `"docker"` | ADR-005 V5 |
