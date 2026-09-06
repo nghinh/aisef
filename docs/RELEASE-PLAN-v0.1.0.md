@@ -65,7 +65,7 @@ Thứ tự thực thi: A1–A5 → B6 (xong) → B1/B2 → C-a → D1/D2/D4. Kh�
 | P1-6 | đóng | Tài liệu lệch mã | W11 sửa 14 chỗ + test meta |
 | P1-13 | đóng | Không kiểm-lại được ứng viên | R13 `--verify-only --repeat` đã gộp; T5 chưa đo agent thật |
 | P2-8..12, P2-14 | P2 | router capabilities, script skill lỗi, A/B script trong scratch, attempts, cổng cỡ agent-splitting, hiệu chuẩn láng giềng | sau phát hành |
-| mới | P1 | Suite đơn vị phụ thuộc Docker: mỗi `run_tool` trong test cũ mở container thật (6–18 s/container) → suite 25–60 phút, nhạy tải | **FakeProvider mặc định cho unit test**, Docker chỉ ở test có đánh dấu (đợt A3) |
+| mới | P1 | Suite đơn vị phụ thuộc Docker: mỗi `run_tool` trong test cũ mở container thật (6–18 s/container) → suite 25–60 phút, nhạy tải | **HostProvider mặc định cho unit test** (A2 xong: 8 module 2 536 → 106 s, suite đầy đủ 167 s), Docker chỉ ở test đánh dấu `needs_docker` |
 | mới | P1 | Vòng improve chọn gap `qa:*` cấp dự án → hai vòng âm | ưu tiên gap `ac` có test id; loại `qa:*` khỏi hàng đợi tự động (đợt B) |
 | mới | P2 | Rate limit phiên làm 8 subagent chết cùng lúc; một luồng dựng tải nhân tạo mồ côi | quy tắc: ≤ 4 luồng song song, cấm tải nhân tạo (đã ghi memory) |
 | S1 | blocked | Sandbox credential cho agent trong container | giữ blocked/degraded rõ ràng theo quyết định 4 |
@@ -87,7 +87,7 @@ Thứ tự thực thi: A1–A5 → B6 (xong) → B1/B2 → C-a → D1/D2/D4. Kh�
 | # | Việc | Ai | Xong khi |
 |---|---|---|---|
 | A1 | ✅ Gộp X7 (V8 bench) `7668a90`: 18 task lỗi kho, 15/15 VALID trên task đo được (bug-15 nhạy tải, bug-6 chưa đo vì Docker ~1 giờ) | tôi | master có 8/8 |
-| A2 | **FakeProvider mặc định cho unit test**: `tests/` dùng `sandbox.using(FakeProvider)`/`AISDLC_TEST_PROVIDER=fake`; test cần Docker thật đánh dấu `@docker` như hợp quy; giữ ≥ 8 test Docker thật (S1–S5 + tools/qa) | 1 subagent | suite đầy đủ < 5 phút trên máy không có Docker rảnh; số test không giảm; test đỏ khi hoàn nguyên FakeProvider |
+| A2 | **HostProvider mặc định cho unit test** (`tests/__init__.py` đặt vào chỗ `docker`; test Docker thật đánh dấu `needs_docker`, bật `AISDLC_TEST_DOCKER=1`; giữ 10 test Docker thật + hợp quy S1–S5). **Đo tuần tự** (trước: bản `99971cf` Docker, load 12–27; sau: HostProvider, load 4–7): `test_tools` 77 → 0 s · `test_qa` 30 → 2 s · `test_implement` 1 213 → 19 s · `test_run` 1 088 → 58 s · `test_candidate` 99 → 4 s · `test_deploy` 1 → 1 s · `test_improve` 23 → 19 s · `test_preservation` 5 → 3 s; **8 module 2 536 s → 106 s**; suite đầy đủ trên cây rebase `798c503`: 1 668 test, 167 s, skipped 69, 1 đỏ có sẵn trên master (`test_preservation::test_chay_sach_thi_khong_co_chan_oan`, đỏ cả trên master sạch lẫn baseline Docker — không phải do A2) | 1 subagent | ✅ suite < 5 phút (167 s); số test 1 624 → 1 631 (+7 test cơ chế, chưa tính master); `test_sandbox::TestProviderMacDinhCuaSuite` + `test_tools::TestSuiteKhongMoContainer` đỏ khi bỏ đăng ký |
 | A3 | Suite đầy đủ trên master, **một suite một lúc**, load < 20 | tôi | `OK`, số test ghi vào STATUS §5 |
 | A4 | `test_meta` khớp mã sau 8 luồng (CLI, knob, mục cổng 16, STEPS, slot, guard) | tôi | xanh; SOLUTION §10/§12/§13 cập nhật |
 | A5 | STATUS §2.10 đợt X + §5, CHANGELOG chốt mục v0.1.0, artifact trạng thái | tôi | trang trạng thái cập nhật |

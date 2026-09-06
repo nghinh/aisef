@@ -156,6 +156,15 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   (`worktree-tạm` | `cây agent` + lý do) và `clean_tree`. Knob
   `verify.clean_tree` (`true`) tắt khi test cần tệp không theo dõi. Mức story
   giữ cây worktree (`clean=False`).
+- **Tests — suite đơn vị không mở container** (kế hoạch phát hành A2):
+  `HostProvider` (`harness/sandbox.py`, chỉ cho test: chạy thật trên máy, khai
+  NATIVE) được `tests/__init__.py` đặt vào chỗ `docker` khi không có
+  `AISDLC_TEST_DOCKER=1`; module chạm sandbox `import tests`. Đo tuần tự trên
+  máy đo (load 4–7): 8 module 2 536 s → 106 s (`test_implement` 1 213 → 19 s,
+  `test_run` 1 088 → 58 s, `test_tools` 77 → 0 s); suite đầy đủ 1 668 test
+  167 s. Docker thật ở test đánh dấu `needs_docker` (`test_sandbox
+  TestIsolation` 8, `test_tools TestRunToolQuaDockerThat` 2) + hợp quy S1–S5;
+  `sandbox.provider = "host"`/`"fake"` trong dự án bị từ chối. Số test không giảm.
 
 ### 4 · Orchestration logic
 
