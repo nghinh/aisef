@@ -2,8 +2,8 @@
 
 AISEF = **AI Software Engineering Framework**.
 
-Ngày 2026-09-06. Bản đang có: **`aisef 0.1.0`** trên PyPI, và **0.2.0** đã sẵn
-trong kho (đổi tên `aisdlc` → `aisef`, sửa lỗi 31). Mọi con số dưới đây đọc từ
+Ngày 2026-09-06. Bản đang có: **`aisef 0.2.0`** trên PyPI (đổi tên
+`aisdlc` → `aisef`, sửa lỗi 31; kho GitHub nay là `nghinh/aisef`). Mọi con số dưới đây đọc từ
 mã, từ bằng chứng trên đĩa, hoặc từ lần chạy thật — chỗ nào chưa đo thì viết là
 chưa đo.
 
@@ -153,7 +153,7 @@ benchmark chung để so pass@k với công cụ khác.
 Nguyên tắc xếp thứ tự: **đo trước, mở rộng sau**. Mỗi bản có một câu hỏi phải
 trả lời được bằng số; không trả lời được thì không lên bản sau.
 
-### 0.2.0 — một tên, một lệnh (xong, chờ phát hành)
+### 0.2.0 — một tên, một lệnh (đã phát hành 2026-09-06)
 
 Đổi hết `aisdlc` → `aisef`; bí danh cũ còn chạy có cảnh báo tới 0.3.0; sửa lỗi
 31 (hook của bản cài từ wheel trỏ đường dẫn không tồn tại nên guard im lặng

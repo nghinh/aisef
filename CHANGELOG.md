@@ -4,7 +4,13 @@ Ghi theo **sáu nhóm harness** (`docs/SOLUTION.md` §5), không theo ADR hay
 ngày. Mỗi dòng có chỗ đọc lại; số lỗi trỏ `docs/STATUS-2026-09-05.md` §2.4
 và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epic-improvement.md` §6.
 
-## v0.2.0 — chưa phát hành
+## v0.2.0 — phát hành 2026-09-06
+
+**Đã phát hành:** tag `v0.2.0` = `7eac114`, gói `aisef 0.2.0` trên PyPI (kho
+GitHub nay là `nghinh/aisef`, trusted publisher khai lại theo tên mới). Kiểm sau
+publish: venv sạch `pip install aisef==0.2.0` → lệnh `aisef` (và bí danh `aisdlc`
+có cảnh báo) → `setup` → `compile` → hook chặn đúng (thoát 2) và cho qua đúng
+(thoát 0) → `doctor` **✅ sẵn sàng**.
 
 **Đổi tên: gói, module và lệnh cùng là `aisef`.** 0.1.0 cài bằng `pip install
 aisef` nhưng gõ `aisdlc` — hai tên cho một thứ, phải giải thích ở mọi trang tài
