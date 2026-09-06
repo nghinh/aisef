@@ -193,6 +193,28 @@ git tag v0.1.0 && git push --tags
 Kho hồi quy dogfood (`tests/dogfood/`, bật bằng `AISDLC_DOGFOOD=1`) dựng lại
 dự án thử `par` từ đầu vào trong kho và so với mốc đã đo — chạy trước mỗi tag.
 
+### Giới hạn đã biết của v0.1.0
+
+Khai ở đây vì mọi claim phải có bằng chứng; thứ chưa chứng minh gọi là chưa
+chứng minh (quyết định chủ đầu tư 2026-09-06, `docs/RELEASE-PLAN-v0.1.0.md` §0):
+
+- **Phạm vi nghiệm thu dogfood là EPIC-01 của `e9`** (7 story, `aisdlc
+  pre-deploy --epic EPIC-01`). EPIC-02..05 (16 story) chưa chạy — báo cáo ghi
+  "ngoài phạm vi", không phải "xong". `e9` chưa phải sản phẩm được nghiệm thu
+  hoàn chỉnh; nó là corpus nghiệm thu của framework.
+- **OpenCode là client hạng hai**: hợp quy 9/10 (C9 model từ chối, không kết
+  luận), không có đầu ra máy đọc ổn định; claim phát hành dựa trên Claude Code.
+- **Agent trong container chưa có cách ly credential** (S1 blocked): V1 chạy
+  agent trên host, chỉ kiểm định trong container; `doctor`/`pre-deploy` nêu
+  tên bảo đảm thiếu, không im lặng.
+- **`mutation` ở môi trường nghiệm thu là KHÔNG CHẠY ĐƯỢC** (công cụ chưa cài);
+  được miễn có lý do ở `verify.waiver_reason`, hiện ◇, không bao giờ thành ✅.
+  `image-scan` cùng loại (docker scout đòi đăng nhập, trivy/grype vắng).
+- **`skills.offer`/`skills.inline` tắt** (A/B không thấy gain), **`repo_map`
+  tắt** (`context.max_repo_map_chars = 0`, A/B hoãn sau v0.1.0).
+- **`coverage`**: harness đọc số từ runner (`--coverage`/`--cov`); dự án chưa
+  bật thì mục cổng là ○ chưa cấu hình, không phải đạt.
+
 ## Khi cổng chặn
 
 Cổng chặn là framework đang làm việc, không phải framework hỏng. Ba ca hay
