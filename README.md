@@ -174,8 +174,13 @@ Gói tên `ai-sdlc`, phát hành khi hoàn tất đợt 4 (quyết định 2026-
 Điều kiện đọc bằng lệnh, không bằng cảm giác:
 
 ```bash
-python3 -m unittest discover -s tests -q && AISDLC_RELEASE=1 python3 -m unittest tests.test_release_gate -q
+python3 -m unittest discover -s tests -q && AISDLC_RELEASE=1 AISDLC_ACCEPTANCE=<dự án nghiệm thu> python3 -m unittest tests.test_release_gate -q
 ```
+
+`AISDLC_ACCEPTANCE` trỏ vào dự án dogfood đã nghiệm thu (v0.1.0: `e9`, phạm vi
+EPIC-01): cổng đọc `pre-deploy-report.json` (đạt, có phạm vi, miễn có lý do)
+và phê duyệt `pre-deploy` trên đúng bản ấy. Không đặt thì bỏ qua có nêu tên —
+không tính là đạt.
 
 ```bash
 uv build && uvx twine check dist/*
