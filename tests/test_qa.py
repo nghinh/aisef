@@ -107,6 +107,46 @@ class TestRunningChecks(QaTestCase):
         )
 
 
+class TestProviderGia(QaTestCase):
+    """`run_suite` trên `FakeProvider` (ADR-005 V5): không Docker, không suy
+    biến, kịch bản quyết định xanh/đỏ — và bậc quyền của loại vẫn tới provider."""
+
+    def test_do_theo_kich_ban_khong_suy_bien(self):
+        from aisdlc.harness import sandbox
+
+        fake = sandbox.FakeProvider([sandbox.SandboxResult(1, stdout="1 failed")])
+        cfg = self.config(**{"verify.unit": "npm test", "sandbox.provider": "fake"})
+        with sandbox.using(fake):
+            r = run_suite(self.project, config=cfg, only=["unit"], has_ui=False)
+        unit = r.results[0]
+        self.assertTrue(unit.ran)
+        self.assertFalse(unit.ok)
+        self.assertFalse(unit.degraded)
+        self.assertEqual(unit.missing, [])
+        self.assertEqual(len(r.failed), 1)
+        self.assertEqual(fake.calls[0].cmd, ["npm", "test"])
+        self.assertIs(fake.calls[0].level, sandbox.Level.WORKSPACE_WRITE)
+
+    def test_loi_ha_tang_la_khong_chay_duoc(self):
+        from aisdlc.harness import sandbox
+
+        fake = sandbox.FakeProvider([sandbox.SandboxResult(
+            125, stderr="docker: Error response from daemon: pull access denied",
+            provider_error="pull access denied")])
+        cfg = self.config(**{"verify.unit": "npm test", "sandbox.provider": "fake"})
+        with sandbox.using(fake):
+            r = run_suite(self.project, config=cfg, only=["unit"], has_ui=False)
+        self.assertEqual(r.failed, [], "không phải test đỏ")
+        self.assertEqual(len(r.unrunnable), 1)
+        self.assertIn("hạ tầng sandbox", r.results[0].unrunnable)
+
+    def test_suy_bien_mang_ten_bao_dam_thieu(self):
+        cfg = self.config(**{"verify.unit": "true", "sandbox.use_docker": False})
+        r = run_suite(self.project, config=cfg, only=["unit"], has_ui=False)
+        self.assertTrue(r.results[0].degraded)
+        self.assertEqual(r.results[0].missing, ["network_none", "non_root", "secrets_absent"])
+
+
 class TestFakeTests(QaTestCase):
     """Test luôn xanh dù code hỏng tệ hơn không có test — nó tạo cảm giác
     an toàn giả."""

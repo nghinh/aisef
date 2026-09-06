@@ -117,6 +117,11 @@ DEFAULTS: dict[str, Any] = {
     "sandbox.tools_network": False,
     "sandbox.use_docker": True,
     "sandbox.allow_degraded": True,
+    # Provider chạy lệnh (ADR-005 V5): `docker` · `local` (chạy thẳng, mọi
+    # bảo đảm UNSUPPORTED — bằng chứng ghi `missing`) · `"mô-đun:Lớp"` cho
+    # backend ngoài cùng hợp đồng `harness/sandbox.py::ExecutionProvider`.
+    # `use_docker=false` tương đương `local`; giữ để cấu hình cũ còn chạy.
+    "sandbox.provider": "docker",
     # Cổng trước triển khai **không** chấp nhận suy biến (kiểm định chạy
     # ngoài Docker) trừ khi có lý do khai tường minh ở đây; lý do được ghi
     # vào `pre-deploy.json`. `run` thường vẫn theo `sandbox.allow_degraded`.
@@ -172,6 +177,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "sandbox.tools_network": bool,
     "sandbox.use_docker": bool,
     "sandbox.allow_degraded": bool,
+    "sandbox.provider": str,
     "sandbox.pre_deploy_degraded_waiver": str,
 }
 

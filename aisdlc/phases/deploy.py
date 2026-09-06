@@ -67,6 +67,8 @@ class PreDeployReport:
                 "failed": [r.kind.id for r in self.qa.failed],
                 "unconfigured": [r.kind.id for r in self.qa.unconfigured],
                 "degraded": [r.kind.id for r in self.qa.degraded],
+                # Tên bảo đảm thiếu theo loại — người ký waiver biết mình nhận gì.
+                "missing": {r.kind.id: list(r.missing) for r in self.qa.degraded},
                 "fake_tests": self.qa.fake_tests,
             },
             "degraded_waiver": self.degraded_waiver,
@@ -94,22 +96,28 @@ class PreDeployReport:
 
 
 def _isolation_check(report: PreDeployReport, cfg: Config) -> Check:
-    """Kiểm định có chạy trong Docker không, và nếu không thì có được phép không."""
-    degraded = [r.kind.id for r in report.qa.degraded] if report.qa else []
+    """Kiểm định có chạy trong Docker không, và nếu không thì có được phép không.
+    Suy biến nêu **tên bảo đảm thiếu** (ADR-005 V5) — "ngoài Docker" chưa
+    nói người ký waiver đang chấp nhận mất gì."""
+    degraded = report.qa.degraded if report.qa else []
     if not degraded:
         if report.qa and not any(r.ran for r in report.qa.results):
             return Check("cách ly", Outcome.UNCONFIGURED, "không có lần chạy nào để biết")
         return Check("cách ly", True, "kiểm định chạy trong Docker")
+    ten = ", ".join(
+        f"{r.kind.id} (thiếu {', '.join(r.missing) if r.missing else 'bảo đảm không rõ'})"
+        for r in degraded
+    )
     waiver = str(cfg.get("sandbox.pre_deploy_degraded_waiver", "") or "").strip()
     if waiver:
         report.degraded_waiver = waiver
         return Check(
             "cách ly", True,
-            f"suy biến ({', '.join(degraded)}) — chấp nhận theo khai báo: {waiver}",
+            f"suy biến: {ten} — chấp nhận theo khai báo: {waiver}",
         )
     return Check(
         "cách ly", False,
-        f"{', '.join(degraded)} chạy ngoài Docker. Cổng trước triển khai không "
+        f"{ten} chạy ngoài Docker. Cổng trước triển khai không "
         f"chấp nhận suy biến; dựng Docker, hoặc khai lý do ở "
         f"`sandbox.pre_deploy_degraded_waiver` để ghi vào bằng chứng.",
     )

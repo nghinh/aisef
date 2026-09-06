@@ -172,6 +172,36 @@ class TestRunTool(ToolTestCase):
             run_tool("khong-co", self.project)
 
 
+class TestProviderGia(ToolTestCase):
+    """`run_tool` trên `FakeProvider` (ADR-005 V5) — không Docker; lỗi hạ tầng
+    sandbox thành `unrunnable`, không thành test đỏ."""
+
+    def test_loi_ha_tang_la_khong_chay_duoc_khong_phai_test_do(self):
+        from aisdlc.harness import sandbox
+
+        fake = sandbox.FakeProvider([sandbox.SandboxResult(
+            125, stderr="docker: Error response from daemon: pull access denied",
+            provider_error="pull access denied")])
+        cfg = Config({**DEFAULTS, "tools.test": "pytest -q", "sandbox.provider": "fake"})
+        with sandbox.using(fake):
+            res = run_tool("test", self.project, story_id="S-01",
+                           artifact_root=self.artifacts, config=cfg)
+        self.assertFalse(res.ok)
+        self.assertIn("hạ tầng sandbox", res.unrunnable)
+        self.assertFalse(res.degraded)
+        self.assertEqual(fake.calls[0].cmd, ["pytest", "-q"])
+        e = EvidenceStore(self.artifacts).read("S-01").last(TOOL_RUN, "test")
+        self.assertEqual(e.detail["provider_error"], "pull access denied")
+        self.assertIn("hạ tầng", e.detail["unrunnable"])
+
+    def test_suy_bien_neu_ten_bao_dam_thieu(self):
+        cfg = Config({**DEFAULTS, "tools.test": "true", "sandbox.use_docker": False})
+        res = run_tool("test", self.project, config=cfg)
+        self.assertTrue(res.degraded)
+        self.assertEqual(res.detail["missing"], ["network_none", "non_root", "secrets_absent"])
+        self.assertIn("network_none", res.summary())
+
+
 class TestDescription(ToolTestCase):
     def test_every_tool_says_when_to_call_it(self):
         """Tool không có mô tả dùng đúng lúc thì agent sẽ gọi sai lúc."""
