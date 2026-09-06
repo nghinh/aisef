@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "aisef"             # gói, module và lệnh cùng một tên từ 0.2.0
 version = "0.2.0"
-description = "AISEF — AI Software Engineering Framework: đầu vào là docs/requirements.md, đầu ra là code đã qua cổng kiểm"
+description = "AISEF — AI Software Engineering Framework: input is docs/requirements.md, output is gate-verified code with SHA-bound evidence"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"

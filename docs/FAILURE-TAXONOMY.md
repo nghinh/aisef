@@ -1,8 +1,8 @@
 # Phân loại lỗi thật của AISEF — để không tái diễn
 
-Hai mươi lăm lỗi tìm được trong hai ngày 2026-09-05 → 06 — 21 trong ngày
-05/09, và 22–25 đêm 05→06/09 khi đo hai đợt ADR-004 trên agent thật (e9
-STORY-01-07 và `aisef improve`) — **tất cả bằng đo trên agent thật**, không
+Ba mươi mốt lỗi tìm được từ 2026-09-05 → 06 — 21 trong ngày 05/09,
+22–25 đêm 05→06/09, và 26–31 trong ngày 06/09 (đổi tên, cài sạch, hợp
+quy CI) — **tất cả bằng đo trên agent thật**, không
 lỗi nào bằng đọc code. Mỗi lỗi có một phép hồi quy đỏ khi hoàn nguyên, trừ
 lỗi 22 (lý do ở lớp I); bảng này nhóm chúng theo *lớp nguyên nhân* để lần
 sau, khi một triệu chứng mới xuất hiện, người sửa hỏi đúng câu hỏi trước.

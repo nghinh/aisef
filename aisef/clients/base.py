@@ -14,6 +14,7 @@ im lặng chạy như thể vẫn đủ (bất biến 10).
 from __future__ import annotations
 
 import os
+import shutil
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from dataclasses import dataclass, field
@@ -93,7 +94,7 @@ ENV_KEEP_PREFIXES = ("LC_", "ANTHROPIC_", "AISEF_")
 #: tiến trình client.
 GIT_NO_CREDENTIALS: dict[str, str] = {
     "GIT_TERMINAL_PROMPT": "0",
-    "GIT_ASKPASS": "/usr/bin/false",
+    "GIT_ASKPASS": shutil.which("false") or "/usr/bin/false",
     "GIT_CONFIG_COUNT": "1",
     "GIT_CONFIG_KEY_0": "credential.helper",
     "GIT_CONFIG_VALUE_0": "",

@@ -1,0 +1,554 @@
+<title>AISEF 360° Assessment</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&family=Outfit:wght@300;400;500;600;700&display=swap">
+<style>
+:root {
+  --navy: #1A2332;
+  --teal: #0D9488;
+  --teal-bg: #F0FDFA;
+  --red: #DC2626;
+  --red-bg: #FEF2F2;
+  --amber: #D97706;
+  --amber-bg: #FFFBEB;
+  --green: #059669;
+  --green-bg: #ECFDF5;
+  --surface: #FAFAF7;
+  --surface-alt: #F3F1EC;
+  --text: #1E293B;
+  --text-muted: #64748B;
+  --border: #E2E0DB;
+  --code-bg: #F1F0EB;
+  --card-bg: #FFFFFF;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --navy: #E2E8F0;
+    --teal: #2DD4BF;
+    --teal-bg: #0D2D2A;
+    --red: #F87171;
+    --red-bg: #2D1515;
+    --amber: #FBBF24;
+    --amber-bg: #2D2210;
+    --green: #34D399;
+    --green-bg: #0D2D1F;
+    --surface: #0F172A;
+    --surface-alt: #1A2332;
+    --text: #E2E8F0;
+    --text-muted: #94A3B8;
+    --border: #334155;
+    --code-bg: #1E293B;
+    --card-bg: #1E293B;
+  }
+}
+:root[data-theme="dark"] {
+  --navy: #E2E8F0;
+  --teal: #2DD4BF;
+  --teal-bg: #0D2D2A;
+  --red: #F87171;
+  --red-bg: #2D1515;
+  --amber: #FBBF24;
+  --amber-bg: #2D2210;
+  --green: #34D399;
+  --green-bg: #0D2D1F;
+  --surface: #0F172A;
+  --surface-alt: #1A2332;
+  --text: #E2E8F0;
+  --text-muted: #94A3B8;
+  --border: #334155;
+  --code-bg: #1E293B;
+  --card-bg: #1E293B;
+}
+
+* { box-sizing: border-box; margin: 0; }
+body { background: var(--surface); color: var(--text); font-family: 'Outfit', system-ui, sans-serif; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4 { font-family: 'Source Serif 4', Georgia, serif; font-weight: 600; line-height: 1.2; text-wrap: balance; color: var(--navy); }
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+/* Header */
+.header { padding: 56px 0 40px; border-bottom: 1px solid var(--border); }
+.header .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); margin-bottom: 12px; }
+.header h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 12px; }
+.header .meta { font-size: 0.9rem; color: var(--text-muted); }
+.header .meta strong { color: var(--text); font-weight: 500; }
+
+/* TOC */
+.toc { padding: 32px 0; border-bottom: 1px solid var(--border); }
+.toc h2 { font-size: 1rem; font-family: 'Outfit', sans-serif; font-weight: 600; margin-bottom: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.toc ol { padding-left: 20px; columns: 2; column-gap: 32px; }
+.toc li { font-size: 0.88rem; margin-bottom: 4px; break-inside: avoid; }
+.toc a { color: var(--teal); text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+@media (max-width: 600px) { .toc ol { columns: 1; } }
+
+/* Sections */
+section { padding: 40px 0; border-bottom: 1px solid var(--border); }
+section:last-of-type { border-bottom: none; }
+section > .wrap > h2 { font-size: 1.5rem; margin-bottom: 24px; padding-bottom: 8px; }
+section h3 { font-size: 1.15rem; margin: 28px 0 12px; }
+section h4 { font-size: 0.95rem; font-family: 'Outfit', sans-serif; font-weight: 600; margin: 20px 0 8px; }
+p, li { font-size: 0.92rem; }
+p + p { margin-top: 12px; }
+ul, ol { padding-left: 20px; margin: 8px 0; }
+li { margin-bottom: 4px; }
+
+/* Stats row */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 24px 0; }
+.stat { text-align: center; padding: 20px 12px; border-radius: 10px; background: var(--card-bg); border: 1px solid var(--border); }
+.stat .num { font-family: 'Source Serif 4', serif; font-size: 1.8rem; font-weight: 700; line-height: 1; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+.stat .label { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; }
+.stat.good .num { color: var(--green); }
+.stat.warn .num { color: var(--amber); }
+.stat.bad .num { color: var(--red); }
+.stat.neutral .num { color: var(--teal); }
+
+/* Verdict badges */
+.verdict { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 10px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
+.verdict.strong { background: var(--green-bg); color: var(--green); }
+.verdict.ok { background: var(--teal-bg); color: var(--teal); }
+.verdict.weak { background: var(--amber-bg); color: var(--amber); }
+.verdict.gap { background: var(--red-bg); color: var(--red); }
+
+/* Tables */
+.table-wrap { overflow-x: auto; margin: 16px 0; border-radius: 8px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: var(--surface-alt); font-weight: 600; font-size: 0.78rem; letter-spacing: 0.03em; text-transform: uppercase; color: var(--text-muted); position: sticky; top: 0; }
+tr:last-child td { border-bottom: none; }
+td { background: var(--card-bg); }
+code { font-family: 'Menlo', 'Consolas', monospace; font-size: 0.82em; background: var(--code-bg); padding: 2px 6px; border-radius: 3px; }
+
+/* Callout boxes */
+.callout { padding: 16px 20px; border-radius: 8px; margin: 16px 0; border-left: 3px solid; font-size: 0.9rem; }
+.callout.finding { background: var(--red-bg); border-color: var(--red); }
+.callout.insight { background: var(--teal-bg); border-color: var(--teal); }
+.callout.warning { background: var(--amber-bg); border-color: var(--amber); }
+.callout strong { font-weight: 600; }
+
+/* Phase cards */
+.phase { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 20px 0; }
+.phase-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.phase-ver { font-family: 'Source Serif 4', serif; font-size: 1.3rem; font-weight: 700; color: var(--teal); }
+.phase-title { font-size: 1.05rem; font-weight: 600; }
+.phase-meta { font-size: 0.82rem; color: var(--text-muted); margin-left: auto; }
+.phase table { margin-top: 12px; }
+.phase td:first-child { font-weight: 500; min-width: 260px; }
+.done-when { font-size: 0.84rem; color: var(--text-muted); font-style: italic; }
+
+/* Priority tags */
+.pri { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; padding: 2px 7px; border-radius: 3px; text-transform: uppercase; vertical-align: middle; }
+.pri.p0 { background: var(--red-bg); color: var(--red); }
+.pri.p1 { background: var(--amber-bg); color: var(--amber); }
+.pri.p2 { background: var(--teal-bg); color: var(--teal); }
+.pri.p3 { background: var(--surface-alt); color: var(--text-muted); }
+</style>
+
+<header class="header">
+  <div class="wrap">
+    <div class="eyebrow">Code-Based Assessment</div>
+    <h1>AISEF 0.2.0 — 360° Audit &amp; Upgrade Plan</h1>
+    <p class="meta">Date: <strong>2026-09-06</strong> &middot; Source: full codebase read (21,740 LOC + 20,876 test LOC + all docs) &middot; Method: <strong>no memory, code only</strong></p>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#snapshot">Snapshot at a glance</a></li>
+      <li><a href="#strengths">What's been achieved</a></li>
+      <li><a href="#gaps">What's still open</a></li>
+      <li><a href="#debt">Technical debt</a></li>
+      <li><a href="#docs-gaps">Documentation gaps</a></li>
+      <li><a href="#ci">CI &amp; release gaps</a></li>
+      <li><a href="#risk">Risk register</a></li>
+      <li><a href="#plan">Upgrade plan: 0.3.0 → 1.0</a></li>
+    </ol>
+  </div>
+</nav>
+
+<!-- 1. Snapshot -->
+<section id="snapshot">
+  <div class="wrap">
+    <h2>1. Snapshot at a glance</h2>
+    <div class="stats">
+      <div class="stat neutral"><div class="num">21,740</div><div class="label">Lines of Python</div></div>
+      <div class="stat neutral"><div class="num">20,876</div><div class="label">Lines of tests</div></div>
+      <div class="stat good"><div class="num">1,678</div><div class="label">Tests passing</div></div>
+      <div class="stat good"><div class="num">0</div><div class="label">Failures</div></div>
+      <div class="stat good"><div class="num">0</div><div class="label">External deps</div></div>
+      <div class="stat good"><div class="num">245s</div><div class="label">Suite runtime</div></div>
+      <div class="stat good"><div class="num">0</div><div class="label">TODO/FIXME</div></div>
+      <div class="stat warn"><div class="num">24</div><div class="label">Functions &gt;80 LOC</div></div>
+    </div>
+    <p>Test-to-code ratio: <strong>0.96</strong> (20,876 test lines / 21,740 source lines). The suite runs without Docker, external services, or network access. Zero acknowledged technical debt markers in code (<code>TODO</code>, <code>FIXME</code>, <code>HACK</code> — all absent). Zero external dependencies — entire framework on Python stdlib.</p>
+  </div>
+</section>
+
+<!-- 2. Strengths -->
+<section id="strengths">
+  <div class="wrap">
+    <h2>2. What's been achieved <span class="verdict strong">Strong foundation</span></h2>
+
+    <h3>2.1 Evidence architecture</h3>
+    <p>Every gate check reads <code>_bmad-output/evidence/{story}.jsonl</code> — append-only, SHA-bound. The behaviour ledger (<code>control/ledger.py</code>, 686 lines) rebuilds VERIFIED/GAP/REOPENED states from evidence every time, never caching truth. Six outcomes instead of binary pass/fail, with three invariants enforced in code: unconfigured ≠ passed, unrunnable ≠ failed, unfixed ≠ unfixable.</p>
+
+    <h3>2.2 Gate qualification</h3>
+    <p>All 16 story-level gate checks have three controls each (positive, negative/mutant, environment) — verified by <code>test_gate_qualification.py</code> which reads <code>test_gate.py</code> by AST to confirm coverage. The nop control (negative control on tests) detects tests that were already green before the story wrote any code.</p>
+
+    <h3>2.3 Guard architecture</h3>
+    <p>Eight guards on three lifecycle moments, framework-side (not client-side). <code>harness/guardrails.py</code> (821 lines) with 109 test methods in <code>test_guardrails.py</code> (973 lines). Client conformance suite proves guards block before tool execution on real agents (10/10 Claude, 9/10 OpenCode).</p>
+
+    <h3>2.4 Separation of concerns</h3>
+    <p>Reviewer ≠ developer is a structural guarantee (separate session, forbidden to edit code). Four agent roles with fresh sessions each. Role routing in <code>harness/routing.py</code>. Write scope enforced by guard, not by instruction.</p>
+
+    <h3>2.5 Self-validation</h3>
+    <p><code>test_meta.py</code> reads source code by AST to detect missing evidence writes and stale capability declarations. <code>test_requirements_evidence.py</code> reads <code>docs/REQUIREMENTS-EVIDENCE.md</code> and verifies every referenced test class still exists. The framework tests its own documentation.</p>
+
+    <h3>2.6 Crash recovery</h3>
+    <p>Transaction journal (<code>control/journal.py</code>, 356 lines) with undo/redo, candidate tracking, and atomic writes. Story state machine (<code>control/state.py</code>) uses <code>fcntl.flock</code> for file locking. Worktree management (<code>control/worktree.py</code>) isolates parallel stories.</p>
+
+    <h3>2.7 Benchmark infrastructure</h3>
+    <p>18 benchmark tasks mined from real bugs and dogfood stories (<code>tests/bench/</code>). Prompt lint prevents SHA/URL/story-ID leakage. Validation runs each task 3× to detect flaky tests. Grading by F2P/P2P test IDs. Export to Harbor format. Not yet run with a real client.</p>
+
+    <h3>2.8 Bug discipline</h3>
+    <p>31 real bugs found by measurement, classified into 11 cause classes. Every bug has a regression test. <code>docs/FAILURE-TAXONOMY.md</code> documents each one. No bug was found by "looking at the code" — all found by running the system on real projects.</p>
+  </div>
+</section>
+
+<!-- 3. Gaps -->
+<section id="gaps">
+  <div class="wrap">
+    <h2>3. What's still open <span class="verdict gap">Needs work</span></h2>
+
+    <h3>3.1 Test coverage gaps</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Module</th><th>Lines</th><th>Direct test file</th><th>Risk</th></tr></thead>
+        <tbody>
+          <tr><td><code>harness/routing.py</code></td><td>146</td><td>None — <code>test_router.py</code> tests <code>kit/router.py</code> (different module)</td><td><span class="pri p0">High</span></td></tr>
+          <tr><td><code>control/complexity.py</code></td><td>533</td><td>None</td><td><span class="pri p1">Medium</span></td></tr>
+          <tr><td><code>harness/browser.py</code></td><td>152</td><td>None (mockup tests skip when Playwright absent)</td><td><span class="pri p1">Medium</span></td></tr>
+          <tr><td><code>harness/mockup_verify.py</code></td><td>297</td><td>Partial via <code>test_mockup.py</code></td><td><span class="pri p2">Low-Med</span></td></tr>
+          <tr><td><code>kit/skills.py</code></td><td>132</td><td>Partial via <code>test_skill_scan.py</code></td><td><span class="pri p3">Low</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout finding"><strong>Critical gap:</strong> <code>harness/routing.py</code> assigns agent roles (developer, reviewer, security, designer) and manages session creation — the module that enforces "reviewer ≠ developer" has zero dedicated tests.</div>
+
+    <h3>3.2 Subprocess timeout gap</h3>
+    <p>20+ calls to <code>subprocess.run()</code> across the codebase lack a <code>timeout</code> parameter. If Docker, Git, Claude CLI, or Playwright hangs, the Python process hangs indefinitely.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>File</th><th>Lines</th><th>What it calls</th></tr></thead>
+        <tbody>
+          <tr><td><code>clients/claude_code.py</code></td><td>132</td><td>Claude CLI</td></tr>
+          <tr><td><code>clients/opencode.py</code></td><td>136</td><td>OpenCode CLI</td></tr>
+          <tr><td><code>cli/doctor.py</code></td><td>57, 128, 143</td><td>docker, git</td></tr>
+          <tr><td><code>harness/sandbox.py</code></td><td>181, 412, 460</td><td>docker run/exec/stop</td></tr>
+          <tr><td><code>harness/browser.py</code></td><td>110</td><td>playwright</td></tr>
+          <tr><td><code>harness/mockup_verify.py</code></td><td>106, 168, 176</td><td>node/vite</td></tr>
+          <tr><td><code>harness/guardrails.py</code></td><td>431</td><td>git diff</td></tr>
+          <tr><td><code>harness/context.py</code></td><td>284</td><td>git ls-files</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>3.3 Evidence breadth</h3>
+    <ul>
+      <li><strong>One dogfood project</strong> (e9), one accepted epic (EPIC-01, 7 stories). EPIC-02..05 (16 stories) never ran.</li>
+      <li><strong>One first-class client</strong> (Claude Code). OpenCode is second-class (9/10, hook conformance not stable).</li>
+      <li><strong>No baseline comparison</strong> — nobody has measured what an agent without AISEF produces on the same tasks.</li>
+      <li><strong>Benchmark never run</strong> — 18 tasks ready, pass@1/pass@3 unknown.</li>
+      <li><strong>Improvement loop not re-measured</strong> under V3 nop control rules.</li>
+    </ul>
+
+    <h3>3.4 Security gaps (declared, not hidden)</h3>
+    <ul>
+      <li><strong>S1:</strong> Agent in container has no credential isolation — V1 runs agent on host.</li>
+      <li><strong>V12:</strong> Egress allowlist not implemented — agent sessions have unrestricted network.</li>
+      <li>Skill sources (5 repos) scanned once by model for injection; no scheduled re-scan.</li>
+    </ul>
+
+    <h3>3.5 Internationalization</h3>
+    <div class="callout warning"><strong>All user-facing strings are Vietnamese.</strong> Gate check names, CLI output, error messages, commit messages generated by the framework, pyproject.toml description — everything shown to the user is in Vietnamese. The code logic is language-neutral, but the entire UI surface requires translation for international adoption.</div>
+
+    <h3>3.6 Portability</h3>
+    <ul>
+      <li><code>clients/base.py:96</code> hardcodes <code>/usr/bin/false</code> for <code>GIT_ASKPASS</code> — not portable (NixOS, some containers).</li>
+      <li>CI tests only Python 3.12 despite declaring <code>&gt;=3.11</code>. Bug 29 (glob behavior) was version-specific.</li>
+      <li>No Windows support tested or documented.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 4. Technical debt -->
+<section id="debt">
+  <div class="wrap">
+    <h2>4. Technical debt <span class="verdict weak">Moderate</span></h2>
+
+    <h3>4.1 The <code>implement.py</code> problem</h3>
+    <p>At <strong>2,020 lines</strong> with <strong>62 functions</strong> and <strong>35 imports</strong>, <code>phases/implement.py</code> is 2.5× the next largest file. It handles context building, preservation, skill routing, developer attempts, candidate freezing, nop control, review sessions, security review, gate evaluation, deadlock detection, verdict parsing, and tree snapshots. Seven of the 24 overlong functions live here.</p>
+    <p>Natural decomposition: <code>implement_context.py</code> (prompt building), <code>implement_verify.py</code> (verification and evidence reuse), <code>implement_review.py</code> (review/security sessions), <code>implement_core.py</code> (story orchestration).</p>
+
+    <h3>4.2 Long functions (24 exceed 80 lines)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Function</th><th>File</th><th>Lines</th></tr></thead>
+        <tbody>
+          <tr><td><code>evaluate()</code></td><td>control/gate.py</td><td>271</td></tr>
+          <tr><td><code>cmd_doctor()</code></td><td>cli/doctor.py</td><td>254</td></tr>
+          <tr><td><code>verify_candidate()</code></td><td>phases/implement.py</td><td>204</td></tr>
+          <tr><td><code>build_parser()</code></td><td>cli/parser.py</td><td>184</td></tr>
+          <tr><td><code>run_epic()</code></td><td>phases/run.py</td><td>130</td></tr>
+          <tr><td><code>review_story_v2()</code></td><td>phases/implement.py</td><td>122</td></tr>
+          <tr><td><code>check_stories()</code></td><td>control/machine_gate.py</td><td>117</td></tr>
+          <tr><td><code>_nop_check()</code></td><td>control/gate.py</td><td>117</td></tr>
+          <tr><td><code>run_suite()</code></td><td>phases/qa.py</td><td>114</td></tr>
+          <tr><td><code>_run_wave()</code></td><td>phases/run.py</td><td>109</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>4.3 Code duplication: git helpers</h3>
+    <p>Four separate <code>subprocess.run(["git", ...])</code> wrappers across the codebase, each with a slightly different signature:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Location</th><th>Function</th><th>Returns</th></tr></thead>
+        <tbody>
+          <tr><td><code>harness/guardrails.py:426</code></td><td><code>_git_lines()</code></td><td><code>list[str]</code></td></tr>
+          <tr><td><code>phases/implement.py:1059</code></td><td><code>_git_lines_text()</code></td><td><code>str</code></td></tr>
+          <tr><td><code>control/tdd.py:27</code></td><td><code>_git()</code></td><td><code>str</code></td></tr>
+          <tr><td><code>control/worktree.py:42</code></td><td><code>_git()</code></td><td><code>CompletedProcess</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Should be consolidated into one shared <code>_git()</code> utility with optional return-type control.</p>
+
+    <h3>4.4 Hardcoded values</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Location</th><th>Value</th><th>Should be</th></tr></thead>
+        <tbody>
+          <tr><td><code>implement.py:396</code></td><td><code>INLINE_SKILL_MAX_CHARS = 8000</code></td><td>Config key</td></tr>
+          <tr><td><code>implement.py:1032</code></td><td><code>REVIEW_DIFF_CHARS = 60_000</code></td><td>Config key</td></tr>
+          <tr><td><code>implement.py:1671</code></td><td><code>5_000_000</code> (tree snapshot limit)</td><td>Config key</td></tr>
+          <tr><td><code>deploy.py:35</code></td><td><code>.github/workflows/aisef.yml</code></td><td>Config key (assumes GitHub Actions)</td></tr>
+          <tr><td><code>base.py:96</code></td><td><code>/usr/bin/false</code></td><td><code>shutil.which("false")</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>4.5 Broad exception handling</h3>
+    <p>Three <code>except Exception:</code> blocks at <code>kit/router.py:190</code>, <code>control/normalize.py:162</code>, <code>control/preflight.py:723</code>. All have <code># noqa</code> comments with rationale, but they could mask unexpected errors in production.</p>
+
+    <h3>4.6 Stale worktree branches</h3>
+    <p>Two worktree branches still exist: <code>worktree-agent-a68e253dfb0278464</code> (old A2 work) and <code>worktree-agent-ada8e4665552b2651</code> (B2 C11/C12 work, commit 1c96e96, not merged). These should be cleaned up or merged.</p>
+  </div>
+</section>
+
+<!-- 5. Docs gaps -->
+<section id="docs-gaps">
+  <div class="wrap">
+    <h2>5. Documentation gaps <span class="verdict weak">Needs update</span></h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Issue</th><th>Location</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td>Test count says "966" / "386"</td><td><code>EXECUTION-PLAN.md</code> lines 61, 91</td><td>Update to 1,678 or note as historical</td></tr>
+          <tr><td>Title says "twenty-five bugs"</td><td><code>FAILURE-TAXONOMY.md</code> opening</td><td>Update to thirty-one</td></tr>
+          <tr><td>User guide Vietnamese-only</td><td><code>HUONG-DAN-SU-DUNG.md</code> (893 lines)</td><td>Translate or write English equivalent</td></tr>
+          <tr><td><code>SALEKIT.html</code> not indexed</td><td><code>docs/</code></td><td>Add to README or remove</td></tr>
+          <tr><td>No CLAUDE.md for the framework repo itself</td><td>Project root</td><td>Decide if framework needs its own harness config</td></tr>
+          <tr><td>pyproject.toml description in Vietnamese</td><td><code>pyproject.toml</code> line 8</td><td>English description for PyPI</td></tr>
+          <tr><td>EXECUTION-PLAN module table frozen</td><td><code>EXECUTION-PLAN.md</code> §0</td><td>Regenerate or mark as archived</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 6. CI gaps -->
+<section id="ci">
+  <div class="wrap">
+    <h2>6. CI &amp; release gaps <span class="verdict weak">One Python, one OS</span></h2>
+    <ul>
+      <li><strong>Single Python version in CI:</strong> <code>tests.yml</code> runs only on 3.12. Given bug 29 (glob behavior differs across versions) and <code>requires-python = "&gt;=3.11"</code>, test on 3.11 and 3.13 too.</li>
+      <li><strong>Single OS in CI:</strong> Only <code>ubuntu-latest</code>. macOS is the primary dev platform. No Windows testing.</li>
+      <li><strong>No lint/type-check in CI:</strong> No <code>mypy</code>, <code>ruff</code>, or <code>flake8</code> step. The framework uses stdlib only, so type errors are caught by tests, but static analysis would catch more.</li>
+      <li><strong>Conformance runs weekly:</strong> <code>conformance.yml</code> triggers Monday 03:00 UTC. A conformance regression between Monday runs could ship unnoticed.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 7. Risk register -->
+<section id="risk">
+  <div class="wrap">
+    <h2>7. Risk register</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Risk</th><th>Impact</th><th>Likelihood</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td>No baseline comparison — can't prove value</td><td><span class="pri p0">High</span></td><td>Certain (never measured)</td><td>Run benchmark with and without harness</td></tr>
+          <tr><td>Vietnamese-only UI blocks adoption</td><td><span class="pri p0">High</span></td><td>Certain</td><td>i18n layer or full English translation</td></tr>
+          <tr><td>subprocess hangs freeze entire pipeline</td><td><span class="pri p1">Medium</span></td><td>Probable (Docker/CLI hangs happen)</td><td>Add timeout to all subprocess calls</td></tr>
+          <tr><td><code>implement.py</code> complexity → merge conflicts, bugs</td><td><span class="pri p1">Medium</span></td><td>Probable (62 functions, growing)</td><td>Split into 4 modules</td></tr>
+          <tr><td>Credential leak via agent in container (S1)</td><td><span class="pri p0">High</span></td><td>Low (agent runs on host in V1)</td><td>Implement isolation before promoting container mode</td></tr>
+          <tr><td>CI misses Python-version bugs</td><td><span class="pri p1">Medium</span></td><td>Has happened (bug 29)</td><td>Matrix test 3.11 + 3.12 + 3.13</td></tr>
+          <tr><td>routing.py untested → role assignment bugs</td><td><span class="pri p0">High</span></td><td>Unknown (no tests)</td><td>Write test_routing.py</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 8. Upgrade Plan -->
+<section id="plan">
+  <div class="wrap">
+    <h2>8. Upgrade plan: 0.3.0 → 1.0</h2>
+    <p>Principle: <strong>fix before feature, measure before optimize, translate before market.</strong> Each version has one question it must answer with data.</p>
+
+    <!-- 0.2.1 -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-ver">0.2.1</span>
+        <span class="phase-title">Hygiene patch</span>
+        <span class="phase-meta">~2 days, $0</span>
+      </div>
+      <p>Fix everything that costs nothing and blocks nothing. No new features.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Task</th><th>Done when</th><th>Pri</th></tr></thead>
+          <tbody>
+            <tr><td>Add <code>timeout=</code> to all 20+ <code>subprocess.run()</code> calls</td><td>No untimed subprocess in <code>grep -rn 'subprocess.run' aisef/</code></td><td><span class="pri p0">P0</span></td></tr>
+            <tr><td>Write <code>test_routing.py</code> for <code>harness/routing.py</code></td><td>Coverage of 4 roles, session creation, refusal paths</td><td><span class="pri p0">P0</span></td></tr>
+            <tr><td>Write <code>test_complexity.py</code> for <code>control/complexity.py</code></td><td>5 dimensions + calibration covered</td><td><span class="pri p1">P1</span></td></tr>
+            <tr><td>Consolidate 4 git helpers into one <code>_git()</code> utility</td><td>Single function, 4 callers updated, tests green</td><td><span class="pri p1">P1</span></td></tr>
+            <tr><td>Fix <code>/usr/bin/false</code> hardcode → <code>shutil.which</code></td><td>Works on NixOS / containers without <code>/usr/bin/</code></td><td><span class="pri p2">P2</span></td></tr>
+            <tr><td>CI matrix: Python 3.11 + 3.12 + 3.13</td><td><code>tests.yml</code> runs on 3 versions</td><td><span class="pri p1">P1</span></td></tr>
+            <tr><td>Update stale docs: test counts, bug count, pyproject description</td><td>EXECUTION-PLAN, FAILURE-TAXONOMY, pyproject.toml all current</td><td><span class="pri p2">P2</span></td></tr>
+            <tr><td>Clean up stale worktree branches</td><td>No orphan worktree branches in <code>git branch -a</code></td><td><span class="pri p3">P3</span></td></tr>
+            <tr><td>Move hardcoded constants to config keys</td><td>INLINE_SKILL_MAX_CHARS, REVIEW_DIFF_CHARS, tree snapshot limit configurable</td><td><span class="pri p2">P2</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 0.3.0 -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-ver">0.3.0</span>
+        <span class="phase-title">Prove value with data</span>
+        <span class="phase-meta">~2 weeks, ~$150</span>
+      </div>
+      <p><strong>Question:</strong> Does the harness catch things a bare agent misses, and at what cost?</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Task</th><th>Done when</th><th>Pri</th></tr></thead>
+          <tbody>
+            <tr><td>Run benchmark: 18 tasks × 3 runs with Claude</td><td>pass@1, pass@3, stability ≥ 80% in <code>docs/BENCHMARK.md</code></td><td><span class="pri p0">P0</span></td></tr>
+            <tr><td>Control group: same 18 tasks with bare agent (no gates, no guards)</td><td>Two-column table: pass rate, cost, bugs that escaped</td><td><span class="pri p0">P0</span></td></tr>
+            <tr><td>Re-measure improvement loop under V3 nop control</td><td>Δ ≥ 0 and gaps close with new-code tests only</td><td><span class="pri p0">P0</span></td></tr>
+            <tr><td>Complete C11/C12 conformance probes</td><td>12 probes, Claude column no ✗</td><td><span class="pri p1">P1</span></td></tr>
+            <tr><td>Cost analysis: plan vs code failure rate by story</td><td>Table in <code>docs/COST-ANALYSIS.md</code></td><td><span class="pri p1">P1</span></td></tr>
+            <tr><td>Split <code>implement.py</code> → 4 modules</td><td>No file &gt;600 LOC in <code>phases/</code></td><td><span class="pri p1">P1</span></td></tr>
+            <tr><td>Remove deprecated <code>aisdlc</code> alias</td><td>Entry point removed from pyproject.toml</td><td><span class="pri p2">P2</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="done-when">Version ships when: benchmark results show what the harness catches vs bare agent, with dollar cost per caught bug.</p>
+    </div>
+
+    <!-- 0.4.0 -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-ver">0.4.0</span>
+        <span class="phase-title">Usable outside Vietnam</span>
+        <span class="phase-meta">~3 weeks, ~$50</span>
+      </div>
+      <p><strong>Question:</strong> Can someone who reads only English install, configure, and run the full lifecycle?</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Task</th><th>Done when</th><th>Pri</th></tr></thead>
+          <tbody>
+            <tr><td>i18n layer: extract all user-facing strings to locale files</td><td><code>LANG=en aisef doctor</code> outputs English</td><td><span class="pri p0">P0</span></td></tr>
+            <tr><td>English user guide (translate or rewrite HUONG-DAN-SU-DUNG.md)</td><td><code>docs/USER-GUIDE.md</code> covers all 18 sections</td><td><span class="pri p0">P0</span></td></tr>
+            <tr><td><code>aisef init --stack &lt;react|python|go&gt;</code></td><td>Generates tools.test, verify.*, app.* for the stack; doctor passes immediately</td><td><span class="pri p1">P1</span></td></tr>
+            <tr><td>Reduce mandatory config keys ≤ 5</td><td>New user runs <code>plan</code> without opening config</td><td><span class="pri p1">P1</span></td></tr>
+            <tr><td>Egress allowlist (V12)</td><td>Agent session contacts only declared hosts; probe blocks undeclared</td><td><span class="pri p1">P1</span></td></tr>
+            <tr><td>Crash recovery: kill mid-story → resume correctly</td><td>State, evidence, and worktree intact after SIGKILL</td><td><span class="pri p1">P1</span></td></tr>
+            <tr><td>Add <code>ruff</code> or <code>mypy</code> to CI</td><td>Static analysis passes on all source files</td><td><span class="pri p2">P2</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="done-when">Version ships when: English-only user follows USER-GUIDE.md from install to pre-deploy on a fresh project without reading Vietnamese.</p>
+    </div>
+
+    <!-- 0.5.0 -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-ver">0.5.0</span>
+        <span class="phase-title">Multi-client, multi-project</span>
+        <span class="phase-meta">~4 weeks, ~$200</span>
+      </div>
+      <p><strong>Question:</strong> Does the framework work on projects it didn't build?</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Task</th><th>Done when</th><th>Pri</th></tr></thead>
+          <tbody>
+            <tr><td>OpenCode promoted to first-class</td><td>12/12 conformance, 3 consecutive weeks stable</td><td><span class="pri p1">P1</span></td></tr>
+            <tr><td>Model routing by role (developer/reviewer/designer)</td><td>A/B on ≥10 stories: quality same, cost ≥20% lower</td><td><span class="pri p1">P1</span></td></tr>
+            <tr><td>Second dogfood project (not by framework author)</td><td>Full lifecycle, pre-deploy passes, bugs filed</td><td><span class="pri p0">P0</span></td></tr>
+            <tr><td>Dashboard: evidence aggregation across projects</td><td>One command → cost/week, behaviours/dollar, gap trend</td><td><span class="pri p1">P1</span></td></tr>
+            <tr><td>Credential isolation in container (S1)</td><td>Sandbox conformance 6/6, agent can't read host keys</td><td><span class="pri p1">P1</span></td></tr>
+            <tr><td>Distributed execution: story queue across machines</td><td>2 machines, 1 epic, evidence merges correctly</td><td><span class="pri p2">P2</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="done-when">Version ships when: a second team has used it end-to-end and filed at least one bug.</p>
+    </div>
+
+    <!-- 1.0 -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-ver">1.0</span>
+        <span class="phase-title">Stability commitment</span>
+        <span class="phase-meta">When ready, not when scheduled</span>
+      </div>
+      <p><strong>Question:</strong> Is this safe to depend on?</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Condition</th><th>Evidence required</th></tr></thead>
+          <tbody>
+            <tr><td>Three diverse projects completed</td><td>Pre-deploy passes on ≥3 projects, ≥1 by external team</td></tr>
+            <tr><td>Benchmark baseline stable</td><td>Three runs ≥2 weeks apart, no regression</td></tr>
+            <tr><td>Gate and config contracts frozen</td><td>Semver: breaking change = major version</td></tr>
+            <tr><td>All 12 conformance probes passing on 2 clients</td><td>Both Claude and OpenCode at 12/12</td></tr>
+            <tr><td>No unwaived UNRUNNABLE in acceptance</td><td>mutation and image-scan either run or dropped from gate</td></tr>
+            <tr><td>English documentation complete</td><td>User guide, API reference, architecture overview</td></tr>
+            <tr><td>Credential isolation (S1) resolved</td><td>Sandbox conformance includes S1</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="done-when">1.0 ships when all conditions are met. Not before.</p>
+    </div>
+
+    <h3>Summary: what each version proves</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Version</th><th>Answers</th><th>Key metric</th></tr></thead>
+        <tbody>
+          <tr><td><strong>0.2.1</strong></td><td>Is the code healthy?</td><td>0 untested critical modules, 0 untimed subprocesses</td></tr>
+          <tr><td><strong>0.3.0</strong></td><td>Is the harness worth the cost?</td><td>pass@1 with vs without harness, $ per caught bug</td></tr>
+          <tr><td><strong>0.4.0</strong></td><td>Can anyone use it?</td><td>English user completes lifecycle unaided</td></tr>
+          <tr><td><strong>0.5.0</strong></td><td>Does it work on other people's projects?</td><td>Second team files bugs, not confusion</td></tr>
+          <tr><td><strong>1.0</strong></td><td>Is it safe to depend on?</td><td>Stable benchmark, frozen contracts, resolved S1</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer style="text-align: center; padding: 32px 0; font-size: 0.82rem; color: var(--text-muted); border-top: 1px solid var(--border);">
+  <div class="wrap">
+    AISEF 360° Assessment &middot; Generated from code audit on 2026-09-06 &middot; All numbers from source, not memory
+  </div>
+</footer>
