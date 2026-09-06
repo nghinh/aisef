@@ -21,11 +21,17 @@ liệu. Từ bản này chỉ còn một tên.
 | thẻ meta mockup `aisdlc-screen`/`aisdlc-route` | `aisef-screen`/`aisef-route` (thẻ cũ **vẫn đọc được**) |
 | quy trình CI sinh ra `.github/workflows/aisdlc.yml` | `aisef.yml` |
 
-Ba chỗ **giữ nguyên** có lý do: tên kho GitHub `nghinh/ai-sdlc` (trusted
-publisher của PyPI gắn theo tên kho — đổi là mất quyền publish cho tới khi khai
-lại), task benchmark trong `tests/bench/tasks/` (patch áp vào commit **trước**
-lần đổi tên nên phải giữ đường dẫn cũ; `_mine.SRC_PREFIXES` nhận cả hai), và
-fixture ghi lại phiên agent thật trong `tests/fixtures/`.
+Kho GitHub cũng đã đổi tên thành **`nghinh/aisef`** (2026-09-06); tag `v0.1.0`,
+lịch sử CI và URL cũ (GitHub tự chuyển hướng) đều còn. **Việc phải làm tay một
+lần:** trên PyPI, sửa trusted publisher của project `aisef` sang repository
+`aisef` — publisher khớp theo đúng chuỗi `chủ/tên kho` lấy từ token OIDC, giữ
+tên cũ thì lần publish sau bị từ chối. Workflow `release.yml` và environment
+`pypi` không đổi.
+
+Hai chỗ **giữ nguyên** có lý do: task benchmark trong `tests/bench/tasks/`
+(patch áp vào commit **trước** lần đổi tên nên phải giữ đường dẫn cũ;
+`_mine.SRC_PREFIXES` nhận cả hai) và fixture ghi lại phiên agent thật trong
+`tests/fixtures/`.
 
 ### Khi nâng cấp lên 0.2.0 — việc phải làm
 

@@ -313,7 +313,7 @@ class TestInstallSpecDoiDuoc(unittest.TestCase):
 
     def test_doi_sang_git_url(self):
         with tempfile.TemporaryDirectory() as tmp:
-            spec = "git+https://github.com/ai-sdlc/ai-sdlc@v0.1.0"
+            spec = "git+https://github.com/nghinh/aisef@v0.2.0"
             noi_dung = write_ci_workflow(tmp, install_spec=spec).read_text(
                 encoding="utf-8")
             self.assertIn(f"pip install --quiet {spec}", noi_dung)

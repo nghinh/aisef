@@ -4,8 +4,12 @@
 #
 # Việc phải làm một lần bằng tay (không tự động hoá được): trên PyPI, tài
 # khoản tổ chức tạo project `aisef` và thêm "trusted publisher" trỏ tới
-# kho này, workflow `release.yml`, environment `pypi`. Sau đó `git tag v0.1.0
-# && git push --tags` là đủ.
+# kho này (`nghinh/aisef`), workflow `release.yml`, environment `pypi`. Sau đó
+# `git tag vX.Y.Z && git push origin vX.Y.Z` là đủ.
+#
+# Đổi tên kho **là** đổi publisher: PyPI khớp theo đúng chuỗi `chủ/tên kho` lấy
+# từ token OIDC, nên sau lần đổi tên 2026-09-06 (`ai-sdlc` → `aisef`) phải khai
+# lại, không thì job `publish` bị từ chối dù mọi thứ khác xanh.
 name: release
 
 on:
