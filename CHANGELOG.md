@@ -297,7 +297,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 - OpenCode `--format json` → `MACHINE_OUTPUT`/`COST_REPORTING` NATIVE (vẫn hạng
   hai V1 — SOLUTION §11).
 - Kho hồi quy chạy lại được từ kho: `tests/dogfood/` (`par`, mốc 3/3 lượt đầu,
-  ≤ 2 × $3,14) và `tests/conformance/` (8 phép, hai client); release gate
+  ≤ 2 × $3,14) và `tests/conformance/` (10 phép, hai client); release gate
   `AISDLC_RELEASE=1 tests.test_release_gate`.
 - `aisdlc doctor`: hook trỏ đúng dự án, hook thiếu guard mới, ngưỡng cỡ story
   lệch dữ liệu, gợi ý lệnh test in coverage, gợi reporter in tên/CTRF (V9).
