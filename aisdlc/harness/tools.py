@@ -358,4 +358,9 @@ def describe_tools(project: Path | str, config: Config | None = None) -> str:
         "  Khi nào: không chắc tên API hay hành vi thư viện — tra, đừng đoán (luật 12). "
         "Thêm `--story <mã>` để lần tra được ghi vào bằng chứng."
     )
+    lines.append(
+        f"- `{binary} ctx --story <mã>` (hoặc `--file <tệp>`) → bản đồ mã quanh phạm vi ghi: "
+        "chữ ký tệp trong phạm vi, tệp gọi/được import, test nhắc tên\n"
+        "  Khi nào: vào phiên mới, trước khi tự dò cây thư mục — gợi ý tĩnh, không phải chân lý."
+    )
     return "\n".join(lines)

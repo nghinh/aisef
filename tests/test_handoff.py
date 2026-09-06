@@ -15,7 +15,7 @@ from aisdlc.phases.implement import SLOT_SOURCE, _skills_section, handoff_slots,
 
 REVIEW_CTX = {"story_id": "S", "story_title": "t", "story_contract": "c", "architecture_rules": "a",
               "write_scope": "src", "mockup_section": "m", "tools": "x", "skills": "k",
-              "diff_summary": "diff", "impact": "i", "_skills": {"enabled": False}}
+              "diff_summary": "diff", "impact": "i", "repo_map": "r", "_skills": {"enabled": False}}
 
 
 class TestNguonSlot(unittest.TestCase):

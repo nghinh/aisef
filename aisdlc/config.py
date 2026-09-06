@@ -52,6 +52,17 @@ DEFAULTS: dict[str, Any] = {
     # 1 200, không phải 1 500: B5 hồi cứu e9 (ADR-004 §6 R4) đo developer
     # +17,5 % prompt với trần 1 500 — vượt trần 15 %; bớt ≈ 300 ký tự về ≈ 15 %.
     "context.max_preservation_chars": 1200,
+    # Bản đồ mã quanh phạm vi ghi (ADR-005 V7, `harness/context.py`): skeleton
+    # tệp trong phạm vi + lân cận 1 bước + test nhắc tên, nạp cho cả ba vai.
+    # **0 = tắt** cho tới khi A/B T8 đạt (trung vị lượt −20 % **và** cổng cùng
+    # kết cục): Aider không công bố số đo nào cho repo map, còn trần B5 là
+    # +15 % prompt — 2 000 ký tự trên baseline 11 537 đã là +17 %, nên khi bật
+    # thử 1 500 (≈ +13 %). Tắt thì developer vẫn tra được bằng `aisdlc ctx`.
+    "context.max_repo_map_chars": 0,
+    # Lệnh ngoài vẽ bản đồ (tree-sitter, serena… cắm sau, không thêm gói):
+    # stdin JSON {project, seeds, budget} → stdout văn bản. Rỗng = dựng sẵn
+    # stdlib; lệnh hỏng thì lùi về dựng sẵn và slot nói rõ là thô.
+    "context.map_provider": "",
     # vòng cải tiến epic theo bằng chứng (ADR-004 R3). HoH chạy T = 70 vòng
     # không có điều kiện dừng; ở đây mọi điều kiện dừng là code và ba số này
     # là trần. Đếm theo epic từ `loops[]` của sổ hành vi — chạy lại
@@ -139,6 +150,8 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "story.max_complexity": float,
     "context.max_index_chars": int,
     "context.max_preservation_chars": int,
+    "context.max_repo_map_chars": int,
+    "context.map_provider": str,
     "improve.max_loops": int,
     "improve.flat_loops": int,
     "improve.cost_cap_usd": float,
@@ -244,6 +257,8 @@ def _validate(values: dict[str, Any]) -> None:
     for key in ("improve.max_loops", "improve.flat_loops"):
         if values[key] < 1:
             raise ConfigError(f"{key} phải >= 1")
+    if values["context.max_repo_map_chars"] < 0:
+        raise ConfigError("context.max_repo_map_chars phải >= 0 (0 = tắt)")
     if values["improve.cost_cap_usd"] < 0:
         raise ConfigError("improve.cost_cap_usd phải >= 0 (0 = không giới hạn)")
     if values["cost.warn_multiple"] <= 1.0:

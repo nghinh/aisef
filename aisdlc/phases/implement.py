@@ -36,6 +36,7 @@ from ..control.preflight import verification_contract
 from ..control.security import SEVERITIES, SecurityReport
 from ..control.security import parse as parse_security
 from ..control.normalize import Architecture, Story, effective_write_scope
+from ..harness import context as code_map
 from ..harness import mockup_verify
 from ..clients.compile import guard_expected
 from ..clients.stream import INFRA_STATUSES, exit_status_of
@@ -179,7 +180,27 @@ def build_context(
         "mockup_section": prompt_section(slices),
         "tools": describe_tools(project, config),
         "index": _index_slice(story, artifact_root, config, ledger=led),
+        "repo_map": _repo_map_section(story, project=project, artifact_root=artifact_root, config=config),
     }
+
+
+def _repo_map_section(story: Story, *, project: Path, artifact_root: Path, config: Config | None) -> str:
+    """Slot `repo_map` (ADR-005 V7): bản đồ mã quanh phạm vi ghi, cấp cho cả
+    ba vai từ **mã** — không vai nào nhận từ lời vai kia (ADR-003 #9).
+
+    Trần `context.max_repo_map_chars` = 0 là tắt: slot rỗng, prompt không có
+    mục — cho tới khi A/B T8 có số. Vẽ trên `project` (trạng thái trước
+    story) chứ không trên worktree: ba vai nhận cùng một bản đồ.
+    """
+    cap = int(config["context.max_repo_map_chars"]) if config else 0
+    if cap <= 0:
+        return ""
+    seeds = code_map.seeds_for(story, project, artifact_root=artifact_root, config=config)
+    text = code_map.repo_map(
+        project, seeds, cap,
+        command=str(config.get("context.map_provider", "") or ""), story_id=story.id,
+    )
+    return code_map.prompt_section(text)
 
 
 def _ledger(artifact_root: Path):
@@ -323,8 +344,13 @@ SLOT_SOURCE = {
     "story_id": "artifact", "story_title": "artifact", "story_contract": "artifact",
     "architecture_rules": "artifact", "write_scope": "artifact", "mockup_section": "artifact",
     "tools": "config", "skills": "router", "diff_summary": "git", "impact": "code",
+    "repo_map": "code",
     "index": "ledger", "preservation": "ledger", "validation": "ledger",
 }
+
+#: Slot được phép rỗng khi dựng prompt: `repo_map` rỗng là knob tắt, không
+#: phải prompt khuyết.
+ALLOW_EMPTY = ("repo_map",)
 
 
 def handoff_slots(context: dict, *, feedback: bool = False) -> dict[str, tuple[str, int]]:
@@ -452,6 +478,7 @@ def run_attempt(
         context,
         workdir=workdir,
         config=config,
+        allow_empty=ALLOW_EMPTY,
     )
     # Guard chạy trong hook — tiến trình con của client — nên phạm vi ghi
     # và mã story chỉ tới được nó qua môi trường.
@@ -1007,6 +1034,7 @@ def review_story_v2(
         context,
         workdir=workdir,
         config=config,
+        allow_empty=ALLOW_EMPTY,
     )
     # Phạm vi ghi — nhưng **không** mã story. Không truyền phạm vi thì
     # guard `diff-scope` rơi vào nhánh "chưa khai phạm vi mà đã đổi file"
@@ -1139,6 +1167,7 @@ def security_review(
         context,
         workdir=workdir,
         config=config,
+        allow_empty=ALLOW_EMPTY,
     )
     # Cùng tổ hợp đã chứng minh trên e9 cho người rà soát: phạm vi để
     # `diff-scope` không chặn mọi lệnh Bash, cây làm việc để guard soi đúng

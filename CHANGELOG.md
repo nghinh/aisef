@@ -180,6 +180,24 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 - Router: năng lực phải khai, không suy từ chữ (lỗi 5); `aisdlc skill --story S`
   in kết quả định tuyến.
 
+- **Mới slot `repo_map`** (ADR-005 V7, `harness/context.py`, nguồn `code`, cả
+  ba vai): bản đồ mã quanh phạm vi ghi bằng stdlib — skeleton tệp trong phạm vi
+  (Python `ast`; TS/JS chữ ký, thân → `…`), tệp gọi/được import một bước, test
+  nhắc tên; xếp hạng √ref, ×0,1 tên định nghĩa ở > 5 tệp, ×10 tên tệp khớp định
+  danh story. **Tắt mặc định** (`context.max_repo_map_chars` = 0) tới khi A/B T8
+  có số; `context.map_provider` cắm lệnh ngoài (stdin JSON → stdout). Prompt
+  `story-implement@7` · `story-review@6` · `story-security-review@4` có mục
+  "Bản đồ mã quanh phạm vi — gợi ý tĩnh, không phải chân lý", chỉ hiện khi slot
+  khác rỗng. **Mới** `aisdlc ctx --story S | --file F [--budget N]`: bản đầy đủ,
+  ghi `note:ctx_lookup` khi gọi trong phiên. Hồi cứu $0 lỗi 21 ở ADR-005 §9:
+  bản đồ **không** tự lộ `tests/e2e` khi phạm vi chỉ `src/**` — spec e2e của e9
+  không nhắc tên nào của `src`; thứ lộ nó là `verification_paths` (sửa lỗi 21).
+- **Đổi hành vi — `control/impact.py`** (ADR-005 §9 phát hiện 5): tách
+  `symbols()` / `refs()` / `weights()`, `builtin` chấm tệp = Σ trọng số × √số
+  lần nhắc — tên định nghĩa ở > 5 tệp ×0,1, `_private` bỏ; tệp chỉ dính tên
+  phổ biến (`save`, `render`) không còn lấp `callers` rồi bị cắt lặng ở 12 mục.
+  Sửa số dòng định nghĩa lệch khi có dòng trống phía trước (`^\s*` → `^[ \t]*`).
+
 ### 5 · Guardrails / hooks
 
 - **Guard thứ 8 `process-ref`** (`PreToolUse` · `Write|Edit`): mã story/epic
@@ -253,6 +271,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 | `story.max_complexity` | `16.0` | ADR-004 R5 |
 | `context.max_index_chars` | `2000` | ADR-004 R6 |
 | `context.max_preservation_chars` | `1 200` | ADR-004 R4 |
+| `context.max_repo_map_chars` · `context.map_provider` | `0` (tắt) · `""` | ADR-005 V7 |
 | `improve.max_loops` · `improve.flat_loops` · `improve.cost_cap_usd` | `3` · `2` · `0.0` | ADR-004 R3 |
 | `verify.baseline` | `true` | ADR-004 R9 |
 | `skills.inline` | `false` | ADR-003 §6 |
@@ -263,7 +282,7 @@ Gỡ: `story.max_context_tokens` (chưa từng có mã đọc; `RETIRED`, cảnh
 
 ### Lệnh CLI mới — `aisdlc/cli/parser.py`, bộ lệnh đủ ở SOLUTION §10
 
-`aisdlc improve` · `aisdlc evidence` · `aisdlc doc` · `aisdlc change` ·
+`aisdlc improve` · `aisdlc evidence` · `aisdlc ctx` · `aisdlc doc` · `aisdlc change` ·
 `aisdlc skill --scan` · `aisdlc guard process-ref`. Gói `aisdlc/cli/` tách từ
 một tệp `cli.py` (S5), không đổi hành vi.
 

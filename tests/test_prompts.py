@@ -47,6 +47,7 @@ STORY_CTX = {
     "skills": "- `x` — dùng khi: y",
     "diff_summary": "3 file đổi",
     "impact": "_Chưa có phân tích ảnh hưởng_",
+    "repo_map": "## Bản đồ mã quanh phạm vi — gợi ý tĩnh, không phải chân lý\n\n`src/a.ts`",
 }
 
 
@@ -141,6 +142,28 @@ class TestPromptContent(unittest.TestCase):
     def test_reviewer_prompt_refuses_padding(self):
         """Bắt phải có phát hiện sẽ đẻ ra phát hiện giả."""
         self.assertIn("đừng nặn ra", self.catalog.get("story-review").body)
+
+
+class TestSlotBanDoMa(unittest.TestCase):
+    """ADR-005 V7: slot `repo_map` ở cả ba vai; knob 0 → slot rỗng và prompt
+    **không** có mục (tiêu đề nằm trong slot, không nằm trong prompt)."""
+
+    def setUp(self):
+        self.catalog = load_catalog()
+
+    def test_ca_ba_prompt_co_slot(self):
+        for name in ("story-implement", "story-review", "story-security-review"):
+            self.assertIn("repo_map", self.catalog.get(name).slots, name)
+
+    def test_slot_rong_thi_khong_co_muc(self):
+        from aisdlc.phases.implement import ALLOW_EMPTY
+        text = self.catalog.get("story-implement").render({**STORY_CTX, "repo_map": ""}, allow_empty=ALLOW_EMPTY)
+        self.assertNotIn("Bản đồ mã", text)
+        self.assertNotIn("{{", text)
+
+    def test_slot_co_thi_muc_hien(self):
+        text = self.catalog.get("story-review").render(STORY_CTX)
+        self.assertIn("## Bản đồ mã quanh phạm vi", text)
 
 
 class TestRouting(unittest.TestCase):

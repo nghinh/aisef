@@ -522,6 +522,49 @@ class TestContext(ImplementTestCase):
         )
         self.assertIn("không dựng màn hình nào", ctx["mockup_section"])
 
+    def test_ban_do_ma_tat_mac_dinh_thi_slot_rong(self):
+        """ADR-005 V7: `context.max_repo_map_chars` = 0 cho tới khi A/B có số —
+        slot rỗng, bàn giao ghi `repo_map: (code, 0)`."""
+        from aisdlc.phases.implement import handoff_slots
+
+        (self.project / "src").mkdir()
+        (self.project / "src" / "a.ts").write_text("export function taoGhiChu() {}\n", encoding="utf-8")
+        ctx = build_context(
+            self.story, project=self.project, artifact_root=self.artifacts,
+            architecture=None, contract=None, config=self.config(),
+        )
+        self.assertEqual(ctx["repo_map"], "")
+        self.assertEqual(handoff_slots(ctx)["repo_map"], ("code", 0))
+
+    def test_ban_do_ma_bat_thi_co_muc_va_ghi_ban_giao(self):
+        from aisdlc.phases.implement import handoff_slots
+
+        (self.project / "src").mkdir()
+        (self.project / "src" / "a.ts").write_text("export function taoGhiChu() {}\n", encoding="utf-8")
+        (self.project / "lib").mkdir()
+        (self.project / "lib" / "b.ts").write_text("taoGhiChu()\n", encoding="utf-8")
+        ctx = build_context(
+            self.story, project=self.project, artifact_root=self.artifacts,
+            architecture=None, contract=None, config=self.config(**{"context.max_repo_map_chars": 2000}),
+        )
+        self.assertTrue(ctx["repo_map"].startswith("## Bản đồ mã quanh phạm vi"))
+        self.assertIn("export function taoGhiChu() …", ctx["repo_map"])
+        self.assertIn("`lib/b.ts` · taoGhiChu", ctx["repo_map"])
+        src, n = handoff_slots(ctx)["repo_map"]
+        self.assertEqual(src, "code")
+        self.assertGreater(n, 0)
+
+    def test_map_provider_hong_thi_lui_ve_va_noi_tho(self):
+        (self.project / "src").mkdir()
+        (self.project / "src" / "a.ts").write_text("export function taoGhiChu() {}\n", encoding="utf-8")
+        ctx = build_context(
+            self.story, project=self.project, artifact_root=self.artifacts,
+            architecture=None, contract=None,
+            config=self.config(**{"context.max_repo_map_chars": 2000, "context.map_provider": "khong-co-lenh --x"}),
+        )
+        self.assertIn("chạy hỏng", ctx["repo_map"])
+        self.assertIn("taoGhiChu", ctx["repo_map"])
+
 
 class TestSchemaRaSoat(ImplementTestCase):
     """R8 nối vào vòng đời thật: agent trả đúng schema thì không tốn lượt thêm."""

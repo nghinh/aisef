@@ -434,6 +434,51 @@ def cmd_evidence(args) -> int:
     return EXIT_OK
 
 
+def cmd_ctx(args) -> int:
+    """Bản đồ mã quanh phạm vi ghi (ADR-005 V7) — nửa sau của progressive
+    disclosure như `evidence`: prompt nhận bản có trần, bản đầy đủ tra ở đây.
+    Gọi trong phiên (có `AISDLC_STORY_ID`) thì ghi `note:ctx_lookup` như
+    `doc_lookup`, để cổng và báo cáo biết agent đã tra gì."""
+    import os
+
+    from ..harness import context as code_map
+    from ..harness.guardrails import ENV_STORY_ID
+
+    project = Path(args.project)
+    root = _artifact_root(args)
+    config = Config.load(project)
+    session = os.environ.get(ENV_STORY_ID, "")
+    story_id = args.story or session
+    if args.file:
+        seeds = [args.file]
+    else:
+        if not story_id:
+            print("✗ cần --story <mã> hoặc --file <tệp>", file=sys.stderr)
+            return EXIT_USAGE
+        from ..phases.run import load_plan
+
+        plan = load_plan(root)
+        story = plan.stories.get(story_id)
+        if story is None:
+            print(f"✗ không có story {story_id} trong chỉ mục" + (f": {plan.error}" if plan.error else ""),
+                  file=sys.stderr)
+            return EXIT_NOT_READY
+        seeds = code_map.seeds_for(story, project, artifact_root=root, config=config)
+    text = code_map.repo_map(
+        project, seeds, args.budget,
+        command=str(config.get("context.map_provider", "") or ""), story_id=story_id,
+    )
+    print(text)
+    if session:
+        from ..harness.observe import NOTE, Event, EvidenceStore
+
+        EvidenceStore(root).record(session, Event(
+            kind=NOTE, name="ctx_lookup",
+            detail={"story": story_id, "file": args.file, "budget": args.budget, "chars": len(text)},
+        ))
+    return EXIT_OK
+
+
 def cmd_issues(args) -> int:
     """Bảng gap/hồi quy ra tệp (ADR-004 R12).
 

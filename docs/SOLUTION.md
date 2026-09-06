@@ -122,7 +122,7 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 |---|---|
 | Định tuyến model | `harness/routing.py` — theo vai; **reviewer ≠ developer** |
 | Sinh sub-agent | không có — mỗi vai là một phiên riêng do harness gọi (`harness/routing.py`); xem ADR-003 #15 |
-| Bàn giao | gói ngữ cảnh mỗi vai dựng từ slot có **nguồn khai** (`phases/implement.py::SLOT_SOURCE`, ghi vào bằng chứng `handoff`): `story_id` · `story_title` · `story_contract` · `architecture_rules` · `write_scope` · `mockup_section` (artifact) · `tools` (config) · `skills` (router) · `diff_summary` (git) · `impact` (code) · `index` · `preservation` · `validation` (ledger — ADR-004 R4/R6). Reviewer/security không nhận slot nguồn `agent` (ADR-003 #9). Không có `next`/`implement`/`complete`: vòng lặp story nằm trong `run` |
+| Bàn giao | gói ngữ cảnh mỗi vai dựng từ slot có **nguồn khai** (`phases/implement.py::SLOT_SOURCE`, ghi vào bằng chứng `handoff`): `story_id` · `story_title` · `story_contract` · `architecture_rules` · `write_scope` · `mockup_section` (artifact) · `tools` (config) · `skills` (router) · `diff_summary` (git) · `impact` · `repo_map` (code — `repo_map` là bản đồ mã quanh phạm vi ghi cho cả ba vai, ADR-005 V7, trần `context.max_repo_map_chars`) · `index` · `preservation` · `validation` (ledger — ADR-004 R4/R6). Reviewer/security không nhận slot nguồn `agent` (ADR-003 #9). Không có `next`/`implement`/`complete`: vòng lặp story nằm trong `run` |
 | Luật kích hoạt | `control/state.py` (FSM `PENDING → RUNNING → VERIFYING → VERIFIED → DONE`) + `control/scheduler.py` (đợt theo phụ thuộc và phạm vi ghi) ✅ **đã xong** |
 
 ### 5.5 Guardrails / Hooks
@@ -401,6 +401,8 @@ aisdlc status                         tiến độ · chi phí · story tốn b�
 aisdlc report  [--out FILE]           báo cáo nghiệm thu + sổ hành vi (`ledger.json`, `INDEX.md`)
 aisdlc evidence <id> [--story S]      lịch sử một story hoặc một hành vi
                                       (STORY-01-04 · AC-STORY-01-04-2 · FR-3 · qa:e2e · mockup:notes-list)
+aisdlc ctx [--story S | --file F] [--budget N]   bản đồ mã quanh phạm vi ghi, đầy đủ (ADR-005 V7);
+                                      prompt chỉ nhận bản có trần `context.max_repo_map_chars`
 aisdlc issues [--format md|csv] [--epic E] [--status gap,reopened] [--out FILE]
                                       bảng gap/hồi quy từ sổ → `ISSUES.md|csv` (ADR-004 R12);
                                       chỉ tệp, không tạo issue ở tracker nào
@@ -615,6 +617,8 @@ Không để chữ "ngưỡng" chung chung. Mặc định trong `.ai/config.json
 | `improve.cost_cap_usd` | `0` | trần tổng chi phí các vòng của epic, đọc từ bằng chứng story sửa; `0` = không giới hạn |
 | `context.max_index_chars` | `2000` | trần ký tự cho slot `index` — lát cắt chỉ mục bằng chứng của epic nạp vào prompt developer. Chỉ mục, **không** phải lịch sử: agent cần chi tiết thì gọi `aisdlc evidence <id>` (ADR-004 R6). e9 EPIC-01 đo được 497 ký tự |
 | `context.max_preservation_chars` | `1 200` | trần ký tự cho hai slot R4 `preservation` (hành vi VERIFIED của story khác mà story này chạm tệp: id · story · nguồn kiểm) và `validation` (thứ harness chạy lại ở ứng viên). Cắt chỉ cắt phần **in ra**; cổng "bảo toàn" vẫn chấm đủ danh sách — không kiểm được là UNRUNNABLE, đỏ là FAILED và sổ ghi REOPENED (ADR-004 R4). Đo trên test giả: hai slot +212 ký tự, prompt developer +13,2 % (ADR-004 §6 R4) |
+| `context.max_repo_map_chars` | `0` | trần ký tự cho slot `repo_map` (ADR-005 V7, `harness/context.py`): skeleton tệp trong phạm vi ghi (Python `ast`, TS/JS chữ ký) → tệp gọi/được import 1 bước → test nhắc tên, cấp cho cả ba vai. **0 = tắt** cho tới khi A/B T8 đạt (trung vị lượt developer −20 % **và** cổng cùng kết cục): Aider không công bố số đo nào cho repo map, còn 2 000 ký tự trên baseline B5 11 537 là +17 % (vượt trần 15 %) — khi bật, thử 1 500 (+13 %). Hồi cứu e9 01-05 tại SHA `2424265`: bản đầy đủ 3 119 ký tự, ADR-005 §9. Bản đầy đủ tra bằng `aisdlc ctx --story S` |
+| `context.map_provider` | `""` | lệnh ngoài vẽ bản đồ (tree-sitter, serena — cắm sau, không thêm gói): stdin JSON `{project, seeds, budget}` → stdout văn bản, cùng kiểu `review.impact_provider`. Rỗng = dựng sẵn stdlib; lệnh hỏng thì lùi về dựng sẵn và slot nói rõ là thô |
 | `run.max_parallel` | `3` | số story song song trong một đợt |
 | `run.max_turns` | `40` | vòng lặp tối đa của một phiên story |
 | `run.timeout_seconds` | `1800` | 30 phút cho một story |

@@ -193,6 +193,7 @@ thẩm quyền; slot chưa khai ở đó hiện thành `?` trong bằng chứng)
 | `story_id` · `story_title` · `story_contract` · `architecture_rules` · `write_scope` · `mockup_section` | `artifact` | developer, reviewer, security |
 | `diff_summary` | `git` | reviewer, security |
 | `impact` | `code` | reviewer, security |
+| **`repo_map`** | **`code`** | developer, reviewer, security (ADR-005 V7) — bản đồ mã quanh phạm vi ghi (`harness/context.py`): skeleton tệp trong phạm vi, tệp gọi/được import 1 bước, test nhắc tên; ba vai nhận cùng bản vẽ trên `project`, không vai nào nhận từ lời vai kia. Trần `context.max_repo_map_chars` (mặc định **0 = tắt** tới khi A/B T8 có số); bản đầy đủ `aisdlc ctx --story S` |
 | `tools` | `config` | developer |
 | `skills` | `router` | developer |
 | **`index`** | **`ledger`** | developer (ADR-004 R6) — lát cắt chỉ mục bằng chứng của epic chứa story: một dòng mỗi story, trần `context.max_index_chars`. **Chỉ mục, không phải lịch sử**: chi tiết tra bằng `aisdlc evidence <id>` |
