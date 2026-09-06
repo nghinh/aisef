@@ -102,7 +102,7 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 ### 5.2 Tools
 | Hạng mục | Hiện thực |
 |---|---|
-| Tool thật | `harness/tools.py` — ba tool có bằng chứng `test` · `lint` · `sast` (agent gọi `aisdlc tool <tên> --story S`; lệnh từ `tools.*` hoặc tự dò), phân biệt **không chạy được** với đỏ (lỗi 8); `test:baseline` là lần test do harness ghi trước phiên developer (ADR-004 R9). Đọc/ghi tệp là tool của client (guard chặn); commit ứng viên do harness làm (`phases/implement.py::freeze_candidate`); route thật/ảnh chụp qua `harness/browser.py` |
+| Tool thật | `harness/tools.py` — ba tool có bằng chứng `test` · `lint` · `sast` (agent gọi `aisdlc tool <tên> --story S`; lệnh từ `tools.*` hoặc tự dò), phân biệt **không chạy được** với đỏ (lỗi 8); `test:baseline` là lần test do harness ghi trước phiên developer (ADR-004 R9). Đọc/ghi tệp là tool của client (guard chặn); commit ứng viên do harness làm (`phases/implement.py::freeze_candidate`); route thật/ảnh chụp qua `harness/browser.py`. Đầu ra `aisdlc tool` có cấu trúc (ADR-005 V11 A): tóm tắt `testlog` (xanh/đỏ/bỏ qua, ≤ 20 tên test đỏ) → `tail` → "(lược N/M dòng — toàn văn: `_bmad-output/evidence/<story>-<tool>-<seq>.log`)" khi output dài hơn `--lines`; `tail` trong evidence giữ 20 dòng, toàn văn ở tệp `.log` chỉ ghi khi có cắt. `tail`, log và `qa:*` đều đã che bí mật `[REDACTED]` (`guardrails.scrub_secrets`, ADR-005 V1) |
 | MCP | không có — quyết định V1: không MCP thường trú; playwright dùng qua CLI trong `harness/browser.py`, tra cứu tài liệu theo yêu cầu là việc đợt 5 (`aisdlc doc`) |
 | **Prose quanh tool** | mỗi tool có mục "khi nào gọi / cách đọc kết quả / khi nào KHÔNG gọi" |
 
@@ -150,6 +150,7 @@ dạng khoá (lỗi 10).
 | **Ứng viên** | mỗi phép kiểm mang `detail.candidate` = SHA bản được kiểm (ADR-004 R1) |
 | **Sổ hành vi** | `control/ledger.py` — phép chiếu từ evidence, không phải kho mới: mỗi tiêu chí / FR / `qa:<kind>` / màn hình có trạng thái VERIFIED · GAP · REOPENED (`regressed_by`); chỉ ứng viên đã *landed* (nhật ký `merge.completed`/`attempt.committed`) mới thành VERIFIED. `ledger.json` + `INDEX.md` + mốc `loops[]`; metrics (tăng trưởng, hồi quy, gap đóng, cải thiện biên/$) ở phần 5 báo cáo (ADR-004 R2/R6/R7) |
 | Bàn giao & phán quyết | `handoff` (slot · nguồn · số ký tự, `prompt_chars`), `review:verdict`/`security:verdict` (JSON), `gate:verdict`; lời rà soát nguyên văn ở `_bmad-output/reviews/<story>-<vai>-<lượt>.md` (lỗi 16) |
+| **Kết cục lượt** | `agent_run.detail.exit_status` ∈ ok · max_turns · timeout · cost · context · permission · infra · error — `clients/stream.py::exit_status_of`, một bảng cho cả vòng thử lại (`INFRA_STATUSES` = timeout, infra không ăn `run.max_retries`) lẫn `aisdlc status` ("Lượt agent: …", bản ghi cũ là "chưa ghi"); `tool_run.detail.redacted` = số bí mật đã che trong `tail`/log (ADR-005 V1/V11 B) |
 | Evaluation | chưa có bộ eval riêng cho skill/prompt; trôi chất lượng đo bằng kho dogfood `tests/dogfood/` (mốc lượt/chi phí) và hợp quy client `tests/conformance/` |
 | Dashboard | `aisdlc status` · `aisdlc report` · `aisdlc evidence <id>` |
 
@@ -365,7 +366,8 @@ aisdlc run     --verify-only --story S [--client c]   kiểm lại ứng viên �
         không mở phiên developer; ứng viên = HEAD nhánh story; chạy lại đúng phép kiểm ✗/thiếu
         ở SHA ấy, giữ rà soát/bảo mật cùng SHA; cổng chấm đủ; đạt → merge như thường, trượt →
         failed không ăn run.max_retries. Dùng khi trượt vì môi trường đo (e2e nhạy tải máy).
-aisdlc tool    test|lint|sast [--story S]      agent gọi qua đây để có bằng chứng
+aisdlc tool    test|lint|sast [--story S] [--lines N]  agent gọi qua đây để có bằng chứng;
+        in tên test đỏ trước tail, khai "(lược N/M dòng — toàn văn: …log)" khi cắt
 aisdlc verify  [--write-scope ...] [--story S] hậu kiểm guard trên cây làm việc
 
 # Bước 5 — kiểm định

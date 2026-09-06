@@ -25,6 +25,8 @@ import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
+from ..clients.stream import exit_status_of
+
 EVIDENCE_DIR = "evidence"
 
 #: Loại sự kiện. Danh sách đóng để nơi đọc không phải đoán.
@@ -308,6 +310,9 @@ class EvidenceStore:
                     "guard_messages": list(result.guard_messages)[:5],
                     "permission_limited": result.permission_limited,
                     "error": result.error,
+                    # Kết cục chuẩn hoá (ADR-005 V11 B) — `aisdlc status` đếm
+                    # theo khoá này, không phải dò lại chuỗi `error`.
+                    "exit_status": exit_status_of(result),
                     # Skill được mời / được mở — đo, không đoán (ADR-003 #1).
                     "skills": skills or {},
                 },

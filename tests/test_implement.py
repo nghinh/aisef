@@ -26,12 +26,12 @@ from aisdlc.harness.guardrails import (  # noqa: E402
     ENV_STORY_ID,
     ENV_WRITE_SCOPE,
 )
+from aisdlc.clients.stream import INFRA_STATUSES, exit_status_of  # noqa: E402
 from aisdlc.harness.observe import AGENT_RUN, NOTE, EvidenceStore  # noqa: E402
 from aisdlc.phases.implement import (  # noqa: E402
     blocking_findings,
     build_context,
     implement_story,
-    is_infrastructure_error,
 )
 
 FIX = ROOT / "tests" / "fixtures" / "bmad"
@@ -471,9 +471,10 @@ class TestFailureKinds(ImplementTestCase):
         self.assertIn("hạ tầng", out.blocked_reason)
 
     def test_classification(self):
+        """Vòng thử lại đọc cùng bảng kết cục với evidence (ADR-005 V11 B)."""
         for err in ("api_error", "overloaded", "quá 1800s", "Connection lost"):
-            self.assertTrue(is_infrastructure_error(err), err)
-        self.assertFalse(is_infrastructure_error("test đỏ"))
+            self.assertIn(exit_status_of(RunResult(ok=False, error=err)), INFRA_STATUSES, err)
+        self.assertNotIn(exit_status_of(RunResult(ok=False, error="test đỏ")), INFRA_STATUSES)
 
     def test_review_that_cannot_run_is_not_clean(self):
         class NoReview(ScriptedClient):
@@ -990,3 +991,13 @@ class TestBaselineTruocKhiSua(ImplementTestCase):
         m = self.muc(out)
         self.assertIs(m.outcome, Outcome.UNCONFIGURED)
         self.assertIn("chưa khai", m.detail)
+
+
+class TestKetCucChuanHoa(ImplementTestCase):
+    def test_cham_tran_luot_la_loi_chat_luong_khong_phai_ha_tang(self):
+        """ADR-005 V11 (B): `Attempt.infra` đọc `exit_status`. e9 01-05 chạm
+        91/90 hai lần — thử lại phải tính vào hạn mức, không được miễn phí."""
+        out = self.implement(ScriptedClient(fail_first=1, fail_error="max_turns"))
+        self.assertFalse(out.attempts[0].infra)
+        self.assertEqual(out.quality_attempts, 2)
+        self.assertNotIn(exit_status_of(RunResult(ok=False, error="max_turns")), INFRA_STATUSES)
