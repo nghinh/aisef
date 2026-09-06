@@ -161,6 +161,23 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   định: <tên>" thay vì ✗ khi test đổi kết cục giữa các lần
   (`gate._khong_on_dinh`), đỏ mọi lần vẫn ✗. K = 1 là hành vi cũ.
 
+- **`aisdlc pre-deploy --epic E`** (QĐ C-a 2026-09-06, `phases/deploy.py::_scope`):
+  cổng **scope-aware, không nới** — chỉ chấm "mọi story xong" trên story của
+  epic khai; story ngoài phạm vi thành mục "ngoài phạm vi nghiệm thu"
+  (– NOT_APPLICABLE, nêu tên: không xong, không thiếu); phạm vi ghi vào
+  `pre-deploy-report.json` (`scope{epic, stories, outside}`) nên băm phê duyệt
+  `pre-deploy` đổi theo phạm vi; `aisdlc report` in phạm vi ở §6. v0.1.0 nghiệm
+  thu e9 **EPIC-01** bằng cách này; EPIC-02..05 chưa nghiệm thu.
+
+- **Vòng improve — hàng đợi sửa tự động** (QĐ B6 2026-09-06,
+  `phases/improve.py::repair_queue`): `qa:*` cấp dự án **đứng ngoài** hàng đợi
+  (đo B1 e9: vòng 4–5 nhận `qa:*`, Δ −1/−2); thứ tự REOPENED → `ac` → `fr`/`nfr`
+  → `mockup`; lý do dừng nêu gap ngoài hàng đợi thay vì "hết gap". Story sửa
+  phải viết **test mới mang mã** (đối chứng nop V3 chấm ✗ khi gắn mã vào test
+  có sẵn); gap chỉ thiếu truy vết thì **không** thành story sửa — người rà soát
+  trả `[bế tắc] truy vết: <test id>`, báo cáo vòng chỉ sang `aisdlc evidence
+  --link` (sửa siêu dữ liệu, không giả thành cải tiến chức năng).
+
 - **Đổi hành vi — thứ tự nhật ký** (`control/journal.py::STEPS`, ADR-004 R1):
   `attempt.started → worktree.created → status.running → changes.detected →
   candidate.frozen → verification.completed → review.completed →
@@ -284,6 +301,17 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 
 ### 6 · Observability
 
+- **Truy vết người khai** (`control/ledger.py::TRACE_FILE`, QĐ B6 2026-09-06):
+  `aisdlc evidence <AC> --link "<test id>" --why … [--by]` ghi
+  `traceability.json` {test_id, why, by, at}; sổ hành vi coi test ấy là test
+  của tiêu chí **nhưng vẫn đòi nó xanh ở ứng viên đã landed** — nguồn ghi
+  `via: traceability, by, why` để ai đọc cũng thấy đây là khai, không phải đo.
+
+- **`pre-deploy-report.json`** thêm `scope` (phạm vi nghiệm thu) và `waivers`
+  (loại miễn → lý do từ `verify.waiver_reason`); mục ◇ "miễn tường minh" chặn
+  khi `verify.waived` khác rỗng mà không có lý do (QĐ5 2026-09-06: `mutation`
+  của e9 UNRUNNABLE ở môi trường nghiệm thu, không cài công cụ để làm đẹp).
+
 - **Mới** `agent_run.detail.exit_status` ∈ {ok, max_turns, timeout, cost,
   context, permission, infra, error} (`clients/stream.py::exit_status_of`,
   ADR-005 V11 B); `Attempt.infra` và vòng thử lại `plan` đọc cùng
@@ -344,6 +372,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 | `verify.nop` | `true` | ADR-005 V3 |
 | `skills.inline` | `false` | ADR-003 §6 |
 | `sandbox.pre_deploy_degraded_waiver` | `""` | quyết định 4 |
+| `verify.waiver_reason` | `""` | quyết định 5 (2026-09-06) |
 | `sandbox.provider` | `"docker"` | ADR-005 V5 |
 | `clients.env_allow` | `[]` | ADR-005 V2 |
 
@@ -353,8 +382,9 @@ Gỡ: `story.max_context_tokens` (chưa từng có mã đọc; `RETIRED`, cảnh
 
 `aisdlc improve` · `aisdlc evidence` · `aisdlc ctx` · `aisdlc doc` · `aisdlc change` ·
 `aisdlc skill --scan` · `aisdlc guard process-ref` · `aisdlc run --verify-only
---story S [--repeat K]` · `aisdlc gate --replay` (ADR-005 V4). Gói `aisdlc/cli/` tách từ
-một tệp `cli.py` (S5), không đổi hành vi.
+--story S [--repeat K]` · `aisdlc gate --replay` (ADR-005 V4) · `aisdlc pre-deploy
+--epic E` (QĐ C-a) · `aisdlc evidence <AC> --link TEST --why …` (QĐ B6). Gói
+`aisdlc/cli/` tách từ một tệp `cli.py` (S5), không đổi hành vi.
 
 ### Lỗi thật tìm bằng đo trong đợt này
 

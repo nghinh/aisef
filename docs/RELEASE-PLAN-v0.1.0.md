@@ -2,6 +2,25 @@
 
 Bản này trả lời ba câu: dự án đang ở đâu, còn gì trước khi phát hành, làm theo thứ tự nào. Mọi số có chỗ đọc lại: `docs/STATUS-2026-09-05.md`, `docs/ADR-004…md` §6, `docs/ADR-005…md` §9, `docs/CONFORMANCE.md`, `docs/SANDBOX-CONFORMANCE.md`, `CHANGELOG.md`, evidence e9/par trong scratchpad.
 
+## 0. Quyết định chủ đầu tư 06/09 11:00 — và tiến độ
+
+Chốt ưu tiên phát hành v0.1.0 nhanh, **không nới invariant/gate**:
+
+| # | Quyết định | Tiến độ |
+|---|---|---|
+| 1 | **C-a**: nghiệm thu v0.1.0 = EPIC-01; `pre-deploy --epic E` scope-aware; story ngoài phạm vi báo "ngoài phạm vi nghiệm thu" (không DONE, không thiếu); report/release notes nói rõ EPIC-01 là corpus nghiệm thu, e9 chưa phải sản phẩm nghiệm thu đủ | ✅ mã + 5 test (`e1766fc`); chạy trên e9 → xem §C |
+| 2 | Đợt A chặn release, làm trước mọi benchmark tốn tiền; suite đầy đủ 100 % xanh, tuần tự, trên master | A1 ✅ (X7 gộp `7668a90`) · A2 đang đo · A3–A5 chờ A2 |
+| 3 | Đợt B không chặn release trừ khi lộ lỗi correctness; B1/B2 trước; B3/T5 nếu còn giờ; **B4 A/B repo-map và B5 bench lớn hoãn sau v0.1.0**, `repo_map` OFF; B7 coverage: cấu hình và thử, không giả PASS | B1 ✅ (X3: V3 hồi cứu 1 story cùng tên + 3 đổi tên; V4 0/12 replay được) · B2 đang chạy · B4/B5 hoãn |
+| 4 | **B6 không nới V3**: gắn mã vào test có sẵn không tính; story sửa phải có hành vi chứng minh bằng đối chứng; gap chỉ thiếu truy vết → sửa siêu dữ liệu bằng harness, không story sửa; `qa:*` ra khỏi hàng đợi tự động; không chạy lại nhiều vòng trước release | ✅ mã + 8 test (`e1766fc`); ADR-004 §6 R3 ghi hệ quả cho B1 |
+| 5 | Mutation UNRUNNABLE của e9: không cài Stryker; waiver có lý do, phạm vi EPIC-01, provenance; không thành PASS; release notes ghi known limitation | ✅ `verify.waiver_reason` + mục ◇ (`e1766fc`); e9 khai ở §C |
+| 6 | S1 giữ BLOCKED/degraded, không workaround; release notes/capability matrix khai rõ | ghi ở D6 |
+| 7 | OpenCode hạng hai; C9 không kết luận không chặn | ghi ở D6 |
+| 8 | P1-4 coverage: không biến UNCONFIGURED thành PASS; cấu hình nếu đơn giản, không thì tài liệu + visibility | B7 |
+| 9 | PyPI sau A + C-a: build + twine, cài venv sạch, setup + doctor, cổng phát hành trả 0; **không tag trước khi xanh** | D1–D4 |
+| 10 | DoD: unit 100 % không cần Docker · Docker conformance riêng xanh · Claude conformance không ✗ · par đạt mốc · e9 EPIC-01 7/7 + QA + pre-deploy scoped đạt (waiver tường minh cho UNRUNNABLE) · wheel/sdist cài sạch · README/CHANGELOG/STATUS/SOLUTION khớp mã · known limitations ghi rõ | D6 |
+
+Thứ tự thực thi: A1–A5 → B6 (xong) → B1/B2 → C-a → D1/D2/D4. Không chạy thêm story e9 chỉ để tăng bằng chứng.
+
 ## 1. Hiện trạng
 
 ### 1.1 Framework (master `96f30ab`, 136 commit từ sáng 05/09)
@@ -67,7 +86,7 @@ Bản này trả lời ba câu: dự án đang ở đâu, còn gì trước khi 
 
 | # | Việc | Ai | Xong khi |
 |---|---|---|---|
-| A1 | Gộp X7 (V8 bench) sau khi rebase và xanh module (X3 đã gộp 96f30ab) | tôi | master có 8/8; `git worktree list` = 1 |
+| A1 | ✅ Gộp X7 (V8 bench) `7668a90`: 18 task lỗi kho, 15/15 VALID trên task đo được (bug-15 nhạy tải, bug-6 chưa đo vì Docker ~1 giờ) | tôi | master có 8/8 |
 | A2 | **FakeProvider mặc định cho unit test**: `tests/` dùng `sandbox.using(FakeProvider)`/`AISDLC_TEST_PROVIDER=fake`; test cần Docker thật đánh dấu `@docker` như hợp quy; giữ ≥ 8 test Docker thật (S1–S5 + tools/qa) | 1 subagent | suite đầy đủ < 5 phút trên máy không có Docker rảnh; số test không giảm; test đỏ khi hoàn nguyên FakeProvider |
 | A3 | Suite đầy đủ trên master, **một suite một lúc**, load < 20 | tôi | `OK`, số test ghi vào STATUS §5 |
 | A4 | `test_meta` khớp mã sau 8 luồng (CLI, knob, mục cổng 16, STEPS, slot, guard) | tôi | xanh; SOLUTION §10/§12/§13 cập nhật |
