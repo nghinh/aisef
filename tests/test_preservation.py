@@ -37,12 +37,18 @@ from test_implement import ScriptedClient  # noqa: E402
 #: Runner giả in đúng định dạng `pytest -v`: test của story trước xanh khi
 #: `src/a.py` còn nguyên, đỏ khi story sau sửa nó — cách rẻ nhất để có một
 #: hồi quy thật, không cần model.
+#:
+#: Test của story sau **chỉ xuất hiện khi `src/b.py` có** — nếu nó xanh sẵn ở
+#: baseline thì đối chứng nop (ADR-005 V3) chấm ✗ đúng: một test xanh trước
+#: khi story viết dòng nào không chứng minh gì cho story ấy. Trước 2026-09-06
+#: kịch bản này in nó vô điều kiện và story B trượt cổng vì đúng lý do ấy.
 RUN_TESTS = """import sys
 from pathlib import Path
 a = Path("src/a.py").read_text() if Path("src/a.py").is_file() else ""
 ok = a.strip() == "x = 1"
 print("tests/test_a.py::test_AC_STORY_01_01_1 " + ("PASSED" if ok else "FAILED"))
-print("tests/test_b.py::test_AC_STORY_01_02_1 PASSED")
+if Path("src/b.py").is_file():
+    print("tests/test_b.py::test_AC_STORY_01_02_1 PASSED")
 sys.exit(0 if ok else 1)
 """
 
@@ -208,6 +214,12 @@ class TestHoiQuyCoChuDich(VongDoiHaiStory):
     """AC (b) — mutation test: B sửa `src/a.py` làm đỏ test của A."""
 
     class PhaA(ScriptedClient):
+        """B làm việc của mình (`src/b.py`, test riêng xuất hiện) **và** sửa
+        `src/a.py` — để lý do trượt là cổng bảo toàn, không phải thiếu test."""
+
+        def __init__(self, **kw):
+            super().__init__(writes=("src/b.py",), **kw)
+
         def run(self, spec):
             r = super().run(spec)
             if spec.env.get("AISDLC_STORY_ID"):
@@ -233,10 +245,16 @@ class TestHoiQuyCoChuDich(VongDoiHaiStory):
     def test_chay_sach_thi_khong_co_chan_oan(self):
         """B3: story sau không làm hỏng gì thì cổng bảo toàn ✅, sổ không REOPENED."""
         self.assertTrue(self.implement(self.a, ScriptedClient()).done)
-        out = self.implement(self.b, ScriptedClient())
+        out = self.implement(self.b, ScriptedClient(writes=("src/b.py",)))
         self.assertTrue(out.done, out.summary())
         muc = next(c for c in out.attempts[-1].gate.checks if c.name == "bảo toàn")
         self.assertIs(muc.outcome, Outcome.PASSED, muc.line())
+        # Đối chứng nop (V3) không chặn: test mang mã của B **không** xanh sẵn ở
+        # baseline. Ở đây nó là – "story không thêm/sửa tệp test" vì runner giả
+        # là một script, không phải tệp test; điều phép kiểm này chốt là **không
+        # ✗**. Gắn mã vào test có sẵn thì mục này ✗ và story không "chạy sạch".
+        nop = next(c for c in out.attempts[-1].gate.checks if c.name == "test có kiểm được story")
+        self.assertIsNot(nop.outcome, Outcome.FAILED, nop.line())
         self.assertEqual(L.build(self.artifacts).reopen_events, 0)
 
     def test_ba_vai_nhan_cung_mot_danh_sach_tu_harness(self):
@@ -257,7 +275,7 @@ class TestNganSachNguCanh(VongDoiHaiStory):
         """AC (c). Số đo trước/sau thật nằm ở ADR-004 §6 R4; đây là chốt chặn để
         lần sửa prompt sau không lặng lẽ phá ngân sách."""
         self.assertTrue(self.implement(self.a, ScriptedClient()).done)
-        self.implement(self.b, ScriptedClient())
+        self.implement(self.b, ScriptedClient(writes=("src/b.py",)))
         ev = EvidenceStore(self.artifacts).read(self.b.id)
         dev = next(e for e in ev.of(AGENT_RUN) if e.name == "STORY-01-02#1")
         goi = next(e for e in ev.of(HANDOFF) if e.detail["to"] == "developer")
