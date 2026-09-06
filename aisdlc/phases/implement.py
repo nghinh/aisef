@@ -17,7 +17,9 @@ Hai điều được giữ chặt ở đây:
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field, replace
+from functools import partial
 import json
 import re
 import subprocess
@@ -571,6 +573,61 @@ def _security_from_evidence(e: Event) -> SecurityReport:
     return rep
 
 
+def _repeat_runs(k: int, chay: Callable[[], object]) -> None:
+    """Chạy lại một phép kiểm ``k`` lần trên cùng SHA (ADR-004 R13 `--repeat`).
+
+    Một lần chạy không phân biệt được "đỏ vì mã" với "đỏ vì tải máy": e9
+    STORY-01-07 (lỗi 22) trượt lượt 3 vì `autosave.spec.ts:210` nhạy tải, đo
+    lại 10/10 xanh — $28,76 cho một lượt developer dựng lại thứ đã có.
+    Terminal-Bench đo flake bằng oracle ×k; ở đây mỗi lần là một `tool_run`
+    thật mang candidate, và `_repeat_note` so tên test giữa các lần. k = 1 là
+    hành vi cũ, không ghi gì thêm.
+    """
+    for _ in range(max(1, k)):
+        chay()
+
+
+def _repeat_note(evidence: EvidenceStore, sid: str, sha: str, *, k: int,
+                 checks: list[str], attempt: int) -> Event:
+    """Ghi `note verify-only.repeat`: phép kiểm nào đổi kết cục giữa ``k`` lần
+    ở cùng SHA — cổng đọc bản ghi này (`gate._khong_on_dinh`).
+
+    `flaky_ids`: test (theo tên, từ `test_ids`/`failed_ids` của `tool_run
+    test`) xanh ở lần này đỏ ở lần khác; `stable_red`: đỏ ở **mọi** lần —
+    đỏ thật, cổng chấm FAILED như thường; `flaky_checks`: phép kiểm (test ·
+    lint · `qa:<kind>`) mà `ok` đổi giữa các lần — cho phép không in tên
+    test. Có flaky → mục ấy UNRUNNABLE "không ổn định": không chạy được ổn
+    định ≠ trượt, ≠ đạt. Test có mặt ở lần này vắng ở lần khác không xếp
+    vào đâu — lần cuối quyết, như không có `--repeat`.
+    """
+    ev = evidence.read(sid)
+    flaky_ids: list[str] = []
+    stable_red: list[str] = []
+    flaky_checks: list[str] = []
+    for name in checks:
+        runs = [e for e in ev.of(TOOL_RUN, name)
+                if str(e.detail.get("candidate") or "") == sha][-k:]
+        oks = [e.ok for e in runs]
+        if any(oks) and not all(oks):
+            flaky_checks.append(name)
+        if name != "test":
+            continue
+        mau: dict[str, list[bool]] = {}
+        for e in runs:
+            do = set(e.detail.get("failed_ids") or [])
+            bo = set(e.detail.get("skipped_ids") or [])
+            for t in e.detail.get("test_ids") or []:
+                if t not in bo:
+                    mau.setdefault(str(t), []).append(t not in do)
+        flaky_ids += [t for t, m in mau.items() if any(m) and not all(m)]
+        stable_red += [t for t, m in mau.items() if len(m) == len(runs) and not any(m)]
+    return evidence.record(sid, Event(
+        kind=NOTE, name="verify-only.repeat", ok=not (flaky_ids or flaky_checks),
+        detail={"k": k, "checks": checks, "flaky_ids": flaky_ids,
+                "stable_red": stable_red, "flaky_checks": flaky_checks, "attempt": attempt},
+    ))
+
+
 def verify_candidate(
     story: Story,
     *,
@@ -588,9 +645,14 @@ def verify_candidate(
     changed: list[str],
     preservation: list[dict],
     reuse: bool = False,
+    repeat: int = 1,
 ) -> Attempt:
     """Nửa sau của một lượt — kiểm, rà soát, chấm cổng — trên ứng viên đã
     đóng băng ở `attempt.candidate`.
+
+    ``repeat`` (R13 `--repeat k`): mỗi phép kiểm **chạy lại** (test, lint,
+    `qa:<kind>`) chạy k lần trên cùng SHA, rồi `note verify-only.repeat` ghi
+    test đổi kết cục giữa các lần — xem `_repeat_runs`/`_repeat_note`.
 
     Tách khỏi `run_attempt` để lượt kiểm-lại (ADR-004 R13) đi **đúng đường
     này**, không có bản chép thứ hai để lệch nhau. `reuse=False` là lượt
@@ -618,10 +680,14 @@ def verify_candidate(
 
     # Harness tự chạy lại test và lint: bằng chứng phải do harness ghi, và
     # agent có thể đã "quên" chạy lần cuối sau khi sửa.
+    chay_lai: list[str] = []  # phép kiểm chạy ở lượt này — `_repeat_note` so giữa k lần
     for tool in ("test", "lint"):
         if not giu(tool, reuse and _green_at(ev, TOOL_RUN, tool, sha)):
-            run_tool(tool, workdir, story_id=sid, artifact_root=artifact_root,
-                     config=config, candidate=sha)
+            _repeat_runs(repeat, partial(
+                run_tool, tool, workdir, story_id=sid, artifact_root=artifact_root,
+                config=config, candidate=sha,
+            ))
+            chay_lai.append(tool)
 
     # Test luôn xanh vì không khẳng định gì tệ hơn không có test: nó làm
     # cổng "test xanh" mất hết ý nghĩa. Kiểm rẻ, nên chạy mỗi lượt.
@@ -640,7 +706,11 @@ def verify_candidate(
     kinds = [k for k in hop_dong
              if not giu(f"qa:{k}", reuse and _green_at(ev, TOOL_RUN, f"qa:{k}", sha))]
     if kinds:
-        run_suite(
+        # `clean=False`: cây worktree đã đóng băng ở đúng SHA và guard
+        # write-scope đã chặn ngoài phạm vi — worktree sạch (V6) là cho
+        # kiểm định cấp dự án, nơi cây có thể là của bất kỳ ai.
+        _repeat_runs(repeat, partial(
+            run_suite,
             workdir,
             config=config,
             only=kinds,
@@ -649,7 +719,11 @@ def verify_candidate(
             artifact_root=artifact_root,
             changed=changed,
             candidate=sha,
-        )
+            clean=False,
+        ))
+        chay_lai += [f"qa:{k}" for k in kinds]
+    if repeat > 1:
+        _repeat_note(evidence, sid, sha, k=repeat, checks=chay_lai, attempt=number)
 
     screens = [m for m in man_hinh
                if not giu(f"mockup:{m}", reuse and _green_at(ev, MOCKUP_MAP, m, sha))]
@@ -1757,10 +1831,15 @@ def verify_only(
     catalog: Catalog | None = None,
     architecture: Architecture | None = None,
     contract: DesignContract | None = None,
+    repeat: int = 1,
 ) -> StoryOutcome:
     """Lượt kiểm-lại trên ứng viên đã đóng băng (ADR-004 R13) — **không** mở
     phiên developer. Cùng chữ ký với `implement_story` để `run.py` gọi thay
-    thế được.
+    thế được (``repeat`` là keyword có mặc định, `run.py` gắn bằng `partial`).
+
+    ``repeat`` = k: mỗi phép kiểm chạy lại chạy k lần trên cùng SHA; test đổi
+    kết cục giữa các lần → `flaky_ids`, cổng ghi UNRUNNABLE "không ổn định"
+    thay vì FAILED; đỏ ở mọi lần → FAILED như thường (`_repeat_note`).
 
     Ứng viên = HEAD nhánh story; `workdir` phải đứng đúng ở đó (`run.py` tạo
     lại worktree **không** mang nhánh chính vào — mang vào là tạo bản mới, và
@@ -1806,12 +1885,13 @@ def verify_only(
         story, project=project, workdir=workdir, artifact_root=root, client=client,
         config=cfg, catalog=cat, architecture=architecture, contract=contract,
         attempt=attempt, base_ref=base_ref, scope=scope, changed=changed_now,
-        preservation=preservation, reuse=True,
+        preservation=preservation, reuse=True, repeat=repeat,
     )
     evidence.record(story.id, Event(
         kind=NOTE, name="verify-only", ok=attempt.ok,
         detail={
             "reran": attempt.reran, "kept": attempt.kept, "attempt": number,
+            "repeat": repeat,
             # Nhánh chính đã tiến lên sau ứng viên: vẫn chấm ứng viên — đó là
             # bản được chấm — nhưng nói ra; merge cuối lượt sẽ gặp phần mới.
             "main_ahead": head if head and base_ref and base_ref != head else "",

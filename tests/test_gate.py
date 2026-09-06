@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT))
 
 from aisdlc.control.outcome import Outcome
 from aisdlc.control.gate import evaluate  # noqa: E402
-from aisdlc.harness.observe import MOCKUP_MAP, EvidenceStore, Event  # noqa: E402
+from aisdlc.harness.observe import MOCKUP_MAP, NOTE, EvidenceStore, Event  # noqa: E402
 
 
 class GateTestCase(unittest.TestCase):
@@ -37,6 +37,52 @@ class GateTestCase(unittest.TestCase):
         }
         params.update(kw)
         return evaluate("S-01", self.store.read("S-01"), **params)
+
+
+class TestKhongOnDinh(GateTestCase):
+    """R13 `--repeat k`: test đổi kết cục giữa k lần trên **cùng SHA** →
+    mục "test" UNRUNNABLE "không ổn định" nêu tên — không phải trượt, không
+    phải đạt (lỗi 22). Đỏ ở mọi lần → FAILED như thường."""
+
+    def lan(self, failed, ids=("t1", "t2")):
+        EvidenceStore(self._tmp.name, candidate="aaa").tool_run("S-01", "test", ok=not failed, detail={
+            "test_format": "pytest", "test_ids": list(ids), "failed_ids": list(failed)})
+
+    def ghi(self, **d):
+        store = EvidenceStore(self._tmp.name, candidate="aaa")
+        store.tool_run("S-01", "lint", ok=True)
+        store.record("S-01", Event(kind=NOTE, name="verify-only.repeat", ok=False, detail={
+            "k": 3, "checks": ["test"], "flaky_ids": [], "stable_red": [], "flaky_checks": [], **d}))
+
+    def muc(self, ten):
+        return next(c for c in self.gate(candidate="aaa").checks if c.name == ten)
+
+    def test_doi_ket_cuc_la_khong_on_dinh_neu_ten(self):
+        for f in ([], [], ["t2"]):
+            self.lan(f)
+        self.ghi(flaky_ids=["t2"], flaky_checks=["test"])
+        m = self.muc("test")
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE, m.detail)
+        self.assertIn("t2", m.detail)
+        self.assertNotIn("t1", m.detail)
+        self.assertFalse(self.gate(candidate="aaa").passed, "không ổn định vẫn chặn")
+
+    def test_do_moi_lan_la_truot_that(self):
+        for _ in range(3):
+            self.lan(["t2"])
+        self.ghi(stable_red=["t2"])
+        self.assertIs(self.muc("test").outcome, Outcome.FAILED)
+
+    def test_khong_co_ban_ghi_repeat_thi_lan_cuoi_quyet(self):
+        self.lan([]); self.lan(["t2"]); self.lan([])
+        EvidenceStore(self._tmp.name, candidate="aaa").tool_run("S-01", "lint", ok=True)
+        self.assertIs(self.muc("test").outcome, Outcome.PASSED)
+
+    def test_lint_doi_ket_cuc_cung_khong_on_dinh(self):
+        self.lan([])
+        EvidenceStore(self._tmp.name, candidate="aaa").tool_run("S-01", "lint", ok=False)
+        self.ghi(checks=["test", "lint"], flaky_checks=["lint"])
+        self.assertIs(self.muc("lint").outcome, Outcome.UNRUNNABLE)
 
 
 class TestHappyPath(GateTestCase):

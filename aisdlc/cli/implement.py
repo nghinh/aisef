@@ -125,6 +125,7 @@ def cmd_run(args) -> int:
 
     verify_only = getattr(args, "verify_only", False)
     story = getattr(args, "story", "")
+    repeat = getattr(args, "repeat", 1)
     if verify_only and not story:
         print("✗ --verify-only cần --story: kiểm lại ứng viên của story nào?", file=sys.stderr)
         return EXIT_USAGE
@@ -134,6 +135,13 @@ def cmd_run(args) -> int:
         return EXIT_USAGE
     if story and not verify_only:
         print("✗ --story chỉ đi với --verify-only (chạy một story thường: --epic)", file=sys.stderr)
+        return EXIT_USAGE
+    if repeat < 1:
+        print(f"✗ --repeat phải ≥ 1, nhận {repeat}", file=sys.stderr)
+        return EXIT_USAGE
+    if repeat != 1 and not verify_only:
+        print("✗ --repeat chỉ đi với --verify-only: lặp là lặp phép kiểm trên một ứng viên "
+              "đã đóng băng, không lặp phiên developer", file=sys.stderr)
         return EXIT_USAGE
 
     if _readiness_blocked(args):
@@ -146,6 +154,7 @@ def cmd_run(args) -> int:
     if verify_only:
         report = run_verify_only(
             args.project, adapter, story_id=story, config=Config.load(args.project),
+            repeat=repeat,
         )
     else:
         report = run_sprint(

@@ -363,16 +363,24 @@ aisdlc auto-approve all|<danh sách>   luôn ghi dấu `auto`
 
 # Bước 4 — hiện thực
 aisdlc run     [--client c] [--epic E] [--sequential] [--no-isolate] [--force]
-aisdlc run     --verify-only --story S [--client c]   kiểm lại ứng viên đã đóng băng (ADR-004 R13):
+aisdlc run     --verify-only --story S [--client c] [--repeat K]   kiểm lại ứng viên đã đóng băng (ADR-004 R13):
         không mở phiên developer; ứng viên = HEAD nhánh story; chạy lại đúng phép kiểm ✗/thiếu
         ở SHA ấy, giữ rà soát/bảo mật cùng SHA; cổng chấm đủ; đạt → merge như thường, trượt →
         failed không ăn run.max_retries. Dùng khi trượt vì môi trường đo (e2e nhạy tải máy).
+        --repeat K: mỗi phép kiểm chạy lại chạy K lần trên cùng SHA (oracle ×k của Terminal-Bench);
+        test đổi kết cục giữa các lần → `note verify-only.repeat {flaky_ids, stable_red, flaky_checks}`,
+        mục cổng ⚠ UNRUNNABLE "không ổn định: <tên>" — không chạy được ổn định ≠ trượt ≠ đạt;
+        đỏ ở mọi lần → ✗ như thường. K = 1 (mặc định) là hành vi cũ.
 aisdlc tool    test|lint|sast [--story S] [--lines N]  agent gọi qua đây để có bằng chứng;
         in tên test đỏ trước tail, khai "(lược N/M dòng — toàn văn: …log)" khi cắt
 aisdlc verify  [--write-scope ...] [--story S] hậu kiểm guard trên cây làm việc
 
 # Bước 5 — kiểm định
 aisdlc qa      [--only <loại>] [--story S] [--story-level]
+        Cấp dự án (qa · pre-deploy · improve) chạy ở **worktree sạch dựng từ SHA** (ADR-005 V6,
+        knob verify.clean_tree): shim node_modules/.bin, conftest.py, pytest.ini chưa commit không
+        tới được cây kiểm; node_modules/.venv của dự án được gắn vào. Bằng chứng ghi
+        `tree = worktree-tạm | cây agent` + `clean_tree = <sha>`; mức story giữ cây worktree.
 
 # Vòng cải tiến epic theo bằng chứng (ADR-004 R3) — sau khi epic đã chạy
 aisdlc improve --epic E [--max-loops N] [--auto] [--client c] [--force]
@@ -634,6 +642,7 @@ Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏn
 | `verify.*` (12 loại: `unit` · `sit` · `api-contract` · `e2e` · `uat` · `perf` · `security` · `mutation` · `accessibility` · `migration` · `sbom` · `image-scan`) | `""` | rỗng nghĩa là **chưa cấu hình**, không phải "đạt"; thư mục test suy từ lệnh được cấp thêm vào phạm vi ghi của story đòi loại ấy (lỗi 21) |
 | `verify.waived` | `""` | miễn phải là quyết định có người ký, không phải hệ quả của việc quên |
 | `verify.baseline` | `true` | chạy bộ test ở candidate cha **trước** phiên developer đầu tiên của story (ADR-004 R9) để cổng "không làm đỏ test có sẵn" so được tên test; tắt khi bộ test quá chậm — tắt thì mục cổng là – "tắt bởi cấu hình", không phải đạt |
+| `verify.clean_tree` | `true` | kiểm định **cấp dự án** (`aisdlc qa`, `pre-deploy`, `improve`) chạy ở `git worktree` tạm dựng từ SHA đang chấm (ADR-005 V6, theo Harbor: verifier chạy tách khỏi env agent): shim `node_modules/.bin/*`, `conftest.py`, `pytest.ini` chưa commit không tới được cây kiểm; `node_modules`/`.venv` của dự án được gắn vào (Docker bind mount, suy biến symlink). Giá: tệp **không theo dõi** mà test cần (`.env.test`, fixture sinh tay) cũng vắng — commit chúng, hoặc tắt khoá này; tắt thì bằng chứng và `pre-deploy.json` ghi `tree = "cây agent"`, không im lặng. Mức story (`run`) giữ cây worktree đã đóng băng, không đọc khoá này |
 | `sandbox.image` | `""` (theo stack) | `alpine` trơn không có công cụ nào; test đỏ vì thiếu công cụ chứ không vì code sai |
 | `sandbox.tools_network` | `false` | dự án cần cài phụ thuộc mới mở mạng, và phải khai tường minh |
 | `sandbox.use_docker` | `true` | tắt được cho toolchain gắn với máy chủ, nhưng luôn ghi `degraded` |

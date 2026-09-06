@@ -129,6 +129,10 @@ def build_parser() -> argparse.ArgumentParser:
                          "không mở phiên developer, chỉ chạy lại phép kiểm ✗/thiếu, giữ rà "
                          "soát cùng SHA; không tính vào run.max_retries (ADR-004 R13)")
     r2.add_argument("--story", default="", help="story để kiểm lại — bắt buộc với --verify-only")
+    r2.add_argument("--repeat", type=int, default=1, metavar="K",
+                    help="với --verify-only: chạy mỗi phép kiểm K lần trên cùng SHA; test đổi kết "
+                         "cục giữa các lần → cổng ghi UNRUNNABLE 'không ổn định' nêu tên, không "
+                         "phải trượt (lỗi 22: e2e nhạy tải máy). Mặc định 1")
     r2.set_defaults(func=cmd_run)
 
     im = sub.add_parser("improve", help="vòng cải tiến epic theo bằng chứng: QA → sổ hành vi → "

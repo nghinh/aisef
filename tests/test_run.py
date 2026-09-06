@@ -24,9 +24,10 @@ from aisdlc.clients.stream import RunResult  # noqa: E402
 from aisdlc.config import DEFAULTS, Config  # noqa: E402
 from aisdlc.control.journal import Entry as JEntry  # noqa: E402
 from aisdlc.control.journal import JournalStore  # noqa: E402
+from aisdlc.control.outcome import Outcome  # noqa: E402
 from aisdlc.control.state import StateStore, StoryStatus  # noqa: E402
 from aisdlc.control.worktree import WorktreeManager  # noqa: E402
-from aisdlc.harness.observe import AGENT_RUN, NOTE, EvidenceStore  # noqa: E402
+from aisdlc.harness.observe import AGENT_RUN, NOTE, TOOL_RUN, EvidenceStore  # noqa: E402
 from aisdlc.phases.run import load_plan, run_sprint, run_verify_only  # noqa: E402
 
 INDEX = {
@@ -766,3 +767,121 @@ class TestVerifyOnly(RunTestCase):
         self.assertTrue(note.detail["main_ahead"], "phải nói ra là nhánh chính đã tiến lên")
         self.assertTrue(self.head_co("src/core/STORY-01-01.py"))
         self.assertTrue(self.head_co("khac.txt"), "merge không làm mất phần mới của main")
+
+
+class TestVerifyOnlyRepeat(RunTestCase):
+    """ADR-004 R13 `--repeat k` — tách "đỏ vì mã" khỏi "đỏ vì tải máy".
+
+    Lỗi 22: e9 STORY-01-07 trượt lượt 3 vì `autosave.spec.ts:210` nhạy tải,
+    đo lại 10/10 xanh — $28,76 cho một lượt developer dựng lại thứ đã có.
+    Ở đây lệnh test giả in tên theo `pytest -v`; lần gọi thứ i cho `test_on`
+    kết cục là chữ thứ i của mẫu (G xanh / R đỏ). Thứ tự gọi: baseline (1)
+    → lượt developer (2, đỏ để story trượt và kiểm lại phải chạy lại test)
+    → kiểm lại k lần (3…). Điều phải chứng minh: đổi kết cục giữa các lần
+    → UNRUNNABLE "không ổn định" nêu tên (không phải trượt, không phải đạt);
+    đỏ mọi lần → FAILED; xanh mọi lần → đạt; k = 1 không đổi gì.
+    """
+
+    SID = "STORY-01-01"
+
+    def setUp(self):
+        super().setUp()
+        self._co = tempfile.TemporaryDirectory()
+        self.co = Path(self._co.name)
+
+    def tearDown(self):
+        self._co.cleanup()
+        super().tearDown()
+
+    def lenh_test(self, mau: str) -> str:
+        script, dem = self.co / "test.sh", self.co / "n"
+        script.write_text(
+            "#!/bin/sh\n"
+            f'f="{dem}"; n=0; [ -f "$f" ] && n=$(cat "$f"); n=$((n+1)); echo "$n" > "$f"\n'
+            f'kc=$(printf %s "{mau}" | cut -c"$n")\n'
+            'echo "tests/test_x.py::test_lung PASSED"\n'
+            'if [ "$kc" = "R" ]; then echo "tests/test_x.py::test_on FAILED"; exit 1; fi\n'
+            'echo "tests/test_x.py::test_on PASSED"\n',
+            encoding="utf-8",
+        )
+        return f"sh {script}"
+
+    def cfg(self, mau: str):
+        return self.config(**{"tools.test": self.lenh_test(mau), "sandbox.use_docker": False})
+
+    def truot_vi_test(self, agent, cfg):
+        r = self.run_sprint(agent, only_epic="EPIC-01", config=cfg)
+        self.assertFalse(r.ok, r.summary())
+        self.assertIn("test", [c.name for c in r.outcomes[0].attempts[-1].gate.failures])
+
+    def kiem_lai(self, agent, cfg, k):
+        return run_verify_only(self.project, agent, story_id=self.SID, config=cfg, repeat=k)
+
+    def muc(self, r, ten):
+        return next(c for c in r.outcomes[0].attempts[-1].gate.checks if c.name == ten)
+
+    def evidence(self):
+        return EvidenceStore(self.artifacts).read(self.SID)
+
+    def test_do_mot_lan_xanh_hai_lan_la_khong_on_dinh_khong_phai_truot(self):
+        agent, cfg = Agent(), self.cfg("GR" + "GGR")
+        self.truot_vi_test(agent, cfg)
+        # Ứng viên không đổi giữa lượt developer và kiểm lại (không có gì để
+        # commit): lần test đỏ của lượt developer cũng mang SHA này — đếm phần thêm.
+        sha = JournalStore(self.artifacts).read(self.SID).last("candidate.frozen").data["sha"]
+        n_truoc = len([e for e in self.evidence().of(TOOL_RUN, "test") if e.detail.get("candidate") == sha])
+
+        r = self.kiem_lai(agent, cfg, 3)
+
+        self.assertFalse(r.ok, r.summary())
+        m = self.muc(r, "test")
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE, m.detail)
+        self.assertIn("không ổn định", m.detail)
+        self.assertIn("tests/test_x.py::test_on", m.detail)
+        self.assertNotIn("test_lung", m.detail, "test ổn định không bị nêu tên")
+        bl = self.muc(r, "không làm đỏ test có sẵn")
+        self.assertIsNot(bl.outcome, Outcome.FAILED,
+                         f"xanh ở baseline, đỏ ở lần cuối vì flaky — không phải làm đỏ: {bl.detail}")
+        note = self.evidence().last(NOTE, "verify-only.repeat")
+        self.assertEqual(note.detail["k"], 3)
+        self.assertEqual(note.detail["flaky_ids"], ["tests/test_x.py::test_on"])
+        self.assertEqual(note.detail["stable_red"], [])
+        self.assertEqual(self.evidence().last(NOTE, "verify-only").detail["candidate"], sha)
+        chay = [e for e in self.evidence().of(TOOL_RUN, "test") if e.detail.get("candidate") == sha]
+        self.assertEqual(len(chay) - n_truoc, 3, "k lần tool_run test, mỗi lần mang candidate")
+        self.assertEqual(len(agent.stories), 1, "không có phiên developer")
+        self.assertIn("test", self.state().stories[self.SID].blocked_reason)
+
+    def test_do_moi_lan_la_truot_that(self):
+        agent, cfg = Agent(), self.cfg("GR" + "RRR")
+        self.truot_vi_test(agent, cfg)
+
+        r = self.kiem_lai(agent, cfg, 3)
+
+        self.assertFalse(r.ok)
+        m = self.muc(r, "test")
+        self.assertIs(m.outcome, Outcome.FAILED, m.detail)
+        note = self.evidence().last(NOTE, "verify-only.repeat")
+        self.assertEqual(note.detail["stable_red"], ["tests/test_x.py::test_on"])
+        self.assertEqual(note.detail["flaky_ids"], [])
+
+    def test_xanh_moi_lan_la_dat(self):
+        agent, cfg = Agent(), self.cfg("GR" + "GGG")
+        self.truot_vi_test(agent, cfg)
+
+        r = self.kiem_lai(agent, cfg, 3)
+
+        self.assertTrue(r.ok, r.summary())
+        self.assertIs(self.state().stories[self.SID].state, StoryStatus.DONE)
+        note = self.evidence().last(NOTE, "verify-only.repeat")
+        self.assertTrue(note.ok)
+        self.assertEqual(note.detail["flaky_ids"], [])
+
+    def test_k_bang_1_la_hanh_vi_cu(self):
+        agent, cfg = Agent(), self.cfg("GR" + "G")
+        self.truot_vi_test(agent, cfg)
+
+        r = self.kiem_lai(agent, cfg, 1)
+
+        self.assertTrue(r.ok, r.summary())
+        self.assertIsNone(self.evidence().last(NOTE, "verify-only.repeat"))

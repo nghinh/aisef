@@ -37,7 +37,7 @@ from .acceptance import ac_code, coverage as ac_coverage, missing as ac_missing
 from .outcome import Check, Outcome
 from .tdd import red_before_green
 from .security import DEFAULT_BLOCKING
-from ..harness.observe import FILE_CHANGE, GUARD_BLOCK, GUARD_SEEN, MOCKUP_MAP, TOOL_RUN, Event, Evidence
+from ..harness.observe import FILE_CHANGE, GUARD_BLOCK, GUARD_SEEN, MOCKUP_MAP, NOTE, TOOL_RUN, Event, Evidence
 from ..harness.testlog import MAX_IDS
 from ..harness.tools import BASELINE_RUN
 
@@ -95,6 +95,10 @@ CHECK_KIND = {
 #: (môi trường/cấu hình không cho kết luận → kết cục có tên, không phải đạt).
 CONTROLS = ("positive", "negative", "env")
 
+#: Bản ghi của `--verify-only --repeat k` (ADR-004 R13): phép kiểm nào đổi
+#: kết cục giữa k lần chạy trên cùng SHA. Ghi ở `implement._repeat_note`.
+REPEAT_NOTE = "verify-only.repeat"
+
 
 @dataclass
 class StoryGate:
@@ -143,6 +147,40 @@ def _latest_per_check(evidence: Evidence) -> dict[tuple[str, str], Event]:
 
 def _ten(tests: list[str], n: int = 5) -> str:
     return ", ".join(tests[:n]) + (f" (+{len(tests) - n})" if len(tests) > n else "")
+
+
+def _flaky_ids(evidence: Evidence) -> list[str]:
+    """Tên test đổi kết cục giữa k lần chạy trên cùng SHA (`--repeat k`)."""
+    note = evidence.last(NOTE, REPEAT_NOTE)
+    return [str(t) for t in (note.detail.get("flaky_ids") or [])] if note else []
+
+
+def _khong_on_dinh(evidence: Evidence, name: str) -> str:
+    """Lý do "không ổn định" cho mục ``name`` từ bản ghi `--repeat k`; rỗng
+    nếu không có gì để nói.
+
+    Mã không đổi giữa k lần mà kết cục đổi thì đó không phải đỏ (không có
+    gì để sửa trong mã) và cũng không phải đạt (không chạy được ổn định) →
+    UNRUNNABLE, nêu tên — lỗi 22: `autosave.spec.ts:210` nhạy tải máy làm
+    e9 STORY-01-07 trượt lượt 3 rồi đo lại 10/10 xanh. Đỏ ở **mọi** lần
+    (`stable_red`) là đỏ thật: không xếp vào đây, lần cuối đỏ và mục "test"
+    chấm FAILED như thường. Phép kiểm không in tên test (lint, `qa:<kind>`)
+    so cả phép: `ok` đổi giữa các lần là không ổn định.
+    """
+    note = evidence.last(NOTE, REPEAT_NOTE)
+    if note is None:
+        return ""
+    d = note.detail
+    if name == "test" and d.get("stable_red"):
+        return ""
+    lat = _flaky_ids(evidence) if name == "test" else []
+    if not lat and name not in (d.get("flaky_checks") or []):
+        return ""
+    return (
+        f"không ổn định qua {d.get('k')} lần chạy trên cùng SHA"
+        + (f": {_ten(lat)}" if lat else "")
+        + " — không chạy được ổn định không phải trượt, cũng không phải đạt"
+    )
 
 
 def _la(test_id: str) -> str:
@@ -213,7 +251,10 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
     goc_ids = list(goc.detail.get("test_ids") or [])
     khong_xanh = set(goc.detail.get("failed_ids") or []) | set(goc.detail.get("skipped_ids") or [])
     xanh_goc = [t for t in goc_ids if t not in khong_xanh]
-    do = set(moi.detail.get("failed_ids") or [])
+    # `--repeat k`: test đổi kết cục giữa k lần ở ứng viên không phải "làm
+    # đỏ" — mục "test" đã ghi UNRUNNABLE nêu tên; ở đây không tính, và nói ra.
+    lat = _flaky_ids(evidence)
+    do = set(moi.detail.get("failed_ids") or []) - set(lat)
     con = set(moi.detail.get("test_ids") or [])
     lam_do = [t for t in xanh_goc if t in do]
     # ponytail: testlog cắt danh sách ở MAX_IDS — bộ test lớn hơn thế thì
@@ -242,6 +283,9 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
                      evidence=doc)
     if do_san:
         return Check(ten, True, f"{len(do_san)} test đã đỏ sẵn ở baseline, không tính: {_ten(do_san)}",
+                     evidence=doc)
+    if lat:
+        return Check(ten, True, f"{len(lat)} test không ổn định không tính ở đây (xem mục test): {_ten(lat)}",
                      evidence=doc)
     if cat:
         return Check(ten, True, f"danh sách test bị cắt ở {MAX_IDS} tên — chỉ so được test đỏ, không so được test mất",
@@ -331,9 +375,12 @@ def evaluate(
     # `completion` đọc lần test cuối và tệp sửa **sau** nó — trỏ đúng hai thứ ấy.
     doc_test = ([last_test.seq] + [e.seq for e in evidence.of(FILE_CHANGE) if e.seq > last_test.seq]
                 if last_test is not None else [])
+    lat = _khong_on_dinh(evidence, "test")
     if last_test is not None and last_test.detail.get("unrunnable"):
         gate.checks.append(Check("test", Outcome.UNRUNNABLE, str(last_test.detail["unrunnable"]),
                                  evidence=doc_test))
+    elif lat:
+        gate.checks.append(Check("test", Outcome.UNRUNNABLE, lat, evidence=doc_test))
     else:
         gate.checks.append(Check("test", completion.allowed, completion.reason.split("\n")[0],
                                  evidence=doc_test))
@@ -346,6 +393,9 @@ def evaluate(
         gate.checks.append(
             Check("lint", Outcome.UNCONFIGURED, str(lint.detail["skipped"]), evidence=[lint.seq])
         )
+    elif _khong_on_dinh(evidence, "lint"):
+        gate.checks.append(Check("lint", Outcome.UNRUNNABLE, _khong_on_dinh(evidence, "lint"),
+                                 evidence=[lint.seq]))
     else:
         gate.checks.append(
             Check("lint", lint.ok, "" if lint.ok else str(lint.detail.get("tail", ""))[:300],
@@ -465,6 +515,9 @@ def evaluate(
             gate.checks.append(Check(kind, Outcome.UNCONFIGURED, kind=CHECK_KIND["<kind>"]))
         elif ran.detail.get("skipped"):
             gate.checks.append(Check(kind, Outcome.UNCONFIGURED, str(ran.detail["skipped"]),
+                                     kind=CHECK_KIND["<kind>"], evidence=[ran.seq]))
+        elif _khong_on_dinh(evidence, f"qa:{kind}"):
+            gate.checks.append(Check(kind, Outcome.UNRUNNABLE, _khong_on_dinh(evidence, f"qa:{kind}"),
                                      kind=CHECK_KIND["<kind>"], evidence=[ran.seq]))
         else:
             gate.checks.append(Check(

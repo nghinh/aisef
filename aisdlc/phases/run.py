@@ -21,6 +21,7 @@ import json
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field, replace
+from functools import partial
 from pathlib import Path
 
 from ..clients.base import ClientAdapter
@@ -157,12 +158,14 @@ def run_epic(
     artifact_root: Path,
     report: RunReport,
     verify_only: bool = False,
+    repeat: int = 1,
 ) -> bool:
     """Chạy hết một epic. False nghĩa là phải dừng cả đợt.
 
     ``verify_only``: lượt kiểm-lại (ADR-004 R13) — không mở phiên developer,
     chấm lại ứng viên ở HEAD nhánh story; mọi thứ còn lại (worktree, cổng,
     merge, `done`, nhật ký) đi **đúng đường này**, không có đường riêng.
+    ``repeat``: chỉ có nghĩa với kiểm-lại — mỗi phép kiểm chạy k lần.
     """
     architecture = None
     arch_file = artifact_root / "architecture.md"
@@ -205,7 +208,7 @@ def run_epic(
                 project=project, client=client, config=config, state=state,
                 worktrees=worktrees, artifact_root=artifact_root,
                 architecture=architecture, contract=contract, catalog=catalog,
-                wave=wave, verify_only=verify_only,
+                wave=wave, verify_only=verify_only, repeat=repeat,
             )
 
         # Gỡ worktree của story **trượt** trước khi thoát. Chúng nằm
@@ -290,6 +293,7 @@ def _run_wave(
     catalog,
     wave: WaveReport,
     verify_only: bool = False,
+    repeat: int = 1,
 ) -> None:
     owned = screen_owners(plan.stories.values())
     fan_in = complexity.fan_in_counts(plan.stories.values())
@@ -329,7 +333,7 @@ def _run_wave(
             _safe_transition(state, story_id, StoryStatus.RUNNING)
             tx.record("status.running", undo={"status.reset": "pending"})
 
-            chay = verify_only_story if verify_only else implement_story
+            chay = partial(verify_only_story, repeat=repeat) if verify_only else implement_story
             outcome = chay(
                 story,
                 project=project,
@@ -463,12 +467,15 @@ def run_verify_only(
     *,
     story_id: str,
     config: Config | None = None,
+    repeat: int = 1,
 ) -> RunReport:
     """Lượt kiểm-lại một story trên ứng viên đã đóng băng (ADR-004 R13).
 
     Không mở phiên developer. Đi qua `run_epic` với kế hoạch thu về một đợt
     một story, để merge, `done`, `attempt.committed` và dọn worktree là
     **cùng một mã** với lượt thường — không phải bản chép có thể lệch.
+    ``repeat`` = k: mỗi phép kiểm chạy lại chạy k lần trên cùng SHA để tách
+    "đỏ vì mã" khỏi "đỏ vì tải máy" (lỗi 22) — xem `implement.verify_only`.
 
     Từ chối bằng code khi không có gì để kiểm lại: story chưa từng có ứng
     viên (không có nhánh story hay mốc `candidate.frozen`), hay đã `done`.
@@ -513,6 +520,6 @@ def run_verify_only(
         story.epic_id, mot,
         project=project, client=client, config=cfg, state=state,
         worktrees=worktrees, artifact_root=artifact_root, report=report,
-        verify_only=True,
+        verify_only=True, repeat=repeat,
     )
     return report

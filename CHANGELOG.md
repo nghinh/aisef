@@ -122,8 +122,25 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
   `_run_degraded` mất PATH khi `env` khác rỗng (ADR-005 §9); timeout Docker giết
   CLI mà container `sleep` chạy tiếp (S5 lộ) — nay `docker rm -f` theo tên.
 - `AISDLC_PROJECT` truyền từ harness cho cả ba vai; guard đọc env trước (P0-1).
+- **Kiểm định cấp dự án chạy ở worktree sạch từ SHA** (ADR-005 V6, theo
+  Harbor): `qa.run_suite(clean=True)` — `aisdlc qa`, `pre-deploy`, `improve`
+  chạy lệnh trong `git worktree` tách tạm dựng từ SHA đang chấm
+  (`WorktreeManager.temporary`), `node_modules`/`.venv` của dự án gắn vào
+  (`SandboxSpec.mounts`: Docker bind mount, suy biến symlink), gỡ sau. Shim
+  `node_modules/.bin/*`, `conftest.py`, `pytest.ini` chưa commit không tới cây
+  kiểm. Bằng chứng `qa:<kind>` và `pre-deploy.json` ghi `tree`
+  (`worktree-tạm` | `cây agent` + lý do) và `clean_tree`. Knob
+  `verify.clean_tree` (`true`) tắt khi test cần tệp không theo dõi. Mức story
+  giữ cây worktree (`clean=False`).
 
 ### 4 · Orchestration logic
+
+- **`aisdlc run --story S --verify-only --repeat K`** (ADR-004 R13 + ADR-005
+  §3, lỗi 22): mỗi phép kiểm chạy lại chạy K lần trên cùng SHA
+  (`implement._repeat_runs`/`_repeat_note`); `note verify-only.repeat
+  {flaky_ids, stable_red, flaky_checks}`; cổng ghi ⚠ UNRUNNABLE "không ổn
+  định: <tên>" thay vì ✗ khi test đổi kết cục giữa các lần
+  (`gate._khong_on_dinh`), đỏ mọi lần vẫn ✗. K = 1 là hành vi cũ.
 
 - **Đổi hành vi — thứ tự nhật ký** (`control/journal.py::STEPS`, ADR-004 R1):
   `attempt.started → worktree.created → status.running → changes.detected →
@@ -274,6 +291,7 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 | `context.max_repo_map_chars` · `context.map_provider` | `0` (tắt) · `""` | ADR-005 V7 |
 | `improve.max_loops` · `improve.flat_loops` · `improve.cost_cap_usd` | `3` · `2` · `0.0` | ADR-004 R3 |
 | `verify.baseline` | `true` | ADR-004 R9 |
+| `verify.clean_tree` | `true` | ADR-005 V6 |
 | `skills.inline` | `false` | ADR-003 §6 |
 | `sandbox.pre_deploy_degraded_waiver` | `""` | quyết định 4 |
 | `sandbox.provider` | `"docker"` | ADR-005 V5 |
@@ -283,8 +301,9 @@ Gỡ: `story.max_context_tokens` (chưa từng có mã đọc; `RETIRED`, cảnh
 ### Lệnh CLI mới — `aisdlc/cli/parser.py`, bộ lệnh đủ ở SOLUTION §10
 
 `aisdlc improve` · `aisdlc evidence` · `aisdlc ctx` · `aisdlc doc` · `aisdlc change` ·
-`aisdlc skill --scan` · `aisdlc guard process-ref`. Gói `aisdlc/cli/` tách từ
-một tệp `cli.py` (S5), không đổi hành vi.
+`aisdlc skill --scan` · `aisdlc guard process-ref` · `aisdlc run --verify-only
+--story S [--repeat K]`. Gói `aisdlc/cli/` tách từ một tệp `cli.py` (S5), không
+đổi hành vi.
 
 ### Lỗi thật tìm bằng đo trong đợt này
 

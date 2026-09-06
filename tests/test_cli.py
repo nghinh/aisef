@@ -416,6 +416,19 @@ class TestRunCommand(CliTestCase):
         self.assertEqual(code, EXIT_USAGE)
         self.assertIn("--no-isolate", err)
 
+    def test_repeat_chi_di_voi_verify_only(self):
+        """R13 `--repeat k` lặp **phép kiểm** trên một ứng viên đã đóng băng —
+        không có nghĩa với lượt developer."""
+        code, _, err = self.run_cli("run", "--repeat", "3", "--force")
+        self.assertEqual(code, EXIT_USAGE)
+        self.assertIn("--repeat", err)
+
+    def test_repeat_phai_duong(self):
+        code, _, err = self.run_cli("run", "--verify-only", "--story", "STORY-01-01",
+                                    "--repeat", "0", "--force")
+        self.assertEqual(code, EXIT_USAGE)
+        self.assertIn("--repeat", err)
+
 
 class TestCtxCommand(CliTestCase):
     """`aisdlc ctx` (ADR-005 V7): bản đồ đầy đủ, và ghi `ctx_lookup` khi gọi
