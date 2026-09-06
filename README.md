@@ -1,282 +1,367 @@
+*English · [Tiếng Việt](README.vi.md)*
+
 # AISEF — AI Software Engineering Framework
 
-Khung phát triển phần mềm bằng agent. Tên đầy đủ là **AI Software Engineering
-Framework**, viết tắt **AISEF**; gói trên PyPI, module Python và lệnh đều là
-`aisef`. Đầu vào của mỗi dự án là **một file**
-`docs/requirements.md`; đầu ra là một ứng dụng chạy được, kèm bằng chứng
-cho từng bước.
+A framework for building software with coding agents. The package on PyPI, the
+Python module and the command are all called `aisef`. Each project's input is
+**one file**, `docs/requirements.md`; the output is a working application plus
+evidence for every step that produced it.
 
-Nguyên tắc nền, xuyên suốt mọi quyết định trong kho này:
+The principle behind every decision in this repository:
 
-> **Cần phán đoán thì giao cho model. Cần đảm bảo thì viết code.**
+> **If it needs judgement, give it to the model. If it needs a guarantee, write code.**
 
-Viết PRD, thiết kế kiến trúc, dựng mockup, viết code — đều cần phán đoán,
-đều giao cho model. Còn "mọi yêu cầu phải có story phủ", "không được ghi
-ra ngoài phạm vi", "test phải xanh sau lần sửa cuối" — đều có đáp án đúng,
-nên đều là code. Hệ quả: **không bao giờ giao cho model việc giám sát
-chính nó.**
+Writing a PRD, designing the architecture, building mockups, writing code — all
+need judgement, all go to the model. "Every requirement must be covered by a
+story", "nothing may be written outside the declared scope", "tests must be
+green after the last edit" — all have a correct answer, so all are code. The
+consequence: **the model is never asked to supervise itself.**
 
-## Cài
+## Install
 
 ```bash
 pip install aisef
 ```
 
-Hoặc chạy từ bản sao kho nguồn:
+Or run from a source checkout:
 
 ```bash
 git clone <repo> aisef && cd aisef && pip install -e .
-python3 -m unittest discover -s tests -q   # vài phút, không mở container (tests/__init__.py)
-AISEF_TEST_DOCKER=1 python3 -m unittest tests.test_sandbox tests.test_tools -q   # thêm test Docker thật
+python3 -m unittest discover -s tests -q   # a few minutes, opens no container (tests/__init__.py)
+AISEF_TEST_DOCKER=1 python3 -m unittest tests.test_sandbox tests.test_tools -q   # plus the real-Docker tests
 ```
 
-Kho skill tham chiếu **không cần clone tay**: `aisef setup` tự lấy về
-`~/.cache/aisef/references` đúng commit mà `aisef/kit/catalog.json`
-ghim (khoảng 93 MB, một lần cho mọi dự án). Máy ngoại tuyến hoặc CI trỏ
-sang chỗ khác bằng `AISEF_REFERENCES=/duong/dan`, hoặc dùng
-`aisef setup --no-fetch` để chỉ xài những gì đã có trên đĩa.
+The reference skill repositories need **no manual clone**: `aisef setup` fetches
+them into `~/.cache/aisef/references` at the exact commit pinned by
+`aisef/kit/catalog.json` (about 93 MB, once for every project). Offline machines
+and CI can point elsewhere with `AISEF_REFERENCES=/path`, or use
+`aisef setup --no-fetch` to work with whatever is already on disk.
 
-Không có phụ thuộc Python nào ngoài thư viện chuẩn. Tuỳ chọn:
-`docker` (cách ly khi chạy test), `playwright` (trích hợp đồng thị giác
-từ mockup) — thiếu thì framework **nói thẳng là thiếu** chứ không giả vờ
-vẫn kiểm được.
+No Python dependencies beyond the standard library. Optional: `docker`
+(isolation when running tests) and `playwright` (extracting the visual contract
+from mockups). When either is missing the framework **says so plainly** instead
+of pretending it still verified anything.
 
-## Hướng dẫn dùng từng bước
+## Step-by-step guide
 
-Người mới bắt đầu đọc `docs/HUONG-DAN-SU-DUNG.md`: chuẩn bị máy, cài, viết
-`docs/requirements.md`, cấu hình lệnh test, đi hết tám cổng, đọc kết cục cổng,
-xử lý sự cố, bảng lệnh và bảng khoá cấu hình đầy đủ.
+New users should read `docs/HUONG-DAN-SU-DUNG.md` (Vietnamese): preparing the
+machine, installing, writing `docs/requirements.md`, configuring the test
+command, passing all eight gates, reading gate outcomes, troubleshooting, plus
+full command and configuration tables. An English translation is on the roadmap.
 
-## Sáu bước
+## What makes it different: the harness
+
+Most agent tooling is a prompt plus a loop. AISEF is a **harness**: the run-time
+scaffolding around the model that decides what the model sees, what it may
+touch, what counts as done, and what is written down afterwards. Everything in
+this repository belongs to exactly one of six harness groups, and that list is
+the acceptance yardstick for the project itself.
+
+| # | Harness group | What lives there | Where |
+|---|---|---|---|
+| 1 | **Instructions & rule files** | the engineering constitution compiled into `CLAUDE.md` / `AGENTS.md`, the pinned skill catalog, four agent roles each with its own fresh session, versioned prompts | `kit/`, `harness/routing.py` |
+| 2 | **Tools** | three evidence-producing tools (`test`, `lint`, `sast`) the agent calls as `aisef tool <name> --story S`, plus documentation lookup; every tool carries prose on when to call it, how to read its result, and when *not* to call it | `harness/tools.py` |
+| 3 | **Sandboxes & execution environments** | four permission levels, an `ExecutionProvider` contract, and five **named guarantees** (`network_none`, `read_only_fs`, `non_root`, `no_host_mount`, `secrets_absent`). A provider that cannot offer one says which one is missing; a degraded run is labelled, never silent | `harness/sandbox.py` |
+| 4 | **Orchestration logic** | role routing where **reviewer ≠ developer**, a story state machine, wave scheduling by dependency *and* write scope, and handoff packets whose every context slot declares its source | `control/`, `phases/` |
+| 5 | **Guardrails / hooks** | eight guards on three lifecycle moments, each a standalone command returning an exit code, compiled into whatever the client supports, defined in one place | `harness/guardrails.py` |
+| 6 | **Observability** | structured events with provenance, cost and latency per session, every check bound to the **SHA of the candidate** it ran on, the behaviour ledger, handoff and verdict records, and a benchmark corpus | `harness/observe.py`, `control/ledger.py`, `tests/bench/` |
+
+Two consequences worth stating plainly. Guards live in group 5 on the framework
+side, so **the client is never trusted** — a client that cannot host
+pre-execution guards is recorded as offering weaker assurance instead of being
+assumed fine. And group 6 binds every result to a commit, so "the tests passed"
+always means "they passed on *this* code", never "they passed at some point".
+
+## Harness of harness: the framework improves the framework
+
+A single story passing its gate is not the interesting part. The hard problem is
+what happens **after** an epic is declared done: a later story quietly breaks an
+earlier one, a criterion has a test that never actually exercised it, a gap
+stays open because nobody is looking for it.
+
+AISEF answers that with a second loop wrapped around the first (ADR-004,
+absorbed from the *Harness-of-Harness* line of work and measured here):
+
+- **Frozen candidate.** Each attempt freezes a SHA; every check records the
+  candidate it ran on. Evidence from another SHA is stale, which is a different
+  outcome from a failure.
+- **Behaviour ledger.** Every acceptance criterion, requirement, verification
+  kind and screen has a state: VERIFIED, GAP or REOPENED. The ledger is a
+  projection of the evidence, rebuilt every time, never a second source of truth.
+- **Bounded improvement loop.** `aisef improve --epic E` reads the ledger,
+  generates **one** repair story for one gap, runs it like any other story, and
+  re-verifies. It stops in code: no gaps left, loop budget spent, marginal
+  improvement ≤ 0 for N consecutive loops, cost cap exceeded, or the plan itself
+  is blocked.
+- **Preservation.** A story that touches files owned by verified behaviour of
+  other stories must leave those behaviours green — checked at the gate, not
+  hoped for.
+- **Negative control on tests.** A test that carries a criterion's code but was
+  already green before the story wrote a line proves nothing; the gate detects
+  that and says so, naming the test.
+- **Qualified gates.** All 16 gate checks have three controls each (positive,
+  negative/mutant, environment), so "is the gate itself scoring correctly" is a
+  question answered by a command.
+
+## Six steps
 
 ```bash
-cd /duong/dan/du-an-cua-ban
+cd /path/to/your/project
 
-aisef doctor                       # môi trường có đủ chưa
-aisef setup                        # dò stack, nạp skill, sinh CLAUDE.md + AGENTS.md
-aisef compile                      # nối guard vào client (hook / plugin)
+aisef doctor                       # is the environment complete
+aisef setup                        # detect stack, install skills, write CLAUDE.md + AGENTS.md
+aisef compile                      # wire guards into the client (hooks / plugin)
 
-aisef plan                         # PRD → kiến trúc → UX → epic → story
-aisef gates                        # xem cổng nào đang chờ người
-aisef review prd                   # đọc artifact
-aisef approve prd                  # duyệt
+aisef plan                         # PRD → architecture → UX → epics → stories
+aisef gates                        # which gate is waiting for a human
+aisef review prd                   # read the artifact
+aisef approve prd                  # approve it
 
-aisef mockup                       # mỗi màn hình một HTML + hợp đồng thị giác
+aisef mockup                       # one HTML per screen + visual contract
 aisef approve mockups
 aisef approve readiness
 
-aisef run                          # hiện thực: epic tuần tự, story song song
-aisef run --verify-only --story STORY-01-07   # kiểm lại ứng viên đã đóng băng, không mở phiên developer
-aisef qa                           # bộ kiểm định
-aisef devsecops                    # CI + Dockerfile + triển khai + runbook
-aisef pre-deploy                   # cổng cuối
-aisef report                       # báo cáo nghiệm thu + sổ hành vi + INDEX.md
-aisef evidence STORY-01-04         # lịch sử một story hay một hành vi (AC-…, FR-…, qa:e2e)
-aisef issues --format csv          # bảng gap/hồi quy từ sổ hành vi → _bmad-output/ISSUES.csv
+aisef run                          # implement: epics in sequence, stories in parallel
+aisef run --verify-only --story STORY-01-07   # re-verify a frozen candidate, no developer session
+aisef qa                           # the verification suite
+aisef devsecops                    # CI + Dockerfile + deployment + runbook
+aisef pre-deploy                   # the final gate
+aisef report                       # acceptance report + behaviour ledger + INDEX.md
+aisef evidence STORY-01-04         # history of one story or one behaviour (AC-…, FR-…, qa:e2e)
+aisef issues --format csv          # gaps and regressions from the ledger → _bmad-output/ISSUES.csv
 ```
 
-Chạy nhanh không cần người duyệt: `aisef plan --auto-approve all`. Phê duyệt
-tự động **luôn** được ghi dấu `auto` để về sau truy được tài liệu nào chưa
-từng có người thật xem.
+To run without stopping for approvals: `aisef plan --auto-approve all`. Automatic
+approvals are **always** marked `auto`, so it stays possible to tell which
+documents no human ever read.
 
-## Sau khi có code
+## Once there is code
 
 ```bash
 aisef doc vitest --topic coverage --story STORY-01-02
 ```
 
-Tra tài liệu thật của thư viện (context7, có cache) thay vì đoán tên API; có
-`--story` thì lần tra vào bằng chứng. Khi yêu cầu đổi sau phát hành:
+Looks up the library's real documentation (context7, cached) instead of guessing
+API names; with `--story` the lookup becomes evidence. When a requirement changes
+after release:
 
 ```bash
-aisef change FR-3 "Slug phải giữ dấu gạch dưới"
+aisef change FR-3 "Slugs must keep underscores"
 ```
 
-Ghi vào `docs/requirements.md`, đánh dấu PRD (cổng `prd` và các cổng sau
-thành stale), sinh story delta `STORY-CH-01` với `covers=[FR-3]` — story cũ
-giữ nguyên `DONE`.
+Writes the change into `docs/requirements.md`, marks the PRD (the `prd` gate and
+everything downstream become `stale`), and generates a delta story
+`STORY-CH-01` with `covers=[FR-3]` — the old story stays `DONE`.
 
 ```bash
-aisef improve --epic EPIC-01 --max-loops 3      # [--auto] không dừng ở cổng người
+aisef improve --epic EPIC-01 --max-loops 3      # [--auto] does not stop at the human gate
 ```
 
-Vòng cải tiến theo bằng chứng (ADR-004 R3): QA → sổ hành vi → **một** story
-sửa cho một hành vi GAP/REOPENED (`STORY-RP-01` trong `EPIC-RP-01`, sinh bằng
-code) → `run` như story thường → QA → mốc `loops[]` + `LOOP-REPORT-<n>.md`.
-Dừng bằng code: hết gap, đủ `improve.max_loops`, cải thiện biên ≤ 0
-`improve.flat_loops` vòng liền, vượt `improve.cost_cap_usd`, hay story sửa bế
-tắc kế hoạch (trả người kèm lời reviewer). Trước mỗi vòng ≥ 2 cần
-`aisef approve improve` trừ `--auto`.
+Evidence-driven improvement loop (ADR-004 R3): QA → behaviour ledger → **one**
+repair story for one GAP/REOPENED behaviour (`STORY-RP-01` inside `EPIC-RP-01`,
+generated by code) → `run` like any other story → QA → a `loops[]` marker plus
+`LOOP-REPORT-<n>.md`. The loop stops in code: no gaps left, `improve.max_loops`
+reached, marginal improvement ≤ 0 for `improve.flat_loops` consecutive loops,
+`improve.cost_cap_usd` exceeded, or the repair story is blocked by the plan
+(handed back to a human with the reviewer's words). Loops from the second one on
+need `aisef approve improve` unless `--auto`.
 
 ```bash
 aisef run --verify-only --story STORY-01-07
 ```
 
-Story trượt chỉ vì môi trường đo (e2e nhạy tải máy) thì không cần trả tiền
-cho một phiên developer để dựng lại mã đã có (ADR-004 R13): lượt kiểm-lại
-lấy ứng viên ở HEAD nhánh story, chạy lại đúng phép kiểm ✗/thiếu ở SHA ấy,
-giữ rà soát và bảo mật đã có ở cùng SHA, chấm đủ cổng; đạt thì merge như lượt
-thường, trượt thì `failed` và không ăn vào `run.max_retries`.
+When a story fails only because of the measuring environment (end-to-end tests
+sensitive to machine load), there is no need to pay for a developer session that
+rebuilds code that already exists (ADR-004 R13): the re-verification run takes
+the candidate at the head of the story branch, re-runs exactly the checks that
+were ✗ or missing at that SHA, keeps the review and security verdicts from the
+same SHA, and scores the full gate. Passing merges as usual; failing marks
+`failed` and does not consume `run.max_retries`.
 
-## Cổng
+## Gates
 
-Tám cổng, mỗi cổng hai lớp. **Cổng máy** chạy trước — nó bắt được thứ máy
-bắt tốt hơn người (chu trình phụ thuộc, yêu cầu không kiểm chứng được,
-story không khai phạm vi ghi). **Cổng người** chạy sau, trên thứ đã sạch.
+Eight gates, each with two layers. The **machine gate** runs first — it catches
+what machines catch better than people (dependency cycles, requirements that
+cannot be verified, stories that declare no write scope). The **human gate**
+runs afterwards, on something already clean.
 
-Phê duyệt là **trạng thái trên đĩa**, không phải câu hỏi trong phiên chat:
-người duyệt có thể là người khác, lúc khác, trên máy khác. Bản ghi phê
-duyệt gắn với **băm nội dung** artifact — sửa tài liệu sau khi duyệt thì
-phê duyệt hết hiệu lực, và sửa tầng trên làm mọi tầng dưới thành `stale`.
+Approval is **state on disk**, not a question inside a chat session: the approver
+may be a different person, at a different time, on a different machine. An
+approval record is bound to the artifact's **content hash** — editing a document
+after approval voids it, and re-approving an upper layer marks every layer below
+`stale`.
 
-## Guard
+## Guards
 
-Tám guard, mỗi guard là một lệnh trả mã thoát, nối vào ba mốc vòng đời:
+Eight guards, each a command returning an exit code, wired into three lifecycle
+moments:
 
-| Mốc | Guard |
+| Moment | Guards |
 |---|---|
-| trước mỗi tool | `write-scope` · `destructive` · `secret` · `git-stage` · `injection` · `process-ref` (luật 6: không mã story/epic trong nguồn) |
-| sau mỗi tool | `diff-scope` |
-| khi agent định dừng | `completion` |
+| before every tool call | `write-scope` · `destructive` · `secret` · `git-stage` · `injection` · `process-ref` (rule 6: no story/epic codes in source) |
+| after every tool call | `diff-scope` |
+| when the agent tries to stop | `completion` |
 
-Guard nằm ở phía framework, không ở phía client — client không được tin.
-Cả Claude Code và OpenCode đều đã **chứng minh bằng phép thử trên agent
-thật** rằng guard chặn *trước* khi tool chạy, chứ không phải phát hiện
-sau. Client nào không gắn được guard tiền kiểm thì `aisef verify` chạy
-lại toàn bộ trên diff, và `aisef compile` ghi rõ mức bảo đảm thấp hơn
-vào báo cáo thay vì im lặng — năng lực là thứ được **khai và kiểm**, mặc
-định là "chưa chứng minh", không phải "chắc là được". Trong V1, OpenCode
-là client **hạng hai** theo quyết định V1: guard chặn được (hợp quy 7/7), và từ 2026-09-05 `--format json` cho luồng máy đọc được (tool, token, cost theo nhà cung cấp) — chưa lên hạng nhất vì chưa đủ số lần hợp quy hook ổn định; chi phí trước đó không đo
-được từ harness; nó không chặn phát hành.
+Guards live on the framework side, not the client side — the client is not
+trusted. Both Claude Code and OpenCode have **proven on a real agent** that
+guards block *before* the tool runs rather than detecting afterwards. A client
+that cannot host pre-execution guards gets `aisef verify`, which re-runs
+everything against the diff, and `aisef compile` records the lower level of
+assurance in its report instead of staying silent — capability is **declared and
+tested**, defaulting to "unproven", never to "probably fine". In V1 OpenCode is a
+**second-class** client: guards do block (conformance 9/10) and since 2026-09-05
+`--format json` gives a machine-readable stream (tools, tokens, cost per
+provider). It has not been promoted because hook conformance has not been stable
+often enough; it does not block releases.
 
-## Lỗi thật đã gặp
+## Real bugs already hit
 
-Hai mươi lăm lỗi tìm bằng đo trên agent thật, xếp theo mười một lớp nguyên nhân kèm phép hồi quy: `docs/FAILURE-TAXONOMY.md`. Lỗi mới thì thêm một dòng vào đó cùng commit với test. Thay đổi theo phiên bản, kèm việc phải làm khi nâng cấp: `CHANGELOG.md`.
+Thirty-one bugs found by measurement on real agents, grouped into eleven cause
+classes with a regression check each: `docs/FAILURE-TAXONOMY.md`. A new bug adds
+a line there in the same commit as its test. Changes per version, and what to do
+when upgrading: `CHANGELOG.md`.
 
-## Hợp quy client
+## Client conformance
 
-Hook và plugin là tạo tác **biên dịch ra** — đúng cú pháp không có nghĩa là
-client chạy chúng. Bốn lỗi thật (31, 39, 40, 41) đều thuộc lớp này, và unit
-test không bắt được theo định nghĩa. Bộ hợp quy chạy bảy phép thử trên
-client thật, worktree thật, guard thật, `.claude/` không commit:
+Hooks and plugins are **compiled artifacts** — being syntactically valid does not
+mean the client runs them. Bug 31 is the most recent example: a wheel install
+compiled a hook pointing at a path that did not exist, valid syntax, and **no
+guard ran at all**. Unit tests cannot catch this class by definition. The
+conformance suite runs ten probes on a real client, a real worktree, real
+guards, with `.claude/` never committed:
 
 ```bash
 AISEF_CONFORMANCE=1 python3 -m unittest tests.conformance -v
 ```
 
-Kết quả ghép vào `docs/CONFORMANCE.md` — mỗi ô là một phiên agent, đọc từ
-đĩa (tệp còn/mất), từ luồng `tool_use` và bằng chứng guard tự ghi, không từ
-lời agent. Dự án thử và log thô từng phép giữ ở `.conformance/<client>/`
-(đổi bằng `AISEF_CONFORMANCE_DIR`) để tra lại một ô ✗ mà không phải đoán.
-Bộ chạy **không** thừa hưởng biến `CLAUDE_*` của phiên gọi nó — chạy hợp
-quy từ bên trong một phiên Claude là chuyện có thật, và phiên con thừa hưởng
-cờ của phiên cha thì đo sai. Cổng
-phát hành của chính kho này đọc bảng đó bằng code
-(`AISEF_RELEASE=1 python3 -m unittest tests.test_release_gate`): cột
-`claude` phải đủ năm ô ✅ và bảng không cũ hơn 14 ngày. OpenCode là hạng
-hai trong V1 — có cột, không chặn. CI: `.github/workflows/conformance.yml`
-chạy tuần.
+Results land in `docs/CONFORMANCE.md` — every cell is one agent session, read
+from disk (files present or gone), from the `tool_use` stream, and from evidence
+the guards wrote themselves, never from what the agent said. The scratch project
+and raw logs of each probe stay in `.conformance/<client>/` (changeable with
+`AISEF_CONFORMANCE_DIR`) so a ✗ can be inspected instead of guessed at. The suite
+deliberately does **not** inherit `CLAUDE_*` variables from the session that
+launched it — running conformance from inside a Claude session is a real
+scenario, and a child inheriting the parent's flags measures the wrong thing.
+This repository's own release gate reads that table in code
+(`AISEF_RELEASE=1 python3 -m unittest tests.test_release_gate`): the `claude`
+column must show ten ✅ and the table must be no older than 14 days. OpenCode is
+second-class in V1 — it has a column, it does not block. CI:
+`.github/workflows/conformance.yml` runs weekly.
 
-## Phát hành
+## Releasing
 
-Gói, module Python và lệnh cùng tên **`aisef`** (từ 0.2.0; 0.1.0 cài `aisef` nhưng gõ `aisdlc` — bí danh cũ còn chạy tới 0.3.0, có cảnh báo).
-Điều kiện đọc bằng lệnh, không bằng cảm giác:
+Package, Python module and command all share the name **`aisef`** (since 0.2.0;
+0.1.0 installed as `aisef` but was typed `aisdlc` — that alias still works until
+0.3.0 and prints a warning). Release conditions are read by command, not by
+feeling:
 
 ```bash
-python3 -m unittest discover -s tests -q && AISEF_RELEASE=1 AISEF_ACCEPTANCE=<dự án nghiệm thu> python3 -m unittest tests.test_release_gate -q
+python3 -m unittest discover -s tests -q && AISEF_RELEASE=1 AISEF_ACCEPTANCE=<acceptance project> python3 -m unittest tests.test_release_gate -q
 ```
 
-`AISEF_ACCEPTANCE` trỏ vào dự án dogfood đã nghiệm thu (v0.1.0: `e9`, phạm vi
-EPIC-01): cổng đọc `pre-deploy-report.json` (đạt, có phạm vi, miễn có lý do)
-và phê duyệt `pre-deploy` trên đúng bản ấy. Không đặt thì bỏ qua có nêu tên —
-không tính là đạt.
+`AISEF_ACCEPTANCE` points at the dogfood project that has been accepted (v0.1.0:
+`e9`, scope EPIC-01): the gate reads `pre-deploy-report.json` (passed, has a
+declared scope, waivers carry reasons) and the `pre-deploy` approval bound to
+that exact report. Unset, it skips with a named reason — which is not a pass.
 
 ```bash
 uv build && uvx twine check dist/*
 ```
 
-`.github/workflows/release.yml` publish bằng *trusted publishing* khi đẩy tag
-`v*` — không có token nào trong kho. Việc làm **một lần bằng tay**, bằng tài
-khoản tổ chức: tạo project `aisef` trên PyPI và khai trusted publisher
-(kho này · workflow `release.yml` · environment `pypi`). Sau đó:
+`.github/workflows/release.yml` publishes through *trusted publishing* when a
+`v*` tag is pushed — no token lives in the repository. The **one-time manual
+step**: create the `aisef` project on PyPI and declare the trusted publisher
+(this repository · workflow `release.yml` · environment `pypi`). Renaming the
+repository means re-declaring the publisher, because PyPI matches the exact
+`owner/repo` string carried by the OIDC token. Then:
 
 ```bash
-git tag v0.1.0 && git push --tags
+git tag vX.Y.Z && git push origin vX.Y.Z
 ```
 
-Kho hồi quy dogfood (`tests/dogfood/`, bật bằng `AISEF_DOGFOOD=1`) dựng lại
-dự án thử `par` từ đầu vào trong kho và so với mốc đã đo — chạy trước mỗi tag.
+The dogfood regression corpus (`tests/dogfood/`, enabled with
+`AISEF_DOGFOOD=1`) rebuilds the `par` sample project from the inputs stored in
+the repository and compares against the measured baseline — run it before every
+tag.
 
-### Giới hạn đã biết của v0.1.0
+### Known limitations
 
-Khai ở đây vì mọi claim phải có bằng chứng; thứ chưa chứng minh gọi là chưa
-chứng minh (quyết định chủ đầu tư 2026-09-06, `docs/RELEASE-PLAN-v0.1.0.md` §0):
+Declared here because every claim needs evidence; what has not been proven is
+called unproven (owner decision 2026-09-06, `docs/RELEASE-PLAN-v0.1.0.md` §0):
 
-- **Phạm vi nghiệm thu dogfood là EPIC-01 của `e9`** (7 story, `aisef
-  pre-deploy --epic EPIC-01`). EPIC-02..05 (16 story) chưa chạy — báo cáo ghi
-  "ngoài phạm vi", không phải "xong". `e9` chưa phải sản phẩm được nghiệm thu
-  hoàn chỉnh; nó là corpus nghiệm thu của framework.
-- **OpenCode là client hạng hai**: hợp quy 9/10 (C9 model từ chối, không kết
-  luận), không có đầu ra máy đọc ổn định; claim phát hành dựa trên Claude Code.
-- **Agent trong container chưa có cách ly credential** (S1 blocked): V1 chạy
-  agent trên host, chỉ kiểm định trong container; `doctor`/`pre-deploy` nêu
-  tên bảo đảm thiếu, không im lặng.
-- **`mutation` ở môi trường nghiệm thu là KHÔNG CHẠY ĐƯỢC** (công cụ chưa cài);
-  được miễn có lý do ở `verify.waiver_reason`, hiện ◇, không bao giờ thành ✅.
-  `image-scan` cùng loại (docker scout đòi đăng nhập, trivy/grype vắng).
-- **`skills.offer`/`skills.inline` tắt** (A/B không thấy gain), **`repo_map`
-  tắt** (`context.max_repo_map_chars = 0`, A/B hoãn sau v0.1.0).
-- **`coverage`**: harness đọc số từ runner (`--coverage`/`--cov`); dự án chưa
-  bật thì mục cổng là ○ chưa cấu hình, không phải đạt.
+- **The dogfood acceptance scope is EPIC-01 of `e9`** (7 stories, `aisef
+  pre-deploy --epic EPIC-01`). EPIC-02..05 (16 stories) never ran — the report
+  says "out of acceptance scope", not "done". `e9` is not a finished accepted
+  product; it is the framework's acceptance corpus.
+- **OpenCode is a second-class client**: conformance 9/10 (on C9 the model
+  refused, so the probe is inconclusive), no stable machine-readable output;
+  release claims rest on Claude Code.
+- **An agent inside a container still has no credential isolation** (S1
+  blocked): V1 runs the agent on the host and only the verification suite in a
+  container; `doctor` and `pre-deploy` name the missing guarantees instead of
+  staying silent.
+- **`mutation` is UNRUNNABLE in the acceptance environment** (the tool is not
+  installed); it is waived with a reason in `verify.waiver_reason`, shown as ◇,
+  and never becomes ✅. `image-scan` is the same case (docker scout requires a
+  login, trivy and grype are absent).
+- **`skills.offer` and `skills.inline` are off** (A/B measured no gain);
+  **`repo_map` is off** (`context.max_repo_map_chars = 0`, its A/B deferred).
+- **`coverage`**: the harness reads the number the runner prints
+  (`--coverage`/`--cov`); a project that has not enabled it gets ○ "not
+  configured", which is not a pass.
 
-## Khi cổng chặn
+## When a gate blocks
 
-Cổng chặn là framework đang làm việc, không phải framework hỏng. Ba ca hay
-gặp và cách xử đúng:
+A blocking gate is the framework working, not the framework broken. Three common
+cases and the correct response:
 
-| Cổng báo | Nghĩa là | Làm gì |
+| The gate says | It means | Do this |
 |---|---|---|
-| `mockup còn N chỗ chưa chốt` | mockup gặp câu hỏi chưa ai trả lời và **đánh dấu** thay vì tự quyết | trả lời câu hỏi (thường nằm ở `open_questions` của PRD/UX), sửa tài liệu, dựng lại mockup |
-| `story đụng vào yêu cầu đang bị câu hỏi mở chặn` | epic gán một FR mà PRD ghi là chưa quyết được | trả lời câu hỏi, hoặc bỏ FR đó khỏi story |
-| `merge đụng …` | hai story cùng sửa một file | `write_scope` khai sai — sửa ở story, **không** gỡ conflict cho xong |
+| `mockup has N unresolved spots` | the mockup hit a question nobody answered and **marked** it instead of deciding alone | answer the question (usually in the PRD/UX `open_questions`), fix the document, rebuild the mockup |
+| `story touches a requirement blocked by an open question` | an epic assigned an FR the PRD records as undecided | answer the question, or drop that FR from the story |
+| `merge conflict in …` | two stories edited the same file | the `write_scope` was declared wrong — fix it in the story, do **not** just resolve the conflict |
 
-`--force` có ở `approve` và `run` cho trường hợp cố ý bỏ qua. Dùng nó là
-một quyết định, và nó được ghi lại: bản ghi phê duyệt giữ ghi chú, báo cáo
-nghiệm thu hiện đúng trạng thái từng cổng.
+`--force` exists on `approve` and `run` for deliberate overrides. Using it is a
+decision, and it is recorded: the approval keeps the note, and the acceptance
+report shows each gate's true state.
 
-## Chạy song song
+## Running in parallel
 
-Epic chạy tuần tự. Trong một epic, hai story chỉ được cùng đợt khi **hết
-phụ thuộc** *và* **phạm vi ghi rời nhau** — thiếu điều kiện thứ hai thì hai
-story cùng sửa một file và người thua là người merge sau. Mỗi story chạy
-trong worktree git riêng; merge tuần tự cuối đợt. Conflict lúc merge không
-được tự gỡ: nó là **bằng chứng `write_scope` khai sai**.
+Epics run sequentially. Inside an epic two stories share a wave only when they
+have **no dependencies left** *and* **disjoint write scopes** — without the
+second condition they edit the same file and whoever merges last loses. Every
+story runs in its own git worktree; merges happen one at a time at the end of the
+wave. A merge conflict must not be resolved silently: it is **evidence that a
+`write_scope` was declared wrong**.
 
-## Cấu trúc
+## Layout
 
 ```
 aisef/
-  cli/              bộ lệnh chia theo pha, mọi lệnh gọi-một-lần, không daemon
-  config.py         ngưỡng và cấu hình, có kiểu, có kiểm
-  clients/          Claude Code · OpenCode; năng lực được **khai**, không giả định
-  control/          cổng, phê duyệt, xếp lịch, worktree, chuẩn hoá tài liệu BMAD
-  harness/          prompt · tool · sandbox · guard · quan sát · map mockup
-  kit/              catalog skill, lọc bảo mật hai tầng, hiến pháp, prompt, skill riêng
+  cli/              commands grouped by phase, every command one-shot, no daemon
+  config.py         thresholds and configuration, typed and validated
+  clients/          Claude Code · OpenCode; capabilities are **declared**, never assumed
+  control/          gates, approvals, scheduling, worktrees, BMAD document normalisation
+  harness/          prompts · tools · sandbox · guards · observability · mockup mapping
+  kit/              skill catalog, two-stage security filter, constitution, prompts, own skills
   phases/           plan · mockup · implement · run · qa · deploy · report
 docs/
-  SOLUTION.md              giải pháp tổng thể và vì sao chọn như vậy
-  EXECUTION-PLAN.md        kế hoạch thực thi, trạng thái từng hạng mục
-  REQUIREMENTS-EVIDENCE.md R1–R14 → test chạy được
-  SPIKE-REPORT.md          kết quả 7 spike kiểm chứng khả thi
+  SOLUTION.md              the whole design and why it is shaped this way
+  EXECUTION-PLAN.md        execution plan and the state of each item
+  REQUIREMENTS-EVIDENCE.md R1–R14 → runnable tests
+  SPIKE-REPORT.md          results of the seven feasibility spikes
+  HUONG-DAN-SU-DUNG.md     step-by-step user guide (Vietnamese)
+  DANH-GIA-360-VA-LO-TRINH.md  360° assessment and roadmap (Vietnamese)
 ```
 
-## Bằng chứng, không tự khai
+## Evidence, not self-report
 
-Mọi cổng đọc `_bmad-output/evidence/{story}.jsonl` — lần chạy test, lần
-sửa file, lần gọi model kèm chi phí và độ trễ, lần đối chiếu mockup. Câu
-"đã hoàn thành" của agent không được tính là gì cả.
+Every gate reads `_bmad-output/evidence/{story}.jsonl` — each test run, each file
+edit, each model call with its cost and latency, each mockup comparison. An
+agent saying "done" counts for nothing.
 
-Cụ thể, một story chỉ xong khi: test xanh **và** xanh sau lần sửa cuối ·
-lint sạch · thay đổi nằm trong phạm vi khai báo · màn hình thật dựng đủ
-component mockup đã hứa · rà soát độc lập (phiên khác, cấm sửa code) không
-còn mục chặn · không có test nào rỗng khẳng định.
+Concretely, a story is finished only when: tests are green **and** green after
+the last edit · lint is clean · changes stayed inside the declared scope · the
+real screen renders every component the mockup promised · an independent review
+(a separate session, forbidden to edit code) has no blocking findings · and no
+test is empty of assertions.

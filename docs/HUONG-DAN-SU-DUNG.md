@@ -888,6 +888,6 @@ Giá trị trong ngoặc là mặc định.
 
 ---
 
-Tài liệu liên quan trong kho: `README.md` (tóm tắt), `docs/SOLUTION.md` (thiết
+Tài liệu liên quan trong kho: `README.md` (tóm tắt, tiếng Anh) và `README.vi.md` (bản tiếng Việt), `docs/SOLUTION.md` (thiết
 kế đầy đủ), `docs/FAILURE-TAXONOMY.md` (lỗi thật đã gặp và cách chặn tái diễn),
 `CHANGELOG.md` (đổi gì giữa các phiên bản, và phải làm gì khi nâng cấp).
