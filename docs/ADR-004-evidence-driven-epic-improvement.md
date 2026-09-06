@@ -625,6 +625,16 @@ Dừng đúng điều kiện (2): đủ `improve.max_loops`. Bất biến (b) gi
 
 **Lỗi 25 (R3 × cổng người), lộ khi gọi `improve` lần hai (05:44):** story sửa ghi vào `stories.index.json` làm phê duyệt `stories`/`readiness` stale → lần gọi kế bị chặn bởi chính vòng trước. Sửa: `approvals._artifact_hash` băm chỉ mục chuẩn hoá và bỏ `STORY-RP-*`/`EPIC-RP-*` (story sửa do cổng `improve` quản); một lần duyệt lại cho dự án đã có phê duyệt cũ (e9 làm 05:5x). Test `TestStorySuaKhongLamStaleCongStories`.
 
+**B1 tiếp (vòng 3–5, 05:48–07:1x, `--max-loops 8`, trần $150) — đường cong phẳng rồi âm, dừng đúng điều kiện (3):**
+
+| vòng | story sửa | hành vi | kết cục | chi phí | Δverified − Δreopened | gap epic |
+|---|---|---|---|---|---|---|
+| 3 | STORY-RP-03 | AC-STORY-01-01-3 | XONG | $3,43 | **+1** | 15 → 14 |
+| 4 | STORY-RP-04 | AC-STORY-01-01-4 | CHƯA XONG (3 lượt, hết `max_retries`) | $14,63 | **−1** (R+1: lượt trượt làm đỏ một hành vi láng giềng — sổ ghi REOPENED dù chưa landed, đúng luật "đỏ vẫn tính") | 14 → 14 |
+| 5 | STORY-RP-05 | `qa:e2e` (gap cấp dự án) | CHƯA XONG | $11,25 | **−2** (V−2 R+2) | 14 → 16 |
+
+Dừng: "cải thiện biên ≤ 0 trong 2 vòng liền (loop-4, loop-5)" — `improve.flat_loops` = 2 làm đúng việc, trước khi chạm `max_loops` 8 và trần $150. Tổng B1 5 vòng ≈ $46: ba vòng đầu +1/vòng ($3–9), hai vòng sau âm ($11–15) khi hành vi còn lại không còn là "test thiếu mã" mà là `qa:*` cấp dự án và tiêu chí cần màn hình/route của story sau. Bài học cho R3: (a) thứ tự chọn gap nên ưu tiên `ac` có test id rõ trước `qa:*`; (b) một story sửa `qa:e2e` là bài toán khác hẳn (không có test AC để gắn) — cân nhắc loại `qa:*` khỏi hàng đợi sửa tự động, để người quyết (ghi P2, đo khi có bench). Sổ toàn dự án sau 5 vòng: 46 → 44 VERIFIED (hai hành vi bị lượt trượt làm đỏ, chưa ai chữa — chính là việc của vòng kế nếu mở lại).
+
 **Chưa đo:** đường cong nhiều vòng hơn (còn 15 gap; kỳ vọng phẳng khi tới các gap cần route/màn hình của story sau), và B3/B5/B6 trên `par`.
 
 **Chưa đo (B1):** e9 EPIC-01 với agent thật — ΔVERIFIED, REOPENED → 0,
