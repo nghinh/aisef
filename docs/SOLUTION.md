@@ -524,8 +524,8 @@ mang `kind` — ai chấm: `deterministic` · `structural` · `security` ·
 `model-judge` · `human` (`outcome.CHECK_KINDS`; bảng `gate.CHECK_KIND` một chỗ)
 — và `evidence`: con trỏ `seq` của sự kiện mục đã đọc, không chép nội dung;
 mục suy từ tham số (`phạm vi ghi`, `bảo mật`, `rà soát`) trỏ rỗng và nói rỗng.
-Tên mục là danh sách **đóng** `gate.CHECK_NAMES` (15 tên: 14 mục trên + họ
-`<kind>`; nop control V3 sẽ là 16). Mỗi tên có **ba control** ở
+Tên mục là danh sách **đóng** `gate.CHECK_NAMES` (16 tên: 15 mục trên + họ
+`<kind>`). Mỗi tên có **ba control** ở
 `tests/test_gate_qualification.py` — positive (bằng chứng tốt → ✅/–), negative
 hay mutant (bằng chứng xấu → ✗), env (môi trường/cấu hình không kết luận được →
 ⚠/○ có tên) — và `gate.qualification_table()` đọc tệp ấy bằng AST; báo cáo

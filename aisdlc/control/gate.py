@@ -51,9 +51,7 @@ from ..harness.tools import BASELINE_RUN, NOP_RUN
 #: positive · negative · env ở `tests/test_gate_qualification.py`. `<kind>` là
 #: **họ** mục theo hợp đồng kiểm định: tên mục thật là tên loại (`e2e`,
 #: `accessibility`, `perf`… — `phases/qa.py::KINDS` trừ unit/mockup-map/security
-#: đã có mục riêng). Chừa chỗ: **"test có kiểm được story"** (nop control,
-#: ADR-005 V3, luồng X3) — thêm `_nop_check` thì thêm tên vào đây và
-#: `CHECK_KIND` cùng một commit, không thì test meta đỏ.
+#: đã có mục riêng).
 CHECK_NAMES = (
     "bằng chứng đúng candidate",
     "guard có chạy",
@@ -66,6 +64,7 @@ CHECK_NAMES = (
     "tiêu chí có test",
     "coverage",
     "TDD",
+    "test có kiểm được story",
     "<kind>",
     "bảo mật",
     "rà soát",
@@ -88,6 +87,7 @@ CHECK_KIND = {
     "tiêu chí có test": "structural",
     "coverage": "deterministic",
     "TDD": "deterministic",
+    "test có kiểm được story": "deterministic",
     "<kind>": "deterministic",
     "bảo mật": "security",
     "rà soát": "model-judge",
@@ -337,6 +337,12 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
            if (goc is None or e.seq > goc.seq)
            and (not candidate or e.detail.get("candidate") == candidate)]
     moi = sau[-1] if sau else None
+    nop = evidence.last(TOOL_RUN, NOP_RUN)
+    # Con trỏ sự kiện đã đọc: baseline, lần test ở ứng viên, nop — cái nào có.
+    doc = [e.seq for e in (goc, moi, nop) if e is not None]
+
+    def ket(outcome, detail: str = "") -> Check:
+        return Check(ten, outcome, detail, evidence=doc)
 
     # Test mang mã tiêu chí **xanh** ở ứng viên — đối tượng của cả hai cấp.
     ac: list[str] = []
@@ -370,44 +376,43 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
                 loi.append(f"đổi tên test có sẵn để mang mã: {len(doi)} test đã xanh ở baseline dưới "
                            f"tên cũ — mã tiêu chí thành một cái tên, không phải một phép kiểm: {_ten(doi)}")
             if loi:
-                return Check(ten, False, "; ".join(loi) + ". Viết test mới cho tiêu chí, giữ test có sẵn nguyên tên")
+                return ket(False, "; ".join(loi) + ". Viết test mới cho tiêu chí, giữ test có sẵn nguyên tên")
 
     # ---- cấp 2
-    nop = evidence.last(TOOL_RUN, NOP_RUN)
     if nop is None:
-        return Check(ten, Outcome.NOT_APPLICABLE,
+        return ket(Outcome.NOT_APPLICABLE,
                      "harness không chạy nop nào (chạy tay, nhật ký trước ADR-005 V3) — không so được")
     d = nop.detail
     if d.get("disabled"):
-        return Check(ten, Outcome.NOT_APPLICABLE, "tắt bởi cấu hình `verify.nop`")
+        return ket(Outcome.NOT_APPLICABLE, "tắt bởi cấu hình `verify.nop`")
     if d.get("skipped"):
         if "files" in d and not d["files"]:
-            return Check(ten, Outcome.NOT_APPLICABLE, "story không thêm/sửa tệp test")
-        return Check(ten, Outcome.UNCONFIGURED, f"không có nop: {d['skipped']}")
+            return ket(Outcome.NOT_APPLICABLE, "story không thêm/sửa tệp test")
+        return ket(Outcome.UNCONFIGURED, f"không có nop: {d['skipped']}")
     if d.get("unrunnable") and not d.get("test_format"):
-        return Check(ten, Outcome.UNRUNNABLE,
+        return ket(Outcome.UNRUNNABLE,
                      f"nop ở SHA cha không chạy được ({d['unrunnable']}) — không so được")
     cha = str(d.get("parent") or "")[:7] or "cha"
     if moi is None:
-        return Check(ten, False, "chưa có lần test nào ở ứng viên — chưa biết test nào xanh để so với SHA cha")
+        return ket(False, "chưa có lần test nào ở ứng viên — chưa biết test nào xanh để so với SHA cha")
     if d.get("test_format") and moi.detail.get("test_format") and acceptance > 0:
         if not ac:
-            return Check(ten, False, "chưa có test nào mang mã tiêu chí xanh ở ứng viên — không có gì "
+            return ket(False, "chưa có test nào mang mã tiêu chí xanh ở ứng viên — không có gì "
                                      "để kiểm ở SHA cha (xem mục tiêu chí có test)")
         khong = set(d.get("failed_ids") or []) | set(d.get("skipped_ids") or [])
         xanh_nop = {t for t in d.get("test_ids") or [] if t not in khong}
         van_xanh = [t for t in ac if t in xanh_nop]
         if van_xanh:
-            return Check(ten, False, f"test không kiểm được gì — xanh cả khi không có mã của story "
+            return ket(False, f"test không kiểm được gì — xanh cả khi không có mã của story "
                                      f"(SHA cha {cha}): {_ten(van_xanh)}")
-        return Check(ten, True, f"{len(ac)} test mang mã tiêu chí đỏ hoặc không tồn tại ở SHA cha {cha}"
+        return ket(True, f"{len(ac)} test mang mã tiêu chí đỏ hoặc không tồn tại ở SHA cha {cha}"
                                 + (f"; {cap1}" if cap1 else ""))
     if nop.ok:
-        return Check(ten, False, f"bộ test xanh ở SHA cha {cha} với tệp test của story chép vào — "
+        return ket(False, f"bộ test xanh ở SHA cha {cha} với tệp test của story chép vào — "
                                  f"test của story không kiểm được gì ({_ten(list(d.get('files') or []), 3)})")
     if acceptance <= 0:
-        return Check(ten, True, f"bộ test đỏ ở SHA cha {cha} — story không khai tiêu chí, không so theo mã")
-    return Check(ten, Outcome.UNCONFIGURED,
+        return ket(True, f"bộ test đỏ ở SHA cha {cha} — story không khai tiêu chí, không so theo mã")
+    return ket(Outcome.UNCONFIGURED,
                  "không đọc được tên test — chỉ biết bộ test đỏ ở SHA cha, không biết có phải test của "
                  "story; dùng reporter in tên (`node --test`, `vitest --reporter=verbose`, `pytest -v`)")
 

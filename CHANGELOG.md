@@ -242,12 +242,12 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 - **Hợp đồng chấm tối thiểu** (ADR-005 V9): `Check.kind` (deterministic ·
   structural · security · model-judge · human — `outcome.CHECK_KINDS`,
   `gate.CHECK_KIND` một chỗ) và `Check.evidence` (con trỏ `seq` sự kiện đã đọc;
-  12/15 mục trỏ, `phạm vi ghi`/`bảo mật`/`rà soát` rỗng vì suy từ tham số);
-  `gate.CHECK_NAMES` danh sách đóng 15 tên (14 mục + họ `<kind>`);
+  13/16 mục trỏ, `phạm vi ghi`/`bảo mật`/`rà soát` rỗng vì suy từ tham số);
+  `gate.CHECK_NAMES` danh sách đóng 16 tên (15 mục + họ `<kind>`, tính cả V3);
   `tests/test_gate_qualification.py` mỗi tên 3 control positive · negative ·
   env + test meta (tên lạ trong `gate.py`, thiếu control, `CHECK_KIND` lệch);
   `gate.qualification_table()` đọc AST tệp test; `gate:verdict` ghi `checks[]`
-  đủ `kind`/`evidence`; báo cáo in "mục cổng có đủ 3 control: 15/15". Không có
+  đủ `kind`/`evidence`; báo cáo in "mục cổng có đủ 3 control: 16/16". Không có
   `blocking` (YAGNI). `Check("lint", True)` cũ không đổi.
 - **Mục cổng `test có kiểm được story`** (ADR-005 V3, ngay sau `TDD`): test
   mang `AC-<story>-i` phải đỏ khi không có mã của story — cấp 1 $0 so với
