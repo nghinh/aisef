@@ -1,0 +1,52 @@
+diff --git a/aisdlc/control/approvals.py b/aisdlc/control/approvals.py
+index 4e85b56..676412a 100644
+--- a/aisdlc/control/approvals.py
++++ b/aisdlc/control/approvals.py
+@@ -113,6 +113,38 @@ def _current_user() -> str:
+     return os.environ.get("AISDLC_APPROVER") or os.environ.get("USER") or "unknown"
+ 
+ 
++#: Tiền tố story/epic do vòng cải tiến (ADR-004 R3) sinh bằng code.
++REPAIR_PREFIX = ("STORY-RP-", "EPIC-RP-")
++
++
++def _artifact_hash(path: Path) -> str:
++    """Băm một artifact của cổng; riêng `stories.index.json` băm **nội dung
++    đã chuẩn hoá và bỏ story sửa**, không băm byte.
++
++    Story sửa do `aisdlc improve` sinh ra và được cổng người `improve` quản.
++    Băm cả chúng thì mỗi vòng cải tiến làm cổng `stories`/`readiness` đã
++    duyệt thành stale, và lần gọi `improve` kế bị chính vòng trước chặn (đo
++    e9 2026-09-06 05:44). Chuẩn hoá (khoá sắp xếp, không phụ thuộc khoảng
++    trắng) để một lần ghi lại cùng nội dung không làm stale. Đổi cách băm
++    làm phê duyệt `stories`/`readiness` đã ký trước bản này stale **một lần**
++    — nói ra ở đây thay vì để người dùng đoán. Không đọc được JSON thì băm byte.
++    """
++    if path.name != STORIES_INDEX or not path.is_file():
++        return sha256_of(path)
++    try:
++        data = json.loads(path.read_text(encoding="utf-8"))
++    except (OSError, json.JSONDecodeError):
++        return sha256_of(path)
++    if not isinstance(data, dict):
++        return sha256_of(path)
++    loc = dict(data)
++    for key in ("stories", "epics"):
++        if isinstance(loc.get(key), list):
++            loc[key] = [x for x in loc[key]
++                        if not (isinstance(x, dict) and str(x.get("id", "")).startswith(REPAIR_PREFIX))]
++    return hashlib.sha256(json.dumps(loc, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
++
++
+ def sha256_of(path: Path) -> str:
+     """Băm nội dung artifact. Trả chuỗi rỗng nếu file chưa tồn tại."""
+     if not path.is_file():
+@@ -177,7 +209,7 @@ class ApprovalStore:
+ 
+     def content_hash(self, gate: Gate) -> str:
+         """Băm gộp toàn bộ file của cổng, theo thứ tự khai báo."""
+-        parts = [f"{p.relative_to(self.root)}:{sha256_of(p)}" for p in self.artifact_paths(gate)]
++        parts = [f"{p.relative_to(self.root)}:{_artifact_hash(p)}" for p in self.artifact_paths(gate)]
+         return hashlib.sha256("\n".join(parts).encode()).hexdigest()
+ 
+     def load(self, gate: Gate) -> Approval | None:

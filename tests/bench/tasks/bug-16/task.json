@@ -1,0 +1,31 @@
+{
+  "id": "bug-16",
+  "source": "bug",
+  "base": "ab0ea25b88fa2163903a6b04c71d89ac1bb013c1",
+  "candidate": "249388933043fe82caf4a27384099a5d7a4949e4",
+  "verify": "python3 -m unittest -v tests.test_findings",
+  "write_scope": [
+    "aisdlc"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [
+    "tests.test_findings.TestMultilineFindings.test_continuation_lines_belong_to_the_finding",
+    "tests.test_findings.TestMultilineFindings.test_single_line_findings_unchanged",
+    "tests.test_findings.TestPersistVerdict.test_full_text_is_kept_on_disk"
+  ],
+  "p2p_ids": [],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": true,
+    "gold_pass": true,
+    "runs": 3
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "",
+  "fix_commit": "249388933043fe82caf4a27384099a5d7a4949e4"
+}

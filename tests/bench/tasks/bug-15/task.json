@@ -1,0 +1,35 @@
+{
+  "id": "bug-15",
+  "source": "bug",
+  "base": "2a68604024ecf1df80a3ab55c43d77a3aef4068b",
+  "candidate": "d5f517d44f0809b35c0858d2bdf1e9f0d5eeaf86",
+  "verify": "python3 -m unittest -v tests.test_mockup_map",
+  "write_scope": [
+    "aisdlc"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [
+    "tests.test_mockup_map.TestAppServerTrust.test_refuses_foreign_responder",
+    "tests.test_mockup_map.TestAppServerTrust.test_stop_kills_whole_process_group"
+  ],
+  "p2p_ids": [
+    "tests.test_mockup_map.TestAppServer.test_dev_server_that_dies_is_reported",
+    "tests.test_mockup_map.TestAppServer.test_url_join",
+    "tests.test_mockup_map.TestRouteRewrite.test_params_get_a_sample_value",
+    "tests.test_mockup_map.TestRouteRewrite.test_plain_route_untouched"
+  ],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": true,
+    "gold_pass": false,
+    "runs": 3
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "base+test+gold còn đỏ: tests.test_mockup_map.TestLoadHalf.test_loads_only_the_named_screen, tests.test_mockup_map.TestLoadHalf.test_sample_data_is_not_a_commitment, tests.test_mockup_map.TestLoadHalf.test_slice_carries_route_and_components, tests.test_mockup_map.TestLoadHalf.test_slice_points_at_mockup_and_screenshot, tests.test_mockup_map.TestLoadHalf.test_story_without_screens_says_so",
+  "fix_commit": "d5f517d44f0809b35c0858d2bdf1e9f0d5eeaf86"
+}

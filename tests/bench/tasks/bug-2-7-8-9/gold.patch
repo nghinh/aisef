@@ -1,0 +1,163 @@
+diff --git a/aisdlc/control/gate.py b/aisdlc/control/gate.py
+index d58a278..7666018 100644
+--- a/aisdlc/control/gate.py
++++ b/aisdlc/control/gate.py
+@@ -91,7 +91,11 @@ def evaluate(
+         ))
+ 
+     completion = check_completion(evidence)
+-    gate.checks.append(Check("test", completion.allowed, completion.reason.split("\n")[0]))
++    last_test = evidence.last(TOOL_RUN, "test")
++    if last_test is not None and last_test.detail.get("unrunnable"):
++        gate.checks.append(Check("test", Outcome.UNRUNNABLE, str(last_test.detail["unrunnable"])))
++    else:
++        gate.checks.append(Check("test", completion.allowed, completion.reason.split("\n")[0]))
+ 
+     lint = evidence.last(TOOL_RUN, "lint")
+     if lint is None:
+@@ -200,7 +204,10 @@ def evaluate(
+     for kind in contract or []:
+         if kind in ("unit", "mockup-map", "security"):
+             continue  # đã có mục riêng ở trên
+-        ran = evidence.last(TOOL_RUN, kind)
++        # `run_suite` ghi `qa:<kind>`; tên trần là của lần chạy tay/`aisdlc tool`.
++        # e9 2026-09-05: e2e/perf/accessibility chạy thật và xanh mà cổng báo
++        # "chưa cấu hình" vì chỉ tìm tên trần.
++        ran = evidence.last(TOOL_RUN, f"qa:{kind}") or evidence.last(TOOL_RUN, kind)
+         if ran is None:
+             gate.checks.append(Check(kind, Outcome.UNCONFIGURED))
+         elif ran.detail.get("skipped"):
+diff --git a/aisdlc/harness/guardrails.py b/aisdlc/harness/guardrails.py
+index 58dc524..ed7dbac 100644
+--- a/aisdlc/harness/guardrails.py
++++ b/aisdlc/harness/guardrails.py
+@@ -338,6 +338,12 @@ HARNESS_OWNED = (
+     "_bmad-output/sprint-status.json.lock",
+     "_bmad-output/compile-report.json",
+     ".aisdlc",
++    # Cấu hình client harness chép vào worktree (`WorktreeManager._carry_client_config`)
++    # — dự án không gitignore `.claude/` thì nó hiện là tệp chưa theo dõi và guard
++    # `diff-scope` chặn mọi lệnh vì "ngoài phạm vi ghi" (dogfood par 2026-09-05:
++    # 3/3 story trượt "phạm vi ghi" vì đúng tệp này).
++    ".claude/settings.json",
++    ".opencode",
+     *VENDOR_PATHS,
+ )
+ 
+@@ -449,6 +455,11 @@ def check_completion(evidence) -> Verdict:
+             f"tool test` rồi mới kết thúc — bằng chứng nằm ở kết quả chạy, "
+             f"không ở lời kể.",
+         )
++    if last.detail.get("unrunnable"):
++        # Không chạy được ≠ đỏ: agent không sửa được môi trường/lệnh test
++        # (ngoài phạm vi ghi), chặn Stop chỉ đốt lượt. Cổng story ghi
++        # UNRUNNABLE và vẫn chặn — với lý do đúng.
++        return ALLOW
+     if last.detail.get("skipped"):
+         # Chưa cấu hình ≠ đỏ. Chặn ở đây thì agent không sửa được gì (lệnh
+         # test là việc của dự án) và chỉ đốt lượt — đo ở hợp quy: Stop bị
+diff --git a/aisdlc/harness/tools.py b/aisdlc/harness/tools.py
+index 15c6c2a..8234548 100644
+--- a/aisdlc/harness/tools.py
++++ b/aisdlc/harness/tools.py
+@@ -99,6 +99,10 @@ class ToolResult:
+     ok: bool
+     exit_code: int = 0
+     stdout: str = ""
++    #: Công cụ không nạp được (MODULE_NOT_FOUND, command not found…) — không
++    #: phải test đỏ. Dogfood par 2026-09-05: `node --test src/` đỏ vì lệnh sai,
++    #: guard `completion` chặn Stop ~10 lần mỗi lượt, 3 story đốt $17.
++    unrunnable: str = ""
+     stderr: str = ""
+     duration_ms: int = 0
+     skipped: str = ""      # lý do không chạy được (không có lệnh cho stack này)
+@@ -214,10 +218,40 @@ def run_tool(
+         degraded=sb.degraded,
+         detail={"command": command, **sb.to_evidence()},
+     )
++    if not sb.ok:
++        res.unrunnable = unrunnable_reason(name, sb.exit_code, sb.stdout + "\n" + sb.stderr)
+     _record(res, story_id, artifact_root)
+     return res
+ 
+ 
++#: Dấu hiệu "công cụ không nạp được", không phải "test đỏ". 127 là mã POSIX
++#: cho lệnh không tìm thấy; phần còn lại là cách các hệ chạy khác nói cùng
++#: một chuyện. Gộp hai loại lại thì báo cáo chỉ sai chỗ cần sửa.
++MISSING_TOOL = (
++    "command not found",
++    "not found",
++    "cannot find module",
++    "module_not_found",
++    "no such file or directory",
++    "is not recognized as an internal or external command",
++)
++
++
++def unrunnable_reason(name: str, exit_code: int, output: str) -> str:
++    """Lý do một dòng nếu lần chạy là "không chạy được"; "" nếu là kết quả thật.
++    Với `test`, chỉ kết luận khi **không test nào xanh** — một test đỏ có
++    thông báo "not found" vẫn là test đỏ."""
++    low = output.lower()
++    hit = next((m for m in MISSING_TOOL if m in low), "")
++    if exit_code != 127 and not hit:
++        return ""
++    if name == "test":
++        from .testlog import parse as parse_testlog
++        if parse_testlog(output).passed:
++            return ""
++    return f"công cụ chưa cài hoặc không nạp được ({hit or 'exit 127'}) — dựng môi trường hoặc sửa lệnh rồi chạy lại"
++
++
+ def _record(res: ToolResult, story_id: str, artifact_root) -> None:
+     """Ghi bằng chứng. Không có story_id thì không ghi — tool chạy ngoài
+     ngữ cảnh story (ví dụ người gõ tay) không nên làm bẩn hồ sơ story."""
+@@ -226,6 +260,7 @@ def _record(res: ToolResult, story_id: str, artifact_root) -> None:
+     detail = {
+         "exit_code": res.exit_code,
+         "skipped": res.skipped,
++        "unrunnable": res.unrunnable,
+         "degraded": res.degraded,
+         "tail": res.tail(20),
+         **res.detail,
+diff --git a/aisdlc/phases/qa.py b/aisdlc/phases/qa.py
+index 0108fb1..b2e5418 100644
+--- a/aisdlc/phases/qa.py
++++ b/aisdlc/phases/qa.py
+@@ -30,7 +30,7 @@ from ..control.outcome import DEFAULT_REASON, Outcome
+ from ..config import Config
+ from ..harness import sandbox
+ from ..harness.observe import EvidenceStore
+-from ..harness.tools import command_for, image_for
++from ..harness.tools import command_for, image_for, unrunnable_reason
+ 
+ 
+ @dataclass(frozen=True)
+@@ -286,26 +286,8 @@ def _project_files(project: Path) -> list[str]:
+     return out
+ 
+ 
+-#: Dấu hiệu "công cụ không nạp được", không phải "test đỏ". 127 là mã
+-#: POSIX cho lệnh không tìm thấy; phần còn lại là cách các hệ chạy khác
+-#: nói cùng một chuyện. Gộp hai loại lại thì báo cáo chỉ sai chỗ cần sửa:
+-#: người đọc đi sửa test trong khi thứ hỏng là môi trường.
+-_MISSING_TOOL = (
+-    "command not found",
+-    "not found",
+-    "cannot find module",
+-    "module_not_found",
+-    "no such file or directory",
+-    "is not recognized as an internal or external command",
+-)
+-
+-
+ def _unrunnable_reason(exit_code: int, detail: str) -> str:
+-    low = detail.lower()
+-    hit = next((m for m in _MISSING_TOOL if m in low), "")
+-    if exit_code != 127 and not hit:
+-        return ""
+-    return "công cụ chưa cài hoặc không nạp được — dựng môi trường rồi chạy lại"
++    return unrunnable_reason("", exit_code, detail)
+ 
+ 
+ def run_suite(

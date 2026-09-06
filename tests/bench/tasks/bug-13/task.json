@@ -1,0 +1,57 @@
+{
+  "id": "bug-13",
+  "source": "bug",
+  "base": "e257b95f517ffac244cc15b7299dc0cab3e52812",
+  "candidate": "765d846d16603f25457221a68165a299000acaa0",
+  "verify": "python3 -m unittest -v tests.test_worktree",
+  "write_scope": [
+    "aisdlc"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [
+    "tests.test_worktree.TestLifecycle.test_stray_dir_is_not_a_worktree"
+  ],
+  "p2p_ids": [
+    "tests.test_worktree.TestCauHinhClientVaoWorktree.test_nothing_to_carry_is_fine",
+    "tests.test_worktree.TestCauHinhClientVaoWorktree.test_untracked_client_config_is_carried",
+    "tests.test_worktree.TestCommitStory.test_commits_only_inside_write_scope",
+    "tests.test_worktree.TestCommitStory.test_nothing_to_commit",
+    "tests.test_worktree.TestCommitStory.test_unknown_story",
+    "tests.test_worktree.TestLifecycle.test_create_is_idempotent",
+    "tests.test_worktree.TestLifecycle.test_create_makes_worktree_and_branch",
+    "tests.test_worktree.TestLifecycle.test_list_active",
+    "tests.test_worktree.TestLifecycle.test_not_a_repo_rejected",
+    "tests.test_worktree.TestLifecycle.test_recreate_after_remove_reuses_branch",
+    "tests.test_worktree.TestLifecycle.test_remove_can_delete_branch",
+    "tests.test_worktree.TestLifecycle.test_remove_keeps_branch_by_default",
+    "tests.test_worktree.TestMainRepo.test_from_inside_a_worktree",
+    "tests.test_worktree.TestMainRepo.test_from_the_repo_itself",
+    "tests.test_worktree.TestMainRepo.test_outside_git_returns_the_path",
+    "tests.test_worktree.TestNhanhStoryKhongBiCu.test_dung_nhau_thi_bao_chu_khong_chay_tiep",
+    "tests.test_worktree.TestNhanhStoryKhongBiCu.test_khong_de_ra_commit_merge_rong",
+    "tests.test_worktree.TestNhanhStoryKhongBiCu.test_nhanh_moi_khong_can_mang_gi",
+    "tests.test_worktree.TestNhanhStoryKhongBiCu.test_noi_lai_nhanh_cu_thi_mang_main_vao",
+    "tests.test_worktree.TestParallelMerge.test_clean_merge_is_not_flagged_as_misdeclared",
+    "tests.test_worktree.TestParallelMerge.test_disjoint_scopes_merge_cleanly",
+    "tests.test_worktree.TestParallelMerge.test_overlapping_writes_conflict_and_abort",
+    "tests.test_worktree.TestParallelMerge.test_wave_stops_at_first_conflict",
+    "tests.test_worktree.TestParallelMerge.test_worktree_dir_does_not_dirty_git_status",
+    "tests.test_worktree.TestSlug.test_empty_rejected",
+    "tests.test_worktree.TestSlug.test_normal_id",
+    "tests.test_worktree.TestSlug.test_unsafe_characters_replaced"
+  ],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": true,
+    "gold_pass": true,
+    "runs": 3
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "",
+  "fix_commit": "765d846d16603f25457221a68165a299000acaa0"
+}

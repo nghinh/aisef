@@ -1,0 +1,54 @@
+{
+  "id": "bug-11",
+  "source": "bug",
+  "base": "4c9dac0f86d71d6987bcaaab55c3889011769907",
+  "candidate": "219bd7888c14baaf3525aa6e6cade7551d323352",
+  "verify": "python3 -m unittest -v tests.test_clients",
+  "write_scope": [
+    "aisdlc"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [
+    "tests.test_clients.TestClaudeCommand.test_isolated_from_user_config"
+  ],
+  "p2p_ids": [
+    "tests.test_clients.TestCapabilityDeclaration.test_claude_blocks_at_source",
+    "tests.test_clients.TestCapabilityDeclaration.test_claude_has_no_degradations",
+    "tests.test_clients.TestCapabilityDeclaration.test_degradations_are_reported",
+    "tests.test_clients.TestCapabilityDeclaration.test_every_adapter_declares_every_capability",
+    "tests.test_clients.TestCapabilityDeclaration.test_opencode_chan_that_da_co_phep_thu",
+    "tests.test_clients.TestClaudeCommand.test_explicit_allowlist_replaces_default",
+    "tests.test_clients.TestClaudeCommand.test_max_turns_is_string",
+    "tests.test_clients.TestClaudeCommand.test_minimum_flags",
+    "tests.test_clients.TestClaudeCommand.test_optional_flags_absent_when_unset",
+    "tests.test_clients.TestClaudeCommand.test_settings_and_dirs",
+    "tests.test_clients.TestClaudeCommand.test_tool_lists",
+    "tests.test_clients.TestGuardRails.test_adapters_available_on_this_machine",
+    "tests.test_clients.TestGuardRails.test_missing_binary_returns_error_not_crash",
+    "tests.test_clients.TestGuardRails.test_missing_workdir_reported",
+    "tests.test_clients.TestKhongThuaHuongPhienCha.test_child_process_really_gets_the_clean_env",
+    "tests.test_clients.TestKhongThuaHuongPhienCha.test_claude_vars_are_dropped_but_anthropic_kept",
+    "tests.test_clients.TestOpenCodeCommand.test_bao_thang_cay_lam_viec_cho_opencode",
+    "tests.test_clients.TestOpenCodeCommand.test_model_flag",
+    "tests.test_clients.TestOpenCodeCommand.test_run_subcommand",
+    "tests.test_clients.TestOpenCodeLuongJson.test_capabilities_now_native",
+    "tests.test_clients.TestOpenCodeLuongJson.test_command_has_json_format",
+    "tests.test_clients.TestOpenCodeLuongJson.test_parse",
+    "tests.test_clients.TestSupportSemantics.test_only_native_and_emulated_block_at_source",
+    "tests.test_clients.TestTimeoutIsInfrastructureError.test_timeout_message_distinguishes_from_quality_failure"
+  ],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": true,
+    "gold_pass": true,
+    "runs": 3
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "",
+  "fix_commit": "219bd7888c14baaf3525aa6e6cade7551d323352"
+}

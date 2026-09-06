@@ -1,0 +1,33 @@
+{
+  "id": "bug-21",
+  "source": "bug",
+  "base": "a315c5c7fbb66e69ffa065e6c9801a94dbeb8805",
+  "candidate": "8f3c9832231245ddcdcee01394a22afd8879f983",
+  "verify": "python3 -m unittest -v tests.test_write_scope_verify",
+  "write_scope": [
+    "aisdlc"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [
+    "tests.test_write_scope_verify.TestVerificationPaths.test_declared_kinds_grant_existing_paths_only",
+    "tests.test_write_scope_verify.TestVerificationPaths.test_effective_scope_includes_granted_paths",
+    "tests.test_write_scope_verify.TestVerificationPaths.test_file_path_in_command_counts",
+    "tests.test_write_scope_verify.TestVerificationPaths.test_no_contract_adds_nothing",
+    "tests.test_write_scope_verify.TestVerificationPaths.test_story_file_shows_granted_paths"
+  ],
+  "p2p_ids": [],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": true,
+    "gold_pass": true,
+    "runs": 3
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "",
+  "fix_commit": "8f3c9832231245ddcdcee01394a22afd8879f983"
+}

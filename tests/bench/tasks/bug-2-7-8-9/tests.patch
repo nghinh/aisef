@@ -1,0 +1,154 @@
+diff --git a/tests/dogfood/_runner.py b/tests/dogfood/_runner.py
+index 2a530ae..4bde95d 100644
+--- a/tests/dogfood/_runner.py
++++ b/tests/dogfood/_runner.py
+@@ -2,8 +2,11 @@
+ thật, so với mốc. Không dùng bản scratch — bản scratch không lặp lại được.
+ 
+ Bật bằng ``AISDLC_DOGFOOD=1`` (tốn tiền thật: `par` EPIC-01 ≈ $3–6).
+-Đầu vào của `par` là 4 tệp ở commit `9adfb59` của dự án thử + cấu hình
+-(`.claude/` **không** commit — đúng kịch bản G4). Mốc so sánh (đo 2026-09-05,
++Đầu vào của `par`: kế hoạch ở commit `9adfb59` của dự án thử, `package.json` +
++`.ai/config.json` ở `963dae3` (lệnh test đã sửa — lần dogfood đầu lấy bản
++`node --test src/` đỏ vì MODULE_NOT_FOUND, ba story đốt $17 trong vòng lặp
++guard `completion`). `.claude/` **không** commit và **không** gitignore — đúng
++kịch bản G4 và kịch bản cấu hình client bị chép vào worktree. Mốc so sánh (đo 2026-09-05,
+ 3 story song song, Claude): 3/3 qua ở lượt đầu, $3,14.
+ """
+ 
+diff --git a/tests/dogfood/par/.ai/config.json b/tests/dogfood/par/.ai/config.json
+index cde40e8..804215c 100644
+--- a/tests/dogfood/par/.ai/config.json
++++ b/tests/dogfood/par/.ai/config.json
+@@ -32,8 +32,8 @@
+   "route.reviewer_model": "",
+   "route.designer_model": "",
+   "review.impact_provider": "",
+-  "tools.test": "node --test src/",
+-  "tools.lint": "true",
++  "tools.test": "npm test --silent",
++  "tools.lint": "npm run lint --silent",
+   "tools.sast": "",
+   "sandbox.image": "",
+   "sandbox.tools_network": false,
+diff --git a/tests/dogfood/par/package.json b/tests/dogfood/par/package.json
+index 04f79ab..cee229a 100644
+--- a/tests/dogfood/par/package.json
++++ b/tests/dogfood/par/package.json
+@@ -2,5 +2,8 @@
+   "name": "chuoi",
+   "version": "0.0.0",
+   "type": "module",
+-  "scripts": { "test": "node --test", "lint": "node --check src/slugify.js && node --check src/truncate.js && node --check src/word-count.js" }
++  "scripts": {
++    "test": "ls src/*.test.js >/dev/null 2>&1 && node --test src/*.test.js",
++    "lint": "node --check src/*.js"
++  }
+ }
+diff --git a/tests/test_gate.py b/tests/test_gate.py
+index f7074be..5c2328a 100644
+--- a/tests/test_gate.py
++++ b/tests/test_gate.py
+@@ -296,3 +296,29 @@ class TestTDD(GateTestCase):
+     def test_caller_that_cannot_know_adds_no_check(self):
+         self.green_story()
+         self.assertNotIn("TDD", [c.name for c in self.gate().checks])
++
++
++class TestTestKhongChayDuoc(GateTestCase):
++    def test_gate_names_the_environment_not_the_story(self):
++        self.store.file_change("S-01", "src/a.py")
++        self.store.tool_run("S-01", "test", ok=False, detail={"unrunnable": "công cụ chưa cài hoặc không nạp được (module_not_found)"})
++        self.store.tool_run("S-01", "lint", ok=True)
++        g = self.gate()
++        m = next(c for c in g.checks if c.name == "test")
++        self.assertIs(m.outcome, Outcome.UNRUNNABLE)
++        self.assertFalse(g.passed)
++        self.assertIn("không nạp được", g.feedback())
++
++
++class TestHopDongDocTenQa(GateTestCase):
++    """e9 R2: `qa:accessibility` xanh trong evidence mà cổng ghi "chưa cấu hình"."""
++
++    def test_qa_prefixed_runs_count(self):
++        self.green_story()
++        self.store.tool_run("S-01", "qa:e2e", ok=True)
++        self.store.tool_run("S-01", "qa:accessibility", ok=False, detail={"tail": "1 failed"})
++        g = self.gate(contract=["unit", "e2e", "accessibility"])
++        muc = {c.name: c for c in g.checks}
++        self.assertIs(muc["e2e"].outcome, Outcome.PASSED)
++        self.assertIs(muc["accessibility"].outcome, Outcome.FAILED)
++        self.assertFalse(g.passed)
+diff --git a/tests/test_guardrails.py b/tests/test_guardrails.py
+index 37c0d4a..5ecc328 100644
+--- a/tests/test_guardrails.py
++++ b/tests/test_guardrails.py
+@@ -835,3 +835,36 @@ class TestGocDuAnTuEnv(unittest.TestCase):
+         self.assertEqual(project_root_from({ENV_PROJECT: "/b"}, "/a"), "/b")
+         self.assertEqual(project_root_from({}, "/a"), "/a")
+         self.assertEqual(project_root_from({ENV_PROJECT: "  "}, "/a"), "/a")
++
++
++class TestCauHinhClientKhongPhaiThayDoiCuaStory(unittest.TestCase):
++    """`.claude/settings.json`/`.opencode/` do harness chép vào worktree không được
++    tính là file story đổi — dogfood par: 3/3 story trượt "phạm vi ghi" vì nó."""
++
++    def test_changed_files_ignores_carried_client_config(self):
++        import subprocess, tempfile
++        from pathlib import Path
++        from aisdlc.harness.guardrails import changed_files, check_diff_scope
++        with tempfile.TemporaryDirectory() as tmp:
++            p = Path(tmp)
++            subprocess.run(["git", "init", "-q"], cwd=p, check=True)
++            subprocess.run(["git", "config", "user.email", "t@t"], cwd=p, check=True)
++            subprocess.run(["git", "config", "user.name", "t"], cwd=p, check=True)
++            (p / "src").mkdir(); (p / "src" / "a.js").write_text("1", encoding="utf-8")
++            subprocess.run(["git", "add", "-A"], cwd=p, check=True)
++            subprocess.run(["git", "commit", "-qm", "nền"], cwd=p, check=True)
++            (p / ".claude").mkdir(); (p / ".claude" / "settings.json").write_text("{}", encoding="utf-8")
++            (p / ".opencode" / "plugin").mkdir(parents=True); (p / ".opencode" / "plugin" / "g.ts").write_text("//", encoding="utf-8")
++            (p / "src" / "b.js").write_text("2", encoding="utf-8")
++            changed = changed_files(str(p))
++        self.assertEqual(changed, ["src/b.js"])
++        self.assertTrue(check_diff_scope(changed, ["src"]).allowed)
++
++
++class TestCompletionKhongChayDuoc(unittest.TestCase):
++    def test_unrunnable_test_lets_the_agent_stop(self):
++        import tempfile
++        with tempfile.TemporaryDirectory() as tmp:
++            st = EvidenceStore(tmp)
++            st.tool_run("S", "test", ok=False, detail={"unrunnable": "công cụ chưa cài"})
++            self.assertTrue(check_completion(st.read("S")).allowed)
+diff --git a/tests/test_tools.py b/tests/test_tools.py
+index aec7ee9..d9ca730 100644
+--- a/tests/test_tools.py
++++ b/tests/test_tools.py
+@@ -202,3 +202,27 @@ class TestDescription(ToolTestCase):
+ 
+ if __name__ == "__main__":
+     unittest.main(verbosity=2)
++
++
++class TestKhongChayDuocKhacDo(ToolTestCase):
++    """Dogfood par: `node --test src/` → MODULE_NOT_FOUND bị coi là test đỏ,
++    guard completion chặn Stop ~10 lần/lượt, 3 story đốt $17."""
++
++    def run_test_tool(self, command: str):
++        cfg = Config({**DEFAULTS, "tools.test": command, "sandbox.allow_degraded": True})
++        return run_tool("test", self.project, story_id="S-01", artifact_root=self.artifacts, config=cfg)
++
++    def test_module_not_found_is_unrunnable(self):
++        res = self.run_test_tool("sh -c 'echo \"Error: Cannot find module x\"; echo \"code: MODULE_NOT_FOUND\" >&2; exit 1'")
++        self.assertFalse(res.ok)
++        self.assertIn("không nạp được", res.unrunnable)
++        e = EvidenceStore(self.artifacts).read("S-01").last(TOOL_RUN, "test")
++        self.assertTrue(e.detail["unrunnable"])
++
++    def test_red_test_mentioning_not_found_is_still_red(self):
++        from pathlib import Path
++        (Path(self.project) / "out.txt").write_text(
++            "✔ AC-S-1: có (1ms)\n✖ AC-S-2: element not found (2ms)\nℹ tests 2\nℹ pass 1\nℹ fail 1\n", encoding="utf-8")
++        res = self.run_test_tool("sh -c 'cat out.txt; exit 1'")
++        self.assertFalse(res.ok)
++        self.assertEqual(res.unrunnable, "")

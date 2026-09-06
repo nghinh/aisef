@@ -1,0 +1,57 @@
+{
+  "id": "bug-r2r1",
+  "source": "bug",
+  "base": "a1cebc8b0af7502b50edd616d36147aa5dd783de",
+  "candidate": "d54339c1800cd1ac147e030fa6c1e0a809bc0aa9",
+  "verify": "python3 -m unittest -v tests.test_ledger",
+  "write_scope": [
+    "aisdlc"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [
+    "tests.test_ledger.TestUngVienChuaLanded.test_xanh_o_ung_vien_bi_cong_tra_ve_khong_thanh_verified"
+  ],
+  "p2p_ids": [
+    "tests.test_ledger.TestChiMuc.test_dong_story_co_du_trang_thai_candidate_so_hanh_vi_va_duong_dan",
+    "tests.test_ledger.TestChiMuc.test_index_ghi_ra_file",
+    "tests.test_ledger.TestChiMuc.test_lat_cat_epic_chi_lay_epic_do_va_co_tran",
+    "tests.test_ledger.TestChiMuc.test_toi_da_mot_dong_moi_story_va_mot_dong_moi_epic",
+    "tests.test_ledger.TestChuoiThoiGian.test_do_lai_trong_luot_cua_chinh_minh_khong_tinh_lien_story",
+    "tests.test_ledger.TestChuoiThoiGian.test_gap_roi_xanh_la_resolved_khong_phai_reopened",
+    "tests.test_ledger.TestChuoiThoiGian.test_lich_su_chi_ghi_khi_trang_thai_doi",
+    "tests.test_ledger.TestChuoiThoiGian.test_regressed_by_chi_dung_story_va_luot_lam_hong",
+    "tests.test_ledger.TestChuoiThoiGian.test_xanh_do_xanh_thanh_verified_reopened_verified",
+    "tests.test_ledger.TestCliEvidence.test_co_story_thi_ghi_bang_chung_evidence_lookup",
+    "tests.test_ledger.TestCliEvidence.test_id_khong_co_thi_bao_khong_biet_chu_khong_im",
+    "tests.test_ledger.TestCliEvidence.test_tra_mot_hanh_vi_in_ra_lich_su",
+    "tests.test_ledger.TestCliEvidence.test_tra_mot_story_in_dong_chi_muc_va_hanh_vi_cua_no",
+    "tests.test_ledger.TestMetrics.test_cai_thien_bien_giua_hai_moc",
+    "tests.test_ledger.TestMetrics.test_growth_reopened_resolved",
+    "tests.test_ledger.TestMetrics.test_khong_co_chi_phi_thi_khong_co_mau_so",
+    "tests.test_ledger.TestMetrics.test_moc_vong_khong_bi_mat_khi_chieu_lai",
+    "tests.test_ledger.TestMetrics.test_snapshot_ghi_vao_ledger_json",
+    "tests.test_ledger.TestNguonHanhVi.test_bo_test_chay_mot_phan_khong_bien_story_khac_thanh_gap",
+    "tests.test_ledger.TestNguonHanhVi.test_bon_nguon_deu_thanh_hanh_vi",
+    "tests.test_ledger.TestNguonHanhVi.test_evidence_cu_khong_co_candidate_van_chieu_duoc",
+    "tests.test_ledger.TestNguonHanhVi.test_khong_doc_duoc_ten_test_la_gap_khong_phai_dat",
+    "tests.test_ledger.TestNguonHanhVi.test_su_kien_behavior_do_pha_khac_ghi_cung_vao_so",
+    "tests.test_ledger.TestSlotIndexTrongPrompt.test_chua_co_bang_chung_thi_slot_noi_that",
+    "tests.test_ledger.TestSlotIndexTrongPrompt.test_slot_index_co_nguon_ledger_va_ton_tran",
+    "tests.test_ledger.TestUngVienChuaLanded.test_bang_chung_khong_co_nhat_ky_hay_khong_co_candidate_van_tinh_nhu_cu",
+    "tests.test_ledger.TestUngVienChuaLanded.test_landed_roi_thi_verified_va_do_o_ung_vien_chua_landed_van_tinh"
+  ],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": true,
+    "gold_pass": true,
+    "runs": 3
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "",
+  "fix_commit": "d54339c1800cd1ac147e030fa6c1e0a809bc0aa9"
+}

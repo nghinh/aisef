@@ -1,0 +1,50 @@
+{
+  "id": "bug-25",
+  "source": "bug",
+  "base": "4d415787533d3fe31008fa23b3ce885dd33d53fd",
+  "candidate": "d0b0792dacabf5f3bd3a45c7de86d89f58aa19ce",
+  "verify": "python3 -m unittest -v tests.test_approvals",
+  "write_scope": [
+    "aisdlc"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [
+    "tests.test_approvals.TestStorySuaKhongLamStaleCongStories.test_them_story_sua_khong_stale"
+  ],
+  "p2p_ids": [
+    "tests.test_approvals.TestAutoApprove.test_auto_is_marked_as_auto",
+    "tests.test_approvals.TestAutoApprove.test_human_approval_is_not_auto",
+    "tests.test_approvals.TestAutoApprove.test_parse_all",
+    "tests.test_approvals.TestAutoApprove.test_parse_none_and_empty",
+    "tests.test_approvals.TestAutoApprove.test_parse_rejects_unknown_gate",
+    "tests.test_approvals.TestAutoApprove.test_parse_subset",
+    "tests.test_approvals.TestBasicFlow.test_approve_then_approved",
+    "tests.test_approvals.TestBasicFlow.test_history_preserved_across_decisions",
+    "tests.test_approvals.TestBasicFlow.test_reject_records_note",
+    "tests.test_approvals.TestBasicFlow.test_reject_requires_note",
+    "tests.test_approvals.TestBasicFlow.test_unknown_gate_is_pending",
+    "tests.test_approvals.TestCascade.test_blocking_lists_unapproved_upstream",
+    "tests.test_approvals.TestCascade.test_first_gate_has_no_blockers",
+    "tests.test_approvals.TestCascade.test_reapproving_upstream_makes_downstream_stale",
+    "tests.test_approvals.TestContentBinding.test_editing_artifact_invalidates_approval",
+    "tests.test_approvals.TestContentBinding.test_restoring_content_restores_approval",
+    "tests.test_approvals.TestDurability.test_corrupt_record_reads_as_pending",
+    "tests.test_approvals.TestDurability.test_summary_covers_every_gate",
+    "tests.test_approvals.TestDurability.test_survives_new_store_instance",
+    "tests.test_approvals.TestStorySuaKhongLamStaleCongStories.test_doi_story_that_van_stale_khi_chua_co_story_sua"
+  ],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": true,
+    "gold_pass": true,
+    "runs": 3
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "",
+  "fix_commit": "d0b0792dacabf5f3bd3a45c7de86d89f58aa19ce"
+}

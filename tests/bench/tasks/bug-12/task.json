@@ -1,0 +1,32 @@
+{
+  "id": "bug-12",
+  "source": "bug",
+  "base": "219bd7888c14baaf3525aa6e6cade7551d323352",
+  "candidate": "9f0438b83d404ff69bef75716452acc6919ebff6",
+  "verify": "python3 -m unittest -v tests.test_design_contract_states",
+  "write_scope": [
+    "aisdlc"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [
+    "tests.test_design_contract_states.TestWholePageContract.test_no_primary_with_duplicates_blocks_gate",
+    "tests.test_design_contract_states.TestWholePageContract.test_primary_declared_passes",
+    "tests.test_design_contract_states.TestWholePageContract.test_roundtrip_keeps_flags",
+    "tests.test_design_contract_states.TestWholePageContract.test_single_state_without_marker_is_fine"
+  ],
+  "p2p_ids": [],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": true,
+    "gold_pass": true,
+    "runs": 3
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "",
+  "fix_commit": "9f0438b83d404ff69bef75716452acc6919ebff6"
+}

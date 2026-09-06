@@ -1,0 +1,30 @@
+{
+  "id": "bug-19",
+  "source": "bug",
+  "base": "616f5a825a61646346c9aa12122726969a45fca9",
+  "candidate": "b7fc2a9dc0804dbd4794cd851896ea46488217b9",
+  "verify": "python3 -m unittest -v tests.test_prd_headings",
+  "write_scope": [
+    "aisdlc"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [
+    "tests.test_prd_headings.TestHeadings.test_english_headings_still_work",
+    "tests.test_prd_headings.TestHeadings.test_vietnamese_headings_yield_criteria"
+  ],
+  "p2p_ids": [],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": true,
+    "gold_pass": true,
+    "runs": 3
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "",
+  "fix_commit": "b7fc2a9dc0804dbd4794cd851896ea46488217b9"
+}

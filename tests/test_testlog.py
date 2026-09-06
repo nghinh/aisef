@@ -81,6 +81,24 @@ class TestPytest(unittest.TestCase):
         self.assertIn("-v", log.note)
 
 
+class TestUnittestVerbose(unittest.TestCase):
+    """`python -m unittest -v` — bộ test của chính kho, bench V8 chấm theo tên."""
+
+    def test_ten_day_du_ke_ca_khi_co_docstring(self):
+        log = parse(fx("unittest-v"))
+        self.assertEqual(log.format, "unittest")
+        self.assertEqual(log.passed, ["tests.test_worktree.TestCreate.test_create_is_idempotent"])
+        # docstring đẩy "... FAIL" xuống dòng sau; phần traceback lặp tên ca đỏ không được đếm hai lần
+        self.assertEqual(log.failed, ["tests.test_worktree.TestCreate.test_stray_dir_is_not_a_worktree",
+                                      "tests.test_worktree.TestCreate.test_list_active"])
+        self.assertEqual(log.skipped, ["tests.test_worktree.TestCreate.test_bo_qua",
+                                       "tests.test_worktree.TestCreate.test_du_kien_do"])
+
+    def test_python_cu_chi_in_lop_thi_noi_them_ten(self):
+        log = parse("test_a (tests.test_x.TestY) ... ok\n\nRan 1 test in 0.001s\n\nOK\n")
+        self.assertEqual(log.passed, ["tests.test_x.TestY.test_a"])
+
+
 class TestCoverageVaLa(unittest.TestCase):
     def test_pytest_cov_total(self):
         log = parse(fx("pytest-v") + "\n---------- coverage ----------\nTOTAL     120     10    92%\n")

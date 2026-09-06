@@ -91,7 +91,8 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 - **Mới** `tool_run test:baseline` (`tools.BASELINE_RUN`): harness chạy
   `tools.test` ở HEAD worktree **trước** phiên developer đầu tiên; ghi tên test,
   `red_before`, `parent`, không mang `candidate` (ADR-004 R9).
-- `harness/testlog.py`: đọc tên test từ node `spec`/`tap`, vitest, pytest;
+- `harness/testlog.py`: đọc tên test từ node `spec`/`tap`, vitest, pytest,
+  `python -m unittest -v` (bench V8 chấm task lỗi kho theo tên);
   `test_ids`/`failed_ids`/`skipped_ids`, coverage; cắt ở `MAX_IDS` = 500 và nói
   ra khi cắt.
 - `harness/testlog.py` đọc **CTRF** (ctrf.io JSON — pytest-json-ctrf,
@@ -314,6 +315,17 @@ chủ đầu tư tạo project PyPI + trusted publisher; wheel/sdist đã `twine
 - Kho hồi quy chạy lại được từ kho: `tests/dogfood/` (`par`, mốc 3/3 lượt đầu,
   ≤ 2 × $3,14) và `tests/conformance/` (10 phép, hai client); release gate
   `AISDLC_RELEASE=1 tests.test_release_gate`.
+- **Mới** `tests/bench/` (ADR-005 V8, Benchmark Factory): task từ hai mỏ —
+  lỗi thật của kho (`tests/bench/tasks/`, commit; commit sửa tìm bằng
+  `git log -S<tên test>`, base = cha, test hồi quy giữ, nguồn hoàn nguyên) và
+  story e9 `done` (sinh lúc chạy từ `AISDLC_BENCH_E9`, base = `test:baseline.parent`
+  hoặc commit `main` trước lượt đầu, test = `is_test_path`, gold = phần còn lại).
+  Lint rò: SHA, URL, `STORY-RP-*`, tên commit sửa. `validate` ×3 trên bản chép
+  `git archive` (một ref — worktree thấy `story/*` = gold): F2P/P2P theo tên,
+  test đổi kết cục → `flaky_ids` loại và nêu tên, không F2P → INVALID. `run`: một
+  phiên client, guard như hợp quy, `note mode=bench`, hoàn nguyên test agent
+  chạm rồi áp test ẩn, chấm ở ứng viên đóng băng. `report` pass@1/pass@k/ổn
+  định/cost so lịch sử; `export` thư mục Harbor (adapter ngoài). Số đo: ADR-005 §9.
 - `aisdlc doctor`: hook trỏ đúng dự án, hook thiếu guard mới, ngưỡng cỡ story
   lệch dữ liệu, gợi ý lệnh test in coverage, gợi reporter in tên/CTRF (V9).
 

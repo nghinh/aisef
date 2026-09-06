@@ -1,0 +1,27 @@
+{
+  "id": "bug-6",
+  "source": "bug",
+  "base": "3d36fdbb17e2369a9f2ce241643177caaf831d43",
+  "candidate": "fe3372fd14b961595b2afaa2224c07add4333a42",
+  "verify": "python3 -m unittest -v tests.test_cli tests.test_guardrails tests.test_implement tests.test_meta",
+  "write_scope": [
+    "aisdlc"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [],
+  "p2p_ids": [],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": false,
+    "gold_pass": false,
+    "runs": 0
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "chưa đo (không phải oracle hỏng): bộ test ở snapshot gọi Docker thật trong từng ca (~9 phút/lần chạy, 6 lần ≈ 1 giờ) — dừng 2026-09-06 để không chen luồng đo thời gian; chạy lại khi máy rảnh: python3 -m tests.bench validate bug-6",
+  "fix_commit": "fe3372fd14b961595b2afaa2224c07add4333a42"
+}

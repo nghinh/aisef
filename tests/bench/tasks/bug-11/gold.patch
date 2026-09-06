@@ -1,0 +1,80 @@
+diff --git a/aisdlc/clients/claude_code.py b/aisdlc/clients/claude_code.py
+index 870c23e..510a94c 100644
+--- a/aisdlc/clients/claude_code.py
++++ b/aisdlc/clients/claude_code.py
+@@ -10,6 +10,17 @@ Mọi cờ dùng ở đây đã kiểm chứng bằng thực nghiệm (spike S1,
+   chạy với ``--permission-mode acceptEdits``;
+ * ``< /dev/null`` là bắt buộc, nếu không CLI chờ stdin ba giây mỗi lần gọi.
+ 
++**Cách ly khỏi cấu hình toàn cục của người dùng** (đo 2026-09-05, Claude Code
++2.1.236, hợp quy C3/C4 trượt sau khi máy chủ bật ``permissions.defaultMode:
++"auto"`` trong ``~/.claude/settings.json``): phiên con thừa hưởng chế độ ấy
++thì **mất Glob/Grep** và được dặn "ưu tiên Bash" — tức ghi tệp bằng heredoc
++và né sạch guard ``Write|Edit``; MCP của người dùng (Google Drive…) và hook
++toàn cục cũng lọt vào phiên. Harness không tin client thì càng không tin
++cấu hình máy: chế độ cố định ``acceptEdits``, tool kê tường minh
++(``DEFAULT_TOOLS``), chỉ nạp settings dự án + ``--settings`` của harness,
++không MCP ngoài. Đo lại cùng ngày: Glob/Grep có, MCP 0, hook người dùng 0,
++guard write-scope vẫn chặn.
++
+ **Hook có tới được worktree không** (đo 2026-09-05 trên `par`, claude CLI,
+ `.claude/` **không** commit nên worktree không có thư mục ấy; mỗi biến thể
+ một phiên `-p` bảo agent Write một tệp; đếm sự kiện guard tự ghi):
+@@ -48,6 +59,14 @@ from .stream import RunResult, parse_stream
+ 
+ BINARY = "claude"
+ 
++#: Chế độ quyền cố định cho phiên con — không để chế độ toàn cục của máy quyết.
++PERMISSION_MODE = "acceptEdits"
++#: Tool được phép khi vai không kê riêng. `acceptEdits` tự duyệt Write/Edit
++#: trong thư mục làm việc nhưng Bash thì phải kê, không thì `-p` từ chối
++#: và agent không chạy nổi `aisdlc tool test`. `--disallowed-tools` của vai
++#: (reviewer/security) vẫn thắng danh sách này.
++DEFAULT_TOOLS = ("Read", "Write", "Edit", "Glob", "Grep", "Bash", "NotebookEdit")
++
+ 
+ def clean_env() -> dict[str, str]:
+     """Môi trường cho tiến trình `claude` con: bỏ mọi `CLAUDE*` của phiên cha."""
+@@ -83,6 +102,9 @@ class ClaudeCodeAdapter(ClientAdapter):
+             "-p", spec.prompt,
+             "--output-format", "stream-json",
+             "--verbose",
++            "--permission-mode", PERMISSION_MODE,
++            "--setting-sources", "project,local",
++            "--strict-mcp-config",
+         ]
+         if spec.system_prompt:
+             cmd += ["--append-system-prompt", spec.system_prompt]
+@@ -90,8 +112,7 @@ class ClaudeCodeAdapter(ClientAdapter):
+             cmd += ["--model", spec.model]
+         if spec.max_turns:
+             cmd += ["--max-turns", str(spec.max_turns)]
+-        if spec.allowed_tools:
+-            cmd += ["--allowed-tools", *spec.allowed_tools]
++        cmd += ["--allowed-tools", *(spec.allowed_tools or DEFAULT_TOOLS)]
+         if spec.disallowed_tools:
+             cmd += ["--disallowed-tools", *spec.disallowed_tools]
+         if spec.settings_file:
+diff --git a/aisdlc/clients/stream.py b/aisdlc/clients/stream.py
+index c445e38..b9ebece 100644
+--- a/aisdlc/clients/stream.py
++++ b/aisdlc/clients/stream.py
+@@ -99,6 +99,10 @@ class RunResult:
+     tool_uses: list[ToolUse] = field(default_factory=list)
+     denials: list[Denial] = field(default_factory=list)
+     hooks: list[HookRun] = field(default_factory=list)
++    #: Mọi đoạn văn assistant theo thứ tự. `text` chỉ là câu chốt — mà câu
++    #: chốt có thể là trả lời cho hook Stop chứ không phải cho việc (hợp quy
++    #: C4 trượt vì thế, 2026-09-05).
++    texts: list[str] = field(default_factory=list)
+     #: Thông báo từ hook đã chặn một tool. Lấy từ `tool_result` chứ không
+     #: từ `hook_response`: quan sát trên luồng thật cho thấy Claude Code
+     #: **không** phát `hook_response` cho lần hook chặn — nó đưa thẳng lý
+@@ -272,6 +276,7 @@ def parse_stream(lines: Iterable[str]) -> RunResult:
+                     or "lỗi không rõ nguyên nhân"
+                 )
+ 
++    res.texts = assistant_text
+     if not res.text and assistant_text:
+         res.text = "\n".join(assistant_text)
+ 

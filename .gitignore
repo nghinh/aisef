@@ -20,6 +20,8 @@ spike/**/package-lock.json
 # tạo tác của lượt hợp quy client (giữ để tra, không commit)
 .conformance/
 .dogfood/
+# bench (ADR-005 V8): task story sinh từ e9, bản chép, kết quả — chỉ task lỗi kho ở tests/bench/tasks/ mới commit
+.bench/
 
 # worktree của subagent (Agent tool)
 .claude/worktrees/

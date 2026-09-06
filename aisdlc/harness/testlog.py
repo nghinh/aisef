@@ -4,17 +4,18 @@ Cổng story hiện chỉ biết "lần test cuối xanh". G5 cần biết *tiê
 có test — nghĩa là cần tên test; G10b cần số coverage. Cả hai nằm trong
 stdout của lần `test`, và không ai đọc nó ngoài `tail(20)` cho người xem.
 
-Bốn định dạng có thật trong các dự án thử: `node --test` reporter `spec`
+Năm định dạng có thật trong các dự án thử: `node --test` reporter `spec`
 (mặc định, `par`), `node --test --test-reporter=tap`, `vitest` (`e9`),
-`pytest -v`. Không nhận ra → `format=""`, `test_ids=[]`, và cổng ghi
+`pytest -v`, và `python -m unittest -v` (bộ test của chính kho — bench
+ADR-005 V8 chấm task lỗi kho theo tên test). Không nhận ra → `format=""`, `test_ids=[]`, và cổng ghi
 "không đọc được tên test" (UNCONFIGURED) — **không** đoán, không tính là
 đạt. Fixture là output thật, ở `tests/fixtures/testlog/`.
 
-Định dạng thứ năm là **CTRF** (ctrf.io — JSON chung cho pytest-json-ctrf,
+Định dạng thứ sáu là **CTRF** (ctrf.io — JSON chung cho pytest-json-ctrf,
 vitest-ctrf-json-reporter, jest/playwright…; ADR-005 V9): một khối JSON
 `{"results": {"tests": [{name, status, suite?, filePath?}]}}` ở bất kỳ đâu
 trong output (`pytest --ctrf /dev/stdout`, hay `cat` tệp reporter ghi ra).
-Regex bốn định dạng trên giữ làm dự phòng; e9/`par` hôm nay 220/377 lần
+Regex năm định dạng trên giữ làm dự phòng; e9/`par` hôm nay 220/377 lần
 `tool_run test` không đọc được tên (`test_format=""`) — `doctor` gợi reporter.
 """
 
@@ -40,6 +41,11 @@ _VITEST_FILE = re.compile(r"^\s*[✓×↓]\s\S+\s\(\d+ tests?")
 # pytest -v ; pytest -q chỉ có FAILED ở phần summary
 _PYTEST = re.compile(r"^(\S+::\S+)\s+(PASSED|FAILED|ERROR|SKIPPED|XFAIL|XPASS)\b")
 _PYTEST_Q_FAIL = re.compile(r"^(?:FAILED|ERROR) (\S+::\S+)")
+# python -m unittest -v: "test_x (mod.C.test_x) ... ok"; test có docstring thì
+# "... ok" nằm cuối dòng docstring kế tiếp, không cùng dòng với tên
+_UNITTEST = re.compile(r"^(\S+) \((\S+)\)(?: \.\.\. (.+))?$")
+_UNITTEST_END = re.compile(r"\.\.\. (ok|FAIL|ERROR|skipped\b.*|expected failure|unexpected success)$")
+_UNITTEST_RAN = re.compile(r"^Ran \d+ tests? in ")
 # coverage: pytest-cov / c8 / istanbul
 _COV = (re.compile(r"^TOTAL\s+\d+\s+\d+(?:\s+\d+\s+\d+)?\s+([\d.]+)%"),
         re.compile(r"^All files\s*\|\s*([\d.]+)"))
@@ -91,6 +97,8 @@ def parse(text: str) -> TestLog:
         _node_spec(lines, log)
     elif any(l.startswith(" RUN  v") or l.strip().startswith("Test Files") for l in lines):
         _vitest(lines, log)
+    elif any(_UNITTEST_RAN.match(l) for l in lines):
+        _unittest(lines, log)
     elif any("test session starts" in l or _PYTEST.match(l) or "short test summary" in l for l in lines):
         _pytest(lines, log)
     return log
@@ -193,6 +201,32 @@ def _vitest(lines: list[str], log: TestLog) -> None:
             _add(log, m.group(2), {"✓": "pass", "×": "fail", "↓": "skip"}[m.group(1)])
     if not log.test_ids:
         log.note = "vitest reporter mặc định không in tên test — thêm `--reporter=verbose`"
+
+
+def _unittest(lines: list[str], log: TestLog) -> None:
+    """`python -m unittest -v`. Mã test = id đầy đủ trong ngoặc (Python ≥ 3.11
+    in `mod.Class.test`; bản cũ chỉ in `mod.Class` — khi ấy nối thêm tên)."""
+    log.format = "unittest"
+    marks = {"ok": "pass", "FAIL": "fail", "ERROR": "fail", "expected failure": "skip",
+             "unexpected success": "pass"}
+    pending = ""
+    for line in lines:
+        if line.startswith("=====") or _UNITTEST_RAN.match(line):
+            break   # phần sau là traceback + tổng kết, lặp lại tên ca đỏ
+        m = _UNITTEST.match(line)
+        if m:
+            name, full = m.group(1), m.group(2)
+            pending = full if full.endswith("." + name) else f"{full}.{name}"
+            if not m.group(3):
+                continue
+            end = m.group(3)
+        else:
+            e = _UNITTEST_END.search(line)
+            if not e or not pending:
+                continue
+            end = e.group(1)
+        _add(log, pending, "skip" if end.startswith("skipped") else marks[end])
+        pending = ""
 
 
 def _pytest(lines: list[str], log: TestLog) -> None:

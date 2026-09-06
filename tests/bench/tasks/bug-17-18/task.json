@@ -1,0 +1,67 @@
+{
+  "id": "bug-17-18",
+  "source": "bug",
+  "base": "1a79a3cbe949645949fabff304e38f31fc4e3344",
+  "candidate": "9416f0446865019edf3e449361db85910a48bbf3",
+  "verify": "python3 -m unittest -v tests.test_deploy tests.test_report_mockup_cell",
+  "write_scope": [
+    "aisdlc"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [
+    "tests.test_deploy.TestPlannedButNeverRun.test_unregistered_planned_story_blocks",
+    "tests.test_report_mockup_cell.TestMockupCell.test_every_screen_must_pass_latest",
+    "tests.test_report_mockup_cell.TestMockupCell.test_latest_failure_is_a_failure",
+    "tests.test_report_mockup_cell.TestMockupCell.test_latest_pass_wins_over_earlier_failures",
+    "tests.test_report_mockup_cell.TestMockupCell.test_no_events_is_not_a_pass"
+  ],
+  "p2p_ids": [
+    "tests.test_deploy.TestCiWorkflow.test_ci_runs_the_same_commands_a_person_runs",
+    "tests.test_deploy.TestCiWorkflow.test_written_where_github_looks",
+    "tests.test_deploy.TestGenerate.test_ci_is_written_by_code_not_by_the_model",
+    "tests.test_deploy.TestGenerate.test_existing_artifacts_are_not_regenerated",
+    "tests.test_deploy.TestGenerate.test_incomplete_runbook_counts_as_missing",
+    "tests.test_deploy.TestGenerate.test_missing_artifact_is_reported",
+    "tests.test_deploy.TestGenerate.test_run_failure_is_reported",
+    "tests.test_deploy.TestInstallSpecDoiDuoc.test_cache_kho_skill_de_ci_khong_clone_lai_moi_luot",
+    "tests.test_deploy.TestInstallSpecDoiDuoc.test_doi_sang_git_url",
+    "tests.test_deploy.TestInstallSpecDoiDuoc.test_mac_dinh_la_ten_goi",
+    "tests.test_deploy.TestInstallSpecDoiDuoc.test_yaml_van_hop_le_sau_khi_them_cache",
+    "tests.test_deploy.TestPreDeployGate.test_empty_project_fails_everything",
+    "tests.test_deploy.TestPreDeployGate.test_everything_ready_passes",
+    "tests.test_deploy.TestPreDeployGate.test_qa_not_configured_blocks_release",
+    "tests.test_deploy.TestPreDeployGate.test_report_is_written_for_the_human_to_read",
+    "tests.test_deploy.TestPreDeployGate.test_running_stories_does_not_stale_the_readiness_approval",
+    "tests.test_deploy.TestPreDeployGate.test_unapproved_gate_blocks",
+    "tests.test_deploy.TestPreDeployGate.test_unfinished_story_blocks",
+    "tests.test_deploy.TestPreDeployKhongChapNhanSuyBien.test_bo_qua_kiem_dinh_thi_muc_cach_ly_cung_bo_qua",
+    "tests.test_deploy.TestPreDeployKhongChapNhanSuyBien.test_co_waiver_thi_qua_va_ghi_vao_bang_chung",
+    "tests.test_deploy.TestPreDeployKhongChapNhanSuyBien.test_khong_co_lan_chay_nao_thi_khong_ket_luan",
+    "tests.test_deploy.TestPreDeployKhongChapNhanSuyBien.test_run_thuong_van_cho_suy_bien",
+    "tests.test_deploy.TestPreDeployKhongChapNhanSuyBien.test_suy_bien_khong_waiver_thi_chan",
+    "tests.test_deploy.TestQuyTrinhCI.test_dem_dung_so_tao_tac",
+    "tests.test_deploy.TestQuyTrinhCI.test_khong_ghim_duong_dan_tuyet_doi_va_co_buoc_cai",
+    "tests.test_deploy.TestRunbook.test_absent_file",
+    "tests.test_deploy.TestRunbook.test_four_sections_required",
+    "tests.test_deploy.TestRunbook.test_missing_escalation_fails",
+    "tests.test_deploy.TestRunbook.test_sections_are_four",
+    "tests.test_deploy.TestTenDuAn.test_duong_dan_tuong_doi_van_ra_ten_that",
+    "tests.test_deploy.TestXongPhaiLaDaMerge.test_da_merge_thi_qua_muc_nay",
+    "tests.test_deploy.TestXongPhaiLaDaMerge.test_khong_co_nhat_ky_thi_khong_doi_merge",
+    "tests.test_deploy.TestXongPhaiLaDaMerge.test_xong_nhung_chua_merge_thi_chan"
+  ],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": true,
+    "gold_pass": true,
+    "runs": 3
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "",
+  "fix_commit": "9416f0446865019edf3e449361db85910a48bbf3"
+}

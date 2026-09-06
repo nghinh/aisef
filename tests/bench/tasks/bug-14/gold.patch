@@ -1,0 +1,60 @@
+diff --git a/aisdlc/harness/mockup_map.py b/aisdlc/harness/mockup_map.py
+index 92c512b..26a6656 100644
+--- a/aisdlc/harness/mockup_map.py
++++ b/aisdlc/harness/mockup_map.py
+@@ -45,6 +45,18 @@ class ScreenSlice:
+         ]
+         if s.purpose:
+             lines.append(f"Mục đích: {s.purpose}")
++        # Quy ước cổng phải nói ra, không để agent đoán (lỗi 14, e9 note-editor
++        # 2026-09-05: cổng mở `/note/1`, app không có ghi chú `1`, trang trống,
++        # story trượt 2 lượt mà không biết vì sao).
++        from .mockup_verify import concrete_route
++
++        if s.route and concrete_route(s.route) != s.route:
++            lines.append(
++                f"Cổng map mockup sẽ mở `{concrete_route(s.route)}` (tham số động thay "
++                f"bằng `1`). Môi trường dev (`app.dev_command`) phải có sẵn bản ghi mã "
++                f"`1` cho route này — dữ liệu hạt giống — nếu không cổng thấy trang "
++                f"trống và story không qua được."
++            )
+ 
+         lines += ["", "Component **phải có** (vai trò + tên gọi, đúng như mockup):"]
+         for c in s.components[:MAX_LISTED]:
+diff --git a/aisdlc/harness/mockup_verify.py b/aisdlc/harness/mockup_verify.py
+index 6176834..3494b8b 100644
+--- a/aisdlc/harness/mockup_verify.py
++++ b/aisdlc/harness/mockup_verify.py
+@@ -190,10 +190,8 @@ def verify_screens(
+             out.unavailable = why
+             return out
+ 
+-        jobs = [
+-            {"id": s.id, "url": server.url_for(concrete_route(s.route or "/"))}
+-            for s in screens
+-        ]
++        urls = {s.id: server.url_for(concrete_route(s.route or "/")) for s in screens}
++        jobs = [{"id": s.id, "url": urls[s.id]} for s in screens]
+         rendered = browser.render(jobs, project=project)
+ 
+     if rendered.unavailable:
+@@ -218,10 +216,15 @@ def verify_screens(
+             )
+         out.results.append(result)
+         if store:
+-            store.record(
+-                story_id,
+-                _event(result, got.error if got else "không mở được route"),
+-            )
++            error = got.error if got else "không mở được route"
++            if (got is not None and not got.error and screen.components
++                    and not result.matched and not getattr(result, "extra", None)):
++                # Không khớp gì và cũng không thừa gì = trang trống. Với route
++                # có tham số, gần như chắc là thiếu bản ghi hạt giống `1`.
++                error = f"trang không dựng component nào tại {urls[screen.id]}"
++                if concrete_route(screen.route or "/") != (screen.route or "/"):
++                    error += " — route có tham số: môi trường dev cần bản ghi mã `1` (hạt giống)"
++            store.record(story_id, _event(result, error))
+     return out
+ 
+ 

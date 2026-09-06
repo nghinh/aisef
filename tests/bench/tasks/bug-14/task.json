@@ -1,0 +1,31 @@
+{
+  "id": "bug-14",
+  "source": "bug",
+  "base": "765d846d16603f25457221a68165a299000acaa0",
+  "candidate": "2a68604024ecf1df80a3ab55c43d77a3aef4068b",
+  "verify": "python3 -m unittest -v tests.test_mockup_map_seed",
+  "write_scope": [
+    "aisdlc"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [
+    "tests.test_mockup_map_seed.TestSeedConvention.test_param_route_names_seed_record"
+  ],
+  "p2p_ids": [
+    "tests.test_mockup_map_seed.TestSeedConvention.test_plain_route_says_nothing_about_seed"
+  ],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": true,
+    "gold_pass": true,
+    "runs": 3
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "",
+  "fix_commit": "2a68604024ecf1df80a3ab55c43d77a3aef4068b"
+}
