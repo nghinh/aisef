@@ -1,0 +1,65 @@
+diff --git a/tests/conformance/_runner.py b/tests/conformance/_runner.py
+index 1396478..66e95de 100644
+--- a/tests/conformance/_runner.py
++++ b/tests/conformance/_runner.py
+@@ -18,6 +18,8 @@ from pathlib import Path
+ ROOT = Path(__file__).resolve().parent.parent.parent
+ sys.path.insert(0, str(ROOT))
+ 
++from aisdlc.clients.base import RunSpec  # noqa: E402
++from aisdlc.clients.claude_code import ClaudeCodeAdapter  # noqa: E402
+ from aisdlc.clients.compile import compile_for, write_compile_report  # noqa: E402
+ from aisdlc.clients.stream import parse_stream  # noqa: E402
+ from aisdlc.control.conformance import ClientRun, ProbeResult, Report  # noqa: E402
+@@ -84,8 +86,11 @@ def env_for(project: Path, workdir: Path, story: str, *, reviewer: bool = False)
+ 
+ 
+ def run_claude(project: Path, workdir: Path, prompt: str, story: str, *, reviewer=False):
+-    cmd = ["claude", "-p", prompt, "--output-format", "stream-json", "--verbose",
+-           "--max-turns", "6", "--settings", str(project / ".claude" / "settings.json")]
++    # Đúng dòng lệnh harness dùng (cách ly cấu hình máy, tool kê tường minh) —
++    # tự dựng thì đo một thứ khác với thứ chạy thật.
++    cmd = ClaudeCodeAdapter().build_command(RunSpec(
++        prompt=prompt, workdir=workdir, max_turns=6,
++        settings_file=project / ".claude" / "settings.json"))
+     # Không bật `--disallowed-tools` ở đây: C5 đo tầng guard (`check_role_tool`
+     # qua env), không đo tầng native — bật cờ thì Write biến mất khỏi danh sách
+     # tool và guard không bao giờ được gọi. Harness thật bật cả hai lớp.
+@@ -94,7 +99,9 @@ def run_claude(project: Path, workdir: Path, prompt: str, story: str, *, reviewe
+                           stdin=subprocess.DEVNULL)
+     _keep(project, story, proc.stdout + "\n--- stderr ---\n" + proc.stderr)
+     r = parse_stream(proc.stdout.splitlines())
+-    return Run(r.text, r.cost_usd, [d.tool_name for d in r.denials],
++    # Cả phiên, không chỉ câu chốt: hook Stop có thể bắt agent chạy test rồi
++    # câu chốt nói về test chứ không về việc (C4, 2026-09-05).
++    return Run("\n".join([*r.texts, r.text]), r.cost_usd, [d.tool_name for d in r.denials],
+                [t.name for t in r.tool_uses])
+ 
+ 
+diff --git a/tests/test_clients.py b/tests/test_clients.py
+index d43bd9a..d486f70 100644
+--- a/tests/test_clients.py
++++ b/tests/test_clients.py
+@@ -104,6 +104,22 @@ class TestClaudeCommand(unittest.TestCase):
+         cmd = self.a.build_command(self.spec(max_turns=40))
+         self.assertIn("40", cmd)
+ 
++    def test_isolated_from_user_config(self):
++        """Đo 2026-09-05: `defaultMode: auto` toàn cục làm phiên con mất
++        Glob/Grep và né guard bằng Bash; MCP + hook người dùng lọt vào."""
++        cmd = self.a.build_command(self.spec())
++        self.assertEqual(cmd[cmd.index("--permission-mode") + 1], "acceptEdits")
++        self.assertEqual(cmd[cmd.index("--setting-sources") + 1], "project,local")
++        self.assertIn("--strict-mcp-config", cmd)
++        tools = cmd[cmd.index("--allowed-tools") + 1:]
++        for t in ("Glob", "Grep", "Bash", "Write"):
++            self.assertIn(t, tools)
++
++    def test_explicit_allowlist_replaces_default(self):
++        cmd = self.a.build_command(self.spec(allowed_tools=["Read"]))
++        self.assertEqual(cmd[cmd.index("--allowed-tools") + 1], "Read")
++        self.assertNotIn("Bash", cmd)
++
+ 
+ class TestOpenCodeCommand(unittest.TestCase):
+     def test_run_subcommand(self):

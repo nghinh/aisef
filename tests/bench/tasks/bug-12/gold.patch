@@ -1,0 +1,77 @@
+diff --git a/aisdlc/control/design_contract.py b/aisdlc/control/design_contract.py
+index 53446d9..b8394b3 100644
+--- a/aisdlc/control/design_contract.py
++++ b/aisdlc/control/design_contract.py
+@@ -45,6 +45,13 @@ class ScreenContract:
+     #: Chỗ mockup tự khai là chưa chốt (`data-unresolved`). Còn mục nào thì
+     #: cổng chặn: dựng code theo một màn hình chưa chốt là làm lại hai lần.
+     unresolved: list[str] = field(default_factory=list)
++    #: Mockup không khai `data-state="primary"` → hợp đồng lấy **cả trang**.
++    #: Trang dựng nhiều trạng thái cạnh nhau thì cả trang không bao giờ khớp
++    #: một màn hình thật (e9 note-editor 2026-09-05: 32 component, 4 lần
++    #: "Thêm thẻ", story đốt $28 qua 4 lượt mà không thể qua cổng).
++    whole_page: bool = False
++    #: Số component trùng (vai trò, tên) đã gộp — dấu vết của nhiều trạng thái.
++    duplicates: int = 0
+     error: str = ""
+ 
+     def as_dict(self) -> dict:
+@@ -60,6 +67,8 @@ class ScreenContract:
+             "fields": self.fields,
+             "states": self.states,
+             "unresolved": self.unresolved,
++            "whole_page": self.whole_page,
++            "duplicates": self.duplicates,
+             "error": self.error,
+         }
+ 
+@@ -80,6 +89,8 @@ class ScreenContract:
+             fields=data.get("fields", []),
+             states=data.get("states", []),
+             unresolved=data.get("unresolved", []),
++            whole_page=bool(data.get("whole_page", False)),
++            duplicates=int(data.get("duplicates", 0) or 0),
+             error=data.get("error", ""),
+         )
+ 
+@@ -186,7 +197,16 @@ def _one(screen: Screen, rendered, root: Path) -> ScreenContract:
+         c for snap in getattr(rendered, "annotation_snapshots", []) or []
+         for c in parse_aria_snapshot(snap)
+     }
+-    out.components = [c for c in everything if c not in ignored]
++    unique: list[Component] = []
++    for c in everything:
++        if c in ignored:
++            continue
++        if c in unique:
++            out.duplicates += 1
++        else:
++            unique.append(c)
++    out.components = unique
++    out.whole_page = not getattr(rendered, "primary_snapshot", "")
+     out.data_roles = sorted({c.role for c in in_samples if c in set(everything)}) or sorted(
+         {c.role for c in in_samples}
+     )
+diff --git a/aisdlc/control/machine_gate.py b/aisdlc/control/machine_gate.py
+index 406ec3e..0545a11 100644
+--- a/aisdlc/control/machine_gate.py
++++ b/aisdlc/control/machine_gate.py
+@@ -237,6 +237,18 @@ def check_design_contract(
+             r.errors.append(f"{screen.id}: {screen.error}")
+             continue
+         unresolved += [(screen.id, item) for item in screen.unresolved]
++        if screen.whole_page and screen.duplicates:
++            # Đo 2026-09-05 (e9 note-editor): mockup bỏ quên `data-state`, hợp
++            # đồng ôm cả trang gồm 4 trạng thái → story không thể qua bước map
++            # mockup, đốt $28 qua 4 lượt. Chặn ở đây rẻ hơn nhiều.
++            r.errors.append(
++                f"{screen.id}: mockup không đánh dấu `data-state=\"primary\"` nên hợp đồng "
++                f"lấy cả trang — {len(screen.components)} component, {screen.duplicates} chỗ "
++                f"trùng, tức nhiều trạng thái dựng cạnh nhau. Ứng dụng thật ở một thời điểm "
++                f"chỉ ở một trạng thái nên bước map mockup sẽ không bao giờ khớp. Đánh dấu "
++                f"trạng thái theo skill aisdlc-mockup-html (mục 7) rồi chạy `aisdlc mockup` "
++                f"(không --force: chỉ trích lại hợp đồng)"
++            )
+         if not screen.route:
+             r.errors.append(
+                 f"{screen.id}: mockup không khai route (thẻ meta aisdlc-route) — "

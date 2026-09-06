@@ -1,0 +1,418 @@
+diff --git a/tests/dogfood/__init__.py b/tests/dogfood/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/tests/dogfood/_runner.py b/tests/dogfood/_runner.py
+new file mode 100644
+index 0000000..2a530ae
+--- /dev/null
++++ b/tests/dogfood/_runner.py
+@@ -0,0 +1,92 @@
++"""Kho hồi quy dogfood (R5): dựng lại dự án thử **từ đầu vào trong kho**, chạy
++thật, so với mốc. Không dùng bản scratch — bản scratch không lặp lại được.
++
++Bật bằng ``AISDLC_DOGFOOD=1`` (tốn tiền thật: `par` EPIC-01 ≈ $3–6).
++Đầu vào của `par` là 4 tệp ở commit `9adfb59` của dự án thử + cấu hình
++(`.claude/` **không** commit — đúng kịch bản G4). Mốc so sánh (đo 2026-09-05,
++3 story song song, Claude): 3/3 qua ở lượt đầu, $3,14.
++"""
++
++from __future__ import annotations
++
++import json
++import os
++import shutil
++import subprocess
++import sys
++from pathlib import Path
++
++ROOT = Path(__file__).resolve().parent.parent.parent
++sys.path.insert(0, str(ROOT))
++
++ENABLED = os.environ.get("AISDLC_DOGFOOD") == "1"
++KEEP_DIR = Path(os.environ.get("AISDLC_DOGFOOD_DIR") or (ROOT / ".dogfood"))
++INPUTS = Path(__file__).parent
++
++#: Mốc `par` EPIC-01 — đo 2026-09-05 (commit `f0342e9`, 3 story, wave 1).
++PAR_BASELINE_USD = 3.14
++
++
++def _git(cwd: Path, *args: str) -> str:
++    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True).stdout.strip()
++
++
++def make_project(name: str) -> Path:
++    """Chép đầu vào, `git init`, commit nền, biên dịch hook Claude (không commit)."""
++    from aisdlc.clients.compile import compile_for, write_compile_report
++
++    dst = KEEP_DIR / name
++    shutil.rmtree(dst, ignore_errors=True)
++    shutil.copytree(INPUTS / name, dst)
++    subprocess.run(["git", "init", "-q", "-b", "main"], cwd=dst, check=True)
++    subprocess.run(["git", "config", "user.email", "dogfood@aisdlc"], cwd=dst, check=True)
++    subprocess.run(["git", "config", "user.name", "dogfood"], cwd=dst, check=True)
++    subprocess.run(["git", "add", "-A"], cwd=dst, check=True)
++    subprocess.run(["git", "commit", "-qm", "nền: đầu vào dogfood"], cwd=dst, check=True)
++    rep = compile_for("claude", dst, aisdlc_bin=str(ROOT / "bin" / "aisdlc"))
++    write_compile_report(dst, [rep])
++    return dst
++
++
++def clean_env() -> dict[str, str]:
++    """Không thừa hưởng `CLAUDE*` của phiên gọi (hợp quy C3)."""
++    return {k: v for k, v in os.environ.items() if not k.startswith("CLAUDE")}
++
++
++def run_epic(project: Path, epic: str, *, client: str = "claude") -> str:
++    proc = subprocess.run(
++        [str(ROOT / "bin" / "aisdlc"), "run", "--epic", epic, "--client", client, "--force"],
++        cwd=project, capture_output=True, text=True, env=clean_env(), timeout=3600,
++    )
++    (project / "_bmad-output" / "dogfood-run.log").write_text(proc.stdout + "\n--- stderr ---\n" + proc.stderr, encoding="utf-8")
++    return proc.stdout
++
++
++def milestones(project: Path, story_ids: list[str]) -> dict:
++    """Đọc từ đĩa: trạng thái, số lượt, chi phí, merge, mã tiêu chí, HANDOFF."""
++    from aisdlc.harness.observe import AGENT_RUN, HANDOFF, TOOL_RUN, EvidenceStore
++    from aisdlc.control.acceptance import missing as ac_missing
++
++    root = project / "_bmad-output"
++    st = json.loads((root / "sprint-status.json").read_text(encoding="utf-8"))["stories"]
++    idx = {s["id"]: s for s in json.loads((root / "stories.index.json").read_text(encoding="utf-8"))["stories"]}
++    ev = EvidenceStore(root)
++    out = {"stories": {}, "cost_usd": 0.0}
++    for sid in story_ids:
++        e = ev.read(sid)
++        xanh = [x for x in e.of(TOOL_RUN, "test") if x.ok]
++        ids = list(xanh[-1].detail.get("test_ids") or []) if xanh else []
++        n_ac = len(idx[sid].get("acceptance_criteria") or [])
++        out["stories"][sid] = {
++            "status": st.get(sid, {}).get("status"),
++            "attempts": st.get(sid, {}).get("attempts"),
++            "cost_usd": e.total_cost_usd,
++            "runs": len(e.of(AGENT_RUN)),
++            "ac_missing": ac_missing(sid, n_ac, ids),
++            "handoffs": len(e.of(HANDOFF)),
++        }
++        out["cost_usd"] += e.total_cost_usd
++    # `main` chỉ đổi qua merge: mọi commit trên main ngoài commit nền phải là merge
++    logs = _git(project, "log", "--format=%H %P", "main").splitlines()
++    out["non_merge_after_base"] = [l.split()[0][:8] for l in logs[:-1] if len(l.split()) < 3]
++    return out
+diff --git a/tests/dogfood/par/.ai/config.json b/tests/dogfood/par/.ai/config.json
+new file mode 100644
+index 0000000..cde40e8
+--- /dev/null
++++ b/tests/dogfood/par/.ai/config.json
+@@ -0,0 +1,42 @@
++{
++  "coverage.min": 0.85,
++  "security.block_severities": [
++    "critical",
++    "high"
++  ],
++  "security.semantic_review": true,
++  "story.max_acceptance_criteria": 8,
++  "story.max_write_scope_paths": 10,
++  "run.max_parallel": 3,
++  "run.max_turns": 40,
++  "run.timeout_seconds": 900,
++  "run.max_retries": 1,
++  "cost.warn_multiple": 3.0,
++  "verify.sit": "",
++  "verify.api-contract": "",
++  "verify.e2e": "",
++  "verify.uat": "",
++  "verify.perf": "",
++  "verify.security": "",
++  "verify.mutation": "",
++  "verify.unit": "",
++  "verify.accessibility": "",
++  "verify.migration": "",
++  "verify.sbom": "",
++  "verify.image-scan": "",
++  "verify.waived": "e2e,accessibility",
++  "app.dev_command": "",
++  "app.base_url": "http://localhost:5173",
++  "app.ready_timeout_seconds": 60,
++  "route.developer_model": "",
++  "route.reviewer_model": "",
++  "route.designer_model": "",
++  "review.impact_provider": "",
++  "tools.test": "node --test src/",
++  "tools.lint": "true",
++  "tools.sast": "",
++  "sandbox.image": "",
++  "sandbox.tools_network": false,
++  "sandbox.use_docker": false,
++  "sandbox.allow_degraded": true
++}
+diff --git a/tests/dogfood/par/.gitignore b/tests/dogfood/par/.gitignore
+new file mode 100644
+index 0000000..8093dec
+--- /dev/null
++++ b/tests/dogfood/par/.gitignore
+@@ -0,0 +1,2 @@
++node_modules/
++.aisdlc/
+diff --git a/tests/dogfood/par/_bmad-output/stories.index.json b/tests/dogfood/par/_bmad-output/stories.index.json
+new file mode 100644
+index 0000000..0da9eac
+--- /dev/null
++++ b/tests/dogfood/par/_bmad-output/stories.index.json
+@@ -0,0 +1,95 @@
++{
++  "version": 1,
++  "epics": [
++    {
++      "id": "EPIC-01",
++      "title": "Ba hàm chuỗi"
++    }
++  ],
++  "stories": [
++    {
++      "id": "STORY-01-01",
++      "epic_id": "EPIC-01",
++      "title": "Đưa chuỗi về slug",
++      "as_a": "người dùng thư viện",
++      "i_want": "gọi `slugify`",
++      "so_that": "khỏi tự viết",
++      "acceptance_criteria": [
++        "Given một chuỗi bất kỳ, When gọi `slugify`, Then kết quả đúng đặc tả FR ở docs/requirements.md",
++        "Given chuỗi rỗng, When gọi `slugify`, Then không ném lỗi"
++      ],
++      "covers": [
++        "FR-1"
++      ],
++      "write_scope": [
++        "src/slugify.js",
++        "src/slugify.test.js"
++      ],
++      "depends_on": [],
++      "screens": [],
++      "verification_contract": [
++        "unit"
++      ],
++      "file": "stories/STORY-01-01.md"
++    },
++    {
++      "id": "STORY-01-02",
++      "epic_id": "EPIC-01",
++      "title": "Cắt chuỗi có dấu ba chấm",
++      "as_a": "người dùng thư viện",
++      "i_want": "gọi `truncate`",
++      "so_that": "khỏi tự viết",
++      "acceptance_criteria": [
++        "Given một chuỗi bất kỳ, When gọi `truncate`, Then kết quả đúng đặc tả FR ở docs/requirements.md",
++        "Given chuỗi rỗng, When gọi `truncate`, Then không ném lỗi"
++      ],
++      "covers": [
++        "FR-2"
++      ],
++      "write_scope": [
++        "src/truncate.js",
++        "src/truncate.test.js"
++      ],
++      "depends_on": [],
++      "screens": [],
++      "verification_contract": [
++        "unit"
++      ],
++      "file": "stories/STORY-01-02.md"
++    },
++    {
++      "id": "STORY-01-03",
++      "epic_id": "EPIC-01",
++      "title": "Đếm số từ",
++      "as_a": "người dùng thư viện",
++      "i_want": "gọi `wordCount`",
++      "so_that": "khỏi tự viết",
++      "acceptance_criteria": [
++        "Given một chuỗi bất kỳ, When gọi `wordCount`, Then kết quả đúng đặc tả FR ở docs/requirements.md",
++        "Given chuỗi rỗng, When gọi `wordCount`, Then không ném lỗi"
++      ],
++      "covers": [
++        "FR-3"
++      ],
++      "write_scope": [
++        "src/word-count.js",
++        "src/word-count.test.js"
++      ],
++      "depends_on": [],
++      "screens": [],
++      "verification_contract": [
++        "unit"
++      ],
++      "file": "stories/STORY-01-03.md"
++    }
++  ],
++  "waves": {
++    "EPIC-01": [
++      [
++        "STORY-01-01",
++        "STORY-01-02",
++        "STORY-01-03"
++      ]
++    ]
++  }
++}
+\ No newline at end of file
+diff --git a/tests/dogfood/par/docs/requirements.md b/tests/dogfood/par/docs/requirements.md
+new file mode 100644
+index 0000000..840ca53
+--- /dev/null
++++ b/tests/dogfood/par/docs/requirements.md
+@@ -0,0 +1,7 @@
++# Thư viện tiện ích chuỗi
++
++Ba hàm thuần, không phụ thuộc nhau, dùng chung không gì cả.
++
++- FR-1: `slugify(s)` — đưa chuỗi về dạng slug ASCII, chữ thường, nối bằng `-`.
++- FR-2: `truncate(s, n)` — cắt chuỗi còn tối đa n ký tự, thêm `…` khi bị cắt.
++- FR-3: `wordCount(s)` — đếm số từ, coi mọi khoảng trắng liên tiếp là một.
+diff --git a/tests/dogfood/par/package.json b/tests/dogfood/par/package.json
+new file mode 100644
+index 0000000..04f79ab
+--- /dev/null
++++ b/tests/dogfood/par/package.json
+@@ -0,0 +1,6 @@
++{
++  "name": "chuoi",
++  "version": "0.0.0",
++  "type": "module",
++  "scripts": { "test": "node --test", "lint": "node --check src/slugify.js && node --check src/truncate.js && node --check src/word-count.js" }
++}
+diff --git a/tests/dogfood/test_par.py b/tests/dogfood/test_par.py
+new file mode 100644
+index 0000000..f6dc7d8
+--- /dev/null
++++ b/tests/dogfood/test_par.py
+@@ -0,0 +1,26 @@
++"""Dogfood `par` EPIC-01 — 3 story độc lập, chạy song song, Claude."""
++
++from __future__ import annotations
++
++import shutil
++import unittest
++
++from . import _runner as R
++
++STORIES = ["STORY-01-01", "STORY-01-02", "STORY-01-03"]
++
++
++@unittest.skipUnless(R.ENABLED and shutil.which("claude"), "AISDLC_DOGFOOD=1 và có `claude`")
++class TestParEpic01(unittest.TestCase):
++    def test_moc(self):
++        project = R.make_project("par")
++        R.run_epic(project, "EPIC-01")
++        m = R.milestones(project, STORIES)
++        for sid, s in m["stories"].items():
++            with self.subTest(story=sid):
++                self.assertEqual(s["status"], "done", s)
++                self.assertEqual(s["attempts"], 1, "mốc: qua ở lượt đầu")
++                self.assertEqual(s["ac_missing"], [], "mọi tiêu chí có test mang mã")
++                self.assertGreaterEqual(s["handoffs"], 3, "dev → reviewer → security")
++        self.assertLessEqual(m["cost_usd"], 2 * R.PAR_BASELINE_USD, m)
++        self.assertEqual(m["non_merge_after_base"], [], "main chỉ đổi qua merge")
+diff --git a/tests/test_cli.py b/tests/test_cli.py
+index bac63fb..8ae648b 100644
+--- a/tests/test_cli.py
++++ b/tests/test_cli.py
+@@ -529,3 +529,26 @@ class TestStatusCanhBaoNguCanhPhinh(CliTestCase):
+             ev.agent_run(sid, RunResult(ok=True, text="x"), name=f"{sid}#1", prompt_chars=chars)
+         code, out, _ = self.run_cli("status")
+         self.assertNotIn("nạp ngữ cảnh hơn", out)
++
++
++class TestDoctorHookTroDungDuAn(CliTestCase):
++    """P0-1: hook trỏ sang dự án khác phải là ✗ — guard sẽ ghi bằng chứng sai chủ."""
++
++    def _hook(self, project_path: str):
++        import json
++        (self.project / ".claude").mkdir(exist_ok=True)
++        (self.project / ".claude" / "settings.json").write_text(json.dumps({"hooks": {"Stop": [
++            {"matcher": "", "hooks": [{"type": "command", "command": f"aisdlc --project {project_path} guard completion"}]}]}}),
++            encoding="utf-8")
++
++    def test_lech_thi_do(self):
++        self._hook("/tmp/du-an-khac")
++        code, out, _ = self.run_cli("doctor")
++        self.assertIn("hook trỏ đúng dự án", out)
++        self.assertIn("/tmp/du-an-khac", out)
++        self.assertIn("compile", out)
++
++    def test_khop_thi_xanh(self):
++        self._hook(str(self.project))
++        code, out, _ = self.run_cli("doctor")
++        self.assertIn("✅ hook trỏ đúng dự án", out)
+diff --git a/tests/test_guardrails.py b/tests/test_guardrails.py
+index 44d1c04..37c0d4a 100644
+--- a/tests/test_guardrails.py
++++ b/tests/test_guardrails.py
+@@ -824,3 +824,14 @@ class TestNhipTimVaBashGhiFile(unittest.TestCase):
+         for _ in range(3):
+             record_outcome("diff-scope", self.bash(), ALLOW, env=self.env, artifact_root=str(self.root))
+         self.assertEqual(len(self.store.read("S-01").of("file_change")), 1)
++
++
++class TestGocDuAnTuEnv(unittest.TestCase):
++    """P0-1: hook ghim `--project` tuyệt đối; dự án chép/di chuyển thì guard ghi
++    bằng chứng vào dự án cũ. Harness khai gốc qua env, env thắng."""
++
++    def test_env_wins_over_compiled_project(self):
++        from aisdlc.harness.guardrails import ENV_PROJECT, project_root_from
++        self.assertEqual(project_root_from({ENV_PROJECT: "/b"}, "/a"), "/b")
++        self.assertEqual(project_root_from({}, "/a"), "/a")
++        self.assertEqual(project_root_from({ENV_PROJECT: "  "}, "/a"), "/a")
+diff --git a/tests/test_implement.py b/tests/test_implement.py
+index 61f86b8..17e943f 100644
+--- a/tests/test_implement.py
++++ b/tests/test_implement.py
+@@ -791,3 +791,23 @@ class TestGoiBanGiaoDuocGhi(ImplementTestCase):
+                 self.assertNotIn("agent", nguon.values(), nguon)
+                 self.assertNotIn("?", nguon.values(), nguon)
+                 self.assertIn("diff_summary", nguon)
++
++
++class TestHarnessKhaiGocDuAn(ImplementTestCase):
++    def test_every_role_gets_the_project_root_in_env(self):
++        from aisdlc.harness.guardrails import ENV_PROJECT
++
++        class Ghi(ScriptedClient):
++            def __init__(self):
++                super().__init__()
++                self.specs = []
++
++            def run(self, spec):
++                self.specs.append(spec)
++                return super().run(spec)
++
++        client = Ghi()
++        self.implement(client)
++        self.assertTrue(client.specs, "không có lượt nào")
++        for spec in client.specs:
++            self.assertEqual(spec.env.get(ENV_PROJECT), str(self.project), spec.env)
+diff --git a/tests/test_meta.py b/tests/test_meta.py
+index 6fe9f5c..b5b6e9a 100644
+--- a/tests/test_meta.py
++++ b/tests/test_meta.py
+@@ -104,3 +104,19 @@ class TestNangLucKhaiEmulatedPhaiCoMaMoPhong(unittest.TestCase):
+ 
+ if __name__ == "__main__":
+     unittest.main()
++
++
++class TestTaiLieuTroVaoMaCoThat(unittest.TestCase):
++    """R4: SOLUTION/README nhắc `kit/agents/`, `kit/mcp/`, `control/fsm.py`,
++    `phases/ship`… không tồn tại. Tài liệu nêu đường dẫn nào thì đường dẫn ấy
++    phải có thật — không thì bảng kiến trúc là lời kể."""
++
++    def test_moi_duong_dan_module_trong_tai_lieu_ton_tai(self):
++        rx = re.compile(r"`((?:aisdlc/)?(?:kit|harness|control|phases|clients)/[A-Za-z0-9_./-]+)`")
++        for doc in ("docs/SOLUTION.md", "README.md"):
++            text = (ROOT / doc).read_text(encoding="utf-8")
++            for ref in sorted(set(rx.findall(text))):
++                rel = (ref if ref.startswith("aisdlc/") else "aisdlc/" + ref).rstrip("/")
++                with self.subTest(doc=doc, path=ref):
++                    self.assertTrue((ROOT / rel).exists() or (ROOT / (rel + ".py")).exists(),
++                                    f"{doc} nhắc `{ref}` nhưng không có trong cây mã")

@@ -1,0 +1,49 @@
+diff --git a/tests/test_mockup_map.py b/tests/test_mockup_map.py
+index 7ed5fec..124773d 100644
+--- a/tests/test_mockup_map.py
++++ b/tests/test_mockup_map.py
+@@ -221,6 +221,44 @@ class TestVerifyHalf(unittest.TestCase):
+         self.assertEqual(res.results, [])
+ 
+ 
++class TestAppServerTrust(unittest.TestCase):
++    """Lỗi 15: thứ đang trả lời ở cổng không phải app của story này."""
++
++    def test_refuses_foreign_responder(self):
++        from unittest import mock
++
++        from aisdlc.harness import mockup_verify as mv
++
++        s = AppServer("echo x", "http://127.0.0.1:1", cwd=Path("."))
++        with mock.patch.object(mv, "_responds", return_value=True), \
++                mock.patch.object(mv, "occupant", return_value="pid 1, cwd /x"):
++            why = s.start()
++        self.assertIn("tiến trình khác", why)
++        self.assertIn("pid 1", why)
++        self.assertIsNone(s.proc)
++
++    def test_stop_kills_whole_process_group(self):
++        import os
++        import tempfile
++        import time
++
++        with tempfile.TemporaryDirectory() as d:
++            pidfile = Path(d) / "child.pid"
++            # cha = shell; con = sleep. Chỉ giết cha thì con sống sót (vite).
++            cmd = f"sh -c 'sleep 30 & echo $! > {pidfile}; wait'"
++            s = AppServer(cmd, "http://127.0.0.1:1", cwd=Path(d), ready_timeout=1)
++            s.start()  # không bao giờ "sẵn sàng" — chỉ cần tiến trình đã chạy
++            for _ in range(50):
++                if pidfile.is_file() and pidfile.read_text().strip():
++                    break
++                time.sleep(0.05)
++            child = int(pidfile.read_text().strip())
++            s.stop()
++            time.sleep(0.2)
++            with self.assertRaises(ProcessLookupError):
++                os.kill(child, 0)
++
++
+ class TestAppServer(unittest.TestCase):
+     def test_url_join(self):
+         s = AppServer("", "http://x:3000", cwd=Path("."))

@@ -1,0 +1,23 @@
+diff --git a/aisdlc/control/worktree.py b/aisdlc/control/worktree.py
+index 652a640..5b23050 100644
+--- a/aisdlc/control/worktree.py
++++ b/aisdlc/control/worktree.py
+@@ -136,8 +136,17 @@ class WorktreeManager:
+         và conflict giữa chừng một chuỗi commit thì không ai gỡ nổi.
+         """
+         path, branch = self.path_for(story_id), self.branch_for(story_id)
+-        if path.exists():
++        if (path / ".git").exists():
+             return Worktree(story_id, path, branch)
++        if path.exists():
++            # Thư mục có mà không phải worktree (lỗi 13, đo 2026-09-05 trên
++            # e9 A/B): tiến trình vite sống sót sau khi gỡ worktree ghi lại
++            # `.vite/` vào đúng chỗ ấy; lần chạy sau tưởng worktree còn, agent
++            # làm việc trong một thư mục thường nằm **trong repo chính**, guard
++            # so diff với repo chính và chặn mọi Bash — 16 lần chặn, $0 việc.
++            # Thư mục ấy là của harness: không phải worktree thì là rác.
++            shutil.rmtree(path)
++            _git(self.repo, "worktree", "prune")
+ 
+         self._ensure_root()
+         co_san = self._branch_exists(branch)

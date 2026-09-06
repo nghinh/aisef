@@ -1,0 +1,124 @@
+diff --git a/tests/test_clients.py b/tests/test_clients.py
+index bfeafc7..8d155f8 100644
+--- a/tests/test_clients.py
++++ b/tests/test_clients.py
+@@ -172,3 +172,35 @@ class TestTimeoutIsInfrastructureError(unittest.TestCase):
+ 
+ if __name__ == "__main__":
+     unittest.main(verbosity=2)
++
++
++class TestKhongThuaHuongPhienCha(unittest.TestCase):
++    """Hợp quy C3: phiên con thừa hưởng `CLAUDE*` của phiên cha thì tự chuyển
++    sang Bash. Harness phải bỏ các biến ấy khi gọi client."""
++
++    def test_claude_vars_are_dropped_but_anthropic_kept(self):
++        import os
++        from unittest import mock
++        from aisdlc.clients.claude_code import clean_env
++        with mock.patch.dict(os.environ, {"CLAUDECODE": "1", "CLAUDE_CODE_ENTRYPOINT": "x", "ANTHROPIC_API_KEY": "k"}):
++            env = clean_env()
++        self.assertNotIn("CLAUDECODE", env)
++        self.assertNotIn("CLAUDE_CODE_ENTRYPOINT", env)
++        self.assertEqual(env["ANTHROPIC_API_KEY"], "k")
++
++    def test_child_process_really_gets_the_clean_env(self):
++        import os, stat, tempfile
++        from pathlib import Path
++        from unittest import mock
++        from aisdlc.clients.base import RunSpec
++        from aisdlc.clients.claude_code import ClaudeCodeAdapter
++        with tempfile.TemporaryDirectory() as tmp:
++            fake = Path(tmp) / "claude-gia"
++            fake.write_text("#!/bin/sh\nenv > \"$PWD/env.txt\"\n", encoding="utf-8")
++            fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
++            a = ClaudeCodeAdapter(binary=str(fake))
++            with mock.patch.dict(os.environ, {"CLAUDECODE": "1"}):
++                a.run(RunSpec(prompt="x", workdir=Path(tmp), env={"AISDLC_STORY_ID": "S"}))
++            got = (Path(tmp) / "env.txt").read_text(encoding="utf-8")
++        self.assertNotIn("CLAUDECODE=", got)
++        self.assertIn("AISDLC_STORY_ID=S", got)
+diff --git a/tests/test_registry.py b/tests/test_registry.py
+index e4d7434..965b926 100644
+--- a/tests/test_registry.py
++++ b/tests/test_registry.py
+@@ -218,3 +218,42 @@ class TestScriptsPhaiBienDichDuoc(unittest.TestCase):
+             v = verify_structure(self._skill(tmp, "print('ok')\n"))
+         self.assertTrue(v.ok, v.gaps)
+         self.assertIn("scripts: 1 tệp biên dịch được", v.checks)
++
++
++class TestMienTheoNguon(unittest.TestCase):
++    def test_ui_ux_source_gets_a_ui_domain_when_frontmatter_has_none(self):
++        from aisdlc.kit.registry import _SOURCE_DOMAIN
++        self.assertEqual(_SOURCE_DOMAIN["ui-ux"], "ui-ux")
++
++
++class TestNangLucPhaiKhai(unittest.TestCase):
++    """Skill không khai miền thì không được suy năng lực từ chữ."""
++
++    def _build(self, tmp, name, frontmatter_extra="", body=""):
++        import json
++        from pathlib import Path
++        from aisdlc.kit.catalog import Catalog
++        from aisdlc.kit.registry import build
++        d = Path(tmp) / ".claude" / "skills" / name
++        d.mkdir(parents=True)
++        (d / "SKILL.md").write_text(f"---\nname: {name}\ndescription: Improve performance of the screen and review flow\n{frontmatter_extra}---\n# {name}\n{body}", encoding="utf-8")
++        return build(Path(tmp), catalog=Catalog.load()).entries[name]
++
++    def test_no_domain_means_no_inferred_capabilities(self):
++        import tempfile
++        with tempfile.TemporaryDirectory() as tmp:
++            e = self._build(tmp, "receiving-code-review")
++        self.assertEqual(e.capabilities, [])
++
++    def test_declared_capabilities_are_kept(self):
++        import tempfile
++        with tempfile.TemporaryDirectory() as tmp:
++            e = self._build(tmp, "toi-uu", "capabilities: [perf]\n")
++        self.assertEqual(e.capabilities, ["perf"])
++
++    def test_cyber_domain_keeps_its_allowed_inferred_set(self):
++        import tempfile
++        with tempfile.TemporaryDirectory() as tmp:
++            e = self._build(tmp, "kiem-bao-mat", "domain: cybersecurity\ntags: [security, authentication]\n")
++        self.assertIn("security", e.capabilities)
++        self.assertNotIn("ui", e.capabilities)
+diff --git a/tests/test_router.py b/tests/test_router.py
+index ab7d788..4e51a73 100644
+--- a/tests/test_router.py
++++ b/tests/test_router.py
+@@ -125,3 +125,32 @@ class TestRaChoAgent(unittest.TestCase):
+ 
+ if __name__ == "__main__":
+     unittest.main()
++
++
++class TestManHinhKhongPhaiTuKhoa(unittest.TestCase):
++    """Đo 2026-09-05 trên e9: story điều hướng bàn phím (có màn hình) được đề
++    nghị skill mã hoá đầu-cuối — vì skill ấy bị suy ra năng lực "ui" từ chữ,
++    và "màn hình + một chữ" được đếm là hai tín hiệu. Cả hai đường đều đóng."""
++
++    def story(self):
++        return Story(id="S-9", epic_id="E", title="Keyboard navigation of the notes list with messaging",
++                     acceptance_criteria=["Given the list, When arrow keys, Then focus moves"],
++                     screens=["danh-sach"], verification_contract=["unit"])
++
++    def test_cyber_skill_with_inferred_ui_is_not_offered_for_a_screen(self):
++        e = entry("implementing-end-to-end-encryption-for-messaging", ["security", "ui"],
++                  tags=["cryptography", "encryption", "messaging"])
++        e.domain = "cybersecurity"
++        r = router.route(self.story(), reg(e))
++        self.assertTrue(r.abstained, [p.line() for p in r.picked])
++
++    def test_ui_domain_skill_needs_two_words_besides_the_screen(self):
++        it = entry("ui-mot-chu", ["ui"], tags=["messaging"]); it.domain = "ui-ux"
++        nhieu = entry("ui-hai-chu", ["ui"], tags=["keyboard", "navigation", "messaging"]); nhieu.domain = "ui-ux"
++        r = router.route(self.story(), reg(it, nhieu))
++        self.assertEqual([p.entry.id for p in r.picked], ["ui-hai-chu"])
++
++    def test_contract_alone_is_still_one_signal(self):
++        e = entry("security-review", ["security"], tags=[]); e.domain = "cybersecurity"
++        s = self.story(); s.verification_contract = ["unit", "security"]
++        self.assertTrue(router.route(s, reg(e)).abstained)

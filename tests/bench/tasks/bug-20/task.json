@@ -1,0 +1,70 @@
+{
+  "id": "bug-20",
+  "source": "bug",
+  "base": "2c70a9727c5474d4a8a61f50b1f5a9dcc6a95087",
+  "candidate": "1595163c3fcddbac1b7095036011188f54e764d5",
+  "verify": "python3 -m unittest -v tests.test_preflight",
+  "write_scope": [
+    "aisdlc"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [
+    "tests.test_preflight.TestDottedNamesAreNotFiles.test_config_and_property_keys_are_not_write_needs"
+  ],
+  "p2p_ids": [
+    "tests.test_preflight.TestBatch.test_cham_ca_tap_story",
+    "tests.test_preflight.TestCodeIntelligence.test_manifest_khong_tinh_la_mot_module",
+    "tests.test_preflight.TestCodeIntelligence.test_mot_module_thi_khong_doi",
+    "tests.test_preflight.TestCodeIntelligence.test_thay_doi_cheo_nhieu_module_doi_phan_tich_anh_huong",
+    "tests.test_preflight.TestCodeIntelligence.test_tieu_chi_noi_toi_moi_noi_dung_thi_doi_phan_tich",
+    "tests.test_preflight.TestDottedNamesAreNotFiles.test_real_source_path_is_still_a_write_need",
+    "tests.test_preflight.TestHaiMucCham.test_ca_hai_loai_deu_lam_story_khong_chay_duoc",
+    "tests.test_preflight.TestHaiMucCham.test_story_hong_la_loi_cua_story",
+    "tests.test_preflight.TestHaiMucCham.test_thieu_cau_hinh_la_viec_cua_du_an",
+    "tests.test_preflight.TestKhongBaoOan.test_dong_tu_tao_ngay_canh_duong_dan_thi_van_bat",
+    "tests.test_preflight.TestKhongBaoOan.test_duong_dan_neu_nhu_rang_buoc_khong_doi_quyen_ghi",
+    "tests.test_preflight.TestKhongBaoOan.test_tep_cau_hinh_o_goc_khong_phai_mot_module",
+    "tests.test_preflight.TestKhongBaoOan.test_tep_o_thu_muc_khac_van_tinh_la_da_co",
+    "tests.test_preflight.TestKhongBaoOan.test_toan_kho_khong_phai_dau_hieu_thay_doi_cheo",
+    "tests.test_preflight.TestKhongBaoOan.test_token_thi_giac_khong_phai_van_de_bao_mat",
+    "tests.test_preflight.TestProvisioned.test_doc_tu_cau_hinh_va_dia_khong_doan",
+    "tests.test_preflight.TestProvisioned.test_khong_co_lenh_dev_thi_chua_co_trinh_duyet",
+    "tests.test_preflight.TestRanhGioiChanChay.test_thieu_cong_cu_test_thi_khong_chay_noi",
+    "tests.test_preflight.TestRanhGioiChanChay.test_thieu_kiem_dinh_thi_van_chay_noi_nhung_chua_du",
+    "tests.test_preflight.TestRanhGioiChanChay.test_thieu_nha_cung_cap_anh_huong_van_chay_noi",
+    "tests.test_preflight.TestRanhGioiChanChay.test_thieu_trinh_duyet_thi_khong_chay_noi",
+    "tests.test_preflight.TestSecurityAndNetwork.test_mo_mang_roi_thi_thoi",
+    "tests.test_preflight.TestSecurityAndNetwork.test_ra_soat_ngu_nghia_bat_thi_da_du",
+    "tests.test_preflight.TestSecurityAndNetwork.test_story_can_mang_doi_mo_mang_cho_sandbox",
+    "tests.test_preflight.TestSecurityAndNetwork.test_story_cham_bao_mat_doi_kiem_dinh_bao_mat",
+    "tests.test_preflight.TestUIStory.test_man_hinh_khac_trong_hop_dong_khong_tinh_la_du",
+    "tests.test_preflight.TestUIStory.test_story_khong_giao_dien_khong_doi_trinh_duyet",
+    "tests.test_preflight.TestUIStory.test_story_ui_du_dieu_kien_thi_chay_duoc",
+    "tests.test_preflight.TestUIStory.test_story_ui_thieu_hop_dong_thi_giac_thi_truot",
+    "tests.test_preflight.TestUIStory.test_story_ui_thieu_trinh_duyet_thi_truot",
+    "tests.test_preflight.TestVerificationTypes.test_cau_hinh_roi_thi_thoi",
+    "tests.test_preflight.TestVerificationTypes.test_khong_nhac_thi_khong_doi",
+    "tests.test_preflight.TestVerificationTypes.test_loai_kiem_dinh_duoc_goi_ten_thi_phai_co_cau_hinh",
+    "tests.test_preflight.TestVerificationTypes.test_mien_co_ghi_lai_duoc_tinh_la_da_cap",
+    "tests.test_preflight.TestVerificationTypes.test_thieu_cong_cu_nen_thi_truot",
+    "tests.test_preflight.TestWriteScope.test_goi_chua_khai_doi_quyen_ghi_manifest",
+    "tests.test_preflight.TestWriteScope.test_goi_da_khai_thi_khong_doi_gi",
+    "tests.test_preflight.TestWriteScope.test_ten_tang_khong_bi_coi_la_duong_dan_thieu",
+    "tests.test_preflight.TestWriteScope.test_tep_da_ton_tai_thi_khong_doi_quyen_ghi",
+    "tests.test_preflight.TestWriteScope.test_thieu_write_scope_thi_truot_truoc_khi_goi_model"
+  ],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": true,
+    "gold_pass": true,
+    "runs": 3
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "",
+  "fix_commit": "1595163c3fcddbac1b7095036011188f54e764d5"
+}

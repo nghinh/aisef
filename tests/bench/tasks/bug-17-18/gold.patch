@@ -1,0 +1,77 @@
+diff --git a/aisdlc/phases/deploy.py b/aisdlc/phases/deploy.py
+index 7f5887e..8cc2061 100644
+--- a/aisdlc/phases/deploy.py
++++ b/aisdlc/phases/deploy.py
+@@ -123,6 +123,16 @@ def check_runbook(path: Path) -> Check:
+     return Check("runbook", True)
+ 
+ 
++
++def _planned_but_never_run(artifact_root: Path, registered: set[str]) -> list[str]:
++    """Mã story trong `stories.index.json` không có bản ghi trạng thái nào."""
++    from .run import load_plan
++
++    plan = load_plan(artifact_root)
++    if plan.error:
++        return []  # không có kế hoạch đọc được thì không kết luận gì thêm
++    return [sid for sid in plan.stories if sid not in registered]
++
+ def pre_deploy(
+     project: Path | str,
+     *,
+@@ -150,9 +160,16 @@ def pre_deploy(
+             r.id for r in state.stories.values()
+             if r.state not in (StoryStatus.DONE, StoryStatus.VERIFIED)
+         ]
++        # Story có trong kế hoạch mà chưa từng được đăng ký thì không "xong":
++        # e9 2026-09-05, 01-06/01-07 chưa chạy bao giờ mà cổng ghi ✅ vì chỉ
++        # đếm bản ghi trạng thái. Chưa chạy ≠ đạt.
++        chua_chay = _planned_but_never_run(artifact_root, set(state.stories))
++        not_done += chua_chay
+         detail = ""
+         if not_done:
+             detail = f"{len(not_done)} chưa xong: {', '.join(not_done[:5])}"
++            if chua_chay:
++                detail += f" (chưa từng chạy: {', '.join(chua_chay[:5])})"
+         if chua_merge:
+             detail += ("; " if detail else "") + (
+                 f"{len(chua_merge)} xong nhưng chưa merge: {', '.join(chua_merge[:5])}"
+diff --git a/aisdlc/phases/report.py b/aisdlc/phases/report.py
+index c4fd42c..d065651 100644
+--- a/aisdlc/phases/report.py
++++ b/aisdlc/phases/report.py
+@@ -31,6 +31,22 @@ from ..control.state import StateStore
+ from ..harness.observe import AGENT_RUN, HANDOFF, MOCKUP_MAP, TOOL_RUN, EvidenceStore
+ 
+ 
++def mockup_cell(maps) -> str:
++    """Ô "Map mockup" của một story: **kết quả mới nhất của từng màn hình**.
++
++    Trước 2026-09-05 ô này đòi *mọi* lần đối chiếu từng đạt — story qua cổng
++    ở lượt cuối vẫn bị ✗ vì các lượt trước trượt (e9 STORY-01-05: done, map
++    3/3 ở lượt cuối, báo cáo ghi ✗). Lịch sử nằm ở evidence; báo cáo nói
++    trạng thái hiện tại.
++    """
++    if not maps:
++        return "✗"
++    latest: dict[str, bool] = {}
++    for m in maps:
++        latest[m.name] = bool(m.ok)
++    return "✅" if all(latest.values()) else "✗"
++
++
+ @dataclass
+ class Row:
+     requirement: str
+@@ -191,10 +207,7 @@ def build(project: Path | str) -> Report:
+     story_ids = [s for s in evidence.stories() if not s.startswith(PHASE_PREFIXES)]
+     for sid in sorted(set(list(state.stories) + story_ids)):
+         ev = evidence.read(sid)
+-        maps = ev.of(MOCKUP_MAP)
+-        mockup = "—"
+-        if story_screens.get(sid):
+-            mockup = "✅" if maps and all(m.ok for m in maps) else "✗"
++        mockup = mockup_cell(ev.of(MOCKUP_MAP)) if story_screens.get(sid) else "—"
+         record = state.stories.get(sid)
+         report.stories.append({
+             "id": sid,

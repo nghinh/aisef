@@ -1,0 +1,167 @@
+diff --git a/aisdlc/control/ledger.py b/aisdlc/control/ledger.py
+index 62c5006..baa8351 100644
+--- a/aisdlc/control/ledger.py
++++ b/aisdlc/control/ledger.py
+@@ -48,6 +48,7 @@ from ..harness.observe import (
+     EvidenceStore,
+ )
+ from .acceptance import ac_code, coverage as ac_coverage
++from .journal import JournalStore
+ 
+ VERSION = 1
+ LEDGER_FILE = "ledger.json"
+@@ -128,6 +129,11 @@ class Ledger:
+     #: story B ≠ A. Đây là con số HoH đo (17/81 của Fusepoint); đỏ-lại trong
+     #: chính lượt của story mình phần lớn là TDD bình thường, không phải hồi quy.
+     cross_reopens: list[dict] = field(default_factory=list)
++    #: Kết quả xanh ở ứng viên **chưa landed** (lượt chưa qua cổng/merge) bị
++    #: bỏ, không được tính VERIFIED. Đo 2026-09-06 (R3, client giả): lượt
++    #: story sửa trượt cổng — test xanh trong worktree, reviewer chặn — vẫn
++    #: làm hành vi gốc VERIFIED dù chưa có gì vào nhánh chính.
++    unlanded_green: int = 0
+ 
+     # ------------------------------------------------------------- ghi nhận
+ 
+@@ -143,6 +149,7 @@ class Ledger:
+         attempt: int = 0,
+         candidate: str = "",
+         source: dict | None = None,
++        landed: bool = True,
+     ) -> None:
+         """Một quan sát.
+ 
+@@ -150,6 +157,14 @@ class Ledger:
+         story **sở hữu** hành vi. Hai cái khác nhau chính là lúc đáng đọc
+         nhất: tiêu chí của story trước đỏ lại trong lượt chạy của story sau.
+         """
++        if ok and not landed:
++            # Xanh ở bản chưa vào nhánh chính không phải "đã xác minh": mã ấy
++            # có thể không bao giờ landed. Đỏ thì vẫn tính — không tin client.
++            self.unlanded_green += 1
++            if bid in self.behaviors:
++                return
++            ok = False
++            source = {**(source or {}), "why": "xanh ở ứng viên chưa landed — lượt chưa qua cổng/merge"}
+         b = self.behaviors.get(bid)
+         if b is None:
+             b = self.behaviors[bid] = Behavior(id=bid, kind=kind)
+@@ -197,6 +212,7 @@ class Ledger:
+             "resolved": self.resolved,
+             "reopen_events": self.reopen_events,
+             "cross_reopens": len(self.cross_reopens),
++            "unlanded_green": self.unlanded_green,
+         }
+ 
+     def epic_of(self, story_id: str) -> str:
+@@ -390,12 +406,16 @@ def build(artifact_root: Path | str) -> Ledger:
+     # Thứ tự thời gian **giữa** các story: `seq` chỉ có nghĩa trong một tệp.
+     events.sort(key=lambda t: (t[0], t[1], t[2]))
+ 
++    landed_of = _landed_candidates(root)
+     attempts: dict[str, int] = {}
+     for at, sid, _seq, e in events:
+         attempts[sid] = _attempt(e, sid, attempts.get(sid, 0))
+         n = attempts[sid]
+         # R1 do luồng khác làm; evidence cũ không có candidate và đó là hợp lệ.
+         cand = str(e.detail.get("candidate") or "")
++        # Story có nhật ký: ứng viên phải nằm trong tập đã landed. Không có
++        # nhật ký (QA cấp dự án, mốc vòng) thì candidate là HEAD nhánh chính.
++        landed = not cand or sid not in landed_of or cand in landed_of[sid]
+         if cand and sid in led.stories:
+             led.stories[sid].candidate = cand
+ 
+@@ -405,14 +425,14 @@ def build(artifact_root: Path | str) -> Ledger:
+                 str(det.get("id") or e.name), str(det.get("kind") or _kind_of(e.name)),
+                 ok=str(det.get("status") or "") == VERIFIED, at=at, story=sid,
+                 attempt=n, candidate=cand or str(det.get("candidate") or ""),
+-                source=dict(det.get("source") or {}),
++                source=dict(det.get("source") or {}), landed=landed,
+             )
+         elif e.kind == TOOL_RUN and e.name == "test":
+-            _observe_tests(led, e, sid, n, cand, at)
++            _observe_tests(led, e, sid, n, cand, at, landed=landed)
+         elif e.kind == TOOL_RUN and e.name.startswith("qa:"):
+             led.observe(
+                 e.name, "qa", ok=bool(e.ok) and not e.detail.get("skipped"),
+-                at=at, story=sid, attempt=n, candidate=cand,
++                at=at, story=sid, attempt=n, candidate=cand, landed=landed,
+                 source={"qa_kind": e.name.split(":", 1)[1],
+                         **({"why": str(e.detail["skipped"])} if e.detail.get("skipped") else {})},
+             )
+@@ -420,13 +440,37 @@ def build(artifact_root: Path | str) -> Ledger:
+             missing = list(e.detail.get("missing") or []) + list(e.detail.get("missing_data_roles") or [])
+             led.observe(
+                 f"mockup:{e.name}", "mockup", ok=bool(e.ok), at=at, story=sid,
+-                attempt=n, candidate=cand,
++                attempt=n, candidate=cand, landed=landed,
+                 source={"screen": e.name, **({"why": "thiếu " + ", ".join(missing)} if missing else {})},
+             )
+     return led
+ 
+ 
+-def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float) -> None:
++def _landed_candidates(root: Path) -> dict[str, set[str]]:
++    """Story → tập SHA ứng viên đã landed, đọc từ nhật ký (ADR-004 R1).
++
++    Một ứng viên landed khi giao dịch đóng băng nó kết thúc bằng
++    `attempt.committed` (hoặc `merge.completed`); ứng viên đóng băng rồi bị
++    cổng trả về không có mặt ở đây. Chỉ story **có** nhật ký mới xuất hiện
++    trong bản đồ — thiếu nhật ký nghĩa là bằng chứng không thuộc một lượt
++    thử nào (QA cấp dự án, mốc vòng), không phải "chưa landed".
++    """
++    store = JournalStore(root)
++    out: dict[str, set[str]] = {}
++    for path in sorted(store.root.glob("*.jsonl")):
++        sid = path.stem
++        cur, landed = "", set()
++        for en in store.read(sid).entries:
++            if en.step == "candidate.frozen":
++                cur = str((en.data or {}).get("sha") or "")
++            elif en.step in ("attempt.committed", "merge.completed") and cur:
++                landed.add(cur)
++        out[sid] = landed
++    return out
++
++
++def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
++                   *, landed: bool = True) -> None:
+     """Một lần chạy test → trạng thái của mọi tiêu chí nó *nhìn thấy*.
+ 
+     Story chủ nhà bị chấm đủ: tiêu chí không có test nào mang mã của nó là
+@@ -441,7 +485,7 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float)
+ 
+     def note(story_id: str, i: int, ok: bool, source: dict) -> None:
+         led.observe(ac_code(story_id, i), "ac", ok=ok, at=at, story=sid,
+-                    owner=story_id, attempt=attempt, candidate=cand,
++                    owner=story_id, attempt=attempt, candidate=cand, landed=landed,
+                     source={"test_run": e.name, **source})
+ 
+     targets: list[tuple[str, StoryLine, bool]] = []
+@@ -464,7 +508,7 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float)
+             for i in range(1, line.acceptance + 1):
+                 note(story_id, i, False, {"why": why})
+             _observe_covers(led, line, ok=False, at=at, story=sid, attempt=attempt,
+-                            cand=cand, why=why)
++                            cand=cand, why=why, landed=landed)
+             continue
+ 
+         cov = ac_coverage(story_id, line.acceptance, ids)
+@@ -487,14 +531,15 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float)
+         # STORY-01-06 vì luật cũ đọc `e.ok`).
+         story_green = all(judged) if judged else bool(e.ok)
+         _observe_covers(led, line, ok=story_green, at=at, story=sid, attempt=attempt,
+-                        cand=cand, why="" if story_green else "tiêu chí của story chưa xanh")
++                        cand=cand, why="" if story_green else "tiêu chí của story chưa xanh",
++                        landed=landed)
+ 
+ 
+ def _observe_covers(led: Ledger, line: StoryLine, *, ok: bool, at: float, story: str,
+-                    attempt: int, cand: str, why: str) -> None:
++                    attempt: int, cand: str, why: str, landed: bool = True) -> None:
+     for req in line.covers:
+         led.observe(req, _kind_of(req), ok=ok, at=at, story=story, owner=line.id,
+-                    attempt=attempt, candidate=cand,
++                    attempt=attempt, candidate=cand, landed=landed,
+                     source={"story": line.id, **({"why": why} if why else {})})
+ 
+ 

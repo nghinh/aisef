@@ -153,7 +153,7 @@ dạng khoá (lỗi 10).
 | **Sổ hành vi** | `control/ledger.py` — phép chiếu từ evidence, không phải kho mới: mỗi tiêu chí / FR / `qa:<kind>` / màn hình có trạng thái VERIFIED · GAP · REOPENED (`regressed_by`); chỉ ứng viên đã *landed* (nhật ký `merge.completed`/`attempt.committed`) mới thành VERIFIED. `ledger.json` + `INDEX.md` + mốc `loops[]`; metrics (tăng trưởng, hồi quy, gap đóng, cải thiện biên/$) ở phần 5 báo cáo (ADR-004 R2/R6/R7) |
 | Bàn giao & phán quyết | `handoff` (slot · nguồn · số ký tự, `prompt_chars`), `review:verdict`/`security:verdict` (JSON), `gate:input` (13 kwargs của `gate.evaluate` JSON-hoá, ghi ngay trước phán quyết — `aisdlc gate --replay` chấm lại lượt cũ bằng luật mới, ADR-005 V4), `gate:verdict`; lời rà soát nguyên văn ở `_bmad-output/reviews/<story>-<vai>-<lượt>.md` (lỗi 16) |
 | **Kết cục lượt** | `agent_run.detail.exit_status` ∈ ok · max_turns · timeout · cost · context · permission · infra · error — `clients/stream.py::exit_status_of`, một bảng cho cả vòng thử lại (`INFRA_STATUSES` = timeout, infra không ăn `run.max_retries`) lẫn `aisdlc status` ("Lượt agent: …", bản ghi cũ là "chưa ghi"); `tool_run.detail.redacted` = số bí mật đã che trong `tail`/log (ADR-005 V1/V11 B) |
-| Evaluation | chưa có bộ eval riêng cho skill/prompt; trôi chất lượng đo bằng kho dogfood `tests/dogfood/` (mốc lượt/chi phí) và hợp quy client `tests/conformance/` |
+| Evaluation | `tests/bench/` (ADR-005 V8): task từ 25 lỗi thật của kho (commit) + story e9 done (sinh lúc chạy); `validate` ×3 trên bản chép `git archive` một ref, F2P/P2P theo tên, flaky loại và nêu tên; `run` → pass@1/pass@k/ổn định/cost so lịch sử; `export` Harbor. Trôi chất lượng còn đo bằng dogfood `tests/dogfood/` (mốc lượt/chi phí) và hợp quy client `tests/conformance/` |
 | Dashboard | `aisdlc status` · `aisdlc report` · `aisdlc evidence <id>` |
 
 ---
@@ -422,6 +422,12 @@ aisdlc gate    --replay <story> [--attempt n] | --all
                                       đã ghi. Luật hợp trên lời reviewer/security **đã ghi** —
                                       không gọi model, $0. Lượt trước V4 (không có `gate:input`)
                                       → "không replay được", không đoán
+
+# Bench (ADR-005 V8) — việc của người phát triển harness, không nối vào `aisdlc`
+python3 -m tests.bench mine [--e9 DIR]           task lỗi kho → tests/bench/tasks/ (commit); story e9 → .bench/tasks/
+python3 -m tests.bench validate [ID…] [--runs 3] base+test đỏ · base+test+gold xanh · test chập chờn loại, nêu tên
+python3 -m tests.bench run --client c [--attempts 3] [ID…]   AISDLC_BENCH=1; guard như hợp quy, `note mode=bench`
+python3 -m tests.bench report | export ID --out DIR          pass@1/pass@k/ổn định/cost so lịch sử · thư mục Harbor
 ```
 
 `report` chiếu bằng chứng thành **sổ hành vi** (ADR-004 R2): mỗi tiêu chí,

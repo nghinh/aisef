@@ -1,0 +1,146 @@
+diff --git a/aisdlc/cli.py b/aisdlc/cli.py
+index d320346..dc743ac 100644
+--- a/aisdlc/cli.py
++++ b/aisdlc/cli.py
+@@ -53,6 +53,24 @@ _GATE_MARK = {
+ }
+ 
+ 
++def _hook_paths_elsewhere(project: Path) -> list[str] | None:
++    """Đường dẫn dự án ghi trong hook/plugin biên dịch mà **khác** dự án này.
++    None khi không có hook nào để so."""
++    import re as _re
++
++    goc = project.resolve()
++    thay: list[str] = []
++    hook = project / ".claude" / "settings.json"
++    if hook.is_file():
++        thay += _re.findall(r"--project\s+(\S+)\s+guard", hook.read_text(encoding="utf-8", errors="replace"))
++    plugin = project / ".opencode" / "plugin" / "aisdlc-guard.ts"
++    if plugin.is_file():
++        thay += _re.findall(r'const PROJECT = "([^"]+)"', plugin.read_text(encoding="utf-8", errors="replace"))
++    if not thay:
++        return None
++    return sorted({p for p in thay if Path(p).resolve() != goc})
++
++
+ def _artifact_root(args) -> Path:
+     """Gốc artifact — **một** gốc cho cả dự án (bất biến 2).
+ 
+@@ -187,6 +205,15 @@ def cmd_doctor(args) -> int:
+             required=False,
+         )
+ 
++    lech = _hook_paths_elsewhere(project)
++    if lech is not None:
++        check(
++            "hook trỏ đúng dự án", not lech,
++            "đường dẫn `--project`/`PROJECT` trong hook khớp thư mục này" if not lech else
++            f"hook trỏ sang {', '.join(lech[:2])} — dự án bị chép/di chuyển? guard sẽ ghi bằng "
++            "chứng vào dự án ấy; chạy `aisdlc compile` lại",
++        )
++
+     try:
+         cfg = Config.load(project)
+         check("cấu hình", True, cfg.source)
+@@ -600,7 +627,13 @@ def cmd_guard(args) -> int:
+     """
+     import json
+ 
+-    from .harness.guardrails import record_outcome, run_guard
++    from .control.worktree import main_repo
++    from .harness.guardrails import project_root_from, record_outcome, run_guard
++
++    # Gốc dự án: harness khai qua env; `--project` biên dịch chỉ là dự phòng —
++    # dự án bị chép/di chuyển thì hook vẫn ghim đường dẫn cũ (P0-1, 2026-09-05).
++    goc = Path(project_root_from(None, str(args.project))).resolve()
++    artifact_root = main_repo(goc) / ARTIFACT_ROOT
+ 
+     try:
+         raw = sys.stdin.read()
+@@ -615,8 +648,8 @@ def cmd_guard(args) -> int:
+         verdict = run_guard(
+             args.kind,
+             event,
+-            project_root=str(Path(args.project).resolve()),
+-            artifact_root=str(_artifact_root(args)),
++            project_root=str(goc),
++            artifact_root=str(artifact_root),
+         )
+     except ValueError as e:
+         print(f"guard: {e}", file=sys.stderr)
+@@ -626,9 +659,7 @@ def cmd_guard(args) -> int:
+     # `guard_blocked` và `FILE_CHANGE` không còn phụ thuộc client có phát
+     # luồng sự kiện hay không. Ghi hỏng không được làm hỏng phán quyết.
+     try:
+-        record_outcome(
+-            args.kind, event, verdict, artifact_root=str(_artifact_root(args))
+-        )
++        record_outcome(args.kind, event, verdict, artifact_root=str(artifact_root))
+     except OSError as e:
+         print(f"guard: không ghi được bằng chứng ({e})", file=sys.stderr)
+ 
+diff --git a/aisdlc/harness/guardrails.py b/aisdlc/harness/guardrails.py
+index b90e074..58dc524 100644
+--- a/aisdlc/harness/guardrails.py
++++ b/aisdlc/harness/guardrails.py
+@@ -37,6 +37,10 @@ ENV_WORKDIR = "AISDLC_WORKDIR"
+ #: được code. Cấm ở guard thì mọi client đều cấm, và Claude có thêm một
+ #: lớp phòng khi cờ bị bỏ quên.
+ ENV_DISALLOWED_TOOLS = "AISDLC_DISALLOWED_TOOLS"
++#: Gốc dự án — harness khai qua env. Hook biên dịch ghim `--project` tuyệt
++#: đối; dự án bị chép/di chuyển thì guard vẫn chạy nhưng ghi bằng chứng vào
++#: dự án cũ (đo A/B `par-A` 2026-09-05: 4 lượt trượt "guard có chạy" sai).
++ENV_PROJECT = "AISDLC_PROJECT"
+ 
+ #: Phạm vi ghi khi **không** ở trong một story: các pha lập kế hoạch và
+ #: dựng mockup. Chúng có phạm vi cố định và biết trước, nên guard vẫn có
+@@ -471,6 +475,12 @@ def check_completion(evidence) -> Verdict:
+     return ALLOW
+ 
+ 
++def project_root_from(env: dict[str, str] | None, fallback: str) -> str:
++    """Gốc dự án cho guard: env của harness thắng, `--project` biên dịch là dự phòng."""
++    goc = (env if env is not None else os.environ).get(ENV_PROJECT, "").strip()
++    return goc or fallback
++
++
+ def scope_from_env(env: dict[str, str] | None = None) -> list[str]:
+     raw = (env or os.environ).get(ENV_WRITE_SCOPE, "")
+     return [p.strip() for p in raw.split(",") if p.strip()]
+diff --git a/aisdlc/phases/implement.py b/aisdlc/phases/implement.py
+index 6d49394..ab56fd7 100644
+--- a/aisdlc/phases/implement.py
++++ b/aisdlc/phases/implement.py
+@@ -38,6 +38,7 @@ from ..harness import mockup_verify
+ from ..clients.compile import guard_expected
+ from ..harness.guardrails import (
+     ENV_DISALLOWED_TOOLS,
++    ENV_PROJECT,
+     ENV_WORKDIR,
+     ENV_BASE_REF,
+     ENV_STORY_ID,
+@@ -250,6 +251,7 @@ def run_attempt(
+         ENV_STORY_ID: story.id,
+         ENV_BASE_REF: base_ref,
+         ENV_WORKDIR: str(workdir),
++        ENV_PROJECT: str(project),
+     }
+ 
+     # Cách ly là thứ **phải kiểm**, không phải thứ giả định. Worktree ngăn
+@@ -511,6 +513,7 @@ def review_story(
+         ENV_WRITE_SCOPE: ",".join(effective_write_scope(story, project)),
+         ENV_BASE_REF: base_ref,
+         ENV_WORKDIR: str(workdir),
++        ENV_PROJECT: str(project),
+         ENV_DISALLOWED_TOOLS: ",".join(ROLES[REVIEWER].disallowed_tools),
+     }
+ 
+@@ -595,6 +598,7 @@ def security_review(
+         ENV_WRITE_SCOPE: ",".join(effective_write_scope(story, project)),
+         ENV_BASE_REF: base_ref,
+         ENV_WORKDIR: str(workdir),
++        ENV_PROJECT: str(project),
+         ENV_DISALLOWED_TOOLS: ",".join(ROLES[SECURITY].disallowed_tools),
+     }
+     _attach_settings(spec, project)

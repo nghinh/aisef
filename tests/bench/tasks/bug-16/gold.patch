@@ -1,0 +1,82 @@
+diff --git a/aisdlc/phases/implement.py b/aisdlc/phases/implement.py
+index ab56fd7..013e71b 100644
+--- a/aisdlc/phases/implement.py
++++ b/aisdlc/phases/implement.py
+@@ -523,6 +523,9 @@ def review_story(
+     EvidenceStore(artifact_root).agent_run(story.id, result, name=f"{story.id}-review",
+                                            prompt_chars=len(spec.prompt))
+     da_sua = _revert_reviewer_writes(workdir, truoc, _tree_snapshot(workdir))
++    # Ghi sau khi đã so cây: artifact có thể nằm trong chính cây làm việc
++    # (không cách ly) và tệp lời rà soát không phải là "người rà soát sửa cây".
++    persist_verdict(artifact_root, story.id, "review", number, result)
+     if da_sua:
+         EvidenceStore(artifact_root).tool_run(
+             story.id, "review:immutable", ok=False, detail={"changed": da_sua[:20]},
+@@ -608,6 +611,7 @@ def security_review(
+         story.id, result, name=f"{story.id}-security", prompt_chars=len(spec.prompt)
+     )
+     da_sua = _revert_reviewer_writes(workdir, truoc, _tree_snapshot(workdir))
++    persist_verdict(artifact_root, story.id, "security", number, result)
+     if da_sua:
+         EvidenceStore(artifact_root).tool_run(
+             story.id, "security:immutable", ok=False, detail={"changed": da_sua[:20]},
+@@ -626,14 +630,56 @@ _BLOCK_TAGS = ("[chặn]", "[blocker]", "[block]")
+ _STUCK_TAGS = ("[bế tắc]", "[be tac]", "[stuck]", "[blocked-by-plan]")
+ 
+ 
++#: Thư mục giữ nguyên văn lời người rà soát — bằng chứng chặn phải đọc lại được.
++REVIEWS_DIR = "reviews"
++
++
++def persist_verdict(artifact_root: Path | str, story_id: str, role: str, number: int, result) -> Path:
++    """Ghi nguyên văn báo cáo của người rà soát / rà soát bảo mật.
++
++    Lỗi 16 (e9 STORY-01-05, 2026-09-05): lý do bế tắc trong sprint-status kết
++    thúc ở "— không." vì chỉ dòng đầu của mục được giữ, còn lời đầy đủ thì
++    không nằm ở đâu cả — bằng chứng chặn một story mà người đọc không kiểm
++    lại được thì không phải bằng chứng.
++    """
++    d = Path(artifact_root) / REVIEWS_DIR
++    d.mkdir(parents=True, exist_ok=True)
++    path = d / f"{story_id}-{role}-{number}.md"
++    head = (
++        f"# {role} — {story_id}, lượt {number}\n\n"
++        f"session: {getattr(result, 'session_id', '')} · lượt hội thoại: "
++        f"{getattr(result, 'num_turns', 0)} · ${getattr(result, 'cost_usd', 0.0):.2f}"
++        f"{' · LỖI: ' + result.error if getattr(result, 'error', '') else ''}\n\n---\n\n"
++    )
++    path.write_text(head + (getattr(result, "text", "") or ""), encoding="utf-8")
++    return path
++
++
+ def blocking_findings(text: str) -> list[str]:
+-    """Lọc mục `[chặn]` và `[bế tắc]` khỏi báo cáo rà soát."""
+-    out = []
++    """Lọc mục `[chặn]` và `[bế tắc]` khỏi báo cáo rà soát.
++
++    Một mục có thể dài nhiều dòng: dòng tiếp theo không mở đầu bằng dấu
++    gạch đầu dòng hay thẻ mới thì thuộc về mục trước (lỗi 16 — trước đây
++    chỉ giữ dòng đầu, lý do bế tắc cụt ở "— không.").
++    """
++    out: list[str] = []
++    dang_mo = False
+     for line in (text or "").splitlines():
+-        stripped = line.strip().lstrip("-*• ").strip()
++        raw = line.rstrip()
++        stripped = raw.strip().lstrip("-*• ").strip()
+         low = stripped.lower()
+         if low.startswith(_BLOCK_TAGS) or low.startswith(_STUCK_TAGS):
+             out.append(stripped)
++            dang_mo = True
++            continue
++        if not stripped:
++            dang_mo = False
++            continue
++        la_muc_moi = raw.lstrip().startswith(("-", "*", "•", "#")) or low.startswith("[")
++        if dang_mo and not la_muc_moi:
++            out[-1] = out[-1] + " " + stripped
++        else:
++            dang_mo = False
+     return out
+ 
+ 

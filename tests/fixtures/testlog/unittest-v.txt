@@ -1,0 +1,29 @@
+test_create_is_idempotent (tests.test_worktree.TestCreate.test_create_is_idempotent) ... ok
+test_stray_dir_is_not_a_worktree (tests.test_worktree.TestCreate.test_stray_dir_is_not_a_worktree)
+Lỗi 13: thư mục còn sót (`.vite/` của vite sống sót) không phải ... FAIL
+test_list_active (tests.test_worktree.TestCreate.test_list_active) ... ERROR
+test_bo_qua (tests.test_worktree.TestCreate.test_bo_qua) ... skipped 'chưa có docker'
+test_du_kien_do (tests.test_worktree.TestCreate.test_du_kien_do)
+Docstring hai dòng, dòng đầu vào output. ... expected failure
+
+======================================================================
+ERROR: test_list_active (tests.test_worktree.TestCreate.test_list_active)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tests/test_worktree.py", line 90, in test_list_active
+    self.wm.create("S-01")
+RuntimeError: git
+
+======================================================================
+FAIL: test_stray_dir_is_not_a_worktree (tests.test_worktree.TestCreate.test_stray_dir_is_not_a_worktree)
+Lỗi 13: thư mục còn sót (`.vite/` của vite sống sót) không phải
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tests/test_worktree.py", line 81, in test_stray_dir_is_not_a_worktree
+    self.assertTrue((wt.path / ".git").exists())
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.412s
+
+FAILED (failures=1, errors=1, skipped=1, expected failures=1)

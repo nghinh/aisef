@@ -1,0 +1,54 @@
+diff --git a/tests/test_gate.py b/tests/test_gate.py
+index a99ec82..a48e988 100644
+--- a/tests/test_gate.py
++++ b/tests/test_gate.py
+@@ -349,6 +349,25 @@ class TestKhongLamDoTestCoSan(GateTestCase):
+     def muc(self, g):
+         return next(c for c in g.checks if c.name == self.TEN)
+ 
++    def test_doi_ten_test_giu_tieu_de_la_khong_phai_mat(self):
++        """e9 01-07 lượt 2: bốn test có sẵn được thêm mã `AC_STORY_01_01_6:` — không phải xoá."""
++        goc = ["src/ui/app-shell.tsx > Lớp token (TCCN 4, 6) > mọi màu có biến CSS",
++               "src/ui/app-shell.tsx > Lớp token (TCCN 4, 6) > mọi bậc spacing có biến CSS",
++               "tests/test_a.py::test_1"]
++        moi = ["src/ui/app-shell.tsx > Lớp token (TCCN 4, 6) > AC_STORY_01_01_6: mọi màu có biến CSS",
++               "src/ui/app-shell.tsx > Lớp token (TCCN 4, 6) > AC_STORY_01_01_6: mọi bậc spacing có biến CSS",
++               "tests/test_a.py::test_1"]
++        self.baseline(goc)
++        self.ung_vien(moi)
++        m = self.muc(self.gate(candidate="aaa"))
++        self.assertIs(m.outcome, Outcome.PASSED, m.detail)
++        self.assertIn("đổi tên", m.detail)
++        # Xoá thật (tiêu đề lá biến mất) vẫn là hồi quy.
++        self.ung_vien(moi[:1] + ["tests/test_a.py::test_1"])
++        m = self.muc(self.gate(candidate="aaa"))
++        self.assertIs(m.outcome, Outcome.FAILED)
++        self.assertIn("mọi bậc spacing", m.detail)
++
+     def test_muoi_xanh_roi_chin_xanh_mot_do_thi_neu_dung_ten(self):
+         ids = [f"tests/test_a.py::test_{i}" for i in range(1, 11)]
+         self.baseline(ids)
+diff --git a/tests/test_preservation.py b/tests/test_preservation.py
+index 8beb7d8..d074cc8 100644
+--- a/tests/test_preservation.py
++++ b/tests/test_preservation.py
+@@ -63,6 +63,19 @@ class TestCongBaoToan(GateTestCase):
+         })
+         self.store.tool_run("S-01", "lint", ok=True, detail={"candidate": self.SHA})
+ 
++    def test_fr_hoi_story_da_xac_minh_no_khong_hoi_story_so_huu(self):
++        """e9 FR-11: sở hữu bởi 01-01 (test không mang mã) nhưng sổ xác minh qua 01-05.
++
++        Hỏi story sở hữu thì không bao giờ có test → UNRUNNABLE oan (01-07 lượt 1,
++        2026-09-06); hỏi đúng story đã xác minh thì test có và xanh → đạt.
++        """
++        self.chay_test(ids=["tests/test_b.py::test_AC_STORY_01_05_1"])
++        via = [{"id": "FR-11", "kind": "fr", "story": "STORY-01-01", "via": "STORY-01-05",
++                "source": {"story": "STORY-01-05"}}]
++        self.assertIs(self.muc(preservation=via).outcome, Outcome.PASSED)
++        chu = [{"id": "FR-11", "kind": "fr", "story": "STORY-01-01", "source": {"story": "STORY-01-05"}}]
++        self.assertIs(self.muc(preservation=chu).outcome, Outcome.UNRUNNABLE)
++
+     def test_khong_truyen_thi_khong_ap_dung(self):
+         self.green_story()
+         m = self.muc()

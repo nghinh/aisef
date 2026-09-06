@@ -1,0 +1,134 @@
+diff --git a/aisdlc/control/normalize.py b/aisdlc/control/normalize.py
+index 13e8a92..db565ce 100644
+--- a/aisdlc/control/normalize.py
++++ b/aisdlc/control/normalize.py
+@@ -130,9 +130,55 @@ def effective_write_scope(story: Story, project: Path) -> list[str]:
+     for name in MANIFESTS:
+         if name not in scope and (project / name).is_file():
+             scope.append(name)
++    for path in verification_paths(story, project):
++        if path not in scope:
++            scope.append(path)
+     return with_lockfiles(scope)
+ 
+ 
++#: Loại kiểm định → khoá cấu hình chứa lệnh chạy nó.
++_VERIFY_COMMAND_KEY = {"unit": "tools.test"}
++
++
++def verification_paths(story: Story, project: Path, config=None) -> list[str]:
++    """Thư mục/tệp test mà **hợp đồng kiểm định của story** đòi — suy từ lệnh
++    kiểm định của dự án (`verify.e2e` = `npx playwright test tests/e2e` →
++    `tests/e2e`), chỉ lấy đường dẫn **có thật**.
++
++    Lỗi 21 (e9 2026-09-05, hai story liên tiếp): story khai `e2e` và
++    `accessibility` nhưng write_scope chỉ có `src/**`; guard chặn ghi
++    `tests/`, người rà soát đánh dấu bế tắc kế hoạch, $30 cho hai story mà
++    lỗi nằm ở chỗ harness *đòi* test rồi *cấm* viết test. Harness đòi gì
++    thì tự cấp phạm vi cho cái đó.
++    """
++    kinds = [k.strip().lower() for k in (story.verification_contract or []) if k.strip()]
++    if not kinds:
++        return []
++    if config is None:
++        from ..config import Config
++
++        try:
++            config = Config.load(project)
++        except Exception:  # noqa: BLE001 — không có config thì không suy gì
++            return []
++    out: list[str] = []
++    for kind in kinds:
++        key = _VERIFY_COMMAND_KEY.get(kind, f"verify.{kind}")
++        try:
++            cmd = str(config[key] or "")
++        except KeyError:
++            continue
++        for tok in cmd.replace("'", " ").replace('"', " ").split():
++            if tok.startswith("-") or "/" not in tok:
++                continue
++            rel = tok.strip("./").rstrip("/")
++            if not rel or rel.startswith("..") or rel.startswith("node_modules"):
++                continue
++            if (project / rel).exists() and rel not in out:
++                out.append(rel)
++    return out
++
++
+ def is_lockfile(path: str) -> bool:
+     """Đường dẫn này là lockfile do `with_lockfiles` thêm vào?
+ 
+diff --git a/aisdlc/phases/implement.py b/aisdlc/phases/implement.py
+index 5779eba..cffbf0e 100644
+--- a/aisdlc/phases/implement.py
++++ b/aisdlc/phases/implement.py
+@@ -151,7 +151,7 @@ def build_context(
+             "\n\n".join(d.as_prompt() for d in rules)
+             or "(kiến trúc không nêu quyết định nào ràng buộc story này)"
+         ),
+-        "write_scope": "\n".join(f"- `{p}`" for p in story.write_scope) or "(chưa khai)",
++        "write_scope": _write_scope_lines(story, project),
+         "mockup_section": prompt_section(slices),
+         "tools": describe_tools(project, config),
+     }
+@@ -233,6 +233,19 @@ def skills_used(result) -> list[str]:
+     return out
+ 
+ 
++def _write_scope_lines(story: Story, project: Path) -> str:
++    """Phạm vi ghi cho prompt: story khai + phần harness cấp thêm vì hợp đồng
++    kiểm định (lỗi 21) — agent phải thấy đúng phạm vi mà guard áp."""
++    from ..control.normalize import verification_paths
++
++    lines = [f"- `{p}`" for p in story.write_scope]
++    them = [p for p in verification_paths(story, project) if p not in story.write_scope]
++    if them:
++        lines.append("- _(harness cấp thêm vì hợp đồng kiểm định đòi)_")
++        lines += [f"- `{p}`" for p in them]
++    return "\n".join(lines) or "(chưa khai)"
++
++
+ def _story_fallback(story: Story) -> str:
+     lines = [f"# {story.id}: {story.title}", "", "## Tiêu chí chấp nhận", ""]
+     lines += [f"{i}. [{ac_code(story.id, i)}] {ac}" for i, ac in enumerate(story.acceptance_criteria, 1)]
+diff --git a/aisdlc/phases/story_split.py b/aisdlc/phases/story_split.py
+index 2c39679..7bc6006 100644
+--- a/aisdlc/phases/story_split.py
++++ b/aisdlc/phases/story_split.py
+@@ -31,6 +31,7 @@ from ..control.normalize import (
+     Story,
+     parse_epics_file,
+     parse_prd_file,
++    verification_paths,
+ )
+ from ..control.scheduler import CycleError, UnknownDependencyError
+ from ..control.scheduler import Story as SchedStory
+@@ -87,7 +88,7 @@ def to_scheduler(stories: list[Story]) -> list[SchedStory]:
+     ]
+ 
+ 
+-def render_story(story: Story, prd: PRD | None) -> str:
++def render_story(story: Story, prd: PRD | None, root: Path | None = None) -> str:
+     """Sinh nội dung file story — bản hợp đồng agent đọc trước khi viết code."""
+     out = [f"# {story.id}: {story.title}", ""]
+ 
+@@ -108,6 +109,10 @@ def render_story(story: Story, prd: PRD | None) -> str:
+     out += ["## Phạm vi được ghi", ""]
+     if story.write_scope:
+         out += [f"- `{p}`" for p in story.write_scope]
++        them = verification_paths(story, root.parent) if root is not None else []
++        if them:
++            out += ["", "Harness cấp thêm vì hợp đồng kiểm định của story đòi (lỗi 21):"]
++            out += [f"- `{p}`" for p in them]
+         out += [
+             "",
+             "Guard chặn mọi thao tác ghi ngoài danh sách này. Cần ghi chỗ khác "
+@@ -218,7 +223,7 @@ def split(
+     for story in stories:
+         path = story_file(root, story)
+         path.parent.mkdir(parents=True, exist_ok=True)
+-        path.write_text(render_story(story, prd), encoding="utf-8")
++        path.write_text(render_story(story, prd, root), encoding="utf-8")
+         written.add(path)
+     res.files = sorted(written)
+     res.removed = _prune(root, written)

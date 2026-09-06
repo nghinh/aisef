@@ -1,0 +1,23 @@
+diff --git a/aisdlc/control/preflight.py b/aisdlc/control/preflight.py
+index f33e4bf..4cadf6f 100644
+--- a/aisdlc/control/preflight.py
++++ b/aisdlc/control/preflight.py
+@@ -171,7 +171,17 @@ IMPACT_MODULE_THRESHOLD = 3
+ _BACKTICK = re.compile(r"`([^`\n]{2,80})`")
+ #: Đường dẫn: có dấu `/`, hoặc có đuôi tệp quen thuộc.
+ _PATHISH = re.compile(r"^[\w.@/-]+$")
+-_EXT = re.compile(r"\.[a-z]{1,5}$")
++#: Đuôi tệp mã nguồn/cấu hình có thật — không phải "có dấu chấm là tệp".
++#: Lỗi 20 (2026-09-05, plan thật trên bản chép e9): `tools.lint`, `Note.text`,
++#: `save.done`, `search.clear`, `tags.title`, `migrate.title` trong tiêu chí
++#: là khoá cấu hình / thuộc tính / khoá i18n, bị coi là tệp chưa tồn tại →
++#: 6/21 story "không chạy được", cổng stories chặn cả kế hoạch.
++_EXT = re.compile(
++    r"\.(?:tsx?|jsx?|mjs|cjs|py|rb|go|rs|java|kt|swift|json|ya?ml|toml|ini|cfg|md|txt|"
++    r"css|scss|less|html?|svg|png|jpe?g|gif|ico|sql|sh|bash|zsh|env|lock|xml|csv|proto|"
++    r"graphql|gql|vue|svelte|astro|mdx|wasm|map)$",
++    re.IGNORECASE,
++)
+ #: Tên gói npm/pypi: chữ thường, có gạch nối hoặc tiền tố scope, không có `/`
+ #: (trừ scope), không có đuôi tệp.
+ _PACKAGEISH = re.compile(r"^(@[a-z0-9][\w.-]*/)?[a-z0-9][a-z0-9._-]*$")

@@ -1,0 +1,152 @@
+diff --git a/aisdlc/clients/claude_code.py b/aisdlc/clients/claude_code.py
+index 43ad897..870c23e 100644
+--- a/aisdlc/clients/claude_code.py
++++ b/aisdlc/clients/claude_code.py
+@@ -49,6 +49,11 @@ from .stream import RunResult, parse_stream
+ BINARY = "claude"
+ 
+ 
++def clean_env() -> dict[str, str]:
++    """Môi trường cho tiến trình `claude` con: bỏ mọi `CLAUDE*` của phiên cha."""
++    return {k: v for k, v in os.environ.items() if not k.startswith("CLAUDE")}
++
++
+ class ClaudeCodeAdapter(ClientAdapter):
+     id = "claude"
+ 
+@@ -98,6 +103,10 @@ class ClaudeCodeAdapter(ClientAdapter):
+         return cmd
+ 
+     def run(self, spec: RunSpec) -> RunResult:
++        """Chạy một lượt. Môi trường con **không** thừa hưởng `CLAUDE*` của
++        tiến trình gọi: harness chạy từ bên trong một phiên Claude là chuyện
++        có thật, và phiên con thừa hưởng cờ của phiên cha thì tự chuyển sang
++        Bash thay vì Read/Write (hợp quy C3, 2026-09-05)."""
+         if not self.available():
+             return RunResult(ok=False, error=f"không tìm thấy lệnh {self.binary}")
+         if not Path(spec.workdir).is_dir():
+@@ -110,7 +119,7 @@ class ClaudeCodeAdapter(ClientAdapter):
+                 capture_output=True,
+                 text=True,
+                 timeout=spec.timeout_seconds,
+-                env={**os.environ, **spec.env} if spec.env else None,
++                env={**clean_env(), **spec.env},
+                 stdin=subprocess.DEVNULL,  # không có: CLI chờ stdin 3s mỗi lần
+             )
+         except subprocess.TimeoutExpired:
+diff --git a/aisdlc/kit/registry.py b/aisdlc/kit/registry.py
+index 107d88a..1a6252d 100644
+--- a/aisdlc/kit/registry.py
++++ b/aisdlc/kit/registry.py
+@@ -179,8 +179,16 @@ def _now() -> str:
+ #: "end-to-end" là nói trong ngữ cảnh an ninh, không phải khai năng lực đo
+ #: hiệu năng hay chạy e2e-test. Đây là "structured metadata > prose", áp cho
+ #: đúng nguồn ta có metadata (109 skill security khai `domain`).
++#: Nguồn không khai `domain` trong frontmatter nhưng miền thì rõ — không có
++#: dòng này thì tín hiệu "story có màn hình" không bao giờ tới skill giao diện.
++_SOURCE_DOMAIN = {"ui-ux": "ui-ux"}
++
+ _DOMAIN_CAPS: dict[str, frozenset[str]] = {
+-    "cybersecurity": frozenset({"security", "review", "ui"}),
++    # Không có "ui": 21/109 skill cybersecurity của e9 bị suy ra "ui" từ chữ
++    # "screen"/"interface" trong mô tả, và một story điều hướng bàn phím
++    # được đề nghị skill mã hoá đầu-cuối (đo 2026-09-05). Năng lực giao diện
++    # phải đến từ skill khai miền giao diện, không từ chữ.
++    "cybersecurity": frozenset({"security", "review"}),
+ }
+ 
+ 
+@@ -350,12 +358,20 @@ def build(project: Path | str, *, catalog: Catalog | None = None,
+             e = SkillEntry(
+                 id=d.name, source=source, path=str(d.relative_to(project)),
+                 description=desc, use_when=_use_when(fm, desc),
+-                domain=str(fm.get("domain", "")), subdomain=str(fm.get("subdomain", "")),
++                domain=str(fm.get("domain", "")) or _SOURCE_DOMAIN.get(source, ""),
++                subdomain=str(fm.get("subdomain", "")),
+                 tags=_listish(fm.get("tags")),
+                 commit=src.commit if src else "",
+                 license=str(fm.get("license") or (src.license if src and src.license else "NO_LICENSE")),
+             )
+-            e.capabilities = sorted(set(_capabilities_of(e.text(), domain=e.domain)))
++            # Năng lực phải **khai** — frontmatter `capabilities:` hoặc miền có
++            # bảng cho phép (cybersecurity). Suy từ chữ cho skill không khai miền
++            # là keyword-matching đội lốt hợp đồng: đo trên e9 (2026-09-05),
++            # `receiving-code-review` (superpowers) bị suy ra `perf` + `ui` và
++            # được chọn cho 5/18 story vì "phải qua kiểm định perf".
++            khai = _listish(fm.get("capabilities"))
++            theo_mien = _capabilities_of(e.text(), domain=e.domain) if e.domain.strip().lower() in _DOMAIN_CAPS else []
++            e.capabilities = sorted(set(khai) | set(theo_mien))
+             ver = verify_structure(d)
+             old = prev.get(e.id)
+             if old is not None:
+diff --git a/aisdlc/kit/router.py b/aisdlc/kit/router.py
+index 0aaa867..a8505f2 100644
+--- a/aisdlc/kit/router.py
++++ b/aisdlc/kit/router.py
+@@ -51,21 +51,32 @@ _STOP = frozenset({
+ _TOKEN = re.compile(r"[a-zA-ZÀ-ỹ][a-zA-ZÀ-ỹ0-9_-]{2,}")
+ 
+ 
++#: Miền giao diện — chỉ skill khai một trong các miền này mới ăn tín hiệu
++#: "story có màn hình". Suy từ chữ thì skill mã hoá cũng thành skill giao diện.
++UI_DOMAINS = frozenset({"ui", "ux", "ui-ux", "ui/ux", "design", "frontend", "accessibility"})
++
++
+ @dataclass
+ class Pick:
+     entry: SkillEntry
+     score: int
+     rationale: list[str] = field(default_factory=list)
+     framework: bool = False
++    strong: int = 0        # contract / need — tín hiệu từ hợp đồng story, không từ chữ
++    screen: bool = False
++    token_hits: int = 0
+ 
+     @property
+     def eligible(self) -> bool:
+-        """Paper §4.2 loại thẳng khớp **một** tín hiệu (keyword-only,
+-        dependency-only). Đo trên e9: một chữ "migration" chung làm story
+-        schema-IndexedDB khớp skill mật-mã-hậu-lượng-tử. Nên một skill chỉ
+-        được chọn khi có **hai** tín hiệu độc lập — hoặc là skill framework
+-        gọi đích danh theo pha."""
+-        return self.framework or len(self.rationale) >= 2
++        """Paper §4.2 loại thẳng khớp keyword-only. Đo trên e9: một chữ
++        "migration" làm story schema-IndexedDB khớp skill mật-mã-hậu-lượng-tử;
++        "màn hình + một chữ" làm story điều hướng bàn phím khớp skill mã hoá
++        đầu-cuối. Nên vẫn là **hai** tín hiệu độc lập — nhưng màn hình chỉ
++        tính cho skill miền giao diện, và "màn hình + một chữ" không phải hai."""
++        # Chữ chỉ là một tín hiệu khi đi cùng hợp đồng story; đi cùng màn hình
++        # (mọi story giao diện đều có) thì phải ≥ 2 chữ.
++        tok = 1 if (self.token_hits >= 2 or (self.token_hits >= 1 and self.strong >= 1)) else 0
++        return self.framework or (self.strong + int(self.screen) + tok) >= 2
+ 
+     def line(self) -> str:
+         return f"{self.entry.id} ({self.score}): {'; '.join(self.rationale)}"
+@@ -132,15 +143,18 @@ def score(entry: SkillEntry, story: Story, *, phase: str = "implement",
+     for kind in (contract or []):
+         if kind in caps:
+             pick.score += W_CONTRACT
++            pick.strong += 1
+             pick.rationale.append(f"story phải qua kiểm định `{kind}`")
+ 
+     for need in (needs or []):
+         if need in caps:
+             pick.score += W_NEED
++            pick.strong += 1
+             pick.rationale.append(f"story cần năng lực `{need}`")
+ 
+-    if story.screens and "ui" in caps:
++    if story.screens and "ui" in caps and entry.domain.strip().lower() in UI_DOMAINS:
+         pick.score += W_SCREEN
++        pick.screen = True
+         pick.rationale.append(f"story có màn hình ({', '.join(story.screens[:2])})")
+ 
+     weak = _tokens(" ".join(story.acceptance_criteria) + " " + story.title)
+@@ -148,6 +162,7 @@ def score(entry: SkillEntry, story: Story, *, phase: str = "implement",
+     if hits:
+         add = min(W_TOKEN * len(hits), W_TOKEN_CAP)
+         pick.score += add
++        pick.token_hits = len(hits)
+         pick.rationale.append(f"tiêu chí nhắc tới: {', '.join(hits[:4])}")
+     return pick
+ 
