@@ -98,19 +98,4 @@ __all__ = [
     "cmd_tool",
     "cmd_verify",
     "main",
-    "main_deprecated_alias",
 ]
-
-
-def main_deprecated_alias(argv: list[str] | None = None) -> int:
-    """Lệnh cũ `aisdlc` (0.1.0) — chạy tiếp, nhưng nói rõ nó sắp biến mất.
-
-    Hook đã biên dịch trong dự án cũ gọi `aisdlc guard …`; đổi tên mà gãy im
-    lặng thì người dùng chỉ thấy guard "không chạy" chứ không biết vì sao.
-    Bí danh này bị gỡ ở 0.3.0 — chạy `aisef compile` để hook trỏ tên mới.
-    """
-    import sys
-
-    print("⚠ `aisdlc` là tên cũ (0.1.0) và sẽ bị gỡ ở 0.3.0 — dùng `aisef`; "
-          "chạy `aisef compile` để hook trong dự án trỏ tên mới.", file=sys.stderr)
-    return main(argv)

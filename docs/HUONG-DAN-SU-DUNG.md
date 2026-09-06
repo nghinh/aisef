@@ -113,9 +113,8 @@ Bạn phải thấy danh sách lệnh con (`setup`, `doctor`, `plan`, `run`, …
 module Python và lệnh đều tên `aisef`. Không có `--version`; muốn biết môi
 trường thì dùng `aisef doctor`.
 
-Nếu bạn từng cài bản 0.1.0 (lệnh khi đó tên `aisdlc`): bí danh cũ vẫn chạy tới
-0.3.0 nhưng in cảnh báo. Sau khi nâng cấp, chạy `aisef compile` trong từng dự
-án để hook trỏ đúng tên mới.
+Nếu bạn từng cài bản 0.1.0 (lệnh khi đó tên `aisdlc`): bí danh cũ đã bị gỡ từ
+0.3.0. Chạy `aisef compile` trong từng dự án để hook trỏ đúng tên mới.
 
 Framework **không có phụ thuộc Python nào** ngoài thư viện chuẩn.
 

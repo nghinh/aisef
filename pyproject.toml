@@ -13,10 +13,6 @@ dependencies = []          # toàn bộ khung chạy bằng thư viện chuẩn
 
 [project.scripts]
 aisef = "aisef.cli:main"
-# Bí danh **tạm** của 0.1.0: hook đã biên dịch trong dự án cũ gọi `aisdlc …`,
-# gãy đột ngột thì người dùng không biết vì sao. Nó cảnh báo rồi chạy tiếp, và
-# sẽ bị gỡ ở 0.3.0.
-aisdlc = "aisef.cli:main_deprecated_alias"
 
 [tool.setuptools.packages.find]
 include = ["aisef*"]
