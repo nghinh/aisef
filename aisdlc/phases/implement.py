@@ -51,7 +51,7 @@ from ..harness.guardrails import (
 )
 from ..control.journal import Entry as JEntry, JournalStore
 from ..harness.mockup_map import load_for_story, prompt_section
-from ..harness.observe import EvidenceStore, NOTE, Event
+from ..harness.observe import AGENT_RUN, MOCKUP_MAP, NOTE, TOOL_RUN, Event, Evidence, EvidenceStore
 from ..harness.prompts import Catalog, load_catalog
 from ..harness.routing import DEVELOPER, REVIEWER, ROLES, SECURITY, build_spec
 from ..harness.testlog import MAX_IDS, parse as parse_testlog
@@ -82,6 +82,12 @@ class Attempt:
     security: SecurityReport | None = None
     #: SHA ứng viên đã đóng băng — mọi bằng chứng của lượt này trỏ vào nó.
     candidate: str = ""
+    #: Lượt kiểm-lại (ADR-004 R13): không có phiên developer, không tính vào
+    #: `run.max_retries`. `reran`/`kept` là phép kiểm đã chạy lại / giữ từ
+    #: bằng chứng ở đúng ứng viên — để người đọc biết đã trả tiền cho gì.
+    verify_only: bool = False
+    reran: list[str] = field(default_factory=list)
+    kept: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -96,8 +102,10 @@ class StoryOutcome:
 
     @property
     def quality_attempts(self) -> int:
-        """Số lần thử **tính vào hạn mức** — lỗi hạ tầng không tính."""
-        return len([a for a in self.attempts if not a.infra])
+        """Số lần thử **tính vào hạn mức** — lỗi hạ tầng và lượt kiểm-lại
+        không tính: cái thứ nhất không phải agent làm sai, cái thứ hai không
+        có agent nào làm gì."""
+        return len([a for a in self.attempts if not a.infra and not a.verify_only])
 
     @property
     def cost_usd(self) -> float:
@@ -106,9 +114,12 @@ class StoryOutcome:
     def summary(self) -> str:
         lines = [f"{self.story_id}: {'XONG' if self.done else 'CHƯA XONG'}"]
         for a in self.attempts:
-            tag = "hạ tầng" if a.infra else f"lần {a.number}"
+            tag = "hạ tầng" if a.infra else ("kiểm lại" if a.verify_only else f"lần {a.number}")
             head = "ok" if a.ok else (a.error or "cổng không đạt")
             lines.append(f"  [{tag}] {head}")
+            if a.verify_only:
+                lines.append(f"  ứng viên {a.candidate[:7]}: chạy lại {', '.join(a.reran) or '—'}"
+                             f" · giữ {', '.join(a.kept) or '—'}")
             if a.gate and not a.gate.passed:
                 lines.extend("  " + line for line in a.gate.summary().splitlines()[1:])
         if self.blocked_reason:
@@ -505,20 +516,99 @@ def run_attempt(
         evidence=evidence, artifact_root=artifact_root, number=number,
         changed=changed_now,
     )
-    evidence.candidate = attempt.candidate
+    return verify_candidate(
+        story, project=project, workdir=workdir, artifact_root=artifact_root,
+        client=client, config=config, catalog=catalog, architecture=architecture,
+        contract=contract, attempt=attempt, base_ref=base_ref, scope=scope,
+        changed=changed_now, preservation=preservation,
+    )
+
+
+def _at(ev: Evidence, kind: str, name: str, sha: str) -> Event | None:
+    """Sự kiện **mới nhất** của một phép kiểm, chỉ khi nó mang đúng SHA ứng viên.
+
+    Mới nhất, không phải "có lần nào": cùng luật với `gate._stale_candidates`
+    — kết quả mới nhất thuộc bản khác nghĩa là mã đã đổi sau khi kiểm, và
+    một lần xanh cũ hơn không cứu được điều đó.
+    """
+    e = ev.last(kind, name)
+    return e if e is not None and str(e.detail.get("candidate") or "") == sha else None
+
+
+def _green_at(ev: Evidence, kind: str, name: str, sha: str) -> bool:
+    """Bằng chứng ở ứng viên đủ để **giữ**: xanh thật — không phải bỏ qua
+    (chưa cấu hình) hay không chạy được; hai thứ ấy chạy lại rẻ và có thể
+    đã đổi (công cụ vừa cài, lệnh vừa khai)."""
+    e = _at(ev, kind, name, sha)
+    return bool(e and e.ok and not e.detail.get("skipped") and not e.detail.get("unrunnable"))
+
+
+def _security_from_evidence(e: Event) -> SecurityReport:
+    """Dựng lại báo cáo bảo mật từ `tool_run security` — dòng `[mức] nội dung`
+    là đúng dạng `parse` đọc, nên một bộ lọc nhiễu chấm cả bản sống lẫn
+    bản giữ."""
+    rep = parse_security("\n".join(e.detail.get("findings") or []))
+    rep.error = str(e.detail.get("error") or "")
+    return rep
+
+
+def verify_candidate(
+    story: Story,
+    *,
+    project: Path,
+    workdir: Path,
+    artifact_root: Path,
+    client: ClientAdapter,
+    config: Config,
+    catalog: Catalog,
+    architecture: Architecture | None,
+    contract: DesignContract | None,
+    attempt: Attempt,
+    base_ref: str,
+    scope: list[str],
+    changed: list[str],
+    preservation: list[dict],
+    reuse: bool = False,
+) -> Attempt:
+    """Nửa sau của một lượt — kiểm, rà soát, chấm cổng — trên ứng viên đã
+    đóng băng ở `attempt.candidate`.
+
+    Tách khỏi `run_attempt` để lượt kiểm-lại (ADR-004 R13) đi **đúng đường
+    này**, không có bản chép thứ hai để lệch nhau. `reuse=False` là lượt
+    thường: chạy đủ. `reuse=True`: mỗi phép kiểm chỉ chạy khi bằng chứng
+    mới nhất của nó không xanh ở đúng ứng viên (✗, thiếu, chưa cấu hình,
+    không chạy được, hay thuộc bản khác); rà soát và bảo mật **giữ** khi cả
+    phiên (`agent_run`) lẫn kết luận (`tool_run review|security`) cùng ở
+    SHA này — kể cả kết luận chặn. Đây là điều R1 làm cho có nghĩa: lời
+    người rà soát nói về một bản; bản không đổi thì lời còn nguyên, hỏi
+    lại là trả tiền cho cùng câu trả lời. Cổng chấm đủ như nhau ở cả hai
+    đường — không nới, chỉ không trả tiền dựng lại thứ đã có.
+    """
+    sid, sha, number = story.id, attempt.candidate, attempt.number
+    evidence = EvidenceStore(artifact_root, candidate=sha)
+    # Đọc **một lần, trước** khi chạy lại gì: phép kiểm chạy lại ghi sự kiện
+    # mới, và quyết định giữ/chạy phải dựa trên bằng chứng lúc bước vào.
+    ev = evidence.read(sid) if reuse else None
+
+    def giu(name: str, du: bool) -> bool:
+        """True = giữ bằng chứng có sẵn, không chạy. Ghi sổ ở cả hai nhánh."""
+        if not reuse:
+            return False
+        (attempt.kept if du else attempt.reran).append(name)
+        return du
 
     # Harness tự chạy lại test và lint: bằng chứng phải do harness ghi, và
     # agent có thể đã "quên" chạy lần cuối sau khi sửa.
     for tool in ("test", "lint"):
-        run_tool(tool, workdir, story_id=story.id, artifact_root=artifact_root,
-                 config=config, candidate=attempt.candidate)
+        if not giu(tool, reuse and _green_at(ev, TOOL_RUN, tool, sha)):
+            run_tool(tool, workdir, story_id=sid, artifact_root=artifact_root,
+                     config=config, candidate=sha)
 
     # Test luôn xanh vì không khẳng định gì tệ hơn không có test: nó làm
     # cổng "test xanh" mất hết ý nghĩa. Kiểm rẻ, nên chạy mỗi lượt.
-    fake = find_fake_tests(workdir, changed_now)
-    evidence.tool_run(
-        story.id, "qa:fake-tests", ok=not fake, detail={"files": fake}
-    )
+    if not giu("qa:fake-tests", reuse and _green_at(ev, TOOL_RUN, "qa:fake-tests", sha)):
+        fake = find_fake_tests(workdir, changed)
+        evidence.tool_run(sid, "qa:fake-tests", ok=not fake, detail={"files": fake})
 
     # Hợp đồng kiểm định của story: chạy đúng những loại nó phải qua.
     # Không phải pha mới — cùng bộ máy `run_suite`, chỉ giới hạn phạm vi.
@@ -528,52 +618,34 @@ def run_attempt(
     # toàn" chỉ chấm được thứ đã chạy ở ứng viên này, và "không chạy" thì
     # nó nói UNRUNNABLE chứ không nói đạt.
     hop_dong, man_hinh = validation_targets(story, preservation)
-    if hop_dong:
+    kinds = [k for k in hop_dong
+             if not giu(f"qa:{k}", reuse and _green_at(ev, TOOL_RUN, f"qa:{k}", sha))]
+    if kinds:
         run_suite(
             workdir,
             config=config,
-            only=hop_dong,
+            only=kinds,
             has_ui=bool(man_hinh),
-            story_id=story.id,
+            story_id=sid,
             artifact_root=artifact_root,
-            changed=changed_now,
-            candidate=attempt.candidate,
+            changed=changed,
+            candidate=sha,
         )
 
-    if man_hinh and contract:
+    screens = [m for m in man_hinh
+               if not giu(f"mockup:{m}", reuse and _green_at(ev, MOCKUP_MAP, m, sha))]
+    if screens and contract:
         mockup_verify.verify_screens(
-            workdir, contract, man_hinh,
-            config=config, story_id=story.id, artifact_root=artifact_root,
-            candidate=attempt.candidate,
+            workdir, contract, screens,
+            config=config, story_id=sid, artifact_root=artifact_root,
+            candidate=sha,
         )
 
-    attempt.review_findings = review_story(
-        story,
-        workdir=workdir,
-        base_ref=base_ref,
-        project=project,
-        artifact_root=artifact_root,
-        client=client,
-        config=config,
-        catalog=catalog,
-        architecture=architecture,
-        number=number,
-        candidate=attempt.candidate,
-        preservation=preservation,
-    )
-    # Mục chặn phải nằm trong bằng chứng, không chỉ trong bản tóm tắt in
-    # ra màn hình — bản tóm tắt cắt ngắn, và khi cần biết lượt này với
-    # lượt trước có bị chặn vì cùng một chuyện không thì phải đọc được
-    # nguyên văn. Thiếu chỗ này thì lối duy nhất là mò nhật ký phiên.
-    evidence.tool_run(
-        story.id,
-        "review",
-        ok=not attempt.review_findings,
-        detail={"findings": attempt.review_findings, "attempt": number},
-    )
-
-    if config.get("security.semantic_review", True):
-        attempt.security = security_review(
+    ra_soat = _at(ev, TOOL_RUN, "review", sha) if reuse else None
+    if giu("review", bool(ra_soat and _at(ev, AGENT_RUN, f"{sid}-review", sha))):
+        attempt.review_findings = list(ra_soat.detail.get("findings") or [])
+    else:
+        attempt.review_findings = review_story(
             story,
             workdir=workdir,
             base_ref=base_ref,
@@ -584,26 +656,57 @@ def run_attempt(
             catalog=catalog,
             architecture=architecture,
             number=number,
-            candidate=attempt.candidate,
+            candidate=sha,
             preservation=preservation,
         )
+        # Mục chặn phải nằm trong bằng chứng, không chỉ trong bản tóm tắt in
+        # ra màn hình — bản tóm tắt cắt ngắn, và khi cần biết lượt này với
+        # lượt trước có bị chặn vì cùng một chuyện không thì phải đọc được
+        # nguyên văn. Thiếu chỗ này thì lối duy nhất là mò nhật ký phiên.
+        # Lượt kiểm-lại đọc lại đúng bản ghi này thay vì gọi lại model.
         evidence.tool_run(
-            story.id,
-            "security",
-            ok=not (attempt.security.error
-                    or attempt.security.blocking(config["security.block_severities"])),
-            detail={
-                "findings": [f.line() for f in attempt.security.findings],
-                "filtered": len(attempt.security.filtered),
-                "error": attempt.security.error,
-                "attempt": number,
-            },
+            sid,
+            "review",
+            ok=not attempt.review_findings,
+            detail={"findings": attempt.review_findings, "attempt": number},
         )
 
+    if config.get("security.semantic_review", True):
+        bao_mat = _at(ev, TOOL_RUN, "security", sha) if reuse else None
+        if giu("security", bool(bao_mat and _at(ev, AGENT_RUN, f"{sid}-security", sha))):
+            attempt.security = _security_from_evidence(bao_mat)
+        else:
+            attempt.security = security_review(
+                story,
+                workdir=workdir,
+                base_ref=base_ref,
+                project=project,
+                artifact_root=artifact_root,
+                client=client,
+                config=config,
+                catalog=catalog,
+                architecture=architecture,
+                number=number,
+                candidate=sha,
+                preservation=preservation,
+            )
+            evidence.tool_run(
+                sid,
+                "security",
+                ok=not (attempt.security.error
+                        or attempt.security.blocking(config["security.block_severities"])),
+                detail={
+                    "findings": [f.line() for f in attempt.security.findings],
+                    "filtered": len(attempt.security.filtered),
+                    "error": attempt.security.error,
+                    "attempt": number,
+                },
+            )
+
     attempt.gate = story_gate.evaluate(
-        story.id,
-        evidence.read(story.id),
-        changed=changed_now,
+        sid,
+        evidence.read(sid),
+        changed=changed,
         write_scope=scope,
         screens=list(story.screens),
         contract=verification_contract(story),
@@ -613,15 +716,15 @@ def run_attempt(
         guard_expected=guard_expected(project, getattr(client, "id", "")),
         acceptance=len(story.acceptance_criteria),
         coverage_min=float(config["coverage.min"]),
-        added_tests=tdd.added_tests(workdir, base_ref=base_ref, changed=changed_now, story_id=story.id),
-        candidate=attempt.candidate,
+        added_tests=tdd.added_tests(workdir, base_ref=base_ref, changed=changed, story_id=sid),
+        candidate=sha,
         preservation=preservation,
     )
     attempt.ok = attempt.gate.passed
     # Kết cục cổng đi vào bằng chứng, mang SHA ứng viên: sổ hành vi (R2) coi
     # "qua cổng ở ứng viên này" là dấu landed ở mức lượt — implement không
     # merge, và `attempt.committed` đóng giao dịch kể cả khi trượt.
-    evidence.record(story.id, Event(
+    evidence.record(sid, Event(
         kind=NOTE, name="gate:verdict", ok=attempt.ok,
         detail={"failures": [c.name for c in attempt.gate.failures][:20], "attempt": number},
     ))
@@ -669,6 +772,7 @@ def freeze_candidate(
     artifact_root: Path,
     number: int,
     changed: list[str],
+    verify_only: bool = False,
 ) -> str:
     """Chốt công việc của phiên developer thành **một bản** và trả SHA của nó.
 
@@ -680,7 +784,8 @@ def freeze_candidate(
     Không có gì để commit thì ứng viên là HEAD hiện tại (agent đã tự chốt).
     Chạy thẳng trong dự án (`--no-isolate`) thì **không** commit: không có
     nhánh riêng, và commit vào thân cây người dùng không phải việc của một
-    lượt thử.
+    lượt thử. ``verify_only`` đánh dấu mốc của lượt kiểm-lại (R13) — không
+    có phiên developer nào trước nó, người đọc nhật ký phải thấy điều đó.
     """
     from ..control.worktree import GitError, commit_paths
 
@@ -702,7 +807,7 @@ def freeze_candidate(
         data={"luot": number, "files": changed[:50], "count": len(changed)}))
     journal.record(story.id, JEntry(
         step="candidate.frozen", attempt=giao_dich,
-        data={"luot": number, "sha": sha, "error": loi}))
+        data={"luot": number, "sha": sha, "error": loi, "verify_only": verify_only}))
     if loi or not sha:
         # Không chốt được thì bằng chứng phía sau gắn vào một bản **không**
         # chứa công việc. Nói ra ở bằng chứng; im lặng ở đây là để lại một
@@ -1615,3 +1720,83 @@ def implement_story(
         feedback = attempt.gate.feedback() if attempt.gate else attempt.error
         if attempt.review_findings:
             feedback += "\n" + "\n".join(f"- {f}" for f in attempt.review_findings[:10])
+
+
+def verify_only(
+    story: Story,
+    *,
+    project: Path | str,
+    workdir: Path | str,
+    artifact_root: Path | str | None = None,
+    client: ClientAdapter,
+    config: Config | None = None,
+    catalog: Catalog | None = None,
+    architecture: Architecture | None = None,
+    contract: DesignContract | None = None,
+) -> StoryOutcome:
+    """Lượt kiểm-lại trên ứng viên đã đóng băng (ADR-004 R13) — **không** mở
+    phiên developer. Cùng chữ ký với `implement_story` để `run.py` gọi thay
+    thế được.
+
+    Ứng viên = HEAD nhánh story; `workdir` phải đứng đúng ở đó (`run.py` tạo
+    lại worktree **không** mang nhánh chính vào — mang vào là tạo bản mới, và
+    mọi bằng chứng cũ thành stale). Đóng băng lại: không có gì để commit thì
+    SHA không đổi, và bằng chứng test/lint/`qa:*`/rà soát ở SHA ấy được
+    `verify_candidate(reuse=True)` giữ, chỉ chạy lại phép kiểm ✗/thiếu.
+
+    Vì sao cần: e9 STORY-01-07 (2026-09-06) trượt lượt 3 chỉ vì e2e nhạy tải
+    máy; ứng viên `a60612e` đo lại 10/10 xanh, rà soát và bảo mật ở đúng SHA
+    ấy đều ✅ — nhưng harness chỉ biết "lượt mới = phiên developer mới", giá
+    $10–15 để dựng lại thứ đã có. Không nới cổng: vẫn chấm đủ mọi mục.
+
+    Không tính vào `run.max_retries` (`Attempt.verify_only`): đây là kiểm
+    lại, không phải lượt developer.
+    """
+    project = Path(project)
+    workdir = Path(workdir)
+    root = Path(artifact_root) if artifact_root else project / "_bmad-output"
+    cfg = config or Config.load(project)
+    cat = catalog or load_catalog()
+    contract = contract if contract is not None else load_contract(root)
+
+    outcome = StoryOutcome(story_id=story.id)
+    evidence = EvidenceStore(root)
+    # Số hiệu = lần chấm cổng thứ n của story, để tệp `reviews/<story>-review-<n>.md`
+    # (nếu phải rà soát lại) không đè lên lời của lượt developer trước.
+    number = len(evidence.read(story.id).of(NOTE, "gate:verdict")) + 1
+    head = head_sha(project)
+    base_ref = fork_point(str(workdir), head) if head else ""
+    scope = effective_write_scope(story, project)
+    changed_now = changed_files(str(workdir), base_ref=base_ref)
+
+    attempt = Attempt(number=number, verify_only=True)
+    attempt.candidate = freeze_candidate(
+        workdir, story=story, scope=scope, isolated=True, evidence=evidence,
+        artifact_root=root, number=number, changed=changed_now, verify_only=True,
+    )
+    evidence.candidate = attempt.candidate
+    # R4: cùng danh sách cho reviewer (nếu phải gọi lại), security và cổng —
+    # tính một lần ở đây như `build_context` làm trước phiên developer.
+    preservation = preservation_items(story, project=project, ledger=_ledger(root))
+    attempt = verify_candidate(
+        story, project=project, workdir=workdir, artifact_root=root, client=client,
+        config=cfg, catalog=cat, architecture=architecture, contract=contract,
+        attempt=attempt, base_ref=base_ref, scope=scope, changed=changed_now,
+        preservation=preservation, reuse=True,
+    )
+    evidence.record(story.id, Event(
+        kind=NOTE, name="verify-only", ok=attempt.ok,
+        detail={
+            "reran": attempt.reran, "kept": attempt.kept, "attempt": number,
+            # Nhánh chính đã tiến lên sau ứng viên: vẫn chấm ứng viên — đó là
+            # bản được chấm — nhưng nói ra; merge cuối lượt sẽ gặp phần mới.
+            "main_ahead": head if head and base_ref and base_ref != head else "",
+        },
+    ))
+    outcome.attempts.append(attempt)
+    if not attempt.ok:
+        outcome.blocked_reason = (
+            f"kiểm lại ứng viên {attempt.candidate[:7]} không qua cổng: "
+            + "; ".join(c.name for c in attempt.gate.failures)
+        )
+    return outcome

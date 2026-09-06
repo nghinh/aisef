@@ -369,6 +369,19 @@ class TestRunCommand(CliTestCase):
         self.assertEqual(code, EXIT_USAGE)
         self.assertIn("khong-co", err)
 
+    def test_verify_only_can_story(self):
+        """R13: kiểm lại là kiểm lại **một** ứng viên — không có story thì
+        không có gì để chỉ vào."""
+        code, _, err = self.run_cli("run", "--verify-only", "--force")
+        self.assertEqual(code, EXIT_USAGE)
+        self.assertIn("--story", err)
+
+    def test_verify_only_khong_di_voi_no_isolate(self):
+        code, _, err = self.run_cli("run", "--verify-only", "--story", "STORY-01-01",
+                                    "--no-isolate", "--force")
+        self.assertEqual(code, EXIT_USAGE)
+        self.assertIn("--no-isolate", err)
+
 
 class TestQaCommand(CliTestCase):
     def test_unconfigured_blocks_release_level(self):

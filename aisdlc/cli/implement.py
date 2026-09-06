@@ -106,8 +106,25 @@ def _readiness_blocked(args) -> bool:
 
 
 def cmd_run(args) -> int:
-    """Chạy đợt: epic tuần tự, trong epic chạy song song theo đợt."""
-    from ..phases.run import run_sprint
+    """Chạy đợt: epic tuần tự, trong epic chạy song song theo đợt.
+
+    `--verify-only --story S`: lượt kiểm-lại trên ứng viên đã đóng băng
+    (ADR-004 R13) — cùng cổng, cùng đường merge, không có phiên developer.
+    """
+    from ..phases.run import run_sprint, run_verify_only
+
+    verify_only = getattr(args, "verify_only", False)
+    story = getattr(args, "story", "")
+    if verify_only and not story:
+        print("✗ --verify-only cần --story: kiểm lại ứng viên của story nào?", file=sys.stderr)
+        return EXIT_USAGE
+    if verify_only and args.no_isolate:
+        print("✗ --verify-only chấm HEAD nhánh story trong worktree — không đi với --no-isolate",
+              file=sys.stderr)
+        return EXIT_USAGE
+    if story and not verify_only:
+        print("✗ --story chỉ đi với --verify-only (chạy một story thường: --epic)", file=sys.stderr)
+        return EXIT_USAGE
 
     if _readiness_blocked(args):
         return EXIT_NOT_READY
@@ -116,14 +133,19 @@ def cmd_run(args) -> int:
     if adapter is None:
         return code
 
-    report = run_sprint(
-        args.project,
-        adapter,
-        config=Config.load(args.project),
-        only_epic=args.epic,
-        sequential=args.sequential,
-        isolate=not args.no_isolate,
-    )
+    if verify_only:
+        report = run_verify_only(
+            args.project, adapter, story_id=story, config=Config.load(args.project),
+        )
+    else:
+        report = run_sprint(
+            args.project,
+            adapter,
+            config=Config.load(args.project),
+            only_epic=args.epic,
+            sequential=args.sequential,
+            isolate=not args.no_isolate,
+        )
     print(report.summary())
     if report.error:
         return EXIT_USAGE

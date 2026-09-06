@@ -97,7 +97,7 @@ Ký hiệu: **P0** = nền tảng, làm trước và đo; **P1** = tạo giá tr
 **R10 — Planner agent cho story sửa** (chỉ khi R3 đo được gain nhưng story sinh bằng code quá thô): agent viết lại tiêu đề/tiêu chí story sửa từ gap + preservation, vẫn qua cổng `stories` và cổng cỡ.
 **R11 — Vòng cấp dự án nhiều epic** (T vòng qua nhiều epic) — sau khi R3 ổn trên một epic.
 **R12 — Xuất issue table** (GitHub Issues/CSV) từ ledger — tiện theo dõi, không ảnh hưởng cổng.
-**R13 — Lượt kiểm-lại trên ứng viên đã đóng băng** (`aisdlc run --story S --verify-only`): không mở phiên developer; ứng viên = HEAD nhánh story; chạy lại đúng các phép kiểm có bằng chứng ✗/thiếu ở ứng viên ấy (rà soát/bảo mật đã ✅ ở cùng SHA thì giữ, theo luật stale của R1). Cần vì: e9 STORY-01-07 2026-09-06 trượt lượt 3 chỉ vì e2e nhạy tải máy, ứng viên `a60612e` đo lại 10/10 xanh (§6). Không nới cổng: vẫn chấm đủ, chỉ không trả tiền cho việc dựng lại mã đã có.
+**R13 — Lượt kiểm-lại trên ứng viên đã đóng băng** (`aisdlc run --story S --verify-only`) — **hiện thực 2026-09-06, unit xanh trên client giả, chưa đo agent thật (§6)**: không mở phiên developer; ứng viên = HEAD nhánh story; chạy lại đúng các phép kiểm có bằng chứng ✗/thiếu ở ứng viên ấy (rà soát/bảo mật đã ✅ ở cùng SHA thì giữ, theo luật stale của R1). Cần vì: e9 STORY-01-07 2026-09-06 trượt lượt 3 chỉ vì e2e nhạy tải máy, ứng viên `a60612e` đo lại 10/10 xanh (§6). Không nới cổng: vẫn chấm đủ, chỉ không trả tiền cho việc dựng lại mã đã có.
 
 ---
 
@@ -125,7 +125,7 @@ Ký hiệu: **P0** = nền tảng, làm trước và đo; **P1** = tạo giá tr
 - **Journal**: thứ tự bước mới `attempt.started → worktree.created → status.running → changes.detected → candidate.frozen(sha) → verification.completed → review.completed → merge.completed → attempt.committed`; `commit.created` trở thành `candidate.frozen`.
 - **`stories.index.json`**: story thêm `repair_of` (hành vi), `loop`, `preservation` (danh sách id); waves cho `EPIC-RP-<E>`.
 - **Config**: `improve.max_loops` (3), `improve.flat_loops` (2), `improve.cost_cap_usd`, `story.max_complexity`, `context.max_preservation_chars`.
-- **CLI**: `aisdlc improve --epic E [--max-loops N] [--auto]`, `aisdlc evidence <id>`, `aisdlc report` mở rộng.
+- **CLI**: `aisdlc improve --epic E [--max-loops N] [--auto]`, `aisdlc evidence <id>`, `aisdlc report` mở rộng; `aisdlc run --story S --verify-only [--client c]` (R13).
 - **Cổng người mới `improve`** trong `control/approvals.py` (giữa `readiness` và `pre-deploy`): duyệt tiếp tục vòng ≥ 2.
 - **Hợp quy**: phép **C8** (stale candidate) vào `docs/CONFORMANCE.md`.
 
@@ -150,6 +150,15 @@ Baseline hôm nay (đã có số): e9 EPIC-01 — 01-04 8 lượt/$79,67; 01-05 
 Thứ tự làm: R1 → R2 (B0) → R4 → R3 (B1) → R5 (B4) → R6/R7 → R8/R9 → P2. Mỗi bước một ADR-004 §6 "số đo" trước khi bước sau.
 
 ## 6. Số đo (điền khi hiện thực)
+
+**R13 — Lượt kiểm-lại trên ứng viên đã đóng băng (`aisdlc run --story S --verify-only`): hiện thực 2026-09-06, unit xanh trên client giả, chưa đo agent thật.**
+
+* Đường đi: `run.run_verify_only` → `run_epic(verify_only=True)` với kế hoạch thu về **một đợt một story** → `_run_wave` tạo lại worktree từ nhánh story mà **không** mang nhánh chính vào (`WorktreeManager.create(refresh=False)` — một commit merge là một bản mới, mọi bằng chứng cũ thành stale) → `implement.verify_only` (cùng chữ ký `implement_story`, gọi thay thế) → merge, `done`, `attempt.committed`, dọn worktree **cùng mã** với lượt thường. Không có đường riêng để lệch.
+* `implement.verify_candidate(reuse=…)`: nửa sau của `run_attempt` (đóng băng xong → test/lint → `qa:*` → mockup → rà soát → bảo mật → cổng → `gate:verdict`) tách ra; `run_attempt` gọi với `reuse=False` (chạy đủ như trước), lượt kiểm-lại gọi `reuse=True`. Luật giữ/chạy: test · lint · `qa:fake-tests` · `qa:<kind>` · `mockup:<screen>` **giữ** khi bằng chứng *mới nhất* của phép ấy mang đúng SHA và xanh thật (không `skipped`, không `unrunnable` — hai thứ ấy chạy lại rẻ và có thể đã đổi); rà soát/bảo mật **giữ** khi có `agent_run <story>-review|-security` **và** `tool_run review|security` cùng SHA — kể cả kết luận chặn: người rà soát đã nói về đúng bản này, hỏi lại là trả tiền cho cùng câu trả lời, muốn qua thì phải đổi mã, tức một lượt developer. Mốc là `tool_run review` chứ không phải `note review:verdict`: bản ghi ấy là đúng đầu vào cổng đã dùng và có cả khi model không trả JSON (client giả, nhật ký trước R8).
+* Bằng chứng: `candidate.frozen` mang `data.verify_only=True` (không có phiên developer trước nó); `note verify-only` `{reran, kept, attempt, main_ahead}` — `main_ahead` = SHA nhánh chính khi nó đã tiến lên sau ứng viên (vẫn chấm ứng viên, vì đó là bản được chấm; merge cuối lượt gặp phần mới). `Attempt.verify_only` → `quality_attempts` không đếm, `StoryRecord.attempts` không tăng, không ghi hiệu chuẩn R5, `run.max_retries` nguyên vẹn cho lượt developer sau.
+* Từ chối bằng code: không có nhánh `story/<id>` hoặc chưa có `candidate.frozen` ("chưa có ứng viên để kiểm lại"); story `done`; `--verify-only` không có `--story`; `--no-isolate`.
+* **Số đo trên client giả** (`tests/test_run.py::TestVerifyOnly` 6 phép + `tests/test_cli.py` 2 phép; "e2e nhạy tải" = lệnh `sit` đọc tệp cờ ngoài kho): story trượt lượt 1 chỉ vì `qa:sit` ✗ → kiểm lại chạy lại **đúng 1** phép (`qa:sit`), giữ 5 (test, lint, qa:fake-tests, review, security), **0** phiên developer, **0** lượt model, cổng ✅, merge vào main, `attempt.committed`; nhánh story tiến thêm một commit → reviewer + security được gọi lại ở SHA mới, vẫn 0 developer; trượt lần nữa → `failed` với lý do nêu tên mục, `attempts` không đổi; nhánh chính tiến lên → ứng viên giữ nguyên SHA, `main_ahead` có, merge vẫn mang phần mới của main.
+* **Chưa đo:** agent thật. Đích là kịch bản e9 01-07 `a60612e` (§6 mục R1·R8): kỳ vọng lượt kiểm-lại = một lần chạy e2e, $0 model, thay cho ~$10–15 developer + $4–6 rà soát/bảo mật của một lượt thường. Cũng chưa đo: `mockup:<screen>` thật qua trình duyệt; story `verified` (đi qua `run_epic` chỉ merge lại, không chấm lại).
 
 **R1 — Frozen Candidate SHA: hiện thực, unit xanh, chưa đo agent** (2026-09-05).
 

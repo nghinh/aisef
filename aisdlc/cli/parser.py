@@ -123,6 +123,11 @@ def build_parser() -> argparse.ArgumentParser:
     r2.add_argument("--sequential", action="store_true", help="tắt chạy song song")
     r2.add_argument("--no-isolate", action="store_true", help="chạy thẳng trong dự án, không worktree")
     r2.add_argument("--force", action="store_true", help="chạy dù cổng stories chưa duyệt")
+    r2.add_argument("--verify-only", action="store_true",
+                    help="kiểm lại ứng viên đã đóng băng của --story (HEAD nhánh story): "
+                         "không mở phiên developer, chỉ chạy lại phép kiểm ✗/thiếu, giữ rà "
+                         "soát cùng SHA; không tính vào run.max_retries (ADR-004 R13)")
+    r2.add_argument("--story", default="", help="story để kiểm lại — bắt buộc với --verify-only")
     r2.set_defaults(func=cmd_run)
 
     im = sub.add_parser("improve", help="vòng cải tiến epic theo bằng chứng: QA → sổ hành vi → "

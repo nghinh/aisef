@@ -148,10 +148,19 @@ class WorktreeManager:
     def branch_for(self, story_id: str) -> str:
         return f"{BRANCH_PREFIX}{safe_slug(story_id)}"
 
-    def create(self, story_id: str, *, base: str | None = None) -> Worktree:
+    def has_branch(self, story_id: str) -> bool:
+        """Nhánh story còn đó không — worktree gỡ rồi thì đây là nơi giữ
+        công việc, và là ứng viên của lượt kiểm-lại."""
+        return self._branch_exists(self.branch_for(story_id))
+
+    def create(self, story_id: str, *, base: str | None = None,
+               refresh: bool = True) -> Worktree:
         """Tạo worktree cho story. Idempotent: đã có thì trả về cái đang có.
 
-        Nhánh có sẵn thì **mang nhánh chính vào trước khi giao cho agent**.
+        Nhánh có sẵn thì **mang nhánh chính vào trước khi giao cho agent**
+        — trừ khi ``refresh=False``: lượt kiểm-lại (ADR-004 R13) chấm đúng
+        ứng viên đã đóng băng ở HEAD nhánh story, và một commit merge là một
+        bản mới làm mọi bằng chứng cũ thành stale.
         Không làm thế thì story chạy lại vẫn đứng trên trunk lúc nó rẽ ra:
         bản sửa cấu hình, bản vá công cụ, và công việc của story đã merge
         ở đợt trước đều không tới nơi. Đo trên dự án `par`:
@@ -188,7 +197,7 @@ class WorktreeManager:
 
         # Tính trước rồi mới dựng: `Worktree` là bất biến, và giữ nó bất
         # biến đáng hơn một dòng ngắn.
-        mang_vao = self.refresh(story_id, base=base) if co_san else ""
+        mang_vao = self.refresh(story_id, base=base) if co_san and refresh else ""
         return Worktree(story_id, path, branch, refreshed_from=mang_vao)
 
     def _carry_client_config(self, path: Path) -> list[str]:

@@ -26,7 +26,8 @@ from aisdlc.control.journal import Entry as JEntry  # noqa: E402
 from aisdlc.control.journal import JournalStore  # noqa: E402
 from aisdlc.control.state import StateStore, StoryStatus  # noqa: E402
 from aisdlc.control.worktree import WorktreeManager  # noqa: E402
-from aisdlc.phases.run import load_plan, run_sprint  # noqa: E402
+from aisdlc.harness.observe import AGENT_RUN, NOTE, EvidenceStore  # noqa: E402
+from aisdlc.phases.run import load_plan, run_sprint, run_verify_only  # noqa: E402
 
 INDEX = {
     "epics": [{"id": "EPIC-01"}, {"id": "EPIC-02"}],
@@ -610,3 +611,158 @@ class TestDoneChiSauMerge(RunTestCase):
         sẵn của chạy không cách ly, không thuộc G12."""
         self.run_sprint(Agent(), only_epic="EPIC-01", isolate=False)
         self.assertIs(self.state().stories["STORY-01-01"].state, StoryStatus.DONE)
+
+
+class TestVerifyOnly(RunTestCase):
+    """ADR-004 R13 — lượt kiểm-lại trên ứng viên đã đóng băng.
+
+    e9 STORY-01-07 (2026-09-06) trượt lượt 3 chỉ vì e2e nhạy tải máy; ứng
+    viên `a60612e` đo lại 10/10 xanh, rà soát và bảo mật ở đúng SHA ấy đều ✅
+    — mà harness chỉ biết "lượt mới = phiên developer mới", $10–15 để dựng
+    lại thứ đã có. Ở đây "e2e nhạy tải" là một lệnh `sit` đọc tệp cờ ngoài
+    kho: chưa có cờ → ✗, có cờ → ✅. Điều phải chứng minh: chỉ phép kiểm đỏ
+    được chạy lại, model không bị gọi lại khi SHA không đổi, cổng vẫn chấm đủ,
+    và lượt này không ăn vào `run.max_retries`.
+    """
+
+    SID = "STORY-01-01"
+
+    def setUp(self):
+        super().setUp()
+        index = json.loads((self.artifacts / "stories.index.json").read_text(encoding="utf-8"))
+        index["stories"][0]["verification_contract"] = ["unit", "sit"]
+        (self.artifacts / "stories.index.json").write_text(
+            json.dumps(index, ensure_ascii=False), encoding="utf-8")
+        subprocess.run(["git", "commit", "-qam", "hợp đồng sit"], cwd=self.project, check=True)
+        self._co = tempfile.TemporaryDirectory()
+        self.co = Path(self._co.name) / "xanh"
+
+    def tearDown(self):
+        self._co.cleanup()
+        super().tearDown()
+
+    def cfg(self):
+        # Không Docker: lệnh `sit` phải thấy tệp cờ trên máy này, và phép thử
+        # không được đổi màu theo việc máy có daemon hay không.
+        return self.config(**{"verify.sit": f"test -f {self.co}", "sandbox.use_docker": False})
+
+    def truot_vi_sit(self, agent):
+        r = self.run_sprint(agent, only_epic="EPIC-01", config=self.cfg())
+        self.assertFalse(r.ok, r.summary())
+        gate = r.outcomes[0].attempts[-1].gate
+        self.assertEqual([c.name for c in gate.failures], ["sit"], gate.summary())
+        self.assertIs(self.state().stories[self.SID].state, StoryStatus.FAILED)
+        return r
+
+    def kiem_lai(self, agent):
+        return run_verify_only(self.project, agent, story_id=self.SID, config=self.cfg())
+
+    def evidence(self):
+        return EvidenceStore(self.artifacts).read(self.SID)
+
+    def journal(self):
+        return JournalStore(self.artifacts).read(self.SID)
+
+    def head_co(self, path: str) -> bool:
+        r = subprocess.run(["git", "ls-tree", "--name-only", "HEAD", path],
+                           cwd=self.project, capture_output=True, text=True)
+        return bool(r.stdout.strip())
+
+    def test_chay_lai_dung_phep_kiem_do_giu_ra_soat_cung_sha_roi_merge(self):
+        agent = Agent()
+        self.truot_vi_sit(agent)
+        n_dev, n_model = len(agent.stories), len(self.evidence().of(AGENT_RUN))
+
+        self.co.write_text("")          # "tải máy" đã hết
+        r = self.kiem_lai(agent)
+
+        self.assertTrue(r.ok, r.summary())
+        self.assertIs(self.state().stories[self.SID].state, StoryStatus.DONE)
+        self.assertTrue(self.head_co("src/core/STORY-01-01.py"), "phải merge vào nhánh chính")
+        self.assertEqual(len(agent.stories), n_dev, "không có phiên developer mới")
+        ev = self.evidence()
+        self.assertEqual(len(ev.of(AGENT_RUN)), n_model,
+                         "SHA không đổi: không gọi lại reviewer lẫn security")
+        note = ev.last(NOTE, "verify-only")
+        self.assertEqual(note.detail["reran"], ["qa:sit"])
+        self.assertEqual(sorted(note.detail["kept"]),
+                         ["lint", "qa:fake-tests", "review", "security", "test"])
+        self.assertIn("attempt.committed", self.journal().steps())
+
+    def test_ra_soat_o_sha_khac_thi_goi_lai_reviewer(self):
+        agent = Agent()
+        self.truot_vi_sit(agent)
+        n_dev, n_model = len(agent.stories), len(self.evidence().of(AGENT_RUN))
+        # Nhánh story tiến thêm một commit (sửa tay) → ứng viên mới, lời rà
+        # soát cũ nói về bản khác.
+        wt = WorktreeManager(self.project)
+        w = wt.create(self.SID, refresh=False)
+        (Path(w.path) / "src" / "core" / "sua.py").write_text("y = 2\n", encoding="utf-8")
+        wt.commit_story(self.SID, "sửa tay", paths=["src/core"])
+        wt.remove(self.SID)
+
+        self.co.write_text("")
+        r = self.kiem_lai(agent)
+
+        self.assertTrue(r.ok, r.summary())
+        self.assertEqual(len(agent.stories), n_dev, "vẫn không có phiên developer")
+        # Client giả không trả JSON nên mỗi vai rà soát tốn 2 lượt (R8 hỏi
+        # lại một lần) — đếm theo vai, không đếm số lượt.
+        moi = [e.name for e in self.evidence().of(AGENT_RUN)][n_model:]
+        self.assertTrue(moi and all("-review" in n or "-security" in n for n in moi), moi)
+        self.assertTrue(any("-review" in n for n in moi), "reviewer phải đọc lại bản mới")
+        self.assertTrue(any("-security" in n for n in moi), "security phải đọc lại bản mới")
+        note = self.evidence().last(NOTE, "verify-only")
+        self.assertIn("review", note.detail["reran"])
+        self.assertIn("security", note.detail["reran"])
+
+    def test_tu_choi_khi_chua_co_ung_vien(self):
+        r = self.kiem_lai(Agent())
+        self.assertIn("chưa có ứng viên", r.error)
+        self.assertNotIn(self.SID, self.state().stories, "từ chối trước khi chạm trạng thái")
+
+    def test_tu_choi_story_da_xong(self):
+        self.co.write_text("")
+        self.run_sprint(Agent(), only_epic="EPIC-01", config=self.cfg())
+        self.assertIs(self.state().stories[self.SID].state, StoryStatus.DONE)
+        r = self.kiem_lai(Agent())
+        self.assertIn("đã xong", r.error)
+
+    def test_truot_khong_tinh_vao_max_retries(self):
+        agent = Agent()
+        self.truot_vi_sit(agent)
+        luot = self.state().stories[self.SID].attempts
+
+        r = self.kiem_lai(agent)        # cờ vẫn chưa có: sit ✗ lần nữa
+
+        self.assertFalse(r.ok, r.summary())
+        rec = self.state().stories[self.SID]
+        self.assertIs(rec.state, StoryStatus.FAILED)
+        self.assertIn("kiểm lại", rec.blocked_reason)
+        self.assertIn("sit", rec.blocked_reason)
+        self.assertEqual(rec.attempts, luot, "kiểm lại không phải lượt developer")
+        self.assertEqual(r.outcomes[0].quality_attempts, 0)
+        self.assertEqual(len(agent.stories), 1)
+        self.assertTrue(self.journal().last("candidate.frozen").data.get("verify_only"))
+        self.assertFalse(self.journal().last("candidate.frozen").data.get("error"))
+
+    def test_nhanh_chinh_tien_len_van_cham_dung_ung_vien_va_noi_ra(self):
+        agent = Agent()
+        self.truot_vi_sit(agent)
+        sha_cu = self.journal().last("candidate.frozen").data["sha"]
+        n_model = len(self.evidence().of(AGENT_RUN))
+        (self.project / "khac.txt").write_text("main đi tiếp\n", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=self.project, check=True)
+        subprocess.run(["git", "commit", "-qm", "main tiến lên"], cwd=self.project, check=True)
+
+        self.co.write_text("")
+        r = self.kiem_lai(agent)
+
+        self.assertTrue(r.ok, r.summary())
+        self.assertEqual(self.journal().last("candidate.frozen").data["sha"], sha_cu,
+                         "không mang nhánh chính vào: ứng viên là bản đã được chấm")
+        self.assertEqual(len(self.evidence().of(AGENT_RUN)), n_model)
+        note = self.evidence().last(NOTE, "verify-only")
+        self.assertTrue(note.detail["main_ahead"], "phải nói ra là nhánh chính đã tiến lên")
+        self.assertTrue(self.head_co("src/core/STORY-01-01.py"))
+        self.assertTrue(self.head_co("khac.txt"), "merge không làm mất phần mới của main")
