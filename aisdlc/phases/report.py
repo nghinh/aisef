@@ -158,6 +158,17 @@ class Report:
         if not self.pre_deploy:
             lines.append("_Chưa chấm — chạy `aisdlc pre-deploy`._")
         else:
+            scope = self.pre_deploy.get("scope") or {}
+            if scope:
+                ngoai = scope.get("outside") or []
+                lines += [
+                    f"Phạm vi nghiệm thu: **{scope.get('epic')}** — "
+                    f"{len(scope.get('stories') or [])} story. "
+                    + (f"**Ngoài phạm vi (chưa nghiệm thu): {len(ngoai)} story** — "
+                       + ", ".join(ngoai[:8]) + ("…" if len(ngoai) > 8 else "") + "."
+                       if ngoai else "Không có story ngoài phạm vi."),
+                    "",
+                ]
             lines += ["| Mục | Kết quả |", "|---|---|"]
             for c in self.pre_deploy.get("checks", []):
                 mark = "✅" if c.get("passed") else "✗"

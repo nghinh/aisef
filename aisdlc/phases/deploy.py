@@ -51,6 +51,13 @@ class PreDeployReport:
     #: Lý do chấp nhận suy biến, nếu có — là bằng chứng của cổng, nên ghi
     #: ra đĩa cùng kết quả chứ không chỉ nằm trong cấu hình.
     degraded_waiver: str = ""
+    #: Phạm vi nghiệm thu khi chấm `--epic E` (QĐ C-a 2026-09-06): story
+    #: trong/ngoài phạm vi, để người ký biết mình nghiệm thu **cái gì**.
+    #: `None` = cả kế hoạch, như trước.
+    scope: dict | None = None
+    #: Loại kiểm định được miễn kèm lý do người khai — bằng chứng của cổng,
+    #: nên ghi ra đĩa cùng kết quả như `degraded_waiver`.
+    waivers: dict = field(default_factory=dict)
 
     @property
     def passed(self) -> bool:
@@ -76,6 +83,8 @@ class PreDeployReport:
                 "fake_tests": self.qa.fake_tests,
             },
             "degraded_waiver": self.degraded_waiver,
+            "scope": self.scope,
+            "waivers": self.waivers,
         }
 
     def write(self, artifact_root: Path | str) -> Path:
@@ -92,7 +101,8 @@ class PreDeployReport:
         return path
 
     def summary(self) -> str:
-        lines = [f"Cổng trước triển khai: {'ĐẠT' if self.passed else 'KHÔNG ĐẠT'}"]
+        pham_vi = f" (phạm vi {self.scope['epic']})" if self.scope else ""
+        lines = [f"Cổng trước triển khai{pham_vi}: {'ĐẠT' if self.passed else 'KHÔNG ĐẠT'}"]
         lines += [c.line() for c in self.checks]
         if self.qa and not self.qa.release_ready:
             lines.append(self.qa.summary())
@@ -147,37 +157,95 @@ def _planned_but_never_run(artifact_root: Path, registered: set[str]) -> list[st
         return []  # không có kế hoạch đọc được thì không kết luận gì thêm
     return [sid for sid in plan.stories if sid not in registered]
 
+def _scope(report: PreDeployReport, artifact_root: Path, epic: str) -> set[str]:
+    """Phạm vi nghiệm thu = story của **một** epic trong kế hoạch (QĐ C-a
+    2026-09-06). Story ngoài phạm vi không được chấm: không "xong", không
+    "thiếu" — và được nêu tên, vì người ký phải biết mình nghiệm thu cái gì.
+    Không phải nới cổng: mọi mục khác chấm y nguyên, chỉ tập story là khai
+    tường minh. Phạm vi ghi vào báo cáo → băm phê duyệt `pre-deploy` đổi
+    theo, nên duyệt cho EPIC-01 không dùng lại được cho cả kế hoạch."""
+    from .run import load_plan
+
+    plan = load_plan(artifact_root)
+    if plan.error:
+        report.checks.append(Check("phạm vi", False, f"--epic {epic}: {plan.error}"))
+        return set()
+    inside = {sid for sid, s in plan.stories.items() if s.epic_id == epic}
+    if not inside:
+        report.checks.append(Check(
+            "phạm vi", False, f"--epic {epic}: không có story nào thuộc epic này trong kế hoạch"))
+        return set()
+    outside = sorted(sid for sid in plan.stories if sid not in inside)
+    report.scope = {"epic": epic, "stories": sorted(inside), "outside": outside}
+    report.checks.append(Check("phạm vi", True, f"nghiệm thu {epic}: {len(inside)} story"))
+    if outside:
+        report.checks.append(Check(
+            "ngoài phạm vi nghiệm thu", Outcome.NOT_APPLICABLE,
+            f"{len(outside)} story không chấm — không xong, không thiếu: "
+            + ", ".join(outside[:5]) + ("…" if len(outside) > 5 else ""),
+        ))
+    return inside
+
+
+def _waiver_check(report: PreDeployReport, cfg: Config) -> Check | None:
+    """Loại kiểm định miễn ở `verify.waived` phải có lý do ở
+    `verify.waiver_reason` (phạm vi, ngày, người ký) — miễn không lý do
+    không phải bằng chứng. Kết cục là ◇ WAIVED, không phải ✅: loại ấy
+    **không** được kiểm, chỉ được người nhận trách nhiệm (QĐ5 2026-09-06:
+    `mutation` của e9 UNRUNNABLE ở môi trường nghiệm thu, không cài thêm
+    công cụ để làm đẹp)."""
+    waived = list(report.qa.waived) if report.qa else []
+    if not waived:
+        return None
+    reason = str(cfg.get("verify.waiver_reason", "") or "").strip()
+    ten = ", ".join(waived)
+    if not reason:
+        return Check(
+            "miễn tường minh", False,
+            f"{ten} miễn ở `verify.waived` mà không có lý do — khai "
+            f"`verify.waiver_reason` (phạm vi, ngày, người ký) để ghi vào bằng chứng",
+        )
+    report.waivers = {k: reason for k in waived}
+    return Check("miễn tường minh", Outcome.WAIVED, f"{ten} — {reason}")
+
+
 def pre_deploy(
     project: Path | str,
     *,
     config: Config | None = None,
     has_ui: bool = True,
     skip_qa: bool = False,
+    epic: str = "",
 ) -> PreDeployReport:
-    """Chấm cổng trước triển khai — chỉ đọc trạng thái, không sửa gì."""
+    """Chấm cổng trước triển khai — chỉ đọc trạng thái, không sửa gì.
+    `epic` khai phạm vi nghiệm thu (xem `_scope`); rỗng = cả kế hoạch."""
     project = Path(project)
     artifact_root = project / "_bmad-output"
     cfg = config or Config.load(project)
     report = PreDeployReport()
 
+    inside = _scope(report, artifact_root, epic) if epic else None
     state = StateStore(artifact_root).load()
-    if not state.stories:
-        report.checks.append(Check("story", False, "chưa story nào chạy"))
+    records = [r for r in state.stories.values() if inside is None or r.id in inside]
+    if not records:
+        report.checks.append(Check(
+            "story", False, "chưa story nào chạy" + (f" trong {epic}" if epic else "")))
     else:
         # Triển khai là triển khai nhánh chính. `verified` là qua cổng mà
         # chưa merge (G12) — với cổng này nó chưa xong, và phải được gọi
         # tên riêng: "chưa xong" và "xong nhưng kẹt merge" cần hai cách sửa.
-        chua_merge = [
-            r.id for r in state.stories.values() if r.state is StoryStatus.VERIFIED
-        ]
+        chua_merge = [r.id for r in records if r.state is StoryStatus.VERIFIED]
         not_done = [
-            r.id for r in state.stories.values()
+            r.id for r in records
             if r.state not in (StoryStatus.DONE, StoryStatus.VERIFIED)
         ]
         # Story có trong kế hoạch mà chưa từng được đăng ký thì không "xong":
         # e9 2026-09-05, 01-06/01-07 chưa chạy bao giờ mà cổng ghi ✅ vì chỉ
         # đếm bản ghi trạng thái. Chưa chạy ≠ đạt.
-        chua_chay = _planned_but_never_run(artifact_root, set(state.stories))
+        chua_chay = [
+            sid for sid in _planned_but_never_run(artifact_root, set(state.stories))
+            if inside is None or sid in inside
+        ]
         not_done += chua_chay
         detail = ""
         if not_done:
@@ -216,6 +284,9 @@ def pre_deploy(
         # cổng phải nhìn thấy. Bộ kiểm định vẫn chạy (suy biến) để người
         # đọc có kết quả; chỉ phán quyết là khác.
         report.checks.append(_isolation_check(report, cfg))
+        mien = _waiver_check(report, cfg)
+        if mien is not None:
+            report.checks.append(mien)
 
     if skip_qa:
         report.checks.append(

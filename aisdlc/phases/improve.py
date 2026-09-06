@@ -158,6 +158,21 @@ def epic_gaps(led: Ledger, epic_id: str) -> list[Behavior]:
     return sorted(out, key=lambda b: (b.status != REOPENED, b.id))
 
 
+#: Loại hành vi vào hàng đợi sửa **tự động**, theo thứ tự ưu tiên (QĐ B6
+#: 2026-09-06): tiêu chí có test id là verifier cụ thể nhất; yêu cầu (fr/nfr)
+#: chứng minh qua tiêu chí của story phủ; màn hình qua hợp đồng thị giác.
+#: `qa:*` là tổng hợp **cấp dự án** (một lần `aisdlc qa`), không có verifier
+#: riêng cho một story sửa — đứng ngoài hàng đợi, xử lý bằng `aisdlc qa
+#: --only <loại>`. Đo B1 trên e9: vòng 4–5 nhận `qa:*`, Δ −1/−2.
+QUEUE_RANK = {"ac": 0, "fr": 1, "nfr": 1, "mockup": 2}
+
+
+def repair_queue(gaps: list[Behavior]) -> list[Behavior]:
+    """Gap được sửa tự động, REOPENED trước, rồi theo `QUEUE_RANK`, rồi id."""
+    return sorted((b for b in gaps if b.kind in QUEUE_RANK),
+                  key=lambda b: (b.status != REOPENED, QUEUE_RANK[b.kind], b.id))
+
+
 # ------------------------------------------------------------------ story sửa
 
 
@@ -219,6 +234,15 @@ def _body(b: Behavior, owner: Story, story: Story, preservation: list[str], loop
         f"Test chứng minh hành vi này phải mang **cả** mã của story này "
         f"(`{ac}`) **và** mã gốc `{b.id}`: sổ hành vi khớp lại theo mã gốc, "
         f"cổng story chấm theo mã mới. Sửa **dự án**, không sửa harness hay tiêu chí.",
+        "",
+        "Test ấy phải **mới và mang mã**: đỏ khi bỏ phần cài đặt của story này — "
+        "cổng \"test có kiểm được story\" chạy đối chứng nop (ADR-005 V3) và chấm ✗ "
+        "nếu test đã xanh ở baseline. **Không** gắn mã vào test có sẵn, không đổi "
+        "tên test có sẵn để mang mã. Nếu hành vi này đã được một test có sẵn chứng "
+        "minh đầy đủ và chỉ thiếu mã truy vết: **không sửa mã**, ghi trong tóm tắt "
+        "`truy vết: <test id> — <vì sao đủ>`; người rà soát trả `[bế tắc] truy vết: "
+        "<test id>`. Harness xử lý việc ấy như sửa siêu dữ liệu (`aisdlc evidence "
+        f"{b.id} --link \"<test id>\" --why ...`), không giả thành cải tiến chức năng.",
         "",
     ]
     if preservation:
@@ -325,9 +349,16 @@ def stop_reason(
     cost_cap: float,
     auto: bool,
     approvals: ApprovalStore,
+    outside: list[Behavior] = (),
 ) -> str:
-    """Lý do dừng trước khi mở vòng kế; rỗng = chạy tiếp. Mọi số đọc từ sổ."""
+    """Lý do dừng trước khi mở vòng kế; rỗng = chạy tiếp. Mọi số đọc từ sổ.
+    `gaps` là **hàng đợi** (`repair_queue`); `outside` là gap thuộc epic đứng
+    ngoài hàng đợi tự động — nêu tên khi dừng để không ai đọc "hết gap"."""
     if not gaps:
+        if outside:
+            return (f"không còn gap có verifier cụ thể thuộc epic — còn {len(outside)} gap "
+                    f"cấp dự án ngoài hàng đợi tự động: {', '.join(b.id for b in outside[:5])}"
+                    " (chạy `aisdlc qa`)")
         return "không còn GAP/REOPENED thuộc epic"
     if last is not None and last.stuck:
         return f"bế tắc kế hoạch ở {last.story_id} — trả người: {last.stuck}"
@@ -363,6 +394,10 @@ def _write_report(root: Path, epic_id: str, lo: Loop, decision: str, spent: floa
         f"- Gap thuộc epic trước: {len(b['gaps'])} ({', '.join(b['gaps'][:8]) or '—'})",
         f"- Gap thuộc epic sau: {len(a['gaps'])} ({', '.join(a['gaps'][:8]) or '—'})",
         f"- Quyết định: {'**dừng** — ' + decision if decision else '**tiếp** vòng kế'}",
+        *([f"- Sửa siêu dữ liệu, **không phải** cải tiến chức năng: hành vi đã được test "
+           f"có sẵn chứng minh — `aisdlc evidence {lo.behavior} --link \"<test id>\" "
+           f"--why \"...\"` rồi `aisdlc report`"]
+          if "truy vết" in lo.stuck.lower() else []),
         "",
         "## Kết cục cổng",
         "",
@@ -441,10 +476,12 @@ def improve(
         led.index(root)
 
         gaps = epic_gaps(led, epic_id)
+        queue = repair_queue(gaps)
         report.gaps_left = [b.id for b in gaps]
         stop = stop_reason(
-            led, epic_id, gaps, pending, max_loops=max_loops, flat_loops=flat_loops,
+            led, epic_id, queue, pending, max_loops=max_loops, flat_loops=flat_loops,
             cost_cap=cost_cap, auto=auto, approvals=approvals,
+            outside=[b for b in gaps if b not in queue],
         )
         if pending is not None:
             spent = sum(float(r.get("cost_usd") or 0.0) for r in _epic_rows(led, epic_id))
@@ -456,7 +493,7 @@ def improve(
             return report
 
         n = 1 + sum(1 for lo in led.loops if lo.get("n") != BASELINE)
-        b = gaps[0]
+        b = queue[0]
         path = repair_story(led, b, epic_id=epic_id, root=root, project=project,
                             config=cfg, state=state, loop=n)
         sid = path.stem

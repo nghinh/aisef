@@ -422,3 +422,49 @@ class TestCongImprove(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestHangDoiSuaTuDong(ImproveTestCase):
+    """QĐ B6 2026-09-06: `qa:*` cấp dự án đứng ngoài hàng đợi tự động; tiêu
+    chí có verifier cụ thể đi trước; story sửa phải viết test mới mang mã."""
+
+    def test_thu_tu_hang_doi_va_qa_dung_ngoai(self):
+        from aisdlc.phases.improve import repair_queue
+
+        led = L.Ledger()
+        for bid, kind in (("qa:e2e", "qa"), ("mockup:m", "mockup"), ("FR-1", "fr"),
+                          ("AC-STORY-01-01-2", "ac"), ("AC-STORY-01-01-1", "ac")):
+            led.observe(bid, kind, ok=False, at=1.0, story="STORY-01-01")
+        led.observe("AC-STORY-01-01-2", "ac", ok=True, at=2.0, story="STORY-01-01")
+        led.observe("AC-STORY-01-01-2", "ac", ok=False, at=3.0, story="STORY-01-02")
+        q = [b.id for b in repair_queue(list(led.behaviors.values()))]
+        self.assertEqual(q, ["AC-STORY-01-01-2", "AC-STORY-01-01-1", "FR-1", "mockup:m"],
+                         "REOPENED trước, rồi ac → fr → mockup; qa:* không có mặt")
+
+    def test_gap_qa_khong_mo_story_sua_va_ly_do_dung_neu_ten_no(self):
+        EvidenceStore(self.artifacts).tool_run(
+            "STORY-01-01", "qa:e2e", ok=False, detail={"tail": "đỏ"})
+        fixer = Fixer(self.artifacts)
+        r = self.improve(fixer, max_loops=5)
+        self.assertEqual([lo.behavior for lo in r.loops], list(BEHAVIORS))
+        self.assertNotIn("qa:e2e", [lo.behavior for lo in r.loops])
+        self.assertIn("ngoài hàng đợi tự động", r.stopped)
+        self.assertIn("qa:e2e", r.stopped)
+        self.assertEqual(r.gaps_left, ["qa:e2e"], "vẫn là gap của epic, chỉ không sửa tự động")
+        self.assertFalse(r.ok)
+
+    def test_story_sua_doi_test_moi_mang_ma_va_chi_duong_truy_vet(self):
+        self.improve(Fixer(self.artifacts), max_loops=1)
+        body = next(self.artifacts.rglob("STORY-RP-01.md")).read_text(encoding="utf-8")
+        self.assertIn("đối chứng nop", body)
+        self.assertIn("Không** gắn mã vào test có sẵn", body)
+        self.assertIn(f"aisdlc evidence {BEHAVIORS[0]} --link", body)
+
+    def test_be_tac_truy_vet_thi_bao_cao_chi_cach_sua_sieu_du_lieu(self):
+        r = self.improve(Fixer(self.artifacts, review=f"[bế tắc] truy vết: {BASE_TEST}"),
+                         max_loops=2)
+        self.assertEqual(len(r.loops), 1)
+        self.assertIn("truy vết", r.loops[0].stuck)
+        report = r.loops[0].report_path.read_text(encoding="utf-8")
+        self.assertIn(f"aisdlc evidence {BEHAVIORS[0]} --link", report)
+        self.assertIn("không phải** cải tiến chức năng", report)

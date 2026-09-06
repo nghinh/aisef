@@ -152,7 +152,10 @@ class KindResult:
         if o is Outcome.UNRUNNABLE:
             return f"  {o.mark} {self.kind.id:12} không chạy được — {self.unrunnable}"
         if o is Outcome.WAIVED:
-            return f"  {o.mark} {self.kind.id:12} miễn tường minh ({self.skipped or self.unrunnable})"
+            ly_do = self.skipped or self.unrunnable
+            if ly_do.startswith("miễn tường minh"):   # đã tự nói, không bọc thêm một lớp
+                return f"  {o.mark} {self.kind.id:12} {ly_do}"
+            return f"  {o.mark} {self.kind.id:12} miễn tường minh ({ly_do})"
         extra = f" — {self.detail}" if self.detail and not self.ok else ""
         return f"  {o.mark} {self.kind.id:12} {self.kind.title}{extra}"
 
@@ -391,7 +394,8 @@ def run_suite(
                 # vẫn đếm là trượt thì miễn chẳng có nghĩa gì, và báo cáo tự
                 # mâu thuẫn: dòng dưới ghi "miễn tường minh" trong khi dòng
                 # trên ghi ✗.
-                result.skipped = "miễn tường minh (verify.waived)"
+                ly_do = str(cfg.get("verify.waiver_reason", "") or "").strip()
+                result.skipped = "miễn tường minh (verify.waived)" + (f": {ly_do}" if ly_do else "")
                 report.results.append(result)
                 continue
             if kind.needs_ui and not has_ui:

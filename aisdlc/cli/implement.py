@@ -389,13 +389,14 @@ def cmd_predeploy(args) -> int:
     has_ui = _project_has_ui(project)
 
     report = pre_deploy(project, config=Config.load(project), has_ui=has_ui,
-                        skip_qa=args.skip_qa)
+                        skip_qa=args.skip_qa, epic=args.epic)
     print(report.summary())
     path = report.write(_artifact_root(args))
     print(f"\nbáo cáo: {path}")
     if not report.passed:
         return EXIT_NOT_READY
-    print(f"Duyệt để triển khai: aisdlc approve {Gate.PRE_DEPLOY.value}")
+    pham_vi = f" (phạm vi {args.epic})" if args.epic else ""
+    print(f"Duyệt để triển khai{pham_vi}: aisdlc approve {Gate.PRE_DEPLOY.value}")
     return EXIT_OK
 
 
@@ -408,8 +409,23 @@ def cmd_evidence(args) -> int:
     from ..control import ledger as ledger_mod
 
     root = _artifact_root(args)
-    led = ledger_mod.build(root)
     target = args.id
+    if getattr(args, "link", ""):
+        if not args.why.strip():
+            print("✗ --link cần --why: truy vết không lý do không phải bằng chứng", file=sys.stderr)
+            return EXIT_NOT_READY
+        import getpass
+        import json
+        import time
+
+        path = root / ledger_mod.TRACE_FILE
+        data = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+        data[target] = {"test_id": args.link, "why": args.why.strip(),
+                        "by": args.by or getpass.getuser(),
+                        "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
+        path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        print(f"truy vết: {target} ← `{args.link}` ({path.name}); sổ chiếu lại ở lần đọc kế")
+    led = ledger_mod.build(root)
 
     def show(b) -> None:
         print(f"\n{b.id} [{b.kind}] — {b.status.upper()}"

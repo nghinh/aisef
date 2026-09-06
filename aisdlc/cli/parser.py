@@ -185,11 +185,19 @@ def build_parser() -> argparse.ArgumentParser:
 
     pd = sub.add_parser("pre-deploy", help="chấm cổng trước triển khai")
     pd.add_argument("--skip-qa", action="store_true", help="bỏ qua bộ kiểm định (chỉ để soi nhanh)")
+    pd.add_argument("--epic", default="", metavar="EPIC",
+                    help="phạm vi nghiệm thu: chỉ chấm story của epic này; story ngoài phạm vi "
+                         "được nêu tên là 'ngoài phạm vi nghiệm thu' (không xong, không thiếu)")
     pd.set_defaults(func=cmd_predeploy)
 
     ev = sub.add_parser("evidence", help="tra lịch sử một story hoặc một hành vi trong sổ")
     ev.add_argument("id", help="mã story (STORY-01-04) hoặc mã hành vi (AC-STORY-01-04-2, FR-3, qa:e2e, mockup:notes-list)")
     ev.add_argument("--story", default="", help="ghi bằng chứng evidence_lookup cho story này")
+    ev.add_argument("--link", default="", metavar="TEST_ID",
+                    help="khai truy vết: test có sẵn này chứng minh hành vi (sửa siêu dữ liệu, "
+                         "không sửa mã — sổ vẫn đòi test xanh ở ứng viên đã landed); cần --why")
+    ev.add_argument("--why", default="", help="vì sao test có sẵn chứng minh đủ (ghi kèm người, ngày)")
+    ev.add_argument("--by", default="", help="người khai (mặc định: người dùng hệ thống)")
     ev.set_defaults(func=cmd_evidence)
 
     cx = sub.add_parser("ctx", help="bản đồ mã quanh phạm vi ghi của một story — đầy đủ, không cắt "

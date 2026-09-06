@@ -396,7 +396,10 @@ aisdlc improve --epic E [--max-loops N] [--auto] [--client c] [--force]
 # Bước 6 — giao hàng
 aisdlc devsecops [--client c] [--install-spec X] [--bin PATH] [--force]
                                                CI (code) + Dockerfile/IaC/runbook (model)
-aisdlc pre-deploy [--skip-qa]                  chấm cổng cuối, ghi báo cáo để người ký
+aisdlc pre-deploy [--skip-qa] [--epic E]       chấm cổng cuối, ghi báo cáo để người ký; --epic khai
+                                               phạm vi nghiệm thu: story ngoài epic nêu tên là "ngoài
+                                               phạm vi" (không xong, không thiếu) — cổng scope-aware,
+                                               không nới (QĐ C-a 2026-09-06)
 
 # Sau phát hành — vòng đời thay đổi
 aisdlc change  FR-x "mô tả"           ghi FR, stale PRD trở xuống, sinh story delta
@@ -409,6 +412,9 @@ aisdlc guard write-scope|diff-scope|secret|git-stage|destructive|injection|proce
 aisdlc status                         tiến độ · chi phí · story tốn bất thường
 aisdlc report  [--out FILE]           báo cáo nghiệm thu + sổ hành vi (`ledger.json`, `INDEX.md`)
 aisdlc evidence <id> [--story S]      lịch sử một story hoặc một hành vi
+    [--link TEST_ID --why ...]        khai truy vết: test có sẵn chứng minh hành vi — sửa siêu dữ
+                                      liệu, không phải story sửa; sổ vẫn đòi test xanh ở ứng viên
+                                      đã landed (`traceability.json`, QĐ B6 2026-09-06)
                                       (STORY-01-04 · AC-STORY-01-04-2 · FR-3 · qa:e2e · mockup:notes-list)
 aisdlc ctx [--story S | --file F] [--budget N]   bản đồ mã quanh phạm vi ghi, đầy đủ (ADR-005 V7);
                                       prompt chỉ nhận bản có trần `context.max_repo_map_chars`
@@ -656,6 +662,7 @@ Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏn
 | `tools.test` · `tools.lint` · `tools.sast` | `""` (tự dò) | lệnh là quyết định của dự án; rỗng thì dò từ file có thật |
 | `verify.*` (12 loại: `unit` · `sit` · `api-contract` · `e2e` · `uat` · `perf` · `security` · `mutation` · `accessibility` · `migration` · `sbom` · `image-scan`) | `""` | rỗng nghĩa là **chưa cấu hình**, không phải "đạt"; thư mục test suy từ lệnh được cấp thêm vào phạm vi ghi của story đòi loại ấy (lỗi 21) |
 | `verify.waived` | `""` | miễn phải là quyết định có người ký, không phải hệ quả của việc quên |
+| `verify.waiver_reason` | `""` | lý do miễn (phạm vi, ngày, người ký) — `pre-deploy` đòi có khi `verify.waived` khác rỗng và ghi vào `pre-deploy-report.json`; loại miễn hiện ◇ WAIVED, không bao giờ thành ✅ (QĐ5 2026-09-06: `mutation` của e9 UNRUNNABLE ở môi trường nghiệm thu, không cài công cụ để làm đẹp) |
 | `verify.baseline` | `true` | chạy bộ test ở candidate cha **trước** phiên developer đầu tiên của story (ADR-004 R9) để cổng "không làm đỏ test có sẵn" so được tên test; tắt khi bộ test quá chậm — tắt thì mục cổng là – "tắt bởi cấu hình", không phải đạt |
 | `verify.clean_tree` | `true` | kiểm định **cấp dự án** (`aisdlc qa`, `pre-deploy`, `improve`) chạy ở `git worktree` tạm dựng từ SHA đang chấm (ADR-005 V6, theo Harbor: verifier chạy tách khỏi env agent): shim `node_modules/.bin/*`, `conftest.py`, `pytest.ini` chưa commit không tới được cây kiểm; `node_modules`/`.venv` của dự án được gắn vào (Docker bind mount, suy biến symlink). Giá: tệp **không theo dõi** mà test cần (`.env.test`, fixture sinh tay) cũng vắng — commit chúng, hoặc tắt khoá này; tắt thì bằng chứng và `pre-deploy.json` ghi `tree = "cây agent"`, không im lặng. Mức story (`run`) giữ cây worktree đã đóng băng, không đọc khoá này |
 | `verify.nop` | `true` | nop control cấp 2 (ADR-005 V3): sau khi đóng băng ứng viên, chạy `tools.test` một lần ở SHA cha với tệp test của story chép vào (`test:nop`) để cổng "test có kiểm được story" thấy test mang mã đỏ khi không có mã của story; +1 lần chạy test mỗi lượt. Tắt khi bộ test quá chậm — tắt thì mục cổng là – "tắt bởi cấu hình", không phải đạt; cấp 1 ($0) vẫn chấm |

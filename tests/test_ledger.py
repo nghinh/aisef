@@ -520,3 +520,54 @@ class TestUngVienChuaLanded(LedgerTestCase):
                                                detail={"candidate": "aaa1111"}))
         self.assertEqual(L.build(self.root).behaviors["AC-STORY-01-01-1"].status, L.VERIFIED)
 
+
+
+class TestTruyVetNguoiKhai(LedgerTestCase):
+    """`aisdlc evidence <AC> --link` (QĐ B6 2026-09-06): sửa siêu dữ liệu —
+    tên test có sẵn chứng minh tiêu chí. Sổ vẫn đòi test ấy xanh ở ứng viên
+    đã landed; không ai ghi thẳng VERIFIED."""
+
+    CU = "src/x.test.js > khởi động đọc được a"
+
+    def setUp(self):
+        super().setUp()
+        self.index([{"id": "STORY-01-01", "epic_id": "EPIC-01", "acceptance_criteria": ["a"]}])
+
+    def link(self, **over):
+        (self.root / L.TRACE_FILE).write_text(json.dumps({
+            "AC-STORY-01-01-1": {"test_id": self.CU, "why": "test đọc a từ đầu", "by": "nghi",
+                                 **over}}, ensure_ascii=False), encoding="utf-8")
+
+    def test_chua_khai_thi_gap_khai_roi_thi_verified_kem_nguon_truy_vet(self):
+        self.run_tests("STORY-01-01", ids=[self.CU])
+        self.assertEqual(L.build(self.root).behaviors["AC-STORY-01-01-1"].status, L.GAP)
+        self.link()
+        b = L.build(self.root).behaviors["AC-STORY-01-01-1"]
+        self.assertEqual(b.status, L.VERIFIED)
+        self.assertEqual(b.source["test_id"], self.CU)
+        self.assertEqual(b.source["via"], "traceability")
+        self.assertEqual(b.source["by"], "nghi")
+
+    def test_test_da_khai_ma_do_thi_van_gap(self):
+        self.link()
+        self.run_tests("STORY-01-01", ids=[self.CU], failed=[self.CU])
+        self.assertEqual(L.build(self.root).behaviors["AC-STORY-01-01-1"].status, L.GAP)
+
+    def test_khai_test_khong_co_trong_lan_chay_thi_khong_noi_gi(self):
+        self.link(test_id="src/khac.test.js > không tồn tại")
+        self.run_tests("STORY-01-01", ids=[self.CU])
+        b = L.build(self.root).behaviors["AC-STORY-01-01-1"]
+        self.assertEqual(b.status, L.GAP)
+        self.assertNotIn("via", b.source)
+
+    def test_cli_link_can_why_va_ghi_tep(self):
+        self.run_tests("STORY-01-01", ids=[self.CU])
+        code, _out, err = self.run_cli("evidence", "AC-STORY-01-01-1", "--link", self.CU)
+        self.assertNotEqual(code, 0)
+        self.assertIn("--why", err)
+        code, out, _err = self.run_cli("evidence", "AC-STORY-01-01-1", "--link", self.CU,
+                                       "--why", "test đọc a từ đầu", "--by", "nghi")
+        self.assertEqual(code, 0, out)
+        data = json.loads((self.root / L.TRACE_FILE).read_text(encoding="utf-8"))
+        self.assertEqual(data["AC-STORY-01-01-1"]["by"], "nghi")
+        self.assertIn("VERIFIED", out)

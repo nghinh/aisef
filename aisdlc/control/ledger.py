@@ -54,6 +54,8 @@ from .acceptance import ac_code, coverage as ac_coverage
 from .journal import JournalStore
 
 VERSION = 1
+#: Truy vết người khai: hành vi → {test_id, why, by, at} (QĐ B6 2026-09-06).
+TRACE_FILE = "traceability.json"
 LEDGER_FILE = "ledger.json"
 INDEX_FILE = "INDEX.md"
 STORIES_INDEX = "stories.index.json"
@@ -142,6 +144,10 @@ class Ledger:
     #: story sửa trượt cổng — test xanh trong worktree, reviewer chặn — vẫn
     #: làm hành vi gốc VERIFIED dù chưa có gì vào nhánh chính.
     unlanded_green: int = 0
+    #: Truy vết người khai (`aisdlc evidence <AC> --link`): hành vi → test có
+    #: sẵn chứng minh nó. Chỉ là **tên test**: sổ vẫn đòi test ấy xanh ở ứng
+    #: viên đã landed, không ai được ghi thẳng VERIFIED.
+    links: dict[str, dict] = field(default_factory=dict)
 
     # ------------------------------------------------------------- ghi nhận
 
@@ -444,6 +450,8 @@ def build(artifact_root: Path | str) -> Ledger:
     # sạch mốc mà vòng R3 vừa chốt.
     led.loops = [lo for lo in _read_json(root / LEDGER_FILE).get("loops") or []
                  if isinstance(lo, dict)]
+    led.links = {bid: v for bid, v in _read_json(root / TRACE_FILE).items()
+                 if isinstance(v, dict) and v.get("test_id")}
 
     store = EvidenceStore(root)
     events: list[tuple] = []
@@ -567,7 +575,8 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
     if readable:
         blob = "\n".join(ids).replace("_", "-")
         for other, line in led.stories.items():
-            if other != sid and line.acceptance and f"AC-{other}-" in blob:
+            if other != sid and line.acceptance and (
+                    f"AC-{other}-" in blob or _linked(led, other, ids)):
                 targets.append((other, line, False))
 
     for story_id, line, owner in targets:
@@ -584,6 +593,11 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
             continue
 
         cov = ac_coverage(story_id, line.acceptance, ids)
+        linked = dict(_linked(led, story_id, ids))
+        for i, t in linked.items():
+            cov.setdefault(i, [])
+            if t not in cov[i]:
+                cov[i].insert(0, t)
         judged = []
         for i, tests in cov.items():
             if not tests:
@@ -595,7 +609,12 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
             # Nguồn của một GAP phải là test **đỏ**, không phải test đầu danh
             # sách: người đọc `aisdlc evidence` cần tên để mở, không cần một
             # cái tên xanh nằm cạnh chỗ hỏng.
-            note(story_id, i, not red, {"test_id": (red or tests)[0], "tests": len(tests)})
+            src = {"test_id": (red or tests)[0], "tests": len(tests)}
+            if i in linked:
+                lk = led.links[ac_code(story_id, i)]
+                src.update(via="traceability", by=str(lk.get("by") or ""),
+                           why=str(lk.get("why") or ""))
+            note(story_id, i, not red, src)
             judged.append(not red)
         # Yêu cầu xanh khi **tiêu chí của nó** xanh — không phải khi cả lần
         # chạy xanh. Một lần chạy đỏ vì story khác không được biến FR của
@@ -605,6 +624,17 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
         _observe_covers(led, line, ok=story_green, at=at, story=sid, attempt=attempt,
                         cand=cand, why="" if story_green else "tiêu chí của story chưa xanh",
                         landed=landed)
+
+
+def _linked(led: Ledger, story_id: str, ids: list[str]) -> list[tuple[int, str]]:
+    """(tiêu chí, test id) mà người đã khai truy vết cho story này **và** có
+    mặt trong lần chạy này. Khai mà test không chạy thì không có gì để nói."""
+    out = []
+    for i in range(1, (led.stories[story_id].acceptance if story_id in led.stories else 0) + 1):
+        lk = led.links.get(ac_code(story_id, i))
+        if lk and str(lk.get("test_id")) in ids:
+            out.append((i, str(lk["test_id"])))
+    return out
 
 
 def _observe_covers(led: Ledger, line: StoryLine, *, ok: bool, at: float, story: str,

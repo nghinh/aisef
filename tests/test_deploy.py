@@ -14,6 +14,7 @@ from aisdlc.clients.base import Capability, ClientAdapter, RunSpec, Support  # n
 from aisdlc.clients.stream import RunResult  # noqa: E402
 from aisdlc.config import DEFAULTS, Config  # noqa: E402
 from aisdlc.control.approvals import GATE_ARTIFACTS, ApprovalStore, Gate  # noqa: E402
+from aisdlc.control.outcome import Outcome  # noqa: E402
 from aisdlc.control.state import StateStore, StoryStatus  # noqa: E402
 from aisdlc.phases.deploy import (  # noqa: E402
     CI_PATH,
@@ -495,3 +496,117 @@ class TestPlannedButNeverRun(DeployTestCase):
         self.assertFalse(check.passed, check.detail)
         self.assertIn("chưa từng chạy", check.detail)
         self.assertIn("STORY-01-02", check.detail)
+
+
+class TestPhamViNghiemThu(DeployTestCase):
+    """`pre-deploy --epic E` (QĐ C-a 2026-09-06): cổng scope-aware, không nới —
+    story ngoài phạm vi nêu tên, không xong, không thiếu."""
+
+    def ready(self, index: dict):
+        import json
+        from aisdlc.control.approvals import GATE_ARTIFACTS
+
+        self.approve_everything()
+        self.finish_a_story()
+        (self.artifacts / "stories.index.json").write_text(
+            json.dumps(index, ensure_ascii=False), encoding="utf-8")
+        store = ApprovalStore(self.artifacts)
+        for gate in GATE_ARTIFACTS:        # chỉ mục thật vừa ghi → ký lại
+            if gate is not Gate.PRE_DEPLOY:
+                store.approve(gate, by="nghi")
+        write_ci_workflow(self.project)
+        (self.project / "Dockerfile").write_text("FROM alpine\n", encoding="utf-8")
+        (self.project / RUNBOOK_PATH).parent.mkdir(parents=True, exist_ok=True)
+        (self.project / RUNBOOK_PATH).write_text(GOOD_RUNBOOK, encoding="utf-8")
+
+    INDEX = {
+        "stories": [
+            {"id": "STORY-01-01", "epic_id": "EPIC-01", "title": "a"},
+            {"id": "STORY-02-01", "epic_id": "EPIC-02", "title": "b"},
+            {"id": "STORY-02-02", "epic_id": "EPIC-02", "title": "c"},
+        ],
+        "waves": {"EPIC-01": [["STORY-01-01"]], "EPIC-02": [["STORY-02-01", "STORY-02-02"]]},
+        "epics": [{"id": "EPIC-01"}, {"id": "EPIC-02"}],
+    }
+
+    def test_khong_khai_pham_vi_thi_story_chua_chay_van_chan(self):
+        self.ready(self.INDEX)
+        report = pre_deploy(self.project, config=self.config(), skip_qa=True)
+        self.assertFalse(report.passed, report.summary())
+        self.assertIn("chưa từng chạy: STORY-02-01", report.summary())
+
+    def test_khai_epic_thi_chi_cham_story_cua_epic_va_neu_ten_phan_con_lai(self):
+        self.ready(self.INDEX)
+        report = pre_deploy(self.project, config=self.config(), skip_qa=True, epic="EPIC-01")
+        self.assertTrue(report.passed, report.summary())
+        text = report.summary()
+        self.assertIn("(phạm vi EPIC-01)", text.splitlines()[0])
+        self.assertIn("ngoài phạm vi nghiệm thu", text)
+        self.assertIn("STORY-02-01, STORY-02-02", text)
+        self.assertIn("không xong, không thiếu", text)
+        d = report.as_dict()
+        self.assertEqual(d["scope"], {"epic": "EPIC-01", "stories": ["STORY-01-01"],
+                                      "outside": ["STORY-02-01", "STORY-02-02"]})
+        ngoai = next(c for c in report.checks if c.name == "ngoài phạm vi nghiệm thu")
+        self.assertIs(ngoai.outcome, Outcome.NOT_APPLICABLE, "không phải ✅, không phải ✗")
+
+    def test_story_chua_xong_trong_pham_vi_van_chan(self):
+        self.ready(self.INDEX)
+        state = StateStore(self.artifacts)
+        state.register("STORY-02-01", "EPIC-02")
+        report = pre_deploy(self.project, config=self.config(), skip_qa=True, epic="EPIC-02")
+        self.assertFalse(report.passed)
+        self.assertIn("STORY-02-01", report.summary())
+        self.assertNotIn("STORY-01-01", next(
+            c.detail for c in report.checks if c.name == "mọi story xong"))
+
+    def test_epic_khong_co_trong_ke_hoach_la_that_bai_neu_ten(self):
+        self.ready(self.INDEX)
+        report = pre_deploy(self.project, config=self.config(), skip_qa=True, epic="EPIC-09")
+        self.assertFalse(report.passed)
+        self.assertIn("EPIC-09", next(c.detail for c in report.checks if c.name == "phạm vi"))
+
+    def test_pham_vi_doi_thi_bam_phe_duyet_doi(self):
+        """Duyệt `pre-deploy` cho EPIC-01 không dùng lại được cho cả kế hoạch."""
+        from aisdlc.control.approvals import Status
+
+        self.ready(self.INDEX)
+        pre_deploy(self.project, config=self.config(), skip_qa=True, epic="EPIC-01").write(self.artifacts)
+        store = ApprovalStore(self.artifacts)
+        store.approve(Gate.PRE_DEPLOY, by="nghi")
+        self.assertIs(store.status(Gate.PRE_DEPLOY), Status.APPROVED)
+        pre_deploy(self.project, config=self.config(), skip_qa=True).write(self.artifacts)
+        self.assertIsNot(store.status(Gate.PRE_DEPLOY), Status.APPROVED)
+
+
+class TestMienTuongMinhCoLyDo(DeployTestCase):
+    """`verify.waived` phải đi kèm `verify.waiver_reason` (QĐ5 2026-09-06);
+    loại miễn là ◇, không phải ✅."""
+
+    def setUp(self):
+        super().setUp()
+        self.approve_everything()
+        self.finish_a_story()
+
+    def test_mien_khong_ly_do_thi_chan(self):
+        report = pre_deploy(self.project, has_ui=False,
+                            config=self.config(**{"verify.waived": "mutation"}))
+        mien = next(c for c in report.checks if c.name == "miễn tường minh")
+        self.assertFalse(mien.passed)
+        self.assertIn("verify.waiver_reason", mien.detail)
+
+    def test_mien_co_ly_do_thi_ghi_vao_bao_cao_va_khong_thanh_dat(self):
+        ly_do = "2026-09-06, EPIC-01, nghi: stryker chưa cài ở môi trường nghiệm thu"
+        report = pre_deploy(self.project, has_ui=False, config=self.config(
+            **{"verify.waived": "mutation", "verify.waiver_reason": ly_do}))
+        mien = next(c for c in report.checks if c.name == "miễn tường minh")
+        self.assertIs(mien.outcome, Outcome.WAIVED)
+        self.assertTrue(mien.passed, "◇ không chặn")
+        self.assertIn(ly_do, mien.detail)
+        self.assertEqual(report.as_dict()["waivers"], {"mutation": ly_do})
+        self.assertIn(f"◇ mutation     miễn tường minh (verify.waived): {ly_do}", report.qa.summary())
+        self.assertNotIn("✅ mutation", report.qa.summary())
+
+    def test_khong_mien_gi_thi_khong_co_muc(self):
+        report = pre_deploy(self.project, has_ui=False, config=self.config())
+        self.assertNotIn("miễn tường minh", [c.name for c in report.checks])

@@ -150,7 +150,8 @@ class TestSolutionKhopMa(unittest.TestCase):
 
     def test_moi_knob_cau_hinh_co_trong_bang_nguong(self):
         from aisdlc.config import DEFAULTS
-        gop = {"verify.waived", "verify.baseline", "verify.clean_tree", "verify.nop"}
+        gop = {"verify.waived", "verify.waiver_reason", "verify.baseline", "verify.clean_tree",
+               "verify.nop"}
         for key in DEFAULTS:
             with self.subTest(key=key):
                 if key.startswith("verify.") and key not in gop:

@@ -98,6 +98,10 @@ DEFAULTS: dict[str, Any] = {
     #: Loại được miễn tường minh, ngăn bởi dấu phẩy. Miễn phải là quyết
     #: định có người ký, không phải hệ quả của việc quên cấu hình.
     "verify.waived": "",
+    #: Lý do miễn (phạm vi, ngày, người ký). `pre-deploy` đòi có lý do khi
+    #: `verify.waived` khác rỗng và ghi nó vào `pre-deploy-report.json`;
+    #: loại miễn hiện ◇, không bao giờ thành ✅.
+    "verify.waiver_reason": "",
     # Baseline trước khi sửa (ADR-004 R9): harness chạy bộ test ở candidate
     # cha **trước** phiên developer đầu tiên, để cổng "không làm đỏ test có
     # sẵn" so được tên test xanh trước/sau. Tắt khi bộ test quá chậm — tắt
@@ -199,6 +203,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "verify.sbom": str,
     "verify.image-scan": str,
     "verify.waived": str,
+    "verify.waiver_reason": str,
     "verify.baseline": bool,
     "verify.clean_tree": bool,
     "verify.nop": bool,
