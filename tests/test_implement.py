@@ -1044,3 +1044,122 @@ class TestKetCucChuanHoa(ImplementTestCase):
         self.assertFalse(out.attempts[0].infra)
         self.assertEqual(out.quality_attempts, 2)
         self.assertNotIn(exit_status_of(RunResult(ok=False, error="max_turns")), INFRA_STATUSES)
+class TestTestCoKiemDuocStory(ImplementTestCase):
+    """ADR-005 V3 cấp 2 trên dự án giả: harness dựng worktree ở SHA cha, chép
+    tệp test của story vào, chạy `tools.test`, ghi `test:nop` mang ứng viên.
+
+    "Runner" là một lệnh in dạng `pytest -v` từ các tệp `tests/test_*.sh` —
+    mỗi tệp là một test thật sự **chạy**: test thật hỏi `src/a.py` có tồn tại
+    không (ở SHA cha thì không → đỏ), test giả in PASSED vô điều kiện.
+    """
+
+    LENH = ("sh -c 'echo \"test session starts\"; "
+            "out=$(for f in tests/test_*.sh; do [ -f \"$f\" ] && sh \"$f\"; done); "
+            "echo \"$out\"; ! echo \"$out\" | grep -q FAILED'")
+    TEN = "test có kiểm được story"
+    AC = "tests/test_ac.sh::test_AC_STORY_01_01_1"
+    THAT = ('[ -f src/a.py ] && echo "%s PASSED" || echo "%s FAILED"\n' % (AC, AC))
+    GIA = 'echo "%s PASSED"\n' % AC
+
+    def setUp(self):
+        super().setUp()
+        for cmd in (["git", "config", "user.email", "t@t"], ["git", "config", "user.name", "t"]):
+            subprocess.run(cmd, cwd=self.project, check=True)
+        (self.project / "goc.txt").write_text("goc\n", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=self.project, check=True)
+        subprocess.run(["git", "commit", "-qm", "goc"], cwd=self.project, check=True)
+        self.story.write_scope = ["src", "tests"]
+
+    class GhiTest(ScriptedClient):
+        def __init__(self, than, **kw):
+            super().__init__(writes=("src/a.py",), **kw)
+            self.than = than
+
+        def run(self, spec):
+            r = super().run(spec)
+            if spec.env.get(ENV_STORY_ID) and self.than is not None:
+                p = Path(spec.workdir) / "tests" / "test_ac.sh"
+                p.parent.mkdir(exist_ok=True)
+                p.write_text(self.than, encoding="utf-8")
+            return r
+
+    def chay(self, than, **over):
+        cfg = self.config(**{"tools.test": self.LENH, "run.max_retries": 0, **over})
+        return self.implement(self.GhiTest(than), config=cfg)
+
+    def muc(self, out):
+        return next(c for c in out.attempts[-1].gate.checks if c.name == self.TEN)
+
+    def evidence(self):
+        return EvidenceStore(self.artifacts).read(self.story.id)
+
+    def test_test_that_do_o_sha_cha_thi_dat_va_don_worktree(self):
+        out = self.chay(self.THAT)
+        m = self.muc(out)
+        self.assertIs(m.outcome, Outcome.PASSED, out.summary())
+        self.assertIn("đỏ hoặc không tồn tại", m.detail)
+        nop = self.evidence().last(TOOL_RUN, "test:nop")
+        self.assertEqual(nop.detail["candidate"], out.attempts[-1].candidate)
+        self.assertEqual(nop.detail["files"], ["tests/test_ac.sh"])
+        self.assertEqual(nop.detail["parent"], head_sha(self.project))
+        self.assertIn(self.AC, nop.detail["failed_ids"])
+        self.assertFalse((self.project / ".aisdlc" / "worktrees" / "STORY-01-01-nop").exists())
+        nhanh = subprocess.run(["git", "branch", "--list", "story/STORY-01-01-nop"],
+                               cwd=self.project, capture_output=True, text=True).stdout
+        self.assertEqual(nhanh.strip(), "", "nhánh tạm phải được xoá")
+
+    def test_test_luon_xanh_la_khong_kiem_duoc_gi_neu_ten(self):
+        out = self.chay(self.GIA)
+        m = self.muc(out)
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("xanh cả khi không có mã của story", m.detail)
+        self.assertIn(self.AC, m.detail)
+        self.assertFalse(out.done)
+
+    def test_khong_them_test_thi_khong_ap_dung_va_khong_dung_gi(self):
+        out = self.chay(None)
+        m = self.muc(out)
+        self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
+        self.assertIn("không thêm/sửa", m.detail)
+        nop = self.evidence().last(TOOL_RUN, "test:nop")
+        self.assertEqual(nop.detail["files"], [])
+        self.assertEqual(nop.detail["candidate"], out.attempts[-1].candidate)
+
+    def test_tat_bang_cau_hinh_thi_khong_chay_va_van_ghi(self):
+        out = self.chay(self.GIA, **{"verify.nop": False})
+        m = self.muc(out)
+        self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
+        self.assertIn("verify.nop", m.detail)
+        nops = self.evidence().of(TOOL_RUN, "test:nop")
+        self.assertEqual(len(nops), 1)
+        self.assertTrue(nops[0].detail["disabled"])
+        self.assertEqual(nops[0].detail["candidate"], out.attempts[-1].candidate)
+
+    def test_khong_biet_sha_cha_thi_khong_chay_duoc(self):
+        """Chạy thẳng trong dự án (không điểm rẽ) và tắt baseline → không có
+        SHA cha nào để dựng: ⚠, không đoán."""
+        out = self.chay(self.GIA, **{"verify.baseline": False})
+        m = self.muc(out)
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("SHA cha", m.detail)
+
+    def test_gate_input_ghi_ngay_truoc_verdict_va_replay_ra_cung_ket_cuc(self):
+        """ADR-005 V4: đầu vào cổng nằm trong bằng chứng; replay bằng luật hiện
+        tại cho đúng mục chặn đã ghi."""
+        from aisdlc.control import replay as R
+
+        out = self.chay(self.GIA)
+        ev = self.evidence()
+        vao, ra = ev.last(NOTE, "gate:input"), ev.last(NOTE, "gate:verdict")
+        self.assertEqual(ra.seq, vao.seq + 1, "đầu vào ghi ngay trước phán quyết")
+        self.assertEqual(vao.detail["attempt"], ra.detail["attempt"])
+        for k in ("changed", "write_scope", "screens", "contract", "review_blocking", "security",
+                  "block_severities", "guard_expected", "acceptance", "coverage_min",
+                  "added_tests", "candidate", "preservation"):
+            self.assertIn(k, vao.detail, k)
+        self.assertEqual(vao.detail["candidate"], out.attempts[-1].candidate)
+        self.assertEqual(vao.detail["added_tests"], ["tests/test_ac.sh"])
+        [r] = R.replay(ev)
+        self.assertEqual(r.now, ra.detail["failures"])
+        self.assertEqual(r.changed(), [])
+

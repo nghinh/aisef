@@ -686,8 +686,10 @@ class TestVerifyOnly(RunTestCase):
                          "SHA không đổi: không gọi lại reviewer lẫn security")
         note = ev.last(NOTE, "verify-only")
         self.assertEqual(note.detail["reran"], ["qa:sit"])
+        # `test:nop` (ADR-005 V3) giữ được: story không thêm tệp test là sự thật
+        # của SHA, chạy lại cho cùng câu trả lời với giá $0.
         self.assertEqual(sorted(note.detail["kept"]),
-                         ["lint", "qa:fake-tests", "review", "security", "test"])
+                         ["lint", "qa:fake-tests", "review", "security", "test", "test:nop"])
         self.assertIn("attempt.committed", self.journal().steps())
 
     def test_ra_soat_o_sha_khac_thi_goi_lai_reviewer(self):

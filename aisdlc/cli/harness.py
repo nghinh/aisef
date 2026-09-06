@@ -1,5 +1,5 @@
 """Lệnh dựng và vận hành harness: ``init`` · ``setup`` · ``compile`` ·
-``guard`` · ``skill`` · ``doc``."""
+``guard`` · ``gate`` · ``skill`` · ``doc``."""
 
 from __future__ import annotations
 
@@ -223,3 +223,48 @@ def cmd_doc(args) -> int:
             detail={"package": args.package, "library": d.library, "topic": d.topic, "chars": len(d.text), "cached": d.cached},
         ))
     return EXIT_OK
+
+
+def cmd_gate(args) -> int:
+    """Chấm lại cổng story trên bằng chứng đã ghi (ADR-005 V4).
+
+    Chỉ đọc: cắt bằng chứng ở `gate:input` của từng lượt, gọi `gate.evaluate`
+    của mã **hiện tại**, in bảng từng mục so với `gate:verdict` đã ghi. Không
+    gọi model — lời reviewer/security là thứ đã ghi. Lượt không có `gate:input`
+    (trước V4) được nêu là không replay được, không đoán. Thoát 2 khi không
+    replay được lượt nào của thứ được hỏi.
+    """
+    from ..control import replay as R
+    from ..harness.observe import EvidenceStore
+
+    if not args.replay:
+        print("✗ gate: hiện chỉ có `--replay` (chấm lại trên bằng chứng)", file=sys.stderr)
+        return EXIT_USAGE
+    if not args.story and not args.all:
+        print("✗ gate --replay cần <story> hoặc --all", file=sys.stderr)
+        return EXIT_USAGE
+
+    store = EvidenceStore(_artifact_root(args))
+    ids = store.stories() if args.all else [args.story]
+    print(R.BANNER)
+    duoc = tong = 0
+    for sid in ids:
+        ev = store.read(sid)
+        rs = R.replay(ev, attempt=args.attempt)
+        thieu = R.unreplayable(ev)
+        if args.attempt:
+            thieu = [a for a in thieu if a == args.attempt]
+        if not rs and not thieu:
+            if not args.all:
+                print(f"✗ {sid}: không có lượt chấm cổng nào trong bằng chứng", file=sys.stderr)
+            continue
+        print()
+        for r in rs:
+            print(r.summary())
+        for a in thieu:
+            print(f"{sid} lượt {a}: không replay được (bằng chứng trước ADR-005 V4 — "
+                  f"không có `gate:input`), không đoán")
+        duoc += len(rs)
+        tong += len(rs) + len(thieu)
+    print(f"\nreplay được {duoc}/{tong} lượt")
+    return EXIT_OK if duoc else EXIT_NOT_READY

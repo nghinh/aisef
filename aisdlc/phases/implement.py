@@ -22,6 +22,7 @@ from dataclasses import dataclass, field, replace
 from functools import partial
 import json
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -33,7 +34,7 @@ from ..kit import registry as skill_registry
 from ..kit import router as skill_router
 from ..control.acceptance import ac_code
 from ..control.design_contract import DesignContract, load as load_contract
-from ..control.impact import analyse as analyse_impact
+from ..control.impact import analyse as analyse_impact, is_test_path
 from ..control.preflight import verification_contract
 from ..control.security import SEVERITIES, SecurityReport
 from ..control.security import parse as parse_security
@@ -59,7 +60,7 @@ from ..harness.observe import AGENT_RUN, MOCKUP_MAP, NOTE, TOOL_RUN, Event, Evid
 from ..harness.prompts import Catalog, load_catalog
 from ..harness.routing import DEVELOPER, REVIEWER, ROLES, SECURITY, build_spec
 from ..harness.testlog import MAX_IDS, parse as parse_testlog
-from ..harness.tools import BASELINE_RUN, describe_tools, record as record_tool, run_tool
+from ..harness.tools import BASELINE_RUN, NOP_RUN, describe_tools, record as record_tool, run_tool
 from .qa import KINDS, find_fake_tests, run_suite
 
 @dataclass
@@ -564,6 +565,39 @@ def _green_at(ev: Evidence, kind: str, name: str, sha: str) -> bool:
     return bool(e and e.ok and not e.detail.get("skipped") and not e.detail.get("unrunnable"))
 
 
+def _nop_at(ev: Evidence, sha: str) -> bool:
+    """Bằng chứng nop ở ứng viên đủ để **giữ**: một kết quả thật (đỏ hay xanh
+    đều là dữ liệu — xanh là ✗ tất định, chạy lại cho cùng câu trả lời) hoặc
+    "story không thêm/sửa tệp test" (sự thật của SHA). Không giữ khi không
+    chạy được, tắt bởi cấu hình, hay thiếu lệnh test: ba thứ ấy có thể đã đổi."""
+    e = _at(ev, TOOL_RUN, NOP_RUN, sha)
+    if e is None or e.detail.get("unrunnable") or e.detail.get("disabled"):
+        return False
+    return not e.detail.get("skipped") or ("files" in e.detail and not e.detail["files"])
+
+
+def _security_as_dict(rep: SecurityReport | None) -> dict | None:
+    """Báo cáo bảo mật dưới dạng ghi được — cùng hình với `tool_run security`,
+    nên `_security_from_evidence` đọc lại được y nguyên."""
+    if rep is None:
+        return None
+    return {"findings": [f.line() for f in rep.findings], "error": rep.error}
+
+
+def _record_gate_input(evidence: EvidenceStore, story_id: str, *, attempt: int, **kw) -> None:
+    """Ghi **đầu vào** cổng (ADR-005 V4): mọi kwargs của `gate.evaluate` JSON-hoá,
+    ngay trước khi chấm. Cổng thuần trên `Evidence` + 13 kwargs; kwargs chỉ
+    sống trong lượt chạy, nên trước đây mọi sửa luật cổng chỉ kiểm được bằng
+    unit hoặc trả tiền cho một lượt agent (0/17 lỗi chấm sai bắt được trước).
+    Có bản ghi này, `aisdlc gate --replay` chấm lại lượt cũ bằng mã hiện tại,
+    $0, tất định — không gọi model: lời reviewer/security đã nằm trong đây."""
+    detail = {**kw, "security": _security_as_dict(kw.get("security")), "attempt": attempt}
+    evidence.record(story_id, Event(
+        kind=NOTE, name="gate:input",
+        detail=json.loads(json.dumps(detail, ensure_ascii=False, default=str)),
+    ))
+
+
 def _security_from_evidence(e: Event) -> SecurityReport:
     """Dựng lại báo cáo bảo mật từ `tool_run security` — dòng `[mức] nội dung`
     là đúng dạng `parse` đọc, nên một bộ lọc nhiễu chấm cả bản sống lẫn
@@ -677,6 +711,11 @@ def verify_candidate(
             return False
         (attempt.kept if du else attempt.reran).append(name)
         return du
+
+    # Nop control (ADR-005 V3) ngay sau đóng băng: test của story ở SHA cha.
+    if not giu(NOP_RUN, reuse and _nop_at(ev, sha)):
+        run_nop(story, workdir=workdir, artifact_root=artifact_root, config=config,
+                candidate=sha, base_ref=base_ref, changed=changed)
 
     # Harness tự chạy lại test và lint: bằng chứng phải do harness ghi, và
     # agent có thể đã "quên" chạy lần cuối sau khi sửa.
@@ -796,9 +835,7 @@ def verify_candidate(
                 },
             )
 
-    attempt.gate = story_gate.evaluate(
-        sid,
-        evidence.read(sid),
+    dau_vao = dict(
         changed=changed,
         write_scope=scope,
         screens=list(story.screens),
@@ -813,6 +850,10 @@ def verify_candidate(
         candidate=sha,
         preservation=preservation,
     )
+    # Đầu vào ghi **trước** khi đọc bằng chứng để chấm: replay dựng lại đúng
+    # tập sự kiện cổng đã thấy bằng cách cắt ở seq của bản ghi này (V4).
+    _record_gate_input(evidence, sid, attempt=number, **dau_vao)
+    attempt.gate = story_gate.evaluate(sid, evidence.read(sid), **dau_vao)
     attempt.ok = attempt.gate.passed
     # Kết cục cổng đi vào bằng chứng, mang SHA ứng viên: sổ hành vi (R2) coi
     # "qua cổng ở ứng viên này" là dấu landed ở mức lượt — implement không
@@ -827,7 +868,8 @@ def verify_candidate(
     return attempt
 
 
-def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Config) -> None:
+def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
+                 base_ref: str = "") -> None:
     """Chạy bộ test ở **candidate cha** trước khi developer sửa gì (ADR-004 R9).
 
     HoH bảo developer "establish a baseline before editing"; ở đây harness
@@ -844,6 +886,12 @@ def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Co
     Không có lệnh test thì bản ghi mang `skipped` (cổng đọc thành chưa cấu
     hình), không phải baseline xanh. Tắt bằng `verify.baseline` thì ghi rõ là
     tắt, để cổng nói "không áp dụng" chứ không im.
+
+    ``base_ref`` (điểm rẽ) ghi cạnh ``parent`` để cổng biết mốc này có đứng
+    **trước** story không: lượt chạy lại nối lại nhánh story, HEAD lúc chạy
+    baseline là bản của chính story (e9 01-07 lần chạy 3: `parent` = ứng viên
+    `a60612e`), và mọi test của story đã xanh sẵn ở đó — nop cấp 1 phải biết
+    để không bắt oan (ADR-005 V3).
     """
     if not config.get("verify.baseline", True):
         EvidenceStore(artifact_root).tool_run(story.id, BASELINE_RUN, ok=False, detail={
@@ -854,8 +902,74 @@ def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Co
     res = run_tool("test", workdir, config=config)   # story_id rỗng: ghi bên dưới, dưới tên riêng
     log = parse_testlog(res.stdout + "\n" + res.stderr)
     record_tool(res, story.id, artifact_root, name=BASELINE_RUN, extra={
-        "baseline": True, "parent": head_sha(workdir), "red_before": log.failed[:MAX_IDS],
+        "baseline": True, "parent": head_sha(workdir), "base_ref": base_ref,
+        "red_before": log.failed[:MAX_IDS],
     })
+
+
+def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
+            candidate: str, base_ref: str, changed: list[str]) -> None:
+    """Nop control cấp 2 (ADR-005 V3): chạy test của story ở **SHA cha**.
+
+    Terminal-Bench nhận task chỉ khi oracle ≥ 1 **và** nop < 1; BERBench ghi
+    `base_fail`. Ở đây: worktree tạm ở SHA cha, chép vào đó **tệp test story
+    thêm/sửa** (tệp test trong `changed` theo `is_test_path` — `tdd.added_tests`
+    là tập con của nó, nên một bộ lọc là đủ; không chép mã nguồn), chạy
+    `tools.test`, ghi `test:nop` mang `candidate`. Cổng đọc: test mang mã tiêu
+    chí phải đỏ hoặc không tồn tại ở đó — lỗi import vì thiếu module của
+    story là đỏ, và là hợp lệ.
+
+    SHA cha = điểm rẽ (`base_ref`) khi có — mốc **trước** story kể cả lượt
+    chạy lại; không có (chạy thẳng trong dự án) thì `test:baseline.parent`;
+    không có nốt thì ghi không chạy được, không đoán. Chỉ `tools.test`
+    (unit), không `qa:e2e` (lỗi 22: nhạy tải máy). Worktree tạm nằm cùng
+    gốc `.aisdlc/worktrees/` với worktree story — cùng cách tìm `node_modules`
+    /venv, nên baseline chạy được thì nop chạy được; dọn xong dù lỗi.
+    Tắt bởi `verify.nop` → vẫn ghi một bản mang `disabled` để cổng nói
+    "không áp dụng: tắt", không im. Story không thêm/sửa tệp test → ghi
+    `files: []`, không dựng gì.
+    """
+    from ..control.worktree import GitError, WorktreeManager, main_repo
+
+    store = EvidenceStore(artifact_root, candidate=candidate)
+    if not config.get("verify.nop", True):
+        store.tool_run(story.id, NOP_RUN, ok=False, detail={
+            "nop": True, "disabled": True, "skipped": "tắt bởi cấu hình `verify.nop`"})
+        return
+    tep = [f for f in changed if is_test_path(f)]
+    if not tep:
+        store.tool_run(story.id, NOP_RUN, ok=False, detail={
+            "nop": True, "files": [], "skipped": "story không thêm/sửa tệp test"})
+        return
+    goc = EvidenceStore(artifact_root).read(story.id).last(TOOL_RUN, BASELINE_RUN)
+    cha = base_ref or (str(goc.detail.get("parent") or "") if goc is not None else "")
+    if not cha:
+        store.tool_run(story.id, NOP_RUN, ok=False, detail={
+            "nop": True, "files": tep[:50],
+            "unrunnable": "không xác định được SHA cha (không có điểm rẽ lẫn baseline)"})
+        return
+
+    wt = WorktreeManager(main_repo(workdir))
+    nop_id = f"{story.id}-nop"
+    try:
+        wt.remove(nop_id, delete_branch=True)      # xác còn sót từ lần gãy trước
+        tam = wt.create(nop_id, base=cha, refresh=False).path
+        for f in tep:
+            src, dst = Path(workdir) / f, tam / f
+            if src.is_file():
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dst)
+            elif dst.exists():
+                dst.unlink()                        # story xoá tệp test: SHA cha cũng không có
+        res = run_tool("test", tam, config=config)   # story_id rỗng: ghi bên dưới, dưới tên riêng
+        record_tool(res, story.id, artifact_root, candidate, name=NOP_RUN, extra={
+            "nop": True, "parent": cha, "base_ref": base_ref, "files": tep[:50]})
+    except GitError as e:
+        store.tool_run(story.id, NOP_RUN, ok=False, detail={
+            "nop": True, "parent": cha, "files": tep[:50],
+            "unrunnable": f"không dựng được worktree ở SHA cha: {e}"})
+    finally:
+        wt.remove(nop_id, delete_branch=True)
 
 
 def freeze_candidate(
@@ -1758,7 +1872,7 @@ def implement_story(
         base_ref = fork_point(str(workdir), head) if head else ""
 
     # Mốc test trước khi story chạm vào — một lần, trước lượt đầu (ADR-004 R9).
-    run_baseline(story, workdir=workdir, artifact_root=root, config=cfg)
+    run_baseline(story, workdir=workdir, artifact_root=root, config=cfg, base_ref=base_ref)
 
     while True:
         attempt = run_attempt(

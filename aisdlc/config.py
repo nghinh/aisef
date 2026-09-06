@@ -113,6 +113,12 @@ DEFAULTS: dict[str, Any] = {
     # Mức story (`run`) giữ cây worktree: đã đóng băng và guard write-scope
     # đã chặn ngoài phạm vi — không đọc khoá này.
     "verify.clean_tree": True,
+    # Nop control (ADR-005 V3): sau khi đóng băng ứng viên, chép tệp test story
+    # thêm/sửa vào một worktree tạm ở SHA cha rồi chạy `tools.test` — test mang
+    # mã tiêu chí phải **đỏ hoặc không tồn tại** khi không có mã của story.
+    # Tắt khi bộ test quá chậm (+1 lần chạy test mỗi lượt) — tắt thì mục cổng
+    # "test có kiểm được story" là "không áp dụng: tắt bởi cấu hình", không đạt.
+    "verify.nop": True,
     # ứng dụng của dự án — để mở route thật lúc đối chiếu với mockup
     "app.dev_command": "",
     "app.base_url": "http://localhost:5173",
@@ -195,6 +201,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "verify.waived": str,
     "verify.baseline": bool,
     "verify.clean_tree": bool,
+    "verify.nop": bool,
     "app.dev_command": str,
     "app.base_url": str,
     "app.ready_timeout_seconds": int,

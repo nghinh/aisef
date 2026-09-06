@@ -517,6 +517,75 @@ class TestBaoToan(Muc):
         self.assertIn("AC-S-02-1", m.detail)
 
 
+class TestTestCoKiemDuocStory(Muc):
+    """ADR-005 V3 nop control: test mang mã tiêu chí phải đỏ khi không có mã
+    của story. Cấp 1 so `test:baseline`, cấp 2 đọc `test:nop` — trỏ cả ba
+    sự kiện đã đọc. Bộ phép đầy đủ ở `test_gate.py::TestTestCoKiemDuocStory`."""
+
+    TEN = "test có kiểm được story"
+    AC = "tests/test_a.py::test_AC_S_01_1_x"
+
+    def baseline(self, ids, **d) -> Event:
+        return self.store.tool_run("S-01", "test:baseline", ok=True, detail={
+            "baseline": True, "test_format": "pytest", "test_ids": list(ids),
+            "failed_ids": [], "skipped_ids": [], **d})
+
+    def nop(self, ids=None, failed=(), **d) -> Event:
+        detail = {"nop": True, "parent": "cha0000", "files": ["tests/test_a.py"], **d}
+        if ids is not None:
+            detail.update({"test_format": "pytest", "test_ids": list(ids), "failed_ids": list(failed)})
+        return self.kho("aaa").tool_run("S-01", "test:nop", ok=not failed and ids is not None, detail=detail)
+
+    def test_positive_test_mang_ma_do_o_sha_cha(self):
+        b = self.baseline(["t1"])
+        t = self.xanh(sha="aaa", ids=[self.AC, "t1"])
+        n = self.nop([self.AC, "t1"], failed=[self.AC])
+        m = self.muc(self.gate(candidate="aaa", acceptance=1))
+        self.assertIs(m.outcome, Outcome.PASSED, m.detail)
+        self.assertEqual(m.evidence, [b.seq, t.seq, n.seq])
+        # story không thêm/sửa tệp test → không áp dụng, có lý do, vẫn trỏ nop
+        n2 = self.nop(files=[], skipped="story không thêm/sửa tệp test")
+        m = self.muc(self.gate(candidate="aaa", acceptance=1))
+        self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
+        self.assertIn(n2.seq, m.evidence)
+
+    def test_negative_xanh_o_sha_cha_hay_xanh_san_o_baseline_neu_ten(self):
+        self.baseline(["t1"])
+        self.xanh(sha="aaa", ids=[self.AC, "t1"])
+        self.nop([self.AC, "t1"])
+        m = self.muc(self.gate(candidate="aaa", acceptance=1))
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("xanh cả khi không có mã của story", m.detail)
+        self.assertIn(self.AC, m.detail)
+        # cấp 1: mã gắn vào test đã xanh ở baseline — ✗ dù nop đỏ
+        self.baseline([self.AC, "t1"])
+        self.xanh(sha="aaa", ids=[self.AC, "t1"])
+        self.nop([self.AC, "t1"], failed=[self.AC])
+        m = self.muc(self.gate(candidate="aaa", acceptance=1))
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("gắn mã vào test có sẵn", m.detail)
+
+    def test_env_nop_khong_chay_duoc_hay_khong_in_ten_khong_phai_dat(self):
+        self.baseline(["t1"])
+        self.xanh(sha="aaa", ids=[self.AC, "t1"])
+        self.nop(unrunnable="công cụ chưa cài (exit 127)")
+        m = self.muc(self.gate(candidate="aaa", acceptance=1))
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("exit 127", m.detail)
+        # reporter không in tên, bộ test đỏ ở SHA cha: không biết của ai → ○
+        self.kho("aaa").tool_run("S-01", "test", ok=True)
+        self.kho("aaa").tool_run("S-01", "test:nop", ok=False, detail={"nop": True, "files": ["tests/test_a.py"]})
+        m = self.muc(self.gate(candidate="aaa", acceptance=1))
+        self.assertIs(m.outcome, Outcome.UNCONFIGURED)
+        self.assertTrue(m.outcome.must_be_named)
+        # tắt bởi cấu hình → –, có tên knob
+        self.kho("aaa").tool_run("S-01", "test:nop", ok=False,
+                                 detail={"nop": True, "disabled": True, "skipped": "tắt bởi cấu hình `verify.nop`"})
+        m = self.muc(self.gate(candidate="aaa", acceptance=1))
+        self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
+        self.assertIn("verify.nop", m.detail)
+
+
 class TestBangChungNhan(Muc):
     """Test meta: bảng đọc từ tệp này khớp `CHECK_NAMES`, `gate.py` không gọi
     tên lạ, `CHECK_KIND` đóng, và sau `evaluate` mọi mục có `kind`, ≥ 10 mục

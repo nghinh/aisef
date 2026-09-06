@@ -82,7 +82,7 @@ Bản này trả lời ba câu: dự án đang ở đâu, còn gì trước khi 
 | B3 | T5 flake: dựng story trượt trên `par` (mutation có sẵn), `--verify-only --repeat 3` dưới tải có kiểm soát (không dùng `yes`, dùng chính suite Docker) | ≈ $4 | `flaky_ids` nêu tên, cổng ⚠ "không ổn định" |
 | B4 | T8 A/B repo map: `par` ×3 + e9 01-02/03/06 × {0, 1500}, n ≥ 3/nhánh | ≈ $40 | quyết định bật (lượt −20 % trung vị, cổng cùng kết cục) hay giữ 0 |
 | B5 | T9 bench run: task lỗi kho (≥ 20) × 1 client × attempts 3 | ≈ $30 | pass@1/pass@3, ổn định ≥ 80 %; mốc cho mọi A/B sau |
-| B6 | Improve: ưu tiên gap `ac` có test id, loại `qa:*` khỏi hàng đợi tự động; chạy lại 2 vòng trên e9 | ≈ $20 | Δ ≥ 0 ở hai vòng; ADR-004 §6 R3 cập nhật |
+| B6 | Improve: ưu tiên gap `ac` có test id, loại `qa:*` khỏi hàng đợi tự động; **và** xử lý mâu thuẫn V3 × B1: ba vòng improve đầu đóng gap bằng cách *gắn mã vào test có sẵn* (RP-02/03/04), điều nop control (V3) nay chấm ✗ vì test ấy xanh cả khi không có mã của story → story sửa phải viết test mới mang mã, hoặc kế hoạch khai "chỉ gắn mã" (quyết định của chủ đầu tư); chạy lại 2 vòng trên e9 với luật mới | ≈ $20 | Δ ≥ 0 ở hai vòng; ADR-004 §6 R3 cập nhật |
 | B7 | P1-4 coverage: e9 `tools.test` thêm `--coverage`, một story RP | ≈ $8 | mục coverage ✅ hoặc lý do rõ |
 
 ### Đợt C — nghiệm thu e9 cho v0.1.0 (cần quyết định chủ đầu tư)
@@ -122,6 +122,7 @@ V12 egress allowlist (spike S7), V13 theo điều kiện, R10 planner cho story 
 | e2e timing trượt oan (lỗi 22) | 01-07 lần 2 | không chạy suite khi có lượt agent thật; R13 `--repeat` |
 | Tải nhân tạo mồ côi | 07:20–09:03 | cấm subagent dựng tải; T5 dùng tải thật có kiểm soát |
 | Cổng chấm sai lớp E/J | 17/27 lỗi | V3 nop + V4 replay + V9 qualification — đo trước khi tuyên bố |
+| Nop control (V3) chặn cách vòng improve đang đóng gap (gắn mã vào test có sẵn) | hồi cứu T3: RP-02/03/04 sẽ ✗ | quyết định B6 trước khi chạy improve tiếp; không nới V3 |
 | Phạm vi nghiệm thu mơ hồ | pre-deploy ✗ hiện nay | quyết định C-a/C-b trước D |
 
 ## 5. Lịch đề xuất

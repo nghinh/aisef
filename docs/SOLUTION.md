@@ -151,7 +151,7 @@ dạng khoá (lỗi 10).
 | **Cost & latency** | token in/out · USD · giây — ghi vào mỗi `evidence/{story}.json`, cộng dồn theo epic |
 | **Ứng viên** | mỗi phép kiểm mang `detail.candidate` = SHA bản được kiểm (ADR-004 R1) |
 | **Sổ hành vi** | `control/ledger.py` — phép chiếu từ evidence, không phải kho mới: mỗi tiêu chí / FR / `qa:<kind>` / màn hình có trạng thái VERIFIED · GAP · REOPENED (`regressed_by`); chỉ ứng viên đã *landed* (nhật ký `merge.completed`/`attempt.committed`) mới thành VERIFIED. `ledger.json` + `INDEX.md` + mốc `loops[]`; metrics (tăng trưởng, hồi quy, gap đóng, cải thiện biên/$) ở phần 5 báo cáo (ADR-004 R2/R6/R7) |
-| Bàn giao & phán quyết | `handoff` (slot · nguồn · số ký tự, `prompt_chars`), `review:verdict`/`security:verdict` (JSON), `gate:verdict`; lời rà soát nguyên văn ở `_bmad-output/reviews/<story>-<vai>-<lượt>.md` (lỗi 16) |
+| Bàn giao & phán quyết | `handoff` (slot · nguồn · số ký tự, `prompt_chars`), `review:verdict`/`security:verdict` (JSON), `gate:input` (13 kwargs của `gate.evaluate` JSON-hoá, ghi ngay trước phán quyết — `aisdlc gate --replay` chấm lại lượt cũ bằng luật mới, ADR-005 V4), `gate:verdict`; lời rà soát nguyên văn ở `_bmad-output/reviews/<story>-<vai>-<lượt>.md` (lỗi 16) |
 | **Kết cục lượt** | `agent_run.detail.exit_status` ∈ ok · max_turns · timeout · cost · context · permission · infra · error — `clients/stream.py::exit_status_of`, một bảng cho cả vòng thử lại (`INFRA_STATUSES` = timeout, infra không ăn `run.max_retries`) lẫn `aisdlc status` ("Lượt agent: …", bản ghi cũ là "chưa ghi"); `tool_run.detail.redacted` = số bí mật đã che trong `tail`/log (ADR-005 V1/V11 B) |
 | Evaluation | chưa có bộ eval riêng cho skill/prompt; trôi chất lượng đo bằng kho dogfood `tests/dogfood/` (mốc lượt/chi phí) và hợp quy client `tests/conformance/` |
 | Dashboard | `aisdlc status` · `aisdlc report` · `aisdlc evidence <id>` |
@@ -415,6 +415,13 @@ aisdlc ctx [--story S | --file F] [--budget N]   bản đồ mã quanh phạm vi
 aisdlc issues [--format md|csv] [--epic E] [--status gap,reopened] [--out FILE]
                                       bảng gap/hồi quy từ sổ → `ISSUES.md|csv` (ADR-004 R12);
                                       chỉ tệp, không tạo issue ở tracker nào
+aisdlc gate    --replay <story> [--attempt n] | --all
+                                      chấm lại cổng story trên bằng chứng đã ghi (ADR-005 V4):
+                                      cắt bằng chứng ở `gate:input` của lượt, gọi `gate.evaluate`
+                                      của mã **hiện tại**, in bảng từng mục so với `gate:verdict`
+                                      đã ghi. Luật hợp trên lời reviewer/security **đã ghi** —
+                                      không gọi model, $0. Lượt trước V4 (không có `gate:input`)
+                                      → "không replay được", không đoán
 ```
 
 `report` chiếu bằng chứng thành **sổ hành vi** (ADR-004 R2): mỗi tiêu chí,
@@ -501,6 +508,7 @@ minh). Hệ quả:
 | `tiêu chí có test` | mỗi `AC-<story>-<i>` nằm trong tên một test ở lần xanh cuối (G5) | ○ reporter không in tên |
 | `coverage` | số đọc từ output runner ≥ `coverage.min` | ○ runner không in coverage |
 | `TDD` | story thêm test thì có một lần đỏ trước lần xanh cuối | – story không thêm test |
+| `test có kiểm được story` | nop control (ADR-005 V3), hai cấp. **Cấp 1 ($0):** test mang `AC-<story>-i` xanh ở ứng viên phải **không** xanh sẵn ở `test:baseline` — cùng tên, hoặc tên cũ mất mà tiêu đề lá còn (đổi tên để gắn mã) → ✗ "gắn mã vào test có sẵn" nêu tên (lỗi 23 → 24); baseline của lượt chạy lại đứng ở bản của chính story (`parent` ≠ `base_ref`) thì cấp 1 không so, cấp 2 quyết. **Cấp 2 (một lần sandbox):** worktree tạm ở SHA cha (điểm rẽ) + chép tệp test story thêm/sửa → `tools.test` ghi `test:nop` mang `candidate`; test mang mã phải **đỏ hoặc không tồn tại** (lỗi import ở SHA cha = đỏ, hợp lệ) → xanh là ✗ "xanh cả khi không có mã của story". Chỉ `tools.test`, không `qa:e2e` (lỗi 22) | ⚠ nop không chạy được; ○ reporter không in tên (chỉ biết bộ test đỏ ở SHA cha); – story không thêm/sửa tệp test · tắt bởi `verify.nop` · nhật ký trước V3 |
 | `<kind>` theo hợp đồng kiểm định | `qa:<kind>` rồi mới tên trần (lỗi 9): e2e · accessibility · perf … | ○ chưa cấu hình |
 | `bảo mật` | phiên rà soát bảo mật riêng không còn mức trong `security.block_severities` | ○ chưa cấu hình |
 | `rà soát` | phiên rà soát độc lập không còn `[chặn]`. Trả **hai bản**: văn bản có thẻ `[chặn]`/`[bế tắc]` và khối JSON (`verdict` + `findings` mang `behavior_id`); thiếu JSON hỏi lại **đúng một lần** rồi mới đọc văn bản; hai bản lệch thì lấy **hợp**, ghi note `review:mismatch` — không nới cổng vì model quên chép (ADR-004 R8) | ✗ chưa rà soát |
@@ -517,8 +525,8 @@ mang `kind` — ai chấm: `deterministic` · `structural` · `security` ·
 `model-judge` · `human` (`outcome.CHECK_KINDS`; bảng `gate.CHECK_KIND` một chỗ)
 — và `evidence`: con trỏ `seq` của sự kiện mục đã đọc, không chép nội dung;
 mục suy từ tham số (`phạm vi ghi`, `bảo mật`, `rà soát`) trỏ rỗng và nói rỗng.
-Tên mục là danh sách **đóng** `gate.CHECK_NAMES` (15 tên: 14 mục trên + họ
-`<kind>`; nop control V3 sẽ là 16). Mỗi tên có **ba control** ở
+Tên mục là danh sách **đóng** `gate.CHECK_NAMES` (16 tên: 15 mục trên + họ
+`<kind>`). Mỗi tên có **ba control** ở
 `tests/test_gate_qualification.py` — positive (bằng chứng tốt → ✅/–), negative
 hay mutant (bằng chứng xấu → ✗), env (môi trường/cấu hình không kết luận được →
 ⚠/○ có tên) — và `gate.qualification_table()` đọc tệp ấy bằng AST; báo cáo
@@ -644,6 +652,7 @@ Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏn
 | `verify.waived` | `""` | miễn phải là quyết định có người ký, không phải hệ quả của việc quên |
 | `verify.baseline` | `true` | chạy bộ test ở candidate cha **trước** phiên developer đầu tiên của story (ADR-004 R9) để cổng "không làm đỏ test có sẵn" so được tên test; tắt khi bộ test quá chậm — tắt thì mục cổng là – "tắt bởi cấu hình", không phải đạt |
 | `verify.clean_tree` | `true` | kiểm định **cấp dự án** (`aisdlc qa`, `pre-deploy`, `improve`) chạy ở `git worktree` tạm dựng từ SHA đang chấm (ADR-005 V6, theo Harbor: verifier chạy tách khỏi env agent): shim `node_modules/.bin/*`, `conftest.py`, `pytest.ini` chưa commit không tới được cây kiểm; `node_modules`/`.venv` của dự án được gắn vào (Docker bind mount, suy biến symlink). Giá: tệp **không theo dõi** mà test cần (`.env.test`, fixture sinh tay) cũng vắng — commit chúng, hoặc tắt khoá này; tắt thì bằng chứng và `pre-deploy.json` ghi `tree = "cây agent"`, không im lặng. Mức story (`run`) giữ cây worktree đã đóng băng, không đọc khoá này |
+| `verify.nop` | `true` | nop control cấp 2 (ADR-005 V3): sau khi đóng băng ứng viên, chạy `tools.test` một lần ở SHA cha với tệp test của story chép vào (`test:nop`) để cổng "test có kiểm được story" thấy test mang mã đỏ khi không có mã của story; +1 lần chạy test mỗi lượt. Tắt khi bộ test quá chậm — tắt thì mục cổng là – "tắt bởi cấu hình", không phải đạt; cấp 1 ($0) vẫn chấm |
 | `sandbox.image` | `""` (theo stack) | `alpine` trơn không có công cụ nào; test đỏ vì thiếu công cụ chứ không vì code sai |
 | `sandbox.tools_network` | `false` | dự án cần cài phụ thuộc mới mở mạng, và phải khai tường minh |
 | `sandbox.use_docker` | `true` | tắt được cho toolchain gắn với máy chủ, nhưng luôn ghi `degraded` |

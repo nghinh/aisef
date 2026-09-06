@@ -14,7 +14,7 @@ from ..harness.guardrails import GUARD_MATCHERS
 from ..phases.deploy import INSTALL_SPEC as DEPLOY_INSTALL_SPEC
 from ._common import EXIT_USAGE, _gate_arg
 from .doctor import cmd_doctor
-from .harness import cmd_compile, cmd_doc, cmd_guard, cmd_init, cmd_setup, cmd_skill
+from .harness import cmd_compile, cmd_doc, cmd_gate, cmd_guard, cmd_init, cmd_setup, cmd_skill
 from .implement import (
     cmd_ctx,
     cmd_devsecops,
@@ -100,6 +100,16 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--client", default="all", help="claude | opencode | all")
     c.add_argument("--bin", default="", help="đường dẫn lệnh aisdlc dùng trong hook")
     c.set_defaults(func=cmd_compile)
+
+    gt = sub.add_parser("gate", help="chấm lại cổng story trên bằng chứng đã ghi "
+                                     "(ADR-005 V4) — luật hiện tại, lời reviewer cũ, không gọi model")
+    gt.add_argument("story", nargs="?", default="", help="mã story; bỏ trống khi --all")
+    gt.add_argument("--replay", action="store_true",
+                    help="chấm lại từng lượt có `gate:input` bằng gate.evaluate hiện tại, "
+                         "in diff so với `gate:verdict` đã ghi")
+    gt.add_argument("--attempt", type=int, default=0, help="chỉ lượt này (mặc định: mọi lượt)")
+    gt.add_argument("--all", action="store_true", help="mọi story có bằng chứng")
+    gt.set_defaults(func=cmd_gate)
 
     g = sub.add_parser("guard", help="chạy guard trên sự kiện hook (đọc stdin)")
     g.add_argument("kind", choices=sorted(GUARD_MATCHERS))
