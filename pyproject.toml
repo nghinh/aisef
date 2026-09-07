@@ -11,6 +11,10 @@ requires-python = ">=3.11"
 license = "MIT"
 dependencies = []          # toàn bộ khung chạy bằng thư viện chuẩn
 
+[project.urls]
+Homepage = "https://aisef.io/"
+Repository = "https://github.com/nghinh/aisef"
+
 [project.scripts]
 aisef = "aisef.cli:main"
 
