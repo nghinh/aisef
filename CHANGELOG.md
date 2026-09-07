@@ -4,6 +4,44 @@ Ghi theo **sáu nhóm harness** (`docs/SOLUTION.md` §5), không theo ADR hay
 ngày. Mỗi dòng có chỗ đọc lại; số lỗi trỏ `docs/STATUS-2026-09-05.md` §2.4
 và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epic-improvement.md` §6.
 
+## v0.3.0 — phát hành 2026-09-07
+
+**Đã phát hành:** tag `v0.3.0` = `5dadc1e`, gói `aisef 0.3.0` trên PyPI.
+Kiểm sau publish: venv sạch `pip install aisef==0.3.0` → `aisef --help` →
+`aisef doctor` → `aisef setup` **✅**.
+
+### Benchmark (nhóm 6 — đo lường)
+
+- **Hạ tầng benchmark ADR-005 V8**: 16 bug-fix task từ kho, interleaved
+  runner (`run-both --shuffle`), bare control mode, scorer chấm F2P/P2P
+  theo tên test, Harbor export.
+- **96-session benchmark** (16 task × 2 condition × 3 attempt): 100% pass@1
+  cả AISEF và bare, 12 guard block, chi phí $147.89 tổng, overhead 7%.
+- **Phân tích guard block**: 6 process-ref, 3 destructive, 3 completion —
+  guard bắt lỗi vệ sinh thật (mã quy trình trong nguồn, xoá đệ quy, bỏ
+  qua test) nhưng không thay đổi kết cục đúng sai trên tập task này.
+- Giao thức đóng băng trước khi chạy (SHA `dbd3858`).
+- Báo cáo: `docs/BENCH-REPORT-v0.3.0.md`.
+
+### Guard / harness (nhóm 1 — kiểm soát)
+
+- **Hợp quy C1-C10** đạt cả Claude và OpenCode (`docs/CONFORMANCE.md`).
+- Sửa timeout runner: `Popen` + `communicate(timeout=)` thay
+  `subprocess.run` — phiên hết giờ nay giữ được dữ liệu chi phí/lượt.
+
+### Skill / kit (nhóm 3 — kỹ năng)
+
+- **Skill scanning by agent** (`aisef skill --scan`): quét lô SKILL.md bằng
+  model chỉ đọc, phát hiện injection, ghi bằng chứng, sổ đăng ký loại skill.
+- **Sổ skill + router** (ADR-002): registry 5 trạng thái, router tất định +
+  luật hai-tín-hiệu + abstain, đo trên e9 (156 skill, abstain 13/18).
+
+### CLI / packaging (nhóm 5 — trải nghiệm)
+
+- Gỡ bí danh CLI `aisdlc` (deprecated từ 0.2.0).
+- Thêm `[project.urls]` Homepage/Repository vào pyproject.toml.
+- Homepage: https://aisef.io/
+
 ## v0.2.0 — phát hành 2026-09-06
 
 **Đã phát hành:** tag `v0.2.0` = `7eac114`, gói `aisef 0.2.0` trên PyPI (kho

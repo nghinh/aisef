@@ -184,14 +184,29 @@ class EvidenceStore:
         return event
 
     def _next_seq(self, path: Path) -> int:
-        highest = 0
-        if path.is_file():
-            for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
-                try:
-                    highest = max(highest, int(json.loads(line).get("seq") or 0))
-                except (json.JSONDecodeError, TypeError, ValueError):
-                    continue
-        return highest + 1
+        # ponytail: read last non-empty line instead of scanning all lines — O(1) vs O(n)
+        if not path.is_file():
+            return 1
+        try:
+            with path.open("rb") as fh:
+                fh.seek(0, 2)
+                size = fh.tell()
+                if size == 0:
+                    return 1
+                chunk = min(size, 4096)
+                fh.seek(-chunk, 2)
+                tail = fh.read().decode("utf-8", errors="replace")
+        except OSError:
+            return 1
+        for line in reversed(tail.splitlines()):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                return int(json.loads(line).get("seq") or 0) + 1
+            except (json.JSONDecodeError, TypeError, ValueError):
+                continue
+        return 1
 
     def read(self, story_id: str) -> Evidence:
         ev = Evidence(story_id=story_id)

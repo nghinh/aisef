@@ -16,6 +16,7 @@ vệ (bất biến 10).
 from __future__ import annotations
 
 import json
+import shlex
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -78,7 +79,7 @@ class CompileReport:
 
 
 def _guard_command(aisef_bin: str, project: Path, kind: str) -> str:
-    return f"{aisef_bin} --project {project} guard {kind}"
+    return f"{shlex.quote(aisef_bin)} --project {shlex.quote(str(project))} guard {kind}"
 
 
 def build_claude_settings(project: Path, aisef_bin: str) -> dict:

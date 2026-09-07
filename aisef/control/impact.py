@@ -22,6 +22,7 @@ from __future__ import annotations
 import json
 import math
 import re
+import shlex
 import subprocess
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
@@ -182,8 +183,7 @@ def _run_command(
     """
     try:
         proc = subprocess.run(
-            command,
-            shell=True,
+            shlex.split(command),
             cwd=project,
             input="\n".join(changed),
             capture_output=True,

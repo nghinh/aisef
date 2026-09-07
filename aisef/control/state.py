@@ -221,8 +221,10 @@ class StateStore:
         if doi:
             payload = json.loads(self.path.read_text(encoding="utf-8"))
             payload["stories"] = {sid: asdict(r) for sid, r in stories.items()}
-            self.path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
-                                 encoding="utf-8")
+            tmp = self.path.with_suffix(".json.tmp")
+            tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
+                           encoding="utf-8")
+            tmp.replace(self.path)
 
     def save(self, state: SprintState) -> None:
         state.updated_at = _now()

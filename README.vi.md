@@ -232,7 +232,7 @@ chạy tuần.
 
 ## Phát hành
 
-Gói, module Python và lệnh cùng tên **`aisef`** (từ 0.2.0; 0.1.0 cài `aisef` nhưng gõ `aisdlc` — bí danh cũ còn chạy tới 0.3.0, có cảnh báo).
+Gói, module Python và lệnh cùng tên **`aisef`** (từ 0.2.0; bí danh `aisdlc` đã bị gỡ trong 0.3.0).
 Điều kiện đọc bằng lệnh, không bằng cảm giác:
 
 ```bash
