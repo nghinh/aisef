@@ -43,12 +43,22 @@ below).
 \* bug-r2r1 bare: 0 turns, $0, 0ms — data anomaly; bare sessions did not
 invoke the agent but scored PASS (base code already satisfies F2P).
 
-## Guard block distribution
+## Guard block analysis
 
-12 total guard interventions across 48 AISEF sessions (25% of sessions
-triggered at least one guard). Tasks with most blocks: bug-10 (4), bug-21 (2).
-Bare agent passed 100% without guards — guards did not change correctness
-outcomes on this task set.
+12 guard blocks across 48 AISEF sessions. Three distinct hook types fired:
+
+| Hook | Count | What it blocked |
+|---|---|---|
+| process-ref | 6 | Agent embedded story/epic IDs (STORY-01-02, EPIC-01, etc.) in source code comments. Rule 6: process references belong in PR descriptions, not source. |
+| destructive | 3 | Agent attempted recursive delete (`rm -rf` or equivalent). Blocked as dangerous; agent must ask human. |
+| completion | 3 | Agent tried to finish without re-running tests after editing source files. Forced another test cycle. |
+
+**Observation**: All 12 blocks are hygiene/safety interventions, not
+correctness-critical. The bare agent simply never triggered these situations
+(or did, silently): no process IDs in code, no destructive commands, no
+untested edits at completion. The guards caught real bad practices but the
+task outcomes were unaffected because the agent self-corrected after each
+block.
 
 ## Interpretation
 
@@ -73,15 +83,25 @@ outcomes on this task set.
 
 ## Data notes
 
-**Timeouts ("quá 1800s")**: 14/96 sessions (15%) timed out before the agent
-finished, recording 0 turns and $0 cost. All 14 still scored PASS — the
-agent's partial edits (files/lines > 0) were sufficient. Distribution: 6
-AISEF, 8 bare. This affects cost averages but not correctness conclusions.
+**Timeouts ("quá 1800s")**: 14/96 sessions (15%) timed out at the
+`subprocess.run` 1800s wall clock. On `TimeoutExpired`, the client adapter
+returns a default `RunResult` (0 turns, $0, 0ms) because `subprocess.run`
+discards stdout on timeout — the agent's streaming cost/turn data is lost.
+The workspace still contains the agent's partial edits (files/lines > 0 in
+the diff), which is why all 14 scored PASS: the edits were sufficient even
+though the agent didn't finish cleanly. Distribution: 6 AISEF, 8 bare.
+This zeroes out cost data for these sessions — cost averages exclude them.
 
-**bug-r2r1 bare**: all 3 bare attempts timed out ($0, 0 turns). The base
-code with partial edits satisfies F2P. Excluded from cost comparison.
+**bug-r2r1 bare**: all 3 bare attempts timed out. The AISEF sessions hit
+`max_turns` (41 turns each, $3.23 avg) but still PASS — meaning the base
+code with the agent's edits satisfies F2P even when the agent runs out of
+turns. The bare sessions timed out before producing any stream data.
 
 **Cost excluding timeouts**: $1.80/session avg across 82 non-timeout sessions.
+
+**Runner improvement opportunity**: Capture partial stdout before timeout
+(e.g. `Popen` + `communicate(timeout=)` instead of `subprocess.run`) to
+recover cost/turn data from timed-out sessions.
 
 ## Next steps
 
