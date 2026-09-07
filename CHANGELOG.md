@@ -4,6 +4,35 @@ Ghi theo **sáu nhóm harness** (`docs/SOLUTION.md` §5), không theo ADR hay
 ngày. Mỗi dòng có chỗ đọc lại; số lỗi trỏ `docs/STATUS-2026-09-05.md` §2.4
 và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epic-improvement.md` §6.
 
+## v0.3.1 — phát hành 2026-09-08
+
+### Bảo mật (nhóm 1 — kiểm soát)
+
+- **Vá shell injection** trong `context._run_provider` và `impact._run_command`:
+  `shlex.split()` + `shell=False` thay `shell=True` với chuỗi lệnh từ cấu hình.
+- **Vá command injection** trong `compile._guard_command`: `shlex.quote()` cho
+  đường dẫn dự án (khoảng trắng, nháy đơn, ký tự đặc biệt shell).
+- Thêm `.env` / `.env.*` vào `.gitignore`.
+- **Regression test**: 6 test mới kiểm trực tiếp các fix trên (edge case:
+  dấu cách, nháy, `$(...)` trong đường dẫn).
+
+### Hiệu năng (nhóm 4 — quan sát)
+
+- `observe._next_seq` đổi từ O(n) quét toàn file sang O(1) đọc cuối file —
+  giảm thời gian ghi bằng chứng trên file lớn (e9: 4,3 MB).
+
+### Đóng gói / CLI (nhóm 5 — trải nghiệm)
+
+- `python -m aisef` hoạt động (thêm `aisef/__main__.py`).
+- `README.vi.md`: sửa mô tả bí danh `aisdlc` (đã gỡ, không còn chạy).
+- CI: thêm Python 3.14 vào ma trận test.
+- `state._migrate_done_before_merge`: ghi nguyên tử (tmp+replace).
+
+### Đo lường (nhóm 6)
+
+- Benchmark v0.3.0 giữ nguyên làm evidence nền — methodology, dataset, scorer
+  không đổi; không rerun.
+
 ## v0.3.0 — phát hành 2026-09-07
 
 **Đã phát hành:** tag `v0.3.0` = `5dadc1e`, gói `aisef 0.3.0` trên PyPI.

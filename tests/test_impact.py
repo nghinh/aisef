@@ -251,5 +251,16 @@ class TestReviewerNhanDuoc(unittest.TestCase):
             self.assertIn("registerSW", out)
 
 
+class TestShellInjectionRegression(unittest.TestCase):
+    """Regression: _run_command must use shlex.split, never shell=True."""
+
+    def test_run_command_uses_shlex_split(self):
+        import inspect
+        from aisef.control.impact import _run_command
+        src = inspect.getsource(_run_command)
+        self.assertNotIn("shell=True", src)
+        self.assertIn("shlex.split", src)
+
+
 if __name__ == "__main__":
     unittest.main()

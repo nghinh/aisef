@@ -234,5 +234,29 @@ class TestCompileReport(CompileTestCase):
         self.assertIn(".claude/settings.json", data["clients"][0]["written"])
 
 
+class TestGuardCommandInjection(CompileTestCase):
+    """Regression: _guard_command must quote paths to prevent shell injection."""
+
+    def test_space_in_project_path(self):
+        from aisef.clients.compile import _guard_command
+        cmd = _guard_command("aisef", Path("/tmp/my project"), "write-scope")
+        self.assertIn("'/tmp/my project'", cmd)
+
+    def test_quote_in_project_path(self):
+        from aisef.clients.compile import _guard_command
+        cmd = _guard_command("aisef", Path("/tmp/it's here"), "write-scope")
+        self.assertNotIn("it's", cmd.replace("'\"'\"'", ""))
+
+    def test_shell_metachar_in_project_path(self):
+        from aisef.clients.compile import _guard_command
+        cmd = _guard_command("aisef", Path("/tmp/$(whoami)"), "write-scope")
+        self.assertIn("'", cmd)
+
+    def test_space_in_aisef_bin(self):
+        from aisef.clients.compile import _guard_command
+        cmd = _guard_command("/opt/my tools/aisef", Path("/tmp/p"), "write-scope")
+        self.assertIn("'/opt/my tools/aisef'", cmd)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

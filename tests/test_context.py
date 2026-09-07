@@ -188,5 +188,16 @@ class TestHatGiongVaMucPrompt(ContextTestCase):
         self.assertIn("aisef ctx --story", sec)
 
 
+class TestShellInjectionRegression(ContextTestCase):
+    """Regression: _run_provider must use shlex.split, never shell=True."""
+
+    def test_run_provider_uses_shlex_split(self):
+        import inspect
+        from aisef.harness.context import _run_provider
+        src = inspect.getsource(_run_provider)
+        self.assertNotIn("shell=True", src)
+        self.assertIn("shlex.split", src)
+
+
 if __name__ == "__main__":
     unittest.main()
