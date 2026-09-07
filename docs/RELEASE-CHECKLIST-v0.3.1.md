@@ -1,6 +1,7 @@
 # Release Checklist — AISEF v0.3.1
 
 Release commit: `cda67461f095bd762a9b45b6c8ea1440acee7f28`
+Tag: `v0.3.1` on `563c5a2b2df2c012fbd24c3ec412d9212e507f9d`
 Release date: 2026-09-08
 
 ## Pre-release gates
@@ -40,16 +41,18 @@ Release date: 2026-09-08
 
 | Step | Status | Detail |
 |------|--------|--------|
-| Tag `v0.3.1` | PENDING | |
-| Push tag | PENDING | |
-| Trusted Publisher (GitHub Actions) | PENDING | `release.yml`, environment `pypi` |
-| PyPI install verification | PENDING | |
+| Tag `v0.3.1` | DONE | `563c5a2` |
+| Push tag | DONE | `origin/master` |
+| Trusted Publisher (GitHub Actions) | DONE | Run 34169831587 — build 1m6s, publish 21s |
+| PyPI version | DONE | `aisef==0.3.1` live |
 
-## Post-publish
+## Post-publish verification
 
 | Step | Status | Detail |
 |------|--------|--------|
-| `pip install aisef==0.3.1` from PyPI | PENDING | |
-| `aisef --help` | PENDING | |
-| `aisef doctor` | PENDING | |
-| Bump to next dev version | PENDING | |
+| `pip install aisef==0.3.1` from PyPI | PASS | Clean venv, Python 3.14 |
+| `aisef --help` | PASS | All subcommands listed |
+| `python -m aisef --help` | PASS | Same output |
+| `aisef doctor` | PASS | Version 0.3.1 reported |
+
+## Release status: COMPLETE
