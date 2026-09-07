@@ -428,6 +428,10 @@ aisef gate    --replay <story> [--attempt n] | --all
                                       đã ghi. Luật hợp trên lời reviewer/security **đã ghi** —
                                       không gọi model, $0. Lượt trước V4 (không có `gate:input`)
                                       → "không replay được", không đoán
+aisef replay  <story> [--attempt n] | --all
+                                      lối vào nhanh cho `gate --replay` — cùng logic, ít gõ hơn
+aisef dashboard [--out FILE]          báo cáo hợp quy HTML tự chứa từ bằng chứng: guard telemetry
+                                      (hit/pass/block, latency), gate verdicts, chi phí — xem offline
 
 # Bench (ADR-005 V8) — việc của người phát triển harness, không nối vào `aisef`
 python3 -m tests.bench mine [--e9 DIR]           task lỗi kho → tests/bench/tasks/ (commit); story e9 → .bench/tasks/

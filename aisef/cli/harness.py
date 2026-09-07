@@ -112,12 +112,11 @@ def cmd_guard(args) -> int:
     lý do phải nói được agent cần sửa gì.
     """
     import json
+    import time
 
     from ..control.worktree import main_repo
     from ..harness.guardrails import project_root_from, record_outcome, run_guard
 
-    # Gốc dự án: harness khai qua env; `--project` biên dịch chỉ là dự phòng —
-    # dự án bị chép/di chuyển thì hook vẫn ghim đường dẫn cũ (P0-1, 2026-09-05).
     goc = Path(project_root_from(None, str(args.project))).resolve()
     artifact_root = main_repo(goc) / ARTIFACT_ROOT
 
@@ -125,11 +124,10 @@ def cmd_guard(args) -> int:
         raw = sys.stdin.read()
         event = json.loads(raw) if raw.strip() else {}
     except json.JSONDecodeError:
-        # Không đọc được sự kiện thì cho qua: guard hỏng không được biến
-        # thành thứ chặn mọi thao tác của agent.
         print("guard: không phân tích được sự kiện, bỏ qua", file=sys.stderr)
         return EXIT_OK
 
+    t0 = time.monotonic()
     try:
         verdict = run_guard(
             args.kind,
@@ -140,16 +138,25 @@ def cmd_guard(args) -> int:
     except ValueError as e:
         print(f"guard: {e}", file=sys.stderr)
         return EXIT_OK
+    elapsed_ms = int((time.monotonic() - t0) * 1000)
 
-    # Guard tự ghi bằng chứng: chỗ duy nhất mọi client đều đi qua, nên
-    # `guard_blocked` và `FILE_CHANGE` không còn phụ thuộc client có phát
-    # luồng sự kiện hay không. Ghi hỏng không được làm hỏng phán quyết.
     try:
-        record_outcome(args.kind, event, verdict, artifact_root=str(artifact_root))
+        record_outcome(args.kind, event, verdict,
+                       artifact_root=str(artifact_root),
+                       duration_ms=elapsed_ms)
     except OSError as e:
         print(f"guard: không ghi được bằng chứng ({e})", file=sys.stderr)
 
     if not verdict.allowed:
+        # P1-4: structured error — JSON on stdout for machine readers,
+        # human reason on stderr for agent
+        import json as _json
+        print(_json.dumps({
+            "guard": args.kind,
+            "allowed": False,
+            "reason": verdict.reason,
+            "tool": str(event.get("tool_name") or ""),
+        }, ensure_ascii=False))
         print(verdict.reason, file=sys.stderr)
     return verdict.exit_code
 
@@ -266,5 +273,42 @@ def cmd_gate(args) -> int:
                   f"không có `gate:input`), không đoán")
         duoc += len(rs)
         tong += len(rs) + len(thieu)
+    print(f"\nreplay được {duoc}/{tong} lượt")
+    return EXIT_OK if duoc else EXIT_NOT_READY
+
+
+def cmd_replay(args) -> int:
+    """Top-level replay: ``aisef replay <story>`` — delegates to gate --replay."""
+    from ..control import replay as R
+    from ..harness.observe import EvidenceStore
+
+    if not args.story and not args.all:
+        print("✗ replay cần <story> hoặc --all", file=sys.stderr)
+        return EXIT_USAGE
+
+    store = EvidenceStore(_artifact_root(args))
+    ids = store.stories() if args.all else [args.story]
+    print(R.BANNER)
+    duoc = tong = 0
+    for sid in ids:
+        ev = store.read(sid)
+        rs = R.replay(ev, attempt=args.attempt)
+        thieu = R.unreplayable(ev)
+        if args.attempt:
+            thieu = [a for a in thieu if a == args.attempt]
+        if not rs and not thieu:
+            if not args.all:
+                print(f"✗ {sid}: không có lượt chấm cổng nào trong bằng chứng", file=sys.stderr)
+            continue
+        print()
+        for r in rs:
+            print(r.summary())
+        for a in thieu:
+            print(f"{sid} lượt {a}: không replay được (trước ADR-005 V4)")
+        duoc += len(rs)
+        tong += len(rs) + len(thieu)
+    if not tong:
+        print("không có bằng chứng gate nào")
+        return EXIT_NOT_READY
     print(f"\nreplay được {duoc}/{tong} lượt")
     return EXIT_OK if duoc else EXIT_NOT_READY

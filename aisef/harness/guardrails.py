@@ -741,6 +741,7 @@ def record_outcome(
     *,
     env: dict[str, str] | None = None,
     artifact_root: str = "",
+    duration_ms: int = 0,
 ) -> None:
     """Guard tự ghi vào bằng chứng — nguồn duy nhất không phụ thuộc client.
 
@@ -756,7 +757,7 @@ def record_outcome(
     story = story_from_env(env)
     if not story or not artifact_root:
         return
-    from .observe import GUARD_BLOCK, GUARD_SEEN, TOOL_RUN, EvidenceStore, Event
+    from .observe import GUARD_BLOCK, GUARD_CHECK, GUARD_SEEN, TOOL_RUN, EvidenceStore, Event
 
     store = EvidenceStore(artifact_root)
     tool_input = event.get("tool_input") or {}
@@ -769,6 +770,12 @@ def record_outcome(
     # là sự kiện riêng, không suy từ sự kiện khác.
     if not hien_co.of(GUARD_SEEN):
         store.record(story, Event(kind=GUARD_SEEN, name=kind, detail={"tool": tool}))
+
+    store.record(story, Event(
+        kind=GUARD_CHECK, name=kind, ok=verdict.allowed,
+        duration_ms=duration_ms,
+        detail={"tool": tool, "verdict": "allow" if verdict.allowed else "block"},
+    ))
 
     if not verdict.allowed:
         store.record(story, Event(

@@ -35,6 +35,7 @@ FILE_CHANGE = "file_change"    # agent ghi file
 AGENT_RUN = "agent_run"        # một lượt gọi model
 GUARD_BLOCK = "guard_block"    # guard chặn một thao tác
 GUARD_SEEN = "guard_seen"      # hook tới được phiên này (ghi một lần mỗi story)
+GUARD_CHECK = "guard_check"    # mỗi lần guard chạy (cả cho qua lẫn chặn) — telemetry v0.4.0
 MOCKUP_MAP = "mockup_map"      # đối chiếu màn hình thật với mockup
 NOTE = "note"
 HANDOFF = "handoff"            # gói bàn giao: vai nào nhận slot nào, từ nguồn nào

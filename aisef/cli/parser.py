@@ -13,8 +13,9 @@ from ..config import ConfigError
 from ..harness.guardrails import GUARD_MATCHERS
 from ..phases.deploy import INSTALL_SPEC as DEPLOY_INSTALL_SPEC
 from ._common import EXIT_USAGE, _gate_arg
+from .dashboard import cmd_dashboard
 from .doctor import cmd_doctor
-from .harness import cmd_compile, cmd_doc, cmd_gate, cmd_guard, cmd_init, cmd_setup, cmd_skill
+from .harness import cmd_compile, cmd_doc, cmd_gate, cmd_guard, cmd_init, cmd_replay, cmd_setup, cmd_skill
 from .implement import (
     cmd_ctx,
     cmd_devsecops,
@@ -223,6 +224,16 @@ def build_parser() -> argparse.ArgumentParser:
     aa = sub.add_parser("auto-approve", help="tự duyệt (ghi dấu auto)")
     aa.add_argument("gates", help="'all' hoặc danh sách ngăn bởi dấu phẩy")
     aa.set_defaults(func=cmd_auto_approve)
+
+    db = sub.add_parser("dashboard", help="báo cáo hợp quy HTML từ bằng chứng")
+    db.add_argument("--out", default="", help="đường dẫn file ra (mặc định: _bmad-output/dashboard.html)")
+    db.set_defaults(func=cmd_dashboard)
+
+    rpl = sub.add_parser("replay", help="chấm lại cổng story trên bằng chứng đã ghi")
+    rpl.add_argument("story", nargs="?", default="", help="mã story; bỏ trống với --all")
+    rpl.add_argument("--attempt", type=int, default=0, help="chỉ lượt này")
+    rpl.add_argument("--all", action="store_true", help="mọi story có bằng chứng")
+    rpl.set_defaults(func=cmd_replay)
 
     return p
 

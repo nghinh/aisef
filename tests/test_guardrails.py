@@ -802,13 +802,15 @@ class TestGuardTuGhiBangChung(unittest.TestCase):
                        env={ENV_WRITE_SCOPE: "src"}, artifact_root=str(self.root))
         self.assertEqual(self.store.stories(), [])
 
-    def test_guard_khac_cho_qua_thi_chi_ghi_nhip_tim(self):
-        """Cho qua và không phải write-scope/diff-scope: không có gì để ghi
-        ngoài nhịp tim "hook tới được" (một lần)."""
+    def test_guard_khac_cho_qua_thi_ghi_nhip_tim_va_telemetry(self):
+        """Cho qua và không phải write-scope/diff-scope: ghi nhịp tim
+        "hook tới được" (một lần) và telemetry guard_check (mọi lần)."""
         record_outcome("git-stage", {"tool_name": "Bash", "tool_input": {"command": "ls"}},
                        ALLOW, env=self.env, artifact_root=str(self.root))
         ev = self.store.read("S-01")
-        self.assertEqual([e.kind for e in ev.events], ["guard_seen"])
+        self.assertEqual([e.kind for e in ev.events], ["guard_seen", "guard_check"])
+        self.assertTrue(ev.events[1].ok)
+        self.assertEqual(ev.events[1].detail["verdict"], "allow")
 
 
 class TestNhipTimVaBashGhiFile(unittest.TestCase):
