@@ -251,8 +251,8 @@ second-class in V1 — it has a column, it does not block. CI:
 ## Releasing
 
 Package, Python module and command all share the name **`aisef`** (since 0.2.0;
-0.1.0 installed as `aisef` but was typed `aisdlc` — that alias still works until
-0.3.0 and prints a warning). Release conditions are read by command, not by
+0.1.0 installed as `aisef` but was typed `aisdlc` — that alias was removed in
+0.3.0). Release conditions are read by command, not by
 feeling:
 
 ```bash

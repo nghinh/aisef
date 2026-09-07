@@ -103,10 +103,41 @@ turns. The bare sessions timed out before producing any stream data.
 (e.g. `Popen` + `communicate(timeout=)` instead of `subprocess.run`) to
 recover cost/turn data from timed-out sessions.
 
-## Next steps
+## v0.3.0 Conclusion
 
-- Investigate bug-r2r1 bare anomaly
-- Design harder task categories: multi-file, security, concurrency
-- Run conformance probes (C11/C12) requiring adversarial agent behavior
-- Consider whether guard value lies in safety (preventing damage on failure
-  paths) rather than correctness (improving solve rate)
+**Guards provide safety value, not correctness value — on simple bug-fix
+tasks with frontier models.**
+
+The 12 guard blocks caught real bad practices:
+- 6× process-ref: prevented story/epic IDs leaking into source code
+- 3× destructive: prevented recursive deletes (`rm -rf`)
+- 3× completion: forced test re-runs after untested edits
+
+The bare agent solved every task without these guards — either by avoiding
+the bad behavior entirely, or by self-correcting when it encountered errors.
+On this task set, guards are a safety net that catches hygiene violations the
+model would otherwise get away with.
+
+**Why no C11/C12 conformance probes?** The plan included adversarial probes
+to force guard-visible differences. After analyzing the 12 guard blocks and
+the 100%/100% pass rates, we concluded:
+1. Frontier models rarely trigger guards on simple tasks — probes designed
+   around the same codebase and difficulty level would likely replicate this
+2. The $20-30 budget is better reserved for v0.4.0 with genuinely harder
+   tasks (multi-file refactors, security-sensitive changes, concurrent edits)
+3. The guard analysis already demonstrates safety value without needing a
+   PASS/FAIL delta
+
+**Ship decision**: v0.3.0 ships the benchmark infrastructure and this report
+as evidence that AISEF's guard hooks are correctly wired and provide
+measurable safety interventions. Correctness differentiation requires harder
+task categories — planned for v0.4.0.
+
+## Future work (v0.4.0+)
+
+- Harder task categories: multi-file, security, concurrency, large refactors
+- Conformance probes requiring adversarial agent behavior
+- Runner improvement: capture partial stdout on timeout (`Popen` +
+  `communicate(timeout=)`) to recover cost/turn data
+- Non-frontier models: guards may provide more value with weaker models that
+  make more mistakes
