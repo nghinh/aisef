@@ -129,23 +129,29 @@ class ClaudeCodeAdapter(ClientAdapter):
             return RunResult(ok=False, error=f"workdir không tồn tại: {spec.workdir}")
 
         try:
-            proc = subprocess.run(
+            proc = subprocess.Popen(
                 self.build_command(spec),
                 cwd=str(spec.workdir),
-                capture_output=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 text=True,
-                timeout=spec.timeout_seconds,
                 env=child_env(spec.env, allow_prefixes=spec.env_allow),
                 stdin=subprocess.DEVNULL,  # không có: CLI chờ stdin 3s mỗi lần
             )
-        except subprocess.TimeoutExpired:
-            # Hết giờ là lỗi hạ tầng, không phải lỗi chất lượng — phân biệt
-            # được thì mới quyết đúng nên thử lại hay chặn story.
-            return RunResult(ok=False, error=f"quá {spec.timeout_seconds}s")
         except OSError as e:
             return RunResult(ok=False, error=f"không chạy được: {e}")
 
-        result = parse_stream(proc.stdout.splitlines())
-        if not result.raw_result and proc.stderr.strip():
-            result.error = proc.stderr.strip()[:500]
+        timed_out = False
+        try:
+            stdout, stderr = proc.communicate(timeout=spec.timeout_seconds)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            stdout, stderr = proc.communicate()
+            timed_out = True
+
+        result = parse_stream(stdout.splitlines())
+        if timed_out:
+            result.error = f"quá {spec.timeout_seconds}s"
+        if not result.raw_result and stderr.strip():
+            result.error = result.error or stderr.strip()[:500]
         return result

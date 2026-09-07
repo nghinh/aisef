@@ -133,30 +133,39 @@ class OpenCodeAdapter(ClientAdapter):
 
         started = time.monotonic()
         try:
-            proc = subprocess.run(
+            proc = subprocess.Popen(
                 self.build_command(spec),
                 cwd=str(spec.workdir),
-                capture_output=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 text=True,
-                timeout=spec.timeout_seconds,
                 # Allowlist, không phải `os.environ` (ADR-005 V2): OpenCode từng
                 # nhận trọn môi trường máy và ghi secret ra log của nó. Provider
                 # đọc khoá từ biến riêng thì dự án khai `clients.env_allow`.
                 env=child_env(spec.env, allow_prefixes=spec.env_allow),
                 stdin=subprocess.DEVNULL,
             )
-        except subprocess.TimeoutExpired:
-            return RunResult(ok=False, error=f"quá {spec.timeout_seconds}s")
         except OSError as e:
             return RunResult(ok=False, error=f"không chạy được: {e}")
+
+        timed_out = False
+        try:
+            stdout, stderr = proc.communicate(timeout=spec.timeout_seconds)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            stdout, stderr = proc.communicate()
+            timed_out = True
 
         # `--format json` (đo 2026-09-05, OpenCode 1.18.26): mỗi dòng một sự kiện
         # `step_start` / `text` / `tool_use` (part.tool, state.input/output) /
         # `step_finish` (tokens, cost). Cost là số nhà cung cấp báo — 9router
         # báo 0, đó là sự thật của nhà cung cấp, không phải của harness.
-        res = parse_json_events(proc.stdout.splitlines())
-        res.ok = proc.returncode == 0
+        res = parse_json_events(stdout.splitlines())
+        res.ok = proc.returncode == 0 and not timed_out
         res.duration_ms = int((time.monotonic() - started) * 1000)
-        res.error = "" if proc.returncode == 0 else (proc.stderr.strip()[:500] or "exit != 0")
+        if timed_out:
+            res.error = f"quá {spec.timeout_seconds}s"
+        elif proc.returncode != 0:
+            res.error = stderr.strip()[:500] or "exit != 0"
         res.raw_result = {"returncode": proc.returncode, **res.raw_result}
         return res
