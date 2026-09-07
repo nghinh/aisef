@@ -4,6 +4,25 @@ Ghi theo **sáu nhóm harness** (`docs/SOLUTION.md` §5), không theo ADR hay
 ngày. Mỗi dòng có chỗ đọc lại; số lỗi trỏ `docs/STATUS-2026-09-05.md` §2.4
 và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epic-improvement.md` §6.
 
+## v0.4.0 — phát hành 2026-09-08
+
+### Quan sát (nhóm 4 — observability)
+
+- **Guard telemetry**: mỗi lần guard chạy ghi sự kiện `GUARD_CHECK` vào
+  evidence JSONL — kind, tool, verdict (allow/block), latency (ms). Dashboard
+  và phân tích hậu kỳ có dữ liệu từ mọi guard invocation, không chỉ block.
+- **`aisef dashboard`**: báo cáo hợp quy HTML tự chứa — tỉ lệ hit/pass/block
+  theo guard, gate verdicts, chi phí và thời lượng từng story. Xem offline,
+  không phụ thuộc dịch vụ ngoài.
+
+### CLI (nhóm 5 — trải nghiệm)
+
+- **`aisef replay`**: lối vào nhanh cho `gate --replay` — cùng logic chấm lại
+  cổng story trên bằng chứng đã ghi (ADR-005 V4), ít gõ hơn.
+- **Structured guard error**: guard chặn giờ xuất JSON trên stdout
+  (`{"guard", "allowed", "reason", "tool"}`) bên cạnh lý do người đọc trên
+  stderr — client có thể parse programmatically.
+
 ## v0.3.1 — phát hành 2026-09-08
 
 ### Bảo mật (nhóm 1 — kiểm soát)
