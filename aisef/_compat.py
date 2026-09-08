@@ -15,11 +15,14 @@ if _WIN:
     def flock_ex_nb(fd: int) -> None:
         """Non-blocking exclusive lock (Windows).
 
-        msvcrt.locking operates on the current file position and locks a
-        byte range.  We seek to 0 and lock 1 byte — mirrors fcntl.flock
-        semantics closely enough for our advisory-lock use case.
-        Raises BlockingIOError (OSError subclass) when the lock is held.
+        msvcrt.locking locks a byte range at the current position.  We
+        ensure the file has at least 1 byte, seek to 0, and lock that
+        byte.  Raises BlockingIOError when the lock is held.
         """
+        # Ensure the file has at least 1 byte so locking has something to lock.
+        pos = os.lseek(fd, 0, os.SEEK_END)
+        if pos == 0:
+            os.write(fd, b"\0")
         os.lseek(fd, 0, os.SEEK_SET)
         try:
             msvcrt.locking(fd, msvcrt.LK_NBLCK, 1)

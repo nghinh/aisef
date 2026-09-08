@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 import shlex
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -79,7 +80,12 @@ class CompileReport:
 
 
 def _guard_command(aisef_bin: str, project: Path, kind: str) -> str:
-    return f"{shlex.quote(aisef_bin)} --project {shlex.quote(str(project))} guard {kind}"
+    if sys.platform == "win32":
+        def _q(s: str) -> str:
+            return f'"{s}"' if " " in s else s
+    else:
+        _q = shlex.quote
+    return f"{_q(aisef_bin)} --project {_q(str(project))} guard {kind}"
 
 
 def build_claude_settings(project: Path, aisef_bin: str) -> dict:
