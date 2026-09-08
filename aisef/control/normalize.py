@@ -439,10 +439,10 @@ def parse_prd_file(path: Path | str) -> PRD:
 # ----------------------------------------------------------------- epics.md
 
 #: `## Epic 1: Nền tảng ghi chú`
-_EPIC_HEADING = re.compile(r"^##\s+Epic\s+(\d+)\s*[:：]\s*(.+?)\s*$", re.MULTILINE)
+_EPIC_HEADING = re.compile(r"^#{2,5}\s+Epic\s+(\d+)\s*[:：]\s*(.+?)\s*$", re.MULTILINE)
 #: `### Story 1.2: Sửa ghi chú` — khuôn cố định trong template BMAD.
 _STORY_HEADING = re.compile(
-    r"^###\s+Story\s+(\d+)\.(\d+)\s*[:：]\s*(.+?)\s*$", re.MULTILINE
+    r"^#{2,5}\s+Story\s+(\d+)\.(\d+)\s*[:：]\s*(.+?)\s*$", re.MULTILINE
 )
 #: Khối tiêu chí chấp nhận kết thúc ở tiêu đề mới hoặc một **nhãn in đậm**
 #: khác — nhưng *không* ở `**When**`/`**Then**`/`**And**`, vốn là thân của
@@ -459,7 +459,7 @@ _AC_BLOCK = re.compile(
 _GIVEN = re.compile(r"^\s*\*\*Given\*\*", re.IGNORECASE)
 #: `- write_scope: src/notes/, src/db/schema.ts` — kể cả khi in đậm nhãn.
 _META_ITEM = re.compile(
-    r"^[-*]?\s*\*{0,2}(covers|write[_ ]scope|depends[_ ]on|screens?)\*{0,2}\s*[:：]\s*(.+?)\s*$",
+    r"^[-*]?\s*\*{0,2}(covers|write[_ ]scope|depends[_ ]on|screens?|verification[_ ]contract)\*{0,2}\s*[:：]\s*(.+?)\s*$",
     re.MULTILINE | re.IGNORECASE,
 )
 _STORY_REF = re.compile(r"\b(\d+)\.(\d+)\b")
@@ -715,7 +715,7 @@ def parse_epics_file(path: Path | str) -> EpicPlan:
 # ---------------------------------------------------------- architecture.md
 
 #: `### AR-1 — Một đường ghi duy nhất`
-_AR_HEADING = re.compile(r"^#{2,4}\s+(AR-\d+)\s*[—–:-]\s*(.+?)\s*$", re.MULTILINE)
+_AR_HEADING = re.compile(r"^#{2,4}\s+((?:AR|AD)-\d+)\s*[—–:-]\s*(.+?)\s*$", re.MULTILINE)
 _AR_FIELD = re.compile(r"^[-*]\s*\*\*(Binds|Prevents|Rule)\s*[:：]?\*\*\s*(.+)$", re.MULTILINE)
 
 
@@ -775,7 +775,7 @@ def parse_architecture(text: str) -> Architecture:
             seen_binds = seen_binds or f.group(1).lower() == "binds"
             key, value = f.group(1).lower(), " ".join(f.group(2).split())
             if key == "binds":
-                d.binds = _expand_fr_refs(value) + re.findall(r"\bAR-\d+\b", value)
+                d.binds = _expand_fr_refs(value) + re.findall(r"\b(?:AR|AD)-\d+\b", value)
                 d.universal = bool(re.search(r"\b(all|mọi story|toàn bộ)\b", value, re.I))
             elif key == "prevents":
                 d.prevents = value

@@ -285,6 +285,59 @@ class TestParsing(unittest.TestCase):
         self.assertIn("UTF-8", prd.assumptions[0])
 
 
+class TestArchitectureFormats(unittest.TestCase):
+    """Parser format robustness for architecture decisions."""
+
+    def test_ad_prefix_accepted(self):
+        """BMAD template uses AD-N, plan.py says AR-N — accept both."""
+        arch = parse_architecture(
+            "### AD-1 — Single write path\n\n"
+            "- **Rule:** all writes through store/.\n"
+            "- **Binds:** FR-1, FR-2\n"
+        )
+        self.assertEqual(len(arch.decisions), 1)
+        self.assertEqual(arch.decisions[0].id, "AD-1")
+        self.assertIn("FR-1", arch.decisions[0].binds)
+
+    def test_ar_prefix_still_works(self):
+        arch = parse_architecture("### AR-1 — Luật nền\n\n- **Rule:** luôn đúng.\n")
+        self.assertEqual(arch.decisions[0].id, "AR-1")
+
+    def test_ad_cross_references_in_binds(self):
+        arch = parse_architecture(
+            "### AD-1 — Rule A\n- **Rule:** x\n- **Binds:** all\n\n"
+            "### AD-2 — Rule B\n- **Rule:** y\n- **Binds:** AD-1, FR-3\n"
+        )
+        self.assertIn("AD-1", arch.by_id("AD-2").binds)
+        self.assertIn("FR-3", arch.by_id("AD-2").binds)
+
+
+class TestEpicsFormats(unittest.TestCase):
+    """Heading level flexibility for epics/stories."""
+
+    def test_epic_heading_level_3(self):
+        """LLM might use ### instead of ## for epic headings."""
+        from aisef.control.normalize import parse_epics
+        plan = parse_epics(
+            "### Epic 1: Setup\n\n"
+            "#### Story 1.1: Init\n\n"
+            "As a dev,\nI want setup,\nSo that it works.\n\n"
+            "**Acceptance Criteria:**\n- Works\n"
+        )
+        self.assertEqual(len(plan.epics), 1)
+        self.assertEqual(len(plan.epics[0].stories), 1)
+
+    def test_story_heading_level_4(self):
+        """LLM might use #### instead of ### for story headings."""
+        from aisef.control.normalize import parse_epics
+        plan = parse_epics(
+            "## Epic 1: Setup\n\n"
+            "#### Story 1.1: Init\n\nAs a dev,\nI want setup,\nSo that it works.\n\n"
+            "**Acceptance Criteria:**\n- Works\n"
+        )
+        self.assertEqual(len(plan.epics[0].stories), 1)
+
+
 class TestArchitecture(unittest.TestCase):
     """Đọc architecture.md thật (26KB, 20 quyết định, do BMAD sinh)."""
 
