@@ -414,6 +414,9 @@ def run_suite(
 
             import shlex
 
+            if artifact_root:
+                from ..harness.runlog import run_log
+                run_log(artifact_root, f"qa:{kind.id} RUN cmd={command}")
             sb = sandbox.run(
                 sandbox.SandboxSpec(
                     workspace=cay,
@@ -444,6 +447,11 @@ def run_suite(
             result.unrunnable = _unrunnable_reason(
                 getattr(sb, "exit_code", 0), day_du, getattr(sb, "provider_error", ""))
             report.results.append(result)
+            if artifact_root:
+                from ..harness.runlog import run_log
+                status = "PASS" if sb.ok else "FAIL"
+                unrun = f" unrunnable" if result.unrunnable else ""
+                run_log(artifact_root, f"qa:{kind.id} {status} {sb.duration_ms}ms{unrun}")
             if store:
                 store.tool_run(
                     story_id, f"qa:{kind.id}", ok=sb.ok, duration_ms=sb.duration_ms,

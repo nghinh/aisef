@@ -622,6 +622,7 @@ def run_attempt(
         evidence=evidence, artifact_root=artifact_root, number=number,
         changed=changed_now,
     )
+    run_log(artifact_root, f"story={story.id}#{number} candidate frozen sha={attempt.candidate[:8]}")
     return verify_candidate(
         story, project=project, workdir=workdir, artifact_root=artifact_root,
         client=client, config=config, catalog=catalog, architecture=architecture,
@@ -791,6 +792,12 @@ def verify_candidate(
     paths -- no relaxation, just no paying to rebuild what already exists.
     """
     sid, sha, number = story.id, attempt.candidate, attempt.number
+    from ..harness.runlog import run_log
+
+    def _log(msg: str) -> None:
+        run_log(artifact_root, msg)
+
+    _log(f"story={sid}#{number} verify START sha={sha[:8]}")
     evidence = EvidenceStore(artifact_root, candidate=sha)
     # Read **once, before** re-running anything: re-run checks write new
     # events, and keep/run decisions must be based on evidence at entry time.
@@ -801,6 +808,8 @@ def verify_candidate(
         if not reuse:
             return False
         (attempt.kept if sufficient else attempt.reran).append(name)
+        if sufficient:
+            _log(f"story={sid}#{number} {name} KEPT (reuse)")
         return sufficient
 
     # Nop control (ADR-005 V3) right after freeze: story's tests at parent SHA.
@@ -818,12 +827,16 @@ def verify_candidate(
                 config=config, candidate=sha,
             ))
             chay_lai.append(tool)
+            last = evidence.read(sid).last(TOOL_RUN, tool)
+            _log(f"story={sid}#{number} {tool} {'PASS' if last and last.ok else 'FAIL'}")
 
     # Tests always green because they assert nothing is worse than no tests:
     # it makes the "tests green" gate meaningless.  Checking is cheap, run every attempt.
     if not keep("qa:fake-tests", reuse and _green_at(ev, TOOL_RUN, "qa:fake-tests", sha)):
         fake = find_fake_tests(workdir, changed)
         evidence.tool_run(sid, "qa:fake-tests", ok=not fake, detail={"files": fake})
+        if fake:
+            _log(f"story={sid}#{number} qa:fake-tests FAIL {len(fake)} file(s)")
 
     # Story's verification contract: run exactly the kinds it must pass.
     # Not a new phase -- same `run_suite` machinery, just scoped.
@@ -853,12 +866,14 @@ def verify_candidate(
             clean=False,
         ))
         chay_lai += [f"qa:{k}" for k in kinds]
+        _log(f"story={sid}#{number} qa suite ran={','.join(kinds)}")
     if repeat > 1:
         _repeat_note(evidence, sid, sha, k=repeat, checks=chay_lai, attempt=number)
 
     screens = [m for m in man_hinh
                if not keep(f"mockup:{m}", reuse and _green_at(ev, MOCKUP_MAP, m, sha))]
     if screens and contract:
+        _log(f"story={sid}#{number} mockup verify screens={','.join(screens)}")
         mockup_verify.verify_screens(
             workdir, contract, screens,
             config=config, story_id=sid, artifact_root=artifact_root,
@@ -895,6 +910,8 @@ def verify_candidate(
             ok=not attempt.review_findings,
             detail={"findings": attempt.review_findings, "attempt": number},
         )
+        n_blocking = len(attempt.review_findings)
+        _log(f"story={sid}#{number} review {'PASS' if not n_blocking else f'FAIL blocking={n_blocking}'}")
 
     if config.get("security.semantic_review", True):
         security_ev = _at(ev, TOOL_RUN, "security", sha) if reuse else None
@@ -915,11 +932,12 @@ def verify_candidate(
                 candidate=sha,
                 preservation=preservation,
             )
+            sec_ok = not (attempt.security.error
+                         or attempt.security.blocking(config["security.block_severities"]))
             evidence.tool_run(
                 sid,
                 "security",
-                ok=not (attempt.security.error
-                        or attempt.security.blocking(config["security.block_severities"])),
+                ok=sec_ok,
                 detail={
                     "findings": [f.line() for f in attempt.security.findings],
                     "filtered": len(attempt.security.filtered),
@@ -927,6 +945,8 @@ def verify_candidate(
                     "attempt": number,
                 },
             )
+            _log(f"story={sid}#{number} security {'PASS' if sec_ok else 'FAIL'} "
+                 f"findings={len(attempt.security.findings)} filtered={len(attempt.security.filtered)}")
 
     dau_vao = dict(
         changed=changed,
@@ -959,6 +979,11 @@ def verify_candidate(
                 # `evidence` pointer -- replay/bench reads from here, not from summary.
                 "checks": [c.as_dict() for c in attempt.gate.checks]},
     ))
+    if attempt.ok:
+        _log(f"story={sid}#{number} gate PASSED")
+    else:
+        fails = ",".join(c.name for c in attempt.gate.failures)[:120]
+        _log(f"story={sid}#{number} gate FAILED: {fails}")
     return attempt
 
 
@@ -991,6 +1016,8 @@ def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Co
     are already green there -- nop level 1 must know to avoid false
     positives (ADR-005 V3).
     """
+    from ..harness.runlog import run_log
+    run_log(artifact_root, f"story={story.id} baseline START")
     if not config.get("verify.baseline", True):
         EvidenceStore(artifact_root).tool_run(story.id, BASELINE_RUN, ok=False, detail={
             "baseline": True, "disabled": True,
@@ -1003,6 +1030,7 @@ def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Co
         "baseline": True, "parent": head_sha(workdir), "base_ref": base_ref,
         "red_before": log.failed[:MAX_IDS],
     })
+    run_log(artifact_root, f"story={story.id} baseline DONE ok={res.ok} red_before={len(log.failed)}")
 
 
 def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
@@ -1030,14 +1058,18 @@ def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
     test files -> records `files: []`, nothing built.
     """
     from ..control.worktree import GitError, WorktreeManager, main_repo
+    from ..harness.runlog import run_log
 
     store = EvidenceStore(artifact_root, candidate=candidate)
     if not config.get("verify.nop", True):
+        run_log(artifact_root, f"story={story.id} nop SKIP disabled")
+
         store.tool_run(story.id, NOP_RUN, ok=False, detail={
             "nop": True, "disabled": True, "skipped": "disabled by config `verify.nop`"})
         return
     test_files = [f for f in changed if is_test_path(f)]
     if not test_files:
+        run_log(artifact_root, f"story={story.id} nop SKIP no test files changed")
         store.tool_run(story.id, NOP_RUN, ok=False, detail={
             "nop": True, "files": [], "skipped": "story did not add/modify test files"})
         return
@@ -1049,6 +1081,7 @@ def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
             "unrunnable": "cannot determine parent SHA (no fork point or baseline)"})
         return
 
+    run_log(artifact_root, f"story={story.id} nop START parent={parent_ref[:8]} test_files={len(test_files)}")
     wt = WorktreeManager(main_repo(workdir))
     nop_id = f"{story.id}-nop"
     try:
@@ -1064,7 +1097,9 @@ def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
         res = run_tool("test", tmp_path, config=config)   # story_id empty: recorded below, under its own name
         record_tool(res, story.id, artifact_root, candidate, name=NOP_RUN, extra={
             "nop": True, "parent": parent_ref, "base_ref": base_ref, "files": test_files[:50]})
+        run_log(artifact_root, f"story={story.id} nop DONE ok={res.ok} {res.duration_ms}ms")
     except GitError as e:
+        run_log(artifact_root, f"story={story.id} nop ERROR {e}")
         store.tool_run(story.id, NOP_RUN, ok=False, detail={
             "nop": True, "parent": parent_ref, "files": test_files[:50],
             "unrunnable": f"cannot create worktree at parent SHA: {e}"})
@@ -1328,6 +1363,8 @@ def review_story_v2(
             + "; ".join(delta)
         )
 
+    from ..harness.runlog import run_log
+    run_log(artifact_root, f"story={story.id}#{number} review START changed={len(changed)}")
     store.handoff(story.id, frm=DEVELOPER, to=REVIEWER, attempt=number,
                   slots=handoff_slots(context))
     spec = build_spec(
@@ -1353,10 +1390,15 @@ def review_story_v2(
     }
 
     _attach_settings(spec, project)
+    run_log(artifact_root, f"story={story.id}#{number} review agent START prompt={len(spec.prompt)}ch")
     result, reverted = _review_session(
         client, spec, store=store, story_id=story.id, artifact_root=artifact_root,
         workdir=workdir, name=f"{story.id}-review", role="review", number=number,
     )
+    run_log(artifact_root, (
+        f"story={story.id}#{number} review agent DONE ok={result.ok} "
+        f"${result.cost_usd:.2f} turns={getattr(result, 'num_turns', '?')}"
+    ))
     if reverted:
         store.tool_run(
             story.id, "review:immutable", ok=False, detail={"changed": reverted[:20]},
@@ -1463,6 +1505,8 @@ def security_review(
         workdir, changed, command=str(config.get("review.impact_provider", "") or "")
     ).as_prompt()
 
+    from ..harness.runlog import run_log
+    run_log(artifact_root, f"story={story.id}#{number} security START changed={len(changed)}")
     store = EvidenceStore(artifact_root, candidate=candidate)
     store.handoff(story.id, frm=REVIEWER, to=SECURITY, attempt=number,
                   slots=handoff_slots(context))
@@ -1486,10 +1530,15 @@ def security_review(
         ENV_ALLOW_HOSTS: ",".join(config["sandbox.allow_hosts"]) if config else "",
     }
     _attach_settings(spec, project)
+    run_log(artifact_root, f"story={story.id}#{number} security agent START prompt={len(spec.prompt)}ch")
     result, reverted = _review_session(
         client, spec, store=store, story_id=story.id, artifact_root=artifact_root,
         workdir=workdir, name=f"{story.id}-security", role="security", number=number,
     )
+    run_log(artifact_root, (
+        f"story={story.id}#{number} security agent DONE ok={result.ok} "
+        f"${result.cost_usd:.2f} turns={getattr(result, 'num_turns', '?')}"
+    ))
     if reverted:
         store.tool_run(
             story.id, "security:immutable", ok=False, detail={"changed": reverted[:20]},

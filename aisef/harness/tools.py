@@ -215,6 +215,9 @@ def run_tool(
         return res
 
     argv = shlex.split(command) + (extra_args or [])
+    if artifact_root:
+        from .runlog import run_log
+        run_log(artifact_root, f"tool={name} RUN cmd={command}")
     level = TOOLS[name].level
     if cfg["sandbox.tools_network"] and level is not sandbox.Level.READ_ONLY:
         # Project needs to install deps before tests can run. Enabling
@@ -248,6 +251,11 @@ def run_tool(
             provider_error=sb.provider_error,
         )
     res.log = record(res, story_id, artifact_root, candidate)
+    if artifact_root:
+        from .runlog import run_log
+        status = "SKIP" if res.skipped else ("PASS" if res.ok else "FAIL")
+        unrun = f" unrunnable={res.unrunnable}" if res.unrunnable else ""
+        run_log(artifact_root, f"tool={name} {status} exit={sb.exit_code} {sb.duration_ms}ms{unrun}")
     return res
 
 
