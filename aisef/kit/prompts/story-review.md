@@ -1,6 +1,6 @@
 ---
 name: story-review
-version: 8
+version: 9
 role: reviewer
 ---
 # Review {{ story_id }} — {{ story_title }}
@@ -49,6 +49,18 @@ the gate is a `[block]` item.
 ## Must be green on the candidate
 
 {{ validation }}
+
+## What you already said about this story
+
+An item you previously tagged `should fix` **cannot** become `[block]`
+now: it was advisory the first time you saw it, so it stays advisory. A
+story whose author fixes every blocker only to be blocked by the next
+tier down can never pass, so the harness demotes such items back
+automatically — spending a `[block]` on one only removes it from your
+report. An item you tagged `[block]` that is still not fixed: block it
+again, in the same words, so the author sees it is the same item.
+
+{{ prior_review }}
 
 ## Review in this order
 

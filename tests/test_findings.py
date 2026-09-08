@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT))
 
 from aisef.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
 from aisef.clients.stream import RunResult  # noqa: E402
-from aisef.harness.observe import NOTE, EvidenceStore  # noqa: E402
+from aisef.harness.observe import NOTE, Event, EvidenceStore  # noqa: E402
 from aisef.phases.implement import (  # noqa: E402
     REVIEWS_DIR,
     _reconcile,
@@ -193,6 +193,55 @@ class TestSchemaVaHoiLai(SchemaTestCase):
         got = _reconcile("STORY-01-01", EvidenceStore(self.root), text, review_verdict(text), role="review")
         self.assertEqual(len(plan_defects(got)), 1)
         self.assertIn("review:mismatch", self.notes())
+
+    def _da_khuyen_nghi(self, sha: str, tag: str = "should fix"):
+        """Lượt trước ở bản `sha`: đúng mục này chỉ được xếp *nên sửa*."""
+        EvidenceStore(self.root, candidate=sha).record("STORY-01-01", Event(
+            kind=NOTE, name="review:verdict", ok=True,
+            detail={"verdict": "block", "findings": [
+                {"tag": tag, "file": "src/a.py", "line": 27,
+                 "why": "test chỉ kiểm một trường", "behavior_id": "AC-1"}]},
+        ))
+
+    def _luot_sau(self, text: str, sha: str = "bbb"):
+        return _reconcile("STORY-01-01", EvidenceStore(self.root, candidate=sha),
+                          text, review_verdict(text), role="review")
+
+    #: Lượt sau nâng đúng mục đó lên chặn.
+    NANG_CAP = """- [block] src/a.py:31 — test chỉ kiểm một trường
+
+```json
+{"verdict": "block", "findings": [
+  {"tag": "block", "file": "src/a.py", "line": 31,
+   "why": "test chỉ kiểm một trường", "behavior_id": "AC-1"}]}
+```
+"""
+
+    def test_muc_da_xep_nen_sua_khong_duoc_nang_thanh_chan(self):
+        """Nâng *nên sửa* của lượt trước thành *chặn* là dời cột mốc: tác giả
+        sửa hết mục chặn rồi bị chặn bởi tầng dưới, story cháy hết lượt mà
+        không hội tụ (todo/STORY-01-01)."""
+        self._da_khuyen_nghi("aaa")
+        self.assertEqual(self._luot_sau(self.NANG_CAP), [], "phải hạ về nên sửa")
+        self.assertIn("review:no-escalation", self.notes())
+        self.assertEqual(self.notes()["review:verdict"]["verdict"], "pass")
+
+    def test_muc_da_chan_lan_truoc_van_duoc_chan_lai(self):
+        """Chưa sửa thì chặn tiếp — quy tắc chỉ cấm *nâng cấp*, không xoá trí nhớ."""
+        self._da_khuyen_nghi("aaa", tag="block")
+        self.assertEqual(len(self._luot_sau(self.NANG_CAP)), 1)
+        self.assertNotIn("review:no-escalation", self.notes())
+
+    def test_muc_moi_o_tep_do_van_chan_duoc(self):
+        """Hạ cấp theo (tệp, behavior_id): tiêu chí khác trong cùng tệp vẫn chặn."""
+        self._da_khuyen_nghi("aaa")
+        text = self.NANG_CAP.replace('"AC-1"', '"AC-9"')
+        self.assertEqual(len(self._luot_sau(text)), 1)
+
+    def test_ket_luan_cua_chinh_luot_nay_khong_tinh_la_lan_truoc(self):
+        """Ghi nhận của cùng bản là kết luận hiện tại, không phải lập trường cũ."""
+        self._da_khuyen_nghi("bbb")
+        self.assertEqual(len(self._luot_sau(self.NANG_CAP, sha="bbb")), 1)
 
     def test_merge_giu_thu_tu_van_ban_truoc(self):
         hop, lech = merge_findings(["[chặn] a.py:1 — x"], ["[chặn] a.py:2 — x"])

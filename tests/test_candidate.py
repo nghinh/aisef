@@ -140,6 +140,19 @@ class TestGateCandidate(GateCandidateTestCase):
         self.assertIs(self.muc(g).outcome, Outcome.PASSED)
         self.assertTrue(g.passed, g.summary())
 
+    def test_dau_vi_pham_mot_lan_khong_lam_ban_sau_stale(self):
+        """`review:immutable` chỉ ghi khi người rà soát sửa cây, không bao giờ
+        chạy lại ở lượt sạch. Kể nó là một phép kiểm thì một vi phạm cũ đánh
+        stale mọi bản về sau và story không bao giờ qua được (todo/STORY-01-01).
+        """
+        self.xanh("aaa")
+        EvidenceStore(self.root, candidate="aaa").tool_run(
+            "S-01", "review:immutable", ok=False, detail={"changed": ["src/a.py"]})
+        self.xanh("bbb")
+        g = self.gate("bbb")
+        self.assertIs(self.muc(g).outcome, Outcome.PASSED, self.muc(g).detail)
+        self.assertTrue(g.passed, g.summary())
+
     def test_khong_truyen_candidate_thi_khong_kiem(self):
         """Test cũ, chạy tay, nhật ký cũ — không kiểm, và nói rõ là không."""
         self.xanh("aaa")

@@ -139,13 +139,23 @@ def _stale_candidates(evidence: Evidence, candidate: str) -> list[str]:
                    if str(e.detail["candidate"]) != candidate})
 
 
+#: Records written **only** when a role misbehaves (`review:immutable`,
+#: `security:candidate`, …), never re-written on a clean attempt. They are
+#: violation stamps, not repeatable checks: counting them as checks means one
+#: old violation marks every later build stale forever and the story can never
+#: pass — todo/STORY-01-01 exhausted its attempts on a `review:immutable`
+#: recorded three candidates earlier, after its cause was already fixed.
+ONE_SHOT_SUFFIXES = (":immutable", ":candidate")
+
+
 def _latest_per_check(evidence: Evidence) -> dict[tuple[str, str], Event]:
     """**Latest** result of each check (kind + name) that declares a candidate —
     exactly the events the "evidence matches candidate" check reads, so its
     `evidence` field points here."""
     moi_nhat: dict[tuple[str, str], Event] = {}
     for e in evidence.events:
-        if e.kind in (TOOL_RUN, MOCKUP_MAP) and e.detail.get("candidate"):
+        if (e.kind in (TOOL_RUN, MOCKUP_MAP) and e.detail.get("candidate")
+                and not e.name.endswith(ONE_SHOT_SUFFIXES)):
             moi_nhat[(e.kind, e.name)] = e
     return moi_nhat
 

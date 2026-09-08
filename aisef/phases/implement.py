@@ -390,6 +390,7 @@ SLOT_SOURCE = {
     "tools": "config", "skills": "router", "diff_summary": "git", "impact": "code",
     "repo_map": "code", "blast_radius": "code",
     "index": "ledger", "preservation": "ledger", "validation": "ledger",
+    "prior_review": "evidence",
 }
 
 #: Slots allowed to be empty when building the prompt: `repo_map` empty means
@@ -1362,6 +1363,7 @@ def review_story_v2(
     # that is a judgment call.
     delta = tdd.test_delta(workdir, base_ref=base_ref, changed=changed)
     store = EvidenceStore(artifact_root, candidate=candidate)
+    context["prior_review"] = _prior_review(store, story.id, role="review")
     store.record(
         story.id, Event(kind=NOTE, name="qa:test-delta", ok=not delta, detail={"files": delta})
     )
@@ -1453,6 +1455,14 @@ def _reconcile(story_id: str, ev: EvidenceStore, text: str,
         ev.record(story_id, Event(kind=NOTE, name=f"{role}:no-schema", ok=False,
                                   detail={"findings": tu_van_ban, "retried": True}))
         return tu_van_ban
+    ha_cap = _no_escalation(story_id, ev, verdict, role=role)
+    if ha_cap:
+        # Text version repeats the same items; drop the ones whose file no
+        # longer has a blocking finding, or the union would put them back.
+        tu_van_ban = [
+            x for x in tu_van_ban
+            if not (_finding_key(x)[0] == "block" and _finding_key(x)[1] in ha_cap)
+        ]
     tu_json = verdict.blocking()
     hop, lech = merge_findings(tu_van_ban, tu_json)
     if lech:
@@ -1465,6 +1475,79 @@ def _reconcile(story_id: str, ev: EvidenceStore, text: str,
         detail={"verdict": verdict.verdict, "findings": verdict.findings},
     ))
     return hop
+
+
+def _prior_review(ev: EvidenceStore, story_id: str, *, role: str) -> str:
+    """The reviewer's own findings on the previous candidate of this story.
+
+    Without it every attempt reviews from scratch and re-ranks its own
+    advisory items into blockers; see `_no_escalation`, which enforces
+    deterministically what this section asks for.
+    """
+    truoc = [e for e in ev.read(story_id).of(NOTE, f"{role}:verdict")
+             if str(e.detail.get("candidate") or "") != ev.candidate]
+    if not truoc:
+        return "_(first review of this story — nothing said before)_"
+    e = truoc[-1]
+    dong = [
+        f"- [{f.get('tag') or 'should fix'}] {_finding_body(f)}"
+        for f in (e.detail.get("findings") or [])
+    ]
+    sha = str(e.detail.get("candidate") or "")[:7]
+    return "\n".join([f"On candidate `{sha}` you reported:", "", *dong]) if dong else (
+        f"On candidate `{sha}` you reported no findings."
+    )
+
+
+def _no_escalation(story_id: str, ev: EvidenceStore, verdict: Verdict, *,
+                   role: str) -> set[str]:
+    """Demote blocking findings this reviewer itself filed as **advisory** on an
+    earlier candidate of the same story; return the files left with no blocker.
+
+    Promoting yesterday's `should fix` into today's `block` moves the goal
+    posts: the author fixes what blocked, the reviewer blocks the next tier
+    down, and the story burns every attempt without converging — todo
+    STORY-01-01 died exactly that way, every blocking item of attempts 2 and 3
+    having been advisory in attempt 1.  Either an item blocks the first time it
+    is seen, or it stays advisory.  It is still reported, just not as a blocker,
+    and the demotion is recorded rather than applied silently.
+
+    Match is `(file, behavior_id)`.  Findings carrying no `behavior_id` collide
+    per file — deliberately loose: erring toward convergence costs an advisory
+    line in the report, erring the other way costs the whole story.
+    """
+    truoc: set[tuple[str, str]] = set()
+    for e in ev.read(story_id).of(NOTE, f"{role}:verdict"):
+        if str(e.detail.get("candidate") or "") == ev.candidate:
+            continue  # this build's own verdict, not a previous position
+        for f in e.detail.get("findings") or []:
+            if str(f.get("tag") or "").lower() not in _JSON_BLOCK_TAGS + _JSON_STUCK_TAGS:
+                truoc.add((str(f.get("file") or ""), str(f.get("behavior_id") or "")))
+    truoc.discard(("", ""))
+    if not truoc:
+        return set()
+
+    ha_cap: list[dict] = []
+    for f in verdict.findings:
+        if (str(f.get("tag") or "").lower() in _JSON_BLOCK_TAGS
+                and (str(f.get("file") or ""), str(f.get("behavior_id") or "")) in truoc):
+            f["tag"] = "should fix"
+            ha_cap.append(f)
+    if not ha_cap:
+        return set()
+
+    con_chan = {str(f.get("file") or "") for f in verdict.findings
+                if str(f.get("tag") or "").lower() in _JSON_BLOCK_TAGS + _JSON_STUCK_TAGS}
+    if verdict.verdict != "pass" and not con_chan:
+        # Every blocker was a re-escalation.  Leaving the verdict at `block`
+        # makes `Verdict.blocking()` synthesise "concluded block but listed no
+        # findings" and the story stays stuck on nothing.
+        verdict.verdict = "pass"
+    ev.record(story_id, Event(
+        kind=NOTE, name=f"{role}:no-escalation", ok=True,
+        detail={"demoted": ha_cap, "verdict": verdict.verdict},
+    ))
+    return {str(f.get("file") or "") for f in ha_cap} - con_chan
 
 
 def security_review(

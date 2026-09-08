@@ -49,6 +49,7 @@ STORY_CTX = {
     "impact": "_Chưa có phân tích ảnh hưởng_",
     "repo_map": "## Code map around write scope — static hint, not ground truth\n\n`src/a.ts`",
     "blast_radius": "_(greenfield — không có blast radius)_",
+    "prior_review": "_(first review of this story — nothing said before)_",
 }
 
 
