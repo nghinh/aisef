@@ -295,12 +295,12 @@ def reconcile_story(
         return Reconciled(story_id, "roll-forward",
                           "already merged to main branch, rolling status forward")
 
-    dang_do = j.open_attempt()
-    ket = cur in (StoryStatus.RUNNING, StoryStatus.VERIFYING)
-    if not dang_do and not ket:
+    in_progress = j.open_attempt()
+    stale = cur in (StoryStatus.RUNNING, StoryStatus.VERIFYING)
+    if not in_progress and not stale:
         return None
 
-    if worktrees is not None and (dang_do or ket):
+    if worktrees is not None and (in_progress or stale):
         # Branch is kept: commits in it are real work.
         worktrees.remove(story_id, delete_branch=False)
     if cur is not StoryStatus.DONE:

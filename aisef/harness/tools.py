@@ -129,8 +129,8 @@ class ToolResult:
         if self.skipped:
             return f"{self.name}: skipped — {self.skipped}"
         mark = "✅" if self.ok else "✗"
-        thieu = ", ".join(self.detail.get("missing") or [])
-        extra = f" (sandbox degraded — missing {thieu or 'guarantees'})" if self.degraded else ""
+        missing = ", ".join(self.detail.get("missing") or [])
+        extra = f" (sandbox degraded — missing {missing or 'guarantees'})" if self.degraded else ""
         return f"{mark} {self.name} — exit {self.exit_code}, {self.duration_ms}ms{extra}"
 
     def output(self) -> tuple[str, int]:

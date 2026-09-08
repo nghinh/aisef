@@ -153,10 +153,10 @@ class Report:
 
         # How many gate checks are **fully qualified** (positive · negative · env)
         # — read from the test table, not from "gate has N conditions" counting.
-        du = sum(all(v.values()) for v in self.qualification.values())
-        tong = len(self.qualification) or len(CHECK_NAMES)
+        qualified = sum(all(v.values()) for v in self.qualification.values())
+        total = len(self.qualification) or len(CHECK_NAMES)
         lines += ["", f"**Story Gate:** gate checks with all 3 controls: "
-                      f"{du if self.qualification else '?'}/{tong} "
+                      f"{qualified if self.qualification else '?'}/{total} "
                       f"(`tests/test_gate_qualification.py`; `?` = no `tests/` directory)"]
 
         lines += ["", "## 4. Six Harness Groups", "", "| Group | Evidence |", "|---|---|"]
@@ -351,11 +351,11 @@ def _ac_cell(sid: str, n: int, ev) -> str:
 
     if n <= 0:
         return "—"
-    xanh = [e for e in ev.of(TOOL_RUN, "test") if e.ok]
-    if not xanh or not xanh[-1].detail.get("test_format"):
+    green = [e for e in ev.of(TOOL_RUN, "test") if e.ok]
+    if not green or not green[-1].detail.get("test_format"):
         return f"?/{n}"
-    thieu = ac_missing(sid, n, list(xanh[-1].detail.get("test_ids") or []))
-    return f"{n - len(thieu)}/{n}"
+    missing = ac_missing(sid, n, list(green[-1].detail.get("test_ids") or []))
+    return f"{n - len(missing)}/{n}"
 
 
 def _read_index(root: Path) -> dict:

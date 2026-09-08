@@ -290,14 +290,14 @@ def verify_structure(skill_dir: Path) -> Verification:
     else:
         v.checks.append("có description")
 
-    hong = []
+    broken = []
     for rel in _LINK.findall(text):
         if rel.startswith(("http://", "https://", "mailto:")):
             continue
         if not (skill_dir / rel).exists():
-            hong.append(rel)
-    if hong:
-        v.gaps.append(f"link hỏng: {', '.join(hong[:5])}")  # không phải ✗: cảnh báo
+            broken.append(rel)
+    if broken:
+        v.gaps.append(f"link hỏng: {', '.join(broken[:5])}")  # không phải ✗: cảnh báo
     else:
         v.checks.append("link tương đối trỏ tới tệp có thật")
 
@@ -320,9 +320,9 @@ def verify_structure(skill_dir: Path) -> Verification:
     # needs sandbox + time budget; upgrade to smoke `--help` when there's a benchmark.
     scripts = _scripts(skill_dir)
     if scripts:
-        hong = [rel for rel in (script_broken(p, skill_dir) for p in scripts) if rel]
-        if hong:
-            v.gaps.append(f"✗ scripts không biên dịch được: {', '.join(hong[:3])}")
+        broken = [rel for rel in (script_broken(p, skill_dir) for p in scripts) if rel]
+        if broken:
+            v.gaps.append(f"✗ scripts không biên dịch được: {', '.join(broken[:3])}")
         else:
             v.checks.append(f"scripts: {len(scripts)} tệp biên dịch được")
 

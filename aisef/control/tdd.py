@@ -73,12 +73,12 @@ def test_delta(workdir: Path | str, *, base_ref: str, changed: list[str]) -> lis
     for f in changed:
         if not is_test_path(f):
             continue
-        truoc = _git(workdir, "show", f"{base_ref}:{f}")
-        if not truoc:
+        before = _git(workdir, "show", f"{base_ref}:{f}")
+        if not before:
             continue
         p = workdir / f
-        sau = p.read_text(encoding="utf-8", errors="replace") if p.is_file() else ""
-        n0, n1 = len(TEST_FUNC.findall(truoc)), len(TEST_FUNC.findall(sau))
+        after = p.read_text(encoding="utf-8", errors="replace") if p.is_file() else ""
+        n0, n1 = len(TEST_FUNC.findall(before)), len(TEST_FUNC.findall(after))
         if n1 < n0:
             out.append(f"{f}: {n0} → {n1}")
     return out

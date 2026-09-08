@@ -589,8 +589,8 @@ def check_completion(evidence) -> Verdict:
 
 def project_root_from(env: dict[str, str] | None, fallback: str) -> str:
     """Project root for guards: harness env wins, compiled `--project` is fallback."""
-    goc = (env if env is not None else os.environ).get(ENV_PROJECT, "").strip()
-    return goc or fallback
+    root = (env if env is not None else os.environ).get(ENV_PROJECT, "").strip()
+    return root or fallback
 
 
 def scope_from_env(env: dict[str, str] | None = None) -> list[str]:

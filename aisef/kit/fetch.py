@@ -75,27 +75,27 @@ def _at_commit(d: Path, commit: str) -> bool:
 def _clone(source: Source, dest: Path) -> str:
     """Shallow-clone a single commit. Return empty string on success, error message otherwise."""
     dest.parent.mkdir(parents=True, exist_ok=True)
-    tam = dest.with_name(dest.name + ".dang-lay")
-    shutil.rmtree(tam, ignore_errors=True)
+    tmp = dest.with_name(dest.name + ".dang-lay")
+    shutil.rmtree(tmp, ignore_errors=True)
     try:
         for cmd in (
-            ["git", "init", "--quiet", str(tam)],
-            ["git", "-C", str(tam), "remote", "add", "origin", source.repo],
-            ["git", "-C", str(tam), "fetch", "--quiet", "--depth", "1",
+            ["git", "init", "--quiet", str(tmp)],
+            ["git", "-C", str(tmp), "remote", "add", "origin", source.repo],
+            ["git", "-C", str(tmp), "fetch", "--quiet", "--depth", "1",
              "--no-tags", "origin", source.commit],
-            ["git", "-C", str(tam), "checkout", "--quiet", "FETCH_HEAD"],
+            ["git", "-C", str(tmp), "checkout", "--quiet", "FETCH_HEAD"],
         ):
             r = subprocess.run(cmd, capture_output=True, text=True,
                                timeout=CLONE_TIMEOUT)
             if r.returncode != 0:
-                loi = (r.stderr or r.stdout).strip().splitlines()
-                return loi[-1] if loi else f"git exited {r.returncode}"
+                error = (r.stderr or r.stdout).strip().splitlines()
+                return error[-1] if error else f"git exited {r.returncode}"
     except subprocess.TimeoutExpired:
         return f"exceeded {CLONE_TIMEOUT}s"
     except OSError as e:
         return str(e)
     shutil.rmtree(dest, ignore_errors=True)
-    tam.replace(dest)
+    tmp.replace(dest)
     return ""
 
 
@@ -113,16 +113,16 @@ def ensure(
     """
     root = Path(root) if root is not None else default_root()
     cat = catalog or Catalog.load()
-    bao = FetchReport()
+    report = FetchReport()
     for source in cat.sources:
         if only and source.id not in only:
             continue
         dest = _dir_of(source, root)
         if _at_commit(dest, source.commit):
-            bao.already.append(source.id)
+            report.already.append(source.id)
             continue
-        loi = _clone(source, dest)
-        (bao.fetched if not loi else bao.failed).append(
-            source.id if not loi else (source.id, loi)
+        error = _clone(source, dest)
+        (report.fetched if not error else report.failed).append(
+            source.id if not error else (source.id, error)
         )
-    return bao
+    return report

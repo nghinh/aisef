@@ -129,8 +129,8 @@ class Routing:
                  "that needs it**, do not open all at once:", ""]
         for p in self.picked:
             why = p.rationale[0] if p.rationale else ""
-            dung = f" — dùng khi: {p.entry.use_when}" if p.entry.use_when else ""
-            lines.append(f"- `{p.entry.id}`{dung}\n  vì sao chọn: {why}. Đường dẫn: `{p.entry.path}`")
+            hint = f" — dùng khi: {p.entry.use_when}" if p.entry.use_when else ""
+            lines.append(f"- `{p.entry.id}`{hint}\n  vì sao chọn: {why}. Đường dẫn: `{p.entry.path}`")
         return "\n".join(lines)
 
 

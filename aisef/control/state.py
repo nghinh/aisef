@@ -225,14 +225,14 @@ class StateStore:
         semantics — fix on read, once, so every status query sees the same truth."""
         from .journal import JournalStore  # avoid circular import
 
-        doi = False
+        migrated = False
         store = JournalStore(self.root)
         for sid, rec in stories.items():
             if rec.state is StoryStatus.DONE and store.read(sid).needs_merge:
                 rec.status = StoryStatus.VERIFIED.value
                 rec.updated_at = _now()
-                doi = True
-        if doi:
+                migrated = True
+        if migrated:
             payload = json.loads(self.path.read_text(encoding="utf-8"))
             payload["stories"] = {sid: asdict(r) for sid, r in stories.items()}
             tmp = self.path.with_suffix(".json.tmp")

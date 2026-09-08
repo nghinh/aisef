@@ -174,7 +174,7 @@ def release_ready(report: Report, *, today: date | None = None,
         if run is None:
             return False, f"missing column for {client}"
         if not run.passed:
-            hong = [r.probe for r in run.results if not r.passed]
-            thieu = [p[0] for p in PROBES if p[0] not in {r.probe for r in run.results}]
-            return False, f"{client}: ✗ {', '.join(hong)}" if hong else f"{client}: missing {', '.join(thieu)}"
+            broken = [r.probe for r in run.results if not r.passed]
+            missing = [p[0] for p in PROBES if p[0] not in {r.probe for r in run.results}]
+            return False, f"{client}: ✗ {', '.join(broken)}" if broken else f"{client}: missing {', '.join(missing)}"
     return True, "conformance complete and current"

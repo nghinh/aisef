@@ -450,13 +450,13 @@ def _needs_from_names(story: Story, project: Path | None) -> list[Need]:
                 ))
     # A story only needs to report missing manifest **once**.
     seen: set[str] = set()
-    ket: list[Need] = []
+    needs: list[Need] = []
     for n in out:
         if n.capability in seen:
             continue
         seen.add(n.capability)
-        ket.append(n)
-    return ket
+        needs.append(n)
+    return needs
 
 
 def _exists_anywhere(project: Path, tok: str) -> bool:
@@ -468,11 +468,11 @@ def _exists_anywhere(project: Path, tok: str) -> bool:
     """
     if (project / tok).exists():
         return True
-    ten = tok.rstrip("/").rsplit("/", 1)[-1]
-    if not ten:
+    name = tok.rstrip("/").rsplit("/", 1)[-1]
+    if not name:
         return False
-    for goc in (project, project / "_bmad-output", project / "docs", project / "src"):
-        if (goc / ten).exists():
+    for root in (project, project / "_bmad-output", project / "docs", project / "src"):
+        if (root / name).exists():
             return True
     return False
 

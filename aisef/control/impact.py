@@ -96,19 +96,19 @@ class ImpactReport:
             "and do not ignore what it does not mention.",
             "",
         ]
-        for nhan, muc in (
+        for label, level in (
             ("Changed symbols", self.changed_symbols),
             ("Callers (outside diff)", self.callers),
             ("Related tests", self.related_tests),
             ("Symbols no test mentions", self.untested_symbols),
             ("Affected flows", self.flows),
         ):
-            if not muc:
+            if not level:
                 continue
-            lines.append(f"**{nhan}:**")
-            lines += [f"- `{m}`" for m in muc[:MAX_PER_KIND]]
-            if len(muc) > MAX_PER_KIND:
-                lines.append(f"- … {len(muc) - MAX_PER_KIND} more")
+            lines.append(f"**{label}:**")
+            lines += [f"- `{m}`" for m in level[:MAX_PER_KIND]]
+            if len(level) > MAX_PER_KIND:
+                lines.append(f"- … {len(level) - MAX_PER_KIND} more")
             lines.append("")
         if self.note:
             lines.append(f"_{self.note}_")
@@ -121,19 +121,19 @@ class ImpactReport:
         Unknown keys are ignored, missing keys default to empty: an external
         tool changing its format should not break an entire review session.
         """
-        def lay(*ten: str) -> list[str]:
-            for t in ten:
+        def extract(*names: str) -> list[str]:
+            for t in names:
                 v = raw.get(t)
                 if isinstance(v, list):
                     return [str(x) for x in v if str(x).strip()]
             return []
 
         return cls(
-            changed_symbols=lay("changed_symbols", "symbols", "changed"),
-            callers=lay("callers", "affected", "dependents", "affected_files"),
-            related_tests=lay("related_tests", "tests", "affected_tests"),
-            untested_symbols=lay("untested_symbols", "missing_tests", "test_gaps"),
-            flows=lay("flows", "affected_flows", "processes"),
+            changed_symbols=extract("changed_symbols", "symbols", "changed"),
+            callers=extract("callers", "affected", "dependents", "affected_files"),
+            related_tests=extract("related_tests", "tests", "affected_tests"),
+            untested_symbols=extract("untested_symbols", "missing_tests", "test_gaps"),
+            flows=extract("flows", "affected_flows", "processes"),
             source=source,
             note=str(raw.get("note") or ""),
         )
@@ -309,7 +309,7 @@ def builtin(project: Path | str, changed: list[str]) -> ImpactReport:
     """
     project = Path(project)
     rep = ImpactReport(source="builtin (name-based search)", degraded=True)
-    doi = set(changed)
+    changed_set = set(changed)
 
     names = sorted({n for syms in symbols(project, changed).values() for n, _, _ in syms})
     if not names:
@@ -325,7 +325,7 @@ def builtin(project: Path | str, changed: list[str]) -> ImpactReport:
         for rel, n in per_file.items():
             # The changed file itself is not a "caller" of itself; tests
             # **within** the diff do count — stories often write tests next to code.
-            if rel in doi and not is_test_path(rel):
+            if rel in changed_set and not is_test_path(rel):
                 continue
             score[rel] += w[name] * math.sqrt(n)
             if is_test_path(rel):

@@ -105,8 +105,8 @@ def cmd_setup(args) -> int:
     )
     if not args.no_fetch:
         print(f"Skill source: {references}")
-        bao = fetch.ensure(references)
-        print(bao.summary())
+        report = fetch.ensure(references)
+        print(report.summary())
         print()
     if not references.is_dir():
         print(f"✗ missing source directory: {references}", file=sys.stderr)

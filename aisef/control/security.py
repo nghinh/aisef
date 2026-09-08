@@ -74,20 +74,20 @@ class SecurityReport:
     def summary(self, severities=DEFAULT_BLOCKING) -> str:
         if self.error:
             return f"security: CANNOT SCORE — {self.error}"
-        chan = self.blocking(severities)
-        dem = ", ".join(f"{s}={n}" for s, n in self.counts.items() if n)
-        head = "security: " + ("FAIL" if chan else "pass")
-        if dem:
-            head += f" ({dem})"
+        blocking = self.blocking(severities)
+        counts_str = ", ".join(f"{s}={n}" for s, n in self.counts.items() if n)
+        head = "security: " + ("FAIL" if blocking else "pass")
+        if counts_str:
+            head += f" ({counts_str})"
         if self.filtered:
             head += f" · {len(self.filtered)} items filtered as noise"
-        lines = [head] + [f"  ✗ {f.line()}" for f in chan[:5]]
+        lines = [head] + [f"  ✗ {f.line()}" for f in blocking[:5]]
         return "\n".join(lines)
 
 
 def is_noise(text: str) -> bool:
     low = text.lower()
-    return any(any(m in low for m in nhom) for nhom in NOISE)
+    return any(any(m in low for m in group) for group in NOISE)
 
 
 def parse(text: str) -> SecurityReport:
@@ -101,12 +101,12 @@ def parse(text: str) -> SecurityReport:
         rep.error = "no results"
         return rep
 
-    sach = text.strip()
-    if not sach:
+    clean = text.strip()
+    if not clean:
         rep.error = "empty results"
         return rep
 
-    for raw in sach.splitlines():
+    for raw in clean.splitlines():
         m = _LINE.match(raw)
         if not m:
             continue
@@ -117,7 +117,7 @@ def parse(text: str) -> SecurityReport:
     if not rep.findings and not rep.filtered:
         # No findings **and** no "no findings" phrase means the report is
         # malformed — fundamentally different from "reviewed, clean".
-        if "no findings" not in sach.lower() and "không có phát hiện" not in sach.lower():
+        if "no findings" not in clean.lower() and "không có phát hiện" not in clean.lower():
             rep.error = "report does not follow the required format"
     return rep
 

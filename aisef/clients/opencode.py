@@ -62,9 +62,9 @@ def parse_json_events(lines) -> RunResult:
         if kind == "text":
             texts.append(str(part.get("text") or ""))
         elif kind == "tool_use":
-            ten = str(part.get("tool") or "")
+            name = str(part.get("tool") or "")
             state = part.get("state") or {}
-            res.tool_uses.append(ToolUse(name=_TOOL_NAMES.get(ten.lower(), ten), tool_use_id=str(part.get("callID") or ""),
+            res.tool_uses.append(ToolUse(name=_TOOL_NAMES.get(name.lower(), name), tool_use_id=str(part.get("callID") or ""),
                                          input=dict(state.get("input") or {})))
             if state.get("status") == "error":
                 res.guard_messages.append(str(state.get("output") or state.get("error") or "")[:300])

@@ -122,7 +122,7 @@ def _isolation_check(report: PreDeployReport, cfg: Config) -> Check:
         if report.qa and not any(r.ran for r in report.qa.results):
             return Check("isolation", Outcome.UNCONFIGURED, "no runs to determine")
         return Check("isolation", True, "verification ran inside Docker")
-    ten = ", ".join(
+    names = ", ".join(
         f"{r.kind.id} (missing {', '.join(r.missing) if r.missing else 'unknown guarantees'})"
         for r in degraded
     )
@@ -131,11 +131,11 @@ def _isolation_check(report: PreDeployReport, cfg: Config) -> Check:
         report.degraded_waiver = waiver
         return Check(
             "isolation", True,
-            f"degraded: {ten} — accepted per declaration: {waiver}",
+            f"degraded: {names} — accepted per declaration: {waiver}",
         )
     return Check(
         "isolation", False,
-        f"{ten} ran outside Docker. Pre-deploy gate does not "
+        f"{names} ran outside Docker. Pre-deploy gate does not "
         f"accept degraded runs; set up Docker, or declare a reason at "
         f"`sandbox.pre_deploy_degraded_waiver` to record in evidence.",
     )
@@ -208,15 +208,15 @@ def _waiver_check(report: PreDeployReport, cfg: Config) -> Check | None:
     if not waived:
         return None
     reason = str(cfg.get("verify.waiver_reason", "") or "").strip()
-    ten = ", ".join(waived)
+    names = ", ".join(waived)
     if not reason:
         return Check(
             "explicit waiver", False,
-            f"{ten} waived at `verify.waived` without a reason — declare "
+            f"{names} waived at `verify.waived` without a reason — declare "
             f"`verify.waiver_reason` (scope, date, signer) to record in evidence",
         )
     report.waivers = {k: reason for k in waived}
-    return Check("explicit waiver", Outcome.WAIVED, f"{ten} — {reason}")
+    return Check("explicit waiver", Outcome.WAIVED, f"{names} — {reason}")
 
 
 def pre_deploy(

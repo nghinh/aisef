@@ -343,8 +343,8 @@ def _run_wave(
                 return out
             tx.record("status.running", undo={"status.reset": "pending"})
 
-            chay = partial(verify_only_story, repeat=repeat) if verify_only else implement_story
-            outcome = chay(
+            run_fn = partial(verify_only_story, repeat=repeat) if verify_only else implement_story
+            outcome = run_fn(
                 story,
                 project=project,
                 workdir=workdir,

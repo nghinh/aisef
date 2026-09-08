@@ -47,26 +47,26 @@ class Replay:
     def rows(self) -> list[tuple[str, str, str]]:
         """(check name, recorded, now): recorded only knows blocked/not — `gate:verdict`
         only stores blocking check names; now has full six-outcome detail."""
-        truoc = set(self.recorded or [])
-        return [(c.name, "✗" if c.name in truoc else "·", c.outcome.mark) for c in self.gate.checks]
+        prev = set(self.recorded or [])
+        return [(c.name, "✗" if c.name in prev else "·", c.outcome.mark) for c in self.gate.checks]
 
     def changed(self) -> list[str]:
         """Checks whose blocking status changed — the only comparison possible with the old record."""
         if self.recorded is None:
             return []
-        truoc, nay = set(self.recorded), set(self.now)
-        return sorted(truoc ^ nay)
+        prev, current = set(self.recorded), set(self.now)
+        return sorted(prev ^ current)
 
     def summary(self) -> str:
         head = (f"{self.story_id} attempt {self.attempt} · candidate {self.candidate[:7] or '—'} · "
                 f"recorded: {'PASS' if self.recorded == [] else 'FAIL' if self.recorded else 'no verdict'}"
                 f" · now: {'PASS' if self.gate.passed else 'FAIL'}")
         lines = [head, "  check                            | recorded | now"]
-        for name, truoc, nay in self.rows():
-            dau = " ≠" if name in self.changed() else ""
-            lines.append(f"  {name:<32} | {truoc:^6} | {nay}{dau}")
-        doi = self.changed()
-        lines.append("  diff: " + (", ".join(doi) if doi else "none — same blocking checks"))
+        for name, prev, current in self.rows():
+            marker = " ≠" if name in self.changed() else ""
+            lines.append(f"  {name:<32} | {prev:^6} | {current}{marker}")
+        changed = self.changed()
+        lines.append("  diff: " + (", ".join(changed) if changed else "none — same blocking checks"))
         return "\n".join(lines)
 
 
@@ -89,8 +89,8 @@ def _pairs(evidence: Evidence) -> list[tuple[Event, Event | None]]:
     verdicts = evidence.of(NOTE, GATE_VERDICT)
     out = []
     for i, inp in enumerate(inputs):
-        tran = inputs[i + 1].seq if i + 1 < len(inputs) else float("inf")
-        v = next((v for v in verdicts if inp.seq < v.seq < tran), None)
+        boundary = inputs[i + 1].seq if i + 1 < len(inputs) else float("inf")
+        v = next((v for v in verdicts if inp.seq < v.seq < boundary), None)
         out.append((inp, v))
     return out
 
@@ -107,15 +107,15 @@ def replay(evidence: Evidence, *, attempt: int = 0) -> list[Replay]:
     """Re-score all attempts that have a `gate:input` (or only the given `attempt`)."""
     out = []
     for inp, verdict in _pairs(evidence):
-        luot = int(inp.detail.get("attempt") or 0)
-        if attempt and luot != attempt:
+        attempt_num = int(inp.detail.get("attempt") or 0)
+        if attempt and attempt_num != attempt:
             continue
-        truoc = Evidence(story_id=evidence.story_id,
+        before = Evidence(story_id=evidence.story_id,
                          events=[e for e in evidence.events if e.seq <= inp.seq])
         kw = kwargs_from(inp.detail)
-        gate = evaluate(evidence.story_id, truoc, **kw)
+        gate = evaluate(evidence.story_id, before, **kw)
         out.append(Replay(
-            story_id=evidence.story_id, attempt=luot, seq=inp.seq,
+            story_id=evidence.story_id, attempt=attempt_num, seq=inp.seq,
             candidate=str(kw.get("candidate") or ""), gate=gate,
             recorded=None if verdict is None else [str(x) for x in verdict.detail.get("failures") or []],
         ))

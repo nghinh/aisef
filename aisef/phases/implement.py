@@ -546,7 +546,7 @@ def run_attempt(
     # OpenCode run pushed `src/reverse-words.js` to `main` while the story
     # branch stayed unchanged -- gate only reported "empty diff" while rogue
     # code was already on trunk.
-    truoc = head_sha(project) if workdir != project else ""
+    before_sha = head_sha(project) if workdir != project else ""
 
     _attach_settings(spec, project)
     result = client.run(spec)
@@ -560,10 +560,10 @@ def run_attempt(
     for sk in used:
         evidence.record(story.id, Event(kind=SKILL_USE, name=sk, detail={"role": DEVELOPER}))
 
-    sau = head_sha(project) if workdir != project else ""
-    if truoc and sau != truoc:
+    after_sha = head_sha(project) if workdir != project else ""
+    if before_sha and after_sha != before_sha:
         attempt.error = (
-            f"the run modified the project's main branch ({truoc[:8]} → {sau[:8]}). "
+            f"the run modified the project's main branch ({before_sha[:8]} → {after_sha[:8]}). "
             f"The story must work in its own worktree; work on the trunk does not "
             f"pass any gate. Revert and re-run."
         )
@@ -571,7 +571,7 @@ def run_attempt(
         attempt.fatal = True   # and retrying is pointless
         evidence.tool_run(
             story.id, "isolation", ok=False,
-            detail={"truoc": truoc, "sau": sau, "attempt": number},
+            detail={"truoc": before_sha, "sau": after_sha, "attempt": number},
         )
         return attempt
 
@@ -660,7 +660,7 @@ def _security_from_evidence(e: Event) -> SecurityReport:
     return rep
 
 
-def _repeat_runs(k: int, chay: Callable[[], object]) -> None:
+def _repeat_runs(k: int, run_fn: Callable[[], object]) -> None:
     """Re-run a check ``k`` times on the same SHA (ADR-004 R13 `--repeat`).
 
     A single run cannot distinguish "red because of code" from "red because of
@@ -672,7 +672,7 @@ def _repeat_runs(k: int, chay: Callable[[], object]) -> None:
     across runs.  k = 1 is the old behavior, nothing extra recorded.
     """
     for _ in range(max(1, k)):
-        chay()
+        run_fn()
 
 
 def _repeat_note(evidence: EvidenceStore, sid: str, sha: str, *, k: int,
@@ -702,15 +702,15 @@ def _repeat_note(evidence: EvidenceStore, sid: str, sha: str, *, k: int,
             flaky_checks.append(name)
         if name != "test":
             continue
-        mau: dict[str, list[bool]] = {}
+        pattern: dict[str, list[bool]] = {}
         for e in runs:
             do = set(e.detail.get("failed_ids") or [])
             bo = set(e.detail.get("skipped_ids") or [])
             for t in e.detail.get("test_ids") or []:
                 if t not in bo:
-                    mau.setdefault(str(t), []).append(t not in do)
-        flaky_ids += [t for t, m in mau.items() if any(m) and not all(m)]
-        stable_red += [t for t, m in mau.items() if len(m) == len(runs) and not any(m)]
+                    pattern.setdefault(str(t), []).append(t not in do)
+        flaky_ids += [t for t, m in pattern.items() if any(m) and not all(m)]
+        stable_red += [t for t, m in pattern.items() if len(m) == len(runs) and not any(m)]
     return evidence.record(sid, Event(
         kind=NOTE, name="verify-only.repeat", ok=not (flaky_ids or flaky_checks),
         detail={"k": k, "checks": checks, "flaky_ids": flaky_ids,
@@ -763,15 +763,15 @@ def verify_candidate(
     # events, and keep/run decisions must be based on evidence at entry time.
     ev = evidence.read(sid) if reuse else None
 
-    def giu(name: str, du: bool) -> bool:
+    def keep(name: str, sufficient: bool) -> bool:
         """True = keep existing evidence, do not run.  Logged on both paths."""
         if not reuse:
             return False
-        (attempt.kept if du else attempt.reran).append(name)
-        return du
+        (attempt.kept if sufficient else attempt.reran).append(name)
+        return sufficient
 
     # Nop control (ADR-005 V3) right after freeze: story's tests at parent SHA.
-    if not giu(NOP_RUN, reuse and _nop_at(ev, sha)):
+    if not keep(NOP_RUN, reuse and _nop_at(ev, sha)):
         run_nop(story, workdir=workdir, artifact_root=artifact_root, config=config,
                 candidate=sha, base_ref=base_ref, changed=changed)
 
@@ -779,7 +779,7 @@ def verify_candidate(
     # harness, and the agent may have "forgotten" to run after the last edit.
     chay_lai: list[str] = []  # checks run this attempt -- `_repeat_note` compares across k runs
     for tool in ("test", "lint"):
-        if not giu(tool, reuse and _green_at(ev, TOOL_RUN, tool, sha)):
+        if not keep(tool, reuse and _green_at(ev, TOOL_RUN, tool, sha)):
             _repeat_runs(repeat, partial(
                 run_tool, tool, workdir, story_id=sid, artifact_root=artifact_root,
                 config=config, candidate=sha,
@@ -788,7 +788,7 @@ def verify_candidate(
 
     # Tests always green because they assert nothing is worse than no tests:
     # it makes the "tests green" gate meaningless.  Checking is cheap, run every attempt.
-    if not giu("qa:fake-tests", reuse and _green_at(ev, TOOL_RUN, "qa:fake-tests", sha)):
+    if not keep("qa:fake-tests", reuse and _green_at(ev, TOOL_RUN, "qa:fake-tests", sha)):
         fake = find_fake_tests(workdir, changed)
         evidence.tool_run(sid, "qa:fake-tests", ok=not fake, detail={"files": fake})
 
@@ -801,7 +801,7 @@ def verify_candidate(
     # candidate, and "not run" means it says UNRUNNABLE, not passed.
     hop_dong, man_hinh = validation_targets(story, preservation)
     kinds = [k for k in hop_dong
-             if not giu(f"qa:{k}", reuse and _green_at(ev, TOOL_RUN, f"qa:{k}", sha))]
+             if not keep(f"qa:{k}", reuse and _green_at(ev, TOOL_RUN, f"qa:{k}", sha))]
     if kinds:
         # `clean=False`: worktree is already frozen at the correct SHA and
         # write-scope guard blocked out-of-scope changes -- clean worktree
@@ -824,7 +824,7 @@ def verify_candidate(
         _repeat_note(evidence, sid, sha, k=repeat, checks=chay_lai, attempt=number)
 
     screens = [m for m in man_hinh
-               if not giu(f"mockup:{m}", reuse and _green_at(ev, MOCKUP_MAP, m, sha))]
+               if not keep(f"mockup:{m}", reuse and _green_at(ev, MOCKUP_MAP, m, sha))]
     if screens and contract:
         mockup_verify.verify_screens(
             workdir, contract, screens,
@@ -832,9 +832,9 @@ def verify_candidate(
             candidate=sha,
         )
 
-    ra_soat = _at(ev, TOOL_RUN, "review", sha) if reuse else None
-    if giu("review", bool(ra_soat and _at(ev, AGENT_RUN, f"{sid}-review", sha))):
-        attempt.review_findings = list(ra_soat.detail.get("findings") or [])
+    review_ev = _at(ev, TOOL_RUN, "review", sha) if reuse else None
+    if keep("review", bool(review_ev and _at(ev, AGENT_RUN, f"{sid}-review", sha))):
+        attempt.review_findings = list(review_ev.detail.get("findings") or [])
     else:
         attempt.review_findings = review_story(
             story,
@@ -864,9 +864,9 @@ def verify_candidate(
         )
 
     if config.get("security.semantic_review", True):
-        bao_mat = _at(ev, TOOL_RUN, "security", sha) if reuse else None
-        if giu("security", bool(bao_mat and _at(ev, AGENT_RUN, f"{sid}-security", sha))):
-            attempt.security = _security_from_evidence(bao_mat)
+        security_ev = _at(ev, TOOL_RUN, "security", sha) if reuse else None
+        if keep("security", bool(security_ev and _at(ev, AGENT_RUN, f"{sid}-security", sha))):
+            attempt.security = _security_from_evidence(security_ev)
         else:
             attempt.security = security_review(
                 story,
@@ -1003,16 +1003,16 @@ def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
         store.tool_run(story.id, NOP_RUN, ok=False, detail={
             "nop": True, "disabled": True, "skipped": "disabled by config `verify.nop`"})
         return
-    tep = [f for f in changed if is_test_path(f)]
-    if not tep:
+    test_files = [f for f in changed if is_test_path(f)]
+    if not test_files:
         store.tool_run(story.id, NOP_RUN, ok=False, detail={
             "nop": True, "files": [], "skipped": "story did not add/modify test files"})
         return
-    goc = EvidenceStore(artifact_root).read(story.id).last(TOOL_RUN, BASELINE_RUN)
-    cha = base_ref or (str(goc.detail.get("parent") or "") if goc is not None else "")
-    if not cha:
+    base_ev = EvidenceStore(artifact_root).read(story.id).last(TOOL_RUN, BASELINE_RUN)
+    parent_ref = base_ref or (str(base_ev.detail.get("parent") or "") if base_ev is not None else "")
+    if not parent_ref:
         store.tool_run(story.id, NOP_RUN, ok=False, detail={
-            "nop": True, "files": tep[:50],
+            "nop": True, "files": test_files[:50],
             "unrunnable": "cannot determine parent SHA (no fork point or baseline)"})
         return
 
@@ -1020,20 +1020,20 @@ def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
     nop_id = f"{story.id}-nop"
     try:
         wt.remove(nop_id, delete_branch=True)      # leftover from a previous crash
-        tam = wt.create(nop_id, base=cha, refresh=False).path
-        for f in tep:
-            src, dst = Path(workdir) / f, tam / f
+        tmp_path = wt.create(nop_id, base=parent_ref, refresh=False).path
+        for f in test_files:
+            src, dst = Path(workdir) / f, tmp_path / f
             if src.is_file():
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src, dst)
             elif dst.exists():
                 dst.unlink()                        # story deleted test file: parent SHA also lacks it
-        res = run_tool("test", tam, config=config)   # story_id empty: recorded below, under its own name
+        res = run_tool("test", tmp_path, config=config)   # story_id empty: recorded below, under its own name
         record_tool(res, story.id, artifact_root, candidate, name=NOP_RUN, extra={
-            "nop": True, "parent": cha, "base_ref": base_ref, "files": tep[:50]})
+            "nop": True, "parent": parent_ref, "base_ref": base_ref, "files": test_files[:50]})
     except GitError as e:
         store.tool_run(story.id, NOP_RUN, ok=False, detail={
-            "nop": True, "parent": cha, "files": tep[:50],
+            "nop": True, "parent": parent_ref, "files": test_files[:50],
             "unrunnable": f"cannot create worktree at parent SHA: {e}"})
     finally:
         wt.remove(nop_id, delete_branch=True)
@@ -1069,12 +1069,12 @@ def freeze_candidate(
     """
     from ..control.worktree import GitError, commit_paths
 
-    loi = ""
+    error = ""
     if isolated:
         try:
             commit_paths(Path(workdir), f"{story.id}: candidate attempt {number}", paths=scope)
         except GitError as e:
-            loi = str(e)
+            error = str(e)
     sha = head_sha(workdir)
 
     journal = JournalStore(artifact_root)
@@ -1088,13 +1088,13 @@ def freeze_candidate(
         data={"luot": number, "files": changed[:50], "count": len(changed)}))
     journal.record(story.id, JEntry(
         step="candidate.frozen", attempt=giao_dich,
-        data={"luot": number, "sha": sha, "error": loi, "verify_only": verify_only}))
-    if loi or not sha:
+        data={"luot": number, "sha": sha, "error": error, "verify_only": verify_only}))
+    if error or not sha:
         # Failed to freeze means subsequent evidence is attached to a version
         # that **does not** contain the work.  Recorded in evidence; silence
         # here would leave a gate scoring on sand.
         evidence.tool_run(story.id, "candidate:frozen", ok=False,
-                          detail={"error": loi or "cannot read HEAD", "attempt": number})
+                          detail={"error": error or "cannot read HEAD", "attempt": number})
     return sha
 
 
@@ -1121,11 +1121,11 @@ def review_diff(workdir: str, changed: list[str], *, base_ref: str = "") -> str:
         return names
     if len(body) > REVIEW_DIFF_CHARS:
         body = body[:REVIEW_DIFF_CHARS] + "\n… (diff truncated, read files directly for the rest)"
-    ket = [names, ""]
+    out = [names, ""]
     if lines:
-        ket += ["```", lines.strip(), "```", ""]
-    ket += ["```diff", body, "```"]
-    return "\n".join(ket)
+        out += ["```", lines.strip(), "```", ""]
+    out += ["```diff", body, "```"]
+    return "\n".join(out)
 
 
 def _git_lines_text(workdir: str, args: list[str]) -> str:
@@ -1181,15 +1181,15 @@ def _review_session(
     working tree itself (no isolation) and the review text file is not "the
     reviewer modifying the tree".
     """
-    truoc = _tree_snapshot(workdir)
+    before_snap = _tree_snapshot(workdir)
     result = client.run(spec)
     store.agent_run(story_id, result, name=name, prompt_chars=len(spec.prompt),
                     role=role, model=spec.model)
     for sk in skills_used(result):
         store.record(story_id, Event(kind=SKILL_USE, name=sk, detail={"role": role}))
-    da_sua = _revert_reviewer_writes(workdir, truoc, _tree_snapshot(workdir))
+    reverted = _revert_reviewer_writes(workdir, before_snap, _tree_snapshot(workdir))
     persist_verdict(artifact_root, story_id, role, number, result)
-    return result, da_sua
+    return result, reverted
 
 
 def _with_schema(client: ClientAdapter, spec, result, *, store: EvidenceStore,
@@ -1204,7 +1204,7 @@ def _with_schema(client: ClientAdapter, spec, result, *, store: EvidenceStore,
     verdict = review_verdict(result.text)
     if verdict is not None:
         return result.text, verdict
-    lai, da_sua = _review_session(
+    lai, reverted = _review_session(
         client, replace(spec, prompt=spec.prompt + SCHEMA_REMINDER), store=store,
         story_id=story_id, artifact_root=artifact_root, workdir=workdir,
         name=f"{story_id}-{role}-retry", role=f"{role}-retry", number=number,
@@ -1216,14 +1216,14 @@ def _with_schema(client: ClientAdapter, spec, result, *, store: EvidenceStore,
                        detail={"expected": store.candidate, "got": lech,
                                "attempt": number, "retry": True})
         return result.text, None
-    if da_sua:
+    if reverted:
         # Retry is also checked by the "review does not write tree" invariant;
         # discard its words, and say so -- silent revert means nobody knows.
         store.tool_run(
             story_id, f"{role}:immutable", ok=False,
-            detail={"changed": da_sua[:20], "retry": True},
+            detail={"changed": reverted[:20], "retry": True},
         )
-    if da_sua or not lai.ok:
+    if reverted or not lai.ok:
         return result.text, None
     verdict = review_verdict(lai.text)
     return (lai.text, verdict) if verdict is not None else (result.text, None)
@@ -1284,15 +1284,15 @@ def review_story_v2(
     # Existing tests with reduced cases (G8): show to reviewer, do not auto-
     # block -- "update expectations" is valid, "delete to go green" is not;
     # that is a judgment call.
-    mat = tdd.test_delta(workdir, base_ref=base_ref, changed=changed)
+    delta = tdd.test_delta(workdir, base_ref=base_ref, changed=changed)
     store = EvidenceStore(artifact_root, candidate=candidate)
     store.record(
-        story.id, Event(kind=NOTE, name="qa:test-delta", ok=not mat, detail={"files": mat})
+        story.id, Event(kind=NOTE, name="qa:test-delta", ok=not delta, detail={"files": delta})
     )
-    if mat:
+    if delta:
         context["impact"] += (
             "\n\n**Existing tests lost cases** — ask why, do not assume it is valid: "
-            + "; ".join(mat)
+            + "; ".join(delta)
         )
 
     store.handoff(story.id, frm=DEVELOPER, to=REVIEWER, attempt=number,
@@ -1320,17 +1320,17 @@ def review_story_v2(
     }
 
     _attach_settings(spec, project)
-    result, da_sua = _review_session(
+    result, reverted = _review_session(
         client, spec, store=store, story_id=story.id, artifact_root=artifact_root,
         workdir=workdir, name=f"{story.id}-review", role="review", number=number,
     )
-    if da_sua:
+    if reverted:
         store.tool_run(
-            story.id, "review:immutable", ok=False, detail={"changed": da_sua[:20]},
+            story.id, "review:immutable", ok=False, detail={"changed": reverted[:20]},
         )
         return [
             "[block] reviewer modified the working tree "
-            f"({', '.join(da_sua[:3])}) — reverted; this review attempt does not "
+            f"({', '.join(reverted[:3])}) — reverted; this review attempt does not "
             "count. Review is a report, not a fix."
         ], None
 
@@ -1453,15 +1453,15 @@ def security_review(
         ENV_ALLOW_HOSTS: ",".join(config["sandbox.allow_hosts"]) if config else "",
     }
     _attach_settings(spec, project)
-    result, da_sua = _review_session(
+    result, reverted = _review_session(
         client, spec, store=store, story_id=story.id, artifact_root=artifact_root,
         workdir=workdir, name=f"{story.id}-security", role="security", number=number,
     )
-    if da_sua:
+    if reverted:
         store.tool_run(
-            story.id, "security:immutable", ok=False, detail={"changed": da_sua[:20]},
+            story.id, "security:immutable", ok=False, detail={"changed": reverted[:20]},
         )
-        return SecurityReport(error=f"security reviewer modified the working tree ({', '.join(da_sua[:3])}) — reverted, this attempt does not count")
+        return SecurityReport(error=f"security reviewer modified the working tree ({', '.join(reverted[:3])}) — reverted, this attempt does not count")
     lech = _candidate_moved(workdir, candidate)
     if lech:
         store.tool_run(story.id, "security:candidate", ok=False,
@@ -1659,8 +1659,8 @@ def review_verdict(text: str) -> Verdict | None:
             continue
         if not isinstance(data, dict) or "verdict" not in data:
             continue
-        ket = str(data.get("verdict", "")).strip().lower()
-        if ket not in VERDICTS:
+        verdict_str = str(data.get("verdict", "")).strip().lower()
+        if verdict_str not in VERDICTS:
             return None
         out = []
         for item in data.get("findings") or []:
@@ -1680,7 +1680,7 @@ def review_verdict(text: str) -> Verdict | None:
             if sev in SEVERITIES:
                 f["severity"] = sev
             out.append(f)
-        return Verdict(ket, out)
+        return Verdict(verdict_str, out)
     return None
 
 
@@ -1694,14 +1694,14 @@ def _finding_key(line: str) -> tuple[str, str]:
     if not m:
         return ("", "")
     tag = m.group(1).strip().lower()
-    loai = tag
+    kind = tag
     if tag in _JSON_STUCK_TAGS:
-        loai = "stuck"
+        kind = "stuck"
     elif tag in _JSON_BLOCK_TAGS:
-        loai = "block"
-    tep = m.group(2).strip().rstrip(":,;")
-    tep = re.sub(r":\d+(-\d+)?$", "", tep)
-    return (loai, tep)
+        kind = "block"
+    filepath = m.group(2).strip().rstrip(":,;")
+    filepath = re.sub(r":\d+(-\d+)?$", "", filepath)
+    return (kind, filepath)
 
 
 def merge_findings(text_items: list[str], json_items: list[str]) -> tuple[list[str], bool]:
@@ -1764,7 +1764,7 @@ def _tree_snapshot(workdir: Path) -> dict[str, bytes | None]:
     return out
 
 
-def _revert_reviewer_writes(workdir: Path, truoc: dict, sau: dict) -> list[str]:
+def _revert_reviewer_writes(workdir: Path, before_snap: dict, after_snap: dict) -> list[str]:
     """A reviewer that can modify code becomes a second write session.
 
     Forbidding `Write`/`Edit` in guards is layer one; compliance testing on
@@ -1775,16 +1775,16 @@ def _revert_reviewer_writes(workdir: Path, truoc: dict, sau: dict) -> list[str]:
     review session **does not count** -- same "coarse-grained revert"
     mechanism as the worktree.
     """
-    doi = sorted({k for k in sau if k not in truoc or sau[k] != truoc[k]}
-                 | {k for k in truoc if k not in sau})
-    if not doi:
+    changed = sorted({k for k in after_snap if k not in before_snap or after_snap[k] != before_snap[k]}
+                     | {k for k in before_snap if k not in after_snap})
+    if not changed:
         return []
-    for rel in doi:
+    for rel in changed:
         p = Path(workdir) / rel
-        if rel in truoc and truoc[rel] is not None:
+        if rel in before_snap and before_snap[rel] is not None:
             p.parent.mkdir(parents=True, exist_ok=True)
-            p.write_bytes(truoc[rel])           # changed or untracked file: restore content
-        elif rel in truoc:
+            p.write_bytes(before_snap[rel])           # changed or untracked file: restore content
+        elif rel in before_snap:
             subprocess.run(["git", "checkout", "--", rel], cwd=workdir,
                            capture_output=True, timeout=30)   # too large to snapshot: delegate to git
         elif p.exists():
@@ -1792,7 +1792,7 @@ def _revert_reviewer_writes(workdir: Path, truoc: dict, sau: dict) -> list[str]:
                 p.unlink()                       # new file created by the reviewer
             except OSError:
                 pass
-    return doi
+    return changed
 
 
 def _candidate_moved(workdir: Path, candidate: str) -> str:
@@ -1825,12 +1825,12 @@ def deadlock_reason(attempts: list[Attempt], write_scope: list[str] | None = Non
     """
     if len(attempts) < 2:
         return ""
-    cuoi, truoc = attempts[-1], attempts[-2]
-    if cuoi.infra or truoc.infra:
+    last_attempt, prev_attempt = attempts[-1], attempts[-2]
+    if last_attempt.infra or prev_attempt.infra:
         return ""
-    if not cuoi.review_findings or not truoc.review_findings:
+    if not last_attempt.review_findings or not prev_attempt.review_findings:
         return ""
-    if not _same_complaint(cuoi.review_findings, truoc.review_findings):
+    if not _same_complaint(last_attempt.review_findings, prev_attempt.review_findings):
         return ""
 
     # Repeated **and** pointing outside write scope is stuck.  Inside scope
@@ -1840,12 +1840,12 @@ def deadlock_reason(attempts: list[Attempt], write_scope: list[str] | None = Non
     # `src/app/list-notes.ts`, a file right inside its scope.  Stopping there
     # cuts short a story that could still be saved; let the retry limit do
     # its job.
-    ngoai = _paths_outside(cuoi.review_findings, write_scope or [])
+    ngoai = _paths_outside(last_attempt.review_findings, write_scope or [])
     if not ngoai:
         return ""
     return (
         "stuck: two consecutive attempts blocked for the same reason — "
-        + "; ".join(cuoi.review_findings[:2])
+        + "; ".join(last_attempt.review_findings[:2])
         + f". Blocking findings point to {', '.join(ngoai)} — not in the "
         f"story's write_scope, so the agent cannot fix it no matter how many "
         f"attempts. Widen write_scope or fix the acceptance criteria, then "
