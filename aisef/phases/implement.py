@@ -57,7 +57,7 @@ from ..harness.guardrails import (
 )
 from ..control.journal import Entry as JEntry, JournalStore
 from ..harness.mockup_map import load_for_story, prompt_section
-from ..harness.observe import AGENT_RUN, MOCKUP_MAP, NOTE, TOOL_RUN, Event, Evidence, EvidenceStore
+from ..harness.observe import AGENT_RUN, MOCKUP_MAP, NOTE, SKILL_USE, TOOL_RUN, Event, Evidence, EvidenceStore
 from ..harness.prompts import Catalog, load_catalog
 from ..harness.routing import DEVELOPER, REVIEWER, ROLES, SECURITY, build_spec
 from ..harness.testlog import MAX_IDS, parse as parse_testlog
@@ -507,11 +507,14 @@ def run_attempt(
     _attach_settings(spec, project)
     result = client.run(spec)
     attempt.cost_usd = result.cost_usd
+    used = skills_used(result)
     evidence.agent_run(
         story.id, result, name=f"{story.id}#{number}", prompt_chars=len(spec.prompt),
-        skills={**context.get("_skills", {}), "used": skills_used(result)},
+        skills={**context.get("_skills", {}), "used": used},
         role=DEVELOPER, model=spec.model,
     )
+    for sk in used:
+        evidence.record(story.id, Event(kind=SKILL_USE, name=sk, detail={"role": DEVELOPER}))
 
     sau = head_sha(project) if workdir != project else ""
     if truoc and sau != truoc:
@@ -1116,6 +1119,8 @@ def _review_session(
     result = client.run(spec)
     store.agent_run(story_id, result, name=name, prompt_chars=len(spec.prompt),
                     role=role, model=spec.model)
+    for sk in skills_used(result):
+        store.record(story_id, Event(kind=SKILL_USE, name=sk, detail={"role": role}))
     da_sua = _revert_reviewer_writes(workdir, truoc, _tree_snapshot(workdir))
     persist_verdict(artifact_root, story_id, role, number, result)
     return result, da_sua

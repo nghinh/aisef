@@ -40,6 +40,7 @@ MOCKUP_MAP = "mockup_map"      # đối chiếu màn hình thật với mockup
 NOTE = "note"
 HANDOFF = "handoff"            # gói bàn giao: vai nào nhận slot nào, từ nguồn nào
 BEHAVIOR = "behavior"          # trạng thái một hành vi: verified | gap | reopened
+SKILL_USE = "skill_use"        # agent gọi skill trong phiên — quan sát, không chặn
 
 
 @dataclass

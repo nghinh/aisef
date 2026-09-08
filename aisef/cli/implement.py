@@ -60,7 +60,7 @@ def cmd_status(args) -> int:
     # Ngữ cảnh nạp mỗi story — đo thật từ evidence, thay cho knob
     # `story.max_context_tokens` chưa từng có mã đọc. Cùng ngưỡng 3× trung
     # vị như chi phí: story nạp gấp ba story khác là dấu hiệu chẻ sai.
-    from ..harness.observe import AGENT_RUN, EvidenceStore
+    from ..harness.observe import AGENT_RUN, SKILL_USE, EvidenceStore
 
     ev_store = EvidenceStore(_artifact_root(args))
     nap = {}
@@ -79,6 +79,14 @@ def cmd_status(args) -> int:
     if ket_cuc:
         print("Lượt agent: " + " · ".join(
             f"{k} {n}" for k, n in sorted(ket_cuc.items(), key=lambda kv: -kv[1])))
+    skill_counts: dict[str, int] = {}
+    for sid in ev_store.stories():
+        for e in ev_store.read(sid).of(SKILL_USE):
+            skill_counts[e.name] = skill_counts.get(e.name, 0) + 1
+    if skill_counts:
+        print("Skill: " + " · ".join(
+            f"{k} ×{n}" for k, n in sorted(skill_counts.items(), key=lambda kv: -kv[1])))
+
     if len(nap) >= 3:
         trung_vi = sorted(nap.values())[len(nap) // 2]
         phinh = {k: v for k, v in nap.items() if v > cfg["cost.warn_multiple"] * trung_vi}
