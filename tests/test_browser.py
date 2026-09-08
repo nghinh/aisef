@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -8,7 +9,12 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisef.harness.browser import RenderedScreen, RenderResult, availability  # noqa: E402
+from aisef.harness.browser import (  # noqa: E402
+    RenderedScreen,
+    RenderResult,
+    availability,
+    find_playwright,
+)
 from aisef.harness.mockup_verify import concrete_route  # noqa: E402
 
 
@@ -71,6 +77,37 @@ class TestAvailability(unittest.TestCase):
     def test_no_node(self, _mock):
         reason = availability("/tmp/fake")
         self.assertIn("node", reason)
+
+
+class TestTimPlaywright(unittest.TestCase):
+    """Story chạy trong worktree `<project>/.aisef/worktrees/<id>` — checkout
+    sạch, không có `node_modules` riêng. `npm test` chạy được vì node dò ngược
+    lên thư mục cha; phép tìm của harness phải dò y như vậy, nếu không mockup
+    bị ghi `unavailable` ở một dự án đã cài playwright (todo/STORY-01-01)."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.project = Path(self._tmp.name)
+        nm = self.project / "node_modules" / "playwright"
+        nm.mkdir(parents=True)
+        (nm / "package.json").write_text("{}", encoding="utf-8")
+        self.worktree = self.project / ".aisef" / "worktrees" / "STORY-01-01"
+        self.worktree.mkdir(parents=True)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_worktree_thay_node_modules_cua_du_an(self):
+        self.assertEqual(find_playwright(self.worktree),
+                         (self.project / "node_modules").resolve())
+
+    def test_uu_tien_gan_nhat(self):
+        """Worktree tự cài thì dùng bản của chính nó, không leo lên cha."""
+        nm = self.worktree / "node_modules" / "playwright"
+        nm.mkdir(parents=True)
+        (nm / "package.json").write_text("{}", encoding="utf-8")
+        self.assertEqual(find_playwright(self.worktree),
+                         (self.worktree / "node_modules").resolve())
 
 
 if __name__ == "__main__":

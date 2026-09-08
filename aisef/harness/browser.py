@@ -21,8 +21,19 @@ SCRIPT = Path(__file__).resolve().parent / "assets" / "render.mjs"
 
 #: Directories to search for `node_modules` containing playwright, in priority order.
 def _node_paths(project: Path) -> list[Path]:
+    """Every `node_modules` from ``project`` upward — the way node resolves
+    modules, and the reason `npm test` works in a story worktree.
+
+    Stories run in `<project>/.aisef/worktrees/<id>`, a fresh checkout with no
+    `node_modules` of its own. Looking only at that one directory reports
+    "playwright not installed" for a project that has it installed, and mockup
+    verification then records `unavailable` instead of comparing anything —
+    todo/STORY-01-01 ran three attempts with that check silently empty.
+    """
     repo = Path(__file__).resolve().parent.parent.parent
-    return [project / "node_modules", repo / "spike" / "s7" / "node_modules"]
+    project = project.resolve()
+    return [*(d / "node_modules" for d in (project, *project.parents)),
+            repo / "spike" / "s7" / "node_modules"]
 
 
 @dataclass
