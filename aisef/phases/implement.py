@@ -564,6 +564,8 @@ def run_attempt(
         story.id, result, name=f"{story.id}#{number}", prompt_chars=len(spec.prompt),
         skills={**context.get("_skills", {}), "used": used},
         role=DEVELOPER, model=spec.model,
+        tool_calls=len(result.tool_uses),
+        response_snippet=(result.text or "")[:300],
     )
     for sk in used:
         evidence.record(story.id, Event(kind=SKILL_USE, name=sk, detail={"role": DEVELOPER}))
@@ -592,6 +594,28 @@ def run_attempt(
     # verifying anything (ADR-004 R1).  Verifying first then freezing means
     # evidence points to no specific version, and "stale" becomes undefined.
     changed_now = changed_files(str(workdir), base_ref=base_ref)
+
+    # Zero-output diagnostic: agent responded (ok=True), wrote no files,
+    # and made no tool calls.  Retrying is pointless — the model can't use
+    # Claude Code's tools (common when an API proxy silently routes to a
+    # different model).  Only fires when output_tokens > 0 (real stream
+    # data, not a mock that omits it).
+    if not changed_now and not result.tool_uses and result.output_tokens > 0:
+        snippet = (result.text or "")[:200].strip()
+        attempt.error = (
+            f"agent responded ({result.output_tokens} tokens, {result.num_turns} turns) "
+            f"but made 0 tool calls and wrote 0 files — it cannot write code. "
+            f"Likely cause: the model behind ANTHROPIC_BASE_URL does not support "
+            f"Claude Code's tool protocol. Check route.developer_model in .aisef.toml "
+            f"or the API proxy configuration."
+        )
+        attempt.infra = True
+        attempt.fatal = True
+        run_log(artifact_root, (
+            f"story={story.id}#{number} ZERO-OUTPUT: {result.output_tokens} tokens, "
+            f"0 tool calls, 0 files. Response: {snippet!r}"
+        ))
+        return attempt
     run_log(artifact_root, f"story={story.id}#{number} changed_files={len(changed_now)}")
     attempt.candidate = freeze_candidate(
         workdir, story=story, scope=scope, isolated=workdir != project,

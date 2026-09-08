@@ -172,16 +172,57 @@ def effective_write_scope(story: Story, project: Path) -> list[str]:
 _VERIFY_COMMAND_KEY = {"unit": "tools.test"}
 
 
-_TEST_CONFIGS = (
-    "playwright.config.js", "playwright.config.ts",
-    "jest.config.js", "jest.config.ts", "jest.config.mjs",
-    "vitest.config.js", "vitest.config.ts", "vitest.config.mts",
-    "cypress.config.js", "cypress.config.ts",
-    ".mocharc.yml", ".mocharc.json",
-    "pytest.ini", "setup.cfg", "pyproject.toml",
-    "conftest.py",
-)
-_TEST_DIRS = ("tests", "test", "__tests__", "spec", "e2e", "cypress")
+_JS_CONFIGS = {
+    "playwright": ("playwright.config.js", "playwright.config.ts"),
+    "jest": ("jest.config.js", "jest.config.ts", "jest.config.mjs"),
+    "vitest": ("vitest.config.js", "vitest.config.ts", "vitest.config.mts"),
+    "cypress": ("cypress.config.js", "cypress.config.ts"),
+    "mocha": (".mocharc.yml", ".mocharc.json"),
+}
+_PY_CONFIGS = ("pytest.ini", "conftest.py")
+_JS_DIRS = ("tests", "test", "__tests__", "spec", "e2e")
+_PY_DIRS = ("tests", "test")
+
+
+def _stack_test_paths(project: Path, commands: list[str]) -> tuple[list[str], list[str]]:
+    """Return (dirs, configs) narrowed to the project's actual stack."""
+    # resolve `npm test` / `npm run X` through package.json
+    resolved = list(commands)
+    pkg_path = project / "package.json"
+    if pkg_path.is_file():
+        try:
+            import json
+            scripts = json.loads(pkg_path.read_text(encoding="utf-8")).get("scripts", {})
+            for cmd in commands:
+                parts = cmd.strip().split()
+                if len(parts) >= 2 and parts[0] == "npm":
+                    key = parts[1] if parts[1] != "run" else (parts[2] if len(parts) > 2 else "")
+                    if key in scripts:
+                        resolved.append(scripts[key])
+        except Exception:  # noqa: BLE001
+            pass
+    joined = " ".join(resolved).lower()
+    has_js = pkg_path.is_file()
+    has_py = any((project / m).is_file() for m in ("pyproject.toml", "setup.py", "setup.cfg"))
+    # detect framework from commands
+    frameworks = [fw for fw in _JS_CONFIGS if fw in joined]
+    if frameworks:
+        dirs = list(dict.fromkeys(d for d in _JS_DIRS))
+        cfgs = [c for fw in frameworks for c in _JS_CONFIGS[fw]]
+        return dirs, cfgs
+    if "pytest" in joined or "python" in joined:
+        return list(_PY_DIRS), list(_PY_CONFIGS)
+    # fallback to project markers
+    if has_js and not has_py:
+        dirs = list(_JS_DIRS)
+        cfgs = [c for fw_cfgs in _JS_CONFIGS.values() for c in fw_cfgs]
+        return dirs, cfgs
+    if has_py and not has_js:
+        return list(_PY_DIRS), list(_PY_CONFIGS)
+    # both or neither: add everything
+    dirs = list(dict.fromkeys(list(_JS_DIRS) + list(_PY_DIRS)))
+    cfgs = [c for fw_cfgs in _JS_CONFIGS.values() for c in fw_cfgs] + list(_PY_CONFIGS)
+    return dirs, cfgs
 
 
 def verification_paths(story: Story, project: Path, config=None) -> list[str]:
@@ -225,10 +266,20 @@ def verification_paths(story: Story, project: Path, config=None) -> list[str]:
                 out.append(rel)
 
     if needs_tests and not out:
-        for d in _TEST_DIRS:
+        commands = []
+        for kind in kinds:
+            key = _VERIFY_COMMAND_KEY.get(kind, f"verify.{kind}")
+            try:
+                cmd = str(config[key] or "")
+            except KeyError:
+                continue
+            if cmd:
+                commands.append(cmd)
+        dirs, cfgs = _stack_test_paths(project, commands)
+        for d in dirs:
             if d not in out:
                 out.append(d)
-        for cfg in _TEST_CONFIGS:
+        for cfg in cfgs:
             if cfg not in out:
                 out.append(cfg)
 

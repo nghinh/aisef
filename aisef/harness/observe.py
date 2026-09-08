@@ -300,7 +300,8 @@ class EvidenceStore:
         )
 
     def agent_run(self, story_id: str, result, *, name: str = "", prompt_chars: int = 0,
-                  skills: dict | None = None, role: str = "", model: str = "") -> Event:
+                  skills: dict | None = None, role: str = "", model: str = "",
+                  tool_calls: int = -1, response_snippet: str = "") -> Event:
         """Record one model invocation from `RunResult` — cost and latency
         taken from the client stream, not estimated."""
         return self.record(
@@ -336,6 +337,8 @@ class EvidenceStore:
                     "skills": skills or {},
                     "role": role,
                     "model": model,
+                    "tool_calls": tool_calls,
+                    "response_snippet": response_snippet[:300] if response_snippet else "",
                 },
             ),
         )
