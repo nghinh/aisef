@@ -4,6 +4,33 @@ Ghi theo **sáu nhóm harness** (`docs/SOLUTION.md` §5), không theo ADR hay
 ngày. Mỗi dòng có chỗ đọc lại; số lỗi trỏ `docs/STATUS-2026-09-05.md` §2.4
 và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epic-improvement.md` §6.
 
+## v0.5.1 — phát hành 2026-09-08
+
+### Tài liệu (nhóm 6 — docs)
+
+- **English usage guide**: `docs/USAGE-GUIDE.md` — 927-line translation of
+  `docs/HUONG-DAN-SU-DUNG.md`. README now links both versions.
+- **API stability contract**: `docs/STABILITY.md` — documents frozen surface
+  (CLI commands, 57 config keys, 9 guards, gate lifecycle, evidence format,
+  state file, exit codes) and internal-only components for v1.0.0.
+
+### Kiểm thử (nhóm 3 — verification)
+
+- **105 test mới cho 9 module chưa có test**:
+  - `test_skills.py` (21): parse_frontmatter, Skill.verb, load_skill, scan
+  - `test_client_base.py` (19): Support.blocks_at_source, child_env
+    allowlist, RunSpec defaults, ClientAdapter utilities
+  - `test_client_adapters.py` (28): ClaudeCodeAdapter.build_command (11
+    biến thể), OpenCodeAdapter.build_command, parse_json_events (8 ca)
+  - `test_browser.py` (14): RenderedScreen/RenderResult dataclass,
+    concrete_route, availability
+  - `test_parser.py` (9): build_parser, subcommand parsing, guard name
+    validation
+  - `test_doctor.py` (6): _hook_paths_elsewhere
+  - `test_design_contract.py` (8): ScreenContract round-trip, DesignContract
+    lookup/write/load
+- **Tổng**: 1904 test, tăng từ 1799 (v0.5.0). Toàn bộ xanh.
+
 ## v0.5.0 — phát hành 2026-09-08
 
 ### Bảo mật (nhóm 1 — kiểm soát)
