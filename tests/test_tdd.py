@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from aisef.control.tdd import added_tests, red_before_green, test_delta
+from aisef.control.tdd import added_tests, red_before_green, test_delta as _test_delta
 from aisef.harness.observe import EvidenceStore
 
 
@@ -62,12 +62,12 @@ class TestThemTest(RepoCase):
 class TestTestBienMat(RepoCase):
     def test_fewer_cases_are_reported_with_numbers(self):
         (self.repo / "tests" / "a.test.js").write_text("test('AC-S-1: một', () => {})\n", encoding="utf-8")
-        self.assertEqual(test_delta(self.repo, base_ref=self.base, changed=["tests/a.test.js"]),
+        self.assertEqual(_test_delta(self.repo, base_ref=self.base, changed=["tests/a.test.js"]),
                          ["tests/a.test.js: 2 → 1"])
 
     def test_more_or_equal_is_silent(self):
         (self.repo / "tests" / "a.test.js").write_text(HAI_TEST + "test('ba', () => {})\n", encoding="utf-8")
-        self.assertEqual(test_delta(self.repo, base_ref=self.base, changed=["tests/a.test.js"]), [])
+        self.assertEqual(_test_delta(self.repo, base_ref=self.base, changed=["tests/a.test.js"]), [])
 
 
 class TestDoTruocXanh(unittest.TestCase):
