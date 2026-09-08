@@ -4,7 +4,7 @@ Ghi theo **sáu nhóm harness** (`docs/SOLUTION.md` §5), không theo ADR hay
 ngày. Mỗi dòng có chỗ đọc lại; số lỗi trỏ `docs/STATUS-2026-09-05.md` §2.4
 và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epic-improvement.md` §6.
 
-## v0.4.1 (dev)
+## v0.4.1 — phát hành 2026-09-08
 
 ### Bảo mật (nhóm 1 — kiểm soát)
 
