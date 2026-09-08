@@ -4,6 +4,22 @@ Ghi theo **sáu nhóm harness** (`docs/SOLUTION.md` §5), không theo ADR hay
 ngày. Mỗi dòng có chỗ đọc lại; số lỗi trỏ `docs/STATUS-2026-09-05.md` §2.4
 và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epic-improvement.md` §6.
 
+## v0.6.0 — phát hành 2026-09-08
+
+### Quan sát (nhóm 2 — observation)
+
+- **SKILL_USE event**: ghi sự kiện `skill_use` mỗi khi agent gọi skill
+  trong phiên developer hoặc reviewer/security. `aisef status` hiển thị
+  tổng hợp số lần dùng từng skill.
+
+### Tài liệu (nhóm 6 — docs)
+
+- **v1.0.0 readiness checklist**: `docs/V1-READINESS.md` — 10 điều kiện
+  tự động DONE, 4 điều kiện cần agent run thật (BLOCKED).
+- **README**: cập nhật từ 8 lên 9 guard (thêm `egress`).
+- **SOLUTION.md**: cập nhật §2.2 và §11 — OpenCode `--format json` đã
+  chứng minh, chi phí/lượt đo được từ `step_finish`.
+
 ## v0.5.1 — phát hành 2026-09-08
 
 ### Tài liệu (nhóm 6 — docs)
