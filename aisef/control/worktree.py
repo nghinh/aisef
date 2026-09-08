@@ -17,10 +17,12 @@ sự cố. Cơ chế đã kiểm chứng ở spike S5 (`docs/SPIKE-REPORT.md`).
 
 from __future__ import annotations
 
+import fcntl
 import re
 import shutil
 import subprocess
 import tempfile
+import time
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -327,6 +329,30 @@ class WorktreeManager:
             return False
         return commit_paths(path, message or f"{story_id}: hoàn tất", paths=paths)
 
+    MERGE_LOCK_TIMEOUT = 120
+
+    @contextmanager
+    def _merge_lock(self) -> Iterator[None]:
+        """Khoá merge — chỉ một máy merge vào nhánh chính cùng lúc."""
+        lock_path = self.repo / ".aisef" / "merge.lock"
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        fh = open(lock_path, "w")
+        deadline = time.monotonic() + self.MERGE_LOCK_TIMEOUT
+        while True:
+            try:
+                fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                break
+            except OSError:
+                if time.monotonic() >= deadline:
+                    fh.close()
+                    raise GitError("merge lock timeout — máy khác đang merge")
+                time.sleep(0.1)
+        try:
+            yield
+        finally:
+            fcntl.flock(fh, fcntl.LOCK_UN)
+            fh.close()
+
     def merge_story(self, story_id: str, *, into: str | None = None) -> MergeResult:
         """Merge nhánh story vào nhánh chính.
 
@@ -334,7 +360,13 @@ class WorktreeManager:
         theo bộ lập lịch, hai story chung đợt lẽ ra không thể chạm cùng vùng,
         nên conflict là bằng chứng ``write_scope`` khai sai — cần người xem
         lại phần chẻ story, không phải cần một lần merge khéo hơn.
+
+        Khoá merge bảo đảm chỉ một máy merge cùng lúc (distributed).
         """
+        with self._merge_lock():
+            return self._merge_story_inner(story_id, into=into)
+
+    def _merge_story_inner(self, story_id: str, *, into: str | None = None) -> MergeResult:
         branch = self.branch_for(story_id)
         if into:
             _git(self.repo, "checkout", "-q", into)

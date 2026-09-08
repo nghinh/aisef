@@ -37,6 +37,7 @@ class WorktreeTestCase(unittest.TestCase):
         git(self.repo, "config", "user.name", "T")
         (self.repo / "src").mkdir()
         (self.repo / "src" / "base.py").write_text("VERSION = 1\n", encoding="utf-8")
+        (self.repo / ".gitignore").write_text(".aisef/\n", encoding="utf-8")
         git(self.repo, "add", "-A")
         git(self.repo, "commit", "-qm", "init")
         self.wm = WorktreeManager(self.repo)
