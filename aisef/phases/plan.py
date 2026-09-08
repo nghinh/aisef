@@ -478,8 +478,8 @@ def run_pipeline(
 
     # Story split runs every time: `epics.md` may have been edited during
     # human review, and the generated story files must follow.
-    # When the machine gate fails (oversized stories), loop back: delete
-    # epics.md so the epics phase re-runs with the gate memo feedback.
+    # When the machine gate fails (oversized stories), loop back: re-run
+    # the epics phase with force + gate memo so the agent splits them.
     epics_phase = PHASE_BY_ID["epics"]
     for attempt in range(1 + MAX_SPLIT_RETRIES):
         outcome = run_split(project, cfg)
@@ -489,13 +489,12 @@ def run_pipeline(
         if outcome.error or attempt >= MAX_SPLIT_RETRIES:
             result.failed_at = SPLIT_PHASE.id
             return result
-        # Gate failed (oversized stories) — gate memo is already written by
-        # run_split.  Delete epics.md so run_phase re-generates it with the
-        # split instructions from the memo.
-        epics_artifact = project / ARTIFACT_ROOT / "epics.md"
-        if epics_artifact.is_file():
-            epics_artifact.unlink()
-        # Re-run only the epics phase (earlier phases are already done).
+        # Gate failed (oversized stories) — gate memo already written by
+        # run_split.  Re-run epics with force=True (skips the "artifacts
+        # exist" check).  Do NOT delete epics.md: the agent reads the
+        # existing plan and only splits the flagged stories instead of
+        # rewriting from scratch; and if the re-run fails, the old file
+        # survives.
         epics_out = run_phase(epics_phase, project, client, config=cfg, force=True)
         result.outcomes.append(epics_out)
         if not epics_out.ok:
