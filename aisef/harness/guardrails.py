@@ -420,6 +420,7 @@ HARNESS_OWNED = (
     "_bmad-output/sprint-status.json",
     "_bmad-output/sprint-status.json.lock",
     "_bmad-output/compile-report.json",
+    "_bmad-output/run.log",
     # Verbatim review verdicts (`implement.persist_verdict`) — written by the
     # harness, not the agent. Exposed when two stories share one tree
     # (`--no-isolate`): the previous story's file appears as "outside write

@@ -119,6 +119,7 @@ def generate(
     only: list[str] | None = None,
 ) -> MockupResult:
     """Generate missing mockups, extract the design contract, run the machine gate."""
+    from ..harness.runlog import run_log
     from .plan import ARTIFACT_ROOT
 
     project = Path(project)
@@ -126,16 +127,25 @@ def generate(
     cfg = config or Config.load(project)
     res = MockupResult()
 
+    def _log(msg: str) -> None:
+        run_log(root, f"mockup {msg}")
+
+    screens_only = ",".join(only) if only else "all"
+    _log(f"START screens={screens_only} force={force}")
+
     exp_file = root / "EXPERIENCE.md"
     if not exp_file.is_file():
         res.error = "EXPERIENCE.md not found — run `aisef plan` first"
+        _log(f"ERROR {res.error}")
         return res
 
     res.experience = parse_experience_file(exp_file)
     if not res.experience.screens:
         res.error = "EXPERIENCE.md does not list any screens"
+        _log(f"ERROR {res.error}")
         return res
 
+    _log(f"screens_found={len(res.experience.screens)}")
     (root / MOCKUP_DIR).mkdir(parents=True, exist_ok=True)
 
     for screen in res.experience.screens:
@@ -144,8 +154,10 @@ def generate(
         path = mockup_path(root, screen.id)
         if path.is_file() and not force:
             res.skipped.append(screen.id)
+            _log(f"screen={screen.id} SKIP exists")
             continue
 
+        _log(f"screen={screen.id} agent START")
         run = client.run(
             RunSpec(
                 prompt=build_prompt(screen, res.experience, root),
@@ -158,15 +170,19 @@ def generate(
         EvidenceStore(root).agent_run(f"mockup-{screen.id}", run, name=screen.id)
         if not run.ok:
             res.failed[screen.id] = run.error or "run failed"
+            _log(f"screen={screen.id} FAIL ${run.cost_usd:.2f} err={res.failed[screen.id][:120]}")
             continue
         if not path.is_file():
             res.failed[screen.id] = f"completed but {path.name} not found"
+            _log(f"screen={screen.id} FAIL ${run.cost_usd:.2f} err={res.failed[screen.id]}")
             continue
         res.generated.append(screen.id)
+        _log(f"screen={screen.id} OK ${run.cost_usd:.2f}")
 
     res.contract, gate_extra = extract(root, res.experience)
     res.gate = gate_extra
     res.index_path = write_index(root, res)
+    _log(f"DONE generated={len(res.generated)} skipped={len(res.skipped)} failed={len(res.failed)} ${res.cost_usd:.2f}")
     return res
 
 

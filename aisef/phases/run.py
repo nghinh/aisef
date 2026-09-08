@@ -301,6 +301,9 @@ def _run_wave(
     verify_only: bool = False,
     repeat: int = 1,
 ) -> None:
+    from ..harness.runlog import run_log
+    run_log(artifact_root, f"wave={wave.epic_id}/w{wave.index} START stories={','.join(story_ids)}")
+
     owned = screen_owners(plan.stories.values())
     fan_in = complexity.fan_in_counts(plan.stories.values())
 
@@ -396,9 +399,12 @@ def _run_wave(
     workers = max(1, min(config["run.max_parallel"], len(story_ids)))
     if workers == 1:
         wave.outcomes = [one(sid) for sid in story_ids]
-        return
-    with ThreadPoolExecutor(max_workers=workers) as pool:
-        wave.outcomes = list(pool.map(one, story_ids))
+    else:
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            wave.outcomes = list(pool.map(one, story_ids))
+    passed = sum(1 for o in wave.outcomes if o.done)
+    wave_cost = sum(o.cost_usd for o in wave.outcomes)
+    run_log(artifact_root, f"wave={wave.epic_id}/w{wave.index} DONE {passed}/{len(wave.outcomes)} passed ${wave_cost:.2f}")
 
 
 def _safe_transition(state: StateStore, story_id: str, to: StoryStatus, **kw) -> None:
@@ -426,6 +432,8 @@ def run_sprint(
     isolate: bool = True,
 ) -> RunReport:
     """Run an entire sprint: epics sequentially, stories within an epic in waves."""
+    from ..harness.runlog import run_log
+
     project = Path(project)
     artifact_root = project / ARTIFACT_ROOT
     cfg = config or Config.load(project)
@@ -433,9 +441,11 @@ def run_sprint(
         cfg = Config({**cfg.values, "run.max_parallel": 1})
 
     report = RunReport()
+    run_log(artifact_root, f"sprint START epics={only_epic or 'all'} parallel={not sequential} isolate={isolate}")
     plan = load_plan(artifact_root)
     if plan.error:
         report.error = plan.error
+        run_log(artifact_root, f"sprint ERROR {plan.error}")
         return report
 
     worktrees = None
@@ -444,16 +454,11 @@ def run_sprint(
             worktrees = WorktreeManager(project)
         except GitError as e:
             report.error = f"{e} — story isolation requires a git repo; use --no-isolate if intentional"
+            run_log(artifact_root, f"sprint ERROR {report.error}")
             return report
 
     state = StateStore(artifact_root)
 
-    # Reconcile state from a previous interrupted run **before** doing
-    # anything else. Without this, stories stuck in `running` stay stuck
-    # forever with no command to recover them; and stories that already
-    # merged but whose record says `failed` get re-run on a worktree
-    # branched from a branch that already contains the work — empty diff,
-    # can never pass.
     report.reconciled = reconcile_all(
         artifact_root=artifact_root, state=state, worktrees=worktrees
     )
@@ -462,16 +467,21 @@ def run_sprint(
     unknown = [e for e in epics if e not in plan.waves]
     if unknown:
         report.error = f"epic not in plan: {', '.join(unknown)}"
+        run_log(artifact_root, f"sprint ERROR {report.error}")
         return report
 
     for epic_id in epics:
+        run_log(artifact_root, f"epic={epic_id} START")
         if not run_epic(
             epic_id, plan,
             project=project, client=client, config=cfg, state=state,
             worktrees=worktrees, artifact_root=artifact_root, report=report,
         ):
+            run_log(artifact_root, f"epic={epic_id} STOPPED at={report.stopped_at}")
             break
         state.finish_epic(epic_id)
+        run_log(artifact_root, f"epic={epic_id} DONE")
+    run_log(artifact_root, f"sprint DONE ${report.cost_usd:.2f} stopped={report.stopped_at or 'no'}")
     return report
 
 

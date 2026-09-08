@@ -40,24 +40,12 @@ from ..control.normalize import parse_prd_file
 from ..clients.stream import INFRA_STATUSES, exit_status_of
 
 ARTIFACT_ROOT = "_bmad-output"
-RUN_LOG = "run.log"
 RESPONSE_DIR = "evidence"
 
 
-_LOG_MAX_BYTES = 512 * 1024
-
-
 def _run_log(project: Path, msg: str) -> None:
-    """Append one timestamped line to the run log; rotate at 512KB."""
-    log = project / ARTIFACT_ROOT / RUN_LOG
-    log.parent.mkdir(parents=True, exist_ok=True)
-    if log.is_file() and log.stat().st_size > _LOG_MAX_BYTES:
-        lines = log.read_text(encoding="utf-8").splitlines(keepends=True)
-        half = len(lines) // 2
-        log.write_text("".join(lines[half:]), encoding="utf-8")
-    ts = time.strftime("%Y-%m-%d %H:%M:%S")
-    with log.open("a", encoding="utf-8") as fh:
-        fh.write(f"[{ts}] {msg}\n")
+    from ..harness.runlog import run_log
+    run_log(project / ARTIFACT_ROOT, msg)
 
 
 def _save_response(project: Path, phase_id: str, text: str, result) -> Path:

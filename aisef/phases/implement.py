@@ -549,9 +549,17 @@ def run_attempt(
     before_sha = head_sha(project) if workdir != project else ""
 
     _attach_settings(spec, project)
+    from ..harness.runlog import run_log
+    run_log(artifact_root, f"story={story.id}#{number} agent START scope={','.join(scope)}")
     result = client.run(spec)
     attempt.cost_usd = result.cost_usd
     used = skills_used(result)
+    run_log(artifact_root, (
+        f"story={story.id}#{number} agent DONE ok={result.ok} ${result.cost_usd:.2f} "
+        f"turns={getattr(result, 'num_turns', '?')} "
+        f"out_tokens={getattr(result, 'output_tokens', '?')} "
+        f"err={result.error or ''}"
+    ))
     evidence.agent_run(
         story.id, result, name=f"{story.id}#{number}", prompt_chars=len(spec.prompt),
         skills={**context.get("_skills", {}), "used": used},
@@ -584,6 +592,7 @@ def run_attempt(
     # verifying anything (ADR-004 R1).  Verifying first then freezing means
     # evidence points to no specific version, and "stale" becomes undefined.
     changed_now = changed_files(str(workdir), base_ref=base_ref)
+    run_log(artifact_root, f"story={story.id}#{number} changed_files={len(changed_now)}")
     attempt.candidate = freeze_candidate(
         workdir, story=story, scope=scope, isolated=workdir != project,
         evidence=evidence, artifact_root=artifact_root, number=number,
@@ -1946,6 +1955,8 @@ def implement_story(
     contract: DesignContract | None = None,
 ) -> StoryOutcome:
     """Run a story until it passes the gate or exhausts retries."""
+    from ..harness.runlog import run_log
+
     project = Path(project)
     workdir = Path(workdir) if workdir else project
     root = Path(artifact_root) if artifact_root else project / "_bmad-output"
@@ -1953,25 +1964,26 @@ def implement_story(
     cat = catalog or load_catalog()
     contract = contract if contract is not None else load_contract(root)
 
+    def _log(msg: str) -> None:
+        run_log(root, msg)
+
     outcome = StoryOutcome(story_id=story.id)
     max_retries = cfg["run.max_retries"]
     infra_budget = max_retries + 1  # infrastructure errors have their own budget
     feedback = ""
 
-    # Fork point where the story branched off main.  Computed once, before
-    # the first attempt: the agent will commit in the worktree, and all gates
-    # must view the work from this point, not from HEAD that moves with it.
-    # Running directly in the project (`--no-isolate`) has no dedicated
-    # branch, empty is correct.
+    _log(f"story={story.id} START max_retries={max_retries}")
+
     base_ref = ""
     if workdir != project:
         head = head_sha(project)
         base_ref = fork_point(str(workdir), head) if head else ""
 
-    # Test baseline before the story touches anything -- once, before the first attempt (ADR-004 R9).
     run_baseline(story, workdir=workdir, artifact_root=root, config=cfg, base_ref=base_ref)
 
     while True:
+        n = outcome.quality_attempts + 1
+        _log(f"story={story.id} attempt={n} START")
         attempt = run_attempt(
             story,
             project=project,
@@ -1982,30 +1994,30 @@ def implement_story(
             catalog=cat,
             architecture=architecture,
             contract=contract,
-            number=outcome.quality_attempts + 1,
+            number=n,
             feedback=feedback,
             base_ref=base_ref,
         )
         outcome.attempts.append(attempt)
 
         if attempt.ok:
+            _log(f"story={story.id} attempt={n} OK ${attempt.cost_usd:.2f}")
             return outcome
 
         if attempt.fatal:
             outcome.blocked_reason = attempt.error
+            _log(f"story={story.id} attempt={n} FATAL ${attempt.cost_usd:.2f} err={attempt.error[:120]}")
             return outcome
 
         if attempt.infra:
             infra_budget -= 1
+            _log(f"story={story.id} attempt={n} INFRA ${attempt.cost_usd:.2f} err={attempt.error[:80]} budget={infra_budget}")
             if infra_budget <= 0:
                 outcome.blocked_reason = f"recurring infrastructure error: {attempt.error}"
+                _log(f"story={story.id} BLOCKED infra budget exhausted")
                 return outcome
-            continue  # does not count toward the quality budget
+            continue
 
-        # The reviewer has **independently verified** that criteria cannot be
-        # satisfied from within the story scope.  Two independent models
-        # reached the same conclusion; a third attempt will receive the same
-        # context and produce the same result.
         loi_ke_hoach = plan_defects(attempt.review_findings)
         if loi_ke_hoach:
             outcome.blocked_reason = (
@@ -2014,20 +2026,25 @@ def implement_story(
                 + ". Fix the acceptance criteria or the story's write_scope, then "
                 "re-run — retrying will not resolve this."
             )
+            _log(f"story={story.id} DEADLOCK plan: {'; '.join(loi_ke_hoach[:2])}")
             return outcome
 
         van = deadlock_reason(outcome.attempts, effective_write_scope(story, project))
         if van:
             outcome.blocked_reason = van
+            _log(f"story={story.id} DEADLOCK {van[:120]}")
             return outcome
 
         if outcome.quality_attempts > max_retries:
             outcome.blocked_reason = (
                 f"tried {outcome.quality_attempts} attempts, still did not pass gate"
             )
+            _log(f"story={story.id} EXHAUSTED {outcome.quality_attempts} attempts ${outcome.cost_usd:.2f}")
             return outcome
 
-        feedback = attempt.gate.feedback() if attempt.gate else attempt.error
+        gate_fb = attempt.gate.feedback() if attempt.gate else attempt.error
+        _log(f"story={story.id} attempt={n} FAIL ${attempt.cost_usd:.2f} gate={gate_fb[:120]}")
+        feedback = gate_fb
         if attempt.review_findings:
             feedback += "\n" + "\n".join(f"- {f}" for f in attempt.review_findings[:10])
 
