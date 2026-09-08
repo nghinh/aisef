@@ -1,5 +1,8 @@
 # Deep review — AISEF, 2026-09-05
 
+> **Tài liệu lịch sử** — viết ngày 2026-09-05. v1.0.0 đã phát hành
+> 2026-09-08, gói `aisef` có trên PyPI. Xem CHANGELOG.md.
+
 Rà toàn bộ framework theo từng lớp, sau khi hai dự án thử (`e9`: 7 story
 có giao diện, 77 phiên agent, $262; `par`: 4 story, 2 client) và 42 lỗi
 tìm được bằng chạy thật. Mọi nhận định đánh dấu nguồn:

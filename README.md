@@ -222,11 +222,10 @@ guards block *before* the tool runs rather than detecting afterwards. A client
 that cannot host pre-execution guards gets `aisef verify`, which re-runs
 everything against the diff, and `aisef compile` records the lower level of
 assurance in its report instead of staying silent — capability is **declared and
-tested**, defaulting to "unproven", never to "probably fine". In V1 OpenCode is a
-**second-class** client: guards do block (conformance 9/10) and since 2026-09-05
-`--format json` gives a machine-readable stream (tools, tokens, cost per
-provider). It has not been promoted because hook conformance has not been stable
-often enough; it does not block releases.
+tested**, defaulting to "unproven", never to "probably fine". Since v1.0.0
+OpenCode is a **first-class** client: guards block, conformance 10/10 (parity
+with Claude — see ADR-006 §4), and `--format json` gives a machine-readable
+stream (tools, tokens, cost per provider).
 
 ## Real bugs already hit
 
@@ -258,8 +257,8 @@ launched it — running conformance from inside a Claude session is a real
 scenario, and a child inheriting the parent's flags measures the wrong thing.
 This repository's own release gate reads that table in code
 (`AISEF_RELEASE=1 python3 -m unittest tests.test_release_gate`): the `claude`
-column must show ten ✅ and the table must be no older than 14 days. OpenCode is
-second-class in V1 — it has a column, it does not block. CI:
+column must show ten ✅ and the table must be no older than 14 days. Both
+Claude and OpenCode are first-class clients (10/10 conformance). CI:
 `.github/workflows/conformance.yml` runs weekly.
 
 ## Releasing
@@ -307,9 +306,10 @@ called unproven (owner decision 2026-09-06, `docs/RELEASE-PLAN-v0.1.0.md` §0):
   pre-deploy --epic EPIC-01`). EPIC-02..05 (16 stories) never ran — the report
   says "out of acceptance scope", not "done". `e9` is not a finished accepted
   product; it is the framework's acceptance corpus.
-- **OpenCode is a second-class client**: conformance 9/10 (on C9 the model
-  refused, so the probe is inconclusive), no stable machine-readable output;
-  release claims rest on Claude Code.
+- **OpenCode is a first-class client since v1.0.0**: conformance 10/10 (parity
+  with Claude, see ADR-006 §4). Known agent-side limitation: OpenCode + Serena
+  writes `.serena/` files outside declared `write_scope`; the harness correctly
+  rejects these.
 - **An agent inside a container still has no credential isolation** (S1
   blocked): V1 runs the agent on the host and only the verification suite in a
   container; `doctor` and `pre-deploy` name the missing guarantees instead of

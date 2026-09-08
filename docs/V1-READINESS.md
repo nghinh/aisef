@@ -1,5 +1,9 @@
 # v1.0.0 Readiness Checklist
 
+> **COMPLETED.** v1.0.0 released 2026-09-08, published to PyPI.
+> See CHANGELOG.md and ADR-006 for the final reconciliation.
+> This document is retained as historical record of the pre-release checklist.
+
 Status as of 2026-09-08. Each item is either automated (readable by command)
 or requires a manual step with real agent runs.
 

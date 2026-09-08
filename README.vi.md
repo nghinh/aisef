@@ -210,9 +210,10 @@ thật** rằng guard chặn *trước* khi tool chạy, chứ không phải ph�
 sau. Client nào không gắn được guard tiền kiểm thì `aisef verify` chạy
 lại toàn bộ trên diff, và `aisef compile` ghi rõ mức bảo đảm thấp hơn
 vào báo cáo thay vì im lặng — năng lực là thứ được **khai và kiểm**, mặc
-định là "chưa chứng minh", không phải "chắc là được". Trong V1, OpenCode
-là client **hạng hai** theo quyết định V1: guard chặn được (hợp quy 9/10), và từ 2026-09-05 `--format json` cho luồng máy đọc được (tool, token, cost theo nhà cung cấp) — chưa lên hạng nhất vì chưa đủ số lần hợp quy hook ổn định; chi phí trước đó không đo
-được từ harness; nó không chặn phát hành.
+định là "chưa chứng minh", không phải "chắc là được". Từ v1.0.0, OpenCode
+là client **hạng nhất**: guard chặn được, hợp quy 10/10 (ngang Claude — xem
+ADR-006 §4), và `--format json` cho luồng máy đọc được (tool, token, cost
+theo nhà cung cấp).
 
 ## Lỗi thật đã gặp
 
@@ -282,8 +283,9 @@ chứng minh (quyết định chủ đầu tư 2026-09-06, `docs/RELEASE-PLAN-v0
   pre-deploy --epic EPIC-01`). EPIC-02..05 (16 story) chưa chạy — báo cáo ghi
   "ngoài phạm vi", không phải "xong". `e9` chưa phải sản phẩm được nghiệm thu
   hoàn chỉnh; nó là corpus nghiệm thu của framework.
-- **OpenCode là client hạng hai**: hợp quy 9/10 (C9 model từ chối, không kết
-  luận), không có đầu ra máy đọc ổn định; claim phát hành dựa trên Claude Code.
+- **OpenCode là client hạng nhất từ v1.0.0**: hợp quy 10/10 (ngang Claude,
+  xem ADR-006 §4). Hạn chế đã biết: OpenCode + Serena ghi `.serena/` ngoài
+  `write_scope` khai; harness từ chối đúng.
 - **Agent trong container chưa có cách ly credential** (S1 blocked): V1 chạy
   agent trên host, chỉ kiểm định trong container; `doctor`/`pre-deploy` nêu
   tên bảo đảm thiếu, không im lặng.

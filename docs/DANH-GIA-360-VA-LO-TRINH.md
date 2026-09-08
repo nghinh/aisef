@@ -1,5 +1,8 @@
 # AISEF — đánh giá 360° bản hiện tại và lộ trình lên bản sau
 
+> **Tài liệu lịch sử** — viết ngày 2026-09-06, khi bản mới nhất là 0.2.0.
+> v1.0.0 đã phát hành 2026-09-08. Xem CHANGELOG.md.
+
 AISEF = **AI Software Engineering Framework**.
 
 Ngày 2026-09-06. Bản đang có: **`aisef 0.2.0`** trên PyPI (đổi tên

@@ -482,7 +482,8 @@ cho trạng thái lệch nhau.
 | OpenCode Desktop | cùng cấu hình dự án với CLI | tiền kiểm | ⚠️ suy luận từ CLI — chưa test riêng |
 | Bất kỳ, nếu hook không gắn được | `aisef verify` chạy lại toàn bộ guard | hậu kiểm | ✅ luôn có |
 
-**Quyết định (2026-09-05, thay quyết định 2026-09-04): OpenCode là client hạng hai trong V1.**
+**Quyết định (2026-09-05, thay quyết định 2026-09-04; cập nhật 2026-09-08
+theo ADR-006 §4): OpenCode là client hạng nhất từ v1.0.0.**
 Phép thử trên agent thật (opencode 1.18.26) đã chứng minh plugin **chặn tại
 nguồn** cho cả tool bash lẫn tool ghi tệp — nên hàng "hậu kiểm" ở bảng trên
 không còn đúng cho guard. `--format json` (đo 2026-09-05, v0.5.0) phát luồng
@@ -490,12 +491,11 @@ sự kiện `step_finish` với token và cost — `machine_output: NATIVE`. Cá
 thiếu: `turn_limit: unsupported` (OpenCode không có cờ giới hạn lượt). Hệ quả:
 
 * OpenCode chạy được trọn story (STORY-02-01 của `par`, qua bảy cổng, merge
-  vào main) và được hỗ trợ — nhưng `compile --client opencode` ghi rõ "hạng
-  hai V1: giới hạn lượt không có";
-* hợp quy client (`docs/CONFORMANCE.md`) chạy cả hai client, nhưng **điều
-  kiện phát hành chỉ đọc cột Claude**; OpenCode không chặn phát hành;
-* nâng hạng nhất sau release khi bộ hợp quy hook chạy ổn định qua nhiều
-  phiên bản.
+  vào main) và được hỗ trợ chính thức;
+* hợp quy client (`docs/CONFORMANCE.md`) chạy cả hai client — cả hai đạt
+  10/10 từ 2026-09-08;
+* hạn chế đã biết: OpenCode + Serena ghi `.serena/` ngoài `write_scope` khai
+  — harness từ chối đúng (vấn đề phía agent, không phải framework).
 
 **Phạm vi V1:** 4 bề mặt của Claude Code và OpenCode (mục 2.1). Antigravity hoãn — chưa test được.
 
