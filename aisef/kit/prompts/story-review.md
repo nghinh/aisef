@@ -1,6 +1,6 @@
 ---
 name: story-review
-version: 7
+version: 8
 role: reviewer
 ---
 # Review {{ story_id }} — {{ story_title }}
@@ -18,6 +18,13 @@ Do not fix code. Report only.
 ## Architecture decisions binding this story
 
 {{ architecture_rules }}
+
+## Write scope (effective)
+
+The developer is allowed to modify these paths. Files here that were
+changed are **in scope** — do not flag them as out-of-scope violations.
+
+{{ write_scope }}
 
 ## Changes to review
 

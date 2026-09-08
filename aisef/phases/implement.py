@@ -466,16 +466,17 @@ def skills_used(result) -> list[str]:
 
 
 def _write_scope_lines(story: Story, project: Path) -> str:
-    """Write scope for prompt: story-declared + harness-added paths required
-    by verification contract (bug 21) -- agent must see exactly the scope
-    the guard enforces."""
-    from ..control.normalize import verification_paths
+    """Write scope for prompt: story-declared + harness-added paths --
+    agent and reviewer must see exactly the scope the guard enforces."""
+    from ..control.normalize import effective_write_scope
 
+    full = effective_write_scope(story, project)
+    declared = set(story.write_scope)
     lines = [f"- `{p}`" for p in story.write_scope]
-    them = [p for p in verification_paths(story, project) if p not in story.write_scope]
-    if them:
-        lines.append("- _(added by harness per verification contract)_")
-        lines += [f"- `{p}`" for p in them]
+    added = [p for p in full if p not in declared]
+    if added:
+        lines.append("- _(added by harness: verification paths, manifests, lockfiles)_")
+        lines += [f"- `{p}`" for p in added]
     return "\n".join(lines) or "(not declared)"
 
 
@@ -874,11 +875,18 @@ def verify_candidate(
                if not keep(f"mockup:{m}", reuse and _green_at(ev, MOCKUP_MAP, m, sha))]
     if screens and contract:
         _log(f"story={sid}#{number} mockup verify screens={','.join(screens)}")
-        mockup_verify.verify_screens(
+        mv_result = mockup_verify.verify_screens(
             workdir, contract, screens,
             config=config, story_id=sid, artifact_root=artifact_root,
             candidate=sha,
         )
+        if mv_result.unavailable:
+            _log(f"story={sid}#{number} mockup UNAVAILABLE: {mv_result.unavailable}")
+            for scr in screens:
+                evidence.record(sid, Event(
+                    kind=MOCKUP_MAP, name=scr, ok=True,
+                    detail={"unavailable": mv_result.unavailable, "candidate": sha},
+                ))
 
     review_ev = _at(ev, TOOL_RUN, "review", sha) if reuse else None
     if keep("review", bool(review_ev and _at(ev, AGENT_RUN, f"{sid}-review", sha))):
@@ -1837,6 +1845,8 @@ def _tree_snapshot(workdir: Path) -> dict[str, bytes | None]:
             continue
         rel = item[3:]
         if rel.startswith((".aisef/", *[f"{h}/" for h in HARNESS_OWNED])) or rel in HARNESS_OWNED:
+            continue
+        if "/__pycache__/" in rel or rel.endswith(".pyc"):
             continue
         p = Path(workdir) / rel
         try:
