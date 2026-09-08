@@ -31,15 +31,15 @@ _FR_HEADING = re.compile(
 
 #: `- **NFR-1 — Thời gian mở ứng dụng.** Từ lúc…`
 _NFR_ITEM = re.compile(
-    r"^(?:[-*]\s+\*\*(NFR-\d+)\s*[—–-]\s*(.+?)\.?\*\*\s*(.*)"
-    r"|#{2,5}\s+\*{0,2}(NFR-\d+)\s*[—–-]\s*(.+?)\s*\*{0,2})$",
+    r"^(?:[-*]\s+\*\*(NFR-\d+)\s*[:：—–-]\s*(.+?)\.?\*\*\s*(.*)"
+    r"|#{2,5}\s+\*{0,2}(NFR-\d+)\s*[:：—–-]\s*(.+?)\s*\*{0,2})$",
     re.MULTILINE,
 )
 #: Section heading for NFR block — Vietnamese or English.
 #: Used as fallback: auto-number unlabelled bullets when the heading is present
 #: but the agent omitted NFR-N IDs.
 _NFR_SECTION = re.compile(
-    r"^#{2,5}\s+(?:Yêu cầu phi chức năng|Non-?functional\s+Requirements?)"
+    r"^#{2,5}\s+.*(?:Yêu cầu phi chức năng|Non-?functional\s+Requirements?)"
     r"\s*$",
     re.MULTILINE | re.IGNORECASE,
 )
@@ -49,10 +49,12 @@ _PLAIN_BULLET = re.compile(r"^(?:[-*]|\d+[.):])\s+(.+?)\s*$", re.MULTILINE)
 #: (lỗi 19, 2026-09-05: lượt `plan` thứ hai viết "Hệ quả kiểm chứng được" và
 #: cổng PRD loại cả 14 FR vì parser chỉ biết "Consequences (testable)").
 _CONSEQUENCES_HEAD = (
-    r"(?:Consequences\s*\(testable\)|Testable consequences|Acceptance criteria"
-    r"|Verification criteria|Verifiable consequences"
-    r"|Hệ quả(?: kiểm chứng(?:\s+được)?|\s*\((?:kiểm chứng được|có thể kiểm chứng)\))"
-    r"|Tiêu chí(?:\s+(?:kiểm chứng(?:\s+được)?|chấp nhận|xác nhận|nghiệm thu|kiểm tra)))"
+    r"(?:Consequences\s*\(testable\)"
+    r"|(?:Testable|Verifiable|Acceptance|Verification|Test)\s+(?:criteria|consequences|conditions)"
+    r"|Criteria"
+    r"|Hệ quả(?:\s+kiểm chứng(?:\s+được)?|\s*\([^)]*\))?"
+    r"|Tiêu chí(?:\s+(?:kiểm chứng(?:\s+được)?|chấp nhận|xác nhận|nghiệm thu|kiểm tra))?"
+    r")"
 )
 _CONSEQUENCES = re.compile(
     r"(?:\*\*" + _CONSEQUENCES_HEAD + r"\s*[:：]?\*\*"
@@ -305,6 +307,23 @@ def parse_prd(text: str) -> PRD:
         cons = _CONSEQUENCES.search(body)
         if cons:
             criteria = [b.group(1).strip() for b in _BULLET.finditer(cons.group(1))]
+
+        # Fallback: last bold-text heading or markdown heading followed by a
+        # bullet/numbered list in the FR body.
+        if not criteria:
+            _last_block = None
+            for _fb in re.finditer(
+                r"(?:^\*\*[^*\n]+\*\*|^#{3,5}\s+\S[^\n]*)[:：]?\s*$\s*\n",
+                body, re.MULTILINE,
+            ):
+                _rest = body[_fb.end():]
+                _end = re.search(r"\n#{2,5}\s|\n\*\*|\Z", _rest, re.MULTILINE)
+                _blk = _rest[: _end.start()] if _end else _rest
+                _items = [b.group(1).strip() for b in _BULLET.finditer(_blk)]
+                if _items:
+                    _last_block = (_fb, _items)
+            if _last_block:
+                cons, criteria = _last_block[0], _last_block[1]
 
         description = body[: cons.start()] if cons else body
         description = _ASSUMPTION.sub("", description)

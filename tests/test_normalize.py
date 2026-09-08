@@ -184,6 +184,70 @@ class TestParsing(unittest.TestCase):
         )
         self.assertEqual(len(prd.functional()[0].acceptance_criteria), 2)
 
+    def test_verifiable_criteria_heading(self):
+        """Real BMAD planner output: **Verifiable criteria:** not in old HEAD."""
+        prd = parse_prd(
+            "#### FR-1: Create a Task\n\n"
+            "The user can create a Task.\n\n"
+            "**Verifiable criteria:**\n\n"
+            "- Given valid title, task is created.\n"
+            "- Given empty title, no task.\n"
+        )
+        self.assertEqual(len(prd.functional()), 1)
+        self.assertEqual(len(prd.functional()[0].acceptance_criteria), 2)
+
+    def test_nfr_heading_with_colon(self):
+        """Real BMAD planner output: #### NFR-1: Title (colon, not dash)."""
+        prd = parse_prd(
+            "#### FR-1: X\n\nDesc.\n\n**Verifiable criteria:**\n- OK\n\n"
+            "#### NFR-1: Client-only operation\n\nNo backend needed.\n\n"
+            "#### NFR-2: Local data privacy\n\nNo external data.\n"
+        )
+        self.assertEqual(len(prd.non_functional()), 2)
+        self.assertEqual(prd.by_id("NFR-1").title, "Client-only operation")
+
+    def test_nfr_section_with_prefix(self):
+        """Section like '## 6. Cross-Cutting Non-Functional Requirements'."""
+        prd = parse_prd(
+            "#### FR-1: X\n\nDesc.\n\n**Criteria:**\n- OK\n\n"
+            "## 6. Cross-Cutting Non-Functional Requirements\n\n"
+            "- No backend needed\n"
+            "- No external data sent\n"
+        )
+        self.assertEqual(len(prd.non_functional()), 2)
+
+    def test_standalone_criteria_heading(self):
+        """Plain 'Criteria' as heading."""
+        prd = parse_prd(
+            "### FR-1: Login\n\nUser logs in.\n\n"
+            "**Criteria:**\n- Works\n- Fails gracefully\n"
+        )
+        self.assertEqual(len(prd.functional()[0].acceptance_criteria), 2)
+
+    def test_tieu_chi_standalone(self):
+        """Vietnamese 'Tiêu chí' without qualifier."""
+        prd = parse_prd(
+            "### FR-1: Đăng nhập\n\nNgười dùng đăng nhập.\n\n"
+            "**Tiêu chí:**\n- Đúng mật khẩu thì vào.\n- Sai thì báo lỗi.\n"
+        )
+        self.assertEqual(len(prd.functional()[0].acceptance_criteria), 2)
+
+    def test_he_qua_standalone(self):
+        """Vietnamese 'Hệ quả' without qualifier."""
+        prd = parse_prd(
+            "### FR-1: Tạo ghi chú\n\nTạo được ghi chú mới.\n\n"
+            "**Hệ quả:**\n- Ghi chú xuất hiện.\n"
+        )
+        self.assertEqual(len(prd.functional()[0].acceptance_criteria), 1)
+
+    def test_fallback_unknown_heading(self):
+        """Unknown bold heading followed by a list still extracts criteria."""
+        prd = parse_prd(
+            "#### FR-1: Login\n\nUser logs in.\n\n"
+            "**Expected behavior:**\n- Logged in on success\n- Error on failure\n"
+        )
+        self.assertEqual(len(prd.functional()[0].acceptance_criteria), 2)
+
 
 class TestArchitecture(unittest.TestCase):
     """Đọc architecture.md thật (26KB, 20 quyết định, do BMAD sinh)."""
