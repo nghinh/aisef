@@ -202,7 +202,7 @@ def _blast_radius_section(story: Story, *, project: Path, config: Config | None)
         from ..codebase.provider import resolve
         provider = resolve(project, preference=str((config or {}).get("context.graph_provider", "auto")))
         result = provider.impact(project, targets)
-    except Exception:
+    except Exception:  # noqa: BLE001
         return ""
     if not result.affected:
         return ""

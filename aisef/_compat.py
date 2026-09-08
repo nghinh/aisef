@@ -68,7 +68,7 @@ else:
             proc.wait(timeout=5)
         except (ProcessLookupError, ChildProcessError):
             pass
-        except Exception:
+        except Exception:  # noqa: BLE001
             try:
                 os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
             except (ProcessLookupError, ChildProcessError):

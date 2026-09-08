@@ -36,11 +36,6 @@ OWN_SKILLS = Path(__file__).resolve().parent / "skills"
 #: Marker file for framework-installed skills — allows cleanup on next run
 #: without touching user-added skills.
 MARKER = ".aisef-managed"
-#: Legacy marker name from 0.1.0 when the CLI/module was named `aisdlc`.
-#: Still **read** so skills installed by the old version are recognized as
-#: framework-managed — otherwise they'd be left on disk forever. Only the
-#: new name is **written**.
-MARKER_LEGACY = ".aisdlc-managed"
 
 
 @dataclass(frozen=True)
@@ -213,7 +208,7 @@ def apply(plan_: InstallPlan, project: Path | str) -> InstallReport:
     for existing in dest_root.iterdir():
         if not existing.is_dir() or existing.name in wanted:
             continue
-        if (existing / MARKER).exists() or (existing / MARKER_LEGACY).exists():
+        if (existing / MARKER).exists():
             shutil.rmtree(existing, ignore_errors=True)
             report.removed.append(existing.name)
 
@@ -246,5 +241,5 @@ def _same_content(src: Path, dest: Path) -> bool:
     if src_md.read_bytes() != dest_md.read_bytes():
         return False
     src_names = {p.name for p in src.iterdir()}
-    dest_names = {p.name for p in dest.iterdir()} - {MARKER, MARKER_LEGACY}
+    dest_names = {p.name for p in dest.iterdir()} - {MARKER}
     return src_names == dest_names

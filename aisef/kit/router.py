@@ -188,7 +188,7 @@ def route(story: Story, registry: Registry, *, phase: str = "implement",
     contract = [k for k in verification_contract(story) if k != "mockup-map"]
     try:
         needs = sorted({n.capability for n in required_capabilities(story, project=project)})
-    except Exception:  # preflight is a secondary signal — if it breaks the router still runs
+    except Exception:  # noqa: BLE001  — preflight is a secondary signal; router still runs
         needs = []
     # `unit` appears in every story: matching it says nothing about this story.
     contract = [k for k in contract if k != "unit"]
