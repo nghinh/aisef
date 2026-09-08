@@ -25,8 +25,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 #: Section headings may vary slightly between generation runs; accept several variants.
-_IA_HEADINGS = ("information architecture", "surfaces", "screens", "màn hình",
-                "kiến trúc thông tin")
+_IA_HEADINGS = ("information architecture", "surfaces", "screens", "screen",
+                "màn hình", "kiến trúc thông tin")
 _COMPONENT_HEADINGS = ("component patterns", "components", "thành phần",
                        "mẫu thành phần")
 _STATE_HEADINGS = ("state patterns", "states", "trạng thái", "mẫu trạng thái")
