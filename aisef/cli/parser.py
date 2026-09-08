@@ -44,10 +44,13 @@ from .plan import (
 
 
 def build_parser() -> argparse.ArgumentParser:
+    from .. import __version__
+
     p = argparse.ArgumentParser(
         prog="aisef",
         description="AISEF — orchestrate the AI-assisted software development lifecycle",
     )
+    p.add_argument("-V", "--version", action="version", version=f"%(prog)s {__version__}")
     p.add_argument("--project", default=".", help="project directory (default: current directory)")
     sub = p.add_subparsers(dest="command", required=True)
 

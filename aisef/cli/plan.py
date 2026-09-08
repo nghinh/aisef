@@ -25,6 +25,7 @@ from ._common import (
     _approvals,
     _artifact_root,
     _client,
+    _ensure_git,
 )
 
 
@@ -201,9 +202,6 @@ def cmd_plan(args) -> int:
     """Run the BMAD phase chain up to the first unapproved gate."""
     from ..phases.plan import run_pipeline
 
-    # Validate arguments first, environment second: wrong args fail on every
-    # machine, while a missing client depends on the machine — mixing the two
-    # makes the exit code vary by host.
     try:
         gates = parse_auto_approve(args.auto_approve)
     except ValueError as e:
@@ -213,6 +211,10 @@ def cmd_plan(args) -> int:
     adapter, code = _client(args)
     if adapter is None:
         return code
+
+    git_err = _ensure_git(args.project)
+    if git_err is not None:
+        return git_err
 
     result = run_pipeline(
         args.project,
@@ -243,6 +245,10 @@ def cmd_mockup(args) -> int:
     adapter, code = _client(args)
     if adapter is None:
         return code
+
+    git_err = _ensure_git(args.project)
+    if git_err is not None:
+        return git_err
 
     res = generate(
         args.project,

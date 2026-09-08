@@ -172,17 +172,29 @@ def effective_write_scope(story: Story, project: Path) -> list[str]:
 _VERIFY_COMMAND_KEY = {"unit": "tools.test"}
 
 
-def verification_paths(story: Story, project: Path, config=None) -> list[str]:
-    """Test directories/files the **story's verification contract** requires —
-    inferred from the project's verification commands (`verify.e2e` =
-    `npx playwright test tests/e2e` -> `tests/e2e`), only paths that
-    **actually exist**.
+_TEST_CONFIGS = (
+    "playwright.config.js", "playwright.config.ts",
+    "jest.config.js", "jest.config.ts", "jest.config.mjs",
+    "vitest.config.js", "vitest.config.ts", "vitest.config.mts",
+    "cypress.config.js", "cypress.config.ts",
+    ".mocharc.yml", ".mocharc.json",
+    "pytest.ini", "setup.cfg", "pyproject.toml",
+    "conftest.py",
+)
+_TEST_DIRS = ("tests", "test", "__tests__", "spec", "e2e", "cypress")
 
-    Bug 21 (e9 2026-09-05, two consecutive stories): story declared `e2e` and
-    `accessibility` but write_scope only had `src/**`; guard blocked writing
-    `tests/`, reviewer marked plan deadlock, $30 for two stories where the
-    fault was the harness *requiring* tests then *forbidding* writing tests.
-    If the harness requires something, it must grant scope for it.
+
+def verification_paths(story: Story, project: Path, config=None) -> list[str]:
+    """Test directories/files the **story's verification contract** requires.
+
+    Bug 21 (e9 2026-09-05): story declared `e2e` and `accessibility` but
+    write_scope only had `src/**`; guard blocked writing `tests/`, $30 wasted.
+    If the harness requires tests, it must grant scope to write them.
+
+    Bug 22 (e9 2026-09-08, greenfield): verification_paths only added paths
+    that **exist**, but in a greenfield project the test directory doesn't
+    exist yet — the story must CREATE it. Now also adds conventional test
+    dirs and config files when the verification contract requires test kinds.
     """
     kinds = [k.strip().lower() for k in (story.verification_contract or []) if k.strip()]
     if not kinds:
@@ -195,6 +207,8 @@ def verification_paths(story: Story, project: Path, config=None) -> list[str]:
         except Exception:  # noqa: BLE001 — no config means nothing to infer
             return []
     out: list[str] = []
+    needs_tests = any(k in kinds for k in ("unit", "e2e", "accessibility", "integration"))
+
     for kind in kinds:
         key = _VERIFY_COMMAND_KEY.get(kind, f"verify.{kind}")
         try:
@@ -207,8 +221,17 @@ def verification_paths(story: Story, project: Path, config=None) -> list[str]:
             rel = tok.strip("./").rstrip("/")
             if not rel or rel.startswith("..") or rel.startswith("node_modules"):
                 continue
-            if (project / rel).exists() and rel not in out:
+            if rel not in out:
                 out.append(rel)
+
+    if needs_tests and not out:
+        for d in _TEST_DIRS:
+            if d not in out:
+                out.append(d)
+        for cfg in _TEST_CONFIGS:
+            if cfg not in out:
+                out.append(cfg)
+
     return out
 
 

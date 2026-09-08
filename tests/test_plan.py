@@ -341,3 +341,26 @@ class TestSummary(PlanTestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestGitReadiness(unittest.TestCase):
+    def test_ensure_git_no_repo(self):
+        from aisef.cli._common import _ensure_git
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            # no .git, no user config → should init then fail on missing user
+            code = _ensure_git(d)
+            self.assertIsNotNone(code)
+
+    def test_ensure_git_configured_repo(self):
+        from aisef.cli._common import _ensure_git
+        import subprocess, tempfile
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init"], cwd=d, capture_output=True)
+            subprocess.run(["git", "config", "user.name", "Test"], cwd=d, capture_output=True)
+            subprocess.run(["git", "config", "user.email", "t@t.t"], cwd=d, capture_output=True)
+            Path(d, "f").write_text("x")
+            subprocess.run(["git", "add", "."], cwd=d, capture_output=True)
+            subprocess.run(["git", "commit", "-m", "init"], cwd=d, capture_output=True)
+            code = _ensure_git(d)
+            self.assertIsNone(code)

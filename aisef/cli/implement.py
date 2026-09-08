@@ -17,6 +17,7 @@ from ._common import (
     _approvals,
     _artifact_root,
     _client,
+    _ensure_git,
     _state,
 )
 
@@ -160,6 +161,10 @@ def cmd_run(args) -> int:
     adapter, code = _client(args)
     if adapter is None:
         return code
+
+    git_err = _ensure_git(args.project)
+    if git_err is not None:
+        return git_err
 
     if verify_only:
         report = run_verify_only(

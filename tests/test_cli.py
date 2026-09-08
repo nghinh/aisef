@@ -27,6 +27,12 @@ class CliTestCase(unittest.TestCase):
         (self.project / "docs" / "requirements.md").write_text("# yêu cầu\n", encoding="utf-8")
         self.artifacts = self.project / "_bmad-output"
         self.artifacts.mkdir()
+        import subprocess
+        subprocess.run(["git", "init"], cwd=self.project, capture_output=True)
+        subprocess.run(["git", "config", "user.name", "Test"], cwd=self.project, capture_output=True)
+        subprocess.run(["git", "config", "user.email", "t@t.t"], cwd=self.project, capture_output=True)
+        subprocess.run(["git", "add", "."], cwd=self.project, capture_output=True)
+        subprocess.run(["git", "commit", "-m", "init"], cwd=self.project, capture_output=True)
 
     def tearDown(self):
         self._tmp.cleanup()

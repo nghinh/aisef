@@ -57,6 +57,44 @@ def _gate_arg(value: str) -> Gate:
         raise argparse.ArgumentTypeError(f"invalid gate: {value}. Valid: {valid}")
 
 
+def _ensure_git(project: str | Path) -> int | None:
+    """Check git readiness; return exit code on failure, None on success."""
+    import subprocess
+
+    root = Path(project)
+    if not (root / ".git").exists():
+        subprocess.run(["git", "init"], cwd=root, capture_output=True)
+        print(f"  git init → {root}")
+
+    def _cfg(key: str) -> str:
+        r = subprocess.run(
+            ["git", "config", key], cwd=root, capture_output=True, text=True,
+        )
+        return r.stdout.strip()
+
+    if not _cfg("user.name") or not _cfg("user.email"):
+        print(
+            "✗ git user.name / user.email not configured for this repo.\n"
+            "  Run:  git config user.name 'Your Name'\n"
+            "        git config user.email 'you@example.com'",
+            file=sys.stderr,
+        )
+        return EXIT_USAGE
+
+    head = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=root,
+        capture_output=True, text=True,
+    )
+    if head.returncode != 0:
+        print(
+            "✗ no commits yet — aisef needs at least one commit.\n"
+            "  Run:  git add . && git commit -m 'initial'",
+            file=sys.stderr,
+        )
+        return EXIT_USAGE
+    return None
+
+
 def _client(args):
     """Validated client adapter. Returns None if unavailable."""
     from ..clients.compile import ADAPTERS
