@@ -1,17 +1,18 @@
-"""Cài skill vào dự án đích.
+"""Install skills into the target project.
 
-Tách làm hai bước có chủ đích: ``plan()`` quyết định cài gì (thuần tính
-toán, không đụng đĩa), ``apply()`` mới ghi. Nhờ đó ``--dry-run`` là thật
-chứ không phải mô phỏng, và phần quyết định — vốn là chỗ dễ sai — kiểm
-được bằng test mà không cần chép hàng trăm thư mục.
+Deliberately split into two steps: ``plan()`` decides what to install (pure
+computation, no disk I/O), ``apply()`` writes. This makes ``--dry-run``
+genuine rather than simulated, and the decision logic — the part most likely
+to have bugs — testable without copying hundreds of directories.
 
-**Sao chép, không tạo liên kết.** Dự án đích phải tự đứng được: đưa cho
-người khác, đẩy lên CI, hay mở trên máy không có thư mục ``references/``
-thì vẫn chạy. Liên kết tượng trưng tiết kiệm đĩa nhưng đổi lấy một dự án
-gãy khi rời khỏi máy này.
+**Copy, don't symlink.** The target project must be self-contained: hand it
+to someone else, push to CI, or open on a machine without the ``references/``
+directory and it still works. Symlinks save disk but break the project the
+moment it leaves this machine.
 
-**Idempotent.** Chạy lại lần hai không nhân bản, và xoá skill không còn
-được chọn — nếu không, đổi stack rồi cài lại sẽ để lại rác của lần trước.
+**Idempotent.** A second run doesn't duplicate, and removes skills no longer
+selected — otherwise changing the stack and re-installing would leave stale
+artifacts from the previous run.
 """
 
 from __future__ import annotations
@@ -25,19 +26,20 @@ from .detect_stack import Stack
 from .security_filter import Verdict, classify_all, select_for_stack
 from .skills import Skill, scan
 
-#: Nơi skill nằm trong dự án đích. Đây là đường dẫn Claude Code đọc.
+#: Where skills live in the target project. This is the path Claude Code reads.
 SKILLS_DIR = ".claude/skills"
 
-#: Skill do chính framework viết — nằm trong repo, không phải kho ngoài,
-#: nên không cần ghim commit hay xét giấy phép.
+#: Skills authored by the framework itself — lives in this repo, not an
+#: external source, so no commit pinning or license check needed.
 OWN_SKILLS = Path(__file__).resolve().parent / "skills"
 
-#: File đánh dấu skill do framework cài — để dọn lần sau mà không đụng
-#: skill người dùng tự thêm.
+#: Marker file for framework-installed skills — allows cleanup on next run
+#: without touching user-added skills.
 MARKER = ".aisef-managed"
-#: Tên đánh dấu của 0.1.0, khi lệnh và module còn tên `aisdlc`. Vẫn **đọc**
-#: để skill cài bằng bản cũ được nhận là của framework — không nhận thì lần
-#: cài sau bỏ sót chúng lại trên đĩa mãi. Chỉ **ghi** tên mới.
+#: Legacy marker name from 0.1.0 when the CLI/module was named `aisdlc`.
+#: Still **read** so skills installed by the old version are recognized as
+#: framework-managed — otherwise they'd be left on disk forever. Only the
+#: new name is **written**.
 MARKER_LEGACY = ".aisdlc-managed"
 
 
@@ -92,7 +94,7 @@ def _select_from_source(
     stack: Stack,
     requirements_text: str,
 ) -> tuple[list[PlannedSkill], str | None]:
-    """Chọn skill của một nguồn. Trả (danh sách, lý do bỏ qua nếu có)."""
+    """Select skills from one source. Returns (list, skip reason if any)."""
     if not source.installable:
         return [], f"reference only (license: {source.license or 'none'})"
 
@@ -116,7 +118,7 @@ def _select_from_source(
         chosen = []
         for s in found:
             if s.name in allow and s.name not in seen:
-                seen.add(s.name)  # ui-ux có bản sao ở cli/assets — chỉ lấy một
+                seen.add(s.name)  # ui-ux has a copy in cli/assets — take only one
                 chosen.append(s)
         reason = "in allowlist"
 
@@ -144,14 +146,14 @@ def plan(
     requirements_text: str = "",
     catalog: Catalog | None = None,
 ) -> InstallPlan:
-    """Quyết định cài gì. Không đụng đĩa của dự án đích."""
+    """Decide what to install. Does not touch the target project's disk."""
     cat = catalog or Catalog.load()
     refs = Path(references_root)
     result = InstallPlan()
     seen_names: set[str] = set()
 
-    # Skill của framework đứng trước: chúng định nghĩa hợp đồng của framework,
-    # nên khi trùng tên với kho ngoài thì bản của ta phải thắng.
+    # Framework skills come first: they define the framework's contract, so
+    # when a name collides with an external source, ours must win.
     for skill in scan(OWN_SKILLS) if OWN_SKILLS.is_dir() else []:
         seen_names.add(skill.name)
         result.skills.append(
@@ -165,7 +167,7 @@ def plan(
             continue
         for ps in chosen:
             if ps.name in seen_names:
-                continue  # tên skill trùng giữa hai nguồn — nguồn trước thắng
+                continue  # skill name collision between two sources — first wins
             seen_names.add(ps.name)
             result.skills.append(ps)
 
@@ -174,15 +176,15 @@ def plan(
 
 
 def apply(plan_: InstallPlan, project: Path | str) -> InstallReport:
-    """Ghi skill vào dự án. Idempotent, dọn skill không còn được chọn."""
+    """Write skills to the project. Idempotent; removes deselected skills."""
     dest_root = Path(project) / SKILLS_DIR
     dest_root.mkdir(parents=True, exist_ok=True)
     report = InstallReport()
 
     wanted = {ps.name: ps for ps in plan_.skills}
 
-    # Gỡ skill do framework cài mà lần này không còn chọn. Chỉ đụng thư mục
-    # có file đánh dấu — skill người dùng tự thêm được giữ nguyên.
+    # Remove framework-installed skills that are no longer selected. Only
+    # touch directories with the marker file — user-added skills are kept.
     for existing in dest_root.iterdir():
         if not existing.is_dir() or existing.name in wanted:
             continue
@@ -207,10 +209,11 @@ def apply(plan_: InstallPlan, project: Path | str) -> InstallReport:
 
 
 def _same_content(src: Path, dest: Path) -> bool:
-    """So nhanh: cùng danh sách file và cùng nội dung SKILL.md.
+    """Quick comparison: same file list and same SKILL.md content.
 
-    Không băm toàn bộ cây — skill là nội dung tĩnh đã ghim theo commit, và
-    băm hàng trăm thư mục mỗi lần chạy tốn hơn giá trị nó mang lại.
+    Doesn't hash the entire tree — skills are static content pinned by commit,
+    and hashing hundreds of directories per run costs more than the value it
+    provides.
     """
     src_md, dest_md = src / "SKILL.md", dest / "SKILL.md"
     if not (src_md.is_file() and dest_md.is_file()):

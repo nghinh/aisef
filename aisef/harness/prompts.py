@@ -1,17 +1,17 @@
-"""Sổ prompt — prompt là mã nguồn, không phải chuỗi rải trong code.
+"""Prompt catalog — prompts are source code, not strings scattered in call sites.
 
-Ba lý do prompt phải nằm ở đây thay vì nằm rải trong hàm gọi:
+Three reasons prompts live here instead of inline in calling functions:
 
-* **có phiên bản.** Bằng chứng mỗi story ghi lại tên + phiên bản prompt.
-  Chất lượng tụt sau một lần sửa prompt thì còn lần được ra nguyên nhân.
-* **kiểm được.** Test dựng prompt với ngữ cảnh giả và kiểm nội dung, không
-  cần gọi model.
-* **thiếu biến là lỗi.** Chỗ trống không được điền sẽ lặng lẽ thành khoảng
-  trắng, và agent sẽ làm việc với một bản hướng dẫn khuyết mà không ai
-  biết. Ở đây nó ném lỗi.
+* **Versioned.** Evidence for each story records the prompt name + version.
+  Quality drops after a prompt edit can still be traced to the cause.
+* **Testable.** Tests build a prompt with mock context and check its content
+  without calling a model.
+* **Missing variables are errors.** An unfilled slot silently becomes
+  whitespace, and the agent works with incomplete instructions unnoticed.
+  Here it raises an error.
 
-Cú pháp chỗ trống là ``{{ ten_bien }}`` chứ không dùng ``str.format``: thân
-prompt có ngoặc nhọn thật (ví dụ JSON, mã nguồn), và ``format`` sẽ vấp.
+Slot syntax is ``{{ var_name }}`` rather than ``str.format``: the prompt body
+contains real braces (e.g. JSON, source code), and ``format`` would choke.
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ class PromptError(ValueError):
 
 
 def _body_of(text: str) -> str:
-    """Phần sau frontmatter."""
+    """The part after frontmatter."""
     lines = text.splitlines()
     if not lines or lines[0].strip() != FRONTMATTER_FENCE:
         return text
@@ -56,7 +56,7 @@ class Prompt:
 
     @property
     def stamp(self) -> str:
-        """Dấu ghi vào bằng chứng: `story-implement@3`."""
+        """Stamp recorded in evidence: `story-implement@3`."""
         return f"{self.name}@{self.version}"
 
     def render(self, context: dict[str, object], *, allow_empty: tuple[str, ...] = ()) -> str:

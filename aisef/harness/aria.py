@@ -1,19 +1,19 @@
-"""Đối chiếu màn hình thật với hợp đồng thị giác lấy từ mockup.
+"""Compare the live screen against the visual contract extracted from a mockup.
 
-Đây là nửa sau của bước map mockup (SOLUTION mục 12bis) và là điều kiện
-thứ 5 của cổng story.
+This is the second half of the mockup-mapping step (SOLUTION item 12bis) and
+the 5th condition of the story gate.
 
-**Vì sao dùng accessibility tree, không dùng CSS selector hay pixel diff:**
+**Why accessibility tree instead of CSS selectors or pixel diff:**
 
-* selector CSS gãy mỗi lần đổi class — bắt lỗi giả, bỏ lọt lỗi thật;
-* pixel diff giữa mockup tĩnh và ứng dụng thật **không bao giờ** trùng,
-  cổng kiểu đó đỏ liên tục rồi bị tắt, mà một cổng bị tắt còn tệ hơn
-  không có cổng;
-* accessibility tree mang **ý nghĩa ngữ nghĩa** (vai trò + tên gọi), bền
-  trước thay đổi giao diện, và kiểm luôn được khả năng tiếp cận.
+* CSS selectors break on every class rename — false positives, missed real bugs;
+* pixel diff between a static mockup and the live app **never** matches,
+  so the gate stays red permanently and gets disabled, and a disabled gate
+  is worse than no gate at all;
+* the accessibility tree carries **semantic meaning** (role + name), is
+  resilient to UI changes, and checks accessibility for free.
 
-Đầu vào là kết quả `page.locator('body').ariaSnapshot()` của Playwright —
-định dạng đã xác lập bằng thực nghiệm ở spike S7.
+Input is the result of Playwright's `page.locator('body').ariaSnapshot()` —
+format validated experimentally in spike S7.
 """
 
 from __future__ import annotations
@@ -21,8 +21,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-#: Vai trò mang hợp đồng. Node `text:` thuần và node bố cục bị bỏ qua:
-#: chúng là chi tiết trình bày, không phải thứ mockup cam kết.
+#: Roles that carry a contract. Pure `text:` nodes and layout nodes are
+#: ignored: they are presentation details, not what the mockup commits to.
 CONTRACT_ROLES = frozenset({
     "button", "textbox", "checkbox", "radio", "link", "combobox",
     "listbox", "option", "slider", "switch", "spinbutton", "searchbox",
@@ -43,7 +43,7 @@ class Component:
 
 @dataclass
 class MapResult:
-    """Kết quả đối chiếu một màn hình."""
+    """Result of comparing one screen against its contract."""
 
     screen_id: str = ""
     route: str = ""
@@ -51,9 +51,9 @@ class MapResult:
     actual: list[Component] = field(default_factory=list)
     missing: list[Component] = field(default_factory=list)
     extra: list[Component] = field(default_factory=list)
-    #: Vai trò hợp đồng hứa có trong vùng dữ liệu nhưng ứng dụng không dựng
-    #: mục nào. So theo tên ở vùng này là vô nghĩa (dữ liệu khác nhau), còn
-    #: không so gì thì bỏ lọt cả một danh sách rỗng.
+    #: Roles the contract promises in the data region but the app renders
+    #: none of. Comparing by name in this region is meaningless (data differs),
+    #: yet comparing nothing would miss an entirely empty list.
     missing_data_roles: list[str] = field(default_factory=list)
 
     @property
@@ -62,10 +62,10 @@ class MapResult:
 
     @property
     def passed(self) -> bool:
-        """Chỉ `missing` mới chặn.
+        """Only `missing` items block the gate.
 
-        Ứng dụng thật được phép có thêm phần tử hợp lý (nút phụ, banner),
-        nhưng **không được thiếu** thứ hợp đồng đã hứa.
+        The live app may have extra reasonable elements (auxiliary buttons,
+        banners), but it **must not lack** what the contract promises.
         """
         return not self.missing and not self.missing_data_roles
 
@@ -97,11 +97,10 @@ class MapResult:
 
 
 def parse_aria_snapshot(text: str) -> list[Component]:
-    """Đọc cây aria của Playwright thành danh sách component có hợp đồng.
+    """Parse a Playwright aria snapshot into a list of contract-bearing components.
 
-    Bỏ node không thuộc `CONTRACT_ROLES` và node không có tên gọi — một
-    phần tử không tên thì không kiểm chứng được, và cũng là dấu hiệu vấn
-    đề khả năng tiếp cận.
+    Nodes outside `CONTRACT_ROLES` and unnamed nodes are dropped — an
+    unnamed element cannot be verified and is itself an accessibility issue.
     """
     out: list[Component] = []
     for line in text.splitlines():
@@ -122,11 +121,11 @@ def compare(
     route: str = "",
     data_roles: list[str] | None = None,
 ) -> MapResult:
-    """So hợp đồng với thực tế.
+    """Compare the contract against the actual screen.
 
-    So theo **tập hợp** chứ không theo thứ tự: mockup và ứng dụng thật có
-    thể sắp xếp khác nhau mà vẫn đúng hợp đồng. Vị trí là chuyện của
-    người đánh giá thị giác, không phải của cổng tất định.
+    Comparison is **set-based**, not order-dependent: the mockup and live
+    app may arrange items differently and still satisfy the contract.
+    Positioning is a visual-review concern, not the deterministic gate's.
     """
     want, have = set(contract), set(actual)
     roles_present = {c.role for c in actual}
@@ -149,7 +148,7 @@ def compare_snapshots(
     route: str = "",
     data_roles: list[str] | None = None,
 ) -> MapResult:
-    """Tiện ích: đối chiếu trực tiếp hai chuỗi aria snapshot."""
+    """Convenience: compare two raw aria snapshot strings directly."""
     return compare(
         parse_aria_snapshot(contract_snapshot),
         parse_aria_snapshot(actual_snapshot),

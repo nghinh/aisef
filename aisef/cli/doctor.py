@@ -1,4 +1,4 @@
-"""Lệnh ``doctor`` — kiểm môi trường, cấu hình, hook và skill đã cài."""
+"""``doctor`` command — check environment, config, hooks, and installed skills."""
 
 from __future__ import annotations
 
@@ -13,25 +13,25 @@ from ._common import EXIT_NOT_READY, EXIT_OK
 
 
 def _hook_paths_elsewhere(project: Path) -> list[str] | None:
-    """Đường dẫn dự án ghi trong hook/plugin biên dịch mà **khác** dự án này.
-    None khi không có hook nào để so."""
+    """Project paths declared in compiled hook/plugin that **differ** from this project.
+    None when there are no hooks to compare."""
     import re as _re
 
-    goc = project.resolve()
-    thay: list[str] = []
+    resolved = project.resolve()
+    found: list[str] = []
     hook = project / ".claude" / "settings.json"
     if hook.is_file():
-        thay += _re.findall(r"--project\s+(\S+)\s+guard", hook.read_text(encoding="utf-8", errors="replace"))
+        found += _re.findall(r"--project\s+(\S+)\s+guard", hook.read_text(encoding="utf-8", errors="replace"))
     plugin = project / ".opencode" / "plugin" / "aisef-guard.ts"
     if plugin.is_file():
-        thay += _re.findall(r'const PROJECT = "([^"]+)"', plugin.read_text(encoding="utf-8", errors="replace"))
-    if not thay:
+        found += _re.findall(r'const PROJECT = "([^"]+)"', plugin.read_text(encoding="utf-8", errors="replace"))
+    if not found:
         return None
-    return sorted({p for p in thay if Path(p).resolve() != goc})
+    return sorted({p for p in found if Path(p).resolve() != resolved})
 
 
 def cmd_doctor(args) -> int:
-    """Kiểm tra môi trường có đủ chạy framework không."""
+    """Check whether the environment meets framework prerequisites."""
     project = Path(args.project)
     problems: list[str] = []
     lines: list[str] = []
@@ -91,8 +91,9 @@ def cmd_doctor(args) -> int:
         )
     except ConfigError:
         image, spec = "?", _sandbox.SandboxSpec(workspace=project, cmd=["true"])
-    # Provider đang dùng và bảo đảm nó khai (ADR-005 V5): người đọc biết
-    # bằng chứng sắp ghi `degraded` vì **thiếu gì**, trước khi chạy story nào.
+    # Active provider and its declared guarantees (ADR-005 V5): the reader
+    # knows evidence will record `degraded` due to **what is missing**, before
+    # any story runs.
     try:
         prov, missing = _sandbox.select_provider(spec)
     except (RuntimeError, ValueError, ImportError, AttributeError) as e:
@@ -108,7 +109,7 @@ def cmd_doctor(args) -> int:
             required=False,
         )
     if prov is not None and prov.id == "docker":
-        # Chỉ Docker mới bàn về ảnh; provider khác chạy công cụ của máy.
+        # Only Docker discusses the image; other providers use the host's tools.
         check(
             "sandbox image",
             image != "alpine:latest",
@@ -119,10 +120,10 @@ def cmd_doctor(args) -> int:
     req = project / "docs" / "requirements.md"
     check("docs/requirements.md", req.is_file(), str(req))
 
-    # Hook sinh ra ≠ hook chạy. Story chạy trong worktree; worktree chỉ có
-    # `.claude/` nếu dự án commit nó. Harness nay truyền `--settings` tường
-    # minh (G4), nhưng thứ đó chỉ được chứng minh bằng hợp quy — ở đây nói
-    # thẳng tình trạng để người đọc biết mình đang dựa vào lớp nào.
+    # Generated hook != running hook.  Stories run in worktrees; a worktree
+    # only has `.claude/` if the project commits it.  Harness now passes
+    # `--settings` explicitly (G4), but that is only proven by conformance —
+    # here we state the situation so the reader knows which layer they rely on.
     plugin = project / ".opencode" / "plugin" / "aisef-guard.ts"
     if plugin.is_file():
         tracked = subprocess.run(
@@ -154,9 +155,9 @@ def cmd_doctor(args) -> int:
             required=False,
         )
 
-    # Guard framework thêm sau lần `compile` cuối thì hook cũ không biết —
-    # ví dụ `process-ref` (luật 6, 2026-09-05). Không kiểm thì guard mới chỉ
-    # có trong mã, không có trong phiên agent nào.
+    # Guards added after the last `compile` are unknown to the old hook —
+    # e.g. `process-ref` (rule 6, 2026-09-05).  Without this check, new
+    # guards exist only in code, not in any agent session.
     rep = project / "_bmad-output" / "compile-report.json"
     if rep.is_file():
         from ..harness.guardrails import GUARD_MATCHERS
@@ -166,69 +167,69 @@ def cmd_doctor(args) -> int:
         except (OSError, json.JSONDecodeError):
             data = {}
         for c in data.get("clients", []):
-            thieu = sorted(set(GUARD_MATCHERS) - set(c.get("guards_wired") or []) - set(c.get("guards_post_hoc") or []))
+            missing_guards = sorted(set(GUARD_MATCHERS) - set(c.get("guards_wired") or []) - set(c.get("guards_post_hoc") or []))
             check(
-                f"hook {c.get('client')} has all guards", not thieu,
-                f"{len(GUARD_MATCHERS)} guards" if not thieu else
-                f"missing {', '.join(thieu)} — framework has new guards since last compile; run `aisef compile --client {c.get('client')}`",
+                f"hook {c.get('client')} has all guards", not missing_guards,
+                f"{len(GUARD_MATCHERS)} guards" if not missing_guards else
+                f"missing {', '.join(missing_guards)} — framework has new guards since last compile; run `aisef compile --client {c.get('client')}`",
             )
 
-    # Ngưỡng cỡ story chỉ đáng tin chừng nào nó còn khớp dữ liệu thật
-    # (ADR-004 R5). Bảng hiệu chuẩn do `run` tự ghi sau mỗi story.
+    # Story size thresholds are only trustworthy while they match real data
+    # (ADR-004 R5).  The calibration table is written by `run` after each story.
     from ..control import complexity
 
     rows = complexity.load_calibration(project / "_bmad-output")
     if rows:
-        lech_nguong = complexity.divergence(rows)
+        threshold_divergence = complexity.divergence(rows)
         check(
-            "story size thresholds match data", not lech_nguong,
-            f"{len(rows)} stories measured, no divergence" if not lech_nguong else
-            "; ".join(lech_nguong) + " — adjust `story.max_complexity` in "
+            "story size thresholds match data", not threshold_divergence,
+            f"{len(rows)} stories measured, no divergence" if not threshold_divergence else
+            "; ".join(threshold_divergence) + " — adjust `story.max_complexity` in "
             "`.ai/config.json` or review weights in `control/complexity.py`",
             required=False,
         )
 
-    lech = _hook_paths_elsewhere(project)
-    if lech is not None:
+    stray = _hook_paths_elsewhere(project)
+    if stray is not None:
         check(
-            "hook points to this project", not lech,
-            "`--project`/`PROJECT` path in hook matches this directory" if not lech else
-            f"hook points to {', '.join(lech[:2])} — project copied/moved? guards will write "
+            "hook points to this project", not stray,
+            "`--project`/`PROJECT` path in hook matches this directory" if not stray else
+            f"hook points to {', '.join(stray[:2])} — project copied/moved? guards will write "
             "evidence to that project; run `aisef compile` again",
         )
 
     try:
         cfg = Config.load(project)
         check("config", True, cfg.source)
-        lenh = str(cfg.get("tools.test", "") or "")
-        if lenh:
-            co_cov = any(k in lenh for k in ("--coverage", "--cov", "--experimental-test-coverage", "c8 ", "nyc "))
+        test_cmd = str(cfg.get("tools.test", "") or "")
+        if test_cmd:
+            has_cov = any(k in test_cmd for k in ("--coverage", "--cov", "--experimental-test-coverage", "c8 ", "nyc "))
             check(
-                "test command prints coverage", co_cov,
-                "gate `coverage.min` can read the number" if co_cov else
-                f"`tools.test` = `{lenh}` does not print coverage — gate coverage check will be **not configured** "
+                "test command prints coverage", has_cov,
+                "gate `coverage.min` can read the number" if has_cov else
+                f"`tools.test` = `{test_cmd}` does not print coverage — gate coverage check will be **not configured** "
                 "(add `--coverage` / `--cov` / `--experimental-test-coverage`)",
                 required=False,
             )
-            # Tên test đọc được không (ADR-005 V9)? Có bằng chứng thì tin bằng
-            # chứng: lần `tool_run test` gần nhất ghi `test_format`; chưa có
-            # thì đoán từ cờ lệnh. e9/par: 220/377 lần test không đọc được tên.
+            # Are test names readable (ADR-005 V9)?  If evidence exists, trust
+            # it: the latest `tool_run test` records `test_format`; otherwise
+            # guess from command flags.  e9/par: 220/377 test runs had unreadable names.
             from ..harness.observe import TOOL_RUN, EvidenceStore
 
             store = EvidenceStore(project / "_bmad-output")
-            lan = [e for sid in store.stories() for e in store.read(sid).of(TOOL_RUN)
-                   if e.name in ("test", "test:baseline") and not e.detail.get("skipped")]
-            if lan:
-                doc_ten = bool(lan[-1].detail.get("test_format"))
-                vi = f"last test run recorded test_format={lan[-1].detail.get('test_format') or ''!r}"
+            runs = [e for sid in store.stories() for e in store.read(sid).of(TOOL_RUN)
+                    if e.name in ("test", "test:baseline") and not e.detail.get("skipped")]
+            if runs:
+                has_names = bool(runs[-1].detail.get("test_format"))
+                detail = f"last test run recorded test_format={runs[-1].detail.get('test_format') or ''!r}"
             else:
-                doc_ten = any(k in lenh for k in ("-v", "--verbose", "--reporter=verbose",
-                                                  "--test-reporter", "node --test", "ctrf"))
-                vi = "no evidence yet — guessing from command flags"
+                has_names = any(k in test_cmd for k in ("-v", "--verbose", "--reporter=verbose",
+                                                        "--test-reporter", "node --test", "ctrf"))
+                detail = "no evidence yet — guessing from command flags"
             check(
-                "test command prints test names", doc_ten,
-                f"gate can read test names ({vi})" if doc_ten else
-                f"{vi} — gate `has tests`/`no existing tests broken` will be **not configured**. "
+                "test command prints test names", has_names,
+                f"gate can read test names ({detail})" if has_names else
+                f"{detail} — gate `has tests`/`no existing tests broken` will be **not configured**. "
                 "Use a reporter that prints names or CTRF: pytest `-v` or `pip install pytest-json-ctrf` + "
                 "`pytest --ctrf /dev/stdout`; vitest `--reporter=verbose` or `vitest-ctrf-json-reporter` "
                 "(prints `vitest-ctrf/report.json` to stdout, preserves exit code); node `--test-reporter=spec|tap`",
@@ -245,15 +246,15 @@ def cmd_doctor(args) -> int:
         lines.append("Installed skills:")
         check("has skills", bool(installed), f"{len(installed)} directories")
 
-        # Bất biến: skill tấn công không bao giờ được có mặt trong dự án.
+        # Invariant: offensive skills must never be present in the project.
         offensive = [
             c.skill.name
             for c in classify_all(skills_dir)
             if c.verdict is Verdict.OFFENSIVE
         ]
-        # Skill của framework nằm trong kho framework; dự án giữ một bản
-        # sao. Sửa skill mà không cài lại thì agent vẫn chạy bản cũ, và
-        # cách duy nhất phát hiện là ngồi so từng file.
+        # Framework skills live in the framework repo; the project keeps a
+        # copy.  Editing a skill without reinstalling leaves the agent running
+        # the old copy, and the only way to detect this is a file-by-file diff.
         from ..kit.install import OWN_SKILLS
 
         stale = []

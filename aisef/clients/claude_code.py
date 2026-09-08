@@ -1,50 +1,54 @@
-"""Chạy agent bằng Claude Code CLI.
+"""Run agent via Claude Code CLI.
 
-Mọi cờ dùng ở đây đã kiểm chứng bằng thực nghiệm (spike S1, S2 —
-`docs/SPIKE-REPORT.md`), không suy từ tài liệu:
+Every flag used here was verified empirically (spike S1, S2 —
+`docs/SPIKE-REPORT.md`), not inferred from documentation:
 
-* ``--output-format stream-json --verbose`` cho luồng sự kiện đọc được,
-  kết thúc bằng sự kiện ``result`` mang cost, latency, usage và
+* ``--output-format stream-json --verbose`` yields a readable event stream
+  ending with a ``result`` event carrying cost, latency, usage, and
   ``permission_denials``;
-* ``--settings`` gắn hook, và hook trả mã 2 **chặn thật** tool — kể cả khi
-  chạy với ``--permission-mode acceptEdits``;
-* ``< /dev/null`` là bắt buộc, nếu không CLI chờ stdin ba giây mỗi lần gọi.
+* ``--settings`` wires hooks, and a hook returning exit 2 **actually blocks**
+  the tool — even under ``--permission-mode acceptEdits``;
+* ``< /dev/null`` is mandatory, otherwise the CLI waits on stdin for three
+  seconds on every invocation.
 
-**Cách ly khỏi cấu hình toàn cục của người dùng** (đo 2026-09-05, Claude Code
-2.1.236, hợp quy C3/C4 trượt sau khi máy chủ bật ``permissions.defaultMode:
-"auto"`` trong ``~/.claude/settings.json``): phiên con thừa hưởng chế độ ấy
-thì **mất Glob/Grep** và được dặn "ưu tiên Bash" — tức ghi tệp bằng heredoc
-và né sạch guard ``Write|Edit``; MCP của người dùng (Google Drive…) và hook
-toàn cục cũng lọt vào phiên. Harness không tin client thì càng không tin
-cấu hình máy: chế độ cố định ``acceptEdits``, tool kê tường minh
-(``DEFAULT_TOOLS``), chỉ nạp settings dự án + ``--settings`` của harness,
-không MCP ngoài. Đo lại cùng ngày: Glob/Grep có, MCP 0, hook người dùng 0,
-guard write-scope vẫn chặn.
+**Isolation from user's global config** (measured 2026-09-05, Claude Code
+2.1.236, conformance C3/C4 failed after host set ``permissions.defaultMode:
+"auto"`` in ``~/.claude/settings.json``): a child session inheriting that
+mode **loses Glob/Grep** and is told to "prefer Bash" — i.e. write files
+via heredoc and bypass all ``Write|Edit`` guards; user MCP servers (Google
+Drive...) and global hooks also leak in.  The harness does not trust the
+client, much less the host config: fixed mode ``acceptEdits``, explicitly
+listed tools (``DEFAULT_TOOLS``), load only project settings + harness
+``--settings``, no external MCP.  Re-measured same day: Glob/Grep present,
+MCP 0, user hooks 0, write-scope guard still blocks.
 
-**Hook có tới được worktree không** (đo 2026-09-05 trên `par`, claude CLI,
-`.claude/` **không** commit nên worktree không có thư mục ấy; mỗi biến thể
-một phiên `-p` bảo agent Write một tệp; đếm sự kiện guard tự ghi):
+**Do hooks reach the worktree?** (measured 2026-09-05 on `par`, claude CLI,
+`.claude/` **not** committed so worktree lacks that directory; each variant
+runs one `-p` session telling the agent to Write a file; count self-recorded
+guard events):
 
 =====  ==============================  ==========  ====
-Biến   cwd / cờ                        guard ghi   tệp
+Var    cwd / flags                     guard logs  file
 =====  ==============================  ==========  ====
-A      worktree, ``--settings <tệp>``  2           có
-B      worktree, ``--settings <json>`` 2           có
-C      gốc dự án (có ``.claude/``)     2           có
-D      worktree, không cờ              **0**       có
+A      worktree, ``--settings <file>`` 2           yes
+B      worktree, ``--settings <json>`` 2           yes
+C      project root (has ``.claude/``) 2           yes
+D      worktree, no flags              **0**       yes
 =====  ==============================  ==========  ====
 
-D là hình dạng của mọi lượt chạy trước G4: story chạy trọn, tệp ghi ra,
-**không một guard nào chạy**, và bằng chứng trông y hệt agent ngoan. Vì
-thế `implement.py` luôn truyền ``--settings`` (``_attach_settings``), và
-cổng story có mục "guard có chạy" đọc nhịp tim ``GUARD_SEEN`` — hai lớp,
-lớp sau bắt được lớp trước hỏng.
+D is the shape of every run before G4: the story completes, files are
+written, **not a single guard runs**, and evidence looks identical to a
+well-behaved agent.  Therefore `implement.py` always passes ``--settings``
+(``_attach_settings``), and the story gate includes a "guard ran" item
+reading the ``GUARD_SEEN`` heartbeat — two layers, the second catches the
+first failing.
 
-Bài học đắt hơn: lượt kiểm đầu tiên sau khi có ``--settings`` vẫn báo
-"guard không chạy" — bản ghi phiên cho thấy hook chạy 17 lần nhưng agent
-ghi file **chỉ bằng Bash**, nên ``write-scope`` (Write|Edit) không được
-gọi và không có gì để ghi. Từ đó guard ghi nhịp tim riêng, và
-``diff-scope`` ghi ``FILE_CHANGE`` cho tệp có mtime mới hơn lần test cuối.
+A more expensive lesson: the first check run after adding ``--settings``
+still reported "guard did not run" — session logs showed the hook fired
+17 times but the agent wrote files **only via Bash**, so ``write-scope``
+(Write|Edit) was never called and there was nothing to record.  Since then,
+the guard writes its own heartbeat, and ``diff-scope`` records
+``FILE_CHANGE`` for files whose mtime is newer than the last test run.
 """
 
 from __future__ import annotations
@@ -58,12 +62,12 @@ from .stream import RunResult, parse_stream
 
 BINARY = "claude"
 
-#: Chế độ quyền cố định cho phiên con — không để chế độ toàn cục của máy quyết.
+#: Fixed permission mode for child sessions — not determined by the host's global mode.
 PERMISSION_MODE = "acceptEdits"
-#: Tool được phép khi vai không kê riêng. `acceptEdits` tự duyệt Write/Edit
-#: trong thư mục làm việc nhưng Bash thì phải kê, không thì `-p` từ chối
-#: và agent không chạy nổi `aisef tool test`. `--disallowed-tools` của vai
-#: (reviewer/security) vẫn thắng danh sách này.
+#: Tools allowed when the role does not specify its own list.  `acceptEdits`
+#: auto-approves Write/Edit in the working directory but Bash must be listed
+#: explicitly, otherwise `-p` denies it and the agent cannot run `aisef tool
+#: test`.  Role-level `--disallowed-tools` (reviewer/security) still win.
 DEFAULT_TOOLS = ("Read", "Write", "Edit", "Glob", "Grep", "Bash", "NotebookEdit")
 
 
@@ -90,7 +94,7 @@ class ClaudeCodeAdapter(ClientAdapter):
         }
 
     def build_command(self, spec: RunSpec) -> list[str]:
-        """Dựng dòng lệnh. Tách riêng để test được mà không gọi model."""
+        """Build the command line.  Separated so it can be tested without calling a model."""
         cmd = [
             self.binary,
             "-p", spec.prompt,
@@ -118,11 +122,12 @@ class ClaudeCodeAdapter(ClientAdapter):
         return cmd
 
     def run(self, spec: RunSpec) -> RunResult:
-        """Chạy một lượt. Môi trường con là **allowlist** (`child_env`, ADR-005
-        V2), không phải môi trường của tiến trình gọi: harness chạy từ bên
-        trong một phiên Claude là chuyện có thật, và phiên con thừa hưởng cờ
-        `CLAUDE*` của phiên cha thì tự chuyển sang Bash thay vì Read/Write
-        (hợp quy C3, 2026-09-05); secret của máy thì agent không cần cầm (C9)."""
+        """Run one round.  Child environment is an **allowlist** (`child_env`,
+        ADR-005 V2), not the calling process's environment: the harness running
+        from inside a Claude session is a real scenario, and a child session
+        inheriting the parent's `CLAUDE*` flags switches to Bash instead of
+        Read/Write (conformance C3, 2026-09-05); the agent does not need the
+        host's secrets (C9)."""
         if not self.available():
             return RunResult(ok=False, error=f"command not found: {self.binary}")
         if not Path(spec.workdir).is_dir():
@@ -136,7 +141,7 @@ class ClaudeCodeAdapter(ClientAdapter):
                 stderr=subprocess.PIPE,
                 text=True,
                 env=child_env(spec.env, allow_prefixes=spec.env_allow),
-                stdin=subprocess.DEVNULL,  # không có: CLI chờ stdin 3s mỗi lần
+                stdin=subprocess.DEVNULL,  # without this: CLI waits on stdin 3s per call
             )
         except OSError as e:
             return RunResult(ok=False, error=f"cannot run: {e}")

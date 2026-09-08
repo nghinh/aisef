@@ -1,18 +1,18 @@
-"""Cô lập story chạy song song bằng git worktree.
+"""Isolate parallel stories using git worktrees.
 
-Chia đợt theo ``write_scope`` chỉ tránh được đụng *nội dung file*. Ba thứ
-vẫn đụng nếu nhiều story chạy chung một thư mục làm việc:
+Wave partitioning by ``write_scope`` only prevents *file content* collisions.
+Three things still clash when multiple stories share a working directory:
 
-* ``git add`` / ``git commit`` đồng thời tranh ``index.lock``;
-* test đồng thời tranh cổng mạng, cơ sở dữ liệu, file tạm;
-* cài phụ thuộc đồng thời làm hỏng ``node_modules`` / venv.
+* concurrent ``git add`` / ``git commit`` fighting over ``index.lock``;
+* concurrent tests fighting over network ports, databases, temp files;
+* concurrent dependency installs corrupting ``node_modules`` / venv.
 
-Mỗi story trong một đợt vì thế chạy trong worktree riêng, có nhánh riêng.
-Worktree dùng chung ``.git`` nên tạo nhanh và tốn ít đĩa.
+Each story in a wave therefore runs in its own worktree with its own branch.
+Worktrees share ``.git`` so creation is fast and disk-cheap.
 
-Hết đợt, các nhánh được **merge tuần tự** vào nhánh chính. Xem
-``merge_story`` để hiểu vì sao conflict ở đây là tín hiệu chứ không phải
-sự cố. Cơ chế đã kiểm chứng ở spike S5 (`docs/SPIKE-REPORT.md`).
+After a wave, branches are **merged sequentially** into the main branch. See
+``merge_story`` for why a conflict here is a signal, not an incident.
+Mechanism validated in spike S5 (`docs/SPIKE-REPORT.md`).
 """
 
 from __future__ import annotations
@@ -30,17 +30,17 @@ from pathlib import Path
 
 from aisef._compat import flock_ex_nb, flock_un
 
-#: Nơi chứa worktree, tương đối so với gốc repo.
+#: Worktree directory, relative to the repo root.
 WORKTREE_ROOT = ".aisef/worktrees"
 
-#: Tiền tố nhánh của story.
+#: Story branch name prefix.
 BRANCH_PREFIX = "story/"
 
 _SAFE = re.compile(r"[^A-Za-z0-9._-]+")
 
 
 class GitError(RuntimeError):
-    """Lệnh git thất bại."""
+    """A git command failed."""
 
 
 def _git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess:
@@ -56,25 +56,25 @@ def _git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProc
 
 
 def commit_paths(path: Path, message: str, *, paths: list[str] | None = None) -> bool:
-    """Chốt phần còn dở của một cây làm việc. False nghĩa là không có gì để chốt.
+    """Commit remaining uncommitted work in a working tree. False means nothing to commit.
 
-    Stage **đúng phạm vi ghi**, không `add -A` (bất biến 5). `diff-scope`
-    thường đã xác nhận cây nằm trong phạm vi nên hai cách cho cùng kết quả —
-    nhưng chỉ khi guard đã chạy. Stage theo phạm vi thì đúng cả khi nó chưa
-    chạy, và đó mới là điều bất biến bảo vệ.
+    Stage **only the declared write scope**, not `add -A` (invariant 5).
+    `diff-scope` usually already confirmed the tree is within scope, so both
+    approaches give the same result — but only when the guard has run. Staging
+    by scope is correct even when it hasn't, and that is what the invariant protects.
     """
     if not _git(path, "status", "--porcelain", check=False).stdout.strip():
-        return False  # agent đã tự commit hết
+        return False  # agent already committed everything
 
-    # Chỉ stage đường dẫn **có thật**: story khai một tệp rồi không tạo ra
-    # nó là chuyện thường, nhất là khi nó trượt giữa chừng, và `git add`
-    # với pathspec không khớp thì gãy cả lệnh. Bỏ đường rỗng không nới lỏng
-    # gì — vẫn không phải `add -A`.
+    # Only stage paths that **actually exist**: a story declaring a file then
+    # not creating it is common, especially on mid-run failures, and `git add`
+    # with a non-matching pathspec breaks the whole command. Dropping missing
+    # paths doesn't loosen anything — still not `add -A`.
     co_that = [p for p in (paths or []) if (path / p).exists()]
     if co_that:
         _git(path, "add", "--", *co_that)
     else:
-        _git(path, "add", "-u")  # không khai phạm vi: chỉ file đã theo dõi
+        _git(path, "add", "-u")  # no scope declared: only tracked files
     if not _git(path, "diff", "--cached", "--name-only", check=False).stdout.strip():
         return False
     _git(path, "commit", "-q", "-m", message)
@@ -82,11 +82,11 @@ def commit_paths(path: Path, message: str, *, paths: list[str] | None = None) ->
 
 
 def main_repo(path: Path | str) -> Path:
-    """Kho chính của một đường dẫn, kể cả khi đang đứng trong worktree.
+    """Main repository root for a given path, even when inside a worktree.
 
-    Story chạy trong worktree riêng, nhưng bằng chứng và trạng thái phải
-    ghi về **một gốc artifact duy nhất** (bất biến 2). Nếu không, mỗi story
-    ghi vào gốc riêng của nó và cổng đọc ở gốc chính sẽ không thấy gì.
+    Stories run in separate worktrees, but evidence and state must be written
+    to **a single artifact root** (invariant 2). Otherwise each story writes
+    to its own root and the gate reading from the main root sees nothing.
     """
     path = Path(path).resolve()
     proc = subprocess.run(
@@ -100,7 +100,7 @@ def main_repo(path: Path | str) -> Path:
 
 
 def safe_slug(story_id: str) -> str:
-    """Biến id story thành mảnh tên nhánh/thư mục an toàn."""
+    """Convert a story id into a safe branch/directory name slug."""
     slug = _SAFE.sub("-", story_id).strip("-")
     if not slug:
         raise ValueError(f"unusable story id: {story_id!r}")
@@ -112,8 +112,8 @@ class Worktree:
     story_id: str
     path: Path
     branch: str
-    #: Nhánh chính đã được mang vào lúc nối lại, hoặc "" nếu không cần.
-    #: Ghi ra để người đọc biết worktree này đứng trên nền nào.
+    #: Main branch merged in on reconnect, or "" if not needed.
+    #: Recorded so readers know which base this worktree stands on.
     refreshed_from: str = ""
 
 
@@ -127,20 +127,20 @@ class MergeResult:
 
     @property
     def scope_was_misdeclared(self) -> bool:
-        """Conflict nghĩa là hai story đã chạm cùng vùng.
+        """A conflict means two stories touched the same region.
 
-        Bộ lập lịch chỉ xếp chung đợt những story có ``write_scope`` rời
-        nhau, nên nếu merge vẫn đụng thì phạm vi đã khai sai.
+        The scheduler only places stories with disjoint ``write_scope`` in
+        the same wave, so a merge conflict means the scope was misdeclared.
         """
         return bool(self.conflicts)
 
 
-#: Cấu hình client mà `compile` sinh ra và dự án có thể không commit.
+#: Client config generated by `compile` that the project may not commit.
 CLIENT_CONFIG = (".claude/settings.json", ".opencode")
 
 
 class WorktreeManager:
-    """Tạo, dọn và hợp nhất worktree của story."""
+    """Create, clean up, and merge story worktrees."""
 
     # git worktree add races on .git/worktrees metadata under ThreadPoolExecutor
     _create_lock = threading.Lock()
@@ -151,7 +151,7 @@ class WorktreeManager:
         if not (self.repo / ".git").exists():
             raise GitError(f"{self.repo} is not a git repository")
 
-    # ------------------------------------------------------------ tạo, dọn
+    # ------------------------------------------------------------ create, clean up
 
     def path_for(self, story_id: str) -> Path:
         return self.root / safe_slug(story_id)
@@ -160,26 +160,26 @@ class WorktreeManager:
         return f"{BRANCH_PREFIX}{safe_slug(story_id)}"
 
     def has_branch(self, story_id: str) -> bool:
-        """Nhánh story còn đó không — worktree gỡ rồi thì đây là nơi giữ
-        công việc, và là ứng viên của lượt kiểm-lại."""
+        """Whether the story branch still exists — after the worktree is removed,
+        the branch holds the work and is a candidate for re-verification."""
         return self._branch_exists(self.branch_for(story_id))
 
     def create(self, story_id: str, *, base: str | None = None,
                refresh: bool = True) -> Worktree:
-        """Tạo worktree cho story. Idempotent: đã có thì trả về cái đang có.
+        """Create a worktree for a story. Idempotent: returns existing one if present.
 
-        Nhánh có sẵn thì **mang nhánh chính vào trước khi giao cho agent**
-        — trừ khi ``refresh=False``: lượt kiểm-lại (ADR-004 R13) chấm đúng
-        ứng viên đã đóng băng ở HEAD nhánh story, và một commit merge là một
-        bản mới làm mọi bằng chứng cũ thành stale.
-        Không làm thế thì story chạy lại vẫn đứng trên trunk lúc nó rẽ ra:
-        bản sửa cấu hình, bản vá công cụ, và công việc của story đã merge
-        ở đợt trước đều không tới nơi. Đo trên dự án `par`:
-        `story/STORY-01-01` rẽ từ `e0a6b4e`, bản vá lệnh test nằm ở
-        `963dae3`, và story trượt vì đúng cái lỗi đã được sửa trên main.
+        If the branch already exists, **merge the main branch in before handing
+        off to the agent** — unless ``refresh=False``: re-verification (ADR-004
+        R13) grades the exact candidate frozen at the story branch HEAD, and a
+        merge commit creates a new revision that makes all prior evidence stale.
+        Without this, a retried story still stands on the trunk at the point it
+        forked: config fixes, tool patches, and work from stories merged in
+        earlier waves never arrive. Measured on project `par`:
+        `story/STORY-01-01` forked from `e0a6b4e`, the test command patch was
+        at `963dae3`, and the story failed due to exactly the bug fixed on main.
 
-        Merge chứ không rebase: rebase viết lại lịch sử agent đã commit,
-        và conflict giữa chừng một chuỗi commit thì không ai gỡ nổi.
+        Merge, not rebase: rebase rewrites the agent's commit history, and a
+        conflict mid-way through a commit chain is unresolvable.
         """
         path, branch = self.path_for(story_id), self.branch_for(story_id)
         if (path / ".git").exists():
@@ -207,11 +207,12 @@ class WorktreeManager:
         return Worktree(story_id, path, branch, refreshed_from=mang_vao)
 
     def _carry_client_config(self, path: Path) -> list[str]:
-        """Chép cấu hình client do `compile` sinh vào worktree khi nó chưa
-        được commit. Claude nhận `--settings` tường minh, nhưng OpenCode chỉ
-        đọc `.opencode/` của thư mục nó chạy — không chép thì guard không
-        tới. Đo ở hợp quy 2026-09-05: OpenCode C1 `rm -rf` chạy thật, tệp
-        mất, vì worktree không có plugin."""
+        """Copy client config generated by `compile` into the worktree when it
+        hasn't been committed. Claude receives `--settings` explicitly, but
+        OpenCode only reads `.opencode/` from its working directory — without
+        copying, guards don't reach it. Measured in conformance 2026-09-05:
+        OpenCode C1 `rm -rf` ran for real, file lost, because the worktree
+        had no plugin."""
         chep = []
         for rel in CLIENT_CONFIG:
             src, dst = self.repo / rel, path / rel
@@ -226,18 +227,18 @@ class WorktreeManager:
         return chep
 
     def refresh(self, story_id: str, *, base: str | None = None) -> str:
-        """Mang nhánh chính vào nhánh story. Trả tên nhánh nguồn, hoặc "".
+        """Merge the main branch into the story branch. Returns source branch name, or "".
 
-        Conflict thì abort và **ném lỗi**: story đứng trên trunk cũ mà cứ
-        chạy tiếp là làm việc trên nền sai, và giấu chuyện đó đi thì lỗi
-        chỉ hiện ra ở lần merge cuối đợt, xa chỗ gây ra nó.
+        On conflict, aborts and **raises an error**: a story running on a stale
+        trunk works on the wrong base, and hiding that only surfaces the error
+        at the end-of-wave merge, far from where it was caused.
         """
         path = self.path_for(story_id)
         goc = base or self._current_branch()
         if not goc or not path.is_dir():
             return ""
-        # Đã chứa đầu nhánh chính rồi thì không cần merge — tránh đẻ ra
-        # một commit merge rỗng mỗi lần chạy lại.
+        # Already contains the main branch tip — no merge needed; avoids
+        # creating an empty merge commit on every rerun.
         dau = _git(self.repo, "rev-parse", goc, check=False).stdout.strip()
         if dau and _git(
             path, "merge-base", "--is-ancestor", dau, "HEAD", check=False
@@ -265,8 +266,8 @@ class WorktreeManager:
         return "" if out in ("", "HEAD") else out
 
     def remove(self, story_id: str, *, delete_branch: bool = False) -> None:
-        """Gỡ worktree. Không xoá nhánh trừ khi được yêu cầu — công việc
-        đã commit không được biến mất chỉ vì dọn thư mục."""
+        """Remove the worktree. Does not delete the branch unless requested —
+        committed work must not disappear just because the directory is cleaned up."""
         path = self.path_for(story_id)
         if path.exists():
             _git(self.repo, "worktree", "remove", "--force", str(path), check=False)
@@ -277,21 +278,22 @@ class WorktreeManager:
             _git(self.repo, "branch", "-D", self.branch_for(story_id), check=False)
 
     def list_active(self) -> list[str]:
-        """Id story đang có worktree."""
+        """Story ids that currently have a worktree."""
         if not self.root.is_dir():
             return []
         return sorted(p.name for p in self.root.iterdir() if p.is_dir())
 
     @contextmanager
     def temporary(self, sha: str, *, label: str = "qa") -> Iterator[Path]:
-        """Worktree **tách** (detached) tạm ở đúng ``sha``; gỡ khi ra khỏi
-        ``with``, kể cả khi bên trong ném lỗi.
+        """Temporary **detached** worktree at exactly ``sha``; removed on exit
+        from the ``with`` block, even if an exception is raised inside.
 
-        Cho kiểm định cấp dự án (ADR-005 V6): cây chấm dựng lại từ SHA, không
-        phải cây làm việc mà agent (hay người) vừa sửa — shim
-        `node_modules/.bin/*`, `pytest.ini`, `conftest.py` chưa commit thì
-        không tới được đây. Không tạo nhánh: kiểm xong không có gì để giữ.
-        Thư mục tạo bằng ``mkdtemp`` nên hai lần gọi cùng SHA không đụng nhau.
+        For project-level verification (ADR-005 V6): the tree under test is
+        reconstructed from SHA, not the working tree the agent (or human) just
+        edited — uncommitted shims like `node_modules/.bin/*`, `pytest.ini`,
+        `conftest.py` cannot reach here. No branch is created: nothing to keep
+        after verification. Directory is created via ``mkdtemp`` so two calls
+        with the same SHA don't collide.
         """
         self._ensure_root()
         path = Path(tempfile.mkdtemp(prefix=f"{label}-{sha[:7]}-", dir=self.root))
@@ -308,21 +310,21 @@ class WorktreeManager:
                 shutil.rmtree(path, ignore_errors=True)
             _git(self.repo, "worktree", "prune", check=False)
 
-    # ------------------------------------------------------------ hợp nhất
+    # ------------------------------------------------------------ merging
 
     def commit_story(
         self, story_id: str, message: str = "", *, paths: list[str] | None = None
     ) -> bool:
-        """Chốt công việc còn dở trong worktree của story.
+        """Commit remaining uncommitted work in a story's worktree.
 
-        Agent được khuyến khích tự commit từng phần, nhưng phần còn dở thì
-        harness chốt: merge chỉ nhìn thấy thứ đã commit, nên bỏ bước này
-        thì story "xong" mà công việc không sang được nhánh chính.
+        Agents are encouraged to commit incrementally, but the harness commits
+        whatever is left: merge only sees committed content, so skipping this
+        step leaves the story "done" with work that never reaches the main branch.
 
-        Stage **đúng phạm vi ghi của story**, không `add -A` (bất biến 5).
-        `diff-scope` vừa xác nhận cây nằm trong phạm vi nên hai cách cho
-        cùng kết quả — nhưng chỉ khi guard đã chạy. Stage theo phạm vi thì
-        đúng cả khi nó chưa chạy, và đó mới là điều bất biến bảo vệ.
+        Stage **only the story's declared write scope**, not `add -A` (invariant 5).
+        `diff-scope` just confirmed the tree is within scope, so both approaches
+        give the same result — but only when the guard has run. Staging by scope
+        is correct even when it hasn't, and that is what the invariant protects.
         """
         path = self.path_for(story_id)
         if not path.is_dir():
@@ -333,7 +335,7 @@ class WorktreeManager:
 
     @contextmanager
     def _merge_lock(self) -> Iterator[None]:
-        """Khoá merge — chỉ một máy merge vào nhánh chính cùng lúc."""
+        """Merge lock — only one machine merges into the main branch at a time."""
         lock_path = self.repo / ".aisef" / "merge.lock"
         lock_path.parent.mkdir(parents=True, exist_ok=True)
         fh = open(lock_path, "w")
@@ -354,14 +356,15 @@ class WorktreeManager:
             fh.close()
 
     def merge_story(self, story_id: str, *, into: str | None = None) -> MergeResult:
-        """Merge nhánh story vào nhánh chính.
+        """Merge a story branch into the main branch.
 
-        Conflict thì **abort ngay** và trả danh sách file đụng. Không tự gỡ:
-        theo bộ lập lịch, hai story chung đợt lẽ ra không thể chạm cùng vùng,
-        nên conflict là bằng chứng ``write_scope`` khai sai — cần người xem
-        lại phần chẻ story, không phải cần một lần merge khéo hơn.
+        On conflict, **aborts immediately** and returns the list of conflicting
+        files. Does not auto-resolve: per the scheduler, two stories in the same
+        wave should never touch the same region, so a conflict is evidence that
+        ``write_scope`` was misdeclared — needs a human to review the story
+        split, not a cleverer merge.
 
-        Khoá merge bảo đảm chỉ một máy merge cùng lúc (distributed).
+        Merge lock ensures only one machine merges at a time (distributed).
         """
         with self._merge_lock():
             return self._merge_story_inner(story_id, into=into)
@@ -390,10 +393,10 @@ class WorktreeManager:
         )
 
     def merge_wave(self, story_ids: list[str], *, into: str | None = None) -> list[MergeResult]:
-        """Merge cả một đợt, **tuần tự** theo thứ tự truyền vào.
+        """Merge an entire wave, **sequentially** in the order given.
 
-        Dừng ngay khi gặp conflict đầu tiên: merge tiếp lên một cây đang
-        có vấn đề chỉ làm khó lần nguyên nhân.
+        Stops at the first conflict: merging further on top of a conflicted
+        tree only makes root-cause analysis harder.
         """
         results: list[MergeResult] = []
         for sid in story_ids:
@@ -403,16 +406,16 @@ class WorktreeManager:
                 break
         return results
 
-    # ------------------------------------------------------------ nội bộ
+    # ------------------------------------------------------------ internals
 
     def _ensure_root(self) -> None:
-        """Tạo thư mục worktree và **tự loại nó khỏi git**.
+        """Create the worktree directory and **self-exclude it from git**.
 
-        Worktree nằm bên trong kho nên nếu không ignore, mọi ``git status``
-        đều bẩn thêm một dòng ``?? .aisef/`` — đủ để làm hỏng phép kiểm
-        "cây sạch sau khi abort merge", và dễ bị nuốt vào commit. Đặt một
-        ``.gitignore`` chứa ``*`` ngay trong thư mục là cách tự loại trừ
-        gọn nhất, không phải sửa ``.gitignore`` của dự án.
+        The worktree directory lives inside the repo, so without ignoring it
+        every ``git status`` would show an extra ``?? .aisef/`` line — enough
+        to break "clean tree after merge abort" checks and easy to accidentally
+        commit. A ``.gitignore`` containing ``*`` inside the directory is the
+        cleanest self-exclusion, without modifying the project's ``.gitignore``.
         """
         self.root.mkdir(parents=True, exist_ok=True)
         marker = self.root / ".gitignore"

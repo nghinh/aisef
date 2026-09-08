@@ -1,22 +1,22 @@
-"""Cổng phê duyệt của con người (Human-In-The-Loop).
+"""Human approval gate (Human-In-The-Loop).
 
-Nguyên tắc thiết kế: **phê duyệt là trạng thái trên đĩa, không phải câu hỏi
-tương tác.** Đây là điều kiện để cùng một cơ chế chạy được ở mọi nơi:
+Design principle: **approval is on-disk state, not an interactive prompt.**
+This is what makes the same mechanism work everywhere:
 
-* chạy nền / CI — không có người ngồi trước màn hình để trả lời;
-* trong phiên chat (Claude Desktop) — agent không thể "đợi" người gõ;
-* người duyệt có thể là người khác, lúc khác, trên máy khác.
+* background / CI — no one sits at a screen to answer;
+* in a chat session (Claude Desktop) — the agent cannot "wait" for user input;
+* the approver may be a different person, at a different time, on a different machine.
 
-Luồng: pipeline chạy tới cổng → ghi ``pending`` rồi **dừng** → người chạy
-``approve``/``reject`` → chạy lại pipeline thì đi tiếp.
+Flow: pipeline reaches gate -> writes ``pending`` and **stops** -> user runs
+``approve``/``reject`` -> re-running the pipeline continues from there.
 
-Hai bảo đảm quan trọng:
+Two key guarantees:
 
-1. **Phê duyệt gắn với nội dung, không gắn với tên cổng.** Bản ghi lưu SHA-256
-   của artifact. Sửa artifact sau khi duyệt thì phê duyệt hết hiệu lực.
-2. **Sửa tầng trên làm mất hiệu lực tầng dưới.** Sửa PRD thì Architecture, UX,
-   Epics, Stories, Mockups đã duyệt đều thành ``stale`` — vì chúng được duyệt
-   dựa trên một bản PRD không còn nữa.
+1. **Approval binds to content, not to gate name.** The record stores the
+   SHA-256 of the artifact. Editing the artifact after approval invalidates it.
+2. **Editing an upstream layer invalidates downstream layers.** Editing the PRD
+   makes approved Architecture, UX, Epics, Stories, Mockups all ``stale`` —
+   because they were approved against a PRD version that no longer exists.
 """
 
 from __future__ import annotations
@@ -29,15 +29,15 @@ from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 
-#: Chỉ mục story đã chuẩn hoá — do bộ tách story sinh ra (GĐ-4.3).
+#: Normalized story index — produced by the story splitter (phase 4.3).
 STORIES_INDEX = "stories.index.json"
 
-#: Kết quả chấm cổng trước triển khai — thứ người đọc trước khi ký.
+#: Pre-deploy gate check result — what the approver reads before signing off.
 PRE_DEPLOY_REPORT = "pre-deploy-report.json"
 
 
 class Gate(str, Enum):
-    """Các cổng cần người duyệt, theo đúng thứ tự vòng đời."""
+    """Gates requiring human approval, in lifecycle order."""
 
     PRD = "prd"
     ARCHITECTURE = "architecture"
@@ -45,17 +45,17 @@ class Gate(str, Enum):
     EPICS = "epics"
     STORIES = "stories"
     MOCKUPS = "mockups"
-    READINESS = "readiness"        # chốt trước khi bắt đầu viết code
-    PRE_DEPLOY = "pre-deploy"      # chốt trước khi triển khai
-    #: Cổng của vòng cải tiến epic (ADR-004 R3): duyệt **tiếp tục** vòng ≥ 2
-    #: sau khi đọc báo cáo vòng vừa xong. Cố ý **không** nằm trong
-    #: `GATE_ORDER`: nó không phải một tầng của vòng đời — dự án chưa từng
-    #: chạy `improve` không được vì nó mà kẹt ở `pre-deploy`, và nó lặp lại
-    #: mỗi vòng chứ không duyệt một lần.
+    READINESS = "readiness"        # lock before starting implementation
+    PRE_DEPLOY = "pre-deploy"      # lock before deployment
+    #: Gate for the epic improvement loop (ADR-004 R3): approve **continuing**
+    #: to round >= 2 after reading the report from the just-finished round.
+    #: Intentionally **not** in `GATE_ORDER`: it is not a lifecycle layer —
+    #: a project that never ran `improve` must not get stuck at `pre-deploy`
+    #: because of it, and it repeats each round rather than being approved once.
     IMPROVE = "improve"
 
 
-#: Thứ tự vòng đời. Duyệt lại một cổng làm mọi cổng phía sau thành stale.
+#: Lifecycle order. Re-approving a gate makes all downstream gates stale.
 GATE_ORDER: tuple[Gate, ...] = (
     Gate.PRD,
     Gate.ARCHITECTURE,
@@ -67,15 +67,15 @@ GATE_ORDER: tuple[Gate, ...] = (
     Gate.PRE_DEPLOY,
 )
 
-#: Artifact của mỗi cổng, tương đối so với gốc artifact.
+#: Artifact(s) for each gate, relative to artifact root.
 #:
-#: Tên phải khớp **file có thật trên đĩa**, vì phê duyệt gắn với băm nội
-#: dung: trỏ nhầm tên thì băm luôn rỗng và cổng không bao giờ phát hiện
-#: được thay đổi — một cổng vô hại nhìn từ ngoài, nhưng không bảo vệ gì.
+#: Names must match **actual files on disk**, because approval binds to a
+#: content hash: a wrong name yields an empty hash and the gate never detects
+#: changes — a gate that looks harmless from outside but protects nothing.
 #:
-#: Cổng UX có hai file vì BMAD sinh hai tài liệu tách vai (`DESIGN.md` là
-#: hệ thống thị giác, `EXPERIENCE.md` là luồng và màn hình). Duyệt một file
-#: rồi sửa file kia sẽ lọt.
+#: The UX gate has two files because BMAD produces two role-separated documents
+#: (`DESIGN.md` is the visual system, `EXPERIENCE.md` is flows and screens).
+#: Approving one file then editing the other would slip through.
 GATE_ARTIFACTS: dict[Gate, tuple[str, ...]] = {
     Gate.PRD: ("prd.md",),
     Gate.ARCHITECTURE: ("architecture.md",),
@@ -83,23 +83,24 @@ GATE_ARTIFACTS: dict[Gate, tuple[str, ...]] = {
     Gate.EPICS: ("epics.md",),
     Gate.STORIES: (STORIES_INDEX,),
     Gate.MOCKUPS: ("design-contract.json",),
-    # Hai cổng cuối **không** gắn vào `sprint-status.json`: file đó đổi
-    # sau mỗi story, nên phê duyệt vừa ký đã thành `stale` — cổng trở thành
-    # thứ báo động liên tục rồi bị bỏ qua.
+    # The last two gates are **not** bound to `sprint-status.json`: that file
+    # changes after every story, so approval would immediately become `stale`
+    # — turning the gate into constant noise that gets ignored.
     Gate.READINESS: (STORIES_INDEX, "design-contract.json"),
     Gate.PRE_DEPLOY: (PRE_DEPLOY_REPORT,),
-    # Mẫu glob: mỗi vòng một báo cáo, số vòng không biết trước. Băm gộp
-    # **mọi** báo cáo, nên vòng mới làm phê duyệt cũ thành `stale` — người
-    # phải đọc báo cáo mới rồi mới duyệt vòng kế.
+    # Glob pattern: one report per round, number of rounds unknown in advance.
+    # Combined hash covers **all** reports, so a new round makes the old
+    # approval `stale` — the human must read the new report before approving
+    # the next round.
     Gate.IMPROVE: ("LOOP-REPORT-*.md",),
 }
 
 
 class Status(str, Enum):
-    PENDING = "pending"                    # chờ người xem
-    APPROVED = "approved"                  # đã duyệt, nội dung còn nguyên
-    CHANGES_REQUESTED = "changes_requested"  # bị trả lại, kèm ghi chú
-    STALE = "stale"                        # từng duyệt nhưng nội dung đã đổi
+    PENDING = "pending"                    # awaiting human review
+    APPROVED = "approved"                  # approved, content unchanged
+    CHANGES_REQUESTED = "changes_requested"  # returned with notes
+    STALE = "stale"                        # was approved but content has changed
 
 
 AUTO_APPROVER = "auto"
@@ -113,21 +114,23 @@ def _current_user() -> str:
     return os.environ.get("AISEF_APPROVER") or os.environ.get("USER") or "unknown"
 
 
-#: Tiền tố story/epic do vòng cải tiến (ADR-004 R3) sinh bằng code.
+#: Story/epic prefix generated by the improvement loop (ADR-004 R3).
 REPAIR_PREFIX = ("STORY-RP-", "EPIC-RP-")
 
 
 def _artifact_hash(path: Path) -> str:
-    """Băm một artifact của cổng; riêng `stories.index.json` băm **nội dung
-    đã chuẩn hoá và bỏ story sửa**, không băm byte.
+    """Hash a gate artifact; for `stories.index.json` specifically, hash
+    **normalized content with repair stories excluded**, not raw bytes.
 
-    Story sửa do `aisef improve` sinh ra và được cổng người `improve` quản.
-    Băm cả chúng thì mỗi vòng cải tiến làm cổng `stories`/`readiness` đã
-    duyệt thành stale, và lần gọi `improve` kế bị chính vòng trước chặn (đo
-    e9 2026-09-06 05:44). Chuẩn hoá (khoá sắp xếp, không phụ thuộc khoảng
-    trắng) để một lần ghi lại cùng nội dung không làm stale. Đổi cách băm
-    làm phê duyệt `stories`/`readiness` đã ký trước bản này stale **một lần**
-    — nói ra ở đây thay vì để người dùng đoán. Không đọc được JSON thì băm byte.
+    Repair stories are generated by `aisef improve` and managed by the human
+    `improve` gate. Including them in the hash would make the
+    `stories`/`readiness` gates stale after every improvement round, and the
+    next `improve` call would be blocked by its own predecessor (measured on
+    e9 2026-09-06 05:44). Normalization (sorted keys, whitespace-independent)
+    ensures that rewriting the same content does not trigger staleness. Changing
+    the hash method makes previously signed `stories`/`readiness` approvals
+    stale **once** — stated here instead of leaving the user to guess. Falls
+    back to raw byte hashing if JSON cannot be parsed.
     """
     if path.name != STORIES_INDEX or not path.is_file():
         return sha256_of(path)
@@ -142,16 +145,17 @@ def _artifact_hash(path: Path) -> str:
         if isinstance(loc.get(key), list):
             loc[key] = [x for x in loc[key]
                         if not (isinstance(x, dict) and str(x.get("id", "")).startswith(REPAIR_PREFIX))]
-    # Đợt chạy của epic sửa cũng đổi mỗi vòng (`register_story(wave=[sid])`):
-    # lỗi 28, e9 2026-09-06 06:50 — vòng 4/5 làm `stories`/`readiness` stale
-    # lần nữa dù lỗi 25 đã lọc story/epic. Lọc cùng một tiền tố, cùng lý do.
+    # Repair epic waves also change each round (`register_story(wave=[sid])`):
+    # bug 28, e9 2026-09-06 06:50 — rounds 4/5 made `stories`/`readiness`
+    # stale again despite bug 25 already filtering stories/epics. Same prefix
+    # filter, same rationale.
     if isinstance(loc.get("waves"), dict):
         loc["waves"] = {k: v for k, v in loc["waves"].items() if not str(k).startswith(REPAIR_PREFIX)}
     return hashlib.sha256(json.dumps(loc, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
 
 
 def sha256_of(path: Path) -> str:
-    """Băm nội dung artifact. Trả chuỗi rỗng nếu file chưa tồn tại."""
+    """Hash artifact content. Returns empty string if the file does not exist."""
     if not path.is_file():
         return ""
     h = hashlib.sha256()
@@ -163,19 +167,19 @@ def sha256_of(path: Path) -> str:
 
 @dataclass
 class Approval:
-    """Một quyết định phê duyệt, kèm dấu vết kiểm toán."""
+    """A single approval decision, with an audit trail."""
 
     gate: str
     artifact: str
     artifact_sha256: str
     status: str
-    #: Số thứ tự đơn điệu trong phạm vi store. Dùng để so thứ tự các quyết
-    #: định thay cho ``decided_at``: bản ghi có thể được tạo trên máy khác
-    #: (đi qua git), nên đồng hồ không đáng tin, còn hai quyết định trong
-    #: cùng một giây thì timestamp không phân biệt được.
+    #: Monotonic sequence number within the store. Used to order decisions
+    #: instead of ``decided_at``: records may be created on different machines
+    #: (via git), so clocks are unreliable, and two decisions in the same
+    #: second are indistinguishable by timestamp.
     seq: int = 0
     decided_by: str = ""
-    decided_at: str = ""  # chỉ để đọc, không dùng để so thứ tự
+    decided_at: str = ""  # informational only, not used for ordering
     note: str = ""
     machine_checks: dict[str, str] = field(default_factory=dict)
     history: list[dict[str, str]] = field(default_factory=list)
@@ -186,7 +190,7 @@ class Approval:
 
 
 class ApprovalStore:
-    """Đọc/ghi bản ghi phê duyệt dưới ``<artifact_root>/approvals/``."""
+    """Read/write approval records under ``<artifact_root>/approvals/``."""
 
     def __init__(self, artifact_root: Path):
         self.root = Path(artifact_root)
@@ -198,22 +202,22 @@ class ApprovalStore:
     def artifact_paths(self, gate: Gate) -> list[Path]:
         out: list[Path] = []
         for name in GATE_ARTIFACTS[gate]:
-            # Mẫu glob không khớp gì thì vẫn trả chính mẫu, để "thiếu" gọi
-            # được tên tệp thay vì im lặng.
+            # If the glob matches nothing, return the pattern itself so
+            # "missing" can name the file instead of being silent.
             matched = sorted(self.root.glob(name)) if any(c in name for c in "*?[") else []
             out += matched or [self.root / name]
         return out
 
     def artifact_path(self, gate: Gate) -> Path:
-        """File chính của cổng — dùng để hiển thị."""
+        """Primary file of the gate — used for display."""
         return self.artifact_paths(gate)[0]
 
     def has_artifacts(self, gate: Gate) -> bool:
-        """**Mọi** file của cổng đều đã có chưa."""
+        """Whether **all** files for this gate exist."""
         return all(p.is_file() for p in self.artifact_paths(gate))
 
     def content_hash(self, gate: Gate) -> str:
-        """Băm gộp toàn bộ file của cổng, theo thứ tự khai báo."""
+        """Combined hash of all gate files, in declaration order."""
         parts = [f"{p.relative_to(self.root)}:{_artifact_hash(p)}" for p in self.artifact_paths(gate)]
         return hashlib.sha256("\n".join(parts).encode()).hexdigest()
 
@@ -232,15 +236,15 @@ class ApprovalStore:
         path = self._path(Gate(approval.gate))
         tmp = path.with_suffix(".json.tmp")
         tmp.write_text(json.dumps(asdict(approval), indent=2, ensure_ascii=False), encoding="utf-8")
-        tmp.replace(path)  # ghi nguyên tử — không để lại file hỏng khi bị ngắt
+        tmp.replace(path)  # atomic write — no corrupt file on interruption
 
-    # ------------------------------------------------------------ truy vấn
+    # ------------------------------------------------------------ queries
 
     def status(self, gate: Gate) -> Status:
-        """Trạng thái hiệu lực *hiện tại* của một cổng.
+        """Current effective status of a gate.
 
-        Tính lại từ nội dung thật trên đĩa, nên một artifact bị sửa sau khi
-        duyệt sẽ tự lộ ra là ``stale`` mà không cần ai đánh dấu.
+        Recomputed from actual on-disk content, so an artifact edited after
+        approval is automatically revealed as ``stale`` without anyone marking it.
         """
         rec = self.load(gate)
         if rec is None:
@@ -251,15 +255,15 @@ class ApprovalStore:
             return Status.PENDING
 
         if self.content_hash(gate) != rec.artifact_sha256:
-            return Status.STALE  # nội dung đã đổi kể từ lúc duyệt
+            return Status.STALE  # content changed since approval
         if self._upstream_decided_after(gate, rec.seq):
-            return Status.STALE  # tầng trên được quyết lại sau đó
+            return Status.STALE  # an upstream gate was re-decided after this one
         return Status.APPROVED
 
     def _upstream_decided_after(self, gate: Gate, seq: int) -> bool:
-        """True nếu có cổng phía trước được quyết định sau cổng này."""
+        """True if any upstream gate was decided after this gate."""
         if gate not in GATE_ORDER:
-            return False  # cổng ngoài vòng đời (`improve`) không có tầng trên
+            return False  # gates outside the lifecycle (`improve`) have no upstream
         idx = GATE_ORDER.index(gate)
         return any(
             (rec := self.load(up)) is not None and rec.seq > seq
@@ -267,7 +271,7 @@ class ApprovalStore:
         )
 
     def _next_seq(self) -> int:
-        """Số thứ tự kế tiếp trong phạm vi store."""
+        """Next sequence number within the store."""
         highest = 0
         for g in Gate:
             rec = self.load(g)
@@ -276,7 +280,7 @@ class ApprovalStore:
         return highest + 1
 
     def blocking(self, gate: Gate) -> list[Gate]:
-        """Các cổng phải xử lý xong trước khi `gate` được phép chạy."""
+        """Gates that must be resolved before `gate` is allowed to proceed."""
         if gate not in GATE_ORDER:
             return []
         idx = GATE_ORDER.index(gate)
@@ -289,7 +293,7 @@ class ApprovalStore:
             out.append((g, self.status(g), rec.decided_by if rec else ""))
         return out
 
-    # ------------------------------------------------------------ quyết định
+    # ------------------------------------------------------------ decisions
 
     def decide(
         self,
@@ -300,7 +304,7 @@ class ApprovalStore:
         note: str = "",
         machine_checks: dict[str, str] | None = None,
     ) -> Approval:
-        """Ghi một quyết định, giữ lại toàn bộ lịch sử trước đó."""
+        """Record a decision, preserving the full prior history."""
         prev = self.load(gate)
         history = list(prev.history) if prev else []
         if prev:
@@ -336,16 +340,17 @@ class ApprovalStore:
         return self.decide(gate, Status.CHANGES_REQUESTED, by=by, note=note)
 
     def auto_approve(self, gate: Gate, *, reason: str = "--auto-approve") -> Approval:
-        """Duyệt máy. Luôn ghi ``decided_by=auto`` để về sau truy được
-        artifact nào chưa từng có người thật xem qua."""
+        """Machine approval. Always records ``decided_by=auto`` so it is
+        possible to later identify which artifacts were never reviewed by a
+        human."""
         return self.decide(gate, Status.APPROVED, by=AUTO_APPROVER, note=reason)
 
 
 def parse_auto_approve(value: str | None) -> frozenset[Gate]:
-    """Diễn giải tham số ``--auto-approve``.
+    """Parse the ``--auto-approve`` argument.
 
-    ``None``/rỗng → không cổng nào; ``all`` → tất cả; hoặc danh sách tên cổng
-    ngăn cách bởi dấu phẩy (``prd,architecture``).
+    ``None``/empty -> no gates; ``all`` -> all gates; or a comma-separated
+    list of gate names (``prd,architecture``).
     """
     if not value:
         return frozenset()

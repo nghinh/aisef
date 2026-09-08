@@ -1,18 +1,17 @@
-"""Kho trạng thái tiến độ — nguồn sự thật duy nhất về việc gì đã xong.
+"""Progress state store — single source of truth for what is done.
 
-Trạng thái nằm **trên đĩa**, không trong bộ nhớ tiến trình. Đó là điều
-kiện để:
+State lives **on disk**, not in process memory. This is required for:
 
-* dừng giữa chừng rồi chạy lại tiếp đúng chỗ dở;
-* control plane là CLI gọi-một-lần chứ không phải daemon (quyết định Đ2);
-* nhiều bề mặt (Desktop, CLI, CI) cùng nhìn một tiến độ.
+* stopping mid-run and resuming exactly where it left off;
+* control plane is a fire-once CLI, not a daemon (decision D2);
+* multiple surfaces (Desktop, CLI, CI) sharing the same progress view.
 
-Hai bảo đảm khi ghi:
+Two guarantees on writes:
 
-1. **Nguyên tử** — ghi ra file tạm rồi `replace`. Bị ngắt giữa chừng thì
-   file cũ còn nguyên, không bao giờ để lại JSON cụt.
-2. **Khoá độc quyền** — nhiều story chạy song song, mỗi story kết thúc lại
-   cập nhật trạng thái; không khoá thì hai lần ghi gần nhau sẽ mất một.
+1. **Atomic** — write to a temp file then ``replace``. If interrupted, the
+   old file stays intact; never leaves behind truncated JSON.
+2. **Exclusive lock** — parallel stories each update state on completion;
+   without locking, two near-simultaneous writes would lose one.
 
 Lock uses ``fcntl.flock`` on Unix, ``msvcrt.locking`` on Windows (via
 ``aisef._compat``).  Both auto-release when the process dies.
@@ -37,7 +36,7 @@ LOCK_SUFFIX = ".lock"
 
 
 def machine_id() -> str:
-    """Tên máy duy nhất dùng cho claim — hostname + pid."""
+    """Unique machine identifier for claims — hostname + pid."""
     import socket
     return f"{socket.gethostname()}:{os.getpid()}"
 LOCK_TIMEOUT_SECONDS = 30
@@ -47,10 +46,11 @@ class StoryStatus(str, Enum):
     PENDING = "pending"
     RUNNING = "running"
     VERIFYING = "verifying"
-    #: Qua cổng, **chưa** lên nhánh chính. Trước 2026-09-05 trạng thái này
-    #: không tồn tại: `done` được ghi lúc qua cổng, trước merge — merge đụng
-    #: thì story "xong" mà code kẹt trên nhánh story, và không ai biết
-    #: (lỗi 42). Giờ `done` chỉ được ghi **sau** `merge.completed`.
+    #: Passed the gate, but **not yet** on the main branch. Before 2026-09-05
+    #: this status did not exist: `done` was written at gate pass, before merge
+    #: — if merge conflicted, the story was "done" but code stuck on the story
+    #: branch with nobody aware (bug 42). Now `done` is written only **after**
+    #: `merge.completed`.
     VERIFIED = "verified"
     DONE = "done"
     BLOCKED = "blocked"
@@ -62,24 +62,24 @@ class StoryStatus(str, Enum):
 
     @property
     def satisfies_dependents(self) -> bool:
-        """Chỉ story xong hẳn mới mở khoá cho story phụ thuộc nó."""
+        """Only fully completed stories unlock their dependents."""
         return self is StoryStatus.DONE
 
 
-#: Chuyển trạng thái hợp lệ. Ngăn những bước nhảy vô nghĩa như
-#: pending → done mà không qua verifying.
+#: Valid state transitions. Prevents meaningless jumps like
+#: pending -> done without going through verifying.
 ALLOWED: dict[StoryStatus, frozenset[StoryStatus]] = {
     StoryStatus.PENDING: frozenset({StoryStatus.RUNNING, StoryStatus.BLOCKED}),
     StoryStatus.RUNNING: frozenset({StoryStatus.VERIFYING, StoryStatus.FAILED, StoryStatus.BLOCKED}),
-    # `verifying → done` thẳng chỉ dành cho chạy không cách ly (`--no-isolate`):
-    # không có nhánh riêng thì không có bước merge. Có worktree thì `run.py`
-    # đi qua `verified`.
+    # `verifying -> done` direct path is only for non-isolated runs (`--no-isolate`):
+    # no dedicated branch means no merge step. With a worktree, `run.py`
+    # goes through `verified`.
     StoryStatus.VERIFYING: frozenset({
         StoryStatus.VERIFIED, StoryStatus.DONE, StoryStatus.FAILED, StoryStatus.BLOCKED,
     }),
-    # merge xong → done; merge đụng và người đã sửa → về pending để merge lại
+    # merge complete -> done; merge conflict resolved by human -> back to pending for re-merge
     StoryStatus.VERIFIED: frozenset({StoryStatus.DONE, StoryStatus.PENDING, StoryStatus.BLOCKED}),
-    # thất bại còn lượt thử thì quay lại pending
+    # failed with retries remaining goes back to pending
     StoryStatus.FAILED: frozenset({StoryStatus.PENDING, StoryStatus.BLOCKED}),
     StoryStatus.BLOCKED: frozenset({StoryStatus.PENDING}),
     StoryStatus.DONE: frozenset(),
@@ -87,11 +87,11 @@ ALLOWED: dict[StoryStatus, frozenset[StoryStatus]] = {
 
 
 class TransitionError(ValueError):
-    """Chuyển trạng thái không hợp lệ."""
+    """Invalid state transition."""
 
 
 class LockTimeout(TimeoutError):
-    """Không lấy được khoá trong thời gian cho phép."""
+    """Could not acquire lock within the allowed timeout."""
 
 
 def _now() -> str:
@@ -126,7 +126,7 @@ class SprintState:
     started_at: str = field(default_factory=_now)
     updated_at: str = field(default_factory=_now)
 
-    # --------------------------------------------------------- truy vấn
+    # --------------------------------------------------------- queries
 
     def by_status(self, status: StoryStatus, *, epic: str = "") -> list[StoryRecord]:
         return [r for r in self.stories.values()
@@ -149,10 +149,10 @@ class SprintState:
         return sum(r.cost_usd for r in self.stories.values())
 
     def cost_outliers(self, multiple: float) -> list[StoryRecord]:
-        """Story tốn hơn `multiple` lần trung vị — dấu hiệu cần xem lại.
+        """Stories costing more than `multiple` times the median — a sign to review.
 
-        Dùng trung vị chứ không dùng trung bình: một story cực đắt sẽ kéo
-        trung bình lên và tự che chính nó.
+        Uses median, not mean: a single extremely expensive story would pull
+        the mean up and mask itself.
         """
         costs = sorted(r.cost_usd for r in self.stories.values() if r.cost_usd > 0)
         if len(costs) < 3:
@@ -165,14 +165,14 @@ class SprintState:
 
 
 class StateStore:
-    """Đọc/ghi trạng thái với khoá độc quyền và ghi nguyên tử."""
+    """Read/write state with exclusive locking and atomic writes."""
 
     def __init__(self, artifact_root: Path | str):
         self.root = Path(artifact_root)
         self.path = self.root / STATE_FILE
         self.lock_path = self.root / (STATE_FILE + LOCK_SUFFIX)
 
-    # --------------------------------------------------------- khoá
+    # --------------------------------------------------------- locking
 
     @contextmanager
     def _locked(self, timeout: float = LOCK_TIMEOUT_SECONDS) -> Iterator[None]:
@@ -197,7 +197,7 @@ class StateStore:
             finally:
                 os.close(fd)
 
-    # --------------------------------------------------------- đọc, ghi
+    # --------------------------------------------------------- read, write
 
     def load(self) -> SprintState:
         if not self.path.is_file():
@@ -205,7 +205,7 @@ class StateStore:
         try:
             raw = json.loads(self.path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
-            # File hỏng: bắt đầu lại còn hơn chạy trên trạng thái nửa vời.
+            # Corrupted file: starting fresh is better than running on half-baked state.
             return SprintState()
         stories = {
             sid: StoryRecord(**rec) for sid, rec in (raw.get("stories") or {}).items()
@@ -220,10 +220,10 @@ class StateStore:
         )
 
     def _migrate_done_before_merge(self, stories: dict[str, StoryRecord]) -> None:
-        """Sổ cũ ghi `done` lúc qua cổng, trước merge. Story `done` mà nhật
-        ký nói chưa merge là `verified` theo nghĩa mới — sửa lúc đọc, một
-        lần, để mọi nơi hỏi trạng thái đều thấy cùng một sự thật."""
-        from .journal import JournalStore  # tránh vòng import
+        """Legacy records wrote `done` at gate pass, before merge. A story marked
+        `done` whose journal says it hasn't merged is `verified` under the new
+        semantics — fix on read, once, so every status query sees the same truth."""
+        from .journal import JournalStore  # avoid circular import
 
         doi = False
         store = JournalStore(self.root)
@@ -256,17 +256,17 @@ class StateStore:
 
     @contextmanager
     def transaction(self) -> Iterator[SprintState]:
-        """Đọc — sửa — ghi dưới một khoá.
+        """Read — modify — write under a single lock.
 
-        Đọc bên trong khoá là điều bắt buộc: đọc ngoài khoá rồi mới ghi sẽ
-        đè mất thay đổi của tiến trình khác xen vào giữa.
+        Reading inside the lock is mandatory: reading outside then writing
+        would overwrite changes made by another process in between.
         """
         with self._locked():
             state = self.load()
             yield state
             self.save(state)
 
-    # --------------------------------------------------------- thao tác
+    # --------------------------------------------------------- operations
 
     def register(self, story_id: str, epic_id: str = "", wave: int = 0) -> None:
         with self.transaction() as st:
@@ -274,22 +274,22 @@ class StateStore:
                 st.stories[story_id] = StoryRecord(id=story_id, epic_id=epic_id, wave=wave)
 
     def reset_for_retry(self, story_id: str) -> bool:
-        """Đưa story chưa xong về ``pending`` để chạy lại. True nếu có đổi.
+        """Reset an incomplete story to ``pending`` for retry. Returns True if changed.
 
-        Chạy lại là lối vào hợp lệ, nhưng máy trạng thái không có cạnh nào
-        đi thẳng từ ``failed`` hay từ ``running`` bỏ dở sang ``running``.
-        Không mở lối này thì mọi lần chuyển của lượt chạy lại đều bị từ
-        chối — và vì `_safe_transition` nuốt lỗi, story vẫn chạy, vẫn
-        merge, mà bản ghi đứng nguyên ở lần thất bại cũ, chi phí lượt mới
-        không vào sổ.
+        Retry is a valid entry point, but the state machine has no edge going
+        directly from ``failed`` or from an abandoned ``running`` to ``running``.
+        Without this path, every transition in a retry run would be rejected
+        — and since `_safe_transition` swallows errors, the story still runs,
+        still merges, but the record stays at the old failure, and the new
+        run's cost never gets recorded.
 
-        ``running``/``verifying`` còn sót là của tiến trình đã chết: lượt
-        chạy mới thu hồi chúng. ``done`` thì không đụng — xong là xong.
+        Leftover ``running``/``verifying`` belong to dead processes: the new
+        run reclaims them. ``done`` is not touched — done is done.
         """
         with self.transaction() as st:
             rec = st.stories.get(story_id)
-            # `verified` là công việc **đã qua cổng**, đang chờ merge — không
-            # phải lượt dở. Đưa nó về pending là chạy lại một story đã xong.
+            # `verified` is work that **passed the gate**, awaiting merge — not
+            # an incomplete run. Resetting it to pending would re-run a finished story.
             if rec is None or rec.state in (StoryStatus.DONE, StoryStatus.VERIFIED):
                 return False
             if rec.state is StoryStatus.PENDING:
@@ -312,11 +312,12 @@ class StateStore:
         worktree: str = "",
         attempts: int = 0,
     ) -> StoryRecord:
-        """Chuyển trạng thái, từ chối bước nhảy không hợp lệ.
+        """Transition state; rejects invalid jumps.
 
-        `attempts` là **số lượt developer** của lần chạy này, cộng dồn vào
-        bản ghi. Trước đây đếm mỗi lần `run` chạm story (vào RUNNING) — dogfood
-        01-02 hai lượt mà ghi 1, e9 01-05 bốn lượt mà ghi 1 (P2-11).
+        `attempts` is the **developer turn count** for this run, accumulated
+        into the record. Previously counted each time `run` touched a story
+        (entered RUNNING) — dogfood 01-02 had two turns but recorded 1,
+        e9 01-05 had four turns but recorded 1 (P2-11).
         """
         with self.transaction() as st:
             rec = st.stories.get(story_id)
@@ -346,10 +347,10 @@ class StateStore:
             return rec
 
     def claim(self, story_id: str, owner: str = "") -> bool:
-        """Nhận một story pending để chạy — atomic compare-and-swap.
+        """Claim a pending story for execution — atomic compare-and-swap.
 
-        Trả True nếu nhận thành công (PENDING -> RUNNING + claimed_by).
-        Trả False nếu story không ở trạng thái pending hoặc đã bị máy khác nhận.
+        Returns True on success (PENDING -> RUNNING + claimed_by).
+        Returns False if the story is not pending or already claimed by another machine.
         """
         owner = owner or machine_id()
         with self.transaction() as st:
@@ -362,7 +363,7 @@ class StateStore:
             return True
 
     def release(self, story_id: str) -> None:
-        """Nhả claim khi story xong hoặc bị lỗi — xoá claimed_by."""
+        """Release claim when story completes or fails — clears claimed_by."""
         with self.transaction() as st:
             rec = st.stories.get(story_id)
             if rec is not None:

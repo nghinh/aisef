@@ -1,34 +1,35 @@
-"""Sổ hành vi — VERIFIED / GAP / REOPENED (ADR-004 R2, R6, R7).
+"""Behavior ledger — VERIFIED / GAP / REOPENED (ADR-004 R2, R6, R7).
 
-Cổng story trả lời "story này xong chưa". Nó **không** trả lời được câu
-thứ hai, câu mà HoH đo bằng 17/81 issue reopened: *hành vi nào từng đúng
-rồi hỏng?* Bằng chứng hôm nay đã đủ để trả lời — mỗi lần chạy test ghi
-tên từng test và test nào đỏ, mỗi lần đối chiếu mockup ghi màn hình nào
-khớp — nhưng chưa ai đọc nó **theo thời gian**.
+The story gate answers "is this story done". It **cannot** answer the second
+question, the one HoH measured at 17/81 issues reopened: *which behavior was
+once correct then broke?* Today's evidence is sufficient to answer — each test
+run records every test name and which ones are red, each mockup comparison
+records which screens match — but no one reads it **over time**.
 
-Module này là một **phép chiếu**, không phải kho mới: không có sự kiện
-nào chỉ nó ghi được, không có sự thật nào chỉ nó biết. Xoá `ledger.json`
-rồi dựng lại từ `evidence/` phải ra đúng cái cũ — trừ `loops[]`, mốc của
-vòng cải tiến, thứ duy nhất không suy được từ bằng chứng nên được mang
-sang từ sổ cũ. Vì thế không ai sửa được lịch sử hành vi, và không có chỗ
-cho ai đó "đánh dấu là xong".
+This module is a **projection**, not a new store: there is no event only it
+records, no fact only it knows. Deleting `ledger.json` and rebuilding from
+`evidence/` must produce the same result — except `loops[]`, the improvement
+loop milestones, the only part not derivable from evidence and therefore
+carried over from the old ledger. Hence no one can edit behavior history,
+and there is no place for someone to "mark as done".
 
-Bốn loại hành vi, mỗi loại một nguồn máy đọc được:
+Four behavior kinds, each from a machine-readable source:
 
-* `AC-<story>-<i>` — tên test ở lần chạy `tool_run test` (qua `acceptance`);
-* `FR-x` / `NFR-x` — `covers` của story, xanh khi tiêu chí của story xanh;
-* `qa:<kind>`   — `tool_run` tên `qa:<kind>`;
-* `mockup:<màn>` — sự kiện `mockup_map`.
+* `AC-<story>-<i>` — test name from `tool_run test` (via `acceptance`);
+* `FR-x` / `NFR-x` — story's `covers`, green when story criteria are green;
+* `qa:<kind>`   — `tool_run` named `qa:<kind>`;
+* `mockup:<screen>` — `mockup_map` event.
 
-Trạng thái suy bằng code theo thứ tự thời gian, không ai khai:
+Status inferred by code in chronological order, no one declares:
 
-    (chưa có) → xanh   → VERIFIED
-    (chưa có) → đỏ     → GAP
-    VERIFIED  → đỏ     → REOPENED  (`regressed_by` = story#lượt[@candidate])
-    GAP/REOPENED → xanh → VERIFIED  (đếm vào *resolved*)
+    (none) -> green  -> VERIFIED
+    (none) -> red    -> GAP
+    VERIFIED  -> red -> REOPENED  (`regressed_by` = story#attempt[@candidate])
+    GAP/REOPENED -> green -> VERIFIED  (counted as *resolved*)
 
-Lịch sử chỉ ghi khi trạng thái **đổi**. e9 có ~100 lần chạy test × ~280
-tên test; ghi mọi lần quan sát thì sổ to hơn bằng chứng nó chiếu ra.
+History records only state **changes**. e9 has ~100 test runs x ~280 test
+names; recording every observation would make the ledger larger than the
+evidence it projects.
 """
 
 from __future__ import annotations
@@ -54,7 +55,7 @@ from .acceptance import ac_code, coverage as ac_coverage
 from .journal import JournalStore
 
 VERSION = 1
-#: Truy vết người khai: hành vi → {test_id, why, by, at} (QĐ B6 2026-09-06).
+#: Human-declared traceability: behavior -> {test_id, why, by, at} (decision B6 2026-09-06).
 TRACE_FILE = "traceability.json"
 LEDGER_FILE = "ledger.json"
 INDEX_FILE = "INDEX.md"
@@ -64,16 +65,16 @@ VERIFIED = "verified"
 GAP = "gap"
 REOPENED = "reopened"
 
-#: Cột của bảng gap/hồi quy (R12) — Markdown và CSV dùng cùng một thứ tự,
-#: để một tệp đọc bằng mắt và một tệp đọc bằng máy không kể hai chuyện khác nhau.
+#: Columns of the gap/regression table (R12) — Markdown and CSV use the same
+#: order, so the human-readable and machine-readable files tell the same story.
 ISSUE_COLUMNS = ("id", "kind", "status", "story", "regressed_by", "source", "why",
                  "candidate", "since", "changes")
 
-#: Bằng chứng không thuộc story nào — pha lập kế hoạch, dựng mockup, quét skill.
+#: Evidence not belonging to any story — planning phase, mockup building, skill scan.
 PHASE_PREFIXES = ("plan-", "mockup-", "skill-")
-#: Bằng chứng cấp dự án của vòng cải tiến (ADR-004 R3): `evidence/loop-<n>.jsonl`.
-#: Là **mốc**, không phải story: sổ đọc nó (hành vi có `since = loop-n`)
-#: nhưng không dựng dòng chỉ mục cho nó.
+#: Project-level evidence of improvement loops (ADR-004 R3): `evidence/loop-<n>.jsonl`.
+#: A **milestone**, not a story: the ledger reads it (behaviors have `since = loop-n`)
+#: but does not build an index line for it.
 LOOP_PREFIX = "loop-"
 
 _ATTEMPT = re.compile(r"#(\d+)$")
@@ -82,14 +83,14 @@ _EPIC_FROM_ID = re.compile(r"^STORY-(\d+)-")
 
 @dataclass
 class Behavior:
-    """Một hành vi và toàn bộ đường đời của nó."""
+    """A behavior and its full lifecycle."""
 
     id: str
     kind: str                                   # ac | fr | nfr | qa | mockup
     story: str = ""
     status: str = ""
     candidate: str = ""
-    since: str = ""                             # "<story>#<lượt>" hoặc "loop-n"
+    since: str = ""                             # "<story>#<attempt>" or "loop-n"
     source: dict = field(default_factory=dict)
     regressed_by: str = ""
     history: list[dict] = field(default_factory=list)
@@ -112,7 +113,7 @@ class Behavior:
 
 @dataclass
 class StoryLine:
-    """Một dòng chỉ mục: thứ đủ để quyết định có cần đọc bằng chứng không."""
+    """An index line: enough to decide whether evidence needs reading."""
 
     id: str
     epic: str = ""
@@ -132,24 +133,26 @@ class Ledger:
     behaviors: dict[str, Behavior] = field(default_factory=dict)
     stories: dict[str, StoryLine] = field(default_factory=dict)
     loops: list[dict] = field(default_factory=list)
-    #: Số lần một hành vi đã xác minh bị làm hỏng lại, và số lần đóng được gap.
+    #: Number of times a verified behavior was broken again, and gaps resolved.
     reopen_events: int = 0
     resolved: int = 0
-    #: Hồi quy **liên story**: hành vi xanh ở story A, đỏ lại ở bằng chứng của
-    #: story B ≠ A. Đây là con số HoH đo (17/81 của Fusepoint); đỏ-lại trong
-    #: chính lượt của story mình phần lớn là TDD bình thường, không phải hồi quy.
+    #: **Cross-story** regressions: behavior green in story A, red again in
+    #: evidence of story B != A. This is the number HoH measured (17/81 for
+    #: Fusepoint); red-again within the story's own turn is mostly normal TDD,
+    #: not regression.
     cross_reopens: list[dict] = field(default_factory=list)
-    #: Kết quả xanh ở ứng viên **chưa landed** (lượt chưa qua cổng/merge) bị
-    #: bỏ, không được tính VERIFIED. Đo 2026-09-06 (R3, client giả): lượt
-    #: story sửa trượt cổng — test xanh trong worktree, reviewer chặn — vẫn
-    #: làm hành vi gốc VERIFIED dù chưa có gì vào nhánh chính.
+    #: Green results on **unlanded** candidates (attempts not yet gated/merged)
+    #: are discarded, not counted as VERIFIED. Measured 2026-09-06 (R3, fake
+    #: client): story fix attempt failed the gate — test green in worktree,
+    #: reviewer blocked — yet it made the original behavior VERIFIED despite
+    #: nothing reaching the main branch.
     unlanded_green: int = 0
-    #: Truy vết người khai (`aisef evidence <AC> --link`): hành vi → test có
-    #: sẵn chứng minh nó. Chỉ là **tên test**: sổ vẫn đòi test ấy xanh ở ứng
-    #: viên đã landed, không ai được ghi thẳng VERIFIED.
+    #: Human-declared traceability (`aisef evidence <AC> --link`): behavior ->
+    #: test that proves it. Only a **test name**: the ledger still requires that
+    #: test to be green on a landed candidate, no one can write VERIFIED directly.
     links: dict[str, dict] = field(default_factory=dict)
 
-    # ------------------------------------------------------------- ghi nhận
+    # ------------------------------------------------------------- recording
 
     def observe(
         self,
@@ -165,15 +168,16 @@ class Ledger:
         source: dict | None = None,
         landed: bool = True,
     ) -> None:
-        """Một quan sát.
+        """Record one observation.
 
-        `story` là story **quan sát** (tệp bằng chứng nào ghi), `owner` là
-        story **sở hữu** hành vi. Hai cái khác nhau chính là lúc đáng đọc
-        nhất: tiêu chí của story trước đỏ lại trong lượt chạy của story sau.
+        `story` is the **observing** story (which evidence file records it),
+        `owner` is the story that **owns** the behavior. The two differ at
+        the most interesting moment: a prior story's criterion goes red during
+        a later story's run.
         """
         if ok and not landed:
-            # Xanh ở bản chưa vào nhánh chính không phải "đã xác minh": mã ấy
-            # có thể không bao giờ landed. Đỏ thì vẫn tính — không tin client.
+            # Green on unlanded candidate is not "verified": that code may
+            # never land. Red still counts — do not trust the client.
             self.unlanded_green += 1
             if bid in self.behaviors:
                 return
@@ -186,7 +190,7 @@ class Ledger:
 
         status = VERIFIED if ok else (REOPENED if b.ever_verified else GAP)
         if status == b.status:
-            # Không đổi trạng thái: cập nhật candidate mới nhất, không ghi sử.
+            # No state change: update latest candidate, do not record history.
             b.candidate = candidate or b.candidate
             return
 
@@ -212,7 +216,7 @@ class Ledger:
             "story": story, "source": b.source,
         })
 
-    # ------------------------------------------------------------- đọc ra
+    # ------------------------------------------------------------- queries
 
     def summary(self) -> dict:
         counts = {VERIFIED: 0, GAP: 0, REOPENED: 0}
@@ -234,8 +238,8 @@ class Ledger:
         return (line.epic if line else "") or _epic_of(story_id)
 
     def for_story(self, story_id: str) -> list[Behavior]:
-        """Hành vi *của* story: tiêu chí và yêu cầu nó phủ, cộng hành vi mà
-        chính bằng chứng của nó đặt trạng thái lần đầu."""
+        """Behaviors *of* a story: its criteria and requirements it covers,
+        plus behaviors whose state was first set by its own evidence."""
         line = self.stories.get(story_id)
         ids = set()
         if line:
@@ -253,7 +257,7 @@ class Ledger:
         return out[VERIFIED], out[GAP], out[REOPENED]
 
     def metrics(self) -> dict:
-        """R7 — bốn số của vòng cải tiến, tất cả đọc từ `history`."""
+        """R7 — four improvement loop numbers, all read from `history`."""
         entries = sorted(
             ((h["at"], bid, h) for bid, b in self.behaviors.items() for h in b.history),
             key=lambda t: (t[0], t[1]),
@@ -276,8 +280,8 @@ class Ledger:
                 **loop,
                 "d_verified": dv,
                 "d_reopened": dr,
-                # Cải thiện biên: hành vi ròng thu được trên mỗi đô la vòng đó.
-                # Không có chi phí thì không có mẫu số — `None`, không phải 0.
+                # Marginal improvement: net behaviors gained per dollar that loop.
+                # No cost means no denominator — `None`, not 0.
                 "marginal": ((dv - dr) / cost) if cost else None,
             })
             prev = loop
@@ -291,12 +295,13 @@ class Ledger:
         }
 
     def issues(self, *, epic: str = "", statuses=(GAP, REOPENED)) -> list[dict]:
-        """R12 — một dòng mỗi hành vi chưa xanh, để theo dõi ngoài kho.
+        """R12 — one row per non-green behavior, for tracking outside the repo.
 
-        Hồi quy lên đầu: "đã đúng rồi hỏng" là thứ người đọc bảng này cần
-        thấy trước, còn gap thì cổng story đã kể rồi. `changes` là số lần đổi
-        trạng thái — một hành vi lật qua lật lại nhiều lần là dấu hiệu story
-        sửa đang giẫm lên nhau, không suy được từ trạng thái hiện tại.
+        Regressions first: "was correct then broke" is what the reader of this
+        table needs to see first; gaps are already reported by the story gate.
+        `changes` is the number of state transitions — a behavior that flips
+        back and forth many times signals stories stepping on each other,
+        not derivable from current status alone.
         """
         want = set(statuses)
         rows = []
@@ -316,7 +321,7 @@ class Ledger:
         return rows
 
     def snapshot(self, loop_label: str, cost_usd: float = 0.0) -> dict:
-        """Chốt một mốc (vòng cải tiến, hoặc lần chạy) vào `loops[]`."""
+        """Record a milestone (improvement loop or run) into `loops[]`."""
         s = self.summary()
         rec = {
             "n": loop_label, "at": time.time(),
@@ -326,7 +331,7 @@ class Ledger:
         self.loops.append(rec)
         return rec
 
-    # ------------------------------------------------------------- ghi đĩa
+    # ------------------------------------------------------------- persist
 
     def as_dict(self) -> dict:
         return {
@@ -344,13 +349,13 @@ class Ledger:
         )
         return path
 
-    # ------------------------------------------------------------- chỉ mục
+    # ------------------------------------------------------------- index
 
     def index_lines(self) -> list[str]:
-        """R6 — một dòng mỗi epic, một dòng mỗi story. Không hơn.
+        """R6 — one line per epic, one line per story. Nothing more.
 
-        Chỉ mục là thứ *thay* cho việc đổ lịch sử vào prompt: nó nói có gì
-        và ở đâu; ai cần chi tiết thì `aisef evidence <id>`.
+        The index *replaces* dumping history into the prompt: it says what
+        exists and where; anyone needing details uses `aisef evidence <id>`.
         """
         by_epic: dict[str, list[StoryLine]] = {}
         for line in self.stories.values():
@@ -387,8 +392,8 @@ class Ledger:
         return path
 
     def epic_slice(self, epic_id: str, *, max_chars: int = 2000) -> str:
-        """Lát cắt chỉ mục của một epic, cho slot prompt. Có trần: ngữ cảnh
-        là tài nguyên hữu hạn, và cắt có báo tốt hơn tràn im lặng."""
+        """Index slice for one epic, for a prompt slot. Capped: context is a
+        finite resource, and truncation with notice beats silent overflow."""
         want = epic_id or ""
         keep: list[str] = []
         taking = False
@@ -404,7 +409,7 @@ class Ledger:
 
 
 def issues_text(rows: list[dict], fmt: str) -> str:
-    """Bảng R12 thành Markdown hay CSV chuẩn (`csv`, để tracker nào cũng nhập được)."""
+    """R12 table as Markdown or standard CSV (`csv`, importable by any tracker)."""
     if fmt == "csv":
         buf = io.StringIO()
         w = csv.DictWriter(buf, fieldnames=ISSUE_COLUMNS, lineterminator="\n")
@@ -421,11 +426,11 @@ def issues_text(rows: list[dict], fmt: str) -> str:
     ]) + "\n"
 
 
-# ---------------------------------------------------------------- dựng sổ
+# ---------------------------------------------------------------- build
 
 
 def build(artifact_root: Path | str) -> Ledger:
-    """Chiếu toàn bộ `evidence/` thành sổ hành vi, theo thứ tự thời gian."""
+    """Project all of `evidence/` into a behavior ledger, in chronological order."""
     root = Path(artifact_root)
     led = Ledger(root=root)
 
@@ -444,10 +449,10 @@ def build(artifact_root: Path | str) -> Ledger:
         if sid in led.stories and isinstance(rec, dict):
             led.stories[sid].status = str(rec.get("status") or "?")
 
-    # `behaviors` dựng lại từ đầu mỗi lần; `loops[]` là phần **duy nhất**
-    # không suy được từ evidence (mốc và chi phí của một vòng cải tiến), nên
-    # nó được mang sang từ sổ cũ — nếu không, một lần `aisef report` sẽ xoá
-    # sạch mốc mà vòng R3 vừa chốt.
+    # `behaviors` is rebuilt from scratch every time; `loops[]` is the **only**
+    # part not derivable from evidence (milestones and cost of an improvement
+    # loop), so it is carried over from the old ledger — otherwise a single
+    # `aisef report` would wipe the milestones the R3 loop just recorded.
     led.loops = [lo for lo in _read_json(root / LEDGER_FILE).get("loops") or []
                  if isinstance(lo, dict)]
     led.links = {bid: v for bid, v in _read_json(root / TRACE_FILE).items()
@@ -462,13 +467,14 @@ def build(artifact_root: Path | str) -> Ledger:
             led.stories.setdefault(sid, StoryLine(id=sid))
         for e in store.read(sid).events:
             events.append((e.at, sid, e.seq, e))
-    # Thứ tự thời gian **giữa** các story: `seq` chỉ có nghĩa trong một tệp.
+    # Chronological order **across** stories: `seq` is meaningful only within one file.
     events.sort(key=lambda t: (t[0], t[1], t[2]))
 
     landed_of = _landed_candidates(root)
-    # Qua cổng ở ứng viên nào thì ứng viên ấy landed ở mức lượt (`note
-    # gate:verdict ok=True`, do `implement.run_attempt` ghi): implement không
-    # merge, và story chạy qua `implement_story` trực tiếp không có nhật ký merge.
+    # Passing the gate on a candidate means that candidate is landed at the
+    # attempt level (`note gate:verdict ok=True`, written by `implement.run_attempt`):
+    # implement does not merge, and stories run via `implement_story` directly
+    # have no merge journal.
     for _at, sid, _seq, e in events:
         if e.kind == NOTE and e.name == "gate:verdict" and e.ok and e.detail.get("candidate"):
             landed_of.setdefault(sid, set()).add(str(e.detail["candidate"]))
@@ -476,15 +482,15 @@ def build(artifact_root: Path | str) -> Ledger:
     for at, sid, _seq, e in events:
         attempts[sid] = _attempt(e, sid, attempts.get(sid, 0))
         n = attempts[sid]
-        # R1 do luồng khác làm; evidence cũ không có candidate và đó là hợp lệ.
+        # R1 done by another flow; old evidence has no candidate and that is valid.
         cand = str(e.detail.get("candidate") or "")
-        # Story đã có ứng viên đóng băng (R1): chỉ SHA đã landed mới tính, và
-        # sự kiện **không mang** candidate của nó là lần agent tự chạy giữa
-        # phiên, trước khi đóng băng — xanh ở đó chưa vào nhánh chính. Lỗi 26
-        # (par B3, 2026-09-06): story trượt, chưa merge, mà 3 hành vi của nó
-        # VERIFIED nhờ đúng lần chạy ấy. Không nhật ký / chưa từng đóng băng
-        # (QA cấp dự án, mốc vòng, bằng chứng trước R1) → candidate là HEAD
-        # nhánh chính, tính như cũ.
+        # Story has a frozen candidate (R1): only landed SHAs count, and an
+        # event **not carrying** its candidate is a mid-session agent run
+        # before freezing — green there has not reached the main branch. Bug 26
+        # (par B3, 2026-09-06): story failed, not merged, yet 3 of its
+        # behaviors were VERIFIED by that exact run. No journal / never frozen
+        # (project-level QA, loop milestones, pre-R1 evidence) -> candidate is
+        # main branch HEAD, counted as before.
         landed = cand in landed_of[sid] if sid in landed_of else True
         if cand and sid in led.stories:
             led.stories[sid].candidate = cand
@@ -517,17 +523,17 @@ def build(artifact_root: Path | str) -> Ledger:
 
 
 def _landed_candidates(root: Path) -> dict[str, set[str]]:
-    """Story → tập SHA ứng viên đã landed, đọc từ nhật ký (ADR-004 R1).
+    """Story -> set of landed candidate SHAs, read from the journal (ADR-004 R1).
 
-    Một ứng viên landed khi sau lúc đóng băng nó có `merge.completed`, hoặc
-    khi nó là ứng viên **cuối** của một story đã `done`/`verified` (chạy
-    thẳng trong dự án thì không có merge). `attempt.committed` **không**
-    phải dấu thành công — nó đóng giao dịch kể cả khi story trượt (e9
-    STORY-01-07 2026-09-06: nhật ký kết bằng `attempt.committed` mà story
-    `failed`). Chỉ story **có** nhật ký mới xuất hiện trong bản đồ — thiếu
-    nhật ký nghĩa là bằng chứng không thuộc một lượt thử nào (QA cấp dự án,
-    mốc vòng), không phải "chưa landed". Story có nhật ký nhưng **chưa từng
-    đóng băng** (chạy trước R1) cũng không có trong bản đồ — cùng lý do.
+    A candidate is landed when after freezing it has `merge.completed`, or
+    when it is the **last** candidate of a `done`/`verified` story (running
+    directly in the project has no merge). `attempt.committed` is **not** a
+    success marker — it closes the transaction even when the story fails (e9
+    STORY-01-07 2026-09-06: journal ends with `attempt.committed` yet story
+    is `failed`). Only stories **with** a journal appear in the map — no
+    journal means evidence does not belong to any attempt (project-level QA,
+    loop milestones), not "unlanded". Stories with a journal but **never
+    frozen** (run before R1) also do not appear in the map — same reason.
     """
     store = JournalStore(root)
     status = {sid: str(rec.get("status") or "")
@@ -551,12 +557,13 @@ def _landed_candidates(root: Path) -> dict[str, set[str]]:
 
 def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
                    *, landed: bool = True) -> None:
-    """Một lần chạy test → trạng thái của mọi tiêu chí nó *nhìn thấy*.
+    """One test run -> status of every criterion it *sees*.
 
-    Story chủ nhà bị chấm đủ: tiêu chí không có test nào mang mã của nó là
-    GAP, đúng như cổng nói "chưa cấu hình ≠ đạt". Story khác chỉ bị chấm
-    những tiêu chí thực sự có test trong lần chạy này — bộ test chạy một
-    phần không được biến story không liên quan thành hồi quy.
+    The home story is fully scored: a criterion with no test carrying its
+    code is GAP, consistent with the gate saying "not configured != passed".
+    Other stories are scored only on criteria that actually have tests in
+    this run — a partial test suite must not turn unrelated stories into
+    regressions.
     """
     det = e.detail
     ids = [str(t) for t in det.get("test_ids") or []]
@@ -606,9 +613,9 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
                     judged.append(False)
                 continue
             red = [t for t in tests if t in failed]
-            # Nguồn của một GAP phải là test **đỏ**, không phải test đầu danh
-            # sách: người đọc `aisef evidence` cần tên để mở, không cần một
-            # cái tên xanh nằm cạnh chỗ hỏng.
+            # Source of a GAP must be a **red** test, not the first test in the
+            # list: the reader of `aisef evidence` needs a name to open, not a
+            # green name sitting next to the failure.
             src = {"test_id": (red or tests)[0], "tests": len(tests)}
             if i in linked:
                 lk = led.links[ac_code(story_id, i)]
@@ -616,10 +623,10 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
                            why=str(lk.get("why") or ""))
             note(story_id, i, not red, src)
             judged.append(not red)
-        # Yêu cầu xanh khi **tiêu chí của nó** xanh — không phải khi cả lần
-        # chạy xanh. Một lần chạy đỏ vì story khác không được biến FR của
-        # story này thành hồi quy (đo trên e9: FR-1/FR-11 bị kết tội oan ở
-        # STORY-01-06 vì luật cũ đọc `e.ok`).
+        # Requirement is green when **its criteria** are green — not when the
+        # whole run is green. A run red because of another story must not turn
+        # this story's FR into a regression (measured on e9: FR-1/FR-11 were
+        # falsely blamed on STORY-01-06 because the old rule read `e.ok`).
         story_green = all(judged) if judged else bool(e.ok)
         _observe_covers(led, line, ok=story_green, at=at, story=sid, attempt=attempt,
                         cand=cand, why="" if story_green else "story criteria not yet green",
@@ -627,8 +634,8 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
 
 
 def _linked(led: Ledger, story_id: str, ids: list[str]) -> list[tuple[int, str]]:
-    """(tiêu chí, test id) mà người đã khai truy vết cho story này **và** có
-    mặt trong lần chạy này. Khai mà test không chạy thì không có gì để nói."""
+    """(criterion, test id) that a human declared as traceability for this
+    story **and** present in this run. Declared but not run means nothing to say."""
     out = []
     for i in range(1, (led.stories[story_id].acceptance if story_id in led.stories else 0) + 1):
         lk = led.links.get(ac_code(story_id, i))
@@ -664,8 +671,8 @@ def _epic_of(story_id: str) -> str:
 
 
 def _attempt(e, sid: str, current: int) -> int:
-    """Lượt thử hiện tại của story — đọc từ tên `agent_run` (`STORY-x#2`)
-    hoặc `detail.attempt` của handoff/rà soát. Không đoán: không thấy thì giữ."""
+    """Current attempt of the story — read from `agent_run` name (`STORY-x#2`)
+    or `detail.attempt` of handoff/review. No guessing: if not found, keep current."""
     if e.kind == AGENT_RUN and e.name.startswith(sid):
         m = _ATTEMPT.search(e.name)
         if m:

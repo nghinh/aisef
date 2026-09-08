@@ -1,7 +1,7 @@
-"""BasicProvider — fallback khi không có Graphify.
+"""BasicProvider — fallback when Graphify is not available.
 
-Dùng grep + phân tích import tĩnh. Luôn có sẵn, không cần cài thêm gì.
-Thô hơn Graphify nhưng đủ cho impact analysis cơ bản.
+Uses grep + static import analysis.  Always available, no extra install needed.
+Coarser than Graphify but sufficient for basic impact analysis.
 """
 
 from __future__ import annotations

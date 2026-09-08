@@ -1,1 +1,1 @@
-"""Các pha của vòng đời: lập kế hoạch, mockup, hiện thực, kiểm định."""
+"""Lifecycle phases: planning, mockup, implementation, verification."""

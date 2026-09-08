@@ -1,18 +1,18 @@
-"""Bước 4 — hiện thực một story: một phiên, một worktree, một cổng.
+"""Phase 4 -- implement a story: one session, one worktree, one gate.
 
-Vòng đời một story:
+Story lifecycle:
 
-    dựng ngữ cảnh → chạy agent (viết code) → đối chiếu mockup → rà soát
-    độc lập → chấm cổng → xong / thử lại / chặn
+    build context -> run agent (write code) -> compare mockup -> independent
+    review -> score gate -> done / retry / blocked
 
-Hai điều được giữ chặt ở đây:
+Two invariants enforced here:
 
-* **Một phiên một story** (quyết định Đ1). Không mang ngữ cảnh story trước
-  sang story sau, vì ngữ cảnh cũ là nguồn gây nhiễu mà không ai kiểm được.
-* **Phân biệt lỗi hạ tầng với lỗi chất lượng.** Mất kết nối giữa chừng
-  không phải agent làm sai: thử lại, và **không** tính vào số lần thử. Gộp
-  hai loại lại thì một mạng chập chờn sẽ làm story bị chặn oan, còn một
-  agent làm sai sẽ được thử mãi.
+* **One session per story** (decision D1).  Do not carry context from the
+  previous story -- stale context is an unverifiable source of noise.
+* **Distinguish infrastructure errors from quality errors.**  A dropped
+  connection is not the agent's fault: retry, and do **not** count it
+  toward the attempt limit.  Merging the two means a flaky network blocks
+  the story unfairly, while a bad agent gets infinite retries.
 """
 
 from __future__ import annotations
@@ -69,19 +69,19 @@ class Attempt:
     number: int
     ok: bool = False
     infra: bool = False
-    #: Hỏng đến mức thử lại cũng vô nghĩa — ví dụ cách ly đã vỡ: worktree
-    #: của lượt sau sẽ rẽ từ thân cây đã bẩn, nên chỉ tiêu tiền thêm.
+    #: Fatal -- retrying is pointless.  E.g. isolation broke: the next
+    #: attempt's worktree forks from a dirty trunk, so it only wastes money.
     fatal: bool = False
     error: str = ""
     cost_usd: float = 0.0
     gate: story_gate.StoryGate | None = None
     review_findings: list[str] = field(default_factory=list)
     security: SecurityReport | None = None
-    #: SHA ứng viên đã đóng băng — mọi bằng chứng của lượt này trỏ vào nó.
+    #: Frozen candidate SHA -- all evidence from this attempt points to it.
     candidate: str = ""
-    #: Lượt kiểm-lại (ADR-004 R13): không có phiên developer, không tính vào
-    #: `run.max_retries`. `reran`/`kept` là phép kiểm đã chạy lại / giữ từ
-    #: bằng chứng ở đúng ứng viên — để người đọc biết đã trả tiền cho gì.
+    #: Re-verify attempt (ADR-004 R13): no developer session, does not count
+    #: toward `run.max_retries`.  `reran`/`kept` are checks re-executed / kept
+    #: from evidence at the correct candidate -- so readers know what was paid for.
     verify_only: bool = False
     reran: list[str] = field(default_factory=list)
     kept: list[str] = field(default_factory=list)
@@ -99,9 +99,9 @@ class StoryOutcome:
 
     @property
     def quality_attempts(self) -> int:
-        """Số lần thử **tính vào hạn mức** — lỗi hạ tầng và lượt kiểm-lại
-        không tính: cái thứ nhất không phải agent làm sai, cái thứ hai không
-        có agent nào làm gì."""
+        """Attempts that **count toward the limit** -- infrastructure errors
+        and re-verify attempts do not count: the former is not the agent's
+        fault, the latter has no agent doing anything."""
         return len([a for a in self.attempts if not a.infra and not a.verify_only])
 
     @property
@@ -137,12 +137,13 @@ def build_context(
     feedback: str = "",
     preservation: list[dict] | None = None,
 ) -> dict:
-    """Ngữ cảnh cho prompt story — chọn bằng tra cứu, không bằng phán đoán.
+    """Story prompt context -- selected by lookup, not by judgment.
 
-    ``preservation`` là danh sách hành vi phải giữ đã tính sẵn (R4). Truyền
-    vào để reviewer/security nhận **đúng** danh sách developer đã nhận: tính
-    lại sau phiên developer thì sổ đã đổi theo bằng chứng của chính lượt ấy,
-    và ba vai nói về ba danh sách khác nhau. `None` = tính từ sổ.
+    ``preservation`` is the pre-computed list of behaviors to preserve (R4).
+    Passed in so reviewer/security receive **exactly** the list the developer
+    received: recomputing after the developer session would reflect evidence
+    from that very attempt, and the three roles would see three different
+    lists.  `None` = compute from ledger.
     """
     story_file = artifact_root / "stories" / story.epic_id / f"{story.id}.md"
     contract_text = (
@@ -190,7 +191,7 @@ def build_context(
 
 
 def _blast_radius_section(story: Story, *, project: Path, config: Config | None) -> str:
-    """Impact analysis từ CodebaseGraphProvider — chỉ chạy khi brownfield."""
+    """Impact analysis from CodebaseGraphProvider -- only runs on brownfield."""
     baseline = project / "_bmad-output" / "baseline.md"
     if not baseline.is_file():
         return ""
@@ -216,12 +217,13 @@ def _blast_radius_section(story: Story, *, project: Path, config: Config | None)
 
 
 def _repo_map_section(story: Story, *, project: Path, artifact_root: Path, config: Config | None) -> str:
-    """Slot `repo_map` (ADR-005 V7): bản đồ mã quanh phạm vi ghi, cấp cho cả
-    ba vai từ **mã** — không vai nào nhận từ lời vai kia (ADR-003 #9).
+    """Slot `repo_map` (ADR-005 V7): code map around write scope, provided to
+    all three roles from **code** -- no role receives it from another role's
+    output (ADR-003 #9).
 
-    Trần `context.max_repo_map_chars` = 0 là tắt: slot rỗng, prompt không có
-    mục — cho tới khi A/B T8 có số. Vẽ trên `project` (trạng thái trước
-    story) chứ không trên worktree: ba vai nhận cùng một bản đồ.
+    Cap `context.max_repo_map_chars` = 0 disables it: empty slot, prompt has
+    no entry -- until A/B T8 has numbers.  Drawn on `project` (state before
+    the story) rather than on worktree: all three roles receive the same map.
     """
     cap = int(config["context.max_repo_map_chars"]) if config else 0
     if cap <= 0:
@@ -235,12 +237,14 @@ def _repo_map_section(story: Story, *, project: Path, artifact_root: Path, confi
 
 
 def _ledger(artifact_root: Path):
-    """Sổ hành vi chiếu từ bằng chứng **hiện có** — không đọc `ledger.json`.
+    """Behavior ledger projected from **existing** evidence -- does not read
+    `ledger.json`.
 
-    Tệp ấy chỉ được `aisef report` làm mới; trong một lần `run` qua cả
-    epic, story sau sẽ không thấy hành vi story trước vừa xác minh. Chiếu
-    lại từ evidence mất 1,1 s trên e9 (4,3 MB) — rẻ hơn một hồi quy bị bỏ
-    sót. Sổ hỏng hay chưa có thì `None`, không làm hỏng lượt chạy.
+    That file is only refreshed by `aisef report`; in a single `run` across
+    an epic, the next story would not see behaviors the previous one just
+    verified.  Reprojecting from evidence takes 1.1s on e9 (4.3 MB) -- cheaper
+    than a missed regression.  Broken or missing ledger returns `None`,
+    does not break the run.
     """
     from ..control import ledger as ledger_mod
 
@@ -251,12 +255,13 @@ def _ledger(artifact_root: Path):
 
 
 def _index_slice(story: Story, artifact_root: Path, config: Config | None, *, ledger=None) -> str:
-    """Lát cắt chỉ mục bằng chứng của epic chứa story (ADR-004 R6).
+    """Evidence index slice for the epic containing this story (ADR-004 R6).
 
-    Progressive disclosure: prompt nhận **một dòng mỗi story** — trạng thái,
-    candidate, số hành vi VERIFIED/GAP/REOPENED — chứ không nhận lịch sử.
-    Lịch sử nằm ở `aisef evidence <id>`, tra khi cần. Sổ hỏng hay chưa có
-    thì slot rỗng có lời giải thích, không làm hỏng lượt chạy.
+    Progressive disclosure: prompt receives **one line per story** -- status,
+    candidate, behavior counts VERIFIED/GAP/REOPENED -- not full history.
+    History is at `aisef evidence <id>`, queried when needed.  Broken or
+    missing ledger yields an empty slot with an explanation, does not break
+    the run.
     """
     cap = int(config["context.max_index_chars"]) if config else 2000
     led = ledger if ledger is not None else _ledger(artifact_root)
@@ -264,22 +269,24 @@ def _index_slice(story: Story, artifact_root: Path, config: Config | None, *, le
     return text or "_(no evidence yet for this epic)_"
 
 
-# --- Hành vi phải giữ và thứ phải xanh ở ứng viên (ADR-004 R4) ----------------
+# --- Behaviors to preserve and things that must be green at candidate (ADR-004 R4)
 #
-# HoH đưa Preservation + Validation Requirements vào tài liệu phát triển mỗi
-# vòng. Ở đây chúng là hai slot **máy tính từ sổ hành vi**, cùng một danh
-# sách cho developer, reviewer và security — không vai nào nhận lời vai kia
-# (ADR-003 #9) — và cổng "bảo toàn" (`control/gate.py`) chấm đúng danh sách
-# ấy trên ứng viên đã đóng băng.
+# HoH puts Preservation + Validation Requirements into each round's dev doc.
+# Here they are two slots **computed from the behavior ledger**, the same list
+# for developer, reviewer and security -- no role receives another role's
+# output (ADR-003 #9) -- and the "preservation" gate (`control/gate.py`)
+# scores exactly this list on the frozen candidate.
 
 
 def preservation_items(story: Story, *, project: Path, ledger) -> list[dict]:
-    """Hành vi VERIFIED của **story khác** mà phạm vi ghi của story này chạm tệp.
+    """VERIFIED behaviors of **other stories** whose files overlap this story's
+    write scope.
 
-    Phép giao tệp là của `complexity.verified_touched` (R5): một luật, hai
-    chỗ dùng, không có bản thứ hai để lệch nhau. Mỗi mục mang đúng thứ cổng
-    cần để kiểm lại ở ứng viên — id, loại, story sở hữu, nguồn kiểm (test
-    id / `qa:<kind>` / màn hình) — lấy từ `ledger.behaviors[id].source`.
+    File intersection is from `complexity.verified_touched` (R5): one rule,
+    two call sites, no second copy to drift.  Each item carries exactly what
+    the gate needs to re-check at the candidate -- id, kind, owning story,
+    verification source (test id / `qa:<kind>` / screen) -- from
+    `ledger.behaviors[id].source`.
     """
     from ..control.complexity import read_scopes, verified_touched
 
@@ -288,10 +295,11 @@ def preservation_items(story: Story, *, project: Path, ledger) -> list[dict]:
     out = []
     for bid in verified_touched(story, ledger.as_dict(), read_scopes(project)):
         b = ledger.behaviors[bid]
-        # FR/NFR được sổ xác minh **qua tiêu chí của một story** (`source.story`)
-        # — không nhất thiết là story sở hữu: e9 FR-11 sở hữu bởi 01-01 (test
-        # không mang mã) nhưng xanh qua 01-05. Cổng phải hỏi đúng story ấy,
-        # không thì đòi test mà sổ chưa từng thấy (01-07 lượt 1, 2026-09-06).
+        # FR/NFR verified by the ledger **via criteria of a specific story**
+        # (`source.story`) -- not necessarily the owning story: e9 FR-11 owned
+        # by 01-01 (test lacks tag) but green via 01-05.  Gate must query that
+        # story, otherwise it demands tests the ledger never saw (01-07 attempt 1,
+        # 2026-09-06).
         out.append({"id": bid, "kind": b.kind, "story": b.story, "source": dict(b.source),
                     "via": str(b.source.get("story") or b.story)})
     return out
@@ -317,11 +325,12 @@ def _cap(text: str, max_chars: int) -> str:
 
 
 def preservation_text(items: list[dict], *, max_chars: int) -> str:
-    """Slot `preservation`: một dòng mỗi hành vi — id · story sở hữu · nguồn.
+    """Slot `preservation`: one line per behavior -- id, owning story, source.
 
-    Chỉ id và nguồn, không lịch sử (progressive disclosure, R6). Cắt theo
-    trần chỉ cắt phần **in ra**; cổng vẫn chấm đủ danh sách — agent bị cắt
-    mất một mục thì có dòng cuối bảo nó tra `aisef evidence`.
+    Only id and source, no history (progressive disclosure, R6).  Truncation
+    by cap only truncates **display**; the gate still scores the full list --
+    an agent that lost an item has a trailing line telling it to query
+    `aisef evidence`.
     """
     if not items:
         return "_(does not touch any VERIFIED behaviour of another story)_"
@@ -331,12 +340,14 @@ def preservation_text(items: list[dict], *, max_chars: int) -> str:
 
 
 def validation_text(story: Story, items: list[dict], *, max_chars: int) -> str:
-    """Slot `validation`: thứ **harness sẽ chạy lại** trên ứng viên và cổng đọc.
+    """Slot `validation`: what the **harness will re-run** on the candidate and
+    the gate reads.
 
-    Liệt kê để agent biết trước cái gì bị chấm, không phải để nó tự chấm:
-    `qa:<kind>` (hợp đồng của story + kiểm định đã xác minh bị chạm), màn
-    hình (của story + của story khác bị chạm). Test bảo toàn chỉ **đếm**:
-    tên đã nằm ở slot `preservation`, chép lại là trả ngân sách B5 hai lần
+    Listed so the agent knows what will be scored, not for self-scoring:
+    `qa:<kind>` (story contract + verified checks that were touched), screens
+    (story's + other stories' touched screens).  Preservation tests only
+    **count**: names already live in slot `preservation`; copying them spends
+    the B5 budget twice
     (e9 01-07: 27 test id).
     """
     kinds, screens = validation_targets(story, items)
@@ -352,15 +363,16 @@ def validation_text(story: Story, items: list[dict], *, max_chars: int) -> str:
 
 
 def validation_targets(story: Story, items: list[dict]) -> tuple[list[str], list[str]]:
-    """(loại kiểm định, màn hình) harness phải chạy ở ứng viên — của story
-    cộng phần bảo toàn. Cùng một hàm cho slot và cho `run_attempt`, để thứ
-    in cho agent và thứ thật sự chạy không bao giờ là hai danh sách."""
+    """(verification kinds, screens) the harness must run at the candidate --
+    story's own plus preservation.  Same function for the slot and for
+    `run_attempt`, so what is shown to the agent and what actually runs are
+    never two different lists."""
     kinds = [k for k in verification_contract(story) if k not in ("mockup-map", "unit", "security")]
     screens = list(story.screens)
     for it in items:
         src = it.get("source") or {}
-        # Chỉ loại `run_suite` chạy được; `qa:fake-tests` là của `run_attempt`,
-        # lượt nào cũng ghi, nên cổng vẫn thấy nó ở ứng viên mà không cần liệt kê.
+        # Only kinds `run_suite` can run; `qa:fake-tests` belongs to `run_attempt`,
+        # recorded every attempt, so the gate sees it at the candidate without listing.
         if it.get("kind") == "qa" and src.get("qa_kind") in KINDS and src["qa_kind"] not in kinds:
             kinds.append(str(src["qa_kind"]))
         if it.get("kind") == "mockup" and src.get("screen") and src["screen"] not in screens:
@@ -368,9 +380,10 @@ def validation_targets(story: Story, items: list[dict]) -> tuple[list[str], list
     return kinds, screens
 
 
-#: Slot nào của prompt đến từ đâu. Gói cho reviewer/security **không** được
-#: có nguồn `agent` — đó là bất biến máy kiểm (ADR-003 #9). Slot mới mà chưa
-#: khai ở đây hiện thành `?` trong bằng chứng, không lặng lẽ thành hợp lệ.
+#: Which prompt slot comes from where.  Reviewer/security bundles must
+#: **not** have `agent` as a source -- that is a machine-checked invariant
+#: (ADR-003 #9).  A new slot not declared here shows as `?` in evidence,
+#: not silently valid.
 SLOT_SOURCE = {
     "story_id": "artifact", "story_title": "artifact", "story_contract": "artifact",
     "architecture_rules": "artifact", "write_scope": "artifact", "mockup_section": "artifact",
@@ -379,37 +392,38 @@ SLOT_SOURCE = {
     "index": "ledger", "preservation": "ledger", "validation": "ledger",
 }
 
-#: Slot được phép rỗng khi dựng prompt: `repo_map` rỗng là knob tắt, không
-#: phải prompt khuyết. `blast_radius` rỗng khi greenfield hoặc write_scope trống.
+#: Slots allowed to be empty when building the prompt: `repo_map` empty means
+#: the knob is off, not a broken prompt.  `blast_radius` empty on greenfield
+#: or empty write_scope.
 ALLOW_EMPTY = ("repo_map", "blast_radius")
 
 
 def handoff_slots(context: dict, *, feedback: bool = False) -> dict[str, tuple[str, int]]:
-    """{slot: (nguồn, số ký tự)} — khoá bắt đầu bằng `_` là nội bộ, không phải slot."""
+    """{slot: (source, char count)} -- keys starting with `_` are internal, not slots."""
     out = {}
     for k, v in context.items():
         if k.startswith("_"):
             continue
         src = SLOT_SOURCE.get(k, "?")
         if k == "story_contract" and feedback:
-            src = "artifact+gate+review"   # lượt sau: có mục "Lượt trước chưa đạt"
+            src = "artifact+gate+review"   # retry: includes "Previous attempt did not pass" section
         out[k] = (src, len(str(v)))
     return out
 
 
 def _skills_section(story: Story, *, project: Path, artifact_root: Path, config: Config | None) -> tuple[str, dict]:
-    """Mục "Kỹ năng có sẵn" + bằng chứng định tuyến. Router là tín hiệu, không
-    phải cổng: abstain thì prompt nói rõ là không có, tắt thì nói là tắt."""
+    """"Available skills" section + routing evidence.  Router is a signal, not
+    a gate: abstain means the prompt says none available, off means off."""
     if not (config and config["skills.offer"]):
         return "_(no skill routing — `skills.offer` off)_", {"enabled": False}
     reg = skill_registry.load(artifact_root)
     r = skill_router.route(story, reg, project=project)
     section, ev = r.prompt_section(), {"enabled": True, **r.as_evidence()}
     if config["skills.inline"] and getattr(r, "picked", None):
-        # Cơ chế B (ADR-003 §6, thí nghiệm): ba nhánh A/B cho thấy agent không
-        # mở skill được mời qua tool `Skill` (`used` 0/0). Dán thẳng nội dung
-        # skill cao điểm nhất để đo xem *có nội dung trong ngữ cảnh* có đổi
-        # hành vi không — chỉ một skill, có trần ký tự.
+        # Mechanism B (ADR-003 §6, experiment): three A/B branches showed the
+        # agent does not open skills offered via tool `Skill` (`used` 0/0).
+        # Inline the top-scoring skill's content to measure whether *having
+        # content in context* changes behavior -- one skill only, with char cap.
         top = r.picked[0].entry
         body = inline_skill_text(project, top.path)
         if body:
@@ -420,12 +434,12 @@ def _skills_section(story: Story, *, project: Path, artifact_root: Path, config:
     return section, ev
 
 
-#: Trần ký tự nội dung skill dán thẳng — quá trần thì cắt, ghi rõ.
+#: Char cap for inlined skill content -- exceeding the cap truncates with a note.
 INLINE_SKILL_MAX_CHARS = 8000
 
 
 def inline_skill_text(project: Path, skill_path: str) -> str:
-    """Thân SKILL.md (bỏ frontmatter), cắt theo trần; rỗng nếu không có tệp."""
+    """SKILL.md body (without frontmatter), truncated to cap; empty if no file."""
     md = Path(project) / skill_path / "SKILL.md"
     if not md.is_file():
         return ""
@@ -441,8 +455,9 @@ def inline_skill_text(project: Path, skill_path: str) -> str:
 
 
 def skills_used(result) -> list[str]:
-    """Skill agent đã mở, đọc từ luồng `tool_use` (tool `Skill`). Client không
-    phát luồng → rỗng, và `skills_measurable` ở capability nói vì sao."""
+    """Skills the agent opened, read from `tool_use` stream (tool `Skill`).
+    Client does not emit stream -> empty, and `skills_measurable` in
+    capability explains why."""
     out = []
     for tu in getattr(result, "tool_uses", None) or []:
         if tu.name == "Skill":
@@ -451,8 +466,9 @@ def skills_used(result) -> list[str]:
 
 
 def _write_scope_lines(story: Story, project: Path) -> str:
-    """Phạm vi ghi cho prompt: story khai + phần harness cấp thêm vì hợp đồng
-    kiểm định (lỗi 21) — agent phải thấy đúng phạm vi mà guard áp."""
+    """Write scope for prompt: story-declared + harness-added paths required
+    by verification contract (bug 21) -- agent must see exactly the scope
+    the guard enforces."""
     from ..control.normalize import verification_paths
 
     lines = [f"- `{p}`" for p in story.write_scope]
@@ -484,7 +500,7 @@ def run_attempt(
     feedback: str = "",
     base_ref: str = "",
 ) -> Attempt:
-    """Một lượt: agent viết code, rồi harness tự kiểm."""
+    """One attempt: agent writes code, then harness self-verifies."""
     attempt = Attempt(number=number)
     evidence = EvidenceStore(artifact_root)
 
@@ -499,9 +515,9 @@ def run_attempt(
     )
     evidence.handoff(story.id, frm="plan" if number == 1 else "gate", to=DEVELOPER,
                      attempt=number, slots=handoff_slots(context, feedback=bool(feedback)))
-    # R4: danh sách hành vi phải giữ chốt **một lần** ở đây, trước phiên
-    # developer; reviewer, security và cổng nhận đúng bản này — tính lại sau
-    # phiên thì sổ đã đổi theo bằng chứng của chính lượt này.
+    # R4: preservation list locked **once** here, before the developer
+    # session; reviewer, security and gate receive exactly this version --
+    # recomputing after the session reflects that attempt's own evidence.
     preservation = list(context.get("_preservation") or [])
     spec = build_spec(
         DEVELOPER,
@@ -511,8 +527,8 @@ def run_attempt(
         config=config,
         allow_empty=ALLOW_EMPTY,
     )
-    # Guard chạy trong hook — tiến trình con của client — nên phạm vi ghi
-    # và mã story chỉ tới được nó qua môi trường.
+    # Guard runs in a hook -- a child process of the client -- so write scope
+    # and story ID reach it only via environment variables.
     scope = effective_write_scope(story, project)
     _hosts = ",".join(config["sandbox.allow_hosts"]) if config else ""
     spec.env = {
@@ -524,11 +540,12 @@ def run_attempt(
         ENV_ALLOW_HOSTS: _hosts,
     }
 
-    # Cách ly là thứ **phải kiểm**, không phải thứ giả định. Worktree ngăn
-    # story giẫm lên nhau, nhưng không có gì cấm agent `cd` ra ngoài rồi
-    # commit thẳng vào thân cây. Đã gặp thật: một lượt OpenCode đưa
-    # `src/reverse-words.js` lên `main` trong khi nhánh story đứng yên —
-    # cổng chỉ báo "diff rỗng", còn code lạ thì đã nằm trên trunk.
+    # Isolation must be **verified**, not assumed.  Worktrees prevent
+    # stories from stepping on each other, but nothing stops the agent from
+    # `cd`-ing out and committing to the trunk.  Observed in practice: an
+    # OpenCode run pushed `src/reverse-words.js` to `main` while the story
+    # branch stayed unchanged -- gate only reported "empty diff" while rogue
+    # code was already on trunk.
     truoc = head_sha(project) if workdir != project else ""
 
     _attach_settings(spec, project)
@@ -550,8 +567,8 @@ def run_attempt(
             f"The story must work in its own worktree; work on the trunk does not "
             f"pass any gate. Revert and re-run."
         )
-        attempt.infra = True   # story chưa hề được chấm
-        attempt.fatal = True   # nhưng thử lại cũng vô nghĩa
+        attempt.infra = True   # story was never scored
+        attempt.fatal = True   # and retrying is pointless
         evidence.tool_run(
             story.id, "isolation", ok=False,
             detail={"truoc": truoc, "sau": sau, "attempt": number},
@@ -563,9 +580,9 @@ def run_attempt(
         attempt.infra = exit_status_of(result) in INFRA_STATUSES
         return attempt
 
-    # Phiên developer đã kết thúc: **đóng băng ứng viên ngay**, trước khi
-    # kiểm bất cứ thứ gì (ADR-004 R1). Kiểm trước rồi mới chốt thì bằng
-    # chứng không trỏ vào bản nào cả, và "stale" không định nghĩa được.
+    # Developer session ended: **freeze candidate immediately**, before
+    # verifying anything (ADR-004 R1).  Verifying first then freezing means
+    # evidence points to no specific version, and "stale" becomes undefined.
     changed_now = changed_files(str(workdir), base_ref=base_ref)
     attempt.candidate = freeze_candidate(
         workdir, story=story, scope=scope, isolated=workdir != project,
@@ -581,29 +598,30 @@ def run_attempt(
 
 
 def _at(ev: Evidence, kind: str, name: str, sha: str) -> Event | None:
-    """Sự kiện **mới nhất** của một phép kiểm, chỉ khi nó mang đúng SHA ứng viên.
+    """**Latest** event of a check, only if it carries the correct candidate SHA.
 
-    Mới nhất, không phải "có lần nào": cùng luật với `gate._stale_candidates`
-    — kết quả mới nhất thuộc bản khác nghĩa là mã đã đổi sau khi kiểm, và
-    một lần xanh cũ hơn không cứu được điều đó.
+    Latest, not "any": same rule as `gate._stale_candidates` -- the latest
+    result belonging to a different version means code changed after the check,
+    and an older green result does not save it.
     """
     e = ev.last(kind, name)
     return e if e is not None and str(e.detail.get("candidate") or "") == sha else None
 
 
 def _green_at(ev: Evidence, kind: str, name: str, sha: str) -> bool:
-    """Bằng chứng ở ứng viên đủ để **giữ**: xanh thật — không phải bỏ qua
-    (chưa cấu hình) hay không chạy được; hai thứ ấy chạy lại rẻ và có thể
-    đã đổi (công cụ vừa cài, lệnh vừa khai)."""
+    """Evidence at the candidate sufficient to **keep**: genuinely green -- not
+    skipped (unconfigured) or unrunnable; those are cheap to re-run and may
+    have changed (tool just installed, command just declared)."""
     e = _at(ev, kind, name, sha)
     return bool(e and e.ok and not e.detail.get("skipped") and not e.detail.get("unrunnable"))
 
 
 def _nop_at(ev: Evidence, sha: str) -> bool:
-    """Bằng chứng nop ở ứng viên đủ để **giữ**: một kết quả thật (đỏ hay xanh
-    đều là dữ liệu — xanh là ✗ tất định, chạy lại cho cùng câu trả lời) hoặc
-    "story không thêm/sửa tệp test" (sự thật của SHA). Không giữ khi không
-    chạy được, tắt bởi cấu hình, hay thiếu lệnh test: ba thứ ấy có thể đã đổi."""
+    """Nop evidence at the candidate sufficient to **keep**: a real result (red
+    or green are both data -- green is a deterministic fail, re-running gives
+    the same answer) or "story did not add/modify test files" (a SHA fact).
+    Not kept when unrunnable, disabled by config, or missing test command:
+    all three may have changed."""
     e = _at(ev, TOOL_RUN, NOP_RUN, sha)
     if e is None or e.detail.get("unrunnable") or e.detail.get("disabled"):
         return False
@@ -611,20 +629,21 @@ def _nop_at(ev: Evidence, sha: str) -> bool:
 
 
 def _security_as_dict(rep: SecurityReport | None) -> dict | None:
-    """Báo cáo bảo mật dưới dạng ghi được — cùng hình với `tool_run security`,
-    nên `_security_from_evidence` đọc lại được y nguyên."""
+    """Security report as a persistable dict -- same shape as `tool_run security`,
+    so `_security_from_evidence` reads it back identically."""
     if rep is None:
         return None
     return {"findings": [f.line() for f in rep.findings], "error": rep.error}
 
 
 def _record_gate_input(evidence: EvidenceStore, story_id: str, *, attempt: int, **kw) -> None:
-    """Ghi **đầu vào** cổng (ADR-005 V4): mọi kwargs của `gate.evaluate` JSON-hoá,
-    ngay trước khi chấm. Cổng thuần trên `Evidence` + 13 kwargs; kwargs chỉ
-    sống trong lượt chạy, nên trước đây mọi sửa luật cổng chỉ kiểm được bằng
-    unit hoặc trả tiền cho một lượt agent (0/17 lỗi chấm sai bắt được trước).
-    Có bản ghi này, `aisef gate --replay` chấm lại lượt cũ bằng mã hiện tại,
-    $0, tất định — không gọi model: lời reviewer/security đã nằm trong đây."""
+    """Record gate **inputs** (ADR-005 V4): all kwargs of `gate.evaluate`
+    JSON-serialized, right before scoring.  The gate is pure on `Evidence` +
+    13 kwargs; kwargs only live during the run, so previously every gate-rule
+    fix could only be tested via unit tests or a paid agent run (0/17 scoring
+    bugs caught before shipping).  With this record, `aisef gate --replay`
+    re-scores a past attempt with current code, $0, deterministic -- no model
+    call: reviewer/security verdicts are already in here."""
     detail = {**kw, "security": _security_as_dict(kw.get("security")), "attempt": attempt}
     evidence.record(story_id, Event(
         kind=NOTE, name="gate:input",
@@ -633,23 +652,24 @@ def _record_gate_input(evidence: EvidenceStore, story_id: str, *, attempt: int, 
 
 
 def _security_from_evidence(e: Event) -> SecurityReport:
-    """Dựng lại báo cáo bảo mật từ `tool_run security` — dòng `[mức] nội dung`
-    là đúng dạng `parse` đọc, nên một bộ lọc nhiễu chấm cả bản sống lẫn
-    bản giữ."""
+    """Reconstruct security report from `tool_run security` -- `[severity] body`
+    lines are exactly the format `parse` reads, so one noise filter scores
+    both live and persisted reports."""
     rep = parse_security("\n".join(e.detail.get("findings") or []))
     rep.error = str(e.detail.get("error") or "")
     return rep
 
 
 def _repeat_runs(k: int, chay: Callable[[], object]) -> None:
-    """Chạy lại một phép kiểm ``k`` lần trên cùng SHA (ADR-004 R13 `--repeat`).
+    """Re-run a check ``k`` times on the same SHA (ADR-004 R13 `--repeat`).
 
-    Một lần chạy không phân biệt được "đỏ vì mã" với "đỏ vì tải máy": e9
-    STORY-01-07 (lỗi 22) trượt lượt 3 vì `autosave.spec.ts:210` nhạy tải, đo
-    lại 10/10 xanh — $28,76 cho một lượt developer dựng lại thứ đã có.
-    Terminal-Bench đo flake bằng oracle ×k; ở đây mỗi lần là một `tool_run`
-    thật mang candidate, và `_repeat_note` so tên test giữa các lần. k = 1 là
-    hành vi cũ, không ghi gì thêm.
+    A single run cannot distinguish "red because of code" from "red because of
+    machine load": e9 STORY-01-07 (bug 22) failed attempt 3 because
+    `autosave.spec.ts:210` was load-sensitive, measured 10/10 green on retry --
+    $28.76 for a developer session rebuilding what already existed.
+    Terminal-Bench measures flake via oracle x k; here each run is a real
+    `tool_run` carrying candidate, and `_repeat_note` compares test names
+    across runs.  k = 1 is the old behavior, nothing extra recorded.
     """
     for _ in range(max(1, k)):
         chay()
@@ -657,16 +677,18 @@ def _repeat_runs(k: int, chay: Callable[[], object]) -> None:
 
 def _repeat_note(evidence: EvidenceStore, sid: str, sha: str, *, k: int,
                  checks: list[str], attempt: int) -> Event:
-    """Ghi `note verify-only.repeat`: phép kiểm nào đổi kết cục giữa ``k`` lần
-    ở cùng SHA — cổng đọc bản ghi này (`gate._khong_on_dinh`).
+    """Record `note verify-only.repeat`: which checks changed outcome across
+    ``k`` runs on the same SHA -- the gate reads this record
+    (`gate._khong_on_dinh`).
 
-    `flaky_ids`: test (theo tên, từ `test_ids`/`failed_ids` của `tool_run
-    test`) xanh ở lần này đỏ ở lần khác; `stable_red`: đỏ ở **mọi** lần —
-    đỏ thật, cổng chấm FAILED như thường; `flaky_checks`: phép kiểm (test ·
-    lint · `qa:<kind>`) mà `ok` đổi giữa các lần — cho phép không in tên
-    test. Có flaky → mục ấy UNRUNNABLE "không ổn định": không chạy được ổn
-    định ≠ trượt, ≠ đạt. Test có mặt ở lần này vắng ở lần khác không xếp
-    vào đâu — lần cuối quyết, như không có `--repeat`.
+    `flaky_ids`: tests (by name, from `test_ids`/`failed_ids` of `tool_run
+    test`) green in one run, red in another; `stable_red`: red in **all**
+    runs -- genuinely red, gate scores FAILED as usual; `flaky_checks`:
+    checks (test / lint / `qa:<kind>`) whose `ok` flipped across runs --
+    allows not printing test names.  Flaky -> that check is UNRUNNABLE
+    "unstable": cannot run stably != failed, != passed.  Tests present in
+    one run but absent in another are not classified -- the last run decides,
+    as without `--repeat`.
     """
     ev = evidence.read(sid)
     flaky_ids: list[str] = []
@@ -715,45 +737,47 @@ def verify_candidate(
     reuse: bool = False,
     repeat: int = 1,
 ) -> Attempt:
-    """Nửa sau của một lượt — kiểm, rà soát, chấm cổng — trên ứng viên đã
-    đóng băng ở `attempt.candidate`.
+    """Second half of an attempt -- verify, review, score gate -- on the
+    candidate frozen at `attempt.candidate`.
 
-    ``repeat`` (R13 `--repeat k`): mỗi phép kiểm **chạy lại** (test, lint,
-    `qa:<kind>`) chạy k lần trên cùng SHA, rồi `note verify-only.repeat` ghi
-    test đổi kết cục giữa các lần — xem `_repeat_runs`/`_repeat_note`.
+    ``repeat`` (R13 `--repeat k`): each **re-runnable** check (test, lint,
+    `qa:<kind>`) runs k times on the same SHA, then `note verify-only.repeat`
+    records tests that changed outcome across runs -- see
+    `_repeat_runs`/`_repeat_note`.
 
-    Tách khỏi `run_attempt` để lượt kiểm-lại (ADR-004 R13) đi **đúng đường
-    này**, không có bản chép thứ hai để lệch nhau. `reuse=False` là lượt
-    thường: chạy đủ. `reuse=True`: mỗi phép kiểm chỉ chạy khi bằng chứng
-    mới nhất của nó không xanh ở đúng ứng viên (✗, thiếu, chưa cấu hình,
-    không chạy được, hay thuộc bản khác); rà soát và bảo mật **giữ** khi cả
-    phiên (`agent_run`) lẫn kết luận (`tool_run review|security`) cùng ở
-    SHA này — kể cả kết luận chặn. Đây là điều R1 làm cho có nghĩa: lời
-    người rà soát nói về một bản; bản không đổi thì lời còn nguyên, hỏi
-    lại là trả tiền cho cùng câu trả lời. Cổng chấm đủ như nhau ở cả hai
-    đường — không nới, chỉ không trả tiền dựng lại thứ đã có.
+    Separated from `run_attempt` so re-verify attempts (ADR-004 R13) follow
+    **exactly this path**, with no second copy to drift.  `reuse=False` is
+    the normal path: run everything.  `reuse=True`: each check runs only when
+    its latest evidence is not green at the correct candidate (fail, missing,
+    unconfigured, unrunnable, or belongs to a different version); review and
+    security are **kept** when both the session (`agent_run`) and conclusion
+    (`tool_run review|security`) are at this SHA -- including blocking
+    conclusions.  This is what R1 makes meaningful: a reviewer's words
+    describe one version; if the version hasn't changed the words still hold,
+    re-asking pays for the same answer.  Gate scores identically on both
+    paths -- no relaxation, just no paying to rebuild what already exists.
     """
     sid, sha, number = story.id, attempt.candidate, attempt.number
     evidence = EvidenceStore(artifact_root, candidate=sha)
-    # Đọc **một lần, trước** khi chạy lại gì: phép kiểm chạy lại ghi sự kiện
-    # mới, và quyết định giữ/chạy phải dựa trên bằng chứng lúc bước vào.
+    # Read **once, before** re-running anything: re-run checks write new
+    # events, and keep/run decisions must be based on evidence at entry time.
     ev = evidence.read(sid) if reuse else None
 
     def giu(name: str, du: bool) -> bool:
-        """True = giữ bằng chứng có sẵn, không chạy. Ghi sổ ở cả hai nhánh."""
+        """True = keep existing evidence, do not run.  Logged on both paths."""
         if not reuse:
             return False
         (attempt.kept if du else attempt.reran).append(name)
         return du
 
-    # Nop control (ADR-005 V3) ngay sau đóng băng: test của story ở SHA cha.
+    # Nop control (ADR-005 V3) right after freeze: story's tests at parent SHA.
     if not giu(NOP_RUN, reuse and _nop_at(ev, sha)):
         run_nop(story, workdir=workdir, artifact_root=artifact_root, config=config,
                 candidate=sha, base_ref=base_ref, changed=changed)
 
-    # Harness tự chạy lại test và lint: bằng chứng phải do harness ghi, và
-    # agent có thể đã "quên" chạy lần cuối sau khi sửa.
-    chay_lai: list[str] = []  # phép kiểm chạy ở lượt này — `_repeat_note` so giữa k lần
+    # Harness re-runs tests and lint: evidence must be recorded by the
+    # harness, and the agent may have "forgotten" to run after the last edit.
+    chay_lai: list[str] = []  # checks run this attempt -- `_repeat_note` compares across k runs
     for tool in ("test", "lint"):
         if not giu(tool, reuse and _green_at(ev, TOOL_RUN, tool, sha)):
             _repeat_runs(repeat, partial(
@@ -762,26 +786,27 @@ def verify_candidate(
             ))
             chay_lai.append(tool)
 
-    # Test luôn xanh vì không khẳng định gì tệ hơn không có test: nó làm
-    # cổng "test xanh" mất hết ý nghĩa. Kiểm rẻ, nên chạy mỗi lượt.
+    # Tests always green because they assert nothing is worse than no tests:
+    # it makes the "tests green" gate meaningless.  Checking is cheap, run every attempt.
     if not giu("qa:fake-tests", reuse and _green_at(ev, TOOL_RUN, "qa:fake-tests", sha)):
         fake = find_fake_tests(workdir, changed)
         evidence.tool_run(sid, "qa:fake-tests", ok=not fake, detail={"files": fake})
 
-    # Hợp đồng kiểm định của story: chạy đúng những loại nó phải qua.
-    # Không phải pha mới — cùng bộ máy `run_suite`, chỉ giới hạn phạm vi.
-    # `verify.X` để trống vẫn là **chưa cấu hình**, không phải đạt: đó là
-    # điều `run_suite` đã phân biệt sẵn, và cổng đọc lại đúng như thế.
-    # R4: cộng thêm kiểm định và màn hình của hành vi phải giữ — cổng "bảo
-    # toàn" chỉ chấm được thứ đã chạy ở ứng viên này, và "không chạy" thì
-    # nó nói UNRUNNABLE chứ không nói đạt.
+    # Story's verification contract: run exactly the kinds it must pass.
+    # Not a new phase -- same `run_suite` machinery, just scoped.
+    # `verify.X` left empty is still **unconfigured**, not passed: that's
+    # what `run_suite` already distinguishes, and the gate reads it as such.
+    # R4: also add verification kinds and screens from behaviors to preserve
+    # -- the "preservation" gate can only score what was run at this
+    # candidate, and "not run" means it says UNRUNNABLE, not passed.
     hop_dong, man_hinh = validation_targets(story, preservation)
     kinds = [k for k in hop_dong
              if not giu(f"qa:{k}", reuse and _green_at(ev, TOOL_RUN, f"qa:{k}", sha))]
     if kinds:
-        # `clean=False`: cây worktree đã đóng băng ở đúng SHA và guard
-        # write-scope đã chặn ngoài phạm vi — worktree sạch (V6) là cho
-        # kiểm định cấp dự án, nơi cây có thể là của bất kỳ ai.
+        # `clean=False`: worktree is already frozen at the correct SHA and
+        # write-scope guard blocked out-of-scope changes -- clean worktree
+        # (V6) is for project-level verification, where the tree could be
+        # anyone's.
         _repeat_runs(repeat, partial(
             run_suite,
             workdir,
@@ -825,11 +850,12 @@ def verify_candidate(
             candidate=sha,
             preservation=preservation,
         )
-        # Mục chặn phải nằm trong bằng chứng, không chỉ trong bản tóm tắt in
-        # ra màn hình — bản tóm tắt cắt ngắn, và khi cần biết lượt này với
-        # lượt trước có bị chặn vì cùng một chuyện không thì phải đọc được
-        # nguyên văn. Thiếu chỗ này thì lối duy nhất là mò nhật ký phiên.
-        # Lượt kiểm-lại đọc lại đúng bản ghi này thay vì gọi lại model.
+        # Blocking items must live in evidence, not just in the truncated
+        # summary printed to screen -- when checking whether this attempt and
+        # the previous were blocked for the same reason, the full text must
+        # be readable.  Without this, the only way is to dig through session
+        # logs.  Re-verify attempts read back exactly this record instead of
+        # calling the model again.
         evidence.tool_run(
             sid,
             "review",
@@ -884,19 +910,20 @@ def verify_candidate(
         candidate=sha,
         preservation=preservation,
     )
-    # Đầu vào ghi **trước** khi đọc bằng chứng để chấm: replay dựng lại đúng
-    # tập sự kiện cổng đã thấy bằng cách cắt ở seq của bản ghi này (V4).
+    # Inputs recorded **before** reading evidence to score: replay rebuilds
+    # exactly the event set the gate saw by cutting at this record's seq (V4).
     _record_gate_input(evidence, sid, attempt=number, **dau_vao)
     attempt.gate = story_gate.evaluate(sid, evidence.read(sid), **dau_vao)
     attempt.ok = attempt.gate.passed
-    # Kết cục cổng đi vào bằng chứng, mang SHA ứng viên: sổ hành vi (R2) coi
-    # "qua cổng ở ứng viên này" là dấu landed ở mức lượt — implement không
-    # merge, và `attempt.committed` đóng giao dịch kể cả khi trượt.
+    # Gate outcome goes into evidence, carrying candidate SHA: the behavior
+    # ledger (R2) treats "passed gate at this candidate" as a per-attempt
+    # landed signal -- implement does not merge, and `attempt.committed`
+    # closes the transaction even on failure.
     evidence.record(sid, Event(
         kind=NOTE, name="gate:verdict", ok=attempt.ok,
         detail={"failures": [c.name for c in attempt.gate.failures][:20], "attempt": number,
-                # Hợp đồng chấm (ADR-005 V9): mỗi mục mang `kind` và con trỏ
-                # `evidence` — replay/bench đọc từ đây, không đọc lại summary.
+                # Scoring contract (ADR-005 V9): each item carries `kind` and
+                # `evidence` pointer -- replay/bench reads from here, not from summary.
                 "checks": [c.as_dict() for c in attempt.gate.checks]},
     ))
     return attempt
@@ -904,28 +931,32 @@ def verify_candidate(
 
 def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
                  base_ref: str = "") -> None:
-    """Chạy bộ test ở **candidate cha** trước khi developer sửa gì (ADR-004 R9).
+    """Run tests at the **parent candidate** before the developer changes
+    anything (ADR-004 R9).
 
-    HoH bảo developer "establish a baseline before editing"; ở đây harness
-    làm, vì lời developer không phải bằng chứng. Ghi dưới tên `test:baseline`
-    (xem `tools.BASELINE_RUN` vì sao không phải `test`), kèm `parent` = HEAD
-    lúc chạy và `red_before` = test đã đỏ sẵn — cổng không tính chúng là hồi
-    quy, và người đọc thấy ngay vì sao.
+    HoH tells the developer "establish a baseline before editing"; here the
+    harness does it, because developer words are not evidence.  Recorded as
+    `test:baseline` (see `tools.BASELINE_RUN` for why not `test`), with
+    `parent` = HEAD at run time and `red_before` = tests already red -- gate
+    does not count them as regressions, and readers see why immediately.
 
-    Chạy **một lần cho cả story**, trước lượt đầu, không phải mỗi lượt: lượt 2
-    mà lấy ứng viên lượt 1 làm mốc thì test lượt 1 vừa làm đỏ thành "đỏ sẵn",
-    và lượt 2 xoá nó đi là qua cổng sạch. Mốc là trạng thái trước khi story
-    chạm vào — và chi phí là một lần chạy test mỗi story, không phải mỗi lượt.
+    Runs **once per story**, before the first attempt, not per-attempt:
+    attempt 2 using attempt 1's candidate as baseline would reclassify
+    attempt 1's newly red tests as "already red", and attempt 2 removing
+    them passes the gate cleanly.  Baseline is the state before the story
+    touched anything -- cost is one test run per story, not per attempt.
 
-    Không có lệnh test thì bản ghi mang `skipped` (cổng đọc thành chưa cấu
-    hình), không phải baseline xanh. Tắt bằng `verify.baseline` thì ghi rõ là
-    tắt, để cổng nói "không áp dụng" chứ không im.
+    No test command means the record carries `skipped` (gate reads as
+    unconfigured), not a green baseline.  Disabled via `verify.baseline`
+    records it explicitly as disabled, so the gate says "not applicable"
+    instead of silence.
 
-    ``base_ref`` (điểm rẽ) ghi cạnh ``parent`` để cổng biết mốc này có đứng
-    **trước** story không: lượt chạy lại nối lại nhánh story, HEAD lúc chạy
-    baseline là bản của chính story (e9 01-07 lần chạy 3: `parent` = ứng viên
-    `a60612e`), và mọi test của story đã xanh sẵn ở đó — nop cấp 1 phải biết
-    để không bắt oan (ADR-005 V3).
+    ``base_ref`` (fork point) recorded alongside ``parent`` so the gate knows
+    whether this baseline stands **before** the story: a re-run reconnects
+    the story branch, HEAD at baseline time is the story's own version
+    (e9 01-07 run 3: `parent` = candidate `a60612e`), and all story tests
+    are already green there -- nop level 1 must know to avoid false
+    positives (ADR-005 V3).
     """
     if not config.get("verify.baseline", True):
         EvidenceStore(artifact_root).tool_run(story.id, BASELINE_RUN, ok=False, detail={
@@ -933,7 +964,7 @@ def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Co
             "skipped": "disabled by config `verify.baseline`",
         })
         return
-    res = run_tool("test", workdir, config=config)   # story_id rỗng: ghi bên dưới, dưới tên riêng
+    res = run_tool("test", workdir, config=config)   # story_id empty: recorded below, under its own name
     log = parse_testlog(res.stdout + "\n" + res.stderr)
     record_tool(res, story.id, artifact_root, name=BASELINE_RUN, extra={
         "baseline": True, "parent": head_sha(workdir), "base_ref": base_ref,
@@ -943,25 +974,27 @@ def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Co
 
 def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
             candidate: str, base_ref: str, changed: list[str]) -> None:
-    """Nop control cấp 2 (ADR-005 V3): chạy test của story ở **SHA cha**.
+    """Nop control level 2 (ADR-005 V3): run story tests at **parent SHA**.
 
-    Terminal-Bench nhận task chỉ khi oracle ≥ 1 **và** nop < 1; BERBench ghi
-    `base_fail`. Ở đây: worktree tạm ở SHA cha, chép vào đó **tệp test story
-    thêm/sửa** (tệp test trong `changed` theo `is_test_path` — `tdd.added_tests`
-    là tập con của nó, nên một bộ lọc là đủ; không chép mã nguồn), chạy
-    `tools.test`, ghi `test:nop` mang `candidate`. Cổng đọc: test mang mã tiêu
-    chí phải đỏ hoặc không tồn tại ở đó — lỗi import vì thiếu module của
-    story là đỏ, và là hợp lệ.
+    Terminal-Bench accepts a task only when oracle >= 1 **and** nop < 1;
+    BERBench records `base_fail`.  Here: temp worktree at parent SHA, copy
+    into it **test files the story added/modified** (test files in `changed`
+    per `is_test_path` -- `tdd.added_tests` is a subset, so one filter
+    suffices; source code is not copied), run `tools.test`, record `test:nop`
+    carrying `candidate`.  Gate reads: tests carrying criteria code must be
+    red or nonexistent there -- import error from missing story module is
+    red, and valid.
 
-    SHA cha = điểm rẽ (`base_ref`) khi có — mốc **trước** story kể cả lượt
-    chạy lại; không có (chạy thẳng trong dự án) thì `test:baseline.parent`;
-    không có nốt thì ghi không chạy được, không đoán. Chỉ `tools.test`
-    (unit), không `qa:e2e` (lỗi 22: nhạy tải máy). Worktree tạm nằm cùng
-    gốc `.aisef/worktrees/` với worktree story — cùng cách tìm `node_modules`
-    /venv, nên baseline chạy được thì nop chạy được; dọn xong dù lỗi.
-    Tắt bởi `verify.nop` → vẫn ghi một bản mang `disabled` để cổng nói
-    "không áp dụng: tắt", không im. Story không thêm/sửa tệp test → ghi
-    `files: []`, không dựng gì.
+    Parent SHA = fork point (`base_ref`) when available -- baseline
+    **before** the story even on re-runs; absent (running directly in
+    project) falls back to `test:baseline.parent`; absent too records
+    unrunnable, does not guess.  Only `tools.test` (unit), not `qa:e2e`
+    (bug 22: load-sensitive).  Temp worktree shares the `.aisef/worktrees/`
+    root with the story worktree -- same `node_modules`/venv discovery, so
+    if baseline runs then nop runs; cleaned up even on error.
+    Disabled via `verify.nop` still records a `disabled` entry so the gate
+    says "not applicable: disabled", not silence.  Story did not add/modify
+    test files -> records `files: []`, nothing built.
     """
     from ..control.worktree import GitError, WorktreeManager, main_repo
 
@@ -986,7 +1019,7 @@ def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
     wt = WorktreeManager(main_repo(workdir))
     nop_id = f"{story.id}-nop"
     try:
-        wt.remove(nop_id, delete_branch=True)      # xác còn sót từ lần gãy trước
+        wt.remove(nop_id, delete_branch=True)      # leftover from a previous crash
         tam = wt.create(nop_id, base=cha, refresh=False).path
         for f in tep:
             src, dst = Path(workdir) / f, tam / f
@@ -994,8 +1027,8 @@ def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src, dst)
             elif dst.exists():
-                dst.unlink()                        # story xoá tệp test: SHA cha cũng không có
-        res = run_tool("test", tam, config=config)   # story_id rỗng: ghi bên dưới, dưới tên riêng
+                dst.unlink()                        # story deleted test file: parent SHA also lacks it
+        res = run_tool("test", tam, config=config)   # story_id empty: recorded below, under its own name
         record_tool(res, story.id, artifact_root, candidate, name=NOP_RUN, extra={
             "nop": True, "parent": cha, "base_ref": base_ref, "files": tep[:50]})
     except GitError as e:
@@ -1018,18 +1051,21 @@ def freeze_candidate(
     changed: list[str],
     verify_only: bool = False,
 ) -> str:
-    """Chốt công việc của phiên developer thành **một bản** và trả SHA của nó.
+    """Freeze the developer session's work into **one version** and return
+    its SHA.
 
-    Đây là điểm HoH gọi là *frozen candidate*: từ đây tới hết lượt, không
-    gì được sửa cây nữa, và mọi phép kiểm nói về đúng bản này. Trước ADR-004
-    R1 harness commit **sau** khi kiểm và rà soát — bằng chứng không trỏ
-    vào bản nào, nên "test này chạy trên mã nào" không có câu trả lời.
+    This is what HoH calls *frozen candidate*: from here to end of attempt,
+    nothing may modify the tree, and all checks refer to exactly this version.
+    Before ADR-004 R1 the harness committed **after** verification and review
+    -- evidence pointed to no specific version, so "which code did this test
+    run on" had no answer.
 
-    Không có gì để commit thì ứng viên là HEAD hiện tại (agent đã tự chốt).
-    Chạy thẳng trong dự án (`--no-isolate`) thì **không** commit: không có
-    nhánh riêng, và commit vào thân cây người dùng không phải việc của một
-    lượt thử. ``verify_only`` đánh dấu mốc của lượt kiểm-lại (R13) — không
-    có phiên developer nào trước nó, người đọc nhật ký phải thấy điều đó.
+    Nothing to commit means the candidate is the current HEAD (agent already
+    committed).  Running directly in the project (`--no-isolate`) does
+    **not** commit: there is no dedicated branch, and committing to the
+    user's trunk is not an attempt's job.  ``verify_only`` marks the
+    re-verify checkpoint (R13) -- no developer session preceded it, log
+    readers must see that.
     """
     from ..control.worktree import GitError, commit_paths
 
@@ -1042,9 +1078,10 @@ def freeze_candidate(
     sha = head_sha(workdir)
 
     journal = JournalStore(artifact_root)
-    # Số hiệu **của giao dịch đang mở**, không phải số lượt thử trong story:
-    # `open_attempt()` đóng một lượt bằng cách so số hiệu, nên ghi số khác
-    # vào đây sẽ để lại một lượt "chưa đóng" và lần chạy sau đi dọn oan.
+    # Sequence number **of the open transaction**, not the attempt count in
+    # the story: `open_attempt()` closes an attempt by matching this number,
+    # so writing a different number here leaves an "unclosed" attempt and
+    # the next run cleans it up incorrectly.
     giao_dich = journal.read(story.id).attempt_no or number
     journal.record(story.id, JEntry(
         step="changes.detected", attempt=giao_dich,
@@ -1053,26 +1090,27 @@ def freeze_candidate(
         step="candidate.frozen", attempt=giao_dich,
         data={"luot": number, "sha": sha, "error": loi, "verify_only": verify_only}))
     if loi or not sha:
-        # Không chốt được thì bằng chứng phía sau gắn vào một bản **không**
-        # chứa công việc. Nói ra ở bằng chứng; im lặng ở đây là để lại một
-        # cổng chấm trên nền cát.
+        # Failed to freeze means subsequent evidence is attached to a version
+        # that **does not** contain the work.  Recorded in evidence; silence
+        # here would leave a gate scoring on sand.
         evidence.tool_run(story.id, "candidate:frozen", ok=False,
                           detail={"error": loi or "cannot read HEAD", "attempt": number})
     return sha
 
 
-#: Trần ký tự cho diff đưa vào prompt rà soát. Đủ cho một story đúng cỡ;
-#: vượt trần thì story quá to, và cắt ở đây tốt hơn là tràn ngữ cảnh.
+#: Char cap for diff in the review prompt.  Sufficient for a right-sized
+#: story; exceeding the cap means the story is too large, and truncating
+#: here is better than overflowing context.
 REVIEW_DIFF_CHARS = 60_000
 
 
 def review_diff(workdir: str, changed: list[str], *, base_ref: str = "") -> str:
-    """Diff thật để rà soát, lùi về danh sách tên file khi không lấy được.
+    """Actual diff for review, falling back to file list when unavailable.
 
-    Đưa mỗi tên file thì người rà soát phải tự đọc lại từng cái — đo trên
-    e9 là 31–43 lượt và 12 phút cho một story nhỏ, phần lớn tiêu vào việc
-    dựng lại thứ harness đã biết. Diff không thay việc đọc code xung
-    quanh, nó chỉ bỏ bớt đoạn mò mẫm ban đầu.
+    Providing only filenames forces the reviewer to re-read each file -- measured
+    on e9 at 31-43 tool calls and 12 minutes for a small story, mostly spent
+    rebuilding what the harness already knows.  The diff does not replace reading
+    surrounding code, it just removes the initial fumbling.
     """
     names = "\n".join(f"- {c}" for c in changed[:50])
     if not base_ref:
@@ -1117,12 +1155,13 @@ def review_story(
     candidate: str = "",
     preservation: list[dict] | None = None,
 ) -> list[str]:
-    """Rà soát độc lập — **phiên mới**, không sửa được gì.
+    """Independent review -- **new session**, cannot modify anything.
 
-    Trả về danh sách mục ``[chặn]``. Người viết đã tin code mình đúng; hỏi
-    lại chính phiên đó chỉ nhận lại cùng niềm tin.
+    Returns list of ``[blocker]`` items.  The author already believes the code
+    is correct; asking the same session only returns the same belief.
 
-    Chữ ký giữ nguyên cho luồng gọi cũ; bản máy đọc lấy ở `review_story_v2`.
+    Signature kept for the old call flow; machine-readable version is in
+    `review_story_v2`.
     """
     return review_story_v2(
         story, workdir=workdir, base_ref=base_ref, project=project,
@@ -1136,11 +1175,11 @@ def _review_session(
     client: ClientAdapter, spec, *, store: EvidenceStore, story_id: str,
     artifact_root: Path, workdir: Path, name: str, role: str, number: int,
 ):
-    """Một phiên rà soát: chạy, ghi bằng chứng, hoàn nguyên cây nếu bị sửa.
+    """One review session: run, record evidence, revert tree if modified.
 
-    Ghi nguyên văn **sau** khi đã so cây: artifact có thể nằm trong chính
-    cây làm việc (không cách ly) và tệp lời rà soát không phải là "người
-    rà soát sửa cây".
+    Full text recorded **after** tree comparison: the artifact may live in the
+    working tree itself (no isolation) and the review text file is not "the
+    reviewer modifying the tree".
     """
     truoc = _tree_snapshot(workdir)
     result = client.run(spec)
@@ -1156,10 +1195,11 @@ def _review_session(
 def _with_schema(client: ClientAdapter, spec, result, *, store: EvidenceStore,
                  story_id: str, artifact_root: Path, workdir: Path, role: str,
                  number: int):
-    """Đòi khối JSON theo schema; thiếu thì hỏi lại **đúng một lần** (R8).
+    """Demand JSON block per schema; missing means retry **exactly once**
+    (R8).
 
-    Trả `(text, verdict)`: `text` là lời được dùng làm bản người đọc — lượt
-    hai nếu lượt ấy đúng schema, còn không thì lời lượt đầu.
+    Returns `(text, verdict)`: `text` is the human-readable version -- second
+    attempt if it has correct schema, otherwise the first attempt's text.
     """
     verdict = review_verdict(result.text)
     if verdict is not None:
@@ -1171,14 +1211,14 @@ def _with_schema(client: ClientAdapter, spec, result, *, store: EvidenceStore,
     )
     lech = _candidate_moved(workdir, store.candidate)
     if lech:
-        # Lượt hỏi lại cũng bị soi ứng viên (R1): đổi bản thì lời không tính.
+        # Retry is also checked for candidate (R1): changed version means words don't count.
         store.tool_run(story_id, f"{role}:candidate", ok=False,
                        detail={"expected": store.candidate, "got": lech,
                                "attempt": number, "retry": True})
         return result.text, None
     if da_sua:
-        # Lượt hỏi lại cũng bị bất biến "rà soát không ghi cây" soi; bỏ lời
-        # của nó, và nói ra — hoàn nguyên im lặng thì không ai biết.
+        # Retry is also checked by the "review does not write tree" invariant;
+        # discard its words, and say so -- silent revert means nobody knows.
         store.tool_run(
             story_id, f"{role}:immutable", ok=False,
             detail={"changed": da_sua[:20], "retry": True},
@@ -1204,17 +1244,19 @@ def review_story_v2(
     candidate: str = "",
     preservation: list[dict] | None = None,
 ) -> tuple[list[str], Verdict | None]:
-    """Như `review_story`, nhưng trả kèm bản máy đọc (`behavior_id`…).
+    """Like `review_story`, but also returns the machine-readable version
+    (`behavior_id`, etc.).
 
-    Luồng sổ hành vi (R2) đọc `note:review:verdict` trong bằng chứng để ghi
-    GAP nguồn `reviewer`; ở đây chỉ cần trả ra cho người gọi nào cần.
+    The behavior ledger flow (R2) reads `note:review:verdict` in evidence to
+    record GAP with source `reviewer`; here it just returns for any caller
+    that needs it.
     """
     changed = changed_files(str(workdir), base_ref=base_ref)
     if not changed:
-        # Nói đúng hai khả năng. "Không có gì để rà" thường không phải
-        # agent lười: hay gặp hơn là công việc của story đã nằm trên
-        # nhánh chính rồi — worktree rẽ từ đó nên diff rỗng — và lúc ấy
-        # lời khuyên "sửa write_scope" dẫn người đọc đi sai đường.
+        # Name exactly two possibilities.  "Nothing to review" is usually
+        # not a lazy agent: more commonly the story's work is already on
+        # the main branch -- worktree forked from it so diff is empty -- and
+        # then the advice "fix write_scope" leads readers astray.
         return [
             "no changes to review: either the run wrote nothing, or the "
             "story's work is already on the main branch (worktree forked "
@@ -1232,14 +1274,16 @@ def review_story_v2(
         preservation=preservation,
     )
     context["diff_summary"] = review_diff(str(workdir), changed, base_ref=base_ref)
-    # Ảnh hưởng của thay đổi: người rà soát nhận diff rồi vẫn phải tự dò
-    # ai gọi, test nào phủ — đo trên e9 là 22–68 lượt, mỗi lượt thử lại
-    # làm lại từ đầu. Đưa sẵn thì nó bắt đầu từ chỗ xa hơn.
+    # Impact of changes: reviewer gets the diff but still has to trace
+    # callers and test coverage on their own -- measured on e9 at 22-68
+    # tool calls, each retry starting from scratch.  Providing it upfront
+    # gives them a head start.
     context["impact"] = analyse_impact(
         workdir, changed, command=str(config.get("review.impact_provider", "") or "")
     ).as_prompt()
-    # Test có sẵn bị bớt ca (G8): đưa cho người rà soát, không tự chặn —
-    # "cập nhật kỳ vọng" là hợp lệ, "xoá cho xanh" thì không; đó là phán đoán.
+    # Existing tests with reduced cases (G8): show to reviewer, do not auto-
+    # block -- "update expectations" is valid, "delete to go green" is not;
+    # that is a judgment call.
     mat = tdd.test_delta(workdir, base_ref=base_ref, changed=changed)
     store = EvidenceStore(artifact_root, candidate=candidate)
     store.record(
@@ -1261,11 +1305,11 @@ def review_story_v2(
         config=config,
         allow_empty=ALLOW_EMPTY,
     )
-    # Phạm vi ghi — nhưng **không** mã story. Không truyền phạm vi thì
-    # guard `diff-scope` rơi vào nhánh "chưa khai phạm vi mà đã đổi file"
-    # và chặn mọi lệnh Bash của người rà soát; truyền mã story thì guard
-    # `completion` lại chặn nó dừng khi test đang đỏ — đúng lúc nó có
-    # nhiều thứ để báo cáo nhất.
+    # Write scope -- but **not** story ID.  Without scope, the `diff-scope`
+    # guard falls into the "no scope declared but files changed" branch and
+    # blocks all reviewer Bash commands; with story ID, the `completion`
+    # guard blocks it from stopping while tests are red -- exactly when it
+    # has the most to report.
     spec.env = {
         ENV_WRITE_SCOPE: ",".join(effective_write_scope(story, project)),
         ENV_BASE_REF: base_ref,
@@ -1292,9 +1336,10 @@ def review_story_v2(
 
     lech = _candidate_moved(workdir, candidate)
     if lech:
-        # Hoàn nguyên chỉ đưa **cây** về như cũ; một `git commit` thì nó không
-        # thấy. Ứng viên đã đổi nghĩa là người rà soát vừa đọc một bản khác
-        # bản được chấm — lượt rà soát ấy không nói gì về ứng viên.
+        # Revert only restores the **tree**; it does not undo a `git commit`.
+        # Candidate changed means the reviewer just read a version different
+        # from the one being scored -- that review says nothing about the
+        # candidate.
         store.tool_run(story.id, "review:candidate", ok=False,
                        detail={"expected": candidate, "got": lech, "attempt": number})
         return [
@@ -1304,7 +1349,7 @@ def review_story_v2(
         ], None
 
     if not result.ok:
-        # Không rà soát được thì **không** coi như sạch.
+        # Cannot review means **not** treated as clean.
         return [f"review could not run: {result.error}"], None
 
     text, verdict = _with_schema(
@@ -1316,11 +1361,12 @@ def review_story_v2(
 
 def _reconcile(story_id: str, ev: EvidenceStore, text: str,
                verdict: Verdict | None, *, role: str) -> list[str]:
-    """Đối chiếu bản máy đọc với bản người đọc, ghi bằng chứng, trả **hợp**."""
+    """Reconcile machine-readable with human-readable version, record evidence,
+    return the **union**."""
     tu_van_ban = blocking_findings(text)
     if verdict is None:
-        # Hai lượt đều không có schema: dùng văn bản như trước R8, và nói
-        # ra là đã phải lùi — im lặng thì lần sau không ai biết để sửa prompt.
+        # Both attempts lack schema: use text as before R8, and note the
+        # fallback -- silence means nobody knows to fix the prompt next time.
         ev.record(story_id, Event(kind=NOTE, name=f"{role}:no-schema", ok=False,
                                   detail={"findings": tu_van_ban, "retried": True}))
         return tu_van_ban
@@ -1353,18 +1399,18 @@ def security_review(
     candidate: str = "",
     preservation: list[dict] | None = None,
 ) -> SecurityReport:
-    """Rà soát bảo mật theo ngữ nghĩa — **phiên riêng**, chỉ đọc.
+    """Semantic security review -- **separate session**, read-only.
 
-    Không gộp vào lượt rà soát chung: một phiên phải giữ hai bộ câu hỏi
-    khác nhau trong đầu thì bộ nào cũng bị làm qua loa, và bảo mật là bộ
-    thường bị bỏ trước.
+    Not combined with the general review: a session holding two different
+    question sets in mind treats both superficially, and security is the set
+    usually dropped first.
 
-    Phiên này đọc mã do agent khác vừa viết — **dữ liệu không tin được**.
-    Nó không có quyền ghi (vai `security` cấm Write/Edit), và không nhận
-    biến môi trường nào của story: mã story đang chạy không việc gì phải
-    tới tay nó. Cách ly khỏi bí mật của máy thì cần sandbox thật, không
-    làm được ở tầng ngôn ngữ — đó là giới hạn, và nó được ghi ra thay vì
-    giấu đi.
+    This session reads code just written by another agent -- **untrusted
+    data**.  It has no write permission (`security` role forbids Write/Edit),
+    and receives no environment variables from the story: running story code
+    has no business reaching it.  Isolating from machine secrets requires a
+    real sandbox, not achievable at the language level -- that is a
+    limitation, and it is documented rather than hidden.
     """
     changed = changed_files(str(workdir), base_ref=base_ref)
     if not changed:
@@ -1395,9 +1441,9 @@ def security_review(
         config=config,
         allow_empty=ALLOW_EMPTY,
     )
-    # Cùng tổ hợp đã chứng minh trên e9 cho người rà soát: phạm vi để
-    # `diff-scope` không chặn mọi lệnh Bash, cây làm việc để guard soi đúng
-    # cây, tool bị cấm để mọi client đều cấm — và **không** mã story.
+    # Same combination proven on e9 for the reviewer: scope so `diff-scope`
+    # does not block all Bash commands, working tree so guard checks the right
+    # tree, forbidden tools so all clients enforce -- and **not** story ID.
     spec.env = {
         ENV_WRITE_SCOPE: ",".join(effective_write_scope(story, project)),
         ENV_BASE_REF: base_ref,
@@ -1436,10 +1482,10 @@ def security_review(
 
 def _reconcile_security(story_id: str, ev: EvidenceStore, text: str,
                         verdict: Verdict | None) -> SecurityReport:
-    """Cùng luật với `_reconcile`, nhưng đơn vị là mức nghiêm trọng.
+    """Same rule as `_reconcile`, but the unit is severity level.
 
-    Mục JSON không có trong văn bản được đưa lại qua `parse_security` để
-    đúng một bộ lọc nhiễu chấm cả hai nguồn.
+    JSON items not in the text are re-parsed via `parse_security` so exactly
+    one noise filter scores both sources.
     """
     rep = parse_security(text)
     if verdict is None:
@@ -1458,8 +1504,8 @@ def _reconcile_security(story_id: str, ev: EvidenceStore, text: str,
         rep.findings.extend(bo_sung.findings)
         rep.filtered.extend(bo_sung.filtered)
         rep.findings.sort(key=lambda f: -f.rank)
-    # Khối JSON hợp lệ **là** báo cáo đúng định dạng: lỗi "sai định dạng"
-    # của bản văn bản không còn đúng nữa.
+    # A valid JSON block **is** a correctly formatted report: the "malformed"
+    # error from the text version no longer applies.
     rep.error = ""
     if lech:
         ev.record(story_id, Event(kind=NOTE, name="security:mismatch", ok=False,
@@ -1471,25 +1517,25 @@ def _reconcile_security(story_id: str, ev: EvidenceStore, text: str,
     return rep
 
 
-#: Mở đầu mục chặn thường.
+#: Opening tag for regular blocking items.
 _BLOCK_TAGS = ("[chặn]", "[blocker]", "[block]")
-#: Mở đầu mục **bế tắc**: người rà soát đã kiểm chứng rằng tiêu chí không
-#: thoả được từ trong phạm vi story. Hai model độc lập cùng kết luận
-#: story sai — thử tiếp là đốt tiền vào chỗ không có lối ra.
+#: Opening tag for **stuck** items: the reviewer has verified that criteria
+#: cannot be satisfied from within the story scope.  Two independent models
+#: reached the same conclusion -- retrying burns money with no way out.
 _STUCK_TAGS = ("[bế tắc]", "[be tac]", "[stuck]", "[blocked-by-plan]")
 
 
-#: Thư mục giữ nguyên văn lời người rà soát — bằng chứng chặn phải đọc lại được.
+#: Directory holding the reviewer's full text -- blocking evidence must be re-readable.
 REVIEWS_DIR = "reviews"
 
 
 def persist_verdict(artifact_root: Path | str, story_id: str, role: str, number: int, result) -> Path:
-    """Ghi nguyên văn báo cáo của người rà soát / rà soát bảo mật.
+    """Record the reviewer's / security reviewer's full text.
 
-    Lỗi 16 (e9 STORY-01-05, 2026-09-05): lý do bế tắc trong sprint-status kết
-    thúc ở "— không." vì chỉ dòng đầu của mục được giữ, còn lời đầy đủ thì
-    không nằm ở đâu cả — bằng chứng chặn một story mà người đọc không kiểm
-    lại được thì không phải bằng chứng.
+    Bug 16 (e9 STORY-01-05, 2026-09-05): stuck reason in sprint-status ended
+    at "-- no." because only the first line of the item was kept, while the
+    full text lived nowhere -- blocking evidence that readers cannot verify
+    is not evidence.
     """
     d = Path(artifact_root) / REVIEWS_DIR
     d.mkdir(parents=True, exist_ok=True)
@@ -1505,11 +1551,11 @@ def persist_verdict(artifact_root: Path | str, story_id: str, role: str, number:
 
 
 def blocking_findings(text: str) -> list[str]:
-    """Lọc mục `[chặn]` và `[bế tắc]` khỏi báo cáo rà soát.
+    """Extract `[blocker]` and `[stuck]` items from a review report.
 
-    Một mục có thể dài nhiều dòng: dòng tiếp theo không mở đầu bằng dấu
-    gạch đầu dòng hay thẻ mới thì thuộc về mục trước (lỗi 16 — trước đây
-    chỉ giữ dòng đầu, lý do bế tắc cụt ở "— không.").
+    An item may span multiple lines: a following line not starting with a
+    bullet or a new tag belongs to the previous item (bug 16 -- previously
+    only the first line was kept, stuck reasons truncated at "-- no.").
     """
     out: list[str] = []
     dang_mo = False
@@ -1533,25 +1579,26 @@ def blocking_findings(text: str) -> list[str]:
 
 
 def plan_defects(findings: list[str]) -> list[str]:
-    """Mục người rà soát đánh dấu là bế tắc do kế hoạch, không do code."""
+    """Items the reviewer marked as stuck due to the plan, not the code."""
     return [f for f in findings if f.strip().lower().startswith(_STUCK_TAGS)]
 
 
-# --- Bản máy đọc của lời rà soát (ADR-004 R8) -------------------------------
+# --- Machine-readable review verdicts (ADR-004 R8) ----------------------------
 #
-# Văn bản là bản người đọc; khối JSON là bản máy đọc. Hai bản phải khớp — và
-# khi lệch thì **hợp** hai nguồn chứ không nới lỏng: một mục chặn bị mất vì
-# model quên chép sang JSON thì cổng cũng mất luôn, và đó là kiểu hỏng im
-# lặng tệ nhất.
+# Text is the human-readable version; JSON block is the machine-readable one.
+# The two must agree -- and when they diverge, **union** the sources rather
+# than relaxing: a blocking item lost because the model forgot to copy it to
+# JSON means the gate loses it too, the worst kind of silent failure.
 
-#: Kết luận hợp lệ. Ngoài ba giá trị này là sai schema.
+#: Valid verdicts.  Anything outside these three is a schema error.
 VERDICTS = ("pass", "block", "stuck")
-#: Thẻ trong JSON tương ứng hai loại mục chặn của văn bản.
+#: JSON tags corresponding to the two blocking item types in text.
 _JSON_BLOCK_TAGS = ("chặn", "chan", "block", "blocker")
 _JSON_STUCK_TAGS = ("bế tắc", "be tac", "stuck", "blocked-by-plan")
 
-#: Nhắc lại schema khi lượt đầu không có khối JSON. Đúng **một** lần: lần
-#: hai vẫn thiếu thì model ấy không làm được, thử tiếp là đốt tiền.
+#: Remind the schema when the first attempt lacks a JSON block.  Exactly
+#: **once**: if the second attempt still lacks it, the model cannot do it,
+#: retrying further wastes money.
 SCHEMA_REMINDER = (
     "\n\n---\n\n**Missing JSON block per schema.** Your previous reply was plain "
     "text without a machine-readable JSON block, so the gate could not read your "
@@ -1565,13 +1612,13 @@ _decoder = json.JSONDecoder()
 
 @dataclass
 class Verdict:
-    """Bản máy đọc của một báo cáo rà soát."""
+    """Machine-readable version of a review report."""
 
     verdict: str
     findings: list[dict] = field(default_factory=list)
 
     def blocking(self) -> list[str]:
-        """Mục chặn/bế tắc, viết đúng dạng dòng của bản văn bản."""
+        """Blocking/stuck items, formatted as text-version lines."""
         out = []
         for f in self.findings:
             if f["tag"] in _JSON_STUCK_TAGS:
@@ -1579,8 +1626,9 @@ class Verdict:
             elif f["tag"] in _JSON_BLOCK_TAGS:
                 out.append("[block] " + _finding_body(f))
         if self.verdict != "pass" and not out:
-            # Kết luận nói chặn mà không nêu mục nào: giữ kết luận, đừng
-            # cho qua. Không tin client — kể cả khi nó tự mâu thuẫn.
+            # Verdict says blocked but lists no items: keep the verdict, do
+            # not let it pass.  Do not trust the client -- even when it
+            # contradicts itself.
             tag = "[stuck]" if self.verdict == "stuck" else "[block]"
             out.append(f"{tag} reviewer concluded `{self.verdict}` "
                        "but listed no findings in the JSON block")
@@ -1588,7 +1636,7 @@ class Verdict:
 
 
 def _finding_body(f: dict) -> str:
-    """`{file}:{line} — {why}` — cùng dạng với dòng người rà soát tự viết."""
+    """`{file}:{line} -- {why}` -- same format as lines the reviewer writes."""
     where = f.get("file") or ""
     if where and f.get("line"):
         where += f":{f['line']}"
@@ -1597,11 +1645,12 @@ def _finding_body(f: dict) -> str:
 
 
 def review_verdict(text: str) -> Verdict | None:
-    """Khối JSON đầu tiên có `verdict` hợp lệ; mục sai schema bỏ, không sập.
+    """First JSON block with a valid `verdict`; invalid items dropped, no
+    crash.
 
-    Cùng cách làm với `kit/skill_scan.parse_verdicts`, nhưng dùng
-    `raw_decode`: nó tự dừng đúng chỗ JSON kết thúc nên chữ thừa phía sau
-    (và hàng rào ```json) không làm hỏng việc.
+    Same approach as `kit/skill_scan.parse_verdicts`, but uses `raw_decode`:
+    it stops exactly where JSON ends so trailing text (and ```json fences)
+    do not break parsing.
     """
     for m in re.finditer(r"\{", text or ""):
         try:
@@ -1636,10 +1685,10 @@ def review_verdict(text: str) -> Verdict | None:
 
 
 def _finding_key(line: str) -> tuple[str, str]:
-    """Khoá đối chiếu giữa hai bản: (loại thẻ, tệp).
+    """Reconciliation key between two versions: (tag type, file).
 
-    Không so nguyên văn: bản JSON và bản văn bản không bao giờ trùng từng
-    chữ, nhưng cùng nói về một chỗ trong một tệp thì là một mục.
+    Not compared verbatim: JSON and text versions never match word-for-word,
+    but referring to the same place in the same file means they are one item.
     """
     m = re.match(r"\s*\[([^\]]*)\]\s*(\S*)", line or "")
     if not m:
@@ -1656,7 +1705,8 @@ def _finding_key(line: str) -> tuple[str, str]:
 
 
 def merge_findings(text_items: list[str], json_items: list[str]) -> tuple[list[str], bool]:
-    """Hợp hai nguồn và nói có lệch không. Văn bản trước, JSON bù vào sau."""
+    """Union two sources and report whether they diverged.  Text first, JSON
+    fills in after."""
     khoa_text = {_finding_key(x) for x in text_items}
     khoa_json = {_finding_key(x) for x in json_items}
     them = [x for x in json_items if _finding_key(x) not in khoa_text]
@@ -1664,23 +1714,24 @@ def merge_findings(text_items: list[str], json_items: list[str]) -> tuple[list[s
 
 
 
-#: Cấu hình hook mà `aisef compile` sinh cho Claude Code.
+#: Hook config that `aisef compile` generates for Claude Code.
 CLAUDE_SETTINGS = Path(".claude") / "settings.json"
 
 
 def _attach_settings(spec, project: Path) -> None:
-    """Truyền tệp hook **tường minh** cho client, thay vì trông vào việc nó
-    tự tìm thấy.
+    """Pass hook files **explicitly** to the client, instead of relying on it
+    finding them on its own.
 
-    Claude Code đọc `.claude/settings.json` của cây nó đang đứng. Story
-    chạy trong worktree, và worktree chỉ có thư mục ấy nếu dự án **commit**
-    nó. Dự án `.gitignore` `.claude/` sẽ chạy mọi story với zero guard —
-    và bằng chứng trông y hệt agent ngoan, vì không có gì để ghi. e9 và
-    par đều commit `.claude/`, nên lỗ hổng này chưa lộ; đó là may, không
-    phải thiết kế.
+    Claude Code reads `.claude/settings.json` from the tree it stands in.
+    Stories run in worktrees, and the worktree only has that directory if the
+    project **commits** it.  A project that `.gitignore`s `.claude/` runs
+    every story with zero guards -- and evidence looks identical to a
+    well-behaved agent, because nothing gets recorded.  e9 and par both
+    commit `.claude/`, so this hole has not surfaced; that is luck, not
+    design.
 
-    Adapter không hỗ trợ cờ (OpenCode) bỏ qua trường này — plugin của nó
-    nạp theo đường khác, đã chứng minh.
+    Adapters that do not support the flag (OpenCode) ignore this field --
+    their plugin loads via a different path, already proven.
     """
     path = Path(project) / CLAUDE_SETTINGS
     if path.is_file():
@@ -1688,10 +1739,10 @@ def _attach_settings(spec, project: Path) -> None:
 
 
 def _tree_snapshot(workdir: Path) -> dict[str, bytes | None]:
-    """Ảnh chụp cây làm việc: đường dẫn → nội dung của mọi tệp git thấy là
-    đã đổi hoặc chưa theo dõi (None nếu quá lớn để giữ). Bỏ qua thứ harness
-    tự ghi (`_bmad-output/`, `.aisef/`): bằng chứng của chính phiên này
-    được ghi trong lúc phiên chạy, tính vào là dương tính giả."""
+    """Working tree snapshot: path -> content of every file git sees as
+    changed or untracked (None if too large to hold).  Skips harness-written
+    paths (`_bmad-output/`, `.aisef/`): evidence from this session is written
+    during the session, counting it is a false positive."""
     from ..harness.guardrails import HARNESS_OWNED
     out: dict[str, bytes | None] = {}
     try:
@@ -1714,14 +1765,15 @@ def _tree_snapshot(workdir: Path) -> dict[str, bytes | None]:
 
 
 def _revert_reviewer_writes(workdir: Path, truoc: dict, sau: dict) -> list[str]:
-    """Người rà soát mà sửa được code thì nó thành lượt viết thứ hai.
+    """A reviewer that can modify code becomes a second write session.
 
-    Cấm `Write`/`Edit` ở guard là lớp một; đo hợp quy 2026-09-05 cho thấy
-    lớp ấy bị lách **trên cả hai client** bằng Bash (`echo > tệp`) — và Bash
-    thì không cấm được, người rà soát cần nó để chạy test. Nên lớp hai là
-    hoàn nguyên: mọi khác biệt của cây sau phiên rà soát bị đưa về như
-    trước, ghi lại, và lượt rà soát ấy **không được tính** — cùng cơ chế
-    "hoàn nguyên hạt thô" của worktree.
+    Forbidding `Write`/`Edit` in guards is layer one; compliance testing on
+    2026-09-05 showed this was bypassed **on both clients** via Bash
+    (`echo > file`) -- and Bash cannot be forbidden, reviewers need it to
+    run tests.  So layer two is revert: all tree differences after the
+    review session are restored to their prior state, logged, and that
+    review session **does not count** -- same "coarse-grained revert"
+    mechanism as the worktree.
     """
     doi = sorted({k for k in sau if k not in truoc or sau[k] != truoc[k]}
                  | {k for k in truoc if k not in sau})
@@ -1731,23 +1783,24 @@ def _revert_reviewer_writes(workdir: Path, truoc: dict, sau: dict) -> list[str]:
         p = Path(workdir) / rel
         if rel in truoc and truoc[rel] is not None:
             p.parent.mkdir(parents=True, exist_ok=True)
-            p.write_bytes(truoc[rel])           # tệp đã đổi hoặc chưa theo dõi: trả nội dung
+            p.write_bytes(truoc[rel])           # changed or untracked file: restore content
         elif rel in truoc:
             subprocess.run(["git", "checkout", "--", rel], cwd=workdir,
-                           capture_output=True, timeout=30)   # quá lớn để chụp: nhờ git
+                           capture_output=True, timeout=30)   # too large to snapshot: delegate to git
         elif p.exists():
             try:
-                p.unlink()                       # tệp mới do người rà soát tạo
+                p.unlink()                       # new file created by the reviewer
             except OSError:
                 pass
     return doi
 
 
 def _candidate_moved(workdir: Path, candidate: str) -> str:
-    """HEAD hiện tại nếu nó đã rời khỏi ứng viên; "" nếu còn đúng bản ấy.
+    """Current HEAD if it has moved away from the candidate; "" if still at
+    the correct version.
 
-    Không kiểm được (chưa đóng băng, hoặc không đọc được git) thì trả "":
-    một lượt rà soát bị huỷ oan vì harness mù còn tệ hơn."""
+    Cannot check (not yet frozen, or git unreadable) returns "": a review
+    session wrongly canceled because the harness is blind is worse."""
     if not candidate:
         return ""
     bay_gio = head_sha(workdir)
@@ -1755,19 +1808,20 @@ def _candidate_moved(workdir: Path, candidate: str) -> str:
 
 
 def deadlock_reason(attempts: list[Attempt], write_scope: list[str] | None = None) -> str:
-    """Thế bí: hai lượt liền chặn vì cùng một chuyện. Rỗng nếu chưa bí.
+    """Deadlock: two consecutive attempts blocked for the same reason.
+    Empty if not deadlocked.
 
-    Người rà soát chặn lại đúng chỗ cũ nghĩa là lượt vừa rồi không dịch
-    chuyển được gì — và lượt sau, với cùng ngữ cảnh và cùng feedback,
-    cũng sẽ không. Thường là mâu thuẫn nằm ngoài tầm agent: tiêu chí
-    chấp nhận đòi một thứ mà ``write_scope`` cấm.
+    Reviewer blocking at the same spot means the last attempt made no
+    progress -- and the next, with the same context and feedback, will not
+    either.  Usually a contradiction outside the agent's reach: acceptance
+    criteria demand something that ``write_scope`` forbids.
 
-    So bằng **độ tương đồng**, không bằng chuỗi y hệt. Người rà soát là
-    một model: cùng một khiếm khuyết được nó viết lại bằng từ khác mỗi
-    lượt. Đo trên e9, STORY-01-02 bị chặn 4 lượt vì đúng một chuyện —
-    `fake-indexeddb` không được khai trong `package.json` — mà không cặp
-    diễn đạt nào trùng nhau, nên bộ dò so chuỗi im lặng suốt và story
-    đốt hết hạn mức: $10,39.
+    Compared by **similarity**, not exact string match.  The reviewer is a
+    model: the same defect gets reworded differently each attempt.  Measured
+    on e9, STORY-01-02 was blocked 4 attempts for exactly one issue --
+    `fake-indexeddb` not declared in `package.json` -- but no two phrasings
+    matched, so the string-comparison detector stayed silent the whole time
+    and the story burned its retry budget: $10.39.
     """
     if len(attempts) < 2:
         return ""
@@ -1779,12 +1833,13 @@ def deadlock_reason(attempts: list[Attempt], write_scope: list[str] | None = Non
     if not _same_complaint(cuoi.review_findings, truoc.review_findings):
         return ""
 
-    # Lặp lại **và** trỏ ra ngoài phạm vi ghi mới là bí. Trong phạm vi thì
-    # đó là "chưa sửa", không phải "không sửa được" — và đo trên e9,
-    # STORY-01-02 qua ở lượt 3 sau hai lượt trượt, còn STORY-01-04 bị chặn
-    # hai lượt liền vì cùng một vi phạm AR-7 trên `src/app/list-notes.ts`,
-    # tệp nằm ngay trong phạm vi của nó. Dừng ở đó là cắt ngang một story
-    # còn cứu được; cứ để hạn mức lượt thử làm việc của nó.
+    # Repeated **and** pointing outside write scope is stuck.  Inside scope
+    # is "not yet fixed", not "cannot fix" -- and measured on e9, STORY-01-02
+    # passed on attempt 3 after two failures, while STORY-01-04 was blocked
+    # two attempts running for the same AR-7 violation on
+    # `src/app/list-notes.ts`, a file right inside its scope.  Stopping there
+    # cuts short a story that could still be saved; let the retry limit do
+    # its job.
     ngoai = _paths_outside(cuoi.review_findings, write_scope or [])
     if not ngoai:
         return ""
@@ -1798,28 +1853,28 @@ def deadlock_reason(attempts: list[Attempt], write_scope: list[str] | None = Non
     )
 
 
-#: Hai mục chặn là "cùng một chuyện" khi chúng chia nhau **danh từ riêng**
-#: — tên tệp, tên gói, định danh — chứ không khi văn bản giống nhau.
-#: Người rà soát là một model: cùng một khiếm khuyết được nó viết lại bằng
-#: từ khác mỗi lượt, nên so văn bản thì không bao giờ khớp. Nhưng
-#: `fake-indexeddb` và `package.json` thì lượt nào nó cũng phải nhắc.
+#: Two blocking items are "the same issue" when they share **proper nouns**
+#: -- filenames, package names, identifiers -- not when the text is similar.
+#: The reviewer is a model: the same defect gets reworded differently each
+#: attempt, so text comparison never matches.  But `fake-indexeddb` and
+#: `package.json` appear in every attempt.
 #:
-#: Đòi **hai** danh từ riêng chung, không phải một: chỉ chung `package.json`
-#: thì "thiếu khai X" và "khai sai Y" cũng khớp — mà đó là có dịch chuyển,
-#: không phải bí. Hệ số phủ đi kèm loại nốt trường hợp mục chặn dài nhắc
-#: qua loa tới thứ mục kia nói chính.
+#: Requiring **two** shared proper nouns, not one: sharing only
+#: `package.json` would match "missing X" and "wrong Y" -- but that is
+#: progress, not deadlock.  The coverage ratio handles the case where a long
+#: blocking item mentions in passing what the other item focuses on.
 SAME_COMPLAINT_NOUNS = 2
 SAME_COMPLAINT_OVERLAP = 0.4
 
 
 def _same_complaint(a: list[str], b: list[str]) -> bool:
-    """Có mục chặn nào của lượt này nói cùng chuyện với lượt trước không."""
+    """Does any blocking item from this attempt match one from the previous?"""
     for x in (_tokens(i) for i in a):
         for y in (_tokens(j) for j in b):
             if not x or not y:
                 continue
             if x == y:
-                return True  # lặp nguyên văn thì khỏi bàn
+                return True  # verbatim repeat, no need to analyze
             chung = x & y
             if len(_rieng(chung)) < SAME_COMPLAINT_NOUNS:
                 continue
@@ -1829,12 +1884,12 @@ def _same_complaint(a: list[str], b: list[str]) -> bool:
 
 
 def _rieng(tokens: set[str]) -> set[str]:
-    """Danh từ riêng: có dấu phân cách của định danh, đủ dài để không phải
-    dấu câu dính vào từ."""
+    """Proper nouns: contain identifier separators, long enough to not be
+    punctuation stuck to a word."""
     return {t for t in tokens if len(t) >= 4 and any(c in t for c in "./-_@")}
 
 
-#: Từ xuất hiện ở gần như mọi mục chặn nên không phân biệt được gì.
+#: Words appearing in nearly every blocking item, too common to distinguish.
 _NHIEU = frozenset(
     "chặn blocker block và or không có là của một các cả cho khi thì mà "
     "nhưng nó này đó ở trong ngoài với từ đến được bị phải nào đâu nữa "
@@ -1843,11 +1898,13 @@ _NHIEU = frozenset(
 
 
 def _tokens(finding: str) -> set[str]:
-    """Rút mục chặn về tập từ so được. Bỏ số dòng và từ quá phổ biến."""
+    """Reduce a blocking item to a comparable word set.  Strip line numbers
+    and overly common words."""
     import re as _re
 
-    # Bỏ số dòng, giữ mọi số khác: "TCCN 1" và "TCCN 7" là hai chuyện
-    # khác nhau, gộp chúng lại thì bộ dò báo bí trong khi có dịch chuyển.
+    # Strip line numbers, keep all other numbers: "AC 1" and "AC 7" are two
+    # different issues, merging them makes the detector report deadlock when
+    # there is progress.
     low = _re.sub(r":\d+", " ", finding.lower())
     words = _re.findall(r"[\w./@-]+", low)
     return {
@@ -1857,10 +1914,10 @@ def _tokens(finding: str) -> set[str]:
 
 
 def _paths_outside(findings: list[str], scope: list[str]) -> list[str]:
-    """Tệp mà mục chặn nhắc tới nhưng story không được ghi.
+    """Files the blocking item mentions but the story is not allowed to write.
 
-    Đây là câu trả lời cụ thể cho "vì sao thử lại cũng vô ích", và nó
-    đọc ra từ dữ liệu đã có chứ không đoán.
+    This is the concrete answer to "why is retrying pointless", and it is
+    read from existing data rather than guessed.
     """
     import re as _re
 
@@ -1888,7 +1945,7 @@ def implement_story(
     architecture: Architecture | None = None,
     contract: DesignContract | None = None,
 ) -> StoryOutcome:
-    """Chạy một story tới khi đạt cổng hoặc hết lượt thử."""
+    """Run a story until it passes the gate or exhausts retries."""
     project = Path(project)
     workdir = Path(workdir) if workdir else project
     root = Path(artifact_root) if artifact_root else project / "_bmad-output"
@@ -1898,19 +1955,20 @@ def implement_story(
 
     outcome = StoryOutcome(story_id=story.id)
     max_retries = cfg["run.max_retries"]
-    infra_budget = max_retries + 1  # lỗi hạ tầng có hạn mức riêng
+    infra_budget = max_retries + 1  # infrastructure errors have their own budget
     feedback = ""
 
-    # Điểm story rẽ khỏi nhánh chính. Tính một lần, trước lượt đầu: agent
-    # sẽ commit trong worktree, và mọi cổng phải nhìn công việc từ mốc này
-    # chứ không từ HEAD đang chạy theo nó. Chạy thẳng trong dự án
-    # (`--no-isolate`) thì không có nhánh riêng, rỗng là đúng.
+    # Fork point where the story branched off main.  Computed once, before
+    # the first attempt: the agent will commit in the worktree, and all gates
+    # must view the work from this point, not from HEAD that moves with it.
+    # Running directly in the project (`--no-isolate`) has no dedicated
+    # branch, empty is correct.
     base_ref = ""
     if workdir != project:
         head = head_sha(project)
         base_ref = fork_point(str(workdir), head) if head else ""
 
-    # Mốc test trước khi story chạm vào — một lần, trước lượt đầu (ADR-004 R9).
+    # Test baseline before the story touches anything -- once, before the first attempt (ADR-004 R9).
     run_baseline(story, workdir=workdir, artifact_root=root, config=cfg, base_ref=base_ref)
 
     while True:
@@ -1942,11 +2000,12 @@ def implement_story(
             if infra_budget <= 0:
                 outcome.blocked_reason = f"recurring infrastructure error: {attempt.error}"
                 return outcome
-            continue  # không tính vào hạn mức chất lượng
+            continue  # does not count toward the quality budget
 
-        # Người rà soát đã **tự kiểm chứng** rằng tiêu chí không thoả được
-        # từ trong phạm vi story. Hai model độc lập cùng kết luận story
-        # sai; lượt thứ ba sẽ nhận cùng ngữ cảnh và cho cùng kết quả.
+        # The reviewer has **independently verified** that criteria cannot be
+        # satisfied from within the story scope.  Two independent models
+        # reached the same conclusion; a third attempt will receive the same
+        # context and produce the same result.
         loi_ke_hoach = plan_defects(attempt.review_findings)
         if loi_ke_hoach:
             outcome.blocked_reason = (
@@ -1986,27 +2045,32 @@ def verify_only(
     contract: DesignContract | None = None,
     repeat: int = 1,
 ) -> StoryOutcome:
-    """Lượt kiểm-lại trên ứng viên đã đóng băng (ADR-004 R13) — **không** mở
-    phiên developer. Cùng chữ ký với `implement_story` để `run.py` gọi thay
-    thế được (``repeat`` là keyword có mặc định, `run.py` gắn bằng `partial`).
+    """Re-verify on the frozen candidate (ADR-004 R13) -- does **not** open
+    a developer session.  Same signature as `implement_story` so `run.py`
+    can substitute it (``repeat`` is a keyword with a default, `run.py`
+    attaches via `partial`).
 
-    ``repeat`` = k: mỗi phép kiểm chạy lại chạy k lần trên cùng SHA; test đổi
-    kết cục giữa các lần → `flaky_ids`, cổng ghi UNRUNNABLE "không ổn định"
-    thay vì FAILED; đỏ ở mọi lần → FAILED như thường (`_repeat_note`).
+    ``repeat`` = k: each re-runnable check runs k times on the same SHA;
+    tests that change outcome across runs -> `flaky_ids`, gate records
+    UNRUNNABLE "unstable" instead of FAILED; red in all runs -> FAILED as
+    usual (`_repeat_note`).
 
-    Ứng viên = HEAD nhánh story; `workdir` phải đứng đúng ở đó (`run.py` tạo
-    lại worktree **không** mang nhánh chính vào — mang vào là tạo bản mới, và
-    mọi bằng chứng cũ thành stale). Đóng băng lại: không có gì để commit thì
-    SHA không đổi, và bằng chứng test/lint/`qa:*`/rà soát ở SHA ấy được
-    `verify_candidate(reuse=True)` giữ, chỉ chạy lại phép kiểm ✗/thiếu.
+    Candidate = HEAD of story branch; `workdir` must be standing there
+    (`run.py` recreates the worktree **without** bringing main in -- bringing
+    it in creates a new version, and all old evidence becomes stale).
+    Re-freeze: nothing to commit means SHA is unchanged, and evidence for
+    test/lint/`qa:*`/review at that SHA is kept by
+    `verify_candidate(reuse=True)`, only re-running failed/missing checks.
 
-    Vì sao cần: e9 STORY-01-07 (2026-09-06) trượt lượt 3 chỉ vì e2e nhạy tải
-    máy; ứng viên `a60612e` đo lại 10/10 xanh, rà soát và bảo mật ở đúng SHA
-    ấy đều ✅ — nhưng harness chỉ biết "lượt mới = phiên developer mới", giá
-    $10–15 để dựng lại thứ đã có. Không nới cổng: vẫn chấm đủ mọi mục.
+    Why needed: e9 STORY-01-07 (2026-09-06) failed attempt 3 solely because
+    e2e was load-sensitive; candidate `a60612e` measured 10/10 green on
+    retry, review and security at that exact SHA both passed -- but the
+    harness only knew "new attempt = new developer session", costing $10-15
+    to rebuild what already existed.  No gate relaxation: still scores every
+    item.
 
-    Không tính vào `run.max_retries` (`Attempt.verify_only`): đây là kiểm
-    lại, không phải lượt developer.
+    Does not count toward `run.max_retries` (`Attempt.verify_only`): this is
+    re-verification, not a developer attempt.
     """
     project = Path(project)
     workdir = Path(workdir)
@@ -2017,8 +2081,9 @@ def verify_only(
 
     outcome = StoryOutcome(story_id=story.id)
     evidence = EvidenceStore(root)
-    # Số hiệu = lần chấm cổng thứ n của story, để tệp `reviews/<story>-review-<n>.md`
-    # (nếu phải rà soát lại) không đè lên lời của lượt developer trước.
+    # Sequence number = the n-th gate scoring for the story, so the file
+    # `reviews/<story>-review-<n>.md` (if re-reviewed) does not overwrite
+    # the previous developer attempt's text.
     number = len(evidence.read(story.id).of(NOTE, "gate:verdict")) + 1
     head = head_sha(project)
     base_ref = fork_point(str(workdir), head) if head else ""
@@ -2031,8 +2096,8 @@ def verify_only(
         artifact_root=root, number=number, changed=changed_now, verify_only=True,
     )
     evidence.candidate = attempt.candidate
-    # R4: cùng danh sách cho reviewer (nếu phải gọi lại), security và cổng —
-    # tính một lần ở đây như `build_context` làm trước phiên developer.
+    # R4: same list for reviewer (if re-called), security and gate --
+    # computed once here as `build_context` does before the developer session.
     preservation = preservation_items(story, project=project, ledger=_ledger(root))
     attempt = verify_candidate(
         story, project=project, workdir=workdir, artifact_root=root, client=client,
@@ -2045,8 +2110,9 @@ def verify_only(
         detail={
             "reran": attempt.reran, "kept": attempt.kept, "attempt": number,
             "repeat": repeat,
-            # Nhánh chính đã tiến lên sau ứng viên: vẫn chấm ứng viên — đó là
-            # bản được chấm — nhưng nói ra; merge cuối lượt sẽ gặp phần mới.
+            # Main branch advanced past the candidate: still score the
+            # candidate -- that is the version being scored -- but note it;
+            # the end-of-attempt merge will encounter the new commits.
             "main_ahead": head if head and base_ref and base_ref != head else "",
         },
     ))

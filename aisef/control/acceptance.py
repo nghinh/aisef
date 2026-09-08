@@ -1,13 +1,15 @@
-"""Tiêu chí chấp nhận ↔ test: hợp đồng mã ``AC-<story>-<i>``.
+"""Acceptance criteria ↔ test: the ``AC-<story>-<i>`` code contract.
 
-Truy vết cũ dừng ở "story phủ FR có test xanh" — tiêu chí 3 không ai kiểm mà
-báo cáo vẫn xanh, và người rà soát được bảo "chỉ ra test nào phủ tiêu chí
-nào": phán đoán ở chỗ lẽ ra là tra cứu. Giờ mỗi tiêu chí *i* của story có
-mã ``AC-<story>-<i>``; mã phải xuất hiện trong **tên** ít nhất một test, và
-tên test đọc từ output runner (``harness/testlog``), không từ lời agent.
+Old traceability stopped at "story covers FR with green tests" — criterion 3
+was never checked yet the report stayed green, and the reviewer was told
+"point out which test covers which criterion": judgment where lookup was
+needed. Now each criterion *i* of a story has code ``AC-<story>-<i>``; the
+code must appear in the **name** of at least one test, and test names are
+read from runner output (``harness/testlog``), not from agent claims.
 
-Khớp nguyên mã: ``AC-S-1`` không khớp ``AC-S-10``; ``_`` và ``-`` coi như
-nhau vì tên hàm pytest không chứa gạch ngang (``test_AC_S_1_chuoi_rong``).
+Exact code matching: ``AC-S-1`` does not match ``AC-S-10``; ``_`` and ``-``
+are treated as equivalent because pytest function names cannot contain
+hyphens (``test_AC_S_1_empty_string``).
 """
 
 from __future__ import annotations
@@ -28,7 +30,7 @@ def _pattern(code: str) -> re.Pattern:
 
 
 def coverage(story_id: str, n: int, test_ids: list[str]) -> dict[int, list[str]]:
-    """Tiêu chí i → những test mang mã của nó (có thể rỗng)."""
+    """Criterion i -> tests carrying its code (may be empty)."""
     norm = [(t, t.replace("_", "-")) for t in test_ids]
     out: dict[int, list[str]] = {}
     for i in range(1, n + 1):

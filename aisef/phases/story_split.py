@@ -1,13 +1,13 @@
-"""Tách `epics.md` thành **mỗi story một file** + chỉ mục máy đọc được.
+"""Split `epics.md` into **one file per story** + a machine-readable index.
 
-Một story là đơn vị công việc của một phiên agent (quyết định Đ1), nên nó
-phải đứng được một mình: agent mở đúng một file và thấy đủ thứ cần —
-tiêu chí chấp nhận, phạm vi được ghi, story phụ thuộc, và **nguyên văn yêu
-cầu FR** mà nó phải thoả. Bắt agent tự lọc lại PRD 33KB mỗi lượt vừa tốn
-tiền vừa để nó tự chọn phần nào là quan trọng.
+A story is the unit of work for a single agent session (decision D1), so it
+must be self-contained: the agent opens exactly one file and finds everything
+it needs — acceptance criteria, declared scope, story dependencies, and the
+**verbatim FR text** it must satisfy. Forcing the agent to re-filter a 33KB
+PRD each turn wastes money and lets it decide what matters.
 
-Chỉ mục `stories.index.json` là bản hợp đồng cho phần điều phối: bộ xếp
-sóng, cổng máy và bảng trạng thái đều đọc từ đây, không đọc markdown.
+The `stories.index.json` index is the contract for the orchestrator: the wave
+scheduler, machine gate, and status board all read from here, not markdown.
 """
 
 from __future__ import annotations
@@ -37,7 +37,7 @@ from ..control.scheduler import CycleError, UnknownDependencyError
 from ..control.scheduler import Story as SchedStory
 from ..control.scheduler import plan_epics
 
-#: Kết quả cổng stories lần gần nhất — đầu vào cho prompt epics lần sau (P2-12).
+#: Most recent stories gate result — fed into the next epics prompt (P2-12).
 GATE_MEMO = "stories.gate.json"
 
 STORIES_DIR = "stories"
@@ -75,7 +75,7 @@ class SplitResult:
 
 
 def to_scheduler(stories: list[Story]) -> list[SchedStory]:
-    """Chuyển sang mô hình bộ xếp lịch (chỉ giữ phần cần để xếp sóng)."""
+    """Convert to scheduler model (keeping only fields needed for wave assignment)."""
     return [
         SchedStory(
             id=s.id,
@@ -89,7 +89,7 @@ def to_scheduler(stories: list[Story]) -> list[SchedStory]:
 
 
 def render_story(story: Story, prd: PRD | None, root: Path | None = None) -> str:
-    """Sinh nội dung file story — bản hợp đồng agent đọc trước khi viết code."""
+    """Render story file content — the contract an agent reads before writing code."""
     out = [f"# {story.id}: {story.title}", ""]
 
     if story.as_a:
@@ -171,10 +171,10 @@ def story_file(root: Path, story: Story) -> Path:
 
 
 def _prune(root: Path, keep: set[Path]) -> list[Path]:
-    """Xoá file story không còn trong `epics.md`.
+    """Remove story files no longer present in `epics.md`.
 
-    Bỏ sót thì một story đã bị gỡ vẫn nằm đó và sẽ được nhặt lên như việc
-    thật ở vòng sau.
+    Missing one means a deleted story lingers on disk and gets picked up as
+    real work in the next cycle.
     """
     base = root / STORIES_DIR
     if not base.is_dir():
@@ -195,7 +195,7 @@ def split(
     *,
     config: Config | None = None,
 ) -> SplitResult:
-    """Đọc `epics.md`, ghi mỗi story một file và chỉ mục, rồi chạy cổng máy."""
+    """Read `epics.md`, write one file per story plus the index, then run the machine gate."""
     root = Path(artifact_root)
     res = SplitResult()
 
@@ -214,8 +214,8 @@ def split(
     prd = parse_prd_file(prd_path) if prd_path.is_file() else None
 
     written: set[Path] = set()
-    # Chốt hợp đồng kiểm định trước khi ghi: chỉ mục và tệp story phải
-    # nói cùng một thứ, và phần điều phối đọc chỉ mục.
+    # Lock verification contracts before writing: the index and story files must
+    # agree, and the orchestrator reads the index.
     for story in stories:
         if not story.verification_contract:
             story.verification_contract = verification_contract(story)
@@ -236,9 +236,9 @@ def split(
         story_ac_count={s.id: len(s.acceptance_criteria) for s in stories},
     )
 
-    # Story chạy được không — tính bằng code, trước khi tiêu đồng nào.
-    # Chấm ở đây chứ không trong `check_stories`: phép kiểm cần tiêu chí
-    # chấp nhận và danh sách màn hình, mà tầng lập lịch không mang theo.
+    # Is the story executable — computed in code, before spending any money.
+    # Checked here rather than in `check_stories`: the check needs acceptance
+    # criteria and screen lists, which the scheduler layer does not carry.
     splits: dict[str, str] = {}
     for pf in check_stories_executable(stories, project=root.parent, config=config):
         for m in pf.story_defects:
@@ -250,22 +250,22 @@ def split(
                 + "; ".join(m.line() for m in pf.story_defects)
             )
         if pf.provisioning_gaps:
-            # Chưa chặn: pha dựng mockup và việc cấu hình công cụ đều diễn
-            # ra **sau** cổng này. Chặn ở đây là bắt người sửa thứ chưa tới
-            # lượt. Cổng `readiness` và bước ngay trước khi gọi model mới
-            # chặn thật.
+            # Not blocking: the mockup phase and tool provisioning both happen
+            # **after** this gate. Blocking here would force fixing things that
+            # aren't due yet. The `readiness` gate and the pre-model-call step
+            # are the real blockers.
             res.gate.warnings.append(
                 f"{pf.story_id} missing prerequisites to run: "
                 + "; ".join(m.line() for m in pf.provisioning_gaps)
             )
 
     res.index_path = write_index(root, res, config)
-    # Ghi lại để lần `plan` sau đưa vào prompt của bước epics: story bị
-    # chặn vì quá lớn thì người chẻ phải là agent lập kế hoạch, và nó chỉ
-    # chẻ đúng khi biết cổng đã nói gì (P2-12).
-    # `splits`: cách chẻ **tất định** cho từng story quá cỡ (ADR-004 R5) —
-    # nêu riêng ra để bước epics lần sau đọc thẳng, không phải bới câu chữ
-    # trong dòng lỗi.
+    # Persisted so the next `plan` run feeds it into the epics prompt: stories
+    # blocked for being too large must be split by the planning agent, and it
+    # can only split correctly when it knows what the gate said (P2-12).
+    # `splits`: **deterministic** split instructions per oversized story
+    # (ADR-004 R5) — separated out so the next epics step reads them directly
+    # instead of parsing error messages.
     (root / GATE_MEMO).write_text(
         json.dumps({"errors": res.gate.errors, "warnings": res.gate.warnings,
                     "splits": splits},
@@ -276,11 +276,11 @@ def split(
 
 
 def write_index(root: Path, res: SplitResult, config: Config | None = None) -> Path:
-    """Ghi `stories.index.json` — hợp đồng cho phần điều phối.
+    """Write `stories.index.json` — the contract for the orchestrator.
 
-    Kèm luôn các sóng chạy song song đã tính sẵn: đây là quyết định máy tính
-    được chắc chắn từ phụ thuộc và ``write_scope``, nên chốt một lần ở đây
-    thay vì để mỗi nơi tính lại một kiểu.
+    Includes pre-computed parallel waves: this is a deterministic decision
+    derived from dependencies and ``write_scope``, so it is locked in once
+    here instead of letting each consumer recompute it differently.
     """
     sched = to_scheduler(res.stories)
     max_parallel = (config or Config(dict(DEFAULTS)))["run.max_parallel"]
@@ -291,8 +291,9 @@ def write_index(root: Path, res: SplitResult, config: Config | None = None) -> P
         }
         wave_error = ""
     except (CycleError, UnknownDependencyError, ValueError) as e:
-        # Đồ thị hỏng — cổng máy đã ghi lỗi; ghi thêm vào chỉ mục để nơi
-        # đọc chỉ mục không phải đoán vì sao không có sóng nào.
+        # Broken dependency graph — machine gate already recorded the error;
+        # also write it into the index so consumers don't have to guess why
+        # there are no waves.
         waves, wave_error = {}, str(e)
 
     data = {
@@ -324,11 +325,12 @@ def write_index(root: Path, res: SplitResult, config: Config | None = None) -> P
 
 
 def describe_index(data: dict) -> str:
-    """Tóm tắt chỉ mục cho người duyệt.
+    """Summarize the index for a human reviewer.
 
-    Cổng story tồn tại để một người thật xem lại cách chia việc. Ném 350
-    dòng JSON vào mặt họ thì cổng chỉ còn là thủ tục — thứ cần nhìn là:
-    story nào, phủ yêu cầu nào, ghi vào đâu, và chạy song song với ai.
+    The story gate exists so a real person reviews the work breakdown. Dumping
+    350 lines of JSON at them turns the gate into a rubber stamp — what they
+    need to see is: which stories, which requirements covered, where they
+    write, and what runs in parallel.
     """
     lines = []
     by_id = {s["id"]: s for s in data.get("stories", [])}
@@ -349,7 +351,7 @@ def describe_index(data: dict) -> str:
                 )
         listed = {sid for w in waves.get(epic["id"], []) for sid in w}
         for sid in epic.get("stories", []):
-            if sid not in listed:  # không xếp được lịch — vẫn phải thấy
+            if sid not in listed:  # unschedulable — still must be visible
                 lines.append(f"    {sid}  {by_id.get(sid, {}).get('title', '')}  [not assigned to any wave]")
 
     gate = data.get("gate", {})

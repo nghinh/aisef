@@ -1,14 +1,16 @@
-"""Giao diện chung cho mọi client agent.
+"""Common interface for all agent clients.
 
-Framework nói chuyện với Claude Code và OpenCode qua cùng một giao diện.
-Chỗ khác nhau giữa chúng — cách truyền prompt, cách đọc kết quả, cách gắn
-guard — nằm gọn trong từng hiện thực, không rò ra phần điều phối.
+The framework talks to Claude Code and OpenCode through the same interface.
+What differs between them — how prompts are passed, how results are read,
+how guards are wired — is encapsulated in each implementation, not leaked
+into the orchestration layer.
 
-**Năng lực được khai báo, không được giả định.** Mỗi client trả về bảng
-`capabilities()` nói rõ nó làm được gì ở mức nào. Client không gắn được
-guard tiền kiểm thì phải khai `POST_HOC`, để framework biết mà chuyển sang
-hậu kiểm ở bước verify và ghi mức bảo đảm thấp hơn vào evidence — thay vì
-im lặng chạy như thể vẫn đủ (bất biến 10).
+**Capabilities are declared, not assumed.**  Each client returns a
+`capabilities()` table stating what it can do and at what level.  A client
+that cannot wire pre-check guards must declare `POST_HOC`, so the framework
+switches to post-check at the verify step and records a lower assurance
+level in evidence — instead of silently running as if full coverage is in
+place (invariant 10).
 """
 
 from __future__ import annotations
@@ -25,34 +27,34 @@ from .stream import RunResult
 
 
 class Support(str, Enum):
-    """Mức hỗ trợ một năng lực."""
+    """Support level for a capability."""
 
-    NATIVE = "native"          # client có sẵn, dùng thẳng
-    EMULATED = "emulated"      # framework mô phỏng bằng cơ chế khác
-    POST_HOC = "post_hoc"      # chỉ kiểm được sau, không chặn được lúc xảy ra
+    NATIVE = "native"          # client has built-in support
+    EMULATED = "emulated"      # framework emulates via an alternative mechanism
+    POST_HOC = "post_hoc"      # can only check after the fact, cannot block at occurrence
     UNSUPPORTED = "unsupported"
 
     @property
     def blocks_at_source(self) -> bool:
-        """Có chặn được ngay lúc hành vi xảy ra không."""
+        """Whether this level blocks at the moment the action occurs."""
         return self in (Support.NATIVE, Support.EMULATED)
 
 
 class Capability(str, Enum):
-    HEADLESS = "headless"              # chạy không cần người
-    MACHINE_OUTPUT = "machine_output"  # kết quả máy đọc được
-    PRE_TOOL_GUARD = "pre_tool_guard"  # chặn trước khi tool chạy
-    TOOL_ALLOWLIST = "tool_allowlist"  # giới hạn tool được dùng
-    DIR_ALLOWLIST = "dir_allowlist"    # giới hạn thư mục truy cập
-    SUBAGENT = "subagent"              # sinh sub-agent
-    MODEL_ROUTING = "model_routing"    # chọn model theo vai
-    COST_REPORTING = "cost_reporting"  # báo chi phí, token
-    TURN_LIMIT = "turn_limit"          # giới hạn số lượt
+    HEADLESS = "headless"              # runs without human interaction
+    MACHINE_OUTPUT = "machine_output"  # machine-readable output
+    PRE_TOOL_GUARD = "pre_tool_guard"  # blocks before tool execution
+    TOOL_ALLOWLIST = "tool_allowlist"  # restricts allowed tools
+    DIR_ALLOWLIST = "dir_allowlist"    # restricts directory access
+    SUBAGENT = "subagent"              # spawns sub-agents
+    MODEL_ROUTING = "model_routing"    # selects model by role
+    COST_REPORTING = "cost_reporting"  # reports cost and tokens
+    TURN_LIMIT = "turn_limit"          # limits turn count
 
 
 @dataclass
 class RunSpec:
-    """Một lượt chạy agent."""
+    """A single agent run."""
 
     prompt: str
     workdir: Path
@@ -65,33 +67,33 @@ class RunSpec:
     extra_dirs: list[Path] = field(default_factory=list)
     settings_file: Path | None = None
     session_id: str = ""
-    #: Biến môi trường thêm vào tiến trình client. Guard chạy trong hook là
-    #: tiến trình con của client, nên phạm vi ghi và mã story tới được guard
-    #: qua đúng đường này.
+    #: Extra environment variables for the client process.  Guards run inside
+    #: hooks as child processes of the client, so write scope and story ID
+    #: reach the guard through exactly this path.
     env: dict[str, str] = field(default_factory=dict)
-    #: Tiền tố biến của máy được cho qua **thêm** (`clients.env_allow`).
-    #: Mặc định rỗng: ngoài `ENV_KEEP`/`ENV_KEEP_PREFIXES` không gì qua.
+    #: Additional host env-var prefixes to pass through (`clients.env_allow`).
+    #: Default empty: nothing passes beyond `ENV_KEEP`/`ENV_KEEP_PREFIXES`.
     env_allow: list[str] = field(default_factory=list)
 
 
-# ------------------------------------------------------------ môi trường con
+# ------------------------------------------------------------ child environment
 
-#: Biến của máy được giữ **nguyên tên** cho tiến trình client — đủ để một CLI
-#: chạy (tìm lệnh, thư mục nhà, locale, tmp, chứng chỉ), không hơn.
+#: Host variables kept **as-is** for the client process — enough for a CLI
+#: to run (find commands, home dir, locale, tmp, certificates), no more.
 ENV_KEEP = frozenset({"PATH", "HOME", "LANG", "TERM", "TMPDIR", "SHELL", "USER", "LOGNAME",
                       "SSL_CERT_FILE"})
-#: Tiền tố được giữ: locale, khoá/URL model của Claude, biến harness đặt cho
-#: guard. `CLAUDE*` của phiên cha **không** có ở đây — hợp quy C3 đo phiên con
-#: thừa hưởng chúng thì tự chuyển sang Bash và né guard Write/Edit (lỗi 4).
+#: Prefixes kept: locale, Claude model key/URL, harness variables for guards.
+#: Parent session's `CLAUDE*` is **not** here — conformance C3 showed a child
+#: session inheriting them switches to Bash and bypasses Write/Edit guards (error 4).
 ENV_KEEP_PREFIXES = ("LC_", "ANTHROPIC_", "AISEF_")
-#: Git trong phiên agent không được cầm credential của máy: không hỏi
-#: terminal, askpass luôn thất bại, và `credential.helper=` rỗng **xoá** danh
-#: sách helper đã khai ở system/global — osxkeychain không được hỏi (đo
-#: 2026-09-06, git 2.53: helper giả không được gọi, `could not read
-#: Username`). Ba biến `GIT_CONFIG_*` đi cùng nhau: có COUNT mà thiếu
-#: KEY/VALUE thì git chết. Push/merge là việc của harness
-#: (`worktree.merge_story`) — tiến trình harness không nhận bộ này, chỉ
-#: tiến trình client.
+#: Git in agent sessions must not hold the host's credentials: no terminal
+#: prompts, askpass always fails, and `credential.helper=` empty **clears**
+#: the helper list declared at system/global — osxkeychain is not queried
+#: (measured 2026-09-06, git 2.53: fake helper not called, `could not read
+#: Username`).  The three `GIT_CONFIG_*` vars go together: COUNT without
+#: KEY/VALUE crashes git.  Push/merge is the harness's job
+#: (`worktree.merge_story`) — the harness process does not receive this set,
+#: only the client process does.
 GIT_NO_CREDENTIALS: dict[str, str] = {
     "GIT_TERMINAL_PROMPT": "0",
     "GIT_ASKPASS": shutil.which("false") or "/usr/bin/false",
@@ -102,18 +104,19 @@ GIT_NO_CREDENTIALS: dict[str, str] = {
 
 
 def child_env(spec_env: dict[str, str], *, allow_prefixes: Iterable[str] = ()) -> dict[str, str]:
-    """Môi trường cho tiến trình client: **allowlist**, không phải `os.environ`
-    bớt đi vài thứ (ADR-005 V2).
+    """Environment for the client process: **allowlist**, not `os.environ`
+    minus a few things (ADR-005 V2).
 
-    Trước: OpenCode nhận trọn `os.environ` (63 biến trên máy đo), Claude chỉ
-    bị bỏ `CLAUDE*`; OpenCode từng ghi secret của máy ra log của nó. Agent
-    không cầm thứ nó không cần: giữ `ENV_KEEP` + `ENV_KEEP_PREFIXES` + tiền
-    tố dự án khai ở `clients.env_allow`, cộng bộ vô hiệu credential git, rồi
-    `spec_env` của harness đè lên trên. Giới hạn đã biết: token model của
-    Claude nằm trong Keychain/OAuth của máy, harness không có broker — phiên
-    con vẫn xác thực bằng tài khoản của máy.
+    Before: OpenCode received the full `os.environ` (63 vars on the test
+    machine), Claude only had `CLAUDE*` removed; OpenCode once logged host
+    secrets to its own log.  The agent should not hold what it does not need:
+    keep `ENV_KEEP` + `ENV_KEEP_PREFIXES` + project-declared prefixes from
+    `clients.env_allow`, plus the git credential disabler, then overlay
+    harness `spec_env` on top.  Known limitation: Claude's model token
+    lives in the host's Keychain/OAuth, harness has no broker — the child
+    session still authenticates with the host's account.
     """
-    # Tiền tố rỗng mở toang mọi biến — bỏ, không phải lỗi cấu hình đáng chết.
+    # An empty prefix opens all vars — drop it, not a fatal config error.
     prefixes = tuple(p for p in (*ENV_KEEP_PREFIXES, *allow_prefixes) if p)
     env = {k: v for k, v in os.environ.items() if k in ENV_KEEP or k.startswith(prefixes)}
     env.update(GIT_NO_CREDENTIALS)
@@ -122,34 +125,34 @@ def child_env(spec_env: dict[str, str], *, allow_prefixes: Iterable[str] = ()) -
 
 
 class ClientAdapter(ABC):
-    """Một cách chạy agent. Hiện thực: Claude Code, OpenCode."""
+    """A way to run an agent.  Implementations: Claude Code, OpenCode."""
 
-    #: Tên hiển thị, cũng là khoá dùng trong cấu hình và báo cáo.
+    #: Display name, also the key used in config and reports.
     id: str = ""
 
     @abstractmethod
     def available(self) -> bool:
-        """Client có cài trên máy này không."""
+        """Whether the client is installed on this machine."""
 
     @abstractmethod
     def capabilities(self) -> dict[Capability, Support]:
-        """Khai báo trung thực mức hỗ trợ từng năng lực."""
+        """Honestly declare support level for each capability."""
 
     @abstractmethod
     def run(self, spec: RunSpec) -> RunResult:
-        """Chạy một lượt, trả kết quả đã chuẩn hoá."""
+        """Run one round, return a normalised result."""
 
-    # ------------------------------------------------------------ tiện ích
+    # ------------------------------------------------------------ utilities
 
     def supports(self, capability: Capability) -> Support:
         return self.capabilities().get(capability, Support.UNSUPPORTED)
 
     def guards_block_at_source(self) -> bool:
-        """Guard của client này chặn được ngay, hay chỉ kiểm sau."""
+        """Whether this client's guards block at source or only check after."""
         return self.supports(Capability.PRE_TOOL_GUARD).blocks_at_source
 
     def degradations(self) -> list[str]:
-        """Những năng lực không đạt mức lý tưởng — phải khai vào báo cáo."""
+        """Capabilities not at the ideal level — must be declared in reports."""
         out = []
         for cap, support in self.capabilities().items():
             if support is not Support.NATIVE:

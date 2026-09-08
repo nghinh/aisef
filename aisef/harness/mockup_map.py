@@ -1,14 +1,14 @@
-"""Map mockup — **nửa nạp**: đưa đúng một màn hình vào phiên viết code.
+"""Map mockup — **loading half**: inject exactly one screen into the coding session.
 
-Nửa còn lại (`mockup_verify`) đối chiếu ứng dụng thật với hợp đồng. Hai
-nửa phải đi cùng nhau: nạp mà không đối chiếu thì mockup chỉ là gợi ý; đối
-chiếu mà không nạp thì agent bị chấm điểm theo một hợp đồng nó chưa từng
-đọc.
+The other half (`mockup_verify`) compares the real app against the contract.
+Both halves must go together: loading without verification makes the mockup
+merely a suggestion; verification without loading grades the agent against a
+contract it never read.
 
-Nguyên tắc ở đây là **nạp ít**: một story dựng màn hình Danh sách thì
-không được thấy hợp đồng của Cài đặt. Nạp cả tệp thì agent sẽ dựng luôn
-thứ không thuộc story mình — và phần thừa đó không ai đặt hàng, không ai
-kiểm, nhưng vẫn phải bảo trì.
+The principle here is **load minimally**: a story building the List screen
+must not see the Settings contract. Loading the entire file causes the agent
+to build things outside its story — and that surplus is unordered, untested,
+yet still requires maintenance.
 """
 
 from __future__ import annotations
@@ -18,14 +18,14 @@ from pathlib import Path
 
 from ..control.design_contract import DesignContract, ScreenContract
 
-#: Số component liệt kê trong prompt trước khi cắt. Hợp đồng dài hàng trăm
-#: dòng sẽ đẩy phần hướng dẫn ra khỏi tầm chú ý của model.
+#: Max components listed in prompt before truncation. A contract hundreds of
+#: lines long pushes the instructions out of the model's attention window.
 MAX_LISTED = 40
 
 
 @dataclass
 class ScreenSlice:
-    """Lát cắt một màn hình, dạng sẵn sàng đưa vào prompt."""
+    """A single-screen slice, ready to embed in a prompt."""
 
     screen: ScreenContract
     mockup_path: Path | None = None
@@ -45,9 +45,9 @@ class ScreenSlice:
         ]
         if s.purpose:
             lines.append(f"Purpose: {s.purpose}")
-        # Quy ước cổng phải nói ra, không để agent đoán (lỗi 14, e9 note-editor
-        # 2026-09-05: cổng mở `/note/1`, app không có ghi chú `1`, trang trống,
-        # story trượt 2 lượt mà không biết vì sao).
+        # Gate convention must be stated explicitly, not left for the agent to guess
+        # (bug 14, e9 note-editor 2026-09-05: gate opened `/note/1`, app had no
+        # note `1`, blank page, story failed 2 rounds with no visible cause).
         from .mockup_verify import concrete_route
 
         if s.route and concrete_route(s.route) != s.route:
@@ -110,7 +110,7 @@ def load_slice(
     artifact_root: Path | str,
     with_html: bool = False,
 ) -> ScreenSlice | None:
-    """Lấy lát cắt của **một** màn hình. None nếu hợp đồng không có nó."""
+    """Return the slice of **one** screen. None if the contract lacks it."""
     screen = contract.by_id(screen_id)
     if screen is None:
         return None
@@ -143,7 +143,7 @@ def load_for_story(
     *,
     artifact_root: Path | str,
 ) -> tuple[list[ScreenSlice], list[str]]:
-    """Nạp lát cắt cho các màn hình story khai. Trả kèm mã không tìm thấy."""
+    """Load slices for the screens declared by the story. Returns unresolved IDs alongside."""
     slices, missing = [], []
     for sid in screen_ids:
         sl = load_slice(contract, sid, artifact_root=artifact_root)
@@ -155,7 +155,7 @@ def load_for_story(
 
 
 def prompt_section(slices: list[ScreenSlice]) -> str:
-    """Phần "Giao diện" của prompt story."""
+    """The "UI" section of the story prompt."""
     if not slices:
         return (
             "This story does not build any screen. Do not add UI — the UI "

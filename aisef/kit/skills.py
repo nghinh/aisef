@@ -1,11 +1,11 @@
-"""Đọc skill từ đĩa.
+"""Read skills from disk.
 
-Một skill là một thư mục chứa SKILL.md có YAML frontmatter. Đây là định dạng
-chung của mọi nguồn ta nhập (BMAD, superpowers, ui-ux-pro-max,
-cybersecurity-skills), nên chỉ cần một bộ đọc.
+A skill is a directory containing SKILL.md with YAML frontmatter. This is the
+common format across all sources we import (BMAD, superpowers, ui-ux-pro-max,
+cybersecurity-skills), so a single reader suffices.
 
-Không dùng PyYAML: frontmatter của skill chỉ gồm scalar và list phẳng, nên
-parser stdlib ~40 dòng là đủ và bỏ được một dependency.
+No PyYAML: skill frontmatter only has scalars and flat lists, so a ~40-line
+stdlib parser is sufficient and avoids adding a dependency.
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ FRONTMATTER_FENCE = "---"
 
 @dataclass(frozen=True)
 class Skill:
-    """Một skill đã đọc từ đĩa."""
+    """A skill read from disk."""
 
     name: str
     path: Path
@@ -29,19 +29,19 @@ class Skill:
 
     @property
     def verb(self) -> str:
-        """Động từ mở đầu tên skill (`performing-x` → `performing`).
+        """Leading verb of the skill name (`performing-x` -> `performing`).
 
-        Kho cybersecurity-skills đặt tên nhất quán theo động từ, nên đây là
-        tín hiệu phân loại rẻ và ổn định.
+        The cybersecurity-skills repo names skills consistently by verb, so
+        this is a cheap and stable classification signal.
         """
         return self.name.split("-", 1)[0].lower()
 
 
 def parse_frontmatter(text: str) -> dict[str, object]:
-    """Trích frontmatter YAML ở đầu file thành dict.
+    """Extract YAML frontmatter at the top of the file into a dict.
 
-    Hỗ trợ đúng những gì skill dùng: `key: value`, khối gấp (`>-`, `|`) và
-    list gạch đầu dòng. Trả dict rỗng nếu file không mở đầu bằng fence.
+    Supports exactly what skills use: `key: value`, folded blocks (`>-`, `|`),
+    and bulleted lists. Returns empty dict if the file doesn't start with a fence.
     """
     lines = text.splitlines()
     if not lines or lines[0].strip() != FRONTMATTER_FENCE:
@@ -50,7 +50,7 @@ def parse_frontmatter(text: str) -> dict[str, object]:
     try:
         end = next(i for i, l in enumerate(lines[1:], 1) if l.strip() == FRONTMATTER_FENCE)
     except StopIteration:
-        return {}  # fence không đóng — coi như không có frontmatter
+        return {}  # unclosed fence — treat as no frontmatter
 
     data: dict[str, object] = {}
     key: str | None = None
@@ -72,12 +72,12 @@ def parse_frontmatter(text: str) -> dict[str, object]:
         if not stripped:
             continue
 
-        # phần tử list thuộc key hiện tại
+        # list item belonging to the current key
         if stripped.startswith("- ") and key is not None:
             items.append(stripped[2:].strip())
             continue
 
-        # dòng thụt vào = phần tiếp của khối gấp
+        # indented line = continuation of a folded block
         if raw.startswith((" ", "\t")) and key is not None:
             folded.append(stripped)
             continue
@@ -90,7 +90,7 @@ def parse_frontmatter(text: str) -> dict[str, object]:
         key = k.strip()
         v = v.strip()
         if v in (">-", ">", "|", "|-", ""):
-            folded = []  # giá trị nằm ở các dòng sau
+            folded = []  # value is on subsequent lines
         else:
             data[key] = v
             key = None
@@ -100,7 +100,7 @@ def parse_frontmatter(text: str) -> dict[str, object]:
 
 
 def load_skill(skill_dir: Path) -> Skill | None:
-    """Đọc một thư mục skill. Trả None nếu không phải skill hợp lệ."""
+    """Read one skill directory. Returns None if not a valid skill."""
     md = skill_dir / "SKILL.md"
     if not md.is_file():
         return None
@@ -125,7 +125,7 @@ def load_skill(skill_dir: Path) -> Skill | None:
 
 
 def scan(root: Path) -> list[Skill]:
-    """Tìm mọi skill dưới `root`, sắp xếp theo tên cho ổn định."""
+    """Find all skills under `root`, sorted by name for stability."""
     if not root.is_dir():
         return []
     found = (load_skill(md.parent) for md in root.rglob("SKILL.md"))

@@ -1,4 +1,4 @@
-"""Lệnh dựng và vận hành harness: ``init`` · ``setup`` · ``compile`` ·
+"""Harness setup and operation commands: ``init`` · ``setup`` · ``compile`` ·
 ``guard`` · ``gate`` · ``skill`` · ``doc``."""
 
 from __future__ import annotations
@@ -12,7 +12,7 @@ from ._common import ARTIFACT_ROOT, EXIT_NOT_READY, EXIT_OK, EXIT_USAGE, _artifa
 
 
 def cmd_baseline(args) -> int:
-    """Dựng baseline cho brownfield: phân tích mã nguồn hiện tại."""
+    """Build baseline for brownfield: analyse the existing codebase."""
     from ..codebase.baseline import build_baseline
     from ..codebase.detect import detect
     from ..codebase.provider import resolve
@@ -74,7 +74,7 @@ STACK_PRESETS: dict[str, dict[str, object]] = {
 
 
 def cmd_init(args) -> int:
-    """Ghi file cấu hình mặc định để chỉnh."""
+    """Write default config file for customisation."""
     stack = getattr(args, "stack", "") or ""
     cfg = Config.load(args.project)
     if stack and stack in STACK_PRESETS:
@@ -87,7 +87,7 @@ def cmd_init(args) -> int:
 
 
 def cmd_setup(args) -> int:
-    """Dò stack rồi nạp skill phù hợp vào dự án."""
+    """Detect stack and install matching skills into the project."""
     from ..kit import install
     from ..kit.detect_stack import detect_file
 
@@ -146,12 +146,12 @@ def cmd_setup(args) -> int:
 
 
 def cmd_compile(args) -> int:
-    """Sinh cấu hình client từ một nguồn duy nhất."""
+    """Generate client configuration from a single source of truth."""
     from ..clients.compile import ADAPTERS, compile_for, write_compile_report
 
     clients = sorted(ADAPTERS) if args.client == "all" else [args.client]
-    # Không tự đoán đường dẫn: `aisef_command` đã biết ưu tiên tên trên PATH
-    # (bản cài thật) rồi mới lùi về `bin/aisef` của kho nguồn.
+    # Don't guess the path: `aisef_command` already prefers the name on PATH
+    # (real install) before falling back to `bin/aisef` from the source repo.
     aisef_bin = args.bin or aisef_command()
 
     reports = []
@@ -173,11 +173,11 @@ def cmd_compile(args) -> int:
 
 
 def cmd_guard(args) -> int:
-    """Chạy một guard trên sự kiện hook đọc từ stdin.
+    """Run a guard on a hook event read from stdin.
 
-    Client gọi lệnh này tại mốc vòng đời. Thoát 2 là chặn, và lý do đi ra
-    stderr — Claude Code chuyển stderr vào kết quả tool cho agent đọc, nên
-    lý do phải nói được agent cần sửa gì.
+    Clients call this at lifecycle hooks.  Exit 2 means block, and the
+    reason goes to stderr — Claude Code passes stderr into the tool result
+    for the agent to read, so the reason must tell the agent what to fix.
     """
     import json
     import time
@@ -185,8 +185,8 @@ def cmd_guard(args) -> int:
     from ..control.worktree import main_repo
     from ..harness.guardrails import project_root_from, record_outcome, run_guard
 
-    goc = Path(project_root_from(None, str(args.project))).resolve()
-    artifact_root = main_repo(goc) / ARTIFACT_ROOT
+    root = Path(project_root_from(None, str(args.project))).resolve()
+    artifact_root = main_repo(root) / ARTIFACT_ROOT
 
     try:
         raw = sys.stdin.read()
@@ -200,7 +200,7 @@ def cmd_guard(args) -> int:
         verdict = run_guard(
             args.kind,
             event,
-            project_root=str(goc),
+            project_root=str(root),
             artifact_root=str(artifact_root),
         )
     except ValueError as e:
@@ -230,7 +230,7 @@ def cmd_guard(args) -> int:
 
 
 def cmd_skill(args) -> int:
-    """Dựng và soi sổ đăng ký skill (ADR-002). Chỉ đọc — không sửa dự án."""
+    """Build and inspect skill registry (ADR-002).  Read-only — does not modify the project."""
     from ..kit import registry as R
     from ..kit import router as RT
     from ..phases.run import load_plan
@@ -275,9 +275,9 @@ def cmd_skill(args) -> int:
 
 
 def cmd_doc(args) -> int:
-    """Tra tài liệu thư viện theo yêu cầu (luật 12) — context7 qua HTTP, có cache.
-    Có `--story` thì ghi bằng chứng `doc_lookup`: cổng và báo cáo biết agent
-    đã tra gì thay vì bịa."""
+    """Look up library documentation on demand (rule 12) — context7 via HTTP, cached.
+    With `--story`, records `doc_lookup` evidence: gates and reports know what
+    the agent looked up instead of guessing."""
     from ..kit.docs import DocError, lookup
 
     try:
@@ -301,13 +301,13 @@ def cmd_doc(args) -> int:
 
 
 def cmd_gate(args) -> int:
-    """Chấm lại cổng story trên bằng chứng đã ghi (ADR-005 V4).
+    """Re-score story gates on recorded evidence (ADR-005 V4).
 
-    Chỉ đọc: cắt bằng chứng ở `gate:input` của từng lượt, gọi `gate.evaluate`
-    của mã **hiện tại**, in bảng từng mục so với `gate:verdict` đã ghi. Không
-    gọi model — lời reviewer/security là thứ đã ghi. Lượt không có `gate:input`
-    (trước V4) được nêu là không replay được, không đoán. Thoát 2 khi không
-    replay được lượt nào của thứ được hỏi.
+    Read-only: slice evidence at each round's `gate:input`, call the
+    **current** code's `gate.evaluate`, print a per-item diff against the
+    recorded `gate:verdict`.  No model calls — reviewer/security notes are
+    what was recorded.  Rounds without `gate:input` (pre-V4) are reported
+    as unreplayable, not guessed.  Exit 2 when no round can be replayed.
     """
     from ..control import replay as R
     from ..harness.observe import EvidenceStore
@@ -322,27 +322,27 @@ def cmd_gate(args) -> int:
     store = EvidenceStore(_artifact_root(args))
     ids = store.stories() if args.all else [args.story]
     print(R.BANNER)
-    duoc = tong = 0
+    replayed = total = 0
     for sid in ids:
         ev = store.read(sid)
         rs = R.replay(ev, attempt=args.attempt)
-        thieu = R.unreplayable(ev)
+        unrepl = R.unreplayable(ev)
         if args.attempt:
-            thieu = [a for a in thieu if a == args.attempt]
-        if not rs and not thieu:
+            unrepl = [a for a in unrepl if a == args.attempt]
+        if not rs and not unrepl:
             if not args.all:
                 print(f"✗ {sid}: no gate evaluation found in evidence", file=sys.stderr)
             continue
         print()
         for r in rs:
             print(r.summary())
-        for a in thieu:
+        for a in unrepl:
             print(f"{sid} attempt {a}: not replayable (evidence predates ADR-005 V4 — "
                   f"no `gate:input`), not guessing")
-        duoc += len(rs)
-        tong += len(rs) + len(thieu)
-    print(f"\nreplayed {duoc}/{tong} attempts")
-    return EXIT_OK if duoc else EXIT_NOT_READY
+        replayed += len(rs)
+        total += len(rs) + len(unrepl)
+    print(f"\nreplayed {replayed}/{total} attempts")
+    return EXIT_OK if replayed else EXIT_NOT_READY
 
 
 def cmd_replay(args) -> int:
@@ -357,26 +357,26 @@ def cmd_replay(args) -> int:
     store = EvidenceStore(_artifact_root(args))
     ids = store.stories() if args.all else [args.story]
     print(R.BANNER)
-    duoc = tong = 0
+    replayed = total = 0
     for sid in ids:
         ev = store.read(sid)
         rs = R.replay(ev, attempt=args.attempt)
-        thieu = R.unreplayable(ev)
+        unrepl = R.unreplayable(ev)
         if args.attempt:
-            thieu = [a for a in thieu if a == args.attempt]
-        if not rs and not thieu:
+            unrepl = [a for a in unrepl if a == args.attempt]
+        if not rs and not unrepl:
             if not args.all:
                 print(f"✗ {sid}: no gate evaluation found in evidence", file=sys.stderr)
             continue
         print()
         for r in rs:
             print(r.summary())
-        for a in thieu:
+        for a in unrepl:
             print(f"{sid} attempt {a}: not replayable (predates ADR-005 V4)")
-        duoc += len(rs)
-        tong += len(rs) + len(thieu)
-    if not tong:
+        replayed += len(rs)
+        total += len(rs) + len(unrepl)
+    if not total:
         print("no gate evidence found")
         return EXIT_NOT_READY
-    print(f"\nreplayed {duoc}/{tong} attempts")
-    return EXIT_OK if duoc else EXIT_NOT_READY
+    print(f"\nreplayed {replayed}/{total} attempts")
+    return EXIT_OK if replayed else EXIT_NOT_READY

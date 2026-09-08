@@ -1,18 +1,19 @@
-"""Điều phối cả đợt: epic tuần tự, trong epic chạy song song theo đợt.
+"""Orchestrate a full sprint: epics run sequentially, stories within an epic
+run in parallel waves.
 
-Ba quyết định định hình module này:
+Three decisions shape this module:
 
-* **Epic tuần tự** — story epic sau thường dựa trên epic trước; chạy chéo
-  epic thì merge cuối đợt sẽ đụng nhau ở chỗ chưa ai lường.
-* **Trong epic, story rời nhau chạy song song** (đợt/wave). Rời nhau nghĩa
-  là không phụ thuộc **và** phạm vi ghi không giao — cả hai điều kiện do
-  bộ xếp lịch tính sẵn và ghi vào ``stories.index.json``.
-* **Mỗi story một worktree, merge tuần tự cuối đợt.** Conflict lúc merge
-  không phải chuyện "gỡ cho xong": nó là **bằng chứng ``write_scope`` khai
-  sai**, nên dừng lại và báo, không tự hoà giải.
+* **Sequential epics** — stories in later epics typically depend on earlier
+  ones; running epics concurrently causes unpredictable merge conflicts at
+  the end of a wave.
+* **Within an epic, independent stories run in parallel** (waves). Independent
+  means no dependency **and** non-overlapping write scopes — both conditions
+  are precomputed by the scheduler and recorded in ``stories.index.json``.
+* **Each story gets its own worktree; merge is sequential at wave end.**
+  A merge conflict is **evidence that ``write_scope`` was declared
+  incorrectly**, so we stop and report rather than auto-resolve.
 
-Chạy lại thì tiếp từ chỗ dở: trạng thái nằm trên đĩa, story đã xong không
-chạy lại.
+Resumable: state lives on disk; already-completed stories are not re-run.
 """
 
 from __future__ import annotations
@@ -46,7 +47,7 @@ from .plan import ARTIFACT_ROOT
 
 @dataclass
 class Plan:
-    """Kế hoạch đọc từ `stories.index.json`."""
+    """Execution plan loaded from `stories.index.json`."""
 
     stories: dict[str, Story] = field(default_factory=dict)
     waves: dict[str, list[list[str]]] = field(default_factory=dict)
@@ -104,8 +105,9 @@ class RunReport:
     waves: list[WaveReport] = field(default_factory=list)
     stopped_at: str = ""
     error: str = ""
-    #: Story được dọn dấu vết lượt chạy trước. In ra, không nuốt: người
-    #: đọc cần biết harness vừa sửa trạng thái của story nào và vì sao.
+    #: Stories whose state was reconciled from a previous interrupted run.
+    #: Printed rather than swallowed: the reader needs to know which stories
+    #: had their state corrected and why.
     reconciled: list = field(default_factory=list)
 
     @property
@@ -160,12 +162,13 @@ def run_epic(
     verify_only: bool = False,
     repeat: int = 1,
 ) -> bool:
-    """Chạy hết một epic. False nghĩa là phải dừng cả đợt.
+    """Run one epic to completion. Returns False to stop the entire sprint.
 
-    ``verify_only``: lượt kiểm-lại (ADR-004 R13) — không mở phiên developer,
-    chấm lại ứng viên ở HEAD nhánh story; mọi thứ còn lại (worktree, cổng,
-    merge, `done`, nhật ký) đi **đúng đường này**, không có đường riêng.
-    ``repeat``: chỉ có nghĩa với kiểm-lại — mỗi phép kiểm chạy k lần.
+    ``verify_only``: re-verification pass (ADR-004 R13) — does not open a
+    developer session; re-scores the candidate at HEAD of the story branch.
+    Everything else (worktree, gates, merge, ``done``, journal) follows
+    **this same path** — no separate code path.
+    ``repeat``: only meaningful for re-verification — each check runs k times.
     """
     architecture = None
     arch_file = artifact_root / "architecture.md"
@@ -185,20 +188,21 @@ def run_epic(
             state.register(sid, epic_id, wave=index)
             trang_thai = state.load().stories[sid].state
             if trang_thai is StoryStatus.DONE:
-                wave.skipped.append(sid)  # chạy lại thì tiếp từ chỗ dở
+                wave.skipped.append(sid)  # resumable: skip already-done stories
             elif trang_thai is StoryStatus.VERIFIED:
-                # Qua cổng rồi, chưa lên nhánh chính (merge đụng ở lượt trước,
-                # người đã sửa). Chỉ merge lại — công việc đã nằm trên nhánh
-                # story, và worktree có thể đã bị dọn.
+                # Already passed the gate but not yet merged to main (merge
+                # conflict on a prior run, user has since resolved it).
+                # Only re-merge — work already lives on the story branch,
+                # and the worktree may have been cleaned up.
                 if worktrees is not None:
                     can_merge_lai.append(sid)
                 else:
                     wave.skipped.append(sid)
             else:
-                # Về `pending` trước: không có cạnh nào đi thẳng từ
-                # `failed`, hay từ `running` mà tiến trình đã chết, sang
-                # `running`. Bỏ bước này thì lượt chạy lại làm hết việc
-                # nhưng mọi lần ghi trạng thái đều bị từ chối và nuốt.
+                # Reset to `pending` first: no valid transition goes directly
+                # from `failed` or from a dead `running` process to `running`.
+                # Without this step, retries complete their work but every
+                # state write is silently rejected.
                 state.reset_for_retry(sid)
                 todo.append(sid)
 
@@ -211,15 +215,16 @@ def run_epic(
                 wave=wave, verify_only=verify_only, repeat=repeat,
             )
 
-        # Gỡ worktree của story **trượt** trước khi thoát. Chúng nằm
-        # trong cây dự án, và `.gitignore` chỉ che được git: vitest,
-        # eslint, tsc đều quét thẳng thư mục và nhặt phải test của story
-        # đang dở. Đo trên e9, cổng trước triển khai báo "unit đỏ" vì
-        # đúng chuyện này — test không đỏ, nó đọc nhầm cây.
+        # Remove worktrees of **failed** stories before exiting. They sit
+        # inside the project tree, and `.gitignore` only hides them from
+        # git — vitest, eslint, tsc all scan directories directly and pick
+        # up tests from in-progress stories. Measured on e9: the pre-deploy
+        # gate reported "unit tests red" for exactly this reason — tests
+        # were not red, it was reading the wrong tree.
         #
-        # Chốt phần còn dở vào nhánh trước khi gỡ: nhánh giữ công việc,
-        # thư mục thì không cần giữ — `create` dựng lại được từ nhánh khi
-        # cần xem lại.
+        # Commit remaining work to the branch before removing: the branch
+        # preserves the work, the directory is disposable — `create`
+        # reconstructs it from the branch when needed.
         if worktrees is not None:
             for o in wave.outcomes:
                 if o.done:
@@ -239,13 +244,14 @@ def run_epic(
         if worktrees is not None:
             journal = JournalStore(artifact_root)
             done_ids = [o.story_id for o in wave.outcomes if o.done]
-            # Story đã xong từ lượt trước nhưng chưa merge: chỉ merge lại,
-            # **không** commit lại — công việc của nó đã nằm trên nhánh
-            # story rồi, và worktree có thể đã bị dọn.
-            # Ứng viên đã được đóng băng ngay sau phiên developer (ADR-004
-            # R1) nên ở đây thường không còn gì để chốt. Vẫn gọi: phần dư
-            # nào sót lại phải sang được nhánh chính, và bước này không ghi
-            # nhật ký nữa — `candidate.frozen` mới là mốc chốt bản.
+            # Stories completed in a previous run but not yet merged: only
+            # re-merge, **do not** re-commit — their work already lives on
+            # the story branch, and the worktree may have been cleaned up.
+            # Candidates were frozen right after the developer session
+            # (ADR-004 R1) so there is usually nothing left to commit here.
+            # Still called: any residual must reach the main branch, and
+            # this step no longer writes to the journal — `candidate.frozen`
+            # is the commit checkpoint.
             for sid in done_ids:
                 story = plan.stories.get(sid)
                 worktrees.commit_story(
@@ -258,17 +264,17 @@ def run_epic(
                     wave.merge_conflicts[result.story_id] = result.conflicts
                     report.stopped_at = f"{epic_id} · wave {index} (merge)"
                     return False
-                # Mốc không quay lại được: công việc đã ra ngoài tầm giao
-                # dịch. Ghi **ngay** sau khi merge, trước cả việc dọn
-                # worktree — chết giữa hai bước này thì lần chạy sau phải
-                # đọc được rằng đã merge, không thì nó chạy lại một story
-                # đã xong và chỉ thấy diff rỗng.
+                # Point of no return: work has left the transaction boundary.
+                # Record **immediately** after merge, before cleaning up the
+                # worktree — if the process dies between these two steps, the
+                # next run must be able to see that the merge happened,
+                # otherwise it re-runs a completed story and sees an empty diff.
                 n = journal.read(result.story_id).attempt_no
                 journal.record(result.story_id,
                                JEntry(step="merge.completed", attempt=n))
-                # `done` chỉ được ghi **sau** dòng trên. Bất biến của G12:
-                # trong `sprint-status.json`, `done` không bao giờ đứng trước
-                # `merge.completed` của nhật ký.
+                # `done` is written **only after** the line above. G12
+                # invariant: in `sprint-status.json`, `done` never appears
+                # before `merge.completed` in the journal.
                 _safe_transition(state, result.story_id, StoryStatus.DONE)
             for sid in can_merge_lai + done_ids:
                 worktrees.remove(sid)
@@ -303,10 +309,10 @@ def _run_wave(
         co = complexity.score_story(story, project=project, owned=owned,
                                     fan_in=fan_in.get(story_id, 0))
 
-        # Chặn **trước** khi mở worktree và gọi model. Cổng `stories` đã
-        # chấm cùng phép kiểm này, nhưng cấu hình dự án đổi được sau khi
-        # cổng ấy duyệt — và một story không chạy được thì mọi đồng tiêu
-        # cho nó là tiêu vào chỗ không thể qua.
+        # Gate **before** opening a worktree or calling the model. The
+        # `stories` gate already ran the same checks, but project config
+        # can change after that gate approved — and every dollar spent on
+        # an unexecutable story is wasted.
         pf = check_story(story, project=project, config=config, owned=owned,
                          fan_in=fan_in.get(story_id, 0))
         if not pf.executable:
@@ -319,13 +325,14 @@ def _run_wave(
                              reason=out.blocked_reason)
             return out
 
-        # Một lượt chạy là **một giao dịch**. Nhật ký nằm trên đĩa nên
-        # nó sống sót qua cả tiến trình bị giết — đó mới là lúc cần nó.
+        # A single run is **one transaction**. The journal lives on disk so
+        # it survives even a killed process — that is exactly when it matters.
         with StoryRunTransaction(story_id, artifact_root=artifact_root) as tx:
             workdir = project
             if worktrees is not None:
-                # Kiểm lại thì **không** mang nhánh chính vào: ứng viên là
-                # HEAD nhánh story, đúng bản đã được chấm và rà soát.
+                # Re-verification: **do not** bring main into the branch —
+                # the candidate is HEAD of the story branch, the exact
+                # version that was scored and reviewed.
                 workdir = worktrees.create(story_id, refresh=not verify_only).path
                 tx.record("worktree.created", path=str(workdir),
                           undo={"worktree.remove": story_id})
@@ -357,11 +364,12 @@ def _run_wave(
             tx.record("review.completed", blocked=[
                 f for a in outcome.attempts for f in a.review_findings
             ][:5])
-            # Hiệu chuẩn cổng cỡ story (ADR-004 R5): điểm dự đoán ↔ lượt
-            # developer thật. Ghi ở đây vì đây là chỗ đầu tiên biết cả hai,
-            # và evidence của story vừa được viết xong. Hỏng thì bỏ qua —
-            # một bảng hiệu chuẩn không đáng làm mất một lượt chạy. Lượt
-            # kiểm-lại không có lượt developer nào để hiệu chuẩn.
+            # Story-level gate calibration (ADR-004 R5): predicted score vs
+            # actual developer attempts. Recorded here because this is the
+            # first place both values are available, and the story's evidence
+            # was just written. Failures are ignored — a calibration table is
+            # not worth aborting a run. Re-verification has no developer
+            # attempts to calibrate against.
             if not verify_only:
                 try:
                     complexity.record(artifact_root, story, score=co, config=config)
@@ -370,16 +378,17 @@ def _run_wave(
 
             _safe_transition(state, story_id, StoryStatus.VERIFYING,
                              cost=outcome.cost_usd, attempts=outcome.quality_attempts)
-            # Qua cổng ≠ xong. Có worktree thì còn nợ merge — `verified`,
-            # và `done` chỉ ghi ở cuối đợt sau `merge.completed`. Không cách
-            # ly thì không có bước merge: `done` ngay.
+            # Passing the gate != done. With worktrees there is still a
+            # pending merge — write `verified`; `done` is written at wave
+            # end after `merge.completed`. Without isolation there is no
+            # merge step: `done` immediately.
             if outcome.done:
                 qua_cong = StoryStatus.DONE if worktrees is None else StoryStatus.VERIFIED
             else:
                 qua_cong = StoryStatus.FAILED
             _safe_transition(state, story_id, qua_cong, reason=outcome.blocked_reason)
-            # Story trượt: giao dịch đóng ngay, không nợ gì. Story xong
-            # còn nợ commit và merge — đóng ở cuối đợt.
+            # Failed story: transaction closes immediately, nothing owed.
+            # Passed story still owes commit and merge — closed at wave end.
             if not outcome.done:
                 tx.commit()
         return outcome
@@ -393,17 +402,17 @@ def _run_wave(
 
 
 def _safe_transition(state: StateStore, story_id: str, to: StoryStatus, **kw) -> None:
-    """Ghi trạng thái, nhưng không để lỗi máy trạng thái làm hỏng cả đợt.
+    """Write state, but do not let a state-machine error abort the entire run.
 
-    Bản ghi trạng thái là để người đọc và để chạy lại; một bước nhảy không
-    hợp lệ đáng ghi vào log, không đáng làm mất công việc đã làm.
+    State records exist for the reader and for resumption; an invalid
+    transition deserves a log entry, not a lost run.
     """
     try:
         state.transition(story_id, to, cost_usd=kw.get("cost", 0.0), reason=kw.get("reason", ""),
                          attempts=kw.get("attempts", 0))
     except TransitionError as e:
-        # Nói ra. Nuốt im lặng đã che một lỗi thật: story chạy lại xong,
-        # merge xong, mà bản ghi vẫn đứng ở lần thất bại cũ.
+        # Log it. Silently swallowing this masked a real bug: a story would
+        # complete and merge, but the state record stayed at its old failure.
         print(f"state {story_id}: {e}", file=sys.stderr)
 
 
@@ -416,7 +425,7 @@ def run_sprint(
     sequential: bool = False,
     isolate: bool = True,
 ) -> RunReport:
-    """Chạy cả sprint: epic tuần tự, trong epic chạy theo đợt."""
+    """Run an entire sprint: epics sequentially, stories within an epic in waves."""
     project = Path(project)
     artifact_root = project / ARTIFACT_ROOT
     cfg = config or Config.load(project)
@@ -439,11 +448,12 @@ def run_sprint(
 
     state = StateStore(artifact_root)
 
-    # Dọn dấu vết lượt chạy trước bị giết, **trước** khi làm gì khác.
-    # Không có bước này thì story kẹt `running` vĩnh viễn và không lệnh
-    # nào gỡ ra được; còn story đã merge mà sổ ghi `failed` sẽ bị chạy
-    # lại trên một worktree rẽ từ nhánh đã chứa sẵn công việc — diff rỗng,
-    # không bao giờ qua được.
+    # Reconcile state from a previous interrupted run **before** doing
+    # anything else. Without this, stories stuck in `running` stay stuck
+    # forever with no command to recover them; and stories that already
+    # merged but whose record says `failed` get re-run on a worktree
+    # branched from a branch that already contains the work — empty diff,
+    # can never pass.
     report.reconciled = reconcile_all(
         artifact_root=artifact_root, state=state, worktrees=worktrees
     )
@@ -473,16 +483,19 @@ def run_verify_only(
     config: Config | None = None,
     repeat: int = 1,
 ) -> RunReport:
-    """Lượt kiểm-lại một story trên ứng viên đã đóng băng (ADR-004 R13).
+    """Re-verify a single story against its frozen candidate (ADR-004 R13).
 
-    Không mở phiên developer. Đi qua `run_epic` với kế hoạch thu về một đợt
-    một story, để merge, `done`, `attempt.committed` và dọn worktree là
-    **cùng một mã** với lượt thường — không phải bản chép có thể lệch.
-    ``repeat`` = k: mỗi phép kiểm chạy lại chạy k lần trên cùng SHA để tách
-    "đỏ vì mã" khỏi "đỏ vì tải máy" (lỗi 22) — xem `implement.verify_only`.
+    Does not open a developer session. Routes through ``run_epic`` with a
+    plan reduced to a single wave of one story, so merge, ``done``,
+    ``attempt.committed``, and worktree cleanup use **the same code** as a
+    normal run — not a copy that can drift.
+    ``repeat`` = k: each verification check runs k times on the same SHA to
+    distinguish "red because of code" from "red because of load" (bug 22) —
+    see ``implement.verify_only``.
 
-    Từ chối bằng code khi không có gì để kiểm lại: story chưa từng có ứng
-    viên (không có nhánh story hay mốc `candidate.frozen`), hay đã `done`.
+    Rejects with an error code when there is nothing to re-verify: story
+    never had a candidate (no story branch or ``candidate.frozen`` marker),
+    or is already ``done``.
     """
     project = Path(project)
     artifact_root = project / ARTIFACT_ROOT

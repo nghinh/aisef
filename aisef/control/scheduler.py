@@ -1,17 +1,20 @@
-"""Lập lịch chạy story: epic tuần tự, trong epic thì song song theo đợt.
+"""Story execution scheduler: epics run sequentially, stories within an epic
+run in parallel waves.
 
-Epic **luôn tuần tự** — epic sau thường dựa vào schema, API hay component mà
-epic trước tạo ra, nên chạy chồng epic là mời gọi hỏng ngầm.
+Epics are **always sequential** — a later epic typically depends on schemas,
+APIs, or components created by an earlier one, so overlapping epics invites
+silent breakage.
 
-Trong một epic, story được chia thành các **đợt (wave)**. Story vào cùng đợt khi
-thoả cả hai:
+Within an epic, stories are grouped into **waves**. Stories enter the same wave
+when both conditions hold:
 
-1. **Không phụ thuộc nhau** — mọi ``depends_on`` đã hoàn thành ở đợt trước.
-2. **Không đụng phạm vi ghi** — hai story cùng sửa ``src/models/user.py`` mà
-   chạy song song thì sẽ đè lên nhau.
+1. **No mutual dependency** — all ``depends_on`` are satisfied by prior waves.
+2. **No write-scope overlap** — two stories that both modify
+   ``src/models/user.py`` would overwrite each other if run in parallel.
 
-Điều kiện 2 hay bị bỏ quên và là nguyên nhân hỏng khó lần nhất: đồ thị phụ
-thuộc trông sạch, nhưng hai story vẫn ghi đè nhau vì cùng chạm một file.
+Condition 2 is often forgotten and is the hardest-to-trace failure mode: the
+dependency graph looks clean, but two stories still overwrite each other
+because they touch the same file.
 """
 
 from __future__ import annotations
@@ -21,14 +24,14 @@ from pathlib import PurePosixPath
 
 
 class CycleError(ValueError):
-    """Đồ thị phụ thuộc có chu trình — không thể xếp lịch."""
+    """Dependency graph contains a cycle — cannot schedule."""
 
 
 class UnknownDependencyError(ValueError):
-    """Story phụ thuộc vào một id không tồn tại."""
+    """Story depends on an id that does not exist."""
 
 
-#: Trạng thái coi như đã xong, không cần chạy lại (phục vụ resume).
+#: Statuses treated as done — no need to re-run (supports resume).
 DONE_STATUSES = frozenset({"done", "skipped"})
 
 
@@ -51,20 +54,21 @@ def _norm(p: str) -> PurePosixPath:
 
 
 def paths_overlap(a: str, b: str) -> bool:
-    """True khi hai đường dẫn chạm cùng một vùng cây thư mục.
+    """True when two paths touch the same directory-tree region.
 
-    So theo **đoạn đường dẫn**, không so tiền tố chuỗi: ``src/api`` và
-    ``src/apidocs`` là hai vùng khác nhau, dù chuỗi này là tiền tố của chuỗi kia.
+    Compared by **path segments**, not string prefix: ``src/api`` and
+    ``src/apidocs`` are distinct regions even though one is a string prefix of
+    the other.
     """
     pa, pb = _norm(a), _norm(b)
     return pa == pb or pa in pb.parents or pb in pa.parents
 
 
 def scopes_conflict(a: Story, b: Story) -> bool:
-    """True khi hai story ghi vào vùng chồng nhau.
+    """True when two stories write to overlapping regions.
 
-    Story không khai ``write_scope`` được coi là **chạm mọi thứ** — an toàn hơn
-    là đoán rằng nó vô hại.
+    A story without ``write_scope`` is treated as **touching everything** — safer
+    than guessing it is harmless.
     """
     if not a.write_scope or not b.write_scope:
         return True
@@ -86,13 +90,14 @@ def _validate(stories: list[Story]) -> dict[str, Story]:
 
 
 def build_waves(stories: list[Story], *, max_parallel: int | None = None) -> list[list[Story]]:
-    """Chia story của **một** epic thành các đợt chạy song song.
+    """Split stories of **one** epic into parallel execution waves.
 
-    Story đã ``done`` được coi là ràng buộc đã thoả và không xuất hiện trong
-    kết quả — nhờ vậy chạy lại sau khi dừng giữa chừng sẽ tiếp đúng chỗ dở.
+    Stories already ``done`` are treated as satisfied constraints and excluded
+    from the result — so resuming after a mid-run stop picks up where it left
+    off.
 
-    ``max_parallel`` giới hạn số story mỗi đợt, để không vượt sức máy hoặc
-    hạn mức gọi model.
+    ``max_parallel`` caps the number of stories per wave, to stay within machine
+    capacity or model call limits.
     """
     if max_parallel is not None and max_parallel < 1:
         raise ValueError("max_parallel must be >= 1")
@@ -108,14 +113,14 @@ def build_waves(stories: list[Story], *, max_parallel: int | None = None) -> lis
             stuck = sorted(s.id for s in remaining)
             raise CycleError(f"dependency cycle or deadlock among: {', '.join(stuck)}")
 
-        # Xếp greedy: nhận story nếu không đụng phạm vi ghi với story đã nhận.
-        # Thứ tự id giữ cho kết quả ổn định giữa các lần chạy.
+        # Greedy assignment: accept a story if its write scope does not conflict
+        # with already-picked stories. Sorting by id keeps results stable across runs.
         wave: list[Story] = []
         for s in sorted(ready, key=lambda s: s.id):
             if max_parallel is not None and len(wave) >= max_parallel:
                 break
             if any(scopes_conflict(s, picked) for picked in wave):
-                continue  # để dành cho đợt sau
+                continue  # deferred to a later wave
             wave.append(s)
 
         waves.append(wave)
@@ -128,7 +133,7 @@ def build_waves(stories: list[Story], *, max_parallel: int | None = None) -> lis
 
 @dataclass
 class EpicPlan:
-    """Lịch chạy của một epic."""
+    """Execution plan for a single epic."""
 
     epic_id: str
     waves: list[list[Story]] = field(default_factory=list)
@@ -139,7 +144,7 @@ class EpicPlan:
 
     @property
     def max_width(self) -> int:
-        """Số story song song nhiều nhất trong một đợt."""
+        """Maximum number of parallel stories in any single wave."""
         return max((len(w) for w in self.waves), default=0)
 
 
@@ -149,10 +154,11 @@ def plan_epics(
     max_parallel: int | None = None,
     epic_order: list[str] | None = None,
 ) -> list[EpicPlan]:
-    """Lập lịch toàn dự án: epic tuần tự, trong epic chia đợt song song.
+    """Schedule the entire project: epics sequential, waves parallel within each.
 
-    Phụ thuộc trỏ sang epic khác được coi là đã thoả khi epic đó nằm trước
-    trong thứ tự chạy — đó chính là lý do epic phải tuần tự.
+    Cross-epic dependencies are considered satisfied when the target epic
+    precedes the current one in execution order — that is exactly why epics
+    must be sequential.
     """
     _validate(stories)
 
@@ -169,8 +175,8 @@ def plan_epics(
     for epic_id in order:
         local = groups[epic_id]
         local_ids = {s.id for s in local}
-        # Phụ thuộc ra ngoài epic đã do thứ tự epic bảo đảm; bỏ khỏi đồ thị
-        # cục bộ để không bị coi là bế tắc.
+        # Cross-epic dependencies are guaranteed by epic ordering; remove them
+        # from the local graph so they are not treated as deadlocks.
         trimmed = [
             Story(
                 id=s.id,
@@ -187,7 +193,7 @@ def plan_epics(
 
 
 def describe(plans: list[EpicPlan]) -> str:
-    """Bản tóm tắt lịch chạy cho người đọc."""
+    """Human-readable execution schedule summary."""
     lines = []
     for p in plans:
         if not p.waves:

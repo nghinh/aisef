@@ -1,21 +1,21 @@
-"""Đọc JSON status mà BMAD trả về khi chạy ở chế độ headless.
+"""Parse the JSON status BMAD returns when running in headless mode.
 
-BMAD tự định nghĩa hợp đồng này (`assets/headless-schemas.md` trong mỗi
-skill), và nó khớp gần như một-một với cổng phê duyệt của framework:
+BMAD defines this contract itself (`assets/headless-schemas.md` in each
+skill), and it maps almost one-to-one to the framework's approval gates:
 
 ===============  ==========================================================
-``complete``     artifact đứng được một mình → đủ điều kiện tự duyệt
-``partial``      có artifact nhưng còn ``open_questions`` → **phải** người xem
-``blocked``      không sinh được artifact → dừng, báo lý do
+``complete``     artifact stands on its own -> eligible for auto-approval
+``partial``      artifact exists but has ``open_questions`` -> **requires** human review
+``blocked``      could not produce artifact -> stop, report reason
 ===============  ==========================================================
 
-Nghĩa là ta không phải tự nghĩ ra cơ chế "khi nào cần hỏi người" — BMAD
-đã trả lời sẵn, chỉ cần đọc cho đúng.
+This means we don't need to invent a "when to ask a human" mechanism --
+BMAD already answers that; we just need to read it correctly.
 
-BMAD đặt JSON ở cuối phần trả lời, thường trong khối ```json nhưng không
-phải lúc nào cũng có rào. Bộ đọc này quét mọi object ở tầng ngoài cùng và
-lấy **object cuối cùng có khoá ``status``** — phần văn xuôi phía trước
-thường trích dẫn cả schema lẫn ví dụ.
+BMAD places the JSON at the end of its reply, usually inside a ```json
+fence but not always. This parser scans all top-level objects and takes
+the **last object with a ``status`` key** -- the prose before it often
+quotes both the schema and examples.
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ class HeadlessStatus:
 
     @property
     def parsed(self) -> bool:
-        """Có đọc được JSON status không."""
+        """Whether a JSON status was successfully parsed."""
         return bool(self.status)
 
     @property
@@ -48,19 +48,19 @@ class HeadlessStatus:
 
     @property
     def needs_human(self) -> bool:
-        """Có bắt buộc người xem trước khi đi tiếp không.
+        """Whether human review is required before proceeding.
 
-        ``partial`` nghĩa là BMAD tự nói artifact chưa đứng được một mình.
-        Tự duyệt một tài liệu như vậy là bỏ qua đúng chỗ mà cổng người sinh
-        ra để bảo vệ.
+        ``partial`` means BMAD itself says the artifact cannot stand on its
+        own. Auto-approving such a document bypasses the exact situation the
+        human gate exists to protect against.
         """
         return self.status == "partial" or bool(self.open_questions)
 
     def declared_paths(self) -> list[str]:
-        """Mọi đường dẫn BMAD tự khai là đã sinh ra.
+        """All paths BMAD claims to have produced.
 
-        Dùng để đối chiếu với đĩa: khai mà không có file là một dạng thất
-        bại im lặng, và chỉ lộ ra nếu ta chịu kiểm.
+        Used to cross-check against disk: a declared path with no actual
+        file is a silent failure, only caught if we bother to verify.
         """
         return sorted(set(self.artifacts.values()))
 
@@ -79,7 +79,7 @@ class HeadlessStatus:
         return " · ".join(parts)
 
 
-#: Khoá mang nghĩa khác, không bao giờ là artifact.
+#: Keys with a different meaning; never an artifact path.
 _NON_ARTIFACT_KEYS = frozenset(
     {"status", "intent", "reason", "assumptions", "open_questions",
      "external_handoffs", "conflicts_with_prior_decisions", "offer_to_update",
@@ -90,22 +90,23 @@ _PATH_LIKE = re.compile(r"[/\\]|\.[A-Za-z0-9]{1,5}$")
 
 
 def _is_path(value) -> bool:
-    """Chuỗi này có hình dạng đường dẫn không.
+    """Whether this string looks like a file path.
 
-    Mỗi skill BMAD đặt tên khoá artifact một kiểu (``spine``, ``design``,
-    ``experience``, ``companions``…), nên không thể liệt kê hết. Xét hình
-    dạng giá trị thì đúng hơn: danh sách khoá cấm sẽ luôn thiếu, còn
-    ``"feature"`` hay ``"build-substrate"`` thì không bao giờ giống một
-    đường dẫn.
+    Each BMAD skill names its artifact key differently (``spine``,
+    ``design``, ``experience``, ``companions``...), so enumerating them all
+    is impossible. Checking the value's shape is more reliable: a blocklist
+    of keys will always be incomplete, while ``"feature"`` or
+    ``"build-substrate"`` never look like a path.
     """
     return isinstance(value, str) and bool(value) and bool(_PATH_LIKE.search(value))
 
 
 def _as_str_list(value) -> list[str]:
-    """Chuẩn hoá về danh sách chuỗi.
+    """Normalize to a list of strings.
 
-    ``open_questions`` có khi là danh sách chuỗi, có khi là danh sách đối
-    tượng ``{id, text}`` — chấp nhận cả hai thay vì bắt BMAD viết một kiểu.
+    ``open_questions`` is sometimes a list of strings, sometimes a list of
+    ``{id, text}`` objects -- accept both rather than requiring BMAD to use
+    one format.
     """
     if not isinstance(value, list):
         return []
@@ -121,12 +122,12 @@ def _as_str_list(value) -> list[str]:
 
 
 def _top_level_objects(text: str) -> list[dict]:
-    """Mọi object JSON ở tầng ngoài cùng trong một đoạn văn bản.
+    """All top-level JSON objects in a block of text.
 
-    Quét từ trái sang, mỗi lần đọc được một object thì nhảy qua hết thân
-    nó. Nhờ vậy object lồng bên trong không bị đếm thành ứng viên riêng —
-    nếu không, một ``{"id": ..., "status": ...}` nằm trong ``open_questions``
-    sẽ bị nhầm là status của cả lượt chạy.
+    Scans left to right; after reading an object it jumps past its entire
+    body. This prevents nested objects from being counted as separate
+    candidates -- otherwise an ``{"id": ..., "status": ...}`` inside
+    ``open_questions`` would be mistaken for the run's status.
     """
     out: list[dict] = []
     i = 0
@@ -145,10 +146,11 @@ def _top_level_objects(text: str) -> list[dict]:
 
 
 def parse_headless_status(text: str) -> HeadlessStatus:
-    """Trích JSON status từ phần trả lời của BMAD.
+    """Extract JSON status from BMAD's reply.
 
-    Lấy **object cuối cùng có khoá ``status``**: phần văn xuôi phía trước
-    thường trích dẫn schema hoặc ví dụ, còn status thật luôn nằm ở cuối.
+    Takes the **last object with a ``status`` key**: the prose before it
+    often quotes the schema or examples, while the real status is always
+    at the end.
     """
     if not text:
         return HeadlessStatus()

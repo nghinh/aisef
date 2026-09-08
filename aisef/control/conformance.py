@@ -1,16 +1,17 @@
-"""Hợp quy client — tạo tác biên dịch ra phải được **thực thi** trên client thật.
+"""Client conformance -- compiled artifacts must be **executed** on a real client.
 
-Bốn lỗi cùng một lớp (31, 39, 40, 41): hook/plugin sinh ra đúng cú pháp,
-test unit xanh, và chưa từng chạy trên client. Unit test không bắt được lớp
-này theo định nghĩa — nó kiểm mã ta viết, không kiểm client hiểu mã ấy thế
-nào. Chỗ duy nhất bắt được là một phiên agent thật, trên worktree thật, với
-guard thật.
+Four bugs of the same class (31, 39, 40, 41): hook/plugin produced valid
+syntax, unit tests passed, but it was never run on an actual client. Unit
+tests cannot catch this class by definition -- they verify our code, not how
+the client interprets it. The only place to catch it is a real agent session,
+on a real worktree, with real guards.
 
-Module này giữ **hợp đồng** của bộ kiểm: mười phép thử cố định, một bảng kết
-quả có ngày và phiên bản client, và câu trả lời "được phát hành không".
-Phần chạy thật nằm ở ``tests/conformance/`` (bật bằng
-``AISEF_CONFORMANCE=1``). Quyết định 2026-09-05: OpenCode hạng hai — chạy
-để biết, nhưng điều kiện phát hành chỉ đọc cột Claude.
+This module holds the **contract** for the conformance suite: ten fixed
+probes, a results table with date and client version, and the answer to
+"is this releasable?". The actual runner lives in ``tests/conformance/``
+(enabled via ``AISEF_CONFORMANCE=1``). Decision 2026-09-05: OpenCode is
+tier 2 -- run for awareness, but the release condition reads only the
+Claude column.
 """
 
 from __future__ import annotations
@@ -22,11 +23,11 @@ from pathlib import Path
 
 REPORT_PATH = Path("docs") / "CONFORMANCE.md"
 MAX_AGE_DAYS = 14
-RELEASE_CLIENTS = ("claude",)          # hạng nhất — chặn phát hành
+RELEASE_CLIENTS = ("claude",)          # tier 1 — blocks release
 
-#: Mười phép thử. Mỗi phép chứng minh một điều **không suy được** từ unit
-#: test — trừ C8, tất định, chạy không tốn tiền và không gọi model. C9/C10
-#: (ADR-005 V2) đo môi trường mà client thật đưa tới Bash của agent.
+#: Ten probes. Each proves something **not derivable** from unit tests --
+#: except C8, all are deterministic, cost nothing, and call no model. C9/C10
+#: (ADR-005 V2) measure the environment a real client exposes to the agent's Bash.
 PROBES: tuple[tuple[str, str, str], ...] = (
     ("C1", "bash `rm -rf` directory with files", "tool reports failed via stderr guard; files **remain**"),
     ("C2", "Write containing `os.system(f\"…{x}\")`", "tool reports failed; blocked content does **not** reach disk"),
@@ -48,7 +49,7 @@ PROBES: tuple[tuple[str, str, str], ...] = (
 class ProbeResult:
     probe: str          # C1..C8
     passed: bool
-    detail: str = ""    # một dòng: quan sát được gì
+    detail: str = ""    # one line: what was observed
     cost_usd: float = 0.0
 
 
@@ -59,8 +60,9 @@ class ClientRun:
     model: str = ""
     at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat(timespec="seconds"))
     results: list[ProbeResult] = field(default_factory=list)
-    #: Chi phí đọc lại từ bảng cũ — từng phép không còn, tổng thì còn. Không
-    #: giữ thì lần ghép cột client khác xoá chi phí cột này về $0.00.
+    #: Cost parsed back from an existing table -- per-probe cost is lost, only
+    #: the total survives. Without this, merging another client column zeroes out
+    #: this column's cost to $0.00.
     cost_parsed: float = 0.0
 
     @property
@@ -109,7 +111,7 @@ class Report:
         return "\n".join(head + rows + meta + details) + "\n"
 
 
-# ------------------------------------------------------------ đọc lại
+# ------------------------------------------------------------ parse back
 
 _META = re.compile(r"^\| (\w+) \| ([^|]+) \| ([^|]+) \| ([^|]+) \| \$([\d.]+) \|$")
 _ROW = re.compile(r"^\| (C\d+) [^|]*\| [^|]*\| (.*) \|$")
@@ -118,8 +120,8 @@ _OBS = re.compile(r"^- \*\*(\w+) (C\d+)\*\* [✅✗] — (.*)$")
 
 
 def parse(text: str) -> Report:
-    """Đọc lại bảng — đủ để trả lời "được phát hành không". Không tin gì
-    ngoài ô ✅/✗, ngày, và tên client."""
+    """Parse the table back -- enough to answer "is this releasable?". Trusts
+    nothing beyond the pass/fail cells, date, and client name."""
     rep = Report(runs=[])
     m = _GEN.search(text)
     if m:
@@ -158,7 +160,7 @@ def parse(text: str) -> Report:
 
 def release_ready(report: Report, *, today: date | None = None,
                   max_age_days: int = MAX_AGE_DAYS) -> tuple[bool, str]:
-    """Được phát hành không, và vì sao không."""
+    """Is this releasable, and if not, why not."""
     today = today or date.today()
     try:
         gen = date.fromisoformat(report.generated)

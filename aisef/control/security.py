@@ -1,14 +1,14 @@
-"""Rà soát bảo mật theo ngữ nghĩa — phân loại và lọc nhiễu.
+"""Semantic security review — classification and noise filtering.
 
-Dò khuôn mẫu trả lời được "có chuỗi nào trông giống lỗ hổng không"; câu
-cần trả lời là "dữ liệu người dùng đi tới đâu, và ở đó có ai kiểm
-không". Câu sau cần phán đoán, nên nó giao cho model — nhưng **việc chấm
-đạt/không đạt thì không**: ngưỡng là code, đọc từ cấu hình.
+Pattern matching answers "does any string look like a vulnerability"; the real
+question is "where does user data flow, and is it validated there". The latter
+requires judgment, so it is delegated to a model — but **the pass/fail decision
+is not**: the threshold is code, read from configuration.
 
-Phần lọc nhiễu mượn ý từ `claude-code-security-review` của Anthropic:
-loại hẳn vài nhóm gây nhiễu nhiều hơn giúp. Báo một mục không khai thác
-được tốn đúng bằng bỏ sót một mục thật — lần sau không ai đọc báo cáo
-nữa.
+Noise filtering borrows from Anthropic's `claude-code-security-review`:
+drop entire categories that produce more noise than signal. Reporting a
+non-exploitable finding costs exactly as much as missing a real one — next
+time nobody reads the report.
 """
 
 from __future__ import annotations
@@ -16,11 +16,11 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-#: Thứ tự nghiêm dần. Dùng cho cả sắp xếp lẫn so ngưỡng.
+#: Ascending severity order. Used for both sorting and threshold comparison.
 SEVERITIES = ("low", "medium", "high", "critical")
 
-#: Mức chặn story mặc định. Trùng với `security.block_severities` trong
-#: cấu hình; để ở đây để module đứng một mình vẫn có nghĩa.
+#: Default blocking severities for a story. Matches `security.block_severities`
+#: in config; kept here so the module is self-contained.
 DEFAULT_BLOCKING = ("critical", "high")
 
 _LINE = re.compile(
@@ -28,9 +28,9 @@ _LINE = re.compile(
     re.IGNORECASE,
 )
 
-#: Nhóm loại hẳn khỏi báo cáo. Mượn từ `claude-code-security-review`:
-#: chúng gần như luôn là nhiễu trên diff của một story, và một báo cáo
-#: nhiễu thì không ai đọc.
+#: Categories dropped entirely from the report. Borrowed from
+#: `claude-code-security-review`: these are almost always noise on a
+#: story-sized diff, and a noisy report goes unread.
 NOISE = (
     ("từ chối dịch vụ", "denial of service", "dos ", "cạn bộ nhớ",
      "cạn cpu", "resource exhaustion"),
@@ -55,8 +55,8 @@ class Finding:
 @dataclass
 class SecurityReport:
     findings: list[Finding] = field(default_factory=list)
-    #: Mục bị lọc bỏ vì thuộc nhóm nhiễu. Giữ lại để đếm được — lọc mà
-    #: không nói đã lọc gì thì không ai kiểm lại được bộ lọc.
+    #: Findings dropped as noise. Kept for counting — filtering without
+    #: disclosing what was filtered makes the filter itself unauditable.
     filtered: list[Finding] = field(default_factory=list)
     error: str = ""
 
@@ -91,10 +91,10 @@ def is_noise(text: str) -> bool:
 
 
 def parse(text: str) -> SecurityReport:
-    """Đọc báo cáo của người rà soát bảo mật.
+    """Parse the security reviewer's report.
 
-    Không chấm được thì nói **không chấm được**, đừng trả rỗng: rỗng đọc
-    ra là "không có lỗ hổng", và đó là kết luận ngược hẳn.
+    When scoring is impossible, say **cannot score** — do not return empty:
+    empty reads as "no vulnerabilities", which is the opposite conclusion.
     """
     rep = SecurityReport()
     if text is None:
@@ -115,8 +115,8 @@ def parse(text: str) -> SecurityReport:
 
     rep.findings.sort(key=lambda f: -f.rank)
     if not rep.findings and not rep.filtered:
-        # Không mục nào **và** không câu "không có phát hiện" nghĩa là báo
-        # cáo sai định dạng — khác hẳn với "đã rà, sạch".
+        # No findings **and** no "no findings" phrase means the report is
+        # malformed — fundamentally different from "reviewed, clean".
         if "no findings" not in sach.lower() and "không có phát hiện" not in sach.lower():
             rep.error = "report does not follow the required format"
     return rep

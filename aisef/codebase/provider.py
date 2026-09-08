@@ -1,8 +1,9 @@
-"""CodebaseGraphProvider — trừu tượng hoá đồ thị tri thức mã nguồn.
+"""CodebaseGraphProvider — codebase knowledge graph abstraction.
 
-Framework không gắn cứng vào bất kỳ công cụ nào: nhà cung cấp là giao diện,
-Graphify và Basic là hai bản cài. Khi dự án có đồ thị thì câu truy vấn đi
-qua đó; không có thì lùi về grep + import tĩnh — vẫn hoạt động, chỉ thô hơn.
+The framework is not coupled to any specific tool: the provider is an
+interface, Graphify and Basic are two implementations.  When the project has a
+graph, queries go through it; otherwise fall back to grep + static imports —
+still works, just coarser.
 """
 
 from __future__ import annotations
@@ -15,7 +16,7 @@ from pathlib import Path
 
 @dataclass
 class GraphNode:
-    """Một nút trong đồ thị: hàm, lớp, module, file, bảng DB…"""
+    """A node in the graph: function, class, module, file, DB table, etc."""
     id: str
     kind: str = ""
     file: str = ""
@@ -33,7 +34,7 @@ class GraphEdge:
 
 @dataclass
 class QueryResult:
-    """Kết quả truy vấn tự nhiên hoặc có cấu trúc."""
+    """Result of a natural-language or structured query."""
     answer: str = ""
     nodes: list[GraphNode] = field(default_factory=list)
     edges: list[GraphEdge] = field(default_factory=list)
@@ -42,7 +43,7 @@ class QueryResult:
 
 @dataclass
 class ImpactResult:
-    """Phạm vi ảnh hưởng khi thay đổi một hoặc nhiều đích."""
+    """Impact scope when changing one or more targets."""
     targets: list[str] = field(default_factory=list)
     affected: list[GraphNode] = field(default_factory=list)
     affected_files: list[str] = field(default_factory=list)
@@ -60,33 +61,33 @@ class BuildResult:
 
 
 class CodebaseGraphProvider(ABC):
-    """Giao diện nhà cung cấp đồ thị mã nguồn."""
+    """Codebase graph provider interface."""
 
     name: str = ""
 
     @abstractmethod
     def build(self, project: Path, *, incremental: bool = False) -> BuildResult:
-        """Dựng (hoặc cập nhật tăng dần) đồ thị."""
+        """Build (or incrementally update) the graph."""
 
     @abstractmethod
     def query(self, project: Path, question: str) -> QueryResult:
-        """Hỏi bằng ngôn ngữ tự nhiên."""
+        """Query using natural language."""
 
     @abstractmethod
     def impact(self, project: Path, targets: list[str]) -> ImpactResult:
-        """Phạm vi ảnh hưởng: nút/file/test bị ảnh hưởng bởi thay đổi ở targets."""
+        """Impact scope: nodes/files/tests affected by changes to targets."""
 
     @abstractmethod
     def path(self, project: Path, a: str, b: str) -> QueryResult:
-        """Đường đi ngắn nhất giữa hai thực thể."""
+        """Shortest path between two entities."""
 
     @classmethod
     @abstractmethod
     def available(cls) -> bool:
-        """Nhà cung cấp có dùng được trên máy này không."""
+        """Whether this provider is available on this machine."""
 
     def repo_map(self, project: Path, seeds: list[str], budget: int = 0) -> str:
-        """Bản đồ mã quanh seeds — mặc định dùng query, lớp con ghi đè."""
+        """Code map around seeds — defaults to query, subclasses override."""
         if not seeds:
             return ""
         r = self.query(project, f"code structure around: {', '.join(seeds[:10])}")
@@ -95,10 +96,10 @@ class CodebaseGraphProvider(ABC):
 
 
 def resolve(project: Path, *, preference: str = "auto") -> CodebaseGraphProvider:
-    """Chọn nhà cung cấp: preference="graphify"|"basic"|"auto".
+    """Select provider: preference="graphify"|"basic"|"auto".
 
-    auto: Graphify nếu có CLI và đã dựng đồ thị; ngược lại Basic.
-    Không bật MCP mặc định — chỉ CLI/on-demand.
+    auto: Graphify if CLI exists and graph is built; otherwise Basic.
+    MCP not enabled by default — CLI/on-demand only.
     """
     from .basic import BasicProvider
     from .graphify import GraphifyProvider

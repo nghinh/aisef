@@ -1,15 +1,15 @@
-"""Bước 3 — dựng mockup HTML cho từng màn hình, rồi trích hợp đồng thị giác.
+"""Step 3 — generate HTML mockups for each screen, then extract the visual contract.
 
-Chia việc theo đúng nguyên tắc gốc:
+Work is split according to the core principle:
 
-* **Cần phán đoán → giao model.** Bố cục, nhịp thị giác, chọn chữ cho nút:
-  mỗi màn hình một phiên riêng, chỉ nạp lát cắt của màn hình đó.
-* **Cần đảm bảo → viết code.** Dựng trang trong trình duyệt, trích
-  component và ràng buộc nhập liệu, kiểm đủ màn hình, sinh trang mục lục:
-  đều là việc có đáp án đúng, không hỏi model.
+* **Requires judgment -> delegate to model.** Layout, visual rhythm, button
+  labels: one session per screen, loading only that screen's slice.
+* **Requires correctness -> write code.** Rendering pages in a browser,
+  extracting components and input constraints, verifying all screens,
+  generating the index page: deterministic work, no model needed.
 
-Màn hình độc lập nhau nên chạy lại chỉ dựng phần còn thiếu — mockup đã có
-thì bỏ qua, không trả tiền hai lần.
+Screens are independent so re-runs only generate what is missing — existing
+mockups are skipped to avoid paying twice.
 """
 
 from __future__ import annotations
@@ -50,8 +50,8 @@ class MockupResult:
 
     @property
     def needs_human(self) -> bool:
-        """Cổng mockup **luôn** đáng để người nhìn: máy kiểm được có đủ
-        component không, không kiểm được nó có dùng được không."""
+        """Mockup gate **always** warrants human review: the machine can check
+        whether components exist, but not whether they are usable."""
         return True
 
     def machine_checks(self) -> dict[str, str]:
@@ -82,7 +82,7 @@ class MockupResult:
 
 
 def build_prompt(screen: Screen, experience: Experience, artifact_root: Path) -> str:
-    """Prompt cho một màn hình — chỉ lát cắt của nó, không phải cả tài liệu."""
+    """Prompt for a single screen — only its slice, not the full document."""
     rules = [
         f"- {name}: {experience.component_rules.get(name, '')}".rstrip(": ")
         for name in screen.components
@@ -118,7 +118,7 @@ def generate(
     force: bool = False,
     only: list[str] | None = None,
 ) -> MockupResult:
-    """Dựng mockup còn thiếu, trích hợp đồng, chạy cổng máy."""
+    """Generate missing mockups, extract the design contract, run the machine gate."""
     from .plan import ARTIFACT_ROOT
 
     project = Path(project)
@@ -175,7 +175,7 @@ def extract(
     experience: Experience,
     stories: list | None = None,
 ) -> tuple[DesignContract, GateResult]:
-    """Dựng mockup trong trình duyệt thật rồi trích hợp đồng + chạy cổng."""
+    """Render mockups in a real browser, then extract the design contract and run the gate."""
     jobs = []
     for screen in experience.screens:
         html = mockup_path(artifact_root, screen.id)
@@ -189,8 +189,8 @@ def extract(
     rendered = browser.render(jobs, project=artifact_root.parent)
     if rendered.unavailable:
         gate = GateResult("machine gate: mockup")
-        # Không giả vờ đạt. Thiếu trình duyệt thì hợp đồng không tồn tại, và
-        # bước map mockup ở GĐ-6 sẽ không có gì để đối chiếu.
+        # Do not pretend to pass. Without a browser the contract does not exist,
+        # and the mockup-map step in phase 6 will have nothing to compare against.
         gate.errors.append(f"could not extract design contract: {rendered.unavailable}")
         return DesignContract(), gate
 
@@ -200,10 +200,10 @@ def extract(
 
 
 def write_index(artifact_root: Path, res: MockupResult) -> Path | None:
-    """Trang mục lục — để người duyệt xem hết màn hình bằng một lần mở.
+    """Index page — lets the reviewer see all screens in one open.
 
-    Cổng mockup là cổng người: bắt họ mở lần lượt sáu file thì phần lớn sẽ
-    chỉ mở file đầu.
+    The mockup gate is a human gate: forcing them to open six files one by one
+    means most will only open the first.
     """
     if not res.experience:
         return None
@@ -277,11 +277,11 @@ _INDEX_TEMPLATE = """<!doctype html>
 
 
 def describe_contract(data: dict, artifact_root: Path) -> str:
-    """Tóm tắt hợp đồng thị giác cho người duyệt.
+    """Summarize the visual contract for the reviewer.
 
-    Người duyệt mockup cần **nhìn**, nên thứ đầu tiên phải là đường dẫn
-    trang mục lục; phần chữ chỉ nói cái mắt không thấy: component nào đã
-    thành cam kết máy sẽ kiểm.
+    Mockup reviewers need to **look**, so the first thing must be the index
+    page path; the text only describes what the eye cannot see: which
+    components became machine-verified commitments.
     """
     lines = [f"Open: {artifact_root / MOCKUP_DIR / 'index.html'}", ""]
     for screen in data.get("screens", []):

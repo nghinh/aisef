@@ -1,19 +1,20 @@
-"""Lọc kho cybersecurity-skills xuống phần dùng được cho SDLC.
+"""Filter the cybersecurity-skills repo down to the SDLC-relevant subset.
 
-Kho `references/cybersecurity-skills` có 818 skill trải 45 subdomain, phần lớn
-phục vụ SOC, forensics, ICS, red team — không liên quan việc xây phần mềm.
-Nạp cả kho vào một dự án vừa vô ích vừa nguy hiểm.
+The `references/cybersecurity-skills` repo has 818 skills across 45 subdomains,
+most serving SOC, forensics, ICS, red team — unrelated to building software.
+Loading the entire repo into a project is both useless and dangerous.
 
-Bộ lọc chia ba nhóm:
+The filter classifies into three groups:
 
-* ``KEEP``          — phục vụ xây phần mềm an toàn, cài mặc định.
-* ``OFFENSIVE``     — tấn công / lưỡng dụng. **Không bao giờ cài mặc định.**
-                      Theo ADR: chỉ bật khi có Security Agent, uỷ quyền tường
-                      minh và sandbox.
-* ``OUT_OF_SCOPE``  — an ninh chính đáng nhưng không thuộc vòng đời phát triển.
+* ``KEEP``          — serves secure software development, installed by default.
+* ``OFFENSIVE``     — attack / dual-use. **Never installed by default.**
+                      Per ADR: enabled only with a Security Agent, explicit
+                      authorization, and sandbox.
+* ``OUT_OF_SCOPE``  — legitimate security but outside the development lifecycle.
 
-Phân loại dựa vào metadata thật trong frontmatter (``subdomain``, ``tags``) và
-động từ mở đầu tên skill — kho này đặt tên rất nhất quán theo động từ.
+Classification is based on real metadata in frontmatter (``subdomain``, ``tags``)
+and the leading verb of the skill name — this repo names skills very consistently
+by verb.
 """
 
 from __future__ import annotations
@@ -31,7 +32,7 @@ class Verdict(str, Enum):
     OUT_OF_SCOPE = "out_of_scope"
 
 
-#: Subdomain phục vụ trực tiếp việc xây phần mềm.
+#: Subdomains that directly serve software development.
 IN_SCOPE_SUBDOMAINS = frozenset({
     "application-security",
     "web-application-security",
@@ -55,7 +56,7 @@ IN_SCOPE_SUBDOMAINS = frozenset({
     "cloud-security",
 })
 
-#: Subdomain thuần tấn công.
+#: Purely offensive subdomains.
 OFFENSIVE_SUBDOMAINS = frozenset({
     "red-teaming",
     "red-team",
@@ -64,7 +65,7 @@ OFFENSIVE_SUBDOMAINS = frozenset({
     "purple-team",
 })
 
-#: Động từ mở đầu thể hiện hành vi tấn công.
+#: Leading verbs indicating offensive behavior.
 OFFENSIVE_VERBS = frozenset({
     "exploiting",
     "abusing",
@@ -78,9 +79,9 @@ OFFENSIVE_VERBS = frozenset({
     "post",  # post-exploiting-*
 })
 
-#: Động từ quan sát/phòng thủ. Vô hiệu hoá các từ khoá tấn công "mềm" —
-#: "detecting-attacks-on-scada" và "auditing-rbac-privilege-escalation" đều là
-#: phòng thủ, dù tên chứa "attack" / "privilege-escalation".
+#: Observation/defensive verbs. Neutralize "soft" offensive keywords —
+#: "detecting-attacks-on-scada" and "auditing-rbac-privilege-escalation" are both
+#: defensive, even though their names contain "attack" / "privilege-escalation".
 DEFENSIVE_VERBS = frozenset({
     "detecting",
     "hunting",
@@ -101,8 +102,8 @@ DEFENSIVE_VERBS = frozenset({
     "extracting",
 })
 
-#: Từ khoá chỉ đích danh hạ tầng tấn công. Chặn **bất kể** động từ — một skill
-#: "audit" bằng bộ công cụ C2 vẫn là năng lực tấn công.
+#: Keywords naming offensive infrastructure explicitly. Blocked **regardless** of
+#: verb — an "audit" skill using a C2 toolkit is still an offensive capability.
 HARD_OFFENSIVE_MARKERS = frozenset({
     "c2",
     "command-and-control",
@@ -115,8 +116,8 @@ HARD_OFFENSIVE_MARKERS = frozenset({
     "cobalt-strike",
 })
 
-#: Từ khoá mô tả *kỹ thuật* tấn công. Chỉ chặn khi khung hành động không phải
-#: phòng thủ — audit hay phát hiện kỹ thuật đó là việc chính đáng.
+#: Keywords describing offensive *techniques*. Blocked only when the action frame
+#: is not defensive — auditing or detecting these techniques is legitimate work.
 SOFT_OFFENSIVE_MARKERS = frozenset({
     "attack",
     "exploit",
@@ -139,13 +140,13 @@ class Classification:
 
 
 def classify(skill: Skill) -> Classification:
-    """Xếp một skill vào một trong ba nhóm.
+    """Classify one skill into one of three groups.
 
-    Thứ tự kiểm tra có chủ đích: động từ phòng thủ được xét trước để một skill
-    *phát hiện* tấn công không bị nhầm thành skill *thực hiện* tấn công.
-    Ngoài ra luôn kiểm tra tấn công trước phạm vi, nên một skill tấn công nằm
-    trong subdomain hợp lệ (ví dụ tiêm SQL trong ``web-application-security``)
-    vẫn bị chặn.
+    Check order is deliberate: defensive verbs are evaluated first so a skill
+    that *detects* an attack isn't mistaken for one that *performs* it.
+    Additionally, offensive checks always precede scope checks, so an offensive
+    skill in a valid subdomain (e.g. SQL injection under
+    ``web-application-security``) is still blocked.
     """
     sub = skill.subdomain.strip().lower()
     verb = skill.verb
@@ -173,7 +174,7 @@ def classify(skill: Skill) -> Classification:
 
 
 def classify_all(root: Path) -> list[Classification]:
-    """Đọc và phân loại toàn bộ skill dưới `root`."""
+    """Read and classify all skills under `root`."""
     return [classify(s) for s in scan(root)]
 
 
@@ -184,10 +185,10 @@ def summarize(results: list[Classification]) -> dict[str, int]:
     return counts
 
 
-# ------------------------------------------------------------------ tầng 2
+# ------------------------------------------------------------------ tier 2
 
-#: Subdomain cần bất kể dự án dùng gì — mọi phần mềm đều có phụ thuộc, bí
-#: mật, và lỗ hổng cần xử lý.
+#: Subdomains needed regardless of the project's stack — all software has
+#: dependencies, secrets, and vulnerabilities to manage.
 ALWAYS_RELEVANT = frozenset({
     "devsecops",
     "supply-chain-security",
@@ -198,9 +199,9 @@ ALWAYS_RELEVANT = frozenset({
     "governance-risk-compliance",
 })
 
-#: Công nghệ nào kéo theo subdomain nào.
+#: Which technology implies which subdomains.
 STACK_SUBDOMAINS: dict[str, frozenset[str]] = {
-    # bất kỳ backend nào cũng phơi ra API
+    # any backend exposes an API
     "backend:*": frozenset({"api-security", "web-application-security"}),
     "frontend:*": frozenset({"web-application-security"}),
     "mobile:*": frozenset({"mobile-security"}),
@@ -213,21 +214,21 @@ STACK_SUBDOMAINS: dict[str, frozenset[str]] = {
     "deploy:serverless": frozenset({"cloud-security"}),
 }
 
-#: Có xác thực người dùng thì cần nhóm định danh.
+#: User authentication present implies identity-management subdomains needed.
 AUTH_SUBDOMAINS = frozenset({
     "identity-access-management",
     "identity-and-access-management",
     "identity-security",
 })
 
-#: Từ khoá cho thấy dự án có xác thực.
+#: Keywords indicating the project has authentication.
 AUTH_MARKERS = ("auth", "login", "đăng nhập", "tài khoản", "oauth", "jwt", "sso", "phân quyền")
 
 
 def subdomains_for_stack(stack_dict: dict[str, list[str]], *, requirements_text: str = "") -> set[str]:
-    """Tập subdomain cần cho một dự án cụ thể.
+    """Set of subdomains needed for a specific project.
 
-    `stack_dict` là kết quả `detect_stack.Stack.as_dict()`.
+    `stack_dict` is the result of `detect_stack.Stack.as_dict()`.
     """
     wanted = set(ALWAYS_RELEVANT)
 
@@ -251,10 +252,10 @@ def select_for_stack(
     *,
     requirements_text: str = "",
 ) -> list[Classification]:
-    """Lọc tầng 2: từ tập đã qua tầng 1, giữ phần hợp với dự án.
+    """Tier 2 filter: from the set that passed tier 1, keep what fits the project.
 
-    Chỉ xét skill ``KEEP`` — skill tấn công không bao giờ được đưa vào,
-    bất kể stack là gì.
+    Only considers ``KEEP`` skills — offensive skills are never included,
+    regardless of the stack.
     """
     wanted = subdomains_for_stack(stack_dict, requirements_text=requirements_text)
     return [

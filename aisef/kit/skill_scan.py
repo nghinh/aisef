@@ -1,14 +1,16 @@
-"""Quét skill ngoài bằng model (S6, đợt 5) — tầng ngữ nghĩa trên tầng heuristic.
+"""Model-based external skill scan (S6, batch 5) — semantic layer above heuristics.
 
-`registry.verify_structure` bắt câu tiêm *theo mẫu* (regex) và bí mật; tầng
-này hỏi một phiên model **chỉ đọc, không tool** cho từng lô SKILL.md: nội
-dung có chỉ dẫn lái agent ra ngoài nhiệm vụ không (rò dữ liệu, tắt guard,
-chạy lệnh mạng/xoá, đọc bí mật, mở rộng quyền, "bỏ qua luật ở trên"…).
+`registry.verify_structure` catches injection phrases *by pattern* (regex) and
+secrets; this layer asks a **read-only, no-tool** model session for each batch
+of SKILL.md files: does the content contain directives steering the agent off-task
+(data exfiltration, disabling guards, running network/delete commands, reading
+secrets, privilege escalation, "ignore the rules above"...).
 
-Phần *phán đoán* giao model; phần *đảm bảo* là code: chia lô, kiểm schema
-JSON trả về, ghi bằng chứng, và sổ đăng ký loại (`rejected`) skill bị kết
-luận `injection` — router không bao giờ mời nó. Kết luận `suspicious` chỉ ghi
-cảnh báo vào `verified.gaps` (không có dấu ✗), người đọc tự quyết.
+*Judgment* is delegated to the model; *assurance* is code: batching, validating
+the returned JSON schema, recording evidence, and the registry marking
+(`rejected`) skills concluded as `injection` — the router never offers them.
+A `suspicious` conclusion only writes a warning to `verified.gaps` (no ✗ mark);
+the human reader decides.
 """
 
 from __future__ import annotations
@@ -26,11 +28,11 @@ from . import registry as R
 
 SCAN_FILE = "skill-scan.json"
 RISKS = ("none", "suspicious", "injection")
-#: Mỗi skill đưa vào lô tối đa từng này ký tự — đủ cho SKILL.md thường; dài
-#: hơn thì phần đầu (chỉ dẫn) vẫn là chỗ tiêm hay nằm.
+#: Max characters per skill in a batch — sufficient for a typical SKILL.md;
+#: longer files still have their head (directives) where injections typically live.
 MAX_CHARS = 6000
-#: Phiên quét không được cầm tool nào: nó đọc văn bản trong prompt, không
-#: đụng đĩa — skill bị tiêm mà được cấp Bash thì chính phiên quét là nạn nhân.
+#: The scan session must hold no tools: it reads text in the prompt, no disk
+#: I/O — an injected skill with Bash access makes the scan session itself the victim.
 NO_TOOLS = ["Bash", "Write", "Edit", "Read", "Glob", "Grep", "NotebookEdit",
             "WebFetch", "WebSearch", "Task", "Skill"]
 
@@ -100,12 +102,12 @@ _JSON_BLOCK = re.compile(r"\{.*\"verdicts\".*\}", re.S)
 
 
 def parse_verdicts(text: str) -> list[Verdict]:
-    """Lấy khối JSON đầu tiên có `verdicts`; mục sai schema bị bỏ, không sập."""
+    """Extract the first JSON block containing `verdicts`; malformed entries are skipped, no crash."""
     m = _JSON_BLOCK.search(text or "")
     if not m:
         return []
     raw = m.group(0)
-    # thử cắt dần từ cuối để bỏ chữ thừa sau JSON
+    # try trimming from the end to strip trailing text after JSON
     for end in range(len(raw), 0, -1):
         if raw[end - 1] != "}":
             continue
@@ -137,7 +139,7 @@ def scan(
     batch: int = 8,
     only: list[str] | None = None,
 ) -> ScanReport:
-    """Quét mọi skill định tuyến được (hoặc `only`), ghi `skill-scan.json`."""
+    """Scan all routable skills (or `only`), write `skill-scan.json`."""
     project, artifact_root = Path(project), Path(artifact_root)
     cfg = config or Config.load(project)
     reg = R.load(artifact_root)
@@ -202,7 +204,7 @@ def load(artifact_root: Path | str) -> dict[str, Verdict]:
 
 
 def apply(reg: R.Registry, verdicts: dict[str, Verdict]) -> list[str]:
-    """Đưa kết luận vào sổ: `injection` → rejected (không định tuyến); `suspicious` → cảnh báo."""
+    """Apply verdicts to the registry: `injection` -> rejected (not routed); `suspicious` -> warning."""
     rejected: list[str] = []
     for sid, v in verdicts.items():
         e = reg.entries.get(sid)

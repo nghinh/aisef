@@ -1,7 +1,7 @@
-"""Graphify CLI adapter — ưu tiên cho brownfield.
+"""Graphify CLI adapter — preferred for brownfield projects.
 
-Gọi Graphify qua CLI (không MCP mặc định). Lần đầu chạy ``build()`` dựng
-đồ thị toàn bộ; sau đó ``build(incremental=True)`` cập nhật tăng dần.
+Calls Graphify via CLI (no MCP by default).  First ``build()`` call constructs
+the full graph; subsequent ``build(incremental=True)`` updates incrementally.
 """
 
 from __future__ import annotations

@@ -1,16 +1,16 @@
-"""Biên dịch cấu hình client từ một nguồn duy nhất.
+"""Compile client configuration from a single source of truth.
 
-Framework mô tả guard **một lần** (`harness/guardrails.GUARD_MATCHERS`),
-rồi sinh ra cấu hình cho từng client. Không duy trì ba bản `settings.json`
-viết tay dễ lệch nhau — đó là quyết định Đ3.
+The framework describes guards **once** (`harness/guardrails.GUARD_MATCHERS`),
+then generates configuration for each client.  No maintaining three hand-written
+`settings.json` files that easily drift — that is decision D3.
 
-Kết quả biên dịch là **artifact sinh ra**, không sửa tay: mỗi file mang
-dòng đầu nói rõ điều đó, và lần chạy sau sẽ ghi đè.
+Compilation output is a **generated artifact**, not hand-edited: each file
+carries a first line stating this, and the next run overwrites.
 
-Điều quan trọng nhất ở đây không phải sinh file, mà là **báo cáo mất mát**.
-Client nào không gắn được guard tiền kiểm thì compile phải nói ra, để
-người vận hành biết mức bảo đảm thật của mình — thay vì tưởng đã được bảo
-vệ (bất biến 10).
+The most important thing here is not file generation, but the **loss report**.
+When a client cannot wire pre-check guards, compile must say so, so the
+operator knows the real assurance level — instead of believing they are
+protected (invariant 10).
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ class CompileReport:
     client: str
     written: list[Path] = field(default_factory=list)
     guards_wired: list[str] = field(default_factory=list)
-    #: Guard phải kiểm sau thay vì chặn ngay — mức bảo đảm thấp hơn.
+    #: Guards that must be checked after the fact instead of blocking — lower assurance.
     guards_post_hoc: list[str] = field(default_factory=list)
     degradations: list[str] = field(default_factory=list)
 
@@ -50,8 +50,8 @@ class CompileReport:
     def summary(self) -> str:
         lines = [f"client: {self.client}"]
         if self.client == "opencode":
-            # Quyết định 2026-09-05: hạng hai trong V1. Guard chặn được (đã
-            # chứng minh), nhưng chi phí và số lượt không đo được từ harness.
+            # Decision 2026-09-05: second-tier in V1.  Guards block (proven),
+            # but cost and turn count are not measurable from the harness.
             lines.append(
                 "  second-tier in V1: cost/turns not measurable from harness — "
                 "supported, does not block release"
@@ -59,9 +59,9 @@ class CompileReport:
         for p in self.written:
             lines.append(f"  wrote {p}")
         if self.guards_wired:
-            # Không gọi hết là "tiền kiểm": `diff-scope` chạy sau mỗi thao
-            # tác và `completion` chạy lúc agent định dừng. Gộp chung sẽ báo
-            # sai mức bảo đảm mà client thật sự cho.
+            # Not all are "pre-check": `diff-scope` runs after each action
+            # and `completion` runs when the agent is about to stop.  Lumping
+            # them together misreports the assurance level the client provides.
             pre = [g for g in self.guards_wired if GUARD_MATCHERS[g][0] == "PreToolUse"]
             after = [g for g in self.guards_wired if g not in pre]
             if pre:
@@ -89,7 +89,7 @@ def _guard_command(aisef_bin: str, project: Path, kind: str) -> str:
 
 
 def build_claude_settings(project: Path, aisef_bin: str) -> dict:
-    """Dựng `.claude/settings.json` gắn mọi guard vào đúng mốc."""
+    """Build `.claude/settings.json` wiring all guards to the correct hooks."""
     by_event: dict[str, list[dict]] = {}
     for kind, (event, matcher) in sorted(GUARD_MATCHERS.items()):
         by_event.setdefault(event, []).append(
@@ -104,26 +104,28 @@ def build_claude_settings(project: Path, aisef_bin: str) -> dict:
 
 
 def build_opencode_plugin(project: Path, aisef_bin: str) -> str:
-    """Dựng plugin OpenCode gọi cùng bộ guard.
+    """Build an OpenCode plugin calling the same guard set.
 
-    Spike S4 chưa chứng minh được việc ném lỗi ở đây có **chặn** tool hay
-    chỉ ghi log, nên plugin vẫn được sinh nhưng năng lực khai là hậu kiểm.
+    Spike S4 has not yet proven whether throwing here **blocks** the tool
+    or just logs, so the plugin is still generated but the capability is
+    declared as post-hoc.
 
-    Guard được chia theo mốc, không đổ hết vào một chỗ. `completion` hỏi
-    "test đã xanh cho đoạn code hiện tại chưa" — hỏi câu đó trước **mỗi**
-    thao tác thì nó chặn cả lần chạy test đầu tiên, và một guard chặn mọi
-    thứ sẽ bị gỡ ngay trong ngày. Nó thuộc về `aisef verify`.
+    Guards are split by hook, not all dumped into one.  `completion` asks
+    "are tests green for the current code" — asking that before **every**
+    action would block even the first test run, and a guard that blocks
+    everything will be removed the same day.  It belongs in `aisef verify`.
     """
     pre = [k for k, (event, _) in sorted(GUARD_MATCHERS.items()) if event == "PreToolUse"]
     post = [k for k, (event, _) in sorted(GUARD_MATCHERS.items()) if event == "PostToolUse"]
-    # Claude Code lọc tool bằng chính chuỗi này trong `settings.json`;
-    # OpenCode không có cơ chế tương đương nên plugin phải tự lọc. Bỏ bước
-    # này thì mọi guard chạy trên mọi tool: `write-scope` sẽ chấm cả `glob`
-    # (tham số `path: "."`) rồi chặn thao tác **chỉ đọc**, và agent kẹt.
+    # Claude Code filters tools by this string in `settings.json`;
+    # OpenCode has no equivalent mechanism so the plugin must filter itself.
+    # Skipping this makes every guard run on every tool: `write-scope` would
+    # score even `glob` (arg `path: "."`) then block a **read-only** action,
+    # and the agent gets stuck.
     #
-    # Khớp không phân biệt hoa thường, có neo hai đầu: tên tool của
-    # OpenCode viết thường (`write`, `edit`, `bash`), và không neo thì
-    # `todowrite` cũng dính vào `Write`.
+    # Match is case-insensitive with anchors: OpenCode tool names are
+    # lowercase (`write`, `edit`, `bash`), and without anchors `todowrite`
+    # would also match `Write`.
     matchers = "{ " + ", ".join(
         f'"{k}": /^({m})$/i' for k, (_, m) in sorted(GUARD_MATCHERS.items()) if m
     ) + " }"
@@ -136,10 +138,10 @@ const MATCH = {matchers}
 const BIN = {json.dumps(aisef_bin)}
 const PROJECT = {json.dumps(str(project))}
 
-// Shell của OpenCode là Bun shell: nó **không** có `.stdin(...)`, chỉ nhận
-// đầu vào bằng cách chuyển hướng từ một giá trị nội suy. Gọi sai thì mọi
-// lần gọi tool đều ném TypeError — trông như guard chặn, thật ra là guard
-// chưa từng chạy.
+// OpenCode's shell is Bun shell: it **does not** have `.stdin(...)`, it only
+// accepts input via redirection from an interpolated value. Getting this wrong
+// means every tool call throws TypeError — looks like guard blocking, but the
+// guard never actually ran.
 async function guard($, kinds, tool, event) {{
   const input = new Blob([event])
   for (const kind of kinds) {{
@@ -152,12 +154,12 @@ async function guard($, kinds, tool, event) {{
   }}
 }}
 
-// `worktree` là cây agent đang thật sự đứng — khi chạy story nó là
-// .aisef/worktrees/<story>, không phải PROJECT. Guard soi nhầm cây thì
-// nó thấy toàn bộ file kế hoạch là "thay đổi ngoài phạm vi" và chặn sạch.
+// `worktree` is the tree the agent is actually standing in — during a story
+// run it is .aisef/worktrees/<story>, not PROJECT. If the guard inspects the
+// wrong tree it sees all plan files as "out-of-scope changes" and blocks everything.
 export const AisefGuardPlugin: Plugin = async ({{ $, directory, worktree }}) => {{
-  // `directory` là cwd của phiên — tương ứng đúng với `cwd` mà hook của
-  // Claude Code gửi. `worktree` là gốc cây git, chỉ dùng khi thiếu.
+  // `directory` is the session's cwd — matches the `cwd` that Claude Code's
+  // hook sends. `worktree` is the git tree root, used only as fallback.
   const CWD = directory || worktree || PROJECT
   return {{
     "tool.execute.before": async (input, output) => {{
@@ -183,7 +185,7 @@ def compile_for(
     *,
     aisef_bin: str = "aisef",
 ) -> CompileReport:
-    """Sinh cấu hình của một client, kèm báo cáo mất mát."""
+    """Generate one client's configuration, with a loss report."""
     if client not in ADAPTERS:
         raise ValueError(f"client not supported: {client}. Available: {', '.join(sorted(ADAPTERS))}")
 
@@ -215,7 +217,7 @@ def compile_for(
 
 
 def write_compile_report(project: Path | str, reports: list[CompileReport]) -> Path:
-    """Ghi báo cáo biên dịch — nguồn tra cứu mức bảo đảm thật của dự án."""
+    """Write the compile report — the source of truth for the project's real assurance level."""
     project = Path(project)
     path = project / "_bmad-output" / "compile-report.json"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -237,12 +239,12 @@ def write_compile_report(project: Path | str, reports: list[CompileReport]) -> P
 
 
 def guard_expected(project: Path | str, client_id: str) -> bool:
-    """Dự án này có **kỳ vọng** guard chạy trong phiên của client này không.
+    """Whether this project **expects** guards to run in this client's sessions.
 
-    Câu trả lời nằm trong `compile-report.json`: client đã được biên dịch
-    hook và khai `blocks_at_source` thì mỗi phiên developer phải để lại ít
-    nhất một dấu vết guard. Chưa biên dịch thì không kỳ vọng — và cổng
-    nói "chưa biên dịch", không giả vờ đã kiểm.
+    The answer lives in `compile-report.json`: if the client's hooks were
+    compiled and it declares `blocks_at_source`, every developer session must
+    leave at least one guard trace.  Not compiled means no expectation — and
+    the gate says "not compiled", not pretending checks ran.
     """
     path = Path(project) / "_bmad-output" / "compile-report.json"
     if not path.is_file():

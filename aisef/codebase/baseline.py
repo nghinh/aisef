@@ -1,8 +1,9 @@
-"""Baseline builder — dựng ảnh chụp trạng thái hiện tại của dự án brownfield.
+"""Baseline builder — snapshot the current state of a brownfield project.
 
-Kết quả là ``baseline.md`` dưới ``_bmad-output/`` — mô tả hệ thống hiện tại
-mà agent dùng làm ngữ cảnh khi nhận change request. Framework coi mã nguồn
-là ground truth; tài liệu brownfield stale được ghi nhận chứ không bỏ qua.
+The output is ``baseline.md`` under ``_bmad-output/`` — a description of the
+existing system that the agent uses as context when receiving change requests.
+The framework treats source code as ground truth; stale brownfield docs are
+acknowledged, not silently ignored.
 """
 
 from __future__ import annotations
@@ -25,7 +26,7 @@ _SKIP_DIRS = {
 
 
 def _tree(project: Path, max_depth: int = 3, max_items: int = 200) -> str:
-    """Cây thư mục nông — đủ để thấy cấu trúc, không đủ để tràn."""
+    """Shallow directory tree — enough to see structure, not enough to overflow."""
     lines: list[str] = []
     count = 0
     for root, dirs, files in os.walk(project):
@@ -50,7 +51,7 @@ def _tree(project: Path, max_depth: int = 3, max_items: int = 200) -> str:
 
 
 def _git_info(project: Path) -> dict:
-    """Thông tin git cơ bản."""
+    """Basic git information."""
     info: dict = {}
     try:
         info["branch"] = subprocess.run(
@@ -75,7 +76,7 @@ def _git_info(project: Path) -> dict:
 
 
 def _existing_docs(project: Path) -> list[str]:
-    """Tìm tài liệu hiện có."""
+    """Find existing documentation files."""
     docs: list[str] = []
     for name in ("README.md", "CHANGELOG.md", "CONTRIBUTING.md",
                  "ARCHITECTURE.md", "DESIGN.md"):
@@ -102,9 +103,9 @@ def build_baseline(
     provider: CodebaseGraphProvider | None = None,
     output: Path | None = None,
 ) -> str:
-    """Dựng baseline.md — ảnh chụp trạng thái hiện tại.
+    """Build baseline.md — current-state snapshot.
 
-    Trả về nội dung Markdown. Ghi vào ``output`` nếu được truyền.
+    Returns Markdown content.  Writes to ``output`` if provided.
     """
     sig = detect(project)
     if not sig.is_brownfield:

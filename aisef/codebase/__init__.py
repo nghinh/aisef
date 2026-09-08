@@ -1,4 +1,4 @@
-"""Codebase knowledge graph — trừu tượng hoá, nhà cung cấp, phát hiện brownfield."""
+"""Codebase knowledge graph — abstraction, providers, brownfield detection."""
 
 from .provider import (
     BuildResult,

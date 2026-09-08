@@ -1,5 +1,5 @@
-"""Giữ nguyên `python -m aisef.cli` — trước khi tách, `cli.py` có khối
-``if __name__ == "__main__"`` làm đúng việc này."""
+"""Preserve ``python -m aisef.cli`` — before the split, ``cli.py`` had an
+``if __name__ == "__main__"`` block that did exactly this."""
 
 import sys
 

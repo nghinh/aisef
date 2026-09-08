@@ -1,17 +1,18 @@
-"""Guard — code tất định chạy tại mốc vòng đời.
+"""Guard — deterministic code that runs at lifecycle checkpoints.
 
-Đây là chỗ dành cho những điều agent **không được phép quên**, và cách duy
-nhất bảo đảm là không trông vào việc nó nhớ. Mỗi guard là một hàm thuần:
-nhận sự kiện, trả phán quyết. Không đọc trạng thái toàn cục, không ghi gì —
-nhờ vậy kiểm được bằng test và chạy được ở mọi client.
+This is where things the agent **must not forget** live, and the only
+guarantee is not relying on the agent remembering. Each guard is a pure
+function: receives an event, returns a verdict. No global state reads, no
+writes — so it is testable and runs on any client.
 
-Quy ước mã thoát theo Claude Code (đã kiểm chứng ở spike S2): **thoát 2 là
-chặn**, và stderr được chuyển vào kết quả tool cho agent đọc. Vì thế lý do
-chặn phải viết cho agent hiểu và sửa được, không phải viết cho log.
+Exit code convention follows Claude Code (verified in spike S2): **exit 2
+means block**, and stderr is forwarded into the tool result for the agent
+to read. Therefore block reasons must be written so the agent can understand
+and fix, not for logs.
 
-Phạm vi ghi của story truyền qua biến môi trường ``AISEF_WRITE_SCOPE``.
-Guard cố ý **không** tự tra `stories.index.json`: giữ nó thuần và nhanh,
-việc tra cứu là của bộ chạy story.
+Story write scope is passed via the ``AISEF_WRITE_SCOPE`` environment
+variable. Guards intentionally do **not** look up `stories.index.json`:
+keeps them pure and fast; lookup is the story runner's job.
 """
 
 from __future__ import annotations
@@ -27,26 +28,28 @@ from .observe import TOOL_RUN
 ENV_WRITE_SCOPE = "AISEF_WRITE_SCOPE"
 ENV_STORY_ID = "AISEF_STORY_ID"
 ENV_BASE_REF = "AISEF_BASE_REF"
-#: Cây làm việc của story. Harness **biết** đường này — chính nó dựng
-#: worktree — nên không việc gì phải hỏi client. Client báo sai (hoặc
-#: model tự đặt `workdir` khác) thì guard vẫn soi đúng cây.
+#: Story working tree. The harness **knows** this path — it creates the
+#: worktree itself — so there is no need to ask the client. If the client
+#: reports wrong (or the model sets a different `workdir`), the guard still
+#: inspects the correct tree.
 ENV_WORKDIR = "AISEF_WORKDIR"
-#: Tool vai này bị cấm, cách nhau bằng dấu phẩy. Claude Code có
-#: `--disallowed-tools`; OpenCode khai "emulated qua permission config"
-#: nhưng không có mã nào sinh config ấy — người rà soát trên OpenCode ghi
-#: được code. Cấm ở guard thì mọi client đều cấm, và Claude có thêm một
-#: lớp phòng khi cờ bị bỏ quên.
+#: Tools disallowed for this role, comma-separated. Claude Code has
+#: `--disallowed-tools`; OpenCode claims "emulated via permission config"
+#: but no code generates that config — reviewers on OpenCode can write
+#: code. Blocking in the guard ensures all clients block, and Claude gets
+#: an extra layer when the flag is forgotten.
 ENV_DISALLOWED_TOOLS = "AISEF_DISALLOWED_TOOLS"
-#: Danh sách host được phép kết nối, phân cách dấu phẩy. Rỗng = không kiểm.
+#: Allowed hosts for outbound connections, comma-separated. Empty = no check.
 ENV_ALLOW_HOSTS = "AISEF_ALLOW_HOSTS"
-#: Gốc dự án — harness khai qua env. Hook biên dịch ghim `--project` tuyệt
-#: đối; dự án bị chép/di chuyển thì guard vẫn chạy nhưng ghi bằng chứng vào
-#: dự án cũ (đo A/B `par-A` 2026-09-05: 4 lượt trượt "guard có chạy" sai).
+#: Project root — harness declares via env. Compiled hook pins `--project`
+#: as absolute; if the project is copied/moved the guard still runs but
+#: writes evidence to the old project (measured A/B `par-A` 2026-09-05:
+#: 4 false "guard ran" failures).
 ENV_PROJECT = "AISEF_PROJECT"
 
-#: Phạm vi ghi khi **không** ở trong một story: các pha lập kế hoạch và
-#: dựng mockup. Chúng có phạm vi cố định và biết trước, nên guard vẫn có
-#: nghĩa — thay vì phải tắt đi ở nửa vòng đời.
+#: Write scope when **not** inside a story: planning and mockup phases.
+#: These have a fixed, known scope, so guards still apply — instead of
+#: having to be disabled for the first half of the lifecycle.
 PLANNING_SCOPE = ("_bmad-output", "docs")
 
 
@@ -63,7 +66,7 @@ class Verdict:
 ALLOW = Verdict(True)
 
 
-# ------------------------------------------------------------ phạm vi ghi
+# ------------------------------------------------------------ write scope
 
 
 def _norm(p: str) -> PurePosixPath:
@@ -71,24 +74,24 @@ def _norm(p: str) -> PurePosixPath:
 
 
 def _within(path: str, scope: str) -> bool:
-    """`path` có nằm trong `scope` không — so theo đoạn đường dẫn.
+    """Is `path` within `scope` — compared by path segments.
 
-    So tiền tố chuỗi sẽ coi `src/apidocs/x.py` là nằm trong `src/api`, mà
-    đó là hai vùng khác nhau.
+    String-prefix comparison would treat `src/apidocs/x.py` as within
+    `src/api`, but those are two different areas.
     """
     p, s = _norm(path), _norm(scope)
     return p == s or s in p.parents
 
 
 def check_write_scope(file_path: str, scope: list[str], *, project_root: str = "") -> Verdict:
-    """Chặn ghi ra ngoài phạm vi story.
+    """Block writes outside the story's scope.
 
-    Phạm vi rỗng nghĩa là **chưa khai**, và chưa khai thì không cho ghi —
-    mặc định mở sẽ biến guard thành thứ trang trí ngay lần đầu ai đó quên
-    truyền biến môi trường.
+    Empty scope means **not declared**, and undeclared means no writes
+    allowed — defaulting to open would turn the guard into decoration the
+    first time someone forgets to pass the environment variable.
     """
     if not file_path:
-        return ALLOW  # không phải thao tác lên file
+        return ALLOW  # not a file operation
 
     if not scope:
         return Verdict(
@@ -118,10 +121,10 @@ def check_write_scope(file_path: str, scope: list[str], *, project_root: str = "
     )
 
 
-# ------------------------------------------------------------ bí mật
+# ------------------------------------------------------------ secrets
 
-#: Mẫu bí mật. Nhắm vào những thứ có hình dạng đặc trưng, không đoán mò —
-#: một chuỗi ngẫu nhiên dài chưa chắc là khoá, nhưng `sk-ant-...` thì chắc.
+#: Secret patterns. Targets things with distinctive shapes, no guesswork —
+#: a long random string may not be a key, but `sk-ant-...` certainly is.
 SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("Anthropic API key", re.compile(r"sk-ant-[A-Za-z0-9_\-]{20,}")),
     ("OpenAI API key", re.compile(r"\bsk-[A-Za-z0-9]{32,}")),
@@ -129,9 +132,10 @@ SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("token GitHub", re.compile(r"\bgh[pousr]_[A-Za-z0-9]{30,}")),
     ("private key", re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----")),
     ("token Slack", re.compile(r"\bxox[baprs]-[A-Za-z0-9\-]{10,}")),
-    # Hai mẫu thêm cho ADR-005 V1: khoá bí mật AWS (đúng 40 ký tự base64) và
-    # token Bearer — hai thứ hay lọt vào stdout của test tích hợp chứ không
-    # vào mã nguồn, nên bộ mẫu cũ (nhắm mã nguồn) chưa từng cần.
+    # Two patterns added for ADR-005 V1: AWS secret key (exactly 40 base64
+    # chars) and Bearer token — these tend to leak into integration test
+    # stdout rather than source code, so the old patterns (aimed at source)
+    # never needed them.
     ("AWS secret key", re.compile(r"\bAWS_SECRET_ACCESS_KEY\s*[=:]\s*['\"]?[A-Za-z0-9/+=]{40}\b")),
     ("token Bearer", re.compile(r"\bBearer\s+[A-Za-z0-9._\-]{20,}")),
     ("password assignment", re.compile(
@@ -140,7 +144,7 @@ SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     )),
 ]
 
-#: Giá trị giữ chỗ — có hình dạng bí mật nhưng rõ ràng là ví dụ.
+#: Placeholder values — shaped like secrets but clearly examples.
 PLACEHOLDER_MARKERS = (
     "example", "placeholder", "your-", "xxx", "changeme", "dummy",
     "<", "{{", "${", "os.environ", "process.env", "getenv",
@@ -148,11 +152,11 @@ PLACEHOLDER_MARKERS = (
 
 
 def check_secrets(content: str) -> Verdict:
-    """Chặn bí mật lọt vào mã nguồn.
+    """Block secrets from leaking into source code.
 
-    Bỏ qua dòng có dấu hiệu giữ chỗ hoặc đọc từ biến môi trường — chặn
-    `API_KEY = os.environ["X"]` sẽ khiến người ta tắt guard đi, và một guard
-    bị tắt còn tệ hơn không có.
+    Skips lines with placeholder markers or env-var reads — blocking
+    `API_KEY = os.environ["X"]` would make people disable the guard, and
+    a disabled guard is worse than none.
     """
     if not content:
         return ALLOW
@@ -175,12 +179,13 @@ REDACTED = "[REDACTED]"
 
 
 def scrub_secrets(text: str) -> tuple[str, int]:
-    """Che mọi chuỗi khớp `SECRET_PATTERNS` bằng `[REDACTED]`; trả (văn bản, số chỗ che).
+    """Redact all strings matching `SECRET_PATTERNS` with `[REDACTED]`; returns (text, count).
 
-    Dùng cho **bằng chứng** — stdout/stderr của test/lint/qa ghi vào
-    `_bmad-output`, thư mục được commit theo dự án (ADR-005 V1). Khác
-    `check_secrets`, không bỏ qua dòng "giữ chỗ": che nhầm một ví dụ là vô
-    hại, còn bỏ sót một khoá thật thì nó đã nằm trong lịch sử git.
+    Used for **evidence** — test/lint/qa stdout/stderr written to
+    `_bmad-output`, a directory committed with the project (ADR-005 V1).
+    Unlike `check_secrets`, does not skip "placeholder" lines: redacting
+    an example is harmless, but missing a real key means it is already in
+    git history.
     """
     if not text:
         return text, 0
@@ -191,23 +196,24 @@ def scrub_secrets(text: str) -> tuple[str, int]:
     return text, total
 
 
-# ------------------------------------------------------------ lệnh shell
+# ------------------------------------------------------------ shell commands
 
-#: `git` có thể mang cờ toàn cục trước lệnh con: `-C <dir>`, `-c k=v`, `--no-pager`.
+#: `git` can carry global flags before the subcommand: `-C <dir>`, `-c k=v`, `--no-pager`.
 _GIT = r"\bgit\b(?:\s+-[Cc]\s+\S+|\s+-\S+)*\s+"
 
-#: Lệnh phá huỷ — chặn thẳng, kể cả khi agent nghĩ nó đang dọn dẹp.
+#: Destructive commands — blocked outright, even if the agent thinks it is cleaning up.
 DESTRUCTIVE_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("git reset --hard", re.compile(r"\bgit\s+reset\s+(--\S+\s+)*--hard\b")),
     ("git checkout bỏ thay đổi", re.compile(r"\bgit\s+checkout\s+--\s")),
     ("git clean", re.compile(r"\bgit\s+clean\b.*-[a-z]*f")),
-    # ADR-005 V2: **mọi** dạng push (kể cả `--dry-run`, vì nó vẫn xác thực với
-    # remote) và đổi remote. Push/merge là việc của harness sau cổng
-    # (`worktree.merge_story`); agent chỉ commit trên nhánh story.
+    # ADR-005 V2: **all** forms of push (including `--dry-run`, since it still
+    # authenticates with the remote) and remote changes. Push/merge is the
+    # harness's job after the gate (`worktree.merge_story`); agent only
+    # commits on the story branch.
     ("git push — push/merge là việc của harness sau cổng", re.compile(_GIT + r"push\b")),
     ("git remote add/set-url — remote là của harness", re.compile(_GIT + r"remote\s+(?:add|set-url)\b")),
-    # Bộ `GIT_NO_CREDENTIALS` (clients/base.py) xoá helper; agent không được
-    # bật lại bằng `-c credential.helper=…` hay gọi thẳng `git credential(-osxkeychain)`.
+    # `GIT_NO_CREDENTIALS` (clients/base.py) removes the helper; agent must not
+    # re-enable via `-c credential.helper=...` or call `git credential(-osxkeychain)` directly.
     ("git credential — phiên agent không cầm credential của máy",
      re.compile(_GIT + r"credential(?:-\w+)?\b|\bgit\b.*\s-c\s*credential\.")),
     ("xoá đệ quy", re.compile(r"\brm\s+(-\w*\s+)*-\w*[rR]\w*f|\brm\s+-fr\b")),
@@ -218,10 +224,10 @@ _GIT_ADD_ALL = re.compile(r"\bgit\s+add\s+(.*\s)?(-A\b|--all\b|\.(\s|$))")
 
 
 def check_git_stage(command: str) -> Verdict:
-    """Chặn `git add -A` và `git add .`.
+    """Block `git add -A` and `git add .`.
 
-    Lệnh gộp nuốt cả file rác lẫn thay đổi của story khác đang chạy song
-    song trong worktree bên cạnh.
+    Bulk-add swallows junk files and changes from other stories running
+    in parallel in adjacent worktrees.
     """
     if not command or not _GIT_ADD_ALL.search(command):
         return ALLOW
@@ -233,7 +239,7 @@ def check_git_stage(command: str) -> Verdict:
 
 
 def check_destructive(command: str) -> Verdict:
-    """Chặn lệnh phá huỷ công việc chưa lưu."""
+    """Block commands that destroy unsaved work."""
     if not command:
         return ALLOW
     for label, pattern in DESTRUCTIVE_PATTERNS:
@@ -246,24 +252,26 @@ def check_destructive(command: str) -> Verdict:
     return ALLOW
 
 
-# ------------------------------------------------------------ tiêm mã
+# ------------------------------------------------------------ injection
 
-#: Mỗi rủi ro có **hai** mẫu, một cho mỗi họ ngôn ngữ framework gặp thật.
-#: Guard chỉ biết mẫu Python thì trên dự án TypeScript nó có mặt mà không
-#: bao giờ nổ — cùng loại sai với "chưa cấu hình bị đếm là đạt", và tệ hơn
-#: vì báo cáo vẫn ghi "7 guard đã nối".
+#: Each risk has **two** patterns, one per language family actually encountered.
+#: A guard that only knows the Python pattern is present but never fires on a
+#: TypeScript project — same class of bug as "unconfigured counts as pass",
+#: and worse because the report still says "7 guards wired".
 #:
-#: Tách theo họ chứ không gộp một mẫu chung, vì dấu hiệu nội suy khác nhau
-#: và gộp lại thì chúng bắt chéo nhau: `{` chỉ có nghĩa nội suy khi chuỗi
-#: có tiền tố `f` của Python, còn trong JS nó là object tuỳ chọn — mẫu gộp
-#: chặn oan `execFileSync('git', ['ls-files'], { cwd })`, đúng dạng **an
-#: toàn** mà guard lẽ ra phải khuyến khích.
+#: Split by family rather than one merged pattern, because interpolation
+#: markers differ and merging causes cross-matches: `{` only means
+#: interpolation when the string has Python's `f` prefix, while in JS it is
+#: an optional object — a merged pattern falsely blocks
+#: `execFileSync('git', ['ls-files'], { cwd })`, a **safe** form the guard
+#: should encourage.
 #:
-#: Chỗ khó riêng của JS là `exec(`: `re.exec(s)` của RegExp phổ biến hơn
-#: nhiều so với `child_process.exec`. Phân biệt bằng **đối số**: chỉ nổ khi
-#: ngay sau ngoặc là chuỗi hoặc template. `re.exec(bien)` truyền biến nên
-#: không dính; đổi lại bỏ sót `exec(chuoi_da_ghep_san)` — thà bỏ sót còn
-#: hơn chặn oan mọi lần dùng biểu thức chính quy.
+#: JS-specific difficulty with `exec(`: RegExp's `re.exec(s)` is far more
+#: common than `child_process.exec`. Distinguished by **argument**: only
+#: fires when right after the paren is a string or template. `re.exec(var)`
+#: passes a variable so it does not match; the trade-off is missing
+#: `exec(pre_built_string)` — better to miss that than false-block every
+#: regex usage.
 _SQL = r"\b(select|insert|update|delete)\b"
 _SHELL_PY = r"os\.system|subprocess\.\w+|commands\.getoutput"
 _SHELL_JS = (
@@ -295,20 +303,20 @@ INJECTION_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
 ]
 
 
-#: Luật 6 hiến pháp: không ghi số hiệu story/epic vào mã nguồn. Ngoại lệ có
-#: chủ đích: tệp test (mã `AC-<story>-<i>` **phải** nằm trong tên test — G5),
-#: tài liệu, artifact của harness.
+#: Constitution rule 6: do not write story/epic IDs into source code.
+#: Intentional exceptions: test files (`AC-<story>-<i>` **must** appear in
+#: test names — G5), documentation, harness artifacts.
 _PROCESS_REF = re.compile(r"\b(?:STORY|EPIC)-\d+(?:-\d+)?\b")
 _REF_ALLOWED_DIRS = ("docs/", "_bmad-output/", ".ai/", ".claude/", ".opencode/", ".aisef/", "bench/")
 _REF_ALLOWED_SUFFIX = (".md", ".txt", ".json", ".yaml", ".yml", ".csv")
 
 
 def check_process_refs(content: str, path: str, *, project_root: str = "") -> Verdict:
-    """Luật 6: mã tham chiếu quy trình (`STORY-01-02`, `EPIC-01`) không được
-    nằm trong mã nguồn. Test và tài liệu được phép — test còn bắt buộc mang
-    mã tiêu chí. So thư mục trên đường dẫn **tương đối với gốc**: đường dẫn
-    tuyệt đối của worktree chứa `.aisef/worktrees/` và khớp nhầm bảng cho
-    phép (hợp quy C6 trên OpenCode, 2026-09-05)."""
+    """Rule 6: process references (`STORY-01-02`, `EPIC-01`) must not appear
+    in source code. Tests and docs are allowed — tests are even required to
+    carry acceptance-criteria codes. Directory matching uses paths **relative
+    to root**: worktree absolute paths contain `.aisef/worktrees/` and
+    falsely match the allow list (conformance C6 on OpenCode, 2026-09-05)."""
     from ..control.impact import is_test_path
 
     rel = path.replace("\\", "/")
@@ -345,20 +353,20 @@ def check_injection(content: str) -> Verdict:
     return ALLOW
 
 
-# ------------------------------------------------------------ điều phối
+# ------------------------------------------------------------ orchestration
 
 
-# ------------------------------------------------------------ phạm vi diff
+# ------------------------------------------------------------ diff scope
 
 
 def check_diff_scope(changed: list[str], scope: list[str]) -> Verdict:
-    """Chặn khi file **ngoài phạm vi** đã bị đổi.
+    """Block when files **outside scope** have been changed.
 
-    `write-scope` chặn từng thao tác ghi mà harness nhìn thấy. Guard này
-    hỏi câu khác: sau tất cả những gì đã xảy ra, cây làm việc có đúng
-    phạm vi không. Nó bắt được cả đường đi vòng — script tự sinh file, lệnh
-    di chuyển file, hoặc client không gắn được hook tiền kiểm (OpenCode ở
-    mức hậu kiểm) — vì nó đọc kết quả chứ không đọc ý định.
+    `write-scope` blocks each write operation the harness observes. This
+    guard asks a different question: after everything that happened, is the
+    working tree within scope. It catches indirect paths — scripts generating
+    files, file moves, or clients that cannot attach a pre-check hook
+    (OpenCode is post-check only) — because it reads outcomes, not intent.
     """
     if not changed:
         return ALLOW
@@ -380,26 +388,28 @@ def check_diff_scope(changed: list[str], scope: list[str]) -> Verdict:
     )
 
 
-#: Đường dẫn do **harness** ghi trong lúc chạy, không phải agent: bằng
-#: chứng, trạng thái đợt, bản ghi phê duyệt, worktree. Không loại chúng ra
-#: thì chính việc harness ghi trạng thái lại bị tính là story ghi ra ngoài
-#: phạm vi — guard tự tố cáo mình và mọi story đều trượt.
+#: Paths written by the **harness** at runtime, not the agent: evidence,
+#: sprint state, approval records, worktree. Without excluding these, the
+#: harness's own state writes would count as out-of-scope story writes —
+#: the guard would incriminate itself and every story would fail.
 #:
-#: Cố ý **không** loại cả `_bmad-output`: tài liệu kế hoạch (PRD, kiến
-#: trúc, epic, hợp đồng thị giác, chỉ mục story) là thứ agent sửa trộm thì
-#: phải lộ ra — sửa `stories.index.json` là sửa chính phạm vi ràng buộc nó.
-#: Phụ thuộc cài đặt và tạo tác build. Chúng xuất hiện vì story **chạy**,
-#: không phải vì story **viết** — tính vào phạm vi thì mọi story cài phụ
-#: thuộc đều trượt, và cách duy nhất chạy tiếp là nới phạm vi đến mức guard
-#: không còn nghĩa gì. Dự án có `.gitignore` đúng thì git đã loại sẵn;
-#: danh sách này là lưới an toàn cho lúc `.gitignore` chưa kịp có.
+#: Intentionally does **not** exclude all of `_bmad-output`: planning docs
+#: (PRD, architecture, epic, visual contract, story index) are things that
+#: must be visible if the agent sneaks edits — editing `stories.index.json`
+#: is editing the very scope that constrains it.
+#: Installed dependencies and build artifacts. They appear because the story
+#: **runs**, not because it **writes** — counting them in scope means every
+#: story that installs dependencies fails, and the only way forward is
+#: widening scope until the guard is meaningless. Projects with a correct
+#: `.gitignore` already exclude these; this list is the safety net for when
+#: `.gitignore` does not exist yet.
 VENDOR_PATHS = (
     "node_modules", ".venv", "venv", "vendor", "target", "dist", "build",
     "__pycache__", ".pytest_cache", ".ruff_cache", ".next", ".turbo",
     "coverage", ".gradle", "Pods",
-    # Tạo tác của chính công cụ agent dùng để làm việc: ảnh chụp, trace,
-    # báo cáo. Chúng ở gốc dự án nhưng không phải sản phẩm của story —
-    # tính vào phạm vi thì mở trình duyệt một lần là trượt cổng.
+    # Artifacts of the agent's own tooling: screenshots, traces, reports.
+    # These sit at the project root but are not story products — counting
+    # them in scope means opening a browser once fails the gate.
     ".playwright-mcp", "playwright-report", "test-results", ".nyc_output",
 )
 
@@ -410,15 +420,17 @@ HARNESS_OWNED = (
     "_bmad-output/sprint-status.json",
     "_bmad-output/sprint-status.json.lock",
     "_bmad-output/compile-report.json",
-    # Nguyên văn lời rà soát (`implement.persist_verdict`) — harness ghi, không
-    # phải agent. Lộ khi hai story chạy chung một cây (`--no-isolate`): tệp
-    # của story trước hiện thành "ngoài phạm vi ghi" của story sau.
+    # Verbatim review verdicts (`implement.persist_verdict`) — written by the
+    # harness, not the agent. Exposed when two stories share one tree
+    # (`--no-isolate`): the previous story's file appears as "outside write
+    # scope" for the next story.
     "_bmad-output/reviews",
     ".aisef",
-    # Cấu hình client harness chép vào worktree (`WorktreeManager._carry_client_config`)
-    # — dự án không gitignore `.claude/` thì nó hiện là tệp chưa theo dõi và guard
-    # `diff-scope` chặn mọi lệnh vì "ngoài phạm vi ghi" (dogfood par 2026-09-05:
-    # 3/3 story trượt "phạm vi ghi" vì đúng tệp này).
+    # Client config the harness copies into the worktree
+    # (`WorktreeManager._carry_client_config`) — if the project does not
+    # gitignore `.claude/` it shows up as untracked and the `diff-scope`
+    # guard blocks every command for "outside write scope" (dogfood par
+    # 2026-09-05: 3/3 stories failed "write scope" because of this file).
     ".claude/settings.json",
     ".opencode",
     *VENDOR_PATHS,
@@ -426,7 +438,7 @@ HARNESS_OWNED = (
 
 
 def _git_lines(project_root: str, args: list[str]) -> list[str]:
-    """Chạy một lệnh git trả kết quả phân tách bằng NUL. Lỗi thì rỗng."""
+    """Run a git command returning NUL-separated results. Returns empty on error."""
     import subprocess
 
     try:
@@ -450,33 +462,33 @@ def changed_files(
     ignore: tuple[str, ...] = HARNESS_OWNED,
     base_ref: str = "",
 ) -> list[str]:
-    """Công việc story đã làm: file đổi so với **điểm rẽ nhánh**, kể cả
-    file mới chưa theo dõi.
+    """Files changed by the story: diff against the **fork point**, including
+    new untracked files.
 
-    Không có ``base_ref`` thì chỉ so với ``HEAD`` — và đó là chỗ sập.
-    Agent được khuyến khích tự commit từng phần (merge chỉ thấy thứ đã
-    commit), nên sau vài commit thì "so với HEAD" trả về gần như rỗng.
-    Ba cổng cùng đọc danh sách này: phạm vi ghi thành đạt vô điều kiện,
-    test-thật không còn gì để kiểm, và người rà soát nhận một diff rỗng
-    rồi phải tự mò cả repo — vừa mù vừa tốn. So với điểm rẽ nhánh thì
-    công việc đã commit vẫn nằm trong tầm nhìn.
+    Without ``base_ref`` this only diffs against ``HEAD`` — and that breaks.
+    The agent is encouraged to make incremental commits (merge only sees
+    committed work), so after a few commits "diff against HEAD" returns
+    nearly empty. Three gates read this list: write scope passes
+    unconditionally, real tests have nothing to check, and the reviewer
+    gets an empty diff and has to search the whole repo — blind and
+    expensive. Diffing against the fork point keeps committed work visible.
 
-    Bỏ qua phần harness tự ghi. Phần còn lại của ``_bmad-output`` **không**
-    được bỏ qua: agent sửa PRD hay hợp đồng thị giác giữa lúc viết code là
-    chuyện phải lộ ra.
+    Skips harness-owned paths. The rest of ``_bmad-output`` is **not**
+    skipped: an agent sneaking edits to the PRD or visual contract while
+    writing code must be visible.
     """
     paths: list[str] = []
     seen: set[str] = set()
 
-    # `git status` cho cả file chưa theo dõi — thứ `git diff` không thấy.
+    # `git status` includes untracked files — which `git diff` does not see.
     for entry in _git_lines(
         project_root, ["status", "--porcelain", "-z", "--untracked-files=all"]
     ):
         if len(entry) > 3:
             paths.append(entry[3:])
 
-    # `git diff <base>` so **cây làm việc** với điểm rẽ nhánh, nên phủ cả
-    # phần đã commit lẫn phần còn dở.
+    # `git diff <base>` compares the **working tree** against the fork point,
+    # so it covers both committed and uncommitted work.
     if base_ref:
         paths += _git_lines(project_root, ["diff", "--name-only", "-z", base_ref])
 
@@ -492,12 +504,12 @@ def changed_files(
 
 
 def fork_point(workdir: str, upstream: str) -> str:
-    """Điểm nhánh story rẽ khỏi nhánh chính. Rỗng nếu không tính được.
+    """Fork point where the story branched off the main branch. Empty if unable to compute.
 
-    Dùng ``merge-base`` chứ không dùng thẳng đầu nhánh chính: trong một
-    đợt, story trước có thể đã merge vào nhánh chính khi story sau đang
-    chạy — so với đầu nhánh thì công việc của story trước bị tính sang
-    story sau.
+    Uses ``merge-base`` instead of the main branch tip: within a sprint,
+    an earlier story may have merged into main while a later story is still
+    running — comparing against the tip would attribute the earlier story's
+    work to the later one.
     """
     if not upstream:
         return ""
@@ -506,34 +518,35 @@ def fork_point(workdir: str, upstream: str) -> str:
 
 
 def head_sha(workdir: str | Path) -> str:
-    """SHA của HEAD. Rỗng nếu không đọc được git.
+    """SHA of HEAD. Empty if git is unreadable.
 
-    Rỗng phải là **không kiểm được**, không phải "khác bản": mất tầm nhìn
-    git thì chặn cả story còn tệ hơn.
+    Empty must mean **unable to check**, not "different version": losing
+    git visibility and blocking the entire story is worse.
     """
     got = _git_lines(str(workdir), ["rev-parse", "HEAD"])
     return got[0].strip() if got else ""
 
 
-# ------------------------------------------------------------ hoàn thành
+# ------------------------------------------------------------ completion
 
 
 def check_completion(evidence) -> Verdict:
-    """Chặn agent kết thúc khi test chưa xanh cho **đoạn code hiện tại**.
+    """Block agent from finishing when tests are not green for the **current code**.
 
-    Ba câu hỏi, theo thứ tự nghiêm dần:
+    Three questions, in increasing strictness:
 
-    1. Có lần chạy test nào chưa? Chưa chạy mà tuyên bố xong là tự khai.
-    2. Lần gần nhất có xanh không?
-    3. Có file nào sửa **sau** lần chạy đó không? Test xanh trước khi sửa
-       không nói gì về đoạn vừa viết — đây là kiểu "xanh" hay gặp nhất khi
-       agent vội kết thúc.
+    1. Has any test run been recorded? Claiming done without running tests
+       is self-incriminating.
+    2. Did the most recent run pass?
+    3. Were any files changed **after** that run? Tests passing before
+       edits say nothing about the code just written — this is the most
+       common false "green" when the agent rushes to finish.
     """
     last = evidence.last(TOOL_RUN, "test")
     if last is None:
-        # Nói đúng lệnh gõ được. Guard chặn bằng một chỉ dẫn không chạy được
-        # thì agent kẹt: nó không dừng được, cũng không làm được điều được
-        # bảo — và cứ thế đốt hết số lượt.
+        # Name the exact command to run. A guard that blocks with an
+        # unrunnable instruction traps the agent: it cannot stop, nor do
+        # what it was told — and burns all its turns.
         from .tools import aisef_command
 
         return Verdict(
@@ -543,15 +556,16 @@ def check_completion(evidence) -> Verdict:
             f"not in claims.",
         )
     if last.detail.get("unrunnable"):
-        # Không chạy được ≠ đỏ: agent không sửa được môi trường/lệnh test
-        # (ngoài phạm vi ghi), chặn Stop chỉ đốt lượt. Cổng story ghi
-        # UNRUNNABLE và vẫn chặn — với lý do đúng.
+        # Unrunnable != red: the agent cannot fix the test environment/command
+        # (outside write scope), blocking Stop only burns turns. The story
+        # gate records UNRUNNABLE and still blocks — with the right reason.
         return ALLOW
     if last.detail.get("skipped"):
-        # Chưa cấu hình ≠ đỏ. Chặn ở đây thì agent không sửa được gì (lệnh
-        # test là việc của dự án) và chỉ đốt lượt — đo ở hợp quy: Stop bị
-        # chặn hai lần liền trên dự án không khai lệnh test. Cổng story vẫn
-        # ghi "unit chưa cấu hình", không tính là đạt.
+        # Not configured != red. Blocking here means the agent cannot fix
+        # anything (test command is the project's concern) and just burns
+        # turns — measured in conformance: Stop blocked twice in a row on a
+        # project with no test command declared. The story gate still records
+        # "unit not configured", does not count as pass.
         return ALLOW
     if not last.ok:
         tail = str(last.detail.get("tail") or "")[:400]
@@ -574,7 +588,7 @@ def check_completion(evidence) -> Verdict:
 
 
 def project_root_from(env: dict[str, str] | None, fallback: str) -> str:
-    """Gốc dự án cho guard: env của harness thắng, `--project` biên dịch là dự phòng."""
+    """Project root for guards: harness env wins, compiled `--project` is fallback."""
     goc = (env if env is not None else os.environ).get(ENV_PROJECT, "").strip()
     return goc or fallback
 
@@ -594,8 +608,8 @@ def disallowed_from_env(env: dict[str, str] | None = None) -> list[str]:
 
 
 def check_role_tool(tool_name: str, disallowed: list[str]) -> Verdict:
-    """Vai này có được gọi tool này không. Khớp không phân biệt hoa thường:
-    Claude gọi `Write`, OpenCode gọi `write`."""
+    """Is this role allowed to call this tool. Case-insensitive matching:
+    Claude sends `Write`, OpenCode sends `write`."""
     if not tool_name or not disallowed:
         return ALLOW
     cam = {t.lower() for t in disallowed}
@@ -620,7 +634,7 @@ _NET_COMMANDS = re.compile(
 
 
 def _extract_hosts(tool_name: str, tool_input: dict) -> list[str]:
-    """Trích hostname từ sự kiện tool."""
+    """Extract hostnames from a tool event."""
     hosts: list[str] = []
     if tool_name in ("WebFetch", "webfetch"):
         url = str(tool_input.get("url") or tool_input.get("URL") or "")
@@ -637,7 +651,7 @@ def _extract_hosts(tool_name: str, tool_input: dict) -> list[str]:
 
 
 def _host_matches(host: str, allowed: list[str]) -> bool:
-    """Host khớp allowlist — khớp chính xác hoặc suffix (*.example.com)."""
+    """Host matches allowlist — exact match or suffix (*.example.com)."""
     for pat in allowed:
         p = pat.lower().strip()
         if p.startswith("*."):
@@ -650,7 +664,7 @@ def _host_matches(host: str, allowed: list[str]) -> bool:
 
 
 def check_egress(tool_name: str, tool_input: dict, allow_hosts: list[str]) -> Verdict:
-    """V12: chặn kết nối tới host chưa khai. Rỗng allowlist = không kiểm."""
+    """V12: block connections to undeclared hosts. Empty allowlist = no check."""
     if not allow_hosts:
         return ALLOW
     hosts = _extract_hosts(tool_name, tool_input)
@@ -673,7 +687,7 @@ def allow_hosts_from_env(env: dict[str, str] | None = None) -> list[str]:
 
 
 def workdir_from_env(env: dict[str, str] | None = None) -> str:
-    """Cây làm việc do harness khai. Rỗng nghĩa là không chạy trong story."""
+    """Working tree declared by the harness. Empty means not running inside a story."""
     return (env or os.environ).get(ENV_WORKDIR, "")
 
 
@@ -682,15 +696,17 @@ def base_from_env(env: dict[str, str] | None = None) -> str:
 
 
 def effective_scope(env: dict[str, str] | None = None) -> list[str]:
-    """Phạm vi ghi đang có hiệu lực.
+    """Currently effective write scope.
 
-    Trong một story: đúng phạm vi story khai, và **rỗng thì chặn** — quên
-    truyền biến môi trường không được biến guard thành đồ trang trí.
+    Inside a story: the scope declared by the story, and **empty means
+    block** — forgetting the env variable must not turn the guard into
+    decoration.
 
-    Ngoài story (pha lập kế hoạch, dựng mockup): phạm vi cố định của
-    framework. Không có nhánh này thì guard chặn cả BMAD ghi PRD, và cách
-    duy nhất để chạy tiếp là tắt guard ở nửa đầu vòng đời — nửa mà tài
-    liệu quyết định mọi thứ phía sau.
+    Outside a story (planning, mockup phases): the framework's fixed scope.
+    Without this branch the guard would block BMAD from writing the PRD,
+    and the only way forward would be disabling the guard for the first
+    half of the lifecycle — the half where documents determine everything
+    downstream.
     """
     scope = scope_from_env(env)
     if scope or story_from_env(env):
@@ -699,11 +715,11 @@ def effective_scope(env: dict[str, str] | None = None) -> list[str]:
 
 
 def _escaped_workdir(tool_input: dict, root: str) -> Verdict | None:
-    """Lệnh có tự chỉ định thư mục nằm ngoài cây agent đang đứng không.
+    """Does the command specify a directory outside the agent's working tree.
 
-    Trả ``None`` khi không có gì để nói — không có `workdir`, không biết
-    cây gốc, hoặc `workdir` nằm trong cây. Cách ly bằng worktree chỉ có
-    giá trị khi không ai bước ra được khỏi nó.
+    Returns ``None`` when there is nothing to say — no `workdir`, unknown
+    root, or `workdir` is within the tree. Worktree isolation only has value
+    when nobody can step outside it.
     """
     wd = str(tool_input.get("workdir") or tool_input.get("cwd") or "")
     if not wd or not root:
@@ -725,47 +741,48 @@ def _escaped_workdir(tool_input: dict, root: str) -> Verdict | None:
 
 def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
               project_root: str = "", artifact_root: str = "") -> Verdict:
-    """Chạy một guard trên sự kiện hook của client.
+    """Run a guard on a client hook event.
 
-    ``event`` theo hình dạng Claude Code gửi: ``tool_name`` và ``tool_input``.
-    Hai guard cuối cần trạng thái ngoài (git, bằng chứng); phần **quyết
-    định** của chúng vẫn là hàm thuần, chỗ này chỉ đi lấy dữ liệu.
+    ``event`` follows the shape Claude Code sends: ``tool_name`` and ``tool_input``.
+    The last two guards need external state (git, evidence); their **decision**
+    logic is still pure, this function only fetches the data.
     """
     tool_input = event.get("tool_input") or {}
-    # Claude Code gửi `file_path`; OpenCode gửi `filePath` (đo hợp quy C6
-    # 2026-09-05: guard thấy đường dẫn rỗng → write-scope cho qua như "không
-    # phải thao tác lên file"). Tên khoá là chuyện của client, không phải của luật.
+    # Claude Code sends `file_path`; OpenCode sends `filePath` (measured in
+    # conformance C6 2026-09-05: guard saw empty path -> write-scope passed as
+    # "not a file operation"). Key name is the client's concern, not the rule's.
     file_path = str(tool_input.get("file_path") or tool_input.get("filePath") or tool_input.get("path") or "")
     content = str(tool_input.get("content") or tool_input.get("new_string") or tool_input.get("newString") or "")
     command = str(tool_input.get("command") or "")
 
-    # Cây phải soi là cây agent đang đứng, không phải cây lúc biên dịch
-    # hook. Story chạy trong worktree riêng, còn hook được ghi vào
-    # `.claude/settings.json` một lần với `--project` là gốc dự án — dùng
-    # nó thì guard đi đọc `git status` của cây khác, thấy toàn bộ tài liệu
-    # kế hoạch chưa commit và chặn mọi thao tác. `--porcelain` luôn trả
-    # đường dẫn tính từ gốc repo nên đứng ở thư mục con cũng đúng.
-    # Thứ tự tin cậy: cây harness khai → cây client báo → cây lúc biên
-    # dịch hook. Bản khai của harness đứng trước vì nó là **sự thật**:
-    # client có thể báo gốc dự án thay vì worktree, và model của OpenCode
-    # còn tự đặt `workdir` cho từng lệnh.
+    # The tree to inspect is the one the agent is standing in, not the tree
+    # at hook compile time. Stories run in their own worktree, but the hook
+    # is written once into `.claude/settings.json` with `--project` as the
+    # project root — using that means the guard reads `git status` of a
+    # different tree, sees all uncommitted planning docs, and blocks every
+    # operation. `--porcelain` always returns paths relative to the repo
+    # root so being in a subdirectory is fine.
+    # Trust order: harness-declared tree -> client-reported tree -> compile-
+    # time tree. The harness declaration comes first because it is **truth**:
+    # the client may report the project root instead of the worktree, and
+    # OpenCode's model even sets `workdir` per command.
     root = workdir_from_env(env) or str(event.get("cwd") or "") or project_root
 
-    # Tool `bash` của OpenCode nhận `workdir` riêng cho **từng lệnh**, và
-    # model tự đặt nó — đã gặp thật: story chạy trong worktree nhưng lệnh
-    # `git add … && git commit` mang `workdir` là gốc dự án, nên công việc
-    # rơi thẳng lên `main` mà không cổng nào thấy (worktree vẫn trống,
-    # diff rỗng, story trượt vì lý do sai).
+    # OpenCode's `bash` tool accepts a per-**command** `workdir`, and the
+    # model sets it on its own — seen in practice: story runs in a worktree
+    # but `git add ... && git commit` carries `workdir` as the project root,
+    # so work lands straight on `main` with no gate seeing it (worktree
+    # stays empty, diff is empty, story fails for the wrong reason).
     #
-    # Kiểm ở đây, tại tầng điều phối, nên nó áp cho **mọi** guard và mọi
-    # client: guard nào chạy trước cũng chặn được. Đi xuống thư mục con
-    # thì vẫn cho — thoát ra khỏi cây mới là chuyện.
+    # Checked here, at the orchestration layer, so it applies to **all**
+    # guards and all clients: whichever guard runs first can block. Going
+    # into a subdirectory is allowed — escaping the tree is the issue.
     if (thoat := _escaped_workdir(tool_input, root)):
         return thoat
 
-    # Vai rà soát mà sửa được code thì nó thành lượt viết thứ hai, và không
-    # còn ai rà soát nữa. Kiểm ở tầng điều phối để mọi guard, mọi client
-    # đều chặn — không trông vào cờ dòng lệnh của từng client.
+    # A reviewer role that can edit code becomes a second write pass, with
+    # nobody left to review. Checked at the orchestration layer so all
+    # guards, all clients block — not relying on per-client CLI flags.
     vai = check_role_tool(str(event.get("tool_name") or ""), disallowed_from_env(env))
     if not vai.allowed:
         return vai
@@ -796,8 +813,9 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
     if kind == "completion":
         story = story_from_env(env)
         if not story or not artifact_root:
-            # Không biết đang làm story nào thì không kết luận được. Chặn ở
-            # đây sẽ chặn cả những lượt chạy ngoài vòng đời story.
+            # Cannot determine which story is running, so no conclusion is
+            # possible. Blocking here would block runs outside the story
+            # lifecycle too.
             return ALLOW
         from .observe import EvidenceStore
 
@@ -814,16 +832,18 @@ def record_outcome(
     artifact_root: str = "",
     duration_ms: int = 0,
 ) -> None:
-    """Guard tự ghi vào bằng chứng — nguồn duy nhất không phụ thuộc client.
+    """Guard self-records into evidence — the only client-independent source.
 
-    Hai lỗ hổng cùng một gốc: (1) `guard_blocked` chỉ trích từ luồng sự kiện
-    của Claude Code, nên trên OpenCode nó luôn False dù guard chặn thật —
-    đo trên `par`: 4 lần chặn, bằng chứng ghi False cả bốn; (2) sự kiện
-    `FILE_CHANGE` có mô hình, có test, nhưng **không ai ghi**, nên luật
-    "file sửa sau lần test cuối" của guard `completion` chưa từng chạy.
+    Two gaps with the same root: (1) `guard_blocked` was extracted only from
+    Claude Code's event stream, so on OpenCode it was always False even when
+    the guard actually blocked — measured on `par`: 4 blocks, evidence
+    recorded False for all four; (2) the `FILE_CHANGE` event had a model and
+    tests but **nobody wrote it**, so the "files changed since last test"
+    rule in the `completion` guard never fired.
 
-    Ghi ở đây, vì guard là điểm mà mọi client đều đi qua. Không có mã story
-    (phiên rà soát cố ý không mang nó) thì không ghi — tránh làm bẩn hồ sơ.
+    Recorded here because the guard is the point all clients pass through.
+    No story ID (review sessions intentionally omit it) means no recording
+    — avoids polluting the record.
     """
     story = story_from_env(env)
     if not story or not artifact_root:
@@ -835,10 +855,10 @@ def record_outcome(
     tool = str(event.get("tool_name") or "")
     hien_co = store.read(story)
 
-    # Nhịp tim: một lần mỗi story. Đo trên `par`: phiên chỉ dùng Bash để
-    # ghi file thì không có Write/Edit nào đi qua `write-scope`, và không có
-    # gì bị chặn — evidence trống dù hook chạy 17 lần. "Hook tới được" phải
-    # là sự kiện riêng, không suy từ sự kiện khác.
+    # Heartbeat: once per story. Measured on `par`: sessions using only Bash
+    # to write files have no Write/Edit going through `write-scope`, and
+    # nothing gets blocked — evidence is empty despite the hook running 17
+    # times. "Hook reachable" must be its own event, not inferred from others.
     if not hien_co.of(GUARD_SEEN):
         store.record(story, Event(kind=GUARD_SEEN, name=kind, detail={"tool": tool}))
 
@@ -860,10 +880,10 @@ def record_outcome(
             store.file_change(story, path, detail={"tool": tool})
         return
     if kind == "diff-scope":
-        # Guard duy nhất nhìn thấy file do **Bash** đổi. Chỉ ghi file có
-        # mtime mới hơn lần `test` gần nhất: đó đúng là định nghĩa "sửa sau
-        # lần test cuối" mà guard `completion` cần, và không ghi trùng file
-        # đã đổi từ trước.
+        # The only guard that sees files changed by **Bash**. Only records
+        # files with mtime newer than the last `test` run: that is exactly
+        # the definition of "changed since last test" that the `completion`
+        # guard needs, and avoids re-recording previously changed files.
         last = hien_co.last(TOOL_RUN, "test")
         moc = last.at if last else 0.0
         root = workdir_from_env(env) or str(event.get("cwd") or "")
@@ -878,7 +898,7 @@ def record_outcome(
                 store.file_change(story, rel, detail={"tool": tool})
 
 
-#: Guard nào gắn vào mốc nào, và khớp tool nào.
+#: Which guard attaches to which hook point, and matches which tool.
 GUARD_MATCHERS: dict[str, tuple[str, str]] = {
     "write-scope": ("PreToolUse", "Write|Edit|NotebookEdit"),
     "secret": ("PreToolUse", "Write|Edit"),
@@ -893,7 +913,7 @@ GUARD_MATCHERS: dict[str, tuple[str, str]] = {
 
 
 def parse_command(command: str) -> list[str]:
-    """Tách lệnh shell an toàn; trả rỗng nếu không phân tích được."""
+    """Safely split a shell command; returns empty if unparseable."""
     try:
         return shlex.split(command)
     except ValueError:

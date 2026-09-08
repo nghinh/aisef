@@ -1,14 +1,14 @@
-"""Lấy kho nguồn skill về máy, theo đúng commit đã ghim trong catalog.
+"""Fetch skill source repos to the local machine at the exact commit pinned in the catalog.
 
-Trước đây `aisef setup` đòi thư mục ``references/`` đã clone sẵn nằm cạnh
-dự án. Điều đó chỉ đúng khi framework chạy từ bản sao kho nguồn: người cài
-bằng ``pip install aisef`` không có cách nào có được thư mục ấy, và
-``setup`` dừng ngay ở dòng đầu.
+Previously `aisef setup` required a pre-cloned ``references/`` directory next
+to the project. That only worked when the framework ran from a source checkout:
+users who installed via ``pip install aisef`` had no way to obtain that
+directory, and ``setup`` failed on the first line.
 
-Nguồn skill là tài sản của **framework**, không phải của dự án đích — nên
-nó thuộc cache của người dùng, dùng chung cho mọi dự án. Mỗi nguồn được
-lấy đúng ``commit`` catalog ghim: skill đổi giữa chừng thì kế hoạch cài
-đổi theo mà không ai biết, và bản dựng hết tái lập được.
+Skill sources belong to the **framework**, not the target project -- so they
+live in the user's cache, shared across all projects. Each source is fetched
+at the exact ``commit`` the catalog pins: if skills change mid-run the install
+plan silently changes too, and builds lose reproducibility.
 """
 
 from __future__ import annotations
@@ -21,14 +21,14 @@ from pathlib import Path
 
 from .catalog import Catalog, Source
 
-#: Biến môi trường cho phép trỏ sang thư mục nguồn khác (CI, máy ngoại tuyến).
+#: Environment variable to override the source directory (CI, offline machines).
 ENV_REFS = "AISEF_REFERENCES"
 
 CLONE_TIMEOUT = 300
 
 
 def default_root() -> Path:
-    """Nơi chứa nguồn skill: cache của người dùng, không phải trong dự án."""
+    """Skill source location: user cache, not inside the project."""
     if env := os.environ.get(ENV_REFS):
         return Path(env).expanduser().resolve()
     base = os.environ.get("XDG_CACHE_HOME") or (Path.home() / ".cache")
@@ -52,12 +52,12 @@ class FetchReport:
         for i in self.already:
             dong.append(f"  ○ already  {i}")
         for i, ly_do in self.failed:
-            dong.append(f"  ✗ failed   {i} — {ly_do}")
+            dong.append(f"  ✗ failed   {i} — {reason}")
         return "\n".join(dong) or "  (no sources to fetch)"
 
 
 def _dir_of(source: Source, root: Path) -> Path:
-    """Thư mục đích của một nguồn, khớp với cách `Source.roots` tra đường."""
+    """Destination directory for a source, matching how `Source.roots` resolves paths."""
     return Path(root).parent / source.local_path
 
 
@@ -73,7 +73,7 @@ def _at_commit(d: Path, commit: str) -> bool:
 
 
 def _clone(source: Source, dest: Path) -> str:
-    """Clone nông đúng một commit. Trả chuỗi rỗng nếu xong, ngược lại là lỗi."""
+    """Shallow-clone a single commit. Return empty string on success, error message otherwise."""
     dest.parent.mkdir(parents=True, exist_ok=True)
     tam = dest.with_name(dest.name + ".dang-lay")
     shutil.rmtree(tam, ignore_errors=True)
@@ -105,11 +105,11 @@ def ensure(
     catalog: Catalog | None = None,
     only: list[str] | None = None,
 ) -> FetchReport:
-    """Bảo đảm mọi nguồn trong catalog có mặt ở `root`, đúng commit đã ghim.
+    """Ensure all catalog sources are present at `root` at the pinned commit.
 
-    Nguồn nào đã đúng commit thì không đụng tới — gọi lại nhiều lần không
-    tốn gì. Một nguồn hỏng không làm chết các nguồn còn lại: `setup` vẫn
-    cài được phần lấy được, và báo rõ phần thiếu.
+    Sources already at the correct commit are left untouched -- calling
+    repeatedly costs nothing. A failed source does not kill the rest:
+    `setup` can still install what was fetched and reports what is missing.
     """
     root = Path(root) if root is not None else default_root()
     cat = catalog or Catalog.load()

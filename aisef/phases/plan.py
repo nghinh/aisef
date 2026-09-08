@@ -1,24 +1,25 @@
-"""Chuỗi pha lập kế hoạch — chạy skill BMAD tuần tự, dừng ở mỗi cổng.
+"""Planning phase pipeline — run BMAD skills sequentially, stop at each gate.
 
-Mỗi pha là một skill BMAD chạy ở chế độ headless. Sau mỗi pha:
+Each phase is a BMAD skill running in headless mode. After each phase:
 
-1. đọc JSON status BMAD trả về (``complete`` / ``partial`` / ``blocked``);
-2. đối chiếu **file trên đĩa** với những gì nó khai đã sinh ra;
-3. chạy **cổng máy** — kiểm những gì kiểm được bằng code;
-4. dừng ở **cổng người**, trừ khi cổng đó nằm trong ``--auto-approve``.
+1. read the JSON status BMAD returns (``complete`` / ``partial`` / ``blocked``);
+2. verify **files on disk** against what it claims to have produced;
+3. run **machine gate** — check whatever can be checked by code;
+4. stop at the **human gate**, unless it is in ``--auto-approve``.
 
-``run_pipeline`` **không** chạy hết rồi mới báo: nó dừng ngay ở cổng đầu
-tiên chưa duyệt và trả về. Gọi lại sau khi người duyệt thì đi tiếp từ đó —
-cùng một cơ chế cho chạy nền, CI lẫn phiên chat, và không cần tiến trình
-nào sống chờ (quyết định Đ2).
+``run_pipeline`` does **not** run everything then report: it stops at the first
+unapproved gate and returns. Call again after human approval to resume from
+there — same mechanism for background runs, CI, and chat sessions, with no
+process left waiting (decision D2).
 
-Pha đã có đủ artifact thì **bỏ qua**, nên chạy lại không trả tiền làm lại
-việc đã xong.
+Phases whose artifacts already exist are **skipped**, so reruns don't pay for
+work already done.
 
-**Không có pha `bmad-sprint-planning`.** Thứ tự thực hiện story là thứ máy
-tính được chắc chắn từ phụ thuộc và ``write_scope`` (``control/scheduler``),
-nên giao nó cho model là vi phạm nguyên tắc gốc: cần đảm bảo thì viết code.
-BMAD dừng ở chỗ sinh ra epic và story; xếp lịch là việc của framework.
+**No `bmad-sprint-planning` phase.** Story execution order can be computed
+deterministically from dependencies and ``write_scope`` (``control/scheduler``),
+so delegating it to a model violates the core principle: when correctness is
+required, write code. BMAD stops at generating epics and stories; scheduling
+is the framework's job.
 """
 
 from __future__ import annotations
@@ -42,32 +43,32 @@ ARTIFACT_ROOT = "_bmad-output"
 
 @dataclass(frozen=True)
 class Phase:
-    """Một pha lập kế hoạch: một skill BMAD, một artifact, một cổng."""
+    """A planning phase: one BMAD skill, one artifact, one gate."""
 
     id: str
     skill: str
-    #: File pha này phải sinh ra. Với pha có cổng, phải trùng
-    #: ``GATE_ARTIFACTS[gate]`` — cổng băm đúng những file này.
+    #: Files this phase must produce. For gated phases, must match
+    #: ``GATE_ARTIFACTS[gate]`` — the gate hashes exactly these files.
     artifacts: tuple[str, ...]
     gate: Gate | None
-    #: Artifact phải có sẵn trước khi chạy.
+    #: Artifacts that must exist before this phase runs.
     needs: tuple[str, ...] = ()
     goal: str = ""
 
 
-#: Thứ tự pha. Tuần tự vì mỗi pha ăn output của pha trước.
+#: Phase ordering. Sequential because each phase consumes the previous one's output.
 #:
-#: Tên file là tên BMAD **thật sự** ghi ra khi được chỉ định đường dẫn —
-#: kiểm chứng bằng lượt chạy thật (xem `tests/fixtures/bmad/`). Riêng pha UX
-#: giữ nguyên hai file của BMAD (`DESIGN.md` hệ thống thị giác,
-#: `EXPERIENCE.md` luồng và màn hình): gộp lại thành một `ux-spec.md` sẽ phá
-#: intent `update`/`validate` của chính skill đó, vì nó tìm hai file này.
+#: Filenames are the **actual** names BMAD writes when given an output path —
+#: verified by real runs (see `tests/fixtures/bmad/`). The UX phase keeps
+#: BMAD's two files (`DESIGN.md` for the visual system, `EXPERIENCE.md` for
+#: flows and screens): merging them into a single `ux-spec.md` would break the
+#: skill's own `update`/`validate` intent, since it looks for those two files.
 PHASES: tuple[Phase, ...] = (
     Phase(
         id="project-context",
         skill="bmad-project-context",
         artifacts=("project-context.md",),
-        gate=None,  # ngữ cảnh nền, không phải quyết định sản phẩm
+        gate=None,  # background context, not a product decision
         goal="Build project context from requirements: domain, users, constraints.",
     ),
     Phase(
@@ -119,7 +120,7 @@ PHASES: tuple[Phase, ...] = (
     ),
 )
 
-#: Bước tách story — do framework tự làm, không gọi model.
+#: Story split step — done by the framework itself, no model call.
 SPLIT_PHASE = Phase(
     id="stories",
     skill="(code)",
@@ -142,10 +143,10 @@ class PhaseOutcome:
     cost_usd: float = 0.0
     duration_ms: int = 0
     error: str = ""
-    #: Số lần phải chạy lại vì lỗi hạ tầng (mạng, quá giờ) — không phải lỗi
-    #: chất lượng, nhưng vẫn tốn tiền nên phải hiện ra.
+    #: Number of retries due to infra errors (network, timeout) — not quality
+    #: errors, but still costs money so must be surfaced.
     infra_retries: int = 0
-    #: Chỉ có ở bước tách story.
+    #: Only present for the story split step.
     split: object = None
 
     @property
@@ -158,11 +159,11 @@ class PhaseOutcome:
 
     @property
     def needs_human(self) -> bool:
-        """BMAD tự khai artifact chưa đứng được một mình."""
+        """BMAD self-reported that the artifact is not yet standalone."""
         return self.status.needs_human
 
     def machine_checks(self) -> dict[str, str]:
-        """Kết quả kiểm máy, ghi kèm bản ghi phê duyệt để về sau truy được."""
+        """Machine check results, stored with the approval record for audit trail."""
         checks = {"bmad_status": self.status.status or "unreadable"}
         if self.machine_gate:
             checks["machine gate"] = "pass" if self.machine_gate.passed else "fail"
@@ -192,7 +193,7 @@ class PhaseOutcome:
 @dataclass
 class PipelineResult:
     outcomes: list[PhaseOutcome] = field(default_factory=list)
-    #: Cổng khiến pipeline dừng chờ người. None nghĩa là đã chạy hết.
+    #: Gate that caused the pipeline to stop for human approval. None means all done.
     waiting_on: Gate | None = None
     failed_at: str = ""
 
@@ -228,7 +229,7 @@ def _is_brownfield(project: Path | None) -> bool:
 
 
 def _brownfield_context(project: Path) -> str:
-    """Ngữ cảnh brownfield cho prompt — baseline + hướng dẫn delta."""
+    """Brownfield context for the prompt — baseline + delta instructions."""
     baseline = Path(project) / ARTIFACT_ROOT / "baseline.md"
     if not baseline.is_file():
         return ""
@@ -250,12 +251,12 @@ def _brownfield_context(project: Path) -> str:
 
 
 def build_prompt(phase: Phase, project: Path | None = None) -> str:
-    """Dựng prompt headless cho một pha.
+    """Build the headless prompt for a phase.
 
-    ``headless: true`` là cờ BMAD tự định nghĩa để bật chế độ không hỏi và
-    trả JSON status ở cuối. Đường dẫn ra được chỉ định tường minh: BMAD tôn
-    trọng đường dẫn được giao (kiểm chứng ở lượt chạy thật), còn tên mặc
-    định của nó khác nhau giữa các skill.
+    ``headless: true`` is a BMAD-defined flag that enables non-interactive mode
+    and returns a JSON status at the end. Output paths are specified explicitly:
+    BMAD respects the given paths (verified in real runs), while its default
+    filenames differ across skills.
     """
     brownfield = _is_brownfield(project)
     intent = "update" if brownfield and not _missing(project, phase.artifacts) else "create"
@@ -290,7 +291,7 @@ def build_prompt(phase: Phase, project: Path | None = None) -> str:
 
 
 def _stories_gate_memo(project: Path | None) -> str:
-    """Cổng stories lần trước nói gì — để agent chẻ story cho đúng (P2-12)."""
+    """Previous stories gate feedback — so the agent splits stories correctly (P2-12)."""
     if project is None:
         return ""
     from .story_split import GATE_MEMO
@@ -323,7 +324,7 @@ def run_phase(
     config: Config,
     force: bool = False,
 ) -> PhaseOutcome:
-    """Chạy một pha. Bỏ qua nếu đã có đủ artifact và không bị ép chạy lại."""
+    """Run one phase. Skip if all artifacts exist and force is not set."""
     out = PhaseOutcome(phase=phase)
 
     if not _missing(project, phase.artifacts) and not force:
@@ -342,9 +343,9 @@ def run_phase(
         timeout_seconds=config["run.timeout_seconds"],
     )
 
-    # Lỗi hạ tầng thì thử lại, và **không** tính là pha thất bại: một lần
-    # đứt kết nối giữa chừng đã tiêu $2.69 mà không sinh ra gì, bỏ luôn thì
-    # lần chạy sau phải trả lại từ đầu.
+    # Retry on infra errors, and do **not** count as phase failure: a single
+    # mid-run disconnect already spent $2.69 producing nothing — giving up
+    # would force the next run to pay again from scratch.
     budget = config["run.max_retries"] + 1
     evidence = EvidenceStore(project / ARTIFACT_ROOT)
     while True:
@@ -352,15 +353,15 @@ def run_phase(
         out.ran = True
         out.cost_usd += result.cost_usd
         out.duration_ms += result.duration_ms
-        # Chi phí lập kế hoạch cũng là chi phí. Chỉ ghi chi phí story thì
-        # tổng trong báo cáo nghiệm thu thiếu mất phần đắt nhất của những
-        # dự án nhỏ.
+        # Planning cost is still cost. Recording only story costs would make
+        # the acceptance report total miss the most expensive part of small
+        # projects.
         evidence.agent_run(f"plan-{phase.id}", result, name=phase.id)
         if result.ok:
             break
         error = result.error or "run failed"
         budget -= 1
-        # Cùng bảng kết cục với vòng thử lại story (ADR-005 V11 B).
+        # Same exit-status table as the story retry loop (ADR-005 V11 B).
         if budget <= 0 or exit_status_of(result) not in INFRA_STATUSES:
             out.error = error
             return out
@@ -368,13 +369,14 @@ def run_phase(
 
     out.status = parse_headless_status(result.text)
 
-    if out.status.status == "blocked":
+    # Verify on disk, don't trust self-report. A run can finish "successfully",
+    # claim it produced artifacts, yet the files don't actually exist.
+    # Conversely, a "blocked" status with artifacts on disk means the agent
+    # produced the work but mis-reported — artifacts on disk win.
+    still_missing = _missing(project, phase.artifacts)
+    if out.status.status == "blocked" and still_missing:
         out.error = f"BMAD blocked: {out.status.reason or 'no reason given'}"
         return out
-
-    # Kiểm đĩa, không tin lời khai. Một lượt chạy có thể kết thúc "thành
-    # công", khai đã sinh artifact, mà file không hề tồn tại.
-    still_missing = _missing(project, phase.artifacts)
     if still_missing:
         out.error = f"run completed but missing: {', '.join(still_missing)}"
         return out
@@ -391,10 +393,10 @@ def _pass_gate(
     outcome,
     auto_approve: frozenset[Gate],
 ) -> bool:
-    """Cổng này đã thông chưa. False nghĩa là phải dừng chờ người.
+    """Whether this gate has passed. False means must stop for human approval.
 
-    ``outcome`` chỉ cần có ``needs_human`` và ``machine_checks()`` — bước
-    mockup dùng lại đúng hàm này.
+    ``outcome`` only needs ``needs_human`` and ``machine_checks()`` — the
+    mockup step reuses this same function.
     """
     if approvals.status(gate) is Status.APPROVED:
         return True
@@ -403,8 +405,8 @@ def _pass_gate(
 
     note = "auto-approved (--auto-approve)"
     if outcome.needs_human:
-        # Không chặn — người dùng đã chọn tự duyệt. Nhưng ghi lại, vì đây
-        # chính là artifact cần xem lại đầu tiên khi có sự cố.
+        # Don't block — user opted for auto-approve. But log it, since this
+        # is the artifact to review first when something goes wrong.
         note += f"; {_why_human(outcome)}"
     approvals.auto_approve(gate, reason=note)
     rec = approvals.load(gate)
@@ -421,9 +423,9 @@ def _why_human(outcome) -> str:
 
 
 def run_split(project: Path, config: Config) -> PhaseOutcome:
-    """Tách `epics.md` thành mỗi story một file. Bước này là **code**, không
-    phải model: chia file và tính sóng chạy song song là việc có đáp án
-    đúng, không phải việc cần phán đoán."""
+    """Split `epics.md` into one file per story. This step is **code**, not a
+    model call: file splitting and parallel wave computation have deterministic
+    answers, not judgment calls."""
     from .story_split import split
 
     out = PhaseOutcome(phase=SPLIT_PHASE)
@@ -445,7 +447,7 @@ def run_pipeline(
     auto_approve: frozenset[Gate] = frozenset(),
     force: bool = False,
 ) -> PipelineResult:
-    """Chạy các pha tới cổng đầu tiên chưa duyệt, rồi dừng."""
+    """Run phases up to the first unapproved gate, then stop."""
     project = Path(project)
     cfg = config or Config.load(project)
     approvals = ApprovalStore(project / ARTIFACT_ROOT)
@@ -464,8 +466,8 @@ def run_pipeline(
             result.waiting_on = phase.gate
             return result
 
-    # Tách story chạy mỗi lần: `epics.md` có thể đã được người duyệt sửa,
-    # và file story sinh ra từ nó thì phải theo.
+    # Story split runs every time: `epics.md` may have been edited during
+    # human review, and the generated story files must follow.
     outcome = run_split(project, cfg)
     result.outcomes.append(outcome)
     if not outcome.ok:

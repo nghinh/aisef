@@ -1,12 +1,12 @@
-"""Sổ đăng ký nguồn skill.
+"""Skill source registry.
 
-Trả lời ba câu cho mỗi nguồn: lấy skill ở đâu, chọn cái nào, và **có được
-phép sao chép vào dự án đích không**.
+Answers three questions per source: where to get the skills, which ones to
+pick, and **whether they may be copied into the target project**.
 
-Câu thứ ba không phải chuyện hình thức. Một kho không có file LICENSE mặc
-định là "all rights reserved" — đóng gói lại và phát cho dự án khác là
-việc không được làm. Nguồn như vậy đánh dấu ``redistribute: false``: đọc
-để tham chiếu thì được, sao chép thì không. Có test giữ ranh giới đó.
+The third question is not a formality. A repo with no LICENSE file defaults
+to "all rights reserved" -- repackaging and distributing to another project
+is not allowed. Such sources are marked ``redistribute: false``: reading for
+reference is fine, copying is not. Tests enforce that boundary.
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ CATALOG_FILE = Path(__file__).with_name("catalog.json")
 
 
 class CatalogError(ValueError):
-    """Sổ đăng ký sai định dạng hoặc trỏ tới thứ không tồn tại."""
+    """Catalog has invalid format or references something that does not exist."""
 
 
 @dataclass(frozen=True)
@@ -39,7 +39,7 @@ class Source:
 
     @property
     def installable(self) -> bool:
-        """Có được sao chép skill của nguồn này vào dự án đích không."""
+        """Whether skills from this source may be copied into the target project."""
         return self.redistribute and self.selection != "reference_only"
 
     def roots(self, references_root: Path) -> list[Path]:
@@ -113,7 +113,7 @@ class Catalog:
         return [s for s in self.sources if not s.installable]
 
     def verify_paths(self, references_root: Path) -> list[str]:
-        """Kiểm mọi đường dẫn trong sổ có thật. Trả danh sách vấn đề."""
+        """Verify all paths in the catalog exist. Return list of problems."""
         problems = []
         for s in self.sources:
             for root in s.roots(references_root):

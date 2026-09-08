@@ -1,23 +1,24 @@
-"""Bước 5 — kiểm định: chạy thật, và không gọi thứ chưa chạy là đã kiểm.
+"""Phase 5 — verification: run for real, and never call unexecuted code verified.
 
-Chín loại kiểm định, mỗi loại một lệnh của dự án chạy trong sandbox và ghi
-bằng chứng. Thiết kế xoay quanh một điều: **"chưa cấu hình" không phải là
-"đạt"**. Một bộ kiểm định báo xanh vì chín trên chín loại chưa từng chạy
-là thứ nguy hiểm hơn không có bộ kiểm định nào.
+Nine verification kinds, each a project command run in a sandbox producing
+evidence. The core design principle: **"unconfigured" is not "passed"**. A
+suite that reports green because all nine kinds were never run is more
+dangerous than having no suite at all.
 
-Vì thế mỗi loại có ba kết quả, không phải hai:
+Therefore each kind has three outcomes, not two:
 
-===============  =========================================================
-``đạt``          chạy và xanh
-``không đạt``    chạy và đỏ
-``chưa cấu hình``  chưa có lệnh — cảnh báo ở mức story, **chặn** ở cổng
-                 trước triển khai, trừ khi được miễn tường minh
-===============  =========================================================
+=================  =======================================================
+``passed``         ran and green
+``failed``         ran and red
+``unconfigured``   no command — warning at story level, **blocked** at the
+                   pre-deploy gate unless explicitly waived
+=================  =======================================================
 
-Ngoài các lệnh của dự án còn một phép kiểm bằng code: **test không có
-khẳng định nào**. Đây là kiểu test giả hay gặp nhất — luôn xanh, không
-kiểm gì, và tạo cảm giác an toàn giả. Kiểm đột biến bắt được nhiều hơn,
-nhưng nó chậm và thường chưa được cài; phép kiểm này rẻ và luôn chạy được.
+Beyond project commands there is one code-level check: **tests with no
+assertions**. This is the most common form of fake test — always green,
+verifies nothing, and creates a false sense of safety. Mutation testing
+catches more, but it is slow and often not installed; this check is cheap
+and always available.
 """
 
 from __future__ import annotations
@@ -35,12 +36,12 @@ from ..harness.guardrails import head_sha, scrub_secrets
 from ..harness.observe import EvidenceStore
 from ..harness.tools import command_for, image_for, unrunnable_reason
 
-#: Nhãn cây đã chạy kiểm định — vào bằng chứng và `pre-deploy.json`.
+#: Tree label for the verification run — recorded in evidence and `pre-deploy.json`.
 TREE_CLEAN = "clean-worktree"
 TREE_AGENT = "agent-tree"
 
-#: Thư mục phụ thuộc không nằm trong git — worktree sạch mượn của dự án.
-#: ponytail: chỉ gốc dự án; monorepo có `packages/*/node_modules` thì thêm sau.
+#: Dependency dirs not tracked by git — clean worktree borrows them from the project.
+#: ponytail: project root only; add `packages/*/node_modules` for monorepos later.
 DEPS_DIRS = ("node_modules", ".venv", "venv")
 
 
@@ -49,7 +50,7 @@ class Kind:
     id: str
     title: str
     level: sandbox.Level = sandbox.Level.WORKSPACE_WRITE
-    #: Chỉ áp dụng khi dự án có giao diện.
+    #: Only applies when the project has a UI.
     needs_ui: bool = False
     why: str = ""
 
@@ -89,21 +90,21 @@ KINDS: dict[str, Kind] = {
                        why="Most vulnerabilities live in the image base layer, not in our code."),
 }
 
-#: Lệnh mặc định khi dự án không khai. Chỉ đặt cho loại có công cụ gần như
-#: chuẩn; còn lại để trống và báo "chưa cấu hình" thay vì đoán bừa.
+#: Default commands when the project does not declare one. Only set for kinds
+#: with near-standard tooling; the rest stay empty and report "unconfigured".
 _DEFAULTS: dict[str, dict[str, str]] = {
     "python": {"security": "bandit -q -r .", "mutation": "mutmut run"},
     "node": {"e2e": "npx playwright test", "mutation": "npx stryker run"},
 }
 
-#: Lệnh không phụ thuộc stack — chỉ dùng khi công cụ có trên máy.
+#: Stack-independent commands — only used when the tool is present on the machine.
 _UNIVERSAL: dict[str, str] = {
     "sbom": "syft . -o cyclonedx-json=sbom.json",
     "image-scan": "trivy fs --exit-code 1 --severity HIGH,CRITICAL .",
 }
 
 _TEST_FILE = re.compile(r"(^|/)(tests?|__tests__)/|(^|/)test_[^/]+\.py$|\.(test|spec)\.[jt]sx?$")
-from ..control.tdd import TEST_FUNC as _TEST_FUNC  # noqa: E402 — một regex, một chỗ
+from ..control.tdd import TEST_FUNC as _TEST_FUNC  # noqa: E402 — one regex, one place
 _ASSERTION = re.compile(
     r"\bassert\b|\bexpect\s*\(|\bshould\b|assert[A-Z]\w+\(|\.to(Be|Equal|Have|Throw)"
 )
@@ -117,16 +118,16 @@ class KindResult:
     detail: str = ""
     duration_ms: int = 0
     skipped: str = ""
-    #: Lệnh có, nhưng môi trường chưa dựng nên nó không chạy nổi. Khác
-    #: hẳn "test đỏ": test không trượt, nó chưa từng chạy. Gộp hai thứ
-    #: lại thì báo cáo nói sai chỗ cần sửa — đo trên e9, `pre-deploy`
-    #: báo "✗ unit" trong khi thật ra gốc dự án chưa `npm ci` bao giờ.
+    #: Command exists but the environment is not set up so it cannot run.
+    #: Distinct from "test failed": the test did not fail, it never ran.
+    #: Conflating the two makes the report point at the wrong fix — measured
+    #: on e9, `pre-deploy` reported "✗ unit" when the root cause was a missing `npm ci`.
     unrunnable: str = ""
-    #: Chạy ngoài Docker (suy biến). Kết quả vẫn tính, nhưng mức cách ly
-    #: thấp hơn phải hiện ra — cổng trước triển khai đọc cờ này.
+    #: Ran outside Docker (degraded). Results still count, but the lower
+    #: isolation level must be visible — the pre-deploy gate reads this flag.
     degraded: bool = False
-    #: Tên bảo đảm bậc này cần mà provider thiếu (`sandbox.Guarantee`) —
-    #: "suy biến" không nói thiếu gì thì cổng không nói được đang tin gì.
+    #: Guarantee names this level requires but the provider lacks (`sandbox.Guarantee`) —
+    #: "degraded" without naming what is missing leaves the gate unable to state what it trusts.
     missing: list[str] = field(default_factory=list)
 
     @property
@@ -165,23 +166,23 @@ class QaReport:
     results: list[KindResult] = field(default_factory=list)
     fake_tests: list[str] = field(default_factory=list)
     waived: list[str] = field(default_factory=list)
-    #: SHA bản được kiểm — bằng chứng không gắn bản thì không nói được nó
-    #: chứng minh cho mã nào (ADR-004 R1).
+    #: SHA of the candidate under test — evidence not tied to a revision cannot
+    #: say which code it proves (ADR-004 R1).
     candidate: str = ""
-    #: Cây đã chạy: `worktree-tạm` dựng từ `clean_tree` (ADR-005 V6) hay
-    #: `cây agent` (kèm lý do khi không dựng được). Mức bảo đảm phải hiện ra.
+    #: Tree that ran: temp worktree built from `clean_tree` (ADR-005 V6) or
+    #: agent tree (with reason when clean worktree could not be created). Guarantee level must be visible.
     tree: str = ""
     clean_tree: str = ""
 
     @property
     def failed(self) -> list[KindResult]:
-        """Loại đã chạy và đỏ. **Không** gồm loại không chạy nổi: chúng
-        vẫn chặn, nhưng qua `unrunnable`, với lý do đúng."""
+        """Kinds that ran and failed. Does **not** include unrunnable kinds:
+        those still block, but via `unrunnable`, with the correct reason."""
         return [r for r in self.results if r.ran and not r.ok and not r.unrunnable]
 
     @property
     def degraded(self) -> list[KindResult]:
-        """Loại đã chạy nhưng ngoài Docker."""
+        """Kinds that ran but outside Docker."""
         return [r for r in self.results if r.ran and r.degraded]
 
     @property
@@ -194,12 +195,12 @@ class QaReport:
 
     @property
     def passed(self) -> bool:
-        """Đạt ở mức story: không có loại nào chạy mà đỏ, không có test giả."""
+        """Passed at story level: no kind ran red, no fake tests."""
         return not self.failed and not self.unrunnable and not self.fake_tests
 
     @property
     def release_ready(self) -> bool:
-        """Đạt ở mức trước triển khai: mọi loại **đã chạy** và xanh."""
+        """Passed at pre-deploy level: every kind **has run** and is green."""
         return self.passed and not self.unconfigured
 
     def summary(self) -> str:
@@ -230,7 +231,7 @@ class QaReport:
 
 
 def command_for_kind(kind_id: str, project: Path, config: Config | None) -> str:
-    """Lệnh của một loại: cấu hình thắng, rồi tới mặc định theo stack."""
+    """Command for a kind: explicit config wins, then stack-based defaults."""
     if config is not None:
         key = f"verify.{kind_id}"
         if key in config and str(config[key]).strip():
@@ -248,8 +249,8 @@ def command_for_kind(kind_id: str, project: Path, config: Config | None) -> str:
     if default:
         return default
 
-    # Công cụ chung chỉ dùng khi thật sự có trên máy: khai một lệnh không
-    # tồn tại thì loại đó "chạy và đỏ", báo sai bản chất — nó chưa cấu hình.
+    # Universal tools only used when actually present: declaring a non-existent
+    # command makes the kind "ran and red", misreporting the root cause — it is unconfigured.
     import shutil as _shutil
 
     universal = _UNIVERSAL.get(kind_id, "")
@@ -259,11 +260,11 @@ def command_for_kind(kind_id: str, project: Path, config: Config | None) -> str:
 
 
 def find_fake_tests(project: Path | str, files: list[str] | None = None) -> list[str]:
-    """Tìm test không có khẳng định nào.
+    """Find tests with no assertions.
 
-    Không cố hiểu ngữ nghĩa: chỉ hỏi một câu rất cụ thể — file này có hàm
-    test mà tuyệt nhiên không có khẳng định nào không. Câu hỏi hẹp nên
-    hiếm báo nhầm, và kiểu test giả nó bắt được là kiểu phổ biến nhất.
+    No semantic analysis: just one narrow question — does this file have a
+    test function with absolutely no assertions. The narrow scope keeps false
+    positives rare, and the fake-test pattern it catches is the most common one.
     """
     project = Path(project)
     if files is None:
@@ -280,20 +281,20 @@ def find_fake_tests(project: Path | str, files: list[str] | None = None) -> list
     return out
 
 
-#: Thư mục không phải mã của dự án. Chỉ dùng khi không có git để hỏi.
+#: Non-source vendor directories. Only used when git is unavailable.
 _VENDOR = ("node_modules", ".git", ".venv", "venv", "dist", "build", "references",
            "__pycache__", ".aisef")
 
 
 def _project_files(project: Path) -> list[str]:
-    """File thuộc dự án. Hỏi git trước — nó biết chính xác cái gì được
-    theo dõi, kể cả những chỗ `.gitignore` loại ra mà ta không đoán được."""
+    """Project files. Ask git first — it knows exactly what is tracked,
+    including paths excluded by `.gitignore` that we cannot guess."""
     import subprocess
 
     try:
-        # `--others --exclude-standard` để thấy cả file **chưa commit**:
-        # test giả vừa viết xong thì chưa nằm trong chỉ mục git, mà đó đúng
-        # là lúc cần bắt nó nhất.
+        # `--others --exclude-standard` to also see **uncommitted** files:
+        # a freshly written fake test is not in the git index yet, and that is
+        # exactly when it most needs to be caught.
         proc = subprocess.run(
             ["git", "-C", str(project), "ls-files",
              "--cached", "--others", "--exclude-standard"],
@@ -320,12 +321,13 @@ def _unrunnable_reason(exit_code: int, detail: str, provider_error: str = "") ->
 def _verification_tree(
     stack: ExitStack, project: Path, sha: str, *, clean: bool,
 ) -> tuple[Path, str, str, dict[str, Path]]:
-    """Cây để **chạy** kiểm định: worktree tạm từ ``sha`` (ADR-005 V6) hay
-    chính cây đang đứng. Trả ``(workspace, nhãn cây, SHA cây sạch, mounts)``.
+    """Tree to **run** verification in: temp worktree from ``sha`` (ADR-005 V6) or
+    the current working tree. Returns ``(workspace, tree label, clean SHA, mounts)``.
 
-    Không dựng được (không git, chưa có commit, SHA lạ) thì chạy trên cây
-    đang đứng **và nói ra** trong nhãn — không chạy được ≠ trượt, và giảm
-    bảo đảm không được im lặng (bất biến 10). Worktree do ``stack`` gỡ.
+    When a clean worktree cannot be created (no git, no commits, unknown SHA),
+    falls back to the current tree **and says so** in the label — inability to
+    create a worktree is not a test failure, and reduced guarantees must not be
+    silent (invariant 10). The worktree is cleaned up by ``stack``.
     """
     if not clean:
         return project, TREE_AGENT, "", {}
@@ -351,25 +353,26 @@ def run_suite(
     candidate: str = "",
     clean: bool = True,
 ) -> QaReport:
-    """Chạy bộ kiểm định.
+    """Run the verification suite.
 
-    ``candidate`` là SHA bản đang kiểm (ADR-004 R1). Không truyền thì lấy
-    HEAD của chính cây đang chạy: QA cấp dự án cũng phải trả lời được "kết
-    quả này thuộc bản nào", không chỉ QA trong story.
+    ``candidate`` is the SHA under test (ADR-004 R1). When omitted, HEAD of the
+    current tree is used: project-level QA must also answer "which revision does
+    this result belong to", not only story-level QA.
 
-    ``clean`` (ADR-005 V6, mặc định bật và còn cần `verify.clean_tree`): các
-    lệnh chạy trong **worktree tạm dựng từ ``candidate``**, không phải cây
-    đang đứng. Harbor dừng env agent rồi chạy verifier ở container tách; ở
-    đây cây agent vừa sửa có thể mang shim `node_modules/.bin/vitest`,
-    `pytest.ini`, `conftest.py` chưa commit — worktree từ SHA không có
-    chúng. `node_modules`/`.venv` của dự án được gắn vào (Docker: bind
-    mount; suy biến: symlink) như cây thường vẫn có. Giá: tệp **không theo
-    dõi** mà test cần (`.env.test`, fixture sinh tay) cũng vắng — commit
-    chúng, hoặc tắt `verify.clean_tree`; tắt thì `tree = "cây agent"`, ghi
-    vào bằng chứng và `pre-deploy.json`. Mức story (`verify_candidate`)
-    truyền ``clean=False``: cây worktree đã đóng băng, guard write-scope đã
-    chặn ngoài phạm vi. `find_fake_tests` vẫn đọc cây đang đứng: test giả
-    vừa viết chưa commit là đúng lúc phải bắt.
+    ``clean`` (ADR-005 V6, on by default and also requires `verify.clean_tree`):
+    commands run in a **temp worktree built from ``candidate``**, not the current
+    working tree. Harbor stops the env agent then runs the verifier in a separate
+    container; here the agent tree may carry uncommitted shims like
+    `node_modules/.bin/vitest`, `pytest.ini`, `conftest.py` — the worktree from
+    SHA does not have them. The project's `node_modules`/`.venv` are mounted in
+    (Docker: bind mount; degraded: symlink) as the tree normally has. Cost:
+    **untracked** files tests need (`.env.test`, hand-generated fixtures) are also
+    absent — commit them, or disable `verify.clean_tree`; disabling sets
+    `tree = "agent-tree"`, recorded in evidence and `pre-deploy.json`. Story level
+    (`verify_candidate`) passes ``clean=False``: the worktree is already frozen and
+    the write-scope guard blocks out-of-scope changes. `find_fake_tests` still reads
+    the current tree: a freshly written fake test not yet committed is exactly when
+    it needs to be caught.
     """
     project = Path(project)
     cfg = config or Config.load(project)
@@ -390,10 +393,10 @@ def run_suite(
                 continue
             result = KindResult(kind=kind)
             if kind.id in waived:
-                # Miễn là **quyết định của người**, đã ghi lại. Vẫn chạy rồi
-                # vẫn đếm là trượt thì miễn chẳng có nghĩa gì, và báo cáo tự
-                # mâu thuẫn: dòng dưới ghi "miễn tường minh" trong khi dòng
-                # trên ghi ✗.
+                # Waiver is a **human decision**, already recorded. Running and
+                # still counting as failed makes the waiver meaningless, and the
+                # report contradicts itself: one line says "explicit waiver" while
+                # another says ✗.
                 ly_do = str(cfg.get("verify.waiver_reason", "") or "").strip()
                 result.skipped = "explicit waiver (verify.waived)" + (f": {ly_do}" if ly_do else "")
                 report.results.append(result)
@@ -429,12 +432,13 @@ def run_suite(
             result.duration_ms = sb.duration_ms
             result.degraded = bool(getattr(sb, "degraded", False))
             result.missing = list(getattr(sb, "missing", []))
-            # Dò dấu hiệu trên đầu ra **đầy đủ**, không phải phần đã cắt:
-            # "Cannot find module" nằm ở đầu stack trace còn `detail` chỉ giữ
-            # 5 dòng cuối. Đo trên e9: sau bản vá đầu tiên, `mutation` vẫn bị
-            # đếm là test đỏ đúng vì chỗ này.
-            # Che bí mật **trước** khi cắt (ADR-005 V1): `tail` đi vào
-            # `_bmad-output`, thư mục được commit theo dự án.
+            # Detect signals on the **full** output, not the truncated tail:
+            # "Cannot find module" appears at the top of the stack trace while
+            # `detail` only keeps the last 5 lines. Measured on e9: after the
+            # first patch, `mutation` was still counted as a real test failure
+            # because of this.
+            # Scrub secrets **before** truncation (ADR-005 V1): `tail` goes into
+            # `_bmad-output`, a directory committed with the project.
             day_du, che = scrub_secrets((sb.stdout + "\n" + sb.stderr).strip())
             result.detail = "\n".join(day_du.splitlines()[-5:])
             result.unrunnable = _unrunnable_reason(

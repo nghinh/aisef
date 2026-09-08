@@ -1,7 +1,7 @@
-"""Phát hiện brownfield — dự án đã có mã nguồn, không chỉ requirements.md.
+"""Brownfield detection — whether the project already has source code, not just requirements.md.
 
-Greenfield: chưa có gì ngoài tài liệu yêu cầu.
-Brownfield: đã có source, test, config, CI, schema, docs.
+Greenfield: nothing beyond requirement documents.
+Brownfield: has source, tests, config, CI, schema, docs.
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ _SKIP_DIRS = {
 
 @dataclass
 class BrownfieldSignal:
-    """Tín hiệu từ hệ thống hiện tại."""
+    """Signals from the existing system."""
     source_files: int = 0
     test_files: int = 0
     config_files: list[str] = field(default_factory=list)
@@ -64,7 +64,7 @@ class BrownfieldSignal:
 
 
 def detect(project: Path, *, limit: int = 10_000) -> BrownfieldSignal:
-    """Quét nhanh dự án — dừng sau ``limit`` file."""
+    """Quick project scan — stops after ``limit`` files."""
     sig = BrownfieldSignal()
     seen = 0
 

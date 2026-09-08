@@ -1,34 +1,34 @@
-"""Cổng story — điều kiện để một story được coi là xong.
+"""Story gate — conditions for a story to be considered done.
 
-Cổng đọc **bằng chứng**, không đọc lời agent kể. Agent nào cũng kết thúc
-bằng câu "đã hoàn thành"; câu đó không mang thông tin. Thứ mang thông tin
-là: có lần chạy test nào không, nó xanh hay đỏ, chạy trước hay sau lần sửa
-cuối, cây git có nằm trong phạm vi không, màn hình thật có đủ component đã
-hứa không.
+The gate reads **evidence**, not agent claims. Every agent ends with
+"completed"; that sentence carries no information. What carries information
+is: whether a test run exists, green or red, run before or after the last
+edit, whether the git tree stays within scope, whether the real screen has
+all promised components.
 
-Năm điều kiện, mỗi điều kiện trả lời được bằng dữ liệu có sẵn:
+Nine conditions, each answerable from available data:
 
-1. test xanh, và xanh **sau** lần sửa file cuối cùng;
-2. lint sạch;
-3. thay đổi nằm trong ``write_scope``;
-4. màn hình khớp hợp đồng thị giác (chỉ story có giao diện);
-5. rà soát độc lập không còn mục chặn;
-6. không có test giả — test không khẳng định gì làm điều kiện 1 rỗng nghĩa;
-7. bảo toàn (ADR-004 R4) — hành vi VERIFIED của story khác mà story này
-   chạm tệp vẫn xanh ở đúng ứng viên; không kiểm được thì nói là không
-   kiểm được, không nói là đạt.
-8. không làm đỏ test có sẵn — test xanh ở baseline (trước khi story chạm
-   vào) phải còn xanh và còn tồn tại ở ứng viên (ADR-004 R9).
-9. test có kiểm được story (nop control, ADR-005 V3) — test mang mã tiêu
-   chí phải **đỏ khi không có mã của story**: không xanh sẵn ở baseline
-   (cấp 1, $0) và đỏ hoặc không tồn tại ở SHA cha với tệp test chép vào
-   (cấp 2, một lần sandbox). Xanh cả hai nơi là một cái tên, không phải
-   một phép kiểm.
+1. tests green, and green **after** the last file edit;
+2. lint clean;
+3. changes within ``write_scope``;
+4. screen matches visual contract (UI stories only);
+5. independent review has no blocking items;
+6. no fake tests — tests asserting nothing make condition 1 vacuous;
+7. preservation (ADR-004 R4) — VERIFIED behaviours of other stories whose
+   files this story touches are still green at the candidate; unverifiable
+   is reported as unverifiable, not as passed.
+8. no baseline regression — tests green at baseline (before the story
+   touched anything) must remain green and present at candidate (ADR-004 R9).
+9. tests verify story (nop control, ADR-005 V3) — tests carrying criteria
+   codes must be **red without the story's code**: not already green at
+   baseline (level 1, $0) and red or absent at parent SHA with test files
+   copied in (level 2, one sandbox run). Green at both places is a label,
+   not a verification.
 
-Danh sách **đóng** tên mục là `CHECK_NAMES`; mỗi mục có `kind` (ai chấm —
-`CHECK_KIND`) và `evidence` (seq sự kiện đã đọc); mỗi tên có ba control ở
-`tests/test_gate_qualification.py`, bảng đọc bằng `qualification_table()`
-(ADR-005 V9).
+The **closed** list of check names is `CHECK_NAMES`; each check has `kind`
+(who scores it — `CHECK_KIND`) and `evidence` (seq of events read); each
+name has three controls in `tests/test_gate_qualification.py`, table read
+by `qualification_table()` (ADR-005 V9).
 """
 
 from __future__ import annotations
@@ -46,12 +46,12 @@ from ..harness.observe import FILE_CHANGE, GUARD_BLOCK, GUARD_SEEN, MOCKUP_MAP, 
 from ..harness.testlog import MAX_IDS
 from ..harness.tools import BASELINE_RUN, NOP_RUN
 
-#: Tên mục cổng story — danh sách **đóng** (ADR-005 V9). Mọi `Check(...)` trong
-#: tệp này phải dùng tên ở đây (test meta grep AST), và mỗi tên có ba control
-#: positive · negative · env ở `tests/test_gate_qualification.py`. `<kind>` là
-#: **họ** mục theo hợp đồng kiểm định: tên mục thật là tên loại (`e2e`,
-#: `accessibility`, `perf`… — `phases/qa.py::KINDS` trừ unit/mockup-map/security
-#: đã có mục riêng).
+#: Story gate check names — **closed** list (ADR-005 V9). Every `Check(...)` in
+#: this file must use a name from here (test meta grep AST), and each name has
+#: three controls positive / negative / env in `tests/test_gate_qualification.py`.
+#: `<kind>` is the check **family** per verification contract: the actual check
+#: name is the kind (`e2e`, `accessibility`, `perf`... — `phases/qa.py::KINDS`
+#: minus unit/mockup-map/security which have dedicated checks).
 CHECK_NAMES = (
     "evidence matches candidate",
     "guard ran",
@@ -71,10 +71,10 @@ CHECK_NAMES = (
     "preservation",
 )
 
-#: Ai chấm mục nào — một chỗ, giá trị thuộc `outcome.CHECK_KINDS`. Máy tất
-#: định đọc kết quả runner; máy so cấu trúc (phạm vi tệp, tên test, DOM,
-#: dấu vết guard, SHA); rà soát bảo mật; model làm giám khảo. Chưa mục nào
-#: `human`.
+#: Who scores each check — single source, values from `outcome.CHECK_KINDS`.
+#: Deterministic machine reads runner results; structural machine compares
+#: file scope, test names, DOM, guard traces, SHA; security review; model as
+#: judge. No check is `human` yet.
 CHECK_KIND = {
     "evidence matches candidate": "structural",
     "guard ran": "structural",
@@ -94,14 +94,14 @@ CHECK_KIND = {
     "preservation": "deterministic",
 }
 
-#: Ba control chứng nhận một mục (Inspect `tests/scorer/*`, TB oracle/nop):
-#: positive (bằng chứng tốt → PASSED/NOT_APPLICABLE có tên), negative/mutant
-#: (bằng chứng xấu → FAILED, hay chặn khi thiết kế mục không có FAILED), env
-#: (môi trường/cấu hình không cho kết luận → kết cục có tên, không phải đạt).
+#: Three controls certifying a check (Inspect `tests/scorer/*`, TB oracle/nop):
+#: positive (good evidence -> PASSED/NOT_APPLICABLE with name), negative/mutant
+#: (bad evidence -> FAILED, or blocks when the check design has no FAILED), env
+#: (environment/config prevents conclusion -> named outcome, not a pass).
 CONTROLS = ("positive", "negative", "env")
 
-#: Bản ghi của `--verify-only --repeat k` (ADR-004 R13): phép kiểm nào đổi
-#: kết cục giữa k lần chạy trên cùng SHA. Ghi ở `implement._repeat_note`.
+#: Record of `--verify-only --repeat k` (ADR-004 R13): which checks changed
+#: outcome across k runs on the same SHA. Written by `implement._repeat_note`.
 REPEAT_NOTE = "verify-only.repeat"
 
 
@@ -123,26 +123,26 @@ class StoryGate:
         return "\n".join([head, *(c.line() for c in self.checks)])
 
     def feedback(self) -> str:
-        """Phần đưa lại cho agent ở lượt thử tiếp theo."""
+        """Feedback to pass back to the agent on the next attempt."""
         return "\n".join(f"- {c.name}: {c.detail}" for c in self.failures)
 
 
 def _stale_candidates(evidence: Evidence, candidate: str) -> list[str]:
-    """Bản cũ mà **kết quả mới nhất** của một phép kiểm còn dính vào.
+    """Old candidates that the **latest result** of a check still refers to.
 
-    So theo từng phép kiểm (kind + tên), không theo cả tệp bằng chứng: lượt
-    trước để lại kết quả ở bản trước, và điều đó là bình thường — chạy lại
-    trên bản mới là đủ. Cái không bình thường là phép kiểm **mới nhất** vẫn
-    thuộc bản khác: nghĩa là mã đã đổi sau khi kiểm.
+    Compared per check (kind + name), not per evidence file: the previous
+    attempt leaving results at the old candidate is normal — rerunning on
+    the new candidate is sufficient. What is abnormal is when the **latest**
+    check still belongs to a different candidate: code changed after testing.
     """
     return sorted({str(e.detail["candidate"]) for e in _latest_per_check(evidence).values()
                    if str(e.detail["candidate"]) != candidate})
 
 
 def _latest_per_check(evidence: Evidence) -> dict[tuple[str, str], Event]:
-    """Kết quả **mới nhất** của từng phép kiểm (kind + tên) có khai bản —
-    chính những sự kiện mục "bằng chứng đúng candidate" đọc, nên `evidence`
-    của mục ấy trỏ vào đây."""
+    """**Latest** result of each check (kind + name) that declares a candidate —
+    exactly the events the "evidence matches candidate" check reads, so its
+    `evidence` field points here."""
     moi_nhat: dict[tuple[str, str], Event] = {}
     for e in evidence.events:
         if e.kind in (TOOL_RUN, MOCKUP_MAP) and e.detail.get("candidate"):
@@ -155,22 +155,23 @@ def _ten(tests: list[str], n: int = 5) -> str:
 
 
 def _flaky_ids(evidence: Evidence) -> list[str]:
-    """Tên test đổi kết cục giữa k lần chạy trên cùng SHA (`--repeat k`)."""
+    """Test names that changed outcome across k runs on the same SHA (`--repeat k`)."""
     note = evidence.last(NOTE, REPEAT_NOTE)
     return [str(t) for t in (note.detail.get("flaky_ids") or [])] if note else []
 
 
 def _khong_on_dinh(evidence: Evidence, name: str) -> str:
-    """Lý do "không ổn định" cho mục ``name`` từ bản ghi `--repeat k`; rỗng
-    nếu không có gì để nói.
+    """Flakiness reason for check ``name`` from the `--repeat k` record; empty
+    if nothing to report.
 
-    Mã không đổi giữa k lần mà kết cục đổi thì đó không phải đỏ (không có
-    gì để sửa trong mã) và cũng không phải đạt (không chạy được ổn định) →
-    UNRUNNABLE, nêu tên — lỗi 22: `autosave.spec.ts:210` nhạy tải máy làm
-    e9 STORY-01-07 trượt lượt 3 rồi đo lại 10/10 xanh. Đỏ ở **mọi** lần
-    (`stable_red`) là đỏ thật: không xếp vào đây, lần cuối đỏ và mục "test"
-    chấm FAILED như thường. Phép kiểm không in tên test (lint, `qa:<kind>`)
-    so cả phép: `ok` đổi giữa các lần là không ổn định.
+    Code unchanged across k runs but outcome changes means it is not red
+    (nothing to fix in code) and not a pass (cannot run stably) -> UNRUNNABLE,
+    naming the tests — bug 22: `autosave.spec.ts:210` was load-sensitive,
+    causing e9 STORY-01-07 to fail attempt 3 then go 10/10 green on retest.
+    Red on **every** run (`stable_red`) is a real failure: not classified
+    here, last run is red and the "test" check scores FAILED as usual.
+    Checks that don't print test names (lint, `qa:<kind>`) compare the whole
+    check: `ok` changing across runs means flaky.
     """
     note = evidence.last(NOTE, REPEAT_NOTE)
     if note is None:
@@ -189,7 +190,7 @@ def _khong_on_dinh(evidence: Evidence, name: str) -> str:
 
 
 def _la(test_id: str) -> str:
-    """Tiêu đề lá của một test id: phần sau dấu `>` cuối, bỏ mã `AC_…:` đứng đầu."""
+    """Leaf title of a test id: part after the last `>`, stripping leading `AC_...:` code."""
     la = test_id.rsplit(">", 1)[-1].strip()
     if ":" in la and la.split(":", 1)[0].replace("_", "-").upper().startswith("AC-"):
         la = la.split(":", 1)[1].strip()
@@ -197,31 +198,33 @@ def _la(test_id: str) -> str:
 
 
 def _baseline_check(evidence: Evidence, candidate: str) -> Check:
-    """Mục "không làm đỏ test có sẵn" (ADR-004 R9).
+    """Check "no baseline regression" (ADR-004 R9).
 
-    Mục "test" chỉ nói lần chạy cuối xanh hay đỏ. Đỏ vì test **mới** của
-    story (TDD, đang đỏ đúng nghĩa) và đỏ vì test **có sẵn** vừa bị làm hỏng
-    trông y hệt nhau ở đó — mà cách sửa khác nhau, và cái thứ hai là hồi quy
-    cần gọi đúng tên. Nên so hai danh sách tên: test xanh ở baseline (harness
-    chạy trước phiên developer, `test:baseline`) với lần test mới nhất ở ứng
-    viên. Xanh trước mà đỏ hoặc mất sau → hồi quy, nêu tên. Test đã đỏ sẵn ở
-    baseline không tính — nói ra là không tính.
+    The "test" check only says whether the last run is green or red. Red from
+    a **new** test (TDD, legitimately red) and red from a **pre-existing**
+    test just broken look identical there — but the fix differs, and the
+    latter is a regression that must be named. So compare two name lists:
+    tests green at baseline (harness runs before the developer session,
+    `test:baseline`) with the latest test run at the candidate. Green before
+    but red or missing after -> regression, named. Tests already red at
+    baseline are excluded — stated explicitly.
 
-    Kết cục theo đúng bất biến: không có baseline vì **chưa khai lệnh test**
-    hay reporter **không in tên** là chưa cấu hình (không đạt, không chặn,
-    phải hiện ra); baseline **không chạy được** (công cụ chưa cài) là không
-    chạy được (chặn với lý do môi trường, không phải "story làm đỏ"); tắt
-    bởi `verify.baseline` hay harness không ghi baseline nào là không áp
-    dụng, có nói lý do. Test **mất** là hồi quy: xoá hay đổi tên test có sẵn
-    phải là quyết định khai trong story, mà story chưa có chỗ khai — không
-    suy được thì không cho qua, và nói rõ vì sao.
+    Outcomes follow the invariant: no baseline because **test command not
+    configured** or reporter **doesn't print names** -> UNCONFIGURED (not a
+    pass, not blocking, must be visible); baseline **unrunnable** (tool not
+    installed) -> UNRUNNABLE (blocks with environment reason, not "story
+    broke it"); disabled by `verify.baseline` or harness recorded no baseline
+    -> NOT_APPLICABLE with reason. Tests **gone** is regression: deleting or
+    renaming existing tests must be declared in the story, and the story has
+    no place to declare that yet — cannot infer intent, so not allowed, with
+    clear explanation.
     """
     ten = "no baseline regression"
     goc = evidence.last(TOOL_RUN, BASELINE_RUN)
     if goc is None:
         return Check(ten, Outcome.NOT_APPLICABLE,
                      "harness recorded no baseline (manual run, old journal) — cannot compare")
-    doc = [goc.seq]     # sự kiện đã đọc: baseline, rồi lần test ở ứng viên
+    doc = [goc.seq]     # events read: baseline, then test run at candidate
     if goc.detail.get("disabled"):
         return Check(ten, Outcome.NOT_APPLICABLE, "disabled by `verify.baseline` config", evidence=doc)
     if goc.detail.get("skipped"):
@@ -236,8 +239,8 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
                         "(`node --test`, `vitest --reporter=verbose`, `pytest -v`, CTRF)",
                      evidence=doc)
 
-    # Lần test ở ứng viên: sau baseline, và đúng bản đang chấm (có candidate
-    # thì không nhận lần chạy tay không khai bản).
+    # Test run at candidate: after baseline, and matching the candidate being
+    # scored (when candidate is given, reject manual runs without a candidate).
     sau = [e for e in evidence.of(TOOL_RUN, "test")
            if e.seq > goc.seq and (not candidate or e.detail.get("candidate") == candidate)]
     if not sau:
@@ -256,20 +259,21 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
     goc_ids = list(goc.detail.get("test_ids") or [])
     khong_xanh = set(goc.detail.get("failed_ids") or []) | set(goc.detail.get("skipped_ids") or [])
     xanh_goc = [t for t in goc_ids if t not in khong_xanh]
-    # `--repeat k`: test đổi kết cục giữa k lần ở ứng viên không phải "làm
-    # đỏ" — mục "test" đã ghi UNRUNNABLE nêu tên; ở đây không tính, và nói ra.
+    # `--repeat k`: tests changing outcome across k runs at candidate are not
+    # "broke" — the "test" check already records UNRUNNABLE naming them;
+    # excluded here, and stated.
     lat = _flaky_ids(evidence)
     do = set(moi.detail.get("failed_ids") or []) - set(lat)
     con = set(moi.detail.get("test_ids") or [])
     lam_do = [t for t in xanh_goc if t in do]
-    # ponytail: testlog cắt danh sách ở MAX_IDS — bộ test lớn hơn thế thì
-    # "mất" không kết luận được (tên có thể nằm ngoài phần cắt), chỉ so đỏ.
+    # ponytail: testlog truncates list at MAX_IDS — test suites larger than
+    # that cannot conclude "lost" (name may be beyond the cutoff), only compare red.
     cat = len(goc_ids) >= MAX_IDS or len(con) >= MAX_IDS
-    # Đổi tên ≠ mất: cùng tiêu đề lá (phần sau dấu `>` cuối) còn ở ứng viên
-    # thì test vẫn đó, chỉ mang tên nhóm/mã khác. e9 01-07 lượt 2 (2026-09-06):
-    # developer thêm mã `AC_STORY_01_01_6:` vào bốn test có sẵn để đóng GAP
-    # của story khác — cổng đọc thành "mất 4 test". Xoá thật thì tiêu đề lá
-    # cũng mất, vẫn bị bắt.
+    # Rename != lost: same leaf title (part after last `>`) still present at
+    # candidate means the test is still there, just under a different group/code
+    # name. e9 01-07 attempt 2 (2026-09-06): developer added `AC_STORY_01_01_6:`
+    # prefix to four existing tests to close GAPs of another story — gate read
+    # it as "lost 4 tests". A real deletion loses the leaf title too, still caught.
     la_con = {_la(t) for t in con}
     doi_ten = [] if cat else [t for t in xanh_goc if t not in con and _la(t) in la_con]
     mat = [] if cat else [t for t in xanh_goc if t not in con and _la(t) not in la_con]
@@ -299,37 +303,41 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
 
 
 def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate: str) -> Check:
-    """Mục "test có kiểm được story" — nop control (ADR-005 V3).
+    """Check "tests verify story" — nop control (ADR-005 V3).
 
-    Câu hỏi của Terminal-Bench (nop < 1), BERBench (`base_fail`) và Agentless
-    (reproduction test): **không có mã của story thì test của story phải
-    đỏ**. `TDD` chỉ hỏi "có một lần đỏ bất kỳ trước lần xanh cuối" — một lần
-    đỏ vì lỗi cú pháp cũng qua. Ở đây hỏi thẳng hai cấp, cấp rẻ trước:
+    The question from Terminal-Bench (nop < 1), BERBench (`base_fail`) and
+    Agentless (reproduction test): **without the story's code, the story's
+    tests must be red**. `TDD` only asks "was there any red run before the
+    last green" — a syntax error red also passes. Here we ask directly at
+    two levels, cheapest first:
 
-    **Cấp 1 ($0, từ `test:baseline` R9):** test mang `AC-<story>-i` xanh ở
-    ứng viên mà đã xanh ở baseline — cùng tên, hoặc tên cũ mất và tiêu đề
-    lá (`_la`) còn nguyên, tức đổi tên để gắn mã — là "gắn mã vào test có
-    sẵn" (lỗi 23 → 24: developer gắn mã vào bốn test có sẵn để cổng thôi
-    kêu): nó xanh **trước khi story viết dòng nào**, nên không kiểm được gì
-    của story. Không nới cho trường hợp "story chỉ sửa/đổi tên test có sẵn"
-    dù thân test có thể đã đổi: bằng chứng $0 chỉ thấy tên, mã tiêu chí là
-    hợp đồng theo **tên** (mục *tiêu chí có test*), và cấp 2 — thứ nhìn
-    được thân test — không phải lúc nào cũng chạy (`verify.nop` tắt, không
-    dựng được SHA cha). Nới ở đây là để lọt đúng lớp lỗi V3 sinh ra để
-    bắt; cách sửa rẻ (một lượt): viết test **mới** mang mã, giữ test có sẵn
-    nguyên tên. Không bắt oan: test mới trùng tiêu đề lá với test có sẵn
-    **còn nguyên tên** ở ứng viên là hai test khác nhau — để cấp 2 xét.
-    Baseline của lượt chạy lại đứng ở bản của chính story (`parent` ≠
-    `base_ref`, e9 01-07 lần chạy 3) thì mọi test của story đã xanh sẵn —
-    cấp 1 không so được, nói ra, cấp 2 quyết (worktree ở đúng điểm rẽ).
+    **Level 1 ($0, from `test:baseline` R9):** tests carrying `AC-<story>-i`
+    green at candidate that were already green at baseline — same name, or old
+    name gone but leaf title (`_la`) still present, meaning renamed to carry
+    the code — are "tagging existing tests" (bug 23 -> 24: developer tagged
+    four existing tests to silence the gate): green **before the story wrote
+    a line**, so they verify nothing of the story. No exception for "story
+    only edits/renames existing tests" even though the test body may differ:
+    $0 evidence only sees names, the criteria code contract is by **name**
+    (the *criteria have tests* check), and level 2 — which can see test
+    bodies — doesn't always run (`verify.nop` disabled, can't build parent
+    SHA). Loosening here lets through exactly the class of bugs V3 was built
+    to catch; cheap fix (one attempt): write **new** tests with codes, keep
+    existing tests under original names. No false positives: a new test
+    sharing a leaf title with an existing test **still present by name** at
+    candidate is a different test — left to level 2. Baseline of a retry
+    stands at the story's own build (`parent` != `base_ref`, e9 01-07
+    attempt 3) so all story tests are already green — level 1 cannot
+    compare, stated, level 2 decides (worktree at the correct branch point).
 
-    **Cấp 2 (`test:nop`, harness chạy sau đóng băng):** ở SHA cha với tệp
-    test story thêm/sửa chép vào, test mang mã phải **đỏ hoặc không tồn
-    tại** — lỗi import ở SHA cha là đỏ, và là hợp lệ. Xanh → FAILED nêu tên.
-    Kết cục khác theo bất biến: nop không chạy được → UNRUNNABLE; reporter
-    không in tên (chỉ biết bộ test đỏ, không biết của ai) → UNCONFIGURED;
-    story không thêm/sửa tệp test, tắt bởi `verify.nop`, hay harness không
-    ghi nop nào (nhật ký trước V3) → NOT_APPLICABLE có lý do.
+    **Level 2 (`test:nop`, harness runs after freeze):** at the parent SHA
+    with story test files copied in, tests carrying codes must be **red or
+    absent** — import errors at parent SHA count as red and are valid. Green
+    -> FAILED naming the tests. Other outcomes per invariant: nop unrunnable
+    -> UNRUNNABLE; reporter doesn't print names (only knows test suite is
+    red, not whose) -> UNCONFIGURED; story didn't add/modify test files,
+    disabled by `verify.nop`, or harness recorded no nop (journal before V3)
+    -> NOT_APPLICABLE with reason.
     """
     ten = "tests verify story"
     goc = evidence.last(TOOL_RUN, BASELINE_RUN)
@@ -338,13 +346,13 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
            and (not candidate or e.detail.get("candidate") == candidate)]
     moi = sau[-1] if sau else None
     nop = evidence.last(TOOL_RUN, NOP_RUN)
-    # Con trỏ sự kiện đã đọc: baseline, lần test ở ứng viên, nop — cái nào có.
+    # Event pointers read: baseline, test run at candidate, nop — whichever exist.
     doc = [e.seq for e in (goc, moi, nop) if e is not None]
 
     def ket(outcome, detail: str = "") -> Check:
         return Check(ten, outcome, detail, evidence=doc)
 
-    # Test mang mã tiêu chí **xanh** ở ứng viên — đối tượng của cả hai cấp.
+    # Tests with criteria codes **green** at candidate — subject of both levels.
     ac: list[str] = []
     if moi is not None and moi.detail.get("test_format") and acceptance > 0:
         do = set(moi.detail.get("failed_ids") or []) | set(moi.detail.get("skipped_ids") or [])
@@ -352,7 +360,7 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
         for tests in ac_coverage(story_id, acceptance, xanh_moi).values():
             ac.extend(t for t in tests if t not in ac)
 
-    # ---- cấp 1
+    # ---- level 1
     cap1 = ""
     if ac and goc is not None and goc.detail.get("test_format"):
         re_nhanh, cha = str(goc.detail.get("base_ref") or ""), str(goc.detail.get("parent") or "")
@@ -378,7 +386,7 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
             if loi:
                 return ket(False, "; ".join(loi) + ". Write new tests for criteria, keep existing tests under their original names")
 
-    # ---- cấp 2
+    # ---- level 2
     if nop is None:
         return ket(Outcome.NOT_APPLICABLE,
                      "harness ran no nop (manual run, journal before ADR-005 V3) — cannot compare")
@@ -436,16 +444,16 @@ def evaluate(
     candidate: str = "",
     preservation: list[dict] | None = None,
 ) -> StoryGate:
-    """Chấm một story từ bằng chứng đã ghi.
+    """Score a story from recorded evidence.
 
-    ``candidate`` là SHA của bản đang chấm (ADR-004 R1). Truyền vào thì
-    bằng chứng ghi ở bản khác **không được dùng để chấm**, và cổng nói ra
-    điều đó thay vì im lặng chấm bằng số liệu của mã đã không còn. Rỗng =
-    không kiểm (chạy tay, nhật ký cũ).
+    ``candidate`` is the SHA of the build being scored (ADR-004 R1). When
+    given, evidence recorded at a different build **is not used for scoring**,
+    and the gate says so instead of silently scoring with stale metrics.
+    Empty = no check (manual run, old journal).
 
-    ``preservation`` là hành vi VERIFIED của story khác mà story này chạm
-    tệp (ADR-004 R4, `implement.preservation_items`). Rỗng = không áp dụng,
-    nên chỗ gọi cũ không đổi kết cục.
+    ``preservation`` is VERIFIED behaviours of other stories whose files
+    this story touches (ADR-004 R4, `implement.preservation_items`). Empty =
+    not applicable, so old callers see no change in outcome.
     """
     gate = StoryGate(story_id=story_id)
 
@@ -467,22 +475,23 @@ def evaluate(
         gate.checks.append(Check("evidence matches candidate", True,
                                  evidence=[e.seq for e in moi_nhat.values()]))
     if candidate:
-        # Sau khi đã nói ra, bỏ hẳn: một phép kiểm của bản khác không được
-        # âm thầm làm mục nào đó thành đạt.
+        # After stating it, drop stale evidence: a check from another build
+        # must not silently make any check pass.
         evidence = evidence.for_candidate(candidate)
 
-    # Hook sinh ra ≠ hook chạy. Claude Code chỉ đọc `.claude/settings.json`
-    # của cây nó đứng; worktree không có thư mục ấy (dự án không commit) thì
-    # story chạy với zero guard — và bằng chứng trông y hệt agent ngoan, vì
-    # không có gì để ghi. Nay guard tự ghi `GUARD_BLOCK`/`FILE_CHANGE`, nên
-    # "guard chưa từng đánh giá một thao tác ghi nào" là điều đo được.
+    # Hook generated != hook running. Claude Code only reads `.claude/settings.json`
+    # of the tree it stands in; worktree lacking that directory (project didn't
+    # commit it) means the story runs with zero guards — and evidence looks
+    # identical to a well-behaved agent, because there is nothing to record.
+    # Now guard self-records `GUARD_BLOCK`/`FILE_CHANGE`, so "guard never
+    # evaluated a write operation" is measurable.
     if not guard_expected:
         gate.checks.append(Check(
             "guard ran", Outcome.NOT_APPLICABLE,
             "hooks not compiled for this client — not expected",
         ))
     else:
-        # Dấu vết đầu tiên là đủ để trả lời "hook có tới không".
+        # First trace is enough to answer "did the hook fire".
         dau_vet = evidence.of(GUARD_SEEN) or evidence.of(GUARD_BLOCK) or evidence.of(FILE_CHANGE)
         gate.checks.append(Check(
             "guard ran", evidence.guard_reached,
@@ -496,7 +505,7 @@ def evaluate(
 
     completion = check_completion(evidence)
     last_test = evidence.last(TOOL_RUN, "test")
-    # `completion` đọc lần test cuối và tệp sửa **sau** nó — trỏ đúng hai thứ ấy.
+    # `completion` reads the last test run and files edited **after** it — point to both.
     doc_test = ([last_test.seq] + [e.seq for e in evidence.of(FILE_CHANGE) if e.seq > last_test.seq]
                 if last_test is not None else [])
     lat = _khong_on_dinh(evidence, "test")
@@ -526,8 +535,8 @@ def evaluate(
                   evidence=[lint.seq])
         )
 
-    # Suy từ tham số (`changed`, `write_scope` — cây git do `run_attempt` đọc),
-    # không từ sự kiện: `evidence` rỗng, và rỗng là đúng.
+    # Inferred from parameters (`changed`, `write_scope` — git tree read by
+    # `run_attempt`), not from events: `evidence` is empty, and empty is correct.
     scope = check_diff_scope(changed, write_scope)
     gate.checks.append(Check("write scope", scope.allowed, scope.reason))
 
@@ -563,10 +572,10 @@ def evaluate(
     else:
         gate.checks.append(Check("real tests", True, evidence=[fake.seq] if fake is not None else []))
 
-    # Tiêu chí có test (G5): mã `AC-<story>-<i>` phải nằm trong tên một test
-    # của lần chạy xanh cuối — tên đọc từ output runner, không từ lời agent.
-    # Không đọc được tên test là **chưa cấu hình** reporter, không phải lỗi
-    # story và không phải đạt.
+    # Criteria have tests (G5): `AC-<story>-<i>` code must appear in the name
+    # of a test in the last green run — names read from runner output, not
+    # agent claims. Cannot read test names -> **unconfigured** reporter, not
+    # a story fault and not a pass.
     xanh = [e for e in evidence.of(TOOL_RUN, "test") if e.ok]
     last_green = xanh[-1] if xanh else None
     doc_xanh = [last_green.seq] if last_green is not None else []
@@ -592,8 +601,8 @@ def evaluate(
             evidence=doc_xanh,
         ))
 
-    # coverage.min (G10b): số đọc từ output runner. Không có số là runner
-    # chưa bật coverage — nói đúng chỗ sửa, không tính là đạt.
+    # coverage.min (G10b): number read from runner output. No number means
+    # runner has not enabled coverage — state the fix, do not count as pass.
     if coverage_min is not None:
         cov = last_green.detail.get("coverage") if last_green else None
         if last_green is None:
@@ -612,7 +621,7 @@ def evaluate(
                 evidence=doc_xanh,
             ))
 
-    # TDD (G8): story thêm test thì phải có một lần đỏ trước lần xanh cuối.
+    # TDD (G8): story added tests must have a red run before the last green.
     if added_tests is not None:
         if not added_tests:
             gate.checks.append(Check("TDD", Outcome.NOT_APPLICABLE, "story did not add tests"))
@@ -622,20 +631,20 @@ def evaluate(
                 "" if red_before_green(evidence) else
                 f"tests green on first run — not proven to verify anything "
                 f"({', '.join(added_tests[:3])}). Write tests first, see them fail, then write code.",
-                evidence=[e.seq for e in evidence.of(TOOL_RUN, "test")],   # thứ tự đỏ/xanh đọc trên cả dãy
+                evidence=[e.seq for e in evidence.of(TOOL_RUN, "test")],   # red/green order read across full sequence
             ))
-    # Nop control (ADR-005 V3) ngay sau TDD: cùng câu hỏi, hỏi thẳng hơn.
+    # Nop control (ADR-005 V3) right after TDD: same question, asked directly.
     gate.checks.append(_nop_check(evidence, story_id, acceptance=acceptance, candidate=candidate))
 
-    # Hợp đồng kiểm định của story. Loại chưa cấu hình được ghi là **chưa
-    # cấu hình**, không phải đạt — nó chặn ở cổng trước triển khai, và ở
-    # đây nó phải hiện ra để người đọc biết chỗ trống nằm đâu.
+    # Story verification contract. Unconfigured kinds are recorded as
+    # **unconfigured**, not passed — they block at the pre-deploy gate, and
+    # here they must be visible so the reader knows where the gap is.
     for kind in contract or []:
         if kind in ("unit", "mockup-map", "security"):
-            continue  # đã có mục riêng ở trên
-        # `run_suite` ghi `qa:<kind>`; tên trần là của lần chạy tay/`aisef tool`.
-        # e9 2026-09-05: e2e/perf/accessibility chạy thật và xanh mà cổng báo
-        # "chưa cấu hình" vì chỉ tìm tên trần.
+            continue  # already has a dedicated check above
+        # `run_suite` records `qa:<kind>`; bare name is from manual runs/`aisef tool`.
+        # e9 2026-09-05: e2e/perf/accessibility ran and were green but gate said
+        # "unconfigured" because it only looked for bare names.
         ran = evidence.last(TOOL_RUN, f"qa:{kind}") or evidence.last(TOOL_RUN, kind)
         if ran is None:
             gate.checks.append(Check(kind, Outcome.UNCONFIGURED, kind=CHECK_KIND["<kind>"]))
@@ -651,11 +660,11 @@ def evaluate(
                 kind=CHECK_KIND["<kind>"], evidence=[ran.seq],
             ))
 
-    # Bảo mật: chưa chạy thì **chưa cấu hình**, không phải đạt. Bỏ mục
-    # này khi không có kết quả sẽ làm cổng im lặng ở đúng chỗ nó phải
-    # nói to nhất. Đọc `security` (kết quả phiên rà soát, tham số) chứ không
-    # đọc sự kiện → `evidence` rỗng, và nói rỗng; `rà soát` bên dưới cũng vậy
-    # (`review_blocking` là lời reviewer đã lọc ở `run_attempt`).
+    # Security: not run -> **unconfigured**, not passed. Omitting this check
+    # when there are no results makes the gate silent exactly where it should
+    # speak loudest. Reads `security` (review session result, parameter) not
+    # events -> `evidence` is empty, and stated empty; `review` below is the
+    # same (`review_blocking` is the reviewer's filtered verdict from `run_attempt`).
     if security is None:
         gate.checks.append(
             Check("security", Outcome.UNCONFIGURED, "security review not configured")
@@ -683,32 +692,34 @@ def evaluate(
         )
 
     gate.checks.append(_preservation_check(evidence, preservation or [], candidate))
-    # `kind` đóng dấu một chỗ từ bảng, không rải ở từng mục; tên ngoài bảng
-    # không có kind — test meta chặn tên lạ, nên ở đây không đoán.
+    # `kind` is stamped from the table in one place, not scattered across checks;
+    # names not in the table have no kind — test meta blocks unknown names,
+    # so no guessing here.
     for c in gate.checks:
         c.kind = c.kind or CHECK_KIND.get(c.name, "")
     return gate
 
 
 def _preservation_check(evidence: Evidence, preservation: list[dict], candidate: str) -> Check:
-    """Mục "bảo toàn" (ADR-004 R4): hành vi VERIFIED của story khác mà story
-    này chạm tệp phải **còn xanh ở đúng ứng viên này**.
+    """Check "preservation" (ADR-004 R4): VERIFIED behaviours of other stories
+    whose files this story touches must **still be green at this candidate**.
 
-    Ba kết cục, không có kết cục thứ tư. Đỏ → FAILED; sổ hành vi tự suy
-    REOPENED (`regressed_by` = story này) từ chính bằng chứng cổng đang đọc,
-    nên không ghi tay lần hai. Không có bằng chứng ở ứng viên — test không
-    mang mã, `qa` bỏ qua, màn chưa đối chiếu — → UNRUNNABLE: "không kiểm
-    được" không phải "đạt". Còn lại → PASSED.
+    Three outcomes, no fourth. Red -> FAILED; the behaviour ledger infers
+    REOPENED (`regressed_by` = this story) from the very evidence the gate
+    reads, so no manual second write. No evidence at candidate — test doesn't
+    carry the code, `qa` skipped, screen not compared — -> UNRUNNABLE:
+    "unverifiable" is not "passed". The rest -> PASSED.
 
-    Bằng chứng phải **mang đúng SHA**: sự kiện không khai bản (`for_candidate`
-    giữ lại) không được dùng ở đây, vì mục này hỏi đúng câu "bản này có làm
-    hỏng không", và một lần chạy không rõ bản nào không trả lời được.
+    Evidence must **carry the correct SHA**: events without a candidate
+    (`for_candidate` retains them) must not be used here, because this check
+    asks exactly "does this build break it", and a run of unknown build
+    cannot answer that.
     """
     if not preservation:
         return Check("preservation", Outcome.NOT_APPLICABLE,
                      "story does not touch any VERIFIED behaviour of other stories")
 
-    doc: list[int] = []     # sự kiện đã đọc ở đúng ứng viên
+    doc: list[int] = []     # events read at the correct candidate
 
     def at_candidate(kind: str, name: str):
         runs = [e for e in evidence.of(kind, name)
@@ -729,8 +740,8 @@ def _preservation_check(evidence: Evidence, preservation: list[dict], candidate:
             i = int(bid.rsplit("-", 1)[-1]) if bid.rsplit("-", 1)[-1].isdigit() else 0
             tests = ac_coverage(owner, i, ids).get(i, []) if i else []
         elif kind in ("fr", "nfr"):
-            # Yêu cầu xanh khi tiêu chí của story **đã xác minh nó** xanh — cùng
-            # luật với sổ (`source.story`), không phải story sở hữu trên giấy.
+            # Requirement green when criteria of the story **that verified it** are
+            # green — same rule as the ledger (`source.story`), not the owning story on paper.
             via = str(it.get("via") or owner)
             tests = [t for t in ids if f"AC-{via}-" in t.replace("_", "-")]
         elif kind == "qa":
@@ -772,13 +783,14 @@ def _preservation_check(evidence: Evidence, preservation: list[dict], candidate:
 
 
 def qualification_table(test_file: Path | None = None) -> dict[str, dict[str, bool]]:
-    """Bảng chứng nhận mục cổng (ADR-005 V9, T10): tên → control nào đã có.
+    """Gate check qualification table (ADR-005 V9, T10): name -> which controls exist.
 
-    Đọc **AST** của `tests/test_gate_qualification.py` — lớp có `TEN = "<tên>"`
-    và phương thức `test_positive*` / `test_negative*` / `test_env*` — không
-    chép tay vào mã, vì bảng chép tay là lời kể về test chứ không phải test.
-    Bản cài từ wheel không có thư mục `tests/` → trả rỗng, báo cáo in `?`,
-    không in 0 (0 là "đã đếm, không có").
+    Reads the **AST** of `tests/test_gate_qualification.py` — classes with
+    `TEN = "<name>"` and methods `test_positive*` / `test_negative*` /
+    `test_env*` — not hand-copied into code, because a hand-copied table is
+    a claim about tests, not a test. Installed from wheel has no `tests/`
+    directory -> returns empty, report prints `?`, not 0 (0 means "counted,
+    none found").
     """
     path = test_file or Path(__file__).resolve().parents[2] / "tests" / "test_gate_qualification.py"
     if not path.is_file():

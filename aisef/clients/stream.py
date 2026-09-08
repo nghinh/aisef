@@ -1,24 +1,24 @@
-"""Đọc luồng `stream-json` của Claude Code CLI.
+"""Parse the ``stream-json`` output of Claude Code CLI.
 
-Cấu trúc luồng được xác lập bằng thực nghiệm (spike S1, S2 — xem
-`docs/SPIKE-REPORT.md`), không suy đoán từ tài liệu. Hai fixture trong
-`tests/fixtures/` là luồng thật do `claude -p` sinh ra.
+The stream structure was established empirically (spike S1, S2 — see
+``docs/SPIKE-REPORT.md``), not inferred from documentation.  Two fixtures in
+``tests/fixtures/`` are real streams produced by ``claude -p``.
 
-Các loại sự kiện quan sát được::
+Observed event types::
 
-    system/hook_started      hook bắt đầu chạy
-    system/hook_response     hook xong: exit_code, outcome, stdout, stderr
-    system/init              phiên khởi tạo
-    assistant                model nói hoặc gọi tool
-    user                     kết quả tool trả về (is_error khi bị chặn)
-    rate_limit_event         thông tin hạn mức
-    system/post_turn_summary tóm tắt lượt
-    result                   **sự kiện cuối** — cost, latency, usage, denials
+    system/hook_started      hook execution started
+    system/hook_response     hook finished: exit_code, outcome, stdout, stderr
+    system/init              session initialised
+    assistant                model speaks or calls a tool
+    user                     tool result returned (is_error when blocked)
+    rate_limit_event         rate limit information
+    system/post_turn_summary turn summary
+    result                   **final event** — cost, latency, usage, denials
 
-Điều đáng giá nhất nằm ở `result`: `total_cost_usd`, `duration_ms`,
-`ttft_ms`, `usage`, và `permission_denials` — danh sách những lần guard
-chặn tool, kèm cả nội dung agent định ghi. Đó là bằng chứng máy đọc được
-để đưa vào evidence, không phải lời agent tự khai.
+The most valuable data is in ``result``: ``total_cost_usd``, ``duration_ms``,
+``ttft_ms``, ``usage``, and ``permission_denials`` — a list of guard-blocked
+tool calls, including the content the agent intended to write.  This is
+machine-readable evidence for the evidence store, not the agent's self-report.
 """
 
 from __future__ import annotations
@@ -29,11 +29,11 @@ from dataclasses import dataclass, field
 from typing import Iterable
 
 
-#: Dấu nhận biết thông báo **của hook**, không phải mọi lỗi tool có chữ
-#: "hook". Tìm chuỗi con "hook" là quá rộng: dự án React nói về hook suốt
-#: ngày, và một `grep` hỏng trên `useEffect` đủ làm cờ `guard_blocked`
-#: bật lên. Cờ sai ở đây đi thẳng vào báo cáo nghiệm thu và làm người đọc
-#: đuổi theo lỗi không tồn tại.
+#: Pattern identifying messages **from hooks**, not every tool error containing
+#: the word "hook".  Matching the substring "hook" is too broad: a React project
+#: talks about hooks all day, and a failed ``grep`` on ``useEffect`` is enough
+#: to flip the ``guard_blocked`` flag.  A false positive here goes straight into
+#: the acceptance report and sends the reader chasing a non-existent defect.
 GUARD_MESSAGE = re.compile(
     r"(?:Pre|Post)ToolUse:\S*\s+hook\b|\bStop:?\s*hook\b|\bhook error\b",
     re.IGNORECASE,
@@ -49,7 +49,7 @@ class ToolUse:
 
 @dataclass(frozen=True)
 class Denial:
-    """Một lần guard chặn tool. Trích từ `result.permission_denials`."""
+    """A guard-blocked tool call.  Extracted from ``result.permission_denials``."""
 
     tool_name: str
     tool_use_id: str
@@ -57,13 +57,13 @@ class Denial:
 
     @property
     def target_path(self) -> str:
-        """Đường dẫn bị chặn, nếu tool có khái niệm đường dẫn."""
+        """The blocked path, if the tool has a path concept."""
         return self.tool_input.get("file_path", "")
 
 
 @dataclass(frozen=True)
 class HookRun:
-    """Một lần hook chạy. `exit_code == 2` là quy ước chặn của Claude Code."""
+    """A single hook execution.  ``exit_code == 2`` is Claude Code's blocking convention."""
 
     name: str
     event: str
@@ -78,7 +78,7 @@ class HookRun:
 
 @dataclass
 class RunResult:
-    """Kết quả một lượt chạy client, đã chuẩn hoá."""
+    """Normalised result of one client run."""
 
     ok: bool = False
     text: str = ""
@@ -99,14 +99,14 @@ class RunResult:
     tool_uses: list[ToolUse] = field(default_factory=list)
     denials: list[Denial] = field(default_factory=list)
     hooks: list[HookRun] = field(default_factory=list)
-    #: Mọi đoạn văn assistant theo thứ tự. `text` chỉ là câu chốt — mà câu
-    #: chốt có thể là trả lời cho hook Stop chứ không phải cho việc (hợp quy
-    #: C4 trượt vì thế, 2026-09-05).
+    #: All assistant text segments in order.  ``text`` is only the final one —
+    #: and the final segment may be a response to the Stop hook rather than to
+    #: the task (conformance C4 failed because of this, 2026-09-05).
     texts: list[str] = field(default_factory=list)
-    #: Thông báo từ hook đã chặn một tool. Lấy từ `tool_result` chứ không
-    #: từ `hook_response`: quan sát trên luồng thật cho thấy Claude Code
-    #: **không** phát `hook_response` cho lần hook chặn — nó đưa thẳng lý
-    #: do vào kết quả tool cho agent đọc.
+    #: Messages from hooks that blocked a tool.  Taken from ``tool_result``,
+    #: not ``hook_response``: observation on real streams shows Claude Code
+    #: does **not** emit ``hook_response`` for blocking hooks — it puts the
+    #: reason directly into the tool result for the agent to read.
     guard_messages: list[str] = field(default_factory=list)
 
     error: str = ""
@@ -123,30 +123,30 @@ class RunResult:
 
     @property
     def guard_blocked(self) -> bool:
-        """True khi **guard của framework** chặn ít nhất một thao tác.
+        """True when a **framework guard** blocked at least one action.
 
-        Đây mới là tín hiệu chất lượng: agent định làm điều bị cấm.
+        This is the quality signal: the agent intended to do something forbidden.
         """
         return bool(self.guard_messages) or any(h.blocked for h in self.hooks)
 
     @property
     def permission_limited(self) -> bool:
-        """True khi client từ chối một tool vì quyền, không phải vì guard.
+        """True when the client denied a tool for permission reasons, not guard.
 
-        Ví dụ ``WebSearch`` bị chặn trong môi trường không có mạng. Đây là
-        **hạn chế môi trường**, không phải agent làm sai — gộp chung với
-        guard sẽ báo cáo sai bản chất, và dẫn tới quyết định sai về việc
-        có thử lại hay chặn story.
+        Example: ``WebSearch`` blocked in a network-less environment.  This is
+        an **environment limitation**, not agent misbehaviour — conflating it
+        with guard blocks misreports the nature of the failure and leads to
+        wrong decisions about retrying or blocking the story.
         """
         return bool(self.denials) and not self.guard_blocked
 
     @property
     def was_blocked(self) -> bool:
-        """Có thao tác nào bị từ chối không, bất kể vì lý do gì."""
+        """Whether any action was denied, regardless of reason."""
         return bool(self.denials) or self.guard_blocked
 
     def evidence(self) -> dict:
-        """Phần đưa vào `evidence/{story}.json`."""
+        """Subset to include in ``evidence/{story}.json``."""
         return {
             "ok": self.ok,
             "cost_usd": round(self.cost_usd, 6),
@@ -170,24 +170,26 @@ class RunResult:
         }
 
 
-#: Kết cục một lượt, chuẩn hoá qua mọi client (ADR-005 V11 B). Danh sách
-#: đóng: `aisef status` đếm theo nó, `Attempt.infra` đọc nó thay vì dò chuỗi.
+#: Normalised exit status across all clients (ADR-005 V11 B).  Closed set:
+#: ``aisef status`` counts by it, ``Attempt.infra`` reads it instead of probing strings.
 EXIT_STATUSES = ("ok", "max_turns", "timeout", "cost", "context", "permission", "infra", "error")
 
-#: Kết cục **không phải lỗi của agent** — thử lại không tính vào hạn mức
-#: chất lượng (`run.max_retries`), có hạn mức hạ tầng riêng.
+#: Exit statuses that are **not the agent's fault** — retries do not count
+#: against the quality limit (``run.max_retries``); infra has its own limit.
 INFRA_STATUSES = ("timeout", "infra")
 
 
 def exit_status_of(res: RunResult) -> str:
-    """Suy kết cục từ `subtype`/`terminal_reason`/`stop_reason`/`error`. Hàm
-    thuần: chỉ đọc `res`, không biết `max_turns` cấu hình — trần lượt là thứ
-    client tự báo (`terminal_reason: max_turns`, e9 01-01 61/60, 01-05 91/90).
+    """Infer exit status from ``subtype``/``terminal_reason``/``stop_reason``/
+    ``error``.  Pure function: reads only ``res``, does not know configured
+    ``max_turns`` — the turn ceiling is what the client itself reports
+    (``terminal_reason: max_turns``, e9 01-01 61/60, 01-05 91/90).
 
-    Thứ tự có chủ đích: trần lượt trước hạ tầng — lượt chạm trần thường kèm
-    thông báo lỗi, xếp nó vào "hạ tầng" thì story ngốn lượt được thử lại
-    miễn phí. Client cắt vì hết giờ báo "quá <n>s" (`claude_code.run`,
-    `opencode.run`); không có sự kiện `result` là tiến trình chết giữa chừng.
+    Order is intentional: turn ceiling before infra — hitting the turn limit
+    usually comes with an error message, and classifying it as "infra" would
+    let turn-hungry stories retry for free.  Client killing on timeout reports
+    "exceeded <n>s" (``claude_code.run``, ``opencode.run``); no ``result``
+    event means the process died mid-run.
     """
     if res.ok:
         return "ok"
@@ -216,7 +218,7 @@ def exit_status_of(res: RunResult) -> str:
 
 
 def _collect_assistant_tools(event: dict, out: list[ToolUse]) -> str:
-    """Gom tool_use và text từ một sự kiện assistant."""
+    """Collect tool_use and text from an assistant event."""
     text_parts = []
     for block in event.get("message", {}).get("content", []) or []:
         if not isinstance(block, dict):
@@ -235,10 +237,10 @@ def _collect_assistant_tools(event: dict, out: list[ToolUse]) -> str:
 
 
 def parse_stream(lines: Iterable[str]) -> RunResult:
-    """Chuyển luồng `stream-json` thành `RunResult`.
+    """Parse ``stream-json`` into ``RunResult``.
 
-    Dòng hỏng bị bỏ qua thay vì làm sập cả lượt chạy: mất một dòng log
-    không đáng để mất kết quả của cả một story.
+    Malformed lines are silently skipped rather than crashing the entire run:
+    losing one log line is not worth losing the result of an entire story.
     """
     res = RunResult()
     assistant_text: list[str] = []
@@ -311,9 +313,10 @@ def parse_stream(lines: Iterable[str]) -> RunResult:
                 )
 
             if ev.get("is_error") or ev.get("api_error_status"):
-                # Thứ tự có chủ đích. `subtype` vẫn là "success" ngay cả khi
-                # `is_error` là true, nên lấy nó ra sẽ cho thông báo lỗi
-                # "success" — vô nghĩa với người đọc lẫn với logic thử lại.
+                # Order is intentional.  ``subtype`` is still "success" even
+                # when ``is_error`` is true, so extracting it would yield an
+                # error message of "success" — meaningless to the reader and
+                # to retry logic.
                 res.error = str(
                     ev.get("api_error_status")
                     or ev.get("terminal_reason")
@@ -325,9 +328,9 @@ def parse_stream(lines: Iterable[str]) -> RunResult:
     if not res.text and assistant_text:
         res.text = "\n".join(assistant_text)
 
-    # Không có sự kiện `result` nghĩa là tiến trình chết giữa chừng.
-    # Phải phân biệt rõ với "chạy xong nhưng thất bại" — hai thứ này cần
-    # cách xử lý khác nhau (lỗi hạ tầng ≠ lỗi chất lượng).
+    # No ``result`` event means the process died mid-run.  Must be clearly
+    # distinguished from "ran to completion but failed" — the two need
+    # different handling (infra error != quality error).
     if not res.raw_result:
         res.ok = False
         res.error = res.error or "stream ended without a result event"

@@ -1,18 +1,19 @@
-"""Định tuyến skill cho một story — phía harness, có ngưỡng, biết từ chối.
+"""Route skills for a story — harness-side, with thresholds and abstention.
 
-Bằng chứng buộc phải có nó (ADR-002 §1): e9 cài 156 skill, 86 phiên Claude,
-tool `Skill` được gọi 11 lần cho đúng 4 skill — tất cả đều được prompt của
-harness gọi **đích danh**. Cài theo stack không sinh ra sử dụng; prompt nêu
-tên mới sinh ra. Vậy chọn skill là việc của harness, không phải cơ chế khám
-phá của client trên 156 mô tả.
+Evidence this is needed (ADR-002 S1): e9 installed 156 skills, 86 Claude
+sessions, the `Skill` tool was called 11 times for exactly 4 skills — all
+explicitly named by the harness prompt. Stack-based installation doesn't
+generate usage; naming in the prompt does. So skill selection is the harness's
+job, not a client-side discovery mechanism over 156 descriptions.
 
-Chọn là **phán đoán có cấu trúc**: tín hiệu có cấu trúc (hợp đồng kiểm
-định, năng lực story cần, màn hình, pha) cho điểm tất định; câu chữ tiêu
-chí chấp nhận chỉ là tín hiệu yếu. Không đủ điểm thì **abstain** — paper
-ghi 2/20 task hỏng vì skill nhồi nhầm làm agent lạc khỏi chiến lược riêng.
+Selection is **structured judgment**: structured signals (verification
+contract, required capabilities, screens, phase) score deterministically;
+acceptance-criteria prose is only a weak signal. Insufficient score means
+**abstain** — the paper records 2/20 tasks failed because wrong skills were
+stuffed in, causing the agent to deviate from its own strategy.
 
-Router là tín hiệu cho agent, không phải cổng: chọn sai không chặn story;
-nó lộ ra ở telemetry (`skills_offered` so với `skills_used`).
+The router is a signal for the agent, not a gate: wrong selection doesn't
+block a story; it surfaces in telemetry (`skills_offered` vs `skills_used`).
 """
 
 from __future__ import annotations
@@ -24,33 +25,33 @@ from ..control.normalize import Story
 from ..control.preflight import required_capabilities, verification_contract
 from .registry import Registry, SkillEntry
 
-#: Ngưỡng và trần — knob **có mã đọc** (config `skills.route_threshold`,
-#: `skills.route_max`); điều chỉnh theo precision đo được.
+#: Threshold and cap — knobs **read by code** (config `skills.route_threshold`,
+#: `skills.route_max`); tuned by measured precision.
 DEFAULT_THRESHOLD = 3
 DEFAULT_MAX = 3
 
-#: Trọng số. Có cấu trúc trước, câu chữ sau.
-W_CONTRACT = 3      # loại kiểm định story phải qua ↔ năng lực skill
-W_NEED = 3          # năng lực preflight suy ra ↔ năng lực skill
-W_SCREEN = 2        # story có màn hình ↔ skill `ui`
-W_TOKEN = 1         # token tiêu chí chấp nhận ↔ tags/subdomain (tối đa W_TOKEN_CAP)
+#: Weights. Structured signals first, prose second.
+W_CONTRACT = 3      # verification type the story requires <-> skill capability
+W_NEED = 3          # preflight-inferred capability <-> skill capability
+W_SCREEN = 2        # story has screens <-> skill `ui`
+W_TOKEN = 1         # acceptance-criteria token <-> tags/subdomain (capped at W_TOKEN_CAP)
 W_TOKEN_CAP = 3
-W_FRAMEWORK = 5     # skill của framework đúng pha
+W_FRAMEWORK = 5     # framework skill matching the phase
 
-#: Skill framework theo pha — tên gọi đích danh, như prompt vẫn làm.
+#: Framework skills by phase — called by exact name, as prompts already do.
 FRAMEWORK_BY_PHASE: dict[str, tuple[str, ...]] = {
     "mockup": ("aisef-mockup-html",),
 }
 
-#: Skill **cửa ngõ** giao diện: mời cho mọi story có màn hình ở pha implement,
-#: theo chính sách chứ không theo chữ. Lý do đo được (e9 2026-09-05): story
-#: viết tiếng Việt, skill `ui-ux` mô tả tiếng Anh, không khai năng lực → hai
-#: tín hiệu không bao giờ đủ, và ứng dụng 5 màn hình không được mời skill
-#: giao diện nào. `ui-ux-pro-max` tự định tuyến tiếp tới skill con (progressive
-#: disclosure) nên chỉ cần mời một cửa.
+#: UI **entry-point** skill: invited for every story with screens at the
+#: implement phase, by policy rather than by text matching. Measured reason
+#: (e9 2026-09-05): stories written in Vietnamese, `ui-ux` skill described in
+#: English, no declared capabilities -> two signals never sufficient, and an
+#: app with 5 screens was never offered any UI skill. `ui-ux-pro-max` routes
+#: further to sub-skills (progressive disclosure) so only one entry is needed.
 UI_ENTRY_SKILLS: tuple[str, ...] = ("ui-ux-pro-max",)
 
-#: Từ quá chung để làm tín hiệu — khớp chúng chỉ tạo nhiễu.
+#: Words too generic to be a signal — matching them only adds noise.
 _STOP = frozenset({
     "the", "and", "for", "with", "when", "then", "given", "user", "data", "file",
     "code", "test", "tests", "story", "một", "các", "của", "khi", "thì", "được", "và",
@@ -59,8 +60,8 @@ _STOP = frozenset({
 _TOKEN = re.compile(r"[a-zA-ZÀ-ỹ][a-zA-ZÀ-ỹ0-9_-]{2,}")
 
 
-#: Miền giao diện — chỉ skill khai một trong các miền này mới ăn tín hiệu
-#: "story có màn hình". Suy từ chữ thì skill mã hoá cũng thành skill giao diện.
+#: UI domains — only skills declaring one of these domains receive the
+#: "story has screens" signal. Inferring from prose would turn encryption skills into UI skills.
 UI_DOMAINS = frozenset({"ui", "ux", "ui-ux", "ui/ux", "design", "frontend", "accessibility"})
 
 
@@ -70,19 +71,19 @@ class Pick:
     score: int
     rationale: list[str] = field(default_factory=list)
     framework: bool = False
-    strong: int = 0        # contract / need — tín hiệu từ hợp đồng story, không từ chữ
+    strong: int = 0        # contract / need — signal from story contract, not from prose
     screen: bool = False
     token_hits: int = 0
 
     @property
     def eligible(self) -> bool:
-        """Paper §4.2 loại thẳng khớp keyword-only. Đo trên e9: một chữ
-        "migration" làm story schema-IndexedDB khớp skill mật-mã-hậu-lượng-tử;
-        "màn hình + một chữ" làm story điều hướng bàn phím khớp skill mã hoá
-        đầu-cuối. Nên vẫn là **hai** tín hiệu độc lập — nhưng màn hình chỉ
-        tính cho skill miền giao diện, và "màn hình + một chữ" không phải hai."""
-        # Chữ chỉ là một tín hiệu khi đi cùng hợp đồng story; đi cùng màn hình
-        # (mọi story giao diện đều có) thì phải ≥ 2 chữ.
+        """Paper S4.2 rejects keyword-only matches. Measured on e9: a single word
+        "migration" made a schema-IndexedDB story match a post-quantum-crypto skill;
+        "screen + one word" made a keyboard-navigation story match an end-to-end
+        encryption skill. So still **two** independent signals are needed — but screens
+        only count for UI-domain skills, and "screen + one word" is not two."""
+        # Prose is only a signal when paired with a story contract; paired with
+        # screens (every UI story has them) requires >= 2 token hits.
         tok = 1 if (self.token_hits >= 2 or (self.token_hits >= 1 and self.strong >= 1)) else 0
         return self.framework or (self.strong + int(self.screen) + tok) >= 2
 
@@ -115,8 +116,8 @@ class Routing:
         }
 
     def prompt_section(self) -> str:
-        """Mục cho prompt — tên, dùng khi, cách mở. **Không** dán nội dung
-        skill: đó là progressive disclosure, agent mở khi cần."""
+        """Section for the prompt — name, use-when, how to open. Does **not**
+        inline skill content: that's progressive disclosure, the agent opens when needed."""
         if self.abstained:
             return (
                 "No skill matched this story well enough (considered "
@@ -139,7 +140,7 @@ def _tokens(text: str) -> set[str]:
 
 def score(entry: SkillEntry, story: Story, *, phase: str = "implement",
           contract: list[str] | None = None, needs: list[str] | None = None) -> Pick:
-    """Chấm một skill cho một story. Mỗi điểm cộng có một câu vì sao."""
+    """Score one skill against one story. Each point added has a rationale."""
     caps = set(entry.capabilities)
     pick = Pick(entry=entry, score=0)
 
@@ -183,13 +184,13 @@ def score(entry: SkillEntry, story: Story, *, phase: str = "implement",
 def route(story: Story, registry: Registry, *, phase: str = "implement",
           threshold: int = DEFAULT_THRESHOLD, limit: int = DEFAULT_MAX,
           project=None) -> Routing:
-    """Chọn ≤ `limit` skill có điểm ≥ `threshold`; không có thì abstain."""
+    """Select <= `limit` skills scoring >= `threshold`; abstain if none qualify."""
     contract = [k for k in verification_contract(story) if k != "mockup-map"]
     try:
         needs = sorted({n.capability for n in required_capabilities(story, project=project)})
-    except Exception:  # preflight là tín hiệu phụ — hỏng thì router vẫn chạy
+    except Exception:  # preflight is a secondary signal — if it breaks the router still runs
         needs = []
-    # `unit` có ở mọi story: khớp nó không nói gì về story này.
+    # `unit` appears in every story: matching it says nothing about this story.
     contract = [k for k in contract if k != "unit"]
 
     picks = [score(e, story, phase=phase, contract=contract, needs=needs)

@@ -1,31 +1,33 @@
-"""Bản đồ mã quanh phạm vi ghi — ngữ cảnh tĩnh cho phiên mới (ADR-005 V7).
+"""Code map around write scope — static context for a new session (ADR-005 V7).
 
-Developer vào phiên mới không có bản đồ: trên e9 lượt đầu tốn 42–91 lượt,
-phần lớn để dò "tệp này định nghĩa gì, ai gọi, test nào chạm"; reviewer
-tốn 22–68 lượt cho cùng câu hỏi. Aider trả lời bằng repo map xếp hạng
-PageRank trên đồ thị định danh; Agentless đo được **skeleton** (chữ ký,
-thân → `…`) thắng tệp đầy đủ cả độ đúng lẫn giá (58 % @ $0,02 so với
-54 % @ $0,15). Ở đây lấy hai ý ấy bằng stdlib, lân cận **một bước** quanh
-phạm vi ghi:
+A developer entering a fresh session has no map: on e9 the first turn costs
+42-91 rounds, mostly probing "what does this file define, who calls it, which
+tests touch it"; a reviewer spends 22-68 rounds on the same questions. Aider
+answers with a repo map ranked by PageRank over the identifier graph;
+Agentless measured that **skeleton** (signatures, body -> `...`) beats full
+files in both accuracy and cost (58% @ $0.02 vs 54% @ $0.15). Here we take
+both ideas using stdlib, **one hop** around write scope:
 
-  (a) skeleton tệp trong phạm vi — Python bằng `ast`, TS/JS bằng
-      `_EXPORTS` + chữ ký trên dòng;
-  (b) tệp ngoài phạm vi nhắc tên trong phạm vi (callers) và tệp phạm vi
-      import — mỗi tệp ≤ 3 dòng;
-  (c) tệp test nhắc tên trong phạm vi.
+  (a) skeleton of in-scope files — Python via `ast`, TS/JS via
+      `_EXPORTS` + inline signatures;
+  (b) out-of-scope files referencing names in scope (callers) and files
+      imported by scope — each file <= 3 lines;
+  (c) test files referencing names in scope.
 
-Đây là **gợi ý tĩnh**, không phải chân lý — cùng giới hạn với
-`control/impact.py`: gọi động, phản chiếu, tiêm phụ thuộc đều không hiện.
-Ngân sách ký tự là thiết kế, không phải nhượng bộ; Aider không công bố số
-đo cho repo map, nên `context.max_repo_map_chars` mặc định 0 (tắt) cho tới
-khi A/B T8 có số. Bản đầy đủ luôn tra được bằng `aisef ctx --story S`.
+This is a **static hint**, not ground truth — same limitations as
+`control/impact.py`: dynamic calls, reflection, dependency injection are
+invisible. The character budget is by design, not a compromise; Aider does
+not publish measurements for repo map, so `context.max_repo_map_chars`
+defaults to 0 (off) until A/B T8 provides numbers. The full map is always
+available via `aisef ctx --story S`.
 
-Nhà cung cấp ngoài (`context.map_provider`, tree-sitter/serena cắm sau)
-nhận stdin JSON ``{project, seeds, budget}`` và trả văn bản; lỗi thì lùi
-về bản dựng sẵn và nói ra ở dòng đầu — cùng kiểu `review.impact_provider`.
+External provider (`context.map_provider`, tree-sitter/serena pluggable
+later) receives stdin JSON ``{project, seeds, budget}`` and returns text;
+on failure falls back to the built-in and reports it on the first line —
+same pattern as `review.impact_provider`.
 
-# ponytail: lân cận 1 bước; PageRank stdlib ~20 dòng khi kho > 500 tệp làm
-# lân cận tràn ngân sách.
+# ponytail: 1-hop neighbours; stdlib PageRank ~20 lines when repo > 500 files
+# would blow the neighbour budget.
 """
 
 from __future__ import annotations
@@ -42,11 +44,11 @@ from pathlib import Path
 
 from ..control.impact import _EXPORTS, SOURCE_EXT, _rel_files, is_test_path, refs, symbols, weights
 
-#: Aider `to_tree` cắt 100 ký tự/dòng — đủ đọc chữ ký, không đủ chép thân.
+#: Aider `to_tree` truncates at 100 chars/line — enough to read signatures, not enough to copy bodies.
 MAX_LINE = 100
-#: Dòng tối đa cho mỗi tệp lân cận.
+#: Max lines per neighbour file.
 PER_NEIGHBOUR = 3
-#: Định danh trong story ngắn hơn chừng này là chữ thường, không phải tên mã.
+#: Identifiers in the story shorter than this are common words, not code names.
 MIN_IDENT = 5
 _IDENT = re.compile(r"[A-Za-z][\w-]{%d,}" % (MIN_IDENT - 1), re.ASCII)
 _IMPORT_JS = re.compile(r"""(?:from|require\()\s*['"](\.{1,2}/[^'"]+)['"]""")
@@ -56,8 +58,8 @@ HEADING = "## Code map around write scope — static hints, not ground truth"
 
 
 def seeds_for(story, project: Path | str, *, artifact_root: Path | str, config=None) -> list[str]:
-    """Hạt giống của một story: phạm vi ghi có hiệu lực ∪ đường dẫn kiểm
-    định ∪ định danh ≥ 5 ký tự trong story file (Aider `get_ident_mentions`)."""
+    """Seeds for a story: effective write scope ∪ verification paths
+    ∪ identifiers >= 5 chars from the story file (Aider `get_ident_mentions`)."""
     from ..control.normalize import effective_write_scope, verification_paths
 
     project = Path(project)
@@ -77,9 +79,9 @@ def seeds_for(story, project: Path | str, *, artifact_root: Path | str, config=N
 
 def repo_map(project: Path | str, seeds: list[str], budget_chars: int = 0, *,
              command: str = "", story_id: str = "", timeout: int = 120) -> str:
-    """Bản đồ quanh ``seeds`` (đường dẫn có thật = phạm vi; còn lại = định
-    danh), cắt ở ``budget_chars`` (0 = không cắt). Có lệnh ngoài thì dùng;
-    hỏng thì lùi về dựng sẵn và ghi rõ ở dòng đầu."""
+    """Map around ``seeds`` (real paths = scope; rest = identifiers), truncated
+    at ``budget_chars`` (0 = no truncation). Uses external command if given;
+    falls back to built-in on failure and notes it on the first line."""
     project = Path(project)
     note = ""
     if command.strip():
@@ -92,8 +94,8 @@ def repo_map(project: Path | str, seeds: list[str], budget_chars: int = 0, *,
 
 
 def prompt_section(map_text: str) -> str:
-    """Mục prompt cho cả ba vai; rỗng khi không có bản đồ (knob 0) để prompt
-    không mang một tiêu đề trống."""
+    """Prompt section for all three roles; empty when there is no map (knob 0)
+    so the prompt doesn't carry a blank heading."""
     if not map_text.strip():
         return ""
     return (
@@ -104,7 +106,7 @@ def prompt_section(map_text: str) -> str:
     )
 
 
-# ------------------------------------------------------------------ dựng sẵn
+# ------------------------------------------------------------------ built-in
 
 
 def _builtin(project: Path, seeds: list[str]) -> str:
@@ -115,7 +117,7 @@ def _builtin(project: Path, seeds: list[str]) -> str:
     syms = symbols(project, scope)
     names = sorted({n for s in syms.values() for n, _, _ in s})
     w = weights(project, names, files)
-    # Aider: tệp có tên khớp định danh story được nhắc ×10.
+    # Aider: files whose stem matches a story identifier get a 10x boost.
     boost = lambda rel: 10.0 if any(i in Path(rel).stem.lower() for i in idents) else 1.0  # noqa: E731
 
     score: dict[str, float] = defaultdict(float)
@@ -152,8 +154,8 @@ def _builtin(project: Path, seeds: list[str]) -> str:
 
 
 def _split_seeds(project: Path, seeds: list[str]) -> tuple[list[str], set[str]]:
-    """Hạt giống là đường dẫn có thật (tệp, thư mục, glob) → phạm vi; còn lại
-    → định danh (chữ thường, khớp với tên tệp để nhân 10)."""
+    """Seeds that are real paths (file, directory, glob) become scope; the rest
+    become identifiers (lowercased, matched against file stems for 10x boost)."""
     scope: list[str] = []
     idents: set[str] = set()
     for s in seeds:
@@ -163,10 +165,11 @@ def _split_seeds(project: Path, seeds: list[str]) -> tuple[list[str], set[str]]:
         elif p.is_dir():
             hits = [f for f in sorted(p.rglob("*")) if f.is_file()]
         elif any(c in s for c in "*?["):
-            # `src/**` chỉ khớp **thư mục** ở Python ≤ 3.12 (3.13 mới cho khớp
-            # cả tệp) — phạm vi ghi viết kiểu ấy thì bản đồ rỗng trên đúng
-            # những phiên bản gói này khai hỗ trợ (CI Linux 3.12, 2026-09-06).
-            # Chuẩn hoá về `**/*`: cùng kết quả trên 3.11 → 3.14.
+            # `src/**` matches **directories only** on Python <= 3.12 (3.13+
+            # matches files too) — a write scope written that way would produce
+            # an empty map on the very versions this package claims to support
+            # (CI Linux 3.12, 2026-09-06). Normalize to `**/*`: same result
+            # on 3.11 through 3.14.
             pat = s + "/*" if s.endswith("**") else s
             hits = [f for f in sorted(project.glob(pat)) if f.is_file()]
         else:
@@ -181,7 +184,7 @@ def _split_seeds(project: Path, seeds: list[str]) -> tuple[list[str], set[str]]:
 
 
 def _skeleton(path: Path, syms: list[tuple[str, int, str]]) -> list[tuple[int, str]]:
-    """Dòng định nghĩa + chữ ký, thân → `…` (Agentless `get_skeleton`)."""
+    """Definition lines + signatures, body -> `...` (Agentless `get_skeleton`)."""
     try:
         body = path.read_text(encoding="utf-8", errors="replace")
     except OSError:
@@ -193,8 +196,8 @@ def _skeleton(path: Path, syms: list[tuple[str, int, str]]) -> list[tuple[int, s
     lines = body.splitlines()
     out = []
     for _, ln, _ in syms:
-        # Chữ ký TS/JS hay xuống dòng (`export function X(\n  props: P\n) {`):
-        # nối tới dòng có `{` hoặc `;`, tối đa 6 dòng, rồi cắt ở `{`.
+        # TS/JS signatures often span multiple lines (`export function X(\n  props: P\n) {`):
+        # join up to the line containing `{` or `;`, max 6 lines, then cut at `{`.
         chunk = []
         for i, l in enumerate(lines[ln - 1: ln + 5]):
             chunk.append(l.strip())
@@ -202,8 +205,8 @@ def _skeleton(path: Path, syms: list[tuple[str, int, str]]) -> list[tuple[int, s
             if "{" in l or ";" in l or not nxt.strip() or any(p.match(nxt) for p in _EXPORTS):
                 break
         sig = " ".join(chunk)
-        # Cắt ở `{` **cuối** — tham số huỷ cấu trúc (`({ onReload }: Props) {`)
-        # cũng có `{`; rồi bỏ `=` / `=>` treo (`export type X =`, `() =>`).
+        # Cut at the **last** `{` — destructured params (`({ onReload }: Props) {`)
+        # also contain `{`; then strip trailing `=` / `=>` (`export type X =`, `() =>`).
         sig = sig.rsplit("{", 1)[0] if "{" in sig else sig
         sig = re.sub(r"\s*(?:=>|=)\s*$", "", sig.rstrip())
         out.append((ln, sig[:MAX_LINE] + " …"))
@@ -237,8 +240,8 @@ def _py_skeleton(body: str) -> list[tuple[int, str]]:
 
 
 def _lines(path: Path, names: set[str], *, syms_of: bool) -> list[tuple[int, str]]:
-    """≤ 3 dòng của tệp lân cận: dòng nhắc tên trong phạm vi; tệp chỉ được
-    import thì lấy dòng định nghĩa xuất khẩu đầu tiên của nó."""
+    """Up to 3 lines from a neighbour file: lines referencing names in scope;
+    for import-only files, take its first exported definition lines instead."""
     try:
         lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
     except OSError:
@@ -252,8 +255,8 @@ def _lines(path: Path, names: set[str], *, syms_of: bool) -> list[tuple[int, str
 
 
 def _imports(project: Path, rel: str) -> list[str]:
-    """Tệp mà ``rel`` import, chỉ lấy tệp có thật trong kho (import tương
-    đối JS/TS; tương đối và tuyệt đối theo gói Python)."""
+    """Files that ``rel`` imports, limited to files that exist in the repo
+    (relative JS/TS imports; relative and package-absolute Python imports)."""
     f = project / rel
     root = project.resolve()
     try:
@@ -294,8 +297,8 @@ def _run_provider(project: Path, seeds: list[str], budget: int, command: str, ti
 
 
 def _cut(text: str, budget: int, story_id: str) -> str:
-    """Cắt ở ranh giới dòng, dòng cuối chỉ chỗ tra bản đầy đủ (R6). Kết quả
-    luôn ≤ ``budget`` ký tự."""
+    """Truncate at a line boundary, with a tail pointing to the full map (R6).
+    Result is always <= ``budget`` chars."""
     if budget <= 0 or len(text) <= budget:
         return text
     tail = f"\n_(truncated — `aisef ctx --story {story_id or '<id>'}`)_"

@@ -1,12 +1,13 @@
-"""Sinh hiến pháp kỹ thuật cho dự án đích.
+"""Generate the technical constitution for the target project.
 
-Một nguồn duy nhất (`kit/rules/*.md`) sinh ra file quy tắc cho từng
-client: `CLAUDE.md` cho Claude Code, `AGENTS.md` cho OpenCode và các client
-đọc quy ước đó. Viết một lần, phát nhiều nơi — không duy trì ba bản dễ lệch.
+A single source (`kit/rules/*.md`) produces rule files for each client:
+`CLAUDE.md` for Claude Code, `AGENTS.md` for OpenCode and other clients
+that read that convention. Write once, distribute many -- no maintaining
+three copies that drift apart.
 
-Phần theo stack được ghép thêm ở cuối: dự án Python nhắc `ruff`/`mypy`/
-`pytest`, dự án React nhắc `tsc`/`eslint`/`vitest`. Nhắc đúng công cụ dự án
-thật sự dùng thì agent mới chạy đúng lệnh.
+Stack-specific sections are appended: Python projects mention `ruff`/`mypy`/
+`pytest`, React projects mention `tsc`/`eslint`/`vitest`. Mentioning the
+tools the project actually uses ensures agents run the right commands.
 """
 
 from __future__ import annotations
@@ -18,7 +19,7 @@ from .detect_stack import Stack
 
 RULES_DIR = Path(__file__).parent / "rules"
 
-#: Lệnh kiểm chất lượng theo công nghệ. Chỉ đưa vào khi dự án thật sự dùng.
+#: Quality-check commands by technology. Only included when the project actually uses it.
 QUALITY_COMMANDS: dict[str, list[str]] = {
     "python": ["ruff format --check .", "ruff check .", "mypy .", "pytest --cov"],
     "node": ["npm run lint", "npm run typecheck", "npm test"],
@@ -35,7 +36,7 @@ QUALITY_COMMANDS: dict[str, list[str]] = {
     "flutter": ["dart format --set-exit-if-changed .", "flutter analyze", "flutter test"],
 }
 
-#: Client nào đọc file tên gì.
+#: Which filename each client reads.
 CLIENT_FILES: dict[str, str] = {
     "claude": "CLAUDE.md",
     "opencode": "AGENTS.md",
@@ -130,7 +131,7 @@ def write_for_project(
     clients: list[str] | None = None,
     source_dir: Path = RULES_DIR,
 ) -> list[Path]:
-    """Ghi file quy tắc cho từng client. Trả danh sách đường dẫn đã ghi."""
+    """Write rule files for each client. Return list of written paths."""
     constitution = Constitution.load(source_dir)
     text = constitution.render(project_name, stack)
 

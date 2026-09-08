@@ -1,16 +1,16 @@
-"""Map mockup — **nửa đối chiếu**: mở route thật, so với hợp đồng.
+"""Map mockup — **verification half**: open the real route, compare against the contract.
 
-Nạp hợp đồng vào prompt mới chỉ là nói cho agent biết phải dựng gì. Nửa
-này kiểm xem nó có dựng thật không — bằng cách chạy ứng dụng, mở đúng
-route, và đọc cây accessibility như một người dùng màn hình đọc.
+Loading the contract into the prompt only tells the agent what to build. This
+half checks whether it actually built it — by running the app, opening the
+correct route, and reading the accessibility tree the way a screen reader does.
 
-Ba mức đối chiếu, và chỉ dùng hai:
+Three levels of comparison, only two are used:
 
-* **cấu trúc** (dùng, và chặn) — component hợp đồng đã hứa có mặt không;
-* **thị giác bằng model** (chưa dùng ở đây, chỉ cảnh báo) — bố cục có hợp lý;
-* **so từng điểm ảnh** (**không bao giờ dùng**) — mockup tĩnh và ứng dụng
-  thật không bao giờ trùng từng điểm; cổng kiểu đó đỏ liên tục rồi bị tắt,
-  mà cổng bị tắt còn tệ hơn không có cổng.
+* **structural** (used, and blocking) — are the contracted components present;
+* **visual via model** (not used here, warning only) — is the layout reasonable;
+* **pixel-perfect** (**never used**) — a static mockup and a live app never
+  match pixel-for-pixel; such a gate stays red permanently then gets disabled,
+  and a disabled gate is worse than no gate at all.
 """
 
 from __future__ import annotations
@@ -52,11 +52,11 @@ class VerifyResult:
 
 
 class AppServer:
-    """Chạy dev server của dự án đủ lâu để đối chiếu, rồi tắt.
+    """Run the project's dev server long enough for verification, then stop.
 
-    Không dùng cổng cố định trong code: hai story chạy song song sẽ giẫm
-    nhau. Cổng lấy từ cấu hình của dự án, và mỗi story chạy trong worktree
-    riêng nên dự án tự quyết.
+    No hardcoded port: two stories running in parallel would collide. The port
+    comes from the project config, and each story runs in its own worktree so
+    the project decides.
     """
 
     def __init__(self, command: str, base_url: str, *, cwd: Path, ready_timeout: int = 60):
@@ -78,17 +78,17 @@ class AppServer:
         return _responds(self.base_url, timeout=2)
 
     def start(self) -> str:
-        """Chuỗi rỗng nếu sẵn sàng; ngược lại là lý do không chạy được."""
+        """Empty string if ready; otherwise the reason it cannot run."""
         if self.proc is not None and self.proc.poll() is None:
-            return ""  # chính mình đã dựng (gọi start() lần hai qua `with`)
+            return ""  # already started by us (second start() call via `with`)
         if self.already_running():
             if not self.command:
-                return ""  # dự án không khai dev_command: người dùng tự chạy app, dùng luôn
-            # Có dev_command mà cổng đã có người trả lời thì không nhận vơ
-            # (lỗi 15, đo 2026-09-05 trên e9): vite của một worktree đã gỡ vẫn
-            # giữ cổng 5199, cổng map mockup của hai lượt sau "mở app" và thấy
-            # trang trống — chấm sai app, story trượt. Thứ đang trả lời ở cổng
-            # này không phải app harness vừa dựng từ worktree của story.
+                return ""  # project has no dev_command: user runs the app themselves, use as-is
+            # dev_command is set but port already has a responder — don't claim it
+            # (bug 15, measured 2026-09-05 on e9): vite from a removed worktree still
+            # held port 5199, mockup-map gate in the next two rounds "opened the app"
+            # and saw a blank page — graded the wrong app, story failed. The process
+            # answering on this port is not the app harness just built from the story's worktree.
             return (
                 f"port {self.base_url} is already occupied by another process "
                 f"({occupant(self.base_url)}) — not this story's app; "
@@ -131,8 +131,8 @@ class AppServer:
             return
         if self.proc.poll() is None:
             _kill_tree(self.proc)
-        # Đóng ống: một đợt 15 story mà mỗi story rò một mô tả tệp thì tới
-        # story thứ n sẽ hỏng vì lý do chẳng liên quan gì tới story đó.
+        # Close pipes: a batch of 15 stories each leaking one fd means story n
+        # will fail for a reason completely unrelated to that story.
         if self.proc.stdout and not self.proc.stdout.closed:
             self.proc.stdout.close()
         self.proc = None
@@ -168,7 +168,7 @@ def _kill_tree(proc: subprocess.Popen) -> None:
 
 
 def occupant(url: str) -> str:
-    """Ai đang giữ cổng — để thông báo chỉ đúng tiến trình, không bắt đoán."""
+    """Who holds the port — for reporting the exact process, not guessing."""
     from urllib.parse import urlparse
 
     port = urlparse(url).port
@@ -196,17 +196,18 @@ def _responds(url: str, *, timeout: float = 2) -> bool:
         with closing(urllib.request.urlopen(url, timeout=timeout)):
             return True
     except (urllib.error.HTTPError,):
-        return True  # có server trả lời, chỉ là mã lỗi — vẫn là "đang chạy"
+        return True  # server responded, just an error code — still "running"
     except (urllib.error.URLError, OSError, ValueError, socket.timeout):
         return False
 
 
 def concrete_route(route: str) -> str:
-    """Thay tham số động bằng giá trị mẫu: `/note/:id` → `/note/1`.
+    """Replace dynamic params with sample values: `/note/:id` -> `/note/1`.
 
-    Route có tham số không mở thẳng được. Giá trị mẫu là quy ước giữa
-    harness và ứng dụng: dữ liệu hạt giống của môi trường dev phải có bản
-    ghi `1`, nếu không đây là chỗ hỏng thật và cổng nên báo.
+    Routes with params cannot be opened directly. The sample value is a
+    convention between harness and app: the dev environment's seed data must
+    have a record with id `1`, otherwise this is a real failure and the gate
+    should report it.
     """
     parts = []
     for seg in route.split("/"):
@@ -227,10 +228,10 @@ def verify_screens(
     artifact_root: Path | str | None = None,
     candidate: str = "",
 ) -> VerifyResult:
-    """Mở từng route thật và đối chiếu với hợp đồng.
+    """Open each real route and compare against the contract.
 
-    ``candidate`` là SHA bản đang kiểm — màn hình đối chiếu ở bản nào thì
-    bằng chứng nói bản ấy (ADR-004 R1)."""
+    ``candidate`` is the SHA being verified — evidence stamps which build the
+    screen was compared against (ADR-004 R1)."""
     project = Path(project)
     cfg = config or Config.load(project)
     out = VerifyResult()
@@ -287,8 +288,8 @@ def verify_screens(
             error = got.error if got else "cannot open route"
             if (got is not None and not got.error and screen.components
                     and not result.matched and not getattr(result, "extra", None)):
-                # Không khớp gì và cũng không thừa gì = trang trống. Với route
-                # có tham số, gần như chắc là thiếu bản ghi hạt giống `1`.
+                # No matches and no extras = blank page. For routes with params,
+                # almost certainly missing the seed record with id `1`.
                 error = f"page rendered no components at {urls[screen.id]}"
                 if concrete_route(screen.route or "/") != (screen.route or "/"):
                     error += " — route has params: dev environment needs a record with id `1` (seed data)"

@@ -1,4 +1,4 @@
-"""Pha lập kế hoạch và các cổng người: ``gates`` · ``review`` · ``approve``
+"""Planning phase and human gates: ``gates`` · ``review`` · ``approve``
 · ``reject`` · ``auto-approve`` · ``plan`` · ``mockup`` · ``change``."""
 
 from __future__ import annotations
@@ -50,7 +50,7 @@ def cmd_gates(args) -> int:
 
 
 def cmd_review(args) -> int:
-    """Hiện artifact và những gì cần xem trước khi duyệt."""
+    """Display artifact and what needs to be reviewed before approval."""
     store = _approvals(args)
     gate: Gate = args.gate
     paths = store.artifact_paths(gate)
@@ -105,11 +105,12 @@ def cmd_review(args) -> int:
 
 
 def _preflight_lines(args) -> list[str]:
-    """Story nào chưa chạy được — tính bằng code, ngay trước cổng người.
+    """Which stories are not yet executable — computed by code, right before
+    the human gate.
 
-    Cổng `readiness` là mốc cuối trước khi tiêu tiền. Ở đây mockup đã dựng
-    và công cụ đã cấu hình xong, nên **cả hai** loại thiếu đều chặn được:
-    story hỏng lẫn dự án chưa cấu hình.
+    The `readiness` gate is the last checkpoint before spending money.  At
+    this point mockups are built and tools are configured, so **both** kinds
+    of gap are catchable: broken stories and unconfigured projects.
     """
     from ..control.preflight import STORY_NOT_EXECUTABLE, check_stories_executable
     from ..phases.run import load_plan
@@ -121,15 +122,16 @@ def _preflight_lines(args) -> list[str]:
     res = check_stories_executable(
         list(plan.stories.values()), project=project, config=Config.load(args.project)
     )
-    # Cổng người: đòi **đủ**, kể cả năng lực nghiệm thu. Đây là mốc
-    # cuối trước khi tiêu tiền, và người duyệt cần thấy chỗ trống.
-    xau = [pf for pf in res if not pf.complete]
-    if not xau:
+    # Human gate: require **completeness**, including acceptance capabilities.
+    # This is the last checkpoint before spending money, and the reviewer
+    # needs to see the gaps.
+    bad = [pf for pf in res if not pf.complete]
+    if not bad:
         return [f"\n✅ {len(res)} stories are all executable"]
-    out = [f"\n✗ {len(xau)}/{len(res)} stories not yet eligible:"]
-    for pf in xau:
-        nhan = STORY_NOT_EXECUTABLE if not pf.executable else "MISSING EVIDENCE"
-        out.append(f"  {nhan} {pf.story_id}")
+    out = [f"\n✗ {len(bad)}/{len(res)} stories not yet eligible:"]
+    for pf in bad:
+        label = STORY_NOT_EXECUTABLE if not pf.executable else "MISSING EVIDENCE"
+        out.append(f"  {label} {pf.story_id}")
         out += [f"    - {m.line()}" for m in pf.missing]
     return out
 
@@ -178,7 +180,7 @@ def cmd_reject(args) -> int:
 
 
 def cmd_auto_approve(args) -> int:
-    """Tự duyệt — luôn ghi dấu `auto` để về sau truy được."""
+    """Auto-approve — always records the `auto` flag for future audit."""
     try:
         gates = parse_auto_approve(args.gates)
     except ValueError as e:
@@ -196,12 +198,12 @@ def cmd_auto_approve(args) -> int:
 
 
 def cmd_plan(args) -> int:
-    """Chạy chuỗi pha BMAD tới cổng đầu tiên chưa duyệt."""
+    """Run the BMAD phase chain up to the first unapproved gate."""
     from ..phases.plan import run_pipeline
 
-    # Kiểm tham số trước, kiểm môi trường sau: sai tham số thì máy nào
-    # cũng sai, còn thiếu client thì tuỳ máy — trộn hai loại lại sẽ cho mã
-    # thoát đổi theo máy chạy.
+    # Validate arguments first, environment second: wrong args fail on every
+    # machine, while a missing client depends on the machine — mixing the two
+    # makes the exit code vary by host.
     try:
         gates = parse_auto_approve(args.auto_approve)
     except ValueError as e:
@@ -227,7 +229,7 @@ def cmd_plan(args) -> int:
 
 
 def cmd_mockup(args) -> int:
-    """Dựng mockup cho từng màn hình rồi trích hợp đồng thị giác."""
+    """Generate mockups for each screen, then extract visual design contracts."""
     from ..control.approvals import Gate
     from ..phases.mockup import generate
     from ..phases.plan import _pass_gate
@@ -264,7 +266,7 @@ def cmd_mockup(args) -> int:
 
 
 def cmd_change(args) -> int:
-    """Vòng đời thay đổi: ghi yêu cầu đổi, đánh stale PRD trở xuống, sinh story delta."""
+    """Change lifecycle: record change request, mark PRD and downstream gates stale, generate delta stories."""
     from ..control.change import apply
 
     try:

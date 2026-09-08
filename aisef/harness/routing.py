@@ -1,13 +1,14 @@
-"""Định tuyến vai — ai làm việc gì, với prompt nào, quyền tới đâu.
+"""Role routing — who does what, with which prompt, and what permissions.
 
-Mỗi vai là một **phiên riêng**. Điều quan trọng nhất ở đây là người rà
-soát không được là người viết: không phải vì model khác thì giỏi hơn, mà
-vì người viết đã tin đoạn code của mình đúng — nếu không họ đã sửa rồi.
-Rà lại trong cùng phiên chỉ là hỏi lại chính niềm tin đó.
+Each role runs in its own **separate session**. The key invariant is that
+the reviewer must not be the writer: not because a different model is better,
+but because the writer already believes their code is correct — otherwise they
+would have fixed it. Re-reviewing in the same session just re-asks the same
+belief.
 
-Vì thế ``build_spec`` **từ chối** truyền ``session_id`` cho vai rà soát.
-Đây là chỗ dễ "tối ưu" nhầm: nối tiếp phiên rẻ hơn nhiều, và cái mất đi
-thì không hiện ra trong hoá đơn.
+Therefore ``build_spec`` **refuses** to pass ``session_id`` to reviewer roles.
+This is an easy place to "optimize" incorrectly: resuming sessions is much
+cheaper, but the loss does not show up on the invoice.
 """
 
 from __future__ import annotations
@@ -31,9 +32,9 @@ class Role:
     id: str
     prompt: str
     level: Level
-    #: Vai này có được nối tiếp phiên đang có không.
+    #: Whether this role may resume an existing session.
     may_resume: bool
-    #: Tool bị cấm hẳn với vai này.
+    #: Tools completely disallowed for this role.
     disallowed_tools: tuple[str, ...] = ()
     note: str = ""
 
@@ -51,8 +52,8 @@ ROLES: dict[str, Role] = {
         prompt="story-review",
         level=Level.READ_ONLY,
         may_resume=False,
-        # Người rà soát mà sửa được code thì nó thành lượt viết thứ hai, và
-        # không còn ai rà soát nữa.
+        # A reviewer that can edit code becomes a second write pass, and
+        # no one is left to review.
         disallowed_tools=("Write", "Edit", "NotebookEdit"),
         note="Rà soát độc lập, phiên mới, không sửa gì.",
     ),
@@ -61,9 +62,9 @@ ROLES: dict[str, Role] = {
         prompt="story-security-review",
         level=Level.READ_ONLY,
         may_resume=False,
-        # Cùng lý do như người rà soát, cộng thêm một lý do riêng: nó đọc
-        # code do agent khác viết, tức **dữ liệu không tin được**. Cho nó
-        # quyền ghi là mở đúng đường mà nó đang đi tìm.
+        # Same reason as the reviewer, plus an additional one: it reads
+        # code written by another agent, i.e. **untrusted data**. Granting
+        # write access opens the exact attack surface it is looking for.
         disallowed_tools=("Write", "Edit", "NotebookEdit"),
         note="Rà soát bảo mật theo ngữ nghĩa, phiên mới, không sửa gì.",
     ),
@@ -83,7 +84,7 @@ class RoutingError(ValueError):
 
 @dataclass
 class Routing:
-    """Model cho từng vai. Rỗng nghĩa là dùng mặc định của client."""
+    """Model per role. Empty means use the client's default."""
 
     models: dict[str, str] = field(default_factory=dict)
 
@@ -117,10 +118,11 @@ def build_spec(
     session_id: str = "",
     allow_empty: tuple[str, ...] = (),
 ) -> RunSpec:
-    """Dựng lượt chạy cho một vai.
+    """Build a run spec for a role.
 
-    Kiểm hai điều mà nếu sai thì hỏng âm thầm: prompt phải đúng của vai đó,
-    và vai không được nối phiên thì không được nhận ``session_id``.
+    Validates two invariants that break silently if wrong: the prompt must
+    belong to that role, and roles that forbid session resumption must not
+    receive a ``session_id``.
     """
     role = role_of(role_id)
     if prompt.name != role.prompt:

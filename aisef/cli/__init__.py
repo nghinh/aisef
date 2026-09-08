@@ -1,29 +1,29 @@
-"""Giao diện dòng lệnh.
+"""Command-line interface.
 
-Mọi lệnh đều **gọi-một-lần**: đọc trạng thái trên đĩa, làm việc, ghi lại,
-rồi thoát. Không lệnh nào giả định mình là tiến trình chính, không lệnh
-nào chạy nền. Đó là điều kiện để cùng bộ lệnh này dùng được ở hai chế độ
-(quyết định Đ2):
+Every command is **fire-and-forget**: read on-disk state, do work, write back,
+then exit.  No command assumes it is the main process, none runs in the
+background.  This is what allows the same command set to work in two modes
+(decision D2):
 
-* **driver-led** — script hoặc CI gọi ``aisef run``;
-* **agent-led** — chính agent gọi ``aisef next`` / ``verify`` / ``complete``
-  qua Bash, ngay trong phiên chat của Claude Desktop hay OpenCode.
+* **driver-led** — a script or CI calls ``aisef run``;
+* **agent-led** — the agent itself calls ``aisef next`` / ``verify`` /
+  ``complete`` via Bash, inside a Claude Desktop or OpenCode chat session.
 
-Quy ước mã thoát: ``0`` thành công · ``1`` lỗi dùng sai · ``2`` trạng thái
-chưa đạt (cổng chưa duyệt, doctor không đạt) — để CI phân biệt được
-"hỏng" với "chưa xong".
+Exit code convention: ``0`` success · ``1`` usage error · ``2`` not-ready
+state (gate unapproved, doctor check failed) — so CI can distinguish
+"broken" from "not yet done".
 
-Bố cục gói (chia theo pha, không đổi hành vi):
+Package layout (split by phase, no behaviour change):
 
-* :mod:`._common` — mã thoát, gốc artifact, kho duyệt/trạng thái, adapter;
-* :mod:`.doctor` — lệnh ``doctor``;
-* :mod:`.plan` — cổng người + pha lập kế hoạch;
-* :mod:`.implement` — pha hiện thực và nghiệm thu;
-* :mod:`.harness` — dựng và vận hành harness;
-* :mod:`.parser` — bộ phân tích tham số và ``main``.
+* :mod:`._common` — exit codes, artifact root, approval/state stores, adapter;
+* :mod:`.doctor` — ``doctor`` command;
+* :mod:`.plan` — human gates + planning phase;
+* :mod:`.implement` — implementation and acceptance phase;
+* :mod:`.harness` — harness setup and operation;
+* :mod:`.parser` — argument parser and ``main``.
 
-Mọi tên module-level cũ được xuất lại ở đây, nên ``from aisef.cli import
-main`` và bạn bè vẫn chạy y như khi còn là một file.
+All legacy module-level names are re-exported here, so ``from aisef.cli import
+main`` and friends still work as they did when this was a single file.
 """
 
 from __future__ import annotations

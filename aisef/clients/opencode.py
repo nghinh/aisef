@@ -1,23 +1,26 @@
-"""Chạy agent bằng OpenCode CLI.
+"""Run agent via OpenCode CLI.
 
-**Đã chứng minh chặn thật** (2026-09-05, opencode 1.18.26, model
-``9router/mycombo``, agent đứng trong thư mục con của dự án):
+**Proven to actually block** (2026-09-05, opencode 1.18.26, model
+``9router/mycombo``, agent standing in a project subdirectory):
 
-* ``rm -rf /tmp/moi-thu-nghiem`` → tool báo failed bằng đúng stderr của
-  guard, và tệp trong thư mục đó **vẫn còn** sau lượt chạy;
-* ``Write ping.py`` chứa ``os.system(f"ping -c 1 {host}")`` → tool báo
-  failed bằng đúng stderr của guard, và **không có tệp nào ra đĩa**.
+* ``rm -rf /tmp/moi-thu-nghiem`` -> tool reported failed with the exact
+  guard stderr, and the files in that directory **still exist** after the run;
+* ``Write ping.py`` containing ``os.system(f"ping -c 1 {host}")`` -> tool
+  reported failed with the exact guard stderr, and **no file was written to
+  disk**.
 
-Phép thử thứ hai cần thiết vì phép thử ghi khoá API trước đó vô giá trị:
-model tự từ chối trước khi gọi tool, nên nó chứng minh model ngoan chứ
-không chứng minh guard chặn. Ca thử phải là thứ model sẵn sàng làm.
+The second test was necessary because the earlier API-key-write test was
+worthless: the model refused on its own before calling the tool, so it proved
+the model is obedient, not that the guard blocks.  The test must be something
+the model is willing to do.
 
-Cũng đã xác nhận plugin ở ``.opencode/plugin/`` cấp dự án được nạp khi
-agent chạy từ thư mục con — đúng tình huống worktree của story.
+Also confirmed that the plugin in ``.opencode/plugin/`` at project level is
+loaded when the agent runs from a subdirectory — exactly the story worktree
+scenario.
 
-Vì thế ``PRE_TOOL_GUARD`` khai ``NATIVE``. Hai mục còn lại vẫn hạ mức
-thật: OpenCode không có giới hạn lượt và không phát luồng sự kiện có cấu
-trúc, nên chi phí phải hỏi riêng.
+Therefore ``PRE_TOOL_GUARD`` is declared ``NATIVE``.  The remaining two items
+are honestly downgraded: OpenCode has no turn limit and does not emit a
+structured event stream, so cost must be queried separately.
 """
 
 from __future__ import annotations
@@ -38,8 +41,8 @@ _TOOL_NAMES = {"read": "Read", "write": "Write", "edit": "Edit", "bash": "Bash",
 
 
 def parse_json_events(lines) -> RunResult:
-    """Luồng `opencode run --format json` → `RunResult` chuẩn. Dòng không phải
-    JSON (banner, cảnh báo) bị bỏ qua, không ném."""
+    """`opencode run --format json` stream to normalised `RunResult`.  Non-JSON
+    lines (banners, warnings) are silently skipped, never raised."""
     import json as _json
 
     from .stream import ToolUse
@@ -92,28 +95,29 @@ class OpenCodeAdapter(ClientAdapter):
     def capabilities(self) -> dict[Capability, Support]:
         return {
             Capability.HEADLESS: Support.NATIVE,            # opencode run
-            # Bằng chứng `par` STORY-02-01: cost=0, turns=0 cả bốn phiên. `--format
-            # json` có trong `--help` nhưng chưa được chứng minh — tới lúc đó, nói
-            # thật là không có. (task nâng cấp đã mở, xem ACTION-PLAN đợt 2)
-            Capability.MACHINE_OUTPUT: Support.NATIVE,     # --format json, đo 2026-09-05
-            Capability.PRE_TOOL_GUARD: Support.NATIVE,     # chứng minh 2026-09-05, xem docstring
+            # Evidence `par` STORY-02-01: cost=0, turns=0 across all four sessions.
+            # `--format json` is in `--help` but was unproven — until then, declare
+            # honestly as absent. (upgrade task open, see ACTION-PLAN batch 2)
+            Capability.MACHINE_OUTPUT: Support.NATIVE,     # --format json, measured 2026-09-05
+            Capability.PRE_TOOL_GUARD: Support.NATIVE,     # proven 2026-09-05, see docstring
             Capability.TOOL_ALLOWLIST: Support.EMULATED,  # emulated by: guardrails.check_role_tool
-            Capability.DIR_ALLOWLIST: Support.UNSUPPORTED,  # không có cờ tương đương
+            Capability.DIR_ALLOWLIST: Support.UNSUPPORTED,  # no equivalent flag
             Capability.SUBAGENT: Support.NATIVE,            # opencode agent
             Capability.MODEL_ROUTING: Support.NATIVE,       # --model
-            # `opencode stats` tồn tại nhưng không có mã nào gọi và ghi vào bằng
-            # chứng; evidence thật ghi cost=0. Không mã mô phỏng → không khai mô phỏng.
-            Capability.COST_REPORTING: Support.NATIVE,     # step_finish.cost/tokens — số của nhà cung cấp
-            Capability.TURN_LIMIT: Support.UNSUPPORTED,     # dùng timeout thay
+            # `opencode stats` exists but no code calls it or writes to evidence;
+            # real evidence records cost=0. No emulation code -> do not declare emulated.
+            Capability.COST_REPORTING: Support.NATIVE,     # step_finish.cost/tokens — provider-reported
+            Capability.TURN_LIMIT: Support.UNSUPPORTED,     # use timeout instead
         }
 
     def build_command(self, spec: RunSpec) -> list[str]:
-        # `--dir` chứ không chỉ `cwd=`: OpenCode dò gốc dự án riêng, và với
-        # worktree nằm trong `<dự án>/.aisef/worktrees/` nó đi ngược lên
-        # tới gốc dự án rồi **nói với model rằng đó là nơi làm việc**. Model
-        # sau đó đọc/ghi bằng đường dẫn tuyệt đối vào gốc dự án và đặt
-        # `workdir` của từng lệnh bash ở đó — công việc rơi thẳng lên thân
-        # cây, worktree vẫn trống. Đo được trong bản ghi phiên:
+        # `--dir` not just `cwd=`: OpenCode discovers the project root on its
+        # own, and with a worktree inside `<project>/.aisef/worktrees/` it
+        # walks up to the project root then **tells the model that is the
+        # working directory**. The model then reads/writes using absolute paths
+        # into the project root and sets each bash command's `workdir` there —
+        # work lands directly on the main tree, worktree stays empty. Observed
+        # in session logs:
         #
         #   {"tool":"read","input":{"filePath":"/…/par/src/reverse-words.js"}}
         #   {"tool":"bash","input":{"command":"git add … && git commit …",
@@ -139,9 +143,9 @@ class OpenCodeAdapter(ClientAdapter):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
-                # Allowlist, không phải `os.environ` (ADR-005 V2): OpenCode từng
-                # nhận trọn môi trường máy và ghi secret ra log của nó. Provider
-                # đọc khoá từ biến riêng thì dự án khai `clients.env_allow`.
+                # Allowlist, not `os.environ` (ADR-005 V2): OpenCode once received
+                # the full host environment and logged secrets to its own log.
+                # Providers reading keys from custom env vars declare `clients.env_allow`.
                 env=child_env(spec.env, allow_prefixes=spec.env_allow),
                 stdin=subprocess.DEVNULL,
             )
@@ -156,10 +160,10 @@ class OpenCodeAdapter(ClientAdapter):
             stdout, stderr = proc.communicate()
             timed_out = True
 
-        # `--format json` (đo 2026-09-05, OpenCode 1.18.26): mỗi dòng một sự kiện
-        # `step_start` / `text` / `tool_use` (part.tool, state.input/output) /
-        # `step_finish` (tokens, cost). Cost là số nhà cung cấp báo — 9router
-        # báo 0, đó là sự thật của nhà cung cấp, không phải của harness.
+        # `--format json` (measured 2026-09-05, OpenCode 1.18.26): one event per
+        # line — `step_start` / `text` / `tool_use` (part.tool, state.input/output)
+        # / `step_finish` (tokens, cost). Cost is the provider-reported number —
+        # 9router reports 0, that is the provider's truth, not the harness's.
         res = parse_json_events(stdout.splitlines())
         res.ok = proc.returncode == 0 and not timed_out
         res.duration_ms = int((time.monotonic() - started) * 1000)

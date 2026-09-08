@@ -1,15 +1,15 @@
-"""TDD kiểm được (G8): đỏ trước xanh, và test có sẵn không bị yếu đi.
+"""TDD verifiability (G8): red before green, and existing tests must not weaken.
 
-Prompt đã đòi "viết test trước, thấy nó đỏ" từ lâu; đây là lần đầu máy
-kiểm. Hai tín hiệu, một chặn một cảnh báo:
+The prompt has long required "write the test first, see it fail"; this is the
+first machine check. Two signals, one blocking, one advisory:
 
-1. **Đỏ trước xanh** — story *thêm* test (tệp test mới, hoặc dòng mới mang
-   mã ``AC-<story>-``) thì bằng chứng phải có một lần ``test`` đỏ **trước**
-   lần xanh cuối. Xanh ngay từ đầu chưa chứng minh test kiểm được gì.
-   Story không thêm test (refactor thuần) thì không áp dụng — không đoán.
-2. **Test biến mất** — tệp test có ở điểm rẽ nhánh mà số ca giảm thì đưa
-   cho người rà soát, kèm tên tệp và số. Không tự chặn: "cập nhật kỳ vọng"
-   là hợp lệ và cần phán đoán.
+1. **Red before green** — if a story *adds* tests (new test file, or new lines
+   containing ``AC-<story>-``), the evidence must show a ``test`` failure
+   **before** the final green run. Green from the start does not prove the test
+   checks anything. Stories that add no tests (pure refactors) are exempt.
+2. **Test disappearance** — if a test file present at the branch point has
+   fewer test cases, surface the file name and counts to the reviewer.
+   Not auto-blocking: "updating expectations" is valid and needs judgment.
 """
 
 from __future__ import annotations
@@ -33,8 +33,8 @@ def _git(cwd: Path | str, *args: str) -> str:
 
 
 def added_tests(workdir: Path | str, *, base_ref: str, changed: list[str], story_id: str) -> list[str]:
-    """Tệp test story **thêm**: mới so với điểm rẽ (kể cả chưa theo dõi),
-    hoặc có dòng mới mang mã tiêu chí của story."""
+    """Test files **added** by the story: new relative to the branch point
+    (including untracked), or containing new lines with the story's AC id."""
     workdir = Path(workdir)
     tests = [f for f in changed if is_test_path(f)]
     if not tests:
@@ -45,17 +45,17 @@ def added_tests(workdir: Path | str, *, base_ref: str, changed: list[str], story
     out = []
     for f in tests:
         if f not in o_goc:
-            out.append(f)                       # tệp mới
+            out.append(f)                       # new file
             continue
         diff = _git(workdir, "diff", base_ref, "--", f) if base_ref else _git(workdir, "diff", "HEAD", "--", f)
         if any(l.startswith("+") and not l.startswith("+++") and f"AC-{story_id}-" in l.replace("_", "-")
                for l in diff.splitlines()):
-            out.append(f)                       # tiêu chí mới có test
+            out.append(f)                       # new AC has test
     return out
 
 
 def red_before_green(evidence: Evidence) -> bool:
-    """Có lần `test` đỏ (chạy thật, không phải bỏ qua) trước lần xanh cuối."""
+    """True if a real (non-skipped) `test` failure exists before the last green run."""
     runs = evidence.of(TOOL_RUN, "test")
     greens = [e for e in runs if e.ok]
     if not greens:
@@ -65,7 +65,7 @@ def red_before_green(evidence: Evidence) -> bool:
 
 
 def test_delta(workdir: Path | str, *, base_ref: str, changed: list[str]) -> list[str]:
-    """Tệp test có sẵn mà số ca giảm: `"path: 5 → 3"`."""
+    """Existing test files whose test-case count decreased: `"path: 5 -> 3"`."""
     if not base_ref:
         return []
     workdir = Path(workdir)

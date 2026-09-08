@@ -1,11 +1,12 @@
-"""Chạy trình duyệt thật để dựng mockup và trích hợp đồng thị giác.
+"""Run a real browser to render mockups and extract the visual contract.
 
-Playwright là **phụ thuộc tuỳ chọn**: thiếu nó thì framework nói thẳng là
-thiếu, không giả vờ vẫn kiểm được. Cùng nguyên tắc với sandbox — thà báo
-mức bảo đảm thấp hơn còn hơn im lặng chạy như thể vẫn đủ (bất biến 10).
+Playwright is an **optional dependency**: when missing the framework says so
+explicitly instead of pretending it can still verify. Same principle as
+sandbox — better to report a lower assurance level than silently run as if
+everything is in place (invariant 10).
 
-Một lần mở trình duyệt xử lý cả danh sách màn hình: mở lại chromium cho
-từng màn hình tốn vài giây mỗi lần, và dự án có hàng chục màn hình.
+One browser launch handles the full list of screens: restarting chromium per
+screen costs several seconds each, and a project can have dozens of screens.
 """
 
 from __future__ import annotations
@@ -18,7 +19,7 @@ from pathlib import Path
 
 SCRIPT = Path(__file__).resolve().parent / "assets" / "render.mjs"
 
-#: Nơi tìm `node_modules` chứa playwright, theo thứ tự ưu tiên.
+#: Directories to search for `node_modules` containing playwright, in priority order.
 def _node_paths(project: Path) -> list[Path]:
     repo = Path(__file__).resolve().parent.parent.parent
     return [project / "node_modules", repo / "spike" / "s7" / "node_modules"]
@@ -33,13 +34,13 @@ class RenderedScreen:
     route: str = ""
     title: str = ""
     snapshot: str = ""
-    #: Snapshot của từng vùng `[data-sample]` — nội dung ví dụ, không phải
-    #: cam kết. Trừ ra khỏi hợp đồng để cổng không đỏ vì dữ liệu khác nhau.
+    #: Snapshot of each `[data-sample]` region — example content, not a
+    #: commitment. Excluded from the contract so the gate doesn't fail on differing data.
     sample_snapshots: list[str] = field(default_factory=list)
-    #: Vùng chú thích của chính tài liệu mockup — không phải cam kết.
+    #: Annotation regions of the mockup document itself — not a commitment.
     annotation_snapshots: list[str] = field(default_factory=list)
-    #: Snapshot của **một** trạng thái chính. Rỗng khi mockup không khai
-    #: `data-state`; khi đó hợp đồng lấy cả trang.
+    #: Snapshot of the **primary** state. Empty when the mockup declares no
+    #: `data-state`; in that case the contract covers the whole page.
     primary_snapshot: str = ""
     declared_states: list[str] = field(default_factory=list)
     fields: list[dict] = field(default_factory=list)
@@ -55,8 +56,8 @@ class RenderedScreen:
 @dataclass
 class RenderResult:
     screens: list[RenderedScreen] = field(default_factory=list)
-    #: Không dựng được gì cả — thiếu node, thiếu playwright, không mở được
-    #: chromium. Khác hẳn với "dựng được nhưng trang lỗi".
+    #: Nothing could be rendered at all — node missing, playwright missing,
+    #: chromium won't launch. Distinct from "rendered but the page errored".
     unavailable: str = ""
 
     @property
@@ -68,7 +69,7 @@ class RenderResult:
 
 
 def find_playwright(project: Path | str = ".") -> Path | None:
-    """Thư mục `node_modules` có playwright, nếu tìm được."""
+    """Return the `node_modules` directory containing playwright, if found."""
     for base in _node_paths(Path(project)):
         if (base / "playwright" / "package.json").is_file():
             return base
@@ -76,7 +77,7 @@ def find_playwright(project: Path | str = ".") -> Path | None:
 
 
 def availability(project: Path | str = ".") -> str:
-    """Chuỗi rỗng nếu dựng được; ngược lại là lý do không dựng được."""
+    """Empty string if rendering is possible; otherwise the reason it is not."""
     if not shutil.which("node"):
         return "node not installed — cannot render mockup to extract contract"
     if find_playwright(project) is None:
@@ -93,7 +94,7 @@ def render(
     viewport: tuple[int, int] = (1280, 900),
     timeout: int = 300,
 ) -> RenderResult:
-    """Dựng từng file HTML, trả về snapshot + siêu dữ liệu (và chụp ảnh)."""
+    """Render each HTML file; return snapshots + metadata (and screenshots)."""
     project = Path(project)
     reason = availability(project)
     if reason:

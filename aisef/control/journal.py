@@ -1,25 +1,24 @@
-"""Một lượt chạy story là **một giao dịch**, không phải bảy lần ghi rời.
+"""A story run is **one transaction**, not seven separate writes.
 
-Một lượt chạy đụng tới bảy kho trạng thái: worktree, nhánh git, bản ghi
-sprint, tệp bằng chứng, trạng thái lượt thử, tiến trình con, và sổ sách
-commit/merge. Chúng phải nhất quán với nhau, nhưng không có gì buộc
-chúng nhất quán — nên khi một lượt chạy chết giữa chừng, mỗi kho dừng ở
-một chỗ khác nhau. Đã quan sát trên e9:
+A single run touches seven state stores: worktree, git branch, sprint record,
+evidence files, attempt status, subprocess, and commit/merge ledger. They must
+be consistent with each other, but nothing enforces consistency — so when a run
+dies mid-way, each store stops at a different point. Observed on e9:
 
-* tiến trình bị dừng → story kẹt ở ``running`` vĩnh viễn;
-* worktree merge vào nhánh chính xong → sổ vẫn ghi ``failed``, và chi
-  phí lượt ấy không vào đâu cả;
-* chạy lại story đã merge → worktree mới rẽ từ nhánh đã chứa sẵn công
-  việc, diff rỗng, story không bao giờ qua được nữa.
+* process killed -> story stuck at ``running`` forever;
+* worktree merged into main branch -> ledger still says ``failed``, and the
+  cost of that attempt is lost;
+* re-running an already-merged story -> new worktree branches from a branch
+  that already contains the work, diff is empty, story can never pass again.
 
-Cách chữa mượn từ *revertible effects*: mỗi bước ghi lại **nghịch đảo**
-của chính nó, và nhật ký là thứ máy đọc được để dựng lại xem lượt chạy
-đã đi tới đâu. Không dựng runtime tổng quát — phạm vi đúng bằng những
-kho AISEF thật sự sở hữu.
+The fix borrows from *revertible effects*: each step records its own
+**inverse**, and the journal is machine-readable state for reconstructing how
+far a run got. No general-purpose runtime — the scope is exactly the stores
+AISEF actually owns.
 
-Một ranh giới cố ý: **không giả vờ hoàn nguyên thứ không hoàn nguyên
-được.** Merge đã vào nhánh chính thì cách xử đúng là *đi tiếp* cho
-trạng thái đuổi kịp, không phải cố lùi lại.
+One deliberate boundary: **do not pretend to revert the irrevertible.** Once
+a merge is on the main branch, the correct action is to *roll forward* so
+status catches up, not to try rolling back.
 """
 
 from __future__ import annotations
@@ -32,14 +31,15 @@ from pathlib import Path
 
 JOURNAL_DIR = "journal"
 
-#: Các mốc của một lượt chạy, đúng thứ tự. Danh sách này là hợp đồng: đọc
-#: nhật ký rồi so với nó là biết lượt chạy dừng ở đâu và còn nợ gì.
+#: Steps of a run, in order. This list is the contract: reading the journal
+#: and comparing against it tells where a run stopped and what remains.
 #:
-#: ``candidate.frozen`` mang SHA của ứng viên và đứng **trước** mọi bước
-#: kiểm (ADR-004 R1): bằng chứng chỉ có nghĩa khi nó trỏ vào một bản cụ
-#: thể. Trước đây bước này tên ``commit.created`` và nằm *sau*
-#: ``review.completed`` — ứng viên được chốt sau khi đã chấm, nên không
-#: nói được "bằng chứng này thuộc bản nào".
+#: ``candidate.frozen`` carries the candidate SHA and comes **before** all
+#: verification steps (ADR-004 R1): evidence only means something when it
+#: points to a specific build. Previously this step was named
+#: ``commit.created`` and came *after* ``review.completed`` — the candidate
+#: was frozen after grading, so there was no way to say "this evidence
+#: belongs to this build."
 STEPS = (
     "attempt.started",
     "worktree.created",
@@ -52,8 +52,8 @@ STEPS = (
     "attempt.committed",
 )
 
-#: Bước đánh dấu công việc đã sang nhánh chính. Từ mốc này trở đi, hoàn
-#: nguyên là sai: công việc đã ở ngoài tầm giao dịch.
+#: Step marking that work has reached the main branch. From this point on,
+#: reverting is wrong: the work is outside the transaction's scope.
 POINT_OF_NO_RETURN = "merge.completed"
 
 ABORTED = "attempt.aborted"
@@ -67,8 +67,8 @@ class Entry:
     at: float = 0.0
     attempt: int = 0
     data: dict = field(default_factory=dict)
-    #: Việc cần làm để gỡ bước này. Rỗng nghĩa là bước không để lại gì
-    #: cần gỡ (ví dụ một mốc thuần thông tin).
+    #: Action needed to undo this step. Empty means the step left nothing
+    #: to undo (e.g. a purely informational milestone).
     undo: dict = field(default_factory=dict)
 
     def as_dict(self) -> dict:
@@ -101,17 +101,18 @@ class Journal:
 
     @property
     def needs_merge(self) -> bool:
-        """Story đã có worktree (tức phải merge) nhưng chưa merge.
+        """Story has a worktree (thus needs merge) but has not merged yet.
 
-        `DONE` được ghi lúc qua cổng, trước merge — nên riêng trạng thái
-        không trả lời được câu "code đã lên nhánh chính chưa". Chạy thẳng
-        trong dự án (`--no-isolate`) thì không có bước merge, và cũng không
-        có `worktree.created`, nên trả False là đúng.
+        `DONE` is written when the gate passes, before merge — so status alone
+        cannot answer "has the code reached the main branch." Running directly
+        in the project (`--no-isolate`) has no merge step and no
+        `worktree.created`, so returning False is correct.
         """
-        # `commit.created` (tên cũ) chỉ xảy ra trong nhánh worktree, nên nó
-        # cũng là bằng chứng có worktree — cho nhật ký cũ thiếu bước đầu.
-        # `candidate.frozen` **không** dùng được ở đây: nó được ghi cả khi
-        # chạy thẳng trong dự án (`--no-isolate`), nơi không có gì để merge.
+        # `commit.created` (old name) only occurs in worktree branches, so it
+        # also proves a worktree exists — for old journals missing the first step.
+        # `candidate.frozen` **cannot** be used here: it is recorded even when
+        # running directly in the project (`--no-isolate`), where there is
+        # nothing to merge.
         co_worktree = self.reached("worktree.created") or self.reached("commit.created")
         return co_worktree and not self.merged()
 
@@ -120,10 +121,11 @@ class Journal:
         return max((e.attempt for e in self.entries), default=0)
 
     def open_attempt(self) -> int:
-        """Số hiệu lượt đã mở mà chưa đóng. 0 nếu không có lượt nào dở.
+        """Attempt number of the open (unclosed) attempt. 0 if no attempt is in progress.
 
-        Đóng nghĩa là có ``attempt.committed``, ``attempt.aborted`` hoặc
-        ``attempt.reconciled`` **sau** lần ``attempt.started`` gần nhất.
+        Closed means ``attempt.committed``, ``attempt.aborted`` or
+        ``attempt.reconciled`` appears **after** the most recent
+        ``attempt.started``.
         """
         mo = 0
         for e in self.entries:
@@ -134,17 +136,18 @@ class Journal:
         return mo
 
     def merged(self) -> bool:
-        """Công việc của story này đã sang nhánh chính chưa.
+        """Whether this story's work has reached the main branch.
 
-        Câu hỏi quan trọng nhất khi chạy lại: worktree mới rẽ từ nhánh đã
-        chứa sẵn công việc thì diff rỗng, và story không bao giờ qua cổng
-        rà soát được nữa. Biết nó đã merge thì bỏ qua, không thử mù.
+        The most important question when re-running: a new worktree branching
+        from a branch that already contains the work produces an empty diff,
+        and the story can never pass the review gate again. Knowing it merged
+        lets us skip instead of retrying blindly.
         """
         return self.reached(POINT_OF_NO_RETURN)
 
 
 class JournalStore:
-    """Đọc/ghi ``journal/{story}.jsonl``. Nối thêm, không sửa."""
+    """Read/write ``journal/{story}.jsonl``. Append-only, never modified."""
 
     def __init__(self, artifact_root: Path | str):
         self.root = Path(artifact_root) / JOURNAL_DIR
@@ -182,7 +185,7 @@ class JournalStore:
             try:
                 raw = json.loads(line)
             except json.JSONDecodeError:
-                continue  # một dòng hỏng không đáng làm mất cả nhật ký
+                continue  # one corrupt line is not worth losing the entire journal
             j.entries.append(Entry(
                 seq=int(raw.get("seq") or 0),
                 step=str(raw.get("step") or ""),
@@ -199,7 +202,7 @@ class JournalStore:
         return sorted(p.stem for p in self.root.glob("*.jsonl"))
 
 
-# ------------------------------------------------------------ giao dịch
+# ------------------------------------------------------------ transactions
 
 
 @dataclass
@@ -213,11 +216,12 @@ class Reconciled:
 
 
 class StoryRunTransaction:
-    """Một lượt chạy story, ghi vào nhật ký từng mốc kèm nghịch đảo.
+    """A story run, recording each step with its inverse in the journal.
 
-    Cố ý **không** giữ trạng thái nào chỉ trong bộ nhớ: tiến trình chết
-    thì object chết theo, còn nhật ký thì còn. Mọi thứ cần để dọn dẹp
-    phải nằm trên đĩa từ lúc bước đó xảy ra, không phải lúc nó hỏng.
+    Intentionally holds **no state only in memory**: when the process dies
+    the object dies with it, but the journal survives. Everything needed
+    for cleanup must be on disk from the moment the step happens, not when
+    it fails.
     """
 
     def __init__(
@@ -251,7 +255,7 @@ class StoryRunTransaction:
     def __exit__(self, exc_type, exc, tb) -> bool:
         if not self.committed:
             self.abort(f"{exc_type.__name__}: {exc}" if exc_type else "abnormal termination")
-        return False  # không nuốt lỗi
+        return False  # do not swallow exceptions
 
 
 def reconcile_story(
@@ -261,18 +265,18 @@ def reconcile_story(
     state,
     worktrees=None,
 ) -> Reconciled | None:
-    """Đưa một story về trạng thái nhất quán sau lượt chạy dở.
+    """Bring a story back to a consistent state after an incomplete run.
 
-    Ba tình huống, ba cách xử khác nhau:
+    Three situations, three different actions:
 
-    1. **Đã merge** — công việc ở ngoài tầm giao dịch rồi. Đi tiếp cho
-       trạng thái đuổi kịp, không cố lùi. Đây đúng là ca đã xảy ra trên
-       e9: worktree merge xong mà sổ vẫn ghi ``failed``.
-    2. **Còn dở, chưa merge** — gỡ tài nguyên tạm (worktree) và đưa
-       trạng thái về ``pending`` để chạy lại. Nhánh **không** xoá: công
-       việc đã commit trong đó không được biến mất vì một lần dọn.
-    3. **Không có lượt dở** — chỉ sửa trạng thái nếu nó kẹt ở
-       ``running``/``verifying`` của một tiến trình đã chết.
+    1. **Already merged** — work is outside the transaction scope. Roll
+       forward so status catches up, do not try to revert. This is exactly
+       the case observed on e9: worktree merged but ledger still says ``failed``.
+    2. **In progress, not merged** — remove temporary resources (worktree)
+       and reset status to ``pending`` for retry. The branch is **not**
+       deleted: committed work in it must not vanish due to cleanup.
+    3. **No open attempt** — only fix status if it is stuck at
+       ``running``/``verifying`` from a dead process.
     """
     from .state import StoryStatus
 
@@ -297,7 +301,7 @@ def reconcile_story(
         return None
 
     if worktrees is not None and (dang_do or ket):
-        # Nhánh giữ lại: commit trong đó là công việc thật.
+        # Branch is kept: commits in it are real work.
         worktrees.remove(story_id, delete_branch=False)
     if cur is not StoryStatus.DONE:
         state.reset_for_retry(story_id)
@@ -317,11 +321,11 @@ def reconcile_all(
     state,
     worktrees=None,
 ) -> list[Reconciled]:
-    """Hoà giải mọi story có nhật ký. Chạy đầu mỗi lượt `aisef run`.
+    """Reconcile all stories that have a journal. Runs at the start of each `aisef run`.
 
-    Đây là chỗ một tiến trình bị giết ở lần chạy trước được dọn: không
-    có bước này thì story kẹt ``running`` vĩnh viễn và không lệnh nào gỡ
-    ra được.
+    This is where a process killed in a previous run gets cleaned up: without
+    this step, a story stuck at ``running`` forever and no command can unstick
+    it.
     """
     store = JournalStore(artifact_root)
     out = []
@@ -335,10 +339,10 @@ def reconcile_all(
 
 
 def _to_done(state, story_id: str) -> None:
-    """Đưa trạng thái tới ``done`` qua đúng các cạnh hợp lệ.
+    """Advance status to ``done`` through valid state transitions.
 
-    Đi theo máy trạng thái chứ không ghi đè: bản ghi phải giữ được một
-    vết chuyển hợp lệ, nếu không thì nó không còn là bằng chứng.
+    Follows the state machine instead of overwriting: the record must retain
+    a valid transition trail, otherwise it is no longer evidence.
     """
     from .state import StoryStatus
 

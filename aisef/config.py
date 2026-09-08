@@ -1,12 +1,13 @@
-"""Cấu hình và ngưỡng.
+"""Configuration and thresholds.
 
-Mọi con số điều khiển hành vi nằm ở đây, không rải rác trong code. Lý do:
-ngưỡng đúng cho dự án này thường sai cho dự án khác — coverage 85% hợp lý
-với dịch vụ nội bộ nhưng thấp với thư viện dùng chung, và `max_parallel`
-phụ thuộc hạn mức model lẫn sức máy.
+All behaviour-controlling numbers live here, not scattered across the code.
+Reason: the right threshold for one project is usually wrong for another —
+85% coverage is reasonable for an internal service but low for a shared
+library, and ``max_parallel`` depends on both model rate limits and machine
+capacity.
 
-Thứ tự ưu tiên: mặc định trong mã → `.ai/config.json` của dự án → biến
-môi trường `AISEF_*`. Càng gần chỗ chạy càng thắng.
+Precedence: code defaults -> project ``.ai/config.json`` -> ``AISEF_*``
+environment variables.  Closer to the run wins.
 """
 
 from __future__ import annotations
@@ -21,71 +22,78 @@ from typing import Any
 CONFIG_PATH = ".ai/config.json"
 ENV_PREFIX = "AISEF_"
 
-#: Mặc định. Khoá dùng dấu chấm để nhóm theo chủ đề.
+#: Defaults.  Keys use dots to group by topic.
 DEFAULTS: dict[str, Any] = {
-    # chất lượng
+    # quality
     "coverage.min": 0.85,
     "security.block_severities": ["critical", "high"],
-    # Rà soát bảo mật theo ngữ nghĩa, chạy cùng pha kiểm định.
+    # Semantic security review, runs during the verification phase.
     "security.semantic_review": True,
-    # kích thước story — chống tràn ngữ cảnh trong một phiên
+    # story size — prevents context overflow in a single session
     "story.max_acceptance_criteria": 8,
     "story.max_write_scope_paths": 10,
-    # trạng thái màn hình một story phải dựng (P2-12): đo 2026-09-05 trên e9,
-    # story 11 và 18 trạng thái đều chạm max_turns ở lượt đầu và cần 4–8 lượt
+    # screen states a story must build (P2-12): measured 2026-09-05 on e9,
+    # stories with 11 and 18 states both hit max_turns on the first attempt and needed 4-8 attempts
     "story.max_screen_states": 8,
-    # điểm cỡ story tổng hợp (ADR-004 R5) — trạng thái màn hình + tiêu chí +
-    # phạm vi ghi + fan-in + hành vi VERIFIED bị chạm. Hiệu chuẩn B4 hồi cứu
-    # 23 story thật (Spearman 0,88 trên 10 story có số lượt): 16 tách đúng hai
-    # story đắt nhất (e9 01-04 23,5 và 01-05 18,0) khỏi phần còn lại (≤ 15,5).
-    # Xem `control/complexity.py` và ADR-004 §6 R5.
+    # composite story complexity score (ADR-004 R5) — screen states + criteria +
+    # write scope + fan-in + VERIFIED behaviours touched.  B4 retrospective
+    # calibration on 23 real stories (Spearman 0.88 on 10 stories with turn
+    # counts): 16 correctly separates the two most expensive stories (e9 01-04
+    # 23.5 and 01-05 18.0) from the rest (<=15.5).
+    # See ``control/complexity.py`` and ADR-004 section 6 R5.
     "story.max_complexity": 16.0,
-    # Trần ký tự cho lát cắt chỉ mục bằng chứng nạp vào prompt (ADR-004 R6).
-    # Chỉ mục thay cho việc đổ lịch sử: agent cần chi tiết thì gọi
-    # `aisef evidence <id>`, không nạp sẵn cả sổ.
+    # Character cap for the evidence index slice loaded into the prompt (ADR-004
+    # R6).  An index instead of dumping history: agent calls ``aisef evidence
+    # <id>`` when it needs details, not pre-loading the entire ledger.
     "context.max_index_chars": 2000,
-    # Trần ký tự cho hai slot R4 (`preservation`, `validation`) — hành vi
-    # VERIFIED của story khác mà story này chạm tệp, và thứ phải xanh ở ứng
-    # viên. Chỉ id + nguồn kiểm, không có lịch sử: đo trên sổ e9, STORY-01-07
-    # chạm 31 hành vi của 3 story — đổ hết vào prompt là quá 15 % ngân sách B5.
-    # Cổng "bảo toàn" vẫn kiểm **đủ** danh sách, cắt chỉ là cắt phần in ra.
-    # 1 200, không phải 1 500: B5 hồi cứu e9 (ADR-004 §6 R4) đo developer
-    # +17,5 % prompt với trần 1 500 — vượt trần 15 %; bớt ≈ 300 ký tự về ≈ 15 %.
+    # Character cap for the two R4 slots (``preservation``, ``validation``) —
+    # VERIFIED behaviours of other stories whose files this story touches, and
+    # what must stay green on the candidate.  Only id + verification source, no
+    # history: measured on the e9 ledger, STORY-01-07 touches 31 behaviours of
+    # 3 stories — dumping all into the prompt exceeds the 15% B5 budget.  The
+    # "preservation" gate still checks the **full** list; the cap only trims
+    # the printed portion.  1200 not 1500: B5 retrospective on e9 (ADR-004
+    # section 6 R4) measured developer +17.5% prompt at 1500 cap — exceeds
+    # 15%; trimming ~300 chars brings it to ~15%.
     "context.max_preservation_chars": 1200,
-    # Bản đồ mã quanh phạm vi ghi (ADR-005 V7, `harness/context.py`): skeleton
-    # tệp trong phạm vi + lân cận 1 bước + test nhắc tên, nạp cho cả ba vai.
-    # **0 = tắt** cho tới khi A/B T8 đạt (trung vị lượt −20 % **và** cổng cùng
-    # kết cục): Aider không công bố số đo nào cho repo map, còn trần B5 là
-    # +15 % prompt — 2 000 ký tự trên baseline 11 537 đã là +17 %, nên khi bật
-    # thử 1 500 (≈ +13 %). Tắt thì developer vẫn tra được bằng `aisef ctx`.
+    # Code map around write scope (ADR-005 V7, ``harness/context.py``): file
+    # skeletons in scope + 1-hop neighbours + tests mentioning them, loaded for
+    # all three roles.  **0 = disabled** until A/B T8 passes (median turns
+    # -20% **and** same gate outcome): Aider publishes no measurements for
+    # repo map, and the B5 cap is +15% prompt — 2000 chars on a baseline of
+    # 11537 is already +17%, so when enabling try 1500 (~+13%).  While disabled
+    # the developer can still query via ``aisef ctx``.
     "context.max_repo_map_chars": 0,
-    # Lệnh ngoài vẽ bản đồ (tree-sitter, serena… cắm sau, không thêm gói):
-    # stdin JSON {project, seeds, budget} → stdout văn bản. Rỗng = dựng sẵn
-    # stdlib; lệnh hỏng thì lùi về dựng sẵn và slot nói rõ là thô.
+    # External command for map rendering (tree-sitter, serena... pluggable,
+    # no extra packages): stdin JSON {project, seeds, budget} -> stdout text.
+    # Empty = built-in stdlib; broken command falls back to built-in and the
+    # slot states it is coarse.
     "context.map_provider": "",
-    # Nhà cung cấp đồ thị mã nguồn cho brownfield: "auto" (Graphify nếu có,
-    # Basic nếu không), "graphify", "basic". Không bật MCP mặc định.
+    # Codebase graph provider for brownfield: "auto" (Graphify if available,
+    # Basic otherwise), "graphify", "basic".  MCP not enabled by default.
     "context.graph_provider": "auto",
-    # vòng cải tiến epic theo bằng chứng (ADR-004 R3). HoH chạy T = 70 vòng
-    # không có điều kiện dừng; ở đây mọi điều kiện dừng là code và ba số này
-    # là trần. Đếm theo epic từ `loops[]` của sổ hành vi — chạy lại
-    # `aisef improve` tiếp từ vòng cuối, không đếm lại từ 0.
+    # Evidence-based epic improvement loops (ADR-004 R3).  HoH runs T=70
+    # loops with no stopping condition; here every stopping condition is code
+    # and these three numbers are ceilings.  Count by epic from ``loops[]`` in
+    # the behaviour ledger — re-running ``aisef improve`` continues from the
+    # last loop, not from 0.
     "improve.max_loops": 3,
-    # dừng khi cải thiện biên (Δverified − Δreopened giữa hai mốc `loops[]`
-    # liên tiếp) ≤ 0 chừng này vòng liền: vòng sau nhận cùng gap, cùng ngữ
-    # cảnh, sẽ cho cùng kết quả.
+    # stop when marginal improvement (delta_verified - delta_reopened between
+    # two consecutive ``loops[]`` checkpoints) <= 0 for this many consecutive
+    # loops: the next loop receives the same gap and context, will produce the
+    # same result.
     "improve.flat_loops": 2,
-    # trần tổng chi phí (USD) các vòng của một epic; 0 = không giới hạn.
-    # Chi phí đọc từ bằng chứng của story sửa, không từ lời client.
+    # total cost ceiling (USD) across loops of one epic; 0 = unlimited.
+    # Cost read from evidence of the fix story, not from the client's word.
     "improve.cost_cap_usd": 0.0,
-    # điều phối
+    # orchestration
     "run.max_parallel": 3,
     "run.max_turns": 40,
     "run.timeout_seconds": 1800,
     "run.max_retries": 2,
-    # chi phí
+    # cost
     "cost.warn_multiple": 3.0,
-    # lệnh kiểm định — rỗng nghĩa là "chưa cấu hình", KHÔNG phải "đạt"
+    # verification commands — empty means "not configured", NOT "passing"
     "verify.sit": "",
     "verify.api-contract": "",
     "verify.e2e": "",
@@ -98,83 +106,92 @@ DEFAULTS: dict[str, Any] = {
     "verify.migration": "",
     "verify.sbom": "",
     "verify.image-scan": "",
-    #: Loại được miễn tường minh, ngăn bởi dấu phẩy. Miễn phải là quyết
-    #: định có người ký, không phải hệ quả của việc quên cấu hình.
+    #: Explicitly waived types, comma-separated.  Waiving must be a signed
+    #: decision, not a consequence of forgetting to configure.
     "verify.waived": "",
-    #: Lý do miễn (phạm vi, ngày, người ký). `pre-deploy` đòi có lý do khi
-    #: `verify.waived` khác rỗng và ghi nó vào `pre-deploy-report.json`;
-    #: loại miễn hiện ◇, không bao giờ thành ✅.
+    #: Waiver reason (scope, date, signer).  ``pre-deploy`` requires a reason
+    #: when ``verify.waived`` is non-empty and records it in
+    #: ``pre-deploy-report.json``; waived types show as diamond, never checkmark.
     "verify.waiver_reason": "",
-    # Baseline trước khi sửa (ADR-004 R9): harness chạy bộ test ở candidate
-    # cha **trước** phiên developer đầu tiên, để cổng "không làm đỏ test có
-    # sẵn" so được tên test xanh trước/sau. Tắt khi bộ test quá chậm — tắt
-    # thì mục cổng là "không áp dụng: tắt bởi cấu hình", không phải đạt.
+    # Pre-fix baseline (ADR-004 R9): harness runs the test suite at the parent
+    # candidate **before** the first developer session, so the "did not break
+    # existing tests" gate can compare green test names before/after.  Disable
+    # when the test suite is too slow — disabled means the gate item is "not
+    # applicable: disabled by config", not passing.
     "verify.baseline": True,
-    # Kiểm định cấp dự án (`aisef qa`, `pre-deploy`, `improve`) chạy ở worktree
-    # sạch dựng từ SHA đang chấm (ADR-005 V6, theo Harbor: dừng env agent rồi
-    # chạy verifier ở chỗ tách): shim `node_modules/.bin/*`, `conftest.py`,
-    # `pytest.ini` chưa commit không tới được cây kiểm; `node_modules`/venv mượn
-    # của dự án. Giá phải trả: tệp **không theo dõi** mà test cần (`.env.test`,
-    # fixture sinh tay) cũng không có ở đó — commit chúng, hoặc tắt khoá này
-    # khi thật cần; tắt thì bằng chứng ghi `tree = "cây agent"`, không im lặng.
-    # Mức story (`run`) giữ cây worktree: đã đóng băng và guard write-scope
-    # đã chặn ngoài phạm vi — không đọc khoá này.
+    # Project-level verification (``aisef qa``, ``pre-deploy``, ``improve``)
+    # runs in a clean worktree built from the SHA being scored (ADR-005 V6,
+    # following Harbor: stop agent env then run verifier separately): shim
+    # ``node_modules/.bin/*``, ``conftest.py``, ``pytest.ini`` that are not
+    # committed will not reach the verification tree; ``node_modules``/venv are
+    # borrowed from the project.  Trade-off: **untracked** files that tests
+    # need (``.env.test``, hand-made fixtures) are also missing there — commit
+    # them, or disable this key when truly needed; disabled means evidence
+    # records ``tree = "agent tree"``, not silent.  Story-level (``run``) keeps
+    # its worktree: already frozen and write-scope guard blocks out-of-scope —
+    # this key is not read there.
     "verify.clean_tree": True,
-    # Nop control (ADR-005 V3): sau khi đóng băng ứng viên, chép tệp test story
-    # thêm/sửa vào một worktree tạm ở SHA cha rồi chạy `tools.test` — test mang
-    # mã tiêu chí phải **đỏ hoặc không tồn tại** khi không có mã của story.
-    # Tắt khi bộ test quá chậm (+1 lần chạy test mỗi lượt) — tắt thì mục cổng
-    # "test có kiểm được story" là "không áp dụng: tắt bởi cấu hình", không đạt.
+    # Nop control (ADR-005 V3): after freezing the candidate, copy story test
+    # files (added/modified) into a temporary worktree at the parent SHA then
+    # run ``tools.test`` — tests carrying acceptance criteria must be **red or
+    # absent** without the story's code.  Disable when test suite is too slow
+    # (+1 test run per attempt) — disabled means the gate item "tests actually
+    # verify the story" is "not applicable: disabled by config", not passing.
     "verify.nop": True,
-    # ứng dụng của dự án — để mở route thật lúc đối chiếu với mockup
+    # project application — to open real routes when comparing against mockups
     "app.dev_command": "",
     "app.base_url": "http://localhost:5173",
     "app.ready_timeout_seconds": 60,
-    # định tuyến model theo vai — rỗng nghĩa là dùng mặc định của client
+    # model routing by role — empty means use the client's default
     "route.developer_model": "",
     "route.reviewer_model": "",
     "route.designer_model": "",
     "route.security_model": "",
-    # Nhà cung cấp phân tích ảnh hưởng cho người rà soát (P0.3).
+    # Impact analysis provider for the reviewer (P0.3).
     "review.impact_provider": "",
-    # Đưa mục "Kỹ năng có sẵn" (router chọn, tên + dùng khi) vào prompt
-    # story. Tắt mặc định cho tới khi A/B trên `par` có số (ADR-003 §6).
+    # Include "Available skills" section (router-selected, name + when-to-use)
+    # in the story prompt.  Disabled by default until A/B on ``par`` has
+    # numbers (ADR-003 section 6).
     "skills.offer": False,
-    # ADR-003 cơ chế B (thí nghiệm): dán thẳng nội dung skill được chọn cao nhất
-    # vào prompt thay vì chỉ mời mở bằng tool `Skill` — đo trước khi quyết.
+    # ADR-003 mechanism B (experimental): inline the highest-scored skill content
+    # into the prompt instead of just offering it via the ``Skill`` tool — measure
+    # before deciding.
     "skills.inline": False,
-    # lệnh của dự án — rỗng nghĩa là tự dò từ file có trong dự án
+    # project commands — empty means auto-detect from files in the project
     "tools.test": "",
     "tools.lint": "",
     "tools.sast": "",
-    # sandbox — ảnh rỗng nghĩa là tự chọn theo stack của dự án
+    # sandbox — empty image means auto-select based on the project's stack
     "sandbox.image": "",
     "sandbox.tools_network": False,
     "sandbox.use_docker": True,
     "sandbox.allow_degraded": True,
-    # Provider chạy lệnh (ADR-005 V5): `docker` · `local` (chạy thẳng, mọi
-    # bảo đảm UNSUPPORTED — bằng chứng ghi `missing`) · `"mô-đun:Lớp"` cho
-    # backend ngoài cùng hợp đồng `harness/sandbox.py::ExecutionProvider`.
-    # `use_docker=false` tương đương `local`; giữ để cấu hình cũ còn chạy.
+    # Execution provider (ADR-005 V5): ``docker`` / ``local`` (runs directly,
+    # all guarantees UNSUPPORTED — evidence records ``missing``) /
+    # ``"module:Class"`` for an external backend with the same contract as
+    # ``harness/sandbox.py::ExecutionProvider``.  ``use_docker=false`` is
+    # equivalent to ``local``; kept so existing configs still work.
     "sandbox.allow_hosts": [],
     "sandbox.provider": "docker",
-    # Cổng trước triển khai **không** chấp nhận suy biến (kiểm định chạy
-    # ngoài Docker) trừ khi có lý do khai tường minh ở đây; lý do được ghi
-    # vào `pre-deploy.json`. `run` thường vẫn theo `sandbox.allow_degraded`.
+    # Pre-deploy gate does **not** accept degradation (verification running
+    # outside Docker) unless an explicit reason is declared here; the reason is
+    # recorded in ``pre-deploy.json``.  ``run`` still follows
+    # ``sandbox.allow_degraded`` as usual.
     "sandbox.pre_deploy_degraded_waiver": "",
-    # Tiền tố biến môi trường của máy được cho qua vào tiến trình client, ngoài
-    # allowlist cố định (`clients.base.ENV_KEEP`: PATH HOME LANG LC_* TERM TMPDIR
-    # SHELL USER LOGNAME SSL_CERT_FILE + `ANTHROPIC_*` + `AISEF_*`). Mặc định
-    # rỗng (ADR-005 V2): agent không cầm thứ nó không cần, và cái nó cần thì dự
-    # án khai tường minh — provider của OpenCode đọc khoá từ biến riêng thì khai
-    # tiền tố ấy; CI xác thực Claude bằng `CLAUDE_CODE_OAUTH_TOKEN` thì khai tên
-    # ấy (tên đầy đủ cũng là một tiền tố). Đo 2026-09-06 với `9router/mycombo`
-    # (khoá nằm ở `~/.local/share/opencode/auth.json`, config chỉ đọc `{env:HOME}`):
-    # OpenCode chạy đủ hợp quy với danh sách rỗng.
+    # Host env-var prefixes passed through to the client process, beyond the
+    # fixed allowlist (``clients.base.ENV_KEEP``: PATH HOME LANG LC_* TERM TMPDIR
+    # SHELL USER LOGNAME SSL_CERT_FILE + ``ANTHROPIC_*`` + ``AISEF_*``).  Default
+    # empty (ADR-005 V2): the agent should not hold what it does not need, and
+    # what it needs the project declares explicitly — OpenCode's provider reads
+    # keys from custom env vars, so declare that prefix; CI authenticating Claude
+    # with ``CLAUDE_CODE_OAUTH_TOKEN`` declares that name (a full name is also a
+    # prefix).  Measured 2026-09-06 with ``9router/mycombo`` (key lives at
+    # ``~/.local/share/opencode/auth.json``, config only reads ``{env:HOME}``):
+    # OpenCode runs fully conformant with an empty list.
     "clients.env_allow": [],
 }
 
-#: Kiểu mong đợi, để bắt lỗi cấu hình sớm thay vì để nó nổ giữa chừng.
+#: Expected types, to catch config errors early instead of mid-run blowups.
 _TYPES: dict[str, type | tuple[type, ...]] = {
     "coverage.min": float,
     "security.block_severities": list,
@@ -237,9 +254,10 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
 }
 
 
-#: Khoá đã gỡ, kèm lý do. Gặp trong `.ai/config.json` thì **cảnh báo rồi bỏ
-#: qua**, không lỗi: dự án cũ phải nạp được. Một knob không có mã đọc là một
-#: lời hứa suông — đúng lớp "chưa cấu hình ≠ đạt" áp cho cấu hình.
+#: Retired keys, with reason.  When found in ``.ai/config.json`` they are
+#: **warned then ignored**, not errored: old projects must still load.  A knob
+#: with no code reading it is an empty promise — same class as "not configured
+#: != passing" applied to config.
 RETIRED: dict[str, str] = {
     "story.max_context_tokens": (
         "2026-09-05 — chưa từng có mã đọc; thay bằng `prompt_chars` ghi vào "
@@ -250,7 +268,7 @@ RETIRED: dict[str, str] = {
 
 
 class ConfigError(ValueError):
-    """Cấu hình sai kiểu hoặc ngoài khoảng cho phép."""
+    """Wrong type or out-of-range configuration value."""
 
 
 def _env_key(key: str) -> str:
@@ -259,7 +277,7 @@ def _env_key(key: str) -> str:
 
 
 def _coerce(key: str, raw: str) -> Any:
-    """Ép giá trị chuỗi từ biến môi trường về đúng kiểu."""
+    """Coerce a string value from an environment variable to the expected type."""
     want = _TYPES.get(key, str)
     try:
         if want is bool:
@@ -280,7 +298,7 @@ def _validate(values: dict[str, Any]) -> None:
         if key not in values:
             continue
         val = values[key]
-        # bool là lớp con của int trong Python — đừng để True lọt vào ô số
+        # bool is a subclass of int in Python — do not let True slip into a numeric field
         if want is int and isinstance(val, bool):
             raise ConfigError(f"{key} must be int, got {val!r}")
         if want is float and isinstance(val, int) and not isinstance(val, bool):
@@ -357,18 +375,18 @@ class Config:
         return self.values.get(key, default)
 
     def __contains__(self, key: object) -> bool:
-        """Không có hàm này thì `key in config` rơi về duyệt theo chỉ số
-        nguyên và báo lỗi khoá "0" — sai chỗ và khó lần ra."""
+        """Without this, ``key in config`` falls back to integer-index iteration
+        and errors on key "0" — wrong location and hard to trace."""
         return key in self.values
 
     def overlay(self, overrides: dict[str, object]) -> "Config":
-        """Trả Config mới với giá trị đã ghi đè — dùng cho stack preset."""
+        """Return a new Config with overridden values — used for stack presets."""
         merged = dict(self.values)
         merged.update(overrides)
         return Config(merged, source=self.source)
 
     def write_template(self, project_root: Path | str = ".") -> Path:
-        """Ghi file cấu hình để người dùng chỉnh."""
+        """Write a config file for the user to customise."""
         path = Path(project_root) / CONFIG_PATH
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(

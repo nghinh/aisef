@@ -1,7 +1,7 @@
-"""``aisef dashboard`` — báo cáo hợp quy dạng HTML từ bằng chứng.
+"""``aisef dashboard`` — HTML conformance report from evidence.
 
-Đọc toàn bộ evidence JSONL, tính thống kê guard / gate / chi phí,
-xuất một file HTML tự chứa xem được offline.
+Reads all evidence JSONL, computes guard / gate / cost statistics,
+and outputs a self-contained HTML file viewable offline.
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ from ._common import EXIT_NOT_READY, EXIT_OK, _artifact_root
 
 
 def _guard_stats(evidences: list[Evidence]) -> dict:
-    """Thống kê guard từ GUARD_CHECK events."""
+    """Guard statistics from GUARD_CHECK events."""
     by_kind: dict[str, dict] = {}
     for ev in evidences:
         for e in ev.of(GUARD_CHECK):
@@ -48,7 +48,7 @@ def _guard_stats(evidences: list[Evidence]) -> dict:
 
 
 def _gate_verdicts(evidences: list[Evidence]) -> list[dict]:
-    """Trích gate:verdict từ bằng chứng."""
+    """Extract gate:verdict from evidence."""
     rows = []
     for ev in evidences:
         for e in ev.of(NOTE, "gate:verdict"):
@@ -65,7 +65,7 @@ def _gate_verdicts(evidences: list[Evidence]) -> list[dict]:
 
 
 def _role_cost(evidences: list[Evidence]) -> dict[str, dict]:
-    """Chi phí theo vai và model từ AGENT_RUN events."""
+    """Cost by role and model from AGENT_RUN events."""
     by_role: dict[str, dict] = {}
     for ev in evidences:
         for e in ev.of(AGENT_RUN):
@@ -247,7 +247,7 @@ def generate_html(evidences: list[Evidence], *, project: str = "",
 
 
 def _collect_projects(args) -> list[tuple[str, list[Evidence]]]:
-    """Thu thập bằng chứng từ dự án chính và các dự án bổ sung."""
+    """Collect evidence from the main project and any additional projects."""
     groups: list[tuple[str, list[Evidence]]] = []
     root = _artifact_root(args)
     store = EvidenceStore(root)
@@ -268,7 +268,7 @@ def _collect_projects(args) -> list[tuple[str, list[Evidence]]]:
 
 
 def _project_summary(groups: list[tuple[str, list[Evidence]]]) -> str:
-    """Bảng tổng hợp nhiều dự án."""
+    """Multi-project summary table."""
     if len(groups) <= 1:
         return ""
     rows = []

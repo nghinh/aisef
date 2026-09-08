@@ -1,15 +1,15 @@
-"""Cổng máy — kiểm những gì kiểm được bằng code, trước khi mời người xem.
+"""Machine gate — check what code can check, before asking a human to review.
 
-Chạy trước cổng người có chủ đích: bắt người đọc một tài liệu có chu trình
-phụ thuộc hay có yêu cầu không ai kiểm chứng được là phí thời gian của
-người, và là loại lỗi máy phát hiện tốt hơn người.
+Running before the human gate is intentional: making a human read a document
+with dependency cycles or unverifiable requirements wastes their time, and
+these are the kind of errors machines catch better than humans.
 
-Phân biệt hai mức, vì hai mức cần hành động khác nhau:
+Two severity levels, because they require different actions:
 
-* **Lỗi** chặn — tài liệu sai đến mức bước sau không dùng được.
-* **Cảnh báo** không chặn nhưng đi vào phần tóm tắt của cổng người, để
-  người quyết định có chấp nhận hay không. Câu hỏi mở chưa trả lời là ví
-  dụ điển hình: nó hợp lệ, nhưng người duyệt cần biết.
+* **Errors** block — the document is too broken for the next step to use.
+* **Warnings** do not block but appear in the human gate summary, so the
+  approver can decide whether to accept. Unanswered open questions are the
+  classic example: valid, but the approver needs to know.
 """
 
 from __future__ import annotations
@@ -44,7 +44,7 @@ class GateResult:
 
 
 def check_prd(prd: PRD) -> GateResult:
-    """Kiểm PRD trước khi mời người duyệt."""
+    """Check the PRD before asking a human to review."""
     r = GateResult("machine gate: prd")
 
     if not prd.functional():
@@ -93,7 +93,7 @@ def check_stories(
     story_fr_map: dict[str, list[str]] | None = None,
     story_ac_count: dict[str, int] | None = None,
 ) -> GateResult:
-    """Kiểm tập story trước khi bắt đầu viết code."""
+    """Check the story set before starting implementation."""
     r = GateResult("machine gate: stories")
     cfg = config or Config(dict(DEFAULTS))
 
@@ -113,8 +113,8 @@ def check_stories(
             f"cannot schedule in parallel, and guard will block all writes"
         )
 
-    # Chu trình phụ thuộc: dùng chính bộ lập lịch, để cổng và lúc chạy
-    # không thể bất đồng về việc thế nào là hợp lệ.
+    # Dependency cycle: use the actual scheduler, so the gate and runtime
+    # cannot disagree on what is valid.
     try:
         build_waves(stories)
     except CycleError as e:
@@ -130,22 +130,17 @@ def check_stories(
                 f"an oversized story will overflow context in a single session"
             )
 
-    # Kế hoạch tuyến tính hoàn toàn: mỗi story một đợt. Có thể đúng —
-    # nhưng cũng là dấu hiệu người lập kế hoạch xâu chuỗi theo thói quen
-    # thay vì theo phụ thuộc thật, và khi ấy toàn bộ khả năng chạy song
-    # song thành không với tới được. Cảnh báo chứ không chặn: đây là fact
-    # để người đọc hỏi lại, không phải kết luận máy tự tin.
-    # Epic nào bị xâu thành chuỗi hoàn toàn — mỗi story một đợt. Có thể
-    # đúng, nhưng cũng là dấu hiệu người lập kế hoạch xâu theo thói quen
-    # thay vì theo phụ thuộc thật, và khi ấy toàn bộ khả năng chạy song
-    # song thành không với tới được.
+    # Fully serialized epics: each story in its own wave. May be correct —
+    # but also a sign the planner chained stories by habit rather than by
+    # real dependency, making all parallelism unreachable.
     #
-    # Kiểm **theo từng epic**, vì đó là đơn vị mà bộ điều phối chia đợt:
-    # epic chạy tuần tự với nhau, story chạy song song trong một epic.
-    # Tính trên cả tập thì con số ra khác và không nói lên điều gì.
+    # Checked **per epic**, since that is the unit the scheduler uses for
+    # waves: epics run sequentially, stories run in parallel within an epic.
+    # Computing across the whole set produces different numbers that mean
+    # nothing.
     #
-    # Cảnh báo chứ không chặn: đây là fact để người đọc hỏi lại, không
-    # phải kết luận máy tự tin.
+    # Warning, not blocking: this is a fact for the reader to question,
+    # not a confident machine conclusion.
     if not r.errors:
         chuoi = []
         for epic in sorted({s.epic_id for s in stories if s.epic_id}):
@@ -209,17 +204,18 @@ def check_design_contract(
     experience,
     stories: list | None = None,
 ) -> GateResult:
-    """Kiểm hợp đồng thị giác trước khi mời người duyệt mockup.
+    """Check the design contract before asking a human to review mockups.
 
-    Ba câu hỏi, đều có đáp án tất định:
+    Three questions, all with deterministic answers:
 
-    1. Mọi màn hình trong EXPERIENCE.md có mockup dựng được không?
-    2. Còn chỗ nào mockup tự khai là **chưa chốt** không?
-    3. Story giao diện có trỏ tới màn hình **có thật** không?
+    1. Does every screen in EXPERIENCE.md have a buildable mockup?
+    2. Are there spots the mockup declares as **unresolved**?
+    3. Do UI stories reference screens that **actually exist**?
 
-    Câu 3 quan trọng vì lúc viết code, agent nạp hợp đồng theo ``screen_id``
-    lấy từ story. Mã sai thì nó nạp rỗng và dựng giao diện theo phán đoán —
-    đúng thứ bước map mockup sinh ra để ngăn.
+    Question 3 matters because at implementation time, the agent loads the
+    contract by ``screen_id`` from the story. A wrong id loads nothing and
+    the agent builds UI by guesswork — exactly what the mockup-map step was
+    created to prevent.
     """
     r = GateResult("machine gate: mockup")
 
@@ -238,9 +234,10 @@ def check_design_contract(
             continue
         unresolved += [(screen.id, item) for item in screen.unresolved]
         if screen.whole_page and screen.duplicates:
-            # Đo 2026-09-05 (e9 note-editor): mockup bỏ quên `data-state`, hợp
-            # đồng ôm cả trang gồm 4 trạng thái → story không thể qua bước map
-            # mockup, đốt $28 qua 4 lượt. Chặn ở đây rẻ hơn nhiều.
+            # Measured 2026-09-05 (e9 note-editor): mockup forgot `data-state`,
+            # contract captured the whole page with 4 states -> story could not
+            # pass the mockup-map step, burned $28 over 4 attempts. Blocking
+            # here is much cheaper.
             r.errors.append(
                 f"{screen.id}: mockup does not mark `data-state=\"primary\"` so the contract "
                 f"captures the whole page — {len(screen.components)} components, {screen.duplicates} "
@@ -257,7 +254,7 @@ def check_design_contract(
         else:
             declared = experience.by_id(screen.id)
             if declared is not None and declared.route and declared.route != screen.route:
-                # Không chặn: một trong hai đúng, và người duyệt biết cái nào.
+                # Not blocking: one of them is correct, and the approver knows which.
                 r.warnings.append(
                     f"{screen.id}: mockup route ({screen.route}) differs from route in "
                     f"EXPERIENCE.md ({declared.route})"
@@ -266,9 +263,9 @@ def check_design_contract(
             r.warnings.append(f"{screen.id}: mockup has no verifiable components")
 
     if unresolved:
-        # Gom theo **câu hỏi**, không theo chỗ đánh dấu. 52 chỗ chưa chốt
-        # trên 5 màn thường quy về 4–5 câu hỏi; liệt kê từng chỗ thì người
-        # duyệt thấy một bức tường, còn gom lại thì thấy đúng việc phải làm.
+        # Group by **question**, not by marked spot. 52 unresolved spots across
+        # 5 screens typically map to 4-5 questions; listing every spot shows the
+        # approver a wall, grouping shows exactly what needs to be done.
         by_question: dict[str, int] = {}
         for _, item in unresolved:
             m = re.search(r"\b(?:UX-)?OQ-\d+\b", item)
@@ -283,8 +280,8 @@ def check_design_contract(
             f"{len(by_question)} questions: {listed}. Answer them in PRD/UX "
             f"then rebuild mockup — building code from unresolved screens costs double."
         )
-        # Chỗ không dẫn mã câu hỏi thì người duyệt không tra được nó thuộc
-        # về đâu; nêu vài ví dụ để họ biết đang nhìn cái gì.
+        # Spots without a question id cannot be traced by the approver; show
+        # a few examples so they know what they are looking at.
         loose = [item for _, item in unresolved if not re.search(r"\b(?:UX-)?OQ-\d+\b", item)]
         for item in loose[:3]:
             r.warnings.append(f"unresolved, no question id: {item[:140]}")
@@ -310,7 +307,7 @@ def check_design_contract(
 
 
 def check_all(results: list[GateResult]) -> GateResult:
-    """Gộp nhiều kết quả cổng thành một."""
+    """Combine multiple gate results into one."""
     combined = GateResult("machine gate")
     for r in results:
         combined.errors.extend(f"[{r.name}] {e}" for e in r.errors)

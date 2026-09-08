@@ -1,15 +1,16 @@
-"""Vòng đời thay đổi sau phát hành (S4): `aisef change FR-x "mô tả"`.
+"""Post-release change lifecycle (S4): `aisef change FR-x "description"`.
 
-Một yêu cầu đổi thì tầng nào cũ đi? Không phải mọi thứ — và không phải chỉ
-code. Lối vào có tên này làm đúng ba việc, còn lại để cơ chế sẵn có lo:
+Which layers go stale when a change is requested? Not everything -- and not
+just code. This entry point does exactly three things; the rest is handled by
+existing mechanisms:
 
-1. Ghi thay đổi vào `docs/requirements.md` (đầu vào duy nhất của dự án) và
-   đánh dấu vào `_bmad-output/prd.md` — hash đổi nên cổng PRD tự thành
-   `stale`, và mọi cổng sau nó cũng thế (cascade đã có ở `approvals`).
-2. Sinh **story delta** `STORY-CH-<n>` trong `EPIC-CH`, `covers=[FR-x]`, tiêu
-   chí là mô tả; `write_scope` để trống — cổng máy sẽ chặn tới khi người
-   khai, đúng như story thường.
-3. Giữ story cũ `DONE`. Lịch sử không bị viết lại; thay đổi là việc mới.
+1. Record the change in `docs/requirements.md` (the project's single source
+   of input) and mark `_bmad-output/prd.md` -- the hash changes so the PRD
+   gate becomes `stale`, and all downstream gates cascade (via `approvals`).
+2. Generate a **delta story** `STORY-CH-<n>` in `EPIC-CH`, `covers=[FR-x]`,
+   acceptance criteria from the description; `write_scope` left blank -- the
+   machine gate blocks until a human declares it, same as any normal story.
+3. Keep old stories `DONE`. History is not rewritten; the change is new work.
 """
 
 from __future__ import annotations
@@ -57,7 +58,7 @@ def apply(project: Path, requirement: str, description: str, *, today: date | No
         raise ValueError("change description must not be empty")
     ngay = (today or date.today()).isoformat()
 
-    # 1. đầu vào + đánh dấu PRD
+    # 1. record input + mark PRD
     req = project / "docs" / "requirements.md"
     req.parent.mkdir(parents=True, exist_ok=True)
     with req.open("a", encoding="utf-8") as f:
@@ -70,7 +71,7 @@ def apply(project: Path, requirement: str, description: str, *, today: date | No
                     f"(recorded by `aisef change`; PRD gate needs re-approval)\n")
         prd_marked = True
 
-    # 2. story delta
+    # 2. delta story
     n = 1 + sum(1 for s in read_index(root).get("stories", [])
                 if str(s.get("id", "")).startswith("STORY-CH-"))
     sid = f"STORY-CH-{n:02d}"
@@ -91,7 +92,7 @@ def apply(project: Path, requirement: str, description: str, *, today: date | No
 
 
 def read_index(root: Path) -> dict:
-    """`stories.index.json`, hoặc bộ khung rỗng khi dự án chưa tách story."""
+    """`stories.index.json`, or an empty skeleton if stories haven't been split yet."""
     idx_path = Path(root) / "stories.index.json"
     if not idx_path.is_file():
         return {"version": 1, "epics": [], "stories": [], "waves": {}}
@@ -107,15 +108,17 @@ def register_story(
     body: str = "",
     wave: list[str] | None = None,
 ) -> Path:
-    """Story **phát sinh** (thay đổi sau phát hành, story sửa của vòng cải
-    tiến): ghi tệp story, đưa vào `stories.index.json` đúng định dạng
-    `story_split` để `run_epic` đọc được, và đăng ký sổ trạng thái.
+    """Register a **generated** story (post-release change or improvement-loop
+    repair): write the story file, insert into `stories.index.json` in the
+    format `story_split` produces so `run_epic` can read it, and register in
+    the state store.
 
-    Story đã có trong chỉ mục thì thay bản ghi — vòng cải tiến chạy lại
-    một story sửa chưa xong. `extra` là các khoá ngoài `Story.as_dict()`
-    (`repair_of`, `loop`, `preservation`); `body` nối vào cuối tệp story.
-    `wave`: đợt của epic chỉ gồm những story này (vòng cải tiến chạy đúng
-    một story mỗi vòng); không truyền thì nối thêm một đợt `[story]`.
+    If the story already exists in the index, its record is replaced --
+    the improvement loop may re-run an unfinished repair story. `extra`
+    holds keys beyond `Story.as_dict()` (`repair_of`, `loop`,
+    `preservation`); `body` is appended to the story file. `wave`: the
+    epic wave containing only these stories (improvement loop runs exactly
+    one story per round); omit to append a new `[story]` wave.
     """
     from ..phases.story_split import render_story, story_file
 
@@ -127,8 +130,8 @@ def register_story(
 
     text = render_story(story, None)
     if body:
-        # Trước dòng chân "sinh tự động từ epics.md": phần thêm là nội dung
-        # story, không phải ghi chú sau chân trang.
+        # Insert before the "auto-generated from epics.md" footer: the added
+        # content is story body, not a post-footer note.
         head, sep, tail = text.rpartition("\n---\n")
         text = head + body + sep + tail if sep else text + body
     path = story_file(root, story)

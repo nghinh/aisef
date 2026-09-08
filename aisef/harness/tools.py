@@ -1,21 +1,22 @@
-"""Tool thật của harness — thứ agent gọi thay vì tự gõ lệnh.
+"""Real harness tools — what the agent calls instead of typing commands.
 
-Chỉ có ở đây những việc mà **bằng chứng của lần chạy là thứ cổng đọc**:
-test, lint, sast. Chụp màn hình và đối chiếu mockup do harness tự làm sau
-lượt agent (nếu để agent tự chụp thì nó vừa làm vừa chấm chính mình);
-commit thì agent dùng thẳng `git`, và guard `git-stage` canh ở đó.
+Only things whose **run evidence is what the gate reads** live here: test,
+lint, sast. Screenshots and mockup comparison are done by the harness after
+the agent turn (if the agent screenshots itself, it is both author and
+grader); commits use `git` directly, and the `git-stage` guard watches there.
 
-Mỗi tool ở đây làm ba việc mà "cứ để agent chạy Bash" không làm được:
+Each tool here does three things that "just let the agent run Bash" cannot:
 
-1. **Lệnh cố định theo dự án**, không do agent nghĩ ra mỗi lượt. `npm test`
-   hay `pytest -q` là quyết định của dự án, không phải chỗ để phán đoán.
-2. **Chạy trong sandbox** — cùng bậc quyền cho mọi story, mọi máy.
-3. **Ghi bằng chứng.** Đây mới là điểm chính: cổng story và guard
-   `completion` đọc bằng chứng chứ không đọc lời agent kể. Không có bản ghi
-   thì coi như chưa chạy.
+1. **Fixed project commands**, not invented by the agent each turn. `npm test`
+   or `pytest -q` is the project's decision, not a place for guessing.
+2. **Runs in the sandbox** — same privilege level for every story, every machine.
+3. **Records evidence.** This is the key point: the story gate and
+   `completion` guard read evidence, not the agent's narrative. No record
+   means it never ran.
 
-Mỗi tool kèm một câu "khi nào gọi" — chuỗi này đi thẳng vào prompt, vì tool
-không có mô tả dùng đúng lúc thì agent sẽ gọi sai lúc.
+Each tool includes a "when to call" string — this goes straight into the
+prompt, because a tool without a correct-use description will be called at
+the wrong time.
 """
 
 from __future__ import annotations
@@ -32,13 +33,14 @@ from . import sandbox
 from .guardrails import scrub_secrets
 from .observe import EvidenceStore
 
-#: Số dòng cuối ghi vào `detail.tail`. Không nâng lên: `tail` đi vào prompt
-#: của cổng và guard (ngân sách B5); toàn văn nằm ở tệp `.log` cạnh sổ.
+#: Trailing lines written to `detail.tail`. Do not increase: `tail` goes into
+#: the gate and guard prompt (budget B5); full text is in the `.log` file
+#: next to the evidence store.
 TAIL_LINES = 20
 
-#: Ảnh sandbox theo stack. `alpine` không có node hay python, nên chạy
-#: `npm test` trong đó sẽ đỏ vì **thiếu công cụ**, không phải vì code sai —
-#: và một cổng báo đỏ vì lý do sai sẽ bị bỏ qua trong hai ngày.
+#: Sandbox images per stack. `alpine` has no node or python, so running
+#: `npm test` in it would fail due to **missing tools**, not wrong code —
+#: and a gate reporting red for the wrong reason gets ignored for two days.
 STACK_IMAGES: list[tuple[str, str]] = [
     ("package.json", "node:22-alpine"),
     ("pyproject.toml", "python:3.12-alpine"),
@@ -51,7 +53,7 @@ STACK_IMAGES: list[tuple[str, str]] = [
 
 
 def image_for(project: Path | str, config: Config | None = None) -> str:
-    """Ảnh sandbox: cấu hình thắng, rồi tới ảnh hợp stack, rồi mặc định."""
+    """Sandbox image: config wins, then stack-matching image, then default."""
     if config is not None and str(config.get("sandbox.image", "")).strip():
         return str(config["sandbox.image"]).strip()
     project = Path(project)
@@ -61,7 +63,7 @@ def image_for(project: Path | str, config: Config | None = None) -> str:
     return sandbox.DEFAULT_IMAGE
 
 
-#: Lệnh mặc định theo dấu hiệu trong dự án. Cặp (test, lint, sast).
+#: Default commands by project marker file. Tuple of (test, lint, sast).
 _STACK_COMMANDS: list[tuple[str, dict[str, str]]] = [
     ("pyproject.toml", {"test": "pytest -q", "lint": "ruff check .", "sast": "bandit -q -r ."}),
     ("setup.py", {"test": "pytest -q", "lint": "ruff check .", "sast": "bandit -q -r ."}),
@@ -76,7 +78,7 @@ _STACK_COMMANDS: list[tuple[str, dict[str, str]]] = [
 @dataclass
 class Tool:
     name: str
-    when: str          # khi nào gọi — đi vào prompt
+    when: str          # when to call — goes into the prompt
     level: sandbox.Level = sandbox.Level.WORKSPACE_WRITE
 
 
@@ -105,17 +107,18 @@ class ToolResult:
     ok: bool
     exit_code: int = 0
     stdout: str = ""
-    #: Công cụ không nạp được (MODULE_NOT_FOUND, command not found…) — không
-    #: phải test đỏ. Dogfood par 2026-09-05: `node --test src/` đỏ vì lệnh sai,
-    #: guard `completion` chặn Stop ~10 lần mỗi lượt, 3 story đốt $17.
+    #: Tool could not load (MODULE_NOT_FOUND, command not found...) — not a
+    #: test failure. Dogfood par 2026-09-05: `node --test src/` failed due to
+    #: wrong command, guard `completion` blocked Stop ~10 times per turn,
+    #: 3 stories burned $17.
     unrunnable: str = ""
     stderr: str = ""
     duration_ms: int = 0
-    skipped: str = ""      # lý do không chạy được (không có lệnh cho stack này)
+    skipped: str = ""      # reason it could not run (no command for this stack)
     degraded: bool = False
     detail: dict = field(default_factory=dict)
-    #: Tệp log toàn văn (đã che bí mật) khi output dài hơn `TAIL_LINES` và
-    #: có story để ghi — `aisef tool` in đường dẫn này ở dòng "lược".
+    #: Full-text log file (secrets redacted) when output exceeds `TAIL_LINES`
+    #: and a story is available — `aisef tool` prints this path in the summary.
     log: str = ""
 
     @property
@@ -131,18 +134,19 @@ class ToolResult:
         return f"{mark} {self.name} — exit {self.exit_code}, {self.duration_ms}ms{extra}"
 
     def output(self) -> tuple[str, int]:
-        """(stdout + stderr đã che bí mật, số chỗ che). Mọi thứ in ra hay ghi
-        lại đi qua đây — che **trước** khi cắt, để một khoá nằm vắt qua mép
-        `tail` không lọt nửa sau (ADR-005 V1)."""
+        """(stdout + stderr with secrets redacted, redaction count). All printed
+        or recorded output goes through here — redact **before** truncating so
+        a key straddling the `tail` boundary does not leak its second half
+        (ADR-005 V1)."""
         return scrub_secrets((self.stdout + "\n" + self.stderr).strip())
 
     def tail(self, lines: int = 40) -> str:
-        """Phần cuối output — chỗ lỗi thường nằm."""
+        """Trailing output — where errors usually appear."""
         return "\n".join(self.output()[0].splitlines()[-lines:])
 
 
 def detect_commands(project: Path | str) -> dict[str, str]:
-    """Lệnh test/lint/sast của dự án, dò từ file có thật trên đĩa."""
+    """Detect project test/lint/sast commands from actual files on disk."""
     project = Path(project)
     pkg = project / "package.json"
     if pkg.is_file():
@@ -154,11 +158,11 @@ def detect_commands(project: Path | str) -> dict[str, str]:
 
 
 def _from_package_json(path: Path) -> dict[str, str]:
-    """Chỉ khai lệnh script **thật sự có**.
+    """Only declare scripts that **actually exist**.
 
-    `npm test` khi package.json không định nghĩa script `test` sẽ thoát khác
-    0 vì lý do sai — cổng sẽ báo "test đỏ" trong khi thực ra dự án chưa có
-    test. Hai chuyện đó cần được phân biệt.
+    `npm test` when package.json does not define a `test` script exits non-zero
+    for the wrong reason — the gate would report "test failed" when in reality
+    the project has no tests. These two situations must be distinguished.
     """
     try:
         scripts = json.loads(path.read_text(encoding="utf-8")).get("scripts") or {}
@@ -175,7 +179,7 @@ def _from_package_json(path: Path) -> dict[str, str]:
 
 
 def command_for(name: str, project: Path | str, config: Config | None = None) -> str:
-    """Lệnh cho một tool: cấu hình thắng, dò tự động là dự phòng."""
+    """Command for a tool: config wins, auto-detection is the fallback."""
     if config is not None:
         key = f"tools.{name}"
         if key in config:
@@ -195,10 +199,10 @@ def run_tool(
     extra_args: list[str] | None = None,
     candidate: str = "",
 ) -> ToolResult:
-    """Chạy một tool trong sandbox và ghi bằng chứng.
+    """Run a tool in the sandbox and record evidence.
 
-    ``candidate`` là SHA bản đang kiểm — đóng vào bằng chứng để cổng biết
-    kết quả này thuộc bản nào (ADR-004 R1)."""
+    ``candidate`` is the SHA of the build under test — stamped into evidence
+    so the gate knows which build this result belongs to (ADR-004 R1)."""
     if name not in TOOLS:
         raise ValueError(f"tool does not exist: {name}. Available: {', '.join(sorted(TOOLS))}")
 
@@ -213,8 +217,8 @@ def run_tool(
     argv = shlex.split(command) + (extra_args or [])
     level = TOOLS[name].level
     if cfg["sandbox.tools_network"] and level is not sandbox.Level.READ_ONLY:
-        # Dự án phải cài phụ thuộc trước khi chạy test được. Mở mạng là
-        # quyết định của dự án, khai tường minh, không phải mặc định.
+        # Project needs to install deps before tests can run. Enabling
+        # network is the project's explicit decision, not the default.
         level = sandbox.Level.WORKSPACE_NETWORK
     sb = sandbox.run(
         sandbox.SandboxSpec(
@@ -247,9 +251,9 @@ def run_tool(
     return res
 
 
-#: Dấu hiệu "công cụ không nạp được", không phải "test đỏ". 127 là mã POSIX
-#: cho lệnh không tìm thấy; phần còn lại là cách các hệ chạy khác nói cùng
-#: một chuyện. Gộp hai loại lại thì báo cáo chỉ sai chỗ cần sửa.
+#: Signatures of "tool could not load", not "test failed". 127 is the POSIX
+#: code for command not found; the rest are how other runtimes say the same
+#: thing. Conflating the two misdirects the report to the wrong fix.
 MISSING_TOOL = (
     "command not found",
     "not found",
@@ -261,10 +265,11 @@ MISSING_TOOL = (
 
 
 def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error: str = "") -> str:
-    """Lý do một dòng nếu lần chạy là "không chạy được"; "" nếu là kết quả thật.
-    Với `test`, chỉ kết luận khi **không test nào xanh** — một test đỏ có
-    thông báo "not found" vẫn là test đỏ. ``provider_error`` là lỗi hạ tầng
-    sandbox (daemon, kéo image) — lệnh chưa từng chạy, kết luận ngay."""
+    """One-line reason if the run is "unrunnable"; "" if it is a real result.
+    For `test`, only conclude unrunnable when **no test passed** — a failing
+    test with a "not found" message is still a test failure. ``provider_error``
+    is a sandbox infrastructure error (daemon, image pull) — command never ran,
+    conclude immediately."""
     if provider_error:
         return f"sandbox infrastructure error ({provider_error}) — command did not run; check daemon/image and retry"
     low = output.lower()
@@ -278,32 +283,35 @@ def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error:
     return f"tool not installed or cannot load ({hit or 'exit 127'}) — set up the environment or fix the command and retry"
 
 
-#: Tên bản ghi của baseline (ADR-004 R9) — bộ test chạy ở candidate cha
-#: **trước** phiên developer. Không ghi là `test`: guard `completion`, TDD
-#: `red_before_green`, mục "tiêu chí có test" và sổ hành vi đều đọc
-#: `tool_run test` như "lần test của lượt này", và một baseline đỏ sẵn sẽ
-#: chặn Stop, làm TDD đạt oan, và bị sổ quy thành hồi quy do story gây ra.
+#: Evidence name for baseline (ADR-004 R9) — test suite run at the parent
+#: candidate **before** the developer session. Not recorded as `test`:
+#: guard `completion`, TDD `red_before_green`, "criteria with tests", and
+#: the behavior log all read `tool_run test` as "this turn's test run", and
+#: a pre-existing red baseline would block Stop, falsely satisfy TDD, and
+#: be attributed by the log as a regression caused by the story.
 BASELINE_RUN = "test:baseline"
 
-#: Tên bản ghi của nop control (ADR-005 V3) — bộ test chạy ở **SHA cha** với
-#: tệp test của story chép vào, **sau** khi đóng băng ứng viên (mang
-#: `candidate`). Cùng lý do không ghi là `test`: kết quả mong đợi của nó là
-#: **đỏ**, và một lần `test` đỏ sẽ chặn Stop, làm TDD đạt oan, bị sổ quy
-#: thành hồi quy.
+#: Evidence name for nop control (ADR-005 V3) — test suite run at the
+#: **parent SHA** with the story's test files copied in, **after** freezing
+#: the candidate (carries `candidate`). Same reason for not recording as
+#: `test`: its expected result is **red**, and a red `test` record would
+#: block Stop, falsely satisfy TDD, and be attributed as a regression.
 NOP_RUN = "test:nop"
 
 
 def record(res: ToolResult, story_id: str, artifact_root, candidate: str = "",
            *, name: str = "", extra: dict | None = None) -> str:
-    """Ghi bằng chứng. Không có story_id thì không ghi — tool chạy ngoài
-    ngữ cảnh story (ví dụ người gõ tay) không nên làm bẩn hồ sơ story.
+    """Record evidence. No story_id means no recording — tools run outside a
+    story context (e.g. manual invocation) should not pollute story records.
 
-    ``name`` ghi dưới tên khác tên tool (baseline ghi `test:baseline`);
-    ``extra`` là khoá thêm vào `detail`. Hình dạng bản ghi vẫn ở một chỗ.
+    ``name`` records under a different name than the tool (baseline records as
+    `test:baseline`); ``extra`` adds keys to `detail`. Record shape stays in
+    one place.
 
-    Trả đường dẫn tệp log toàn văn `evidence/<story>-<tool>-<seq>.log` khi
-    output dài hơn `TAIL_LINES` (ADR-005 V11 A), "" khi không có gì bị cắt.
-    Cả `tail` lẫn log đều đã che bí mật (V1); `detail.redacted` = số chỗ che."""
+    Returns the full-text log path `evidence/<story>-<tool>-<seq>.log` when
+    output exceeds `TAIL_LINES` (ADR-005 V11 A), "" when nothing was
+    truncated. Both `tail` and log have secrets redacted (V1);
+    `detail.redacted` = redaction count."""
     if not story_id or artifact_root is None:
         return ""
     full, redacted = res.output()
@@ -319,8 +327,8 @@ def record(res: ToolResult, story_id: str, artifact_root, candidate: str = "",
     if redacted:
         detail["redacted"] = redacted
     if res.name == "test" and not res.skipped:
-        # Tên test nào chạy, xanh/đỏ, coverage — cổng tiêu chí (G5) và
-        # `coverage.min` (G10b) đọc từ đây, không đọc lại stdout.
+        # Which tests ran, pass/fail, coverage — the criteria gate (G5) and
+        # `coverage.min` (G10b) read from here, not from stdout again.
         from .testlog import parse as parse_testlog
 
         detail.update(parse_testlog(full).to_evidence())
@@ -331,8 +339,8 @@ def record(res: ToolResult, story_id: str, artifact_root, candidate: str = "",
     )
     if len(lines) <= TAIL_LINES:
         return ""
-    # Toàn văn cạnh sổ bằng chứng, tên mang `seq` để khớp đúng bản ghi;
-    # `:` của `test:baseline` đổi thành `-` vì tên tệp phải mở được ở mọi hệ.
+    # Full text next to the evidence store, filename carries `seq` to match
+    # the record; `:` in `test:baseline` becomes `-` for cross-platform filenames.
     log = store.path(story_id).with_name(
         f"{story_id}-{(name or res.name).replace(':', '-')}-{event.seq}.log")
     log.write_text(full + "\n", encoding="utf-8")
@@ -340,29 +348,30 @@ def record(res: ToolResult, story_id: str, artifact_root, candidate: str = "",
 
 
 def aisef_command() -> str:
-    """Lệnh gọi framework mà agent gõ được **thật**.
+    """The framework command the agent can **actually** type.
 
-    Prompt in ra `aisef tool test` là vô dụng nếu `aisef` không nằm trên
-    PATH của phiên agent — nó sẽ nhận "command not found", rồi tự chạy
-    pytest bằng tay, và lần chạy đó không vào bằng chứng. Ưu tiên tên trên
-    PATH, không có thì dùng đường dẫn tuyệt đối của chính kho này.
+    Printing `aisef tool test` in the prompt is useless if `aisef` is not on
+    the agent session's PATH — it will get "command not found", then run
+    pytest manually, and that run will not be recorded as evidence. Prefer
+    the name on PATH; if absent, use the absolute path from this repo.
     """
     if shutil.which("aisef"):
         return "aisef"
-    # Kho nguồn: `bin/aisef` nằm cạnh gói. Bản cài từ wheel **không có** thư
-    # mục ấy — trước 0.2.0 chỗ này trả về `<site-packages>/bin/aisef`, một
-    # đường dẫn không tồn tại, và hook biên dịch ra im lặng không chạy guard
-    # nào (đo 2026-09-06 trên venv sạch). Kiểm tra tồn tại rồi mới trả.
+    # Source repo: `bin/aisef` sits next to the package. Wheel installs do
+    # **not** have that directory — before 0.2.0 this returned
+    # `<site-packages>/bin/aisef`, a non-existent path, and the compile hook
+    # silently ran no guards (measured 2026-09-06 on a clean venv). Check
+    # existence before returning.
     trong_kho = Path(__file__).resolve().parent.parent.parent / "bin" / "aisef"
     if trong_kho.is_file():
         return str(trong_kho)
-    # Luôn chạy được với bản đã cài, kể cả khi venv không nằm trên PATH của
-    # phiên agent: chính trình thông dịch đang chạy + module.
+    # Always works with an installed package, even when venv is not on the
+    # agent session's PATH: the running interpreter itself + module.
     return f"{sys.executable} -m aisef.cli"
 
 
 def describe_tools(project: Path | str, config: Config | None = None) -> str:
-    """Bảng tool cho prompt: tên, lệnh thật, và **khi nào gọi**."""
+    """Tool table for the prompt: name, actual command, and **when to call**."""
     project = Path(project)
     binary = aisef_command()
     lines = []

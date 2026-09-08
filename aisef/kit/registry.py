@@ -1,15 +1,17 @@
-"""Sổ đăng ký skill — tầng tri thức vận hành (ADR-002, đợt 1).
+"""Skill registry — operational knowledge layer (ADR-002, batch 1).
 
-Skill nhập từ bốn nguồn có frontmatter **không đồng nhất**: security có
-`tags/subdomain/nist_csf/license/version`, bmad và superpowers chỉ có
-`name/description`. Router không thể chấm điểm trên bốn hình dạng; và
-`.aisef-managed` chỉ ghi `source=` — không commit, không license, không
-"dùng khi nào". Sổ này chuẩn hoá mỗi skill đã cài thành **một bản ghi có
-provenance và trạng thái vòng đời**, dựng từ những gì đã có (`install`,
-`catalog`, `security_filter`), không đổi định dạng skill nguồn.
+Skills are imported from four sources with **heterogeneous** frontmatter:
+security has `tags/subdomain/nist_csf/license/version`, bmad and superpowers
+only have `name/description`. The router can't score across four shapes; and
+`.aisef-managed` only records `source=` — no commit, no license, no
+"use when". This registry normalizes each installed skill into **one record
+with provenance and lifecycle status**, built from what already exists
+(`install`, `catalog`, `security_filter`) without changing source skill
+formats.
 
-Trạng thái chỉ đổi khi có kiểm — kiểm là code (`verify_structure`), không
-phải model. Skill `candidate`/`stale`/`rejected` **không được định tuyến**.
+Status changes only through verification — verification is code
+(`verify_structure`), not a model. Skills with status
+`candidate`/`stale`/`rejected` **are never routed**.
 """
 
 from __future__ import annotations
@@ -36,9 +38,9 @@ STALE = "stale"
 REJECTED = "rejected"
 STATUSES = (CANDIDATE, VERIFIED, ACTIVE, STALE, REJECTED)
 
-#: Cạnh hợp lệ của vòng đời. Không có cạnh nào **vào** `verified` mà không
-#: qua kiểm; không có cạnh nào ra khỏi `rejected` — muốn dùng lại thì cài
-#: lại từ đầu, và kiểm lại từ đầu.
+#: Valid lifecycle transitions. No edge **into** `verified` without passing
+#: verification; no edge out of `rejected` — to reuse, reinstall from scratch
+#: and re-verify from scratch.
 ALLOWED: dict[str, frozenset[str]] = {
     CANDIDATE: frozenset({VERIFIED, REJECTED}),
     VERIFIED: frozenset({ACTIVE, STALE, REJECTED}),
@@ -47,11 +49,11 @@ ALLOWED: dict[str, frozenset[str]] = {
     REJECTED: frozenset(),
 }
 
-#: Trạng thái router được xét.
+#: Statuses the router considers.
 ROUTABLE = frozenset({VERIFIED, ACTIVE})
 
-#: Câu dạng chỉ dẫn tiêm — cùng lớp với điều prompt `story-security-review`
-#: bảo người rà soát coi là phát hiện, không phải mệnh lệnh.
+#: Injection-style directive phrases — same class that prompt
+#: `story-security-review` tells the reviewer to treat as a finding, not a command.
 _INJECTION_PHRASES = re.compile(
     r"(?i)(ignore (all |the )?(previous|prior|above) instructions"
     r"|disregard (your|the) (system|previous)"
@@ -62,8 +64,8 @@ _INJECTION_PHRASES = re.compile(
 
 _LINK = re.compile(r"\[[^\]]*\]\(([^)\s#]+)(?:#[^)]*)?\)")
 
-#: Từ vựng năng lực chuẩn — cùng từ với `preflight`/`qa` để router so được
-#: với hợp đồng kiểm định của story mà không cần bảng dịch.
+#: Canonical capability vocabulary — same terms as `preflight`/`qa` so the
+#: router can match against the story's verification contract without a lookup table.
 _CAPABILITY_HINTS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("security", ("security", "secure", "auth", "authz", "authn", "crypto", "owasp",
                   "injection", "secret", "vulnerab", "threat", "hardening", "sast")),
@@ -109,7 +111,7 @@ class SkillEntry:
     status: str = CANDIDATE
     verified: Verification = field(default_factory=Verification)
     links: dict[str, list[str]] = field(default_factory=lambda: {"depends_on": [], "see_also": []})
-    #: Bằng chứng dùng: story nào đã gọi skill này (tích luỹ từ telemetry).
+    #: Usage evidence: which stories invoked this skill (accumulated from telemetry).
     used_in: list[str] = field(default_factory=list)
 
     @property
@@ -117,7 +119,7 @@ class SkillEntry:
         return self.status in ROUTABLE
 
     def text(self) -> str:
-        """Văn bản để router so khớp token — không phải nội dung skill."""
+        """Text for the router's token matching — not the skill's content."""
         return " ".join([self.id.replace("-", " "), self.description, self.use_when,
                          self.subdomain, " ".join(self.tags)]).lower()
 
@@ -150,7 +152,7 @@ class Registry:
         return e
 
     def record_use(self, skill_id: str, story_id: str) -> None:
-        """Telemetry gọi: story dùng skill. `verified` có bằng chứng dùng → `active`."""
+        """Telemetry callback: story used a skill. `verified` with usage evidence -> `active`."""
         e = self.entries.get(skill_id)
         if e is None:
             return
@@ -167,37 +169,38 @@ class Registry:
         }
 
 
-# ------------------------------------------------------------- dựng
+# ------------------------------------------------------------- build
 
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
-#: Năng lực mà một domain đã khai (metadata thật) cho phép — chặn suy diễn
-#: keyword tràn sang lĩnh vực khác. Skill cybersecurity nói "performance" hay
-#: "end-to-end" là nói trong ngữ cảnh an ninh, không phải khai năng lực đo
-#: hiệu năng hay chạy e2e-test. Đây là "structured metadata > prose", áp cho
-#: đúng nguồn ta có metadata (109 skill security khai `domain`).
-#: Nguồn không khai `domain` trong frontmatter nhưng miền thì rõ — không có
-#: dòng này thì tín hiệu "story có màn hình" không bao giờ tới skill giao diện.
+#: Capabilities a declared domain (real metadata) permits — prevents keyword
+#: inference from spilling into unrelated fields. A cybersecurity skill saying
+#: "performance" or "end-to-end" means it in a security context, not declaring
+#: perf-benchmarking or e2e-testing capability. This is "structured metadata >
+#: prose", applied to the source where we have metadata (109 security skills
+#: declare `domain`).
+#: Sources that don't declare `domain` in frontmatter but whose domain is
+#: obvious — without this line the "story has screens" signal never reaches UI skills.
 _SOURCE_DOMAIN = {"ui-ux": "ui-ux"}
 
 _DOMAIN_CAPS: dict[str, frozenset[str]] = {
-    # Không có "ui": 21/109 skill cybersecurity của e9 bị suy ra "ui" từ chữ
-    # "screen"/"interface" trong mô tả, và một story điều hướng bàn phím
-    # được đề nghị skill mã hoá đầu-cuối (đo 2026-09-05). Năng lực giao diện
-    # phải đến từ skill khai miền giao diện, không từ chữ.
+    # No "ui": 21/109 cybersecurity skills in e9 had "ui" inferred from the
+    # word "screen"/"interface" in descriptions, and a keyboard-navigation story
+    # was offered an end-to-end encryption skill (measured 2026-09-05). UI
+    # capability must come from skills declaring a UI domain, not from words.
     "cybersecurity": frozenset({"security", "review"}),
     "ui-ux": frozenset({"ui", "accessibility", "design"}),
 }
 
 
 def _hit(hint: str, text: str, words: set[str]) -> bool:
-    """Hint dài (≥ 6) khớp chuỗi con là an toàn; hint ngắn (`perf`, `e2e`,
-    `git`, `ui`) phải khớp **cả từ** — nếu không thì "performative" nuốt
-    `perf`, "digital" nuốt `git`. Đây là lỗi thật thấy trên e9:
-    `receiving-code-review` bị gắn `perf` vì chữ "performative agreement"."""
+    """Long hints (>= 6) safely match as substrings; short hints (`perf`, `e2e`,
+    `git`, `ui`) must match **whole words** — otherwise "performative" swallows
+    `perf`, "digital" swallows `git`. This is a real bug seen on e9:
+    `receiving-code-review` was tagged `perf` because of "performative agreement"."""
     if len(hint) >= 6 and " " not in hint:
         return hint in text
     return hint in words or (" " in hint and hint in text)
@@ -214,8 +217,8 @@ def _capabilities_of(text: str, *, domain: str = "") -> list[str]:
 
 
 def _use_when(fm: dict, description: str) -> str:
-    """Frontmatter có `use_when` thì lấy; không thì lấy mệnh đề "Use when …"
-    trong mô tả — superpowers viết đúng kiểu ấy."""
+    """Take `use_when` from frontmatter if present; otherwise extract the
+    "Use when ..." clause from the description — superpowers follows that convention."""
     if fm.get("use_when"):
         return str(fm["use_when"]).strip()
     m = re.search(r"(?i)\b(use when|dùng khi)\b(.{0,240})", description)
@@ -241,15 +244,15 @@ def _scripts(skill_dir: Path) -> list[Path]:
 
 
 def script_broken(path: Path, skill_dir: Path) -> str:
-    """Đường dẫn tương đối nếu script không biên dịch được, "" nếu ổn.
-    Không chạy script — chỉ parse."""
+    """Relative path if the script fails to compile, "" if OK.
+    Does not execute the script — parse only."""
     import shutil
     import subprocess
 
     rel = str(path.relative_to(skill_dir))
     try:
         if path.suffix == ".py":
-            # compile() thuần, không ghi .pyc: py_compile cần chỗ ghi cfile.
+            # Pure compile(), no .pyc written: py_compile needs a cfile path.
             compile(path.read_text(encoding="utf-8", errors="replace"), str(path), "exec")
             return ""
         if path.suffix == ".sh":
@@ -257,7 +260,7 @@ def script_broken(path: Path, skill_dir: Path) -> str:
         elif shutil.which("node"):
             cmd = ["node", "--check", str(path)]
         else:
-            return ""                       # không có node: không kết luận
+            return ""                       # no node available: inconclusive
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
         return "" if r.returncode == 0 else rel
     except (SyntaxError, ValueError, OSError, subprocess.SubprocessError):
@@ -265,7 +268,7 @@ def script_broken(path: Path, skill_dir: Path) -> str:
 
 
 def verify_structure(skill_dir: Path) -> Verification:
-    """Kiểm cấu trúc — code, không model. Gap ghi ra, không giấu."""
+    """Structural verification — code, not model. Gaps are recorded, not hidden."""
     v = Verification(at=_now(), by="structural")
     md = skill_dir / "SKILL.md"
     if not md.is_file():
@@ -309,11 +312,12 @@ def verify_structure(skill_dir: Path) -> Verification:
     else:
         v.checks.append("không có bí mật, không có câu tiêm")
 
-    # scripts/ phải ít nhất **biên dịch được** — SKILL.md đúng mà script hỏng
-    # thì skill không dùng được, cùng lớp lỗi với hook đúng cú pháp mà client
-    # không chạy (G6). Paper đòi chạy thật; đây là mức an toàn không cần Docker.
-    # ponytail: chỉ kiểm cú pháp, không chạy — 201 tệp trên e9, chạy thật cần
-    # sandbox + ngân sách thời gian; nâng lên smoke `--help` khi có hạng mục đo.
+    # scripts/ must at least **compile** — a valid SKILL.md with a broken script
+    # means the skill is unusable, same class of bug as a syntactically valid hook
+    # the client won't run (G6). Paper demands real execution; this is the safe
+    # level without Docker.
+    # ponytail: syntax check only, no execution — 201 files on e9, real execution
+    # needs sandbox + time budget; upgrade to smoke `--help` when there's a benchmark.
     scripts = _scripts(skill_dir)
     if scripts:
         hong = [rel for rel in (script_broken(p, skill_dir) for p in scripts) if rel]
@@ -334,8 +338,9 @@ def verify_structure(skill_dir: Path) -> Verification:
 
 def build(project: Path | str, *, catalog: Catalog | None = None,
           previous: Registry | None = None) -> Registry:
-    """Dựng sổ từ `.claude/skills`. Giữ `used_in` và trạng thái `active` của
-    lần dựng trước; skill có thư mục mà không còn ở lần này → `stale`."""
+    """Build registry from `.claude/skills`. Preserves `used_in` and `active`
+    status from the previous build; skills with a directory that no longer
+    exists in this build -> `stale`."""
     project = Path(project)
     root = project / SKILLS_DIR
     cat = catalog or Catalog.load()
@@ -365,11 +370,12 @@ def build(project: Path | str, *, catalog: Catalog | None = None,
                 commit=src.commit if src else "",
                 license=str(fm.get("license") or (src.license if src and src.license else "NO_LICENSE")),
             )
-            # Năng lực phải **khai** — frontmatter `capabilities:` hoặc miền có
-            # bảng cho phép (cybersecurity). Suy từ chữ cho skill không khai miền
-            # là keyword-matching đội lốt hợp đồng: đo trên e9 (2026-09-05),
-            # `receiving-code-review` (superpowers) bị suy ra `perf` + `ui` và
-            # được chọn cho 5/18 story vì "phải qua kiểm định perf".
+            # Capabilities must be **declared** — frontmatter `capabilities:` or a
+            # domain with a permitted set (cybersecurity). Inferring from prose for
+            # skills that don't declare a domain is keyword-matching disguised as a
+            # contract: measured on e9 (2026-09-05), `receiving-code-review`
+            # (superpowers) had `perf` + `ui` inferred and was selected for 5/18
+            # stories because "must pass perf verification".
             khai = _listish(fm.get("capabilities"))
             theo_mien = _capabilities_of(e.text(), domain=e.domain) if e.domain.strip().lower() in _DOMAIN_CAPS else []
             e.capabilities = sorted(set(khai) | set(theo_mien))
@@ -393,7 +399,7 @@ def build(project: Path | str, *, catalog: Catalog | None = None,
     return reg
 
 
-# ------------------------------------------------------------- đĩa
+# ------------------------------------------------------------- disk
 
 
 def path_for(artifact_root: Path | str) -> Path:
@@ -423,10 +429,10 @@ def load(artifact_root: Path | str) -> Registry:
 
 
 def refresh(project: Path | str, artifact_root: Path | str, *, catalog: Catalog | None = None) -> Registry:
-    """Dựng lại giữ lịch sử, ghi xuống đĩa. Gọi sau `setup` và trước `run`."""
+    """Rebuild preserving history, write to disk. Call after `setup` and before `run`."""
     reg = build(project, catalog=catalog, previous=load(artifact_root))
-    # Kết luận quét ngữ nghĩa (S6) sống qua các lần dựng lại: dựng lại là
-    # đọc lại cấu trúc, không phải xoá đi một phán quyết đã trả tiền để có.
+    # Semantic scan verdicts (S6) survive rebuilds: a rebuild re-reads
+    # structure, it doesn't discard a verdict that cost money to produce.
     from . import skill_scan
 
     skill_scan.apply(reg, skill_scan.load(artifact_root))

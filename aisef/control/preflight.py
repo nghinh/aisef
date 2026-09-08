@@ -1,18 +1,18 @@
-"""Kiểm story chạy được không, **trước khi** gọi model.
+"""Check whether a story is executable, **before** calling the model.
 
-Một story không chạy được là story mà tiêu chí chấp nhận của nó đòi thứ
-mà phạm vi ghi cấm, hoặc đòi một loại kiểm định chưa ai cấu hình. Không
-có bước này thì cách duy nhất phát hiện là chạy thật rồi trượt cổng —
-đo trên e9, hai story liên tiếp bí đúng vì thế, tám lượt không lượt nào
-qua, $20.
+A non-executable story is one whose acceptance criteria demand something
+the write scope forbids, or demand a verification kind nobody configured.
+Without this step the only way to discover it is to run and fail the gate —
+measured on e9, two consecutive stories deadlocked this way, eight attempts
+with none passing, $20.
 
-Cả module là **hàm thuần trên dữ liệu đã có**. Không hỏi model câu nào:
-"story này có đủ điều kiện chạy không" là câu tính được, và câu tính
-được thì hỏi model chỉ thêm một nguồn sai. Đổi lại, mọi luật ở đây phải
-bảo thủ — báo thiếu oan sẽ chặn một story chạy được, đắt ngang bỏ sót.
+The entire module is a **pure function over existing data**. No model calls:
+"is this story executable" is a computable question, and asking a model only
+adds an error source. The trade-off: every rule here must be conservative —
+a false missing report blocks a runnable story, as expensive as missing one.
 
-Mỗi năng lực suy ra mang theo **bằng chứng** đã kích nó, để người đọc
-kiểm lại được kết luận thay vì phải tin.
+Each inferred capability carries the **evidence** that triggered it, so the
+reader can verify the conclusion rather than trust it.
 """
 
 from __future__ import annotations
@@ -32,26 +32,27 @@ from .normalize import (
     is_lockfile,
 )
 
-#: Mã trả về khi story không chạy được. Chặn trước khi gọi model.
+#: Return code when a story is not executable. Blocks before calling the model.
 STORY_NOT_EXECUTABLE = "STORY_NOT_EXECUTABLE"
 
 
 @dataclass(frozen=True)
 class Need:
-    """Một năng lực story cần, kèm chỗ trong story đã đòi nó."""
+    """A capability the story needs, with the part of the story that required it."""
 
     capability: str
-    #: Câu chữ trong story làm nảy sinh yêu cầu này. Không có nó thì kết
-    #: luận không kiểm lại được, và người đọc chỉ còn cách tin.
+    #: Text in the story that gave rise to this need. Without it the conclusion
+    #: is not verifiable, and the reader can only trust it.
     evidence: str
-    #: Cách cấp năng lực, in ra khi thiếu.
+    #: How to provision the capability, printed when missing.
     remedy: str = ""
-    #: Ai phải sửa. ``"story"`` = chính story hỏng (tiêu chí đòi thứ phạm
-    #: vi cấm) — sửa được ngay lúc chia story. ``"project"`` = dự án chưa
-    #: cấu hình đủ — không phải lỗi của story, và sửa được **sau** khi
-    #: story đã chốt. Phân biệt hai loại này vì cổng `stories` chạy trước
-    #: cả pha dựng mockup: đòi hợp đồng thị giác ở đó là bài toán con gà
-    #: quả trứng, còn đòi nó trước khi gọi model thì đúng.
+    #: Who must fix it. ``"story"`` = the story itself is defective (criteria
+    #: demand what scope forbids) — fixable when splitting stories.
+    #: ``"project"`` = project not yet configured — not the story's fault,
+    #: and fixable **after** stories are finalized. The distinction matters
+    #: because the `stories` gate runs before the mockup phase: demanding a
+    #: visual contract there is a chicken-and-egg problem, but demanding it
+    #: before calling the model is correct.
     kind: str = "project"
 
     def line(self) -> str:
@@ -60,20 +61,20 @@ class Need:
 
     @property
     def blocks_run(self) -> bool:
-        """Thiếu cái này thì story **không chạy nổi**, hay chỉ là chạy
-        xong mà thiếu bằng chứng?
+        """Does missing this make the story **unrunnable**, or just missing
+        acceptance evidence?
 
-        Không có trình duyệt thì story giao diện không dựng được màn nào
-        — chặn. Không có `verify.accessibility` thì nó vẫn viết được
-        code; cái thiếu là bằng chứng nghiệm thu, và cổng story đã ghi
-        đúng "chưa cấu hình — không tính là đạt", còn cổng trước triển
-        khai thì chặn thật. Chặn ở đây nữa là chặn hai lần cho một
-        chuyện, và làm khung không dùng được ngay từ story giao diện đầu
-        tiên.
+        No browser means a UI story cannot build any screen — block. No
+        `verify.accessibility` means it can still write code; what is
+        missing is acceptance evidence, and the story gate already records
+        "unconfigured — does not count as passed", while the pre-deploy
+        gate blocks for real. Blocking here too is blocking twice for the
+        same thing, and makes the framework unusable from the very first
+        UI story.
         """
         if self.capability.startswith("verify."):
             return False
-        # Bản dựng sẵn vẫn chạy khi không cấu hình nhà cung cấp riêng.
+        # Built-in provider still runs without a custom provider configured.
         return self.capability != "code-intelligence"
 
 
@@ -85,25 +86,25 @@ class Preflight:
 
     @property
     def executable(self) -> bool:
-        """Chạy nổi không. Thiếu **bằng chứng nghiệm thu** không tính vào
-        đây — cổng story và cổng trước triển khai lo phần đó."""
+        """Can it run. Missing **acceptance evidence** is not counted here —
+        the story gate and pre-deploy gate handle that."""
         return not [m for m in self.missing if m.blocks_run]
 
     @property
     def complete(self) -> bool:
-        """Đủ cả năng lực chạy lẫn năng lực nghiệm thu."""
+        """Has both run capabilities and acceptance capabilities."""
         return not self.missing
 
     @property
     def story_defects(self) -> list[Need]:
-        """Thiếu do **story** hỏng — chặn ngay từ cổng `stories`."""
+        """Missing due to **story** defect — blocks at the `stories` gate."""
         return [m for m in self.missing if m.kind == "story"]
 
     @property
     def provisioning_gaps(self) -> list[Need]:
-        """Thiếu do **dự án** chưa cấu hình — còn sửa được sau khi chốt
-        story, nên ở cổng `stories` chỉ cảnh báo; chặn ở `readiness` và
-        ngay trước khi gọi model."""
+        """Missing due to **project** not yet configured — still fixable after
+        stories are finalized, so at the `stories` gate only a warning;
+        blocks at `readiness` and right before calling the model."""
         return [m for m in self.missing if m.kind != "story"]
 
     def summary(self) -> str:
@@ -114,22 +115,23 @@ class Preflight:
         return "\n".join(lines)
 
 
-# ------------------------------------------------------------ dấu hiệu
+# ------------------------------------------------------------ markers
 
-#: Dấu hiệu kích một loại kiểm định. Cố ý hẹp: chỉ những cụm chỉ đích danh
-#: loại kiểm, không phải cụm nào nhắc xa xôi tới nó. Rộng ra thì mọi story
-#: đều "cần E2E" và cổng mất hết nghĩa.
+#: Markers triggering a verification kind. Deliberately narrow: only phrases
+#: that specifically name the verification kind, not ones that vaguely
+#: reference it. Widen them and every story "needs E2E" and the gate loses
+#: all meaning.
 _VERIFY_MARKERS: dict[str, tuple[str, ...]] = {
     "verify.e2e": ("e2e", "end-to-end", "đầu-cuối", "đầu cuối", "kịch bản người dùng"),
     "verify.sit": ("tích hợp", "integration test", "kiểm thử tích hợp"),
     "verify.api-contract": ("hợp đồng api", "api contract", "contract test", "openapi"),
     "verify.accessibility": ("trợ năng", "accessibility", "a11y", "wcag", "screen reader"),
     "verify.migration": ("migration", "di trú", "nâng cấp schema", "onupgradeneeded"),
-    # "rớt khung hình", "bài đo", "ở quy mô N" đều là ngưỡng hiệu năng mà
-    # không dùng chữ "hiệu năng". Đo trên e9: TCCN 3 của STORY-01-04 đòi
-    # "bài đo AR-16 xác nhận ngưỡng ... ở quy mô này" và không khớp dấu
-    # hiệu nào — cổng `readiness` im lặng, rồi story bí ở lượt rà soát
-    # sau khi đã tiêu $10,49.
+    # "dropped frames", "benchmark", "at scale N" are all performance thresholds
+    # without using the word "performance". Measured on e9: AC 3 of STORY-01-04
+    # required "benchmark AR-16 confirms threshold ... at this scale" and matched
+    # no marker — `readiness` gate was silent, then story deadlocked at review
+    # after already spending $10.49.
     "verify.perf": (
         "hiệu năng", "performance", "p95", "p99", "độ trễ", "latency",
         "khung hình", "fps", "bài đo", "benchmark", "ở quy mô",
@@ -137,61 +139,63 @@ _VERIFY_MARKERS: dict[str, tuple[str, ...]] = {
     ),
 }
 
-#: Dấu hiệu story chạm mặt bảo mật. Rộng hơn nhóm trên có chủ đích: sót
-#: một story bảo mật đắt hơn nhiều so với chạy thừa một lượt rà soát.
+#: Markers that a story touches a security surface. Deliberately wider than
+#: the group above: missing a security story is much more expensive than
+#: running one extra review.
 _SECURITY_MARKERS = (
     "bảo mật", "security", "xác thực", "phân quyền", "auth", "oauth", "jwt",
     "mã hoá", "mã hóa", "encrypt", "crypto", "băm mật khẩu", "hash",
     "bí mật", "secret", "credential", "injection", "xss", "csrf",
-    # "token" trơn quá rộng: "token thị giác" của hệ thiết kế là biến CSS,
-    # và nó xuất hiện ở gần như mọi story dựng giao diện.
+    # bare "token" is too broad: "design token" in a design system is a CSS
+    # variable, and it appears in nearly every UI story.
     "token phiên", "token xác thực", "access token", "refresh token",
     "bearer", "api token", "session token",
     "sql", "sanitize", "khử trùng", "leo thang đặc quyền",
 )
 
-#: Dấu hiệu story cần mạng lúc chạy kiểm.
+#: Markers that a story needs network during verification.
 _NETWORK_MARKERS = (
     "gọi api ngoài", "dịch vụ ngoài", "third-party", "bên thứ ba",
     "tải về từ", "cdn", "webhook", "đồng bộ lên máy chủ",
 )
 
-#: Dấu hiệu story cần hiểu ảnh hưởng chéo module.
-#: Cố ý **không** có "toàn kho": trong tiếng Việt "kho" vừa là kho mã vừa
-#: là kho dữ liệu, và trên e9 nó xuất hiện ở câu *cấm* quét toàn kho
-#: IndexedDB — báo oan ngay ở story đầu tiên có nó.
+#: Markers that a story needs cross-module impact analysis.
+#: Deliberately **excludes** "full repository scan" markers: in Vietnamese
+#: the word is ambiguous between code repository and data store, and on e9
+#: it appeared in a sentence *forbidding* full IndexedDB scan — false
+#: positive on the very first story containing it.
 _IMPACT_MARKERS = (
     "mọi nơi dùng", "tất cả caller", "mọi lời gọi", "mọi nơi gọi",
     "cross-module", "liên module", "phiên bản api", "api version",
     "breaking change", "thay đổi phá vỡ", "mọi module",
 )
 
-#: Ngưỡng số module gốc mà phạm vi ghi chạm tới thì coi là thay đổi chéo.
+#: Threshold of root modules the write scope touches to be considered cross-module.
 IMPACT_MODULE_THRESHOLD = 3
 
 _BACKTICK = re.compile(r"`([^`\n]{2,80})`")
-#: Đường dẫn: có dấu `/`, hoặc có đuôi tệp quen thuộc.
+#: Path: contains `/`, or has a recognized file extension.
 _PATHISH = re.compile(r"^[\w.@/-]+$")
-#: Đuôi tệp mã nguồn/cấu hình có thật — không phải "có dấu chấm là tệp".
-#: Lỗi 20 (2026-09-05, plan thật trên bản chép e9): `tools.lint`, `Note.text`,
-#: `save.done`, `search.clear`, `tags.title`, `migrate.title` trong tiêu chí
-#: là khoá cấu hình / thuộc tính / khoá i18n, bị coi là tệp chưa tồn tại →
-#: 6/21 story "không chạy được", cổng stories chặn cả kế hoạch.
+#: Real source/config file extensions — not "has a dot means it's a file".
+#: Bug 20 (2026-09-05, real plan on e9 copy): `tools.lint`, `Note.text`,
+#: `save.done`, `search.clear`, `tags.title`, `migrate.title` in criteria
+#: are config keys / properties / i18n keys, misidentified as non-existent
+#: files -> 6/21 stories "not executable", stories gate blocked the entire plan.
 _EXT = re.compile(
     r"\.(?:tsx?|jsx?|mjs|cjs|py|rb|go|rs|java|kt|swift|json|ya?ml|toml|ini|cfg|md|txt|"
     r"css|scss|less|html?|svg|png|jpe?g|gif|ico|sql|sh|bash|zsh|env|lock|xml|csv|proto|"
     r"graphql|gql|vue|svelte|astro|mdx|wasm|map)$",
     re.IGNORECASE,
 )
-#: Tên gói npm/pypi: chữ thường, có gạch nối hoặc tiền tố scope, không có `/`
-#: (trừ scope), không có đuôi tệp.
+#: npm/pypi package name: lowercase, has hyphen or scope prefix, no `/`
+#: (except scope), no file extension.
 _PACKAGEISH = re.compile(r"^(@[a-z0-9][\w.-]*/)?[a-z0-9][a-z0-9._-]*$")
 
-#: Động từ cho thấy story phải **tạo hoặc sửa** thứ được nêu. Không có nó
-#: thì đường dẫn trong tiêu chí là **ràng buộc**, không phải sản phẩm:
-#: "tệp trong `src/search/` import React thì build hỏng" nói về một thư
-#: mục story không sở hữu. Đo trên e9, luật thiếu vế này báo oan 2/18
-#: story ngay lần chạy đầu.
+#: Verbs indicating the story must **create or modify** the named entity.
+#: Without this, paths in criteria are **constraints**, not deliverables:
+#: "files in `src/search/` that import React fail the build" references a
+#: directory the story does not own. Measured on e9, the rule without this
+#: clause produced false positives on 2/18 stories on the first run.
 _MUTATION = (
     "sinh ra", "tạo ", "tạo,", "ghi ", "ghi,", "cập nhật", "thêm vào",
     "sửa ", "xoá ", "xóa ", "commit", "lưu ", "dựng ", "xuất ra",
@@ -207,20 +211,20 @@ def _ticked(story: Story) -> list[str]:
     return _BACKTICK.findall(" \n".join([story.title, *story.acceptance_criteria]))
 
 
-#: Khoảng cách tối đa giữa định danh và động từ tạo/sửa để coi là chúng
-#: nói về nhau. Một tiêu chí chấp nhận dài thường có nhiều mệnh đề: quét
-#: cả câu thì một động từ ở cuối kéo theo mọi đường dẫn ở đầu. Đo trên
-#: e9: TCCN 2 của STORY-01-01 nêu `src/search/` như **ràng buộc** ở đầu
-#: câu rồi nói "lệnh dựng thất bại" ở cuối — cách nhau 90 ký tự.
+#: Maximum distance between identifier and mutation verb to consider them
+#: related. A long acceptance criterion often has multiple clauses: scanning
+#: the whole sentence lets a verb at the end pull in all paths at the start.
+#: Measured on e9: AC 2 of STORY-01-01 names `src/search/` as a **constraint**
+#: at the beginning then says "build fails" at the end — 90 characters apart.
 MUTATION_WINDOW = 60
 
 
 def _ticked_in_mutations(story: Story) -> list[str]:
-    """Định danh trong backtick **đứng gần** một động từ tạo/sửa.
+    """Identifiers in backticks that are **near** a mutation verb.
 
-    Nhắc tới một đường dẫn không đòi quyền ghi lên nó: tiêu chí hay nêu
-    thư mục như ràng buộc ("tệp trong `src/search/` import React thì
-    build hỏng") chứ không như sản phẩm story phải tạo.
+    Mentioning a path does not demand write permission on it: criteria often
+    name directories as constraints ("files in `src/search/` that import
+    React fail the build") rather than as deliverables the story must create.
     """
     out: list[str] = []
     for cau in [story.title, *story.acceptance_criteria]:
@@ -240,12 +244,13 @@ def _within(path: str, scope: str) -> bool:
 
 
 def _covered(tok: str, scope: list[str]) -> bool:
-    """Đường dẫn này đã nằm trong phạm vi ghi chưa.
+    """Is this path already within write scope.
 
-    Ngoài quan hệ tiền tố, còn nhận **đoạn giữa**: tiêu chí chấp nhận hay
-    gọi tên tầng (`store/`) trong khi phạm vi khai đường đầy đủ
-    (`src/store/db.ts`). Coi hai cái đó là khác nhau thì cổng báo thiếu
-    oan, mà báo thiếu oan chặn một story chạy được — đắt ngang bỏ sót.
+    Beyond prefix matching, also accepts **middle segments**: acceptance
+    criteria often name a layer (`store/`) while scope declares the full
+    path (`src/store/db.ts`). Treating them as different produces a false
+    missing report, and a false missing blocks a runnable story — as
+    expensive as a miss.
     """
     if any(_within(tok, s) for s in scope):
         return True
@@ -265,29 +270,28 @@ def _first_marker(text: str, markers: tuple[str, ...]) -> str:
     return ""
 
 
-# ------------------------------------------------------------ suy ra
+# ------------------------------------------------------------ inference
 
 
-#: Loại kiểm định gắn với một dấu hiệu cấu trúc, không phải câu chữ.
-#: Story có màn hình thì **luôn** phải qua trợ năng và map mockup: một
-#: màn hình không dùng được bằng bàn phím là màn hình hỏng, dù mọi tiêu
-#: chí chấp nhận đều xanh.
+#: Verification kinds tied to a structural marker, not textual.
+#: A story with screens **always** requires accessibility and mockup-map:
+#: a screen that cannot be used with a keyboard is a broken screen, even
+#: if all acceptance criteria are green.
 STRUCTURAL_CONTRACT = {
     "screens": ("unit", "e2e", "accessibility", "mockup-map"),
 }
 
-#: Loại kiểm định mọi story đều phải qua. Ngắn có chủ đích: hợp đồng dài
-#: cho mọi story thì không loại nào được coi trọng.
+#: Verification kinds every story must pass. Deliberately short: a long
+#: contract for every story means no kind is taken seriously.
 BASE_CONTRACT = ("unit",)
 
 
 def verification_contract(story: Story) -> list[str]:
-    """Loại kiểm định story này phải qua.
+    """Verification kinds this story must pass.
 
-    Story tự khai thì lấy bản khai — người lập kế hoạch biết thứ code
-    không suy ra được. Không khai thì suy bằng code từ cùng những dấu
-    hiệu mà `required_capabilities` dùng, để hai bên không bao giờ nói
-    khác nhau.
+    If the story declares them, the declaration is used — the planner knows
+    things code cannot infer. Otherwise inferred by code from the same
+    markers `required_capabilities` uses, so the two never disagree.
     """
     if story.verification_contract:
         return list(dict.fromkeys(story.verification_contract))
@@ -305,18 +309,18 @@ def verification_contract(story: Story) -> list[str]:
 
 
 def required_capabilities(story: Story, *, project: Path | None = None) -> list[Need]:
-    """Năng lực story này cần, suy ra từ chính nội dung story.
+    """Capabilities this story needs, inferred from the story's own content.
 
-    Nguồn suy ra, theo đúng thứ tự đáng tin: trường có cấu trúc trước
-    (``screens``, ``write_scope``), rồi mới tới câu chữ tiêu chí chấp
-    nhận. Câu chữ là nguồn yếu nhất nên chỉ dùng với dấu hiệu chỉ đích
-    danh, không suy diễn.
+    Inference sources in order of reliability: structured fields first
+    (``screens``, ``write_scope``), then acceptance criteria text. Text is
+    the weakest source, so only used with markers that specifically name
+    the capability, no guessing.
     """
     text = _text_of(story)
     needs: list[Need] = []
 
-    # 1. Story có giao diện: cần trình duyệt để dựng, và hợp đồng thị giác
-    #    để đối chiếu. Đây là trường có cấu trúc, chắc chắn nhất.
+    # 1. UI story: needs browser to build screens, and visual contract to
+    #    compare against. This is a structured field, highest certainty.
     for screen in story.screens:
         needs.append(Need(
             "browser", f"story builds screen `{screen}`",
@@ -327,37 +331,37 @@ def required_capabilities(story: Story, *, project: Path | None = None) -> list[
             "run `aisef mockup` to produce a design contract for this screen",
         ))
 
-    # 2. Công cụ nền: mọi story đều bị chấm bằng test và lint. Không cấu
-    #    hình thì guard `completion` chặn agent kết thúc bằng một chỉ dẫn
-    #    nó không chạy được.
+    # 2. Baseline tools: every story is scored by tests and lint. Without
+    #    configuration the guard `completion` blocks the agent from finishing
+    #    with an instruction it cannot run.
     needs.append(Need("tools.test", "every story is scored by tests",
                       "configure `tools.test`"))
     needs.append(Need("tools.lint", "every story is scored by lint",
                       "configure `tools.lint`"))
 
-    # 3. Loại kiểm định trong hợp đồng của story. Một nguồn duy nhất, để
-    #    cổng và hợp đồng không bao giờ nói khác nhau.
+    # 3. Verification kinds in the story's contract. Single source so the
+    #    gate and contract never disagree.
     khai = bool(story.verification_contract)
     for kind in verification_contract(story):
         if kind == "mockup-map":
-            continue  # đã tính ở mục 1 theo từng màn hình
+            continue  # already counted in item 1 per screen
         vi_sao = (
             "story declares in `verification_contract`" if khai
             else _why_kind(story, kind)
         )
         needs.append(Need(f"verify.{kind}", vi_sao, f"configure `verify.{kind}`"))
 
-    # 5. Mạng lúc chạy kiểm.
+    # 5. Network during verification.
     hit = _first_marker(text, _NETWORK_MARKERS)
     if hit:
         needs.append(Need("network", f'acceptance criteria mention "{hit}"',
                           "enable `sandbox.tools_network`"))
 
-    # 6. Hiểu ảnh hưởng chéo module.
+    # 6. Cross-module impact analysis.
     hit = _first_marker(text, _IMPACT_MARKERS)
-    # Chỉ đếm **thư mục** gốc: `vite.config.ts` hay `index.html` là tệp
-    # cấu hình ở gốc dự án, không phải một module. Đếm chúng vào thì mọi
-    # story dựng nền dự án đều bị coi là thay đổi chéo module.
+    # Only count **root directories**: `vite.config.ts` or `index.html` are
+    # config files at the project root, not modules. Counting them would make
+    # every project-scaffolding story appear as a cross-module change.
     roots = {
         p.strip("/").split("/")[0]
         for p in story.write_scope
@@ -376,13 +380,13 @@ def required_capabilities(story: Story, *, project: Path | None = None) -> list[
             "name-based search runs, but it is much coarser",
         ))
 
-    # 7. Tệp và gói tiêu chí chấp nhận gọi tên.
+    # 7. Files and packages named in acceptance criteria.
     needs += _needs_from_names(story, project)
     return needs
 
 
 def _why_kind(story: Story, kind: str) -> str:
-    """Vì sao loại kiểm này có trong hợp đồng — nói ra chỗ đã kích nó."""
+    """Why this verification kind is in the contract — names the trigger."""
     if kind in BASE_CONTRACT:
         return "every story must pass"
     if story.screens and kind in STRUCTURAL_CONTRACT["screens"]:
@@ -396,18 +400,18 @@ def _why_kind(story: Story, kind: str) -> str:
 
 
 def _needs_from_names(story: Story, project: Path | None) -> list[Need]:
-    """Tệp/gói mà tiêu chí chấp nhận nêu đích danh nhưng story không được
-    phép chạm.
+    """Files/packages that acceptance criteria name explicitly but the story
+    is not allowed to touch.
 
-    Phân biệt bằng **đĩa**, không đoán: một đường dẫn đã tồn tại trong dự
-    án thì story có thể chỉ đọc nó; một đường dẫn chưa tồn tại thì story
-    phải tạo ra, nên phải nằm trong phạm vi ghi. Cùng lối đó, một tên gói
-    chưa có trong manifest nghĩa là story phải khai nó.
+    Distinguished by **disk**, not guessing: a path that exists in the
+    project means the story may only read it; a path that does not exist
+    means the story must create it, so it must be in write scope. Similarly,
+    a package name not in the manifest means the story must declare it.
     """
     out: list[Need] = []
-    # Đối chiếu với phạm vi **có hiệu lực**, không phải phạm vi khai thô:
-    # harness tự thêm tệp khai phụ thuộc và lockfile, nên so với bản thô
-    # thì cổng báo một vấn đề đã được vá.
+    # Compare against **effective** write scope, not the raw declaration:
+    # harness auto-adds dependency manifests and lockfiles, so comparing
+    # against the raw scope reports an issue that was already patched.
     scope = (
         effective_write_scope(story, project)
         if project is not None
@@ -423,9 +427,9 @@ def _needs_from_names(story: Story, project: Path | None) -> list[Need]:
             if _covered(tok, scope):
                 continue
             if project is not None and _exists_anywhere(project, tok):
-                continue  # đã có sẵn — story chỉ đọc, không cần quyền ghi
+                continue  # already exists — story only reads, no write needed
             if project is None:
-                continue  # không có đĩa để đối chiếu thì không kết luận
+                continue  # no disk to check against — cannot conclude
             out.append(Need(
                 f"write:{tok}",
                 f"acceptance criteria require `{tok}`, file does not exist",
@@ -433,8 +437,8 @@ def _needs_from_names(story: Story, project: Path | None) -> list[Need]:
                 kind="story",
             ))
         elif deps is not None and _PACKAGEISH.match(tok) and "-" in tok:
-            # Chỉ tên có gạch nối: từ thường một tiếng (`store`, `rev`) hay
-            # bị bọc backtick mà không phải tên gói.
+            # Only hyphenated names: single common words (`store`, `rev`) are
+            # often backtick-wrapped but are not package names.
             if tok in deps:
                 continue
             if not any(m in scope for m in MANIFESTS):
@@ -444,7 +448,7 @@ def _needs_from_names(story: Story, project: Path | None) -> list[Need]:
                     "add the manifest file to the story's `write_scope`",
                     kind="story",
                 ))
-    # Một story chỉ cần báo thiếu manifest **một lần**.
+    # A story only needs to report missing manifest **once**.
     seen: set[str] = set()
     ket: list[Need] = []
     for n in out:
@@ -456,10 +460,11 @@ def _needs_from_names(story: Story, project: Path | None) -> list[Need]:
 
 
 def _exists_anywhere(project: Path, tok: str) -> bool:
-    """Tệp này đã có trong dự án chưa — kể cả ở thư mục khác.
+    """Does this file exist anywhere in the project — including other dirs.
 
-    `DESIGN.md` nằm trong `_bmad-output/`, không ở gốc; so đúng một chỗ
-    thì cổng kết luận story phải tạo ra nó, mà nó đã có sẵn.
+    `DESIGN.md` lives in `_bmad-output/`, not at root; checking only one
+    location makes the gate conclude the story must create it when it
+    already exists.
     """
     if (project / tok).exists():
         return True
@@ -473,8 +478,8 @@ def _exists_anywhere(project: Path, tok: str) -> bool:
 
 
 def _declared_deps(project: Path) -> set[str] | None:
-    """Tên gói dự án đã khai. ``None`` nếu không có manifest nào đọc được —
-    không đọc được thì không kết luận, thay vì kết luận sai."""
+    """Package names declared by the project. ``None`` if no manifest is
+    readable — unreadable means no conclusion, rather than a wrong one."""
     pkg = project / "package.json"
     if pkg.is_file():
         try:
@@ -497,7 +502,7 @@ def _declared_deps(project: Path) -> set[str] | None:
     return None
 
 
-# ------------------------------------------------------------ đối chiếu
+# ------------------------------------------------------------ comparison
 
 
 def provisioned(
@@ -506,14 +511,14 @@ def provisioned(
     *,
     contract_screens: set[str] | None = None,
 ) -> set[str]:
-    """Năng lực dự án **đã** cấp. Đọc cấu hình và đĩa, không đoán."""
+    """Capabilities the project **already** provides. Reads config and disk, no guessing."""
     have: set[str] = set()
 
     for key in DEFAULTS:
         if key.startswith(("verify.", "tools.")) and str(config.get(key, "")).strip():
             have.add(key)
 
-    # Miễn có ghi lại là một quyết định của người, không phải chỗ trống.
+    # Any recorded waiver is a deliberate human decision, not a blank.
     for waived in str(config.get("verify.waived", "")).split(","):
         w = waived.strip()
         if w:
@@ -527,19 +532,19 @@ def provisioned(
     if config.get("sandbox.tools_network"):
         have.add("network")
 
-    # Kiểm thử đơn vị chạy qua `tools.test` — harness gọi nó mỗi lượt và
-    # cổng `completion` chặn agent kết thúc khi nó đỏ. Đòi thêm
-    # `verify.unit` là bắt cấu hình hai lần cho cùng một việc, và nó làm
-    # **mọi** story thành không chạy được.
+    # Unit tests run through `tools.test` — harness runs it every turn and
+    # the `completion` guard blocks the agent from finishing when it is red.
+    # Requiring `verify.unit` on top means configuring twice for the same
+    # thing, and it makes **every** story non-executable.
     if str(config.get("tools.test", "")).strip():
         have.add("verify.unit")
 
     if str(config.get("review.impact_provider", "")).strip():
         have.add("code-intelligence")
 
-    # Rà soát bảo mật theo ngữ nghĩa của chính harness **là** một cách cấp
-    # năng lực này. Đòi thêm `verify.security` khi nó đã bật là bắt cấu
-    # hình hai lần cho cùng một việc.
+    # Harness's own semantic security review **is** a way to provision this
+    # capability. Requiring `verify.security` when it is already enabled
+    # means configuring twice for the same thing.
     if config.get("security.semantic_review", True):
         have.add("verify.security")
 
@@ -564,9 +569,9 @@ def _contract_screens(project: Path) -> set[str]:
     if isinstance(screens, dict):
         return set(screens.keys())
     if isinstance(screens, list):
-        # Hợp đồng thật dùng khoá `id`; nhận thêm `screen_id` cho bản cũ.
-        # Đọc sai khoá thì cổng báo thiếu hợp đồng cho **mọi** màn — và
-        # đó là chặn oan trên diện rộng, đắt hơn nhiều so với bỏ sót.
+        # Real contract uses key `id`; also accepts `screen_id` for old format.
+        # Reading the wrong key makes the gate report missing contract for
+        # **every** screen — a widespread false block, far costlier than a miss.
         out = set()
         for s in screens:
             if not isinstance(s, dict):
@@ -588,15 +593,15 @@ def check_story(
     done: set[str] | None = None,
     fan_in: int = 0,
 ) -> Preflight:
-    """Story này chạy được không. Không gọi model.
+    """Is this story executable. Does not call a model.
 
-    ``owned``: màn hình → story dựng nó đầu tiên (xem ``screen_owners``);
-    dùng để đo cỡ story. Không có thì mọi màn hình story chạm đều tính.
-    ``fan_in``: số story phụ thuộc vào story này (xem
-    ``complexity.fan_in_counts``) — một chiều của điểm cỡ.
-    ``done``: story đã xong — cỡ story là phép kiểm **trước khi vào coding
-    agent**; story đã qua cổng rồi thì chẻ nó không còn nghĩa gì (e9
-    STORY-01-04 xong sau 8 lượt, cổng stories chặn lại cả kế hoạch vì nó).
+    ``owned``: screen -> story that builds it first (see ``screen_owners``);
+    used to measure story size. If absent, all screens the story touches count.
+    ``fan_in``: number of stories depending on this one (see
+    ``complexity.fan_in_counts``) — one dimension of the size score.
+    ``done``: completed stories — size check is a **pre-coding-agent** gate;
+    a story that already passed the gate has no point being split (e9
+    STORY-01-04 finished in 8 turns, stories gate blocked the whole plan).
     """
     cfg = config or Config(dict(DEFAULTS))
     got = have if have is not None else provisioned(project, cfg)
@@ -605,9 +610,9 @@ def check_story(
     qua_lon = None if (done and story.id in done) else story_size_defect(
         story, project=project, config=cfg, owned=owned, fan_in=fan_in)
     if qua_lon is not None:
-        # Chỉ vào `needs`: vòng dưới thấy `size` không nằm trong năng lực
-        # đã cấp và tự đưa nó sang `missing`. Thêm ở cả hai chỗ thì cổng in
-        # cùng một lỗi hai lần — đo trên kế hoạch thật e9.
+        # Added only to `needs`: the loop below sees `size` is not in
+        # provisioned capabilities and moves it to `missing`. Adding to both
+        # makes the gate print the same error twice — measured on real e9 plan.
         out.needs.append(qua_lon)
 
     for need in out.needs:
@@ -619,7 +624,7 @@ def check_story(
             out.missing.append(need)
             continue
         if cap.startswith("write:") or cap == "manifest-write":
-            out.missing.append(need)  # suy ra đã là bằng chứng thiếu
+            out.missing.append(need)  # inference itself is evidence of missing
             continue
         if cap not in got:
             out.missing.append(need)
@@ -627,12 +632,13 @@ def check_story(
 
 
 def screen_owners(stories) -> dict[str, str]:
-    """Màn hình → story **dựng nó đầu tiên** (theo thứ tự kế hoạch).
+    """Screen -> story that **builds it first** (plan order).
 
-    Story sau chạm lại màn hình có sẵn (thêm một nút) không gánh cả số
-    trạng thái của màn ấy: e9 STORY-01-05 chạm `notes-list` (11 trạng thái,
-    01-04 đã dựng) và dựng `note-editor` (7) — đo lại sau khi sửa lỗi
-    12/14/15, nó xong phần máy trong 72 lượt; gánh 18 thì bị chặn oan.
+    A later story touching an existing screen (adding a button) does not
+    carry that screen's full state count: e9 STORY-01-05 touches `notes-list`
+    (11 states, 01-04 already built) and builds `note-editor` (7) — after
+    fixing bugs 12/14/15 it finished machine part in 72 turns; carrying 18
+    would have blocked it falsely.
     """
     owners: dict[str, str] = {}
     for s in stories:
@@ -649,19 +655,20 @@ def story_size_defect(
     owned: dict[str, str] | None = None,
     fan_in: int = 0,
 ) -> Need | None:
-    """Story quá lớn cho **một phiên** — chẻ trước khi vào coding agent.
+    """Story too large for **one session** — split before entering coding agent.
 
-    Hai ngưỡng, và vượt **một trong hai** là chặn:
+    Two thresholds; exceeding **either** blocks:
 
-    * `story.max_screen_states` (P2-12, giữ nguyên): trạng thái màn hình
-      story dựng đầu tiên. Đo 2026-09-05 trên e9 — STORY-01-04 (dựng
-      `notes-list`) chạm `max_turns` ở lượt đầu và cần 8 lượt, $79,67.
-    * `story.max_complexity` (ADR-004 R5): điểm tổng hợp năm chiều, xem
-      `control/complexity.py` — chiều màn hình một mình bỏ sót story
-      không giao diện mà vẫn 61 lượt (e9 01-01, 9 đường dẫn, 7 tiêu chí).
+    * `story.max_screen_states` (P2-12, unchanged): screen states the story
+      builds first. Measured 2026-09-05 on e9 — STORY-01-04 (builds
+      `notes-list`) hit `max_turns` on the first turn and needed 8, $79.67.
+    * `story.max_complexity` (ADR-004 R5): composite five-dimension score,
+      see `control/complexity.py` — screen dimension alone misses non-UI
+      stories that still take 61 turns (e9 01-01, 9 paths, 7 criteria).
 
-    Điểm và cách chẻ đều **tất định**: cùng dữ liệu cho cùng kết luận, và
-    thông báo mang theo từng thành phần để người đọc kiểm lại được.
+    Score and split suggestion are both **deterministic**: same data yields
+    same conclusion, and the message includes each component so the reader
+    can verify.
     """
     cfg = config or Config(dict(DEFAULTS))
     exp = _experience(project)
@@ -700,7 +707,7 @@ def check_stories_executable(
     project: Path,
     config: Config | None = None,
 ) -> list[Preflight]:
-    """Chấm cả tập story. Cấp năng lực đọc một lần, dùng cho mọi story."""
+    """Score all stories. Reads provisioned capabilities once, reuses for all."""
     cfg = config or Config(dict(DEFAULTS))
     got = provisioned(Path(project), cfg)
     owned = screen_owners(stories)
@@ -714,13 +721,13 @@ def check_stories_executable(
 
 
 def _done_stories(project: Path) -> set[str]:
-    """Story đã `done`/`verified` theo sprint-status — không có thì rỗng."""
+    """Stories already `done`/`verified` per sprint-status — empty if none."""
     from .state import StateStore, StoryStatus
 
     root = project / "_bmad-output"
     try:
         st = StateStore(root).load()
-    except Exception:  # noqa: BLE001 — chưa có trạng thái thì không ai xong
+    except Exception:  # noqa: BLE001 — no state means no one is done
         return set()
     return {sid for sid, r in st.stories.items()
             if r.state in (StoryStatus.DONE, StoryStatus.VERIFIED)}

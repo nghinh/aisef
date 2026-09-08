@@ -1,17 +1,16 @@
-"""Hợp đồng thị giác — cầu nối giữa mockup và code.
+"""Visual contract -- the bridge between mockups and code.
 
-Mockup là thứ người nhìn; hợp đồng là thứ máy kiểm. Nó được trích từ
-**mockup đã dựng trong trình duyệt thật**, không đọc HTML bằng regex: cái
-người dùng thấy mới là cam kết, còn thẻ nằm trong HTML mà CSS ẩn đi thì
-không.
+A mockup is what people see; the contract is what the machine checks. It is
+extracted from **mockups rendered in a real browser**, not by parsing HTML
+with regex: what the user sees is the commitment; tags hidden by CSS are not.
 
-Hai chỗ dùng, và đó là lý do file này tồn tại:
+Two consumers, and they are the reason this file exists:
 
-* **cổng mockup (GĐ-5)** — mọi màn hình trong EXPERIENCE.md phải có mockup,
-  không còn chỗ nào tự khai là chưa chốt;
-* **bước map mockup (GĐ-6.7a)** — agent viết một story chỉ được nạp
-  ``slice_for(screen_id)``: đúng một màn hình. Nạp cả tệp thì nó sẽ dựng
-  luôn thứ không thuộc story mình.
+* **mockup gate (phase 5)** -- every screen in EXPERIENCE.md must have a
+  mockup, with no remaining self-declared unresolved items;
+* **map-mockup step (phase 6.7a)** -- an agent writing a story may only load
+  ``slice_for(screen_id)``: exactly one screen. Loading the full file would
+  cause it to build things outside its story's scope.
 """
 
 from __future__ import annotations
@@ -35,22 +34,24 @@ class ScreenContract:
     purpose: str = ""
     mockup: str = ""
     screenshot: str = ""
-    #: Khung giao diện — cam kết theo (vai trò, tên gọi).
+    #: UI skeleton -- committed by (role, name) pairs.
     components: list[Component] = field(default_factory=list)
-    #: Vai trò xuất hiện trong vùng dữ liệu mẫu. Ứng dụng thật hiển thị dữ
-    #: liệu khác, nên chỉ cam kết **có mặt**, không cam kết tên gọi.
+    #: Roles present in the sample-data region. The real app shows different
+    #: data, so we commit only to **presence**, not to specific names.
     data_roles: list[str] = field(default_factory=list)
     fields: list[dict] = field(default_factory=list)
     states: list[str] = field(default_factory=list)
-    #: Chỗ mockup tự khai là chưa chốt (`data-unresolved`). Còn mục nào thì
-    #: cổng chặn: dựng code theo một màn hình chưa chốt là làm lại hai lần.
+    #: Items the mockup self-declares as unresolved (`data-unresolved`). Any
+    #: remaining item blocks the gate: coding against an unresolved screen means
+    #: doing the work twice.
     unresolved: list[str] = field(default_factory=list)
-    #: Mockup không khai `data-state="primary"` → hợp đồng lấy **cả trang**.
-    #: Trang dựng nhiều trạng thái cạnh nhau thì cả trang không bao giờ khớp
-    #: một màn hình thật (e9 note-editor 2026-09-05: 32 component, 4 lần
-    #: "Thêm thẻ", story đốt $28 qua 4 lượt mà không thể qua cổng).
+    #: Mockup did not declare `data-state="primary"` -- contract covers the
+    #: **whole page**. A page rendering multiple states side by side never
+    #: matches a real single-state screen (e9 note-editor 2026-09-05: 32
+    #: components, 4x "Add tag", story burned $28 over 4 rounds and still
+    #: could not pass the gate).
     whole_page: bool = False
-    #: Số component trùng (vai trò, tên) đã gộp — dấu vết của nhiều trạng thái.
+    #: Number of duplicate (role, name) components merged -- a sign of multiple states.
     duplicates: int = 0
     error: str = ""
 
@@ -114,7 +115,7 @@ class DesignContract:
         }
 
     def slice_for(self, screen_id: str) -> dict | None:
-        """Lát cắt một màn hình — đầu vào của bước map mockup lúc viết code."""
+        """Single-screen slice -- input for the map-mockup step during coding."""
         screen = self.by_id(screen_id)
         return screen.as_dict() if screen else None
 
@@ -144,11 +145,12 @@ def build(
     *,
     artifact_root: Path | str = ".",
 ) -> DesignContract:
-    """Ghép danh sách màn hình (EXPERIENCE.md) với kết quả dựng mockup.
+    """Join the screen list (EXPERIENCE.md) with rendered mockup results.
 
-    Màn hình có trong EXPERIENCE.md mà chưa dựng được vẫn **có mặt** trong
-    hợp đồng, kèm lý do. Bỏ nó đi thì hợp đồng trông đầy đủ trong khi thực
-    tế thiếu một màn hình — đúng loại lỗi mà cổng sinh ra để bắt.
+    A screen present in EXPERIENCE.md but not yet rendered still **appears**
+    in the contract, with a reason. Dropping it would make the contract look
+    complete while a screen is actually missing -- exactly the kind of error
+    the gate exists to catch.
     """
     root = Path(artifact_root)
     contract = DesignContract()
@@ -184,9 +186,9 @@ def _one(screen: Screen, rendered, root: Path) -> ScreenContract:
     out.route = rendered.route
     out.mockup = _rel(root, rendered.html)
     out.screenshot = _rel(root, rendered.png)
-    # Một file mockup thường dựng nhiều trạng thái cạnh nhau, nhưng ứng
-    # dụng thật ở một thời điểm chỉ ở **một** trạng thái. Gộp hết thì không
-    # màn hình thật nào khớp nổi, và cổng đỏ vì lý do sai.
+    # A mockup file often renders multiple states side by side, but the real
+    # app shows only **one** state at a time. Merging all of them means no
+    # real screen can match, and the gate fails for the wrong reason.
     primary = getattr(rendered, "primary_snapshot", "") or rendered.snapshot
     everything = parse_aria_snapshot(primary)
     in_samples = [

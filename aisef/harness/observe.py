@@ -1,20 +1,21 @@
-"""Quan sát — sự kiện có cấu trúc, chi phí và độ trễ cho từng story.
+"""Observation — structured events, cost, and latency per story.
 
-Không có quan sát thì không có cách nào biết agent đang làm tốt hay đang
-lặng lẽ trôi. Nhưng "log" thôi thì chưa đủ: thứ cần là **bằng chứng máy
-đọc được**, vì hai chỗ khác nhau dựa vào nó:
+Without observation there is no way to tell whether the agent is doing well
+or silently drifting. But plain "logging" is not enough: what is needed is
+**machine-readable evidence**, because two different places depend on it:
 
-* cổng story hỏi "test đã xanh chưa, lint sạch chưa, mockup khớp chưa";
-* guard `completion` hỏi "có lần chạy test nào **sau** lần sửa file cuối
-  cùng không" — đó là cách chặn agent tuyên bố xong khi chưa chạy lại test.
+* the story gate asks "are tests green, lint clean, mockup matched";
+* the `completion` guard asks "was there a test run **after** the last file
+  edit" — that is how it blocks the agent from declaring done without re-running
+  tests.
 
-Vì thế mỗi sự kiện có ``seq`` tăng dần và ``at`` (mốc thời gian đơn điệu
-của tiến trình). So thứ tự bằng ``seq``, không bằng đồng hồ treo tường:
-file bằng chứng đi qua git giữa các máy.
+Therefore each event has a monotonically increasing ``seq`` and ``at``
+(process-monotonic timestamp). Compare ordering by ``seq``, not wall clock:
+the evidence file travels through git between machines.
 
-Một file một story, ghi nối thêm và nguyên tử: nhiều tiến trình (agent
-chạy tool, guard chạy trong hook) cùng ghi vào một story là chuyện bình
-thường khi chạy song song.
+One file per story, append-only and atomic: multiple processes (agent running
+tools, guard running in a hook) writing to the same story is normal under
+parallel execution.
 """
 
 from __future__ import annotations
@@ -29,18 +30,18 @@ from ..clients.stream import exit_status_of
 
 EVIDENCE_DIR = "evidence"
 
-#: Loại sự kiện. Danh sách đóng để nơi đọc không phải đoán.
-TOOL_RUN = "tool_run"          # chạy test/lint/sast/screenshot…
-FILE_CHANGE = "file_change"    # agent ghi file
-AGENT_RUN = "agent_run"        # một lượt gọi model
-GUARD_BLOCK = "guard_block"    # guard chặn một thao tác
-GUARD_SEEN = "guard_seen"      # hook tới được phiên này (ghi một lần mỗi story)
-GUARD_CHECK = "guard_check"    # mỗi lần guard chạy (cả cho qua lẫn chặn) — telemetry v0.4.0
-MOCKUP_MAP = "mockup_map"      # đối chiếu màn hình thật với mockup
+#: Event kinds. Closed set so readers don't have to guess.
+TOOL_RUN = "tool_run"          # ran test/lint/sast/screenshot...
+FILE_CHANGE = "file_change"    # agent wrote a file
+AGENT_RUN = "agent_run"        # one model invocation
+GUARD_BLOCK = "guard_block"    # guard blocked an operation
+GUARD_SEEN = "guard_seen"      # hook reached this session (recorded once per story)
+GUARD_CHECK = "guard_check"    # each guard run (pass or block) — telemetry v0.4.0
+MOCKUP_MAP = "mockup_map"      # real screen compared against mockup
 NOTE = "note"
-HANDOFF = "handoff"            # gói bàn giao: vai nào nhận slot nào, từ nguồn nào
-BEHAVIOR = "behavior"          # trạng thái một hành vi: verified | gap | reopened
-SKILL_USE = "skill_use"        # agent gọi skill trong phiên — quan sát, không chặn
+HANDOFF = "handoff"            # handoff package: which role receives which slot, from which source
+BEHAVIOR = "behavior"          # behavior status: verified | gap | reopened
+SKILL_USE = "skill_use"        # agent invoked a skill in the session — observe, don't block
 
 
 @dataclass
@@ -61,7 +62,7 @@ class Event:
 
 @dataclass
 class Evidence:
-    """Toàn bộ sự kiện của một story, đã đọc lên."""
+    """All events for a story, loaded from disk."""
 
     story_id: str
     events: list[Event] = field(default_factory=list)
@@ -74,7 +75,7 @@ class Evidence:
 
     @property
     def candidate(self) -> str:
-        """SHA ứng viên gần nhất mà bằng chứng trỏ tới (ADR-004 R1)."""
+        """Most recent candidate SHA the evidence points to (ADR-004 R1)."""
         for e in reversed(self.events):
             sha = str(e.detail.get("candidate") or "")
             if sha:
@@ -82,12 +83,13 @@ class Evidence:
         return ""
 
     def for_candidate(self, sha: str) -> "Evidence":
-        """Bằng chứng dùng được để chấm bản ``sha``.
+        """Evidence usable for grading build ``sha``.
 
-        Sự kiện ghi ở **bản khác** bị bỏ: nó nói về mã đã không còn. Sự
-        kiện **không** khai bản nào thì giữ — nó không phải bằng chứng gắn
-        ứng viên (guard tự ghi, tool người gõ tay, nhật ký cũ), và bỏ nó đi
-        sẽ làm cổng mù chứ không làm cổng nghiêm hơn.
+        Events recorded against a **different** build are dropped: they describe
+        code that no longer exists. Events with **no** candidate stamp are kept —
+        they are not candidate-bound evidence (guard self-records, manual tool
+        runs, legacy logs), and dropping them would blind the gate rather than
+        tighten it.
         """
         return Evidence(
             story_id=self.story_id,
@@ -109,27 +111,27 @@ class Evidence:
 
     @property
     def guard_reached(self) -> bool:
-        """Hook có tới được phiên của story này không — bất kỳ dấu vết guard
-        nào cũng đủ. Đo trên `par`: worktree không có `.claude/` và không
-        `--settings` → 0 dấu vết dù story chạy trọn; có `--settings` → có."""
+        """Whether the hook reached this story's session — any guard trace
+        suffices. Measured on `par`: worktree without `.claude/` and no
+        `--settings` -> 0 traces even if the story ran fully; with `--settings` -> present."""
         return bool(self.of(GUARD_SEEN) or self.of(GUARD_BLOCK) or self.of(FILE_CHANGE))
 
     @property
     def guard_blocks(self) -> list[Event]:
-        """Những lần guard chặn, do **chính guard** ghi — không phụ thuộc
-        client có phát luồng sự kiện hay không."""
+        """Guard blocks, recorded by **the guard itself** — independent of
+        whether the client emits an event stream."""
         return self.of(GUARD_BLOCK)
 
     def tests_green(self) -> bool:
-        """Lần chạy test gần nhất có xanh không."""
+        """Whether the most recent test run passed."""
         last = self.last(TOOL_RUN, "test")
         return bool(last and last.ok)
 
     def stale_since_last_test(self) -> list[str]:
-        """File đã sửa **sau** lần chạy test gần nhất.
+        """Files modified **after** the most recent test run.
 
-        Đây là câu hỏi mà guard `completion` cần: test xanh từ mười phút
-        trước không nói gì về đoạn code vừa viết xong.
+        This is the question the `completion` guard needs: a green test from ten
+        minutes ago says nothing about code just written.
         """
         last = self.last(TOOL_RUN, "test")
         after = 0 if last is None else last.seq
@@ -152,12 +154,12 @@ class Evidence:
 
 
 class EvidenceStore:
-    """Đọc/ghi ``evidence/{story}.jsonl``.
+    """Read/write ``evidence/{story}.jsonl``.
 
-    ``candidate`` là SHA của bản đang được kiểm: mọi sự kiện ghi qua kho
-    này đóng dấu bản ấy vào ``detail`` (ADR-004 R1). Đóng dấu ở đây, một
-    chỗ, thay vì bắt từng nơi gọi nhớ — nơi nào quên thì bằng chứng của nó
-    lặng lẽ hết gắn với bản nào.
+    ``candidate`` is the SHA of the build being verified: every event recorded
+    through this store stamps that build into ``detail`` (ADR-004 R1). Stamped
+    here, in one place, instead of requiring every caller to remember — any
+    caller that forgets silently produces evidence bound to no build.
     """
 
     def __init__(self, artifact_root: Path | str, *, candidate: str = ""):
@@ -168,16 +170,16 @@ class EvidenceStore:
         return self.root / f"{story_id}.jsonl"
 
     def record(self, story_id: str, event: Event) -> Event:
-        """Ghi nối thêm một sự kiện. `seq` do file quyết định, không do
-        người gọi — hai tiến trình cùng ghi vẫn ra thứ tự nhất quán."""
+        """Append one event. `seq` is determined by the file, not by the
+        caller — two processes writing concurrently still produce consistent ordering."""
         self.root.mkdir(parents=True, exist_ok=True)
         path = self.path(story_id)
 
         event.at = event.at or time.time()
         if self.candidate and not event.detail.get("candidate"):
             event.detail = {**event.detail, "candidate": self.candidate}
-        # Mở chế độ nối thêm rồi ghi một dòng: ghi một dòng ngắn dưới
-        # PIPE_BUF là nguyên tử trên POSIX, nên không cần khoá riêng.
+        # Open in append mode and write one line: a short line under PIPE_BUF
+        # is atomic on POSIX, so no separate lock is needed.
         with path.open("a", encoding="utf-8") as fh:
             event.seq = self._next_seq(path)
             fh.write(json.dumps(event.as_dict(), ensure_ascii=False) + "\n")
@@ -221,7 +223,7 @@ class EvidenceStore:
             try:
                 data = json.loads(line)
             except json.JSONDecodeError:
-                continue  # một dòng hỏng không được làm mất cả tệp bằng chứng
+                continue  # one corrupt line must not lose the entire evidence file
             if not isinstance(data, dict):
                 continue
             ev.events.append(
@@ -245,7 +247,7 @@ class EvidenceStore:
             return []
         return sorted(p.stem for p in self.root.glob("*.jsonl"))
 
-    # ------------------------------------------------------------ tiện ích
+    # ------------------------------------------------------------ utilities
 
     def tool_run(
         self,
@@ -264,9 +266,9 @@ class EvidenceStore:
 
     def handoff(self, story_id: str, *, frm: str, to: str, attempt: int,
                 slots: dict[str, tuple[str, int]]) -> Event:
-        """Gói bàn giao cho một vai: slot nào, từ nguồn nào, bao nhiêu ký tự.
-        Trả lời được "người rà soát đã thấy gì" từ đĩa — và cho máy kiểm bất
-        biến: gói cho reviewer/security không có lời của developer."""
+        """Handoff package for a role: which slot, from which source, how many chars.
+        Answers "what did the reviewer see" from disk — and lets the machine check
+        invariants: a reviewer/security package must not contain the developer's words."""
         return self.record(
             story_id,
             Event(kind=HANDOFF, name=f"{frm}->{to}",
@@ -276,12 +278,12 @@ class EvidenceStore:
 
     def behavior(self, story_id: str, *, id: str, status: str, candidate: str = "",
                  source: dict | None = None, prev: str = "") -> Event:
-        """Trạng thái một hành vi, do một pha *kết luận* được (rà soát chỉ ra
-        gap, cổng bảo toàn thấy hồi quy).
+        """Status of a behavior, concluded by a phase (review identified a gap,
+        preservation gate detected a regression).
 
-        Sổ hành vi (`control/ledger.py`) đọc cả sự kiện này lẫn suy từ bằng
-        chứng cũ — nên ghi ở đây là **thêm nguồn**, không phải nguồn duy
-        nhất, và không ghi cũng không mất gì đã đo được.
+        The behavior ledger (`control/ledger.py`) reads both this event and
+        inferences from prior evidence — so recording here **adds a source**,
+        not the only source, and omitting it loses nothing already measured.
         """
         return self.record(
             story_id,
@@ -299,8 +301,8 @@ class EvidenceStore:
 
     def agent_run(self, story_id: str, result, *, name: str = "", prompt_chars: int = 0,
                   skills: dict | None = None, role: str = "", model: str = "") -> Event:
-        """Ghi lại một lượt gọi model từ `RunResult` — chi phí và độ trễ
-        lấy từ luồng client, không tự đoán."""
+        """Record one model invocation from `RunResult` — cost and latency
+        taken from the client stream, not estimated."""
         return self.record(
             story_id,
             Event(
@@ -318,19 +320,19 @@ class EvidenceStore:
                 detail={
                     "session_id": result.session_id,
                     "turns": result.num_turns,
-                    # Kích thước ngữ cảnh nạp — đo thật, thay cho knob
-                    # `story.max_context_tokens` chưa từng có mã đọc.
+                    # Loaded context size — measured, replacing the knob
+                    # `story.max_context_tokens` which was never read by any code.
                     "prompt_chars": prompt_chars,
                     "guard_blocked": result.guard_blocked,
-                    # Cờ không nói được guard nào chặn vì gì. Thiếu chỗ
-                    # này thì lần sau lại phải đi mò nhật ký phiên.
+                    # The flag alone doesn't say which guard blocked or why.
+                    # Without this field, next time requires digging through session logs.
                     "guard_messages": list(result.guard_messages)[:5],
                     "permission_limited": result.permission_limited,
                     "error": result.error,
-                    # Kết cục chuẩn hoá (ADR-005 V11 B) — `aisef status` đếm
-                    # theo khoá này, không phải dò lại chuỗi `error`.
+                    # Normalized exit status (ADR-005 V11 B) — `aisef status` counts
+                    # by this key, not by re-parsing the `error` string.
                     "exit_status": exit_status_of(result),
-                    # Skill được mời / được mở — đo, không đoán (ADR-003 #1).
+                    # Skills invited / opened — measured, not guessed (ADR-003 #1).
                     "skills": skills or {},
                     "role": role,
                     "model": model,

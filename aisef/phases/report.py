@@ -1,19 +1,20 @@
-"""Báo cáo nghiệm thu — gom bằng chứng đã có, không kể lại.
+"""Acceptance report — aggregate existing evidence, do not narrate.
 
-Mọi con số ở đây đọc từ artifact và bằng chứng trên đĩa. Không mục nào
-được viết bằng tay, vì một báo cáo nghiệm thu viết tay chỉ chứng minh
-người viết tin là mình đúng.
+Every figure here is read from artifacts and on-disk evidence. Nothing is
+written by hand, because a hand-written acceptance report only proves the
+author believes they are correct.
 
-Năm phần, đúng năm câu hỏi người duyệt hỏi:
+Five sections, answering the five questions a reviewer asks:
 
-* **Truy vết** — mỗi yêu cầu trong PRD đi tới story nào, story đó động vào
-  file nào, và có test không.
-* **Chất lượng** — cổng nào đạt, loại kiểm định nào đã chạy.
-* **Vận hành** — mỗi story tốn bao nhiêu tiền, bao lâu, mấy lượt.
-* **Harness** — sáu nhóm có bằng chứng chạy thật hay chưa.
-* **Cải tiến** — sổ hành vi (`control/ledger.py`): năng lực đã xác minh,
-  hồi quy, gap đã đóng, cải thiện biên. Đây là câu hỏi cổng story không
-  trả lời được, vì cổng chấm **một** story ở **một** thời điểm.
+* **Traceability** — which PRD requirement maps to which story, which files
+  does that story touch, and is there a test.
+* **Quality** — which gates passed, which check types were run.
+* **Operations** — per-story cost, duration, and number of runs.
+* **Harness** — do the six groups have real execution evidence.
+* **Improvement** — behavior ledger (`control/ledger.py`): verified
+  capabilities, regressions, closed gaps, marginal improvement. This is the
+  question story gates cannot answer, since a gate scores **one** story at
+  **one** point in time.
 """
 
 from __future__ import annotations
@@ -38,12 +39,12 @@ from ..harness.observe import AGENT_RUN, HANDOFF, MOCKUP_MAP, TOOL_RUN, Evidence
 
 
 def mockup_cell(maps) -> str:
-    """Ô "Map mockup" của một story: **kết quả mới nhất của từng màn hình**.
+    """Mockup-map cell for a story: **latest result per screen**.
 
-    Trước 2026-09-05 ô này đòi *mọi* lần đối chiếu từng đạt — story qua cổng
-    ở lượt cuối vẫn bị ✗ vì các lượt trước trượt (e9 STORY-01-05: done, map
-    3/3 ở lượt cuối, báo cáo ghi ✗). Lịch sử nằm ở evidence; báo cáo nói
-    trạng thái hiện tại.
+    Before 2026-09-05 this cell required *every* comparison to have passed —
+    a story that passed the gate on its final run still showed ✗ because
+    earlier runs failed (e9 STORY-01-05: done, map 3/3 on last run, report
+    showed ✗). History lives in evidence; the report states current status.
     """
     if not maps:
         return "✗"
@@ -65,7 +66,7 @@ class Row:
         return bool(self.stories)
 
 
-#: Bằng chứng không thuộc về story nào: pha lập kế hoạch và dựng mockup.
+#: Evidence not belonging to any story: planning and mockup phases.
 PHASE_PREFIXES = ("plan-", "mockup-")
 
 
@@ -77,13 +78,13 @@ class Report:
     stories: list[dict] = field(default_factory=list)
     phases: list[dict] = field(default_factory=list)
     harness: dict[str, str] = field(default_factory=dict)
-    #: Kết quả cổng trước triển khai, nếu đã chấm.
+    #: Pre-deploy gate result, if evaluated.
     pre_deploy: dict = field(default_factory=dict)
     total_cost_usd: float = 0.0
-    #: Số của sổ hành vi (ADR-004 R2/R7) — chiếu từ cùng bằng chứng.
+    #: Behavior ledger metrics (ADR-004 R2/R7) — projected from the same evidence.
     ledger: dict = field(default_factory=dict)
-    #: Bảng chứng nhận mục cổng story (ADR-005 V9): tên → control đã có.
-    #: Rỗng khi không có `tests/` (bản cài từ wheel) — in `?`, không in 0.
+    #: Story gate qualification table (ADR-005 V9): check name -> controls present.
+    #: Empty when `tests/` is absent (wheel install) — prints `?`, not 0.
     qualification: dict = field(default_factory=dict)
 
     @property
@@ -101,8 +102,8 @@ class Report:
             "| Requirement | Title | Covering Story | Test Evidence |",
             "|---|---|---|---|",
         ]
-        # Phạm vi nghiệm thu (pre-deploy --epic, QĐ C-a): yêu cầu chỉ có story
-        # ngoài phạm vi thì nói "ngoài phạm vi", không phải "—" (chưa có gì).
+        # Acceptance scope (pre-deploy --epic, decision C-a): requirements whose
+        # only stories are out of scope show "out of scope", not "—" (nothing yet).
         ngoai = set((self.pre_deploy.get("scope") or {}).get("outside") or [])
         for row in self.traceability:
             if row.tested:
@@ -150,8 +151,8 @@ class Report:
 
         lines += ["", f"**Total Cost:** ${self.total_cost_usd:.2f}"]
 
-        # Cổng story chấm được bao nhiêu mục là **đã chứng nhận** (positive ·
-        # negative · env) — đọc từ bảng test, không phải "cổng N điều kiện" kể.
+        # How many gate checks are **fully qualified** (positive · negative · env)
+        # — read from the test table, not from "gate has N conditions" counting.
         du = sum(all(v.values()) for v in self.qualification.values())
         tong = len(self.qualification) or len(CHECK_NAMES)
         lines += ["", f"**Story Gate:** gate checks with all 3 controls: "
@@ -181,8 +182,8 @@ class Report:
                 ]
             lines += ["| Check | Result |", "|---|---|"]
             for c in self.pre_deploy.get("checks", []):
-                # Dấu theo **kết cục**, không theo "không chặn": mục – không áp
-                # dụng hay ◇ miễn mà in ✅ là tự khai đạt thứ chưa kiểm.
+                # Mark by **outcome**, not by "non-blocking": printing ✅ for a
+                # not-applicable or exempted item would self-certify an unchecked pass.
                 try:
                     mark = Outcome(str(c.get("outcome") or "")).mark
                 except ValueError:
@@ -199,11 +200,11 @@ class Report:
         return "\n".join(lines) + "\n"
 
     def _ledger_section(self) -> list[str]:
-        """Phần 5 — cải tiến liên tục (ADR-004 R7).
+        """Section 5 — continuous improvement (ADR-004 R7).
 
-        Bốn số, tất cả chiếu từ cùng bằng chứng của phần 3: năng lực đã xác
-        minh tăng bao nhiêu, bao nhiêu cái từng đúng rồi hỏng, bao nhiêu gap
-        đã đóng, và mỗi đô la mua được bao nhiêu hành vi ròng.
+        Four metrics, all projected from the same evidence as section 3: how
+        many verified capabilities grew, how many previously-passing ones
+        regressed, how many gaps were closed, and net behaviors per dollar.
         """
         m = self.ledger
         if not m:
@@ -245,8 +246,8 @@ class Report:
 
 
 def build(project: Path | str) -> Report:
-    # `resolve()` vì hàm này gọi được thẳng từ mã khác, không chỉ qua CLI
-    # (nơi đường dẫn đã được tuyệt đối hoá ở cửa vào).
+    # `resolve()` because this function can be called directly from other code,
+    # not only via CLI (where the path is already absolute at the entry point).
     project = Path(project).resolve()
     root = project / "_bmad-output"
     report = Report(project=project.name)
@@ -307,8 +308,8 @@ def build(project: Path | str) -> Report:
         report.stories.append({
             "id": sid,
             "status": record.status if record else "?",
-            # Bản mà bằng chứng của story trỏ vào (ADR-004 R1) — không có
-            # thì báo cáo phải nói là không có, không im lặng.
+            # Commit the story's evidence points to (ADR-004 R1) — if absent
+            # the report must say so explicitly, not stay silent.
             "candidate": ev.candidate[:7],
             "runs": len(ev.of(AGENT_RUN)),
             "cost": ev.total_cost_usd,
@@ -336,15 +337,16 @@ def build(project: Path | str) -> Report:
 
 
 def _behavior_cell(led, sid: str) -> str:
-    """Ô "Hành vi": `V/G/R` của story. `R > 0` là thứ báo cáo cũ không nói
-    được — story qua cổng mà vẫn để lại một hành vi từng đúng nay hỏng."""
+    """Behavior cell: `V/G/R` for a story. `R > 0` is what the old report
+    could not express — a story that passed the gate yet left a previously-
+    passing behavior now broken."""
     v, g, r = led.counts_for(sid)
     return "—" if not (v or g or r) else f"{v}/{g}/{r}"
 
 
 def _ac_cell(sid: str, n: int, ev) -> str:
-    """`k/n` tiêu chí có test mang mã, từ lần test xanh cuối. Không đọc
-    được tên test thì `?/n` — chưa biết, không phải đủ."""
+    """`k/n` acceptance criteria with coded tests, from the last green test run.
+    If test names cannot be read: `?/n` — unknown, not sufficient."""
     from ..control.acceptance import missing as ac_missing
 
     if n <= 0:
@@ -367,7 +369,7 @@ def _read_index(root: Path) -> dict:
 
 
 def _harness_evidence(project: Path, root: Path, evidence: EvidenceStore) -> dict[str, str]:
-    """Sáu nhóm harness — mỗi nhóm phải chỉ ra được một artifact có thật."""
+    """Six harness groups — each must point to a real artifact."""
     from ..harness.prompts import load_catalog
 
     any_story = [s for s in evidence.stories() if not s.startswith(PHASE_PREFIXES)]
@@ -403,10 +405,10 @@ def _harness_evidence(project: Path, root: Path, evidence: EvidenceStore) -> dic
 
 
 def _isolation_note(ev) -> str:
-    """Mức cách ly **quan sát được**, không phải mức mong muốn.
+    """**Observed** isolation level, not the desired one.
 
-    Báo "có sandbox" khi thực tế chạy thẳng trên máy là đúng loại tự khai
-    mà cả framework này sinh ra để chống.
+    Reporting "sandboxed" when execution actually ran directly on the host is
+    exactly the kind of self-certification this framework exists to prevent.
     """
     if ev is None:
         return "no evidence"

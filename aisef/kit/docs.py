@@ -1,11 +1,11 @@
-"""Tra tài liệu thư viện **theo yêu cầu** (luật 12: không bịa tên API, không
-chắc thì tra) — qua HTTP API của context7, không MCP thường trú.
+"""Look up library documentation **on demand** (rule 12: do not fabricate API
+names; when unsure, look it up) -- via the context7 HTTP API, no resident MCP.
 
-Đo 2026-09-05: `GET https://context7.com/api/v1/search?query=vitest` trả
-`results[].id` (`/vitest-dev/vitest`); `GET /api/v1/<id>?type=txt&topic=…&tokens=…`
-trả văn bản tài liệu kèm nguồn. Không cần khoá cho mức dùng này. Kết quả
-được cache ở `~/.cache/aisef/docs/` để lần sau (và phiên agent sau) không
-gọi mạng lại; agent mở bằng lệnh `aisef doc <gói> --topic <chủ đề>`.
+Measured 2026-09-05: `GET https://context7.com/api/v1/search?query=vitest`
+returns `results[].id` (`/vitest-dev/vitest`); `GET /api/v1/<id>?type=txt&topic=...&tokens=...`
+returns documentation text with sources. No key needed at this usage level.
+Results are cached at `~/.cache/aisef/docs/` so subsequent calls (and later
+agent sessions) skip the network; agents invoke via `aisef doc <pkg> --topic <topic>`.
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ def cache_root() -> Path:
 
 @dataclass
 class Doc:
-    library: str        # id context7, ví dụ `/vitest-dev/vitest`
+    library: str        # context7 id, e.g. `/vitest-dev/vitest`
     title: str
     topic: str
     text: str
@@ -47,7 +47,7 @@ class DocError(RuntimeError):
 
 
 def _get(url: str, fetch=None) -> str:
-    """Tải văn bản; `fetch` để test thay bằng hàm giả."""
+    """Fetch text; `fetch` allows tests to substitute a fake."""
     if fetch is not None:
         return fetch(url)
     req = urllib.request.Request(url, headers={"User-Agent": "aisef"})
@@ -68,7 +68,7 @@ def _pick(package: str, results: list[dict]) -> dict:
     if not results:
         raise DocError(f"no documentation found for `{package}`")
     p = package.lower()
-    for r in results:  # ưu tiên khớp tên đúng
+    for r in results:  # prefer exact name match
         rid = str(r.get("id", "")).lower()
         if rid.endswith("/" + p) or str(r.get("title", "")).lower() == p:
             return r
@@ -77,7 +77,7 @@ def _pick(package: str, results: list[dict]) -> dict:
 
 def lookup(package: str, topic: str = "", *, tokens: int = DEFAULT_TOKENS, fetch=None,
            root: Path | None = None) -> Doc:
-    """Tra tài liệu một gói (kèm chủ đề). Cache trước, mạng sau."""
+    """Look up documentation for a package (with topic). Cache first, network second."""
     root = root or cache_root()
     key = hashlib.sha256(f"{package}|{topic}|{tokens}".encode()).hexdigest()[:16]
     cached = root / f"{_slug(package)}__{_slug(topic) or 'all'}__{key}.json"

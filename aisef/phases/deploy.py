@@ -1,16 +1,18 @@
-"""Bước 6 — DevSecOps: cổng trước triển khai và bộ khung vận hành.
+"""Phase 6 -- DevSecOps: pre-deploy gate and operational scaffolding.
 
-Chia đúng theo nguyên tắc gốc:
+Split according to the core principle:
 
-* **Cần đảm bảo → viết code.** Cổng trước triển khai và quy trình CI là
-  những thứ có đáp án đúng: mọi story đã xong chưa, bộ kiểm định đã chạy
-  đủ chưa, cổng nào chưa có người duyệt. Không hỏi model.
-* **Cần phán đoán → giao model.** Dockerfile cho stack này, manifest triển
-  khai, runbook cho hệ này — mỗi dự án một khác. Model viết, rồi **kiểm
-  bằng code**: image có build được không, runbook có đủ bốn mục không.
+* **Must be guaranteed -> write code.** The pre-deploy gate and CI workflow
+  have deterministic answers: are all stories done, has the verification
+  suite run fully, which gates lack approval. No model needed.
+* **Needs judgment -> delegate to model.** Dockerfile for this stack,
+  deploy manifests, runbook for this system -- each project differs.
+  Model writes, then **verify with code**: does the image build, does the
+  runbook have all four required sections.
 
-Runbook bị kiểm bốn mục vì một runbook thiếu mục "leo thang" chỉ hữu ích
-với người đã biết phải gọi ai — tức là người không cần runbook.
+The runbook is checked for four sections because a runbook missing the
+"escalation" section is only useful to someone who already knows whom to
+call -- i.e. the person who does not need the runbook.
 """
 
 from __future__ import annotations
@@ -34,13 +36,13 @@ from .qa import QaReport, run_suite
 
 CI_PATH = ".github/workflows/aisef.yml"
 
-#: Cách CI cài framework. Để người dùng đổi được khi họ phát hành nội bộ
-#: hoặc dùng bản từ git.
-INSTALL_SPEC = "aisef"          # tên gói PyPI; module/lệnh vẫn `aisef`
+#: How CI installs the framework. User-configurable for internal releases
+#: or git-based installs.
+INSTALL_SPEC = "aisef"          # PyPI package name; module/command stays `aisef`
 RUNBOOK_PATH = "docs/RUNBOOK.md"
 
-#: Bốn mục một runbook phải có. Thiếu mục nào cũng làm nó vô dụng đúng lúc
-#: cần nhất — lúc 3 giờ sáng, với người trực chưa từng đọc hệ này.
+#: Four required runbook sections. Missing any one renders it useless exactly
+#: when needed most -- at 3 AM, by the on-call who has never read this system.
 RUNBOOK_SECTIONS = ("symptoms", "diagnosis", "remediation", "escalation")
 _RUNBOOK_VI = {"triệu chứng": "symptoms", "chẩn đoán": "diagnosis",
                "xử lý": "remediation", "leo thang": "escalation"}
@@ -50,15 +52,15 @@ _RUNBOOK_VI = {"triệu chứng": "symptoms", "chẩn đoán": "diagnosis",
 class PreDeployReport:
     checks: list[Check] = field(default_factory=list)
     qa: QaReport | None = None
-    #: Lý do chấp nhận suy biến, nếu có — là bằng chứng của cổng, nên ghi
-    #: ra đĩa cùng kết quả chứ không chỉ nằm trong cấu hình.
+    #: Reason for accepting degraded runs, if any -- gate evidence, so it is
+    #: persisted alongside results, not only kept in config.
     degraded_waiver: str = ""
-    #: Phạm vi nghiệm thu khi chấm `--epic E` (QĐ C-a 2026-09-06): story
-    #: trong/ngoài phạm vi, để người ký biết mình nghiệm thu **cái gì**.
-    #: `None` = cả kế hoạch, như trước.
+    #: Acceptance scope when scoring `--epic E` (decision C-a 2026-09-06):
+    #: stories in/out of scope, so the signer knows what they are accepting.
+    #: `None` = entire plan, as before.
     scope: dict | None = None
-    #: Loại kiểm định được miễn kèm lý do người khai — bằng chứng của cổng,
-    #: nên ghi ra đĩa cùng kết quả như `degraded_waiver`.
+    #: Verification kinds explicitly waived with the declarer's reason -- gate
+    #: evidence, persisted alongside results like `degraded_waiver`.
     waivers: dict = field(default_factory=dict)
 
     @property
@@ -71,16 +73,16 @@ class PreDeployReport:
             "checks": [c.as_dict() for c in self.checks],
             "qa": None if self.qa is None else {
                 "release_ready": self.qa.release_ready,
-                # Bản mà bộ kiểm định cấp dự án đã chạy trên đó (ADR-004 R1).
+                # Candidate SHA the project-level verification suite ran on (ADR-004 R1).
                 "candidate": self.qa.candidate,
-                # Cây đã chạy: worktree sạch từ SHA (ADR-005 V6) hay cây agent —
-                # người ký cổng phải thấy được mức bảo đảm này.
+                # Tree used for verification: clean worktree from SHA (ADR-005 V6)
+                # or agent tree -- gate signer must see this assurance level.
                 "tree": self.qa.tree,
                 "clean_tree": self.qa.clean_tree,
                 "failed": [r.kind.id for r in self.qa.failed],
                 "unconfigured": [r.kind.id for r in self.qa.unconfigured],
                 "degraded": [r.kind.id for r in self.qa.degraded],
-                # Tên bảo đảm thiếu theo loại — người ký waiver biết mình nhận gì.
+                # Missing guarantees per kind -- waiver signer knows what they accept.
                 "missing": {r.kind.id: list(r.missing) for r in self.qa.degraded},
                 "fake_tests": self.qa.fake_tests,
             },
@@ -90,8 +92,8 @@ class PreDeployReport:
         }
 
     def write(self, artifact_root: Path | str) -> Path:
-        """Ghi kết quả ra đĩa — đây là thứ người đọc trước khi ký cổng
-        `pre-deploy`, và là nội dung phê duyệt gắn vào."""
+        """Persist results to disk -- this is what the signer reads before
+        approving the `pre-deploy` gate, and is attached to the approval."""
         import json
 
         path = Path(artifact_root) / PRE_DEPLOY_REPORT
@@ -112,9 +114,9 @@ class PreDeployReport:
 
 
 def _isolation_check(report: PreDeployReport, cfg: Config) -> Check:
-    """Kiểm định có chạy trong Docker không, và nếu không thì có được phép không.
-    Suy biến nêu **tên bảo đảm thiếu** (ADR-005 V5) — "ngoài Docker" chưa
-    nói người ký waiver đang chấp nhận mất gì."""
+    """Check whether verification ran inside Docker, and if not whether that
+    is permitted.  Degraded runs name **missing guarantees** (ADR-005 V5) --
+    "outside Docker" alone does not tell the waiver signer what they accept."""
     degraded = report.qa.degraded if report.qa else []
     if not degraded:
         if report.qa and not any(r.ran for r in report.qa.results):
@@ -156,21 +158,22 @@ def check_runbook(path: Path) -> Check:
 
 
 def _planned_but_never_run(artifact_root: Path, registered: set[str]) -> list[str]:
-    """Mã story trong `stories.index.json` không có bản ghi trạng thái nào."""
+    """Story IDs in `stories.index.json` that have no state record at all."""
     from .run import load_plan
 
     plan = load_plan(artifact_root)
     if plan.error:
-        return []  # không có kế hoạch đọc được thì không kết luận gì thêm
+        return []  # no readable plan -- cannot draw further conclusions
     return [sid for sid in plan.stories if sid not in registered]
 
 def _scope(report: PreDeployReport, artifact_root: Path, epic: str) -> set[str]:
-    """Phạm vi nghiệm thu = story của **một** epic trong kế hoạch (QĐ C-a
-    2026-09-06). Story ngoài phạm vi không được chấm: không "xong", không
-    "thiếu" — và được nêu tên, vì người ký phải biết mình nghiệm thu cái gì.
-    Không phải nới cổng: mọi mục khác chấm y nguyên, chỉ tập story là khai
-    tường minh. Phạm vi ghi vào báo cáo → băm phê duyệt `pre-deploy` đổi
-    theo, nên duyệt cho EPIC-01 không dùng lại được cho cả kế hoạch."""
+    """Acceptance scope = stories of **one** epic in the plan (decision C-a
+    2026-09-06).  Stories outside scope are not scored: not "done", not
+    "missing" -- and are named, because the signer must know what they accept.
+    This does not relax the gate: all other checks score identically; only the
+    story set is explicitly declared.  Scope is written into the report, so
+    the `pre-deploy` approval hash changes accordingly -- approving EPIC-01
+    cannot be reused for the entire plan."""
     from .run import load_plan
 
     plan = load_plan(artifact_root)
@@ -195,12 +198,12 @@ def _scope(report: PreDeployReport, artifact_root: Path, epic: str) -> set[str]:
 
 
 def _waiver_check(report: PreDeployReport, cfg: Config) -> Check | None:
-    """Loại kiểm định miễn ở `verify.waived` phải có lý do ở
-    `verify.waiver_reason` (phạm vi, ngày, người ký) — miễn không lý do
-    không phải bằng chứng. Kết cục là ◇ WAIVED, không phải ✅: loại ấy
-    **không** được kiểm, chỉ được người nhận trách nhiệm (QĐ5 2026-09-06:
-    `mutation` của e9 UNRUNNABLE ở môi trường nghiệm thu, không cài thêm
-    công cụ để làm đẹp)."""
+    """Verification kinds waived at `verify.waived` must have a reason at
+    `verify.waiver_reason` (scope, date, signer) -- a waiver without a
+    reason is not evidence.  Outcome is WAIVED, not PASSED: that kind was
+    **not** verified, only accepted by the responsible party (decision 5
+    2026-09-06: e9 `mutation` UNRUNNABLE in acceptance environment, no
+    extra tooling installed just for optics)."""
     waived = list(report.qa.waived) if report.qa else []
     if not waived:
         return None
@@ -224,8 +227,8 @@ def pre_deploy(
     skip_qa: bool = False,
     epic: str = "",
 ) -> PreDeployReport:
-    """Chấm cổng trước triển khai — chỉ đọc trạng thái, không sửa gì.
-    `epic` khai phạm vi nghiệm thu (xem `_scope`); rỗng = cả kế hoạch."""
+    """Score the pre-deploy gate -- read-only, changes nothing.
+    `epic` declares acceptance scope (see `_scope`); empty = entire plan."""
     project = Path(project)
     artifact_root = project / "_bmad-output"
     cfg = config or Config.load(project)
@@ -238,17 +241,17 @@ def pre_deploy(
         report.checks.append(Check(
             "story", False, "no stories have run" + (f" in {epic}" if epic else "")))
     else:
-        # Triển khai là triển khai nhánh chính. `verified` là qua cổng mà
-        # chưa merge (G12) — với cổng này nó chưa xong, và phải được gọi
-        # tên riêng: "chưa xong" và "xong nhưng kẹt merge" cần hai cách sửa.
+        # Deploy means deploying the main branch. `verified` = passed gate but
+        # not merged (G12) -- for this gate it is not done, and must be named
+        # separately: "not done" and "done but stuck on merge" need different fixes.
         chua_merge = [r.id for r in records if r.state is StoryStatus.VERIFIED]
         not_done = [
             r.id for r in records
             if r.state not in (StoryStatus.DONE, StoryStatus.VERIFIED)
         ]
-        # Story có trong kế hoạch mà chưa từng được đăng ký thì không "xong":
-        # e9 2026-09-05, 01-06/01-07 chưa chạy bao giờ mà cổng ghi ✅ vì chỉ
-        # đếm bản ghi trạng thái. Chưa chạy ≠ đạt.
+        # Stories in the plan that were never registered are not "done":
+        # e9 2026-09-05, 01-06/01-07 never ran yet gate showed pass because
+        # it only counted state records.  Never ran != passed.
         chua_chay = [
             sid for sid in _planned_but_never_run(artifact_root, set(state.stories))
             if inside is None or sid in inside
@@ -285,11 +288,11 @@ def pre_deploy(
                 "" if report.qa.release_ready else "see details below",
             )
         )
-        # Quyết định 2026-09-05: cổng trước triển khai **không** chấp nhận
-        # kiểm định chạy ngoài Docker, trừ khi có lý do khai tường minh —
-        # và lý do ấy ghi vào báo cáo cổng, vì đó là bằng chứng người ký
-        # cổng phải nhìn thấy. Bộ kiểm định vẫn chạy (suy biến) để người
-        # đọc có kết quả; chỉ phán quyết là khác.
+        # Decision 2026-09-05: the pre-deploy gate does **not** accept
+        # verification runs outside Docker, unless an explicit reason is
+        # declared -- and that reason is recorded in the gate report as
+        # evidence the signer must see.  The verification suite still runs
+        # (degraded) so readers have results; only the verdict differs.
         report.checks.append(_isolation_check(report, cfg))
         mien = _waiver_check(report, cfg)
         if mien is not None:
@@ -318,16 +321,15 @@ def write_ci_workflow(
     aisef_bin: str = "aisef",
     install_spec: str = INSTALL_SPEC,
 ) -> Path:
-    """Sinh quy trình CI nối đúng các cổng đã có.
+    """Generate a CI workflow that wires up the existing gates.
 
-    CI chạy lại **cùng bộ lệnh** người chạy trên máy mình. Viết một quy
-    trình riêng cho CI là cách chắc chắn để hai bên trôi khỏi nhau, rồi
-    "chạy được trên máy tôi" thành một cuộc tranh luận thay vì một sự thật
-    kiểm được.
+    CI reruns **the same commands** the developer runs locally.  Writing a
+    separate workflow for CI is a sure way for the two to drift apart, and
+    then "works on my machine" becomes a debate instead of a verifiable fact.
 
-    ``aisef_bin`` mặc định là tên lệnh trên PATH, **không** phải đường
-    dẫn tuyệt đối của máy sinh ra tệp: đường ấy không tồn tại trên máy
-    chạy CI, và quy trình hỏng ngay bước đầu.
+    ``aisef_bin`` defaults to the command name on PATH, **not** the
+    absolute path of the machine that generated the file: that path does
+    not exist on CI runners, and the workflow breaks at the first step.
     """
     path = Path(project) / CI_PATH
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -394,7 +396,7 @@ _SECTION = re.compile(r"^#{1,3}\s+(.+?)\s*$", re.MULTILINE)
 
 
 def build_prompt(project: Path, stack_summary: str) -> str:
-    """Prompt cho phần model viết: Dockerfile, IaC, quan sát, runbook."""
+    """Prompt for the model-written part: Dockerfile, IaC, observability, runbook."""
     from ..harness.prompts import load_catalog
 
     return load_catalog().get("devsecops").render({
@@ -421,8 +423,9 @@ class DevSecOpsReport:
     def summary(self) -> str:
         if self.error:
             return f"devsecops: ✗ {self.error}"
-        # Đếm cả quy trình CI: nó cũng là một tạo tác sinh ra, và in "sinh
-        # 2" rồi liệt kê 3 dòng làm người đọc nghi ngờ cả phần còn lại.
+        # Count the CI workflow too: it is also a generated artifact, and
+        # printing "generated 2" then listing 3 lines makes readers doubt
+        # the rest of the output.
         n = len(self.generated) + (1 if self.ci_path else 0)
         lines = [f"devsecops: generated {n} artifacts"]
         if self.ci_path:
@@ -436,7 +439,7 @@ class DevSecOpsReport:
         return "\n".join(lines)
 
 
-#: Tạo tác bắt buộc phải có sau khi chạy. Kiểm bằng code, không tin lời khai.
+#: Required artifacts after a run. Verified by code, not by self-report.
 REQUIRED_ARTIFACTS = ("Dockerfile", RUNBOOK_PATH)
 
 
@@ -449,12 +452,13 @@ def generate(
     install_spec: str = INSTALL_SPEC,
     force: bool = False,
 ) -> DevSecOpsReport:
-    """Sinh quy trình CI (bằng code) và bộ khung vận hành (bằng model)."""
+    """Generate CI workflow (by code) and operational scaffolding (by model)."""
     from ..kit.detect_stack import detect_file
 
-    # `resolve()`: prompt dùng `project.name`, và `Path(".").name` là
-    # chuỗi rỗng. CLI đã tuyệt đối hoá ở cửa vào, nhưng hàm này gọi được
-    # thẳng từ mã khác — chỗ duy nhất cần `.name` thì tự lo lấy.
+    # `resolve()`: prompt uses `project.name`, and `Path(".").name` is the
+    # empty string. CLI already resolves at entry, but this function can be
+    # called directly from other code -- the one place that needs `.name`
+    # handles it itself.
     project = Path(project).resolve()
     cfg = config or Config.load(project)
     report = DevSecOpsReport()

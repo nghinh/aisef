@@ -1,36 +1,36 @@
-"""Điểm cỡ story — tất định, giải thích được từng thành phần (ADR-004 R5).
+"""Story size score — deterministic, each component explainable (ADR-004 R5).
 
-`story.max_screen_states` (P2-12) đo **một** chiều: trạng thái màn hình.
-Số đo 2026-09-05 trên e9 cho thấy chiều ấy chưa đủ — STORY-01-01 không có
-màn hình nào mà vẫn 61 lượt developer ở lượt đầu và 4 lượt thử (14 đường
-dẫn khai, 9 sau khi trừ manifest/lockfile; 7 tiêu chí). Module này cộng
-năm chiều đo được **trước khi gọi model**, mỗi chiều một trọng số có tên,
-và trả về bản giải thích để người đọc kiểm lại được con số thay vì phải
-tin nó.
+`story.max_screen_states` (P2-12) measures **one** dimension: screen states.
+Measurements from 2026-09-05 on e9 show that one dimension is insufficient —
+STORY-01-01 has no screens yet took 61 developer turns on the first attempt
+and 4 retries (14 declared paths, 9 after excluding manifest/lockfile; 7
+acceptance criteria). This module sums five dimensions measurable **before
+calling the model**, each with a named weight, and returns an explanation so
+the reader can verify the number instead of trusting it.
 
-Hiệu chuẩn (B4, hồi cứu 2026-09-05, không tốn agent — xem ADR-004 §6 R5):
-11 story thật có bằng chứng (e9 STORY-01-01..01-06, `par` 5 story), đối
-chiếu điểm với **lượt developer lượt đầu** (`turns` của `agent_run`
-`<story>#1` đầu tiên trong evidence):
+Calibration (B4, retrospective 2026-09-05, zero agent cost — see ADR-004 §6 R5):
+11 real stories with evidence (e9 STORY-01-01..01-06, `par` 5 stories),
+comparing score against **first-attempt developer turns** (`turns` from the
+first `agent_run` `<story>#1` in evidence):
 
-| story | trạng thái | tiêu chí | scope | fan-in | điểm | lượt đầu |
+| story | states | criteria | scope | fan-in | score | first turns |
 |---|---|---|---|---|---|---|
-| e9 01-01 | 0 | 7 | 9 | 1 | 12,5 | 61 |
-| e9 01-02 | 0 | 7 | 10 | 2 | 14,0 | 42 |
-| e9 01-03 | 0 | 4 | 3 | 1 | 6,5 | 57 |
-| e9 01-04 | 9 | 7 | 13 | 1 | **23,5** | 89 / 90, 4 lượt, $79,67 |
-| e9 01-05 | 5 | 7 | 10 | 1 | **18,0** | 91 — chạm `max_turns` |
-| e9 01-06 | 1 | 7 | 6 | 2 | 13,0 | 84 |
-| par ×5 | 0 | 2 | 2 | 0 | 3,0 | 24 / 41 / 37 / — / 8 |
+| e9 01-01 | 0 | 7 | 9 | 1 | 12.5 | 61 |
+| e9 01-02 | 0 | 7 | 10 | 2 | 14.0 | 42 |
+| e9 01-03 | 0 | 4 | 3 | 1 | 6.5 | 57 |
+| e9 01-04 | 9 | 7 | 13 | 1 | **23.5** | 89 / 90, 4 attempts, $79.67 |
+| e9 01-05 | 5 | 7 | 10 | 1 | **18.0** | 91 — hit `max_turns` |
+| e9 01-06 | 1 | 7 | 6 | 2 | 13.0 | 84 |
+| par x5 | 0 | 2 | 2 | 0 | 3.0 | 24 / 41 / 37 / — / 8 |
 
-Spearman(điểm, lượt đầu) = **0,88** trên 10 story có số lượt (par
-STORY-02-01 ghi `turns = 0` — client không báo, loại khỏi mẫu). Ngưỡng
-mặc định 16 chặn đúng hai story đắt nhất (01-04 và 01-05) và không chạm
-01-01/01-02/01-06 (12,5–14,0), 01-03 (6,5) hay `par` (3,0). Nó **không**
-bắt được hai lần chạm `max_turns` khác (e9 01-01 ở 61/60 lượt, `par`
-01-02 ở 41/40) — cả hai xảy ra dưới trần `max_turns` thấp hơn trần hiện
-tại, nên đó là chuyện của `run.max_turns`, không phải của cỡ story. Xem
-`docs/ADR-004-evidence-driven-epic-improvement.md` §6 R5.
+Spearman(score, first_turns) = **0.88** on 10 stories with turn counts (par
+STORY-02-01 reports `turns = 0` — client did not report, excluded from sample).
+Default threshold 16 blocks exactly the two most expensive stories (01-04 and
+01-05) and does not touch 01-01/01-02/01-06 (12.5-14.0), 01-03 (6.5) or
+`par` (3.0). It does **not** catch two other `max_turns` hits (e9 01-01 at
+61/60 turns, `par` 01-02 at 41/40) — both occurred under a lower `max_turns`
+ceiling than the current one, so that is `run.max_turns`'s concern, not story
+size's. See `docs/ADR-004-evidence-driven-epic-improvement.md` §6 R5.
 """
 
 from __future__ import annotations
@@ -46,46 +46,47 @@ from pathlib import Path
 from ..config import DEFAULTS, Config
 from .normalize import MANIFESTS, Story, is_lockfile
 
-#: Một trạng thái màn hình story **dựng đầu tiên**. Chiều đắt nhất đã đo:
-#: 01-04 (9 trạng thái) 89 lượt, 01-05 (4 + 1 chạm lại) 91 lượt.
+#: One screen state the story **builds for the first time**. Most expensive
+#: dimension measured: 01-04 (9 states) 89 turns, 01-05 (4 + 1 revisit) 91.
 SCREEN_STATE_WEIGHT = 1.0
-#: Một tiêu chí chấp nhận. Cùng cỡ với một trạng thái: e9 mọi story 7 tiêu
-#: chí, và story 4 tiêu chí (01-03) rẻ hơn hẳn.
+#: One acceptance criterion. Same magnitude as one state: e9 every story has
+#: 7 criteria, and the 4-criteria story (01-03) was markedly cheaper.
 ACCEPTANCE_WEIGHT = 1.0
-#: Một đường dẫn trong phạm vi ghi (không tính manifest/lockfile — chúng là
-#: hệ quả tự động, xem `normalize.with_lockfiles`). Nửa trọng số: 01-01 có
-#: 9 đường dẫn mà vẫn xong sau 2 lượt.
+#: One path in write scope (excluding manifest/lockfile — they are automatic
+#: side-effects, see `normalize.with_lockfiles`). Half weight: 01-01 has 9
+#: paths yet finished in 2 turns.
 WRITE_SCOPE_WEIGHT = 0.5
-#: Một story phụ thuộc vào story này. Fan-in cao nghĩa là sai ở đây lan ra
-#: nhiều chỗ, nên phiên phải cẩn thận hơn.
+#: One story that depends on this story. High fan-in means errors here
+#: propagate widely, so the session must be more careful.
 FAN_IN_WEIGHT = 1.0
-#: Một **story láng giềng** có hành vi đã VERIFIED mà phạm vi ghi của story
-#: này chạm vào (ledger, R2). Đếm theo story sở hữu, không theo hành vi: đo
-#: 2026-09-06 trên e9, STORY-01-07 chạm 31 hành vi của 3 story (01-04/05/06)
-#: — đếm hành vi thì +15,5 điểm, một story 12,5 bị chặn oan ở 28,0.
+#: A **neighboring story** with VERIFIED behaviors whose write scope overlaps
+#: this story's (ledger, R2). Counted by owning story, not by behavior: on
+#: e9 2026-09-06, STORY-01-07 touches 31 behaviors of 3 stories (01-04/05/06)
+#: — counting behaviors would add +15.5 points, blocking a 12.5 story at 28.0.
 #:
-#: Trọng số **0 cho tới khi hiệu chuẩn được**: bảng B4 (Spearman 0,88) dựng
-#: trên các story chạy khi sổ còn rỗng, nên chiều này chưa góp một điểm nào
-#: vào tương quan ấy. Bật 0,5 thử trên sổ thật e9 (2026-09-06) thì ba story
-#: sát ngưỡng (02-03 15,0 → 17,0; 03-03 15,5 → 17,0; 05-01 16,0 → 17,5) bị
-#: chặn bằng một trọng số chưa có số lượt nào chứng minh. Thành phần vẫn
-#: được đếm và ghi vào `complexity.json` để hiệu chuẩn khi đủ story vừa có
-#: sổ vừa có số lượt (xem `divergence`); lúc ấy đặt trọng số bằng số đo.
+#: Weight is **0 until calibrated**: the B4 table (Spearman 0.88) was built
+#: on stories that ran when the ledger was empty, so this dimension contributed
+#: zero points to that correlation. Trying 0.5 on the real e9 ledger (2026-09-06)
+#: blocks three near-threshold stories (02-03 15.0->17.0; 03-03 15.5->17.0;
+#: 05-01 16.0->17.5) with a weight that has no turn-count evidence behind it.
+#: The component is still counted and recorded in `complexity.json` for future
+#: calibration when enough stories have both a ledger and turn counts (see
+#: `divergence`); at that point, set the weight from measured data.
 VERIFIED_TOUCHED_WEIGHT = 0.0
 
-#: Tên tệp hiệu chuẩn tự ghi, trong `_bmad-output/`.
+#: Auto-written calibration filename, in `_bmad-output/`.
 CALIBRATION_FILE = "complexity.json"
 
-#: "Xong trong một lượt ngắn" = lượt đầu dùng dưới ngần này phần `run.max_turns`.
+#: "Done in one short run" = first attempt uses below this fraction of `run.max_turns`.
 SHORT_TURN_FRACTION = 0.5
 
-#: Cần bao nhiêu story lệch cùng một hướng thì mới kết luận ngưỡng sai.
-#: Một story lệch là chuyện thường; hai là dấu hiệu.
+#: How many stories must diverge in the same direction before concluding the
+#: threshold is wrong. One divergent story is normal; two is a signal.
 DIVERGENCE_MIN = 2
 
-#: Dấu hiệu một trạng thái màn hình là **phụ** — chẻ được sang story sau.
-#: Trạng thái chính là màn hình lúc mọi thứ bình thường; phần còn lại là
-#: biên. Dùng để đề xuất cách chẻ, không dùng để tính điểm.
+#: Markers indicating a screen state is **secondary** — can be split to a
+#: follow-up story. Primary state is the screen in the normal/happy path;
+#: the rest are edge cases. Used for split suggestions, not for scoring.
 SECONDARY_STATE_MARKERS = (
     "rỗng", "trống", "empty", "lỗi", "error", "thất bại", "fail",
     "offline", "ngoại tuyến", "đang tải", "loading", "chưa sẵn sàng",
@@ -94,14 +95,14 @@ SECONDARY_STATE_MARKERS = (
 
 _DEV_RUN = re.compile(r"^(?P<story>[\w.-]+)#(?P<n>\d+)$")
 
-#: Story trong một đợt chạy song song bằng luồng, và `record` là đọc-sửa-ghi
-#: cả tệp: không có khoá thì hai story xong cùng lúc làm mất một dòng.
+#: Stories in a wave run in parallel threads, and `record` is a read-modify-write
+#: of the whole file: without a lock, two stories finishing simultaneously lose a row.
 _WRITE_LOCK = threading.Lock()
 
 
 @dataclass(frozen=True)
 class Component:
-    """Một chiều của điểm, kèm chỗ đã đếm ra nó."""
+    """One dimension of the score, with evidence of how it was counted."""
 
     name: str
     count: int
@@ -147,7 +148,7 @@ class Score:
         )
 
 
-# ------------------------------------------------------------ thành phần
+# ------------------------------------------------------------ components
 
 
 def screen_states(
@@ -156,11 +157,11 @@ def screen_states(
     experience=None,
     owned: dict[str, str] | None = None,
 ) -> list[tuple[str, int]]:
-    """Trạng thái story phải dựng, theo từng màn hình.
+    """States the story must build, per screen.
 
-    Màn hình story **khác** đã dựng trước tính 1 (chạm lại), không gánh cả
-    số trạng thái của nó — giữ đúng luật `preflight.screen_owners` đã hiệu
-    chuẩn trên e9 01-05.
+    A screen already built by a **different** story counts as 1 (revisit),
+    not all its states — preserving the `preflight.screen_owners` rule
+    calibrated on e9 01-05.
     """
     out: list[tuple[str, int]] = []
     for sid in story.screens:
@@ -171,8 +172,9 @@ def screen_states(
 
 
 def scope_paths(story: Story) -> list[str]:
-    """Đường dẫn phạm vi ghi **story tự khai to tới đâu** — bỏ manifest và
-    lockfile, vì harness tự thêm chúng (`normalize.with_lockfiles`)."""
+    """Write-scope paths **as declared by the story** — excluding manifests
+    and lockfiles, since the harness adds those automatically
+    (`normalize.with_lockfiles`)."""
     return [
         p for p in story.write_scope
         if not is_lockfile(p) and p.strip("/").rsplit("/", 1)[-1] not in MANIFESTS
@@ -180,7 +182,7 @@ def scope_paths(story: Story) -> list[str]:
 
 
 def fan_in_counts(stories) -> dict[str, int]:
-    """story → số story phụ thuộc vào nó."""
+    """story -> number of stories that depend on it."""
     out: dict[str, int] = {}
     for s in stories:
         for dep in getattr(s, "depends_on", []) or []:
@@ -195,16 +197,17 @@ def _within(path: str, scope: str) -> bool:
 
 def verified_touched(story: Story, ledger: dict | None,
                      scopes: dict[str, list[str]] | None = None) -> list[str]:
-    """Hành vi đã VERIFIED của **story khác** mà phạm vi ghi của story này chạm vào.
+    """VERIFIED behaviors of **other stories** whose write scope overlaps this story's.
 
-    Sổ hành vi (R2, `control/ledger.py`) ghi story *sở hữu* hành vi, không
-    ghi tệp — tệp là phạm vi ghi của story ấy, tra qua ``scopes`` (id →
-    write_scope, đọc từ `stories.index.json`). Bản ghi có sẵn `files` /
-    `write_scope` vẫn được đọc. Thiếu sổ, thiếu chỉ mục, hay hành vi không
-    tra được tệp thì chiều này = 0 — thiếu dữ liệu không được biến thành
-    điểm bịa. Hành vi của chính story (chạy lại) không tính: đó là mục tiêu
-    của nó, không phải thứ nó phải giữ. Hành vi REOPENED mà `regressed_by`
-    là chính story này **có** tính — nó vừa làm hỏng thì nó phải sửa lại.
+    The behavior ledger (R2, `control/ledger.py`) records the story that *owns*
+    a behavior, not files — files come from that story's write scope, looked up
+    via ``scopes`` (id -> write_scope, read from `stories.index.json`). Records
+    that already have `files` / `write_scope` are also used. Missing ledger,
+    missing index, or behaviors with no file mapping result in this dimension
+    = 0 — missing data must not become fabricated points. Behaviors owned by
+    this story (re-runs) are excluded: those are its goal, not something it must
+    preserve. REOPENED behaviors where `regressed_by` is this story itself **are**
+    counted — it just broke them, so it must fix them.
     """
     if not isinstance(ledger, dict):
         return []
@@ -217,11 +220,12 @@ def verified_touched(story: Story, ledger: dict | None,
         if not isinstance(rec, dict):
             continue
         status = str(rec.get("status", "")).lower()
-        # REOPENED **do chính story này** vẫn là thứ nó phải giữ: bỏ khỏi danh
-        # sách thì lượt 2 nhận cổng "bảo toàn" ✅ trong khi test của story
-        # trước còn đỏ — đo par B3 2026-09-06: lượt 2 chỉ còn AC-01-01-2, mất
-        # AC-01-01-1 và FR-1 mà lượt 1 vừa làm hỏng. REOPENED do story khác
-        # thì không: story này không làm hỏng nó, chấm nó là ✗ oan.
+        # REOPENED **by this story** is still something it must preserve: excluding
+        # them from the list means attempt 2 gets a "preserve" gate pass while the
+        # previous story's tests are still red — measured on par B3 2026-09-06:
+        # attempt 2 only had AC-01-01-2, lost AC-01-01-1 and FR-1 that attempt 1
+        # just broke. REOPENED by another story is excluded: this story did not
+        # break it, marking it as failed would be unfair.
         if status != "verified" and not (
             status == "reopened"
             and str(rec.get("regressed_by") or "").startswith(story.id + "#")
@@ -239,7 +243,7 @@ def verified_touched(story: Story, ledger: dict | None,
 
 
 def read_scopes(project: Path | str | None) -> dict[str, list[str]]:
-    """id → write_scope từ `_bmad-output/stories.index.json`; thiếu thì rỗng."""
+    """id -> write_scope from `_bmad-output/stories.index.json`; empty if missing."""
     if project is None:
         return {}
     path = Path(project) / "_bmad-output" / "stories.index.json"
@@ -257,7 +261,7 @@ def read_scopes(project: Path | str | None) -> dict[str, list[str]]:
 
 
 def read_experience(project: Path | str | None):
-    """`_bmad-output/EXPERIENCE.md` nếu đọc được, không thì `None`."""
+    """`_bmad-output/EXPERIENCE.md` if readable, otherwise `None`."""
     if project is None:
         return None
     from .experience import parse_experience_file
@@ -272,7 +276,7 @@ def read_experience(project: Path | str | None):
 
 
 def read_ledger(project: Path | str | None) -> dict | None:
-    """`_bmad-output/ledger.json` nếu có. Không có thì `None`, không lỗi."""
+    """`_bmad-output/ledger.json` if it exists. Returns `None` if missing, no error."""
     if project is None:
         return None
     path = Path(project) / "_bmad-output" / "ledger.json"
@@ -294,7 +298,7 @@ def score_story(
     fan_in: int = 0,
     ledger: dict | None = None,
 ) -> Score:
-    """Điểm cỡ của một story. Hàm thuần trên dữ liệu đã có, không gọi model."""
+    """Size score for a story. Pure function on available data, no model calls."""
     if experience is None:
         experience = read_experience(project)
     per_screen = screen_states(story, experience=experience, owned=owned)
@@ -304,7 +308,7 @@ def score_story(
         ledger = read_ledger(project)
     touched = verified_touched(story, ledger, read_scopes(project))
     behaviors = (ledger or {}).get("behaviors") or {}
-    # Hành vi không ghi story sở hữu (bản ghi cũ, tự tay) đếm riêng từng cái.
+    # Behaviors without an owning story (legacy records, manual) count individually.
     owners = {str(behaviors.get(b, {}).get("story") or b) for b in touched}
 
     return Score(story.id, (
@@ -320,7 +324,7 @@ def score_story(
     ))
 
 
-# ------------------------------------------------------------ gợi ý chẻ
+# ------------------------------------------------------------ split suggestions
 
 
 def split_suggestion(
@@ -330,12 +334,12 @@ def split_suggestion(
     experience=None,
     owned: dict[str, str] | None = None,
 ) -> str:
-    """Cách chẻ story này, **tất định**, theo chiều nào đang nặng nhất.
+    """How to split this story, **deterministic**, based on the heaviest dimension.
 
-    Ba lối, xét theo thứ tự: nhiều màn hình → mỗi màn một story; một màn
-    nhiều trạng thái → trạng thái chính trước, trạng thái biên sau; không
-    có màn hình → chẻ theo cụm tiêu chí chấp nhận. Không lối nào cần model:
-    người lập kế hoạch đọc là làm được ngay.
+    Three strategies in priority order: multiple screens -> one story per
+    screen; one screen with many states -> primary states first, edge-case
+    states next; no screens -> split by acceptance criteria groups. None of
+    these require a model: the planner can act on them immediately.
     """
     per = screen_states(story, experience=experience, owned=owned)
     minh_dung = [(sid, n) for sid, n in per
@@ -371,16 +375,17 @@ def _is_secondary(state: str) -> bool:
     return any(m in low for m in SECONDARY_STATE_MARKERS)
 
 
-# ------------------------------------------------------------ hiệu chuẩn
+# ------------------------------------------------------------ calibration
 
 
 def observed(artifact_root: Path | str, story_id: str, *, max_turns: int = 0) -> dict:
-    """Số **thật** của story, đọc từ evidence: lượt developer lượt đầu, số
-    lượt thử, có chạm `max_turns` không.
+    """**Actual** numbers for a story, read from evidence: first-attempt
+    developer turns, number of attempts, whether `max_turns` was hit.
 
-    Lượt đầu là `agent_run` tên `<story>#1` **đầu tiên** trong sổ: đó là
-    phiên chưa có phản hồi nào, nên nó đo đúng "story này khó tới đâu khi
-    đọc lần đầu". Chạy lại story sau khi sửa kế hoạch không ghi đè số ấy.
+    First attempt is the first `agent_run` named `<story>#1` in the evidence
+    store: that session has no prior feedback, so it measures exactly "how hard
+    is this story on first read." Re-running the story after plan edits does
+    not overwrite that number.
     """
     from ..harness.observe import AGENT_RUN, EvidenceStore
 
@@ -389,7 +394,7 @@ def observed(artifact_root: Path | str, story_id: str, *, max_turns: int = 0) ->
     for e in ev.of(AGENT_RUN):
         m = _DEV_RUN.match(e.name or "")
         if not m or m.group("story") != story_id:
-            continue  # rà soát/bảo mật không phải lượt developer
+            continue  # review/security runs are not developer attempts
         turns = int(e.detail.get("turns") or 0)
         attempts = max(attempts, int(m.group("n")))
         if first is None:
@@ -425,12 +430,12 @@ def record(
     score: Score,
     config: Config | None = None,
 ) -> dict:
-    """Ghi một dòng hiệu chuẩn cho story vừa xong: điểm dự đoán, từng thành
-    phần, và số thật đo được từ evidence.
+    """Record a calibration row for a completed story: predicted score, each
+    component, and actual numbers measured from evidence.
 
-    Bảng này là thứ duy nhất nói được ngưỡng có còn đúng không. Không ghi
-    thì mỗi lần nghi ngờ lại phải đi bới evidence bằng tay — và ngưỡng sẽ
-    được nới bằng cảm giác."""
+    This table is the only thing that tells whether the threshold is still
+    correct. Without it, every doubt requires manually digging through
+    evidence — and thresholds get adjusted by gut feeling."""
     cfg = config or Config(dict(DEFAULTS))
     row = score.as_dict() | observed(
         artifact_root, story.id, max_turns=int(cfg["run.max_turns"])
@@ -452,11 +457,12 @@ def record(
 
 
 def divergence(rows: dict) -> list[str]:
-    """Ngưỡng có lệch dữ liệu không — đọc bảng hiệu chuẩn, không đoán.
+    """Is the threshold diverging from data — reads the calibration table, no guessing.
 
-    Hai hướng lệch, mỗi hướng cần ``DIVERGENCE_MIN`` story: ngưỡng **quá
-    cao** (story dưới ngưỡng vẫn chạm `max_turns`) và ngưỡng **quá thấp**
-    (story trên ngưỡng xong ngay lượt đầu, ngắn).
+    Two divergence directions, each requiring ``DIVERGENCE_MIN`` stories:
+    threshold **too high** (stories below threshold still hit `max_turns`)
+    and threshold **too low** (stories above threshold finish quickly on the
+    first attempt).
     """
     qua_cao, qua_thap = [], []
     for sid, r in sorted(rows.items()):
@@ -479,10 +485,10 @@ def divergence(rows: dict) -> list[str]:
 
 
 def spearman(xs, ys) -> float:
-    """Tương quan hạng Spearman, có xử lý hạng đồng. NaN nếu không tính được.
+    """Spearman rank correlation, with tied-rank handling. NaN if not computable.
 
-    Dùng để đọc lại bảng hiệu chuẩn (B4): điểm dự đoán có xếp story theo
-    đúng thứ tự tốn lượt không.
+    Used to validate the calibration table (B4): does the predicted score rank
+    stories in the same order as actual turn cost.
     """
     n = len(xs)
     if n < 2 or n != len(ys):

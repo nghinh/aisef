@@ -1,4 +1,4 @@
-"""Pha hiện thực và nghiệm thu: ``status`` · ``run`` · ``verify`` ·
+"""Implementation and acceptance phase: ``status`` · ``run`` · ``verify`` ·
 ``tool`` · ``qa`` · ``devsecops`` · ``pre-deploy`` · ``report``."""
 
 from __future__ import annotations
@@ -34,12 +34,12 @@ def cmd_status(args) -> int:
     done = totals[StoryStatus.DONE.value]
 
     print(f"Progress: {done}/{total} stories done")
-    # `verified` = qua cổng, chưa lên nhánh chính (merge đụng ở lượt trước).
-    # Không nói ra thì người đọc tưởng code đã ở main.
-    chua_merge = [r.id for r in state.by_status(StoryStatus.VERIFIED)]
-    if chua_merge:
-        print(f"⚠️  {len(chua_merge)} stories done but not merged to main: "
-              f"{', '.join(chua_merge[:5])} — run `aisef run` again to merge")
+    # `verified` = passed gate, not yet on main branch (merge conflict in a
+    # previous attempt).  Without saying so, the reader assumes code is on main.
+    unmerged = [r.id for r in state.by_status(StoryStatus.VERIFIED)]
+    if unmerged:
+        print(f"⚠️  {len(unmerged)} stories done but not merged to main: "
+              f"{', '.join(unmerged[:5])} — run `aisef run` again to merge")
     if state.active_epics:
         print(f"Active epics: {', '.join(state.active_epics)}")
     elif state.current_epic:
@@ -57,28 +57,28 @@ def cmd_status(args) -> int:
         for r in sorted(outliers, key=lambda r: -r.cost_usd)[:5]:
             print(f"    {r.id:16} ${r.cost_usd:.2f}")
 
-    # Ngữ cảnh nạp mỗi story — đo thật từ evidence, thay cho knob
-    # `story.max_context_tokens` chưa từng có mã đọc. Cùng ngưỡng 3× trung
-    # vị như chi phí: story nạp gấp ba story khác là dấu hiệu chẻ sai.
+    # Per-story context loaded — measured from evidence, replacing the
+    # `story.max_context_tokens` knob that never had reading code.  Same 3x
+    # median threshold as cost: a story loading 3x another is a split smell.
     from ..harness.observe import AGENT_RUN, SKILL_USE, EvidenceStore
 
     ev_store = EvidenceStore(_artifact_root(args))
-    nap = {}
-    ket_cuc: dict[str, int] = {}
+    ctx_sizes = {}
+    exit_counts: dict[str, int] = {}
     for sid in ev_store.stories():
         runs = ev_store.read(sid).of(AGENT_RUN)
         sizes = [int(e.detail.get("prompt_chars") or 0) for e in runs]
         if any(sizes):
-            nap[sid] = max(sizes)
+            ctx_sizes[sid] = max(sizes)
         for e in runs:
             k = str(e.detail.get("exit_status") or "unrecorded")
-            ket_cuc[k] = ket_cuc.get(k, 0) + 1
-    # Kết cục từng lượt gọi model (ADR-005 V11 B) — đếm theo `exit_status`
-    # harness chuẩn hoá lúc ghi. Lượt ghi trước khoá này là "chưa ghi":
-    # không suy đoán thay bằng chứng cũ.
-    if ket_cuc:
+            exit_counts[k] = exit_counts.get(k, 0) + 1
+    # Per-round exit status (ADR-005 V11 B) — counted by `exit_status`
+    # normalised by harness at write time.  Rounds recorded before this key
+    # are "unrecorded": do not speculate on behalf of old evidence.
+    if exit_counts:
         print("Agent runs: " + " · ".join(
-            f"{k} {n}" for k, n in sorted(ket_cuc.items(), key=lambda kv: -kv[1])))
+            f"{k} {n}" for k, n in sorted(exit_counts.items(), key=lambda kv: -kv[1])))
     skill_counts: dict[str, int] = {}
     for sid in ev_store.stories():
         for e in ev_store.read(sid).of(SKILL_USE):
@@ -87,17 +87,17 @@ def cmd_status(args) -> int:
         print("Skill: " + " · ".join(
             f"{k} ×{n}" for k, n in sorted(skill_counts.items(), key=lambda kv: -kv[1])))
 
-    if len(nap) >= 3:
-        trung_vi = sorted(nap.values())[len(nap) // 2]
-        phinh = {k: v for k, v in nap.items() if v > cfg["cost.warn_multiple"] * trung_vi}
-        if phinh:
-            print(f"⚠️  {len(phinh)} stories loaded context exceeding {cfg['cost.warn_multiple']}x median "
-                  f"({trung_vi:,} chars):")
-            for k, v in sorted(phinh.items(), key=lambda kv: -kv[1])[:5]:
+    if len(ctx_sizes) >= 3:
+        median = sorted(ctx_sizes.values())[len(ctx_sizes) // 2]
+        bloated = {k: v for k, v in ctx_sizes.items() if v > cfg["cost.warn_multiple"] * median}
+        if bloated:
+            print(f"⚠️  {len(bloated)} stories loaded context exceeding {cfg['cost.warn_multiple']}x median "
+                  f"({median:,} chars):")
+            for k, v in sorted(bloated.items(), key=lambda kv: -kv[1])[:5]:
                 print(f"    {k:16} {v:,} chars")
 
-    # `failed` cũng là chưa sẵn sàng, không chỉ `blocked`: một story trượt
-    # cổng mà lệnh trả 0 thì CI báo xanh trên một sprint đang hỏng.
+    # `failed` is also not-ready, not just `blocked`: a story that fails
+    # the gate while the command returns 0 makes CI report green on a broken sprint.
     stuck = state.by_status(StoryStatus.BLOCKED) + state.by_status(StoryStatus.FAILED)
     if stuck:
         print(f"\n✗ {len(stuck)} stories not passing:")
@@ -108,10 +108,10 @@ def cmd_status(args) -> int:
 
 
 def _readiness_blocked(args) -> bool:
-    """Cổng `readiness` chứ không phải `stories`: nó gắn vào **cả** chỉ mục
-    story lẫn hợp đồng thị giác. Chỉ đòi `stories` thì một story khai
-    `screens` vẫn chạy được khi chưa có mockup nào — rồi trượt ở cổng vì
-    "chưa đối chiếu", sau khi đã tiêu tiền viết xong code."""
+    """Gate `readiness`, not just `stories`: it covers **both** the story index
+    and the visual design contract.  Requiring only `stories` lets a story
+    declaring `screens` run without any mockups — then fail the gate for
+    "not compared", after spending money writing all the code."""
     from ..control.approvals import Gate
 
     store = _approvals(args)
@@ -126,10 +126,10 @@ def _readiness_blocked(args) -> bool:
 
 
 def cmd_run(args) -> int:
-    """Chạy đợt: epic tuần tự, trong epic chạy song song theo đợt.
+    """Run a wave: epics sequentially, stories in parallel within each epic.
 
-    `--verify-only --story S`: lượt kiểm-lại trên ứng viên đã đóng băng
-    (ADR-004 R13) — cùng cổng, cùng đường merge, không có phiên developer.
+    `--verify-only --story S`: re-check on a frozen candidate (ADR-004 R13)
+    — same gate, same merge path, no developer session.
     """
     from ..phases.run import run_sprint, run_verify_only
 
@@ -182,10 +182,11 @@ def cmd_run(args) -> int:
 
 
 def cmd_improve(args) -> int:
-    """Vòng cải tiến epic theo bằng chứng (ADR-004 R3).
+    """Evidence-driven improvement loop for an epic (ADR-004 R3).
 
-    Một lần gọi chạy tối đa `--max-loops` vòng rồi thoát; chạy lại tiếp
-    từ mốc `loops[]` cuối trong sổ hành vi — không daemon.
+    One invocation runs up to `--max-loops` loops then exits; re-running
+    continues from the last `loops[]` checkpoint in the behaviour ledger
+    — not a daemon.
     """
     from ..phases.improve import improve
 
@@ -210,10 +211,11 @@ def cmd_improve(args) -> int:
 
 
 def cmd_verify(args) -> int:
-    """Chạy lại toàn bộ guard trên cây làm việc — hậu kiểm.
+    """Re-run all guards on the working tree — post-check.
 
-    Đây là lớp bảo đảm cho client không gắn được hook tiền kiểm: vi phạm
-    vẫn bị bắt, chỉ là bắt **sau khi đã ghi** thay vì chặn lúc ghi.
+    This is the assurance layer for clients that cannot wire pre-check hooks:
+    violations are still caught, just **after the write** instead of blocking
+    at write time.
     """
     from ..harness.guardrails import changed_files, check_completion, check_diff_scope
     from ..harness.observe import EvidenceStore
@@ -247,14 +249,14 @@ def cmd_verify(args) -> int:
 
 
 def cmd_tool(args) -> int:
-    """Chạy một tool của harness và ghi bằng chứng."""
+    """Run a harness tool and record evidence."""
     import os
 
     from ..harness.guardrails import ENV_STORY_ID
     from ..harness.tools import run_tool
 
-    # Agent không cần biết mã story của chính nó: harness đã đặt vào môi
-    # trường khi mở phiên.
+    # The agent does not need to know its own story ID: the harness placed
+    # it in the environment when opening the session.
     story = args.story or os.environ.get(ENV_STORY_ID, "")
     res = run_tool(
         args.name,
@@ -264,8 +266,9 @@ def cmd_tool(args) -> int:
         config=Config.load(args.project),
     )
     print(res.summary())
-    # Thứ tự có chủ đích (ADR-005 V11 A): kết luận máy đọc **trước** tail —
-    # tên test đỏ ở 5 dòng đầu, agent không phải tự chạy lại runner để tìm.
+    # Intentional order (ADR-005 V11 A): machine-readable summary **before**
+    # tail — failed test names in the first 5 lines so the agent does not
+    # need to re-run the runner to find them.
     full = res.output()[0]
     if res.name == "test" and res.ran:
         from ..harness.testlog import parse as parse_testlog
@@ -282,7 +285,8 @@ def cmd_tool(args) -> int:
         print(res.tail(args.lines))
     total = len(full.splitlines())
     if total > args.lines:
-        # Khai cắt: agent biết mình chưa thấy hết, và biết toàn văn ở đâu.
+        # Declare truncation: the agent knows it has not seen everything, and
+        # knows where the full output lives.
         full_ref = f" — full output: {_rel(res.log, args.project)}" if res.log else ""
         print(f"(truncated {total - args.lines}/{total} lines{full_ref})")
     if res.skipped:
@@ -291,8 +295,8 @@ def cmd_tool(args) -> int:
 
 
 def _rel(path: str, project) -> str:
-    """Đường dẫn ngắn khi tệp nằm trong dự án; tuyệt đối khi không (agent
-    chạy trong worktree, sổ bằng chứng ở gốc chính)."""
+    """Short path when the file is inside the project; absolute otherwise
+    (agent runs in a worktree, evidence log is at the main repo root)."""
     try:
         return str(Path(path).resolve().relative_to(Path(project).resolve()))
     except ValueError:
@@ -300,11 +304,11 @@ def _rel(path: str, project) -> str:
 
 
 def cmd_qa(args) -> int:
-    """Chạy bộ kiểm định của dự án.
+    """Run the project's test suite.
 
-    Mặc định chấm ở mức **trước triển khai**: loại chưa cấu hình cũng chặn,
-    vì "chưa chạy" không phải là "đạt". `--story-level` hạ xuống mức story,
-    nơi thiếu công cụ chỉ là cảnh báo.
+    Defaults to **pre-deploy** scoring: unconfigured types also block,
+    because "not run" is not "passed".  `--story-level` lowers to story-level
+    scoring, where missing tools are only warnings.
     """
     from ..kit.detect_stack import detect_file
     from ..phases.qa import run_suite
@@ -333,7 +337,7 @@ def cmd_qa(args) -> int:
 
 
 def cmd_devsecops(args) -> int:
-    """Sinh quy trình CI (code) và bộ khung vận hành (model)."""
+    """Generate CI pipeline (code) and operational scaffolding (model)."""
     from ..phases.deploy import generate
 
     adapter, code = _client(args)
@@ -344,8 +348,8 @@ def cmd_devsecops(args) -> int:
         args.project,
         adapter,
         config=Config.load(args.project),
-        # Mặc định là **tên lệnh trên PATH**, không phải đường dẫn tuyệt
-        # đối của máy này: quy trình CI sinh ra sẽ chạy trên máy khác.
+        # Default is the **command name on PATH**, not this machine's absolute
+        # path: the generated CI pipeline will run on a different machine.
         aisef_bin=args.bin or "aisef",
         install_spec=args.install_spec,
         force=args.force,
@@ -355,14 +359,14 @@ def cmd_devsecops(args) -> int:
 
 
 def _project_has_ui(project: Path) -> bool:
-    """Dự án này có giao diện không — hỏi thứ đã **quyết**, không phải
-    thứ được **gợi ý**.
+    """Whether this project has a UI — ask what has been **decided**, not
+    what was **suggested**.
 
-    `detect_file(requirements.md)` chỉ đọc tài liệu yêu cầu ban đầu, nơi
-    người viết thường không nêu tên framework. Tới lúc chấm cổng trước
-    triển khai thì kiến trúc đã chốt và màn hình đã dựng — dùng chúng.
-    Đo trên e9: ứng dụng 5 màn hình bị báo "dự án không có giao diện", và
-    `e2e`/`accessibility` bị bỏ qua với một lý do sai sự thật.
+    `detect_file(requirements.md)` only reads the initial requirements doc,
+    where the author often does not name a framework.  By the time we score
+    the pre-deploy gate, architecture is finalised and screens are built —
+    use those.  Measured on e9: a 5-screen app was reported as "project has
+    no UI", and `e2e`/`accessibility` were skipped with a factually wrong reason.
     """
     from ..kit.detect_stack import detect_file
 
@@ -390,7 +394,7 @@ def _project_has_ui(project: Path) -> bool:
 
 
 def cmd_predeploy(args) -> int:
-    """Chấm cổng trước triển khai."""
+    """Score the pre-deployment gate."""
     from ..control.approvals import Gate
     from ..kit.detect_stack import detect_file
     from ..phases.deploy import pre_deploy
@@ -411,10 +415,11 @@ def cmd_predeploy(args) -> int:
 
 
 def cmd_evidence(args) -> int:
-    """Tra một story hoặc một hành vi trong sổ hành vi (ADR-004 R6).
+    """Look up a story or behaviour in the behaviour ledger (ADR-004 R6).
 
-    Đây là nửa sau của progressive disclosure: prompt chỉ nhận **chỉ mục**,
-    còn lịch sử nằm ở đây, tra khi cần chứ không nạp sẵn.
+    This is the second half of progressive disclosure: the prompt receives
+    only the **index**, while history lives here, queried on demand rather
+    than preloaded.
     """
     from ..control import ledger as ledger_mod
 
@@ -470,10 +475,11 @@ def cmd_evidence(args) -> int:
 
 
 def cmd_ctx(args) -> int:
-    """Bản đồ mã quanh phạm vi ghi (ADR-005 V7) — nửa sau của progressive
-    disclosure như `evidence`: prompt nhận bản có trần, bản đầy đủ tra ở đây.
-    Gọi trong phiên (có `AISEF_STORY_ID`) thì ghi `note:ctx_lookup` như
-    `doc_lookup`, để cổng và báo cáo biết agent đã tra gì."""
+    """Code map around write scope (ADR-005 V7) — second half of progressive
+    disclosure like `evidence`: prompt receives the capped version, full
+    version is queried here.  When called in a session (has `AISEF_STORY_ID`),
+    records `note:ctx_lookup` like `doc_lookup`, so gates and reports know
+    what the agent looked up."""
     import os
 
     from ..harness import context as code_map
@@ -515,18 +521,19 @@ def cmd_ctx(args) -> int:
 
 
 def cmd_issues(args) -> int:
-    """Bảng gap/hồi quy ra tệp (ADR-004 R12).
+    """Export gap/regression table to file (ADR-004 R12).
 
-    Chỉ là một cách **đọc** sổ: không tạo issue ở đâu, không gọi mạng, không
-    chạm cổng. Ai muốn đưa lên GitHub/Jira thì cầm CSV đi — kho này không
-    biết tracker của dự án, và không nên biết.
+    This is just a way to **read** the ledger: no issue creation anywhere,
+    no network calls, no gate interaction.  Anyone wanting to push to
+    GitHub/Jira can take the CSV — this repo does not know the project's
+    tracker, and should not.
     """
     from ..control import ledger as ledger_mod
 
     statuses = {s.strip().lower() for s in args.status.split(",") if s.strip()}
     unknown = statuses - {ledger_mod.VERIFIED, ledger_mod.GAP, ledger_mod.REOPENED}
     if unknown or not statuses:
-        # Gõ sai trạng thái mà vẫn xuất tệp rỗng là lừa người đọc "không còn gap".
+        # Mistyping a status and still exporting an empty file misleads the reader into "no gaps left".
         print(f"✗ invalid --status: {', '.join(sorted(unknown)) or '(empty)'}. "
               f"Valid: gap, reopened, verified", file=sys.stderr)
         return EXIT_USAGE
@@ -541,7 +548,7 @@ def cmd_issues(args) -> int:
 
 
 def cmd_report(args) -> int:
-    """Sinh báo cáo nghiệm thu từ bằng chứng đã có."""
+    """Generate acceptance report from existing evidence."""
     from ..control import ledger as ledger_mod
     from ..phases.report import build, write
 
@@ -552,7 +559,7 @@ def cmd_report(args) -> int:
     print(f"  stories with evidence: {len(report.stories)}")
     print(f"  total cost: ${report.total_cost_usd:.2f}")
 
-    # Sổ hành vi + chỉ mục: chiếu lại từ bằng chứng mỗi lần, không tích luỹ.
+    # Behaviour ledger + index: rebuilt from evidence each time, not accumulated.
     led = ledger_mod.build(_artifact_root(args))
     s = led.summary()
     print(f"  behaviour ledger: {s['verified']} verified · {s['gap']} gap · "

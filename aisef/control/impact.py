@@ -1,20 +1,21 @@
-"""Thay đổi này chạm tới đâu — ngữ cảnh cho người rà soát.
+"""What does this change touch — context for the reviewer.
 
-Người rà soát nhận diff rồi vẫn phải tự trả lời: đoạn sửa này ai gọi,
-test nào phủ, luồng nào đi qua. Đo trên e9, nó tốn 22–68 lượt cho việc
-ấy, mỗi lượt thử lại làm lại từ đầu — STORY-01-04 chạy bốn lượt và ba
-lượt trong đó cùng đi dò lại một đường đọc.
+A reviewer receives the diff but still must answer: who calls the changed
+code, which tests cover it, which flows pass through it. Measured on e9, this
+costs 22-68 turns per attempt, and each retry starts from scratch —
+STORY-01-04 ran four attempts and three of them re-traced the same read path.
 
-Đây là **ngữ cảnh**, không phải phán quyết. Đồ thị gọi hàm dựng bằng
-phân tích tĩnh luôn thiếu: gọi động, phản chiếu, tiêm phụ thuộc đều
-không hiện lên. Coi nó là chân lý thì người rà soát bỏ qua chỗ nó không
-thấy — mà đó thường đúng là chỗ hỏng. Nên mọi kết quả ở đây đi kèm
-nguồn và mức tin cậy, và prompt nói rõ nó chỉ là gợi ý khởi đầu.
+This is **context**, not a verdict. Call graphs built by static analysis are
+always incomplete: dynamic calls, reflection, and dependency injection are
+invisible. Treating it as ground truth makes the reviewer ignore what it
+misses — and that is usually where the bug is. So every result here includes
+its source and confidence level, and the prompt states it is only a starting
+suggestion.
 
-Kiến trúc **không** buộc vào một công cụ nào. `review.impact_provider`
-nhận một lệnh; lệnh ấy trả JSON theo hợp đồng dưới đây. Không cấu hình
-thì dùng bản dựng sẵn — thô hơn nhiều, nhưng chạy được ngay và nói
-thẳng là nó thô.
+The architecture is **not** tied to any specific tool. `review.impact_provider`
+takes a command; the command returns JSON per the contract below. If not
+configured, the built-in fallback is used — much rougher, but works
+immediately and says so explicitly.
 """
 
 from __future__ import annotations
@@ -28,11 +29,11 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 
-#: Số mục tối đa mỗi loại đưa vào prompt. Đủ để định hướng, không đủ để
-#: lấn át diff — người rà soát phải đọc code, không phải đọc danh sách.
+#: Max items per category included in the prompt. Enough to orient, not enough
+#: to overshadow the diff — the reviewer must read code, not lists.
 MAX_PER_KIND = 12
 
-#: Đuôi tệp coi là mã nguồn khi dò tham chiếu.
+#: File extensions treated as source code when searching for references.
 SOURCE_EXT = (
     ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".py", ".go", ".rs",
     ".java", ".kt", ".rb", ".php", ".cs", ".swift",
@@ -47,25 +48,26 @@ def is_test_path(path: str) -> bool:
 
 @dataclass
 class ImpactReport:
-    """Ảnh hưởng của một thay đổi. Rỗng là hợp lệ, và phải nói ra."""
+    """Impact of a change. Empty is valid, and must be stated explicitly."""
 
-    #: Tên hàm/lớp/hằng xuất khẩu bị đổi trong diff.
+    #: Exported function/class/constant names changed in the diff.
     changed_symbols: list[str] = field(default_factory=list)
-    #: Tệp có tham chiếu tới các tên đó nhưng **không** nằm trong diff.
+    #: Files referencing those names but **not** in the diff.
     callers: list[str] = field(default_factory=list)
-    #: Tệp test có tham chiếu tới các tên đó.
+    #: Test files referencing those names.
     related_tests: list[str] = field(default_factory=list)
-    #: Tên bị đổi mà không tệp test nào nhắc tới. Đây là mục đáng giá
-    #: nhất: khuôn thất bại lặp lại nhiều nhất trên e9 là "code có mặt
-    #: nhưng không test nào chứng minh nó chạy" — `registerSW`,
-    #: `roving tabindex`, `watchNotes`, điều hướng bằng phím mũi tên.
+    #: Changed names not mentioned by any test file. This is the most valuable
+    #: item: the most frequent failure pattern on e9 is "code exists but no
+    #: test proves it works" — `registerSW`, `roving tabindex`, `watchNotes`,
+    #: arrow-key navigation.
     untested_symbols: list[str] = field(default_factory=list)
-    #: Luồng/đường thực thi bị chạm, nếu nhà cung cấp biết.
+    #: Flows/execution paths affected, if the provider knows.
     flows: list[str] = field(default_factory=list)
-    #: Ai tính ra kết quả này.
+    #: Who computed this result.
     source: str = ""
-    #: True khi kết quả thô hơn mức mong muốn (bản dựng sẵn, hoặc lệnh
-    #: ngoài hỏng). Phải nói ra: người đọc cần biết mức tin cậy.
+    #: True when the result is rougher than desired (built-in fallback, or
+    #: external command failed). Must be stated: the reader needs to know the
+    #: confidence level.
     degraded: bool = False
     note: str = ""
 
@@ -77,7 +79,7 @@ class ImpactReport:
         )
 
     def as_prompt(self) -> str:
-        """Phần đưa vào prompt rà soát. Nói rõ nguồn và giới hạn."""
+        """Section for the review prompt. States source and limitations."""
         if self.empty:
             return (
                 "_No impact analysis available_ — `review.impact_provider` "
@@ -114,10 +116,10 @@ class ImpactReport:
 
     @classmethod
     def from_json(cls, raw: dict, *, source: str) -> "ImpactReport":
-        """Đọc kết quả của một nhà cung cấp ngoài.
+        """Parse the result of an external provider.
 
-        Khoá lạ bị bỏ qua, khoá thiếu thành rỗng: một công cụ ngoài đổi
-        định dạng không đáng làm hỏng cả lượt rà soát.
+        Unknown keys are ignored, missing keys default to empty: an external
+        tool changing its format should not break an entire review session.
         """
         def lay(*ten: str) -> list[str]:
             for t in ten:
@@ -137,7 +139,7 @@ class ImpactReport:
         )
 
 
-# ------------------------------------------------------------ nhà cung cấp
+# ------------------------------------------------------------ providers
 
 
 def analyse(
@@ -147,11 +149,12 @@ def analyse(
     command: str = "",
     timeout: int = 120,
 ) -> ImpactReport:
-    """Phân tích ảnh hưởng của một tập tệp đã đổi.
+    """Analyse the impact of a set of changed files.
 
-    Có lệnh ngoài thì dùng nó; lệnh hỏng thì **lùi về** bản dựng sẵn và
-    nói rõ, thay vì trả rỗng. Rỗng im lặng là tệ nhất: người rà soát
-    không phân biệt được "không có ảnh hưởng" với "không ai tính".
+    Uses the external command if provided; on failure, **falls back** to the
+    built-in and says so, rather than returning empty. Silent empty is the
+    worst outcome: the reviewer cannot distinguish "no impact" from "nobody
+    computed it."
     """
     project = Path(project)
     changed = [c for c in changed if c]
@@ -176,10 +179,10 @@ def analyse(
 def _run_command(
     project: Path, changed: list[str], command: str, timeout: int
 ) -> ImpactReport | None:
-    """Chạy nhà cung cấp ngoài. ``None`` nếu không dùng được kết quả.
+    """Run the external provider. Returns ``None`` if the result is unusable.
 
-    Hợp đồng cố tình đơn giản để công cụ nào cũng nối được: nhận danh
-    sách tệp qua stdin (mỗi dòng một tệp), trả JSON ra stdout.
+    The contract is intentionally simple so any tool can plug in: receives
+    file list via stdin (one file per line), returns JSON on stdout.
     """
     try:
         proc = subprocess.run(
@@ -203,21 +206,22 @@ def _run_command(
     return ImpactReport.from_json(raw, source=command.split()[0])
 
 
-#: Tên xuất khẩu, theo họ ngôn ngữ. Cố ý chỉ bắt **khai báo xuất khẩu**:
-#: biến cục bộ không đáng dò tham chiếu toàn kho. Nhóm 1 = loại, nhóm 2 = tên.
+#: Exported names, by language family. Intentionally only catches **export
+#: declarations**: local variables are not worth searching across the repo.
+#: Group 1 = kind, group 2 = name.
 _EXPORTS = (
-    # `[ \t]*` chứ không `\s*`: `\s` nuốt cả dòng trống phía trước và số
-    # dòng của định nghĩa lệch đi chừng ấy dòng.
+    # `[ \t]*` not `\s*`: `\s` swallows preceding blank lines and shifts
+    # the definition's line number by that many lines.
     re.compile(r"^[ \t]*export\s+(?:default\s+)?(?:async\s+)?"
                r"(function|class|const|let|var|interface|type|enum)\s+(\w+)", re.M),
     re.compile(r"^[ \t]*(?:public\s+|async\s+)?(def|class|func|fn)\s+(\w+)", re.M),
 )
 
-#: Tên ngắn hơn chừng này không đáng dò: `id`, `run`, `get` dính khắp kho.
+#: Names shorter than this are not worth searching: `id`, `run`, `get` match everywhere.
 MIN_NAME_LEN = 4
-#: Tên định nghĩa ở nhiều hơn chừng này tệp là tên phổ biến (`save`,
-#: `render`) — Aider giảm trọng ×0,1; trước đây `builtin` để chúng lấp đầy
-#: `callers` rồi cắt lặng ở MAX_PER_KIND (ADR-005 §9, phát hiện 5).
+#: Names defined in more than this many files are common names (`save`, `render`)
+#: — Aider down-weights them x0.1; previously `builtin` let them fill up
+#: `callers` then silently cut at MAX_PER_KIND (ADR-005 §9, finding 5).
 COMMON_DEFS = 5
 
 
@@ -231,10 +235,11 @@ def _read(path: Path) -> str | None:
 
 
 def symbols(project: Path | str, files=None) -> dict[str, list[tuple[str, int, str]]]:
-    """{tệp: [(tên, dòng, loại)]} — tên xuất khẩu của từng tệp.
+    """{file: [(name, line, kind)]} — exported names per file.
 
-    Bỏ tên `_private` (Aider: không đáng dò ngoài tệp) và tên ngắn hơn
-    `MIN_NAME_LEN`. ``files`` là đường dẫn tương đối; ``None`` = cả kho.
+    Excludes `_private` names (Aider: not worth searching outside the file)
+    and names shorter than `MIN_NAME_LEN`. ``files`` are relative paths;
+    ``None`` = entire repo.
     """
     project = Path(project)
     out: dict[str, list[tuple[str, int, str]]] = {}
@@ -255,10 +260,10 @@ def symbols(project: Path | str, files=None) -> dict[str, list[tuple[str, int, s
 
 
 def refs(project: Path | str, names, files=None) -> dict[str, dict[str, int]]:
-    """{tên: {tệp: số lần nhắc}} — **một** lượt quét kho cho mọi tên.
+    """{name: {file: mention_count}} — **one** repo scan for all names.
 
-    Nhận nhiều tên một lần thay vì một tên mỗi lần gọi: 50 tên × 500 tệp
-    quét lại từng tên là 25 000 lần đọc, gộp lại còn 500.
+    Takes all names at once instead of one per call: 50 names x 500 files
+    re-scanning per name is 25,000 reads, batching reduces it to 500.
     """
     project = Path(project)
     names = sorted({n for n in names if n}, key=len, reverse=True)
@@ -276,9 +281,9 @@ def refs(project: Path | str, names, files=None) -> dict[str, dict[str, int]]:
 
 
 def weights(project: Path | str, names, files=None) -> dict[str, float]:
-    """Trọng số mỗi tên theo ba luật của Aider: `_private` → 0, định nghĩa ở
-    > `COMMON_DEFS` tệp → ×0,1, còn lại 1. Luật thứ ba (√số lần nhắc) áp ở
-    chỗ cộng điểm, không ở đây."""
+    """Weight per name using three Aider rules: `_private` -> 0, defined in
+    > `COMMON_DEFS` files -> x0.1, otherwise 1. The third rule (sqrt of
+    mention count) is applied at score accumulation, not here."""
     defs: Counter = Counter()
     for syms in symbols(project, files).values():
         defs.update({n for n, _, _ in syms})
@@ -289,17 +294,18 @@ def weights(project: Path | str, names, files=None) -> dict[str, float]:
 
 
 def builtin(project: Path | str, changed: list[str]) -> ImpactReport:
-    """Bản dựng sẵn: tìm tên xuất khẩu rồi dò tham chiếu bằng văn bản.
+    """Built-in fallback: find exported names then search for references by text.
 
-    Thô so với đồ thị gọi hàm thật — trùng tên là dính, gọi động không
-    thấy — nhưng chạy được ngay, không cài gì, và trả lời đúng câu hỏi
-    đắt nhất: **tên nào vừa đổi mà không test nào nhắc tới**. Khuôn thất
-    bại lặp lại nhiều nhất trên e9 chính là loại đó.
+    Rough compared to a real call graph — name collisions produce false
+    positives, dynamic calls are invisible — but works immediately, requires
+    no installation, and answers the most expensive question: **which changed
+    names are not mentioned by any test**. The most frequent failure pattern
+    on e9 is exactly that kind.
 
-    Điểm một tệp = Σ trọng số(tên) × √(số lần nhắc); tệp dưới 1 điểm (chỉ
-    dính tên phổ biến) bị bỏ, phần còn lại xếp theo điểm rồi mới cắt ở
-    `MAX_PER_KIND` — tên `save`/`render` không còn đẩy tệp gọi thật ra
-    khỏi danh sách.
+    File score = sum(weight(name) * sqrt(mention_count)); files below 1 point
+    (only matched common names) are dropped, the rest are sorted by score
+    before cutting at `MAX_PER_KIND` — `save`/`render` no longer push real
+    callers out of the list.
     """
     project = Path(project)
     rep = ImpactReport(source="builtin (name-based search)", degraded=True)
@@ -314,11 +320,11 @@ def builtin(project: Path | str, changed: list[str]) -> ImpactReport:
     files = list(_rel_files(project))
     w = weights(project, names, files)
     score: dict[str, float] = defaultdict(float)
-    nhac: set[str] = set()      # tên được test nhắc tới
+    nhac: set[str] = set()      # names mentioned by at least one test
     for name, per_file in refs(project, names, files).items():
         for rel, n in per_file.items():
-            # Chính tệp vừa sửa không phải "nơi dùng" của chính nó; test
-            # **trong** diff thì tính — story hay viết test cạnh code.
+            # The changed file itself is not a "caller" of itself; tests
+            # **within** the diff do count — stories often write tests next to code.
             if rel in doi and not is_test_path(rel):
                 continue
             score[rel] += w[name] * math.sqrt(n)
@@ -333,7 +339,7 @@ def builtin(project: Path | str, changed: list[str]) -> ImpactReport:
 
 
 def _rel_files(project: Path):
-    """Đường dẫn tương đối (posix) của mọi tệp mã nguồn trong kho."""
+    """Relative (posix) paths of all source files in the repo."""
     for f in _source_files(project):
         yield f.relative_to(project).as_posix()
 
