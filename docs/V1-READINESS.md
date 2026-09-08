@@ -15,13 +15,13 @@ due to this bug (probabilistic).
 
 | # | Condition | Evidence |
 |---|---|---|
-| A1 | 100% unit tests green | 1904/1904, `python3 -m unittest discover -s tests` |
+| A1 | 100% unit tests green | 1930/1930, `python3 -m unittest discover -s tests` |
 | A2 | API stability contract | `docs/STABILITY.md` — frozen surface documented |
-| A3 | PyPI publish works | Trusted Publisher: v0.4.1, v0.5.0, v0.5.1, v0.6.0 all published |
+| A3 | PyPI publish works | Trusted Publisher: v0.4.1, v0.5.0, v0.5.1, v0.6.0, v0.7.0 all published |
 | A4 | Clean install verification | `pip install aisef` → `aisef doctor` runs |
 | A5 | English usage guide | `docs/USAGE-GUIDE.md` (927 lines) |
 | A6 | Documentation accuracy | SOLUTION.md §2.2, §11, §13 match code; README guard count |
-| A7 | Config key freeze | 57 keys, all documented in STABILITY.md |
+| A7 | Config key freeze | 58 keys, all documented in STABILITY.md |
 | A8 | Guard count matches | 9 guards, all in STABILITY.md table |
 | A9 | Meta tests | `test_meta.py` — every evidence kind has a producer, every EMULATED capability names its mechanism |
 | A10 | Test coverage for all public modules | test_skills, test_client_base, test_client_adapters, test_browser, test_parser, test_doctor, test_design_contract |
@@ -43,7 +43,7 @@ Options:
 1. **v1.0.0-rc1** — tag current code, document B1-B4 as pre-GA requirements
 2. **v1.0.0** — wait for B1-B4 (needs owner to run agents)
 
-v0.6.0 released 2026-09-08 with all automated conditions met.
+v0.8.0 released 2026-09-08 with brownfield support and all automated conditions met.
 
 The action plan's release conditions (R1-R5) require B1-B4. The framework
 code is feature-complete and well-tested for v1.0 scope; only the

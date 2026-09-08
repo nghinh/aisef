@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AISEF — AI Software Engineering Framework</title>
+  <meta name="description" content="The engineering harness that turns coding agents from black boxes into auditable, evidence-producing systems. Zero dependencies. One input file. Every claim backed by a SHA.">
+  <link rel="icon" type="image/png" sizes="32x32" href="icon/aisef-favicon-32.png">
+  <link rel="apple-touch-icon" href="icon/aisef-icon-light.png">
+  <meta property="og:title" content="AISEF — Your agent says done. Can you prove it?">
+  <meta property="og:description" content="Engineering harness for AI coding agents. Evidence-driven, SHA-bound, zero dependencies.">
+  <meta property="og:image" content="icon/aisef-icon-light.png">
+  <meta name="theme-color" content="#0A2540">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Outfit:wght@300;400;500;600;700&display=swap">
+  <style>
+:root {
+  --navy: #0A2540;
+  --teal: #00D4AA;
+  --teal-dim: #009E7F;
+  --teal-bg: rgba(0, 212, 170, 0.08);
+  --amber: #FFB224;
+  --surface: #FAFAF8;
+  --surface-alt: #F0EDE8;
+  --text: #1E293B;
+  --text-muted: #64748B;
+  --text-inv: #E2E8F0;
+  --border: #E2E0DB;
+  --code-bg: #1E293B;
+  --card-bg: #FFFFFF;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface: #0F172A;
+    --surface-alt: #1A2332;
+    --card-bg: #1E293B;
+    --text: #E2E8F0;
+    --text-muted: #94A3B8;
+    --text-inv: #1E293B;
+    --border: #334155;
+    --navy: #F1F5F9;
+    --code-bg: #0D1117;
+  }
+}
+:root[data-theme="dark"] {
+  --surface: #0F172A;
+  --surface-alt: #1A2332;
+  --card-bg: #1E293B;
+  --text: #E2E8F0;
+  --text-muted: #94A3B8;
+  --text-inv: #1E293B;
+  --border: #334155;
+  --navy: #F1F5F9;
+  --code-bg: #0D1117;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+body {
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 500;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+a { color: var(--teal-dim); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; display: block; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+section { padding: 80px 0; }
+@media (max-width: 768px) { section { padding: 56px 0; } }
+
+/* ── Header ── */
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 0;
+}
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.header-brand {
+  font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--navy);
+  display: flex; align-items: center; gap: 8px;
+}
+.header-brand img { width: 28px; height: 28px; border-radius: 6px; }
+.header-nav { display: flex; gap: 28px; font-size: 0.88rem; font-weight: 500; }
+.header-nav a { color: var(--text-muted); }
+.header-nav a:hover { color: var(--text); text-decoration: none; }
+.header-cta {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--teal); color: #0A2540;
+  font-weight: 600; font-size: 0.85rem;
+  padding: 8px 18px; border-radius: 8px; text-decoration: none;
+}
+.header-cta:hover { opacity: 0.88; text-decoration: none; }
+@media (max-width: 768px) {
+  .header-nav { display: none; }
+}
+
+/* ── Hero ── */
+.hero { padding: 100px 0 72px; text-align: center; }
+.hero-badge {
+  display: inline-block; font-size: 12px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal);
+  border: 1.5px solid var(--teal); border-radius: 100px; padding: 5px 16px;
+  margin-bottom: 24px;
+}
+.hero h1 {
+  font-size: clamp(2.2rem, 5vw, 3.8rem); color: var(--navy);
+  margin-bottom: 18px; font-weight: 600;
+  max-width: 800px; margin-left: auto; margin-right: auto;
+}
+.hero h1 em { font-style: italic; color: var(--teal-dim); }
+.hero-sub {
+  font-size: 1.1rem; color: var(--text-muted);
+  max-width: 600px; margin: 0 auto 36px; line-height: 1.65;
+}
+.hero-install {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--code-bg); color: #E2E8F0;
+  font-family: 'Menlo', 'Consolas', monospace; font-size: 15px;
+  padding: 14px 28px; border-radius: 10px;
+}
+.hero-install .dollar { color: #64748B; }
+.hero-version {
+  display: block; margin-top: 16px;
+  font-size: 0.82rem; color: var(--text-muted);
+}
+
+/* ── Principle ── */
+.principle {
+  padding: 56px 0; text-align: center;
+  background: var(--surface-alt);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.principle blockquote {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.2rem, 2.6vw, 1.6rem);
+  font-style: italic; font-weight: 400; color: var(--navy);
+  max-width: 720px; margin: 0 auto 12px; line-height: 1.4;
+}
+.principle .attr { font-size: 0.88rem; color: var(--text-muted); }
+
+/* ── Problem ── */
+.problem h2 { font-size: 1.8rem; margin-bottom: 32px; color: var(--navy); }
+.problem-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+.problem-card {
+  padding: 28px; border-radius: 12px;
+  background: var(--card-bg); border: 1px solid var(--border);
+}
+.problem-card .icon { font-size: 1.5rem; margin-bottom: 10px; }
+.problem-card h3 {
+  font-size: 1rem; font-family: 'Outfit', sans-serif;
+  font-weight: 600; margin-bottom: 8px;
+}
+.problem-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.55; }
+
+/* ── USP ── */
+.usp { background: var(--surface-alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.usp h2 { font-size: 1.8rem; text-align: center; margin-bottom: 10px; color: var(--navy); }
+.usp .subtitle {
+  text-align: center; color: var(--text-muted); margin-bottom: 44px;
+  font-size: 1rem; max-width: 580px; margin-left: auto; margin-right: auto;
+}
+.usp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 18px;
+}
+.usp-card {
+  padding: 28px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--card-bg);
+  position: relative; overflow: hidden;
+  transition: border-color 0.2s;
+}
+.usp-card:hover { border-color: var(--teal); }
+.usp-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; background: var(--teal); opacity: 0; transition: opacity 0.2s;
+}
+.usp-card:hover::before { opacity: 1; }
+.usp-num {
+  font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 300;
+  color: var(--teal); line-height: 1; margin-bottom: 12px;
+}
+.usp-card h3 { font-size: 1.05rem; font-family: 'Outfit', sans-serif; font-weight: 600; margin-bottom: 8px; }
+.usp-card p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
+.usp-tag {
+  display: inline-block; margin-top: 12px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--teal-dim);
+  background: var(--teal-bg); padding: 3px 9px; border-radius: 4px;
+}
+
+/* ── Comparison ── */
+.compare h2 { font-size: 1.8rem; margin-bottom: 10px; color: var(--navy); }
+.compare .subtitle { color: var(--text-muted); margin-bottom: 32px; font-size: 1rem; }
+.compare-table-wrap {
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  border-radius: 12px; border: 1px solid var(--border);
+}
+.compare-table {
+  width: 100%; min-width: 760px; border-collapse: collapse; font-size: 0.86rem;
+}
+.compare-table th, .compare-table td {
+  padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border);
+}
+.compare-table thead th {
+  background: var(--card-bg); font-weight: 600; font-size: 0.8rem;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted);
+  position: sticky; top: 0;
+}
+.compare-table thead th:last-child { color: var(--teal-dim); }
+.compare-table tbody tr:last-child td { border-bottom: none; }
+.compare-table tbody td { background: var(--card-bg); }
+.compare-table tbody td:first-child { font-weight: 500; }
+.compare-table .y { color: var(--teal-dim); font-weight: 600; }
+.compare-table .n { color: var(--text-muted); }
+.compare-table .p { color: var(--amber); font-weight: 500; }
+.compare-table .aisef-col {
+  background: color-mix(in srgb, var(--teal) 6%, var(--card-bg)) !important;
+  font-weight: 500;
+}
+
+/* ── Stats ── */
+.stats h2 { font-size: 1.8rem; text-align: center; margin-bottom: 10px; color: var(--navy); }
+.stats .subtitle {
+  text-align: center; color: var(--text-muted); margin-bottom: 44px;
+  font-size: 1rem; max-width: 600px; margin-left: auto; margin-right: auto;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 18px;
+}
+.stat-card {
+  text-align: center; padding: 28px 16px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--card-bg);
+}
+.stat-num {
+  font-family: 'Fraunces', serif; font-size: 2.6rem; font-weight: 600;
+  color: var(--teal-dim); line-height: 1; margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.stat-label { font-size: 0.84rem; color: var(--text-muted); font-weight: 500; }
+
+/* ── Workflow ── */
+.workflow h2 { font-size: 1.8rem; text-align: center; margin-bottom: 10px; color: var(--navy); }
+.workflow .subtitle {
+  text-align: center; color: var(--text-muted); margin-bottom: 44px;
+  font-size: 1rem; max-width: 600px; margin-left: auto; margin-right: auto;
+}
+.flow-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.flow-step {
+  text-align: center; padding: 24px 14px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--card-bg);
+}
+.flow-step .step-num {
+  font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 300;
+  color: var(--teal); margin-bottom: 6px;
+}
+.flow-step h4 {
+  font-size: 0.88rem; font-family: 'Outfit', sans-serif;
+  font-weight: 600; margin-bottom: 4px;
+}
+.flow-step p { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; }
+
+/* ── Harness groups ── */
+.harness { background: var(--surface-alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.harness h2 { font-size: 1.8rem; text-align: center; margin-bottom: 10px; color: var(--navy); }
+.harness .subtitle {
+  text-align: center; color: var(--text-muted); margin-bottom: 44px;
+  font-size: 1rem; max-width: 600px; margin-left: auto; margin-right: auto;
+}
+.harness-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 14px;
+}
+.harness-item {
+  display: flex; gap: 14px; padding: 22px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--card-bg); align-items: flex-start;
+}
+.harness-item .h-num {
+  font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 300;
+  color: var(--teal); flex-shrink: 0; width: 26px;
+}
+.harness-item h4 {
+  font-size: 0.92rem; font-family: 'Outfit', sans-serif;
+  font-weight: 600; margin-bottom: 3px;
+}
+.harness-item p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; }
+
+/* ── CTA ── */
+.cta {
+  text-align: center; padding: 72px 0 88px;
+  background: var(--surface-alt); border-top: 1px solid var(--border);
+}
+.cta h2 { font-size: 1.8rem; color: var(--navy); margin-bottom: 14px; }
+.cta p {
+  color: var(--text-muted); margin-bottom: 28px; font-size: 1rem;
+  max-width: 500px; margin-left: auto; margin-right: auto;
+}
+.cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 24px; border-radius: 10px;
+  font-weight: 600; font-size: 0.92rem; text-decoration: none;
+  transition: opacity 0.15s;
+}
+.btn:hover { opacity: 0.85; text-decoration: none; }
+.btn-primary { background: var(--teal); color: #0A2540; }
+.btn-outline { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
+
+/* ── Footer ── */
+.footer {
+  text-align: center; padding: 28px 0;
+  font-size: 0.8rem; color: var(--text-muted);
+  border-top: 1px solid var(--border);
+}
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="wrap header-inner">
+    <div class="header-brand">
+      <img src="icon/aisef-icon-dark.png" alt="">
+      AISEF
+    </div>
+    <nav class="header-nav">
+      <a href="#problem">Problem</a>
+      <a href="#capabilities">Capabilities</a>
+      <a href="#compare">Comparison</a>
+      <a href="#workflow">Workflow</a>
+      <a href="https://github.com/nghinh/aisef" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+    <a class="header-cta" href="https://pypi.org/project/aisef/" target="_blank" rel="noopener">Install</a>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-badge">Open Source &middot; Zero Dependencies</div>
+    <h1>Your agent says <em>"done"</em>.<br>Can you prove it?</h1>
+    <p class="hero-sub">AISEF is the engineering harness that turns coding agents from black boxes into auditable, evidence-producing systems. One input file. Every claim backed by a SHA.</p>
+    <div class="hero-install">
+      <span class="dollar">$</span> pip install aisef
+    </div>
+    <span class="hero-version">v0.8.0 &middot; Python &ge; 3.11 &middot; Greenfield &amp; Brownfield</span>
+  </div>
+</section>
+
+<!-- Principle -->
+<section class="principle">
+  <div class="wrap">
+    <blockquote>"If it needs judgement, give it to the model.<br>If it needs a guarantee, write code."</blockquote>
+    <div class="attr">The design principle behind every decision in AISEF</div>
+  </div>
+</section>
+
+<!-- Problem -->
+<section class="problem" id="problem">
+  <div class="wrap">
+    <h2>The problem with agent tooling today</h2>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="icon">Self-grading</div>
+        <h3>The model supervises itself</h3>
+        <p>Most frameworks let the agent decide when it's done. That's asking the student to grade their own exam. When the reviewer is the developer, mistakes are invisible by design.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">Detached evidence</div>
+        <h3>"Tests passed" means nothing</h3>
+        <p>Tests passed when? On which code? A test suite that ran on a commit three edits ago proves nothing about the code you're shipping. Evidence without a commit hash is an anecdote.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">Trust by default</div>
+        <h3>The client is trusted blindly</h3>
+        <p>Guards, hooks, and plugins are compiled artifacts. Being syntactically valid doesn't mean the client runs them. A hook pointing to a missing binary means no guard ran at all — silently.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">Greenfield-only</div>
+        <h3>No support for existing code</h3>
+        <p>Most agent tools assume you're starting from scratch. Real teams have existing codebases. Without blast-radius analysis, an agent "fixing" one module silently breaks three others.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- USPs -->
+<section class="usp" id="capabilities">
+  <div class="wrap">
+    <h2>What exists nowhere else</h2>
+    <p class="subtitle">Nine capabilities no other agent framework offers in combination. Each measured on real agents, not theorized.</p>
+    <div class="usp-grid">
+      <div class="usp-card">
+        <div class="usp-num">01</div>
+        <h3>SHA-Bound Evidence</h3>
+        <p>Every check records the exact commit it ran on. Evidence from another SHA is classified as stale — a different outcome from failure, and a different outcome from success.</p>
+        <span class="usp-tag">World first</span>
+      </div>
+      <div class="usp-card">
+        <div class="usp-num">02</div>
+        <h3>Reviewer &ne; Developer</h3>
+        <p>The review session is a separate agent instance, forbidden to edit code. It can only read and judge. The model never supervises its own output — structural guarantee, not a prompt instruction.</p>
+        <span class="usp-tag">Structural guarantee</span>
+      </div>
+      <div class="usp-card">
+        <div class="usp-num">03</div>
+        <h3>Qualified Gates (16 &times; 3)</h3>
+        <p>All 16 story-level gate checks have three controls each: positive, negative/mutant, and environment. "Is the gate itself scoring correctly" is answered by a command.</p>
+        <span class="usp-tag">World first</span>
+      </div>
+      <div class="usp-card">
+        <div class="usp-num">04</div>
+        <h3>Negative Control on Tests</h3>
+        <p>A test already green before the story wrote any code proves nothing. The gate detects this and names the offending test. No credit for pre-existing passes.</p>
+        <span class="usp-tag">World first</span>
+      </div>
+      <div class="usp-card">
+        <div class="usp-num">05</div>
+        <h3>Behaviour Ledger</h3>
+        <p>Every acceptance criterion, requirement, and screen has a state: VERIFIED, GAP, or REOPENED. The ledger is rebuilt from evidence — never a second source of truth.</p>
+        <span class="usp-tag">Automatic regression</span>
+      </div>
+      <div class="usp-card">
+        <div class="usp-num">06</div>
+        <h3>Never Trust the Client</h3>
+        <p>Guards live on the framework side. A client that cannot host pre-execution guards is recorded as offering weaker assurance — capability declared and tested, defaulting to "unproven".</p>
+        <span class="usp-tag">Proven on 2 clients</span>
+      </div>
+      <div class="usp-card">
+        <div class="usp-num">07</div>
+        <h3>Six Outcomes, Not Two</h3>
+        <p>PASSED, FAILED, UNRUNNABLE, UNCONFIGURED, WAIVED, NOT_APPLICABLE. Three invariants: unconfigured &ne; passed, unrunnable &ne; failed, unfixed &ne; unfixable.</p>
+        <span class="usp-tag">Epistemic honesty</span>
+      </div>
+      <div class="usp-card">
+        <div class="usp-num">08</div>
+        <h3>Harness of Harness</h3>
+        <p>A second loop wraps the first: frozen candidates, behaviour ledger, bounded improvement, preservation gates, and negative controls. Stops in code, not by feeling.</p>
+        <span class="usp-tag">Self-improving</span>
+      </div>
+      <div class="usp-card">
+        <div class="usp-num">09</div>
+        <h3>Brownfield-Ready</h3>
+        <p>Existing codebase? One command builds a baseline. Code graph providers power blast-radius analysis on every story. Delta planning preserves what works and changes only what the requirement asks.</p>
+        <span class="usp-tag">New in v0.8</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Comparison -->
+<section class="compare" id="compare">
+  <div class="wrap">
+    <h2>Compared to what exists</h2>
+    <p class="subtitle">Capabilities checked against publicly documented features of leading agent frameworks, September 2026.</p>
+    <div class="compare-table-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Capability</th>
+            <th>Devin / Factory</th>
+            <th>Cursor / Windsurf</th>
+            <th>SWE-agent / Aider</th>
+            <th>Claude Code / Codex</th>
+            <th class="aisef-col">AISEF</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Evidence bound to commit SHA</td>
+            <td class="n">No</td><td class="n">No</td><td class="n">No</td><td class="n">No</td>
+            <td class="y aisef-col">Yes</td>
+          </tr>
+          <tr>
+            <td>Reviewer &ne; developer (separate session)</td>
+            <td class="n">No</td><td class="n">No</td><td class="n">No</td><td class="n">No</td>
+            <td class="y aisef-col">Yes</td>
+          </tr>
+          <tr>
+            <td>Gate checks with qualified controls</td>
+            <td class="n">No</td><td class="n">No</td><td class="n">No</td><td class="n">No</td>
+            <td class="y aisef-col">16 &times; 3</td>
+          </tr>
+          <tr>
+            <td>Negative control on tests (nop detection)</td>
+            <td class="n">No</td><td class="n">No</td><td class="n">No</td><td class="n">No</td>
+            <td class="y aisef-col">Yes</td>
+          </tr>
+          <tr>
+            <td>Behaviour ledger with auto-regression</td>
+            <td class="n">No</td><td class="n">No</td><td class="n">No</td><td class="n">No</td>
+            <td class="y aisef-col">Yes</td>
+          </tr>
+          <tr>
+            <td>Pre-execution guards (framework-side)</td>
+            <td class="p">Partial</td><td class="p">Partial</td><td class="n">No</td><td class="p">Client-side</td>
+            <td class="y aisef-col">9 guards</td>
+          </tr>
+          <tr>
+            <td>Brownfield support with blast-radius</td>
+            <td class="n">No</td><td class="n">No</td><td class="n">No</td><td class="n">No</td>
+            <td class="y aisef-col">Yes</td>
+          </tr>
+          <tr>
+            <td>Six-outcome classification</td>
+            <td class="n">Pass/Fail</td><td class="n">Pass/Fail</td><td class="n">Pass/Fail</td><td class="n">Pass/Fail</td>
+            <td class="y aisef-col">6 outcomes</td>
+          </tr>
+          <tr>
+            <td>Evidence-driven improvement loop</td>
+            <td class="n">No</td><td class="n">No</td><td class="p">Retry only</td><td class="n">No</td>
+            <td class="y aisef-col">Bounded loop</td>
+          </tr>
+          <tr>
+            <td>Zero external dependencies</td>
+            <td class="n">No</td><td class="n">No</td><td class="n">No</td><td class="n">No</td>
+            <td class="y aisef-col">Stdlib only</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section class="stats" style="background: var(--surface-alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="wrap">
+    <h2>Measured, not claimed</h2>
+    <p class="subtitle">Every number comes from real agent runs on real codebases. Where something hasn't been measured, we say so.</p>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num">23,203</div>
+        <div class="stat-label">Lines of Python, zero deps</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">1,930</div>
+        <div class="stat-label">Unit tests, no Docker needed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">31</div>
+        <div class="stat-label">Real bugs found by measurement</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">48</div>
+        <div class="stat-label">Gate checks (16 &times; 3 controls)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">9</div>
+        <div class="stat-label">Guards on 3 lifecycle moments</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">58</div>
+        <div class="stat-label">Configuration keys, all documented</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Workflow -->
+<section class="workflow" id="workflow">
+  <div class="wrap">
+    <h2>From requirements to production</h2>
+    <p class="subtitle">One input file drives every phase. Eight human gates control what moves forward.</p>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <h4>Setup</h4>
+        <p>Detect stack, install skills, generate rules</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <h4>Plan</h4>
+        <p>PRD &rarr; Architecture &rarr; UX &rarr; Epics &rarr; Stories</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">3</div>
+        <h4>Mockup</h4>
+        <p>HTML per screen, visual contract extracted</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">4</div>
+        <h4>Implement</h4>
+        <p>TDD in isolated worktrees, guards active</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">5</div>
+        <h4>Verify</h4>
+        <p>Independent review + security + 16 gate checks</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">6</div>
+        <h4>Ship</h4>
+        <p>Pre-deploy gate, acceptance report, behavior ledger</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Harness groups -->
+<section class="harness">
+  <div class="wrap">
+    <h2>The six harness groups</h2>
+    <p class="subtitle">Everything in AISEF belongs to exactly one group. This is the acceptance yardstick for the framework itself.</p>
+    <div class="harness-list">
+      <div class="harness-item">
+        <span class="h-num">1</span>
+        <div>
+          <h4>Instructions &amp; Rule Files</h4>
+          <p>Engineering constitution compiled into CLAUDE.md/AGENTS.md, pinned skill catalog, four agent roles each with its own fresh session, versioned prompts.</p>
+        </div>
+      </div>
+      <div class="harness-item">
+        <span class="h-num">2</span>
+        <div>
+          <h4>Tools</h4>
+          <p>Three evidence-producing tools the agent calls. Every tool carries prose on when to call it, how to read its result, and when not to call it.</p>
+        </div>
+      </div>
+      <div class="harness-item">
+        <span class="h-num">3</span>
+        <div>
+          <h4>Sandboxes &amp; Execution</h4>
+          <p>Four permission levels, an ExecutionProvider contract, five named guarantees. A provider that can't offer one says which — degraded, never silent.</p>
+        </div>
+      </div>
+      <div class="harness-item">
+        <span class="h-num">4</span>
+        <div>
+          <h4>Orchestration Logic</h4>
+          <p>Role routing where reviewer &ne; developer, story state machine, wave scheduling by dependency and write scope, handoff packets with declared sources.</p>
+        </div>
+      </div>
+      <div class="harness-item">
+        <span class="h-num">5</span>
+        <div>
+          <h4>Guardrails &amp; Hooks</h4>
+          <p>Nine guards on three lifecycle moments, each a standalone command returning an exit code. Compiled into whatever the client supports.</p>
+        </div>
+      </div>
+      <div class="harness-item">
+        <span class="h-num">6</span>
+        <div>
+          <h4>Observability</h4>
+          <p>Structured events with provenance, cost and latency per session, every check bound to the SHA of the candidate, behaviour ledger, benchmark corpus.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="wrap">
+    <h2>Start building with evidence</h2>
+    <p>One file in, verified software out. Open source, zero dependencies, installs in one command. Works on new and existing codebases.</p>
+    <div class="cta-buttons">
+      <a class="btn btn-primary" href="https://pypi.org/project/aisef/" target="_blank" rel="noopener">Install from PyPI</a>
+      <a class="btn btn-outline" href="https://github.com/nghinh/aisef" target="_blank" rel="noopener">View on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    AISEF — AI Software Engineering Framework &middot; v0.8.0 &middot; Open Source &middot; MIT License
+  </div>
+</footer>
+
+</body>
+</html>

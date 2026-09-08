@@ -11,7 +11,7 @@ Reading conventions:
 
 - `bash` blocks are commands to type in the terminal. Run one block at a time, read the output, then move on.
 - The symbols `✅ ○ ⚠ ✗ –` are the **six gate outcomes** of the framework, not decoration. Their meaning is in [§10](#10-reading-story-gates-six-outcomes).
-- Where it says "wait a few minutes", an agent session is running and **costs money**; real costs are in [§14](#14-real-costs-and-how-to-reduce-them).
+- Where it says "wait a few minutes", an agent session is running and **costs money**; real costs are in [§15](#15-real-costs-and-how-to-reduce-them).
 
 ---
 
@@ -28,13 +28,14 @@ Reading conventions:
 9. [Mockup step (UI projects)](#9-mockup-step-ui-projects)
 10. [Reading story gates: six outcomes](#10-reading-story-gates-six-outcomes)
 11. [Implementation step: `aisef run`](#11-implementation-step-aisef-run)
-12. [Verification, packaging, and acceptance](#12-verification-packaging-and-acceptance)
-13. [Improvement loops and post-release changes](#13-improvement-loops-and-post-release-changes)
-14. [Real costs and how to reduce them](#14-real-costs-and-how-to-reduce-them)
-15. [Troubleshooting](#15-troubleshooting)
-16. [Reference: all commands](#16-reference-all-commands)
-17. [Reference: all configuration keys](#17-reference-all-configuration-keys)
-18. [Glossary](#18-glossary)
+12. [Brownfield projects (existing codebases)](#12-brownfield-projects-existing-codebases)
+13. [Verification, packaging, and acceptance](#13-verification-packaging-and-acceptance)
+14. [Improvement loops and post-release changes](#14-improvement-loops-and-post-release-changes)
+15. [Real costs and how to reduce them](#15-real-costs-and-how-to-reduce-them)
+16. [Troubleshooting](#16-troubleshooting)
+17. [Reference: all commands](#17-reference-all-commands)
+18. [Reference: all configuration keys](#18-reference-all-configuration-keys)
+19. [Glossary](#19-glossary)
 
 ---
 
@@ -295,7 +296,7 @@ Three things worth knowing right away:
 A waiver without a reason is blocked by the gate. Waived types show ◇ and
 **never** become ✅ — you accept responsibility, not a passing grade.
 
-All keys are listed in [§17](#17-reference-all-configuration-keys).
+All keys are listed in [§18](#18-reference-all-configuration-keys).
 
 ---
 
@@ -305,7 +306,7 @@ All keys are listed in [§17](#17-reference-all-configuration-keys).
 aisef compile
 ```
 
-Generates hooks/plugins for the client, connecting the framework's **eight
+Generates hooks/plugins for the client, connecting the framework's **nine
 guards** to the agent session. Guards run on the framework side, not the client
 side — the client is not trusted.
 
@@ -317,6 +318,7 @@ side — the client is not trusted.
 | | `git-stage` | unauthorized staging/committing outside the workflow |
 | | `injection` | content containing prompt-injection attempts targeting the agent |
 | | `process-ref` | writing story/epic codes into source code |
+| | `egress` | outbound network connections to hosts not in the allowlist |
 | after each tool use | `diff-scope` | actual changes exceeding the allowed scope |
 | when the agent is about to stop | `completion` | stopping when tests aren't green after the last edit |
 
@@ -595,7 +597,7 @@ Then classify:
   and the story file, re-approve the `stories` gate, then run again.
 
 - **Failed due to bad code**: let the framework retry, or run an improvement
-  loop from [§13](#13-improvement-loops-and-post-release-changes).
+  loop from [§14](#14-improvement-loops-and-post-release-changes).
 
 To see what the agent is given:
 
@@ -606,7 +608,180 @@ aisef skill --story STORY-01-03      # skills routed to this story
 
 ---
 
-## 12. Verification, packaging, and acceptance
+## 12. Brownfield projects (existing codebases)
+
+Everything above assumes a **greenfield** project — an empty repo. If you are
+bringing AISEF into an **existing codebase** (≥ 3 source files), the framework
+detects this automatically and switches to **brownfield mode**.
+
+### 12.1 Running the baseline scan
+
+Before planning, run the baseline command to snapshot the current state of your
+codebase:
+
+```bash
+aisef baseline
+```
+
+This command:
+
+1. **Detects** that the project is brownfield (≥ 3 source files, config files,
+   `package.json` / `pyproject.toml` / etc.)
+2. **Scans** the codebase using a code graph provider (see below)
+3. **Writes** `_bmad-output/baseline.md` — a structured summary of the current
+   architecture, modules, dependencies, and technology stack
+
+The baseline file is the foundation for all brownfield planning. Without it,
+the framework treats the project as greenfield and will try to generate
+everything from scratch.
+
+### 12.2 Choosing a code graph provider
+
+The framework supports pluggable code graph providers via the
+`context.graph_provider` config key:
+
+| Value | Provider | What it does |
+|---|---|---|
+| `"auto"` (default) | Picks the best available | Uses Graphify if installed, otherwise falls back to Basic |
+| `"graphify"` | Graphify CLI | Full dependency graph, function-level impact analysis. Requires `graphify` on PATH (`uv tool install graphifyy`) |
+| `"basic"` | Built-in regex | Parses Python/JS imports with regex. Always available, no extra install |
+
+To set the provider:
+
+```json
+{
+  "context.graph_provider": "auto"
+}
+```
+
+To install Graphify (recommended for large codebases):
+
+```bash
+uv tool install graphifyy
+graphify .                          # build the graph once
+```
+
+You can also specify the provider on the command line:
+
+```bash
+aisef baseline --provider graphify
+```
+
+### 12.3 Incremental graph updates
+
+After each merge or significant change, update the graph incrementally instead
+of rebuilding from scratch:
+
+```bash
+aisef baseline --incremental
+```
+
+This is fast and keeps the impact analysis accurate.
+
+### 12.4 How brownfield changes the planning pipeline
+
+Once `_bmad-output/baseline.md` exists, `aisef plan` automatically:
+
+- **Switches intent** from `"create"` to `"update"` for artifacts that already exist
+- **Injects brownfield context** into every planning prompt, including the
+  baseline summary and these rules:
+  - Preserve existing architecture, code, and behavior — only change what the
+    change request requires
+  - Code is ground truth; existing docs may be stale — record contradictions
+  - Generate **delta** artifacts, not full regenerations
+- **Skips** phases whose artifacts already exist (unless you pass `--force`)
+
+You don't need to change your workflow — just run `aisef baseline` before
+`aisef plan`, and the framework handles the rest.
+
+### 12.5 Blast radius analysis
+
+When implementing stories in a brownfield project, the framework adds
+**blast radius analysis** to every story prompt. This means:
+
+1. The code graph provider identifies all files/modules affected by the story's
+   `write_scope`
+2. This impact list is injected into the developer, reviewer, and security
+   reviewer prompts
+3. The agent is instructed to run regression tests on affected files and not
+   modify anything outside `write_scope` unless necessary for compatibility
+
+### 12.6 Post-release changes in brownfield projects
+
+`aisef change` is brownfield-aware. When you change a requirement:
+
+```bash
+aisef change FR-3 "Slugs must preserve underscores"
+```
+
+In a brownfield project, the generated delta story automatically includes:
+- A reference to the baseline for context
+- A blast-radius analysis step
+- Instructions to preserve existing behavior
+
+### 12.7 Complete brownfield workflow (step by step)
+
+```bash
+# 1. Go into your existing project
+cd ~/projects/my-existing-app
+
+# 2. Make sure it's a git repo
+git init   # skip if already a repo
+
+# 3. Install AISEF and set up
+pip install aisef
+aisef setup
+aisef compile
+
+# 4. Write what you want to change (not the whole app — just the change)
+cat > docs/requirements.md << 'EOF'
+# Add dark mode support
+
+The application already works. We need to add a dark mode toggle
+that respects the user's OS preference and persists the choice.
+
+## Functional requirements
+
+- Add a dark/light mode toggle in the header.
+- Default to the user's OS color scheme preference.
+- Persist the user's choice in localStorage.
+- All existing screens must render correctly in both themes.
+
+## Constraints
+
+- Must not break any existing functionality.
+- Must not change the existing component API.
+EOF
+
+# 5. Run the baseline scan
+aisef baseline
+
+# 6. (Optional) Install Graphify for better impact analysis
+uv tool install graphifyy
+graphify .
+aisef baseline --provider graphify
+
+# 7. Configure your tools
+# Edit .ai/config.json with your test/lint commands (see §6)
+
+# 8. Plan — the framework detects brownfield and generates delta plans
+aisef plan
+
+# 9. Review and approve gates as usual (see §8)
+aisef gates
+aisef approve prd --note "delta scope looks right"
+# ... approve each gate
+
+# 10. Run implementation — stories include blast radius analysis
+aisef run
+
+# 11. After stories merge, update the graph incrementally
+aisef baseline --incremental
+```
+
+---
+
+## 13. Verification, packaging, and acceptance
 
 ```bash
 aisef qa
@@ -673,7 +848,7 @@ aisef issues --format csv            # gap/regression table as a file
 
 ---
 
-## 13. Improvement loops and post-release changes
+## 14. Improvement loops and post-release changes
 
 **Improvement loops** progressively close the gaps (GAP) recorded in the
 behavior ledger:
@@ -705,7 +880,7 @@ and all downstream gates as `stale`, and generates a delta story
 
 ---
 
-## 14. Real costs and how to reduce them
+## 15. Real costs and how to reduce them
 
 Real measurements on a notes project (Claude Code client):
 
@@ -735,7 +910,7 @@ Ways to reduce cost:
 
 ---
 
-## 15. Troubleshooting
+## 16. Troubleshooting
 
 | You see | It means | What to do |
 |---|---|---|
@@ -758,7 +933,7 @@ Exit codes for all commands: `0` success, `1` bad arguments or missing input,
 
 ---
 
-## 16. Reference: all commands
+## 17. Reference: all commands
 
 All commands accept `--project <directory>` (default: current directory).
 
@@ -767,8 +942,9 @@ All commands accept `--project <directory>` (default: current directory).
 ```bash
 aisef doctor                              # check the environment
 aisef setup [--references DIR] [--no-fetch] [--dry-run]
-aisef init                                # write default .ai/config.json
+aisef init [--stack react|python|go|node]  # write default .ai/config.json
 aisef compile [--client claude|opencode|all] [--bin PATH]
+aisef baseline [--provider auto|graphify|basic] [--incremental]
 ```
 
 **Planning and human gates**
@@ -814,11 +990,12 @@ aisef ctx [--story S | --file F] [--budget N]
 aisef skill [--story S] [--scan --client c --batch N]
 aisef doc <package> [--topic T] [--story S]
 aisef change FR-x "description"
+aisef dashboard                           # browser-based project dashboard
 ```
 
 ---
 
-## 17. Reference: all configuration keys
+## 18. Reference: all configuration keys
 
 Values in parentheses are defaults.
 
@@ -882,6 +1059,7 @@ Values in parentheses are defaults.
 | `context.max_index_chars` | `2000` | character limit for the evidence index loaded into the prompt |
 | `context.max_preservation_chars` | `1200` | character limit for the behavior preservation list |
 | `context.max_repo_map_chars` | `0` | limit for the code map; `0` disables it |
+| `context.graph_provider` | `"auto"` | code graph provider for brownfield: `auto`, `graphify`, or `basic` |
 | `improve.max_loops` | `3` | maximum improvement loops per epic |
 | `improve.flat_loops` | `2` | stop when this many consecutive loops show no improvement |
 | `improve.cost_cap_usd` | `0.0` | cost ceiling for improvement loops; `0` means unlimited |
@@ -891,7 +1069,7 @@ Values in parentheses are defaults.
 
 ---
 
-## 18. Glossary
+## 19. Glossary
 
 - **Story** — a unit of work with its own acceptance criteria, write scope, and
   dependencies. Each story runs in a new agent session.
@@ -919,6 +1097,19 @@ Values in parentheses are defaults.
   never becomes ✅.
 - **Worktree** — a separate working tree for one story, so two stories running
   in parallel don't step on each other.
+- **Brownfield** — an existing codebase (≥ 3 source files). The framework
+  detects this and switches to delta mode: preserve existing architecture,
+  generate only what the change request requires.
+- **Greenfield** — a new project with no existing code. The default mode.
+- **Baseline** — a snapshot of the current codebase state, written to
+  `_bmad-output/baseline.md` by `aisef baseline`. Required for brownfield
+  planning.
+- **Blast radius** — the set of files/modules affected by a story's
+  `write_scope`, determined by the code graph provider's impact analysis.
+- **Code graph provider** — a pluggable module that builds a dependency graph
+  of the codebase. Used for impact analysis and blast radius. Two
+  implementations: Graphify (CLI, full graph) and Basic (regex imports,
+  always available).
 
 ---
 

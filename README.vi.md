@@ -63,7 +63,7 @@ nghiệm thu của dự án.
 | 2 | **Tools** | ba tool sinh bằng chứng (`test`, `lint`, `sast`) agent gọi bằng `aisef tool <tên> --story S`, cộng tra tài liệu; mỗi tool kèm câu "khi nào gọi · đọc kết quả thế nào · khi nào KHÔNG gọi" | `harness/tools.py` |
 | 3 | **Sandboxes & execution environments** | bốn bậc quyền, hợp đồng `ExecutionProvider`, năm **bảo đảm có tên** (`network_none`, `read_only_fs`, `non_root`, `no_host_mount`, `secrets_absent`); provider thiếu bảo đảm nào thì nói tên bảo đảm ấy, suy biến được dán nhãn chứ không im lặng | `harness/sandbox.py` |
 | 4 | **Orchestration logic** | định tuyến vai với **reviewer ≠ developer**, máy trạng thái story, xếp đợt theo phụ thuộc *và* phạm vi ghi, gói bàn giao mà mỗi slot ngữ cảnh đều khai nguồn | `control/`, `phases/` |
-| 5 | **Guardrails / hooks** | tám guard trên ba mốc vòng đời, mỗi guard là một lệnh độc lập trả mã thoát, biên dịch ra đúng thứ client hỗ trợ, khai ở một chỗ duy nhất | `harness/guardrails.py` |
+| 5 | **Guardrails / hooks** | chín guard trên ba mốc vòng đời, mỗi guard là một lệnh độc lập trả mã thoát, biên dịch ra đúng thứ client hỗ trợ, khai ở một chỗ duy nhất | `harness/guardrails.py` |
 | 6 | **Observability** | sự kiện có cấu trúc và có provenance, chi phí và độ trễ từng phiên, mọi phép kiểm gắn **SHA của ứng viên**, sổ hành vi, bản ghi bàn giao và phán quyết, kho benchmark | `harness/observe.py`, `control/ledger.py`, `tests/bench/` |
 
 Hai hệ quả đáng nói thẳng. Guard nằm ở nhóm 5 phía framework, nên **client không
@@ -196,11 +196,11 @@ phê duyệt hết hiệu lực, và sửa tầng trên làm mọi tầng dướ
 
 ## Guard
 
-Tám guard, mỗi guard là một lệnh trả mã thoát, nối vào ba mốc vòng đời:
+Chín guard, mỗi guard là một lệnh trả mã thoát, nối vào ba mốc vòng đời:
 
 | Mốc | Guard |
 |---|---|
-| trước mỗi tool | `write-scope` · `destructive` · `secret` · `git-stage` · `injection` · `process-ref` (luật 6: không mã story/epic trong nguồn) |
+| trước mỗi tool | `write-scope` · `destructive` · `secret` · `git-stage` · `injection` · `process-ref` (luật 6: không mã story/epic trong nguồn) · `egress` (chặn kết nối ra host không trong allowlist) |
 | sau mỗi tool | `diff-scope` |
 | khi agent định dừng | `completion` |
 

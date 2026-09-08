@@ -370,7 +370,7 @@ section { padding: 80px 0; }
 <section class="usp">
   <div class="wrap">
     <h2>What exists nowhere else</h2>
-    <p class="subtitle">Eight capabilities that no other agent framework offers in combination. Each one is measured on real agents, not theorized.</p>
+    <p class="subtitle">Nine capabilities that no other agent framework offers in combination. Each one is measured on real agents, not theorized.</p>
     <div class="usp-grid">
       <div class="usp-card">
         <div class="usp-num">01</div>
@@ -419,6 +419,12 @@ section { padding: 80px 0; }
         <h3>Harness of Harness</h3>
         <p>A second loop wraps the first: frozen candidates, behaviour ledger, bounded improvement, preservation gates, and negative controls. The framework improves itself with the same rigor it applies to user code — and stops in code, not by feeling.</p>
         <span class="usp-tag">Self-improving</span>
+      </div>
+      <div class="usp-card">
+        <div class="usp-num">09</div>
+        <h3>Brownfield-Ready</h3>
+        <p>Existing codebase? One command scans the project, builds a baseline, and switches every planning phase to delta mode. Code graph providers (Graphify or built-in regex) power blast-radius analysis on every story. The framework preserves what works and changes only what the requirement asks.</p>
+        <span class="usp-tag">New in v0.8</span>
       </div>
     </div>
   </div>
@@ -488,7 +494,7 @@ section { padding: 80px 0; }
             <td class="p">Partial</td>
             <td class="n">No</td>
             <td class="p">Client-side</td>
-            <td class="y aisef-col">8 guards</td>
+            <td class="y aisef-col">9 guards</td>
           </tr>
           <tr>
             <td>Six-outcome classification</td>
@@ -515,6 +521,14 @@ section { padding: 80px 0; }
             <td class="y aisef-col">Bounded loop</td>
           </tr>
           <tr>
+            <td>Brownfield support with blast-radius analysis</td>
+            <td class="n">No</td>
+            <td class="n">No</td>
+            <td class="n">No</td>
+            <td class="n">No</td>
+            <td class="y aisef-col">Yes</td>
+          </tr>
+          <tr>
             <td>Zero external dependencies</td>
             <td class="n">No</td>
             <td class="n">No</td>
@@ -535,11 +549,11 @@ section { padding: 80px 0; }
     <p class="subtitle">Every number below comes from real agent runs on real codebases. Where something hasn't been measured, we say so — that's the whole point.</p>
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-num">21,739</div>
+        <div class="stat-num">23,203</div>
         <div class="stat-label">Lines of Python, zero dependencies</div>
       </div>
       <div class="stat-card">
-        <div class="stat-num">1,678</div>
+        <div class="stat-num">1,930</div>
         <div class="stat-label">Unit tests, 189s, no Docker</div>
       </div>
       <div class="stat-card">
@@ -600,7 +614,7 @@ section { padding: 80px 0; }
         <span class="h-num">5</span>
         <div>
           <h4>Guardrails &amp; Hooks</h4>
-          <p>Eight guards on three lifecycle moments, each a standalone command returning an exit code. Compiled into whatever the client supports, defined in one place.</p>
+          <p>Nine guards on three lifecycle moments, each a standalone command returning an exit code. Compiled into whatever the client supports, defined in one place.</p>
         </div>
       </div>
       <div class="harness-item">
@@ -628,6 +642,6 @@ section { padding: 80px 0; }
 
 <footer class="footer">
   <div class="wrap">
-    AISEF — AI Software Engineering Framework &middot; v0.2.0 &middot; Open Source
+    AISEF — AI Software Engineering Framework &middot; v0.8.0 &middot; Open Source
   </div>
 </footer>
