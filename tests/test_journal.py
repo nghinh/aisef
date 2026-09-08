@@ -186,6 +186,33 @@ class TestReconcile(JournalTestCase):
         self.assertEqual(goi, [("STORY-01-01", False)])
 
 
+class TestCrashRecovery(JournalTestCase):
+    """v0.4.1: giết giữa story → state đúng, evidence còn nguyên."""
+
+    def test_evidence_survives_crash(self):
+        """JSONL append-only nên sự kiện đã ghi không mất khi tiến trình chết."""
+        from aisef.harness.observe import EvidenceStore, Event, TOOL_RUN
+        ev = EvidenceStore(self.root)
+        ev.record("STORY-01-01", Event(kind=TOOL_RUN, name="test", ok=True))
+        self.rec("attempt.started")
+        self.to(StoryStatus.RUNNING)
+        # "crash" — tiến trình chết, reconcile dọn
+        reconcile_all(artifact_root=self.root, state=self.state)
+        self.assertIs(self.status(), StoryStatus.PENDING)
+        # evidence vẫn còn
+        self.assertEqual(len(ev.read("STORY-01-01").of(TOOL_RUN)), 1)
+
+    def test_candidate_sha_survives_reconcile(self):
+        """Candidate SHA ghi trước crash phải còn trong nhật ký sau reconcile."""
+        self.rec("attempt.started")
+        self.rec("candidate.frozen", sha="abc123")
+        self.to(StoryStatus.RUNNING)
+        reconcile_all(artifact_root=self.root, state=self.state)
+        j = self.store.read("STORY-01-01")
+        shas = [e.data.get("sha") for e in j.entries if e.step == "candidate.frozen"]
+        self.assertIn("abc123", shas)
+
+
 class TestJournalIsMachineReadable(JournalTestCase):
     def test_moi_dong_la_json_co_du_truong(self):
         self.rec("worktree.created", path="/tmp/x")

@@ -6,6 +6,13 @@ và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epi
 
 ## v0.4.1 (dev)
 
+### Bảo mật (nhóm 1 — kiểm soát)
+
+- **Egress guard** (ADR-005 V12): `check_egress()` trích host từ URL trong
+  tool input (WebFetch URL, Bash curl/wget/pip/npm), đối chiếu
+  `sandbox.allow_hosts` (wildcard `*.example.com`). Rỗng = không kiểm. Env
+  `AISEF_ALLOW_HOSTS` truyền vào session. 10 test.
+
 ### Điều phối (nhóm 2 — orchestration)
 
 - **Multi-epic state**: `SprintState.active_epics` theo dõi nhiều epic chạy
@@ -13,6 +20,22 @@ và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epi
   và fallback `current_epic`. `of_epic()` / `by_status(epic=)` lọc story theo
   epic. `aisef status` hiển thị các epic đang hoạt động. Tương thích ngược —
   state.json cũ thiếu `active_epics` tải bình thường.
+- **Crash recovery tests**: 2 test xác nhận `reconcile_all()` giữ nguyên
+  evidence và candidate SHA khi story bị crash giữa chừng.
+
+### Quan sát (nhóm 4 — observability)
+
+- **Multi-project dashboard**: `aisef dashboard --projects ../proj-b ../proj-c`
+  gộp bằng chứng nhiều dự án vào một báo cáo. Bảng tổng hợp hiển thị story
+  count, chi phí, guard check/block theo từng dự án. 5 test.
+
+### CLI (nhóm 5 — trải nghiệm)
+
+- **`aisef init --stack`**: preset cho react/python/go/node — test, lint,
+  sandbox image, allow_hosts cấu hình sẵn. `Config.overlay()` merge preset
+  lên config hiện tại. 2 test.
+- **Config keys tối giản**: zero mandatory config keys — tất cả đều có default.
+  Không cần khai báo gì để chạy `aisef run`.
 
 ## v0.4.0 — phát hành 2026-09-08
 

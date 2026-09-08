@@ -143,6 +143,96 @@ class TestDashboardGeneration(unittest.TestCase):
         self.assertEqual(rc, 2)
 
 
+class TestMultiProjectDashboard(unittest.TestCase):
+    """Multi-project aggregation — v0.4.1."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        self.proj_a = self.root / "proj-a" / "_bmad-output"
+        self.proj_b = self.root / "proj-b" / "_bmad-output"
+        for d in (self.proj_a, self.proj_b):
+            d.mkdir(parents=True)
+        self.store_a = EvidenceStore(self.proj_a)
+        self.store_b = EvidenceStore(self.proj_b)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def _seed(self, store, story_id):
+        store.record(story_id, Event(kind=GUARD_CHECK, name="write-scope",
+                                     ok=True, duration_ms=5,
+                                     detail={"tool": "Write", "verdict": "allow"}))
+        store.record(story_id, Event(kind=TOOL_RUN, name="test", ok=True, duration_ms=1000))
+
+    def test_collect_projects_includes_extra_dirs(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        from aisef.cli.dashboard import _collect_projects
+
+        self._seed(self.store_a, "SA-01")
+        self._seed(self.store_b, "SB-01")
+        args = SimpleNamespace(
+            project=str(self.root / "proj-a"),
+            projects=[str(self.root / "proj-b")],
+        )
+        with patch("aisef.cli.dashboard._artifact_root", return_value=self.proj_a):
+            groups = _collect_projects(args)
+        self.assertEqual(len(groups), 2)
+        names = [n for n, _ in groups]
+        self.assertIn("proj-a", names)
+        self.assertIn("proj-b", names)
+
+    def test_project_summary_table_only_for_multi(self):
+        from aisef.cli.dashboard import _project_summary
+        self._seed(self.store_a, "SA-01")
+        evs = [self.store_a.read("SA-01")]
+        self.assertEqual(_project_summary([("a", evs)]), "")
+        self.assertIn("Tổng hợp dự án", _project_summary([("a", evs), ("b", evs)]))
+
+    def test_generate_html_with_extra_sections(self):
+        from aisef.cli.dashboard import generate_html
+        self._seed(self.store_a, "SA-01")
+        evs = [self.store_a.read("SA-01")]
+        html = generate_html(evs, project="multi", extra_sections="<h2>EXTRA</h2>")
+        self.assertIn("EXTRA", html)
+
+    def test_cmd_dashboard_multi_project(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        from aisef.cli.dashboard import cmd_dashboard
+
+        self._seed(self.store_a, "SA-01")
+        self._seed(self.store_b, "SB-01")
+        out = self.root / "out.html"
+        args = SimpleNamespace(
+            project=str(self.root / "proj-a"),
+            projects=[str(self.root / "proj-b")],
+            out=str(out),
+        )
+        with patch("aisef.cli.dashboard._artifact_root", return_value=self.proj_a):
+            rc = cmd_dashboard(args)
+        self.assertEqual(rc, 0)
+        content = out.read_text()
+        self.assertIn("proj-a", content)
+        self.assertIn("proj-b", content)
+        self.assertIn("Tổng hợp dự án", content)
+
+    def test_nonexistent_project_dir_skipped(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        from aisef.cli.dashboard import _collect_projects
+
+        self._seed(self.store_a, "SA-01")
+        args = SimpleNamespace(
+            project=str(self.root / "proj-a"),
+            projects=[str(self.root / "nonexistent")],
+        )
+        with patch("aisef.cli.dashboard._artifact_root", return_value=self.proj_a):
+            groups = _collect_projects(args)
+        self.assertEqual(len(groups), 1)
+
+
 class TestStructuredGuardError(unittest.TestCase):
     """P1-4: guard block emits JSON on stdout."""
 

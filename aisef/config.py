@@ -152,6 +152,7 @@ DEFAULTS: dict[str, Any] = {
     # bảo đảm UNSUPPORTED — bằng chứng ghi `missing`) · `"mô-đun:Lớp"` cho
     # backend ngoài cùng hợp đồng `harness/sandbox.py::ExecutionProvider`.
     # `use_docker=false` tương đương `local`; giữ để cấu hình cũ còn chạy.
+    "sandbox.allow_hosts": [],
     "sandbox.provider": "docker",
     # Cổng trước triển khai **không** chấp nhận suy biến (kiểm định chạy
     # ngoài Docker) trừ khi có lý do khai tường minh ở đây; lý do được ghi
@@ -221,6 +222,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "tools.sast": str,
     "sandbox.image": str,
     "sandbox.tools_network": bool,
+    "sandbox.allow_hosts": list,
     "sandbox.use_docker": bool,
     "sandbox.allow_degraded": bool,
     "sandbox.provider": str,
@@ -353,11 +355,17 @@ class Config:
         nguyên và báo lỗi khoá "0" — sai chỗ và khó lần ra."""
         return key in self.values
 
+    def overlay(self, overrides: dict[str, object]) -> "Config":
+        """Trả Config mới với giá trị đã ghi đè — dùng cho stack preset."""
+        merged = dict(self.values)
+        merged.update(overrides)
+        return Config(merged, source=self.source)
+
     def write_template(self, project_root: Path | str = ".") -> Path:
-        """Ghi file cấu hình mặc định để người dùng chỉnh."""
+        """Ghi file cấu hình để người dùng chỉnh."""
         path = Path(project_root) / CONFIG_PATH
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(
-            json.dumps(DEFAULTS, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+            json.dumps(self.values, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
         )
         return path

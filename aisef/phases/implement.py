@@ -44,6 +44,7 @@ from ..harness import mockup_verify
 from ..clients.compile import guard_expected
 from ..clients.stream import INFRA_STATUSES, exit_status_of
 from ..harness.guardrails import (
+    ENV_ALLOW_HOSTS,
     ENV_DISALLOWED_TOOLS,
     ENV_PROJECT,
     ENV_WORKDIR,
@@ -486,12 +487,14 @@ def run_attempt(
     # Guard chạy trong hook — tiến trình con của client — nên phạm vi ghi
     # và mã story chỉ tới được nó qua môi trường.
     scope = effective_write_scope(story, project)
+    _hosts = ",".join(config["sandbox.allow_hosts"]) if config else ""
     spec.env = {
         ENV_WRITE_SCOPE: ",".join(scope),
         ENV_STORY_ID: story.id,
         ENV_BASE_REF: base_ref,
         ENV_WORKDIR: str(workdir),
         ENV_PROJECT: str(project),
+        ENV_ALLOW_HOSTS: _hosts,
     }
 
     # Cách ly là thứ **phải kiểm**, không phải thứ giả định. Worktree ngăn
@@ -1235,6 +1238,7 @@ def review_story_v2(
         ENV_WORKDIR: str(workdir),
         ENV_PROJECT: str(project),
         ENV_DISALLOWED_TOOLS: ",".join(ROLES[REVIEWER].disallowed_tools),
+        ENV_ALLOW_HOSTS: ",".join(config["sandbox.allow_hosts"]) if config else "",
     }
 
     _attach_settings(spec, project)
@@ -1366,6 +1370,7 @@ def security_review(
         ENV_WORKDIR: str(workdir),
         ENV_PROJECT: str(project),
         ENV_DISALLOWED_TOOLS: ",".join(ROLES[SECURITY].disallowed_tools),
+        ENV_ALLOW_HOSTS: ",".join(config["sandbox.allow_hosts"]) if config else "",
     }
     _attach_settings(spec, project)
     result, da_sua = _review_session(

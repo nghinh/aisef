@@ -37,6 +37,8 @@ ENV_WORKDIR = "AISEF_WORKDIR"
 #: được code. Cấm ở guard thì mọi client đều cấm, và Claude có thêm một
 #: lớp phòng khi cờ bị bỏ quên.
 ENV_DISALLOWED_TOOLS = "AISEF_DISALLOWED_TOOLS"
+#: Danh sách host được phép kết nối, phân cách dấu phẩy. Rỗng = không kiểm.
+ENV_ALLOW_HOSTS = "AISEF_ALLOW_HOSTS"
 #: Gốc dự án — harness khai qua env. Hook biên dịch ghim `--project` tuyệt
 #: đối; dự án bị chép/di chuyển thì guard vẫn chạy nhưng ghi bằng chứng vào
 #: dự án cũ (đo A/B `par-A` 2026-09-05: 4 lượt trượt "guard có chạy" sai).
@@ -606,6 +608,70 @@ def check_role_tool(tool_name: str, disallowed: list[str]) -> Verdict:
     )
 
 
+# ------------------------------------------------------------ egress
+
+_URL_RE = re.compile(r"https?://([^/:@\s#?]+)")
+_NET_COMMANDS = re.compile(
+    r"\b(curl|wget|fetch|http|nc|ncat|ssh|scp|rsync|git\s+clone"
+    r"|git\s+push|git\s+pull|git\s+fetch|npm\s+install|npm\s+ci"
+    r"|npx|yarn|pnpm|pip\s+install|uv\s+pip|poetry\s+install"
+    r"|apt|apt-get|brew)\b"
+)
+
+
+def _extract_hosts(tool_name: str, tool_input: dict) -> list[str]:
+    """Trích hostname từ sự kiện tool."""
+    hosts: list[str] = []
+    if tool_name in ("WebFetch", "webfetch"):
+        url = str(tool_input.get("url") or tool_input.get("URL") or "")
+        for m in _URL_RE.finditer(url):
+            hosts.append(m.group(1).lower())
+    elif tool_name in ("WebSearch", "websearch"):
+        pass  # web search is a search engine query, not a direct connection
+    else:
+        cmd = str(tool_input.get("command") or "")
+        if cmd and _NET_COMMANDS.search(cmd):
+            for m in _URL_RE.finditer(cmd):
+                hosts.append(m.group(1).lower())
+    return hosts
+
+
+def _host_matches(host: str, allowed: list[str]) -> bool:
+    """Host khớp allowlist — khớp chính xác hoặc suffix (*.example.com)."""
+    for pat in allowed:
+        p = pat.lower().strip()
+        if p.startswith("*."):
+            suffix = p[1:]  # ".example.com"
+            if host == p[2:] or host.endswith(suffix):
+                return True
+        elif host == p:
+            return True
+    return False
+
+
+def check_egress(tool_name: str, tool_input: dict, allow_hosts: list[str]) -> Verdict:
+    """V12: chặn kết nối tới host chưa khai. Rỗng allowlist = không kiểm."""
+    if not allow_hosts:
+        return ALLOW
+    hosts = _extract_hosts(tool_name, tool_input)
+    if not hosts:
+        return ALLOW
+    for h in hosts:
+        if not _host_matches(h, allow_hosts):
+            return Verdict(
+                False,
+                f"host {h} không nằm trong danh sách được phép "
+                f"(sandbox.allow_hosts). Thêm nó vào .ai/config.json nếu "
+                f"dự án cần kết nối tới host này.",
+            )
+    return ALLOW
+
+
+def allow_hosts_from_env(env: dict[str, str] | None = None) -> list[str]:
+    raw = (env or os.environ).get(ENV_ALLOW_HOSTS, "")
+    return [h.strip() for h in raw.split(",") if h.strip()] if raw else []
+
+
 def workdir_from_env(env: dict[str, str] | None = None) -> str:
     """Cây làm việc do harness khai. Rỗng nghĩa là không chạy trong story."""
     return (env or os.environ).get(ENV_WORKDIR, "")
@@ -718,6 +784,11 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
         return check_git_stage(command)
     if kind == "destructive":
         return check_destructive(command)
+    if kind == "egress":
+        return check_egress(
+            str(event.get("tool_name") or ""), tool_input,
+            allow_hosts_from_env(env),
+        )
     if kind == "diff-scope":
         return check_diff_scope(
             changed_files(root, base_ref=base_from_env(env)), scope_from_env(env)
@@ -815,6 +886,7 @@ GUARD_MATCHERS: dict[str, tuple[str, str]] = {
     "process-ref": ("PreToolUse", "Write|Edit"),
     "git-stage": ("PreToolUse", "Bash"),
     "destructive": ("PreToolUse", "Bash"),
+    "egress":      ("PreToolUse", "WebFetch|Bash"),
     "diff-scope": ("PostToolUse", "Write|Edit|NotebookEdit|Bash"),
     "completion": ("Stop", ""),
 }

@@ -562,6 +562,24 @@ class TestInit(CliTestCase):
         self.assertIn("config.json", out)
 
 
+    def test_init_with_stack_sets_tools(self):
+        code, out, _ = self.run_cli("init", "--stack", "python")
+        self.assertEqual(code, EXIT_OK)
+        import json
+        cfg = json.loads((self.project / ".ai" / "config.json").read_text())
+        self.assertEqual(cfg["tools.test"], "python -m pytest")
+        self.assertEqual(cfg["sandbox.image"], "python:3.12-slim")
+        self.assertIn("pypi.org", cfg["sandbox.allow_hosts"])
+
+    def test_init_with_stack_react(self):
+        code, out, _ = self.run_cli("init", "--stack", "react")
+        self.assertEqual(code, EXIT_OK)
+        import json
+        cfg = json.loads((self.project / ".ai" / "config.json").read_text())
+        self.assertIn("vitest", cfg["tools.test"])
+        self.assertTrue(cfg["sandbox.tools_network"])
+
+
 class TestDuongDanDuAn(unittest.TestCase):
     """`--project .` phải thành đường dẫn tuyệt đối ngay ở cửa vào.
 

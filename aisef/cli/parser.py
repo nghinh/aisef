@@ -58,7 +58,10 @@ def build_parser() -> argparse.ArgumentParser:
     s.set_defaults(func=cmd_setup)
 
     sub.add_parser("doctor", help="kiểm tra môi trường").set_defaults(func=cmd_doctor)
-    sub.add_parser("init", help="ghi .ai/config.json mặc định").set_defaults(func=cmd_init)
+    s_init = sub.add_parser("init", help="ghi .ai/config.json mặc định")
+    s_init.add_argument("--stack", choices=["react", "python", "go", "node"], default="",
+                        help="sinh cấu hình phù hợp cho stack (test/lint/sandbox)")
+    s_init.set_defaults(func=cmd_init)
     sub.add_parser("gates", help="bảng trạng thái 8 cổng").set_defaults(func=cmd_gates)
     sub.add_parser("status", help="tiến độ story, chi phí").set_defaults(func=cmd_status)
     ch = sub.add_parser("change", help="thay đổi sau phát hành: ghi FR, stale PRD trở xuống, sinh story delta")
@@ -227,6 +230,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     db = sub.add_parser("dashboard", help="báo cáo hợp quy HTML từ bằng chứng")
     db.add_argument("--out", default="", help="đường dẫn file ra (mặc định: _bmad-output/dashboard.html)")
+    db.add_argument("--projects", nargs="*", metavar="DIR",
+                    help="thư mục dự án bổ sung — gộp bằng chứng từ nhiều dự án")
     db.set_defaults(func=cmd_dashboard)
 
     rpl = sub.add_parser("replay", help="chấm lại cổng story trên bằng chứng đã ghi")

@@ -126,12 +126,15 @@ class TestOpenCodePlugin(CompileTestCase):
                 self.assertIsNone(r.match("read"))
 
     def test_guard_chi_doc_khong_bi_chan(self):
-        """Ba tool chỉ đọc phải đi qua sạch mọi guard tiền kiểm."""
+        """Tool chỉ đọc không dính guard ghi — egress kiểm host nên khớp WebFetch là đúng."""
         src = build_opencode_plugin(self.project, "/bin/aisef")
         dong = next(d for d in src.splitlines() if d.startswith("const MATCH"))
         import re as _re
+        matchers = _re.findall(r"/\^\(([^)]+)\)\$/i", dong)
+        egress_matcher = "WebFetch|Bash"
+        non_egress = [m for m in matchers if m != egress_matcher]
         for tool in ("glob", "grep", "read", "webfetch", "todowrite"):
-            for m in _re.findall(r"/\^\(([^)]+)\)\$/i", dong):
+            for m in non_egress:
                 with self.subTest(tool=tool, matcher=m):
                     self.assertIsNone(_re.compile(f"^({m})$", _re.I).match(tool))
 

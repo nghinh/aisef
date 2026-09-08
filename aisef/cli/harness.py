@@ -11,10 +11,47 @@ from ..harness.tools import aisef_command
 from ._common import ARTIFACT_ROOT, EXIT_NOT_READY, EXIT_OK, EXIT_USAGE, _artifact_root, _client
 
 
+STACK_PRESETS: dict[str, dict[str, object]] = {
+    "react": {
+        "tools.test": "npx vitest run",
+        "tools.lint": "npx eslint . --max-warnings=0",
+        "sandbox.image": "node:22-alpine",
+        "sandbox.tools_network": True,
+        "sandbox.allow_hosts": ["registry.npmjs.org", "*.npmjs.org"],
+        "app.dev_command": "npm run dev",
+    },
+    "python": {
+        "tools.test": "python -m pytest",
+        "tools.lint": "ruff check .",
+        "sandbox.image": "python:3.12-slim",
+        "sandbox.allow_hosts": ["pypi.org", "files.pythonhosted.org"],
+    },
+    "go": {
+        "tools.test": "go test ./...",
+        "tools.lint": "golangci-lint run",
+        "sandbox.image": "golang:1.23-alpine",
+        "sandbox.allow_hosts": ["proxy.golang.org", "sum.golang.org"],
+    },
+    "node": {
+        "tools.test": "npm test",
+        "tools.lint": "npx eslint . --max-warnings=0",
+        "sandbox.image": "node:22-alpine",
+        "sandbox.tools_network": True,
+        "sandbox.allow_hosts": ["registry.npmjs.org", "*.npmjs.org"],
+    },
+}
+
+
 def cmd_init(args) -> int:
     """Ghi file cấu hình mặc định để chỉnh."""
-    path = Config.load(args.project).write_template(args.project)
+    stack = getattr(args, "stack", "") or ""
+    cfg = Config.load(args.project)
+    if stack and stack in STACK_PRESETS:
+        cfg = cfg.overlay(STACK_PRESETS[stack])
+    path = cfg.write_template(args.project)
     print(f"đã ghi {path}")
+    if stack:
+        print(f"stack: {stack} — test/lint/sandbox đã được cấu hình")
     return EXIT_OK
 
 

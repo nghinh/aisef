@@ -135,6 +135,7 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 | `PreToolUse` · `Write\|Edit` | `process-ref` | mã `STORY-…`/`EPIC-…` trong mã nguồn (luật 6); test và tài liệu được phép |
 | `PreToolUse` · `Bash` | `git-stage` | `git add -A` |
 | `PreToolUse` · `Bash` | `destructive` | `rm -rf`, `git reset --hard`, `checkout --`; **mọi** `git push` (kể cả `--dry-run`), `git remote add/set-url`, `git credential*`/`-c credential.helper=` — push/merge là việc của harness sau cổng (ADR-005 V2, hợp quy C10) |
+| `PreToolUse` · `WebFetch\|Bash` | `egress` | kết nối tới host chưa khai trong `sandbox.allow_hosts`; rỗng = không kiểm (ADR-005 V12) |
 | `PostToolUse` · `Write\|Edit\|NotebookEdit\|Bash` | `diff-scope` | file không liên quan bị chạm |
 | `Stop` | `completion` | kết thúc khi test chưa xanh — **cho dừng** khi test không chạy được hay chưa khai lệnh, kết cục ghi ở cổng (lỗi 2, 8) |
 
@@ -338,7 +339,7 @@ dự-án/
 # Chuẩn bị
 aisef doctor                         môi trường: python · git · client · docker · playwright
 aisef setup   [--references DIR] [--no-fetch] [--dry-run]   dò stack, nạp skill, sinh CLAUDE.md + AGENTS.md
-aisef init                           ghi .ai/config.json mặc định
+aisef init [--stack react|python|go|node]  ghi .ai/config.json — stack preset cấu hình sẵn test/lint/sandbox/allow_hosts
 aisef compile [--client claude|opencode|all] [--bin PATH]   sinh hook/plugin từ một nguồn guard duy nhất
 
 # Tri thức vận hành (ADR-002 / ADR-003)
@@ -406,7 +407,7 @@ aisef change  FR-x "mô tả"           ghi FR, stale PRD trở xuống, sinh st
                                       STORY-CH-nn trong EPIC-CH (sinh bằng code)
 
 # Guard — client gọi vào tại mốc vòng đời (do `compile` nối sẵn)
-aisef guard write-scope|diff-scope|secret|git-stage|destructive|injection|process-ref|completion
+aisef guard write-scope|diff-scope|secret|git-stage|destructive|egress|injection|process-ref|completion
 
 # Theo dõi
 aisef status                         tiến độ · chi phí · story tốn bất thường
@@ -430,8 +431,10 @@ aisef gate    --replay <story> [--attempt n] | --all
                                       → "không replay được", không đoán
 aisef replay  <story> [--attempt n] | --all
                                       lối vào nhanh cho `gate --replay` — cùng logic, ít gõ hơn
-aisef dashboard [--out FILE]          báo cáo hợp quy HTML tự chứa từ bằng chứng: guard telemetry
-                                      (hit/pass/block, latency), gate verdicts, chi phí — xem offline
+aisef dashboard [--out FILE] [--projects DIR…]
+                                      báo cáo hợp quy HTML tự chứa — guard telemetry (hit/pass/block,
+                                      latency), gate verdicts, chi phí. `--projects` gộp nhiều dự án
+                                      vào một báo cáo — xem offline
 
 # Bench (ADR-005 V8) — việc của người phát triển harness, không nối vào `aisef`
 python3 -m tests.bench mine [--e9 DIR]           task lỗi kho → tests/bench/tasks/ (commit); story e9 → .bench/tasks/
@@ -671,6 +674,7 @@ Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏn
 | `verify.clean_tree` | `true` | kiểm định **cấp dự án** (`aisef qa`, `pre-deploy`, `improve`) chạy ở `git worktree` tạm dựng từ SHA đang chấm (ADR-005 V6, theo Harbor: verifier chạy tách khỏi env agent): shim `node_modules/.bin/*`, `conftest.py`, `pytest.ini` chưa commit không tới được cây kiểm; `node_modules`/`.venv` của dự án được gắn vào (Docker bind mount, suy biến symlink). Giá: tệp **không theo dõi** mà test cần (`.env.test`, fixture sinh tay) cũng vắng — commit chúng, hoặc tắt khoá này; tắt thì bằng chứng và `pre-deploy.json` ghi `tree = "cây agent"`, không im lặng. Mức story (`run`) giữ cây worktree đã đóng băng, không đọc khoá này |
 | `verify.nop` | `true` | nop control cấp 2 (ADR-005 V3): sau khi đóng băng ứng viên, chạy `tools.test` một lần ở SHA cha với tệp test của story chép vào (`test:nop`) để cổng "test có kiểm được story" thấy test mang mã đỏ khi không có mã của story; +1 lần chạy test mỗi lượt. Tắt khi bộ test quá chậm — tắt thì mục cổng là – "tắt bởi cấu hình", không phải đạt; cấp 1 ($0) vẫn chấm |
 | `sandbox.image` | `""` (theo stack) | `alpine` trơn không có công cụ nào; test đỏ vì thiếu công cụ chứ không vì code sai |
+| `sandbox.allow_hosts` | `[]` | danh sách host agent được phép kết nối (`["api.github.com", "*.npmjs.org"]`); rỗng = không kiểm; guard `egress` dùng danh sách này (ADR-005 V12) |
 | `sandbox.tools_network` | `false` | dự án cần cài phụ thuộc mới mở mạng, và phải khai tường minh |
 | `sandbox.use_docker` | `true` | tắt được cho toolchain gắn với máy chủ, nhưng luôn ghi `degraded` |
 | `sandbox.allow_degraded` | `true` | `run` chấp nhận kiểm định ngoài Docker khi không có Docker, ghi `degraded` vào bằng chứng |

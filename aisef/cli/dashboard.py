@@ -90,7 +90,8 @@ def _esc(s) -> str:
     return html.escape(str(s))
 
 
-def generate_html(evidences: list[Evidence], *, project: str = "") -> str:
+def generate_html(evidences: list[Evidence], *, project: str = "",
+                   extra_sections: str = "") -> str:
     guard = _guard_stats(evidences)
     gates = _gate_verdicts(evidences)
     stories = _story_summary(evidences)
@@ -185,6 +186,8 @@ def generate_html(evidences: list[Evidence], *, project: str = "") -> str:
   <div class="card"><div class="num">${total_cost:.2f}</div><div class="label">Total cost</div></div>
 </div>
 
+{extra_sections}
+
 <h2>Guard telemetry</h2>
 {"<p class='empty'>No guard telemetry data (GUARD_CHECK events). Run stories with v0.4.0+ to collect.</p>" if not guard_rows else f'''
 <table>
@@ -211,18 +214,60 @@ def generate_html(evidences: list[Evidence], *, project: str = "") -> str:
 </html>"""
 
 
-def cmd_dashboard(args) -> int:
+def _collect_projects(args) -> list[tuple[str, list[Evidence]]]:
+    """Thu thập bằng chứng từ dự án chính và các dự án bổ sung."""
+    groups: list[tuple[str, list[Evidence]]] = []
     root = _artifact_root(args)
     store = EvidenceStore(root)
     ids = store.stories()
-    if not ids:
+    if ids:
+        evidences = [store.read(sid) for sid in ids]
+        groups.append((Path(args.project).resolve().name, evidences))
+    for p in getattr(args, "projects", None) or []:
+        pp = Path(p).resolve()
+        pr = pp / "_bmad-output"
+        if not pr.is_dir():
+            continue
+        st = EvidenceStore(pr)
+        sids = st.stories()
+        if sids:
+            groups.append((pp.name, [st.read(sid) for sid in sids]))
+    return groups
+
+
+def _project_summary(groups: list[tuple[str, list[Evidence]]]) -> str:
+    """Bảng tổng hợp nhiều dự án."""
+    if len(groups) <= 1:
+        return ""
+    rows = []
+    for name, evs in groups:
+        stories = len(evs)
+        cost = sum(e.total_cost_usd for e in evs)
+        blocks = sum(len(e.of(GUARD_BLOCK)) for e in evs)
+        checks = sum(len(e.of(GUARD_CHECK)) for e in evs)
+        rows.append(f"<tr><td>{_esc(name)}</td><td>{stories}</td>"
+                    f"<td>${cost:.2f}</td><td>{checks}</td><td>{blocks}</td></tr>")
+    return (
+        "<h2>Tổng hợp dự án</h2>"
+        "<table><tr><th>Dự án</th><th>Story</th><th>Chi phí</th>"
+        "<th>Guard check</th><th>Guard block</th></tr>"
+        + "\n".join(rows) + "</table>"
+    )
+
+
+def cmd_dashboard(args) -> int:
+    groups = _collect_projects(args)
+    if not groups:
         print("✗ không có bằng chứng nào — chạy `aisef run` trước", file=__import__("sys").stderr)
         return EXIT_NOT_READY
 
-    evidences = [store.read(sid) for sid in ids]
-    project = Path(args.project).name
-    content = generate_html(evidences, project=project)
+    all_evidences = [e for _, evs in groups for e in evs]
+    multi_summary = _project_summary(groups)
+    project_label = ", ".join(name for name, _ in groups) if len(groups) > 1 else groups[0][0]
+    content = generate_html(all_evidences, project=project_label,
+                            extra_sections=multi_summary)
 
+    root = _artifact_root(args)
     out = Path(args.out) if getattr(args, "out", "") else root / "dashboard.html"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(content, encoding="utf-8")
