@@ -25,7 +25,9 @@ from pathlib import Path
 from .experience import slugify
 
 #: `#### FR-1: Tạo ghi chú`
-_FR_HEADING = re.compile(r"^#{2,5}\s+(FR-\d+)\s*[:：]\s*(.+?)\s*$", re.MULTILINE)
+_FR_HEADING = re.compile(
+    r"^#{2,5}\s+(FR-\d+)\s*[:：—–-]\s*(.+?)\s*$", re.MULTILINE
+)
 
 #: `- **NFR-1 — Thời gian mở ứng dụng.** Từ lúc…`
 _NFR_ITEM = re.compile(
@@ -53,9 +55,10 @@ _CONSEQUENCES_HEAD = (
     r"|Tiêu chí(?:\s+(?:kiểm chứng(?:\s+được)?|chấp nhận|xác nhận|nghiệm thu|kiểm tra)))"
 )
 _CONSEQUENCES = re.compile(
-    r"\*\*" + _CONSEQUENCES_HEAD + r"\s*[:：]\*\*\s*\n(.*?)(?=\n#{2,5}\s|\n\*\*|\Z)",
-    re.IGNORECASE |
-    re.DOTALL,
+    r"(?:\*\*" + _CONSEQUENCES_HEAD + r"\s*[:：]?\*\*"
+    r"|#{2,5}\s+" + _CONSEQUENCES_HEAD + r")"
+    r"\s*[:：]?\s*\n(.*?)(?=\n#{2,5}\s|\n\*\*|\Z)",
+    re.IGNORECASE | re.DOTALL,
 )
 _BULLET = re.compile(r"^(?:[-*]|\d+[.):])\s+(.+?)\s*$", re.MULTILINE)
 

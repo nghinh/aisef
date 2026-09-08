@@ -168,6 +168,22 @@ class TestParsing(unittest.TestCase):
         self.assertEqual(len(prd.non_functional()), 2)
         self.assertEqual(prd.by_id("NFR-1").title, "Response time under 200ms")
 
+    def test_fr_dash_separator(self):
+        prd = parse_prd("#### FR-1 — Login\nDesc.\n**Testable consequences:**\n- Works\n")
+        self.assertEqual(len(prd.functional()), 1)
+        self.assertEqual(prd.functional()[0].title, "Login")
+
+    def test_fr_hyphen_separator(self):
+        prd = parse_prd("#### FR-1 - Login\nDesc.\n**Testable consequences:**\n- Works\n")
+        self.assertEqual(len(prd.functional()), 1)
+
+    def test_ac_as_plain_heading(self):
+        prd = parse_prd(
+            "#### FR-1: Login\nDesc.\n### Acceptance Criteria\n"
+            "1. Crit A\n2. Crit B\n"
+        )
+        self.assertEqual(len(prd.functional()[0].acceptance_criteria), 2)
+
 
 class TestArchitecture(unittest.TestCase):
     """Đọc architecture.md thật (26KB, 20 quyết định, do BMAD sinh)."""
