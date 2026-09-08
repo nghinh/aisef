@@ -44,10 +44,11 @@ of pretending it still verified anything.
 
 ## Step-by-step guide
 
-New users should read `docs/HUONG-DAN-SU-DUNG.md` (Vietnamese): preparing the
-machine, installing, writing `docs/requirements.md`, configuring the test
-command, passing all eight gates, reading gate outcomes, troubleshooting, plus
-full command and configuration tables. An English translation is on the roadmap.
+New users should read [`docs/USAGE-GUIDE.md`](docs/USAGE-GUIDE.md) (English) or
+[`docs/HUONG-DAN-SU-DUNG.md`](docs/HUONG-DAN-SU-DUNG.md) (Vietnamese):
+preparing the machine, installing, writing `docs/requirements.md`, configuring
+the test command, passing all eight gates, reading gate outcomes,
+troubleshooting, plus full command and configuration tables.
 
 ## What makes it different: the harness
 
