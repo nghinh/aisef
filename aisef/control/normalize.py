@@ -66,10 +66,21 @@ _BULLET = re.compile(r"^(?:[-*]|\d+[.):])\s+(.+?)\s*$", re.MULTILINE)
 
 _ASSUMPTION = re.compile(r"\[ASSUMPTION:\s*(.+?)\]", re.DOTALL)
 _OQ_MENTION = re.compile(r"\b(OQ-\d+)\b")
-#: `**OQ-1 (chặn FR-13..FR-15)** — …`
+#: `**OQ-1 (chặn FR-13..FR-15)** — …` or `- **OQ-1:** …`
 _OQ_DEFINITION = re.compile(
-    r"\*\*(OQ-\d+)\s*(?:\(([^)]*)\))?\*\*\s*[—–-]\s*(.+?)(?=\n\d+\.\s|\n\n|\Z)",
+    r"\*\*(OQ-\d+)\s*(?:\(([^)]*)\))?\s*[:：]?\s*\*\*\s*[—–:：-]?\s*(.+?)"
+    r"(?=\n[-*]\s+\*\*OQ-|\n\d+\.\s+\*\*OQ-|\n\d+\.\s|\n\n|\Z)",
     re.DOTALL,
+)
+#: Section heading for assumptions — used as fallback when inline
+#: `[ASSUMPTION: ...]` markers are absent.
+_ASSUMPTION_SECTION = re.compile(
+    r"^#{2,5}\s+.*(?:Assumptions|Giả định)\s*$",
+    re.MULTILINE | re.IGNORECASE,
+)
+_SECTION_ASSUMPTION_ITEM = re.compile(
+    r"^[-*]\s+(?:\*\*[^*]+\*\*\s*[:：]?\s*)?(.+?)\s*$",
+    re.MULTILINE,
 )
 _FR_RANGE = re.compile(r"FR-(\d+)\s*\.\.\s*FR-(\d+)")
 _FR_SINGLE = re.compile(r"\bFR-(\d+)\b")
@@ -390,6 +401,19 @@ def parse_prd(text: str) -> PRD:
         if a not in seen_assumptions:
             seen_assumptions.add(a)
             prd.assumptions.append(a)
+
+    # Fallback: assumptions in a dedicated section (no inline markers).
+    if not prd.assumptions:
+        asec = _ASSUMPTION_SECTION.search(text)
+        if asec:
+            after = text[asec.end():]
+            end = re.search(r"\n#{2,5}\s", after)
+            block = after[: end.start()] if end else after
+            for bm in _SECTION_ASSUMPTION_ITEM.finditer(block):
+                a = " ".join(bm.group(1).split())
+                if a and a not in seen_assumptions:
+                    seen_assumptions.add(a)
+                    prd.assumptions.append(a)
 
     seen_oq: set[str] = set()
     for m in _OQ_DEFINITION.finditer(text):

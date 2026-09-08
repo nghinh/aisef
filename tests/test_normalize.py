@@ -248,6 +248,42 @@ class TestParsing(unittest.TestCase):
         )
         self.assertEqual(len(prd.functional()[0].acceptance_criteria), 2)
 
+    def test_oq_bullet_colon_format(self):
+        """Real BMAD planner output: - **OQ-1:** text (not **OQ-1** — text)."""
+        prd = parse_prd(
+            "- **OQ-1:** What hardware defines the test env?\n"
+            "- **OQ-2:** Should deletion require confirmation?\n"
+        )
+        self.assertEqual(len(prd.open_questions), 2)
+        self.assertEqual(prd.open_questions[0].id, "OQ-1")
+        self.assertIn("hardware", prd.open_questions[0].text)
+
+    def test_oq_original_format_still_works(self):
+        """Fixture format: **OQ-1 (scope)** — text."""
+        prd = parse_prd("**OQ-3 (chặn FR-2..FR-4)** — Câu hỏi gì đó.\n")
+        self.assertEqual(prd.open_questions[0].blocks, ["FR-2", "FR-3", "FR-4"])
+
+    def test_assumptions_section_format(self):
+        """Real BMAD planner output: dedicated ## Assumptions section."""
+        prd = parse_prd(
+            "#### FR-1: X\n\nDesc.\n\n**Criteria:**\n- OK\n\n"
+            "## 10. Assumptions\n\n"
+            "- **A-1:** Browser preserves localStorage.\n"
+            "- **A-2:** Timestamps use ISO format.\n\n"
+            "## 11. Open Questions\n"
+        )
+        self.assertEqual(len(prd.assumptions), 2)
+        self.assertIn("localStorage", prd.assumptions[0])
+
+    def test_assumptions_inline_format_still_works(self):
+        """Fixture format: inline [ASSUMPTION: text] markers."""
+        prd = parse_prd(
+            "#### FR-1: X\n\nSomething [ASSUMPTION: data is UTF-8].\n\n"
+            "**Criteria:**\n- OK\n"
+        )
+        self.assertEqual(len(prd.assumptions), 1)
+        self.assertIn("UTF-8", prd.assumptions[0])
+
 
 class TestArchitecture(unittest.TestCase):
     """Đọc architecture.md thật (26KB, 20 quyết định, do BMAD sinh)."""
