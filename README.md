@@ -64,7 +64,7 @@ the acceptance yardstick for the project itself.
 | 2 | **Tools** | three evidence-producing tools (`test`, `lint`, `sast`) the agent calls as `aisef tool <name> --story S`, plus documentation lookup; every tool carries prose on when to call it, how to read its result, and when *not* to call it | `harness/tools.py` |
 | 3 | **Sandboxes & execution environments** | four permission levels, an `ExecutionProvider` contract, and five **named guarantees** (`network_none`, `read_only_fs`, `non_root`, `no_host_mount`, `secrets_absent`). A provider that cannot offer one says which one is missing; a degraded run is labelled, never silent | `harness/sandbox.py` |
 | 4 | **Orchestration logic** | role routing where **reviewer ≠ developer**, a story state machine, wave scheduling by dependency *and* write scope, and handoff packets whose every context slot declares its source | `control/`, `phases/` |
-| 5 | **Guardrails / hooks** | eight guards on three lifecycle moments, each a standalone command returning an exit code, compiled into whatever the client supports, defined in one place | `harness/guardrails.py` |
+| 5 | **Guardrails / hooks** | nine guards on three lifecycle moments, each a standalone command returning an exit code, compiled into whatever the client supports, defined in one place | `harness/guardrails.py` |
 | 6 | **Observability** | structured events with provenance, cost and latency per session, every check bound to the **SHA of the candidate** it ran on, the behaviour ledger, handoff and verdict records, and a benchmark corpus | `harness/observe.py`, `control/ledger.py`, `tests/bench/` |
 
 Two consequences worth stating plainly. Guards live in group 5 on the framework
@@ -194,12 +194,12 @@ after approval voids it, and re-approving an upper layer marks every layer below
 
 ## Guards
 
-Eight guards, each a command returning an exit code, wired into three lifecycle
+Nine guards, each a command returning an exit code, wired into three lifecycle
 moments:
 
 | Moment | Guards |
 |---|---|
-| before every tool call | `write-scope` · `destructive` · `secret` · `git-stage` · `injection` · `process-ref` (rule 6: no story/epic codes in source) |
+| before every tool call | `write-scope` · `destructive` · `secret` · `git-stage` · `injection` · `process-ref` (rule 6) · `egress` (network destination allowlist) |
 | after every tool call | `diff-scope` |
 | when the agent tries to stop | `completion` |
 
