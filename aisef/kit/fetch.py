@@ -52,7 +52,7 @@ class FetchReport:
         for i in self.already:
             dong.append(f"  ○ already  {i}")
         for i, ly_do in self.failed:
-            dong.append(f"  ✗ failed   {i} — {reason}")
+            dong.append(f"  ✗ failed   {i} — {ly_do}")
         return "\n".join(dong) or "  (no sources to fetch)"
 
 

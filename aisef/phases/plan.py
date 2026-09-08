@@ -25,6 +25,7 @@ is the framework's job.
 from __future__ import annotations
 
 import json
+import time
 
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -39,6 +40,39 @@ from ..control.normalize import parse_prd_file
 from ..clients.stream import INFRA_STATUSES, exit_status_of
 
 ARTIFACT_ROOT = "_bmad-output"
+RUN_LOG = "run.log"
+RESPONSE_DIR = "evidence"
+
+
+_LOG_MAX_BYTES = 512 * 1024
+
+
+def _run_log(project: Path, msg: str) -> None:
+    """Append one timestamped line to the run log; rotate at 512KB."""
+    log = project / ARTIFACT_ROOT / RUN_LOG
+    log.parent.mkdir(parents=True, exist_ok=True)
+    if log.is_file() and log.stat().st_size > _LOG_MAX_BYTES:
+        lines = log.read_text(encoding="utf-8").splitlines(keepends=True)
+        half = len(lines) // 2
+        log.write_text("".join(lines[half:]), encoding="utf-8")
+    ts = time.strftime("%Y-%m-%d %H:%M:%S")
+    with log.open("a", encoding="utf-8") as fh:
+        fh.write(f"[{ts}] {msg}\n")
+
+
+def _save_response(project: Path, phase_id: str, text: str, result) -> Path:
+    """Save the full LLM response so parser failures are debuggable."""
+    d = project / ARTIFACT_ROOT / RESPONSE_DIR
+    d.mkdir(parents=True, exist_ok=True)
+    path = d / f"plan-{phase_id}.response.md"
+    head = (
+        f"# plan-{phase_id} response\n\n"
+        f"session: {getattr(result, 'session_id', '')} · "
+        f"turns: {getattr(result, 'num_turns', 0)} · "
+        f"${getattr(result, 'cost_usd', 0.0):.2f}\n\n---\n\n"
+    )
+    path.write_text(head + (text or ""), encoding="utf-8")
+    return path
 
 
 @dataclass(frozen=True)
@@ -326,14 +360,17 @@ def run_phase(
 ) -> PhaseOutcome:
     """Run one phase. Skip if all artifacts exist and force is not set."""
     out = PhaseOutcome(phase=phase)
+    _run_log(project, f"phase={phase.id} START")
 
     if not _missing(project, phase.artifacts) and not force:
         out.skipped_reason = "artifacts already exist"
+        _run_log(project, f"phase={phase.id} SKIP (artifacts exist)")
         return out
 
     missing_inputs = _missing(project, phase.needs)
     if missing_inputs:
         out.error = f"missing inputs: {', '.join(missing_inputs)}"
+        _run_log(project, f"phase={phase.id} ERROR missing inputs: {', '.join(missing_inputs)}")
         return out
 
     spec = RunSpec(
@@ -364,9 +401,12 @@ def run_phase(
         # Same exit-status table as the story retry loop (ADR-005 V11 B).
         if budget <= 0 or exit_status_of(result) not in INFRA_STATUSES:
             out.error = error
+            _run_log(project, f"phase={phase.id} FAIL ${out.cost_usd:.2f} err={error}")
+            _save_response(project, phase.id, result.text, result)
             return out
         out.infra_retries += 1
 
+    _save_response(project, phase.id, result.text, result)
     out.status = parse_headless_status(result.text)
 
     # Verify on disk, don't trust self-report. A run can finish "successfully",
@@ -379,11 +419,14 @@ def run_phase(
         return out
     if still_missing:
         out.error = f"run completed but missing: {', '.join(still_missing)}"
+        _run_log(project, f"phase={phase.id} FAIL ${out.cost_usd:.2f} missing={', '.join(still_missing)}")
         return out
 
     if phase.id == "prd":
         out.machine_gate = check_prd(parse_prd_file(project / ARTIFACT_ROOT / "prd.md"))
 
+    status_tag = out.status.status if out.status.parsed else "no-json"
+    _run_log(project, f"phase={phase.id} OK ${out.cost_usd:.2f} status={status_tag}")
     return out
 
 
@@ -462,6 +505,7 @@ def run_pipeline(
     cfg = config or Config.load(project)
     approvals = ApprovalStore(project / ARTIFACT_ROOT)
     result = PipelineResult()
+    _run_log(project, "pipeline START")
 
     for phase in PHASES:
         outcome = run_phase(phase, project, client, config=cfg, force=force)
@@ -507,4 +551,7 @@ def run_pipeline(
     if not _pass_gate(approvals, Gate.STORIES, outcome, auto_approve):
         result.waiting_on = Gate.STORIES
 
+    total = sum(o.cost_usd for o in result.outcomes)
+    tag = "DONE" if result.complete else f"STOP({result.failed_at or result.waiting_on})"
+    _run_log(project, f"pipeline {tag} ${total:.2f}")
     return result
