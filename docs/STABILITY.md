@@ -70,7 +70,7 @@ The `evaluate()` function in `control/gate.py` checks:
 
 JSONL files in `_bmad-output/evidence/{story_id}.jsonl`. Event kinds:
 `agent_run`, `tool_run`, `guard_check`, `guard_block`, `guard_seen`,
-`file_change`, `note`, `behavior`, `mockup_map`.
+`file_change`, `note`, `behavior`, `mockup_map`, `handoff`, `skill_use`.
 
 ### State file
 
