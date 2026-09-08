@@ -802,7 +802,7 @@ aisef/control/scheduler.py     epic tuần tự, story song song theo đợt
 | 2 | `clients/` + `compile` + golden test | — |
 | 3 | `phases/plan` + normalizer + story splitter | 3 skill BMAD pipeline |
 | 4 | `phases/mockup` + contract extract | 2 skill mockup |
-| 5–6 | `harness/` 6 nhóm + `guardrails` 8 guard | PromptCatalog · 3 agent |
+| 5–6 | `harness/` 6 nhóm + `guardrails` 9 guard | PromptCatalog · 3 agent |
 | 7 | `harness/observe.py` · `control/gate.py` · `phases/qa.py` | kiểm định theo hợp đồng story |
 | 8 | `phases/deploy.py` | DevSecOps · runbook · cổng trước triển khai |
 | 9 | chạy đầu-cuối trên dự án mẫu | hiệu chỉnh |
