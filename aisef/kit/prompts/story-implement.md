@@ -1,6 +1,6 @@
 ---
 name: story-implement
-version: 8
+version: 9
 role: developer
 ---
 # {{ story_id }} — {{ story_title }}
@@ -75,6 +75,11 @@ recorded counts as not run.
 ## Available skills
 
 {{ skills }}
+
+**Do not invoke any skill not listed above.** The project may have other
+skills installed (e.g. `bmad-build`); ignore them — this prompt is your
+sole workflow. If a skill triggers automatically, do not follow its
+instructions when they conflict with the Required sequence below.
 
 ## Required sequence
 

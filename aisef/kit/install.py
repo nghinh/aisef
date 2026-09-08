@@ -88,6 +88,30 @@ class InstallReport:
         )
 
 
+_LAUNCHER_MARKER = "_bmad/scripts/render_skill.py"
+
+
+def _is_launcher(skill: PlannedSkill) -> bool:
+    """A launcher skill delegates to an external script that must exist."""
+    for name in ("skill.md", "SKILL.md"):
+        md = skill.path / name
+        if md.is_file():
+            try:
+                if _LAUNCHER_MARKER in md.read_text(encoding="utf-8", errors="replace"):
+                    return True
+            except OSError:
+                pass
+    return False
+
+
+def _filter_launchers(skills: list[PlannedSkill], project: Path) -> list[PlannedSkill]:
+    """Drop launcher skills whose infrastructure is missing from the project."""
+    infra = project / "_bmad" / "scripts"
+    if infra.is_dir():
+        return skills
+    return [s for s in skills if not _is_launcher(s)]
+
+
 def _select_from_source(
     source: Source,
     references_root: Path,
@@ -171,6 +195,7 @@ def plan(
             seen_names.add(ps.name)
             result.skills.append(ps)
 
+    result.skills = _filter_launchers(result.skills, project)
     result.skills.sort(key=lambda s: (s.source_id, s.name))
     return result
 
