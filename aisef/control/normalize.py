@@ -425,9 +425,12 @@ _STORY_HEADING = re.compile(
 #: chính tiêu chí. Cắt nhầm ở đó thì mỗi story chỉ còn một tiêu chí cụt.
 _AC_BLOCK = re.compile(
     r"\*\*(?:Acceptance Criteria|Tiêu chí chấp nhận|Tiêu chí kiểm chứng"
-    r"|Tiêu chí nghiệm thu)\s*[:：]?\*\*\s*\n(.*?)"
+    r"|Tiêu chí nghiệm thu"
+    r"|(?:Testable|Verifiable|Acceptance|Verification|Test)\s+(?:criteria|consequences|conditions)"
+    r"|Criteria|Tiêu chí|Hệ quả(?:\s+kiểm chứng(?:\s+được)?)?)"
+    r"\s*[:：]?\*\*\s*\n(.*?)"
     r"(?=\n#{2,4}\s|\n\s*\*\*(?!Given|When|Then|And)[^\n*]+\*\*\s*[:：]?\s*\n|\Z)",
-    re.DOTALL,
+    re.DOTALL | re.IGNORECASE,
 )
 _GIVEN = re.compile(r"^\s*\*\*Given\*\*", re.IGNORECASE)
 #: `- write_scope: src/notes/, src/db/schema.ts` — kể cả khi in đậm nhãn.
