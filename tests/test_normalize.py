@@ -139,6 +139,35 @@ class TestParsing(unittest.TestCase):
         prd = parse_prd("**OQ-1 (chặn FR-9..FR-2)** — dải ngược.\n")
         self.assertEqual(prd.open_questions[0].blocks, ["FR-2", "FR-9"])
 
+    def test_numbered_list_acceptance_criteria(self):
+        prd = parse_prd(
+            "### FR-1: Login\n\nLogin page.\n\n"
+            "**Acceptance criteria:**\n"
+            "1. Given valid credentials, then logged in\n"
+            "2. Given invalid credentials, then error\n"
+        )
+        self.assertEqual(len(prd.functional()[0].acceptance_criteria), 2)
+
+    def test_heading_style_nfr(self):
+        prd = parse_prd(
+            "### FR-1: X\n\nDesc.\n\n**Testable consequences:**\n- Works\n\n"
+            "### NFR-1 — Performance\nUnder 200ms.\n\n"
+            "### NFR-2 — Scale\n1000 users.\n"
+        )
+        self.assertEqual(len(prd.non_functional()), 2)
+        self.assertEqual(prd.by_id("NFR-1").title, "Performance")
+        self.assertIn("200ms", prd.by_id("NFR-1").description)
+
+    def test_numbered_nfr_fallback(self):
+        prd = parse_prd(
+            "### FR-1: X\n\nDesc.\n\n**Testable consequences:**\n- OK\n\n"
+            "### Non-functional Requirements\n\n"
+            "1. Response time under 200ms\n"
+            "2. Support 1000 concurrent users\n"
+        )
+        self.assertEqual(len(prd.non_functional()), 2)
+        self.assertEqual(prd.by_id("NFR-1").title, "Response time under 200ms")
+
 
 class TestArchitecture(unittest.TestCase):
     """Đọc architecture.md thật (26KB, 20 quyết định, do BMAD sinh)."""
