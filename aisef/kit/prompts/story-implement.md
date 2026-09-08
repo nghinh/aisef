@@ -30,6 +30,8 @@ story, không sửa bằng cách đi vòng.
 
 {{ repo_map }}
 
+{{ blast_radius }}
+
 ## Giao diện
 
 {{ mockup_section }}

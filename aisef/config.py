@@ -63,6 +63,9 @@ DEFAULTS: dict[str, Any] = {
     # stdin JSON {project, seeds, budget} → stdout văn bản. Rỗng = dựng sẵn
     # stdlib; lệnh hỏng thì lùi về dựng sẵn và slot nói rõ là thô.
     "context.map_provider": "",
+    # Nhà cung cấp đồ thị mã nguồn cho brownfield: "auto" (Graphify nếu có,
+    # Basic nếu không), "graphify", "basic". Không bật MCP mặc định.
+    "context.graph_provider": "auto",
     # vòng cải tiến epic theo bằng chứng (ADR-004 R3). HoH chạy T = 70 vòng
     # không có điều kiện dừng; ở đây mọi điều kiện dừng là code và ba số này
     # là trần. Đếm theo epic từ `loops[]` của sổ hành vi — chạy lại
@@ -184,6 +187,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "context.max_preservation_chars": int,
     "context.max_repo_map_chars": int,
     "context.map_provider": str,
+    "context.graph_provider": str,
     "improve.max_loops": int,
     "improve.flat_loops": int,
     "improve.cost_cap_usd": float,

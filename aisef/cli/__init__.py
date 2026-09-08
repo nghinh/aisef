@@ -41,7 +41,7 @@ from ._common import (
     _state,
 )
 from .doctor import _hook_paths_elsewhere, cmd_doctor
-from .harness import cmd_compile, cmd_doc, cmd_guard, cmd_init, cmd_setup, cmd_skill
+from .harness import cmd_baseline, cmd_compile, cmd_doc, cmd_guard, cmd_init, cmd_setup, cmd_skill
 from .implement import (
     _project_has_ui,
     cmd_devsecops,
@@ -75,6 +75,7 @@ __all__ = [
     "build_parser",
     "cmd_approve",
     "cmd_auto_approve",
+    "cmd_baseline",
     "cmd_change",
     "cmd_compile",
     "cmd_devsecops",

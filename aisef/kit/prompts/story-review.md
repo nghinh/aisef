@@ -29,6 +29,8 @@ Không sửa code. Chỉ báo cáo.
 
 {{ repo_map }}
 
+{{ blast_radius }}
+
 ## Hành vi phải giữ
 
 Từ sổ hành vi, không từ người viết. Test mang mã của một mục dưới đây bị

@@ -131,6 +131,19 @@ Chạy nhanh không cần người duyệt: `aisef plan --auto-approve all`. Ph�
 tự động **luôn** được ghi dấu `auto` để về sau truy được tài liệu nào chưa
 từng có người thật xem.
 
+## Brownfield (dự án đã có mã)
+
+```bash
+aisef baseline                     # phân tích mã hiện tại → _bmad-output/baseline.md
+aisef baseline --provider graphify # dùng Graphify graph (cài: uv tool install graphifyy)
+aisef baseline --incremental       # cập nhật graph sau merge
+```
+
+Khi `baseline.md` tồn tại, `aisef plan` tự chuyển sang chế độ delta: giữ
+artifact có sẵn, thêm ngữ cảnh brownfield vào prompt, đổi intent thành
+`"update"`, và slot `blast_radius` trong prompt story hiện impact analysis
+từ đồ thị mã trước khi implement.
+
 ## Sau khi có code
 
 ```bash

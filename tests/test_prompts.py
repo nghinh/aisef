@@ -48,6 +48,7 @@ STORY_CTX = {
     "diff_summary": "3 file đổi",
     "impact": "_Chưa có phân tích ảnh hưởng_",
     "repo_map": "## Bản đồ mã quanh phạm vi — gợi ý tĩnh, không phải chân lý\n\n`src/a.ts`",
+    "blast_radius": "_(greenfield — không có blast radius)_",
 }
 
 

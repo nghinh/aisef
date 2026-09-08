@@ -31,6 +31,8 @@ Không sửa code. Chỉ báo cáo.
 
 {{ repo_map }}
 
+{{ blast_radius }}
+
 ## Hành vi phải giữ · phải xanh ở ứng viên
 
 Cùng danh sách người rà soát nhận, từ sổ hành vi. Mục nào chạm xác thực,

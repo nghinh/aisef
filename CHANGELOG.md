@@ -4,6 +4,28 @@ Ghi theo **sáu nhóm harness** (`docs/SOLUTION.md` §5), không theo ADR hay
 ngày. Mỗi dòng có chỗ đọc lại; số lỗi trỏ `docs/STATUS-2026-09-05.md` §2.4
 và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epic-improvement.md` §6.
 
+## v0.8.0 — phát hành 2026-09-08
+
+### Tính năng mới (nhóm 4 — context / nhóm 5 — control)
+
+- **Brownfield support**: hỗ trợ đầy đủ dự án đã có mã nguồn.
+  - `aisef baseline` — dựng baseline từ mã hiện tại (brownfield detection,
+    git info, cấu trúc thư mục, graph codebase).
+  - `CodebaseGraphProvider` abstraction (`aisef/codebase/`): Graphify CLI
+    adapter + Basic grep/import fallback, chọn qua `context.graph_provider`.
+  - `aisef baseline --incremental` — cập nhật graph sau merge.
+  - Delta planning: `build_prompt()` tự phát hiện brownfield (baseline.md tồn tại),
+    thêm context brownfield vào prompt, đổi intent `"create"` → `"update"` khi
+    artifact đã có.
+  - Slot `blast_radius` trong prompt developer/reviewer/security: impact analysis
+    từ CodebaseGraphProvider trước khi implement, chỉ khi brownfield + write_scope.
+  - `aisef change` tự ghi chú brownfield vào story delta khi baseline tồn tại.
+
+### Cấu hình
+
+- `context.graph_provider`: `"auto"` (mặc định) / `"graphify"` / `"basic"` —
+  chọn CodebaseGraphProvider.
+
 ## v0.7.0 — phát hành 2026-09-08
 
 ### Sửa lỗi (nhóm 1 — isolation)

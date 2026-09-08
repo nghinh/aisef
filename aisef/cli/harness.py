@@ -11,6 +11,37 @@ from ..harness.tools import aisef_command
 from ._common import ARTIFACT_ROOT, EXIT_NOT_READY, EXIT_OK, EXIT_USAGE, _artifact_root, _client
 
 
+def cmd_baseline(args) -> int:
+    """Dựng baseline cho brownfield: phân tích mã nguồn hiện tại."""
+    from ..codebase.baseline import build_baseline
+    from ..codebase.detect import detect
+    from ..codebase.provider import resolve
+
+    project = Path(args.project)
+
+    if getattr(args, "incremental", False):
+        provider = resolve(project, preference=args.provider or "auto")
+        result = provider.build(project, incremental=True)
+        print(f"Graph cập nhật: {provider.name} — {result.nodes} node, {result.edges} edge")
+        return EXIT_OK
+
+    sig = detect(project)
+    if not sig.is_brownfield and not args.force:
+        print(f"Greenfield: {sig.source_files} file mã — dùng `aisef plan` thay cho `aisef baseline`.")
+        print("  (dùng --force để dựng baseline dù greenfield)")
+        return EXIT_OK
+
+    provider = resolve(project, preference=args.provider or "auto")
+    output = _artifact_root(args) / "baseline.md"
+    text = build_baseline(project, provider=provider, output=output)
+    print(f"Baseline: {sig.summary}")
+    print(f"  provider: {provider.name}")
+    print(f"  ghi: {output}")
+    lines = text.count("\n")
+    print(f"  {lines} dòng")
+    return EXIT_OK
+
+
 STACK_PRESETS: dict[str, dict[str, object]] = {
     "react": {
         "tools.test": "npx vitest run",

@@ -9,12 +9,12 @@ bumps the major version) and what remains internal (may change in any release).
 
 ```
 aisef doctor | setup | init | compile | run | status | dashboard | guard |
-       gate | replay | skill | doc | change
+       gate | replay | skill | doc | change | baseline
 ```
 
 New subcommands may be added; existing ones keep their flags and exit codes.
 
-### Config keys (57 keys)
+### Config keys (58 keys)
 
 Every key in `aisef.config.DEFAULTS` is part of the public contract. Keys may
 be **added** but never removed or renamed. Type and default may not change

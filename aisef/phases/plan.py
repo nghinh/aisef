@@ -222,6 +222,34 @@ class PipelineResult:
         return "\n".join(lines)
 
 
+def _is_brownfield(project: Path | None) -> bool:
+    if project is None:
+        return False
+    return (Path(project) / ARTIFACT_ROOT / "baseline.md").is_file()
+
+
+def _brownfield_context(project: Path) -> str:
+    """Ngữ cảnh brownfield cho prompt — baseline + hướng dẫn delta."""
+    baseline = Path(project) / ARTIFACT_ROOT / "baseline.md"
+    if not baseline.is_file():
+        return ""
+    try:
+        text = baseline.read_text(encoding="utf-8")[:4000]
+    except OSError:
+        return ""
+    return (
+        "\n\n## Brownfield Context\n\n"
+        "Dự án này ĐÃ CÓ mã nguồn. Đây là baseline (tóm tắt):\n\n"
+        + text + "\n\n"
+        "**Quy tắc brownfield:**\n"
+        "- BẢO TOÀN kiến trúc, code, behavior hợp lệ hiện có — chỉ thay đổi "
+        "những gì change request yêu cầu.\n"
+        "- Code hiện tại là ground truth; tài liệu có thể stale — ghi nhận mâu thuẫn rõ.\n"
+        "- intent: 'update' thay cho 'create' khi artifact đã có.\n"
+        "- Tạo DELTA, không regenerate toàn bộ.\n"
+    )
+
+
 def build_prompt(phase: Phase, project: Path | None = None) -> str:
     """Dựng prompt headless cho một pha.
 
@@ -230,14 +258,20 @@ def build_prompt(phase: Phase, project: Path | None = None) -> str:
     trọng đường dẫn được giao (kiểm chứng ở lượt chạy thật), còn tên mặc
     định của nó khác nhau giữa các skill.
     """
+    brownfield = _is_brownfield(project)
+    intent = "update" if brownfield and not _missing(project, phase.artifacts) else "create"
+
     inputs = ["docs/requirements.md (yêu cầu gốc)"]
+    if brownfield:
+        inputs.insert(0, f"{ARTIFACT_ROOT}/baseline.md (brownfield baseline)")
     inputs += [f"{ARTIFACT_ROOT}/{n}" for n in phase.needs]
     outputs = ", ".join(f"{ARTIFACT_ROOT}/{n}" for n in phase.artifacts)
     memo = _stories_gate_memo(project) if phase.gate is Gate.EPICS else ""
+    bf_ctx = _brownfield_context(project) if brownfield and project else ""
 
     return (
         "headless: true\n\n"
-        f'Use the {phase.skill} skill. intent: "create".\n'
+        f'Use the {phase.skill} skill. intent: "{intent}".\n'
         f"doc_workspace: {ARTIFACT_ROOT}\n\n"
         f"Đầu vào: {', '.join(inputs)}.\n"
         f"Mục tiêu: {phase.goal}\n"
@@ -245,7 +279,7 @@ def build_prompt(phase: Phase, project: Path | None = None) -> str:
         "Không hỏi lại. Giả định nào phải tự suy thì ghi vào assumptions; "
         "chỗ nào cần người quyết thì ghi vào open_questions — đừng tự chọn "
         "rồi im lặng. Kết thúc bằng JSON status theo schema headless."
-        + memo
+        + memo + bf_ctx
     )
 
 

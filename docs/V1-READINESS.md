@@ -3,6 +3,10 @@
 Status as of 2026-09-08. Each item is either automated (readable by command)
 or requires a manual step with real agent runs.
 
+**v0.8.0**: Brownfield support — `aisef baseline`, CodebaseGraphProvider
+(Graphify + Basic), delta planning, `blast_radius` slot, `context.graph_provider`
+config key. 26 new tests in `test_brownfield.py`.
+
 **CI fix (0.7.0.dev0)**: worktree race condition fixed — `git worktree add`
 serialized with threading lock. v0.5.1 and v0.6.0 releases failed in CI
 due to this bug (probabilistic).

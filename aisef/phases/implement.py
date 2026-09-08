@@ -185,7 +185,34 @@ def build_context(
         "tools": describe_tools(project, config),
         "index": _index_slice(story, artifact_root, config, ledger=led),
         "repo_map": _repo_map_section(story, project=project, artifact_root=artifact_root, config=config),
+        "blast_radius": _blast_radius_section(story, project=project, config=config),
     }
+
+
+def _blast_radius_section(story: Story, *, project: Path, config: Config | None) -> str:
+    """Impact analysis từ CodebaseGraphProvider — chỉ chạy khi brownfield."""
+    baseline = project / "_bmad-output" / "baseline.md"
+    if not baseline.is_file():
+        return ""
+    targets = list(story.write_scope) if story.write_scope else []
+    if not targets:
+        return ""
+    try:
+        from ..codebase.provider import resolve
+        provider = resolve(project, preference=str((config or {}).get("context.graph_provider", "auto")))
+        result = provider.impact(project, targets)
+    except Exception:
+        return ""
+    if not result.affected:
+        return ""
+    lines = [f"- {n.file or n.id}" + (f" ({n.kind})" if n.kind else "") for n in result.affected[:30]]
+    return (
+        "\n## Blast Radius\n\n"
+        "Các file/module bị ảnh hưởng bởi write_scope (impact analysis):\n\n"
+        + "\n".join(lines) + "\n\n"
+        "**Kiểm tra regression cho các file này.** Đừng sửa ngoài write_scope "
+        "trừ khi cần thiết để giữ tương thích.\n"
+    )
 
 
 def _repo_map_section(story: Story, *, project: Path, artifact_root: Path, config: Config | None) -> str:
@@ -348,13 +375,13 @@ SLOT_SOURCE = {
     "story_id": "artifact", "story_title": "artifact", "story_contract": "artifact",
     "architecture_rules": "artifact", "write_scope": "artifact", "mockup_section": "artifact",
     "tools": "config", "skills": "router", "diff_summary": "git", "impact": "code",
-    "repo_map": "code",
+    "repo_map": "code", "blast_radius": "code",
     "index": "ledger", "preservation": "ledger", "validation": "ledger",
 }
 
 #: Slot được phép rỗng khi dựng prompt: `repo_map` rỗng là knob tắt, không
-#: phải prompt khuyết.
-ALLOW_EMPTY = ("repo_map",)
+#: phải prompt khuyết. `blast_radius` rỗng khi greenfield hoặc write_scope trống.
+ALLOW_EMPTY = ("repo_map", "blast_radius")
 
 
 def handoff_slots(context: dict, *, feedback: bool = False) -> dict[str, tuple[str, int]]:

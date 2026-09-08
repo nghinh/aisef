@@ -136,6 +136,19 @@ To run without stopping for approvals: `aisef plan --auto-approve all`. Automati
 approvals are **always** marked `auto`, so it stays possible to tell which
 documents no human ever read.
 
+## Brownfield (existing codebase)
+
+```bash
+aisef baseline                     # analyse existing code → _bmad-output/baseline.md
+aisef baseline --provider graphify # use Graphify graph (install: uv tool install graphifyy)
+aisef baseline --incremental       # update graph after merge, without rebuilding baseline
+```
+
+When `baseline.md` exists, `aisef plan` automatically enters delta mode:
+existing artifacts are kept, prompts include brownfield context and
+`intent: "update"`, and the `blast_radius` slot in story prompts shows
+impact analysis from the codebase graph before implementation.
+
 ## Once there is code
 
 ```bash

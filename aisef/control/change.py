@@ -37,6 +37,17 @@ class ChangeResult:
     next_steps: list[str]
 
 
+def _brownfield_note(project: Path) -> str:
+    baseline = project / "_bmad-output" / "baseline.md"
+    if not baseline.is_file():
+        return ""
+    return (
+        "\n\n## Brownfield\n\n"
+        "Dự án này có mã nguồn hiện tại (xem `_bmad-output/baseline.md`). "
+        "Bảo toàn kiến trúc và behavior hợp lệ. Code là ground truth.\n"
+    )
+
+
 def apply(project: Path, requirement: str, description: str, *, today: date | None = None) -> ChangeResult:
     project = Path(project)
     root = project / "_bmad-output"
@@ -66,13 +77,17 @@ def apply(project: Path, requirement: str, description: str, *, today: date | No
     story = Story(id=sid, epic_id=EPIC_ID, title=description.strip().split("\n")[0][:80],
                   acceptance_criteria=[description.strip()], covers=[requirement],
                   verification_contract=["unit"])
-    path = register_story(root, story, epic_title=EPIC_TITLE)
+    body = _brownfield_note(project)
+    path = register_story(root, story, epic_title=EPIC_TITLE, body=body)
 
-    return ChangeResult(sid, path, requirement, prd_marked, [
+    steps = [
         f"khai `write_scope` cho {sid} trong `{path.relative_to(project)}` và chỉ mục",
         "duyệt lại cổng `prd` (và các cổng sau) — chúng đã thành stale",
         f"chạy `aisef run --epic {EPIC_ID}`",
-    ])
+    ]
+    if (root / "baseline.md").is_file():
+        steps.insert(0, "blast-radius sẽ chạy tự động khi implement (cần write_scope)")
+    return ChangeResult(sid, path, requirement, prd_marked, steps)
 
 
 def read_index(root: Path) -> dict:

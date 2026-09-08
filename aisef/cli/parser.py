@@ -15,7 +15,7 @@ from ..phases.deploy import INSTALL_SPEC as DEPLOY_INSTALL_SPEC
 from ._common import EXIT_USAGE, _gate_arg
 from .dashboard import cmd_dashboard
 from .doctor import cmd_doctor
-from .harness import cmd_compile, cmd_doc, cmd_gate, cmd_guard, cmd_init, cmd_replay, cmd_setup, cmd_skill
+from .harness import cmd_baseline, cmd_compile, cmd_doc, cmd_gate, cmd_guard, cmd_init, cmd_replay, cmd_setup, cmd_skill
 from .implement import (
     cmd_ctx,
     cmd_devsecops,
@@ -68,6 +68,12 @@ def build_parser() -> argparse.ArgumentParser:
     ch.add_argument("requirement", help="mã yêu cầu, ví dụ FR-3")
     ch.add_argument("description", help="mô tả thay đổi — thành tiêu chí chấp nhận của story delta")
     ch.set_defaults(func=cmd_change)
+
+    bl = sub.add_parser("baseline", help="dựng baseline cho brownfield: phân tích mã nguồn hiện tại")
+    bl.add_argument("--provider", default="", help="graphify | basic | auto (mặc định)")
+    bl.add_argument("--force", action="store_true", help="dựng baseline dù greenfield")
+    bl.add_argument("--incremental", action="store_true", help="cập nhật graph mà không dựng lại baseline")
+    bl.set_defaults(func=cmd_baseline)
 
     dc = sub.add_parser("doc", help="tra tài liệu thư viện theo yêu cầu (context7, có cache)")
     dc.add_argument("package", help="tên gói/thư viện, ví dụ vitest, react, fastapi")

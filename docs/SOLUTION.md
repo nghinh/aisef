@@ -123,7 +123,7 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 |---|---|
 | Định tuyến model | `harness/routing.py` — theo vai; **reviewer ≠ developer** |
 | Sinh sub-agent | không có — mỗi vai là một phiên riêng do harness gọi (`harness/routing.py`); xem ADR-003 #15 |
-| Bàn giao | gói ngữ cảnh mỗi vai dựng từ slot có **nguồn khai** (`phases/implement.py::SLOT_SOURCE`, ghi vào bằng chứng `handoff`): `story_id` · `story_title` · `story_contract` · `architecture_rules` · `write_scope` · `mockup_section` (artifact) · `tools` (config) · `skills` (router) · `diff_summary` (git) · `impact` · `repo_map` (code — `repo_map` là bản đồ mã quanh phạm vi ghi cho cả ba vai, ADR-005 V7, trần `context.max_repo_map_chars`) · `index` · `preservation` · `validation` (ledger — ADR-004 R4/R6). Reviewer/security không nhận slot nguồn `agent` (ADR-003 #9). Không có `next`/`implement`/`complete`: vòng lặp story nằm trong `run` |
+| Bàn giao | gói ngữ cảnh mỗi vai dựng từ slot có **nguồn khai** (`phases/implement.py::SLOT_SOURCE`, ghi vào bằng chứng `handoff`): `story_id` · `story_title` · `story_contract` · `architecture_rules` · `write_scope` · `mockup_section` (artifact) · `tools` (config) · `skills` (router) · `diff_summary` (git) · `impact` · `repo_map` · `blast_radius` (code — `repo_map` là bản đồ mã quanh phạm vi ghi cho cả ba vai, ADR-005 V7, trần `context.max_repo_map_chars`; `blast_radius` là impact analysis từ CodebaseGraphProvider cho brownfield, rỗng khi greenfield) · `index` · `preservation` · `validation` (ledger — ADR-004 R4/R6). Reviewer/security không nhận slot nguồn `agent` (ADR-003 #9). Không có `next`/`implement`/`complete`: vòng lặp story nằm trong `run` |
 | Luật kích hoạt | `control/state.py` (FSM `PENDING → RUNNING → VERIFYING → VERIFIED → DONE`) + `control/scheduler.py` (đợt theo phụ thuộc và phạm vi ghi) ✅ **đã xong** |
 
 ### 5.5 Guardrails / Hooks
@@ -348,6 +348,8 @@ aisef skill   --scan [--client c] [--batch N]   quét SKILL.md bằng model (ch�
                                       injection → rejected, suspicious → cảnh báo trong sổ
 aisef doc     <package> [--topic T] [--tokens N] [--story S]   tra tài liệu thư viện
                                       (context7, có cache), ghi bằng chứng doc_lookup
+aisef baseline [--provider graphify|basic|auto] [--force] [--incremental]
+                                      brownfield: dựng baseline mã hiện tại (hoặc --incremental cập nhật graph)
 
 # Bước 2 — tài liệu, dừng ở mỗi cổng
 aisef plan    [--client c] [--auto-approve all|<danh sách>] [--force]
@@ -654,6 +656,7 @@ Không để chữ "ngưỡng" chung chung. Mặc định trong `.ai/config.json
 | `context.max_preservation_chars` | `1 200` | trần ký tự cho hai slot R4 `preservation` (hành vi VERIFIED của story khác mà story này chạm tệp: id · story · nguồn kiểm) và `validation` (thứ harness chạy lại ở ứng viên). Cắt chỉ cắt phần **in ra**; cổng "bảo toàn" vẫn chấm đủ danh sách — không kiểm được là UNRUNNABLE, đỏ là FAILED và sổ ghi REOPENED (ADR-004 R4). Đo trên test giả: hai slot +212 ký tự, prompt developer +13,2 % (ADR-004 §6 R4) |
 | `context.max_repo_map_chars` | `0` | trần ký tự cho slot `repo_map` (ADR-005 V7, `harness/context.py`): skeleton tệp trong phạm vi ghi (Python `ast`, TS/JS chữ ký) → tệp gọi/được import 1 bước → test nhắc tên, cấp cho cả ba vai. **0 = tắt** cho tới khi A/B T8 đạt (trung vị lượt developer −20 % **và** cổng cùng kết cục): Aider không công bố số đo nào cho repo map, còn 2 000 ký tự trên baseline B5 11 537 là +17 % (vượt trần 15 %) — khi bật, thử 1 500 (+13 %). Hồi cứu e9 01-05 tại SHA `2424265`: bản đầy đủ 3 119 ký tự, ADR-005 §9. Bản đầy đủ tra bằng `aisef ctx --story S` |
 | `context.map_provider` | `""` | lệnh ngoài vẽ bản đồ (tree-sitter, serena — cắm sau, không thêm gói): stdin JSON `{project, seeds, budget}` → stdout văn bản, cùng kiểu `review.impact_provider`. Rỗng = dựng sẵn stdlib; lệnh hỏng thì lùi về dựng sẵn và slot nói rõ là thô |
+| `context.graph_provider` | `"auto"` | `"auto"` / `"graphify"` / `"basic"` — chọn CodebaseGraphProvider cho brownfield. `auto` ưu tiên Graphify nếu có CLI + graph, lùi về Basic. Dùng bởi `aisef baseline` và slot `blast_radius` |
 | `run.max_parallel` | `3` | số story song song trong một đợt |
 | `run.max_turns` | `40` | vòng lặp tối đa của một phiên story |
 | `run.timeout_seconds` | `1800` | 30 phút cho một story |
