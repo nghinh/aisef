@@ -439,6 +439,9 @@ def run_split(project: Path, config: Config) -> PhaseOutcome:
     return out
 
 
+MAX_SPLIT_RETRIES = 2
+
+
 def run_pipeline(
     project: Path | str,
     client: ClientAdapter,
@@ -447,7 +450,14 @@ def run_pipeline(
     auto_approve: frozenset[Gate] = frozenset(),
     force: bool = False,
 ) -> PipelineResult:
-    """Run phases up to the first unapproved gate, then stop."""
+    """Run phases up to the first unapproved gate, then stop.
+
+    When the stories gate fails (oversized stories), the pipeline loops back
+    to re-run epics with the gate memo feedback, up to ``MAX_SPLIT_RETRIES``
+    times.  Without this, a single ``aisef plan --auto-approve=all`` would
+    stop at the first oversized story and the user would have to manually
+    re-run — a bad first experience for external users.
+    """
     project = Path(project)
     cfg = config or Config.load(project)
     approvals = ApprovalStore(project / ARTIFACT_ROOT)
@@ -468,11 +478,33 @@ def run_pipeline(
 
     # Story split runs every time: `epics.md` may have been edited during
     # human review, and the generated story files must follow.
-    outcome = run_split(project, cfg)
-    result.outcomes.append(outcome)
-    if not outcome.ok:
-        result.failed_at = SPLIT_PHASE.id
-        return result
+    # When the machine gate fails (oversized stories), loop back: delete
+    # epics.md so the epics phase re-runs with the gate memo feedback.
+    epics_phase = PHASE_BY_ID["epics"]
+    for attempt in range(1 + MAX_SPLIT_RETRIES):
+        outcome = run_split(project, cfg)
+        result.outcomes.append(outcome)
+        if outcome.ok:
+            break
+        if outcome.error or attempt >= MAX_SPLIT_RETRIES:
+            result.failed_at = SPLIT_PHASE.id
+            return result
+        # Gate failed (oversized stories) — gate memo is already written by
+        # run_split.  Delete epics.md so run_phase re-generates it with the
+        # split instructions from the memo.
+        epics_artifact = project / ARTIFACT_ROOT / "epics.md"
+        if epics_artifact.is_file():
+            epics_artifact.unlink()
+        # Re-run only the epics phase (earlier phases are already done).
+        epics_out = run_phase(epics_phase, project, client, config=cfg, force=True)
+        result.outcomes.append(epics_out)
+        if not epics_out.ok:
+            result.failed_at = epics_phase.id
+            return result
+        if not _pass_gate(approvals, epics_phase.gate, epics_out, auto_approve):
+            result.waiting_on = epics_phase.gate
+            return result
+
     if not _pass_gate(approvals, Gate.STORIES, outcome, auto_approve):
         result.waiting_on = Gate.STORIES
 
