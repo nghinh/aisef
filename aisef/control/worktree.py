@@ -22,6 +22,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+import threading
 import time
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -140,6 +141,9 @@ CLIENT_CONFIG = (".claude/settings.json", ".opencode")
 class WorktreeManager:
     """Tạo, dọn và hợp nhất worktree của story."""
 
+    # git worktree add races on .git/worktrees metadata under ThreadPoolExecutor
+    _create_lock = threading.Lock()
+
     def __init__(self, repo: Path, *, root: str = WORKTREE_ROOT):
         self.repo = Path(repo).resolve()
         self.root = self.repo / root
@@ -179,30 +183,25 @@ class WorktreeManager:
         path, branch = self.path_for(story_id), self.branch_for(story_id)
         if (path / ".git").exists():
             return Worktree(story_id, path, branch)
-        if path.exists():
-            # Thư mục có mà không phải worktree (lỗi 13, đo 2026-09-05 trên
-            # e9 A/B): tiến trình vite sống sót sau khi gỡ worktree ghi lại
-            # `.vite/` vào đúng chỗ ấy; lần chạy sau tưởng worktree còn, agent
-            # làm việc trong một thư mục thường nằm **trong repo chính**, guard
-            # so diff với repo chính và chặn mọi Bash — 16 lần chặn, $0 việc.
-            # Thư mục ấy là của harness: không phải worktree thì là rác.
-            shutil.rmtree(path)
-            _git(self.repo, "worktree", "prune")
+        with self._create_lock:
+            if (path / ".git").exists():
+                return Worktree(story_id, path, branch)
+            if path.exists():
+                shutil.rmtree(path)
+                _git(self.repo, "worktree", "prune")
 
-        self._ensure_root()
-        co_san = self._branch_exists(branch)
-        args = ["worktree", "add", "-q"]
-        if co_san:
-            args += [str(path), branch]  # nhánh có sẵn — nối lại, không tạo mới
-        else:
-            args += [str(path), "-b", branch]
-            if base:
-                args.append(base)
-        _git(self.repo, *args)
+            self._ensure_root()
+            co_san = self._branch_exists(branch)
+            args = ["worktree", "add", "-q"]
+            if co_san:
+                args += [str(path), branch]
+            else:
+                args += [str(path), "-b", branch]
+                if base:
+                    args.append(base)
+            _git(self.repo, *args)
         self._carry_client_config(path)
 
-        # Tính trước rồi mới dựng: `Worktree` là bất biến, và giữ nó bất
-        # biến đáng hơn một dòng ngắn.
         mang_vao = self.refresh(story_id, base=base) if co_san and refresh else ""
         return Worktree(story_id, path, branch, refreshed_from=mang_vao)
 
