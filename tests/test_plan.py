@@ -292,6 +292,26 @@ class TestFailures(PlanTestCase):
         self.assertNotIn("architecture", c.calls)
 
 
+    def test_agent_fails_but_artifacts_on_disk_recovers(self):
+        """Agent exit != 0 but wrote all files → phase should recover, not fail."""
+        import json
+
+        class FailButWrite(FakeClient):
+            def run(self, spec):
+                phase = self._phase_for(spec.prompt)
+                self.calls.append(phase.id)
+                out = spec.workdir / ARTIFACT_ROOT
+                out.mkdir(parents=True, exist_ok=True)
+                for name in phase.artifacts:
+                    self._write(out / name, phase.id)
+                body = json.dumps({"status": "complete", "intent": "create"})
+                return RunResult(ok=False, error="max_turns", cost_usd=1.0,
+                                 text="xong.\n\n" + body)
+
+        r = self.run_plan(FailButWrite(), auto_approve=frozenset(Gate))
+        self.assertTrue(r.complete, r.summary())
+
+
 class TestSummary(PlanTestCase):
     def test_waiting_summary_tells_the_next_command(self):
         text = self.run_plan(FakeClient()).summary()

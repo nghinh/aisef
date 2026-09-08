@@ -400,19 +400,20 @@ def run_phase(
         budget -= 1
         # Same exit-status table as the story retry loop (ADR-005 V11 B).
         if budget <= 0 or exit_status_of(result) not in INFRA_STATUSES:
+            _save_response(project, phase.id, result.text, result)
+            # Artifacts on disk win: agent may have written the files before
+            # failing (e.g. max_turns after writing but before JSON status).
+            if not _missing(project, phase.artifacts):
+                _run_log(project, f"phase={phase.id} RECOVER ${out.cost_usd:.2f} err={error}")
+                break
             out.error = error
             _run_log(project, f"phase={phase.id} FAIL ${out.cost_usd:.2f} err={error}")
-            _save_response(project, phase.id, result.text, result)
             return out
         out.infra_retries += 1
 
     _save_response(project, phase.id, result.text, result)
     out.status = parse_headless_status(result.text)
 
-    # Verify on disk, don't trust self-report. A run can finish "successfully",
-    # claim it produced artifacts, yet the files don't actually exist.
-    # Conversely, a "blocked" status with artifacts on disk means the agent
-    # produced the work but mis-reported — artifacts on disk win.
     still_missing = _missing(project, phase.artifacts)
     if out.status.status == "blocked" and still_missing:
         out.error = f"BMAD blocked: {out.status.reason or 'no reason given'}"
