@@ -4,6 +4,16 @@ Ghi theo **sáu nhóm harness** (`docs/SOLUTION.md` §5), không theo ADR hay
 ngày. Mỗi dòng có chỗ đọc lại; số lỗi trỏ `docs/STATUS-2026-09-05.md` §2.4
 và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epic-improvement.md` §6.
 
+## v0.4.1 (dev)
+
+### Điều phối (nhóm 2 — orchestration)
+
+- **Multi-epic state**: `SprintState.active_epics` theo dõi nhiều epic chạy
+  song song trong cùng dự án. `finish_epic()` gỡ epic khỏi danh sách active
+  và fallback `current_epic`. `of_epic()` / `by_status(epic=)` lọc story theo
+  epic. `aisef status` hiển thị các epic đang hoạt động. Tương thích ngược —
+  state.json cũ thiếu `active_epics` tải bình thường.
+
 ## v0.4.0 — phát hành 2026-09-08
 
 ### Quan sát (nhóm 4 — observability)

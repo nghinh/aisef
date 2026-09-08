@@ -40,7 +40,9 @@ def cmd_status(args) -> int:
     if chua_merge:
         print(f"⚠️  {len(chua_merge)} story xong nhưng chưa merge vào nhánh chính: "
               f"{', '.join(chua_merge[:5])} — chạy lại `aisef run` để merge")
-    if state.current_epic:
+    if state.active_epics:
+        print(f"Epic đang chạy: {', '.join(state.active_epics)}")
+    elif state.current_epic:
         print(f"Epic hiện tại: {state.current_epic}")
     print()
     for status in StoryStatus:

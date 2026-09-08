@@ -114,13 +114,18 @@ class StoryRecord:
 class SprintState:
     stories: dict[str, StoryRecord] = field(default_factory=dict)
     current_epic: str = ""
+    active_epics: list[str] = field(default_factory=list)
     started_at: str = field(default_factory=_now)
     updated_at: str = field(default_factory=_now)
 
     # --------------------------------------------------------- truy vấn
 
-    def by_status(self, status: StoryStatus) -> list[StoryRecord]:
-        return [r for r in self.stories.values() if r.state is status]
+    def by_status(self, status: StoryStatus, *, epic: str = "") -> list[StoryRecord]:
+        return [r for r in self.stories.values()
+                if r.state is status and (not epic or r.epic_id == epic)]
+
+    def of_epic(self, epic_id: str) -> list[StoryRecord]:
+        return [r for r in self.stories.values() if r.epic_id == epic_id]
 
     def done_ids(self) -> set[str]:
         return {r.id for r in self.stories.values() if r.state.satisfies_dependents}
@@ -201,6 +206,7 @@ class StateStore:
         return SprintState(
             stories=stories,
             current_epic=raw.get("current_epic", ""),
+            active_epics=raw.get("active_epics") or [],
             started_at=raw.get("started_at", _now()),
             updated_at=raw.get("updated_at", _now()),
         )
@@ -231,6 +237,7 @@ class StateStore:
         payload = {
             "stories": {sid: asdict(r) for sid, r in state.stories.items()},
             "current_epic": state.current_epic,
+            "active_epics": state.active_epics,
             "started_at": state.started_at,
             "updated_at": state.updated_at,
         }
@@ -332,3 +339,16 @@ class StateStore:
     def set_current_epic(self, epic_id: str) -> None:
         with self.transaction() as st:
             st.current_epic = epic_id
+            if epic_id and epic_id not in st.active_epics:
+                st.active_epics.append(epic_id)
+
+    def finish_epic(self, epic_id: str) -> None:
+        with self.transaction() as st:
+            if epic_id in st.active_epics:
+                st.active_epics.remove(epic_id)
+            if st.current_epic == epic_id:
+                st.current_epic = st.active_epics[-1] if st.active_epics else ""
+
+    def epic_stories(self, epic_id: str) -> list[StoryRecord]:
+        state = self.load()
+        return [r for r in state.stories.values() if r.epic_id == epic_id]

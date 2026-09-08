@@ -458,6 +458,7 @@ def run_sprint(
             worktrees=worktrees, artifact_root=artifact_root, report=report,
         ):
             break
+        state.finish_epic(epic_id)
     return report
 
 

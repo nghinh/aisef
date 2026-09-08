@@ -265,3 +265,76 @@ class TestVerifiedTruocDone(unittest.TestCase):
         for s in ("attempt.started", "worktree.created", "merge.completed", "attempt.committed"):
             j.record("S-01", Entry(step=s, attempt=1))
         self.assertIs(self.store.load().stories["S-01"].state, StoryStatus.DONE)
+
+
+class TestMultiEpic(StateTestCase):
+    """P2-6 v0.4.0: concurrent epics in one project."""
+
+    def test_active_epics_tracked(self):
+        self.store.set_current_epic("EPIC-01")
+        self.store.set_current_epic("EPIC-02")
+        state = self.store.load()
+        self.assertEqual(state.active_epics, ["EPIC-01", "EPIC-02"])
+        self.assertEqual(state.current_epic, "EPIC-02")
+
+    def test_finish_epic_removes_from_active(self):
+        self.store.set_current_epic("EPIC-01")
+        self.store.set_current_epic("EPIC-02")
+        self.store.finish_epic("EPIC-01")
+        state = self.store.load()
+        self.assertEqual(state.active_epics, ["EPIC-02"])
+        self.assertEqual(state.current_epic, "EPIC-02")
+
+    def test_finish_current_falls_back(self):
+        self.store.set_current_epic("EPIC-01")
+        self.store.set_current_epic("EPIC-02")
+        self.store.finish_epic("EPIC-02")
+        state = self.store.load()
+        self.assertEqual(state.current_epic, "EPIC-01")
+
+    def test_finish_last_epic_clears(self):
+        self.store.set_current_epic("EPIC-01")
+        self.store.finish_epic("EPIC-01")
+        state = self.store.load()
+        self.assertEqual(state.active_epics, [])
+        self.assertEqual(state.current_epic, "")
+
+    def test_of_epic_filters(self):
+        self.store.register("S-01", "EPIC-01")
+        self.store.register("S-02", "EPIC-02")
+        self.store.register("S-03", "EPIC-01")
+        state = self.store.load()
+        self.assertEqual([r.id for r in state.of_epic("EPIC-01")], ["S-01", "S-03"])
+
+    def test_by_status_filters_by_epic(self):
+        self.store.register("S-01", "EPIC-01")
+        self.store.register("S-02", "EPIC-02")
+        self.store.transition("S-01", StoryStatus.RUNNING)
+        self.store.transition("S-02", StoryStatus.RUNNING)
+        state = self.store.load()
+        self.assertEqual(len(state.by_status(StoryStatus.RUNNING)), 2)
+        self.assertEqual(len(state.by_status(StoryStatus.RUNNING, epic="EPIC-01")), 1)
+
+    def test_no_duplicate_active(self):
+        self.store.set_current_epic("EPIC-01")
+        self.store.set_current_epic("EPIC-01")
+        self.assertEqual(self.store.load().active_epics, ["EPIC-01"])
+
+    def test_epic_stories_from_store(self):
+        self.store.register("S-01", "EPIC-01")
+        self.store.register("S-02", "EPIC-02")
+        stories = self.store.epic_stories("EPIC-01")
+        self.assertEqual(len(stories), 1)
+        self.assertEqual(stories[0].id, "S-01")
+
+    def test_backward_compat_no_active_epics_in_json(self):
+        """Old state.json without active_epics field loads fine."""
+        import json
+        self.store.root.mkdir(parents=True, exist_ok=True)
+        self.store.path.write_text(json.dumps({
+            "stories": {}, "current_epic": "EPIC-01",
+            "started_at": "2026-01-01", "updated_at": "2026-01-01",
+        }))
+        state = self.store.load()
+        self.assertEqual(state.active_epics, [])
+        self.assertEqual(state.current_epic, "EPIC-01")
