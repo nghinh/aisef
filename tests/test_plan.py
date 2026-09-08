@@ -131,6 +131,17 @@ class TestPhaseContract(unittest.TestCase):
         self.assertIn(f"{ARTIFACT_ROOT}/prd.md", p)
         self.assertIn("open_questions", p)
 
+    def test_prd_prompt_defers_oqs_downstream_resolves(self):
+        """PRD tells agent to put unknowns in open_questions;
+        downstream phases tell agent to resolve OQs with MVP defaults."""
+        prd = build_prompt(PHASES[1])  # prd
+        self.assertIn("open_questions", prd)
+        self.assertNotIn("resolve each one", prd)
+        for phase in PHASES[2:]:  # architecture, ux, epics
+            p = build_prompt(phase)
+            self.assertIn("resolve each one", p, f"{phase.id} should resolve OQs")
+            self.assertNotIn("goes in open_questions", p, f"{phase.id} should not defer OQs")
+
 
 class TestStopsAtGates(PlanTestCase):
     def test_stops_at_first_gate(self):

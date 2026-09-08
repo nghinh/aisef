@@ -24,5 +24,7 @@ Read: {{ artifact_root }}/DESIGN.md (visual tokens), {{ artifact_root }}/EXPERIE
 
 Write exactly one file: {{ output }}
 
-Where something is unresolved, mark it `data-unresolved` instead of
-choosing on your own.
+If the input documents contain open questions, unresolved items, or
+provisional assumptions, resolve each one with the simplest reasonable
+MVP default and implement it. Do NOT use `data-unresolved` or leave
+placeholders — every decision point must have a concrete implementation.

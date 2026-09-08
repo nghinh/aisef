@@ -317,9 +317,20 @@ def build_prompt(phase: Phase, project: Path | None = None) -> str:
         "communication_language=en, document_output_language=en). "
         "Do not call list_dir or find_file on _bmad/. "
         "Do not run uv commands referencing _bmad/scripts/.\n\n"
-        "Do not ask questions. Any assumptions you must infer go in assumptions; "
-        "anything requiring human decision goes in open_questions — do not choose "
-        "silently. End with a JSON status following the headless schema."
+        "Do not ask questions. "
+        + (
+            "Any assumptions you must infer go in assumptions; "
+            "anything requiring human decision goes in open_questions — do not choose "
+            "silently. "
+            if phase.id == "prd"
+            else
+            "If input documents contain open questions (OQ-*), unresolved items, or "
+            "provisional assumptions, resolve each one with the simplest reasonable "
+            "MVP default and mark it resolved. Do NOT propagate 'unresolved', "
+            "'pending', or 'provisional' into your output — every decision point "
+            "must have a concrete answer. "
+        )
+        + "End with a JSON status following the headless schema."
         + memo + bf_ctx
     )
 
