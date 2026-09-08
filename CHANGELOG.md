@@ -4,6 +4,21 @@ Ghi theo **sáu nhóm harness** (`docs/SOLUTION.md` §5), không theo ADR hay
 ngày. Mỗi dòng có chỗ đọc lại; số lỗi trỏ `docs/STATUS-2026-09-05.md` §2.4
 và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epic-improvement.md` §6.
 
+## v0.7.0 — phát hành 2026-09-08
+
+### Sửa lỗi (nhóm 1 — isolation)
+
+- **Worktree race condition**: `git worktree add` chạy đồng thời dưới
+  `ThreadPoolExecutor` gây lỗi `failed to read .git/worktrees/…/commondir`.
+  Khắc phục bằng `threading.Lock()` trên `WorktreeManager._create_lock`.
+  Lỗi này làm CI release v0.5.1 và v0.6.0 trượt (re-run thành công do
+  race là xác suất).
+
+### Tài liệu (nhóm 6 — docs)
+
+- Sửa bảng guard count: "8 guard" → "9 guard" trong EXECUTION-PLAN.md
+  và SOLUTION.md §9.
+
 ## v0.6.0 — phát hành 2026-09-08
 
 ### Quan sát (nhóm 2 — observation)
