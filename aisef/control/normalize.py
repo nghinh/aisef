@@ -29,7 +29,9 @@ _FR_HEADING = re.compile(r"^#{2,5}\s+(FR-\d+)\s*[:：]\s*(.+?)\s*$", re.MULTILIN
 
 #: `- **NFR-1 — Thời gian mở ứng dụng.** Từ lúc…`
 _NFR_ITEM = re.compile(
-    r"^[-*]\s+\*\*(NFR-\d+)\s*[—–-]\s*(.+?)\.?\*\*\s*(.*)$", re.MULTILINE
+    r"^(?:[-*]\s+\*\*(NFR-\d+)\s*[—–-]\s*(.+?)\.?\*\*\s*(.*)"
+    r"|#{2,5}\s+\*{0,2}(NFR-\d+)\s*[—–-]\s*(.+?)\s*\*{0,2})$",
+    re.MULTILINE,
 )
 #: Section heading for NFR block — Vietnamese or English.
 #: Used as fallback: auto-number unlabelled bullets when the heading is present
@@ -39,7 +41,7 @@ _NFR_SECTION = re.compile(
     r"\s*$",
     re.MULTILINE | re.IGNORECASE,
 )
-_PLAIN_BULLET = re.compile(r"^[-*]\s+(.+?)\s*$", re.MULTILINE)
+_PLAIN_BULLET = re.compile(r"^(?:[-*]|\d+[.):])\s+(.+?)\s*$", re.MULTILINE)
 
 #: Tiêu đề khối tiêu chí — agent viết bằng tiếng Anh hoặc tiếng Việt tuỳ lượt
 #: (lỗi 19, 2026-09-05: lượt `plan` thứ hai viết "Hệ quả kiểm chứng được" và
@@ -55,7 +57,7 @@ _CONSEQUENCES = re.compile(
     re.IGNORECASE |
     re.DOTALL,
 )
-_BULLET = re.compile(r"^[-*]\s+(.+?)\s*$", re.MULTILINE)
+_BULLET = re.compile(r"^(?:[-*]|\d+[.):])\s+(.+?)\s*$", re.MULTILINE)
 
 _ASSUMPTION = re.compile(r"\[ASSUMPTION:\s*(.+?)\]", re.DOTALL)
 _OQ_MENTION = re.compile(r"\b(OQ-\d+)\b")
@@ -315,14 +317,25 @@ def parse_prd(text: str) -> PRD:
             )
         )
 
-    for m in _NFR_ITEM.finditer(text):
+    nfr_matches = list(_NFR_ITEM.finditer(text))
+    for i, m in enumerate(nfr_matches):
+        nfr_id = m.group(1) or m.group(4)
+        nfr_title = m.group(2) or m.group(5) or ""
+        nfr_desc = m.group(3) or ""
+        if m.group(4) and not nfr_desc:
+            body_start = m.end()
+            body_end = nfr_matches[i + 1].start() if i + 1 < len(nfr_matches) else None
+            nfr_desc = _section_for(text, body_start, body_end)
         prd.requirements.append(
             Requirement(
-                id=m.group(1),
+                id=nfr_id,
                 kind="non_functional",
-                title=m.group(2).strip(),
-                description=" ".join(_ASSUMPTION.sub("", m.group(3)).split())[:600],
-                open_questions=sorted(set(_OQ_MENTION.findall(m.group(0)))),
+                title=nfr_title.strip(),
+                description=" ".join(_ASSUMPTION.sub("", nfr_desc).split())[:600],
+                open_questions=sorted(set(_OQ_MENTION.findall(
+                    text[m.start():nfr_matches[i + 1].start()] if i + 1 < len(nfr_matches)
+                    else text[m.start():]
+                ))),
             )
         )
 
