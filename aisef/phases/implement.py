@@ -1518,11 +1518,11 @@ def _reconcile_security(story_id: str, ev: EvidenceStore, text: str,
 
 
 #: Opening tag for regular blocking items.
-_BLOCK_TAGS = ("[chặn]", "[blocker]", "[block]")
+_BLOCK_TAGS = ("[chặn]", "[blocker]", "[block]", "[blocked]", "[blocking]")
 #: Opening tag for **stuck** items: the reviewer has verified that criteria
 #: cannot be satisfied from within the story scope.  Two independent models
 #: reached the same conclusion -- retrying burns money with no way out.
-_STUCK_TAGS = ("[bế tắc]", "[be tac]", "[stuck]", "[blocked-by-plan]")
+_STUCK_TAGS = ("[bế tắc]", "[be tac]", "[stuck]", "[blocked-by-plan]", "[stuck-by-plan]")
 
 
 #: Directory holding the reviewer's full text -- blocking evidence must be re-readable.
@@ -1591,10 +1591,10 @@ def plan_defects(findings: list[str]) -> list[str]:
 # JSON means the gate loses it too, the worst kind of silent failure.
 
 #: Valid verdicts.  Anything outside these three is a schema error.
-VERDICTS = ("pass", "block", "stuck")
+VERDICTS = ("pass", "block", "blocked", "stuck")
 #: JSON tags corresponding to the two blocking item types in text.
-_JSON_BLOCK_TAGS = ("chặn", "chan", "block", "blocker")
-_JSON_STUCK_TAGS = ("bế tắc", "be tac", "stuck", "blocked-by-plan")
+_JSON_BLOCK_TAGS = ("chặn", "chan", "block", "blocker", "blocked", "blocking")
+_JSON_STUCK_TAGS = ("bế tắc", "be tac", "stuck", "blocked-by-plan", "stuck-by-plan")
 
 #: Remind the schema when the first attempt lacks a JSON block.  Exactly
 #: **once**: if the second attempt still lacks it, the model cannot do it,

@@ -26,6 +26,7 @@ from pathlib import Path
 
 #: Section headings may vary slightly between generation runs; accept several variants.
 _IA_HEADINGS = ("information architecture", "surfaces", "screens", "screen",
+                "pages", "page", "views", "view", "routes",
                 "màn hình", "kiến trúc thông tin")
 _COMPONENT_HEADINGS = ("component patterns", "components", "thành phần",
                        "mẫu thành phần")
@@ -47,7 +48,7 @@ def slugify(name: str) -> str:
 #: misassign "Reached from" as purpose and lose the route entirely.
 _COLUMNS: dict[str, tuple[str, ...]] = {
     "id": ("screen_id", "screen id", "id", "mã màn hình", "mã"),
-    "name": ("surface", "screen", "màn hình", "tên", "name"),
+    "name": ("surface", "screen", "page", "view", "màn hình", "tên", "name"),
     "route": ("route", "đường dẫn", "path", "url"),
     "reached_from": ("reached from", "đến từ", "vào từ", "entry", "lối vào", "reached"),
     "purpose": ("purpose", "mục đích", "vai trò", "description", "mô tả"),
@@ -104,7 +105,7 @@ def _is_separator(line: str) -> bool:
 def _tables_in_section(text: str, headings: tuple[str, ...]) -> list[list[list[str]]]:
     """All markdown tables inside sections whose headings match."""
     tables: list[list[list[str]]] = []
-    marks = list(re.finditer(r"^(#{2,4})\s+(.+?)\s*$", text, re.MULTILINE))
+    marks = list(re.finditer(r"^(#{2,6})\s+(.+?)\s*$", text, re.MULTILINE))
     for i, m in enumerate(marks):
         if not any(h in m.group(2).lower() for h in headings):
             continue
@@ -200,7 +201,9 @@ def _attach(exp: Experience, text: str, headings: tuple[str, ...], field_name: s
             if field_name == "components":
                 exp.component_rules.setdefault(label, _strip_markup(" ".join(row[2:])))
 
-            everywhere = "global" in scope or "anywhere" in scope or "mọi màn hình" in scope
+            everywhere = any(k in scope for k in ("global", "anywhere", "everywhere",
+                                                     "all screens", "all pages", "every",
+                                                     "mọi màn hình"))
             for screen in exp.screens:
                 if everywhere or _mentions(scope, screen.name):
                     target = getattr(screen, field_name)

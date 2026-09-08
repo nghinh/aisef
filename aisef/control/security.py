@@ -24,7 +24,7 @@ SEVERITIES = ("low", "medium", "high", "critical")
 DEFAULT_BLOCKING = ("critical", "high")
 
 _LINE = re.compile(
-    r"^\s*[-*•]?\s*\[(?P<sev>critical|high|medium|low)\]\s*(?P<body>.+)$",
+    r"^\s*(?:[-*•]|\d+[.):]?)?\s*\[(?P<sev>critical|high|medium|low)\]\s*(?P<body>.+)$",
     re.IGNORECASE,
 )
 
@@ -117,7 +117,11 @@ def parse(text: str) -> SecurityReport:
     if not rep.findings and not rep.filtered:
         # No findings **and** no "no findings" phrase means the report is
         # malformed — fundamentally different from "reviewed, clean".
-        if "no findings" not in clean.lower() and "không có phát hiện" not in clean.lower():
+        low = clean.lower()
+        clean_phrases = ("no findings", "no vulnerabilit", "no security issue",
+                         "no issue", "all clear", "0 findings", "clean",
+                         "không có phát hiện", "không tìm thấy")
+        if not any(p in low for p in clean_phrases):
             rep.error = "report does not follow the required format"
     return rep
 

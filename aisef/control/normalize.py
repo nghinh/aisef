@@ -27,14 +27,14 @@ from .experience import slugify
 
 #: `#### FR-1: Create note`
 _FR_HEADING = re.compile(
-    r"^#{2,5}\s+(FR-\d+)\s*[:：—–-]\s*(.+?)\s*$", re.MULTILINE
+    r"^#{2,5}\s+(FR-\d+)\s*[:：—–-]\s*(.+?)\s*$", re.MULTILINE | re.IGNORECASE
 )
 
 #: `- **NFR-1 — App launch time.** From the moment...`
 _NFR_ITEM = re.compile(
     r"^(?:[-*]\s+\*\*(NFR-\d+)\s*[:：—–-]\s*(.+?)\.?\*\*\s*(.*)"
     r"|#{2,5}\s+\*{0,2}(NFR-\d+)\s*[:：—–-]\s*(.+?)\s*\*{0,2})$",
-    re.MULTILINE,
+    re.MULTILINE | re.IGNORECASE,
 )
 #: Section heading for NFR block — Vietnamese or English.
 #: Used as fallback: auto-number unlabelled bullets when the heading is present
@@ -65,13 +65,14 @@ _CONSEQUENCES = re.compile(
 )
 _BULLET = re.compile(r"^(?:[-*]|\d+[.):])\s+(.+?)\s*$", re.MULTILINE)
 
-_ASSUMPTION = re.compile(r"\[ASSUMPTION:\s*(.+?)\]", re.DOTALL)
+_ASSUMPTION = re.compile(r"\[ASSUMPTION:\s*(.+?)\]", re.DOTALL | re.IGNORECASE)
 _OQ_MENTION = re.compile(r"\b(OQ-\d+)\b")
 #: `**OQ-1 (blocks FR-13..FR-15)** — ...` or `- **OQ-1:** ...`
 _OQ_DEFINITION = re.compile(
-    r"\*\*(OQ-\d+)\s*(?:\(([^)]*)\))?\s*[:：]?\s*\*\*\s*[—–:：-]?\s*(.+?)"
-    r"(?=\n[-*]\s+\*\*OQ-|\n\d+\.\s+\*\*OQ-|\n\d+\.\s|\n\n|\Z)",
-    re.DOTALL,
+    r"(?:\*\*(OQ-\d+)\s*(?:\(([^)]*)\))?\s*[:：]?\s*\*\*\s*[—–:：-]?\s*(.+?)"
+    r"|#{2,5}\s+(OQ-\d+)\s*(?:\(([^)]*)\))?\s*[:：—–-]\s*(.+?))"
+    r"(?=\n[-*]\s+\*\*OQ-|\n\d+\.\s+\*\*OQ-|\n#{2,5}\s+OQ-|\n\d+\.\s|\n\n|\Z)",
+    re.DOTALL | re.IGNORECASE,
 )
 #: Section heading for assumptions — used as fallback when inline
 #: `[ASSUMPTION: ...]` markers are absent.
@@ -423,15 +424,15 @@ def parse_prd(text: str) -> PRD:
 
     seen_oq: set[str] = set()
     for m in _OQ_DEFINITION.finditer(text):
-        oq_id = m.group(1)
+        oq_id = m.group(1) or m.group(4)
         if oq_id in seen_oq:
             continue
         seen_oq.add(oq_id)
         prd.open_questions.append(
             OpenQuestion(
                 id=oq_id,
-                text=" ".join(m.group(3).split())[:400],
-                blocks=_expand_fr_refs(m.group(2) or ""),
+                text=" ".join((m.group(3) or m.group(6)).split())[:400],
+                blocks=_expand_fr_refs(m.group(2) or m.group(5) or ""),
             )
         )
 
@@ -445,21 +446,25 @@ def parse_prd_file(path: Path | str) -> PRD:
 # ----------------------------------------------------------------- epics.md
 
 #: `## Epic 1: Note-taking foundation`
-_EPIC_HEADING = re.compile(r"^#{2,5}\s+Epic\s+(\d+)\s*[:：]\s*(.+?)\s*$", re.MULTILINE)
+_EPIC_HEADING = re.compile(r"^#{2,5}\s+Epic\s+(\d+)\s*[:：—–-]\s*(.+?)\s*$", re.MULTILINE | re.IGNORECASE)
 #: `### Story 1.2: Edit note` — fixed pattern in BMAD template.
 _STORY_HEADING = re.compile(
-    r"^#{2,5}\s+Story\s+(\d+)\.(\d+)\s*[:：]\s*(.+?)\s*$", re.MULTILINE
+    r"^#{2,5}\s+Story\s+(\d+)\.(\d+)\s*[:：—–-]\s*(.+?)\s*$", re.MULTILINE | re.IGNORECASE
 )
 #: Acceptance criteria block ends at a new heading or another **bold label**
 #: — but *not* at `**When**`/`**Then**`/`**And**`, which are body parts of
 #: the criteria themselves. Cutting there leaves each story with one truncated criterion.
-_AC_BLOCK = re.compile(
-    r"\*\*(?:Acceptance Criteria|Tiêu chí chấp nhận|Tiêu chí kiểm chứng"
+_AC_HEAD = (
+    r"(?:Acceptance Criteria|Tiêu chí chấp nhận|Tiêu chí kiểm chứng"
     r"|Tiêu chí nghiệm thu"
     r"|(?:Testable|Verifiable|Acceptance|Verification|Test)\s+(?:criteria|consequences|conditions)"
     r"|Criteria|Tiêu chí|Hệ quả(?:\s+kiểm chứng(?:\s+được)?)?)"
-    r"\s*[:：]?\*\*\s*\n(.*?)"
-    r"(?=\n#{2,4}\s|\n\s*\*\*(?!Given|When|Then|And)[^\n*]+\*\*\s*[:：]?\s*\n|\Z)",
+)
+_AC_BLOCK = re.compile(
+    r"(?:\*\*" + _AC_HEAD + r"\s*[:：]?\*\*"
+    r"|#{2,5}\s+" + _AC_HEAD + r")"
+    r"\s*[:：]?\s*\n(.*?)"
+    r"(?=\n#{2,5}\s|\n\s*\*\*(?!Given|When|Then|And)[^\n*]+\*\*\s*[:：]?\s*\n|\Z)",
     re.DOTALL | re.IGNORECASE,
 )
 _GIVEN = re.compile(r"^\s*\*\*Given\*\*", re.IGNORECASE)
@@ -638,7 +643,7 @@ def _parse_coverage_map(text: str) -> dict[str, list[str]]:
     mapping line; no rigid table format, because the model formats
     differently each time.
     """
-    m = re.search(r"^#{2,4}\s+(?:FR Coverage Map|Bản đồ phủ FR)\s*$", text, re.MULTILINE)
+    m = re.search(r"^#{2,4}\s+(?:FR[- ]?(?:Story\s+)?Coverage\s+Map|(?:Requirements?\s+)?Coverage(?:\s+Map)?|Bản đồ phủ FR)\s*$", text, re.MULTILINE | re.IGNORECASE)
     if not m:
         return {}
     section = text[m.end():]
@@ -725,7 +730,7 @@ def parse_epics_file(path: Path | str) -> EpicPlan:
 # ---------------------------------------------------------- architecture.md
 
 #: `### AR-1 — Single write path`
-_AR_HEADING = re.compile(r"^#{2,4}\s+((?:AR|AD)-\d+)\s*[—–:-]\s*(.+?)\s*$", re.MULTILINE)
+_AR_HEADING = re.compile(r"^#{2,4}\s+((?:AR|AD)-\d+)\s*[—–:-]\s*(.+?)\s*$", re.MULTILINE | re.IGNORECASE)
 _AR_FIELD = re.compile(r"^[-*]\s*\*\*(Binds|Prevents|Rule)\s*[:：]?\*\*\s*(.+)$", re.MULTILINE)
 
 

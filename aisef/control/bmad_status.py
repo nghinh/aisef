@@ -171,7 +171,7 @@ def parse_headless_status(text: str) -> HeadlessStatus:
                         artifacts[f"{k}[{i}]"] = item
 
         return HeadlessStatus(
-            status=str(data.get("status", "")),
+            status=str(data.get("status", "")).lower(),
             intent=str(data.get("intent", "")),
             reason=str(data.get("reason", "")),
             artifacts=artifacts,
