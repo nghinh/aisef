@@ -4,6 +4,27 @@ Ghi theo **sáu nhóm harness** (`docs/SOLUTION.md` §5), không theo ADR hay
 ngày. Mỗi dòng có chỗ đọc lại; số lỗi trỏ `docs/STATUS-2026-09-05.md` §2.4
 và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epic-improvement.md` §6.
 
+## v0.5.0 (dev)
+
+### Bảo mật (nhóm 1 — kiểm soát)
+
+- **Distributed story claim**: `StateStore.claim()` atomic compare-and-swap
+  chuyển story PENDING → RUNNING + `claimed_by` dưới `fcntl.flock`. Nhiều máy
+  dùng chung `sprint-status.json` (NFS) không tranh nhau story.
+  `reset_for_retry()` và `release()` xoá claim. `machine_id()` =
+  `hostname:pid`. 7 test.
+
+### Điều phối (nhóm 2 — orchestration)
+
+- **Model routing hoàn chỉnh**: thêm `route.security_model` config key — bốn
+  vai (developer/reviewer/designer/security) đều có model riêng. `agent_run`
+  evidence ghi `role` và `model` vào detail.
+
+### Quan sát (nhóm 4 — observability)
+
+- **Cost by role**: dashboard hiển thị bảng chi phí theo vai và model —
+  `_role_cost()` trích từ `AGENT_RUN` events. 2 test.
+
 ## v0.4.1 — phát hành 2026-09-08
 
 ### Bảo mật (nhóm 1 — kiểm soát)

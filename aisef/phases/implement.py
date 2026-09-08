@@ -510,6 +510,7 @@ def run_attempt(
     evidence.agent_run(
         story.id, result, name=f"{story.id}#{number}", prompt_chars=len(spec.prompt),
         skills={**context.get("_skills", {}), "used": skills_used(result)},
+        role=DEVELOPER, model=spec.model,
     )
 
     sau = head_sha(project) if workdir != project else ""
@@ -1113,7 +1114,8 @@ def _review_session(
     """
     truoc = _tree_snapshot(workdir)
     result = client.run(spec)
-    store.agent_run(story_id, result, name=name, prompt_chars=len(spec.prompt))
+    store.agent_run(story_id, result, name=name, prompt_chars=len(spec.prompt),
+                    role=role, model=spec.model)
     da_sua = _revert_reviewer_writes(workdir, truoc, _tree_snapshot(workdir))
     persist_verdict(artifact_root, story_id, role, number, result)
     return result, da_sua

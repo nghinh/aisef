@@ -33,6 +33,12 @@ from typing import Iterator
 
 STATE_FILE = "sprint-status.json"
 LOCK_SUFFIX = ".lock"
+
+
+def machine_id() -> str:
+    """Tên máy duy nhất dùng cho claim — hostname + pid."""
+    import socket
+    return f"{socket.gethostname()}:{os.getpid()}"
 LOCK_TIMEOUT_SECONDS = 30
 
 
@@ -103,6 +109,7 @@ class StoryRecord:
     cost_usd: float = 0.0
     duration_ms: int = 0
     blocked_reason: str = ""
+    claimed_by: str = ""
     updated_at: str = field(default_factory=_now)
 
     @property
@@ -288,6 +295,7 @@ class StateStore:
                 return False
             rec.status = StoryStatus.PENDING.value
             rec.blocked_reason = ""
+            rec.claimed_by = ""
             rec.updated_at = _now()
             return True
 
@@ -335,6 +343,29 @@ class StateStore:
             if worktree:
                 rec.worktree = worktree
             return rec
+
+    def claim(self, story_id: str, owner: str = "") -> bool:
+        """Nhận một story pending để chạy — atomic compare-and-swap.
+
+        Trả True nếu nhận thành công (PENDING -> RUNNING + claimed_by).
+        Trả False nếu story không ở trạng thái pending hoặc đã bị máy khác nhận.
+        """
+        owner = owner or machine_id()
+        with self.transaction() as st:
+            rec = st.stories.get(story_id)
+            if rec is None or rec.state is not StoryStatus.PENDING:
+                return False
+            rec.status = StoryStatus.RUNNING.value
+            rec.claimed_by = owner
+            rec.updated_at = _now()
+            return True
+
+    def release(self, story_id: str) -> None:
+        """Nhả claim khi story xong hoặc bị lỗi — xoá claimed_by."""
+        with self.transaction() as st:
+            rec = st.stories.get(story_id)
+            if rec is not None:
+                rec.claimed_by = ""
 
     def set_current_epic(self, epic_id: str) -> None:
         with self.transaction() as st:

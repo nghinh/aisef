@@ -681,7 +681,7 @@ Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏn
 | `sandbox.provider` | `"docker"` | provider chạy lệnh (ADR-005 V5): `docker` · `local` · `"mô-đun:Lớp"` cho backend ngoài cùng hợp đồng `harness/sandbox.py::ExecutionProvider`; thiếu bảo đảm nào thì bằng chứng ghi tên bảo đảm ấy (`missing`). `sandbox.use_docker=false` tương đương `local` |
 | `sandbox.pre_deploy_degraded_waiver` | `""` | cổng `pre-deploy` **không** nhận suy biến (QĐ4) trừ khi có lý do khai ở đây; lý do ghi vào `pre-deploy.json` |
 | `app.dev_command` · `app.base_url` · `app.ready_timeout_seconds` | `""` · `http://localhost:5173` · `60` | để mở **route thật** lúc đối chiếu mockup; cổng đã có người trả lời thì từ chối, không nhận vơ (lỗi 15) |
-| `route.developer_model` · `route.reviewer_model` · `route.designer_model` | `""` | chọn model theo vai; rỗng thì theo mặc định của client |
+| `route.developer_model` · `route.reviewer_model` · `route.designer_model` · `route.security_model` | `""` | chọn model theo vai; rỗng thì theo mặc định của client |
 | `clients.env_allow` | `[]` | tiền tố biến môi trường của máy được cho qua **thêm** vào tiến trình client, ngoài allowlist cố định (§5.3). Rỗng nghĩa là không gì qua thêm; provider của OpenCode đọc khoá từ biến riêng, hay CI xác thực Claude bằng `CLAUDE_CODE_OAUTH_TOKEN`, thì khai tường minh (tên đầy đủ cũng là tiền tố). Đo 2026-09-06: `9router/mycombo` giữ khoá ở `auth.json` của OpenCode, không cần khai (ADR-005 §9 V2) |
 
 ---

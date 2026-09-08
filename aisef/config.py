@@ -131,6 +131,7 @@ DEFAULTS: dict[str, Any] = {
     "route.developer_model": "",
     "route.reviewer_model": "",
     "route.designer_model": "",
+    "route.security_model": "",
     # Nhà cung cấp phân tích ảnh hưởng cho người rà soát (P0.3).
     "review.impact_provider": "",
     # Đưa mục "Kỹ năng có sẵn" (router chọn, tên + dùng khi) vào prompt
@@ -214,6 +215,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "route.developer_model": str,
     "route.reviewer_model": str,
     "route.designer_model": str,
+    "route.security_model": str,
     "review.impact_provider": str,
     "skills.offer": bool,
     "skills.inline": bool,

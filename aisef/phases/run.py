@@ -330,7 +330,10 @@ def _run_wave(
                 tx.record("worktree.created", path=str(workdir),
                           undo={"worktree.remove": story_id})
 
-            _safe_transition(state, story_id, StoryStatus.RUNNING)
+            if not state.claim(story_id):
+                out = StoryOutcome(story_id=story_id)
+                out.blocked_reason = "đã được máy khác nhận"
+                return out
             tx.record("status.running", undo={"status.reset": "pending"})
 
             chay = partial(verify_only_story, repeat=repeat) if verify_only else implement_story

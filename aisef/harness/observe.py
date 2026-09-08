@@ -297,7 +297,7 @@ class EvidenceStore:
         )
 
     def agent_run(self, story_id: str, result, *, name: str = "", prompt_chars: int = 0,
-                  skills: dict | None = None) -> Event:
+                  skills: dict | None = None, role: str = "", model: str = "") -> Event:
         """Ghi lại một lượt gọi model từ `RunResult` — chi phí và độ trễ
         lấy từ luồng client, không tự đoán."""
         return self.record(
@@ -331,6 +331,8 @@ class EvidenceStore:
                     "exit_status": exit_status_of(result),
                     # Skill được mời / được mở — đo, không đoán (ADR-003 #1).
                     "skills": skills or {},
+                    "role": role,
+                    "model": model,
                 },
             ),
         )

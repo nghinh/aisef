@@ -338,3 +338,58 @@ class TestMultiEpic(StateTestCase):
         state = self.store.load()
         self.assertEqual(state.active_epics, [])
         self.assertEqual(state.current_epic, "EPIC-01")
+
+
+class TestClaim(StateTestCase):
+    """Distributed execution — claim/release mechanism."""
+
+    def test_claim_pending_succeeds(self):
+        self.store.register("S-01")
+        self.assertTrue(self.store.claim("S-01", owner="machine-a:1"))
+        rec = self.store.load().stories["S-01"]
+        self.assertEqual(rec.state, StoryStatus.RUNNING)
+        self.assertEqual(rec.claimed_by, "machine-a:1")
+
+    def test_claim_already_running_fails(self):
+        self.store.register("S-01")
+        self.store.claim("S-01", owner="machine-a:1")
+        self.assertFalse(self.store.claim("S-01", owner="machine-b:2"))
+        rec = self.store.load().stories["S-01"]
+        self.assertEqual(rec.claimed_by, "machine-a:1")
+
+    def test_claim_nonexistent_fails(self):
+        self.assertFalse(self.store.claim("S-99"))
+
+    def test_release_clears_claimed_by(self):
+        self.store.register("S-01")
+        self.store.claim("S-01", owner="machine-a:1")
+        self.store.release("S-01")
+        rec = self.store.load().stories["S-01"]
+        self.assertEqual(rec.claimed_by, "")
+
+    def test_reset_for_retry_clears_claim(self):
+        self.store.register("S-01")
+        self.store.claim("S-01", owner="machine-a:1")
+        self.store.reset_for_retry("S-01")
+        rec = self.store.load().stories["S-01"]
+        self.assertEqual(rec.state, StoryStatus.PENDING)
+        self.assertEqual(rec.claimed_by, "")
+
+    def test_claim_uses_machine_id_by_default(self):
+        from aisef.control.state import machine_id
+        self.store.register("S-01")
+        self.store.claim("S-01")
+        rec = self.store.load().stories["S-01"]
+        self.assertEqual(rec.claimed_by, machine_id())
+
+    def test_backward_compat_no_claimed_by(self):
+        """Old state.json without claimed_by loads fine."""
+        import json
+        self.store.root.mkdir(parents=True, exist_ok=True)
+        self.store.path.write_text(json.dumps({
+            "stories": {"S-01": {"id": "S-01", "status": "pending"}},
+            "current_epic": "", "active_epics": [],
+            "started_at": "2026-01-01", "updated_at": "2026-01-01",
+        }))
+        state = self.store.load()
+        self.assertEqual(state.stories["S-01"].claimed_by, "")

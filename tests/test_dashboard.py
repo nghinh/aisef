@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisef.harness.observe import (  # noqa: E402
+    AGENT_RUN,
     GUARD_BLOCK,
     GUARD_CHECK,
     GUARD_SEEN,
@@ -268,3 +269,41 @@ class TestStructuredGuardError(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestRoleCost(unittest.TestCase):
+    """Role cost breakdown — v0.5.0."""
+
+    def test_role_cost_from_agent_run(self):
+        from aisef.cli.dashboard import _role_cost
+        tmp = tempfile.TemporaryDirectory()
+        root = Path(tmp.name)
+        store = EvidenceStore(root)
+        store.record("S-01", Event(kind=AGENT_RUN, name="dev", ok=True,
+                                   cost_usd=0.50, duration_ms=5000,
+                                   detail={"role": "developer", "model": "claude-sonnet"}))
+        store.record("S-01", Event(kind=AGENT_RUN, name="rev", ok=True,
+                                   cost_usd=0.30, duration_ms=3000,
+                                   detail={"role": "reviewer", "model": "claude-haiku"}))
+        evs = [store.read("S-01")]
+        roles = _role_cost(evs)
+        self.assertIn("developer", roles)
+        self.assertIn("reviewer", roles)
+        self.assertAlmostEqual(roles["developer"]["cost"], 0.50)
+        self.assertEqual(roles["developer"]["runs"], 1)
+        self.assertIn("claude-sonnet", roles["developer"]["models"])
+        tmp.cleanup()
+
+    def test_role_cost_in_html(self):
+        from aisef.cli.dashboard import generate_html
+        tmp = tempfile.TemporaryDirectory()
+        root = Path(tmp.name)
+        store = EvidenceStore(root)
+        store.record("S-01", Event(kind=AGENT_RUN, name="dev", ok=True,
+                                   cost_usd=1.0, duration_ms=5000,
+                                   detail={"role": "developer", "model": "opus"}))
+        evs = [store.read("S-01")]
+        html = generate_html(evs, project="test")
+        self.assertIn("Cost by role", html)
+        self.assertIn("developer", html)
+        tmp.cleanup()
