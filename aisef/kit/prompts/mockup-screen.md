@@ -1,27 +1,28 @@
 ---
 name: mockup-screen
-version: 2
+version: 3
 role: designer
 ---
 Use the aisef-mockup-html skill.
 
-Dựng mockup cho **một** màn hình.
+Build the mockup for **one** screen.
 
 screen_id: {{ screen_id }}
-Tên màn hình: {{ screen_name }}
-Mục đích: {{ purpose }}
-Vào từ: {{ reached_from }}
+Screen name: {{ screen_name }}
+Purpose: {{ purpose }}
+Reached from: {{ reached_from }}
 Route: {{ route }}
 
-Component phải có (theo EXPERIENCE.md) và luật hành vi:
+Required components (from EXPERIENCE.md) and behavioral rules:
 {{ components }}
 
-Trạng thái phải dựng: {{ states }}
+States to render: {{ states }}
 
-Đọc: {{ artifact_root }}/DESIGN.md (token thị giác), {{ artifact_root }}/EXPERIENCE.md
-(mục Information Architecture, Component Patterns, State Patterns),
-{{ artifact_root }}/prd.md (nội dung thật để điền).
+Read: {{ artifact_root }}/DESIGN.md (visual tokens), {{ artifact_root }}/EXPERIENCE.md
+(Information Architecture, Component Patterns, State Patterns sections),
+{{ artifact_root }}/prd.md (real content to populate).
 
-Ghi ra đúng một file: {{ output }}
+Write exactly one file: {{ output }}
 
-Chỗ nào chưa chốt thì đánh dấu `data-unresolved` chứ đừng tự chọn.
+Where something is unresolved, mark it `data-unresolved` instead of
+choosing on your own.

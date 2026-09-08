@@ -83,7 +83,7 @@ PHASES: tuple[Phase, ...] = (
         artifacts=GATE_ARTIFACTS[Gate.ARCHITECTURE],
         gate=Gate.ARCHITECTURE,
         needs=("prd.md",),
-        goal="Design architecture, number decisions AR-x that stories must comply with.",
+        goal="Design architecture, number decisions AD-x that stories must comply with.",
     ),
     Phase(
         id="ux",
@@ -275,6 +275,13 @@ def build_prompt(phase: Phase, project: Path | None = None) -> str:
         f"Inputs: {', '.join(inputs)}.\n"
         f"Goal: {phase.goal}\n"
         f"Write to exact paths: {outputs}\n\n"
+        "IMPORTANT: This project uses AISEF, not the full BMAD framework. "
+        "The _bmad/ directory does NOT exist. Skip any activation step that "
+        "references _bmad/ (resolve_customization.py, memlog.py, config.yaml). "
+        "Use neutral defaults for all BMAD config values (user_name, "
+        "communication_language=en, document_output_language=en). "
+        "Do not call list_dir or find_file on _bmad/. "
+        "Do not run uv commands referencing _bmad/scripts/.\n\n"
         "Do not ask questions. Any assumptions you must infer go in assumptions; "
         "anything requiring human decision goes in open_questions — do not choose "
         "silently. End with a JSON status following the headless schema."

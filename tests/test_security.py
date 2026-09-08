@@ -40,7 +40,7 @@ class TestParse(unittest.TestCase):
                          ["critical", "high", "medium", "low"])
 
     def test_khong_co_phat_hien_la_ket_qua_hop_le(self):
-        r = parse("không có phát hiện bảo mật")
+        r = parse("no findings")
         self.assertEqual(r.findings, [])
         self.assertFalse(r.error)
         self.assertIn("pass", r.summary())
@@ -59,7 +59,7 @@ class TestParse(unittest.TestCase):
         self.assertIn("format", r.error)
 
     def test_dong_thua_bi_bo_qua_khong_lam_hong_ca_bao_cao(self):
-        r = parse("Mở đầu vài dòng.\n\n" + BAO_CAO + "\nKết luận: nên sửa.")
+        r = parse("Mở đầu vài dòng.\n\n" + BAO_CAO + "\nConclusion: should fix.")
         self.assertEqual(len(r.findings), 4)
 
     def test_muc_nghiem_trong_khong_phan_biet_hoa_thuong(self):
@@ -161,8 +161,8 @@ class TestVaiTro(unittest.TestCase):
         from aisef.harness.prompts import load_catalog
 
         body = load_catalog().get("story-security-review").body
-        self.assertIn("không tin được", body)
-        self.assertIn("không có phát hiện bảo mật", body)
+        self.assertIn("untrusted data", body)
+        self.assertIn("no security findings", body)
 
 
 class TestFinding(unittest.TestCase):

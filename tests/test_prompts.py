@@ -47,7 +47,7 @@ STORY_CTX = {
     "skills": "- `x` — dùng khi: y",
     "diff_summary": "3 file đổi",
     "impact": "_Chưa có phân tích ảnh hưởng_",
-    "repo_map": "## Bản đồ mã quanh phạm vi — gợi ý tĩnh, không phải chân lý\n\n`src/a.ts`",
+    "repo_map": "## Code map around write scope — static hint, not ground truth\n\n`src/a.ts`",
     "blast_radius": "_(greenfield — không có blast radius)_",
 }
 
@@ -126,23 +126,23 @@ class TestPromptContent(unittest.TestCase):
 
     def test_developer_prompt_forbids_working_around_scope(self):
         body = self.catalog.get("story-implement").body
-        self.assertIn("lách", body)
-        self.assertIn("dừng lại", body)
+        self.assertIn("workaround", body)
+        self.assertIn("stop", body)
 
     def test_developer_prompt_demands_red_before_green(self):
         body = self.catalog.get("story-implement").body
-        self.assertIn("ĐỎ", body)
-        self.assertIn("trước", body)
+        self.assertIn("RED", body)
+        self.assertIn("first", body)
 
     def test_developer_prompt_says_evidence_beats_claims(self):
-        self.assertIn("bằng chứng", self.catalog.get("story-implement").body)
+        self.assertIn("evidence", self.catalog.get("story-implement").body)
 
     def test_reviewer_prompt_forbids_editing(self):
-        self.assertIn("Không sửa code", self.catalog.get("story-review").body)
+        self.assertIn("Do not fix code", self.catalog.get("story-review").body)
 
     def test_reviewer_prompt_refuses_padding(self):
         """Bắt phải có phát hiện sẽ đẻ ra phát hiện giả."""
-        self.assertIn("đừng nặn ra", self.catalog.get("story-review").body)
+        self.assertIn("not manufacture findings", self.catalog.get("story-review").body)
 
 
 class TestSlotBanDoMa(unittest.TestCase):
@@ -159,12 +159,12 @@ class TestSlotBanDoMa(unittest.TestCase):
     def test_slot_rong_thi_khong_co_muc(self):
         from aisef.phases.implement import ALLOW_EMPTY
         text = self.catalog.get("story-implement").render({**STORY_CTX, "repo_map": ""}, allow_empty=ALLOW_EMPTY)
-        self.assertNotIn("Bản đồ mã", text)
+        self.assertNotIn("Code map", text)
         self.assertNotIn("{{", text)
 
     def test_slot_co_thi_muc_hien(self):
         text = self.catalog.get("story-review").render(STORY_CTX)
-        self.assertIn("## Bản đồ mã quanh phạm vi", text)
+        self.assertIn("## Code map around write scope", text)
 
 
 class TestRouting(unittest.TestCase):

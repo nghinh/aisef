@@ -169,10 +169,10 @@ class Client(ClientAdapter):
 
     def run(self, spec: RunSpec) -> RunResult:
         dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
-        if dau.startswith("# Rà soát bảo mật"):
+        if dau.startswith("# Security review"):
             self.calls.append("security")
             return RunResult(ok=True, text="không có phát hiện bảo mật", cost_usd=0.1)
-        if dau.startswith("# Rà soát"):
+        if dau.startswith("# Review"):
             self.calls.append("review")
             if self.review_commits:
                 d = Path(spec.workdir)

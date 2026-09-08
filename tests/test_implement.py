@@ -71,8 +71,8 @@ class ScriptedClient(ClientAdapter):
         # của reviewer ("[chặn] … Rà soát là báo cáo"), nên dò chuỗi trong
         # toàn prompt sẽ nhận nhầm phiên developer là phiên review.
         dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
-        is_security = dau.startswith("# Rà soát bảo mật")
-        is_review = dau.startswith("# Rà soát") and not is_security
+        is_security = dau.startswith("# Security review")
+        is_review = dau.startswith("# Review") and not is_security
         if is_security:
             self.calls.append("security")
             self.security_envs.append(dict(spec.env))
@@ -179,7 +179,7 @@ class TestHappyPath(ImplementTestCase):
 
             def run(self, spec):
                 r = super().run(spec)
-                if "Rà soát" not in spec.prompt:
+                if "Review" not in spec.prompt:
                     subprocess.run(["git", "add", "src"], cwd=spec.workdir, check=False)
                     subprocess.run(
                         ["git", "commit", "-qm", "xong"], cwd=spec.workdir, check=False
@@ -425,7 +425,7 @@ class TestRetry(ImplementTestCase):
             lan = 0
 
             def run(self, spec):
-                if "Rà soát" in spec.prompt:
+                if "Review" in spec.prompt:
                     DoiMuc.lan += 1
                     self.review = f"[chặn] src/a.py:1 — khiếm khuyết số {DoiMuc.lan}"
                 return super().run(spec)
@@ -446,7 +446,7 @@ class TestRetry(ImplementTestCase):
             prompts: list = []
 
             def run(self, spec):
-                if "Rà soát" not in spec.prompt:
+                if "Review" not in spec.prompt:
                     Recorder.prompts.append(spec.prompt)
                 return super().run(spec)
 
@@ -481,7 +481,7 @@ class TestFailureKinds(ImplementTestCase):
     def test_review_that_cannot_run_is_not_clean(self):
         class NoReview(ScriptedClient):
             def run(self, spec):
-                if "Rà soát" in spec.prompt:
+                if "Review" in spec.prompt:
                     return RunResult(ok=False, error="hết giờ")
                 return super().run(spec)
 
@@ -822,14 +822,14 @@ class TestNguoiRaSoatKhongDuocSuaCay(ImplementTestCase):
         def run(self, spec):
             r = super().run(spec)
             dau = spec.prompt.lstrip().splitlines()[0]
-            if dau.startswith("# Rà soát") and not dau.startswith("# Rà soát bảo mật"):
+            if dau.startswith("# Review") and not dau.startswith("# Security review"):
                 (Path(spec.workdir) / "src" / "reviewer-da-ghi.py").write_text("x\n")
             return r
 
     class SecurityGhi(ScriptedClient):
         def run(self, spec):
             r = super().run(spec)
-            if spec.prompt.lstrip().startswith("# Rà soát bảo mật"):
+            if spec.prompt.lstrip().startswith("# Security review"):
                 (Path(spec.workdir) / "src" / "a.py").write_text("bi sua\n")
             return r
 

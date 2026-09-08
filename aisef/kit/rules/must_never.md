@@ -1,40 +1,49 @@
-# Tuyệt đối không
+# Absolute prohibitions
 
-Danh sách này khác phần nguyên tắc ở chỗ: nguyên tắc cần phán đoán, còn những
-điều dưới đây **không có ngoại lệ** và phần lớn được cưỡng chế bằng hook, chứ
-không trông vào việc agent nhớ.
+This list differs from principles in that principles require judgment,
+while the items below **have no exceptions** and most are enforced by
+hooks rather than relying on the agent's memory.
 
-## Với mã nguồn
+## With source code
 
-1. **Không ghi ra ngoài `write_scope` của story.** Cần chạm chỗ khác thì dừng
-   và báo — nhiều khả năng story bị chẻ sai, hoặc phạm vi khai thiếu.
-2. **Không `git add -A`, không `git add .`.** Chỉ stage đúng đường dẫn story
-   đó chạm. Lệnh gộp nuốt cả file rác lẫn thay đổi của story khác.
-3. **Không đưa bí mật vào mã nguồn, log, hay trace.** Khoá, mật khẩu, token
-   đọc từ biến môi trường hoặc kho bí mật.
-4. **Không nối chuỗi vào câu truy vấn.** Tham số hoá, không ngoại lệ.
-5. **Không sửa test cho nó xanh**, trừ khi nhiệm vụ chính là cập nhật kỳ vọng
-   của test. Test đỏ là thông tin, không phải chướng ngại.
-6. **Không để lại mã tham chiếu quy trình trong nguồn** — không ghi số hiệu
-   story, epic, hay ghi chú kế hoạch vào comment. Comment giải thích *vì sao*,
-   không phải *việc này thuộc phiếu nào*.
+1. **Do not write outside the story's `write_scope`.** If you need to
+   touch something else, stop and report — most likely the story was
+   split incorrectly, or the scope declaration is incomplete.
+2. **No `git add -A`, no `git add .`.** Stage only the paths the story
+   touches. Bulk commands swallow stray files and changes from other
+   stories.
+3. **Do not put secrets in source code, logs, or traces.** Keys,
+   passwords, and tokens are read from environment variables or a secret
+   store.
+4. **Do not concatenate strings into queries.** Parameterize, no
+   exceptions.
+5. **Do not edit a test to make it green**, unless the task is
+   specifically to update the test's expectations. A red test is
+   information, not an obstacle.
+6. **Do not leave process references in source** — no story numbers,
+   epic IDs, or planning notes in comments. Comments explain *why*, not
+   *which ticket this belongs to*.
 
-## Với kho mã
+## With the repository
 
-7. **Không chạy lệnh phá huỷ khi chưa hỏi**: `git reset --hard`,
-   `git checkout -- .`, `rm -rf` trong kho, `git push --force`.
-8. **Không tự gỡ xung đột merge cuối đợt.** Xung đột nghĩa là hai story chạm
-   cùng vùng, tức phạm vi khai sai — việc cần sửa nằm ở khâu chẻ story, không
-   phải ở lần merge này.
+7. **Do not run destructive commands without asking first**:
+   `git reset --hard`, `git checkout -- .`, `rm -rf` inside the repo,
+   `git push --force`.
+8. **Do not resolve end-of-wave merge conflicts yourself.** A conflict
+   means two stories touched the same area, which means scope
+   declarations are wrong — the fix belongs in story splitting, not in
+   this merge.
 
-## Với quy trình
+## With the process
 
-9. **Người viết code không tự duyệt code của mình.** Reviewer phải là phiên
-   khác, ngữ cảnh sạch.
-10. **Không bỏ qua cổng.** Không tuyên bố story xong khi chưa đủ bằng chứng;
-    không sang pha sau khi cổng trước chưa duyệt.
-11. **Không sửa file gốc của nguồn ngoài.** Tuỳ biến BMAD ghi ở
-    `_bmad/custom/`, không sửa `customize.toml` trong kho gốc — bản nâng cấp
-    sau sẽ đè mất.
-12. **Không bịa số liệu, tên API, hay hành vi thư viện.** Không chắc thì tra;
-    tra không ra thì ghi vào phần giả định.
+9. **The code author does not review their own code.** The reviewer must
+   be a separate session with a clean context.
+10. **Do not skip gates.** Do not declare a story done without sufficient
+    evidence; do not advance to the next phase when the previous gate has
+    not been approved.
+11. **Do not modify source files of external references.** BMAD
+    customizations go in `_bmad/custom/`, not in `customize.toml` of the
+    upstream repo — the next upgrade would overwrite them.
+12. **Do not fabricate metrics, API names, or library behavior.** If
+    unsure, look it up; if you cannot find it, record it as an
+    assumption.

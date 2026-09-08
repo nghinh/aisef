@@ -14,13 +14,12 @@ Hai bảo đảm khi ghi:
 2. **Khoá độc quyền** — nhiều story chạy song song, mỗi story kết thúc lại
    cập nhật trạng thái; không khoá thì hai lần ghi gần nhau sẽ mất một.
 
-Khoá dùng ``fcntl.flock``: tự nhả khi tiến trình chết, nên không để lại
-khoá mồ côi như cách dùng file cờ.
+Lock uses ``fcntl.flock`` on Unix, ``msvcrt.locking`` on Windows (via
+``aisef._compat``).  Both auto-release when the process dies.
 """
 
 from __future__ import annotations
 
-import fcntl
 import json
 import os
 import time
@@ -28,6 +27,8 @@ from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
+
+from aisef._compat import flock_ex_nb, flock_un
 from pathlib import Path
 from typing import Iterator
 
@@ -181,7 +182,7 @@ class StateStore:
         try:
             while True:
                 try:
-                    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    flock_ex_nb(fd)
                     break
                 except BlockingIOError:
                     if time.monotonic() >= deadline:
@@ -192,7 +193,7 @@ class StateStore:
             yield
         finally:
             try:
-                fcntl.flock(fd, fcntl.LOCK_UN)
+                flock_un(fd)
             finally:
                 os.close(fd)
 

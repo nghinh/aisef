@@ -28,12 +28,12 @@ class TestRender(unittest.TestCase):
 
     def test_includes_principles_and_prohibitions(self):
         out = self.render("Backend Python.")
-        self.assertIn("Hiểu trước khi viết", out)
-        self.assertIn("Tuyệt đối không", out)
+        self.assertIn("Understand before you write", out)
+        self.assertIn("Absolute prohibitions", out)
 
     def test_evidence_principle_present(self):
         """Nguyên tắc nền của mọi cổng phải có mặt."""
-        self.assertIn("Bằng chứng, không tự khai", self.render("Python."))
+        self.assertIn("Evidence, not self-report", self.render("Python."))
 
     def test_python_quality_commands(self):
         out = self.render("Backend Python FastAPI.")

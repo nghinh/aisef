@@ -16,9 +16,9 @@ Ba mức đối chiếu, và chỉ dùng hai:
 from __future__ import annotations
 
 import os
-import signal
 import socket
 import subprocess
+import sys
 import time
 import urllib.error
 import urllib.request
@@ -109,7 +109,9 @@ class AppServer:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
-                start_new_session=True,  # để stop() giết được cả nhóm
+                **({"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
+                   if sys.platform == "win32"
+                   else {"start_new_session": True}),
             )
         except OSError as e:
             return f"cannot run `{self.command}`: {e}"
@@ -128,15 +130,7 @@ class AppServer:
         if self.proc is None:
             return
         if self.proc.poll() is None:
-            # Giết cả nhóm tiến trình: `npm run dev` chết mà `node vite` con
-            # sống sót thì cổng còn bị giữ và `.vite/` được ghi lại vào
-            # worktree đã gỡ (lỗi 13 + 15).
-            _signal_group(self.proc, signal.SIGTERM)
-            try:
-                self.proc.wait(timeout=10)
-            except subprocess.TimeoutExpired:
-                _signal_group(self.proc, signal.SIGKILL)  # dev server hay bỏ qua SIGTERM
-                self.proc.wait(timeout=5)
+            _kill_tree(self.proc)
         # Đóng ống: một đợt 15 story mà mỗi story rò một mô tả tệp thì tới
         # story thứ n sẽ hỏng vì lý do chẳng liên quan gì tới story đó.
         if self.proc.stdout and not self.proc.stdout.closed:
@@ -147,14 +141,30 @@ class AppServer:
         return urljoin(self.base_url, route.lstrip("/"))
 
 
-def _signal_group(proc: subprocess.Popen, sig: int) -> None:
+def _kill_tree(proc: subprocess.Popen) -> None:
+    if sys.platform == "win32":
+        subprocess.call(
+            ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        proc.wait(timeout=10)
+        return
+    import signal
     try:
-        os.killpg(os.getpgid(proc.pid), sig)
+        os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+        proc.wait(timeout=10)
     except (ProcessLookupError, PermissionError, OSError):
         try:
-            proc.send_signal(sig)
+            proc.send_signal(signal.SIGTERM)
         except ProcessLookupError:
             pass
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+        except (ProcessLookupError, PermissionError, OSError):
+            pass
+        proc.wait(timeout=5)
 
 
 def occupant(url: str) -> str:

@@ -1,64 +1,70 @@
-# Nguyên tắc kỹ thuật
+# Engineering principles
 
-Bốn nguyên tắc đầu diễn đạt lại quan sát của Andrej Karpathy về cách làm việc
-với agent lập trình (nguồn: `multica-ai/andrej-karpathy-skills`). Viết lại bằng
-ngôn ngữ của framework này vì kho gốc không kèm giấy phép — tham chiếu được,
-đóng gói lại thì không.
+The first four principles restate Andrej Karpathy's observations on
+working with coding agents (source: `multica-ai/andrej-karpathy-skills`).
+Rewritten in this framework's language because the original repo has no
+license — reference is fine, repackaging is not.
 
-## 1. Hiểu trước khi viết
+## 1. Understand before you write
 
-Đọc yêu cầu, lần theo luồng thực tế, xác định đúng chỗ phải sửa — rồi mới gõ
-dòng đầu tiên. Phần lớn lỗi không đến từ việc viết code kém, mà từ việc viết
-đúng một giải pháp cho sai vấn đề.
+Read the requirement, trace the real flow, identify the right place to
+change — then type the first line. Most defects come not from writing bad
+code, but from writing a correct solution to the wrong problem.
 
-Khi yêu cầu có nhiều cách hiểu: nêu ra, đừng chọn thầm. Khi có cách đơn giản
-hơn: nói. Không có người trong vòng lặp thì ghi giả định vào artifact và đi
-tiếp, không dừng chờ.
+When a requirement is ambiguous: surface the ambiguity, do not pick
+silently. When a simpler approach exists: say so. If there is no human in
+the loop, record the assumption in the artifact and continue — do not
+block waiting.
 
-## 2. Đơn giản trước
+## 2. Simple first
 
-Viết đúng lượng code giải quyết vấn đề hôm nay. Không lớp trừu tượng cho một
-chỗ dùng, không tham số hoá cho một giá trị chưa từng đổi, không khung sườn
-cho việc chưa ai yêu cầu.
+Write exactly enough code to solve today's problem. No abstraction layer
+for a single call site, no parameterization for a value that has never
+changed, no scaffolding for work nobody has requested.
 
-Thư viện chuẩn trước thư viện ngoài. Tính năng sẵn có của nền tảng trước code
-tự viết. Một dòng hơn năm dòng — nhưng chỉ khi một dòng đó vẫn đúng ở các
-trường hợp biên.
+Standard library before external libraries. Built-in platform features
+before hand-written code. One line beats five — but only when the one
+line is still correct at the edge cases.
 
-## 3. Sửa đúng chỗ phải sửa
+## 3. Change only what needs changing
 
-Chạm đúng thứ nhiệm vụ đòi hỏi. Không "tiện tay" chỉnh format, đổi tên, hay
-dọn code lân cận trong cùng một thay đổi — việc đó làm diff phình ra và che
-mất thứ thực sự thay đổi.
+Touch exactly what the task demands. Do not "while you're here" reformat,
+rename, or clean up neighboring code in the same change — that inflates
+the diff and hides what actually changed.
 
-Sửa lỗi thì tìm nguyên nhân gốc, không vá triệu chứng ở một nhánh gọi. Một
-lần sửa ở chỗ mọi nhánh đi qua nhỏ hơn nhiều lần vá ở từng nhánh, và không bỏ
-sót nhánh nào.
+When fixing a bug, find the root cause, do not patch the symptom in one
+call site. One fix where all callers route through is a smaller diff than
+separate patches in each caller, and it does not miss any.
 
-## 4. Bám mục tiêu, không bám câu chữ
+## 4. Serve the goal, not the wording
 
-Biết việc này phục vụ điều gì. Khi câu chữ của nhiệm vụ mâu thuẫn với mục
-tiêu của nó, nêu mâu thuẫn ra thay vì làm theo câu chữ rồi giao một thứ vô
-dụng.
+Know what this task serves. When the wording of a task conflicts with its
+goal, surface the conflict instead of following the letter and delivering
+something useless.
 
-## 5. Bằng chứng, không tự khai
+## 5. Evidence, not self-report
 
-Không tuyên bố "xong", "đã sửa", "test xanh" khi chưa có kết quả chạy thật và
-còn tươi. Định nghĩa tiêu chí thành công đo được **trước** khi bắt tay. Viết
-test tái hiện lỗi trước khi sửa lỗi.
+Do not declare "done", "fixed", or "tests green" without a fresh, actual
+run result. Define measurable success criteria **before** starting. Write
+a test that reproduces the bug before fixing it.
 
-Nguyên tắc này là nền của mọi cổng chất lượng trong framework: cổng chỉ đọc
-kết quả tiến trình bên ngoài chạy, không bao giờ đọc lời agent tự đánh giá.
+This principle is the foundation of every quality gate in the framework:
+gates read only the output of external processes, never the agent's
+self-assessment.
 
-## 6. Dừng khi mâu thuẫn
+## 6. Stop on contradiction
 
-Tài liệu đá nhau, mockup lệch kiến trúc, yêu cầu tự phủ định nhau — dừng và
-báo. Không tự chọn một bên rồi đi tiếp im lặng.
+Documents disagree, mockup contradicts architecture, requirements are
+self-negating — stop and report. Do not silently pick one side and
+continue.
 
-Thứ tự khi phải phân xử: kiến trúc > đặc tả UX > hợp đồng thị giác từ mockup.
+Precedence when arbitration is needed: architecture > UX spec > visual
+contract from mockup.
 
-## 7. Thiếu thì khai báo
+## 7. Declare what is missing
 
-Không có cơ chế nào đó (sandbox không chạy được, hook không gắn được, reviewer
-không độc lập) thì ghi rõ mức bảo đảm thấp hơn vào artifact. Im lặng vờ như
-vẫn đủ là kiểu hỏng tệ nhất, vì nó lấy đi cả khả năng biết mình đang thiếu.
+If a mechanism is absent (sandbox will not run, hook cannot attach,
+reviewer is not independent), record the reduced assurance level
+explicitly in the artifact. Silently pretending everything is in place is
+the worst kind of failure, because it removes even the ability to know
+something is missing.

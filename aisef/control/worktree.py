@@ -17,7 +17,6 @@ sự cố. Cơ chế đã kiểm chứng ở spike S5 (`docs/SPIKE-REPORT.md`).
 
 from __future__ import annotations
 
-import fcntl
 import re
 import shutil
 import subprocess
@@ -28,6 +27,8 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
+
+from aisef._compat import flock_ex_nb, flock_un
 
 #: Nơi chứa worktree, tương đối so với gốc repo.
 WORKTREE_ROOT = ".aisef/worktrees"
@@ -339,7 +340,7 @@ class WorktreeManager:
         deadline = time.monotonic() + self.MERGE_LOCK_TIMEOUT
         while True:
             try:
-                fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                flock_ex_nb(fh.fileno())
                 break
             except OSError:
                 if time.monotonic() >= deadline:
@@ -349,7 +350,7 @@ class WorktreeManager:
         try:
             yield
         finally:
-            fcntl.flock(fh, fcntl.LOCK_UN)
+            flock_un(fh.fileno())
             fh.close()
 
     def merge_story(self, story_id: str, *, into: str | None = None) -> MergeResult:
