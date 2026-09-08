@@ -4,7 +4,7 @@ Ghi theo **sáu nhóm harness** (`docs/SOLUTION.md` §5), không theo ADR hay
 ngày. Mỗi dòng có chỗ đọc lại; số lỗi trỏ `docs/STATUS-2026-09-05.md` §2.4
 và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epic-improvement.md` §6.
 
-## v0.5.0 (dev)
+## v0.5.0 — phát hành 2026-09-08
 
 ### Bảo mật (nhóm 1 — kiểm soát)
 
@@ -13,6 +13,9 @@ và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epi
   dùng chung `sprint-status.json` (NFS) không tranh nhau story.
   `reset_for_retry()` và `release()` xoá claim. `machine_id()` =
   `hostname:pid`. 7 test.
+- **Merge lock**: `WorktreeManager._merge_lock()` — `fcntl.flock` trên
+  `.aisef/merge.lock` bảo đảm chỉ một máy merge vào nhánh chính cùng lúc.
+  Timeout 120s.
 
 ### Điều phối (nhóm 2 — orchestration)
 
@@ -24,6 +27,12 @@ và `docs/FAILURE-TAXONOMY.md`; số đo trỏ `docs/ADR-004-evidence-driven-epi
 
 - **Cost by role**: dashboard hiển thị bảng chi phí theo vai và model —
   `_role_cost()` trích từ `AGENT_RUN` events. 2 test.
+
+### Đã biết — chưa giải quyết
+
+- **S1 credential isolation**: blocked — chưa có cách ly credential trong
+  container mà không làm yếu sandbox. Đợi upstream Docker/Buildah hỗ trợ.
+- **OpenCode first-class**: second-class cho V1 — chưa đạt hợp quy 12/12.
 
 ## v0.4.1 — phát hành 2026-09-08
 
