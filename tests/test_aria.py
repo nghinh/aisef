@@ -94,7 +94,7 @@ class TestCompareRealPages(unittest.TestCase):
     def test_summary_readable(self):
         text = compare_snapshots(snap("mockup"), snap("app-bad"), screen_id="SCREEN-01").summary()
         self.assertIn("FAIL", text)
-        self.assertIn("thiếu", text)
+        self.assertIn("missing", text)
 
 
 class TestCompareSemantics(unittest.TestCase):

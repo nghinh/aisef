@@ -164,7 +164,7 @@ class TestPlanLoading(RunTestCase):
 
     def test_broken_index(self):
         (self.artifacts / "stories.index.json").write_text("{ hỏng", encoding="utf-8")
-        self.assertIn("hỏng", load_plan(self.artifacts).error)
+        self.assertIn("corrupted", load_plan(self.artifacts).error)
 
 
 class TestOrchestration(RunTestCase):
@@ -220,7 +220,7 @@ class TestOrchestration(RunTestCase):
         self.assertEqual([o.story_id for o in report.outcomes], ["STORY-02-01"])
 
     def test_unknown_epic_is_refused(self):
-        self.assertIn("không có", self.run_sprint(Agent(), only_epic="EPIC-99").error)
+        self.assertIn("not in plan", self.run_sprint(Agent(), only_epic="EPIC-99").error)
 
 
 class TestStopsOnFailure(RunTestCase):
@@ -239,7 +239,7 @@ class TestStopsOnFailure(RunTestCase):
     def test_out_of_scope_write_fails_the_story(self):
         report = self.run_sprint(Agent(out_of_scope={"STORY-01-01"}))
         self.assertFalse(report.ok)
-        self.assertIn("phạm vi", report.summary())
+        self.assertIn("write_scope", report.summary())
 
 
 class TestResume(RunTestCase):
@@ -342,7 +342,7 @@ class TestPreflight(RunTestCase):
         rec = self.state().stories["STORY-01-01"]
         self.assertIs(rec.state, StoryStatus.BLOCKED)
         self.assertIn("story.max_complexity", rec.blocked_reason)
-        self.assertIn("chẻ theo cụm tiêu chí", rec.blocked_reason)
+        self.assertIn("split by acceptance criteria", rec.blocked_reason)
 
     def test_story_xong_thi_ghi_bang_hieu_chuan_co_story(self):
         """Ngưỡng chỉ đáng tin khi có bảng đối chiếu điểm ↔ lượt thật."""
@@ -723,7 +723,7 @@ class TestVerifyOnly(RunTestCase):
 
     def test_tu_choi_khi_chua_co_ung_vien(self):
         r = self.kiem_lai(Agent())
-        self.assertIn("chưa có ứng viên", r.error)
+        self.assertIn("no candidate to re-verify", r.error)
         self.assertNotIn(self.SID, self.state().stories, "từ chối trước khi chạm trạng thái")
 
     def test_tu_choi_story_da_xong(self):
@@ -731,7 +731,7 @@ class TestVerifyOnly(RunTestCase):
         self.run_sprint(Agent(), only_epic="EPIC-01", config=self.cfg())
         self.assertIs(self.state().stories[self.SID].state, StoryStatus.DONE)
         r = self.kiem_lai(Agent())
-        self.assertIn("đã xong", r.error)
+        self.assertIn("already done", r.error)
 
     def test_truot_khong_tinh_vao_max_retries(self):
         agent = Agent()
@@ -743,7 +743,7 @@ class TestVerifyOnly(RunTestCase):
         self.assertFalse(r.ok, r.summary())
         rec = self.state().stories[self.SID]
         self.assertIs(rec.state, StoryStatus.FAILED)
-        self.assertIn("kiểm lại", rec.blocked_reason)
+        self.assertIn("re-verify", rec.blocked_reason)
         self.assertIn("sit", rec.blocked_reason)
         self.assertEqual(rec.attempts, luot, "kiểm lại không phải lượt developer")
         self.assertEqual(r.outcomes[0].quality_attempts, 0)
@@ -840,10 +840,10 @@ class TestVerifyOnlyRepeat(RunTestCase):
         self.assertFalse(r.ok, r.summary())
         m = self.muc(r, "test")
         self.assertIs(m.outcome, Outcome.UNRUNNABLE, m.detail)
-        self.assertIn("không ổn định", m.detail)
+        self.assertIn("unstable", m.detail)
         self.assertIn("tests/test_x.py::test_on", m.detail)
         self.assertNotIn("test_lung", m.detail, "test ổn định không bị nêu tên")
-        bl = self.muc(r, "không làm đỏ test có sẵn")
+        bl = self.muc(r, "no baseline regression")
         self.assertIsNot(bl.outcome, Outcome.FAILED,
                          f"xanh ở baseline, đỏ ở lần cuối vì flaky — không phải làm đỏ: {bl.detail}")
         note = self.evidence().last(NOTE, "verify-only.repeat")

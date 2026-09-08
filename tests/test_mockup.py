@@ -158,7 +158,7 @@ class TestGate(MockupTestCase):
     def test_unresolved_marker_blocks(self):
         _, gate = extract(self.root, self.exp)
         self.assertFalse(gate.passed)
-        self.assertTrue(any("chưa chốt" in e for e in gate.errors))
+        self.assertTrue(any("unresolved" in e for e in gate.errors))
 
     def test_missing_route_blocks(self):
         _, gate = extract(self.root, self.exp)
@@ -186,8 +186,8 @@ class TestGate(MockupTestCase):
         )
         gate = check_design_contract(contract, exp)
         blob = gate.summary()
-        self.assertIn("4 chỗ chưa chốt", blob)
-        self.assertIn("UX-OQ-1 (2 chỗ)", blob)
+        self.assertIn("4 unresolved spots", blob)
+        self.assertIn("UX-OQ-1 (2 spots)", blob)
         self.assertIn("thiếu bề mặt báo lỗi", blob)   # ví dụ cho nhóm không mã
 
     def test_missing_mockup_blocks(self):
@@ -212,7 +212,7 @@ class TestGate(MockupTestCase):
         stories = [Story(id="STORY-01-01", epic_id="EPIC-01", title="x", screens=["danh-sach"])]
         gate = check_design_contract(contract, self.exp, stories)
         self.assertTrue(gate.passed)
-        self.assertTrue(any("chưa story nào dựng" in w for w in gate.warnings))
+        self.assertTrue(any("not built by any story" in w for w in gate.warnings))
 
 
 @unittest.skipIf(BROWSER_REASON, f"không dựng được mockup: {BROWSER_REASON}")
@@ -229,7 +229,7 @@ class TestIndexPage(MockupTestCase):
         html = path.read_text(encoding="utf-8")
         for screen in self.exp.screens:
             self.assertIn(f"{screen.id}.html", html)
-        self.assertIn("6 màn hình", html)
+        self.assertIn("6 screen(s)", html)
 
     def test_index_escapes_content(self):
         self.exp.screens[0].purpose = 'nguy <script>alert("x")</script>'

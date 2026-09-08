@@ -57,7 +57,7 @@ class TestWriteScope(unittest.TestCase):
         """Chưa khai phạm vi thì không cho ghi — mặc định mở là guard trang trí."""
         v = check_write_scope("src/a.py", [])
         self.assertFalse(v.allowed)
-        self.assertIn("chưa khai write_scope", v.reason)
+        self.assertIn("has not declared write_scope", v.reason)
 
     def test_no_file_path_is_not_a_write(self):
         self.assertTrue(check_write_scope("", ["src"]).allowed)
@@ -70,13 +70,13 @@ class TestWriteScope(unittest.TestCase):
     def test_absolute_path_outside_project_blocked(self):
         v = check_write_scope("/etc/passwd", ["src"], project_root="/tmp/du-an")
         self.assertFalse(v.allowed)
-        self.assertIn("ngoài thư mục dự án", v.reason)
+        self.assertIn("outside the project directory", v.reason)
 
     def test_reason_tells_agent_what_to_do(self):
         """Lý do được chuyển vào kết quả tool cho agent đọc — phải hành động được."""
         v = check_write_scope("x.py", ["src"])
         self.assertIn("write_scope", v.reason)
-        self.assertIn("dừng lại và báo", v.reason)
+        self.assertIn("stop and report", v.reason)
 
 
 class TestSecrets(unittest.TestCase):
@@ -109,7 +109,7 @@ class TestSecrets(unittest.TestCase):
 
     def test_reports_line_number(self):
         v = check_secrets('dòng một\ndòng hai\npassword = "that-la-bi-mat"')
-        self.assertIn("dòng 3", v.reason)
+        self.assertIn("line 3", v.reason)
 
     def test_clean_content_allowed(self):
         self.assertTrue(check_secrets("def cong(a, b):\n    return a + b\n").allowed)
@@ -556,7 +556,7 @@ class TestCompletion(unittest.TestCase):
     def test_never_ran_tests(self):
         v = self.verdict()
         self.assertFalse(v.allowed)
-        self.assertIn("chưa có lần chạy test", v.reason)
+        self.assertIn("no test run recorded", v.reason)
 
     def test_unconfigured_test_command_does_not_trap_the_agent(self):
         """Dự án chưa khai lệnh test: `tool test` ghi ok=False + skipped.
@@ -650,7 +650,7 @@ class TestThoatKhoiCayLamViec(unittest.TestCase):
     def test_chan_khi_workdir_ra_ngoai_cay(self):
         v = self.guard("git-stage", workdir="/tmp/noi-khac")
         self.assertFalse(v.allowed)
-        self.assertIn("nằm ngoài cây đang làm việc", v.reason)
+        self.assertIn("outside the working tree", v.reason)
 
     def test_chan_ca_khi_ra_gocdu_an_la_cha_cua_cay(self):
         """Gốc dự án là **cha** của worktree — đúng ca đã gặp thật."""
@@ -731,7 +731,7 @@ class TestCamToolTheoVai(unittest.TestCase):
     def test_vai_ra_soat_khong_duoc_ghi(self):
         v = self.guard("Write")
         self.assertFalse(v.allowed)
-        self.assertIn("không được dùng tool Write", v.reason)
+        self.assertIn("not allowed to use tool Write", v.reason)
 
     def test_ten_tool_viet_thuong_cua_opencode_cung_bi_cam(self):
         self.assertFalse(self.guard("write").allowed)

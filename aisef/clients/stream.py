@@ -199,7 +199,7 @@ def exit_status_of(res: RunResult) -> str:
     ).lower()
     if "max_turns" in why:
         return "max_turns"
-    if err.startswith("quá "):
+    if err.startswith("exceeded "):
         return "timeout"
     if "budget" in why or "max_cost" in why:
         return "cost"
@@ -207,7 +207,7 @@ def exit_status_of(res: RunResult) -> str:
         return "context"
     if raw.get("api_error_status") or any(
         m in why for m in ("api_error", "overloaded", "connection",
-                           "không chạy được", "không có sự kiện result")
+                           "cannot run", "without a result event")
     ):
         return "infra"
     if res.permission_limited:
@@ -318,7 +318,7 @@ def parse_stream(lines: Iterable[str]) -> RunResult:
                     ev.get("api_error_status")
                     or ev.get("terminal_reason")
                     or (ev.get("result") or "").strip()[:200]
-                    or "lỗi không rõ nguyên nhân"
+                    or "unknown error"
                 )
 
     res.texts = assistant_text
@@ -330,7 +330,7 @@ def parse_stream(lines: Iterable[str]) -> RunResult:
     # cách xử lý khác nhau (lỗi hạ tầng ≠ lỗi chất lượng).
     if not res.raw_result:
         res.ok = False
-        res.error = res.error or "stream kết thúc không có sự kiện result"
+        res.error = res.error or "stream ended without a result event"
 
     return res
 

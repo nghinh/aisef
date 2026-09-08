@@ -315,7 +315,7 @@ def score_story(
                   ", ".join(f"`{p}`" for p in scope[:4]) + ("…" if len(scope) > 4 else "")),
         Component("fan_in", int(fan_in), FAN_IN_WEIGHT),
         Component("verified_touched", len(owners), VERIFIED_TOUCHED_WEIGHT,
-                  f"{len(touched)} hành vi: " + ", ".join(touched[:4])
+                  f"{len(touched)} behaviours: " + ", ".join(touched[:4])
                   + ("…" if len(touched) > 4 else "") if touched else ""),
     ))
 
@@ -342,8 +342,8 @@ def split_suggestion(
                  if owned is None or owned.get(sid, story.id) == story.id]
 
     if len(minh_dung) > 1:
-        return ("chẻ theo màn hình — mỗi màn một story: "
-                + "; ".join(f"`{sid}` ({n} trạng thái)" for sid, n in minh_dung))
+        return ("split by screen — one story per screen: "
+                + "; ".join(f"`{sid}` ({n} states)" for sid, n in minh_dung))
 
     if minh_dung and minh_dung[0][1] > 1 and experience is not None:
         sid = minh_dung[0][0]
@@ -352,18 +352,18 @@ def split_suggestion(
         chinh = [s for s in states if not _is_secondary(s)]
         phu = [s for s in states if _is_secondary(s)]
         if chinh and phu:
-            return (f"chẻ `{sid}` theo nhóm trạng thái — story trước dựng trạng thái "
-                    f"chính ({', '.join(chinh)}); story sau dựng trạng thái phụ "
+            return (f"split `{sid}` by state group — first story builds primary states "
+                    f"({', '.join(chinh)}); next story builds secondary states "
                     f"({', '.join(phu)})")
 
     ac = story.acceptance_criteria
     if len(ac) > 1:
         nua = math.ceil(len(ac) / 2)
-        return (f"chẻ theo cụm tiêu chí — story trước giữ TCCN 1–{nua}, story sau "
-                f"giữ TCCN {nua + 1}–{len(ac)}; chia `write_scope` theo đúng hai cụm "
-                f"({score.get('write_scope').count} đường dẫn)")
+        return (f"split by acceptance criteria group — first story keeps AC 1–{nua}, next story "
+                f"keeps AC {nua + 1}–{len(ac)}; divide `write_scope` to match the two groups "
+                f"({score.get('write_scope').count} paths)")
 
-    return "chẻ story: giảm phạm vi ghi hoặc tách tiêu chí chấp nhận sang story sau"
+    return "split story: reduce write scope or move acceptance criteria to a follow-up story"
 
 
 def _is_secondary(state: str) -> bool:
@@ -465,16 +465,16 @@ def divergence(rows: dict) -> list[str]:
         total, limit = float(r.get("total") or 0), float(r.get("threshold") or 0)
         turns, cap = r.get("first_turns"), int(r.get("max_turns") or 0)
         if total <= limit and r.get("max_turns_hit"):
-            qua_cao.append(f"{sid} ({total:g} ≤ {limit:g}, chạm max_turns)")
+            qua_cao.append(f"{sid} ({total:g} ≤ {limit:g}, hit max_turns)")
         elif (total > limit and int(r.get("attempts") or 0) <= 1 and turns
                 and cap and turns <= cap * SHORT_TURN_FRACTION):
-            qua_thap.append(f"{sid} ({total:g} > {limit:g}, xong lượt đầu {turns} lượt)")
+            qua_thap.append(f"{sid} ({total:g} > {limit:g}, done in first run {turns} turns)")
 
     out = []
     if len(qua_cao) >= DIVERGENCE_MIN:
-        out.append(f"`story.max_complexity` có vẻ **quá cao**: {', '.join(qua_cao)}")
+        out.append(f"`story.max_complexity` appears **too high**: {', '.join(qua_cao)}")
     if len(qua_thap) >= DIVERGENCE_MIN:
-        out.append(f"`story.max_complexity` có vẻ **quá thấp**: {', '.join(qua_thap)}")
+        out.append(f"`story.max_complexity` appears **too low**: {', '.join(qua_thap)}")
     return out
 
 

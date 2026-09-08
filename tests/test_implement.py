@@ -279,7 +279,7 @@ class TestRetry(ImplementTestCase):
         out = self.implement(c)
         self.assertFalse(out.done)
         self.assertEqual(out.quality_attempts, 2)   # lần đầu + 1 lần thử lại
-        self.assertIn("đã thử", out.blocked_reason)
+        self.assertIn("tried", out.blocked_reason)
 
     def test_bi_thi_dung_som_thay_vi_dot_het_han_muc(self):
         """Lặp lại **và** trỏ ra ngoài phạm vi ghi thì thử tiếp vô nghĩa.
@@ -292,7 +292,7 @@ class TestRetry(ImplementTestCase):
         )
         out = self.implement(c, config=self.config(**{"run.max_retries": 5}))
         self.assertEqual(out.quality_attempts, 2, "phải dừng ở lượt 2, không chạy tới 6")
-        self.assertIn("không nằm trong write_scope", out.blocked_reason)
+        self.assertIn("not in the story's write_scope", out.blocked_reason)
 
     def test_be_tac_do_ke_hoach_thi_dung_ngay_o_luot_dau(self):
         """Hai model độc lập cùng kết luận story sai thì thử tiếp là đốt
@@ -309,7 +309,7 @@ class TestRetry(ImplementTestCase):
         ))
         out = self.implement(c, config=self.config(**{"run.max_retries": 5}))
         self.assertEqual(out.quality_attempts, 1, "phải dừng ngay lượt đầu")
-        self.assertIn("bế tắc do kế hoạch", out.blocked_reason)
+        self.assertIn("deadlock due to plan", out.blocked_reason)
         self.assertIn("src/store/db.ts", out.blocked_reason)
 
     def test_muc_chan_thuong_van_duoc_thu_lai(self):
@@ -317,7 +317,7 @@ class TestRetry(ImplementTestCase):
         c = ScriptedClient(review="[chặn] src/a.py:1 — quên xử lý null")
         out = self.implement(c, config=self.config(**{"run.max_retries": 2}))
         self.assertGreater(out.quality_attempts, 1)
-        self.assertNotIn("bế tắc do kế hoạch", out.blocked_reason)
+        self.assertNotIn("deadlock due to plan", out.blocked_reason)
 
     def test_lap_lai_trong_pham_vi_la_chua_sua_khong_phai_khong_sua_duoc(self):
         """Mục chặn lặp lại nhưng tệp nằm trong phạm vi thì vẫn thử tiếp.
@@ -330,7 +330,7 @@ class TestRetry(ImplementTestCase):
         c = ScriptedClient(review="[chặn] src/a.py:1 — mất dữ liệu khi lưu")
         out = self.implement(c, config=self.config(**{"run.max_retries": 3}))
         self.assertEqual(out.quality_attempts, 4, "hạn mức lượt thử phải chạy hết")
-        self.assertIn("đã thử", out.blocked_reason)
+        self.assertIn("tried", out.blocked_reason)
 
     def test_bi_nhan_ra_du_nguoi_ra_soat_doi_cach_dien_dat(self):
         """Người rà soát là một model: cùng một khiếm khuyết được viết lại
@@ -365,7 +365,7 @@ class TestRetry(ImplementTestCase):
                 ly_do = deadlock_reason([Lan(muc[i - 1]), Lan(muc[i])], scope)
                 self.assertTrue(ly_do, "phải nhận ra là cùng một chuyện")
                 self.assertIn("package.json", ly_do)
-                self.assertIn("không nằm trong write_scope", ly_do)
+                self.assertIn("not in the story's write_scope", ly_do)
 
     def test_hai_khiem_khuyet_khac_nhau_tren_cung_tep_khong_phai_bi(self):
         """Cùng tệp nhưng khác khiếm khuyết nghĩa là có dịch chuyển."""
@@ -433,13 +433,13 @@ class TestRetry(ImplementTestCase):
         DoiMuc.lan = 0
         out = self.implement(DoiMuc(), config=self.config(**{"run.max_retries": 2}))
         self.assertEqual(out.quality_attempts, 3)
-        self.assertIn("đã thử", out.blocked_reason)
+        self.assertIn("tried", out.blocked_reason)
 
     def test_out_of_scope_write_fails_the_gate(self):
         c = ScriptedClient(writes=("src/a.py", "ngoai/pham-vi.py"))
         out = self.implement(c)
         self.assertFalse(out.done)
-        self.assertIn("phạm vi", out.summary())
+        self.assertIn("write scope", out.summary())
 
     def test_feedback_reaches_the_next_attempt(self):
         class Recorder(ScriptedClient):
@@ -453,7 +453,7 @@ class TestRetry(ImplementTestCase):
         Recorder.prompts = []
         self.implement(Recorder(review="[chặn] src/a.py:1 — sai"))
         self.assertGreaterEqual(len(Recorder.prompts), 2)
-        self.assertIn("Lượt trước chưa đạt", Recorder.prompts[1])
+        self.assertIn("Previous attempt did not pass", Recorder.prompts[1])
         self.assertIn("sai", Recorder.prompts[1])
 
 
@@ -470,11 +470,11 @@ class TestFailureKinds(ImplementTestCase):
     def test_repeated_infrastructure_errors_eventually_block(self):
         out = self.implement(ScriptedClient(fail_first=99, fail_error="api_error"))
         self.assertFalse(out.done)
-        self.assertIn("hạ tầng", out.blocked_reason)
+        self.assertIn("infrastructure", out.blocked_reason)
 
     def test_classification(self):
         """Vòng thử lại đọc cùng bảng kết cục với evidence (ADR-005 V11 B)."""
-        for err in ("api_error", "overloaded", "quá 1800s", "Connection lost"):
+        for err in ("api_error", "overloaded", "exceeded 1800s", "Connection lost"):
             self.assertIn(exit_status_of(RunResult(ok=False, error=err)), INFRA_STATUSES, err)
         self.assertNotIn(exit_status_of(RunResult(ok=False, error="test đỏ")), INFRA_STATUSES)
 
@@ -494,7 +494,7 @@ class TestFakeTestDetection(ImplementTestCase):
         """Mốc demo 7: đẩy một story có test giả → cổng chặn, nêu đúng lý do."""
         out = self.implement(ScriptedClient(writes=("src/tests/test_a.py",)))
         self.assertFalse(out.done)
-        self.assertIn("test thật", out.summary())
+        self.assertIn("real tests", out.summary())
 
 
 class TestContext(ImplementTestCase):
@@ -522,7 +522,7 @@ class TestContext(ImplementTestCase):
             self.story, project=self.project, artifact_root=self.artifacts,
             architecture=None, contract=None, config=self.config(),
         )
-        self.assertIn("không dựng màn hình nào", ctx["mockup_section"])
+        self.assertIn("does not build any screen", ctx["mockup_section"])
 
     def test_ban_do_ma_tat_mac_dinh_thi_slot_rong(self):
         """ADR-005 V7: `context.max_repo_map_chars` = 0 cho tới khi A/B có số —
@@ -549,7 +549,7 @@ class TestContext(ImplementTestCase):
             self.story, project=self.project, artifact_root=self.artifacts,
             architecture=None, contract=None, config=self.config(**{"context.max_repo_map_chars": 2000}),
         )
-        self.assertTrue(ctx["repo_map"].startswith("## Bản đồ mã quanh phạm vi"))
+        self.assertTrue(ctx["repo_map"].startswith("## Code map around write scope"))
         self.assertIn("export function taoGhiChu() …", ctx["repo_map"])
         self.assertIn("`lib/b.ts` · taoGhiChu", ctx["repo_map"])
         src, n = handoff_slots(ctx)["repo_map"]
@@ -564,7 +564,7 @@ class TestContext(ImplementTestCase):
             architecture=None, contract=None,
             config=self.config(**{"context.max_repo_map_chars": 2000, "context.map_provider": "khong-co-lenh --x"}),
         )
-        self.assertIn("chạy hỏng", ctx["repo_map"])
+        self.assertIn("failed", ctx["repo_map"])
         self.assertIn("taoGhiChu", ctx["repo_map"])
 
 
@@ -673,13 +673,13 @@ class TestCachLyThanCay(ImplementTestCase):
         truoc = self.head()
         out = self.implement(self.PhaCachLy(self.project), workdir=self.workdir)
         self.assertFalse(out.done)
-        self.assertIn("đổi nhánh chính", out.attempts[0].error)
+        self.assertIn("modified the project's main branch", out.attempts[0].error)
         self.assertNotEqual(self.head(), truoc)
 
     def test_ghi_vao_bang_chung_de_ve_sau_truy_duoc(self):
         self.implement(self.PhaCachLy(self.project), workdir=self.workdir)
         ev = EvidenceStore(self.artifacts).read(self.story.id)
-        muc = [e for e in ev.events if e.name == "cách ly"]
+        muc = [e for e in ev.events if e.name == "isolation"]
         self.assertTrue(muc, "phải có bản ghi cách ly bị phá")
         self.assertFalse(muc[0].ok)
         self.assertNotEqual(muc[0].detail["truoc"], muc[0].detail["sau"])
@@ -693,14 +693,14 @@ class TestCachLyThanCay(ImplementTestCase):
         """Agent ngoan không được nhận cảnh báo — guard giả là guard bị gỡ."""
         out = self.implement(ScriptedClient(), workdir=self.workdir)
         ev = EvidenceStore(self.artifacts).read(self.story.id)
-        self.assertEqual([e for e in ev.events if e.name == "cách ly"], [])
-        self.assertNotIn("đổi nhánh chính", out.attempts[0].error or "")
+        self.assertEqual([e for e in ev.events if e.name == "isolation"], [])
+        self.assertNotIn("modified the project's main branch", out.attempts[0].error or "")
 
     def test_chay_thang_trong_du_an_thi_khong_kiem(self):
         """`--no-isolate` là cố ý làm việc trên thân cây; kiểm ở đó sẽ
         chặn mọi lượt chạy hợp lệ."""
         out = self.implement(self.PhaCachLy(self.project), workdir=self.project)
-        self.assertNotIn("đổi nhánh chính", out.attempts[0].error or "")
+        self.assertNotIn("modified the project's main branch", out.attempts[0].error or "")
 
 
 class TestCachLyVoLaDungHan(TestCachLyThanCay):
@@ -709,7 +709,7 @@ class TestCachLyVoLaDungHan(TestCachLyThanCay):
         thêm tiền và làm hỏng sâu hơn."""
         out = self.implement(self.PhaCachLy(self.project), workdir=self.workdir)
         self.assertEqual(len(out.attempts), 1)
-        self.assertIn("đổi nhánh chính", out.blocked_reason)
+        self.assertIn("modified the project's main branch", out.blocked_reason)
 
 
 class TestVaiRaSoatKhaiToolBiCam(ImplementTestCase):
@@ -778,7 +778,7 @@ class TestKyVongGuardTheoBaoCaoBienDich(ImplementTestCase):
                          "degradations": []}]}), encoding="utf-8")
 
     def muc(self, out):
-        return next(c for c in out.attempts[-1].gate.checks if c.name == "guard có chạy")
+        return next(c for c in out.attempts[-1].gate.checks if c.name == "guard ran")
 
     def test_chua_bien_dich_thi_khong_doi(self):
         out = self.implement(ScriptedClient())
@@ -842,7 +842,7 @@ class TestNguoiRaSoatKhongDuocSuaCay(ImplementTestCase):
         out = self.implement(self.ReviewerGhi())
         self.assertFalse((self.project / "src" / "reviewer-da-ghi.py").exists(), "phải hoàn nguyên")
         chan = out.attempts[-1].review_findings
-        self.assertTrue(any("đã sửa cây làm việc" in f for f in chan), chan)
+        self.assertTrue(any("modified the working tree" in f for f in chan), chan)
         ev = EvidenceStore(self.artifacts).read(self.story.id)
         self.assertTrue(any(e.name == "review:immutable" and not e.ok for e in ev.events))
 
@@ -851,7 +851,7 @@ class TestNguoiRaSoatKhongDuocSuaCay(ImplementTestCase):
         out = self.implement(self.SecurityGhi())
         # src/a.py do developer giả viết ("x = 1"); security sửa → phải về như cũ
         self.assertEqual((self.project / "src" / "a.py").read_text(), "x = 1\n")
-        self.assertIn("đã sửa cây làm việc", out.attempts[-1].security.error)
+        self.assertIn("modified the working tree", out.attempts[-1].security.error)
 
     def test_reviewer_ngoan_khong_bi_dung(self):
         self._init_git()
@@ -916,7 +916,7 @@ class TestBaselineTruocKhiSua(ImplementTestCase):
     """
 
     LENH = 'sh -c "cat src/ket-qua.txt; ! grep -q FAILED src/ket-qua.txt"'
-    TEN = "không làm đỏ test có sẵn"
+    TEN = "no baseline regression"
 
     @staticmethod
     def ket_qua(xanh, do=()):
@@ -990,7 +990,7 @@ class TestBaselineTruocKhiSua(ImplementTestCase):
         out = self.chay(self.ket_qua(range(1, 10)))
         m = self.muc(out)
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("mất 1 test", m.detail)
+        self.assertIn("lost 1 test", m.detail)
         self.assertIn("tests/test_a.py::test_10", m.detail)
 
     def test_hoi_quy_vao_feedback_luot_sau(self):
@@ -1035,7 +1035,7 @@ class TestBaselineTruocKhiSua(ImplementTestCase):
         out = self.chay(self.ket_qua(range(1, 11)), **{"tools.test": ""})
         m = self.muc(out)
         self.assertIs(m.outcome, Outcome.UNCONFIGURED)
-        self.assertIn("chưa khai", m.detail)
+        self.assertIn("no baseline", m.detail)
 
 
 class TestKetCucChuanHoa(ImplementTestCase):
@@ -1058,7 +1058,7 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
     LENH = ("sh -c 'echo \"test session starts\"; "
             "out=$(for f in tests/test_*.sh; do [ -f \"$f\" ] && sh \"$f\"; done); "
             "echo \"$out\"; ! echo \"$out\" | grep -q FAILED'")
-    TEN = "test có kiểm được story"
+    TEN = "tests verify story"
     AC = "tests/test_ac.sh::test_AC_STORY_01_01_1"
     THAT = ('[ -f src/a.py ] && echo "%s PASSED" || echo "%s FAILED"\n' % (AC, AC))
     GIA = 'echo "%s PASSED"\n' % AC
@@ -1099,7 +1099,7 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         out = self.chay(self.THAT)
         m = self.muc(out)
         self.assertIs(m.outcome, Outcome.PASSED, out.summary())
-        self.assertIn("đỏ hoặc không tồn tại", m.detail)
+        self.assertIn("red or absent", m.detail)
         nop = self.evidence().last(TOOL_RUN, "test:nop")
         self.assertEqual(nop.detail["candidate"], out.attempts[-1].candidate)
         self.assertEqual(nop.detail["files"], ["tests/test_ac.sh"])
@@ -1114,7 +1114,7 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         out = self.chay(self.GIA)
         m = self.muc(out)
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("xanh cả khi không có mã của story", m.detail)
+        self.assertIn("still green without story code", m.detail)
         self.assertIn(self.AC, m.detail)
         self.assertFalse(out.done)
 
@@ -1122,7 +1122,7 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         out = self.chay(None)
         m = self.muc(out)
         self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
-        self.assertIn("không thêm/sửa", m.detail)
+        self.assertIn("did not add/modify", m.detail)
         nop = self.evidence().last(TOOL_RUN, "test:nop")
         self.assertEqual(nop.detail["files"], [])
         self.assertEqual(nop.detail["candidate"], out.attempts[-1].candidate)
@@ -1143,7 +1143,7 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         out = self.chay(self.GIA, **{"verify.baseline": False})
         m = self.muc(out)
         self.assertIs(m.outcome, Outcome.UNRUNNABLE)
-        self.assertIn("SHA cha", m.detail)
+        self.assertIn("parent SHA", m.detail)
 
     def test_gate_input_ghi_ngay_truoc_verdict_va_replay_ra_cung_ket_cuc(self):
         """ADR-005 V4: đầu vào cổng nằm trong bằng chứng; replay bằng luật hiện

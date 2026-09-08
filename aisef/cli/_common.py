@@ -1,8 +1,8 @@
-"""Mảnh dùng chung của bộ lệnh: mã thoát, gốc artifact, kho duyệt/trạng
-thái, adapter client, và bộ chuyển tham số tên cổng.
+"""Shared CLI utilities: exit codes, artifact root, approval/state stores,
+client adapter, and gate argument converter.
 
-Mọi module lệnh khác nhập từ đây, nên file này không được nhập ngược lại
-chúng — giữ đồ thị nhập một chiều.
+All command modules import from here; this file must not import back
+from them — keep the import graph one-directional.
 """
 
 from __future__ import annotations
@@ -21,7 +21,6 @@ EXIT_OK = 0
 EXIT_USAGE = 1
 EXIT_NOT_READY = 2
 
-#: Ký hiệu trạng thái cổng, đủ để đọc lướt.
 _GATE_MARK = {
     Status.APPROVED: "✅",
     Status.PENDING: "⏳",
@@ -31,11 +30,11 @@ _GATE_MARK = {
 
 
 def _artifact_root(args) -> Path:
-    """Gốc artifact — **một** gốc cho cả dự án (bất biến 2).
+    """Artifact root — one root per project (invariant 2).
 
-    Agent chạy trong worktree của story, nên `--project .` ở đó trỏ vào
-    worktree. Ghi bằng chứng vào đấy thì cổng đọc ở gốc chính không thấy
-    gì, và story "chưa từng chạy test" dù nó vừa chạy.
+    Agents run inside story worktrees, so `--project .` there points at
+    the worktree. Writing evidence there means the gate reading from the
+    main repo root sees nothing.
     """
     from ..control.worktree import main_repo
 
@@ -55,18 +54,18 @@ def _gate_arg(value: str) -> Gate:
         return Gate(value)
     except ValueError:
         valid = ", ".join(g.value for g in GATE_ORDER)
-        raise argparse.ArgumentTypeError(f"cổng không hợp lệ: {value}. Hợp lệ: {valid}")
+        raise argparse.ArgumentTypeError(f"invalid gate: {value}. Valid: {valid}")
 
 
 def _client(args):
-    """Adapter đã kiểm tên và tình trạng cài đặt. None nếu không dùng được."""
+    """Validated client adapter. Returns None if unavailable."""
     from ..clients.compile import ADAPTERS
 
     if args.client not in ADAPTERS:
-        print(f"✗ client không hỗ trợ: {args.client}", file=sys.stderr)
+        print(f"✗ unsupported client: {args.client}", file=sys.stderr)
         return None, EXIT_USAGE
     adapter = ADAPTERS[args.client]()
     if not adapter.available():
-        print(f"✗ chưa cài {args.client} trên máy này", file=sys.stderr)
+        print(f"✗ {args.client} is not installed on this machine", file=sys.stderr)
         return None, EXIT_NOT_READY
     return adapter, EXIT_OK

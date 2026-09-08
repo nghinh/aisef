@@ -78,10 +78,10 @@ def find_playwright(project: Path | str = ".") -> Path | None:
 def availability(project: Path | str = ".") -> str:
     """Chuỗi rỗng nếu dựng được; ngược lại là lý do không dựng được."""
     if not shutil.which("node"):
-        return "chưa cài node — không dựng được mockup để trích hợp đồng"
+        return "node not installed — cannot render mockup to extract contract"
     if find_playwright(project) is None:
         return (
-            "chưa cài playwright — chạy: npm i -D playwright && npx playwright install chromium"
+            "playwright not installed — run: npm i -D playwright && npx playwright install chromium"
         )
     return ""
 
@@ -115,15 +115,15 @@ def render(
             timeout=timeout,
         )
     except subprocess.TimeoutExpired:
-        return RenderResult(unavailable=f"dựng mockup quá {timeout}s")
+        return RenderResult(unavailable=f"mockup rendering exceeded {timeout}s")
 
     if proc.returncode != 0 and not proc.stdout.strip():
-        return RenderResult(unavailable=(proc.stderr or "node thất bại").strip()[:400])
+        return RenderResult(unavailable=(proc.stderr or "node failed").strip()[:400])
 
     try:
         data = json.loads(proc.stdout)
     except json.JSONDecodeError:
-        return RenderResult(unavailable=f"không đọc được kết quả node: {proc.stdout[:200]}")
+        return RenderResult(unavailable=f"cannot parse node output: {proc.stdout[:200]}")
 
     if data.get("error"):
         return RenderResult(unavailable=data["error"])

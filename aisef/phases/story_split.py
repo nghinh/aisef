@@ -64,11 +64,11 @@ class SplitResult:
 
     def summary(self) -> str:
         if self.error:
-            return f"tách story: ✗ {self.error}"
+            return f"split stories: ✗ {self.error}"
         n_epics = len(self.plan.epics) if self.plan else 0
-        lines = [f"tách story: {len(self.stories)} story / {n_epics} epic"]
+        lines = [f"split stories: {len(self.stories)} stories / {n_epics} epics"]
         if self.removed:
-            lines.append(f"  gỡ {len(self.removed)} file story không còn trong epics.md")
+            lines.append(f"  removed {len(self.removed)} story file(s) no longer in epics.md")
         if self.gate:
             lines.append(self.gate.summary())
         return "\n".join(lines)
@@ -94,73 +94,73 @@ def render_story(story: Story, prd: PRD | None, root: Path | None = None) -> str
 
     if story.as_a:
         out += [
-            f"**Là** {story.as_a}",
-            f"**tôi muốn** {story.i_want}",
-            f"**để** {story.so_that}",
+            f"**As a** {story.as_a}",
+            f"**I want** {story.i_want}",
+            f"**so that** {story.so_that}",
             "",
         ]
 
-    out += ["## Tiêu chí chấp nhận", ""]
+    out += ["## Acceptance Criteria", ""]
     out += [f"{i}. [{ac_code(story.id, i)}] {ac}" for i, ac in enumerate(story.acceptance_criteria, 1)] or [
-        "_(chưa có — cổng máy sẽ chặn)_"
+        "_(none — machine gate will block)_"
     ]
     out.append("")
 
-    out += ["## Phạm vi được ghi", ""]
+    out += ["## Recorded Scope", ""]
     if story.write_scope:
         out += [f"- `{p}`" for p in story.write_scope]
         them = verification_paths(story, root.parent) if root is not None else []
         if them:
-            out += ["", "Harness cấp thêm vì hợp đồng kiểm định của story đòi (lỗi 21):"]
+            out += ["", "Harness added because the story's verification contract requires them (error 21):"]
             out += [f"- `{p}`" for p in them]
         out += [
             "",
-            "Guard chặn mọi thao tác ghi ngoài danh sách này. Cần ghi chỗ khác "
-            "nghĩa là phạm vi khai sai — dừng lại và báo, đừng lách.",
+            "Guard blocks all writes outside this list. Needing to write elsewhere "
+            "means the scope declaration is wrong — stop and report, do not work around it.",
         ]
     else:
-        out.append("_(chưa khai — cổng máy sẽ chặn)_")
+        out.append("_(not declared — machine gate will block)_")
     out.append("")
 
     hop_dong = verification_contract(story)
     if hop_dong:
         out += [
-            "## Xong nghĩa là gì",
+            "## Definition of Done",
             "",
-            "Story này phải qua các loại kiểm định sau. Loại chưa cấu hình "
-            "trên dự án **không** được tính là đạt — nó là chỗ trống, và "
-            "cổng sẽ nói ra.",
+            "This story must pass the following verification types. Types not configured "
+            "on the project are **not** counted as passing — they are gaps, and "
+            "the gate will flag them.",
             "",
         ]
         out += [f"- `{k}`" for k in hop_dong]
         out.append("")
 
     if story.depends_on:
-        out += ["## Phụ thuộc", ""] + [f"- {d}" for d in story.depends_on] + [""]
+        out += ["## Dependencies", ""] + [f"- {d}" for d in story.depends_on] + [""]
 
-    out += ["## Yêu cầu phải thoả", ""]
+    out += ["## Requirements", ""]
     if not story.covers:
-        out.append("_(chưa ánh xạ FR nào — cổng máy sẽ chặn)_")
+        out.append("_(no FR mapped — machine gate will block)_")
     for fr_id in story.covers:
         req = prd.by_id(fr_id) if prd else None
         if req is None:
             out.append(f"### {fr_id}")
-            out.append("_(không tìm thấy trong PRD)_")
+            out.append("_(not found in PRD)_")
             out.append("")
             continue
         out += [f"### {req.id}: {req.title}", ""]
         if req.description:
             out += [req.description.strip(), ""]
         if req.acceptance_criteria:
-            out += ["Hệ quả kiểm chứng được:", ""]
+            out += ["Verifiable Consequences:", ""]
             out += [f"- {c}" for c in req.acceptance_criteria]
             out.append("")
 
     out += [
         "---",
         "",
-        f"_Sinh tự động từ `epics.md`. Sửa ở đây sẽ mất khi tách lại — "
-        f"sửa `epics.md` rồi chạy `aisef plan`._",
+        f"_Auto-generated from `epics.md`. Edits here will be lost on next split — "
+        f"edit `epics.md` and run `aisef plan`._",
         "",
     ]
     return "\n".join(out)
@@ -201,13 +201,13 @@ def split(
 
     epics_md = root / "epics.md"
     if not epics_md.is_file():
-        res.error = "chưa có epics.md"
+        res.error = "epics.md not found"
         return res
 
     res.plan = parse_epics_file(epics_md)
     stories = res.plan.stories()
     if not stories:
-        res.error = "epics.md không có story nào đọc được"
+        res.error = "no readable stories found in epics.md"
         return res
 
     prd_path = root / "prd.md"
@@ -255,7 +255,7 @@ def split(
             # lượt. Cổng `readiness` và bước ngay trước khi gọi model mới
             # chặn thật.
             res.gate.warnings.append(
-                f"{pf.story_id} còn thiếu để chạy được: "
+                f"{pf.story_id} missing prerequisites to run: "
                 + "; ".join(m.line() for m in pf.provisioning_gaps)
             )
 
@@ -316,7 +316,7 @@ def write_index(root: Path, res: SplitResult, config: Config | None = None) -> P
         },
     }
     if wave_error:
-        data["gate"]["errors"] = list(data["gate"]["errors"]) + [f"xếp sóng: {wave_error}"]
+        data["gate"]["errors"] = list(data["gate"]["errors"]) + [f"wave assignment: {wave_error}"]
 
     path = root / STORIES_INDEX
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -337,24 +337,24 @@ def describe_index(data: dict) -> str:
     for epic in data.get("epics", []):
         lines.append(f"\n{epic['id']}: {epic['title']}")
         for i, wave in enumerate(waves.get(epic["id"], []), 1):
-            tag = f"  đợt {i}" + (" (song song)" if len(wave) > 1 else "")
+            tag = f"  wave {i}" + (" (parallel)" if len(wave) > 1 else "")
             lines.append(tag)
             for sid in wave:
                 s = by_id.get(sid, {})
                 lines.append(
                     f"    {sid}  {s.get('title', '')}\n"
-                    f"        phủ: {', '.join(s.get('covers') or ['—'])}"
-                    f"  ·  ghi: {', '.join(s.get('write_scope') or ['—'])}"
-                    f"  ·  {len(s.get('acceptance_criteria') or [])} tiêu chí"
+                    f"        covers: {', '.join(s.get('covers') or ['—'])}"
+                    f"  ·  writes: {', '.join(s.get('write_scope') or ['—'])}"
+                    f"  ·  {len(s.get('acceptance_criteria') or [])} criteria"
                 )
         listed = {sid for w in waves.get(epic["id"], []) for sid in w}
         for sid in epic.get("stories", []):
             if sid not in listed:  # không xếp được lịch — vẫn phải thấy
-                lines.append(f"    {sid}  {by_id.get(sid, {}).get('title', '')}  [chưa xếp được đợt]")
+                lines.append(f"    {sid}  {by_id.get(sid, {}).get('title', '')}  [not assigned to any wave]")
 
     gate = data.get("gate", {})
     lines.append("")
-    lines.append("cổng máy: " + ("ĐẠT" if gate.get("passed") else "KHÔNG ĐẠT"))
+    lines.append("machine gate: " + ("PASS" if gate.get("passed") else "FAIL"))
     for e in gate.get("errors", []):
         lines.append(f"  ✗ {e}")
     for w in gate.get("warnings", []):

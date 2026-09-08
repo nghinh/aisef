@@ -55,11 +55,11 @@ MARK = {
 }
 
 DEFAULT_REASON = {
-    Outcome.FAILED: "không đạt",
-    Outcome.UNRUNNABLE: "không chạy được — môi trường chưa dựng, không phải test đỏ",
-    Outcome.UNCONFIGURED: "chưa cấu hình — không tính là đạt",
-    Outcome.WAIVED: "miễn tường minh",
-    Outcome.NOT_APPLICABLE: "không áp dụng",
+    Outcome.FAILED: "failed",
+    Outcome.UNRUNNABLE: "cannot run — environment not set up, not a red test",
+    Outcome.UNCONFIGURED: "not configured — does not count as passed",
+    Outcome.WAIVED: "explicitly waived",
+    Outcome.NOT_APPLICABLE: "not applicable",
 }
 
 

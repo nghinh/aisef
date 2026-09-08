@@ -200,7 +200,7 @@ def _vitest(lines: list[str], log: TestLog) -> None:
         if m and " > " in m.group(2):
             _add(log, m.group(2), {"✓": "pass", "×": "fail", "↓": "skip"}[m.group(1)])
     if not log.test_ids:
-        log.note = "vitest reporter mặc định không in tên test — thêm `--reporter=verbose`"
+        log.note = "vitest default reporter does not print test names — add `--reporter=verbose`"
 
 
 def _unittest(lines: list[str], log: TestLog) -> None:
@@ -242,4 +242,4 @@ def _pytest(lines: list[str], log: TestLog) -> None:
             m = _PYTEST_Q_FAIL.match(line)
             if m:
                 _add(log, m.group(1), "fail")
-        log.note = "pytest chưa `-v`: chỉ đọc được tên test đỏ, không biết test nào xanh"
+        log.note = "pytest without `-v`: can only read failing test names, cannot tell which passed"

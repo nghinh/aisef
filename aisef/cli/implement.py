@@ -26,34 +26,34 @@ def cmd_status(args) -> int:
     cfg = Config.load(args.project)
 
     if not state.stories:
-        print("Chưa có story nào được đăng ký.")
+        print("No stories registered.")
         return EXIT_OK
 
     totals = state.totals()
     total = len(state.stories)
     done = totals[StoryStatus.DONE.value]
 
-    print(f"Tiến độ: {done}/{total} story xong")
+    print(f"Progress: {done}/{total} stories done")
     # `verified` = qua cổng, chưa lên nhánh chính (merge đụng ở lượt trước).
     # Không nói ra thì người đọc tưởng code đã ở main.
     chua_merge = [r.id for r in state.by_status(StoryStatus.VERIFIED)]
     if chua_merge:
-        print(f"⚠️  {len(chua_merge)} story xong nhưng chưa merge vào nhánh chính: "
-              f"{', '.join(chua_merge[:5])} — chạy lại `aisef run` để merge")
+        print(f"⚠️  {len(chua_merge)} stories done but not merged to main: "
+              f"{', '.join(chua_merge[:5])} — run `aisef run` again to merge")
     if state.active_epics:
-        print(f"Epic đang chạy: {', '.join(state.active_epics)}")
+        print(f"Active epics: {', '.join(state.active_epics)}")
     elif state.current_epic:
-        print(f"Epic hiện tại: {state.current_epic}")
+        print(f"Current epic: {state.current_epic}")
     print()
     for status in StoryStatus:
         n = totals[status.value]
         if n:
             print(f"  {status.value:11} {n}")
 
-    print(f"\nChi phí: ${state.total_cost_usd:.2f}")
+    print(f"\nCost: ${state.total_cost_usd:.2f}")
     outliers = state.cost_outliers(cfg["cost.warn_multiple"])
     if outliers:
-        print(f"⚠️  {len(outliers)} story tốn hơn {cfg['cost.warn_multiple']}× trung vị:")
+        print(f"⚠️  {len(outliers)} stories cost more than {cfg['cost.warn_multiple']}x median:")
         for r in sorted(outliers, key=lambda r: -r.cost_usd)[:5]:
             print(f"    {r.id:16} ${r.cost_usd:.2f}")
 
@@ -71,13 +71,13 @@ def cmd_status(args) -> int:
         if any(sizes):
             nap[sid] = max(sizes)
         for e in runs:
-            k = str(e.detail.get("exit_status") or "chưa ghi")
+            k = str(e.detail.get("exit_status") or "unrecorded")
             ket_cuc[k] = ket_cuc.get(k, 0) + 1
     # Kết cục từng lượt gọi model (ADR-005 V11 B) — đếm theo `exit_status`
     # harness chuẩn hoá lúc ghi. Lượt ghi trước khoá này là "chưa ghi":
     # không suy đoán thay bằng chứng cũ.
     if ket_cuc:
-        print("Lượt agent: " + " · ".join(
+        print("Agent runs: " + " · ".join(
             f"{k} {n}" for k, n in sorted(ket_cuc.items(), key=lambda kv: -kv[1])))
     skill_counts: dict[str, int] = {}
     for sid in ev_store.stories():
@@ -91,18 +91,18 @@ def cmd_status(args) -> int:
         trung_vi = sorted(nap.values())[len(nap) // 2]
         phinh = {k: v for k, v in nap.items() if v > cfg["cost.warn_multiple"] * trung_vi}
         if phinh:
-            print(f"⚠️  {len(phinh)} story nạp ngữ cảnh hơn {cfg['cost.warn_multiple']}× trung vị "
-                  f"({trung_vi:,} ký tự):")
+            print(f"⚠️  {len(phinh)} stories loaded context exceeding {cfg['cost.warn_multiple']}x median "
+                  f"({trung_vi:,} chars):")
             for k, v in sorted(phinh.items(), key=lambda kv: -kv[1])[:5]:
-                print(f"    {k:16} {v:,} ký tự")
+                print(f"    {k:16} {v:,} chars")
 
     # `failed` cũng là chưa sẵn sàng, không chỉ `blocked`: một story trượt
     # cổng mà lệnh trả 0 thì CI báo xanh trên một sprint đang hỏng.
     stuck = state.by_status(StoryStatus.BLOCKED) + state.by_status(StoryStatus.FAILED)
     if stuck:
-        print(f"\n✗ {len(stuck)} story chưa qua được:")
+        print(f"\n✗ {len(stuck)} stories not passing:")
         for r in stuck[:10]:
-            print(f"    {r.id:16} {r.status:8} {r.blocked_reason or '(không rõ lý do)'}")
+            print(f"    {r.id:16} {r.status:8} {r.blocked_reason or '(unknown reason)'}")
         return EXIT_NOT_READY
     return EXIT_OK
 
@@ -119,7 +119,7 @@ def _readiness_blocked(args) -> bool:
     if store.status(Gate.READINESS) is not Status.APPROVED:
         blocking.append(Gate.READINESS.value)
     if blocking and not args.force:
-        print(f"✗ cổng chưa duyệt: {', '.join(blocking)}", file=sys.stderr)
+        print(f"✗ gate not approved: {', '.join(blocking)}", file=sys.stderr)
         print(f"  aisef review {blocking[0]}", file=sys.stderr)
         return True
     return False
@@ -137,21 +137,21 @@ def cmd_run(args) -> int:
     story = getattr(args, "story", "")
     repeat = getattr(args, "repeat", 1)
     if verify_only and not story:
-        print("✗ --verify-only cần --story: kiểm lại ứng viên của story nào?", file=sys.stderr)
+        print("✗ --verify-only requires --story: which story's candidate to re-check?", file=sys.stderr)
         return EXIT_USAGE
     if verify_only and args.no_isolate:
-        print("✗ --verify-only chấm HEAD nhánh story trong worktree — không đi với --no-isolate",
+        print("✗ --verify-only checks HEAD of the story branch in a worktree — incompatible with --no-isolate",
               file=sys.stderr)
         return EXIT_USAGE
     if story and not verify_only:
-        print("✗ --story chỉ đi với --verify-only (chạy một story thường: --epic)", file=sys.stderr)
+        print("✗ --story only works with --verify-only (to run a regular story: use --epic)", file=sys.stderr)
         return EXIT_USAGE
     if repeat < 1:
-        print(f"✗ --repeat phải ≥ 1, nhận {repeat}", file=sys.stderr)
+        print(f"✗ --repeat must be >= 1, got {repeat}", file=sys.stderr)
         return EXIT_USAGE
     if repeat != 1 and not verify_only:
-        print("✗ --repeat chỉ đi với --verify-only: lặp là lặp phép kiểm trên một ứng viên "
-              "đã đóng băng, không lặp phiên developer", file=sys.stderr)
+        print("✗ --repeat only works with --verify-only: repeat re-checks a frozen candidate, "
+              "not a developer session", file=sys.stderr)
         return EXIT_USAGE
 
     if _readiness_blocked(args):
@@ -223,26 +223,26 @@ def cmd_verify(args) -> int:
     problems = []
 
     changed = changed_files(str(project))
-    print(f"Thay đổi trong cây: {len(changed)} file")
+    print(f"Changes in tree: {len(changed)} files")
     if scope:
         v = check_diff_scope(changed, scope)
-        print(("  ✅ " if v.allowed else "  ✗ ") + (v.reason or "nằm trong phạm vi"))
+        print(("  ✅ " if v.allowed else "  ✗ ") + (v.reason or "within scope"))
         if not v.allowed:
-            problems.append("phạm vi ghi")
+            problems.append("write scope")
     else:
-        print("  ○ chưa truyền --write-scope, bỏ qua kiểm phạm vi")
+        print("  ○ no --write-scope given, skipping scope check")
 
     if args.story:
         evidence = EvidenceStore(_artifact_root(args)).read(args.story)
         v = check_completion(evidence)
-        print(("  ✅ " if v.allowed else "  ✗ ") + (v.reason or "test xanh, không sửa gì sau đó"))
+        print(("  ✅ " if v.allowed else "  ✗ ") + (v.reason or "tests green, no changes after"))
         if not v.allowed:
             problems.append("test")
 
     if problems:
-        print(f"\n✗ hậu kiểm không đạt: {', '.join(problems)}", file=sys.stderr)
+        print(f"\n✗ post-check failed: {', '.join(problems)}", file=sys.stderr)
         return EXIT_NOT_READY
-    print("\n✅ hậu kiểm đạt")
+    print("\n✅ post-check passed")
     return EXIT_OK
 
 
@@ -272,19 +272,19 @@ def cmd_tool(args) -> int:
 
         log = parse_testlog(full)
         if log.format:
-            print(f"{len(log.passed)} xanh · {len(log.failed)} đỏ · "
-                  f"{len(log.skipped)} bỏ qua ({log.format})")
+            print(f"{len(log.passed)} passed · {len(log.failed)} failed · "
+                  f"{len(log.skipped)} skipped ({log.format})")
             for tid in log.failed[:20]:
                 print(f"  ✗ {tid}")
             if len(log.failed) > 20:
-                print(f"  … và {len(log.failed) - 20} test đỏ nữa")
+                print(f"  … and {len(log.failed) - 20} more failed tests")
     if full:
         print(res.tail(args.lines))
     total = len(full.splitlines())
     if total > args.lines:
         # Khai cắt: agent biết mình chưa thấy hết, và biết toàn văn ở đâu.
-        toan_van = f" — toàn văn: {_rel(res.log, args.project)}" if res.log else ""
-        print(f"(lược {total - args.lines}/{total} dòng{toan_van})")
+        full_ref = f" — full output: {_rel(res.log, args.project)}" if res.log else ""
+        print(f"(truncated {total - args.lines}/{total} lines{full_ref})")
     if res.skipped:
         return EXIT_NOT_READY
     return EXIT_OK if res.ok else EXIT_NOT_READY
@@ -327,7 +327,7 @@ def cmd_qa(args) -> int:
 
     ok = report.passed if args.story_level else report.release_ready
     if ok:
-        print("\n✅ kiểm định đạt")
+        print("\n✅ QA passed")
         return EXIT_OK
     return EXIT_NOT_READY
 
@@ -402,11 +402,11 @@ def cmd_predeploy(args) -> int:
                         skip_qa=args.skip_qa, epic=args.epic)
     print(report.summary())
     path = report.write(_artifact_root(args))
-    print(f"\nbáo cáo: {path}")
+    print(f"\nreport: {path}")
     if not report.passed:
         return EXIT_NOT_READY
-    pham_vi = f" (phạm vi {args.epic})" if args.epic else ""
-    print(f"Duyệt để triển khai{pham_vi}: aisef approve {Gate.PRE_DEPLOY.value}")
+    scope_note = f" (scope {args.epic})" if args.epic else ""
+    print(f"Approve for deployment{scope_note}: aisef approve {Gate.PRE_DEPLOY.value}")
     return EXIT_OK
 
 
@@ -422,7 +422,7 @@ def cmd_evidence(args) -> int:
     target = args.id
     if getattr(args, "link", ""):
         if not args.why.strip():
-            print("✗ --link cần --why: truy vết không lý do không phải bằng chứng", file=sys.stderr)
+            print("✗ --link requires --why: a trace without a reason is not evidence", file=sys.stderr)
             return EXIT_NOT_READY
         import getpass
         import json
@@ -434,13 +434,13 @@ def cmd_evidence(args) -> int:
                         "by": args.by or getpass.getuser(),
                         "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
         path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-        print(f"truy vết: {target} ← `{args.link}` ({path.name}); sổ chiếu lại ở lần đọc kế")
+        print(f"trace: {target} ← `{args.link}` ({path.name}); ledger reconciles on next read")
     led = ledger_mod.build(root)
 
     def show(b) -> None:
         print(f"\n{b.id} [{b.kind}] — {b.status.upper()}"
               + (f" · candidate {b.candidate[:7]}" if b.candidate else "")
-              + (f" · hồi quy do {b.regressed_by}" if b.regressed_by else ""))
+              + (f" · regressed by {b.regressed_by}" if b.regressed_by else ""))
         for h in b.history:
             src = h.get("source") or {}
             note = src.get("test_id") or src.get("why") or src.get("screen") or src.get("qa_kind") or ""
@@ -456,8 +456,8 @@ def cmd_evidence(args) -> int:
     elif target in led.behaviors:
         show(led.behaviors[target])
     else:
-        print(f"✗ không có story hay hành vi nào tên {target} trong sổ. "
-              f"Xem `{root.name}/INDEX.md` (aisef report sinh lại).", file=sys.stderr)
+        print(f"✗ no story or behaviour named {target} in ledger. "
+              f"See `{root.name}/INDEX.md` (aisef report regenerates it).", file=sys.stderr)
         return EXIT_NOT_READY
 
     if args.story:
@@ -488,14 +488,14 @@ def cmd_ctx(args) -> int:
         seeds = [args.file]
     else:
         if not story_id:
-            print("✗ cần --story <mã> hoặc --file <tệp>", file=sys.stderr)
+            print("✗ need --story <id> or --file <path>", file=sys.stderr)
             return EXIT_USAGE
         from ..phases.run import load_plan
 
         plan = load_plan(root)
         story = plan.stories.get(story_id)
         if story is None:
-            print(f"✗ không có story {story_id} trong chỉ mục" + (f": {plan.error}" if plan.error else ""),
+            print(f"✗ no story {story_id} in index" + (f": {plan.error}" if plan.error else ""),
                   file=sys.stderr)
             return EXIT_NOT_READY
         seeds = code_map.seeds_for(story, project, artifact_root=root, config=config)
@@ -527,8 +527,8 @@ def cmd_issues(args) -> int:
     unknown = statuses - {ledger_mod.VERIFIED, ledger_mod.GAP, ledger_mod.REOPENED}
     if unknown or not statuses:
         # Gõ sai trạng thái mà vẫn xuất tệp rỗng là lừa người đọc "không còn gap".
-        print(f"✗ --status không hợp lệ: {', '.join(sorted(unknown)) or '(rỗng)'}. "
-              f"Hợp lệ: gap, reopened, verified", file=sys.stderr)
+        print(f"✗ invalid --status: {', '.join(sorted(unknown)) or '(empty)'}. "
+              f"Valid: gap, reopened, verified", file=sys.stderr)
         return EXIT_USAGE
     root = _artifact_root(args)
     rows = ledger_mod.build(root).issues(epic=args.epic, statuses=statuses)
@@ -536,7 +536,7 @@ def cmd_issues(args) -> int:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(ledger_mod.issues_text(rows, args.format), encoding="utf-8")
     reopened = sum(1 for r in rows if r["status"] == ledger_mod.REOPENED)
-    print(f"{path} · {len(rows)} hành vi ({reopened} hồi quy)")
+    print(f"{path} · {len(rows)} behaviours ({reopened} regressions)")
     return EXIT_OK
 
 
@@ -547,16 +547,16 @@ def cmd_report(args) -> int:
 
     report = build(args.project)
     path = write(args.project, out=args.out or None)
-    print(f"Báo cáo: {path}")
-    print(f"  yêu cầu chưa phủ: {len(report.uncovered)}")
-    print(f"  story có bằng chứng: {len(report.stories)}")
-    print(f"  tổng chi phí: ${report.total_cost_usd:.2f}")
+    print(f"Report: {path}")
+    print(f"  uncovered requirements: {len(report.uncovered)}")
+    print(f"  stories with evidence: {len(report.stories)}")
+    print(f"  total cost: ${report.total_cost_usd:.2f}")
 
     # Sổ hành vi + chỉ mục: chiếu lại từ bằng chứng mỗi lần, không tích luỹ.
     led = ledger_mod.build(_artifact_root(args))
     s = led.summary()
-    print(f"  sổ hành vi: {s['verified']} verified · {s['gap']} gap · "
-          f"{s['reopened']} reopened (đóng lại {s['resolved']}, "
-          f"hồi quy liên story {s['cross_reopens']})")
+    print(f"  behaviour ledger: {s['verified']} verified · {s['gap']} gap · "
+          f"{s['reopened']} reopened (resolved {s['resolved']}, "
+          f"cross-story regressions {s['cross_reopens']})")
     print(f"  {led.write(_artifact_root(args))}\n  {led.index(_artifact_root(args))}")
     return EXIT_OK if not report.uncovered else EXIT_NOT_READY

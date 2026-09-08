@@ -40,11 +40,11 @@ class ScreenSlice:
     def as_prompt(self) -> str:
         s = self.screen
         lines = [
-            f"### Màn hình `{s.id}` — {s.name}",
-            f"Route phải dựng: `{s.route}`" if s.route else "Route: (hợp đồng chưa khai)",
+            f"### Screen `{s.id}` — {s.name}",
+            f"Route to build: `{s.route}`" if s.route else "Route: (contract not declared)",
         ]
         if s.purpose:
-            lines.append(f"Mục đích: {s.purpose}")
+            lines.append(f"Purpose: {s.purpose}")
         # Quy ước cổng phải nói ra, không để agent đoán (lỗi 14, e9 note-editor
         # 2026-09-05: cổng mở `/note/1`, app không có ghi chú `1`, trang trống,
         # story trượt 2 lượt mà không biết vì sao).
@@ -52,53 +52,53 @@ class ScreenSlice:
 
         if s.route and concrete_route(s.route) != s.route:
             lines.append(
-                f"Cổng map mockup sẽ mở `{concrete_route(s.route)}` (tham số động thay "
-                f"bằng `1`). Môi trường dev (`app.dev_command`) phải có sẵn bản ghi mã "
-                f"`1` cho route này — dữ liệu hạt giống — nếu không cổng thấy trang "
-                f"trống và story không qua được."
+                f"The mockup map gate will open `{concrete_route(s.route)}` (dynamic params "
+                f"replaced with `1`). The dev environment (`app.dev_command`) must have a record "
+                f"with id `1` for this route — seed data — otherwise the gate sees a blank "
+                f"page and the story will not pass."
             )
 
-        lines += ["", "Component **phải có** (vai trò + tên gọi, đúng như mockup):"]
+        lines += ["", "**Required** components (role + name, exactly as in mockup):"]
         for c in s.components[:MAX_LISTED]:
             lines.append(f"- {c.role} “{c.name}”")
         if len(s.components) > MAX_LISTED:
-            lines.append(f"- … và {len(s.components) - MAX_LISTED} component nữa (xem mockup)")
+            lines.append(f"- … and {len(s.components) - MAX_LISTED} more components (see mockup)")
 
         if s.data_roles:
             lines += [
                 "",
-                "Vùng dữ liệu — phải dựng được từ dữ liệu thật, mỗi mục là "
-                f"{', '.join(s.data_roles)}. Hợp đồng **không** ràng buộc nội "
-                "dung ở đây (ứng dụng thật hiển thị dữ liệu khác), chỉ ràng "
-                "buộc kiểu phần tử.",
+                "Data region — must render from real data, each item is "
+                f"{', '.join(s.data_roles)}. The contract does **not** bind "
+                "content here (the real app displays different data), only "
+                "the element type.",
             ]
 
         if s.fields:
-            lines += ["", "Ràng buộc nhập liệu (thực thi đúng, đừng nới lỏng):"]
+            lines += ["", "Input constraints (enforce exactly, do not relax):"]
             for f in s.fields:
                 bits = [f"type={f.get('type', '')}"]
                 if f.get("required"):
-                    bits.append("bắt buộc")
+                    bits.append("required")
                 for key in ("pattern", "minlength", "maxlength", "min", "max"):
                     if f.get(key):
                         bits.append(f"{key}={f[key]}")
-                label = f.get("label") or f.get("name") or "(không nhãn)"
+                label = f.get("label") or f.get("name") or "(no label)"
                 lines.append(f"- {label}: {', '.join(bits)}")
 
         if s.states:
-            lines += ["", "Trạng thái phải dựng: " + ", ".join(s.states)]
+            lines += ["", "States to build: " + ", ".join(s.states)]
 
         if self.mockup_path:
             lines += ["", f"Mockup: `{self.mockup_path}`"]
         if self.screenshot_path:
-            lines.append(f"Ảnh chụp: `{self.screenshot_path}`")
+            lines.append(f"Screenshot: `{self.screenshot_path}`")
 
         lines += [
             "",
-            "Cổng story đối chiếu ứng dụng thật với danh sách trên bằng cây "
-            "accessibility. Thiếu một component đã cam kết là **trượt**; thêm "
-            "component mới chỉ là cảnh báo. Tên gọi phải khớp — đó là thứ người "
-            "dùng đọc và là thứ máy so.",
+            "The story gate compares the real app against the list above using the "
+            "accessibility tree. Missing a committed component means **fail**; adding "
+            "new components is only a warning. Names must match — that is what the "
+            "user reads and what the machine compares.",
         ]
         return "\n".join(lines)
 
@@ -125,7 +125,7 @@ def load_slice(
             if with_html:
                 sl.html = path.read_text(encoding="utf-8", errors="replace")
         else:
-            sl.warnings.append(f"hợp đồng trỏ tới mockup không có: {screen.mockup}")
+            sl.warnings.append(f"contract points to missing mockup: {screen.mockup}")
 
     if screen.screenshot:
         shot = root / screen.screenshot
@@ -133,7 +133,7 @@ def load_slice(
             sl.screenshot_path = shot
 
     if not screen.components:
-        sl.warnings.append(f"{screen_id}: hợp đồng không có component nào để đối chiếu")
+        sl.warnings.append(f"{screen_id}: contract has no components to compare")
     return sl
 
 
@@ -158,7 +158,7 @@ def prompt_section(slices: list[ScreenSlice]) -> str:
     """Phần "Giao diện" của prompt story."""
     if not slices:
         return (
-            "Story này không dựng màn hình nào. Không thêm giao diện — phần "
-            "giao diện thuộc story khác."
+            "This story does not build any screen. Do not add UI — the UI "
+            "belongs to another story."
         )
     return "\n\n".join(s.as_prompt() for s in slices)

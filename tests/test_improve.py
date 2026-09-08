@@ -171,7 +171,7 @@ class TestVongSuaGap(ImproveTestCase):
         self.assertEqual(len(r.loops[0].before["gaps"]), 2)
         self.assertEqual(len(r.loops[0].after["gaps"]), 1)
         self.assertEqual(len(r.loops[1].after["gaps"]), 0)
-        self.assertIn("không còn GAP/REOPENED", r.stopped)
+        self.assertIn("no GAP/REOPENED remaining", r.stopped)
         self.assertTrue(r.ok, r.summary())
         self.assertEqual([lo.behavior for lo in r.loops], list(BEHAVIORS))
         for lo in r.loops:
@@ -198,9 +198,9 @@ class TestVongSuaGap(ImproveTestCase):
             self.assertTrue(path.is_file(), path)
             text = path.read_text(encoding="utf-8")
             self.assertIn(f"STORY-RP-0{n}", text)
-            self.assertIn("Gap thuộc epic trước", text)
-            self.assertIn("Quyết định", text)
-        self.assertIn("không còn GAP", (self.artifacts / "LOOP-REPORT-2.md").read_text(encoding="utf-8"))
+            self.assertIn("Epic gaps before", text)
+            self.assertIn("Decision", text)
+        self.assertIn("no GAP", (self.artifacts / "LOOP-REPORT-2.md").read_text(encoding="utf-8"))
         self.assertEqual([lo.report_path.name for lo in r.loops],
                          ["LOOP-REPORT-1.md", "LOOP-REPORT-2.md"])
 
@@ -219,12 +219,12 @@ class TestVongSuaGap(ImproveTestCase):
         self.assertEqual(len(rp["acceptance_criteria"]), 1)
         self.assertIn("AC-STORY-01-01-1", rp["acceptance_criteria"][0],
                       "giữ id hành vi để sổ khớp lại")
-        self.assertEqual(rp["source"].get("why"), "chưa có test mang mã", "nguồn của gap đi theo story")
+        self.assertEqual(rp["source"].get("why"), "no test carries this code", "nguồn của gap đi theo story")
         self.assertEqual(idx["waves"]["EPIC-RP-01"], [["STORY-RP-01"]])
         self.assertTrue(any(e["id"] == "EPIC-RP-01" for e in idx["epics"]))
         text = (self.artifacts / rp["file"]).read_text(encoding="utf-8")
         self.assertIn("[AC-STORY-RP-01-1]", text)
-        self.assertIn("## Sửa hành vi", text)
+        self.assertIn("## Fix behavior", text)
         self.assertIn("aisef evidence AC-STORY-01-01-1", text)
         # story gốc không bị đụng
         self.assertTrue(any(s["id"] == "STORY-01-01" for s in idx["stories"]))
@@ -235,7 +235,7 @@ class TestVongSuaGap(ImproveTestCase):
         rp2 = next(s for s in self.index()["stories"] if s["id"] == "STORY-RP-02")
         self.assertIn("AC-STORY-01-01-1", rp2["preservation"])
         text = (self.artifacts / rp2["file"]).read_text(encoding="utf-8")
-        self.assertIn("## Bảo toàn", text)
+        self.assertIn("## Preservation", text)
         self.assertIn("AC-STORY-01-01-1", text)
 
     def test_bat_bien_moi_story_sua_di_qua_run_epic(self):
@@ -277,7 +277,7 @@ class TestDieuKienDung(ImproveTestCase):
         self.assertEqual([lo.n for lo in r.loops], [1, 2], r.summary())
         self.assertTrue(all(lo.done for lo in r.loops), "qua cổng nhưng vô ích")
         self.assertTrue(all(lo.improvement <= 0 for lo in r.loops))
-        self.assertIn("cải thiện biên ≤ 0 trong 2 vòng", r.stopped)
+        self.assertIn("marginal improvement ≤ 0 for 2 consecutive", r.stopped)
         self.assertGreater(self.ledger().summary()["verified"],
                            r.loops[0].before["verified"], "Δ toàn sổ dương — không dùng nó")
 
@@ -304,7 +304,7 @@ class TestDieuKienDung(ImproveTestCase):
         ))
         r = self.improve(c, max_loops=5)
         self.assertEqual(len(r.loops), 1)
-        self.assertIn("bế tắc kế hoạch", r.stopped)
+        self.assertIn("plan stuck", r.stopped)
         self.assertIn("src/store/db.ts", r.stopped, "lời người rà soát phải tới tay người")
         self.assertEqual(len(c.develop_calls), 1, "không thử tiếp trên cùng gap")
 
@@ -312,7 +312,7 @@ class TestDieuKienDung(ImproveTestCase):
         c = Fixer(self.artifacts)
         r = self.improve(c, max_loops=3, auto=False)
         self.assertEqual(len(r.loops), 1)
-        self.assertIn("chờ người duyệt cổng `improve`", r.stopped)
+        self.assertIn("awaiting human approval", r.stopped)
         store = ApprovalStore(self.artifacts)
         self.assertIs(store.status(Gate.IMPROVE), Status.PENDING)
         self.assertTrue(store.has_artifacts(Gate.IMPROVE), "LOOP-REPORT-1.md là artifact")
@@ -320,13 +320,13 @@ class TestDieuKienDung(ImproveTestCase):
         store.approve(Gate.IMPROVE, by="nghi")
         r2 = self.improve(c, max_loops=3, auto=False)
         self.assertEqual([lo.n for lo in r2.loops], [2], "chạy lại tiếp từ mốc cuối")
-        self.assertIn("không còn GAP", r2.stopped)
+        self.assertIn("no GAP", r2.stopped)
         # báo cáo vòng 2 là artifact mới → phê duyệt cũ hết hiệu lực
         self.assertIs(store.status(Gate.IMPROVE), Status.STALE)
 
     def test_auto_khong_hoi_nguoi_nhung_van_bi_chan_boi_dieu_kien_khac(self):
         r = self.improve(Fixer(self.artifacts), max_loops=1, auto=True)
-        self.assertNotIn("chờ người", r.stopped)
+        self.assertNotIn("awaiting human", r.stopped)
         self.assertIn("max_loops", r.stopped)
 
 
@@ -354,14 +354,14 @@ class TestChayLai(ImproveTestCase):
         )
         r = self.improve(c, max_loops=3)
         self.assertEqual(r.loops, [])
-        self.assertIn("không còn GAP", r.stopped)
+        self.assertIn("no GAP", r.stopped)
         self.assertEqual([lo["n"] for lo in self.ledger().loops], ["loop-0", "loop-1", "loop-0"])
 
 
 class TestLoiVao(ImproveTestCase):
     def test_epic_khong_co_trong_ke_hoach(self):
         r = improve(self.project, Fixer(self.artifacts), "EPIC-99", config=self.config())
-        self.assertIn("không có trong kế hoạch", r.error)
+        self.assertIn("not found in plan", r.error)
 
     def test_cli_chan_khi_readiness_chua_duyet(self):
         import io
@@ -373,7 +373,7 @@ class TestLoiVao(ImproveTestCase):
         with redirect_stdout(out), redirect_stderr(err):
             code = main(["--project", str(self.project), "improve", "--epic", "EPIC-01"])
         self.assertEqual(code, EXIT_NOT_READY)
-        self.assertIn("cổng chưa duyệt", err.getvalue())
+        self.assertIn("gate not approved", err.getvalue())
 
     def test_ba_knob_co_kieu_va_ngu_nghia(self):
         cfg = Config.load(self.project, env={})
@@ -450,7 +450,7 @@ class TestHangDoiSuaTuDong(ImproveTestCase):
         r = self.improve(fixer, max_loops=5)
         self.assertEqual([lo.behavior for lo in r.loops], list(BEHAVIORS))
         self.assertNotIn("qa:e2e", [lo.behavior for lo in r.loops])
-        self.assertIn("ngoài hàng đợi tự động", r.stopped)
+        self.assertIn("outside auto-repair queue", r.stopped)
         self.assertIn("qa:e2e", r.stopped)
         self.assertEqual(r.gaps_left, ["qa:e2e"], "vẫn là gap của epic, chỉ không sửa tự động")
         self.assertFalse(r.ok)
@@ -458,8 +458,8 @@ class TestHangDoiSuaTuDong(ImproveTestCase):
     def test_story_sua_doi_test_moi_mang_ma_va_chi_duong_truy_vet(self):
         self.improve(Fixer(self.artifacts), max_loops=1)
         body = next(self.artifacts.rglob("STORY-RP-01.md")).read_text(encoding="utf-8")
-        self.assertIn("đối chứng nop", body)
-        self.assertIn("Không** gắn mã vào test có sẵn", body)
+        self.assertIn("nop control", body)
+        self.assertIn("not** add tags to existing tests", body)
         self.assertIn(f"aisef evidence {BEHAVIORS[0]} --link", body)
 
     def test_be_tac_truy_vet_thi_bao_cao_chi_cach_sua_sieu_du_lieu(self):
@@ -469,4 +469,4 @@ class TestHangDoiSuaTuDong(ImproveTestCase):
         self.assertIn("truy vết", r.loops[0].stuck)
         report = r.loops[0].report_path.read_text(encoding="utf-8")
         self.assertIn(f"aisef evidence {BEHAVIORS[0]} --link", report)
-        self.assertIn("không phải** cải tiến chức năng", report)
+        self.assertIn("not** a functional improvement", report)

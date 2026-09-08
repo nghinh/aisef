@@ -108,8 +108,8 @@ class Stack:
             if v and k != "undetermined"
         ]
         if self.undetermined:
-            parts.append(f"chưa xác định: {', '.join(self.undetermined)}")
-        return " · ".join(parts) if parts else "không dò được gì"
+            parts.append(f"undetermined: {', '.join(self.undetermined)}")
+        return " · ".join(parts) if parts else "nothing detected"
 
 
 def _matches(text: str, keywords: tuple[str, ...]) -> bool:
@@ -156,5 +156,5 @@ def detect(text: str) -> Stack:
 def detect_file(path: Path | str) -> Stack:
     p = Path(path)
     if not p.is_file():
-        raise FileNotFoundError(f"không có {p}")
+        raise FileNotFoundError(f"not found: {p}")
     return detect(p.read_text(encoding="utf-8", errors="replace"))

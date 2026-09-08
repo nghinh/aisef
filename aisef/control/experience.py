@@ -24,9 +24,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 #: Tên mục có thể khác nhau đôi chút giữa các lần sinh; nhận cả vài biến thể.
-_IA_HEADINGS = ("information architecture", "surfaces", "screens", "màn hình")
-_COMPONENT_HEADINGS = ("component patterns", "components")
-_STATE_HEADINGS = ("state patterns", "states")
+_IA_HEADINGS = ("information architecture", "surfaces", "screens", "màn hình",
+                "kiến trúc thông tin")
+_COMPONENT_HEADINGS = ("component patterns", "components", "thành phần",
+                       "mẫu thành phần")
+_STATE_HEADINGS = ("state patterns", "states", "trạng thái", "mẫu trạng thái")
 
 
 def slugify(name: str) -> str:

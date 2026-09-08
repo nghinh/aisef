@@ -132,7 +132,7 @@ class TestScope(GateTestCase):
         self.green_story()
         g = self.gate(changed=["src/a.py", "infra/deploy.yaml"])
         self.assertFalse(g.passed)
-        self.assertIn("phạm vi ghi", [c.name for c in g.failures])
+        self.assertIn("write scope", [c.name for c in g.failures])
 
 
 class TestMockupMap(GateTestCase):
@@ -151,7 +151,7 @@ class TestMockupMap(GateTestCase):
         self.green_story()
         g = self.gate(screens=["danh-sach"])
         self.assertFalse(g.passed)
-        self.assertIn("chưa đối chiếu", g.feedback())
+        self.assertIn("not compared", g.feedback())
 
     def test_missing_component_fails(self):
         self.green_story()
@@ -198,7 +198,7 @@ class TestFeedback(GateTestCase):
     def test_feedback_only_lists_failures(self):
         self.green_story()
         g = self.gate(changed=["ngoai/pham-vi.py"])
-        self.assertIn("phạm vi ghi", g.feedback())
+        self.assertIn("write scope", g.feedback())
         self.assertNotIn("lint", g.feedback())
 
 
@@ -226,17 +226,17 @@ class TestGuardCoChay(unittest.TestCase):
                         write_scope=["src"], screens=[], guard_expected=expected)
 
     def muc(self, g):
-        return next(c for c in g.checks if c.name == "guard có chạy")
+        return next(c for c in g.checks if c.name == "guard ran")
 
     def test_khong_ky_vong_thi_bo_qua_co_ly_do(self):
         m = self.muc(self.gate(False))
         self.assertTrue(m.skipped)
-        self.assertIn("chưa biên dịch", m.detail)
+        self.assertIn("not compiled", m.detail)
 
     def test_ky_vong_ma_khong_dau_vet_thi_truot(self):
         m = self.muc(self.gate(True))
         self.assertFalse(m.passed)
-        self.assertIn("hook không tới được worktree", m.detail)
+        self.assertIn("hook cannot reach worktree", m.detail)
 
     def test_mot_file_change_la_du(self):
         self.store.file_change("S-01", "src/a.py")
@@ -265,7 +265,7 @@ class TestTieuChiCoTest(GateTestCase):
         self.store.tool_run("S-01", "lint", ok=True)
 
     def muc(self, g):
-        return next(c for c in g.checks if c.name == "tiêu chí có test")
+        return next(c for c in g.checks if c.name == "criteria have tests")
 
     def test_missing_criterion_is_named_and_blocks(self):
         self.green_with_ids(["AC-S-01-1: chuỗi rỗng"])
@@ -327,7 +327,7 @@ class TestTDD(GateTestCase):
         self.green_story()
         g = self.gate(added_tests=["tests/x.test.js"])
         self.assertIn("TDD", [c.name for c in g.failures])
-        self.assertIn("xanh ngay lần đầu", g.feedback())
+        self.assertIn("green on first run", g.feedback())
 
     def test_red_then_green_passes(self):
         self.store.tool_run("S-01", "test", ok=False)
@@ -375,7 +375,7 @@ class TestKhongLamDoTestCoSan(GateTestCase):
     và cổng phải nêu **đúng tên** — không phải "test đỏ" chung chung, vì đỏ
     do test mới của story (TDD) và đỏ do làm hỏng test có sẵn sửa khác nhau."""
 
-    TEN = "không làm đỏ test có sẵn"
+    TEN = "no baseline regression"
 
     def baseline(self, ids, failed=(), skipped=(), **detail):
         self.store.tool_run("S-01", "test:baseline", ok=not failed, detail={
@@ -407,7 +407,7 @@ class TestKhongLamDoTestCoSan(GateTestCase):
         self.ung_vien(moi)
         m = self.muc(self.gate(candidate="aaa"))
         self.assertIs(m.outcome, Outcome.PASSED, m.detail)
-        self.assertIn("đổi tên", m.detail)
+        self.assertIn("renamed", m.detail)
         # Xoá thật (tiêu đề lá biến mất) vẫn là hồi quy.
         self.ung_vien(moi[:1] + ["tests/test_a.py::test_1"])
         m = self.muc(self.gate(candidate="aaa"))
@@ -439,7 +439,7 @@ class TestKhongLamDoTestCoSan(GateTestCase):
         self.ung_vien(["t1", "t2"], failed=["t2"])
         m = self.muc(self.gate(candidate="aaa"))
         self.assertIs(m.outcome, Outcome.PASSED)
-        self.assertIn("đã đỏ sẵn", m.detail)
+        self.assertIn("already red", m.detail)
         self.assertIn("t2", m.detail)
 
     def test_bo_qua_o_baseline_khong_phai_xanh(self):
@@ -454,15 +454,15 @@ class TestKhongLamDoTestCoSan(GateTestCase):
         self.ung_vien(["t1", "t3"])
         m = self.muc(self.gate(candidate="aaa"))
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("mất 1 test", m.detail)
+        self.assertIn("lost 1 test", m.detail)
         self.assertIn("t2", m.detail)
-        self.assertIn("khai trong story", m.detail)
+        self.assertIn("declared in the story", m.detail)
 
     def test_khong_co_baseline_thi_khong_ap_dung_co_ly_do(self):
         self.green_story()
         m = self.muc(self.gate())
         self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
-        self.assertIn("không ghi baseline", m.detail)
+        self.assertIn("recorded no baseline", m.detail)
 
     def test_tat_boi_cau_hinh_la_khong_ap_dung_khong_phai_dat(self):
         self.store.tool_run("S-01", "test:baseline", ok=False,
@@ -504,7 +504,7 @@ class TestKhongLamDoTestCoSan(GateTestCase):
         self.ung_vien(["t1"], sha="bbb")
         m = self.muc(self.gate(candidate="aaa"))
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("chưa có lần test nào ở ứng viên", m.detail)
+        self.assertIn("no test run at candidate", m.detail)
 
     def test_lan_test_truoc_baseline_khong_duoc_tinh(self):
         """Lịch sử của lần chạy trước không phải "ứng viên": chỉ so lần sau mốc."""
@@ -520,7 +520,7 @@ class TestTestCoKiemDuocStory(GateTestCase):
     của story**. Cấp 1 ($0) so với `test:baseline`; cấp 2 đọc `test:nop` —
     bộ test chạy ở SHA cha với tệp test của story chép vào."""
 
-    TEN = "test có kiểm được story"
+    TEN = "tests verify story"
     AC = "tests/test_a.py::test_AC_S_01_1_x"       # mang mã AC-S-01-1 của story S-01
 
     def baseline(self, ids, failed=(), skipped=(), **detail):
@@ -559,7 +559,7 @@ class TestTestCoKiemDuocStory(GateTestCase):
         self.nop([self.AC, "t1"], failed=[self.AC])
         m = self.cham()
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("gắn mã vào test có sẵn", m.detail)
+        self.assertIn("tagged existing tests", m.detail)
         self.assertIn(self.AC, m.detail)
         self.assertNotIn("t1", m.detail.replace(self.AC, ""))
 
@@ -571,9 +571,9 @@ class TestTestCoKiemDuocStory(GateTestCase):
         self.ung_vien([moi, "t1"])
         m = self.cham()
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("đổi tên test có sẵn", m.detail)
+        self.assertIn("renamed existing tests", m.detail)
         self.assertIn(moi, m.detail)
-        self.assertIn("test mới", m.detail)
+        self.assertIn("new tests", m.detail)
 
     def test_test_moi_trung_tieu_de_la_voi_test_con_nguyen_ten_khong_bi_bat_oan(self):
         """Test có sẵn còn nguyên tên ở ứng viên → test mang mã là test **khác**;
@@ -592,8 +592,8 @@ class TestTestCoKiemDuocStory(GateTestCase):
         self.nop(["t1"])
         m = self.cham()
         self.assertIs(m.outcome, Outcome.PASSED, m.detail)
-        self.assertIn("cấp 1 không so được", m.detail)
-        self.assertIn("chạy lại", m.detail)
+        self.assertIn("level 1 cannot compare", m.detail)
+        self.assertIn("rerun", m.detail)
         # cùng dữ liệu, baseline ở điểm rẽ → cấp 1 bắt
         self.baseline([self.AC, "t1"], parent="aaa0", base_ref="aaa0")
         self.assertIs(self.cham().outcome, Outcome.FAILED)
@@ -606,7 +606,7 @@ class TestTestCoKiemDuocStory(GateTestCase):
         g = self.gate(candidate="aaa", acceptance=1)
         m = self.muc(g)
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("xanh cả khi không có mã của story", m.detail)
+        self.assertIn("still green without story code", m.detail)
         self.assertIn(self.AC, m.detail)
         self.assertIn("cha0000"[:7], m.detail)
         self.assertIn(self.AC, g.feedback(), "tên test phải vào feedback lượt sau")
@@ -617,7 +617,7 @@ class TestTestCoKiemDuocStory(GateTestCase):
         self.nop(["t1"])                            # lỗi import ở SHA cha: test không tồn tại
         m = self.cham()
         self.assertIs(m.outcome, Outcome.PASSED)
-        self.assertIn("đỏ hoặc không tồn tại", m.detail)
+        self.assertIn("red or absent", m.detail)
         self.nop([self.AC, "t1"], failed=[self.AC])   # có mặt nhưng đỏ
         self.assertIs(self.cham().outcome, Outcome.PASSED)
 
@@ -627,7 +627,7 @@ class TestTestCoKiemDuocStory(GateTestCase):
         self.nop([self.AC, "t1"], sha="bbb")          # bản khác: không dùng để chấm bản này
         m = self.cham()
         self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
-        self.assertIn("không chạy nop", m.detail)
+        self.assertIn("ran no nop", m.detail)
 
     def test_chua_co_test_mang_ma_xanh_o_ung_vien_thi_khong_co_gi_de_kiem(self):
         self.baseline(["t1"])
@@ -635,7 +635,7 @@ class TestTestCoKiemDuocStory(GateTestCase):
         self.nop(["t1", "t2"])
         m = self.cham()
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("tiêu chí có test", m.detail)
+        self.assertIn("criteria have tests", m.detail)
 
     def test_khong_chay_duoc_la_moi_truong_khong_phai_story(self):
         self.baseline(["t1"])
@@ -659,7 +659,7 @@ class TestTestCoKiemDuocStory(GateTestCase):
         self.nop(ok=False, files=[], skipped="story không thêm/sửa tệp test")
         m = self.cham()
         self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
-        self.assertIn("không thêm/sửa", m.detail)
+        self.assertIn("did not add/modify", m.detail)
 
     def test_chua_khai_lenh_test_la_chua_cau_hinh(self):
         self.ung_vien([self.AC])
@@ -677,7 +677,7 @@ class TestTestCoKiemDuocStory(GateTestCase):
         self.green_story()
         m = self.muc(self.gate())
         self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
-        self.assertIn("không chạy nop", m.detail)
+        self.assertIn("ran no nop", m.detail)
 
     def test_reporter_khong_in_ten_thi_chi_ket_luan_khi_ca_bo_xanh(self):
         store = EvidenceStore(self._tmp.name, candidate="aaa")
@@ -686,7 +686,7 @@ class TestTestCoKiemDuocStory(GateTestCase):
         self.nop(ok=True)
         m = self.cham()
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("bộ test xanh ở SHA cha", m.detail)
+        self.assertIn("test suite green at parent SHA", m.detail)
         self.nop(ok=False)
         m = self.cham()
         self.assertIs(m.outcome, Outcome.UNCONFIGURED)

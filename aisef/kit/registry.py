@@ -139,11 +139,11 @@ class Registry:
     def transition(self, skill_id: str, to: str, *, verification: Verification | None = None) -> SkillEntry:
         e = self.entries[skill_id]
         if to not in STATUSES:
-            raise ValueError(f"trạng thái không có: {to}")
+            raise ValueError(f"status not found: {to}")
         if to != e.status and to not in ALLOWED[e.status]:
-            raise ValueError(f"{skill_id}: {e.status} → {to} không hợp lệ")
+            raise ValueError(f"{skill_id}: {e.status} → {to} is not a valid transition")
         if to == VERIFIED and (verification is None or not verification.ok):
-            raise ValueError(f"{skill_id}: lên `verified` phải có bản kiểm đạt")
+            raise ValueError(f"{skill_id}: transitioning to `verified` requires a passing check")
         e.status = to
         if verification is not None:
             e.verified = verification

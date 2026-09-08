@@ -33,7 +33,7 @@ class TestChange(unittest.TestCase):
         r = apply(self.p, "FR-1", "Slug phải giữ dấu gạch dưới", today=date(2026, 9, 5))
         self.assertEqual(r.story_id, "STORY-CH-01")
         self.assertIs(self.store.status(Gate.PRD), Status.STALE)
-        self.assertIn("thay đổi 2026-09-05", (self.p / "docs" / "requirements.md").read_text(encoding="utf-8"))
+        self.assertIn("change 2026-09-05", (self.p / "docs" / "requirements.md").read_text(encoding="utf-8"))
         idx = json.loads((self.p / "_bmad-output" / "stories.index.json").read_text(encoding="utf-8"))
         s = next(x for x in idx["stories"] if x["id"] == "STORY-CH-01")
         self.assertEqual(s["covers"], ["FR-1"]); self.assertEqual(s["write_scope"], [])

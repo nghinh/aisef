@@ -194,7 +194,7 @@ class TestKhoaDaGo(unittest.TestCase):
             c = Config.load(self.root)
         self.assertEqual(c["run.max_turns"], 12)
         self.assertNotIn("story.max_context_tokens", c)
-        self.assertIn("không còn tác dụng", err.getvalue())
+        self.assertIn("is retired", err.getvalue())
         self.assertIn("prompt_chars", err.getvalue())
 
     def test_khoa_la_van_la_loi(self):

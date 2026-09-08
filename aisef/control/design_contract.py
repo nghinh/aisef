@@ -175,7 +175,7 @@ def _one(screen: Screen, rendered, root: Path) -> ScreenContract:
         states=list(screen.states),
     )
     if rendered is None:
-        out.error = "chưa dựng được mockup cho màn hình này"
+        out.error = "mockup could not be built for this screen"
         return out
     if rendered.error:
         out.error = rendered.error
@@ -214,5 +214,5 @@ def _one(screen: Screen, rendered, root: Path) -> ScreenContract:
     out.fields = rendered.fields
     out.unresolved = list(rendered.unresolved)
     if rendered.console_errors:
-        out.error = f"mockup lỗi javascript: {rendered.console_errors[0][:200]}"
+        out.error = f"mockup javascript error: {rendered.console_errors[0][:200]}"
     return out

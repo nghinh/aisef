@@ -215,7 +215,7 @@ class TestDivergence(unittest.TestCase):
             for i in range(3)
         }
         msgs = divergence(rows)
-        self.assertTrue(any("quá cao" in m for m in msgs))
+        self.assertTrue(any("too high" in m for m in msgs))
 
     def test_too_low(self):
         rows = {
@@ -224,7 +224,7 @@ class TestDivergence(unittest.TestCase):
             for i in range(3)
         }
         msgs = divergence(rows)
-        self.assertTrue(any("quá thấp" in m for m in msgs))
+        self.assertTrue(any("too low" in m for m in msgs))
 
 
 class TestSplitSuggestion(unittest.TestCase):
@@ -233,13 +233,13 @@ class TestSplitSuggestion(unittest.TestCase):
         story = _story(ac=["AC-1", "AC-2", "AC-3", "AC-4"], scope=["src/a.py"])
         score = score_story(story)
         suggestion = split_suggestion(story, score)
-        self.assertIn("tiêu chí", suggestion)
+        self.assertIn("acceptance criteria", suggestion)
 
     def test_no_criteria(self):
         story = _story(ac=[], scope=["src/a.py"])
         score = score_story(story)
         suggestion = split_suggestion(story, score)
-        self.assertIn("phạm vi ghi", suggestion)
+        self.assertIn("write scope", suggestion)
 
 
 class TestCalibration(unittest.TestCase):

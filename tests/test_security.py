@@ -43,7 +43,7 @@ class TestParse(unittest.TestCase):
         r = parse("không có phát hiện bảo mật")
         self.assertEqual(r.findings, [])
         self.assertFalse(r.error)
-        self.assertIn("đạt", r.summary())
+        self.assertIn("pass", r.summary())
 
     def test_rong_la_khong_cham_duoc_khong_phai_sach(self):
         """Rỗng đọc ra là "không có lỗ hổng" — kết luận ngược hẳn."""
@@ -51,12 +51,12 @@ class TestParse(unittest.TestCase):
             with self.subTest(x=x):
                 r = parse(x)
                 self.assertTrue(r.error)
-                self.assertIn("KHÔNG CHẤM ĐƯỢC", r.summary())
+                self.assertIn("CANNOT SCORE", r.summary())
 
     def test_sai_dinh_dang_cung_la_khong_cham_duoc(self):
         r = parse("tôi nghĩ code này ổn thôi")
         self.assertTrue(r.error)
-        self.assertIn("định dạng", r.error)
+        self.assertIn("format", r.error)
 
     def test_dong_thua_bi_bo_qua_khong_lam_hong_ca_bao_cao(self):
         r = parse("Mở đầu vài dòng.\n\n" + BAO_CAO + "\nKết luận: nên sửa.")
@@ -85,7 +85,7 @@ class TestLocNhieu(unittest.TestCase):
         """Lọc mà không nói đã lọc gì thì không ai kiểm lại được bộ lọc."""
         r = parse(BAO_CAO + "\n[high] api.ts:1 — thiếu giới hạn tần suất\n")
         self.assertEqual(len(r.filtered), 1)
-        self.assertIn("1 mục bị lọc", r.summary())
+        self.assertIn("1 items filtered", r.summary())
         self.assertNotIn("tần suất", " ".join(f.text for f in r.findings))
 
 
@@ -103,7 +103,7 @@ class TestNguong(unittest.TestCase):
     def test_chi_con_medium_low_thi_dat(self):
         r = parse("[medium] a.ts:1 — x\n[low] b.ts:2 — y")
         self.assertEqual(r.blocking(), [])
-        self.assertIn("đạt", r.summary())
+        self.assertIn("pass", r.summary())
 
 
 class TestCong(unittest.TestCase):
@@ -121,31 +121,31 @@ class TestCong(unittest.TestCase):
 
     def test_phat_hien_high_lam_cong_truot(self):
         g = self.gate(parse("[high] src/auth.ts:1 — chiếm phiên được"))
-        self.assertFalse(self.muc(g, "bảo mật").passed)
+        self.assertFalse(self.muc(g, "security").passed)
         self.assertFalse(g.passed)
 
     def test_phat_hien_critical_lam_cong_truot(self):
         g = self.gate(parse("[critical] src/api.ts:1 — thực thi mã từ xa"))
-        self.assertFalse(self.muc(g, "bảo mật").passed)
+        self.assertFalse(self.muc(g, "security").passed)
 
     def test_chi_medium_thi_khong_chan(self):
         g = self.gate(parse("[medium] src/log.ts:1 — ghi email vào log"))
-        self.assertTrue(self.muc(g, "bảo mật").passed)
+        self.assertTrue(self.muc(g, "security").passed)
 
     def test_chua_cau_hinh_la_bo_qua_co_ghi_lai_khong_phai_dat_am_tham(self):
         g = self.gate(None)
-        muc = self.muc(g, "bảo mật")
+        muc = self.muc(g, "security")
         self.assertTrue(muc.skipped)
-        self.assertIn("chưa cấu hình", muc.detail)
+        self.assertIn("not configured", muc.detail)
 
     def test_khong_cham_duoc_thi_chan(self):
         """"Không chấm được" khác "sạch" — và phải chặn, không phải bỏ qua."""
         g = self.gate(SecurityReport(error="không chạy được: hết lượt"))
-        self.assertFalse(self.muc(g, "bảo mật").passed)
+        self.assertFalse(self.muc(g, "security").passed)
 
     def test_nguong_truyen_vao_duoc_ton_trong(self):
         g = self.gate(parse("[high] a.ts:1 — x"), block_severities=["critical"])
-        self.assertTrue(self.muc(g, "bảo mật").passed)
+        self.assertTrue(self.muc(g, "security").passed)
 
 
 class TestVaiTro(unittest.TestCase):

@@ -80,33 +80,33 @@ class ImpactReport:
         """Phần đưa vào prompt rà soát. Nói rõ nguồn và giới hạn."""
         if self.empty:
             return (
-                "_Chưa có phân tích ảnh hưởng_ — không cấu hình "
-                "`review.impact_provider`, hoặc không suy ra được gì. "
-                "Tự dò từ diff."
+                "_No impact analysis available_ — `review.impact_provider` "
+                "not configured, or nothing could be inferred. "
+                "Detect from diff manually."
             )
         lines = [
-            f"_Nguồn: {self.source or 'không rõ'}"
-            + (" · **thô**, chỉ là gợi ý khởi đầu" if self.degraded else "")
+            f"_Source: {self.source or 'unknown'}"
+            + (" · **rough**, starting suggestion only" if self.degraded else "")
             + "._",
             "",
-            "Đây là **gợi ý**, không phải chân lý: phân tích tĩnh không thấy "
-            "gọi động, phản chiếu hay tiêm phụ thuộc. Đừng dừng ở đây, và "
-            "đừng bỏ qua chỗ nó không nhắc tới.",
+            "This is a **suggestion**, not ground truth: static analysis misses "
+            "dynamic calls, reflection, and dependency injection. Do not stop here, "
+            "and do not ignore what it does not mention.",
             "",
         ]
         for nhan, muc in (
-            ("Tên bị đổi", self.changed_symbols),
-            ("Nơi dùng chúng (ngoài diff)", self.callers),
-            ("Test có liên quan", self.related_tests),
-            ("Tên không test nào nhắc tới", self.untested_symbols),
-            ("Luồng bị chạm", self.flows),
+            ("Changed symbols", self.changed_symbols),
+            ("Callers (outside diff)", self.callers),
+            ("Related tests", self.related_tests),
+            ("Symbols no test mentions", self.untested_symbols),
+            ("Affected flows", self.flows),
         ):
             if not muc:
                 continue
             lines.append(f"**{nhan}:**")
             lines += [f"- `{m}`" for m in muc[:MAX_PER_KIND]]
             if len(muc) > MAX_PER_KIND:
-                lines.append(f"- … còn {len(muc) - MAX_PER_KIND}")
+                lines.append(f"- … {len(muc) - MAX_PER_KIND} more")
             lines.append("")
         if self.note:
             lines.append(f"_{self.note}_")
@@ -156,7 +156,7 @@ def analyse(
     project = Path(project)
     changed = [c for c in changed if c]
     if not changed:
-        return ImpactReport(source="không có thay đổi")
+        return ImpactReport(source="no changes")
 
     if command.strip():
         got = _run_command(project, changed, command, timeout)
@@ -165,7 +165,7 @@ def analyse(
         fallback = builtin(project, changed)
         fallback.degraded = True
         fallback.note = (
-            f"`review.impact_provider` chạy hỏng, đã lùi về bản dựng sẵn: "
+            f"`review.impact_provider` failed, fell back to built-in: "
             f"{command.split()[0]}"
         )
         return fallback
@@ -302,12 +302,12 @@ def builtin(project: Path | str, changed: list[str]) -> ImpactReport:
     khỏi danh sách.
     """
     project = Path(project)
-    rep = ImpactReport(source="dựng sẵn (dò theo tên)", degraded=True)
+    rep = ImpactReport(source="builtin (name-based search)", degraded=True)
     doi = set(changed)
 
     names = sorted({n for syms in symbols(project, changed).values() for n, _, _ in syms})
     if not names:
-        rep.note = "không thấy tên xuất khẩu nào trong tệp đã đổi"
+        rep.note = "no exported names found in changed files"
         return rep
     rep.changed_symbols = names
 

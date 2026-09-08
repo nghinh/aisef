@@ -32,8 +32,8 @@ class TestPrdGateOnRealDocument(unittest.TestCase):
 
     def test_real_prd_surfaces_open_questions_as_warnings(self):
         r = check_prd(parse_prd_file(PRD_FIXTURE))
-        self.assertTrue(any("câu hỏi mở" in w for w in r.warnings))
-        self.assertTrue(any("bị câu hỏi mở chặn" in w for w in r.warnings))
+        self.assertTrue(any("open questions" in w for w in r.warnings))
+        self.assertTrue(any("blocked by open questions" in w for w in r.warnings))
 
 
 class TestPrdGate(unittest.TestCase):
@@ -62,7 +62,7 @@ class TestPrdGate(unittest.TestCase):
     def test_missing_nfr_is_only_a_warning(self):
         r = check_prd(PRD(requirements=[req("FR-1")]))
         self.assertTrue(r.passed)
-        self.assertTrue(any("phi chức năng" in w for w in r.warnings))
+        self.assertTrue(any("non-functional" in w for w in r.warnings))
 
 
 class TestStoryGate(unittest.TestCase):
@@ -81,7 +81,7 @@ class TestStoryGate(unittest.TestCase):
     def test_duplicate_id_blocks(self):
         r = check_stories([story("S-1"), story("S-1", scope=("src/b.py",))])
         self.assertFalse(r.passed)
-        self.assertTrue(any("trùng mã" in e for e in r.errors))
+        self.assertTrue(any("duplicate" in e for e in r.errors))
 
     def test_dependency_cycle_blocks(self):
         stories = [
@@ -90,7 +90,7 @@ class TestStoryGate(unittest.TestCase):
         ]
         r = check_stories(stories)
         self.assertFalse(r.passed)
-        self.assertTrue(any("vòng" in e for e in r.errors))
+        self.assertTrue(any("cycle" in e for e in r.errors))
 
     def test_unknown_dependency_blocks(self):
         r = check_stories([story("S-1", deps=("KHONG-CO",))])
@@ -100,7 +100,7 @@ class TestStoryGate(unittest.TestCase):
         """Story quá lớn sẽ tràn ngữ cảnh trong một phiên."""
         r = check_stories([story("S-1")], story_ac_count={"S-1": 20})
         self.assertFalse(r.passed)
-        self.assertTrue(any("chẻ nhỏ" in e for e in r.errors))
+        self.assertTrue(any("split" in e for e in r.errors))
 
     def test_ac_limit_respects_config(self):
         cfg = Config({**DEFAULTS, "story.max_acceptance_criteria": 30})
@@ -111,7 +111,7 @@ class TestStoryGate(unittest.TestCase):
         wide = tuple(f"src/{i}.py" for i in range(20))
         r = check_stories([story("S-1", scope=wide)])
         self.assertFalse(r.passed)
-        self.assertTrue(any("quá nhiều nơi" in e for e in r.errors))
+        self.assertTrue(any("too many" in e for e in r.errors))
 
 
 class TestTraceability(unittest.TestCase):
@@ -141,7 +141,7 @@ class TestTraceability(unittest.TestCase):
             [story("S-1")], self.prd(), story_fr_map={"S-1": ["FR-1", "FR-2", "FR-3"]}
         )
         self.assertFalse(r.passed)
-        self.assertTrue(any("bị câu hỏi mở chặn" in e for e in r.errors))
+        self.assertTrue(any("blocked by open questions" in e for e in r.errors))
 
     def test_unknown_requirement_reference_warns(self):
         r = check_stories(
@@ -156,7 +156,7 @@ class TestCombine(unittest.TestCase):
         b = check_stories([])
         combined = check_all([a, b])
         self.assertFalse(combined.passed)
-        self.assertTrue(all(e.startswith("[cổng máy") for e in combined.errors))
+        self.assertTrue(all(e.startswith("[machine gate") for e in combined.errors))
 
     def test_all_passing_combines_to_pass(self):
         prd = PRD(requirements=[req("FR-1")])
@@ -190,7 +190,7 @@ class TestChuoiHoanToan(unittest.TestCase):
         ]
         r = check_stories(stories)
         self.assertTrue(r.passed, r.errors)
-        self.assertTrue(any("xâu thành chuỗi" in w for w in r.warnings))
+        self.assertTrue(any("fully serialized" in w for w in r.warnings))
         self.assertTrue(any("EPIC-01" in w for w in r.warnings))
 
     def test_khong_canh_bao_khi_co_story_song_song(self):
@@ -201,13 +201,13 @@ class TestChuoiHoanToan(unittest.TestCase):
             self.st("S-4", ["S-2", "S-3"], scope=("src/d.py",)),
         ]
         r = check_stories(stories)
-        self.assertFalse(any("xâu thành chuỗi" in w for w in r.warnings))
+        self.assertFalse(any("fully serialized" in w for w in r.warnings))
 
     def test_epic_qua_nho_thi_khong_ket_luan(self):
         """Hai story nối nhau không nói lên gì về thói quen lập kế hoạch."""
         stories = [self.st("S-1"), self.st("S-2", ["S-1"], scope=("src/b.py",))]
         r = check_stories(stories)
-        self.assertFalse(any("xâu thành chuỗi" in w for w in r.warnings))
+        self.assertFalse(any("fully serialized" in w for w in r.warnings))
 
     def test_theo_tung_epic_khong_phai_ca_tap(self):
         """Epic chạy tuần tự với nhau; song song chỉ có nghĩa **trong** một
@@ -221,7 +221,7 @@ class TestChuoiHoanToan(unittest.TestCase):
             self.st("T-3", ["T-1"], epic="EPIC-02", scope=("api/c.py",)),
         ]
         r = check_stories(stories)
-        canh = [w for w in r.warnings if "xâu thành chuỗi" in w]
+        canh = [w for w in r.warnings if "fully serialized" in w]
         self.assertEqual(len(canh), 1)
         self.assertIn("EPIC-01", canh[0])
         self.assertNotIn("EPIC-02", canh[0])

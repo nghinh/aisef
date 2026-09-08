@@ -100,7 +100,7 @@ class TestBuiltin(ImpactTestCase):
         self.write("src/rong.ts", "const cucBo = 1\n")
         r = builtin(self.p, ["src/rong.ts"])
         self.assertTrue(r.empty)
-        self.assertIn("không thấy tên xuất khẩu", r.note)
+        self.assertIn("no exported names", r.note)
 
     def test_luon_bao_la_tho(self):
         """Dò theo tên trùng là dính, gọi động không thấy — người đọc phải
@@ -180,7 +180,7 @@ class TestProviderNgoai(ImpactTestCase):
         self.write("src/main.ts", "export function motHam() { return 1 }\n")
         r = analyse(self.p, ["src/main.ts"], command="khong-co-lenh-nay --json")
         self.assertTrue(r.degraded)
-        self.assertIn("chạy hỏng", r.note)
+        self.assertIn("failed", r.note)
         self.assertIn("motHam", r.changed_symbols)
 
     def test_json_hong_cung_lui_ve(self):
@@ -197,19 +197,19 @@ class TestProviderNgoai(ImpactTestCase):
 
 class TestPrompt(ImpactTestCase):
     def test_rong_thi_noi_la_chua_cau_hinh_khong_im_lang(self):
-        self.assertIn("Chưa có phân tích ảnh hưởng", ImpactReport().as_prompt())
+        self.assertIn("No impact analysis available", ImpactReport().as_prompt())
 
     def test_noi_ro_nguon_va_gioi_han(self):
         r = ImpactReport(changed_symbols=["a"], source="thử", degraded=True)
         out = r.as_prompt()
         self.assertIn("thử", out)
-        self.assertIn("thô", out)
-        self.assertIn("không phải chân lý", out)
+        self.assertIn("rough", out)
+        self.assertIn("not ground truth", out)
 
     def test_cat_bot_khi_qua_dai(self):
         r = ImpactReport(callers=[f"f{i}.ts" for i in range(40)], source="x")
         out = r.as_prompt()
-        self.assertIn("còn 28", out)
+        self.assertIn("28 more", out)
 
     def test_khong_co_in_dam_long_nhau(self):
         r = ImpactReport(untested_symbols=["a"], source="x")

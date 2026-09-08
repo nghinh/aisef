@@ -81,7 +81,7 @@ class TestReplayDungVerdictCu(ReplayCase):
         self.assertEqual(r.recorded, ["lint"])
         self.assertEqual(r.now, ["lint"])
         self.assertEqual(r.changed(), [])
-        self.assertIn("không — cùng mục chặn", r.summary())
+        self.assertIn("none — same blocking checks", r.summary())
 
     def test_luot_dat_cung_replay_dat(self):
         self.luot(1)
@@ -101,8 +101,8 @@ class TestReplayDungVerdictCu(ReplayCase):
     def test_security_dung_lai_tu_dong_da_ghi(self):
         self.luot(1, security={"findings": ["[high] SQL nối chuỗi ở src/a.py:3"], "error": ""})
         [r] = R.replay(self.evidence())
-        self.assertIn("bảo mật", r.now)
-        self.assertEqual(r.recorded, ["bảo mật"])
+        self.assertIn("security", r.now)
+        self.assertEqual(r.recorded, ["security"])
 
 
 class TestReplayThayLuatDoi(ReplayCase):
@@ -113,17 +113,17 @@ class TestReplayThayLuatDoi(ReplayCase):
 
         def luat_moi(story_id, evidence, **kw):
             g = evaluate(story_id, evidence, **kw)
-            g.checks = [Check("rà soát", False, "luật mới") if c.name == "rà soát" else c
+            g.checks = [Check("review", False, "luật mới") if c.name == "review" else c
                         for c in g.checks]
             return g
 
         with mock.patch.object(R, "evaluate", luat_moi):
             [r] = R.replay(self.evidence())
-        self.assertEqual(r.changed(), ["rà soát"])
+        self.assertEqual(r.changed(), ["review"])
         self.assertEqual(r.recorded, [])
-        self.assertIn("rà soát", r.now)
+        self.assertIn("review", r.now)
         rows = {name: (truoc, nay) for name, truoc, nay in r.rows()}
-        self.assertEqual(rows["rà soát"], ("·", Outcome.FAILED.mark))
+        self.assertEqual(rows["review"], ("·", Outcome.FAILED.mark))
         self.assertIn("≠", r.summary())
 
     def test_luat_noi_ra_thi_diff_chi_muc_het_chan(self):
@@ -159,18 +159,18 @@ class TestLenhGateReplay(ReplayCase):
         self.luot(1, lint_ok=False)
         code, out, _ = self.run_cli("gate", "--replay", SID)
         self.assertEqual(code, EXIT_OK, out)
-        self.assertIn("không gọi model", out)
+        self.assertIn("no model calls", out)
         self.assertIn("lint", out)
-        self.assertIn("replay được 1/1 lượt", out)
+        self.assertIn("replayed 1/1 attempts", out)
 
     def test_luot_truoc_v4_thi_noi_khong_replay_duoc(self):
         self.store.record(SID, Event(kind=NOTE, name="gate:verdict", ok=True,
                                      detail={"failures": [], "attempt": 1}))
         code, out, _ = self.run_cli("gate", "--replay", SID)
         self.assertEqual(code, EXIT_NOT_READY)
-        self.assertIn("không replay được", out)
+        self.assertIn("not replayable", out)
         self.assertIn("gate:input", out)
-        self.assertIn("replay được 0/1 lượt", out)
+        self.assertIn("replayed 0/1 attempts", out)
 
     def test_all_gom_moi_story(self):
         self.luot(1)
@@ -178,9 +178,9 @@ class TestLenhGateReplay(ReplayCase):
             kind=NOTE, name="gate:verdict", ok=True, detail={"failures": [], "attempt": 1}))
         code, out, _ = self.run_cli("gate", "--replay", "--all")
         self.assertEqual(code, EXIT_OK)
-        self.assertIn("STORY-01-01 lượt 1", out)
-        self.assertIn("STORY-01-02 lượt 1: không replay được", out)
-        self.assertIn("replay được 1/2 lượt", out)
+        self.assertIn("STORY-01-01 attempt 1", out)
+        self.assertIn("STORY-01-02 attempt 1: not replayable", out)
+        self.assertIn("replayed 1/2 attempts", out)
 
     def test_thieu_story_va_thieu_replay_la_loi_dung(self):
         self.assertEqual(self.run_cli("gate", "--replay")[0], EXIT_USAGE)

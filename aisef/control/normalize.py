@@ -31,14 +31,24 @@ _FR_HEADING = re.compile(r"^#{2,5}\s+(FR-\d+)\s*[:：]\s*(.+?)\s*$", re.MULTILIN
 _NFR_ITEM = re.compile(
     r"^[-*]\s+\*\*(NFR-\d+)\s*[—–-]\s*(.+?)\.?\*\*\s*(.*)$", re.MULTILINE
 )
+#: Section heading for NFR block — Vietnamese or English.
+#: Used as fallback: auto-number unlabelled bullets when the heading is present
+#: but the agent omitted NFR-N IDs.
+_NFR_SECTION = re.compile(
+    r"^#{2,5}\s+(?:Yêu cầu phi chức năng|Non-?functional\s+Requirements?)"
+    r"\s*$",
+    re.MULTILINE | re.IGNORECASE,
+)
+_PLAIN_BULLET = re.compile(r"^[-*]\s+(.+?)\s*$", re.MULTILINE)
 
 #: Tiêu đề khối tiêu chí — agent viết bằng tiếng Anh hoặc tiếng Việt tuỳ lượt
 #: (lỗi 19, 2026-09-05: lượt `plan` thứ hai viết "Hệ quả kiểm chứng được" và
 #: cổng PRD loại cả 14 FR vì parser chỉ biết "Consequences (testable)").
 _CONSEQUENCES_HEAD = (
     r"(?:Consequences\s*\(testable\)|Testable consequences|Acceptance criteria"
-    r"|Hệ quả kiểm chứng được|Hệ quả \(kiểm chứng được\)|Tiêu chí kiểm chứng(?: được)?"
-    r"|Tiêu chí chấp nhận)"
+    r"|Verification criteria|Verifiable consequences"
+    r"|Hệ quả(?: kiểm chứng(?:\s+được)?|\s*\((?:kiểm chứng được|có thể kiểm chứng)\))"
+    r"|Tiêu chí(?:\s+(?:kiểm chứng(?:\s+được)?|chấp nhận|xác nhận|nghiệm thu|kiểm tra)))"
 )
 _CONSEQUENCES = re.compile(
     r"\*\*" + _CONSEQUENCES_HEAD + r"\s*[:：]\*\*\s*\n(.*?)(?=\n#{2,5}\s|\n\*\*|\Z)",
@@ -316,6 +326,29 @@ def parse_prd(text: str) -> PRD:
             )
         )
 
+    # Fallback: agent wrote NFR section but omitted NFR-N IDs — auto-number.
+    if not prd.non_functional():
+        sec = _NFR_SECTION.search(text)
+        if sec:
+            after = text[sec.end():]
+            end = re.search(r"\n#{2,5}\s", after)
+            block = after[: end.start()] if end else after
+            for i, bm in enumerate(_PLAIN_BULLET.finditer(block), start=1):
+                line = bm.group(1).strip()
+                if not line or line.startswith("#"):
+                    break
+                parts = re.split(r"[—–-]\s+", line, maxsplit=1)
+                title = parts[0].strip().strip("*").strip()
+                desc = parts[1].strip() if len(parts) > 1 else ""
+                prd.requirements.append(
+                    Requirement(
+                        id=f"NFR-{i}",
+                        kind="non_functional",
+                        title=title,
+                        description=desc[:600],
+                    )
+                )
+
     seen_assumptions: set[str] = set()
     for m in _ASSUMPTION.finditer(text):
         a = " ".join(m.group(1).split())
@@ -356,7 +389,8 @@ _STORY_HEADING = re.compile(
 #: khác — nhưng *không* ở `**When**`/`**Then**`/`**And**`, vốn là thân của
 #: chính tiêu chí. Cắt nhầm ở đó thì mỗi story chỉ còn một tiêu chí cụt.
 _AC_BLOCK = re.compile(
-    r"\*\*Acceptance Criteria\s*[:：]?\*\*\s*\n(.*?)"
+    r"\*\*(?:Acceptance Criteria|Tiêu chí chấp nhận|Tiêu chí kiểm chứng"
+    r"|Tiêu chí nghiệm thu)\s*[:：]?\*\*\s*\n(.*?)"
     r"(?=\n#{2,4}\s|\n\s*\*\*(?!Given|When|Then|And)[^\n*]+\*\*\s*[:：]?\s*\n|\Z)",
     re.DOTALL,
 )
@@ -533,7 +567,7 @@ def _parse_coverage_map(text: str) -> dict[str, list[str]]:
     Mỗi dòng có ít nhất một mã FR và một số hiệu story thì tính là một
     dòng ánh xạ; không ép khuôn bảng, vì model trình bày mỗi lúc một khác.
     """
-    m = re.search(r"^#{2,4}\s+FR Coverage Map\s*$", text, re.MULTILINE)
+    m = re.search(r"^#{2,4}\s+(?:FR Coverage Map|Bản đồ phủ FR)\s*$", text, re.MULTILINE)
     if not m:
         return {}
     section = text[m.end():]
@@ -642,9 +676,9 @@ class Decision:
     def as_prompt(self) -> str:
         parts = [f"**{self.id} — {self.title}**"]
         if self.rule:
-            parts.append(f"Luật: {self.rule}")
+            parts.append(f"Rule: {self.rule}")
         if self.prevents:
-            parts.append(f"Ngăn: {self.prevents}")
+            parts.append(f"Prevents: {self.prevents}")
         return "\n".join(parts)
 
 

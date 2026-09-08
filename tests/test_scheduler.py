@@ -190,8 +190,8 @@ class TestEpicPlanning(unittest.TestCase):
             story("B", deps=("A",), scope=("src/b.py",)),
         ]
         text = describe(plan_epics(stories))
-        self.assertIn("đợt 1: A", text)
-        self.assertIn("đợt 2: B", text)
+        self.assertIn("wave 1: A", text)
+        self.assertIn("wave 2: B", text)
 
 
 if __name__ == "__main__":

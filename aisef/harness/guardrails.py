@@ -93,8 +93,8 @@ def check_write_scope(file_path: str, scope: list[str], *, project_root: str = "
     if not scope:
         return Verdict(
             False,
-            f"story chưa khai write_scope nên không được ghi {file_path}. "
-            f"Bổ sung write_scope vào story rồi chạy lại.",
+            f"story has not declared write_scope so writing {file_path} is not allowed. "
+            f"Add write_scope to the story and retry.",
         )
 
     rel = str(file_path)
@@ -104,17 +104,17 @@ def check_write_scope(file_path: str, scope: list[str], *, project_root: str = "
         except ValueError:
             return Verdict(
                 False,
-                f"{file_path} nằm ngoài thư mục dự án. Story chỉ được ghi trong "
-                f"write_scope của nó: {', '.join(scope)}",
+                f"{file_path} is outside the project directory. Story may only write within "
+                f"its write_scope: {', '.join(scope)}",
             )
 
     if any(_within(rel, s) for s in scope):
         return ALLOW
     return Verdict(
         False,
-        f"{rel} nằm ngoài write_scope của story ({', '.join(scope)}). "
-        f"Nếu story thật sự cần chạm chỗ này thì dừng lại và báo — nhiều khả "
-        f"năng phạm vi khai thiếu hoặc story bị chẻ sai.",
+        f"{rel} is outside the story's write_scope ({', '.join(scope)}). "
+        f"If the story truly needs to touch this, stop and report — most likely "
+        f"the scope is incomplete or the story was split incorrectly.",
     )
 
 
@@ -123,18 +123,18 @@ def check_write_scope(file_path: str, scope: list[str], *, project_root: str = "
 #: Mẫu bí mật. Nhắm vào những thứ có hình dạng đặc trưng, không đoán mò —
 #: một chuỗi ngẫu nhiên dài chưa chắc là khoá, nhưng `sk-ant-...` thì chắc.
 SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
-    ("khoá API Anthropic", re.compile(r"sk-ant-[A-Za-z0-9_\-]{20,}")),
-    ("khoá API OpenAI", re.compile(r"\bsk-[A-Za-z0-9]{32,}")),
-    ("khoá truy cập AWS", re.compile(r"\b(AKIA|ASIA)[0-9A-Z]{16}\b")),
+    ("Anthropic API key", re.compile(r"sk-ant-[A-Za-z0-9_\-]{20,}")),
+    ("OpenAI API key", re.compile(r"\bsk-[A-Za-z0-9]{32,}")),
+    ("AWS access key", re.compile(r"\b(AKIA|ASIA)[0-9A-Z]{16}\b")),
     ("token GitHub", re.compile(r"\bgh[pousr]_[A-Za-z0-9]{30,}")),
-    ("khoá riêng tư", re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----")),
+    ("private key", re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----")),
     ("token Slack", re.compile(r"\bxox[baprs]-[A-Za-z0-9\-]{10,}")),
     # Hai mẫu thêm cho ADR-005 V1: khoá bí mật AWS (đúng 40 ký tự base64) và
     # token Bearer — hai thứ hay lọt vào stdout của test tích hợp chứ không
     # vào mã nguồn, nên bộ mẫu cũ (nhắm mã nguồn) chưa từng cần.
-    ("khoá bí mật AWS", re.compile(r"\bAWS_SECRET_ACCESS_KEY\s*[=:]\s*['\"]?[A-Za-z0-9/+=]{40}\b")),
+    ("AWS secret key", re.compile(r"\bAWS_SECRET_ACCESS_KEY\s*[=:]\s*['\"]?[A-Za-z0-9/+=]{40}\b")),
     ("token Bearer", re.compile(r"\bBearer\s+[A-Za-z0-9._\-]{20,}")),
-    ("gán mật khẩu", re.compile(
+    ("password assignment", re.compile(
         r"(?i)\b(password|passwd|pwd|pw|secret|api[_-]?key|access[_-]?token)\s*[=:]\s*"
         r"['\"][^'\"\s{}$]{8,}['\"]"
     )),
@@ -165,8 +165,8 @@ def check_secrets(content: str) -> Verdict:
             if pattern.search(line):
                 return Verdict(
                     False,
-                    f"dòng {line_no} có vẻ chứa {label}. Đọc từ biến môi trường "
-                    f"hoặc kho bí mật, đừng viết thẳng vào mã nguồn.",
+                    f"line {line_no} appears to contain {label}. Read from environment variables "
+                    f"or a secret store, do not write directly into source code.",
                 )
     return ALLOW
 
@@ -227,8 +227,8 @@ def check_git_stage(command: str) -> Verdict:
         return ALLOW
     return Verdict(
         False,
-        "không dùng `git add -A` hay `git add .`. Chỉ stage đúng đường dẫn "
-        "story này chạm, ví dụ: git add src/api/users.py tests/test_users.py",
+        "do not use `git add -A` or `git add .`. Only stage paths this "
+        "story touches, e.g.: git add src/api/users.py tests/test_users.py",
     )
 
 
@@ -240,8 +240,8 @@ def check_destructive(command: str) -> Verdict:
         if pattern.search(command):
             return Verdict(
                 False,
-                f"lệnh phá huỷ bị chặn ({label}). Nếu thật sự cần, dừng lại "
-                f"và báo người — đừng tự chạy.",
+                f"destructive command blocked ({label}). If truly needed, stop "
+                f"and report to a human — do not run it yourself.",
             )
     return ALLOW
 
@@ -325,8 +325,8 @@ def check_process_refs(content: str, path: str, *, project_root: str = "") -> Ve
         return ALLOW
     return Verdict(
         False,
-        f"luật 6: mã quy trình `{hit.group(0)}` trong mã nguồn ({rel}). Comment giải thích "
-        f"*vì sao*, không phải *việc này thuộc phiếu nào* — bỏ số hiệu ra khỏi nguồn.",
+        f"rule 6: process reference `{hit.group(0)}` in source code ({rel}). Comments should explain "
+        f"*why*, not *which ticket this belongs to* — remove the reference from source.",
     )
 
 
@@ -339,8 +339,8 @@ def check_injection(content: str) -> Verdict:
             line_no = content[: m.start()].count("\n") + 1
             return Verdict(
                 False,
-                f"dòng {line_no}: {label}. Dùng tham số hoá / API an toàn thay "
-                f"vì ghép chuỗi.",
+                f"line {line_no}: {label}. Use parameterization / safe API instead "
+                f"of string concatenation.",
             )
     return ALLOW
 
@@ -365,7 +365,7 @@ def check_diff_scope(changed: list[str], scope: list[str]) -> Verdict:
     if not scope:
         return Verdict(
             False,
-            f"story chưa khai write_scope nhưng đã đổi {len(changed)} file: "
+            f"story has not declared write_scope but {len(changed)} files changed: "
             f"{', '.join(changed[:5])}",
         )
 
@@ -374,9 +374,9 @@ def check_diff_scope(changed: list[str], scope: list[str]) -> Verdict:
         return ALLOW
     return Verdict(
         False,
-        f"{len(outside)} file bị đổi ngoài write_scope ({', '.join(scope)}): "
-        f"{', '.join(outside[:5])}. Hoàn nguyên chúng, hoặc dừng lại và báo "
-        f"rằng phạm vi story khai thiếu.",
+        f"{len(outside)} files changed outside write_scope ({', '.join(scope)}): "
+        f"{', '.join(outside[:5])}. Revert them, or stop and report "
+        f"that the story's scope is incomplete.",
     )
 
 
@@ -538,9 +538,9 @@ def check_completion(evidence) -> Verdict:
 
         return Verdict(
             False,
-            f"chưa có lần chạy test nào cho story này. Chạy `{aisef_command()} "
-            f"tool test` rồi mới kết thúc — bằng chứng nằm ở kết quả chạy, "
-            f"không ở lời kể.",
+            f"no test run recorded for this story. Run `{aisef_command()} "
+            f"tool test` before finishing — evidence is in the run result, "
+            f"not in claims.",
         )
     if last.detail.get("unrunnable"):
         # Không chạy được ≠ đỏ: agent không sửa được môi trường/lệnh test
@@ -557,7 +557,7 @@ def check_completion(evidence) -> Verdict:
         tail = str(last.detail.get("tail") or "")[:400]
         return Verdict(
             False,
-            "lần chạy test gần nhất còn đỏ, chưa được kết thúc story.\n" + tail,
+            "the most recent test run is still failing, the story cannot be finished.\n" + tail,
         )
 
     stale = evidence.stale_since_last_test()
@@ -566,9 +566,9 @@ def check_completion(evidence) -> Verdict:
 
         return Verdict(
             False,
-            f"{len(stale)} file đã sửa sau lần chạy test gần nhất "
-            f"({', '.join(stale[:5])}). Chạy lại `{aisef_command()} tool test` "
-            f"rồi mới kết thúc.",
+            f"{len(stale)} files changed since the most recent test run "
+            f"({', '.join(stale[:5])}). Re-run `{aisef_command()} tool test` "
+            f"before finishing.",
         )
     return ALLOW
 
@@ -603,8 +603,8 @@ def check_role_tool(tool_name: str, disallowed: list[str]) -> Verdict:
         return ALLOW
     return Verdict(
         False,
-        f"vai này không được dùng tool {tool_name} — nó rà soát, không sửa. "
-        f"Báo cáo phát hiện thay vì tự chữa.",
+        f"this role is not allowed to use tool {tool_name} — it reviews, not edits. "
+        f"Report findings instead of fixing them yourself.",
     )
 
 
@@ -660,9 +660,9 @@ def check_egress(tool_name: str, tool_input: dict, allow_hosts: list[str]) -> Ve
         if not _host_matches(h, allow_hosts):
             return Verdict(
                 False,
-                f"host {h} không nằm trong danh sách được phép "
-                f"(sandbox.allow_hosts). Thêm nó vào .ai/config.json nếu "
-                f"dự án cần kết nối tới host này.",
+                f"host {h} is not in the allowed list "
+                f"(sandbox.allow_hosts). Add it to .ai/config.json if "
+                f"the project needs to connect to this host.",
             )
     return ALLOW
 
@@ -717,9 +717,9 @@ def _escaped_workdir(tool_input: dict, root: str) -> Verdict | None:
         return None
     return Verdict(
         False,
-        f"lệnh tự chỉ định thư mục {wd}, nằm ngoài cây đang làm việc ({root}). "
-        f"Story chỉ được làm việc trong worktree của nó — công việc đặt ra "
-        f"ngoài không qua cổng nào cả. Bỏ tham số thư mục đi và chạy lại.",
+        f"command specifies directory {wd}, outside the working tree ({root}). "
+        f"Story may only work within its worktree — work placed outside "
+        f"bypasses all gates. Remove the directory parameter and retry.",
     )
 
 
@@ -802,7 +802,7 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
         from .observe import EvidenceStore
 
         return check_completion(EvidenceStore(artifact_root).read(story))
-    raise ValueError(f"guard không tồn tại: {kind}")
+    raise ValueError(f"guard does not exist: {kind}")
 
 
 def record_outcome(

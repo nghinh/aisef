@@ -60,13 +60,13 @@ def search(package: str, *, fetch=None) -> list[dict]:
     try:
         data = json.loads(raw)
     except ValueError as e:
-        raise DocError(f"context7 trả về không phải JSON: {e}") from e
+        raise DocError(f"context7 returned non-JSON: {e}") from e
     return list(data.get("results") or [])
 
 
 def _pick(package: str, results: list[dict]) -> dict:
     if not results:
-        raise DocError(f"không tìm thấy tài liệu cho `{package}`")
+        raise DocError(f"no documentation found for `{package}`")
     p = package.lower()
     for r in results:  # ưu tiên khớp tên đúng
         rid = str(r.get("id", "")).lower()
@@ -91,7 +91,7 @@ def lookup(package: str, topic: str = "", *, tokens: int = DEFAULT_TOKENS, fetch
         q["topic"] = topic
     text = _get(f"{API}{lib}?{urllib.parse.urlencode(q)}", fetch)
     if not text.strip():
-        raise DocError(f"context7 không có nội dung cho `{lib}` (chủ đề: {topic or 'tất cả'})")
+        raise DocError(f"context7 has no content for `{lib}` (topic: {topic or 'all'})")
     root.mkdir(parents=True, exist_ok=True)
     cached.write_text(json.dumps({"library": lib, "title": str(hit.get("title", "")), "topic": topic,
                                   "text": text}, ensure_ascii=False), encoding="utf-8")

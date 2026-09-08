@@ -88,9 +88,9 @@ class Loop:
 
     def line(self) -> str:
         return (
-            f"loop-{self.n} · {self.story_id} sửa {self.behavior} · "
-            f"{'XONG' if self.done else 'CHƯA XONG'} · ${self.cost_usd:.2f} · "
-            f"V{self.d_verified:+d} R{self.d_reopened:+d} · gap thuộc epic "
+            f"loop-{self.n} · {self.story_id} fixes {self.behavior} · "
+            f"{'DONE' if self.done else 'NOT DONE'} · ${self.cost_usd:.2f} · "
+            f"V{self.d_verified:+d} R{self.d_reopened:+d} · epic gaps "
             f"{len(self.before['gaps'])}→{len(self.after.get('gaps', []))}"
         )
 
@@ -114,16 +114,16 @@ class ImproveReport:
 
     def summary(self) -> str:
         if self.error:
-            return f"cải tiến {self.epic}: ✗ {self.error}"
-        lines = [f"cải tiến {self.epic}: {len(self.loops)} vòng lần này, ${self.cost_usd:.2f}"]
+            return f"improve {self.epic}: ✗ {self.error}"
+        lines = [f"improve {self.epic}: {len(self.loops)} round(s) this run, ${self.cost_usd:.2f}"]
         lines += [f"↺ {r.line()}" for r in self.reconciled]
         lines += [f"  {lo.line()}" for lo in self.loops]
         for lo in self.loops:
             if lo.report_path:
-                lines.append(f"  báo cáo: {lo.report_path}")
-        lines.append(f"⏸ dừng: {self.stopped}")
+                lines.append(f"  report: {lo.report_path}")
+        lines.append(f"⏸ stop: {self.stopped}")
         if self.gaps_left:
-            lines.append(f"  còn {len(self.gaps_left)} gap thuộc epic: "
+            lines.append(f"  {len(self.gaps_left)} epic gap(s) remaining: "
                          + ", ".join(self.gaps_left[:5]))
         return "\n".join(lines)
 
@@ -194,13 +194,13 @@ def _describe(b: Behavior, owner: Story) -> str:
     if b.kind == "ac":
         i = int(b.id.rsplit("-", 1)[1])
         text = owner.acceptance_criteria[i - 1] if 0 < i <= len(owner.acceptance_criteria) \
-            else f"tiêu chí {i} của {owner.id}"
-        return f"{b.id} xanh lại: {text}"
+            else f"criterion {i} of {owner.id}"
+        return f"{b.id} green again: {text}"
     if b.kind in ("fr", "nfr"):
-        return f"{b.id} xanh: mọi tiêu chí của {owner.id} phủ yêu cầu này xanh"
+        return f"{b.id} green: all criteria of {owner.id} covering this requirement pass"
     if b.kind == "qa":
-        return f"{b.id} xanh: aisef qa --only {b.id.split(':', 1)[1]} đạt ở HEAD"
-    return f"{b.id} xanh: màn hình {b.id.split(':', 1)[1]} khớp hợp đồng thị giác"
+        return f"{b.id} green: aisef qa --only {b.id.split(':', 1)[1]} passes at HEAD"
+    return f"{b.id} green: screen {b.id.split(':', 1)[1]} matches visual contract"
 
 
 def _contract(b: Behavior, owner: Story) -> tuple[list[str], list[str]]:
@@ -217,40 +217,40 @@ def _contract(b: Behavior, owner: Story) -> tuple[list[str], list[str]]:
 def _source_line(b: Behavior) -> str:
     src = b.source or {}
     parts = [f"{k}: `{v}`" for k, v in src.items() if k != "tests" and v]
-    return "; ".join(parts) or "(sổ không ghi nguồn)"
+    return "; ".join(parts) or "(ledger has no source)"
 
 
 def _body(b: Behavior, owner: Story, story: Story, preservation: list[str], loop: int) -> str:
     ac = f"AC-{story.id}-1"
     out = [
         "",
-        "## Sửa hành vi (vòng cải tiến `loop-%d`, ADR-004 R3)" % loop,
+        "## Fix behavior (improvement loop `loop-%d`, ADR-004 R3)" % loop,
         "",
-        f"- Hành vi: `{b.id}` — trạng thái **{b.status}** trong sổ, thuộc {owner.id}"
-        + (f" (hồi quy do {b.regressed_by})" if b.regressed_by else ""),
-        f"- Nguồn: {_source_line(b)}",
-        f"- Lịch sử: `aisef evidence {b.id}`",
+        f"- Behavior: `{b.id}` — status **{b.status}** in ledger, belongs to {owner.id}"
+        + (f" (regression by {b.regressed_by})" if b.regressed_by else ""),
+        f"- Source: {_source_line(b)}",
+        f"- History: `aisef evidence {b.id}`",
         "",
-        f"Test chứng minh hành vi này phải mang **cả** mã của story này "
-        f"(`{ac}`) **và** mã gốc `{b.id}`: sổ hành vi khớp lại theo mã gốc, "
-        f"cổng story chấm theo mã mới. Sửa **dự án**, không sửa harness hay tiêu chí.",
+        f"The test proving this behavior must carry **both** this story's tag "
+        f"(`{ac}`) **and** the original tag `{b.id}`: the ledger reconciles by the original tag, "
+        f"the story gate scores by the new tag. Fix the **project**, not the harness or criteria.",
         "",
-        "Test ấy phải **mới và mang mã**: đỏ khi bỏ phần cài đặt của story này — "
-        "cổng \"test có kiểm được story\" chạy đối chứng nop (ADR-005 V3) và chấm ✗ "
-        "nếu test đã xanh ở baseline. **Không** gắn mã vào test có sẵn, không đổi "
-        "tên test có sẵn để mang mã. Nếu hành vi này đã được một test có sẵn chứng "
-        "minh đầy đủ và chỉ thiếu mã truy vết: **không sửa mã**, ghi trong tóm tắt "
-        "`truy vết: <test id> — <vì sao đủ>`; người rà soát trả `[bế tắc] truy vết: "
-        "<test id>`. Harness xử lý việc ấy như sửa siêu dữ liệu (`aisef evidence "
-        f"{b.id} --link \"<test id>\" --why ...`), không giả thành cải tiến chức năng.",
+        "The test must be **new and tagged**: red when this story's implementation is removed — "
+        "the \"does the test check the story\" gate runs a nop control (ADR-005 V3) and scores ✗ "
+        "if the test is already green at baseline. Do **not** add tags to existing tests, do not "
+        "rename existing tests to carry tags. If this behavior is already fully proven by an "
+        "existing test and only lacks a trace tag: **do not change code**, write in the summary "
+        "`trace: <test id> — <why sufficient>`; the reviewer returns `[stuck] trace: "
+        "<test id>`. The harness handles this as a metadata fix (`aisef evidence "
+        f"{b.id} --link \"<test id>\" --why ...`), not as a functional improvement.",
         "",
     ]
     if preservation:
         out += [
-            "## Bảo toàn",
+            "## Preservation",
             "",
-            "Hành vi đã VERIFIED của story khác nằm trong phạm vi ghi — sửa xong "
-            "chúng vẫn phải xanh (cổng bảo toàn, ADR-004 R4):",
+            "VERIFIED behaviors of other stories within write scope — after the fix "
+            "they must still be green (preservation gate, ADR-004 R4):",
             "",
             *[f"- `{bid}`" for bid in preservation],
             "",
@@ -299,7 +299,7 @@ def repair_story(
     sid = _pick_id(root, state, b.id)
     story = Story(
         id=sid, epic_id=repair_epic(epic_id),
-        title=f"Sửa {b.id} ({b.status}) của {owner.id}"[:80],
+        title=f"Fix {b.id} ({b.status}) of {owner.id}"[:80],
         acceptance_criteria=[_describe(b, owner)],
         covers=list(owner.covers), write_scope=scope, depends_on=[],
         screens=screens, verification_contract=kinds,
@@ -308,7 +308,7 @@ def repair_story(
         story, led.as_dict(), complexity.read_scopes(project))
     return register_story(
         root, story,
-        epic_title=f"Sửa hành vi theo sổ — {epic_id}",
+        epic_title=f"Fix behavior per ledger — {epic_id}",
         extra={"repair_of": b.id, "loop": f"loop-{loop}", "preservation": preservation,
                "source": dict(b.source or {})},
         body=_body(b, owner, story, preservation, loop),
@@ -356,57 +356,57 @@ def stop_reason(
     ngoài hàng đợi tự động — nêu tên khi dừng để không ai đọc "hết gap"."""
     if not gaps:
         if outside:
-            return (f"không còn gap có verifier cụ thể thuộc epic — còn {len(outside)} gap "
-                    f"cấp dự án ngoài hàng đợi tự động: {', '.join(b.id for b in outside[:5])}"
-                    " (chạy `aisef qa`)")
-        return "không còn GAP/REOPENED thuộc epic"
+            return (f"no gap with specific verifier remaining in epic — {len(outside)} project-level "
+                    f"gap(s) outside auto-repair queue: {', '.join(b.id for b in outside[:5])}"
+                    " (run `aisef qa`)")
+        return "no GAP/REOPENED remaining in epic"
     if last is not None and last.stuck:
-        return f"bế tắc kế hoạch ở {last.story_id} — trả người: {last.stuck}"
+        return f"plan stuck at {last.story_id} — returning to human: {last.stuck}"
     rows = _epic_rows(led, epic_id)
     if len(rows) >= max_loops:
-        return f"đủ improve.max_loops = {max_loops} ({len(rows)} vòng đã chạy cho epic)"
+        return f"reached improve.max_loops = {max_loops} ({len(rows)} round(s) ran for epic)"
     tail = rows[-flat_loops:]
     if len(tail) >= flat_loops and all(r["d_verified"] - r["d_reopened"] <= 0 for r in tail):
-        return (f"cải thiện biên ≤ 0 trong {flat_loops} vòng liền "
+        return (f"marginal improvement ≤ 0 for {flat_loops} consecutive round(s) "
                 f"({', '.join(r['n'] for r in tail)})")
     spent = sum(float(r.get("cost_usd") or 0.0) for r in rows)
     if cost_cap and spent > cost_cap:
-        return f"vượt improve.cost_cap_usd = ${cost_cap:.2f} (đã tiêu ${spent:.2f})"
+        return f"exceeded improve.cost_cap_usd = ${cost_cap:.2f} (spent ${spent:.2f})"
     if rows and not auto and approvals.status(Gate.IMPROVE) is not Status.APPROVED:
-        return ("chờ người duyệt cổng `improve` trước vòng %d: aisef review improve · "
-                "aisef approve improve (hoặc --auto)" % (len(rows) + 1))
+        return ("awaiting human approval of `improve` gate before round %d: aisef review improve · "
+                "aisef approve improve (or --auto)" % (len(rows) + 1))
     return ""
 
 
 def _write_report(root: Path, epic_id: str, lo: Loop, decision: str, spent: float) -> Path:
     b, a = lo.before, lo.after
     lines = [
-        f"# Vòng cải tiến loop-{lo.n} — {epic_id} (vòng {lo.epic_loop} của epic)",
+        f"# Improvement loop-{lo.n} — {epic_id} (round {lo.epic_loop} of epic)",
         "",
-        f"- Story sửa: **{lo.story_id}** — hành vi `{lo.behavior}` — "
-        f"{'XONG' if lo.done else 'CHƯA XONG'}",
-        f"- Chi phí vòng: ${lo.cost_usd:.2f} (bằng chứng story sửa) · tổng epic: ${spent:.2f}",
-        f"- Hành vi thuộc epic: VERIFIED {b['epic_verified']}→{a['epic_verified']} · "
+        f"- Repair story: **{lo.story_id}** — behavior `{lo.behavior}` — "
+        f"{'DONE' if lo.done else 'NOT DONE'}",
+        f"- Round cost: ${lo.cost_usd:.2f} (repair story evidence) · epic total: ${spent:.2f}",
+        f"- Epic behaviors: VERIFIED {b['epic_verified']}→{a['epic_verified']} · "
         f"GAP {b['epic_gap']}→{a['epic_gap']} · REOPENED {b['epic_reopened']}→{a['epic_reopened']} · "
         f"Δverified − Δreopened = {lo.improvement:+d}",
-        f"- Sổ toàn dự án: VERIFIED {b['verified']}→{a['verified']} · GAP {b['gap']}→{a['gap']} · "
+        f"- Project-wide ledger: VERIFIED {b['verified']}→{a['verified']} · GAP {b['gap']}→{a['gap']} · "
         f"REOPENED {b['reopened']}→{a['reopened']}",
-        f"- Gap thuộc epic trước: {len(b['gaps'])} ({', '.join(b['gaps'][:8]) or '—'})",
-        f"- Gap thuộc epic sau: {len(a['gaps'])} ({', '.join(a['gaps'][:8]) or '—'})",
-        f"- Quyết định: {'**dừng** — ' + decision if decision else '**tiếp** vòng kế'}",
-        *([f"- Sửa siêu dữ liệu, **không phải** cải tiến chức năng: hành vi đã được test "
-           f"có sẵn chứng minh — `aisef evidence {lo.behavior} --link \"<test id>\" "
-           f"--why \"...\"` rồi `aisef report`"]
+        f"- Epic gaps before: {len(b['gaps'])} ({', '.join(b['gaps'][:8]) or '—'})",
+        f"- Epic gaps after: {len(a['gaps'])} ({', '.join(a['gaps'][:8]) or '—'})",
+        f"- Decision: {'**stop** — ' + decision if decision else '**continue** next round'}",
+        *([f"- Metadata fix, **not** a functional improvement: behavior already proven by existing test "
+           f"— `aisef evidence {lo.behavior} --link \"<test id>\" "
+           f"--why \"...\"` then `aisef report`"]
           if "truy vết" in lo.stuck.lower() else []),
         "",
-        "## Kết cục cổng",
+        "## Gate outcome",
         "",
         "```",
-        lo.outcome_text.strip() or "(không có story nào chạy)",
+        lo.outcome_text.strip() or "(no stories ran)",
         "```",
         "",
-        "Duyệt tiếp: `aisef approve improve` rồi chạy lại `aisef improve --epic "
-        f"{epic_id}`. Lịch sử một hành vi: `aisef evidence <id>`.",
+        "To continue: `aisef approve improve` then rerun `aisef improve --epic "
+        f"{epic_id}`. History of a behavior: `aisef evidence <id>`.",
         "",
     ]
     path = root / LOOP_REPORT.format(n=lo.n)
@@ -438,12 +438,12 @@ def improve(
         report.error = plan.error
         return report
     if epic_id not in plan.waves:
-        report.error = f"epic không có trong kế hoạch: {epic_id}"
+        report.error = f"epic not found in plan: {epic_id}"
         return report
     try:
         worktrees = WorktreeManager(project)
     except GitError as e:
-        report.error = f"{e} — story sửa luôn chạy trong worktree, cần kho git"
+        report.error = f"{e} — repair stories always run in worktree, requires git repo"
         return report
 
     state = StateStore(root)

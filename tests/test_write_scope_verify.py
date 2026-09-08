@@ -60,7 +60,7 @@ class TestVerificationPaths(unittest.TestCase):
             '{"verify.e2e": "npx playwright test tests/e2e"}', encoding="utf-8")
         root = self.project / "_bmad-output"; root.mkdir()
         text = render_story(self.story(["e2e"]), None, root)
-        self.assertIn("Harness cấp thêm", text)
+        self.assertIn("Harness added", text)
         self.assertIn("`tests/e2e`", text)
 
 

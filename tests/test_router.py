@@ -100,8 +100,8 @@ class TestChonDung(unittest.TestCase):
 class TestRaChoAgent(unittest.TestCase):
     def test_prompt_abstain_bao_lam_theo_hien_phap(self):
         sec = router.route(story(), reg(entry("x", ["security"]))).prompt_section()
-        self.assertIn("Không có skill", sec)
-        self.assertIn("hiến pháp", sec)
+        self.assertIn("No skill", sec)
+        self.assertIn("constitution", sec)
 
     def test_prompt_khong_dan_noi_dung_skill(self):
         """Progressive disclosure: chỉ tên, dùng-khi, đường dẫn — agent mở khi cần."""
@@ -112,7 +112,7 @@ class TestRaChoAgent(unittest.TestCase):
         self.assertIn("bao-mat", sec)
         self.assertIn("khi chạm dữ liệu người dùng", sec)
         self.assertIn(".claude/skills/bao-mat", sec)
-        self.assertIn("khi tới bước", sec)  # nhắc mở muộn
+        self.assertIn("when you reach the step", sec)  # nhắc mở muộn
 
     def test_evidence_ghi_da_xet_bao_nhieu_va_nguong(self):
         s = story(acceptance_criteria=["Then p95 dưới 200ms"])

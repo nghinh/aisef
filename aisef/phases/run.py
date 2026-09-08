@@ -61,11 +61,11 @@ class Plan:
 def load_plan(artifact_root: Path | str) -> Plan:
     path = Path(artifact_root) / STORIES_INDEX
     if not path.is_file():
-        return Plan(error=f"chưa có {STORIES_INDEX} — chạy `aisef plan` trước")
+        return Plan(error=f"missing {STORIES_INDEX} — run `aisef plan` first")
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as e:
-        return Plan(error=f"{STORIES_INDEX} hỏng: {e}")
+        return Plan(error=f"{STORIES_INDEX} corrupted: {e}")
 
     plan = Plan(waves=data.get("waves") or {})
     for raw in data.get("stories", []):
@@ -82,7 +82,7 @@ def load_plan(artifact_root: Path | str) -> Plan:
         )
     plan.epic_order = [e["id"] for e in data.get("epics", [])]
     if not plan.waves:
-        plan.error = plan.error or "chỉ mục không có đợt chạy nào (đồ thị phụ thuộc hỏng?)"
+        plan.error = plan.error or "index has no waves (dependency graph broken?)"
     return plan
 
 
@@ -122,27 +122,27 @@ class RunReport:
 
     def summary(self) -> str:
         if self.error:
-            return f"chạy đợt: ✗ {self.error}"
+            return f"run wave: ✗ {self.error}"
         lines = []
         for r in self.reconciled:
             lines.append(f"↺ {r.line()}")
         for w in self.waves:
-            head = f"{w.epic_id} · đợt {w.index}"
+            head = f"{w.epic_id} · wave {w.index}"
             if len(w.outcomes) > 1:
-                head += f" ({len(w.outcomes)} story song song)"
+                head += f" ({len(w.outcomes)} stories in parallel)"
             lines.append(head)
             lines += [o.summary() for o in w.outcomes]
             for sid in w.skipped:
-                lines.append(f"  ○ {sid}: đã xong từ trước, bỏ qua")
+                lines.append(f"  ○ {sid}: already done, skipped")
             for sid, files in w.merge_conflicts.items():
                 lines.append(
-                    f"  ✗ {sid}: merge đụng {', '.join(files[:5])} — đây là bằng "
-                    f"chứng write_scope khai sai, không phải chuyện gỡ cho xong"
+                    f"  ✗ {sid}: merge conflict {', '.join(files[:5])} — this is "
+                    f"evidence of incorrect write_scope, not something to resolve manually"
                 )
         if self.stopped_at:
-            lines.append(f"\n⏸ dừng ở {self.stopped_at}")
+            lines.append(f"\n⏸ stopped at {self.stopped_at}")
         if self.cost_usd:
-            lines.append(f"chi phí: ${self.cost_usd:.2f}")
+            lines.append(f"cost: ${self.cost_usd:.2f}")
         return "\n".join(lines)
 
 
@@ -233,7 +233,7 @@ def run_epic(
                 worktrees.remove(o.story_id, delete_branch=False)
 
         if not all(o.done for o in wave.outcomes):
-            report.stopped_at = f"{epic_id} · đợt {index}"
+            report.stopped_at = f"{epic_id} · wave {index}"
             return False
 
         if worktrees is not None:
@@ -256,7 +256,7 @@ def run_epic(
             for result in worktrees.merge_wave(can_merge_lai + done_ids):
                 if not result.merged:
                     wave.merge_conflicts[result.story_id] = result.conflicts
-                    report.stopped_at = f"{epic_id} · đợt {index} (merge)"
+                    report.stopped_at = f"{epic_id} · wave {index} (merge)"
                     return False
                 # Mốc không quay lại được: công việc đã ra ngoài tầm giao
                 # dịch. Ghi **ngay** sau khi merge, trước cả việc dọn
@@ -332,7 +332,7 @@ def _run_wave(
 
             if not state.claim(story_id):
                 out = StoryOutcome(story_id=story_id)
-                out.blocked_reason = "đã được máy khác nhận"
+                out.blocked_reason = "already claimed by another machine"
                 return out
             tx.record("status.running", undo={"status.reset": "pending"})
 
@@ -366,7 +366,7 @@ def _run_wave(
                 try:
                     complexity.record(artifact_root, story, score=co, config=config)
                 except OSError as e:
-                    print(f"hiệu chuẩn cỡ story {story_id}: {e}", file=sys.stderr)
+                    print(f"story size calibration {story_id}: {e}", file=sys.stderr)
 
             _safe_transition(state, story_id, StoryStatus.VERIFYING,
                              cost=outcome.cost_usd, attempts=outcome.quality_attempts)
@@ -404,7 +404,7 @@ def _safe_transition(state: StateStore, story_id: str, to: StoryStatus, **kw) ->
     except TransitionError as e:
         # Nói ra. Nuốt im lặng đã che một lỗi thật: story chạy lại xong,
         # merge xong, mà bản ghi vẫn đứng ở lần thất bại cũ.
-        print(f"trạng thái {story_id}: {e}", file=sys.stderr)
+        print(f"state {story_id}: {e}", file=sys.stderr)
 
 
 def run_sprint(
@@ -434,7 +434,7 @@ def run_sprint(
         try:
             worktrees = WorktreeManager(project)
         except GitError as e:
-            report.error = f"{e} — cách ly story cần kho git; dùng --no-isolate nếu cố ý"
+            report.error = f"{e} — story isolation requires a git repo; use --no-isolate if intentional"
             return report
 
     state = StateStore(artifact_root)
@@ -451,7 +451,7 @@ def run_sprint(
     epics = [only_epic] if only_epic else (plan.epic_order or sorted(plan.waves))
     unknown = [e for e in epics if e not in plan.waves]
     if unknown:
-        report.error = f"epic không có trong kế hoạch: {', '.join(unknown)}"
+        report.error = f"epic not in plan: {', '.join(unknown)}"
         return report
 
     for epic_id in epics:
@@ -494,12 +494,12 @@ def run_verify_only(
         return report
     story = plan.stories.get(story_id)
     if story is None:
-        report.error = f"story không có trong kế hoạch: {story_id}"
+        report.error = f"story not in plan: {story_id}"
         return report
     try:
         worktrees = WorktreeManager(project)
     except GitError as e:
-        report.error = f"{e} — kiểm lại cần kho git: ứng viên là HEAD nhánh story"
+        report.error = f"{e} — re-verify requires a git repo: candidate is HEAD of story branch"
         return report
 
     state = StateStore(artifact_root)
@@ -508,14 +508,14 @@ def run_verify_only(
     )
     rec = state.load().stories.get(story_id)
     if rec is not None and rec.state is StoryStatus.DONE:
-        report.error = f"{story_id} đã xong — không có gì để kiểm lại"
+        report.error = f"{story_id} already done — nothing to re-verify"
         return report
     journal = JournalStore(artifact_root).read(story_id)
     if not worktrees.has_branch(story_id) or not journal.reached("candidate.frozen"):
         report.error = (
-            f"{story_id}: chưa có ứng viên để kiểm lại — cần một lượt developer "
-            f"đã đóng băng ứng viên trên nhánh `{worktrees.branch_for(story_id)}` "
-            f"(chạy `aisef run` trước)"
+            f"{story_id}: no candidate to re-verify — need a developer session "
+            f"that froze a candidate on branch `{worktrees.branch_for(story_id)}` "
+            f"(run `aisef run` first)"
         )
         return report
 

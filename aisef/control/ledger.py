@@ -178,7 +178,7 @@ class Ledger:
             if bid in self.behaviors:
                 return
             ok = False
-            source = {**(source or {}), "why": "xanh ở ứng viên chưa landed — lượt chưa qua cổng/merge"}
+            source = {**(source or {}), "why": "green on unlanded candidate — attempt not yet gated/merged"}
         b = self.behaviors.get(bid)
         if b is None:
             b = self.behaviors[bid] = Behavior(id=bid, kind=kind)
@@ -368,16 +368,16 @@ class Ledger:
                     f"V{v} G{g} R{r} · {s.evidence_path}"
                 )
             done = sum(1 for s in stories if s.status == "done")
-            out.append(f"## {epic} — {done}/{len(stories)} story xong · V{tv} G{tg} R{tr}")
+            out.append(f"## {epic} — {done}/{len(stories)} stories done · V{tv} G{tg} R{tr}")
             out += body
         return out
 
     def index(self, root: Path | str | None = None) -> Path:
         text = "\n".join([
-            "# Chỉ mục bằng chứng",
+            "# Evidence index",
             "",
-            "Một dòng mỗi story: trạng thái · candidate · số hành vi "
-            "VERIFIED/GAP/REOPENED · tệp bằng chứng. Chi tiết: `aisef evidence <id>`.",
+            "One line per story: status · candidate · behaviour count "
+            "VERIFIED/GAP/REOPENED · evidence file. Details: `aisef evidence <id>`.",
             "",
             *self.index_lines(),
         ]) + "\n"
@@ -399,7 +399,7 @@ class Ledger:
                 keep.append(line)
         text = "\n".join(keep)
         if len(text) > max_chars:
-            text = text[:max_chars].rstrip() + "\n_(đã cắt theo trần ký tự — `aisef evidence <id>`)_"
+            text = text[:max_chars].rstrip() + "\n_(truncated to character limit — `aisef evidence <id>`)_"
         return text
 
 
@@ -413,7 +413,7 @@ def issues_text(rows: list[dict], fmt: str) -> str:
         return buf.getvalue()
     cell = lambda v: str(v).replace("|", "\\|").replace("\n", " ")  # noqa: E731
     return "\n".join([
-        f"# Gap / hồi quy · {len(rows)} hành vi",
+        f"# Gap / regression · {len(rows)} behaviours",
         "",
         "| " + " | ".join(ISSUE_COLUMNS) + " |",
         "|" + "---|" * len(ISSUE_COLUMNS),
@@ -511,7 +511,7 @@ def build(artifact_root: Path | str) -> Ledger:
             led.observe(
                 f"mockup:{e.name}", "mockup", ok=bool(e.ok), at=at, story=sid,
                 attempt=n, candidate=cand, landed=landed,
-                source={"screen": e.name, **({"why": "thiếu " + ", ".join(missing)} if missing else {})},
+                source={"screen": e.name, **({"why": "missing " + ", ".join(missing)} if missing else {})},
             )
     return led
 
@@ -584,7 +584,7 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
             if not owner:
                 continue
             why = str(det.get("unrunnable") or det.get("test_note") or "") or (
-                "không đọc được tên test từ output runner"
+                "cannot read test names from runner output"
             )
             for i in range(1, line.acceptance + 1):
                 note(story_id, i, False, {"why": why})
@@ -602,7 +602,7 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
         for i, tests in cov.items():
             if not tests:
                 if owner:
-                    note(story_id, i, False, {"why": "chưa có test mang mã"})
+                    note(story_id, i, False, {"why": "no test carries this code"})
                     judged.append(False)
                 continue
             red = [t for t in tests if t in failed]
@@ -622,7 +622,7 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
         # STORY-01-06 vì luật cũ đọc `e.ok`).
         story_green = all(judged) if judged else bool(e.ok)
         _observe_covers(led, line, ok=story_green, at=at, story=sid, attempt=attempt,
-                        cand=cand, why="" if story_green else "tiêu chí của story chưa xanh",
+                        cand=cand, why="" if story_green else "story criteria not yet green",
                         landed=landed)
 
 
@@ -660,7 +660,7 @@ def _kind_of(bid: str) -> str:
 
 def _epic_of(story_id: str) -> str:
     m = _EPIC_FROM_ID.match(story_id)
-    return f"EPIC-{m.group(1)}" if m else "(không epic)"
+    return f"EPIC-{m.group(1)}" if m else "(no epic)"
 
 
 def _attempt(e, sid: str, current: int) -> int:

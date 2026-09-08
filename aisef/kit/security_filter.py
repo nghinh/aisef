@@ -152,24 +152,24 @@ def classify(skill: Skill) -> Classification:
     haystack = f"{skill.name} {' '.join(skill.tags)}".lower()
 
     if sub in OFFENSIVE_SUBDOMAINS:
-        return Classification(skill, Verdict.OFFENSIVE, f"subdomain tấn công: {sub}")
+        return Classification(skill, Verdict.OFFENSIVE, f"offensive subdomain: {sub}")
 
     if verb in OFFENSIVE_VERBS:
-        return Classification(skill, Verdict.OFFENSIVE, f"động từ tấn công: {verb}")
+        return Classification(skill, Verdict.OFFENSIVE, f"offensive verb: {verb}")
 
     hard = next((m for m in HARD_OFFENSIVE_MARKERS if m in haystack), None)
     if hard:
-        return Classification(skill, Verdict.OFFENSIVE, f"hạ tầng tấn công: {hard}")
+        return Classification(skill, Verdict.OFFENSIVE, f"offensive infrastructure: {hard}")
 
     if verb not in DEFENSIVE_VERBS:
         soft = next((m for m in SOFT_OFFENSIVE_MARKERS if m in haystack), None)
         if soft:
-            return Classification(skill, Verdict.OFFENSIVE, f"kỹ thuật tấn công: {soft}")
+            return Classification(skill, Verdict.OFFENSIVE, f"offensive technique: {soft}")
 
     if sub in IN_SCOPE_SUBDOMAINS:
-        return Classification(skill, Verdict.KEEP, f"subdomain thuộc SDLC: {sub}")
+        return Classification(skill, Verdict.KEEP, f"SDLC subdomain: {sub}")
 
-    return Classification(skill, Verdict.OUT_OF_SCOPE, f"ngoài phạm vi SDLC: {sub or 'không rõ'}")
+    return Classification(skill, Verdict.OUT_OF_SCOPE, f"outside SDLC scope: {sub or 'unknown'}")
 
 
 def classify_all(root: Path) -> list[Classification]:

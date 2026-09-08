@@ -148,7 +148,7 @@ class Evidence:
         parts = [f"{k}={v}" for k, v in sorted(by_kind.items())]
         if self.total_cost_usd:
             parts.append(f"${self.total_cost_usd:.2f}")
-        return f"{self.story_id}: " + " · ".join(parts) if parts else f"{self.story_id}: (trống)"
+        return f"{self.story_id}: " + " · ".join(parts) if parts else f"{self.story_id}: (empty)"
 
 
 class EvidenceStore:

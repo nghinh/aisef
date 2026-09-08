@@ -197,13 +197,13 @@ class TestRecordsEvidence(PlanTestCase):
         self.run_plan(c, auto_approve=frozenset(Gate))
         note = self.store.load(Gate.PRD).note
         self.assertIn("partial", note)
-        self.assertIn("1 câu hỏi mở", note)
+        self.assertIn("1 open questions", note)
 
     def test_machine_checks_saved_with_approval(self):
         self.run_plan(FakeClient(), auto_approve=frozenset(Gate))
         checks = self.store.load(Gate.PRD).machine_checks
         self.assertEqual(checks["bmad_status"], "complete")
-        self.assertEqual(checks["cổng máy"], "đạt")
+        self.assertEqual(checks["machine gate"], "pass")
 
     def test_cost_accumulates_across_phases(self):
         r = self.run_plan(FakeClient(), auto_approve=frozenset(Gate))
@@ -220,7 +220,7 @@ class TestFailures(PlanTestCase):
         """Lời khai của agent không phải bằng chứng — kiểm đĩa."""
         r = self.run_plan(FakeClient(skip={"prd"}))
         self.assertEqual(r.failed_at, "prd")
-        self.assertIn("không thấy", r.outcomes[-1].error)
+        self.assertIn("missing", r.outcomes[-1].error)
 
     def test_infrastructure_error_is_retried_not_abandoned(self):
         """Một lần đứt kết nối đã tiêu tiền mà không sinh ra gì; bỏ luôn
@@ -304,8 +304,8 @@ class TestSummary(PlanTestCase):
                 path.write_text("# rỗng\n", encoding="utf-8")
 
         text = self.run_plan(BadPrd()).summary()
-        self.assertIn("KHÔNG ĐẠT", text)
-        self.assertIn("yêu cầu chức năng", text)
+        self.assertIn("FAIL", text)
+        self.assertIn("functional requirements", text)
 
 
 if __name__ == "__main__":

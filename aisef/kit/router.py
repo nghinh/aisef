@@ -119,13 +119,13 @@ class Routing:
         skill: đó là progressive disclosure, agent mở khi cần."""
         if self.abstained:
             return (
-                "Không có skill nào đủ khớp với story này (đã xét "
-                f"{self.considered}). Làm theo hiến pháp và quyết định kiến "
-                "trúc; đừng đi tìm skill."
+                "No skill matched this story well enough (considered "
+                f"{self.considered}). Follow the constitution and architecture "
+                "decisions; do not search for skills."
             )
-        lines = ["Những skill dưới đây được chọn cho **đúng story này**. Mở bằng "
-                 "tool `Skill` (hoặc đọc `SKILL.md` ở đường dẫn) **khi tới bước "
-                 "cần nó**, không mở hết từ đầu:", ""]
+        lines = ["The skills below were selected for **this specific story**. Open with "
+                 "tool `Skill` (or read `SKILL.md` at the path) **when you reach the step "
+                 "that needs it**, do not open all at once:", ""]
         for p in self.picked:
             why = p.rationale[0] if p.rationale else ""
             dung = f" — dùng khi: {p.entry.use_when}" if p.entry.use_when else ""

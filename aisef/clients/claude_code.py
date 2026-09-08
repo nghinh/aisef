@@ -124,9 +124,9 @@ class ClaudeCodeAdapter(ClientAdapter):
         `CLAUDE*` của phiên cha thì tự chuyển sang Bash thay vì Read/Write
         (hợp quy C3, 2026-09-05); secret của máy thì agent không cần cầm (C9)."""
         if not self.available():
-            return RunResult(ok=False, error=f"không tìm thấy lệnh {self.binary}")
+            return RunResult(ok=False, error=f"command not found: {self.binary}")
         if not Path(spec.workdir).is_dir():
-            return RunResult(ok=False, error=f"workdir không tồn tại: {spec.workdir}")
+            return RunResult(ok=False, error=f"workdir does not exist: {spec.workdir}")
 
         try:
             proc = subprocess.Popen(
@@ -139,7 +139,7 @@ class ClaudeCodeAdapter(ClientAdapter):
                 stdin=subprocess.DEVNULL,  # không có: CLI chờ stdin 3s mỗi lần
             )
         except OSError as e:
-            return RunResult(ok=False, error=f"không chạy được: {e}")
+            return RunResult(ok=False, error=f"cannot run: {e}")
 
         timed_out = False
         try:
@@ -151,7 +151,7 @@ class ClaudeCodeAdapter(ClientAdapter):
 
         result = parse_stream(stdout.splitlines())
         if timed_out:
-            result.error = f"quá {spec.timeout_seconds}s"
+            result.error = f"exceeded {spec.timeout_seconds}s"
         if not result.raw_result and stderr.strip():
             result.error = result.error or stderr.strip()[:500]
         return result

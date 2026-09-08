@@ -127,9 +127,9 @@ class OpenCodeAdapter(ClientAdapter):
 
     def run(self, spec: RunSpec) -> RunResult:
         if not self.available():
-            return RunResult(ok=False, error=f"không tìm thấy lệnh {self.binary}")
+            return RunResult(ok=False, error=f"command not found: {self.binary}")
         if not Path(spec.workdir).is_dir():
-            return RunResult(ok=False, error=f"workdir không tồn tại: {spec.workdir}")
+            return RunResult(ok=False, error=f"workdir does not exist: {spec.workdir}")
 
         started = time.monotonic()
         try:
@@ -146,7 +146,7 @@ class OpenCodeAdapter(ClientAdapter):
                 stdin=subprocess.DEVNULL,
             )
         except OSError as e:
-            return RunResult(ok=False, error=f"không chạy được: {e}")
+            return RunResult(ok=False, error=f"cannot run: {e}")
 
         timed_out = False
         try:
@@ -164,7 +164,7 @@ class OpenCodeAdapter(ClientAdapter):
         res.ok = proc.returncode == 0 and not timed_out
         res.duration_ms = int((time.monotonic() - started) * 1000)
         if timed_out:
-            res.error = f"quá {spec.timeout_seconds}s"
+            res.error = f"exceeded {spec.timeout_seconds}s"
         elif proc.returncode != 0:
             res.error = stderr.strip()[:500] or "exit != 0"
         res.raw_result = {"returncode": proc.returncode, **res.raw_result}

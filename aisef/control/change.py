@@ -24,7 +24,7 @@ from .normalize import Story
 from .state import StateStore
 
 EPIC_ID = "EPIC-CH"
-EPIC_TITLE = "Thay đổi sau phát hành"
+EPIC_TITLE = "Post-release changes"
 _FR = re.compile(r"^(FR|NFR)-\d+$")
 
 
@@ -43,8 +43,8 @@ def _brownfield_note(project: Path) -> str:
         return ""
     return (
         "\n\n## Brownfield\n\n"
-        "Dự án này có mã nguồn hiện tại (xem `_bmad-output/baseline.md`). "
-        "Bảo toàn kiến trúc và behavior hợp lệ. Code là ground truth.\n"
+        "This project has existing source code (see `_bmad-output/baseline.md`). "
+        "Preserve existing architecture and valid behaviour. Code is ground truth.\n"
     )
 
 
@@ -52,22 +52,22 @@ def apply(project: Path, requirement: str, description: str, *, today: date | No
     project = Path(project)
     root = project / "_bmad-output"
     if not _FR.match(requirement):
-        raise ValueError(f"mã yêu cầu phải dạng FR-n hoặc NFR-n, nhận `{requirement}`")
+        raise ValueError(f"requirement id must be FR-n or NFR-n, got `{requirement}`")
     if not description.strip():
-        raise ValueError("mô tả thay đổi không được rỗng")
+        raise ValueError("change description must not be empty")
     ngay = (today or date.today()).isoformat()
 
     # 1. đầu vào + đánh dấu PRD
     req = project / "docs" / "requirements.md"
     req.parent.mkdir(parents=True, exist_ok=True)
     with req.open("a", encoding="utf-8") as f:
-        f.write(f"\n## {requirement} — thay đổi {ngay}\n{description.strip()}\n")
+        f.write(f"\n## {requirement} — change {ngay}\n{description.strip()}\n")
     prd = root / "prd.md"
     prd_marked = False
     if prd.is_file():
         with prd.open("a", encoding="utf-8") as f:
-            f.write(f"\n> **Thay đổi {ngay} — {requirement}:** {description.strip()} "
-                    f"(ghi bởi `aisef change`; cổng PRD cần duyệt lại)\n")
+            f.write(f"\n> **Change {ngay} — {requirement}:** {description.strip()} "
+                    f"(recorded by `aisef change`; PRD gate needs re-approval)\n")
         prd_marked = True
 
     # 2. story delta
@@ -81,12 +81,12 @@ def apply(project: Path, requirement: str, description: str, *, today: date | No
     path = register_story(root, story, epic_title=EPIC_TITLE, body=body)
 
     steps = [
-        f"khai `write_scope` cho {sid} trong `{path.relative_to(project)}` và chỉ mục",
-        "duyệt lại cổng `prd` (và các cổng sau) — chúng đã thành stale",
-        f"chạy `aisef run --epic {EPIC_ID}`",
+        f"declare `write_scope` for {sid} in `{path.relative_to(project)}` and the index",
+        "re-approve the `prd` gate (and all downstream gates) — they are now stale",
+        f"run `aisef run --epic {EPIC_ID}`",
     ]
     if (root / "baseline.md").is_file():
-        steps.insert(0, "blast-radius sẽ chạy tự động khi implement (cần write_scope)")
+        steps.insert(0, "blast-radius will run automatically during implement (requires write_scope)")
     return ChangeResult(sid, path, requirement, prd_marked, steps)
 
 

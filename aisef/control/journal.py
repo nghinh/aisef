@@ -250,7 +250,7 @@ class StoryRunTransaction:
 
     def __exit__(self, exc_type, exc, tb) -> bool:
         if not self.committed:
-            self.abort(f"{exc_type.__name__}: {exc}" if exc_type else "kết thúc bất thường")
+            self.abort(f"{exc_type.__name__}: {exc}" if exc_type else "abnormal termination")
         return False  # không nuốt lỗi
 
 
@@ -289,7 +289,7 @@ def reconcile_story(
             data={"action": "roll-forward", "from": cur.value},
         ))
         return Reconciled(story_id, "roll-forward",
-                          "đã merge vào nhánh chính, đưa trạng thái theo kịp")
+                          "already merged to main branch, rolling status forward")
 
     dang_do = j.open_attempt()
     ket = cur in (StoryStatus.RUNNING, StoryStatus.VERIFYING)
@@ -307,7 +307,7 @@ def reconcile_story(
     ))
     return Reconciled(
         story_id, "undo",
-        f"lượt chạy dở ở `{j.steps()[-1] if j.entries else '?'}`, đã dọn và về pending",
+        f"incomplete run at `{j.steps()[-1] if j.entries else '?'}`, cleaned up and back to pending",
     )
 
 

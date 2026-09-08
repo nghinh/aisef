@@ -83,17 +83,17 @@ class Tool:
 TOOLS: dict[str, Tool] = {
     "test": Tool(
         "test",
-        "Sau mỗi lần sửa code, và bắt buộc trước khi tuyên bố story xong. "
-        "Chạy trước khi viết code để thấy test đỏ (RED) rồi mới viết cho xanh.",
+        "After every code change, and required before declaring the story done. "
+        "Run before writing code to see a failing test (RED) then write to make it pass.",
     ),
     "lint": Tool(
         "lint",
-        "Trước khi commit. Lỗi lint là lỗi phải sửa, không phải gợi ý.",
+        "Before committing. Lint errors must be fixed, not suggestions.",
     ),
     "sast": Tool(
         "sast",
-        "Trước khi commit, khi story chạm tới xác thực, phân quyền, truy vấn "
-        "dữ liệu, tải file lên, hoặc bất kỳ dữ liệu nào đến từ người dùng.",
+        "Before committing, when the story touches authentication, authorization, data "
+        "queries, file uploads, or any data from users.",
         level=sandbox.Level.READ_ONLY,
     ),
 }
@@ -124,11 +124,11 @@ class ToolResult:
 
     def summary(self) -> str:
         if self.skipped:
-            return f"{self.name}: bỏ qua — {self.skipped}"
+            return f"{self.name}: skipped — {self.skipped}"
         mark = "✅" if self.ok else "✗"
         thieu = ", ".join(self.detail.get("missing") or [])
-        extra = f" (sandbox suy biến — thiếu {thieu or 'bảo đảm'})" if self.degraded else ""
-        return f"{mark} {self.name} — thoát {self.exit_code}, {self.duration_ms}ms{extra}"
+        extra = f" (sandbox degraded — missing {thieu or 'guarantees'})" if self.degraded else ""
+        return f"{mark} {self.name} — exit {self.exit_code}, {self.duration_ms}ms{extra}"
 
     def output(self) -> tuple[str, int]:
         """(stdout + stderr đã che bí mật, số chỗ che). Mọi thứ in ra hay ghi
@@ -200,13 +200,13 @@ def run_tool(
     ``candidate`` là SHA bản đang kiểm — đóng vào bằng chứng để cổng biết
     kết quả này thuộc bản nào (ADR-004 R1)."""
     if name not in TOOLS:
-        raise ValueError(f"tool không tồn tại: {name}. Có: {', '.join(sorted(TOOLS))}")
+        raise ValueError(f"tool does not exist: {name}. Available: {', '.join(sorted(TOOLS))}")
 
     project = Path(project)
     cfg = config or Config.load(project)
     command = command_for(name, project, cfg)
     if not command:
-        res = ToolResult(name=name, ok=False, skipped="dự án chưa khai lệnh cho tool này")
+        res = ToolResult(name=name, ok=False, skipped="project has not declared a command for this tool")
         record(res, story_id, artifact_root, candidate)
         return res
 
@@ -266,7 +266,7 @@ def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error:
     thông báo "not found" vẫn là test đỏ. ``provider_error`` là lỗi hạ tầng
     sandbox (daemon, kéo image) — lệnh chưa từng chạy, kết luận ngay."""
     if provider_error:
-        return f"hạ tầng sandbox lỗi ({provider_error}) — lệnh chưa chạy; kiểm daemon/image rồi chạy lại"
+        return f"sandbox infrastructure error ({provider_error}) — command did not run; check daemon/image and retry"
     low = output.lower()
     hit = next((m for m in MISSING_TOOL if m in low), "")
     if exit_code != 127 and not hit:
@@ -275,7 +275,7 @@ def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error:
         from .testlog import parse as parse_testlog
         if parse_testlog(output).passed:
             return ""
-    return f"công cụ chưa cài hoặc không nạp được ({hit or 'exit 127'}) — dựng môi trường hoặc sửa lệnh rồi chạy lại"
+    return f"tool not installed or cannot load ({hit or 'exit 127'}) — set up the environment or fix the command and retry"
 
 
 #: Tên bản ghi của baseline (ADR-004 R9) — bộ test chạy ở candidate cha
@@ -367,16 +367,16 @@ def describe_tools(project: Path | str, config: Config | None = None) -> str:
     binary = aisef_command()
     lines = []
     for tool in TOOLS.values():
-        cmd = command_for(tool.name, project, config) or "(dự án chưa khai)"
-        lines.append(f"- `{binary} tool {tool.name}` → `{cmd}`\n  Khi nào: {tool.when}")
+        cmd = command_for(tool.name, project, config) or "(not declared)"
+        lines.append(f"- `{binary} tool {tool.name}` → `{cmd}`\n  When: {tool.when}")
     lines.append(
         f"- `{binary} doc <gói> --topic <chủ đề>` → tài liệu thật của thư viện (context7, có cache)\n"
-        "  Khi nào: không chắc tên API hay hành vi thư viện — tra, đừng đoán (luật 12). "
-        "Thêm `--story <mã>` để lần tra được ghi vào bằng chứng."
+        "  When: unsure about API names or library behaviour — look up, do not guess (rule 12). "
+        "Add `--story <id>` so the lookup is recorded in evidence."
     )
     lines.append(
-        f"- `{binary} ctx --story <mã>` (hoặc `--file <tệp>`) → bản đồ mã quanh phạm vi ghi: "
-        "chữ ký tệp trong phạm vi, tệp gọi/được import, test nhắc tên\n"
-        "  Khi nào: vào phiên mới, trước khi tự dò cây thư mục — gợi ý tĩnh, không phải chân lý."
+        f"- `{binary} ctx --story <id>` (or `--file <path>`) → code map around write scope: "
+        "signatures of files in scope, callers/imports, tests referencing names\n"
+        "  When: at the start of a new session, before exploring the directory tree — static hints, not ground truth."
     )
     return "\n".join(lines)

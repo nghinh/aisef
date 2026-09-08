@@ -34,7 +34,7 @@ class GateResult:
         return not self.errors
 
     def summary(self) -> str:
-        head = f"{self.name}: {'ĐẠT' if self.passed else 'KHÔNG ĐẠT'}"
+        head = f"{self.name}: {'PASS' if self.passed else 'FAIL'}"
         lines = [head]
         for e in self.errors:
             lines.append(f"  ✗ {e}")
@@ -45,42 +45,42 @@ class GateResult:
 
 def check_prd(prd: PRD) -> GateResult:
     """Kiểm PRD trước khi mời người duyệt."""
-    r = GateResult("cổng máy: prd")
+    r = GateResult("machine gate: prd")
 
     if not prd.functional():
-        r.errors.append("không có yêu cầu chức năng nào")
+        r.errors.append("no functional requirements found")
         return r
 
     untestable = prd.untestable()
     if untestable:
         ids = ", ".join(x.id for x in untestable)
         r.errors.append(
-            f"yêu cầu không có tiêu chí kiểm chứng được: {ids} — "
-            f"không nghiệm thu được thì không triển khai được"
+            f"requirements with no verifiable acceptance criteria: {ids} — "
+            f"cannot accept what cannot be verified"
         )
 
     empty_title = [x.id for x in prd.requirements if not x.title.strip()]
     if empty_title:
-        r.errors.append(f"yêu cầu thiếu tiêu đề: {', '.join(empty_title)}")
+        r.errors.append(f"requirements missing title: {', '.join(empty_title)}")
 
     blocked = prd.blocked_ids()
     if blocked:
         r.warnings.append(
-            f"{len(blocked)} yêu cầu đang bị câu hỏi mở chặn "
-            f"({', '.join(sorted(blocked))}) — không đưa vào story trước khi chốt"
+            f"{len(blocked)} requirements blocked by open questions "
+            f"({', '.join(sorted(blocked))}) — do not assign to stories until resolved"
         )
 
     unresolved = [q.id for q in prd.open_questions]
     if unresolved:
         r.warnings.append(
-            f"{len(unresolved)} câu hỏi mở cần người quyết: {', '.join(unresolved)}"
+            f"{len(unresolved)} open questions need human decision: {', '.join(unresolved)}"
         )
 
     if prd.assumptions:
-        r.warnings.append(f"{len(prd.assumptions)} giả định được ghi lại — xem lại khi duyệt")
+        r.warnings.append(f"{len(prd.assumptions)} assumptions recorded — review during approval")
 
     if not prd.non_functional():
-        r.warnings.append("không có yêu cầu phi chức năng nào — hiếm khi đúng")
+        r.warnings.append("no non-functional requirements — rarely correct")
 
     return r
 
@@ -94,23 +94,23 @@ def check_stories(
     story_ac_count: dict[str, int] | None = None,
 ) -> GateResult:
     """Kiểm tập story trước khi bắt đầu viết code."""
-    r = GateResult("cổng máy: stories")
+    r = GateResult("machine gate: stories")
     cfg = config or Config(dict(DEFAULTS))
 
     if not stories:
-        r.errors.append("không có story nào")
+        r.errors.append("no stories found")
         return r
 
     ids = [s.id for s in stories]
     dupes = sorted({i for i in ids if ids.count(i) > 1})
     if dupes:
-        r.errors.append(f"story trùng mã: {', '.join(dupes)}")
+        r.errors.append(f"duplicate story ids: {', '.join(dupes)}")
 
     no_scope = [s.id for s in stories if not s.write_scope]
     if no_scope:
         r.errors.append(
-            f"story chưa khai write_scope: {', '.join(no_scope)} — "
-            f"không xếp lịch song song được, và guard sẽ chặn mọi thao tác ghi"
+            f"stories missing write_scope: {', '.join(no_scope)} — "
+            f"cannot schedule in parallel, and guard will block all writes"
         )
 
     # Chu trình phụ thuộc: dùng chính bộ lập lịch, để cổng và lúc chạy
@@ -118,7 +118,7 @@ def check_stories(
     try:
         build_waves(stories)
     except CycleError as e:
-        r.errors.append(f"phụ thuộc vòng: {e}")
+        r.errors.append(f"dependency cycle: {e}")
     except ValueError as e:
         r.errors.append(str(e))
 
@@ -126,8 +126,8 @@ def check_stories(
     for sid, n in (story_ac_count or {}).items():
         if n > max_ac:
             r.errors.append(
-                f"{sid} có {n} tiêu chí chấp nhận, vượt ngưỡng {max_ac} — chẻ nhỏ ra, "
-                f"story quá lớn sẽ tràn ngữ cảnh trong một phiên"
+                f"{sid} has {n} acceptance criteria, exceeding limit {max_ac} — split it, "
+                f"an oversized story will overflow context in a single session"
             )
 
     # Kế hoạch tuyến tính hoàn toàn: mỗi story một đợt. Có thể đúng —
@@ -160,9 +160,9 @@ def check_stories(
                 chuoi.append(f"{epic} ({len(trong)} story)")
         if chuoi:
             r.warnings.append(
-                "epic bị xâu thành chuỗi hoàn toàn, không story nào chạy song "
-                f"song được: {', '.join(chuoi)} — xem lại `depends_on`, chỉ khai "
-                "khi story sau thật sự cần **kết quả** của story trước"
+                "epics are fully serialized, no stories can run in parallel: "
+                f"{', '.join(chuoi)} — review `depends_on`, only declare when a story "
+                "truly needs the **output** of an earlier one"
             )
 
     max_paths = cfg["story.max_write_scope_paths"]
@@ -173,7 +173,7 @@ def check_stories(
     ]
     if too_wide:
         r.errors.append(
-            f"story chạm quá nhiều nơi (> {max_paths} đường dẫn): {', '.join(too_wide)}"
+            f"stories touch too many locations (> {max_paths} paths): {', '.join(too_wide)}"
         )
 
     if prd is not None:
@@ -186,20 +186,20 @@ def check_stories(
         missing = sorted(expected - covered, key=lambda s: int(s.split("-")[1]))
         if missing:
             r.errors.append(
-                f"yêu cầu chưa story nào phủ: {', '.join(missing)} — "
-                f"mất truy vết từ PRD tới code"
+                f"requirements not covered by any story: {', '.join(missing)} — "
+                f"traceability from PRD to code is broken"
             )
 
         touched_blocked = sorted(covered & blocked)
         if touched_blocked:
             r.errors.append(
-                f"story đụng vào yêu cầu đang bị câu hỏi mở chặn: "
+                f"stories touch requirements blocked by open questions: "
                 f"{', '.join(touched_blocked)}"
             )
 
         unknown = sorted(covered - {x.id for x in prd.requirements})
         if unknown:
-            r.warnings.append(f"story tham chiếu mã không có trong PRD: {', '.join(unknown)}")
+            r.warnings.append(f"stories reference ids not found in PRD: {', '.join(unknown)}")
 
     return r
 
@@ -221,15 +221,15 @@ def check_design_contract(
     lấy từ story. Mã sai thì nó nạp rỗng và dựng giao diện theo phán đoán —
     đúng thứ bước map mockup sinh ra để ngăn.
     """
-    r = GateResult("cổng máy: mockup")
+    r = GateResult("machine gate: mockup")
 
     if not experience.screens:
-        r.errors.append("EXPERIENCE.md không liệt kê màn hình nào")
+        r.errors.append("EXPERIENCE.md lists no screens")
         return r
 
     missing = [s.id for s in experience.screens if contract.by_id(s.id) is None]
     if missing:
-        r.errors.append(f"màn hình chưa có trong hợp đồng: {', '.join(missing)}")
+        r.errors.append(f"screens not in design contract: {', '.join(missing)}")
 
     unresolved: list[tuple[str, str]] = []
     for screen in contract.screens:
@@ -242,28 +242,28 @@ def check_design_contract(
             # đồng ôm cả trang gồm 4 trạng thái → story không thể qua bước map
             # mockup, đốt $28 qua 4 lượt. Chặn ở đây rẻ hơn nhiều.
             r.errors.append(
-                f"{screen.id}: mockup không đánh dấu `data-state=\"primary\"` nên hợp đồng "
-                f"lấy cả trang — {len(screen.components)} component, {screen.duplicates} chỗ "
-                f"trùng, tức nhiều trạng thái dựng cạnh nhau. Ứng dụng thật ở một thời điểm "
-                f"chỉ ở một trạng thái nên bước map mockup sẽ không bao giờ khớp. Đánh dấu "
-                f"trạng thái theo skill aisef-mockup-html (mục 7) rồi chạy `aisef mockup` "
-                f"(không --force: chỉ trích lại hợp đồng)"
+                f"{screen.id}: mockup does not mark `data-state=\"primary\"` so the contract "
+                f"captures the whole page — {len(screen.components)} components, {screen.duplicates} "
+                f"duplicates, i.e. multiple states rendered side by side. A real app shows one state "
+                f"at a time so the mockup-map step will never match. Mark states per "
+                f"aisef-mockup-html skill (section 7) then run `aisef mockup` "
+                f"(without --force: re-extract the contract only)"
             )
         if not screen.route:
             r.errors.append(
-                f"{screen.id}: mockup không khai route (thẻ meta aisef-route) — "
-                "không đối chiếu được với ứng dụng thật"
+                f"{screen.id}: mockup does not declare a route (meta tag aisef-route) — "
+                "cannot cross-check against the real app"
             )
         else:
             declared = experience.by_id(screen.id)
             if declared is not None and declared.route and declared.route != screen.route:
                 # Không chặn: một trong hai đúng, và người duyệt biết cái nào.
                 r.warnings.append(
-                    f"{screen.id}: route mockup ({screen.route}) khác route trong "
+                    f"{screen.id}: mockup route ({screen.route}) differs from route in "
                     f"EXPERIENCE.md ({declared.route})"
                 )
         if not screen.components:
-            r.warnings.append(f"{screen.id}: mockup không có component nào kiểm được")
+            r.warnings.append(f"{screen.id}: mockup has no verifiable components")
 
     if unresolved:
         # Gom theo **câu hỏi**, không theo chỗ đánh dấu. 52 chỗ chưa chốt
@@ -272,26 +272,26 @@ def check_design_contract(
         by_question: dict[str, int] = {}
         for _, item in unresolved:
             m = re.search(r"\b(?:UX-)?OQ-\d+\b", item)
-            key = m.group(0) if m else "không gắn mã câu hỏi"
+            key = m.group(0) if m else "no question id"
             by_question[key] = by_question.get(key, 0) + 1
         listed = " · ".join(
-            f"{q} ({n} chỗ)" for q, n in sorted(by_question.items(), key=lambda x: -x[1])
+            f"{q} ({n} spots)" for q, n in sorted(by_question.items(), key=lambda x: -x[1])
         )
         r.errors.append(
-            f"mockup còn {len(unresolved)} chỗ chưa chốt trên "
-            f"{len({s for s, _ in unresolved})} màn hình, quy về "
-            f"{len(by_question)} câu hỏi: {listed}. Trả lời chúng trong PRD/UX "
-            f"rồi dựng lại mockup — dựng code theo màn hình chưa chốt tốn gấp đôi."
+            f"mockup has {len(unresolved)} unresolved spots across "
+            f"{len({s for s, _ in unresolved})} screens, mapping to "
+            f"{len(by_question)} questions: {listed}. Answer them in PRD/UX "
+            f"then rebuild mockup — building code from unresolved screens costs double."
         )
         # Chỗ không dẫn mã câu hỏi thì người duyệt không tra được nó thuộc
         # về đâu; nêu vài ví dụ để họ biết đang nhìn cái gì.
         loose = [item for _, item in unresolved if not re.search(r"\b(?:UX-)?OQ-\d+\b", item)]
         for item in loose[:3]:
-            r.warnings.append(f"chưa chốt, không dẫn mã câu hỏi: {item[:140]}")
+            r.warnings.append(f"unresolved, no question id: {item[:140]}")
 
     extra = [s.id for s in contract.screens if experience.by_id(s.id) is None]
     if extra:
-        r.warnings.append(f"hợp đồng có màn hình không nằm trong EXPERIENCE.md: {', '.join(extra)}")
+        r.warnings.append(f"design contract has screens not in EXPERIENCE.md: {', '.join(extra)}")
 
     if stories is not None:
         known = set(contract.ids) | set(experience.ids)
@@ -299,19 +299,19 @@ def check_design_contract(
             unknown = [sid for sid in getattr(story, "screens", []) if sid not in known]
             if unknown:
                 r.errors.append(
-                    f"{story.id}: trỏ tới màn hình không có thật: {', '.join(unknown)}"
+                    f"{story.id}: references non-existent screens: {', '.join(unknown)}"
                 )
         used = {sid for st in stories for sid in getattr(st, "screens", [])}
         orphan = [s.id for s in experience.screens if s.id not in used]
         if orphan:
-            r.warnings.append(f"màn hình chưa story nào dựng: {', '.join(orphan)}")
+            r.warnings.append(f"screens not built by any story: {', '.join(orphan)}")
 
     return r
 
 
 def check_all(results: list[GateResult]) -> GateResult:
     """Gộp nhiều kết quả cổng thành một."""
-    combined = GateResult("cổng máy")
+    combined = GateResult("machine gate")
     for r in results:
         combined.errors.extend(f"[{r.name}] {e}" for e in r.errors)
         combined.warnings.extend(f"[{r.name}] {w}" for w in r.warnings)

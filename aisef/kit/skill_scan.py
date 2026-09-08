@@ -146,7 +146,7 @@ def scan(
     if only:
         targets = [e for e in targets if e.id in only]
     if not targets:
-        report.error = "sổ skill không có bản ghi định tuyến được — chạy `aisef setup` trước"
+        report.error = "skill registry has no routable entries — run `aisef setup` first"
         return report
     items: list[tuple[str, str]] = []
     for e in targets:

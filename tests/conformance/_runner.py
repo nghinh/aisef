@@ -378,7 +378,7 @@ def probe_all(client: str, project: Path, workdir: Path) -> list[ProbeResult]:
     return out
 
 
-CANDIDATE_CHECK = "bằng chứng đúng candidate"
+CANDIDATE_CHECK = "evidence matches candidate"
 
 
 def probe_c8(project: Path, workdir: Path) -> ProbeResult:
@@ -422,7 +422,7 @@ def probe_c8(project: Path, workdir: Path) -> ProbeResult:
     test_muc = next((c for c in sau.checks if c.name == "test"), None)
     stale = bool(muc and not muc.passed and "stale" in muc.detail)
     passed = (a != b and truoc.passed and stale and not sau.passed
-              and "đỏ" not in (test_muc.detail if test_muc else ""))
+              and "red" not in (test_muc.detail if test_muc else ""))
     return ProbeResult(
         "C8", passed,
         f"A={a[:7]} cổng {'ĐẠT' if truoc.passed else 'KHÔNG ĐẠT'}; B={b[:7]} "

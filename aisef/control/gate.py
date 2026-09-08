@@ -53,22 +53,22 @@ from ..harness.tools import BASELINE_RUN, NOP_RUN
 #: `accessibility`, `perf`… — `phases/qa.py::KINDS` trừ unit/mockup-map/security
 #: đã có mục riêng).
 CHECK_NAMES = (
-    "bằng chứng đúng candidate",
-    "guard có chạy",
+    "evidence matches candidate",
+    "guard ran",
     "test",
-    "không làm đỏ test có sẵn",
+    "no baseline regression",
     "lint",
-    "phạm vi ghi",
-    "map mockup",
-    "test thật",
-    "tiêu chí có test",
+    "write scope",
+    "mockup map",
+    "real tests",
+    "criteria have tests",
     "coverage",
     "TDD",
-    "test có kiểm được story",
+    "tests verify story",
     "<kind>",
-    "bảo mật",
-    "rà soát",
-    "bảo toàn",
+    "security",
+    "review",
+    "preservation",
 )
 
 #: Ai chấm mục nào — một chỗ, giá trị thuộc `outcome.CHECK_KINDS`. Máy tất
@@ -76,22 +76,22 @@ CHECK_NAMES = (
 #: dấu vết guard, SHA); rà soát bảo mật; model làm giám khảo. Chưa mục nào
 #: `human`.
 CHECK_KIND = {
-    "bằng chứng đúng candidate": "structural",
-    "guard có chạy": "structural",
+    "evidence matches candidate": "structural",
+    "guard ran": "structural",
     "test": "deterministic",
-    "không làm đỏ test có sẵn": "deterministic",
+    "no baseline regression": "deterministic",
     "lint": "deterministic",
-    "phạm vi ghi": "structural",
-    "map mockup": "structural",
-    "test thật": "structural",
-    "tiêu chí có test": "structural",
+    "write scope": "structural",
+    "mockup map": "structural",
+    "real tests": "structural",
+    "criteria have tests": "structural",
     "coverage": "deterministic",
     "TDD": "deterministic",
-    "test có kiểm được story": "deterministic",
+    "tests verify story": "deterministic",
     "<kind>": "deterministic",
-    "bảo mật": "security",
-    "rà soát": "model-judge",
-    "bảo toàn": "deterministic",
+    "security": "security",
+    "review": "model-judge",
+    "preservation": "deterministic",
 }
 
 #: Ba control chứng nhận một mục (Inspect `tests/scorer/*`, TB oracle/nop):
@@ -119,7 +119,7 @@ class StoryGate:
         return [c for c in self.checks if c.outcome.blocks]
 
     def summary(self) -> str:
-        head = f"cổng story {self.story_id}: {'ĐẠT' if self.passed else 'KHÔNG ĐẠT'}"
+        head = f"story gate {self.story_id}: {'PASS' if self.passed else 'FAIL'}"
         return "\n".join([head, *(c.line() for c in self.checks)])
 
     def feedback(self) -> str:
@@ -182,9 +182,9 @@ def _khong_on_dinh(evidence: Evidence, name: str) -> str:
     if not lat and name not in (d.get("flaky_checks") or []):
         return ""
     return (
-        f"không ổn định qua {d.get('k')} lần chạy trên cùng SHA"
+        f"flaky across {d.get('k')} runs on the same SHA"
         + (f": {_ten(lat)}" if lat else "")
-        + " — không chạy được ổn định không phải trượt, cũng không phải đạt"
+        + " — unstable results are neither a failure nor a pass"
     )
 
 
@@ -216,23 +216,23 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
     phải là quyết định khai trong story, mà story chưa có chỗ khai — không
     suy được thì không cho qua, và nói rõ vì sao.
     """
-    ten = "không làm đỏ test có sẵn"
+    ten = "no baseline regression"
     goc = evidence.last(TOOL_RUN, BASELINE_RUN)
     if goc is None:
         return Check(ten, Outcome.NOT_APPLICABLE,
-                     "harness không ghi baseline nào (chạy tay, nhật ký cũ) — không so được")
+                     "harness recorded no baseline (manual run, old journal) — cannot compare")
     doc = [goc.seq]     # sự kiện đã đọc: baseline, rồi lần test ở ứng viên
     if goc.detail.get("disabled"):
-        return Check(ten, Outcome.NOT_APPLICABLE, "tắt bởi cấu hình `verify.baseline`", evidence=doc)
+        return Check(ten, Outcome.NOT_APPLICABLE, "disabled by `verify.baseline` config", evidence=doc)
     if goc.detail.get("skipped"):
-        return Check(ten, Outcome.UNCONFIGURED, f"không có baseline: {goc.detail['skipped']}", evidence=doc)
+        return Check(ten, Outcome.UNCONFIGURED, f"no baseline: {goc.detail['skipped']}", evidence=doc)
     if goc.detail.get("unrunnable"):
         return Check(ten, Outcome.UNRUNNABLE,
-                     f"baseline không chạy được ({goc.detail['unrunnable']}) — không so được test có sẵn",
+                     f"baseline unrunnable ({goc.detail['unrunnable']}) — cannot compare existing tests",
                      evidence=doc)
     if not goc.detail.get("test_format"):
         return Check(ten, Outcome.UNCONFIGURED, str(goc.detail.get("test_note") or "")
-                     or "không đọc được tên test ở baseline — dùng reporter in tên "
+                     or "cannot read test names from baseline — use a reporter that prints names "
                         "(`node --test`, `vitest --reporter=verbose`, `pytest -v`, CTRF)",
                      evidence=doc)
 
@@ -241,17 +241,17 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
     sau = [e for e in evidence.of(TOOL_RUN, "test")
            if e.seq > goc.seq and (not candidate or e.detail.get("candidate") == candidate)]
     if not sau:
-        return Check(ten, False, "chưa có lần test nào ở ứng viên sau baseline — không so được",
+        return Check(ten, False, "no test run at candidate after baseline — cannot compare",
                      evidence=doc)
     moi = sau[-1]
     doc.append(moi.seq)
     if moi.detail.get("unrunnable"):
         return Check(ten, Outcome.UNRUNNABLE,
-                     f"lần test ở ứng viên không chạy được ({moi.detail['unrunnable']}) — không so được",
+                     f"candidate test run unrunnable ({moi.detail['unrunnable']}) — cannot compare",
                      evidence=doc)
     if not moi.detail.get("test_format"):
         return Check(ten, Outcome.UNCONFIGURED, str(moi.detail.get("test_note") or "")
-                     or "không đọc được tên test ở ứng viên — dùng reporter in tên", evidence=doc)
+                     or "cannot read test names at candidate — use a reporter that prints names", evidence=doc)
 
     goc_ids = list(goc.detail.get("test_ids") or [])
     khong_xanh = set(goc.detail.get("failed_ids") or []) | set(goc.detail.get("skipped_ids") or [])
@@ -276,24 +276,24 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
     if lam_do or mat:
         loi = []
         if lam_do:
-            loi.append(f"làm đỏ {len(lam_do)} test xanh ở baseline: {_ten(lam_do)}")
+            loi.append(f"broke {len(lam_do)} tests green at baseline: {_ten(lam_do)}")
         if mat:
-            loi.append(f"mất {len(mat)} test có ở baseline: {_ten(mat)} — xoá hay đổi tên "
-                       "test có sẵn phải là quyết định khai trong story; bằng chứng không "
-                       "suy được nên tính là hồi quy")
+            loi.append(f"lost {len(mat)} tests present at baseline: {_ten(mat)} — deleting or renaming "
+                       "existing tests must be declared in the story; evidence cannot infer intent "
+                       "so this counts as regression")
         return Check(ten, False, "; ".join(loi), evidence=doc)
     do_san = list(goc.detail.get("red_before") or goc.detail.get("failed_ids") or [])
     if doi_ten:
-        return Check(ten, True, f"{len(doi_ten)} test đổi tên nhưng còn tiêu đề lá, không tính là mất: {_ten(doi_ten)}",
+        return Check(ten, True, f"{len(doi_ten)} tests renamed but leaf title still present, not counted as lost: {_ten(doi_ten)}",
                      evidence=doc)
     if do_san:
-        return Check(ten, True, f"{len(do_san)} test đã đỏ sẵn ở baseline, không tính: {_ten(do_san)}",
+        return Check(ten, True, f"{len(do_san)} tests already red at baseline, not counted: {_ten(do_san)}",
                      evidence=doc)
     if lat:
-        return Check(ten, True, f"{len(lat)} test không ổn định không tính ở đây (xem mục test): {_ten(lat)}",
+        return Check(ten, True, f"{len(lat)} flaky tests not counted here (see test check): {_ten(lat)}",
                      evidence=doc)
     if cat:
-        return Check(ten, True, f"danh sách test bị cắt ở {MAX_IDS} tên — chỉ so được test đỏ, không so được test mất",
+        return Check(ten, True, f"test list truncated at {MAX_IDS} names — can only compare red tests, cannot detect lost tests",
                      evidence=doc)
     return Check(ten, True, evidence=doc)
 
@@ -331,7 +331,7 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
     story không thêm/sửa tệp test, tắt bởi `verify.nop`, hay harness không
     ghi nop nào (nhật ký trước V3) → NOT_APPLICABLE có lý do.
     """
-    ten = "test có kiểm được story"
+    ten = "tests verify story"
     goc = evidence.last(TOOL_RUN, BASELINE_RUN)
     sau = [e for e in evidence.of(TOOL_RUN, "test")
            if (goc is None or e.seq > goc.seq)
@@ -357,8 +357,8 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
     if ac and goc is not None and goc.detail.get("test_format"):
         re_nhanh, cha = str(goc.detail.get("base_ref") or ""), str(goc.detail.get("parent") or "")
         if re_nhanh and cha and re_nhanh != cha:
-            cap1 = (f"cấp 1 không so được: baseline chạy ở {cha[:7]} — bản của chính story "
-                    f"(lượt chạy lại), không phải điểm rẽ {re_nhanh[:7]}")
+            cap1 = (f"level 1 cannot compare: baseline ran at {cha[:7]} — the story's own build "
+                    f"(rerun), not the branch point {re_nhanh[:7]}")
         else:
             goc_ids = list(goc.detail.get("test_ids") or [])
             khong_xanh = set(goc.detail.get("failed_ids") or []) | set(goc.detail.get("skipped_ids") or [])
@@ -370,51 +370,51 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
             doi = [t for t in ac if t not in goc_ids and _la(t) in la_mat]
             loi = []
             if gan:
-                loi.append(f"gắn mã vào test có sẵn: {len(gan)} test mang mã tiêu chí đã xanh ở "
-                           f"baseline với đúng tên này — xanh trước khi story viết dòng nào: {_ten(gan)}")
+                loi.append(f"tagged existing tests: {len(gan)} tests with criteria codes were already green at "
+                           f"baseline under the same name — green before the story wrote a line: {_ten(gan)}")
             if doi:
-                loi.append(f"đổi tên test có sẵn để mang mã: {len(doi)} test đã xanh ở baseline dưới "
-                           f"tên cũ — mã tiêu chí thành một cái tên, không phải một phép kiểm: {_ten(doi)}")
+                loi.append(f"renamed existing tests to carry codes: {len(doi)} tests were green at baseline under "
+                           f"their old name — criteria code became a label, not a verification: {_ten(doi)}")
             if loi:
-                return ket(False, "; ".join(loi) + ". Viết test mới cho tiêu chí, giữ test có sẵn nguyên tên")
+                return ket(False, "; ".join(loi) + ". Write new tests for criteria, keep existing tests under their original names")
 
     # ---- cấp 2
     if nop is None:
         return ket(Outcome.NOT_APPLICABLE,
-                     "harness không chạy nop nào (chạy tay, nhật ký trước ADR-005 V3) — không so được")
+                     "harness ran no nop (manual run, journal before ADR-005 V3) — cannot compare")
     d = nop.detail
     if d.get("disabled"):
-        return ket(Outcome.NOT_APPLICABLE, "tắt bởi cấu hình `verify.nop`")
+        return ket(Outcome.NOT_APPLICABLE, "disabled by `verify.nop` config")
     if d.get("skipped"):
         if "files" in d and not d["files"]:
-            return ket(Outcome.NOT_APPLICABLE, "story không thêm/sửa tệp test")
-        return ket(Outcome.UNCONFIGURED, f"không có nop: {d['skipped']}")
+            return ket(Outcome.NOT_APPLICABLE, "story did not add/modify test files")
+        return ket(Outcome.UNCONFIGURED, f"no nop: {d['skipped']}")
     if d.get("unrunnable") and not d.get("test_format"):
         return ket(Outcome.UNRUNNABLE,
-                     f"nop ở SHA cha không chạy được ({d['unrunnable']}) — không so được")
+                     f"nop at parent SHA unrunnable ({d['unrunnable']}) — cannot compare")
     cha = str(d.get("parent") or "")[:7] or "cha"
     if moi is None:
-        return ket(False, "chưa có lần test nào ở ứng viên — chưa biết test nào xanh để so với SHA cha")
+        return ket(False, "no test run at candidate — cannot determine which tests are green to compare with parent SHA")
     if d.get("test_format") and moi.detail.get("test_format") and acceptance > 0:
         if not ac:
-            return ket(False, "chưa có test nào mang mã tiêu chí xanh ở ứng viên — không có gì "
-                                     "để kiểm ở SHA cha (xem mục tiêu chí có test)")
+            return ket(False, "no tests with criteria codes green at candidate — nothing "
+                                     "to verify at parent SHA (see criteria have tests check)")
         khong = set(d.get("failed_ids") or []) | set(d.get("skipped_ids") or [])
         xanh_nop = {t for t in d.get("test_ids") or [] if t not in khong}
         van_xanh = [t for t in ac if t in xanh_nop]
         if van_xanh:
-            return ket(False, f"test không kiểm được gì — xanh cả khi không có mã của story "
-                                     f"(SHA cha {cha}): {_ten(van_xanh)}")
-        return ket(True, f"{len(ac)} test mang mã tiêu chí đỏ hoặc không tồn tại ở SHA cha {cha}"
+            return ket(False, f"tests verify nothing — still green without story code "
+                                     f"(parent SHA {cha}): {_ten(van_xanh)}")
+        return ket(True, f"{len(ac)} tests with criteria codes are red or absent at parent SHA {cha}"
                                 + (f"; {cap1}" if cap1 else ""))
     if nop.ok:
-        return ket(False, f"bộ test xanh ở SHA cha {cha} với tệp test của story chép vào — "
-                                 f"test của story không kiểm được gì ({_ten(list(d.get('files') or []), 3)})")
+        return ket(False, f"test suite green at parent SHA {cha} with story test files copied in — "
+                                 f"story tests verify nothing ({_ten(list(d.get('files') or []), 3)})")
     if acceptance <= 0:
-        return ket(True, f"bộ test đỏ ở SHA cha {cha} — story không khai tiêu chí, không so theo mã")
+        return ket(True, f"test suite red at parent SHA {cha} — story declares no criteria, not compared by code")
     return ket(Outcome.UNCONFIGURED,
-                 "không đọc được tên test — chỉ biết bộ test đỏ ở SHA cha, không biết có phải test của "
-                 "story; dùng reporter in tên (`node --test`, `vitest --reporter=verbose`, `pytest -v`)")
+                 "cannot read test names — only know test suite is red at parent SHA, cannot tell if those are "
+                 "story tests; use a reporter that prints names (`node --test`, `vitest --reporter=verbose`, `pytest -v`)")
 
 
 def evaluate(
@@ -453,18 +453,18 @@ def evaluate(
     moi_nhat = _latest_per_check(evidence)
     if not candidate:
         gate.checks.append(Check(
-            "bằng chứng đúng candidate", Outcome.NOT_APPLICABLE,
-            "không truyền candidate — không kiểm được bằng chứng thuộc bản nào",
+            "evidence matches candidate", Outcome.NOT_APPLICABLE,
+            "no candidate passed — cannot verify which build evidence belongs to",
         ))
     elif stale:
         gate.checks.append(Check(
-            "bằng chứng đúng candidate", Outcome.UNRUNNABLE,
-            f"stale: ghi ở {', '.join(s[:7] for s in stale)}, "
-            f"ứng viên hiện tại là {candidate[:7]} — chạy lại phép kiểm trên bản này",
+            "evidence matches candidate", Outcome.UNRUNNABLE,
+            f"stale: recorded at {', '.join(s[:7] for s in stale)}, "
+            f"current candidate is {candidate[:7]} — rerun checks on this build",
             evidence=[e.seq for e in moi_nhat.values() if str(e.detail["candidate"]) != candidate],
         ))
     else:
-        gate.checks.append(Check("bằng chứng đúng candidate", True,
+        gate.checks.append(Check("evidence matches candidate", True,
                                  evidence=[e.seq for e in moi_nhat.values()]))
     if candidate:
         # Sau khi đã nói ra, bỏ hẳn: một phép kiểm của bản khác không được
@@ -478,18 +478,18 @@ def evaluate(
     # "guard chưa từng đánh giá một thao tác ghi nào" là điều đo được.
     if not guard_expected:
         gate.checks.append(Check(
-            "guard có chạy", Outcome.NOT_APPLICABLE,
-            "chưa biên dịch hook cho client này — không kỳ vọng",
+            "guard ran", Outcome.NOT_APPLICABLE,
+            "hooks not compiled for this client — not expected",
         ))
     else:
         # Dấu vết đầu tiên là đủ để trả lời "hook có tới không".
         dau_vet = evidence.of(GUARD_SEEN) or evidence.of(GUARD_BLOCK) or evidence.of(FILE_CHANGE)
         gate.checks.append(Check(
-            "guard có chạy", evidence.guard_reached,
+            "guard ran", evidence.guard_reached,
             "" if evidence.guard_reached else (
-                "guard chưa đánh giá thao tác ghi nào trong phiên — hook không "
-                "tới được worktree? (.claude/ chưa commit, hoặc --settings không "
-                "được truyền). Story không ghi gì cũng rơi vào đây, và đó là đúng."
+                "guard did not evaluate any write in this session — hook cannot "
+                "reach worktree? (.claude/ not committed, or --settings not "
+                "passed). A story that writes nothing also lands here, and that is correct."
             ),
             evidence=[dau_vet[0].seq] if dau_vet else [],
         ))
@@ -512,7 +512,7 @@ def evaluate(
 
     lint = evidence.last(TOOL_RUN, "lint")
     if lint is None:
-        gate.checks.append(Check("lint", False, "chưa chạy lint lần nào"))
+        gate.checks.append(Check("lint", False, "lint has never been run"))
     elif lint.detail.get("skipped"):
         gate.checks.append(
             Check("lint", Outcome.UNCONFIGURED, str(lint.detail["skipped"]), evidence=[lint.seq])
@@ -529,17 +529,17 @@ def evaluate(
     # Suy từ tham số (`changed`, `write_scope` — cây git do `run_attempt` đọc),
     # không từ sự kiện: `evidence` rỗng, và rỗng là đúng.
     scope = check_diff_scope(changed, write_scope)
-    gate.checks.append(Check("phạm vi ghi", scope.allowed, scope.reason))
+    gate.checks.append(Check("write scope", scope.allowed, scope.reason))
 
     if not screens:
-        gate.checks.append(Check("map mockup", Outcome.NOT_APPLICABLE, "story không có giao diện"))
+        gate.checks.append(Check("mockup map", Outcome.NOT_APPLICABLE, "story has no UI"))
     else:
         maps = {e.name: e for e in evidence.of(MOCKUP_MAP)}
         doc_map = [maps[s].seq for s in screens if s in maps]
         missing_runs = [s for s in screens if s not in maps]
         if missing_runs:
             gate.checks.append(
-                Check("map mockup", False, f"chưa đối chiếu: {', '.join(missing_runs)}", evidence=doc_map)
+                Check("mockup map", False, f"not compared: {', '.join(missing_runs)}", evidence=doc_map)
             )
         else:
             failed = [s for s in screens if not maps[s].ok]
@@ -547,21 +547,21 @@ def evaluate(
             if failed:
                 first = maps[failed[0]].detail
                 detail = (
-                    f"{failed[0]} thiếu: "
+                    f"{failed[0]} missing: "
                     + ", ".join(first.get("missing", []) + first.get("missing_data_roles", []))
                 )
-            gate.checks.append(Check("map mockup", not failed, detail, evidence=doc_map))
+            gate.checks.append(Check("mockup map", not failed, detail, evidence=doc_map))
 
     fake = evidence.last(TOOL_RUN, "qa:fake-tests")
     if fake is not None and not fake.ok:
         files = fake.detail.get("files") or []
         gate.checks.append(
-            Check("test thật", False,
-                  f"{len(files)} test không có khẳng định nào: {', '.join(files[:3])}",
+            Check("real tests", False,
+                  f"{len(files)} tests have no assertions: {', '.join(files[:3])}",
                   evidence=[fake.seq])
         )
     else:
-        gate.checks.append(Check("test thật", True, evidence=[fake.seq] if fake is not None else []))
+        gate.checks.append(Check("real tests", True, evidence=[fake.seq] if fake is not None else []))
 
     # Tiêu chí có test (G5): mã `AC-<story>-<i>` phải nằm trong tên một test
     # của lần chạy xanh cuối — tên đọc từ output runner, không từ lời agent.
@@ -571,24 +571,24 @@ def evaluate(
     last_green = xanh[-1] if xanh else None
     doc_xanh = [last_green.seq] if last_green is not None else []
     if acceptance <= 0:
-        gate.checks.append(Check("tiêu chí có test", Outcome.NOT_APPLICABLE, "story không khai tiêu chí"))
+        gate.checks.append(Check("criteria have tests", Outcome.NOT_APPLICABLE, "story declares no criteria"))
     elif last_green is None:
-        gate.checks.append(Check("tiêu chí có test", False, "chưa có lần test xanh"))
+        gate.checks.append(Check("criteria have tests", False, "no green test run yet"))
     elif not last_green.detail.get("test_format"):
         gate.checks.append(Check(
-            "tiêu chí có test", Outcome.UNCONFIGURED,
+            "criteria have tests", Outcome.UNCONFIGURED,
             str(last_green.detail.get("test_note") or "")
-            or "không đọc được tên test từ output runner — dùng reporter in tên "
+            or "cannot read test names from runner output — use a reporter that prints names "
                "(`node --test`, `vitest --reporter=verbose`, `pytest -v`, CTRF)",
             evidence=doc_xanh,
         ))
     else:
         thieu = ac_missing(story_id, acceptance, list(last_green.detail.get("test_ids") or []))
         gate.checks.append(Check(
-            "tiêu chí có test", not thieu,
+            "criteria have tests", not thieu,
             "" if not thieu else
-            f"chưa có test mang mã {', '.join(ac_code(story_id, i) for i in thieu)} — "
-            f"mỗi tiêu chí cần ít nhất một test đặt tên theo mã của nó",
+            f"no tests with codes {', '.join(ac_code(story_id, i) for i in thieu)} — "
+            f"each criterion needs at least one test named after its code",
             evidence=doc_xanh,
         ))
 
@@ -597,11 +597,11 @@ def evaluate(
     if coverage_min is not None:
         cov = last_green.detail.get("coverage") if last_green else None
         if last_green is None:
-            gate.checks.append(Check("coverage", Outcome.UNCONFIGURED, "chưa có lần test xanh để đo"))
+            gate.checks.append(Check("coverage", Outcome.UNCONFIGURED, "no green test run to measure"))
         elif cov is None:
             gate.checks.append(Check(
                 "coverage", Outcome.UNCONFIGURED,
-                "runner chưa in coverage — thêm `--coverage` (vitest/c8) hoặc `--cov` (pytest) vào lệnh test",
+                "runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command",
                 evidence=doc_xanh,
             ))
         else:
@@ -615,13 +615,13 @@ def evaluate(
     # TDD (G8): story thêm test thì phải có một lần đỏ trước lần xanh cuối.
     if added_tests is not None:
         if not added_tests:
-            gate.checks.append(Check("TDD", Outcome.NOT_APPLICABLE, "story không thêm test"))
+            gate.checks.append(Check("TDD", Outcome.NOT_APPLICABLE, "story did not add tests"))
         else:
             gate.checks.append(Check(
                 "TDD", red_before_green(evidence),
                 "" if red_before_green(evidence) else
-                f"test xanh ngay lần đầu — chưa chứng minh nó kiểm được gì "
-                f"({', '.join(added_tests[:3])}). Viết test trước, chạy thấy đỏ, rồi mới viết code.",
+                f"tests green on first run — not proven to verify anything "
+                f"({', '.join(added_tests[:3])}). Write tests first, see them fail, then write code.",
                 evidence=[e.seq for e in evidence.of(TOOL_RUN, "test")],   # thứ tự đỏ/xanh đọc trên cả dãy
             ))
     # Nop control (ADR-005 V3) ngay sau TDD: cùng câu hỏi, hỏi thẳng hơn.
@@ -658,27 +658,27 @@ def evaluate(
     # (`review_blocking` là lời reviewer đã lọc ở `run_attempt`).
     if security is None:
         gate.checks.append(
-            Check("bảo mật", Outcome.UNCONFIGURED, "chưa cấu hình rà soát bảo mật")
+            Check("security", Outcome.UNCONFIGURED, "security review not configured")
         )
     elif security.error:
-        gate.checks.append(Check("bảo mật", False, security.error))
+        gate.checks.append(Check("security", False, security.error))
     else:
         chan = security.blocking(block_severities or DEFAULT_BLOCKING)
         gate.checks.append(Check(
-            "bảo mật",
+            "security",
             not chan,
-            "" if not chan else f"{len(chan)} mục chặn: {chan[0].line()[:200]}",
+            "" if not chan else f"{len(chan)} blocking items: {chan[0].line()[:200]}",
         ))
 
     if not review_ran:
-        gate.checks.append(Check("rà soát", False, "chưa rà soát độc lập"))
+        gate.checks.append(Check("review", False, "independent review not run"))
     else:
         blocking = review_blocking or []
         gate.checks.append(
             Check(
-                "rà soát",
+                "review",
                 not blocking,
-                "" if not blocking else f"{len(blocking)} mục chặn: {blocking[0][:200]}",
+                "" if not blocking else f"{len(blocking)} blocking items: {blocking[0][:200]}",
             )
         )
 
@@ -705,8 +705,8 @@ def _preservation_check(evidence: Evidence, preservation: list[dict], candidate:
     hỏng không", và một lần chạy không rõ bản nào không trả lời được.
     """
     if not preservation:
-        return Check("bảo toàn", Outcome.NOT_APPLICABLE,
-                     "story không chạm hành vi VERIFIED nào của story khác")
+        return Check("preservation", Outcome.NOT_APPLICABLE,
+                     "story does not touch any VERIFIED behaviour of other stories")
 
     doc: list[int] = []     # sự kiện đã đọc ở đúng ứng viên
 
@@ -758,17 +758,17 @@ def _preservation_check(evidence: Evidence, preservation: list[dict], candidate:
             do.append(f"{bid} ({red[0]})")
 
     if do:
-        return Check("bảo toàn", Outcome.FAILED,
-                     f"hồi quy: {', '.join(do[:3])}{'…' if len(do) > 3 else ''} — hành vi đã "
-                     "VERIFIED của story khác đỏ ở ứng viên này; sửa code cho nó xanh lại, "
-                     "không sửa test của nó", evidence=doc)
+        return Check("preservation", Outcome.FAILED,
+                     f"regression: {', '.join(do[:3])}{'…' if len(do) > 3 else ''} — VERIFIED "
+                     "behaviour of other stories is red at this candidate; fix code to make it green again, "
+                     "do not modify their tests", evidence=doc)
     if thieu:
-        return Check("bảo toàn", Outcome.UNRUNNABLE,
-                     f"chưa kiểm được ở ứng viên {candidate[:7] or 'này'}: "
-                     f"{', '.join(thieu[:3])}{'…' if len(thieu) > 3 else ''} — không có test "
-                     "mang mã / kiểm định bỏ qua / màn chưa đối chiếu; không kiểm được không phải đạt",
+        return Check("preservation", Outcome.UNRUNNABLE,
+                     f"cannot verify at candidate {candidate[:7] or 'this'}: "
+                     f"{', '.join(thieu[:3])}{'…' if len(thieu) > 3 else ''} — no test "
+                     "with code / check skipped / screen not compared; unverifiable is not a pass",
                      evidence=doc)
-    return Check("bảo toàn", True, f"{len(preservation)} hành vi của story khác còn xanh", evidence=doc)
+    return Check("preservation", True, f"{len(preservation)} behaviours of other stories still green", evidence=doc)
 
 
 def qualification_table(test_file: Path | None = None) -> dict[str, dict[str, bool]]:

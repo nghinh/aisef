@@ -31,7 +31,7 @@ from aisef.harness.guardrails import head_sha  # noqa: E402
 from aisef.harness.observe import AGENT_RUN, TOOL_RUN, EvidenceStore  # noqa: E402
 from aisef.phases.implement import implement_story  # noqa: E402
 
-CANDIDATE = "bằng chứng đúng candidate"
+CANDIDATE = "evidence matches candidate"
 
 
 class TestJournalOrder(unittest.TestCase):
@@ -129,8 +129,8 @@ class TestGateCandidate(GateCandidateTestCase):
         self.xanh("aaa")
         g = self.gate("bbb")
         test = next(c for c in g.checks if c.name == "test")
-        self.assertNotIn("đỏ", test.detail)
-        self.assertIn("chưa", test.detail.lower())
+        self.assertNotIn("red", test.detail)
+        self.assertIn("no test run", test.detail.lower())
 
     def test_luot_truoc_o_ban_cu_khong_lam_luot_sau_stale(self):
         """Chạy lại phép kiểm ở bản mới là đủ: lịch sử không phải nợ."""
@@ -296,7 +296,7 @@ class TestReviewerDoiUngVien(WorktreeCase):
         out = self.implement(Client(review_commits=True))
         self.assertFalse(out.done, out.summary())
         finding = " ".join(out.attempts[-1].review_findings)
-        self.assertIn("ứng viên đổi", finding)
+        self.assertIn("candidate changed", finding)
         got = self.evidence().last(TOOL_RUN, "review:candidate")
         self.assertIsNotNone(got, "phải ghi bằng chứng lượt rà soát không tính")
         self.assertFalse(got.ok)

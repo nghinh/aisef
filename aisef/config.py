@@ -272,7 +272,7 @@ def _coerce(key: str, raw: str) -> Any:
             return [p.strip() for p in raw.split(",") if p.strip()]
         return raw
     except ValueError as e:
-        raise ConfigError(f"{_env_key(key)}={raw!r} không ép được về {want.__name__}") from e
+        raise ConfigError(f"{_env_key(key)}={raw!r} cannot coerce to {want.__name__}") from e
 
 
 def _validate(values: dict[str, Any]) -> None:
@@ -282,29 +282,29 @@ def _validate(values: dict[str, Any]) -> None:
         val = values[key]
         # bool là lớp con của int trong Python — đừng để True lọt vào ô số
         if want is int and isinstance(val, bool):
-            raise ConfigError(f"{key} phải là số nguyên, nhận {val!r}")
+            raise ConfigError(f"{key} must be int, got {val!r}")
         if want is float and isinstance(val, int) and not isinstance(val, bool):
             values[key] = float(val)
             continue
         if not isinstance(val, want):
-            raise ConfigError(f"{key} phải là {want.__name__}, nhận {type(val).__name__}")
+            raise ConfigError(f"{key} must be {want.__name__}, got {type(val).__name__}")
 
     if not 0.0 <= values["coverage.min"] <= 1.0:
-        raise ConfigError("coverage.min phải trong khoảng 0..1")
+        raise ConfigError("coverage.min must be in range 0..1")
     for key in ("run.max_parallel", "run.max_turns", "run.timeout_seconds"):
         if values[key] < 1:
-            raise ConfigError(f"{key} phải >= 1")
+            raise ConfigError(f"{key} must be >= 1")
     if values["run.max_retries"] < 0:
-        raise ConfigError("run.max_retries phải >= 0")
+        raise ConfigError("run.max_retries must be >= 0")
     for key in ("improve.max_loops", "improve.flat_loops"):
         if values[key] < 1:
-            raise ConfigError(f"{key} phải >= 1")
+            raise ConfigError(f"{key} must be >= 1")
     if values["context.max_repo_map_chars"] < 0:
-        raise ConfigError("context.max_repo_map_chars phải >= 0 (0 = tắt)")
+        raise ConfigError("context.max_repo_map_chars must be >= 0 (0 = disabled)")
     if values["improve.cost_cap_usd"] < 0:
-        raise ConfigError("improve.cost_cap_usd phải >= 0 (0 = không giới hạn)")
+        raise ConfigError("improve.cost_cap_usd must be >= 0 (0 = unlimited)")
     if values["cost.warn_multiple"] <= 1.0:
-        raise ConfigError("cost.warn_multiple phải > 1 thì cảnh báo mới có nghĩa")
+        raise ConfigError("cost.warn_multiple must be > 1 for the warning to be meaningful")
 
 
 @dataclass
@@ -322,15 +322,15 @@ class Config:
             try:
                 loaded = json.loads(path.read_text(encoding="utf-8"))
             except json.JSONDecodeError as e:
-                raise ConfigError(f"{path} không phải JSON hợp lệ: {e}") from e
+                raise ConfigError(f"{path} is not valid JSON: {e}") from e
             retired = sorted(k for k in loaded if k in RETIRED)
             for k in retired:
-                print(f"cấu hình: `{k}` không còn tác dụng ({RETIRED[k]}) — xoá khỏi {path}",
+                print(f"config: `{k}` is retired ({RETIRED[k]}) — remove from {path}",
                       file=sys.stderr)
                 loaded.pop(k)
             unknown = sorted(set(loaded) - set(DEFAULTS))
             if unknown:
-                raise ConfigError(f"khoá không nhận ra trong {path}: {', '.join(unknown)}")
+                raise ConfigError(f"unrecognized keys in {path}: {', '.join(unknown)}")
             values.update(loaded)
             sources.append(str(path))
 
@@ -351,7 +351,7 @@ class Config:
         try:
             return self.values[key]
         except KeyError:
-            raise KeyError(f"khoá cấu hình không tồn tại: {key}") from None
+            raise KeyError(f"config key does not exist: {key}") from None
 
     def get(self, key: str, default: Any = None) -> Any:
         return self.values.get(key, default)

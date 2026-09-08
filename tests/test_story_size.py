@@ -161,7 +161,7 @@ class TestStorySize(unittest.TestCase):
             self.assertIsNotNone(d)
             self.assertEqual(d.kind, "story")
             self.assertTrue(d.blocks_run)
-            self.assertIn("18 trạng thái màn hình", d.evidence)
+            self.assertIn("18 screen states", d.evidence)
             pf = preflight.check_story(s, project=Path("."), config=self.cfg)
         self.assertFalse(pf.executable)
         self.assertTrue(any(m.capability == "size" for m in pf.story_defects))
@@ -178,7 +178,7 @@ class TestStorySize(unittest.TestCase):
                 s5, project=Path("."), config=self.cfg, owned=owned))
             d4 = preflight.story_size_defect(s4, project=Path("."), config=self.cfg, owned=owned)
         self.assertIsNotNone(d4)
-        self.assertIn("11 trạng thái màn hình", d4.evidence)
+        self.assertIn("11 screen states", d4.evidence)
 
     def test_done_story_is_not_measured(self):
         """Cổng cỡ story là phép kiểm trước execution: story đã xong thì bỏ qua."""
@@ -260,9 +260,9 @@ class TestSplitSuggestion(unittest.TestCase):
         e = exp(**{"notes-list": 9, "note-editor": 4})
         out = complexity.split_suggestion(s, complexity.score_story(s, experience=e),
                                           experience=e)
-        self.assertIn("mỗi màn một story", out)
-        self.assertIn("`notes-list` (9 trạng thái)", out)
-        self.assertIn("`note-editor` (4 trạng thái)", out)
+        self.assertIn("one story per screen", out)
+        self.assertIn("`notes-list` (9 states)", out)
+        self.assertIn("`note-editor` (4 states)", out)
 
     def test_one_screen_splits_primary_states_from_edge_states(self):
         e = Experience(screens=[Screen(id="notes-list", name="notes-list", states=[
@@ -270,14 +270,14 @@ class TestSplitSuggestion(unittest.TestCase):
         s = story(["notes-list"])
         out = complexity.split_suggestion(s, complexity.score_story(s, experience=e),
                                           experience=e)
-        self.assertIn("trạng thái chính (Mở nguội)", out)
+        self.assertIn("primary states (Mở nguội)", out)
         self.assertIn("Kho rỗng, Đang offline, Focus", out)
 
     def test_no_screen_splits_by_acceptance_clusters(self):
         s = story([], ac=7, scope=["src/a.ts", "src/b.ts"])
         out = complexity.split_suggestion(s, complexity.score_story(s))
-        self.assertIn("TCCN 1–4", out)
-        self.assertIn("TCCN 5–7", out)
+        self.assertIn("AC 1–4", out)
+        self.assertIn("AC 5–7", out)
 
     def test_suggestion_reaches_the_need_and_is_stable(self):
         s = story(["notes-list", "note-editor"], ac=7)
@@ -285,8 +285,8 @@ class TestSplitSuggestion(unittest.TestCase):
         with mock.patch.object(preflight, "_experience", return_value=e):
             a = preflight.story_size_defect(s, project=Path("."))
             b = preflight.story_size_defect(s, project=Path("."))
-        self.assertIn("mỗi màn một story", a.remedy)
-        self.assertIn("mỗi màn một story", a.line())
+        self.assertIn("one story per screen", a.remedy)
+        self.assertIn("one story per screen", a.line())
         self.assertEqual(a.line(), b.line(), "cùng dữ liệu phải cho cùng câu chữ")
 
 
@@ -341,7 +341,7 @@ class TestCalibrationTable(unittest.TestCase):
                 for i in range(2)}
         out = complexity.divergence(rows)
         self.assertEqual(len(out), 1)
-        self.assertIn("quá cao", out[0])
+        self.assertIn("too high", out[0])
 
     def test_divergence_flags_threshold_too_low(self):
         rows = {f"S{i}": {"total": 20.0, "threshold": 16.0, "first_turns": 12,
@@ -349,7 +349,7 @@ class TestCalibrationTable(unittest.TestCase):
                 for i in range(2)}
         out = complexity.divergence(rows)
         self.assertEqual(len(out), 1)
-        self.assertIn("quá thấp", out[0])
+        self.assertIn("too low", out[0])
 
     def test_one_diverging_story_is_not_enough(self):
         rows = {"S0": {"total": 5.0, "threshold": 16.0, "first_turns": 40,
@@ -373,8 +373,8 @@ class TestCalibrationTable(unittest.TestCase):
         buf = io.StringIO()
         with redirect_stdout(buf):
             doctor.cmd_doctor(argparse.Namespace(project=str(self.root.parent)))
-        self.assertIn("ngưỡng cỡ story khớp dữ liệu", buf.getvalue())
-        self.assertIn("quá cao", buf.getvalue())
+        self.assertIn("story size thresholds match data", buf.getvalue())
+        self.assertIn("too high", buf.getvalue())
 
     def test_spearman_matches_a_hand_computed_case(self):
         self.assertAlmostEqual(complexity.spearman([1, 2, 3], [10, 20, 30]), 1.0)
@@ -389,12 +389,12 @@ class TestGateMemo(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d) / "_bmad-output"
             root.mkdir()
-            self.assertNotIn("KHÔNG ĐẠT", build_prompt(epics, project=Path(d)))
+            self.assertNotIn("FAILED", build_prompt(epics, project=Path(d)))
             (root / GATE_MEMO).write_text(json.dumps(
                 {"errors": ["STORY-01-05 quá lớn: 18 trạng thái"], "warnings": []}),
                 encoding="utf-8")
             text = build_prompt(epics, project=Path(d))
-            self.assertIn("KHÔNG ĐẠT", text)
+            self.assertIn("FAILED", text)
             self.assertIn("18 trạng thái", text)
 
 

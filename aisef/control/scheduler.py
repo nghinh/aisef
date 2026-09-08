@@ -75,13 +75,13 @@ def _validate(stories: list[Story]) -> dict[str, Story]:
     by_id: dict[str, Story] = {}
     for s in stories:
         if s.id in by_id:
-            raise ValueError(f"story trùng id: {s.id}")
+            raise ValueError(f"duplicate story id: {s.id}")
         by_id[s.id] = s
 
     for s in stories:
         for dep in s.depends_on:
             if dep not in by_id:
-                raise UnknownDependencyError(f"{s.id} phụ thuộc {dep!r} không tồn tại")
+                raise UnknownDependencyError(f"{s.id} depends on {dep!r} which does not exist")
     return by_id
 
 
@@ -95,7 +95,7 @@ def build_waves(stories: list[Story], *, max_parallel: int | None = None) -> lis
     hạn mức gọi model.
     """
     if max_parallel is not None and max_parallel < 1:
-        raise ValueError("max_parallel phải >= 1")
+        raise ValueError("max_parallel must be >= 1")
 
     by_id = _validate(stories)
     satisfied = {s.id for s in stories if s.is_done}
@@ -106,7 +106,7 @@ def build_waves(stories: list[Story], *, max_parallel: int | None = None) -> lis
         ready = [s for s in remaining if all(d in satisfied for d in s.depends_on)]
         if not ready:
             stuck = sorted(s.id for s in remaining)
-            raise CycleError(f"phụ thuộc vòng hoặc bế tắc giữa: {', '.join(stuck)}")
+            raise CycleError(f"dependency cycle or deadlock among: {', '.join(stuck)}")
 
         # Xếp greedy: nhận story nếu không đụng phạm vi ghi với story đã nhận.
         # Thứ tự id giữ cho kết quả ổn định giữa các lần chạy.
@@ -163,7 +163,7 @@ def plan_epics(
     order = epic_order or sorted(groups)
     unknown = [e for e in order if e not in groups]
     if unknown:
-        raise ValueError(f"epic không có story: {', '.join(unknown)}")
+        raise ValueError(f"epic has no stories: {', '.join(unknown)}")
 
     plans: list[EpicPlan] = []
     for epic_id in order:
@@ -191,9 +191,9 @@ def describe(plans: list[EpicPlan]) -> str:
     lines = []
     for p in plans:
         if not p.waves:
-            lines.append(f"{p.epic_id}: (đã xong)")
+            lines.append(f"{p.epic_id}: (done)")
             continue
-        lines.append(f"{p.epic_id}: {p.story_count} story · {len(p.waves)} đợt · rộng nhất {p.max_width}")
+        lines.append(f"{p.epic_id}: {p.story_count} stories · {len(p.waves)} waves · max width {p.max_width}")
         for i, wave in enumerate(p.waves, 1):
-            lines.append(f"  đợt {i}: " + ", ".join(s.id for s in wave))
+            lines.append(f"  wave {i}: " + ", ".join(s.id for s in wave))
     return "\n".join(lines)

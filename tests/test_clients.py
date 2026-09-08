@@ -153,7 +153,7 @@ class TestGuardRails(unittest.TestCase):
         a = ClaudeCodeAdapter(binary="lenh-khong-ton-tai-12345")
         r = a.run(RunSpec(prompt="p", workdir=Path(".")))
         self.assertFalse(r.ok)
-        self.assertIn("không tìm thấy", r.error)
+        self.assertIn("command not found", r.error)
 
     def test_missing_workdir_reported(self):
         a = ClaudeCodeAdapter()
@@ -183,7 +183,7 @@ class TestTimeoutIsInfrastructureError(unittest.TestCase):
                 RunSpec(prompt="p", workdir=Path(d), timeout_seconds=1)
             )
         self.assertFalse(r.ok)
-        self.assertIn("quá 1s", r.error)
+        self.assertIn("exceeded 1s", r.error)
 
 
 if __name__ == "__main__":

@@ -81,7 +81,7 @@ class TestBangChungDungCandidate(Muc):
     (⚠ UNRUNNABLE — chạy lại, không phải sửa mã), nên control negative kiểm
     rằng nó chặn và không cho mục khác mượn kết quả của bản cũ."""
 
-    TEN = "bằng chứng đúng candidate"
+    TEN = "evidence matches candidate"
 
     def test_positive_moi_phep_kiem_o_dung_sha(self):
         t = self.xanh(sha="aaa")
@@ -90,7 +90,7 @@ class TestBangChungDungCandidate(Muc):
         self.assertIn(t.seq, m.evidence)
         m = self.muc(self.gate())
         self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
-        self.assertIn("không truyền candidate", m.detail)
+        self.assertIn("no candidate passed", m.detail)
 
     def test_negative_ket_qua_o_ban_cu_khong_lam_muc_khac_dat(self):
         self.xanh(sha="bbb")
@@ -110,7 +110,7 @@ class TestBangChungDungCandidate(Muc):
 
 
 class TestGuardCoChay(Muc):
-    TEN = "guard có chạy"
+    TEN = "guard ran"
 
     def setUp(self):
         super().setUp()
@@ -126,7 +126,7 @@ class TestGuardCoChay(Muc):
     def test_negative_ky_vong_ma_khong_dau_vet(self):
         m = self.muc(self.gate(guard_expected=True))
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("hook không tới được worktree", m.detail)
+        self.assertIn("hook cannot reach worktree", m.detail)
         self.assertEqual(m.evidence, [])
 
     def test_env_chua_bien_dich_hook_thi_khong_ky_vong_co_ly_do(self):
@@ -134,7 +134,7 @@ class TestGuardCoChay(Muc):
         (không kỳ vọng), mục nói lý do và không phải đạt."""
         m = self.muc(self.gate(guard_expected=False))
         self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
-        self.assertIn("chưa biên dịch", m.detail)
+        self.assertIn("not compiled", m.detail)
 
 
 class TestTest(Muc):
@@ -168,7 +168,7 @@ class TestTest(Muc):
 
 
 class TestKhongLamDoTestCoSan(Muc):
-    TEN = "không làm đỏ test có sẵn"
+    TEN = "no baseline regression"
 
     def baseline(self, ids, **d) -> Event:
         return self.store.tool_run("S-01", "test:baseline", ok=True, detail={
@@ -188,7 +188,7 @@ class TestKhongLamDoTestCoSan(Muc):
         self.xanh(sha="aaa", ids=["t1", "t2"], failed_ids=["t2"])
         m = self.muc(self.gate(candidate="aaa"))
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("làm đỏ 1 test", m.detail)
+        self.assertIn("broke 1 test", m.detail)
         self.assertIn("t2", m.detail)
 
     def test_env_baseline_khong_chay_duoc_hay_khong_doc_duoc_ten(self):
@@ -236,7 +236,7 @@ class TestPhamViGhi(Muc):
     """Suy từ `changed`/`write_scope` (cây git do `run_attempt` đọc), không từ
     sự kiện → `evidence` rỗng là điều được khai."""
 
-    TEN = "phạm vi ghi"
+    TEN = "write scope"
 
     def test_positive_tep_doi_nam_trong_pham_vi(self):
         self.xanh()
@@ -262,7 +262,7 @@ class TestPhamViGhi(Muc):
 
 
 class TestMapMockup(Muc):
-    TEN = "map mockup"
+    TEN = "mockup map"
 
     def doi_chieu(self, screen: str, ok: bool, **detail) -> Event:
         return self.store.record("S-01", Event(kind=MOCKUP_MAP, name=screen, ok=ok,
@@ -276,7 +276,7 @@ class TestMapMockup(Muc):
         self.assertEqual(m.evidence, [e.seq])
         m = self.muc(self.gate(screens=[]))
         self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
-        self.assertIn("không có giao diện", m.detail)
+        self.assertIn("no UI", m.detail)
 
     def test_negative_thieu_component_neu_ten(self):
         self.xanh()
@@ -291,12 +291,12 @@ class TestMapMockup(Muc):
         self.xanh()
         m = self.muc(self.gate(screens=["danh-sach"]))
         self.assertTrue(m.outcome.blocks)
-        self.assertIn("chưa đối chiếu: danh-sach", m.detail)
+        self.assertIn("not compared: danh-sach", m.detail)
         self.assertEqual(m.evidence, [])
 
 
 class TestTestThat(Muc):
-    TEN = "test thật"
+    TEN = "real tests"
 
     def test_positive_khong_test_rong_khang_dinh(self):
         self.xanh()
@@ -324,7 +324,7 @@ class TestTestThat(Muc):
 
 
 class TestTieuChiCoTest(Muc):
-    TEN = "tiêu chí có test"
+    TEN = "criteria have tests"
 
     def test_positive_moi_tieu_chi_co_test_mang_ma(self):
         t = self.xanh(ids=["AC-S-01-1: a", "nhóm > AC-S-01-2: b"])
@@ -389,7 +389,7 @@ class TestTDD(Muc):
         self.xanh()
         m = self.muc(self.gate(added_tests=["tests/x.test.js"]))
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("xanh ngay lần đầu", m.detail)
+        self.assertIn("green on first run", m.detail)
 
     def test_env_lan_bo_qua_khong_duoc_tinh_la_do(self):
         """Lần `test` chưa cấu hình (`skipped`) trông giống đỏ (ok=False) —
@@ -436,7 +436,7 @@ class TestBaoMat(Muc):
     """Đọc `SecurityReport` của phiên rà soát bảo mật (tham số) — `evidence`
     rỗng là điều được khai."""
 
-    TEN = "bảo mật"
+    TEN = "security"
 
     def test_positive_khong_muc_chan(self):
         self.xanh()
@@ -449,7 +449,7 @@ class TestBaoMat(Muc):
         rep = SecurityReport(findings=[Finding("high", "os.system với chuỗi ghép từ input")])
         m = self.muc(self.gate(security=rep))
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("1 mục chặn", m.detail)
+        self.assertIn("1 blocking item", m.detail)
         self.assertIn("os.system", m.detail)
 
     def test_env_chua_cau_hinh_ra_soat_bao_mat(self):
@@ -458,14 +458,14 @@ class TestBaoMat(Muc):
         self.assertIs(m.outcome, Outcome.UNCONFIGURED)
         self.assertTrue(m.outcome.must_be_named)
         self.assertFalse(m.outcome.counts_as_done)
-        self.assertIn("chưa cấu hình rà soát bảo mật", m.detail)
+        self.assertIn("security review not configured", m.detail)
 
 
 class TestRaSoat(Muc):
     """Đọc `review_blocking` (lời reviewer đã lọc ở `run_attempt`, tham số) —
     `evidence` rỗng là điều được khai."""
 
-    TEN = "rà soát"
+    TEN = "review"
 
     def test_positive_khong_con_muc_chan(self):
         self.xanh()
@@ -485,18 +485,18 @@ class TestRaSoat(Muc):
         self.xanh()
         m = self.muc(self.gate(review_ran=False))
         self.assertTrue(m.outcome.blocks)
-        self.assertIn("chưa rà soát độc lập", m.detail)
+        self.assertIn("independent review not run", m.detail)
 
 
 class TestBaoToan(Muc):
-    TEN = "bảo toàn"
+    TEN = "preservation"
     GIU = [{"id": "AC-S-02-1", "kind": "ac", "story": "S-02"}]
 
     def test_positive_hanh_vi_story_khac_con_xanh(self):
         t = self.xanh(sha="aaa", ids=["AC-S-02-1: giữ"])
         m = self.muc(self.gate(candidate="aaa", preservation=self.GIU))
         self.assertIs(m.outcome, Outcome.PASSED)
-        self.assertIn("còn xanh", m.detail)
+        self.assertIn("still green", m.detail)
         self.assertEqual(m.evidence, [t.seq])
         m = self.muc(self.gate(candidate="aaa", preservation=[]))
         self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
@@ -505,7 +505,7 @@ class TestBaoToan(Muc):
         self.xanh(sha="aaa", ids=["AC-S-02-1: giữ"], failed_ids=["AC-S-02-1: giữ"])
         m = self.muc(self.gate(candidate="aaa", preservation=self.GIU))
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("hồi quy", m.detail)
+        self.assertIn("regression", m.detail)
         self.assertIn("AC-S-02-1", m.detail)
 
     def test_env_khong_kiem_duoc_o_ung_vien_khong_phai_dat(self):
@@ -513,7 +513,7 @@ class TestBaoToan(Muc):
         m = self.muc(self.gate(candidate="aaa", preservation=self.GIU))
         self.assertIs(m.outcome, Outcome.UNRUNNABLE)
         self.assertTrue(m.outcome.must_be_named)
-        self.assertIn("chưa kiểm được", m.detail)
+        self.assertIn("cannot verify", m.detail)
         self.assertIn("AC-S-02-1", m.detail)
 
 
@@ -522,7 +522,7 @@ class TestTestCoKiemDuocStory(Muc):
     của story. Cấp 1 so `test:baseline`, cấp 2 đọc `test:nop` — trỏ cả ba
     sự kiện đã đọc. Bộ phép đầy đủ ở `test_gate.py::TestTestCoKiemDuocStory`."""
 
-    TEN = "test có kiểm được story"
+    TEN = "tests verify story"
     AC = "tests/test_a.py::test_AC_S_01_1_x"
 
     def baseline(self, ids, **d) -> Event:
@@ -555,7 +555,7 @@ class TestTestCoKiemDuocStory(Muc):
         self.nop([self.AC, "t1"])
         m = self.muc(self.gate(candidate="aaa", acceptance=1))
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("xanh cả khi không có mã của story", m.detail)
+        self.assertIn("still green without story code", m.detail)
         self.assertIn(self.AC, m.detail)
         # cấp 1: mã gắn vào test đã xanh ở baseline — ✗ dù nop đỏ
         self.baseline([self.AC, "t1"])
@@ -563,7 +563,7 @@ class TestTestCoKiemDuocStory(Muc):
         self.nop([self.AC, "t1"], failed=[self.AC])
         m = self.muc(self.gate(candidate="aaa", acceptance=1))
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("gắn mã vào test có sẵn", m.detail)
+        self.assertIn("tagged existing tests", m.detail)
 
     def test_env_nop_khong_chay_duoc_hay_khong_in_ten_khong_phai_dat(self):
         self.baseline(["t1"])
@@ -664,7 +664,7 @@ class TestBangChungNhan(Muc):
             with self.subTest(muc=c.name):
                 self.assertIn(c.kind, CHECK_KINDS, f"mục `{c.name}` không có kind")
         rong = {c.name for c in g.checks if not c.evidence}
-        self.assertEqual(rong, {"phạm vi ghi", "bảo mật", "rà soát"}, "mục rỗng phải là mục suy từ tham số")
+        self.assertEqual(rong, {"write scope", "security", "review"}, "mục rỗng phải là mục suy từ tham số")
         self.assertGreaterEqual(len(g.checks) - len(rong), 10)
 
     def test_as_dict_xuat_kind_va_evidence_json_hoa_duoc(self):

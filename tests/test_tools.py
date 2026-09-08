@@ -162,7 +162,7 @@ class TestRunTool(ToolTestCase):
         self.assertTrue(res.skipped)
         e = EvidenceStore(self.artifacts).read("S-01").last(TOOL_RUN, "test")
         self.assertFalse(e.ok)
-        self.assertIn("chưa khai lệnh", e.detail["skipped"])
+        self.assertIn("has not declared a command", e.detail["skipped"])
 
     def test_no_story_means_no_evidence(self):
         """Người gõ tay không nên làm bẩn hồ sơ story."""
@@ -190,12 +190,12 @@ class TestProviderGia(ToolTestCase):
             res = run_tool("test", self.project, story_id="S-01",
                            artifact_root=self.artifacts, config=cfg)
         self.assertFalse(res.ok)
-        self.assertIn("hạ tầng sandbox", res.unrunnable)
+        self.assertIn("sandbox infrastructure", res.unrunnable)
         self.assertFalse(res.degraded)
         self.assertEqual(fake.calls[0].cmd, ["pytest", "-q"])
         e = EvidenceStore(self.artifacts).read("S-01").last(TOOL_RUN, "test")
         self.assertEqual(e.detail["provider_error"], "pull access denied")
-        self.assertIn("hạ tầng", e.detail["unrunnable"])
+        self.assertIn("infrastructure", e.detail["unrunnable"])
 
     def test_suy_bien_neu_ten_bao_dam_thieu(self):
         cfg = Config({**DEFAULTS, "tools.test": "true", "sandbox.use_docker": False})
@@ -293,7 +293,7 @@ class TestDescription(ToolTestCase):
         self.write("pyproject.toml", "")
         text = describe_tools(self.project, self.cfg)
         self.assertIn("pytest -q", text)
-        self.assertIn("Khi nào:", text)
+        self.assertIn("When:", text)
 
 
 if __name__ == "__main__":
@@ -311,7 +311,7 @@ class TestKhongChayDuocKhacDo(ToolTestCase):
     def test_module_not_found_is_unrunnable(self):
         res = self.run_test_tool("sh -c 'echo \"Error: Cannot find module x\"; echo \"code: MODULE_NOT_FOUND\" >&2; exit 1'")
         self.assertFalse(res.ok)
-        self.assertIn("không nạp được", res.unrunnable)
+        self.assertIn("cannot load", res.unrunnable)
         e = EvidenceStore(self.artifacts).read("S-01").last(TOOL_RUN, "test")
         self.assertTrue(e.detail["unrunnable"])
 

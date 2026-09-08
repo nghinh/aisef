@@ -68,14 +68,14 @@ PHASES: tuple[Phase, ...] = (
         skill="bmad-project-context",
         artifacts=("project-context.md",),
         gate=None,  # ngữ cảnh nền, không phải quyết định sản phẩm
-        goal="Dựng ngữ cảnh dự án từ requirements: miền, người dùng, ràng buộc.",
+        goal="Build project context from requirements: domain, users, constraints.",
     ),
     Phase(
         id="prd",
         skill="bmad-prd",
         artifacts=GATE_ARTIFACTS[Gate.PRD],
         gate=Gate.PRD,
-        goal="Viết PRD: mỗi yêu cầu chức năng có mã và tiêu chí kiểm chứng được.",
+        goal="Write PRD: each functional requirement has an ID and verifiable criteria.",
     ),
     Phase(
         id="architecture",
@@ -83,7 +83,7 @@ PHASES: tuple[Phase, ...] = (
         artifacts=GATE_ARTIFACTS[Gate.ARCHITECTURE],
         gate=Gate.ARCHITECTURE,
         needs=("prd.md",),
-        goal="Thiết kế kiến trúc, đánh số quyết định AR-x mà story phải tuân thủ.",
+        goal="Design architecture, number decisions AR-x that stories must comply with.",
     ),
     Phase(
         id="ux",
@@ -91,7 +91,7 @@ PHASES: tuple[Phase, ...] = (
         artifacts=GATE_ARTIFACTS[Gate.UX_SPEC],
         gate=Gate.UX_SPEC,
         needs=("prd.md",),
-        goal="Đặc tả trải nghiệm: hệ thống thị giác, luồng người dùng, danh sách màn hình.",
+        goal="UX specification: visual system, user flows, screen inventory.",
     ),
     Phase(
         id="epics",
@@ -100,22 +100,21 @@ PHASES: tuple[Phase, ...] = (
         gate=Gate.EPICS,
         needs=("prd.md", "architecture.md", "EXPERIENCE.md"),
         goal=(
-            "Chia thành epic và story theo đúng khuôn template "
+            "Split into epics and stories following the template "
             "(`## Epic N: …`, `### Story N.M: …`, Given/When/Then).\n"
-            "Ngay dưới tiêu chí chấp nhận của **mỗi** story, thêm khối:\n"
+            "Right below the acceptance criteria of **each** story, add a block:\n"
             "**Story metadata:**\n"
-            "- covers: FR-x, FR-y   (mã FR trong PRD story này phủ)\n"
-            "- write_scope: đường/dẫn/, đường/dẫn/khác  "
-            "(mọi đường dẫn story được phép ghi, tương đối so với gốc dự án)\n"
-            "- depends_on: N.M hoặc none — chỉ khai khi story sau **không "
-            "bắt đầu được** nếu chưa có kết quả của story trước. Xâu chuỗi "
-            "theo thứ tự viết ra là thói quen, không phải phụ thuộc: nó "
-            "biến mọi story thành tuần tự và bỏ phí việc chạy song song. "
-            "Hai story ghi vào những đường dẫn rời nhau thì gần như chắc "
-            "chắn không phụ thuộc nhau.\n"
-            "- screens: mã màn hình trong EXPERIENCE.md story này dựng, "
-            "hoặc none nếu story không có giao diện\n"
-            "Bốn dòng này là hợp đồng máy đọc: thiếu thì story bị chặn."
+            "- covers: FR-x, FR-y   (FR IDs from the PRD this story covers)\n"
+            "- write_scope: path/to/, path/to/other  "
+            "(all paths the story is allowed to write, relative to project root)\n"
+            "- depends_on: N.M or none — only declare when the later story **cannot "
+            "start** without the result of the earlier one. Chaining by written "
+            "order is habit, not dependency: it turns every story sequential and "
+            "wastes parallelism. Two stories writing to disjoint paths almost "
+            "certainly do not depend on each other.\n"
+            "- screens: screen IDs from EXPERIENCE.md that this story builds, "
+            "or none if the story has no UI\n"
+            "These four lines are a machine-readable contract: missing means the story is blocked."
         ),
     ),
 )
@@ -127,7 +126,7 @@ SPLIT_PHASE = Phase(
     artifacts=GATE_ARTIFACTS[Gate.STORIES],
     gate=Gate.STORIES,
     needs=("epics.md",),
-    goal="Tách epics.md thành mỗi story một file + chỉ mục.",
+    goal="Split epics.md into one file per story + index.",
 )
 
 PHASE_BY_ID = {p.id: p for p in (*PHASES, SPLIT_PHASE)}
@@ -164,27 +163,27 @@ class PhaseOutcome:
 
     def machine_checks(self) -> dict[str, str]:
         """Kết quả kiểm máy, ghi kèm bản ghi phê duyệt để về sau truy được."""
-        checks = {"bmad_status": self.status.status or "không đọc được"}
+        checks = {"bmad_status": self.status.status or "unreadable"}
         if self.machine_gate:
-            checks["cổng máy"] = "đạt" if self.machine_gate.passed else "không đạt"
+            checks["machine gate"] = "pass" if self.machine_gate.passed else "fail"
             if self.machine_gate.warnings:
-                checks["cảnh báo"] = "; ".join(self.machine_gate.warnings)
+                checks["warnings"] = "; ".join(self.machine_gate.warnings)
         return checks
 
     def summary(self) -> str:
         if self.skipped_reason:
-            return f"{self.phase.id}: bỏ qua — {self.skipped_reason}"
-        bits = [f"{self.phase.id}: {'ok' if self.ok else 'KHÔNG ĐẠT'}"]
+            return f"{self.phase.id}: skipped — {self.skipped_reason}"
+        bits = [f"{self.phase.id}: {'ok' if self.ok else 'FAIL'}"]
         if self.status.parsed:
             bits.append(self.status.summary())
         if self.error:
-            bits.append(f"lỗi: {self.error}")
+            bits.append(f"error: {self.error}")
         if self.split is not None:
-            bits.append(f"{len(self.split.stories)} story")
+            bits.append(f"{len(self.split.stories)} stories")
         if self.machine_gate and not self.machine_gate.passed:
-            bits.append(f"{len(self.machine_gate.errors)} lỗi cổng máy")
+            bits.append(f"{len(self.machine_gate.errors)} machine gate errors")
         if self.infra_retries:
-            bits.append(f"{self.infra_retries} lần chạy lại vì lỗi hạ tầng")
+            bits.append(f"{self.infra_retries} infra retries")
         if self.cost_usd:
             bits.append(f"${self.cost_usd:.2f}")
         return " · ".join(bits)
@@ -209,16 +208,16 @@ class PipelineResult:
         lines = [o.summary() for o in self.outcomes]
         last = self.outcomes[-1] if self.outcomes else None
         if self.failed_at:
-            lines.append(f"\n✗ dừng vì pha {self.failed_at} không đạt")
+            lines.append(f"\n✗ stopped because phase {self.failed_at} failed")
             if last and last.machine_gate:
                 lines.append(last.machine_gate.summary())
         elif self.waiting_on:
-            lines.append(f"\n⏸ chờ người duyệt: {self.waiting_on.value}")
+            lines.append(f"\n⏸ waiting for approval: {self.waiting_on.value}")
             lines.append(f"   aisef review {self.waiting_on.value}")
         else:
-            lines.append("\n✅ mọi pha đã xong và đã duyệt")
+            lines.append("\n✅ all phases done and approved")
         if self.total_cost_usd:
-            lines.append(f"chi phí: ${self.total_cost_usd:.2f}")
+            lines.append(f"cost: ${self.total_cost_usd:.2f}")
         return "\n".join(lines)
 
 
@@ -239,14 +238,14 @@ def _brownfield_context(project: Path) -> str:
         return ""
     return (
         "\n\n## Brownfield Context\n\n"
-        "Dự án này ĐÃ CÓ mã nguồn. Đây là baseline (tóm tắt):\n\n"
+        "This project ALREADY HAS source code. Here is the baseline (summary):\n\n"
         + text + "\n\n"
-        "**Quy tắc brownfield:**\n"
-        "- BẢO TOÀN kiến trúc, code, behavior hợp lệ hiện có — chỉ thay đổi "
-        "những gì change request yêu cầu.\n"
-        "- Code hiện tại là ground truth; tài liệu có thể stale — ghi nhận mâu thuẫn rõ.\n"
-        "- intent: 'update' thay cho 'create' khi artifact đã có.\n"
-        "- Tạo DELTA, không regenerate toàn bộ.\n"
+        "**Brownfield rules:**\n"
+        "- PRESERVE existing valid architecture, code, and behaviour — only change "
+        "what the change request requires.\n"
+        "- Current code is ground truth; documentation may be stale — note contradictions clearly.\n"
+        "- intent: 'update' instead of 'create' when the artifact already exists.\n"
+        "- Produce a DELTA, do not regenerate everything.\n"
     )
 
 
@@ -261,7 +260,7 @@ def build_prompt(phase: Phase, project: Path | None = None) -> str:
     brownfield = _is_brownfield(project)
     intent = "update" if brownfield and not _missing(project, phase.artifacts) else "create"
 
-    inputs = ["docs/requirements.md (yêu cầu gốc)"]
+    inputs = ["docs/requirements.md (original requirements)"]
     if brownfield:
         inputs.insert(0, f"{ARTIFACT_ROOT}/baseline.md (brownfield baseline)")
     inputs += [f"{ARTIFACT_ROOT}/{n}" for n in phase.needs]
@@ -273,12 +272,12 @@ def build_prompt(phase: Phase, project: Path | None = None) -> str:
         "headless: true\n\n"
         f'Use the {phase.skill} skill. intent: "{intent}".\n'
         f"doc_workspace: {ARTIFACT_ROOT}\n\n"
-        f"Đầu vào: {', '.join(inputs)}.\n"
-        f"Mục tiêu: {phase.goal}\n"
-        f"Ghi ra đúng đường dẫn: {outputs}\n\n"
-        "Không hỏi lại. Giả định nào phải tự suy thì ghi vào assumptions; "
-        "chỗ nào cần người quyết thì ghi vào open_questions — đừng tự chọn "
-        "rồi im lặng. Kết thúc bằng JSON status theo schema headless."
+        f"Inputs: {', '.join(inputs)}.\n"
+        f"Goal: {phase.goal}\n"
+        f"Write to exact paths: {outputs}\n\n"
+        "Do not ask questions. Any assumptions you must infer go in assumptions; "
+        "anything requiring human decision goes in open_questions — do not choose "
+        "silently. End with a JSON status following the headless schema."
         + memo + bf_ctx
     )
 
@@ -299,8 +298,8 @@ def _stories_gate_memo(project: Path | None) -> str:
     if not errors:
         return ""
     return (
-        "\n\nCổng máy `stories` lần trước KHÔNG ĐẠT. Sửa đúng những điểm này khi "
-        "viết lại epics/story (story quá lớn thì chẻ, không nới ngưỡng):\n"
+        "\n\nMachine gate `stories` FAILED last time. Fix these issues when "
+        "rewriting epics/stories (split oversized stories, do not raise thresholds):\n"
         + "\n".join(f"- {e}" for e in errors)
     )
 
@@ -321,12 +320,12 @@ def run_phase(
     out = PhaseOutcome(phase=phase)
 
     if not _missing(project, phase.artifacts) and not force:
-        out.skipped_reason = "artifact đã có"
+        out.skipped_reason = "artifacts already exist"
         return out
 
     missing_inputs = _missing(project, phase.needs)
     if missing_inputs:
-        out.error = f"thiếu đầu vào: {', '.join(missing_inputs)}"
+        out.error = f"missing inputs: {', '.join(missing_inputs)}"
         return out
 
     spec = RunSpec(
@@ -352,7 +351,7 @@ def run_phase(
         evidence.agent_run(f"plan-{phase.id}", result, name=phase.id)
         if result.ok:
             break
-        error = result.error or "lượt chạy thất bại"
+        error = result.error or "run failed"
         budget -= 1
         # Cùng bảng kết cục với vòng thử lại story (ADR-005 V11 B).
         if budget <= 0 or exit_status_of(result) not in INFRA_STATUSES:
@@ -363,14 +362,14 @@ def run_phase(
     out.status = parse_headless_status(result.text)
 
     if out.status.status == "blocked":
-        out.error = f"BMAD dừng: {out.status.reason or 'không nêu lý do'}"
+        out.error = f"BMAD blocked: {out.status.reason or 'no reason given'}"
         return out
 
     # Kiểm đĩa, không tin lời khai. Một lượt chạy có thể kết thúc "thành
     # công", khai đã sinh artifact, mà file không hề tồn tại.
     still_missing = _missing(project, phase.artifacts)
     if still_missing:
-        out.error = f"chạy xong nhưng không thấy: {', '.join(still_missing)}"
+        out.error = f"run completed but missing: {', '.join(still_missing)}"
         return out
 
     if phase.id == "prd":
@@ -395,7 +394,7 @@ def _pass_gate(
     if gate not in auto_approve:
         return False
 
-    note = "tự duyệt (--auto-approve)"
+    note = "auto-approved (--auto-approve)"
     if outcome.needs_human:
         # Không chặn — người dùng đã chọn tự duyệt. Nhưng ghi lại, vì đây
         # chính là artifact cần xem lại đầu tiên khi có sự cố.
@@ -410,8 +409,8 @@ def _pass_gate(
 def _why_human(outcome) -> str:
     status = getattr(outcome, "status", None)
     if status is not None and getattr(status, "parsed", False):
-        return f"BMAD khai {status.status} với {len(status.open_questions)} câu hỏi mở"
-    return "bước này luôn cần người nhìn"
+        return f"BMAD reported {status.status} with {len(status.open_questions)} open questions"
+    return "this step always needs human review"
 
 
 def run_split(project: Path, config: Config) -> PhaseOutcome:

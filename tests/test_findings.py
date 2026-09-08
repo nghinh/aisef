@@ -125,7 +125,7 @@ class TestReviewVerdict(unittest.TestCase):
         v = review_verdict(JSON_KHOP)
         self.assertEqual(v.verdict, "block")
         self.assertEqual(v.findings[0]["behavior_id"], "AC-STORY-01-01-1")
-        self.assertEqual(v.blocking(), ["[chặn] src/a.py:1 — mất dữ liệu khi lưu"])
+        self.assertEqual(v.blocking(), ["[block] src/a.py:1 — mất dữ liệu khi lưu"])
 
     def test_khong_co_json_thi_none(self):
         self.assertIsNone(review_verdict("- [chặn] src/a.py:1 — mất dữ liệu"))
@@ -141,7 +141,7 @@ class TestReviewVerdict(unittest.TestCase):
     def test_ket_luan_chan_ma_khong_neu_muc_van_la_chan(self):
         v = review_verdict('{"verdict": "stuck", "findings": []}')
         self.assertEqual(len(v.blocking()), 1)
-        self.assertTrue(v.blocking()[0].startswith("[bế tắc]"))
+        self.assertTrue(v.blocking()[0].startswith("[stuck]"))
 
 
 class TestSchemaVaHoiLai(SchemaTestCase):
@@ -157,7 +157,7 @@ class TestSchemaVaHoiLai(SchemaTestCase):
         client, text, verdict = self.chay("- [chặn] src/a.py:1 — mất dữ liệu khi lưu",
                                           JSON_KHOP)
         self.assertEqual(len(client.prompts), 2, "phải hỏi lại đúng một lần")
-        self.assertIn("Thiếu khối JSON", client.prompts[1])
+        self.assertIn("Missing JSON block", client.prompts[1])
         self.assertEqual(verdict.verdict, "block")
         _reconcile("STORY-01-01", EvidenceStore(self.root), text, verdict, role="review")
         self.assertNotIn("review:no-schema", self.notes())

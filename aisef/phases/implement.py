@@ -109,20 +109,20 @@ class StoryOutcome:
         return sum(a.cost_usd for a in self.attempts)
 
     def summary(self) -> str:
-        lines = [f"{self.story_id}: {'XONG' if self.done else 'CHƯA XONG'}"]
+        lines = [f"{self.story_id}: {'DONE' if self.done else 'NOT DONE'}"]
         for a in self.attempts:
-            tag = "hạ tầng" if a.infra else ("kiểm lại" if a.verify_only else f"lần {a.number}")
-            head = "ok" if a.ok else (a.error or "cổng không đạt")
+            tag = "infra" if a.infra else ("re-verify" if a.verify_only else f"attempt {a.number}")
+            head = "ok" if a.ok else (a.error or "gate failed")
             lines.append(f"  [{tag}] {head}")
             if a.verify_only:
-                lines.append(f"  ứng viên {a.candidate[:7]}: chạy lại {', '.join(a.reran) or '—'}"
-                             f" · giữ {', '.join(a.kept) or '—'}")
+                lines.append(f"  candidate {a.candidate[:7]}: reran {', '.join(a.reran) or '—'}"
+                             f" · kept {', '.join(a.kept) or '—'}")
             if a.gate and not a.gate.passed:
                 lines.extend("  " + line for line in a.gate.summary().splitlines()[1:])
         if self.blocked_reason:
             lines.append(f"  ✗ {self.blocked_reason}")
         if self.cost_usd:
-            lines.append(f"  chi phí: ${self.cost_usd:.2f}")
+            lines.append(f"  cost: ${self.cost_usd:.2f}")
         return "\n".join(lines)
 
 
@@ -152,9 +152,9 @@ def build_context(
     )
     if feedback:
         contract_text += (
-            "\n\n## Lượt trước chưa đạt\n\n"
-            "Đây là kết quả chấm cổng lần trước. Sửa đúng những mục này; "
-            "đừng viết lại từ đầu.\n\n" + feedback + "\n"
+            "\n\n## Previous attempt did not pass\n\n"
+            "These are the gate results from the previous attempt. Fix exactly "
+            "these items; do not rewrite from scratch.\n\n" + feedback + "\n"
         )
 
     rules = architecture.for_requirements(story.covers) if architecture else []
@@ -178,7 +178,7 @@ def build_context(
         "story_contract": contract_text,
         "architecture_rules": (
             "\n\n".join(d.as_prompt() for d in rules)
-            or "(kiến trúc không nêu quyết định nào ràng buộc story này)"
+            or "(architecture has no decisions constraining this story)"
         ),
         "write_scope": _write_scope_lines(story, project),
         "mockup_section": prompt_section(slices),
@@ -208,10 +208,10 @@ def _blast_radius_section(story: Story, *, project: Path, config: Config | None)
     lines = [f"- {n.file or n.id}" + (f" ({n.kind})" if n.kind else "") for n in result.affected[:30]]
     return (
         "\n## Blast Radius\n\n"
-        "Các file/module bị ảnh hưởng bởi write_scope (impact analysis):\n\n"
+        "Files/modules affected by write_scope (impact analysis):\n\n"
         + "\n".join(lines) + "\n\n"
-        "**Kiểm tra regression cho các file này.** Đừng sửa ngoài write_scope "
-        "trừ khi cần thiết để giữ tương thích.\n"
+        "**Check regression for these files.** Do not modify outside write_scope "
+        "unless necessary to maintain compatibility.\n"
     )
 
 
@@ -261,7 +261,7 @@ def _index_slice(story: Story, artifact_root: Path, config: Config | None, *, le
     cap = int(config["context.max_index_chars"]) if config else 2000
     led = ledger if ledger is not None else _ledger(artifact_root)
     text = led.epic_slice(story.epic_id, max_chars=cap) if led is not None else ""
-    return text or "_(chưa có bằng chứng nào cho epic này)_"
+    return text or "_(no evidence yet for this epic)_"
 
 
 # --- Hành vi phải giữ và thứ phải xanh ở ứng viên (ADR-004 R4) ----------------
@@ -304,15 +304,15 @@ def _source_line(item: dict) -> str:
     if src.get("qa_kind"):
         return f"`qa:{src['qa_kind']}`"
     if src.get("screen"):
-        return f"màn hình `{src['screen']}`"
+        return f"screen `{src['screen']}`"
     if src.get("story"):
-        return "qua tiêu chí của story"
+        return "via story criteria"
     return f"`aisef evidence {item.get('id', '')}`"
 
 
 def _cap(text: str, max_chars: int) -> str:
     if len(text) > max_chars:
-        return text[:max_chars].rstrip() + "\n_(đã cắt theo trần ký tự — `aisef evidence <id>`)_"
+        return text[:max_chars].rstrip() + "\n_(truncated to char limit — `aisef evidence <id>`)_"
     return text
 
 
@@ -324,7 +324,7 @@ def preservation_text(items: list[dict], *, max_chars: int) -> str:
     mất một mục thì có dòng cuối bảo nó tra `aisef evidence`.
     """
     if not items:
-        return "_(không chạm hành vi VERIFIED nào của story khác)_"
+        return "_(does not touch any VERIFIED behaviour of another story)_"
     return _cap("\n".join(
         f"- `{it['id']}` · {it.get('story') or '?'} · {_source_line(it)}" for it in items
     ), max_chars)
@@ -343,12 +343,12 @@ def validation_text(story: Story, items: list[dict], *, max_chars: int) -> str:
     tests = {it["source"]["test_id"] for it in items if (it.get("source") or {}).get("test_id")}
     lines = []
     if tests:
-        lines.append(f"- {len(tests)} test bảo toàn nêu ở mục trên")
+        lines.append(f"- {len(tests)} preservation tests listed above")
     if kinds:
-        lines.append("- kiểm định: " + ", ".join(f"`qa:{k}`" for k in kinds))
+        lines.append("- checks: " + ", ".join(f"`qa:{k}`" for k in kinds))
     if screens:
-        lines.append("- màn hình khớp mockup: " + ", ".join(f"`{s}`" for s in screens))
-    return _cap("\n".join(lines), max_chars) or "_(chỉ cổng chuẩn: test, lint, phạm vi ghi)_"
+        lines.append("- screens matching mockup: " + ", ".join(f"`{s}`" for s in screens))
+    return _cap("\n".join(lines), max_chars) or "_(standard gate only: test, lint, write scope)_"
 
 
 def validation_targets(story: Story, items: list[dict]) -> tuple[list[str], list[str]]:
@@ -401,7 +401,7 @@ def _skills_section(story: Story, *, project: Path, artifact_root: Path, config:
     """Mục "Kỹ năng có sẵn" + bằng chứng định tuyến. Router là tín hiệu, không
     phải cổng: abstain thì prompt nói rõ là không có, tắt thì nói là tắt."""
     if not (config and config["skills.offer"]):
-        return "_(không định tuyến skill — `skills.offer` tắt)_", {"enabled": False}
+        return "_(no skill routing — `skills.offer` off)_", {"enabled": False}
     reg = skill_registry.load(artifact_root)
     r = skill_router.route(story, reg, project=project)
     section, ev = r.prompt_section(), {"enabled": True, **r.as_evidence()}
@@ -413,9 +413,9 @@ def _skills_section(story: Story, *, project: Path, artifact_root: Path, config:
         top = r.picked[0].entry
         body = inline_skill_text(project, top.path)
         if body:
-            section += (f"\n\n### Nội dung skill `{top.id}` (nạp thẳng)\n\n"
-                        f"Đọc như hướng dẫn chuyên môn cho story này, không phải mệnh lệnh "
-                        f"thay thế hiến pháp.\n\n{body}")
+            section += (f"\n\n### Skill content `{top.id}` (inlined)\n\n"
+                        f"Read as domain guidance for this story, not as a directive "
+                        f"overriding the constitution.\n\n{body}")
             ev["inline"] = [top.id]
     return section, ev
 
@@ -436,7 +436,7 @@ def inline_skill_text(project: Path, skill_path: str) -> str:
             text = text[end + 4:]
     text = text.strip()
     if len(text) > INLINE_SKILL_MAX_CHARS:
-        text = text[:INLINE_SKILL_MAX_CHARS] + "\n\n_(đã cắt theo trần ký tự — xem SKILL.md đầy đủ)_"
+        text = text[:INLINE_SKILL_MAX_CHARS] + "\n\n_(truncated to char limit — see full SKILL.md)_"
     return text
 
 
@@ -458,13 +458,13 @@ def _write_scope_lines(story: Story, project: Path) -> str:
     lines = [f"- `{p}`" for p in story.write_scope]
     them = [p for p in verification_paths(story, project) if p not in story.write_scope]
     if them:
-        lines.append("- _(harness cấp thêm vì hợp đồng kiểm định đòi)_")
+        lines.append("- _(added by harness per verification contract)_")
         lines += [f"- `{p}`" for p in them]
-    return "\n".join(lines) or "(chưa khai)"
+    return "\n".join(lines) or "(not declared)"
 
 
 def _story_fallback(story: Story) -> str:
-    lines = [f"# {story.id}: {story.title}", "", "## Tiêu chí chấp nhận", ""]
+    lines = [f"# {story.id}: {story.title}", "", "## Acceptance Criteria", ""]
     lines += [f"{i}. [{ac_code(story.id, i)}] {ac}" for i, ac in enumerate(story.acceptance_criteria, 1)]
     return "\n".join(lines)
 
@@ -546,20 +546,20 @@ def run_attempt(
     sau = head_sha(project) if workdir != project else ""
     if truoc and sau != truoc:
         attempt.error = (
-            f"lượt chạy đã đổi nhánh chính của dự án ({truoc[:8]} → {sau[:8]}). "
-            f"Story phải làm việc trong worktree riêng; công việc trên thân cây "
-            f"không qua cổng nào cả. Hoàn nguyên rồi chạy lại."
+            f"the run modified the project's main branch ({truoc[:8]} → {sau[:8]}). "
+            f"The story must work in its own worktree; work on the trunk does not "
+            f"pass any gate. Revert and re-run."
         )
         attempt.infra = True   # story chưa hề được chấm
         attempt.fatal = True   # nhưng thử lại cũng vô nghĩa
         evidence.tool_run(
-            story.id, "cách ly", ok=False,
+            story.id, "isolation", ok=False,
             detail={"truoc": truoc, "sau": sau, "attempt": number},
         )
         return attempt
 
     if not result.ok:
-        attempt.error = result.error or "lượt chạy thất bại"
+        attempt.error = result.error or "run failed"
         attempt.infra = exit_status_of(result) in INFRA_STATUSES
         return attempt
 
@@ -930,7 +930,7 @@ def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Co
     if not config.get("verify.baseline", True):
         EvidenceStore(artifact_root).tool_run(story.id, BASELINE_RUN, ok=False, detail={
             "baseline": True, "disabled": True,
-            "skipped": "tắt bởi cấu hình `verify.baseline`",
+            "skipped": "disabled by config `verify.baseline`",
         })
         return
     res = run_tool("test", workdir, config=config)   # story_id rỗng: ghi bên dưới, dưới tên riêng
@@ -968,19 +968,19 @@ def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
     store = EvidenceStore(artifact_root, candidate=candidate)
     if not config.get("verify.nop", True):
         store.tool_run(story.id, NOP_RUN, ok=False, detail={
-            "nop": True, "disabled": True, "skipped": "tắt bởi cấu hình `verify.nop`"})
+            "nop": True, "disabled": True, "skipped": "disabled by config `verify.nop`"})
         return
     tep = [f for f in changed if is_test_path(f)]
     if not tep:
         store.tool_run(story.id, NOP_RUN, ok=False, detail={
-            "nop": True, "files": [], "skipped": "story không thêm/sửa tệp test"})
+            "nop": True, "files": [], "skipped": "story did not add/modify test files"})
         return
     goc = EvidenceStore(artifact_root).read(story.id).last(TOOL_RUN, BASELINE_RUN)
     cha = base_ref or (str(goc.detail.get("parent") or "") if goc is not None else "")
     if not cha:
         store.tool_run(story.id, NOP_RUN, ok=False, detail={
             "nop": True, "files": tep[:50],
-            "unrunnable": "không xác định được SHA cha (không có điểm rẽ lẫn baseline)"})
+            "unrunnable": "cannot determine parent SHA (no fork point or baseline)"})
         return
 
     wt = WorktreeManager(main_repo(workdir))
@@ -1001,7 +1001,7 @@ def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
     except GitError as e:
         store.tool_run(story.id, NOP_RUN, ok=False, detail={
             "nop": True, "parent": cha, "files": tep[:50],
-            "unrunnable": f"không dựng được worktree ở SHA cha: {e}"})
+            "unrunnable": f"cannot create worktree at parent SHA: {e}"})
     finally:
         wt.remove(nop_id, delete_branch=True)
 
@@ -1036,7 +1036,7 @@ def freeze_candidate(
     loi = ""
     if isolated:
         try:
-            commit_paths(Path(workdir), f"{story.id}: ứng viên lượt {number}", paths=scope)
+            commit_paths(Path(workdir), f"{story.id}: candidate attempt {number}", paths=scope)
         except GitError as e:
             loi = str(e)
     sha = head_sha(workdir)
@@ -1057,7 +1057,7 @@ def freeze_candidate(
         # chứa công việc. Nói ra ở bằng chứng; im lặng ở đây là để lại một
         # cổng chấm trên nền cát.
         evidence.tool_run(story.id, "candidate:frozen", ok=False,
-                          detail={"error": loi or "không đọc được HEAD", "attempt": number})
+                          detail={"error": loi or "cannot read HEAD", "attempt": number})
     return sha
 
 
@@ -1082,7 +1082,7 @@ def review_diff(workdir: str, changed: list[str], *, base_ref: str = "") -> str:
     if not body:
         return names
     if len(body) > REVIEW_DIFF_CHARS:
-        body = body[:REVIEW_DIFF_CHARS] + "\n… (diff bị cắt, đọc thẳng file phần còn lại)"
+        body = body[:REVIEW_DIFF_CHARS] + "\n… (diff truncated, read files directly for the rest)"
     ket = [names, ""]
     if lines:
         ket += ["```", lines.strip(), "```", ""]
@@ -1216,10 +1216,10 @@ def review_story_v2(
         # nhánh chính rồi — worktree rẽ từ đó nên diff rỗng — và lúc ấy
         # lời khuyên "sửa write_scope" dẫn người đọc đi sai đường.
         return [
-            "không có thay đổi nào để rà soát: hoặc lượt chạy không viết "
-            "gì, hoặc công việc của story đã nằm trên nhánh chính rồi "
-            "(worktree rẽ từ đó nên diff rỗng). Kiểm nhánh chính trước; "
-            "nếu công việc đã ở đó thì story này xong rồi."
+            "no changes to review: either the run wrote nothing, or the "
+            "story's work is already on the main branch (worktree forked "
+            "from it so diff is empty). Check the main branch first; if "
+            "the work is already there, this story is done."
         ], None
 
     context = build_context(
@@ -1247,7 +1247,7 @@ def review_story_v2(
     )
     if mat:
         context["impact"] += (
-            "\n\n**Test có sẵn bị bớt ca** — hỏi vì sao, đừng mặc định là hợp lệ: "
+            "\n\n**Existing tests lost cases** — ask why, do not assume it is valid: "
             + "; ".join(mat)
         )
 
@@ -1285,9 +1285,9 @@ def review_story_v2(
             story.id, "review:immutable", ok=False, detail={"changed": da_sua[:20]},
         )
         return [
-            "[chặn] người rà soát đã sửa cây làm việc "
-            f"({', '.join(da_sua[:3])}) — đã hoàn nguyên; lượt rà soát này không "
-            "được tính. Rà soát là báo cáo, không phải sửa."
+            "[block] reviewer modified the working tree "
+            f"({', '.join(da_sua[:3])}) — reverted; this review attempt does not "
+            "count. Review is a report, not a fix."
         ], None
 
     lech = _candidate_moved(workdir, candidate)
@@ -1298,14 +1298,14 @@ def review_story_v2(
         store.tool_run(story.id, "review:candidate", ok=False,
                        detail={"expected": candidate, "got": lech, "attempt": number})
         return [
-            f"[chặn] ứng viên đổi trong phiên rà soát ({candidate[:7]} → {lech[:7]}) — "
-            "lượt rà soát này không được tính. Rà soát đọc bản đã đóng băng, "
-            "không tạo bản mới."
+            f"[block] candidate changed during review session ({candidate[:7]} → {lech[:7]}) — "
+            "this review attempt does not count. Review reads the frozen candidate, "
+            "it does not create a new one."
         ], None
 
     if not result.ok:
         # Không rà soát được thì **không** coi như sạch.
-        return [f"rà soát không chạy được: {result.error}"], None
+        return [f"review could not run: {result.error}"], None
 
     text, verdict = _with_schema(
         client, spec, result, store=store, story_id=story.id,
@@ -1368,7 +1368,7 @@ def security_review(
     """
     changed = changed_files(str(workdir), base_ref=base_ref)
     if not changed:
-        return SecurityReport(error="không có thay đổi nào để rà")
+        return SecurityReport(error="no changes to review")
 
     context = build_context(
         story,
@@ -1415,17 +1415,17 @@ def security_review(
         store.tool_run(
             story.id, "security:immutable", ok=False, detail={"changed": da_sua[:20]},
         )
-        return SecurityReport(error=f"người rà soát bảo mật đã sửa cây làm việc ({', '.join(da_sua[:3])}) — đã hoàn nguyên, lượt này không được tính")
+        return SecurityReport(error=f"security reviewer modified the working tree ({', '.join(da_sua[:3])}) — reverted, this attempt does not count")
     lech = _candidate_moved(workdir, candidate)
     if lech:
         store.tool_run(story.id, "security:candidate", ok=False,
                        detail={"expected": candidate, "got": lech, "attempt": number})
         return SecurityReport(
-            error=f"ứng viên đổi trong phiên rà soát bảo mật ({candidate[:7]} → "
-                  f"{lech[:7]}) — lượt này không được tính"
+            error=f"candidate changed during security review session ({candidate[:7]} → "
+                  f"{lech[:7]}) — this attempt does not count"
         )
     if not result.ok:
-        return SecurityReport(error=f"không chạy được: {result.error}")
+        return SecurityReport(error=f"could not run: {result.error}")
 
     text, verdict = _with_schema(
         client, spec, result, store=store, story_id=story.id,
@@ -1495,10 +1495,10 @@ def persist_verdict(artifact_root: Path | str, story_id: str, role: str, number:
     d.mkdir(parents=True, exist_ok=True)
     path = d / f"{story_id}-{role}-{number}.md"
     head = (
-        f"# {role} — {story_id}, lượt {number}\n\n"
-        f"session: {getattr(result, 'session_id', '')} · lượt hội thoại: "
+        f"# {role} — {story_id}, attempt {number}\n\n"
+        f"session: {getattr(result, 'session_id', '')} · turns: "
         f"{getattr(result, 'num_turns', 0)} · ${getattr(result, 'cost_usd', 0.0):.2f}"
-        f"{' · LỖI: ' + result.error if getattr(result, 'error', '') else ''}\n\n---\n\n"
+        f"{' · ERROR: ' + result.error if getattr(result, 'error', '') else ''}\n\n---\n\n"
     )
     path.write_text(head + (getattr(result, "text", "") or ""), encoding="utf-8")
     return path
@@ -1553,11 +1553,11 @@ _JSON_STUCK_TAGS = ("bế tắc", "be tac", "stuck", "blocked-by-plan")
 #: Nhắc lại schema khi lượt đầu không có khối JSON. Đúng **một** lần: lần
 #: hai vẫn thiếu thì model ấy không làm được, thử tiếp là đốt tiền.
 SCHEMA_REMINDER = (
-    "\n\n---\n\n**Thiếu khối JSON theo schema.** Lượt trước bạn trả lời bằng "
-    "văn bản nhưng không kèm khối JSON máy đọc được, nên cổng không đọc được "
-    "kết luận của bạn. Trả lời **lại** đầy đủ như yêu cầu ở trên, và kết thúc "
-    "bằng đúng một khối ```json``` theo schema đã nêu. Bản JSON và bản văn "
-    "bản phải khớp nhau.\n"
+    "\n\n---\n\n**Missing JSON block per schema.** Your previous reply was plain "
+    "text without a machine-readable JSON block, so the gate could not read your "
+    "conclusion. Reply **again** in full as requested above, and end with exactly "
+    "one ```json``` block following the stated schema. The JSON and the text must "
+    "match.\n"
 )
 
 _decoder = json.JSONDecoder()
@@ -1575,15 +1575,15 @@ class Verdict:
         out = []
         for f in self.findings:
             if f["tag"] in _JSON_STUCK_TAGS:
-                out.append("[bế tắc] " + _finding_body(f))
+                out.append("[stuck] " + _finding_body(f))
             elif f["tag"] in _JSON_BLOCK_TAGS:
-                out.append("[chặn] " + _finding_body(f))
+                out.append("[block] " + _finding_body(f))
         if self.verdict != "pass" and not out:
             # Kết luận nói chặn mà không nêu mục nào: giữ kết luận, đừng
             # cho qua. Không tin client — kể cả khi nó tự mâu thuẫn.
-            tag = "[bế tắc]" if self.verdict == "stuck" else "[chặn]"
-            out.append(f"{tag} người rà soát kết luận `{self.verdict}` "
-                       "nhưng không nêu mục nào trong khối JSON")
+            tag = "[stuck]" if self.verdict == "stuck" else "[block]"
+            out.append(f"{tag} reviewer concluded `{self.verdict}` "
+                       "but listed no findings in the JSON block")
         return out
 
 
@@ -1789,12 +1789,12 @@ def deadlock_reason(attempts: list[Attempt], write_scope: list[str] | None = Non
     if not ngoai:
         return ""
     return (
-        "bí: hai lượt liền bị chặn vì cùng một chuyện — "
+        "stuck: two consecutive attempts blocked for the same reason — "
         + "; ".join(cuoi.review_findings[:2])
-        + f". Mục chặn trỏ tới {', '.join(ngoai)} — không nằm trong "
-        f"write_scope của story, nên agent không sửa được dù có thử bao "
-        f"nhiêu lượt. Nới write_scope hoặc sửa tiêu chí chấp nhận rồi "
-        f"chạy lại."
+        + f". Blocking findings point to {', '.join(ngoai)} — not in the "
+        f"story's write_scope, so the agent cannot fix it no matter how many "
+        f"attempts. Widen write_scope or fix the acceptance criteria, then "
+        f"re-run."
     )
 
 
@@ -1940,7 +1940,7 @@ def implement_story(
         if attempt.infra:
             infra_budget -= 1
             if infra_budget <= 0:
-                outcome.blocked_reason = f"lỗi hạ tầng lặp lại: {attempt.error}"
+                outcome.blocked_reason = f"recurring infrastructure error: {attempt.error}"
                 return outcome
             continue  # không tính vào hạn mức chất lượng
 
@@ -1950,10 +1950,10 @@ def implement_story(
         loi_ke_hoach = plan_defects(attempt.review_findings)
         if loi_ke_hoach:
             outcome.blocked_reason = (
-                "bế tắc do kế hoạch, người rà soát đã kiểm chứng: "
+                "deadlock due to plan, reviewer verified: "
                 + "; ".join(loi_ke_hoach[:2])
-                + ". Sửa tiêu chí chấp nhận hoặc write_scope của story rồi "
-                "chạy lại — thử tiếp không gỡ được."
+                + ". Fix the acceptance criteria or the story's write_scope, then "
+                "re-run — retrying will not resolve this."
             )
             return outcome
 
@@ -1964,7 +1964,7 @@ def implement_story(
 
         if outcome.quality_attempts > max_retries:
             outcome.blocked_reason = (
-                f"đã thử {outcome.quality_attempts} lần vẫn không qua cổng"
+                f"tried {outcome.quality_attempts} attempts, still did not pass gate"
             )
             return outcome
 
@@ -2053,7 +2053,7 @@ def verify_only(
     outcome.attempts.append(attempt)
     if not attempt.ok:
         outcome.blocked_reason = (
-            f"kiểm lại ứng viên {attempt.candidate[:7]} không qua cổng: "
+            f"re-verify candidate {attempt.candidate[:7]} did not pass gate: "
             + "; ".join(c.name for c in attempt.gate.failures)
         )
     return outcome

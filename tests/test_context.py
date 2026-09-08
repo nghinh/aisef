@@ -56,11 +56,11 @@ class TestBanDoQuanhPhamVi(ContextTestCase):
         self.assertIn("export function taoGhiChu(text: string) …", out)   # chữ ký, thân → …
         self.assertNotIn("return luuKho", out)                          # không chép thân
         self.assertIn("`src/ui/app.ts` · taoGhiChu", out)                # gọi
-        self.assertIn("`src/store.ts` · được import", out)              # được import
+        self.assertIn("`src/store.ts` · imported", out)              # được import
         self.assertIn("- `tests/a.test.ts` · taoGhiChu", out)           # test nhắc
         self.assertNotIn("khac.ts", out)
-        self.assertLess(out.index("Trong phạm vi"), out.index("Lân cận"))
-        self.assertLess(out.index("Lân cận"), out.index("Test nhắc"))
+        self.assertLess(out.index("**In scope"), out.index("**1-hop neighbours"))
+        self.assertLess(out.index("**1-hop neighbours"), out.index("**Tests referencing"))
 
     def test_chu_ky_nhieu_dong_va_so_dong_dung(self):
         """e9 `notes.ts`: `export function readNotesPage(` xuống dòng, và ba
@@ -110,13 +110,13 @@ class TestBanDoQuanhPhamVi(ContextTestCase):
         for budget in (200, 500, 900):
             out = repo_map(self.p, ["src/a.ts"], budget, story_id="STORY-01-05")
             self.assertLessEqual(len(out), budget)
-            self.assertIn("đã cắt — `aisef ctx --story STORY-01-05`", out)
-        self.assertNotIn("đã cắt", repo_map(self.p, ["src/a.ts"], 0))
+            self.assertIn("truncated — `aisef ctx --story STORY-01-05`", out)
+        self.assertNotIn("truncated", repo_map(self.p, ["src/a.ts"], 0))
 
     def test_thu_muc_va_glob_la_pham_vi(self):
         self.du_an()
-        self.assertIn("`src/store.ts`", repo_map(self.p, ["src"]).split("Lân cận")[0])
-        self.assertIn("`src/ui/app.ts`", repo_map(self.p, ["src/**"]).split("Lân cận")[0])
+        self.assertIn("`src/store.ts`", repo_map(self.p, ["src"]).split("**1-hop neighbours")[0])
+        self.assertIn("`src/ui/app.ts`", repo_map(self.p, ["src/**"]).split("**1-hop neighbours")[0])
 
     def test_hai_dau_sao_cho_cung_ket_qua_tren_moi_ban_python(self):
         """`src/**` và `src/**/*` phải ra cùng tệp.
@@ -127,8 +127,8 @@ class TestBanDoQuanhPhamVi(ContextTestCase):
         hoá (CI Linux 3.12 bắt được 2026-09-06, máy đo 3.14 thì không).
         """
         self.du_an()
-        sao = repo_map(self.p, ["src/**"]).split("Lân cận")[0]
-        sao_tep = repo_map(self.p, ["src/**/*"]).split("Lân cận")[0]
+        sao = repo_map(self.p, ["src/**"]).split("**1-hop neighbours")[0]
+        sao_tep = repo_map(self.p, ["src/**/*"]).split("**1-hop neighbours")[0]
         self.assertEqual(sao, sao_tep)
         self.assertIn("`src/ui/app.ts`", sao)
 
@@ -143,7 +143,7 @@ class TestBanDoQuanhPhamVi(ContextTestCase):
 
     def test_pham_vi_chua_co_tep_thi_noi_ra(self):
         out = repo_map(self.p, ["src/moi.ts", "taoGhiChu"])
-        self.assertIn("chưa có tệp mã nào", out)
+        self.assertIn("no source files on disk", out)
 
 
 class TestNhaCungCapNgoai(ContextTestCase):
@@ -152,14 +152,14 @@ class TestNhaCungCapNgoai(ContextTestCase):
         cmd = "python3 -c \"import json,sys; d=json.load(sys.stdin); print('MAP', d['budget'], *d['seeds'])\""
         out = repo_map(self.p, ["src/a.ts"], 500, command=cmd)
         self.assertIn("MAP 500 src/a.ts", out)
-        self.assertIn("_Nguồn: python3._", out)
-        self.assertNotIn("Trong phạm vi", out)
+        self.assertIn("_Source: python3._", out)
+        self.assertNotIn("In scope", out)
 
     def test_lenh_hong_thi_lui_ve_stdlib_va_noi_la_tho(self):
         self.du_an()
         out = repo_map(self.p, ["src/a.ts"], command="khong-co-lenh-nay --map")
-        self.assertIn("chạy hỏng", out.splitlines()[0])
-        self.assertIn("**thô**", out.splitlines()[0])
+        self.assertIn("failed", out.splitlines()[0])
+        self.assertIn("**raw**", out.splitlines()[0])
         self.assertIn("export function taoGhiChu", out)
 
 
@@ -184,7 +184,7 @@ class TestHatGiongVaMucPrompt(ContextTestCase):
         self.assertEqual(prompt_section(""), "")
         sec = prompt_section("bản đồ")
         self.assertTrue(sec.startswith(HEADING))
-        self.assertIn("không phải chân lý", sec)
+        self.assertIn("not ground truth", sec)
         self.assertIn("aisef ctx --story", sec)
 
 

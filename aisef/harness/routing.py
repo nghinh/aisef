@@ -102,7 +102,7 @@ class Routing:
 
 def role_of(role_id: str) -> Role:
     if role_id not in ROLES:
-        raise RoutingError(f"vai không có: {role_id}. Có: {', '.join(sorted(ROLES))}")
+        raise RoutingError(f"role not found: {role_id}. Available: {', '.join(sorted(ROLES))}")
     return ROLES[role_id]
 
 
@@ -125,12 +125,12 @@ def build_spec(
     role = role_of(role_id)
     if prompt.name != role.prompt:
         raise RoutingError(
-            f"vai {role_id} dùng prompt {role.prompt}, không phải {prompt.name}"
+            f"role {role_id} uses prompt {role.prompt}, not {prompt.name}"
         )
     if session_id and not role.may_resume:
         raise RoutingError(
-            f"vai {role_id} phải chạy trong phiên mới. Nối tiếp phiên của "
-            f"người viết thì người rà soát chỉ hỏi lại chính niềm tin đã có."
+            f"role {role_id} must run in a new session. Resuming the writer's "
+            f"session means the reviewer only re-asks its own existing beliefs."
         )
 
     cfg = config

@@ -50,16 +50,16 @@ class TestRender(unittest.TestCase):
         self.assertNotIn("gradlew", out)
 
     def test_ui_section_only_when_ui(self):
-        self.assertIn("Story có giao diện", self.render("Frontend React."))
-        self.assertNotIn("Story có giao diện", self.render("Công cụ dòng lệnh Python."))
+        self.assertIn("Stories with UI", self.render("Frontend React."))
+        self.assertNotIn("Stories with UI", self.render("Công cụ dòng lệnh Python."))
 
     def test_undetermined_is_surfaced_not_guessed(self):
         out = self.render("Ứng dụng quản lý công việc.")
-        self.assertIn("Chưa chốt", out)
-        self.assertIn("không tự chọn", out)
+        self.assertIn("Not decided", out)
+        self.assertIn("do not choose", out)
 
     def test_warns_against_hand_editing(self):
-        self.assertIn("Không sửa tay", self.render("Python."))
+        self.assertIn("Do not edit manually", self.render("Python."))
 
     def test_project_name_in_title(self):
         self.assertIn("BookStore", self.render("Python.", "BookStore"))

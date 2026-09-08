@@ -36,8 +36,8 @@ from ..harness.observe import EvidenceStore
 from ..harness.tools import command_for, image_for, unrunnable_reason
 
 #: Nhãn cây đã chạy kiểm định — vào bằng chứng và `pre-deploy.json`.
-TREE_CLEAN = "worktree-tạm"
-TREE_AGENT = "cây agent"
+TREE_CLEAN = "clean-worktree"
+TREE_AGENT = "agent-tree"
 
 #: Thư mục phụ thuộc không nằm trong git — worktree sạch mượn của dự án.
 #: ponytail: chỉ gốc dự án; monorepo có `packages/*/node_modules` thì thêm sau.
@@ -55,38 +55,38 @@ class Kind:
 
 
 KINDS: dict[str, Kind] = {
-    "unit": Kind("unit", "Kiểm thử đơn vị và chức năng",
-                 why="Từng đơn vị làm đúng phần việc của nó."),
-    "sit": Kind("sit", "Kiểm thử tích hợp hệ thống",
+    "unit": Kind("unit", "Unit and functional tests",
+                 why="Each unit does its part correctly."),
+    "sit": Kind("sit", "System integration tests",
                 level=sandbox.Level.WORKSPACE_NETWORK,
-                why="Các thành phần ghép lại vẫn chạy — nơi lỗi hay nằm nhất."),
-    "api-contract": Kind("api-contract", "Hợp đồng API",
+                why="Components still work when assembled — where bugs hide most."),
+    "api-contract": Kind("api-contract", "API contract tests",
                          level=sandbox.Level.WORKSPACE_NETWORK,
-                         why="Máy khách dựa vào hợp đồng; đổi lặng lẽ là làm hỏng người khác."),
-    "e2e": Kind("e2e", "Đầu-cuối", level=sandbox.Level.WORKSPACE_NETWORK, needs_ui=True,
-                why="Đường đi thật của người dùng, không phải đường đi trong đầu ta."),
-    "uat": Kind("uat", "Nghiệm thu theo tiêu chí chấp nhận",
+                         why="Clients rely on the contract; silent changes break others."),
+    "e2e": Kind("e2e", "End-to-end", level=sandbox.Level.WORKSPACE_NETWORK, needs_ui=True,
+                why="The real user journey, not the one in our heads."),
+    "uat": Kind("uat", "Acceptance tests against criteria",
                 level=sandbox.Level.WORKSPACE_NETWORK,
-                why="Đúng thứ PRD hứa, diễn đạt bằng ngôn ngữ người dùng."),
-    "perf": Kind("perf", "Hiệu năng", level=sandbox.Level.WORKSPACE_NETWORK,
-                 why="Ngưỡng lấy từ NFR; không có số thì 'nhanh' là ý kiến."),
-    "security": Kind("security", "Bảo mật", level=sandbox.Level.READ_ONLY,
-                     why="Quét mã, phụ thuộc và bí mật lọt vào kho."),
-    "accessibility": Kind("accessibility", "Trợ năng", needs_ui=True,
+                why="What the PRD promised, expressed in user language."),
+    "perf": Kind("perf", "Performance", level=sandbox.Level.WORKSPACE_NETWORK,
+                 why="Thresholds from NFR; without numbers, 'fast' is an opinion."),
+    "security": Kind("security", "Security", level=sandbox.Level.READ_ONLY,
+                     why="Scan code, dependencies, and secrets leaked into the repo."),
+    "accessibility": Kind("accessibility", "Accessibility", needs_ui=True,
                           level=sandbox.Level.WORKSPACE_NETWORK,
-                          why="Người dùng bàn phím và trình đọc màn hình cũng là "
-                              "người dùng; thiếu tên gọi thì màn hình không dùng được."),
-    "migration": Kind("migration", "Di trú dữ liệu",
-                      why="Nâng cấp lược đồ sai thì dữ liệu người dùng mất, và "
-                          "không có đường lùi."),
-    "mutation": Kind("mutation", "Kiểm đột biến",
-                     why="Bắt test luôn xanh dù code hỏng — thứ tệ hơn không có test."),
-    "sbom": Kind("sbom", "Kê khai thành phần (SBOM)", level=sandbox.Level.READ_ONLY,
-                 why="Không biết mình chạy thư viện nào thì không trả lời được câu "
-                     "'chúng ta có dính lỗ hổng đó không'."),
-    "image-scan": Kind("image-scan", "Quét image triển khai",
+                          why="Keyboard and screen-reader users are users too; "
+                              "missing labels make screens unusable."),
+    "migration": Kind("migration", "Data migration",
+                      why="A bad schema upgrade loses user data, and there is "
+                          "no way back."),
+    "mutation": Kind("mutation", "Mutation testing",
+                     why="Catches tests that pass even when code is broken — worse than no tests."),
+    "sbom": Kind("sbom", "Software bill of materials (SBOM)", level=sandbox.Level.READ_ONLY,
+                 why="Not knowing which libraries you run means you cannot answer "
+                     "'are we affected by that vulnerability'."),
+    "image-scan": Kind("image-scan", "Deploy image scan",
                        level=sandbox.Level.WORKSPACE_NETWORK,
-                       why="Lỗ hổng phần lớn nằm ở tầng nền của image, không nằm ở mã ta viết."),
+                       why="Most vulnerabilities live in the image base layer, not in our code."),
 }
 
 #: Lệnh mặc định khi dự án không khai. Chỉ đặt cho loại có công cụ gần như
@@ -150,12 +150,12 @@ class KindResult:
         if o is Outcome.UNCONFIGURED:
             return f"  {o.mark} {self.kind.id:12} {self.skipped or DEFAULT_REASON[o]}"
         if o is Outcome.UNRUNNABLE:
-            return f"  {o.mark} {self.kind.id:12} không chạy được — {self.unrunnable}"
+            return f"  {o.mark} {self.kind.id:12} unrunnable — {self.unrunnable}"
         if o is Outcome.WAIVED:
             ly_do = self.skipped or self.unrunnable
-            if ly_do.startswith("miễn tường minh"):   # đã tự nói, không bọc thêm một lớp
+            if ly_do.startswith("explicit waiver"):   # already self-describing, don't wrap again
                 return f"  {o.mark} {self.kind.id:12} {ly_do}"
-            return f"  {o.mark} {self.kind.id:12} miễn tường minh ({ly_do})"
+            return f"  {o.mark} {self.kind.id:12} explicit waiver ({ly_do})"
         extra = f" — {self.detail}" if self.detail and not self.ok else ""
         return f"  {o.mark} {self.kind.id:12} {self.kind.title}{extra}"
 
@@ -203,29 +203,29 @@ class QaReport:
         return self.passed and not self.unconfigured
 
     def summary(self) -> str:
-        lines = ["Kiểm định:"]
+        lines = ["Verification:"]
         lines += [r.line(waived=r.kind.id in self.waived) for r in self.results]
         if self.fake_tests:
-            lines.append(f"  ✗ test giả: {len(self.fake_tests)} test không có khẳng định nào")
+            lines.append(f"  ✗ fake tests: {len(self.fake_tests)} tests with no assertions")
             for t in self.fake_tests[:5]:
                 lines.append(f"      {t}")
         if self.unrunnable:
             lines.append(
-                "\n⚠️  không chạy được: "
+                "\n⚠️  unrunnable: "
                 + ", ".join(r.kind.id for r in self.unrunnable)
-                + " — môi trường chưa dựng, không phải test đỏ"
+                + " — environment not set up, not a test failure"
             )
         if self.unconfigured:
             lines.append(
-                "\n⚠️  chưa cấu hình: "
+                "\n⚠️  unconfigured: "
                 + ", ".join(r.kind.id for r in self.unconfigured)
-                + " — chưa chạy thì không được gọi là đã kiểm"
+                + " — never ran means never verified"
             )
         if self.waived:
-            lines.append(f"miễn tường minh: {', '.join(self.waived)}")
+            lines.append(f"explicit waiver: {', '.join(self.waived)}")
         if self.tree:
-            lines.append(f"cây kiểm: {self.tree}"
-                         + (f" từ {self.clean_tree[:7]}" if self.clean_tree else ""))
+            lines.append(f"verification tree: {self.tree}"
+                         + (f" from {self.clean_tree[:7]}" if self.clean_tree else ""))
         return "\n".join(lines)
 
 
@@ -330,11 +330,11 @@ def _verification_tree(
     if not clean:
         return project, TREE_AGENT, "", {}
     if not sha:
-        return project, f"{TREE_AGENT} (không có git/HEAD để dựng worktree sạch)", "", {}
+        return project, f"{TREE_AGENT} (no git/HEAD to create clean worktree)", "", {}
     try:
         cay = stack.enter_context(WorktreeManager(project).temporary(sha))
     except GitError as e:
-        return project, f"{TREE_AGENT} (không dựng được worktree sạch: {e})", "", {}
+        return project, f"{TREE_AGENT} (could not create clean worktree: {e})", "", {}
     mounts = {d: project / d for d in DEPS_DIRS if (project / d).is_dir()}
     return cay, TREE_CLEAN, sha, mounts
 
@@ -395,17 +395,17 @@ def run_suite(
                 # mâu thuẫn: dòng dưới ghi "miễn tường minh" trong khi dòng
                 # trên ghi ✗.
                 ly_do = str(cfg.get("verify.waiver_reason", "") or "").strip()
-                result.skipped = "miễn tường minh (verify.waived)" + (f": {ly_do}" if ly_do else "")
+                result.skipped = "explicit waiver (verify.waived)" + (f": {ly_do}" if ly_do else "")
                 report.results.append(result)
                 continue
             if kind.needs_ui and not has_ui:
-                result.skipped = "dự án không có giao diện"
+                result.skipped = "project has no UI"
                 report.results.append(result)
                 continue
 
             command = command_for_kind(kind.id, project, cfg)
             if not command:
-                result.skipped = "chưa cấu hình lệnh (verify.%s)" % kind.id
+                result.skipped = "command not configured (verify.%s)" % kind.id
                 report.results.append(result)
                 continue
 

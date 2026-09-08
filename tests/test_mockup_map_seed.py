@@ -26,11 +26,11 @@ class TestSeedConvention(unittest.TestCase):
     def test_param_route_names_seed_record(self):
         text = slice_for("/note/:id").as_prompt()
         self.assertIn("`/note/1`", text)
-        self.assertIn("hạt giống", text)
+        self.assertIn("seed data", text)
 
     def test_plain_route_says_nothing_about_seed(self):
         text = slice_for("/").as_prompt()
-        self.assertNotIn("hạt giống", text)
+        self.assertNotIn("seed data", text)
 
 
 if __name__ == "__main__":

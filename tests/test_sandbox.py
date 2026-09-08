@@ -218,7 +218,7 @@ class TestProviderMacDinhCuaSuite(unittest.TestCase):
         for ten in ("host", "fake"):
             with self.subTest(ten=ten), self.assertRaises(ValueError) as e:
                 select_provider(SandboxSpec(workspace=self.ws, cmd=["true"], provider=ten))
-            self.assertIn("không tồn tại", str(e.exception))
+            self.assertIn("does not exist", str(e.exception))
 
 
 class TestDockerCanBeTurnedOff(unittest.TestCase):
@@ -245,7 +245,7 @@ class TestDockerCanBeTurnedOff(unittest.TestCase):
         with self.assertRaises(RuntimeError) as e:
             run(SandboxSpec(workspace=self.ws, cmd=["true"],
                             use_docker=False, allow_degraded=False))
-        self.assertIn("cấu hình tắt Docker", str(e.exception))
+        self.assertIn("configuration disabled Docker", str(e.exception))
 
 
 class TestBacKhaiYeuCauProviderKhaiNangLuc(unittest.TestCase):

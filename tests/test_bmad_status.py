@@ -61,7 +61,7 @@ class TestRealArchitectureRun(unittest.TestCase):
     def test_summary_readable(self):
         text = self.s.summary()
         self.assertIn("partial", text)
-        self.assertIn("6 câu hỏi mở", text)
+        self.assertIn("6 open questions", text)
 
 
 class TestStatusSemantics(unittest.TestCase):
@@ -107,7 +107,7 @@ class TestParsing(unittest.TestCase):
     def test_no_json_at_all(self):
         s = parse_headless_status("Tôi đã viết xong tài liệu.")
         self.assertFalse(s.parsed)
-        self.assertIn("không đọc được", s.summary())
+        self.assertIn("could not parse", s.summary())
 
     def test_malformed_json_is_not_a_crash(self):
         self.assertFalse(parse_headless_status('```json\n{hỏng\n```').parsed)

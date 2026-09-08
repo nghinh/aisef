@@ -137,7 +137,7 @@ def generate_html(evidences: list[Evidence], *, project: str = "",
         gate_rows += (
             f'<tr class="{cls}"><td>{_esc(g["story"])}</td><td>{g["attempt"]}</td>'
             f'<td>{_esc(g["candidate"])}</td>'
-            f'<td>{"DAT" if g["passed"] else "KHONG DAT"}</td>'
+            f'<td>{"PASS" if g["passed"] else "FAIL"}</td>'
             f'<td>{_esc(fails)}</td></tr>\n'
         )
 
@@ -161,7 +161,7 @@ def generate_html(evidences: list[Evidence], *, project: str = "",
 
     # ponytail: inline CSS, no external deps
     return f"""<!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -280,8 +280,8 @@ def _project_summary(groups: list[tuple[str, list[Evidence]]]) -> str:
         rows.append(f"<tr><td>{_esc(name)}</td><td>{stories}</td>"
                     f"<td>${cost:.2f}</td><td>{checks}</td><td>{blocks}</td></tr>")
     return (
-        "<h2>Tổng hợp dự án</h2>"
-        "<table><tr><th>Dự án</th><th>Story</th><th>Chi phí</th>"
+        "<h2>Project summary</h2>"
+        "<table><tr><th>Project</th><th>Story</th><th>Cost</th>"
         "<th>Guard check</th><th>Guard block</th></tr>"
         + "\n".join(rows) + "</table>"
     )
@@ -290,7 +290,7 @@ def _project_summary(groups: list[tuple[str, list[Evidence]]]) -> str:
 def cmd_dashboard(args) -> int:
     groups = _collect_projects(args)
     if not groups:
-        print("✗ không có bằng chứng nào — chạy `aisef run` trước", file=__import__("sys").stderr)
+        print("✗ no evidence found — run `aisef run` first", file=__import__("sys").stderr)
         return EXIT_NOT_READY
 
     all_evidences = [e for _, evs in groups for e in evs]

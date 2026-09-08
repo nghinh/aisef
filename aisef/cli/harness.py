@@ -22,13 +22,13 @@ def cmd_baseline(args) -> int:
     if getattr(args, "incremental", False):
         provider = resolve(project, preference=args.provider or "auto")
         result = provider.build(project, incremental=True)
-        print(f"Graph cập nhật: {provider.name} — {result.nodes} node, {result.edges} edge")
+        print(f"Graph updated: {provider.name} — {result.nodes} nodes, {result.edges} edges")
         return EXIT_OK
 
     sig = detect(project)
     if not sig.is_brownfield and not args.force:
-        print(f"Greenfield: {sig.source_files} file mã — dùng `aisef plan` thay cho `aisef baseline`.")
-        print("  (dùng --force để dựng baseline dù greenfield)")
+        print(f"Greenfield: {sig.source_files} source files — use `aisef plan` instead of `aisef baseline`.")
+        print("  (use --force to build baseline even for greenfield)")
         return EXIT_OK
 
     provider = resolve(project, preference=args.provider or "auto")
@@ -36,9 +36,9 @@ def cmd_baseline(args) -> int:
     text = build_baseline(project, provider=provider, output=output)
     print(f"Baseline: {sig.summary}")
     print(f"  provider: {provider.name}")
-    print(f"  ghi: {output}")
+    print(f"  wrote: {output}")
     lines = text.count("\n")
-    print(f"  {lines} dòng")
+    print(f"  {lines} lines")
     return EXIT_OK
 
 
@@ -80,9 +80,9 @@ def cmd_init(args) -> int:
     if stack and stack in STACK_PRESETS:
         cfg = cfg.overlay(STACK_PRESETS[stack])
     path = cfg.write_template(args.project)
-    print(f"đã ghi {path}")
+    print(f"wrote {path}")
     if stack:
-        print(f"stack: {stack} — test/lint/sandbox đã được cấu hình")
+        print(f"stack: {stack} — test/lint/sandbox configured")
     return EXIT_OK
 
 
@@ -94,8 +94,8 @@ def cmd_setup(args) -> int:
     project = Path(args.project)
     req = project / "docs" / "requirements.md"
     if not req.is_file():
-        print(f"✗ không có {req}", file=sys.stderr)
-        print("  đây là đầu vào duy nhất của dự án — tạo nó trước", file=sys.stderr)
+        print(f"✗ missing {req}", file=sys.stderr)
+        print("  this is the project's sole input — create it first", file=sys.stderr)
         return EXIT_NOT_READY
 
     from ..kit import fetch
@@ -104,20 +104,20 @@ def cmd_setup(args) -> int:
         Path(args.references).resolve() if args.references else fetch.default_root()
     )
     if not args.no_fetch:
-        print(f"Nguồn skill: {references}")
+        print(f"Skill source: {references}")
         bao = fetch.ensure(references)
         print(bao.summary())
         print()
     if not references.is_dir():
-        print(f"✗ không có thư mục nguồn: {references}", file=sys.stderr)
-        print("  chạy lại không kèm --no-fetch để tự lấy về", file=sys.stderr)
+        print(f"✗ missing source directory: {references}", file=sys.stderr)
+        print("  rerun without --no-fetch to auto-fetch", file=sys.stderr)
         return EXIT_NOT_READY
 
     stack = detect_file(req)
-    print(f"Stack dò được: {stack.summary()}")
+    print(f"Detected stack: {stack.summary()}")
     if stack.undetermined:
-        print(f"  ⚠️  chưa xác định: {', '.join(stack.undetermined)}")
-        print("     — pha kiến trúc sẽ quyết; không đoán ở đây")
+        print(f"  ⚠️  undetermined: {', '.join(stack.undetermined)}")
+        print("     — architecture phase will decide; not guessing here")
 
     text = req.read_text(encoding="utf-8", errors="replace")
     plan_ = install.plan(project, stack, references_root=references, requirements_text=text)
@@ -125,7 +125,7 @@ def cmd_setup(args) -> int:
     print(plan_.summary())
 
     if args.dry_run:
-        print("\n(dry-run — chưa ghi gì)")
+        print("\n(dry-run — nothing written)")
         return EXIT_OK
 
     report = install.apply(plan_, project)
@@ -134,14 +134,14 @@ def cmd_setup(args) -> int:
     from ..kit.constitution import write_for_project
 
     written = write_for_project(project, project.resolve().name, stack)
-    print("quy tắc: " + ", ".join(p.name for p in written))
+    print("rules: " + ", ".join(p.name for p in written))
 
     cfg_path = project / ".ai" / "config.json"
     if not cfg_path.is_file():
         Config.load(project).write_template(project)
-        print(f"đã ghi {cfg_path}")
+        print(f"wrote {cfg_path}")
 
-    print(f"\n✅ xong. Kiểm tra: aisef --project {args.project} doctor")
+    print(f"\n✅ done. Verify: aisef --project {args.project} doctor")
     return EXIT_OK
 
 
@@ -165,10 +165,10 @@ def cmd_compile(args) -> int:
         print(r.summary())
 
     path = write_compile_report(args.project, reports)
-    print(f"\nbáo cáo: {path}")
+    print(f"\nreport: {path}")
 
     if any(not r.blocks_at_source for r in reports):
-        print("\n⚠️  có client chỉ kiểm được sau — mức bảo đảm thấp hơn, đã ghi vào báo cáo")
+        print("\n⚠️  some clients can only be checked later — lower assurance, noted in report")
     return EXIT_OK
 
 
@@ -192,7 +192,7 @@ def cmd_guard(args) -> int:
         raw = sys.stdin.read()
         event = json.loads(raw) if raw.strip() else {}
     except json.JSONDecodeError:
-        print("guard: không phân tích được sự kiện, bỏ qua", file=sys.stderr)
+        print("guard: could not parse event, skipping", file=sys.stderr)
         return EXIT_OK
 
     t0 = time.monotonic()
@@ -213,7 +213,7 @@ def cmd_guard(args) -> int:
                        artifact_root=str(artifact_root),
                        duration_ms=elapsed_ms)
     except OSError as e:
-        print(f"guard: không ghi được bằng chứng ({e})", file=sys.stderr)
+        print(f"guard: could not record evidence ({e})", file=sys.stderr)
 
     if not verdict.allowed:
         # P1-4: structured error — JSON on stdout for machine readers,
@@ -252,13 +252,13 @@ def cmd_skill(args) -> int:
             return EXIT_NOT_READY
     reg = R.refresh(project, _artifact_root(args))
     by = reg.by_status()
-    print(f"Sổ skill: {len(reg.entries)} bản ghi")
+    print(f"Skill registry: {len(reg.entries)} entries")
     for st in R.STATUSES:
         if by[st]:
             print(f"  {st:10} {by[st]}")
     rej = [e for e in reg.entries.values() if e.status == R.REJECTED]
     if rej:
-        print("\n✗ bị loại (không định tuyến):")
+        print("\n✗ rejected (not routed):")
         for e in rej[:10]:
             print(f"    {e.id:50} {'; '.join(e.verified.gaps[:1])}")
 
@@ -266,10 +266,10 @@ def cmd_skill(args) -> int:
         plan = load_plan(_artifact_root(args))
         st = plan.stories.get(args.story)
         if st is None:
-            print(f"\nkhông có story {args.story} trong kế hoạch", file=sys.stderr)
+            print(f"\nstory {args.story} not found in plan", file=sys.stderr)
             return EXIT_NOT_READY
         r = RT.route(st, reg, project=project)
-        print(f"\nĐịnh tuyến cho {args.story} — {st.title}:")
+        print(f"\nRouting for {args.story} — {st.title}:")
         print("  " + r.prompt_section().replace(chr(10), chr(10) + "  "))
     return EXIT_OK
 
@@ -286,9 +286,9 @@ def cmd_doc(args) -> int:
         print(f"doc: {e}", file=sys.stderr)
         return EXIT_NOT_READY
     except OSError as e:
-        print(f"doc: không gọi được context7 ({e}) — làm việc theo tài liệu đã có, đừng đoán tên API", file=sys.stderr)
+        print(f"doc: could not reach context7 ({e}) — work from existing docs, do not guess API names", file=sys.stderr)
         return EXIT_NOT_READY
-    print(f"# {d.title or d.library} — {d.topic or 'tổng quan'} ({'cache' if d.cached else 'context7'}: {d.library})\n")
+    print(f"# {d.title or d.library} — {d.topic or 'overview'} ({'cache' if d.cached else 'context7'}: {d.library})\n")
     print(d.text)
     if args.story:
         from ..harness.observe import NOTE, Event, EvidenceStore
@@ -313,10 +313,10 @@ def cmd_gate(args) -> int:
     from ..harness.observe import EvidenceStore
 
     if not args.replay:
-        print("✗ gate: hiện chỉ có `--replay` (chấm lại trên bằng chứng)", file=sys.stderr)
+        print("✗ gate: currently only `--replay` is supported (re-evaluate on recorded evidence)", file=sys.stderr)
         return EXIT_USAGE
     if not args.story and not args.all:
-        print("✗ gate --replay cần <story> hoặc --all", file=sys.stderr)
+        print("✗ gate --replay requires <story> or --all", file=sys.stderr)
         return EXIT_USAGE
 
     store = EvidenceStore(_artifact_root(args))
@@ -331,17 +331,17 @@ def cmd_gate(args) -> int:
             thieu = [a for a in thieu if a == args.attempt]
         if not rs and not thieu:
             if not args.all:
-                print(f"✗ {sid}: không có lượt chấm cổng nào trong bằng chứng", file=sys.stderr)
+                print(f"✗ {sid}: no gate evaluation found in evidence", file=sys.stderr)
             continue
         print()
         for r in rs:
             print(r.summary())
         for a in thieu:
-            print(f"{sid} lượt {a}: không replay được (bằng chứng trước ADR-005 V4 — "
-                  f"không có `gate:input`), không đoán")
+            print(f"{sid} attempt {a}: not replayable (evidence predates ADR-005 V4 — "
+                  f"no `gate:input`), not guessing")
         duoc += len(rs)
         tong += len(rs) + len(thieu)
-    print(f"\nreplay được {duoc}/{tong} lượt")
+    print(f"\nreplayed {duoc}/{tong} attempts")
     return EXIT_OK if duoc else EXIT_NOT_READY
 
 
@@ -351,7 +351,7 @@ def cmd_replay(args) -> int:
     from ..harness.observe import EvidenceStore
 
     if not args.story and not args.all:
-        print("✗ replay cần <story> hoặc --all", file=sys.stderr)
+        print("✗ replay requires <story> or --all", file=sys.stderr)
         return EXIT_USAGE
 
     store = EvidenceStore(_artifact_root(args))
@@ -366,17 +366,17 @@ def cmd_replay(args) -> int:
             thieu = [a for a in thieu if a == args.attempt]
         if not rs and not thieu:
             if not args.all:
-                print(f"✗ {sid}: không có lượt chấm cổng nào trong bằng chứng", file=sys.stderr)
+                print(f"✗ {sid}: no gate evaluation found in evidence", file=sys.stderr)
             continue
         print()
         for r in rs:
             print(r.summary())
         for a in thieu:
-            print(f"{sid} lượt {a}: không replay được (trước ADR-005 V4)")
+            print(f"{sid} attempt {a}: not replayable (predates ADR-005 V4)")
         duoc += len(rs)
         tong += len(rs) + len(thieu)
     if not tong:
-        print("không có bằng chứng gate nào")
+        print("no gate evidence found")
         return EXIT_NOT_READY
-    print(f"\nreplay được {duoc}/{tong} lượt")
+    print(f"\nreplayed {duoc}/{tong} attempts")
     return EXIT_OK if duoc else EXIT_NOT_READY

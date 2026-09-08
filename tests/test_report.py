@@ -117,18 +117,18 @@ class TestPlanningCost(ReportTestCase):
 
     def test_phase_table_in_the_markdown(self):
         EvidenceStore(self.artifacts).record("plan-ux", Event(kind="agent_run", cost_usd=3.71))
-        self.assertIn("Chi phí lập kế hoạch", build(self.project).markdown())
+        self.assertIn("Planning and Mockup Cost", build(self.project).markdown())
 
     def test_planning_runs_do_not_count_as_harness_story_evidence(self):
         EvidenceStore(self.artifacts).record("plan-ux", Event(kind="agent_run", cost_usd=1.0))
-        self.assertIn("chưa có bằng chứng", build(self.project).harness["2 Tool"])
+        self.assertIn("no evidence", build(self.project).harness["2 Tool"])
 
 
 class TestHarnessEvidence(ReportTestCase):
     def test_missing_evidence_is_said_plainly(self):
         harness = build(self.project).harness
         self.assertEqual(len(harness), 6)
-        self.assertIn("chưa có bằng chứng", harness["5 Guardrail"])
+        self.assertIn("no evidence", harness["5 Guardrail"])
 
     def test_isolation_reports_what_actually_happened(self):
         """Báo "có sandbox" khi thực tế chạy thẳng trên máy là đúng loại tự
@@ -138,7 +138,7 @@ class TestHarnessEvidence(ReportTestCase):
                        detail={"isolation": "subprocess", "degraded": True})
         note = build(self.project).harness["3 Sandbox"]
         self.assertIn("subprocess", note)
-        self.assertIn("suy biến", note)
+        self.assertIn("degraded", note)
 
     def test_isolation_with_a_container(self):
         EvidenceStore(self.artifacts).tool_run(
@@ -146,7 +146,7 @@ class TestHarnessEvidence(ReportTestCase):
             detail={"isolation": "docker/WORKSPACE_WRITE", "degraded": False})
         note = build(self.project).harness["3 Sandbox"]
         self.assertIn("docker", note)
-        self.assertNotIn("suy biến", note)
+        self.assertNotIn("degraded", note)
 
     def test_present_evidence_names_the_artifact(self):
         (self.project / ".claude").mkdir()
@@ -156,7 +156,7 @@ class TestHarnessEvidence(ReportTestCase):
 
 class TestPreDeploySection(ReportTestCase):
     def test_absent_when_never_scored(self):
-        self.assertIn("Chưa chấm", build(self.project).markdown())
+        self.assertIn("Not yet evaluated", build(self.project).markdown())
 
     def test_reads_the_report_that_was_signed(self):
         from aisef.control.approvals import PRE_DEPLOY_REPORT
@@ -168,7 +168,7 @@ class TestPreDeploySection(ReportTestCase):
         }, ensure_ascii=False), encoding="utf-8")
         text = build(self.project).markdown()
         self.assertIn("leo thang", text)
-        self.assertIn("chưa cấu hình = perf", text)
+        self.assertIn("unconfigured = perf", text)
 
     def test_dau_theo_ket_cuc_khong_theo_khong_chan(self):
         """Mục – không áp dụng / ◇ miễn không được in ✅ (QĐ C-a, QĐ5 2026-09-06)."""
@@ -190,8 +190,8 @@ class TestPreDeploySection(ReportTestCase):
         self.assertIn("| ngoài phạm vi nghiệm thu | – 16 story không chấm |", text)
         self.assertIn("| miễn tường minh | ◇ mutation — lý do |", text)
         self.assertIn("| runbook | ✗ thiếu |", text)
-        self.assertIn("Phạm vi nghiệm thu: **EPIC-01**", text)
-        self.assertIn("Ngoài phạm vi (chưa nghiệm thu): 1 story", text)
+        self.assertIn("Acceptance scope: **EPIC-01**", text)
+        self.assertIn("Out of scope (not accepted): 1 stories", text)
 
     def test_yeu_cau_chi_co_story_ngoai_pham_vi_thi_noi_ngoai_pham_vi(self):
         from aisef.control.approvals import PRE_DEPLOY_REPORT
@@ -203,7 +203,7 @@ class TestPreDeploySection(ReportTestCase):
         }), encoding="utf-8")
         text = build(self.project).markdown()
         row = next(l for l in text.splitlines() if l.startswith("| FR-1 |"))
-        self.assertTrue(row.endswith("| STORY-02-01 | ngoài phạm vi |"), row)
+        self.assertTrue(row.endswith("| STORY-02-01 | out of scope |"), row)
         # Không có phạm vi thì vẫn "—" như cũ.
         (self.artifacts / PRE_DEPLOY_REPORT).unlink()
         text = build(self.project).markdown()
@@ -212,7 +212,7 @@ class TestPreDeploySection(ReportTestCase):
 
 
 class TestCongStoryChungNhan(ReportTestCase):
-    """ADR-005 V9: báo cáo in "mục cổng có đủ 3 control: n/N" đọc từ bảng
+    """ADR-005 V9: báo cáo in "gate checks with all 3 controls: n/N" đọc từ bảng
     test, không phải câu "cổng 6 điều kiện" kể tay."""
 
     def test_so_doc_tu_bang_qualification(self):
@@ -221,7 +221,7 @@ class TestCongStoryChungNhan(ReportTestCase):
         report = build(self.project)
         self.assertEqual(set(report.qualification), set(CHECK_NAMES))
         du = sum(all(v.values()) for v in qualification_table().values())
-        self.assertIn(f"mục cổng có đủ 3 control: {du}/{len(CHECK_NAMES)}", report.markdown())
+        self.assertIn(f"gate checks with all 3 controls: {du}/{len(CHECK_NAMES)}", report.markdown())
         self.assertNotIn("6 điều kiện", report.markdown())
 
     def test_khong_co_thu_muc_tests_thi_in_dau_hoi_khong_in_0(self):
@@ -229,14 +229,14 @@ class TestCongStoryChungNhan(ReportTestCase):
         from aisef.phases.report import Report
 
         text = Report(project="x", qualification={}).markdown()
-        self.assertIn(f"mục cổng có đủ 3 control: ?/{len(CHECK_NAMES)}", text)
+        self.assertIn(f"gate checks with all 3 controls: ?/{len(CHECK_NAMES)}", text)
 
 
 class TestOutput(ReportTestCase):
     def test_written_to_docs(self):
         path = write(self.project)
         self.assertTrue(path.is_file())
-        self.assertIn("Báo cáo nghiệm thu", path.read_text(encoding="utf-8"))
+        self.assertIn("Acceptance Report", path.read_text(encoding="utf-8"))
 
     def test_tieu_de_co_ten_du_an_ke_ca_khi_chay_tai_cho(self):
         """CLI mặc định `--project .`, và `Path(".").name` là chuỗi rỗng —
@@ -249,7 +249,7 @@ class TestOutput(ReportTestCase):
             text = build(".").markdown()
         finally:
             os.chdir(cwd)
-        self.assertIn(f"# Báo cáo nghiệm thu — {self.project.name}", text)
+        self.assertIn(f"# Acceptance Report — {self.project.name}", text)
 
     def test_custom_path(self):
         out = self.project / "bao-cao.md"
@@ -269,7 +269,7 @@ class TestTieuChiCoTestTrongBaoCao(ReportTestCase):
         ev.tool_run("S-1", "test", ok=True, detail={"test_format": "node-spec", "test_ids": ["AC-S-1-1: a"]})
         rep = build(self.project)
         self.assertEqual(next(s for s in rep.stories if s["id"] == "S-1")["ac"], "1/2")
-        self.assertIn("| TCCN có test |", rep.markdown())
+        self.assertIn("| AC w/ Test |", rep.markdown())
 
     def test_unreadable_names_show_unknown_not_full(self):
         from aisef.harness.observe import EvidenceStore

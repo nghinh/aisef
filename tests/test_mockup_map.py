@@ -60,8 +60,9 @@ class TestLoadHalf(unittest.TestCase):
             load_for_story(self.contract, ["danh-sach"], artifact_root=self.root)[0]
         )
         self.assertIn("danh-sach", text)
-        for other in ("thung-rac", "cai-dat", "the"):
+        for other in ("thung-rac", "cai-dat"):
             self.assertNotIn(other, text)
+        self.assertNotIn("Screen `the`", text)
 
     def test_slice_carries_route_and_components(self):
         sl = load_slice(self.contract, "danh-sach", artifact_root=self.root)
@@ -81,7 +82,7 @@ class TestLoadHalf(unittest.TestCase):
         names = [c.name for c in sl.screen.components]
         self.assertNotIn("Đặt lịch khám răng 2 phút trước", names)
         self.assertIn("link", sl.screen.data_roles)
-        self.assertIn("Vùng dữ liệu", sl.as_prompt())
+        self.assertIn("Data region", sl.as_prompt())
 
     def test_validation_constraints_go_into_the_prompt(self):
         text = load_slice(self.contract, "danh-sach", artifact_root=self.root).as_prompt()
@@ -96,7 +97,7 @@ class TestLoadHalf(unittest.TestCase):
 
     def test_story_without_screens_says_so(self):
         text = prompt_section([])
-        self.assertIn("không dựng màn hình nào", text)
+        self.assertIn("does not build any screen", text)
 
 
 class TestRouteRewrite(unittest.TestCase):
@@ -195,7 +196,7 @@ class TestVerifyHalf(unittest.TestCase):
         )
         res = self.run_verify(cfg)
         self.assertFalse(res.passed)
-        self.assertIn("vùng dữ liệu", res.summary())
+        self.assertIn("data region", res.summary())
 
     def test_evidence_records_the_comparison(self):
         cfg = self.serve("trống")
@@ -233,7 +234,7 @@ class TestAppServerTrust(unittest.TestCase):
         with mock.patch.object(mv, "_responds", return_value=True), \
                 mock.patch.object(mv, "occupant", return_value="pid 1, cwd /x"):
             why = s.start()
-        self.assertIn("tiến trình khác", why)
+        self.assertIn("another process", why)
         self.assertIn("pid 1", why)
         self.assertIsNone(s.proc)
 
@@ -270,7 +271,7 @@ class TestAppServer(unittest.TestCase):
                       f"http://127.0.0.1:{_free_port()}", cwd=Path("."), ready_timeout=10)
         why = s.start()
         s.stop()
-        self.assertIn("thoát sớm", why)
+        self.assertIn("exited early", why)
 
 
 def _free_port() -> int:

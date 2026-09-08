@@ -243,7 +243,7 @@ class TestExitStatus(unittest.TestCase):
                                        "result": "API Error: connection reset"}), "max_turns")
 
     def test_timeout_do_client_cat(self):
-        self.assertEqual(exit_status_of(RunResult(ok=False, error="quá 1800s")), "timeout")
+        self.assertEqual(exit_status_of(RunResult(ok=False, error="exceeded 1800s")), "timeout")
 
     def test_cost(self):
         self.assertEqual(self.ket_cuc({"subtype": "error_max_budget_usd", "is_error": True}), "cost")
@@ -271,7 +271,7 @@ class TestExitStatus(unittest.TestCase):
         sinh = {
             exit_status_of(parse_file(MINIMAL)), exit_status_of(parse_file(API_ERROR)),
             exit_status_of(parse_stream([])),
-            exit_status_of(RunResult(ok=False, error="quá 1s")),
+            exit_status_of(RunResult(ok=False, error="exceeded 1s")),
             exit_status_of(RunResult(ok=False, error="lạ")),
             self.ket_cuc({"subtype": "error_max_turns", "is_error": True}),
             self.ket_cuc({"subtype": "error_max_budget_usd", "is_error": True}),

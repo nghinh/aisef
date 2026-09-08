@@ -332,7 +332,7 @@ class ApprovalStore:
 
     def reject(self, gate: Gate, *, note: str, by: str = "") -> Approval:
         if not note.strip():
-            raise ValueError("từ chối phải kèm ghi chú nói rõ cần sửa gì")
+            raise ValueError("rejection must include a note explaining what to fix")
         return self.decide(gate, Status.CHANGES_REQUESTED, by=by, note=note)
 
     def auto_approve(self, gate: Gate, *, reason: str = "--auto-approve") -> Approval:
@@ -363,5 +363,5 @@ def parse_auto_approve(value: str | None) -> frozenset[Gate]:
             unknown.append(part)
     if unknown:
         valid = ", ".join(g.value for g in GATE_ORDER)
-        raise ValueError(f"cổng không hợp lệ: {', '.join(unknown)}. Hợp lệ: {valid}")
+        raise ValueError(f"invalid gate: {', '.join(unknown)}. Valid: {valid}")
     return frozenset(gates)

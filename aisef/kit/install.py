@@ -61,11 +61,11 @@ class InstallPlan:
         return counts
 
     def summary(self) -> str:
-        lines = [f"sẽ cài {len(self.skills)} skill:"]
+        lines = [f"will install {len(self.skills)} skills:"]
         for src, n in sorted(self.by_source().items()):
             lines.append(f"  {src:12} {n}")
         for src, why in self.skipped_sources:
-            lines.append(f"  {src:12} bỏ qua — {why}")
+            lines.append(f"  {src:12} skipped — {why}")
         return "\n".join(lines)
 
 
@@ -81,8 +81,8 @@ class InstallReport:
 
     def summary(self) -> str:
         return (
-            f"cài mới {len(self.installed)} · giữ nguyên {len(self.unchanged)} · "
-            f"gỡ {len(self.removed)} · tổng {self.total}"
+            f"installed {len(self.installed)} · unchanged {len(self.unchanged)} · "
+            f"removed {len(self.removed)} · total {self.total}"
         )
 
 
@@ -94,21 +94,21 @@ def _select_from_source(
 ) -> tuple[list[PlannedSkill], str | None]:
     """Chọn skill của một nguồn. Trả (danh sách, lý do bỏ qua nếu có)."""
     if not source.installable:
-        return [], f"chỉ tham chiếu (license: {source.license or 'không có'})"
+        return [], f"reference only (license: {source.license or 'none'})"
 
     if "frontend_or_mobile" in source.requires and not stack.has_ui:
-        return [], "dự án không có giao diện"
+        return [], "project has no UI"
 
     found: list[Skill] = []
     for root in source.roots(references_root):
         found.extend(scan(root))
 
     if not found:
-        return [], "không tìm thấy skill nào"
+        return [], "no skills found"
 
     if source.selection == "all":
         chosen = found
-        reason = "toàn bộ nguồn"
+        reason = "entire source"
 
     elif source.selection == "allowlist":
         allow = set(source.allowlist)
@@ -118,17 +118,17 @@ def _select_from_source(
             if s.name in allow and s.name not in seen:
                 seen.add(s.name)  # ui-ux có bản sao ở cli/assets — chỉ lấy một
                 chosen.append(s)
-        reason = "trong danh sách cho phép"
+        reason = "in allowlist"
 
     elif source.selection == "filtered":
         results = classify_all(source.roots(references_root)[0])
         keep = [r for r in results if r.verdict is Verdict.KEEP]
         selected = select_for_stack(keep, stack.as_dict(), requirements_text=requirements_text)
         chosen = [r.skill for r in selected]
-        reason = "qua lọc hai tầng, hợp với stack"
+        reason = "passed two-tier filter, matching stack"
 
     else:
-        return [], f"cách chọn không hiểu: {source.selection}"
+        return [], f"unknown selection mode: {source.selection}"
 
     return (
         [PlannedSkill(s.name, source.id, s.path, reason) for s in chosen],
@@ -155,7 +155,7 @@ def plan(
     for skill in scan(OWN_SKILLS) if OWN_SKILLS.is_dir() else []:
         seen_names.add(skill.name)
         result.skills.append(
-            PlannedSkill(skill.name, "aisef", skill.path, "skill của framework")
+            PlannedSkill(skill.name, "aisef", skill.path, "framework skill")
         )
 
     for source in cat.sources:

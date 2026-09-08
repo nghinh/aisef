@@ -45,7 +45,7 @@ class TestUnconfiguredIsNotPassing(QaTestCase):
         r = run_suite(self.project, config=self.config(), has_ui=False)
         self.assertFalse(r.release_ready)
         self.assertTrue(r.unconfigured)
-        self.assertIn("chưa chạy thì không được gọi là đã kiểm", r.summary())
+        self.assertIn("never ran means never verified", r.summary())
 
     def test_story_level_tolerates_unconfigured(self):
         """Ở mức story thì cảnh báo là đủ — chặn từng story vì thiếu k6 sẽ
@@ -63,7 +63,7 @@ class TestUnconfiguredIsNotPassing(QaTestCase):
     def test_ui_checks_skipped_without_ui(self):
         r = run_suite(self.project, config=self.config(), has_ui=False)
         e2e = next(x for x in r.results if x.kind.id == "e2e")
-        self.assertIn("không có giao diện", e2e.skipped)
+        self.assertIn("no UI", e2e.skipped)
 
 
 class TestRunningChecks(QaTestCase):
@@ -140,7 +140,7 @@ class TestProviderGia(QaTestCase):
             r = run_suite(self.project, config=cfg, only=["unit"], has_ui=False)
         self.assertEqual(r.failed, [], "không phải test đỏ")
         self.assertEqual(len(r.unrunnable), 1)
-        self.assertIn("hạ tầng sandbox", r.results[0].unrunnable)
+        self.assertIn("sandbox infrastructure error", r.results[0].unrunnable)
 
     def test_suy_bien_mang_ten_bao_dam_thieu(self):
         cfg = self.config(**{"verify.unit": "true", "sandbox.use_docker": False})
@@ -182,7 +182,7 @@ class TestFakeTests(QaTestCase):
         self.write("tests/test_a.py", "def test_gi_do():\n    pass\n")
         r = run_suite(self.project, config=self.config(), has_ui=False)
         self.assertFalse(r.passed)
-        self.assertIn("test giả", r.summary())
+        self.assertIn("fake tests", r.summary())
 
     def test_only_changed_files_when_given(self):
         self.write("tests/test_cu.py", "def test_x():\n    pass\n")
@@ -283,7 +283,7 @@ class TestKhongChayDuoc(unittest.TestCase):
 
     def test_khong_bi_in_thanh_dau_thap(self):
         r = self.kq("sh: vitest: command not found")
-        self.assertIn("không chạy được", r.line())
+        self.assertIn("unrunnable", r.line())
         self.assertNotIn("✗", r.line())
 
     def test_van_chan_nhung_khong_bi_dem_la_test_do(self):
@@ -293,7 +293,7 @@ class TestKhongChayDuoc(unittest.TestCase):
         self.assertEqual(rep.failed, [], "không phải test đỏ")
         self.assertEqual(len(rep.unrunnable), 1)
         self.assertFalse(rep.passed, "vẫn không đạt — chưa chạy thì chưa kiểm")
-        self.assertIn("môi trường chưa dựng", rep.summary())
+        self.assertIn("environment not set up", rep.summary())
 
     def test_test_do_that_van_la_test_do(self):
         from aisef.phases.qa import QaReport
@@ -351,7 +351,7 @@ class TestMienTuongMinh(unittest.TestCase):
 
         e2e = rep.results[0]
         self.assertTrue(e2e.skipped)
-        self.assertIn("miễn tường minh", e2e.skipped)
+        self.assertIn("explicit waiver", e2e.skipped)
         self.assertFalse(e2e.ran, "miễn thì không chạy")
         self.assertEqual(rep.failed, [])
         self.assertEqual(rep.unconfigured, [], "miễn không phải là chưa cấu hình")
@@ -412,12 +412,12 @@ class TestCayKiemSach(QaTestCase):
         self.assertTrue(unit.ran)
         self.assertFalse(unit.ok, "shim in 'ok' không được tính")
         self.assertIn("vitest that", unit.detail)
-        self.assertEqual(r.tree, "worktree-tạm")
+        self.assertEqual(r.tree, "clean-worktree")
         self.assertEqual(r.clean_tree, self.sha)
         e = EvidenceStore(self.artifacts).read("S-01").last(TOOL_RUN, "qa:unit")
         self.assertEqual(e.detail["clean_tree"], self.sha)
-        self.assertEqual(e.detail["tree"], "worktree-tạm")
-        self.assertIn("cây kiểm: worktree-tạm", r.summary())
+        self.assertEqual(e.detail["tree"], "clean-worktree")
+        self.assertIn("verification tree: clean-worktree", r.summary())
 
     def test_worktree_tam_duoc_go_sau_khi_kiem(self):
         run_suite(self.project, config=self.cfg(), only=["unit"], has_ui=False)
@@ -429,13 +429,13 @@ class TestCayKiemSach(QaTestCase):
         r = run_suite(self.project, config=self.cfg(**{"verify.clean_tree": False}),
                       only=["unit"], has_ui=False)
         self.assertTrue(r.results[0].ok, "shim chạy — đó là điều tắt knob chấp nhận, có ghi")
-        self.assertEqual(r.tree, "cây agent")
+        self.assertEqual(r.tree, "agent-tree")
         self.assertEqual(r.clean_tree, "")
 
     def test_muc_story_giu_cay_worktree(self):
         r = run_suite(self.project, config=self.cfg(), only=["unit"], has_ui=False, clean=False)
         self.assertTrue(r.results[0].ok)
-        self.assertEqual(r.tree, "cây agent")
+        self.assertEqual(r.tree, "agent-tree")
 
     def test_khong_co_git_thi_chay_cay_dang_dung_va_noi_ly_do(self):
         with tempfile.TemporaryDirectory() as d:
@@ -443,6 +443,6 @@ class TestCayKiemSach(QaTestCase):
             r = run_suite(d, config=self.config(**{"verify.unit": "sh t.sh", "sandbox.use_docker": False}),
                           only=["unit"], has_ui=False)
         self.assertTrue(r.results[0].ok)
-        self.assertTrue(r.tree.startswith("cây agent"), r.tree)
+        self.assertTrue(r.tree.startswith("agent-tree"), r.tree)
         self.assertIn("git", r.tree)
 

@@ -313,8 +313,8 @@ def resolve_provider(name: str) -> ExecutionProvider:
         return PROVIDERS[name]
     if ":" not in name:
         raise ValueError(
-            f"sandbox.provider={name!r} không tồn tại; có: {', '.join(sorted(PROVIDERS))} "
-            "hoặc \"mô-đun:Lớp\""
+            f"sandbox.provider={name!r} does not exist; available: {', '.join(sorted(PROVIDERS))} "
+            "or \"module:Class\""
         )
     mod, _, cls = name.partition(":")
     provider = getattr(importlib.import_module(mod), cls)()
@@ -366,19 +366,19 @@ def select_provider(spec: SandboxSpec) -> tuple[ExecutionProvider, list[str]]:
     why = ""
     if not provider.available():
         if name == "local":
-            raise RuntimeError("provider local không sẵn sàng — không có gì để lùi về")
-        why = "daemon không chạy" if name == "docker" else f"provider {name} không sẵn sàng"
+            raise RuntimeError("provider local not available — nothing to fall back to")
+        why = "daemon not running" if name == "docker" else f"provider {name} not available"
         provider = resolve_provider("local")
     elif name == "local" and not spec.use_docker and not spec.provider:
-        why = "cấu hình tắt Docker"
+        why = "configuration disabled Docker"
 
     missing = missing_guarantees(provider, spec.level)
     if missing and not spec.allow_degraded:
         raise RuntimeError(
-            f"bậc {spec.level.value} cần cách ly nhưng provider {provider.id}"
+            f"level {spec.level.value} requires isolation but provider {provider.id}"
             + (f" ({why})" if why else "")
-            + f" thiếu bảo đảm: {', '.join(missing)}"
-            "; đặt allow_degraded=True nếu chấp nhận mức bảo đảm thấp hơn"
+            + f" is missing guarantees: {', '.join(missing)}"
+            "; set allow_degraded=True to accept a lower assurance level"
         )
     return provider, missing
 
@@ -387,9 +387,9 @@ def run(spec: SandboxSpec) -> SandboxResult:
     """Chạy lệnh trên provider đã chọn; kết quả mang tên provider, bậc, và bảo đảm thiếu."""
     workspace = Path(spec.workspace)
     if not workspace.is_dir():
-        raise FileNotFoundError(f"workspace không tồn tại: {workspace}")
+        raise FileNotFoundError(f"workspace does not exist: {workspace}")
     if not spec.cmd:
-        raise ValueError("cmd rỗng")
+        raise ValueError("cmd is empty")
 
     provider, missing = select_provider(spec)
     result = provider.run(spec)
@@ -418,7 +418,7 @@ def _run_docker(spec: SandboxSpec) -> SandboxResult:
         subprocess.run(["docker", "rm", "-f", name], capture_output=True, timeout=30)
         return SandboxResult(
             exit_code=124,
-            stderr=f"quá {spec.timeout_seconds}s",
+            stderr=f"exceeded {spec.timeout_seconds}s",
             duration_ms=int((time.monotonic() - started) * 1000),
             timed_out=True,
         )
@@ -427,12 +427,12 @@ def _run_docker(spec: SandboxSpec) -> SandboxResult:
             exit_code=_DOCKER_INFRA_EXIT,
             stderr=str(e),
             duration_ms=int((time.monotonic() - started) * 1000),
-            provider_error=f"không gọi được docker: {e}",
+            provider_error=f"cannot invoke docker: {e}",
         )
     provider_error = ""
     if proc.returncode == _DOCKER_INFRA_EXIT:
         last = [l for l in proc.stderr.strip().splitlines() if l.strip()]
-        provider_error = (last[-1] if last else "docker thoát 125").strip()[:300]
+        provider_error = (last[-1] if last else "docker exited 125").strip()[:300]
     return SandboxResult(
         exit_code=proc.returncode,
         stdout=proc.stdout,
@@ -471,7 +471,7 @@ def _run_degraded(spec: SandboxSpec) -> SandboxResult:
     except subprocess.TimeoutExpired:
         return SandboxResult(
             exit_code=124,
-            stderr=f"quá {spec.timeout_seconds}s",
+            stderr=f"exceeded {spec.timeout_seconds}s",
             duration_ms=int((time.monotonic() - started) * 1000),
             timed_out=True,
         )

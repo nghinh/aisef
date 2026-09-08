@@ -48,12 +48,12 @@ class FetchReport:
     def summary(self) -> str:
         dong = []
         for i in self.fetched:
-            dong.append(f"  ✅ lấy về {i}")
+            dong.append(f"  ✅ fetched  {i}")
         for i in self.already:
-            dong.append(f"  ○ đã có   {i}")
+            dong.append(f"  ○ already  {i}")
         for i, ly_do in self.failed:
-            dong.append(f"  ✗ hỏng    {i} — {ly_do}")
-        return "\n".join(dong) or "  (không nguồn nào cần lấy)"
+            dong.append(f"  ✗ failed   {i} — {ly_do}")
+        return "\n".join(dong) or "  (no sources to fetch)"
 
 
 def _dir_of(source: Source, root: Path) -> Path:
@@ -89,9 +89,9 @@ def _clone(source: Source, dest: Path) -> str:
                                timeout=CLONE_TIMEOUT)
             if r.returncode != 0:
                 loi = (r.stderr or r.stdout).strip().splitlines()
-                return loi[-1] if loi else f"git trả mã {r.returncode}"
+                return loi[-1] if loi else f"git exited {r.returncode}"
     except subprocess.TimeoutExpired:
-        return f"quá {CLONE_TIMEOUT}s"
+        return f"exceeded {CLONE_TIMEOUT}s"
     except OSError as e:
         return str(e)
     shutil.rmtree(dest, ignore_errors=True)

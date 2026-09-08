@@ -113,7 +113,7 @@ class TestDashboardGeneration(unittest.TestCase):
         self._seed_evidence()
         html = generate_html([self.store.read("S-01")], project="p")
         self.assertIn("abc1234", html)
-        self.assertIn("DAT", html)
+        self.assertIn("PASS", html)
 
     def test_empty_evidence_produces_html(self):
         from aisef.cli.dashboard import generate_html
@@ -189,7 +189,7 @@ class TestMultiProjectDashboard(unittest.TestCase):
         self._seed(self.store_a, "SA-01")
         evs = [self.store_a.read("SA-01")]
         self.assertEqual(_project_summary([("a", evs)]), "")
-        self.assertIn("Tổng hợp dự án", _project_summary([("a", evs), ("b", evs)]))
+        self.assertIn("Project summary", _project_summary([("a", evs), ("b", evs)]))
 
     def test_generate_html_with_extra_sections(self):
         from aisef.cli.dashboard import generate_html
@@ -217,7 +217,7 @@ class TestMultiProjectDashboard(unittest.TestCase):
         content = out.read_text()
         self.assertIn("proj-a", content)
         self.assertIn("proj-b", content)
-        self.assertIn("Tổng hợp dự án", content)
+        self.assertIn("Project summary", content)
 
     def test_nonexistent_project_dir_skipped(self):
         from types import SimpleNamespace

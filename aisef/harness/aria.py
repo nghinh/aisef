@@ -85,14 +85,14 @@ class MapResult:
         verdict = "PASS" if self.passed else "FAIL"
         parts = [f"{self.screen_id or 'screen'}: {verdict} ({self.matched}/{len(self.contract)})"]
         if self.missing:
-            parts.append("  thiếu: " + ", ".join(str(c) for c in self.missing))
+            parts.append("  missing: " + ", ".join(str(c) for c in self.missing))
         if self.missing_data_roles:
             parts.append(
-                "  vùng dữ liệu không dựng mục nào kiểu: "
+                "  data region rendered no items of type: "
                 + ", ".join(self.missing_data_roles)
             )
         if self.extra:
-            parts.append("  thừa (cảnh báo): " + ", ".join(str(c) for c in self.extra))
+            parts.append("  extra (warning): " + ", ".join(str(c) for c in self.extra))
         return "\n".join(parts)
 
 

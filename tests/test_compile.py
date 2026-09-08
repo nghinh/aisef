@@ -63,7 +63,7 @@ class TestClaudeSettings(CompileTestCase):
             self.assertIn(matcher, matchers)
 
     def test_marked_as_generated(self):
-        self.assertIn("không sửa tay", self.settings()["_generated"])
+        self.assertIn("do not edit", self.settings()["_generated"])
 
 
 class TestOpenCodePlugin(CompileTestCase):

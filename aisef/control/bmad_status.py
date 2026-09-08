@@ -66,16 +66,16 @@ class HeadlessStatus:
 
     def summary(self) -> str:
         if not self.parsed:
-            return "không đọc được JSON status của BMAD"
+            return "could not parse BMAD JSON status"
         parts = [f"status={self.status}"]
         if self.artifacts:
             parts.append("artifact: " + ", ".join(sorted(self.artifacts)))
         if self.open_questions:
-            parts.append(f"{len(self.open_questions)} câu hỏi mở")
+            parts.append(f"{len(self.open_questions)} open questions")
         if self.assumptions:
-            parts.append(f"{len(self.assumptions)} giả định")
+            parts.append(f"{len(self.assumptions)} assumptions")
         if self.reason:
-            parts.append(f"lý do: {self.reason}")
+            parts.append(f"reason: {self.reason}")
         return " · ".join(parts)
 
 

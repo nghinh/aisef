@@ -25,8 +25,8 @@ from .security import parse as parse_security
 GATE_INPUT = "gate:input"
 GATE_VERDICT = "gate:verdict"
 
-BANNER = ("replay: chấm lại luật hợp (gate.evaluate của mã hiện tại) trên bằng chứng "
-          "và lời reviewer/security đã ghi — không gọi model")
+BANNER = ("replay: re-score gate rules (gate.evaluate from current code) on recorded "
+          "evidence and reviewer/security findings — no model calls")
 
 
 @dataclass
@@ -57,15 +57,15 @@ class Replay:
         return sorted(truoc ^ nay)
 
     def summary(self) -> str:
-        head = (f"{self.story_id} lượt {self.attempt} · ứng viên {self.candidate[:7] or '—'} · "
-                f"đã ghi: {'ĐẠT' if self.recorded == [] else 'KHÔNG ĐẠT' if self.recorded else 'không có verdict'}"
-                f" · nay: {'ĐẠT' if self.gate.passed else 'KHÔNG ĐẠT'}")
-        lines = [head, "  mục                              | đã ghi | nay"]
+        head = (f"{self.story_id} attempt {self.attempt} · candidate {self.candidate[:7] or '—'} · "
+                f"recorded: {'PASS' if self.recorded == [] else 'FAIL' if self.recorded else 'no verdict'}"
+                f" · now: {'PASS' if self.gate.passed else 'FAIL'}")
+        lines = [head, "  check                            | recorded | now"]
         for name, truoc, nay in self.rows():
             dau = " ≠" if name in self.changed() else ""
             lines.append(f"  {name:<32} | {truoc:^6} | {nay}{dau}")
         doi = self.changed()
-        lines.append("  diff: " + (", ".join(doi) if doi else "không — cùng mục chặn"))
+        lines.append("  diff: " + (", ".join(doi) if doi else "none — same blocking checks"))
         return "\n".join(lines)
 
 

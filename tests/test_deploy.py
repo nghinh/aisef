@@ -33,10 +33,10 @@ GOOD_RUNBOOK = """# Runbook
 
 ## Không lưu được ghi chú
 
-**Triệu chứng:** người dùng báo mất chữ vừa gõ.
-**Chẩn đoán:** `kubectl logs -l app=notes --since=15m | grep write_failed`
-**Xử lý:** `kubectl rollout restart deploy/notes`
-**Leo thang:** sau 15 phút chưa hết, gọi trực chính qua kênh #oncall.
+**Symptoms:** người dùng báo mất chữ vừa gõ.
+**Diagnosis:** `kubectl logs -l app=notes --since=15m | grep write_failed`
+**Remediation:** `kubectl rollout restart deploy/notes`
+**Escalation:** sau 15 phút chưa hết, gọi trực chính qua kênh #oncall.
 """
 
 
@@ -114,10 +114,10 @@ class TestRunbook(unittest.TestCase):
         gọi ai — tức là người không cần runbook."""
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "RUNBOOK.md"
-            path.write_text(GOOD_RUNBOOK.split("**Leo thang:**")[0], encoding="utf-8")
+            path.write_text(GOOD_RUNBOOK.split("**Escalation:**")[0], encoding="utf-8")
             check = check_runbook(path)
             self.assertFalse(check.passed)
-            self.assertIn("leo thang", check.detail)
+            self.assertIn("escalation", check.detail)
 
     def test_absent_file(self):
         self.assertFalse(check_runbook(Path("/khong/co/RUNBOOK.md")).passed)
@@ -144,7 +144,7 @@ class TestPreDeployGate(DeployTestCase):
     def test_empty_project_fails_everything(self):
         report = pre_deploy(self.project, config=self.config(), skip_qa=True)
         self.assertFalse(report.passed)
-        self.assertIn("chưa story nào chạy", report.summary())
+        self.assertIn("no stories have run", report.summary())
 
     def test_unfinished_story_blocks(self):
         self.approve_everything()
@@ -157,7 +157,7 @@ class TestPreDeployGate(DeployTestCase):
     def test_unapproved_gate_blocks(self):
         self.finish_a_story()
         report = pre_deploy(self.project, config=self.config(), skip_qa=True)
-        self.assertIn("chưa duyệt", report.summary())
+        self.assertIn("not approved", report.summary())
 
     def test_report_is_written_for_the_human_to_read(self):
         report = pre_deploy(self.project, config=self.config(), skip_qa=True)
@@ -197,7 +197,7 @@ class TestPreDeployGate(DeployTestCase):
         (self.project / RUNBOOK_PATH).write_text(GOOD_RUNBOOK, encoding="utf-8")
         report = pre_deploy(self.project, config=self.config(), has_ui=False)
         self.assertFalse(report.passed)
-        self.assertIn("chưa cấu hình", report.summary())
+        self.assertIn("unconfigured", report.summary())
 
 
 class TestGenerate(DeployTestCase):
@@ -213,14 +213,14 @@ class TestGenerate(DeployTestCase):
         self.assertIn(RUNBOOK_PATH, report.summary())
 
     def test_incomplete_runbook_counts_as_missing(self):
-        bad = GOOD_RUNBOOK.split("**Leo thang:**")[0]
+        bad = GOOD_RUNBOOK.split("**Escalation:**")[0]
         report = generate(
             self.project,
             Writer(files={"Dockerfile": "FROM alpine\n", RUNBOOK_PATH: bad}),
             config=self.config(),
         )
         self.assertFalse(report.ok)
-        self.assertIn("leo thang", report.summary())
+        self.assertIn("escalation", report.summary())
 
     def test_existing_artifacts_are_not_regenerated(self):
         generate(self.project, Writer(), config=self.config())
@@ -297,7 +297,7 @@ class TestQuyTrinhCI(unittest.TestCase):
         r = DevSecOpsReport(generated=["Dockerfile", "docs/RUNBOOK.md"],
                             ci_path=_P(".github/workflows/aisef.yml"))
         head = r.summary().splitlines()[0]
-        self.assertIn("3 tạo tác", head)
+        self.assertIn("3 artifacts", head)
         self.assertEqual(sum(1 for l in r.summary().splitlines() if "✅" in l), 3)
 
 
@@ -353,7 +353,7 @@ class TestXongPhaiLaDaMerge(DeployTestCase):
                      "attempt.committed")
         report = pre_deploy(self.project, config=self.config(), skip_qa=True)
         self.assertFalse(report.passed)
-        self.assertIn("xong nhưng chưa merge", report.summary())
+        self.assertIn("done but not merged", report.summary())
         self.assertIn("STORY-01-01", report.summary())
 
     def test_da_merge_thi_qua_muc_nay(self):
@@ -362,7 +362,7 @@ class TestXongPhaiLaDaMerge(DeployTestCase):
         self.nhat_ky("attempt.started", "worktree.created", "merge.completed",
                      "attempt.committed")
         report = pre_deploy(self.project, config=self.config(), skip_qa=True)
-        muc = next(c for c in report.checks if c.name == "mọi story xong")
+        muc = next(c for c in report.checks if c.name == "all stories done")
         self.assertTrue(muc.passed, muc.detail)
 
     def test_khong_co_nhat_ky_thi_khong_doi_merge(self):
@@ -370,7 +370,7 @@ class TestXongPhaiLaDaMerge(DeployTestCase):
         self.approve_everything()
         self.finish_a_story()
         report = pre_deploy(self.project, config=self.config(), skip_qa=True)
-        muc = next(c for c in report.checks if c.name == "mọi story xong")
+        muc = next(c for c in report.checks if c.name == "all stories done")
         self.assertTrue(muc.passed, muc.detail)
 
 
@@ -392,9 +392,9 @@ class TestPreDeployKhongChapNhanSuyBien(DeployTestCase):
     def test_suy_bien_khong_waiver_thi_chan(self):
         self.approve_everything(); self.finish_a_story()
         report = pre_deploy(self.project, config=self.cau_hinh())
-        m = self.muc(report, "cách ly")
+        m = self.muc(report, "isolation")
         self.assertFalse(m.passed)
-        self.assertIn("ngoài Docker", m.detail)
+        self.assertIn("outside Docker", m.detail)
         self.assertIn("sandbox.pre_deploy_degraded_waiver", m.detail)
         self.assertFalse(report.passed)
 
@@ -403,7 +403,7 @@ class TestPreDeployKhongChapNhanSuyBien(DeployTestCase):
         `pre-deploy.json` nêu tên bảo đảm thiếu."""
         self.approve_everything(); self.finish_a_story()
         report = pre_deploy(self.project, config=self.cau_hinh())
-        m = self.muc(report, "cách ly")
+        m = self.muc(report, "isolation")
         for g in ("network_none", "non_root", "secrets_absent"):
             self.assertIn(g, m.detail)
         import json
@@ -415,7 +415,7 @@ class TestPreDeployKhongChapNhanSuyBien(DeployTestCase):
         ly_do = "máy CI chưa có Docker, xem ticket OPS-12"
         report = pre_deploy(self.project, config=self.cau_hinh(
             **{"sandbox.pre_deploy_degraded_waiver": ly_do}))
-        m = self.muc(report, "cách ly")
+        m = self.muc(report, "isolation")
         self.assertTrue(m.passed)
         self.assertIn(ly_do, m.detail)
         self.assertEqual(report.degraded_waiver, ly_do)
@@ -426,7 +426,7 @@ class TestPreDeployKhongChapNhanSuyBien(DeployTestCase):
 
     def test_bo_qua_kiem_dinh_thi_muc_cach_ly_cung_bo_qua(self):
         report = pre_deploy(self.project, config=self.cau_hinh(), skip_qa=True)
-        m = self.muc(report, "cách ly")
+        m = self.muc(report, "isolation")
         self.assertTrue(m.skipped)
 
     def test_khong_co_lan_chay_nao_thi_khong_ket_luan(self):
@@ -435,9 +435,9 @@ class TestPreDeployKhongChapNhanSuyBien(DeployTestCase):
         self.approve_everything(); self.finish_a_story()
         report = pre_deploy(self.project, config=self.config(
             **{"sandbox.use_docker": False}))
-        m = self.muc(report, "cách ly")
+        m = self.muc(report, "isolation")
         self.assertTrue(m.skipped)
-        self.assertIn("không có lần chạy nào", m.detail)
+        self.assertIn("no runs to determine", m.detail)
 
     def test_run_thuong_van_cho_suy_bien(self):
         """Quyết định chỉ chạm cổng trước triển khai."""
@@ -466,14 +466,14 @@ class TestPreDeployGhiCayKiem(DeployTestCase):
         report = pre_deploy(self.project, config=self.config(
             **{"verify.unit": "true", "sandbox.use_docker": False}))
         data = json.loads(report.write(self.artifacts).read_text(encoding="utf-8"))
-        self.assertEqual(data["qa"]["tree"], "worktree-tạm")
+        self.assertEqual(data["qa"]["tree"], "clean-worktree")
         self.assertEqual(data["qa"]["clean_tree"], sha)
 
     def test_khong_git_thi_noi_la_cay_agent(self):
         self.approve_everything(); self.finish_a_story()
         report = pre_deploy(self.project, config=self.config(
             **{"verify.unit": "true", "sandbox.use_docker": False}))
-        self.assertTrue(report.as_dict()["qa"]["tree"].startswith("cây agent"))
+        self.assertTrue(report.as_dict()["qa"]["tree"].startswith("agent-tree"))
 
 
 class TestPlannedButNeverRun(DeployTestCase):
@@ -494,9 +494,9 @@ class TestPlannedButNeverRun(DeployTestCase):
             "waves": {"EPIC-01": [["STORY-01-01"], ["STORY-01-02"]]},
         }), encoding="utf-8")
         report = pre_deploy(self.project, config=self.config(), skip_qa=True)
-        check = next(c for c in report.checks if c.name == "mọi story xong")
+        check = next(c for c in report.checks if c.name == "all stories done")
         self.assertFalse(check.passed, check.detail)
-        self.assertIn("chưa từng chạy", check.detail)
+        self.assertIn("never run", check.detail)
         self.assertIn("STORY-01-02", check.detail)
 
 
@@ -535,21 +535,21 @@ class TestPhamViNghiemThu(DeployTestCase):
         self.ready(self.INDEX)
         report = pre_deploy(self.project, config=self.config(), skip_qa=True)
         self.assertFalse(report.passed, report.summary())
-        self.assertIn("chưa từng chạy: STORY-02-01", report.summary())
+        self.assertIn("never run: STORY-02-01", report.summary())
 
     def test_khai_epic_thi_chi_cham_story_cua_epic_va_neu_ten_phan_con_lai(self):
         self.ready(self.INDEX)
         report = pre_deploy(self.project, config=self.config(), skip_qa=True, epic="EPIC-01")
         self.assertTrue(report.passed, report.summary())
         text = report.summary()
-        self.assertIn("(phạm vi EPIC-01)", text.splitlines()[0])
-        self.assertIn("ngoài phạm vi nghiệm thu", text)
+        self.assertIn("(scope EPIC-01)", text.splitlines()[0])
+        self.assertIn("outside acceptance scope", text)
         self.assertIn("STORY-02-01, STORY-02-02", text)
-        self.assertIn("không xong, không thiếu", text)
+        self.assertIn("not scored", text)
         d = report.as_dict()
         self.assertEqual(d["scope"], {"epic": "EPIC-01", "stories": ["STORY-01-01"],
                                       "outside": ["STORY-02-01", "STORY-02-02"]})
-        ngoai = next(c for c in report.checks if c.name == "ngoài phạm vi nghiệm thu")
+        ngoai = next(c for c in report.checks if c.name == "outside acceptance scope")
         self.assertIs(ngoai.outcome, Outcome.NOT_APPLICABLE, "không phải ✅, không phải ✗")
 
     def test_story_chua_xong_trong_pham_vi_van_chan(self):
@@ -560,13 +560,13 @@ class TestPhamViNghiemThu(DeployTestCase):
         self.assertFalse(report.passed)
         self.assertIn("STORY-02-01", report.summary())
         self.assertNotIn("STORY-01-01", next(
-            c.detail for c in report.checks if c.name == "mọi story xong"))
+            c.detail for c in report.checks if c.name == "all stories done"))
 
     def test_epic_khong_co_trong_ke_hoach_la_that_bai_neu_ten(self):
         self.ready(self.INDEX)
         report = pre_deploy(self.project, config=self.config(), skip_qa=True, epic="EPIC-09")
         self.assertFalse(report.passed)
-        self.assertIn("EPIC-09", next(c.detail for c in report.checks if c.name == "phạm vi"))
+        self.assertIn("EPIC-09", next(c.detail for c in report.checks if c.name == "scope"))
 
     def test_pham_vi_doi_thi_bam_phe_duyet_doi(self):
         """Duyệt `pre-deploy` cho EPIC-01 không dùng lại được cho cả kế hoạch."""
@@ -593,7 +593,7 @@ class TestMienTuongMinhCoLyDo(DeployTestCase):
     def test_mien_khong_ly_do_thi_chan(self):
         report = pre_deploy(self.project, has_ui=False,
                             config=self.config(**{"verify.waived": "mutation"}))
-        mien = next(c for c in report.checks if c.name == "miễn tường minh")
+        mien = next(c for c in report.checks if c.name == "explicit waiver")
         self.assertFalse(mien.passed)
         self.assertIn("verify.waiver_reason", mien.detail)
 
@@ -601,14 +601,14 @@ class TestMienTuongMinhCoLyDo(DeployTestCase):
         ly_do = "2026-09-06, EPIC-01, nghi: stryker chưa cài ở môi trường nghiệm thu"
         report = pre_deploy(self.project, has_ui=False, config=self.config(
             **{"verify.waived": "mutation", "verify.waiver_reason": ly_do}))
-        mien = next(c for c in report.checks if c.name == "miễn tường minh")
+        mien = next(c for c in report.checks if c.name == "explicit waiver")
         self.assertIs(mien.outcome, Outcome.WAIVED)
         self.assertTrue(mien.passed, "◇ không chặn")
         self.assertIn(ly_do, mien.detail)
         self.assertEqual(report.as_dict()["waivers"], {"mutation": ly_do})
-        self.assertIn(f"◇ mutation     miễn tường minh (verify.waived): {ly_do}", report.qa.summary())
+        self.assertIn(f"◇ mutation     explicit waiver (verify.waived): {ly_do}", report.qa.summary())
         self.assertNotIn("✅ mutation", report.qa.summary())
 
     def test_khong_mien_gi_thi_khong_co_muc(self):
         report = pre_deploy(self.project, has_ui=False, config=self.config())
-        self.assertNotIn("miễn tường minh", [c.name for c in report.checks])
+        self.assertNotIn("explicit waiver", [c.name for c in report.checks])

@@ -59,7 +59,7 @@ class TestInline(unittest.TestCase):
         (d / "SKILL.md").write_text("x" * 20000, encoding="utf-8")
         text = I.inline_skill_text(self.project, ".claude/skills/big")
         self.assertLess(len(text), I.INLINE_SKILL_MAX_CHARS + 100)
-        self.assertIn("đã cắt", text)
+        self.assertIn("truncated", text)
 
 
 if __name__ == "__main__":

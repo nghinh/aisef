@@ -55,11 +55,11 @@ class MockupResult:
         return True
 
     def machine_checks(self) -> dict[str, str]:
-        checks = {"màn hình": str(len(self.experience.screens) if self.experience else 0)}
+        checks = {"screens": str(len(self.experience.screens) if self.experience else 0)}
         if self.gate:
-            checks["cổng máy"] = "đạt" if self.gate.passed else "không đạt"
+            checks["machine gate"] = "pass" if self.gate.passed else "fail"
             if self.gate.warnings:
-                checks["cảnh báo"] = "; ".join(self.gate.warnings)
+                checks["warnings"] = "; ".join(self.gate.warnings)
         return checks
 
     def summary(self) -> str:
@@ -67,17 +67,17 @@ class MockupResult:
             return f"mockup: ✗ {self.error}"
         n = len(self.experience.screens) if self.experience else 0
         lines = [
-            f"mockup: {n} màn hình — dựng mới {len(self.generated)}, "
-            f"bỏ qua {len(self.skipped)}"
+            f"mockup: {n} screen(s) — generated {len(self.generated)}, "
+            f"skipped {len(self.skipped)}"
         ]
         for sid, why in self.failed.items():
             lines.append(f"  ✗ {sid}: {why}")
         if self.cost_usd:
-            lines.append(f"  chi phí: ${self.cost_usd:.2f}")
+            lines.append(f"  cost: ${self.cost_usd:.2f}")
         if self.gate:
             lines.append(self.gate.summary())
         if self.index_path:
-            lines.append(f"  mở xem: {self.index_path}")
+            lines.append(f"  open: {self.index_path}")
         return "\n".join(lines)
 
 
@@ -91,15 +91,15 @@ def build_prompt(screen: Screen, experience: Experience, artifact_root: Path) ->
         {
             "screen_id": screen.id,
             "screen_name": screen.name,
-            "purpose": screen.purpose or "(tài liệu không nêu)",
-            "reached_from": screen.reached_from or "(tài liệu không nêu)",
+            "purpose": screen.purpose or "(not specified in document)",
+            "reached_from": screen.reached_from or "(not specified in document)",
             "route": (
-                f"`{screen.route}` — đặt đúng chuỗi này vào thẻ meta aisef-route"
+                f"`{screen.route}` — use this exact string in the aisef-route meta tag"
                 if screen.route
-                else "(tài liệu không khai — tự chọn đường dẫn hợp lý và khai vào meta)"
+                else "(not declared in document — choose a reasonable path and declare it in the meta tag)"
             ),
-            "components": "\n".join(rules) or "- (tài liệu không nêu)",
-            "states": ", ".join(screen.states) or "(chỉ trạng thái chính)",
+            "components": "\n".join(rules) or "- (not specified in document)",
+            "states": ", ".join(screen.states) or "(default state only)",
             "artifact_root": artifact_root.name,
             "output": f"{artifact_root.name}/{MOCKUP_DIR}/{screen.id}.html",
         }
@@ -128,12 +128,12 @@ def generate(
 
     exp_file = root / "EXPERIENCE.md"
     if not exp_file.is_file():
-        res.error = "chưa có EXPERIENCE.md — chạy `aisef plan` trước"
+        res.error = "EXPERIENCE.md not found — run `aisef plan` first"
         return res
 
     res.experience = parse_experience_file(exp_file)
     if not res.experience.screens:
-        res.error = "EXPERIENCE.md không liệt kê màn hình nào"
+        res.error = "EXPERIENCE.md does not list any screens"
         return res
 
     (root / MOCKUP_DIR).mkdir(parents=True, exist_ok=True)
@@ -157,10 +157,10 @@ def generate(
         res.cost_usd += run.cost_usd
         EvidenceStore(root).agent_run(f"mockup-{screen.id}", run, name=screen.id)
         if not run.ok:
-            res.failed[screen.id] = run.error or "lượt chạy thất bại"
+            res.failed[screen.id] = run.error or "run failed"
             continue
         if not path.is_file():
-            res.failed[screen.id] = f"chạy xong nhưng không thấy {path.name}"
+            res.failed[screen.id] = f"completed but {path.name} not found"
             continue
         res.generated.append(screen.id)
 
@@ -188,10 +188,10 @@ def extract(
 
     rendered = browser.render(jobs, project=artifact_root.parent)
     if rendered.unavailable:
-        gate = GateResult("cổng máy: mockup")
+        gate = GateResult("machine gate: mockup")
         # Không giả vờ đạt. Thiếu trình duyệt thì hợp đồng không tồn tại, và
         # bước map mockup ở GĐ-6 sẽ không có gì để đối chiếu.
-        gate.errors.append(f"không trích được hợp đồng: {rendered.unavailable}")
+        gate.errors.append(f"could not extract design contract: {rendered.unavailable}")
         return DesignContract(), gate
 
     contract = build(experience, rendered, artifact_root=artifact_root)
@@ -216,15 +216,15 @@ def write_index(artifact_root: Path, res: MockupResult) -> Path | None:
         if c and c.error:
             status = f'<span class="bad">{_esc(c.error)}</span>'
         elif c and c.unresolved:
-            status = f'<span class="warn">{len(c.unresolved)} chỗ chưa chốt</span>'
+            status = f'<span class="warn">{len(c.unresolved)} unresolved</span>'
         elif c:
             status = f'<span class="ok">{len(c.components)} component · route {_esc(c.route or "?")}</span>'
         elif not exists:
-            status = '<span class="bad">chưa dựng</span>'
+            status = '<span class="bad">not generated</span>'
 
         shot = f'<img src="{screen.id}.png" alt="{_esc(screen.name)}">' if (
             artifact_root / MOCKUP_DIR / f"{screen.id}.png"
-        ).is_file() else '<div class="noshot">chưa có ảnh</div>'
+        ).is_file() else '<div class="noshot">no screenshot</div>'
 
         link = f'<a href="{html}">{_esc(screen.name)}</a>' if exists else _esc(screen.name)
         rows.append(
@@ -251,9 +251,9 @@ def _esc(text: str) -> str:
 
 
 _INDEX_TEMPLATE = """<!doctype html>
-<html lang="vi"><head><meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mockup — {count} màn hình</title>
+<title>Mockup — {count} screen(s)</title>
 <style>
   :root {{ color-scheme: light dark; }}
   body {{ font: 15px/1.5 system-ui, sans-serif; margin: 0; padding: 2rem;
@@ -270,7 +270,7 @@ _INDEX_TEMPLATE = """<!doctype html>
   a {{ color: inherit; }}
 </style></head>
 <body>
-<h1>Mockup — {count} màn hình</h1>
+<h1>Mockup — {count} screen(s)</h1>
 {rows}
 </body></html>
 """
@@ -283,7 +283,7 @@ def describe_contract(data: dict, artifact_root: Path) -> str:
     trang mục lục; phần chữ chỉ nói cái mắt không thấy: component nào đã
     thành cam kết máy sẽ kiểm.
     """
-    lines = [f"Mở xem: {artifact_root / MOCKUP_DIR / 'index.html'}", ""]
+    lines = [f"Open: {artifact_root / MOCKUP_DIR / 'index.html'}", ""]
     for screen in data.get("screens", []):
         head = f"{screen['id']:14} {screen.get('name', '')}"
         if screen.get("error"):
@@ -293,10 +293,10 @@ def describe_contract(data: dict, artifact_root: Path) -> str:
         comps = screen.get("components", [])
         shown = ", ".join(f"{c['role']} \"{c['name']}\"" for c in comps[:6])
         more = f" … +{len(comps) - 6}" if len(comps) > 6 else ""
-        lines.append(f"      cam kết: {shown or '(không có)'}{more}")
+        lines.append(f"      contract: {shown or '(none)'}{more}")
         req = [f["label"] or f["name"] for f in screen.get("fields", []) if f.get("required")]
         if req:
-            lines.append(f"      bắt buộc nhập: {', '.join(req)}")
+            lines.append(f"      required fields: {', '.join(req)}")
         for u in screen.get("unresolved", []):
-            lines.append(f"      ⚠️  chưa chốt: {u}")
+            lines.append(f"      ⚠️  unresolved: {u}")
     return "\n".join(lines)

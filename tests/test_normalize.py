@@ -179,7 +179,7 @@ class TestArchitecture(unittest.TestCase):
     def test_prompt_form_carries_the_rule(self):
         text = self.arch.by_id("AR-6").as_prompt()
         self.assertIn("AR-6", text)
-        self.assertIn("Luật:", text)
+        self.assertIn("Rule:", text)
 
 
 class TestArchitectureRobustness(unittest.TestCase):

@@ -517,22 +517,22 @@ thiếu: `turn_limit: unsupported` (OpenCode không có cờ giới hạn lượ
 
 | Mục | Đọc gì | Khi không có bằng chứng |
 |---|---|---|
-| `bằng chứng đúng candidate` | kết quả *mới nhất* của mỗi phép kiểm mang đúng SHA ứng viên (ADR-004 R1) | ⚠ stale — không phải "đỏ"; không truyền SHA → – |
-| `guard có chạy` | guard đã đánh giá ít nhất một thao tác ghi trong phiên | ✗ hook không tới worktree; chưa biên dịch hook → – |
+| `evidence matches candidate` | kết quả *mới nhất* của mỗi phép kiểm mang đúng SHA ứng viên (ADR-004 R1) | ⚠ stale — không phải "đỏ"; không truyền SHA → – |
+| `guard ran` | guard đã đánh giá ít nhất một thao tác ghi trong phiên | ✗ hook không tới worktree; chưa biên dịch hook → – |
 | `test` | lần test cuối xanh **và** sau lần sửa tệp cuối (`completion`) | ✗; không chạy được → ⚠ |
-| `không làm đỏ test có sẵn` | tên test xanh ở `test:baseline` còn xanh **và còn tồn tại** ở ứng viên (ADR-004 R9; đổi tên giữ tiêu đề lá không tính là mất — lỗi 24) | ○ reporter không in tên; ⚠ baseline không chạy được; – tắt bởi `verify.baseline` |
+| `no baseline regression` | tên test xanh ở `test:baseline` còn xanh **và còn tồn tại** ở ứng viên (ADR-004 R9; đổi tên giữ tiêu đề lá không tính là mất — lỗi 24) | ○ reporter không in tên; ⚠ baseline không chạy được; – tắt bởi `verify.baseline` |
 | `lint` | lần lint cuối | ✗ chưa chạy; ○ chưa cấu hình |
-| `phạm vi ghi` | tệp đổi ⊆ `write_scope` hiệu lực (+ thư mục test của kiểm định story đòi — lỗi 21) | ✗ |
-| `map mockup` | mỗi `screen_id` có một lần đối chiếu và `missing` rỗng (mục 12bis) | ✗; story không giao diện → – |
-| `test thật` | `qa:fake-tests`: không test nào rỗng khẳng định | ✗ |
-| `tiêu chí có test` | mỗi `AC-<story>-<i>` nằm trong tên một test ở lần xanh cuối (G5) | ○ reporter không in tên |
+| `write scope` | tệp đổi ⊆ `write_scope` hiệu lực (+ thư mục test của kiểm định story đòi — lỗi 21) | ✗ |
+| `mockup map` | mỗi `screen_id` có một lần đối chiếu và `missing` rỗng (mục 12bis) | ✗; story không giao diện → – |
+| `real tests` | `qa:fake-tests`: không test nào rỗng khẳng định | ✗ |
+| `criteria have tests` | mỗi `AC-<story>-<i>` nằm trong tên một test ở lần xanh cuối (G5) | ○ reporter không in tên |
 | `coverage` | số đọc từ output runner ≥ `coverage.min` | ○ runner không in coverage |
 | `TDD` | story thêm test thì có một lần đỏ trước lần xanh cuối | – story không thêm test |
-| `test có kiểm được story` | nop control (ADR-005 V3), hai cấp. **Cấp 1 ($0):** test mang `AC-<story>-i` xanh ở ứng viên phải **không** xanh sẵn ở `test:baseline` — cùng tên, hoặc tên cũ mất mà tiêu đề lá còn (đổi tên để gắn mã) → ✗ "gắn mã vào test có sẵn" nêu tên (lỗi 23 → 24); baseline của lượt chạy lại đứng ở bản của chính story (`parent` ≠ `base_ref`) thì cấp 1 không so, cấp 2 quyết. **Cấp 2 (một lần sandbox):** worktree tạm ở SHA cha (điểm rẽ) + chép tệp test story thêm/sửa → `tools.test` ghi `test:nop` mang `candidate`; test mang mã phải **đỏ hoặc không tồn tại** (lỗi import ở SHA cha = đỏ, hợp lệ) → xanh là ✗ "xanh cả khi không có mã của story". Chỉ `tools.test`, không `qa:e2e` (lỗi 22) | ⚠ nop không chạy được; ○ reporter không in tên (chỉ biết bộ test đỏ ở SHA cha); – story không thêm/sửa tệp test · tắt bởi `verify.nop` · nhật ký trước V3 |
+| `tests verify story` | nop control (ADR-005 V3), hai cấp. **Cấp 1 ($0):** test mang `AC-<story>-i` xanh ở ứng viên phải **không** xanh sẵn ở `test:baseline` — cùng tên, hoặc tên cũ mất mà tiêu đề lá còn (đổi tên để gắn mã) → ✗ "gắn mã vào test có sẵn" nêu tên (lỗi 23 → 24); baseline của lượt chạy lại đứng ở bản của chính story (`parent` ≠ `base_ref`) thì cấp 1 không so, cấp 2 quyết. **Cấp 2 (một lần sandbox):** worktree tạm ở SHA cha (điểm rẽ) + chép tệp test story thêm/sửa → `tools.test` ghi `test:nop` mang `candidate`; test mang mã phải **đỏ hoặc không tồn tại** (lỗi import ở SHA cha = đỏ, hợp lệ) → xanh là ✗ "xanh cả khi không có mã của story". Chỉ `tools.test`, không `qa:e2e` (lỗi 22) | ⚠ nop không chạy được; ○ reporter không in tên (chỉ biết bộ test đỏ ở SHA cha); – story không thêm/sửa tệp test · tắt bởi `verify.nop` · nhật ký trước V3 |
 | `<kind>` theo hợp đồng kiểm định | `qa:<kind>` rồi mới tên trần (lỗi 9): e2e · accessibility · perf … | ○ chưa cấu hình |
-| `bảo mật` | phiên rà soát bảo mật riêng không còn mức trong `security.block_severities` | ○ chưa cấu hình |
-| `rà soát` | phiên rà soát độc lập không còn `[chặn]`. Trả **hai bản**: văn bản có thẻ `[chặn]`/`[bế tắc]` và khối JSON (`verdict` + `findings` mang `behavior_id`); thiếu JSON hỏi lại **đúng một lần** rồi mới đọc văn bản; hai bản lệch thì lấy **hợp**, ghi note `review:mismatch` — không nới cổng vì model quên chép (ADR-004 R8) | ✗ chưa rà soát |
-| `bảo toàn` | hành vi VERIFIED của story khác mà story này chạm tệp còn xanh ở đúng ứng viên; FR hỏi story **đã xác minh** nó (`via`, lỗi 23) (ADR-004 R4) | ⚠ không kiểm được ≠ đạt; – không chạm hành vi nào |
+| `security` | phiên rà soát bảo mật riêng không còn mức trong `security.block_severities` | ○ chưa cấu hình |
+| `review` | phiên rà soát độc lập không còn `[chặn]`. Trả **hai bản**: văn bản có thẻ `[chặn]`/`[bế tắc]` và khối JSON (`verdict` + `findings` mang `behavior_id`); thiếu JSON hỏi lại **đúng một lần** rồi mới đọc văn bản; hai bản lệch thì lấy **hợp**, ghi note `review:mismatch` — không nới cổng vì model quên chép (ADR-004 R8) | ✗ chưa rà soát |
+| `preservation` | hành vi VERIFIED của story khác mà story này chạm tệp còn xanh ở đúng ứng viên; FR hỏi story **đã xác minh** nó (`via`, lỗi 23) (ADR-004 R4) | ⚠ không kiểm được ≠ đạt; – không chạm hành vi nào |
 
 Ký hiệu: ✗ FAILED · ⚠ UNRUNNABLE · ○ UNCONFIGURED · – NOT_APPLICABLE. ✗ và ⚠
 chặn story; ○ không chặn story nhưng phải hiện ra và chặn ở `pre-deploy`.

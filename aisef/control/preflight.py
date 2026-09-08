@@ -108,7 +108,7 @@ class Preflight:
 
     def summary(self) -> str:
         if self.executable:
-            return f"{self.story_id}: chạy được ({len(self.needs)} năng lực)"
+            return f"{self.story_id}: executable ({len(self.needs)} capabilities)"
         lines = [f"{self.story_id}: {STORY_NOT_EXECUTABLE}"]
         lines += [f"  ✗ {m.line()}" for m in self.missing]
         return "\n".join(lines)
@@ -319,21 +319,21 @@ def required_capabilities(story: Story, *, project: Path | None = None) -> list[
     #    để đối chiếu. Đây là trường có cấu trúc, chắc chắn nhất.
     for screen in story.screens:
         needs.append(Need(
-            "browser", f"story dựng màn hình `{screen}`",
-            "cấu hình `app.dev_command` và `app.base_url`",
+            "browser", f"story builds screen `{screen}`",
+            "configure `app.dev_command` and `app.base_url`",
         ))
         needs.append(Need(
-            "mockup-map", f"story dựng màn hình `{screen}`",
-            "chạy `aisef mockup` để có hợp đồng thị giác cho màn này",
+            "mockup-map", f"story builds screen `{screen}`",
+            "run `aisef mockup` to produce a design contract for this screen",
         ))
 
     # 2. Công cụ nền: mọi story đều bị chấm bằng test và lint. Không cấu
     #    hình thì guard `completion` chặn agent kết thúc bằng một chỉ dẫn
     #    nó không chạy được.
-    needs.append(Need("tools.test", "mọi story đều bị chấm bằng test",
-                      "cấu hình `tools.test`"))
-    needs.append(Need("tools.lint", "mọi story đều bị chấm bằng lint",
-                      "cấu hình `tools.lint`"))
+    needs.append(Need("tools.test", "every story is scored by tests",
+                      "configure `tools.test`"))
+    needs.append(Need("tools.lint", "every story is scored by lint",
+                      "configure `tools.lint`"))
 
     # 3. Loại kiểm định trong hợp đồng của story. Một nguồn duy nhất, để
     #    cổng và hợp đồng không bao giờ nói khác nhau.
@@ -342,16 +342,16 @@ def required_capabilities(story: Story, *, project: Path | None = None) -> list[
         if kind == "mockup-map":
             continue  # đã tính ở mục 1 theo từng màn hình
         vi_sao = (
-            "story khai trong `verification_contract`" if khai
+            "story declares in `verification_contract`" if khai
             else _why_kind(story, kind)
         )
-        needs.append(Need(f"verify.{kind}", vi_sao, f"cấu hình `verify.{kind}`"))
+        needs.append(Need(f"verify.{kind}", vi_sao, f"configure `verify.{kind}`"))
 
     # 5. Mạng lúc chạy kiểm.
     hit = _first_marker(text, _NETWORK_MARKERS)
     if hit:
-        needs.append(Need("network", f'tiêu chí chấp nhận nhắc "{hit}"',
-                          "bật `sandbox.tools_network`"))
+        needs.append(Need("network", f'acceptance criteria mention "{hit}"',
+                          "enable `sandbox.tools_network`"))
 
     # 6. Hiểu ảnh hưởng chéo module.
     hit = _first_marker(text, _IMPACT_MARKERS)
@@ -365,15 +365,15 @@ def required_capabilities(story: Story, *, project: Path | None = None) -> list[
     }
     roots -= set(MANIFESTS)
     if hit:
-        needs.append(Need("code-intelligence", f'tiêu chí chấp nhận nhắc "{hit}"',
-                          "cấu hình `review.impact_provider` — không có thì vẫn chạy "
-            "bản dựng sẵn, nhưng nó dò theo tên nên thô hơn nhiều"))
+        needs.append(Need("code-intelligence", f'acceptance criteria mention "{hit}"',
+                          "configure `review.impact_provider` — without it the builtin "
+            "name-based search runs, but it is much coarser"))
     elif len(roots) >= IMPACT_MODULE_THRESHOLD:
         needs.append(Need(
             "code-intelligence",
-            f"phạm vi ghi chạm {len(roots)} module gốc: {', '.join(sorted(roots))}",
-            "cấu hình `review.impact_provider` — không có thì vẫn chạy "
-            "bản dựng sẵn, nhưng nó dò theo tên nên thô hơn nhiều",
+            f"write scope touches {len(roots)} root modules: {', '.join(sorted(roots))}",
+            "configure `review.impact_provider` — without it the builtin "
+            "name-based search runs, but it is much coarser",
         ))
 
     # 7. Tệp và gói tiêu chí chấp nhận gọi tên.
@@ -384,15 +384,15 @@ def required_capabilities(story: Story, *, project: Path | None = None) -> list[
 def _why_kind(story: Story, kind: str) -> str:
     """Vì sao loại kiểm này có trong hợp đồng — nói ra chỗ đã kích nó."""
     if kind in BASE_CONTRACT:
-        return "mọi story đều phải qua"
+        return "every story must pass"
     if story.screens and kind in STRUCTURAL_CONTRACT["screens"]:
-        return f"story dựng màn hình `{story.screens[0]}`"
+        return f"story builds screen `{story.screens[0]}`"
     text = _text_of(story)
     markers = _VERIFY_MARKERS.get(f"verify.{kind}")
     hit = _first_marker(text, markers) if markers else ""
     if not hit and kind == "security":
         hit = _first_marker(text, _SECURITY_MARKERS)
-    return f'tiêu chí chấp nhận nhắc "{hit}"' if hit else "suy ra từ nội dung story"
+    return f'acceptance criteria mention "{hit}"' if hit else "inferred from story content"
 
 
 def _needs_from_names(story: Story, project: Path | None) -> list[Need]:
@@ -428,8 +428,8 @@ def _needs_from_names(story: Story, project: Path | None) -> list[Need]:
                 continue  # không có đĩa để đối chiếu thì không kết luận
             out.append(Need(
                 f"write:{tok}",
-                f"tiêu chí chấp nhận đòi `{tok}`, tệp chưa tồn tại",
-                "thêm nó vào `write_scope` của story hoặc sửa tiêu chí",
+                f"acceptance criteria require `{tok}`, file does not exist",
+                "add it to the story's `write_scope` or fix the criteria",
                 kind="story",
             ))
         elif deps is not None and _PACKAGEISH.match(tok) and "-" in tok:
@@ -440,8 +440,8 @@ def _needs_from_names(story: Story, project: Path | None) -> list[Need]:
             if not any(m in scope for m in MANIFESTS):
                 out.append(Need(
                     "manifest-write",
-                    f"tiêu chí chấp nhận đòi gói `{tok}`, chưa khai trong manifest",
-                    "thêm tệp manifest vào `write_scope` của story",
+                    f"acceptance criteria require package `{tok}`, not declared in manifest",
+                    "add the manifest file to the story's `write_scope`",
                     kind="story",
                 ))
     # Một story chỉ cần báo thiếu manifest **một lần**.
@@ -678,10 +678,10 @@ def story_size_defect(
 
     ly_do = []
     if qua_man:
-        ly_do.append(f"{states.count} trạng thái màn hình ({states.evidence}) "
-                     f"vượt `story.max_screen_states` = {state_limit}")
+        ly_do.append(f"{states.count} screen states ({states.evidence}) "
+                     f"exceeds `story.max_screen_states` = {state_limit}")
     if qua_diem:
-        ly_do.append(f"điểm cỡ {sc.explain()} vượt `story.max_complexity` = {score_limit:g}")
+        ly_do.append(f"size score {sc.explain()} exceeds `story.max_complexity` = {score_limit:g}")
     return Need(
         "size",
         "; ".join(ly_do),

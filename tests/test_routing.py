@@ -121,13 +121,13 @@ class TestBuildSpec(unittest.TestCase):
         prompt = _prompt("story-review")
         with self.assertRaises(RoutingError) as ctx:
             build_spec(REVIEWER, prompt, {}, workdir=Path("/tmp/test"), session_id="abc")
-        self.assertIn("phiên mới", str(ctx.exception))
+        self.assertIn("new session", str(ctx.exception))
 
     def test_security_with_session_id_raises(self):
         prompt = _prompt("story-security-review")
         with self.assertRaises(RoutingError) as ctx:
             build_spec(SECURITY, prompt, {}, workdir=Path("/tmp/test"), session_id="abc")
-        self.assertIn("phiên mới", str(ctx.exception))
+        self.assertIn("new session", str(ctx.exception))
 
     def test_developer_with_session_id_ok(self):
         prompt = _prompt("story-implement")

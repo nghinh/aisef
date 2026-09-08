@@ -62,7 +62,7 @@ class TestCongBaoToan(GateTestCase):
 
     def muc(self, **kw):
         g = self.gate(candidate=self.SHA, **kw)
-        return next(c for c in g.checks if c.name == "bảo toàn")
+        return next(c for c in g.checks if c.name == "preservation")
 
     def chay_test(self, *, ids, failed=(), candidate=None):
         self.store.tool_run("S-01", "test", ok=not failed, detail={
@@ -182,7 +182,7 @@ class TestSlotBaoToan(VongDoiHaiStory):
         """AC (a). Trước khi A chạy: không có gì để giữ. Sau: đúng hành vi của A, kèm test id."""
         ctx0 = build_context(self.b, project=self.project, artifact_root=self.artifacts,
                              architecture=None, contract=None, config=self.cfg)
-        self.assertIn("không chạm hành vi VERIFIED nào", ctx0["preservation"])
+        self.assertIn("does not touch any VERIFIED behaviour", ctx0["preservation"])
         self.assertEqual(ctx0["_preservation"], [])
 
         self.assertTrue(self.implement(self.a, ScriptedClient()).done)
@@ -194,7 +194,7 @@ class TestSlotBaoToan(VongDoiHaiStory):
         self.assertNotIn("AC-STORY-01-02-1", ids, "hành vi của chính mình không phải thứ phải giữ")
         self.assertIn("`AC-STORY-01-01-1` · STORY-01-01 · test `tests/test_a.py::test_AC_STORY_01_01_1`",
                       ctx["preservation"])
-        self.assertIn("1 test bảo toàn", ctx["validation"])
+        self.assertIn("1 preservation test", ctx["validation"])
         self.assertEqual(handoff_slots(ctx)["preservation"][0], "ledger")
         self.assertEqual(handoff_slots(ctx)["validation"][0], "ledger")
         self.assertEqual(SLOT_SOURCE["preservation"], "ledger")
@@ -204,7 +204,7 @@ class TestSlotBaoToan(VongDoiHaiStory):
         cfg = Config({**self.cfg.values, "context.max_preservation_chars": 40})
         ctx = build_context(self.b, project=self.project, artifact_root=self.artifacts,
                             architecture=None, contract=None, config=cfg)
-        self.assertIn("đã cắt theo trần", ctx["preservation"])
+        self.assertIn("truncated to char limit", ctx["preservation"])
         self.assertLessEqual(len(ctx["preservation"]), 40 + 80)
         # AC-STORY-01-01-1 · FR-1 · qa:fake-tests — cổng vẫn nhận đủ ba.
         self.assertEqual(len(ctx["_preservation"]), 3)
@@ -230,7 +230,7 @@ class TestHoiQuyCoChuDich(VongDoiHaiStory):
         self.assertTrue(self.implement(self.a, ScriptedClient()).done)
         out = self.implement(self.b, self.PhaA())
         self.assertFalse(out.done)
-        muc = next(c for c in out.attempts[-1].gate.checks if c.name == "bảo toàn")
+        muc = next(c for c in out.attempts[-1].gate.checks if c.name == "preservation")
         self.assertIs(muc.outcome, Outcome.FAILED, muc.line())
         self.assertIn("AC-STORY-01-01-1", muc.detail)
 
@@ -247,13 +247,13 @@ class TestHoiQuyCoChuDich(VongDoiHaiStory):
         self.assertTrue(self.implement(self.a, ScriptedClient()).done)
         out = self.implement(self.b, ScriptedClient(writes=("src/b.py",)))
         self.assertTrue(out.done, out.summary())
-        muc = next(c for c in out.attempts[-1].gate.checks if c.name == "bảo toàn")
+        muc = next(c for c in out.attempts[-1].gate.checks if c.name == "preservation")
         self.assertIs(muc.outcome, Outcome.PASSED, muc.line())
         # Đối chứng nop (V3) không chặn: test mang mã của B **không** xanh sẵn ở
         # baseline. Ở đây nó là – "story không thêm/sửa tệp test" vì runner giả
         # là một script, không phải tệp test; điều phép kiểm này chốt là **không
         # ✗**. Gắn mã vào test có sẵn thì mục này ✗ và story không "chạy sạch".
-        nop = next(c for c in out.attempts[-1].gate.checks if c.name == "test có kiểm được story")
+        nop = next(c for c in out.attempts[-1].gate.checks if c.name == "tests verify story")
         self.assertIsNot(nop.outcome, Outcome.FAILED, nop.line())
         self.assertEqual(L.build(self.artifacts).reopen_events, 0)
 

@@ -102,7 +102,7 @@ def safe_slug(story_id: str) -> str:
     """Biến id story thành mảnh tên nhánh/thư mục an toàn."""
     slug = _SAFE.sub("-", story_id).strip("-")
     if not slug:
-        raise ValueError(f"story id không dùng được: {story_id!r}")
+        raise ValueError(f"unusable story id: {story_id!r}")
     return slug
 
 
@@ -148,7 +148,7 @@ class WorktreeManager:
         self.repo = Path(repo).resolve()
         self.root = self.repo / root
         if not (self.repo / ".git").exists():
-            raise GitError(f"{self.repo} không phải kho git")
+            raise GitError(f"{self.repo} is not a git repository")
 
     # ------------------------------------------------------------ tạo, dọn
 
@@ -254,9 +254,9 @@ class WorktreeManager:
         ]
         _git(path, "merge", "--abort", check=False)
         raise GitError(
-            f"{story_id}: không mang được `{goc}` vào nhánh story — đụng "
-            f"{', '.join(dung[:5]) or 'không rõ file'}. Nhánh story đã rẽ quá "
-            f"xa; gỡ nhánh rồi chạy lại, hoặc hợp nhất bằng tay."
+            f"{story_id}: cannot merge `{goc}` into story branch — conflicts in "
+            f"{', '.join(dung[:5]) or 'unknown files'}. Story branch has diverged too "
+            f"far; delete the branch and rerun, or merge manually."
         )
 
     def _current_branch(self) -> str:
@@ -326,7 +326,7 @@ class WorktreeManager:
         path = self.path_for(story_id)
         if not path.is_dir():
             return False
-        return commit_paths(path, message or f"{story_id}: hoàn tất", paths=paths)
+        return commit_paths(path, message or f"{story_id}: done", paths=paths)
 
     MERGE_LOCK_TIMEOUT = 120
 
@@ -344,7 +344,7 @@ class WorktreeManager:
             except OSError:
                 if time.monotonic() >= deadline:
                     fh.close()
-                    raise GitError("merge lock timeout — máy khác đang merge")
+                    raise GitError("merge lock timeout — another machine is merging")
                 time.sleep(0.1)
         try:
             yield

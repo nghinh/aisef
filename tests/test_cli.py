@@ -94,7 +94,7 @@ class TestDoctor(CliTestCase):
     def test_passes_on_valid_project(self):
         code, out, _ = self.run_cli("doctor")
         self.assertEqual(code, EXIT_OK)
-        self.assertIn("sẵn sàng", out)
+        self.assertIn("ready", out)
 
     def test_fails_without_requirements(self):
         (self.project / "docs" / "requirements.md").unlink()
@@ -121,9 +121,9 @@ class TestDoctorTenTest(CliTestCase):
     def test_lenh_khong_in_ten_thi_goi_ctrf(self):
         self.cau_hinh("pytest")
         _, out, _ = self.run_cli("doctor")
-        self.assertIn("lệnh test in tên test", out)
+        self.assertIn("test command prints test names", out)
         self.assertIn("pytest-json-ctrf", out)
-        self.assertIn("đoán từ cờ lệnh", out)
+        self.assertIn("guessing from command flags", out)
 
     def test_bang_chung_thang_co_lenh(self):
         """Lệnh trông "câm" nhưng bằng chứng ghi `test_format` → tin bằng chứng."""
@@ -131,7 +131,7 @@ class TestDoctorTenTest(CliTestCase):
         self.cau_hinh("pytest")
         EvidenceStore(self.artifacts).tool_run("S-01", "test", ok=True, detail={"test_format": "ctrf"})
         _, out, _ = self.run_cli("doctor")
-        self.assertIn("cổng đọc được tên test", out)
+        self.assertIn("gate can read test names", out)
         self.assertIn("'ctrf'", out)
 
     def test_bang_chung_rong_thi_goi_du_lenh_in_ten(self):
@@ -139,7 +139,7 @@ class TestDoctorTenTest(CliTestCase):
         self.cau_hinh("pytest -v")
         EvidenceStore(self.artifacts).tool_run("S-01", "test", ok=True, detail={"test_format": ""})
         _, out, _ = self.run_cli("doctor")
-        self.assertIn("chưa cấu hình", out)
+        self.assertIn("not configured", out)
         self.assertIn("CTRF", out)
 
 
@@ -156,7 +156,7 @@ class TestDoctorSkillFreshness(CliTestCase):
         copied.write_text("bản cũ\n", encoding="utf-8")
 
         _, out, _ = self.run_cli("doctor")
-        self.assertIn("cũ hơn kho", out)
+        self.assertIn("outdated", out)
         self.assertIn(own.parent.name, out)
 
     def test_matching_copy_passes(self):
@@ -167,7 +167,7 @@ class TestDoctorSkillFreshness(CliTestCase):
         copied.parent.mkdir(parents=True)
         copied.write_bytes(own.read_bytes())
         _, out, _ = self.run_cli("doctor")
-        self.assertIn("khớp bản gốc", out)
+        self.assertIn("matches source", out)
 
 
 class TestGates(CliTestCase):
@@ -180,34 +180,34 @@ class TestGates(CliTestCase):
 
     def test_points_at_next_gate(self):
         _, out, _ = self.run_cli("gates")
-        self.assertIn("Cổng kế tiếp cần xử lý: prd", out)
+        self.assertIn("Next gate to handle: prd", out)
 
     def test_flags_missing_artifact_by_name(self):
         """Nói thiếu file nào, không chỉ nói thiếu — cổng ux-spec có hai
         file nên "chưa có artifact" không đủ để biết phải làm gì."""
         _, out, _ = self.run_cli("gates")
-        self.assertIn("thiếu: prd.md", out)
-        self.assertIn("thiếu: DESIGN.md, EXPERIENCE.md", out)
+        self.assertIn("missing: prd.md", out)
+        self.assertIn("missing: DESIGN.md, EXPERIENCE.md", out)
 
 
 class TestApproveReject(CliTestCase):
     def test_cannot_approve_without_artifact(self):
         code, _, err = self.run_cli("approve", "prd")
         self.assertEqual(code, EXIT_NOT_READY)
-        self.assertIn("chưa có artifact", err)
+        self.assertIn("no artifact", err)
 
     def test_approve_with_artifact(self):
         self.write_artifact("prd.md")
         code, out, _ = self.run_cli("approve", "prd")
         self.assertEqual(code, EXIT_OK)
-        self.assertIn("đã duyệt", out)
+        self.assertIn("approved", out)
 
     def test_cannot_approve_out_of_order(self):
         """Duyệt architecture khi prd chưa duyệt là bỏ qua thứ tự."""
         self.write_artifact("architecture.md")
         code, _, err = self.run_cli("approve", "architecture")
         self.assertEqual(code, EXIT_NOT_READY)
-        self.assertIn("cổng phía trước chưa duyệt", err)
+        self.assertIn("preceding gates not yet approved", err)
 
     def test_force_bypasses_order(self):
         self.write_artifact("architecture.md")
@@ -260,14 +260,14 @@ class TestAutoApprove(CliTestCase):
     def test_skips_gates_without_artifact(self):
         code, out, _ = self.run_cli("auto-approve", "all")
         self.assertEqual(code, EXIT_OK)
-        self.assertIn("không cổng nào có artifact", out)
+        self.assertIn("no gate has artifacts", out)
 
 
 class TestReview(CliTestCase):
     def test_missing_artifact(self):
         code, out, _ = self.run_cli("review", "prd")
         self.assertEqual(code, EXIT_NOT_READY)
-        self.assertIn("chưa có artifact", out)
+        self.assertIn("artifact not found", out)
 
     def test_shows_content_and_next_steps(self):
         self.write_artifact("prd.md", "# PRD\n\ndòng một\ndòng hai\n")
@@ -279,7 +279,7 @@ class TestReview(CliTestCase):
     def test_truncates_long_artifact(self):
         self.write_artifact("prd.md", "\n".join(f"dòng {i}" for i in range(200)))
         _, out, _ = self.run_cli("review", "prd", "--lines", "10")
-        self.assertIn("còn 190 dòng", out)
+        self.assertIn("190 more lines", out)
 
     def test_shows_previous_note(self):
         self.write_artifact("prd.md")
@@ -304,9 +304,9 @@ class TestReviewStories(CliTestCase):
         code, out, _ = self.run_cli("review", "stories")
         self.assertEqual(code, EXIT_OK)
         self.assertIn("EPIC-01", out)
-        self.assertIn("đợt 2 (song song)", out)
-        self.assertIn("phủ: FR-1", out)
-        self.assertIn("cổng máy: ĐẠT", out)
+        self.assertIn("wave 2 (parallel)", out)
+        self.assertIn("covers: FR-1", out)
+        self.assertIn("machine gate: PASS", out)
 
 
 class TestMockupCommand(CliTestCase):
@@ -350,8 +350,8 @@ class TestMockupCommand(CliTestCase):
         code, out, _ = self.run_cli("review", "mockups")
         self.assertEqual(code, EXIT_OK)
         self.assertIn("index.html", out)
-        self.assertIn("cam kết:", out)
-        self.assertIn("chưa chốt", out)      # tim-kiem cố ý còn OQ-4
+        self.assertIn("contract:", out)
+        self.assertIn("unresolved", out)      # tim-kiem cố ý còn OQ-4
 
 
 class TestStatusExitCode(CliTestCase):
@@ -391,7 +391,7 @@ class TestToolCommand(CliTestCase):
     def test_project_without_a_command_says_so(self):
         code, out, _ = self.run_cli("tool", "test")
         self.assertEqual(code, EXIT_NOT_READY)
-        self.assertIn("chưa khai lệnh", out)
+        self.assertIn("has not declared a command", out)
 
     def test_runs_and_records_evidence(self):
         (self.project / ".ai").mkdir()
@@ -410,13 +410,13 @@ class TestVerifyCommand(CliTestCase):
     def test_clean_tree_passes(self):
         code, out, _ = self.run_cli("verify")
         self.assertEqual(code, EXIT_OK)
-        self.assertIn("hậu kiểm đạt", out)
+        self.assertIn("post-check passed", out)
 
     def test_story_without_tests_fails_post_hoc(self):
         """Lớp bảo đảm cho client không gắn được hook tiền kiểm."""
         code, out, _ = self.run_cli("verify", "--story", "STORY-01-01")
         self.assertEqual(code, EXIT_NOT_READY)
-        self.assertIn("chưa có lần chạy test", out)
+        self.assertIn("no test run recorded", out)
 
 
 class TestRunCommand(CliTestCase):
@@ -476,13 +476,13 @@ class TestCtxCommand(CliTestCase):
         self.assertEqual(code, EXIT_OK)
         self.assertIn("export function taoGhiChu() …", out)
         self.assertIn("`src/b.ts` · taoGhiChu", out)
-        self.assertNotIn("đã cắt", out)
+        self.assertNotIn("truncated", out)
 
     def test_budget_cat_va_chi_cho_tra(self):
         code, out, _ = self.run_cli("ctx", "--file", "src", "--budget", "120")
         self.assertEqual(code, EXIT_OK)
         self.assertLessEqual(len(out.rstrip("\n")), 120)
-        self.assertIn("đã cắt", out)
+        self.assertIn("truncated", out)
 
     def test_khong_story_khong_file_la_loi_dung_cach(self):
         code, _, err = self.run_cli("ctx")
@@ -514,7 +514,7 @@ class TestQaCommand(CliTestCase):
         """Mặc định là mức trước triển khai: chưa chạy thì không phải đạt."""
         code, out, _ = self.run_cli("qa")
         self.assertEqual(code, EXIT_NOT_READY)
-        self.assertIn("chưa cấu hình", out)
+        self.assertIn("unconfigured", out)
 
     def test_story_level_only_warns(self):
         code, _, _ = self.run_cli("qa", "--story-level")
@@ -532,7 +532,7 @@ class TestStatus(CliTestCase):
     def test_empty(self):
         code, out, _ = self.run_cli("status")
         self.assertEqual(code, EXIT_OK)
-        self.assertIn("Chưa có story", out)
+        self.assertIn("No stories registered", out)
 
     def test_shows_progress_and_cost(self):
         store = StateStore(self.artifacts)
@@ -542,7 +542,7 @@ class TestStatus(CliTestCase):
         store.transition("S-01", StoryStatus.DONE)
         code, out, _ = self.run_cli("status")
         self.assertEqual(code, EXIT_OK)
-        self.assertIn("1/1 story xong", out)
+        self.assertIn("1/1 stories done", out)
         self.assertIn("$1.50", out)
 
     def test_blocked_story_makes_status_not_ready(self):
@@ -613,7 +613,7 @@ class TestDuongDanDuAn(unittest.TestCase):
         text = (self.project / "docs" / "ACCEPTANCE-REPORT.md").read_text(
             encoding="utf-8"
         )
-        self.assertIn("# Báo cáo nghiệm thu — du-an-cua-toi", text)
+        self.assertIn("# Acceptance Report — du-an-cua-toi", text)
 
 
 
@@ -632,7 +632,7 @@ class TestStatusNoiRoChuaMerge(CliTestCase):
         for s in ("attempt.started", "worktree.created", "commit.created", "attempt.committed"):
             j.record("S-01", Entry(step=s, attempt=1))
         code, out, _ = self.run_cli("status")
-        self.assertIn("xong nhưng chưa merge", out)
+        self.assertIn("done but not merged", out)
         self.assertIn("S-01", out)
 
 
@@ -645,8 +645,8 @@ class TestDoctorHookTrongWorktree(CliTestCase):
         self._hook()
         subprocess.run(["git", "init", "-q"], cwd=self.project, check=True)
         code, out, _ = self.run_cli("doctor")
-        self.assertIn("hook trong worktree", out)
-        self.assertIn("chưa commit", out)
+        self.assertIn("hook in worktree", out)
+        self.assertIn("not committed", out)
         self.assertIn("--settings", out)
 
     def test_da_commit_thi_xanh(self):
@@ -657,7 +657,7 @@ class TestDoctorHookTrongWorktree(CliTestCase):
         subprocess.run(["git", "add", ".claude/settings.json"], cwd=self.project, check=True)
         subprocess.run(["git", "commit", "-qm", "hook"], cwd=self.project, check=True)
         code, out, _ = self.run_cli("doctor")
-        self.assertIn("đã commit", out)
+        self.assertIn("committed", out)
 
 
 class TestStatusCanhBaoNguCanhPhinh(CliTestCase):
@@ -673,9 +673,9 @@ class TestStatusCanhBaoNguCanhPhinh(CliTestCase):
             store.register(sid, "E-01")
             ev.agent_run(sid, RunResult(ok=True, text="x"), name=f"{sid}#1", prompt_chars=chars)
         code, out, _ = self.run_cli("status")
-        self.assertIn("nạp ngữ cảnh hơn", out)
+        self.assertIn("loaded context exceeding", out)
         self.assertIn("S-04", out)
-        self.assertNotIn("S-02", out.split("nạp ngữ cảnh")[1].split("\n\n")[0] if "nạp ngữ cảnh" in out else "")
+        self.assertNotIn("S-02", out.split("loaded context exceeding")[1].split("\n\n")[0] if "loaded context exceeding" in out else "")
 
     def test_it_hon_ba_story_thi_khong_ket_luan(self):
         from aisef.clients.stream import RunResult
@@ -685,7 +685,7 @@ class TestStatusCanhBaoNguCanhPhinh(CliTestCase):
             store.register(sid, "E-01")
             ev.agent_run(sid, RunResult(ok=True, text="x"), name=f"{sid}#1", prompt_chars=chars)
         code, out, _ = self.run_cli("status")
-        self.assertNotIn("nạp ngữ cảnh hơn", out)
+        self.assertNotIn("loaded context exceeding", out)
 
 
 class TestDoctorHookTroDungDuAn(CliTestCase):
@@ -701,14 +701,14 @@ class TestDoctorHookTroDungDuAn(CliTestCase):
     def test_lech_thi_do(self):
         self._hook("/tmp/du-an-khac")
         code, out, _ = self.run_cli("doctor")
-        self.assertIn("hook trỏ đúng dự án", out)
+        self.assertIn("hook points to this project", out)
         self.assertIn("/tmp/du-an-khac", out)
         self.assertIn("compile", out)
 
     def test_khop_thi_xanh(self):
         self._hook(str(self.project))
         code, out, _ = self.run_cli("doctor")
-        self.assertIn("✅ hook trỏ đúng dự án", out)
+        self.assertIn("✅ hook points to this project", out)
 
 
 class TestDoctorCoverageHint(CliTestCase):
@@ -717,15 +717,15 @@ class TestDoctorCoverageHint(CliTestCase):
         (self.project / ".ai").mkdir(exist_ok=True)
         (self.project / ".ai" / "config.json").write_text(json.dumps({"tools.test": "node --test src/*.test.js"}), encoding="utf-8")
         code, out, _ = self.run_cli("doctor")
-        self.assertIn("lệnh test in coverage", out)
-        self.assertIn("chưa cấu hình", out)
+        self.assertIn("test command prints coverage", out)
+        self.assertIn("not configured", out)
 
     def test_with_coverage_flag_is_green(self):
         import json
         (self.project / ".ai").mkdir(exist_ok=True)
         (self.project / ".ai" / "config.json").write_text(json.dumps({"tools.test": "node --test --experimental-test-coverage src/*.test.js"}), encoding="utf-8")
         code, out, _ = self.run_cli("doctor")
-        self.assertIn("✅ lệnh test in coverage", out)
+        self.assertIn("✅ test command prints coverage", out)
 
 
 class TestLenhDoc(CliTestCase):
@@ -767,7 +767,7 @@ class TestDoctorHookThieuGuard(CliTestCase):
             "guards_wired": ["completion", "destructive", "diff-scope", "git-stage", "injection", "secret", "write-scope"],
             "guards_post_hoc": [], "blocks_at_source": True, "degradations": []}]}), encoding="utf-8")
         code, out, _ = self.run_cli("doctor")
-        self.assertIn("hook claude đủ guard", out)
+        self.assertIn("hook claude has all guards", out)
         self.assertIn("process-ref", out)
         self.assertIn("aisef compile", out)
 
@@ -788,21 +788,21 @@ class TestToolCoCauTruc(CliTestCase):
         code, out, _ = self.run_cli("tool", "test", "--story", "STORY-01-01")
         self.assertEqual(code, EXIT_NOT_READY)
         dau = out.splitlines()[:5]
-        self.assertIn("1 xanh · 1 đỏ · 0 bỏ qua (pytest)", dau)
+        self.assertIn("1 passed · 1 failed · 0 skipped (pytest)", dau)
         self.assertTrue(any("✗ tests/test_a.py::test_x" in line for line in dau), dau)
 
     def test_output_dai_khai_cat_va_tro_toan_van(self):
         self.config("seq 1 500")
         code, out, _ = self.run_cli("tool", "test", "--story", "STORY-01-01", "--lines", "40")
-        self.assertIn("(lược 460/500 dòng — toàn văn: ", out)
-        path = out.split("toàn văn: ")[1].split(")")[0]
+        self.assertIn("(truncated 460/500 lines — full output: ", out)
+        path = out.split("full output: ")[1].split(")")[0]
         self.assertTrue((self.project / path).is_file(), path)
         self.assertEqual(len((self.project / path).read_text(encoding="utf-8").splitlines()), 500)
 
     def test_output_ngan_khong_co_dong_luoc(self):
         self.config("seq 1 10")
         _, out, _ = self.run_cli("tool", "test", "--story", "STORY-01-01")
-        self.assertNotIn("lược", out)
+        self.assertNotIn("truncated", out)
 
 
 class TestStatusDemKetCuc(CliTestCase):
@@ -818,6 +818,6 @@ class TestStatusDemKetCuc(CliTestCase):
         ev.agent_run("S-01", RunResult(ok=True, text="x"), name="S-01#2")
         ev.record("S-01", Event(kind=AGENT_RUN, name="S-01-cu"))
         _, out, _ = self.run_cli("status")
-        line = next(l for l in out.splitlines() if l.startswith("Lượt agent: "))
-        for phan in ("max_turns 1", "ok 1", "chưa ghi 1"):
+        line = next(l for l in out.splitlines() if l.startswith("Agent runs: "))
+        for phan in ("max_turns 1", "ok 1", "unrecorded 1"):
             self.assertIn(phan, line)

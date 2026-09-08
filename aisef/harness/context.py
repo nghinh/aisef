@@ -52,7 +52,7 @@ _IDENT = re.compile(r"[A-Za-z][\w-]{%d,}" % (MIN_IDENT - 1), re.ASCII)
 _IMPORT_JS = re.compile(r"""(?:from|require\()\s*['"](\.{1,2}/[^'"]+)['"]""")
 _IMPORT_PY = re.compile(r"^\s*(?:from\s+([.\w]+)\s+import|import\s+([\w.]+))", re.M)
 
-HEADING = "## Bản đồ mã quanh phạm vi — gợi ý tĩnh, không phải chân lý"
+HEADING = "## Code map around write scope — static hints, not ground truth"
 
 
 def seeds_for(story, project: Path | str, *, artifact_root: Path | str, config=None) -> list[str]:
@@ -85,9 +85,9 @@ def repo_map(project: Path | str, seeds: list[str], budget_chars: int = 0, *,
     if command.strip():
         got = _run_provider(project, seeds, budget_chars, command, timeout)
         if got is not None:
-            return _cut(f"_Nguồn: {command.split()[0]}._\n\n{got}", budget_chars, story_id)
-        note = f" · **thô** — `context.map_provider` chạy hỏng ({command.split()[0]}), đã lùi về bản dựng sẵn"
-    text = f"_Nguồn: dựng sẵn (stdlib, lân cận 1 bước){note}._\n\n" + _builtin(project, seeds)
+            return _cut(f"_Source: {command.split()[0]}._\n\n{got}", budget_chars, story_id)
+        note = f" · **raw** — `context.map_provider` failed ({command.split()[0]}), fell back to built-in"
+    text = f"_Source: built-in (stdlib, 1-hop neighbours){note}._\n\n" + _builtin(project, seeds)
     return _cut(text, budget_chars, story_id)
 
 
@@ -98,9 +98,9 @@ def prompt_section(map_text: str) -> str:
         return ""
     return (
         f"{HEADING}\n\n"
-        "Đây là **gợi ý**, không phải chân lý: phân tích tĩnh không thấy gọi động, "
-        "phản chiếu hay tiêm phụ thuộc. Đừng dừng ở đây, và đừng bỏ qua chỗ nó "
-        "không nhắc tới. Bản đầy đủ: `aisef ctx --story <mã>`.\n\n" + map_text
+        "This is a **hint**, not ground truth: static analysis cannot see dynamic calls, "
+        "reflection, or dependency injection. Do not stop here, and do not skip what it "
+        "does not mention. Full map: `aisef ctx --story <id>`.\n\n" + map_text
     )
 
 
@@ -110,7 +110,7 @@ def prompt_section(map_text: str) -> str:
 def _builtin(project: Path, seeds: list[str]) -> str:
     scope, idents = _split_seeds(project, seeds)
     if not scope:
-        return "_(phạm vi ghi chưa có tệp mã nào trên đĩa — story tạo mới từ đầu)_"
+        return "_(write scope has no source files on disk — story starts from scratch)_"
     files = list(_rel_files(project))
     syms = symbols(project, scope)
     names = sorted({n for s in syms.values() for n, _, _ in s})
@@ -131,22 +131,22 @@ def _builtin(project: Path, seeds: list[str]) -> str:
     for rel in imported:
         score[rel] += 1.0
 
-    out = ["**Trong phạm vi (skeleton):**"]
+    out = ["**In scope (skeleton):**"]
     for rel in sorted(scope, key=lambda r: (-boost(r), r)):
         out.append(f"`{rel}`")
-        out += [f"  {ln} {sig}" for ln, sig in _skeleton(project / rel, syms.get(rel, []))] or ["  (không có định nghĩa xuất khẩu)"]
+        out += [f"  {ln} {sig}" for ln, sig in _skeleton(project / rel, syms.get(rel, []))] or ["  (no exported definitions)"]
 
     rank = lambda r: (-score[r] * boost(r), r)  # noqa: E731
     near = sorted((r for r in score if not is_test_path(r) and (score[r] >= 1 or r in imported)), key=rank)
     if near:
-        out.append("\n**Lân cận 1 bước (gọi tên trong phạm vi / được phạm vi import):**")
+        out.append("\n**1-hop neighbours (reference names in scope / imported by scope):**")
         for rel in near:
-            tag = ", ".join(sorted(hit[rel])[:4]) or "được import"
+            tag = ", ".join(sorted(hit[rel])[:4]) or "imported"
             out.append(f"`{rel}` · {tag}")
             out += [f"  {ln} {line}" for ln, line in _lines(project / rel, hit[rel], syms_of=rel in imported and not hit[rel])]
     tests = sorted((r for r in score if is_test_path(r) and score[r] >= 1), key=rank)
     if tests:
-        out.append("\n**Test nhắc tên trong phạm vi:**")
+        out.append("\n**Tests referencing names in scope:**")
         out += [f"- `{rel}` · {', '.join(sorted(hit[rel])[:4])}" for rel in tests]
     return "\n".join(out)
 
@@ -298,7 +298,7 @@ def _cut(text: str, budget: int, story_id: str) -> str:
     luôn ≤ ``budget`` ký tự."""
     if budget <= 0 or len(text) <= budget:
         return text
-    tail = f"\n_(đã cắt — `aisef ctx --story {story_id or '<mã>'}`)_"
+    tail = f"\n_(truncated — `aisef ctx --story {story_id or '<id>'}`)_"
     keep = text[: max(budget - len(tail), 0)]
     keep = keep[: keep.rfind("\n")] if "\n" in keep else keep
     return (keep.rstrip() + tail)[:budget]

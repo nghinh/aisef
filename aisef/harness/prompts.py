@@ -62,7 +62,7 @@ class Prompt:
     def render(self, context: dict[str, object], *, allow_empty: tuple[str, ...] = ()) -> str:
         missing = [s for s in self.slots if s not in context]
         if missing:
-            raise PromptError(f"{self.name}: thiếu biến {', '.join(missing)}")
+            raise PromptError(f"{self.name}: missing variables {', '.join(missing)}")
 
         blank = [
             s for s in self.slots
@@ -70,8 +70,8 @@ class Prompt:
         ]
         if blank:
             raise PromptError(
-                f"{self.name}: biến rỗng {', '.join(blank)} — prompt khuyết sẽ "
-                f"làm agent làm việc với hướng dẫn thiếu mà không ai biết"
+                f"{self.name}: empty variables {', '.join(blank)} — incomplete prompt will "
+                f"make the agent work with missing instructions unnoticed"
             )
 
         return _SLOT.sub(lambda m: str(context[m.group(1)]), self.body)
@@ -84,7 +84,7 @@ class Catalog:
     def get(self, name: str) -> Prompt:
         if name not in self.prompts:
             raise PromptError(
-                f"prompt không có: {name}. Có: {', '.join(sorted(self.prompts))}"
+                f"prompt not found: {name}. Available: {', '.join(sorted(self.prompts))}"
             )
         return self.prompts[name]
 

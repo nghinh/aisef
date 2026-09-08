@@ -42,14 +42,14 @@ def cmd_doctor(args) -> int:
         if required and not ok:
             problems.append(label)
 
-    lines.append("Môi trường:")
+    lines.append("Environment:")
     check("python >= 3.11", sys.version_info >= (3, 11), sys.version.split()[0])
     check("git", bool(shutil.which("git")))
 
     claude = shutil.which("claude")
-    check("claude CLI", bool(claude), claude or "không tìm thấy", required=False)
+    check("claude CLI", bool(claude), claude or "not found", required=False)
     opencode = shutil.which("opencode")
-    check("opencode CLI", bool(opencode), opencode or "không tìm thấy", required=False)
+    check("opencode CLI", bool(opencode), opencode or "not found", required=False)
 
     docker_ok = False
     if shutil.which("docker"):
@@ -62,7 +62,7 @@ def cmd_doctor(args) -> int:
     check(
         "docker daemon",
         docker_ok,
-        "chạy" if docker_ok else "không chạy — sandbox sẽ suy biến, bảo đảm thấp hơn",
+        "running" if docker_ok else "not running — sandbox will degrade, lower guarantees",
         required=False,
     )
 
@@ -73,12 +73,12 @@ def cmd_doctor(args) -> int:
     check(
         "playwright + chromium",
         not browser_why,
-        "sẵn sàng" if not browser_why else f"{browser_why} — không trích được hợp đồng mockup",
+        "ready" if not browser_why else f"{browser_why} — cannot extract mockup contracts",
         required=False,
     )
 
-    lines.append("Dự án:")
-    check("thư mục dự án", project.is_dir(), str(project))
+    lines.append("Project:")
+    check("project directory", project.is_dir(), str(project))
     from ..harness import sandbox as _sandbox
 
     try:
@@ -102,18 +102,18 @@ def cmd_doctor(args) -> int:
         co = sorted(g.value for g, s in prov.guarantees(spec.level).items() if s.blocks_at_source)
         check(
             "sandbox provider", not missing,
-            f"{prov.id} — bảo đảm ở {spec.level.value}: {', '.join(co) or 'không có'}"
-            + (f"; THIẾU {', '.join(missing)} — công cụ chạy ngoài cách ly, bằng chứng ghi degraded"
+            f"{prov.id} — guarantees at {spec.level.value}: {', '.join(co) or 'none'}"
+            + (f"; MISSING {', '.join(missing)} — tools run outside isolation, evidence marked degraded"
                if missing else ""),
             required=False,
         )
     if prov is not None and prov.id == "docker":
         # Chỉ Docker mới bàn về ảnh; provider khác chạy công cụ của máy.
         check(
-            "ảnh sandbox",
+            "sandbox image",
             image != "alpine:latest",
-            image + (" — không có công cụ của stack nào, test sẽ đỏ vì thiếu công cụ"
-                     if image == "alpine:latest" else " (hợp stack)"),
+            image + (" — no stack tools, tests will fail due to missing tools"
+                     if image == "alpine:latest" else " (matches stack)"),
             required=False,
         )
     req = project / "docs" / "requirements.md"
@@ -130,12 +130,12 @@ def cmd_doctor(args) -> int:
             capture_output=True, text=True, timeout=10,
         ).returncode == 0
         check(
-            "plugin OpenCode trong worktree",
+            "OpenCode plugin in worktree",
             tracked,
-            "`.opencode/plugin` đã commit — worktree tự có plugin" if tracked else
-            "`.opencode/plugin` chưa commit — worktree KHÔNG có plugin, OpenCode chạy "
-            "story với zero guard (đo hợp quy 2026-09-05); commit `.opencode/` hoặc "
-            "không dùng OpenCode cho `run`",
+            "`.opencode/plugin` committed — worktree has plugin" if tracked else
+            "`.opencode/plugin` not committed — worktree has NO plugin, OpenCode runs "
+            "stories with zero guards (conformance measured 2026-09-05); commit `.opencode/` or "
+            "do not use OpenCode for `run`",
             required=False,
         )
     hook = project / ".claude" / "settings.json"
@@ -145,12 +145,12 @@ def cmd_doctor(args) -> int:
             capture_output=True, text=True, timeout=10,
         ).returncode == 0
         check(
-            "hook trong worktree",
+            "hook in worktree",
             tracked,
-            "`.claude/settings.json` đã commit — worktree tự có hook" if tracked else
-            "`.claude/settings.json` chưa commit — worktree không có hook; harness "
-            "truyền `--settings` tường minh, cổng story mục \"guard có chạy\" sẽ "
-            "trượt nếu hook không tới",
+            "`.claude/settings.json` committed — worktree has hook" if tracked else
+            "`.claude/settings.json` not committed — worktree has no hook; harness "
+            "passes `--settings` explicitly, story gate \"guard ran\" will "
+            "fail if hook is missing",
             required=False,
         )
 
@@ -168,9 +168,9 @@ def cmd_doctor(args) -> int:
         for c in data.get("clients", []):
             thieu = sorted(set(GUARD_MATCHERS) - set(c.get("guards_wired") or []) - set(c.get("guards_post_hoc") or []))
             check(
-                f"hook {c.get('client')} đủ guard", not thieu,
-                f"{len(GUARD_MATCHERS)} guard" if not thieu else
-                f"thiếu {', '.join(thieu)} — framework có guard mới sau lần biên dịch; chạy `aisef compile --client {c.get('client')}`",
+                f"hook {c.get('client')} has all guards", not thieu,
+                f"{len(GUARD_MATCHERS)} guards" if not thieu else
+                f"missing {', '.join(thieu)} — framework has new guards since last compile; run `aisef compile --client {c.get('client')}`",
             )
 
     # Ngưỡng cỡ story chỉ đáng tin chừng nào nó còn khớp dữ liệu thật
@@ -181,33 +181,33 @@ def cmd_doctor(args) -> int:
     if rows:
         lech_nguong = complexity.divergence(rows)
         check(
-            "ngưỡng cỡ story khớp dữ liệu", not lech_nguong,
-            f"{len(rows)} story đã đo, không thấy lệch" if not lech_nguong else
-            "; ".join(lech_nguong) + " — chỉnh `story.max_complexity` trong "
-            "`.ai/config.json` hoặc xem lại trọng số ở `control/complexity.py`",
+            "story size thresholds match data", not lech_nguong,
+            f"{len(rows)} stories measured, no divergence" if not lech_nguong else
+            "; ".join(lech_nguong) + " — adjust `story.max_complexity` in "
+            "`.ai/config.json` or review weights in `control/complexity.py`",
             required=False,
         )
 
     lech = _hook_paths_elsewhere(project)
     if lech is not None:
         check(
-            "hook trỏ đúng dự án", not lech,
-            "đường dẫn `--project`/`PROJECT` trong hook khớp thư mục này" if not lech else
-            f"hook trỏ sang {', '.join(lech[:2])} — dự án bị chép/di chuyển? guard sẽ ghi bằng "
-            "chứng vào dự án ấy; chạy `aisef compile` lại",
+            "hook points to this project", not lech,
+            "`--project`/`PROJECT` path in hook matches this directory" if not lech else
+            f"hook points to {', '.join(lech[:2])} — project copied/moved? guards will write "
+            "evidence to that project; run `aisef compile` again",
         )
 
     try:
         cfg = Config.load(project)
-        check("cấu hình", True, cfg.source)
+        check("config", True, cfg.source)
         lenh = str(cfg.get("tools.test", "") or "")
         if lenh:
             co_cov = any(k in lenh for k in ("--coverage", "--cov", "--experimental-test-coverage", "c8 ", "nyc "))
             check(
-                "lệnh test in coverage", co_cov,
-                "cổng `coverage.min` đọc được số" if co_cov else
-                f"`tools.test` = `{lenh}` không in coverage → mục coverage của cổng sẽ là **chưa cấu hình** "
-                "(thêm `--coverage` / `--cov` / `--experimental-test-coverage`)",
+                "test command prints coverage", co_cov,
+                "gate `coverage.min` can read the number" if co_cov else
+                f"`tools.test` = `{lenh}` does not print coverage — gate coverage check will be **not configured** "
+                "(add `--coverage` / `--cov` / `--experimental-test-coverage`)",
                 required=False,
             )
             # Tên test đọc được không (ADR-005 V9)? Có bằng chứng thì tin bằng
@@ -220,30 +220,30 @@ def cmd_doctor(args) -> int:
                    if e.name in ("test", "test:baseline") and not e.detail.get("skipped")]
             if lan:
                 doc_ten = bool(lan[-1].detail.get("test_format"))
-                vi = f"lần test gần nhất ghi test_format={lan[-1].detail.get('test_format') or ''!r}"
+                vi = f"last test run recorded test_format={lan[-1].detail.get('test_format') or ''!r}"
             else:
                 doc_ten = any(k in lenh for k in ("-v", "--verbose", "--reporter=verbose",
                                                   "--test-reporter", "node --test", "ctrf"))
-                vi = "chưa có bằng chứng — đoán từ cờ lệnh"
+                vi = "no evidence yet — guessing from command flags"
             check(
-                "lệnh test in tên test", doc_ten,
-                f"cổng đọc được tên test ({vi})" if doc_ten else
-                f"{vi} → mục `tiêu chí có test`/`không làm đỏ test có sẵn` là **chưa cấu hình**. "
-                "Dùng reporter in tên hoặc CTRF: pytest `-v` hay `pip install pytest-json-ctrf` + "
-                "`pytest --ctrf /dev/stdout`; vitest `--reporter=verbose` hay `vitest-ctrf-json-reporter` "
-                "(in `vitest-ctrf/report.json` ra stdout, giữ mã thoát); node `--test-reporter=spec|tap`",
+                "test command prints test names", doc_ten,
+                f"gate can read test names ({vi})" if doc_ten else
+                f"{vi} — gate `has tests`/`no existing tests broken` will be **not configured**. "
+                "Use a reporter that prints names or CTRF: pytest `-v` or `pip install pytest-json-ctrf` + "
+                "`pytest --ctrf /dev/stdout`; vitest `--reporter=verbose` or `vitest-ctrf-json-reporter` "
+                "(prints `vitest-ctrf/report.json` to stdout, preserves exit code); node `--test-reporter=spec|tap`",
                 required=False,
             )
     except ConfigError as e:
-        check("cấu hình", False, str(e))
+        check("config", False, str(e))
 
     skills_dir = project / ".claude" / "skills"
     if skills_dir.is_dir():
         from ..kit.security_filter import Verdict, classify_all
 
         installed = [d for d in skills_dir.iterdir() if d.is_dir()]
-        lines.append("Skill đã cài:")
-        check("có skill", bool(installed), f"{len(installed)} thư mục")
+        lines.append("Installed skills:")
+        check("has skills", bool(installed), f"{len(installed)} directories")
 
         # Bất biến: skill tấn công không bao giờ được có mặt trong dự án.
         offensive = [
@@ -262,25 +262,25 @@ def cmd_doctor(args) -> int:
             if copied.is_file() and copied.read_bytes() != own.read_bytes():
                 stale.append(own.parent.name)
         check(
-            "skill framework cập nhật",
+            "framework skills up to date",
             not stale,
-            "khớp bản gốc" if not stale
-            else f"cũ hơn kho: {', '.join(stale)} — chạy `aisef setup`",
+            "matches source" if not stale
+            else f"outdated: {', '.join(stale)} — run `aisef setup`",
             required=False,
         )
 
         check(
-            "không có skill tấn công",
+            "no offensive skills",
             not offensive,
-            "sạch" if not offensive else f"LỌT: {', '.join(offensive[:5])}",
+            "clean" if not offensive else f"FOUND: {', '.join(offensive[:5])}",
         )
     else:
-        lines.append("Skill đã cài:")
-        check("đã chạy setup", False, "chưa — chạy: aisef setup", required=False)
+        lines.append("Installed skills:")
+        check("setup completed", False, "not yet — run: aisef setup", required=False)
 
     print("\n".join(lines))
     if problems:
-        print(f"\n✗ thiếu: {', '.join(problems)}")
+        print(f"\n✗ missing: {', '.join(problems)}")
         return EXIT_NOT_READY
-    print("\n✅ sẵn sàng")
+    print("\n✅ ready")
     return EXIT_OK

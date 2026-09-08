@@ -92,13 +92,13 @@ class Report:
 
     def markdown(self) -> str:
         lines = [
-            f"# Báo cáo nghiệm thu — {self.project}",
+            f"# Acceptance Report — {self.project}",
             "",
-            "Mọi số liệu dưới đây đọc từ artifact và bằng chứng trên đĩa.",
+            "All figures below are read from artifacts and on-disk evidence.",
             "",
-            "## 1. Truy vết yêu cầu",
+            "## 1. Requirements Traceability",
             "",
-            "| Yêu cầu | Tiêu đề | Story phủ | Có bằng chứng test |",
+            "| Requirement | Title | Covering Story | Test Evidence |",
             "|---|---|---|---|",
         ]
         # Phạm vi nghiệm thu (pre-deploy --epic, QĐ C-a): yêu cầu chỉ có story
@@ -108,7 +108,7 @@ class Report:
             if row.tested:
                 cell = "✅"
             elif row.stories and ngoai and all(s in ngoai for s in row.stories):
-                cell = "ngoài phạm vi"
+                cell = "out of scope"
             else:
                 cell = "—"
             lines.append(
@@ -116,15 +116,15 @@ class Report:
                 f"{', '.join(row.stories) or '—'} | {cell} |"
             )
         if self.uncovered:
-            lines += ["", f"**Chưa phủ:** {', '.join(self.uncovered)}"]
+            lines += ["", f"**Uncovered:** {', '.join(self.uncovered)}"]
 
-        lines += ["", "## 2. Cổng phê duyệt", "", "| Cổng | Trạng thái | Ai duyệt |", "|---|---|---|"]
+        lines += ["", "## 2. Approval Gate", "", "| Gate | Status | Approved By |", "|---|---|---|"]
         for gate, status, by in self.gates:
             lines.append(f"| {gate} | {status} | {by or '—'} |")
 
         lines += [
-            "", "## 3. Vận hành từng story", "",
-            "| Story | Trạng thái | Candidate | Lượt agent | Chi phí | Thời gian | Map mockup | TCCN có test | Hành vi (V/G/R) |",
+            "", "## 3. Per-Story Operations", "",
+            "| Story | Status | Candidate | Agent Runs | Cost | Duration | Mockup Map | AC w/ Test | Behaviors (V/G/R) |",
             "|---|---|---|---|---|---|---|---|---|",
         ]
         for s in self.stories:
@@ -135,12 +135,12 @@ class Report:
             )
         chuoi = [s for s in self.stories if s.get("handoffs")]
         if chuoi:
-            lines += ["", "Chuỗi bàn giao (từ bằng chứng `handoff`, mỗi vai một phiên mới):", ""]
+            lines += ["", "Handoff chains (from `handoff` evidence, each role in a new session):", ""]
             lines += [f"- {s['id']}: {s['handoffs']}" for s in chuoi]
         if self.phases:
             lines += [
-                "", "### Chi phí lập kế hoạch và mockup", "",
-                "| Pha | Lượt | Chi phí | Thời gian |", "|---|---|---|---|",
+                "", "### Planning and Mockup Cost", "",
+                "| Phase | Runs | Cost | Duration |", "|---|---|---|---|",
             ]
             for ph in self.phases:
                 lines.append(
@@ -148,38 +148,38 @@ class Report:
                     f"{ph['duration_ms'] / 1000:.0f}s |"
                 )
 
-        lines += ["", f"**Tổng chi phí:** ${self.total_cost_usd:.2f}"]
+        lines += ["", f"**Total Cost:** ${self.total_cost_usd:.2f}"]
 
         # Cổng story chấm được bao nhiêu mục là **đã chứng nhận** (positive ·
         # negative · env) — đọc từ bảng test, không phải "cổng N điều kiện" kể.
         du = sum(all(v.values()) for v in self.qualification.values())
         tong = len(self.qualification) or len(CHECK_NAMES)
-        lines += ["", f"**Cổng story:** mục cổng có đủ 3 control: "
+        lines += ["", f"**Story Gate:** gate checks with all 3 controls: "
                       f"{du if self.qualification else '?'}/{tong} "
-                      f"(`tests/test_gate_qualification.py`; `?` = không có thư mục `tests/`)"]
+                      f"(`tests/test_gate_qualification.py`; `?` = no `tests/` directory)"]
 
-        lines += ["", "## 4. Sáu nhóm harness", "", "| Nhóm | Bằng chứng |", "|---|---|"]
+        lines += ["", "## 4. Six Harness Groups", "", "| Group | Evidence |", "|---|---|"]
         for group, proof in self.harness.items():
             lines.append(f"| {group} | {proof} |")
 
         lines += self._ledger_section()
 
-        lines += ["", "## 6. Cổng trước triển khai", ""]
+        lines += ["", "## 6. Pre-Deploy Gate", ""]
         if not self.pre_deploy:
-            lines.append("_Chưa chấm — chạy `aisef pre-deploy`._")
+            lines.append("_Not yet evaluated — run `aisef pre-deploy`._")
         else:
             scope = self.pre_deploy.get("scope") or {}
             if scope:
                 ngoai = scope.get("outside") or []
                 lines += [
-                    f"Phạm vi nghiệm thu: **{scope.get('epic')}** — "
-                    f"{len(scope.get('stories') or [])} story. "
-                    + (f"**Ngoài phạm vi (chưa nghiệm thu): {len(ngoai)} story** — "
+                    f"Acceptance scope: **{scope.get('epic')}** — "
+                    f"{len(scope.get('stories') or [])} stories. "
+                    + (f"**Out of scope (not accepted): {len(ngoai)} stories** — "
                        + ", ".join(ngoai[:8]) + ("…" if len(ngoai) > 8 else "") + "."
-                       if ngoai else "Không có story ngoài phạm vi."),
+                       if ngoai else "No stories out of scope."),
                     "",
                 ]
-            lines += ["| Mục | Kết quả |", "|---|---|"]
+            lines += ["| Check | Result |", "|---|---|"]
             for c in self.pre_deploy.get("checks", []):
                 # Dấu theo **kết cục**, không theo "không chặn": mục – không áp
                 # dụng hay ◇ miễn mà in ✅ là tự khai đạt thứ chưa kiểm.
@@ -194,7 +194,7 @@ class Report:
                 failed = ", ".join(qa.get("failed", [])) or "—"
                 lines += [
                     "",
-                    f"Kiểm định: không đạt = {failed} · chưa cấu hình = {unconf}",
+                    f"Qualifications: failed = {failed} · unconfigured = {unconf}",
                 ]
         return "\n".join(lines) + "\n"
 
@@ -207,31 +207,31 @@ class Report:
         """
         m = self.ledger
         if not m:
-            return ["", "## 5. Cải tiến liên tục (sổ hành vi)", "",
-                    "_Chưa có bằng chứng nào để chiếu thành hành vi._"]
+            return ["", "## 5. Continuous Improvement (Behavior Ledger)", "",
+                    "_No evidence to project into behaviors yet._"]
         lines = [
-            "", "## 5. Cải tiến liên tục (sổ hành vi)", "",
-            "| Số đo | Giá trị |", "|---|---|",
-            f"| Năng lực đã xác minh (VERIFIED hiện tại) | {m['verified']} |",
-            f"| Từng xác minh (growth, duy nhất theo thời gian) | {m['ever_verified']} |",
+            "", "## 5. Continuous Improvement (Behavior Ledger)", "",
+            "| Metric | Value |", "|---|---|",
+            f"| Verified capabilities (current VERIFIED) | {m['verified']} |",
+            f"| Ever verified (growth, unique over time) | {m['ever_verified']} |",
             f"| GAP | {m['gap']} |",
-            f"| REOPENED (đang hỏng lại) | {m['reopened']} |",
-            f"| Lần hồi quy / tỷ lệ trên hành vi từng xác minh | "
+            f"| REOPENED (currently regressed) | {m['reopened']} |",
+            f"| Regression events / rate over ever-verified | "
             f"{m['reopen_events']} · {m['reopen_rate']:.2f} |",
-            f"| Hồi quy **liên story** (story sau làm hỏng story trước) | {m['cross_reopens']} |",
-            f"| Gap đã đóng (resolved) | {m['resolved']} |",
+            f"| **Cross-story** regressions (later story broke earlier one) | {m['cross_reopens']} |",
+            f"| Gaps closed (resolved) | {m['resolved']} |",
         ]
         cross = m.get("cross_reopen_list") or []
         if cross:
-            lines += ["", "Hồi quy liên story, kèm nguồn:", ""]
+            lines += ["", "Cross-story regressions with source:", ""]
             lines += [
-                f"- `{c['id']}` xanh ở {c['verified_by']} → đỏ lại ở {c['regressed_by']}"
+                f"- `{c['id']}` green at {c['verified_by']} → red again at {c['regressed_by']}"
                 for c in cross[:10]
             ]
         loops = m.get("loops") or []
         if loops:
             lines += [
-                "", "| Vòng | VERIFIED | GAP | REOPENED | ΔV | ΔR | $ | Cải thiện biên |",
+                "", "| Loop | VERIFIED | GAP | REOPENED | ΔV | ΔR | $ | Marginal Improvement |",
                 "|---|---|---|---|---|---|---|---|",
             ]
             for lo in loops:
@@ -373,31 +373,31 @@ def _harness_evidence(project: Path, root: Path, evidence: EvidenceStore) -> dic
     any_story = [s for s in evidence.stories() if not s.startswith(PHASE_PREFIXES)]
     ev = evidence.read(any_story[0]) if any_story else None
 
-    def yes(cond, proof, missing="chưa có bằng chứng"):
+    def yes(cond, proof, missing="no evidence"):
         return proof if cond else missing
 
     prompts = load_catalog()
     return {
-        "1 Chỉ dẫn & luật": yes(
+        "1 Instructions & Rules": yes(
             (project / "CLAUDE.md").is_file(),
-            f"CLAUDE.md · AGENTS.md · {len(prompts.prompts)} prompt có phiên bản",
+            f"CLAUDE.md · AGENTS.md · {len(prompts.prompts)} versioned prompts",
         ),
         "2 Tool": yes(
             bool(ev and ev.of(TOOL_RUN)),
-            f"{len(ev.of(TOOL_RUN)) if ev else 0} lần chạy tool được ghi",
+            f"{len(ev.of(TOOL_RUN)) if ev else 0} recorded tool runs",
         ),
         "3 Sandbox": _isolation_note(ev),
-        "4 Điều phối": yes(
+        "4 Orchestration": yes(
             (root / STORIES_INDEX).is_file(),
-            "chỉ mục story có đợt chạy song song tính sẵn",
+            "story index with parallel-run batches pre-computed",
         ),
         "5 Guardrail": yes(
             (project / ".claude" / "settings.json").is_file(),
-            ".claude/settings.json nối 7 guard vào 3 mốc",
+            ".claude/settings.json wiring 7 guards to 3 hooks",
         ),
-        "6 Quan sát": yes(
+        "6 Observability": yes(
             bool(any_story),
-            f"evidence/ có {len(any_story)} story, kèm chi phí và độ trễ",
+            f"evidence/ has {len(any_story)} stories with cost and latency",
         ),
     }
 
@@ -409,17 +409,17 @@ def _isolation_note(ev) -> str:
     mà cả framework này sinh ra để chống.
     """
     if ev is None:
-        return "chưa có bằng chứng"
+        return "no evidence"
     levels = {
         str(e.detail.get("isolation"))
         for e in ev.of(TOOL_RUN)
         if e.detail.get("isolation")
     }
     if not levels:
-        return "chưa có bằng chứng"
+        return "no evidence"
     degraded = any(e.detail.get("degraded") for e in ev.of(TOOL_RUN))
-    note = "mức cách ly quan sát được: " + ", ".join(sorted(levels))
-    return note + (" — **suy biến**, không có container" if degraded else "")
+    note = "observed isolation level: " + ", ".join(sorted(levels))
+    return note + (" — **degraded**, no container" if degraded else "")
 
 
 def write(project: Path | str, *, out: Path | str | None = None) -> Path:

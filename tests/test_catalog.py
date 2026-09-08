@@ -105,7 +105,7 @@ class TestValidation(unittest.TestCase):
         p = self.write({"sources": [self.base_source(), self.base_source()]})
         with self.assertRaises(CatalogError) as ctx:
             Catalog.load(p)
-        self.assertIn("trùng", str(ctx.exception))
+        self.assertIn("duplicate", str(ctx.exception))
 
     def test_rejects_missing_field(self):
         s = self.base_source()

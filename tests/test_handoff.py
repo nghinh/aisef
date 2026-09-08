@@ -74,4 +74,4 @@ class TestSkillTelemetry(unittest.TestCase):
                                        config=Config({**DEFAULTS, "skills.offer": True}))
         self.assertTrue(ev["enabled"])
         self.assertTrue(ev["abstained"])
-        self.assertIn("Không có skill nào", text)
+        self.assertIn("No skill matched", text)

@@ -148,7 +148,7 @@ class TestSplit(SplitTestCase):
         self.assertIn("FR-1", text)
         self.assertIn("Kho cục bộ", text)          # nguyên văn từ PRD thật
         self.assertIn("src/notes/", text)          # phạm vi được ghi
-        self.assertIn("Tiêu chí chấp nhận", text)
+        self.assertIn("Acceptance Criteria", text)
 
     def test_index_feeds_the_scheduler(self):
         split(self.root)
@@ -205,13 +205,13 @@ class TestSplitFailures(SplitTestCase):
         (self.root / "epics.md").unlink()
         r = split(self.root)
         self.assertFalse(r.ok)
-        self.assertIn("chưa có epics.md", r.error)
+        self.assertIn("epics.md not found", r.error)
 
     def test_epics_without_stories(self):
         (self.root / "epics.md").write_text("# Epic Breakdown\n\nchưa viết gì.\n", encoding="utf-8")
         r = split(self.root)
         self.assertFalse(r.ok)
-        self.assertIn("không có story", r.error)
+        self.assertIn("no readable stories", r.error)
 
     def test_missing_write_scope_fails_the_gate(self):
         text = (self.root / "epics.md").read_text(encoding="utf-8")

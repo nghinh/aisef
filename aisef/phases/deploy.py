@@ -41,7 +41,9 @@ RUNBOOK_PATH = "docs/RUNBOOK.md"
 
 #: Bốn mục một runbook phải có. Thiếu mục nào cũng làm nó vô dụng đúng lúc
 #: cần nhất — lúc 3 giờ sáng, với người trực chưa từng đọc hệ này.
-RUNBOOK_SECTIONS = ("triệu chứng", "chẩn đoán", "xử lý", "leo thang")
+RUNBOOK_SECTIONS = ("symptoms", "diagnosis", "remediation", "escalation")
+_RUNBOOK_VI = {"triệu chứng": "symptoms", "chẩn đoán": "diagnosis",
+               "xử lý": "remediation", "leo thang": "escalation"}
 
 
 @dataclass
@@ -101,8 +103,8 @@ class PreDeployReport:
         return path
 
     def summary(self) -> str:
-        pham_vi = f" (phạm vi {self.scope['epic']})" if self.scope else ""
-        lines = [f"Cổng trước triển khai{pham_vi}: {'ĐẠT' if self.passed else 'KHÔNG ĐẠT'}"]
+        scope_label = f" (scope {self.scope['epic']})" if self.scope else ""
+        lines = [f"Pre-deploy gate{scope_label}: {'PASS' if self.passed else 'FAIL'}"]
         lines += [c.line() for c in self.checks]
         if self.qa and not self.qa.release_ready:
             lines.append(self.qa.summary())
@@ -116,34 +118,39 @@ def _isolation_check(report: PreDeployReport, cfg: Config) -> Check:
     degraded = report.qa.degraded if report.qa else []
     if not degraded:
         if report.qa and not any(r.ran for r in report.qa.results):
-            return Check("cách ly", Outcome.UNCONFIGURED, "không có lần chạy nào để biết")
-        return Check("cách ly", True, "kiểm định chạy trong Docker")
+            return Check("isolation", Outcome.UNCONFIGURED, "no runs to determine")
+        return Check("isolation", True, "verification ran inside Docker")
     ten = ", ".join(
-        f"{r.kind.id} (thiếu {', '.join(r.missing) if r.missing else 'bảo đảm không rõ'})"
+        f"{r.kind.id} (missing {', '.join(r.missing) if r.missing else 'unknown guarantees'})"
         for r in degraded
     )
     waiver = str(cfg.get("sandbox.pre_deploy_degraded_waiver", "") or "").strip()
     if waiver:
         report.degraded_waiver = waiver
         return Check(
-            "cách ly", True,
-            f"suy biến: {ten} — chấp nhận theo khai báo: {waiver}",
+            "isolation", True,
+            f"degraded: {ten} — accepted per declaration: {waiver}",
         )
     return Check(
-        "cách ly", False,
-        f"{ten} chạy ngoài Docker. Cổng trước triển khai không "
-        f"chấp nhận suy biến; dựng Docker, hoặc khai lý do ở "
-        f"`sandbox.pre_deploy_degraded_waiver` để ghi vào bằng chứng.",
+        "isolation", False,
+        f"{ten} ran outside Docker. Pre-deploy gate does not "
+        f"accept degraded runs; set up Docker, or declare a reason at "
+        f"`sandbox.pre_deploy_degraded_waiver` to record in evidence.",
     )
 
 
 def check_runbook(path: Path) -> Check:
     if not path.is_file():
-        return Check("runbook", False, f"chưa có {path.name}")
+        return Check("runbook", False, f"missing {path.name}")
     text = path.read_text(encoding="utf-8", errors="replace").lower()
-    missing = [s for s in RUNBOOK_SECTIONS if s not in text]
+    # Accept both English and Vietnamese section headings.
+    found = {s for s in RUNBOOK_SECTIONS if s in text}
+    for vi, en in _RUNBOOK_VI.items():
+        if vi in text:
+            found.add(en)
+    missing = [s for s in RUNBOOK_SECTIONS if s not in found]
     if missing:
-        return Check("runbook", False, f"thiếu mục: {', '.join(missing)}")
+        return Check("runbook", False, f"missing sections: {', '.join(missing)}")
     return Check("runbook", True)
 
 
@@ -168,20 +175,20 @@ def _scope(report: PreDeployReport, artifact_root: Path, epic: str) -> set[str]:
 
     plan = load_plan(artifact_root)
     if plan.error:
-        report.checks.append(Check("phạm vi", False, f"--epic {epic}: {plan.error}"))
+        report.checks.append(Check("scope", False, f"--epic {epic}: {plan.error}"))
         return set()
     inside = {sid for sid, s in plan.stories.items() if s.epic_id == epic}
     if not inside:
         report.checks.append(Check(
-            "phạm vi", False, f"--epic {epic}: không có story nào thuộc epic này trong kế hoạch"))
+            "scope", False, f"--epic {epic}: no stories belong to this epic in the plan"))
         return set()
     outside = sorted(sid for sid in plan.stories if sid not in inside)
     report.scope = {"epic": epic, "stories": sorted(inside), "outside": outside}
-    report.checks.append(Check("phạm vi", True, f"nghiệm thu {epic}: {len(inside)} story"))
+    report.checks.append(Check("scope", True, f"acceptance {epic}: {len(inside)} stories"))
     if outside:
         report.checks.append(Check(
-            "ngoài phạm vi nghiệm thu", Outcome.NOT_APPLICABLE,
-            f"{len(outside)} story không chấm — không xong, không thiếu: "
+            "outside acceptance scope", Outcome.NOT_APPLICABLE,
+            f"{len(outside)} stories not scored — neither done nor missing: "
             + ", ".join(outside[:5]) + ("…" if len(outside) > 5 else ""),
         ))
     return inside
@@ -201,12 +208,12 @@ def _waiver_check(report: PreDeployReport, cfg: Config) -> Check | None:
     ten = ", ".join(waived)
     if not reason:
         return Check(
-            "miễn tường minh", False,
-            f"{ten} miễn ở `verify.waived` mà không có lý do — khai "
-            f"`verify.waiver_reason` (phạm vi, ngày, người ký) để ghi vào bằng chứng",
+            "explicit waiver", False,
+            f"{ten} waived at `verify.waived` without a reason — declare "
+            f"`verify.waiver_reason` (scope, date, signer) to record in evidence",
         )
     report.waivers = {k: reason for k in waived}
-    return Check("miễn tường minh", Outcome.WAIVED, f"{ten} — {reason}")
+    return Check("explicit waiver", Outcome.WAIVED, f"{ten} — {reason}")
 
 
 def pre_deploy(
@@ -229,7 +236,7 @@ def pre_deploy(
     records = [r for r in state.stories.values() if inside is None or r.id in inside]
     if not records:
         report.checks.append(Check(
-            "story", False, "chưa story nào chạy" + (f" trong {epic}" if epic else "")))
+            "story", False, "no stories have run" + (f" in {epic}" if epic else "")))
     else:
         # Triển khai là triển khai nhánh chính. `verified` là qua cổng mà
         # chưa merge (G12) — với cổng này nó chưa xong, và phải được gọi
@@ -249,15 +256,15 @@ def pre_deploy(
         not_done += chua_chay
         detail = ""
         if not_done:
-            detail = f"{len(not_done)} chưa xong: {', '.join(not_done[:5])}"
+            detail = f"{len(not_done)} not done: {', '.join(not_done[:5])}"
             if chua_chay:
-                detail += f" (chưa từng chạy: {', '.join(chua_chay[:5])})"
+                detail += f" (never run: {', '.join(chua_chay[:5])})"
         if chua_merge:
             detail += ("; " if detail else "") + (
-                f"{len(chua_merge)} xong nhưng chưa merge: {', '.join(chua_merge[:5])}"
+                f"{len(chua_merge)} done but not merged: {', '.join(chua_merge[:5])}"
             )
         report.checks.append(
-            Check("mọi story xong", not not_done and not chua_merge, detail)
+            Check("all stories done", not not_done and not chua_merge, detail)
         )
 
     approvals = ApprovalStore(artifact_root)
@@ -266,16 +273,16 @@ def pre_deploy(
         if g is not Gate.PRE_DEPLOY and approvals.status(g) is not Status.APPROVED
     ]
     report.checks.append(
-        Check("cổng người", not pending, "" if not pending else f"chưa duyệt: {', '.join(pending)}")
+        Check("human gates", not pending, "" if not pending else f"not approved: {', '.join(pending)}")
     )
 
     if not skip_qa:
         report.qa = run_suite(project, config=cfg, has_ui=has_ui)
         report.checks.append(
             Check(
-                "kiểm định",
+                "verification",
                 report.qa.release_ready,
-                "" if report.qa.release_ready else "xem chi tiết bên dưới",
+                "" if report.qa.release_ready else "see details below",
             )
         )
         # Quyết định 2026-09-05: cổng trước triển khai **không** chấp nhận
@@ -290,16 +297,16 @@ def pre_deploy(
 
     if skip_qa:
         report.checks.append(
-            Check("cách ly", Outcome.NOT_APPLICABLE, "bỏ qua cùng bộ kiểm định")
+            Check("isolation", Outcome.NOT_APPLICABLE, "skipped along with verification suite")
         )
 
     dockerfile = project / "Dockerfile"
     report.checks.append(
-        Check("Dockerfile", dockerfile.is_file(), "" if dockerfile.is_file() else "chưa có")
+        Check("Dockerfile", dockerfile.is_file(), "" if dockerfile.is_file() else "missing")
     )
     report.checks.append(
-        Check("quy trình CI", (project / CI_PATH).is_file(),
-              "" if (project / CI_PATH).is_file() else f"chưa có {CI_PATH}")
+        Check("CI workflow", (project / CI_PATH).is_file(),
+              "" if (project / CI_PATH).is_file() else f"missing {CI_PATH}")
     )
     report.checks.append(check_runbook(project / RUNBOOK_PATH))
     return report
@@ -330,7 +337,7 @@ def write_ci_workflow(
     return path
 
 
-_CI_TEMPLATE = """# Sinh bởi `aisef devsecops` — chạy đúng bộ lệnh người chạy trên máy mình.
+_CI_TEMPLATE = """# Generated by `aisef devsecops` — runs the same commands the developer runs locally.
 name: aisef
 
 on:
@@ -349,36 +356,36 @@ jobs:
         with:
           python-version: "3.11"
 
-      # Đường dẫn tuyệt đối của máy sinh ra quy trình này không tồn tại
-      # trên máy chạy CI. Cài rồi gọi từ PATH.
+      # The absolute path from the machine that generated this workflow does
+      # not exist on CI runners. Install then invoke from PATH.
       #
-      # `{install}` phải là thứ pip thật sự cài được: tên gói trên PyPI
-      # nếu đã phát hành, hoặc `git+https://…` / đường dẫn tới bản sao kho
-      # nguồn nếu chưa. Đổi bằng `--install-spec` khi sinh lại.
-      - name: Cài AISEF
+      # `{install}` must be something pip can actually install: a PyPI package
+      # name if published, or `git+https://…` / path to the source repo if not.
+      # Change via `--install-spec` when regenerating.
+      - name: Install AISEF
         run: pip install --quiet {install}
 
-      # Kho skill (~93 MB) không nằm trong gói. Cache lại để mỗi lượt CI
-      # không phải clone lần nữa.
-      - name: Cache kho skill
+      # The skill repo (~93 MB) is not bundled in the package. Cache it so
+      # each CI run does not have to clone it again.
+      - name: Cache skill repo
         uses: actions/cache@v4
         with:
           path: ~/.cache/aisef/references
           key: aisef-references-${{{{ hashFiles('.ai/config.json') }}}}
 
-      - name: Môi trường
+      - name: Environment
         run: {bin} doctor
 
-      - name: Hậu kiểm guard trên diff
+      - name: Post-hoc guard on diff
         run: {bin} verify
 
-      - name: Kiểm định
+      - name: Verification
         run: {bin} qa
 
-      - name: Cổng phê duyệt
+      - name: Approval gate
         run: {bin} gates
 
-      - name: Trạng thái story
+      - name: Story status
         run: {bin} status
 """
 
@@ -392,7 +399,7 @@ def build_prompt(project: Path, stack_summary: str) -> str:
 
     return load_catalog().get("devsecops").render({
         "project_name": project.name,
-        "stack": stack_summary or "(chưa dò được — đọc mã nguồn để xác định)",
+        "stack": stack_summary or "(not detected — read source code to determine)",
         "runbook_sections": ", ".join(RUNBOOK_SECTIONS),
         "ci_path": CI_PATH,
         "runbook_path": RUNBOOK_PATH,
@@ -417,15 +424,15 @@ class DevSecOpsReport:
         # Đếm cả quy trình CI: nó cũng là một tạo tác sinh ra, và in "sinh
         # 2" rồi liệt kê 3 dòng làm người đọc nghi ngờ cả phần còn lại.
         n = len(self.generated) + (1 if self.ci_path else 0)
-        lines = [f"devsecops: sinh {n} tạo tác"]
+        lines = [f"devsecops: generated {n} artifacts"]
         if self.ci_path:
             lines.append(f"  ✅ {CI_PATH}")
         for name in self.generated:
             lines.append(f"  ✅ {name}")
         for name in self.missing:
-            lines.append(f"  ✗ thiếu {name}")
+            lines.append(f"  ✗ missing {name}")
         if self.cost_usd:
-            lines.append(f"  chi phí: ${self.cost_usd:.2f}")
+            lines.append(f"  cost: ${self.cost_usd:.2f}")
         return "\n".join(lines)
 
 
@@ -473,7 +480,7 @@ def generate(
     )
     report.cost_usd = result.cost_usd
     if not result.ok:
-        report.error = result.error or "lượt chạy thất bại"
+        report.error = result.error or "run failed"
         return report
 
     for name in REQUIRED_ARTIFACTS:

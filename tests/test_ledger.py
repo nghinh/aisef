@@ -157,7 +157,7 @@ class TestNguonHanhVi(LedgerTestCase):
         self.store.tool_run("STORY-01-01", "test", ok=True, detail={"tail": "3 passed"})
         led = L.build(self.root)
         self.assertEqual(led.summary()["gap"], 2)
-        self.assertIn("không đọc được", led.behaviors["AC-STORY-01-01-1"].source["why"])
+        self.assertIn("cannot read test names", led.behaviors["AC-STORY-01-01-1"].source["why"])
 
     def test_bo_test_chay_mot_phan_khong_bien_story_khac_thanh_gap(self):
         """Lần chạy không thấy story kia thì nó im lặng, không kết tội."""
@@ -274,7 +274,7 @@ class TestChiMuc(LedgerTestCase):
         self.assertNotIn("STORY-02-01", slice_)
         cut = led.epic_slice("EPIC-01", max_chars=40)
         self.assertLessEqual(len(cut), 40 + 80)      # phần cắt có ghi chú
-        self.assertIn("đã cắt", cut)
+        self.assertIn("truncated", cut)
 
 
 class TestSlotIndexTrongPrompt(LedgerTestCase):
@@ -305,7 +305,7 @@ class TestSlotIndexTrongPrompt(LedgerTestCase):
         story = Story(id="STORY-09-01", epic_id="EPIC-09", title="t")
         ctx = build_context(story, project=self.root.parent, artifact_root=self.root,
                             architecture=None, contract=None, config=None)
-        self.assertIn("chưa có bằng chứng", ctx["index"])
+        self.assertIn("no evidence yet", ctx["index"])
 
 
 class TestCliEvidence(LedgerTestCase):
@@ -338,7 +338,7 @@ class TestCliEvidence(LedgerTestCase):
         self.seed()
         code, _, err = self.run_cli("evidence", "AC-KHONG-CO-1")
         self.assertEqual(code, 2)
-        self.assertIn("không có story hay hành vi", err)
+        self.assertIn("no story or behaviour", err)
 
     def test_co_story_thi_ghi_bang_chung_evidence_lookup(self):
         self.seed()
@@ -380,7 +380,7 @@ class TestXuatBangGap(LedgerTestCase):
         self.assertTrue(rows[0].startswith("| AC-STORY-01-01-1 | ac | reopened | STORY-01-01 "
                                            "| STORY-01-02#2@deadbee | src/x.ts"))
         self.assertIn("| 2 |", rows[0])                        # verified → reopened: 2 lần đổi
-        self.assertIn("| AC-STORY-01-02-2 | ac | gap | STORY-01-02 |  |  | chưa có test mang mã", text)
+        self.assertIn("| AC-STORY-01-02-2 | ac | gap | STORY-01-02 |  |  | no test carries this code", text)
         self.assertIn("| qa:e2e | qa | gap | STORY-02-01 |  | qa:e2e |", text)
         self.assertNotIn("| verified |", text)
 
@@ -404,7 +404,7 @@ class TestXuatBangGap(LedgerTestCase):
         self.assertNotIn("STORY-01-", text)
 
         self.run_cli("issues", "--status", "reopened", "--out", str(out))
-        self.assertIn("· 1 hành vi", out.read_text(encoding="utf-8"))
+        self.assertIn("· 1 behaviours", out.read_text(encoding="utf-8"))
 
         self.run_cli("issues", "--status", "verified,gap", "--out", str(out))
         self.assertIn("| AC-STORY-01-02-1 | ac | verified |", out.read_text(encoding="utf-8"))
@@ -454,7 +454,7 @@ class TestUngVienChuaLanded(LedgerTestCase):
         led = L.build(self.root)
         self.assertEqual(led.behaviors["AC-STORY-01-01-1"].status, L.GAP)
         self.assertEqual(led.behaviors["FR-1"].status, L.GAP)
-        self.assertIn("chưa landed", led.behaviors["AC-STORY-01-01-1"].source.get("why", ""))
+        self.assertIn("unlanded", led.behaviors["AC-STORY-01-01-1"].source.get("why", ""))
         self.assertEqual(led.summary()["unlanded_green"], 2)
 
     def test_landed_roi_thi_verified_va_do_o_ung_vien_chua_landed_van_tinh(self):

@@ -47,7 +47,7 @@ class VerifyResult:
         if self.unavailable:
             return f"map mockup: ✗ {self.unavailable}"
         if not self.results:
-            return "map mockup: story không dựng màn hình nào"
+            return "map mockup: story does not build any screen"
         return "\n".join(r.summary() for r in self.results)
 
 
@@ -90,14 +90,14 @@ class AppServer:
             # trang trống — chấm sai app, story trượt. Thứ đang trả lời ở cổng
             # này không phải app harness vừa dựng từ worktree của story.
             return (
-                f"cổng {self.base_url} đang có tiến trình khác trả lời "
-                f"({occupant(self.base_url)}) — không phải app của story này; "
-                "dừng nó hoặc đổi `app.base_url`"
+                f"port {self.base_url} is already occupied by another process "
+                f"({occupant(self.base_url)}) — not this story's app; "
+                "stop it or change `app.base_url`"
             )
         if not self.command:
             return (
-                "dự án chưa khai `app.dev_command` nên không mở được ứng dụng "
-                "để đối chiếu với mockup"
+                "project has not declared `app.dev_command` so the app cannot "
+                "be opened for mockup comparison"
             )
 
         import shlex
@@ -112,17 +112,17 @@ class AppServer:
                 start_new_session=True,  # để stop() giết được cả nhóm
             )
         except OSError as e:
-            return f"không chạy được `{self.command}`: {e}"
+            return f"cannot run `{self.command}`: {e}"
 
         deadline = time.time() + self.ready_timeout
         while time.time() < deadline:
             if self.proc.poll() is not None:
                 out = (self.proc.stdout.read() if self.proc.stdout else "")[-500:]
-                return f"dev server thoát sớm (mã {self.proc.returncode}): {out.strip()}"
+                return f"dev server exited early (code {self.proc.returncode}): {out.strip()}"
             if _responds(self.base_url, timeout=2):
                 return ""
             time.sleep(0.5)
-        return f"dev server không phản hồi tại {self.base_url} sau {self.ready_timeout}s"
+        return f"dev server not responding at {self.base_url} after {self.ready_timeout}s"
 
     def stop(self) -> None:
         if self.proc is None:
@@ -163,14 +163,14 @@ def occupant(url: str) -> str:
 
     port = urlparse(url).port
     if not port:
-        return "không rõ"
+        return "unknown"
     try:
         out = subprocess.run(["lsof", "-nP", "-t", "-i", f":{port}"], capture_output=True,
                              text=True, timeout=5).stdout.split()
     except (OSError, subprocess.SubprocessError):
-        return "không rõ"
+        return "unknown"
     if not out:
-        return "không rõ"
+        return "unknown"
     pid = out[0]
     try:
         cwd = subprocess.run(["lsof", "-a", "-d", "cwd", "-p", pid, "-Fn"], capture_output=True,
@@ -274,14 +274,14 @@ def verify_screens(
             )
         out.results.append(result)
         if store:
-            error = got.error if got else "không mở được route"
+            error = got.error if got else "cannot open route"
             if (got is not None and not got.error and screen.components
                     and not result.matched and not getattr(result, "extra", None)):
                 # Không khớp gì và cũng không thừa gì = trang trống. Với route
                 # có tham số, gần như chắc là thiếu bản ghi hạt giống `1`.
-                error = f"trang không dựng component nào tại {urls[screen.id]}"
+                error = f"page rendered no components at {urls[screen.id]}"
                 if concrete_route(screen.route or "/") != (screen.route or "/"):
-                    error += " — route có tham số: môi trường dev cần bản ghi mã `1` (hạt giống)"
+                    error += " — route has params: dev environment needs a record with id `1` (seed data)"
             store.record(story_id, _event(result, error))
     return out
 

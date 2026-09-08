@@ -39,8 +39,8 @@ class TestBangDocLaiDuoc(unittest.TestCase):
 
     def test_bang_neu_ro_opencode_khong_chan_phat_hanh(self):
         md = C.Report(runs=[run("claude", *[True] * len(C.PROBES))]).to_markdown()
-        self.assertIn("không chặn phát hành", md)
-        self.assertIn("bằng chứng", md)
+        self.assertIn("does not block release", md)
+        self.assertIn("evidence", md)
 
 
 class TestDuocPhatHanhKhong(unittest.TestCase):
@@ -53,7 +53,7 @@ class TestDuocPhatHanhKhong(unittest.TestCase):
 
     def test_bang_cu_hon_14_ngay_thi_khong(self):
         ok, why = C.release_ready(self.rep(run("claude", *[True] * len(C.PROBES))), today=date(2026, 9, 25))
-        self.assertFalse(ok); self.assertIn("cũ", why)
+        self.assertFalse(ok); self.assertIn("old", why)
 
     def test_claude_co_o_do_thi_khong(self):
         ok, why = C.release_ready(self.rep(run("claude", True, False, *[True] * (len(C.PROBES) - 2))),
@@ -62,7 +62,7 @@ class TestDuocPhatHanhKhong(unittest.TestCase):
 
     def test_claude_thieu_phep_thi_khong(self):
         ok, why = C.release_ready(self.rep(run("claude", True, True, True)), today=date(2026, 9, 6))
-        self.assertFalse(ok); self.assertIn("thiếu", why)
+        self.assertFalse(ok); self.assertIn("missing", why)
 
     def test_opencode_do_khong_chan(self):
         """Quyết định 2026-09-05: OpenCode hạng hai."""

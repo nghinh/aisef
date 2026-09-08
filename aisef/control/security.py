@@ -73,14 +73,14 @@ class SecurityReport:
 
     def summary(self, severities=DEFAULT_BLOCKING) -> str:
         if self.error:
-            return f"bảo mật: KHÔNG CHẤM ĐƯỢC — {self.error}"
+            return f"security: CANNOT SCORE — {self.error}"
         chan = self.blocking(severities)
         dem = ", ".join(f"{s}={n}" for s, n in self.counts.items() if n)
-        head = "bảo mật: " + ("KHÔNG ĐẠT" if chan else "đạt")
+        head = "security: " + ("FAIL" if chan else "pass")
         if dem:
             head += f" ({dem})"
         if self.filtered:
-            head += f" · {len(self.filtered)} mục bị lọc là nhiễu"
+            head += f" · {len(self.filtered)} items filtered as noise"
         lines = [head] + [f"  ✗ {f.line()}" for f in chan[:5]]
         return "\n".join(lines)
 
@@ -98,12 +98,12 @@ def parse(text: str) -> SecurityReport:
     """
     rep = SecurityReport()
     if text is None:
-        rep.error = "không có kết quả"
+        rep.error = "no results"
         return rep
 
     sach = text.strip()
     if not sach:
-        rep.error = "kết quả rỗng"
+        rep.error = "empty results"
         return rep
 
     for raw in sach.splitlines():
@@ -117,8 +117,8 @@ def parse(text: str) -> SecurityReport:
     if not rep.findings and not rep.filtered:
         # Không mục nào **và** không câu "không có phát hiện" nghĩa là báo
         # cáo sai định dạng — khác hẳn với "đã rà, sạch".
-        if "không có phát hiện" not in sach.lower():
-            rep.error = "báo cáo không theo định dạng đã yêu cầu"
+        if "no findings" not in sach.lower() and "không có phát hiện" not in sach.lower():
+            rep.error = "report does not follow the required format"
     return rep
 
 

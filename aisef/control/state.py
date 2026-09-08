@@ -186,7 +186,7 @@ class StateStore:
                 except BlockingIOError:
                     if time.monotonic() >= deadline:
                         raise LockTimeout(
-                            f"không lấy được khoá {self.lock_path} sau {timeout}s"
+                            f"could not acquire lock {self.lock_path} after {timeout}s"
                         ) from None
                     time.sleep(0.05)
             yield
@@ -325,7 +325,7 @@ class StateStore:
 
             current = rec.state
             if to is not current and to not in ALLOWED[current]:
-                raise TransitionError(f"{story_id}: {current.value} → {to.value} không hợp lệ")
+                raise TransitionError(f"{story_id}: {current.value} → {to.value} is not a valid transition")
 
             if attempts:
                 rec.attempts += attempts

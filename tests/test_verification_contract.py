@@ -132,7 +132,7 @@ class TestCong(unittest.TestCase):
         g = self.gate(["unit", "e2e"])
         m = self.muc(g, "e2e")
         self.assertTrue(m.skipped)
-        self.assertIn("không tính là đạt", m.detail)
+        self.assertIn("does not count as passed", m.detail)
 
     def test_loai_da_chay_va_do_thi_chan(self):
         ev = self.evidence(e2e=(False, {"tail": "3 kịch bản đỏ"}))
@@ -166,9 +166,9 @@ class TestGhiVaoStory(unittest.TestCase):
         from aisef.phases.story_split import render_story
 
         body = render_story(story(screens=["notes-list"]), None)
-        self.assertIn("Xong nghĩa là gì", body)
+        self.assertIn("Definition of Done", body)
         self.assertIn("`accessibility`", body)
-        self.assertIn("không** được tính là đạt", body)
+        self.assertIn("not** counted as passing", body)
 
 
 if __name__ == "__main__":

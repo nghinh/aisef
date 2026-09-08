@@ -57,7 +57,7 @@ class Catalog:
         try:
             raw = json.loads(p.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as e:
-            raise CatalogError(f"không đọc được {p}: {e}") from e
+            raise CatalogError(f"cannot read {p}: {e}") from e
 
         sources = []
         seen: set[str] = set()
@@ -67,17 +67,17 @@ class Catalog:
                 if k not in entry
             ]
             if missing:
-                raise CatalogError(f"nguồn {entry.get('id', '?')} thiếu: {', '.join(missing)}")
+                raise CatalogError(f"source {entry.get('id', '?')} missing fields: {', '.join(missing)}")
             if entry["id"] in seen:
-                raise CatalogError(f"nguồn trùng id: {entry['id']}")
+                raise CatalogError(f"duplicate source id: {entry['id']}")
             seen.add(entry["id"])
 
             if not entry["commit"] or len(entry["commit"]) < 7:
-                raise CatalogError(f"nguồn {entry['id']} phải ghim commit cụ thể")
+                raise CatalogError(f"source {entry['id']} must pin a specific commit")
 
             if entry.get("license") is None and entry["redistribute"]:
                 raise CatalogError(
-                    f"nguồn {entry['id']} không có license nhưng đặt redistribute=true"
+                    f"source {entry['id']} has no license but sets redistribute=true"
                 )
 
             sources.append(
@@ -97,14 +97,14 @@ class Catalog:
                 )
             )
         if not sources:
-            raise CatalogError("sổ đăng ký rỗng")
+            raise CatalogError("catalog is empty")
         return cls(sources)
 
     def by_id(self, source_id: str) -> Source:
         for s in self.sources:
             if s.id == source_id:
                 return s
-        raise KeyError(f"không có nguồn: {source_id}")
+        raise KeyError(f"source not found: {source_id}")
 
     def installable(self) -> list[Source]:
         return [s for s in self.sources if s.installable]
@@ -118,5 +118,5 @@ class Catalog:
         for s in self.sources:
             for root in s.roots(references_root):
                 if not root.is_dir():
-                    problems.append(f"{s.id}: không có {root}")
+                    problems.append(f"{s.id}: not found {root}")
         return problems
