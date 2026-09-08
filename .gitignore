@@ -27,3 +27,9 @@ spike/**/package-lock.json
 
 # worktree của subagent (Agent tool)
 .claude/worktrees/
+
+# OpenCode / Serena plugin
+.serena/
+
+# uv lock — not used for this project
+uv.lock

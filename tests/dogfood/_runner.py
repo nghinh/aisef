@@ -34,8 +34,8 @@ def _git(cwd: Path, *args: str) -> str:
     return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True).stdout.strip()
 
 
-def make_project(name: str, *, src: str = "") -> Path:
-    """Chép đầu vào (`src`, mặc định cùng tên), `git init`, commit nền, biên dịch hook Claude (không commit)."""
+def make_project(name: str, *, src: str = "", clients: tuple[str, ...] = ("claude",)) -> Path:
+    """Chép đầu vào (`src`, mặc định cùng tên), `git init`, commit nền, biên dịch hook cho `clients` (không commit)."""
     from aisef.clients.compile import compile_for, write_compile_report
 
     dst = KEEP_DIR / name
@@ -46,8 +46,8 @@ def make_project(name: str, *, src: str = "") -> Path:
     subprocess.run(["git", "config", "user.name", "dogfood"], cwd=dst, check=True)
     subprocess.run(["git", "add", "-A"], cwd=dst, check=True)
     subprocess.run(["git", "commit", "-qm", "nền: đầu vào dogfood"], cwd=dst, check=True)
-    rep = compile_for("claude", dst, aisef_bin=str(ROOT / "bin" / "aisef"))
-    write_compile_report(dst, [rep])
+    reps = [compile_for(c, dst, aisef_bin=str(ROOT / "bin" / "aisef")) for c in clients]
+    write_compile_report(dst, reps)
     return dst
 
 

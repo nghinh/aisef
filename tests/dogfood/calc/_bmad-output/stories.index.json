@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "epics": [
+    {
+      "id": "EPIC-01",
+      "title": "Expression evaluator"
+    }
+  ],
+  "stories": [
+    {
+      "id": "STORY-01-01",
+      "epic_id": "EPIC-01",
+      "title": "Tokenizer",
+      "as_a": "developer",
+      "i_want": "call tokenize(expr)",
+      "so_that": "I get a list of typed tokens",
+      "acceptance_criteria": [
+        "Given '2 + 3', When tokenize, Then returns [NUMBER(2), PLUS, NUMBER(3)]",
+        "Given '(1.5 + 2) * 3', When tokenize, Then handles decimals and parens",
+        "Given '', When tokenize, Then returns empty list"
+      ],
+      "covers": ["FR-3"],
+      "write_scope": ["src/calc.py", "src/test_calc.py"],
+      "depends_on": [],
+      "screens": [],
+      "verification_contract": ["unit"],
+      "file": "stories/STORY-01-01.md"
+    },
+    {
+      "id": "STORY-01-02",
+      "epic_id": "EPIC-01",
+      "title": "Parser and evaluator",
+      "as_a": "developer",
+      "i_want": "call evaluate(expr)",
+      "so_that": "I get the numeric result",
+      "acceptance_criteria": [
+        "Given '2 + 3 * 4', When evaluate, Then returns 14.0 (precedence correct)",
+        "Given '(2 + 3) * 4', When evaluate, Then returns 20.0",
+        "Given '2 ** 3', When evaluate, Then returns 8.0",
+        "Given '1 / 0', When evaluate, Then raises CalcError"
+      ],
+      "covers": ["FR-1", "FR-2"],
+      "write_scope": ["src/calc.py", "src/test_calc.py"],
+      "depends_on": ["STORY-01-01"],
+      "screens": [],
+      "verification_contract": ["unit"],
+      "file": "stories/STORY-01-02.md"
+    },
+    {
+      "id": "STORY-01-03",
+      "epic_id": "EPIC-01",
+      "title": "Edge cases and safety",
+      "as_a": "developer",
+      "i_want": "safe evaluation of untrusted input",
+      "so_that": "no code injection is possible",
+      "acceptance_criteria": [
+        "Given '__import__(\"os\")', When evaluate, Then raises CalcError",
+        "Given 'a' * 1001 characters, When evaluate, Then raises CalcError (input too long)",
+        "Given '-3 + 2', When evaluate, Then returns -1.0 (unary minus)"
+      ],
+      "covers": ["NFR-1", "NFR-2"],
+      "write_scope": ["src/calc.py", "src/test_calc.py"],
+      "depends_on": ["STORY-01-02"],
+      "screens": [],
+      "verification_contract": ["unit"],
+      "file": "stories/STORY-01-03.md"
+    }
+  ],
+  "waves": {
+    "EPIC-01": [
+      ["STORY-01-01"],
+      ["STORY-01-02"],
+      ["STORY-01-03"]
+    ]
+  }
+}
