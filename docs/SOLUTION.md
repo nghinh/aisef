@@ -51,13 +51,13 @@ OpenCode còn có `serve` (server headless) + `attach`/`web` — nhiều client 
 | Năng lực cần | Claude Code 2.1.236 | OpenCode | Kết luận |
 |---|---|---|---|
 | Chạy headless | `-p / --print` | `run`, `serve` | ✅ |
-| Đọc kết quả máy | `--output-format stream-json` | `export <sessionID>` | ✅ |
+| Đọc kết quả máy | `--output-format stream-json` | `--format json` (đo 2026-09-05) | ✅ |
 | Nạp hook | `--settings <file\|json>` | `plugin` | ✅ |
 | Custom agent | `--agents <json>` | `agent` | ✅ |
 | Giới hạn tool | `--allowed-tools` / `--disallowed-tools` | permission config | ✅ |
 | **Giới hạn thư mục** | `--add-dir` | — | ✅ Claude; OpenCode dùng guard |
 | Định tuyến model | `--model` | `models` | ✅ |
-| **Cost / token** | usage trong stream-json | **`stats`** | ✅ |
+| **Cost / token** | usage trong stream-json | `step_finish` trong `--format json` (đo 2026-09-05) | ✅ |
 | Phiên, resume | `--session-id`, `--resume` | `session` | ✅ |
 | Giới hạn vòng lặp | `--max-turns` | — | ✅ Claude; OpenCode dùng timeout |
 | **Cách ly cấu hình máy** | `--permission-mode acceptEdits` + `--allowed-tools` kê tường minh + `--setting-sources project,local` + `--strict-mcp-config` | plugin dự án — chưa đo | ✅ Claude, đo 2026-09-05: `defaultMode: auto` toàn cục làm phiên con **mất Glob/Grep** và ghi bằng Bash heredoc né guard `Write\|Edit`; MCP + hook người dùng lọt vào. Sau cờ: Glob có, MCP 0, hook người dùng 0, guard vẫn chặn |
@@ -483,18 +483,17 @@ cho trạng thái lệch nhau.
 **Quyết định (2026-09-05, thay quyết định 2026-09-04): OpenCode là client hạng hai trong V1.**
 Phép thử trên agent thật (opencode 1.18.26) đã chứng minh plugin **chặn tại
 nguồn** cho cả tool bash lẫn tool ghi tệp — nên hàng "hậu kiểm" ở bảng trên
-không còn đúng cho guard. Cái còn thiếu là **quan sát**: OpenCode không phát
-luồng sự kiện có cấu trúc, nên chi phí, số lượt và giới hạn lượt không đo
-được từ harness (`turn_limit: unsupported`, `machine_output` chưa chứng
-minh). Hệ quả:
+không còn đúng cho guard. `--format json` (đo 2026-09-05, v0.5.0) phát luồng
+sự kiện `step_finish` với token và cost — `machine_output: NATIVE`. Cái còn
+thiếu: `turn_limit: unsupported` (OpenCode không có cờ giới hạn lượt). Hệ quả:
 
 * OpenCode chạy được trọn story (STORY-02-01 của `par`, qua bảy cổng, merge
   vào main) và được hỗ trợ — nhưng `compile --client opencode` ghi rõ "hạng
-  hai V1: chi phí/lượt không đo được";
+  hai V1: giới hạn lượt không có";
 * hợp quy client (`docs/CONFORMANCE.md`) chạy cả hai client, nhưng **điều
   kiện phát hành chỉ đọc cột Claude**; OpenCode không chặn phát hành;
-* nâng hạng nhất sau release, khi `--format json` được chứng minh và bộ hợp
-  quy hook chạy ổn định qua nhiều phiên bản.
+* nâng hạng nhất sau release khi bộ hợp quy hook chạy ổn định qua nhiều
+  phiên bản.
 
 **Phạm vi V1:** 4 bề mặt của Claude Code và OpenCode (mục 2.1). Antigravity hoãn — chưa test được.
 
