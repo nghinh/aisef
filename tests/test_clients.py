@@ -6,10 +6,12 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from aisef.clients import base  # noqa: E402
 from aisef.clients.base import Capability, RunSpec, Support  # noqa: E402
 from aisef.clients.claude_code import ClaudeCodeAdapter  # noqa: E402
 from aisef.clients.opencode import OpenCodeAdapter  # noqa: E402
@@ -488,3 +490,26 @@ class TestLoiNhaCungCapPhaiNoiRa(unittest.TestCase):
         r.ok = False
         self.assertEqual(exit_status_of(r), "infra",
                          "400 vẫn là api_error_status — phân biệt sâu hơn là việc của bản sau")
+
+
+class TestSplitCommand(unittest.TestCase):
+    """Windows paths are backslashes; POSIX shlex ate them (bug 54)."""
+
+    def test_posix_unchanged(self):
+        with mock.patch.object(base.sys, "platform", "linux"):
+            self.assertEqual(base.split_command("npm run lint"), ["npm", "run", "lint"])
+            self.assertEqual(base.split_command("py -c 'a b'"), ["py", "-c", "a b"])
+
+    def test_windows_keeps_backslashes(self):
+        with mock.patch.object(base.sys, "platform", "win32"):
+            self.assertEqual(
+                base.split_command(r"C:\hostedtoolcache\Python\python.exe -c x"),
+                [r"C:\hostedtoolcache\Python\python.exe", "-c", "x"],
+            )
+
+    def test_windows_groups_with_double_quotes_only(self):
+        with mock.patch.object(base.sys, "platform", "win32"):
+            self.assertEqual(
+                base.split_command(r'"C:\Program Files\node\npm.cmd" run "my test"'),
+                [r"C:\Program Files\node\npm.cmd", "run", "my test"],
+            )

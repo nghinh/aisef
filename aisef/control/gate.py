@@ -44,7 +44,7 @@ from .tdd import red_before_green
 from .security import DEFAULT_BLOCKING
 from ..harness.observe import FILE_CHANGE, GUARD_BLOCK, GUARD_SEEN, MOCKUP_MAP, NOTE, TOOL_RUN, Event, Evidence
 from ..harness.testlog import MAX_IDS
-from ..harness.tools import BASELINE_RUN, NOP_RUN
+from ..harness.tools import BASELINE_RUN, NO_PROJECT, NOP_RUN
 
 #: Story gate check names — **closed** list (ADR-005 V9). Every `Check(...)` in
 #: this file must use a name from here (test meta grep AST), and each name has
@@ -248,6 +248,10 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
     if base_ev.detail.get("skipped"):
         return Check(name, Outcome.UNCONFIGURED, f"no baseline: {base_ev.detail['skipped']}", evidence=seqs)
     if base_ev.detail.get("unrunnable"):
+        if str(base_ev.detail["unrunnable"]).startswith(NO_PROJECT):
+            return Check(name, Outcome.NOT_APPLICABLE,
+                         "no project at the baseline commit — there were no tests to regress",
+                         evidence=seqs)
         return Check(name, Outcome.UNRUNNABLE,
                      f"baseline unrunnable ({base_ev.detail['unrunnable']}) — cannot compare existing tests",
                      evidence=seqs)
@@ -416,6 +420,13 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
             return check_result(Outcome.NOT_APPLICABLE, "story did not add/modify test files")
         return check_result(Outcome.UNCONFIGURED, f"no nop: {d['skipped']}")
     if d.get("unrunnable") and not d.get("test_format"):
+        # The parent SHA having no project at all is not a broken environment:
+        # it is the strongest form of the answer this control asks for. A
+        # greenfield project's first story creates the manifest, so the tests
+        # provably cannot have been green before it.
+        if str(d["unrunnable"]).startswith(NO_PROJECT):
+            return check_result(True, f"parent SHA {str(d.get('parent') or '')[:7] or 'cha'} has no project yet — "
+                                      "the story's tests cannot have been green there")
         return check_result(Outcome.UNRUNNABLE,
                      f"nop at parent SHA unrunnable ({d['unrunnable']}) — cannot compare")
     parent = str(d.get("parent") or "")[:7] or "cha"

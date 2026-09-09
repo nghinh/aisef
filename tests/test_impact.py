@@ -252,14 +252,14 @@ class TestReviewerNhanDuoc(unittest.TestCase):
 
 
 class TestShellInjectionRegression(unittest.TestCase):
-    """Regression: _run_command must use shlex.split, never shell=True."""
+    """Regression: _run_command must split into argv, never shell=True."""
 
-    def test_run_command_uses_shlex_split(self):
+    def test_run_command_splits_into_argv(self):
         import inspect
         from aisef.control.impact import _run_command
         src = inspect.getsource(_run_command)
         self.assertNotIn("shell=True", src)
-        self.assertIn("shlex.split", src)
+        self.assertIn("split_command", src)  # POSIX shlex.split eats Windows path separators
 
 
 if __name__ == "__main__":

@@ -22,12 +22,12 @@ the wrong time.
 from __future__ import annotations
 
 import json
-import shlex
 import shutil
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from ..clients.base import quote_command, split_command
 from ..config import Config
 from . import sandbox
 from .guardrails import scrub_secrets
@@ -214,7 +214,7 @@ def run_tool(
         record(res, story_id, artifact_root, candidate)
         return res
 
-    argv = shlex.split(command) + (extra_args or [])
+    argv = split_command(command) + (extra_args or [])
     if artifact_root:
         from .runlog import run_log
         run_log(artifact_root, f"tool={name} RUN cmd={command}")
@@ -276,6 +276,23 @@ MISSING_TOOL = (
 )
 
 
+#: Manifests whose absence means **the project is not here**, not that the
+#: tool is missing. npm's `ENOENT ... package.json` matches "no such file or
+#: directory" and was reported as "npm not installed" — on a machine where npm
+#: had just run the same suite minutes earlier. It matters because the nop
+#: control deliberately runs at the parent SHA, where a greenfield project's
+#: first story has not created the manifest yet: read as "tool missing" that
+#: is an environment failure the agent cannot fix, and the first story of every
+#: new project failed the gate forever (measured 2026-09-09 on `todo-e2e`).
+MANIFESTS = (
+    "package.json", "pyproject.toml", "setup.py", "requirements.txt",
+    "cargo.toml", "go.mod", "pom.xml", "build.gradle", "gemfile", "composer.json",
+)
+
+#: Stable prefix of that reason, so callers can tell it from a missing tool.
+NO_PROJECT = "no project at this commit"
+
+
 def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error: str = "") -> str:
     """One-line reason if the run is "unrunnable"; "" if it is a real result.
     For `test`, only conclude unrunnable when **no test passed** — a failing
@@ -292,6 +309,8 @@ def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error:
         from .testlog import parse as parse_testlog
         if parse_testlog(output).passed:
             return ""
+    if hit == "no such file or directory" and any(m in low for m in MANIFESTS):
+        return f"{NO_PROJECT} — the tree has no project manifest, so there is nothing to run"
     return f"tool not installed or cannot load ({hit or 'exit 127'}) — set up the environment or fix the command and retry"
 
 
@@ -396,7 +415,7 @@ def aisef_command() -> str:
     pytest manually, and that run will not be recorded as evidence. Prefer
     the name on PATH; if absent, use the absolute path from this repo.
     """
-    return " ".join(shlex.quote(p) for p in aisef_argv())
+    return quote_command(aisef_argv())
 
 
 def describe_tools(project: Path | str, config: Config | None = None) -> str:

@@ -304,12 +304,17 @@ class TestDescription(ToolTestCase):
         import os
         import shutil
 
+        from aisef.clients.base import split_command
+
         binary = aisef_command()
-        if binary != "aisef":
-            self.assertTrue(os.path.isfile(binary), binary)
-            self.assertTrue(os.access(binary, os.X_OK), binary)
-        else:
+        program, *rest = split_command(binary)
+        if program == "aisef":
             self.assertTrue(shutil.which("aisef"))
+        elif rest[:1] == ["-m"]:
+            self.assertEqual(program, sys.executable)  # last resort: this interpreter
+        else:
+            self.assertTrue(os.path.isfile(program), program)
+            self.assertTrue(os.access(program, os.X_OK), program)
         self.assertIn(binary, describe_tools(self.project, self.cfg))
 
     def test_prompt_table_shows_the_real_command(self):
@@ -402,3 +407,32 @@ class TestCheBiMatVaLogToanVan(ToolTestCase):
         res = ToolResult(name="test", ok=True, stdout="\n".join(map(str, range(30))))
         path = record(res, "S-01", self.artifacts, name=BASELINE_RUN)
         self.assertEqual(Path(path).name, "S-01-test-baseline-1.log")
+
+
+class TestThieuDuAnKhacThieuCongCu(unittest.TestCase):
+    """Lỗi 54: npm báo ENOENT vì **thiếu package.json**, không phải thiếu npm.
+    Chuỗi "no such file or directory" khớp MISSING_TOOL nên harness kết luận
+    "tool not installed" trên đúng cái máy vừa chạy bộ test đó."""
+
+    NPM_ENOENT = (
+        "npm error code ENOENT\nnpm error syscall open\n"
+        "npm error path /w/package.json\n"
+        "npm error enoent Could not read package.json: Error: ENOENT: "
+        "no such file or directory, open '/w/package.json'"
+    )
+
+    def test_thieu_manifest_la_khong_co_du_an(self):
+        from aisef.harness.tools import NO_PROJECT, unrunnable_reason
+        self.assertTrue(unrunnable_reason("test", 254, self.NPM_ENOENT).startswith(NO_PROJECT))
+
+    def test_thieu_cong_cu_van_la_thieu_cong_cu(self):
+        from aisef.harness.tools import unrunnable_reason
+        for out, code in (("npm: command not found", 127),
+                          ("sh: vitest: not found\nsee package.json for scripts", 127)):
+            with self.subTest(out=out):
+                self.assertIn("tool not installed", unrunnable_reason("test", code, out))
+
+    def test_test_that_ra_ket_qua_van_khong_phai_unrunnable(self):
+        from aisef.harness.tools import unrunnable_reason
+        out = "tests/a.py::test_x PASSED\nno such file or directory: package.json"
+        self.assertEqual(unrunnable_reason("test", 1, out), "")

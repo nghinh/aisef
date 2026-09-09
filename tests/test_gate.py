@@ -515,6 +515,48 @@ class TestKhongLamDoTestCoSan(GateTestCase):
         self.assertIs(self.muc(self.gate(candidate="aaa")).outcome, Outcome.PASSED)
 
 
+class TestDuAnMoiTinh(GateTestCase):
+    """Lỗi 54: story **đầu tiên** của một dự án trống không bao giờ qua cổng.
+
+    Ở SHA cha chưa có `package.json` — chính story này tạo ra nó — nên `npm
+    test` thoát 254 với ENOENT. Chuỗi "no such file or directory" khớp bảng
+    MISSING_TOOL, harness kết luận "tool not installed", cổng đọc thành
+    UNRUNNABLE và chặn. Đo trên `todo-e2e` 2026-09-09: npm vừa chạy xong bộ
+    test đó ba phút trước.
+    """
+
+    KHONG_DU_AN = ("no project at this commit — the tree has no project "
+                   "manifest, so there is nothing to run")
+
+    def muc(self, ten, **kw):
+        g = self.gate(candidate="aaa", **kw)
+        return next(c for c in g.checks if c.name == ten)
+
+    def test_cha_khong_co_du_an_thi_nop_la_dat(self):
+        self.store.file_change("S-01", "src/a.py")
+        EvidenceStore(self._tmp.name, candidate="aaa").tool_run("S-01", "test", ok=True)
+        EvidenceStore(self._tmp.name, candidate="aaa").tool_run(
+            "S-01", "test:nop", ok=False,
+            detail={"nop": True, "parent": "cha0000", "files": ["tests/a.py"],
+                    "unrunnable": self.KHONG_DU_AN})
+        m = self.muc("tests verify story", acceptance=1)
+        self.assertIs(m.outcome, Outcome.PASSED, m.detail)
+        self.assertIn("no project yet", m.detail)
+
+    def test_baseline_khong_co_du_an_thi_khong_ap_dung(self):
+        self.store.tool_run("S-01", "test:baseline", ok=False, detail={
+            "baseline": True, "unrunnable": self.KHONG_DU_AN})
+        m = self.muc("no baseline regression")
+        self.assertIs(m.outcome, Outcome.NOT_APPLICABLE, m.detail)
+
+    def test_thieu_cong_cu_that_van_chan(self):
+        """Đối chứng: `npm: command not found` vẫn là môi trường hỏng."""
+        thieu = "tool not installed or cannot load (command not found) — set up the environment"
+        self.store.tool_run("S-01", "test:baseline", ok=False, detail={
+            "baseline": True, "unrunnable": thieu})
+        self.assertIs(self.muc("no baseline regression").outcome, Outcome.UNRUNNABLE)
+
+
 class TestTestCoKiemDuocStory(GateTestCase):
     """ADR-005 V3 nop control: test mang mã tiêu chí phải **đỏ khi không có mã
     của story**. Cấp 1 ($0) so với `test:baseline`; cấp 2 đọc `test:nop` —

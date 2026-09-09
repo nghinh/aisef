@@ -28,7 +28,7 @@ from pathlib import Path
 from urllib.parse import urljoin
 
 from ..config import Config
-from ..clients.base import runnable
+from ..clients.base import runnable, split_command
 from ..control.design_contract import DesignContract
 from . import browser
 from .aria import MapResult, compare, parse_aria_snapshot
@@ -101,11 +101,9 @@ class AppServer:
                 "be opened for mockup comparison"
             )
 
-        import shlex
-
         try:
             self.proc = subprocess.Popen(
-                runnable(shlex.split(self.command)),
+                runnable(split_command(self.command)),
                 cwd=self.cwd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,

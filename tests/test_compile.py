@@ -278,27 +278,38 @@ class TestCompileReport(CompileTestCase):
 
 
 class TestGuardCommandInjection(CompileTestCase):
-    """Regression: _guard_command must quote paths to prevent shell injection."""
+    """The hook command is a **string** a shell will split. Whatever the path
+    contains, that shell must hand the guard back exactly the argv we meant —
+    not a second argument, and not a second command."""
+
+    def _argv(self, aisef_bin, project: str) -> list[str]:
+        from aisef.clients.base import split_command
+        from aisef.clients.compile import _guard_command
+        return split_command(_guard_command(aisef_bin, Path(project), "write-scope"))
+
+    def _expect(self, aisef_bin, project: str) -> list[str]:
+        binary = [aisef_bin] if isinstance(aisef_bin, str) else list(aisef_bin)
+        return [*binary, "--project", str(Path(project)), "guard", "write-scope"]
 
     def test_space_in_project_path(self):
-        from aisef.clients.compile import _guard_command
-        cmd = _guard_command("aisef", Path("/tmp/my project"), "write-scope")
-        self.assertIn("'/tmp/my project'", cmd)
+        self.assertEqual(self._argv("aisef", "/tmp/my project"),
+                         self._expect("aisef", "/tmp/my project"))
 
     def test_quote_in_project_path(self):
-        from aisef.clients.compile import _guard_command
-        cmd = _guard_command("aisef", Path("/tmp/it's here"), "write-scope")
-        self.assertNotIn("it's", cmd.replace("'\"'\"'", ""))
+        self.assertEqual(self._argv("aisef", "/tmp/it's here"),
+                         self._expect("aisef", "/tmp/it's here"))
 
     def test_shell_metachar_in_project_path(self):
         from aisef.clients.compile import _guard_command
-        cmd = _guard_command("aisef", Path("/tmp/$(whoami)"), "write-scope")
-        self.assertIn("'", cmd)
+        raw = _guard_command("aisef", Path("/tmp/$(whoami)"), "write-scope")
+        # Quoted, not merely present: bare, the shell would run `whoami`.
+        self.assertNotIn(f" {Path('/tmp/$(whoami)')} ", raw)
+        self.assertEqual(self._argv("aisef", "/tmp/$(whoami)"),
+                         self._expect("aisef", "/tmp/$(whoami)"))
 
     def test_space_in_aisef_bin(self):
-        from aisef.clients.compile import _guard_command
-        cmd = _guard_command("/opt/my tools/aisef", Path("/tmp/p"), "write-scope")
-        self.assertIn("'/opt/my tools/aisef'", cmd)
+        self.assertEqual(self._argv("/opt/my tools/aisef", "/tmp/p"),
+                         self._expect("/opt/my tools/aisef", "/tmp/p"))
 
 
 if __name__ == "__main__":

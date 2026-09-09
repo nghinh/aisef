@@ -23,6 +23,7 @@ import shlex
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
+from ..clients.base import split_command
 from .observe import TOOL_RUN
 
 ENV_WRITE_SCOPE = "AISEF_WRITE_SCOPE"
@@ -979,6 +980,6 @@ GUARD_MATCHERS: dict[str, tuple[str, str]] = {
 def parse_command(command: str) -> list[str]:
     """Safely split a shell command; returns empty if unparseable."""
     try:
-        return shlex.split(command)
+        return split_command(command)
     except ValueError:
         return []

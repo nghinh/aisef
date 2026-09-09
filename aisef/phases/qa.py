@@ -28,6 +28,7 @@ from contextlib import ExitStack
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from ..clients.base import split_command
 from ..control.outcome import DEFAULT_REASON, Outcome
 from ..control.worktree import GitError, WorktreeManager
 from ..config import Config
@@ -428,7 +429,7 @@ def run_suite(
             sb = sandbox.run(
                 sandbox.SandboxSpec(
                     workspace=cay,
-                    cmd=shlex.split(command),
+                    cmd=split_command(command),
                     level=kind.level,
                     image=image_for(project, cfg),
                     timeout_seconds=cfg["run.timeout_seconds"],

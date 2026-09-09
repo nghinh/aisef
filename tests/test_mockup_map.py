@@ -284,7 +284,7 @@ class TestAppServer(unittest.TestCase):
         self.assertEqual(s.url_for("/"), "http://x:3000/")
 
     def test_dev_server_that_dies_is_reported(self):
-        s = AppServer(f"{sys.executable} -c 'raise SystemExit(3)'",
+        s = AppServer(f'"{sys.executable}" -c "raise SystemExit(3)"',
                       f"http://127.0.0.1:{_free_port()}", cwd=Path("."), ready_timeout=10)
         why = s.start()
         s.stop()

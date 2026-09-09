@@ -42,6 +42,7 @@ import subprocess
 from collections import defaultdict
 from pathlib import Path
 
+from ..clients.base import split_command
 from ..control.impact import _EXPORTS, SOURCE_EXT, _rel_files, is_test_path, refs, symbols, weights
 
 #: Aider `to_tree` truncates at 100 chars/line — enough to read signatures, not enough to copy bodies.
@@ -286,7 +287,7 @@ def _imports(project: Path, rel: str) -> list[str]:
 def _run_provider(project: Path, seeds: list[str], budget: int, command: str, timeout: int) -> str | None:
     try:
         proc = subprocess.run(
-            shlex.split(command), cwd=project, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout,
+            split_command(command), cwd=project, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout,
             input=json.dumps({"project": str(project), "seeds": seeds, "budget": budget}),
         )
     except (OSError, subprocess.TimeoutExpired):
