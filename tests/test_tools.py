@@ -214,11 +214,22 @@ class TestLenhGoiFramework(unittest.TestCase):
         with mock.patch("shutil.which", return_value="/usr/local/bin/aisef"):
             self.assertEqual(aisef_command(), "aisef")
 
+    @unittest.skipIf(sys.platform == "win32",
+                     "bin/aisef là script POSIX; Windows đi thẳng xuống python -m")
     def test_khong_co_tren_path_thi_dung_bin_cua_kho(self):
         with mock.patch("shutil.which", return_value=None):
             got = aisef_command()
         self.assertTrue(got.endswith("bin/aisef"), got)
         self.assertTrue(Path(got).is_file(), "đường dẫn trả về phải tồn tại")
+
+    def test_windows_khong_dung_script_posix(self):
+        """Lỗi 49. `bin/aisef` là script shell: có mặt trong bản kho trên **mọi**
+        HĐH, nhưng Windows không chạy được — `is_file()` nói có, `CreateProcess`
+        nói không, và hook được ghi trỏ vào thứ không chạy nổi (đúng hình dạng
+        lỗi 31, ở nền tảng bên kia)."""
+        with mock.patch("shutil.which", return_value=None), \
+             mock.patch("aisef.harness.tools.sys.platform", "win32"):
+            self.assertEqual(aisef_argv(), [sys.executable, "-m", "aisef.cli"])
 
     def test_ban_cai_tu_wheel_lui_ve_python_m(self):
         """Wheel không mang `bin/`. Trước 0.2.0 chỗ này trả `<site-packages>/bin/aisef`

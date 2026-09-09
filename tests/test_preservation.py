@@ -44,7 +44,7 @@ from test_implement import ScriptedClient  # noqa: E402
 #: kịch bản này in nó vô điều kiện và story B trượt cổng vì đúng lý do ấy.
 RUN_TESTS = """import sys
 from pathlib import Path
-a = Path("src/a.py").read_text() if Path("src/a.py").is_file() else ""
+a = Path("src/a.py").read_text(encoding="utf-8") if Path("src/a.py").is_file() else ""
 ok = a.strip() == "x = 1"
 print("tests/test_a.py::test_AC_STORY_01_01_1 " + ("PASSED" if ok else "FAILED"))
 if Path("src/b.py").is_file():

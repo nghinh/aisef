@@ -88,7 +88,12 @@ class DeployTestCase(unittest.TestCase):
         store = ApprovalStore(self.artifacts)
         for gate in GATE_ARTIFACTS:
             for name in GATE_ARTIFACTS[gate]:
-                path = self.artifacts / name
+                # A gate may declare a **pattern** (`LOOP-REPORT-*.md`); write
+                # a file the pattern matches, not the pattern itself. `*` is a
+                # legal filename character on POSIX and an illegal one on
+                # Windows, where creating it raises `OSError [Errno 22]` — 22
+                # of the 48 failures in the first Windows CI run were this.
+                path = self.artifacts / name.replace("*", "1")
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text("nội dung\n", encoding="utf-8")
             if gate is not Gate.PRE_DEPLOY:

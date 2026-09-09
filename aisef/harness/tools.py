@@ -376,8 +376,12 @@ def aisef_argv() -> list[str]:
     # `<site-packages>/bin/aisef`, a non-existent path, and the compile hook
     # silently ran no guards (measured 2026-09-06 on a clean venv). Check
     # existence before returning.
+    # `bin/aisef` is a POSIX shell script. It exists in a source checkout on
+    # every OS, but Windows cannot execute it — `is_file()` says yes and
+    # `CreateProcess` says no, which is how a hook gets written pointing at
+    # something that cannot run (bug 31's shape, on the other platform).
     trong_kho = Path(__file__).resolve().parent.parent.parent / "bin" / "aisef"
-    if trong_kho.is_file():
+    if trong_kho.is_file() and sys.platform != "win32":
         return [str(trong_kho)]
     # Always works with an installed package, even when venv is not on the
     # agent session's PATH: the running interpreter itself + module.

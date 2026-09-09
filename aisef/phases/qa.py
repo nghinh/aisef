@@ -277,7 +277,11 @@ def find_fake_tests(project: Path | str, files: list[str] | None = None) -> list
             continue
         text = path.read_text(encoding="utf-8", errors="replace")
         if _TEST_FUNC.search(text) and not _ASSERTION.search(text):
-            out.append(str(path.relative_to(project)))
+            # `/` always. `relative_to` yields the native form, and every
+            # consumer — evidence, the gate, git output it is compared with —
+            # speaks `/`. On Windows this returned `tests\\test_a.py` and
+            # matched nothing.
+            out.append(path.relative_to(project).as_posix())
     return out
 
 

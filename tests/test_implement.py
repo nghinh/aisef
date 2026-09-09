@@ -695,7 +695,7 @@ class TestCachLyThanCay(ImplementTestCase):
         def run(self, spec: RunSpec) -> RunResult:
             tep = self.project / "len-thang-trunk.py"
             if not tep.exists():          # chỉ phiên lập trình mới commit
-                tep.write_text("x = 1\n")
+                tep.write_text("x = 1\n", encoding="utf-8")
                 for cmd in (["git", "add", "len-thang-trunk.py"],
                             ["git", "commit", "-q", "-m", "lạc"]):
                     subprocess.run(cmd, cwd=self.project, check=True)
@@ -855,14 +855,14 @@ class TestNguoiRaSoatKhongDuocSuaCay(ImplementTestCase):
             r = super().run(spec)
             dau = spec.prompt.lstrip().splitlines()[0]
             if dau.startswith("# Review") and not dau.startswith("# Security review"):
-                (Path(spec.workdir) / "src" / "reviewer-da-ghi.py").write_text("x\n")
+                (Path(spec.workdir) / "src" / "reviewer-da-ghi.py").write_text("x\n", encoding="utf-8")
             return r
 
     class SecurityGhi(ScriptedClient):
         def run(self, spec):
             r = super().run(spec)
             if spec.prompt.lstrip().startswith("# Security review"):
-                (Path(spec.workdir) / "src" / "a.py").write_text("bi sua\n")
+                (Path(spec.workdir) / "src" / "a.py").write_text("bi sua\n", encoding="utf-8")
             return r
 
     def _init_git(self):
@@ -882,7 +882,7 @@ class TestNguoiRaSoatKhongDuocSuaCay(ImplementTestCase):
         self._init_git()
         out = self.implement(self.SecurityGhi())
         # src/a.py do developer giả viết ("x = 1"); security sửa → phải về như cũ
-        self.assertEqual((self.project / "src" / "a.py").read_text(), "x = 1\n")
+        self.assertEqual((self.project / "src" / "a.py").read_text(encoding="utf-8"), "x = 1\n")
         self.assertIn("modified the working tree", out.attempts[-1].security.error)
 
     def test_reviewer_ngoan_khong_bi_dung(self):

@@ -132,7 +132,7 @@ class TestDashboardGeneration(unittest.TestCase):
             rc = cmd_dashboard(args)
         self.assertEqual(rc, 0)
         self.assertTrue(out.exists())
-        self.assertIn("<!DOCTYPE html>", out.read_text())
+        self.assertIn("<!DOCTYPE html>", out.read_text(encoding="utf-8"))
 
     def test_cmd_dashboard_no_evidence_returns_not_ready(self):
         from types import SimpleNamespace
@@ -214,7 +214,7 @@ class TestMultiProjectDashboard(unittest.TestCase):
         with patch("aisef.cli.dashboard._artifact_root", return_value=self.proj_a):
             rc = cmd_dashboard(args)
         self.assertEqual(rc, 0)
-        content = out.read_text()
+        content = out.read_text(encoding="utf-8")
         self.assertIn("proj-a", content)
         self.assertIn("proj-b", content)
         self.assertIn("Project summary", content)

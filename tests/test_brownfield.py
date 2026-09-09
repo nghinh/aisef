@@ -20,7 +20,7 @@ class TestBrownfieldDetect(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)
             for i in range(3):
-                (p / f"mod{i}.py").write_text(f"x = {i}\n")
+                (p / f"mod{i}.py").write_text(f"x = {i}\n", encoding="utf-8")
             sig = detect(p)
             self.assertEqual(sig.source_files, 3)
             self.assertTrue(sig.is_brownfield)
@@ -31,10 +31,10 @@ class TestBrownfieldDetect(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)
             (p / ".git").mkdir()
-            (p / ".git" / "config.py").write_text("x = 1\n")
+            (p / ".git" / "config.py").write_text("x = 1\n", encoding="utf-8")
             (p / "node_modules").mkdir()
-            (p / "node_modules" / "lib.js").write_text("export default 1;\n")
-            (p / "real.py").write_text("x = 1\n")
+            (p / "node_modules" / "lib.js").write_text("export default 1;\n", encoding="utf-8")
+            (p / "real.py").write_text("x = 1\n", encoding="utf-8")
             sig = detect(p)
             self.assertEqual(sig.source_files, 1)
 
@@ -42,7 +42,7 @@ class TestBrownfieldDetect(unittest.TestCase):
         from aisef.codebase.detect import detect
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)
-            (p / "pyproject.toml").write_text("[project]\n")
+            (p / "pyproject.toml").write_text("[project]\n", encoding="utf-8")
             sig = detect(p)
             self.assertGreaterEqual(len(sig.config_files), 1)
             self.assertIn("pip", sig.package_managers)
@@ -70,8 +70,8 @@ class TestBasicProvider(unittest.TestCase):
         from aisef.codebase.basic import BasicProvider
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)
-            (p / "a.py").write_text("import b\n")
-            (p / "b.py").write_text("x = 1\n")
+            (p / "a.py").write_text("import b\n", encoding="utf-8")
+            (p / "b.py").write_text("x = 1\n", encoding="utf-8")
             prov = BasicProvider()
             r = prov.build(p)
             self.assertGreaterEqual(r.nodes, 2)
@@ -80,9 +80,9 @@ class TestBasicProvider(unittest.TestCase):
         from aisef.codebase.basic import BasicProvider
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)
-            (p / "config.py").write_text("X = 1\n")
-            (p / "main.py").write_text("from config import X\n")
-            (p / "other.py").write_text("y = 2\n")
+            (p / "config.py").write_text("X = 1\n", encoding="utf-8")
+            (p / "main.py").write_text("from config import X\n", encoding="utf-8")
+            (p / "other.py").write_text("y = 2\n", encoding="utf-8")
             prov = BasicProvider()
             r = prov.impact(p, ["config.py"])
             ids = [n.id for n in r.affected]
@@ -94,7 +94,7 @@ class TestBasicProvider(unittest.TestCase):
         from aisef.codebase.basic import BasicProvider
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)
-            (p / "hello.py").write_text("def greet(): pass\n")
+            (p / "hello.py").write_text("def greet(): pass\n", encoding="utf-8")
             prov = BasicProvider()
             r = prov.query(p, "greet")
             self.assertTrue(r.answer)
@@ -135,7 +135,7 @@ class TestBaseline(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)
             for i in range(3):
-                (p / f"mod{i}.py").write_text(f"x = {i}\n")
+                (p / f"mod{i}.py").write_text(f"x = {i}\n", encoding="utf-8")
             out = p / "baseline.md"
             text = build_baseline(p, output=out)
             self.assertTrue(out.is_file())
@@ -146,7 +146,7 @@ class TestBaseline(unittest.TestCase):
         from aisef.codebase.baseline import build_baseline
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)
-            (p / "a.py").write_text("x = 1\n")
+            (p / "a.py").write_text("x = 1\n", encoding="utf-8")
             text = build_baseline(p)
             self.assertIn("Greenfield", text)
 
@@ -156,7 +156,7 @@ class TestBaseline(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)
             for i in range(3):
-                (p / f"m{i}.py").write_text(f"x = {i}\n")
+                (p / f"m{i}.py").write_text(f"x = {i}\n", encoding="utf-8")
             text = build_baseline(p, provider=BasicProvider())
             self.assertIn("basic", text.lower())
 
@@ -172,7 +172,7 @@ class TestPlanBrownfield(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)
             (p / "_bmad-output").mkdir()
-            (p / "_bmad-output" / "baseline.md").write_text("# Baseline\n")
+            (p / "_bmad-output" / "baseline.md").write_text("# Baseline\n", encoding="utf-8")
             self.assertTrue(_is_brownfield(p))
 
     def test_brownfield_context_empty_without_baseline(self):
@@ -185,7 +185,7 @@ class TestPlanBrownfield(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)
             (p / "_bmad-output").mkdir()
-            (p / "_bmad-output" / "baseline.md").write_text("# Baseline\n100 files\n")
+            (p / "_bmad-output" / "baseline.md").write_text("# Baseline\n100 files\n", encoding="utf-8")
             ctx = _brownfield_context(p)
             self.assertIn("Brownfield Context", ctx)
             self.assertIn("ground truth", ctx)
@@ -196,7 +196,7 @@ class TestPlanBrownfield(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)
             (p / "_bmad-output").mkdir()
-            (p / "_bmad-output" / "baseline.md").write_text("# Baseline\n")
+            (p / "_bmad-output" / "baseline.md").write_text("# Baseline\n", encoding="utf-8")
             prompt = build_prompt(PHASES[0], project=p)
             self.assertIn("baseline.md", prompt)
             self.assertIn("Brownfield Context", prompt)
@@ -227,9 +227,9 @@ class TestBlastRadius(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)
             (p / "_bmad-output").mkdir()
-            (p / "_bmad-output" / "baseline.md").write_text("# Baseline\n")
-            (p / "config.py").write_text("X = 1\n")
-            (p / "main.py").write_text("from config import X\n")
+            (p / "_bmad-output" / "baseline.md").write_text("# Baseline\n", encoding="utf-8")
+            (p / "config.py").write_text("X = 1\n", encoding="utf-8")
+            (p / "main.py").write_text("from config import X\n", encoding="utf-8")
             result = _blast_radius_section(s, project=p, config=None)
             # Should find affected files
             self.assertIn("Blast Radius", result)
@@ -242,12 +242,12 @@ class TestChangeBrownfield(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)
             (p / "docs").mkdir()
-            (p / "docs" / "requirements.md").write_text("# Req\n")
+            (p / "docs" / "requirements.md").write_text("# Req\n", encoding="utf-8")
             (p / "_bmad-output").mkdir()
-            (p / "_bmad-output" / "baseline.md").write_text("# Baseline\n")
+            (p / "_bmad-output" / "baseline.md").write_text("# Baseline\n", encoding="utf-8")
             r = apply(p, "FR-1", "add feature X")
             self.assertTrue(r.story_file.is_file())
-            content = r.story_file.read_text()
+            content = r.story_file.read_text(encoding="utf-8")
             self.assertIn("Brownfield", content)
             self.assertTrue(any("blast-radius" in s for s in r.next_steps))
 
@@ -256,10 +256,10 @@ class TestChangeBrownfield(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)
             (p / "docs").mkdir()
-            (p / "docs" / "requirements.md").write_text("# Req\n")
+            (p / "docs" / "requirements.md").write_text("# Req\n", encoding="utf-8")
             (p / "_bmad-output").mkdir()
             r = apply(p, "FR-1", "add feature X")
-            content = r.story_file.read_text()
+            content = r.story_file.read_text(encoding="utf-8")
             self.assertNotIn("Brownfield", content)
             self.assertFalse(any("blast-radius" in s for s in r.next_steps))
 

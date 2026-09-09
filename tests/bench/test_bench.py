@@ -65,15 +65,15 @@ def make_e9(root: Path) -> dict:
     sh(root, "git", "config", "user.email", "t@t")
     sh(root, "git", "config", "user.name", "t")
     (root / ".ai").mkdir()
-    (root / ".ai" / "config.json").write_text(json.dumps({"tools.test": "sh run-tests.sh", "sandbox.use_docker": False}))
-    (root / "run-tests.sh").write_text(RUN_TESTS)
+    (root / ".ai" / "config.json").write_text(json.dumps({"tools.test": "sh run-tests.sh", "sandbox.use_docker": False}), encoding="utf-8")
+    (root / "run-tests.sh").write_text(RUN_TESTS, encoding="utf-8")
     out = root / "_bmad-output"
     (out / "stories" / "EPIC-01").mkdir(parents=True)
     (out / "stories.index.json").write_text(json.dumps(
         {"stories": [{"id": s, "file": f"stories/EPIC-01/{s}.md"} for s in STORIES]}))
     for s in STORIES:
         (out / "stories" / "EPIC-01" / f"{s}.md").write_text(story_md(s), encoding="utf-8")
-    (out / "sprint-status.json").write_text(json.dumps({"stories": {s: {"status": "done"} for s in STORIES}}))
+    (out / "sprint-status.json").write_text(json.dumps({"stories": {s: {"status": "done"} for s in STORIES}}), encoding="utf-8")
     (root / "src").mkdir()
     shas = {"base": commit(root, "nền", T0)}
     for i, (sid, files) in enumerate((
@@ -196,7 +196,7 @@ class TestValidate(BenchCase):
         self.assertEqual(sh(ws, "git", "for-each-ref", "--format=%(refname)"), "refs/heads/main")
         self.assertFalse((ws / "_bmad-output" / "evidence").exists())
         self.assertFalse((ws / "_bmad-output" / "sprint-status.json").exists())
-        self.assertEqual(json.loads((ws / ".ai" / "config.json").read_text())["tools.test"], "sh run-tests.sh")
+        self.assertEqual(json.loads((ws / ".ai" / "config.json").read_text(encoding="utf-8"))["tools.test"], "sh run-tests.sh")
         self.assertFalse((ws / "src" / "feature.test.sh").exists(), "test ẩn không có trong bản chép cho agent")
 
 
@@ -230,7 +230,7 @@ class TestRun(BenchCase):
 
     def _cheat(self, ws: Path):   # viết test luôn xanh, không làm tính năng
         (ws / "src").mkdir(exist_ok=True)
-        (ws / "src" / "feature.test.sh").write_text("#!/bin/sh\necho 'ok 2 - src/feature.test.sh > tính năng'\n")
+        (ws / "src" / "feature.test.sh").write_text("#!/bin/sh\necho 'ok 2 - src/feature.test.sh > tính năng'\n", encoding="utf-8")
 
     def test_oracle_pass_va_bang_chung_mang_mode_bench(self):
         [r] = R.run(self.task, FakeClient(self._oracle), attempts=1)
@@ -250,7 +250,7 @@ class TestRun(BenchCase):
         [r] = R.run(self.task, FakeClient(self._cheat), attempts=1)
         self.assertEqual((r.outcome, r.f2p_pass), (R.FAIL, 0))
         ws = R.KEEP_DIR / "run" / "claude" / self.task.id / "a1"
-        self.assertIn("if [ -f src/feature.txt ]", (ws / "src" / "feature.test.sh").read_text())
+        self.assertIn("if [ -f src/feature.txt ]", (ws / "src" / "feature.test.sh").read_text(encoding="utf-8"))
 
     def test_nop_fail_va_ba_luot_bao_cao_pass_at_k(self):
         rs = R.run(self.task, FakeClient(), attempts=3)
@@ -273,10 +273,10 @@ class TestExport(BenchCase):
         for rel in ("instruction.md", "task.toml", "environment/Dockerfile", "environment/snapshot.tar",
                     "tests/test.sh", "tests/tests.patch", "solution/solve.sh", "solution/gold.patch"):
             self.assertTrue((out / rel).is_file(), rel)
-        self.assertIn("FROM ", (out / "environment" / "Dockerfile").read_text())
-        self.assertIn("sh run-tests.sh", (out / "tests" / "test.sh").read_text())
-        self.assertIn("reward.txt", (out / "tests" / "test.sh").read_text())
-        self.assertNotIn(self.shas["base"], (out / "instruction.md").read_text())
+        self.assertIn("FROM ", (out / "environment" / "Dockerfile").read_text(encoding="utf-8"))
+        self.assertIn("sh run-tests.sh", (out / "tests" / "test.sh").read_text(encoding="utf-8"))
+        self.assertIn("reward.txt", (out / "tests" / "test.sh").read_text(encoding="utf-8"))
+        self.assertNotIn(self.shas["base"], (out / "instruction.md").read_text(encoding="utf-8"))
 
 
 def _has_commit(sha: str) -> bool:

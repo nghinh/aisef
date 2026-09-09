@@ -886,7 +886,7 @@ class TestNhipTimVaBashGhiFile(unittest.TestCase):
         import time
         self.store.tool_run("S-01", "test", ok=True)
         time.sleep(0.05)
-        (self.repo / "src").mkdir(); (self.repo / "src" / "a.py").write_text("x = 1\n")
+        (self.repo / "src").mkdir(); (self.repo / "src" / "a.py").write_text("x = 1\n", encoding="utf-8")
         record_outcome("diff-scope", self.bash("echo > src/a.py"), ALLOW,
                        env=self.env, artifact_root=str(self.root))
         ev = self.store.read("S-01")
@@ -895,7 +895,7 @@ class TestNhipTimVaBashGhiFile(unittest.TestCase):
 
     def test_file_doi_truoc_lan_test_khong_bi_coi_la_cu(self):
         import time
-        (self.repo / "src").mkdir(); (self.repo / "src" / "a.py").write_text("x = 1\n")
+        (self.repo / "src").mkdir(); (self.repo / "src" / "a.py").write_text("x = 1\n", encoding="utf-8")
         time.sleep(0.05)
         self.store.tool_run("S-01", "test", ok=True)
         record_outcome("diff-scope", self.bash(), ALLOW, env=self.env, artifact_root=str(self.root))
@@ -904,7 +904,7 @@ class TestNhipTimVaBashGhiFile(unittest.TestCase):
     def test_khong_ghi_trung_cung_file(self):
         import time
         self.store.tool_run("S-01", "test", ok=True); time.sleep(0.05)
-        (self.repo / "src").mkdir(); (self.repo / "src" / "a.py").write_text("x\n")
+        (self.repo / "src").mkdir(); (self.repo / "src" / "a.py").write_text("x\n", encoding="utf-8")
         for _ in range(3):
             record_outcome("diff-scope", self.bash(), ALLOW, env=self.env, artifact_root=str(self.root))
         self.assertEqual(len(self.store.read("S-01").of("file_change")), 1)

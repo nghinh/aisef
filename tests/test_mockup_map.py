@@ -267,10 +267,10 @@ class TestAppServerTrust(unittest.TestCase):
             s = AppServer(cmd, "http://127.0.0.1:1", cwd=Path(d), ready_timeout=1)
             s.start()  # không bao giờ "sẵn sàng" — chỉ cần tiến trình đã chạy
             for _ in range(50):
-                if pidfile.is_file() and pidfile.read_text().strip():
+                if pidfile.is_file() and pidfile.read_text(encoding="utf-8").strip():
                     break
                 time.sleep(0.05)
-            child = int(pidfile.read_text().strip())
+            child = int(pidfile.read_text(encoding="utf-8").strip())
             s.stop()
             time.sleep(0.2)
             with self.assertRaises(ProcessLookupError):

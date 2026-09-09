@@ -572,7 +572,7 @@ class TestInit(CliTestCase):
         code, out, _ = self.run_cli("init", "--stack", "python")
         self.assertEqual(code, EXIT_OK)
         import json
-        cfg = json.loads((self.project / ".ai" / "config.json").read_text())
+        cfg = json.loads((self.project / ".ai" / "config.json").read_text(encoding="utf-8"))
         self.assertEqual(cfg["tools.test"], "python -m pytest")
         self.assertEqual(cfg["sandbox.image"], "python:3.12-slim")
         self.assertIn("pypi.org", cfg["sandbox.allow_hosts"])
@@ -581,7 +581,7 @@ class TestInit(CliTestCase):
         code, out, _ = self.run_cli("init", "--stack", "react")
         self.assertEqual(code, EXIT_OK)
         import json
-        cfg = json.loads((self.project / ".ai" / "config.json").read_text())
+        cfg = json.loads((self.project / ".ai" / "config.json").read_text(encoding="utf-8"))
         self.assertIn("vitest", cfg["tools.test"])
         self.assertTrue(cfg["sandbox.tools_network"])
 

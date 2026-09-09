@@ -77,7 +77,7 @@ class TestLoadSkill(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             sd = Path(d) / "my-skill"
             sd.mkdir()
-            (sd / "SKILL.md").write_text(SKILL_MD)
+            (sd / "SKILL.md").write_text(SKILL_MD, encoding="utf-8")
             s = load_skill(sd)
             self.assertIsNotNone(s)
             self.assertEqual(s.name, "performing-audit")
@@ -92,7 +92,7 @@ class TestLoadSkill(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             sd = Path(d) / "fallback-name"
             sd.mkdir()
-            (sd / "SKILL.md").write_text("---\ndescription: x\n---\n")
+            (sd / "SKILL.md").write_text("---\ndescription: x\n---\n", encoding="utf-8")
             s = load_skill(sd)
             self.assertEqual(s.name, "fallback-name")
 
@@ -100,7 +100,7 @@ class TestLoadSkill(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             sd = Path(d) / "s"
             sd.mkdir()
-            (sd / "SKILL.md").write_text("---\ntags: solo\n---\n")
+            (sd / "SKILL.md").write_text("---\ntags: solo\n---\n", encoding="utf-8")
             s = load_skill(sd)
             self.assertEqual(s.tags, ("solo",))
 
@@ -108,7 +108,7 @@ class TestLoadSkill(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             sd = Path(d) / "s"
             sd.mkdir()
-            (sd / "SKILL.md").write_text("---\nname: x\n---\n")
+            (sd / "SKILL.md").write_text("---\nname: x\n---\n", encoding="utf-8")
             s = load_skill(sd)
             self.assertEqual(s.tags, ())
 
@@ -119,7 +119,7 @@ class TestScan(unittest.TestCase):
             for name in ("zz-skill", "aa-skill", "mm-skill"):
                 sd = Path(d) / name
                 sd.mkdir()
-                (sd / "SKILL.md").write_text(f"---\nname: {name}\n---\n")
+                (sd / "SKILL.md").write_text(f"---\nname: {name}\n---\n", encoding="utf-8")
             result = scan(Path(d))
             self.assertEqual([s.name for s in result], ["aa-skill", "mm-skill", "zz-skill"])
 
@@ -133,7 +133,7 @@ class TestScan(unittest.TestCase):
     def test_skips_invalid(self):
         with tempfile.TemporaryDirectory() as d:
             (Path(d) / "valid").mkdir()
-            (Path(d) / "valid" / "SKILL.md").write_text("---\nname: ok\n---\n")
+            (Path(d) / "valid" / "SKILL.md").write_text("---\nname: ok\n---\n", encoding="utf-8")
             (Path(d) / "empty").mkdir()
             result = scan(Path(d))
             self.assertEqual(len(result), 1)

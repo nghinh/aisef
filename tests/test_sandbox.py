@@ -125,7 +125,7 @@ class TestIsolation(unittest.TestCase):
     def test_write_lands_on_host(self):
         r = run(self.spec(["sh", "-c", "echo tao-ra > out.txt"]))
         self.assertTrue(r.ok)
-        self.assertEqual((self.ws / "out.txt").read_text().strip(), "tao-ra")
+        self.assertEqual((self.ws / "out.txt").read_text(encoding="utf-8").strip(), "tao-ra")
 
     def test_read_only_level_blocks_writes(self):
         r = run(self.spec(["sh", "-c", "echo x > blocked.txt"], level=Level.READ_ONLY))

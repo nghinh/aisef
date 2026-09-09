@@ -300,7 +300,7 @@ class TestPreflight(RunTestCase):
     """
 
     def index_with(self, **over):
-        raw = json.loads((self.artifacts / "stories.index.json").read_text())
+        raw = json.loads((self.artifacts / "stories.index.json").read_text(encoding="utf-8"))
         for s in raw["stories"]:
             if s["id"] == "STORY-01-01":
                 s.update(over)
@@ -676,7 +676,7 @@ class TestVerifyOnly(RunTestCase):
         self.truot_vi_sit(agent)
         n_dev, n_model = len(agent.stories), len(self.evidence().of(AGENT_RUN))
 
-        self.co.write_text("")          # "tải máy" đã hết
+        self.co.write_text("", encoding="utf-8")          # "tải máy" đã hết
         r = self.kiem_lai(agent)
 
         self.assertTrue(r.ok, r.summary())
@@ -706,7 +706,7 @@ class TestVerifyOnly(RunTestCase):
         wt.commit_story(self.SID, "sửa tay", paths=["src/core"])
         wt.remove(self.SID)
 
-        self.co.write_text("")
+        self.co.write_text("", encoding="utf-8")
         r = self.kiem_lai(agent)
 
         self.assertTrue(r.ok, r.summary())
@@ -727,7 +727,7 @@ class TestVerifyOnly(RunTestCase):
         self.assertNotIn(self.SID, self.state().stories, "từ chối trước khi chạm trạng thái")
 
     def test_tu_choi_story_da_xong(self):
-        self.co.write_text("")
+        self.co.write_text("", encoding="utf-8")
         self.run_sprint(Agent(), only_epic="EPIC-01", config=self.cfg())
         self.assertIs(self.state().stories[self.SID].state, StoryStatus.DONE)
         r = self.kiem_lai(Agent())
@@ -760,7 +760,7 @@ class TestVerifyOnly(RunTestCase):
         subprocess.run(["git", "add", "-A"], cwd=self.project, check=True)
         subprocess.run(["git", "commit", "-qm", "main tiến lên"], cwd=self.project, check=True)
 
-        self.co.write_text("")
+        self.co.write_text("", encoding="utf-8")
         r = self.kiem_lai(agent)
 
         self.assertTrue(r.ok, r.summary())

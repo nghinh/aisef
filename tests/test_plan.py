@@ -359,7 +359,7 @@ class TestGitReadiness(unittest.TestCase):
             subprocess.run(["git", "init"], cwd=d, capture_output=True)
             subprocess.run(["git", "config", "user.name", "Test"], cwd=d, capture_output=True)
             subprocess.run(["git", "config", "user.email", "t@t.t"], cwd=d, capture_output=True)
-            Path(d, "f").write_text("x")
+            Path(d, "f").write_text("x", encoding="utf-8")
             subprocess.run(["git", "add", "."], cwd=d, capture_output=True)
             subprocess.run(["git", "commit", "-m", "init"], cwd=d, capture_output=True)
             code = _ensure_git(d)
