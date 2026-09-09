@@ -87,7 +87,7 @@ again, in the same words, so the author sees it is the same item.
 The product is split into stories on purpose. Everything below that is not
 this story has an owner and a turn.
 
-{{ index }}
+{{ roadmap }}
 
 ## Three things you do **not** grade
 

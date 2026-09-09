@@ -1216,3 +1216,40 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         self.assertEqual(r.now, ra.detail["failures"])
         self.assertEqual(r.changed(), [])
 
+
+
+class TestBanDoKeHoachChoNguoiRaSoat(ImplementTestCase):
+    """Lỗi 58, nửa dữ liệu: người rà soát phải **thấy** kế hoạch thì lời dặn
+    "yêu cầu thuộc story khác thì im lặng" mới kiểm chứng được. Chỉ mục bằng
+    chứng không dùng được cho việc này — nó bó trong một epic và **rỗng** trên
+    dự án mới, đúng lúc cần nhất."""
+
+    def roadmap(self):
+        from aisef.phases.implement import _roadmap
+        return _roadmap(self.story, self.artifacts, self.config())
+
+    def viet_index(self, n=14):
+        import json
+        (self.artifacts / "stories.index.json").write_text(json.dumps({"stories": [
+            {"id": f"STORY-{i // 3 + 1:02d}-{i % 3 + 1:02d}", "title": f"việc {i}"}
+            for i in range(n)
+        ]}), encoding="utf-8")
+
+    def test_liet_ke_moi_story_ke_ca_epic_khac(self):
+        self.viet_index()
+        text = self.roadmap()
+        self.assertIn("STORY-05-02", text, text)          # epic khác hẳn
+        self.assertEqual(text.count("\n") + 1, 14)
+
+    def test_danh_dau_story_dang_ra_soat(self):
+        import json
+        (self.artifacts / "stories.index.json").write_text(json.dumps({"stories": [
+            {"id": self.story.id, "title": "vỏ ứng dụng"},
+            {"id": "STORY-02-01", "title": "tạo task"},
+        ]}), encoding="utf-8")
+        text = self.roadmap()
+        self.assertIn("← the story under review", text)
+        self.assertTrue(text.splitlines()[0].endswith("← the story under review"), text)
+
+    def test_khong_co_chi_muc_thi_noi_ra_chu_khong_de_trong(self):
+        self.assertIn("no story index", self.roadmap())

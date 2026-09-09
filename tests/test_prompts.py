@@ -42,6 +42,7 @@ STORY_CTX = {
     "mockup_section": "màn hình danh-sach",
     "tools": "- aisef tool test",
     "index": "- STORY-01-01 · done · abc1234 · V3 G0 R0 · evidence/STORY-01-01.jsonl",
+    "roadmap": "- STORY-01-01 — Tạo ghi chú   ← the story under review\n- STORY-02-01 — Lưu ghi chú",
     "preservation": "- `AC-STORY-01-00-1` · STORY-01-00 · test `src/x.test.ts > AC-STORY-01-00-1`",
     "validation": "- test bảo toàn: `src/x.test.ts > AC-STORY-01-00-1`",
     "skills": "- `x` — dùng khi: y",
@@ -151,7 +152,7 @@ class TestPromptContent(unittest.TestCase):
         lưu: đúng ba story sau nó. Người rà soát chấm cả PRD, nên story đầu
         tiên của mọi dự án bị chặn vì không phải story cuối cùng."""
         prompt = self.catalog.get("story-review")
-        self.assertIn("index", prompt.slots)
+        self.assertIn("roadmap", prompt.slots)
         body = prompt.body
         self.assertIn("Behaviour another story owns", body)
         self.assertIn("acceptance criteria are the", body)

@@ -185,6 +185,7 @@ def build_context(
         "mockup_section": prompt_section(slices),
         "tools": describe_tools(project, config),
         "index": _index_slice(story, artifact_root, config, ledger=led),
+        "roadmap": _roadmap(story, artifact_root, config),
         "repo_map": _repo_map_section(story, project=project, artifact_root=artifact_root, config=config),
         "blast_radius": _blast_radius_section(story, project=project, config=config),
     }
@@ -252,6 +253,31 @@ def _ledger(artifact_root: Path):
         return ledger_mod.build(artifact_root)
     except OSError:
         return None
+
+
+def _roadmap(story: Story, artifact_root: Path, config: Config | None) -> str:
+    """Every story in the plan, one line — whose turn each thing is.
+
+    The evidence index is the wrong source for this question: it is scoped to
+    one epic and it is empty on a fresh project, which is exactly when the
+    reviewer most needs to know that thirteen other stories exist. Bug 58 —
+    STORY-01-01, whose one criterion is "the document contains these
+    elements", was blocked three times for work owned by stories in EPIC-02.
+    """
+    from ..control.change import read_index
+
+    cap = int(config["context.max_index_chars"]) if config else 2000
+    rows = read_index(Path(artifact_root)).get("stories") or []
+    lines = []
+    for s in rows:
+        sid = str(s.get("id") or "")
+        title = str(s.get("title") or "").strip()
+        lines.append(f"- {sid} — {title}" + ("   ← the story under review" if sid == story.id else ""))
+    text = "\n".join(lines)
+    while len(text) > cap and len(lines) > 1:
+        lines.pop()
+        text = "\n".join(lines) + f"\n- (+{len(rows) - len(lines)} more stories)"
+    return text or "_(the plan has no story index)_"
 
 
 def _index_slice(story: Story, artifact_root: Path, config: Config | None, *, ledger=None) -> str:
@@ -389,7 +415,7 @@ SLOT_SOURCE = {
     "architecture_rules": "artifact", "write_scope": "artifact", "mockup_section": "artifact",
     "tools": "config", "skills": "router", "diff_summary": "git", "impact": "code",
     "repo_map": "code", "blast_radius": "code",
-    "index": "ledger", "preservation": "ledger", "validation": "ledger",
+    "index": "ledger", "roadmap": "artifact", "preservation": "ledger", "validation": "ledger",
     "prior_review": "evidence",
 }
 
