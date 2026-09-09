@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **An infra retry in the plan phase left no line in the log** (bug 60).
+  `todo-e3`'s ux phase failed twice with `APIError: SSE read timed out`, was
+  correctly classified as infrastructure and retried both times — and the log
+  showed one motionless `phase=ux START` for thirty-six minutes. The story
+  loop has logged this since ADR-005 V11; the plan loop never did. Agent
+  `START` lines now also carry the timeout, so silence has a readable bound.
+
 - **On Windows the OpenCode client was launched with its flags inside
   `cmd.exe`'s own arguments** (bug 59). `build_command` inserted `--format
   json` at index 2, which is right when the resolved program is one token and

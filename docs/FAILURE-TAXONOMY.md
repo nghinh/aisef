@@ -27,7 +27,7 @@ lỗi 22–25 còn có số đo ở `docs/ADR-004-evidence-driven-epic-improveme
 | **J. Hai luật cho một sự thật — sổ và cổng suy cùng một hành vi bằng hai cách** | "Sự thật này còn chỗ nào khác suy nó không? Hai chỗ có dùng chung một hàm, một trường không? Nếu không, chỗ nào là luật?" | 47 `stale_since_last_test` so `seq` trong khi `read()` đã chuyển sang so thời gian · 23 cổng "bảo toàn" hỏi test mang mã của story **sở hữu** FR, sổ xác minh FR **qua** story khác (`source.story`) → sổ nói VERIFIED, cổng nói UNRUNNABLE oan; cùng lớp, không đánh số: R2×R1 (sổ ghi VERIFIED ở ứng viên chưa landed trong khi nhật ký biết), R5×R2 (sổ không ghi tệp, cổng cỡ tra tệp) | `test_preservation.TestCongBaoToan.test_fr_hoi_story_da_xac_minh_no_khong_hoi_story_so_huu` · `test_ledger.TestUngVienChuaLanded` |
 | **K. Cơ chế mới ghi vào artifact mà cổng người cũ đang băm** | "Bước này ghi vào tệp nào? Tệp ấy có cổng người nào băm không? Ai duyệt lại, và có phải mỗi lần không?" | 25 `aisef improve` ghi story sửa vào `stories.index.json` → `stories`/`readiness` đã duyệt thành stale → lần gọi kế bị chính vòng trước chặn (exit 2), 28 | `test_approvals.TestStorySuaKhongLamStaleCongStories` (thêm story sửa không stale; sửa story thật vẫn stale) |
 
-## Lỗi 22–59 — triệu chứng, gốc, bài học
+## Lỗi 22–60 — triệu chứng, gốc, bài học
 
 | # | Lớp | Triệu chứng | Gốc | Bài học | Chặn tái diễn |
 |---|---|---|---|---|---|
@@ -68,6 +68,8 @@ lỗi 22–25 còn có số đo ở `docs/ADR-004-evidence-driven-epic-improveme
 | 58 | D | STORY-01-01 "vỏ ứng dụng" — **một** tiêu chí, cấu trúc tài liệu — bị người rà soát chặn ba mục: chưa có submit handler, chưa đọc localStorage, chưa lưu. Đúng ba story kế tiếp trong kế hoạch | prompt rà soát đưa `story_contract` **và** toàn bộ quyết định kiến trúc, nhưng không hề nói cho người rà soát biết kế hoạch có những story nào khác. Không có gì trong prompt phân biệt "chưa làm" với "story khác làm", nên nó chấm theo PRD: story đầu tiên của mọi dự án bị chặn vì không phải story cuối cùng. Đường thoát duy nhất của agent là làm luôn phần của story sau — rồi story sau trượt `tests verify story` vì test đã xanh sẵn ở SHA cha | một người rà soát chỉ công bằng khi biết **giới hạn của lượt này**: tiêu chí nghiệm thu là toàn bộ những gì phải có *bây giờ*. Đưa cho nó danh sách story và nói thẳng: yêu cầu thuộc story chưa chạy thì im lặng | `story-review@10` thêm mục "The plan, one line per story" (`{{ roadmap }}` — **không** phải chỉ mục bằng chứng: chỉ mục bó trong một epic và rỗng trên dự án mới) và điều thứ ba trong "không chấm": *Behaviour another story owns*; `test_nguoi_ra_soat_thay_ca_ke_hoach_va_duoc_dan_khong_cham_luot_khac` |
 | 59 | F/A | Windows: client OpenCode được khởi chạy thành `cmd /c --format json opencode.cmd run --dir …` — cờ nằm trong tham số của chính `cmd.exe`, chương trình thật không bao giờ nhận chúng | `build_command` dựng argv rồi `insert(2, "--format")`: đúng khi `resolve_binary` trả **một** token (POSIX), sai khi nó trả **ba** (`cmd.exe /c <shim>.cmd` — đúng dạng npm/bun cài `opencode` trên Windows). Lỗi 32 lần thứ ba: chỗ nào coi "lệnh" là một từ thì chỗ ấy hỏng | dựng argv **theo thứ tự**, không theo chỉ số: chỉ số chỉ đúng khi độ dài phần đầu là hằng số, mà độ dài ấy do HĐH quyết định | dựng thẳng `[..bin, "run", "--format", "json", "--dir", wd]`; `test_shim_nhieu_tu_khong_lam_lech_co` (đỏ khi hoàn nguyên) |
 
+| 60 | G | `todo-e3`: `run.log` đứng yên **36 phút** ở một dòng `phase=ux START` duy nhất, trong khi đã có hai lượt chạy hỏng và một lượt thứ ba đang chạy | lượt chạy lại vì lỗi hạ tầng (`APIError: SSE read timed out`) được phân loại đúng và thử lại đúng — nhưng vòng lặp của phase **không ghi gì**; vòng lặp story đã ghi `attempt=n INFRA` từ ADR-005 V11, phase thì không. Người vận hành không phân biệt được "đang nghĩ" với "treo", cũng không biết còn mấy lượt | mỗi lần vòng lặp quyết định điều gì — hỏng, thử lại, còn bao nhiêu — phải để lại một dòng ở nơi người vận hành đang nhìn. Cùng lớp lỗi 36 | `phase=<id> RETRY (infra) after <ms> err=… · <n> left`; dòng `START` mang thêm `timeout=<n>s` để im lặng có giới hạn đọc được; `test_infrastructure_error_is_retried_not_abandoned` kiểm cả nhật ký |
+
 ## Bài học vận hành đi kèm
 
 1. **Đo trước khi kết luận, và đo cả thứ vô can.** Lỗi 14 được "tìm ra" khi
@@ -89,6 +91,14 @@ lỗi 22–25 còn có số đo ở `docs/ADR-004-evidence-driven-epic-improveme
    chứng ấy phụ thuộc tải máy; giá là một lượt developer (~$10–30) dựng lại
    thứ đã có. Trước lượt agent: `uptime` load < số lõi, không suite nào
    khác đang chạy; đo lại đúng ứng viên trước khi kết luận "mã sai".
+
+6. **Một phép đối chứng hỏng được theo hai cách thì phải nói ra cách nào.**
+   `assertTrue(any(srv.seen))` sai cả khi git chưa hề tới máy chủ lẫn khi nó
+   tới mà không gửi credential — hai chẩn đoán khác hẳn, một thông báo. Ba
+   vòng CI Windows đi vào việc đoán giữa hai khả năng ấy; thêm `requests=[…]`
+   và `stderr` của git vào thông báo thì một vòng là xong (gốc: `write_text`
+   ở chế độ văn bản đổi `\n` thành `\r\n`, `git-credential-store` đọc ra một
+   host có cổng kết thúc bằng ký tự xuống dòng nên không khớp gì).
 
 ## Khi thêm lỗi mới
 
