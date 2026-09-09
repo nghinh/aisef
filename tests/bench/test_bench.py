@@ -43,7 +43,7 @@ STORIES = ("STORY-01-01", "STORY-01-02", "STORY-01-03")
 
 def sh(cwd, *cmd, ts=None):
     env = {**os.environ, "GIT_COMMITTER_DATE": f"{ts} +0000", "GIT_AUTHOR_DATE": f"{ts} +0000"} if ts else None
-    return subprocess.run(cmd, cwd=cwd, check=True, capture_output=True, text=True, env=env).stdout.strip()
+    return subprocess.run(cmd, cwd=cwd, check=True, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env).stdout.strip()
 
 
 def commit(cwd, msg, ts):

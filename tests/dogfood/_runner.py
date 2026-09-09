@@ -31,7 +31,7 @@ PAR_BASELINE_USD = 3.14
 
 
 def _git(cwd: Path, *args: str) -> str:
-    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True).stdout.strip()
+    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
 
 
 def make_project(name: str, *, src: str = "", clients: tuple[str, ...] = ("claude",)) -> Path:
@@ -59,7 +59,7 @@ def clean_env() -> dict[str, str]:
 def run_epic(project: Path, epic: str, *, client: str = "claude") -> str:
     proc = subprocess.run(
         [str(ROOT / "bin" / "aisef"), "run", "--epic", epic, "--client", client, "--force"],
-        cwd=project, capture_output=True, text=True, env=clean_env(), timeout=3600,
+        cwd=project, capture_output=True, text=True, encoding="utf-8", errors="replace", env=clean_env(), timeout=3600,
     )
     (project / "_bmad-output" / "dogfood-run.log").write_text(proc.stdout + "\n--- stderr ---\n" + proc.stderr, encoding="utf-8")
     return proc.stdout

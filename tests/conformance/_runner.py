@@ -45,7 +45,7 @@ TIMEOUT = 420
 
 
 def _git(cwd: Path, *args: str) -> str:
-    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True).stdout.strip()
+    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
 
 
 def make_project(root: Path, client: str) -> tuple[Path, Path]:
@@ -91,7 +91,7 @@ def _run(cmd, project: Path, workdir: Path, story: str, *, reviewer: bool) -> su
     `TimeoutExpired` ném xuyên `probe_all`, cột OpenCode giữ số cũ và C9/C10
     thành "—" — bảng trông như chưa chạy thay vì nói đã treo ở đâu."""
     try:
-        proc = subprocess.run(cmd, cwd=workdir, capture_output=True, text=True, timeout=TIMEOUT,
+        proc = subprocess.run(cmd, cwd=workdir, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=TIMEOUT,
                               env=env_for(project, workdir, story, reviewer=reviewer),
                               stdin=subprocess.DEVNULL)
     except subprocess.TimeoutExpired as e:
@@ -219,7 +219,7 @@ RUNNERS = {"claude": run_claude, "opencode": run_opencode}
 
 def version_of(client: str) -> str:
     try:
-        out = subprocess.run([client, "--version"], capture_output=True, text=True, timeout=30).stdout
+        out = subprocess.run([client, "--version"], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30).stdout
         return out.strip().split()[0] if out.strip() else "?"
     except (OSError, subprocess.SubprocessError):
         return "?"

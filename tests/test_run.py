@@ -468,7 +468,7 @@ class TestDonWorktree(RunTestCase):
         self.run_sprint(Agent(out_of_scope={"STORY-01-01"}))
         nhanh = subprocess.run(
             ["git", "branch", "--list", "story/STORY-01-01"],
-            cwd=self.project, capture_output=True, text=True, check=True,
+            cwd=self.project, capture_output=True, text=True, encoding="utf-8", errors="replace", check=True,
         ).stdout
         self.assertIn("story/STORY-01-01", nhanh)
 
@@ -535,7 +535,7 @@ class TestMergeDungRoiChayLai(RunTestCase):
 
     def head_co(self, path: str) -> bool:
         r = subprocess.run(["git", "ls-tree", "--name-only", "HEAD", path],
-                           cwd=self.project, capture_output=True, text=True)
+                           cwd=self.project, capture_output=True, text=True, encoding="utf-8", errors="replace")
         return bool(r.stdout.strip())
 
     def test_khong_bo_qua_story_da_xong_ma_chua_merge(self):
@@ -668,7 +668,7 @@ class TestVerifyOnly(RunTestCase):
 
     def head_co(self, path: str) -> bool:
         r = subprocess.run(["git", "ls-tree", "--name-only", "HEAD", path],
-                           cwd=self.project, capture_output=True, text=True)
+                           cwd=self.project, capture_output=True, text=True, encoding="utf-8", errors="replace")
         return bool(r.stdout.strip())
 
     def test_chay_lai_dung_phep_kiem_do_giu_ra_soat_cung_sha_roi_merge(self):

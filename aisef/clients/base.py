@@ -174,6 +174,11 @@ def child_env(spec_env: dict[str, str], *, allow_prefixes: Iterable[str] = ()) -
     prefixes = tuple(p for p in (*ENV_KEEP_PREFIXES, *allow_prefixes) if p)
     env = {k: v for k, v in os.environ.items() if k in ENV_KEEP or k.startswith(prefixes)}
     env.update(GIT_NO_CREDENTIALS)
+    # A child Python process picks its stdout encoding from the console code
+    # page; on Windows that is a legacy one and `·` or `✅` comes back
+    # mangled or raises. Say it explicitly rather than inheriting a terminal's
+    # opinion.
+    env.setdefault("PYTHONIOENCODING", "utf-8")
     env.update(spec_env)
     return env
 

@@ -391,7 +391,7 @@ class TestGitKhongCamCredentialCuaMay(unittest.TestCase):
             try:
                 seed_fake_credential(repo, url)
                 doi_chung = subprocess.run(["git", "push", url, "HEAD"], cwd=repo, env=base,
-                                           capture_output=True, text=True, timeout=60)
+                                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
                 self.assertNotEqual(doi_chung.returncode, 0)
                 self.assertTrue(any(srv.seen), "đối chứng: helper `store` phải gửi token, không thì fixture vô nghĩa")
                 srv.seen.clear()
@@ -399,7 +399,7 @@ class TestGitKhongCamCredentialCuaMay(unittest.TestCase):
                 with mock.patch.dict(os.environ, base, clear=True):
                     env = child_env({})
                 con = subprocess.run(["git", "push", url, "HEAD"], cwd=repo, env=env,
-                                     capture_output=True, text=True, timeout=60)
+                                     capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
             finally:
                 srv.shutdown()
                 srv.server_close()

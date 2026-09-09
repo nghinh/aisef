@@ -462,7 +462,7 @@ class TestPreDeployGhiCayKiem(DeployTestCase):
 
         def git(*a):
             return subprocess.run(["git", "-C", str(self.project), *a],
-                                  capture_output=True, text=True, check=True).stdout.strip()
+                                  capture_output=True, text=True, encoding="utf-8", errors="replace", check=True).stdout.strip()
 
         git("init", "-q"); git("config", "user.email", "t@t"); git("config", "user.name", "t")
         git("add", "-A"); git("commit", "-qm", "đầu")

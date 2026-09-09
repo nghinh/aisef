@@ -30,7 +30,11 @@ FIX = ROOT / "tests" / "fixtures" / "bmad"
 #: Artifact thật (hoặc đúng khuôn thật) — client giả chép ra để pha sau và
 #: cổng máy làm việc trên dữ liệu có hình dạng thật.
 REAL = {"prd.md": FIX / "prd.md", "architecture.md": FIX / "architecture.md",
-        "epics.md": FIX / "epics.md"}
+        "epics.md": FIX / "epics.md",
+        # Lỗi 50: khuôn cũ ghi một EXPERIENCE.md không có bảng màn hình — thứ
+        # mà chính pipeline không đọc nổi. Dùng bản thật để cổng `ux` làm việc
+        # trên hình dạng thật.
+        "EXPERIENCE.md": FIX / "EXPERIENCE.md"}
 
 
 class FakeClient(ClientAdapter):
@@ -364,3 +368,44 @@ class TestGitReadiness(unittest.TestCase):
             subprocess.run(["git", "commit", "-m", "init"], cwd=d, capture_output=True)
             code = _ensure_git(d)
             self.assertIsNone(code)
+
+
+class TestCongUxDoiDanhMucManHinh(unittest.TestCase):
+    """Lỗi 50. `EXPERIENCE.md` là hợp đồng giữa phase `ux` và mọi bước sau:
+    mockup dựng một tệp cho mỗi màn hình, story tham chiếu `screen_id`. Nhưng
+    yêu cầu ấy chưa từng được nói cho bên viết, cũng chưa từng được kiểm ở
+    cổng của chính nó.
+
+    Đo 2026-09-09 trên todo-e2e (chạy từ requirements): agent viết một tài liệu
+    tốt, mô tả "one surface, the Todo List screen" bằng văn xuôi, cổng `ux`
+    **duyệt**, rồi `aisef mockup` chết một phase sau với "EXPERIENCE.md does not
+    list any screens" — đổ lỗi cho tài liệu thay vì cho bước đã nhận nó.
+    """
+
+    def test_khong_co_man_hinh_thi_cong_ux_chan(self):
+        from aisef.control.experience import parse_experience
+        from aisef.control.machine_gate import check_experience
+        exp = parse_experience("# EXPERIENCE\n\n## Information Architecture\n\n"
+                               "One surface, the Todo List screen. No navigation.\n")
+        r = check_experience(exp)
+        self.assertFalse(r.passed)
+        self.assertIn("screen inventory", r.errors[0])
+
+    def test_co_bang_thi_qua(self):
+        from aisef.control.experience import parse_experience
+        from aisef.control.machine_gate import check_experience
+        exp = parse_experience("# EXPERIENCE\n\n## Screen Inventory\n\n"
+                               "| Screen | Route | Purpose |\n|---|---|---|\n"
+                               "| Todo List | / | Create and manage tasks |\n")
+        self.assertTrue(check_experience(exp).passed, check_experience(exp).errors)
+
+    def test_prompt_ux_noi_ro_hinh_dang_bang(self):
+        """Bên sản xuất phải đọc được yêu cầu, không phải đoán."""
+        from aisef.phases.plan import PHASES, build_prompt
+        ux = next(p for p in PHASES if p.id == "ux")
+        t = build_prompt(ux)
+        self.assertIn("| Screen | Route | Purpose |", t)
+        self.assertIn("screen_id", t)
+        prd = next(p for p in PHASES if p.id == "prd")
+        self.assertNotIn("| Screen | Route | Purpose |", build_prompt(prd),
+                         "chỉ phase ux mới cần bảng này")

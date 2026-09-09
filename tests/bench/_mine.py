@@ -108,7 +108,7 @@ def load_tasks(*dirs: Path | str) -> list[Task]:
 
 
 def _git(cwd: Path | str, *args: str, check: bool = True) -> str:
-    p = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True)
+    p = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace")
     if check and p.returncode:
         raise RuntimeError(f"git {' '.join(args)}: {p.stderr.strip()}")
     return p.stdout.strip()
@@ -118,7 +118,7 @@ def _diff(repo: Path, a: str, b: str, paths: list[str]) -> str:
     if not paths:
         return ""
     return subprocess.run(["git", "diff", "--binary", a, b, "--", *paths], cwd=repo,
-                          capture_output=True, text=True, check=True).stdout
+                          capture_output=True, text=True, encoding="utf-8", errors="replace", check=True).stdout
 
 
 def _is_ancestor(repo: Path, a: str, b: str) -> bool:

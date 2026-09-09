@@ -193,7 +193,7 @@ class TestHappyPath(ImplementTestCase):
             self.assertEqual(
                 subprocess.run(
                     ["git", "status", "--porcelain"], cwd=work,
-                    capture_output=True, text=True, check=True,
+                    capture_output=True, text=True, encoding="utf-8", errors="replace", check=True,
                 ).stdout.strip(),
                 "",
                 "agent phải đã commit hết — nếu không, test này không kiểm gì",
@@ -236,7 +236,7 @@ class TestHappyPath(ImplementTestCase):
             subprocess.run(["git", "commit", "-qm", "goc"], cwd=d, check=True)
             base = subprocess.run(
                 ["git", "rev-parse", "HEAD"], cwd=d,
-                capture_output=True, text=True, check=True,
+                capture_output=True, text=True, encoding="utf-8", errors="replace", check=True,
             ).stdout.strip()
             (d / "a.py").write_text("def cong(a, b):\n    return a - b\n", encoding="utf-8")
             subprocess.run(["git", "add", "-A"], cwd=d, check=True)
@@ -673,7 +673,7 @@ class TestCachLyThanCay(ImplementTestCase):
 
     def head(self) -> str:
         return subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.project,
-                              capture_output=True, text=True).stdout.strip()
+                              capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
 
     class PhaCachLy(ClientAdapter):
         """Agent commit thẳng vào thân cây, đúng như lượt OpenCode đã làm."""
@@ -1139,7 +1139,7 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         self.assertIn(self.AC, nop.detail["failed_ids"])
         self.assertFalse((self.project / ".aisef" / "worktrees" / "STORY-01-01-nop").exists())
         nhanh = subprocess.run(["git", "branch", "--list", "story/STORY-01-01-nop"],
-                               cwd=self.project, capture_output=True, text=True).stdout
+                               cwd=self.project, capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
         self.assertEqual(nhanh.strip(), "", "nhánh tạm phải được xoá")
 
     def test_test_luon_xanh_la_khong_kiem_duoc_gi_neu_ten(self):

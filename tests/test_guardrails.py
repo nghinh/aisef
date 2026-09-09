@@ -324,7 +324,7 @@ class TestChangedFilesBase(unittest.TestCase):
             d = self.repo(tmp)
             base = subprocess.run(
                 ["git", "rev-parse", "HEAD"], cwd=d,
-                capture_output=True, text=True, check=True,
+                capture_output=True, text=True, encoding="utf-8", errors="replace", check=True,
             ).stdout.strip()
 
             (d / "src").mkdir()
@@ -340,7 +340,7 @@ class TestChangedFilesBase(unittest.TestCase):
             d = self.repo(tmp)
             base = subprocess.run(
                 ["git", "rev-parse", "HEAD"], cwd=d,
-                capture_output=True, text=True, check=True,
+                capture_output=True, text=True, encoding="utf-8", errors="replace", check=True,
             ).stdout.strip()
             (d / "a.py").write_text("a", encoding="utf-8")
             subprocess.run(["git", "add", "a.py"], cwd=d, check=True)
@@ -359,7 +359,7 @@ class TestChangedFilesBase(unittest.TestCase):
             d = self.repo(tmp)
             main = subprocess.run(
                 ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=d,
-                capture_output=True, text=True, check=True,
+                capture_output=True, text=True, encoding="utf-8", errors="replace", check=True,
             ).stdout.strip()
             subprocess.run(["git", "checkout", "-qb", "story/b"], cwd=d, check=True)
             (d / "cua-b.py").write_text("b", encoding="utf-8")

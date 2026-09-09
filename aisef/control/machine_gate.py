@@ -216,6 +216,41 @@ def is_route_like(route: str) -> bool:
     return bool(r) and not any(c.isspace() for c in r)
 
 
+def check_experience(exp) -> GateResult:
+    """The UX artifact must carry a **machine-readable** screen inventory.
+
+    `EXPERIENCE.md` is the contract between the UX phase and everything after
+    it: the mockup phase builds one file per screen, the design contract pins
+    each screen's components, and stories reference `screen_id`. A run on a
+    fresh project produced a well-written document that described "one
+    surface, the Todo List screen" in prose and never tabulated it — the UX
+    gate approved, and `aisef mockup` failed a phase later with "EXPERIENCE.md
+    does not list any screens", blaming the document instead of the step that
+    accepted it (measured 2026-09-09, todo-e2e).
+
+    A gate that ships an artifact its own consumer cannot read is the wrong
+    place to be lenient.
+    """
+    r = GateResult(name="ux-spec")
+    if not getattr(exp, "screens", None):
+        r.errors.append(
+            "EXPERIENCE.md lists no screens. Add a screen inventory **table** — "
+            "one row per screen, with columns `Screen` (or `screen_id`), `Route`, "
+            "and `Purpose` — under a heading such as `Screen Inventory`, "
+            "`Screens` or `Information Architecture`. Prose describing the screens "
+            "is not enough: the mockup step builds one file per row, and stories "
+            "reference `screen_id`."
+        )
+        return r
+    for s in exp.screens:
+        if not s.name and not s.id:
+            r.errors.append("a screen row has neither a name nor an id")
+        if not s.route:
+            r.warnings.append(f"{s.id or s.name}: no route declared — "
+                              "the mockup gate will require one")
+    return r
+
+
 def check_design_contract(
     contract,
     experience,
