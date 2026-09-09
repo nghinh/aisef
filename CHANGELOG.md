@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.2.19 — 2026-09-09
+
+Three real failures found by running the framework, two of them silent.
+
+- **OpenCode ran with every guard disabled** (bug 32). `aisef_command()`
+  falls back to `<python> -m aisef.cli` when `aisef` is not on PATH, and that
+  three-word command was carried as one string into both clients — read back
+  as one filename containing spaces. A guard call that cannot start is not a
+  block, so a whole run finishes unguarded with evidence identical to a
+  well-behaved agent. Measured on `todo`: 46 sessions, 0 guard events.
+  `aisef_argv()` now returns argv, the plugin emits an array, and a guard
+  that cannot run refuses the action instead of allowing it.
+- **Windows could not start either client** (bug 33). `WinError 2` on the
+  `.cmd` shim npm/bun installs, then `WinError 206` because the prompt rode
+  on a command line Windows caps at 32767 characters. Binaries are resolved
+  before exec, the prompt goes to stdin, and `ENV_KEEP` no longer hands a
+  Windows child a POSIX-only environment.
+- **A worktree kept a stale guard.** Projects that commit
+  `.opencode/plugin/aisef-guard.ts` checked out the committed blob, so a
+  plugin `aisef compile` had just fixed never reached a story. Generated
+  client config is now overwritten on every worktree create.
+- `run.log` states the reason for each failed check instead of only naming
+  it; mockup verification that could not run scores *unconfigured*, not a
+  green pass.
+
 ## 1.0.0 — 2026-09-08
 
 First stable release. The harness is feature-complete for single-machine,
