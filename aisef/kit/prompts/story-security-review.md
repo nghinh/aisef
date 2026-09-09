@@ -1,6 +1,6 @@
 ---
 name: story-security-review
-version: 5
+version: 6
 role: security
 ---
 # Security review {{ story_id }} — {{ story_title }}
@@ -41,6 +41,16 @@ passes through, check whether it still holds.
 {{ preservation }}
 
 {{ validation }}
+
+## What you already said about this story
+
+A finding you previously reported below the blocking threshold cannot come
+back above it now: it was that severity the first time you saw it, so it
+stays there. A story whose author fixes every blocking finding only to be
+blocked by the next tier down can never pass. Something still unfixed:
+report it again, at the same severity, in the same words.
+
+{{ prior_review }}
 
 ## What to look for
 

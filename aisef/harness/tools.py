@@ -252,10 +252,14 @@ def run_tool(
         )
     res.log = record(res, story_id, artifact_root, candidate)
     if artifact_root:
-        from .runlog import run_log
+        from .runlog import one_line, run_log
         status = "SKIP" if res.skipped else ("PASS" if res.ok else "FAIL")
         unrun = f" unrunnable={res.unrunnable}" if res.unrunnable else ""
         run_log(artifact_root, f"tool={name} {status} exit={sb.exit_code} {sb.duration_ms}ms{unrun}")
+        if not res.ok and not res.skipped:
+            # Exit code alone does not say what broke, and the reader then has
+            # to go find the evidence file to learn anything at all.
+            run_log(artifact_root, f"tool={name} output: " + one_line(res.tail(TAIL_LINES)))
     return res
 
 

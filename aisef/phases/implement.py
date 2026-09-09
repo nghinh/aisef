@@ -794,7 +794,7 @@ def verify_candidate(
     paths -- no relaxation, just no paying to rebuild what already exists.
     """
     sid, sha, number = story.id, attempt.candidate, attempt.number
-    from ..harness.runlog import run_log
+    from ..harness.runlog import one_line, run_log
 
     def _log(msg: str) -> None:
         run_log(artifact_root, msg)
@@ -884,8 +884,14 @@ def verify_candidate(
         if mv_result.unavailable:
             _log(f"story={sid}#{number} mockup UNAVAILABLE: {mv_result.unavailable}")
             for scr in screens:
+                # `ok=False`: the comparison did not happen. 1.2.13 wrote
+                # `ok=True` here to stop the gate blocking on "not compared",
+                # which turned a check that verified nothing into a green ✅ —
+                # the exact confusion `Outcome` exists to prevent. The gate
+                # reads `unavailable` and scores it **unconfigured**: named,
+                # not blocking, and not a pass.
                 evidence.record(sid, Event(
-                    kind=MOCKUP_MAP, name=scr, ok=True,
+                    kind=MOCKUP_MAP, name=scr, ok=False,
                     detail={"unavailable": mv_result.unavailable, "candidate": sha},
                 ))
 
@@ -921,6 +927,8 @@ def verify_candidate(
         )
         n_blocking = len(attempt.review_findings)
         _log(f"story={sid}#{number} review {'PASS' if not n_blocking else f'FAIL blocking={n_blocking}'}")
+        for f in attempt.review_findings:
+            _log(f"story={sid}#{number} review ✗ {one_line(f)}")
 
     if config.get("security.semantic_review", True):
         security_ev = _at(ev, TOOL_RUN, "security", sha) if reuse else None
@@ -956,6 +964,11 @@ def verify_candidate(
             )
             _log(f"story={sid}#{number} security {'PASS' if sec_ok else 'FAIL'} "
                  f"findings={len(attempt.security.findings)} filtered={len(attempt.security.filtered)}")
+            if not sec_ok:
+                if attempt.security.error:
+                    _log(f"story={sid}#{number} security ✗ {one_line(attempt.security.error)}")
+                for f in attempt.security.blocking(config["security.block_severities"]):
+                    _log(f"story={sid}#{number} security ✗ {one_line(f.line())}")
 
     dau_vao = dict(
         changed=changed,
@@ -991,8 +1004,14 @@ def verify_candidate(
     if attempt.ok:
         _log(f"story={sid}#{number} gate PASSED")
     else:
-        fails = ",".join(c.name for c in attempt.gate.failures)[:120]
-        _log(f"story={sid}#{number} gate FAILED: {fails}")
+        # Names first (one grep-able line), then one line per failed check with
+        # its reason. Naming the checks without their detail forced the reader
+        # into the evidence file to learn anything — the log said which gate
+        # failed, never why.
+        _log(f"story={sid}#{number} gate FAILED: {','.join(c.name for c in attempt.gate.failures)}")
+        for c in attempt.gate.failures:
+            _log(f"story={sid}#{number} gate ✗ {c.name} · {c.outcome.value} · "
+                 + (one_line(c.detail) or "(no detail recorded)"))
     return attempt
 
 
@@ -1106,7 +1125,13 @@ def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
         res = run_tool("test", tmp_path, config=config)   # story_id empty: recorded below, under its own name
         record_tool(res, story.id, artifact_root, candidate, name=NOP_RUN, extra={
             "nop": True, "parent": parent_ref, "base_ref": base_ref, "files": test_files[:50]})
-        run_log(artifact_root, f"story={story.id} nop DONE ok={res.ok} {res.duration_ms}ms")
+        # `ok` here is the **test run**, and for the nop control red is the
+        # wanted result: green at the parent SHA means the tests do not verify
+        # the story. `ok=False` read as a failure for months; say what it means.
+        ket = "tests red at parent (expected)" if not res.ok else (
+            "tests GREEN at parent — they do not verify the story")
+        run_log(artifact_root,
+                f"story={story.id} nop DONE {ket} {res.duration_ms}ms")
     except GitError as e:
         run_log(artifact_root, f"story={story.id} nop ERROR {e}")
         store.tool_run(story.id, NOP_RUN, ok=False, detail={
@@ -1599,6 +1624,7 @@ def security_review(
     from ..harness.runlog import run_log
     run_log(artifact_root, f"story={story.id}#{number} security START changed={len(changed)}")
     store = EvidenceStore(artifact_root, candidate=candidate)
+    context["prior_review"] = _prior_review(store, story.id, role="security")
     store.handoff(story.id, frm=REVIEWER, to=SECURITY, attempt=number,
                   slots=handoff_slots(context))
     spec = build_spec(
@@ -2121,7 +2147,7 @@ def implement_story(
     contract: DesignContract | None = None,
 ) -> StoryOutcome:
     """Run a story until it passes the gate or exhausts retries."""
-    from ..harness.runlog import run_log
+    from ..harness.runlog import one_line, run_log
 
     project = Path(project)
     workdir = Path(workdir) if workdir else project
@@ -2206,10 +2232,20 @@ def implement_story(
                 f"tried {outcome.quality_attempts} attempts, still did not pass gate"
             )
             _log(f"story={story.id} EXHAUSTED {outcome.quality_attempts} attempts ${outcome.cost_usd:.2f}")
+            # What was still blocking when it gave up — the one thing a reader
+            # opens the log for after an exhausted story.
+            for c in (attempt.gate.failures if attempt.gate else []):
+                _log(f"story={story.id} EXHAUSTED ✗ {c.name} · {c.outcome.value} · "
+                     + (one_line(c.detail) or "(no detail recorded)"))
             return outcome
 
         gate_fb = attempt.gate.feedback() if attempt.gate else attempt.error
-        _log(f"story={story.id} attempt={n} FAIL ${attempt.cost_usd:.2f} gate={gate_fb[:120]}")
+        # Check names only: each reason already has its own `gate ✗` line above.
+        # Slicing the joined feedback to 120 chars printed one reason, cut
+        # mid-word, and hid the other seven.
+        _log(f"story={story.id} attempt={n} FAIL ${attempt.cost_usd:.2f} gate="
+             + (",".join(c.name for c in attempt.gate.failures) if attempt.gate
+                else one_line(attempt.error)))
         feedback = gate_fb
         if attempt.review_findings:
             feedback += "\n" + "\n".join(f"- {f}" for f in attempt.review_findings[:10])

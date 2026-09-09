@@ -448,10 +448,12 @@ def run_suite(
                 getattr(sb, "exit_code", 0), day_du, getattr(sb, "provider_error", ""))
             report.results.append(result)
             if artifact_root:
-                from ..harness.runlog import run_log
+                from ..harness.runlog import one_line, run_log
                 status = "PASS" if sb.ok else "FAIL"
                 unrun = f" unrunnable" if result.unrunnable else ""
                 run_log(artifact_root, f"qa:{kind.id} {status} {sb.duration_ms}ms{unrun}")
+                if not sb.ok:
+                    run_log(artifact_root, f"qa:{kind.id} output: " + one_line(result.detail))
             if store:
                 store.tool_run(
                     story_id, f"qa:{kind.id}", ok=sb.ok, duration_ms=sb.duration_ms,

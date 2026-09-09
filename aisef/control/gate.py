@@ -139,13 +139,21 @@ def _stale_candidates(evidence: Evidence, candidate: str) -> list[str]:
                    if str(e.detail["candidate"]) != candidate})
 
 
-#: Records written **only** when a role misbehaves (`review:immutable`,
-#: `security:candidate`, …), never re-written on a clean attempt. They are
-#: violation stamps, not repeatable checks: counting them as checks means one
-#: old violation marks every later build stale forever and the story can never
-#: pass — todo/STORY-01-01 exhausted its attempts on a `review:immutable`
-#: recorded three candidates earlier, after its cause was already fixed.
+#: Records written **only** when something goes wrong — a role writes the tree
+#: (`review:immutable`), reviews a moved build (`security:candidate`), the run
+#: touches the trunk (`isolation`), the commit fails (`candidate:frozen`) —
+#: and never re-written on a clean attempt. They are violation stamps, not
+#: repeatable checks: counting them as checks means one old violation marks
+#: every later build stale forever and the story can never pass —
+#: todo/STORY-01-01 exhausted its attempts on a `review:immutable` recorded
+#: three candidates earlier, after its cause was already fixed. Each still
+#: blocks at the moment it fires; only the freshness scan ignores them.
+ONE_SHOT_NAMES = ("isolation", "candidate:frozen")
 ONE_SHOT_SUFFIXES = (":immutable", ":candidate")
+
+
+def _one_shot(name: str) -> bool:
+    return name in ONE_SHOT_NAMES or name.endswith(ONE_SHOT_SUFFIXES)
 
 
 def _latest_per_check(evidence: Evidence) -> dict[tuple[str, str], Event]:
@@ -155,7 +163,7 @@ def _latest_per_check(evidence: Evidence) -> dict[tuple[str, str], Event]:
     moi_nhat: dict[tuple[str, str], Event] = {}
     for e in evidence.events:
         if (e.kind in (TOOL_RUN, MOCKUP_MAP) and e.detail.get("candidate")
-                and not e.name.endswith(ONE_SHOT_SUFFIXES)):
+                and not _one_shot(e.name)):
             moi_nhat[(e.kind, e.name)] = e
     return moi_nhat
 
@@ -561,7 +569,11 @@ def evaluate(
                 Check("mockup map", False, f"not compared: {', '.join(missing_runs)}", evidence=doc_map)
             )
         else:
-            failed = [s for s in screens if not maps[s].ok]
+            # Rendering unavailable (no node, no playwright) is not a mismatch
+            # and not a pass: nothing was compared. Naming it keeps the reader
+            # from reading ✅ as "the screen matches the mockup".
+            khong_chay = [s for s in screens if maps[s].detail.get("unavailable")]
+            failed = [s for s in screens if not maps[s].ok and s not in khong_chay]
             detail = ""
             if failed:
                 first = maps[failed[0]].detail
@@ -569,7 +581,16 @@ def evaluate(
                     f"{failed[0]} missing: "
                     + ", ".join(first.get("missing", []) + first.get("missing_data_roles", []))
                 )
-            gate.checks.append(Check("mockup map", not failed, detail, evidence=doc_map))
+            if failed:
+                gate.checks.append(Check("mockup map", False, detail, evidence=doc_map))
+            elif khong_chay:
+                gate.checks.append(Check(
+                    "mockup map", Outcome.UNCONFIGURED,
+                    f"{', '.join(khong_chay)} not compared: "
+                    + str(maps[khong_chay[0]].detail["unavailable"])[:200],
+                    evidence=doc_map))
+            else:
+                gate.checks.append(Check("mockup map", True, evidence=doc_map))
 
     fake = evidence.last(TOOL_RUN, "qa:fake-tests")
     if fake is not None and not fake.ok:
@@ -763,8 +784,8 @@ def _preservation_check(evidence: Evidence, preservation: list[dict], candidate:
             continue
         elif kind == "mockup":
             m = at_candidate(MOCKUP_MAP, bid.split(":", 1)[-1])
-            if m is None:
-                missing.append(bid)
+            if m is None or m.detail.get("unavailable"):
+                missing.append(bid)      # not compared ≠ broken
             elif not m.ok:
                 broken.append(bid)
             continue
