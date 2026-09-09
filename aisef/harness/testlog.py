@@ -85,7 +85,16 @@ class TestLog:
 #: Playwright's `list` reporter: `  ✓   3 file.spec.js:26:1 › name (217ms)`.
 #: The status glyph, the ordinal, `path:line:col`, ` › `, then the title.
 #: A skipped test is `-`, a failure `✘`; an ANSI-stripped line keeps them.
-_PW = re.compile(r"^\s*([✓✘×✕⊘-])\s+\d+\s+\S+?:\d+:\d+\s+›\s+(.+?)(?:\s+\(\d+(?:\.\d+)?m?s\))?\s*$")
+#: One `--reporter=list` line. The `[project] › ` tag appears as soon as
+#: `playwright.config` declares projects — which is the default for anything
+#: testing more than one browser — and without it in the pattern a 99-test run
+#: read as zero tests (`todo`, 2026-09-09).
+_PW = re.compile(
+    r"^\s*([✓✘×✕⊘-])\s+\d+\s+"
+    r"(?:\[([^\]]+)\]\s+›\s+)?"
+    r"\S+?:\d+:\d+\s+›\s+"
+    r"(.+?)(?:\s+\(\d+(?:\.\d+)?m?s\))?\s*$"
+)
 
 
 def parse(text: str) -> TestLog:
@@ -200,7 +209,10 @@ def _playwright(lines: list[str], log: TestLog) -> None:
     for line in lines:
         m = _PW.match(line)
         if m:
-            _add(log, m.group(2), mark[m.group(1)])
+            # The same test runs once per project; keep them apart, or one
+            # browser skipping a case hides the other browser passing it.
+            project, title = m.group(2), m.group(3)
+            _add(log, f"[{project}] {title}" if project else title, mark[m.group(1)])
 
 
 def _node_tap(lines: list[str], log: TestLog) -> None:

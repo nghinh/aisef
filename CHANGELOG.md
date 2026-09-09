@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **A 99-test Playwright run read as zero tests** (bug 57). The fix for bug 43
+  matched its own fixture — a single-project config. The moment
+  `playwright.config` declares `projects`, which is the default for anything
+  testing more than one browser, every line carries a `[chromium] › ` tag and
+  the pattern matched nothing; `criteria have tests`, `coverage`,
+  `no baseline regression`, `tests verify story` and `preservation` all went
+  back to reporting that they could not read test names. The new fixture is
+  cut from a real three-browser run, and a test name now keeps its browser tag
+  so one browser skipping a case cannot hide another browser passing it.
+
 - **A story that builds the shell was told its list is missing a checkbox**
   (bug 56). Roles that appear only inside the mockup's sample rows were
   compared by "is this role anywhere on the page", so an empty list and an

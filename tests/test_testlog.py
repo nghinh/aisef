@@ -177,6 +177,29 @@ class TestPlaywright(unittest.TestCase):
         self.assertIn("AC-STORY-01-02-8: valid loaded task field values survive refresh "
                       "in the same browser profile", log.passed)
 
+    def test_nhieu_project_thi_moi_dong_mang_the_trinh_duyet(self):
+        """Lỗi 57. Ngay khi `playwright.config` khai `projects` — mặc định của
+        bất cứ dự án nào thử nhiều trình duyệt — mỗi dòng mang thêm
+        `[chromium] › `. Fixture của lỗi 43 chỉ có dạng một project, nên bản
+        vá ấy đọc được 20/20 ở đó và **0/99** trên `todo` thật."""
+        log = parse(fx("playwright-projects"))
+        self.assertEqual(log.format, "playwright-list")
+        self.assertTrue(log.passed, "không đọc được tên nào")
+        self.assertIn("[chromium] AC-STORY-01-01-1: initial document exposes the Todo List "
+                      "landmarks and labels", log.passed)
+        self.assertEqual(log.skipped,
+                         ["[webkit] AC-STORY-01-01-3: keyboard focus is visible in DOM order "
+                          "without positive tabindex"])
+
+    def test_cung_ten_o_hai_trinh_duyet_la_hai_ket_qua(self):
+        """Giữ tách ra: một trình duyệt bỏ qua không được che việc trình duyệt
+        kia chạy đạt."""
+        text = ("  ✓   1 [chromium] › tests/a.spec.js:7:1 › AC-1: mở được trang (10ms)\n"
+                "  -   2 [webkit] › tests/a.spec.js:7:1 › AC-1: mở được trang\n")
+        log = parse(text)
+        self.assertEqual(log.passed, ["[chromium] AC-1: mở được trang"])
+        self.assertEqual(log.skipped, ["[webkit] AC-1: mở được trang"])
+
     def test_bo_qua_log_cua_may_chu_xen_giua(self):
         """Output thật có `[WebServer] ... "GET / HTTP/1.1" 200 -` xen giữa."""
         text = ('[WebServer] 127.0.0.1 - - [09/Sep/2026 12:18:36] "GET / HTTP/1.1" 200 -\n'
