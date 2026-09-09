@@ -159,6 +159,33 @@ _NETWORK_MARKERS = (
     "tải về từ", "cdn", "webhook", "đồng bộ lên máy chủ",
 )
 
+#: Words that turn a network marker into a **prohibition** instead of a need.
+_NEGATIONS = ("no ", "not ", "never ", "without ", "must not", "cannot", "n't",
+              "khong ", "không ", "cấm ", "cam ")
+
+
+def _is_forbidden(text: str, marker: str) -> bool:
+    """Is this marker part of a requirement that network **not** happen.
+
+    A story whose acceptance criteria read "no third-party resources are
+    requested and no outbound network requests are made on load" was reported
+    as needing `sandbox.tools_network` **enabled** — the preflight matched the
+    words and ignored the sentence, turning a security requirement into a
+    demand to weaken the sandbox, and blocking the story as not executable
+    (measured 2026-09-09, todo-e2e STORY-01-01). Default is network off, which
+    is exactly what such a story wants: nothing to configure.
+
+    Only the clause the marker sits in is examined; a negation three sentences
+    earlier says nothing about this one.
+    """
+    low = text.lower()
+    i = low.find(marker.lower())
+    if i < 0:
+        return False
+    start = max(low.rfind(".", 0, i), low.rfind(",", 0, i), low.rfind("\n", 0, i)) + 1
+    return any(n in low[start:i] for n in _NEGATIONS)
+
+
 #: Markers that a story needs cross-module impact analysis.
 #: Deliberately **excludes** "full repository scan" markers: in Vietnamese
 #: the word is ambiguous between code repository and data store, and on e9
@@ -353,7 +380,7 @@ def required_capabilities(story: Story, *, project: Path | None = None) -> list[
 
     # 5. Network during verification.
     hit = _first_marker(text, _NETWORK_MARKERS)
-    if hit:
+    if hit and not _is_forbidden(text, hit):
         needs.append(Need("network", f'acceptance criteria mention "{hit}"',
                           "enable `sandbox.tools_network`"))
 

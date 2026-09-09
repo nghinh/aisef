@@ -228,3 +228,32 @@ class TestStorySuaKhongLamStaleCongStories(unittest.TestCase):
         self.ghi(data)
         self.assertIs(self.store.status(Gate.STORIES), Status.STALE)
 
+
+
+class TestReadinessChanTheoCaiChanDuocChay(unittest.TestCase):
+    """Lỗi 53. Cổng `readiness` từ chối duyệt khi **bất kỳ** khoảng trống nào
+    còn lại, gộp chung hai thứ khác hẳn nhau: story *không chạy nổi* (thiếu
+    lệnh test/lint — phải sửa trước) và story thiếu năng lực **tuỳ chọn** như
+    `review.impact_provider`, mà chính thông báo của nó nói "builtin vẫn chạy,
+    chỉ thô hơn".
+
+    Hệ quả là bế tắc: dự án mới không bao giờ duyệt được readiness nếu không
+    `--force`, vì bằng chứng và provider tuỳ chọn chính là thứ chưa tồn tại
+    trước lượt chạy đầu — mà story không chạy được cho tới khi readiness được
+    duyệt. Đo 2026-09-09 trên todo-e2e: 9/14 story bị giữ lại bởi đúng một
+    dòng khuyến nghị.
+    """
+
+    def test_chi_chan_khi_story_khong_chay_noi(self):
+        import inspect
+        from aisef.cli import plan
+        src = inspect.getsource(plan.cmd_approve)
+        self.assertIn("cannot run at all", src)
+        self.assertNotIn('if any("✗" in ln for ln in lines):\n            print("\\n".join(lines), file=sys.stderr)', src,
+                         "không được từ chối chỉ vì có dấu ✗ trong bản in")
+
+    def test_khoang_trong_chi_lam_giam_chat_luong_van_duoc_in(self):
+        import inspect
+        from aisef.cli import plan
+        self.assertIn("Gaps that only degrade quality are shown",
+                      inspect.getsource(plan.cmd_approve))

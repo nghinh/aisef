@@ -455,3 +455,35 @@ class TestDottedNamesAreNotFiles(PreflightTestCase):
         s = self.story(acceptance_criteria=["Then tệp `src/ui/new-screen.tsx` được tạo"])
         pf = self.check(s)
         self.assertTrue(any(m.capability == "write:src/ui/new-screen.tsx" for m in pf.missing), [m.line() for m in pf.missing])
+
+
+class TestCamMangKhongPhaiCanMang(unittest.TestCase):
+    """Lỗi 52. Preflight khớp chữ "third-party" rồi đòi **bật**
+    `sandbox.tools_network` — cho một story mà tiêu chí chấp nhận nói *cấm*
+    mọi truy cập mạng.
+
+    Đo 2026-09-09 trên todo-e2e STORY-01-01: AC là "no third-party resources
+    are requested and no outbound network requests are made on load". Heuristic
+    đọc chữ mà bỏ câu, biến một yêu cầu bảo mật thành yêu sách nới lỏng
+    sandbox, và chặn story là NOT_EXECUTABLE. Mặc định vốn đã là tắt mạng —
+    đúng thứ story ấy cần, không phải cấu hình gì cả.
+    """
+
+    def test_cau_cam_thi_khong_sinh_nhu_cau(self):
+        from aisef.control.preflight import _is_forbidden
+        self.assertTrue(_is_forbidden(
+            "the document loads and no third-party resources are requested", "third-party"))
+        self.assertTrue(_is_forbidden(
+            "Then no outbound network requests are made and no CDN is used", "cdn"))
+
+    def test_cau_khang_dinh_van_sinh_nhu_cau(self):
+        from aisef.control.preflight import _is_forbidden
+        self.assertFalse(_is_forbidden(
+            "the app calls a third-party geocoding API on submit", "third-party"))
+
+    def test_phu_dinh_o_cau_khac_khong_tinh(self):
+        """Một câu phủ định ba câu trước không nói gì về câu này."""
+        from aisef.control.preflight import _is_forbidden
+        self.assertFalse(_is_forbidden(
+            "There is no login. The importer downloads from a third-party feed.",
+            "third-party"))
