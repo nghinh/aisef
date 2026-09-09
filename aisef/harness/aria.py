@@ -87,9 +87,16 @@ class MapResult:
         if self.missing:
             parts.append("  missing: " + ", ".join(str(c) for c in self.missing))
         if self.missing_data_roles:
+            # An empty list is the usual cause, not a missing feature: the
+            # mockup shows sample rows, the app at a bare URL has none. Say
+            # where to look, or the next reader spends an afternoon on it
+            # (`todo` 2026-09-09: `checkbox` missing because a fresh browser
+            # profile has no stored task).
             parts.append(
                 "  data region rendered no items of type: "
                 + ", ".join(self.missing_data_roles)
+                + " — the list was empty at this URL; `app.dev_command` must "
+                  "serve an environment that already holds a record"
             )
         if self.extra:
             parts.append("  extra (warning): " + ", ".join(str(c) for c in self.extra))

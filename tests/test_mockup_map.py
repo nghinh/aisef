@@ -167,6 +167,23 @@ class TestVerifyHalf(unittest.TestCase):
         self.assertFalse(res.passed)
         self.assertIn("Ghi chú mới", res.summary())
 
+    def test_trang_404_khong_phai_ung_dung_thieu_component(self):
+        """Lỗi 35. Trang lỗi của máy chủ **cũng là** một trang: nó có tiêu đề,
+        có phần tử, và bộ so sánh chấm nó như thể ứng dụng dựng thiếu mọi thứ.
+
+        Đo 2026-09-09 trên `todo`: route trong hợp đồng là một câu tiếng Anh
+        ("Single initial document; no route change required"), `http.server`
+        trả 404, cổng báo thiếu cả 6 component, và story đốt hết 3 lượt sửa mã
+        không hỏng. Dấu vết duy nhất là `extra: heading "Error response"`.
+        """
+        cfg = self.serve("<button>Ghi chú mới</button>")
+        self.contract.by_id("danh-sach").route = "/khong-he-co-duong-nay"
+        res = self.run_verify(cfg)
+        self.assertFalse(res.passed)
+        ev = EvidenceStore(self.artifacts).read("STORY-01-01").last(MOCKUP_MAP, "danh-sach")
+        self.assertIn("404", str(ev.detail.get("error", "")),
+                      f"phải nói route không mở được, không phải 'thiếu component': {ev.detail}")
+
     def test_extra_component_only_warns(self):
         cfg = self.serve(
             '<input type="search" aria-label="Tìm ghi chú">'

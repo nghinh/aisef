@@ -199,6 +199,23 @@ def check_stories(
     return r
 
 
+def is_route_like(route: str) -> bool:
+    """Can this string be opened as a URL path.
+
+    The route is filled in by an agent writing prose in a table, and prose
+    reaches the browser unchanged: `todo` 2026-09-09 declared "Single initial
+    document; no route change required", the dev server answered 404, and the
+    mockup-map step read the error page as an app missing every component.
+
+    Whitespace is the tell — a real path has none, and every sentence has
+    some.  Deliberately lenient about everything else: `/`, `/tasks`,
+    `/note/:id`, `#/inbox`, `index.html` and `?tab=done` are all routes
+    somebody really uses.
+    """
+    r = route.strip()
+    return bool(r) and not any(c.isspace() for c in r)
+
+
 def check_design_contract(
     contract,
     experience,
@@ -250,6 +267,19 @@ def check_design_contract(
             r.errors.append(
                 f"{screen.id}: mockup does not declare a route (meta tag aisef-route) — "
                 "cannot cross-check against the real app"
+            )
+        elif not is_route_like(screen.route):
+            # Measured 2026-09-09 (`todo`): the route read "Single initial
+            # document; no route change required" — a sentence, which became
+            # a URL, which the dev server answered with its 404 page. The
+            # comparison then reported every component missing and the story
+            # burned all 3 attempts fixing code that was fine. A route is
+            # opened, not read: it must be openable.
+            r.errors.append(
+                f"{screen.id}: `{screen.route[:80]}` is a sentence, not a route — it becomes a "
+                f"URL and the app answers 404, then the mockup-map step reports every component "
+                f"missing. Put the real path in the `aisef-route` meta tag (`/`, `/tasks`, "
+                f"`/note/:id`) and re-run `aisef mockup`"
             )
         else:
             declared = experience.by_id(screen.id)

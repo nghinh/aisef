@@ -41,7 +41,18 @@ for (const job of input.jobs ?? []) {
     // Mockup mở bằng file://, ứng dụng thật mở bằng http:// — cùng một
     // đường trích, để hai bên so bằng cùng thước đo.
     const target = job.url ?? pathToFileURL(resolve(job.html)).href;
-    await page.goto(target, { waitUntil: job.url ? 'networkidle' : 'load' });
+    const resp = await page.goto(target, { waitUntil: job.url ? 'networkidle' : 'load' });
+
+    // Trang lỗi của máy chủ **cũng là** một trang: nó có tiêu đề, có phần tử,
+    // và bộ so sánh chấm nó như thể ứng dụng dựng thiếu mọi thứ. Đo trên
+    // `todo` 2026-09-09: route trong hợp đồng là một câu tiếng Anh, máy chủ
+    // trả 404, cổng báo "thiếu heading/form/control" và story đốt hết 3 lượt
+    // để sửa thứ không hỏng. Trạng thái ≥ 400 nghĩa là **chưa so được**.
+    if (job.url && resp && resp.status() >= 400) {
+      screens.push({ id: job.id, html: '', url: job.url, console_errors: errors,
+                     error: `route không mở được: HTTP ${resp.status()} tại ${target}` });
+      continue;
+    }
     const snapshot = await page.locator('body').ariaSnapshot();
 
     // Vùng dữ liệu mẫu: hàng danh sách, thẻ, kết quả tìm kiếm. Tên gọi ở

@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.2.21 — 2026-09-09
+
+- **A sentence in the route field failed a story three times** (bug 35). The
+  UX table's column is "Route/state", so the agent wrote prose in it, the
+  mockup copied the sentence into `aisef-route`, the harness turned it into a
+  URL, and the dev server answered with its 404 page. The mockup-map step
+  then compared that error page against the contract and reported every
+  component missing — with `preservation` calling it a regression. The only
+  trace was `extra: heading "Error response"`.
+  - the mockup gate now rejects a route that is not openable, before a story
+    spends anything;
+  - `render.mjs` treats HTTP >= 400 as *not compared*, not as an app missing
+    its interface;
+  - the mockup prompt asks for a real path when the document holds prose.
+- A data region that renders nothing now says the list was empty at that URL
+  and points at `app.dev_command`, instead of only naming the missing role.
+
 ## 1.2.20 — 2026-09-09
 
 - **Windows: the guard rejected paths that were inside scope** (bug 34).

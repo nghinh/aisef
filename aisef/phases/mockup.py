@@ -21,7 +21,7 @@ from ..clients.base import ClientAdapter, RunSpec
 from ..config import Config
 from ..control.design_contract import CONTRACT_FILE, DesignContract, build
 from ..control.experience import Experience, Screen, parse_experience_file
-from ..control.machine_gate import GateResult, check_design_contract
+from ..control.machine_gate import GateResult, check_design_contract, is_route_like
 from ..harness import browser
 from ..harness.observe import EvidenceStore
 from ..harness.prompts import load_catalog
@@ -93,10 +93,22 @@ def build_prompt(screen: Screen, experience: Experience, artifact_root: Path) ->
             "screen_name": screen.name,
             "purpose": screen.purpose or "(not specified in document)",
             "reached_from": screen.reached_from or "(not specified in document)",
+            # The UX table's column is "Route/state", which invites prose, and
+            # the agent then copies the sentence verbatim into the meta tag —
+            # `todo` shipped "Single initial document; no route change
+            # required" as a route, the dev server answered 404, and the
+            # mockup-map step blamed the app for missing every component.
+            # Ask for a path when what the document holds is a description.
             "route": (
                 f"`{screen.route}` — use this exact string in the aisef-route meta tag"
-                if screen.route
-                else "(not declared in document — choose a reasonable path and declare it in the meta tag)"
+                if is_route_like(screen.route)
+                else (
+                    f"the document says \"{screen.route}\" — that is a description, not a path. "
+                    f"Put the path the app really serves this screen at in the meta tag "
+                    f"(`/` for a single-page app)"
+                    if screen.route
+                    else "(not declared in document — choose a reasonable path and declare it in the meta tag)"
+                )
             ),
             "components": "\n".join(rules) or "- (not specified in document)",
             "states": ", ".join(screen.states) or "(default state only)",

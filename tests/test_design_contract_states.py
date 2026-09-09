@@ -65,3 +65,42 @@ class TestWholePageContract(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestRouteLaDuongDanKhongPhaiCauVan(unittest.TestCase):
+    """Lỗi 35. Cột trong bảng UX tên là "Route/state", nên agent viết mô tả
+    vào đó; agent dựng mockup chép nguyên câu ấy vào thẻ `aisef-route`; harness
+    ghép nó thành URL; máy chủ trả 404; và bộ so sánh chấm **trang lỗi** của
+    máy chủ như thể ứng dụng dựng thiếu mọi thứ.
+
+    Đo 2026-09-09 trên `todo`: route = "Single initial document; no route
+    change required", cổng báo thiếu cả 6 component + 2 data role, dấu vết duy
+    nhất là `extra: heading "Error response"` — tiêu đề trang lỗi của
+    `python3 -m http.server`. Story đốt cả 3 lượt sửa thứ không hỏng.
+    """
+
+    def test_nhan_dang_route(self):
+        from aisef.control.machine_gate import is_route_like
+        for r in ("/", "/tasks", "/note/:id", "#/inbox", "index.html", "?tab=done"):
+            with self.subTest(route=r):
+                self.assertTrue(is_route_like(r))
+        for r in ("Single initial document; no route change required", "trang chủ", "", "  "):
+            with self.subTest(route=r):
+                self.assertFalse(is_route_like(r))
+
+    def test_cong_chan_cau_van_truoc_khi_story_chay(self):
+        exp = Experience(screens=[Screen(id="s1", name="S1", route="Single initial document")])
+        scr = SimpleNamespace(
+            id="s1", error="", route="Single initial document", html="", png="",
+            snapshot=ONE_STATE, primary_snapshot=ONE_STATE, sample_snapshots=[],
+            annotation_snapshots=[], declared_states=["primary"], fields=[],
+            unresolved=[], console_errors=[],
+        )
+        c = build(exp, SimpleNamespace(by_id=lambda sid: scr if sid == "s1" else None))
+        errs = check_design_contract(c, exp).errors
+        self.assertTrue(any("not a route" in e and "s1" in e for e in errs), errs)
+
+    def test_route_that_van_qua(self):
+        c = build(EXP, rendered(ONE_STATE, ONE_STATE))
+        errs = check_design_contract(c, EXP).errors
+        self.assertFalse(any("not a route" in e for e in errs), errs)
