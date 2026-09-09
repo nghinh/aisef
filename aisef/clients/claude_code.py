@@ -53,11 +53,10 @@ the guard writes its own heartbeat, and ``diff-scope`` records
 
 from __future__ import annotations
 
-import shutil
 import subprocess
 from pathlib import Path
 
-from .base import Capability, ClientAdapter, RunSpec, Support, child_env
+from .base import Capability, ClientAdapter, RunSpec, Support, child_env, resolve_binary
 from .stream import RunResult, parse_stream
 
 BINARY = "claude"
@@ -78,7 +77,7 @@ class ClaudeCodeAdapter(ClientAdapter):
         self.binary = binary
 
     def available(self) -> bool:
-        return bool(shutil.which(self.binary))
+        return bool(resolve_binary(self.binary))
 
     def capabilities(self) -> dict[Capability, Support]:
         return {
@@ -95,9 +94,14 @@ class ClaudeCodeAdapter(ClientAdapter):
 
     def build_command(self, spec: RunSpec) -> list[str]:
         """Build the command line.  Separated so it can be tested without calling a model."""
+        # The prompt goes to **stdin**, not argv.  Windows caps a command
+        # line at 32767 characters and a planning prompt is 16-23k on its own:
+        # `WinError 206 the filename or extension is too long`, reported
+        # 2026-09-09.  Both CLIs read the prompt from stdin when no positional
+        # prompt is given (measured on both, 2026-09-09).
         cmd = [
-            self.binary,
-            "-p", spec.prompt,
+            *(resolve_binary(self.binary) or [self.binary]),
+            "-p",
             "--output-format", "stream-json",
             "--verbose",
             "--permission-mode", PERMISSION_MODE,
@@ -141,14 +145,16 @@ class ClaudeCodeAdapter(ClientAdapter):
                 stderr=subprocess.PIPE,
                 text=True,
                 env=child_env(spec.env, allow_prefixes=spec.env_allow),
-                stdin=subprocess.DEVNULL,  # without this: CLI waits on stdin 3s per call
+                # The prompt is written and stdin closed straight away; an open
+                # stdin makes the CLI wait 3s on every call.
+                stdin=subprocess.PIPE,
             )
         except OSError as e:
             return RunResult(ok=False, error=f"cannot run: {e}")
 
         timed_out = False
         try:
-            stdout, stderr = proc.communicate(timeout=spec.timeout_seconds)
+            stdout, stderr = proc.communicate(input=spec.prompt, timeout=spec.timeout_seconds)
         except subprocess.TimeoutExpired:
             proc.kill()
             stdout, stderr = proc.communicate()

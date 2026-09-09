@@ -125,7 +125,18 @@ class TestOpenCodeCommand(unittest.TestCase):
     def test_run_subcommand(self):
         cmd = OpenCodeAdapter().build_command(RunSpec(prompt="xin chào", workdir=Path(".")))
         self.assertEqual(cmd[1], "run")
-        self.assertIn("xin chào", cmd)
+
+    def test_prompt_di_qua_stdin_khong_qua_dong_lenh(self):
+        """Lỗi 33. Windows chặn dòng lệnh dài quá 32767 ký tự, mà riêng
+        prompt lập kế hoạch đã 16–23k (`WinError 206`, người dùng báo
+        2026-09-09). Prompt đi qua stdin — đo 2026-09-09: cả hai CLI đọc
+        prompt từ stdin khi không có tham số vị trí."""
+        for a in (OpenCodeAdapter(), ClaudeCodeAdapter()):
+            with self.subTest(client=a.id):
+                cmd = a.build_command(RunSpec(prompt="X" * 40_000, workdir=Path(".")))
+                self.assertNotIn("X" * 40_000, cmd)
+                self.assertLess(sum(len(c) for c in cmd), 32_767,
+                                "dòng lệnh vẫn vượt giới hạn của Windows")
 
     def test_model_flag(self):
         cmd = OpenCodeAdapter().build_command(

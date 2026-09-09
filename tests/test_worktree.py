@@ -299,6 +299,27 @@ class TestCauHinhClientVaoWorktree(WorktreeTestCase):
         wt = self.wm.create("S-02")
         self.assertFalse((wt.path / ".opencode").exists())
 
+    def test_ban_da_commit_khong_duoc_thang_ban_moi_bien_dich(self):
+        """Lỗi 32. Dự án `todo` **commit** `.opencode/plugin/aisef-guard.ts`,
+        nên worktree luôn checkout bản đã commit — bản `aisef compile` vừa
+        sửa nằm ở gốc dự án mà không story nào dùng tới, và cả lượt chạy
+        không có guard. Cấu hình client là artifact sinh ra: ghi đè."""
+        (self.repo / ".opencode" / "plugin").mkdir(parents=True)
+        guard = self.repo / ".opencode" / "plugin" / "aisef-guard.ts"
+        guard.write_text("// hong", encoding="utf-8")
+        git(self.repo, "add", "-A")
+        git(self.repo, "commit", "-qm", "commit plugin")
+        guard.write_text("// da sua", encoding="utf-8")     # compile chạy lại, chưa commit
+
+        wt = self.wm.create("S-03")
+        trong_wt = wt.path / ".opencode" / "plugin" / "aisef-guard.ts"
+        self.assertEqual(trong_wt.read_text(encoding="utf-8"), "// da sua")
+
+        guard.write_text("// sua lan hai", encoding="utf-8")  # worktree đã tồn tại
+        self.wm.create("S-03")
+        self.assertEqual(trong_wt.read_text(encoding="utf-8"), "// sua lan hai",
+                         "worktree dùng lại vẫn phải nhận bản guard mới nhất")
+
 
 class TestWorktreeTam(WorktreeTestCase):
     """ADR-005 V6: worktree tách tạm ở đúng SHA, gỡ khi xong — kể cả khi lỗi."""

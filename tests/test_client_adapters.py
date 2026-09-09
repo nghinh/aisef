@@ -34,9 +34,9 @@ class TestClaudeCodeId(unittest.TestCase):
 class TestClaudeCodeBuildCommand(unittest.TestCase):
     def test_minimal(self):
         cmd = ClaudeCodeAdapter().build_command(_spec())
-        self.assertEqual(cmd[0], "claude")
+        self.assertTrue(cmd[0].endswith("claude"), cmd[0])   # resolved path on Windows
         self.assertIn("-p", cmd)
-        self.assertEqual(cmd[cmd.index("-p") + 1], "test")
+        self.assertNotIn("test", cmd, "prompt đi qua stdin, không qua dòng lệnh")
         self.assertIn("--output-format", cmd)
         self.assertEqual(cmd[cmd.index("--output-format") + 1], "stream-json")
         self.assertIn("--verbose", cmd)
@@ -114,13 +114,13 @@ class TestOpenCodeId(unittest.TestCase):
 class TestOpenCodeBuildCommand(unittest.TestCase):
     def test_minimal(self):
         cmd = OpenCodeAdapter().build_command(_spec())
-        self.assertEqual(cmd[0], "opencode")
+        self.assertTrue(cmd[0].endswith("opencode"), cmd[0])   # resolved path on Windows
         self.assertIn("run", cmd)
         self.assertIn("--format", cmd)
         self.assertEqual(cmd[cmd.index("--format") + 1], "json")
         self.assertIn("--dir", cmd)
         self.assertEqual(cmd[cmd.index("--dir") + 1], "/tmp/test")
-        self.assertEqual(cmd[-1], "test")
+        self.assertNotIn("test", cmd[cmd.index("--dir") + 2:], "prompt đi qua stdin")
 
     def test_with_model(self):
         cmd = OpenCodeAdapter().build_command(_spec(model="gpt-4"))

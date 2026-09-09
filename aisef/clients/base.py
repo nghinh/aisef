@@ -81,7 +81,18 @@ class RunSpec:
 #: Host variables kept **as-is** for the client process — enough for a CLI
 #: to run (find commands, home dir, locale, tmp, certificates), no more.
 ENV_KEEP = frozenset({"PATH", "HOME", "LANG", "TERM", "TMPDIR", "SHELL", "USER", "LOGNAME",
-                      "SSL_CERT_FILE"})
+                      "SSL_CERT_FILE",
+                      # Windows equivalents.  Without `SystemRoot` a child
+                      # process cannot load system DLLs or open a socket, and
+                      # without `PATHEXT` it cannot resolve `.cmd`/`.exe` at
+                      # all — an allowlist written for POSIX leaves a Windows
+                      # child in an environment nothing runs in.
+                      # Names are upper-case because that is how `os.environ`
+                      # normalises them on Windows.
+                      "SYSTEMROOT", "SYSTEMDRIVE", "WINDIR", "COMSPEC", "PATHEXT",
+                      "USERPROFILE", "APPDATA", "LOCALAPPDATA", "PROGRAMDATA",
+                      "PROGRAMFILES", "PROGRAMFILES(X86)", "TEMP", "TMP",
+                      "NUMBER_OF_PROCESSORS", "PROCESSOR_ARCHITECTURE"})
 #: Prefixes kept: locale, Claude model key/URL, harness variables for guards.
 #: Parent session's `CLAUDE*` is **not** here — conformance C3 showed a child
 #: session inheriting them switches to Bash and bypasses Write/Edit guards (error 4).
@@ -101,6 +112,26 @@ GIT_NO_CREDENTIALS: dict[str, str] = {
     "GIT_CONFIG_KEY_0": "credential.helper",
     "GIT_CONFIG_VALUE_0": "",
 }
+
+
+def resolve_binary(name: str) -> list[str]:
+    """The argv prefix that actually starts `name` on this OS — empty if it is
+    not installed.
+
+    `subprocess` does not search `PATHEXT`, and `CreateProcess` cannot execute
+    a `.cmd`/`.bat` shim at all.  Both CLIs install as such a shim on Windows
+    (npm/bun), so passing the bare name raises **WinError 2 "cannot find the
+    file"** on a machine where the CLI is installed and `shutil.which` finds
+    it — reported 2026-09-09 by a user running `aisef plan --client opencode`
+    on Windows.  Resolve the real path, and hand a shim to the interpreter
+    that can run it.
+    """
+    path = shutil.which(name)
+    if not path:
+        return []
+    if os.name == "nt" and Path(path).suffix.lower() in (".cmd", ".bat"):
+        return [os.environ.get("COMSPEC", "cmd.exe"), "/c", path]
+    return [path]
 
 
 def child_env(spec_env: dict[str, str], *, allow_prefixes: Iterable[str] = ()) -> dict[str, str]:

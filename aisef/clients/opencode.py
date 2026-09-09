@@ -25,12 +25,11 @@ structured event stream, so cost must be queried separately.
 
 from __future__ import annotations
 
-import shutil
 import subprocess
 import time
 from pathlib import Path
 
-from .base import Capability, ClientAdapter, RunSpec, Support, child_env
+from .base import Capability, ClientAdapter, RunSpec, Support, child_env, resolve_binary
 from .stream import RunResult
 
 BINARY = "opencode"
@@ -90,7 +89,7 @@ class OpenCodeAdapter(ClientAdapter):
         self.binary = binary
 
     def available(self) -> bool:
-        return bool(shutil.which(self.binary))
+        return bool(resolve_binary(self.binary))
 
     def capabilities(self) -> dict[Capability, Support]:
         return {
@@ -122,7 +121,12 @@ class OpenCodeAdapter(ClientAdapter):
         #   {"tool":"read","input":{"filePath":"/…/par/src/reverse-words.js"}}
         #   {"tool":"bash","input":{"command":"git add … && git commit …",
         #                           "workdir":"/…/par"}}
-        cmd = [self.binary, "run", "--dir", str(spec.workdir), spec.prompt]
+        # The prompt goes to **stdin**, not argv: Windows caps a command line
+        # at 32767 characters and a planning prompt is 16-23k on its own
+        # (`WinError 206`, reported 2026-09-09).  `opencode run` with no
+        # message reads the prompt from stdin — measured 2026-09-09.
+        cmd = [*(resolve_binary(self.binary) or [self.binary]),
+               "run", "--dir", str(spec.workdir)]
         if spec.model:
             cmd += ["--model", spec.model]
         cmd.insert(2, "--format")
@@ -147,14 +151,14 @@ class OpenCodeAdapter(ClientAdapter):
                 # the full host environment and logged secrets to its own log.
                 # Providers reading keys from custom env vars declare `clients.env_allow`.
                 env=child_env(spec.env, allow_prefixes=spec.env_allow),
-                stdin=subprocess.DEVNULL,
+                stdin=subprocess.PIPE,
             )
         except OSError as e:
             return RunResult(ok=False, error=f"cannot run: {e}")
 
         timed_out = False
         try:
-            stdout, stderr = proc.communicate(timeout=spec.timeout_seconds)
+            stdout, stderr = proc.communicate(input=spec.prompt, timeout=spec.timeout_seconds)
         except subprocess.TimeoutExpired:
             proc.kill()
             stdout, stderr = proc.communicate()
