@@ -871,7 +871,18 @@ def record_outcome(
     — avoids polluting the record.
     """
     story = story_from_env(env)
-    if not story or not artifact_root:
+    if not artifact_root:
+        return
+    if not story:
+        # Planning and mockup sessions have no story, so nothing was recorded
+        # — including the blocks.  A guard that stops the UX phase then leaves
+        # its reason only inside the client's own session log, where the
+        # operator cannot see it: reported 2026-09-09 from Windows as "the ux
+        # phase is blocked" with no way to learn which path or which rule.
+        if not verdict.allowed:
+            from .runlog import one_line, run_log
+            run_log(artifact_root, f"guard {kind} BLOCK "
+                    + one_line(f"{event.get('tool_name') or '?'} · {verdict.reason}"))
         return
     from .observe import GUARD_BLOCK, GUARD_CHECK, GUARD_SEEN, TOOL_RUN, EvidenceStore, Event
 

@@ -1077,3 +1077,41 @@ class TestEgressGuard(unittest.TestCase):
         event = {"tool_name": "WebFetch", "tool_input": {"url": "https://anywhere.com"}}
         v = run_guard("egress", event, env={})
         self.assertTrue(v.allowed)
+
+
+class TestGiaiDoanKeHoachKhaiBaoPhamVi(unittest.TestCase):
+    """Lỗi 36. Giai đoạn plan/mockup **không** truyền env nào cho client, nên
+    guard suy phạm vi từ thứ **vắng mặt**: hết `AISEF_WRITE_SCOPE` thì lùi về
+    phạm vi kế hoạch — nhưng chỉ đúng khi máy không còn `AISEF_STORY_ID` sót
+    lại từ lượt trước. Còn sót thì guard chuyển sang chế độ story với phạm vi
+    rỗng và **từ chối mọi lần ghi** của giai đoạn kế hoạch.
+    """
+
+    def test_story_id_sot_lai_lam_ket_giai_doan_ke_hoach(self):
+        from aisef.harness.guardrails import PLANNING_SCOPE, effective_scope
+        self.assertEqual(effective_scope({}), list(PLANNING_SCOPE))
+        self.assertEqual(effective_scope({"AISEF_STORY_ID": "STORY-CU"}), [],
+                         "đây là cái bẫy: có story, không có phạm vi ⇒ chặn hết")
+
+    def test_plan_khai_bao_du_bon_bien(self):
+        """Harness biết câu trả lời, không để môi trường xung quanh quyết."""
+        import inspect
+        from aisef.phases import mockup, plan
+        for mod in (plan, mockup):
+            src = inspect.getsource(mod)
+            with self.subTest(module=mod.__name__):
+                self.assertIn("ENV_WRITE_SCOPE: \",\".join(PLANNING_SCOPE)", src)
+                self.assertIn("ENV_STORY_ID: \"\"", src)
+
+    def test_chan_ngoai_story_van_vao_nhat_ky(self):
+        """Guard chặn giai đoạn kế hoạch từng chỉ để lại lý do trong log phiên
+        của client — người vận hành không thấy gì."""
+        import tempfile
+        from aisef.harness.guardrails import Verdict, record_outcome
+        with tempfile.TemporaryDirectory() as tmp:
+            record_outcome("write-scope", {"tool_name": "write"},
+                           Verdict(False, "docs/x.md is outside the story's write_scope"),
+                           env={}, artifact_root=tmp)
+            log = (Path(tmp) / "run.log").read_text(encoding="utf-8")
+        self.assertIn("guard write-scope BLOCK", log)
+        self.assertIn("outside the story's write_scope", log)

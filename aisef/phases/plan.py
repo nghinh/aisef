@@ -35,6 +35,13 @@ from ..config import Config
 from ..control.approvals import GATE_ARTIFACTS, ApprovalStore, Gate, Status
 from ..control.bmad_status import HeadlessStatus, parse_headless_status
 from ..control.machine_gate import GateResult, check_prd
+from ..harness.guardrails import (
+    ENV_PROJECT,
+    ENV_STORY_ID,
+    ENV_WORKDIR,
+    ENV_WRITE_SCOPE,
+    PLANNING_SCOPE,
+)
 from ..harness.observe import EvidenceStore
 from ..control.normalize import parse_prd_file
 from ..clients.stream import INFRA_STATUSES, exit_status_of
@@ -378,6 +385,19 @@ def run_phase(
         max_turns=config["run.max_turns"],
         timeout_seconds=config["run.timeout_seconds"],
     )
+    # Declare what the guard must see, instead of letting it infer from what
+    # is **absent**.  With no env at all, `effective_scope` fell back to the
+    # planning scope only as long as the host had no `AISEF_*` left over from
+    # an earlier run: a stale `AISEF_STORY_ID` in the shell flips the guard
+    # into story mode with an empty scope, and every planning write is denied
+    # with "story has not declared write_scope".  The harness knows the answer
+    # here; nothing should be left to the ambient environment.
+    spec.env = {
+        ENV_WRITE_SCOPE: ",".join(PLANNING_SCOPE),
+        ENV_STORY_ID: "",
+        ENV_PROJECT: str(project),
+        ENV_WORKDIR: str(project),
+    }
 
     # Retry on infra errors, and do **not** count as phase failure: a single
     # mid-run disconnect already spent $2.69 producing nothing — giving up

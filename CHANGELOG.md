@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.2.22 — 2026-09-09
+
+- **Planning phases inferred the guard's scope from what was absent**
+  (bug 36). `plan` and `mockup` passed no environment to the client, so the
+  guard fell back to the planning scope only as long as the host had no
+  `AISEF_*` left over: a stale `AISEF_STORY_ID` in the shell flips it into
+  story mode with an empty scope and denies every planning write. Both
+  phases now declare `AISEF_WRITE_SCOPE`, `AISEF_STORY_ID`, `AISEF_PROJECT`
+  and `AISEF_WORKDIR` outright.
+- **A guard that blocked outside a story left no trace.** Nothing is recorded
+  without a story id, so a blocked planning phase kept its reason inside the
+  client's own session log. Blocks now reach `run.log` as
+  `guard <kind> BLOCK <tool> · <reason>`.
+
 ## 1.2.21 — 2026-09-09
 
 - **A sentence in the route field failed a story three times** (bug 35). The

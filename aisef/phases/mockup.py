@@ -22,6 +22,13 @@ from ..config import Config
 from ..control.design_contract import CONTRACT_FILE, DesignContract, build
 from ..control.experience import Experience, Screen, parse_experience_file
 from ..control.machine_gate import GateResult, check_design_contract, is_route_like
+from ..harness.guardrails import (
+    ENV_PROJECT,
+    ENV_STORY_ID,
+    ENV_WORKDIR,
+    ENV_WRITE_SCOPE,
+    PLANNING_SCOPE,
+)
 from ..harness import browser
 from ..harness.observe import EvidenceStore
 from ..harness.prompts import load_catalog
@@ -79,6 +86,28 @@ class MockupResult:
         if self.index_path:
             lines.append(f"  open: {self.index_path}")
         return "\n".join(lines)
+
+
+def _spec(*, prompt: str, project: Path, cfg: Config) -> RunSpec:
+    """Run spec for a mockup session, with the guard's inputs **declared**.
+
+    Same reason as the plan phase: without an explicit env the guard reads
+    the ambient one, and a stale `AISEF_STORY_ID` left in the shell turns the
+    planning scope into an empty story scope that denies every write.
+    """
+    spec = RunSpec(
+        prompt=prompt,
+        workdir=project,
+        max_turns=cfg["run.max_turns"],
+        timeout_seconds=cfg["run.timeout_seconds"],
+    )
+    spec.env = {
+        ENV_WRITE_SCOPE: ",".join(PLANNING_SCOPE),
+        ENV_STORY_ID: "",
+        ENV_PROJECT: str(project),
+        ENV_WORKDIR: str(project),
+    }
+    return spec
 
 
 def build_prompt(screen: Screen, experience: Experience, artifact_root: Path) -> str:
@@ -171,11 +200,10 @@ def generate(
 
         _log(f"screen={screen.id} agent START")
         run = client.run(
-            RunSpec(
+            _spec(
                 prompt=build_prompt(screen, res.experience, root),
-                workdir=project,
-                max_turns=cfg["run.max_turns"],
-                timeout_seconds=cfg["run.timeout_seconds"],
+                project=project,
+                cfg=cfg,
             )
         )
         res.cost_usd += run.cost_usd
