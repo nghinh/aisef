@@ -15,6 +15,8 @@ from __future__ import annotations
 
 import os
 import shutil
+import sys
+import stat
 import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -94,9 +96,32 @@ def _clone(source: Source, dest: Path) -> str:
         return f"exceeded {CLONE_TIMEOUT}s"
     except OSError as e:
         return str(e)
-    shutil.rmtree(dest, ignore_errors=True)
+    _remove_tree(dest)
     tmp.replace(dest)
     return ""
+
+
+def _remove_tree(path: Path) -> None:
+    """Delete a directory tree, including the read-only files git leaves.
+
+    Windows refuses to unlink a read-only file, and a fresh clone's
+    `.git/objects` is full of them: `aisef setup` failed with
+    `PermissionError [WinError 5] Access is denied` while replacing a cached
+    reference repo. POSIX does not care, which is why this went unnoticed.
+    """
+    def _force(func, target, _exc):
+        try:
+            os.chmod(target, stat.S_IWRITE)
+            func(target)
+        except OSError:
+            pass
+
+    if not path.exists():
+        return
+    if sys.version_info >= (3, 12):
+        shutil.rmtree(path, onexc=_force)
+    else:
+        shutil.rmtree(path, onerror=_force)
 
 
 def ensure(

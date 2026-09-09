@@ -314,7 +314,11 @@ def _project_files(project: Path) -> list[str]:
         rel = path.relative_to(project)
         if not path.is_file() or any(part in _VENDOR for part in rel.parts):
             continue
-        out.append(str(rel))
+        # `/` always: the git branch above returns POSIX paths and every
+        # consumer's pattern is written that way. `str(rel)` gave
+        # `tests\test_a.py` on Windows, `_TEST_FILE` matched nothing, and the
+        # fake-test check silently found zero files in any project without git.
+        out.append(rel.as_posix())
     return out
 
 
