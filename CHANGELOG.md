@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **The reviewer rejected the fix it had prescribed** (bug 61). Round 2 asked
+  for "a defined post-load quiet period"; the author added one; round 3 blocked
+  the same line because a defined window is finite, and asked for deterministic
+  timer control instead. The story spent all three attempts doing exactly what
+  it was told. The rule against moving goalposts only covered promoting
+  *should fix* to *block*; it now covers rejecting your own prescription, and
+  names `[stuck]` as the outcome when no change the author can make would
+  satisfy the criterion.
+
 - **An infra retry in the plan phase left no line in the log** (bug 60).
   `todo-e3`'s ux phase failed twice with `APIError: SSE read timed out`, was
   correctly classified as infrastructure and retried both times — and the log
