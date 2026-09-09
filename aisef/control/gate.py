@@ -251,7 +251,9 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
         if str(base_ev.detail["unrunnable"]).startswith(NO_SETUP):
             return Check(name, Outcome.NOT_APPLICABLE,
                          "nothing runnable at the baseline commit — no test was ever green "
-                         "there, so there is nothing to regress",
+                         "there, so there is nothing to regress. To get this check back, "
+                         "install the project's dependencies at the project root: each story "
+                         "worktree resolves them by walking up from there",
                          evidence=seqs)
         return Check(name, Outcome.UNRUNNABLE,
                      f"baseline unrunnable ({base_ev.detail['unrunnable']}) — cannot compare existing tests",

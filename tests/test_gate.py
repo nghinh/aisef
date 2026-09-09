@@ -525,9 +525,9 @@ class TestDuAnMoiTinh(GateTestCase):
     test đó ba phút trước.
     """
 
-    KHONG_DU_AN = "no runnable setup at this commit — no project manifest in this tree"
-    KHONG_PHU_THUOC = ("no runnable setup at this commit — the project's "
-                       "dependencies are not installed in this tree")
+    KHONG_DU_AN = "no runnable setup in this tree — there is no project manifest here"
+    KHONG_PHU_THUOC = ("no runnable setup in this tree — the project's "
+                       "dependencies are not installed here")
 
     def muc(self, ten, **kw):
         g = self.gate(candidate="aaa", **kw)

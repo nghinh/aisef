@@ -1058,7 +1058,11 @@ def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Co
         "baseline": True, "parent": head_sha(workdir), "base_ref": base_ref,
         "red_before": log.failed[:MAX_IDS],
     })
-    run_log(artifact_root, f"story={story.id} baseline DONE ok={res.ok} red_before={len(log.failed)}")
+    # Say *why* when it could not run: `ok=False` alone sends the reader to the
+    # evidence JSONL to find out whether the baseline was red or never started.
+    run_log(artifact_root, f"story={story.id} baseline DONE ok={res.ok} "
+                           f"red_before={len(log.failed)}"
+                           + (f" unrunnable={res.unrunnable}" if res.unrunnable else ""))
 
 
 def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,

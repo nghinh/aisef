@@ -60,12 +60,12 @@ class TestLyDoTrongNhatKy(unittest.TestCase):
     def tearDown(self):
         self.case.tearDown()
 
-    def chay(self, **kw):
+    def chay(self, config=None, **kw):
         from aisef.phases.implement import implement_story
 
         implement_story(
             self.case.story, project=self.case.project, artifact_root=self.case.artifacts,
-            client=self.ScriptedClient(**kw), config=self.case.config(),
+            client=self.ScriptedClient(**kw), config=config or self.case.config(),
         )
         return (self.case.artifacts / "run.log").read_text(encoding="utf-8")
 
@@ -81,6 +81,15 @@ class TestLyDoTrongNhatKy(unittest.TestCase):
     def test_muc_chan_cua_reviewer_nam_trong_nhat_ky(self):
         log = self.chay(review="[chặn] src/a.py:1 — mất dữ liệu khi lưu")
         self.assertIn("review ✗ [chặn] src/a.py:1 — mất dữ liệu khi lưu", log)
+
+    def test_baseline_khong_chay_duoc_thi_noi_ra_ngay_trong_nhat_ky(self):
+        """`baseline DONE ok=False` một mình không phân biệt "đỏ" với "chưa
+        khởi chạy được" — người vận hành phải mở evidence JSONL mới biết. Đo
+        trên `todo-e2e` 2026-09-09: hai lần."""
+        log = self.chay(config=self.case.config(**{"tools.test": "khong-he-co-lenh-nay --chay"}))
+        self.assertIn("baseline DONE", log)
+        dong = next(d for d in log.splitlines() if "baseline DONE" in d)
+        self.assertIn("unrunnable=", dong, dong)
 
     def test_nop_noi_ro_do_la_ket_qua_mong_doi(self):
         """`nop DONE ok=False` từng bị đọc là lỗi; đỏ ở parent mới là điều cần."""
