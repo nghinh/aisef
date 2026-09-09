@@ -210,7 +210,11 @@ def seed_fake_credential(repo: Path, url: str) -> Path:
     env con (`GIT_NO_CREDENTIALS`) thì helper không được hỏi."""
     store = repo / ".git" / "hop-quy-credentials"
     store.write_text(url.replace("://", "://gia:token-gia@").rsplit("/", 1)[0] + "\n", encoding="utf-8")
-    subprocess.run(["git", "-C", str(repo), "config", "credential.helper", f"store --file={store}"], check=True)
+    # git parses the helper as a shell command, and its bundled `sh` eats
+    # backslashes: a Windows path must go in POSIX form or the token is
+    # silently read from a file that does not exist.
+    subprocess.run(["git", "-C", str(repo), "config", "credential.helper",
+                    f"store --file={store.as_posix()}"], check=True)
     return store
 
 

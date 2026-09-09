@@ -23,11 +23,16 @@ def write_exe(path: Path, *, posix: str, windows: str) -> Path:
     return path
 
 
-def dump_env(path: Path) -> Path:
-    """Fake client that writes its own environment to `env.txt` in its cwd."""
+def dump_env(path: Path, out: Path) -> Path:
+    """Fake client that writes its own environment to `out`.
+
+    An absolute destination, not `$PWD/env.txt`: adapters differ on whether
+    they set the child's cwd or pass the directory as a flag, and the fixture
+    must not depend on which.
+    """
     return write_exe(path,
-                     posix='#!/bin/sh\nenv > "$PWD/env.txt"\n',
-                     windows='@set > "%CD%\\env.txt"\r\n')
+                     posix=f'#!/bin/sh\nenv > "{out}"\n',
+                     windows=f'@set > "{out}"\r\n')
 
 
 def sleeps(path: Path, seconds: int) -> Path:

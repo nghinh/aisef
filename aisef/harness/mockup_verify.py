@@ -31,7 +31,7 @@ from ..config import Config
 from ..clients.base import runnable, split_command
 from ..control.design_contract import DesignContract
 from . import browser
-from .aria import MapResult, compare, parse_aria_snapshot
+from .aria import MapResult, compare, has_items, parse_aria_snapshot
 from .observe import MOCKUP_MAP, EvidenceStore
 
 
@@ -281,6 +281,7 @@ def verify_screens(
                 screen_id=screen.id,
                 route=screen.route,
                 data_roles=screen.data_roles,
+                items_rendered=has_items(got.snapshot),
             )
         out.results.append(result)
         if store:

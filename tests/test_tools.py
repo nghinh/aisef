@@ -328,18 +328,35 @@ if __name__ == "__main__":
     unittest.main(verbosity=2)
 
 
+def lenh_in(*dong: str, exit_code: int = 1, doc_tep: str = "") -> str:
+    """A command that prints `dong` and exits — Python, not `sh -c`: Windows
+    has no `sh`, so such a fixture only ever "passed" there because the
+    command could not start, which measures nothing."""
+    from aisef.clients.base import quote_command
+
+    code = "import sys\n"
+    if doc_tep:
+        code += f"sys.stdout.write(open({doc_tep!r}, encoding='utf-8').read())\n"
+    for d in dong:
+        code += f"print({d!r})\n"
+    code += f"sys.exit({exit_code})\n"
+    return quote_command([sys.executable, "-c", code])
+
+
 class TestKhongChayDuocKhacDo(ToolTestCase):
     """Dogfood par: `node --test src/` → MODULE_NOT_FOUND bị coi là test đỏ,
     guard completion chặn Stop ~10 lần/lượt, 3 story đốt $17."""
+
 
     def run_test_tool(self, command: str):
         cfg = Config({**DEFAULTS, "tools.test": command, "sandbox.allow_degraded": True})
         return run_tool("test", self.project, story_id="S-01", artifact_root=self.artifacts, config=cfg)
 
     def test_module_not_found_is_unrunnable(self):
-        res = self.run_test_tool("sh -c 'echo \"Error: Cannot find module x\"; echo \"code: MODULE_NOT_FOUND\" >&2; exit 1'")
+        res = self.run_test_tool(
+            lenh_in("Error: Cannot find module x", "code: MODULE_NOT_FOUND"))
         self.assertFalse(res.ok)
-        self.assertIn("cannot load", res.unrunnable)
+        self.assertIn("dependencies are not installed", res.unrunnable)
         e = EvidenceStore(self.artifacts).read("S-01").last(TOOL_RUN, "test")
         self.assertTrue(e.detail["unrunnable"])
 
@@ -347,7 +364,7 @@ class TestKhongChayDuocKhacDo(ToolTestCase):
         from pathlib import Path
         (Path(self.project) / "out.txt").write_text(
             "✔ AC-S-1: có (1ms)\n✖ AC-S-2: element not found (2ms)\nℹ tests 2\nℹ pass 1\nℹ fail 1\n", encoding="utf-8")
-        res = self.run_test_tool("sh -c 'cat out.txt; exit 1'")
+        res = self.run_test_tool(lenh_in(doc_tep="out.txt"))
         self.assertFalse(res.ok)
         self.assertEqual(res.unrunnable, "")
 
@@ -372,7 +389,7 @@ class TestCheBiMatVaLogToanVan(ToolTestCase):
 
     def test_bi_mat_trong_stdout_bi_che_va_dem(self):
         res = self.run_test_tool(
-            f"sh -c 'echo {self.AWS}; echo {self.GH}; echo \"{self.BEARER}\"; exit 1'")
+            lenh_in(self.AWS, self.GH, self.BEARER))
         e = self.last()
         self.assertEqual(e.detail["redacted"], 3)
         self.assertEqual(e.detail["tail"].count("[REDACTED]"), 3)
@@ -422,8 +439,16 @@ class TestThieuDuAnKhacThieuCongCu(unittest.TestCase):
     )
 
     def test_thieu_manifest_la_khong_co_du_an(self):
-        from aisef.harness.tools import NO_PROJECT, unrunnable_reason
-        self.assertTrue(unrunnable_reason("test", 254, self.NPM_ENOENT).startswith(NO_PROJECT))
+        from aisef.harness.tools import NO_SETUP, unrunnable_reason
+        self.assertTrue(unrunnable_reason("test", 254, self.NPM_ENOENT).startswith(NO_SETUP))
+
+    def test_chua_cai_phu_thuoc_cung_la_chua_dung_duoc(self):
+        """`node_modules` sống trong worktree story sắp dựng; ở commit gốc
+        `npm test` chỉ có thể báo thiếu gói."""
+        from aisef.harness.tools import NO_SETUP, unrunnable_reason
+        out = ("Error [ERR_MODULE_NOT_FOUND]: Cannot find package "
+               "'@playwright/test' imported from /w/playwright.config.js")
+        self.assertTrue(unrunnable_reason("test", 1, out).startswith(NO_SETUP))
 
     def test_thieu_cong_cu_van_la_thieu_cong_cu(self):
         from aisef.harness.tools import unrunnable_reason

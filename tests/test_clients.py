@@ -327,7 +327,7 @@ class TestKhongThuaHuongPhienCha(unittest.TestCase):
         from pathlib import Path
         fake = Path(tmp) / "client-gia"
         from tests._bin import dump_env
-        return dump_env(fake)
+        return dump_env(fake, Path(tmp) / "env.txt")
 
     def test_child_process_really_gets_the_clean_env(self):
         import os, tempfile
@@ -504,6 +504,25 @@ class TestSplitCommand(unittest.TestCase):
                 base.split_command(r"C:\hostedtoolcache\Python\python.exe -c x"),
                 [r"C:\hostedtoolcache\Python\python.exe", "-c", "x"],
             )
+
+    def test_ghep_roi_tach_lai_ra_dung_argv(self):
+        """Tính chất mà hook guard dựa vào: ghép argv thành một chuỗi rồi để
+        shell của HĐH tách lại phải ra **đúng** argv ấy — dấu cách, nháy, hay
+        ký tự đặc biệt của shell đều không được sinh thêm một tham số."""
+        argv = ["aisef", "--project", "/tmp/my project", "guard", "write-scope"]
+        for platform in ("linux", "win32"):
+            with self.subTest(platform=platform), \
+                 mock.patch.object(base.sys, "platform", platform):
+                self.assertEqual(base.split_command(base.quote_command(argv)), argv)
+
+    def test_ghep_khong_de_lot_ky_tu_dac_biet_cua_shell(self):
+        for platform, argv in (("linux", ["aisef", "/tmp/$(whoami)"]),
+                               ("win32", ["aisef", r"C:\tmp\a&b"])):
+            with self.subTest(platform=platform), \
+                 mock.patch.object(base.sys, "platform", platform):
+                raw = base.quote_command(argv)
+                self.assertNotIn(f" {argv[1]}", raw)      # không bao giờ để trần
+                self.assertEqual(base.split_command(raw), argv)
 
     def test_windows_groups_with_double_quotes_only(self):
         with mock.patch.object(base.sys, "platform", "win32"):

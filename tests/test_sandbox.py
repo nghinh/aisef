@@ -456,7 +456,7 @@ class TestMounts(unittest.TestCase):
     """ADR-005 V6: worktree sạch từ SHA không có `node_modules`/venv — mượn của dự án."""
 
     def test_docker_bind_mount_cung_mode_voi_workspace(self):
-        src = Path("/du-an/node_modules")
+        src = Path("/du-an/node_modules").resolve()   # docker args resolve the source
         s = SandboxSpec(workspace=Path("/tmp"), cmd=["true"], mounts={"node_modules": src})
         self.assertIn(f"{src}:/workspace/node_modules:rw", build_docker_args(s))
         s.level = Level.READ_ONLY

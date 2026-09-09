@@ -289,8 +289,17 @@ MANIFESTS = (
     "cargo.toml", "go.mod", "pom.xml", "build.gradle", "gemfile", "composer.json",
 )
 
-#: Stable prefix of that reason, so callers can tell it from a missing tool.
-NO_PROJECT = "no project at this commit"
+#: Markers meaning the program started fine but the **project's** own setup is
+#: absent from this tree: dependencies were never installed here. The first
+#: story of a JS project hits this at its baseline commit — `node_modules`
+#: lives in the worktree the story is about to build, and there is nothing to
+#: borrow from a project root that never installed them either.
+NO_DEPENDENCIES = ("cannot find module", "cannot find package",
+                   "module_not_found", "modulenotfounderror")
+
+#: Stable prefix shared by both, so callers can tell "this commit has nothing
+#: to run" from "this machine is missing the tool".
+NO_SETUP = "no runnable setup at this commit"
 
 
 def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error: str = "") -> str:
@@ -310,7 +319,9 @@ def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error:
         if parse_testlog(output).passed:
             return ""
     if hit == "no such file or directory" and any(m in low for m in MANIFESTS):
-        return f"{NO_PROJECT} — the tree has no project manifest, so there is nothing to run"
+        return f"{NO_SETUP} — no project manifest in this tree"
+    if any(m in low for m in NO_DEPENDENCIES):
+        return f"{NO_SETUP} — the project's dependencies are not installed in this tree"
     return f"tool not installed or cannot load ({hit or 'exit 127'}) — set up the environment or fix the command and retry"
 
 

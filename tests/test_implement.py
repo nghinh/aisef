@@ -1087,16 +1087,35 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
     không (ở SHA cha thì không → đỏ), test giả in PASSED vô điều kiện.
     """
 
-    LENH = ("sh -c 'echo \"test session starts\"; "
-            "out=$(for f in tests/test_*.sh; do [ -f \"$f\" ] && sh \"$f\"; done); "
-            "echo \"$out\"; ! echo \"$out\" | grep -q FAILED'")
     TEN = "tests verify story"
-    AC = "tests/test_ac.sh::test_AC_STORY_01_01_1"
-    THAT = ('[ -f src/a.py ] && echo "%s PASSED" || echo "%s FAILED"\n' % (AC, AC))
-    GIA = 'echo "%s PASSED"\n' % AC
+    AC = "tests/test_ac.py::test_AC_STORY_01_01_1"
+    THAT = ('import os\nprint("%s " + ("PASSED" if os.path.exists("src/a.py") else "FAILED"))\n' % AC)
+    GIA = 'print("%s PASSED")\n' % AC
+
+    #: Runner: run every `tests/test_*.py` in the worktree and print their
+    #: lines like `pytest -v`. Written in Python, not `sh -c` — Windows has no
+    #: `sh`, so this whole class only ever ran on POSIX.
+    RUNNER = (
+        "import glob, subprocess, sys\n"
+        'print("test session starts")\n'
+        "out = []\n"
+        'for f in sorted(glob.glob("tests/test_*.py")):\n'
+        "    out.append(subprocess.run([sys.executable, f], capture_output=True,\n"
+        "                              text=True).stdout.strip())\n"
+        'text = "\\n".join(x for x in out if x)\n'
+        "print(text)\n"
+        'sys.exit(1 if "FAILED" in text else 0)\n'
+    )
 
     def setUp(self):
         super().setUp()
+        from aisef.clients.base import quote_command
+
+        self._ngoai = tempfile.TemporaryDirectory()
+        runner = Path(self._ngoai.name) / "runner.py"     # outside the repo: not a change
+        runner.write_text(self.RUNNER, encoding="utf-8")
+        self.LENH = quote_command([sys.executable, str(runner)])
+        self.addCleanup(self._ngoai.cleanup)
         for cmd in (["git", "config", "user.email", "t@t"], ["git", "config", "user.name", "t"]):
             subprocess.run(cmd, cwd=self.project, check=True)
         (self.project / "goc.txt").write_text("goc\n", encoding="utf-8")
@@ -1112,7 +1131,7 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         def run(self, spec):
             r = super().run(spec)
             if spec.env.get(ENV_STORY_ID) and self.than is not None:
-                p = Path(spec.workdir) / "tests" / "test_ac.sh"
+                p = Path(spec.workdir) / "tests" / "test_ac.py"
                 p.parent.mkdir(exist_ok=True)
                 p.write_text(self.than, encoding="utf-8")
             return r
@@ -1134,7 +1153,7 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         self.assertIn("red or absent", m.detail)
         nop = self.evidence().last(TOOL_RUN, "test:nop")
         self.assertEqual(nop.detail["candidate"], out.attempts[-1].candidate)
-        self.assertEqual(nop.detail["files"], ["tests/test_ac.sh"])
+        self.assertEqual(nop.detail["files"], ["tests/test_ac.py"])
         self.assertEqual(nop.detail["parent"], head_sha(self.project))
         self.assertIn(self.AC, nop.detail["failed_ids"])
         self.assertFalse((self.project / ".aisef" / "worktrees" / "STORY-01-01-nop").exists())
@@ -1192,7 +1211,7 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
                   "added_tests", "candidate", "preservation"):
             self.assertIn(k, vao.detail, k)
         self.assertEqual(vao.detail["candidate"], out.attempts[-1].candidate)
-        self.assertEqual(vao.detail["added_tests"], ["tests/test_ac.sh"])
+        self.assertEqual(vao.detail["added_tests"], ["tests/test_ac.py"])
         [r] = R.replay(ev)
         self.assertEqual(r.now, ra.detail["failures"])
         self.assertEqual(r.changed(), [])

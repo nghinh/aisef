@@ -525,8 +525,9 @@ class TestDuAnMoiTinh(GateTestCase):
     test đó ba phút trước.
     """
 
-    KHONG_DU_AN = ("no project at this commit — the tree has no project "
-                   "manifest, so there is nothing to run")
+    KHONG_DU_AN = "no runnable setup at this commit — no project manifest in this tree"
+    KHONG_PHU_THUOC = ("no runnable setup at this commit — the project's "
+                       "dependencies are not installed in this tree")
 
     def muc(self, ten, **kw):
         g = self.gate(candidate="aaa", **kw)
@@ -541,13 +542,20 @@ class TestDuAnMoiTinh(GateTestCase):
                     "unrunnable": self.KHONG_DU_AN})
         m = self.muc("tests verify story", acceptance=1)
         self.assertIs(m.outcome, Outcome.PASSED, m.detail)
-        self.assertIn("no project yet", m.detail)
+        self.assertIn("nothing to run", m.detail)
 
     def test_baseline_khong_co_du_an_thi_khong_ap_dung(self):
         self.store.tool_run("S-01", "test:baseline", ok=False, detail={
             "baseline": True, "unrunnable": self.KHONG_DU_AN})
         m = self.muc("no baseline regression")
         self.assertIs(m.outcome, Outcome.NOT_APPLICABLE, m.detail)
+
+    def test_cha_chua_cai_phu_thuoc_thi_baseline_khong_ap_dung(self):
+        """`node_modules` nằm trong worktree mà chính story này sắp dựng: ở
+        commit gốc không có gì chạy được, nên không có test nào từng xanh."""
+        self.store.tool_run("S-01", "test:baseline", ok=False, detail={
+            "baseline": True, "unrunnable": self.KHONG_PHU_THUOC})
+        self.assertIs(self.muc("no baseline regression").outcome, Outcome.NOT_APPLICABLE)
 
     def test_thieu_cong_cu_that_van_chan(self):
         """Đối chứng: `npm: command not found` vẫn là môi trường hỏng."""

@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **A story that builds the shell was told its list is missing a checkbox**
+  (bug 56). Roles that appear only inside the mockup's sample rows were
+  compared by "is this role anywhere on the page", so an empty list and an
+  unbuilt feature looked identical — and the advice the message gave
+  (`app.dev_command` must serve an environment that already holds a record)
+  is not achievable for a browser-stored app, or for the first story of a
+  project, which builds the shell before anything can create a record. These
+  roles are still reported, and now block only when the data region actually
+  rendered rows.
+
 - **The first story of every new project failed the gate forever** (bug 55).
   `no baseline regression` and `tests verify story` both reported
   `unrunnable · tool not installed or cannot load (no such file or directory)`
@@ -11,7 +21,10 @@
   whose text matches the missing-tool table. A missing **manifest** is now told
   apart from a missing **tool**: at the parent that means no project, which is
   the strongest form of the answer nop is asking for (PASSED), and there were
-  no tests to regress (NOT_APPLICABLE). A real `command not found` still
+  no tests to regress (NOT_APPLICABLE). The same holds one commit later, when
+  the manifest exists but `node_modules` does not: dependencies live in the
+  worktree the story is about to build, and a project root that never
+  installed them has nothing to lend. A real `command not found` still
   blocks.
 
 - **Every command line was split and quoted with POSIX rules** (bug 54). On

@@ -204,16 +204,37 @@ class TestVerifyHalf(unittest.TestCase):
         )
         self.assertTrue(self.run_verify(cfg).passed)
 
-    def test_empty_data_region_is_a_failure(self):
-        """Không so tên ở vùng dữ liệu, nhưng vẫn phải có mục — nếu không
-        thì một danh sách rỗng cũng "đạt"."""
+    def test_vung_du_lieu_rong_thi_chua_so_duoc_chu_khong_phai_thieu(self):
+        """Lỗi 56. Danh sách rỗng và "chưa dựng ô tích" trông y hệt nhau ở đây,
+        và story đầu tiên của một dự án **không có cách nào** làm nó khác đi:
+        nó dựng vỏ trước khi có bất cứ thứ gì tạo được bản ghi, còn ứng dụng
+        lưu trong trình duyệt thì dev server không có gì để gieo.
+
+        Đo 2026-09-09: `todo` và `todo-e2e` cùng trượt vì `checkbox` thiếu
+        trong một danh sách rỗng — cả hai đều không thể qua được. Vẫn báo ra,
+        chỉ thôi chặn."""
         cfg = self.serve(
             '<input type="search" aria-label="Tìm ghi chú">'
             "<button>Ghi chú mới</button>"
         )
         res = self.run_verify(cfg)
-        self.assertFalse(res.passed)
-        self.assertIn("data region", res.summary())
+        self.assertTrue(res.passed, res.summary())
+        self.assertIn("data region was empty", res.summary())
+        e = EvidenceStore(self.artifacts).read("STORY-01-01").last(MOCKUP_MAP)
+        self.assertEqual(e.detail["missing_data_roles"], [])
+        self.assertEqual(e.detail["unchecked_data_roles"], ["link"])
+
+    def test_co_dong_ma_khong_co_vai_thi_van_chan(self):
+        """Đối chứng: vùng dữ liệu **có** bản ghi mà không mang vai hợp đồng
+        hứa — đây mới là lệch thật, và vẫn phải chặn."""
+        cfg = self.serve(
+            '<input type="search" aria-label="Tìm ghi chú">'
+            "<button>Ghi chú mới</button>"
+            "<ul><li>chỉ là chữ, không có liên kết</li></ul>"
+        )
+        res = self.run_verify(cfg)
+        self.assertFalse(res.passed, res.summary())
+        self.assertIn("has rows", res.summary())
 
     def test_evidence_records_the_comparison(self):
         cfg = self.serve("trống")
