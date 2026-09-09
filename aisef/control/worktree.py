@@ -203,9 +203,15 @@ class WorktreeManager:
                 if base:
                     args.append(base)
             _git(self.repo, *args)
-        self._carry_client_config(path)
 
+        # Refresh **first**, then lay the client config down. The other order
+        # copies a generated file over a tracked one, and `git merge` then
+        # refuses to run at all: "your local changes would be overwritten".
+        # Measured on todo/STORY-01-02 2026-09-09 — the merge that brings the
+        # trunk's fixes into the story failed while `git merge-tree` showed
+        # the branches merge cleanly. The config is re-derived here anyway.
         merged_from = self.refresh(story_id, base=base) if exists and refresh else ""
+        self._carry_client_config(path)
         return Worktree(story_id, path, branch, refreshed_from=merged_from)
 
     def _carry_client_config(self, path: Path) -> list[str]:
@@ -247,6 +253,14 @@ class WorktreeManager:
         base_branch = base or self._current_branch()
         if not base_branch or not path.is_dir():
             return ""
+        # Discard our own copy of the generated client config before merging:
+        # a worktree reused from an earlier run still carries it, and git
+        # refuses to merge over a locally modified tracked file. It is put
+        # back immediately after the merge.
+        for rel in CLIENT_CONFIG:
+            if (path / rel).exists():
+                subprocess.run(["git", "checkout", "--", rel], cwd=path,
+                               capture_output=True, timeout=30)
         # Already contains the main branch tip — no merge needed; avoids
         # creating an empty merge commit on every rerun.
         tip = _git(self.repo, "rev-parse", base_branch, check=False).stdout.strip()

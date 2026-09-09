@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.2.24 — 2026-09-09
+
+- **"Conflicts in unknown files" where the branches merge cleanly** (bug 39).
+  `create()` copied the generated client config — a tracked file — into the
+  worktree *before* calling `refresh()`, and `git merge` refuses to run over a
+  locally modified tracked file. `aisef run` stopped on todo/STORY-01-02 with
+  a conflict report while `git merge-tree` merged the two branches without a
+  single conflict. Refresh now happens first and the config is laid down
+  after; `refresh()` also discards its own earlier copy before merging.
+
+  Third consequence of one decision in 1.2.19 (overwrite the guard plugin so
+  it can never be stale), after bug 37. The overwrite is still right — it is
+  what stops a run going unguarded — but it has to happen where git is done
+  looking.
+
 ## 1.2.23 — 2026-09-09
 
 Both fixes are the same mistake in two places: a gate that judges *state*

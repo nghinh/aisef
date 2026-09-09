@@ -299,6 +299,42 @@ class TestCauHinhClientVaoWorktree(WorktreeTestCase):
         wt = self.wm.create("S-02")
         self.assertFalse((wt.path / ".opencode").exists())
 
+    def test_lam_moi_nhanh_duoc_khi_cau_hinh_client_da_commit(self):
+        """Lỗi 39. Ghi đè cấu hình client lên một tệp **đã theo dõi** làm
+        `git merge` từ chối chạy ("local changes would be overwritten"), nên
+        worktree của story không nhận được bản sửa trên nhánh chính.
+
+        Đo trên todo/STORY-01-02 2026-09-09: `aisef run` dừng với "cannot
+        merge master into story branch — conflicts in unknown files", trong
+        khi `git merge-tree` cho thấy hai nhánh gộp sạch. Không có xung đột
+        nào cả: chính harness làm bẩn cây.
+        """
+        (self.repo / ".opencode" / "plugin").mkdir(parents=True)
+        guard = self.repo / ".opencode" / "plugin" / "aisef-guard.ts"
+        guard.write_text("// v1", encoding="utf-8")
+        git(self.repo, "add", "-A")
+        git(self.repo, "commit", "-qm", "commit plugin")
+
+        wt = self.wm.create("S-04")                       # nhánh story ra đời ở đây
+        (wt.path / "src" / "story.py").write_text("x = 1\n", encoding="utf-8")
+        git(wt.path, "add", "-A")
+        git(wt.path, "commit", "-qm", "story")
+
+        self.wm.remove("S-04")                            # cuối lượt: harness dọn worktree
+
+        guard.write_text("// v2 — compile chạy lại", encoding="utf-8")   # nhánh chính đi tiếp
+        (self.repo / "src" / "tren-nhanh-chinh.py").write_text("y = 2\n", encoding="utf-8")
+        git(self.repo, "add", "-A")
+        git(self.repo, "commit", "-qm", "trunk moves on")
+
+        again = self.wm.create("S-04")                    # lượt sau: dựng lại từ nhánh story
+        self.assertTrue(again.refreshed_from, "không gộp được nhánh chính vào story")
+        self.assertTrue((again.path / "src" / "tren-nhanh-chinh.py").is_file(),
+                        "bản sửa trên nhánh chính chưa tới worktree")
+        self.assertEqual((again.path / ".opencode" / "plugin" / "aisef-guard.ts")
+                         .read_text(encoding="utf-8"), "// v2 — compile chạy lại")
+        self.assertTrue((again.path / "src" / "story.py").is_file(), "mất việc của story")
+
     def test_ban_da_commit_khong_duoc_thang_ban_moi_bien_dich(self):
         """Lỗi 32. Dự án `todo` **commit** `.opencode/plugin/aisef-guard.ts`,
         nên worktree luôn checkout bản đã commit — bản `aisef compile` vừa
