@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.2.26 — 2026-09-09
+
+- **Every gate could read an older run's result** (bug 42). `_next_seq` read
+  the last 4096 bytes to find the highest sequence number — an O(1) shortcut
+  with no guard on its ceiling. One event longer than that window (a review
+  verdict with findings) leaves the window holding a single truncated line,
+  nothing parses, and the function answers `1`: numbering restarts mid-file.
+  `read()` sorted by that number, so an old run's events sorted *after* the
+  current ones and every "latest result" check read the wrong build. The gate
+  reported evidence recorded three candidates back while test, lint, qa,
+  mockup, review and security had all just run and recorded against the
+  current one. Measured on todo/STORY-01-02: 3 restarts in one file, each
+  immediately after a line over 4 KB.
+
+  The window now grows until it parses, and `read()` orders by time then
+  sequence, which also heals files already written with restarted numbering.
+
 ## 1.2.25 — 2026-09-09
 
 - **The security reviewer kept re-filing a finding against harness code**

@@ -188,29 +188,43 @@ class EvidenceStore:
         return event
 
     def _next_seq(self, path: Path) -> int:
-        # ponytail: read last non-empty line instead of scanning all lines — O(1) vs O(n)
+        """Next sequence number, read from the end of the file.
+
+        Reads the tail rather than the whole file, but **grows the window
+        until a complete line is in it**. A single event can exceed any fixed
+        window — a review verdict with findings, a tool tail — and then the
+        window holds one truncated line, nothing parses, and this used to
+        answer `1`. Numbering restarted mid-file, `read()` sorts by `seq`, so
+        events from an old run sorted *after* the current ones and every
+        "latest result" check read a stale event: the gate reported evidence
+        recorded at a candidate three builds back and refused the story
+        (todo/STORY-01-02 2026-09-09 — 3 restarts in one file, each right
+        after a line over 4 KB).
+        """
         if not path.is_file():
             return 1
         try:
-            with path.open("rb") as fh:
-                fh.seek(0, 2)
-                size = fh.tell()
-                if size == 0:
-                    return 1
-                chunk = min(size, 4096)
-                fh.seek(-chunk, 2)
-                tail = fh.read().decode("utf-8", errors="replace")
+            size = path.stat().st_size
+            if size == 0:
+                return 1
+            chunk = 4096
+            while True:
+                with path.open("rb") as fh:
+                    fh.seek(-min(chunk, size), 2)
+                    tail = fh.read().decode("utf-8", errors="replace")
+                for line in reversed(tail.splitlines()):
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        return int(json.loads(line).get("seq") or 0) + 1
+                    except (json.JSONDecodeError, TypeError, ValueError):
+                        break      # truncated by the window — widen and retry
+                if chunk >= size:
+                    return 1       # whole file read, nothing parseable
+                chunk *= 8
         except OSError:
             return 1
-        for line in reversed(tail.splitlines()):
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                return int(json.loads(line).get("seq") or 0) + 1
-            except (json.JSONDecodeError, TypeError, ValueError):
-                continue
-        return 1
 
     def read(self, story_id: str) -> Evidence:
         ev = Evidence(story_id=story_id)
@@ -239,7 +253,11 @@ class EvidenceStore:
                     detail=data.get("detail") or {},
                 )
             )
-        ev.events.sort(key=lambda e: e.seq)
+        # By time **then** sequence. Files written before the fix above carry
+        # restarted numbering, and sorting those by `seq` alone puts an old
+        # run's events after this run's — heals them on read instead of
+        # leaving every gate reading the wrong build.
+        ev.events.sort(key=lambda e: (e.at, e.seq))
         return ev
 
     def stories(self) -> list[str]:

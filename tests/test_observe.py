@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
 import unittest
@@ -143,3 +144,50 @@ class TestGuardBlocks(unittest.TestCase):
             ev = st.read("S-01")
             self.assertEqual([e.name for e in ev.guard_blocks], ["write-scope"])
             self.assertIn("guard_block=1", ev.summary())
+
+
+class TestSoThuTuKhongDuocDatLai(unittest.TestCase):
+    """Lỗi 42. `_next_seq` chỉ đọc 4096 byte cuối. Một sự kiện dài hơn thế —
+    phán quyết rà soát kèm findings, đuôi output của tool — làm cửa sổ ấy chỉ
+    chứa một dòng cụt: không parse được gì, hàm trả `1`, và **số thứ tự đặt
+    lại giữa tệp**.
+
+    `read()` sắp theo `seq`, nên sự kiện của lượt cũ (seq lớn) xếp *sau* sự
+    kiện của lượt này (seq nhỏ), và mọi phép kiểm đọc "kết quả mới nhất" đọc
+    nhầm bản cũ. Đo trên todo/STORY-01-02 2026-09-09: 3 lần đặt lại trong một
+    tệp, mỗi lần ngay sau một dòng > 4 KB; cổng báo "bằng chứng ghi ở ứng viên
+    e7a81a6" trong khi mọi phép kiểm vừa chạy ở dd88027, và story trượt.
+    """
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_su_kien_dai_khong_lam_dat_lai_so(self):
+        st = EvidenceStore(self.root)
+        st.record("S", Event(kind="tool_run", name="test", detail={"tail": "x" * 8000}))
+        e = st.record("S", Event(kind="tool_run", name="lint"))
+        self.assertEqual(e.seq, 2, "sự kiện dài làm số thứ tự quay về 1")
+
+    def test_tien_trinh_moi_van_doc_duoc_so_cuoi(self):
+        EvidenceStore(self.root).record(
+            "S", Event(kind="tool_run", name="test", detail={"tail": "y" * 20000}))
+        e = EvidenceStore(self.root).record("S", Event(kind="tool_run", name="lint"))
+        self.assertEqual(e.seq, 2)
+
+    def test_doc_theo_thoi_gian_chua_lanh_tep_da_hong(self):
+        """Tệp ghi bằng bản cũ đã mang số đặt lại — đọc theo `at` chữa được."""
+        path = EvidenceStore(self.root).path("S")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps({"kind": "tool_run", "name": "test", "seq": 300, "at": 100.0,
+                        "detail": {"candidate": "cu"}}) + "\n"
+            + json.dumps({"kind": "tool_run", "name": "test", "seq": 2, "at": 200.0,
+                          "detail": {"candidate": "moi"}}) + "\n",
+            encoding="utf-8")
+        ev = EvidenceStore(self.root).read("S")
+        self.assertEqual(ev.events[-1].detail["candidate"], "moi",
+                         "sự kiện mới nhất phải là sự kiện xảy ra sau cùng")
