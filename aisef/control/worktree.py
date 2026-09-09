@@ -183,12 +183,10 @@ class WorktreeManager:
         """
         path, branch = self.path_for(story_id), self.branch_for(story_id)
         if (path / ".git").exists():
-            self._carry_client_config(path)   # a reused worktree can hold a stale guard
-            return Worktree(story_id, path, branch)
+            return self._reuse(story_id, path, branch, base=base, refresh=refresh)
         with self._create_lock:
             if (path / ".git").exists():
-                self._carry_client_config(path)
-                return Worktree(story_id, path, branch)
+                return self._reuse(story_id, path, branch, base=base, refresh=refresh)
             if path.exists():
                 shutil.rmtree(path)
                 _git(self.repo, "worktree", "prune")
@@ -212,6 +210,21 @@ class WorktreeManager:
         # the branches merge cleanly. The config is re-derived here anyway.
         merged_from = self.refresh(story_id, base=base) if exists and refresh else ""
         self._carry_client_config(path)
+        return Worktree(story_id, path, branch, refreshed_from=merged_from)
+
+    def _reuse(self, story_id: str, path: Path, branch: str, *,
+               base: str | None, refresh: bool) -> Worktree:
+        """A worktree that is already there — refresh it like a new one.
+
+        Skipping the merge here meant a worktree left behind by a **failed**
+        run kept its old base for every run after: `dev/serve.py`, config
+        fixes and stories merged in earlier waves never arrived, and the story
+        failed again on something already fixed on the trunk (measured on
+        todo/STORY-01-02 2026-09-09). The merge is a no-op when the trunk has
+        not moved, so this costs nothing in the common case.
+        """
+        merged_from = self.refresh(story_id, base=base) if refresh else ""
+        self._carry_client_config(path)   # a reused worktree can hold a stale guard
         return Worktree(story_id, path, branch, refreshed_from=merged_from)
 
     def _carry_client_config(self, path: Path) -> list[str]:

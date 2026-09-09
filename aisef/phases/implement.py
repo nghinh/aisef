@@ -1397,7 +1397,7 @@ def review_story_v2(
     # that is a judgment call.
     delta = tdd.test_delta(workdir, base_ref=base_ref, changed=changed)
     store = EvidenceStore(artifact_root, candidate=candidate)
-    context["prior_review"] = _prior_review(store, story.id, role="review")
+    context["prior_review"] = _prior_review(store, story.id, role="review", changed=changed)
     store.record(
         story.id, Event(kind=NOTE, name="qa:test-delta", ok=not delta, detail={"files": delta})
     )
@@ -1511,21 +1511,35 @@ def _reconcile(story_id: str, ev: EvidenceStore, text: str,
     return hop
 
 
-def _prior_review(ev: EvidenceStore, story_id: str, *, role: str) -> str:
+def _prior_review(ev: EvidenceStore, story_id: str, *, role: str,
+                  changed: list[str] | None = None) -> str:
     """The reviewer's own findings on the previous candidate of this story.
 
     Without it every attempt reviews from scratch and re-ranks its own
     advisory items into blockers; see `_no_escalation`, which enforces
     deterministically what this section asks for.
+
+    Findings about files **no longer in the diff** are dropped. Handing them
+    back invites the reviewer to file them again — the security reviewer kept
+    re-raising a finding against `.opencode/plugin/aisef-guard.ts`, a file the
+    harness writes and the story never touched, and raised it from `high` to
+    `critical` the second time (todo/STORY-01-02 2026-09-09). What is not in
+    this candidate's diff is not this candidate's to answer for.
     """
     truoc = [e for e in ev.read(story_id).of(NOTE, f"{role}:verdict")
              if str(e.detail.get("candidate") or "") != ev.candidate]
     if not truoc:
         return "_(first review of this story — nothing said before)_"
     e = truoc[-1]
+    trong_diff = set(changed or [])
+
+    def con_lien_quan(f: dict) -> bool:
+        tep = str(f.get("file") or "").strip()
+        return not tep or not trong_diff or tep in trong_diff
+
     dong = [
         f"- [{f.get('tag') or 'should fix'}] {_finding_body(f)}"
-        for f in (e.detail.get("findings") or [])
+        for f in (e.detail.get("findings") or []) if con_lien_quan(f)
     ]
     sha = str(e.detail.get("candidate") or "")[:7]
     return "\n".join([f"On candidate `{sha}` you reported:", "", *dong]) if dong else (
@@ -1633,7 +1647,7 @@ def security_review(
     from ..harness.runlog import run_log
     run_log(artifact_root, f"story={story.id}#{number} security START changed={len(changed)}")
     store = EvidenceStore(artifact_root, candidate=candidate)
-    context["prior_review"] = _prior_review(store, story.id, role="security")
+    context["prior_review"] = _prior_review(store, story.id, role="security", changed=changed)
     store.handoff(story.id, frm=REVIEWER, to=SECURITY, attempt=number,
                   slots=handoff_slots(context))
     spec = build_spec(

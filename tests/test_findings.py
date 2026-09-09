@@ -282,3 +282,47 @@ class TestSchemaBaoMat(SchemaTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestPhatHienCuKhongThuocDiffNay(unittest.TestCase):
+    """Lỗi 40. Mục người rà soát nêu ở lượt trước được đưa lại cho chính họ để
+    chặn "dời cột gôn". Nhưng mục nhắm vào tệp **không còn trong diff** thì đưa
+    lại chính là mời họ nêu lần nữa: người rà soát bảo mật lặp lại phiếu nhắm
+    `.opencode/plugin/aisef-guard.ts` — tệp do harness ghi, story không hề chạm
+    — và lần thứ hai nâng từ `high` lên `critical` (todo/STORY-01-02
+    2026-09-09). Thứ không nằm trong diff của ứng viên này không phải việc của
+    ứng viên này.
+    """
+
+    def setUp(self):
+        import tempfile
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def _ghi(self):
+        from aisef.harness.observe import NOTE, EvidenceStore, Event
+        st = EvidenceStore(self.root, candidate="cu")
+        st.record("S-01", Event(kind=NOTE, name="security:verdict", ok=False, detail={
+            "verdict": "block",
+            "candidate": "cu",
+            "findings": [
+                {"tag": "block", "file": "js/main.js", "line": 3, "why": "mat du lieu"},
+                {"tag": "block", "file": ".opencode/plugin/aisef-guard.ts", "line": 13,
+                 "why": "PATH hijacking"},
+            ],
+        }))
+        return EvidenceStore(self.root, candidate="moi")
+
+    def test_bo_muc_ve_tep_ngoai_diff(self):
+        from aisef.phases.implement import _prior_review
+        got = _prior_review(self._ghi(), "S-01", role="security", changed=["js/main.js"])
+        self.assertIn("js/main.js", got)
+        self.assertNotIn("aisef-guard", got, "tệp ngoài diff không được đưa lại")
+
+    def test_khong_biet_diff_thi_giu_nguyen(self):
+        from aisef.phases.implement import _prior_review
+        got = _prior_review(self._ghi(), "S-01", role="security", changed=[])
+        self.assertIn("aisef-guard", got, "không có diff để lọc thì không đoán")

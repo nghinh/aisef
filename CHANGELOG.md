@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.2.25 — 2026-09-09
+
+- **The security reviewer kept re-filing a finding against harness code**
+  (bug 40). Each attempt hands the reviewer its own previous findings so it
+  cannot re-rank yesterday's advice into today's blocker. When one of those
+  findings names a file that is no longer in the diff, handing it back invites
+  the reviewer to file it again — and it came back a tier higher, `high` then
+  `critical`, against `.opencode/plugin/aisef-guard.ts`, which the harness
+  writes and the story never touched. Prior findings are now filtered to files
+  still in this candidate's diff.
+- **A worktree left by a failed run never saw the trunk again** (bug 41).
+  Reuse took a shortcut past `refresh()`, so fixes merged to the trunk between
+  runs never arrived and the story failed again on something already fixed.
+  Reuse now refreshes like a fresh worktree; the merge is a no-op when the
+  trunk has not moved.
+
 ## 1.2.24 — 2026-09-09
 
 - **"Conflicts in unknown files" where the branches merge cleanly** (bug 39).
