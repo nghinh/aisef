@@ -121,6 +121,41 @@ class TestClaudeCommand(unittest.TestCase):
         self.assertNotIn("Bash", cmd)
 
 
+class TestGiaiTenLenh(unittest.TestCase):
+    """Lỗi 33. `CreateProcess` không tra `PATHEXT` và không chạy được shim
+    `.cmd` mà npm/bun cài — gọi tên trần trên Windows là `WinError 2` dù CLI
+    có cài và `shutil.which` tìm thấy."""
+
+    def test_khong_cai_thi_rong(self):
+        from unittest import mock
+        from aisef.clients.base import resolve_binary
+        with mock.patch("shutil.which", return_value=None):
+            self.assertEqual(resolve_binary("opencode"), [])
+
+    def test_posix_dung_duong_dan_da_giai(self):
+        from unittest import mock
+        from aisef.clients.base import resolve_binary
+        with mock.patch("shutil.which", return_value="/usr/local/bin/opencode"), \
+             mock.patch("aisef.clients.base.os.name", "posix"):
+            self.assertEqual(resolve_binary("opencode"), ["/usr/local/bin/opencode"])
+
+    def test_windows_shim_cmd_chay_qua_cmd_exe(self):
+        from unittest import mock
+        from aisef.clients.base import resolve_binary
+        with mock.patch("shutil.which", return_value=r"C:\npm\opencode.cmd"), \
+             mock.patch("aisef.clients.base.os.name", "nt"), \
+             mock.patch.dict("os.environ", {"COMSPEC": r"C:\Windows\cmd.exe"}):
+            self.assertEqual(resolve_binary("opencode"),
+                             [r"C:\Windows\cmd.exe", "/c", r"C:\npm\opencode.cmd"])
+
+    def test_windows_exe_khong_can_boc(self):
+        from unittest import mock
+        from aisef.clients.base import resolve_binary
+        with mock.patch("shutil.which", return_value=r"C:\bin\opencode.exe"), \
+             mock.patch("aisef.clients.base.os.name", "nt"):
+            self.assertEqual(resolve_binary("opencode"), [r"C:\bin\opencode.exe"])
+
+
 class TestOpenCodeCommand(unittest.TestCase):
     def test_run_subcommand(self):
         cmd = OpenCodeAdapter().build_command(RunSpec(prompt="xin chào", workdir=Path(".")))
