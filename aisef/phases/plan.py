@@ -390,7 +390,10 @@ def run_phase(
 ) -> PhaseOutcome:
     """Run one phase. Skip if all artifacts exist and force is not set."""
     out = PhaseOutcome(phase=phase)
-    _run_log(project, f"phase={phase.id} START")
+    # Name the timeout: an agent turn is silent for minutes at a time, and
+    # without the bound the reader cannot tell "thinking" from "hung"
+    # (measured twice on 2026-09-09: a 14-minute silence each time).
+    _run_log(project, f"phase={phase.id} START timeout={config['run.timeout_seconds']}s")
 
     if not _missing(project, phase.artifacts) and not force:
         out.skipped_reason = "artifacts already exist"

@@ -578,7 +578,8 @@ def run_attempt(
 
     _attach_settings(spec, project)
     from ..harness.runlog import run_log
-    run_log(artifact_root, f"story={story.id}#{number} agent START scope={','.join(scope)}")
+    run_log(artifact_root, f"story={story.id}#{number} agent START "
+                           f"timeout={spec.timeout_seconds}s scope={','.join(scope)}")
     result = client.run(spec)
     attempt.cost_usd = result.cost_usd
     used = skills_used(result)
