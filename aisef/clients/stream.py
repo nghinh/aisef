@@ -207,7 +207,7 @@ def exit_status_of(res: RunResult) -> str:
         return "cost"
     if any(m in why for m in ("prompt is too long", "context window", "context_length", "max_tokens")):
         return "context"
-    if raw.get("api_error_status") or any(
+    if raw.get("api_error_status") or raw.get("retryable") or any(
         m in why for m in ("api_error", "overloaded", "connection",
                            "cannot run", "without a result event")
     ):

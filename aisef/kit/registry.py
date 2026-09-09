@@ -261,7 +261,7 @@ def script_broken(path: Path, skill_dir: Path) -> str:
             cmd = ["node", "--check", str(path)]
         else:
             return ""                       # no node available: inconclusive
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
+        r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=20)
         return "" if r.returncode == 0 else rel
     except (SyntaxError, ValueError, OSError, subprocess.SubprocessError):
         return rel

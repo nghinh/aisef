@@ -485,7 +485,7 @@ def _git_lines(project_root: str, args: list[str]) -> list[str]:
             ["git", *args],
             cwd=project_root or ".",
             capture_output=True,
-            text=True,
+            text=True, encoding="utf-8", errors="replace",
             timeout=30,
         )
     except (OSError, subprocess.TimeoutExpired):

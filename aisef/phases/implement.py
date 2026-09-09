@@ -1249,7 +1249,7 @@ def _git_lines_text(workdir: str, args: list[str]) -> str:
 
     try:
         proc = subprocess.run(
-            ["git", *args], cwd=workdir, capture_output=True, text=True, timeout=30
+            ["git", *args], cwd=workdir, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30
         )
     except (OSError, subprocess.TimeoutExpired):
         return ""
@@ -1974,7 +1974,7 @@ def _tree_snapshot(workdir: Path) -> dict[str, bytes | None]:
     out: dict[str, bytes | None] = {}
     try:
         r = subprocess.run(["git", "status", "--porcelain", "-z", "-uall"],
-                           cwd=workdir, capture_output=True, text=True, timeout=30)
+                           cwd=workdir, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30)
     except (OSError, subprocess.SubprocessError):
         return out
     for item in r.stdout.split("\0"):

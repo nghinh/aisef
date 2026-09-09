@@ -128,7 +128,7 @@ def cmd_doctor(args) -> int:
     if plugin.is_file():
         tracked = subprocess.run(
             ["git", "-C", str(project), "ls-files", "--error-unmatch", str(plugin)],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=10,
         ).returncode == 0
         check(
             "OpenCode plugin in worktree",
@@ -143,7 +143,7 @@ def cmd_doctor(args) -> int:
     if hook.is_file():
         tracked = subprocess.run(
             ["git", "-C", str(project), "ls-files", "--error-unmatch", str(hook)],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=10,
         ).returncode == 0
         check(
             "hook in worktree",

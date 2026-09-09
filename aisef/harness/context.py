@@ -286,7 +286,7 @@ def _imports(project: Path, rel: str) -> list[str]:
 def _run_provider(project: Path, seeds: list[str], budget: int, command: str, timeout: int) -> str | None:
     try:
         proc = subprocess.run(
-            shlex.split(command), cwd=project, capture_output=True, text=True, timeout=timeout,
+            shlex.split(command), cwd=project, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout,
             input=json.dumps({"project": str(project), "seeds": seeds, "budget": budget}),
         )
     except (OSError, subprocess.TimeoutExpired):

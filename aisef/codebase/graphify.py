@@ -26,7 +26,7 @@ GRAPH_REPORT = "GRAPH_REPORT.md"
 
 def _run(args: list[str], cwd: Path, *, timeout: int = 300) -> subprocess.CompletedProcess:
     return subprocess.run(
-        args, cwd=cwd, capture_output=True, text=True, timeout=timeout,
+        args, cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout,
     )
 
 

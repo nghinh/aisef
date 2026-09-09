@@ -143,7 +143,7 @@ class ClaudeCodeAdapter(ClientAdapter):
                 cwd=str(spec.workdir),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                text=True,
+                text=True, encoding="utf-8", errors="replace",
                 env=child_env(spec.env, allow_prefixes=spec.env_allow),
                 # The prompt is written and stdin closed straight away; an open
                 # stdin makes the CLI wait 3s on every call.

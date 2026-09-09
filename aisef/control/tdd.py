@@ -26,7 +26,7 @@ TEST_FUNC = re.compile(r"^\s*(def test_|it\(|test\(|func Test)", re.MULTILINE)
 
 def _git(cwd: Path | str, *args: str) -> str:
     try:
-        p = subprocess.run(["git", *args], cwd=str(cwd), capture_output=True, text=True, timeout=60)
+        p = subprocess.run(["git", *args], cwd=str(cwd), capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
     except (OSError, subprocess.SubprocessError):
         return ""
     return p.stdout if p.returncode == 0 else ""

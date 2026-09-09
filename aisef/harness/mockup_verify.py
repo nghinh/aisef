@@ -109,7 +109,7 @@ class AppServer:
                 cwd=self.cwd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
-                text=True,
+                text=True, encoding="utf-8", errors="replace",
                 **({"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
                    if sys.platform == "win32"
                    else {"start_new_session": True}),
@@ -177,7 +177,7 @@ def occupant(url: str) -> str:
         return "unknown"
     try:
         out = subprocess.run(["lsof", "-nP", "-t", "-i", f":{port}"], capture_output=True,
-                             text=True, timeout=5).stdout.split()
+                             text=True, encoding="utf-8", errors="replace", timeout=5).stdout.split()
     except (OSError, subprocess.SubprocessError):
         return "unknown"
     if not out:
@@ -185,7 +185,7 @@ def occupant(url: str) -> str:
     pid = out[0]
     try:
         cwd = subprocess.run(["lsof", "-a", "-d", "cwd", "-p", pid, "-Fn"], capture_output=True,
-                             text=True, timeout=5).stdout
+                             text=True, encoding="utf-8", errors="replace", timeout=5).stdout
         where = next((l[1:] for l in cwd.splitlines() if l.startswith("n")), "")
     except (OSError, subprocess.SubprocessError):
         where = ""

@@ -68,7 +68,7 @@ def _ensure_git(project: str | Path) -> int | None:
 
     def _cfg(key: str) -> str:
         r = subprocess.run(
-            ["git", "config", key], cwd=root, capture_output=True, text=True,
+            ["git", "config", key], cwd=root, capture_output=True, text=True, encoding="utf-8", errors="replace",
         )
         return r.stdout.strip()
 
@@ -83,7 +83,7 @@ def _ensure_git(project: str | Path) -> int | None:
 
     head = subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=root,
-        capture_output=True, text=True,
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     if head.returncode != 0:
         print(

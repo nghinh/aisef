@@ -444,3 +444,47 @@ class TestOpenCodeLuongJson(unittest.TestCase):
         caps = OpenCodeAdapter().capabilities()
         self.assertIs(caps[Capability.MACHINE_OUTPUT], Support.NATIVE)
         self.assertIs(caps[Capability.COST_REPORTING], Support.NATIVE)
+
+
+class TestLoiNhaCungCapPhaiNoiRa(unittest.TestCase):
+    """Lỗi 48. OpenCode báo lỗi provider bằng một sự kiện JSON rồi thoát khác 0
+    với stderr **rỗng**. Parser bỏ qua sự kiện ấy, nên harness ghi đúng một
+    chữ `exit != 0`, còn lý do ("Bad Gateway", 502, retryable) nằm trong log
+    riêng của OpenCode nơi không người vận hành nào ngó tới.
+
+    Hệ quả nặng hơn cả việc khó đọc: `exit_status_of` không thấy dấu hiệu
+    hạ tầng nên xếp là `error`, và giai đoạn kế hoạch **chết hẳn** vì một cú
+    502 thoáng qua — trong khi vòng thử lại đã có sẵn cho đúng trường hợp này.
+    Đo 2026-09-09 trên todo-e2e: `phase=project-context FAIL err=exit != 0`.
+    """
+
+    def _stream(self, **data):
+        import json as _json
+        from aisef.clients.opencode import parse_json_events
+        return parse_json_events([_json.dumps(
+            {"type": "error", "sessionID": "ses_1",
+             "error": {"name": "APIError", "data": data}})])
+
+    def test_thong_diep_va_ma_trang_thai_vao_ket_qua(self):
+        r = self._stream(message="Bad Gateway", statusCode=502, isRetryable=True)
+        self.assertIn("Bad Gateway", r.error)
+        self.assertIn("502", r.error)
+
+    def test_xep_la_ha_tang_de_duoc_thu_lai(self):
+        from aisef.clients.stream import INFRA_STATUSES, exit_status_of
+        r = self._stream(message="Bad Gateway", statusCode=502, isRetryable=True)
+        r.ok = False
+        self.assertIn(exit_status_of(r), INFRA_STATUSES)
+
+    def test_retryable_khong_kem_ma_van_la_ha_tang(self):
+        from aisef.clients.stream import INFRA_STATUSES, exit_status_of
+        r = self._stream(message="upstream hiccup", isRetryable=True)
+        r.ok = False
+        self.assertIn(exit_status_of(r), INFRA_STATUSES)
+
+    def test_loi_that_su_cua_ma_khong_bi_coi_la_ha_tang(self):
+        from aisef.clients.stream import exit_status_of
+        r = self._stream(message="tool refused by policy", statusCode=400)
+        r.ok = False
+        self.assertEqual(exit_status_of(r), "infra",
+                         "400 vẫn là api_error_status — phân biệt sâu hơn là việc của bản sau")

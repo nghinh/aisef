@@ -190,7 +190,7 @@ def _run_command(
             cwd=project,
             input="\n".join(changed),
             capture_output=True,
-            text=True,
+            text=True, encoding="utf-8", errors="replace",
             timeout=timeout,
         )
     except (OSError, subprocess.TimeoutExpired):

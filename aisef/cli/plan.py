@@ -14,6 +14,7 @@ from ..control.approvals import (
     ApprovalStore,
     Gate,
     Status,
+    is_present,
     parse_auto_approve,
 )
 from ..control.design_contract import CONTRACT_FILE
@@ -36,7 +37,7 @@ def cmd_gates(args) -> int:
     for gate, status, by in store.summary():
         mark = _GATE_MARK[status]
         who = f"  ({by})" if by else ""
-        missing = [p.name for p in store.artifact_paths(gate) if not p.is_file()]
+        missing = [p.name for p in store.artifact_paths(gate) if not is_present(p)]
         exists = "" if not missing else f"   [missing: {', '.join(missing)}]"
         print(f"  {mark} {gate.value:14} {status.value:18}{who}{exists}")
         if pending_first is None and status is not Status.APPROVED:
@@ -141,7 +142,7 @@ def cmd_approve(args) -> int:
     store = _approvals(args)
     gate: Gate = args.gate
     if not store.has_artifacts(gate):
-        missing = ", ".join(p.name for p in store.artifact_paths(gate) if not p.is_file())
+        missing = ", ".join(p.name for p in store.artifact_paths(gate) if not is_present(p))
         print(f"✗ no artifact for gate {gate.value}: {missing}", file=sys.stderr)
         return EXIT_NOT_READY
 

@@ -298,7 +298,7 @@ def _project_files(project: Path) -> list[str]:
         proc = subprocess.run(
             ["git", "-C", str(project), "ls-files",
              "--cached", "--others", "--exclude-standard"],
-            capture_output=True, text=True, timeout=30,
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30,
         )
         if proc.returncode == 0:
             return [line for line in proc.stdout.splitlines() if line.strip()]

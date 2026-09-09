@@ -47,7 +47,7 @@ def _git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProc
     proc = subprocess.run(
         ["git", "-C", str(repo), *args],
         capture_output=True,
-        text=True,
+        text=True, encoding="utf-8", errors="replace",
         timeout=30,
     )
     if check and proc.returncode != 0:
@@ -91,7 +91,7 @@ def main_repo(path: Path | str) -> Path:
     path = Path(path).resolve()
     proc = subprocess.run(
         ["git", "-C", str(path), "rev-parse", "--path-format=absolute", "--git-common-dir"],
-        capture_output=True, text=True, timeout=10,
+        capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=10,
     )
     if proc.returncode != 0 or not proc.stdout.strip():
         return path

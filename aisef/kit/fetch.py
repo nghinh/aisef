@@ -65,7 +65,7 @@ def _at_commit(d: Path, commit: str) -> bool:
     try:
         r = subprocess.run(
             ["git", "-C", str(d), "rev-parse", "HEAD"],
-            capture_output=True, text=True, timeout=30,
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30,
         )
     except (OSError, subprocess.SubprocessError):
         return False
@@ -85,7 +85,7 @@ def _clone(source: Source, dest: Path) -> str:
              "--no-tags", "origin", source.commit],
             ["git", "-C", str(tmp), "checkout", "--quiet", "FETCH_HEAD"],
         ):
-            r = subprocess.run(cmd, capture_output=True, text=True,
+            r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace",
                                timeout=CLONE_TIMEOUT)
             if r.returncode != 0:
                 error = (r.stderr or r.stdout).strip().splitlines()
