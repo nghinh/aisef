@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+- **The reviewer graded the first story against the whole PRD** (bug 58). A
+  story whose single acceptance criterion is "the document has these
+  elements" was blocked three times for having no submit handler, not reading
+  storage, and not persisting — the work of three later stories. Nothing in
+  the review prompt distinguished "not done" from "another story does it", and
+  the only way out was for the author to build the next stories' work, which
+  then fails *those* stories' nop control. The reviewer now receives the plan,
+  one line per story, and is told plainly: a requirement whose story has not
+  run is not this story's debt.
+
+- **A failing test run logged 40 lines of HTTP access log.** Playwright's
+  `webServer` writes into the same stream as the results; server access lines
+  are dropped before the tail is taken (the full text stays in the evidence
+  log).
+
 - **A 99-test Playwright run read as zero tests** (bug 57). The fix for bug 43
   matched its own fixture — a single-project config. The moment
   `playwright.config` declares `projects`, which is the default for anything

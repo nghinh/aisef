@@ -145,6 +145,17 @@ class TestPromptContent(unittest.TestCase):
         """Bắt phải có phát hiện sẽ đẻ ra phát hiện giả."""
         self.assertIn("not manufacture findings", self.catalog.get("story-review").body)
 
+    def test_nguoi_ra_soat_thay_ca_ke_hoach_va_duoc_dan_khong_cham_luot_khac(self):
+        """Lỗi 58. Story "vỏ ứng dụng" có **một** tiêu chí — cấu trúc tài liệu —
+        bị chặn ba mục vì chưa có submit handler, chưa đọc localStorage, chưa
+        lưu: đúng ba story sau nó. Người rà soát chấm cả PRD, nên story đầu
+        tiên của mọi dự án bị chặn vì không phải story cuối cùng."""
+        prompt = self.catalog.get("story-review")
+        self.assertIn("index", prompt.slots)
+        body = prompt.body
+        self.assertIn("Behaviour another story owns", body)
+        self.assertIn("acceptance criteria are the", body)
+
 
 class TestSlotBanDoMa(unittest.TestCase):
     """ADR-005 V7: slot `repo_map` ở cả ba vai; knob 0 → slot rỗng và prompt
