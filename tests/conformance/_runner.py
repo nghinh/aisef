@@ -209,7 +209,12 @@ def seed_fake_credential(repo: Path, url: str) -> Path:
     **của kho** (worktree dùng chung). Env thường thì git gửi nó — đối chứng;
     env con (`GIT_NO_CREDENTIALS`) thì helper không được hỏi."""
     store = repo / ".git" / "hop-quy-credentials"
-    store.write_text(url.replace("://", "://gia:token-gia@").rsplit("/", 1)[0] + "\n", encoding="utf-8")
+    # `newline="\n"`: text mode turns `\n` into `\r\n` on Windows, and
+    # git-credential-store then reads a host whose port ends in `\r` — it
+    # matches nothing, git falls through to prompting for a username, and the
+    # control measures "no credentials sent" for entirely the wrong reason.
+    store.write_text(url.replace("://", "://gia:token-gia@").rsplit("/", 1)[0] + "\n",
+                     encoding="utf-8", newline="\n")
     # git parses the helper as a shell command, and its bundled `sh` eats
     # backslashes: a Windows path must go in POSIX form or the token is
     # silently read from a file that does not exist.
