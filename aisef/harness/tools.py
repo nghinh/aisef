@@ -22,6 +22,7 @@ the wrong time.
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import sys
 from dataclasses import dataclass, field
@@ -141,8 +142,18 @@ class ToolResult:
         return scrub_secrets((self.stdout + "\n" + self.stderr).strip())
 
     def tail(self, lines: int = 40) -> str:
-        """Trailing output — where errors usually appear."""
-        return "\n".join(self.output()[0].splitlines()[-lines:])
+        """Trailing output — where errors usually appear.
+
+        Server access logs are dropped first. Playwright's `webServer` writes
+        one line per HTTP request into the same stream as the test results, so
+        a failing run's last 40 lines were 40 `GET /js/app.js 200` lines and
+        the reader learned nothing (measured on `todo-e2e`, 2026-09-09: four
+        consecutive failures whose logged output was entirely access log).
+        Nothing is lost — the full text is in the evidence log file.
+        """
+        all_lines = self.output()[0].splitlines()
+        keep = [x for x in all_lines if not _NOISE.search(x)]
+        return "\n".join((keep or all_lines)[-lines:])
 
 
 def detect_commands(project: Path | str) -> dict[str, str]:
@@ -262,6 +273,11 @@ def run_tool(
             run_log(artifact_root, f"tool={name} output: " + one_line(res.tail(TAIL_LINES)))
     return res
 
+
+#: Server access logs interleaved into the test stream: Playwright's
+#: `[WebServer]` tag, and the common log format any static server prints.
+_NOISE = re.compile(r'^\s*(?:\[[\w -]*[Ss]erver[\w -]*\]\s*)?'
+                    r'\S+ - - \[[^\]]+\] "(?:GET|POST|HEAD|PUT|DELETE) [^"]*" \d{3}')
 
 #: Signatures of "tool could not load", not "test failed". 127 is the POSIX
 #: code for command not found; the rest are how other runtimes say the same

@@ -461,3 +461,34 @@ class TestThieuDuAnKhacThieuCongCu(unittest.TestCase):
         from aisef.harness.tools import unrunnable_reason
         out = "tests/a.py::test_x PASSED\nno such file or directory: package.json"
         self.assertEqual(unrunnable_reason("test", 1, out), "")
+
+
+class TestNhatKyKhongNgapLogMayChu(unittest.TestCase):
+    """40 dòng cuối của một lượt test hỏng từng là 40 dòng `GET /js/app.js 200`
+    — người đọc không biết gì thêm ngoài "đỏ". Đo trên `todo-e2e` 2026-09-09:
+    bốn lần liên tiếp, output ghi vào nhật ký **toàn bộ** là log truy cập."""
+
+    def ket_qua(self, out: str):
+        from aisef.harness.tools import ToolResult
+        return ToolResult(name="test", ok=False, exit_code=1, stdout=out, stderr="")
+
+    NOISE = "\n".join(
+        f'[WebServer] 127.0.0.1 - - [09/Sep/2026 18:43:0{i%10}] "GET /js/a.js HTTP/1.1" 200 -'
+        for i in range(50))
+
+    def test_log_truy_cap_bi_bo_qua(self):
+        out = "  ✘   2 tests/a.spec.js:19:1 › AC-2: lưu thất bại (81ms)\n" + self.NOISE
+        tail = self.ket_qua(out).tail(10)
+        self.assertIn("AC-2: lưu thất bại", tail)
+        self.assertNotIn("WebServer", tail)
+
+    def test_khong_con_gi_thi_van_hien_nguyen_ban(self):
+        """Đối chứng: lọc sạch không được để lại một dòng trống."""
+        tail = self.ket_qua(self.NOISE).tail(3)
+        self.assertIn("WebServer", tail)
+
+    def test_log_truy_cap_khong_co_the_cung_bi_bo(self):
+        out = ("thất bại thật\n"
+               + "\n".join(f'127.0.0.1 - - [09/Sep/2026 18:43:0{i%10}] "GET / HTTP/1.1" 200 -'
+                           for i in range(50)))
+        self.assertIn("thất bại thật", self.ket_qua(out).tail(5))
