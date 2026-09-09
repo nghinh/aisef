@@ -383,7 +383,13 @@ class TestGitKhongCamCredentialCuaMay(unittest.TestCase):
             repo = Path(d) / "r"
             repo.mkdir()
             # HOME riêng + không đọc config hệ thống: không đụng osxkeychain của máy.
-            base = {"PATH": os.environ["PATH"], "HOME": d, "GIT_CONFIG_NOSYSTEM": "1"}
+            # Trên Windows, "môi trường tối thiểu" vẫn phải có SystemRoot/PATHEXT
+            # — thiếu chúng thì git không mở nổi socket, hỏng **trước** khi kịp
+            # hỏi credential helper, và phép đối chứng đo nhầm.
+            from aisef.clients.base import ENV_KEEP
+            base = {k: v for k, v in os.environ.items()
+                    if k.upper() in ENV_KEEP and k.upper() not in ("HOME", "PATH")}
+            base.update({"PATH": os.environ["PATH"], "HOME": d, "GIT_CONFIG_NOSYSTEM": "1"})
             subprocess.run(["git", "init", "-q", "-b", "main"], cwd=repo, env=base, check=True)
             subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q",
                             "--allow-empty", "-m", "x"], cwd=repo, env=base, check=True)

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **On Windows the OpenCode client was launched with its flags inside
+  `cmd.exe`'s own arguments** (bug 59). `build_command` inserted `--format
+  json` at index 2, which is right when the resolved program is one token and
+  wrong when it is three — and it is three on Windows, where `opencode` is a
+  `.cmd` shim and resolves to `cmd.exe /c <shim>`. The client ran as `cmd /c
+  --format json opencode.cmd run …`. Bug 32's shape a third time: a command is
+  not a word. argv is now built in order.
+
 - **The reviewer graded the first story against the whole PRD** (bug 58). A
   story whose single acceptance criterion is "the document has these
   elements" was blocked three times for having no submit handler, not reading

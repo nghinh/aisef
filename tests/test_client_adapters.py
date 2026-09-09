@@ -122,6 +122,24 @@ class TestOpenCodeBuildCommand(unittest.TestCase):
         self.assertEqual(cmd[cmd.index("--dir") + 1], str(Path("/tmp/test")))
         self.assertNotIn("test", cmd[cmd.index("--dir") + 2:], "prompt đi qua stdin")
 
+    def test_shim_nhieu_tu_khong_lam_lech_co(self):
+        """Lỗi 59. Trên Windows `opencode` là shim `.cmd`, `resolve_binary`
+        trả **ba** token (`cmd.exe /c <shim>`), nên `insert(2, "--format")`
+        nhét cờ vào giữa tham số của chính `cmd.exe`: client được gọi là
+        `cmd /c --format json opencode.cmd run …`. Hình dạng lỗi 32 lần nữa —
+        một **lệnh** không phải một **từ**."""
+        from unittest import mock
+
+        from aisef.clients import opencode as oc
+
+        with mock.patch.object(oc, "resolve_binary",
+                               return_value=["cmd.exe", "/c", r"C:\x\opencode.cmd"]):
+            cmd = OpenCodeAdapter().build_command(_spec())
+        self.assertEqual(cmd[:3], ["cmd.exe", "/c", r"C:\x\opencode.cmd"])
+        self.assertEqual(cmd[3], "run")
+        self.assertEqual(cmd[cmd.index("--format") + 1], "json")
+        self.assertGreater(cmd.index("--format"), 3, cmd)
+
     def test_with_model(self):
         cmd = OpenCodeAdapter().build_command(_spec(model="gpt-4"))
         self.assertIn("--model", cmd)

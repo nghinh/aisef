@@ -146,12 +146,15 @@ class OpenCodeAdapter(ClientAdapter):
         # at 32767 characters and a planning prompt is 16-23k on its own
         # (`WinError 206`, reported 2026-09-09).  `opencode run` with no
         # message reads the prompt from stdin — measured 2026-09-09.
+        # Built in order, never by index: `resolve_binary` returns **three**
+        # tokens on Windows (`cmd.exe /c <shim>.cmd`), so `insert(2, …)` put
+        # `--format json` among cmd.exe's own arguments and the client was
+        # launched as `cmd /c --format json opencode.cmd run …`. Bug 32's
+        # shape again — a command is not a word.
         cmd = [*(resolve_binary(self.binary) or [self.binary]),
-               "run", "--dir", str(spec.workdir)]
+               "run", "--format", "json", "--dir", str(spec.workdir)]
         if spec.model:
             cmd += ["--model", spec.model]
-        cmd.insert(2, "--format")
-        cmd.insert(3, "json")
         return cmd
 
     def run(self, spec: RunSpec) -> RunResult:
