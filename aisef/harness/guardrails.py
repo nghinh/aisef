@@ -411,11 +411,17 @@ def check_diff_scope(changed: list[str], scope: list[str]) -> Verdict:
     outside = [c for c in changed if not any(_within(c, s) for s in scope)]
     if not outside:
         return ALLOW
+    # Offending files **first**. The scope list runs to 27 entries once the
+    # harness adds the verification directories, and every consumer folds this
+    # message to one line — so the one thing the reader needs was always the
+    # part that got cut (measured on `todo-e2e`, 2026-09-09).
     return Verdict(
         False,
-        f"{len(outside)} files changed outside write_scope ({', '.join(scope)}): "
-        f"{', '.join(outside[:5])}. Revert them, or stop and report "
-        f"that the story's scope is incomplete.",
+        f"{len(outside)} files changed outside write_scope: {', '.join(outside[:5])}"
+        f"{f' (+{len(outside) - 5} more)' if len(outside) > 5 else ''}. "
+        f"Revert them, or stop and report that the story's scope is incomplete. "
+        f"Scope: {', '.join(scope[:12])}"
+        f"{f' (+{len(scope) - 12} more)' if len(scope) > 12 else ''}",
     )
 
 
