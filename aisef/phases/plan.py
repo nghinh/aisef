@@ -459,6 +459,12 @@ def run_phase(
             out.error = error
             _run_log(project, f"phase={phase.id} FAIL ${out.cost_usd:.2f} err={error}")
             return out
+        # Say it in the log the operator watches. An SSE timeout after 22
+        # minutes, retried silently, reads as 36 minutes of one motionless
+        # `START` line — measured on `todo-e3`, 2026-09-09.
+        from ..harness.runlog import one_line
+        _run_log(project, f"phase={phase.id} RETRY (infra) after {result.duration_ms}ms "
+                          f"err={one_line(error, 200)} · {budget} left")
         out.infra_retries += 1
 
     _save_response(project, phase.id, result.text, result)

@@ -258,6 +258,12 @@ class TestFailures(PlanTestCase):
         self.assertEqual(r.waiting_on, Gate.PRD)
         self.assertEqual(r.outcomes[0].infra_retries, 1)
         self.assertAlmostEqual(r.outcomes[0].cost_usd, 1.75)  # cả lượt hỏng
+        # Và nói ra trong nhật ký: một `SSE read timed out` sau 22 phút, thử
+        # lại lặng lẽ, hiện ra thành 36 phút chỉ có một dòng `START` bất động
+        # (đo trên `todo-e3` 2026-09-09).
+        log = (self.project / "_bmad-output" / "run.log").read_text(encoding="utf-8")
+        self.assertIn("RETRY (infra)", log)
+        self.assertIn("api_error", log)
 
     def test_quality_failure_is_not_retried(self):
         """Chạy lại một lượt đã hỏng vì nội dung chỉ tốn tiền lần nữa."""
