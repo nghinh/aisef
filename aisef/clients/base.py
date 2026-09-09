@@ -140,6 +140,23 @@ def resolve_binary(name: str) -> list[str]:
     return [path]
 
 
+def runnable(cmd: list[str]) -> list[str]:
+    """`cmd` with its program resolved so this OS can actually start it.
+
+    Project commands are `npm test`, `npm run lint`, `npx playwright …` — all
+    `.cmd` shims on Windows, which `CreateProcess` cannot execute and
+    `subprocess` will not find because it does not search `PATHEXT`. Every one
+    of them came back as `[WinError 2] The system cannot find the file
+    specified`, exit 127, "tool not installed" — on a machine where npm is
+    installed and working (reported 2026-09-09). Unresolvable programs are
+    left untouched so the caller still reports the original error.
+    """
+    if not cmd:
+        return cmd
+    resolved = resolve_binary(cmd[0])
+    return [*resolved, *cmd[1:]] if resolved else list(cmd)
+
+
 def child_env(spec_env: dict[str, str], *, allow_prefixes: Iterable[str] = ()) -> dict[str, str]:
     """Environment for the client process: **allowlist**, not `os.environ`
     minus a few things (ADR-005 V2).

@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.29 — 2026-09-09
+
+- **Windows could not run any project command** (bug 45). `npm test`,
+  `npm run lint` and `npm audit` all came back `[WinError 2] The system cannot
+  find the file specified`, exit 127, reported as "tool not installed" — on a
+  machine with npm installed and working. Same cause as 1.2.19's client
+  launcher, one layer down: `npm` is a `.cmd` shim on Windows, which
+  `CreateProcess` cannot execute and `subprocess` will not find because it
+  does not search `PATHEXT`. Every host command — project tools and the app
+  dev server — now goes through the same resolution.
+
 ## 1.2.28 — 2026-09-09
 
 - **"Missing component" now names the component it was renamed to** (bug 44).

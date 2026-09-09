@@ -156,6 +156,38 @@ class TestGiaiTenLenh(unittest.TestCase):
             self.assertEqual(resolve_binary("opencode"), [r"C:\bin\opencode.exe"])
 
 
+class TestLenhDuAnChayDuocTrenWindows(unittest.TestCase):
+    """Lỗi 45. Lệnh của dự án — `npm test`, `npm run lint`, `npm audit` — trên
+    Windows là shim `.cmd`: `CreateProcess` không chạy được, `subprocess` cũng
+    không tra `PATHEXT`. Mọi lệnh trả `[WinError 2]`, exit 127, và harness báo
+    "tool not installed" trên máy có npm cài đủ và chạy tốt (báo 2026-09-09).
+    Cùng gốc lỗi 33, một tầng sâu hơn: lần ấy sửa cho CLI của client, lần này
+    cho lệnh của dự án."""
+
+    def test_shim_cmd_duoc_boc_qua_cmd_exe(self):
+        from unittest import mock
+        from aisef.clients.base import runnable
+        with mock.patch("shutil.which", return_value=r"C:\npm\npm.cmd"), \
+             mock.patch("aisef.clients.base.sys.platform", "win32"), \
+             mock.patch.dict("os.environ", {"COMSPEC": r"C:\Windows\cmd.exe"}):
+            self.assertEqual(runnable(["npm", "test"]),
+                             [r"C:\Windows\cmd.exe", "/c", r"C:\npm\npm.cmd", "test"])
+
+    def test_posix_giu_nguyen_tham_so(self):
+        from unittest import mock
+        from aisef.clients.base import runnable
+        with mock.patch("shutil.which", return_value="/usr/bin/npm"), \
+             mock.patch("aisef.clients.base.sys.platform", "linux"):
+            self.assertEqual(runnable(["npm", "run", "lint"]), ["/usr/bin/npm", "run", "lint"])
+
+    def test_khong_tim_thay_thi_giu_nguyen_de_bao_loi_that(self):
+        from unittest import mock
+        from aisef.clients.base import runnable
+        with mock.patch("shutil.which", return_value=None):
+            self.assertEqual(runnable(["khong-co-lenh-nay", "-v"]), ["khong-co-lenh-nay", "-v"])
+        self.assertEqual(runnable([]), [])
+
+
 class TestOpenCodeCommand(unittest.TestCase):
     def test_run_subcommand(self):
         cmd = OpenCodeAdapter().build_command(RunSpec(prompt="xin chào", workdir=Path(".")))

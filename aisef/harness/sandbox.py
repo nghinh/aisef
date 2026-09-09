@@ -50,7 +50,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Protocol
 
-from ..clients.base import Support
+from ..clients.base import Support, runnable
 
 #: Default image: small, typically pre-pulled on dev machines.
 DEFAULT_IMAGE = "alpine:latest"
@@ -466,7 +466,7 @@ def _run_degraded(spec: SandboxSpec) -> SandboxResult:
     started = time.monotonic()
     try:
         proc = subprocess.run(
-            spec.cmd,
+            runnable(spec.cmd),
             cwd=str(spec.workspace),
             capture_output=True,
             text=True,
