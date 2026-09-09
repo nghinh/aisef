@@ -479,6 +479,13 @@ HARNESS_OWNED = (
     # 2026-09-05: 3/3 stories failed "write scope" because of this file).
     ".claude/settings.json",
     ".opencode",
+    # State the agent's own MCP servers write into the tree they are pointed
+    # at. Serena writes `.serena/memories/*.md` on its first call, which is
+    # every session — so on `todo-e2e` 2026-09-09 the `diff-scope` guard
+    # blocked every command the agent ran, all three attempts, and the story
+    # died having produced almost nothing. The framework does not choose the
+    # user's MCP servers; it must not fail their stories for having them.
+    ".serena",
     *VENDOR_PATHS,
 )
 

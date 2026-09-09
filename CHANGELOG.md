@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- **An MCP server's own notes killed a story** (bug 62). Serena writes
+  `.serena/memories/*.md` into whatever tree it is pointed at, on its first
+  call — which is every session. `diff-scope` saw a file outside `write_scope`
+  and blocked every command the agent ran, all three attempts, and seven other
+  gate checks went red as a consequence. Same class as `node_modules` and
+  `*.tsbuildinfo`: it appears because the story *ran*, not because the story
+  *wrote* it. The framework does not choose the user's MCP servers and must not
+  fail their stories for having them.
+
+- **The write-scope message cut off before naming the file** (bug 63). It
+  printed the twenty-seven-entry scope list first and the offending file last,
+  and every consumer folds the message to one line. Offending files come first
+  now.
+
 - **The reviewer rejected the fix it had prescribed** (bug 61). Round 2 asked
   for "a defined post-load quiet period"; the author added one; round 3 blocked
   the same line because a defined window is finite, and asked for deterministic
