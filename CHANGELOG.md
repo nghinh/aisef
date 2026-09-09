@@ -1,5 +1,32 @@
 # Changelog
 
+## Unreleased
+
+- **The first story of every new project failed the gate forever** (bug 55).
+  `no baseline regression` and `tests verify story` both reported
+  `unrunnable · tool not installed or cannot load (no such file or directory)`
+  on a machine that had run the same suite three minutes earlier. The nop
+  control runs at the parent SHA, where a greenfield project has no
+  `package.json` yet — this story creates it — so npm exits 254 with `ENOENT`,
+  whose text matches the missing-tool table. A missing **manifest** is now told
+  apart from a missing **tool**: at the parent that means no project, which is
+  the strongest form of the answer nop is asking for (PASSED), and there were
+  no tests to regress (NOT_APPLICABLE). A real `command not found` still
+  blocks.
+
+- **Every command line was split and quoted with POSIX rules** (bug 54). On
+  Windows `shlex.split` ate the backslashes out of absolute paths — a project
+  command naming `C:\Python\python.exe` lost its program entirely — and
+  `shlex.quote` wrapped the framework's own command in single quotes, which
+  `cmd.exe` treats as ordinary characters, so every prompt and every guard hook
+  named a program that does not exist. Splitting and joining now go through
+  `split_command` / `quote_command`, which follow the host's rules.
+
+- Windows CI: the compile report and `Config.source` print POSIX separators
+  like every other path the framework shows; `remove_tree` is public, because
+  `shutil.rmtree(..., ignore_errors=True)` leaves read-only `.git/objects`
+  behind and the next `mkdir` fails.
+
 ## 1.2.31 — 2026-09-09
 
 - **"5 files changed since the most recent test run" when nothing had

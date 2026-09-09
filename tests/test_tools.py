@@ -410,7 +410,7 @@ class TestCheBiMatVaLogToanVan(ToolTestCase):
 
 
 class TestThieuDuAnKhacThieuCongCu(unittest.TestCase):
-    """Lỗi 54: npm báo ENOENT vì **thiếu package.json**, không phải thiếu npm.
+    """Lỗi 55: npm báo ENOENT vì **thiếu package.json**, không phải thiếu npm.
     Chuỗi "no such file or directory" khớp MISSING_TOOL nên harness kết luận
     "tool not installed" trên đúng cái máy vừa chạy bộ test đó."""
 

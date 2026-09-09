@@ -516,7 +516,7 @@ class TestKhongLamDoTestCoSan(GateTestCase):
 
 
 class TestDuAnMoiTinh(GateTestCase):
-    """Lỗi 54: story **đầu tiên** của một dự án trống không bao giờ qua cổng.
+    """Lỗi 55: story **đầu tiên** của một dự án trống không bao giờ qua cổng.
 
     Ở SHA cha chưa có `package.json` — chính story này tạo ra nó — nên `npm
     test` thoát 254 với ENOENT. Chuỗi "no such file or directory" khớp bảng
