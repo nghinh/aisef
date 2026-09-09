@@ -31,10 +31,18 @@ def cmd_status(args) -> int:
         return EXIT_OK
 
     totals = state.totals()
-    total = len(state.stories)
     done = totals[StoryStatus.DONE.value]
+    # Against the **plan**, not against what has been registered so far: a
+    # `--epic` run registers one story at a time, and "0/1 stories done" reads
+    # as a one-story project when fourteen are planned.
+    from ..control.change import read_index
 
-    print(f"Progress: {done}/{total} stories done")
+    planned = len(read_index(_artifact_root(args)).get("stories") or [])
+    total = max(planned, len(state.stories))
+
+    print(f"Progress: {done}/{total} stories done"
+          + (f" ({total - len(state.stories)} not started)"
+             if total > len(state.stories) else ""))
     # `verified` = passed gate, not yet on main branch (merge conflict in a
     # previous attempt).  Without saying so, the reader assumes code is on main.
     unmerged = [r.id for r in state.by_status(StoryStatus.VERIFIED)]

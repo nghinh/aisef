@@ -118,6 +118,22 @@ def _current_user() -> str:
 REPAIR_PREFIX = ("STORY-RP-", "EPIC-RP-")
 
 
+def is_present(path: Path) -> bool:
+    """Does this artifact exist — false, never an exception, for a path that
+    cannot exist.
+
+    `artifact_paths` deliberately returns the unmatched **pattern** so a
+    message can name what is missing (`LOOP-REPORT-*.md`). On POSIX asking
+    `is_file()` about that just answers False; on Windows `*` is an illegal
+    filename character and `stat` raises `OSError [Errno 22]`. 22 of the 48
+    failures in the first Windows CI run were this one call.
+    """
+    try:
+        return path.is_file()
+    except OSError:
+        return False
+
+
 def _artifact_hash(path: Path) -> str:
     """Hash a gate artifact; for `stories.index.json` specifically, hash
     **normalized content with repair stories excluded**, not raw bytes.
@@ -214,7 +230,7 @@ class ApprovalStore:
 
     def has_artifacts(self, gate: Gate) -> bool:
         """Whether **all** files for this gate exist."""
-        return all(p.is_file() for p in self.artifact_paths(gate))
+        return all(is_present(p) for p in self.artifact_paths(gate))
 
     def content_hash(self, gate: Gate) -> str:
         """Combined hash of all gate files, in declaration order."""

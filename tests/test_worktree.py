@@ -21,7 +21,7 @@ from aisef.control.worktree import (  # noqa: E402
 
 
 def git(repo: Path, *args: str) -> str:
-    p = subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True)
+    p = subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True, encoding="utf-8", errors="replace")
     if p.returncode != 0:
         raise AssertionError(f"git {' '.join(args)}: {p.stderr}")
     return p.stdout
@@ -81,7 +81,8 @@ class TestLifecycle(WorktreeTestCase):
         wt = self.wm.create("S-01")
         self.assertTrue((wt.path / ".git").exists())
         self.assertFalse((wt.path / ".vite").exists())
-        self.assertIn(str(wt.path), _git(self.repo, "worktree", "list").stdout)
+        # git prints worktree paths with `/` on every OS
+        self.assertIn(wt.path.as_posix(), _git(self.repo, "worktree", "list").stdout)
 
     def test_create_is_idempotent(self):
         a = self.wm.create("S-01")
@@ -203,7 +204,7 @@ class TestCommitStory(WorktreeTestCase):
         self.assertTrue(self.wm.commit_story("S-01", "S-01: xong", paths=["src"]))
         tracked = subprocess.run(
             ["git", "-C", str(wt.path), "show", "--name-only", "--format=", "HEAD"],
-            capture_output=True, text=True,
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
         ).stdout.split()
         self.assertIn("src/a.py", tracked)
         self.assertNotIn("rac.txt", tracked)

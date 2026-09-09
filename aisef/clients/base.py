@@ -16,6 +16,8 @@ place (invariant 10).
 from __future__ import annotations
 
 import os
+import re
+import shlex
 import shutil
 import sys
 from abc import ABC, abstractmethod
@@ -140,6 +142,47 @@ def resolve_binary(name: str) -> list[str]:
     return [path]
 
 
+def split_command(command: str) -> list[str]:
+    """Split a command line into argv the way the host OS would.
+
+    `shlex.split` is POSIX: backslash escapes the next character. Windows
+    paths are made of backslashes, so `C:\\hostedtoolcache\\...\\python.exe -c x`
+    split into `C:hostedtoolcache...python.exe` and the program simply
+    vanished -- every project command carrying an absolute path failed with
+    "cannot run". Windows keeps backslashes literal and groups only with
+    double quotes, so lex it that way there.
+    """
+    if sys.platform != "win32":
+        return shlex.split(command)
+    lex = shlex.shlex(command, posix=True)
+    lex.whitespace_split = True
+    lex.escape = ""  # backslash is an ordinary character on Windows
+    lex.quotes = '"'  # cmd does not group with single quotes
+    return list(lex)
+
+
+#: Characters `cmd.exe` passes through untouched. Anything else gets quoted:
+#: on Windows `& | ^ < > ( )` are metacharacters, so a project path holding one
+#: is a broken command line at best and an injection at worst.
+_WIN_BARE = re.compile(r"^[A-Za-z0-9_@%+=:,./\\-]+$")
+
+
+def quote_command(argv: Iterable[str]) -> str:
+    """Join argv into one command line the host shell splits back correctly.
+
+    `shlex.quote` is POSIX: it wraps in **single** quotes, which cmd.exe treats
+    as ordinary characters. On Windows that turned the framework's own command
+    into `'C:\\...\\python.exe' -m aisef.cli` -- a program name that does not
+    exist, printed into every prompt and every guard hook.
+    """
+    if sys.platform != "win32":
+        return " ".join(shlex.quote(p) for p in argv)
+    # A Windows path cannot contain `"`, so doubling is only for malformed input.
+    return " ".join(
+        p if _WIN_BARE.match(p) else '"' + p.replace('"', '""') + '"' for p in argv
+    )
+
+
 def runnable(cmd: list[str]) -> list[str]:
     """`cmd` with its program resolved so this OS can actually start it.
 
@@ -174,6 +217,11 @@ def child_env(spec_env: dict[str, str], *, allow_prefixes: Iterable[str] = ()) -
     prefixes = tuple(p for p in (*ENV_KEEP_PREFIXES, *allow_prefixes) if p)
     env = {k: v for k, v in os.environ.items() if k in ENV_KEEP or k.startswith(prefixes)}
     env.update(GIT_NO_CREDENTIALS)
+    # A child Python process picks its stdout encoding from the console code
+    # page; on Windows that is a legacy one and `·` or `✅` comes back
+    # mangled or raises. Say it explicitly rather than inheriting a terminal's
+    # opinion.
+    env.setdefault("PYTHONIOENCODING", "utf-8")
     env.update(spec_env)
     return env
 

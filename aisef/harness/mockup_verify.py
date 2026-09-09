@@ -28,10 +28,10 @@ from pathlib import Path
 from urllib.parse import urljoin
 
 from ..config import Config
-from ..clients.base import runnable
+from ..clients.base import runnable, split_command
 from ..control.design_contract import DesignContract
 from . import browser
-from .aria import MapResult, compare, parse_aria_snapshot
+from .aria import MapResult, compare, has_items, parse_aria_snapshot
 from .observe import MOCKUP_MAP, EvidenceStore
 
 
@@ -101,15 +101,13 @@ class AppServer:
                 "be opened for mockup comparison"
             )
 
-        import shlex
-
         try:
             self.proc = subprocess.Popen(
-                runnable(shlex.split(self.command)),
+                runnable(split_command(self.command)),
                 cwd=self.cwd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
-                text=True,
+                text=True, encoding="utf-8", errors="replace",
                 **({"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
                    if sys.platform == "win32"
                    else {"start_new_session": True}),
@@ -177,7 +175,7 @@ def occupant(url: str) -> str:
         return "unknown"
     try:
         out = subprocess.run(["lsof", "-nP", "-t", "-i", f":{port}"], capture_output=True,
-                             text=True, timeout=5).stdout.split()
+                             text=True, encoding="utf-8", errors="replace", timeout=5).stdout.split()
     except (OSError, subprocess.SubprocessError):
         return "unknown"
     if not out:
@@ -185,7 +183,7 @@ def occupant(url: str) -> str:
     pid = out[0]
     try:
         cwd = subprocess.run(["lsof", "-a", "-d", "cwd", "-p", pid, "-Fn"], capture_output=True,
-                             text=True, timeout=5).stdout
+                             text=True, encoding="utf-8", errors="replace", timeout=5).stdout
         where = next((l[1:] for l in cwd.splitlines() if l.startswith("n")), "")
     except (OSError, subprocess.SubprocessError):
         where = ""
@@ -283,6 +281,7 @@ def verify_screens(
                 screen_id=screen.id,
                 route=screen.route,
                 data_roles=screen.data_roles,
+                items_rendered=has_items(got.snapshot),
             )
         out.results.append(result)
         if store:

@@ -32,6 +32,17 @@ CONTRACT_ROLES = frozenset({
 
 _LINE = re.compile(r'^\s*-\s+([a-z]+)(?:\s+"([^"]*)")?')
 
+#: Roles a repeated record carries. They never belong to a contract — a
+#: contract pins **named** controls — so they are read straight from the
+#: snapshot to answer one question: did the data region render any rows?
+ITEM_ROLES = frozenset({"listitem", "row", "option", "gridcell", "treeitem"})
+
+
+def has_items(snapshot: str) -> bool:
+    """True if the snapshot shows at least one repeated record."""
+    return any((m := _LINE.match(line)) and m.group(1) in ITEM_ROLES
+               for line in (snapshot or "").splitlines())
+
 
 @dataclass(frozen=True)
 class Component:
@@ -56,10 +67,26 @@ class MapResult:
     #: none of. Comparing by name in this region is meaningless (data differs),
     #: yet comparing nothing would miss an entirely empty list.
     missing_data_roles: list[str] = field(default_factory=list)
+    #: The live page showed at least one repeated record.
+    items_rendered: bool = False
 
     @property
     def matched(self) -> int:
         return len(self.contract) - len(self.missing)
+
+    @property
+    def blocking_data_roles(self) -> list[str]:
+        """Data-region roles whose absence is a real gap, not an empty list.
+
+        On a page with no rows the two are indistinguishable — and demanding
+        rows is not always answerable: the first story of a project builds the
+        shell before anything can create a record, and a browser-stored app
+        has no seed the dev server could serve. Reported either way, blocking
+        only when there were rows to look in (measured on `todo` and
+        `todo-e2e`, 2026-09-09: `checkbox` missing from an empty list cost
+        both projects attempts they could not have passed).
+        """
+        return self.missing_data_roles if self.items_rendered else []
 
     @property
     def passed(self) -> bool:
@@ -68,7 +95,7 @@ class MapResult:
         The live app may have extra reasonable elements (auxiliary buttons,
         banners), but it **must not lack** what the contract promises.
         """
-        return not self.missing and not self.missing_data_roles
+        return not self.missing and not self.blocking_data_roles
 
     def renamed(self) -> list[tuple[str, str]]:
         """Missing components that look like something the app **does** render
@@ -99,7 +126,11 @@ class MapResult:
             "contract_components": len(self.contract),
             "matched": self.matched,
             "missing": [str(c) for c in self.missing],
-            "missing_data_roles": self.missing_data_roles,
+            # Only the blocking ones under the name every reader treats as a
+            # gap; the rest are recorded separately so they stay visible
+            # without turning into "missing" in the gate message and ISSUES.md.
+            "missing_data_roles": self.blocking_data_roles,
+            "unchecked_data_roles": [] if self.items_rendered else list(self.missing_data_roles),
             "extra": [str(c) for c in self.extra],
             "renamed": [list(x) for x in self.renamed()],
             "passed": self.passed,
@@ -114,17 +145,17 @@ class MapResult:
             parts.append(
                 f"  {thieu} is on screen as {thay} — the mockup pins the accessible "
                 f"name: rename it back, or change the mockup and re-approve")
-        if self.missing_data_roles:
-            # An empty list is the usual cause, not a missing feature: the
-            # mockup shows sample rows, the app at a bare URL has none. Say
-            # where to look, or the next reader spends an afternoon on it
-            # (`todo` 2026-09-09: `checkbox` missing because a fresh browser
-            # profile has no stored task).
+        if self.missing_data_roles and self.items_rendered:
             parts.append(
-                "  data region rendered no items of type: "
+                "  the data region has rows, but none of type: "
                 + ", ".join(self.missing_data_roles)
-                + " — the list was empty at this URL; `app.dev_command` must "
-                  "serve an environment that already holds a record"
+                + " — the mockup shows this role inside a record"
+            )
+        elif self.missing_data_roles:
+            parts.append(
+                "  (note) data region was empty, so these roles could not be "
+                "checked: " + ", ".join(self.missing_data_roles)
+                + " — not a gap; seed a record to compare them"
             )
         if self.extra:
             parts.append("  extra (warning): " + ", ".join(str(c) for c in self.extra))
@@ -155,12 +186,19 @@ def compare(
     screen_id: str = "",
     route: str = "",
     data_roles: list[str] | None = None,
+    items_rendered: bool = False,
 ) -> MapResult:
     """Compare the contract against the actual screen.
 
     Comparison is **set-based**, not order-dependent: the mockup and live
     app may arrange items differently and still satisfy the contract.
     Positioning is a visual-review concern, not the deterministic gate's.
+
+    ``items_rendered`` says whether the live page showed any repeated record.
+    Roles that exist only inside the mockup's sample rows cannot be judged on
+    a page with no rows — "the list is empty" and "the checkbox was never
+    built" look identical there. They are still reported; they only block
+    when there **were** rows to look at.
     """
     want, have = set(contract), set(actual)
     roles_present = {c.role for c in actual}
@@ -172,6 +210,7 @@ def compare(
         missing=[c for c in contract if c not in have],
         extra=[c for c in actual if c not in want],
         missing_data_roles=[r for r in (data_roles or []) if r not in roles_present],
+        items_rendered=items_rendered,
     )
 
 
@@ -190,4 +229,5 @@ def compare_snapshots(
         screen_id=screen_id,
         route=route,
         data_roles=data_roles,
+        items_rendered=has_items(actual_snapshot),
     )

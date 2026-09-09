@@ -45,7 +45,7 @@ TIMEOUT = 420
 
 
 def _git(cwd: Path, *args: str) -> str:
-    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True).stdout.strip()
+    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
 
 
 def make_project(root: Path, client: str) -> tuple[Path, Path]:
@@ -91,7 +91,7 @@ def _run(cmd, project: Path, workdir: Path, story: str, *, reviewer: bool) -> su
     `TimeoutExpired` ném xuyên `probe_all`, cột OpenCode giữ số cũ và C9/C10
     thành "—" — bảng trông như chưa chạy thay vì nói đã treo ở đâu."""
     try:
-        proc = subprocess.run(cmd, cwd=workdir, capture_output=True, text=True, timeout=TIMEOUT,
+        proc = subprocess.run(cmd, cwd=workdir, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=TIMEOUT,
                               env=env_for(project, workdir, story, reviewer=reviewer),
                               stdin=subprocess.DEVNULL)
     except subprocess.TimeoutExpired as e:
@@ -209,8 +209,17 @@ def seed_fake_credential(repo: Path, url: str) -> Path:
     **của kho** (worktree dùng chung). Env thường thì git gửi nó — đối chứng;
     env con (`GIT_NO_CREDENTIALS`) thì helper không được hỏi."""
     store = repo / ".git" / "hop-quy-credentials"
-    store.write_text(url.replace("://", "://gia:token-gia@").rsplit("/", 1)[0] + "\n", encoding="utf-8")
-    subprocess.run(["git", "-C", str(repo), "config", "credential.helper", f"store --file={store}"], check=True)
+    # `newline="\n"`: text mode turns `\n` into `\r\n` on Windows, and
+    # git-credential-store then reads a host whose port ends in `\r` — it
+    # matches nothing, git falls through to prompting for a username, and the
+    # control measures "no credentials sent" for entirely the wrong reason.
+    store.write_text(url.replace("://", "://gia:token-gia@").rsplit("/", 1)[0] + "\n",
+                     encoding="utf-8", newline="\n")
+    # git parses the helper as a shell command, and its bundled `sh` eats
+    # backslashes: a Windows path must go in POSIX form or the token is
+    # silently read from a file that does not exist.
+    subprocess.run(["git", "-C", str(repo), "config", "credential.helper",
+                    f"store --file={store.as_posix()}"], check=True)
     return store
 
 
@@ -219,7 +228,7 @@ RUNNERS = {"claude": run_claude, "opencode": run_opencode}
 
 def version_of(client: str) -> str:
     try:
-        out = subprocess.run([client, "--version"], capture_output=True, text=True, timeout=30).stdout
+        out = subprocess.run([client, "--version"], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30).stdout
         return out.strip().split()[0] if out.strip() else "?"
     except (OSError, subprocess.SubprocessError):
         return "?"

@@ -350,7 +350,7 @@ class Config:
             if unknown:
                 raise ConfigError(f"unrecognized keys in {path}: {', '.join(unknown)}")
             values.update(loaded)
-            sources.append(str(path))
+            sources.append(Path(path).as_posix())
 
         environ = os.environ if env is None else env
         overridden = []

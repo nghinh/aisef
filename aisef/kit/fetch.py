@@ -15,6 +15,8 @@ from __future__ import annotations
 
 import os
 import shutil
+import sys
+import stat
 import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -65,7 +67,7 @@ def _at_commit(d: Path, commit: str) -> bool:
     try:
         r = subprocess.run(
             ["git", "-C", str(d), "rev-parse", "HEAD"],
-            capture_output=True, text=True, timeout=30,
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30,
         )
     except (OSError, subprocess.SubprocessError):
         return False
@@ -85,7 +87,7 @@ def _clone(source: Source, dest: Path) -> str:
              "--no-tags", "origin", source.commit],
             ["git", "-C", str(tmp), "checkout", "--quiet", "FETCH_HEAD"],
         ):
-            r = subprocess.run(cmd, capture_output=True, text=True,
+            r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace",
                                timeout=CLONE_TIMEOUT)
             if r.returncode != 0:
                 error = (r.stderr or r.stdout).strip().splitlines()
@@ -94,9 +96,35 @@ def _clone(source: Source, dest: Path) -> str:
         return f"exceeded {CLONE_TIMEOUT}s"
     except OSError as e:
         return str(e)
-    shutil.rmtree(dest, ignore_errors=True)
+    remove_tree(dest)
     tmp.replace(dest)
     return ""
+
+
+def remove_tree(path: Path | str) -> None:
+    """Delete a directory tree, including the read-only files git leaves.
+
+    Windows refuses to unlink a read-only file, and any repo's `.git/objects`
+    is full of them: `aisef setup` failed with `PermissionError [WinError 5]
+    Access is denied` while replacing a cached reference repo, and
+    `shutil.rmtree(..., ignore_errors=True)` silently leaves the tree behind so
+    the next `mkdir` fails with `[WinError 183] file already exists`. POSIX
+    does not care, which is why this went unnoticed.
+    """
+    def _force(func, target, _exc):
+        try:
+            os.chmod(target, stat.S_IWRITE)
+            func(target)
+        except OSError:
+            pass
+
+    path = Path(path)
+    if not path.exists():
+        return
+    if sys.version_info >= (3, 12):
+        shutil.rmtree(path, onexc=_force)
+    else:
+        shutil.rmtree(path, onerror=_force)
 
 
 def ensure(

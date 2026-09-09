@@ -417,7 +417,7 @@ def _run_docker(spec: SandboxSpec) -> SandboxResult:
     started = time.monotonic()
     try:
         proc = subprocess.run(
-            args, capture_output=True, text=True, timeout=spec.timeout_seconds
+            args, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=spec.timeout_seconds
         )
     except subprocess.TimeoutExpired:
         # Killing the CLI does not kill the container: `sleep 9999` would
@@ -469,7 +469,7 @@ def _run_degraded(spec: SandboxSpec) -> SandboxResult:
             runnable(spec.cmd),
             cwd=str(spec.workspace),
             capture_output=True,
-            text=True,
+            text=True, encoding="utf-8", errors="replace",
             timeout=spec.timeout_seconds,
             # Inherit host env then overlay `spec.env`. Previously `{**spec.env}
             # or None`: non-empty env lost PATH, commands outside /bin were

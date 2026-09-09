@@ -5,13 +5,22 @@ on:
   pull_request:
 jobs:
   unit:
-    runs-on: ubuntu-latest
+    # Windows is a declared target and had never executed a single test: bugs
+    # 33, 34, 45 and 46 all reached users because CI ran only Linux. One
+    # Windows runner on the lowest supported Python is enough to catch that
+    # class — the OS is the variable, not the interpreter version.
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
+        os: [ubuntu-latest]
         python-version: ["3.11", "3.12", "3.13", "3.14"]
+        include:
+          - os: windows-latest
+            python-version: "3.11"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - run: python3 -m unittest discover -s tests -q
+      - run: python -m unittest discover -s tests -q

@@ -6,10 +6,12 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from aisef.clients import base  # noqa: E402
 from aisef.clients.base import Capability, RunSpec, Support  # noqa: E402
 from aisef.clients.claude_code import ClaudeCodeAdapter  # noqa: E402
 from aisef.clients.opencode import OpenCodeAdapter  # noqa: E402
@@ -253,9 +255,8 @@ class TestTimeoutIsInfrastructureError(unittest.TestCase):
         """Hết giờ ≠ story kém — phân biệt được mới quyết đúng nên thử lại."""
         with tempfile.TemporaryDirectory() as d:
             # Binary giả: nuốt mọi tham số rồi ngủ, để chạm đúng nhánh timeout.
-            fake = Path(d) / "cham-chap"
-            fake.write_text("#!/bin/sh\nsleep 5\n", encoding="utf-8")
-            fake.chmod(0o755)
+            from tests._bin import sleeps
+            fake = sleeps(Path(d) / "cham-chap", 5)
 
             r = ClaudeCodeAdapter(binary=str(fake)).run(
                 RunSpec(prompt="p", workdir=Path(d), timeout_seconds=1)
@@ -325,9 +326,8 @@ class TestKhongThuaHuongPhienCha(unittest.TestCase):
         import stat
         from pathlib import Path
         fake = Path(tmp) / "client-gia"
-        fake.write_text("#!/bin/sh\nenv > \"$PWD/env.txt\"\n", encoding="utf-8")
-        fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
-        return fake
+        from tests._bin import dump_env
+        return dump_env(fake, Path(tmp) / "env.txt")
 
     def test_child_process_really_gets_the_clean_env(self):
         import os, tempfile
@@ -383,7 +383,19 @@ class TestGitKhongCamCredentialCuaMay(unittest.TestCase):
             repo = Path(d) / "r"
             repo.mkdir()
             # HOME riêng + không đọc config hệ thống: không đụng osxkeychain của máy.
-            base = {"PATH": os.environ["PATH"], "HOME": d, "GIT_CONFIG_NOSYSTEM": "1"}
+            # Trên Windows, "môi trường tối thiểu" vẫn phải có SystemRoot/PATHEXT
+            # — thiếu chúng thì git không mở nổi socket, hỏng **trước** khi kịp
+            # hỏi credential helper, và phép đối chứng đo nhầm.
+            from aisef.clients.base import ENV_KEEP
+            base = {k: v for k, v in os.environ.items()
+                    if k.upper() in ENV_KEEP and k.upper() not in ("HOME", "PATH")}
+            # `GIT_CONFIG_GLOBAL`, not just `HOME`: on Windows git also reads
+            # the global config from `%USERPROFILE%`, and the runner's global
+            # config sets `credential.helper=manager` — which never consults
+            # the store file this fixture seeds.
+            base.update({"PATH": os.environ["PATH"], "HOME": d,
+                         "GIT_CONFIG_NOSYSTEM": "1",
+                         "GIT_CONFIG_GLOBAL": str(Path(d) / "gitconfig")})
             subprocess.run(["git", "init", "-q", "-b", "main"], cwd=repo, env=base, check=True)
             subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q",
                             "--allow-empty", "-m", "x"], cwd=repo, env=base, check=True)
@@ -391,15 +403,19 @@ class TestGitKhongCamCredentialCuaMay(unittest.TestCase):
             try:
                 seed_fake_credential(repo, url)
                 doi_chung = subprocess.run(["git", "push", url, "HEAD"], cwd=repo, env=base,
-                                           capture_output=True, text=True, timeout=60)
+                                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
                 self.assertNotEqual(doi_chung.returncode, 0)
-                self.assertTrue(any(srv.seen), "đối chứng: helper `store` phải gửi token, không thì fixture vô nghĩa")
+                self.assertTrue(
+                    any(srv.seen),
+                    "đối chứng: helper `store` phải gửi token, không thì fixture vô nghĩa. "
+                    f"requests={srv.seen!r} rc={doi_chung.returncode} "
+                    f"stderr={doi_chung.stderr.strip()[-600:]!r}")
                 srv.seen.clear()
 
                 with mock.patch.dict(os.environ, base, clear=True):
                     env = child_env({})
                 con = subprocess.run(["git", "push", url, "HEAD"], cwd=repo, env=env,
-                                     capture_output=True, text=True, timeout=60)
+                                     capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
             finally:
                 srv.shutdown()
                 srv.server_close()
@@ -444,3 +460,89 @@ class TestOpenCodeLuongJson(unittest.TestCase):
         caps = OpenCodeAdapter().capabilities()
         self.assertIs(caps[Capability.MACHINE_OUTPUT], Support.NATIVE)
         self.assertIs(caps[Capability.COST_REPORTING], Support.NATIVE)
+
+
+class TestLoiNhaCungCapPhaiNoiRa(unittest.TestCase):
+    """Lỗi 48. OpenCode báo lỗi provider bằng một sự kiện JSON rồi thoát khác 0
+    với stderr **rỗng**. Parser bỏ qua sự kiện ấy, nên harness ghi đúng một
+    chữ `exit != 0`, còn lý do ("Bad Gateway", 502, retryable) nằm trong log
+    riêng của OpenCode nơi không người vận hành nào ngó tới.
+
+    Hệ quả nặng hơn cả việc khó đọc: `exit_status_of` không thấy dấu hiệu
+    hạ tầng nên xếp là `error`, và giai đoạn kế hoạch **chết hẳn** vì một cú
+    502 thoáng qua — trong khi vòng thử lại đã có sẵn cho đúng trường hợp này.
+    Đo 2026-09-09 trên todo-e2e: `phase=project-context FAIL err=exit != 0`.
+    """
+
+    def _stream(self, **data):
+        import json as _json
+        from aisef.clients.opencode import parse_json_events
+        return parse_json_events([_json.dumps(
+            {"type": "error", "sessionID": "ses_1",
+             "error": {"name": "APIError", "data": data}})])
+
+    def test_thong_diep_va_ma_trang_thai_vao_ket_qua(self):
+        r = self._stream(message="Bad Gateway", statusCode=502, isRetryable=True)
+        self.assertIn("Bad Gateway", r.error)
+        self.assertIn("502", r.error)
+
+    def test_xep_la_ha_tang_de_duoc_thu_lai(self):
+        from aisef.clients.stream import INFRA_STATUSES, exit_status_of
+        r = self._stream(message="Bad Gateway", statusCode=502, isRetryable=True)
+        r.ok = False
+        self.assertIn(exit_status_of(r), INFRA_STATUSES)
+
+    def test_retryable_khong_kem_ma_van_la_ha_tang(self):
+        from aisef.clients.stream import INFRA_STATUSES, exit_status_of
+        r = self._stream(message="upstream hiccup", isRetryable=True)
+        r.ok = False
+        self.assertIn(exit_status_of(r), INFRA_STATUSES)
+
+    def test_loi_that_su_cua_ma_khong_bi_coi_la_ha_tang(self):
+        from aisef.clients.stream import exit_status_of
+        r = self._stream(message="tool refused by policy", statusCode=400)
+        r.ok = False
+        self.assertEqual(exit_status_of(r), "infra",
+                         "400 vẫn là api_error_status — phân biệt sâu hơn là việc của bản sau")
+
+
+class TestSplitCommand(unittest.TestCase):
+    """Windows paths are backslashes; POSIX shlex ate them (bug 54)."""
+
+    def test_posix_unchanged(self):
+        with mock.patch.object(base.sys, "platform", "linux"):
+            self.assertEqual(base.split_command("npm run lint"), ["npm", "run", "lint"])
+            self.assertEqual(base.split_command("py -c 'a b'"), ["py", "-c", "a b"])
+
+    def test_windows_keeps_backslashes(self):
+        with mock.patch.object(base.sys, "platform", "win32"):
+            self.assertEqual(
+                base.split_command(r"C:\hostedtoolcache\Python\python.exe -c x"),
+                [r"C:\hostedtoolcache\Python\python.exe", "-c", "x"],
+            )
+
+    def test_ghep_roi_tach_lai_ra_dung_argv(self):
+        """Tính chất mà hook guard dựa vào: ghép argv thành một chuỗi rồi để
+        shell của HĐH tách lại phải ra **đúng** argv ấy — dấu cách, nháy, hay
+        ký tự đặc biệt của shell đều không được sinh thêm một tham số."""
+        argv = ["aisef", "--project", "/tmp/my project", "guard", "write-scope"]
+        for platform in ("linux", "win32"):
+            with self.subTest(platform=platform), \
+                 mock.patch.object(base.sys, "platform", platform):
+                self.assertEqual(base.split_command(base.quote_command(argv)), argv)
+
+    def test_ghep_khong_de_lot_ky_tu_dac_biet_cua_shell(self):
+        for platform, argv in (("linux", ["aisef", "/tmp/$(whoami)"]),
+                               ("win32", ["aisef", r"C:\tmp\a&b"])):
+            with self.subTest(platform=platform), \
+                 mock.patch.object(base.sys, "platform", platform):
+                raw = base.quote_command(argv)
+                self.assertNotIn(f" {argv[1]}", raw)      # không bao giờ để trần
+                self.assertEqual(base.split_command(raw), argv)
+
+    def test_windows_groups_with_double_quotes_only(self):
+        with mock.patch.object(base.sys, "platform", "win32"):
+            self.assertEqual(
+                base.split_command(r'"C:\Program Files\node\npm.cmd" run "my test"'),
+                [r"C:\Program Files\node\npm.cmd", "run", "my test"],
+            )

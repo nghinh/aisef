@@ -42,6 +42,7 @@ STORY_CTX = {
     "mockup_section": "màn hình danh-sach",
     "tools": "- aisef tool test",
     "index": "- STORY-01-01 · done · abc1234 · V3 G0 R0 · evidence/STORY-01-01.jsonl",
+    "roadmap": "- STORY-01-01 — Tạo ghi chú   ← the story under review\n- STORY-02-01 — Lưu ghi chú",
     "preservation": "- `AC-STORY-01-00-1` · STORY-01-00 · test `src/x.test.ts > AC-STORY-01-00-1`",
     "validation": "- test bảo toàn: `src/x.test.ts > AC-STORY-01-00-1`",
     "skills": "- `x` — dùng khi: y",
@@ -144,6 +145,17 @@ class TestPromptContent(unittest.TestCase):
     def test_reviewer_prompt_refuses_padding(self):
         """Bắt phải có phát hiện sẽ đẻ ra phát hiện giả."""
         self.assertIn("not manufacture findings", self.catalog.get("story-review").body)
+
+    def test_nguoi_ra_soat_thay_ca_ke_hoach_va_duoc_dan_khong_cham_luot_khac(self):
+        """Lỗi 58. Story "vỏ ứng dụng" có **một** tiêu chí — cấu trúc tài liệu —
+        bị chặn ba mục vì chưa có submit handler, chưa đọc localStorage, chưa
+        lưu: đúng ba story sau nó. Người rà soát chấm cả PRD, nên story đầu
+        tiên của mọi dự án bị chặn vì không phải story cuối cùng."""
+        prompt = self.catalog.get("story-review")
+        self.assertIn("roadmap", prompt.slots)
+        body = prompt.body
+        self.assertIn("Behaviour another story owns", body)
+        self.assertIn("acceptance criteria are the", body)
 
 
 class TestSlotBanDoMa(unittest.TestCase):

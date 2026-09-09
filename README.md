@@ -136,6 +136,14 @@ To run without stopping for approvals: `aisef plan --auto-approve all`. Automati
 approvals are **always** marked `auto`, so it stays possible to tell which
 documents no human ever read.
 
+On a **greenfield** project, `app.dev_command` and `app.base_url` have no value
+until the architecture picks a stack — `aisef mockup` and the readiness gate
+will both say so, and the readiness gate refuses approval until they are set.
+Once the first story has created the manifest, install the project's
+dependencies **at the project root**: the baseline run, the nop control and the
+clean verification tree all resolve `node_modules` / `.venv` from there, and
+without them they can only report that there is nothing to run.
+
 ## Brownfield (existing codebase)
 
 ```bash

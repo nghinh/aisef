@@ -300,7 +300,7 @@ class TestPreflight(RunTestCase):
     """
 
     def index_with(self, **over):
-        raw = json.loads((self.artifacts / "stories.index.json").read_text())
+        raw = json.loads((self.artifacts / "stories.index.json").read_text(encoding="utf-8"))
         for s in raw["stories"]:
             if s["id"] == "STORY-01-01":
                 s.update(over)
@@ -468,7 +468,7 @@ class TestDonWorktree(RunTestCase):
         self.run_sprint(Agent(out_of_scope={"STORY-01-01"}))
         nhanh = subprocess.run(
             ["git", "branch", "--list", "story/STORY-01-01"],
-            cwd=self.project, capture_output=True, text=True, check=True,
+            cwd=self.project, capture_output=True, text=True, encoding="utf-8", errors="replace", check=True,
         ).stdout
         self.assertIn("story/STORY-01-01", nhanh)
 
@@ -484,9 +484,9 @@ class TestIsolationOff(RunTestCase):
         self.assertTrue((self.project / "src/late/STORY-02-01.py").is_file())
 
     def test_isolation_requires_git(self):
-        import shutil
+        from aisef.kit.fetch import remove_tree
 
-        shutil.rmtree(self.project / ".git")
+        remove_tree(self.project / ".git")   # `.git/objects` is read-only on Windows
         self.assertIn("git", self.run_sprint(Agent()).error)
 
 
@@ -535,7 +535,7 @@ class TestMergeDungRoiChayLai(RunTestCase):
 
     def head_co(self, path: str) -> bool:
         r = subprocess.run(["git", "ls-tree", "--name-only", "HEAD", path],
-                           cwd=self.project, capture_output=True, text=True)
+                           cwd=self.project, capture_output=True, text=True, encoding="utf-8", errors="replace")
         return bool(r.stdout.strip())
 
     def test_khong_bo_qua_story_da_xong_ma_chua_merge(self):
@@ -639,6 +639,12 @@ class TestVerifyOnly(RunTestCase):
         subprocess.run(["git", "commit", "-qam", "hợp đồng sit"], cwd=self.project, check=True)
         self._co = tempfile.TemporaryDirectory()
         self.co = Path(self._co.name) / "xanh"
+        # `test -f` is a POSIX builtin — on Windows the flag could never turn
+        # green, so the half of every test after "tải máy đã hết" never ran.
+        self.co_check = Path(self._co.name) / "co.py"
+        self.co_check.write_text(
+            "import os, sys\nsys.exit(0 if os.path.exists(sys.argv[1]) else 1)\n",
+            encoding="utf-8")
 
     def tearDown(self):
         self._co.cleanup()
@@ -647,7 +653,9 @@ class TestVerifyOnly(RunTestCase):
     def cfg(self):
         # Không Docker: lệnh `sit` phải thấy tệp cờ trên máy này, và phép thử
         # không được đổi màu theo việc máy có daemon hay không.
-        return self.config(**{"verify.sit": f"test -f {self.co}", "sandbox.use_docker": False})
+        from aisef.clients.base import quote_command
+        sit = quote_command([sys.executable, str(self.co_check), str(self.co)])
+        return self.config(**{"verify.sit": sit, "sandbox.use_docker": False})
 
     def truot_vi_sit(self, agent):
         r = self.run_sprint(agent, only_epic="EPIC-01", config=self.cfg())
@@ -668,7 +676,7 @@ class TestVerifyOnly(RunTestCase):
 
     def head_co(self, path: str) -> bool:
         r = subprocess.run(["git", "ls-tree", "--name-only", "HEAD", path],
-                           cwd=self.project, capture_output=True, text=True)
+                           cwd=self.project, capture_output=True, text=True, encoding="utf-8", errors="replace")
         return bool(r.stdout.strip())
 
     def test_chay_lai_dung_phep_kiem_do_giu_ra_soat_cung_sha_roi_merge(self):
@@ -676,7 +684,7 @@ class TestVerifyOnly(RunTestCase):
         self.truot_vi_sit(agent)
         n_dev, n_model = len(agent.stories), len(self.evidence().of(AGENT_RUN))
 
-        self.co.write_text("")          # "tải máy" đã hết
+        self.co.write_text("", encoding="utf-8")          # "tải máy" đã hết
         r = self.kiem_lai(agent)
 
         self.assertTrue(r.ok, r.summary())
@@ -706,7 +714,7 @@ class TestVerifyOnly(RunTestCase):
         wt.commit_story(self.SID, "sửa tay", paths=["src/core"])
         wt.remove(self.SID)
 
-        self.co.write_text("")
+        self.co.write_text("", encoding="utf-8")
         r = self.kiem_lai(agent)
 
         self.assertTrue(r.ok, r.summary())
@@ -727,7 +735,7 @@ class TestVerifyOnly(RunTestCase):
         self.assertNotIn(self.SID, self.state().stories, "từ chối trước khi chạm trạng thái")
 
     def test_tu_choi_story_da_xong(self):
-        self.co.write_text("")
+        self.co.write_text("", encoding="utf-8")
         self.run_sprint(Agent(), only_epic="EPIC-01", config=self.cfg())
         self.assertIs(self.state().stories[self.SID].state, StoryStatus.DONE)
         r = self.kiem_lai(Agent())
@@ -760,7 +768,7 @@ class TestVerifyOnly(RunTestCase):
         subprocess.run(["git", "add", "-A"], cwd=self.project, check=True)
         subprocess.run(["git", "commit", "-qm", "main tiến lên"], cwd=self.project, check=True)
 
-        self.co.write_text("")
+        self.co.write_text("", encoding="utf-8")
         r = self.kiem_lai(agent)
 
         self.assertTrue(r.ok, r.summary())
@@ -798,17 +806,25 @@ class TestVerifyOnlyRepeat(RunTestCase):
         super().tearDown()
 
     def lenh_test(self, mau: str) -> str:
-        script, dem = self.co / "test.sh", self.co / "n"
+        """Lệnh test giả, đếm số lần gọi. Viết bằng Python chứ không phải `sh`:
+        Windows không có `sh`, nên cả lớp này chưa từng chạy ở đó."""
+        from aisef.clients.base import quote_command
+
+        script, dem = self.co / "test_gia.py", self.co / "n"
         script.write_text(
-            "#!/bin/sh\n"
-            f'f="{dem}"; n=0; [ -f "$f" ] && n=$(cat "$f"); n=$((n+1)); echo "$n" > "$f"\n'
-            f'kc=$(printf %s "{mau}" | cut -c"$n")\n'
-            'echo "tests/test_x.py::test_lung PASSED"\n'
-            'if [ "$kc" = "R" ]; then echo "tests/test_x.py::test_on FAILED"; exit 1; fi\n'
-            'echo "tests/test_x.py::test_on PASSED"\n',
+            "import pathlib, sys\n"
+            f"mau = {mau!r}\n"
+            f"dem = pathlib.Path({str(dem)!r})\n"
+            "n = (int(dem.read_text()) if dem.exists() else 0) + 1\n"
+            "dem.write_text(str(n))\n"
+            "print('tests/test_x.py::test_lung PASSED')\n"
+            "if mau[n - 1:n] == 'R':\n"
+            "    print('tests/test_x.py::test_on FAILED')\n"
+            "    sys.exit(1)\n"
+            "print('tests/test_x.py::test_on PASSED')\n",
             encoding="utf-8",
         )
-        return f"sh {script}"
+        return quote_command([sys.executable, str(script)])
 
     def cfg(self, mau: str):
         return self.config(**{"tools.test": self.lenh_test(mau), "sandbox.use_docker": False})

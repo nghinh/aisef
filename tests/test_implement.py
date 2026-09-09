@@ -193,7 +193,7 @@ class TestHappyPath(ImplementTestCase):
             self.assertEqual(
                 subprocess.run(
                     ["git", "status", "--porcelain"], cwd=work,
-                    capture_output=True, text=True, check=True,
+                    capture_output=True, text=True, encoding="utf-8", errors="replace", check=True,
                 ).stdout.strip(),
                 "",
                 "agent phải đã commit hết — nếu không, test này không kiểm gì",
@@ -236,7 +236,7 @@ class TestHappyPath(ImplementTestCase):
             subprocess.run(["git", "commit", "-qm", "goc"], cwd=d, check=True)
             base = subprocess.run(
                 ["git", "rev-parse", "HEAD"], cwd=d,
-                capture_output=True, text=True, check=True,
+                capture_output=True, text=True, encoding="utf-8", errors="replace", check=True,
             ).stdout.strip()
             (d / "a.py").write_text("def cong(a, b):\n    return a - b\n", encoding="utf-8")
             subprocess.run(["git", "add", "-A"], cwd=d, check=True)
@@ -673,7 +673,7 @@ class TestCachLyThanCay(ImplementTestCase):
 
     def head(self) -> str:
         return subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.project,
-                              capture_output=True, text=True).stdout.strip()
+                              capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
 
     class PhaCachLy(ClientAdapter):
         """Agent commit thẳng vào thân cây, đúng như lượt OpenCode đã làm."""
@@ -695,7 +695,7 @@ class TestCachLyThanCay(ImplementTestCase):
         def run(self, spec: RunSpec) -> RunResult:
             tep = self.project / "len-thang-trunk.py"
             if not tep.exists():          # chỉ phiên lập trình mới commit
-                tep.write_text("x = 1\n")
+                tep.write_text("x = 1\n", encoding="utf-8")
                 for cmd in (["git", "add", "len-thang-trunk.py"],
                             ["git", "commit", "-q", "-m", "lạc"]):
                     subprocess.run(cmd, cwd=self.project, check=True)
@@ -855,14 +855,14 @@ class TestNguoiRaSoatKhongDuocSuaCay(ImplementTestCase):
             r = super().run(spec)
             dau = spec.prompt.lstrip().splitlines()[0]
             if dau.startswith("# Review") and not dau.startswith("# Security review"):
-                (Path(spec.workdir) / "src" / "reviewer-da-ghi.py").write_text("x\n")
+                (Path(spec.workdir) / "src" / "reviewer-da-ghi.py").write_text("x\n", encoding="utf-8")
             return r
 
     class SecurityGhi(ScriptedClient):
         def run(self, spec):
             r = super().run(spec)
             if spec.prompt.lstrip().startswith("# Security review"):
-                (Path(spec.workdir) / "src" / "a.py").write_text("bi sua\n")
+                (Path(spec.workdir) / "src" / "a.py").write_text("bi sua\n", encoding="utf-8")
             return r
 
     def _init_git(self):
@@ -882,7 +882,7 @@ class TestNguoiRaSoatKhongDuocSuaCay(ImplementTestCase):
         self._init_git()
         out = self.implement(self.SecurityGhi())
         # src/a.py do developer giả viết ("x = 1"); security sửa → phải về như cũ
-        self.assertEqual((self.project / "src" / "a.py").read_text(), "x = 1\n")
+        self.assertEqual((self.project / "src" / "a.py").read_text(encoding="utf-8"), "x = 1\n")
         self.assertIn("modified the working tree", out.attempts[-1].security.error)
 
     def test_reviewer_ngoan_khong_bi_dung(self):
@@ -1087,16 +1087,35 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
     không (ở SHA cha thì không → đỏ), test giả in PASSED vô điều kiện.
     """
 
-    LENH = ("sh -c 'echo \"test session starts\"; "
-            "out=$(for f in tests/test_*.sh; do [ -f \"$f\" ] && sh \"$f\"; done); "
-            "echo \"$out\"; ! echo \"$out\" | grep -q FAILED'")
     TEN = "tests verify story"
-    AC = "tests/test_ac.sh::test_AC_STORY_01_01_1"
-    THAT = ('[ -f src/a.py ] && echo "%s PASSED" || echo "%s FAILED"\n' % (AC, AC))
-    GIA = 'echo "%s PASSED"\n' % AC
+    AC = "tests/test_ac.py::test_AC_STORY_01_01_1"
+    THAT = ('import os\nprint("%s " + ("PASSED" if os.path.exists("src/a.py") else "FAILED"))\n' % AC)
+    GIA = 'print("%s PASSED")\n' % AC
+
+    #: Runner: run every `tests/test_*.py` in the worktree and print their
+    #: lines like `pytest -v`. Written in Python, not `sh -c` — Windows has no
+    #: `sh`, so this whole class only ever ran on POSIX.
+    RUNNER = (
+        "import glob, subprocess, sys\n"
+        'print("test session starts")\n'
+        "out = []\n"
+        'for f in sorted(glob.glob("tests/test_*.py")):\n'
+        "    out.append(subprocess.run([sys.executable, f], capture_output=True,\n"
+        "                              text=True).stdout.strip())\n"
+        'text = "\\n".join(x for x in out if x)\n'
+        "print(text)\n"
+        'sys.exit(1 if "FAILED" in text else 0)\n'
+    )
 
     def setUp(self):
         super().setUp()
+        from aisef.clients.base import quote_command
+
+        self._ngoai = tempfile.TemporaryDirectory()
+        runner = Path(self._ngoai.name) / "runner.py"     # outside the repo: not a change
+        runner.write_text(self.RUNNER, encoding="utf-8")
+        self.LENH = quote_command([sys.executable, str(runner)])
+        self.addCleanup(self._ngoai.cleanup)
         for cmd in (["git", "config", "user.email", "t@t"], ["git", "config", "user.name", "t"]):
             subprocess.run(cmd, cwd=self.project, check=True)
         (self.project / "goc.txt").write_text("goc\n", encoding="utf-8")
@@ -1112,7 +1131,7 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         def run(self, spec):
             r = super().run(spec)
             if spec.env.get(ENV_STORY_ID) and self.than is not None:
-                p = Path(spec.workdir) / "tests" / "test_ac.sh"
+                p = Path(spec.workdir) / "tests" / "test_ac.py"
                 p.parent.mkdir(exist_ok=True)
                 p.write_text(self.than, encoding="utf-8")
             return r
@@ -1134,12 +1153,12 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         self.assertIn("red or absent", m.detail)
         nop = self.evidence().last(TOOL_RUN, "test:nop")
         self.assertEqual(nop.detail["candidate"], out.attempts[-1].candidate)
-        self.assertEqual(nop.detail["files"], ["tests/test_ac.sh"])
+        self.assertEqual(nop.detail["files"], ["tests/test_ac.py"])
         self.assertEqual(nop.detail["parent"], head_sha(self.project))
         self.assertIn(self.AC, nop.detail["failed_ids"])
         self.assertFalse((self.project / ".aisef" / "worktrees" / "STORY-01-01-nop").exists())
         nhanh = subprocess.run(["git", "branch", "--list", "story/STORY-01-01-nop"],
-                               cwd=self.project, capture_output=True, text=True).stdout
+                               cwd=self.project, capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
         self.assertEqual(nhanh.strip(), "", "nhánh tạm phải được xoá")
 
     def test_test_luon_xanh_la_khong_kiem_duoc_gi_neu_ten(self):
@@ -1192,8 +1211,45 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
                   "added_tests", "candidate", "preservation"):
             self.assertIn(k, vao.detail, k)
         self.assertEqual(vao.detail["candidate"], out.attempts[-1].candidate)
-        self.assertEqual(vao.detail["added_tests"], ["tests/test_ac.sh"])
+        self.assertEqual(vao.detail["added_tests"], ["tests/test_ac.py"])
         [r] = R.replay(ev)
         self.assertEqual(r.now, ra.detail["failures"])
         self.assertEqual(r.changed(), [])
 
+
+
+class TestBanDoKeHoachChoNguoiRaSoat(ImplementTestCase):
+    """Lỗi 58, nửa dữ liệu: người rà soát phải **thấy** kế hoạch thì lời dặn
+    "yêu cầu thuộc story khác thì im lặng" mới kiểm chứng được. Chỉ mục bằng
+    chứng không dùng được cho việc này — nó bó trong một epic và **rỗng** trên
+    dự án mới, đúng lúc cần nhất."""
+
+    def roadmap(self):
+        from aisef.phases.implement import _roadmap
+        return _roadmap(self.story, self.artifacts, self.config())
+
+    def viet_index(self, n=14):
+        import json
+        (self.artifacts / "stories.index.json").write_text(json.dumps({"stories": [
+            {"id": f"STORY-{i // 3 + 1:02d}-{i % 3 + 1:02d}", "title": f"việc {i}"}
+            for i in range(n)
+        ]}), encoding="utf-8")
+
+    def test_liet_ke_moi_story_ke_ca_epic_khac(self):
+        self.viet_index()
+        text = self.roadmap()
+        self.assertIn("STORY-05-02", text, text)          # epic khác hẳn
+        self.assertEqual(text.count("\n") + 1, 14)
+
+    def test_danh_dau_story_dang_ra_soat(self):
+        import json
+        (self.artifacts / "stories.index.json").write_text(json.dumps({"stories": [
+            {"id": self.story.id, "title": "vỏ ứng dụng"},
+            {"id": "STORY-02-01", "title": "tạo task"},
+        ]}), encoding="utf-8")
+        text = self.roadmap()
+        self.assertIn("← the story under review", text)
+        self.assertTrue(text.splitlines()[0].endswith("← the story under review"), text)
+
+    def test_khong_co_chi_muc_thi_noi_ra_chu_khong_de_trong(self):
+        self.assertIn("no story index", self.roadmap())

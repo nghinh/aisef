@@ -43,6 +43,7 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisef.clients.base import ClientAdapter, RunSpec  # noqa: E402
+from aisef.kit.fetch import remove_tree  # noqa: E402
 from aisef.clients.compile import compile_for, write_compile_report  # noqa: E402
 from aisef.config import Config  # noqa: E402
 from aisef.control.impact import is_test_path  # noqa: E402
@@ -92,7 +93,7 @@ def materialize(task: Task, dest: Path | str, *, tests: bool = False, gold: bool
     một commit `nền`. `tests`/`gold` áp patch **trước** commit nền."""
     repo = repo_for(task)
     dest = Path(dest)
-    shutil.rmtree(dest, ignore_errors=True)
+    remove_tree(dest)          # ignore_errors leaves read-only .git objects behind
     dest.mkdir(parents=True)
     tar = subprocess.run(["git", "archive", "--format=tar", task.base], cwd=repo,
                          capture_output=True, check=True).stdout

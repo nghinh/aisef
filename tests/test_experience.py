@@ -148,3 +148,54 @@ class TestRobustness(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestChiBangDanhMucMoiLaManHinh(unittest.TestCase):
+    """Lỗi 51. Một tài liệu có nhiều bảng dưới cùng một heading, và chỉ một
+    trong số đó là danh mục màn hình.
+
+    Đo 2026-09-09 trên todo-e2e: dưới `## Information Architecture` có
+    `### Screen Inventory` (`Screen | Route | Purpose`, 1 dòng) và
+    `### Tasks → surfaces` (`Need | Surface | Notes`, 6 dòng ánh xạ nhu cầu
+    sang chỗ). Parser đọc cả hai → 6 component thành 6 "màn hình", và bước
+    mockup sẽ dựng 6 tệp không ai yêu cầu. Chữ `Surface` quá phổ biến để tin
+    một mình; khi đã có bảng khai đích danh màn hình thì bảng mờ hơn không
+    phải danh mục.
+    """
+
+    DOC = """# EXPERIENCE
+
+## Information Architecture
+
+### Screen Inventory
+
+| Screen | Route | Purpose |
+|---|---|---|
+| Todo List | `/` | Create and manage tasks |
+
+### Tasks to surfaces
+
+| Need | Surface | Notes |
+|---|---|---|
+| Create a task | Task input card on Todo List | FR-1 |
+| See all tasks | Task list region on Todo List | FR-5 |
+"""
+
+    def test_chi_lay_bang_khai_dich_danh(self):
+        from aisef.control.experience import parse_experience
+        exp = parse_experience(self.DOC)
+        self.assertEqual([s.id for s in exp.screens], ["todo-list"])
+
+    def test_khong_co_bang_manh_thi_van_dung_bang_yeu(self):
+        """Giữ hành vi cũ: tài liệu chỉ có cột `Surface` vẫn đọc được."""
+        from aisef.control.experience import parse_experience
+        doc = """# EXPERIENCE
+
+## Surfaces
+
+| Surface | Purpose |
+|---|---|
+| Danh sach | Xem tat ca |
+"""
+        exp = parse_experience(doc)
+        self.assertEqual([s.id for s in exp.screens], ["danh-sach"])

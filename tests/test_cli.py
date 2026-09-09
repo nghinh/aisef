@@ -551,6 +551,23 @@ class TestStatus(CliTestCase):
         self.assertIn("1/1 stories done", out)
         self.assertIn("$1.50", out)
 
+    def test_tien_do_dem_theo_ke_hoach_khong_theo_so_da_dang_ky(self):
+        """Một lượt `--epic` chỉ đăng ký từng story một: "0/1 stories done"
+        đọc thành một dự án một story trong khi kế hoạch có mười bốn (đo trên
+        `todo-e2e` 2026-09-09)."""
+        import json
+
+        (self.artifacts / "stories.index.json").write_text(
+            json.dumps({"stories": [{"id": f"S-{i:02d}"} for i in range(1, 15)]}),
+            encoding="utf-8")
+        store = StateStore(self.artifacts)
+        store.register("S-01", "E-01")
+        store.transition("S-01", StoryStatus.RUNNING)
+        code, out, _ = self.run_cli("status")
+        self.assertEqual(code, EXIT_OK)
+        self.assertIn("0/14 stories done", out)
+        self.assertIn("13 not started", out)
+
     def test_blocked_story_makes_status_not_ready(self):
         store = StateStore(self.artifacts)
         store.register("S-02", "E-01")
@@ -572,7 +589,7 @@ class TestInit(CliTestCase):
         code, out, _ = self.run_cli("init", "--stack", "python")
         self.assertEqual(code, EXIT_OK)
         import json
-        cfg = json.loads((self.project / ".ai" / "config.json").read_text())
+        cfg = json.loads((self.project / ".ai" / "config.json").read_text(encoding="utf-8"))
         self.assertEqual(cfg["tools.test"], "python -m pytest")
         self.assertEqual(cfg["sandbox.image"], "python:3.12-slim")
         self.assertIn("pypi.org", cfg["sandbox.allow_hosts"])
@@ -581,7 +598,7 @@ class TestInit(CliTestCase):
         code, out, _ = self.run_cli("init", "--stack", "react")
         self.assertEqual(code, EXIT_OK)
         import json
-        cfg = json.loads((self.project / ".ai" / "config.json").read_text())
+        cfg = json.loads((self.project / ".ai" / "config.json").read_text(encoding="utf-8"))
         self.assertIn("vitest", cfg["tools.test"])
         self.assertTrue(cfg["sandbox.tools_network"])
 

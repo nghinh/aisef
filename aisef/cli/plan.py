@@ -14,6 +14,7 @@ from ..control.approvals import (
     ApprovalStore,
     Gate,
     Status,
+    is_present,
     parse_auto_approve,
 )
 from ..control.design_contract import CONTRACT_FILE
@@ -36,7 +37,7 @@ def cmd_gates(args) -> int:
     for gate, status, by in store.summary():
         mark = _GATE_MARK[status]
         who = f"  ({by})" if by else ""
-        missing = [p.name for p in store.artifact_paths(gate) if not p.is_file()]
+        missing = [p.name for p in store.artifact_paths(gate) if not is_present(p)]
         exists = "" if not missing else f"   [missing: {', '.join(missing)}]"
         print(f"  {mark} {gate.value:14} {status.value:18}{who}{exists}")
         if pending_first is None and status is not Status.APPROVED:
@@ -105,6 +106,38 @@ def cmd_review(args) -> int:
     return EXIT_OK
 
 
+def _preflight(args):
+    """(lines to print, stories that genuinely cannot run).
+
+    Two different things were being conflated. A story missing a **run**
+    capability cannot start; a story missing an optional one — the
+    code-intelligence provider, whose own message says the builtin still runs,
+    only coarser — merely runs with less. Approval refused on both, so a fresh
+    project could never approve `readiness` without `--force`: evidence and
+    optional providers are exactly what does not exist before the first run,
+    and stories cannot run until readiness is approved. Measured 2026-09-09 on
+    todo-e2e, 9 of 14 stories held up by one advisory line.
+
+    The reviewer still sees every gap — that part of the design was right.
+    """
+    lines = _preflight_lines(args)
+    return lines, _not_executable(args)
+
+
+def _not_executable(args) -> list[str]:
+    from ..control.preflight import check_stories_executable
+    from ..phases.run import load_plan
+
+    plan = load_plan(_artifact_root(args))
+    if plan.error or not plan.stories:
+        return []
+    res = check_stories_executable(
+        list(plan.stories.values()), project=Path(args.project).resolve(),
+        config=Config.load(args.project),
+    )
+    return [pf.story_id for pf in res if not pf.executable]
+
+
 def _preflight_lines(args) -> list[str]:
     """Which stories are not yet executable — computed by code, right before
     the human gate.
@@ -141,7 +174,7 @@ def cmd_approve(args) -> int:
     store = _approvals(args)
     gate: Gate = args.gate
     if not store.has_artifacts(gate):
-        missing = ", ".join(p.name for p in store.artifact_paths(gate) if not p.is_file())
+        missing = ", ".join(p.name for p in store.artifact_paths(gate) if not is_present(p))
         print(f"✗ no artifact for gate {gate.value}: {missing}", file=sys.stderr)
         return EXIT_NOT_READY
 
@@ -153,15 +186,20 @@ def cmd_approve(args) -> int:
         return EXIT_NOT_READY
 
     if gate is Gate.READINESS and not args.force:
-        lines = _preflight_lines(args)
-        if any("✗" in ln for ln in lines):
+        lines, blocked = _preflight(args)
+        if blocked:
             print("\n".join(lines), file=sys.stderr)
             print(
-                "\n✗ cannot approve: some stories are not yet executable. "
-                "Fix them and re-approve, or use --force to override.",
+                f"\n✗ cannot approve: {len(blocked)} storie(s) cannot run at all "
+                f"({', '.join(blocked[:5])}). Configure what they need and re-approve, "
+                "or use --force to override.",
                 file=sys.stderr,
             )
             return EXIT_NOT_READY
+        # Gaps that only degrade quality are shown, not blocking: they are
+        # what the human is here to weigh.
+        if any("✗" in ln for ln in lines):
+            print("\n".join(lines))
 
     rec = store.approve(gate, note=args.note or "")
     print(f"✅ {gate.value} approved by {rec.decided_by}")

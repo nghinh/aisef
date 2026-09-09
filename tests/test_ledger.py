@@ -373,7 +373,7 @@ class TestXuatBangGap(LedgerTestCase):
         code, out, _ = self.run_cli("issues")
         self.assertEqual(code, 0)
         path = self.root / "ISSUES.md"
-        self.assertIn(str(path), out)
+        self.assertIn(str(path.resolve()), out)   # Windows tmp is an 8.3 alias
         text = path.read_text(encoding="utf-8")
         rows = [l for l in text.splitlines() if l.startswith("| AC-") or l.startswith("| qa:")]
         self.assertEqual(len(rows), 3)                         # 01-01-1 · 01-02-2 · qa:e2e

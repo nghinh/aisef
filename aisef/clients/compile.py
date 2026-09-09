@@ -16,13 +16,12 @@ protected (invariant 10).
 from __future__ import annotations
 
 import json
-import shlex
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..harness.guardrails import GUARD_MATCHERS
-from .base import Capability, ClientAdapter, Support
+from .base import Capability, ClientAdapter, Support, quote_command
 from .claude_code import ClaudeCodeAdapter
 from .opencode import OpenCodeAdapter
 
@@ -93,13 +92,7 @@ def split_bin(aisef_bin: str | list[str]) -> list[str]:
 
 
 def _guard_command(aisef_bin: str | list[str], project: Path, kind: str) -> str:
-    if sys.platform == "win32":
-        def _q(s: str) -> str:
-            return f'"{s}"' if " " in s else s
-    else:
-        _q = shlex.quote
-    binary = " ".join(_q(p) for p in split_bin(aisef_bin))
-    return f"{binary} --project {_q(str(project))} guard {kind}"
+    return quote_command([*split_bin(aisef_bin), "--project", str(project), "guard", kind])
 
 
 def build_claude_settings(project: Path, aisef_bin: str | list[str]) -> dict:
@@ -253,7 +246,7 @@ def write_compile_report(project: Path | str, reports: list[CompileReport]) -> P
         "clients": [
             {
                 "client": r.client,
-                "written": [str(p.relative_to(project.resolve())) for p in r.written],
+                "written": [p.relative_to(project.resolve()).as_posix() for p in r.written],
                 "guards_wired": r.guards_wired,
                 "guards_post_hoc": r.guards_post_hoc,
                 "blocks_at_source": r.blocks_at_source,

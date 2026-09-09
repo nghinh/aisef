@@ -12,7 +12,7 @@ from aisef.harness.observe import EvidenceStore
 
 
 def git(repo: Path, *args: str) -> str:
-    p = subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True)
+    p = subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True, encoding="utf-8", errors="replace")
     if p.returncode != 0:
         raise AssertionError(f"git {' '.join(args)}: {p.stderr}")
     return p.stdout.strip()

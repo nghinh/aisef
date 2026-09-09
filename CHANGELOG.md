@@ -1,5 +1,85 @@
 # Changelog
 
+## Unreleased
+
+- **An infra retry in the plan phase left no line in the log** (bug 60).
+  `todo-e3`'s ux phase failed twice with `APIError: SSE read timed out`, was
+  correctly classified as infrastructure and retried both times — and the log
+  showed one motionless `phase=ux START` for thirty-six minutes. The story
+  loop has logged this since ADR-005 V11; the plan loop never did. Agent
+  `START` lines now also carry the timeout, so silence has a readable bound.
+
+- **On Windows the OpenCode client was launched with its flags inside
+  `cmd.exe`'s own arguments** (bug 59). `build_command` inserted `--format
+  json` at index 2, which is right when the resolved program is one token and
+  wrong when it is three — and it is three on Windows, where `opencode` is a
+  `.cmd` shim and resolves to `cmd.exe /c <shim>`. The client ran as `cmd /c
+  --format json opencode.cmd run …`. Bug 32's shape a third time: a command is
+  not a word. argv is now built in order.
+
+- **The reviewer graded the first story against the whole PRD** (bug 58). A
+  story whose single acceptance criterion is "the document has these
+  elements" was blocked three times for having no submit handler, not reading
+  storage, and not persisting — the work of three later stories. Nothing in
+  the review prompt distinguished "not done" from "another story does it", and
+  the only way out was for the author to build the next stories' work, which
+  then fails *those* stories' nop control. The reviewer now receives the plan,
+  one line per story, and is told plainly: a requirement whose story has not
+  run is not this story's debt.
+
+- **A failing test run logged 40 lines of HTTP access log.** Playwright's
+  `webServer` writes into the same stream as the results; server access lines
+  are dropped before the tail is taken (the full text stays in the evidence
+  log).
+
+- **A 99-test Playwright run read as zero tests** (bug 57). The fix for bug 43
+  matched its own fixture — a single-project config. The moment
+  `playwright.config` declares `projects`, which is the default for anything
+  testing more than one browser, every line carries a `[chromium] › ` tag and
+  the pattern matched nothing; `criteria have tests`, `coverage`,
+  `no baseline regression`, `tests verify story` and `preservation` all went
+  back to reporting that they could not read test names. The new fixture is
+  cut from a real three-browser run, and a test name now keeps its browser tag
+  so one browser skipping a case cannot hide another browser passing it.
+
+- **A story that builds the shell was told its list is missing a checkbox**
+  (bug 56). Roles that appear only inside the mockup's sample rows were
+  compared by "is this role anywhere on the page", so an empty list and an
+  unbuilt feature looked identical — and the advice the message gave
+  (`app.dev_command` must serve an environment that already holds a record)
+  is not achievable for a browser-stored app, or for the first story of a
+  project, which builds the shell before anything can create a record. These
+  roles are still reported, and now block only when the data region actually
+  rendered rows.
+
+- **The first story of every new project failed the gate forever** (bug 55).
+  `no baseline regression` and `tests verify story` both reported
+  `unrunnable · tool not installed or cannot load (no such file or directory)`
+  on a machine that had run the same suite three minutes earlier. The nop
+  control runs at the parent SHA, where a greenfield project has no
+  `package.json` yet — this story creates it — so npm exits 254 with `ENOENT`,
+  whose text matches the missing-tool table. A missing **manifest** is now told
+  apart from a missing **tool**: at the parent that means no project, which is
+  the strongest form of the answer nop is asking for (PASSED), and there were
+  no tests to regress (NOT_APPLICABLE). The same holds one commit later, when
+  the manifest exists but `node_modules` does not: dependencies live in the
+  worktree the story is about to build, and a project root that never
+  installed them has nothing to lend. A real `command not found` still
+  blocks.
+
+- **Every command line was split and quoted with POSIX rules** (bug 54). On
+  Windows `shlex.split` ate the backslashes out of absolute paths — a project
+  command naming `C:\Python\python.exe` lost its program entirely — and
+  `shlex.quote` wrapped the framework's own command in single quotes, which
+  `cmd.exe` treats as ordinary characters, so every prompt and every guard hook
+  named a program that does not exist. Splitting and joining now go through
+  `split_command` / `quote_command`, which follow the host's rules.
+
+- Windows CI: the compile report and `Config.source` print POSIX separators
+  like every other path the framework shows; `remove_tree` is public, because
+  `shutil.rmtree(..., ignore_errors=True)` leaves read-only `.git/objects`
+  behind and the next `mkdir` fails.
+
 ## 1.2.31 — 2026-09-09
 
 - **"5 files changed since the most recent test run" when nothing had

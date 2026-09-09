@@ -204,16 +204,37 @@ class TestVerifyHalf(unittest.TestCase):
         )
         self.assertTrue(self.run_verify(cfg).passed)
 
-    def test_empty_data_region_is_a_failure(self):
-        """Không so tên ở vùng dữ liệu, nhưng vẫn phải có mục — nếu không
-        thì một danh sách rỗng cũng "đạt"."""
+    def test_vung_du_lieu_rong_thi_chua_so_duoc_chu_khong_phai_thieu(self):
+        """Lỗi 56. Danh sách rỗng và "chưa dựng ô tích" trông y hệt nhau ở đây,
+        và story đầu tiên của một dự án **không có cách nào** làm nó khác đi:
+        nó dựng vỏ trước khi có bất cứ thứ gì tạo được bản ghi, còn ứng dụng
+        lưu trong trình duyệt thì dev server không có gì để gieo.
+
+        Đo 2026-09-09: `todo` và `todo-e2e` cùng trượt vì `checkbox` thiếu
+        trong một danh sách rỗng — cả hai đều không thể qua được. Vẫn báo ra,
+        chỉ thôi chặn."""
         cfg = self.serve(
             '<input type="search" aria-label="Tìm ghi chú">'
             "<button>Ghi chú mới</button>"
         )
         res = self.run_verify(cfg)
-        self.assertFalse(res.passed)
-        self.assertIn("data region", res.summary())
+        self.assertTrue(res.passed, res.summary())
+        self.assertIn("data region was empty", res.summary())
+        e = EvidenceStore(self.artifacts).read("STORY-01-01").last(MOCKUP_MAP)
+        self.assertEqual(e.detail["missing_data_roles"], [])
+        self.assertEqual(e.detail["unchecked_data_roles"], ["link"])
+
+    def test_co_dong_ma_khong_co_vai_thi_van_chan(self):
+        """Đối chứng: vùng dữ liệu **có** bản ghi mà không mang vai hợp đồng
+        hứa — đây mới là lệch thật, và vẫn phải chặn."""
+        cfg = self.serve(
+            '<input type="search" aria-label="Tìm ghi chú">'
+            "<button>Ghi chú mới</button>"
+            "<ul><li>chỉ là chữ, không có liên kết</li></ul>"
+        )
+        res = self.run_verify(cfg)
+        self.assertFalse(res.passed, res.summary())
+        self.assertIn("has rows", res.summary())
 
     def test_evidence_records_the_comparison(self):
         cfg = self.serve("trống")
@@ -255,6 +276,24 @@ class TestAppServerTrust(unittest.TestCase):
         self.assertIn("pid 1", why)
         self.assertIsNone(s.proc)
 
+    def test_windows_kills_the_tree_with_taskkill(self):
+        """Windows has no process groups: only `taskkill /T` reaches the
+        children, and a surviving dev server holds the port for the next
+        story (bug 15's shape)."""
+        from unittest import mock
+
+        from aisef.harness import mockup_verify as mv
+
+        proc = mock.Mock(pid=4242)
+        with mock.patch.object(mv.sys, "platform", "win32"), \
+             mock.patch.object(mv.subprocess, "call", return_value=0) as call:
+            mv._kill_tree(proc)
+        self.assertEqual(call.call_args[0][0][:4], ["taskkill", "/F", "/T", "/PID"])
+        proc.wait.assert_called_once()
+
+    @unittest.skipIf(sys.platform == "win32",
+                     "process groups + os.kill are POSIX; Windows uses taskkill /T, "
+                     "covered by test_windows_kills_the_tree_with_taskkill")
     def test_stop_kills_whole_process_group(self):
         import os
         import tempfile
@@ -267,10 +306,10 @@ class TestAppServerTrust(unittest.TestCase):
             s = AppServer(cmd, "http://127.0.0.1:1", cwd=Path(d), ready_timeout=1)
             s.start()  # không bao giờ "sẵn sàng" — chỉ cần tiến trình đã chạy
             for _ in range(50):
-                if pidfile.is_file() and pidfile.read_text().strip():
+                if pidfile.is_file() and pidfile.read_text(encoding="utf-8").strip():
                     break
                 time.sleep(0.05)
-            child = int(pidfile.read_text().strip())
+            child = int(pidfile.read_text(encoding="utf-8").strip())
             s.stop()
             time.sleep(0.2)
             with self.assertRaises(ProcessLookupError):
@@ -284,7 +323,7 @@ class TestAppServer(unittest.TestCase):
         self.assertEqual(s.url_for("/"), "http://x:3000/")
 
     def test_dev_server_that_dies_is_reported(self):
-        s = AppServer(f"{sys.executable} -c 'raise SystemExit(3)'",
+        s = AppServer(f'"{sys.executable}" -c "raise SystemExit(3)"',
                       f"http://127.0.0.1:{_free_port()}", cwd=Path("."), ready_timeout=10)
         why = s.start()
         s.stop()

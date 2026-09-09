@@ -30,7 +30,11 @@ FIX = ROOT / "tests" / "fixtures" / "bmad"
 #: Artifact thật (hoặc đúng khuôn thật) — client giả chép ra để pha sau và
 #: cổng máy làm việc trên dữ liệu có hình dạng thật.
 REAL = {"prd.md": FIX / "prd.md", "architecture.md": FIX / "architecture.md",
-        "epics.md": FIX / "epics.md"}
+        "epics.md": FIX / "epics.md",
+        # Lỗi 50: khuôn cũ ghi một EXPERIENCE.md không có bảng màn hình — thứ
+        # mà chính pipeline không đọc nổi. Dùng bản thật để cổng `ux` làm việc
+        # trên hình dạng thật.
+        "EXPERIENCE.md": FIX / "EXPERIENCE.md"}
 
 
 class FakeClient(ClientAdapter):
@@ -254,6 +258,12 @@ class TestFailures(PlanTestCase):
         self.assertEqual(r.waiting_on, Gate.PRD)
         self.assertEqual(r.outcomes[0].infra_retries, 1)
         self.assertAlmostEqual(r.outcomes[0].cost_usd, 1.75)  # cả lượt hỏng
+        # Và nói ra trong nhật ký: một `SSE read timed out` sau 22 phút, thử
+        # lại lặng lẽ, hiện ra thành 36 phút chỉ có một dòng `START` bất động
+        # (đo trên `todo-e3` 2026-09-09).
+        log = (self.project / "_bmad-output" / "run.log").read_text(encoding="utf-8")
+        self.assertIn("RETRY (infra)", log)
+        self.assertIn("api_error", log)
 
     def test_quality_failure_is_not_retried(self):
         """Chạy lại một lượt đã hỏng vì nội dung chỉ tốn tiền lần nữa."""
@@ -359,8 +369,49 @@ class TestGitReadiness(unittest.TestCase):
             subprocess.run(["git", "init"], cwd=d, capture_output=True)
             subprocess.run(["git", "config", "user.name", "Test"], cwd=d, capture_output=True)
             subprocess.run(["git", "config", "user.email", "t@t.t"], cwd=d, capture_output=True)
-            Path(d, "f").write_text("x")
+            Path(d, "f").write_text("x", encoding="utf-8")
             subprocess.run(["git", "add", "."], cwd=d, capture_output=True)
             subprocess.run(["git", "commit", "-m", "init"], cwd=d, capture_output=True)
             code = _ensure_git(d)
             self.assertIsNone(code)
+
+
+class TestCongUxDoiDanhMucManHinh(unittest.TestCase):
+    """Lỗi 50. `EXPERIENCE.md` là hợp đồng giữa phase `ux` và mọi bước sau:
+    mockup dựng một tệp cho mỗi màn hình, story tham chiếu `screen_id`. Nhưng
+    yêu cầu ấy chưa từng được nói cho bên viết, cũng chưa từng được kiểm ở
+    cổng của chính nó.
+
+    Đo 2026-09-09 trên todo-e2e (chạy từ requirements): agent viết một tài liệu
+    tốt, mô tả "one surface, the Todo List screen" bằng văn xuôi, cổng `ux`
+    **duyệt**, rồi `aisef mockup` chết một phase sau với "EXPERIENCE.md does not
+    list any screens" — đổ lỗi cho tài liệu thay vì cho bước đã nhận nó.
+    """
+
+    def test_khong_co_man_hinh_thi_cong_ux_chan(self):
+        from aisef.control.experience import parse_experience
+        from aisef.control.machine_gate import check_experience
+        exp = parse_experience("# EXPERIENCE\n\n## Information Architecture\n\n"
+                               "One surface, the Todo List screen. No navigation.\n")
+        r = check_experience(exp)
+        self.assertFalse(r.passed)
+        self.assertIn("screen inventory", r.errors[0])
+
+    def test_co_bang_thi_qua(self):
+        from aisef.control.experience import parse_experience
+        from aisef.control.machine_gate import check_experience
+        exp = parse_experience("# EXPERIENCE\n\n## Screen Inventory\n\n"
+                               "| Screen | Route | Purpose |\n|---|---|---|\n"
+                               "| Todo List | / | Create and manage tasks |\n")
+        self.assertTrue(check_experience(exp).passed, check_experience(exp).errors)
+
+    def test_prompt_ux_noi_ro_hinh_dang_bang(self):
+        """Bên sản xuất phải đọc được yêu cầu, không phải đoán."""
+        from aisef.phases.plan import PHASES, build_prompt
+        ux = next(p for p in PHASES if p.id == "ux")
+        t = build_prompt(ux)
+        self.assertIn("| Screen | Route | Purpose |", t)
+        self.assertIn("screen_id", t)
+        prd = next(p for p in PHASES if p.id == "prd")
+        self.assertNotIn("| Screen | Route | Purpose |", build_prompt(prd),
+                         "chỉ phase ux mới cần bảng này")

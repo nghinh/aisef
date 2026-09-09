@@ -252,7 +252,7 @@ class TestFreeze(WorktreeCase):
         self.assertEqual(sha, head_sha(self.work), "ứng viên phải là HEAD của worktree")
         self.assertEqual(
             subprocess.run(["git", "status", "--porcelain"], cwd=self.work,
-                           capture_output=True, text=True).stdout.strip(),
+                           capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip(),
             "", "đóng băng nghĩa là không còn gì chưa commit",
         )
 

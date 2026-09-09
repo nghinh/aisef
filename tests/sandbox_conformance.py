@@ -87,7 +87,7 @@ class Cell:
 def _leftover_containers() -> list[str]:
     try:
         out = subprocess.run(["docker", "ps", "-q", "--filter", "name=aisef-"],
-                             capture_output=True, text=True, timeout=30).stdout
+                             capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30).stdout
     except (OSError, subprocess.TimeoutExpired):
         return []
     return out.split()

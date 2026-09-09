@@ -28,6 +28,7 @@ from contextlib import ExitStack
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from ..clients.base import split_command
 from ..control.outcome import DEFAULT_REASON, Outcome
 from ..control.worktree import GitError, WorktreeManager
 from ..config import Config
@@ -277,7 +278,11 @@ def find_fake_tests(project: Path | str, files: list[str] | None = None) -> list
             continue
         text = path.read_text(encoding="utf-8", errors="replace")
         if _TEST_FUNC.search(text) and not _ASSERTION.search(text):
-            out.append(str(path.relative_to(project)))
+            # `/` always. `relative_to` yields the native form, and every
+            # consumer — evidence, the gate, git output it is compared with —
+            # speaks `/`. On Windows this returned `tests\\test_a.py` and
+            # matched nothing.
+            out.append(path.relative_to(project).as_posix())
     return out
 
 
@@ -298,7 +303,7 @@ def _project_files(project: Path) -> list[str]:
         proc = subprocess.run(
             ["git", "-C", str(project), "ls-files",
              "--cached", "--others", "--exclude-standard"],
-            capture_output=True, text=True, timeout=30,
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30,
         )
         if proc.returncode == 0:
             return [line for line in proc.stdout.splitlines() if line.strip()]
@@ -310,7 +315,11 @@ def _project_files(project: Path) -> list[str]:
         rel = path.relative_to(project)
         if not path.is_file() or any(part in _VENDOR for part in rel.parts):
             continue
-        out.append(str(rel))
+        # `/` always: the git branch above returns POSIX paths and every
+        # consumer's pattern is written that way. `str(rel)` gave
+        # `tests\test_a.py` on Windows, `_TEST_FILE` matched nothing, and the
+        # fake-test check silently found zero files in any project without git.
+        out.append(rel.as_posix())
     return out
 
 
@@ -420,7 +429,7 @@ def run_suite(
             sb = sandbox.run(
                 sandbox.SandboxSpec(
                     workspace=cay,
-                    cmd=shlex.split(command),
+                    cmd=split_command(command),
                     level=kind.level,
                     image=image_for(project, cfg),
                     timeout_seconds=cfg["run.timeout_seconds"],

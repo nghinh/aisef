@@ -253,7 +253,25 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
+def _speak_utf8() -> None:
+    """Write UTF-8 whatever the console's code page says.
+
+    Windows consoles default to a legacy code page (cp1252 on the CI runner),
+    and this CLI prints `✅`, `·` and Vietnamese throughout. Two things break:
+    the command dies with UnicodeEncodeError on its own output, and a parent
+    process reading that output gets mojibake — `EPIC-01 · wave 1` arrived as
+    `EPIC-01 ? wave 1` and every assertion on it failed. Encoding is a
+    property of what we write, not of the terminal we happen to land in.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError, OSError):
+            pass       # not a real stream (captured in tests, piped oddly)
+
+
 def main(argv: list[str] | None = None) -> int:
+    _speak_utf8()
     args = build_parser().parse_args(argv)
     args.project = str(Path(args.project).resolve())
     try:

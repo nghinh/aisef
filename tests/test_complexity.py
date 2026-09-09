@@ -250,7 +250,7 @@ class TestCalibration(unittest.TestCase):
     def test_load_corrupt(self):
         with tempfile.TemporaryDirectory() as d:
             p = Path(d) / "complexity.json"
-            p.write_text("not json")
+            p.write_text("not json", encoding="utf-8")
             self.assertEqual(load_calibration(d), {})
 
     def test_record_round_trip(self):

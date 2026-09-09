@@ -216,7 +216,7 @@ class TestCrashRecovery(JournalTestCase):
 class TestJournalIsMachineReadable(JournalTestCase):
     def test_moi_dong_la_json_co_du_truong(self):
         self.rec("worktree.created", path="/tmp/x")
-        raw = json.loads(self.store.path("STORY-01-01").read_text().splitlines()[0])
+        raw = json.loads(self.store.path("STORY-01-01").read_text(encoding="utf-8").splitlines()[0])
         self.assertEqual(
             sorted(raw), ["at", "attempt", "data", "seq", "step", "undo"]
         )

@@ -60,7 +60,7 @@ class TestApply(InstallTestCase):
         (src / "SKILL.md").write_text("---\nname: a\n---\nbản 2\n", encoding="utf-8")
         r = install.apply(p, self.project)
         self.assertEqual(r.installed, ["a"])
-        self.assertIn("bản 2", (self.skills_dir / "a" / "SKILL.md").read_text())
+        self.assertIn("bản 2", (self.skills_dir / "a" / "SKILL.md").read_text(encoding="utf-8"))
 
     def test_removes_skill_no_longer_selected(self):
         """Đổi stack rồi cài lại không được để lại rác của lần trước."""

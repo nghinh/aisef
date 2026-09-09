@@ -73,7 +73,7 @@ class TestClaudeCodeBuildCommand(unittest.TestCase):
     def test_with_settings_file(self):
         cmd = ClaudeCodeAdapter().build_command(_spec(settings_file=Path("/s.json")))
         self.assertIn("--settings", cmd)
-        self.assertEqual(cmd[cmd.index("--settings") + 1], "/s.json")
+        self.assertEqual(cmd[cmd.index("--settings") + 1], str(Path("/s.json")))
 
     def test_allowed_tools_override(self):
         cmd = ClaudeCodeAdapter().build_command(_spec(allowed_tools=["Read", "Bash"]))
@@ -89,8 +89,8 @@ class TestClaudeCodeBuildCommand(unittest.TestCase):
         cmd = ClaudeCodeAdapter().build_command(_spec(extra_dirs=[Path("/a"), Path("/b")]))
         indices = [i for i, x in enumerate(cmd) if x == "--add-dir"]
         self.assertEqual(len(indices), 2)
-        self.assertEqual(cmd[indices[0] + 1], "/a")
-        self.assertEqual(cmd[indices[1] + 1], "/b")
+        self.assertEqual(cmd[indices[0] + 1], str(Path("/a")))
+        self.assertEqual(cmd[indices[1] + 1], str(Path("/b")))
 
     def test_with_session_id(self):
         cmd = ClaudeCodeAdapter().build_command(_spec(session_id="abc123"))
@@ -119,8 +119,26 @@ class TestOpenCodeBuildCommand(unittest.TestCase):
         self.assertIn("--format", cmd)
         self.assertEqual(cmd[cmd.index("--format") + 1], "json")
         self.assertIn("--dir", cmd)
-        self.assertEqual(cmd[cmd.index("--dir") + 1], "/tmp/test")
+        self.assertEqual(cmd[cmd.index("--dir") + 1], str(Path("/tmp/test")))
         self.assertNotIn("test", cmd[cmd.index("--dir") + 2:], "prompt đi qua stdin")
+
+    def test_shim_nhieu_tu_khong_lam_lech_co(self):
+        """Lỗi 59. Trên Windows `opencode` là shim `.cmd`, `resolve_binary`
+        trả **ba** token (`cmd.exe /c <shim>`), nên `insert(2, "--format")`
+        nhét cờ vào giữa tham số của chính `cmd.exe`: client được gọi là
+        `cmd /c --format json opencode.cmd run …`. Hình dạng lỗi 32 lần nữa —
+        một **lệnh** không phải một **từ**."""
+        from unittest import mock
+
+        from aisef.clients import opencode as oc
+
+        with mock.patch.object(oc, "resolve_binary",
+                               return_value=["cmd.exe", "/c", r"C:\x\opencode.cmd"]):
+            cmd = OpenCodeAdapter().build_command(_spec())
+        self.assertEqual(cmd[:3], ["cmd.exe", "/c", r"C:\x\opencode.cmd"])
+        self.assertEqual(cmd[3], "run")
+        self.assertEqual(cmd[cmd.index("--format") + 1], "json")
+        self.assertGreater(cmd.index("--format"), 3, cmd)
 
     def test_with_model(self):
         cmd = OpenCodeAdapter().build_command(_spec(model="gpt-4"))

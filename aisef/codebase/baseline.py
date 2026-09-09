@@ -56,19 +56,19 @@ def _git_info(project: Path) -> dict:
     try:
         info["branch"] = subprocess.run(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-            cwd=project, capture_output=True, text=True, timeout=5,
+            cwd=project, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=5,
         ).stdout.strip()
         info["commit_count"] = subprocess.run(
             ["git", "rev-list", "--count", "HEAD"],
-            cwd=project, capture_output=True, text=True, timeout=5,
+            cwd=project, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=5,
         ).stdout.strip()
         info["last_commit"] = subprocess.run(
             ["git", "log", "-1", "--format=%h %s", "--no-walk"],
-            cwd=project, capture_output=True, text=True, timeout=5,
+            cwd=project, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=5,
         ).stdout.strip()
         info["contributors"] = subprocess.run(
             ["git", "shortlog", "-sn", "--no-merges", "HEAD"],
-            cwd=project, capture_output=True, text=True, timeout=10,
+            cwd=project, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=10,
         ).stdout.strip().count("\n") + 1
     except (subprocess.TimeoutExpired, OSError):
         pass

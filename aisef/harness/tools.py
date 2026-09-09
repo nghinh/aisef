@@ -22,12 +22,13 @@ the wrong time.
 from __future__ import annotations
 
 import json
-import shlex
+import re
 import shutil
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from ..clients.base import quote_command, split_command
 from ..config import Config
 from . import sandbox
 from .guardrails import scrub_secrets
@@ -141,8 +142,18 @@ class ToolResult:
         return scrub_secrets((self.stdout + "\n" + self.stderr).strip())
 
     def tail(self, lines: int = 40) -> str:
-        """Trailing output — where errors usually appear."""
-        return "\n".join(self.output()[0].splitlines()[-lines:])
+        """Trailing output — where errors usually appear.
+
+        Server access logs are dropped first. Playwright's `webServer` writes
+        one line per HTTP request into the same stream as the test results, so
+        a failing run's last 40 lines were 40 `GET /js/app.js 200` lines and
+        the reader learned nothing (measured on `todo-e2e`, 2026-09-09: four
+        consecutive failures whose logged output was entirely access log).
+        Nothing is lost — the full text is in the evidence log file.
+        """
+        all_lines = self.output()[0].splitlines()
+        keep = [x for x in all_lines if not _NOISE.search(x)]
+        return "\n".join((keep or all_lines)[-lines:])
 
 
 def detect_commands(project: Path | str) -> dict[str, str]:
@@ -214,7 +225,7 @@ def run_tool(
         record(res, story_id, artifact_root, candidate)
         return res
 
-    argv = shlex.split(command) + (extra_args or [])
+    argv = split_command(command) + (extra_args or [])
     if artifact_root:
         from .runlog import run_log
         run_log(artifact_root, f"tool={name} RUN cmd={command}")
@@ -263,6 +274,11 @@ def run_tool(
     return res
 
 
+#: Server access logs interleaved into the test stream: Playwright's
+#: `[WebServer]` tag, and the common log format any static server prints.
+_NOISE = re.compile(r'^\s*(?:\[[\w -]*[Ss]erver[\w -]*\]\s*)?'
+                    r'\S+ - - \[[^\]]+\] "(?:GET|POST|HEAD|PUT|DELETE) [^"]*" \d{3}')
+
 #: Signatures of "tool could not load", not "test failed". 127 is the POSIX
 #: code for command not found; the rest are how other runtimes say the same
 #: thing. Conflating the two misdirects the report to the wrong fix.
@@ -274,6 +290,32 @@ MISSING_TOOL = (
     "no such file or directory",
     "is not recognized as an internal or external command",
 )
+
+
+#: Manifests whose absence means **the project is not here**, not that the
+#: tool is missing. npm's `ENOENT ... package.json` matches "no such file or
+#: directory" and was reported as "npm not installed" — on a machine where npm
+#: had just run the same suite minutes earlier. It matters because the nop
+#: control deliberately runs at the parent SHA, where a greenfield project's
+#: first story has not created the manifest yet: read as "tool missing" that
+#: is an environment failure the agent cannot fix, and the first story of every
+#: new project failed the gate forever (measured 2026-09-09 on `todo-e2e`).
+MANIFESTS = (
+    "package.json", "pyproject.toml", "setup.py", "requirements.txt",
+    "cargo.toml", "go.mod", "pom.xml", "build.gradle", "gemfile", "composer.json",
+)
+
+#: Markers meaning the program started fine but the **project's** own setup is
+#: absent from this tree: dependencies were never installed here. The first
+#: story of a JS project hits this at its baseline commit — `node_modules`
+#: lives in the worktree the story is about to build, and there is nothing to
+#: borrow from a project root that never installed them either.
+NO_DEPENDENCIES = ("cannot find module", "cannot find package",
+                   "module_not_found", "modulenotfounderror")
+
+#: Stable prefix shared by both, so callers can tell "this commit has nothing
+#: to run" from "this machine is missing the tool".
+NO_SETUP = "no runnable setup in this tree"
 
 
 def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error: str = "") -> str:
@@ -292,6 +334,12 @@ def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error:
         from .testlog import parse as parse_testlog
         if parse_testlog(output).passed:
             return ""
+    if hit == "no such file or directory" and any(m in low for m in MANIFESTS):
+        return f"{NO_SETUP} — there is no project manifest here"
+    if any(m in low for m in NO_DEPENDENCIES):
+        return (f"{NO_SETUP} — the project's dependencies are not installed here; "
+                "install them at the **project root**, which is where a clean "
+                "worktree resolves them from")
     return f"tool not installed or cannot load ({hit or 'exit 127'}) — set up the environment or fix the command and retry"
 
 
@@ -376,8 +424,12 @@ def aisef_argv() -> list[str]:
     # `<site-packages>/bin/aisef`, a non-existent path, and the compile hook
     # silently ran no guards (measured 2026-09-06 on a clean venv). Check
     # existence before returning.
+    # `bin/aisef` is a POSIX shell script. It exists in a source checkout on
+    # every OS, but Windows cannot execute it — `is_file()` says yes and
+    # `CreateProcess` says no, which is how a hook gets written pointing at
+    # something that cannot run (bug 31's shape, on the other platform).
     trong_kho = Path(__file__).resolve().parent.parent.parent / "bin" / "aisef"
-    if trong_kho.is_file():
+    if trong_kho.is_file() and sys.platform != "win32":
         return [str(trong_kho)]
     # Always works with an installed package, even when venv is not on the
     # agent session's PATH: the running interpreter itself + module.
@@ -392,7 +444,7 @@ def aisef_command() -> str:
     pytest manually, and that run will not be recorded as evidence. Prefer
     the name on PATH; if absent, use the absolute path from this repo.
     """
-    return " ".join(shlex.quote(p) for p in aisef_argv())
+    return quote_command(aisef_argv())
 
 
 def describe_tools(project: Path | str, config: Config | None = None) -> str:

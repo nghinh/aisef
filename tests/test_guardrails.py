@@ -324,7 +324,7 @@ class TestChangedFilesBase(unittest.TestCase):
             d = self.repo(tmp)
             base = subprocess.run(
                 ["git", "rev-parse", "HEAD"], cwd=d,
-                capture_output=True, text=True, check=True,
+                capture_output=True, text=True, encoding="utf-8", errors="replace", check=True,
             ).stdout.strip()
 
             (d / "src").mkdir()
@@ -340,7 +340,7 @@ class TestChangedFilesBase(unittest.TestCase):
             d = self.repo(tmp)
             base = subprocess.run(
                 ["git", "rev-parse", "HEAD"], cwd=d,
-                capture_output=True, text=True, check=True,
+                capture_output=True, text=True, encoding="utf-8", errors="replace", check=True,
             ).stdout.strip()
             (d / "a.py").write_text("a", encoding="utf-8")
             subprocess.run(["git", "add", "a.py"], cwd=d, check=True)
@@ -359,7 +359,7 @@ class TestChangedFilesBase(unittest.TestCase):
             d = self.repo(tmp)
             main = subprocess.run(
                 ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=d,
-                capture_output=True, text=True, check=True,
+                capture_output=True, text=True, encoding="utf-8", errors="replace", check=True,
             ).stdout.strip()
             subprocess.run(["git", "checkout", "-qb", "story/b"], cwd=d, check=True)
             (d / "cua-b.py").write_text("b", encoding="utf-8")
@@ -619,10 +619,13 @@ class TestCompletion(unittest.TestCase):
 
         from aisef.harness.tools import aisef_command
 
+        from aisef.clients.base import split_command
+
         binary = aisef_command()
         self.assertIn(f"{binary} tool test", self.verdict().reason)
-        if binary != "aisef":
-            self.assertTrue(os.access(binary, os.X_OK))
+        program, *rest = split_command(binary)
+        if program != "aisef" and rest[:1] != ["-m"]:
+            self.assertTrue(os.access(program, os.X_OK), program)
 
     def test_stale_message_also_names_the_command(self):
         self.store.tool_run("S-01", "test", ok=True)
@@ -886,7 +889,7 @@ class TestNhipTimVaBashGhiFile(unittest.TestCase):
         import time
         self.store.tool_run("S-01", "test", ok=True)
         time.sleep(0.05)
-        (self.repo / "src").mkdir(); (self.repo / "src" / "a.py").write_text("x = 1\n")
+        (self.repo / "src").mkdir(); (self.repo / "src" / "a.py").write_text("x = 1\n", encoding="utf-8")
         record_outcome("diff-scope", self.bash("echo > src/a.py"), ALLOW,
                        env=self.env, artifact_root=str(self.root))
         ev = self.store.read("S-01")
@@ -895,7 +898,7 @@ class TestNhipTimVaBashGhiFile(unittest.TestCase):
 
     def test_file_doi_truoc_lan_test_khong_bi_coi_la_cu(self):
         import time
-        (self.repo / "src").mkdir(); (self.repo / "src" / "a.py").write_text("x = 1\n")
+        (self.repo / "src").mkdir(); (self.repo / "src" / "a.py").write_text("x = 1\n", encoding="utf-8")
         time.sleep(0.05)
         self.store.tool_run("S-01", "test", ok=True)
         record_outcome("diff-scope", self.bash(), ALLOW, env=self.env, artifact_root=str(self.root))
@@ -904,7 +907,7 @@ class TestNhipTimVaBashGhiFile(unittest.TestCase):
     def test_khong_ghi_trung_cung_file(self):
         import time
         self.store.tool_run("S-01", "test", ok=True); time.sleep(0.05)
-        (self.repo / "src").mkdir(); (self.repo / "src" / "a.py").write_text("x\n")
+        (self.repo / "src").mkdir(); (self.repo / "src" / "a.py").write_text("x\n", encoding="utf-8")
         for _ in range(3):
             record_outcome("diff-scope", self.bash(), ALLOW, env=self.env, artifact_root=str(self.root))
         self.assertEqual(len(self.store.read("S-01").of("file_change")), 1)

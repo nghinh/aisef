@@ -22,7 +22,7 @@ from aisef.kit.catalog import Catalog, Source  # noqa: E402
 
 
 def git(*args, cwd=None):
-    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True)
+    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace")
 
 
 def kho_gia(d: Path) -> str:
@@ -117,7 +117,7 @@ class TestLayVe(unittest.TestCase):
                 sources=[nguon(str(t / "goc"), sha2)]))
             self.assertEqual(bao.fetched, ["thu"], bao.summary())
             self.assertIn("đổi rồi",
-                          (t / "references" / "thu" / "SKILL.md").read_text())
+                          (t / "references" / "thu" / "SKILL.md").read_text(encoding="utf-8"))
 
     def test_mot_nguon_hong_khong_giet_cac_nguon_con_lai(self):
         with TemporaryDirectory() as tmp:

@@ -149,13 +149,35 @@ def _cell(row: list[str], index: int | None) -> str:
     return _strip_markup(row[index])
 
 
+#: Column names that say "this table lists screens", as opposed to merely
+#: having a column that could name one.  `route` counts: only a screen has a
+#: route.
+_STRONG_SCREEN_COLUMNS = ("screen_id", "screen id", "screen", "page", "view",
+                          "màn hình", "mã màn hình")
+
+
+def _names_screens(header: list[str]) -> bool:
+    """Does this table's header declare screens rather than something else."""
+    labels = [_strip_markup(c).lower() for c in header]
+    if any(lb.startswith(n) for lb in labels for n in ("route", "đường dẫn", "path", "url")):
+        return True
+    return any(lb == n or lb.startswith(n) for lb in labels for n in _STRONG_SCREEN_COLUMNS)
+
+
 def parse_experience(text: str) -> Experience:
     """`EXPERIENCE.md` -> normalized screen list."""
     exp = Experience()
 
-    for table in _tables_in_section(text, _IA_HEADINGS):
-        if not table:
-            continue
+    # A document can hold several tables under the same heading, and only one
+    # of them is the screen inventory. A real run wrote both a
+    # `Screen | Route | Purpose` table and a `Need | Surface | Notes` mapping
+    # of jobs to places; reading every table turned six components into
+    # screens, which would have had the mockup step generate six files nobody
+    # asked for. When any table names screens outright, the vaguer ones are
+    # not inventories — `Surface` alone is too common a word to trust.
+    tables = [t for t in _tables_in_section(text, _IA_HEADINGS) if t]
+    strong = [t for t in tables if _names_screens(t[0])]
+    for table in strong or tables:
         cols = _column_map(table[0])
         # No recognizable header: fall back to positional column order.
         if not cols:

@@ -214,11 +214,22 @@ class TestLenhGoiFramework(unittest.TestCase):
         with mock.patch("shutil.which", return_value="/usr/local/bin/aisef"):
             self.assertEqual(aisef_command(), "aisef")
 
+    @unittest.skipIf(sys.platform == "win32",
+                     "bin/aisef là script POSIX; Windows đi thẳng xuống python -m")
     def test_khong_co_tren_path_thi_dung_bin_cua_kho(self):
         with mock.patch("shutil.which", return_value=None):
             got = aisef_command()
         self.assertTrue(got.endswith("bin/aisef"), got)
         self.assertTrue(Path(got).is_file(), "đường dẫn trả về phải tồn tại")
+
+    def test_windows_khong_dung_script_posix(self):
+        """Lỗi 49. `bin/aisef` là script shell: có mặt trong bản kho trên **mọi**
+        HĐH, nhưng Windows không chạy được — `is_file()` nói có, `CreateProcess`
+        nói không, và hook được ghi trỏ vào thứ không chạy nổi (đúng hình dạng
+        lỗi 31, ở nền tảng bên kia)."""
+        with mock.patch("shutil.which", return_value=None), \
+             mock.patch("aisef.harness.tools.sys.platform", "win32"):
+            self.assertEqual(aisef_argv(), [sys.executable, "-m", "aisef.cli"])
 
     def test_ban_cai_tu_wheel_lui_ve_python_m(self):
         """Wheel không mang `bin/`. Trước 0.2.0 chỗ này trả `<site-packages>/bin/aisef`
@@ -293,12 +304,17 @@ class TestDescription(ToolTestCase):
         import os
         import shutil
 
+        from aisef.clients.base import split_command
+
         binary = aisef_command()
-        if binary != "aisef":
-            self.assertTrue(os.path.isfile(binary), binary)
-            self.assertTrue(os.access(binary, os.X_OK), binary)
-        else:
+        program, *rest = split_command(binary)
+        if program == "aisef":
             self.assertTrue(shutil.which("aisef"))
+        elif rest[:1] == ["-m"]:
+            self.assertEqual(program, sys.executable)  # last resort: this interpreter
+        else:
+            self.assertTrue(os.path.isfile(program), program)
+            self.assertTrue(os.access(program, os.X_OK), program)
         self.assertIn(binary, describe_tools(self.project, self.cfg))
 
     def test_prompt_table_shows_the_real_command(self):
@@ -312,18 +328,35 @@ if __name__ == "__main__":
     unittest.main(verbosity=2)
 
 
+def lenh_in(*dong: str, exit_code: int = 1, doc_tep: str = "") -> str:
+    """A command that prints `dong` and exits — Python, not `sh -c`: Windows
+    has no `sh`, so such a fixture only ever "passed" there because the
+    command could not start, which measures nothing."""
+    from aisef.clients.base import quote_command
+
+    code = "import sys\n"
+    if doc_tep:
+        code += f"sys.stdout.write(open({doc_tep!r}, encoding='utf-8').read())\n"
+    for d in dong:
+        code += f"print({d!r})\n"
+    code += f"sys.exit({exit_code})\n"
+    return quote_command([sys.executable, "-c", code])
+
+
 class TestKhongChayDuocKhacDo(ToolTestCase):
     """Dogfood par: `node --test src/` → MODULE_NOT_FOUND bị coi là test đỏ,
     guard completion chặn Stop ~10 lần/lượt, 3 story đốt $17."""
+
 
     def run_test_tool(self, command: str):
         cfg = Config({**DEFAULTS, "tools.test": command, "sandbox.allow_degraded": True})
         return run_tool("test", self.project, story_id="S-01", artifact_root=self.artifacts, config=cfg)
 
     def test_module_not_found_is_unrunnable(self):
-        res = self.run_test_tool("sh -c 'echo \"Error: Cannot find module x\"; echo \"code: MODULE_NOT_FOUND\" >&2; exit 1'")
+        res = self.run_test_tool(
+            lenh_in("Error: Cannot find module x", "code: MODULE_NOT_FOUND"))
         self.assertFalse(res.ok)
-        self.assertIn("cannot load", res.unrunnable)
+        self.assertIn("dependencies are not installed", res.unrunnable)
         e = EvidenceStore(self.artifacts).read("S-01").last(TOOL_RUN, "test")
         self.assertTrue(e.detail["unrunnable"])
 
@@ -331,7 +364,7 @@ class TestKhongChayDuocKhacDo(ToolTestCase):
         from pathlib import Path
         (Path(self.project) / "out.txt").write_text(
             "✔ AC-S-1: có (1ms)\n✖ AC-S-2: element not found (2ms)\nℹ tests 2\nℹ pass 1\nℹ fail 1\n", encoding="utf-8")
-        res = self.run_test_tool("sh -c 'cat out.txt; exit 1'")
+        res = self.run_test_tool(lenh_in(doc_tep="out.txt"))
         self.assertFalse(res.ok)
         self.assertEqual(res.unrunnable, "")
 
@@ -356,7 +389,7 @@ class TestCheBiMatVaLogToanVan(ToolTestCase):
 
     def test_bi_mat_trong_stdout_bi_che_va_dem(self):
         res = self.run_test_tool(
-            f"sh -c 'echo {self.AWS}; echo {self.GH}; echo \"{self.BEARER}\"; exit 1'")
+            lenh_in(self.AWS, self.GH, self.BEARER))
         e = self.last()
         self.assertEqual(e.detail["redacted"], 3)
         self.assertEqual(e.detail["tail"].count("[REDACTED]"), 3)
@@ -391,3 +424,71 @@ class TestCheBiMatVaLogToanVan(ToolTestCase):
         res = ToolResult(name="test", ok=True, stdout="\n".join(map(str, range(30))))
         path = record(res, "S-01", self.artifacts, name=BASELINE_RUN)
         self.assertEqual(Path(path).name, "S-01-test-baseline-1.log")
+
+
+class TestThieuDuAnKhacThieuCongCu(unittest.TestCase):
+    """Lỗi 55: npm báo ENOENT vì **thiếu package.json**, không phải thiếu npm.
+    Chuỗi "no such file or directory" khớp MISSING_TOOL nên harness kết luận
+    "tool not installed" trên đúng cái máy vừa chạy bộ test đó."""
+
+    NPM_ENOENT = (
+        "npm error code ENOENT\nnpm error syscall open\n"
+        "npm error path /w/package.json\n"
+        "npm error enoent Could not read package.json: Error: ENOENT: "
+        "no such file or directory, open '/w/package.json'"
+    )
+
+    def test_thieu_manifest_la_khong_co_du_an(self):
+        from aisef.harness.tools import NO_SETUP, unrunnable_reason
+        self.assertTrue(unrunnable_reason("test", 254, self.NPM_ENOENT).startswith(NO_SETUP))
+
+    def test_chua_cai_phu_thuoc_cung_la_chua_dung_duoc(self):
+        """`node_modules` sống trong worktree story sắp dựng; ở commit gốc
+        `npm test` chỉ có thể báo thiếu gói."""
+        from aisef.harness.tools import NO_SETUP, unrunnable_reason
+        out = ("Error [ERR_MODULE_NOT_FOUND]: Cannot find package "
+               "'@playwright/test' imported from /w/playwright.config.js")
+        self.assertTrue(unrunnable_reason("test", 1, out).startswith(NO_SETUP))
+
+    def test_thieu_cong_cu_van_la_thieu_cong_cu(self):
+        from aisef.harness.tools import unrunnable_reason
+        for out, code in (("npm: command not found", 127),
+                          ("sh: vitest: not found\nsee package.json for scripts", 127)):
+            with self.subTest(out=out):
+                self.assertIn("tool not installed", unrunnable_reason("test", code, out))
+
+    def test_test_that_ra_ket_qua_van_khong_phai_unrunnable(self):
+        from aisef.harness.tools import unrunnable_reason
+        out = "tests/a.py::test_x PASSED\nno such file or directory: package.json"
+        self.assertEqual(unrunnable_reason("test", 1, out), "")
+
+
+class TestNhatKyKhongNgapLogMayChu(unittest.TestCase):
+    """40 dòng cuối của một lượt test hỏng từng là 40 dòng `GET /js/app.js 200`
+    — người đọc không biết gì thêm ngoài "đỏ". Đo trên `todo-e2e` 2026-09-09:
+    bốn lần liên tiếp, output ghi vào nhật ký **toàn bộ** là log truy cập."""
+
+    def ket_qua(self, out: str):
+        from aisef.harness.tools import ToolResult
+        return ToolResult(name="test", ok=False, exit_code=1, stdout=out, stderr="")
+
+    NOISE = "\n".join(
+        f'[WebServer] 127.0.0.1 - - [09/Sep/2026 18:43:0{i%10}] "GET /js/a.js HTTP/1.1" 200 -'
+        for i in range(50))
+
+    def test_log_truy_cap_bi_bo_qua(self):
+        out = "  ✘   2 tests/a.spec.js:19:1 › AC-2: lưu thất bại (81ms)\n" + self.NOISE
+        tail = self.ket_qua(out).tail(10)
+        self.assertIn("AC-2: lưu thất bại", tail)
+        self.assertNotIn("WebServer", tail)
+
+    def test_khong_con_gi_thi_van_hien_nguyen_ban(self):
+        """Đối chứng: lọc sạch không được để lại một dòng trống."""
+        tail = self.ket_qua(self.NOISE).tail(3)
+        self.assertIn("WebServer", tail)
+
+    def test_log_truy_cap_khong_co_the_cung_bi_bo(self):
+        out = ("thất bại thật\n"
+               + "\n".join(f'127.0.0.1 - - [09/Sep/2026 18:43:0{i%10}] "GET / HTTP/1.1" 200 -'
+                           for i in range(50)))
+        self.assertIn("thất bại thật", self.ket_qua(out).tail(5))

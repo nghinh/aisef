@@ -34,7 +34,7 @@ from ..clients.base import ClientAdapter, RunSpec
 from ..config import Config
 from ..control.approvals import GATE_ARTIFACTS, ApprovalStore, Gate, Status
 from ..control.bmad_status import HeadlessStatus, parse_headless_status
-from ..control.machine_gate import GateResult, check_prd
+from ..control.machine_gate import GateResult, check_experience, check_prd
 from ..harness.guardrails import (
     ENV_BASELINE_DIRTY,
     ENV_PROJECT,
@@ -298,6 +298,8 @@ def build_prompt(phase: Phase, project: Path | None = None) -> str:
     inputs += [f"{ARTIFACT_ROOT}/{n}" for n in phase.needs]
     outputs = ", ".join(f"{ARTIFACT_ROOT}/{n}" for n in phase.artifacts)
     memo = _stories_gate_memo(project) if phase.gate is Gate.EPICS else ""
+    if phase.id == "ux":
+        memo += _UX_SCREEN_TABLE
     bf_ctx = _brownfield_context(project) if brownfield and project else ""
 
     return (
@@ -330,6 +332,26 @@ def build_prompt(phase: Phase, project: Path | None = None) -> str:
         + "End with a JSON status following the headless schema."
         + memo + bf_ctx
     )
+
+
+#: The UX artifact is read by machines, and only the prose contract was ever
+#: stated. A real run described "one surface, the Todo List screen" in a
+#: paragraph, the phase gate approved, and `aisef mockup` failed later with
+#: "does not list any screens" — the requirement had never been written down
+#: where the author could see it.
+_UX_SCREEN_TABLE = (
+    "\n\nEXPERIENCE.md MUST contain a screen inventory **table**, because the "
+    "next steps read it: the mockup step builds one HTML file per row, and "
+    "stories reference `screen_id`. One row per screen, under a heading such "
+    "as `Screen Inventory`, `Screens` or `Information Architecture`:\n\n"
+    "| Screen | Route | Purpose |\n"
+    "|---|---|---|\n"
+    "| Todo List | / | Create and manage tasks |\n\n"
+    "`Route` is the path the app serves the screen at (`/`, `/tasks`, "
+    "`/note/:id`) — a path, never a sentence. A single-screen app still needs "
+    "its one row: prose describing the screens is not readable by the steps "
+    "that consume this file."
+)
 
 
 def _stories_gate_memo(project: Path | None) -> str:
@@ -368,7 +390,10 @@ def run_phase(
 ) -> PhaseOutcome:
     """Run one phase. Skip if all artifacts exist and force is not set."""
     out = PhaseOutcome(phase=phase)
-    _run_log(project, f"phase={phase.id} START")
+    # Name the timeout: an agent turn is silent for minutes at a time, and
+    # without the bound the reader cannot tell "thinking" from "hung"
+    # (measured twice on 2026-09-09: a 14-minute silence each time).
+    _run_log(project, f"phase={phase.id} START timeout={config['run.timeout_seconds']}s")
 
     if not _missing(project, phase.artifacts) and not force:
         out.skipped_reason = "artifacts already exist"
@@ -434,6 +459,12 @@ def run_phase(
             out.error = error
             _run_log(project, f"phase={phase.id} FAIL ${out.cost_usd:.2f} err={error}")
             return out
+        # Say it in the log the operator watches. An SSE timeout after 22
+        # minutes, retried silently, reads as 36 minutes of one motionless
+        # `START` line — measured on `todo-e3`, 2026-09-09.
+        from ..harness.runlog import one_line
+        _run_log(project, f"phase={phase.id} RETRY (infra) after {result.duration_ms}ms "
+                          f"err={one_line(error, 200)} · {budget} left")
         out.infra_retries += 1
 
     _save_response(project, phase.id, result.text, result)
@@ -450,6 +481,11 @@ def run_phase(
 
     if phase.id == "prd":
         out.machine_gate = check_prd(parse_prd_file(project / ARTIFACT_ROOT / "prd.md"))
+    elif phase.id == "ux":
+        from ..control.experience import parse_experience_file
+
+        out.machine_gate = check_experience(
+            parse_experience_file(project / ARTIFACT_ROOT / "EXPERIENCE.md"))
 
     status_tag = out.status.status if out.status.parsed else "no-json"
     _run_log(project, f"phase={phase.id} OK ${out.cost_usd:.2f} status={status_tag}")
