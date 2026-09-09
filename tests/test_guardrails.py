@@ -79,6 +79,48 @@ class TestWriteScope(unittest.TestCase):
         self.assertIn("stop and report", v.reason)
 
 
+class TestDauPhanCachWindows(unittest.TestCase):
+    """Lỗi 34. `Path.relative_to` trả về **dạng bản địa**, còn mọi phép so
+    sau đó viết bằng `/`. Trên Windows `_bmad-output\\project-context.md` là
+    **một** đoạn, không khớp phạm vi nào, nên guard từ chối một tệp rõ ràng
+    nằm trong `_bmad-output` và chặn đứng giai đoạn plan (người dùng báo
+    2026-09-09, aisef 1.2.19).
+
+    Đặt `_WIN_SEP` thay vì giả lập `os.name`: giả lập `os.name` khiến
+    `pathlib` dựng `WindowsPath` và vỡ trên Linux (CI 3.11/3.12).
+    """
+
+    def setUp(self):
+        import aisef.harness.guardrails as g
+        self.g = g
+        self._cu = g._WIN_SEP
+        g._WIN_SEP = True
+
+    def tearDown(self):
+        self.g._WIN_SEP = self._cu
+
+    def test_duong_dan_windows_trong_pham_vi_duoc_cho_qua(self):
+        v = check_write_scope(r"_bmad-output\project-context.md", ["_bmad-output", "docs"])
+        self.assertTrue(v.allowed, v.reason)
+
+    def test_van_chan_dung_thu_ngoai_pham_vi(self):
+        self.assertFalse(check_write_scope(r"src\models\user.py", ["src/api"]).allowed)
+
+    def test_hang_xom_cung_tien_to_van_khong_phai_ben_trong(self):
+        self.assertFalse(check_write_scope(r"src\apidocs\x.py", ["src/api"]).allowed)
+
+    def test_diff_scope_doc_duoc_duong_dan_windows(self):
+        from aisef.harness.guardrails import check_diff_scope
+        self.assertTrue(check_diff_scope([r"_bmad-output\prd.md"], ["_bmad-output"]).allowed)
+
+    def test_posix_khong_doi_hanh_vi(self):
+        """Trên POSIX dấu `\\` là ký tự hợp lệ trong tên tệp: đọc nó thành
+        ranh giới thư mục sẽ cho `docs\\evil.sh` ở gốc lọt qua như thể nằm
+        trong `docs/`."""
+        self.g._WIN_SEP = False
+        self.assertFalse(check_write_scope(r"docs\evil.sh", ["docs"]).allowed)
+
+
 class TestSecrets(unittest.TestCase):
     def test_anthropic_key_blocked(self):
         v = check_secrets('KEY = "sk-ant-api03-abcdefghijklmnopqrstuvwxyz123456"')

@@ -69,8 +69,32 @@ ALLOW = Verdict(True)
 # ------------------------------------------------------------ write scope
 
 
+#: True when this OS separates path segments with a backslash.  A module
+#: constant, not a live `os.name` lookup, so a test can flip it without
+#: faking `os.name` — faking that makes `pathlib` try to build a
+#: `WindowsPath` and fail on Linux (CI, 3.11/3.12).
+_WIN_SEP = os.sep == "\\"
+
+
+def to_posix(p: str) -> str:
+    """A path with `/` separators, whatever the OS handed us.
+
+    `Path.relative_to` returns the **native** form, and every comparison
+    after it — scope segments, `docs/` prefixes, the test-path pattern —
+    is written in `/`.  On Windows that made
+    `_bmad-output\\project-context.md` a single segment matching nothing, so
+    the guard rejected a file plainly inside `_bmad-output` and stopped the
+    plan phase (reported 2026-09-09).
+
+    Translated **only on Windows**: a backslash is a legal character in a
+    POSIX filename, and reading it as a directory boundary would let a file
+    called `docs\\evil.sh` at the root pass as being inside `docs/`.
+    """
+    return p.replace("\\", "/") if _WIN_SEP else p
+
+
 def _norm(p: str) -> PurePosixPath:
-    return PurePosixPath(str(p).strip().strip("/"))
+    return PurePosixPath(to_posix(str(p)).strip().strip("/"))
 
 
 def _within(path: str, scope: str) -> bool:
@@ -325,7 +349,7 @@ def check_process_refs(content: str, path: str, *, project_root: str = "") -> Ve
             rel = str(Path(rel).resolve().relative_to(Path(project_root).resolve()))
         except ValueError:
             pass
-    rel = rel.lstrip("./")
+    rel = to_posix(rel).lstrip("./")   # `relative_to` gave it back native separators
     if any(rel.startswith(seg) for seg in _REF_ALLOWED_DIRS) or rel.endswith(_REF_ALLOWED_SUFFIX) or is_test_path(rel):
         return ALLOW
     hit = _PROCESS_REF.search(content or "")

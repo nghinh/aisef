@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.20 — 2026-09-09
+
+- **Windows: the guard rejected paths that were inside scope** (bug 34).
+  `Path.relative_to` returns the native form, and every comparison after it
+  is written in `/` — so `_bmad-output\project-context.md` was one segment
+  matching nothing, and the plan phase stopped on a file plainly inside
+  `_bmad-output`. `to_posix()` normalises where OS-produced paths meet
+  story-declared ones, on Windows only: a backslash is a legal character in
+  a POSIX filename, and reading it as a directory boundary would let
+  `docs\evil.sh` at the root pass as being inside `docs/`.
+  Same fix reaches `check_process_refs` and the test-path pattern.
+
 ## 1.2.19 — 2026-09-09
 
 Three real failures found by running the framework, two of them silent.
