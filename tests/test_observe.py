@@ -191,3 +191,51 @@ class TestSoThuTuKhongDuocDatLai(unittest.TestCase):
         ev = EvidenceStore(self.root).read("S")
         self.assertEqual(ev.events[-1].detail["candidate"], "moi",
                          "sự kiện mới nhất phải là sự kiện xảy ra sau cùng")
+
+
+class TestSauLanChayTestLaTheoThoiGian(unittest.TestCase):
+    """Lỗi 47. `stale_since_last_test` so bằng `seq`. Số ấy cấp theo từng lần
+    ghi và **đặt lại** ở tệp do bản cũ ghi (lỗi 42), nên một sự kiện cũ trông
+    mới hơn lần chạy test hôm nay.
+
+    Đo trên todo/STORY-02-01 2026-09-09: 6 `file_change` mang seq 161–166 ghi
+    lúc 14:17:15, lần test cuối seq 144 lúc 14:50:55 — sớm hơn 33 phút. Cổng
+    báo "5 files changed since the most recent test run" ba lượt liền trong
+    khi từ sau lần test không có gì đổi, và story cạn lượt.
+    """
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def _viet(self, hang):
+        path = EvidenceStore(self.root).path("S")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("".join(json.dumps(h) + "\n" for h in hang), encoding="utf-8")
+
+    def test_seq_cao_nhung_cu_hon_thi_khong_tinh_la_moi(self):
+        self._viet([
+            {"kind": "file_change", "name": "a.js", "seq": 161, "at": 100.0,
+             "detail": {"path": "a.js"}},
+            {"kind": "tool_run", "name": "test", "ok": True, "seq": 144, "at": 200.0},
+        ])
+        self.assertEqual(EvidenceStore(self.root).read("S").stale_since_last_test(), [],
+                         "sự kiện ghi trước lần test không phải là 'đổi sau khi test'")
+
+    def test_that_su_doi_sau_thi_van_bat(self):
+        self._viet([
+            {"kind": "tool_run", "name": "test", "ok": True, "seq": 10, "at": 100.0},
+            {"kind": "file_change", "name": "b.js", "seq": 11, "at": 200.0,
+             "detail": {"path": "b.js"}},
+        ])
+        self.assertEqual(EvidenceStore(self.root).read("S").stale_since_last_test(), ["b.js"])
+
+    def test_chua_chay_test_lan_nao_thi_tinh_het(self):
+        self._viet([
+            {"kind": "file_change", "name": "c.js", "seq": 1, "at": 100.0,
+             "detail": {"path": "c.js"}},
+        ])
+        self.assertEqual(EvidenceStore(self.root).read("S").stale_since_last_test(), ["c.js"])

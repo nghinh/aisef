@@ -949,8 +949,10 @@ def record_outcome(
         last = hien_co.last(TOOL_RUN, "test")
         moc = last.at if last else 0.0
         root = workdir_from_env(env) or str(event.get("cwd") or "")
-        da_ghi = {str(e.detail.get("path") or e.name) for e in hien_co.of("file_change")
-                  if e.seq > (last.seq if last else 0)}
+        # After the last test **by position**, not by `seq` — same reason as
+        # `stale_since_last_test`.
+        da_ghi = {str(e.detail.get("path") or e.name)
+                  for e in hien_co.after_last(TOOL_RUN, "test") if e.kind == "file_change"}
         for rel in changed_files(root, base_ref=base_from_env(env)) if root else []:
             try:
                 mtime = (Path(root) / rel).stat().st_mtime

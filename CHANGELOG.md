@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.2.31 — 2026-09-09
+
+- **"5 files changed since the most recent test run" when nothing had
+  changed** (bug 47). todo/STORY-02-01 was refused three attempts running,
+  taking `no baseline regression` and `tests verify story` down with it, while
+  the log showed `tool=test PASS` after the candidate was frozen.
+  `stale_since_last_test` compared `seq`, and a file written by a build from
+  before 1.2.26 carries restarted numbering — six `file_change` events with
+  seq 161-166 recorded 33 minutes *before* the test run at seq 144. By time,
+  nothing had changed at all. Comparison is now by position in the
+  time-ordered list, here and in the `diff-scope` guard.
+
+  1.2.26 fixed the ordering `read()` returns; this is the other side of the
+  same coin — when a field stops being trustworthy, every reader of it has to
+  be found, not just the one that surfaced the problem.
+
 ## 1.2.30 — 2026-09-09
 
 - **A TypeScript story failed write-scope on its own compiler output**

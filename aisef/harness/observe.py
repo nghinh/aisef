@@ -127,20 +127,38 @@ class Evidence:
         last = self.last(TOOL_RUN, "test")
         return bool(last and last.ok)
 
+    def after_last(self, kind: str, name: str) -> list[Event]:
+        """Events recorded after the last `kind`/`name` — by **position** in
+        this time-ordered list, not by `seq`.
+
+        `seq` is assigned per write and restarts whenever a file was written
+        by a build that could not read the tail (bug 42). Comparing the
+        numbers then makes an old event look newer: todo/STORY-02-01 carried
+        six `file_change` events with seq 161-166 recorded 33 minutes
+        **before** the test run at seq 144, and the story was refused three
+        attempts running for "5 files changed since the most recent test run"
+        while nothing had changed since. Position after sorting is what
+        "after" means.
+        """
+        moc = -1
+        for i, e in enumerate(self.events):
+            if e.kind == kind and e.name == name:
+                moc = i
+        return self.events[moc + 1:]
+
     def stale_since_last_test(self) -> list[str]:
         """Files modified **after** the most recent test run.
 
         This is the question the `completion` guard needs: a green test from ten
         minutes ago says nothing about code just written.
         """
-        last = self.last(TOOL_RUN, "test")
-        after = 0 if last is None else last.seq
         touched: list[str] = []
-        for e in self.of(FILE_CHANGE):
-            if e.seq > after:
-                path = str(e.detail.get("path") or e.name)
-                if path and path not in touched:
-                    touched.append(path)
+        for e in self.after_last(TOOL_RUN, "test"):
+            if e.kind != FILE_CHANGE:
+                continue
+            path = str(e.detail.get("path") or e.name)
+            if path and path not in touched:
+                touched.append(path)
         return touched
 
     def summary(self) -> str:
