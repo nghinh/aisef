@@ -205,6 +205,19 @@ class TestHappyPath(ImplementTestCase):
                 cwd=self.project, check=False,
             )
 
+    def test_nop_khong_chay_duoc_thi_khong_phai_ket_qua_mong_doi(self):
+        """Lỗi 46b. Với phép đối chứng nop, đỏ ở parent là kết quả **cần**.
+        Nhưng lệnh test không khởi chạy được (exit 127 trên Windows) cũng cho
+        `ok=False`, và gọi đó là "expected" là báo một phép đối chứng chưa hề
+        xảy ra."""
+        import inspect
+        from aisef.phases import implement
+        src = inspect.getsource(implement.run_nop)
+        self.assertIn("control NOT performed", src)
+        i_unrun = src.index("res.unrunnable")
+        i_expected = src.index("tests red at parent (expected)")
+        self.assertLess(i_unrun, i_expected, "phải hỏi 'chạy được không' trước khi nói 'đỏ đúng như mong đợi'")
+
     def test_nguoi_ra_soat_nhan_diff_that_khong_chi_ten_file(self):
         """Danh sách tên file bắt người rà soát dựng lại thứ harness đã
         biết — đo trên e9 là 31–43 lượt cho một story nhỏ."""

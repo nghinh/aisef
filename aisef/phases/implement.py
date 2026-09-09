@@ -1128,8 +1128,13 @@ def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
         # `ok` here is the **test run**, and for the nop control red is the
         # wanted result: green at the parent SHA means the tests do not verify
         # the story. `ok=False` read as a failure for months; say what it means.
-        ket = "tests red at parent (expected)" if not res.ok else (
-            "tests GREEN at parent — they do not verify the story")
+        # "Could not run" is not "red". A test command that fails to start
+        # (exit 127 on Windows before 1.2.29) makes `ok=False`, and calling
+        # that the expected result reports a control that never happened.
+        ket = ("could not run at parent — control NOT performed: " + res.unrunnable
+               if res.unrunnable else
+               "tests red at parent (expected)" if not res.ok else
+               "tests GREEN at parent — they do not verify the story")
         run_log(artifact_root,
                 f"story={story.id} nop DONE {ket} {res.duration_ms}ms")
     except GitError as e:

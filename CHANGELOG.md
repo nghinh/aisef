@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.2.30 — 2026-09-09
+
+- **A TypeScript story failed write-scope on its own compiler output**
+  (bug 46). `tsc` rewrites `*.tsbuildinfo` on every build, so the guard
+  blocked every bash command with "2 files changed outside write_scope:
+  tsconfig.app.tsbuildinfo, tsconfig.node.tsbuildinfo", and the reviewer spent
+  2 of its 7 blocking findings telling the author to revert a file the next
+  build recreates. Same class as `node_modules` — it appears because the story
+  *ran*, not because it *wrote* — but `VENDOR_PATHS` matches directories and
+  this is a suffix. Excluded in `changed_files`, which is the one place write
+  scope, the diff-scope guard and the reviewer's diff all read.
+- The nop control called a command that **could not start** "tests red at
+  parent (expected)". A control that never ran now says so.
+
 ## 1.2.29 — 2026-09-09
 
 - **Windows could not run any project command** (bug 45). `npm test`,

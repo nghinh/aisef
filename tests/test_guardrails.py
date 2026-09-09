@@ -1167,3 +1167,44 @@ class TestBanDauDaBanThiKhongPhaiLoiCuaPhien(unittest.TestCase):
         v = self._guard(env)
         self.assertFalse(v.allowed)
         self.assertIn("ngoai-pham-vi.py", v.reason)
+
+
+class TestSanPhamBuildKhongPhaiViecCuaStory(unittest.TestCase):
+    """Lỗi 46. `tsc` ghi lại `*.tsbuildinfo` mỗi lần build, nên một story
+    TypeScript trượt `write scope` vì **output của chính trình biên dịch** —
+    cùng lớp với `node_modules`: nó xuất hiện vì story **chạy**, không phải vì
+    story **ghi**.
+
+    Đo trên Windows 2026-09-09: `2 files changed outside write_scope:
+    tsconfig.app.tsbuildinfo, tsconfig.node.tsbuildinfo`, guard chặn mọi lệnh
+    bash, và người rà soát tiêu 2 trong 7 mục chặn để bảo tác giả hoàn nguyên
+    một tệp mà lần build sau sinh lại.
+    """
+
+    def setUp(self):
+        import subprocess
+        import tempfile
+        self._tmp = tempfile.TemporaryDirectory()
+        self.repo = Path(self._tmp.name)
+        for cmd in (["git", "init", "-q"], ["git", "config", "user.email", "t@t"],
+                    ["git", "config", "user.name", "t"]):
+            subprocess.run(cmd, cwd=self.repo, check=True)
+        (self.repo / "a.ts").write_text("export const a = 1\n", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=self.repo, check=True)
+        subprocess.run(["git", "commit", "-qm", "goc"], cwd=self.repo, check=True)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_tsbuildinfo_khong_tinh_la_thay_doi(self):
+        from aisef.harness.guardrails import changed_files
+        (self.repo / "tsconfig.app.tsbuildinfo").write_text("{}", encoding="utf-8")
+        (self.repo / "src.ts").write_text("x\n", encoding="utf-8")
+        got = changed_files(str(self.repo))
+        self.assertIn("src.ts", got)
+        self.assertNotIn("tsconfig.app.tsbuildinfo", got)
+
+    def test_van_bat_tep_that_su_ngoai_pham_vi(self):
+        from aisef.harness.guardrails import changed_files
+        (self.repo / "ngoai.ts").write_text("y\n", encoding="utf-8")
+        self.assertIn("ngoai.ts", changed_files(str(self.repo)))

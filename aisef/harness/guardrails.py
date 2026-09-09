@@ -443,6 +443,14 @@ VENDOR_PATHS = (
     ".playwright-mcp", "playwright-report", "test-results", ".nyc_output",
 )
 
+#: Generated files identified by **suffix**, not by directory. Same reason as
+#: `VENDOR_PATHS`: they appear because the story ran a tool, not because it
+#: wrote them. `tsc` rewrites `*.tsbuildinfo` on every build, so a TypeScript
+#: story failed `write scope` on its own compiler output — and the reviewer
+#: spent 2 of its 7 blocking findings telling the author to revert a file the
+#: next build recreates (reported from Windows 2026-09-09).
+GENERATED_SUFFIXES = (".tsbuildinfo",)
+
 HARNESS_OWNED = (
     "_bmad-output/evidence",
     "_bmad-output/journal",
@@ -528,6 +536,8 @@ def changed_files(
         if path in seen:
             continue
         seen.add(path)
+        if path.endswith(GENERATED_SUFFIXES):
+            continue
         if any(_within(path, skip) or skip in Path(path).parts for skip in ignore):
             continue
         out.append(path)
