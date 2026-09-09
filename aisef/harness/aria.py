@@ -229,4 +229,5 @@ def compare_snapshots(
         screen_id=screen_id,
         route=route,
         data_roles=data_roles,
+        items_rendered=has_items(actual_snapshot),
     )

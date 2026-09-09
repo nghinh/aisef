@@ -551,6 +551,23 @@ class TestStatus(CliTestCase):
         self.assertIn("1/1 stories done", out)
         self.assertIn("$1.50", out)
 
+    def test_tien_do_dem_theo_ke_hoach_khong_theo_so_da_dang_ky(self):
+        """Một lượt `--epic` chỉ đăng ký từng story một: "0/1 stories done"
+        đọc thành một dự án một story trong khi kế hoạch có mười bốn (đo trên
+        `todo-e2e` 2026-09-09)."""
+        import json
+
+        (self.artifacts / "stories.index.json").write_text(
+            json.dumps({"stories": [{"id": f"S-{i:02d}"} for i in range(1, 15)]}),
+            encoding="utf-8")
+        store = StateStore(self.artifacts)
+        store.register("S-01", "E-01")
+        store.transition("S-01", StoryStatus.RUNNING)
+        code, out, _ = self.run_cli("status")
+        self.assertEqual(code, EXIT_OK)
+        self.assertIn("0/14 stories done", out)
+        self.assertIn("13 not started", out)
+
     def test_blocked_story_makes_status_not_ready(self):
         store = StateStore(self.artifacts)
         store.register("S-02", "E-01")
