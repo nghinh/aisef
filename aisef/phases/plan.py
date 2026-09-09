@@ -57,6 +57,11 @@ def _run_log(project: Path, msg: str) -> None:
     run_log(project / ARTIFACT_ROOT, msg)
 
 
+def one_line(text: object, limit: int = 500) -> str:
+    from ..harness.runlog import one_line as _fold
+    return _fold(text, limit)
+
+
 def _save_response(project: Path, phase_id: str, text: str, result) -> Path:
     """Save the full LLM response so parser failures are debuggable."""
     d = project / ARTIFACT_ROOT / RESPONSE_DIR
@@ -462,7 +467,6 @@ def run_phase(
         # Say it in the log the operator watches. An SSE timeout after 22
         # minutes, retried silently, reads as 36 minutes of one motionless
         # `START` line — measured on `todo-e3`, 2026-09-09.
-        from ..harness.runlog import one_line
         _run_log(project, f"phase={phase.id} RETRY (infra) after {result.duration_ms}ms "
                           f"err={one_line(error, 200)} · {budget} left")
         out.infra_retries += 1
@@ -473,6 +477,12 @@ def run_phase(
     still_missing = _missing(project, phase.artifacts)
     if out.status.status == "blocked" and still_missing:
         out.error = f"BMAD blocked: {out.status.reason or 'no reason given'}"
+        # Every terminal outcome leaves a line. This one did not, so a phase
+        # that ran for half an hour and gave up ended the log at `START`
+        # (measured on `todo-e3`, 2026-09-09).
+        _run_log(project, f"phase={phase.id} BLOCKED ${out.cost_usd:.2f} "
+                          f"reason={one_line(out.status.reason or 'no reason given', 200)} "
+                          f"missing={', '.join(still_missing)}")
         return out
     if still_missing:
         out.error = f"run completed but missing: {', '.join(still_missing)}"

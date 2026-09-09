@@ -303,6 +303,12 @@ class TestFailures(PlanTestCase):
         r = self.run_plan(Blocked())
         self.assertEqual(r.failed_at, "project-context")
         self.assertIn("thiếu yêu cầu gốc", r.outcomes[-1].error)
+        # Và có mặt trong nhật ký: nhánh này là nhánh duy nhất kết thúc mà
+        # không ghi gì, nên một pha chạy nửa giờ rồi bỏ cuộc kết thúc nhật ký
+        # ở đúng dòng `START` (đo trên `todo-e3` 2026-09-09).
+        log = (self.project / "_bmad-output" / "run.log").read_text(encoding="utf-8")
+        self.assertIn("BLOCKED", log)
+        self.assertIn("thiếu yêu cầu gốc", log)
 
     def test_machine_gate_failure_blocks_before_asking_a_human(self):
         """Không mời người xem một PRD mà máy đã biết là hỏng."""
