@@ -23,11 +23,13 @@ from ..control.design_contract import CONTRACT_FILE, DesignContract, build
 from ..control.experience import Experience, Screen, parse_experience_file
 from ..control.machine_gate import GateResult, check_design_contract, is_route_like
 from ..harness.guardrails import (
+    ENV_BASELINE_DIRTY,
     ENV_PROJECT,
     ENV_STORY_ID,
     ENV_WORKDIR,
     ENV_WRITE_SCOPE,
     PLANNING_SCOPE,
+    changed_files,
 )
 from ..harness import browser
 from ..harness.observe import EvidenceStore
@@ -106,6 +108,7 @@ def _spec(*, prompt: str, project: Path, cfg: Config) -> RunSpec:
         ENV_STORY_ID: "",
         ENV_PROJECT: str(project),
         ENV_WORKDIR: str(project),
+        ENV_BASELINE_DIRTY: ",".join(changed_files(str(project))[:200]),
     }
     return spec
 

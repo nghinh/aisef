@@ -36,11 +36,13 @@ from ..control.approvals import GATE_ARTIFACTS, ApprovalStore, Gate, Status
 from ..control.bmad_status import HeadlessStatus, parse_headless_status
 from ..control.machine_gate import GateResult, check_prd
 from ..harness.guardrails import (
+    ENV_BASELINE_DIRTY,
     ENV_PROJECT,
     ENV_STORY_ID,
     ENV_WORKDIR,
     ENV_WRITE_SCOPE,
     PLANNING_SCOPE,
+    changed_files,
 )
 from ..harness.observe import EvidenceStore
 from ..control.normalize import parse_prd_file
@@ -397,6 +399,10 @@ def run_phase(
         ENV_STORY_ID: "",
         ENV_PROJECT: str(project),
         ENV_WORKDIR: str(project),
+        # What was already dirty before this phase opened. `diff-scope` reads
+        # the whole tree, so an uncommitted file the operator left behind
+        # otherwise blocks every tool call of the phase.
+        ENV_BASELINE_DIRTY: ",".join(changed_files(str(project))[:200]),
     }
 
     # Retry on infra errors, and do **not** count as phase failure: a single

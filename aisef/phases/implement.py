@@ -1215,10 +1215,19 @@ def review_diff(workdir: str, changed: list[str], *, base_ref: str = "") -> str:
     surrounding code, it just removes the initial fumbling.
     """
     names = "\n".join(f"- {c}" for c in changed[:50])
-    if not base_ref:
+    if not base_ref or not changed:
         return names
-    lines = _git_lines_text(workdir, ["diff", "--stat", base_ref])
-    body = _git_lines_text(workdir, ["diff", base_ref])
+    # Limited to the story's **own** files. An unlimited `git diff` also shows
+    # what the harness itself wrote into the worktree — it refreshes the guard
+    # plugin there on every run — and the reviewer then blocks the story for
+    # "modifies a file outside the effective write scope" while the security
+    # reviewer files a finding against the harness's own generated code.
+    # Measured on todo/STORY-01-02 2026-09-09: two attempts, both blocked on
+    # `.opencode/plugin/aisef-guard.ts`, story marked stuck. `changed` already
+    # excludes HARNESS_OWNED; the diff has to honour the same list.
+    pathspec = ["--", *changed]
+    lines = _git_lines_text(workdir, ["diff", "--stat", base_ref, *pathspec])
+    body = _git_lines_text(workdir, ["diff", base_ref, *pathspec])
     if not body:
         return names
     if len(body) > REVIEW_DIFF_CHARS:

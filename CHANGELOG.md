@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.2.23 — 2026-09-09
+
+Both fixes are the same mistake in two places: a gate that judges *state*
+where it means to judge *change*.
+
+- **The reviewer saw the harness's own file and blocked the story** (bug 37).
+  Since 1.2.19 the harness refreshes the guard plugin inside the worktree on
+  every run, which leaves that tracked file modified. The structural checks
+  filter `HARNESS_OWNED` correctly, but `review_diff` ran an unlimited
+  `git diff`, so the reviewer blocked "modifies a file outside the effective
+  write scope" and the security reviewer filed a high finding against
+  generated harness code. todo/STORY-01-02 went stuck on it. The diff is now
+  limited to the story's own changed paths.
+- **A file the operator left uncommitted blocked every planning tool call**
+  (bug 38). `.ai/config.json`, written by `aisef setup`, made `diff-scope`
+  report "changed outside write_scope" 14 times in one Windows run and left
+  the ux phase blocked. Planning and mockup phases now declare
+  `AISEF_BASELINE_DIRTY` — what was already dirty when the phase opened — and
+  the guard subtracts it. What the session really writes outside scope is
+  still blocked.
+
 ## 1.2.22 — 2026-09-09
 
 - **Planning phases inferred the guard's scope from what was absent**

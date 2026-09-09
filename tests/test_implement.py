@@ -236,6 +236,25 @@ class TestHappyPath(ImplementTestCase):
             # Không có mốc rẽ nhánh thì lùi về danh sách tên, không nổ.
             self.assertEqual(review_diff(str(d), ["a.py"]), "- a.py")
 
+            # Lỗi 37. Harness tự làm bẩn worktree: nó làm mới plugin guard ở đó
+            # mỗi lượt chạy. `git diff` không giới hạn đường dẫn cho người rà
+            # soát thấy luôn tệp ấy, và người rà soát chặn story vì "sửa tệp
+            # ngoài phạm vi ghi" — còn người rà soát bảo mật mở phiếu high
+            # nhắm vào mã do chính harness sinh. Đo trên todo/STORY-01-02
+            # 2026-09-09: hai lượt liên tiếp, story bị đánh dấu stuck.
+            (d / ".opencode").mkdir()
+            (d / ".opencode" / "aisef-guard.ts").write_text(
+                'const BIN = ["aisef"]\n', encoding="utf-8")
+            subprocess.run(["git", "add", "-A"], cwd=d, check=True)
+            subprocess.run(["git", "commit", "-qm", "guard"], cwd=d, check=True)
+            (d / ".opencode" / "aisef-guard.ts").write_text(
+                'const BIN = ["aisef", "moi"]\n', encoding="utf-8")   # harness ghi đè
+
+            got = review_diff(str(d), ["a.py"], base_ref=base)
+            self.assertIn("return a - b", got)
+            self.assertNotIn("aisef-guard", got,
+                             "tệp của harness không phải việc của người rà soát")
+
     def test_reviewer_gets_scope_but_not_story_id(self):
         """Người rà soát cần **phạm vi**, không cần **mã story**.
 

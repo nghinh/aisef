@@ -1115,3 +1115,55 @@ class TestGiaiDoanKeHoachKhaiBaoPhamVi(unittest.TestCase):
             log = (Path(tmp) / "run.log").read_text(encoding="utf-8")
         self.assertIn("guard write-scope BLOCK", log)
         self.assertIn("outside the story's write_scope", log)
+
+
+class TestBanDauDaBanThiKhongPhaiLoiCuaPhien(unittest.TestCase):
+    """Lỗi 38. `diff-scope` đọc **cả cây**, nên tệp người dùng để dở dang từ
+    trước bị tính là "phiên này ghi ra ngoài phạm vi".
+
+    Đo trên Windows 2026-09-09: `.ai/config.json` (do `aisef setup` ghi, chưa
+    commit) làm mọi lần gọi tool của giai đoạn kế hoạch bị chặn — 14 lần trong
+    một lượt, phase `ux` ra `status=blocked`. Guard hỏi *phiên này có bước ra
+    ngoài phạm vi không*; thứ có sẵn trước khi phiên mở không phải việc của nó.
+    """
+
+    def setUp(self):
+        import subprocess
+        import tempfile
+        self._tmp = tempfile.TemporaryDirectory()
+        self.repo = Path(self._tmp.name)
+        for cmd in (["git", "init", "-q"], ["git", "config", "user.email", "t@t"],
+                    ["git", "config", "user.name", "t"]):
+            subprocess.run(cmd, cwd=self.repo, check=True)
+        (self.repo / "goc.txt").write_text("goc\n", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=self.repo, check=True)
+        subprocess.run(["git", "commit", "-qm", "goc"], cwd=self.repo, check=True)
+        (self.repo / ".ai").mkdir()
+        (self.repo / ".ai" / "config.json").write_text("{}", encoding="utf-8")  # bẩn từ trước
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def _guard(self, env):
+        from aisef.harness.guardrails import run_guard
+        return run_guard("diff-scope", {"cwd": str(self.repo), "tool_name": "write", "tool_input": {}},
+                         project_root=str(self.repo), env=env)
+
+    def test_khong_khai_ban_dau_thi_bi_chan(self):
+        env = {"AISEF_WRITE_SCOPE": "_bmad-output,docs", "AISEF_WORKDIR": str(self.repo)}
+        v = self._guard(env)
+        self.assertFalse(v.allowed)
+        self.assertIn(".ai/config.json", v.reason)
+
+    def test_khai_ban_dau_thi_cho_qua(self):
+        env = {"AISEF_WRITE_SCOPE": "_bmad-output,docs", "AISEF_WORKDIR": str(self.repo),
+               "AISEF_BASELINE_DIRTY": ".ai/config.json"}
+        self.assertTrue(self._guard(env).allowed, "tệp bẩn sẵn không phải do phiên này")
+
+    def test_van_chan_thu_phien_nay_that_su_ghi_ra_ngoai(self):
+        (self.repo / "ngoai-pham-vi.py").write_text("x = 1\n", encoding="utf-8")
+        env = {"AISEF_WRITE_SCOPE": "_bmad-output,docs", "AISEF_WORKDIR": str(self.repo),
+               "AISEF_BASELINE_DIRTY": ".ai/config.json"}
+        v = self._guard(env)
+        self.assertFalse(v.allowed)
+        self.assertIn("ngoai-pham-vi.py", v.reason)

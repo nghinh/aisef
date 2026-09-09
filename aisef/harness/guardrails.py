@@ -46,6 +46,12 @@ ENV_ALLOW_HOSTS = "AISEF_ALLOW_HOSTS"
 #: writes evidence to the old project (measured A/B `par-A` 2026-09-05:
 #: 4 false "guard ran" failures).
 ENV_PROJECT = "AISEF_PROJECT"
+#: Paths already changed in the tree **before** this session started, declared
+#: by the phase that opened it.  `diff-scope` reads the whole tree, so without
+#: this it blames the session for whatever the operator left uncommitted —
+#: `.ai/config.json` written by `aisef setup` blocked every tool call of a
+#: Windows planning run (2026-09-09) with "changed outside write_scope".
+ENV_BASELINE_DIRTY = "AISEF_BASELINE_DIRTY"
 
 #: Write scope when **not** inside a story: planning and mockup phases.
 #: These have a fixed, known scope, so guards still apply — instead of
@@ -716,6 +722,11 @@ def workdir_from_env(env: dict[str, str] | None = None) -> str:
     return (env or os.environ).get(ENV_WORKDIR, "")
 
 
+def baseline_dirty_from_env(env: dict[str, str] | None = None) -> tuple[str, ...]:
+    raw = (env or os.environ).get(ENV_BASELINE_DIRTY, "")
+    return tuple(p.strip() for p in raw.split(",") if p.strip())
+
+
 def base_from_env(env: dict[str, str] | None = None) -> str:
     return (env or os.environ).get(ENV_BASE_REF, "")
 
@@ -832,8 +843,13 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
             allow_hosts_from_env(env),
         )
     if kind == "diff-scope":
+        # Subtract what was already dirty when the session opened: this guard
+        # asks "did **this** session step outside its scope", and a file the
+        # operator left modified is not this session's doing.
         return check_diff_scope(
-            changed_files(root, base_ref=base_from_env(env)), scope_from_env(env)
+            changed_files(root, base_ref=base_from_env(env),
+                          ignore=HARNESS_OWNED + baseline_dirty_from_env(env)),
+            scope_from_env(env),
         )
     if kind == "completion":
         story = story_from_env(env)
