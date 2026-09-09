@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 from ..config import Config
-from ..harness.tools import aisef_command
+from ..harness.tools import aisef_argv
 from ._common import ARTIFACT_ROOT, EXIT_NOT_READY, EXIT_OK, EXIT_USAGE, _artifact_root, _client
 
 
@@ -150,9 +150,10 @@ def cmd_compile(args) -> int:
     from ..clients.compile import ADAPTERS, compile_for, write_compile_report
 
     clients = sorted(ADAPTERS) if args.client == "all" else [args.client]
-    # Don't guess the path: `aisef_command` already prefers the name on PATH
+    # Don't guess the path: `aisef_argv` already prefers the name on PATH
     # (real install) before falling back to `bin/aisef` from the source repo.
-    aisef_bin = args.bin or aisef_command()
+    # `--bin` names one binary, so it stays one token; the fallback is argv.
+    aisef_bin = args.bin or aisef_argv()
 
     reports = []
     for client in clients:

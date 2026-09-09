@@ -92,6 +92,46 @@ class TestOpenCodePlugin(CompileTestCase):
         """Cùng quy ước mã thoát với Claude Code."""
         self.assertIn("exitCode === 2", build_opencode_plugin(self.project, "/bin/aisef"))
 
+    def test_lenh_aisef_la_mang_khong_phai_chuoi(self):
+        """Lỗi 32. `aisef_command()` lùi về `"<python> -m aisef.cli"` khi
+        `aisef` không nằm trên PATH (cài trong venv). Bun shell trích dẫn
+        một chuỗi nội suy thành **một** argv[0], nên tên chương trình thành
+        một đường dẫn có dấu cách: `bun: command not found`, `.nothrow()`
+        nuốt lỗi, và **mọi guard im lặng không chạy**.
+
+        Đo 2026-09-09 trên `todo`, cùng một phiên OpenCode, cùng một hook:
+        dạng chuỗi exit=1, dạng mảng exit=0. Cả run 46 phiên không có lấy
+        một sự kiện guard nào, story trượt cổng `guard ran` tới cạn lượt.
+        """
+        src = build_opencode_plugin(
+            self.project, ["/Users/x/.venvs/aisef/bin/python3.14", "-m", "aisef.cli"])
+        dong = next(d for d in src.splitlines() if d.startswith("const BIN"))
+        self.assertEqual(
+            dong,
+            'const BIN = ["/Users/x/.venvs/aisef/bin/python3.14", "-m", "aisef.cli"]',
+            "lệnh nhiều từ phải thành mảng, không thì Bun coi cả câu là tên tệp")
+        self.assertIn("${BIN} --project", src)
+
+    def test_hook_claude_khong_boc_ca_cau_lenh_thanh_mot_tu(self):
+        """Cùng gốc lỗi 32, phía Claude Code: `shlex.quote` bọc cả
+        `"<python> -m aisef.cli"` thành một token, shell đi tìm một tệp có
+        dấu cách trong tên. Hook trả mã khác 2 ⇒ Claude cho qua."""
+        from aisef.clients.compile import build_claude_settings
+        import json as _json
+        s = _json.dumps(build_claude_settings(
+            self.project, ["/Users/x/.venvs/aisef/bin/python", "-m", "aisef.cli"]))
+        self.assertIn("/Users/x/.venvs/aisef/bin/python -m aisef.cli --project", s)
+        self.assertNotIn("'/Users/x/.venvs/aisef/bin/python -m aisef.cli'", s)
+
+    def test_guard_khong_chay_duoc_thi_chan(self):
+        """Mã thoát khác 0 và 2 nghĩa là guard **chưa** chấm thao tác này.
+        Coi đó là cho qua chính là cách một lượt chạy kết thúc với zero
+        guard mà bằng chứng trông y hệt một agent ngoan."""
+        src = build_opencode_plugin(self.project, "/bin/aisef")
+        self.assertIn("res.exitCode !== 0", src)
+        than = src.split("res.exitCode !== 0")[1].split("}")[0]
+        self.assertIn("throw", than, "guard hỏng mà không chặn thì bảo vệ chỉ là hình thức")
+
     def test_hooks_the_right_event(self):
         self.assertIn("tool.execute.before", build_opencode_plugin(self.project, "/bin/aisef"))
 

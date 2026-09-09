@@ -359,6 +359,31 @@ def record(res: ToolResult, story_id: str, artifact_root, candidate: str = "",
     return str(log)
 
 
+def aisef_argv() -> list[str]:
+    """The framework command as **argv**, which is what every caller needs.
+
+    Returned as a list, never a string: the last fallback is three words, and
+    a three-word command squeezed into one string is later read back as one
+    filename — the OpenCode plugin ran `bun: command not found: "<python> -m
+    aisef.cli"` on every tool call and, because a failed guard call is not a
+    block, the whole run finished with zero guards (measured 2026-09-09 on
+    `todo`: 46 sessions, 0 guard events, story exhausted on "guard ran").
+    """
+    if shutil.which("aisef"):
+        return ["aisef"]
+    # Source repo: `bin/aisef` sits next to the package. Wheel installs do
+    # **not** have that directory — before 0.2.0 this returned
+    # `<site-packages>/bin/aisef`, a non-existent path, and the compile hook
+    # silently ran no guards (measured 2026-09-06 on a clean venv). Check
+    # existence before returning.
+    trong_kho = Path(__file__).resolve().parent.parent.parent / "bin" / "aisef"
+    if trong_kho.is_file():
+        return [str(trong_kho)]
+    # Always works with an installed package, even when venv is not on the
+    # agent session's PATH: the running interpreter itself + module.
+    return [sys.executable, "-m", "aisef.cli"]
+
+
 def aisef_command() -> str:
     """The framework command the agent can **actually** type.
 
@@ -367,19 +392,7 @@ def aisef_command() -> str:
     pytest manually, and that run will not be recorded as evidence. Prefer
     the name on PATH; if absent, use the absolute path from this repo.
     """
-    if shutil.which("aisef"):
-        return "aisef"
-    # Source repo: `bin/aisef` sits next to the package. Wheel installs do
-    # **not** have that directory — before 0.2.0 this returned
-    # `<site-packages>/bin/aisef`, a non-existent path, and the compile hook
-    # silently ran no guards (measured 2026-09-06 on a clean venv). Check
-    # existence before returning.
-    trong_kho = Path(__file__).resolve().parent.parent.parent / "bin" / "aisef"
-    if trong_kho.is_file():
-        return str(trong_kho)
-    # Always works with an installed package, even when venv is not on the
-    # agent session's PATH: the running interpreter itself + module.
-    return f"{sys.executable} -m aisef.cli"
+    return " ".join(shlex.quote(p) for p in aisef_argv())
 
 
 def describe_tools(project: Path | str, config: Config | None = None) -> str:

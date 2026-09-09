@@ -18,6 +18,7 @@ from aisef.config import DEFAULTS, Config  # noqa: E402
 from aisef.harness.observe import TOOL_RUN, EvidenceStore  # noqa: E402
 from aisef.harness.tools import (  # noqa: E402
     TOOLS,
+    aisef_argv,
     aisef_command,
     command_for,
     image_for,
@@ -226,6 +227,17 @@ class TestLenhGoiFramework(unittest.TestCase):
              mock.patch.object(Path, "is_file", return_value=False):
             got = aisef_command()
         self.assertEqual(got, f"{sys.executable} -m aisef.cli")
+
+    def test_dang_argv_khong_gop_ba_tu_thanh_mot(self):
+        """Lỗi 32. Người gọi thật cần **argv**: gộp `<python> -m aisef.cli`
+        vào một chuỗi thì phía nhận đọc lại thành một tên tệp có dấu cách —
+        `command not found` ở mọi lần gọi guard, và cả lượt chạy không còn
+        guard nào (đo 2026-09-09 trên `todo`: 46 phiên, 0 sự kiện guard)."""
+        with mock.patch("shutil.which", return_value=None), \
+             mock.patch.object(Path, "is_file", return_value=False):
+            self.assertEqual(aisef_argv(), [sys.executable, "-m", "aisef.cli"])
+        with mock.patch("shutil.which", return_value="/usr/local/bin/aisef"):
+            self.assertEqual(aisef_argv(), ["aisef"])
 
 
 class TestSuiteKhongMoContainer(ToolTestCase):

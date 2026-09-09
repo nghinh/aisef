@@ -79,16 +79,30 @@ class CompileReport:
         return "\n".join(lines)
 
 
-def _guard_command(aisef_bin: str, project: Path, kind: str) -> str:
+def split_bin(aisef_bin: str | list[str]) -> list[str]:
+    """The aisef command as argv.
+
+    A **string is one token** — `--bin` names a binary, and `/opt/my
+    tools/aisef` must not be split at the space.  A **list is already argv**:
+    that is how the `<python> -m aisef.cli` fallback arrives, and it is the
+    reason `aisef_argv()` exists.  Squeezing it through a string made it a
+    filename with spaces in it — `command not found` on every guard call,
+    which both clients read as "allowed".
+    """
+    return [aisef_bin] if isinstance(aisef_bin, str) else list(aisef_bin)
+
+
+def _guard_command(aisef_bin: str | list[str], project: Path, kind: str) -> str:
     if sys.platform == "win32":
         def _q(s: str) -> str:
             return f'"{s}"' if " " in s else s
     else:
         _q = shlex.quote
-    return f"{_q(aisef_bin)} --project {_q(str(project))} guard {kind}"
+    binary = " ".join(_q(p) for p in split_bin(aisef_bin))
+    return f"{binary} --project {_q(str(project))} guard {kind}"
 
 
-def build_claude_settings(project: Path, aisef_bin: str) -> dict:
+def build_claude_settings(project: Path, aisef_bin: str | list[str]) -> dict:
     """Build `.claude/settings.json` wiring all guards to the correct hooks."""
     by_event: dict[str, list[dict]] = {}
     for kind, (event, matcher) in sorted(GUARD_MATCHERS.items()):
@@ -103,7 +117,7 @@ def build_claude_settings(project: Path, aisef_bin: str) -> dict:
     return {"_generated": GENERATED_NOTE, "hooks": by_event}
 
 
-def build_opencode_plugin(project: Path, aisef_bin: str) -> str:
+def build_opencode_plugin(project: Path, aisef_bin: str | list[str]) -> str:
     """Build an OpenCode plugin calling the same guard set.
 
     Spike S4 has not yet proven whether throwing here **blocks** the tool
@@ -135,7 +149,13 @@ import type {{ Plugin }} from "@opencode-ai/plugin"
 const BEFORE = [{", ".join(f'"{k}"' for k in pre)}]
 const AFTER = [{", ".join(f'"{k}"' for k in post)}]
 const MATCH = {matchers}
-const BIN = {json.dumps(aisef_bin)}
+// **Array**, not a string: Bun shell quotes an interpolated string as a
+// single argv[0], so the `<python> -m aisef.cli` form `aisef_command()`
+// falls back to when `aisef` is not on PATH became a filename containing
+// spaces — `bun: command not found` on every tool call, swallowed by
+// `.nothrow()`, every guard a silent no-op. Measured 2026-09-09 on `todo`,
+// same session, same hook: string form exit=1, array form exit=0.
+const BIN = {json.dumps(split_bin(aisef_bin))}
 const PROJECT = {json.dumps(str(project))}
 
 // OpenCode's shell is Bun shell: it **does not** have `.stdin(...)`, it only
@@ -150,6 +170,14 @@ async function guard($, kinds, tool, event) {{
       .quiet().nothrow()
     if (res.exitCode === 2) {{
       throw new Error(String(res.stderr).trim() || `guard ${{kind}} blocked this action`)
+    }}
+    // Fail closed. Any other non-zero exit means the guard did not judge this
+    // action — binary missing, crash, bad install. Treating that as "allow"
+    // is how a whole run finishes with zero guards and evidence that looks
+    // identical to a well-behaved agent.
+    if (res.exitCode !== 0) {{
+      throw new Error(`guard ${{kind}} could not run (exit ${{res.exitCode}}): `
+        + (String(res.stderr).trim() || "no output") + " — fix the aisef install, then retry")
     }}
   }}
 }}
@@ -183,7 +211,7 @@ def compile_for(
     client: str,
     project: Path | str,
     *,
-    aisef_bin: str = "aisef",
+    aisef_bin: str | list[str] = "aisef",
 ) -> CompileReport:
     """Generate one client's configuration, with a loss report."""
     if client not in ADAPTERS:
