@@ -389,9 +389,13 @@ class TestLocalGiuPath(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             bin_dir = Path(d) / "bin"
             bin_dir.mkdir()
-            script = bin_dir / "lenh-rieng"
-            script.write_text("#!/bin/sh\necho CI=$CI\n", encoding="utf-8")
-            script.chmod(0o755)
+            if sys.platform == "win32":
+                script = bin_dir / "lenh-rieng.cmd"      # PATHEXT: `.cmd` is how Windows names one
+                script.write_text("@echo CI=%CI%\r\n", encoding="utf-8")
+            else:
+                script = bin_dir / "lenh-rieng"
+                script.write_text("#!/bin/sh\necho CI=$CI\n", encoding="utf-8")
+                script.chmod(0o755)
             with patch.dict(os.environ, {"PATH": f"{bin_dir}{os.pathsep}{os.environ.get('PATH', '')}"}):
                 r = run(SandboxSpec(workspace=Path(d), cmd=["lenh-rieng"], env={"CI": "1"}, use_docker=False))
         self.assertTrue(r.ok, r.stderr)
@@ -452,11 +456,11 @@ class TestMounts(unittest.TestCase):
     """ADR-005 V6: worktree sạch từ SHA không có `node_modules`/venv — mượn của dự án."""
 
     def test_docker_bind_mount_cung_mode_voi_workspace(self):
-        s = SandboxSpec(workspace=Path("/tmp"), cmd=["true"],
-                        mounts={"node_modules": Path("/du-an/node_modules")})
-        self.assertIn("/du-an/node_modules:/workspace/node_modules:rw", build_docker_args(s))
+        src = Path("/du-an/node_modules")
+        s = SandboxSpec(workspace=Path("/tmp"), cmd=["true"], mounts={"node_modules": src})
+        self.assertIn(f"{src}:/workspace/node_modules:rw", build_docker_args(s))
         s.level = Level.READ_ONLY
-        self.assertIn("/du-an/node_modules:/workspace/node_modules:ro", build_docker_args(s))
+        self.assertIn(f"{src}:/workspace/node_modules:ro", build_docker_args(s))
 
     def test_suy_bien_symlink_vao_workspace(self):
         with tempfile.TemporaryDirectory() as d:

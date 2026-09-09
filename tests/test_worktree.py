@@ -81,7 +81,8 @@ class TestLifecycle(WorktreeTestCase):
         wt = self.wm.create("S-01")
         self.assertTrue((wt.path / ".git").exists())
         self.assertFalse((wt.path / ".vite").exists())
-        self.assertIn(str(wt.path), _git(self.repo, "worktree", "list").stdout)
+        # git prints worktree paths with `/` on every OS
+        self.assertIn(wt.path.as_posix(), _git(self.repo, "worktree", "list").stdout)
 
     def test_create_is_idempotent(self):
         a = self.wm.create("S-01")

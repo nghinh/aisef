@@ -255,6 +255,24 @@ class TestAppServerTrust(unittest.TestCase):
         self.assertIn("pid 1", why)
         self.assertIsNone(s.proc)
 
+    def test_windows_kills_the_tree_with_taskkill(self):
+        """Windows has no process groups: only `taskkill /T` reaches the
+        children, and a surviving dev server holds the port for the next
+        story (bug 15's shape)."""
+        from unittest import mock
+
+        from aisef.harness import mockup_verify as mv
+
+        proc = mock.Mock(pid=4242)
+        with mock.patch.object(mv.sys, "platform", "win32"), \
+             mock.patch.object(mv.subprocess, "call", return_value=0) as call:
+            mv._kill_tree(proc)
+        self.assertEqual(call.call_args[0][0][:4], ["taskkill", "/F", "/T", "/PID"])
+        proc.wait.assert_called_once()
+
+    @unittest.skipIf(sys.platform == "win32",
+                     "process groups + os.kill are POSIX; Windows uses taskkill /T, "
+                     "covered by test_windows_kills_the_tree_with_taskkill")
     def test_stop_kills_whole_process_group(self):
         import os
         import tempfile

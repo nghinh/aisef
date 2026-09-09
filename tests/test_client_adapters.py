@@ -73,7 +73,7 @@ class TestClaudeCodeBuildCommand(unittest.TestCase):
     def test_with_settings_file(self):
         cmd = ClaudeCodeAdapter().build_command(_spec(settings_file=Path("/s.json")))
         self.assertIn("--settings", cmd)
-        self.assertEqual(cmd[cmd.index("--settings") + 1], "/s.json")
+        self.assertEqual(cmd[cmd.index("--settings") + 1], str(Path("/s.json")))
 
     def test_allowed_tools_override(self):
         cmd = ClaudeCodeAdapter().build_command(_spec(allowed_tools=["Read", "Bash"]))
@@ -89,8 +89,8 @@ class TestClaudeCodeBuildCommand(unittest.TestCase):
         cmd = ClaudeCodeAdapter().build_command(_spec(extra_dirs=[Path("/a"), Path("/b")]))
         indices = [i for i, x in enumerate(cmd) if x == "--add-dir"]
         self.assertEqual(len(indices), 2)
-        self.assertEqual(cmd[indices[0] + 1], "/a")
-        self.assertEqual(cmd[indices[1] + 1], "/b")
+        self.assertEqual(cmd[indices[0] + 1], str(Path("/a")))
+        self.assertEqual(cmd[indices[1] + 1], str(Path("/b")))
 
     def test_with_session_id(self):
         cmd = ClaudeCodeAdapter().build_command(_spec(session_id="abc123"))
@@ -119,7 +119,7 @@ class TestOpenCodeBuildCommand(unittest.TestCase):
         self.assertIn("--format", cmd)
         self.assertEqual(cmd[cmd.index("--format") + 1], "json")
         self.assertIn("--dir", cmd)
-        self.assertEqual(cmd[cmd.index("--dir") + 1], "/tmp/test")
+        self.assertEqual(cmd[cmd.index("--dir") + 1], str(Path("/tmp/test")))
         self.assertNotIn("test", cmd[cmd.index("--dir") + 2:], "prompt đi qua stdin")
 
     def test_with_model(self):

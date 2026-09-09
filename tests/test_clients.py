@@ -255,9 +255,8 @@ class TestTimeoutIsInfrastructureError(unittest.TestCase):
         """Hết giờ ≠ story kém — phân biệt được mới quyết đúng nên thử lại."""
         with tempfile.TemporaryDirectory() as d:
             # Binary giả: nuốt mọi tham số rồi ngủ, để chạm đúng nhánh timeout.
-            fake = Path(d) / "cham-chap"
-            fake.write_text("#!/bin/sh\nsleep 5\n", encoding="utf-8")
-            fake.chmod(0o755)
+            from tests._bin import sleeps
+            fake = sleeps(Path(d) / "cham-chap", 5)
 
             r = ClaudeCodeAdapter(binary=str(fake)).run(
                 RunSpec(prompt="p", workdir=Path(d), timeout_seconds=1)
@@ -327,9 +326,8 @@ class TestKhongThuaHuongPhienCha(unittest.TestCase):
         import stat
         from pathlib import Path
         fake = Path(tmp) / "client-gia"
-        fake.write_text("#!/bin/sh\nenv > \"$PWD/env.txt\"\n", encoding="utf-8")
-        fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
-        return fake
+        from tests._bin import dump_env
+        return dump_env(fake)
 
     def test_child_process_really_gets_the_clean_env(self):
         import os, tempfile

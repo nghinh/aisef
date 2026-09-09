@@ -619,10 +619,13 @@ class TestCompletion(unittest.TestCase):
 
         from aisef.harness.tools import aisef_command
 
+        from aisef.clients.base import split_command
+
         binary = aisef_command()
         self.assertIn(f"{binary} tool test", self.verdict().reason)
-        if binary != "aisef":
-            self.assertTrue(os.access(binary, os.X_OK))
+        program, *rest = split_command(binary)
+        if program != "aisef" and rest[:1] != ["-m"]:
+            self.assertTrue(os.access(program, os.X_OK), program)
 
     def test_stale_message_also_names_the_command(self):
         self.store.tool_run("S-01", "test", ok=True)

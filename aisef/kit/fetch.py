@@ -96,18 +96,20 @@ def _clone(source: Source, dest: Path) -> str:
         return f"exceeded {CLONE_TIMEOUT}s"
     except OSError as e:
         return str(e)
-    _remove_tree(dest)
+    remove_tree(dest)
     tmp.replace(dest)
     return ""
 
 
-def _remove_tree(path: Path) -> None:
+def remove_tree(path: Path | str) -> None:
     """Delete a directory tree, including the read-only files git leaves.
 
-    Windows refuses to unlink a read-only file, and a fresh clone's
-    `.git/objects` is full of them: `aisef setup` failed with
-    `PermissionError [WinError 5] Access is denied` while replacing a cached
-    reference repo. POSIX does not care, which is why this went unnoticed.
+    Windows refuses to unlink a read-only file, and any repo's `.git/objects`
+    is full of them: `aisef setup` failed with `PermissionError [WinError 5]
+    Access is denied` while replacing a cached reference repo, and
+    `shutil.rmtree(..., ignore_errors=True)` silently leaves the tree behind so
+    the next `mkdir` fails with `[WinError 183] file already exists`. POSIX
+    does not care, which is why this went unnoticed.
     """
     def _force(func, target, _exc):
         try:
@@ -116,6 +118,7 @@ def _remove_tree(path: Path) -> None:
         except OSError:
             pass
 
+    path = Path(path)
     if not path.exists():
         return
     if sys.version_info >= (3, 12):
