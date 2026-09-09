@@ -265,6 +265,18 @@ class TestFailures(PlanTestCase):
         self.assertIn("RETRY (infra)", log)
         self.assertIn("api_error", log)
 
+    def test_pha_bi_bo_qua_khong_hua_mot_khoang_cho(self):
+        """`START timeout=1800s` ngay trên `SKIP` đọc thành nửa giờ chờ không
+        hề xảy ra — dòng ấy chỉ dành cho pha thật sự có chờ."""
+        self.run_plan(FakeClient())          # lượt đầu sinh đủ tạo tác
+        (self.project / "_bmad-output" / "run.log").unlink()
+        self.run_plan(FakeClient())          # lượt hai bỏ qua
+        log = (self.project / "_bmad-output" / "run.log").read_text(encoding="utf-8")
+        for dong in log.splitlines():
+            if "SKIP (artifacts exist)" in dong:
+                pha = dong.split("phase=")[1].split()[0]
+                self.assertNotIn(f"phase={pha} START", log, f"{pha}: hứa chờ rồi bỏ qua")
+
     def test_quality_failure_is_not_retried(self):
         """Chạy lại một lượt đã hỏng vì nội dung chỉ tốn tiền lần nữa."""
         c = FakeClient(skip={"project-context"})
