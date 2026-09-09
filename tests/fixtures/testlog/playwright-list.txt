@@ -1,0 +1,25 @@
+
+Running 20 tests using 1 worker
+
+  ✓   1 tests/todo-list.spec.js:7:1 › AC-STORY-01-01-1: initial document exposes the Todo List landmarks and labels (405ms)
+  ✓   2 tests/todo-list.spec.js:19:1 › AC-STORY-01-01-2: empty task list keeps the creation form available (97ms)
+  ✓   3 tests/todo-list.spec.js:26:1 › AC-STORY-01-01-3: keyboard focus is visible in DOM order without positive tabindex (238ms)
+  ✓   4 tests/todo-list.spec.js:56:1 › AC-STORY-01-01-4: 320px viewport reflows without horizontal page scrolling (113ms)
+  ✓   5 tests/todo-list.spec.js:68:1 › AC-STORY-01-01-4: 200% zoom reflows without horizontal page scrolling (107ms)
+  ✓   6 tests/todo-list.spec.js:82:1 › AC-STORY-01-01-5: controls remain visible with text labels and minimum targets (214ms)
+  ✓   7 tests/todo-list.spec.js:122:1 › FR-3: persisted tasks render exactly once with complete controls (111ms)
+  ✓   8 tests/todo-list.spec.js:148:1 › AD-5: canonical persisted tasks load and newly created tasks retain the canonical schema (182ms)
+  ✓   9 tests/todo-list.spec.js:183:1 › AD-5: malformed canonical task records are rejected (83ms)
+  ✓  10 tests/todo-list.spec.js:196:1 › AC-STORY-01-01-6: normal use sends no task data and requires no backend (816ms)
+  ✓  11 tests/todo-list.spec.js:236:1 › AC-STORY-01-02-1: absent storage hydrates an empty collection without writing storage (102ms)
+  ✓  12 tests/todo-list.spec.js:244:1 › AC-STORY-01-02-2: valid version-one tasks render exactly once in one visible semantic list (124ms)
+  ✓  13 tests/todo-list.spec.js:261:1 › AC-STORY-01-02-3: task title and optional description render as wrapping plain text without placeholders (117ms)
+  ✓  14 tests/todo-list.spec.js:278:1 › AC-STORY-01-02-4: each task has a native checkbox and task-identifying Edit and Delete actions (80ms)
+  ✓  15 tests/todo-list.spec.js:289:1 › AC-STORY-01-02-5: markup-like task text is rendered literally and never interpreted as HTML (82ms)
+  ✓  16 tests/todo-list.spec.js:298:1 › AC-STORY-01-02-6: every invalid snapshot is rejected atomically and preserved unchanged (506ms)
+  ✓  17 tests/todo-list.spec.js:326:1 › AC-STORY-01-02-7: hydration failure surfaces a storage error without claiming success (87ms)
+  ✓  18 tests/todo-list.spec.js:339:1 › AC-STORY-01-02-8: valid loaded task field values survive refresh in the same browser profile (93ms)
+  ✓  19 tests/todo-list.spec.js:351:1 › AC-STORY-01-02-6: failed hydration prevents later submissions from overwriting rejected storage (107ms)
+  ✓  20 tests/todo-list.spec.js:364:1 › AC-STORY-01-02-7: persistence failure does not commit or render the proposed task (104ms)
+
+  20 passed (4.8s)

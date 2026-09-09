@@ -159,3 +159,37 @@ class TestCtrf(unittest.TestCase):
     def test_evidence_shape_giong_dinh_dang_khac(self):
         ev = parse((FIX / "ctrf-pytest.json").read_text(encoding="utf-8")).to_evidence()
         self.assertEqual(set(ev), {"test_format", "test_ids", "failed_ids", "skipped_ids", "coverage"})
+
+
+class TestPlaywright(unittest.TestCase):
+    """Lỗi 43. Playwright là runner mà chính framework này lái (map mockup,
+    e2e), và reporter mặc định của nó **có** in tên từng test — nhưng parser
+    không biết hình dạng ấy, nên `criteria have tests`, `coverage`,
+    `no baseline regression` và `tests verify story` chấm *unconfigured* trên
+    mọi dự án Playwright. Đo trên `todo` 2026-09-09: 20 tên trong output, đọc
+    được 0.
+    """
+
+    def test_doc_duoc_ten_tu_output_that(self):
+        log = parse(fx("playwright-list"))
+        self.assertEqual(log.format, "playwright-list")
+        self.assertEqual((len(log.passed), len(log.failed), len(log.skipped)), (20, 0, 0))
+        self.assertIn("AC-STORY-01-02-8: valid loaded task field values survive refresh "
+                      "in the same browser profile", log.passed)
+
+    def test_bo_qua_log_cua_may_chu_xen_giua(self):
+        """Output thật có `[WebServer] ... "GET / HTTP/1.1" 200 -` xen giữa."""
+        text = ('[WebServer] 127.0.0.1 - - [09/Sep/2026 12:18:36] "GET / HTTP/1.1" 200 -\n'
+                "  ✓   1 tests/a.spec.js:7:1 › AC-1: mở được trang (172ms)\n"
+                '[WebServer] 127.0.0.1 - - [09/Sep/2026 12:18:37] "GET /js/main.js HTTP/1.1" 200 -\n'
+                "  ✘   2 tests/a.spec.js:19:1 › AC-2: lưu thất bại (81ms)\n"
+                "  -   3 tests/a.spec.js:26:1 › AC-3: chưa làm\n")
+        log = parse(text)
+        self.assertEqual(log.passed, ["AC-1: mở được trang"])
+        self.assertEqual(log.failed, ["AC-2: lưu thất bại"])
+        self.assertEqual(log.skipped, ["AC-3: chưa làm"])
+
+    def test_khong_nhan_vo_output_cua_runner_khac(self):
+        for ten in ("pytest-v", "vitest-verbose", "node-test-pass", "unittest-v"):
+            with self.subTest(fixture=ten):
+                self.assertNotEqual(parse(fx(ten)).format, "playwright-list")

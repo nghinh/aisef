@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.27 — 2026-09-09
+
+- **Playwright test names are read now** (bug 43). Its `list` reporter prints
+  every test name, but the parser did not know the shape, so `criteria have
+  tests`, `coverage`, `no baseline regression` and `tests verify story` all
+  scored *unconfigured* on every Playwright project — and told the operator to
+  switch to a reporter that prints names, which theirs already did. Playwright
+  is the runner this framework drives for mockup and e2e checks, so the gap
+  sat in the middle of its own house. The fixture is real `todo` output.
+
 ## 1.2.26 — 2026-09-09
 
 - **Every gate could read an older run's result** (bug 42). `_next_seq` read

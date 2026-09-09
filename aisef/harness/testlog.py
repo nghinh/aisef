@@ -82,6 +82,12 @@ class TestLog:
         return out
 
 
+#: Playwright's `list` reporter: `  ✓   3 file.spec.js:26:1 › name (217ms)`.
+#: The status glyph, the ordinal, `path:line:col`, ` › `, then the title.
+#: A skipped test is `-`, a failure `✘`; an ANSI-stripped line keeps them.
+_PW = re.compile(r"^\s*([✓✘×✕⊘-])\s+\d+\s+\S+?:\d+:\d+\s+›\s+(.+?)(?:\s+\(\d+(?:\.\d+)?m?s\))?\s*$")
+
+
 def parse(text: str) -> TestLog:
     lines = _ANSI.sub("", text or "").splitlines()
     log = TestLog()
@@ -100,6 +106,8 @@ def parse(text: str) -> TestLog:
         _node_spec(lines, log)
     elif any(l.startswith(" RUN  v") or l.strip().startswith("Test Files") for l in lines):
         _vitest(lines, log)
+    elif any(_PW.match(l) for l in lines):
+        _playwright(lines, log)
     elif any(_UNITTEST_RAN.match(l) for l in lines):
         _unittest(lines, log)
     elif any("test session starts" in l or _PYTEST.match(l) or "short test summary" in l for l in lines):
@@ -172,6 +180,27 @@ def _node_spec(lines: list[str], log: TestLog) -> None:
             suites.remove((indent, name.strip()))   # closing suite line, not a test
             continue
         _add(log, name, {"✔": "pass", "✖": "fail", "﹣": "skip"}[sym])
+
+
+def _playwright(lines: list[str], log: TestLog) -> None:
+    """Playwright `--reporter=list`.
+
+    Playwright is the runner this framework itself drives for mockup and e2e
+    checks, and its default reporter prints every test name — but the parser
+    did not know the shape, so `criteria have tests`, `coverage`,
+    `no baseline regression` and `tests verify story` all scored
+    *unconfigured* on every Playwright project. Measured on `todo`
+    2026-09-09: 20 named tests in the output, 0 read.
+
+    Interleaved server logs are common (`[WebServer] ... "GET / HTTP/1.1"`)
+    and simply do not match.
+    """
+    log.format = "playwright-list"
+    mark = {"✓": "pass", "✘": "fail", "×": "fail", "✕": "fail", "⊘": "skip", "-": "skip"}
+    for line in lines:
+        m = _PW.match(line)
+        if m:
+            _add(log, m.group(2), mark[m.group(1)])
 
 
 def _node_tap(lines: list[str], log: TestLog) -> None:
