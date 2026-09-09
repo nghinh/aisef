@@ -136,14 +136,14 @@ class TestGiaiTenLenh(unittest.TestCase):
         from unittest import mock
         from aisef.clients.base import resolve_binary
         with mock.patch("shutil.which", return_value="/usr/local/bin/opencode"), \
-             mock.patch("aisef.clients.base.os.name", "posix"):
+             mock.patch("aisef.clients.base.sys.platform", "linux"):
             self.assertEqual(resolve_binary("opencode"), ["/usr/local/bin/opencode"])
 
     def test_windows_shim_cmd_chay_qua_cmd_exe(self):
         from unittest import mock
         from aisef.clients.base import resolve_binary
         with mock.patch("shutil.which", return_value=r"C:\npm\opencode.cmd"), \
-             mock.patch("aisef.clients.base.os.name", "nt"), \
+             mock.patch("aisef.clients.base.sys.platform", "win32"), \
              mock.patch.dict("os.environ", {"COMSPEC": r"C:\Windows\cmd.exe"}):
             self.assertEqual(resolve_binary("opencode"),
                              [r"C:\Windows\cmd.exe", "/c", r"C:\npm\opencode.cmd"])
@@ -152,7 +152,7 @@ class TestGiaiTenLenh(unittest.TestCase):
         from unittest import mock
         from aisef.clients.base import resolve_binary
         with mock.patch("shutil.which", return_value=r"C:\bin\opencode.exe"), \
-             mock.patch("aisef.clients.base.os.name", "nt"):
+             mock.patch("aisef.clients.base.sys.platform", "win32"):
             self.assertEqual(resolve_binary("opencode"), [r"C:\bin\opencode.exe"])
 
 

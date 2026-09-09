@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import os
 import shutil
+import sys
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from dataclasses import dataclass, field
@@ -129,7 +130,12 @@ def resolve_binary(name: str) -> list[str]:
     path = shutil.which(name)
     if not path:
         return []
-    if os.name == "nt" and Path(path).suffix.lower() in (".cmd", ".bat"):
+    # `os.path.splitext`, not `Path`: building a `Path` from a Windows string
+    # picks the running OS's flavour, and a test that fakes `os.name` then
+    # asks pathlib for a `WindowsPath` on Linux — green on 3.14, an error on
+    # 3.11/3.12 where pathlib reads `os.name` at instantiation (CI, bug 29's
+    # class again).
+    if sys.platform == "win32" and os.path.splitext(path)[1].lower() in (".cmd", ".bat"):
         return [os.environ.get("COMSPEC", "cmd.exe"), "/c", path]
     return [path]
 
