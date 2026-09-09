@@ -405,7 +405,11 @@ class TestGitKhongCamCredentialCuaMay(unittest.TestCase):
                 doi_chung = subprocess.run(["git", "push", url, "HEAD"], cwd=repo, env=base,
                                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
                 self.assertNotEqual(doi_chung.returncode, 0)
-                self.assertTrue(any(srv.seen), "đối chứng: helper `store` phải gửi token, không thì fixture vô nghĩa")
+                self.assertTrue(
+                    any(srv.seen),
+                    "đối chứng: helper `store` phải gửi token, không thì fixture vô nghĩa. "
+                    f"requests={srv.seen!r} rc={doi_chung.returncode} "
+                    f"stderr={doi_chung.stderr.strip()[-600:]!r}")
                 srv.seen.clear()
 
                 with mock.patch.dict(os.environ, base, clear=True):
