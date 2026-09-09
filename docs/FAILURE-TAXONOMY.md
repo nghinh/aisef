@@ -100,6 +100,15 @@ lỗi 22–25 còn có số đo ở `docs/ADR-004-evidence-driven-epic-improveme
    ở chế độ văn bản đổi `\n` thành `\r\n`, `git-credential-store` đọc ra một
    host có cổng kết thúc bằng ký tự xuống dòng nên không khớp gì).
 
+7. **Pha treo thì dựng lại prompt và gọi thẳng client trước khi nghi harness.**
+   Pha `ux` của `todo-e3` hỏng 5 lượt (3 × `SSE read timed out`, 1 × tự báo
+   `blocked`). Đổ đúng prompt ấy vào `opencode run` **không qua harness**: 10
+   phút, 128 KB sự kiện, **0 lần gọi write** — 10 read, 3 glob, 2 todowrite,
+   1 `serena_initial_instructions` (MCP trong cấu hình toàn cục của máy). Agent
+   đi khám phá chứ không sản xuất; harness phân loại infra và thử lại đúng.
+   Một phép đo 10 phút thay cho hàng giờ đọc mã. (Client kia cũng không cứu
+   được: `claude` trả 401 — phiên con không có credential, hạn chế S1 đã biết.)
+
 ## Khi thêm lỗi mới
 
 Một dòng vào bảng trên (lớp, câu hỏi, số lỗi, phép hồi quy) **cùng commit**
