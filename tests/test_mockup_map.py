@@ -301,3 +301,43 @@ def _free_port() -> int:
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestDoiTenNhanThiPhaiNoiRa(unittest.TestCase):
+    """Lỗi 44. Đổi tên nhãn là cách phổ biến nhất khiến một component "biến
+    mất", và nói mỗi "missing" đẩy tác giả đi tìm một trường đang nằm ngay
+    trên màn hình trước mặt.
+
+    Đo trên todo/STORY-02-01 2026-09-09: cổng báo `missing: textbox
+    "Description"` suốt 3 lượt, trong khi `textbox "Description (optional)"`
+    nằm sẵn trong `extra` cả ba lần. Story cạn lượt.
+    """
+
+    def _ket_qua(self, ten_that: str):
+        from aisef.harness.aria import Component, compare
+        return compare(
+            [Component(role="textbox", name="Description"),
+             Component(role="button", name="Add Task")],
+            [Component(role="textbox", name=ten_that),
+             Component(role="button", name="Add Task")],
+            screen_id="todo-list",
+        )
+
+    def test_chi_ra_ten_dang_hien(self):
+        r = self._ket_qua("Description (optional)")
+        self.assertEqual(r.renamed(), [('textbox "Description"',
+                                        'textbox "Description (optional)"')])
+        self.assertIn("Description (optional)", r.summary())
+        self.assertIn("re-approve", r.summary())
+        self.assertEqual(r.to_evidence()["renamed"],
+                         [['textbox "Description"', 'textbox "Description (optional)"']])
+
+    def test_khong_ghep_bua_thu_khong_lien_quan(self):
+        r = self._ket_qua("Ngày hết hạn")
+        self.assertEqual(r.renamed(), [], "hai tên không liên quan thì không được đoán")
+
+    def test_khong_ghep_khac_vai(self):
+        from aisef.harness.aria import Component, compare
+        r = compare([Component(role="textbox", name="Description")],
+                    [Component(role="heading", name="Description")], screen_id="s")
+        self.assertEqual(r.renamed(), [], "cùng tên khác vai không phải đổi tên")

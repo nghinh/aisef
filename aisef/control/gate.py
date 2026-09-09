@@ -581,6 +581,14 @@ def evaluate(
                     f"{failed[0]} missing: "
                     + ", ".join(first.get("missing", []) + first.get("missing_data_roles", []))
                 )
+                # Name the near-match. "missing textbox X" sends the author
+                # hunting for a field that is on the screen under another
+                # label — todo/STORY-02-01 spent all three attempts that way.
+                doi_ten = first.get("renamed") or []
+                if doi_ten:
+                    detail += " — on screen as " + ", ".join(
+                        f"{co}" for _, co in doi_ten
+                    ) + "; the mockup pins the accessible name (rename back, or change the mockup and re-approve)"
             if failed:
                 gate.checks.append(Check("mockup map", False, detail, evidence=doc_map))
             elif khong_chay:

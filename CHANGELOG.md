@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.28 — 2026-09-09
+
+- **"Missing component" now names the component it was renamed to** (bug 44).
+  todo/STORY-02-01 spent all three attempts on `mockup map ✗ missing: textbox
+  "Description"` while `textbox "Description (optional)"` sat in the evidence's
+  `extra` list every single time — the agent had read the story's "optional
+  Description" as label text. A renamed label is the most common way a
+  component goes missing, and reporting only the absence sends the author
+  hunting for a field that is on the screen in front of them. The gate and the
+  result summary now pair them and say which one the mockup pins.
+
 ## 1.2.27 — 2026-09-09
 
 - **Playwright test names are read now** (bug 43). Its `list` reporter prints

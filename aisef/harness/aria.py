@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from difflib import SequenceMatcher
 
 #: Roles that carry a contract. Pure `text:` nodes and layout nodes are
 #: ignored: they are presentation details, not what the mockup commits to.
@@ -69,6 +70,28 @@ class MapResult:
         """
         return not self.missing and not self.missing_data_roles
 
+    def renamed(self) -> list[tuple[str, str]]:
+        """Missing components that look like something the app **does** render
+        under a different name.
+
+        A renamed label is the most common way a component goes missing, and
+        saying only "missing" sends the author looking for a field that is on
+        the screen in front of them: todo/STORY-02-01 2026-09-09 burned three
+        attempts on `missing: textbox "Description"` while
+        `textbox "Description (optional)"` sat in `extra` the whole time.
+        The mockup pins the accessible name — that is the point of it — so the
+        fix is to rename back or re-approve the mockup, and the message has to
+        say which two names are in play.
+        """
+        out = []
+        for m in self.missing:
+            gan = [e for e in self.extra if e.role == m.role and (
+                m.name in e.name or e.name in m.name
+                or SequenceMatcher(None, m.name.lower(), e.name.lower()).ratio() >= 0.75)]
+            if gan:
+                out.append((str(m), str(gan[0])))
+        return out
+
     def to_evidence(self) -> dict:
         return {
             "screen_id": self.screen_id,
@@ -78,6 +101,7 @@ class MapResult:
             "missing": [str(c) for c in self.missing],
             "missing_data_roles": self.missing_data_roles,
             "extra": [str(c) for c in self.extra],
+            "renamed": [list(x) for x in self.renamed()],
             "passed": self.passed,
         }
 
@@ -86,6 +110,10 @@ class MapResult:
         parts = [f"{self.screen_id or 'screen'}: {verdict} ({self.matched}/{len(self.contract)})"]
         if self.missing:
             parts.append("  missing: " + ", ".join(str(c) for c in self.missing))
+        for thieu, thay in self.renamed():
+            parts.append(
+                f"  {thieu} is on screen as {thay} — the mockup pins the accessible "
+                f"name: rename it back, or change the mockup and re-approve")
         if self.missing_data_roles:
             # An empty list is the usual cause, not a missing feature: the
             # mockup shows sample rows, the app at a bare URL has none. Say
