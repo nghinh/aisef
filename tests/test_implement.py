@@ -20,7 +20,7 @@ sys.path.insert(0, str(ROOT))
 import tests  # noqa: E402,F401 — HostProvider vào chỗ docker, không mở container (tests/__init__.py)
 
 from aisef.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
-from aisef.clients.stream import RunResult  # noqa: E402
+from aisef.clients.stream import RunResult, ToolUse  # noqa: E402
 from aisef.config import DEFAULTS, Config  # noqa: E402
 from aisef.control.normalize import Story, parse_architecture_file  # noqa: E402
 from aisef.harness.guardrails import (  # noqa: E402
@@ -1370,6 +1370,33 @@ class TestLuotKhongVietGiThiKhongPhaiUngVien(ImplementTestCase):
         im = [a for a in report.attempts if "wrote nothing" in a.error]
         self.assertTrue(im, "phải nói thẳng phiên đã không viết gì")
         self.assertTrue(im[0].infra, "story chưa từng được chấm thì đừng tính lượt của nó")
+
+    def test_luot_dau_im_lang_cung_khong_phai_ung_vien(self):
+        """`todo-e2e` STORY-03-01 10/09: im lặng ngay **lượt đầu** — chưa có
+        việc của lượt trước nên diff rỗng, phép chẩn cũ đòi `tool_uses == 0`
+        nên không nổ, và cổng vẫn chạy: 4 mục đỏ cho **một** nguyên nhân, mở
+        đầu bằng "guard did not evaluate any write … hook cannot reach
+        worktree?" — đẩy người đọc đi tìm một lỗi hook không tồn tại."""
+
+        class ImNgayTuDau(ScriptedClient):
+            def run(inner, spec):
+                dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
+                if not dau.startswith("# Review") and not dau.startswith("# Security review"):
+                    inner.calls.append("develop")
+                    # Có gọi công cụ (đọc code) nhưng không ghi gì — khác hẳn
+                    # ca "0 tool call" mà phép chẩn zero-output đã bắt.
+                    return RunResult(ok=True, text="không có gì để sửa", cost_usd=0.4,
+                                     num_turns=7, output_tokens=870,
+                                     tool_uses=[ToolUse(name="Read", tool_use_id="t1", input={})])
+                return super().run(spec)
+
+        client = ImNgayTuDau()
+        report = self.chay(client)
+        self.assertEqual(self.so_lan_ra_soat(), 0, "không viết gì thì không có gì để rà soát")
+        self.assertEqual(client.calls.count("security"), 0)
+        self.assertTrue(all(a.infra for a in report.attempts), report.summary())
+        self.assertIn("main branch", report.attempts[0].error,
+                      "phải chỉ chỗ đáng nghi khi diff rỗng ngay từ đầu")
 
     def test_luot_co_viet_that_van_duoc_cham_binh_thuong(self):
         """Chỉ *phiên im lặng* mới bị chặn; lượt sửa thật vẫn đi qua cổng.
