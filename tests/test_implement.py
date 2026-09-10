@@ -57,6 +57,7 @@ class ScriptedClient(ClientAdapter):
         self.fail_first = fail_first
         self.fail_error = fail_error
         self.calls: list[str] = []
+        self.develop_calls = 0
         self.envs: list[dict] = []
         self.settings_files: list = []
 
@@ -90,13 +91,20 @@ class ScriptedClient(ClientAdapter):
         if is_review:
             return RunResult(ok=True, text=self.review, cost_usd=0.3)
 
+        self.develop_calls += 1
         for rel in self.writes:
             path = Path(spec.workdir) / rel
             path.parent.mkdir(parents=True, exist_ok=True)
             # File test thì viết như một file test — nội dung quyết định
             # phép kiểm "test giả" có bắt được hay không.
             body = "def test_x():\n    pass\n" if "test_" in path.name else "x = 1\n"
-            path.write_text(body, encoding="utf-8")
+            # Từ lượt **thứ hai** trở đi viết ra nội dung khác — agent thật
+            # thử lại thì sửa khác đi. Ghi lại y hệt là không sửa gì, và
+            # harness nay nói đúng như thế (lỗi 68), nên một agent giả ghi lặp
+            # sẽ không còn mô tả được một lượt thử lại. Lượt đầu giữ nguyên
+            # văn để các phép so nội dung sẵn có vẫn đọc được.
+            them = "" if self.develop_calls == 1 else f"# lượt {self.develop_calls}\n"
+            path.write_text(body + them, encoding="utf-8")
         return RunResult(ok=True, text="xong", cost_usd=1.0)
 
 
@@ -883,7 +891,9 @@ class TestNguoiRaSoatKhongDuocSuaCay(ImplementTestCase):
         self._init_git()
         out = self.implement(self.SecurityGhi())
         # src/a.py do developer giả viết ("x = 1"); security sửa → phải về như cũ
-        self.assertEqual((self.project / "src" / "a.py").read_text(encoding="utf-8"), "x = 1\n")
+        noi_dung = (self.project / "src" / "a.py").read_text(encoding="utf-8")
+        self.assertTrue(noi_dung.startswith("x = 1\n"), noi_dung)
+        self.assertNotIn("bi sua", noi_dung, "phải hoàn nguyên bản security đã ghi đè")
         self.assertIn("modified the working tree", out.attempts[-1].security.error)
 
     def test_reviewer_ngoan_khong_bi_dung(self):
@@ -981,6 +991,12 @@ class TestBaselineTruocKhiSua(ImplementTestCase):
             r = super().run(spec)
             if spec.env.get(ENV_STORY_ID):
                 (Path(spec.workdir) / "src" / "ket-qua.txt").write_text(self.sau, encoding="utf-8")
+                # Mỗi phiên developer để lại dấu riêng: kịch bản này cố ý cho
+                # ra **cùng** kết quả test ở mọi lượt, mà ghi lại y hệt thì
+                # harness gọi đúng tên là "phiên không viết gì" (lỗi 68) và
+                # không chấm nữa — lượt thử lại sẽ biến mất khỏi phép đo.
+                (Path(spec.workdir) / "src" / "luot.txt").write_text(
+                    str(self.develop_calls), encoding="utf-8")
             return r
 
     def chay(self, sau, **over):
@@ -1298,3 +1314,87 @@ class TestLuotBiNgatGiuLaiLoiRaSoat(ImplementTestCase):
     def test_luot_truoc_qua_ra_soat_thi_khong_giao_lai(self):
         self._ghi(self._head(), [])
         self.assertEqual(_unfinished_review(self.artifacts, "STORY-01-01", self.project), "")
+
+
+class TestLuotKhongVietGiThiKhongPhaiUngVien(ImplementTestCase):
+    """Lỗi 68. `changed_files` đo với `base_ref`, nên ở lượt thử lại nó mang
+    theo việc của lượt trước: một phiên viết **0 tệp** trông y như một phiên
+    viết 2 tệp. `todo-e2e` STORY-02-01 10/09: agent chạy 7 turn, sửa 0 dòng,
+    harness vẫn đóng băng ứng viên rồi trả tiền cho cả verify + review +
+    security trên đúng cái cây nó vừa rà soát xong — và tính cho story một
+    lượt."""
+
+    class ImLang(ScriptedClient):
+        """Lượt 1 viết code; từ lượt 2 trở đi không đụng vào tệp nào."""
+
+        def __init__(self, **kw):
+            super().__init__(**kw)
+            self.develop_turns = 0
+
+        def run(self, spec):
+            dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
+            if not dau.startswith("# Review") and not dau.startswith("# Security review"):
+                self.develop_turns += 1
+                if self.develop_turns > 1:
+                    self.calls.append("develop")
+                    return RunResult(ok=True, text="đã xem, không cần sửa", cost_usd=0.4,
+                                     num_turns=7, output_tokens=1616)
+            return super().run(spec)
+
+    def setUp(self):
+        super().setUp()
+        for cmd in (["git", "config", "user.email", "t@t.t"],
+                    ["git", "config", "user.name", "T"],
+                    ["git", "commit", "-q", "--allow-empty", "-m", "nen"]):
+            subprocess.run(cmd, cwd=self.project, check=True)
+        from aisef.control.worktree import WorktreeManager
+        self.tree = WorktreeManager(self.project).create(self.story.id)
+
+    def so_lan_ra_soat(self) -> int:
+        """Số **ứng viên** đã được rà soát — không phải số lần gọi client: một
+        bản rà soát thiếu khối JSON bị hỏi lại đúng một lần (SCHEMA_REMINDER),
+        nên đếm lời gọi sẽ đếm đôi."""
+        return len(EvidenceStore(self.artifacts).read(self.story.id).of(TOOL_RUN, "review"))
+
+    def chay(self, client):
+        return implement_story(
+            self.story, project=self.project, workdir=self.tree.path,
+            artifact_root=self.artifacts, client=client, config=self.config())
+
+    def test_khong_ra_soat_lai_cay_y_het_va_khong_tinh_luot(self):
+        client = self.ImLang(writes=("src/a.py", "tests/test_a.py"),
+                             review="[chặn] src/a.py:1 — thiếu kiểm tra")
+        report = self.chay(client)
+        self.assertEqual(self.so_lan_ra_soat(), 1,
+                         "cây không đổi thì không có gì mới để rà soát")
+        im = [a for a in report.attempts if "wrote nothing" in a.error]
+        self.assertTrue(im, "phải nói thẳng phiên đã không viết gì")
+        self.assertTrue(im[0].infra, "story chưa từng được chấm thì đừng tính lượt của nó")
+
+    def test_luot_co_viet_that_van_duoc_cham_binh_thuong(self):
+        """Chỉ *phiên im lặng* mới bị chặn; lượt sửa thật vẫn đi qua cổng.
+
+        Ghi lại **đúng nội dung cũ** cũng là không đổi: cây y hệt thì cổng
+        cho lại đúng kết quả cũ, nên phép so là nội dung, không phải lời kể
+        của agent."""
+
+        class SuaThat(ScriptedClient):
+            def __init__(inner, **kw):
+                super().__init__(**kw)
+                inner.vong = 0
+
+            def run(inner, spec):
+                dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
+                if not dau.startswith("# Review") and not dau.startswith("# Security review"):
+                    inner.vong += 1
+                    if inner.vong > 1:
+                        inner.calls.append("develop")
+                        (Path(spec.workdir) / "src" / "a.py").write_text(
+                            f"x = {inner.vong}\n", encoding="utf-8")
+                        return RunResult(ok=True, text="đã sửa", cost_usd=1.0)
+                return super().run(spec)
+
+        client = SuaThat(writes=("src/a.py", "tests/test_a.py"),
+                         review="[chặn] src/a.py:1 — thiếu kiểm tra")
+        self.chay(client)
+        self.assertEqual(self.so_lan_ra_soat(), 2, "hai lượt sửa thật, hai lần rà soát")

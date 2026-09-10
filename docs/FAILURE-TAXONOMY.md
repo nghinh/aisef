@@ -85,6 +85,8 @@ lỗi 22–25 còn có số đo ở `docs/ADR-004-evidence-driven-epic-improveme
 
 | — | — | *Quan sát, chưa sửa:* prompt rà soát nói "nếu tác giả kêu tiêu chí bất khả thi thì hãy thẩm tra", nhưng tác giả **không có kênh nào** để kêu: `story-implement.md` không hề nhắc `[stuck]`, và lời nhắn cuối của tác giả không nằm trong slot nào của người rà soát. Nửa hợp đồng chưa được viết. Chưa dựng kênh ấy vì luật mới (67) đã đóng được ca đo được — dựng khi nào đo thấy cần | | | |
 
+| 68 | H/E | `todo-e2e` STORY-02-01 lượt 1 (10/09 10:38): agent chạy 7 turn, **sửa 0 dòng** — cây y hệt bản vừa bị rà soát xong — mà harness vẫn ghi `changed_files=2`, đóng băng ứng viên, chạy đủ nop + test + lint + e2e + a11y + mockup + review + security, rồi tính cho story một lượt trong ngân sách ba lượt | `changed_files` đo với `base_ref`, tức trả lời câu *"story này đổi những gì"* — đúng cho diff giao người rà soát. Nó bị dùng thay cho câu khác: *"phiên vừa rồi viết được gì"*. Ở lượt thử lại, việc của lượt trước nằm sẵn trong diff nên một phiên im lặng trông y như một phiên viết hai tệp. Phép chẩn "zero-output" có sẵn cũng không nổ, vì nó đòi `changed_now` rỗng | hai câu hỏi khác nhau thì phải có hai phép đo. Cây không đổi thì cổng cho lại đúng kết quả cũ — trả tiền để biết lại điều đã biết, và tính cho story một lượt vì máy im lặng | `test_implement.TestLuotKhongVietGiThiKhongPhaiUngVien` |
+
 ## Bài học vận hành đi kèm
 
 1. **Đo trước khi kết luận, và đo cả thứ vô can.** Lỗi 14 được "tìm ra" khi

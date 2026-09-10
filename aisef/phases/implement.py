@@ -575,6 +575,13 @@ def run_attempt(
     # branch stayed unchanged -- gate only reported "empty diff" while rogue
     # code was already on trunk.
     before_sha = head_sha(project) if workdir != project else ""
+    # What *this session* writes, as opposed to what the story changes.  The
+    # diff against `base_ref` answers the second question and carries a
+    # previous attempt's work with it, so it cannot answer the first.
+    # Both halves are needed: `_tree_snapshot` sees only files git reports as
+    # dirty, so an agent that commits its own work -- which the prompt asks
+    # for -- leaves a clean tree and would look silent.
+    tree_before = (head_sha(workdir), _tree_snapshot(workdir))
 
     _attach_settings(spec, project)
     from ..harness.runlog import run_log
@@ -644,6 +651,25 @@ def run_attempt(
             f"story={story.id}#{number} ZERO-OUTPUT: {result.output_tokens} tokens, "
             f"0 tool calls, 0 files. Response: {snippet!r}"
         ))
+        return attempt
+
+    # An attempt that wrote nothing is not a candidate.  `changed_now` is the
+    # diff against the base branch, so on a retry it shows the *previous*
+    # attempt's work and this session's silence looks like two changed files
+    # (todo-e2e/STORY-02-01 2026-09-10: 7 turns, 0 edits, and the harness paid
+    # for a full verify + review + security pass on a tree byte-identical to
+    # the one it had just reviewed -- then charged the story an attempt for
+    # it).  Re-measuring identical code returns the identical verdict; the
+    # only new information is that the author produced nothing.
+    if changed_now and (head_sha(workdir), _tree_snapshot(workdir)) == tree_before:
+        attempt.error = (
+            f"the session wrote nothing ({result.num_turns} turns): the tree is "
+            f"identical to the one already reviewed. Re-running the gate on it "
+            f"would return the verdict it already returned."
+        )
+        attempt.infra = True   # the story was never scored, so do not charge it
+        run_log(artifact_root, f"story={story.id}#{number} NO-OP: "
+                               f"{result.num_turns} turns, 0 files written")
         return attempt
     run_log(artifact_root, f"story={story.id}#{number} changed_files={len(changed_now)}")
     attempt.candidate = freeze_candidate(
