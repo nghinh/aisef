@@ -44,7 +44,7 @@ from .tdd import red_before_green
 from .security import DEFAULT_BLOCKING
 from ..harness.observe import FILE_CHANGE, GUARD_BLOCK, GUARD_SEEN, MOCKUP_MAP, NOTE, TOOL_RUN, Event, Evidence
 from ..harness.testlog import MAX_IDS
-from ..harness.tools import BASELINE_RUN, NO_SETUP, NOP_RUN
+from ..harness.tools import BASELINE_RUN, NO_MANIFEST, NO_SETUP, NOP_RUN
 
 #: Story gate check names — **closed** list (ADR-005 V9). Every `Check(...)` in
 #: this file must use a name from here (test meta grep AST), and each name has
@@ -426,7 +426,7 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
         # it is the strongest form of the answer this control asks for. A
         # greenfield project's first story creates the manifest, so the tests
         # provably cannot have been green before it.
-        if str(d["unrunnable"]).startswith(NO_SETUP):
+        if str(d["unrunnable"]) == NO_MANIFEST:
             return check_result(True, f"parent SHA {str(d.get('parent') or '')[:7] or 'cha'} has nothing to run — "
                                       "the story's tests cannot have been green there")
         return check_result(Outcome.UNRUNNABLE,

@@ -544,6 +544,16 @@ class TestDuAnMoiTinh(GateTestCase):
         self.assertIs(m.outcome, Outcome.PASSED, m.detail)
         self.assertIn("nothing to run", m.detail)
 
+    def test_missing_dependencies_do_not_prove_nop_failure(self):
+        self.store.file_change("S-01", "src/a.py")
+        store = EvidenceStore(self._tmp.name, candidate="aaa")
+        store.tool_run("S-01", "test", ok=True)
+        store.tool_run("S-01", "test:nop", ok=False, detail={
+            "nop": True, "parent": "cha0000", "files": ["tests/a.py"],
+            "unrunnable": self.KHONG_PHU_THUOC})
+        result = self.muc("tests verify story", acceptance=1)
+        self.assertIs(result.outcome, Outcome.UNRUNNABLE)
+
     def test_baseline_khong_co_du_an_thi_khong_ap_dung(self):
         self.store.tool_run("S-01", "test:baseline", ok=False, detail={
             "baseline": True, "unrunnable": self.KHONG_DU_AN})

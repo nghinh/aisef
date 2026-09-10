@@ -316,6 +316,7 @@ NO_DEPENDENCIES = ("cannot find module", "cannot find package",
 #: Stable prefix shared by both, so callers can tell "this commit has nothing
 #: to run" from "this machine is missing the tool".
 NO_SETUP = "no runnable setup in this tree"
+NO_MANIFEST = f"{NO_SETUP} — there is no project manifest here"
 
 
 def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error: str = "") -> str:
@@ -335,7 +336,7 @@ def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error:
         if parse_testlog(output).passed:
             return ""
     if hit == "no such file or directory" and any(m in low for m in MANIFESTS):
-        return f"{NO_SETUP} — there is no project manifest here"
+        return NO_MANIFEST
     if any(m in low for m in NO_DEPENDENCIES):
         return (f"{NO_SETUP} — the project's dependencies are not installed here; "
                 "install them at the **project root**, which is where a clean "
