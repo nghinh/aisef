@@ -165,16 +165,47 @@ class TestVongDoi(unittest.TestCase):
         self.assertEqual(back.entries["s"].used_in, ["STORY-09"])
 
 
-@unittest.skipUnless(
-    Path("/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/"
-         "736b2d5e-78a8-4969-b1e7-1de43eca981e/scratchpad/e9/.claude/skills").is_dir(),
-    "cần .claude/skills thật của e9",
-)
+def require_external_skills(root: Path) -> None:
+    if not root.exists() and not root.is_symlink():
+        raise unittest.SkipTest(f"optional external skill fixture absent: {root}")
+    if root.is_dir() and not any(
+            p.is_symlink() or not p.is_dir() for p in root.rglob("*")):
+        raise unittest.SkipTest(f"optional external skill fixture has no files: {root}")
+
+
+class TestExternalSkillFixture(unittest.TestCase):
+    def test_absent_and_directory_only_fixture_skip(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp) / "skills"
+            with self.assertRaises(unittest.SkipTest):
+                require_external_skills(root)
+            (root / "skill" / "references").mkdir(parents=True)
+            with self.assertRaises(unittest.SkipTest):
+                require_external_skills(root)
+
+    def test_partial_or_malformed_present_fixture_does_not_skip(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp) / ".claude" / "skills"
+            root.mkdir(parents=True)
+            (root / "leftover.txt").write_text("partial fixture", encoding="utf-8")
+            require_external_skills(root)
+            case = TestTrenSkillThat("test_dung_duoc_tren_156_skill_that")
+            case.E9 = Path(tmp)
+            with self.assertRaises(AssertionError):
+                case.test_dung_duoc_tren_156_skill_that()
+            make_skill(root, "broken", fm="name: broken\ndescription:\n")
+            require_external_skills(root)
+            self.assertEqual(R.build(Path(tmp)).entries["broken"].status, R.REJECTED)
+            with self.assertRaises(AssertionError):
+                case.test_dung_duoc_tren_156_skill_that()
+
+
 class TestTrenSkillThat(unittest.TestCase):
     E9 = Path("/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/"
               "736b2d5e-78a8-4969-b1e7-1de43eca981e/scratchpad/e9")
 
     def test_dung_duoc_tren_156_skill_that(self):
+        require_external_skills(self.E9 / ".claude" / "skills")
         reg = R.build(self.E9)
         self.assertGreater(len(reg.entries), 100)
         # mỗi bản ghi có provenance và trạng thái hợp lệ
