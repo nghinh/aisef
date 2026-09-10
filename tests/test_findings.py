@@ -50,6 +50,16 @@ class TestMultilineFindings(unittest.TestCase):
     def test_single_line_findings_unchanged(self):
         self.assertEqual(blocking_findings("- [chặn] a\n- [chặn] b\n"), ["[chặn] a", "[chặn] b"])
 
+    def test_the_dan_vao_cuoi_cau_van_la_mot_muc(self):
+        """todo-e2e/STORY-01-02 10/09: mở đầu bằng một câu dẫn rồi dán thẳng
+        thẻ vào sau dấu chấm — `...detect regressions.[block] tests/x.js:217`.
+        Đọc theo đầu dòng thì mục chặn ấy không tồn tại."""
+        f = blocking_findings("Tôi đang đối chiếu bản dựng.[block] tests/x.js:217 — "
+                              "test không chạm tới nhánh lỗi\n")
+        self.assertEqual(len(f), 1)
+        self.assertTrue(f[0].startswith("[block] tests/x.js:217"))
+        self.assertNotIn("đang đối chiếu", f[0])
+
 
 class TestPersistVerdict(unittest.TestCase):
     def test_full_text_is_kept_on_disk(self):
@@ -244,9 +254,24 @@ class TestSchemaVaHoiLai(SchemaTestCase):
         self.assertEqual(len(self._luot_sau(self.NANG_CAP, sha="bbb")), 1)
 
     def test_merge_giu_thu_tu_van_ban_truoc(self):
-        hop, lech = merge_findings(["[chặn] a.py:1 — x"], ["[chặn] a.py:2 — x"])
-        self.assertEqual(hop, ["[chặn] a.py:1 — x"], "cùng tệp cùng thẻ là một mục")
+        hop, lech = merge_findings(["[chặn] a.py:1 — x"], ["[chặn] a.py:1 — x, chữ khác"])
+        self.assertEqual(hop, ["[chặn] a.py:1 — x"], "cùng chỗ cùng thẻ là một mục")
         self.assertFalse(lech)
+
+    def test_ba_muc_cung_tep_khong_bi_gop_thanh_mot(self):
+        """todo-e2e/STORY-01-02 10/09: người rà soát nêu ba mục chặn trong
+        `tests/todo.spec.js`; bản văn mang hai, bản JSON mang ba. Khoá chỉ
+        gồm *tệp* nên hai tập khoá bằng nhau ⇒ hợp hai nguồn kết luận "đã đủ",
+        mục thứ ba biến mất và `review:mismatch` cũng im. Mất một mục chặn là
+        mất cả story; lặp một mục chỉ tốn một dòng trong danh sách sửa."""
+        van_ban = ["[block] tests/todo.spec.js:26 — bỏ qua same-origin",
+                   "[block] tests/todo.spec.js:43 — dùng lại thông báo cũ"]
+        json_ = ["[block] tests/todo.spec.js:217 — không chạm JSON.stringify",
+                 *van_ban]
+        hop, lech = merge_findings(van_ban, json_)
+        self.assertEqual(len(hop), 3, "mục chỉ có ở bản JSON phải được giữ")
+        self.assertIn(":217", " ".join(hop))
+        self.assertTrue(lech, "hai nguồn lệch nhau thì phải ghi lại")
 
 
 class TestSchemaBaoMat(SchemaTestCase):

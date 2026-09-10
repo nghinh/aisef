@@ -1808,16 +1808,28 @@ def persist_verdict(artifact_root: Path | str, story_id: str, role: str, number:
     return path
 
 
+#: A tag the model wrote **mid-line**, glued to whatever came before it.
+#: todo-e2e/STORY-01-02 2026-09-10 opened with "...whether each test can
+#: detect regressions.[block] tests/todo.spec.js:217 -- ..." on one line, and
+#: a parser that only looked at line starts lost that blocker.  Split there.
+_TAG_MO_DAU = re.compile(
+    "(?<=[^\n])(" + "|".join(re.escape(t) for t in _BLOCK_TAGS + _STUCK_TAGS) + ")",
+    re.IGNORECASE)
+
+
 def blocking_findings(text: str) -> list[str]:
     """Extract `[blocker]` and `[stuck]` items from a review report.
 
     An item may span multiple lines: a following line not starting with a
     bullet or a new tag belongs to the previous item (bug 16 -- previously
     only the first line was kept, stuck reasons truncated at "-- no.").
+
+    A tag is an item wherever it starts, not only at the start of a line
+    (`_TAG_MO_DAU`).
     """
     out: list[str] = []
     dang_mo = False
-    for line in (text or "").splitlines():
+    for line in _TAG_MO_DAU.sub(r"\n\1", text or "").splitlines():
         raw = line.rstrip()
         stripped = raw.strip().lstrip("-*• ").strip()
         low = stripped.lower()
@@ -1942,15 +1954,24 @@ def review_verdict(text: str) -> Verdict | None:
     return None
 
 
-def _finding_key(line: str) -> tuple[str, str]:
-    """Reconciliation key between two versions: (tag type, file).
+def _finding_key(line: str) -> tuple[str, str, str]:
+    """Reconciliation key between two versions: (tag type, file, line).
 
     Not compared verbatim: JSON and text versions never match word-for-word,
-    but referring to the same place in the same file means they are one item.
+    but pointing at the same place means they are one item.
+
+    The **place** is file *and* line.  Keying on the file alone -- which this
+    did until todo-e2e/STORY-01-02 2026-09-10 -- makes every finding in one
+    file the same item: the reviewer filed three blockers in
+    `tests/todo.spec.js`, the text version carried two of them, and the union
+    concluded the two covered the three.  The third was dropped, and
+    `review:mismatch` stayed silent because the two key *sets* matched.
+    Losing a blocker costs the story; repeating one costs a line in the fix
+    list.  Callers wanting the file alone take element 1.
     """
     m = re.match(r"\s*\[([^\]]*)\]\s*(\S*)", line or "")
     if not m:
-        return ("", "")
+        return ("", "", "")
     tag = m.group(1).strip().lower()
     kind = tag
     if tag in _JSON_STUCK_TAGS:
@@ -1958,8 +1979,9 @@ def _finding_key(line: str) -> tuple[str, str]:
     elif tag in _JSON_BLOCK_TAGS:
         kind = "block"
     filepath = m.group(2).strip().rstrip(":,;")
+    dong = re.search(r":(\d+(?:-\d+)?)$", filepath)
     filepath = re.sub(r":\d+(-\d+)?$", "", filepath)
-    return (kind, filepath)
+    return (kind, filepath, dong.group(1) if dong else "")
 
 
 def merge_findings(text_items: list[str], json_items: list[str]) -> tuple[list[str], bool]:
