@@ -79,6 +79,8 @@ lỗi 22–25 còn có số đo ở `docs/ADR-004-evidence-driven-epic-improveme
 
 | 65 | G | Cùng lượt ấy: bản văn của người rà soát chỉ cho ra 2/3 mục chặn trước cả khi hợp nguồn | mô hình mở đầu bằng một câu dẫn rồi dán thẳng thẻ vào sau dấu chấm — `...detect regressions.[block] tests/todo.spec.js:217 — ...` trên cùng một dòng. Bộ đọc chỉ nhận thẻ ở **đầu dòng** | định dạng do mô hình sinh không có hợp đồng về xuống dòng; một cái thẻ là một mục ở bất cứ đâu nó bắt đầu | `test_findings.test_the_dan_vao_cuoi_cau_van_la_mot_muc` |
 
+| 66 | H | Chạy lại `todo-e2e` STORY-01-02 sau khi tiến trình bị ngắt: lượt 1 nộp lại đúng bản đã bị từ chối, người rà soát nêu lại **nguyên văn** mục chặn cũ (`tests/todo.spec.js:217`) — mất một lượt trong ngân sách ba lượt chỉ vì bị ngắt | `feedback` là biến cục bộ của vòng thử lại trong `implement_story`, chết theo tiến trình; lời chặn của người rà soát thì nằm trong `evidence` và sống sót. Story chạy lại mở ở lượt 1 với `feedback=""` — bằng chứng còn nguyên nhưng không ai đọc | thứ gì quyết định lượt sau phải sống lâu bằng thứ nó nói về. Trạng thái chỉ nằm trong biến cục bộ là trạng thái mất khi máy dừng — mà máy sẽ dừng | `test_implement.TestLuotBiNgatGiuLaiLoiRaSoat` |
+
 ## Bài học vận hành đi kèm
 
 1. **Đo trước khi kết luận, và đo cả thứ vô can.** Lỗi 14 được "tìm ra" khi

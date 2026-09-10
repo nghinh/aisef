@@ -29,8 +29,9 @@ from aisef.harness.guardrails import (  # noqa: E402
     ENV_WRITE_SCOPE,
 )
 from aisef.clients.stream import INFRA_STATUSES, exit_status_of  # noqa: E402
-from aisef.harness.observe import AGENT_RUN, NOTE, EvidenceStore  # noqa: E402
+from aisef.harness.observe import AGENT_RUN, NOTE, Event, EvidenceStore  # noqa: E402
 from aisef.phases.implement import (  # noqa: E402
+    _unfinished_review,
     blocking_findings,
     build_context,
     implement_story,
@@ -1253,3 +1254,47 @@ class TestBanDoKeHoachChoNguoiRaSoat(ImplementTestCase):
 
     def test_khong_co_chi_muc_thi_noi_ra_chu_khong_de_trong(self):
         self.assertIn("no story index", self.roadmap())
+
+
+class TestLuotBiNgatGiuLaiLoiRaSoat(ImplementTestCase):
+    """Lỗi 66. `feedback` là biến cục bộ của vòng thử lại nên chết theo tiến
+    trình; bằng chứng thì không. Story chạy lại sau khi bị ngắt mở lại ở lượt
+    1 với lời chặn của người rà soát nằm im trong `evidence`, tác giả nộp lại
+    đúng bản đã bị từ chối, người rà soát nêu lại đúng mục ấy — mất một lượt
+    trong ngân sách chỉ vì bị ngắt (todo-e2e/STORY-01-02 10/09)."""
+
+    def setUp(self):
+        super().setUp()
+        for cmd in (["git", "config", "user.email", "t@t.t"],
+                    ["git", "config", "user.name", "T"],
+                    ["git", "commit", "-q", "--allow-empty", "-m", "nen"]):
+            subprocess.run(cmd, cwd=self.project, check=True)
+
+    def _head(self) -> str:
+        return subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.project,
+                              capture_output=True, text=True).stdout.strip()
+
+    def _ghi(self, sha: str, findings: list[str]) -> None:
+        EvidenceStore(self.artifacts, candidate=sha).record("STORY-01-01", Event(
+            kind=NOTE, name="review", ok=not findings,
+            detail={"findings": findings, "attempt": 2}))
+
+    def test_muc_chan_con_lai_duoc_giao_lai_cho_luot_dau(self):
+        self._ghi(self._head(), ["[block] tests/a.spec.js:217 — không chạm JSON.stringify"])
+        fb = _unfinished_review(self.artifacts, "STORY-01-01", self.project)
+        self.assertIn("tests/a.spec.js:217", fb)
+        self.assertIn("still blocking", fb)
+
+    def test_ban_khac_thi_khong_giao_lai(self):
+        """Cây dựng lại từ gốc không mang bản mà lời chặn nói tới."""
+        subprocess.run(["git", "commit", "-q", "--allow-empty", "-m", "khac"],
+                       cwd=self.project, check=True)
+        self._ghi("0" * 40, ["[block] tests/a.spec.js:217 — không chạm JSON.stringify"])
+        self.assertEqual(_unfinished_review(self.artifacts, "STORY-01-01", self.project), "")
+
+    def test_lan_dau_chay_thi_khong_co_gi(self):
+        self.assertEqual(_unfinished_review(self.artifacts, "STORY-01-01", self.project), "")
+
+    def test_luot_truoc_qua_ra_soat_thi_khong_giao_lai(self):
+        self._ghi(self._head(), [])
+        self.assertEqual(_unfinished_review(self.artifacts, "STORY-01-01", self.project), "")

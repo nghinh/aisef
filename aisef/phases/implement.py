@@ -2215,6 +2215,38 @@ def _paths_outside(findings: list[str], scope: list[str]) -> list[str]:
     return out[:3]
 
 
+def _unfinished_review(root: Path, story_id: str, workdir: Path) -> str:
+    """Blocking findings left over from a run that was interrupted.
+
+    `feedback` is a local of the retry loop, so it dies with the process.
+    Evidence does not.  A resumed story therefore opens at attempt 1 with the
+    reviewer's rejection sitting unread in `_bmad-output/evidence`, the author
+    re-submits the candidate that was already rejected, and the reviewer files
+    the same finding again -- one attempt of the budget spent on being
+    interrupted.  Measured on todo-e2e/STORY-01-02 2026-09-10: the resumed
+    attempt drew back `tests/todo.spec.js:217 -- the serialization-error test
+    fails validation before JSON.stringify`, word for word.
+
+    Only while the worktree still carries the candidate they were filed
+    against: reconciliation keeps the branch, but a tree rebuilt from the base
+    has nothing those findings describe.
+    """
+    last = EvidenceStore(root).read(story_id).last(NOTE, "review")
+    if last is None:
+        return ""
+    findings = [str(f) for f in (last.detail.get("findings") or [])]
+    sha = str(last.detail.get("candidate") or "")
+    if not findings or not sha:
+        return ""
+    same = subprocess.run(["git", "merge-base", "--is-ancestor", sha, "HEAD"],
+                          cwd=workdir, capture_output=True, timeout=30)
+    if same.returncode != 0:
+        return ""
+    return ("The run was interrupted after the reviewer had already rejected "
+            "this candidate. These items are still blocking:\n"
+            + "\n".join(f"- {f}" for f in findings[:10]))
+
+
 def implement_story(
     story: Story,
     *,
@@ -2243,7 +2275,7 @@ def implement_story(
     outcome = StoryOutcome(story_id=story.id)
     max_retries = cfg["run.max_retries"]
     infra_budget = max_retries + 1  # infrastructure errors have their own budget
-    feedback = ""
+    feedback = _unfinished_review(root, story.id, workdir)
 
     _log(f"story={story.id} START max_retries={max_retries}")
 
