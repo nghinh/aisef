@@ -1398,6 +1398,39 @@ class TestLuotKhongVietGiThiKhongPhaiUngVien(ImplementTestCase):
         self.assertIn("main branch", report.attempts[0].error,
                       "phải chỉ chỗ đáng nghi khi diff rỗng ngay từ đầu")
 
+    def test_cay_chua_ai_cham_thi_van_phai_cham_du_phien_im_lang(self):
+        """Lỗi 70 — do chính bản vá 68/69 đẻ ra. Kết luận của cổng **không**
+        chỉ phụ thuộc vào cây: nó còn đọc bản đặc tả. `todo-e2e` STORY-03-01
+        10/09: người rà soát chặn `[stuck]` vì AD-9 mâu thuẫn với một tiêu chí
+        đã duyệt; AD-9 được sửa, worktree hợp nhất bản sửa, agent viết 0 dòng
+        vì **việc đã xong**. Bỏ qua ở đây là chôn việc đã làm dưới câu "biết
+        rồi": story cạn ngân sách infra rồi BLOCKED trong khi code đã sẵn."""
+
+        class KhongBaoGioViet(ScriptedClient):
+            def run(inner, spec):
+                dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
+                if not dau.startswith("# Review") and not dau.startswith("# Security review"):
+                    inner.calls.append("develop")
+                    return RunResult(ok=True, text="việc đã xong", cost_usd=0.4,
+                                     num_turns=14, output_tokens=900,
+                                     tool_uses=[ToolUse(name="Read", tool_use_id="t1", input={})])
+                return super().run(spec)
+
+        # Việc của lượt chạy trước nằm sẵn trên nhánh story và **chưa** có kết
+        # luận nào gắn với nó (bản đặc tả vừa đổi sau lần chấm cũ).
+        (self.tree.path / "src").mkdir(parents=True, exist_ok=True)
+        (self.tree.path / "src" / "a.py").write_text("x = 1\n", encoding="utf-8")
+        (self.tree.path / "tests").mkdir(parents=True, exist_ok=True)
+        (self.tree.path / "tests" / "test_a.py").write_text(
+            "def test_x():\n    pass\n", encoding="utf-8")
+        for cmd in (["git", "add", "-A"], ["git", "commit", "-qm", "việc của lượt trước"]):
+            subprocess.run(cmd, cwd=self.tree.path, check=True)
+
+        client = KhongBaoGioViet()
+        self.chay(client)
+        self.assertEqual(self.so_lan_ra_soat(), 1,
+                         "cây có việc mà chưa ai chấm thì phải được chấm")
+
     def test_luot_co_viet_that_van_duoc_cham_binh_thuong(self):
         """Chỉ *phiên im lặng* mới bị chặn; lượt sửa thật vẫn đi qua cổng.
 
