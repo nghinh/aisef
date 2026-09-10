@@ -155,6 +155,16 @@ class TestPromptContent(unittest.TestCase):
         self.assertIn("prescribed and the author implemented is closed", body)
         self.assertIn("[stuck]", body)
 
+    def test_don_thuoc_phai_ke_duoc_trong_pham_vi_ghi(self):
+        """Lỗi 67. `todo-e2e` STORY-02-01: phát hiện đúng — `js/app.js` tự hoàn
+        thiện hình dạng Task — nhưng cách sửa duy nhất là thêm tham số cho
+        `createTask` trong `js/tasks.js`, **ngoài** write_scope của story. Luật
+        `[stuck]` cũ chỉ chạy khi *tác giả* kêu bế tắc, nên người rà soát chặn
+        hai lượt liền vào một việc tác giả không có quyền làm."""
+        body = self.catalog.get("story-review").body
+        self.assertIn("reachable from inside the write scope", body)
+        self.assertIn("not only to what the", body)
+
     def test_nguoi_ra_soat_thay_ca_ke_hoach_va_duoc_dan_khong_cham_luot_khac(self):
         """Lỗi 58. Story "vỏ ứng dụng" có **một** tiêu chí — cấu trúc tài liệu —
         bị chặn ba mục vì chưa có submit handler, chưa đọc localStorage, chưa

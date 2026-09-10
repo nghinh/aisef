@@ -1,6 +1,6 @@
 ---
 name: story-review
-version: 11
+version: 12
 role: reviewer
 ---
 # Review {{ story_id }} — {{ story_title }}
@@ -119,6 +119,18 @@ Blocking the first story for not being the last one blocks the author for
 work they were explicitly told not to do (measured on `todo-e2e`,
 2026-09-09: three `[block]` items on a one-criterion story, all of them
 naming requirements owned by three later stories).
+
+**A fix you prescribe must be reachable from inside the write scope.**
+Before you tag an item `[block]`, name the file the author has to change to
+satisfy you, and check it against the write scope above. If that file is not
+there, the author cannot do what you are asking — blocking them again just
+burns the retry budget on a dead end. Tag it `[stuck]` and say which file the
+fix needs. This applies to what *you* are demanding, not only to what the
+author claimed: a finding whose location is inside the scope can still have
+its only remedy outside it (measured on `todo-e2e` STORY-02-01, 2026-09-10 —
+`js/app.js` completed the Task shape because the domain factory in
+`js/tasks.js`, outside this story's scope, took no `description`; two attempts
+died on a correct finding with no legal fix).
 
 **Criteria that cannot be satisfied from within the story's scope.** If
 the author flagged a criterion as unsatisfiable — because the fix is
