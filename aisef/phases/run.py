@@ -39,7 +39,7 @@ from ..control.journal import (
 from ..control.normalize import Story, parse_architecture_file
 from ..control.preflight import STORY_NOT_EXECUTABLE, check_story, screen_owners
 from ..control.state import StateStore, StoryStatus, TransitionError
-from ..control.worktree import GitError, WorktreeManager
+from ..control.worktree import GitError, RunOwnedError, WorktreeManager, run_ownership
 from ..harness.prompts import load_catalog
 from .implement import StoryOutcome, implement_story, verify_only as verify_only_story
 from .plan import ARTIFACT_ROOT
@@ -431,6 +431,23 @@ def run_sprint(
     sequential: bool = False,
     isolate: bool = True,
 ) -> RunReport:
+    try:
+        with run_ownership(project):
+            return _run_sprint_owned(project, client, config=config, only_epic=only_epic,
+                                     sequential=sequential, isolate=isolate)
+    except RunOwnedError as exc:
+        return RunReport(error=str(exc))
+
+
+def _run_sprint_owned(
+    project: Path | str,
+    client: ClientAdapter,
+    *,
+    config: Config | None = None,
+    only_epic: str = "",
+    sequential: bool = False,
+    isolate: bool = True,
+) -> RunReport:
     """Run an entire sprint: epics sequentially, stories within an epic in waves."""
     from ..harness.runlog import run_log
 
@@ -486,6 +503,22 @@ def run_sprint(
 
 
 def run_verify_only(
+    project: Path | str,
+    client: ClientAdapter,
+    *,
+    story_id: str,
+    config: Config | None = None,
+    repeat: int = 1,
+) -> RunReport:
+    try:
+        with run_ownership(project):
+            return _run_verify_only_owned(project, client, story_id=story_id,
+                                          config=config, repeat=repeat)
+    except RunOwnedError as exc:
+        return RunReport(error=str(exc))
+
+
+def _run_verify_only_owned(
     project: Path | str,
     client: ClientAdapter,
     *,

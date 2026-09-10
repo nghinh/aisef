@@ -46,7 +46,8 @@ from ..control.ledger import GAP, REOPENED, Behavior, Ledger
 from ..control.normalize import Story, verification_paths
 from ..control.preflight import verification_contract
 from ..control.state import StateStore, StoryStatus
-from ..control.worktree import GitError, WorktreeManager
+from ..control.worktree import GitError, RunOwnedError, WorktreeManager, run_ownership
+from ..harness.guardrails import head_sha
 from ..harness.observe import EvidenceStore
 from .implement import plan_defects
 from .plan import ARTIFACT_ROOT
@@ -106,10 +107,11 @@ class ImproveReport:
     gaps_left: list[str] = field(default_factory=list)
     error: str = ""
     reconciled: list = field(default_factory=list)
+    qualification: list[str] = field(default_factory=list)
 
     @property
     def ok(self) -> bool:
-        return not self.error and not self.gaps_left
+        return not self.error and not self.gaps_left and not self.qualification
 
     @property
     def cost_usd(self) -> float:
@@ -378,8 +380,8 @@ def stop_reason(
         return (f"marginal improvement ≤ 0 for {flat_loops} consecutive round(s) "
                 f"({', '.join(r['n'] for r in tail)})")
     spent = sum(float(r.get("cost_usd") or 0.0) for r in rows)
-    if cost_cap and spent > cost_cap:
-        return f"exceeded improve.cost_cap_usd = ${cost_cap:.2f} (spent ${spent:.2f})"
+    if cost_cap and spent >= cost_cap:
+        return f"reached improve.cost_cap_usd = ${cost_cap:.2f} (spent ${spent:.2f})"
     if rows and not auto and approvals.status(Gate.IMPROVE) is not Status.APPROVED:
         return ("awaiting human approval of `improve` gate before round %d: aisef review improve · "
                 "aisef approve improve (or --auto)" % (len(rows) + 1))
@@ -432,6 +434,24 @@ def improve(
     auto: bool = False,
     has_ui: bool = True,
 ) -> ImproveReport:
+    try:
+        with run_ownership(project):
+            return _improve_owned(project, client, epic_id, config=config,
+                                  max_loops=max_loops, auto=auto, has_ui=has_ui)
+    except RunOwnedError as exc:
+        return ImproveReport(epic=epic_id, error=str(exc))
+
+
+def _improve_owned(
+    project: Path | str,
+    client: ClientAdapter,
+    epic_id: str,
+    *,
+    config: Config | None = None,
+    max_loops: int = 0,
+    auto: bool = False,
+    has_ui: bool = True,
+) -> ImproveReport:
     """Run at most `max_loops` rounds (counting rounds from prior calls too) then exit."""
     project = Path(project)
     root = project / ARTIFACT_ROOT
@@ -459,12 +479,35 @@ def improve(
     approvals = ApprovalStore(root)
     evidence = EvidenceStore(root)
 
+    required = set()
+    for raw in read_index(root).get("stories", []):
+        if raw.get("epic_id") == epic_id:
+            required.update(verification_contract(_owner(root, raw["id"])))
+
     pending: Loop | None = None
     while True:
         # Project-level evidence at current HEAD.  One QA run closes the previous
         # round **and** opens the next -- end-to-end QA is expensive, don't run twice.
         label = f"loop-{pending.n}" if pending else BASELINE
-        run_suite(project, config=cfg, has_ui=has_ui, story_id=label, artifact_root=root)
+        candidate = head_sha(project)
+        qa = run_suite(project, config=cfg, has_ui=has_ui, story_id=label,
+                       artifact_root=root, candidate=candidate)
+        report.qualification = []
+        if not candidate or qa.candidate != candidate or head_sha(project) != candidate:
+            report.qualification.append("candidate evidence is missing or stale")
+        if cfg.get("verify.clean_tree", True) and qa.clean_tree != candidate:
+            report.qualification.append("requested clean-tree evidence unavailable")
+        results = {r.kind.id: r for r in qa.results}
+        for kind in sorted(required):
+            result = results.get(kind)
+            if kind not in qa.waived and (result is None or not result.ran):
+                report.qualification.append(f"required evidence missing: {kind}")
+        for result in qa.unrunnable:
+            report.qualification.append(
+                f"infrastructure: {result.kind.id}: {result.unrunnable}")
+        product_failures = [r.kind.id for r in qa.failed]
+        if qa.fake_tests:
+            product_failures.append("fake-tests")
         led = ledger_mod.build(root)
 
         if pending is None:
@@ -491,6 +534,11 @@ def improve(
             cost_cap=cost_cap, auto=auto, approvals=approvals,
             outside=[b for b in gaps if b not in queue],
         )
+        if product_failures and not queue:
+            report.qualification.append(
+                "product checks failed outside auto-repair queue: " + ", ".join(product_failures))
+        if report.qualification:
+            stop = "; ".join(report.qualification)
         if pending is not None:
             spent = sum(float(r.get("cost_usd") or 0.0) for r in _epic_rows(led, epic_id))
             pending.report_path = _write_report(root, epic_id, pending, stop, spent)

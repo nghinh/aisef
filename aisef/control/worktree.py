@@ -99,6 +99,25 @@ def main_repo(path: Path | str) -> Path:
     return common.parent if common.name == ".git" else path
 
 
+class RunOwnedError(RuntimeError):
+    pass
+
+
+@contextmanager
+def run_ownership(project: Path | str) -> Iterator[None]:
+    lock_path = main_repo(project) / ".aisef" / "run.lock"
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    with lock_path.open("a+b") as owner:
+        try:
+            flock_ex_nb(owner.fileno())
+        except BlockingIOError:
+            raise RunOwnedError(f"another run owns {lock_path.parent.parent}") from None
+        try:
+            yield
+        finally:
+            flock_un(owner.fileno())
+
+
 def safe_slug(story_id: str) -> str:
     """Convert a story id into a safe branch/directory name slug."""
     slug = _SAFE.sub("-", story_id).strip("-")

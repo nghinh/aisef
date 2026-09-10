@@ -261,6 +261,114 @@ class TestVongSuaGap(ImproveTestCase):
         self.assertNotIn("loop-", (self.artifacts / L.INDEX_FILE).read_text(encoding="utf-8"))
 
 
+class TestRepairQualification(ImproveTestCase):
+    def test_required_missing_check_stops_without_agent(self):
+        from unittest.mock import patch
+        from aisef.harness.guardrails import head_sha
+        from aisef.phases.qa import QaReport
+
+        client = Fixer(self.artifacts)
+        with patch("aisef.phases.improve.run_suite", return_value=QaReport(
+                candidate=head_sha(self.project))):
+            report = self.improve(client)
+        self.assertFalse(report.ok)
+        self.assertIn("required evidence missing: unit", report.stopped)
+        self.assertEqual(client.develop_calls, [])
+
+    def test_infrastructure_failure_is_not_a_product_repair(self):
+        client = Fixer(self.artifacts)
+        report = self.improve(client, config=self.config(**{
+            "verify.unit": "aisef_nonexistent_test_command"}))
+        self.assertIn("infrastructure", report.stopped)
+        self.assertEqual(client.develop_calls, [])
+
+    def test_stale_candidate_stops_without_agent(self):
+        from unittest.mock import patch
+        from aisef.phases.qa import QaReport
+
+        client = Fixer(self.artifacts)
+        with patch("aisef.phases.improve.run_suite", return_value=QaReport(candidate="old")):
+            report = self.improve(client)
+        self.assertIn("candidate", report.stopped)
+        self.assertFalse(report.ok)
+        self.assertEqual(client.develop_calls, [])
+
+    def test_scripted_client_retry_repair_and_fresh_qa_lifecycle(self):
+        from unittest.mock import patch
+        from tests.test_implement import ScriptedClient
+        from aisef.harness.guardrails import head_sha
+        from aisef.phases.qa import run_suite
+
+        fixer = Fixer(self.artifacts)
+
+        class RepairClient(ScriptedClient):
+            def run(inner, spec):
+                result = super().run(spec)
+                if result.ok and inner.calls[-1] == "develop":
+                    return fixer.run(spec)
+                return result
+
+        client = RepairClient(writes=(), fail_first=1)
+        candidates = []
+
+        def measured(*args, **kwargs):
+            result = run_suite(*args, **kwargs)
+            candidates.append(result.candidate)
+            return result
+
+        with patch("aisef.phases.improve.run_suite", side_effect=measured):
+            report = self.improve(client, config=self.config(**{"run.max_retries": 1}))
+        self.assertTrue(report.ok, report.summary())
+        self.assertEqual(len(report.loops), 2)
+        self.assertEqual(client.calls.count("develop"), 3)
+        self.assertEqual(len(set(candidates)), 3)
+        self.assertEqual(candidates[-1], head_sha(self.project))
+        for loop in report.loops:
+            steps = JournalStore(self.artifacts).read(loop.story_id).steps()
+            self.assertIn("merge.completed", steps)
+
+    def test_product_failure_cannot_be_clean_when_epic_gaps_close(self):
+        report = self.improve(Fixer(self.artifacts), config=self.config(**{
+            "verify.sit": "false"}))
+        self.assertEqual(len(report.loops), 2)
+        self.assertEqual(report.gaps_left, [])
+        self.assertFalse(report.ok)
+        self.assertIn("product checks failed", report.stopped)
+
+    def test_explicit_required_waiver_remains_supported(self):
+        report = self.improve(Fixer(self.artifacts), config=self.config(**{
+            "verify.waived": "unit"}))
+        self.assertTrue(report.ok, report.summary())
+
+    def test_clean_tree_fallback_cannot_qualify_candidate(self):
+        from unittest.mock import patch
+        from aisef.harness.guardrails import head_sha
+        from aisef.phases.qa import KINDS, KindResult, QaReport
+
+        candidate = head_sha(self.project)
+        qa = QaReport(candidate=candidate, tree="agent-tree (fallback)",
+                      results=[KindResult(KINDS["unit"], ran=True, ok=True)])
+        client = Fixer(self.artifacts)
+        with patch("aisef.phases.improve.run_suite", return_value=qa):
+            report = self.improve(client)
+        self.assertFalse(report.ok)
+        self.assertIn("clean-tree evidence", report.stopped)
+        self.assertEqual(client.develop_calls, [])
+
+    def test_exact_cost_cap_does_not_open_another_round(self):
+        from aisef.phases.improve import stop_reason
+
+        led = L.Ledger()
+        led.loops = [
+            {"n": "loop-0", "epic": "EPIC-01"},
+            {"n": "loop-1", "epic": "EPIC-01", "cost_usd": 1.0},
+        ]
+        reason = stop_reason(led, "EPIC-01", [object()], None, max_loops=5,
+                             flat_loops=2, cost_cap=1.0, auto=True,
+                             approvals=ApprovalStore(self.artifacts))
+        self.assertIn("cost_cap_usd", reason)
+
+
 class TestDieuKienDung(ImproveTestCase):
     def test_du_max_loops(self):
         r = self.improve(Fixer(self.artifacts), max_loops=1)

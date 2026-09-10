@@ -15,6 +15,7 @@ import threading
 import time
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -150,6 +151,90 @@ class RunTestCase(unittest.TestCase):
 
     def state(self):
         return StateStore(self.artifacts).load()
+
+
+class TestRunOwnership(RunTestCase):
+    def test_live_owner_blocks_recovery_across_processes(self):
+        from aisef.control.worktree import run_ownership
+
+        sid = "STORY-01-01"
+        state = StateStore(self.artifacts)
+        state.register(sid, "EPIC-01")
+        state.transition(sid, StoryStatus.RUNNING)
+        journal = JournalStore(self.artifacts)
+        journal.record(sid, JEntry(step="attempt.started", attempt=1))
+        manager = WorktreeManager(self.project)
+        tree = manager.create(sid)
+        marker = tree.path / "owner.txt"
+        marker.write_text("active owner", encoding="utf-8")
+        before = journal.path(sid).read_bytes()
+        with run_ownership(self.project):
+            proc = subprocess.run(
+                [sys.executable, "-c",
+                 "import sys; from aisef.phases.run import run_sprint; "
+                 "r=run_sprint(sys.argv[1], None); "
+                 "sys.exit(0 if 'another run owns' in r.error else 1)",
+                 str(self.project)], cwd=ROOT, capture_output=True, timeout=20,
+            )
+        self.assertEqual(proc.returncode, 0, proc.stderr.decode(errors="replace"))
+        self.assertEqual(marker.read_text(encoding="utf-8"), "active owner")
+        self.assertEqual(journal.path(sid).read_bytes(), before)
+        self.assertEqual(state.load().stories[sid].state, StoryStatus.RUNNING)
+
+    def test_lock_releases_after_exception_and_shares_worktree_identity(self):
+        from aisef.control.worktree import RunOwnedError, run_ownership
+
+        tree = WorktreeManager(self.project).create("STORY-01-01")
+        with self.assertRaisesRegex(RuntimeError, "interrupted"):
+            with run_ownership(self.project):
+                with self.assertRaises(RunOwnedError):
+                    with run_ownership(tree.path):
+                        self.fail("worktree bypassed ownership")
+                raise RuntimeError("interrupted")
+        with run_ownership(tree.path):
+            pass
+
+    def test_entrypoint_retains_ownership_during_recovery(self):
+        from aisef.control.worktree import RunOwnedError, run_ownership
+
+        def recover(**kwargs):
+            with self.assertRaises(RunOwnedError):
+                with run_ownership(self.project):
+                    self.fail("ownership released before recovery")
+            raise RuntimeError("recovery interrupted")
+
+        with patch("aisef.phases.run.reconcile_all", side_effect=recover):
+            with self.assertRaisesRegex(RuntimeError, "recovery interrupted"):
+                self.run_sprint(Agent())
+        with run_ownership(self.project):
+            pass
+
+    def test_competing_entrypoints_do_not_reconcile_or_create_worktrees(self):
+        from aisef._compat import flock_ex_nb, flock_un
+        from aisef.phases.improve import improve
+
+        lock_path = self.project / ".aisef" / "run.lock"
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        with lock_path.open("a+b") as owner:
+            flock_ex_nb(owner.fileno())
+            try:
+                for entry, module, kwargs in (
+                    (run_sprint, "aisef.phases.run", {}),
+                    (run_sprint, "aisef.phases.run", {"isolate": False}),
+                    (run_verify_only, "aisef.phases.run", {"story_id": "STORY-01-01"}),
+                    (improve, "aisef.phases.improve", {"epic_id": "EPIC-01"}),
+                ):
+                    with self.subTest(entry=entry.__name__, kwargs=kwargs):
+                        with patch(module + ".WorktreeManager") as worktrees, \
+                                patch(module + ".reconcile_all") as reconcile, \
+                                patch(module + ".load_plan") as plan:
+                            report = entry(self.project, Agent(), config=self.config(), **kwargs)
+                        self.assertIn("another run owns", report.error)
+                        worktrees.assert_not_called()
+                        reconcile.assert_not_called()
+                        plan.assert_not_called()
+            finally:
+                flock_un(owner.fileno())
 
 
 class TestPlanLoading(RunTestCase):
