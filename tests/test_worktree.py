@@ -53,6 +53,60 @@ class WorktreeTestCase(unittest.TestCase):
         git(wt_path, "commit", "-qm", msg)
 
 
+class TestScopeInvariants(WorktreeTestCase):
+    def test_absent_scope_does_not_stage_unrelated(self):
+        from aisef.control.worktree import commit_paths
+
+        (self.repo / "src/base.py").write_text("changed\n")
+        self.assertFalse(commit_paths(self.repo, "scoped", paths=["missing"]))
+        self.assertEqual(git(self.repo, "diff", "--cached", "--name-only"), "")
+
+    def test_deletion_is_staged_alongside_existing_scope(self):
+        from aisef.control.worktree import commit_paths
+
+        (self.repo / "src/base.py").unlink()
+        (self.repo / "new.py").write_text("new\n")
+        self.assertTrue(commit_paths(self.repo, "scoped", paths=["src/base.py", "new.py"]))
+        self.assertEqual(git(self.repo, "status", "--porcelain"), "")
+
+    def test_prestaged_outside_scope_is_preserved_and_rejected(self):
+        from aisef.control.worktree import commit_paths
+
+        (self.repo / ".gitignore").write_text("changed\n")
+        git(self.repo, "add", ".gitignore")
+        before = git(self.repo, "rev-parse", "HEAD")
+        with self.assertRaises(GitError):
+            commit_paths(self.repo, "scoped", paths=["src"])
+        self.assertEqual(git(self.repo, "rev-parse", "HEAD"), before)
+        self.assertEqual(git(self.repo, "diff", "--cached", "--name-only").strip(), ".gitignore")
+
+
+class TestCandidateInvariants(WorktreeTestCase):
+    def test_changed_branch_cannot_merge_verified_sha(self):
+        wt = self.wm.create("S-01")
+        candidate = git(wt.path, "rev-parse", "HEAD").strip()
+        self.commit_in(wt.path, "src/new.py", "unverified\n", "drift")
+        before = git(self.repo, "rev-parse", "HEAD")
+        result = self.wm.merge_story("S-01", expected_candidate=candidate)
+        self.assertFalse(result.merged)
+        self.assertEqual(git(self.repo, "rev-parse", "HEAD"), before)
+
+    def test_dirty_candidate_cannot_merge(self):
+        wt = self.wm.create("S-01")
+        candidate = git(wt.path, "rev-parse", "HEAD").strip()
+        (wt.path / "src/base.py").write_text("unverified\n")
+        self.assertFalse(self.wm.merge_story("S-01", expected_candidate=candidate).merged)
+
+    def test_disjoint_merge_preserves_verified_parent(self):
+        wt = self.wm.create("S-01")
+        self.commit_in(wt.path, "src/story.py", "story\n", "story")
+        candidate = git(wt.path, "rev-parse", "HEAD").strip()
+        self.commit_in(self.repo, "src/main.py", "main\n", "main")
+        result = self.wm.merge_story("S-01", expected_candidate=candidate)
+        self.assertTrue(result.merged)
+        self.assertIn(candidate, git(self.repo, "rev-list", "--parents", "-n", "1", "HEAD"))
+
+
 class TestSlug(unittest.TestCase):
     def test_normal_id(self):
         self.assertEqual(safe_slug("STORY-01-02"), "STORY-01-02")

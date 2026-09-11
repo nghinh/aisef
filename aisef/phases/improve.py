@@ -41,10 +41,20 @@ from ..control import complexity
 from ..control import ledger as ledger_mod
 from ..control.approvals import ApprovalStore, Gate, Status
 from ..control.change import read_index, register_story
-from ..control.journal import reconcile_all
+from ..control.journal import Entry, JournalStore, reconcile_all
 from ..control.ledger import GAP, REOPENED, Behavior, Ledger
 from ..control.normalize import Story, verification_paths
 from ..control.preflight import verification_contract
+from ..control.qualification import (
+    ApprovalSnapshot as QApproval,
+    BehaviorGap as QGap,
+    Inputs as QInputs,
+    PHASE_REPAIR,
+    Profile as QProfile,
+    QaSnapshot as QQa,
+    Verdict as QVerdict,
+    qualify as q_qualify,
+)
 from ..control.state import StateStore, StoryStatus
 from ..control.worktree import GitError, RunOwnedError, WorktreeManager, run_ownership
 from ..harness.guardrails import head_sha
@@ -388,6 +398,48 @@ def stop_reason(
     return ""
 
 
+def _qualification_strings(qa, candidate, queue, verdict: QVerdict,
+                            *, cfg=None, required=()) -> list[str]:
+    """Translate the QA report and the unified verdict into the legacy
+    ``report.qualification`` list — same shape, same readers, single
+    decision underneath. The legacy surface names every cause; the
+    verdict still owns the decision so the two stay consistent."""
+    out: list[str] = []
+    if not candidate or qa.candidate != candidate:
+        out.append("candidate evidence is missing or stale")
+    if (cfg is None or cfg.get("verify.clean_tree", True)) and qa.clean_tree != candidate:
+        out.append("requested clean-tree evidence unavailable")
+    if required and getattr(qa, "waived", None) is not None:
+        results = {r.kind.id: r for r in qa.results}
+        for kind in sorted(required):
+            result = results.get(kind)
+            if kind not in qa.waived and (result is None or not result.ran):
+                out.append(f"required evidence missing: {kind}")
+    product_failures = [r.kind.id for r in qa.failed]
+    if qa.fake_tests:
+        product_failures.append("fake-tests")
+    if product_failures and not queue:
+        out.append("product checks failed outside auto-repair queue: "
+                   + ", ".join(product_failures))
+    for result in qa.unrunnable:
+        out.append(f"infrastructure: {result.kind.id}: {result.unrunnable}")
+    return out
+
+
+def _stop_from_verdict(verdict: QVerdict, qualification: list[str]) -> str:
+    """Translate the unified verdict into the legacy ``stop`` string. Empty
+    when the verdict is "continue" — callers keep the legacy ``stop_reason``
+    text in that case so the marginal-improvement rule remains a single
+    owner. When the verdict flags evidence/candidate reasons, the joined
+    ``report.qualification`` list is the human-readable surface (its lines
+    are what dashboards and tests look for); the verdict reason falls back
+    when the list is empty (e.g. ``HUMAN`` with no list to project)."""
+    if verdict.decision.value in ("repair", "verify", "merge"):
+        return ""
+    joined = "; ".join(qualification)
+    return joined or verdict.reason
+
+
 def _write_report(root: Path, epic_id: str, lo: Loop, decision: str, spent: float) -> Path:
     b, a = lo.before, lo.after
     lines = [
@@ -484,7 +536,43 @@ def _improve_owned(
         if raw.get("epic_id") == epic_id:
             required.update(verification_contract(_owner(root, raw["id"])))
 
+    rounds = JournalStore(root)
+    round_id = f"improve-{epic_id}"
+    history = rounds.read(round_id)
+    intent = history.last("repair.intent")
+    closed = history.last("repair.closed")
     pending: Loop | None = None
+    for other_id in rounds.story_ids():
+        if other_id.startswith("improve-") and other_id != round_id:
+            other = rounds.read(other_id)
+            opened, finished = other.last("repair.intent"), other.last("repair.closed")
+            if opened and (finished is None or finished.seq < opened.seq):
+                report.error = f"resume interrupted round for {other_id.removeprefix('improve-')} first"
+                return report
+    if intent is None:
+        recorded = {r.get("story") for r in ledger_mod.build(root).loops}
+        orphaned = [s["id"] for s in read_index(root).get("stories", [])
+                    if s.get("epic_id") == repair_epic(epic_id) and s.get("repair_of")
+                    and s.get("loop") and s["id"] not in recorded]
+        if orphaned:
+            report.error = "legacy repair round lacks durable attribution; reconcile manually: " + ", ".join(orphaned)
+            return report
+    if intent is not None and (closed is None or closed.seq < intent.seq):
+        data = intent.data
+        if data.get("version") != 1:
+            report.error = "unsupported repair journal version; manual reconciliation required"
+            return report
+        pending = Loop(**data["loop"])
+        result = history.last("repair.result")
+        if result is not None and result.seq > intent.seq:
+            for key, value in result.data.items():
+                setattr(pending, key, value)
+        else:
+            pending.cost_usd = max(0.0, evidence.read(pending.story_id).total_cost_usd
+                                   - data["cost0"])
+            pending.done = rounds.read(pending.story_id).merged()
+            pending.stuck = "interrupted repair round; reconciled without automatic redispatch"
+            pending.outcome_text = pending.stuck
     while True:
         # Project-level evidence at current HEAD.  One QA run closes the previous
         # round **and** opens the next -- end-to-end QA is expensive, don't run twice.
@@ -492,23 +580,10 @@ def _improve_owned(
         candidate = head_sha(project)
         qa = run_suite(project, config=cfg, has_ui=has_ui, story_id=label,
                        artifact_root=root, candidate=candidate)
-        report.qualification = []
-        if not candidate or qa.candidate != candidate or head_sha(project) != candidate:
-            report.qualification.append("candidate evidence is missing or stale")
-        if cfg.get("verify.clean_tree", True) and qa.clean_tree != candidate:
-            report.qualification.append("requested clean-tree evidence unavailable")
-        results = {r.kind.id: r for r in qa.results}
-        for kind in sorted(required):
-            result = results.get(kind)
-            if kind not in qa.waived and (result is None or not result.ran):
-                report.qualification.append(f"required evidence missing: {kind}")
-        for result in qa.unrunnable:
-            report.qualification.append(
-                f"infrastructure: {result.kind.id}: {result.unrunnable}")
-        product_failures = [r.kind.id for r in qa.failed]
-        if qa.fake_tests:
-            product_failures.append("fake-tests")
         led = ledger_mod.build(root)
+        checkpoint = rounds.read("improve-ledger").last("repair.ledger")
+        if checkpoint is not None and len(led.loops) < len(checkpoint.data["loops"]):
+            led.loops = checkpoint.data["loops"]
 
         if pending is None:
             last = led.loops[-1] if led.loops else None
@@ -516,33 +591,85 @@ def _improve_owned(
                     or _counts(last) != _counts(led.summary()):
                 led.snapshot(BASELINE).update(epic=epic_id, **epic_counts(led, epic_id))
         else:
-            rec = led.snapshot(f"loop-{pending.n}", cost_usd=pending.cost_usd)
-            rec.update(epic=epic_id, story=pending.story_id, behavior=pending.behavior,
-                       **epic_counts(led, epic_id))
-            row = _epic_rows(led, epic_id)[-1]
-            pending.d_verified, pending.d_reopened = row["d_verified"], row["d_reopened"]
-            pending.after = {**led.summary(), **epic_counts(led, epic_id),
-                             "gaps": [b.id for b in epic_gaps(led, epic_id)]}
+            rec = next((r for r in led.loops if r.get("n") == f"loop-{pending.n}"), None)
+            if rec is None:
+                rec = led.snapshot(f"loop-{pending.n}", cost_usd=pending.cost_usd)
+                rec.update(epic=epic_id, story=pending.story_id, behavior=pending.behavior,
+                           **epic_counts(led, epic_id),
+                           gaps=[b.id for b in epic_gaps(led, epic_id)])
+            pending.d_verified = rec["epic_verified"] - pending.before["epic_verified"]
+            pending.d_reopened = rec["epic_reopened"] - pending.before["epic_reopened"]
+            pending.after = {**rec, "gaps": rec.get("gaps", [])}
+        rounds.record("improve-ledger", Entry(step="repair.ledger", data={"loops": led.loops}))
         led.write(root)
         led.index(root)
 
         gaps = epic_gaps(led, epic_id)
         queue = repair_queue(gaps)
         report.gaps_left = [b.id for b in gaps]
-        stop = stop_reason(
+
+        # Unified qualification policy (phase 2/4): the same rule used by
+        # `run` and `pre-deploy` consults this call. ``report.qualification``
+        # keeps the legacy list shape for old reports; the verdict itself is
+        # the single source of truth. ``stop_reason`` (legacy) still runs so
+        # any flat-loop / marginal-improvement conditions the unified rule
+        # does not cover stay authoritative.
+        q_inputs = QInputs(
+            candidate=candidate,
+            qa=QQa(
+                candidate=qa.candidate,
+                clean_tree=qa.clean_tree,
+                release_ready=qa.release_ready,
+                failed_kinds=tuple(r.kind.id for r in qa.failed),
+                unrunnable_kinds=tuple(r.kind.id for r in qa.unrunnable),
+                unconfigured_kinds=tuple(r.kind.id for r in qa.unconfigured),
+                waived_kinds=tuple(qa.waived),
+            ),
+            behaviors=tuple(
+                QGap(b.id, b.status,
+                     has_verifier=(b.kind in QUEUE_RANK))
+                for b in gaps),
+            approvals=tuple(
+                QApproval(g.value, approvals.status(g).value)
+                for g in [Gate.IMPROVE]),
+            plan_stuck=(pending.stuck if pending is not None else ""),
+        )
+        spent = sum(float(r.get("cost_usd") or 0.0) for r in _epic_rows(led, epic_id))
+        verdict = q_qualify(
+            QProfile(
+                phase=PHASE_REPAIR,
+                max_loops=max_loops,
+                cost_cap_usd=cost_cap,
+                cost_spent_usd=spent,
+                loops_completed=len(_epic_rows(led, epic_id)),
+                auto=auto,
+                required_kinds=tuple(sorted(required)),
+            ),
+            q_inputs,
+        )
+        # Keep the legacy qualification list in sync with the unified rule
+        # so old reports and dashboards do not silently lose information.
+        report.qualification = _qualification_strings(
+            qa, candidate, queue, verdict, cfg=cfg, required=required)
+        stop_reason_text = stop_reason(
             led, epic_id, queue, pending, max_loops=max_loops, flat_loops=flat_loops,
             cost_cap=cost_cap, auto=auto, approvals=approvals,
             outside=[b for b in gaps if b not in queue],
         )
-        if product_failures and not queue:
-            report.qualification.append(
-                "product checks failed outside auto-repair queue: " + ", ".join(product_failures))
+        # Whichever source gives the more specific stop wins; tie-breaker is
+        # the unified verdict so the new rule has a single owner.  The
+        # legacy qualification list still names concrete evidence reasons
+        # (clean-tree, missing kind, candidate mismatch) that the verdict
+        # reason field summarises; ``if report.qualification`` preserves
+        # the same surface callers and tests have asserted on since v1.x.
         if report.qualification:
             stop = "; ".join(report.qualification)
+        else:
+            stop = stop_reason_text or _stop_from_verdict(verdict, report.qualification)
         if pending is not None:
-            spent = sum(float(r.get("cost_usd") or 0.0) for r in _epic_rows(led, epic_id))
             pending.report_path = _write_report(root, epic_id, pending, stop, spent)
             report.loops.append(pending)
+            rounds.record(round_id, Entry(step="repair.closed", data={"n": pending.n}))
             pending = None
         if stop:
             report.stopped = stop
@@ -550,9 +677,7 @@ def _improve_owned(
 
         n = 1 + sum(1 for lo in led.loops if lo.get("n") != BASELINE)
         b = queue[0]
-        path = repair_story(led, b, epic_id=epic_id, root=root, project=project,
-                            config=cfg, state=state, loop=n)
-        sid = path.stem
+        sid = _pick_id(root, state, b.id)
         loop = Loop(n=n, epic_loop=len(_epic_rows(led, epic_id)) + 1, story_id=sid,
                     behavior=b.id,
                     before={**led.summary(), **epic_counts(led, epic_id),
@@ -561,6 +686,15 @@ def _improve_owned(
         # No changes to `run`/`implement`: the repair story follows the same
         # path as a regular story -- worktree, gate, reviewer != developer.
         cost0 = evidence.read(sid).total_cost_usd
+        rounds.record(round_id, Entry(step="repair.intent", data={
+            "version": 1, "cost0": cost0,
+            "loop": {"n": loop.n, "epic_loop": loop.epic_loop, "story_id": sid,
+                     "behavior": loop.behavior, "before": loop.before},
+        }))
+        path = repair_story(led, b, epic_id=epic_id, root=root, project=project,
+                            config=cfg, state=state, loop=n)
+        if path.stem != sid:
+            raise RuntimeError("repair story identity changed after durable intent")
         rr = RunReport()
         run_epic(
             repair_epic(epic_id), load_plan(root),
@@ -578,4 +712,8 @@ def _improve_owned(
         if stuck:
             loop.stuck = next((o.blocked_reason for o in rr.outcomes if o.blocked_reason),
                               "; ".join(stuck))
+        rounds.record(round_id, Entry(step="repair.result", data={
+            "cost_usd": loop.cost_usd, "done": loop.done,
+            "outcome_text": loop.outcome_text, "stuck": loop.stuck,
+        }))
         pending = loop

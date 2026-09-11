@@ -1,0 +1,11 @@
+{
+  "long_horizon/convention_carry_over": ["CONVENTION_BOUNDED_RETRY"],
+  "long_horizon/failure_pattern_repeat": ["FAILURE_MIGRATION_TX"],
+  "long_horizon/reviewer_recurrence": ["REVIEW_NULL_BOUNDARY"],
+  "long_horizon/security_recurrence": ["SECURITY_AUTHZ_OWNERSHIP"],
+  "long_horizon/supersede_authority": ["ARCH_NEW"],
+  "long_horizon/tool_env_repeat": ["TOOL_ENV_ISOLATED"],
+  "dogfood/par": [],
+  "dogfood/calc": [],
+  "dogfood/par_mutation": []
+}

@@ -54,6 +54,16 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--project", default=".", help="project directory (default: current directory)")
     sub = p.add_subparsers(dest="command", required=True)
 
+    from .memory import cmd_memory
+    mem = sub.add_parser("memory", help="experimental scoped advisory memory (default off)")
+    mem.add_argument("action", choices=("status", "recall", "search", "show", "capture", "consolidate", "audit", "forget", "providers"))
+    mem.add_argument("value", nargs="?", default="")
+    mem.add_argument("--story", default="")
+    mem.add_argument("--role", choices=("developer", "reviewer", "security", "designer"), default="developer")
+    mem.add_argument("--tool", default="*")
+    mem.add_argument("--json", action="store_true")
+    mem.set_defaults(func=cmd_memory)
+
     s = sub.add_parser("setup", help="detect stack and install skills into the project")
     s.add_argument("--references", default="", help="directory containing skill sources (default: user cache)")
     s.add_argument("--no-fetch", action="store_true",

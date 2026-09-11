@@ -1,5 +1,7 @@
 # AISEF Usage Guide
 
+Optional [long-term memory guide](MEMORY.md): `aisef memory` is experimental and OFF by default. Includes configuration, CLI, provenance, security and retrieval-only benchmark limitations; memory is never gate evidence. Cross-references: [research/plan](MEMORY-RESEARCH-PLAN.md), [validation report](MEMORY-VALIDATION.md), [ADR-007](ADR-007-scoped-advisory-memory.md).
+
 **AISEF** stands for **AI Software Engineering Framework**. The installable
 package, Python module, and CLI command are all named `aisef`.
 

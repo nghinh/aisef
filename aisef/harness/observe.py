@@ -301,7 +301,7 @@ class EvidenceStore:
         )
 
     def handoff(self, story_id: str, *, frm: str, to: str, attempt: int,
-                slots: dict[str, tuple[str, int]]) -> Event:
+                slots: dict[str, tuple[str, int]], memory: dict | None = None) -> Event:
         """Handoff package for a role: which slot, from which source, how many chars.
         Answers "what did the reviewer see" from disk — and lets the machine check
         invariants: a reviewer/security package must not contain the developer's words."""
@@ -309,7 +309,8 @@ class EvidenceStore:
             story_id,
             Event(kind=HANDOFF, name=f"{frm}->{to}",
                   detail={"from": frm, "to": to, "attempt": attempt,
-                          "slots": {k: {"source": s, "chars": n} for k, (s, n) in slots.items()}}),
+                          "slots": {k: {"source": s, "chars": n} for k, (s, n) in slots.items()},
+                          **({"memory": memory} if memory is not None else {})}),
         )
 
     def behavior(self, story_id: str, *, id: str, status: str, candidate: str = "",

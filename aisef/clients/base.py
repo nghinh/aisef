@@ -232,6 +232,20 @@ class ClientAdapter(ABC):
     #: Display name, also the key used in config and reports.
     id: str = ""
 
+    #: Optional budget guard injected by ``phases.run``; subclasses and
+    #: tests that don't need the budget path leave it ``None`` and pay
+    #: no overhead.  Setter is provided so the orchestrator can wire the
+    #: guard without exposing internal state to the tests that don't need it.
+    _budget_guard: object | None = None
+
+    def attach_budget_guard(self, guard: object | None) -> None:
+        """Inject a ``BudgetGuard`` so every ``run`` is reserved against it.
+
+        ``guard=None`` clears the wiring; passing the same guard twice is
+        a no-op (idempotent).
+        """
+        self._budget_guard = guard
+
     @abstractmethod
     def available(self) -> bool:
         """Whether the client is installed on this machine."""

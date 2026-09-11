@@ -2,6 +2,8 @@
 
 # AISEF — AI Software Engineering Framework
 
+Experimental [scoped long-term memory](docs/MEMORY.md) is available via `aisef memory`, **OFF by default**. Memory is advisory context, never gate evidence; fresh sessions remain unchanged. See [research and plan](docs/MEMORY-RESEARCH-PLAN.md), [validation report](docs/MEMORY-VALIDATION.md) and [ADR-007](docs/ADR-007-scoped-advisory-memory.md).
+
 A framework for building software with coding agents. The package on PyPI, the
 Python module and the command are all called `aisef`. Each project's input is
 **one file**, `docs/requirements.md`; the output is a working application plus

@@ -58,15 +58,23 @@ class AppServer:
     No hardcoded port: two stories running in parallel would collide. The port
     comes from the project config, and each story runs in its own worktree so
     the project decides.
+
+    Optional ``lease_root`` + ``run_id`` arguments wire the candidate-bound
+    identity check: only the dev server this run started may answer ready
+    probes, and the lease file records who owns the port.
     """
 
-    def __init__(self, command: str, base_url: str, *, cwd: Path, ready_timeout: int = 60):
+    def __init__(self, command: str, base_url: str, *, cwd: Path, ready_timeout: int = 60,
+                  lease_root: Path | None = None, run_id: str = ""):
         self.command = command
         self.base_url = base_url.rstrip("/") + "/"
         self.cwd = Path(cwd)
         self.ready_timeout = ready_timeout
         self.proc: subprocess.Popen | None = None
         self.log = ""
+        self.lease_root = lease_root
+        self.run_id = run_id
+        self._lease_fd: int | None = None
 
     def __enter__(self) -> "AppServer":
         self.start()
@@ -82,6 +90,21 @@ class AppServer:
         """Empty string if ready; otherwise the reason it cannot run."""
         if self.proc is not None and self.proc.poll() is None:
             return ""  # already started by us (second start() call via `with`)
+        # Reserve the port for this candidate before we spawn anything.
+        # ``lease_root`` is None in tests where isolation isn't required;
+        # the earlier race-free path is preserved.
+        if self.lease_root is not None and self.run_id:
+            from .server_identity import acquire_port_lease, write_lease, ServerLease
+            now = time.time()
+            self._lease_fd = acquire_port_lease(
+                self.lease_root, self.run_id, self.base_url)
+            if self._lease_fd is not None:
+                lease = ServerLease(
+                    run_id=self.run_id, story_id=self.run_id,
+                    candidate=self.run_id, base_url=self.base_url,
+                    pid=os.getpid(), started_at=now,
+                )
+                write_lease(self.lease_root, lease)
         if self.already_running():
             if not self.command:
                 return ""  # project has no dev_command: user runs the app themselves, use as-is
@@ -120,7 +143,12 @@ class AppServer:
             if self.proc.poll() is not None:
                 out = (self.proc.stdout.read() if self.proc.stdout else "")[-500:]
                 return f"dev server exited early (code {self.proc.returncode}): {out.strip()}"
-            if _responds(self.base_url, timeout=2):
+            if self.lease_root is not None and self.run_id:
+                from .server_identity import ready_with_identity
+                if ready_with_identity(
+                        self.base_url, self.run_id, attempts=1):
+                    return ""
+            elif _responds(self.base_url, timeout=2):
                 return ""
             time.sleep(0.5)
         return f"dev server not responding at {self.base_url} after {self.ready_timeout}s"
@@ -135,6 +163,14 @@ class AppServer:
         if self.proc.stdout and not self.proc.stdout.closed:
             self.proc.stdout.close()
         self.proc = None
+        if self.lease_root is not None and self.run_id:
+            from .server_identity import release_port_lease, remove_lease
+            release_port_lease(
+                self.lease_root, self.run_id,
+                fd=self._lease_fd if self._lease_fd is not None else -1,
+            )
+            remove_lease(self.lease_root, self.run_id)
+            self._lease_fd = None
 
     def url_for(self, route: str) -> str:
         return urljoin(self.base_url, route.lstrip("/"))
@@ -234,6 +270,15 @@ def verify_screens(
     project = Path(project)
     cfg = config or Config.load(project)
     out = VerifyResult()
+    # Run-id derived from artifact_root + story for the candidate-bound
+    # dev server identity check.  Optional — when unset, the legacy
+    # liveness check is used (kept for backward compatibility with
+    # external callers and older fixtures).
+    run_id = ""
+    lease_root = None
+    if artifact_root and story_id:
+        run_id = f"{Path(artifact_root).name}-{story_id}"
+        lease_root = project / ".aisef"
 
     screens = [contract.by_id(s) for s in screen_ids]
     screens = [s for s in screens if s is not None]
@@ -250,6 +295,8 @@ def verify_screens(
         str(cfg.get("app.base_url", "http://localhost:5173")),
         cwd=project,
         ready_timeout=int(cfg.get("app.ready_timeout_seconds", 60)),
+        lease_root=lease_root,
+        run_id=run_id,
     )
     with server:
         why = server.start()

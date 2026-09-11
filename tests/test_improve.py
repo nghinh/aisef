@@ -162,6 +162,66 @@ class ImproveTestCase(unittest.TestCase):
         return json.loads((self.artifacts / "stories.index.json").read_text(encoding="utf-8"))
 
 
+class TestRepairRecovery(ImproveTestCase):
+    def test_intent_precedes_story_registration(self):
+        from unittest.mock import patch
+
+        with patch("aisef.phases.improve.repair_story", side_effect=KeyboardInterrupt):
+            with self.assertRaises(KeyboardInterrupt):
+                self.improve(Fixer(self.artifacts), max_loops=1)
+        journal = JournalStore(self.artifacts).read("improve-EPIC-01")
+        self.assertTrue(journal.reached("repair.intent"))
+        with patch("aisef.phases.improve.run_epic") as dispatch:
+            resumed = self.improve(Fixer(self.artifacts), max_loops=1)
+        dispatch.assert_not_called()
+        self.assertEqual([lo.n for lo in resumed.loops], [1])
+        self.assertIn("interrupted", resumed.stopped)
+
+    def test_dispatch_interruption_preserves_cost_and_budget(self):
+        from unittest.mock import patch
+        from aisef.phases.run import run_epic
+
+        def interrupted(*args, **kwargs):
+            run_epic(*args, **kwargs)
+            raise KeyboardInterrupt
+
+        client = Fixer(self.artifacts)
+        with patch("aisef.phases.improve.run_epic", side_effect=interrupted):
+            with self.assertRaises(KeyboardInterrupt):
+                self.improve(client, max_loops=1)
+        with patch("aisef.phases.improve.run_epic") as dispatch:
+            resumed = self.improve(client, max_loops=1)
+        dispatch.assert_not_called()
+        self.assertEqual([lo.n for lo in resumed.loops], [1])
+        self.assertGreater(resumed.cost_usd, 1.0)
+        again = self.improve(client, max_loops=1)
+        self.assertEqual(again.loops, [])
+        self.assertEqual(len([r for r in self.ledger().loops if r["n"] == "loop-1"]), 1)
+
+    def test_lost_ledger_does_not_reset_round_budget(self):
+        from unittest.mock import patch
+
+        self.improve(Fixer(self.artifacts), max_loops=1)
+        (self.artifacts / L.LEDGER_FILE).write_text("{")
+        with patch("aisef.phases.improve.run_epic") as dispatch:
+            result = self.improve(Fixer(self.artifacts), max_loops=1)
+        dispatch.assert_not_called()
+        self.assertEqual(result.loops, [])
+        self.assertIn("max_loops", result.stopped)
+
+    def test_report_interruption_does_not_duplicate_snapshot(self):
+        from unittest.mock import patch
+
+        with patch("aisef.phases.improve._write_report", side_effect=KeyboardInterrupt):
+            with self.assertRaises(KeyboardInterrupt):
+                self.improve(Fixer(self.artifacts), max_loops=1)
+        with patch("aisef.phases.improve.run_epic") as dispatch:
+            resumed = self.improve(Fixer(self.artifacts), max_loops=1)
+        dispatch.assert_not_called()
+        self.assertEqual([lo.n for lo in resumed.loops], [1])
+        self.assertEqual(len([r for r in self.ledger().loops if r["n"] == "loop-1"]), 1)
+
+
 class TestVongSuaGap(ImproveTestCase):
     def test_hai_gap_moi_vong_sua_mot_vong_ba_dung_vi_het_gap(self):
         """AC (a) của R3: 2 GAP → vòng 1 sửa 1, vòng 2 sửa 1, vòng 3 dừng."""

@@ -1,0 +1,46 @@
+{
+  "candidate_sha": "13fcaaec9a470d1749bd271fa47e18aad9070c3e",
+  "config_hash": "37cbd9b75cbe15122e1c83a9ce8747d4af843c1ab6778afc5daa7e51883e72a9",
+  "default_arms": [
+    "A",
+    "B",
+    "C"
+  ],
+  "effective_config_snapshot": [
+    [
+      "memory.enabled",
+      false
+    ],
+    [
+      "memory.provider",
+      "local"
+    ],
+    [
+      "memory.fallback",
+      "none"
+    ],
+    [
+      "memory.timeout_seconds",
+      2
+    ],
+    [
+      "memory.max_chars",
+      1200
+    ],
+    [
+      "memory.capture",
+      false
+    ],
+    [
+      "memory.toggle_arms",
+      [
+        "A",
+        "B",
+        "C"
+      ]
+    ]
+  ],
+  "schema_version": 1,
+  "signature": "9f8be6dfbbeeb33fe2366640",
+  "toggle_signature": "f4000b7450456246"
+}

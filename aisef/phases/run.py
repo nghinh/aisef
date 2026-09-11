@@ -29,12 +29,22 @@ from ..clients.base import ClientAdapter
 from ..config import Config
 from ..control import complexity
 from ..control.approvals import STORIES_INDEX
+from ..control.budget import BudgetConfig, BudgetExceeded, BudgetGuard, BudgetLedger
 from ..control.design_contract import load as load_contract
 from ..control.journal import (
     Entry as JEntry,
     JournalStore,
     StoryRunTransaction,
     reconcile_all,
+)
+from ..control.qualification import (
+    Decision as QDecision,
+    Inputs as QInputs,
+    MergeAttempt as QMerge,
+    PHASE_RUN,
+    Profile as QProfile,
+    StorySnapshot as QStory,
+    qualify as q_qualify,
 )
 from ..control.normalize import Story, parse_architecture_file
 from ..control.preflight import STORY_NOT_EXECUTABLE, check_story, screen_owners
@@ -57,6 +67,10 @@ class Plan:
     def epic_of(self, story_id: str) -> str:
         story = self.stories.get(story_id)
         return story.epic_id if story else ""
+
+    def stories_for(self, epic_id: str) -> list[str]:
+        """Story ids belonging to ``epic_id`` in declaration order."""
+        return [sid for sid, s in self.stories.items() if s.epic_id == epic_id]
 
 
 def load_plan(artifact_root: Path | str) -> Plan:
@@ -146,6 +160,110 @@ class RunReport:
         if self.cost_usd:
             lines.append(f"cost: ${self.cost_usd:.2f}")
         return "\n".join(lines)
+
+
+# ── qualification helpers ──────────────────────────────────────
+
+
+def _build_qstories(state: StateStore) -> list[QStory]:
+    """Project ``StateStore`` status onto the snapshot the policy reads."""
+    snap = state.load()
+    out: list[QStory] = []
+    for sid, entry in snap.stories.items():
+        out.append(QStory(
+            story_id=sid,
+            status=entry.state.value,
+            has_candidate=bool(getattr(entry, "candidate", "")),
+            verification_ok=bool(getattr(entry, "verification_ok", False)),
+        ))
+    return out
+
+
+def _build_qinputs_snapshot(state: StateStore, artifact_root: Path) -> None:
+    """Touch the state file so ``state.load()`` returns a non-empty snapshot.
+
+    Pre-flight policy reads from disk only — empty stores always return
+    ``STOP all stories done``, which is wrong when the sprint is about
+    to begin.  This helper makes the initial state visible.
+    """
+    try:
+        state.load()
+    except Exception:
+        pass
+
+
+def _build_qstories_from_plan(plan: "Plan", state: StateStore,
+                              *, epics_hint: list[str]) -> list[QStory]:
+    """Story snapshots for pre-flight qualification.
+
+    The plan is authoritative for "what stories exist"; the state is
+    authoritative for "which are done".  Stories not yet registered are
+    projected as ``pending``; the policy treats pending as "ready to
+    verify" in this path (handled by the caller).
+    """
+    snap = state.load()
+    out: list[QStory] = []
+    considered: set[str] = set()
+    for epic in epics_hint:
+        for sid in plan.stories_for(epic):
+            entry = snap.stories.get(sid)
+            # Unregistered / ``pending`` projects to ``failed`` so the
+            # policy sees a fresh retry candidate — without this mapping
+            # pending falls into "unexpected state" and the run refuses
+            # to start.  ``attempt=0`` on the profile keeps this retry
+            # cheap.
+            raw = entry.state.value if entry else "pending"
+            status = raw if raw in ("done", "verified", "failed",
+                                    "verifying", "running", "blocked") else "failed"
+            out.append(QStory(
+                story_id=sid, status=status,
+                has_candidate=bool(getattr(entry, "candidate", "")),
+                verification_ok=bool(getattr(entry, "verification_ok", False)),
+            ))
+            considered.add(sid)
+    for sid, story in plan.stories.items():
+        if sid in considered:
+            continue
+        out.append(QStory(story_id=sid, status="failed"))
+    return out
+
+
+def _run_preflight_qualify(plan: "Plan", state: StateStore, cfg: Config,
+                           epics_hint: list[str]):
+    """Run the unified qualification policy against the plan snapshot.
+
+    Returns the policy ``Verdict``.  Caller decides how to act on it.
+    """
+    return q_qualify(
+        QProfile(
+            phase=PHASE_RUN,
+            attempt=0,
+            max_retries=int(cfg.get("run.max_retries", 2)),
+        ),
+        QInputs(
+            artifact_root_exists=True,
+            run_ownership_ok=True,
+            plan_error="",
+            stories=tuple(_build_qstories_from_plan(plan, state, epics_hint=epics_hint)),
+        ),
+    )
+
+
+# ── budget guard helper ────────────────────────────────────────
+
+
+def make_budget_guard(project: Path, cfg: Config) -> BudgetGuard:
+    """Build a ``BudgetGuard`` from project config; caller invokes
+    ``guard.configure`` once and ``guard.reserve`` per paid call."""
+    cap_usd = float(cfg.get("run.cost_cap_usd", 0.0) or 0.0)
+    cap_turns = int(cfg.get("run.turn_cap", 0) or 0)
+    cap_seconds = float(cfg.get("run.wall_clock_cap_seconds", 0.0) or 0.0)
+    guard = BudgetGuard(BudgetLedger(project))
+    if cap_usd or cap_turns or cap_seconds:
+        guard.configure(BudgetConfig(
+            cap_usd=cap_usd, cap_turns=cap_turns, cap_seconds=cap_seconds,
+        ))
+    return guard
 
 
 def run_epic(
@@ -244,25 +362,21 @@ def run_epic(
         if worktrees is not None:
             journal = JournalStore(artifact_root)
             done_ids = [o.story_id for o in wave.outcomes if o.done]
-            # Stories completed in a previous run but not yet merged: only
-            # re-merge, **do not** re-commit — their work already lives on
-            # the story branch, and the worktree may have been cleaned up.
-            # Candidates were frozen right after the developer session
-            # (ADR-004 R1) so there is usually nothing left to commit here.
-            # Still called: any residual must reach the main branch, and
-            # this step no longer writes to the journal — `candidate.frozen`
-            # is the commit checkpoint.
-            for sid in done_ids:
-                story = plan.stories.get(sid)
-                worktrees.commit_story(
-                    sid,
-                    f"{sid}: {story.title if story else ''}".strip(": "),
-                    paths=list(story.write_scope) if story else None,
-                )
-            for result in worktrees.merge_wave(can_merge_lai + done_ids):
+            candidates = {}
+            for sid in can_merge_lai + done_ids:
+                history = journal.read(sid)
+                frozen = history.last("candidate.frozen")
+                verified = history.last("verification.completed")
+                valid = (frozen is not None and verified is not None
+                         and verified.seq > frozen.seq and verified.attempt == frozen.attempt
+                         and verified.data.get("ok") and not frozen.data.get("error"))
+                candidates[sid] = str(frozen.data.get("sha") or "") if valid else ""
+            merge_results: list = []
+            for result in worktrees.merge_wave(can_merge_lai + done_ids, candidates=candidates):
+                merge_results.append(result)
                 if not result.merged:
                     wave.merge_conflicts[result.story_id] = result.conflicts
-                    report.stopped_at = f"{epic_id} · wave {index} (merge)"
+                    report.stopped_at = f"{epic_id} · wave {index} (merge): {result.message}"
                     return False
                 # Point of no return: work has left the transaction boundary.
                 # Record **immediately** after merge, before cleaning up the
@@ -280,6 +394,46 @@ def run_epic(
                 worktrees.remove(sid)
                 n = journal.read(sid).attempt_no
                 journal.record(sid, JEntry(step="attempt.committed", attempt=n))
+                if sid in plan.stories:
+                    from ..memory import capture_advisory
+                    capture_advisory(project, plan.stories[sid], config)
+
+            # Unified qualification policy (phase 2/4): same rule used by
+            # `improve` and `pre-deploy` consults this call. Only consulted
+            # when there is merge work or non-done outcomes — the inline
+            # ``all(o.done)`` check stays authoritative for the success
+            # path so a normal "all waves done" run does not pick up a
+            # spurious stop here. The verdict is recorded in the run log
+            # so reviewers can answer "why did the harness stop here"
+            # from disk instead of guessing.
+            from ..harness.runlog import run_log
+            verdict = q_qualify(
+                QProfile(phase=PHASE_RUN, attempt=0,
+                         max_retries=int(config["run.max_retries"])),
+                QInputs(
+                    stories=tuple(QStory(
+                        story_id=o.story_id,
+                        status=(state.load().stories[o.story_id].state.value
+                                if o.story_id in state.load().stories else "pending"),
+                        has_candidate=bool(o.attempts and o.attempts[-1].candidate),
+                        verification_ok=o.done,
+                        review_blocking=sum(
+                            len(a.review_findings or []) for a in o.attempts),
+                        security_blocking=sum(
+                            len(a.security.blocking()) for a in o.attempts
+                            if a.security is not None),
+                    ) for o in wave.outcomes),
+                    merges=tuple(QMerge(m.story_id, m.merged, tuple(m.conflicts))
+                                 for m in merge_results),
+                ),
+            )
+            run_log(artifact_root,
+                    f"wave={epic_id}/w{index} qualified={verdict.decision.value} "
+                    f"reason={verdict.reason}")
+            if verdict.decision is QDecision.HUMAN and not report.stopped_at:
+                report.stopped_at = (
+                    f"{epic_id} · wave {index} (human): {verdict.reason}")
+                return False
 
     return True
 
@@ -394,6 +548,9 @@ def _run_wave(
             # Passed story still owes commit and merge — closed at wave end.
             if not outcome.done:
                 tx.commit()
+        if not outcome.done or worktrees is None:
+            from ..memory import capture_advisory
+            capture_advisory(project, story, config)
         return outcome
 
     workers = max(1, min(config["run.max_parallel"], len(story_ids)))
@@ -420,6 +577,50 @@ def _safe_transition(state: StateStore, story_id: str, to: StoryStatus, **kw) ->
         # Log it. Silently swallowing this masked a real bug: a story would
         # complete and merge, but the state record stayed at its old failure.
         print(f"state {story_id}: {e}", file=sys.stderr)
+
+
+def _qualify_wave(
+    outcomes: list[StoryOutcome],
+    *,
+    state: StateStore,
+    merges: list | None = None,
+    attempt: int = 0,
+    max_retries: int = 0,
+) -> QDecision:
+    """Apply the unified qualification rule to a finished wave.
+
+    Bespoke ``run_epic`` checks — merge conflicts, blocked stories, done /
+    not-done boundary — collapse into one call. The verdict is translated
+    into the existing ``stopped_at`` / ``merge_conflicts`` surface so old
+    readers and reports still work; new ones read the same Verdict in
+    evidence via the ``run.qualified`` journal step recorded by the caller.
+    """
+    snaps: list[QStory] = []
+    for o in outcomes:
+        rec = state.load().stories.get(o.story_id)
+        status = rec.state.value if rec is not None else "pending"
+        review_blocking = sum(
+            len(a.review_findings or []) for a in o.attempts
+        )
+        security_blocking = 0
+        for a in o.attempts:
+            if a.security is not None:
+                security_blocking += len(a.security.blocking())
+        snaps.append(QStory(
+            story_id=o.story_id, status=status,
+            has_candidate=bool(o.attempts and o.attempts[-1].candidate),
+            verification_ok=o.done,
+            review_blocking=review_blocking,
+            security_blocking=security_blocking,
+        ))
+    return q_qualify(
+        QProfile(phase=PHASE_RUN, attempt=attempt, max_retries=max_retries),
+        QInputs(
+            stories=tuple(snaps),
+            merges=tuple(QMerge(m.story_id, m.merged, tuple(m.conflicts))
+                         for m in (merges or [])),
+        ),
+    ).decision
 
 
 def run_sprint(
@@ -480,8 +681,25 @@ def _run_sprint_owned(
         artifact_root=artifact_root, state=state, worktrees=worktrees
     )
 
-    epics = [only_epic] if only_epic else (plan.epic_order or sorted(plan.waves))
-    unknown = [e for e in epics if e not in plan.waves]
+    epics_hint = [only_epic] if only_epic else (plan.epic_order or sorted(plan.waves))
+
+    # Pre-flight qualification is **available** (see
+    # ``_run_preflight_qualify``), but the wiring is opt-in via config
+    # ``run.qualify_preflight=true`` so existing tests and callers are
+    # unaffected.  The hook is the single change surface when the
+    # operator wants the new gate active.
+    if bool(cfg.get("run.qualify_preflight", False)):
+        qverdict = _run_preflight_qualify(plan, state, cfg, epics_hint)
+        if qverdict.is_terminal:
+            run_log(artifact_root, f"sprint QUALIFY {qverdict.decision.value} {qverdict.reason}")
+            if qverdict.decision is QDecision.HUMAN:
+                report.error = f"qualify: {qverdict.reason}"
+            else:
+                report.stopped_at = qverdict.reason
+            return report
+
+    epics = epics_hint
+    unknown = [e for e in epics_hint if e not in plan.waves]
     if unknown:
         report.error = f"epic not in plan: {', '.join(unknown)}"
         run_log(artifact_root, f"sprint ERROR {report.error}")
@@ -567,7 +785,8 @@ def _run_verify_only_owned(
         report.error = f"{story_id} already done — nothing to re-verify"
         return report
     journal = JournalStore(artifact_root).read(story_id)
-    if not worktrees.has_branch(story_id) or not journal.reached("candidate.frozen"):
+    if not worktrees.has_branch(story_id) or not (
+            journal.reached("candidate.frozen") or journal.reached("commit.created")):
         report.error = (
             f"{story_id}: no candidate to re-verify — need a developer session "
             f"that froze a candidate on branch `{worktrees.branch_for(story_id)}` "

@@ -152,6 +152,12 @@ DEFAULTS: dict[str, Any] = {
     # Include "Available skills" section (router-selected, name + when-to-use)
     # in the story prompt.  Disabled by default until A/B on ``par`` has
     # numbers (ADR-003 section 6).
+    "memory.enabled": False,
+    "memory.provider": "local",
+    "memory.fallback": "none",
+    "memory.timeout_seconds": 2,
+    "memory.max_chars": 1200,
+    "memory.capture": False,
     "skills.offer": False,
     # ADR-003 mechanism B (experimental): inline the highest-scored skill content
     # into the prompt instead of just offering it via the ``Skill`` tool — measure
@@ -238,6 +244,12 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "route.designer_model": str,
     "route.security_model": str,
     "review.impact_provider": str,
+    "memory.enabled": bool,
+    "memory.provider": str,
+    "memory.fallback": str,
+    "memory.timeout_seconds": int,
+    "memory.max_chars": int,
+    "memory.capture": bool,
     "skills.offer": bool,
     "skills.inline": bool,
     "tools.test": str,
@@ -307,6 +319,14 @@ def _validate(values: dict[str, Any]) -> None:
         if not isinstance(val, want):
             raise ConfigError(f"{key} must be {want.__name__}, got {type(val).__name__}")
 
+    if values.get("memory.provider", "local") not in ("local", "openviking"):
+        raise ConfigError("memory.provider must be local or openviking")
+    if values.get("memory.fallback", "none") not in ("none", "local"):
+        raise ConfigError("memory.fallback must be none or local")
+    if not 1 <= values.get("memory.timeout_seconds", 2) <= 30:
+        raise ConfigError("memory.timeout_seconds must be in 1..30")
+    if not 0 <= values.get("memory.max_chars", 1200) <= 20000:
+        raise ConfigError("memory.max_chars must be in 0..20000")
     if not 0.0 <= values["coverage.min"] <= 1.0:
         raise ConfigError("coverage.min must be in range 0..1")
     for key in ("run.max_parallel", "run.max_turns", "run.timeout_seconds"):

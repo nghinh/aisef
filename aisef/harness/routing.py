@@ -136,8 +136,21 @@ def build_spec(
         )
 
     cfg = config
+    rendered = prompt.render(context, allow_empty=allow_empty)
+    if cfg and cfg.get("memory.enabled", False) and context.get("memory"):
+        from ..memory import screen
+        packet = context.get("_memory") or {}
+        selected = packet.get("selected") or []
+        if role_id in (REVIEWER, SECURITY) and (not selected or any(
+                row.get("trust") == "agent" or row.get("status") != "active"
+                or row.get("role") != role_id for row in selected)):
+            raise RoutingError("review memory requires independent active provenance")
+        screen(context["memory"])
+        if len(context["memory"]) > cfg.get("memory.max_chars", 1200):
+            raise RoutingError("memory exceeds context budget")
+        rendered += context["memory"]
     return RunSpec(
-        prompt=prompt.render(context, allow_empty=allow_empty),
+        prompt=rendered,
         workdir=Path(workdir),
         model=(routing or Routing.from_config(cfg)).model_for(role_id),
         max_turns=cfg["run.max_turns"] if cfg else 0,

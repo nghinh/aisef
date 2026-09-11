@@ -25,6 +25,13 @@ from ._common import (
 def cmd_status(args) -> int:
     state = _state(args).load()
     cfg = Config.load(args.project)
+    if cfg.get("memory.enabled", False):
+        from ..memory import MemoryError, resolve
+        try:
+            provider, resolution = resolve(_artifact_root(args).parent, cfg)
+            print("Memory (advisory): " + json.dumps({**provider.health(), **resolution}))
+        except (MemoryError, OSError):
+            print("Memory (advisory): unavailable; no implicit fallback")
 
     if not state.stories:
         print("No stories registered.")

@@ -1,5 +1,7 @@
 # Hướng dẫn sử dụng AISEF
 
+[Bộ nhớ dài hạn thử nghiệm](MEMORY.md): `aisef memory` mặc định TẮT. Hướng dẫn gồm cấu hình, CLI, nguồn/phạm vi, bảo mật và giới hạn benchmark; bộ nhớ không phải bằng chứng cho cổng. Tham khảo: [nghiên cứu/kế hoạch](MEMORY-RESEARCH-PLAN.md), [báo cáo kiểm thử](MEMORY-VALIDATION.md), [ADR-007](ADR-007-scoped-advisory-memory.md).
+
 **AISEF** là viết tắt của **AI Software Engineering Framework**. Gói cài, module
 Python và lệnh gõ đều tên `aisef`.
 

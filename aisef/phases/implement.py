@@ -55,6 +55,7 @@ from ..harness.guardrails import (
     fork_point,
     head_sha,
 )
+from ..control.budget import BudgetExceeded, BudgetGuard, BudgetLedger
 from ..control.journal import Entry as JEntry, JournalStore
 from ..harness.mockup_map import load_for_story, prompt_section
 from ..harness.observe import AGENT_RUN, MOCKUP_MAP, NOTE, SKILL_USE, TOOL_RUN, Event, Evidence, EvidenceStore
@@ -416,7 +417,7 @@ SLOT_SOURCE = {
     "tools": "config", "skills": "router", "diff_summary": "git", "impact": "code",
     "repo_map": "code", "blast_radius": "code",
     "index": "ledger", "roadmap": "artifact", "preservation": "ledger", "validation": "ledger",
-    "prior_review": "evidence",
+    "prior_review": "evidence", "memory": "memory",
 }
 
 #: Slots allowed to be empty when building the prompt: `repo_map` empty means
@@ -513,6 +514,27 @@ def _story_fallback(story: Story) -> str:
     return "\n".join(lines)
 
 
+def _reserved_client_run(client: ClientAdapter, spec, *, story_id: str,
+                          estimate_usd: float = 0.0,
+                          estimate_turns: int = 1):
+    """Run ``client.run(spec)`` inside a budget reservation if a guard
+    is attached on the client.  Returns the RunResult, or raises
+    ``BudgetExceeded`` without dispatching when the cap would be
+    breached; ``estimate_usd`` and ``estimate_turns`` are best-effort —
+    the post-call ``settle`` records the *actual* cost from the result.
+    """
+    guard = getattr(client, "_budget_guard", None)
+    if not isinstance(guard, BudgetGuard):
+        return client.run(spec)
+    with guard.reserve(
+        story_id=story_id, est_usd=estimate_usd, est_turns=estimate_turns,
+    ) as token:
+        result = client.run(spec)
+        token.actual_usd = float(getattr(result, "cost_usd", 0.0) or 0.0)
+        token.actual_turns = int(getattr(result, "num_turns", 1) or 1)
+        return result
+
+
 def run_attempt(
     story: Story,
     *,
@@ -541,8 +563,11 @@ def run_attempt(
         config=config,
         feedback=feedback,
     )
+    from ..memory import attach
+    attach(context, story, project, config, DEVELOPER)
     evidence.handoff(story.id, frm="plan" if number == 1 else "gate", to=DEVELOPER,
-                     attempt=number, slots=handoff_slots(context, feedback=bool(feedback)))
+                     attempt=number, slots=handoff_slots(context, feedback=bool(feedback)),
+                     memory=context.get("_memory"))
     # R4: preservation list locked **once** here, before the developer
     # session; reviewer, security and gate receive exactly this version --
     # recomputing after the session reflects that attempt's own evidence.
@@ -587,7 +612,15 @@ def run_attempt(
     from ..harness.runlog import run_log
     run_log(artifact_root, f"story={story.id}#{number} agent START "
                            f"timeout={spec.timeout_seconds}s scope={','.join(scope)}")
-    result = client.run(spec)
+    try:
+        result = _reserved_client_run(
+            client, spec, story_id=story.id, estimate_turns=1,
+        )
+    except BudgetExceeded as e:
+        attempt.error = f"budget exceeded: {e}"
+        attempt.fatal = False
+        attempt.ok = False
+        return attempt
     attempt.cost_usd = result.cost_usd
     used = skills_used(result)
     run_log(artifact_root, (
@@ -1379,7 +1412,18 @@ def _review_session(
     reviewer modifying the tree".
     """
     before_snap = _tree_snapshot(workdir)
-    result = client.run(spec)
+    try:
+        result = _reserved_client_run(
+            client, spec, story_id=story_id, estimate_turns=1,
+        )
+    except BudgetExceeded as e:
+        # Review sessions are recoverable: record a synthesised failure
+        # result so the rest of the pipeline can react.  Attempt is left
+        # at its previous `ok` state and the failure is surfaced through
+        # the evidence store as ``infra``.
+        from .mockup import RunResult
+        result = RunResult(ok=False, error=f"budget exceeded: {e}",
+                           cost_usd=0.0, turns=0)
     store.agent_run(story_id, result, name=name, prompt_chars=len(spec.prompt),
                     role=role, model=spec.model)
     for sk in skills_used(result):
@@ -1495,8 +1539,10 @@ def review_story_v2(
 
     from ..harness.runlog import run_log
     run_log(artifact_root, f"story={story.id}#{number} review START changed={len(changed)}")
+    from ..memory import attach
+    attach(context, story, project, config, REVIEWER)
     store.handoff(story.id, frm=DEVELOPER, to=REVIEWER, attempt=number,
-                  slots=handoff_slots(context))
+                  slots=handoff_slots(context), memory=context.get("_memory"))
     spec = build_spec(
         REVIEWER,
         catalog.get(ROLES[REVIEWER].prompt),
@@ -1734,8 +1780,10 @@ def security_review(
     run_log(artifact_root, f"story={story.id}#{number} security START changed={len(changed)}")
     store = EvidenceStore(artifact_root, candidate=candidate)
     context["prior_review"] = _prior_review(store, story.id, role="security", changed=changed)
+    from ..memory import attach
+    attach(context, story, project, config, SECURITY)
     store.handoff(story.id, frm=REVIEWER, to=SECURITY, attempt=number,
-                  slots=handoff_slots(context))
+                  slots=handoff_slots(context), memory=context.get("_memory"))
     spec = build_spec(
         SECURITY,
         catalog.get(ROLES[SECURITY].prompt),

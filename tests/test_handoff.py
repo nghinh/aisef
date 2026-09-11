@@ -39,7 +39,7 @@ class TestNguonSlot(unittest.TestCase):
         # `evidence` là bản ghi đã lưu của chính vai đó ở lượt trước, đọc lại
         # từ đĩa; điều bị cấm là lời **agent khác** trong phiên này.
         self.assertTrue(set(SLOT_SOURCE.values())
-                        <= {"artifact", "config", "router", "git", "code", "ledger", "evidence"})
+                        <= {"artifact", "config", "router", "git", "code", "ledger", "evidence", "memory"})
 
 
 class TestSuKienHandoff(unittest.TestCase):

@@ -122,6 +122,7 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 | Hạng mục | Hiện thực |
 |---|---|
 | Định tuyến model | `harness/routing.py` — theo vai; **reviewer ≠ developer** |
+| Bộ nhớ tư vấn | `memory` là slot riêng, nguồn `memory`, có IDs/nguồn/điểm/ngân sách/audit; **không phải bằng chứng**. Mặc định tắt, mỗi vai truy hồi riêng, reviewer/security không nhận quan sát agent chưa xác minh; phiên vẫn mới. [ADR-007](ADR-007-scoped-advisory-memory.md), [hướng dẫn](MEMORY.md), [kiểm thử](MEMORY-VALIDATION.md), [nghiên cứu/kế hoạch](MEMORY-RESEARCH-PLAN.md) |
 | Sinh sub-agent | không có — mỗi vai là một phiên riêng do harness gọi (`harness/routing.py`); xem ADR-003 #15 |
 | Bàn giao | gói ngữ cảnh mỗi vai dựng từ slot có **nguồn khai** (`phases/implement.py::SLOT_SOURCE`, ghi vào bằng chứng `handoff`): `story_id` · `story_title` · `story_contract` · `architecture_rules` · `write_scope` · `mockup_section` (artifact) · `tools` (config) · `skills` (router) · `diff_summary` (git) · `impact` · `repo_map` · `blast_radius` (code — `repo_map` là bản đồ mã quanh phạm vi ghi cho cả ba vai, ADR-005 V7, trần `context.max_repo_map_chars`; `blast_radius` là impact analysis từ CodebaseGraphProvider cho brownfield, rỗng khi greenfield) · `index` (ledger — lát cắt epic) · `roadmap` (artifact — **toàn** kế hoạch, một dòng mỗi story, cho reviewer: chỉ mục bằng chứng bó trong một epic và rỗng trên dự án mới, nên không trả lời được câu "việc này của story nào" — lỗi 58) · `preservation` · `validation` (ledger — ADR-004 R4/R6) · `prior_review` (evidence — kết luận của **chính reviewer** ở candidate trước, đọc lại từ `note:review:verdict`; không có nó thì mỗi lượt rà soát lại từ đầu và tự nâng mục *nên sửa* của mình thành *chặn*, story cháy hết lượt mà không hội tụ). Reviewer/security không nhận slot nguồn `agent` (ADR-003 #9). Không có `next`/`implement`/`complete`: vòng lặp story nằm trong `run` |
 | Luật kích hoạt | `control/state.py` (FSM `PENDING → RUNNING → VERIFYING → VERIFIED → DONE`) + `control/scheduler.py` (đợt theo phụ thuộc và phạm vi ghi) ✅ **đã xong** |
@@ -412,6 +413,10 @@ aisef change  FR-x "mô tả"           ghi FR, stale PRD trở xuống, sinh st
 aisef guard write-scope|diff-scope|secret|git-stage|destructive|egress|injection|process-ref|completion
 
 # Theo dõi
+aisef memory status|providers|audit|consolidate [--json]
+aisef memory recall|search [QUERY] --story S [--role developer|reviewer|security] [--json]
+aisef memory capture --story S [--json]
+aisef memory show|forget ID [--json]  bộ nhớ tư vấn thử nghiệm, mặc định tắt; không ảnh hưởng cổng
 aisef status                         tiến độ · chi phí · story tốn bất thường
 aisef report  [--out FILE]           báo cáo nghiệm thu + sổ hành vi (`ledger.json`, `INDEX.md`)
 aisef evidence <id> [--story S]      lịch sử một story hoặc một hành vi
@@ -657,6 +662,12 @@ Không để chữ "ngưỡng" chung chung. Mặc định trong `.ai/config.json
 | `context.max_repo_map_chars` | `0` | trần ký tự cho slot `repo_map` (ADR-005 V7, `harness/context.py`): skeleton tệp trong phạm vi ghi (Python `ast`, TS/JS chữ ký) → tệp gọi/được import 1 bước → test nhắc tên, cấp cho cả ba vai. **0 = tắt** cho tới khi A/B T8 đạt (trung vị lượt developer −20 % **và** cổng cùng kết cục): Aider không công bố số đo nào cho repo map, còn 2 000 ký tự trên baseline B5 11 537 là +17 % (vượt trần 15 %) — khi bật, thử 1 500 (+13 %). Hồi cứu e9 01-05 tại SHA `2424265`: bản đầy đủ 3 119 ký tự, ADR-005 §9. Bản đầy đủ tra bằng `aisef ctx --story S` |
 | `context.map_provider` | `""` | lệnh ngoài vẽ bản đồ (tree-sitter, serena — cắm sau, không thêm gói): stdin JSON `{project, seeds, budget}` → stdout văn bản, cùng kiểu `review.impact_provider`. Rỗng = dựng sẵn stdlib; lệnh hỏng thì lùi về dựng sẵn và slot nói rõ là thô |
 | `context.graph_provider` | `"auto"` | `"auto"` / `"graphify"` / `"basic"` — chọn CodebaseGraphProvider cho brownfield. `auto` ưu tiên Graphify nếu có CLI + graph, lùi về Basic. Dùng bởi `aisef baseline` và slot `blast_radius` |
+| `memory.enabled` | `false` | bật thử nghiệm local advisory memory; không tái sử dụng phiên, không thay evidence |
+| `memory.provider` | `"local"` | `local` hoặc `openviking`; OpenViking hiện khai unavailable, chưa có adapter |
+| `memory.fallback` | `"none"` | `none` hoặc `local`; chỉ fallback tường minh, luôn ghi lý do |
+| `memory.timeout_seconds` | `2` | hạn chờ khoá local 1–30 giây; chưa phải timeout dịch vụ remote |
+| `memory.max_chars` | `1200` | ngân sách toàn slot 0–20000 ký tự; không phải token |
+| `memory.capture` | `false` | tự chụp outcome tất định sau lifecycle; CLI capture là opt-in từng lần |
 | `run.max_parallel` | `3` | số story song song trong một đợt |
 | `run.max_turns` | `40` | vòng lặp tối đa của một phiên story |
 | `run.timeout_seconds` | `1800` | 30 phút cho một story |

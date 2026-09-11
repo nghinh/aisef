@@ -66,15 +66,21 @@ def commit_paths(path: Path, message: str, *, paths: list[str] | None = None) ->
     if not _git(path, "status", "--porcelain", check=False).stdout.strip():
         return False  # agent already committed everything
 
-    # Only stage paths that **actually exist**: a story declaring a file then
-    # not creating it is common, especially on mid-run failures, and `git add`
-    # with a non-matching pathspec breaks the whole command. Dropping missing
-    # paths doesn't loosen anything — still not `add -A`.
-    co_that = [p for p in (paths or []) if (path / p).exists()]
-    if co_that:
-        _git(path, "add", "--", *co_that)
+    if paths is None:
+        _git(path, "add", "-u")
     else:
-        _git(path, "add", "-u")  # no scope declared: only tracked files
+        specs = [f":(literal){p}" for p in paths]
+        staged = set(_git(path, "diff", "--cached", "--name-only", "--no-renames", "-z").stdout.split("\0")) - {""}
+        allowed = set(_git(path, "ls-files", "-z", "--", *specs).stdout.split("\0")) - {""} if specs else set()
+        allowed.update(p for p in staged if any(
+            p == scope.rstrip("/") or p.startswith(scope.rstrip("/") + "/")
+            for scope in paths))
+        if staged - allowed:
+            raise GitError("pre-staged changes outside write scope: " + ", ".join(sorted(staged - allowed)))
+        matched = [spec for p, spec in zip(paths, specs)
+                   if (path / p).exists() or _git(path, "ls-files", "-z", "--", spec).stdout]
+        if matched:
+            _git(path, "add", "-A", "--", *matched)
     if not _git(path, "diff", "--cached", "--name-only", check=False).stdout.strip():
         return False
     _git(path, "commit", "-q", "-m", message)
@@ -411,7 +417,8 @@ class WorktreeManager:
             flock_un(fh.fileno())
             fh.close()
 
-    def merge_story(self, story_id: str, *, into: str | None = None) -> MergeResult:
+    def merge_story(self, story_id: str, *, into: str | None = None,
+                    expected_candidate: str | None = None) -> MergeResult:
         """Merge a story branch into the main branch.
 
         On conflict, **aborts immediately** and returns the list of conflicting
@@ -423,14 +430,23 @@ class WorktreeManager:
         Merge lock ensures only one machine merges at a time (distributed).
         """
         with self._merge_lock():
-            return self._merge_story_inner(story_id, into=into)
+            return self._merge_story_inner(story_id, into=into,
+                                           expected_candidate=expected_candidate)
 
-    def _merge_story_inner(self, story_id: str, *, into: str | None = None) -> MergeResult:
+    def _merge_story_inner(self, story_id: str, *, into: str | None = None,
+                           expected_candidate: str | None = None) -> MergeResult:
         branch = self.branch_for(story_id)
+        if expected_candidate is not None:
+            actual = _git(self.repo, "rev-parse", branch, check=False).stdout.strip()
+            path = self.path_for(story_id)
+            dirty = path.is_dir() and _git(path, "status", "--porcelain").stdout.strip()
+            if not expected_candidate or actual != expected_candidate or dirty:
+                return MergeResult(story_id, branch, False,
+                                   message="candidate changed or missing; re-verification required")
         if into:
             _git(self.repo, "checkout", "-q", into)
 
-        proc = _git(self.repo, "merge", "--no-edit", branch, check=False)
+        proc = _git(self.repo, "merge", "--no-edit", expected_candidate or branch, check=False)
         if proc.returncode == 0:
             return MergeResult(story_id, branch, True, message=proc.stdout.strip())
 
@@ -448,7 +464,8 @@ class WorktreeManager:
             message=(proc.stderr or proc.stdout).strip(),
         )
 
-    def merge_wave(self, story_ids: list[str], *, into: str | None = None) -> list[MergeResult]:
+    def merge_wave(self, story_ids: list[str], *, into: str | None = None,
+                   candidates: dict[str, str] | None = None) -> list[MergeResult]:
         """Merge an entire wave, **sequentially** in the order given.
 
         Stops at the first conflict: merging further on top of a conflicted
@@ -456,7 +473,8 @@ class WorktreeManager:
         """
         results: list[MergeResult] = []
         for sid in story_ids:
-            r = self.merge_story(sid, into=into)
+            r = self.merge_story(sid, into=into,
+                                 expected_candidate=candidates.get(sid, "") if candidates is not None else None)
             results.append(r)
             if not r.merged:
                 break

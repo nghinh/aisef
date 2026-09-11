@@ -607,7 +607,10 @@ class TestMergeDungRoiChayLai(RunTestCase):
         j = JournalStore(self.artifacts)
         j.record(sid, JEntry(step="attempt.started", attempt=1))
         j.record(sid, JEntry(step="worktree.created", attempt=1))  # lượt thật luôn có
-        j.record(sid, JEntry(step="commit.created", attempt=1))
+        sha = subprocess.run(["git", "rev-parse", wt.branch_for(sid)], cwd=self.project,
+                             capture_output=True, text=True, check=True).stdout.strip()
+        j.record(sid, JEntry(step="candidate.frozen", attempt=1, data={"sha": sha}))
+        j.record(sid, JEntry(step="verification.completed", attempt=1, data={"ok": True}))
         # Lượt chạy **kết thúc gọn** — không phải bị giết giữa chừng, nếu
         # không thì reconciler sẽ hoàn nguyên nó và ta đo nhầm chuyện khác.
         j.record(sid, JEntry(step="attempt.committed", attempt=1))
@@ -631,6 +634,40 @@ class TestMergeDungRoiChayLai(RunTestCase):
 
         self.assertTrue(self.head_co("src/core/a.py"),
                         "công việc phải được merge vào nhánh chính")
+
+    def test_legacy_unbound_candidate_requires_reverification(self):
+        sid = self.sinh_story_da_xong_nhung_chua_merge()
+        path = JournalStore(self.artifacts).path(sid)
+        rows = [json.loads(line) for line in path.read_text().splitlines()]
+        rows = [row for row in rows if row["step"] not in
+                ("candidate.frozen", "verification.completed")]
+        rows.append({"step": "commit.created", "attempt": 1})
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+        agent = Agent()
+        result = self.run_sprint(agent, only_epic="EPIC-01")
+        self.assertFalse(self.head_co("src/core/a.py"))
+        self.assertFalse(result.ok)
+        self.assertNotIn(sid, agent.stories)
+
+    def test_verified_branch_drift_is_not_integrated(self):
+        sid = self.sinh_story_da_xong_nhung_chua_merge()
+        wm = WorktreeManager(self.project)
+        wt = wm.create(sid, refresh=False)
+        (wt.path / "src/core/a.py").write_text("unverified = True\n")
+        wm.commit_story(sid, paths=["src/core"])
+        result = self.run_sprint(Agent(), only_epic="EPIC-01")
+        self.assertFalse(self.head_co("src/core/a.py"))
+        self.assertFalse(result.ok)
+
+    def test_verified_residual_is_not_committed_or_integrated(self):
+        sid = self.sinh_story_da_xong_nhung_chua_merge()
+        wm = WorktreeManager(self.project)
+        wt = wm.create(sid, refresh=False)
+        (wt.path / "src/core/a.py").write_text("unverified = True\n")
+        result = self.run_sprint(Agent(), only_epic="EPIC-01")
+        self.assertFalse(self.head_co("src/core/a.py"))
+        self.assertFalse(result.ok)
+        self.assertEqual((wt.path / "src/core/a.py").read_text(), "unverified = True\n")
 
     def test_khong_hien_thuc_lai_story_da_xong(self):
         """Chỉ merge lại, không chạy agent lần nữa — công việc đã có sẵn."""

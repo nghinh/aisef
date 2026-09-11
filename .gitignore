@@ -24,6 +24,8 @@ spike/**/package-lock.json
 .dogfood/
 # bench (ADR-005 V8): task story sinh từ e9, bản chép, kết quả — chỉ task lỗi kho ở tests/bench/tasks/ mới commit
 .bench/
+# paired A/B/C memory harness (ADR-008): per-arm kết quả là tạo tác, không commit
+framework/bench/memory_compare/results/
 
 # worktree của subagent (Agent tool)
 .claude/worktrees/

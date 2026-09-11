@@ -1,5 +1,9 @@
 # Post-1.0 Roadmap
 
+## Experimental memory follow-up (2026-09-11)
+
+Local scoped advisory memory is implemented but default OFF. [P0/P1/P2 research plan](MEMORY-RESEARCH-PLAN.md), [ADR-007](ADR-007-scoped-advisory-memory.md), [operational guide](MEMORY.md), [validation report](MEMORY-VALIDATION.md). Pending: independently reviewed security hardening, verified OpenViking protocol adapter, authorized paired long-horizon real-agent efficacy (primary repeated-error rate), signed promotion/global sharing. Scripted retrieval success is not an enablement criterion.
+
 Written 2026-09-08, after v1.0.0 release. Items prioritized by evidence
 from dogfood runs, conformance, and known limitations — not by feature wish.
 
