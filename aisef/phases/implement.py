@@ -2248,7 +2248,15 @@ SAME_COMPLAINT_OVERLAP = 0.4
 
 
 def _same_complaint(a: list[str], b: list[str]) -> bool:
-    """Does any blocking item from this attempt match one from the previous?"""
+    """Does any blocking item from this attempt match one from the previous?
+
+    Prefers the new structured ``Finding`` id — two findings raised against
+    the same defect carry the same 16-hex digest by construction (see
+    ``aisef/control/findings.py``). Falls back to the legacy token overlap
+    rule for callers that haven't migrated to the canonical line shape.
+    """
+    if _same_complaint_by_finding(a, b):
+        return True
     for x in (_tokens(i) for i in a):
         for y in (_tokens(j) for j in b):
             if not x or not y:
@@ -2267,6 +2275,24 @@ def _rieng(tokens: set[str]) -> set[str]:
     """Proper nouns: contain identifier separators, long enough to not be
     punctuation stuck to a word."""
     return {t for t in tokens if len(t) >= 4 and any(c in t for c in "./-_@")}
+
+
+def _same_complaint_by_finding(a: list[str], b: list[str]) -> bool:
+    """Exact-match path: identical canonical lines share a structured
+    ``Finding.id`` 16-hex digest (see ``aisef/control/findings.py``).
+    Two review attempts raising the same defect produce the same id —
+    cheaper and more reliable than token overlap.  Non-canonical
+    lines are silently ignored: the legacy fallback still runs.
+    """
+    try:
+        from ..control.findings import Finding
+        ids_a = {f.id for f in Finding.parse_lines(
+            a, source="reviewer", trust="reviewer")}
+        ids_b = {f.id for f in Finding.parse_lines(
+            b, source="reviewer", trust="reviewer")}
+    except (ValueError, TypeError):
+        return False
+    return bool(ids_a and ids_b and ids_a & ids_b)
 
 
 #: Words appearing in nearly every blocking item, too common to distinguish.
