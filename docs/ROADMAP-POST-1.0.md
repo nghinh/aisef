@@ -9,6 +9,17 @@ from dogfood runs, conformance, and known limitations — not by feature wish.
 
 ---
 
+## Cross-tier invariants (2026-09-12)
+
+Three of the seven systemic issues surfaced in the pre-Phase-2 audit
+were transactional defects that are now closed: structured findings
+(anti-goalpost reviewer), candidate-bound dev-server identity lease,
+and in-flight budget reservation.  See
+[ADR-009](ADR-009-phase-3-cross-tier-invariants.md).  The other four
+issues are *semantic* and depend on these being correct first; they
+remain open until dogfood data confirms the wire-up is doing the
+right thing under load.
+
 ## 1. External user validation
 
 **Problem:** v1.0.0 shipped without any external user running the framework

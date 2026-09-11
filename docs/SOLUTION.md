@@ -672,6 +672,10 @@ Không để chữ "ngưỡng" chung chung. Mặc định trong `.ai/config.json
 | `run.max_turns` | `40` | vòng lặp tối đa của một phiên story |
 | `run.timeout_seconds` | `1800` | 30 phút cho một story |
 | `run.max_retries` | `2` | số lần thử lại trước khi `blocked` |
+| `run.cost_cap_usd` | `0` | trần tổng chi phí các lượt gọi model trong một run (USD; `0` = không giới hạn). Bật bằng cách đặt giá trị > 0 → `BudgetGuard.reserve(...)` chặn lượt gọi vượt trần, hoàn lại reservation khi ngoại lệ. Xem `aisef/control/budget.py` |
+| `run.turn_cap` | `0` | trần tổng số turn trong run (`0` = không giới hạn). Cùng cơ chế với `run.cost_cap_usd` |
+| `run.wall_clock_cap_seconds` | `0` | trần tổng thời gian chạy của run, giây (`0` = không giới hạn). Đo từ lúc run bắt đầu, không tính từng lượt gọi |
+| `run.qualify_preflight` | `false` | bật pre-flight qualification policy (`aisef/control/qualification.py`) trước lượt đầu. Mặc định tắt vì policy coi `pending` là "trạng thái không kỳ vọng"; `run.py` chiếu `pending → failed` để policy chuyển sang `verify` khi bật |
 | `cost.warn_multiple` | `3.0` | cảnh báo khi story tốn > 3× trung vị |
 | `security.block_severities` | `["critical","high"]` | mức chặn merge |
 
