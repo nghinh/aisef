@@ -14,7 +14,7 @@ aisef doctor | setup | init | compile | run | status | dashboard | guard |
 
 New subcommands may be added; existing ones keep their flags and exit codes.
 
-### Config keys (68 keys)
+### Config keys (67 keys)
 
 Every key in `aisef.config.DEFAULTS` is part of the public contract. Keys may
 be **added** but never removed or renamed. Type and default may not change

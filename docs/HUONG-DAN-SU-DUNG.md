@@ -892,7 +892,7 @@ Giá trị trong ngoặc là mặc định.
 | `improve.cost_cap_usd` | `0.0` | trần chi phí vòng cải tiến; `0` là không giới hạn |
 | `route.developer_model` · `route.reviewer_model` · `route.designer_model` | `""` | ép model cho từng vai |
 | `clients.env_allow` | `[]` | biến môi trường được phép truyền vào phiên agent |
-| `skills.offer` · `skills.inline` | `false` | hai cơ chế gợi ý skill; đo chưa thấy lợi nên tắt |
+| `skills.offer` | `false` | gợi ý skill cho agent; đo chưa thấy lợi nên tắt. Cơ chế thứ hai (`skills.inline`) đã **gỡ** ở 1.3.2 sau hai lần A/B cho `used` 0/0 |
 
 ---
 

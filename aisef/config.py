@@ -172,7 +172,6 @@ DEFAULTS: dict[str, Any] = {
     # ADR-003 mechanism B (experimental): inline the highest-scored skill content
     # into the prompt instead of just offering it via the ``Skill`` tool — measure
     # before deciding.
-    "skills.inline": False,
     # project commands — empty means auto-detect from files in the project
     "tools.test": "",
     "tools.lint": "",
@@ -265,7 +264,6 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "memory.max_chars": int,
     "memory.capture": bool,
     "skills.offer": bool,
-    "skills.inline": bool,
     "tools.test": str,
     "tools.lint": str,
     "tools.sast": str,
@@ -285,6 +283,12 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
 #: with no code reading it is an empty promise — same class as "not configured
 #: != passing" applied to config.
 RETIRED: dict[str, str] = {
+    "skills.inline": (
+        "2026-09-13 — cơ chế B của ADR-003, đo A/B **hai lần** trên agent thật "
+        "(e9 STORY-01-05 tối 05/09 và lần lặp sau): `used` 0/0 ở cả hai nhánh, "
+        "nhánh inline thêm ~8,8k ký tự prompt và trượt đúng bằng nhánh off. "
+        "Một cờ mặc định tắt, không ai bật, có mã phải bảo trì"
+    ),
     "story.max_context_tokens": (
         "2026-09-05 — chưa từng có mã đọc; thay bằng `prompt_chars` ghi vào "
         "evidence của mỗi lượt gọi model, `aisef status` cảnh báo story vượt "

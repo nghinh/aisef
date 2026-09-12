@@ -2,6 +2,27 @@
 
 ## Unreleased
 
+- **`skills.inline` is gone.** ADR-003's mechanism B inlined the top-scoring
+  skill's SKILL.md into the prompt. Two A/B runs on real agents reported
+  `used` 0/0 in both branches while the inlined branch carried ~8.8k extra
+  prompt characters and failed exactly as often. A flag that is off by
+  default, that nobody turns on, and that has code to maintain is debt: the
+  key is retired (an old project declaring it loads with a warning naming
+  the measurement) and the code is deleted.
+- **The OpenCode adapter enforces `run.max_turns`.** The CLI has no
+  `--max-turns`, so the cap was a number nobody read — measured: a session
+  declared a cap of 40, ran 61 turns and stopped only on the 1800s clock.
+  The adapter now counts turns on the event stream, kills the process at the
+  cap, and reports `max_turns` rather than `timeout`.
+- **A session the CLI cut short is no longer counted as an agent failure.**
+  When the model emits a tool call the CLI cannot parse, the session ends
+  there; the adapter recognises that ending and marks the run retryable
+  infrastructure.
+- **Guard messages advise per command.** Recursive delete stays blocked
+  whatever the target, but the message now explains why a path filter cannot
+  save it and that caches need not be deleted — the one guard block measured
+  in the C-1 cohort was a `__pycache__` cleanup told to "report to a human".
+
 - **`aisef dashboard` prints the four numbers an operator asks weekly**: cost
   per ISO week, net VERIFIED behaviours and behaviours per dollar, open gaps,
   and the age of the conformance table. A provider that reports no cost says so

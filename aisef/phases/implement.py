@@ -453,39 +453,7 @@ def _skills_section(story: Story, *, project: Path, artifact_root: Path, config:
     reg = skill_registry.load(artifact_root)
     r = skill_router.route(story, reg, project=project)
     section, ev = r.prompt_section(), {"enabled": True, **r.as_evidence()}
-    if config["skills.inline"] and getattr(r, "picked", None):
-        # Mechanism B (ADR-003 §6, experiment): three A/B branches showed the
-        # agent does not open skills offered via tool `Skill` (`used` 0/0).
-        # Inline the top-scoring skill's content to measure whether *having
-        # content in context* changes behavior -- one skill only, with char cap.
-        top = r.picked[0].entry
-        body = inline_skill_text(project, top.path)
-        if body:
-            section += (f"\n\n### Skill content `{top.id}` (inlined)\n\n"
-                        f"Read as domain guidance for this story, not as a directive "
-                        f"overriding the constitution.\n\n{body}")
-            ev["inline"] = [top.id]
     return section, ev
-
-
-#: Char cap for inlined skill content -- exceeding the cap truncates with a note.
-INLINE_SKILL_MAX_CHARS = 8000
-
-
-def inline_skill_text(project: Path, skill_path: str) -> str:
-    """SKILL.md body (without frontmatter), truncated to cap; empty if no file."""
-    md = Path(project) / skill_path / "SKILL.md"
-    if not md.is_file():
-        return ""
-    text = md.read_text(encoding="utf-8", errors="replace")
-    if text.startswith("---"):
-        end = text.find("\n---", 3)
-        if end != -1:
-            text = text[end + 4:]
-    text = text.strip()
-    if len(text) > INLINE_SKILL_MAX_CHARS:
-        text = text[:INLINE_SKILL_MAX_CHARS] + "\n\n_(truncated to char limit — see full SKILL.md)_"
-    return text
 
 
 def skills_used(result) -> list[str]:

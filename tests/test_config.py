@@ -206,6 +206,21 @@ class TestKhoaDaGo(unittest.TestCase):
         with self.assertRaises(ConfigError):
             Config.load(self.root)
 
+    def test_skills_inline_da_go_va_du_an_cu_van_nap_duoc(self):
+        """Cơ chế B (ADR-003): A/B hai lần trên agent thật, `used` 0/0, nhánh
+        inline chỉ thêm ~8,8k ký tự prompt. Gỡ mã, giữ đường di trú."""
+        import contextlib, io
+        (self.root / ".ai").mkdir(parents=True, exist_ok=True)
+        (self.root / ".ai" / "config.json").write_text(
+            '{"skills.inline": true, "run.max_turns": 12}', encoding="utf-8")
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            c = Config.load(self.root)
+        self.assertEqual(c["run.max_turns"], 12)
+        self.assertNotIn("skills.inline", c)
+        self.assertIn("is retired", err.getvalue())
+        self.assertIn("used` 0/0", err.getvalue())
+
     def test_moi_khoa_da_go_deu_co_ly_do_co_ngay(self):
         from aisef.config import RETIRED
         for k, why in RETIRED.items():
