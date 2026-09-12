@@ -167,3 +167,26 @@ on real reports, not speculative cleanup.
 - **Version bumps** for the sake of progress.
 - **New features** not driven by user feedback or evidence.
 - **Config key reduction** — already at 0 mandatory, 58 total with defaults.
+
+## Lessons from MiMo-Code (2026-09-12)
+
+[ADR-010](ADR-010-mimo-code-lessons.md) records a study of
+[MiMo-Code](https://github.com/XiaomiMiMo/MiMo-Code) — an OpenCode fork with
+persistent memory, `/dream` consolidation, `/distill` skill extraction, a
+QuickJS tool-batching sandbox and a harness hand-off mechanism.
+
+Three things landed: rate limits are no longer retried instantly, the retry
+delay is read from what the provider says, and a ranking harness now exists for
+memory retrieval. The ranking harness is the interesting one — it was built to
+justify replacing AISEF's word-overlap scorer with BM25 and instead showed no
+winner across two deliberately opposed datasets, so nothing was replaced.
+
+Four candidates carry written measurement conditions and are not enabled:
+evidence-backed memory consolidation, in-session stall detection, batched tool
+execution, and MiMo as a third client (which stays closed until a memory
+isolation test proves a fresh story cannot inherit a previous session's state).
+
+Rejected with evidence from MiMo's own issue tracker: automatic checkpoints and
+session resume (keep-alive loops, OOM at 6–20 GB), cross-tool transcript
+ingestion, and a second canonical task state.
+
