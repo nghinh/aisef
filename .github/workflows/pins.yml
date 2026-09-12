@@ -1,0 +1,31 @@
+# Kho tham chiếu ngoài chạy tiếp thì phần văn bản mới **chưa ai quét**, trong khi
+# một phần trong số đó được nạp làm skill cho agent. Job này chỉ phát hiện; quyết
+# định quét lại (tốn tiền, cần khoá) là của người.
+#
+# Không ghi báo cáo vào `docs/` như kế hoạch đợt 3 viết ban đầu: để CI tự commit
+# vào kho là thêm một bề mặt bot-push chỉ để chở một bảng. Bảng đi vào job summary
+# và job **đỏ khi nguồn skill chạy tiếp** — đó là tín hiệu cần người đọc.
+name: pins
+
+on:
+  schedule:
+    - cron: "17 3 1 * *"      # 03:17 UTC ngày 1 hằng tháng
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pins:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: so PINS.md với HEAD thượng nguồn
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # chỉ để nới giới hạn gọi API
+        run: |
+          set -o pipefail
+          python3 -m framework.pins | tee -a "$GITHUB_STEP_SUMMARY"
