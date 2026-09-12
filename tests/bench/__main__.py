@@ -33,7 +33,8 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("ids", nargs="*")
     b.add_argument("--client", default="claude")
     b.add_argument("--attempts", type=int, default=3)
-    b.add_argument("--shuffle", action="store_true", help="xáo thứ tự task")
+    b.add_argument("--shuffle", type=int, default=0, metavar="SEED",
+                   help="xáo thứ tự task với hạt giống cho trước (0 = giữ nguyên thứ tự). Có hạt giống thì lần chạy sau dựng lại được đúng thứ tự ấy; xáo không hạt giống là một biến không ai ghi lại")
     b.add_argument("--model", default="", help="model cụ thể (rỗng = mặc định của client); đi vào cả hai điều kiện")
     b.add_argument("--max-usd", type=float, default=0.0,
                    help="trần chi phí: dừng TRƯỚC task kế nếu đã tiêu quá; 0 = không trần. Cắt ở ranh giới task để mỗi task đo được vẫn đủ thiết kế; task bị bỏ được in ra, không im lặng")
@@ -75,7 +76,8 @@ def main(argv: list[str] | None = None) -> int:
         client = R.make_client(a.client)
         order = list(pick)
         if a.shuffle:
-            random.shuffle(order)
+            random.Random(a.shuffle).shuffle(order)
+            print(f"thứ tự (hạt giống {a.shuffle}): {', '.join(t.id for t in order)}", file=sys.stderr)
         res, bo_qua = [], []
         for i, t in enumerate(order):
             tieu = sum(x.cost_usd for x in res)
