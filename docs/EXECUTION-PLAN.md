@@ -682,8 +682,8 @@ kết quả.
 | **B-1** | Bench smoke: simulator đi hết `R.run` | ✅ `5f8957c` | |
 | **B-2** | **Dataset manifest ghim byte task-fixture** | ✅ `bfb0709` | `MANIFEST.sha256` khớp trước và sau mỗi lần chạy |
 | **B-3** | **Frontier trên 12 task A-2** — 3 lượt × 2 điều kiện = 72 phiên | ⏳ chưa chạy (~$50–80) | pass@1/pass@3, ổn định, tỉ lệ chi phí, số lần guard chặn; kết quả null vẫn ghi |
-| **C-1** | **Cột model yếu *thật*** (model rẻ, không phải simulator) — 12 × 2 × 2 | ⏳ chưa chạy (~$10–25) | trả lời "guard có cứu agent yếu không"; đây là giả thuyết trung tâm, simulator không trả lời được |
-| **C-2** | **Metric "xong giả"**: tuyên bố xong nhưng test đỏ · không có test cho tiêu chí · ghi ngoài scope · hồi quy P2P | ⏳ chưa chạy ($0, đọc lại log B-3/C-1) | bảng hai cột; đo đúng thứ harness được thiết kế để chặn, thay vì chỉ `pass@1` |
+| **C-1** | **Cột model yếu *thật*** (model rẻ, không phải simulator) — 12 × 3 × 2 | 🔄 chạy 12/09 19:10 → 13/09, 11/12 task xong, `multi-4` đang chạy. Chi phí nhà cung cấp báo: **0,00 $** | trả lời "guard có cứu agent yếu không"; quan sát ghi trong lúc chạy ở [BENCH-OBSERVATIONS-C1](BENCH-OBSERVATIONS-C1.md) O-1…O-11 |
+| **C-2** | **Metric "xong giả"**: tuyên bố xong nhưng test đỏ · không có test cho tiêu chí · ghi ngoài scope · hồi quy P2P | ✅ công cụ xong (`python3 -m tests.bench analyze`), đo trên C-1 | bảng hai cột **+ cột "phiên bị CLI cắt"**: 9/10 lượt "xong giả" của nhánh AISEF thật ra là phiên bị cắt, nên metric này không phân biệt được gì trên cohort ấy — và bảng nói ra điều đó |
 | **C-3** | Tỉ lệ chênh chi phí có ngưỡng phát hành (v1.3 §6.4) | ⏳ chờ B-3 | "đạt nếu chi phí AISEF ≤ 2× trần ở ≥80 % task" |
 | **D-1** | `partial` ở mức hunk/hàm thay vì mức tệp (v1.3 §6.2) | ⏳ chỉ làm nếu A-3 còn sống ở v2.0 | 9/12 task A-2 có gold một tệp nên `partial` mức tệp thiên về PASS |
 | **D-2** | Phễu tester: coder gọi tester ở ranh giới eval (v1.3 §6.5) | ⏳ chưa lên lịch | đếm F2P xanh độc lập với đường đi của agent |
