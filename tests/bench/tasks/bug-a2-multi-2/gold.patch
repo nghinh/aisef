@@ -1,0 +1,30 @@
+diff --git a/aisef/phases/implement.py b/aisef/phases/implement.py
+index 45fdf7a..03e9871 100644
+--- a/aisef/phases/implement.py
++++ b/aisef/phases/implement.py
+@@ -578,7 +578,8 @@ def run_attempt(
+ 
+     _attach_settings(spec, project)
+     from ..harness.runlog import run_log
+-    run_log(artifact_root, f"story={story.id}#{number} agent START scope={','.join(scope)}")
++    run_log(artifact_root, f"story={story.id}#{number} agent START "
++                           f"timeout={spec.timeout_seconds}s scope={','.join(scope)}")
+     result = client.run(spec)
+     attempt.cost_usd = result.cost_usd
+     used = skills_used(result)
+diff --git a/aisef/phases/plan.py b/aisef/phases/plan.py
+index 4155874..8b01a15 100644
+--- a/aisef/phases/plan.py
++++ b/aisef/phases/plan.py
+@@ -390,7 +390,10 @@ def run_phase(
+ ) -> PhaseOutcome:
+     """Run one phase. Skip if all artifacts exist and force is not set."""
+     out = PhaseOutcome(phase=phase)
+-    _run_log(project, f"phase={phase.id} START")
++    # Name the timeout: an agent turn is silent for minutes at a time, and
++    # without the bound the reader cannot tell "thinking" from "hung"
++    # (measured twice on 2026-09-09: a 14-minute silence each time).
++    _run_log(project, f"phase={phase.id} START timeout={config['run.timeout_seconds']}s")
+ 
+     if not _missing(project, phase.artifacts) and not force:
+         out.skipped_reason = "artifacts already exist"

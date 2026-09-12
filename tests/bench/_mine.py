@@ -340,6 +340,39 @@ BUGS: tuple[Bug, ...] = (
         "chọn 8/18 story — sai cả 8: năng lực suy từ chữ trong SKILL.md, \"màn hình + một chữ\" đếm là hai tín hiệu."),
 )
 
+#: A-2 — 12 task khó hơn cho đợt đo v1.3.  Phân bố: 4 đa tệp, 4 trạng thái/
+#: đồng thời, 4 nhắm-phạm-vi/an-ninh-người-rà-soát.  Commit sửa tự `_find_commit`,
+#: dấu vết nhật ký chỉ vào kho nguồn (lệnh kho) — không ghi vào task.json.
+A2_BUGS: tuple[Bug, ...] = (
+    # ----- 4 đa tệp (refactor / log parser / tooling rộng) -----
+    Bug("a2-multi-1", "test_nhieu_project_thi_moi_dong_mang_the_trinh_duyet",
+        "Bản ghi log Playwright mặc định thử nhiều trình duyệt (`projects`); mỗi dòng mang theo `[chromium] › ` ngoài tên test. Bộ phân tích log đọc 0/99 tên trên bản ghi nhiều project, cổng gate tin log rỗng và đập phiên — sửa 7 tệp."),
+    Bug("a2-multi-2", "test_dong_START_noi_ra_han_cho",
+        "Đầu phiên chỉ ghi `START` không nói chờ bao lâu; agent kết thúc trước khi mạng chậm kịp phản hồi, phần việc xong nhưng phiên bị chấm 'failed to start' dù thực ra chỉ lâu hơn ngưỡng cấu hình."),
+    Bug("a2-multi-3", "test_luot_dau_im_lang_cung_khong_phai_ung_vien",
+        "Phiên đầu tiên im lặng — không viết tệp, không gọi công cụ — vẫn được ghi là 'ứng viên' và bị rà soát: rảnh cổng `gate` rà soát phiên rỗng, cổng bận thì chính rà-soát-viên tự rà soát bản thân mình, sinh FINDING."),
+    Bug("a2-multi-4", "test_required_missing_check_stops_without_agent",
+        "Hai phiên của cùng một dự án giành nhau một tệp trạng thái; phiên đến sau ghi đè phiên đến trước và `improve` sửa trên bằng chứng phiên khác — bằng chứng ấy đã bị thay mất trước khi `improve` chạm vào."),
+    # ----- 4 trạng thái / đồng thời -----
+    Bug("a2-state-1", "test_khong_ra_soat_lai_cay_y_het_va_khong_tinh_luot",
+        "Lượt viết cùng nội dung như lượt trước được tính là 'đã sửa', cổng chấm PASS mà không phân biệt; phiên tiếp theo của cùng story sẽ đốt vì cổng đã đánh dấu xong."),
+    Bug("a2-state-2", "test_cay_chua_ai_cham_thi_van_phai_cham_du_phien_im_lang",
+        "Lượt kế tiếp khi phiên agent im lặng và không ghi tệp nào thì cổng 'no-op' lại đập ngược — cây chưa ai chạm vẫn được đem đi rà soát, REVIEWER rảnh thì rà một bản trống, REVIEWER bận thì tự rà phiên trước."),
+    Bug("a2-state-3", "test_ban_khac_thi_khong_giao_lai",
+        "Sau khi phiên bị ngắt (timeout, khởi động lại), lượt kế tiếp gửi lại **ứng viên đã bị bác** của lượt trước; rà-soát-viên lại phải dò lại từ đầu dù lý do bác vẫn còn trên bằng chứng."),
+    Bug("a2-state-4", "test_cau_cam_thi_khong_sinh_nhu_cau",
+        "Preflight khớp chữ 'third-party' rồi đòi **bật** `sandbox.tools_network` cho story mà AC cấm mọi truy cập mạng — heuristic đọc chữ mà bỏ câu, biến yêu cầu bảo mật thành yêu cầu nới lỏng sandbox, chặn story là NOT_EXECUTABLE. Mặc định vốn đã là tắt mạng — không phải cấu hình gì cả."),
+    # ----- 4 nhắm-phạm-vi / an-ninh / rà-soát -----
+    Bug("a2-sec-1", "test_thu_muc_trang_thai_cua_cong_cu_bi_loai",
+        "MCP server lưu vết trong thư mục riêng (`~/.mcp/state`); guard phạm vi ghi không biết thư mục ấy là tạo tác của công cụ, thấy tệp mới thì chặn cả khi MCP đã ghi — agent bị cấm đọc lại kết quả."),
+    Bug("a2-sec-2", "test_ten_tep_pham_loi_dung_truoc_danh_sach_pham_vi",
+        "Thông báo vi phạm phạm vi cắt bỏ danh sách phạm vi được phép, chỉ in tên tệp sai — agent không biết **mình được phép ghi đâu** thì không sửa được."),
+    Bug("a2-sec-3", "test_ban_va_minh_ke_don_roi_thi_khong_duoc_chan_lai",
+        "Lúc tự rà soát mình (`self-review`) hệ thống khóa cổng `block` đúng nơi, nhưng **đánh dấu khối `BLOCK` của mình là không hợp lệ** — người rà soát bỏ qua bản thân mình, bản sửa do người viết đề xuất tự đi vào giai đoạn tiếp theo mà không có phản biện nào."),
+    Bug("a2-sec-4", "test_nguoi_ra_soat_thay_ca_ke_hoach_va_duoc_dan_khong_cham_luot_khac",
+        "Người rà soát viết nhận xét trên cả kế hoạch nhưng `prompts` chỉ đưa về story đơn; người rà soát thấy ngoài phạm vi rồi dán nhãn nhầm cho một story khác trong lúc thiếu thông tin — scope của prompt không khớp scope họ nhìn."),
+)
+
 #: Lỗi không thành task được — nêu tên, không im.
 SKIPPED_BUGS = {
     "1": "sửa (`_carry_client_config`) nằm trong commit gộp đợt 2+3 (39 tệp) — không tách nguồn/test sạch",

@@ -1,0 +1,31 @@
+diff --git a/aisef/kit/prompts/story-review.md b/aisef/kit/prompts/story-review.md
+index c4bdc71..88ce407 100644
+--- a/aisef/kit/prompts/story-review.md
++++ b/aisef/kit/prompts/story-review.md
+@@ -1,6 +1,6 @@
+ ---
+ name: story-review
+-version: 10
++version: 11
+ role: reviewer
+ ---
+ # Review {{ story_id }} — {{ story_title }}
+@@ -60,6 +60,18 @@ automatically — spending a `[block]` on one only removes it from your
+ report. An item you tagged `[block]` that is still not fixed: block it
+ again, in the same words, so the author sees it is the same item.
+ 
++**A fix you prescribed and the author implemented is closed.** When your
++previous item carried `Fix: …` and the code now does that, the item is
++resolved — you may not block the same line again because the fix *you asked
++for* turns out not to satisfy you. That is moving the bar after the author
++has already paid a round for it, and the story runs out of attempts having
++done exactly what it was told. Measured on `todo-e2e` STORY-01-01,
++2026-09-09: round 2 asked for "a defined post-load quiet period", round 3
++blocked the same line because a defined window is finite. If you now believe
++no change the author can make satisfies the criterion — proving no delayed
++request ever fires needs an unbounded window — that is `[stuck]`, which hands
++it to a human, not `[block]`, which spends another attempt on it.
++
+ {{ prior_review }}
+ 
+ ## Review in this order

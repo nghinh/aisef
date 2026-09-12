@@ -1,0 +1,46 @@
+diff --git a/aisef/kit/prompts/story-review.md b/aisef/kit/prompts/story-review.md
+index 1c5e493..c030fa6 100644
+--- a/aisef/kit/prompts/story-review.md
++++ b/aisef/kit/prompts/story-review.md
+@@ -1,6 +1,6 @@
+ ---
+ name: story-review
+-version: 9
++version: 10
+ role: reviewer
+ ---
+ # Review {{ story_id }} — {{ story_title }}
+@@ -82,7 +82,14 @@ again, in the same words, so the author sees it is the same item.
+ 6. **Security** — where does user data flow, is it validated at the trust
+    boundary.
+ 
+-## Two things you do **not** grade
++## The plan, one line per story
++
++The product is split into stories on purpose. Everything below that is not
++this story has an owner and a turn.
++
++{{ index }}
++
++## Three things you do **not** grade
+ 
+ **Verification types the project has not configured.** If the story
+ declares it must pass `e2e` or `accessibility` but the project has not
+@@ -90,6 +97,17 @@ configured the tooling — that is a project gap; the harness already
+ logged it. Blocking the story for this blocks the author for something
+ they cannot do, and the story can never pass.
+ 
++**Behaviour another story owns.** This story's acceptance criteria are the
++whole of what must exist **now**. A requirement the PRD states but whose
++story has not run yet is not this story's debt — the shell story is not
++failing because it has no submit handler, it is a shell. Before writing
++`[block]` for something the code does not do, look at the story list above:
++if another story owns it, say nothing at all, not even `should fix`.
++Blocking the first story for not being the last one blocks the author for
++work they were explicitly told not to do (measured on `todo-e2e`,
++2026-09-09: three `[block]` items on a one-criterion story, all of them
++naming requirements owned by three later stories).
++
+ **Criteria that cannot be satisfied from within the story's scope.** If
+ the author flagged a criterion as unsatisfiable — because the fix is
+ outside `write_scope`, or because two criteria conflict — your job is to

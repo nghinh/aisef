@@ -1,0 +1,48 @@
+diff --git a/aisef/phases/implement.py b/aisef/phases/implement.py
+index 10f8311..5cefd83 100644
+--- a/aisef/phases/implement.py
++++ b/aisef/phases/implement.py
+@@ -653,19 +653,31 @@ def run_attempt(
+         ))
+         return attempt
+ 
+-    # An attempt that wrote nothing is not a candidate.  `changed_now` is the
+-    # diff against the base branch, so on a retry it shows the *previous*
+-    # attempt's work and this session's silence looks like two changed files
+-    # (todo-e2e/STORY-02-01 2026-09-10: 7 turns, 0 edits, and the harness paid
+-    # for a full verify + review + security pass on a tree byte-identical to
+-    # the one it had just reviewed -- then charged the story an attempt for
+-    # it).  Re-measuring identical code returns the identical verdict; the
+-    # only new information is that the author produced nothing.
+-    if changed_now and (head_sha(workdir), _tree_snapshot(workdir)) == tree_before:
++    # An attempt that wrote nothing is not a candidate.  Two shapes of the
++    # same silence, both measured on todo-e2e 2026-09-10:
++    #
++    # * STORY-02-01: 7 turns, 0 edits, on a retry.  `changed_now` is the diff
++    #   against the base branch, so it showed the *previous* attempt's two
++    #   files and the silence was invisible.
++    # * STORY-03-01: 7 turns, 0 edits, on a first attempt.  `changed_now` was
++    #   empty, and the gate ran anyway -- four checks red for one cause,
++    #   opening with "guard did not evaluate any write in this session -- hook
++    #   cannot reach worktree?", which sends the reader after a hook problem
++    #   that does not exist.
++    #
++    # Both paid for a full verify pass, including two more agent sessions
++    # (review and security), to establish what `changed_files` already knew.
++    # Nothing was written, so there is nothing to grade: the gate would return
++    # either the verdict it already returned, or "no changes to review".
++    if (head_sha(workdir), _tree_snapshot(workdir)) == tree_before:
+         attempt.error = (
+-            f"the session wrote nothing ({result.num_turns} turns): the tree is "
+-            f"identical to the one already reviewed. Re-running the gate on it "
+-            f"would return the verdict it already returned."
++            f"the session wrote nothing ({result.num_turns} turns) — the tree is "
++            f"exactly as the session found it, so the gate has nothing to grade. "
++            + ("Re-running it would return the verdict it already returned."
++               if changed_now else
++               "If the story's work is already on the main branch, the worktree "
++               "forked from it and the diff stays empty however many sessions "
++               "run — check the main branch before retrying.")
+         )
+         attempt.infra = True   # the story was never scored, so do not charge it
+         run_log(artifact_root, f"story={story.id}#{number} NO-OP: "

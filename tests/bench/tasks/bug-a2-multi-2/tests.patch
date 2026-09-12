@@ -1,0 +1,19 @@
+diff --git a/tests/test_runlog.py b/tests/test_runlog.py
+index b2968ce..364d39d 100644
+--- a/tests/test_runlog.py
++++ b/tests/test_runlog.py
+@@ -91,6 +91,14 @@ class TestLyDoTrongNhatKy(unittest.TestCase):
+         dong = next(d for d in log.splitlines() if "baseline DONE" in d)
+         self.assertIn("unrunnable=", dong, dong)
+ 
++    def test_dong_START_noi_ra_han_cho(self):
++        """Một lượt agent im lặng hàng chục phút. Không có con số ấy trong
++        nhật ký, người vận hành không phân biệt được "đang nghĩ" với "treo" —
++        đo hai lần ngày 2026-09-09, mỗi lần 14 phút im lặng."""
++        log = self.chay()
++        dong = next(d for d in log.splitlines() if "agent START" in d)
++        self.assertIn("timeout=", dong, dong)
++
+     def test_nop_noi_ro_do_la_ket_qua_mong_doi(self):
+         """`nop DONE ok=False` từng bị đọc là lỗi; đỏ ở parent mới là điều cần."""
+         log = self.chay()

@@ -1,0 +1,25 @@
+diff --git a/tests/test_guardrails.py b/tests/test_guardrails.py
+index 08bc4dc..e748de3 100644
+--- a/tests/test_guardrails.py
++++ b/tests/test_guardrails.py
+@@ -1211,3 +1211,20 @@ class TestSanPhamBuildKhongPhaiViecCuaStory(unittest.TestCase):
+         from aisef.harness.guardrails import changed_files
+         (self.repo / "ngoai.ts").write_text("y\n", encoding="utf-8")
+         self.assertIn("ngoai.ts", changed_files(str(self.repo)))
++
++
++class TestThongBaoNgoaiPhamViNoiTenTepTruoc(unittest.TestCase):
++    """Danh sách phạm vi lên tới 27 mục sau khi harness thêm thư mục kiểm
++    định, mà mọi nơi đọc thông báo này đều gấp về **một dòng** — nên thứ duy
++    nhất người đọc cần (tệp nào) luôn là phần bị cắt (đo `todo-e2e`
++    2026-09-09)."""
++
++    def test_ten_tep_pham_loi_dung_truoc_danh_sach_pham_vi(self):
++        from aisef.harness.guardrails import check_diff_scope
++
++        scope = [f"duong-dan-rat-dai-so-{i}" for i in range(27)]
++        v = check_diff_scope(["ke-hoach/khong-thuoc-pham-vi.md"], scope)
++        self.assertFalse(v.allowed)
++        self.assertLess(v.reason.index("khong-thuoc-pham-vi.md"), v.reason.index("Scope:"),
++                        v.reason)
++        self.assertIn("(+15 more)", v.reason)

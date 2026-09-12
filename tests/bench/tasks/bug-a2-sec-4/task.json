@@ -1,0 +1,58 @@
+{
+  "id": "bug-a2-sec-4",
+  "source": "bug",
+  "base": "93efd0ec3f8ddf8603e47646e1b6709e4b1060c0",
+  "candidate": "2e6fbdc77d1a42278b5a983a20744dc0cf2ca4ac",
+  "verify": "python3 -m unittest -v tests.test_prompts",
+  "write_scope": [
+    "aisef"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [
+    "tests.test_prompts.TestPromptContent.test_nguoi_ra_soat_thay_ca_ke_hoach_va_duoc_dan_khong_cham_luot_khac"
+  ],
+  "p2p_ids": [
+    "tests.test_prompts.TestCatalog.test_every_role_has_its_prompt",
+    "tests.test_prompts.TestCatalog.test_frontmatter_not_left_in_the_body",
+    "tests.test_prompts.TestCatalog.test_prompts_are_versioned",
+    "tests.test_prompts.TestCatalog.test_unknown_prompt_names_the_alternatives",
+    "tests.test_prompts.TestPromptContent.test_developer_prompt_demands_red_before_green",
+    "tests.test_prompts.TestPromptContent.test_developer_prompt_forbids_working_around_scope",
+    "tests.test_prompts.TestPromptContent.test_developer_prompt_says_evidence_beats_claims",
+    "tests.test_prompts.TestPromptContent.test_reviewer_prompt_forbids_editing",
+    "tests.test_prompts.TestPromptContent.test_reviewer_prompt_refuses_padding",
+    "tests.test_prompts.TestPromptFilesOnDisk.test_prompt_dir_shipped_with_the_package",
+    "tests.test_prompts.TestRender.test_blank_allowed_when_declared",
+    "tests.test_prompts.TestRender.test_blank_variable_raises",
+    "tests.test_prompts.TestRender.test_braces_in_body_are_left_alone",
+    "tests.test_prompts.TestRender.test_load_from_a_directory_without_prompts",
+    "tests.test_prompts.TestRender.test_missing_variable_raises",
+    "tests.test_prompts.TestRender.test_slots_filled",
+    "tests.test_prompts.TestRouting.test_developer_may_resume",
+    "tests.test_prompts.TestRouting.test_model_comes_from_config",
+    "tests.test_prompts.TestRouting.test_no_model_configured_leaves_client_default",
+    "tests.test_prompts.TestRouting.test_reviewer_cannot_write",
+    "tests.test_prompts.TestRouting.test_reviewer_may_not_resume_the_developer_session",
+    "tests.test_prompts.TestRouting.test_reviewer_runs_read_only",
+    "tests.test_prompts.TestRouting.test_routing_without_config",
+    "tests.test_prompts.TestRouting.test_unknown_role",
+    "tests.test_prompts.TestRouting.test_wrong_prompt_for_the_role_is_refused",
+    "tests.test_prompts.TestSlotBanDoMa.test_ca_ba_prompt_co_slot",
+    "tests.test_prompts.TestSlotBanDoMa.test_slot_co_thi_muc_hien",
+    "tests.test_prompts.TestSlotBanDoMa.test_slot_rong_thi_khong_co_muc"
+  ],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": true,
+    "gold_pass": true,
+    "runs": 1
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "",
+  "fix_commit": "2e6fbdc77d1a42278b5a983a20744dc0cf2ca4ac"
+}

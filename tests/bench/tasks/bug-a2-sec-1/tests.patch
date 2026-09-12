@@ -1,0 +1,25 @@
+diff --git a/tests/test_guardrails.py b/tests/test_guardrails.py
+index e748de3..ba97eb9 100644
+--- a/tests/test_guardrails.py
++++ b/tests/test_guardrails.py
+@@ -1228,3 +1228,20 @@ class TestThongBaoNgoaiPhamViNoiTenTepTruoc(unittest.TestCase):
+         self.assertLess(v.reason.index("khong-thuoc-pham-vi.md"), v.reason.index("Scope:"),
+                         v.reason)
+         self.assertIn("(+15 more)", v.reason)
++
++
++class TestTrangThaiMcpKhongPhaiViecCuaStory(unittest.TestCase):
++    """Lỗi 62. Serena ghi `.serena/memories/*.md` ngay lần gọi đầu — tức là
++    mọi phiên. `diff-scope` chặn **mọi** lệnh agent chạy suốt cả ba lượt, story
++    chết mà gần như chưa sản xuất được gì (đo `todo-e2e` 2026-09-09). Framework
++    không chọn MCP server của người dùng; không được đánh trượt story vì chúng."""
++
++    def test_thu_muc_trang_thai_cua_cong_cu_bi_loai(self):
++        from aisef.harness.guardrails import HARNESS_OWNED
++        for d in (".serena", ".opencode", ".claude/settings.json"):
++            self.assertIn(d, HARNESS_OWNED, d)
++
++    def test_van_thay_thu_story_that_su_ghi(self):
++        """Đối chứng: loại trạng thái công cụ không được loại luôn mã."""
++        from aisef.harness.guardrails import check_diff_scope
++        self.assertFalse(check_diff_scope(["ke-hoach/x.md"], ["src"]).allowed)

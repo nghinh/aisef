@@ -1,0 +1,39 @@
+{
+  "id": "bug-a2-multi-2",
+  "source": "bug",
+  "base": "db0081275046d687e136bc2540cae78a156e7dd1",
+  "candidate": "df4da096ede81e00add3299d7b8f5a18fb37f2d9",
+  "verify": "python3 -m unittest -v tests.test_runlog",
+  "write_scope": [
+    "aisef"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [
+    "tests.test_runlog.TestLyDoTrongNhatKy.test_dong_START_noi_ra_han_cho"
+  ],
+  "p2p_ids": [
+    "tests.test_runlog.TestGhiVaXoay.test_ghi_them_dong_co_dau_thoi_gian",
+    "tests.test_runlog.TestLyDoTrongNhatKy.test_baseline_khong_chay_duoc_thi_noi_ra_ngay_trong_nhat_ky",
+    "tests.test_runlog.TestLyDoTrongNhatKy.test_moi_phep_kiem_truot_co_mot_dong_ly_do",
+    "tests.test_runlog.TestLyDoTrongNhatKy.test_muc_chan_cua_reviewer_nam_trong_nhat_ky",
+    "tests.test_runlog.TestLyDoTrongNhatKy.test_nop_noi_ro_do_la_ket_qua_mong_doi",
+    "tests.test_runlog.TestMotDong.test_cat_thi_noi_ro_da_cat",
+    "tests.test_runlog.TestMotDong.test_gap_xuong_dong_thanh_mot_dong",
+    "tests.test_runlog.TestMotDong.test_khong_cat_thi_khong_them_gi",
+    "tests.test_runlog.TestMotDong.test_nhan_moi_kieu"
+  ],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": true,
+    "gold_pass": true,
+    "runs": 3
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "",
+  "fix_commit": "df4da096ede81e00add3299d7b8f5a18fb37f2d9"
+}

@@ -1,0 +1,49 @@
+diff --git a/aisef/phases/implement.py b/aisef/phases/implement.py
+index 5cefd83..f71f7de 100644
+--- a/aisef/phases/implement.py
++++ b/aisef/phases/implement.py
+@@ -670,19 +670,31 @@ def run_attempt(
+     # Nothing was written, so there is nothing to grade: the gate would return
+     # either the verdict it already returned, or "no changes to review".
+     if (head_sha(workdir), _tree_snapshot(workdir)) == tree_before:
+-        attempt.error = (
+-            f"the session wrote nothing ({result.num_turns} turns) — the tree is "
+-            f"exactly as the session found it, so the gate has nothing to grade. "
+-            + ("Re-running it would return the verdict it already returned."
+-               if changed_now else
+-               "If the story's work is already on the main branch, the worktree "
+-               "forked from it and the diff stays empty however many sessions "
+-               "run — check the main branch before retrying.")
+-        )
+-        attempt.infra = True   # the story was never scored, so do not charge it
+-        run_log(artifact_root, f"story={story.id}#{number} NO-OP: "
+-                               f"{result.num_turns} turns, 0 files written")
+-        return attempt
++        # ...unless this tree has never been graded.  A verdict is not a pure
++        # function of the tree: it also depends on the spec the gate reads.
++        # todo-e2e/STORY-03-01 2026-09-10 -- a reviewer stopped the story
++        # `[stuck]` on a contradiction between AD-9 and an accepted criterion,
++        # AD-9 was amended, the worktree merged the amendment, and the agent
++        # then correctly wrote nothing because the work was already done.
++        # Skipping there would bury finished work under "already known".
++        cham_roi = {str(e.detail.get("candidate") or "")
++                    for e in evidence.read(story.id).of(NOTE, "gate:verdict")}
++        if not changed_now or head_sha(workdir) in cham_roi:
++            attempt.error = (
++                f"the session wrote nothing ({result.num_turns} turns) — the tree is "
++                f"exactly as the session found it, so the gate has nothing to grade. "
++                + ("Re-running it would return the verdict it already returned."
++                   if changed_now else
++                   "If the story's work is already on the main branch, the worktree "
++                   "forked from it and the diff stays empty however many sessions "
++                   "run — check the main branch before retrying.")
++            )
++            attempt.infra = True   # never scored, so do not charge the story
++            run_log(artifact_root, f"story={story.id}#{number} NO-OP: "
++                                   f"{result.num_turns} turns, 0 files written")
++            return attempt
++        run_log(artifact_root, f"story={story.id}#{number} wrote nothing, but this "
++                               f"tree has no verdict yet — grading it")
+     run_log(artifact_root, f"story={story.id}#{number} changed_files={len(changed_now)}")
+     attempt.candidate = freeze_candidate(
+         workdir, story=story, scope=scope, isolated=workdir != project,

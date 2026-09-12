@@ -1,0 +1,54 @@
+{
+  "id": "bug-a2-multi-1",
+  "source": "bug",
+  "base": "8b4690453ab8d5c9b3c76983ae251b01c66a900b",
+  "candidate": "9b5d7b354adf6441b65e8eb25adda21f86f66d46",
+  "verify": "python3 -m unittest -v tests.test_testlog",
+  "write_scope": [
+    "aisef"
+  ],
+  "tests_visible": true,
+  "use_docker": false,
+  "f2p_ids": [
+    "tests.test_testlog.TestPlaywright.test_cung_ten_o_hai_trinh_duyet_la_hai_ket_qua",
+    "tests.test_testlog.TestPlaywright.test_nhieu_project_thi_moi_dong_mang_the_trinh_duyet"
+  ],
+  "p2p_ids": [
+    "tests.test_testlog.TestCoverageVaLa.test_evidence_shape",
+    "tests.test_testlog.TestCoverageVaLa.test_istanbul_all_files",
+    "tests.test_testlog.TestCoverageVaLa.test_pytest_cov_total",
+    "tests.test_testlog.TestCoverageVaLa.test_unknown_output_does_not_guess",
+    "tests.test_testlog.TestCtrf.test_evidence_shape_giong_dinh_dang_khac",
+    "tests.test_testlog.TestCtrf.test_json_chen_giua_output_runner",
+    "tests.test_testlog.TestCtrf.test_pytest_json_ctrf",
+    "tests.test_testlog.TestCtrf.test_suite_pending_va_json_la",
+    "tests.test_testlog.TestCtrf.test_vitest_ctrf_ghep_file_vao_ten",
+    "tests.test_testlog.TestNodeSpec.test_all_pass_par",
+    "tests.test_testlog.TestNodeSpec.test_fail_skip_and_suite_line_is_not_a_test",
+    "tests.test_testlog.TestNodeTap.test_tap_par",
+    "tests.test_testlog.TestNodeTap.test_tap_suite_and_directives",
+    "tests.test_testlog.TestPlaywright.test_bo_qua_log_cua_may_chu_xen_giua",
+    "tests.test_testlog.TestPlaywright.test_doc_duoc_ten_tu_output_that",
+    "tests.test_testlog.TestPlaywright.test_khong_nhan_vo_output_cua_runner_khac",
+    "tests.test_testlog.TestPytest.test_quiet_only_knows_failures",
+    "tests.test_testlog.TestPytest.test_verbose",
+    "tests.test_testlog.TestUnittestVerbose.test_python_cu_chi_in_lop_thi_noi_them_ten",
+    "tests.test_testlog.TestUnittestVerbose.test_ten_day_du_ke_ca_khi_co_docstring",
+    "tests.test_testlog.TestVitest.test_default_reporter_has_no_names",
+    "tests.test_testlog.TestVitest.test_fail_and_skip_marks",
+    "tests.test_testlog.TestVitest.test_verbose_e9"
+  ],
+  "flaky_ids": [],
+  "validated": {
+    "base_fail": true,
+    "gold_pass": true,
+    "runs": 3
+  },
+  "history": {
+    "cost_usd": 0.0,
+    "turns": 0
+  },
+  "too_big": false,
+  "invalid_reason": "",
+  "fix_commit": "9b5d7b354adf6441b65e8eb25adda21f86f66d46"
+}

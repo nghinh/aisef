@@ -1,0 +1,20 @@
+diff --git a/tests/test_prompts.py b/tests/test_prompts.py
+index e16a796..887899d 100644
+--- a/tests/test_prompts.py
++++ b/tests/test_prompts.py
+@@ -146,6 +146,15 @@ class TestPromptContent(unittest.TestCase):
+         """Bắt phải có phát hiện sẽ đẻ ra phát hiện giả."""
+         self.assertIn("not manufacture findings", self.catalog.get("story-review").body)
+ 
++    def test_ban_va_minh_ke_don_roi_thi_khong_duoc_chan_lai(self):
++        """Lỗi 61. Vòng 2 dặn "giữ trang dưới quan sát một khoảng yên tĩnh
++        **xác định**"; tác giả làm đúng thế (5,5 giây); vòng 3 chặn lại **cùng
++        dòng ấy** vì một khoảng xác định thì hữu hạn. Story cạn cả 3 lượt sau
++        khi làm đúng điều được bảo."""
++        body = self.catalog.get("story-review").body
++        self.assertIn("prescribed and the author implemented is closed", body)
++        self.assertIn("[stuck]", body)
++
+     def test_nguoi_ra_soat_thay_ca_ke_hoach_va_duoc_dan_khong_cham_luot_khac(self):
+         """Lỗi 58. Story "vỏ ứng dụng" có **một** tiêu chí — cấu trúc tài liệu —
+         bị chặn ba mục vì chưa có submit handler, chưa đọc localStorage, chưa
