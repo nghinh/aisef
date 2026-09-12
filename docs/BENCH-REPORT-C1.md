@@ -198,6 +198,11 @@ Mục này dài hơn người ta muốn đọc, và đó là chủ ý: một đ�
 | 5 | Sửa đề bài `sec-2` (đọc được hai nghĩa) ở **v1.4 của bộ dữ liệu**, không sửa giữa đợt | [O-2](BENCH-OBSERVATIONS-C1.md) | ⏳ |
 | 6 | Cột 2: đổi model sau alias, giữ nguyên mọi thứ khác | quy trình đã đóng băng trong [BENCH-PROTOCOL-v1.3 § Cột 2](BENCH-PROTOCOL-v1.3.md) | ⏳ chờ chủ dự án đổi model |
 
+**Đợt tiếp theo đã chạy, và nó nhỏ hơn:** [C-1b](BENCH-PROTOCOL-v1.3.md#addendum-c-1b--đóng-băng-1309-trước-khi-chạy)
+— ba task duy nhất phân biệt được ở C-1, 6 lượt mỗi nhánh, bộ dữ liệu v1.4,
+phiên chết vì hạ tầng được chạy lại một lần. Cùng model (chủ dự án xác nhận
+`mycombo` vẫn là MiniMax-M2.7 ngày 13/09), nên **đây không phải cột 2**.
+
 **Một việc cố ý *không* làm:** thêm task để "có mẫu lớn hơn". Với 20/24 lượt
 trượt là lỗi tích hợp model↔CLI, thêm task chỉ mua thêm phiên bị cắt. Việc đáng
 làm trước là chạy lại trên một cặp model↔CLI không có kiểu hỏng ấy — và bản vá

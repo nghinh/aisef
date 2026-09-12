@@ -166,6 +166,22 @@ Khoảng trống thật: **trong** một phiên, AISEF không biết agent đang
 Một lượt 35 turn/491 giây không ghi gì (đo hôm nay trên `sec-2` lượt 3) chỉ bị
 phát hiện khi đã trả tiền xong. Đây là P2 vì nó cần hook mức tool để đếm.
 
+### Cập nhật 13/09 — hai phần ba khoảng trống đã đóng, bằng đường khác
+
+Cohort C-1 cho hai tín hiệu **đo được trong phiên**, và cả hai đã có mã:
+
+| tín hiệu | trạng thái | cơ chế |
+|---|---|---|
+| phiên chết vì CLI không phân giải nổi cú gọi công cụ | ✅ 1.4.0 | `clients/opencode.py` nhận chữ ký ở phần văn bản cuối → `infra`, chạy lại được. 20/20 phiên mang chữ ký ấy chết tại chỗ |
+| **vượt trần lượt** | ✅ 1.4.0 | `_stream_with_timeout(stop_when=…)` đếm `step_finish` và **giết tiến trình** tại trần. Trước đó: khai 40, phiên chạy 61 |
+| không đổi tệp nào quá X phút | ⏳ vẫn hở | cần đếm mức tool; `step_finish` không nói tệp nào đổi |
+
+Điều đáng ghi về cách nó được đóng: không phải bằng "hook mức tool" như ADR này
+dự đoán, mà bằng **đọc luồng sự kiện mà adapter đã nhận sẵn**. Tín hiệu rẻ hơn
+dự đoán một bậc; chỉ tín hiệu thứ ba (tệp nào đổi) mới thật sự cần hook. Đây là
+lý do ADR này viết điều kiện thay vì viết lịch: điều kiện đúng thì cách làm có
+thể rẻ hơn kế hoạch.
+
 ## §9 — MiMo làm client thứ ba: hoãn, có điều kiện mở
 
 MiMo là fork của OpenCode, nên adapter OpenCode của AISEF có thể chạy được với
