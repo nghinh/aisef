@@ -19,7 +19,9 @@ import os
 import re
 import shlex
 import shutil
+import subprocess
 import sys
+import threading
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from dataclasses import dataclass, field
@@ -274,3 +276,110 @@ class ClientAdapter(ABC):
             if support is not Support.NATIVE:
                 out.append(f"{cap.value}: {support.value}")
         return sorted(out)
+
+
+# ------------------------------------------------------------ partial-stream capture
+#
+# `subprocess.communicate(timeout=)` is unsafe for clients whose output we
+# must *parse* even if they time out: on `TimeoutExpired` the child is still
+# writing to its stdout pipe, the framework calls `proc.kill()`, and the
+# subsequent `proc.communicate()` drains only what the pipe buffer held at
+# that moment.  For our adapters the cost/turn signal lives in the *last*
+# line of the stream (`result` event for Claude Code, `step_finish` for
+# OpenCode), so a timeout right before that line wipes the entire evidence
+# of the spend — `BENCH-REPORT-v0.3.0.md` documented 14/96 sessions with
+# cost=$0 because of this.
+#
+# `_stream_with_timeout` runs a reader thread from Popen start, accumulates
+# lines into a thread-safe list as they arrive, and lets the parent enforce
+# the timeout via `proc.wait(timeout=)`.  On timeout, the parent kills the
+# child and waits without timeout; whatever the reader thread collected up
+# to that point is the partial stream we have.  Lines are kept as-is (text
+# mode, python line buffering for pipes is partial — we accept that the
+# last line may be incomplete and split on newlines is the caller's
+# responsibility).
+
+def _drain(stream, lines: list[str], partial: list[str], lock: threading.Lock) -> None:
+    """Read lines from a pipe stream until EOF, appending to a shared list.
+
+    `partial` collects the trailing buffer when the last line lacks a
+    newline (the child process was killed mid-write).  Callers can decide
+    to drop or include it; we surface it so the parser can decide.
+    """
+    pending = ""
+    try:
+        while True:
+            chunk = stream.read(1)
+            if not chunk:
+                if pending:
+                    with lock:
+                        partial.append(pending)
+                return
+            if chunk == "\n":
+                with lock:
+                    lines.append(pending)
+                pending = ""
+            else:
+                pending += chunk
+    finally:
+        # Pipe owns an OS fd; releasing it at EOF silences the
+        # ResourceWarning on CPython 3.13 and frees the descriptor
+        # immediately instead of on GC.  Closing a pipe that was already
+        # half-closed raises ValueError on CPython; swallow that case.
+        try:
+            stream.close()
+        except ValueError:
+            pass
+
+
+def _stream_with_timeout(proc, *, timeout_seconds: int
+                         ) -> tuple[list[str], str, bool]:
+    """Run `proc` to completion with a hard wall-clock deadline, returning
+    ``(lines, stderr, timed_out)``.
+
+    * ``lines`` — every newline-terminated line written to stdout up to the
+      end of the process (or up to the millisecond before kill on timeout).
+    * ``stderr`` — full stderr text (only read after exit; short).
+    * ``timed_out`` — whether the deadline fired before the child exited.
+    """
+    lines: list[str] = []
+    partial: list[str] = []
+    lock = threading.Lock()
+
+    # The reader thread reads from the live pipe.  Even if `proc.wait`
+    # times out and the child is killed, the thread keeps draining until
+    # EOF, so the partial stream survives whatever event forced the kill.
+    reader = threading.Thread(
+        target=_drain,
+        args=(proc.stdout, lines, partial, lock),
+        daemon=True,
+    )
+    reader.start()
+
+    timed_out = False
+    try:
+        proc.wait(timeout=timeout_seconds)
+    except subprocess.TimeoutExpired:
+        timed_out = True
+        proc.kill()
+        # No timeout — the child is dying, the OS will reap it.
+        proc.wait()
+
+    reader.join(timeout=2.0)
+    if proc.stderr:
+        try:
+            stderr = proc.stderr.read()
+            proc.stderr.close()
+        except (ValueError, OSError):
+            stderr = ""
+    else:
+        stderr = ""
+
+    with lock:
+        snapshot = list(lines)
+        trailing = "".join(partial)
+    if trailing:
+        # The last block may be an incomplete JSON object — surface it; the
+        # parser will skip it cleanly.
+        snapshot.append(trailing)
+    return snapshot, stderr, timed_out

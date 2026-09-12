@@ -7,6 +7,7 @@ were POSIX-only and the Windows runner reported them as framework failures.
 
 from __future__ import annotations
 
+import shlex
 import stat
 import sys
 from pathlib import Path
@@ -40,3 +41,22 @@ def sleeps(path: Path, seconds: int) -> Path:
     return write_exe(path,
                      posix=f"#!/bin/sh\nsleep {seconds}\n",
                      windows=f"@ping -n {seconds + 1} 127.0.0.1 >nul\r\n")
+
+
+def emits_then_sleeps(path: Path, *, prefix_lines: list[str], sleep_seconds: int) -> Path:
+    """Fake client that emits each `prefix_lines` JSONL line, then blocks.
+
+    Used to verify partial-stream capture: a harness that only reads stdout
+    *after* `kill()` would lose the lines written before `sleep`; one that
+    drains concurrently keeps them.  Lines are written to stdout with
+    explicit `flush` so the subprocess pipe sees them immediately on POSIX
+    (default is line-buffered for terminals, block-buffered for pipes —
+    `stdbuf` is not available everywhere, hence the explicit write).
+    """
+    posix_body = "#!/bin/sh\n"
+    for line in prefix_lines:
+        # `printf %s\\n` prints one logical line; no interpolation.
+        posix_body += f"printf '%s\\n' {shlex.quote(line)}\n"
+    posix_body += f"sleep {sleep_seconds}\n"
+    return write_exe(path, posix=posix_body,
+                     windows="@echo only testable on POSIX at the moment\r\n")

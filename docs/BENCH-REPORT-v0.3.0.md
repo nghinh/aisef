@@ -103,6 +103,18 @@ turns. The bare sessions timed out before producing any stream data.
 (e.g. `Popen` + `communicate(timeout=)` instead of `subprocess.run`) to
 recover cost/turn data from timed-out sessions.
 
+**Update 2026-09-12 (phase A-1 follow-up)**: the runner already moved to
+`Popen` + `communicate(timeout=)` in commit `72f23e8` (validation harness
+landed first). The remaining 14 zero-cost sessions in v0.3.0 therefore
+came from agents that **never reached** the `result` event before the
+1800s deadline, not from the runner discarding an already-flushed stream.
+Phase A-1 (commit below) hardened the read path with a concurrent drain
+thread so the read is guaranteed to be live from `Popen` start rather
+than relying on whatever `proc.communicate()` recovers after `kill()` —
+the recovery margin is small today (single-digit lines), but it removes
+a class of races for sessions that publish a `result` event in the final
+window before the deadline.
+
 ## v0.3.0 Conclusion
 
 **Guards provide safety value, not correctness value — on simple bug-fix

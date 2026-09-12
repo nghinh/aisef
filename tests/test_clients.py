@@ -265,6 +265,63 @@ class TestTimeoutIsInfrastructureError(unittest.TestCase):
         self.assertIn("exceeded 1s", r.error)
 
 
+class TestTimeoutCapturesPartialStream(unittest.TestCase):
+    """When a client is killed on wall-clock deadline, the harness must
+    retain whatever stdout it produced **before** the kill — the cost/turn
+    signal lives in the last event, and a late timeout used to wipe it.
+
+    The previous ``proc.communicate(timeout=)`` call buffered stdout in the
+    pipe until kill; the drain-capturing version keeps a reader thread
+    alive from Popen start, so lines are captured up to the millisecond.
+    """
+
+    def test_claude_keeps_result_event_before_timeout(self):
+        """Result event written before timeout → cost_usd survives."""
+        # A Claude Code stream emits `{"type":"result","total_cost_usd":0.42, ...}`
+        # on its last line.  Emit one, then block past the deadline.
+        if sys.platform == "win32":
+            self.skipTest("emits_then_sleeps fixture is POSIX-only")
+        from tests._bin import emits_then_sleeps
+        result_line = '{"type":"result","total_cost_usd":0.42,"num_turns":3,"text":"x"}'
+        with tempfile.TemporaryDirectory() as d:
+            fake = emits_then_sleeps(
+                Path(d) / "claude-fake",
+                prefix_lines=[result_line],
+                sleep_seconds=5,
+            )
+            r = ClaudeCodeAdapter(binary=str(fake)).run(
+                RunSpec(prompt="p", workdir=Path(d), timeout_seconds=1)
+            )
+        # Infrastructure: timeout fired.
+        self.assertFalse(r.ok)
+        self.assertEqual(r.error, "exceeded 1s")
+        # Signal preserved: cost and turn count arrive from the captured line.
+        self.assertAlmostEqual(r.cost_usd, 0.42, places=3)
+        self.assertEqual(r.num_turns, 3)
+
+    def test_opencode_keeps_step_finish_before_timeout(self):
+        """OpenCode's `step_finish` carries tokens + cost; same drain logic."""
+        if sys.platform == "win32":
+            self.skipTest("emits_then_sleeps fixture is POSIX-only")
+        from tests._bin import emits_then_sleeps
+        finish = '{"type":"step_finish","part":{"tokens":{"input":10,"output":7,"cache":{"read":0,"write":0}},"cost":0.07}}'
+        with tempfile.TemporaryDirectory() as d:
+            fake = emits_then_sleeps(
+                Path(d) / "opencode-fake",
+                prefix_lines=[finish],
+                sleep_seconds=5,
+            )
+            r = OpenCodeAdapter(binary=str(fake)).run(
+                RunSpec(prompt="p", workdir=Path(d), timeout_seconds=1)
+            )
+        self.assertFalse(r.ok)
+        self.assertEqual(r.error, "exceeded 1s")
+        # `parse_json_events` accumulates cost + tokens from step_finish.
+        self.assertAlmostEqual(r.cost_usd, 0.07, places=3)
+        self.assertEqual(r.num_turns, 1)
+        self.assertEqual(r.input_tokens, 10)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
 

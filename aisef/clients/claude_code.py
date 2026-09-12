@@ -56,7 +56,7 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
-from .base import Capability, ClientAdapter, RunSpec, Support, child_env, resolve_binary
+from .base import Capability, ClientAdapter, RunSpec, Support, _stream_with_timeout, child_env, resolve_binary
 from .stream import RunResult, parse_stream
 
 BINARY = "claude"
@@ -152,17 +152,30 @@ class ClaudeCodeAdapter(ClientAdapter):
         except OSError as e:
             return RunResult(ok=False, error=f"cannot run: {e}")
 
-        timed_out = False
-        try:
-            stdout, stderr = proc.communicate(input=spec.prompt, timeout=spec.timeout_seconds)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            stdout, stderr = proc.communicate()
-            timed_out = True
+        # Write the prompt to stdin in a small thread so a slow stdin-writer
+        # cannot deadlock the parent if the child fills its stdout pipe.
+        # We close stdin immediately so the CLI exits the stdin-wait prompt.
+        import threading as _t
+        def _feed_stdin(proc=proc, prompt=spec.prompt):
+            try:
+                if proc.stdin:
+                    proc.stdin.write(prompt)
+                    proc.stdin.close()
+            except (BrokenPipeError, ValueError):
+                pass
+        _t.Thread(target=_feed_stdin, daemon=True).start()
 
-        result = parse_stream(stdout.splitlines())
+        lines, stderr, timed_out = _stream_with_timeout(proc,
+                                                       timeout_seconds=spec.timeout_seconds)
+
+        result = parse_stream(lines)
         if timed_out:
+            # Infrastructure signal: keep it on the error string so the
+            # caller distinguishes a hard wall-clock kill from any
+            # parse-derived message.  The reader thread kept collecting
+            # lines up to the kill instant, so the cost/turn signal may
+            # already be in `result` regardless.
             result.error = f"exceeded {spec.timeout_seconds}s"
-        if not result.raw_result and stderr.strip():
+        if not result.raw_result and stderr.strip() and not timed_out:
             result.error = result.error or stderr.strip()[:500]
         return result

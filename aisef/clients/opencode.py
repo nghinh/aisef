@@ -29,7 +29,7 @@ import subprocess
 import time
 from pathlib import Path
 
-from .base import Capability, ClientAdapter, RunSpec, Support, child_env, resolve_binary
+from .base import Capability, ClientAdapter, RunSpec, Support, _stream_with_timeout, child_env, resolve_binary
 from .stream import RunResult
 
 BINARY = "opencode"
@@ -180,19 +180,24 @@ class OpenCodeAdapter(ClientAdapter):
         except OSError as e:
             return RunResult(ok=False, error=f"cannot run: {e}")
 
-        timed_out = False
-        try:
-            stdout, stderr = proc.communicate(input=spec.prompt, timeout=spec.timeout_seconds)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            stdout, stderr = proc.communicate()
-            timed_out = True
+        import threading as _t
+        def _feed_stdin(proc=proc, prompt=spec.prompt):
+            try:
+                if proc.stdin:
+                    proc.stdin.write(prompt)
+                    proc.stdin.close()
+            except (BrokenPipeError, ValueError):
+                pass
+        _t.Thread(target=_feed_stdin, daemon=True).start()
+
+        lines, stderr, timed_out = _stream_with_timeout(proc,
+                                                       timeout_seconds=spec.timeout_seconds)
 
         # `--format json` (measured 2026-09-05, OpenCode 1.18.26): one event per
         # line — `step_start` / `text` / `tool_use` (part.tool, state.input/output)
         # / `step_finish` (tokens, cost). Cost is the provider-reported number —
         # 9router reports 0, that is the provider's truth, not the harness's.
-        res = parse_json_events(stdout.splitlines())
+        res = parse_json_events(lines)
         res.ok = proc.returncode == 0 and not timed_out
         res.duration_ms = int((time.monotonic() - started) * 1000)
         if timed_out:
