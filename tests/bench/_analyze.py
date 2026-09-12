@@ -129,8 +129,11 @@ def _outside(paths: list[str], scope: list[str]) -> list[str]:
 
 def collect(client_prefix: str = "opencode") -> list[Session]:
     tasks = {t.id: t for t in M.load_tasks(M.TASKS_DIR, M.KEEP_DIR / "tasks")}
+    so = R.KEEP_DIR / "results.jsonl"
+    if not so.is_file():        # kho sạch: chưa chạy đợt nào — bảng rỗng, không phải lỗi
+        return []
     rows = [json.loads(line) for line in
-            (R.KEEP_DIR / "results.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+            so.read_text(encoding="utf-8").splitlines() if line.strip()]
     # `results.jsonl` là sổ **nối thêm**: một phiên smoke và phiên thật của cùng
     # (task, điều kiện, lượt) nằm cùng tệp, và cây làm việc thì chỉ còn bản sau.
     # Giữ dòng cuối cùng cho mỗi khoá — đúng với cây còn trên đĩa.

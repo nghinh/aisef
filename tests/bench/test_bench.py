@@ -761,3 +761,14 @@ class TestLenhAnalyzeCoThat(unittest.TestCase):
                 pass
         self.assertIn("Đo lại sau đợt chạy", ra.getvalue())
 
+    def test_khong_co_so_ket_qua_thi_bang_rong_chu_khong_no(self):
+        """CI chạy trên kho sạch: `.bench/results.jsonl` không tồn tại. Trước
+        2026-09-12 `analyze` ném `FileNotFoundError` ở cả 5 job — test cũ không
+        bắt được vì máy tôi **có** tệp đó."""
+        import tempfile
+        from . import _analyze as A
+        from . import _runner as R
+        with tempfile.TemporaryDirectory() as d:
+            with mock.patch.object(R, "KEEP_DIR", Path(d)):
+                self.assertEqual(A.collect(), [])
+
