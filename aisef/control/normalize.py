@@ -561,6 +561,9 @@ _GIVEN = re.compile(
     r"^\s*(?:\*{0,2}(?:And|Và)\*{0,2}\s+)?\*{0,2}Given\*{0,2}\s",
     re.IGNORECASE,
 )
+_AND_PREFIX = re.compile(
+    r"^\s*\*{0,2}(?:And|Và)\*{0,2}\s+(?=\*{0,2}Given)", re.IGNORECASE
+)
 #: `- write_scope: src/notes/, src/db/schema.ts` — including when labels are bold.
 _META_ITEM = re.compile(
     r"^[-*]?\s*\*{0,2}(covers|write[_ ]scope|depends[_ ]on|screens?|verification[_ ]contract)\*{0,2}\s*[:：]\s*(.+?)\s*$",
@@ -696,7 +699,10 @@ def _split_ac(block: str) -> list[str]:
         if _GIVEN.match(line):
             if current:
                 items.append(" ".join(current))
-            current = [line]
+            # Drop the chaining `And` — it introduced the previous scenario,
+            # and a criterion that opens with "And Given" reads as the tail of
+            # something the agent cannot see.
+            current = [_AND_PREFIX.sub("", line, count=1)]
         elif current:
             current.append(line)
         else:

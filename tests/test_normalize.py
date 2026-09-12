@@ -380,6 +380,8 @@ class TestEpicsFormats(unittest.TestCase):
         self.assertEqual(len(crit), 3)
         self.assertIn("no note is created", crit[0])
         self.assertNotIn("the note is saved", crit[0])
+        # The chaining word introduced the scenario before it, not this one.
+        self.assertTrue(crit[1].startswith("Given"), crit[1])
 
     def test_unbolded_gherkin_is_not_one_criterion_per_line(self):
         """The same blind spot the other way round: plain `Given/When/Then`
