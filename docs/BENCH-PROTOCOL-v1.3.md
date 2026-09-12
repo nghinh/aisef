@@ -158,10 +158,17 @@ Lượt phóng đầu tiên chạy cả 12 task trong một tiến trình nền 
 ~35 phút** (harness dọn tác vụ nền dài, không phải lỗi của bench). Hai task đã
 xong đủ thiết kế, task thứ ba dở dang.
 
-Đợt được chạy tiếp theo **lô hai task một lần**, giữ nguyên thứ tự của hạt
-giống 1312, và task dở dang được chạy lại **từ đầu** chứ không nối tiếp — nửa
-bộ lượt của một task là một thiết kế khác, không phải cùng một thiết kế bị
-ngắt. `results.jsonl` là sổ nối thêm nên dòng cũ vẫn nằm đó; công cụ đọc lấy
+Đợt được chạy tiếp theo **lô hai task một lần**, và task dở dang được chạy lại
+**từ đầu** chứ không nối tiếp — nửa bộ lượt của một task là một thiết kế khác,
+không phải cùng một thiết kế bị ngắt.
+
+Đính chính, ghi ngay khi phát hiện: lô đầu tiên được gọi là
+`run-both bug-a2-multi-3 bug-a2-multi-1` nhưng **chạy multi-1 trước** — bộ lọc
+task duyệt theo thứ tự dataset chứ không theo thứ tự tham số. Thứ tự trong các
+lô vì thế là thứ tự dataset, không phải thứ tự của hạt giống 1312 (hạt giống
+ấy chỉ chi phối lượt phóng đầu tiên, tức hai task `sec-4`, `sec-3`). Mã đã sửa
+để nêu tên là chạy theo thứ tự đã nêu, và câu này ở lại đây vì đợt đo không
+chạy dưới bản đã sửa. `results.jsonl` là sổ nối thêm nên dòng cũ vẫn nằm đó; công cụ đọc lấy
 dòng **cuối cùng** cho mỗi `(task, điều kiện, lượt)`, đúng với cây làm việc còn
 trên đĩa.
 

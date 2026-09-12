@@ -634,3 +634,33 @@ class TestUngVienKhongMangTepCuaHarness(unittest.TestCase):
         for thu_muc in ("_bmad-output", ".claude", ".aisef", ".opencode"):
             with self.subTest(thu_muc=thu_muc):
                 self.assertIn(f":(exclude){thu_muc}", khoi)
+
+
+class TestThuTuTaskTheoLoiNguoiGoi(unittest.TestCase):
+    """Nêu tên task thì chạy theo thứ tự đã nêu.
+
+    Lọc theo thứ tự dataset trông vô hại cho tới khi báo cáo nói "đợt này chạy
+    theo thứ tự X" — lúc ấy nó là một câu sai mà không ai kiểm được (đo
+    2026-09-12: lô `multi-3 multi-1` thực tế chạy multi-1 trước).
+    """
+
+    def test_thu_tu_dung_nhu_tham_so(self):
+        import io
+        from contextlib import redirect_stderr, redirect_stdout
+
+        from . import __main__ as CLI
+        tasks = [R.Task(id=n, source="bug", dir=M.TASKS_DIR / n) for n in ("a", "b", "c")]
+        goi = []
+
+        def run(task, client, attempts=3, bare=False, model=""):
+            goi.append(task.id)
+            return []
+
+        with mock.patch.object(CLI.M, "load_tasks", return_value=tasks), \
+             mock.patch.object(CLI.R, "ENABLED", True), \
+             mock.patch.object(CLI.R, "make_client", return_value=object()), \
+             mock.patch.object(CLI.R, "run", run), \
+             mock.patch.object(CLI.R, "report", return_value=""), \
+             redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            CLI.main(["run-both", "c", "a"])
+        self.assertEqual([g for i, g in enumerate(goi) if i % 2 == 0], ["c", "a"])

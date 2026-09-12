@@ -46,7 +46,11 @@ def main(argv: list[str] | None = None) -> int:
 
     tasks = M.load_tasks(M.TASKS_DIR, M.KEEP_DIR / "tasks")
     ids = getattr(a, "ids", [])
-    pick = [t for t in tasks if not ids or t.id in ids]
+    # Khi người dùng nêu tên task, chạy **theo thứ tự họ nêu**: lọc theo thứ tự
+    # dataset làm lời khai "chạy theo thứ tự này" trong báo cáo thành sai mà
+    # không ai thấy (đo 2026-09-12: lô `multi-3 multi-1` chạy multi-1 trước).
+    by_id = {t.id: t for t in tasks}
+    pick = [by_id[i] for i in ids if i in by_id] if ids else list(tasks)
     if a.cmd == "mine":
         got = [] if a.no_bugs else M.mine_bugs(R.ROOT)
         if a.e9:
