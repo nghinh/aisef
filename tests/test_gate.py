@@ -757,3 +757,83 @@ class TestTestCoKiemDuocStory(GateTestCase):
         names = [c.name for c in self.gate(added_tests=["tests/x.py"]).checks]
         self.assertEqual(names[names.index("TDD") + 1], self.TEN)
 
+
+class TestBaselineAfterGateSurvivesSeqReset(unittest.TestCase):
+    """Bug 47 + 42: ``gate._baseline_check`` (and ``_test_criteria_check``)
+    used to ask "is this test run *after* the baseline?" by comparing
+    ``e.seq > base_ev.seq``.  On evidence rewritten by a buggy build that
+    reset the seq counter, the test event can sit *before* the baseline
+    chronologically and still have a higher seq, so the gate sees it as
+    post-baseline.  The semantic question — does the candidate have a
+    clean test run *after the cutoff?* — must follow time, not seq.
+
+    This test scripts that exact scenario in storage: a baseline event
+    written by an old build (seq 200), a test run written earlier by a
+    newer-but-broken build (seq 300, earlier `at`).  Position-after-sort
+    is the canonical ordering; the gate must return PASSED."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def _write_evidence(self, lines: list[str]) -> None:
+        path = EvidenceStore(self.root).path("S-01")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    def _line(self, **kw) -> str:
+        import json as _json
+        e = {"kind": "tool_run", "detail": {"test_format": "pytest"}, **kw}
+        return _json.dumps(e)
+
+    def test_old_baseline_with_higher_seq_still_anchors_position(self):
+        """Baseline written by an old build at seq=200.  Then a
+        pre-baseline test run written by a newer build with seq=300
+        and an *earlier* `at`.  The test event is genuinely before
+        the baseline in time; the gate must not include it as
+        "post-baseline", because doing so would silently accept a
+        test run that pre-dates the comparison point.
+        """
+        import json as _json
+        path = EvidenceStore(self.root).path("S-01")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("w", encoding="utf-8") as f:
+            f.write(_json.dumps({
+                "kind": "tool_run", "name": "test:baseline", "seq": 200, "at": 100.0,
+                "detail": {"baseline": True, "test_format": "pytest",
+                           "test_ids": ["t1"], "failed_ids": [],
+                           "red_before": []},
+            }) + "\n")
+            f.write(_json.dumps({
+                "kind": "tool_run", "name": "test", "seq": 300, "at": 50.0,
+                "detail": {"candidate": "aaa", "test_format": "pytest",
+                           "test_ids": ["t1"], "failed_ids": []},
+            }) + "\n")
+            f.write(_json.dumps({
+                "kind": "tool_run", "name": "lint", "seq": 301, "at": 60.0,
+                "detail": {"candidate": "aaa", "ok": True},
+            }) + "\n")
+            f.write(_json.dumps({
+                "kind": "agent_run", "name": "x", "seq": 302, "at": 70.0,
+                "detail": {"candidate": "aaa"},
+            }) + "\n")
+        from aisef.control.gate import evaluate
+        g = evaluate("S-01", EvidenceStore(self.root).read("S-01"),
+                     candidate="aaa", changed=[], write_scope=[],
+                     screens=[])
+        no_reg = next((c for c in g.checks if c.name == "no baseline regression"), None)
+        # The pre-baseline test event must not be counted as a
+        # post-baseline run; the gate either reports no candidate
+        # run after baseline, or (if it picks the only one) names
+        # the time it actually landed.  What it must NOT do is treat
+        # the pre-baseline seq=300 event as post-baseline just
+        # because 300 > 200.
+        self.assertIsNotNone(no_reg)
+        self.assertNotEqual(no_reg.outcome, Outcome.PASSED,
+                            "fake passing — the lone 'post-baseline' candidate"
+                            " is actually pre-baseline in time; PASSED here"
+                            " would mean the gate trusted seq over `at`.")
+

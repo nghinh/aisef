@@ -187,5 +187,56 @@ class TestLenhGateReplay(ReplayCase):
         self.assertEqual(self.run_cli("gate", SID)[0], EXIT_USAGE)
 
 
+class TestPairsByPosition(unittest.TestCase):
+    """Bug 47 + 42. ``_pairs`` used to compare ``inp.seq < v.seq``
+    to match ``gate:input`` with the next ``gate:verdict``.  When a
+    long event wrote past the read-tail window, ``seq`` reset, so an
+    earlier verdict looked like a later one.  The fixture is built so
+    the seq ordering is *inverted*: the older verdict carries a
+    higher seq than the input.  Pairing must still find the right
+    verdict by position in the time-sorted event list."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_pairs_selects_verdict_by_position_not_seq(self):
+        path = EvidenceStore(self.root).path("S")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        events = [
+            # input, attempt 1, with newer higher seq because a buggy
+            # build reset the counter before this write.
+            {"kind": "note", "name": "gate:input", "seq": 200, "at": 100.0,
+             "detail": {"attempt": 1, "candidate": "c"}},
+            # verdict for attempt 1, written earlier by an older build.
+            {"kind": "note", "name": "gate:verdict", "seq": 10, "at": 200.0,
+             "detail": {"attempt": 1}},
+            # input, attempt 2.
+            {"kind": "note", "name": "gate:input", "seq": 300, "at": 300.0,
+             "detail": {"attempt": 2, "candidate": "c"}},
+            # verdict for attempt 2.
+            {"kind": "note", "name": "gate:verdict", "seq": 12, "at": 400.0,
+             "detail": {"attempt": 2}},
+        ]
+        path.write_text(
+            "\n".join(__import__("json").dumps(e) for e in events) + "\n",
+            encoding="utf-8")
+        ev = EvidenceStore(self.root).read("S")
+        pairs = R._pairs(ev)
+        self.assertEqual(len(pairs), 2)
+        # First input pairs with the verdict at at=200 (the only one in
+        # its time window — input at 100, next input at 300).
+        first_inp, first_v = pairs[0]
+        self.assertEqual(first_inp.detail["attempt"], 1)
+        self.assertIsNotNone(first_v)
+        self.assertEqual(first_v.detail["attempt"], 1)
+        self.assertEqual(first_v.at, 200.0,
+                          "the verdict with seq=10 (old) at at=200.0 is correct;"
+                          " a seq-based search would match a later verdict with seq=12")
+
+
 if __name__ == "__main__":
     unittest.main()

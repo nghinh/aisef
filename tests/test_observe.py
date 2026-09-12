@@ -239,3 +239,56 @@ class TestSauLanChayTestLaTheoThoiGian(unittest.TestCase):
              "detail": {"path": "c.js"}},
         ])
         self.assertEqual(EvidenceStore(self.root).read("S").stale_since_last_test(), ["c.js"])
+
+
+class TestAfterEventByPosition(unittest.TestCase):
+    """Bug 47 — downstream consumers (gate/replay) used to compare
+    ``e.seq > base.seq`` to detect "after the baseline run" / "after the
+    last test".  That broke when the on-disk ``seq`` reset (bug 42): a
+    file_change written 33 minutes before the latest test run read as
+    "after the test" because its seq (165) was greater than the test's
+    seq (144).  ``Evidence.after_event`` anchors on **position** in the
+    time-sorted event list, so the consumer is correct regardless of
+    seq drift."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_after_event_skips_old_event_with_higher_seq(self):
+        """Old file_change with seq 165 written 33 min before the test at seq
+        144 must NOT appear in "events after the test"."""
+        path = EvidenceStore(self.root).path("S")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            "\n".join([
+                json.dumps({"kind": "file_change", "name": "old.py", "seq": 165,
+                            "at": 100.0, "detail": {"path": "old.py"}}),
+                json.dumps({"kind": "tool_run", "name": "test", "seq": 144,
+                            "at": 200.0, "detail": {"ok": True}}),
+                json.dumps({"kind": "file_change", "name": "new.py", "seq": 200,
+                            "at": 300.0, "detail": {"path": "new.py"}}),
+            ]) + "\n", encoding="utf-8")
+        ev = EvidenceStore(self.root).read("S")
+        last_test = ev.last("tool_run", "test")
+        after = ev.after_event(last_test)
+        paths = [e.detail["path"] for e in after if e.kind == "file_change"]
+        self.assertEqual(paths, ["new.py"],
+                         "old.py (seq > test.seq) MUST be excluded when anchor is by position")
+
+    def test_after_event_with_unknown_event_returns_empty(self):
+        ev = EvidenceStore(self.root).read("S")
+        sentinel = Event(kind="tool_run", name="ghost", detail={}, seq=9999)
+        self.assertEqual(ev.after_event(sentinel), [])
+
+    def test_after_event_returns_empty_for_last_in_list(self):
+        path = EvidenceStore(self.root).path("S")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps({"kind": "tool_run", "name": "test", "seq": 1, "at": 1.0,
+                        "detail": {"ok": True}}) + "\n", encoding="utf-8")
+        ev = EvidenceStore(self.root).read("S")
+        self.assertEqual(ev.after_event(ev.last("tool_run", "test")), [])
