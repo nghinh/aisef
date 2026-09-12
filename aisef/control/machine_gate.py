@@ -233,12 +233,10 @@ def check_experience(exp) -> GateResult:
     r = GateResult(name="ux-spec")
     if not getattr(exp, "screens", None):
         r.errors.append(
-            "EXPERIENCE.md lists no screens. Add a screen inventory **table** — "
-            "one row per screen, with columns `Screen` (or `screen_id`), `Route`, "
-            "and `Purpose` — under a heading such as `Screen Inventory`, "
-            "`Screens` or `Information Architecture`. Prose describing the screens "
-            "is not enough: the mockup step builds one file per row, and stories "
-            "reference `screen_id`."
+            "EXPERIENCE.md: add a screen inventory **table** under a heading like "
+            "`Screen Inventory` / `Screens` / `Information Architecture` — one row per "
+            "screen, columns `Screen` (or `screen_id`), `Route`, `Purpose`. Prose is not "
+            "enough: mockup builds one file per row and stories reference `screen_id`."
         )
         return r
     for s in exp.screens:
@@ -290,12 +288,11 @@ def check_design_contract(
             # pass the mockup-map step, burned $28 over 4 attempts. Blocking
             # here is much cheaper.
             r.errors.append(
-                f"{screen.id}: mockup does not mark `data-state=\"primary\"` so the contract "
-                f"captures the whole page — {len(screen.components)} components, {screen.duplicates} "
-                f"duplicates, i.e. multiple states rendered side by side. A real app shows one state "
-                f"at a time so the mockup-map step will never match. Mark states per "
-                f"aisef-mockup-html skill (section 7) then run `aisef mockup` "
-                f"(without --force: re-extract the contract only)"
+                f"{screen.id}: mark the states with `data-state=\"primary\"` "
+                f"(aisef-mockup-html skill, section 7), then `aisef mockup` — no --force, "
+                f"it only re-extracts the contract. Until then the contract holds the whole "
+                f"page ({len(screen.components)} components, {screen.duplicates} duplicates): "
+                f"every state side by side, where a real app shows one, so mockup-map never matches"
             )
         if not screen.route:
             r.errors.append(
@@ -310,10 +307,10 @@ def check_design_contract(
             # burned all 3 attempts fixing code that was fine. A route is
             # opened, not read: it must be openable.
             r.errors.append(
-                f"{screen.id}: `{screen.route[:80]}` is a sentence, not a route — it becomes a "
-                f"URL and the app answers 404, then the mockup-map step reports every component "
-                f"missing. Put the real path in the `aisef-route` meta tag (`/`, `/tasks`, "
-                f"`/note/:id`) and re-run `aisef mockup`"
+                f"{screen.id}: put the real path in the `aisef-route` meta tag "
+                f"(`/`, `/tasks`, `/note/:id`) and re-run `aisef mockup`. "
+                f"`{screen.route[:80]}` is a sentence, not a route: it becomes a URL, the app "
+                f"answers 404, and mockup-map then reports every component missing"
             )
         else:
             declared = experience.by_id(screen.id)

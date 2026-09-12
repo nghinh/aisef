@@ -295,3 +295,54 @@ class TestLienKetTaiLieuTroVaoChoCoThat(unittest.TestCase):
                         self.assertIn(phan_neo, neo[dich.name],
                                       f"{f.name} trỏ tới `{href}` — tệp có, neo không có")
         self.assertGreater(so_lien_ket, 40, "regex lệch — không đọc được liên kết nào đáng kể")
+
+class TestThongDiepCongMayDuNgan(unittest.TestCase):
+    """Thông điệp cổng máy phải đọc được trong một màn hình terminal.
+
+    Mẫu lấy từ guard: **nói chỗ sửa trước**, giải thích sau. Một đoạn văn 7
+    dòng có đủ thông tin vẫn là một đoạn văn người ta lướt qua — và lướt qua
+    thì thông tin ấy bằng không. Ngưỡng ≤ 5 dòng ở 80 cột (đợt 2 mục 2.3).
+    """
+
+    NGUONG_DONG = 5
+
+    def _thong_diep(self):
+        import ast
+        import textwrap
+
+        src = (ROOT / "aisef" / "control" / "machine_gate.py").read_text(encoding="utf-8")
+
+        def van_ban(node):
+            """Chuỗi người dùng thấy; chỗ thay `{...}` tính là 12 ký tự."""
+            ra = []
+
+            def di(n):
+                if isinstance(n, ast.Constant) and isinstance(n.value, str):
+                    ra.append(n.value)
+                elif isinstance(n, ast.JoinedStr):
+                    for v in n.values:
+                        ra.append(str(v.value) if isinstance(v, ast.Constant) else "x" * 12)
+                elif isinstance(n, ast.BinOp):
+                    di(n.left)
+                    di(n.right)
+
+            for a in node.args:
+                di(a)
+            return "".join(ra)
+
+        ra = []
+        for node in ast.walk(ast.parse(src)):
+            if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                    and node.func.attr == "append" and "errors" in ast.unparse(node.func)):
+                t = van_ban(node)
+                if t:
+                    ra.append((len(textwrap.wrap(t, 80)), node.lineno, t))
+        return ra
+
+    def test_khong_thong_diep_nao_qua_nam_dong(self):
+        qua = [(d, ln, t[:70]) for d, ln, t in self._thong_diep() if d > self.NGUONG_DONG]
+        self.assertEqual(qua, [], f"thông điệp dài quá {self.NGUONG_DONG} dòng: {qua}")
+
+    def test_van_con_thong_diep_de_do(self):
+        """Phép thử trên chỉ có nghĩa khi thật sự có thông điệp để đo."""
+        self.assertGreaterEqual(len(self._thong_diep()), 10)
