@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import types
 from pathlib import Path
 
 from ..config import ConfigError
@@ -153,7 +154,10 @@ def build_parser() -> argparse.ArgumentParser:
     gt.add_argument("--all", action="store_true", help="all stories with evidence")
     gt.set_defaults(func=cmd_gate)
 
+    # `guard` **không** dùng `_Parser`: xem `_GuardParser` — hook coi mã thoát
+    # khác 2 là "không chặn", nên lỗi gõ ở đây phải chặn, không được cho qua.
     g = sub.add_parser("guard", help="run guard on a hook event (reads stdin)")
+    g.error = types.MethodType(_guard_error, g)      # type: ignore[method-assign]
     g.add_argument("kind", choices=sorted(GUARD_MATCHERS))
     g.set_defaults(func=cmd_guard)
 
@@ -296,6 +300,23 @@ def _speak_utf8() -> None:
             stream.reconfigure(encoding="utf-8", errors="replace")
         except (AttributeError, ValueError, OSError):
             pass       # not a real stream (captured in tests, piped oddly)
+
+
+def _guard_error(self: argparse.ArgumentParser, message: str):
+    """Lỗi gõ ở `aisef guard` phải **chặn**, không được cho qua.
+
+    Hook của Claude Code đọc mã thoát: **2 = chặn**, mọi mã khác = không chặn.
+    Nên quy ước "1 = gõ sai" của CLI này (xem `_Parser`) đúng ở mọi lệnh **trừ**
+    lệnh này: một hook đã biên dịch với tên guard gõ sai hay đã đổi tên sẽ âm
+    thầm tắt guard ấy. Đây đúng là bài học của lỗi 32 — guard không chạy được
+    thì phải chặn.
+
+    Đo 13/09/2026: sau khi sửa lỗi 81, `aisef guard <tên sai>` thoát 1 và hook
+    coi là cho qua. Lỗ hổng do chính bản vá ấy mở ra, bắt được bằng cách chạy
+    lệnh guard bằng tay.
+    """
+
+    self.exit(2, f"guard could not run ({message}) — blocking, not allowing\n")
 
 
 def _cho_moi_lenh_nhan_project(p: argparse.ArgumentParser) -> None:

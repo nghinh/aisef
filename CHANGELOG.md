@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **A mistyped guard name blocks instead of passing** (bug 84). The bug-81
+  fix — usage errors exit 1 — collided with the hook protocol, where any exit
+  code other than 2 means "not blocked". So `aisef guard <typo>`, which a
+  stale compiled hook can easily produce, silently disabled that guard. The
+  guard subcommand exits 2 on a usage error and says "blocking, not
+  allowing"; every other command keeps 1. When a command serves someone
+  else's protocol, that protocol wins over the local convention.
+
 - **`init --stack python` now writes a test command this machine can run**
   (bug 82). It wrote `python -m pytest -v`; macOS and most current Linux
   distributions have only `python3`, so `aisef tool test` answered `exit 127:

@@ -992,6 +992,21 @@ class TestQuyUocMaThoat(unittest.TestCase):
         self.assertEqual(p.parse_args(["--project", "/tmp/x", "gates"]).project, "/tmp/x")
         self.assertEqual(p.parse_args(["gates", "--project", "/tmp/y"]).project, "/tmp/y")
 
+    def test_guard_go_sai_thi_chan_chu_khong_cho_qua(self):
+        """Hook đọc mã thoát: **2 = chặn**, mọi mã khác = không chặn. Nên quy
+        ước "1 = gõ sai" đúng ở mọi lệnh **trừ** `guard`.
+
+        Bản vá lỗi 81 đã mở đúng lỗ hổng này (gõ sai tên guard → thoát 1 → hook
+        cho qua) và nó được bắt bằng cách chạy lệnh guard bằng tay. Lỗi 32 đã
+        dạy một lần: guard không chạy được thì phải chặn."""
+        import subprocess
+        for args in (["guard", "khong-co-guard-nay"], ["guard"]):
+            with self.subTest(args=args):
+                r = subprocess.run([sys.executable, "-m", "aisef", *args],
+                                   input="{}", capture_output=True, text=True, cwd=str(ROOT))
+                self.assertEqual(r.returncode, 2, r.stderr[-200:])
+                self.assertIn("blocking, not allowing", r.stderr)
+
     def test_chua_san_sang_van_thoat_2(self):
         """Đừng sửa lỗi này bằng cách biến mọi thứ thành 1: cổng chưa duyệt
         **phải** còn là 2, nếu không CI hết phân biệt được hai ca."""
