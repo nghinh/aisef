@@ -1,6 +1,6 @@
 # Phase 3 end-to-end validation
 
-12/12 checks passed.
+14/14 checks passed.
 
 ## Detailed observations
 
@@ -16,3 +16,5 @@
 - [PASS] 4.identity lease re-acquire after release: second fd=4
 - [PASS] 5.findings round-trip id-stable: lines=1 ids-match=True
 - [PASS] 5.findings stable id across same/different file: same=True different_id=70bd8620
+- [PASS] 6.after_event excludes older higher-seq event: paths=['new.py'] (expected ['new.py']; old.py seq=165 pre-dates test seq=144 in time)
+- [PASS] 6.seq-based view would have included stale event: seq_view=['old.py', 'new.py'] (illustrative: shows why the fix matters)

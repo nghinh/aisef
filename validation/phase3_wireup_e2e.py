@@ -296,12 +296,52 @@ def step_findings() -> None:
     )
 
 
+def step_after_event_by_position() -> None:
+    """Bug 47 cross-tier: an old file_change with seq 165 written
+    33 min **before** the most recent test run (seq 144) must NOT appear
+    in "events after the test" — position-after-sort is what "after"
+    means, not ``seq``."""
+    import json as _json
+    from aisef.harness.observe import EvidenceStore
+    with tempfile.TemporaryDirectory() as d:
+        path = EvidenceStore(d).path("S-01")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("w", encoding="utf-8") as f:
+            f.write(_json.dumps({"kind": "file_change", "name": "old.py",
+                                  "seq": 165, "at": 100.0,
+                                  "detail": {"path": "old.py"}}) + "\n")
+            f.write(_json.dumps({"kind": "tool_run", "name": "test",
+                                  "seq": 144, "at": 200.0,
+                                  "detail": {"ok": True}}) + "\n")
+            f.write(_json.dumps({"kind": "file_change", "name": "new.py",
+                                  "seq": 200, "at": 300.0,
+                                  "detail": {"path": "new.py"}}) + "\n")
+        ev = EvidenceStore(d).read("S-01")
+        last_test = ev.last("tool_run", "test")
+        paths = [e.detail["path"] for e in ev.after_event(last_test)
+                 if e.kind == "file_change"]
+        record(
+            "6.after_event excludes older higher-seq event",
+            paths == ["new.py"],
+            f"paths={paths} (expected ['new.py']; old.py seq=165 pre-dates test seq=144 in time)",
+        )
+        # Sanity: seq-based comparison WOULD have included old.py.
+        seq_view = [e.detail["path"] for e in ev.of("file_change")
+                    if e.seq > last_test.seq]
+        record(
+            "6.seq-based view would have included stale event",
+            seq_view == ["old.py", "new.py"],
+            f"seq_view={seq_view} (illustrative: shows why the fix matters)",
+        )
+
+
 def main() -> int:
     step_config()
     step_qualify()
     step_budget()
     step_identity()
     step_findings()
+    step_after_event_by_position()
 
     fails = [r for r in REPORT if r.startswith("[FAIL]")]
     summary = f"# Phase 3 end-to-end validation\n\n{len(REPORT) - len(fails)}/{len(REPORT)} checks passed.\n\n"
