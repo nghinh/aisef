@@ -337,3 +337,34 @@ Không sửa trong lúc đo (adapter là một phần hệ đang đo). Việc ph
 đóng đợt, nay có hai bằng chứng độc lập: adapter OpenCode tự đếm `step_finish`
 trên luồng sự kiện và dừng tiến trình khi chạm trần, báo `exit_status =
 max_turns`. Một trần theo thời gian không phải trần theo chi phí.
+## O-11 · Xuất xứ mã của hệ đang đo, và vì sao tôi mở đóng băng trước khi `multi-4` xong
+
+Đợt đo chạy theo **nhiều chunk**, mỗi chunk là một tiến trình mới nạp cây làm
+việc **tại thời điểm nó khởi động**. Nên "mã nào đã chạy" không phải một SHA duy
+nhất, và nói là một SHA sẽ là nói sai.
+
+| chunk | bắt đầu | cây làm việc tại thời điểm ấy |
+|---|---|---|
+| các task đầu | 12/09 19:10 → | trước `a4369ea` |
+| chunk cuối (PID 70190: `sec-1`, `state-1..4`, `multi-4`) | 12/09 21:11 | sau `ec78adb`? **không** — `ec78adb` là 21:35, sau khi chunk đã chạy |
+
+Commit chạm vào mã của hệ đang đo **trong lúc đợt chạy**, và vì sao từng cái
+không đổi kết quả:
+
+| commit | giờ | tệp | vì sao vô hại với đợt đo |
+|---|---|---|---|
+| `a4369ea` | 19:14 | `clients/opencode.py` | chỉ **ghi lại** tên model vào kết quả; không đổi thứ gửi cho agent |
+| `8f4fd65`, `4da3f57` | 19:28, 19:47 | `clients/simulated.py` | adapter mô phỏng, không nằm trên đường đi của cohort này |
+| `ec78adb` | 21:35 | `clients/stream.py` | thêm trạng thái `rate_limit` + chờ trước khi thử lại; **không phiên nào của C-1 gặp 429** |
+| `57b6092` | 21:53 | `memory.py` | bộ nhớ **tắt** trong mọi phiên của cohort |
+| `b678eb8` | 22:08 | xoá `clients/simulated.py` | như trên |
+
+Và điều quyết định: **tiến trình đã nạp module thì sửa tệp trên đĩa không đổi
+hành vi của nó** — Python không đọc lại mã nguồn của module đã import. Cây làm
+việc mà agent sửa cũng không phải cây của tôi: nó là bản `git archive <base>`
+của từng task.
+
+Vì vậy từ 01:0x tôi **mở đóng băng** để làm tiếp các việc đã ghi ở O-7/O-10,
+với hai điều kiện tự đặt: (1) bảng xuất xứ trên phải nằm trong báo cáo, (2)
+không chạm vào `tests/bench/tasks/` — và `MANIFEST.sha256` được kiểm lại lúc
+đóng đợt để chứng minh dữ liệu không đổi.
