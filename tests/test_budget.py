@@ -84,6 +84,45 @@ class TestReservation(unittest.TestCase):
             self.assertEqual(rebuilt.cap_usd, 0.0)
 
 
+class TestLockSidecarStableAcrossSave(unittest.TestCase):
+    """Regression test: flock on the state file was a no-op when
+    ``os.replace`` swapped the inode.  Lock must move to a never-replaced
+    sidecar so concurrent ``reserve()`` calls serialise correctly even
+    after a save."""
+
+    def test_lock_held_by_outer_reserve_blocks_inner_reserve(self):
+        with _tempdir() as root:
+            g1 = BudgetGuard(BudgetLedger(root))
+            g2 = BudgetGuard(BudgetLedger(root))
+            g1.configure(BudgetConfig(cap_usd=10.0))
+            with g1.reserve(story_id="S1", est_usd=0.5, est_turns=1) as r1:
+                # Inner reserve on a second guard must be blocked while
+                # the outer reserve holds the lock — even though the
+                # outer guard already saved reservations to its ledger.
+                with self.assertRaises(BudgetExceeded):
+                    with g2.reserve(story_id="S2", est_usd=0.5, est_turns=1):
+                        pass
+                r1.actual_usd = 0.5
+
+    def test_lock_path_is_sidecar_not_state_file(self):
+        with _tempdir() as root:
+            ledger = BudgetLedger(root)
+            # The state file is rewritten via os.replace (swap-inode on
+            # some filesystems).  The lock must NOT be on it.
+            self.assertNotEqual(ledger.lock_path, ledger.path)
+            self.assertEqual(ledger.lock_path.name,
+                             ledger.path.name + ".lock")
+
+    def test_state_save_does_not_unlink_lock(self):
+        with _tempdir() as root:
+            g = BudgetGuard(BudgetLedger(root))
+            g.configure(BudgetConfig(cap_usd=1.0))
+            with g.reserve(est_usd=0.1, est_turns=1) as r:
+                self.assertTrue(g.ledger.lock_path.exists())
+                r.actual_usd = 0.1
+            self.assertTrue(g.ledger.lock_path.exists())
+
+
 from contextlib import contextmanager
 from tempfile import TemporaryDirectory
 

@@ -42,6 +42,7 @@ from .._compat import flock_ex_nb, flock_un
 
 
 BUDGET_FILE = Path("_bmad-output") / "budget.json"
+BUDGET_LOCK = Path("_bmad-output") / "budget.json.lock"
 BUDGET_VERSION = 1
 
 
@@ -98,6 +99,16 @@ class BudgetLedger:
     def path(self) -> Path:
         return self.root / BUDGET_FILE
 
+    @property
+    def lock_path(self) -> Path:
+        # Sidecar lock file.  The state file is rewritten via ``os.replace``,
+        # which swaps the inode on filesystems where ``os.replace`` is not
+        # in-place (macOS APFS, several network FS).  An exclusive flock
+        # held on the state file would be left dangling on the orphan inode
+        # while a new fd on the new inode slips past the lock.  Locking a
+        # never-replaced sidecar keeps the lock stable across save() calls.
+        return self.root / BUDGET_LOCK
+
     def load(self) -> BudgetState:
         if not self.path.exists():
             return BudgetState()
@@ -149,9 +160,9 @@ class BudgetGuard:
             yield _Reservation(token=None, spent_usd=0.0, spent_turns=0)
             return
 
-        path = self.ledger.path
-        path.parent.mkdir(parents=True, exist_ok=True)
-        fd = os.open(str(path), os.O_CREAT | os.O_RDWR | os.O_CLOEXEC, 0o600)
+        lock_path = self.ledger.lock_path
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        fd = os.open(str(lock_path), os.O_CREAT | os.O_RDWR | os.O_CLOEXEC, 0o600)
         try:
             flock_ex_nb(fd)
         except (BlockingIOError, OSError) as e:
@@ -244,5 +255,5 @@ def _refund(state: BudgetState, rid: str) -> None:
 
 __all__ = [
     "BudgetLedger", "BudgetGuard", "BudgetConfig", "BudgetState",
-    "BudgetExceeded", "BUDGET_FILE", "BUDGET_VERSION",
+    "BudgetExceeded", "BUDGET_FILE", "BUDGET_LOCK", "BUDGET_VERSION",
 ]
