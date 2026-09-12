@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- **The mockup prompt was empty because the experience tables named no screen**
+  (bug 98). Components attach to a screen when the table's scope column names
+  it — but the real column holds a region ("Header area", "List area"), and the
+  state table has only two columns, `State | Treatment`, with no scope column
+  at all. So a screen with five documented components and five documented
+  states got neither, and the mockup agent was asked to build it from the
+  purpose line alone: three runs of the same prompt produced three different
+  screens, one of them missing the search box entirely. A table where no row
+  names any screen is a table about the whole app; a table where some rows
+  match is scoped on purpose and is left alone.
+
 - **The readiness gate stopped contradicting itself** (bug 97). It printed
   "STORY-04-03 missing prerequisites to run: configure `app.dev_command`" and,
   ten lines below, "✅ 7 stories are all executable". The first came from the

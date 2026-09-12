@@ -215,6 +215,7 @@ def _attach(exp: Experience, text: str, headings: tuple[str, ...], field_name: s
     prompt would be filled with components that don't belong.
     """
     for table in _tables_in_section(text, headings):
+        nhan_theo_hang: list[tuple[str, bool]] = []
         for row in table[1:] if len(table) > 1 else []:
             label = _strip_markup(row[0])
             if not label:
@@ -226,9 +227,25 @@ def _attach(exp: Experience, text: str, headings: tuple[str, ...], field_name: s
             everywhere = any(k in scope for k in ("global", "anywhere", "everywhere",
                                                      "all screens", "all pages", "every",
                                                      "mọi màn hình"))
+            trung = False
             for screen in exp.screens:
                 if everywhere or _mentions(scope, screen.name):
+                    trung = True
                     target = getattr(screen, field_name)
+                    if label not in target:
+                        target.append(label)
+            nhan_theo_hang.append((label, trung))
+
+        # A table where **no** row names a screen is a table about the whole
+        # app, not a table nobody wanted: the second column holds a region
+        # ("Header area"), a treatment, or nothing at all. Dropping it silently
+        # left every screen with no components and no states, and the mockup
+        # prompt with nothing to build from (bug 98) — worst of all in a
+        # single-screen app, where no row can ever name the one screen.
+        if nhan_theo_hang and not any(t for _, t in nhan_theo_hang):
+            for screen in exp.screens:
+                target = getattr(screen, field_name)
+                for label, _ in nhan_theo_hang:
                     if label not in target:
                         target.append(label)
 

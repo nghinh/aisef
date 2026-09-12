@@ -72,6 +72,58 @@ class TestParseFixture(unittest.TestCase):
         self.assertIn("1 giây", self.exp.component_rules["Ô soạn thảo"])
 
 
+class TestBangKhongNhacManHinhNao(unittest.TestCase):
+    """Lỗi 98: cột thứ hai của bảng thành phần thường là **vùng trên màn
+    hình** ("Header area"), còn bảng trạng thái nhiều khi chỉ có hai cột
+    (`State | Treatment`) — không chỗ nào nhắc tên màn hình. Cả bảng rơi
+    xuống đất, và với ứng dụng một màn hình thì không dòng nào **có thể**
+    nhắc tới nó. Prompt dựng mockup vì thế trống, nên hai lượt dựng liên
+    tiếp cho ra hai màn hình khác hẳn nhau."""
+
+    MOT_MAN_HINH = """# EXPERIENCE
+
+## Information Architecture
+
+### Screen Inventory
+
+| Screen | Route | Purpose |
+|---|---|---|
+| Note List | / | Create, search, and delete notes |
+
+## Component Patterns
+
+| Component | Use | Behavioral rules |
+|---|---|---|
+| Note textarea | Header area | Enter submits. |
+| Search input | Between header and list | Real-time filter. |
+
+## State Patterns
+
+| State | Treatment |
+|---|---|
+| App load (no notes) | Empty state message. |
+| Search no results | "No notes match". |
+"""
+
+    def test_ca_bang_thuoc_ve_man_hinh_duy_nhat(self):
+        from aisef.control.experience import parse_experience
+        s = parse_experience(self.MOT_MAN_HINH).screens[0]
+        self.assertEqual(s.components, ["Note textarea", "Search input"])
+        self.assertEqual(s.states, ["App load (no notes)", "Search no results"])
+
+    def test_bang_co_nhac_man_hinh_thi_khong_gan_bua(self):
+        """Có một dòng khớp là bảng ấy **có** khai phạm vi — những dòng còn
+        lại không khớp là cố ý, không được vơ vào."""
+        from aisef.control.experience import parse_experience
+        doc = self.MOT_MAN_HINH.replace(
+            "| Note List | / | Create, search, and delete notes |",
+            "| Note List | / | Create notes |\n| Settings | /settings | Preferences |",
+        ).replace("| Note textarea | Header area |", "| Note textarea | Note List |")
+        exp = parse_experience(doc)
+        self.assertEqual(exp.by_id("note-list").components, ["Note textarea"])
+        self.assertEqual(exp.by_id("settings").components, [])
+
+
 class TestParseBmadSample(unittest.TestCase):
     """Mẫu của chính BMAD — hình dạng thật, không phải cách viết của ta."""
 
