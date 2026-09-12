@@ -585,3 +585,33 @@ class TestModelDiVaoCaHaiDieuKien(unittest.TestCase):
 
     def test_nhanh_tran_nhan_cung_model(self):
         self.assertEqual(self._spec_of(bare=True).model, "model-yeu")
+
+
+class TestDoLaiSauDotChay(unittest.TestCase):
+    """`_analyze` đo hai thứ `pass@1` không thấy, và phải công bằng hai điều kiện.
+
+    Ba cái bẫy nó phải tránh, cả ba đều đã lộ trên dữ liệu thật 2026-09-12:
+    tính tệp của **harness** thành tệp agent ghi bậy; coi phiên mất cây làm
+    việc là phiên sạch; và trộn dòng smoke với dòng của đợt đo thật trong cùng
+    một sổ nối thêm.
+    """
+
+    def test_tep_cua_harness_khong_tinh_la_ghi_ngoai_pham_vi(self):
+        from . import _analyze as A
+        ra = A._outside([".opencode/plugin/aisef-guard.ts", "_bmad-output/x.json",
+                         "aisef/phases/plan.py", "src/khac.py"], ["aisef"])
+        self.assertEqual(ra, ["src/khac.py"])
+
+    def test_tep_test_khong_tinh(self):
+        from . import _analyze as A
+        self.assertEqual(A._outside(["tests/test_x.py"], ["aisef"]), [])
+
+    def test_mat_cay_lam_viec_thi_khong_ket_luan_duoc(self):
+        from . import _analyze as A
+        self.assertIsNone(A._changed_in_candidate(Path("/khong/co/that"), "deadbeef"))
+
+    def test_xong_gia_la_fail_ma_phien_khong_bao_loi(self):
+        from . import _analyze as A
+        s = A.Session("t", "c", 1, "FAIL", 3, false_done=True, out_of_scope=[], workspace_found=True)
+        bao_cao = A.report([s])
+        self.assertIn("| c | 1 | 1 | 1 | 1 |", bao_cao)
