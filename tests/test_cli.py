@@ -973,14 +973,23 @@ class TestQuyUocMaThoat(unittest.TestCase):
         cùng mã thoát và cùng đầu ra."""
         import subprocess
         import tempfile
+        # `stdout=PIPE` tường minh thay vì `capture_output`: trên runner Windows
+        # 3.11, `capture_output=True` cho `stdout is None` ở phép thử này (CI
+        # 13/09/2026) — nguyên nhân chưa rõ, nên ống được mở tay và thông báo
+        # lỗi mang theo nguyên văn cả ba trường để lần sau đọc được sự thật thay
+        # vì đoán.
         with tempfile.TemporaryDirectory() as d:
             sau = subprocess.run([sys.executable, "-m", "aisef", "gates", "--project", d],
-                                 capture_output=True, text=True, cwd=str(ROOT))
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                 text=True, cwd=str(ROOT))
             truoc = subprocess.run([sys.executable, "-m", "aisef", "--project", d, "gates"],
-                                   capture_output=True, text=True, cwd=str(ROOT))
-        self.assertEqual(sau.returncode, truoc.returncode, sau.stderr[-300:])
-        self.assertEqual(sau.stdout, truoc.stdout)
-        self.assertIn("prd", sau.stdout)
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                   text=True, cwd=str(ROOT))
+        chi_tiet = (f"sau: rc={sau.returncode} out={sau.stdout!r} err={sau.stderr!r}\n"
+                    f"truoc: rc={truoc.returncode} out={truoc.stdout!r} err={truoc.stderr!r}")
+        self.assertEqual(sau.returncode, truoc.returncode, chi_tiet)
+        self.assertEqual(sau.stdout, truoc.stdout, chi_tiet)
+        self.assertIn("prd", sau.stdout or "", chi_tiet)
 
     def test_project_truoc_lenh_khong_bi_subparser_ghi_de(self):
         """Cái bẫy của argparse: nếu subparser khai `--project` với mặc định
