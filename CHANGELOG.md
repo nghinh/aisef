@@ -1,5 +1,53 @@
 # Changelog
 
+## 1.3.1 — 2026-09-12
+
+A same-day patch. 1.3.0 shipped a project template that froze all 68 defaults
+into every new project, a Windows path bug in memory scoping, and a retry loop
+that treated "please wait" as "try again immediately". None of it changes a
+gate's verdict; all of it was found by running the thing.
+
+### Fixes
+
+- **`init` no longer freezes the framework's defaults into your project**
+  (measured today: `.ai/config.json` went from **68 keys to 4**). Writing every
+  default meant two things went wrong quietly: a newcomer could not tell which
+  line mattered, and when the framework changed a default — which has happened,
+  `context.max_preservation_chars` 1500 → 1200 — every existing project silently
+  kept the old number forever. The file now carries only what the project
+  actually decided plus the keys you *must* declare (today: `tools.test`).
+  Reading is unchanged: `load` still merges with `DEFAULTS`, so nothing is lost.
+- **A backslash path no longer slips past memory scoping** (bug 75, Windows).
+  Scope matching compared raw strings, so a record scoped to `src\work` did not
+  match a query for `src/work` — the record simply never came back, with no
+  error. Both sides are normalised to POSIX form before comparison, and
+  `src/work` still does not cover `src/workers/job.py`.
+- **A rate limit is "wait, then retry", and the harness was not waiting.**
+  `429` now has its own exit status, and `retry_delay_seconds` reads the delay
+  the provider actually stated (`Retry-After` header, error body, or prose like
+  "try again in 27s"), capped at 300 s so an absurd number cannot turn a retry
+  into a hang. Retrying instantly spent the whole infra budget in seconds
+  against a provider that was only asking for a pause.
+- **An expired or missing key is no longer retried as infrastructure.** `401`
+  and friends map to `auth`, which is outside the retry set, and the error now
+  names the credential environment variables it looked at — names only, never
+  values. Measured before the fix: three attempts, 176 s each, $0 recorded,
+  nothing learned.
+- **The published wheel no longer carries the benchmark's fake agent.**
+  `SimulatedWeakAdapter` existed to fake a weak agent for bench runs and was
+  shipping to every user; it now lives in `tests/bench/`.
+
+### Added
+
+- **`aisef status --attempts`** — where attempts actually end, read from
+  evidence rather than from memory: how many passed, how many were blocked at
+  the gate and by which check, how many never reached a verdict. On a real
+  10-story project it reported 34 attempts, 26% passed, and `review` as 18 of
+  19 gate blocks.
+- **`aisef doctor` names the agent credential it found** (again, names only).
+- `RunResult.model` records which model actually answered, so two cohorts run
+  behind the same alias can be told apart afterwards.
+
 ## 1.3.0 — 2026-09-12
 
 Sixty-one commits had accumulated behind `v1.2.31` (2026-09-09): seven real
