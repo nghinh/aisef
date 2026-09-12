@@ -192,3 +192,31 @@ lúc một cột đang chạy**. Đổi giữa chừng thì nửa cột đo mode
 model khác, mà mọi dòng vẫn ghi cùng một chuỗi — hỏng không cứu được. Cột 2 chỉ
 bắt đầu sau khi cột 1 đóng, và mang nhãn `--note "mycombo→<tên model>"`.
 
+
+### Cột 2 — quy trình, viết trước khi chạy
+
+Cột 1 chạy trên `9router/mycombo` với model nền **MiniMax-M2.7** (lời khai chủ
+dự án). Cột 2 giữ nguyên **mọi thứ khác** và chỉ đổi model nền sau alias.
+
+Bốn bước, theo thứ tự, không rút gọn:
+
+1. Chủ dự án đổi model sau alias `mycombo` và **nói ra tên model mới** — harness
+   không tự đọc được cấu hình của 9router, nên tên ấy là lời khai và phải được
+   ghi là lời khai.
+2. Chạy:
+
+   ```
+   nohup python3 -m tests.bench run-both <12 task theo đúng thứ tự cột 1> \
+       --client opencode --attempts 3 --note "mycombo→<tên model> (khai <ngày>)" &
+   ```
+
+   Thứ tự task **giữ nguyên như cột 1**. Xáo lại là đổi một biến không cần đổi.
+3. Đóng đợt: `python3 -m tests.bench report --cohort "<tên model>"` và
+   `python3 -m tests.bench analyze`.
+4. So hai cột **theo từng task**, không so hai con số tổng: 12 task với n = 3
+   không đủ mẫu để một hiệu số tổng có nghĩa.
+
+**Điều kiện dừng sớm, chốt trước:** nếu hai task đầu của cột 2 đều 6/6 PASS ở cả
+hai điều kiện thì model mới cũng chạm trần trên bộ dữ liệu này — dừng, báo, và
+đừng đốt hai giờ nữa để lấy một cột toàn số 1,00. Trần dữ liệu là kết quả, và
+nó phải được báo như một kết quả.
