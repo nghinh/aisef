@@ -77,13 +77,15 @@ A bench-only `ClientAdapter` that emulates a low-quality coding agent determinis
 
 **Honest framing**: this is a *control distribution over pass@1*, not a model of any specific weak agent. Anyone who reads the pass@1 = 0.44 and concludes "the harness is broken on weak inputs" is misreading — the simulator has no hooks to fire.
 
+**Implementation correction (2026-09-12, after measurement):** historical numbers and evidence below are preserved, not regenerated or validated by the corrected simulator. Previously `_read_gold` ignored the root supplied in `RunSpec.env`, file traversal was unsorted, test-path exclusion was ineffective, and `revert` looked up the materialized base SHA in the source repository: failed lookups could delete existing files rather than restore them. The corrected implementation honors the explicit source root, sorts non-test files by POSIX path, and restores from the materialized repository, rejecting an invalid base before writing. `partial` writes one complete file, not half the hunks; single-file fixes can pass, while multi-file partial outcomes depend on the tests. In particular, historical `revert` failures do not establish that pre-fix restoration was measured. Synthetic regression tests verify the corrected behavior without changing the frozen dataset, scorer, or recorded measurements.
+
 ### 3.2 Results (12 A-2 tasks × 4 attempts × 2 conditions = 96 sessions)
 
 ```
 strategy    pass    total   pass@1
 gold         24      24      1.00     ← apply exact gold
 noop          0      24      0.00     ← write nothing
-partial      18      24      0.75     ← first half of hunks
+partial      18      24      0.75     ← first file's complete post-image
 revert        0      24      0.00     ← restore pre-fix
 ───────────────────────────────────
 overall      42      96      0.44
@@ -117,7 +119,7 @@ Per-task (simulated-weak; bare identical — see §3.3):
 | guard blocks | 0 | 0 | — |
 | $/attempt | $0.00 | $0.00 | — |
 
-**Why AISEF == Bare exactly**: the simulator writes files via `subprocess.run(["patch", …])` and returns a hand-rolled `RunResult`. It never spawns a Claude Code / OpenCode session, never invokes a hook, never goes through `compile_for`.  So the AISEF harness has *nothing to act on*.  The post-hoc `diff-scope` check in the bench harness compares `gold.patch` against the candidate diff — if the simulator's diff happens to match scope (which `gold` does, by construction), the post-hoc check is a no-op.  Same on the bare side.  Equal.
+**Why these simulator conditions match**: the simulator reconstructs gold in a scratch directory using `patch`, then writes file post-images directly. It never starts a real client session, invokes client hooks, or goes through `compile_for`. The runner restores candidate-touched tests and applies hidden tests, then grades F2P/P2P test IDs. There is no post-hoc diff-scope enforcement or comparison of the candidate against `gold.patch`; `_grade` uses the candidate diff only to count changed source files and lines.
 
 **What this DOES measure**: that the bench harness can score a known distribution correctly.  Pre-v1.3 we had no way to validate the harness on a *non-frontier* data path.
 
@@ -189,3 +191,75 @@ Ship:
 Do **not** ship any claim that "guards help weak agents" based on simulator results; that conclusion requires option 1 or 3 + real hooks in a future protocol.
 
 **Status**: Phase A complete (A-1 / A-2 / A-3 / A-4).  Phases B/C/D remain in `docs/EXECUTION-PLAN.md` queue.
+
+---
+
+## 7. Corrected simulator re-run (2026-09-12 follow-up)
+
+Historical numbers in §3 are preserved, **not** retroactively regenerated. After the §3 measurement, three concrete defects were identified in `aisef/clients/simulated.py` and corrected in the worktree but not on the bench path:
+
+1. `_read_gold` created `.sim_scratch` and `.sim_clean` inside the frozen `tests/bench/tasks/<id>/` directory. Side-effect: mutated task-directory mtime on every attempt and littered the gitignore-free area inside the dataset fixture.
+2. `_read_gold` did not honor `AISEF_BENCH_AISEF_ROOT` from `RunSpec.env`; it walked four levels up from `task_dir` to find a "repo root". Worked in production (`_runner.run` sets the env var), but unit tests with synthetic worktrees proved ambiguous.
+3. `run()` raised `ValueError` on a non-integer `AISEF_BENCH_ATTEMPT` and propagated `JSONDecodeError` / `tarfile.TarError` past the documented `(OSError, CalledProcessError)` guard. Cross-platform robustness, not pass-rate.
+
+Corrected run was executed in isolation, with frozen fixtures and historical `.bench/results.jsonl` verified byte/metadata-identical before and after:
+
+- Cohort: 12 A-2 tasks × 4 attempts × 2 conditions = 96 sessions.
+- Storage: `/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/opencode/bench-corrected-20260912-1040/`
+  - `corrected-results.jsonl` (immutable, sha256 in `provenance.json`) — 96 rows.
+  - `provenance.json` — `HEAD = 5f8957cf…`, implementation digest `19a1d43c…`, dataset manifest digest `35850e82…`, frozen-fixture snapshot before/after, historical `results.jsonl` snapshot before/after.
+  - Inputs copied to `inputs/<id>/` so simulator scratch work never touched `tests/bench/tasks/`.
+- Validate: every task `gold_pass=True`, `use_docker=False`, `verify` is a plain `python3 -m unittest …` command — no shell metacharacters, no Docker. No live adapter dispatched.
+- AISEF_BENCH_DIR set in the driver before any import, so the runner's `KEEP_DIR = $AISEF_BENCH_DIR/.bench` is a sibling of `inputs/`, not the repo's `.bench/`.
+
+### 7.1 Totals by condition × strategy
+
+Per-condition × per-strategy: 12 attempts each (one per A-2 task).
+
+| condition | strategy | PASS | FAIL | INVALID | UNRUNNABLE | F2P pass/total | P2P red/total | guard blocks | $ |
+|---|---|---|---|---|---|---|---|---|---|
+| simulated-weak | gold | 12 | 0 | 0 | 0 | 108/108 | 0/751 | 0 | 0.00 |
+| simulated-weak | noop | 0 | 12 | 0 | 0 | 0/108 | 0/751 | 0 | 0.00 |
+| simulated-weak | partial | 10 | 2 | 0 | 0 | 96/108 | 0/751 | 0 | 0.00 |
+| simulated-weak | revert | 0 | 12 | 0 | 0 | 0/108 | 0/751 | 0 | 0.00 |
+| simulated-weak-bare | gold | 12 | 0 | 0 | 0 | 108/108 | 0/751 | 0 | 0.00 |
+| simulated-weak-bare | noop | 0 | 12 | 0 | 0 | 0/108 | 0/751 | 0 | 0.00 |
+| simulated-weak-bare | partial | 10 | 2 | 0 | 0 | 96/108 | 0/751 | 0 | 0.00 |
+| simulated-weak-bare | revert | 0 | 12 | 0 | 0 | 0/108 | 0/751 | 0 | 0.00 |
+
+Aggregate: simulated-weak pass@1 = 22/48 (45.83%), simulated-weak-bare pass@1 = 22/48 (45.83%), Δ = 0. P2P regressions across all 96 sessions: 0.
+
+### 7.2 Per-task (corrected run)
+
+| task | gold | noop | partial | revert | pass@1 |
+|---|---|---|---|---|---|
+| bug-a2-multi-1 | PASS | FAIL | PASS | FAIL | 0.50 |
+| bug-a2-multi-2 | PASS | FAIL | PASS | FAIL | 0.50 |
+| bug-a2-multi-3 | PASS | FAIL | PASS | FAIL | 0.50 |
+| bug-a2-multi-4 | PASS | FAIL | FAIL | FAIL | 0.25 |
+| bug-a2-sec-1   | PASS | FAIL | PASS | FAIL | 0.50 |
+| bug-a2-sec-2   | PASS | FAIL | PASS | FAIL | 0.50 |
+| bug-a2-sec-3   | PASS | FAIL | PASS | FAIL | 0.50 |
+| bug-a2-sec-4   | PASS | FAIL | PASS | FAIL | 0.50 |
+| bug-a2-state-1 | PASS | FAIL | PASS | FAIL | 0.50 |
+| bug-a2-state-2 | PASS | FAIL | PASS | FAIL | 0.50 |
+| bug-a2-state-3 | PASS | FAIL | PASS | FAIL | 0.50 |
+| bug-a2-state-4 | PASS | FAIL | FAIL | FAIL | 0.25 |
+
+### 7.3 What changed vs §3
+
+The §3 measurement was made with the prior simulator; this follow-up is the first post-correction measurement. Per-strategy totals are materially different and **the §3 numbers must not be cross-referenced for change detection**:
+
+| metric | §3 (historical) | §7.1 (corrected) | note |
+|---|---|---|---|
+| simulator pass@1 | 42/96 (43.75%) | 44/96 (45.83%) | within sampling noise of a deterministic strategy split |
+| partial pass | 18/24 (75%) | 20/24 (83.33%) | two extra A-2 tasks have a single-file fix among the gold's files |
+| partial fail | bug-a2-multi-2, bug-a2-multi-4, bug-a2-state-4 | bug-a2-multi-4, bug-a2-state-4 only | bug-a2-multi-2's `plan.py` alone contains the fix; this is a real dataset property, not a simulator artifact |
+| errors raised by `run` | n/a (not measured) | 0 | JSON, tar, integer, subprocess errors all caught |
+
+### 7.4 What this follow-up does and does not claim
+
+- **Does** confirm the simulator's pass-rate by strategy is consistent with its design under the corrected implementation.
+- **Does** confirm the harness can re-grade the 96 sessions deterministically without invoking any real model.
+- **Does NOT** update §3 numbers — that would falsify the protocol's freeze on historical evidence.
+- **Does NOT** make any claim about guard effectiveness. §3.3 and §5.2 stand. The simulator still has no hooks to fire.
