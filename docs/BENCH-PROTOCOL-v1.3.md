@@ -293,6 +293,7 @@ tín hiệu.
 | trần lượt | `TRAN_LUOT = 0` như C-1 |
 | chạy lại khi hạ tầng hỏng | **1 lần** (`INFRA_RETRIES = 1`) — mới, xem dưới |
 | tổng | 3 × 6 × 2 = **36 lượt** |
+| thời gian ước tính | **≈ 3 giờ** — suy từ thời gian phiên trung vị của đúng ba task này ở C-1 (sec-1 6,1 · sec-2 3,6 · state-3 4,9 phút/phiên). Commit `5506ba8` nói "a third of the time" so với C-1; đúng hơn là **một nửa** (2,9 giờ so với 5,8) — sửa ở đây vì thông điệp commit đã đẩy |
 
 ### Thứ đổi so với C-1, và vì sao nó không phải "làm đẹp kết quả"
 
