@@ -44,7 +44,10 @@ def main(argv: list[str] | None = None) -> int:
                         "(đổi mô hình nền không đổi một ký tự nào trong dữ liệu)")
     b.add_argument("--max-usd", type=float, default=0.0,
                    help="trần chi phí: dừng TRƯỚC task kế nếu đã tiêu quá; 0 = không trần. Cắt ở ranh giới task để mỗi task đo được vẫn đủ thiết kế; task bị bỏ được in ra, không im lặng")
-    sub.add_parser("report", help="báo cáo Markdown từ .bench/results.jsonl")
+    rp = sub.add_parser("report", help="báo cáo Markdown từ .bench/results.jsonl")
+    rp.add_argument("--cohort", default="",
+                    help="chỉ lấy dòng có `model` hoặc `note` chứa chuỗi này — "
+                         "sổ là tệp nối thêm, mọi đợt đo nằm chung một chỗ")
     an = sub.add_parser("analyze", help="đo lại sau đợt chạy: xong giả, ghi ngoài phạm vi, lượt trượt sửa ở đâu (đọc cây đã giữ, không đụng scorer)")
     an.add_argument("--client", default="opencode", help="tiền tố mã client cần đọc")
     e = sub.add_parser("export", help="xuất một task ra thư mục định dạng Harbor")
@@ -107,7 +110,13 @@ def main(argv: list[str] | None = None) -> int:
         from . import _analyze as A
         print(A.report(A.collect(a.client), A.cut_sessions()))
     elif a.cmd == "report":
-        print(R.report(R.load_results(), tasks))
+        rows = R.load_results()
+        if a.cohort:
+            rows = [r for r in rows if a.cohort in (r.model or "") or a.cohort in (r.note or "")]
+            if not rows:
+                print(f"không có dòng nào khớp cohort {a.cohort!r}", file=sys.stderr)
+                return 2
+        print(R.report(rows, tasks))
     elif a.cmd == "export":
         print(R.export(next(t for t in tasks if t.id == a.id), a.out))
     return 0

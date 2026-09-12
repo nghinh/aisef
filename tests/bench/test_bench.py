@@ -761,6 +761,50 @@ class TestLenhAnalyzeCoThat(unittest.TestCase):
                 pass
         self.assertIn("Đo lại sau đợt chạy", ra.getvalue())
 
+    def test_report_loc_duoc_theo_cohort(self):
+        """`results.jsonl` là sổ **nối thêm**: mọi đợt đo nằm chung một tệp, nên
+        `report` không lọc được sẽ trộn cohort claude 09/06 vào bảng của cohort
+        opencode 09/12 — và không ai đọc bảng ấy mà nhận ra."""
+        import io
+        import json as _json
+        import tempfile
+        from contextlib import redirect_stdout
+
+        from . import __main__ as CLI
+        from . import _runner as R
+        with tempfile.TemporaryDirectory() as d:
+            kho = Path(d)
+            dong = [
+                {"task_id": "t1", "client": "opencode", "attempt": 1, "outcome": "PASS",
+                 "model": "9router/mycombo", "note": "cột 1"},
+                {"task_id": "t1", "client": "claude", "attempt": 1, "outcome": "FAIL",
+                 "model": "claude-opus-5", "note": ""},
+            ]
+            (kho / "results.jsonl").write_text(
+                "\n".join(_json.dumps(x) for x in dong), encoding="utf-8")
+            with mock.patch.object(R, "KEEP_DIR", kho):
+                ra = io.StringIO()
+                with redirect_stdout(ra):
+                    CLI.main(["report", "--cohort", "mycombo"])
+        out = ra.getvalue()
+        self.assertIn("| t1 | opencode |", out)
+        self.assertNotIn("| t1 | claude |", out)
+
+    def test_cohort_khong_khop_thi_bao_chu_khong_in_bang_rong(self):
+        import io
+        import tempfile
+        from contextlib import redirect_stderr, redirect_stdout
+
+        from . import __main__ as CLI
+        from . import _runner as R
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "results.jsonl").write_text("", encoding="utf-8")
+            with mock.patch.object(R, "KEEP_DIR", Path(d)), redirect_stdout(io.StringIO()), \
+                    redirect_stderr(io.StringIO()) as err:
+                ma = CLI.main(["report", "--cohort", "khong-co"])
+        self.assertEqual(ma, 2)
+        self.assertIn("khong-co", err.getvalue())
+
     def test_dem_phien_bi_cat_tu_kho_phien_cua_cli(self):
         """Phiên chết vì CLI không phân giải nổi cú gọi công cụ là hỏng của cặp
         model↔CLI. Nếu không đếm riêng, nó bị cộng vào cột "agent sửa sai" —
