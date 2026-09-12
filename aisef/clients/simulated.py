@@ -210,7 +210,11 @@ def _apply_gold(workdir: Path, files: list[tuple[Path, str]]) -> int:
     for rel, body in files:
         target = workdir / rel
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(body, encoding="utf-8")
+        # ``newline=""`` tắt dịch ký tự xuống dòng theo nền tảng: mặc định,
+        # Windows biến mỗi ``\n`` thành ``\r\n``, nên tệp ghi ra khác **byte**
+        # với tệp mà patch dựng lên, và cây làm việc bẩn ngay cả sau khi hoàn
+        # nguyên (CI Windows 2026-09-12, lỗi 74).
+        target.write_text(body, encoding="utf-8", newline="")
     return len(files)
 
 
@@ -223,25 +227,23 @@ def _revert_files(workdir: Path, files: list[tuple[Path, str]],
 
     subprocess.run(["git", "cat-file", "-e", f"{base_sha}^{{commit}}"],
                    cwd=workdir, capture_output=True, check=True)
-    restored = []
+    n = 0
     for rel, _ in files:
         entry = subprocess.run(
             ["git", "ls-tree", "-z", base_sha, "--", rel.as_posix()],
             cwd=workdir, capture_output=True, check=True,
         )
-        body = None
-        if entry.stdout:
-            body = subprocess.run(
-                ["git", "show", f"{base_sha}:{rel.as_posix()}"],
-                cwd=workdir, capture_output=True, check=True,
-            ).stdout
-        restored.append((rel, body))
-    n = 0
-    for rel, body in restored:
         target = workdir / rel
-        if body is not None:
+        if entry.stdout:
+            # ``git checkout`` chứ không phải ghi thẳng blob: blob trong kho
+            # luôn là ``\n``, còn cây làm việc trên Windows có thể đã được
+            # lấy ra với ``\r\n`` (``core.autocrlf``). Ghi thẳng blob làm tệp
+            # khác với chính nó trước khi sửa — git báo `M` cho một lần "hoàn
+            # nguyên" đúng nghĩa (CI Windows 2026-09-12, lỗi 74). Để git áp lại
+            # đúng bộ lọc nó đã dùng lúc lấy ra.
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes(body)
+            subprocess.run(["git", "checkout", base_sha, "--", rel.as_posix()],
+                           cwd=workdir, capture_output=True, check=True)
             n += 1
         elif target.exists():
             target.unlink()

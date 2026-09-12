@@ -189,3 +189,38 @@ class TestApDungPatchChayDuocTrenMoiHeDieuHanh(unittest.TestCase):
              mock.patch("subprocess.run", gia_run):
             self.assertFalse(simulated._apply_patch_file(d, patch))
 
+
+
+class TestGhiKhongDichKyTuXuongDong(unittest.TestCase):
+    """Lỗi 74 (CI Windows 2026-09-12): `gold` ghi bằng `write_text` mặc định,
+    nên trên Windows mỗi `\\n` thành `\\r\\n`. Tệp ghi ra khác **byte** với tệp
+    mà patch dựng lên, và sau khi hoàn nguyên `git status` vẫn báo `M` — một
+    lần hoàn nguyên đúng nghĩa mà cây vẫn bẩn.
+    """
+
+    def test_gold_ghi_dung_byte_khong_them_cr(self):
+        from aisef.clients.simulated import _apply_gold
+        d = Path(tempfile.mkdtemp())
+        _apply_gold(d, [(Path("a.py"), "mot\ndong\nnua\n")])
+        self.assertEqual((d / "a.py").read_bytes(), b"mot\ndong\nnua\n")
+        self.assertNotIn(b"\r\n", (d / "a.py").read_bytes())
+
+    def test_hoan_nguyen_dung_git_checkout_de_git_ap_lai_bo_loc(self):
+        """Hoàn nguyên phải để git quyết định byte trên đĩa, không ghi thẳng blob:
+        kho luôn giữ `\\n`, cây làm việc có thể đã lấy ra `\\r\\n`."""
+        from aisef.clients import simulated
+        goi = []
+
+        def gia_run(cmd, **kw):
+            goi.append(cmd)
+            class Ra:
+                returncode = 0
+                stdout = b"x" if cmd[:2] == ["git", "ls-tree"] else b""
+                stderr = b""
+            return Ra()
+
+        with mock.patch("subprocess.run", gia_run):
+            simulated._revert_files(Path("/tmp/khong-quan-trong"), [(Path("a.py"), "")], "abc123")
+        lenh = [c[:2] for c in goi]
+        self.assertIn(["git", "checkout"], lenh, "phải hoàn nguyên bằng git checkout")
+        self.assertNotIn(["git", "show"], lenh, "không ghi thẳng blob nữa")
