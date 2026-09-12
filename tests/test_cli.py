@@ -315,6 +315,49 @@ class TestReviewStories(CliTestCase):
         self.assertIn("machine gate: PASS", out)
 
 
+class TestReviewReadinessTinhLaiThieuGi(CliTestCase):
+    """Lỗi 97: cổng `readiness` in lại cảnh báo thiếu cấu hình **ghi lúc chia
+    story** — tức trước khi có mockup và trước khi ai kịp cấu hình công cụ —
+    ngay bên trên dòng "✅ 7 stories are all executable" nó vừa tính xong."""
+
+    def _chia_story(self):
+        import shutil
+
+        from aisef.phases.story_split import split
+
+        fix = Path(__file__).resolve().parent / "fixtures" / "bmad"
+        for name in ("epics.md", "prd.md"):
+            shutil.copy(fix / name, self.artifacts / name)
+        split(self.artifacts)
+
+    def test_canh_bao_thieu_cong_cu_duoc_tinh_lai_khi_da_cau_hinh(self):
+        self._chia_story()
+        # Ghi nhận lúc chia: chưa có `tools.test` nào.
+        ghi = (self.artifacts / "stories.gate.json").read_text(encoding="utf-8")
+        self.assertIn("configure `tools.test`", ghi)
+
+        (self.project / ".ai").mkdir(exist_ok=True)
+        (self.project / ".ai" / "config.json").write_text(
+            '{"tools.test": "true", "tools.lint": "true"}', encoding="utf-8")
+        (self.artifacts / "design-contract.json").write_text(
+            '{"version": 1, "screens": []}', encoding="utf-8")
+
+        code, out, _ = self.run_cli("review", "readiness")
+        self.assertEqual(code, EXIT_OK)
+        self.assertNotIn("configure `tools.test`", out)
+        # Cảnh báo không thuộc loại "thiếu cấu hình" vẫn còn nguyên.
+        self.assertIn("machine gate:", out)
+
+    def test_cong_story_van_in_dung_ban_da_ghi(self):
+        """Ở cổng `stories` thì bản ghi là bản đúng: nó tính ngay lúc ấy."""
+        self._chia_story()
+        (self.project / ".ai").mkdir(exist_ok=True)
+        (self.project / ".ai" / "config.json").write_text(
+            '{"tools.test": "true", "tools.lint": "true"}', encoding="utf-8")
+        _, out, _ = self.run_cli("review", "stories")
+        self.assertIn("configure `tools.test`", out)
+
+
 class TestMockupCommand(CliTestCase):
     def test_rejects_unknown_client(self):
         code, _, err = self.run_cli("mockup", "--client", "khong-co")

@@ -42,6 +42,12 @@ GATE_MEMO = "stories.gate.json"
 
 STORIES_DIR = "stories"
 
+#: Marker for the provisioning-gap warnings. They are recorded when stories are
+#: split, but read again at the `readiness` gate — by which time the project may
+#: well have been configured. Whoever re-renders them recomputes them instead
+#: (bug 97), and needs to recognise them.
+PREREQ_WARNING = "missing prerequisites to run"
+
 
 @dataclass
 class SplitResult:
@@ -259,9 +265,7 @@ def split(
                 # There is no `aisef config` command, so "configure X" on its
                 # own leaves the reader with a key and nowhere to put it.
                 thieu += f" — these keys live in `{CONFIG_PATH}`"
-            res.gate.warnings.append(
-                f"{pf.story_id} missing prerequisites to run: {thieu}"
-            )
+            res.gate.warnings.append(f"{pf.story_id} {PREREQ_WARNING}: {thieu}")
 
     res.index_path = write_index(root, res, config)
     # Persisted so the next `plan` run feeds it into the epics prompt: stories

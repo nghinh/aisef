@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- **The readiness gate stopped contradicting itself** (bug 97). It printed
+  "STORY-04-03 missing prerequisites to run: configure `app.dev_command`" and,
+  ten lines below, "✅ 7 stories are all executable". The first came from the
+  stories index — recorded when stories were split, before mockups existed and
+  before anyone had configured a tool; the second was computed on the spot. A
+  warning contradicted by the conclusion under it teaches the approver to skip
+  both. Provisioning warnings are now recomputed at the readiness gate; the
+  rest of the recorded gate (cycles, serialized epics) still holds and is left
+  alone, and the stories gate still shows what it recorded.
+
+- **"configure `tools.lint`" now says where the key goes** — `.ai/config.json`,
+  named once per story, since there is no `aisef config` command.
+
 - **One misplaced attribute emptied the design contract, and the gate passed**
   (bug 96). The mockup agent put `data-annotation` — the marker for "this part
   is documentation, not a commitment" — on the `<section data-state="primary">`

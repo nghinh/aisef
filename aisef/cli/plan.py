@@ -88,6 +88,8 @@ def cmd_review(args) -> int:
             from ..phases.story_split import describe_index
 
             data = json.loads(artifact.read_text(encoding="utf-8"))
+            if gate is Gate.READINESS:
+                data = _prereqs_recomputed(data, args)
             print(f"\n— {len(data.get('stories', []))} story —")
             print(describe_index(data))
             continue
@@ -136,6 +138,36 @@ def _not_executable(args) -> list[str]:
         config=Config.load(args.project),
     )
     return [pf.story_id for pf in res if not pf.executable]
+
+
+def _prereqs_recomputed(data: dict, args) -> dict:
+    """Replace the recorded provisioning warnings with today's answer.
+
+    The stories gate runs before mockups exist and before tools are
+    configured, so its warnings are expected to be out of date by the time
+    anyone reads them at the `readiness` gate — which printed "configure
+    `app.dev_command`" directly above the "✅ 7 stories are all executable"
+    it had just computed (bug 97). The rest of the recorded gate (cycles,
+    serialized epics) still holds and is left alone.
+    """
+    from ..control.preflight import check_stories_executable
+    from ..phases.run import load_plan
+    from ..phases.story_split import PREREQ_WARNING
+
+    plan = load_plan(_artifact_root(args))
+    if plan.error or not plan.stories:
+        return data
+    gate = dict(data.get("gate") or {})
+    ghi = [w for w in gate.get("warnings", []) if PREREQ_WARNING not in w]
+    for pf in check_stories_executable(
+        list(plan.stories.values()), project=Path(args.project).resolve(),
+        config=Config.load(args.project),
+    ):
+        if pf.provisioning_gaps:
+            ghi.append(f"{pf.story_id} {PREREQ_WARNING}: "
+                       + "; ".join(m.line() for m in pf.provisioning_gaps))
+    gate["warnings"] = ghi
+    return {**data, "gate": gate}
 
 
 def _preflight_lines(args) -> list[str]:
