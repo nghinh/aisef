@@ -177,10 +177,15 @@ class RunResult:
 
 #: Normalised exit status across all clients (ADR-005 V11 B).  Closed set:
 #: ``aisef status`` counts by it, ``Attempt.infra`` reads it instead of probing strings.
-EXIT_STATUSES = ("ok", "max_turns", "timeout", "cost", "context", "permission", "infra", "error")
+EXIT_STATUSES = ("ok", "max_turns", "timeout", "cost", "context", "permission", "auth", "infra",
+                 "error")
 
 #: Exit statuses that are **not the agent's fault** — retries do not count
 #: against the quality limit (``run.max_retries``); infra has its own limit.
+#: ``auth`` is deliberately **not** here: a rejected credential is not
+#: transient, and retrying it spends wall-clock and the infra budget on a
+#: failure that will repeat identically (measured 2026-09-12: 176 s per
+#: attempt, $0 recorded, three attempts, nothing learned).
 INFRA_STATUSES = ("timeout", "infra")
 
 
@@ -212,6 +217,12 @@ def exit_status_of(res: RunResult) -> str:
         return "cost"
     if any(m in why for m in ("prompt is too long", "context window", "context_length", "max_tokens")):
         return "context"
+    # Authentication before infra: a 401/403 carries ``api_error_status`` too,
+    # so the infra branch would swallow it and the harness would retry a
+    # credential that is going to be rejected again.
+    if any(m in why for m in ("401", "403", "authentication_error", "permission_error",
+                              "invalid api key", "invalid x-api-key", "unauthorized")):
+        return "auth"
     if raw.get("api_error_status") or raw.get("retryable") or any(
         m in why for m in ("api_error", "overloaded", "connection",
                            "cannot run", "without a result event")

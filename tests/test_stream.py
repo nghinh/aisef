@@ -267,6 +267,21 @@ class TestExitStatus(unittest.TestCase):
         self.assertEqual(self.ket_cuc({"subtype": "error_during_execution", "is_error": True}), "error")
         self.assertEqual(exit_status_of(RunResult(ok=False, error="test đỏ")), "error")
 
+    def test_credential_bi_tu_choi_khong_phai_ha_tang(self):
+        """401/403 mang `api_error_status` như lỗi hạ tầng thật, nhưng thử lại
+        thì hỏng y hệt: đo 2026-09-12 trên máy có `ANTHROPIC_API_KEY` hết hạn —
+        176 giây mỗi lượt, chi phí ghi 0, ba lượt không học được gì."""
+        for status in (401, 403):
+            with self.subTest(status=status):
+                self.assertEqual(self.ket_cuc({"subtype": "success", "is_error": True,
+                                               "api_error_status": status}), "auth")
+        self.assertEqual(exit_status_of(RunResult(ok=False, error="authentication_error: invalid x-api-key")),
+                         "auth")
+
+    def test_auth_khong_nam_trong_nhom_duoc_thu_lai(self):
+        from aisef.clients.stream import INFRA_STATUSES
+        self.assertNotIn("auth", INFRA_STATUSES)
+
     def test_bang_dong_va_moi_gia_tri_deu_sinh_duoc(self):
         sinh = {
             exit_status_of(parse_file(MINIMAL)), exit_status_of(parse_file(API_ERROR)),
@@ -278,6 +293,7 @@ class TestExitStatus(unittest.TestCase):
             self.ket_cuc({"subtype": "success", "is_error": True, "result": "prompt is too long"}),
             self.ket_cuc({"subtype": "error_during_execution", "is_error": True,
                           "permission_denials": [{"tool_name": "Bash", "tool_use_id": "t", "tool_input": {}}]}),
+            self.ket_cuc({"subtype": "success", "is_error": True, "api_error_status": 401}),
         }
         self.assertEqual(sinh, set(EXIT_STATUSES))
 

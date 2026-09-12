@@ -202,6 +202,32 @@ def runnable(cmd: list[str]) -> list[str]:
     return [*resolved, *cmd[1:]] if resolved else list(cmd)
 
 
+#: Variables that decide **who the agent authenticates as**.  They are kept
+#: (a user may legitimately authenticate this way) but they are also the first
+#: suspect when a session comes back 401: a stale key in the operator's shell
+#: silently outranks a working `claude.ai` login, and the CLI says so only in a
+#: line that never reaches the harness (measured 2026-09-12).
+AUTH_ENV_NAMES = ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN",
+                  "ANTHROPIC_BASE_URL")
+
+
+def auth_hint(env: dict[str, str]) -> str:
+    """One sentence naming what the rejected session authenticated with.
+
+    Never the value — only the variable name, which is what the operator needs
+    to act.  Empty when nothing in the child environment explains it, because a
+    guess here would send the reader to the wrong place.
+    """
+    present = [n for n in AUTH_ENV_NAMES if env.get(n)]
+    if not present:
+        return ("the provider rejected the credential; this session used the client's own login "
+                "(no auth variable was passed to it)")
+    return ("the provider rejected the credential; this session authenticated with "
+            + ", ".join(present)
+            + " from the environment, which outranks a `claude.ai` login — unset it to fall back "
+              "to that login, or replace it")
+
+
 def child_env(spec_env: dict[str, str], *, allow_prefixes: Iterable[str] = ()) -> dict[str, str]:
     """Environment for the client process: **allowlist**, not `os.environ`
     minus a few things (ADR-005 V2).

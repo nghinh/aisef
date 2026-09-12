@@ -56,8 +56,9 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
-from .base import Capability, ClientAdapter, RunSpec, Support, _stream_with_timeout, child_env, resolve_binary
-from .stream import RunResult, parse_stream
+from .base import (Capability, ClientAdapter, RunSpec, Support, _stream_with_timeout, auth_hint,
+                   child_env, resolve_binary)
+from .stream import RunResult, exit_status_of, parse_stream
 
 BINARY = "claude"
 
@@ -137,6 +138,7 @@ class ClaudeCodeAdapter(ClientAdapter):
         if not Path(spec.workdir).is_dir():
             return RunResult(ok=False, error=f"workdir does not exist: {spec.workdir}")
 
+        child = child_env(spec.env, allow_prefixes=spec.env_allow)
         try:
             proc = subprocess.Popen(
                 self.build_command(spec),
@@ -144,7 +146,7 @@ class ClaudeCodeAdapter(ClientAdapter):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True, encoding="utf-8", errors="replace",
-                env=child_env(spec.env, allow_prefixes=spec.env_allow),
+                env=child,
                 # The prompt is written and stdin closed straight away; an open
                 # stdin makes the CLI wait 3s on every call.
                 stdin=subprocess.PIPE,
@@ -178,4 +180,8 @@ class ClaudeCodeAdapter(ClientAdapter):
             result.error = f"exceeded {spec.timeout_seconds}s"
         if not result.raw_result and stderr.strip() and not timed_out:
             result.error = result.error or stderr.strip()[:500]
+        if exit_status_of(result) == "auth":
+            # "401" is not something an operator can act on.  Name the
+            # variable that decided who this session was.
+            result.error = f"{result.error}: {auth_hint(child)}"
         return result
