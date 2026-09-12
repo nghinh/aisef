@@ -500,7 +500,7 @@ class TestTranChiPhiCatOChanhGioiTask(unittest.TestCase):
     """
 
     def _fake_run(self, calls, cost):
-        def run(task, client, attempts=3, bare=False, model=""):
+        def run(task, client, attempts=3, bare=False, model="", note=""):
             calls.append((task.id, bare))
             return [R.Result(task.id, "x", 1, R.PASS, cost_usd=cost)]
         return run
@@ -652,7 +652,7 @@ class TestThuTuTaskTheoLoiNguoiGoi(unittest.TestCase):
         tasks = [R.Task(id=n, source="bug", dir=M.TASKS_DIR / n) for n in ("a", "b", "c")]
         goi = []
 
-        def run(task, client, attempts=3, bare=False, model=""):
+        def run(task, client, attempts=3, bare=False, model="", note=""):
             goi.append(task.id)
             return []
 
@@ -664,3 +664,40 @@ class TestThuTuTaskTheoLoiNguoiGoi(unittest.TestCase):
              redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
             CLI.main(["run-both", "c", "a"])
         self.assertEqual([g for i, g in enumerate(goi) if i % 2 == 0], ["c", "a"])
+
+
+class TestNhanCohortDoNguoiVanHanhKhai(unittest.TestCase):
+    """Khi model là **alias**, dữ liệu không tự phân biệt được hai cột.
+
+    `9router/mycombo` là một alias: đổi mô hình nền phía nhà cung cấp không đổi
+    một ký tự nào trong dòng kết quả, mà luồng JSON của OpenCode lại không mang
+    tên model. Hai đợt đo hai model khác nhau vì thế trông y hệt nhau khi đọc
+    lại. `--note` là lời khai của người vận hành, ghi vào **từng dòng** — không
+    phải quan sát, và báo cáo phải gọi đúng tên nó.
+    """
+
+    def test_note_di_vao_moi_dong_ca_hai_dieu_kien(self):
+        import io
+        from contextlib import redirect_stderr, redirect_stdout
+
+        from . import __main__ as CLI
+        ghi = []
+
+        def run(task, client, attempts=3, bare=False, model="", note=""):
+            ghi.append((bare, note))
+            return []
+
+        tasks = [R.Task(id="a", source="bug", dir=M.TASKS_DIR / "a")]
+        with mock.patch.object(CLI.M, "load_tasks", return_value=tasks), \
+             mock.patch.object(CLI.R, "ENABLED", True), \
+             mock.patch.object(CLI.R, "make_client", return_value=object()), \
+             mock.patch.object(CLI.R, "run", run), \
+             mock.patch.object(CLI.R, "report", return_value=""), \
+             redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            CLI.main(["run-both", "a", "--note", "mycombo→gemma-4-26B"])
+        self.assertEqual(ghi, [(False, "mycombo→gemma-4-26B"), (True, "mycombo→gemma-4-26B")])
+
+    def test_note_co_trong_dong_ket_qua(self):
+        r = R.Result("t", "opencode", 1, R.PASS, note="mycombo→X")
+        from dataclasses import asdict
+        self.assertEqual(asdict(r)["note"], "mycombo→X")

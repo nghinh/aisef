@@ -29,6 +29,9 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--attempts", type=int, default=3)
     r.add_argument("--bare", action="store_true", help="control group: cùng prompt, không guard/env AISEF")
     r.add_argument("--model", default="", help="model cụ thể (rỗng = mặc định của client); đi vào cả hai điều kiện")
+    r.add_argument("--note", default=os.environ.get("AISEF_BENCH_NOTE", ""),
+                   help="nhãn cohort do người vận hành khai, ghi vào từng dòng — bắt buộc khi model là alias "
+                        "(đổi mô hình nền không đổi một ký tự nào trong dữ liệu)")
     b = sub.add_parser("run-both", help="interleaved: AISEF rồi bare cho mỗi task, --attempts lượt (cần AISEF_BENCH=1)")
     b.add_argument("ids", nargs="*")
     b.add_argument("--client", default="claude")
@@ -36,6 +39,9 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--shuffle", type=int, default=0, metavar="SEED",
                    help="xáo thứ tự task với hạt giống cho trước (0 = giữ nguyên thứ tự). Có hạt giống thì lần chạy sau dựng lại được đúng thứ tự ấy; xáo không hạt giống là một biến không ai ghi lại")
     b.add_argument("--model", default="", help="model cụ thể (rỗng = mặc định của client); đi vào cả hai điều kiện")
+    b.add_argument("--note", default=os.environ.get("AISEF_BENCH_NOTE", ""),
+                   help="nhãn cohort do người vận hành khai, ghi vào từng dòng — bắt buộc khi model là alias "
+                        "(đổi mô hình nền không đổi một ký tự nào trong dữ liệu)")
     b.add_argument("--max-usd", type=float, default=0.0,
                    help="trần chi phí: dừng TRƯỚC task kế nếu đã tiêu quá; 0 = không trần. Cắt ở ranh giới task để mỗi task đo được vẫn đủ thiết kế; task bị bỏ được in ra, không im lặng")
     sub.add_parser("report", help="báo cáo Markdown từ .bench/results.jsonl")
@@ -70,7 +76,7 @@ def main(argv: list[str] | None = None) -> int:
             print("đặt AISEF_BENCH=1 — chạy client thật tốn tiền", file=sys.stderr)
             return 1
         client = R.make_client(a.client)
-        res = [x for t in pick for x in R.run(t, client, attempts=a.attempts, bare=a.bare, model=a.model)]
+        res = [x for t in pick for x in R.run(t, client, attempts=a.attempts, bare=a.bare, model=a.model, note=a.note)]
         print(R.report(res, tasks))
     elif a.cmd == "run-both":
         if a.client not in R.SIMULATED_CLIENTS and not R.ENABLED:
@@ -88,8 +94,8 @@ def main(argv: list[str] | None = None) -> int:
             if a.max_usd and tieu >= a.max_usd:
                 bo_qua = [x.id for x in order[i:]]
                 break
-            res += R.run(t, client, attempts=a.attempts, bare=False, model=a.model)
-            res += R.run(t, client, attempts=a.attempts, bare=True, model=a.model)
+            res += R.run(t, client, attempts=a.attempts, bare=False, model=a.model, note=a.note)
+            res += R.run(t, client, attempts=a.attempts, bare=True, model=a.model, note=a.note)
         if bo_qua:
             print(f"TRẦN CHI PHÍ {a.max_usd:.2f} USD đạt sau {len(order) - len(bo_qua)}/{len(order)} task "
                   f"(đã tiêu {sum(x.cost_usd for x in res):.2f}). KHÔNG chạy: {', '.join(bo_qua)}",

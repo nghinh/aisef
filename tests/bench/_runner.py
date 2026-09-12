@@ -236,6 +236,11 @@ class Result:
     #: scorer, nhưng model bên kia đổi theo thời gian: không ghi lại thì
     #: hai đợt đo cách nhau vài tuần không so được với nhau.
     model: str = ""
+    #: Nhãn cohort **do người vận hành khai** (`--note`). Cần khi model là một
+    #: *alias*: đổi mô hình nền phía nhà cung cấp không đổi một ký tự nào trong
+    #: dữ liệu, nên hai cột đo hai model khác nhau trông y hệt nhau khi đọc lại.
+    #: Đây là lời khai, không phải quan sát — báo cáo phải gọi đúng tên nó.
+    note: str = ""
     error: str = ""
 
 
@@ -252,7 +257,7 @@ def _prompt(task: Task, ws: Path, cfg: Config) -> str:
 
 
 def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = False,
-        model: str = "") -> list[Result]:
+        model: str = "", note: str = "") -> list[Result]:
     """``model`` đi vào **cả hai** điều kiện như nhau — nhóm đối chứng phải
     khác đúng một thứ (guard), không phải hai."""
     condition = f"{client.id}-bare" if bare else client.id
@@ -260,7 +265,8 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = Fa
     sim = is_simulated(client)
     for n in range(1, attempts + 1):
         if task.invalid_reason or not task.validated.get("gold_pass"):
-            out.append(Result(task.id, condition, n, INVALID, error=task.invalid_reason or "chưa validate"))
+            out.append(Result(task.id, condition, n, INVALID, note=note,
+                              error=task.invalid_reason or "chưa validate"))
             continue
         ws = materialize(task, KEEP_DIR / "run" / condition / task.id / f"a{n}", tests=task.tests_visible)
         base = head_sha(ws)
@@ -326,7 +332,8 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = Fa
         _git(ws, "commit", "-qm", f"{task.id}: ứng viên lượt {n}", check=False)   # không có gì để chốt = HEAD
         cand = head_sha(ws)
         res = run_tool("test", ws, story_id=task.id, artifact_root=root, config=cfg, candidate=cand)
-        out.append(_grade(task, condition, n, result, res, ws, base, cand, len(store.read(task.id).guard_blocks)))
+        out.append(_grade(task, condition, n, result, res, ws, base, cand,
+                          len(store.read(task.id).guard_blocks), note=note))
     KEEP_DIR.mkdir(parents=True, exist_ok=True)
     with (KEEP_DIR / "results.jsonl").open("a", encoding="utf-8") as fh:
         for r in out:
@@ -335,12 +342,12 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = Fa
 
 
 def _grade(task: Task, client_id: str, n: int, result, res, ws: Path, base: str, cand: str,
-           guard_block: int) -> Result:
+           guard_block: int, note: str = "") -> Result:
     log = parse_testlog(res.stdout + "\n" + res.stderr)
     r = Result(task.id, client_id, n, FAIL, f2p_total=len(task.f2p_ids), cost_usd=result.cost_usd,
                turns=result.num_turns, duration_ms=result.duration_ms, guard_block=guard_block,
                candidate=cand, isolation=str(res.detail.get("isolation", "")),
-               model=getattr(result, "model", ""), error=result.error)
+               model=getattr(result, "model", ""), note=note, error=result.error)
     if res.unrunnable or not log.test_ids:
         r.outcome, r.error = UNRUNNABLE, res.unrunnable or "không đọc được tên test"
         return r
