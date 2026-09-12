@@ -116,14 +116,47 @@ aisef --help
 ```
 
 You should see a list of subcommands (`setup`, `doctor`, `plan`, `run`, …).
-The package, Python module, and CLI command are all named `aisef`. There is no
-`--version` flag; to inspect the environment, use `aisef doctor`.
+The package, Python module, and CLI command are all named `aisef`.
+`aisef --version` prints the version; to inspect the whole environment, use
+`aisef doctor`.
 
 If you previously installed version 0.1.0 (when the command was called
 `aisdlc`): the old alias was removed in 0.3.0. Run `aisef compile` in each
 project to point hooks to the new name.
 
 The framework has **no Python dependencies** beyond the standard library.
+
+### How long the first ten minutes actually takes — measured, not estimated
+
+On a clock, 2026-09-12, macOS (Darwin 25.5, Python 3.14.7), with an **empty**
+pip cache so the number is not flattered:
+
+| step | command | measured |
+|---|---|---|
+| virtualenv | `python3 -m venv .venv` | 2.0 s |
+| install | `pip install --no-cache-dir aisef` | 2.1 s |
+| initialise | `aisef init --stack python` | 0.1 s |
+| diagnose | `aisef doctor` | 1.2 s |
+| **write `docs/requirements.md`** | — | **your work**, and the only part a clock cannot help with |
+| diagnose again | `aisef doctor` | 1.1 s → `✅ ready` |
+
+That is about **six seconds of machine time**. The "ten minutes" is almost
+entirely one task: writing down what you want. A four-line `requirements.md` is
+enough to turn `doctor` green.
+
+Two things `doctor` tells you on that first run, both worth reading:
+
+- `docker daemon — not running` and `sandbox provider — local`: tools run
+  outside isolation and evidence is marked *degraded*. Fine for a trial, not
+  for an acceptance run.
+- Until 1.3.1 the `tools.test` written by `init` printed no test names, so two
+  gate checks came up "not configured". The presets now include `-v`; coverage
+  still needs a plugin and is still yours to declare.
+
+`init` writes **4 keys** into `.ai/config.json` (`tools.test`, `tools.lint`,
+`sandbox.image`, `sandbox.allow_hosts`), of which exactly **one must be
+declared**: `tools.test`. Version 1.3.0 on PyPI still wrote all 68 defaults;
+1.3.1 does not.
 
 For contributors who want to modify the framework:
 
