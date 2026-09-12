@@ -33,6 +33,8 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--client", default="claude")
     b.add_argument("--attempts", type=int, default=3)
     b.add_argument("--shuffle", action="store_true", help="xáo thứ tự task")
+    b.add_argument("--max-usd", type=float, default=0.0,
+                   help="trần chi phí: dừng TRƯỚC task kế nếu đã tiêu quá; 0 = không trần. Cắt ở ranh giới task để mỗi task đo được vẫn đủ thiết kế; task bị bỏ được in ra, không im lặng")
     sub.add_parser("report", help="báo cáo Markdown từ .bench/results.jsonl")
     e = sub.add_parser("export", help="xuất một task ra thư mục định dạng Harbor")
     e.add_argument("id")
@@ -72,10 +74,18 @@ def main(argv: list[str] | None = None) -> int:
         order = list(pick)
         if a.shuffle:
             random.shuffle(order)
-        res = []
-        for t in order:
+        res, bo_qua = [], []
+        for i, t in enumerate(order):
+            tieu = sum(x.cost_usd for x in res)
+            if a.max_usd and tieu >= a.max_usd:
+                bo_qua = [x.id for x in order[i:]]
+                break
             res += R.run(t, client, attempts=a.attempts, bare=False)
             res += R.run(t, client, attempts=a.attempts, bare=True)
+        if bo_qua:
+            print(f"TRẦN CHI PHÍ {a.max_usd:.2f} USD đạt sau {len(order) - len(bo_qua)}/{len(order)} task "
+                  f"(đã tiêu {sum(x.cost_usd for x in res):.2f}). KHÔNG chạy: {', '.join(bo_qua)}",
+                  file=sys.stderr)
         print(R.report(res, tasks))
     elif a.cmd == "report":
         print(R.report(R.load_results(), tasks))

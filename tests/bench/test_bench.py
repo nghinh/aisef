@@ -14,6 +14,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
@@ -488,3 +489,58 @@ class TestSimulatedRoundTrip(unittest.TestCase):
 
     def test_multi_file_gold(self):
         self.run_shape(("a", "z"))
+
+
+class TestTranChiPhiCatOChanhGioiTask(unittest.TestCase):
+    """`run-both --max-usd` dừng trước task kế, và nói ra task nào bị bỏ.
+
+    Một đợt đo bị cắt giữa chừng mà không nói là một bảng kết quả nói dối: người
+    đọc thấy 8 task và tưởng dataset có 8. Cắt ở **ranh giới task** giữ nguyên
+    thiết kế (mỗi task đủ số lượt, đủ hai điều kiện) cho những task thật sự chạy.
+    """
+
+    def _fake_run(self, calls, cost):
+        def run(task, client, attempts=3, bare=False):
+            calls.append((task.id, bare))
+            return [R.Result(task.id, "x", 1, R.PASS, cost_usd=cost)]
+        return run
+
+    def test_dung_truoc_task_ke_khi_qua_tran_va_in_ten_task_bo(self):
+        import io
+        from contextlib import redirect_stderr, redirect_stdout
+
+        from . import __main__ as CLI
+        tasks = [R.Task(id=f"t{i}", source="bug", dir=M.TASKS_DIR / f"t{i}") for i in range(4)]
+        calls = []
+        err = io.StringIO()
+        with mock.patch.object(CLI.M, "load_tasks", return_value=tasks), \
+             mock.patch.object(CLI.R, "ENABLED", True), \
+             mock.patch.object(CLI.R, "make_client", return_value=object()), \
+             mock.patch.object(CLI.R, "run", self._fake_run(calls, 3.0)), \
+             mock.patch.object(CLI.R, "report", return_value=""), \
+             redirect_stdout(io.StringIO()), redirect_stderr(err):
+            CLI.main(["run-both", "--max-usd", "5"])
+
+        # task 1: 0 đã tiêu < 5 -> chạy (2 lượt gọi, 6 USD). task 2: 6 >= 5 -> dừng.
+        self.assertEqual([c[0] for c in calls], ["t0", "t0"])
+        self.assertIn("TRẦN CHI PHÍ", err.getvalue())
+        for bo in ("t1", "t2", "t3"):
+            self.assertIn(bo, err.getvalue())
+
+    def test_khong_tran_thi_chay_het(self):
+        import io
+        from contextlib import redirect_stderr, redirect_stdout
+
+        from . import __main__ as CLI
+        tasks = [R.Task(id=f"t{i}", source="bug", dir=M.TASKS_DIR / f"t{i}") for i in range(3)]
+        calls = []
+        err = io.StringIO()
+        with mock.patch.object(CLI.M, "load_tasks", return_value=tasks), \
+             mock.patch.object(CLI.R, "ENABLED", True), \
+             mock.patch.object(CLI.R, "make_client", return_value=object()), \
+             mock.patch.object(CLI.R, "run", self._fake_run(calls, 99.0)), \
+             mock.patch.object(CLI.R, "report", return_value=""), \
+             redirect_stdout(io.StringIO()), redirect_stderr(err):
+            CLI.main(["run-both"])
+        self.assertEqual(len(calls), 6)
+        self.assertNotIn("TRẦN CHI PHÍ", err.getvalue())
