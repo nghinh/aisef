@@ -19,6 +19,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
+import sqlite3
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -52,6 +54,61 @@ class Session:
     #: guard, scope) hay rải đều? Dồn thì điều kiện thí nghiệm đang dẫn agent đi
     #: lạc; rải đều thì giả thuyết sai.
     edited: list[str]
+
+
+#: Cú pháp gọi công cụ mà CLI **không** phân giải được: model in nó ra như văn
+#: bản thường, CLI coi đó là câu trả lời cuối và phiên dừng tại chỗ. Đo trên
+#: C-1: 11/11 lần chữ ký này là phần văn bản **cuối cùng** của phiên
+#: (`docs/BENCH-OBSERVATIONS-C1.md` § O-7).
+_CU_PHAP_KHONG_PHAN_GIAI = re.compile(r"<\w+:tool_call>|<invoke name=")
+_DUONG_DAN_PHIEN = re.compile(r"\.bench/run/([\w-]+)/([\w-]+)/a(\d+)")
+#: Kho phiên của OpenCode. Chỉ đọc, không bao giờ ghi.
+KHO_PHIEN = Path.home() / ".local" / "share" / "opencode" / "opencode.db"
+
+
+def cut_sessions(db: Path | None = None) -> dict[tuple[str, str, int], tuple[int, int]]:
+    """(điều kiện, task, lượt) → (số phiên, số phiên bị cắt giữa chừng).
+
+    Một phiên tính là **bị cắt** khi phần văn bản cuối của nó chứa cú pháp gọi
+    công cụ chưa phân giải — tức model định gọi công cụ, CLI không hiểu, và
+    phiên kết thúc ở đó. Đây là kiểu hỏng của cặp model↔CLI, **không** của
+    harness, nên nó phải đếm được riêng: nếu không, mọi phiên bị cắt sẽ bị cộng
+    vào cột "agent sửa sai".
+
+    Không có kho phiên (CI, máy khác, client khác) thì trả về rỗng — chỉ số này
+    là phần thêm, không phải điều kiện để bảng chính chạy.
+    """
+    kho = KHO_PHIEN if db is None else db
+    if not kho.is_file():
+        return {}
+    ra: dict[tuple[str, str, int], tuple[int, int]] = {}
+    try:
+        con = sqlite3.connect(f"file:{kho}?mode=ro", uri=True)
+        try:
+            phien: dict[str, list[str]] = {}
+            for sid, data in con.execute("select session_id, data from part order by rowid"):
+                if isinstance(data, str):
+                    phien.setdefault(sid, []).append(data)
+        finally:
+            con.close()
+    except sqlite3.Error:
+        return {}
+    for phan in phien.values():
+        khoa = None
+        for d in phan:
+            m = _DUONG_DAN_PHIEN.search(d)
+            if m:
+                moi = (m.group(1), m.group(2), int(m.group(3)))
+                if khoa is not None and khoa != moi:   # phiên chạm hai cây: bỏ, không đoán
+                    khoa = None
+                    break
+                khoa = moi
+        if khoa is None:
+            continue
+        cuoi = next((d for d in reversed(phan) if '"type":"text"' in d), "")
+        n, cat = ra.get(khoa, (0, 0))
+        ra[khoa] = (n + 1, cat + bool(_CU_PHAP_KHONG_PHAN_GIAI.search(cuoi)))
+    return ra
 
 
 def _changed_in_candidate(ws: Path, candidate: str) -> list[str] | None:
@@ -160,7 +217,8 @@ def collect(client_prefix: str = "opencode") -> list[Session]:
     return ra
 
 
-def report(sessions: list[Session]) -> str:
+def report(sessions: list[Session], cut: dict[tuple[str, str, int], tuple[int, int]] | None = None) -> str:
+    cut = cut or {}
     conditions = sorted({s.client for s in sessions})
     lines = ["# Đo lại sau đợt chạy — xong giả và ghi ngoài phạm vi", "",
              "Tính từ diff của ứng viên, **giống hệt nhau ở cả hai điều kiện**; guard không tham gia phép tính.",
@@ -191,6 +249,21 @@ def report(sessions: list[Session]) -> str:
             lines.append(f"| {s.task_id} | {s.client} | {s.attempt} | "
                          f"{', '.join(s.edited[:6]) if s.edited else '**không sửa gì**'} |")
 
+    if cut:
+        lines += ["", "## Phiên bị cắt giữa chừng (model↔CLI, không phải harness)", "",
+                  "Model in cú gọi công cụ ra dưới dạng văn bản, CLI không phân giải được, phiên dừng tại đó. "
+                  "Đọc từ kho phiên của CLI, không từ bằng chứng của harness.", "",
+                  "| điều kiện | phiên | bị cắt | tỉ lệ |", "|---|---|---|---|"]
+        for c in sorted({k[0] for k in cut}):
+            n = sum(v[0] for k, v in cut.items() if k[0] == c)
+            x = sum(v[1] for k, v in cut.items() if k[0] == c)
+            lines.append(f"| {c} | {n} | {x} | {x / n:.0%} |" if n else f"| {c} | 0 | 0 | — |")
+        chi = sorted(k for k, v in cut.items() if v[1])
+        if chi:
+            lines += ["", "| task | lượt | điều kiện | phiên | bị cắt |", "|---|---|---|---|---|"]
+            for k in sorted(chi, key=lambda k: (k[1], k[2], k[0])):
+                lines.append(f"| {k[1]} | a{k[2]} | {k[0]} | {cut[k][0]} | {cut[k][1]} |")
+
     thieu = [s for s in sessions if not s.workspace_found]
     if thieu:
         lines += ["", f"**{len(thieu)} phiên không còn cây làm việc** — không kết luận được về phạm vi ghi "
@@ -202,7 +275,7 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="python3 -m tests.bench.analyze", description=__doc__)
     p.add_argument("--client", default="opencode", help="tiền tố mã client cần đọc")
     a = p.parse_args(argv)
-    print(report(collect(a.client)))
+    print(report(collect(a.client), cut_sessions()))
     return 0
 
 

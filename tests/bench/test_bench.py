@@ -761,6 +761,42 @@ class TestLenhAnalyzeCoThat(unittest.TestCase):
                 pass
         self.assertIn("Đo lại sau đợt chạy", ra.getvalue())
 
+    def test_dem_phien_bi_cat_tu_kho_phien_cua_cli(self):
+        """Phiên chết vì CLI không phân giải nổi cú gọi công cụ là hỏng của cặp
+        model↔CLI. Nếu không đếm riêng, nó bị cộng vào cột "agent sửa sai" —
+        đúng chỗ đợt C-1 suýt kết luận nhầm (BENCH-OBSERVATIONS-C1 § O-7)."""
+        import sqlite3
+        import tempfile
+        from . import _analyze as A
+        with tempfile.TemporaryDirectory() as d:
+            db = Path(d) / "opencode.db"
+            con = sqlite3.connect(db)
+            con.execute("create table part (session_id text, data text)")
+            duong = ".bench/run/opencode/bug-a2-x/a1"
+            con.executemany("insert into part values (?,?)", [
+                # phiên 1: kết thúc bằng cú gọi công cụ chưa phân giải → bị cắt
+                ("s1", '{"type":"text","text":"đọc %s"}' % duong),
+                ("s1", '{"type":"text","text":"<minimax:tool_call><invoke name=\"read\">"}'),
+                # phiên 2: cùng cây, kết thúc bằng văn bản bình thường → sạch
+                ("s2", '{"type":"text","text":"đọc %s"}' % duong),
+                ("s2", '{"type":"text","text":"xong, 3 test xanh"}'),
+                # phiên 3: chạm hai cây khác nhau → không đoán, bỏ qua
+                ("s3", '{"type":"text","text":".bench/run/opencode/bug-a2-y/a1"}'),
+                ("s3", '{"type":"text","text":".bench/run/opencode-bare/bug-a2-y/a2"}'),
+            ])
+            con.commit()
+            con.close()
+            ra = A.cut_sessions(db)
+        self.assertEqual(ra, {("opencode", "bug-a2-x", 1): (2, 1)})
+
+    def test_khong_co_kho_phien_thi_chi_so_them_bi_bo_qua(self):
+        """Chỉ số này là phần thêm: CI không có kho phiên của OpenCode, và bảng
+        chính vẫn phải in ra được."""
+        from . import _analyze as A
+        with tempfile.TemporaryDirectory() as d:
+            self.assertEqual(A.cut_sessions(Path(d) / "khong-co.db"), {})
+        self.assertNotIn("bị cắt", A.report([], {}))
+
     def test_khong_co_so_ket_qua_thi_bang_rong_chu_khong_no(self):
         """CI chạy trên kho sạch: `.bench/results.jsonl` không tồn tại. Trước
         2026-09-12 `analyze` ném `FileNotFoundError` ở cả 5 job — test cũ không

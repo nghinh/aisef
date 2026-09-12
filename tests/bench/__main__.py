@@ -105,7 +105,7 @@ def main(argv: list[str] | None = None) -> int:
         print(R.report(res, tasks))
     elif a.cmd == "analyze":
         from . import _analyze as A
-        print(A.report(A.collect(a.client)))
+        print(A.report(A.collect(a.client), A.cut_sessions()))
     elif a.cmd == "report":
         print(R.report(R.load_results(), tasks))
     elif a.cmd == "export":
