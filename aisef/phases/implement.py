@@ -17,6 +17,8 @@ Two invariants enforced here:
 
 from __future__ import annotations
 
+import time
+
 from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 from functools import partial
@@ -42,7 +44,7 @@ from ..control.normalize import Architecture, Story, effective_write_scope
 from ..harness import context as code_map
 from ..harness import mockup_verify
 from ..clients.compile import guard_expected
-from ..clients.stream import INFRA_STATUSES, exit_status_of
+from ..clients.stream import INFRA_STATUSES, exit_status_of, retry_delay_seconds
 from ..harness.guardrails import (
     ENV_ALLOW_HOSTS,
     ENV_DISALLOWED_TOOLS,
@@ -70,6 +72,10 @@ class Attempt:
     number: int
     ok: bool = False
     infra: bool = False
+    #: Nhà cung cấp bảo chờ bao lâu trước khi thử lại (429). 0 = không nói.
+    #: Thử lại ngay một lượt bị giới hạn tần suất là cách chắc chắn nhất để
+    #: nhận đúng lỗi ấy lần nữa, và ngân sách hạ tầng bốc hơi trong vài giây.
+    retry_after: float = 0.0
     #: Fatal -- retrying is pointless.  E.g. isolation broke: the next
     #: attempt's worktree forks from a dirty trunk, so it only wastes money.
     fatal: bool = False
@@ -657,6 +663,7 @@ def run_attempt(
     if not result.ok:
         attempt.error = result.error or "run failed"
         attempt.infra = exit_status_of(result) in INFRA_STATUSES
+        attempt.retry_after = retry_delay_seconds(result)
         return attempt
 
     # Developer session ended: **freeze candidate immediately**, before
@@ -2440,11 +2447,16 @@ def implement_story(
 
         if attempt.infra:
             infra_budget -= 1
-            _log(f"story={story.id} attempt={n} INFRA ${attempt.cost_usd:.2f} err={attempt.error[:80]} budget={infra_budget}")
+            cho = attempt.retry_after
+            _log(f"story={story.id} attempt={n} INFRA ${attempt.cost_usd:.2f} "
+                 f"err={attempt.error[:80]} budget={infra_budget}"
+                 + (f" wait={cho:.0f}s" if cho else ""))
             if infra_budget <= 0:
                 outcome.blocked_reason = f"recurring infrastructure error: {attempt.error}"
                 _log(f"story={story.id} BLOCKED infra budget exhausted")
                 return outcome
+            if cho:
+                time.sleep(cho)
             continue
 
         loi_ke_hoach = plan_defects(attempt.review_findings)

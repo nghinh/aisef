@@ -177,8 +177,8 @@ class RunResult:
 
 #: Normalised exit status across all clients (ADR-005 V11 B).  Closed set:
 #: ``aisef status`` counts by it, ``Attempt.infra`` reads it instead of probing strings.
-EXIT_STATUSES = ("ok", "max_turns", "timeout", "cost", "context", "permission", "auth", "infra",
-                 "error")
+EXIT_STATUSES = ("ok", "max_turns", "timeout", "cost", "context", "permission", "auth",
+                 "rate_limit", "infra", "error")
 
 #: Exit statuses that are **not the agent's fault** — retries do not count
 #: against the quality limit (``run.max_retries``); infra has its own limit.
@@ -186,7 +186,12 @@ EXIT_STATUSES = ("ok", "max_turns", "timeout", "cost", "context", "permission", 
 #: transient, and retrying it spends wall-clock and the infra budget on a
 #: failure that will repeat identically (measured 2026-09-12: 176 s per
 #: attempt, $0 recorded, three attempts, nothing learned).
-INFRA_STATUSES = ("timeout", "infra")
+#: ``rate_limit`` is retryable like infra, but only **after waiting** — see
+#: ``retry_delay_seconds``. Retrying it immediately, which is what this
+#: harness did until 2026-09-12, spends the whole infra budget inside a few
+#: seconds and fails the story with a provider that was merely asking for a
+#: pause (three attempts of `RP-05` on `e9` went this way).
+INFRA_STATUSES = ("timeout", "infra", "rate_limit")
 
 
 def exit_status_of(res: RunResult) -> str:
@@ -223,6 +228,14 @@ def exit_status_of(res: RunResult) -> str:
     if any(m in why for m in ("401", "403", "authentication_error", "permission_error",
                               "invalid api key", "invalid x-api-key", "unauthorized")):
         return "auth"
+    # Rate limiting before the generic infra branch, for the same reason as
+    # auth: 429 carries ``api_error_status`` and would otherwise be retried
+    # instantly, which is the one response guaranteed not to help.
+    if str(raw.get("api_error_status")) == "429" or any(
+        m in why for m in ("429", "rate limit", "rate_limit", "too many requests",
+                           "quota exceeded")
+    ):
+        return "rate_limit"
     if raw.get("api_error_status") or raw.get("retryable") or any(
         m in why for m in ("api_error", "overloaded", "connection",
                            "cannot run", "without a result event")
@@ -231,6 +244,43 @@ def exit_status_of(res: RunResult) -> str:
     if res.permission_limited:
         return "permission"
     return "error"
+
+
+#: Trần chờ một lần: nhà cung cấp đôi khi trả `Retry-After` rất lớn, và một
+#: harness ngủ nửa tiếng trong im lặng thì không phân biệt được với treo.
+MAX_RETRY_DELAY_SECONDS = 300
+
+_RETRY_AFTER = re.compile(
+    r"(?:retry[- _]?after|try again in|retry in)\D{0,12}?(\d+(?:\.\d+)?)\s*(ms|s|sec|seconds|m|min|minutes)?",
+    re.I,
+)
+
+
+def retry_delay_seconds(res: RunResult) -> float:
+    """Chờ bao lâu trước khi thử lại — đọc từ lời nhà cung cấp, không đoán.
+
+    Nhà cung cấp nói `Retry-After` ở header, ở thân lỗi, hoặc bằng câu chữ
+    ("try again in 27s"). Đọc được thì theo; không đọc được thì trả 0 và người
+    gọi tự chọn cách lùi. Trần ``MAX_RETRY_DELAY_SECONDS`` để một con số vô lý
+    không biến lần thử lại thành treo máy.
+    """
+    raw = res.raw_result or {}
+    for key in ("retry_after", "retryAfter", "retry-after"):
+        gia_tri = raw.get(key)
+        if isinstance(gia_tri, (int, float)) and gia_tri > 0:
+            return min(float(gia_tri), MAX_RETRY_DELAY_SECONDS)
+        if isinstance(gia_tri, str) and gia_tri.strip().replace(".", "", 1).isdigit():
+            return min(float(gia_tri), MAX_RETRY_DELAY_SECONDS)
+    m = _RETRY_AFTER.search(f"{res.error or ''} {raw.get('result') or ''}")
+    if not m:
+        return 0.0
+    so = float(m.group(1))
+    don_vi = (m.group(2) or "s").lower()
+    if don_vi == "ms":
+        so /= 1000.0
+    elif don_vi in ("m", "min", "minutes"):
+        so *= 60.0
+    return min(so, MAX_RETRY_DELAY_SECONDS)
 
 
 def _collect_assistant_tools(event: dict, out: list[ToolUse]) -> str:

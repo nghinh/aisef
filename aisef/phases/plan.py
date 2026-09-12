@@ -25,6 +25,7 @@ is the framework's job.
 from __future__ import annotations
 
 import json
+import time
 
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -45,7 +46,7 @@ from ..harness.guardrails import (
 )
 from ..harness.observe import EvidenceStore
 from ..control.normalize import parse_prd_file
-from ..clients.stream import INFRA_STATUSES, exit_status_of
+from ..clients.stream import INFRA_STATUSES, exit_status_of, retry_delay_seconds
 
 ARTIFACT_ROOT = "_bmad-output"
 RESPONSE_DIR = "evidence"
@@ -466,8 +467,14 @@ def run_phase(
         # Say it in the log the operator watches. An SSE timeout after 22
         # minutes, retried silently, reads as 36 minutes of one motionless
         # `START` line — measured on `todo-e3`, 2026-09-09.
-        _run_log(project, f"phase={phase.id} RETRY (infra) after {result.duration_ms}ms "
+        cho = retry_delay_seconds(result)
+        _run_log(project, f"phase={phase.id} RETRY ({exit_status_of(result)}) after "
+                          f"{result.duration_ms}ms · wait {cho:.0f}s · "
                           f"err={one_line(error, 200)} · {budget} left")
+        if cho:
+            # Nhà cung cấp đã nói phải chờ bao lâu. Thử lại ngay là cách chắc
+            # chắn nhất để nhận đúng lỗi ấy lần nữa.
+            time.sleep(cho)
         out.infra_retries += 1
 
     _save_response(project, phase.id, result.text, result)

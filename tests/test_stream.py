@@ -294,6 +294,7 @@ class TestExitStatus(unittest.TestCase):
             self.ket_cuc({"subtype": "error_during_execution", "is_error": True,
                           "permission_denials": [{"tool_name": "Bash", "tool_use_id": "t", "tool_input": {}}]}),
             self.ket_cuc({"subtype": "success", "is_error": True, "api_error_status": 401}),
+            self.ket_cuc({"subtype": "success", "is_error": True, "api_error_status": 429}),
         }
         self.assertEqual(sinh, set(EXIT_STATUSES))
 
@@ -335,3 +336,48 @@ class TestModelQuanSatDuoc(unittest.TestCase):
     def test_client_khong_noi_thi_de_rong_chu_khong_doan(self):
         r = parse_stream(['{"type":"result","subtype":"success","result":"xong"}'])
         self.assertEqual(r.model, "")
+
+
+class TestGioiHanTanSuatChoTruocKhiThuLai(unittest.TestCase):
+    """429 là "chờ rồi thử lại", không phải "thử lại ngay".
+
+    Trước 2026-09-12, 429 rơi vào nhóm `infra` và được thử lại **tức thì**: ba
+    lượt cháy trong vài giây rồi story bị chặn với lý do "recurring
+    infrastructure error", trong khi nhà cung cấp chỉ đang yêu cầu nghỉ một
+    lát. Đã xảy ra thật trên `e9` (RP-05).
+    """
+
+    def test_429_co_ket_cuc_rieng(self):
+        from aisef.clients.stream import exit_status_of
+        self.assertEqual(exit_status_of(RunResult(ok=False, error="429 Too Many Requests")), "rate_limit")
+        r = RunResult(ok=False, error="slow down")
+        r.raw_result = {"api_error_status": 429}
+        self.assertEqual(exit_status_of(r), "rate_limit")
+
+    def test_van_duoc_thu_lai_vi_khong_phai_loi_cua_agent(self):
+        from aisef.clients.stream import INFRA_STATUSES
+        self.assertIn("rate_limit", INFRA_STATUSES)
+
+    def test_doc_thoi_gian_cho_tu_loi_nha_cung_cap(self):
+        from aisef.clients.stream import retry_delay_seconds
+        for text, mong in (("rate limit exceeded, retry after 12s", 12.0),
+                           ("try again in 2 minutes", 120.0),
+                           ("Retry-After: 500ms", 0.5),
+                           ("retry in 30", 30.0)):
+            with self.subTest(text=text):
+                self.assertAlmostEqual(retry_delay_seconds(RunResult(ok=False, error=text)), mong)
+
+    def test_doc_tu_header_khi_co(self):
+        from aisef.clients.stream import retry_delay_seconds
+        r = RunResult(ok=False, error="429")
+        r.raw_result = {"retry_after": 45}
+        self.assertEqual(retry_delay_seconds(r), 45.0)
+
+    def test_khong_noi_thi_khong_doan(self):
+        from aisef.clients.stream import retry_delay_seconds
+        self.assertEqual(retry_delay_seconds(RunResult(ok=False, error="overloaded")), 0.0)
+
+    def test_co_tran_de_thu_lai_khong_thanh_treo_may(self):
+        from aisef.clients.stream import MAX_RETRY_DELAY_SECONDS, retry_delay_seconds
+        r = RunResult(ok=False, error="retry after 86400s")
+        self.assertEqual(retry_delay_seconds(r), MAX_RETRY_DELAY_SECONDS)

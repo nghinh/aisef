@@ -1458,3 +1458,31 @@ class TestLuotKhongVietGiThiKhongPhaiUngVien(ImplementTestCase):
                          review="[chặn] src/a.py:1 — thiếu kiểm tra")
         self.chay(client)
         self.assertEqual(self.so_lan_ra_soat(), 2, "hai lượt sửa thật, hai lần rà soát")
+
+
+class TestChoTruocKhiThuLaiKhiBiGioiHanTanSuat(unittest.TestCase):
+    """Vòng lặp story phải **chờ** rồi mới thử lại khi nhà cung cấp bảo chờ.
+
+    Không chờ thì ba lượt hạ tầng cháy trong vài giây và story bị chặn vì một
+    thứ chỉ cần nghỉ mười giây.
+    """
+
+    def test_attempt_mang_theo_thoi_gian_cho(self):
+        from aisef.clients.stream import RunResult, retry_delay_seconds
+        r = RunResult(ok=False, error="429 rate limit, retry after 8s")
+        self.assertEqual(retry_delay_seconds(r), 8.0)
+
+    def test_vong_lap_goi_sleep_dung_so_giay(self):
+        """Chứng minh bằng chỗ gọi: `time.sleep` được gọi với đúng số nhà cung
+        cấp nói, trước khi `continue`."""
+        import re as _re
+        from pathlib import Path as _Path
+
+        from aisef.phases import implement
+        src = _Path(implement.__file__).read_text(encoding="utf-8")
+        khoi = src[src.index("if attempt.infra:"):]
+        khoi = khoi[:khoi.index("continue") + len("continue")]
+        self.assertIn("cho = attempt.retry_after", khoi)
+        self.assertIn("time.sleep(cho)", khoi)
+        self.assertTrue(_re.search(r"if cho:\s*\n\s*time\.sleep\(cho\)", khoi),
+                        "chỉ được ngủ khi nhà cung cấp thật sự nói thời gian chờ")
