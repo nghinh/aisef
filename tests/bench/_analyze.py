@@ -11,8 +11,8 @@ diff của ứng viên chứ không từ guard: nhánh trần không có guard, 
 là hỏi sai chỗ. Chạy sau khi đợt đo kết thúc, đọc cây làm việc đã giữ lại, và
 không ghi gì vào `results.jsonl` — giao thức đã đóng băng trước lúc chạy.
 
-    python3 -m tests.bench.analyze            # mọi dòng opencode trong .bench
-    python3 -m tests.bench.analyze --client claude
+    python3 -m tests.bench analyze            # mọi dòng opencode trong .bench
+    python3 -m tests.bench analyze --client claude
 """
 
 from __future__ import annotations

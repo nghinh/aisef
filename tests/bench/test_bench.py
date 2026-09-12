@@ -741,3 +741,23 @@ class TestPhienImLangKhongDocThanhGhiCaKho(unittest.TestCase):
         sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=d, capture_output=True,
                              text=True, check=True).stdout.strip()
         self.assertEqual(A._changed_in_candidate(d, sha), ["a.py"])
+
+
+class TestLenhAnalyzeCoThat(unittest.TestCase):
+    """Docstring của `_analyze` từng chỉ người đọc chạy `python3 -m
+    tests.bench.analyze` — một lệnh không tồn tại. Chỉ dẫn sai trong tài liệu
+    cùng lớp với con trỏ treo: người đọc mất thời gian cho một thứ không có."""
+
+    def test_analyze_la_mot_subcommand_that(self):
+        import io
+        from contextlib import redirect_stdout
+
+        from . import __main__ as CLI
+        ra = io.StringIO()
+        with mock.patch.object(CLI, "_analyze_report", create=True), redirect_stdout(ra):
+            try:
+                CLI.main(["analyze", "--client", "khong-co-client-nay"])
+            except SystemExit:
+                pass
+        self.assertIn("Đo lại sau đợt chạy", ra.getvalue())
+

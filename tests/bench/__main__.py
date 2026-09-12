@@ -45,6 +45,8 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--max-usd", type=float, default=0.0,
                    help="trần chi phí: dừng TRƯỚC task kế nếu đã tiêu quá; 0 = không trần. Cắt ở ranh giới task để mỗi task đo được vẫn đủ thiết kế; task bị bỏ được in ra, không im lặng")
     sub.add_parser("report", help="báo cáo Markdown từ .bench/results.jsonl")
+    an = sub.add_parser("analyze", help="đo lại sau đợt chạy: xong giả, ghi ngoài phạm vi, lượt trượt sửa ở đâu (đọc cây đã giữ, không đụng scorer)")
+    an.add_argument("--client", default="opencode", help="tiền tố mã client cần đọc")
     e = sub.add_parser("export", help="xuất một task ra thư mục định dạng Harbor")
     e.add_argument("id")
     e.add_argument("--out", default=str(R.KEEP_DIR / "harbor"))
@@ -101,6 +103,9 @@ def main(argv: list[str] | None = None) -> int:
                   f"(đã tiêu {sum(x.cost_usd for x in res):.2f}). KHÔNG chạy: {', '.join(bo_qua)}",
                   file=sys.stderr)
         print(R.report(res, tasks))
+    elif a.cmd == "analyze":
+        from . import _analyze as A
+        print(A.report(A.collect(a.client)))
     elif a.cmd == "report":
         print(R.report(R.load_results(), tasks))
     elif a.cmd == "export":
