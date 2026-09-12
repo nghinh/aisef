@@ -87,7 +87,7 @@ e764a8eae2e0e27debd5e3310673175704f592e3b30f8947b402844f1ee8dfeb  bug-a2-multi-4
 43dc315c66bfc97a8a910126289ad87b58a6fc570bbdece8d9fa4009bd6c2525  bug-a2-sec-1/task.json
 1f64538076ab55d451101ea6347bb380d6a99a2a575df70dc572038c45bcc3bc  bug-a2-sec-1/tests.patch
 969e893a8a6362e09ce10374446f76cb0033b5772de81d0443826dd17e12bdf5  bug-a2-sec-2/gold.patch
-4ff8dc71d6a1991ac10f173da4f35f1a04bfc70b99447eafcac78fa8d9f9bc16  bug-a2-sec-2/prompt.md
+ab5d21f039f45d6089b9a414093cc3bbea03b395edf2a3bf2110b17ba58fb72b  bug-a2-sec-2/prompt.md
 00f5279cfb3ccb4f16ba22dcdc691cc5a85bfc956f0d4942a6ef65ea9ac35e12  bug-a2-sec-2/task.json
 1819250cf25a52db40b19beb7a955a4aed8289ce7ec4d75e1a81cdbd1cb046f9  bug-a2-sec-2/tests.patch
 afb04e382b61494f4cdb22af066e14b7902c17394e5bfda8f10b7524d8936e70  bug-a2-sec-3/gold.patch

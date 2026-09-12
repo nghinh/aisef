@@ -227,3 +227,47 @@ có phép thử ghim. Muốn đổi con số ấy thì phải sửa mục này t
 hai điều kiện thì model mới cũng chạm trần trên bộ dữ liệu này — dừng, báo, và
 đừng đốt hai giờ nữa để lấy một cột toàn số 1,00. Trần dữ liệu là kết quả, và
 nó phải được báo như một kết quả.
+
+## Bộ dữ liệu v1.4 — sửa đúng một đề bài, sau khi C-1 đã đóng
+
+Ngày 13/09, **sau** khi cohort C-1 đóng (không sửa giữa đợt: xem
+[O-2](BENCH-OBSERVATIONS-C1.md)).
+
+`bug-a2-sec-2` có đề bài đọc được **hai nghĩa**, và hai nhánh đã đọc ra hai nghĩa
+khác nhau: "thông báo … cắt bỏ danh sách phạm vi được phép … agent không biết
+mình được phép ghi đâu" có thể hiểu là *câu thông báo in thiếu* (đúng — test ẩn
+gọi tên `check_diff_scope`) hoặc *phạm vi tính sai* (sai chỗ — và là cách đọc tự
+nhiên nếu agent đang sống trong một phiên có `AISEF_WRITE_SCOPE` thật). Nhánh
+AISEF đi vào `effective_scope` cả hai lượt có ghi tệp; nhánh trần đi vào
+`check_diff_scope` và qua. Một đề bài mà điều kiện thí nghiệm đổi được cách đọc
+là **lỗi của bộ dữ liệu**, không phải kết quả về harness.
+
+Đã sửa: đề bài nói rõ đây là **câu thông báo** của guard, và nói thẳng "phạm vi
+*tính* đúng — chỉ câu chữ báo lại là thiếu". Không tiết lộ hàm nào, thứ tự nào —
+phần ấy vẫn là việc của agent.
+
+**Truy vết được cho C-1:** byte đề bài mà C-1 đã chạy là
+`4ff8dc71d6a1991ac10f173da4f35f1a04bfc70b99447eafcac78fa8d9f9bc16`
+(`bug-a2-sec-2/prompt.md`); bản v1.4 là
+`ab5d21f039f45d6089b9a414093cc3bbea03b395edf2a3bf2110b17ba58fb72b`. Mọi task
+khác **không đổi một byte**. Muốn dựng lại C-1 nguyên trạng thì `git checkout`
+`MANIFEST.sha256` và `prompt.md` ở commit trước bản vá này.
+
+**Hệ quả cho so sánh:** cột 2 (đổi model) chạy trên **v1.4**, nên `sec-2` của cột
+2 **không so được** với `sec-2` của cột 1. Báo cáo cột 2 phải nói rõ điều đó ở
+chính dòng task ấy, và 11 task còn lại vẫn so được.
+
+### Hình dạng khó của bộ dữ liệu, đo trên C-1
+
+Con số hữu ích cho người thiết kế đợt sau: trong 12 task, chỉ **4 task phân biệt
+được hai điều kiện**.
+
+| nhóm | task | kết cục |
+|---|---|---|
+| chạm trần (cả hai nhánh 1,00) | `multi-1`, `multi-2`, `multi-3`, `sec-3`, `sec-4`, `state-4` | 6 task — không nói được gì về harness |
+| bất khả (cả hai nhánh 0,00) | `state-1`, `state-2`, `multi-4` | 3 task — model không giải được, kể cả có harness |
+| **phân biệt được** | `sec-1`, `sec-2`, `state-3` | 3 task |
+
+Nghĩa là một cohort 12 task × 3 lượt tốn ~6 giờ chỉ cho ra **9 lượt có thông
+tin**. Đợt sau nên tuyển task theo tiêu chí "đã từng có nhánh thắng nhánh kia",
+chứ không tuyển theo cảm giác khó.
