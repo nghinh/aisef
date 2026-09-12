@@ -42,9 +42,15 @@ def cmd_baseline(args) -> int:
     return EXIT_OK
 
 
+#: Lệnh test mặc định của mỗi stack **in tên test**. Đo 2026-09-12 trên một dự
+#: án mới tinh: `init --stack python` ghi `python -m pytest`, rồi `doctor` báo
+#: ngay hai mục kiểm của cổng ("has tests", "no existing tests broken") sẽ ra
+#: *chưa cấu hình* — vì không đọc được tên test. Người mới không có cách nào
+#: biết điều đó trước khi chạy hết một story. Thêm `-v` là đủ, không thêm phụ
+#: thuộc nào. Coverage thì vẫn cần plugin, nên vẫn để người tự khai.
 STACK_PRESETS: dict[str, dict[str, object]] = {
     "react": {
-        "tools.test": "npx vitest run",
+        "tools.test": "npx vitest run --reporter=verbose",
         "tools.lint": "npx eslint . --max-warnings=0",
         "sandbox.image": "node:22-alpine",
         "sandbox.tools_network": True,
@@ -52,13 +58,13 @@ STACK_PRESETS: dict[str, dict[str, object]] = {
         "app.dev_command": "npm run dev",
     },
     "python": {
-        "tools.test": "python -m pytest",
+        "tools.test": "python -m pytest -v",
         "tools.lint": "ruff check .",
         "sandbox.image": "python:3.12-slim",
         "sandbox.allow_hosts": ["pypi.org", "files.pythonhosted.org"],
     },
     "go": {
-        "tools.test": "go test ./...",
+        "tools.test": "go test -v ./...",
         "tools.lint": "golangci-lint run",
         "sandbox.image": "golang:1.23-alpine",
         "sandbox.allow_hosts": ["proxy.golang.org", "sum.golang.org"],

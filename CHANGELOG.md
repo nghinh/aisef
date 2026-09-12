@@ -37,6 +37,13 @@ gate's verdict; all of it was found by running the thing.
   `SimulatedWeakAdapter` existed to fake a weak agent for bench runs and was
   shipping to every user; it now lives in `tests/bench/`.
 
+- **Every stack preset now writes a test command that prints test names.**
+  `init --stack python` wrote `python -m pytest`, and `doctor` then told you two
+  gate checks would be "not configured" — on a project you had just created, in
+  the first minute. Adding `-v` (and `--reporter=verbose` for vitest, `-v` for
+  go) costs no dependency and closes that. Coverage still needs a plugin, so it
+  is still yours to declare.
+
 ### Added
 
 - **`aisef status --attempts`** — where attempts actually end, read from

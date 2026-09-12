@@ -590,9 +590,22 @@ class TestInit(CliTestCase):
         self.assertEqual(code, EXIT_OK)
         import json
         cfg = json.loads((self.project / ".ai" / "config.json").read_text(encoding="utf-8"))
-        self.assertEqual(cfg["tools.test"], "python -m pytest")
+        self.assertEqual(cfg["tools.test"], "python -m pytest -v")
         self.assertEqual(cfg["sandbox.image"], "python:3.12-slim")
         self.assertIn("pypi.org", cfg["sandbox.allow_hosts"])
+
+    def test_moi_stack_preset_deu_in_duoc_ten_test(self):
+        """`doctor` coi lệnh không in tên test là "gate chưa cấu hình". Một
+        preset mặc định mà rơi ngay vào đó thì người mới không có cách nào biết
+        trước khi chạy hết một story (đo 2026-09-12 trên dự án mới)."""
+        from aisef.cli.harness import STACK_PRESETS
+        doc_duoc = ("-v", "--verbose", "--reporter=verbose", "--test-reporter", "node --test", "ctrf")
+        for ten, preset in STACK_PRESETS.items():
+            lenh = str(preset["tools.test"])
+            with self.subTest(stack=ten):
+                if ten == "node":
+                    continue   # `npm test` chạy script của dự án — không đoán hộ được
+                self.assertTrue(any(k in lenh for k in doc_duoc), f"{ten}: {lenh}")
 
     def test_init_with_stack_react(self):
         code, out, _ = self.run_cli("init", "--stack", "react")

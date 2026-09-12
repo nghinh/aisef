@@ -143,9 +143,9 @@ Hai điều `doctor` nói ngay ở lần chạy đầu và **nên đọc kỹ**:
 - `docker daemon — not running` và `sandbox provider — local`: công cụ chạy
   ngoài cách ly, bằng chứng bị đánh dấu *degraded*. Chạy thử thì được; nghiệm
   thu thật thì bật Docker.
-- `tools.test` mà `init` ghi sẵn (`python -m pytest`) **không in tên test và
-  không in coverage**, nên hai mục kiểm của cổng sẽ ra "chưa cấu hình". Thêm
-  `-v` là xong phần tên test; coverage cần plugin.
+- `tools.test` mà `init` ghi sẵn **không in coverage**, nên mục kiểm coverage
+  của cổng ra "chưa cấu hình" cho tới khi bạn thêm plugin. Phần tên test thì
+  preset đã có `-v` sẵn từ 1.3.1 — bản 1.3.0 thì chưa, và `doctor` sẽ nói.
 
 Số khoá `init` ghi vào `.ai/config.json`: **4** (`tools.test`, `tools.lint`,
 `sandbox.image`, `sandbox.allow_hosts`), trong đó **1 khoá bắt buộc khai** là
