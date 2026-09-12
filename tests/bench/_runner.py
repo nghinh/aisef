@@ -232,6 +232,10 @@ class Result:
     guard_block: int = 0
     candidate: str = ""
     isolation: str = ""
+    #: Model quan sát trong luồng phiên. Giao thức đóng băng dataset và
+    #: scorer, nhưng model bên kia đổi theo thời gian: không ghi lại thì
+    #: hai đợt đo cách nhau vài tuần không so được với nhau.
+    model: str = ""
     error: str = ""
 
 
@@ -325,7 +329,8 @@ def _grade(task: Task, client_id: str, n: int, result, res, ws: Path, base: str,
     log = parse_testlog(res.stdout + "\n" + res.stderr)
     r = Result(task.id, client_id, n, FAIL, f2p_total=len(task.f2p_ids), cost_usd=result.cost_usd,
                turns=result.num_turns, duration_ms=result.duration_ms, guard_block=guard_block,
-               candidate=cand, isolation=str(res.detail.get("isolation", "")), error=result.error)
+               candidate=cand, isolation=str(res.detail.get("isolation", "")),
+               model=getattr(result, "model", ""), error=result.error)
     if res.unrunnable or not log.test_ids:
         r.outcome, r.error = UNRUNNABLE, res.unrunnable or "không đọc được tên test"
         return r

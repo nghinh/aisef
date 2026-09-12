@@ -283,3 +283,39 @@ class TestExitStatus(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestModelQuanSatDuoc(unittest.TestCase):
+    """Model nào trả lời phiên này — đọc từ luồng, không phải từ cấu hình.
+
+    Một phép đo so hai đợt cách nhau nhiều tuần chỉ có nghĩa khi biết bên kia
+    là ai; benchmark v0.3.0 ghi chi phí và pass@1 nhưng không ghi model, nên
+    câu "kết quả có đổi không" không trả lời được nếu model đã đổi.
+    """
+
+    def test_model_doc_tu_su_kien_init(self):
+        r = parse_stream([
+            '{"type":"system","subtype":"init","model":"claude-opus-5"}',
+            '{"type":"result","subtype":"success","result":"xong"}',
+        ])
+        self.assertEqual(r.model, "claude-opus-5")
+
+    def test_model_doc_tu_tin_nhan_assistant_khi_khong_co_init(self):
+        r = parse_stream([
+            '{"type":"assistant","message":{"model":"claude-sonnet-5","content":[]}}',
+            '{"type":"result","subtype":"success","result":"xong"}',
+        ])
+        self.assertEqual(r.model, "claude-sonnet-5")
+
+    def test_init_thang_khi_ca_hai_cung_noi(self):
+        """Init là lời khai của client về phiên; tin nhắn đến sau không ghi đè."""
+        r = parse_stream([
+            '{"type":"system","subtype":"init","model":"claude-opus-5"}',
+            '{"type":"assistant","message":{"model":"claude-haiku-4-5","content":[]}}',
+            '{"type":"result","subtype":"success","result":"xong"}',
+        ])
+        self.assertEqual(r.model, "claude-opus-5")
+
+    def test_client_khong_noi_thi_de_rong_chu_khong_doan(self):
+        r = parse_stream(['{"type":"result","subtype":"success","result":"xong"}'])
+        self.assertEqual(r.model, "")

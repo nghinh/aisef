@@ -85,6 +85,10 @@ class RunResult:
     session_id: str = ""
     num_turns: int = 0
     stop_reason: str = ""
+    #: Model **quan sát được** trong luồng, không phải model đã yêu cầu: một
+    #: đo lường so hai lần chạy cách nhau nhiều tuần là vô nghĩa nếu không
+    #: biết bên kia là ai. Rỗng khi client không nói.
+    model: str = ""
 
     cost_usd: float = 0.0
     duration_ms: int = 0
@@ -159,6 +163,7 @@ class RunResult:
                 "cache_read": self.cache_read_tokens,
             },
             "num_turns": self.num_turns,
+            "model": self.model,
             "session_id": self.session_id,
             "denials": [
                 {"tool": d.tool_name, "path": d.target_path} for d in self.denials
@@ -258,7 +263,12 @@ def parse_stream(lines: Iterable[str]) -> RunResult:
 
         etype = ev.get("type")
 
+        if etype == "system" and ev.get("subtype") == "init" and not res.model:
+            res.model = str(ev.get("model") or "")
+
         if etype == "assistant":
+            if not res.model:
+                res.model = str((ev.get("message") or {}).get("model") or "")
             txt = _collect_assistant_tools(ev, res.tool_uses)
             if txt.strip():
                 assistant_text.append(txt)
@@ -291,6 +301,7 @@ def parse_stream(lines: Iterable[str]) -> RunResult:
             res.session_id = ev.get("session_id", "") or ""
             res.num_turns = int(ev.get("num_turns") or 0)
             res.stop_reason = ev.get("stop_reason", "") or ""
+            res.model = res.model or str(ev.get("model") or "")
 
             res.cost_usd = float(ev.get("total_cost_usd") or 0.0)
             res.duration_ms = int(ev.get("duration_ms") or 0)
