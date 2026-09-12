@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **`aisef run` says when guards are not compiled.** The story gate already
+  records `guard ran: not applicable — hooks not compiled for this client`,
+  which is honest but arrives after the session is paid for. Until now a
+  project that had never run `aisef compile` started a run exactly like one
+  that had, and the difference is whether anything can block a write at the
+  source. One line before the first session, naming the command that fixes it.
+
 - **A missing file is not a guard block** (bug 100). The OpenCode adapter put
   every failed tool call into `guard_messages`, and `guard_blocked` means "the
   agent tried to do something forbidden" — it goes into the evidence, the

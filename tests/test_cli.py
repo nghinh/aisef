@@ -478,6 +478,39 @@ class TestRunCommand(CliTestCase):
         self.assertEqual(code, EXIT_NOT_READY)
         self.assertIn("readiness", err)
 
+    def test_noi_ra_khi_guard_chua_bien_dich(self):
+        """Cổng story ghi `guard ran: not applicable` — đúng, nhưng ghi **sau
+        khi** đã tiêu tiền. Trước đó không gì phân biệt dự án đã `aisef
+        compile` với dự án chưa, mà khác biệt là có thứ gì chặn được một lượt
+        ghi hay không."""
+        from aisef.cli.implement import _canh_bao_chua_bien_dich_guard
+
+        class Adapter:
+            id = "opencode"
+
+        out = io.StringIO()
+        with redirect_stdout(out):
+            _canh_bao_chua_bien_dich_guard(str(self.project), Adapter())
+        self.assertIn("not compiled", out.getvalue())
+        self.assertIn("aisef compile --client opencode", out.getvalue())
+
+    def test_im_lang_khi_guard_da_bien_dich(self):
+        import json
+
+        from aisef.cli.implement import _canh_bao_chua_bien_dich_guard
+
+        (self.artifacts / "compile-report.json").write_text(
+            json.dumps({"clients": [{"client": "opencode", "blocks_at_source": True}]}),
+            encoding="utf-8")
+
+        class Adapter:
+            id = "opencode"
+
+        out = io.StringIO()
+        with redirect_stdout(out):
+            _canh_bao_chua_bien_dich_guard(str(self.project), Adapter())
+        self.assertEqual(out.getvalue(), "")
+
     def test_rejects_unknown_client(self):
         code, _, err = self.run_cli("run", "--client", "khong-co", "--force")
         self.assertEqual(code, EXIT_USAGE)

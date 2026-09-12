@@ -210,6 +210,24 @@ def _readiness_blocked(args) -> bool:
     return False
 
 
+def _canh_bao_chua_bien_dich_guard(project, adapter) -> None:
+    """Say it out loud when this run has no source-level guard.
+
+    The story gate records `guard ran: not applicable — hooks not compiled`,
+    which is honest but arrives after the money is spent. Nothing said so
+    beforehand: a project that never ran `aisef compile` runs exactly like one
+    that did, and the difference is whether anything can block a write.
+    """
+    from ..clients.compile import guard_expected
+
+    client_id = getattr(adapter, "id", "")
+    if guard_expected(project, client_id):
+        return
+    print(f"⚠️  guards are not compiled for `{client_id}` — nothing blocks a write at "
+          f"the source in this run, and the story gate will record `guard ran` as "
+          f"not applicable.\n   Compile them first:  aisef compile --client {client_id}")
+
+
 def cmd_run(args) -> int:
     """Run a wave: epics sequentially, stories in parallel within each epic.
 
@@ -249,6 +267,8 @@ def cmd_run(args) -> int:
     git_err = _ensure_git(args.project)
     if git_err is not None:
         return git_err
+
+    _canh_bao_chua_bien_dich_guard(args.project, adapter)
 
     if verify_only:
         report = run_verify_only(
