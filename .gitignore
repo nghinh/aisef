@@ -12,8 +12,13 @@ venv/
 dist/
 build/
 
-# repo tham chiếu clone ngoài — không commit
-references/
+# repo tham chiếu clone ngoài — không commit **mã**, nhưng commit bản ghi ghim:
+# `PINS.md` là xuất xứ của mọi kết luận đọc từ các kho ấy, và `clone.sh` là cách
+# dựng lại đúng bản đã đọc. Để cả hai sống trên một máy là cách mất chúng —
+# cây bằng chứng của e9 đã biến mất đúng kiểu đó.
+references/*
+!references/PINS.md
+!references/clone.sh
 
 # spike: phụ thuộc cài tạm, không commit
 spike/**/node_modules/
