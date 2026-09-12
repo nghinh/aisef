@@ -112,13 +112,45 @@ aisef --help
 ```
 
 Bạn phải thấy danh sách lệnh con (`setup`, `doctor`, `plan`, `run`, …). Gói,
-module Python và lệnh đều tên `aisef`. Không có `--version`; muốn biết môi
-trường thì dùng `aisef doctor`.
+module Python và lệnh đều tên `aisef`. `aisef --version` in số bản; muốn biết cả
+môi trường thì dùng `aisef doctor`.
 
 Nếu bạn từng cài bản 0.1.0 (lệnh khi đó tên `aisdlc`): bí danh cũ đã bị gỡ từ
 0.3.0. Chạy `aisef compile` trong từng dự án để hook trỏ đúng tên mới.
 
 Framework **không có phụ thuộc Python nào** ngoài thư viện chuẩn.
+
+### Mười phút đầu tốn bao lâu — số đo, không phải ước lượng
+
+Bấm đồng hồ ngày 12/09/2026 trên macOS (Darwin 25.5, Python 3.14.7, kho pip
+**trống** để không ăn gian bằng cache):
+
+| bước | lệnh | đo được |
+|---|---|---|
+| tạo môi trường ảo | `python3 -m venv .venv` | 2,0 s |
+| cài | `pip install --no-cache-dir aisef` | 2,1 s |
+| khởi tạo dự án | `aisef init --stack python` | 0,1 s |
+| chẩn đoán | `aisef doctor` | 1,2 s |
+| **viết `docs/requirements.md`** | — | **phần việc của người**, không đo được bằng máy |
+| chẩn đoán lại | `aisef doctor` | 1,1 s → `✅ ready` |
+
+Tức là **khoảng 6 giây máy**. "Mười phút" nằm gần như trọn ở một việc: viết ra
+mình muốn gì. Một tệp `requirements.md` bốn dòng đủ để `doctor` chuyển sang
+`✅ ready`.
+
+Hai điều `doctor` nói ngay ở lần chạy đầu và **nên đọc kỹ**:
+
+- `docker daemon — not running` và `sandbox provider — local`: công cụ chạy
+  ngoài cách ly, bằng chứng bị đánh dấu *degraded*. Chạy thử thì được; nghiệm
+  thu thật thì bật Docker.
+- `tools.test` mà `init` ghi sẵn (`python -m pytest`) **không in tên test và
+  không in coverage**, nên hai mục kiểm của cổng sẽ ra "chưa cấu hình". Thêm
+  `-v` là xong phần tên test; coverage cần plugin.
+
+Số khoá `init` ghi vào `.ai/config.json`: **4** (`tools.test`, `tools.lint`,
+`sandbox.image`, `sandbox.allow_hosts`), trong đó **1 khoá bắt buộc khai** là
+`tools.test`. Bản **1.3.0 trên PyPI vẫn ghi cả 68 khoá** — đã sửa trên nhánh
+chính, sẽ có ở bản kế; xem [§6](#6-cấu-hình-aiconfigjson).
 
 Bản dành cho người muốn sửa framework:
 
