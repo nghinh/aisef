@@ -65,3 +65,42 @@ ghi đâu". Câu ấy đọc được theo hai nghĩa: *thông báo in thiếu* 
 nhiên nếu đang sống trong một phiên có phạm vi ghi thật). Một đề bài mà hai
 điều kiện đọc ra hai nghĩa khác nhau là đề bài cần sửa — nhưng **không sửa giữa
 đợt đo**; ghi vào đây, sửa ở v1.4 và nêu trong báo cáo.
+
+## O-3 · `sec-1`: giả thuyết đứng vững, nhưng vẫn chưa tách khỏi một cách đọc khác
+
+| điều kiện | lượt 1 | lượt 2 | lượt 3 | pass@1 |
+|---|---|---|---|---|
+| AISEF | PASS (33 turn, 461 s) | PASS (72 turn, 1115 s) | FAIL (15 turn) | 0,67 |
+| trần | PASS (8 turn, 76 s) | PASS (26 turn, 144 s) | PASS (9 turn, 74 s) | **1,00** |
+
+Hai điều đáng ghi.
+
+**Một: phản chứng đã được kiểm, và giả thuyết sống sót.** Ở O-2 tôi viết "nếu
+các lượt trượt của nhánh AISEF rải đều thì giả thuyết sai". Chúng **không** rải
+đều. Cả ba lượt trượt có ghi tệp của nhánh AISEF rơi vào đúng một họ hàm:
+
+| task | lượt | hàm đã sửa |
+|---|---|---|
+| `sec-1` | 3 | `scope_from_env`, `story_from_env`, `disallowed_from_env` |
+| `sec-2` | 1 | `effective_scope` |
+| `sec-2` | 3 | `scope_from_env`, `story_from_env`, `effective_scope` |
+
+Mọi hàm trong danh sách đều đọc **biến môi trường mà chính điều kiện AISEF đặt
+ra**. Lượt trượt duy nhất của nhánh trần thì không ghi gì — một kiểu hỏng khác
+hẳn.
+
+**Hai: nhánh AISEF tốn nhiều hơn hẳn để tới cùng kết quả.** Trên `sec-1`, 33 và
+72 turn so với 8 và 26; một lượt chạy 1115 giây. Cùng model, cùng đề bài, cùng
+dữ liệu — khác nhau ở chỗ nhánh AISEF có trạng thái chạy của harness trong cây.
+
+**Cách đọc thứ hai chưa loại được.** Các task `sec-*` **vốn nói về** mã guard và
+phạm vi ghi, nên "sửa hàm đọc phạm vi" có thể chỉ là "sửa quanh chỗ lỗi", không
+phải bị dẫn đi lạc. Điểm phân biệt: ở `sec-2`, nhánh trần cũng sửa trong cùng
+tệp `guardrails.py` nhưng đi tới `check_diff_scope` — đúng hàm mà test hồi quy
+gọi tên — còn nhánh AISEF đi tới các hàm đọc env. Cùng tệp, khác hàm, khác kết
+cục.
+
+Phép tách sạch: nhánh AISEF có trượt trên các task **không** nói về env/scope
+(`multi-*`, `state-*`) hay không, và nếu có thì trượt ở đâu. Tới lúc này
+`multi-*` chưa có lượt trượt nào của nhánh AISEF. Năm task còn lại quyết định.
+
