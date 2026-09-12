@@ -16,7 +16,7 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from ..config import DEFAULTS, Config
+from ..config import CONFIG_PATH, DEFAULTS, Config
 from ..control.acceptance import ac_code
 from ..control.approvals import STORIES_INDEX
 from ..control.machine_gate import GateResult, check_stories
@@ -254,9 +254,13 @@ def split(
             # **after** this gate. Blocking here would force fixing things that
             # aren't due yet. The `readiness` gate and the pre-model-call step
             # are the real blockers.
+            thieu = "; ".join(m.line() for m in pf.provisioning_gaps)
+            if "configure `" in thieu:
+                # There is no `aisef config` command, so "configure X" on its
+                # own leaves the reader with a key and nowhere to put it.
+                thieu += f" — these keys live in `{CONFIG_PATH}`"
             res.gate.warnings.append(
-                f"{pf.story_id} missing prerequisites to run: "
-                + "; ".join(m.line() for m in pf.provisioning_gaps)
+                f"{pf.story_id} missing prerequisites to run: {thieu}"
             )
 
     res.index_path = write_index(root, res, config)
