@@ -892,3 +892,42 @@ class TestStatusAttemptsDoLuotDiDauMat(CliTestCase):
         code, out, _ = self.run_cli("status", "--attempts")
         self.assertEqual(code, 0)
         self.assertTrue("no gate verdict recorded yet" in out or "No stories registered" in out, out)
+
+class TestCliLuonNoiUtf8(unittest.TestCase):
+    """`main()` phải đặt stdout/stderr về UTF-8 **trước** khi chạy lệnh.
+
+    Không có bước này thì trên console Windows (cp1252 trên runner CI) mọi lệnh
+    in `✅`, `·` hay tiếng Việt sẽ chết bằng UnicodeEncodeError trên chính đầu
+    ra của nó — và tiến trình cha đọc được mojibake. Lỗi ấy đã xảy ra thật
+    2026-09-13 ở `aisef dashboard`; phép thử này là cái chuông cho lần sau.
+    """
+
+    def test_main_goi_speak_utf8_truoc_khi_chay_lenh(self):
+        from unittest.mock import patch
+
+        from aisef.cli import parser as P
+
+        goi: list[str] = []
+        with patch.object(P, "_speak_utf8", lambda: goi.append("x")):
+            P.main(["doctor"])        # lệnh rẻ nhất; mã thoát không quan trọng ở đây
+        self.assertEqual(goi, ["x"])
+
+    def test_speak_utf8_dat_dung_bang_ma(self):
+        from unittest.mock import MagicMock, patch
+
+        from aisef.cli.parser import _speak_utf8
+
+        gia = MagicMock()
+        with patch("sys.stdout", gia), patch("sys.stderr", gia):
+            _speak_utf8()
+        gia.reconfigure.assert_called_with(encoding="utf-8", errors="replace")
+
+    def test_stream_khong_reconfigure_duoc_thi_bo_qua_chu_khong_no(self):
+        """`StringIO` trong test không có `reconfigure` — lệnh vẫn phải chạy."""
+        import io
+        from unittest.mock import patch
+
+        from aisef.cli.parser import _speak_utf8
+
+        with patch("sys.stdout", io.StringIO()), patch("sys.stderr", io.StringIO()):
+            _speak_utf8()      # không ném là đạt

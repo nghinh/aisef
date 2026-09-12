@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import io
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -128,7 +130,11 @@ class TestDashboardGeneration(unittest.TestCase):
         self._seed_evidence()
         out = self.root / "out.html"
         args = SimpleNamespace(project=str(self.root), out=str(out))
-        with patch("aisef.cli.dashboard._artifact_root", return_value=self.root):
+        # Bắt stdout: lệnh in bản tóm tắt có dấu tiếng Việt, và stdout thật của
+        # runner Windows là cp1252 — `main()` gọi `_speak_utf8()` trước khi vào
+        # lệnh, phép thử gọi thẳng hàm nên không đi qua chỗ ấy.
+        with patch("aisef.cli.dashboard._artifact_root", return_value=self.root), \
+                redirect_stdout(io.StringIO()):
             rc = cmd_dashboard(args)
         self.assertEqual(rc, 0)
         self.assertTrue(out.exists())
@@ -244,7 +250,8 @@ class TestMultiProjectDashboard(unittest.TestCase):
             projects=[str(self.root / "proj-b")],
             out=str(out),
         )
-        with patch("aisef.cli.dashboard._artifact_root", return_value=self.proj_a):
+        with patch("aisef.cli.dashboard._artifact_root", return_value=self.proj_a), \
+                redirect_stdout(io.StringIO()):
             rc = cmd_dashboard(args)
         self.assertEqual(rc, 0)
         content = out.read_text(encoding="utf-8")
