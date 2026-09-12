@@ -151,3 +151,22 @@ be rebuilt.
 `--max-usd` cuts at task boundaries only, so every task that ran, ran its full
 design. Any task not run is printed by name. A truncated dataset is reported as
 truncated.
+
+### Cách đợt đo thật sự chạy (ghi lúc đang chạy, 2026-09-12)
+
+Lượt phóng đầu tiên chạy cả 12 task trong một tiến trình nền và **bị kill sau
+~35 phút** (harness dọn tác vụ nền dài, không phải lỗi của bench). Hai task đã
+xong đủ thiết kế, task thứ ba dở dang.
+
+Đợt được chạy tiếp theo **lô hai task một lần**, giữ nguyên thứ tự của hạt
+giống 1312, và task dở dang được chạy lại **từ đầu** chứ không nối tiếp — nửa
+bộ lượt của một task là một thiết kế khác, không phải cùng một thiết kế bị
+ngắt. `results.jsonl` là sổ nối thêm nên dòng cũ vẫn nằm đó; công cụ đọc lấy
+dòng **cuối cùng** cho mỗi `(task, điều kiện, lượt)`, đúng với cây làm việc còn
+trên đĩa.
+
+Hệ quả phải nói ra: các phiên không chạy liền một mạch trong cùng một khung giờ.
+Với một alias định tuyến có thể đổi mô hình nền giữa các lần gọi, đó là một
+biến không kiểm soát được — và là thêm một lý do để báo cáo không rút ra kết
+luận mạnh hơn dữ liệu.
+
