@@ -24,3 +24,67 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: python -m unittest discover -s tests -q
+
+  # Cổng lint — bật 2026-09-12. Tập rule ở `[tool.ruff.lint]` của pyproject là
+  # cổng chứ không phải sở thích: F (pyflakes), B (bugbear), E9. Lượt bật đã bắt
+  # một lỗi thật ngay trong chính lượt ấy, nên phép này có giá trị chứng minh
+  # được, không phải nghi thức.
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install ruff==0.16.4
+      - run: ruff check .
+
+  # Wheel smoke — lỗi 31 là lớp lỗi mà unit test **không thể** bắt: bản cài từ
+  # wheel biên dịch hook trỏ vào đường dẫn không tồn tại, cú pháp hợp lệ, và
+  # không guard nào chạy. Phép này cài gói như người dùng cài rồi hỏi ba câu:
+  # lệnh có chạy không, dữ liệu chạy (prompt/luật/skill/asset) có trong gói
+  # không, và gói có dựng nổi một dự án trống không.
+  wheel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install build twine
+      - run: python -m build
+      - run: twine check dist/*
+      - name: install the wheel into a clean venv
+        run: |
+          python -m venv /tmp/venv
+          /tmp/venv/bin/pip install --no-index dist/*.whl
+      - name: the command runs and reports the packaged version
+        run: |
+          set -eu
+          want=$(python -c "import tomllib,pathlib;print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])")
+          got=$(/tmp/venv/bin/aisef --version | awk '{print $2}')
+          test "$want" = "$got" || { echo "version mismatch: pyproject=$want cli=$got"; exit 1; }
+      - name: runtime data really shipped inside the wheel
+        run: |
+          /tmp/venv/bin/python - <<'PY'
+          from importlib.resources import files
+          root = files("aisef")
+          need = {
+              "kit/prompts": ".md",
+              "kit/rules": None,
+              "kit/skills": None,
+              "harness/assets": None,
+          }
+          for rel in need:
+              d = root.joinpath(*rel.split("/"))
+              assert d.is_dir(), f"missing packaged directory: {rel}"
+              assert any(True for _ in d.iterdir()), f"packaged directory is empty: {rel}"
+          assert root.joinpath("kit", "catalog.json").is_file(), "kit/catalog.json not packaged"
+          print("packaged runtime data OK")
+          PY
+      - name: a clean project can be initialised by the installed command
+        run: |
+          set -eu
+          mkdir -p /tmp/proj && cd /tmp/proj && git init -q .
+          /tmp/venv/bin/aisef init --stack python
+          test -f .ai/config.json
