@@ -70,15 +70,21 @@ của dự án này, còn skill là kiến thức chung.
    một cổng đỏ mãi mãi thì bị tắt.
 
 7. **Trạng thái**: mỗi trạng thái một `<section data-state="tên">`, và
-   trạng thái mặc định của màn hình mang `data-state="primary"`:
+   trạng thái mặc định của màn hình mang `data-state="primary"`. Tên trạng
+   thái là **định danh máy đọc**: chữ thường ASCII, nối bằng gạch ngang,
+   như `primary`, `empty`, `no-results`, `loading`, `error` — không phải câu
+   mô tả, và không đổi theo ngôn ngữ của dự án (lỗi 95: bản chạy `todo-oc`
+   viết tài liệu bằng tiếng Anh nhưng chép tên trạng thái tiếng Việt ra khỏi
+   ví dụ này, nên hợp đồng thiết kế mang `data-state="không có ghi chú"`).
+   Câu mô tả cho người đọc thuộc về `data-annotation` ở mục 8.
 
    ```html
    <section data-state="primary"> … màn hình lúc bình thường … </section>
-   <section data-state="rỗng"> … chưa có ghi chú nào … </section>
+   <section data-state="empty"> … chưa có ghi chú nào … </section>
    ```
 
    Hợp đồng chỉ lấy **trạng thái chính**. Ứng dụng thật ở một thời điểm chỉ
-   ở một trạng thái; gộp cả "rỗng" lẫn "có kết quả" vào cam kết thì không
+   ở một trạng thái; gộp cả `empty` lẫn `primary` vào cam kết thì không
    màn hình thật nào khớp nổi, và cổng đỏ vì lý do sai.
 
 8. **Chú thích của tài liệu** — tiêu đề trạng thái, ghi chú giải thích cho

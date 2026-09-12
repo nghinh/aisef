@@ -492,6 +492,50 @@ class TestArchitectureRobustness(unittest.TestCase):
         self.assertTrue(arch.by_id("AR-1").universal)
         self.assertEqual([d.id for d in arch.for_requirements(["FR-99"])], ["AR-1"])
 
+    #: Đúng hình dạng `architecture.md` thật của `todo-oc` (2026-09-13).
+    THAT = (
+        "## Invariants & Rules\n\n"
+        "### AD-1 — Single-file deployment\n\n"
+        "- **Binds:** all\n"
+        "- **Rule:** Everything lives in `index.html`.\n\n"
+        "### AD-2 — localStorage as sole persistence\n\n"
+        "- **Binds:** NFR-1, NFR-3\n"
+        "- **Rule:** Note data is read from `window.localStorage` under `qn:notes`.\n\n"
+        "### AD-3 — Note entity schema\n\n"
+        "- **Binds:** FR-1, FR-2\n"
+        "- **Rule:** Every note has exactly three fields:\n\n"
+        "| Field | Type |\n|---|---|\n| `id` | UUID v4 |\n| `body` | string |\n"
+        "| `createdAt` | ISO 8601 |\n\n"
+        "## Stack\n\n| Name | Version |\n|---|---|\n| JavaScript | ES2022 |\n\n"
+        "## Deferred\n\n| Decision | Reason |\n|---|---|\n| Editing | not MVP |\n"
+    )
+
+    def test_binds_counts_non_functional_codes(self):
+        """Lỗi 93: `Binds: NFR-1, NFR-3` phân giải ra danh sách rỗng, nên
+        quyết định ấy không ràng buộc story nào — nó biến mất."""
+        arch = parse_architecture(self.THAT)
+        self.assertEqual(arch.by_id("AD-2").binds, ["NFR-1", "NFR-3"])
+
+    def test_decision_bound_only_to_nfr_reaches_every_story(self):
+        """Story khai `covers` toàn FR, nên quyết định chỉ ràng NFR không bao
+        giờ giao — mà đó lại là luật xuyên suốt (khoá lưu trữ, ngân sách 500ms)."""
+        arch = parse_architecture(self.THAT)
+        self.assertIn("AD-2", [d.id for d in arch.for_requirements(["FR-1"])])
+        self.assertIn("AD-2", [d.id for d in arch.for_requirements(["FR-9"])])
+
+    def test_rule_keeps_the_lines_under_it(self):
+        """Lỗi 94: `**Rule:** … ba trường:` tới tay agent đúng chỗ dấu hai
+        chấm — bảng ba trường nằm ở dòng sau bị cắt."""
+        rule = parse_architecture(self.THAT).by_id("AD-3").rule
+        self.assertIn("createdAt", rule)
+        self.assertIn("ISO 8601", rule)
+
+    def test_last_decision_stops_at_the_next_section(self):
+        """Lỗi 93: quyết định cuối nuốt toàn bộ phần đuôi tài liệu."""
+        d = parse_architecture(self.THAT).by_id("AD-3")
+        self.assertNotIn("Deferred", d.text)
+        self.assertNotIn("ES2022", d.rule)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

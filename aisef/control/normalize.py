@@ -89,8 +89,8 @@ _SECTION_ASSUMPTION_ITEM = re.compile(
     r"^[-*]\s+(?:\*\*[^*]+\*\*\s*[:：]?\s*)?(.+?)\s*$",
     re.MULTILINE,
 )
-_FR_RANGE = re.compile(r"FR-(\d+)\s*\.\.\s*FR-(\d+)")
-_FR_SINGLE = re.compile(r"\bFR-(\d+)\b")
+_FR_RANGE = re.compile(r"\b(N?FR)-(\d+)\s*\.\.\s*(?:N?FR-)?(\d+)", re.IGNORECASE)
+_FR_SINGLE = re.compile(r"\b(N?FR)-(\d+)\b", re.IGNORECASE)
 
 
 @dataclass
@@ -370,20 +370,25 @@ class PRD:
 
 
 def _expand_fr_refs(text: str) -> list[str]:
-    """`FR-13..FR-15` -> [FR-13, FR-14, FR-15]; includes single references too."""
+    """`FR-13..FR-15` -> [FR-13, FR-14, FR-15]; includes single references too.
+
+    Non-functional codes count as references (bug 93): a decision that binds
+    `NFR-1, NFR-3` used to parse to an empty list, which made it bind nothing.
+    """
     ids: list[str] = []
     consumed = text
     for m in _FR_RANGE.finditer(text):
-        start, end = int(m.group(1)), int(m.group(2))
+        kind = m.group(1).upper()
+        start, end = int(m.group(2)), int(m.group(3))
         if start <= end and end - start < 100:
-            ids.extend(f"FR-{n}" for n in range(start, end + 1))
+            ids.extend(f"{kind}-{n}" for n in range(start, end + 1))
             consumed = consumed.replace(m.group(0), " ")
         # Reversed or overly wide range is a writing error. Not expanded, but
         # also not removed from text — the two codes at each end are still
         # picked up as single references. Blocking one extra is safer than
         # missing both.
-    ids.extend(f"FR-{m.group(1)}" for m in _FR_SINGLE.finditer(consumed))
-    return sorted(set(ids), key=lambda s: int(s.split("-")[1]))
+    ids.extend(f"{m.group(1).upper()}-{m.group(2)}" for m in _FR_SINGLE.finditer(consumed))
+    return sorted(set(ids), key=lambda s: (s.split("-")[0], int(s.split("-")[1])))
 
 
 def _section_for(text: str, start: int, next_start: int | None) -> str:
@@ -885,6 +890,19 @@ class Decision:
         return "\n".join(parts)
 
 
+def _chi_phi_chuc_nang(binds: list[str]) -> bool:
+    """Whether a decision binds **only** non-functional requirements.
+
+    Stories declare the functional requirements they cover, so a decision
+    bound to `NFR-1, NFR-3` joins with nothing and reaches no session — which
+    is how a real run sent every implementing agent to build a localStorage
+    app without the decision naming the storage key (bug 93). Non-functional
+    requirements are cross-cutting by construction, so decisions bound only to
+    them bind the whole build.
+    """
+    return bool(binds) and all(b.upper().startswith("NFR-") for b in binds)
+
+
 @dataclass
 class Architecture:
     decisions: list[Decision] = field(default_factory=list)
@@ -901,7 +919,16 @@ class Architecture:
         letting the agent self-select means every session selects differently.
         """
         want = set(fr_ids)
-        return [d for d in self.decisions if d.universal or (want & set(d.binds))]
+        return [
+            d for d in self.decisions
+            if d.universal or (want & set(d.binds)) or _chi_phi_chuc_nang(d.binds)
+        ]
+
+
+#: How much of a multi-line `**Rule:**` block travels into the prompt. The
+#: rule is quoted verbatim in every session the decision binds, so it is
+#: bounded — but generously: the table under AD-3 in a real run *was* the rule.
+MAX_RULE_CHARS = 1500
 
 
 def parse_architecture(text: str) -> Architecture:
@@ -909,10 +936,18 @@ def parse_architecture(text: str) -> Architecture:
     marks = list(_AR_HEADING.finditer(text))
     for i, m in enumerate(marks):
         end = marks[i + 1].start() if i + 1 < len(marks) else len(text)
+        # The last decision is not the last section of the document: bound it
+        # at the next heading of the same level or shallower (bug 93 — AD-5's
+        # body ran on through Stack, Structural Seed and Deferred).
+        muc = len(m.group(0)) - len(m.group(0).lstrip("#"))
+        ke = re.compile(r"^#{1,%d}\s" % muc, re.MULTILINE).search(text, m.end(), end)
+        if ke:
+            end = ke.start()
         body = text[m.end():end]
         d = Decision(id=m.group(1), title=m.group(2).strip(), text=body.strip())
         seen_binds = False
-        for f in _AR_FIELD.finditer(body):
+        fields = list(_AR_FIELD.finditer(body))
+        for j, f in enumerate(fields):
             seen_binds = seen_binds or f.group(1).lower() == "binds"
             key, value = f.group(1).lower(), " ".join(f.group(2).split())
             if key == "binds":
@@ -921,10 +956,18 @@ def parse_architecture(text: str) -> Architecture:
             elif key == "prevents":
                 d.prevents = value
             else:
-                d.rule = value
+                # A rule can continue past its own line — a table of fields, a
+                # list, a code block (bug 94: `Rule: Every note is an object
+                # with exactly three fields:` reached the agent with the three
+                # fields cut off).
+                tail = body[f.end():fields[j + 1].start() if j + 1 < len(fields) else None]
+                d.rule = (value + "\n" + tail.strip()).strip()[:MAX_RULE_CHARS]
         # No bindings declared = baseline rule, applies to all stories. Treating
-        # it as "applies to no story" would drop exactly the most important rules.
-        d.universal = d.universal or not seen_binds
+        # it as "applies to no story" would drop exactly the most important rules
+        # — and the same hole opens when bindings *are* declared but none of them
+        # parse (bug 93: `Binds: NFR-1, NFR-3` read as an empty list, so two
+        # decisions bound nothing and reached no session).
+        d.universal = d.universal or not seen_binds or not d.binds
         arch.decisions.append(d)
     return arch
 

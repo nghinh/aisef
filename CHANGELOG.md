@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+- **Architecture decisions bound to NFRs reached no session at all** (bug 93).
+  A decision declaring `Binds: NFR-1, NFR-3` parsed to an empty list, because
+  the reference scanner only knew `FR-`; an empty list is not "binds
+  everything" either, since bindings *were* declared. So in a real run the two
+  decisions that defined the project — the localStorage key every note is
+  stored under, and the 500 ms UI budget — were injected into no story's
+  prompt. Non-functional codes now parse, a declared-but-unreadable binding
+  list falls back to universal rather than to nothing, and a decision bound
+  only to non-functional requirements is treated as cross-cutting, because
+  stories declare the functional requirements they cover and would never join
+  with it. The same fix bounds a decision's section at the next heading: the
+  last one used to swallow the rest of the document.
+
+- **A rule that continues past its own line is no longer cut off** (bug 94).
+  `**Rule:** Every note is an object with exactly three fields:` reached the
+  agent exactly like that — the table naming the three fields sat on the
+  following lines and was dropped. A markdown field label opens a block, not
+  a line.
+
+- **Mockup state names are identifiers, not sentences** (bug 95). The skill's
+  example used state names in its own language, so an all-English project got
+  `data-state="không có ghi chú"` in its design contract — a value used for
+  selecting and comparing, not for reading. The skill now calls for ASCII
+  slugs (`primary`, `empty`, `no-results`) and leaves prose to
+  `data-annotation`.
+
 - **The acceptance-criteria parser was a way around the story-size gate**
   (bug 91). Blocked for writing a story with nine acceptance criteria, the
   planner did not split the story — it chained the scenarios as `**And**
