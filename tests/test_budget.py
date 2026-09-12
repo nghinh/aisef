@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -192,3 +193,64 @@ def _tempdir():
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestCanhBaoTruocKhiCham(unittest.TestCase):
+    """Chặn tại trần là đúng nhưng tới quá muộn: lần đầu người biết là lúc
+    story dừng giữa chừng. Cảnh báo ở 80 % cho họ kịp quyết định."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.guard = BudgetGuard(BudgetLedger(Path(self._tmp.name)))
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def _chay(self, tien: float) -> str:
+        import contextlib
+        import io
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err), self.guard.reserve(est_usd=0.01) as r:
+            r.actual_usd = tien
+        return err.getvalue()
+
+    def test_vuot_80_phan_tram_thi_keu_co_so(self):
+        self.guard.configure(BudgetConfig(cap_usd=1.0))
+        ra = self._chay(0.85)
+        self.assertIn("$0.85", ra)
+        self.assertIn("$1.00", ra)
+        self.assertIn("85%", ra)
+
+    def test_duoi_nguong_thi_im(self):
+        self.guard.configure(BudgetConfig(cap_usd=1.0))
+        self.assertEqual(self._chay(0.5), "")
+
+    def test_keu_mot_lan_thoi(self):
+        """Kêu ở mọi lượt còn lại là cách nhanh nhất để người ta thôi đọc."""
+        self.guard.configure(BudgetConfig(cap_usd=1.0))
+        self.assertIn("⚠", self._chay(0.85))
+        self.assertEqual(self._chay(0.02), "")
+
+    def test_khong_khai_tran_thi_khong_co_gi_de_canh_bao(self):
+        self.assertEqual(self._chay(999.0), "")
+
+    def test_co_da_keu_song_qua_lan_chay_khac(self):
+        """Cờ nằm trên đĩa: tiến trình sau không kêu lại cùng một ngưỡng."""
+        self.guard.configure(BudgetConfig(cap_usd=1.0))
+        self.assertIn("⚠", self._chay(0.85))
+        khac = BudgetGuard(BudgetLedger(Path(self._tmp.name)))
+        import contextlib
+        import io
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err), khac.reserve(est_usd=0.01) as r:
+            r.actual_usd = 0.01
+        self.assertEqual(err.getvalue(), "")
+
+    def test_tran_luot_cung_canh_bao(self):
+        self.guard.configure(BudgetConfig(cap_turns=10))
+        import contextlib
+        import io
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err), self.guard.reserve(est_turns=1) as r:
+            r.actual_turns = 9
+        self.assertIn("9 lượt / 10 lượt", err.getvalue())

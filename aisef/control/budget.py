@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import time
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -61,6 +62,9 @@ class BudgetState:
     spent_turns: int = 0
     started_at: float = 0.0
     reservations: list[dict] = field(default_factory=list)
+    #: Chiều đã cảnh báo ("usd"/"turns"/"seconds"). Ghi xuống đĩa để một lần
+    #: chạm ngưỡng kêu **một lần**, không kêu ở mọi lượt gọi còn lại.
+    warned: list[str] = field(default_factory=list)
     version: int = BUDGET_VERSION
 
     def to_dict(self) -> dict:
@@ -73,6 +77,7 @@ class BudgetState:
             "spent_turns": self.spent_turns,
             "started_at": self.started_at,
             "reservations": list(self.reservations),
+            "warned": list(self.warned),
         }
 
     @staticmethod
@@ -86,6 +91,7 @@ class BudgetState:
             spent_turns=int(d.get("spent_turns") or 0),
             started_at=float(d.get("started_at") or 0.0),
             reservations=list(d.get("reservations") or []),
+            warned=[str(x) for x in (d.get("warned") or [])],
         )
 
 
@@ -216,6 +222,32 @@ class _Reservation:
     actual_seconds: float = 0.0
 
 
+#: Cảnh báo khi tiêu tới đây. Chặn là tại trần; cảnh báo phải tới **trước** đó
+#: đủ sớm để người còn kịp quyết định, và đủ muộn để không kêu suốt. Đo trên
+#: `todo-e2e`: một phiên đơn lẻ chiếm 42 % token của cả dự án — nếu chỉ có
+#: chặn-tại-trần thì lần đầu người biết là lúc story dừng giữa chừng.
+WARN_FRACTION = 0.8
+
+
+def _canh_bao(state: BudgetState) -> list[str]:
+    """Câu cảnh báo cho chiều nào vừa vượt ngưỡng, và **đánh dấu đã kêu**.
+
+    Có số thật trong câu: "sắp hết ngân sách" không giúp ai quyết định gì.
+    """
+    ra: list[str] = []
+    da_tieu = (("usd", state.spent_usd, state.cap_usd, "${:.2f}"),
+               ("turns", float(state.spent_turns), float(state.cap_turns), "{:.0f} lượt"),
+               ("seconds", (time.time() - state.started_at) if state.started_at else 0.0,
+                state.cap_seconds, "{:.0f}s"))
+    for ten, tieu, tran, mau in da_tieu:
+        if not tran or ten in state.warned or tieu < tran * WARN_FRACTION:
+            continue
+        state.warned.append(ten)
+        ra.append(f"⚠ ngân sách: đã dùng {mau.format(tieu)} / {mau.format(tran)} "
+                  f"({tieu / tran:.0%} trần {ten}) — vượt trần sẽ **dừng trước khi gọi model**")
+    return ra
+
+
 def _has_at_least_one(state: BudgetState) -> bool:
     return bool(state.cap_usd or state.cap_turns or state.cap_seconds
                 or state.spent_usd or state.spent_turns or state.started_at)
@@ -256,9 +288,15 @@ def _settle(ledger: BudgetLedger, state: BudgetState, rid: str,
     state.reservations = [r for r in state.reservations if r.get("id") != rid]
     state.spent_usd = round(state.spent_usd + max(0.0, actual_usd), 4)
     state.spent_turns = state.spent_turns + max(0, actual_turns)
+    for cau in _canh_bao(state):
+        print(cau, file=sys.stderr)
     # Re-check after settle: a long call may have blown the cap on its own.
-    _check_caps(state, est_usd=0, est_turns=0, est_seconds=0)
-    ledger.save(state)
+    try:
+        _check_caps(state, est_usd=0, est_turns=0, est_seconds=0)
+    finally:
+        # Lưu cả khi vượt trần: cờ đã-cảnh-báo và số đã tiêu là sự thật, mất nó
+        # thì lần chạy sau kêu lại từ đầu và đếm lại từ đầu.
+        ledger.save(state)
 
 
 def _refund(state: BudgetState, rid: str) -> None:

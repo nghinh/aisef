@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+- **`aisef dashboard` prints the four numbers an operator asks weekly**: cost
+  per ISO week, net VERIFIED behaviours and behaviours per dollar, open gaps,
+  and the age of the conformance table. A provider that reports no cost says so
+  rather than printing $0.00, and a missing `docs/CONFORMANCE.md` says "could
+  not read" rather than an age of zero days.
+- **The budget warns at 80% of a declared cap**, with the real numbers in the
+  message, once per dimension (the flag is on disk, so a second process does
+  not repeat it). Blocking at the cap was already there and still happens
+  before the model call — but the first time anyone heard about it was the run
+  stopping mid-story.
+
 ## 1.3.1 — 2026-09-12
 
 A same-day patch. 1.3.0 shipped a project template that froze all 68 defaults
