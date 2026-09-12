@@ -2,6 +2,44 @@
 
 ## Unreleased
 
+- **The acceptance-criteria parser was a way around the story-size gate**
+  (bug 91). Blocked for writing a story with nine acceptance criteria, the
+  planner did not split the story — it chained the scenarios as `**And**
+  **Given** …`, and `_GIVEN` only recognised a line *starting* with
+  `**Given**`. Six scenarios parsed as one criterion, the size gate passed,
+  and the story file handed the agent a single `AC-…-1` code covering all six
+  — which the behaviour ledger can mark VERIFIED on the strength of the first.
+  The same blind spot ran the other way for unbolded `Given/When/Then`:
+  every line counted as its own criterion, failing the gate on stories that
+  were the right size. Any threshold counted on parsed output makes the parser
+  part of the gate.
+
+- **Stories keep their role block** (bug 92). `As a … / I want … / So that …`
+  had to be three lines; real planner output folds the purpose into the
+  I-want line, and writes `so I can` or `so it` more often than `so that`
+  (six of seven stories in the run that found this). Every story file lost
+  the block entirely, so the implementing agent never read who the story was
+  for.
+
+- **One epic, not one per heading** (bug 89). BMAD writes an `## Epic List`
+  summary and then a detail section per epic, both headed `Epic N: …`, so
+  `stories.index.json` carried two EPIC-01 entries: one with the goal and no
+  stories, one with the stories and no goal. Sections sharing a number now
+  merge.
+
+- **The PRD gate no longer warns about requirements that are there**
+  (bug 88). `- **NFR-1:** …` — the bold span holding the ID alone — was not a
+  shape the parser knew, so a PRD with four non-functional requirements was
+  recorded in the approval evidence as having none. A false warning in a
+  SHA-bound record is worse than no warning: it teaches the approver to
+  doubt a correct document.
+
+- **The story-split step writes to the run log** (bug 90). It is code rather
+  than a model call, so it never passed through `run_phase` and left no
+  trace; when the size gate sent the pipeline back to re-run epics, the only
+  log an operator has showed `phase=epics START` twice in a row with nothing
+  between them. The split-retry loop also had no test until now.
+
 - **`gate --replay` compares what the evidence actually recorded** (bug 87).
   `gate:verdict` has stored all seventeen checks with their outcomes since
   ADR-005 V4, but replay read only the blocking-check list, printed `·` for

@@ -277,6 +277,47 @@ class TestFailures(PlanTestCase):
                 pha = dong.split("phase=")[1].split()[0]
                 self.assertNotIn(f"phase={pha} START", log, f"{pha}: hứa chờ rồi bỏ qua")
 
+    def test_oversized_story_loops_back_to_epics_and_says_so(self):
+        """Vòng chia lại: cổng máy chặn story quá to, pipeline chạy lại pha
+        `epics` với memo. Trước lỗi 90, bước `split` không ghi gì vào nhật ký
+        nên vòng này hiện ra thành `phase=epics START` hai lần liền, không
+        cách nào biết vì sao."""
+        def epics_md(n_ac: int) -> str:
+            ac = "\n\n".join(
+                f"**Given** trạng thái {i}\n**When** tôi bấm\n**Then** xong {i}"
+                for i in range(1, n_ac + 1)
+            )
+            return (
+                "# Epic Breakdown\n\n## Epic 1: Ghi chú\n\n"
+                "### Story 1.1: Tạo ghi chú\n\n"
+                "As a người dùng,\nI want tạo ghi chú,\nSo that tôi không quên.\n\n"
+                f"**Acceptance Criteria:**\n\n{ac}\n\n"
+                "**Story metadata:**\n- covers: FR-1\n- write_scope: src/notes/\n"
+                "- depends_on: none\n"
+            )
+
+        qua_to = self.cfg["story.max_acceptance_criteria"] + 1
+
+        class Oversized(FakeClient):
+            def run(self, spec):
+                res = super().run(spec)
+                # Lượt đầu: story quá to. Lượt hai: để nguyên epics.md thật
+                # của fixture (đã biết là qua cổng).
+                if self.calls[-1] == "epics" and self.calls.count("epics") == 1:
+                    (spec.workdir / ARTIFACT_ROOT / "epics.md").write_text(
+                        epics_md(qua_to), encoding="utf-8")
+                return res
+
+        c = Oversized()
+        r = self.run_plan(c, auto_approve=frozenset(Gate))
+        self.assertEqual(c.calls.count("epics"), 2, "không chạy lại pha epics")
+        self.assertTrue(r.complete, r.failed_at or r.waiting_on)
+
+        log = (self.project / "_bmad-output" / "run.log").read_text(encoding="utf-8")
+        self.assertIn("phase=split attempt=1 GATE-FAIL", log)
+        self.assertIn(f"{qua_to} acceptance criteria", log)
+        self.assertIn("phase=split attempt=2 OK stories=", log)
+
     def test_quality_failure_is_not_retried(self):
         """Chạy lại một lượt đã hỏng vì nội dung chỉ tốn tiền lần nữa."""
         c = FakeClient(skip={"project-context"})

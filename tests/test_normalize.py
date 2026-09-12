@@ -12,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from aisef.control.machine_gate import check_prd
 from aisef.control.normalize import (  # noqa: E402
     parse_architecture,
     parse_architecture_file,
@@ -206,6 +207,29 @@ class TestParsing(unittest.TestCase):
         self.assertEqual(len(prd.non_functional()), 2)
         self.assertEqual(prd.by_id("NFR-1").title, "Client-only operation")
 
+    def test_nfr_bullet_id_only_no_title(self):
+        """Real planner output (bug 88): `- **NFR-1:** sentence.` — the bold
+        span holds the ID alone, so there is no title to parse."""
+        prd = parse_prd(
+            "#### FR-1: X\n\nDesc.\n\n**Criteria:**\n- OK\n\n"
+            "## 5. Non-Functional Requirements\n\n### Cross-Cutting NFRs\n\n"
+            "- **NFR-1:** The app runs with no backend. All data is local.\n"
+            "- **NFR-2:** Notes persist across reloads.\n"
+        )
+        self.assertEqual([r.id for r in prd.non_functional()], ["NFR-1", "NFR-2"])
+        # A missing title is a blocking gate error, so one is derived.
+        self.assertEqual(prd.by_id("NFR-1").title, "The app runs with no backend")
+        self.assertIn("All data is local", prd.by_id("NFR-1").description)
+        self.assertEqual(check_prd(prd).errors, [])
+
+    def test_nfr_bullet_bold_id_without_separator(self):
+        prd = parse_prd(
+            "#### FR-1: X\n\nDesc.\n\n**Criteria:**\n- OK\n\n"
+            "- **NFR-1** — Startup is under 2s.\n"
+        )
+        self.assertEqual(len(prd.non_functional()), 1)
+        self.assertEqual(prd.by_id("NFR-1").title, "Startup is under 2s")
+
     def test_nfr_section_with_prefix(self):
         """Section like '## 6. Cross-Cutting Non-Functional Requirements'."""
         prd = parse_prd(
@@ -336,6 +360,83 @@ class TestEpicsFormats(unittest.TestCase):
             "**Acceptance Criteria:**\n- Works\n"
         )
         self.assertEqual(len(plan.epics[0].stories), 1)
+
+    def test_and_given_chain_is_not_one_giant_criterion(self):
+        """Bug 91: told to split an oversized story, the planner chained the
+        scenarios as `**And** **Given** …` instead. The parser read all of
+        them as one criterion, so the size gate passed — and the story file
+        handed the agent a single AC code covering four scenarios, which the
+        ledger can then mark VERIFIED on the strength of the first one."""
+        from aisef.control.normalize import _split_ac
+        block = (
+            "**Given** the textarea is empty\n**When** I press Enter\n"
+            "**Then** no note is created\n\n"
+            "**And** **Given** the textarea has text\n**When** I press Enter\n"
+            "**Then** the note is saved\n\n"
+            "**And** **Given** a note exists\n**When** I reload\n"
+            "**Then** it is still there\n"
+        )
+        crit = _split_ac(block)
+        self.assertEqual(len(crit), 3)
+        self.assertIn("no note is created", crit[0])
+        self.assertNotIn("the note is saved", crit[0])
+
+    def test_unbolded_gherkin_is_not_one_criterion_per_line(self):
+        """The same blind spot the other way round: plain `Given/When/Then`
+        counted three criteria per scenario, failing the size gate on a story
+        that was the right size."""
+        from aisef.control.normalize import _split_ac
+        crit = _split_ac(
+            "Given the app is open\nWhen I type a note\nThen it appears\n\n"
+            "Given the list is empty\nWhen I load\nThen the empty state shows\n"
+        )
+        self.assertEqual(len(crit), 2)
+
+    def test_and_line_that_is_not_a_new_given_still_continues(self):
+        from aisef.control.normalize import _split_ac
+        crit = _split_ac(
+            "**Given** the app is open\n**When** I type\n**Then** it appears\n"
+            "**And** the textarea clears\n"
+        )
+        self.assertEqual(len(crit), 1)
+        self.assertIn("textarea clears", crit[0])
+
+    def test_two_line_role_with_inline_purpose(self):
+        """Bug 92: real planner output folds the purpose into the I-want line
+        (`so I can …`), and the three-line template dropped the whole role
+        block from every story file."""
+        from aisef.control.normalize import parse_epics
+        plan = parse_epics(
+            "## Epic 1: Notes\n\n### Story 1.1: Scan notes\n\n"
+            "As a **Note keeper**,\n"
+            "I want to see my notes newest-first so I can scan what I saved.\n\n"
+            "**Acceptance Criteria:**\n- Works\n"
+        )
+        st = plan.stories()[0]
+        self.assertEqual(st.as_a, "Note keeper")
+        self.assertEqual(st.i_want, "to see my notes newest-first")
+        self.assertEqual(st.so_that, "I can scan what I saved")
+
+    def test_epic_list_summary_does_not_duplicate_the_epic(self):
+        """Bug 89: BMAD writes an `## Epic List` summary, then a detail
+        section — both headed `Epic N: …`. One epic, not two."""
+        from aisef.control.normalize import parse_epics
+        plan = parse_epics(
+            "## Epic List\n\n"
+            "### Epic 1: Setup\n\nGet the project standing up on its own.\n\n"
+            "### Epic 2: Ship\n\nPut it in front of users.\n\n"
+            "## Epic 1: Setup\n\n"
+            "### Story 1.1: Init\n\nAs a dev,\nI want setup,\nSo that it works.\n\n"
+            "**Acceptance Criteria:**\n- Works\n\n"
+            "## Epic 2: Ship\n\n"
+            "### Story 2.1: Deploy\n\nAs a dev,\nI want deploy,\nSo that users see it.\n\n"
+            "**Acceptance Criteria:**\n- Works\n"
+        )
+        self.assertEqual([e.id for e in plan.epics], ["EPIC-01", "EPIC-02"])
+        self.assertEqual([len(e.stories) for e in plan.epics], [1, 1])
+        # The goal lives in the summary section; it must reach the real epic.
+        self.assertIn("standing up on its own", plan.epics[0].goal)
+        self.assertIn("in front of users", plan.epics[1].goal)
 
 
 class TestArchitecture(unittest.TestCase):

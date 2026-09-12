@@ -560,6 +560,19 @@ def run_split(project: Path, config: Config) -> PhaseOutcome:
     return out
 
 
+def _split_log(project: Path, outcome: PhaseOutcome, attempt: int) -> None:
+    res = outcome.split
+    n = len(res.stories) if res else 0
+    if res and res.error:
+        tag = f"ERROR {res.error}"
+    elif outcome.ok:
+        tag = f"OK stories={n}"
+    else:
+        errs = "; ".join(res.gate.errors) if res and res.gate else "gate failed"
+        tag = f"GATE-FAIL stories={n} {errs}"
+    _run_log(project, f"phase=split attempt={attempt + 1} {tag}")
+
+
 MAX_SPLIT_RETRIES = 2
 
 
@@ -606,6 +619,10 @@ def run_pipeline(
     for attempt in range(1 + MAX_SPLIT_RETRIES):
         outcome = run_split(project, cfg)
         result.outcomes.append(outcome)
+        # The split is code, not a model call, so it has no run_phase logging
+        # of its own — without this line the retry below shows up in run.log
+        # as the epics phase mysteriously starting twice (bug 90).
+        _split_log(project, outcome, attempt)
         if outcome.ok:
             break
         if outcome.error or attempt >= MAX_SPLIT_RETRIES:

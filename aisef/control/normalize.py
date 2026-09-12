@@ -30,10 +30,15 @@ _FR_HEADING = re.compile(
     r"^#{2,5}\s+(FR-\d+)\s*[:：—–-]\s*(.+?)\s*$", re.MULTILINE | re.IGNORECASE
 )
 
-#: `- **NFR-1 — App launch time.** From the moment...`
+#: `- **NFR-1 — App launch time.** From the moment...` — and the shape where
+#: the bold span holds the ID alone, with no title: `- **NFR-1:** The app
+#: starts in under 2s.` (bug 88, 2026-09-13: real planner output; the whole
+#: NFR section was dropped and the gate warned "no non-functional
+#: requirements" about a document that had four).
 _NFR_ITEM = re.compile(
     r"^(?:[-*]\s+\*\*(NFR-\d+)\s*[:：—–-]\s*(.+?)\.?\*\*\s*(.*)"
-    r"|#{2,5}\s+\*{0,2}(NFR-\d+)\s*[:：—–-]\s*(.+?)\s*\*{0,2})$",
+    r"|#{2,5}\s+\*{0,2}(NFR-\d+)\s*[:：—–-]\s*(.+?)\s*\*{0,2}"
+    r"|[-*]\s+\*\*(NFR-\d+)\s*[:：—–-]?\s*\*\*\s*[:：—–-]?\s*(.+?))\s*$",
     re.MULTILINE | re.IGNORECASE,
 )
 #: Section heading for NFR block — Vietnamese or English.
@@ -433,9 +438,14 @@ def parse_prd(text: str) -> PRD:
 
     nfr_matches = list(_NFR_ITEM.finditer(text))
     for i, m in enumerate(nfr_matches):
-        nfr_id = m.group(1) or m.group(4)
+        nfr_id = m.group(1) or m.group(4) or m.group(6)
         nfr_title = m.group(2) or m.group(5) or ""
-        nfr_desc = m.group(3) or ""
+        nfr_desc = m.group(3) or m.group(7) or ""
+        if not nfr_title.strip():
+            # `- **NFR-1:** text` carries no title of its own. An empty title
+            # is a blocking gate error, so the first sentence becomes one.
+            nfr_title = re.split(r"(?<=[.!?])\s", nfr_desc.strip(), maxsplit=1)[0]
+            nfr_title = " ".join(nfr_title.split()).rstrip(".")[:120]
         if m.group(4) and not nfr_desc:
             body_start = m.end()
             body_end = nfr_matches[i + 1].start() if i + 1 < len(nfr_matches) else None
@@ -541,7 +551,16 @@ _AC_BLOCK = re.compile(
     r"(?=\n#{2,5}\s|\n\s*\*\*(?!Given|When|Then|And)[^\n*]+\*\*\s*[:：]?\s*\n|\Z)",
     re.DOTALL | re.IGNORECASE,
 )
-_GIVEN = re.compile(r"^\s*\*\*Given\*\*", re.IGNORECASE)
+#: A criterion opens with Given. Two real variants beyond `**Given**` (bug 91,
+#: 2026-09-13): the planner chains scenarios as `**And** **Given** …`, which
+#: made eight criteria parse as one and slipped straight through the
+#: `story.max_acceptance_criteria` gate; and plain unbolded `Given`, which
+#: went the other way — every line counted as its own criterion, inflating
+#: the count and failing the gate on a story that was the right size.
+_GIVEN = re.compile(
+    r"^\s*(?:\*{0,2}(?:And|Và)\*{0,2}\s+)?\*{0,2}Given\*{0,2}\s",
+    re.IGNORECASE,
+)
 #: `- write_scope: src/notes/, src/db/schema.ts` — including when labels are bold.
 _META_ITEM = re.compile(
     r"^[-*]?\s*\*{0,2}(covers|write[_ ]scope|depends[_ ]on|screens?|verification[_ ]contract)\*{0,2}\s*[:：]\s*(.+?)\s*$",
@@ -556,12 +575,30 @@ _STORY_REF = re.compile(r"\b(\d+)\.(\d+)\b")
 _NO_STORY = re.compile(
     r"(không có story|chưa có story|no story|ngoài phạm vi|out of scope|n/a)", re.I
 )
+#: The third line is optional because planners also write the two-line form,
+#: with the purpose folded into the I-want line (bug 92, 2026-09-13:
+#: `I want to type a note so that it is saved` — the whole role block was
+#: dropped from every story file, and the agent never saw who it was for).
 _ROLE_LINE = re.compile(
     r"^\s*(?:As an?|Tôi là)\s+(.+?),?\s*$\n"
-    r"^\s*(?:I want|Tôi muốn)\s+(.+?),?\s*$\n"
-    r"^\s*(?:So that|Để)\s+(.+?)\.?\s*$",
+    r"^\s*(?:I want|Tôi muốn)\s+(.+?),?\s*$"
+    r"(?:\n^\s*(?:So that|Để)\s+(.+?)\.?\s*$)?",
     re.MULTILINE | re.IGNORECASE,
 )
+#: `so that` is the template, but real planner output writes `so I can`,
+#: `so it`, or a bare `so` (6 of 7 stories in the todo-oc run).
+_SO_THAT_INLINE = re.compile(r",?\s+(?:so that|so|để)\s+", re.IGNORECASE)
+
+
+def _role_parts(m: re.Match[str]) -> tuple[str, str, str]:
+    """`As a … / I want … / So that …` — the third part may be inline."""
+    as_a, i_want, so_that = (" ".join((g or "").split()) for g in m.groups())
+    if not so_that:
+        parts = _SO_THAT_INLINE.split(i_want, maxsplit=1)
+        if len(parts) == 2:
+            i_want, so_that = parts[0].rstrip(","), parts[1]
+    return (as_a.strip("*").strip(), i_want.strip("*").strip(),
+            so_that.rstrip(".").strip())
 
 
 def epic_id(n: int | str) -> str:
@@ -744,16 +781,28 @@ def parse_epics(text: str) -> EpicPlan:
     plan = EpicPlan(coverage_map=_parse_coverage_map(text))
 
     epic_marks = list(_EPIC_HEADING.finditer(text))
+    # One epic can carry more than one heading: BMAD writes an `## Epic List`
+    # summary and then a detail section per epic, both titled `Epic N: …`
+    # (bug 89, 2026-09-13 — the summary produced a second EPIC-01 with the
+    # goal and no stories, leaving the real one goal-less). Sections with the
+    # same number are one epic; their stories and goal merge.
+    by_number: dict[str, Epic] = {}
     for i, em in enumerate(epic_marks):
         epic_n = int(em.group(1))
         end = epic_marks[i + 1].start() if i + 1 < len(epic_marks) else len(text)
         section = text[em.end():end]
-        epic = Epic(id=epic_id(epic_n), title=em.group(2).strip())
+        epic = by_number.get(epic_id(epic_n))
+        if epic is None:
+            epic = Epic(id=epic_id(epic_n), title=em.group(2).strip())
+            by_number[epic.id] = epic
+            plan.epics.append(epic)
 
         story_marks = list(_STORY_HEADING.finditer(section))
-        epic.goal = " ".join(
+        goal = " ".join(
             section[: story_marks[0].start() if story_marks else len(section)].split()
         )[:600]
+        if len(goal) > len(epic.goal):
+            epic.goal = goal
 
         for j, sm in enumerate(story_marks):
             s_end = story_marks[j + 1].start() if j + 1 < len(story_marks) else len(section)
@@ -767,9 +816,7 @@ def parse_epics(text: str) -> EpicPlan:
 
             role = _ROLE_LINE.search(body)
             if role:
-                story.as_a, story.i_want, story.so_that = (
-                    " ".join(g.split()) for g in role.groups()
-                )
+                story.as_a, story.i_want, story.so_that = _role_parts(role)
 
             ac = _AC_BLOCK.search(body)
             if ac:
@@ -783,7 +830,6 @@ def parse_epics(text: str) -> EpicPlan:
             story.verification_contract = meta.get("verification_contract", [])
 
             epic.stories.append(story)
-        plan.epics.append(epic)
 
     # Coverage map is the fallback source: if a story doesn't declare `covers`
     # it comes from here, because missing FR mappings make the machine gate
