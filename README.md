@@ -320,10 +320,13 @@ called unproven (owner decision 2026-09-06, `docs/RELEASE-PLAN-v0.1.0.md` §0):
   with Claude, see ADR-006 §4). Known agent-side limitation: OpenCode + Serena
   writes `.serena/` files outside declared `write_scope`; the harness correctly
   rejects these.
-- **An agent inside a container still has no credential isolation** (S1
-  blocked): V1 runs the agent on the host and only the verification suite in a
-  container; `doctor` and `pre-deploy` name the missing guarantees instead of
-  staying silent.
+- **An agent inside a container still has no credential isolation** (S1): V1
+  runs the agent on the host and only the verification suite in a container;
+  `doctor` and `pre-deploy` name the missing guarantees instead of staying
+  silent. As of 2026-09-13 this is a **decision, not a backlog item** — building
+  isolation for the `local` provider is rejected with reasons in
+  [ADR-011](docs/ADR-011-sandbox-local-provider.md); sensitive projects run
+  Docker.
 - **`mutation` is UNRUNNABLE in the acceptance environment** (the tool is not
   installed); it is waived with a reason in `verify.waiver_reason`, shown as ◇,
   and never becomes ✅. `image-scan` is the same case (docker scout requires a
