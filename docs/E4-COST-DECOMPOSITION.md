@@ -92,12 +92,20 @@ chạy lồng kéo trung bình lên.
    hai. Trùng với `aisef status --attempts` trên cùng dự án (18/19 lần chặn ở
    cổng là `review`). Muốn giảm chi phí thật thì phải làm việc với vòng lặp
    review, không phải với prompt.
-3. **Không có trần lượt trong phiên implement.** `run.max_turns = 40` được
-   truyền ở `phases/plan.py`, `phases/mockup.py`, `phases/deploy.py` — và
-   **không** ở `phases/implement.py`; `clients/opencode.py` cũng không có cờ
-   giới hạn lượt nào (OpenCode CLI không có `--max-turns`; `claude_code.py` thì
-   có). Thứ duy nhất chặn phiên 77 turn kia là `run.timeout_seconds = 1800`.
-   Một trần theo thời gian không phải trần theo chi phí.
+3. **Trần lượt có được khai, nhưng không ai thi hành.** ~~`run.max_turns = 40`
+   không được truyền ở `phases/implement.py`~~ — **sai, sửa 13/09**: spec của
+   pha implement dựng ở `harness/routing.py:152` và nó **có**
+   `max_turns=cfg["run.max_turns"]`. Lỗi thật nằm một tầng dưới:
+   `clients/opencode.py` không có cách nào **thi hành** con số ấy, vì OpenCode
+   CLI không có cờ giới hạn lượt (`claude_code.py` có `--max-turns`). Nên với
+   client này `run.max_turns` là một knob không ai đọc, và thứ duy nhất chặn
+   phiên 77 turn kia là `run.timeout_seconds = 1800`. Một trần theo thời gian
+   không phải trần theo chi phí.
+
+   Bằng chứng độc lập tìm được sau đó, trên đợt đo C-1: khai trần 40, một phiên
+   chạy **61 lượt** rồi chỉ dừng vì đồng hồ ([O-10](BENCH-OBSERVATIONS-C1.md)).
+   Đã sửa 13/09: adapter đếm `step_finish` trên luồng và dừng tiến trình khi
+   chạm trần, báo `exit_status = max_turns`.
 
 ## Việc phải làm (quyết định, chưa thực hiện)
 
@@ -106,8 +114,8 @@ chạy lồng kéo trung bình lên.
 
 | # | Việc | Vì sao ngay bây giờ thì không |
 |---|---|---|
-| 1 | `implement.py` truyền `run.max_turns` xuống client, như ba pha kia | đổi hành vi pha implement giữa đợt đo |
-| 2 | Adapter OpenCode tự đếm lượt trên luồng sự kiện và dừng tiến trình khi chạm trần, báo `exit_status = max_turns` | CLI không có cờ; phải làm ở adapter — cũng là mã đang đo |
+| 1 | ~~`implement.py` truyền `run.max_turns`~~ — **không cần**: `harness/routing.py` đã truyền | chẩn đoán sai, sửa 13/09 |
+| 2 ✅ | Adapter OpenCode tự đếm lượt trên luồng sự kiện và dừng tiến trình khi chạm trần, báo `exit_status = max_turns` | **xong 13/09** (`_stream_with_timeout(stop_when=…)`); phép thử giết tiến trình thật ở lượt thứ 5 |
 | 3 | Ghi cảnh báo khi một phiên vượt **x lần** trung vị token của dự án | cần số trung vị từ chính bảng trên, làm sau là đúng thứ tự |
 
 Ba việc trên đều là **giảm chi phí mà không hạ cổng nào** — trần lượt chặn phiên

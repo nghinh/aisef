@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
 import unittest
@@ -14,7 +15,8 @@ sys.path.insert(0, str(ROOT))
 from aisef.clients import base  # noqa: E402
 from aisef.clients.base import Capability, RunSpec, Support  # noqa: E402
 from aisef.clients.claude_code import ClaudeCodeAdapter  # noqa: E402
-from aisef.clients.opencode import OpenCodeAdapter  # noqa: E402
+from aisef.clients.opencode import OpenCodeAdapter, parse_json_events  # noqa: E402
+from aisef.clients.stream import exit_status_of  # noqa: E402
 
 ADAPTERS = [ClaudeCodeAdapter(), OpenCodeAdapter()]
 
@@ -637,3 +639,85 @@ class TestOpenCodeGhiLaiModelDaYeuCau(unittest.TestCase):
             ra = configured_model(Path(d))
             self.assertEqual(ra, "9router/mycombo")
             self.assertNotIn("sk-", ra)
+
+#: Con giả: in `step_finish` đều đặn cho tới khi bị giết. Đủ để đo trần lượt mà
+#: không cần model thật.
+_CON_STEP = (
+    "import json, time\n"
+    "for i in range(100):\n"
+    "    print(json.dumps({'type': 'step_finish', 'part': {'tokens': {'input': 1}}})"
+    ".replace(chr(39), chr(34)), flush=True)\n"
+    "    time.sleep(0.1)\n"
+)
+
+
+class _OpenCodeGia(OpenCodeAdapter):
+    """Adapter thật, lệnh giả — đo đúng đường đi của `run()`."""
+
+    def __init__(self, ma: str):
+        super().__init__()
+        self._ma = ma
+
+    def available(self) -> bool:
+        return True
+
+    def build_command(self, spec):
+        return [sys.executable, "-c", self._ma]
+
+
+class TestTranLuotDoAdapterThiHanh(unittest.TestCase):
+    """OpenCode CLI không có cờ giới hạn lượt, nên `run.max_turns` chỉ có nghĩa
+    nếu adapter tự đếm và tự dừng.
+
+    Đo trên cohort C-1 khi chưa có phần này: khai trần 40, một phiên chạy **61**
+    lượt và chỉ dừng vì đồng hồ 1800 s (`docs/BENCH-OBSERVATIONS-C1.md` § O-10).
+    Trần theo thời gian không phải trần theo chi phí.
+    """
+
+    def test_cham_tran_thi_dung_tien_trinh_va_goi_ten_dung(self):
+        import time as _t
+        t = _t.monotonic()
+        res = _OpenCodeGia(_CON_STEP).run(
+            RunSpec(prompt="x", workdir=".", max_turns=5, timeout_seconds=60))
+        self.assertFalse(res.ok)
+        self.assertEqual(exit_status_of(res), "max_turns")
+        self.assertEqual(res.num_turns, 5)
+        self.assertLess(_t.monotonic() - t, 20, "phải giết sớm, không chờ hết 100 bước")
+
+    def test_khong_khai_tran_thi_chay_het(self):
+        ngan = "import json\nprint(json.dumps({'type': 'step_finish'}).replace(chr(39), chr(34)))\n"
+        res = _OpenCodeGia(ngan).run(
+            RunSpec(prompt="x", workdir=".", max_turns=0, timeout_seconds=30))
+        self.assertTrue(res.ok, res.error)
+        self.assertEqual(res.num_turns, 1)
+
+
+class TestPhienBiCliCatGiuaChung(unittest.TestCase):
+    """Model in cú gọi công cụ ra dưới dạng văn bản, CLI không phân giải được,
+    phiên dừng. Đo C-1: 20/20 phiên mang chữ ký ấy chết ngay tại đó, và 7/8 lượt
+    trượt của **cả hai** nhánh là kiểu hỏng này — nếu xếp nó là "agent trượt"
+    thì mọi kết luận về harness đều đọc sai (§ O-7)."""
+
+    def _luong(self, text: str):
+        return parse_json_events([json.dumps({"type": "text", "part": {"text": text}})])
+
+    def test_cu_phap_chua_phan_giai_o_cuoi_thi_la_ha_tang_chay_lai_duoc(self):
+        res = self._luong('<think></think><minimax:tool_call><invoke name="read">')
+        self.assertEqual(exit_status_of(res), "infra")
+        self.assertIn("could not parse", res.error)
+        self.assertTrue((res.raw_result or {}).get("retryable"))
+
+    def test_ket_thuc_binh_thuong_thi_khong_dong_gi_vao(self):
+        res = self._luong("xong: 133 test xanh, lint sạch")
+        res.ok = True
+        self.assertEqual(exit_status_of(res), "ok")
+        self.assertEqual(res.error, "")
+
+    def test_cu_phap_o_giua_phien_khong_tinh(self):
+        """Chỉ phần văn bản **cuối** mới là dấu hiệu phiên chết ở đó."""
+        res = parse_json_events([
+            json.dumps({"type": "text", "part": {"text": '<invoke name="read">'}}),
+            json.dumps({"type": "text", "part": {"text": "đã sửa xong, test xanh"}}),
+        ])
+        res.ok = True
+        self.assertEqual(exit_status_of(res), "ok")

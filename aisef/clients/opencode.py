@@ -26,6 +26,7 @@ structured event stream, so cost must be queried separately.
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import time
 from pathlib import Path
@@ -73,6 +74,14 @@ def configured_model(workdir) -> str:
         if isinstance(model, str) and model:
             return model
     return ""
+
+
+#: Cú pháp gọi công cụ mà CLI **không** phân giải được. Model in nó ra như văn
+#: bản thường, OpenCode coi đó là câu trả lời cuối, bước kết thúc `reason=stop`
+#: và phiên dừng tại chỗ. Đo trên cohort C-1 (12/09): 20/20 phiên mang chữ ký
+#: này đều chết ngay ở đó, và 7/8 lượt trượt của cả hai nhánh là kiểu hỏng ấy
+#: (`docs/BENCH-OBSERVATIONS-C1.md` § O-7).
+_CU_PHAP_KHONG_PHAN_GIAI = re.compile(r"<\w+:tool_call>|<invoke name=")
 
 
 def parse_json_events(lines) -> RunResult:
@@ -136,6 +145,13 @@ def parse_json_events(lines) -> RunResult:
         if ev.get("sessionID") and not res.session_id:
             res.session_id = str(ev["sessionID"])
     res.text = "".join(texts)
+    if texts and not res.error and _CU_PHAP_KHONG_PHAN_GIAI.search(texts[-1]):
+        # Không phải agent làm sai: model định gọi công cụ, CLI không hiểu cú
+        # pháp, phiên chết. Xếp vào nhóm hạ tầng để lượt sau được thử lại —
+        # nếu không, một lỗi tích hợp model↔CLI sẽ bị tính là "agent trượt".
+        res.error = ("client could not parse the model's tool call; the session ended there "
+                     "(unparsed tool-call syntax in the final message)")
+        res.raw_result = {**(res.raw_result or {}), "retryable": True}
     return res
 
 
@@ -226,17 +242,36 @@ class OpenCodeAdapter(ClientAdapter):
                 pass
         _t.Thread(target=_feed_stdin, daemon=True).start()
 
-        lines, stderr, timed_out = _stream_with_timeout(proc,
-                                                       timeout_seconds=spec.timeout_seconds)
+        # OpenCode CLI không có cờ giới hạn lượt (`claude_code` có `--max-turns`),
+        # nên trần phải do adapter thi hành: đếm `step_finish` trên luồng và dừng
+        # tiến trình khi chạm. Không làm thì `run.max_turns` là con số không ai
+        # đọc — đo được: khai 40, phiên chạy 61 lượt (O-10).
+        cham_tran = False
+
+        def _dem_luot(moi: list[str], _tran=int(spec.max_turns or 0)) -> bool:
+            nonlocal cham_tran, luot
+            luot += sum(1 for d in moi if '"type":"step_finish"' in d
+                        or '"type": "step_finish"' in d)
+            cham_tran = luot >= _tran
+            return cham_tran
+
+        luot = 0
+        lines, stderr, timed_out = _stream_with_timeout(
+            proc, timeout_seconds=spec.timeout_seconds,
+            stop_when=_dem_luot if spec.max_turns else None)
 
         # `--format json` (measured 2026-09-05, OpenCode 1.18.26): one event per
         # line — `step_start` / `text` / `tool_use` (part.tool, state.input/output)
         # / `step_finish` (tokens, cost). Cost is the provider-reported number —
         # 9router reports 0, that is the provider's truth, not the harness's.
         res = parse_json_events(lines)
-        res.ok = proc.returncode == 0 and not timed_out
+        res.ok = proc.returncode == 0 and not timed_out and not cham_tran
         res.duration_ms = int((time.monotonic() - started) * 1000)
-        if timed_out:
+        if cham_tran:
+            # Tên trạng thái phải là `max_turns`, không phải `timeout`: hai thứ
+            # ấy dẫn tới hai quyết định khác nhau ở tầng trên.
+            res.error = f"max_turns: stopped at {res.num_turns or luot} turns (cap {spec.max_turns})"
+        elif timed_out:
             res.error = f"exceeded {spec.timeout_seconds}s"
         elif proc.returncode != 0:
             # Keep what the stream already explained; stderr is empty here.

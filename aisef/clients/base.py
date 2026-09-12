@@ -22,6 +22,7 @@ import shutil
 import subprocess
 import sys
 import threading
+import time
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from dataclasses import dataclass, field
@@ -358,7 +359,7 @@ def _drain(stream, lines: list[str], partial: list[str], lock: threading.Lock) -
             pass
 
 
-def _stream_with_timeout(proc, *, timeout_seconds: int
+def _stream_with_timeout(proc, *, timeout_seconds: int, stop_when=None
                          ) -> tuple[list[str], str, bool]:
     """Run `proc` to completion with a hard wall-clock deadline, returning
     ``(lines, stderr, timed_out)``.
@@ -367,6 +368,13 @@ def _stream_with_timeout(proc, *, timeout_seconds: int
       end of the process (or up to the millisecond before kill on timeout).
     * ``stderr`` — full stderr text (only read after exit; short).
     * ``timed_out`` — whether the deadline fired before the child exited.
+
+    ``stop_when`` là **trần không phải thời gian**: một hàm nhận các dòng mới
+    xuất hiện từ lần hỏi trước và trả `True` khi phải dừng tiến trình. Cần nó
+    vì có CLI không có cờ giới hạn lượt nào (OpenCode), nên `run.max_turns`
+    không ai thi hành — đo được trên cohort C-1: khai trần 40, phiên chạy 61
+    lượt và chỉ dừng vì đồng hồ (`docs/BENCH-OBSERVATIONS-C1.md` § O-10).
+    Không truyền thì đường đi cũ giữ nguyên từng dòng.
     """
     lines: list[str] = []
     partial: list[str] = []
@@ -383,13 +391,34 @@ def _stream_with_timeout(proc, *, timeout_seconds: int
     reader.start()
 
     timed_out = False
-    try:
-        proc.wait(timeout=timeout_seconds)
-    except subprocess.TimeoutExpired:
-        timed_out = True
-        proc.kill()
-        # No timeout — the child is dying, the OS will reap it.
-        proc.wait()
+    if stop_when is None:
+        try:
+            proc.wait(timeout=timeout_seconds)
+        except subprocess.TimeoutExpired:
+            timed_out = True
+            proc.kill()
+            # No timeout — the child is dying, the OS will reap it.
+            proc.wait()
+    else:
+        han = time.monotonic() + timeout_seconds
+        da_doc = 0
+        while True:
+            try:
+                proc.wait(timeout=0.5)
+                break
+            except subprocess.TimeoutExpired:
+                pass
+            with lock:
+                moi, da_doc = lines[da_doc:], len(lines)
+            if moi and stop_when(moi):
+                proc.kill()
+                proc.wait()
+                break
+            if time.monotonic() >= han:
+                timed_out = True
+                proc.kill()
+                proc.wait()
+                break
 
     reader.join(timeout=2.0)
     if proc.stderr:
