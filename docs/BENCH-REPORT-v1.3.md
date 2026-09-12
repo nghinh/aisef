@@ -190,7 +190,13 @@ Ship:
 
 Do **not** ship any claim that "guards help weak agents" based on simulator results; that conclusion requires option 1 or 3 + real hooks in a future protocol.
 
-**Status**: Phase A complete (A-1 / A-2 / A-3 / A-4).  Phases B/C/D remain in `docs/EXECUTION-PLAN.md` queue.
+**Status**: Phase A complete (A-1 / A-2 / A-3 / A-4); B-1 and B-2 complete.
+The remaining B/C/D queue is written down in
+[`docs/EXECUTION-PLAN.md` § Hàng đợi bench phase A–D](EXECUTION-PLAN.md#hàng-đợi-bench-phase-ad-chốt-2026-09-12)
+— it did not exist on disk until 2026-09-12, when this pointer was found dangling.
+Next in line: **B-3** (frontier on the 12 A-2 tasks), then **C-1** (a real
+weak model, which is the only condition that can answer the guard question
+this report explicitly declines to answer).
 
 ---
 

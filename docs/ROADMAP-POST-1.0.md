@@ -20,8 +20,14 @@ closed by switching the lock carrier to a sidecar and counting
 in-flight reservations in the cap math.  See
 [ADR-009](ADR-009-phase-3-cross-tier-invariants.md#follow-up-two-cross-tier-defects-in-the-budget-seam).
 The other four issues are *semantic* and depend on these being
-correct first; they remain open until dogfood data confirms the
-wire-up is doing the right thing under load.
+correct first.  They are now written down — reconstructed from
+on-disk evidence, with that provenance stated — in
+[ADR-009 § Open](ADR-009-phase-3-cross-tier-invariants.md#open--the-four-remaining-semantic-issues-reconstructed-2026-09-12):
+reviewer verdicts are not themselves qualified (O1), the ledger does
+not record what *kind* of gap a GAP is (O2), preservation is scoped by
+file rather than by behaviour (O3), and spend is attributed to calls
+rather than to outcomes (O4).  Each carries the measurement that
+closes it.
 
 ## 1. External user validation
 

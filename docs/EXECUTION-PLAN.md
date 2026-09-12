@@ -658,3 +658,34 @@ Bước tiếp: **đợt 1 — G4** truyền `--settings` tường minh + nhịp
 | Router hai-tín-hiệu + abstain + progressive disclosure | 12 | e9: abstain 13/18 (catalog security không có skill app ghi chú — đúng); lộ & sửa 2 va chạm keyword (crypto-migration↔schema, "performative"↔perf) | `aisef skill --story` | ✅ |
 | Kích hoạt: router → prompt story + telemetry `skills_offered`/`skills_used` | | **chưa** — cần kiểm agent thật | | ⏳ đợt sau |
 | Chưng cất + học từ trace (ADR §5) | | | | ⏳ đợt 2 (PROPOSED) |
+
+---
+
+## Hàng đợi bench phase A–D (chốt 2026-09-12)
+
+`docs/BENCH-REPORT-v1.3.md` trước đây trỏ người đọc tới "hàng đợi phase B/C/D
+trong `docs/EXECUTION-PLAN.md`" — hàng đợi ấy **chưa từng có trên đĩa**, nó
+sống trong ngữ cảnh của một phiên. Mục này là hàng đợi thật, chốt trong phiên
+đánh giá 360° ngày 2026-09-12; nội dung B/C/D suy từ §6 *Future work* của chính
+báo cáo v1.3 cộng với ba việc mà báo cáo tự khai là chưa đo được.
+
+Luật của hàng đợi này: **đóng băng phương pháp trước khi chạy**; không đổi
+dataset hay scorer giữa chừng; kết quả âm tính báo trung thực và vẫn tính là
+kết quả.
+
+| Phase | Nội dung | Trạng thái | Điều kiện xong |
+|---|---|---|---|
+| **A-1** | Adapter client rút stdout song song, giữ được luồng dở khi hết giờ | ✅ `e3f64f2` | test hồi quy cho luồng dở |
+| **A-2** | +12 task khó (multi-file · state · security), giao thức v1.3 | ✅ `41fcae9` | 12/12 validate sạch ×3 |
+| **A-3** | `SimulatedWeakAdapter` — control tất định 4 chiến lược | ✅ `582c739` + sửa `2b30d13` | chạy lại được, không chạm dataset |
+| **A-4** | BENCH-REPORT-v1.3, mô hình ba cột, khung diễn giải trung thực | ✅ `882dee0` + `a899fa0` | nói rõ cái gì **không** đo được |
+| **B-1** | Bench smoke: simulator đi hết `R.run` | ✅ `5f8957c` | |
+| **B-2** | **Dataset manifest ghim byte task-fixture** | ✅ `bfb0709` | `MANIFEST.sha256` khớp trước và sau mỗi lần chạy |
+| **B-3** | **Frontier trên 12 task A-2** — 3 lượt × 2 điều kiện = 72 phiên | ⏳ chưa chạy (~$50–80) | pass@1/pass@3, ổn định, tỉ lệ chi phí, số lần guard chặn; kết quả null vẫn ghi |
+| **C-1** | **Cột model yếu *thật*** (model rẻ, không phải simulator) — 12 × 2 × 2 | ⏳ chưa chạy (~$10–25) | trả lời "guard có cứu agent yếu không"; đây là giả thuyết trung tâm, simulator không trả lời được |
+| **C-2** | **Metric "xong giả"**: tuyên bố xong nhưng test đỏ · không có test cho tiêu chí · ghi ngoài scope · hồi quy P2P | ⏳ chưa chạy ($0, đọc lại log B-3/C-1) | bảng hai cột; đo đúng thứ harness được thiết kế để chặn, thay vì chỉ `pass@1` |
+| **C-3** | Tỉ lệ chênh chi phí có ngưỡng phát hành (v1.3 §6.4) | ⏳ chờ B-3 | "đạt nếu chi phí AISEF ≤ 2× trần ở ≥80 % task" |
+| **D-1** | `partial` ở mức hunk/hàm thay vì mức tệp (v1.3 §6.2) | ⏳ chỉ làm nếu A-3 còn sống ở v2.0 | 9/12 task A-2 có gold một tệp nên `partial` mức tệp thiên về PASS |
+| **D-2** | Phễu tester: coder gọi tester ở ranh giới eval (v1.3 §6.5) | ⏳ chưa lên lịch | đếm F2P xanh độc lập với đường đi của agent |
+
+Thứ tự thực thi: **B-3 → C-1 → C-2 → C-3**. D chỉ mở sau khi C có số.

@@ -139,6 +139,91 @@ the "unexpected state" branch.
   The bridge (``parse_lines``) keeps the wire format a stable
   intermediate representation.
 
+## Open — the four remaining semantic issues (reconstructed 2026-09-12)
+
+**Provenance, stated plainly.** The pre-Phase-2 audit that produced "seven
+systemic issues" was never written to disk: neither this repository nor any
+reachable session transcript contains the list.  The three transactional ones
+are recoverable because they became code (findings, lease, budget).  The four
+below are a **reconstruction** from evidence that *is* on disk — the owner
+decisions of 2026-09-06, the calibration note that pinned the neighbour weight
+to zero, the C11 conformance probe, and the cost figures in
+`docs/STATUS-2026-09-05.md`.  They are not quoted from the original audit.  If
+that list resurfaces, reconcile against this section and say which items moved.
+
+The rule that produced this section: *a statement of the form "N items remain"
+must carry the list, on disk, in the same document.*
+
+Each item names the semantic question, why it had to wait for the transactional
+seams, and the measurement that closes it.
+
+### O1 — the reviewer's verdicts are not themselves qualified
+
+`review` is the only `model-judge` check in `CHECK_NAMES`.  Every other check
+has three controls certifying the *check*; nothing certifies the *judgement*.
+Conformance probe C11 already showed the reviewer model passing a candidate
+that the machine gate blocked, which is evidence the two layers disagree — but
+not a measurement of how often, or in which direction.
+
+*Why it waited*: counting "findings raised vs findings that were real" is
+meaningless while a reviewer can restate the same complaint in new words.
+Stable `Finding.id` (§1) makes the count well-defined.
+
+*Closes when*: a reviewer-qualification table exists with the same three
+controls as the machine checks, scored over a corpus of recorded reviews —
+false-block rate and miss rate both reported, neither hidden behind a pass.
+
+### O2 — the ledger records that a behaviour is a GAP, never what kind of gap
+
+`improve` picks one GAP and writes one repair story.  But three different
+absences are all recorded as GAP: the behaviour was never built, the behaviour
+exists but no test exercises it, and the behaviour and its test both exist but
+the trace linking them is missing.  Only the first deserves a paid repair
+story; the owner decision of 2026-09-06 §4 had to say so in prose ("a gap that
+is only missing traceability is fixed by the harness, not by a story"), and
+that rule still lives in a decision record rather than in code.
+
+*Why it waited*: distinguishing the three requires the evidence for one
+candidate to be trustworthy, which is what the SHA-bound checks and the nop
+control provide.
+
+*Closes when*: `Behaviour.gap_kind` exists with the three values, the repair
+queue routes each kind to a different action (story / test-only story /
+harness metadata fix), and `aisef issues` reports the three counts separately.
+
+### O3 — preservation is scoped by file, not by behaviour
+
+`complexity.verified_touched` answers "did this story touch a file owned by a
+verified behaviour of another story" by looking the file up through the owning
+story's `write_scope`.  That is a proxy.  The real question is whether the
+behaviour still holds, and the ledger already knows how to answer it — but the
+neighbour weight that would widen the blast radius is **pinned to 0** because
+turning it to 0.5 blocked three innocent stories of `e9` (02-03, 03-03, 05-01)
+during calibration.
+
+*Why it waited*: widening the radius multiplies re-verification cost, which was
+unbounded until the budget seam could reserve and refund (§3).
+
+*Closes when*: the weight is calibrated on a recorded corpus with both error
+rates reported (innocent stories blocked / broken behaviours missed), and the
+chosen value is a config knob with the measurement written next to it.
+
+### O4 — spend is attributed to calls, not to outcomes
+
+With reservations correct, the ledger can say what a run cost.  It still cannot
+say what the money bought.  The two dogfood corpora differ by a factor of
+thirty-six per story (`e9` ≈ $70, `par` ≈ $1.9) and nobody has decomposed the
+difference; `docs/ROADMAP-POST-1.0.md` asks for "net VERIFIED behaviour per
+dollar" and no command computes it.
+
+*Why it waited*: attribution needs a cost record that is complete at the moment
+of the call rather than reconciled afterwards — the in-flight reservation is
+exactly that record.
+
+*Closes when*: one command reports, per story, the spend split across attempt
+outcomes (plan-blocked / code-failed / environment-failed / passed) and the net
+VERIFIED behaviours the spend produced.
+
 ## Deferred
 
 - Budget cap values are surfaced in ``Config`` defaults but not yet
