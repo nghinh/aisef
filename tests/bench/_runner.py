@@ -251,7 +251,10 @@ def _prompt(task: Task, ws: Path, cfg: Config) -> str:
     )
 
 
-def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = False) -> list[Result]:
+def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = False,
+        model: str = "") -> list[Result]:
+    """``model`` đi vào **cả hai** điều kiện như nhau — nhóm đối chứng phải
+    khác đúng một thứ (guard), không phải hai."""
     condition = f"{client.id}-bare" if bare else client.id
     out: list[Result] = []
     sim = is_simulated(client)
@@ -287,6 +290,7 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = Fa
             spec = RunSpec(
                 prompt=prompt, workdir=ws, max_turns=cfg["run.max_turns"],
                 timeout_seconds=cfg["run.timeout_seconds"],
+                model=model,
                 env=sim_env,
             )
         else:
@@ -295,6 +299,7 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = Fa
                 prompt=prompt, workdir=ws, max_turns=cfg["run.max_turns"],
                 timeout_seconds=cfg["run.timeout_seconds"],
                 settings_file=settings if settings.is_file() and not sim else None,
+                model=model,
                 env={
                     **sim_env,
                     ENV_WRITE_SCOPE: ",".join(task.write_scope), ENV_STORY_ID: task.id,

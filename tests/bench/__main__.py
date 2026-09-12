@@ -28,11 +28,13 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--client", default="claude")
     r.add_argument("--attempts", type=int, default=3)
     r.add_argument("--bare", action="store_true", help="control group: cùng prompt, không guard/env AISEF")
+    r.add_argument("--model", default="", help="model cụ thể (rỗng = mặc định của client); đi vào cả hai điều kiện")
     b = sub.add_parser("run-both", help="interleaved: AISEF rồi bare cho mỗi task, --attempts lượt (cần AISEF_BENCH=1)")
     b.add_argument("ids", nargs="*")
     b.add_argument("--client", default="claude")
     b.add_argument("--attempts", type=int, default=3)
     b.add_argument("--shuffle", action="store_true", help="xáo thứ tự task")
+    b.add_argument("--model", default="", help="model cụ thể (rỗng = mặc định của client); đi vào cả hai điều kiện")
     b.add_argument("--max-usd", type=float, default=0.0,
                    help="trần chi phí: dừng TRƯỚC task kế nếu đã tiêu quá; 0 = không trần. Cắt ở ranh giới task để mỗi task đo được vẫn đủ thiết kế; task bị bỏ được in ra, không im lặng")
     sub.add_parser("report", help="báo cáo Markdown từ .bench/results.jsonl")
@@ -63,7 +65,7 @@ def main(argv: list[str] | None = None) -> int:
             print("đặt AISEF_BENCH=1 — chạy client thật tốn tiền", file=sys.stderr)
             return 1
         client = R.make_client(a.client)
-        res = [x for t in pick for x in R.run(t, client, attempts=a.attempts, bare=a.bare)]
+        res = [x for t in pick for x in R.run(t, client, attempts=a.attempts, bare=a.bare, model=a.model)]
         print(R.report(res, tasks))
     elif a.cmd == "run-both":
         if a.client not in R.SIMULATED_CLIENTS and not R.ENABLED:
@@ -80,8 +82,8 @@ def main(argv: list[str] | None = None) -> int:
             if a.max_usd and tieu >= a.max_usd:
                 bo_qua = [x.id for x in order[i:]]
                 break
-            res += R.run(t, client, attempts=a.attempts, bare=False)
-            res += R.run(t, client, attempts=a.attempts, bare=True)
+            res += R.run(t, client, attempts=a.attempts, bare=False, model=a.model)
+            res += R.run(t, client, attempts=a.attempts, bare=True, model=a.model)
         if bo_qua:
             print(f"TRẦN CHI PHÍ {a.max_usd:.2f} USD đạt sau {len(order) - len(bo_qua)}/{len(order)} task "
                   f"(đã tiêu {sum(x.cost_usd for x in res):.2f}). KHÔNG chạy: {', '.join(bo_qua)}",

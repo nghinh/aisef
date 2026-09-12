@@ -500,7 +500,7 @@ class TestTranChiPhiCatOChanhGioiTask(unittest.TestCase):
     """
 
     def _fake_run(self, calls, cost):
-        def run(task, client, attempts=3, bare=False):
+        def run(task, client, attempts=3, bare=False, model=""):
             calls.append((task.id, bare))
             return [R.Result(task.id, "x", 1, R.PASS, cost_usd=cost)]
         return run
@@ -544,3 +544,44 @@ class TestTranChiPhiCatOChanhGioiTask(unittest.TestCase):
             CLI.main(["run-both"])
         self.assertEqual(len(calls), 6)
         self.assertNotIn("TRẦN CHI PHÍ", err.getvalue())
+
+
+class _Dung(Exception):
+    """Dừng `run` ngay sau khi RunSpec đã dựng xong."""
+
+
+class TestModelDiVaoCaHaiDieuKien(unittest.TestCase):
+    """`--model` phải tới **cả** nhánh AISEF lẫn nhánh trần, y hệt nhau.
+
+    Nhóm đối chứng chỉ có nghĩa khi khác đúng một biến. Nếu cờ model chỉ được
+    nối vào một nhánh thì bảng kết quả so guard *và* so model cùng lúc, và
+    không đọc được gì từ nó — đúng lớp lỗi mà giao thức v1.3 gọi là confound.
+    """
+
+    def _spec_of(self, bare: bool):
+        ghi = {}
+
+        class Ghi:
+            id = "claude"
+
+            def run(self, spec):
+                ghi["spec"] = spec
+                raise _Dung()          # đã bắt được spec, không cần chạy tiếp
+
+        task = R.Task(id="bug-a2-sec-3", source="bug",
+                      dir=M.TASKS_DIR / "bug-a2-sec-3", base="x",
+                      validated={"base_fail": True, "gold_pass": True, "runs": 3})
+        with mock.patch.object(R, "materialize", return_value=Path(tempfile.mkdtemp())), \
+             mock.patch.object(R, "head_sha", return_value="0" * 40), \
+             mock.patch.object(R, "compile_for", return_value={}), \
+             mock.patch.object(R, "write_compile_report", return_value=None), \
+             mock.patch.object(R, "_prompt", return_value="đề bài"), \
+             self.assertRaises(_Dung):
+            R.run(task, Ghi(), attempts=1, bare=bare, model="model-yeu")
+        return ghi["spec"]
+
+    def test_nhanh_aisef_nhan_model(self):
+        self.assertEqual(self._spec_of(bare=False).model, "model-yeu")
+
+    def test_nhanh_tran_nhan_cung_model(self):
+        self.assertEqual(self._spec_of(bare=True).model, "model-yeu")
