@@ -104,3 +104,73 @@ Phép tách sạch: nhánh AISEF có trượt trên các task **không** nói v�
 (`multi-*`, `state-*`) hay không, và nếu có thì trượt ở đâu. Tới lúc này
 `multi-*` chưa có lượt trượt nào của nhánh AISEF. Năm task còn lại quyết định.
 
+## O-4 · Lần guard chặn đầu tiên của cả đợt — và nó là **báo động nhầm**
+
+`sec-1`, nhánh AISEF, lượt 2 (phiên 72 turn / 1 115 s): `guard_block = 1`. Đây
+là lần chặn duy nhất trong 45 phiên đã chạy tới lúc này.
+
+Sự kiện (`.bench/run/opencode/bug-a2-sec-1/a2/_bmad-output/evidence/bug-a2-sec-1.jsonl`, seq 100–101):
+
+```
+guard_check destructive  verdict=block
+guard_block destructive  "destructive command blocked (xoá đệ quy)."
+```
+
+Lệnh bị chặn (khôi phục từ kho phiên của OpenCode, `part` có `callID =
+call_function_3rex724gvu7d_1`):
+
+```
+cd …/bug-a2-sec-1/a2 && find . -name "*.pyc" -delete \
+  && find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null; python3 -m unittest …
+```
+
+Tức là **dọn cache Python trong chính cây làm việc** — vô hại. Guard chặn mọi
+`rm -rf` đệ quy không xét đích, nên nó chặn cả cái này. Giá phải trả: một turn;
+seq 102 đã `allow` trở lại và phiên vẫn PASS.
+
+Hai điều rút ra, ghi lại chứ **chưa sửa**:
+
+1. Câu khuyên trong thông báo sai ngữ cảnh: "stop and report to a human" là
+   đúng cho `rm -rf /` nhưng vô lý cho `__pycache__`. Sửa câu chữ thì rẻ.
+2. Nới chính sách để cho phép xoá đệ quy "có vẻ vô hại" thì **không** rẻ:
+   `__pycache__/../..` cũng khớp mọi bộ lọc theo tên. Đề xuất hiện tại là giữ
+   nguyên hành vi chặn, chỉ sửa thông báo.
+
+**Không đụng vào `guardrails.py` trước khi đợt đo kết thúc**: plugin guard là
+một phần của điều kiện thí nghiệm; đổi nó giữa chừng là đổi hệ đang đo.
+
+## O-5 · `sec-1` lượt 3: nhánh AISEF **làm đỏ** đúng bài test về phạm vi
+
+Lượt trượt duy nhất có ghi tệp của nhánh AISEF trên `sec-1` không chỉ *sửa* hàm
+đọc env — nó phá một bài test P2P:
+
+```
+p2p_red = ['tests.test_guardrails.TestEffectiveScope.test_planning_scope_when_no_story']
+```
+
+Đây là bằng chứng mạnh hơn O-3 một bậc: không phải "sửa quanh chỗ lỗi" mà là
+**đổi ngữ nghĩa `effective_scope`** tới mức hồi quy. Ba lượt trượt có ghi tệp
+của nhánh AISEF nay đều quy về một điểm: khái niệm *phạm vi ghi* — thứ mà chính
+điều kiện AISEF đang hiện thực hoá sống trong phiên của agent.
+
+Vẫn chưa đủ để kết luận. Phép tách vẫn là `state-*`/`multi-4`.
+
+## O-6 · Khai báo nhiễu: những gì **không** sạch trong đợt này
+
+Ghi ra vì chúng có thể ảnh hưởng tới con số, kể cả khi tôi tin là ảnh hưởng nhỏ.
+
+- **Máy không rảnh trong cửa sổ `state-1`.** Khoảng 22:00–22:04 ngày 12/09 tôi
+  chạy toàn bộ suite (2 336 test, 240 s) trên cùng máy với đợt đo — vi phạm
+  chính ràng buộc "không chạy suite đầy đủ trong lúc đo" đã ghi ở kế hoạch. Hệ
+  quả có thể có: `duration_ms` của lượt đang chạy khi đó bị thổi lên. Số turn,
+  kết cục PASS/FAIL, `f2p`/`p2p` **không** phụ thuộc tải máy. Không sửa số,
+  không chạy lại — ghi vào đây để người đọc trừ hao đúng chỗ.
+- **`multi-3` có 6 lượt ở nhánh AISEF thay vì 3**, hệ quả của lần đợt đo bị giết
+  rồi chạy lại theo chunk. Quy tắc xử lý: **lấy 3 lượt sớm nhất theo thứ tự
+  ghi**. Quy tắc này được tuyên bố *sau* khi đã thấy cả 6 lượt đều PASS, nên nó
+  không chọn được kết quả nào có lợi — mọi cách lấy đều cho 3/3. Ghi rõ để lần
+  sau tuyên bố trước.
+- **Cột `cost_usd` là 0,00 ở toàn bộ 45 dòng.** OpenCode không trả chi phí qua
+  9router cho alias này, nên mọi so sánh "tỉ lệ chi phí" trong đợt C-1 **không
+  có dữ liệu**; dùng số turn và giây làm đại lượng thay thế, và nói rõ đó là đại
+  lượng thay thế.
