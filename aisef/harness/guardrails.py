@@ -268,17 +268,30 @@ def check_git_stage(command: str) -> Verdict:
     )
 
 
+#: Lời khuyên theo **loại** lệnh bị chặn. Hành vi chặn không đổi; chỉ câu chữ.
+#: Lần guard nổ duy nhất của cohort C-1 là `find . -name __pycache__ -exec rm -rf
+#: {} +` — dọn cache trong chính cây làm việc. Với ca ấy, "dừng lại và báo cho
+#: người" là lời khuyên vô nghĩa, và một thông báo vô nghĩa dạy agent bỏ qua
+#: thông báo (`docs/BENCH-OBSERVATIONS-C1.md` § O-4).
+_LOI_KHUYEN = {
+    "": "If truly needed, stop and report to a human — do not run it yourself.",
+    "xoá đệ quy": ("Recursive delete is blocked whatever the target: a path filter cannot tell "
+                   "`__pycache__` from `__pycache__/../..`. Caches do not need deleting — tests "
+                   "must pass without cleaning. If a delete is genuinely required, stop and say "
+                   "so; do not run it yourself."),
+    "git stash bỏ việc": ("Stash entries are the only copy of work nobody committed. Leave them; "
+                          "if they are in the way, say which entry and why."),
+}
+
+
 def check_destructive(command: str) -> Verdict:
     """Block commands that destroy unsaved work."""
     if not command:
         return ALLOW
     for label, pattern in DESTRUCTIVE_PATTERNS:
         if pattern.search(command):
-            return Verdict(
-                False,
-                f"destructive command blocked ({label}). If truly needed, stop "
-                f"and report to a human — do not run it yourself.",
-            )
+            return Verdict(False, f"destructive command blocked ({label}). "
+                                  + _LOI_KHUYEN.get(label, _LOI_KHUYEN[""]))
     return ALLOW
 
 

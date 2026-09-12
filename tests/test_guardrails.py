@@ -1245,3 +1245,37 @@ class TestTrangThaiMcpKhongPhaiViecCuaStory(unittest.TestCase):
         """Đối chứng: loại trạng thái công cụ không được loại luôn mã."""
         from aisef.harness.guardrails import check_diff_scope
         self.assertFalse(check_diff_scope(["ke-hoach/x.md"], ["src"]).allowed)
+
+class TestLoiKhuyenDungNguCanh(unittest.TestCase):
+    """Chặn thì vẫn chặn; nhưng lời khuyên phải dùng được.
+
+    Lần guard nổ duy nhất của cohort C-1 là dọn `__pycache__` trong chính cây
+    làm việc, và câu "dừng lại, báo cho người" ở đó là vô nghĩa. Một thông báo
+    vô nghĩa dạy agent bỏ qua thông báo (§ O-4).
+    """
+
+    def test_xoa_de_quy_noi_ro_vi_sao_khong_loc_theo_duong_dan(self):
+        v = check_destructive("find . -name __pycache__ -type d -exec rm -rf {} +")
+        self.assertFalse(v.allowed)
+        self.assertIn("__pycache__/../..", v.reason)
+        self.assertIn("tests must pass without cleaning", v.reason)
+
+    def test_git_stash_noi_ro_mat_gi(self):
+        v = check_destructive("git stash drop stash@{0}")
+        self.assertFalse(v.allowed)
+        self.assertIn("only copy of work", v.reason)
+
+    def test_loai_chua_co_loi_khuyen_rieng_van_co_cau_mac_dinh(self):
+        v = check_destructive("git reset --hard HEAD~1")
+        self.assertFalse(v.allowed)
+        self.assertIn("report to a human", v.reason)
+
+    def test_hanh_vi_chan_khong_doi(self):
+        """Sửa câu chữ không được nới một lệnh nào."""
+        for lenh in ("rm -rf /tmp/x", "rm -fr x", "git stash clear",
+                     "git reset --hard origin/main"):
+            with self.subTest(lenh=lenh):
+                self.assertFalse(check_destructive(lenh).allowed)
+        for lenh in ("rm x.txt", "git stash list", "ls -la"):
+            with self.subTest(lenh=lenh):
+                self.assertTrue(check_destructive(lenh).allowed)
