@@ -35,6 +35,7 @@ import shutil
 import subprocess
 import sys
 import tarfile
+from statistics import median
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -412,10 +413,16 @@ def report(results: list[Result], tasks: list[Task] | None = None) -> str:
     for base_cl, bare_cl in bare_pairs:
         if base_cl not in clients:
             continue
+        # Cột turn/giây có mặt vì cột tiền có thể **vắng mặt**: nhà cung cấp sau
+        # alias `9router` báo `cost_usd = 0` ở mọi bước (cohort C-1, 12/09). Không
+        # có đại lượng tài nguyên nào thì hai cột pass@1 bằng nhau đọc thành "như
+        # nhau", trong khi một bên có thể tốn gấp ba để tới cùng chỗ.
         lines += ["", f"## So sánh {base_cl} (AISEF) vs {bare_cl} (bare)", "",
-                  "| task | AISEF pass@1 | bare pass@1 | delta | AISEF $/lượt | bare $/lượt | guard chặn |",
-                  "|---|---|---|---|---|---|---|"]
-        a_p1 = a_cost = b_p1 = b_cost = 0
+                  "| task | AISEF pass@1 | bare pass@1 | delta | AISEF turn | bare turn | "
+                  "AISEF giây | bare giây | AISEF $/lượt | bare $/lượt | guard chặn |",
+                  "|---|---|---|---|---|---|---|---|---|---|---|"]
+        a_p1 = a_cost = b_p1 = b_cost = 0.0
+        a_turn = b_turn = a_sec = b_sec = 0.0
         a_n = b_n = a_guard = 0
         for tid in sorted({t for t, _ in groups}):
             a_rs = groups.get((tid, base_cl), [])
@@ -427,16 +434,24 @@ def report(results: list[Result], tasks: list[Task] | None = None) -> str:
             ac = sum(x.cost_usd for x in a_rs) / len(a_rs)
             bc = sum(x.cost_usd for x in b_rs) / len(b_rs)
             gb = sum(x.guard_block for x in a_rs)
+            at = median(x.turns for x in a_rs)
+            bt = median(x.turns for x in b_rs)
+            asec = median(x.duration_ms for x in a_rs) / 1000
+            bsec = median(x.duration_ms for x in b_rs) / 1000
             a_p1 += ap; b_p1 += bp; a_cost += ac; b_cost += bc; a_guard += gb
+            a_turn += at; b_turn += bt; a_sec += asec; b_sec += bsec
             a_n += 1; b_n += 1
             d = ap - bp
-            lines.append(f"| {tid} | {ap:.2f} | {bp:.2f} | {d:+.2f} | {ac:.2f} | {bc:.2f} | {gb} |")
+            lines.append(f"| {tid} | {ap:.2f} | {bp:.2f} | {d:+.2f} | {at:.0f} | {bt:.0f} | "
+                         f"{asec:.0f} | {bsec:.0f} | {ac:.2f} | {bc:.2f} | {gb} |")
         if a_n:
             lines += ["",
                 f"**AISEF pass@1** {a_p1 / a_n:.2f} vs **bare pass@1** {b_p1 / b_n:.2f} "
                 f"(delta {(a_p1 - b_p1) / a_n:+.2f})",
                 f"**AISEF $/lượt trung bình** {a_cost / a_n:.2f} vs **bare** {b_cost / b_n:.2f} "
                 f"(tỉ lệ {a_cost / b_cost:.2f}× nếu bare > 0)" if b_cost else "",
+                f"**Turn trung vị (trung bình theo task)** AISEF {a_turn / a_n:.0f} vs bare "
+                f"{b_turn / b_n:.0f} · **giây** AISEF {a_sec / a_n:.0f} vs bare {b_sec / b_n:.0f}",
                 f"**Guard chặn tổng** {a_guard} lần trên {a_n} task"]
     bad = [t for t in tasks or [] if t.invalid_reason or t.flaky_ids]
     if bad:
