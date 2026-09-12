@@ -8,8 +8,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisef.clients.base import (
-    Capability, ClientAdapter, Support, RunSpec, ENV_KEEP, ENV_KEEP_PREFIXES,
-    GIT_NO_CREDENTIALS, child_env,
+    Capability, ClientAdapter, Support, RunSpec, GIT_NO_CREDENTIALS, child_env,
 )
 from aisef.clients.stream import RunResult
 

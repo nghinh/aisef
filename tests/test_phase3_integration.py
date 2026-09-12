@@ -9,7 +9,6 @@ paid call; they all run on synthetic scripts.
 
 from __future__ import annotations
 
-import asyncio
 import sys
 import tempfile
 import threading
@@ -36,7 +35,6 @@ from aisef.control.findings import (
 )
 from aisef.harness.server_identity import (
     acquire_port_lease,
-    port_owned_by_other_run,
     ready_with_identity,
     release_port_lease,
 )

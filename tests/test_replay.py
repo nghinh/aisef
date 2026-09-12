@@ -21,7 +21,7 @@ sys.path.insert(0, str(ROOT))
 
 from aisef.cli import EXIT_NOT_READY, EXIT_OK, EXIT_USAGE, main  # noqa: E402
 from aisef.control import replay as R  # noqa: E402
-from aisef.control.gate import StoryGate, evaluate  # noqa: E402
+from aisef.control.gate import evaluate  # noqa: E402
 from aisef.control.outcome import Check, Outcome  # noqa: E402
 from aisef.harness.observe import NOTE, Event, EvidenceStore  # noqa: E402
 

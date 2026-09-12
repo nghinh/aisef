@@ -261,7 +261,6 @@ class TestNangLucPhaiKhai(unittest.TestCase):
     """Skill không khai miền thì không được suy năng lực từ chữ."""
 
     def _build(self, tmp, name, frontmatter_extra="", body=""):
-        import json
         from pathlib import Path
         from aisef.kit.catalog import Catalog
         from aisef.kit.registry import build

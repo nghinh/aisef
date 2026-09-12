@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-import json
 import socket
 import sys
 import threading
-import time
 import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path

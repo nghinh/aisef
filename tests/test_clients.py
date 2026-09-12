@@ -380,7 +380,6 @@ class TestKhongThuaHuongPhienCha(unittest.TestCase):
         self.assertNotIn("GIT_CONFIG_COUNT", os.environ)
 
     def _fake(self, tmp):
-        import stat
         from pathlib import Path
         fake = Path(tmp) / "client-gia"
         from tests._bin import dump_env

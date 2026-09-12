@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import math
 import tempfile
 import unittest
@@ -11,8 +10,6 @@ from pathlib import Path
 from aisef.control.complexity import (
     ACCEPTANCE_WEIGHT,
     Component,
-    FAN_IN_WEIGHT,
-    SCREEN_STATE_WEIGHT,
     Score,
     VERIFIED_TOUCHED_WEIGHT,
     WRITE_SCOPE_WEIGHT,

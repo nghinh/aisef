@@ -7,7 +7,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisef.cli._common import EXIT_USAGE  # noqa: E402
 from aisef.cli.parser import build_parser, main  # noqa: E402
 from aisef.harness.guardrails import GUARD_MATCHERS  # noqa: E402
 

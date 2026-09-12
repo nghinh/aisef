@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import sys
 import tempfile
 import unittest
@@ -12,7 +11,6 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisef.control.design_contract import (  # noqa: E402
-    CONTRACT_FILE,
     DesignContract,
     ScreenContract,
     load,

@@ -12,8 +12,7 @@ sys.path.insert(0, str(ROOT))
 from aisef.control.findings import (  # noqa: E402
     Finding, FindingBook, TransitionError,
     Trust, Severity, Status,
-    SOURCE_REVIEWER, SOURCE_SECURITY, SOURCE_DETERMINISTIC,
-    REVIEWER_TRUST,
+    SOURCE_REVIEWER, REVIEWER_TRUST,
     apply_transition,
 )
 

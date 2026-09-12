@@ -8,12 +8,8 @@ verify the wire-up so future callers can rely on the contract.
 
 from __future__ import annotations
 
-import json
-import os
 import tempfile
-import threading
 import unittest
-from http.server import HTTPServer
 from pathlib import Path
 
 from aisef.control.findings import (
@@ -33,7 +29,6 @@ from aisef.control.qualification import (
 )
 from aisef.harness.server_identity import (
     acquire_port_lease,
-    ready_with_identity,
     release_port_lease,
 )
 from aisef.control.budget import (

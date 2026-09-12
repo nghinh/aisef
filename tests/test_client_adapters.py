@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from aisef.clients.base import Capability, RunSpec, Support
+from aisef.clients.base import Capability, RunSpec
 from aisef.clients.claude_code import ClaudeCodeAdapter, DEFAULT_TOOLS, PERMISSION_MODE
 from aisef.clients.opencode import OpenCodeAdapter, parse_json_events, _TOOL_NAMES
 
