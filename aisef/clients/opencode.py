@@ -25,6 +25,7 @@ structured event stream, so cost must be queried separately.
 
 from __future__ import annotations
 
+import os
 import subprocess
 import time
 from pathlib import Path
@@ -37,6 +38,41 @@ BINARY = "opencode"
 
 _TOOL_NAMES = {"read": "Read", "write": "Write", "edit": "Edit", "bash": "Bash", "glob": "Glob",
                "grep": "Grep", "list": "LS", "webfetch": "WebFetch", "todowrite": "TodoWrite", "skill": "Skill"}
+
+
+#: Nơi OpenCode khai model mặc định. Chỉ đọc **đúng một khoá** ``model``: tệp
+#: này cũng chứa khoá API của nhà cung cấp, và một hàm tiện tay đọc cả tệp rồi
+#: in ra là cách rò bí mật kinh điển.
+_CONFIG_PATHS = (
+    "opencode.json",
+    ".opencode/opencode.json",
+)
+
+
+def configured_model(workdir) -> str:
+    """Model OpenCode sẽ dùng khi không ai truyền ``--model``.
+
+    Luồng JSON của OpenCode **không nói** model nào đã trả lời (đo 2026-09-12:
+    không sự kiện nào mang ``modelID``/``providerID``), nên đây là *model được
+    yêu cầu*, không phải model đã đáp. Với một alias định tuyến như
+    ``9router/mycombo`` — đổi mô hình nền theo từng lần gọi — ghi lại lời khai
+    này là điều duy nhất làm được, và bản báo cáo phải nói rõ nó là lời khai.
+    """
+    import json as _json
+    from pathlib import Path as _Path
+
+    ung_vien = [_Path(workdir) / p for p in _CONFIG_PATHS]
+    home = os.environ.get("XDG_CONFIG_HOME") or str(_Path.home() / ".config")
+    ung_vien.append(_Path(home) / "opencode" / "opencode.json")
+    for path in ung_vien:
+        try:
+            data = _json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        model = data.get("model")
+        if isinstance(model, str) and model:
+            return model
+    return ""
 
 
 def parse_json_events(lines) -> RunResult:
@@ -206,4 +242,7 @@ class OpenCodeAdapter(ClientAdapter):
             # Keep what the stream already explained; stderr is empty here.
             res.error = res.error or stderr.strip()[:500] or "exit != 0"
         res.raw_result = {"returncode": proc.returncode, **res.raw_result}
+        # Lời khai, không phải quan sát: luồng của OpenCode không mang tên
+        # model. Ghi cái đã yêu cầu còn hơn để trống, miễn là nói rõ.
+        res.model = spec.model or configured_model(spec.workdir)
         return res

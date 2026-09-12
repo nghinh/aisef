@@ -602,3 +602,38 @@ class TestSplitCommand(unittest.TestCase):
                 base.split_command(r'"C:\Program Files\node\npm.cmd" run "my test"'),
                 [r"C:\Program Files\node\npm.cmd", "run", "my test"],
             )
+
+
+class TestOpenCodeGhiLaiModelDaYeuCau(unittest.TestCase):
+    """OpenCode không nói model nào đã trả lời — ghi cái đã yêu cầu, nói rõ là lời khai.
+
+    Đo 2026-09-12: `opencode run --format json` phát ba loại sự kiện
+    (`step_start`/`text`/`step_finish`) và **không** sự kiện nào mang
+    `modelID`/`providerID`. Với alias định tuyến như `9router/mycombo` — đổi mô
+    hình nền theo từng lần gọi — bỏ trống trường này làm cả đợt đo không so lại
+    được với đợt sau.
+    """
+
+    def test_doc_khoa_model_tu_cau_hinh_du_an(self):
+        from aisef.clients.opencode import configured_model
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "opencode.json").write_text('{"model": "9router/mycombo"}', encoding="utf-8")
+            self.assertEqual(configured_model(Path(d)), "9router/mycombo")
+
+    def test_khong_co_cau_hinh_thi_de_rong(self):
+        from aisef.clients.opencode import configured_model
+        with tempfile.TemporaryDirectory() as d, \
+             mock.patch.dict("os.environ", {"XDG_CONFIG_HOME": d}):
+            self.assertEqual(configured_model(Path(d)), "")
+
+    def test_chi_doc_khoa_model_chu_khong_mang_theo_bi_mat(self):
+        """Tệp cấu hình của OpenCode chứa cả khoá API nhà cung cấp. Hàm này chỉ
+        được trả về tên model — không trả, không ghi, không log gì khác."""
+        from aisef.clients.opencode import configured_model
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "opencode.json").write_text(
+                '{"model": "9router/mycombo", "provider": {"p": {"options": {"apiKey": "sk-BI-MAT"}}}}',
+                encoding="utf-8")
+            ra = configured_model(Path(d))
+            self.assertEqual(ra, "9router/mycombo")
+            self.assertNotIn("sk-", ra)
