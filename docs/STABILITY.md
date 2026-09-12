@@ -14,7 +14,7 @@ aisef doctor | setup | init | compile | run | status | dashboard | guard |
 
 New subcommands may be added; existing ones keep their flags and exit codes.
 
-### Config keys (58 keys)
+### Config keys (68 keys)
 
 Every key in `aisef.config.DEFAULTS` is part of the public contract. Keys may
 be **added** but never removed or renamed. Type and default may not change
@@ -22,8 +22,8 @@ without a migration in `Config.load()` that preserves old `.ai/config.json`
 files.
 
 Groups: `app.*`, `clients.*`, `context.*`, `cost.*`, `coverage.*`,
-`improve.*`, `review.*`, `route.*`, `run.*`, `sandbox.*`, `security.*`,
-`skills.*`, `story.*`, `tools.*`, `verify.*`.
+`improve.*`, `memory.*`, `review.*`, `route.*`, `run.*`, `sandbox.*`,
+`security.*`, `skills.*`, `story.*`, `tools.*`, `verify.*`.
 
 ### Guards (9 guards)
 

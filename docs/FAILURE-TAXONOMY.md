@@ -27,7 +27,7 @@ lỗi 22–25 còn có số đo ở `docs/ADR-004-evidence-driven-epic-improveme
 | **J. Hai luật cho một sự thật — sổ và cổng suy cùng một hành vi bằng hai cách** | "Sự thật này còn chỗ nào khác suy nó không? Hai chỗ có dùng chung một hàm, một trường không? Nếu không, chỗ nào là luật?" | 47 `stale_since_last_test` so `seq` trong khi `read()` đã chuyển sang so thời gian · 23 cổng "bảo toàn" hỏi test mang mã của story **sở hữu** FR, sổ xác minh FR **qua** story khác (`source.story`) → sổ nói VERIFIED, cổng nói UNRUNNABLE oan; cùng lớp, không đánh số: R2×R1 (sổ ghi VERIFIED ở ứng viên chưa landed trong khi nhật ký biết), R5×R2 (sổ không ghi tệp, cổng cỡ tra tệp) | `test_preservation.TestCongBaoToan.test_fr_hoi_story_da_xac_minh_no_khong_hoi_story_so_huu` · `test_ledger.TestUngVienChuaLanded` |
 | **K. Cơ chế mới ghi vào artifact mà cổng người cũ đang băm** | "Bước này ghi vào tệp nào? Tệp ấy có cổng người nào băm không? Ai duyệt lại, và có phải mỗi lần không?" | 25 `aisef improve` ghi story sửa vào `stories.index.json` → `stories`/`readiness` đã duyệt thành stale → lần gọi kế bị chính vòng trước chặn (exit 2), 28 | `test_approvals.TestStorySuaKhongLamStaleCongStories` (thêm story sửa không stale; sửa story thật vẫn stale) |
 
-## Lỗi 22–63 — triệu chứng, gốc, bài học
+## Lỗi 22–70 — triệu chứng, gốc, bài học
 
 | # | Lớp | Triệu chứng | Gốc | Bài học | Chặn tái diễn |
 |---|---|---|---|---|---|

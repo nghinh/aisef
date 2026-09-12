@@ -190,3 +190,108 @@ class TestSolutionKhopMa(unittest.TestCase):
         for g in Gate:
             with self.subTest(gate=g.value):
                 self.assertTrue(self._co(g.value), f"cổng người `{g.value}` không có ở SOLUTION §6")
+
+
+class TestConSoTrongTaiLieuKhopNguonDocDuoc(unittest.TestCase):
+    """Số đếm trong tài liệu phải đọc được từ mã hoặc từ bảng — không đánh máy.
+
+    Ba con số đã trôi cùng lúc (đo 2026-09-12): `STABILITY.md` nói 58 khoá cấu
+    hình khi `DEFAULTS` đã có 68; `README` nói 31 lỗi khi bảng phân loại đã ghi
+    tới lỗi 70; và tiêu đề mục của chính bảng ấy còn nói "22–63". Cả ba đều là
+    lỗi **vắng phép kiểm**: không có gì nối con số trong tài liệu với nguồn sinh
+    ra nó. Ba phép dưới đây làm chính việc nối ấy.
+    """
+
+    DOCS = ROOT / "docs"
+
+    @staticmethod
+    def _ma_loi_trong_bang(text: str) -> list[int]:
+        """Mã lỗi = ô đầu của mỗi dòng bảng trong FAILURE-TAXONOMY."""
+        return [int(m) for m in re.findall(r"(?m)^\|\s*(\d+)\s*\|", text)]
+
+    def test_so_khoa_cau_hinh_trong_stability_khop_defaults(self):
+        from aisef.config import DEFAULTS
+        text = (self.DOCS / "STABILITY.md").read_text(encoding="utf-8")
+        m = re.search(r"### Config keys \((\d+) keys\)", text)
+        self.assertIsNotNone(m, "không đọc được số khoá ở STABILITY.md — tiêu đề đã đổi dạng")
+        self.assertEqual(int(m.group(1)), len(DEFAULTS),
+                         "STABILITY.md nói số khoá khác `len(DEFAULTS)`")
+
+    def test_nhom_khoa_trong_stability_phu_het_defaults(self):
+        from aisef.config import DEFAULTS
+        text = (self.DOCS / "STABILITY.md").read_text(encoding="utf-8")
+        for prefix in sorted({k.split(".")[0] for k in DEFAULTS}):
+            with self.subTest(nhom=prefix):
+                self.assertIn(f"`{prefix}.*`", text,
+                              f"nhóm khoá `{prefix}.*` có trong DEFAULTS nhưng không có ở STABILITY.md")
+
+    def test_so_loi_trong_readme_khop_bang_phan_loai(self):
+        ids = self._ma_loi_trong_bang((self.DOCS / "FAILURE-TAXONOMY.md").read_text(encoding="utf-8"))
+        self.assertTrue(ids, "regex lệch với bảng trong FAILURE-TAXONOMY.md")
+        lon_nhat = max(ids)
+        for ten in ("README.md", "README.vi.md"):
+            with self.subTest(tai_lieu=ten):
+                text = (ROOT / ten).read_text(encoding="utf-8")
+                m = re.search(r"(?m)^(\d+) (?:bugs found by measurement|lỗi tìm bằng đo)", text)
+                self.assertIsNotNone(m, f"không đọc được số lỗi ở {ten} — câu đã đổi dạng")
+                self.assertEqual(int(m.group(1)), lon_nhat,
+                                 f"{ten} nói số lỗi khác mã lỗi lớn nhất trong FAILURE-TAXONOMY")
+
+    def test_tieu_de_muc_phu_het_ma_loi_trong_bang(self):
+        text = (self.DOCS / "FAILURE-TAXONOMY.md").read_text(encoding="utf-8")
+        ids = self._ma_loi_trong_bang(text)
+        m = re.search(r"## Lỗi (\d+)[–-](\d+) —", text)
+        self.assertIsNotNone(m, "không đọc được khoảng mã lỗi ở tiêu đề mục")
+        dau, cuoi = int(m.group(1)), int(m.group(2))
+        self.assertEqual((dau, cuoi), (min(ids), max(ids)),
+                         "tiêu đề mục không phủ đúng khoảng mã lỗi có trong bảng")
+
+
+class TestLienKetTaiLieuTroVaoChoCoThat(unittest.TestCase):
+    """Mọi liên kết tương đối trong tài liệu phải trỏ vào tệp — và neo — có thật.
+
+    Lỗi thật đã xảy ra (đo 2026-09-12): `BENCH-REPORT-v1.3.md` bảo người đọc tìm
+    "hàng đợi phase B/C/D trong `docs/EXECUTION-PLAN.md`" trong khi tệp ấy không
+    có hàng đợi nào. Người đọc mất thời gian tìm một thứ không tồn tại, và kế
+    hoạch thật thì nằm trong ngữ cảnh một phiên — mất khi phiên đóng. Phép kiểm
+    này bắt cả hai dạng: tệp không có, và neo không có trong tệp có.
+    """
+
+    TAI_LIEU = "docs/*.md"
+    THEM = ("README.md", "README.vi.md", "CHANGELOG.md")
+    LIEN_KET = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
+    TIEU_DE = re.compile(r"(?m)^#{1,6}\s+(.+?)\s*$")
+
+    @staticmethod
+    def _neo(tieu_de: str) -> str:
+        """Slug kiểu GitHub: thường hoá, bỏ dấu câu (giữ khoảng trắng nó để lại),
+        khoảng trắng → gạch nối. Không gộp gạch nối liền nhau — GitHub cũng không."""
+        import unicodedata
+        h = unicodedata.normalize("NFC", tieu_de.strip().lower())
+        return re.sub(r"[^\w\s-]", "", h).replace(" ", "-")
+
+    def _tep(self) -> list[Path]:
+        return sorted(ROOT.glob(self.TAI_LIEU)) + [ROOT / t for t in self.THEM]
+
+    def test_moi_lien_ket_tuong_doi_tro_vao_tep_va_neo_co_that(self):
+        tep = self._tep()
+        neo = {
+            f.name: {self._neo(m) for m in self.TIEU_DE.findall(f.read_text(encoding="utf-8"))}
+            for f in tep
+        }
+        so_lien_ket = 0
+        for f in tep:
+            for href in self.LIEN_KET.findall(f.read_text(encoding="utf-8")):
+                if href.startswith(("http://", "https://", "mailto:")):
+                    continue
+                so_lien_ket += 1
+                duong_dan, _, phan_neo = href.partition("#")
+                dich = (f.parent / duong_dan) if duong_dan else f
+                with self.subTest(tu=f.name, toi=href):
+                    if duong_dan:
+                        self.assertTrue(dich.exists(),
+                                        f"{f.name} trỏ tới `{href}` — tệp không có")
+                    if phan_neo and dich.suffix == ".md" and dich.name in neo:
+                        self.assertIn(phan_neo, neo[dich.name],
+                                      f"{f.name} trỏ tới `{href}` — tệp có, neo không có")
+        self.assertGreater(so_lien_ket, 40, "regex lệch — không đọc được liên kết nào đáng kể")
