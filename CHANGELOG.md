@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **A cut session now actually reaches the retry path** (bug 86). The previous
+  release recognised the signature and set `error` plus a retryable flag — on a
+  result whose `ok` was still `True`, because OpenCode exits 0 when it thinks
+  the session ended normally, and `exit_status_of` returns "ok" on the first
+  line without reading `error`. Measured on the C-1b cohort: eight of
+  twenty-four attempts ended on a cut session and the retry fired zero times.
+  `ok` now also requires an empty `error`, and the test drives a real process
+  that exits 0 rather than only the stream parser.
+
 - **`reject` requires the artifact to exist, like `approve` does** (bug 85).
   On an empty project `approve prd` refused with "no artifact" while `reject
   prd --note x` succeeded, recording a verdict on a document that did not

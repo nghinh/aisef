@@ -265,7 +265,13 @@ class OpenCodeAdapter(ClientAdapter):
         # / `step_finish` (tokens, cost). Cost is the provider-reported number —
         # 9router reports 0, that is the provider's truth, not the harness's.
         res = parse_json_events(lines)
-        res.ok = proc.returncode == 0 and not timed_out and not cham_tran
+        # `not res.error` là phần đắt nhất của dòng này: khi phiên bị CLI cắt,
+        # OpenCode vẫn **thoát 0** (nó tưởng phiên kết thúc bình thường), nên
+        # `ok` sẽ là True và `exit_status_of` trả `"ok"` ngay ở dòng đầu —
+        # không bao giờ đọc tới `error`. Đo 13/09/2026 trên cohort C-1b: 8/24
+        # lượt kết thúc bằng phiên bị cắt và **0 lần** chạy lại hạ tầng nổ.
+        res.ok = (proc.returncode == 0 and not timed_out and not cham_tran
+                  and not res.error)
         res.duration_ms = int((time.monotonic() - started) * 1000)
         if cham_tran:
             # Tên trạng thái phải là `max_turns`, không phải `timeout`: hai thứ

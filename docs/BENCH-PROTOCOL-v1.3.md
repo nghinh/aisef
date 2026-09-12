@@ -291,7 +291,7 @@ tín hiệu.
 | model | **vẫn MiniMax-M2.7** sau alias `mycombo` (lời khai chủ dự án 13/09) — đây **không** phải cột 2 |
 | bộ dữ liệu | **v1.4** (`sec-2` đã sửa đề bài; hai task kia không đổi byte) |
 | trần lượt | `TRAN_LUOT = 0` như C-1 |
-| chạy lại khi hạ tầng hỏng | **1 lần** (`INFRA_RETRIES = 1`) — mới, xem dưới |
+| chạy lại khi hạ tầng hỏng | khai **1 lần** (`INFRA_RETRIES = 1`) — **thực tế không nổ lần nào**, xem [B-4](BENCH-OBSERVATIONS-C1B.md): phiên bị cắt vẫn cho `ok=True` nên `exit_status_of` trả `"ok"`. Đã sửa 13/09 nhưng sau khi đợt đã khởi động, nên **cả 36 lượt của C-1b chạy theo đúng định nghĩa lượt của C-1** |
 | tổng | 3 × 6 × 2 = **36 lượt** |
 | thời gian ước tính | **≈ 3 giờ** — suy từ thời gian phiên trung vị của đúng ba task này ở C-1 (sec-1 6,1 · sec-2 3,6 · state-3 4,9 phút/phiên). Commit `5506ba8` nói "a third of the time" so với C-1; đúng hơn là **một nửa** (2,9 giờ so với 5,8) — sửa ở đây vì thông điệp commit đã đẩy |
 

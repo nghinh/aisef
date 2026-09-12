@@ -707,6 +707,20 @@ class TestPhienBiCliCatGiuaChung(unittest.TestCase):
         self.assertIn("could not parse", res.error)
         self.assertTrue((res.raw_result or {}).get("retryable"))
 
+    def test_cli_thoat_0_van_phai_ra_infra_khi_phien_bi_cat(self):
+        """Chỗ bản vá đầu **hỏng**: OpenCode thoát 0 khi phiên bị cắt (nó tưởng
+        phiên xong bình thường), nên `ok=True` và `exit_status_of` trả `"ok"`
+        ngay dòng đầu, không bao giờ đọc tới `error`. Hệ quả đo được trên C-1b:
+        8/24 lượt kết thúc bằng phiên bị cắt, **0 lần** chạy lại hạ tầng nổ.
+
+        Phép thử đi qua đúng `run()` với một tiến trình thật thoát 0."""
+        ma = ("import json\n"
+              "print(json.dumps({'type': 'text', 'part': {'text': "
+              "'<minimax:tool_call><invoke name=\"read\">'}}).replace(chr(39), chr(34)))\n")
+        res = _OpenCodeGia(ma).run(RunSpec(prompt="x", workdir=".", timeout_seconds=30))
+        self.assertFalse(res.ok, "CLI thoát 0 nhưng phiên bị cắt thì không phải ok")
+        self.assertEqual(exit_status_of(res), "infra")
+
     def test_ket_thuc_binh_thuong_thi_khong_dong_gi_vao(self):
         res = self._luong("xong: 133 test xanh, lint sạch")
         res.ok = True
