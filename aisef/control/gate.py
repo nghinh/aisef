@@ -265,8 +265,11 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
 
     # Test run at candidate: after baseline, and matching the candidate being
     # scored (when candidate is given, reject manual runs without a candidate).
-    post = [e for e in evidence.of(TOOL_RUN, "test")
-           if e.seq > base_ev.seq and (not candidate or e.detail.get("candidate") == candidate)]
+    # Tests *after* the baseline run — by position in the time-sorted event list,
+    # not by ``seq``. ``seq`` reset mid-file (bug 42) makes numeric comparison
+    # unsafe; position-after-sort is what "after" really means. Bug 47.
+    post = [e for e in evidence.after_event(base_ev) if e.kind == TOOL_RUN and e.name == "test"
+            and (not candidate or e.detail.get("candidate") == candidate)]
     if not post:
         return Check(name, False, "no test run at candidate after baseline — cannot compare",
                      evidence=seqs)
@@ -365,9 +368,12 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
     """
     name = "tests verify story"
     base_ev = evidence.last(TOOL_RUN, BASELINE_RUN)
-    post = [e for e in evidence.of(TOOL_RUN, "test")
-           if (base_ev is None or e.seq > base_ev.seq)
-           and (not candidate or e.detail.get("candidate") == candidate)]
+    # Same position-vs-seq reasoning as ``_baseline_check``: ``after_event``
+    # for the events that came after the baseline, not numeric comparison.
+    post = [e for e in evidence.after_event(base_ev) if e.kind == TOOL_RUN and e.name == "test"
+            and (not candidate or e.detail.get("candidate") == candidate)] \
+        if base_ev is not None \
+        else list(evidence.of(TOOL_RUN, "test"))
     latest = post[-1] if post else None
     nop = evidence.last(TOOL_RUN, NOP_RUN)
     # Event pointers read: baseline, test run at candidate, nop — whichever exist.
@@ -537,7 +543,7 @@ def evaluate(
     completion = check_completion(evidence)
     last_test = evidence.last(TOOL_RUN, "test")
     # `completion` reads the last test run and files edited **after** it — point to both.
-    doc_test = ([last_test.seq] + [e.seq for e in evidence.of(FILE_CHANGE) if e.seq > last_test.seq]
+    doc_test = ([last_test.seq] + [e.seq for e in evidence.after_event(last_test) if e.kind == FILE_CHANGE]
                 if last_test is not None else [])
     flaky = _flaky_note(evidence, "test")
     if last_test is not None and last_test.detail.get("unrunnable"):

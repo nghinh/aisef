@@ -146,6 +146,20 @@ class Evidence:
                 moc = i
         return self.events[moc + 1:]
 
+    def after_event(self, event: Event) -> list[Event]:
+        """Events recorded after the given event — by **position** in this
+        time-ordered list. Symmetric to ``after_last`` but anchored on a
+        specific event rather than a kind/name pair. Use this when ``seq``
+        cannot be trusted for ordering (evidence written by a build that
+        reset the counter). Bug 47: gate/replay used to compare by ``seq``
+        directly; the time-sorted position is what "after" really means.
+        """
+        try:
+            idx = self.events.index(event)
+        except ValueError:
+            return []
+        return self.events[idx + 1:]
+
     def stale_since_last_test(self) -> list[str]:
         """Files modified **after** the most recent test run.
 

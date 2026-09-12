@@ -84,13 +84,31 @@ def kwargs_from(detail: dict) -> dict:
 
 
 def _pairs(evidence: Evidence) -> list[tuple[Event, Event | None]]:
-    """Pair each `gate:input` with the **first** `gate:verdict` after it."""
+    """Pair each `gate:input` with the **first** `gate:verdict` after it.
+
+    Pairing is by **position** in the time-sorted event list, not by the
+    ``seq`` number printed in the file. Numeric comparison breaks when a
+    build that could not read the file tail reset the ``_next_seq`` counter
+    (bug 42 → bug 47).  Two events on disk now carry ``seq`` values that
+    are out of order while their timestamps are perfectly ordered.
+    """
     inputs = evidence.of(NOTE, GATE_INPUT)
     verdicts = evidence.of(NOTE, GATE_VERDICT)
     out = []
     for i, inp in enumerate(inputs):
-        boundary = inputs[i + 1].seq if i + 1 < len(inputs) else float("inf")
-        v = next((v for v in verdicts if inp.seq < v.seq < boundary), None)
+        try:
+            inp_idx = evidence.events.index(inp)
+        except ValueError:
+            continue
+        try:
+            boundary_idx = evidence.events.index(inputs[i + 1]) if i + 1 < len(inputs) else len(evidence.events)
+        except ValueError:
+            boundary_idx = len(evidence.events)
+        v = next(
+            (v for v in verdicts
+             if inp_idx < evidence.events.index(v) < boundary_idx),
+            None,
+        )
         out.append((inp, v))
     return out
 
@@ -98,9 +116,9 @@ def _pairs(evidence: Evidence) -> list[tuple[Event, Event | None]]:
 def unreplayable(evidence: Evidence) -> list[int]:
     """Attempt numbers that have a `gate:verdict` without a preceding `gate:input`
     — pre-V4 evidence. Returns attempt numbers so the reader knows what was skipped."""
-    co = {v.seq for _, v in _pairs(evidence) if v is not None}
+    co = {id(v) for _, v in _pairs(evidence) if v is not None}
     return [int(v.detail.get("attempt") or 0)
-            for v in evidence.of(NOTE, GATE_VERDICT) if v.seq not in co]
+            for v in evidence.of(NOTE, GATE_VERDICT) if id(v) not in co]
 
 
 def replay(evidence: Evidence, *, attempt: int = 0) -> list[Replay]:
@@ -110,8 +128,14 @@ def replay(evidence: Evidence, *, attempt: int = 0) -> list[Replay]:
         attempt_num = int(inp.detail.get("attempt") or 0)
         if attempt and attempt_num != attempt:
             continue
-        before = Evidence(story_id=evidence.story_id,
-                         events=[e for e in evidence.events if e.seq <= inp.seq])
+        # Use position-in-sorted-list, not ``seq``, so a build that reset the
+        # counter mid-file doesn't make replay look at the wrong slice of the
+        # log (bug 47 / bug 42).
+        slice_end = evidence.events.index(inp) + 1 if inp in evidence.events else len(evidence.events)
+        before = Evidence(
+            story_id=evidence.story_id,
+            events=evidence.events[:slice_end],
+        )
         kw = kwargs_from(inp.detail)
         gate = evaluate(evidence.story_id, before, **kw)
         out.append(Replay(
