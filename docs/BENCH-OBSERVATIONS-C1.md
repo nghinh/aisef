@@ -311,3 +311,29 @@ chỉnh) trông đúng như một ca gán nhầm.
 Bài học, viết cho lần sau: **một quan sát giải thích theo hướng có lợi cho sản
 phẩm phải đi qua mã trước khi vào báo cáo.** O-7 viết đúng phần đo được (chữ ký,
 tỉ lệ) và sai đúng ở câu duy nhất mang tin vui.
+## O-10 · `multi-4` lượt 1: trần lượt được **khai** 40, phiên chạy **61**
+
+Bằng chứng (`.bench/run/opencode/bug-a2-multi-4/a1/_bmad-output/evidence/…`):
+
+```
+turns: 61 | exit_status: timeout | error: exceeded 1800s | duration_ms: 1800047
+```
+
+Bench dựng `RunSpec(max_turns=cfg["run.max_turns"])` cho **cả hai** điều kiện
+(`tests/bench/_runner.py:298,306`), mặc định là **40**. Phiên vẫn chạy 61 lượt
+và chỉ dừng vì đồng hồ.
+
+Lý do nằm trong adapter: `aisef/clients/opencode.py` **không có** cờ giới hạn
+lượt nào (`grep -c "max-turns"` → 0), vì OpenCode CLI không cung cấp cờ ấy —
+`claude_code.py` thì có `--max-turns`. Nên với client này, `run.max_turns` là
+một con số **không ai thi hành**: một knob hứa suông.
+
+Đây là cùng lỗ hổng mà [E4](E4-COST-DECOMPOSITION.md) tìm thấy trên `todo-e2e`
+bằng đường khác (một phiên 77 turn nuốt 42 % token của cả dự án). Ở đó tôi mới
+suy từ mã; ở đây có phiên thật, có số, và có `exit_status` tự khai là `timeout`
+chứ không phải `max_turns`.
+
+Không sửa trong lúc đo (adapter là một phần hệ đang đo). Việc phải làm sau khi
+đóng đợt, nay có hai bằng chứng độc lập: adapter OpenCode tự đếm `step_finish`
+trên luồng sự kiện và dừng tiến trình khi chạm trần, báo `exit_status =
+max_turns`. Một trần theo thời gian không phải trần theo chi phí.
