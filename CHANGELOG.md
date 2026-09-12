@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- **One misplaced attribute emptied the design contract, and the gate passed**
+  (bug 96). The mockup agent put `data-annotation` — the marker for "this part
+  is documentation, not a commitment" — on the `<section data-state="primary">`
+  itself, so the extractor subtracted the entire state subtree and wrote a
+  contract with zero components, for a screen whose mockup had a textarea, an
+  Add button and a search box. Nothing failed: the gate carries only a warning
+  for an empty component list, and the later mockup-map step compares an empty
+  contract against anything at all and passes. A state section is never an
+  annotation, so the extractor now says so; re-extracting the same HTML
+  recovered all three components without another model call.
+
 - **Architecture decisions bound to NFRs reached no session at all** (bug 93).
   A decision declaring `Binds: NFR-1, NFR-3` parsed to an empty list, because
   the reference scanner only knew `FR-`; an empty list is not "binds

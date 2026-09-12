@@ -67,8 +67,12 @@ for (const job of input.jobs ?? []) {
     // Chú thích của chính tài liệu mockup: tiêu đề trạng thái, ghi chú cho
     // người đọc. Ứng dụng thật không bao giờ dựng chúng, nên chúng không
     // phải cam kết.
+    // `:not([data-state])` — một mục trạng thái không bao giờ là chú thích.
+    // Lỗi 96: model đánh `data-annotation` lên chính `<section data-state=
+    // "primary">`; cả cây con bị trừ đi, hợp đồng còn **0 thành phần** trong
+    // khi mockup có đủ ô nhập, nút Add, ô tìm kiếm — và cổng vẫn PASS.
     const annotations = [];
-    for (const region of await page.locator('[data-annotation]').all()) {
+    for (const region of await page.locator('[data-annotation]:not([data-state])').all()) {
       annotations.push(await region.ariaSnapshot());
     }
 

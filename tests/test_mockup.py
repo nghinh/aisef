@@ -100,6 +100,23 @@ class TestExtractContract(MockupTestCase):
         self.assertIn("Tìm ghi chú", names)
         self.assertNotIn("Ghi chú", names)
 
+    def test_state_section_marked_as_annotation_still_commits(self):
+        """Lỗi 96: model đánh `data-annotation` lên chính `<section
+        data-state="primary">`. Cả cây con bị trừ khỏi cam kết, hợp đồng còn
+        **0 thành phần** trong khi mockup có đủ ô nhập, nút, ô tìm kiếm — và
+        cổng vẫn PASS, nên khâu đối chiếu về sau không so gì cả."""
+        p = self.root / "mockups" / "danh-sach.html"
+        p.write_text(
+            p.read_text(encoding="utf-8").replace(
+                '<section data-state="primary">',
+                '<section data-state="primary" data-annotation>', 1),
+            encoding="utf-8",
+        )
+        contract, _ = extract(self.root, self.exp)
+        names = [c.name for c in contract.by_id("danh-sach").components]
+        self.assertIn("Ghi chú mới", names)
+        self.assertIn("Tìm ghi chú", names)
+
     def test_only_the_primary_state_is_a_commitment(self):
         """Ứng dụng thật ở một thời điểm chỉ ở **một** trạng thái. Gộp cả
         "rỗng" lẫn "có kết quả" vào cam kết thì không màn hình thật nào
