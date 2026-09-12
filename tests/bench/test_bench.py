@@ -789,6 +789,19 @@ class TestLenhAnalyzeCoThat(unittest.TestCase):
             ra = A.cut_sessions(db)
         self.assertEqual(ra, {("opencode", "bug-a2-x", 1): (2, 1)})
 
+    def test_cot_phu_noi_bao_nhieu_luot_xong_gia_that_ra_bi_cat(self):
+        """Không trừ vào cột "xong giả" — định nghĩa đã đóng băng trước khi
+        chạy. Chỉ nói thêm, để người đọc tự trừ nếu muốn."""
+        from . import _analyze as A
+        phien = A.Session(task_id="t", client="opencode", attempt=1, outcome="FAIL",
+                          turns=9, false_done=True, out_of_scope=[], workspace_found=True,
+                          edited=[])
+        co_cat = A.report([phien], {("opencode", "t", 1): (2, 1)})
+        khong_cat = A.report([phien], {("opencode", "t", 1): (2, 0)})
+        self.assertIn("| opencode | 1 | 1 | 1 | 1 | 1 |", co_cat)
+        self.assertIn("| opencode | 1 | 1 | 1 | 1 | 0 |", khong_cat)
+        self.assertIn("| opencode | 1 | 1 | 1 | 1 | — |", A.report([phien], {}))
+
     def test_khong_co_kho_phien_thi_chi_so_them_bi_bo_qua(self):
         """Chỉ số này là phần thêm: CI không có kho phiên của OpenCode, và bảng
         chính vẫn phải in ra được."""

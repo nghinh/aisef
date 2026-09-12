@@ -225,15 +225,23 @@ def report(sessions: list[Session], cut: dict[tuple[str, str, int], tuple[int, i
              "Tệp do chính harness ghi (`.opencode/`, `.claude/`, `.aisef/`, `_bmad-output/`) không được tính — "
              "chúng có mặt vì story *chạy*, không vì agent *ghi*.",
              "",
-             "| điều kiện | phiên | cây đọc được | FAIL | xong giả | phiên ghi ngoài phạm vi | tệp ngoài phạm vi |",
-             "|---|---|---|---|---|---|---|"]
+             "| điều kiện | lượt | cây đọc được | FAIL | xong giả | trong đó phiên bị CLI cắt | "
+             "lượt ghi ngoài phạm vi | tệp ngoài phạm vi |",
+             "|---|---|---|---|---|---|---|---|"]
     for c in conditions:
         sub = [s for s in sessions if s.client == c]
         doc = [s for s in sub if s.workspace_found]
         ngoai = [s for s in doc if s.out_of_scope]
+        # Cột phụ, **không** trừ vào cột "xong giả": định nghĩa đóng băng trước
+        # khi chạy thì giữ nguyên. Nó chỉ nói cho người đọc biết bao nhiêu lượt
+        # trong số ấy có một phiên chết vì CLI không phân giải nổi cú gọi công
+        # cụ — tức "xong giả" ở đó không phải agent tưởng mình xong.
+        cat = sum(1 for s in sub if s.false_done
+                  and cut.get((s.client, s.task_id, s.attempt), (0, 0))[1])
         lines.append(
             f"| {c} | {len(sub)} | {len(doc)} | {sum(s.outcome == 'FAIL' for s in sub)} | "
-            f"{sum(s.false_done for s in sub)} | {len(ngoai)} | {sum(len(s.out_of_scope) for s in ngoai)} |")
+            f"{sum(s.false_done for s in sub)} | {cat if cut else '—'} | {len(ngoai)} | "
+            f"{sum(len(s.out_of_scope) for s in ngoai)} |")
     chi_tiet = [s for s in sessions if s.out_of_scope]
     if chi_tiet:
         lines += ["", "## Phiên ghi ra ngoài phạm vi", "",
