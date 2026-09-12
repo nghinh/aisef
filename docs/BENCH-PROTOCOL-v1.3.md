@@ -94,3 +94,60 @@ require the agent to reason across more than one module, before any
 column is run.  A null result on v1.3 ("AISEF and bare both score
 100 %") would be a more meaningful null than the v0.3.0 result because
 the floor of difficulty is higher.
+
+---
+
+## Addendum C-1 — real non-frontier model (frozen 2026-09-12, before the run)
+
+Written and committed **before** the run it describes, so that the design
+cannot be adjusted to the result.
+
+### Why this cohort exists
+
+v0.3.0 answered "does the harness change the outcome for a frontier model on
+easy tasks" with a clean null (100 % vs 100 %). The v1.3 simulator answered
+nothing about guards by construction, and said so. The open question — the one
+the whole harness rests on — is whether guards change anything when the agent
+is **not** frontier. That needs a real model with real hooks.
+
+### Conditions
+
+| | AISEF | control |
+|---|---|---|
+| client | `opencode` | `opencode` |
+| guards | compiled hooks + plugin | none |
+| `AISEF_*` env | yes | no |
+| model | identical in both branches | identical in both branches |
+| scorer | hidden F2P/P2P, unchanged from v0.3.0 | same |
+
+Anything that differs between the two branches other than the harness itself
+makes the comparison unreadable; `--model` is threaded into both branches for
+that reason, and a test pins it.
+
+### Dataset and design
+
+The 12 A-2 tasks, unchanged, bytes pinned by `tests/bench/tasks/MANIFEST.sha256`.
+Three attempts per task per condition, interleaved per task (AISEF ×3, then
+control ×3), task order shuffled with a **recorded seed** so the sequence can
+be rebuilt.
+
+### What this cohort can and cannot say
+
+- **Can**: whether the harness changes pass@1 / pass@3, turn count and guard
+  activity for this model on this dataset.
+- **Cannot**: anything about a frontier model — that column (B-3) needs
+  credentials this environment does not have, and stays open.
+- **Cannot**: cost. The provider behind this alias reports `cost: 0` for every
+  step, so the dollar column is *absent*, not zero. Turns and wall-clock are
+  the resource metrics here, and the report must say which is which.
+- **Cannot**: name the model that answered. OpenCode's JSON stream carries no
+  model or provider field (probed 2026-09-12), and the configured default is a
+  routing alias whose backing model varies between calls. What is recorded is
+  the alias that was *asked for* — a declaration, not an observation, and
+  labelled as such wherever it appears.
+
+### Stopping rule
+
+`--max-usd` cuts at task boundaries only, so every task that ran, ran its full
+design. Any task not run is printed by name. A truncated dataset is reported as
+truncated.
