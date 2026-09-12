@@ -180,16 +180,49 @@ class TestMultiProjectDashboard(unittest.TestCase):
         with patch("aisef.cli.dashboard._artifact_root", return_value=self.proj_a):
             groups = _collect_projects(args)
         self.assertEqual(len(groups), 2)
-        names = [n for n, _ in groups]
+        names = [n for n, _root, _evs in groups]
         self.assertIn("proj-a", names)
         self.assertIn("proj-b", names)
+        for _n, root, _evs in groups:      # thư mục tạo tác đi kèm: sổ hành vi đọc từ đó
+            self.assertTrue(Path(root).is_dir(), root)
 
     def test_project_summary_table_only_for_multi(self):
         from aisef.cli.dashboard import _project_summary
         self._seed(self.store_a, "SA-01")
         evs = [self.store_a.read("SA-01")]
-        self.assertEqual(_project_summary([("a", evs)]), "")
-        self.assertIn("Project summary", _project_summary([("a", evs), ("b", evs)]))
+        self.assertEqual(_project_summary([("a", self.proj_a, evs)]), "")
+        self.assertIn("Project summary",
+                      _project_summary([("a", self.proj_a, evs), ("b", self.proj_b, evs)]))
+
+    def test_tom_tat_van_hanh_in_bon_con_so(self):
+        """DoD đợt 4 mục 4.2: một lệnh in chi phí/tuần · VERIFIED ròng trên mỗi
+        đô · gap tồn · tuổi hợp quy. Bốn dòng ấy phải có mặt, kể cả khi nhà
+        cung cấp không báo chi phí — im lặng ở đây đọc thành "không tốn gì"."""
+        from aisef.cli.dashboard import tom_tat_van_hanh
+        self._seed(self.store_a, "SA-01")
+        ra = tom_tat_van_hanh([("a", self.proj_a, [self.store_a.read("SA-01")])])
+        for nhan in ("chi phí/tuần", "VERIFIED ròng", "gap tồn", "tuổi hợp quy"):
+            self.assertIn(nhan, ra)
+        self.assertIn("không báo chi phí", ra)   # fixture không có cost_usd
+
+    def test_chi_phi_theo_tuan_gom_dung_tuan_iso(self):
+        from aisef.cli.dashboard import chi_phi_theo_tuan
+        from aisef.harness.observe import AGENT_RUN, Event
+        # hai sự kiện cách nhau đúng một tuần → hai dòng, không cộng dồn
+        for at, tien in ((1789000000.0, 1.5), (1789000000.0 + 7 * 86400, 2.5)):
+            self.store_a.record("SA-02", Event(kind=AGENT_RUN, name="SA-02#1", ok=True,
+                                               cost_usd=tien, at=at))
+        tuan = chi_phi_theo_tuan([("a", self.proj_a, [self.store_a.read("SA-02")])])
+        self.assertEqual(len(tuan), 2, tuan)
+        self.assertEqual(sorted(v for _t, v in tuan), [1.5, 2.5])
+
+    def test_tuoi_hop_quy_noi_ro_khi_khong_doc_duoc(self):
+        """Bản cài từ gói không mang `docs/` — phải nói "không đọc được", không
+        được trả 0 ngày (đọc thành "bảng vừa chạy xong")."""
+        from aisef.cli.dashboard import tuoi_hop_quy
+        ngay, vi_sao = tuoi_hop_quy(self.root / "khong-co-framework")
+        self.assertEqual(ngay, -1)
+        self.assertIn("docs/", vi_sao)
 
     def test_generate_html_with_extra_sections(self):
         from aisef.cli.dashboard import generate_html

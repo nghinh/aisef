@@ -243,15 +243,20 @@ def generate_html(evidences: list[Evidence], *, project: str = "",
 </html>"""
 
 
-def _collect_projects(args) -> list[tuple[str, list[Evidence]]]:
-    """Collect evidence from the main project and any additional projects."""
-    groups: list[tuple[str, list[Evidence]]] = []
+def _collect_projects(args) -> list[tuple[str, Path, list[Evidence]]]:
+    """Collect evidence from the main project and any additional projects.
+
+    Trả cả **thư mục tạo tác**, không chỉ tên và bằng chứng: sổ hành vi và bảng
+    hợp quy đọc từ đĩa, và một bảng điều khiển nhiều dự án không thể suy ngược
+    đường dẫn từ cái tên.
+    """
+    groups: list[tuple[str, Path, list[Evidence]]] = []
     root = _artifact_root(args)
     store = EvidenceStore(root)
     ids = store.stories()
     if ids:
         evidences = [store.read(sid) for sid in ids]
-        groups.append((Path(args.project).resolve().name, evidences))
+        groups.append((Path(args.project).resolve().name, root, evidences))
     for p in getattr(args, "projects", None) or []:
         pp = Path(p).resolve()
         pr = pp / "_bmad-output"
@@ -260,16 +265,16 @@ def _collect_projects(args) -> list[tuple[str, list[Evidence]]]:
         st = EvidenceStore(pr)
         sids = st.stories()
         if sids:
-            groups.append((pp.name, [st.read(sid) for sid in sids]))
+            groups.append((pp.name, pr, [st.read(sid) for sid in sids]))
     return groups
 
 
-def _project_summary(groups: list[tuple[str, list[Evidence]]]) -> str:
+def _project_summary(groups: list[tuple[str, Path, list[Evidence]]]) -> str:
     """Multi-project summary table."""
     if len(groups) <= 1:
         return ""
     rows = []
-    for name, evs in groups:
+    for name, _root, evs in groups:
         stories = len(evs)
         cost = sum(e.total_cost_usd for e in evs)
         blocks = sum(len(e.of(GUARD_BLOCK)) for e in evs)
@@ -284,15 +289,88 @@ def _project_summary(groups: list[tuple[str, list[Evidence]]]) -> str:
     )
 
 
+def _tuan(at: float) -> str:
+    return time.strftime("%G-W%V", time.gmtime(at))
+
+
+def chi_phi_theo_tuan(groups, *, so_tuan: int = 4) -> list[tuple[str, float]]:
+    """Chi phí thật theo tuần ISO, mới nhất trước. Tuần không có sự kiện không hiện."""
+    theo: dict[str, float] = {}
+    for _name, _root, evs in groups:
+        for ev in evs:
+            for e in ev.events:
+                if e.cost_usd:
+                    theo[_tuan(e.at)] = theo.get(_tuan(e.at), 0.0) + e.cost_usd
+    return sorted(theo.items(), reverse=True)[:so_tuan]
+
+
+def tuoi_hop_quy(goc_framework: Path | None = None) -> tuple[int, str]:
+    """(số ngày, lý do nếu không đọc được). -1 nghĩa là không đọc được.
+
+    Bảng hợp quy là của **framework**, không của dự án đích, và bản cài từ gói
+    không mang `docs/` — nên "không đọc được" là kết cục hợp lệ, không phải lỗi.
+    """
+    from datetime import date
+
+    from ..control import conformance as C
+
+    goc = goc_framework or Path(__file__).resolve().parents[2]
+    p = goc / C.REPORT_PATH
+    if not p.is_file():
+        return -1, f"không có {C.REPORT_PATH} (bản cài từ gói không mang docs/)"
+    ngay = C.parse(p.read_text(encoding="utf-8")).generated
+    try:
+        sinh = date.fromisoformat(str(ngay))
+    except ValueError:
+        return -1, f"bảng ghi ngày sinh không đọc được: {ngay!r}"
+    return (date.today() - sinh).days, ""
+
+
+def tom_tat_van_hanh(groups) -> str:
+    """Bốn con số vận hành, in ra terminal — thứ người vận hành hỏi hằng tuần."""
+    from ..control import ledger as L
+
+    dong = ["", "Vận hành:"]
+    tuan = chi_phi_theo_tuan(groups)
+    if tuan:
+        dong.append("  chi phí/tuần   " + " · ".join(f"{t} ${v:.2f}" for t, v in tuan))
+    else:
+        dong.append("  chi phí/tuần   — nhà cung cấp không báo chi phí (mọi sự kiện $0)")
+
+    tong_verified = tong_gap = 0
+    tong_tien = 0.0
+    for name, root, evs in groups:
+        s = L.build(root).summary()
+        tong_verified += s["verified"]
+        tong_gap += s["gap"] + s["reopened"]
+        tien = sum(e.total_cost_usd for e in evs)
+        tong_tien += tien
+        if len(groups) > 1:
+            dong.append(f"    {name}: VERIFIED {s['verified']} · gap {s['gap']} "
+                        f"· reopened {s['reopened']} · ${tien:.2f}")
+    moi_do = f"{tong_verified / tong_tien:.1f} hành vi/$" if tong_tien else "— (chi phí $0)"
+    dong.append(f"  VERIFIED ròng  {tong_verified} ({moi_do})")
+    dong.append(f"  gap tồn        {tong_gap}")
+
+    ngay, vi_sao = tuoi_hop_quy()
+    if ngay < 0:
+        dong.append(f"  tuổi hợp quy   không đọc được — {vi_sao}")
+    else:
+        from ..control.conformance import MAX_AGE_DAYS
+        dau = "✅" if ngay <= MAX_AGE_DAYS else "⚠"
+        dong.append(f"  tuổi hợp quy   {ngay} ngày (trần {MAX_AGE_DAYS}) {dau}")
+    return "\n".join(dong)
+
+
 def cmd_dashboard(args) -> int:
     groups = _collect_projects(args)
     if not groups:
         print("✗ no evidence found — run `aisef run` first", file=__import__("sys").stderr)
         return EXIT_NOT_READY
 
-    all_evidences = [e for _, evs in groups for e in evs]
+    all_evidences = [e for _, _root, evs in groups for e in evs]
     multi_summary = _project_summary(groups)
-    project_label = ", ".join(name for name, _ in groups) if len(groups) > 1 else groups[0][0]
+    project_label = ", ".join(n for n, _r, _e in groups) if len(groups) > 1 else groups[0][0]
     content = generate_html(all_evidences, project=project_label,
                             extra_sections=multi_summary)
 
@@ -301,4 +379,5 @@ def cmd_dashboard(args) -> int:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(content, encoding="utf-8")
     print(f"dashboard: {out}")
+    print(tom_tat_van_hanh(groups))
     return EXIT_OK
