@@ -271,3 +271,51 @@ Con số hữu ích cho người thiết kế đợt sau: trong 12 task, chỉ *
 Nghĩa là một cohort 12 task × 3 lượt tốn ~6 giờ chỉ cho ra **9 lượt có thông
 tin**. Đợt sau nên tuyển task theo tiêu chí "đã từng có nhánh thắng nhánh kia",
 chứ không tuyển theo cảm giác khó.
+
+## Addendum C-1b — đóng băng 13/09, **trước** khi chạy
+
+### Vì sao cần một đợt nữa, và vì sao nó **nhỏ hơn** chứ không lớn hơn
+
+C-1 tốn ~6 giờ và chỉ cho **9 lượt có thông tin**: 6 task chạm trần ở cả hai
+nhánh, 3 task bất khả ở cả hai nhánh, 3 task phân biệt được. Thêm task là mua
+thêm phiên bị cắt; thêm **lượt trên đúng 3 task phân biệt được** là mua thêm
+tín hiệu.
+
+### Thiết kế
+
+| | |
+|---|---|
+| task | `sec-1`, `sec-2`, `state-3` — ba task duy nhất có nhánh thắng nhánh kia ở C-1 |
+| lượt | **6** mỗi task mỗi điều kiện (C-1 là 3) |
+| điều kiện | `opencode` (AISEF) vs `opencode-bare`, khác đúng một thứ |
+| model | **vẫn MiniMax-M2.7** sau alias `mycombo` (lời khai chủ dự án 13/09) — đây **không** phải cột 2 |
+| bộ dữ liệu | **v1.4** (`sec-2` đã sửa đề bài; hai task kia không đổi byte) |
+| trần lượt | `TRAN_LUOT = 0` như C-1 |
+| chạy lại khi hạ tầng hỏng | **1 lần** (`INFRA_RETRIES = 1`) — mới, xem dưới |
+| tổng | 3 × 6 × 2 = **36 lượt** |
+
+### Thứ đổi so với C-1, và vì sao nó không phải "làm đẹp kết quả"
+
+**Phiên chết vì hạ tầng được chạy lại một lần.** Ở C-1, 20/24 lượt trượt có một
+phiên bị CLI cắt giữa chừng — model in cú gọi công cụ mà CLI không phân giải
+được. Tính chúng là "lượt trượt của agent" là sai về bản chất, và nó làm **cả
+hai** nhánh xấu đi chứ không thiên vị nhánh nào. Bản vá 13/09 khiến adapter gọi
+tên đúng kiểu hỏng ấy (`infra`), và bench chạy lại **một** lần trên cây làm việc
+mới, ghi `bench:infra_retry` vào bằng chứng.
+
+Vì sao không phải là nới scorer: scorer (F2P/P2P trên test ẩn) **không đổi một
+dòng**. Cái đổi là định nghĩa "một lượt" — và nó đổi theo hướng *khắt khe hơn*
+với sản phẩm, vì nhánh AISEF là nhánh có nhiều phiên bị cắt hơn (31 % so với
+25 %), nên nó là nhánh được lợi ít hơn từ việc bỏ các phiên chết. Ghi ra để
+người đọc tự kiểm hướng thiên vị.
+
+**Hệ quả so sánh:** C-1b **không so trực tiếp** với C-1 (khác định nghĩa lượt,
+khác byte đề bài `sec-2`). Nó trả lời một câu hẹp hơn: *trên ba task từng phân
+biệt được, với phiên hạ tầng đã loại, harness có đổi kết cục không?*
+
+### Điều kiện dừng và cách đọc
+
+- Dừng sớm nếu **cả hai** nhánh đạt 6/6 trên cả ba task: trần dữ liệu, báo và dừng.
+- Đọc **theo từng task**, không theo một con số tổng: n = 6 vẫn quá nhỏ cho
+  một hiệu số tổng.
+- Kết quả null vẫn là kết quả và vẫn được báo.

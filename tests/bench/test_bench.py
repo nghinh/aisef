@@ -761,6 +761,35 @@ class TestLenhAnalyzeCoThat(unittest.TestCase):
                 pass
         self.assertIn("Đo lại sau đợt chạy", ra.getvalue())
 
+    def test_phien_chet_vi_ha_tang_duoc_chay_lai_khong_an_mat_luot(self):
+        """20/24 lượt trượt của C-1 có một phiên bị CLI cắt. Tính chúng là lượt
+        của agent thì mọi kết luận về harness đều đọc sai — nên bench chạy lại
+        một lần khi trạng thái thoát thuộc nhóm hạ tầng."""
+        import inspect
+
+        from aisef.clients.stream import INFRA_STATUSES
+        from . import _runner as R
+        self.assertEqual(R.INFRA_RETRIES, 1)
+        src = inspect.getsource(R.run)
+        self.assertIn("for lan in range(1, INFRA_RETRIES + 2)", src)
+        self.assertIn("trang_thai not in INFRA_STATUSES or lan > INFRA_RETRIES", src)
+        # nhóm hạ tầng phải gồm cả kiểu hỏng đã đo
+        self.assertIn("infra", INFRA_STATUSES)
+        self.assertIn("rate_limit", INFRA_STATUSES)
+        self.assertIn("timeout", INFRA_STATUSES)
+
+    def test_phien_bi_cli_cat_ra_trang_thai_thuoc_nhom_chay_lai(self):
+        """Mắt nối giữa hai bản vá: adapter đánh dấu phiên bị cắt là `infra`,
+        và bench chạy lại đúng nhóm ấy. Nếu một bên đổi tên trạng thái thì phép
+        thử này đỏ, chứ không phải đợt đo sau âm thầm mất lượt."""
+        import json as _json
+
+        from aisef.clients.opencode import parse_json_events
+        from aisef.clients.stream import INFRA_STATUSES, exit_status_of
+        res = parse_json_events([_json.dumps(
+            {"type": "text", "part": {"text": '<minimax:tool_call><invoke name="read">'}})])
+        self.assertIn(exit_status_of(res), INFRA_STATUSES)
+
     def test_hai_dieu_kien_chay_cung_che_do_tran_luot(self):
         """Cột 1 chạy khi adapter chưa thi hành trần lượt (một phiên 61 lượt,
         § O-10). Nếu bench truyền `run.max_turns` thì từ 13/09 phiên sẽ bị giết

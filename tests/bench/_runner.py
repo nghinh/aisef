@@ -44,6 +44,7 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisef.clients.base import ClientAdapter, RunSpec  # noqa: E402
+from aisef.clients.stream import INFRA_STATUSES, exit_status_of  # noqa: E402
 from aisef.kit.fetch import remove_tree  # noqa: E402
 from aisef.clients.compile import compile_for, write_compile_report  # noqa: E402
 from aisef.config import Config  # noqa: E402
@@ -257,6 +258,12 @@ def _prompt(task: Task, ws: Path, cfg: Config) -> str:
     )
 
 
+#: Số lần chạy lại khi phiên chết vì hạ tầng, **không** tính vào lượt của agent.
+#: 1 là đủ để phiên bị CLI cắt không ăn mất một lượt, và đủ nhỏ để một nhà cung
+#: cấp đang hỏng không kéo đợt đo dài vô hạn. Đổi số này = đổi giao thức.
+INFRA_RETRIES = 1
+
+
 def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = False,
         model: str = "", note: str = "") -> list[Result]:
     """``model`` đi vào **cả hai** điều kiện như nhau — nhóm đối chứng phải
@@ -269,59 +276,75 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = Fa
             out.append(Result(task.id, condition, n, INVALID, note=note,
                               error=task.invalid_reason or "chưa validate"))
             continue
-        ws = materialize(task, KEEP_DIR / "run" / condition / task.id / f"a{n}", tests=task.tests_visible)
-        base = head_sha(ws)
-        root = ws / "_bmad-output"
-        if not bare and not sim:
-            # Simulated clients do not run real hooks — skip compile_for
-            # so the worktree stays free of a misleading settings.json.
-            write_compile_report(ws, [compile_for(client.id, ws, aisef_bin=str(ROOT / "bin" / "aisef"))])
-        store = EvidenceStore(root)
-        store.record(task.id, Event(kind=NOTE, name="mode",
-                                    detail={"mode": "bench", "client": condition, "attempt": n,
-                                            "base": base, "bare": bare,
-                                            "sim": sim}))
-        cfg = Config.load(ws)
-        prompt = _prompt(task, ws, cfg)
-        sim_env = (
-            {
-                "AISEF_BENCH_TASK_DIR": str(task.dir),
-                "AISEF_BENCH_AISEF_ROOT": str(repo_for(task)),
-                "AISEF_BENCH_ATTEMPT": str(n),
-                "AISEF_BENCH_BASE_SHA": base,
-            }
-            if sim
-            else {}
-        )
-        # `max_turns=0` là **có chủ ý**, không phải quên: cột 1 của cohort C-1
-        # (12/09) chạy khi adapter OpenCode chưa thi hành trần lượt, nên chế độ
-        # thật của nó là "chỉ đồng hồ chặn" — một phiên đã chạy 61 lượt (O-10).
-        # Từ 13/09 adapter giết tiến trình tại trần; nếu để `run.max_turns` ở
-        # đây thì cột 2 chạy dưới một chế độ khác cột 1 và hai cột hết so được.
-        # Đổi con số này = đổi giao thức: phải ghi vào BENCH-PROTOCOL trước.
-        TRAN_LUOT = 0
-        if bare:
-            spec = RunSpec(
-                prompt=prompt, workdir=ws, max_turns=TRAN_LUOT,
-                timeout_seconds=cfg["run.timeout_seconds"],
-                model=model,
-                env=sim_env,
+        for lan in range(1, INFRA_RETRIES + 2):
+            ws = materialize(task, KEEP_DIR / "run" / condition / task.id / f"a{n}", tests=task.tests_visible)
+            base = head_sha(ws)
+            root = ws / "_bmad-output"
+            if not bare and not sim:
+                # Simulated clients do not run real hooks — skip compile_for
+                # so the worktree stays free of a misleading settings.json.
+                write_compile_report(ws, [compile_for(client.id, ws, aisef_bin=str(ROOT / "bin" / "aisef"))])
+            store = EvidenceStore(root)
+            store.record(task.id, Event(kind=NOTE, name="mode",
+                                        detail={"mode": "bench", "client": condition, "attempt": n,
+                                                "base": base, "bare": bare,
+                                                "sim": sim}))
+            cfg = Config.load(ws)
+            prompt = _prompt(task, ws, cfg)
+            sim_env = (
+                {
+                    "AISEF_BENCH_TASK_DIR": str(task.dir),
+                    "AISEF_BENCH_AISEF_ROOT": str(repo_for(task)),
+                    "AISEF_BENCH_ATTEMPT": str(n),
+                    "AISEF_BENCH_BASE_SHA": base,
+                }
+                if sim
+                else {}
             )
-        else:
-            settings = ws / ".claude" / "settings.json"
-            spec = RunSpec(
-                prompt=prompt, workdir=ws, max_turns=TRAN_LUOT,
-                timeout_seconds=cfg["run.timeout_seconds"],
-                settings_file=settings if settings.is_file() and not sim else None,
-                model=model,
-                env={
-                    **sim_env,
-                    ENV_WRITE_SCOPE: ",".join(task.write_scope), ENV_STORY_ID: task.id,
-                    ENV_BASE_REF: base, ENV_WORKDIR: str(ws), ENV_PROJECT: str(ws),
-                },
-            )
-        result = client.run(spec)
-        store.agent_run(task.id, result, name=f"{task.id}#{n}", prompt_chars=len(prompt))
+            # `max_turns=0` là **có chủ ý**, không phải quên: cột 1 của cohort C-1
+            # (12/09) chạy khi adapter OpenCode chưa thi hành trần lượt, nên chế độ
+            # thật của nó là "chỉ đồng hồ chặn" — một phiên đã chạy 61 lượt (O-10).
+            # Từ 13/09 adapter giết tiến trình tại trần; nếu để `run.max_turns` ở
+            # đây thì cột 2 chạy dưới một chế độ khác cột 1 và hai cột hết so được.
+            # Đổi con số này = đổi giao thức: phải ghi vào BENCH-PROTOCOL trước.
+            TRAN_LUOT = 0
+            if bare:
+                spec = RunSpec(
+                    prompt=prompt, workdir=ws, max_turns=TRAN_LUOT,
+                    timeout_seconds=cfg["run.timeout_seconds"],
+                    model=model,
+                    env=sim_env,
+                )
+            else:
+                settings = ws / ".claude" / "settings.json"
+                spec = RunSpec(
+                    prompt=prompt, workdir=ws, max_turns=TRAN_LUOT,
+                    timeout_seconds=cfg["run.timeout_seconds"],
+                    settings_file=settings if settings.is_file() and not sim else None,
+                    model=model,
+                    env={
+                        **sim_env,
+                        ENV_WRITE_SCOPE: ",".join(task.write_scope), ENV_STORY_ID: task.id,
+                        ENV_BASE_REF: base, ENV_WORKDIR: str(ws), ENV_PROJECT: str(ws),
+                    },
+                )
+            result = client.run(spec)
+            store.agent_run(task.id, result, name=f"{task.id}#{n}", prompt_chars=len(prompt))
+
+            # Phiên chết vì hạ tầng (CLI cắt phiên, 429, timeout của nhà cung cấp)
+            # **không phải một lượt của agent**. Đo trên C-1: 20/24 lượt trượt có
+            # một phiên bị CLI cắt — tính chúng là lượt trượt của agent thì mọi
+            # kết luận về harness đều đọc sai (§ O-7). Chạy lại trên cây làm việc
+            # mới, tối đa `INFRA_RETRIES` lần, và ghi lại số lần đã bỏ.
+            trang_thai = exit_status_of(result)
+            if trang_thai not in INFRA_STATUSES or lan > INFRA_RETRIES:
+                break
+            store.record(task.id, Event(kind=NOTE, name="bench:infra_retry",
+                                        ok=False, detail={"attempt": n, "lan": lan,
+                                                          "exit_status": trang_thai,
+                                                          "error": result.error[:200]}))
+            print(f"  ↻ {task.id} {condition} lượt {n}: {trang_thai} — chạy lại ({lan}/{INFRA_RETRIES})",
+                  file=sys.stderr)
 
         # guard.protect (BERBench): test agent chạm bị hoàn nguyên, rồi test ẩn mới được áp.
         for p in [p for p in changed_files(str(ws), base_ref=base) if is_test_path(p)]:
