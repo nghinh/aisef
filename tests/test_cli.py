@@ -992,6 +992,24 @@ class TestQuyUocMaThoat(unittest.TestCase):
         self.assertEqual(p.parse_args(["--project", "/tmp/x", "gates"]).project, "/tmp/x")
         self.assertEqual(p.parse_args(["gates", "--project", "/tmp/y"]).project, "/tmp/y")
 
+    def test_reject_doi_tao_tac_co_that_nhu_approve(self):
+        """`approve` đòi tạo tác có thật; nếu `reject` không đòi thì ghi được một
+        lời từ chối cho thứ **chưa tồn tại**, và khi pha kế hoạch sinh ra tạo
+        tác thật thì cổng đã mang sẵn trạng thái "bị từ chối" kèm nhận xét viết
+        trước khi có gì để nhận xét. Đo 13/09/2026: `approve prd` thoát 2 trong
+        khi `reject prd` thoát 0 trên cùng dự án rỗng."""
+        import subprocess
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            ap = subprocess.run([sys.executable, "-m", "aisef", "approve", "prd", "--project", d],
+                                capture_output=True, text=True, cwd=str(ROOT))
+            rj = subprocess.run([sys.executable, "-m", "aisef", "reject", "prd",
+                                 "--note", "x", "--project", d],
+                                capture_output=True, text=True, cwd=str(ROOT))
+        self.assertEqual(ap.returncode, 2, ap.stderr[-200:])
+        self.assertEqual(rj.returncode, 2, rj.stdout + rj.stderr)
+        self.assertIn("nothing to reject yet", rj.stderr)
+
     def test_guard_go_sai_thi_chan_chu_khong_cho_qua(self):
         """Hook đọc mã thoát: **2 = chặn**, mọi mã khác = không chặn. Nên quy
         ước "1 = gõ sai" đúng ở mọi lệnh **trừ** `guard`.

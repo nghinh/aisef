@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **`reject` requires the artifact to exist, like `approve` does** (bug 85).
+  On an empty project `approve prd` refused with "no artifact" while `reject
+  prd --note x` succeeded, recording a verdict on a document that did not
+  exist yet. When the planning phase then produced it, the gate already
+  carried a rejection written before there was anything to read.
+
 - **A mistyped guard name blocks instead of passing** (bug 84). The bug-81
   fix — usage errors exit 1 — collided with the hook protocol, where any exit
   code other than 2 means "not blocked". So `aisef guard <typo>`, which a

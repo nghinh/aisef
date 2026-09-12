@@ -209,6 +209,17 @@ def cmd_approve(args) -> int:
 def cmd_reject(args) -> int:
     store = _approvals(args)
     gate: Gate = args.gate
+    # `approve` đòi tạo tác có thật; `reject` thì không — bất đối xứng ấy cho
+    # phép ghi một lời từ chối cho thứ **chưa tồn tại**. Khi pha kế hoạch sinh
+    # ra tạo tác thật, cổng đã mang sẵn trạng thái "bị từ chối" kèm một lời
+    # nhận xét viết trước khi có gì để nhận xét — người đọc sau không có cách
+    # nào biết điều đó. Đo 13/09/2026 trên dự án mới: `approve prd` thoát 2
+    # "no artifact", cùng lúc `reject prd --note test` thoát 0.
+    if not store.has_artifacts(gate):
+        missing = ", ".join(p.name for p in store.artifact_paths(gate) if not is_present(p))
+        print(f"✗ no artifact for gate {gate.value}: {missing} — nothing to reject yet",
+              file=sys.stderr)
+        return EXIT_NOT_READY
     try:
         rec = store.reject(gate, note=args.note)
     except ValueError as e:
