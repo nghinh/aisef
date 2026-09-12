@@ -937,7 +937,7 @@ section { padding: 100px 0; }
           <li>On simple bug-fix tasks, correctness was saturated for both harnessed and bare agents. On 12 hard tasks with a non-frontier model (cohort C-1): AISEF pass@1 0.64 vs bare 0.69 — nine of twelve tie, and the harnessed arm spends 44% more turns to get there. No measured improvement, and no measured degradation</li>
           <li>AISEF added governance and safety layers with near-zero measured cost overhead on those tasks</li>
           <li>Conformance probes pass 10/10 on two different clients (Claude Code, OpenCode)</li>
-          <li>2,383 unit tests cover all public modules; 297 benchmark runs across 28 challenge tasks (169 of them on real agents, the rest on a simulator that says so)</li>
+          <li>2,391 unit tests cover all public modules; 300 benchmark runs across 28 challenge tasks (169 of them on real agents, the rest on a simulator that says so)</li>
           <li>Crash recovery: three interrupted-run paths (journal reconcile, run loop, improve loop) plus a real SIGKILL mid-write — at most the one half-written line is lost</li>
         </ul>
       </div>
