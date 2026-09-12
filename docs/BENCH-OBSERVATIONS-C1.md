@@ -274,3 +274,40 @@ Ba điều chốt lại từ đây:
 Từ lúc này chỉ số "phiên bị cắt" **được đo bằng mã, không bằng SQL gõ tay**:
 `python3 -m tests.bench analyze` in ra bảng ấy (`tests/bench/_analyze.py ::
 cut_sessions`), nên con số trong báo cáo là con số dựng lại được.
+## O-9 · Đính chính O-7: **harness không hề mở phiên thứ hai**
+
+Ở O-7 tôi viết: "trên `sec-1` lượt 1 và 2, phiên đầu chết vì chữ ký này, harness
+mở **phiên thứ hai** và lượt đó vẫn PASS… Nhánh trần có đúng một phiên cho mỗi
+lượt." Cả hai vế đều sai, và đây là đính chính.
+
+**Đọc mã trước khi kết luận (`tests/bench/_runner.py`):** mỗi lượt gọi
+`client.run(spec)` **đúng một lần**. Không có vòng lặp thử lại ở tầng bench, và
+điều đó đúng cho **cả hai** điều kiện. Vậy "phiên thứ hai" không thể do harness
+mở.
+
+**Đọc số trước khi kết luận:** đếm phiên trên mỗi lượt (khớp theo đường dẫn cây
+làm việc xuất hiện trong phiên):
+
+| điều kiện | lượt | phiên | phiên/lượt | lượt có > 1 phiên |
+|---|---|---|---|---|
+| AISEF | 34 | 49 | 1,44 | 10 |
+| trần | 33 | 38 | 1,15 | 5 |
+
+Nhánh trần **cũng** có lượt nhiều phiên — trong đó `state-2` lượt 3 có hai phiên
+và **cả hai đều mang chữ ký O-7**. Ba trong năm ca của nhánh trần là `multi-3`,
+task bị chạy lại do chunk (nhiễu đã khai ở O-6).
+
+**Cách đọc còn đứng được:** nhiều bản ghi phiên cho một lần gọi `opencode run`
+là hành vi **của CLI**, không phải của harness. Chênh lệch 1,44 so với 1,15 vẫn
+còn và vẫn chưa giải thích được — nhưng không được kể thành "harness chạy lại
+nên cứu được lượt".
+
+**Một giới hạn của chính phép đo này, khai luôn:** phiên được gán về lượt bằng
+cách tìm đường dẫn cây làm việc **trong văn bản của phiên**. Một phiên ở task
+sau có nhắc lại đường dẫn cũ sẽ bị gán nhầm. Ca `sec-3` lượt 1 nhánh trần (hai
+phiên, không phiên nào bị cắt, cả hai đều kết thúc bằng một bản tóm tắt hoàn
+chỉnh) trông đúng như một ca gán nhầm.
+
+Bài học, viết cho lần sau: **một quan sát giải thích theo hướng có lợi cho sản
+phẩm phải đi qua mã trước khi vào báo cáo.** O-7 viết đúng phần đo được (chữ ký,
+tỉ lệ) và sai đúng ở câu duy nhất mang tin vui.
