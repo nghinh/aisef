@@ -57,7 +57,41 @@ from aisef.harness.tools import describe_tools, image_for, run_tool  # noqa: E40
 from ._mine import KEEP_DIR, Task, _git  # noqa: E402
 
 ENABLED = os.environ.get("AISEF_BENCH") == "1"
+
+#: Lệnh `--client <id>` nào trong `aisef.clients.simulated` không tốn tiền,
+#: không cần AISEF_BENCH=1, không chạy compile_for.  Bộ lọc chứ không phải
+#: bí danh để tránh nhầm "opencode" với "opencode-mini".
+SIMULATED_CLIENTS: frozenset[str] = frozenset({"simulated-weak"})
+
 PASS, FAIL, INVALID, UNRUNNABLE = "PASS", "FAIL", "INVALID", "UNRUNNABLE"
+
+
+def make_client(client_id: str) -> ClientAdapter:
+    """Build an adapter by id — bench-only dispatch.
+
+    ``ADAPTERS`` lives in ``aisef.clients.compile`` and is the production
+    registry: only ``claude`` and ``opencode``.  Simulated weak/strong
+    clients live in ``aisef.clients.simulated`` and are reached via
+    this lookup, so the production compile surface does not grow.
+
+    Tests instantiate directly (``SimulatedWeakAdapter()``); this
+    helper exists so the bench CLI does not branch by string.
+    """
+    if client_id == "simulated-weak":
+        from aisef.clients.simulated import SimulatedWeakAdapter
+
+        return SimulatedWeakAdapter()
+    from aisef.clients.compile import ADAPTERS
+
+    if client_id not in ADAPTERS:
+        raise ValueError(f"client not supported: {client_id}. Available: "
+                         f"{', '.join(sorted({*ADAPTERS, *SIMULATED_CLIENTS}))}")
+    return ADAPTERS[client_id]()
+
+
+def is_simulated(client: ClientAdapter) -> bool:
+    """True for clients that bypass ``AISEF_BENCH=1`` and ``compile_for``."""
+    return getattr(client, "id", "") in SIMULATED_CLIENTS
 
 #: Lịch sử của lượt gốc — không vào bản chép.
 _STRIP = ("_bmad-output/evidence", "_bmad-output/journal", "_bmad-output/reviews",
@@ -216,6 +250,7 @@ def _prompt(task: Task, ws: Path, cfg: Config) -> str:
 def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = False) -> list[Result]:
     condition = f"{client.id}-bare" if bare else client.id
     out: list[Result] = []
+    sim = is_simulated(client)
     for n in range(1, attempts + 1):
         if task.invalid_reason or not task.validated.get("gold_pass"):
             out.append(Result(task.id, condition, n, INVALID, error=task.invalid_reason or "chưa validate"))
@@ -223,27 +258,44 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = Fa
         ws = materialize(task, KEEP_DIR / "run" / condition / task.id / f"a{n}", tests=task.tests_visible)
         base = head_sha(ws)
         root = ws / "_bmad-output"
-        if not bare:
+        if not bare and not sim:
+            # Simulated clients do not run real hooks — skip compile_for
+            # so the worktree stays free of a misleading settings.json.
             write_compile_report(ws, [compile_for(client.id, ws, aisef_bin=str(ROOT / "bin" / "aisef"))])
         store = EvidenceStore(root)
         store.record(task.id, Event(kind=NOTE, name="mode",
                                     detail={"mode": "bench", "client": condition, "attempt": n,
-                                            "base": base, "bare": bare}))
+                                            "base": base, "bare": bare,
+                                            "sim": sim}))
         cfg = Config.load(ws)
         prompt = _prompt(task, ws, cfg)
+        sim_env = (
+            {
+                "AISEF_BENCH_TASK_DIR": str(task.dir),
+                "AISEF_BENCH_AISEF_ROOT": str(ROOT),
+                "AISEF_BENCH_ATTEMPT": str(n),
+                "AISEF_BENCH_BASE_SHA": base,
+            }
+            if sim
+            else {}
+        )
         if bare:
             spec = RunSpec(
                 prompt=prompt, workdir=ws, max_turns=cfg["run.max_turns"],
                 timeout_seconds=cfg["run.timeout_seconds"],
+                env=sim_env,
             )
         else:
             settings = ws / ".claude" / "settings.json"
             spec = RunSpec(
                 prompt=prompt, workdir=ws, max_turns=cfg["run.max_turns"],
                 timeout_seconds=cfg["run.timeout_seconds"],
-                settings_file=settings if settings.is_file() else None,
-                env={ENV_WRITE_SCOPE: ",".join(task.write_scope), ENV_STORY_ID: task.id,
-                     ENV_BASE_REF: base, ENV_WORKDIR: str(ws), ENV_PROJECT: str(ws)},
+                settings_file=settings if settings.is_file() and not sim else None,
+                env={
+                    **sim_env,
+                    ENV_WRITE_SCOPE: ",".join(task.write_scope), ENV_STORY_ID: task.id,
+                    ENV_BASE_REF: base, ENV_WORKDIR: str(ws), ENV_PROJECT: str(ws),
+                },
             )
         result = client.run(spec)
         store.agent_run(task.id, result, name=f"{task.id}#{n}", prompt_chars=len(prompt))

@@ -57,25 +57,25 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{t.id:14s} F2P={len(t.f2p_ids)} P2P={len(t.p2p_ids)} flaky={t.flaky_ids} "
                   f"{t.invalid_reason or 'ok'}")
     elif a.cmd == "run":
-        if not R.ENABLED:
+        if a.client not in R.SIMULATED_CLIENTS and not R.ENABLED:
             print("đặt AISEF_BENCH=1 — chạy client thật tốn tiền", file=sys.stderr)
             return 1
-        from aisef.clients.compile import ADAPTERS
-        res = [x for t in pick for x in R.run(t, ADAPTERS[a.client](), attempts=a.attempts, bare=a.bare)]
+        client = R.make_client(a.client)
+        res = [x for t in pick for x in R.run(t, client, attempts=a.attempts, bare=a.bare)]
         print(R.report(res, tasks))
     elif a.cmd == "run-both":
-        if not R.ENABLED:
+        if a.client not in R.SIMULATED_CLIENTS and not R.ENABLED:
             print("đặt AISEF_BENCH=1 — chạy client thật tốn tiền", file=sys.stderr)
             return 1
         import random
-        from aisef.clients.compile import ADAPTERS
+        client = R.make_client(a.client)
         order = list(pick)
         if a.shuffle:
             random.shuffle(order)
         res = []
         for t in order:
-            res += R.run(t, ADAPTERS[a.client](), attempts=a.attempts, bare=False)
-            res += R.run(t, ADAPTERS[a.client](), attempts=a.attempts, bare=True)
+            res += R.run(t, client, attempts=a.attempts, bare=False)
+            res += R.run(t, client, attempts=a.attempts, bare=True)
         print(R.report(res, tasks))
     elif a.cmd == "report":
         print(R.report(R.load_results(), tasks))
