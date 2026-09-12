@@ -151,10 +151,14 @@ class TestValidation(ConfigTestCase):
 
 class TestTemplate(ConfigTestCase):
     def test_writes_readable_template(self):
+        """Mẫu ghi ra phải **ngắn**: chỉ thứ dự án quyết định, cộng khoá bắt
+        buộc khai. Trước 2026-09-12 nó ghi cả `DEFAULTS`, tức đóng băng mọi mặc
+        định vào dự án — xem `TestTepCauHinhChiGhiThuDuAnQuyetDinh`."""
         c = Config.load(self.root, env={})
         p = c.write_template(self.root)
         self.assertTrue(p.is_file())
-        self.assertEqual(json.loads(p.read_text(encoding="utf-8")), DEFAULTS)
+        self.assertEqual(json.loads(p.read_text(encoding="utf-8")),
+                         dict.fromkeys(Config.MUST_DECLARE, ""))
 
     def test_template_reloads_cleanly(self):
         Config.load(self.root, env={}).write_template(self.root)
@@ -207,3 +211,41 @@ class TestKhoaDaGo(unittest.TestCase):
         for k, why in RETIRED.items():
             self.assertRegex(why, r"^20\d\d-\d\d-\d\d", k)
             self.assertNotIn(k, DEFAULTS, f"{k} vừa gỡ vừa còn trong DEFAULTS")
+
+
+class TestTepCauHinhChiGhiThuDuAnQuyetDinh(unittest.TestCase):
+    """`init` không đóng băng toàn bộ mặc định vào dự án.
+
+    Trước 2026-09-12 tệp `.ai/config.json` chứa cả 68 khoá. Hai cái giá: người
+    mới mở ra không biết dòng nào quan trọng, và khi framework đổi một mặc định
+    (đã xảy ra thật: `context.max_preservation_chars` 1500 → 1200) thì dự án cũ
+    giữ con số cũ **im lặng, mãi mãi** — mặc định có hai nơi sống.
+    """
+
+    def test_chi_ghi_khac_biet_va_khoa_bat_buoc_khai(self):
+        with tempfile.TemporaryDirectory() as d:
+            cfg = Config.load(d).overlay({"tools.test": "python -m pytest",
+                                          "tools.lint": "ruff check ."})
+            path = cfg.write_template(d)
+            ghi = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(set(ghi), {"tools.test", "tools.lint"})
+
+    def test_khoa_bat_buoc_khai_van_hien_ra_du_con_trong(self):
+        """Không có lệnh test thì mọi mục kiểm định chỉ báo "chưa chạy được" —
+        người mới phải **thấy** chỗ phải điền."""
+        with tempfile.TemporaryDirectory() as d:
+            path = Config.load(d).write_template(d)
+            ghi = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(ghi, {"tools.test": ""})
+
+    def test_doc_lai_van_ra_day_du_mac_dinh(self):
+        """Tệp ngắn không được làm mất giá trị nào: `load` hợp nhất với DEFAULTS."""
+        from aisef.config import DEFAULTS
+        with tempfile.TemporaryDirectory() as d:
+            Config.load(d).overlay({"tools.test": "pytest"}).write_template(d)
+            lai = Config.load(d)
+        self.assertEqual(lai["tools.test"], "pytest")
+        for k, v in DEFAULTS.items():
+            if k != "tools.test":
+                with self.subTest(key=k):
+                    self.assertEqual(lai[k], v)

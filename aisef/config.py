@@ -424,11 +424,28 @@ class Config:
         merged.update(overrides)
         return Config(merged, source=self.source)
 
+    #: Khoá mọi dự án phải khai, kể cả khi giá trị còn trống: không có lệnh
+    #: test thì mọi mục kiểm định chỉ báo "chưa chạy được". Ghi ra để người mới
+    #: nhìn thấy chỗ phải điền, thay vì phải đọc tài liệu mới biết tồn tại.
+    MUST_DECLARE = ("tools.test",)
+
     def write_template(self, project_root: Path | str = ".") -> Path:
-        """Write a config file for the user to customise."""
+        """Ghi cấu hình **chỉ gồm thứ dự án này quyết định**.
+
+        Trước 2026-09-12 tệp này chứa cả 68 khoá — toàn bộ mặc định được đóng
+        băng vào dự án lúc `init`. Hai cái giá: người mới mở ra thấy 68 dòng mà
+        không dòng nào nói dòng nào quan trọng; và khi framework đổi một mặc
+        định (đã xảy ra: `context.max_preservation_chars` 1500 → 1200) thì dự án
+        cũ **không bao giờ nhận** — nó giữ con số cũ, im lặng, mãi mãi.
+
+        Mặc định phải sống ở đúng một nơi: `DEFAULTS`. Tệp dự án chỉ nói phần
+        khác biệt. `Config.load` vốn đã hợp nhất hai thứ ấy.
+        """
         path = Path(project_root) / CONFIG_PATH
         path.parent.mkdir(parents=True, exist_ok=True)
+        khac = {k: v for k, v in self.values.items()
+                if k in self.MUST_DECLARE or v != DEFAULTS.get(k)}
         path.write_text(
-            json.dumps(self.values, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+            json.dumps(khac, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
         )
         return path
