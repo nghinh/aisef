@@ -615,3 +615,22 @@ class TestDoLaiSauDotChay(unittest.TestCase):
         s = A.Session("t", "c", 1, "FAIL", 3, false_done=True, out_of_scope=[], workspace_found=True)
         bao_cao = A.report([s])
         self.assertIn("| c | 1 | 1 | 1 | 1 |", bao_cao)
+
+
+class TestUngVienKhongMangTepCuaHarness(unittest.TestCase):
+    """Thư mục cấu hình client là của harness, không phải của agent.
+
+    Bước `compile` ghi `.opencode/plugin/aisef-guard.ts` vào cây làm việc. Lệnh
+    chốt ứng viên loại `_bmad-output`, `.claude`, `.aisef` — nhưng quên
+    `.opencode`, nên ở nhánh AISEF mỗi ứng viên có thêm một tệp, và cột
+    `files`/`lines` của hai điều kiện lệch nhau vì việc của chính harness.
+    """
+
+    def test_bon_thu_muc_cua_harness_deu_bi_loai_khi_chot_ung_vien(self):
+        src = (Path(R.__file__)).read_text(encoding="utf-8")
+        dong = [l for l in src.splitlines() if '_git(ws, "add", "-A"' in l]
+        self.assertTrue(dong, "không tìm thấy lệnh chốt ứng viên")
+        khoi = src[src.index(dong[0]):src.index(dong[0]) + 400]
+        for thu_muc in ("_bmad-output", ".claude", ".aisef", ".opencode"):
+            with self.subTest(thu_muc=thu_muc):
+                self.assertIn(f":(exclude){thu_muc}", khoi)

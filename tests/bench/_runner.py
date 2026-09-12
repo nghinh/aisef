@@ -317,7 +317,12 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = Fa
                 (ws / p).unlink(missing_ok=True)
         if not task.tests_visible:
             apply_patch(ws, task.dir / "tests.patch")
-        _git(ws, "add", "-A", "--", ".", ":(exclude)_bmad-output", ":(exclude).claude", ":(exclude).aisef")
+        # `.opencode` cùng loại với ba cái kia: harness ghi plugin guard vào
+        # đó ở bước compile, nên mỗi ứng viên của nhánh AISEF mang thêm một
+        # tệp agent chưa từng chạm — `files`/`lines` của hai điều kiện lệch
+        # nhau vì việc của harness (đo 2026-09-12 trên đợt C-1).
+        _git(ws, "add", "-A", "--", ".", ":(exclude)_bmad-output", ":(exclude).claude",
+             ":(exclude).aisef", ":(exclude).opencode")
         _git(ws, "commit", "-qm", f"{task.id}: ứng viên lượt {n}", check=False)   # không có gì để chốt = HEAD
         cand = head_sha(ws)
         res = run_tool("test", ws, story_id=task.id, artifact_root=root, config=cfg, candidate=cand)
