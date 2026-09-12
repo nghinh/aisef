@@ -1,6 +1,6 @@
 # Phase 3 end-to-end validation
 
-14/14 checks passed.
+16/16 checks passed.
 
 ## Detailed observations
 
@@ -18,3 +18,5 @@
 - [PASS] 5.findings stable id across same/different file: same=True different_id=70bd8620
 - [PASS] 6.after_event excludes older higher-seq event: paths=['new.py'] (expected ['new.py']; old.py seq=165 pre-dates test seq=144 in time)
 - [PASS] 6.seq-based view would have included stale event: seq_view=['old.py', 'new.py'] (illustrative: shows why the fix matters)
+- [PASS] 7.lock sidecar serialises concurrent reserves: second guard raised BudgetExceeded while first held the lock
+- [PASS] 7.cap check counts outstanding reservations: 0.06 outstanding + 0.06 proposed > 0.10 cap blocks at reserve

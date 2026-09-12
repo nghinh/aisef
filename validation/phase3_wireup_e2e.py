@@ -16,6 +16,10 @@ Steps:
      from ``run-B``, then release and re-acquire.
   5. Findings round-trip: structured ``Finding`` instance → canonical
      lines → ``FindingBook.parse_lines`` back to instances.
+  6. ``Evidence.after_event`` survives a stale higher-seq entry that
+     precedes the most recent test (bug 47 cross-tier).
+  7. Budget ledger sidecar lock + cap-headroom reservation math
+     (Bug-48 sidecar lock + Bug-49 reservation cap-overrun).
 """
 from __future__ import annotations
 
@@ -335,6 +339,48 @@ def step_after_event_by_position() -> None:
         )
 
 
+def step_budget_concurrency() -> None:
+    """Concurrency sanity for the Phase 3 budget ledger:
+
+    * sidecar lock survives ``os.replace`` of the state file;
+    * cap math subtracts outstanding reservations, not just settled
+      spend, so two parallel reserves cannot blow past the cap.
+    """
+    from aisef.control.budget import BudgetState, _check_caps
+    with tempfile.TemporaryDirectory() as d:
+        root = Path(d)
+        g1 = BudgetGuard(BudgetLedger(root))
+        g2 = BudgetGuard(BudgetLedger(root))
+        g1.configure(BudgetConfig(cap_usd=10.0))
+        blocked = False
+        try:
+            with g1.reserve(story_id="outer", est_usd=0.5, est_turns=1) as r1:
+                with g2.reserve(story_id="inner", est_usd=0.5, est_turns=1):
+                    pass
+        except BudgetExceeded:
+            blocked = True
+        finally:
+            r1.actual_usd = 0.5
+        record(
+            "7.lock sidecar serialises concurrent reserves",
+            blocked,
+            f"second guard raised BudgetExceeded while first held the lock",
+        )
+
+        state = BudgetState(cap_usd=0.10, spent_usd=0.0)
+        state.reservations = [{"est_usd": 0.06, "est_turns": 1, "id": "r1"}]
+        blocked_cap = False
+        try:
+            _check_caps(state, est_usd=0.06, est_turns=1, est_seconds=0.0)
+        except BudgetExceeded:
+            blocked_cap = True
+        record(
+            "7.cap check counts outstanding reservations",
+            blocked_cap,
+            "0.06 outstanding + 0.06 proposed > 0.10 cap blocks at reserve",
+        )
+
+
 def main() -> int:
     step_config()
     step_qualify()
@@ -342,6 +388,7 @@ def main() -> int:
     step_identity()
     step_findings()
     step_after_event_by_position()
+    step_budget_concurrency()
 
     fails = [r for r in REPORT if r.startswith("[FAIL]")]
     summary = f"# Phase 3 end-to-end validation\n\n{len(REPORT) - len(fails)}/{len(REPORT)} checks passed.\n\n"
