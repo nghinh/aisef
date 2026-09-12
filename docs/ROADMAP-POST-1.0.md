@@ -14,11 +14,14 @@ from dogfood runs, conformance, and known limitations — not by feature wish.
 Three of the seven systemic issues surfaced in the pre-Phase-2 audit
 were transactional defects that are now closed: structured findings
 (anti-goalpost reviewer), candidate-bound dev-server identity lease,
-and in-flight budget reservation.  See
-[ADR-009](ADR-009-phase-3-cross-tier-invariants.md).  The other four
-issues are *semantic* and depend on these being correct first; they
-remain open until dogfood data confirms the wire-up is doing the
-right thing under load.
+and in-flight budget reservation.  Two follow-up defects in the
+budget seam were caught by the wire-up harness on the same day and
+closed by switching the lock carrier to a sidecar and counting
+in-flight reservations in the cap math.  See
+[ADR-009](ADR-009-phase-3-cross-tier-invariants.md#follow-up-two-cross-tier-defects-in-the-budget-seam).
+The other four issues are *semantic* and depend on these being
+correct first; they remain open until dogfood data confirms the
+wire-up is doing the right thing under load.
 
 ## 1. External user validation
 

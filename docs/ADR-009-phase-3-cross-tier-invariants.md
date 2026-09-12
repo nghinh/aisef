@@ -157,3 +157,49 @@ the "unexpected state" branch.
   ``flock_ex_nb`` but on a kernel that hands out different UIDs to
   different processes, ``flock`` semantics differ — a stress test is
   the right next step before any multi-tenant deployment.
+
+## Follow-up: two cross-tier defects in the budget seam
+
+Two transactional gaps surfaced once the reservation lock was
+exercised end-to-end.  Both were uncovered by the new
+``validation/phase3_wireup_e2e.py`` step-7 scenarios and closed in
+``595c731`` (``fix(phase 3+): lock BudgetGuard ledger via sidecar
+to survive os.replace``) and ``dee903b`` (``fix(phase 3+):
+BudgetGuard cap check counts in-flight reservations``).  Each fix is
+pinned by a pair of unit tests in ``tests/test_budget.py`` and the
+matching ``7.lock sidecar serialises concurrent reserves`` /
+``7.cap check counts outstanding reservations`` checks in the
+validation harness.
+
+### ``os.replace`` orphans the held flock
+
+``BudgetLedger.save()`` rebuilds the state file via ``os.replace``
+for atomic durability.  On filesystems where ``os.replace`` swaps
+the inode (macOS APFS, several network FS), the exclusive ``flock``
+held on the previous fd is left holding a lock on an orphan inode
+while a new fd on the replacement inode slips past.  Two concurrent
+``reserve()`` calls then both held the *exclusive* lock at the same
+time.
+
+Fix: sidecar lock file at ``budget.json.lock``, never replaced,
+matching the pattern already in use by ``state.py`` and
+``worktree.py``.  ``BudgetLedger.lock_path`` exposes it; ``reserve()``
+opens the sidecar, not the state file.
+
+This supersedes one bullet of the original *Deferred* list
+("lock carrier might lose the inode on os.replace") which the prior
+ADR omitted; future audits should treat the sidecar rule as the
+canonical write-under-lock pattern across ``_bmad-output``.
+
+### In-flight reservations did not count toward the cap
+
+``_check_caps`` was a per-call check looking only at
+``state.spent_usd + est_usd``.  Two parallel calls each below cap
+(e.g. 0.06 + 0.06 vs cap 0.10) sailed through, ran, and only tripped
+at settle — by which point both had already spent.
+
+Fix: sum ``state.reservations[].est_usd`` (and ``est_turns``) into
+the cap math.  Direct ``_check_caps`` unit tests bypass the lock
+so the cap-math gap is reproducible even when concurrency happens
+to serialise.  ``7.cap check counts outstanding reservations`` in the
+validation harness exercises the same scenario.
