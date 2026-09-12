@@ -32,7 +32,7 @@ import time
 from pathlib import Path
 
 from .base import Capability, ClientAdapter, RunSpec, Support, _stream_with_timeout, child_env, resolve_binary
-from .stream import RunResult
+from .stream import GUARD_MESSAGE, RunResult
 
 BINARY = "opencode"
 
@@ -111,7 +111,15 @@ def parse_json_events(lines) -> RunResult:
             res.tool_uses.append(ToolUse(name=_TOOL_NAMES.get(name.lower(), name), tool_use_id=str(part.get("callID") or ""),
                                          input=dict(state.get("input") or {})))
             if state.get("status") == "error":
-                res.guard_messages.append(str(state.get("output") or state.get("error") or "")[:300])
+                # Only messages that came **from a guard** (bug 100). Every
+                # other tool error — "File not found", a failed grep, a
+                # non-zero test run — used to land here, and `guard_blocked`
+                # reads "the agent intended to do something forbidden". One
+                # missing file was enough to report a guard block that never
+                # happened, in the evidence and in the acceptance report.
+                loi = str(state.get("output") or state.get("error") or "")
+                if GUARD_MESSAGE.search(loi):
+                    res.guard_messages.append(loi[:300])
         elif kind == "error":
             # OpenCode reports a provider failure as a JSON event and exits
             # non-zero with an empty stderr, so the harness used to record

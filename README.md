@@ -239,7 +239,7 @@ stream (tools, tokens, cost per provider).
 
 ## Real bugs already hit
 
-99 bugs found by measurement on real agents, grouped into eleven cause
+100 bugs found by measurement on real agents, grouped into eleven cause
 classes with a regression check each: `docs/FAILURE-TAXONOMY.md`. A new bug adds
 a line there in the same commit as its test. Changes per version, and what to do
 when upgrading: `CHANGELOG.md`.

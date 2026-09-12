@@ -161,14 +161,14 @@ async function guard($, kinds, tool, event) {{
     const res = await $`${{BIN}} --project ${{PROJECT}} guard ${{kind}} < ${{input}}`
       .quiet().nothrow()
     if (res.exitCode === 2) {{
-      throw new Error(String(res.stderr).trim() || `guard ${{kind}} blocked this action`)
+      throw new Error(String(res.stderr).trim() || `aisef guard ${{kind}}: blocked this action`)
     }}
     // Fail closed. Any other non-zero exit means the guard did not judge this
     // action — binary missing, crash, bad install. Treating that as "allow"
     // is how a whole run finishes with zero guards and evidence that looks
     // identical to a well-behaved agent.
     if (res.exitCode !== 0) {{
-      throw new Error(`guard ${{kind}} could not run (exit ${{res.exitCode}}): `
+      throw new Error(`aisef guard ${{kind}}: could not run (exit ${{res.exitCode}}): `
         + (String(res.stderr).trim() || "no output") + " — fix the aisef install, then retry")
     }}
   }}

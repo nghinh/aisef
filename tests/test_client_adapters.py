@@ -198,9 +198,30 @@ class TestParseJsonEvents(unittest.TestCase):
         self.assertEqual(res.session_id, "sess-42")
 
     def test_guard_message_on_error(self):
-        line = '{"type":"tool_use","part":{"tool":"bash","callID":"c1","state":{"input":{},"status":"error","output":"blocked by guard"}}}'
+        line = ('{"type":"tool_use","part":{"tool":"bash","callID":"c1","state":'
+                '{"input":{},"status":"error","output":'
+                '"aisef guard write-scope: src/x.py is outside the story scope"}}}')
         res = parse_json_events([line])
-        self.assertIn("blocked by guard", res.guard_messages[0])
+        self.assertIn("outside the story scope", res.guard_messages[0])
+        self.assertTrue(res.guard_blocked)
+
+    def test_a_plain_tool_error_is_not_a_guard_block(self):
+        """Lỗi 100: mọi lỗi công cụ đều rơi vào `guard_messages`, mà
+        `guard_blocked` có nghĩa "agent định làm việc bị cấm". Một tệp không
+        tồn tại đủ để báo cáo nghiệm thu ghi một lần guard chặn không hề xảy
+        ra — đúng thứ mà docstring của `GUARD_MESSAGE` dặn phải tránh."""
+        line = ('{"type":"tool_use","part":{"tool":"read","callID":"c1","state":'
+                '{"input":{},"status":"error","output":"File not found: /p/index.html"}}}')
+        res = parse_json_events([line])
+        self.assertEqual(res.guard_messages, [])
+        self.assertFalse(res.guard_blocked)
+
+    def test_stale_plugin_message_still_reads_as_a_guard(self):
+        """Plugin cũ (chưa `aisef compile` lại) ném câu của chính nó."""
+        line = ('{"type":"tool_use","part":{"tool":"write","callID":"c1","state":'
+                '{"input":{},"status":"error","output":'
+                '"guard write-scope could not run (exit 127): no output"}}}')
+        self.assertTrue(parse_json_events([line]).guard_blocked)
 
 
 if __name__ == "__main__":

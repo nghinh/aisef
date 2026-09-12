@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- **A missing file is not a guard block** (bug 100). The OpenCode adapter put
+  every failed tool call into `guard_messages`, and `guard_blocked` means "the
+  agent tried to do something forbidden" — it goes into the evidence, the
+  acceptance report, and the benchmark's guard counts. A real run recorded a
+  guard block whose entire content was `File not found: index.html`. The
+  Claude adapter had always filtered through `GUARD_MESSAGE`, whose own
+  docstring warns about exactly this.
+  Guard output now carries a marker — `aisef guard <kind>:` — printed by the
+  guard itself, so it survives a compiled plugin that only forwards stderr,
+  and both adapters recognise the same thing. Messages thrown by an
+  out-of-date plugin are still recognised.
+
 - **Windows CI: the test that read a child process with the machine's codec**
   (bug 99). `subprocess.run(..., text=True)` decodes with the locale encoding —
   cp1252 on the runner — while every `aisef` process deliberately speaks UTF-8.

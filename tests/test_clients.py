@@ -489,7 +489,7 @@ class TestOpenCodeLuongJson(unittest.TestCase):
     LINES = [
         '{"type":"step_start","timestamp":1,"sessionID":"ses_1","part":{"type":"step-start"}}',
         '{"type":"tool_use","timestamp":2,"sessionID":"ses_1","part":{"type":"tool","tool":"read","callID":"call_1","state":{"status":"completed","input":{"filePath":"/p/package.json"},"output":"..."}}}',
-        '{"type":"tool_use","timestamp":3,"sessionID":"ses_1","part":{"type":"tool","tool":"write","callID":"call_2","state":{"status":"error","input":{"filePath":"/p/x.py"},"output":"Write bị chặn: injection"}}}',
+        '{"type":"tool_use","timestamp":3,"sessionID":"ses_1","part":{"type":"tool","tool":"write","callID":"call_2","state":{"status":"error","input":{"filePath":"/p/x.py"},"output":"aisef guard injection: Write bị chặn"}}}',
         '{"type":"step_finish","timestamp":4,"sessionID":"ses_1","part":{"type":"step-finish","tokens":{"total":48888,"input":29851,"output":93,"reasoning":0,"cache":{"write":0,"read":18944}},"cost":0}}',
         'banner không phải json',
         '{"type":"text","timestamp":5,"sessionID":"ses_1","part":{"type":"text","text":"OK"}}',

@@ -240,7 +240,11 @@ def cmd_guard(args) -> int:
             "reason": verdict.reason,
             "tool": str(event.get("tool_name") or ""),
         }, ensure_ascii=False))
-        print(verdict.reason, file=sys.stderr)
+        # Prefixed so a client can tell a guard block from any other tool
+        # error (bug 100). The prefix is printed by the guard itself, which
+        # means it survives an out-of-date compiled hook that only forwards
+        # stderr.
+        print(f"aisef guard {args.kind}: {verdict.reason}", file=sys.stderr)
     return verdict.exit_code
 
 

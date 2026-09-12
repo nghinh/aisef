@@ -35,7 +35,12 @@ from typing import Iterable
 #: to flip the ``guard_blocked`` flag.  A false positive here goes straight into
 #: the acceptance report and sends the reader chasing a non-existent defect.
 GUARD_MESSAGE = re.compile(
-    r"(?:Pre|Post)ToolUse:\S*\s+hook\b|\bStop:?\s*hook\b|\bhook error\b",
+    r"(?:Pre|Post)ToolUse:\S*\s+hook\b|\bStop:?\s*hook\b|\bhook error\b"
+    # `aisef guard <kind>:` — printed by the guard itself, so it survives a
+    # stale compiled plugin passing stderr through verbatim. The two legacy
+    # forms are what an older plugin throws on its own (bug 100).
+    r"|\baisef guard \S+:"
+    r"|\bguard \S+ (?:blocked this action|could not run)\b",
     re.IGNORECASE,
 )
 
