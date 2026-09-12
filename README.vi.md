@@ -2,7 +2,7 @@
 
 # AISEF — AI Software Engineering Framework
 
-[Bộ nhớ dài hạn có phạm vi](docs/MEMORY.md) thử nghiệm qua `aisef memory`, **mặc định TẮT**. Bộ nhớ chỉ là ngữ cảnh tư vấn, không phải bằng chứng cho cổng; giữ phiên mới. Xem [nghiên cứu/kế hoạch](docs/MEMORY-RESEARCH-PLAN.md), [báo cáo kiểm thử](docs/MEMORY-VALIDATION.md) và [ADR-007](docs/ADR-007-scoped-advisory-memory.md).
+[Bộ nhớ dài hạn có phạm vi](docs/MEMORY.md) qua `aisef memory`, **mặc định TẮT và đã đóng băng** từ 12/09/2026 — vẫn chạy, vẫn được vá lỗi và vá bảo mật, nhưng không đầu tư thêm tính năng cho tới khi có người ngoài cần ([phụ lục ADR-007](docs/ADR-007-scoped-advisory-memory.md)). Bộ nhớ chỉ là ngữ cảnh tư vấn, không phải bằng chứng cho cổng; giữ phiên mới. Xem [nghiên cứu/kế hoạch](docs/MEMORY-RESEARCH-PLAN.md), [báo cáo kiểm thử](docs/MEMORY-VALIDATION.md) và [ADR-007](docs/ADR-007-scoped-advisory-memory.md).
 
 Khung phát triển phần mềm bằng agent. Tên đầy đủ là **AI Software Engineering
 Framework**, viết tắt **AISEF**; gói trên PyPI, module Python và lệnh đều là

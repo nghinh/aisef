@@ -31,3 +31,41 @@ These references describe how the decision above is enforced today; the ADR itse
 - Operational behavior of the local provider, security boundary, capture pipeline and disabled-mode prompt contract: `docs/MEMORY.md`.
 - Updated trust posture cross-checked against an independent-audit report, including exercised adversarial tests, ablations, precision/recall and unchanged 17 pre-existing lint findings: `docs/MEMORY-VALIDATION.md`.
 - Research and verified upstream `main` commit/release metadata used for the comparison table: `docs/MEMORY-RESEARCH-PLAN.md` (see § "Verified upstream metadata snapshot").
+
+## Addendum — frozen (2026-09-12)
+
+Status changes from **EXPERIMENTAL, default OFF** to **FROZEN, default OFF**.
+The decision, contract and security posture above stand unmodified; what
+changes is the investment policy, and only forward.
+
+Why now. The enabling condition this ADR wrote for itself — "paired real-agent
+repeated-error measurements" — has not been met in the year since, and two
+things measured since argue against spending more on it before it is:
+
+- The retrieval scorer was put on a bench built to replace it
+  ([MEMORY-BENCH](MEMORY-BENCH.md), [ADR-010 §3](ADR-010-mimo-code-lessons.md)).
+  BM25 and an IDF-weighted variant were measured against the current
+  word-overlap scorer on two deliberately opposed datasets. No candidate won
+  both. Nothing was replaced, and the honest reading is that ranking is not
+  the binding constraint — having something worth recalling is.
+- No external user has run the lifecycle end to end yet (tracking table,
+  [DANH-GIA-360](DANH-GIA-360-2026-09-12.md) §6). A feature default-OFF with no
+  external user generates no demand signal, so further work on it would be
+  guesswork dressed as a roadmap.
+
+What frozen means, concretely:
+
+| | |
+|---|---|
+| Code | stays. `aisef memory` keeps working; the store format keeps its version |
+| Default | stays OFF |
+| Bug fixes | yes, if it breaks (bug 75's scope-comparison fix is exactly this case) |
+| Security fixes | yes, unconditionally |
+| New capability | no — no new providers, no new taxonomy, no ranking work |
+| Deletion | no. Freezing costs a paragraph; deleting costs a migration, and the contract has no known defect |
+
+Thaw condition, written now so it is not argued later: an external user asks
+for it **or** a paired measurement on a real agent shows a repeated error the
+memory would have prevented. Retrieval-only scores still do not count — that
+was true when this ADR was written and the MEMORY-BENCH result is why it stays
+true.

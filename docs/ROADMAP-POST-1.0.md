@@ -190,3 +190,20 @@ Rejected with evidence from MiMo's own issue tracker: automatic checkpoints and
 session resume (keep-alive loops, OOM at 6–20 GB), cross-tool transcript
 ingestion, and a second canonical task state.
 
+
+## Re-check trigger: `phases/implement.py` (2026-09-12)
+
+The file is 2 581 lines. By this project's own splitting rule — split on
+evidence of real friction, not on a line count — **not splitting is currently
+correct**: no bug in the last three waves was caused by the file's size, and a
+split would move code without fixing anything.
+
+Splitting is not free either, so the decision gets a trigger rather than a
+re-argument every release:
+
+> If **three consecutive real bugs** land in `aisef/phases/implement.py`, split
+> it — and split along the seam the three bugs share, not along a tidy one.
+
+Bugs are counted from the numbered bug log in `CHANGELOG.md`. Three bugs in one
+file is the point where "the file is fine" stops being a claim about evidence
+and starts being a habit.
