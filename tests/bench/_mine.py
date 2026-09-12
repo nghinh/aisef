@@ -32,6 +32,7 @@ dự án thử không vào kho.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -62,6 +63,31 @@ TOO_BIG_USD = 100.0
 SRC_PREFIXES = ("aisef/", "aisdlc/")
 _NOT_CODE = ("docs/", "_bmad-output/", ".claude/", ".opencode/", ".ai/", ".aisef/", ".github/")
 _NOT_CODE_NAMES = ("README.md", "CHANGELOG.md", ".gitignore")
+_FIXTURE_FILES = ("task.json", "prompt.md", "gold.patch", "tests.patch")
+
+
+def dataset_manifest(root: Path | str = TASKS_DIR) -> dict[str, str]:
+    """SHA-256 per committed task fixture, sorted by POSIX path.
+
+    The manifest is the machine-enforced side of a frozen benchmark protocol:
+    changing any task input after measuring requires an explicit manifest
+    update, so a report can never silently refer to a different dataset.
+    """
+    root = Path(root)
+    paths = sorted(
+        (p for d in root.iterdir() if d.is_dir()
+         for name in _FIXTURE_FILES if (p := d / name).is_file()),
+        key=lambda p: p.relative_to(root).as_posix(),
+    )
+    return {
+        p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in paths
+    }
+
+
+def render_dataset_manifest(root: Path | str = TASKS_DIR) -> str:
+    """Render ``MANIFEST.sha256`` deterministically."""
+    return "".join(f"{digest}  {rel}\n" for rel, digest in dataset_manifest(root).items())
 
 
 @dataclass

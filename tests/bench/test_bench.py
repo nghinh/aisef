@@ -330,6 +330,71 @@ class TestMineBugsThat(unittest.TestCase):
         self.assertEqual(t.validated, {"base_fail": True, "gold_pass": True, "runs": 3})
 
 
+class TestDatasetManifest(unittest.TestCase):
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.root = Path(tmp.name)
+        self.task = self.root / "task-b"
+        self.task.mkdir()
+        for name in ("tests.patch", "prompt.md", "task.json", "gold.patch"):
+            (self.task / name).write_bytes(b"abc")
+        self.before = M.render_dataset_manifest(self.root)
+
+    def test_content_mutation_changes_manifest(self):
+        for name in M._FIXTURE_FILES:
+            with self.subTest(name=name):
+                path = self.task / name
+                path.write_bytes(b"abd")
+                self.assertNotEqual(M.render_dataset_manifest(self.root), self.before)
+                path.write_bytes(b"abc")
+
+    def test_deletion_changes_manifest(self):
+        (self.task / "gold.patch").unlink()
+        self.assertNotEqual(M.render_dataset_manifest(self.root), self.before)
+        self.assertNotIn("task-b/gold.patch", M.dataset_manifest(self.root))
+
+    def test_addition_changes_manifest(self):
+        task = self.root / "task-a"
+        task.mkdir()
+        (task / "prompt.md").write_bytes(b"abc")
+        self.assertNotEqual(M.render_dataset_manifest(self.root), self.before)
+        self.assertIn("task-a/prompt.md", M.dataset_manifest(self.root))
+
+    def test_rename_changes_manifest(self):
+        self.task.rename(self.root / "task-a")
+        self.assertNotEqual(M.render_dataset_manifest(self.root), self.before)
+        self.assertEqual(list(M.dataset_manifest(self.root)), [
+            "task-a/gold.patch", "task-a/prompt.md", "task-a/task.json", "task-a/tests.patch",
+        ])
+
+    def test_sorted_paths_and_sha256(self):
+        task = self.root / "task-a"
+        task.mkdir()
+        (task / "prompt.md").write_bytes(b"abc")
+        paths = ["task-a/prompt.md", "task-b/gold.patch", "task-b/prompt.md",
+                 "task-b/task.json", "task-b/tests.patch"]
+        digest = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        self.assertEqual(list(M.dataset_manifest(str(self.root)).items()),
+                         [(path, digest) for path in paths])
+        expected = "".join(f"{digest}  {path}\n" for path in paths)
+        self.assertEqual(M.render_dataset_manifest(self.root), expected)
+        self.assertEqual(M.render_dataset_manifest(self.root), expected)
+
+    def test_line_endings_are_not_normalized(self):
+        path = self.task / "prompt.md"
+        path.write_bytes(b"abc\n")
+        lf = M.render_dataset_manifest(self.root)
+        path.write_bytes(b"abc\r\n")
+        self.assertNotEqual(M.render_dataset_manifest(self.root), lf)
+        self.assertEqual(path.read_bytes(), b"abc\r\n")
+
+    def test_empty_dataset(self):
+        with tempfile.TemporaryDirectory() as root:
+            self.assertEqual(M.dataset_manifest(root), {})
+            self.assertEqual(M.render_dataset_manifest(root), "")
+
+
 class TestTaskDaCommit(unittest.TestCase):
     """`tests/bench/tasks/` là mã của kho: task hợp lệ phải đủ patch, prompt sạch."""
 
@@ -344,6 +409,23 @@ class TestTaskDaCommit(unittest.TestCase):
                 self.assertTrue(t.read("tests.patch") and t.read("gold.patch"))
                 self.assertEqual(M.lint_prompt(t.read("prompt.md")), [])
                 self.assertTrue(t.verify.startswith("python3 -m unittest -v tests."))
+
+    def test_fixture_attributes_preserve_bytes(self):
+        paths = [f"tests/bench/tasks/{path}" for path in M.dataset_manifest()]
+        paths.extend(f"tests/bench/tasks/synthetic/{name}" for name in M._FIXTURE_FILES)
+        result = subprocess.run(
+            ["git", "-c", "core.autocrlf=true", "check-attr", "-z", "text", "--", *paths],
+            cwd=ROOT, check=True, capture_output=True,
+        )
+        self.assertEqual(result.stdout.decode().split("\0")[:-1],
+                         [value for path in paths for value in (path, "text", "unset")])
+
+    def test_manifest_dong_bang_du_lieu_da_do(self):
+        manifest = M.TASKS_DIR / "MANIFEST.sha256"
+        expected = manifest.read_text(encoding="utf-8")
+        actual = M.render_dataset_manifest(M.TASKS_DIR)
+        self.assertEqual(actual, expected, "task fixture changed after protocol freeze — regenerate MANIFEST.sha256 deliberately")
+        self.assertEqual(len(expected.splitlines()), 120, "30 tasks × 4 fixture files")
 
 
 class TestSimulatedRoundTrip(unittest.TestCase):
