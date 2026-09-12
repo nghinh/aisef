@@ -276,6 +276,36 @@ git tag vX.Y.Z && git push origin vX.Y.Z
 Kho hồi quy dogfood (`tests/dogfood/`, bật bằng `AISEF_DOGFOOD=1`) dựng lại
 dự án thử `par` từ đầu vào trong kho và so với mốc đã đo — chạy trước mỗi tag.
 
+### Benchmark đã đo được gì
+
+Ba đợt đo, ba kết quả null — báo ra vì null cũng là kết quả:
+
+| đợt | model | task | AISEF pass@1 | trần pass@1 |
+|---|---|---|---|---|
+| v0.3.0 | frontier | dễ | 1,00 | 1,00 |
+| v1.3 simulator | agent yếu theo kịch bản | 12 khó | — (guard không tham gia, theo thiết kế) | — |
+| **C-1 (12/09/2026)** | **không frontier, thật** | **12 khó** | **0,64** | **0,69** |
+
+[C-1](docs/BENCH-REPORT-C1.md): 9/12 task hoà, AISEF kém 2 task và hơn 1 task;
+với 3 lượt mỗi task thì −0,05 không phân biệt được với nhiễu. Nhánh có harness
+tốn **hơn 44 % số lượt và 51 % thời gian** để tới cùng chỗ. Guard nổ **1 lần
+trên 72 lượt**, và đó là lệnh dọn `__pycache__`. Không nhánh nào ghi một tệp nào
+ra ngoài phạm vi.
+
+Hai điều phải đọc kèm:
+
+- **20 trong 24 lượt trượt, ở cả hai nhánh, là phiên bị CLI cắt** khi model in
+  ra cú gọi công cụ mà nó không phân giải được. Cohort này đo lỗi tích hợp
+  model↔CLI ít nhất ngang với đo harness.
+- **Chế độ bench chạy một phiên agent, không reviewer, không bảo mật, không
+  cổng.** Nên C-1 đo **tầng guard**, không đo **tầng cổng**. Chi phí đo được
+  nằm ở tầng cổng: trên một dự án 10 story thật, **67 % token vào** rơi vào lượt
+  bị cổng chặn, `review` chiếm 18/31 lần ([E4](docs/E4-COST-DECOMPOSITION.md)).
+
+Nên định vị trung thực với bằng chứng hiện có: AISEF **không** làm agent giải
+được nhiều hơn. Thứ nó làm được, đo được, là **không cho gọi việc chưa xong là
+xong**, và để lại bằng chứng nói rõ vì sao.
+
 ### Giới hạn đã biết
 
 Khai ở đây vì mọi claim phải có bằng chứng; thứ chưa chứng minh gọi là chưa

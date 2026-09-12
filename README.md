@@ -307,6 +307,37 @@ The dogfood regression corpus (`tests/dogfood/`, enabled with
 the repository and compares against the measured baseline — run it before every
 tag.
 
+### What the benchmarks measured
+
+Three cohorts, three null results, reported because a null is a result:
+
+| cohort | model | tasks | AISEF pass@1 | bare pass@1 |
+|---|---|---|---|---|
+| v0.3.0 | frontier | easy | 1.00 | 1.00 |
+| v1.3 simulator | scripted weak agent | 12 hard | — (by construction, no guards involved) | — |
+| **C-1 (2026-09-12)** | **non-frontier, real** | **12 hard** | **0.64** | **0.69** |
+
+On [C-1](docs/BENCH-REPORT-C1.md): nine of twelve tasks tie, AISEF loses two
+and wins one, and at three attempts per task that −0.05 is not distinguishable
+from noise. The harnessed arm spent **44% more turns and 51% more wall-clock**
+to get there. The guard fired **once in 72 attempts**, on a `__pycache__`
+cleanup. Neither arm wrote a single file outside its declared scope.
+
+Two things that reading needs:
+
+- **20 of the 24 failures, in both arms, were sessions the CLI cut** when the
+  model emitted a tool call it could not parse. This cohort measures a
+  model↔CLI integration defect at least as much as it measures a harness.
+- **Bench mode runs one agent session with no reviewer, no security pass and
+  no gate.** So C-1 measures the *guard* layer, not the *gate* layer. The gate
+  layer is where the measured cost is: on a real 10-story project, **67% of
+  input tokens** went into attempts the gate then blocked, `review` being 18 of
+  31 blocks ([E4](docs/E4-COST-DECOMPOSITION.md)).
+
+So the honest positioning, on the evidence available today: AISEF does not make
+an agent solve more. What it does, measurably, is refuse to call unfinished work
+done, and leave evidence that says why.
+
 ### Known limitations
 
 Declared here because every claim needs evidence; what has not been proven is
