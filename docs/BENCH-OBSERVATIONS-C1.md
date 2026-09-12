@@ -174,3 +174,71 @@ Ghi ra vì chúng có thể ảnh hưởng tới con số, kể cả khi tôi ti
   9router cho alias này, nên mọi so sánh "tỉ lệ chi phí" trong đợt C-1 **không
   có dữ liệu**; dùng số turn và giây làm đại lượng thay thế, và nói rõ đó là đại
   lượng thay thế.
+## O-7 · Nguyên nhân thật của gần như mọi lượt trượt: **model tự cắt phiên**
+
+Đây là quan sát quan trọng nhất của đợt, và nó lật lại cách đọc ở O-2/O-3.
+
+Đọc kho phiên của OpenCode (`~/.local/share/opencode/opencode.db`, bảng `part`)
+cho 66 phiên đã ánh xạ được về đợt C-1, thấy một chữ ký lặp lại:
+
+```
+{"type":"text","text":"<think>\n</think>\n\n<minimax:tool_call>\n<invoke name=\"read\">…</invoke>\n</minimax:tool_call>"}
+{"reason":"stop", …}
+```
+
+Model in **cú gọi công cụ theo cú pháp riêng của MiniMax ra dưới dạng văn bản**.
+OpenCode không phân giải được nên coi đó là câu trả lời cuối; bước kết thúc với
+`reason = "stop"` và phiên dừng ngay tại đó. Trong **11/11** phiên có chữ ký
+này, nó là phần văn bản **cuối cùng** — không phiên nào hồi phục.
+
+**Nó giải thích gần hết các lượt trượt:**
+
+| | lượt trượt | trong đó kết thúc bằng chữ ký trên |
+|---|---|---|
+| AISEF | 7 | 6 |
+| trần | 1 | 1 |
+
+7/8 lượt trượt của cả hai nhánh là **phiên bị cắt giữa chừng**, không phải agent
+sửa sai. Lượt còn lại (`sec-2` AISEF lượt 2) kết thúc bình thường mà không ghi gì.
+
+**Tỉ lệ theo phiên, và nó lệch giữa hai nhánh:**
+
+| điều kiện | phiên | phiên bị cắt | tỉ lệ |
+|---|---|---|---|
+| AISEF (`opencode`) | 39 | 10 | 26 % |
+| trần (`opencode-bare`) | 27 | 2 | 7 % |
+
+Chỉ tính ba task mà chữ ký này xuất hiện (`sec-1`, `sec-2`, `state-1`): AISEF
+10/14, trần 2/7. Năm task còn lại: **0 phiên bị cắt ở cả hai nhánh**.
+
+**Ba cách giải thích đã đo và bị loại:**
+
+- *"Nhánh AISEF nhồi ngữ cảnh dài hơn nên model hỏng sớm hơn."* Không đúng theo
+  số: trung vị đỉnh token mỗi phiên là **40 314** (AISEF) so với **40 138**
+  (trần) — bằng nhau. Trung bình lệch nhẹ (48 356 / 44 632) do đuôi dài.
+- *"`aisef ctx` bơm ngữ cảnh khổng lồ."* Có một lần in 55 351 ký tự — nhưng
+  **đúng một lần trong 66 phiên**. Không phải nguyên nhân hệ thống. Ghi cả cái
+  vô can vào đây để lần sau khỏi nghi oan.
+- *"Prompt của AISEF mồi cho model dùng cú pháp XML."* Prompt là Markdown
+  thuần, không có `<invoke`, không có thẻ công cụ nào —
+  `.bench/run/opencode/bug-a2-state-1/a1` lưu nguyên văn.
+
+Vậy **vì sao nhánh AISEF dính nhiều hơn thì chưa có câu trả lời có bằng chứng**.
+Ghi là câu hỏi mở, không suy diễn.
+
+**Một điều nhánh AISEF làm được mà nhánh trần không:** trên `sec-1` lượt 1 và 2,
+phiên đầu chết vì chữ ký này, harness mở **phiên thứ hai** và lượt đó vẫn PASS.
+Nhánh trần có đúng một phiên cho mỗi lượt: phiên chết là lượt trượt. Đây là
+phần "33 và 72 turn" ở O-3 — cái giá của việc chạy lại chính là thứ đã cứu hai
+lượt ấy.
+
+**Hệ quả cho đợt đo.** Cột C-1 đang đo **lỗi tích hợp giữa model và CLI** ít
+nhất ngang với đo chất lượng harness. Không đổi gì giữa chừng; đợt chạy tiếp tục
+tới hết, và câu hỏi "cột này có công bố được không" để dành cho báo cáo.
+
+**Việc phải làm sau khi đợt đo kết thúc** (không làm bây giờ — guard và adapter
+là một phần của hệ đang đo): dạy `aisef/clients/opencode.py` nhận ra chữ ký
+`reason=stop` + văn bản cuối chứa cú pháp công cụ chưa phân giải + không có
+`file_change`, và xếp nó vào nhóm trạng thái **hạ tầng, chạy lại được**, thay vì
+coi là một phiên đã hoàn thành. Đây đúng là mục "phát hiện đứng máy trong phiên"
+đã hoãn ở [ADR-010 §8](ADR-010-mimo-code-lessons.md) — nay có chữ ký đo được.
