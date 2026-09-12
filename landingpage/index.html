@@ -934,7 +934,7 @@ section { padding: 100px 0; }
       <div class="benchmark-col proven">
         <h3><span style="color:var(--verify)">●</span> Measured and verified</h3>
         <ul>
-          <li>On simple bug-fix tasks, correctness was saturated for both harnessed and bare agents — the harness did not degrade output quality</li>
+          <li>On simple bug-fix tasks, correctness was saturated for both harnessed and bare agents. On 12 hard tasks with a non-frontier model (cohort C-1): AISEF pass@1 0.64 vs bare 0.69 — nine of twelve tie, and the harnessed arm spends 44% more turns to get there. No measured improvement, and no measured degradation</li>
           <li>AISEF added governance and safety layers with near-zero measured cost overhead on those tasks</li>
           <li>Conformance probes pass 10/10 on two different clients (Claude Code, OpenCode)</li>
           <li>2,383 unit tests cover all public modules; 297 benchmark runs across 28 challenge tasks (169 of them on real agents, the rest on a simulator that says so)</li>
@@ -944,7 +944,7 @@ section { padding: 100px 0; }
       <div class="benchmark-col unproven">
         <h3><span style="color:var(--amber)">●</span> Not yet proven</h3>
         <ul>
-          <li>Harder task classes (multi-file features, large refactors, architecture changes) remain the next proving ground</li>
+          <li>That the harness helps an agent solve more — three cohorts, three nulls. The measured value is elsewhere: refusing to call unfinished work done, and leaving evidence why</li>
           <li>No external user has independently adopted the framework — all evidence is internal</li>
           <li>Distributed execution (multi-machine) is designed but untested in production</li>
           <li>Local sandbox provider does not isolate credentials — Docker is required for credential-sensitive projects</li>
