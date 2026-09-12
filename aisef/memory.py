@@ -12,7 +12,7 @@ from contextlib import contextmanager
 from pathlib import Path, PurePosixPath
 from typing import Protocol
 
-from ._compat import flock_ex_nb, flock_un
+from ._compat import atomic_replace, flock_ex_nb, flock_un, open_lock_fd
 
 TAXONOMY = frozenset(['decision', 'lesson', 'failure', 'trajectory', 'tool', 'codebase', 'preference', 'review_pattern', 'security_pattern', 'environment'])
 LIFECYCLE = frozenset(['active', 'stale', 'superseded', 'revoked', 'unverified'])
@@ -297,7 +297,7 @@ class LocalMemory:
         safe_path(self.root, '_bmad-output/memory')
         self.path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         lock = safe_path(self.root, '_bmad-output/memory/store.lock')
-        fd = os.open(lock, os.O_CREAT | os.O_RDWR | getattr(os, 'O_NOFOLLOW', 0), 0o600)
+        fd = open_lock_fd(lock)
         start = time.monotonic()
         try:
             while True:
@@ -326,7 +326,7 @@ class LocalMemory:
                 out.write(payload)
                 out.flush()
                 os.fsync(out.fileno())
-            os.replace(name, self.path)
+            atomic_replace(name, self.path)
         finally:
             if os.path.exists(name):
                 os.unlink(name)

@@ -38,7 +38,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from .._compat import flock_ex_nb, flock_un
+from .._compat import atomic_replace, flock_ex_nb, flock_un, open_lock_fd
 
 
 BUDGET_FILE = Path("_bmad-output") / "budget.json"
@@ -125,7 +125,7 @@ class BudgetLedger:
             json.dump(state.to_dict(), fh, ensure_ascii=False)
             fh.flush()
             os.fsync(fh.fileno())
-        os.replace(tmp, self.path)
+        atomic_replace(tmp, self.path)
 
 
 @dataclass
@@ -162,7 +162,7 @@ class BudgetGuard:
 
         lock_path = self.ledger.lock_path
         lock_path.parent.mkdir(parents=True, exist_ok=True)
-        fd = os.open(str(lock_path), os.O_CREAT | os.O_RDWR | os.O_CLOEXEC, 0o600)
+        fd = open_lock_fd(lock_path)
         try:
             flock_ex_nb(fd)
         except (BlockingIOError, OSError) as e:

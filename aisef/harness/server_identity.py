@@ -39,7 +39,7 @@ from contextlib import closing
 from dataclasses import dataclass
 from pathlib import Path
 
-from .._compat import flock_ex_nb, flock_un
+from .._compat import atomic_replace, flock_ex_nb, flock_un, open_lock_fd
 
 
 LEASE_ROOT = Path(".aisef") / "lease"
@@ -105,7 +105,7 @@ def write_lease(root: Path, lease: ServerLease) -> Path:
         json.dump(lease.to_dict(), fh, ensure_ascii=False)
         fh.flush()
         os.fsync(fh.fileno())
-    os.replace(tmp, path)
+    atomic_replace(tmp, path)
     return path
 
 
@@ -196,7 +196,7 @@ def acquire_port_lease(root: Path, run_id: str, base_url: str) -> int | None:
     """
     path = root / LEASE_ROOT / f"port-{run_id}.lock"
     path.parent.mkdir(parents=True, exist_ok=True)
-    fd = os.open(str(path), os.O_CREAT | os.O_RDWR | os.O_CLOEXEC, 0o600)
+    fd = open_lock_fd(path)
     try:
         flock_ex_nb(fd)
     except (BlockingIOError, OSError):
