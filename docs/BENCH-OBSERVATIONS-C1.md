@@ -242,3 +242,35 @@ là một phần của hệ đang đo): dạy `aisef/clients/opencode.py` nhận
 `file_change`, và xếp nó vào nhóm trạng thái **hạ tầng, chạy lại được**, thay vì
 coi là một phiên đã hoàn thành. Đây đúng là mục "phát hiện đứng máy trong phiên"
 đã hoãn ở [ADR-010 §8](ADR-010-mimo-code-lessons.md) — nay có chữ ký đo được.
+## O-8 · `state-1`: phép tách đã chạy — **cả hai nhánh cùng trượt 0/3**
+
+Ở O-3 tôi viết: phép tách sạch cho giả thuyết "điều kiện AISEF dẫn agent đi lạc
+vào hàm đọc env" là các task **không** nói về env/scope. `state-1` là task đầu
+tiên như vậy, và kết quả không ủng hộ giả thuyết:
+
+| điều kiện | lượt 1 | lượt 2 | lượt 3 | pass@1 |
+|---|---|---|---|---|
+| AISEF | FAIL (22 turn, 291 s, 0 tệp) | FAIL (15 turn, 229 s, 0 tệp) | FAIL (46 turn, 826 s, 1 tệp) | **0,00** |
+| trần | FAIL (11 turn, 313 s, 0 tệp) | FAIL (30 turn, 408 s, 0 tệp) | FAIL (13 turn, 184 s, 0 tệp) | **0,00** |
+
+Guard chặn: 0. Ghi ngoài phạm vi: 0. **Năm trong sáu lượt không ghi một tệp
+nào**, và cả sáu phiên đều mang chữ ký O-7 — model in cú gọi công cụ ra dưới
+dạng văn bản rồi phiên dừng.
+
+Ba điều chốt lại từ đây:
+
+1. **Giả thuyết "dữ liệu phạt nhánh AISEF" không còn giải thích được số liệu.**
+   Nó dựng lên để giải thích `sec-1`/`sec-2`; trên task không nói gì về env thì
+   hai nhánh trượt như nhau. Cách đọc còn sống là cách đọc O-7: cái đang quyết
+   định kết cục là phiên bị cắt, không phải điều kiện thí nghiệm.
+2. **Lượt trượt duy nhất có ghi tệp đi vào `run_attempt`/`verify_candidate`/
+   `implement_story`** — vòng lặp của harness, không phải hàm đọc env. Đây cũng
+   là bằng chứng ngược với mẫu ở O-3.
+3. **Tỉ lệ phiên bị cắt của hai nhánh đang xích lại gần nhau** khi có thêm dữ
+   liệu: 26 %/7 % ở O-7 (sau 7 task) thành **27 % (11/41) và 14 % (4/28)** sau
+   `state-1`. Chênh lệch còn đó nhưng nhỏ hơn một nửa so với lúc đầu; đừng xây
+   kết luận trên nó cho tới khi hết 12 task.
+
+Từ lúc này chỉ số "phiên bị cắt" **được đo bằng mã, không bằng SQL gõ tay**:
+`python3 -m tests.bench analyze` in ra bảng ấy (`tests/bench/_analyze.py ::
+cut_sessions`), nên con số trong báo cáo là con số dựng lại được.
