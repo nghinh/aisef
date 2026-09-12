@@ -61,7 +61,11 @@ class Session:
 #: C-1: 11/11 lần chữ ký này là phần văn bản **cuối cùng** của phiên
 #: (`docs/BENCH-OBSERVATIONS-C1.md` § O-7).
 _CU_PHAP_KHONG_PHAN_GIAI = re.compile(r"<\w+:tool_call>|<invoke name=")
-_DUONG_DAN_PHIEN = re.compile(r"\.bench/run/([\w-]+)/([\w-]+)/a(\d+)")
+#: `.bench/run/…` **và** `.bench-c1b/run/…`: mỗi cohort có thể ghi vào thư mục
+#: riêng (`AISEF_BENCH_DIR`) để không xoá cây làm việc của cohort trước. Neo
+#: cứng vào `.bench/` nghĩa là chỉ số "phiên bị cắt" **im lặng trả rỗng** cho
+#: mọi cohort chạy ở thư mục khác — mất phép đo mà không có lỗi nào.
+_DUONG_DAN_PHIEN = re.compile(r"\.bench[\w.-]*/run/([\w-]+)/([\w-]+)/a(\d+)")
 #: Kho phiên của OpenCode. Chỉ đọc, không bao giờ ghi.
 KHO_PHIEN = Path.home() / ".local" / "share" / "opencode" / "opencode.db"
 
@@ -91,7 +95,7 @@ def cut_sessions(db: Path | None = None) -> dict[tuple[str, str, int], tuple[int
             # id của phiên có đụng cây bench; lượt hai mới đọc nội dung từng
             # phiên ấy.
             ung_vien = [r[0] for r in con.execute(
-                "select distinct session_id from part where data like ?", ("%.bench/run/%",))]
+                "select distinct session_id from part where data like ?", ("%.bench%/run/%",))]
             phien: dict[str, list[str]] = {}
             for sid in ung_vien:
                 phien[sid] = [d for (d,) in con.execute(

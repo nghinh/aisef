@@ -889,6 +889,30 @@ class TestLenhAnalyzeCoThat(unittest.TestCase):
         self.assertIn("| opencode | 1 | 1 | 1 | 1 | 0 |", khong_cat)
         self.assertIn("| opencode | 1 | 1 | 1 | 1 | — |", A.report([phien], {}))
 
+    def test_dem_duoc_ca_cohort_ghi_o_thu_muc_khac(self):
+        """Mỗi cohort có thể ghi vào thư mục riêng (`AISEF_BENCH_DIR`) để không
+        xoá cây làm việc của cohort trước. Neo cứng vào `.bench/` thì chỉ số
+        "phiên bị cắt" **im lặng trả rỗng** cho cohort ấy — mất phép đo mà không
+        có lỗi nào, đúng kiểu hỏng khó thấy nhất."""
+        import sqlite3
+        import tempfile
+        from . import _analyze as A
+        with tempfile.TemporaryDirectory() as d:
+            db = Path(d) / "opencode.db"
+            con = sqlite3.connect(db)
+            con.execute("create table part (session_id text, data text)")
+            con.executemany("insert into part values (?,?)", [
+                ("s1", '{"type":"text","text":"đọc .bench-c1b/run/opencode/bug-a2-sec-1/a6"}'),
+                ("s1", '{"type":"text","text":"<minimax:tool_call>"}'),
+                ("s2", '{"type":"text","text":"đọc .bench/run/opencode/bug-a2-sec-1/a1"}'),
+                ("s2", '{"type":"text","text":"xong"}'),
+            ])
+            con.commit()
+            con.close()
+            ra = A.cut_sessions(db)
+        self.assertEqual(ra, {("opencode", "bug-a2-sec-1", 6): (1, 1),
+                              ("opencode", "bug-a2-sec-1", 1): (1, 0)})
+
     def test_khong_co_kho_phien_thi_chi_so_them_bi_bo_qua(self):
         """Chỉ số này là phần thêm: CI không có kho phiên của OpenCode, và bảng
         chính vẫn phải in ra được."""
