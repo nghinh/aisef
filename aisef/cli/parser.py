@@ -43,16 +43,31 @@ from .plan import (
 )
 
 
+class _Parser(argparse.ArgumentParser):
+    """`ArgumentParser` thoát **1** khi gõ sai, không phải 2.
+
+    Quy ước thoát của CLI này (README): `0` xong · `1` gõ sai · `2` **chưa
+    sẵn sàng** (cổng chưa duyệt, doctor chưa đạt) — để CI phân biệt "hỏng" với
+    "chưa tới lúc". Mặc định của argparse là 2, nên một lỗi gõ lệnh đọc thành
+    "chưa tới lúc" và script CI đi tiếp như thể mọi thứ bình thường. Đo
+    13/09/2026: `aisef evidence` thiếu tham số thoát 2.
+    """
+
+    def error(self, message: str):   # type: ignore[override]
+        self.print_usage(sys.stderr)
+        self.exit(EXIT_USAGE, f"{self.prog}: error: {message}\n")
+
+
 def build_parser() -> argparse.ArgumentParser:
     from .. import __version__
 
-    p = argparse.ArgumentParser(
+    p = _Parser(
         prog="aisef",
         description="AISEF — orchestrate the AI-assisted software development lifecycle",
     )
     p.add_argument("-V", "--version", action="version", version=f"%(prog)s {__version__}")
     p.add_argument("--project", default=".", help="project directory (default: current directory)")
-    sub = p.add_subparsers(dest="command", required=True)
+    sub = p.add_subparsers(dest="command", required=True, parser_class=_Parser)
 
     from .memory import cmd_memory
     mem = sub.add_parser("memory", help="experimental scoped advisory memory (default off)")
@@ -283,9 +298,29 @@ def _speak_utf8() -> None:
             pass       # not a real stream (captured in tests, piped oddly)
 
 
+def _cho_moi_lenh_nhan_project(p: argparse.ArgumentParser) -> None:
+    """Cho `--project` đứng **sau** tên lệnh nữa, không chỉ trước.
+
+    `aisef --project X gates` là dạng argparse mặc định; `aisef gates --project X`
+    là dạng người thật gõ (và là dạng `git`/`docker` nhận). Trước 13/09/2026 dạng
+    thứ hai ra lỗi gõ sai — đo được: `gates` trong thư mục rỗng thoát 2, cùng lệnh
+    thêm `--project <dir>` thoát 1 vì argparse không nhận nổi cờ ấy.
+
+    `default=SUPPRESS` là phần quan trọng: nếu để mặc định `"."` thì
+    `aisef --project X gates` sẽ bị chính subparser ghi đè về `"."` — hỏng theo
+    hướng im lặng, tệ hơn hẳn lỗi gõ sai.
+    """
+    for act in p._subparsers._group_actions if p._subparsers else ():   # noqa: SLF001
+        for sub in getattr(act, "choices", {}).values():
+            sub.add_argument("--project", default=argparse.SUPPRESS,
+                             help="project directory (also accepted before the command)")
+
+
 def main(argv: list[str] | None = None) -> int:
     _speak_utf8()
-    args = build_parser().parse_args(argv)
+    parser = build_parser()
+    _cho_moi_lenh_nhan_project(parser)
+    args = parser.parse_args(argv)
     args.project = str(Path(args.project).resolve())
     try:
         return args.func(args)

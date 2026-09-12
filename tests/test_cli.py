@@ -931,3 +931,61 @@ class TestCliLuonNoiUtf8(unittest.TestCase):
 
         with patch("sys.stdout", io.StringIO()), patch("sys.stderr", io.StringIO()):
             _speak_utf8()      # không ném là đạt
+
+class TestQuyUocMaThoat(unittest.TestCase):
+    """`0` xong · `1` gõ sai · `2` chưa sẵn sàng — README hứa thế để CI phân
+    biệt "hỏng" với "chưa tới lúc".
+
+    Mặc định của argparse là thoát **2** khi gõ sai, tức một lỗi gõ lệnh đọc
+    thành "chưa tới lúc" và script CI đi tiếp như thể bình thường. Đo 13/09/2026
+    trên bản 1.4.0: `aisef evidence` thiếu tham số thoát 2.
+    """
+
+    def _chay(self, *args) -> int:
+        import subprocess
+        return subprocess.run([sys.executable, "-m", "aisef", *args],
+                              capture_output=True, text=True, cwd=str(ROOT)).returncode
+
+    def test_thieu_tham_so_la_go_sai_thoat_1(self):
+        self.assertEqual(self._chay("evidence"), 1)
+
+    def test_lenh_khong_ton_tai_thoat_1(self):
+        self.assertEqual(self._chay("khong-co-lenh-nay"), 1)
+
+    def test_co_khong_ton_tai_thoat_1(self):
+        self.assertEqual(self._chay("status", "--co-nay-khong-co"), 1)
+
+    def test_project_dat_sau_ten_lenh_cung_chay(self):
+        """`aisef gates --project X` là dạng người thật gõ (và `git`/`docker`
+        nhận). Trước 13/09/2026 nó ra lỗi gõ sai; sau bản vá, hai thứ tự cho
+        cùng mã thoát và cùng đầu ra."""
+        import subprocess
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            sau = subprocess.run([sys.executable, "-m", "aisef", "gates", "--project", d],
+                                 capture_output=True, text=True, cwd=str(ROOT))
+            truoc = subprocess.run([sys.executable, "-m", "aisef", "--project", d, "gates"],
+                                   capture_output=True, text=True, cwd=str(ROOT))
+        self.assertEqual(sau.returncode, truoc.returncode, sau.stderr[-300:])
+        self.assertEqual(sau.stdout, truoc.stdout)
+        self.assertIn("prd", sau.stdout)
+
+    def test_project_truoc_lenh_khong_bi_subparser_ghi_de(self):
+        """Cái bẫy của argparse: nếu subparser khai `--project` với mặc định
+        `"."` thì `aisef --project X gates` bị ghi đè về `"."` — hỏng im lặng,
+        tệ hơn lỗi gõ sai. `default=SUPPRESS` là thứ chặn điều đó."""
+        from aisef.cli.parser import _cho_moi_lenh_nhan_project, build_parser
+        p = build_parser()
+        _cho_moi_lenh_nhan_project(p)
+        self.assertEqual(p.parse_args(["--project", "/tmp/x", "gates"]).project, "/tmp/x")
+        self.assertEqual(p.parse_args(["gates", "--project", "/tmp/y"]).project, "/tmp/y")
+
+    def test_chua_san_sang_van_thoat_2(self):
+        """Đừng sửa lỗi này bằng cách biến mọi thứ thành 1: cổng chưa duyệt
+        **phải** còn là 2, nếu không CI hết phân biệt được hai ca."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            import subprocess
+            rc = subprocess.run([sys.executable, "-m", "aisef", "gates", "--project", d],
+                                capture_output=True, text=True, cwd=str(ROOT)).returncode
+        self.assertEqual(rc, 2)

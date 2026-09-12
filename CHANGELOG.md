@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+- **`aisef <command> --project <dir>` works now** (bug 80). The flag was
+  declared only on the root parser, so the order people actually type — and
+  that `git` and `docker` accept — came back as a usage error. It is declared
+  on every subcommand as well, with `default=SUPPRESS` so that putting it
+  before the command is not silently overwritten by the subparser's default.
+- **A typo exits 1, not 2** (bug 81). `argparse` exits 2 on a usage error,
+  which is this CLI's documented code for "not ready yet" (gate unapproved,
+  doctor failing). A mistyped command therefore read to CI as "not yet done"
+  and scripts carried on. Usage errors now exit 1; the not-ready cases still
+  exit 2, and a test pins both.
+
 ## 1.4.0 — 2026-09-13
 
 A minor, not a patch, because one behaviour genuinely changes: a turn cap
