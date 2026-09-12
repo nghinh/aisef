@@ -492,3 +492,31 @@ class TestNhatKyKhongNgapLogMayChu(unittest.TestCase):
                + "\n".join(f'127.0.0.1 - - [09/Sep/2026 18:43:0{i%10}] "GET / HTTP/1.1" 200 -'
                            for i in range(50)))
         self.assertIn("thất bại thật", self.ket_qua(out).tail(5))
+
+
+class TestSummaryNoiRoKhiChuaChayDuoc(unittest.TestCase):
+    """Harness đã phân loại "không chạy được" rồi, nhưng dòng đầu chỉ in
+    `✗ exit 127` — người đọc đi tìm lỗi trong mã của mình. Đo 13/09/2026:
+    `aisef tool test` trên dự án mới in đúng hai dòng, không dòng nào nói
+    "chưa chạy được"."""
+
+    def _res(self, **kw):
+        from aisef.harness.tools import ToolResult
+        return ToolResult(name="test", ok=kw.pop("ok", False),
+                          exit_code=kw.pop("exit_code", 127), duration_ms=3, **kw)
+
+    def test_co_ly_do_thi_hien_o_dong_dau_va_dau_la_tron(self):
+        r = self._res(unrunnable="tool not installed or cannot load (exit 127)")
+        s = r.summary()
+        self.assertIn("NOT RUNNABLE", s)
+        self.assertIn("tool not installed", s)
+        self.assertTrue(s.startswith("○"), s)
+
+    def test_that_bai_that_van_la_dau_x(self):
+        s = self._res(exit_code=1).summary()
+        self.assertTrue(s.startswith("✗"), s)
+        self.assertNotIn("NOT RUNNABLE", s)
+
+    def test_chay_duoc_va_xanh_thi_khong_doi(self):
+        s = self._res(exit_code=0, ok=True).summary()
+        self.assertTrue(s.startswith("✅"), s)

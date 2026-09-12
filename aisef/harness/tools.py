@@ -132,7 +132,14 @@ class ToolResult:
         mark = "✅" if self.ok else "✗"
         missing = ", ".join(self.detail.get("missing") or [])
         extra = f" (sandbox degraded — missing {missing or 'guarantees'})" if self.degraded else ""
-        return f"{mark} {self.name} — exit {self.exit_code}, {self.duration_ms}ms{extra}"
+        # "Không chạy được" phải hiện ngay ở dòng đầu, không nằm chờ trong
+        # `detail`: harness đã phân loại xong mà người đọc chỉ thấy "✗ exit 127"
+        # thì họ đi tìm lỗi trong mã của mình. Đo 13/09/2026 trên một dự án mới:
+        # `aisef tool test` in đúng hai dòng, không dòng nào nói "chưa chạy được".
+        chua_chay = f" — NOT RUNNABLE: {self.unrunnable}" if self.unrunnable else ""
+        mark = "○" if self.unrunnable else mark
+        return (f"{mark} {self.name} — exit {self.exit_code}, "
+                f"{self.duration_ms}ms{extra}{chua_chay}")
 
     def output(self) -> tuple[str, int]:
         """(stdout + stderr with secrets redacted, redaction count). All printed

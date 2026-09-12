@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- **`init --stack python` now writes a test command this machine can run**
+  (bug 82). It wrote `python -m pytest -v`; macOS and most current Linux
+  distributions have only `python3`, so `aisef tool test` answered `exit 127:
+  No such file or directory: 'python'` on the very machine that had just
+  written the config. The preset picks the interpreter `shutil.which` finds.
+- **"Could not run" is now visible where it is read** (bug 83). The harness
+  already classified a missing tool as unrunnable, but `aisef tool test`
+  printed `✗ test — exit 127` and left the reason inside the evidence detail,
+  so a reader goes looking for the bug in their own code. The summary line
+  carries `○ … NOT RUNNABLE: <reason>`; real failures keep `✗`.
+
 - **`aisef <command> --project <dir>` works now** (bug 80). The flag was
   declared only on the root parser, so the order people actually type — and
   that `git` and `docker` accept — came back as a usage error. It is declared

@@ -590,9 +590,21 @@ class TestInit(CliTestCase):
         self.assertEqual(code, EXIT_OK)
         import json
         cfg = json.loads((self.project / ".ai" / "config.json").read_text(encoding="utf-8"))
-        self.assertEqual(cfg["tools.test"], "python -m pytest -v")
+        from aisef.cli.harness import _PY
+        self.assertEqual(cfg["tools.test"], f"{_PY} -m pytest -v")
         self.assertEqual(cfg["sandbox.image"], "python:3.12-slim")
         self.assertIn("pypi.org", cfg["sandbox.allow_hosts"])
+
+    def test_lenh_test_cua_preset_chay_duoc_tren_may_nay(self):
+        """`init --stack python` ghi `python -m pytest -v` trên máy không có
+        `python` (macOS, phần lớn Linux) — `aisef tool test` ra `exit 127` ngay
+        trên máy vừa sinh ra lệnh ấy. Đo 13/09/2026 trên dự án mới."""
+        import shutil
+
+        from aisef.cli.harness import STACK_PRESETS, _PY
+        self.assertIsNotNone(shutil.which(_PY), f"{_PY} không có trên máy này")
+        lenh = str(STACK_PRESETS["python"]["tools.test"])
+        self.assertTrue(lenh.startswith(_PY + " "), lenh)
 
     def test_moi_stack_preset_deu_in_duoc_ten_test(self):
         """`doctor` coi lệnh không in tên test là "gate chưa cấu hình". Một

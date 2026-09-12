@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import shutil
 import sys
 from pathlib import Path
 
@@ -48,6 +49,13 @@ def cmd_baseline(args) -> int:
 #: *chưa cấu hình* — vì không đọc được tên test. Người mới không có cách nào
 #: biết điều đó trước khi chạy hết một story. Thêm `-v` là đủ, không thêm phụ
 #: thuộc nào. Coverage thì vẫn cần plugin, nên vẫn để người tự khai.
+#: Tên trình thông dịch **có thật trên máy đang chạy `init`**. macOS và phần lớn
+#: bản Linux hiện đại không có `python`, chỉ có `python3`; Windows thì ngược lại.
+#: Đo 13/09/2026: `init --stack python` ghi `python -m pytest -v`, rồi
+#: `aisef tool test` trên đúng máy ấy ra `exit 127: No such file or directory:
+#: 'python'` — preset sinh ra một lệnh không chạy được trên máy vừa sinh ra nó.
+_PY = "python" if shutil.which("python") else "python3"
+
 STACK_PRESETS: dict[str, dict[str, object]] = {
     "react": {
         "tools.test": "npx vitest run --reporter=verbose",
@@ -58,7 +66,7 @@ STACK_PRESETS: dict[str, dict[str, object]] = {
         "app.dev_command": "npm run dev",
     },
     "python": {
-        "tools.test": "python -m pytest -v",
+        "tools.test": f"{_PY} -m pytest -v",
         "tools.lint": "ruff check .",
         "sandbox.image": "python:3.12-slim",
         "sandbox.allow_hosts": ["pypi.org", "files.pythonhosted.org"],
