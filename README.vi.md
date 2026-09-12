@@ -296,7 +296,7 @@ chứng minh (quyết định chủ đầu tư 2026-09-06, `docs/RELEASE-PLAN-v0
   `image-scan` cùng loại (docker scout đòi đăng nhập, trivy/grype vắng).
 - **`skills.offer` tắt** (A/B không thấy gain) và **`skills.inline` đã gỡ** —
   hai lần A/B trên agent thật cho `used` 0/0 trong khi nhánh inline thêm ~8,8k
-  ký tự prompt, nên cờ và mã bị gỡ ở 1.3.2; dự án cũ còn khai thì nạp được kèm
+  ký tự prompt, nên cờ và mã bị gỡ ở 1.4.0; dự án cũ còn khai thì nạp được kèm
   cảnh báo. **`repo_map` tắt** (`context.max_repo_map_chars = 0`, A/B hoãn).
 - **`coverage`**: harness đọc số từ runner (`--coverage`/`--cov`); dự án chưa
   bật thì mục cổng là ○ chưa cấu hình, không phải đạt.

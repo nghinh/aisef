@@ -334,7 +334,7 @@ called unproven (owner decision 2026-09-06, `docs/RELEASE-PLAN-v0.1.0.md` §0):
 - **`skills.offer` is off** (A/B measured no gain) and **`skills.inline` is
   gone** — two A/B runs on real agents reported `used` 0/0 while the inlined
   branch added ~8.8k prompt characters, so the flag and its code were removed
-  in 1.3.2; an old project that still declares it loads with a warning.
+  in 1.4.0; an old project that still declares it loads with a warning.
   **`repo_map` is off** (`context.max_repo_map_chars = 0`, its A/B deferred).
 - **`coverage`**: the harness reads the number the runner prints
   (`--coverage`/`--cov`); a project that has not enabled it gets ○ "not

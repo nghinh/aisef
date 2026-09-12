@@ -1,6 +1,15 @@
 # Changelog
 
-## Unreleased
+## 1.4.0 — 2026-09-13
+
+A minor, not a patch, because one behaviour genuinely changes: a turn cap
+that used to be ignored now stops sessions. If a project relies on
+OpenCode sessions running past `run.max_turns` (default 40) to the
+half-hour timeout, raise the cap deliberately — the number is enforced now.
+
+Everything here came out of the C-1 benchmark cohort (12 hard tasks, 3
+attempts, 2 conditions, a non-frontier model) and the cost decomposition
+that ran beside it, both reported in `docs/`.
 
 - **`skills.inline` is gone.** ADR-003's mechanism B inlined the top-scoring
   skill's SKILL.md into the prompt. Two A/B runs on real agents reported
