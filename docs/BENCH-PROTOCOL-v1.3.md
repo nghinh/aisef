@@ -177,3 +177,18 @@ Với một alias định tuyến có thể đổi mô hình nền giữa các l
 biến không kiểm soát được — và là thêm một lý do để báo cáo không rút ra kết
 luận mạnh hơn dữ liệu.
 
+### Lời khai model cho cột 1 (chủ dự án, 2026-09-12 trong lúc đang chạy)
+
+Chủ dự án khai: mô hình nền sau alias `9router/mycombo` **đang là MiniMax-M2.7**.
+
+Đây là **lời khai**, không phải quan sát: luồng JSON của OpenCode không mang
+tên model, nên dữ liệu của cột 1 ghi `9router/mycombo` ở mọi dòng và không thể
+tự xác nhận điều trên. Trường `note` của các dòng ấy để trống vì trường này
+chưa tồn tại lúc cột 1 bắt đầu; dán nhãn ngược vào dữ liệu đã đóng băng là việc
+không được làm, nên lời khai ở lại đây, kèm ngày giờ.
+
+Ràng buộc kéo theo, đã thống nhất với chủ dự án: **không đổi mô hình nền trong
+lúc một cột đang chạy**. Đổi giữa chừng thì nửa cột đo model này, nửa kia đo
+model khác, mà mọi dòng vẫn ghi cùng một chuỗi — hỏng không cứu được. Cột 2 chỉ
+bắt đầu sau khi cột 1 đóng, và mang nhãn `--note "mycombo→<tên model>"`.
+
