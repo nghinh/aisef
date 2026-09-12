@@ -257,5 +257,49 @@ class TestBrowserUnavailable(unittest.TestCase):
             mod.browser.render = real
 
 
+
+class TestHopDongYeuDiThiNoiRa(unittest.TestCase):
+    """`--force` chạy lại agent, và lượt hai không phải lượt một: bản đo trên
+    `todo-oc` mất ô tìm kiếm và 2/3 trạng thái. Hợp đồng là thứ khâu kiểm
+    đối chiếu ứng dụng thật, nên hợp đồng nghèo đi là cổng nhạt đi."""
+
+    def _hop_dong(self, *, components, states, fields=()):
+        from aisef.control.design_contract import DesignContract, ScreenContract
+        from aisef.harness.aria import Component
+        return DesignContract(screens=[ScreenContract(
+            id="note-list",
+            components=[Component(r, n) for r, n in components],
+            states=list(states),
+            fields=[{"name": f} for f in fields],
+        )])
+
+    def test_mat_thanh_phan_va_trang_thai_thi_canh_bao(self):
+        from aisef.phases.mockup import _mat_bot_so_voi_ban_truoc
+        cu = self._hop_dong(
+            components=[("textbox", "New note"), ("searchbox", "Search notes")],
+            states=["primary", "empty"], fields=["search-input"])
+        moi = self._hop_dong(
+            components=[("textbox", "New note")], states=["primary"])
+        canh = _mat_bot_so_voi_ban_truoc(cu, moi)
+        self.assertEqual(len(canh), 1)
+        self.assertIn("Search notes", canh[0])
+        self.assertIn("empty", canh[0])
+        self.assertIn("search-input", canh[0])
+
+    def test_khong_mat_gi_thi_im_lang(self):
+        from aisef.phases.mockup import _mat_bot_so_voi_ban_truoc
+        cu = self._hop_dong(components=[("textbox", "New note")], states=["primary"])
+        moi = self._hop_dong(
+            components=[("textbox", "New note"), ("button", "Add")],
+            states=["primary", "empty"])
+        self.assertEqual(_mat_bot_so_voi_ban_truoc(cu, moi), [])
+
+    def test_man_hinh_moi_khong_bi_coi_la_mat(self):
+        from aisef.control.design_contract import DesignContract
+        from aisef.phases.mockup import _mat_bot_so_voi_ban_truoc
+        moi = self._hop_dong(components=[("textbox", "x")], states=["primary"])
+        self.assertEqual(_mat_bot_so_voi_ban_truoc(DesignContract(), moi), [])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -19,7 +19,7 @@ from pathlib import Path
 
 from ..clients.base import ClientAdapter, RunSpec
 from ..config import Config
-from ..control.design_contract import DesignContract, build
+from ..control.design_contract import DesignContract, build, load as load_contract
 from ..control.experience import Experience, Screen, parse_experience_file
 from ..control.machine_gate import GateResult, check_design_contract, is_route_like
 from ..harness.guardrails import (
@@ -254,8 +254,44 @@ def extract(
         return DesignContract(), gate
 
     contract = build(experience, rendered, artifact_root=artifact_root)
+    gate = check_design_contract(contract, experience, stories)
+    gate.warnings += _mat_bot_so_voi_ban_truoc(load_contract(artifact_root), contract)
     contract.write(artifact_root)
-    return contract, check_design_contract(contract, experience, stories)
+    return contract, gate
+
+
+def _mat_bot_so_voi_ban_truoc(cu: DesignContract, moi: DesignContract) -> list[str]:
+    """Warn when a regenerated screen promises less than the one it replaces.
+
+    `--force` re-runs the agent, and a second run of the same prompt is not the
+    same mockup: measured on `todo-oc`, the rerun dropped the search box and
+    two of three states. The contract is what verification compares the real
+    app against, so a quieter contract is a quieter gate — and nothing else
+    would have said so.
+    """
+    ra = []
+    for s_moi in moi.screens:
+        s_cu = cu.by_id(s_moi.id)
+        if s_cu is None:
+            continue
+        mat = []
+        for ten, truoc, sau in (
+            ("components", {c.name for c in s_cu.components}, {c.name for c in s_moi.components}),
+            ("states", set(s_cu.states), set(s_moi.states)),
+            ("fields", {f.get("name", "") for f in s_cu.fields},
+             {f.get("name", "") for f in s_moi.fields}),
+        ):
+            thieu = truoc - sau
+            if thieu:
+                mat.append(f"{ten}: {', '.join(sorted(thieu))}")
+        if mat:
+            ra.append(
+                f"{s_moi.id}: the regenerated mockup no longer declares "
+                + "; ".join(mat)
+                + " — the previous contract had them, and this one is what "
+                "verification compares the app against"
+            )
+    return ra
 
 
 def write_index(artifact_root: Path, res: MockupResult) -> Path | None:
