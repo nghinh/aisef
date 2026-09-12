@@ -55,7 +55,7 @@ from ..harness.guardrails import (
     fork_point,
     head_sha,
 )
-from ..control.budget import BudgetExceeded, BudgetGuard, BudgetLedger
+from ..control.budget import BudgetExceeded, BudgetGuard
 from ..control.journal import Entry as JEntry, JournalStore
 from ..harness.mockup_map import load_for_story, prompt_section
 from ..harness.observe import AGENT_RUN, MOCKUP_MAP, NOTE, SKILL_USE, TOOL_RUN, Event, Evidence, EvidenceStore

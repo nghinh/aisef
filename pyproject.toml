@@ -26,5 +26,32 @@ include = ["aisef*"]
 # liệu: thiếu chúng thì `aisef run` chết ở lần gọi agent đầu tiên.
 "aisef" = ["kit/prompts/*", "kit/rules/*", "kit/skills/**/*", "kit/*.json", "harness/assets/*"]
 
+[tool.ruff]
+target-version = "py311"        # bản thấp nhất khai hỗ trợ, không phải bản của máy đo
+line-length = 120
+
+[tool.ruff.lint]
+# Tập rule là **cổng**, không phải sở thích: chỉ những lớp lỗi mà một phát hiện
+# là một lỗi thật hoặc một mập mờ thật. Bật 2026-09-12 sau khi đo: F/B/E9 sạch
+# sau ~90 sửa nhỏ, và chính lượt bật đã bắt một lỗi vừa gây ra (đổi tên biến
+# vòng lặp còn dùng trong thân) — đó là giá trị của cổng.
+#   F  pyflakes     — import thừa, biến gán không dùng, tên không tồn tại
+#   B  bugbear      — zip() không khai strict, raise mất nguyên nhân, biến vòng lặp chết
+#   E9 pycodestyle  — lỗi cú pháp/IO ở mức chặn
+select = ["F", "B", "E9"]
+# Hoãn có lý do (đo 2026-09-12) — không phải "bỏ qua vì ồn":
+#   I001/UP/ISC/SIM/PERF/C4 — thuần phong cách, sửa hàng loạt sát phát hành là churn
+#     không đổi hành vi; mở sau khi 1.3.0 ra, từng họ một.
+#   PLW1510 (66 chỗ) — `subprocess.run` không khai `check=`: harness **cố ý** đọc
+#     returncode; khai `check=False` tường minh là đúng nhưng chạm 66 điểm gọi.
+#   S (bandit) — phần lớn là subprocess/tempfile mà harness buộc phải dùng; cần
+#     một lượt phân loại riêng trước khi thành cổng.
+
+[tool.ruff.lint.per-file-ignores]
+# Fixture và kho task của bench là **byte đã ghim** (MANIFEST.sha256) — sửa lint
+# ở đó làm hỏng dataset.
+"tests/bench/tasks/**" = ["ALL"]
+"tests/fixtures/**" = ["ALL"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

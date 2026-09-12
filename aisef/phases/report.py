@@ -28,7 +28,6 @@ from ..control.approvals import (
     PRE_DEPLOY_REPORT,
     STORIES_INDEX,
     ApprovalStore,
-    Status,
 )
 from ..control import ledger
 from ..control.gate import CHECK_NAMES, qualification_table

@@ -159,8 +159,8 @@ def render_story(story: Story, prd: PRD | None, root: Path | None = None) -> str
     out += [
         "---",
         "",
-        f"_Auto-generated from `epics.md`. Edits here will be lost on next split — "
-        f"edit `epics.md` and run `aisef plan`._",
+        "_Auto-generated from `epics.md`. Edits here will be lost on next split — "
+        "edit `epics.md` and run `aisef plan`._",
         "",
     ]
     return "\n".join(out)

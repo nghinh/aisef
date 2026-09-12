@@ -16,7 +16,8 @@ from aisef.control import conformance as C  # noqa: E402
 
 def run(client, *cells, version="1.0", at="2026-09-05T00:00:00+00:00"):
     r = C.ClientRun(client=client, version=version, at=at)
-    for pid, ok in zip([p[0] for p in C.PROBES], cells):
+    # phép thử cố tình truyền ít ô hơn số probe — cắt theo bên ngắn hơn
+    for pid, ok in zip([p[0] for p in C.PROBES], cells, strict=False):
         r.results.append(C.ProbeResult(pid, ok, detail=f"{pid} quan sát"))
     return r
 

@@ -70,12 +70,12 @@ def safe_path(root, relative):
         try:
             if current.is_symlink():
                 raise MemoryError('symlink memory path')
-        except OSError:
-            raise MemoryError('unsafe memory path')
+        except OSError as err:
+            raise MemoryError('unsafe memory path') from err
     try:
         resolved = current.resolve()
-    except (OSError, RuntimeError):
-        raise MemoryError('unsafe memory path')
+    except (OSError, RuntimeError) as err:
+        raise MemoryError('unsafe memory path') from err
     if not (resolved == resolved_root or resolved_root in resolved.parents):
         raise MemoryError('memory path escapes project')
     return Path(resolved_root) / PurePosixPath(relative)
@@ -223,15 +223,15 @@ class LocalMemory:
             return
         try:
             lines = [line for line in path.read_text(encoding='utf-8', errors='replace').splitlines() if line.strip()]
-        except OSError:
-            raise MemoryError('event source unreadable')
+        except OSError as err:
+            raise MemoryError('event source unreadable') from err
         if src['type'] == 'evidence':
             events = []
             for line in lines:
                 try:
                     entry = json.loads(line)
-                except json.JSONDecodeError:
-                    raise MemoryError('event source not structured jsonl')
+                except json.JSONDecodeError as err:
+                    raise MemoryError('event source not structured jsonl') from err
                 if not isinstance(entry, dict):
                     raise MemoryError('event entry not structured')
                 events.append(entry)
@@ -242,8 +242,8 @@ class LocalMemory:
             for line in lines:
                 try:
                     entry = json.loads(line)
-                except json.JSONDecodeError:
-                    raise MemoryError('journal source not structured jsonl')
+                except json.JSONDecodeError as err:
+                    raise MemoryError('journal source not structured jsonl') from err
                 if not isinstance(entry, dict) or 'step' not in entry or 'seq' not in entry or 'attempt' not in entry:
                     raise MemoryError('journal entry missing required keys')
                 data = entry.get('data') or {}
@@ -304,9 +304,9 @@ class LocalMemory:
                 try:
                     flock_ex_nb(fd)
                     break
-                except BlockingIOError:
+                except BlockingIOError as err:
                     if time.monotonic() - start >= self.timeout:
-                        raise MemoryError('memory lock timeout')
+                        raise MemoryError('memory lock timeout') from err
                     time.sleep(0.01)
             yield
         finally:

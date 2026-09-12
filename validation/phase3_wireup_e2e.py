@@ -23,7 +23,6 @@ Steps:
 """
 from __future__ import annotations
 
-import json
 import sys
 import tempfile
 import threading
@@ -45,7 +44,6 @@ from aisef.control.findings import (  # noqa: E402
     Finding,
     FindingBook,
     Severity,
-    Status,
     Trust,
 )
 from aisef.control.qualification import (  # noqa: E402
@@ -270,7 +268,6 @@ def step_findings() -> None:
     book = FindingBook()
     book.add(original)
     lines = [f.format_line() for f in book]
-    body_text = "\n".join(lines)
     parsed = FindingBook.from_lines(lines, source="reviewer",
                                     trust=Trust.REVIEWER.value)
     record(
@@ -364,7 +361,7 @@ def step_budget_concurrency() -> None:
         record(
             "7.lock sidecar serialises concurrent reserves",
             blocked,
-            f"second guard raised BudgetExceeded while first held the lock",
+            "second guard raised BudgetExceeded while first held the lock",
         )
 
         state = BudgetState(cap_usd=0.10, spent_usd=0.0)

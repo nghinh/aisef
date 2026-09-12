@@ -102,7 +102,7 @@ def build_waves(stories: list[Story], *, max_parallel: int | None = None) -> lis
     if max_parallel is not None and max_parallel < 1:
         raise ValueError("max_parallel must be >= 1")
 
-    by_id = _validate(stories)
+    _validate(stories)   # gọi để kiểm tra đầu vào; giá trị trả về không dùng ở đây
     satisfied = {s.id for s in stories if s.is_done}
     remaining = [s for s in stories if not s.is_done]
 

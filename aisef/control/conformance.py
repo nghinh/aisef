@@ -135,7 +135,8 @@ def parse(text: str) -> Report:
         rm = _ROW.match(line)
         if rm and clients:
             cells = [c.strip() for c in rm.group(2).split("|")]
-            for run, cell in zip(rep.runs, cells):
+            # bảng có thể thiếu ô (tài liệu người sửa tay) — cắt theo bên ngắn hơn
+            for run, cell in zip(rep.runs, cells, strict=False):
                 if cell in ("✅", "✗"):
                     run.results.append(ProbeResult(probe=rm.group(1), passed=(cell == "✅")))
             continue

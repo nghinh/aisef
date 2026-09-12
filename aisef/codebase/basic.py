@@ -6,10 +6,8 @@ Coarser than Graphify but sufficient for basic impact analysis.
 
 from __future__ import annotations
 
-import ast
 import os
 import re
-from collections import defaultdict
 from pathlib import Path
 
 from .provider import (
@@ -124,4 +122,4 @@ class BasicProvider(CodebaseGraphProvider):
         )
 
     def path(self, project: Path, a: str, b: str) -> QueryResult:
-        return QueryResult(answer=f"(basic provider không hỗ trợ path — cài graphify)")
+        return QueryResult(answer="(basic provider không hỗ trợ path — cài graphify)")

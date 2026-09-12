@@ -627,7 +627,7 @@ class TestMergeDungRoiChayLai(RunTestCase):
         return bool(r.stdout.strip())
 
     def test_khong_bo_qua_story_da_xong_ma_chua_merge(self):
-        sid = self.sinh_story_da_xong_nhung_chua_merge()
+        self.sinh_story_da_xong_nhung_chua_merge()
         self.assertFalse(self.head_co("src/core/a.py"), "tiền đề: chưa có trên main")
 
         self.run_sprint(Agent(), only_epic="EPIC-01")
@@ -691,7 +691,6 @@ class TestDoneChiSauMerge(RunTestCase):
 
     def test_merge_dung_thi_verified_khong_phai_done(self):
         """Hai story cùng đợt cố ý chạm một tệp → merge story thứ hai đụng."""
-        from aisef.control.worktree import WorktreeManager
         # STORY-01-02 (src/a) và STORY-01-03 (src/b) cùng đợt 2. Ép đụng bằng
         # cách để agent giả của 01-03 cũng ghi vào src/a/STORY-01-02.py.
         class Dung(Agent):

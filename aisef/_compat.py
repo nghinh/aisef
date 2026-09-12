@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # chú thích kiểu dùng `subprocess`; thân hàm tự import khi chạy
+    import subprocess
+
 import os
 import sys
 

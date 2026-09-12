@@ -77,7 +77,7 @@ def commit_paths(path: Path, message: str, *, paths: list[str] | None = None) ->
             for scope in paths))
         if staged - allowed:
             raise GitError("pre-staged changes outside write scope: " + ", ".join(sorted(staged - allowed)))
-        matched = [spec for p, spec in zip(paths, specs)
+        matched = [spec for p, spec in zip(paths, specs, strict=True)
                    if (path / p).exists() or _git(path, "ls-files", "-z", "--", spec).stdout]
         if matched:
             _git(path, "add", "-A", "--", *matched)
@@ -406,10 +406,10 @@ class WorktreeManager:
             try:
                 flock_ex_nb(fh.fileno())
                 break
-            except OSError:
+            except OSError as err:
                 if time.monotonic() >= deadline:
                     fh.close()
-                    raise GitError("merge lock timeout — another machine is merging")
+                    raise GitError("merge lock timeout — another machine is merging") from err
                 time.sleep(0.1)
         try:
             yield

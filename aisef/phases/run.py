@@ -29,7 +29,7 @@ from ..clients.base import ClientAdapter
 from ..config import Config
 from ..control import complexity
 from ..control.approvals import STORIES_INDEX
-from ..control.budget import BudgetConfig, BudgetExceeded, BudgetGuard, BudgetLedger
+from ..control.budget import BudgetConfig, BudgetGuard, BudgetLedger
 from ..control.design_contract import load as load_contract
 from ..control.journal import (
     Entry as JEntry,
@@ -221,7 +221,7 @@ def _build_qstories_from_plan(plan: "Plan", state: StateStore,
                 verification_ok=bool(getattr(entry, "verification_ok", False)),
             ))
             considered.add(sid)
-    for sid, story in plan.stories.items():
+    for sid, _story in plan.stories.items():
         if sid in considered:
             continue
         out.append(QStory(story_id=sid, status="failed"))

@@ -30,20 +30,20 @@ from __future__ import annotations
 
 from ._common import (
     ARTIFACT_ROOT,
-    _GATE_MARK,
+    _GATE_MARK,  # noqa: F401 — tái xuất cho tương thích ngược
     EXIT_NOT_READY,
     EXIT_OK,
     EXIT_USAGE,
-    _approvals,
-    _artifact_root,
-    _client,
-    _gate_arg,
-    _state,
+    _approvals,  # noqa: F401 — tái xuất cho tương thích ngược
+    _artifact_root,  # noqa: F401 — tái xuất cho tương thích ngược
+    _client,  # noqa: F401 — tái xuất cho tương thích ngược
+    _gate_arg,  # noqa: F401 — tái xuất cho tương thích ngược
+    _state,  # noqa: F401 — tái xuất cho tương thích ngược
 )
-from .doctor import _hook_paths_elsewhere, cmd_doctor
+from .doctor import _hook_paths_elsewhere, cmd_doctor  # noqa: F401 — tái xuất cho tương thích ngược
 from .harness import cmd_baseline, cmd_compile, cmd_doc, cmd_guard, cmd_init, cmd_setup, cmd_skill
 from .implement import (
-    _project_has_ui,
+    _project_has_ui,  # noqa: F401 — tái xuất cho tương thích ngược
     cmd_devsecops,
     cmd_evidence,
     cmd_predeploy,
@@ -56,7 +56,7 @@ from .implement import (
 )
 from .parser import build_parser, main
 from .plan import (
-    _preflight_lines,
+    _preflight_lines,  # noqa: F401 — tái xuất cho tương thích ngược
     cmd_approve,
     cmd_auto_approve,
     cmd_change,

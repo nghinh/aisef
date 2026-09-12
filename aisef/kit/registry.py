@@ -17,7 +17,6 @@ Status changes only through verification — verification is code
 from __future__ import annotations
 
 import json
-import os
 import re
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone

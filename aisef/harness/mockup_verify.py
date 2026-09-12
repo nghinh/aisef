@@ -230,7 +230,7 @@ def _responds(url: str, *, timeout: float = 2) -> bool:
     try:
         with closing(urllib.request.urlopen(url, timeout=timeout)):
             return True
-    except (urllib.error.HTTPError,):
+    except urllib.error.HTTPError:
         return True  # server responded, just an error code — still "running"
     except (urllib.error.URLError, OSError, ValueError, socket.timeout):
         return False

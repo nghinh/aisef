@@ -421,7 +421,6 @@ def run_suite(
                 report.results.append(result)
                 continue
 
-            import shlex
 
             if artifact_root:
                 from ..harness.runlog import run_log
@@ -459,7 +458,7 @@ def run_suite(
             if artifact_root:
                 from ..harness.runlog import one_line, run_log
                 status = "PASS" if sb.ok else "FAIL"
-                unrun = f" unrunnable" if result.unrunnable else ""
+                unrun = " unrunnable" if result.unrunnable else ""
                 run_log(artifact_root, f"qa:{kind.id} {status} {sb.duration_ms}ms{unrun}")
                 if not sb.ok:
                     run_log(artifact_root, f"qa:{kind.id} output: " + one_line(result.detail))

@@ -19,7 +19,7 @@ from pathlib import Path
 
 from ..clients.base import ClientAdapter, RunSpec
 from ..config import Config
-from ..control.design_contract import CONTRACT_FILE, DesignContract, build
+from ..control.design_contract import DesignContract, build
 from ..control.experience import Experience, Screen, parse_experience_file
 from ..control.machine_gate import GateResult, check_design_contract, is_route_like
 from ..harness.guardrails import (

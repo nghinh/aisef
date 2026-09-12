@@ -184,7 +184,7 @@ def score_from_results(results_dir: Path = ARM_RESULTS_DIR) -> ScoreResult:
             else:
                 # no label set: count as wrong (unverifiable) rather than useful
                 stats.wrong_memory_count += 1
-        for record_id in stale:
+        for _record_id in stale:
             stats.stale_memory_count += 1
         for r in rejected:
             if isinstance(r, dict) and r.get("category") == "reviewer_independence":

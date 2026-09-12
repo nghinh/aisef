@@ -54,7 +54,7 @@ def _gate_arg(value: str) -> Gate:
         return Gate(value)
     except ValueError:
         valid = ", ".join(g.value for g in GATE_ORDER)
-        raise argparse.ArgumentTypeError(f"invalid gate: {value}. Valid: {valid}")
+        raise argparse.ArgumentTypeError(f"invalid gate: {value}. Valid: {valid}") from None
 
 
 def _ensure_git(project: str | Path) -> int | None:

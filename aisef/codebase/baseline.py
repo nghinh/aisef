@@ -13,7 +13,7 @@ import subprocess
 from datetime import date
 from pathlib import Path
 
-from .detect import BrownfieldSignal, detect
+from .detect import detect
 from .provider import CodebaseGraphProvider, resolve
 
 BASELINE_FILE = "baseline.md"
@@ -145,7 +145,7 @@ def build_baseline(
         )
 
     sections = [
-        f"# Baseline — Current-State Snapshot\n",
+        "# Baseline — Current-State Snapshot\n",
         f"_Dựng lúc {date.today().isoformat()} bằng `aisef baseline`._\n",
         f"\n## Tín hiệu brownfield\n\n{sig.summary}\n",
     ]

@@ -416,7 +416,6 @@ def _project_has_ui(project: Path) -> bool:
 def cmd_predeploy(args) -> int:
     """Score the pre-deployment gate."""
     from ..control.approvals import Gate
-    from ..kit.detect_stack import detect_file
     from ..phases.deploy import pre_deploy
 
     project = Path(args.project)

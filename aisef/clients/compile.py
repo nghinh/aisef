@@ -16,12 +16,11 @@ protected (invariant 10).
 from __future__ import annotations
 
 import json
-import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..harness.guardrails import GUARD_MATCHERS
-from .base import Capability, ClientAdapter, Support, quote_command
+from .base import Capability, ClientAdapter, quote_command
 from .claude_code import ClaudeCodeAdapter
 from .opencode import OpenCodeAdapter
 

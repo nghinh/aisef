@@ -8,7 +8,6 @@ still works, just coarser.
 
 from __future__ import annotations
 
-import shutil
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path

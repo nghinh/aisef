@@ -187,7 +187,7 @@ def scripted_arm_B(fixture: dict, scenario_id: str, attempt_index: int,
     rep_id = None if memory_had_relevant else expected_repeated_id
     augmented_decisions = list(base.decisions)
     if memory_had_relevant:
-        for sid, ref in zip(packet_selected_ids, packet_selected_refs):
+        for _sid, ref in zip(packet_selected_ids, packet_selected_refs, strict=True):
             for record in fixture.get("memory_records", []):
                 if record.get("source_ref") == ref:
                     augmented_decisions.append(Decision("memory_recalled", record["id"]))

@@ -8,7 +8,6 @@ from __future__ import annotations
 import sys
 import tempfile
 import threading
-import time
 import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
@@ -77,7 +76,6 @@ class TestAppServerLease(unittest.TestCase):
             root = Path(d)
             run_id = "test-run"
             port = _free_port()
-            AppServer.__init__.__defaults__  # silence linter
             lease_root = root / ".aisef"
             # No actual dev server runs; we only verify the lease file
             # lifecycle (acquire → release) around the with-block.

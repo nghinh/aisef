@@ -70,7 +70,7 @@ def run():
                     arm_store.consolidate()
                 hits = wrong = chars = 0
                 if excluded is not None:
-                    for name, text, path, role, kind in scenarios:
+                    for name, text, path, role, _kind in scenarios:
                         packet = arm_store.recall(query=text, epic='E1', story='S8', role=role,
                             paths=[path + '/task.py'])
                         selected = {r['id'] for r in packet['selected']}
@@ -81,7 +81,7 @@ def run():
                 ablations[mode] = {'relevant_selected': hits, 'expected': len(scenarios),
                     'recall': hits / len(scenarios), 'wrong_retrievals': wrong, 'chars': chars}
         rows = []
-        for name, text, path, role, kind in scenarios:
+        for name, text, path, role, _kind in scenarios:
             packet = store.recall(query=text, epic='E1', story='S8' if 'failure' in name else 'S6',
                 role=role, paths=[path + '/task.py'])
             selected = {r['id'] for r in packet['selected']}

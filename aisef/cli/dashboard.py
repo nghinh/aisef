@@ -7,18 +7,15 @@ and outputs a self-contained HTML file viewable offline.
 from __future__ import annotations
 
 import html
-import json
 import time
 from pathlib import Path
 
 from ..harness.observe import (
     AGENT_RUN,
-    BEHAVIOR,
     EvidenceStore,
     Evidence,
     GUARD_BLOCK,
     GUARD_CHECK,
-    GUARD_SEEN,
     NOTE,
     TOOL_RUN,
 )

@@ -495,7 +495,7 @@ def spearman(xs, ys) -> float:
         return float("nan")
     rx, ry = _ranks(xs), _ranks(ys)
     mx, my = sum(rx) / n, sum(ry) / n
-    num = sum((a - mx) * (b - my) for a, b in zip(rx, ry))
+    num = sum((a - mx) * (b - my) for a, b in zip(rx, ry, strict=True))
     den = math.sqrt(sum((a - mx) ** 2 for a in rx) * sum((b - my) ** 2 for b in ry))
     return num / den if den else float("nan")
 
