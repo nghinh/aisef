@@ -15,7 +15,10 @@ from aisef.kit.detect_stack import detect  # noqa: E402
 from aisef.kit.install import MARKER, SKILLS_DIR, InstallPlan, PlannedSkill  # noqa: E402
 
 REFERENCES = ROOT / "references"
-needs_refs = unittest.skipUnless(REFERENCES.is_dir(), "chưa clone references/")
+#: Xem ghi chú ở `tests/test_catalog.py`: `references/` nay luôn tồn tại (chứa
+#: `PINS.md`), nên điều kiện bỏ qua phải là "có kho con nào đã clone chưa".
+CO_CLONE = REFERENCES.is_dir() and any(p.is_dir() for p in REFERENCES.iterdir())
+needs_refs = unittest.skipUnless(CO_CLONE, "chưa clone references/")
 
 
 class InstallTestCase(unittest.TestCase):

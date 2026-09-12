@@ -14,6 +14,11 @@ sys.path.insert(0, str(ROOT))
 from aisef.kit.catalog import Catalog, CatalogError  # noqa: E402
 
 REFERENCES = ROOT / "references"
+#: Thư mục `references/` **có mặt trong kho** kể từ 2026-09-12: `PINS.md` và
+#: `clone.sh` được commit để xuất xứ không sống trên một máy. Nên "đã clone hay
+#: chưa" phải hỏi bằng *có thư mục kho con nào không*, chứ không phải bằng sự
+#: tồn tại của `references/` — hỏi sai làm 5 job CI đỏ ngay hôm ấy.
+CO_CLONE = REFERENCES.is_dir() and any(p.is_dir() for p in REFERENCES.iterdir())
 
 
 class TestRealCatalog(unittest.TestCase):
@@ -60,7 +65,7 @@ class TestRealCatalog(unittest.TestCase):
         self.assertIn("test-driven-development", s.allowlist)
         self.assertIn("verification-before-completion", s.allowlist)
 
-    @unittest.skipUnless(REFERENCES.is_dir(), "chưa clone references/")
+    @unittest.skipUnless(CO_CLONE, "chưa clone references/")
     def test_all_paths_exist(self):
         problems = self.cat.verify_paths(REFERENCES)
         self.assertEqual(problems, [], f"đường dẫn hỏng: {problems}")
