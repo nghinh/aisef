@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -50,6 +51,22 @@ def cmd_doctor(args) -> int:
     check("claude CLI", bool(claude), claude or "not found", required=False)
     opencode = shutil.which("opencode")
     check("opencode CLI", bool(opencode), opencode or "not found", required=False)
+
+    # Which credential an agent session will authenticate with.  Not a
+    # pass/fail — authenticating by key is legitimate — but the operator has to
+    # be able to *see* it: a stale `ANTHROPIC_API_KEY` in the shell silently
+    # outranks a working `claude.ai` login, and the only symptom is every
+    # session returning 401 after burning its full wall-clock (measured
+    # 2026-09-12).  Names only; a value never reaches this line.
+    from ..clients.base import AUTH_ENV_NAMES
+    auth_vars = [n for n in AUTH_ENV_NAMES if os.environ.get(n)]
+    check(
+        "agent credential",
+        True,
+        (", ".join(auth_vars) + " set in the environment — these outrank the client's own login; "
+         "unset them to use it") if auth_vars else "none in the environment — the client uses its own login",
+        required=False,
+    )
 
     docker_ok = False
     if shutil.which("docker"):
