@@ -71,6 +71,29 @@ a gate's verdict on evidence that was already correct.
   decision — since corrected — was told a rerun would produce the same result,
   while its branch already carried the finished feature.
 
+### Windows, and a credential that was retried three times
+
+These landed after the version bump and before the tag, because a release that
+is broken on a declared platform is not a release.
+
+- **The phase-2 locks used a POSIX-only flag** (bug 71). `BudgetGuard` and the
+  dev-server lease opened their lock files with `os.O_CLOEXEC`, which does not
+  exist on Windows — every reservation and every lease raised there, so the
+  whole phase-2 seam was dead on half the supported operating systems. Windows
+  CI caught it on its first run against this code.
+- **The memory store's atomic write was atomic only on POSIX** (bug 72).
+  `os.replace` is refused on Windows while any handle to the destination is
+  open, so a reader overlapping a writer crashed the write. `_compat` now owns
+  both: `open_lock_fd` picks the flag by name, `atomic_replace` retries briefly
+  on Windows and nowhere else.
+- **A rejected credential is no longer treated as an infrastructure error.** A
+  401 carries the same marker as a transient API failure, so the harness
+  retried it — 176 seconds per attempt, $0 recorded, three times, on a
+  credential that would be rejected identically each time. `auth` is now its
+  own exit status, outside the retryable set, and the message names the
+  environment variable that decided who the session was (the name, never the
+  value) instead of printing `401`.
+
 ### Benchmark v1.3
 
 - Client adapters drain stdout concurrently and keep the partial stream when a
