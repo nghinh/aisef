@@ -85,10 +85,18 @@ def cut_sessions(db: Path | None = None) -> dict[tuple[str, str, int], tuple[int
     try:
         con = sqlite3.connect(f"file:{kho}?mode=ro", uri=True)
         try:
+            # Hai lượt, không phải một: kho phiên của OpenCode trên máy này là
+            # **3,5 GB**, nên `select session_id, data from part` rồi gom trong
+            # bộ nhớ là cách chắc chắn làm sập máy người khác. Lượt một chỉ lấy
+            # id của phiên có đụng cây bench; lượt hai mới đọc nội dung từng
+            # phiên ấy.
+            ung_vien = [r[0] for r in con.execute(
+                "select distinct session_id from part where data like ?", ("%.bench/run/%",))]
             phien: dict[str, list[str]] = {}
-            for sid, data in con.execute("select session_id, data from part order by rowid"):
-                if isinstance(data, str):
-                    phien.setdefault(sid, []).append(data)
+            for sid in ung_vien:
+                phien[sid] = [d for (d,) in con.execute(
+                    "select data from part where session_id = ? order by rowid", (sid,))
+                    if isinstance(d, str)]
         finally:
             con.close()
     except sqlite3.Error:
