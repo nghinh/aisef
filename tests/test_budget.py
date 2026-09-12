@@ -123,6 +123,63 @@ class TestLockSidecarStableAcrossSave(unittest.TestCase):
             self.assertTrue(g.ledger.lock_path.exists())
 
 
+class TestReservationHeadroomCountsInFlight(unittest.TestCase):
+    """Regression test: a second reserve whose total with an outstanding
+    reservation would exceed the cap was passing the per-call check,
+    letting two parallel calls burn past the cap before settle noticed."""
+
+    def test_second_reserve_respects_first_outstanding(self):
+        with _tempdir() as root:
+            g = BudgetGuard(BudgetLedger(root))
+            g.configure(BudgetConfig(cap_usd=0.10))
+            # First reservation holds 0.06; second 0.06 alone fits cap,
+            # but 0.06 + 0.06 = 0.12 > 0.10 must be blocked.
+            with g.reserve(story_id="S1", est_usd=0.06, est_turns=1) as r1:
+                with self.assertRaises(BudgetExceeded):
+                    with g.reserve(story_id="S2", est_usd=0.06, est_turns=1):
+                        pass
+                r1.actual_usd = 0.06
+
+    def test_second_turn_reserve_respects_first(self):
+        with _tempdir() as root:
+            g = BudgetGuard(BudgetLedger(root))
+            g.configure(BudgetConfig(cap_turns=4))
+            with g.reserve(est_turns=3, est_usd=0.0) as r1:
+                with self.assertRaises(BudgetExceeded):
+                    with g.reserve(est_turns=2, est_usd=0.0):
+                        pass
+                r1.actual_turns = 3
+
+    def test_check_caps_sees_in_flight_reservations(self):
+        # Direct test of the cap math, bypassing the lock so the
+        # behavioural gap is reproducible even when concurrency
+        # happens to serialise.
+        from aisef.control.budget import BudgetState, _check_caps
+        state = BudgetState(cap_usd=0.10, spent_usd=0.0)
+        state.reservations = [{"est_usd": 0.06, "est_turns": 1, "id": "r1"}]
+        with self.assertRaisesRegex(BudgetExceeded, "cost cap"):
+            _check_caps(state, est_usd=0.06, est_turns=1, est_seconds=0.0)
+
+    def test_check_caps_turn_sees_in_flight_reservations(self):
+        from aisef.control.budget import BudgetState, _check_caps
+        state = BudgetState(cap_turns=4, spent_turns=0)
+        state.reservations = [{"est_usd": 0.0, "est_turns": 3, "id": "r1"}]
+        with self.assertRaisesRegex(BudgetExceeded, "turn cap"):
+            _check_caps(state, est_usd=0.0, est_turns=2, est_seconds=0.0)
+
+    def test_settled_reservation_frees_headroom(self):
+        with _tempdir() as root:
+            g = BudgetGuard(BudgetLedger(root))
+            g.configure(BudgetConfig(cap_usd=0.10))
+            with g.reserve(story_id="S1", est_usd=0.06, est_turns=1) as r1:
+                r1.actual_usd = 0.06
+            # After S1 settled, the only thing on the books is the
+            # settled spend (0.06).  A small reserve that fits below
+            # the post-spend headroom must still succeed.
+            with g.reserve(story_id="S2", est_usd=0.03, est_turns=1) as r2:
+                r2.actual_usd = 0.03
+
+
 from contextlib import contextmanager
 from tempfile import TemporaryDirectory
 

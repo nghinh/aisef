@@ -223,14 +223,26 @@ def _has_at_least_one(state: BudgetState) -> bool:
 
 def _check_caps(state: BudgetState, *, est_usd: float, est_turns: int,
                 est_seconds: float) -> None:
-    if state.cap_usd and state.spent_usd + est_usd > state.cap_usd:
-        raise BudgetExceeded(
-            f"cost cap reached: spent=${state.spent_usd:.2f}, "
-            f"reserve=${est_usd:.2f}, cap=${state.cap_usd:.2f}")
-    if state.cap_turns and state.spent_turns + est_turns > state.cap_turns:
-        raise BudgetExceeded(
-            f"turn cap reached: spent={state.spent_turns}, "
-            f"reserve={est_turns}, cap={state.cap_turns}")
+    # In-flight reservations must count toward cap usage; otherwise two
+    # reserves that each fit below the cap but together exceed it slip
+    # through the per-call check and only blow the cap at settle time,
+    # after the spend has already happened.
+    reserved_usd = sum(float(r.get("est_usd") or 0.0)
+                       for r in state.reservations)
+    reserved_turns = sum(int(r.get("est_turns") or 0)
+                         for r in state.reservations)
+    if state.cap_usd:
+        if state.spent_usd + reserved_usd + est_usd > state.cap_usd:
+            raise BudgetExceeded(
+                f"cost cap reached: spent=${state.spent_usd:.2f}, "
+                f"reserved=${reserved_usd:.2f}, "
+                f"reserve=${est_usd:.2f}, cap=${state.cap_usd:.2f}")
+    if state.cap_turns:
+        if state.spent_turns + reserved_turns + est_turns > state.cap_turns:
+            raise BudgetExceeded(
+                f"turn cap reached: spent={state.spent_turns}, "
+                f"reserved={reserved_turns}, "
+                f"reserve={est_turns}, cap={state.cap_turns}")
     if state.cap_seconds and state.started_at:
         elapsed = time.time() - state.started_at + est_seconds
         if elapsed > state.cap_seconds:
