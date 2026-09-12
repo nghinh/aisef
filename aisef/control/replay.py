@@ -17,10 +17,11 @@ non-replayable; kwargs are never guessed from other sources.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from ..harness.observe import NOTE, Evidence, Event
 from .gate import StoryGate, evaluate
+from .outcome import Outcome
 from .security import parse as parse_security
 
 GATE_INPUT = "gate:input"
@@ -39,21 +40,47 @@ class Replay:
     gate: StoryGate
     #: Blocking checks recorded in the `gate:verdict` after this input; None = no verdict.
     recorded: list[str] | None
+    #: Kết cục **từng mục** đã ghi (tên → chuỗi outcome), nếu bản ghi có.
+    #: `gate:verdict` ghi cả 17 mục kèm `outcome` từ ADR-005 V4; trước đó chỉ có
+    #: danh sách mục chặn. So theo mục chặn thôi thì một mục đi từ `passed` sang
+    #: `unconfigured` **không hiện ra** — mà đó đúng là kiểu trôi rules mà công
+    #: cụ này tồn tại để bắt (lớp E: "chưa cấu hình" bị coi là "đạt").
+    recorded_outcomes: dict[str, str] = field(default_factory=dict)
 
     @property
     def now(self) -> list[str]:
         return [c.name for c in self.gate.failures]
 
+    def _dau_da_ghi(self, name: str) -> str:
+        """Dấu của kết cục **đã ghi** cho mục này.
+
+        Có `recorded_outcomes` thì dùng dấu thật; không có (bản ghi cũ) thì chỉ
+        biết chặn/không chặn, và nói ra bằng `✗`/`·` như trước.
+        """
+        ghi = self.recorded_outcomes.get(name)
+        if ghi:
+            try:
+                return Outcome(ghi).mark
+            except ValueError:
+                return "?"
+        return "✗" if name in set(self.recorded or []) else "·"
+
     def rows(self) -> list[tuple[str, str, str]]:
-        """(check name, recorded, now): recorded only knows blocked/not — `gate:verdict`
-        only stores blocking check names; now has full six-outcome detail."""
-        prev = set(self.recorded or [])
-        return [(c.name, "✗" if c.name in prev else "·", c.outcome.mark) for c in self.gate.checks]
+        """(tên mục, kết cục đã ghi, kết cục bây giờ)."""
+        return [(c.name, self._dau_da_ghi(c.name), c.outcome.mark) for c in self.gate.checks]
 
     def changed(self) -> list[str]:
-        """Checks whose blocking status changed — the only comparison possible with the old record."""
+        """Mục có **kết cục** đổi — không chỉ trạng thái chặn.
+
+        Bản ghi cũ chỉ có danh sách mục chặn thì lùi về so chặn/không chặn, và
+        đó là tất cả những gì so được với bản ghi ấy.
+        """
         if self.recorded is None:
             return []
+        if self.recorded_outcomes:
+            bay_gio = {c.name: c.outcome.value for c in self.gate.checks}
+            return sorted(n for n, cu in self.recorded_outcomes.items()
+                          if n in bay_gio and bay_gio[n] != cu)
         prev, current = set(self.recorded), set(self.now)
         return sorted(prev ^ current)
 
@@ -66,7 +93,8 @@ class Replay:
             marker = " ≠" if name in self.changed() else ""
             lines.append(f"  {name:<32} | {prev:^6} | {current}{marker}")
         changed = self.changed()
-        lines.append("  diff: " + (", ".join(changed) if changed else "none — same blocking checks"))
+        cach = "kết cục từng mục" if self.recorded_outcomes else "mục chặn (bản ghi cũ không có kết cục từng mục)"
+        lines.append("  diff: " + (", ".join(changed) if changed else f"none — {cach} giống bản ghi"))
         return "\n".join(lines)
 
 
@@ -142,5 +170,9 @@ def replay(evidence: Evidence, *, attempt: int = 0) -> list[Replay]:
             story_id=evidence.story_id, attempt=attempt_num, seq=inp.seq,
             candidate=str(kw.get("candidate") or ""), gate=gate,
             recorded=None if verdict is None else [str(x) for x in verdict.detail.get("failures") or []],
+            recorded_outcomes={} if verdict is None else {
+                str(c.get("name")): str(c.get("outcome"))
+                for c in (verdict.detail.get("checks") or [])
+                if isinstance(c, dict) and c.get("name") and c.get("outcome")},
         ))
     return out

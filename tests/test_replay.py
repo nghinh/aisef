@@ -81,7 +81,10 @@ class TestReplayDungVerdictCu(ReplayCase):
         self.assertEqual(r.recorded, ["lint"])
         self.assertEqual(r.now, ["lint"])
         self.assertEqual(r.changed(), [])
-        self.assertIn("none — same blocking checks", r.summary())
+        # Fixture này ghi `gate:verdict` không kèm kết cục từng mục (dạng trước
+        # ADR-005 V4), nên replay nói rõ đang so **mục chặn**, không giả vờ so
+        # được kết cục — xem `TestSoSanhKetCucTungMucChuKhongChiMucChan`.
+        self.assertIn("none — mục chặn", r.summary())
 
     def test_luot_dat_cung_replay_dat(self):
         self.luot(1)
@@ -240,3 +243,43 @@ class TestPairsByPosition(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class TestSoSanhKetCucTungMucChuKhongChiMucChan(unittest.TestCase):
+    """`gate:verdict` ghi **cả 17 mục kèm `outcome`** từ ADR-005 V4, nhưng replay
+    chỉ đọc danh sách mục chặn và in `·` cho mọi mục khác.
+
+    Hệ quả: một mục đi từ `passed` sang `unconfigured` — đúng kiểu trôi rules mà
+    công cụ này tồn tại để bắt (lớp E: "chưa cấu hình" bị coi là "đạt") — hiện ra
+    là "diff: none". Đo 13/09/2026 trên `todo-e2e`.
+    """
+
+    def _replay(self, ghi: dict[str, str], bay_gio: list[tuple[str, str]]):
+        from aisef.control.gate import StoryGate
+        from aisef.control.outcome import Check, Outcome
+        from aisef.control.replay import Replay
+        checks = [Check(name, Outcome(o), "") for name, o in bay_gio]
+        chan = [c.name for c in checks if c.outcome.blocks]
+        return Replay(story_id="S", attempt=1, seq=1, candidate="abc1234",
+                      gate=StoryGate(story_id="S", checks=checks),
+                      recorded=chan, recorded_outcomes=ghi)
+
+    def test_passed_thanh_unconfigured_phai_hien_ra(self):
+        r = self._replay({"coverage": "passed"}, [("coverage", "unconfigured")])
+        self.assertEqual(r.changed(), ["coverage"])
+        self.assertIn("coverage", r.summary())
+
+    def test_khong_doi_thi_khong_bao_doi(self):
+        r = self._replay({"coverage": "passed"}, [("coverage", "passed")])
+        self.assertEqual(r.changed(), [])
+
+    def test_cot_da_ghi_in_dau_that_chu_khong_phai_dau_cham(self):
+        r = self._replay({"coverage": "unconfigured"}, [("coverage", "unconfigured")])
+        ten, cu, moi = r.rows()[0]
+        self.assertEqual((ten, cu, moi), ("coverage", "○", "○"))
+
+    def test_ban_ghi_cu_khong_co_ket_cuc_tung_muc_thi_lui_ve_so_muc_chan(self):
+        """Bản ghi trước V4 chỉ có danh sách mục chặn — phải nói ra là đang so
+        cái gì, không được giả vờ so được kết cục."""
+        r = self._replay({}, [("coverage", "unconfigured")])
+        self.assertEqual(r.rows()[0][1], "·")
+        self.assertIn("bản ghi cũ", r.summary())

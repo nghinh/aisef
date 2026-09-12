@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **`gate --replay` compares what the evidence actually recorded** (bug 87).
+  `gate:verdict` has stored all seventeen checks with their outcomes since
+  ADR-005 V4, but replay read only the blocking-check list, printed `·` for
+  everything else, and reported "diff: none". A check drifting from `passed`
+  to `unconfigured` — the exact silent degradation this tool exists to catch —
+  was invisible. Replay now diffs outcome by outcome, falls back to
+  blocking-only for pre-V4 records, and says which comparison it is making.
+  Re-scoring all 21 recorded attempts of a real project with today's rules
+  reproduces every verdict, check for check.
+
 - **A cut session now actually reaches the retry path** (bug 86). The previous
   release recognised the signature and set `error` plus a retryable flag — on a
   result whose `ok` was still `True`, because OpenCode exits 0 when it thinks
