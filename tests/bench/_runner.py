@@ -58,7 +58,7 @@ from ._mine import KEEP_DIR, Task, _git  # noqa: E402
 
 ENABLED = os.environ.get("AISEF_BENCH") == "1"
 
-#: Lệnh `--client <id>` nào trong `aisef.clients.simulated` không tốn tiền,
+#: Lệnh `--client <id>` nào trong `tests.bench.simulated` không tốn tiền,
 #: không cần AISEF_BENCH=1, không chạy compile_for.  Bộ lọc chứ không phải
 #: bí danh để tránh nhầm "opencode" với "opencode-mini".
 SIMULATED_CLIENTS: frozenset[str] = frozenset({"simulated-weak"})
@@ -71,14 +71,14 @@ def make_client(client_id: str) -> ClientAdapter:
 
     ``ADAPTERS`` lives in ``aisef.clients.compile`` and is the production
     registry: only ``claude`` and ``opencode``.  Simulated weak/strong
-    clients live in ``aisef.clients.simulated`` and are reached via
+    clients live in ``tests.bench.simulated`` and are reached via
     this lookup, so the production compile surface does not grow.
 
     Tests instantiate directly (``SimulatedWeakAdapter()``); this
     helper exists so the bench CLI does not branch by string.
     """
     if client_id == "simulated-weak":
-        from aisef.clients.simulated import SimulatedWeakAdapter
+        from .simulated import SimulatedWeakAdapter
 
         return SimulatedWeakAdapter()
     from aisef.clients.compile import ADAPTERS

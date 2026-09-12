@@ -67,8 +67,8 @@ from pathlib import Path
 
 from aisef.control.impact import is_test_path
 
-from .base import Capability, ClientAdapter, RunSpec, Support
-from .stream import RunResult
+from aisef.clients.base import Capability, ClientAdapter, RunSpec, Support
+from aisef.clients.stream import RunResult
 
 BINARY = "simulated-weak"
 
@@ -277,7 +277,7 @@ class SimulatedWeakAdapter(ClientAdapter):
             # "emulated" in the sense that the bench harness can read
             # what was written — but it is worth being precise: this is
             # not a real machine-readable stream from an LLM.
-            Capability.MACHINE_OUTPUT: Support.EMULATED,  # emulated by: aisef.clients.simulated._read_gold
+            Capability.MACHINE_OUTPUT: Support.EMULATED,  # emulated by: tests.bench.simulated._read_gold
             Capability.PRE_TOOL_GUARD: Support.UNSUPPORTED,
             Capability.TOOL_ALLOWLIST: Support.UNSUPPORTED,
             Capability.DIR_ALLOWLIST: Support.UNSUPPORTED,

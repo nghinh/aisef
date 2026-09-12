@@ -10,7 +10,7 @@ from unittest import mock
 from unittest.mock import patch
 
 from aisef.clients.base import RunSpec
-from aisef.clients.simulated import SimulatedWeakAdapter, _read_gold, _revert_files
+from tests.bench.simulated import SimulatedWeakAdapter, _read_gold, _revert_files
 
 
 def git(repo, *args):
@@ -155,14 +155,14 @@ class TestApDungPatchChayDuocTrenMoiHeDieuHanh(unittest.TestCase):
         return d, patch
 
     def test_ap_duoc_khi_co_git(self):
-        from aisef.clients.simulated import _apply_patch_file
+        from tests.bench.simulated import _apply_patch_file
         d, patch = self._du_lieu()
         self.assertTrue(_apply_patch_file(d, patch))
         self.assertEqual((d / "a.py").read_text(encoding="utf-8"), "new\n")
 
     def test_khong_co_patch_tren_may_van_ap_duoc_bang_git(self):
         """Đây là ca Windows: `shutil.which('patch')` trả None."""
-        from aisef.clients import simulated
+        from tests.bench import simulated
         d, patch = self._du_lieu()
         with mock.patch.object(simulated.shutil, "which", return_value=None):
             self.assertTrue(simulated._apply_patch_file(d, patch))
@@ -170,7 +170,7 @@ class TestApDungPatchChayDuocTrenMoiHeDieuHanh(unittest.TestCase):
 
     def test_git_in_skipped_patch_roi_exit_0_khong_tinh_la_ap_duoc(self):
         """`git apply` ngoài repo in `Skipped patch` rồi exit 0 — im lặng không áp."""
-        from aisef.clients import simulated
+        from tests.bench import simulated
         d, patch = self._du_lieu()
 
         class GiaKetQua:
@@ -199,7 +199,7 @@ class TestGhiKhongDichKyTuXuongDong(unittest.TestCase):
     """
 
     def test_gold_ghi_dung_byte_khong_them_cr(self):
-        from aisef.clients.simulated import _apply_gold
+        from tests.bench.simulated import _apply_gold
         d = Path(tempfile.mkdtemp())
         _apply_gold(d, [(Path("a.py"), "mot\ndong\nnua\n")])
         self.assertEqual((d / "a.py").read_bytes(), b"mot\ndong\nnua\n")
@@ -208,7 +208,7 @@ class TestGhiKhongDichKyTuXuongDong(unittest.TestCase):
     def test_hoan_nguyen_dung_git_checkout_de_git_ap_lai_bo_loc(self):
         """Hoàn nguyên phải để git quyết định byte trên đĩa, không ghi thẳng blob:
         kho luôn giữ `\\n`, cây làm việc có thể đã lấy ra `\\r\\n`."""
-        from aisef.clients import simulated
+        from tests.bench import simulated
         goi = []
 
         def gia_run(cmd, **kw):
