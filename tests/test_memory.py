@@ -539,3 +539,40 @@ class BoundaryTests(MemoryTests):
         row2['contract_authority'] = None
         with self.assertRaises(MemoryError):
             self.store.put(row2)
+
+
+class TestPhamViDuongDanKhongLechVieDauPhanCach(unittest.TestCase):
+    """Bản ghi và truy vấn tới từ hai nguồn; trên Windows chúng dùng hai dấu.
+
+    So khớp bằng chuỗi thô trượt **im lặng**: bản ghi đúng bị loại với lý do
+    "path scope" và không ai biết bộ nhớ vừa mất tác dụng. MiMo-Code phát hành
+    đúng lỗi này (issue #1571, `memory_fts` rỗng trên Windows). Bộ nhớ của AISEF
+    mặc định tắt nên bán kính nhỏ, nhưng lỗi im lặng thì không có bán kính an
+    toàn.
+    """
+
+    def test_hai_dau_phan_cach_cho_cung_ket_qua(self):
+        from aisef.memory import _in_scope
+        for record, query in ((['src/workers'], ['src\\workers\\job.py']),
+                              (['src\\workers'], ['src/workers/job.py']),
+                              (['src/workers'], ['src/workers/job.py'])):
+            with self.subTest(record=record, query=query):
+                self.assertTrue(_in_scope(record, query))
+
+    def test_sao_phu_moi_duong_dan(self):
+        from aisef.memory import _in_scope
+        self.assertTrue(_in_scope(['*'], ['bất/kỳ/đâu.py']))
+
+    def test_khong_phu_thi_van_khong_phu(self):
+        from aisef.memory import _in_scope
+        self.assertFalse(_in_scope(['src/workers'], ['ui/widget.tsx']))
+
+    def test_tien_to_khong_tron_ranh_gioi_thu_muc(self):
+        """`src/work` không được phủ `src/workers/…` — chuẩn hoá không được nới
+        phạm vi, chỉ được xoá khác biệt hệ điều hành."""
+        from aisef.memory import _in_scope
+        self.assertFalse(_in_scope(['src/work'], ['src/workers/job.py']))
+
+    def test_dau_gach_cheo_thua_khong_doi_ket_qua(self):
+        from aisef.memory import _in_scope
+        self.assertTrue(_in_scope(['src/workers/'], ['/src/workers/job.py']))

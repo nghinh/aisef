@@ -143,6 +143,32 @@ class MemoryProvider(Protocol):
     def stats(self) -> dict: ...
 
 
+def _posix(path: str) -> str:
+    """Đường dẫn về một dạng duy nhất trước khi so khớp.
+
+    Phạm vi của bản ghi và phạm vi của truy vấn có thể tới từ hai nơi khác nhau:
+    một cái do người/agent viết trong `stories.index.json`, một cái do máy suy
+    ra. Trên Windows, hai nguồn ấy dùng hai dấu phân cách, và phép so khớp bằng
+    chuỗi thô **trượt im lặng** — bản ghi đúng bị loại với lý do "path scope" và
+    không ai biết bộ nhớ vừa mất tác dụng. MiMo-Code phát hành đúng lỗi này
+    (issue #1571, `memory_fts` rỗng trên Windows vì lệch dấu phân cách).
+    """
+    return path.replace("\\", "/").strip("/")
+
+
+def _in_scope(record_paths, query_paths) -> bool:
+    """Bản ghi có phủ ít nhất một đường dẫn của truy vấn không."""
+    for p in record_paths:
+        if p == "*":
+            return True
+        pp = _posix(p)
+        for q in query_paths:
+            qq = _posix(q)
+            if qq == pp or qq.startswith(pp + "/"):
+                return True
+    return False
+
+
 class LocalMemory:
     def __init__(self, root, *, timeout=2):
         self.root = Path(root).resolve()
@@ -451,7 +477,7 @@ class LocalMemory:
                                for v in row.get('contract_authority', {}).values())
                 ):
                     reason = 'unbound review provenance'
-                elif not any(p == '*' or q == p or q.startswith(p.rstrip('/') + '/') for p in row['paths'] for q in paths):
+                elif not _in_scope(row['paths'], paths):
                     reason = 'path scope'
                 overlap = words & set(re.findall(r'\w+', row['text'].lower()))
                 if not reason and not overlap:
