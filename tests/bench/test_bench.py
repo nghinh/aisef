@@ -612,7 +612,8 @@ class TestDoLaiSauDotChay(unittest.TestCase):
 
     def test_xong_gia_la_fail_ma_phien_khong_bao_loi(self):
         from . import _analyze as A
-        s = A.Session("t", "c", 1, "FAIL", 3, false_done=True, out_of_scope=[], workspace_found=True)
+        s = A.Session("t", "c", 1, "FAIL", 3, false_done=True, out_of_scope=[],
+                      workspace_found=True, edited=[])
         bao_cao = A.report([s])
         self.assertIn("| c | 1 | 1 | 1 | 1 |", bao_cao)
 
@@ -701,3 +702,42 @@ class TestNhanCohortDoNguoiVanHanhKhai(unittest.TestCase):
         r = R.Result("t", "opencode", 1, R.PASS, note="mycombo→X")
         from dataclasses import asdict
         self.assertEqual(asdict(r)["note"], "mycombo→X")
+
+
+class TestPhienImLangKhongDocThanhGhiCaKho(unittest.TestCase):
+    """Không ghi gì ≠ ghi mọi thứ ra ngoài phạm vi.
+
+    Bench không tạo commit mới khi phiên không ghi gì ("không có gì để chốt =
+    HEAD"), nên `candidate` trỏ vào **commit nền**. `git show` trên một commit
+    gốc liệt kê toàn bộ cây, và công cụ đo đọc ra "ghi 364 tệp ngoài phạm vi" —
+    một tiêu đề sai hoàn toàn, theo hướng buộc tội nhầm. Đo thật 2026-09-12 trên
+    `bug-a2-sec-2`.
+    """
+
+    def _kho_mot_commit(self) -> Path:
+        d = Path(tempfile.mkdtemp())
+        subprocess.run(["git", "init", "-q", str(d)], check=True, capture_output=True)
+        (d / "a.py").write_text("x = 1\n", encoding="utf-8")
+        for cmd in (["git", "add", "-A"],
+                    ["git", "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "nền"]):
+            subprocess.run(cmd, cwd=d, check=True, capture_output=True)
+        return d
+
+    def test_commit_goc_doc_thanh_khong_ghi_gi(self):
+        from . import _analyze as A
+        d = self._kho_mot_commit()
+        sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=d, capture_output=True,
+                             text=True, check=True).stdout.strip()
+        self.assertEqual(A._changed_in_candidate(d, sha), [])
+        self.assertEqual(A._edited_functions(d, sha), [])
+
+    def test_commit_co_cha_van_doc_duoc_tep_va_ham(self):
+        from . import _analyze as A
+        d = self._kho_mot_commit()
+        (d / "a.py").write_text("def f():\n    return 2\n", encoding="utf-8")
+        for cmd in (["git", "add", "-A"],
+                    ["git", "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "ứng viên"]):
+            subprocess.run(cmd, cwd=d, check=True, capture_output=True)
+        sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=d, capture_output=True,
+                             text=True, check=True).stdout.strip()
+        self.assertEqual(A._changed_in_candidate(d, sha), ["a.py"])

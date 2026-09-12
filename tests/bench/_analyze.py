@@ -46,19 +46,36 @@ class Session:
     #: bench tự hoàn nguyên test agent chạm rồi áp test ẩn).
     out_of_scope: list[str]
     workspace_found: bool
+    #: Hàm mà ứng viên thật sự sửa, đọc từ tiêu đề hunk của git (`@@ … @@ def x`).
+    #: Dùng để kiểm một giả thuyết cụ thể: các lượt trượt của nhánh AISEF có
+    #: **dồn** vào nhóm hàm liên quan tới trạng thái chạy của harness (env,
+    #: guard, scope) hay rải đều? Dồn thì điều kiện thí nghiệm đang dẫn agent đi
+    #: lạc; rải đều thì giả thuyết sai.
+    edited: list[str]
 
 
 def _changed_in_candidate(ws: Path, candidate: str) -> list[str] | None:
-    """Tệp mà commit ứng viên đụng vào; None khi không đọc được cây."""
+    """Tệp mà commit ứng viên đụng vào; None khi không đọc được cây.
+
+    Bẫy: khi phiên **không ghi gì**, bench không tạo commit mới (`commit
+    check=False` — "không có gì để chốt = HEAD"), nên ``candidate`` chính là
+    commit nền. `git show` trên một commit gốc (không cha) liệt kê **toàn bộ
+    cây**, và phiên im lặng bỗng đọc thành "ghi 364 tệp ra ngoài phạm vi". Một
+    commit không cha nghĩa là không có gì được ghi — trả về danh sách rỗng.
+    """
     if not ws.is_dir() or not candidate:
         return None
     try:
+        cha = subprocess.run(["git", "show", "--no-patch", "--format=%P", candidate],
+                             cwd=str(ws), capture_output=True, text=True, check=False)
         out = subprocess.run(["git", "show", "--name-only", "--format=", candidate],
                              cwd=str(ws), capture_output=True, text=True, check=False)
     except OSError:
         return None
-    if out.returncode != 0:
+    if out.returncode != 0 or cha.returncode != 0:
         return None
+    if not cha.stdout.strip():
+        return []
     return [line.strip() for line in out.stdout.splitlines() if line.strip()]
 
 
@@ -68,6 +85,35 @@ def _changed_in_candidate(ws: Path, candidate: str) -> list[str] | None:
 #: mỗi ứng viên mang thêm một tệp mà agent chưa từng chạm. Đếm nó vào "ghi
 #: ngoài phạm vi" là chấm nhánh AISEF vì việc của chính harness.
 HARNESS_PATHS = (".opencode/", ".claude/", ".aisef/", "_bmad-output/")
+
+
+def _edited_functions(ws: Path, candidate: str) -> list[str]:
+    """Tên hàm bao quanh mỗi hunk của ứng viên, theo git.
+
+    git in hàm bao quanh ngay trong tiêu đề hunk (`@@ -755,9 +755,10 @@ def
+    effective_scope(...)`), nên không cần phân tích cú pháp Python — dùng lại
+    thứ git đã biết.
+    """
+    if not ws.is_dir() or not candidate:
+        return []
+    cha = subprocess.run(["git", "show", "--no-patch", "--format=%P", candidate],
+                         cwd=str(ws), capture_output=True, text=True, check=False)
+    if cha.returncode != 0 or not cha.stdout.strip():
+        return []          # commit gốc = phiên không ghi gì
+    out = subprocess.run(["git", "show", "--unified=0", "--format=", candidate],
+                         cwd=str(ws), capture_output=True, text=True, check=False)
+    if out.returncode != 0:
+        return []
+    ra: list[str] = []
+    for line in out.stdout.splitlines():
+        if not line.startswith("@@"):
+            continue
+        duoi = line.split("@@")[-1].strip()
+        if duoi.startswith(("def ", "class ", "async def ")):
+            ten = duoi.split("(")[0].replace("async def ", "").replace("def ", "").replace("class ", "")
+            if ten and ten not in ra:
+                ra.append(ten)
+    return ra
 
 
 def _outside(paths: list[str], scope: list[str]) -> list[str]:
@@ -106,6 +152,7 @@ def collect(client_prefix: str = "opencode") -> list[Session]:
             false_done=(row["outcome"] == "FAIL" and not row.get("error")),
             out_of_scope=_outside(changed or [], task.write_scope),
             workspace_found=changed is not None,
+            edited=_edited_functions(ws, row.get("candidate", "")),
         ))
     return ra
 
@@ -132,6 +179,15 @@ def report(sessions: list[Session]) -> str:
                   "| task | điều kiện | lượt | tệp |", "|---|---|---|---|"]
         for s in sorted(chi_tiet, key=lambda s: (s.task_id, s.client, s.attempt)):
             lines.append(f"| {s.task_id} | {s.client} | {s.attempt} | {', '.join(s.out_of_scope[:6])} |")
+    truot = [s for s in sessions if s.outcome == "FAIL" and s.workspace_found]
+    if truot:
+        lines += ["", "## Lượt trượt sửa ở đâu", "",
+                  "Để trả lời một câu cụ thể: các lượt trượt có **dồn** vào một nhóm hàm không?",
+                  "", "| task | điều kiện | lượt | hàm đã sửa |", "|---|---|---|---|"]
+        for s in sorted(truot, key=lambda s: (s.task_id, s.client, s.attempt)):
+            lines.append(f"| {s.task_id} | {s.client} | {s.attempt} | "
+                         f"{', '.join(s.edited[:6]) if s.edited else '**không sửa gì**'} |")
+
     thieu = [s for s in sessions if not s.workspace_found]
     if thieu:
         lines += ["", f"**{len(thieu)} phiên không còn cây làm việc** — không kết luận được về phạm vi ghi "
