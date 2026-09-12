@@ -429,130 +429,62 @@ class TestTaskDaCommit(unittest.TestCase):
 
 
 class TestSimulatedRoundTrip(unittest.TestCase):
-    """Bench smoke — A-2 task + SimulatedWeakAdapter end-to-end.
-
-    Why this exists
-    ----------------
-    A bench harness is correct iff it scores a known distribution right.
-    A real agent run is not a known distribution; the simulator is.  Driving
-    a single A-2 task through ``R.run`` with ``SimulatedWeakAdapter``,
-    attempts=4, asserts the strategy-stratified outcomes match the design
-    (``docs/BENCH-REPORT-v1.3.md §3.1``):
-
-        attempt 1 → gold     → PASS (full gold fixes F2P)
-        attempt 2 → noop     → FAIL (bug remains)
-        attempt 3 → partial  → PASS for single-file gold, FAIL for multi-file
-        attempt 4 → revert   → FAIL (pre-fix content leaves the bug intact or
-                                       breaks P2P — depends on the gold shape)
-
-    Cost
-    ----
-    ~8 s in our test environment — one mine, one validate, one 4-attempt run.
-    No paid-model call; safe for the tests CI matrix (Linux + Windows × Python
-    3.11..3.14).  The AISEF repo is the source of truth, so ``ROOT`` doubles
-    as the bench project (``AISEF_BENCH_E9`` is *not* set — the bug-fix tasks
-    are mined from the AISEF repo's own history).
-
-    Why a single task
-    -----------------
-    Twelve A-2 tasks × ~5 s = ~60 s, fine for a nightly conformance job but
-    too slow for every-PR CI.  Re-run the full set when a guard migration or
-    a bench schema change lands.
-    """
-
     def setUp(self):
-        self._tmp = tempfile.TemporaryDirectory()
-        self.tmp = Path(self._tmp.name)
-        self.tasks_dir = self.tmp / "tasks"
-        self.tasks_dir.mkdir()
-        self._e9, self._keep, self._ar = os.environ.get("AISEF_BENCH_E9"), R.KEEP_DIR, os.environ.get("AISEF_BENCH_AISEF_ROOT")
-        os.environ["AISEF_BENCH_AISEF_ROOT"] = str(ROOT.resolve())
-        os.environ.pop("AISEF_BENCH_E9", None)
-        R.KEEP_DIR = self.tmp / "bench"
+        from unittest.mock import patch
 
-    def tearDown(self):
-        R.KEEP_DIR = self._keep
-        if self._e9 is None:
-            os.environ.pop("AISEF_BENCH_E9", None)
-        else:
-            os.environ["AISEF_BENCH_E9"] = self._e9
-        if self._ar is None:
-            os.environ.pop("AISEF_BENCH_AISEF_ROOT", None)
-        else:
-            os.environ["AISEF_BENCH_AISEF_ROOT"] = self._ar
-        self._tmp.cleanup()
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.tmp = Path(tmp.name)
+        self.repo = self.tmp / "source"
+        self.repo.mkdir()
+        sh(self.repo, "git", "init", "-q", "-b", "main")
+        sh(self.repo, "git", "config", "user.email", "t@t")
+        sh(self.repo, "git", "config", "user.name", "t")
+        (self.repo / "aisef").mkdir()
+        (self.repo / "aisef/__init__.py").write_text("", encoding="utf-8")
+        (self.repo / "tests").mkdir()
+        (self.repo / "tests/__init__.py").write_text("", encoding="utf-8")
+        for name in ("a", "z"):
+            (self.repo / f"aisef/{name}.py").write_text("value = 0\n", encoding="utf-8")
+        commit(self.repo, "base", T0)
+        for name, value in (("ROOT", self.repo), ("KEEP_DIR", self.tmp / "bench")):
+            mock = patch.object(R, name, value)
+            mock.start()
+            self.addCleanup(mock.stop)
+        mock = patch.dict(os.environ, {k: v for k, v in os.environ.items() if not k.startswith("AISEF_BENCH_")}, clear=True)
+        mock.start()
+        self.addCleanup(mock.stop)
 
-    def test_phien_simulator_x4_khop_stratified_outcome(self):
-        # Mine one task from A-2 (first in the tuple).  ``bug-a2-multi-1``
-        # has a single-file gold (testlog.py), so attempt 3 = ``partial`` =
-        # full gold = PASS.  ``bug-a2-multi-2`` would invert attempt 3 to
-        # FAIL but the per-attempt assertion is one-to-one with each bug's
-        # own gold shape — keep the test focused on a known-validate task.
-        tasks = M.mine_bugs(ROOT, self.tasks_dir, bugs=M.A2_BUGS[:1])
-        self.assertEqual(len(tasks), 1, tasks[0].invalid_reason or "")
+    def run_shape(self, names):
+        for name in names:
+            (self.repo / f"aisef/{name}.py").write_text("value = 1\n", encoding="utf-8")
+        test = "import unittest\n" + "\n".join(f"from aisef import {name}" for name in names)
+        test += "\nclass TestFix(unittest.TestCase):\n    def test_fix(self):\n"
+        test += "".join(f"        self.assertEqual({name}.value, 1)\n" for name in names)
+        test += "    def test_baseline(self):\n        self.assertTrue(True)\n"
+        (self.repo / "tests/test_fix.py").write_text(test, encoding="utf-8")
+        commit(self.repo, "synthetic repair", T0 + 1)
+        tasks = M.mine_bugs(self.repo, self.tmp / "tasks", bugs=(M.Bug("synthetic", "tests/test_fix.py", "Values must be one."),))
+        self.assertEqual(len(tasks), 1)
         self.assertFalse(tasks[0].invalid_reason, tasks[0].invalid_reason)
         task = R.validate(tasks[0], runs=1)
         self.assertFalse(task.invalid_reason, task.invalid_reason)
-        self.assertGreater(len(task.f2p_ids), 0, f"task {task.id} has no F2P")
-        self.assertTrue(task.validated.get("gold_pass"), task.validated)
-
-        # Run × 4 — let the simulator's `attempt % 4` walk all four strategies.
+        self.assertTrue(task.f2p_ids)
+        task.source = "story"
+        os.environ["AISEF_BENCH_E9"] = str(self.repo)
+        R.ROOT = ROOT
         results = R.run(task, SimulatedWeakAdapter(), attempts=4)
-
-        self.assertEqual(len(results), 4)
-        outcomes = [r.outcome for r in results]
-        strategies = ["gold", "noop", "partial", "revert"]
-
-        # gold / noop / revert are deterministic by strategy alone.  partial
-        # depends on the gold shape — the strategy is to write the first
-        # file touched by gold.patch; if that's the only file (single-file
-        # gold) it's effectively the full gold and PASS.  We picked
-        # bug-a2-multi-1 specifically because it is single-file (testlog.py),
-        # so partial = PASS here.  Documents the property in the assertion.
-        self.assertEqual((strategies[0], outcomes[0]), ("gold", R.PASS))
-        self.assertEqual((strategies[1], outcomes[1]), ("noop", R.FAIL))
-        self.assertEqual((strategies[2], outcomes[2]), ("partial", R.PASS))
-        self.assertEqual((strategies[3], outcomes[3]), ("revert", R.FAIL))
-
-        # The harness wrote at least one F2P+P2P evidence pair per attempt
-        # and the bench framework committed each candidate as a separate
-        # commit on top of base — ``rev-list --all --count`` should be
-        # ``1 base + 4 candidates = 5``, never more or fewer.
-        ws = R.KEEP_DIR / "run" / "simulated-weak" / task.id
-        self.assertTrue(ws.is_dir(), ws)
-        self.assertEqual(
-            sum(1 for _ in (ws / f"a{n}" for n in (1, 2, 3, 4)) if _.is_dir()),
-            4,
-        )
-        # The simulator makes the bench machinery forget real cost — every
-        # attempt should report $0 and 1 turn (the simulator is single-shot).
+        self.assertEqual([r.outcome for r in results],
+                         [R.PASS, R.FAIL, R.PASS if len(names) == 1 else R.FAIL, R.FAIL])
         self.assertEqual([r.cost_usd for r in results], [0.0] * 4)
         self.assertEqual([r.turns for r in results], [1] * 4)
+        ws = R.KEEP_DIR / "run" / "simulated-weak" / task.id
+        for n in range(1, 5):
+            self.assertTrue((ws / f"a{n}" / "aisef/a.py").is_file())
+        self.assertEqual((ws / "a4/aisef/a.py").read_text(), "value = 0\n")
 
-    def test_phien_simulator_partial_da_file_la_FAIL_cho_multi_file_gold(self):
-        """Mirror of the previous test for a multi-file gold — same harness,
-        inverted partial outcome.  Both run in ~8 s together and together
-        they pin both ends of the ``partial`` strategy's behaviour.
-        """
-        # bug-a2-multi-2 has 2 files in gold (implement.py, plan.py);
-        # partial = first file only is incomplete by design → FAIL.
-        # bug-a2-multi-4 and bug-a2-state-4 are also multi-file and would
-        # do; multi-2 was chosen for its stable head SHA at the time of
-        # the A-2 commit and its small F2P set, which keeps validate fast.
-        TWO_FILE_BUGS = M.A2_BUGS[1:2]
-        tasks = M.mine_bugs(ROOT, self.tasks_dir, bugs=TWO_FILE_BUGS)
-        self.assertEqual(len(tasks), 1, tasks[0].invalid_reason or "")
-        if tasks[0].invalid_reason:
-            self.skipTest(f"task invalidated: {tasks[0].invalid_reason}")
-        task = R.validate(tasks[0], runs=1)
-        if task.invalid_reason:
-            self.skipTest(f"validate: {task.invalid_reason}")
-        self.assertTrue(task.validated.get("gold_pass"), task.validated)
+    def test_single_file_gold(self):
+        self.run_shape(("a",))
 
-        results = R.run(task, SimulatedWeakAdapter(), attempts=4)
-        outcomes = [r.outcome for r in results]
-        self.assertEqual(outcomes[0], R.PASS, "gold → PASS")
-        self.assertEqual(outcomes[1], R.FAIL, "noop → FAIL")
-        self.assertEqual(outcomes[2], R.FAIL, "partial → FAIL on multi-file gold")
-        self.assertEqual(outcomes[3], R.FAIL, "revert → FAIL")
-
+    def test_multi_file_gold(self):
+        self.run_shape(("a", "z"))

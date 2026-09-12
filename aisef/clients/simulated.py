@@ -21,8 +21,8 @@ What this simulator **is**:
   deterministic strategies and applies it to the worktree:
   * ``gold``: apply ``gold.patch`` exactly (would PASS).
   * ``noop``: write nothing (should FAIL — bug remains).
-  * ``partial``: apply only the first non-test hunk from ``gold.patch``
-    (should FAIL — fix is incomplete).
+  * ``partial``: write the first non-test file in sorted POSIX-path order
+    (may PASS when that file contains the complete fix).
   * ``revert``: replace every file touched by ``gold.patch`` with the
     pre-fix version (should FAIL — the agent re-rolled the fix).
   Strategy is keyed on ``attempt % 4`` so it is reproducible across
@@ -64,13 +64,15 @@ import os
 import time
 from pathlib import Path
 
+from aisef.control.impact import is_test_path
+
 from .base import Capability, ClientAdapter, RunSpec, Support
 from .stream import RunResult
 
 BINARY = "simulated-weak"
 
 
-def _read_gold(task_dir: Path) -> list[tuple[Path, str]]:
+def _read_gold(task_dir: Path, repo_root: Path | None = None) -> list[tuple[Path, str]]:
     """``gold.patch`` parsed into ``(file_path, new_contents)`` pairs.
 
     Strategy: ``git apply`` to a scratch tree, then read the result.
@@ -101,16 +103,18 @@ def _read_gold(task_dir: Path) -> list[tuple[Path, str]]:
     if not base:
         return []
 
-    scratch = task_dir / ".sim_scratch"
-    shutil.rmtree(scratch, ignore_errors=True)
-    scratch.mkdir(parents=True)
+    import tempfile
+
+    temporary = tempfile.TemporaryDirectory(prefix="aisef-sim-")
+    scratch = Path(temporary.name) / "scratch"
+    scratch.mkdir()
     clean: Path | None = None
     # Resolve the AISEF project root.  In production, ``_runner.run``
     # sets ``AISEF_BENCH_AISEF_ROOT`` explicitly; for unit tests we
     # accept either the env or a walk-up the task-dir tree.  ``task_dir``
     # is ``<aisef>/tests/bench/tasks/<id>/`` in both cases, so four
     # levels up is the repo root.
-    repo_root = Path(os.environ.get("AISEF_BENCH_AISEF_ROOT")
+    repo_root = repo_root or Path(os.environ.get("AISEF_BENCH_AISEF_ROOT")
                      or task_dir.parent.parent.parent.parent)
     try:
         arch = subprocess.run(
@@ -140,14 +144,14 @@ def _read_gold(task_dir: Path) -> list[tuple[Path, str]]:
             cwd=str(repo_root),
             capture_output=True, check=True,
         )
-        clean = task_dir / ".sim_clean"
+        clean = Path(temporary.name) / "clean"
         shutil.rmtree(clean, ignore_errors=True)
         clean.mkdir()
         with tarfile.open(fileobj=io.BytesIO(arch2.stdout)) as tf:
             tf.extractall(clean, filter="data")
         out: list[tuple[Path, str]] = []
         seen: set[Path] = set()
-        for f in scratch.rglob("*"):
+        for f in sorted(scratch.rglob("*"), key=lambda p: p.relative_to(scratch).as_posix()):
             if not f.is_file() or f.is_symlink():
                 continue
             rel = f.relative_to(scratch)
@@ -159,7 +163,7 @@ def _read_gold(task_dir: Path) -> list[tuple[Path, str]]:
             clean_path = clean / rel
             if clean_path.is_file() and clean_path.read_bytes() == f.read_bytes():
                 continue
-            if "tests/" in rel.parts:
+            if is_test_path(rel.as_posix()):
                 continue
             if rel in seen:
                 continue
@@ -168,8 +172,7 @@ def _read_gold(task_dir: Path) -> list[tuple[Path, str]]:
         return out
     finally:
         shutil.rmtree(scratch, ignore_errors=True)
-        if clean is not None and clean.exists():
-            shutil.rmtree(clean, ignore_errors=True)
+        temporary.cleanup()
 
 
 def _apply_gold(workdir: Path, files: list[tuple[Path, str]]) -> int:
@@ -185,40 +188,36 @@ def _apply_gold(workdir: Path, files: list[tuple[Path, str]]) -> int:
 
 def _revert_files(workdir: Path, files: list[tuple[Path, str]],
                   base_sha: str) -> int:
-    """Restore each file touched by ``gold.patch`` to its pre-image at
-    ``base_sha``.  Falls back to delete if the file is new at the gold
-    version.  Count restored.
-
-    Reads ``<base_sha>:<path>`` from the AISEF repo, not the workdir:
-    a fresh worktree's object DB only has its own HEAD, and the base
-    SHA may be dangling.  The bench ``_runner`` sets
-    ``AISEF_BENCH_AISEF_ROOT``; fall back to walking up ``workdir``
-    for unit tests that already start from the AISEF repo.
-    """
+    """Restore source files from the materialized workdir base commit."""
     if not base_sha or not files:
         return 0
     import subprocess
 
-    repo = Path(os.environ.get("AISEF_BENCH_AISEF_ROOT")
-                or workdir.parent.parent.parent.parent).resolve()
-    n = 0
+    subprocess.run(["git", "cat-file", "-e", f"{base_sha}^{{commit}}"],
+                   cwd=workdir, capture_output=True, check=True)
+    restored = []
     for rel, _ in files:
-        rel_s = str(rel)
-        proc = subprocess.run(
-            ["git", "show", f"{base_sha}:{rel_s}"],
-            cwd=str(repo), capture_output=True, text=True, check=False,
-            encoding="utf-8", errors="replace",
+        entry = subprocess.run(
+            ["git", "ls-tree", "-z", base_sha, "--", rel.as_posix()],
+            cwd=workdir, capture_output=True, check=True,
         )
-        if proc.returncode == 0:
-            target = workdir / rel
+        body = None
+        if entry.stdout:
+            body = subprocess.run(
+                ["git", "show", f"{base_sha}:{rel.as_posix()}"],
+                cwd=workdir, capture_output=True, check=True,
+            ).stdout
+        restored.append((rel, body))
+    n = 0
+    for rel, body in restored:
+        target = workdir / rel
+        if body is not None:
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(proc.stdout, encoding="utf-8")
+            target.write_bytes(body)
             n += 1
-        else:
-            target = workdir / rel
-            if target.exists():
-                target.unlink()
-                n += 1
+        elif target.exists():
+            target.unlink()
+            n += 1
     return n
 
 
@@ -268,20 +267,21 @@ class SimulatedWeakAdapter(ClientAdapter):
         # CLI, but the simulator is a library call).
         env = dict(spec.env or {})
         task_dir_env = env.get("AISEF_BENCH_TASK_DIR") or os.environ.get("AISEF_BENCH_TASK_DIR")
-        attempt_n = int(env.get("AISEF_BENCH_ATTEMPT")
-                        or os.environ.get("AISEF_BENCH_ATTEMPT") or "1")
+        attempt = env.get("AISEF_BENCH_ATTEMPT") or os.environ.get("AISEF_BENCH_ATTEMPT") or "1"
         base_sha = env.get("AISEF_BENCH_BASE_SHA") or os.environ.get("AISEF_BENCH_BASE_SHA") or ""
-        # ``_read_gold`` picks up ``AISEF_BENCH_AISEF_ROOT`` itself; we
-        # only need to keep it consistent across this call and ``_read_gold``.
+        root_env = env.get("AISEF_BENCH_AISEF_ROOT") or os.environ.get("AISEF_BENCH_AISEF_ROOT")
         ws = Path(spec.workdir)
-        if task_dir_env:
-            files = _read_gold(Path(task_dir_env))
-        else:
-            files = []
+        files = []
 
-        strategy = ["gold", "noop", "partial", "revert"][(attempt_n - 1) % 4]
         applied = 0
+        import subprocess
+        import tarfile
+
         try:
+            attempt_n = int(attempt)
+            strategy = ["gold", "noop", "partial", "revert"][(attempt_n - 1) % 4]
+            if task_dir_env and strategy != "noop":
+                files = _read_gold(Path(task_dir_env), Path(root_env) if root_env else None)
             if strategy == "gold":
                 applied = _apply_gold(ws, files)
                 res.text = f"simulated-weak strategy=gold wrote {applied} files"
@@ -298,7 +298,7 @@ class SimulatedWeakAdapter(ClientAdapter):
                 res.text = f"simulated-weak strategy=revert restored {applied} files"
             res.raw_result = {"strategy": strategy, "files_touched": applied,
                               "task_dir_present": bool(task_dir_env)}
-        except OSError as e:
+        except (OSError, ValueError, tarfile.TarError, subprocess.CalledProcessError) as e:
             res.ok = False
             res.error = f"simulator I/O failed: {e}"
         res.duration_ms = int((time.monotonic() - started) * 1000)

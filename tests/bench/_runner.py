@@ -272,7 +272,7 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = Fa
         sim_env = (
             {
                 "AISEF_BENCH_TASK_DIR": str(task.dir),
-                "AISEF_BENCH_AISEF_ROOT": str(ROOT),
+                "AISEF_BENCH_AISEF_ROOT": str(repo_for(task)),
                 "AISEF_BENCH_ATTEMPT": str(n),
                 "AISEF_BENCH_BASE_SHA": base,
             }
