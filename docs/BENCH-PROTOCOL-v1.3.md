@@ -314,6 +314,17 @@ người đọc tự kiểm hướng thiên vị.
 khác byte đề bài `sec-2`). Nó trả lời một câu hẹp hơn: *trên ba task từng phân
 biệt được, với phiên hạ tầng đã loại, harness có đổi kết cục không?*
 
+### Nơi ghi: `.bench-c1b/`, không phải `.bench/`
+
+`materialize()` **xoá cây cũ** trước khi dựng cây mới, nên chạy C-1b với
+`--attempts 6` trong `.bench/` sẽ xoá đúng ba cây làm việc mà báo cáo C-1 đang
+trích dẫn làm bằng chứng (`a1`–`a3` của `sec-1`, `sec-2`, `state-3`). Đó là mất
+dữ liệu đo, không phải dọn rác.
+
+C-1b vì vậy chạy với `AISEF_BENCH_DIR=.bench-c1b`: cây làm việc và
+`results.jsonl` riêng. Bằng chứng C-1 không bị chạm một byte, và mỗi cohort có
+một sổ riêng — đọc bảng thì trỏ `AISEF_BENCH_DIR` vào đúng sổ của cohort ấy.
+
 ### Điều kiện dừng và cách đọc
 
 - Dừng sớm nếu **cả hai** nhánh đạt 6/6 trên cả ba task: trần dữ liệu, báo và dừng.

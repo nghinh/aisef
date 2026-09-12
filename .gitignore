@@ -40,3 +40,4 @@ framework/bench/memory_compare/results/
 
 # uv lock — not used for this project
 uv.lock
+.bench-c1b/
