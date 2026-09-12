@@ -608,7 +608,7 @@ class TestMergeDungRoiChayLai(RunTestCase):
         j.record(sid, JEntry(step="attempt.started", attempt=1))
         j.record(sid, JEntry(step="worktree.created", attempt=1))  # lượt thật luôn có
         sha = subprocess.run(["git", "rev-parse", wt.branch_for(sid)], cwd=self.project,
-                             capture_output=True, text=True, check=True).stdout.strip()
+                             capture_output=True, text=True, encoding="utf-8", errors="replace", check=True).stdout.strip()
         j.record(sid, JEntry(step="candidate.frozen", attempt=1, data={"sha": sha}))
         j.record(sid, JEntry(step="verification.completed", attempt=1, data={"ok": True}))
         # Lượt chạy **kết thúc gọn** — không phải bị giết giữa chừng, nếu

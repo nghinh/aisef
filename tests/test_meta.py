@@ -102,6 +102,52 @@ class TestNangLucKhaiEmulatedPhaiCoMaMoPhong(unittest.TestCase):
                     )
 
 
+
+class TestKhongDocDauRaBangBangMaCuaMay(unittest.TestCase):
+    """`subprocess.run(..., text=True)` không nói bảng mã thì Python dùng bảng
+    mã **của máy**: cp1252 trên runner Windows. Tiến trình con của dự án này
+    nói UTF-8 (chính `_speak_utf8` đặt thế, lỗi 79), nên luồng đọc của cha
+    chết bằng `UnicodeDecodeError` **trong thread**, `communicate()` trả về
+    `stdout=None` — không ngoại lệ, không thông báo, chỉ là không có gì. Đúng
+    một dòng như thế làm CI Windows đỏ ba vòng (lỗi 99).
+
+    Quét bằng `ast` chứ không bằng grep: `encoding=` nằm dòng khác vẫn tính.
+    """
+
+    GOI = ("run", "Popen", "check_output", "call", "check_call")
+
+    def _thieu(self, path: Path) -> list[int]:
+        import ast
+        out = []
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if not isinstance(node, ast.Call):
+                continue
+            f = node.func
+            ten = f.attr if isinstance(f, ast.Attribute) else getattr(f, "id", "")
+            if ten not in self.GOI:
+                continue
+            kw = {k.arg for k in node.keywords if k.arg}
+            if ("text" in kw or "universal_newlines" in kw) and "encoding" not in kw:
+                out.append(node.lineno)
+        return out
+
+    def test_moi_lan_goi_tien_trinh_con_deu_khai_bang_ma(self):
+        thieu = []
+        for d in ("aisef", "tests"):
+            for p in sorted((ROOT / d).rglob("*.py")):
+                thieu += [f"{p.relative_to(ROOT)}:{ln}" for ln in self._thieu(p)]
+        self.assertEqual(thieu, [], "thiếu encoding=\"utf-8\": " + ", ".join(thieu))
+
+    def test_phep_quet_that_su_thay_duoc_loi(self):
+        """Phép quét chỉ có nghĩa nếu nó bắt được ca hỏng."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "x.py"
+            p.write_text("import subprocess\n"
+                         "subprocess.run(['git'], capture_output=True, text=True)\n",
+                         encoding="utf-8")
+            self.assertEqual(self._thieu(p), [2])
+
 if __name__ == "__main__":
     unittest.main()
 

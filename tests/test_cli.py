@@ -999,7 +999,7 @@ class TestQuyUocMaThoat(unittest.TestCase):
     def _chay(self, *args) -> int:
         import subprocess
         return subprocess.run([sys.executable, "-m", "aisef", *args],
-                              capture_output=True, text=True, cwd=str(ROOT)).returncode
+                              capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(ROOT)).returncode
 
     def test_thieu_tham_so_la_go_sai_thoat_1(self):
         self.assertEqual(self._chay("evidence"), 1)
@@ -1016,18 +1016,18 @@ class TestQuyUocMaThoat(unittest.TestCase):
         cùng mã thoát và cùng đầu ra."""
         import subprocess
         import tempfile
-        # `stdout=PIPE` tường minh thay vì `capture_output`: trên runner Windows
-        # 3.11, `capture_output=True` cho `stdout is None` ở phép thử này (CI
-        # 13/09/2026) — nguyên nhân chưa rõ, nên ống được mở tay và thông báo
-        # lỗi mang theo nguyên văn cả ba trường để lần sau đọc được sự thật thay
-        # vì đoán.
+        # `encoding="utf-8"` là thứ phải có: `text=True` trần giải mã bằng bảng
+        # mã của máy (cp1252 trên runner Windows), mà tiến trình con nói UTF-8,
+        # nên luồng đọc chết trong thread và `stdout` về `None` — đúng cái
+        # `out=None` đã làm CI Windows đỏ ba vòng (lỗi 99). Thông báo lỗi vẫn
+        # mang nguyên văn cả ba trường để lần sau đọc được sự thật thay vì đoán.
         with tempfile.TemporaryDirectory() as d:
             sau = subprocess.run([sys.executable, "-m", "aisef", "gates", "--project", d],
                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                 text=True, cwd=str(ROOT))
+                                 text=True, encoding="utf-8", errors="replace", cwd=str(ROOT))
             truoc = subprocess.run([sys.executable, "-m", "aisef", "--project", d, "gates"],
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                   text=True, cwd=str(ROOT))
+                                   text=True, encoding="utf-8", errors="replace", cwd=str(ROOT))
         chi_tiet = (f"sau: rc={sau.returncode} out={sau.stdout!r} err={sau.stderr!r}\n"
                     f"truoc: rc={truoc.returncode} out={truoc.stdout!r} err={truoc.stderr!r}")
         self.assertEqual(sau.returncode, truoc.returncode, chi_tiet)
@@ -1054,10 +1054,10 @@ class TestQuyUocMaThoat(unittest.TestCase):
         import tempfile
         with tempfile.TemporaryDirectory() as d:
             ap = subprocess.run([sys.executable, "-m", "aisef", "approve", "prd", "--project", d],
-                                capture_output=True, text=True, cwd=str(ROOT))
+                                capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(ROOT))
             rj = subprocess.run([sys.executable, "-m", "aisef", "reject", "prd",
                                  "--note", "x", "--project", d],
-                                capture_output=True, text=True, cwd=str(ROOT))
+                                capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(ROOT))
         self.assertEqual(ap.returncode, 2, ap.stderr[-200:])
         self.assertEqual(rj.returncode, 2, rj.stdout + rj.stderr)
         self.assertIn("nothing to reject yet", rj.stderr)
@@ -1073,7 +1073,7 @@ class TestQuyUocMaThoat(unittest.TestCase):
         for args in (["guard", "khong-co-guard-nay"], ["guard"]):
             with self.subTest(args=args):
                 r = subprocess.run([sys.executable, "-m", "aisef", *args],
-                                   input="{}", capture_output=True, text=True, cwd=str(ROOT))
+                                   input="{}", capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(ROOT))
                 self.assertEqual(r.returncode, 2, r.stderr[-200:])
                 self.assertIn("blocking, not allowing", r.stderr)
 
@@ -1084,5 +1084,5 @@ class TestQuyUocMaThoat(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             import subprocess
             rc = subprocess.run([sys.executable, "-m", "aisef", "gates", "--project", d],
-                                capture_output=True, text=True, cwd=str(ROOT)).returncode
+                                capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(ROOT)).returncode
         self.assertEqual(rc, 2)

@@ -14,7 +14,7 @@ from tests.bench.simulated import SimulatedWeakAdapter, _read_gold, _revert_file
 
 
 def git(repo, *args):
-    return subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True, text=True).stdout.strip()
+    return subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
 
 
 class TestSimulatedStrategies(unittest.TestCase):

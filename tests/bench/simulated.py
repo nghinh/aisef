@@ -96,11 +96,11 @@ def _apply_patch_file(scratch: Path, patch: Path) -> bool:
     """
     import subprocess
 
-    init = subprocess.run(["git", "init", "-q", str(scratch)], capture_output=True, text=True, check=False)
+    init = subprocess.run(["git", "init", "-q", str(scratch)], capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
     if init.returncode == 0:
         applied = subprocess.run(
             ["git", "apply", "-p1", "--whitespace=nowarn", str(patch.resolve())],
-            cwd=str(scratch), capture_output=True, text=True, check=False,
+            cwd=str(scratch), capture_output=True, text=True, encoding="utf-8", errors="replace", check=False,
         )
         if applied.returncode == 0 and "Skipped patch" not in (applied.stdout + applied.stderr):
             return True
@@ -108,7 +108,7 @@ def _apply_patch_file(scratch: Path, patch: Path) -> bool:
         return False
     return subprocess.run(
         ["patch", "-p1", "--binary", "-d", str(scratch), "-i", str(patch.resolve())],
-        capture_output=True, text=True, check=False,
+        capture_output=True, text=True, encoding="utf-8", errors="replace", check=False,
     ).returncode == 0
 
 

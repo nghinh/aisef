@@ -1288,7 +1288,7 @@ class TestLuotBiNgatGiuLaiLoiRaSoat(ImplementTestCase):
 
     def _head(self) -> str:
         return subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.project,
-                              capture_output=True, text=True).stdout.strip()
+                              capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
 
     def _ghi(self, sha: str, findings: list[str]) -> None:
         EvidenceStore(self.artifacts, candidate=sha).record("STORY-01-01", Event(

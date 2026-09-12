@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **Windows CI: the test that read a child process with the machine's codec**
+  (bug 99). `subprocess.run(..., text=True)` decodes with the locale encoding —
+  cp1252 on the runner — while every `aisef` process deliberately speaks UTF-8.
+  The mismatch raises inside `communicate()`'s reader thread, which does not
+  propagate: the call returns with `stdout=None`, indistinguishable from a
+  program that printed nothing. Three red Windows runs and a "cause unknown"
+  note in the test came out of that. Nineteen call sites in the test suite now
+  name the encoding (the library code already did), and a meta-test walks the
+  AST of `aisef/` and `tests/` to keep it that way.
+
 - **The mockup prompt was empty because the experience tables named no screen**
   (bug 98). Components attach to a screen when the table's scope column names
   it — but the real column holds a region ("Header area", "List area"), and the

@@ -136,9 +136,9 @@ def _changed_in_candidate(ws: Path, candidate: str) -> list[str] | None:
         return None
     try:
         cha = subprocess.run(["git", "show", "--no-patch", "--format=%P", candidate],
-                             cwd=str(ws), capture_output=True, text=True, check=False)
+                             cwd=str(ws), capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
         out = subprocess.run(["git", "show", "--name-only", "--format=", candidate],
-                             cwd=str(ws), capture_output=True, text=True, check=False)
+                             cwd=str(ws), capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
     except OSError:
         return None
     if out.returncode != 0 or cha.returncode != 0:
@@ -166,11 +166,11 @@ def _edited_functions(ws: Path, candidate: str) -> list[str]:
     if not ws.is_dir() or not candidate:
         return []
     cha = subprocess.run(["git", "show", "--no-patch", "--format=%P", candidate],
-                         cwd=str(ws), capture_output=True, text=True, check=False)
+                         cwd=str(ws), capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
     if cha.returncode != 0 or not cha.stdout.strip():
         return []          # commit gốc = phiên không ghi gì
     out = subprocess.run(["git", "show", "--unified=0", "--format=", candidate],
-                         cwd=str(ws), capture_output=True, text=True, check=False)
+                         cwd=str(ws), capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
     if out.returncode != 0:
         return []
     ra: list[str] = []

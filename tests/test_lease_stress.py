@@ -44,7 +44,7 @@ class TestTranhLeaseDaTienTrinh(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             ma = CON % {"root": str(ROOT), "root_run": d, "giu": 600}
             procs = [subprocess.Popen([sys.executable, "-c", ma],
-                                      stdout=subprocess.PIPE, text=True)
+                                      stdout=subprocess.PIPE, text=True, encoding="utf-8", errors="replace")
                      for _ in range(self.SO_CON)]
             try:
                 ket = [(p.stdout.readline() or "").strip() for p in procs]
@@ -64,7 +64,7 @@ class TestTranhLeaseDaTienTrinh(unittest.TestCase):
             ma = CON % {"root": str(ROOT), "root_run": d, "giu": 0}
             for lan in range(3):
                 out = subprocess.run([sys.executable, "-c", ma], capture_output=True,
-                                     text=True, timeout=60).stdout.strip()
+                                     text=True, encoding="utf-8", errors="replace", timeout=60).stdout.strip()
                 self.assertEqual(out.splitlines()[0], "WIN", f"lượt {lan + 1}: {out!r}")
 
 

@@ -727,7 +727,7 @@ class TestPhienImLangKhongDocThanhGhiCaKho(unittest.TestCase):
         from . import _analyze as A
         d = self._kho_mot_commit()
         sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=d, capture_output=True,
-                             text=True, check=True).stdout.strip()
+                             text=True, encoding="utf-8", errors="replace", check=True).stdout.strip()
         self.assertEqual(A._changed_in_candidate(d, sha), [])
         self.assertEqual(A._edited_functions(d, sha), [])
 
@@ -739,7 +739,7 @@ class TestPhienImLangKhongDocThanhGhiCaKho(unittest.TestCase):
                     ["git", "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "ứng viên"]):
             subprocess.run(cmd, cwd=d, check=True, capture_output=True)
         sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=d, capture_output=True,
-                             text=True, check=True).stdout.strip()
+                             text=True, encoding="utf-8", errors="replace", check=True).stdout.strip()
         self.assertEqual(A._changed_in_candidate(d, sha), ["a.py"])
 
 
