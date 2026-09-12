@@ -94,6 +94,26 @@ is broken on a declared platform is not a release.
   environment variable that decided who the session was (the name, never the
   value) instead of printing `401`.
 
+- **The simulator shelled out to a tool Windows does not have** (bug 73).
+  `gold.patch` was applied with GNU `patch`; on Windows there is none, and
+  because "no applier" and "did not apply" both returned an empty list, five
+  bench tests failed with no diagnostic at all. It now applies through
+  `git apply` inside an initialised scratch repository — the mode where a hunk
+  that will not place is an error rather than a `Skipped patch` line with exit
+  0 — and falls back to `patch` where that is available.
+
+- **Line endings, on both sides of the simulator's write** (bug 74). Applying
+  gold and then reverting left the tree dirty on Windows: the write translated
+  `\n` to `\r\n`, and the revert wrote the blob's bytes into a working tree
+  that had been checked out with `core.autocrlf`. Writes now disable
+  translation explicitly, and reverting goes through `git checkout` so git
+  applies the same filters it used on the way out.
+
+- **`doctor` says which credential an agent session will use.** Names only,
+  never values: an expired key in the operator's shell outranks the client's
+  own login, and the only previous symptom was every session returning 401
+  after burning its full wall-clock.
+
 ### Benchmark v1.3
 
 - Client adapters drain stdout concurrently and keep the partial stream when a
