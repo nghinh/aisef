@@ -61,6 +61,7 @@ from __future__ import annotations
 
 import io
 import os
+import shutil
 import time
 from pathlib import Path
 
@@ -70,6 +71,45 @@ from .base import Capability, ClientAdapter, RunSpec, Support
 from .stream import RunResult
 
 BINARY = "simulated-weak"
+
+
+def _apply_patch_file(scratch: Path, patch: Path) -> bool:
+    """Apply ``patch`` inside ``scratch``; True when it really applied.
+
+    Two appliers, tried in order, because neither works everywhere:
+
+    * ``git apply`` **inside a repository**.  Run from a plain directory it
+      prints ``Skipped patch '...'`` for a hunk it cannot place and still
+      exits 0 (observed 2026-09-12 on ``bug-a2-state-1/gold.patch``) — no
+      error, no apply, the file left at its pre-image.  Initialising the
+      scratch tree as a repository removes that mode: a hunk that will not
+      place is an error there, which is the contract this function needs.
+    * GNU ``patch``, which is what the rest of the bench uses — and which
+      simply **does not exist on Windows** (CI, 2026-09-12: every simulator
+      strategy wrote nothing and the five bench tests failed with no
+      diagnostic, because a missing tool and a patch that does not apply
+      both arrived here as "returned nothing").
+
+    The two cover each other: git ships on any machine that could have
+    cloned this repository, and ``patch`` covers a git too old for
+    ``--unsafe-paths`` semantics.
+    """
+    import subprocess
+
+    init = subprocess.run(["git", "init", "-q", str(scratch)], capture_output=True, text=True, check=False)
+    if init.returncode == 0:
+        applied = subprocess.run(
+            ["git", "apply", "-p1", "--whitespace=nowarn", str(patch.resolve())],
+            cwd=str(scratch), capture_output=True, text=True, check=False,
+        )
+        if applied.returncode == 0 and "Skipped patch" not in (applied.stdout + applied.stderr):
+            return True
+    if not shutil.which("patch"):
+        return False
+    return subprocess.run(
+        ["patch", "-p1", "--binary", "-d", str(scratch), "-i", str(patch.resolve())],
+        capture_output=True, text=True, check=False,
+    ).returncode == 0
 
 
 def _read_gold(task_dir: Path, repo_root: Path | None = None) -> list[tuple[Path, str]]:
@@ -124,19 +164,7 @@ def _read_gold(task_dir: Path, repo_root: Path | None = None) -> list[tuple[Path
         )
         with tarfile.open(fileobj=io.BytesIO(arch.stdout)) as tf:
             tf.extractall(scratch, filter="data")
-        # Use GNU ``patch`` rather than ``git apply``: a clean
-        # ``git apply`` from a non-worktree directory emits
-        # ``Skipped patch 'aisef/phases/...'.`` for any hunk that does
-        # not match byte-for-byte (observed 2026-09-12 on
-        # ``bug-a2-state-1/gold.patch``: no error, no apply, the file
-        # stays the pre-image).  ``patch`` applies the same diff with
-        # the same exit-code contract and is what the validate step
-        # already uses elsewhere in the bench.
-        proc = subprocess.run(
-            ["patch", "-p1", "--binary", "-d", str(scratch), "-i", str(patch.resolve())],
-            capture_output=True, text=True, check=False,
-        )
-        if proc.returncode != 0:
+        if not _apply_patch_file(scratch, patch):
             return []
         # Find all files that differ from a fresh extraction.
         arch2 = subprocess.run(

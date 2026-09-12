@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 from unittest.mock import patch
 
 from aisef.clients.base import RunSpec
@@ -137,3 +138,54 @@ class TestSimulatedStrategies(unittest.TestCase):
 
     def test_missing_patch_returns_empty(self):
         self.assertEqual(_read_gold(self.root), [])
+
+class TestApDungPatchChayDuocTrenMoiHeDieuHanh(unittest.TestCase):
+    """Bug 73 (CI Windows 2026-09-12): simulator gọi GNU `patch`, thứ Windows
+    không có. Mọi chiến lược ghi 0 tệp, 5 phép thử bench đỏ, và **không có lời
+    chẩn nào** — vì "thiếu tool" và "patch không áp được" cùng trả về danh sách
+    rỗng. Cùng lớp với lỗi 55: thiếu công cụ bị đọc thành không có gì để làm.
+    """
+
+    def _du_lieu(self):
+        d = Path(tempfile.mkdtemp())
+        (d / "a.py").write_text("old\n", encoding="utf-8")
+        patch = d / "p.patch"
+        patch.write_text(
+            "--- a/a.py\n+++ b/a.py\n@@ -1 +1 @@\n-old\n+new\n", encoding="utf-8")
+        return d, patch
+
+    def test_ap_duoc_khi_co_git(self):
+        from aisef.clients.simulated import _apply_patch_file
+        d, patch = self._du_lieu()
+        self.assertTrue(_apply_patch_file(d, patch))
+        self.assertEqual((d / "a.py").read_text(encoding="utf-8"), "new\n")
+
+    def test_khong_co_patch_tren_may_van_ap_duoc_bang_git(self):
+        """Đây là ca Windows: `shutil.which('patch')` trả None."""
+        from aisef.clients import simulated
+        d, patch = self._du_lieu()
+        with mock.patch.object(simulated.shutil, "which", return_value=None):
+            self.assertTrue(simulated._apply_patch_file(d, patch))
+        self.assertEqual((d / "a.py").read_text(encoding="utf-8"), "new\n")
+
+    def test_git_in_skipped_patch_roi_exit_0_khong_tinh_la_ap_duoc(self):
+        """`git apply` ngoài repo in `Skipped patch` rồi exit 0 — im lặng không áp."""
+        from aisef.clients import simulated
+        d, patch = self._du_lieu()
+
+        class GiaKetQua:
+            returncode = 0
+            stdout = "Skipped patch 'a.py'.\n"
+            stderr = ""
+
+        def gia_run(cmd, **kw):
+            if cmd[:2] == ["git", "init"]:
+                return GiaKetQua()
+            if cmd[:2] == ["git", "apply"]:
+                return GiaKetQua()
+            raise AssertionError("không được gọi tới đây khi patch vắng mặt")
+
+        with mock.patch.object(simulated.shutil, "which", return_value=None), \
+             mock.patch("subprocess.run", gia_run):
+            self.assertFalse(simulated._apply_patch_file(d, patch))
+
