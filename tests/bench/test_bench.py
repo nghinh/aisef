@@ -761,6 +761,20 @@ class TestLenhAnalyzeCoThat(unittest.TestCase):
                 pass
         self.assertIn("Đo lại sau đợt chạy", ra.getvalue())
 
+    def test_hai_dieu_kien_chay_cung_che_do_tran_luot(self):
+        """Cột 1 chạy khi adapter chưa thi hành trần lượt (một phiên 61 lượt,
+        § O-10). Nếu bench truyền `run.max_turns` thì từ 13/09 phiên sẽ bị giết
+        ở lượt 40 — cột 2 chạy chế độ khác cột 1, và hai cột hết so được.
+        Trần ở đây phải là 0, và giống nhau ở cả hai nhánh."""
+        import inspect
+
+        from . import _runner as R
+        src = inspect.getsource(R.run)
+        self.assertIn("TRAN_LUOT = 0", src)
+        self.assertEqual(src.count("max_turns=TRAN_LUOT"), 2,
+                         "hai nhánh phải dùng cùng một trần")
+        self.assertNotIn('max_turns=cfg["run.max_turns"]', src)
+
     def test_report_loc_duoc_theo_cohort(self):
         """`results.jsonl` là sổ **nối thêm**: mọi đợt đo nằm chung một tệp, nên
         `report` không lọc được sẽ trộn cohort claude 09/06 vào bảng của cohort

@@ -293,9 +293,16 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = Fa
             if sim
             else {}
         )
+        # `max_turns=0` là **có chủ ý**, không phải quên: cột 1 của cohort C-1
+        # (12/09) chạy khi adapter OpenCode chưa thi hành trần lượt, nên chế độ
+        # thật của nó là "chỉ đồng hồ chặn" — một phiên đã chạy 61 lượt (O-10).
+        # Từ 13/09 adapter giết tiến trình tại trần; nếu để `run.max_turns` ở
+        # đây thì cột 2 chạy dưới một chế độ khác cột 1 và hai cột hết so được.
+        # Đổi con số này = đổi giao thức: phải ghi vào BENCH-PROTOCOL trước.
+        TRAN_LUOT = 0
         if bare:
             spec = RunSpec(
-                prompt=prompt, workdir=ws, max_turns=cfg["run.max_turns"],
+                prompt=prompt, workdir=ws, max_turns=TRAN_LUOT,
                 timeout_seconds=cfg["run.timeout_seconds"],
                 model=model,
                 env=sim_env,
@@ -303,7 +310,7 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = Fa
         else:
             settings = ws / ".claude" / "settings.json"
             spec = RunSpec(
-                prompt=prompt, workdir=ws, max_turns=cfg["run.max_turns"],
+                prompt=prompt, workdir=ws, max_turns=TRAN_LUOT,
                 timeout_seconds=cfg["run.timeout_seconds"],
                 settings_file=settings if settings.is_file() and not sim else None,
                 model=model,

@@ -216,6 +216,13 @@ Bốn bước, theo thứ tự, không rút gọn:
 4. So hai cột **theo từng task**, không so hai con số tổng: 12 task với n = 3
    không đủ mẫu để một hiệu số tổng có nghĩa.
 
+**Chế độ trần lượt phải giữ nguyên như cột 1.** Cột 1 chạy khi adapter OpenCode
+chưa thi hành `run.max_turns` — chế độ thật của nó là *chỉ đồng hồ 1800 s chặn*,
+và một phiên đã chạy 61 lượt ([O-10](BENCH-OBSERVATIONS-C1.md)). Từ 13/09 adapter
+giết tiến trình tại trần. Nếu cột 2 chạy có trần thì hai cột khác chế độ và hết
+so được, nên `tests/bench/_runner.py` khai `TRAN_LUOT = 0` cho **cả hai** nhánh,
+có phép thử ghim. Muốn đổi con số ấy thì phải sửa mục này trước, không sửa mã trước.
+
 **Điều kiện dừng sớm, chốt trước:** nếu hai task đầu của cột 2 đều 6/6 PASS ở cả
 hai điều kiện thì model mới cũng chạm trần trên bộ dữ liệu này — dừng, báo, và
 đừng đốt hai giờ nữa để lấy một cột toàn số 1,00. Trần dữ liệu là kết quả, và
