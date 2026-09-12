@@ -1,6 +1,120 @@
 # Changelog
 
-## Unreleased
+## 1.3.0 — 2026-09-12
+
+Sixty-one commits had accumulated behind `v1.2.31` (2026-09-09): seven real
+bugs from a greenfield end-to-end run, three cross-tier invariants, the v1.3
+benchmark protocol, and this release's own housekeeping. Nothing here changes
+a gate's verdict on evidence that was already correct.
+
+### Cross-tier invariants (ADR-009)
+
+- **Findings are objects now, not lines of text.** Every advisory claim is a
+  `Finding` (`aisef/control/findings.py`) with a stable 16-hex id computed over
+  `(source, trust, file, line, body, behavior_id, scope)`, an explicit
+  lifecycle (`OPEN / CLOSED / REOPENED / SUPERSEDED / STUCK`), and one rule that
+  closes bug 61 for good: closing without evidence requires both
+  `force_prescription_match=True` and a matching `previous_prescription`. A
+  reviewer can no longer reject the fix it prescribed by rewording the
+  complaint. `agent` trust is rejected at construction; reviewer and security
+  records must carry a 64-hex `contract_authority` digest.
+- **The dev server now belongs to a candidate.** `AppServer` takes an optional
+  `lease_root` / `run_id`, holds a non-blocking flock over
+  `.aisef/lease/port-<run_id>.lock`, and probes `GET /_aisef/identity` before
+  it believes a server is ready. Two runs of the same project can no longer
+  grade each other's app — the failure mode that made a whole branch look
+  blank in the September 5 A/B.
+- **Budget is reserved before the call, not counted after it.**
+  `BudgetGuard.reserve(...)` short-circuits when no caps are set, otherwise it
+  locks the ledger, refuses an oversized estimate, settles the real cost on
+  success and refunds on exception. Two defects in that seam were found by the
+  wire-up harness on the same day and closed: the flock was carried on a file
+  that `os.replace` swaps out from under it (now a sidecar lock), and the cap
+  check ignored in-flight reservations, so two parallel calls each under the
+  cap could both spend.
+- New knobs, all default-off: `run.cost_cap_usd`, `run.turn_cap`,
+  `run.wall_clock_cap_seconds`, `run.qualify_preflight`.
+- `validation/phase3_wireup_e2e.py` checks all four seams end to end and
+  writes `validation/phase3-report.md` — 16/16 at this release.
+
+### Bugs found by measurement on a real greenfield run
+
+- **A third of the reviewer's blocking findings never reached the author**
+  (bug 64). The key used to reconcile the prose verdict against the JSON one
+  was `(tag, file)` with the line number deliberately dropped — so three
+  findings in one file collapsed into one key, the two sets compared equal, and
+  the mismatch alarm built exactly for this case went blind with them.
+- **A tag pasted after a sentence was not read as a finding** (bug 65). The
+  model opened with a lead-in sentence and put `[block] path:line` after the
+  full stop; the parser only recognised tags at the start of a line.
+- **A story resumed after an interruption re-submitted the rejected candidate**
+  (bug 66). The reviewer's blocking words lived in a local variable of the
+  retry loop and died with the process, while the evidence survived on disk.
+  The rerun opened attempt 1 with empty feedback and burned a paid attempt
+  re-submitting what had just been rejected.
+- **The reviewer never checked its own prescription against the write scope**
+  (bug 67). The `[stuck]` rule only fired when the *author* claimed a deadlock.
+  A correct finding whose only fix lay outside the story's write scope cost two
+  attempts before the gate could conclude anything.
+- **An attempt where the agent wrote nothing still cost a full gate run**
+  (bugs 68 and 69). `changed_files` answers "what did this story change",
+  measured against `base_ref` — correct for the reviewer's diff, wrong as an
+  answer to "did this session write anything". On a retry the previous
+  attempt's work made a silent session look like a productive one: candidate
+  frozen, nop + test + lint + e2e + a11y + mockup + review + security all run,
+  one attempt consumed. The first-attempt variant slipped past both the old
+  zero-output check (it *did* call tools) and the first fix.
+- **My own no-op guard buried finished work under "already known"** (bug 70).
+  The fix above assumed a gate verdict is a pure function of the tree. It is
+  not: the gate also reads the spec and the prompt, and both can change between
+  attempts. A story whose previous block was caused by an architecture
+  decision — since corrected — was told a rerun would produce the same result,
+  while its branch already carried the finished feature.
+
+### Benchmark v1.3
+
+- Client adapters drain stdout concurrently and keep the partial stream when a
+  run times out, so a timeout no longer reads as zero data.
+- Twelve harder tasks (`bug-a2-multi-*`, `-state-*`, `-sec-*`): 108 fail-to-pass
+  and ~750 pass-to-pass tests, averaging 4.5 source modules per fix against the
+  1.4 of the v0.3.0 set.
+- `SimulatedWeakAdapter` — a deterministic four-strategy control that costs
+  nothing and, crucially, is reported for what it is: it never invokes a hook,
+  so AISEF ≡ bare on it is expected and says nothing about guards.
+- `tests/bench/tasks/MANIFEST.sha256` pins the fixture bytes; the dataset is
+  frozen under the protocol, and the corrected simulator re-run is recorded
+  next to the original numbers rather than replacing them.
+
+### Documentation that can no longer drift
+
+- Three counts in the documentation had drifted from their sources:
+  `STABILITY.md` said 58 config keys where `DEFAULTS` had 68, both READMEs said
+  thirty-one bugs where the taxonomy had reached 70, and the taxonomy's own
+  section heading still said "22–63". All three are corrected, and four
+  meta-tests now read the source and fail if any of them drifts again.
+- Every relative link in `docs/`, both READMEs and this file is checked for a
+  target that exists — and, for anchors, a heading that generates it. The test
+  was written because `BENCH-REPORT-v1.3.md` was pointing at a bench phase
+  queue that had never been written down; that queue now exists in
+  `docs/EXECUTION-PLAN.md`.
+- The four remaining semantic issues from the pre-Phase-2 audit are written
+  down in `ADR-009 § Open`, reconstructed from on-disk evidence with that
+  provenance stated, because the original list was never recorded anywhere.
+
+### Tooling
+
+- `ruff` is now a CI gate with an explicit rule set (`F`, `B`, `E9`) chosen by
+  measurement, and the deferred families each carry a reason in
+  `pyproject.toml`. Enabling it caught a live defect introduced in the same
+  session, which is the argument for having it.
+- A wheel-smoke CI job installs the built wheel into a clean environment and
+  checks the three things unit tests cannot: the command runs, the packaged
+  runtime data (prompts, rules, skills, assets, catalog) is really inside the
+  wheel, and a blank project can be initialised by the installed command. This
+  is the bug-31 class — a wheel whose hooks pointed at a path that did not
+  exist, valid syntax, no guard running at all.
+
+### Bugs 54–63 — Windows CI and the greenfield run that preceded it
 
 - **An MCP server's own notes killed a story** (bug 62). Serena writes
   `.serena/memories/*.md` into whatever tree it is pointed at, on its first
