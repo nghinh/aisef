@@ -154,7 +154,7 @@ dạng khoá (lỗi 10).
 | **Ứng viên** | mỗi phép kiểm mang `detail.candidate` = SHA bản được kiểm (ADR-004 R1) |
 | **Sổ hành vi** | `control/ledger.py` — phép chiếu từ evidence, không phải kho mới: mỗi tiêu chí / FR / `qa:<kind>` / màn hình có trạng thái VERIFIED · GAP · REOPENED (`regressed_by`); chỉ ứng viên đã *landed* (nhật ký `merge.completed`/`attempt.committed`) mới thành VERIFIED. `ledger.json` + `INDEX.md` + mốc `loops[]`; metrics (tăng trưởng, hồi quy, gap đóng, cải thiện biên/$) ở phần 5 báo cáo (ADR-004 R2/R6/R7) |
 | Bàn giao & phán quyết | `handoff` (slot · nguồn · số ký tự, `prompt_chars`), `review:verdict`/`security:verdict` (JSON), `gate:input` (13 kwargs của `gate.evaluate` JSON-hoá, ghi ngay trước phán quyết — `aisef gate --replay` chấm lại lượt cũ bằng luật mới, ADR-005 V4), `gate:verdict`; lời rà soát nguyên văn ở `_bmad-output/reviews/<story>-<vai>-<lượt>.md` (lỗi 16) |
-| **Kết cục lượt** | `agent_run.detail.exit_status` ∈ ok · max_turns · timeout · cost · context · permission · infra · error — `clients/stream.py::exit_status_of`, một bảng cho cả vòng thử lại (`INFRA_STATUSES` = timeout, infra không ăn `run.max_retries`) lẫn `aisef status` ("Lượt agent: …", bản ghi cũ là "chưa ghi"); `tool_run.detail.redacted` = số bí mật đã che trong `tail`/log (ADR-005 V1/V11 B) |
+| **Kết cục lượt** | `agent_run.detail.exit_status` ∈ ok · max_turns · timeout · cost · context · permission · auth · rate_limit · infra · error — `clients/stream.py::exit_status_of`, một bảng cho cả vòng thử lại (`INFRA_STATUSES` = timeout, infra, rate_limit — không ăn `run.max_retries`; `rate_limit` còn **chờ** đúng số giây nhà cung cấp nói trước khi thử lại, `auth` thì không thử lại vì khoá bị từ chối sẽ bị từ chối lần nữa) lẫn `aisef status` ("Lượt agent: …", bản ghi cũ là "chưa ghi"); `tool_run.detail.redacted` = số bí mật đã che trong `tail`/log (ADR-005 V1/V11 B) |
 | Evaluation | `tests/bench/` (ADR-005 V8): task từ 25 lỗi thật của kho (commit) + story e9 done (sinh lúc chạy); `validate` ×3 trên bản chép `git archive` một ref, F2P/P2P theo tên, flaky loại và nêu tên; `run` → pass@1/pass@k/ổn định/cost so lịch sử; `export` Harbor. Trôi chất lượng còn đo bằng dogfood `tests/dogfood/` (mốc lượt/chi phí) và hợp quy client `tests/conformance/` |
 | Dashboard | `aisef status` · `aisef report` · `aisef evidence <id>` |
 
@@ -418,6 +418,7 @@ aisef memory recall|search [QUERY] --story S [--role developer|reviewer|security
 aisef memory capture --story S [--json]
 aisef memory show|forget ID [--json]  bộ nhớ tư vấn thử nghiệm, mặc định tắt; không ảnh hưởng cổng
 aisef status                         tiến độ · chi phí · story tốn bất thường
+aisef status --attempts              lượt đã kết thúc ở đâu: mục cổng nào chặn, lượt nào chưa tới cổng
 aisef report  [--out FILE]           báo cáo nghiệm thu + sổ hành vi (`ledger.json`, `INDEX.md`)
 aisef evidence <id> [--story S]      lịch sử một story hoặc một hành vi
     [--link TEST_ID --why ...]        khai truy vết: test có sẵn chứng minh hành vi — sửa siêu dữ

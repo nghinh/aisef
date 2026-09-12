@@ -77,7 +77,10 @@ def build_parser() -> argparse.ArgumentParser:
                         help="generate config tailored to this stack (test/lint/sandbox)")
     s_init.set_defaults(func=cmd_init)
     sub.add_parser("gates", help="show gate status table").set_defaults(func=cmd_gates)
-    sub.add_parser("status", help="show story progress and cost").set_defaults(func=cmd_status)
+    st = sub.add_parser("status", help="show story progress and cost")
+    st.add_argument("--attempts", action="store_true",
+                    help="where attempts ended: which gate check blocked them, which never reached the gate")
+    st.set_defaults(func=cmd_status)
     ch = sub.add_parser("change", help="post-release change: record FR, stale PRD downward, generate delta stories")
     ch.add_argument("requirement", help="requirement ID, e.g. FR-3")
     ch.add_argument("description", help="change description — becomes acceptance criteria for the delta story")

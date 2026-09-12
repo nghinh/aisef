@@ -844,3 +844,38 @@ class TestStatusDemKetCuc(CliTestCase):
         line = next(l for l in out.splitlines() if l.startswith("Agent runs: "))
         for phan in ("max_turns 1", "ok 1", "unrecorded 1"):
             self.assertIn(phan, line)
+
+
+class TestStatusAttemptsDoLuotDiDauMat(CliTestCase):
+    """`aisef status --attempts` trả lời câu hỏi của ADR-009 O4.
+
+    Sổ nói được một lần chạy tốn bao nhiêu, chưa nói được tiền ấy mua gì. Bước
+    đầu: lượt nào chết vì cái gì. Trượt vì test đỏ và trượt vì người rà soát
+    chặn là hai bài toán khác nhau với hai chi phí sửa khác nhau.
+    """
+
+    def _du_lieu(self) -> None:
+        from aisef.harness.observe import AGENT_RUN, NOTE, Event, EvidenceStore
+
+        store = EvidenceStore(self.artifacts)
+        store.record("STORY-01-01", Event(kind=NOTE, name="gate:input", detail={"attempt": 1}))
+        store.record("STORY-01-01", Event(kind=NOTE, name="gate:verdict", ok=False,
+                                          detail={"attempt": 1, "failures": ["review"]}))
+        store.record("STORY-01-01", Event(kind=NOTE, name="gate:verdict", ok=True,
+                                          detail={"attempt": 2, "failures": []}))
+        # Pha kế hoạch: có phiên agent nhưng **không** qua cổng story.
+        store.record("plan-architecture", Event(kind=AGENT_RUN, name="plan",
+                                                detail={"role": "", "exit_status": "ok"}))
+
+    def test_dem_dung_va_khong_tinh_pha_ke_hoach(self):
+        self._du_lieu()
+        code, out, _ = self.run_cli("status", "--attempts")
+        self.assertEqual(code, 0)
+        self.assertIn("Attempts: 2 across 1 stories", out)
+        self.assertIn("review", out)
+        self.assertNotIn("plan-architecture", out)
+
+    def test_khong_co_lan_cham_nao_thi_noi_thang(self):
+        code, out, _ = self.run_cli("status", "--attempts")
+        self.assertEqual(code, 0)
+        self.assertTrue("no gate verdict recorded yet" in out or "No stories registered" in out, out)

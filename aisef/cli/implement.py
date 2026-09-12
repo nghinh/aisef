@@ -22,6 +22,52 @@ from ._common import (
 )
 
 
+def _attempt_breakdown(ev_store) -> tuple[dict, dict, dict]:
+    """Mỗi lượt đã kết thúc **ở đâu** — đọc từ sổ bằng chứng, không đoán.
+
+    ADR-009 §Open O4: sổ nói được một lần chạy tốn bao nhiêu, nhưng chưa nói
+    được tiền ấy mua được gì. Bước đầu tiên là biết lượt nào chết vì cái gì:
+    một lượt trượt vì test đỏ và một lượt trượt vì người rà soát chặn là hai
+    bài toán khác nhau, và hai chi phí khác nhau để sửa.
+
+    Ba giá trị trả về: lượt theo lớp, lượt theo mục cổng đã chặn, và số lượt
+    của mỗi story. Lượt **không có** `gate:verdict` là lượt chưa bao giờ tới
+    cổng — phân loại theo `exit_status` của phiên agent, và nếu cũng không có
+    thì gọi tên là `unrecorded` chứ không suy đoán.
+    """
+    from ..harness.observe import AGENT_RUN, NOTE
+
+    theo_lop: dict[str, int] = {}
+    theo_muc: dict[str, int] = {}
+    theo_story: dict[str, int] = {}
+    for sid in ev_store.stories():
+        ev = ev_store.read(sid)
+        verdicts = [e for e in ev.of(NOTE) if e.name == "gate:verdict"]
+        # Sổ bằng chứng chứa cả pha `plan-*` và `mockup-*`; chúng có phiên agent
+        # nhưng **không đi qua cổng story**, nên đếm chúng vào đây thổi phồng
+        # nhóm "chưa tới cổng" bằng những lượt vốn không thuộc về phép đo này.
+        # Dấu hiệu đọc được từ dữ liệu: chỉ story mới có `gate:input`.
+        if not verdicts and not any(e.name == "gate:input" for e in ev.of(NOTE)):
+            continue
+        for e in verdicts:
+            lop = "passed" if e.ok else "gate"
+            if not e.ok:
+                for ten in (e.detail.get("failures") or ["unnamed"]):
+                    theo_muc[str(ten)] = theo_muc.get(str(ten), 0) + 1
+            theo_lop[lop] = theo_lop.get(lop, 0) + 1
+            theo_story[sid] = theo_story.get(sid, 0) + 1
+        # Lượt chưa tới cổng: phiên agent nhiều hơn số lần chấm.
+        phien = [e for e in ev.of(AGENT_RUN) if str(e.detail.get("role") or "") in ("", "developer")]
+        chua_toi_cong = max(0, len(phien) - len(verdicts))
+        if chua_toi_cong:
+            trang_thai = [str(e.detail.get("exit_status") or "unrecorded") for e in phien]
+            for ten in trang_thai[-chua_toi_cong:]:
+                lop = ten if ten != "ok" else "no gate verdict"
+                theo_lop[lop] = theo_lop.get(lop, 0) + 1
+                theo_story[sid] = theo_story.get(sid, 0) + 1
+    return theo_lop, theo_muc, theo_story
+
+
 def cmd_status(args) -> int:
     state = _state(args).load()
     cfg = Config.load(args.project)
@@ -32,6 +78,29 @@ def cmd_status(args) -> int:
             print("Memory (advisory): " + json.dumps({**provider.health(), **resolution}))
         except (MemoryError, OSError):
             print("Memory (advisory): unavailable; no implicit fallback")
+
+    if getattr(args, "attempts", False):
+        # Đọc thẳng sổ bằng chứng, **trước** lối ra sớm bên dưới: câu hỏi "lượt
+        # đi đâu mất" trả lời được từ sổ kể cả khi tệp trạng thái đã bị dọn, và
+        # một dự án đã chạy xong thường rơi đúng vào tình huống ấy.
+        from ..harness.observe import EvidenceStore as _EvidenceStore
+
+        lop, muc, story = _attempt_breakdown(_EvidenceStore(_artifact_root(args)))
+        tong = sum(lop.values())
+        if not tong:
+            print("Attempts: no gate verdict recorded yet")
+        else:
+            print(f"Attempts: {tong} across {len(story)} stories")
+            for k, n in sorted(lop.items(), key=lambda kv: -kv[1]):
+                print(f"  {k:22} {n:3}  ({n / tong:.0%})")
+            if muc:
+                print("  blocked by:")
+                for k, n in sorted(muc.items(), key=lambda kv: -kv[1]):
+                    print(f"    {k:20} {n:3}")
+            dat = [(sid, n) for sid, n in sorted(story.items(), key=lambda kv: -kv[1]) if n > 1]
+            if dat:
+                print("  attempts per story: " + " · ".join(f"{sid} {n}" for sid, n in dat[:6]))
+        print()
 
     if not state.stories:
         print("No stories registered.")
