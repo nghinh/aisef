@@ -675,7 +675,13 @@ def cmd_issues(args) -> int:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(ledger_mod.issues_text(rows, args.format), encoding="utf-8")
     reopened = sum(1 for r in rows if r["status"] == ledger_mod.REOPENED)
-    print(f"{path} · {len(rows)} behaviours ({reopened} regressions)")
+    # The three absences apart (ADR-009 O2): only `unbuilt` costs a repair story,
+    # `untraced` is a harness metadata fix.  One number for all three read as a
+    # repair bill thirty times the real one.
+    c = ledger_mod.gap_kind_counts(rows)
+    print(f"{path} · {len(rows)} behaviours ({reopened} regressions) · "
+          f"unbuilt {c[ledger_mod.UNBUILT]} · untested {c[ledger_mod.UNTESTED]} · "
+          f"untraced {c[ledger_mod.UNTRACED]}")
     return EXIT_OK
 
 

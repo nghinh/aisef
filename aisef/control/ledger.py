@@ -65,10 +65,27 @@ VERIFIED = "verified"
 GAP = "gap"
 REOPENED = "reopened"
 
+#: Which **absence** a GAP/REOPENED is (ADR-009 O2). Three different absences used to
+#: be recorded as the same GAP, and only the first deserves a paid repair story — the
+#: owner decision of 2026-09-06 §4 ("a gap that is only missing traceability is fixed
+#: by the harness, not by a story") lived in prose until now.
+UNBUILT = "unbuilt"      # nothing landed proves the behaviour: red test, unlanded green, red check
+UNTESTED = "untested"    # the run was readable and no test name carries this code
+UNTRACED = "untraced"    # the harness cannot link behaviour -> test: metadata fix, not a story
+
+#: The exact `source.why` sentences the ledger itself writes. `gap_kind` reads them
+#: back, so writer and reader cannot drift apart into two different vocabularies.
+WHY_NO_TEST = "no test carries this code"
+WHY_UNREADABLE = "cannot read test names from runner output"
+WHY_TRACE_ABSENT = "declared trace not in this run"
+WHY_UNLANDED = "green on unlanded candidate — attempt not yet gated/merged"
+
 #: Columns of the gap/regression table (R12) — Markdown and CSV use the same
 #: order, so the human-readable and machine-readable files tell the same story.
+#: `gap_kind` is appended, never inserted: a tracker importing the CSV by position
+#: keeps reading the same columns it read before.
 ISSUE_COLUMNS = ("id", "kind", "status", "story", "regressed_by", "source", "why",
-                 "candidate", "since", "changes")
+                 "candidate", "since", "changes", "gap_kind")
 
 #: Evidence not belonging to any story — planning phase, mockup building, skill scan.
 PHASE_PREFIXES = ("plan-", "mockup-", "skill-")
@@ -99,11 +116,32 @@ class Behavior:
     def ever_verified(self) -> bool:
         return any(h["status"] == VERIFIED for h in self.history)
 
+    @property
+    def gap_kind(self) -> str:
+        """Which absence this GAP/REOPENED is (ADR-009 O2); empty when VERIFIED.
+
+        Read off `source.why` and nothing else, so the kind stays a **projection**
+        like the rest of this module: `_observe_tests` writes exactly one of the
+        `WHY_*` sentences, and every other cause (red test, green on an unlanded
+        candidate, project check red, missing screen) means nothing landed proves
+        the behaviour. Unknown therefore defaults to `UNBUILT` on purpose —
+        mislabelling a real defect as a cheap harness fix would hide it, the
+        reverse only wastes money.
+        """
+        if self.status in ("", VERIFIED):
+            return ""
+        why = str((self.source or {}).get("why") or "")
+        if why.startswith((WHY_UNREADABLE, WHY_TRACE_ABSENT)):
+            return UNTRACED
+        return UNTESTED if why == WHY_NO_TEST else UNBUILT
+
     def as_dict(self) -> dict:
         out = {
             "kind": self.kind, "status": self.status, "candidate": self.candidate,
             "since": self.since, "source": self.source, "history": self.history,
         }
+        if self.gap_kind:
+            out["gap_kind"] = self.gap_kind
         if self.story:
             out["story"] = self.story
         if self.regressed_by:
@@ -182,7 +220,7 @@ class Ledger:
             if bid in self.behaviors:
                 return
             ok = False
-            source = {**(source or {}), "why": "green on unlanded candidate — attempt not yet gated/merged"}
+            source = {**(source or {}), "why": WHY_UNLANDED}
         b = self.behaviors.get(bid)
         if b is None:
             b = self.behaviors[bid] = Behavior(id=bid, kind=kind)
@@ -190,8 +228,15 @@ class Ledger:
 
         status = VERIFIED if ok else (REOPENED if b.ever_verified else GAP)
         if status == b.status:
-            # No state change: update latest candidate, do not record history.
+            # No state change: update the latest candidate, do not record history.
             b.candidate = candidate or b.candidate
+            # The **reason** of a non-green behaviour must not go stale: `gap_kind`
+            # routes repair money by it (ADR-009 O2), and a gap first seen as "no
+            # test carries this code" that a later run shows as a *red test* is a
+            # different absence with a different fix. VERIFIED keeps its source —
+            # the run that proved it is the one worth naming.
+            if status != VERIFIED:
+                b.source = dict(source or {})
             return
 
         marker = f"{story}#{attempt}" if attempt else story
@@ -317,6 +362,7 @@ class Ledger:
                               or (f"qa:{src['qa_kind']}" if src.get("qa_kind") else "")),
                 "why": str(src.get("why") or ""),
                 "candidate": b.candidate[:7], "since": b.since, "changes": len(b.history),
+                "gap_kind": b.gap_kind,
             })
         return rows
 
@@ -408,6 +454,13 @@ class Ledger:
         return text
 
 
+def gap_kind_counts(rows: list[dict]) -> dict:
+    """The three absences counted apart (ADR-009 O2) — always all three keys, so a
+    zero reads as "measured zero", not as "not reported"."""
+    return {k: sum(1 for r in rows if r.get("gap_kind") == k)
+            for k in (UNBUILT, UNTESTED, UNTRACED)}
+
+
 def issues_text(rows: list[dict], fmt: str) -> str:
     """R12 table as Markdown or standard CSV (`csv`, importable by any tracker)."""
     if fmt == "csv":
@@ -417,8 +470,10 @@ def issues_text(rows: list[dict], fmt: str) -> str:
         w.writerows(rows)
         return buf.getvalue()
     cell = lambda v: str(v).replace("|", "\\|").replace("\n", " ")  # noqa: E731
+    c = gap_kind_counts(rows)
     return "\n".join([
-        f"# Gap / regression · {len(rows)} behaviours",
+        f"# Gap / regression · {len(rows)} behaviours · "
+        f"unbuilt {c[UNBUILT]} · untested {c[UNTESTED]} · untraced {c[UNTRACED]}",
         "",
         "| " + " | ".join(ISSUE_COLUMNS) + " |",
         "|" + "---|" * len(ISSUE_COLUMNS),
@@ -590,9 +645,12 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
         if not readable:
             if not owner:
                 continue
-            why = str(det.get("unrunnable") or det.get("test_note") or "") or (
-                "cannot read test names from runner output"
-            )
+            # The cause varies (no reporter, suite unrunnable, runner note) but the
+            # consequence is one: no test name to attach to this behaviour. Keep
+            # `WHY_UNREADABLE` as the prefix so `gap_kind` classifies the whole
+            # branch as UNTRACED while the sentence still names the actual cause.
+            detail = str(det.get("unrunnable") or det.get("test_note") or "")
+            why = f"{WHY_UNREADABLE}: {detail}" if detail else WHY_UNREADABLE
             for i in range(1, line.acceptance + 1):
                 note(story_id, i, False, {"why": why})
             _observe_covers(led, line, ok=False, at=at, story=sid, attempt=attempt,
@@ -606,11 +664,18 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
             if t not in cov[i]:
                 cov[i].insert(0, t)
         judged = []
+        gap_whys = []                       # reason of each non-green criterion, in order
         for i, tests in cov.items():
             if not tests:
                 if owner:
-                    note(story_id, i, False, {"why": "no test carries this code"})
+                    # A trace *was* declared (`aisef evidence <AC> --link`) but its
+                    # test is not in this run: the absence is in the metadata, not
+                    # in the product — say which id, so the fix is a one-liner.
+                    lk = led.links.get(ac_code(story_id, i))
+                    why = f"{WHY_TRACE_ABSENT}: {lk['test_id']}" if lk else WHY_NO_TEST
+                    note(story_id, i, False, {"why": why})
                     judged.append(False)
+                    gap_whys.append(why)
                 continue
             red = [t for t in tests if t in failed]
             # Source of a GAP must be a **red** test, not the first test in the
@@ -623,14 +688,27 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
                            why=str(lk.get("why") or ""))
             note(story_id, i, not red, src)
             judged.append(not red)
+            if red:
+                gap_whys.append("")         # a red test needs no sentence
         # Requirement is green when **its criteria** are green — not when the
         # whole run is green. A run red because of another story must not turn
         # this story's FR into a regression (measured on e9: FR-1/FR-11 were
         # falsely blamed on STORY-01-06 because the old rule read `e.ok`).
         story_green = all(judged) if judged else bool(e.ok)
+        # The requirement is non-green *through* its criteria, so it inherits their
+        # kind of absence (ADR-009 O2): when every non-green criterion gives the same
+        # reason, that reason is the requirement's reason too, and `gap_kind` routes
+        # both the same way. Mixed reasons fall back to the unspecific sentence, which
+        # `gap_kind` reads as `unbuilt` — the expensive side, never the cheap one.
+        # `landed` gates the whole rule: on an unlanded candidate the *green* criteria
+        # are not proof either (measured on todo-cli, where dropping the gate reduced
+        # nine requirement gaps of STORY-06-01 to "one criterion lacks a test" while
+        # the other seven were green only in a worktree that never merged).
+        why = "" if story_green else (
+            gap_whys[0] if landed and gap_whys and len(set(gap_whys)) == 1 and gap_whys[0]
+            else "story criteria not yet green")
         _observe_covers(led, line, ok=story_green, at=at, story=sid, attempt=attempt,
-                        cand=cand, why="" if story_green else "story criteria not yet green",
-                        landed=landed)
+                        cand=cand, why=why, landed=landed)
 
 
 def _linked(led: Ledger, story_id: str, ids: list[str]) -> list[tuple[int, str]]:
