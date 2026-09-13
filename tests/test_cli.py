@@ -511,6 +511,37 @@ class TestRunCommand(CliTestCase):
             _canh_bao_chua_bien_dich_guard(str(self.project), Adapter())
         self.assertEqual(out.getvalue(), "")
 
+    def test_noi_ra_khi_plugin_bien_dich_roi_ma_chua_commit(self):
+        """Worktree là bản checkout mới: plugin chưa commit thì **không có**
+        ở nơi phiên chạy. Cổng sẽ đánh trượt `guard ran` cho một guard chưa
+        từng có cơ hội chạy — sau khi đã trả tiền cho phiên."""
+        import json
+
+        from aisef.cli.implement import _canh_bao_chua_bien_dich_guard
+
+        (self.artifacts / "compile-report.json").write_text(
+            json.dumps({"clients": [{"client": "opencode", "blocks_at_source": True}]}),
+            encoding="utf-8")
+        plugin = self.project / ".opencode" / "plugin" / "aisef-guard.ts"
+        plugin.parent.mkdir(parents=True)
+        plugin.write_text("// guard\n", encoding="utf-8")
+
+        class Adapter:
+            id = "opencode"
+
+        out = io.StringIO()
+        with redirect_stdout(out):
+            _canh_bao_chua_bien_dich_guard(str(self.project), Adapter())
+        self.assertIn("not committed", out.getvalue())
+
+        import subprocess
+        subprocess.run(["git", "add", "-A"], cwd=self.project, capture_output=True)
+        subprocess.run(["git", "commit", "-m", "plugin"], cwd=self.project, capture_output=True)
+        out = io.StringIO()
+        with redirect_stdout(out):
+            _canh_bao_chua_bien_dich_guard(str(self.project), Adapter())
+        self.assertEqual(out.getvalue(), "")
+
     def test_rejects_unknown_client(self):
         code, _, err = self.run_cli("run", "--client", "khong-co", "--force")
         self.assertEqual(code, EXIT_USAGE)

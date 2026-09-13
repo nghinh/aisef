@@ -218,14 +218,31 @@ def _canh_bao_chua_bien_dich_guard(project, adapter) -> None:
     beforehand: a project that never ran `aisef compile` runs exactly like one
     that did, and the difference is whether anything can block a write.
     """
+    import subprocess
+
     from ..clients.compile import guard_expected
 
     client_id = getattr(adapter, "id", "")
-    if guard_expected(project, client_id):
+    if not guard_expected(project, client_id):
+        print(f"⚠️  guards are not compiled for `{client_id}` — nothing blocks a write at "
+              f"the source in this run, and the story gate will record `guard ran` as "
+              f"not applicable.\n   Compile them first:  aisef compile --client {client_id}")
         return
-    print(f"⚠️  guards are not compiled for `{client_id}` — nothing blocks a write at "
-          f"the source in this run, and the story gate will record `guard ran` as "
-          f"not applicable.\n   Compile them first:  aisef compile --client {client_id}")
+    # Compiled is not the same as *present where the session runs*: stories run
+    # in a worktree, which is a fresh checkout, so an uncommitted OpenCode
+    # plugin is simply absent there. The gate then fails the story for a guard
+    # that never had a chance to run — after the session is paid for.
+    plugin = Path(project) / ".opencode" / "plugin" / "aisef-guard.ts"
+    if client_id == "opencode" and plugin.is_file():
+        tracked = subprocess.run(
+            ["git", "-C", str(project), "ls-files", "--error-unmatch", str(plugin)],
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=10,
+        ).returncode == 0
+        if not tracked:
+            print("⚠️  `.opencode/plugin` is compiled but not committed — a story worktree "
+                  "is a fresh checkout, so the session will run with no guard at all, and "
+                  "the gate will fail `guard ran`.\n   Commit it first:  "
+                  "git add .opencode && git commit -m 'guard plugin'")
 
 
 def cmd_run(args) -> int:

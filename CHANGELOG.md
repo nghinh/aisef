@@ -36,7 +36,12 @@
   endpoint using `ANTHROPIC_*` variables, add `"clients.env_allow":
   ["ANTHROPIC_"]` to `.ai/config.json`.
 
-- **`aisef run` says when guards are not compiled.** The story gate already
+- **`aisef run` says when guards are not compiled — or compiled but not
+  committed.** Stories run in a worktree, which is a fresh checkout: an
+  uncommitted `.opencode/plugin` is simply absent there, and the session runs
+  with no guard at all while the gate fails `guard ran` afterwards. `doctor`
+  had said this for a while; now the run says it too, before the session
+  starts. The story gate already
   records `guard ran: not applicable — hooks not compiled for this client`,
   which is honest but arrives after the session is paid for. Until now a
   project that had never run `aisef compile` started a run exactly like one
