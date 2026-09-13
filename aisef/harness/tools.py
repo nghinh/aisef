@@ -398,9 +398,24 @@ def record(res: ToolResult, story_id: str, artifact_root, candidate: str = "",
     if res.name == "test" and not res.skipped:
         # Which tests ran, pass/fail, coverage — the criteria gate (G5) and
         # `coverage.min` (G10b) read from here, not from stdout again.
+        # Unconditional: an empty `test_format` is itself the signal the gate
+        # reads to say "this reporter does not print names".
         from .testlog import parse as parse_testlog
 
         detail.update(parse_testlog(full).to_evidence())
+    elif not res.skipped and not res.unrunnable:
+        # Every other suite too, when its output is a test log we can read.
+        # `testlog` has understood `playwright-list` all along, but the parse
+        # only ever ran for the `test` tool — so an e2e suite recorded zero
+        # test names, and a story whose criteria are browser behaviour had no
+        # way to satisfy "criteria have tests" (lỗi 132). Conditional on the
+        # parser recognising the format, so a non-test tool's output is not
+        # dressed up as one.
+        from .testlog import parse as parse_testlog
+
+        doc = parse_testlog(full)
+        if doc.format:
+            detail.update(doc.to_evidence())
     detail.update(extra or {})
     store = EvidenceStore(artifact_root, candidate=candidate)
     event = store.tool_run(

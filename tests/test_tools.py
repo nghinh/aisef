@@ -531,3 +531,46 @@ class TestSummaryNoiRoKhiChuaChayDuoc(unittest.TestCase):
     def test_chay_duoc_va_xanh_thi_khong_doi(self):
         s = self._res(exit_code=0, ok=True).summary()
         self.assertTrue(s.startswith("✅"), s)
+
+
+class TestGhiTenTestChoMoiBoDocDuoc(ToolTestCase):
+    """Lỗi 132: `testlog` hiểu `playwright-list` từ đầu, nhưng phép phân tích
+    chỉ chạy cho tool `test` — nên bộ e2e ghi **0** tên test, và cổng
+    `criteria have tests` không có gì để đối chiếu với mã tiêu chí."""
+
+    def _ghi(self, ten, out, **kw):
+        from aisef.harness.observe import TOOL_RUN, EvidenceStore
+        from aisef.harness.tools import ToolResult, record
+
+        res = ToolResult(ten, ok=kw.pop("ok", True), stdout=out, **kw)
+        record(res, "S-01", self.artifacts, "aaa", name=ten)
+        return EvidenceStore(self.artifacts).read("S-01").last(TOOL_RUN, ten)
+
+    PW = ("Running 2 tests using 1 worker\n"
+          "  ✓  1 e2e/a.spec.js:3:1 › AC-S-01-1: adding a note shows it (120ms)\n"
+          "  ✓  2 e2e/a.spec.js:9:1 › AC-S-01-2: search filters the list (90ms)\n"
+          "  2 passed (1.2s)\n")
+
+    def test_bo_e2e_ghi_duoc_ten(self):
+        e = self._ghi("qa:e2e", self.PW)
+        self.assertEqual(e.detail["test_format"], "playwright-list")
+        self.assertTrue(any("AC-S-01-1" in t for t in e.detail["test_ids"]))
+
+    def test_dau_ra_khong_phai_test_log_thi_khong_bia_ra(self):
+        """Đầu ra của một tool không phải bộ test thì không được dựng thành
+        `test_ids` — `format` rỗng nghĩa là không đọc được, không phải rỗng."""
+        e = self._ghi("qa:fake-tests", "3 suspicious assertions in tests/a.test.js\n")
+        self.assertIsNone(e.detail.get("test_format"))
+        self.assertEqual(e.detail.get("test_ids"), None)
+
+    def test_tool_test_giu_nguyen_hanh_vi_ke_ca_khi_khong_doc_duoc(self):
+        """`test_format` rỗng chính là tín hiệu cổng đọc để nói "reporter này
+        không in tên" — không được biến thành "chưa ghi gì"."""
+        e = self._ghi("test", "everything is fine\n")
+        self.assertIn("test_format", e.detail)
+        self.assertFalse(e.detail["test_format"])
+
+    def test_bo_khong_chay_duoc_thi_khong_phan_tich(self):
+        e = self._ghi("qa:e2e", "stryker: command not found", ok=False,
+                      unrunnable="tool not installed")
+        self.assertIsNone(e.detail.get("test_format"))

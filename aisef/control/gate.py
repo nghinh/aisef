@@ -650,20 +650,41 @@ def evaluate(
             evidence=doc_xanh,
         ))
     else:
-        missing = ac_missing(story_id, acceptance, list(last_green.detail.get("test_ids") or []))
+        # Names from **every** green suite at this candidate that printed them,
+        # not only the unit runner. A story whose acceptance criteria are
+        # browser behaviour can only name them in e2e titles, and reading the
+        # unit runner alone made that story unsatisfiable — measured on a
+        # single-screen browser app that never passed a story in three runs,
+        # where the agent read the harness's own source to work out why
+        # (lỗi 132). The requirement does not move: each criterion still needs
+        # a test bearing its code, green at this build. A red suite contributes
+        # nothing, and neither does a failed test inside a green one.
+        phu: dict[str, list[str]] = {}
+        for e in evidence.of(TOOL_RUN):
+            if not e.ok or not e.name.startswith("qa:"):
+                continue
+            hong = {str(x) for x in (e.detail.get("failed_ids") or [])}
+            ids = [str(t) for t in (e.detail.get("test_ids") or []) if str(t) not in hong]
+            if ids:
+                phu[e.name] = ids
+        tat_ca = list(last_green.detail.get("test_ids") or [])
+        for ids in phu.values():
+            tat_ca.extend(ids)
+        missing = ac_missing(story_id, acceptance, tat_ca)
         lenh = str(last_green.detail.get("command") or "tools.test")
+        nguon = ", ".join([f"`{lenh}`", *(f"`{k}`" for k in sorted(phu))])
         gate.checks.append(Check(
             "criteria have tests", not missing,
             "" if not missing else
             f"no tests with codes {', '.join(ac_code(story_id, i) for i in missing)} — "
-            f"each criterion needs at least one test named after its code. "
-            # Names come from one runner. An agent that put the codes in its
-            # e2e titles reads "no tests with codes" as a contradiction and
-            # spends its next attempt renaming what is already named.
-            f"Names are read from the last green `{lenh}` run only; e2e and the "
-            f"other verification kinds are scored by their own checks and do not "
-            f"count here",
-            evidence=doc_xanh,
+            f"each criterion needs at least one test named after its code, green at "
+            f"this build. Names were read from {nguon}"
+            + ("" if phu else
+               " — no other suite recorded test names at this candidate, so if the "
+               "codes are in e2e titles, check that the e2e run is in this story's "
+               "verification contract and that its reporter prints names"),
+            evidence=doc_xanh + [e.seq for e in evidence.of(TOOL_RUN)
+                                 if e.name in phu],
         ))
 
     # coverage.min (G10b): number read from runner output. No number means

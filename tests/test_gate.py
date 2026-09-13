@@ -306,6 +306,64 @@ class TestTieuChiCoTest(GateTestCase):
         self.assertIs(self.muc(self.gate(acceptance=0)).outcome, Outcome.NOT_APPLICABLE)
 
 
+class TestTieuChiCoTestOBoKhac(GateTestCase):
+    """Lỗi 132 (todo-oc 2026-09-13): story một màn hình trình duyệt chưa từng
+    qua cổng trong **ba** đợt chạy. Tiêu chí của nó là hành vi trong trình duyệt
+    — chỉ đặt tên được trong tiêu đề e2e — mà `criteria have tests` chỉ đọc tên
+    từ bộ **unit**. Agent đọc ngược cả mã nguồn harness để tìm ra điều đó
+    (`find / -name aisef`), rồi hết 40 lượt. Yêu cầu không hạ: mỗi tiêu chí vẫn
+    cần một test mang mã của nó, **xanh ở đúng bản này**."""
+
+    AC = "AC-S-01-1"
+
+    def dung(self, *, unit_ids=(), qa=None, qa_ok=True, qa_failed=()):
+        store = EvidenceStore(self._tmp.name, candidate="aaa")
+        store.file_change("S-01", "index.html")
+        store.tool_run("S-01", "test", ok=True, detail={
+            "test_format": "node-spec", "test_ids": list(unit_ids), "failed_ids": [],
+            "command": "node --test",
+        })
+        store.tool_run("S-01", "lint", ok=True)
+        if qa is not None:
+            store.tool_run("S-01", "qa:e2e", ok=qa_ok, detail={
+                "test_format": "playwright-list", "test_ids": list(qa),
+                "failed_ids": list(qa_failed),
+            })
+        return next(c for c in self.gate(candidate="aaa", acceptance=1).checks
+                    if c.name == "criteria have tests")
+
+    def test_ten_trong_tieu_de_e2e_duoc_tinh(self):
+        m = self.dung(qa=[f"{self.AC}: adding a note shows it in the list"])
+        self.assertIs(m.outcome, Outcome.PASSED, m.detail)
+
+    def test_bo_e2e_do_thi_khong_tinh(self):
+        """Test nằm trong bộ đỏ thì không chứng minh được gì."""
+        m = self.dung(qa=[f"{self.AC}: x"], qa_ok=False)
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn(self.AC, m.detail)
+
+    def test_test_do_trong_bo_xanh_cung_khong_tinh(self):
+        m = self.dung(qa=[f"{self.AC}: x"], qa_failed=[f"{self.AC}: x"])
+        self.assertIs(m.outcome, Outcome.FAILED)
+
+    def test_unit_van_dung_nhu_cu(self):
+        m = self.dung(unit_ids=[f"{self.AC}: unit"])
+        self.assertIs(m.outcome, Outcome.PASSED)
+
+    def test_thong_bao_neu_ten_tung_nguon_da_doc(self):
+        m = self.dung(qa=["khong mang ma"])
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("node --test", m.detail)
+        self.assertIn("qa:e2e", m.detail)
+
+    def test_khong_co_bo_nao_khac_thi_noi_ro_cho_kiem(self):
+        """Không có bộ nào ghi tên thì phải chỉ chỗ để kiểm, không để người đọc
+        tưởng mã đã được tìm ở mọi nơi."""
+        m = self.dung(unit_ids=["khong mang ma"])
+        self.assertIs(m.outcome, Outcome.FAILED)
+        self.assertIn("verification contract", m.detail)
+
+
 class TestCoverageMin(GateTestCase):
     """G10b: số coverage đọc từ output runner; không có số là chưa cấu hình."""
 

@@ -169,6 +169,21 @@ written an `escapeHtml` helper had no idea what would satisfy it: it spent two
 the rule, and wrote nothing. The empty string literal is now exempt, everything
 else still blocked, and each injection rule states its own alternative.
 
+**A browser story could not satisfy `criteria have tests`** (bug 132). Its
+acceptance criteria are behaviour in a page, so their codes can only live in
+e2e test titles — and the check read names from the unit runner only. Two
+layers were involved: `harness.tools.record` parsed test names only when the
+tool was `test`, so an e2e suite recorded zero names even though `testlog` has
+understood `playwright-list` all along. Measured on a single-screen app that
+never passed a story in three runs; the agent read the framework's own source
+to work out why, then ran out of turns.
+
+Names are now parsed for every suite whose output a parser recognises, and the
+check unions criterion-coded names from every green suite at the candidate,
+naming which runners it read. The requirement is unchanged: each criterion
+needs a test bearing its code, green at this build. A red suite contributes
+nothing, and neither does a failed test inside a green one.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on
