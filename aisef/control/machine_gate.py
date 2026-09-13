@@ -173,11 +173,22 @@ def check_stories(
     # module. The reader decides; the gate only refuses to stay quiet.
     if not r.errors:
         theo_pham_vi: dict[tuple[str, tuple[str, ...]], list[str]] = {}
+        ca_du_an: dict[tuple[str, ...], int] = {}
         for s_ in stories:
             pham_vi = tuple(sorted(p for p in s_.write_scope if not is_lockfile(p)))
-            if pham_vi and s_.epic_id:
+            if not pham_vi:
+                continue
+            ca_du_an[pham_vi] = ca_du_an.get(pham_vi, 0) + 1
+            if s_.epic_id:
                 theo_pham_vi.setdefault((s_.epic_id, pham_vi), []).append(s_.id)
-        trung = [(k, v) for k, v in theo_pham_vi.items() if len(v) > 1]
+        # A scope that **every** story in the plan declares is the project's
+        # shape, not a smell about any pair: measured on a single-file browser
+        # app where all seven stories write `index.html` — there this named two
+        # pairs and told the reader nothing. On the multi-file project it stays
+        # informative, `lib/commands/list.js` being shared by 2 of 13.
+        co_pham_vi = sum(ca_du_an.values())
+        trung = [(k, v) for k, v in theo_pham_vi.items()
+                 if len(v) > 1 and ca_du_an[k[1]] < co_pham_vi]
         if trung:
             r.warnings.append(
                 "stories in the same epic write exactly the same files: "

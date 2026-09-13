@@ -244,7 +244,8 @@ class TestHaiStoryCungPhamViGhi(unittest.TestCase):
         return [w for w in r.warnings if "same epic write exactly the same files" in w]
 
     def test_canh_bao_khi_hai_story_cung_tep(self):
-        r = check_stories([self.st("S-1"), self.st("S-2", deps=["S-1"])])
+        r = check_stories([self.st("S-1"), self.st("S-2", deps=["S-1"]),
+                           self.st("S-9", epic="EPIC-09", scope=("lib/commands/add.js",))])
         self.assertTrue(r.passed, r.errors)
         canh = self._canh(r)
         self.assertEqual(len(canh), 1)
@@ -269,6 +270,7 @@ class TestHaiStoryCungPhamViGhi(unittest.TestCase):
         r = check_stories([
             self.st("S-1", scope=("lib/commands/list.js", "package-lock.json")),
             self.st("S-2", deps=["S-1"], scope=("lib/commands/list.js", "yarn.lock")),
+            self.st("S-9", epic="EPIC-09", scope=("lib/commands/add.js",)),
         ])
         canh = self._canh(r)
         self.assertEqual(len(canh), 1, "lockfile không được che mất chỗ trùng thật")
@@ -277,3 +279,27 @@ class TestHaiStoryCungPhamViGhi(unittest.TestCase):
     def test_pham_vi_rong_thi_khong_ket_luan(self):
         r = check_stories([self.st("S-1", scope=()), self.st("S-2", scope=())])
         self.assertEqual(self._canh(r), [])
+
+    def test_pham_vi_ca_du_an_deu_dung_thi_khong_noi_gi(self):
+        """Đo trên `todo-oc` (ứng dụng một tệp): cả **7** story đều ghi
+        `index.html`, và cảnh báo tố 2 cặp — nói đúng nhưng không nói được gì.
+        Phạm vi mà **mọi** story đều khai là hình dạng của dự án, không phải mùi
+        của cặp nào. Trên dự án nhiều tệp nó vẫn có nghĩa: `list.js` là 2/13."""
+        r = check_stories([
+            self.st("S-1", epic="EPIC-01", scope=("index.html",)),
+            self.st("S-2", epic="EPIC-02", scope=("index.html",)),
+            self.st("S-3", epic="EPIC-03", scope=("index.html",)),
+            self.st("S-4", epic="EPIC-03", deps=["S-3"], scope=("index.html",)),
+        ])
+        self.assertEqual(self._canh(r), [])
+
+    def test_chi_mot_phan_du_an_dung_chung_thi_van_noi(self):
+        r = check_stories([
+            self.st("S-1", epic="EPIC-01", scope=("lib/a.js",)),
+            self.st("S-2", epic="EPIC-02", scope=("lib/b.js",)),
+            self.st("S-3", epic="EPIC-03", scope=("lib/list.js",)),
+            self.st("S-4", epic="EPIC-03", deps=["S-3"], scope=("lib/list.js",)),
+        ])
+        canh = self._canh(r)
+        self.assertEqual(len(canh), 1)
+        self.assertIn("S-3, S-4", canh[0])
