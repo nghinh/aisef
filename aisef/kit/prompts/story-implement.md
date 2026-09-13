@@ -1,6 +1,6 @@
 ---
 name: story-implement
-version: 9
+version: 10
 role: developer
 ---
 # {{ story_id }} — {{ story_title }}
@@ -119,6 +119,13 @@ yourself. Your job is to build the committed components.
   attempt fails. If you need to tag a criterion, prepend `AC_…:` before
   the existing title, keeping the rest intact.
 * Do not declare done when acceptance criteria still have no covering test.
+* Do not go reading the harness: `_bmad-output/`, `.aisef/`, or the framework's
+  own source answer nothing this prompt does not already carry, and the gate
+  rules are not negotiable by knowing them. Measured on two sessions that spent
+  every one of their forty turns there — reading evidence files, then running
+  `find / -name aisef` — and wrote no code at all. If a gate verdict is unclear,
+  the feedback above says what failed; `aisef evidence <id>` is the supported
+  way to see a behaviour's history.
 
 ## Done when
 

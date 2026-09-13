@@ -184,6 +184,15 @@ naming which runners it read. The requirement is unchanged: each criterion
 needs a test bearing its code, green at this build. A red suite contributes
 nothing, and neither does a failed test inside a green one.
 
+**The developer is told not to read the harness** (bug 133). Nine consecutive
+sessions across three runs ended at the 40-turn cap with the working tree
+unchanged. The transcripts show all forty turns going into `_bmad-output/`
+evidence files and then `find / -name aisef`, hunting for the framework's source
+to work out the gate rules. The prompt already carries what a story needs, and
+knowing a gate's rules does not negotiate with them. Worth noting the older
+model hid this: it wrote nothing and stopped early, so nobody saw what the turns
+were being spent on.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on

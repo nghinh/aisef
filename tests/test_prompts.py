@@ -255,3 +255,20 @@ class TestPromptFilesOnDisk(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestKhongDiDocNoiTaiHarness(unittest.TestCase):
+    """Lỗi 133 (todo-oc 2026-09-13, MiniMax-M3): hai phiên tiêu **cả 40 lượt**
+    đọc `_bmad-output/evidence/*.jsonl` rồi `find / -name aisef` để đọc mã
+    framework, không viết một dòng nào. Prompt đã mang sẵn thứ nó cần; biết luật
+    cổng cũng không thương lượng được với luật cổng."""
+
+    def test_prompt_developer_noi_ro(self):
+        from aisef.harness.prompts import load_catalog
+
+        than = load_catalog().get("story-implement").body
+        self.assertIn("_bmad-output/", than)
+        self.assertIn("aisef evidence", than)
+        i_dung = than.index("Do not go reading the harness")
+        i_xong = than.index("## Done when")
+        self.assertLess(i_dung, i_xong, "phải nằm trong phần 'Do not', trước 'Done when'")
