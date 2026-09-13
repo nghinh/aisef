@@ -229,25 +229,46 @@ def _attach(exp: Experience, text: str, headings: tuple[str, ...], field_name: s
                                                      "mọi màn hình"))
             trung = False
             for screen in exp.screens:
-                if everywhere or _mentions(scope, screen.name):
+                if everywhere or any(_mentions(scope, t) for t in _ten_goi(screen)):
                     trung = True
                     target = getattr(screen, field_name)
                     if label not in target:
                         target.append(label)
             nhan_theo_hang.append((label, trung))
 
-        # A table where **no** row names a screen is a table about the whole
-        # app, not a table nobody wanted: the second column holds a region
-        # ("Header area"), a treatment, or nothing at all. Dropping it silently
-        # left every screen with no components and no states, and the mockup
-        # prompt with nothing to build from (bug 98) — worst of all in a
-        # single-screen app, where no row can ever name the one screen.
-        if nhan_theo_hang and not any(t for _, t in nhan_theo_hang):
+        # A table where **no** row names a screen, in a document with exactly
+        # one screen, is a table about that screen: no row *can* name it, and
+        # dropping it left the only screen with no components and no states,
+        # and the mockup prompt with nothing to build from (bug 98).
+        #
+        # Only for a single screen. With several, "names nobody" is genuinely
+        # ambiguous, and attaching everything to everyone is not free: it gave
+        # each of six CLI screens all nine app-wide error states and the story
+        # size gate then blocked every story in the plan (bug 106).
+        if len(exp.screens) == 1 and nhan_theo_hang and not any(t for _, t in nhan_theo_hang):
             for screen in exp.screens:
                 target = getattr(screen, field_name)
                 for label, _ in nhan_theo_hang:
                     if label not in target:
                         target.append(label)
+
+
+def _ten_goi(screen) -> list[str]:
+    """What a table row can call this screen: its name, and for a command-line
+    surface the command itself.
+
+    A CLI's state table describes behaviour by command (```done <n>` prints
+    …``), never by the screen's display name (``Complete Task``), so name
+    matching alone attaches nothing. Path-like routes are left out: `/tasks`
+    would make the common word "tasks" a match for prose about tasks.
+    """
+    ten = [screen.name]
+    route = (screen.route or "").strip().strip("`")
+    if route and not route.startswith(("/", "http")):
+        dau = route.split()[0].lstrip("-").strip("\"'`")
+        if len(dau) > 1:
+            ten.append(dau)
+    return ten
 
 
 def _mentions(haystack: str, name: str) -> bool:

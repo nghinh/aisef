@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+- **Eleven stories vanished because the planner wrote `Story 01-01`**
+  (bug 105). The size gate asked for a split, the agent split correctly and
+  rewrote the headings with a hyphen instead of a dot — the same shape the
+  framework uses for story ids everywhere it speaks to a reader. The parser
+  accepted only `Story 1.1`, so the next pass reported "no readable stories
+  found in epics.md" and the plan pipeline stopped. `Story 01-01`,
+  `Story STORY-01-01` and `STORY-01-01` are now read too.
+
+- **The experience tables attach by command as well as by name, and the
+  whole-table fallback is for single-screen documents only** (bug 106). A CLI
+  state table describes behaviour by command (`done <n> prints …`), never by
+  the screen's display name, so name matching found nothing and the bug 98
+  fallback gave all six command surfaces all nine application-wide error
+  states — which put every story over `story.max_screen_states` and blocked
+  the entire plan. Widening a match also widens whatever counts its results.
+
+- **The traceability table asks whether the requirement has tests** (bug 104).
+  It read "some test command exited 0 in a session of a covering story", which
+  a runner with no test files satisfies: the top table of the acceptance
+  report showed ✅ for requirements the same report scored `AC w/ Test 0/6`,
+  in a story that failed. Now every criterion of a covering story needs a
+  test carrying its code — the same measure the per-story column shows.
+
 - **Coverage from `node --test`, and no coverage number without tests**
   (bug 103). Node prefixes every line of its coverage table with `ℹ `, which
   neither coverage pattern matched, so a project that had just enabled

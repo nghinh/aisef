@@ -263,8 +263,15 @@ def build(project: Path | str) -> Report:
     report.ledger = led.metrics() if led.behaviors else {}
 
     evidence = EvidenceStore(root)
+    # "Test evidence" for a requirement means its criteria have tests, not
+    # that some command exited 0 in one of its sessions. A story whose test
+    # command ran zero tests is green by that weaker reading, and the top
+    # table — the one a stakeholder reads — said ✅ for a requirement with no
+    # test at all (bug 104).
     tested_stories = {
-        sid for sid in evidence.stories() if evidence.read(sid).tests_green()
+        sid for sid in evidence.stories()
+        if evidence.read(sid).tests_green()
+        and _ac_all_covered(sid, story_ac.get(sid, 0), evidence.read(sid))
     }
 
     prd_path = root / "prd.md"
@@ -343,17 +350,29 @@ def _behavior_cell(led, sid: str) -> str:
     return "—" if not (v or g or r) else f"{v}/{g}/{r}"
 
 
+def _ac_missing(sid: str, n: int, ev) -> list[int] | None:
+    """Criteria of `sid` with no coded test in the last green run.
+    `None` = test names could not be read, which is unknown, not zero."""
+    from ..control.acceptance import missing as ac_missing
+
+    green = [e for e in ev.of(TOOL_RUN, "test") if e.ok]
+    if not green or not green[-1].detail.get("test_format"):
+        return None
+    return ac_missing(sid, n, list(green[-1].detail.get("test_ids") or []))
+
+
+def _ac_all_covered(sid: str, n: int, ev) -> bool:
+    return n > 0 and _ac_missing(sid, n, ev) == []
+
+
 def _ac_cell(sid: str, n: int, ev) -> str:
     """`k/n` acceptance criteria with coded tests, from the last green test run.
     If test names cannot be read: `?/n` — unknown, not sufficient."""
-    from ..control.acceptance import missing as ac_missing
-
     if n <= 0:
         return "—"
-    green = [e for e in ev.of(TOOL_RUN, "test") if e.ok]
-    if not green or not green[-1].detail.get("test_format"):
+    missing = _ac_missing(sid, n, ev)
+    if missing is None:
         return f"?/{n}"
-    missing = ac_missing(sid, n, list(green[-1].detail.get("test_ids") or []))
     return f"{n - len(missing)}/{n}"
 
 

@@ -537,8 +537,16 @@ def parse_prd_file(path: Path | str) -> PRD:
 #: `## Epic 1: Note-taking foundation`
 _EPIC_HEADING = re.compile(r"^#{2,5}\s+Epic\s+(\d+)\s*[:：—–-]\s*(.+?)\s*$", re.MULTILINE | re.IGNORECASE)
 #: `### Story 1.2: Edit note` — fixed pattern in BMAD template.
+#: `### Story 1.1: Title` — and the shapes a planner reaches for when the
+#: framework has been calling the same thing `STORY-01-01` all along:
+#: `Story 01-01:`, `Story STORY-01-01:`, `STORY-01-01:` (bug 105, 2026-09-13:
+#: the size gate asked for a split, the agent rewrote the headings with a
+#: hyphen, and every story in the file vanished — "no readable stories found
+#: in epics.md", with the plan pipeline stopped).
 _STORY_HEADING = re.compile(
-    r"^#{2,5}\s+Story\s+(\d+)\.(\d+)\s*[:：—–-]\s*(.+?)\s*$", re.MULTILINE | re.IGNORECASE
+    r"^#{2,5}\s+(?:Story\s+(?:STORY[-_])?|STORY[-_])(\d+)[.\-_](\d+)"
+    r"\s*[:：—–-]\s*(.+?)\s*$",
+    re.MULTILINE | re.IGNORECASE,
 )
 #: Acceptance criteria block ends at a new heading or another **bold label**
 #: — but *not* at `**When**`/`**Then**`/`**And**`, which are body parts of

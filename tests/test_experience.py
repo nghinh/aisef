@@ -124,6 +124,61 @@ class TestBangKhongNhacManHinhNao(unittest.TestCase):
         self.assertEqual(exp.by_id("settings").components, [])
 
 
+class TestGanTheoLenhVaKhongVoBua(unittest.TestCase):
+    """Bảng trạng thái của một CLI mô tả hành vi **theo lệnh** (`done <n>`),
+    không theo tên hiển thị của màn hình (`Complete Task`)."""
+
+    CLI = """# EXPERIENCE
+
+## Information Architecture
+
+### Screen Inventory
+
+| Screen | Route | Purpose |
+|---|---|---|
+| Help | `--help` | Usage summary |
+| Add Task | `add "<title>"` | Create a task |
+| Complete Task | `done <id>` | Mark done |
+
+## State Patterns
+
+| State | Behavior |
+|---|---|
+| Whitespace-only title | `add "   "` is rejected with a message. |
+| Unknown task id | `done <n>` prints an error and exits non-zero. |
+| Store file unparseable | Error on stderr, exit non-zero. |
+"""
+
+    def test_trang_thai_gan_theo_ten_lenh(self):
+        from aisef.control.experience import parse_experience
+        exp = parse_experience(self.CLI)
+        self.assertEqual(exp.by_id("add-task").states, ["Whitespace-only title"])
+        self.assertEqual(exp.by_id("complete-task").states, ["Unknown task id"])
+
+    def test_khong_gan_bua_cho_moi_man_hinh_khi_co_nhieu_man_hinh(self):
+        """Lỗi 106: gắn cả bảng cho mọi màn hình thì mỗi màn hình của một CLI
+        nhận đủ 9 trạng thái lỗi toàn ứng dụng, và cổng cỡ story chặn sạch kế
+        hoạch. "Không nhắc ai" chỉ rõ nghĩa khi tài liệu có **một** màn hình."""
+        from aisef.control.experience import parse_experience
+        exp = parse_experience(self.CLI)
+        # `Store file unparseable` không nhắc lệnh nào — không màn hình nào nhận.
+        for screen in exp.screens:
+            self.assertNotIn("Store file unparseable", screen.states)
+        self.assertEqual(exp.by_id("help").states, [])
+
+    def test_route_dang_duong_dan_khong_thanh_tu_khoa(self):
+        """`/tasks` mà thành từ khoá thì mọi câu nói về "tasks" đều gắn vào."""
+        from aisef.control.experience import parse_experience
+        exp = parse_experience(
+            "# EXPERIENCE\n\n## Information Architecture\n\n### Screen Inventory\n\n"
+            "| Screen | Route | Purpose |\n|---|---|---|\n"
+            "| Board | /tasks | Kanban |\n| Settings | /settings | Prefs |\n\n"
+            "## State Patterns\n\n| State | Behavior |\n|---|---|\n"
+            "| Empty | No tasks yet. |\n"
+        )
+        self.assertEqual(exp.by_id("board").states, [])
+
+
 class TestParseBmadSample(unittest.TestCase):
     """Mẫu của chính BMAD — hình dạng thật, không phải cách viết của ta."""
 

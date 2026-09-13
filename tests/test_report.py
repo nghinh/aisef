@@ -56,12 +56,39 @@ class TestTraceability(ReportTestCase):
         self.assertNotIn("FR-1", report.uncovered)
 
     def test_test_evidence_is_read_from_disk_not_claimed(self):
-        self.write_index([{"id": "STORY-01-01", "covers": ["FR-1"]}])
+        self.write_index([{"id": "STORY-01-01", "covers": ["FR-1"],
+                           "acceptance_criteria": ["a", "b"]}])
         store = EvidenceStore(self.artifacts)
         store.file_change("STORY-01-01", "src/a.ts")
-        store.tool_run("STORY-01-01", "test", ok=True)
+        store.tool_run("STORY-01-01", "test", ok=True,
+                       detail={"test_format": "node-spec",
+                               "test_ids": ["AC-STORY-01-01-1: a", "AC-STORY-01-01-2: b"]})
         row = next(r for r in build(self.project).traceability if r.requirement == "FR-1")
         self.assertTrue(row.tested)
+
+    def test_green_run_without_any_coded_test_is_not_evidence(self):
+        """Lỗi 104: `node --test` trên cây chưa có test nào thoát 0. Đọc theo
+        nghĩa yếu ấy thì bảng truy vết — thứ người đọc báo cáo xem đầu tiên —
+        đánh ✅ cho một yêu cầu không có một dòng test nào."""
+        self.write_index([{"id": "STORY-01-01", "covers": ["FR-1"],
+                           "acceptance_criteria": ["a", "b"]}])
+        store = EvidenceStore(self.artifacts)
+        store.file_change("STORY-01-01", "src/a.ts")
+        store.tool_run("STORY-01-01", "test", ok=True,
+                       detail={"test_format": "node-spec", "test_ids": []})
+        row = next(r for r in build(self.project).traceability if r.requirement == "FR-1")
+        self.assertFalse(row.tested)
+
+    def test_partial_ac_coverage_is_not_full_evidence(self):
+        self.write_index([{"id": "STORY-01-01", "covers": ["FR-1"],
+                           "acceptance_criteria": ["a", "b"]}])
+        store = EvidenceStore(self.artifacts)
+        store.file_change("STORY-01-01", "src/a.ts")
+        store.tool_run("STORY-01-01", "test", ok=True,
+                       detail={"test_format": "node-spec",
+                               "test_ids": ["AC-STORY-01-01-1: a"]})
+        row = next(r for r in build(self.project).traceability if r.requirement == "FR-1")
+        self.assertFalse(row.tested)
 
     def test_red_tests_do_not_count_as_tested(self):
         self.write_index([{"id": "STORY-01-01", "covers": ["FR-1"]}])
