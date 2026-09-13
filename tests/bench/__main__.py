@@ -14,6 +14,35 @@ from . import _mine as M
 from . import _runner as R
 
 
+def _giu_khoa(cmd: str):
+    """Khoá độc quyền cho `run`/`run-both`; None với lệnh chỉ đọc.
+
+    Hai tiến trình bench cùng một `AISEF_BENCH_DIR` **xoá cây làm việc của
+    nhau**: `materialize()` gọi `remove_tree(dest)` trước khi dựng, nên lượt
+    thứ hai của cùng (task, điều kiện, lượt) dọn sạch bằng chứng mà báo cáo
+    trước đang trích dẫn. Và nhà cung cấp sau `mycombo` không chịu được hai
+    phiên song song. Khoá ở ranh giới lệnh chặn cả hai bằng một chỗ.
+
+    Khoá **không** liên tiến trình với dogfood: một `aisef run` đang chạy vẫn
+    chiếm endpoint mà bench không thấy. Đó là việc của người vận hành.
+    """
+    if cmd not in ("run", "run-both"):
+        return None
+    from aisef._compat import flock_ex_nb, open_lock_fd
+
+    R.KEEP_DIR.mkdir(parents=True, exist_ok=True)
+    fd = open_lock_fd(R.KEEP_DIR / "bench.lock")
+    try:
+        flock_ex_nb(fd)
+    except OSError:
+        os.close(fd)
+        print(f"một đợt đo khác đang chạy trong {R.KEEP_DIR} (khoá: bench.lock). Chạy song song "
+              "thì hai đợt xoá cây làm việc của nhau — đợi nó xong, hoặc đặt AISEF_BENCH_DIR khác.",
+              file=sys.stderr)
+        return False
+    return fd
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="python3 -m tests.bench", description=__doc__)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -44,12 +73,20 @@ def main(argv: list[str] | None = None) -> int:
                         "(đổi mô hình nền không đổi một ký tự nào trong dữ liệu)")
     b.add_argument("--max-usd", type=float, default=0.0,
                    help="trần chi phí: dừng TRƯỚC task kế nếu đã tiêu quá; 0 = không trần. Cắt ở ranh giới task để mỗi task đo được vẫn đủ thiết kế; task bị bỏ được in ra, không im lặng")
+    b.add_argument("--max-minutes", type=float, default=0.0,
+                   help="trần thời gian phiên (phút), cắt ở ranh giới task như --max-usd; 0 = không trần. "
+                        "Cần vì --max-usd TRƠ với nhà cung cấp báo cost=0: không có trần nào thì một model "
+                        "hay chạm trần lượt chạy tới hết đồng hồ 1800 s mỗi lượt")
     rp = sub.add_parser("report", help="báo cáo Markdown từ .bench/results.jsonl")
     rp.add_argument("--cohort", default="",
                     help="chỉ lấy dòng có `model` hoặc `note` chứa chuỗi này — "
                          "sổ là tệp nối thêm, mọi đợt đo nằm chung một chỗ")
     an = sub.add_parser("analyze", help="đo lại sau đợt chạy: xong giả, ghi ngoài phạm vi, lượt trượt sửa ở đâu (đọc cây đã giữ, không đụng scorer)")
     an.add_argument("--client", default="opencode", help="tiền tố mã client cần đọc")
+    sc = sub.add_parser("selfcheck", help="chạy đường ống thật với `opencode` GIẢ — chứng minh plumbing "
+                                          "trước khi phóng đợt đo thật, không tốn một lượt gọi model nào")
+    sc.add_argument("--task", default=None, help="task để tự kiểm (mặc định: task rẻ nhất)")
+    sc.add_argument("--model", default="", help="giá trị `--model` cần kiểm là tới **cả hai** nhánh")
     e = sub.add_parser("export", help="xuất một task ra thư mục định dạng Harbor")
     e.add_argument("id")
     e.add_argument("--out", default=str(R.KEEP_DIR / "harbor"))
@@ -62,6 +99,17 @@ def main(argv: list[str] | None = None) -> int:
     # không ai thấy (đo 2026-09-12: lô `multi-3 multi-1` chạy multi-1 trước).
     by_id = {t.id: t for t in tasks}
     pick = [by_id[i] for i in ids if i in by_id] if ids else list(tasks)
+    khoa = _giu_khoa(a.cmd)
+    if khoa is False:
+        return 3
+    try:
+        return _dispatch(a, tasks, pick)
+    finally:
+        if khoa is not None:
+            os.close(khoa)
+
+
+def _dispatch(a, tasks: list, pick: list) -> int:
     if a.cmd == "mine":
         got = [] if a.no_bugs else M.mine_bugs(R.ROOT)
         if a.e9:
@@ -93,18 +141,25 @@ def main(argv: list[str] | None = None) -> int:
         if a.shuffle:
             random.Random(a.shuffle).shuffle(order)
             print(f"thứ tự (hạt giống {a.shuffle}): {', '.join(t.id for t in order)}", file=sys.stderr)
-        res, bo_qua = [], []
+        res, bo_qua, vi_sao = [], [], ""
         for i, t in enumerate(order):
-            tieu = sum(x.cost_usd for x in res)
-            if a.max_usd and tieu >= a.max_usd:
-                bo_qua = [x.id for x in order[i:]]
+            phut = sum(x.duration_ms for x in res) / 60_000
+            if a.max_usd and sum(x.cost_usd for x in res) >= a.max_usd:
+                bo_qua, vi_sao = [x.id for x in order[i:]], f"TRẦN CHI PHÍ {a.max_usd:.2f} USD"
+                break
+            # Trần thời gian: `--max-usd` trơ với nhà cung cấp báo cost=0 (C-1,
+            # C-1b: 0,00 ở mọi dòng), nên không có nó thì đợt đo không có điều
+            # kiện dừng nào ngoài người vận hành ngồi canh.
+            if a.max_minutes and phut >= a.max_minutes:
+                bo_qua, vi_sao = [x.id for x in order[i:]], f"TRẦN THỜI GIAN {a.max_minutes:.0f} phút"
                 break
             res += R.run(t, client, attempts=a.attempts, bare=False, model=a.model, note=a.note)
             res += R.run(t, client, attempts=a.attempts, bare=True, model=a.model, note=a.note)
         if bo_qua:
-            print(f"TRẦN CHI PHÍ {a.max_usd:.2f} USD đạt sau {len(order) - len(bo_qua)}/{len(order)} task "
-                  f"(đã tiêu {sum(x.cost_usd for x in res):.2f}). KHÔNG chạy: {', '.join(bo_qua)}",
-                  file=sys.stderr)
+            print(f"{vi_sao} đạt sau {len(order) - len(bo_qua)}/{len(order)} task "
+                  f"(đã tiêu {sum(x.cost_usd for x in res):.2f} USD, "
+                  f"{sum(x.duration_ms for x in res) / 60_000:.0f} phút phiên). "
+                  f"KHÔNG chạy: {', '.join(bo_qua)}", file=sys.stderr)
         print(R.report(res, tasks))
     elif a.cmd == "analyze":
         from . import _analyze as A
@@ -117,6 +172,9 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"không có dòng nào khớp cohort {a.cohort!r}", file=sys.stderr)
                 return 2
         print(R.report(rows, tasks))
+    elif a.cmd == "selfcheck":
+        from . import _selfcheck as S
+        return S.run_selfcheck(a.task or S.TASK_MAC_DINH, model=a.model)
     elif a.cmd == "export":
         print(R.export(next(t for t in tasks if t.id == a.id), a.out))
     return 0

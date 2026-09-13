@@ -513,7 +513,10 @@ class TestTranChiPhiCatOChanhGioiTask(unittest.TestCase):
         tasks = [R.Task(id=f"t{i}", source="bug", dir=M.TASKS_DIR / f"t{i}") for i in range(4)]
         calls = []
         err = io.StringIO()
-        with mock.patch.object(CLI.M, "load_tasks", return_value=tasks), \
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        with mock.patch.object(CLI.R, "KEEP_DIR", Path(tmp.name)), \
+             mock.patch.object(CLI.M, "load_tasks", return_value=tasks), \
              mock.patch.object(CLI.R, "ENABLED", True), \
              mock.patch.object(CLI.R, "make_client", return_value=object()), \
              mock.patch.object(CLI.R, "run", self._fake_run(calls, 3.0)), \
@@ -535,7 +538,10 @@ class TestTranChiPhiCatOChanhGioiTask(unittest.TestCase):
         tasks = [R.Task(id=f"t{i}", source="bug", dir=M.TASKS_DIR / f"t{i}") for i in range(3)]
         calls = []
         err = io.StringIO()
-        with mock.patch.object(CLI.M, "load_tasks", return_value=tasks), \
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        with mock.patch.object(CLI.R, "KEEP_DIR", Path(tmp.name)), \
+             mock.patch.object(CLI.M, "load_tasks", return_value=tasks), \
              mock.patch.object(CLI.R, "ENABLED", True), \
              mock.patch.object(CLI.R, "make_client", return_value=object()), \
              mock.patch.object(CLI.R, "run", self._fake_run(calls, 99.0)), \
@@ -544,6 +550,64 @@ class TestTranChiPhiCatOChanhGioiTask(unittest.TestCase):
             CLI.main(["run-both"])
         self.assertEqual(len(calls), 6)
         self.assertNotIn("TRẦN CHI PHÍ", err.getvalue())
+
+
+class TestTranDongHoCatOChanhGioiTask(unittest.TestCase):
+    """`--max-usd` là điều kiện dừng duy nhất giao thức khai — và nó **trơ** với
+    nhà cung cấp sau `mycombo`: `cost_usd = 0` ở mọi bước, nên trần chi phí
+    không bao giờ đạt. Với một model hay chạm trần lượt, mỗi lượt có thể chạy
+    tới hết đồng hồ 1800 s, và 72 lượt × 30 phút = 36 giờ. Trần thời gian cắt ở
+    **ranh giới task** (giống trần chi phí: task đã chạy thì chạy đủ thiết kế),
+    và task bị bỏ được nêu tên — bảng bị cắt phải đọc ra là bị cắt."""
+
+    def _fake_run(self, calls, giay):
+        def run(task, client, attempts=3, bare=False, model="", note=""):
+            calls.append((task.id, bare))
+            return [R.Result(task.id, "x", 1, R.PASS, duration_ms=int(giay * 1000))]
+        return run
+
+    def test_dung_truoc_task_ke_khi_qua_tran_thoi_gian(self):
+        import io
+        from contextlib import redirect_stderr, redirect_stdout
+
+        from . import __main__ as CLI
+        tasks = [R.Task(id=f"t{i}", source="bug", dir=M.TASKS_DIR / f"t{i}") for i in range(4)]
+        calls, err = [], io.StringIO()
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        with mock.patch.object(CLI.R, "KEEP_DIR", Path(tmp.name)), \
+             mock.patch.object(CLI.M, "load_tasks", return_value=tasks), \
+             mock.patch.object(CLI.R, "ENABLED", True), \
+             mock.patch.object(CLI.R, "make_client", return_value=object()), \
+             mock.patch.object(CLI.R, "run", self._fake_run(calls, 600)), \
+             mock.patch.object(CLI.R, "report", return_value=""), \
+             redirect_stdout(io.StringIO()), redirect_stderr(err):
+            CLI.main(["run-both", "--max-minutes", "15"])
+        # t0: 0 phút < 15 → chạy (2 lượt × 10 phút = 20). t1: 20 >= 15 → dừng.
+        self.assertEqual([c[0] for c in calls], ["t0", "t0"])
+        self.assertIn("TRẦN THỜI GIAN", err.getvalue())
+        for bo in ("t1", "t2", "t3"):
+            self.assertIn(bo, err.getvalue())
+
+    def test_khong_tran_thoi_gian_thi_chay_het(self):
+        import io
+        from contextlib import redirect_stderr, redirect_stdout
+
+        from . import __main__ as CLI
+        tasks = [R.Task(id=f"t{i}", source="bug", dir=M.TASKS_DIR / f"t{i}") for i in range(3)]
+        calls, err = [], io.StringIO()
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        with mock.patch.object(CLI.R, "KEEP_DIR", Path(tmp.name)), \
+             mock.patch.object(CLI.M, "load_tasks", return_value=tasks), \
+             mock.patch.object(CLI.R, "ENABLED", True), \
+             mock.patch.object(CLI.R, "make_client", return_value=object()), \
+             mock.patch.object(CLI.R, "run", self._fake_run(calls, 99_999)), \
+             mock.patch.object(CLI.R, "report", return_value=""), \
+             redirect_stdout(io.StringIO()), redirect_stderr(err):
+            CLI.main(["run-both"])
+        self.assertEqual(len(calls), 6)
+        self.assertNotIn("TRẦN THỜI GIAN", err.getvalue())
 
 
 class _Dung(Exception):
@@ -931,4 +995,151 @@ class TestLenhAnalyzeCoThat(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             with mock.patch.object(R, "KEEP_DIR", Path(d)):
                 self.assertEqual(A.collect(), [])
+
+
+class _KhachCoToken(ClientAdapter):
+    """Client giả trả đúng hình dạng token mà `mycombo` báo thật.
+
+    Số lấy từ bằng chứng C-1b (`.bench-c1b/…/evidence/bug-a2-sec-1.jsonl`, lượt
+    trần a1): vào 98 392 · ra 1 487 · cache đọc 581 444 — trong khi `cost_usd`
+    là 0,00. Đó là lý do cột token phải tồn tại.
+    """
+
+    id = "claude"
+
+    def __init__(self, hong_lan_dau: bool = False):
+        self.hong_lan_dau, self.calls, self._gold = hong_lan_dau, 0, None
+
+    def available(self):
+        return True
+
+    def capabilities(self):
+        return {}
+
+    def run(self, spec):
+        self.calls += 1
+        if self.hong_lan_dau and self.calls == 1:
+            return RunResult(ok=False, num_turns=3, duration_ms=10,
+                             error="client could not parse the model's tool call",
+                             raw_result={"retryable": True})
+        sh(Path(spec.workdir), "git", "apply", str(self._gold))
+        return RunResult(ok=True, text="xong", cost_usd=0.0, duration_ms=20, num_turns=9,
+                         input_tokens=98_392, output_tokens=1_487, cache_read_tokens=581_444)
+
+
+class TestTokenVaKieuKetThucVaoSo(BenchCase):
+    """Nhà cung cấp sau `mycombo` báo `cost = 0` ở **mọi** bước (C-1, C-1b), nên
+    cột tiền của hai cohort ấy *vắng mặt* — nhưng token thì có thật và đã nằm
+    trong bằng chứng (≈680 k/phiên). Không đưa token vào sổ kết quả thì hai cột
+    "0,00 USD" đọc thành "miễn phí", trong khi một nhánh có thể tiêu gấp mấy lần
+    tài nguyên để tới cùng chỗ.
+
+    Và: một lượt FAIL vì CLI cắt phiên phải **đọc ra được** khác một lượt FAIL
+    vì agent sửa sai. C-1 phải đối chiếu kho sqlite của CLI mới phân biệt được
+    (§ O-7); trạng thái thoát thuộc về chính dòng kết quả.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.task = R.validate(self.tasks["STORY-01-01"], runs=2)
+
+    def _khach(self, hong_lan_dau: bool = False) -> _KhachCoToken:
+        c = _KhachCoToken(hong_lan_dau)
+        c._gold = self.task.dir / "gold.patch"
+        return c
+
+    def test_token_va_trang_thai_thoat_vao_dong_ket_qua(self):
+        [r] = R.run(self.task, self._khach(), attempts=1)
+        self.assertEqual((r.tokens_in, r.tokens_out, r.tokens_cache_read, r.tokens_cache_write),
+                         (98_392, 1_487, 581_444, 0))
+        self.assertEqual(r.tokens, 681_323)
+        self.assertEqual((r.outcome, r.cost_usd, r.exit_status, r.infra_retries),
+                         (R.PASS, 0.0, "ok", 0))
+
+    def test_token_song_qua_json_chu_khong_chi_trong_bo_nho(self):
+        R.run(self.task, self._khach(), attempts=1)
+        [doc_lai] = R.load_results()
+        self.assertEqual((doc_lai.tokens, doc_lai.exit_status), (681_323, "ok"))
+
+    def test_phien_bi_cat_duoc_chay_lai_that_va_ghi_lai_so_lan(self):
+        """Phép thử hành vi, không phải phép thử mã nguồn: `INFRA_RETRIES` đã
+        được khai từ C-1b nhưng **không nổ lần nào** (lỗi 86). Đếm số lần gọi
+        client là cách duy nhất thấy nó có chạy."""
+        c = self._khach(hong_lan_dau=True)
+        [r] = R.run(self.task, c, attempts=1)
+        self.assertEqual(c.calls, 2, "phiên hỏng hạ tầng phải được chạy lại một lần")
+        self.assertEqual((r.outcome, r.exit_status, r.infra_retries), (R.PASS, "ok", 1))
+
+    def test_lan_chay_lai_van_hong_thi_dong_ket_qua_noi_ra_la_ha_tang(self):
+        c = self._khach()
+        c.run = lambda spec: RunResult(ok=False, num_turns=3, duration_ms=10,
+                                       error="client could not parse the model's tool call",
+                                       raw_result={"retryable": True})
+        [r] = R.run(self.task, c, attempts=1)
+        self.assertEqual((r.outcome, r.exit_status, r.infra_retries), (R.FAIL, "infra", 1))
+
+    def test_bao_cao_noi_ro_0_usd_khong_phai_mien_phi(self):
+        rs = R.run(self.task, self._khach(), attempts=1)
+        md = R.report(rs, list(self.tasks.values()))
+        self.assertIn("681 323", md.replace(",", " "), "tổng token phải in ra")
+        self.assertIn("vắng mặt giá", md)
+
+    def test_khong_co_token_thi_khong_in_muc_tai_nguyen(self):
+        """Bảng của cohort đã đóng (C-1, C-1b) dựng lại được **nguyên trạng**:
+        dòng cũ không có token, nên mục này không được chen vào báo cáo của
+        chúng — và một con số 0 in ra ở đó sẽ là lời nói dối ngược lại ("không
+        tiêu gì"), đúng kiểu hỏng mục này sinh ra để chặn."""
+        md = R.report([R.Result("t", "opencode", 1, R.PASS, turns=9)], [])
+        self.assertNotIn("token", md.lower())
+
+
+class TestTuKiemDuongOng(unittest.TestCase):
+    """`selfcheck` là thứ duy nhất chứng minh được đường ống **trước** một đợt
+    đo 6–8 giờ, nên nó phải nằm trong suite: bốn phép kiểm của nó (đề bài giống
+    nhau từng byte, biến `AISEF_*` chỉ tới nhánh AISEF, token vào sổ, phiên bị
+    cắt được chạy lại) là đúng những thứ đổi lặng lẽ nhất.
+
+    Không tốn một lượt gọi model nào: adapter được dựng với `binary=` trỏ vào
+    script giả trong thư mục tạm."""
+
+    def test_selfcheck_dat_het_va_khong_goi_model(self):
+        import io
+
+        from . import _selfcheck as S
+        task = M.Task.load(M.TASKS_DIR / S.TASK_MAC_DINH)
+        if subprocess.run(["git", "cat-file", "-e", f"{task.base}^{{commit}}"], cwd=ROOT,
+                          capture_output=True).returncode:
+            self.skipTest("kho không có lịch sử tới base của task (bản chép nông)")
+        ra = io.StringIO()
+        ma = S.run_selfcheck(out=ra)
+        self.assertEqual(ma, 0, ra.getvalue())
+        self.assertIn("KHÔNG PHẢI KẾT QUẢ ĐO", ra.getvalue())
+        self.assertNotIn("✗", ra.getvalue())
+
+
+class TestMotDotDoMotLuc(unittest.TestCase):
+    """Hai tiến trình bench cùng một `AISEF_BENCH_DIR` thì `materialize()` xoá
+    cây làm việc của nhau (`remove_tree` trước khi dựng) — mất dữ liệu đo, im
+    lặng. Nhà cung cấp sau `mycombo` cũng không chịu được hai phiên song song.
+    Khoá ở ranh giới lệnh là chỗ rẻ nhất chặn cả hai."""
+
+    def test_lenh_run_thu_hai_bi_tu_choi_chu_khong_xoa_cay_cua_lenh_dau(self):
+        import io
+        from contextlib import redirect_stderr
+
+        from aisef._compat import flock_ex_nb, open_lock_fd
+        from . import __main__ as CLI
+        with tempfile.TemporaryDirectory() as d:
+            with mock.patch.object(R, "KEEP_DIR", Path(d)), \
+                    mock.patch.dict(os.environ, {"AISEF_BENCH": "1"}):
+                fd = open_lock_fd(Path(d) / "bench.lock")
+                flock_ex_nb(fd)                      # đợt đo khác đang giữ khoá
+                try:
+                    err = io.StringIO()
+                    with redirect_stderr(err):
+                        ma = CLI.main(["run-both", "--client", "opencode", "--attempts", "1"])
+                finally:
+                    os.close(fd)
+        self.assertEqual(ma, 3)
+        self.assertIn("đang chạy", err.getvalue())
 

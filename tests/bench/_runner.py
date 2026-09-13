@@ -243,7 +243,31 @@ class Result:
     #: dữ liệu, nên hai cột đo hai model khác nhau trông y hệt nhau khi đọc lại.
     #: Đây là lời khai, không phải quan sát — báo cáo phải gọi đúng tên nó.
     note: str = ""
+    #: Token nhà cung cấp báo cho phiên (`step_finish.tokens` ở OpenCode,
+    #: `result.usage` ở Claude Code). Cột tiền của nhà cung cấp sau `mycombo` là
+    #: **0,00 ở mọi bước** (C-1, C-1b) — nếu token cũng không vào sổ thì hai cột
+    #: "0,00 USD" đọc thành "miễn phí", trong khi một phiên thật tiêu ≈680 k
+    #: token (đo trên bằng chứng C-1b: vào 98 392 · ra 1 487 · cache đọc
+    #: 581 444). Token là đại lượng tài nguyên duy nhất nhà cung cấp này báo
+    #: thật, nên nó là chỗ duy nhất câu hỏi "harness tốn thêm bao nhiêu" trả
+    #: lời được bằng số.
+    tokens_in: int = 0
+    tokens_out: int = 0
+    tokens_cache_read: int = 0
+    tokens_cache_write: int = 0
+    #: Trạng thái kết thúc đã chuẩn hoá (`exit_status_of`) và số lần đã chạy lại
+    #: vì hạ tầng. **Không** đổi cách chấm: chỉ để một lượt FAIL vì CLI cắt phiên
+    #: đọc ra được khác một lượt FAIL vì agent sửa sai. C-1 phải đối chiếu kho
+    #: sqlite của CLI mới phân biệt nổi hai thứ ấy (§ O-7) — thông tin ấy thuộc
+    #: về chính dòng kết quả.
+    exit_status: str = ""
+    infra_retries: int = 0
     error: str = ""
+
+    @property
+    def tokens(self) -> int:
+        return (self.tokens_in + self.tokens_out
+                + self.tokens_cache_read + self.tokens_cache_write)
 
 
 def _prompt(task: Task, ws: Path, cfg: Config) -> str:
@@ -364,7 +388,8 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = Fa
         cand = head_sha(ws)
         res = run_tool("test", ws, story_id=task.id, artifact_root=root, config=cfg, candidate=cand)
         out.append(_grade(task, condition, n, result, res, ws, base, cand,
-                          len(store.read(task.id).guard_blocks), note=note))
+                          len(store.read(task.id).guard_blocks), note=note,
+                          exit_status=trang_thai, infra_retries=lan - 1))
     KEEP_DIR.mkdir(parents=True, exist_ok=True)
     with (KEEP_DIR / "results.jsonl").open("a", encoding="utf-8") as fh:
         for r in out:
@@ -373,12 +398,17 @@ def run(task: Task, client: ClientAdapter, attempts: int = 3, *, bare: bool = Fa
 
 
 def _grade(task: Task, client_id: str, n: int, result, res, ws: Path, base: str, cand: str,
-           guard_block: int, note: str = "") -> Result:
+           guard_block: int, note: str = "", exit_status: str = "", infra_retries: int = 0) -> Result:
     log = parse_testlog(res.stdout + "\n" + res.stderr)
     r = Result(task.id, client_id, n, FAIL, f2p_total=len(task.f2p_ids), cost_usd=result.cost_usd,
                turns=result.num_turns, duration_ms=result.duration_ms, guard_block=guard_block,
                candidate=cand, isolation=str(res.detail.get("isolation", "")),
-               model=getattr(result, "model", ""), note=note, error=result.error)
+               model=getattr(result, "model", ""), note=note,
+               tokens_in=getattr(result, "input_tokens", 0),
+               tokens_out=getattr(result, "output_tokens", 0),
+               tokens_cache_read=getattr(result, "cache_read_tokens", 0),
+               tokens_cache_write=getattr(result, "cache_creation_tokens", 0),
+               exit_status=exit_status, infra_retries=infra_retries, error=result.error)
     if res.unrunnable or not log.test_ids:
         r.outcome, r.error = UNRUNNABLE, res.unrunnable or "không đọc được tên test"
         return r
@@ -401,6 +431,65 @@ def load_results() -> list[Result]:
 
 
 # ------------------------------------------------------------ report
+
+
+def _so(n: int) -> str:
+    return f"{n:,}".replace(",", " ")
+
+
+def _tai_nguyen(results: list[Result]) -> list[str]:
+    """Mục **token và kiểu kết thúc** — in ra *chỉ khi* dòng kết quả có token.
+
+    Vì sao có điều kiện ấy: báo cáo của cohort đã đóng dựng lại bằng đúng lệnh
+    `report --cohort …` (C-1 § 2), và dòng của chúng không mang token. In một
+    cột 0 vào đó là nói "không tiêu gì" — sai ngược lại, đúng kiểu hỏng mục này
+    sinh ra để chặn. Vắng mục thì người đọc biết là *không đo*; có mục thì con
+    số là thật.
+    """
+    co = [r for r in results if r.tokens]
+    if not co:
+        return []
+    tong = sum(r.tokens for r in co)
+    khong_tien = sum(1 for r in co if not r.cost_usd)
+    lines = ["", "## Token và kiểu kết thúc", "",
+             f"Nhà cung cấp báo 0,00 USD ở {khong_tien}/{len(co)} lượt có token — **vắng mặt giá** "
+             f"chứ không phải vắng mặt tài nguyên: {_so(tong)} token đã đi qua. Đọc cột `$` thành "
+             "\"miễn phí\" là đọc sai cột.", "",
+             "| điều kiện | lượt | token tổng | token/lượt (trung vị) | vào | ra | cache đọc | "
+             "lượt hỏng hạ tầng | lần chạy lại |",
+             "|---|---|---|---|---|---|---|---|---|"]
+    theo_dk: dict[str, list[Result]] = {}
+    for r in results:
+        theo_dk.setdefault(r.client, []).append(r)
+    for cl, rs in sorted(theo_dk.items()):
+        ct = [r for r in rs if r.tokens]
+        if not ct:
+            continue
+        lines.append(
+            f"| {cl} | {len(ct)} | {_so(sum(r.tokens for r in ct))} | "
+            f"{_so(int(median(r.tokens for r in ct)))} | {_so(sum(r.tokens_in for r in ct))} | "
+            f"{_so(sum(r.tokens_out for r in ct))} | {_so(sum(r.tokens_cache_read for r in ct))} | "
+            f"{sum(1 for r in rs if r.exit_status in INFRA_STATUSES)}/{len(rs)} | "
+            f"{sum(r.infra_retries for r in rs)} |")
+    for bare_cl in sorted(cl for cl in theo_dk if cl.endswith("-bare")):
+        base_cl = bare_cl[: -len("-bare")]
+        a = [r.tokens for r in theo_dk.get(base_cl, []) if r.tokens]
+        b = [r.tokens for r in theo_dk[bare_cl] if r.tokens]
+        if not a or not b:
+            continue
+        ma, mb = median(a), median(b)
+        lines += ["", f"**Token trung vị/lượt** {base_cl} {_so(int(ma))} vs {bare_cl} {_so(int(mb))} "
+                      f"(tỉ lệ {ma / mb:.2f}×) — đây là cái giá của harness tính bằng đại lượng nhà "
+                      "cung cấp thật sự báo."]
+    trang_thai = sorted({r.exit_status for r in results if r.exit_status})
+    if trang_thai:
+        lines += ["", "Kiểu kết thúc của phiên cuối mỗi lượt (không đổi cách chấm — một lượt hỏng hạ "
+                      "tầng vẫn được chấm như đã chấm, chỉ là đọc ra được):", ""]
+        for cl, rs in sorted(theo_dk.items()):
+            dem = ", ".join(f"{t} {sum(1 for r in rs if r.exit_status == t)}"
+                            for t in trang_thai if any(r.exit_status == t for r in rs))
+            lines.append(f"- `{cl}`: {dem}")
+    return lines
 
 
 def report(results: list[Result], tasks: list[Task] | None = None) -> str:
@@ -483,6 +572,7 @@ def report(results: list[Result], tasks: list[Task] | None = None) -> str:
                 f"**Turn trung vị (trung bình theo task)** AISEF {a_turn / a_n:.0f} vs bare "
                 f"{b_turn / b_n:.0f} · **giây** AISEF {a_sec / a_n:.0f} vs bare {b_sec / b_n:.0f}",
                 f"**Guard chặn tổng** {a_guard} lần trên {a_n} task"]
+    lines += _tai_nguyen(results)
     bad = [t for t in tasks or [] if t.invalid_reason or t.flaky_ids]
     if bad:
         lines += ["", "## Task loại / test chập chờn", ""]
