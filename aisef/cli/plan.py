@@ -298,12 +298,16 @@ def _canh_bao_da_co_ma_nguon(project) -> None:
     if (root / ARTIFACT_ROOT / "baseline.md").is_file():
         return
     sig = detect(root)
-    if not sig.is_brownfield:
+    # A manifest counts as much as source files here. The run that found this
+    # had one source file and a `package.json` — and the plan's first story
+    # asked for the `package.json` fields that were already in it.
+    if not sig.is_brownfield and not sig.config_files:
         return
-    print(f"⚠️  this project already has source code ({sig.summary}) and there is no "
+    lenh = "aisef baseline" if sig.is_brownfield else "aisef baseline --force"
+    print(f"⚠️  this project already has files ({sig.summary}) and there is no "
           f"`{ARTIFACT_ROOT}/baseline.md`.\n   Planning reads only "
           f"`docs/requirements.md`, so it will write stories for work that may "
-          f"already exist.\n   Build the baseline first:  aisef baseline")
+          f"already exist.\n   Build the baseline first:  {lenh}")
 
 
 def cmd_plan(args) -> int:

@@ -3,7 +3,10 @@
 ## Unreleased
 
 - **The framework's own installed skills counted as the project's source code**
-  (bug 109). `aisef setup` writes 155 skills under `.claude/skills`, 213 of
+  (bug 109). The skip list also existed twice — `baseline.py` kept its own copy
+  of the literal, and that copy is the one its directory tree walked, so fixing
+  one place left the baseline still listing all 155 installed skills. There is
+  one list now. `aisef setup` writes 155 skills under `.claude/skills`, 213 of
   them carrying Python scripts, and the brownfield scan counted every one: a
   freshly created Node project read as brownfield with 216 source files and
   `py` as its main language. A survey of a project has to subtract the
@@ -17,7 +20,11 @@
   `package.json` already had every field it asked for — its tests were green
   at the parent SHA, the nop control correctly refused them, and three
   attempts went into work already done. The brownfield mechanism existed
-  (`aisef baseline`); nothing pointed at it.
+  (`aisef baseline`); nothing pointed at it. The warning also fires on a
+  manifest alone — the run that found this had one source file and a
+  `package.json` — and a greenfield baseline now names what is already on disk
+  (`package.json` — `type`, `bin`, scripts, no runtime dependencies) instead of
+  saying only "no source code yet".
 
 - **A project that runs `node --test` is no longer granted write scope over
   four test frameworks it does not use** (bug 108). The scope narrows by the

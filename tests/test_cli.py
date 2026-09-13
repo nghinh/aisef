@@ -358,6 +358,35 @@ class TestReviewReadinessTinhLaiThieuGi(CliTestCase):
         self.assertIn("configure `tools.test`", out)
 
 
+class TestPlanCanhBaoDaCoFile(CliTestCase):
+    """Lỗi 110: pha lập kế hoạch chỉ đọc `docs/requirements.md`, nên một kho
+    đã có sẵn file vẫn được lập kế hoạch như thư mục rỗng."""
+
+    def _noi_gi(self) -> str:
+        from aisef.cli.plan import _canh_bao_da_co_ma_nguon
+
+        out = io.StringIO()
+        with redirect_stdout(out):
+            _canh_bao_da_co_ma_nguon(str(self.project))
+        return out.getvalue()
+
+    def test_du_an_rong_thi_im_lang(self):
+        self.assertEqual(self._noi_gi(), "")
+
+    def test_co_manifest_thi_noi_ra(self):
+        """Ca thật: một tệp nguồn + `package.json` — chưa đủ ngưỡng brownfield
+        nhưng thừa đủ để planner viết một story "khởi tạo dự án" trùng lặp."""
+        (self.project / "package.json").write_text('{"name": "x"}', encoding="utf-8")
+        noi = self._noi_gi()
+        self.assertIn("package.json", noi)
+        self.assertIn("aisef baseline --force", noi)
+
+    def test_co_baseline_roi_thi_im_lang(self):
+        (self.project / "package.json").write_text('{"name": "x"}', encoding="utf-8")
+        (self.artifacts / "baseline.md").write_text("# baseline\n", encoding="utf-8")
+        self.assertEqual(self._noi_gi(), "")
+
+
 class TestMockupCommand(CliTestCase):
     def test_rejects_unknown_client(self):
         code, _, err = self.run_cli("mockup", "--client", "khong-co")

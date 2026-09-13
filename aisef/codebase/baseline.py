@@ -13,16 +13,15 @@ import subprocess
 from datetime import date
 from pathlib import Path
 
-from .detect import detect
+from .detect import _SKIP_DIRS, _SRC_EXTS, detect
 from .provider import CodebaseGraphProvider, resolve
 
 BASELINE_FILE = "baseline.md"
 
-_SKIP_DIRS = {
-    "node_modules", ".git", "__pycache__", ".venv", "venv", "dist",
-    "build", ".next", ".nuxt", "target", "vendor", "_bmad-output",
-    "graphify-out", ".aisef",
-}
+#: `_SKIP_DIRS` is imported from `detect`, not redefined here. It used to be a
+#: second copy of the same literal, and the copy is what `_tree()` walked — so
+#: fixing the list in one place left the baseline's directory tree still
+#: listing all 155 installed skills (bug 109).
 
 
 def _tree(project: Path, max_depth: int = 3, max_items: int = 200) -> str:
@@ -97,6 +96,44 @@ def _existing_docs(project: Path) -> list[str]:
     return docs[:30]
 
 
+def _da_co_gi(project: Path, sig) -> str:
+    """What a below-threshold project already has, in enough detail to plan
+    against: manifests with their key fields, config files, source files."""
+    import json as _json
+
+    dong: list[str] = []
+    for name in sig.config_files:
+        path = project / name
+        chi_tiet = ""
+        if name == "package.json":
+            try:
+                data = _json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                data = {}
+            phan = [f"`{k}`" for k in ("name", "type", "bin", "main", "exports")
+                    if data.get(k)]
+            scripts = list((data.get("scripts") or {}))
+            if scripts:
+                phan.append("scripts: " + ", ".join(f"`{x}`" for x in scripts[:6]))
+            deps = list((data.get("dependencies") or {}))
+            phan.append(f"{len(deps)} runtime dependencies" if deps
+                        else "no runtime dependencies")
+            chi_tiet = " — " + "; ".join(phan) if phan else ""
+        dong.append(f"- `{name}`{chi_tiet}")
+
+    ma = []
+    for root, dirs, files in os.walk(project):
+        dirs[:] = [d for d in dirs if d not in _SKIP_DIRS]
+        for f in sorted(files):
+            if Path(f).suffix.lower() in _SRC_EXTS:
+                ma.append(os.path.relpath(os.path.join(root, f), project))
+    for rel in sorted(ma)[:20]:
+        dong.append(f"- `{rel}`")
+    if len(ma) > 20:
+        dong.append(f"- … và {len(ma) - 20} tệp mã khác")
+    return "\n".join(dong) + "\n" if dong else ""
+
+
 def build_baseline(
     project: Path,
     *,
@@ -109,10 +146,24 @@ def build_baseline(
     """
     sig = detect(project)
     if not sig.is_brownfield:
+        # Below the brownfield threshold is not the same as empty. The run that
+        # found this had one source file and a `package.json` carrying `bin`,
+        # `type` and a test script — and the plan's first story asked for
+        # exactly those fields, "given a fresh directory with no files"
+        # (bug 110). Whatever is already on disk gets named here, because this
+        # file is the only thing that tells the planner.
         text = (
             "# Baseline — Greenfield\n\n"
-            "Dự án chưa có mã nguồn — chế độ greenfield, bắt đầu từ requirements.md.\n"
+            "Dự án chưa có mã nguồn đáng kể — chế độ greenfield, bắt đầu từ "
+            "requirements.md.\n"
         )
+        co_san = _da_co_gi(project, sig)
+        if co_san:
+            text += (
+                "\n## Đã có sẵn trên đĩa\n\n"
+                "Những thứ dưới đây **đã tồn tại**: đừng lập story để tạo lại chúng.\n\n"
+                + co_san
+            )
         if output:
             output.parent.mkdir(parents=True, exist_ok=True)
             output.write_text(text, encoding="utf-8")

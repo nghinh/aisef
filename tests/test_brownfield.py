@@ -46,6 +46,26 @@ class TestBrownfieldDetect(unittest.TestCase):
             self.assertEqual(list(sig.languages), ["js"])
             self.assertFalse(sig.is_brownfield)
 
+    def test_baseline_greenfield_names_what_is_already_there(self):
+        """Dưới ngưỡng brownfield ≠ rỗng. `baseline.md` là thứ **duy nhất** nói
+        cho planner biết trên đĩa có gì; nếu nó chỉ nói "chưa có mã nguồn" thì
+        planner viết story tạo lại `package.json` đã có (lỗi 110)."""
+        from aisef.codebase.baseline import build_baseline
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d)
+            (p / "package.json").write_text(
+                '{"name": "taskbook", "type": "module", '
+                '"bin": {"taskbook": "./bin/t.js"}, "scripts": {"test": "node --test"}}',
+                encoding="utf-8")
+            (p / ".claude" / "skills" / "s" / "scripts").mkdir(parents=True)
+            (p / ".claude" / "skills" / "s" / "scripts" / "a.py").write_text("x=1\n", encoding="utf-8")
+            text = build_baseline(p)
+            self.assertIn("package.json", text)
+            self.assertIn("`test`", text)
+            self.assertIn("no runtime dependencies", text)
+            # Skill của khung không phải mã của dự án, kể cả ở đây.
+            self.assertNotIn(".claude", text)
+
     def test_skips_hidden_and_node_modules(self):
         from aisef.codebase.detect import detect
         with tempfile.TemporaryDirectory() as d:
