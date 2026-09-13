@@ -19,6 +19,7 @@ from .dashboard import cmd_dashboard
 from .doctor import cmd_doctor
 from .harness import cmd_baseline, cmd_compile, cmd_doc, cmd_gate, cmd_guard, cmd_init, cmd_replay, cmd_setup, cmd_skill
 from .implement import (
+    cmd_cost,
     cmd_ctx,
     cmd_devsecops,
     cmd_evidence,
@@ -265,6 +266,12 @@ def build_parser() -> argparse.ArgumentParser:
     rp = sub.add_parser("report", help="generate acceptance report from evidence")
     rp.add_argument("--out", default="", help="output file path")
     rp.set_defaults(func=cmd_report)
+
+    ct = sub.add_parser("cost", help="attribute spend to outcomes: net VERIFIED behaviour "
+                                     "per dollar (per input token when the provider prices "
+                                     "nothing), split by attempt outcome (ADR-009 O4)")
+    ct.add_argument("--out", default="", help="write the Markdown table to a file too")
+    ct.set_defaults(func=cmd_cost)
 
     aa = sub.add_parser("auto-approve", help="auto-approve gates (records auto flag)")
     aa.add_argument("gates", help="'all' or comma-separated gate list")

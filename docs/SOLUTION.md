@@ -421,6 +421,10 @@ aisef memory show|forget ID [--json]  bộ nhớ tư vấn thử nghiệm, mặc
 aisef status                         tiến độ · chi phí · story tốn bất thường
 aisef status --attempts              lượt đã kết thúc ở đâu: mục cổng nào chặn, lượt nào chưa tới cổng
 aisef report  [--out FILE]           báo cáo nghiệm thu + sổ hành vi (`ledger.json`, `INDEX.md`)
+aisef cost    [--out FILE]           tiền mua được gì (ADR-009 O4): hành vi VERIFIED ròng mỗi đô
+                                      la — mỗi triệu token vào khi nhà cung cấp không định giá —
+                                      chia theo kết cục của lượt (passed · gate-blocked · turn-cap
+                                      · env-failed · no-verdict · planning) và theo story
 aisef evidence <id> [--story S]      lịch sử một story hoặc một hành vi
     [--link TEST_ID --why ...]        khai truy vết: test có sẵn chứng minh hành vi — sửa siêu dữ
                                       liệu, không phải story sửa; sổ vẫn đòi test xanh ở ứng viên
