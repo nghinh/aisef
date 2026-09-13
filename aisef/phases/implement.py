@@ -440,7 +440,9 @@ def validation_targets(story: Story, items: list[dict]) -> tuple[list[str], list
     story's own plus preservation.  Same function for the slot and for
     `run_attempt`, so what is shown to the agent and what actually runs are
     never two different lists."""
-    kinds = [k for k in verification_contract(story) if k not in ("mockup-map", "unit", "security")]
+    from ..control.gate import KHONG_PHAI_QA
+
+    kinds = [k for k in verification_contract(story) if k not in KHONG_PHAI_QA]
     screens = list(story.screens)
     for it in items:
         src = it.get("source") or {}

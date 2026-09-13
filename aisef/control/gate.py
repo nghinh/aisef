@@ -162,6 +162,14 @@ def _stale_candidates(evidence: Evidence, candidate: str,
 #: Scored for every story regardless of its verification contract.
 FAKE_TESTS = "qa:fake-tests"
 
+#: Kinds a story may **declare** that never appear as a `qa:<kind>` check:
+#: `unit` is the `test` tool's own run, `security` is the security review,
+#: `mockup-map` is the screen comparison. `run_suite` does not run them and
+#: the gate does not score them — so a `qa:` record of one, left at an old
+#: build by a full `aisef qa` pass, must not make a story's evidence stale
+#: either (lỗi 136). Named once so the two lists cannot drift apart.
+KHONG_PHAI_QA = ("unit", "mockup-map", "security")
+
 ONE_SHOT_NAMES = ("isolation", "candidate:frozen")
 ONE_SHOT_SUFFIXES = (":immutable", ":candidate")
 
@@ -184,7 +192,8 @@ def _latest_per_check(evidence: Evidence,
                 and not _one_shot(e.name)):
             continue
         if (kinds is not None and e.name.startswith("qa:")
-                and e.name != FAKE_TESTS and e.name[3:] not in kinds):
+                and e.name != FAKE_TESTS
+                and (e.name[3:] not in kinds or e.name[3:] in KHONG_PHAI_QA)):
             continue                      # not scored for this story
         moi_nhat[(e.kind, e.name)] = e
     return moi_nhat
@@ -772,7 +781,7 @@ def evaluate(
     # **unconfigured**, not passed — they block at the pre-deploy gate, and
     # here they must be visible so the reader knows where the gap is.
     for kind in contract or []:
-        if kind in ("unit", "mockup-map", "security"):
+        if kind in KHONG_PHAI_QA:
             continue  # already has a dedicated check above
         # `run_suite` records `qa:<kind>`; bare name is from manual runs/`aisef tool`.
         # e9 2026-09-05: e2e/perf/accessibility ran and were green but gate said

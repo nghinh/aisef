@@ -398,6 +398,36 @@ class TestBangChungCuCuaLoaiKhongChamKhongLamOi(GateTestCase):
         self.assertIs(m.outcome, Outcome.UNRUNNABLE)
         self.assertIn("cu00000", m.detail)
 
+    def test_loai_khai_nhung_khong_bao_gio_la_qa_khong_lam_oi(self):
+        """Bản vá đầu của 136 lọc theo hợp đồng **thô**, nên `unit` — thứ story
+        khai thật — vẫn giữ bản ghi `qa:unit` cũ và cổng vẫn báo stale. Mà
+        `unit`/`security`/`mockup-map` không bao giờ chạy dưới dạng `qa:<loại>`
+        (`run_suite` bỏ qua) và cổng cũng không chấm chúng ở nhánh `<kind>`:
+        kết quả unit nằm ở `tool_run test`. Đo trên đợt chạy thật: hợp đồng là
+        `['unit','e2e','accessibility','mockup-map']` và `qa:unit` ở SHA cũ."""
+        cu = EvidenceStore(self._tmp.name, candidate="cu00000")
+        cu.tool_run("S-01", "qa:unit", ok=True, detail={})
+        cu.tool_run("S-01", "qa:security", ok=True, detail={})
+        moi = EvidenceStore(self._tmp.name, candidate="aaa")
+        moi.file_change("S-01", "src/a.py")
+        moi.tool_run("S-01", "test", ok=True, detail={"test_format": "pytest", "test_ids": ["t"]})
+        moi.tool_run("S-01", "lint", ok=True)
+        g = self.gate(candidate="aaa", contract=["unit", "e2e", "accessibility", "mockup-map"])
+        m = next(c for c in g.checks if c.name == "evidence matches candidate")
+        self.assertIs(m.outcome, Outcome.PASSED, m.detail)
+
+    def test_mot_nguon_cho_ca_hai_danh_sach(self):
+        """Danh sách "không phải qa" nằm ở **một** chỗ; `run_suite` và cổng
+        cùng đọc nó, không thì hai bên trôi ra xa nhau đúng như lần này."""
+        from aisef.control.gate import KHONG_PHAI_QA
+        from aisef.phases.implement import validation_targets
+        from aisef.control.normalize import Story
+
+        st = Story(id="S-01", epic_id="E", title="t",
+                   verification_contract=list(KHONG_PHAI_QA) + ["e2e"])
+        kinds, _ = validation_targets(st, [])
+        self.assertEqual(kinds, ["e2e"])
+
     def test_muc_cong_thuong_van_lam_oi(self):
         """`test`/`lint`/`review` không phải `qa:*`: chúng luôn được chấm."""
         cu = EvidenceStore(self._tmp.name, candidate="cu00000")
