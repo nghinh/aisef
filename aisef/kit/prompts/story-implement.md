@@ -1,6 +1,6 @@
 ---
 name: story-implement
-version: 11
+version: 12
 role: developer
 ---
 # {{ story_id }} — {{ story_title }}
@@ -63,6 +63,11 @@ unbuildable and had to be amended by hand.
 
 Being minimal is the requirement here, not a style preference. If your criteria
 do not ask for it, leave it undone.
+
+This is about a later story's own feature, not about baseline quality. Every
+story is graded on accessibility, security and lint, so accessible markup,
+input validation and error handling are part of doing **your** story properly —
+build them. What you leave alone is the thing another story exists to deliver.
 
 {{ roadmap }}
 

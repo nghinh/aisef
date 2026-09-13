@@ -334,7 +334,15 @@ so no test that story's developer writes can be red at its branch point, and
 the story becomes undeliverable — two sessions burned, then a hand edit to the
 plan. The reviewer has had the plan-wide `roadmap` slot since bug 58; the
 developer role never got it. It does now, with the consequence spelled out and
-both measured cases named.
+the measured cases named.
+
+A third case, todo-oc STORY-04-03, reads differently: STORY-01-01 had already
+written `role="main"` and `aria-live`, all of that story — and was right to,
+because `qa:accessibility` grades every story. There the plan was at fault for
+carrying an accessibility story at all. So the instruction excludes baseline
+quality: accessible markup, validation and error handling are part of doing
+your own story well. What you leave alone is what another story exists to
+deliver.
 
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
