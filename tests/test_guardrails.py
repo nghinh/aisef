@@ -1342,6 +1342,26 @@ class TestChayThangLenhCongCu(unittest.TestCase):
         from aisef.harness.guardrails import GUARD_MATCHERS
         self.assertEqual(GUARD_MATCHERS["tool-bypass"], ("PreToolUse", "Bash"))
 
+    def test_phien_ra_soat_khong_bi_chan(self):
+        """Lỗi 125. Guard này sinh ra để lượt chạy **thành bằng chứng**, mà
+        bằng chứng ghi theo story — reviewer cố ý không có story id, nên
+        `aisef tool test` cũng không ghi gì cho nó. Chặn ở đó vừa tốn lượt vừa
+        cản đúng việc slot `proven` mới yêu cầu: kiểm lại lời khẳng định trên
+        chính mã đang đọc."""
+        import json
+        import tempfile
+
+        from aisef.harness.guardrails import ENV_STORY_ID, run_guard
+        with tempfile.TemporaryDirectory() as tmp:
+            du_an = Path(tmp)
+            (du_an / "package.json").write_text(
+                json.dumps({"name": "x", "scripts": {"test": "node --test"}}), encoding="utf-8")
+            su_kien = {"tool_name": "Bash", "tool_input": {"command": "npm test"}, "cwd": str(du_an)}
+            self.assertTrue(run_guard("tool-bypass", su_kien, env={},
+                                      project_root=str(du_an)).allowed)
+            self.assertFalse(run_guard("tool-bypass", su_kien, env={ENV_STORY_ID: "S-01"},
+                                       project_root=str(du_an)).allowed)
+
     def test_chay_qua_run_guard(self):
         """Đi hết đường thật: `run_guard` phải tự đọc lệnh dự án khai."""
         import json
@@ -1352,10 +1372,14 @@ class TestChayThangLenhCongCu(unittest.TestCase):
             du_an = Path(tmp)
             (du_an / "package.json").write_text(
                 json.dumps({"name": "x", "scripts": {"test": "node --test"}}), encoding="utf-8")
+            from aisef.harness.guardrails import ENV_STORY_ID
+            moi_truong = {ENV_STORY_ID: "S-01"}
             su_kien = {"tool_name": "Bash", "tool_input": {"command": "npm test"}, "cwd": str(du_an)}
-            self.assertFalse(run_guard("tool-bypass", su_kien, project_root=str(du_an)).allowed)
+            self.assertFalse(run_guard("tool-bypass", su_kien, env=moi_truong,
+                                       project_root=str(du_an)).allowed)
             su_kien["tool_input"] = {"command": "git status"}
-            self.assertTrue(run_guard("tool-bypass", su_kien, project_root=str(du_an)).allowed)
+            self.assertTrue(run_guard("tool-bypass", su_kien, env=moi_truong,
+                                      project_root=str(du_an)).allowed)
 
     def test_chan_ca_than_script_npm(self):
         """`npm test` và `node --test …` mà nó gọi là **một** lượt chạy; chặn

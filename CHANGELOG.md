@@ -97,6 +97,13 @@ absolution — a green test can sit over broken code, which is worth reporting �
 but a blocking item that contradicts one of them must name the test and say
 why it does not cover the case.
 
+**`tool-bypass` no longer fires in review sessions** (bug 125). It blocked
+`npm test` inside a reviewer's session in the same run the `proven` slot
+landed — one fix stopping a reviewer from doing what the other had just asked
+it to do. The guard exists so a run becomes evidence, and evidence is per
+story; a reviewer deliberately has no story id, so `aisef tool test` would
+record nothing for it either. It now applies only where a story id is present.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on

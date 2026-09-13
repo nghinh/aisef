@@ -983,6 +983,15 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
     if kind == "destructive":
         return check_destructive(command)
     if kind == "tool-bypass":
+        # Only in a story session. The guard exists so a run becomes evidence,
+        # and evidence is recorded per story — a reviewer has no story id on
+        # purpose, so `aisef tool test` would record nothing for it either.
+        # Blocking there costs the reviewer turns and, worse, stops it from
+        # checking a claim against the code, which is exactly what the
+        # `proven` slot now asks it to do (lỗi 125, seen the same run the slot
+        # landed: `npm test 2>&1` blocked inside a review session).
+        if not story_from_env(env):
+            return ALLOW
         return check_tool_bypass(command, declared_commands(root or project_root or "."))
     if kind == "egress":
         return check_egress(
