@@ -516,7 +516,7 @@ def _run_wave(
     def one(story_id: str) -> StoryOutcome:
         story = plan.stories[story_id]
         co = complexity.score_story(story, project=project, owned=owned,
-                                    fan_in=fan_in.get(story_id, 0))
+                                    fan_in=fan_in.get(story_id, 0), config=config)
 
         # Gate **before** opening a worktree or calling the model. The
         # `stories` gate already ran the same checks, but project config

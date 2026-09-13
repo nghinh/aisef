@@ -141,6 +141,72 @@ class TestComponents(unittest.TestCase):
             sc = complexity.score_story(story([], scope=["src/a.ts"]), project=Path(d))
         self.assertEqual(sc.get("verified_touched").count, 0)
 
+    def test_lang_gieng_doc_tu_bang_chung_khong_tu_ledger_json_cu(self):
+        """O3: `ledger.json` chỉ được làm mới ở **cuối** sprint, nên story sau
+        không thấy hành vi story trước vừa VERIFIED.
+
+        Đo 2026-09-14 trên bốn kho đã ghi (`validation/o3_preservation_radius.py`):
+        24/32 story được chấm với **ít** láng giềng hơn phép chiếu từ bằng chứng
+        — todo-e2e STORY-05-01 ghi 0 trong khi phép chiếu thấy 9. Chiều này phải
+        đọc cùng phép chiếu mà cổng "bảo toàn" đọc (`ledger.build`).
+        """
+        from aisef.harness.observe import EvidenceStore
+
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d) / "_bmad-output"
+            root.mkdir()
+            (root / "stories.index.json").write_text(json.dumps({"stories": [
+                {"id": "STORY-01-04", "epic_id": "EPIC-01", "write_scope": ["src/a.ts"],
+                 "acceptance_criteria": ["xong"]}]}), encoding="utf-8")
+            # Không có `ledger.json`: sprint chưa kết thúc, bằng chứng đã có.
+            EvidenceStore(root).tool_run("STORY-01-04", "test", ok=True, detail={
+                "test_format": "vitest",
+                "test_ids": ["src/a.test.ts > AC-STORY-01-04-1: xong"],
+                "failed_ids": [],
+            })
+            s = story([], scope=("src/a.ts",), sid="STORY-01-06")
+            self.assertEqual(complexity.verified_touched(
+                s, complexity.read_ledger(d), complexity.read_scopes(d)),
+                ["AC-STORY-01-04-1"])
+            self.assertEqual(
+                complexity.score_story(s, project=Path(d)).get("verified_touched").count, 1)
+
+    def test_ledger_json_van_dung_khi_chua_co_bang_chung(self):
+        """Hồ sơ viết tay/di sản không có bằng chứng vẫn phải đếm: phép chiếu
+        thắng ở khoá nó biết, tệp lấp phần còn lại."""
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d) / "_bmad-output"
+            root.mkdir()
+            (root / "ledger.json").write_text(json.dumps({"behaviors": {
+                "AC-STORY-01-04-1": {"status": "VERIFIED", "story": "STORY-01-04"}}}),
+                encoding="utf-8")
+            (root / "stories.index.json").write_text(json.dumps({"stories": [
+                {"id": "STORY-01-04", "write_scope": ["src/a.ts"]}]}), encoding="utf-8")
+            s = story([], scope=("src/a.ts",), sid="STORY-01-06")
+            self.assertEqual(
+                complexity.score_story(s, project=Path(d)).get("verified_touched").count, 1)
+
+    def test_trong_so_lang_gieng_la_nut_cau_hinh(self):
+        """O3: trọng số là **nút cấu hình**, mặc định 0 theo số đo.
+
+        Bảng hiệu chuẩn 2026-09-14 (32 story, 15 story thật sự làm hỏng hành vi
+        của story khác): w ≤ 1.0 không đổi quyết định nào; quyết định đầu tiên
+        w > 0 đổi là một lần chặn **oan** (todo-oc STORY-04-03, chặn khi w vượt
+        1,08); w = 5
+        bắt được 11/15 nhưng chặn oan 7/17 story lành.
+        """
+        ledger = {"behaviors": {
+            "AC-STORY-01-04-1": {"status": "verified", "story": "STORY-01-04"}}}
+        scopes = {"STORY-01-04": ["src/a.ts"]}
+        s = story([], scope=("src/a.ts",), sid="STORY-01-06")
+        with mock.patch.object(complexity, "read_scopes", return_value=scopes):
+            mac_dinh = complexity.score_story(s, ledger=ledger).get("verified_touched")
+            self.assertEqual((mac_dinh.count, mac_dinh.weight, mac_dinh.points),
+                             (1, 0.0, 0.0))
+            cfg = Config(dict(DEFAULTS) | {"story.verified_touched_weight": 2.5})
+            dat = complexity.score_story(s, ledger=ledger, config=cfg).get("verified_touched")
+            self.assertEqual((dat.count, dat.weight, dat.points), (1, 2.5, 2.5))
+
     def test_total_is_the_sum_and_explains_itself(self):
         s = story(["note-editor"], ac=7, scope=["src/a.ts", "src/b.ts"], deps=[])
         sc = complexity.score_story(s, experience=exp(**{"note-editor": 4}), fan_in=1)

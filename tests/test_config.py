@@ -126,6 +126,17 @@ class TestValidation(ConfigTestCase):
         self.write({"run.max_retries": 0})
         self.assertEqual(Config.load(self.root, env={})["run.max_retries"], 0)
 
+    def test_trong_so_lang_gieng_khong_duoc_am(self):
+        """Trọng số âm thì chạm càng nhiều hành vi VERIFIED điểm càng **thấp** —
+        cổng cỡ story nới ra đúng lúc bán kính vỡ rộng nhất (ADR-009 O3)."""
+        self.write({"story.verified_touched_weight": -0.5})
+        with self.assertRaises(ConfigError):
+            Config.load(self.root, env={})
+
+    def test_trong_so_lang_gieng_nhan_gia_tri_duong(self):
+        self.write({"story.verified_touched_weight": 2.5})
+        self.assertEqual(Config.load(self.root, env={})["story.verified_touched_weight"], 2.5)
+
     def test_warn_multiple_must_exceed_one(self):
         """Cảnh báo khi vượt 1× trung vị thì gần như luôn kêu — vô nghĩa."""
         self.write({"cost.warn_multiple": 1.0})

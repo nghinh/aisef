@@ -774,7 +774,7 @@ def story_size_defect(
     cfg = config or Config(dict(DEFAULTS))
     exp = _experience(project)
     sc = complexity.score_story(story, project=project, experience=exp,
-                                owned=owned, fan_in=fan_in)
+                                owned=owned, fan_in=fan_in, config=cfg)
 
     states = sc.get("screen_states")
     state_limit = int(cfg["story.max_screen_states"])

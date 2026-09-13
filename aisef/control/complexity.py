@@ -64,14 +64,17 @@ FAN_IN_WEIGHT = 1.0
 #: e9 2026-09-06, STORY-01-07 touches 31 behaviors of 3 stories (01-04/05/06)
 #: — counting behaviors would add +15.5 points, blocking a 12.5 story at 28.0.
 #:
-#: Weight is **0 until calibrated**: the B4 table (Spearman 0.88) was built
-#: on stories that ran when the ledger was empty, so this dimension contributed
-#: zero points to that correlation. Trying 0.5 on the real e9 ledger (2026-09-06)
-#: blocks three near-threshold stories (02-03 15.0->17.0; 03-03 15.5->17.0;
-#: 05-01 16.0->17.5) with a weight that has no turn-count evidence behind it.
-#: The component is still counted and recorded in `complexity.json` for future
-#: calibration when enough stories have both a ledger and turn counts (see
-#: `divergence`); at that point, set the weight from measured data.
+#: Default for `story.verified_touched_weight` — **calibrated**, not pinned
+#: (ADR-009 O3, closed 2026-09-14). `validation/o3_preservation_radius.py`
+#: scores 32 recorded stories from four dogfood corpora, 15 of which really did
+#: break a VERIFIED behaviour of another story: no weight <= 1.0 changes a
+#: single verdict, the first verdict a larger weight changes is a **false**
+#: block (todo-oc STORY-04-03, blocked once w passes 1.08), and catching 11 of 15
+#: regressors costs blocking 7 of the 17 clean stories. Both error rates and
+#: the full table live next to the knob in `config.DEFAULTS`. The earlier note
+#: pinned this to 0 because 0.5 blocked three near-threshold `e9` stories
+#: (02-03, 03-03, 05-01); that corpus is gone from the machine, so the table is
+#: built only on corpora that can be re-measured.
 VERIFIED_TOUCHED_WEIGHT = 0.0
 
 #: Auto-written calibration filename, in `_bmad-output/`.
@@ -276,17 +279,50 @@ def read_experience(project: Path | str | None):
 
 
 def read_ledger(project: Path | str | None) -> dict | None:
-    """`_bmad-output/ledger.json` if it exists. Returns `None` if missing, no error."""
+    """The behaviour ledger of a project, **projected from evidence**.
+
+    `ledger.json` alone is the wrong source: it is refreshed only at the end of
+    a sprint (`phases/run.py`) or by `aisef report`, so inside one sprint story
+    N does not see what story N-1 just verified — the same reason
+    `implement._ledger` reprojects for the preservation slot. Measured
+    2026-09-14 over four recorded corpora
+    (`validation/o3_preservation_radius.py`): 24 of 32 stories were scored
+    against **fewer** neighbours than the projection held — todo-e2e STORY-05-01
+    recorded 0 while the projection held 9, and 12 of the 15 stories that really
+    broke a neighbour were scored at 0 — so the O3 weight would have been
+    calibrated against a stale input.
+
+    The file still fills in behaviours evidence does not mention (hand-written
+    or legacy records); the projection wins wherever it has an opinion, because
+    only it can take a VERIFIED behaviour back to REOPENED. Projection costs
+    44–350 ms on those corpora (0.8–6 MB of evidence) — cheaper than a missed
+    regression, the same trade `implement._ledger` already documents.
+    Returns `None` when neither source says anything.
+    """
     if project is None:
         return None
-    path = Path(project) / "_bmad-output" / "ledger.json"
-    if not path.is_file():
-        return None
+    root = Path(project) / "_bmad-output"
+    data: dict = {}
+    path = root / "ledger.json"
+    if path.is_file():
+        try:
+            tep = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            tep = None
+        if isinstance(tep, dict):
+            data = tep
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return None
-    return data if isinstance(data, dict) else None
+        from .ledger import build
+
+        chieu = build(root).as_dict()
+    except OSError:
+        chieu = {}
+    if chieu.get("behaviors"):
+        cu = data.get("behaviors")
+        data = data | chieu | {
+            "behaviors": (cu if isinstance(cu, dict) else {}) | chieu["behaviors"]
+        }
+    return data or None
 
 
 def score_story(
@@ -297,8 +333,14 @@ def score_story(
     owned: dict[str, str] | None = None,
     fan_in: int = 0,
     ledger: dict | None = None,
+    config: Config | None = None,
 ) -> Score:
-    """Size score for a story. Pure function on available data, no model calls."""
+    """Size score for a story. Pure function on available data, no model calls.
+
+    Only the neighbour dimension reads ``config``
+    (``story.verified_touched_weight``, ADR-009 O3); the other four weights are
+    module constants calibrated by the B4 table above.
+    """
     if experience is None:
         experience = read_experience(project)
     per_screen = screen_states(story, experience=experience, owned=owned)
@@ -310,6 +352,8 @@ def score_story(
     behaviors = (ledger or {}).get("behaviors") or {}
     # Behaviors without an owning story (legacy records, manual) count individually.
     owners = {str(behaviors.get(b, {}).get("story") or b) for b in touched}
+    w_lang_gieng = (float(config["story.verified_touched_weight"])
+                    if config is not None else VERIFIED_TOUCHED_WEIGHT)
 
     return Score(story.id, (
         Component("screen_states", states, SCREEN_STATE_WEIGHT,
@@ -318,7 +362,7 @@ def score_story(
         Component("write_scope", len(scope), WRITE_SCOPE_WEIGHT,
                   ", ".join(f"`{p}`" for p in scope[:4]) + ("…" if len(scope) > 4 else "")),
         Component("fan_in", int(fan_in), FAN_IN_WEIGHT),
-        Component("verified_touched", len(owners), VERIFIED_TOUCHED_WEIGHT,
+        Component("verified_touched", len(owners), w_lang_gieng,
                   f"{len(touched)} behaviours: " + ", ".join(touched[:4])
                   + ("…" if len(touched) > 4 else "") if touched else ""),
     ))

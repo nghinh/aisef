@@ -139,13 +139,17 @@ the "unexpected state" branch.
   The bridge (``parse_lines``) keeps the wire format a stable
   intermediate representation.
 
-## Open — the four remaining semantic issues (reconstructed 2026-09-12)
+## Open — the three remaining semantic issues (reconstructed 2026-09-12)
+
+O3 closed on 2026-09-14; its measurement is recorded below under *Closed — O3*.
+Three remain: O1, O2, O4.
 
 **Provenance, stated plainly.** The pre-Phase-2 audit that produced "seven
 systemic issues" was never written to disk: neither this repository nor any
 reachable session transcript contains the list.  The three transactional ones
 are recoverable because they became code (findings, lease, budget).  The four
-below are a **reconstruction** from evidence that *is* on disk — the owner
+semantic ones (O1, O2, O4 below and O3 under *Closed*) are a **reconstruction**
+from evidence that *is* on disk — the owner
 decisions of 2026-09-06, the calibration note that pinned the neighbour weight
 to zero, the C11 conformance probe, and the cost figures in
 `docs/STATUS-2026-09-05.md`.  They are not quoted from the original audit.  If
@@ -191,23 +195,6 @@ control provide.
 queue routes each kind to a different action (story / test-only story /
 harness metadata fix), and `aisef issues` reports the three counts separately.
 
-### O3 — preservation is scoped by file, not by behaviour
-
-`complexity.verified_touched` answers "did this story touch a file owned by a
-verified behaviour of another story" by looking the file up through the owning
-story's `write_scope`.  That is a proxy.  The real question is whether the
-behaviour still holds, and the ledger already knows how to answer it — but the
-neighbour weight that would widen the blast radius is **pinned to 0** because
-turning it to 0.5 blocked three innocent stories of `e9` (02-03, 03-03, 05-01)
-during calibration.
-
-*Why it waited*: widening the radius multiplies re-verification cost, which was
-unbounded until the budget seam could reserve and refund (§3).
-
-*Closes when*: the weight is calibrated on a recorded corpus with both error
-rates reported (innocent stories blocked / broken behaviours missed), and the
-chosen value is a config knob with the measurement written next to it.
-
 ### O4 — spend is attributed to calls, not to outcomes
 
 With reservations correct, the ledger can say what a run cost.  It still cannot
@@ -237,6 +224,117 @@ recomputable from evidence.  (b) The unit cannot be dollars on any corpus that
 survives: the provider priced 0% of sessions in three of four, and 1 of 180 in
 the fourth.  `aisef cost` therefore decides the unit from the evidence and
 refuses to average a partial dollar record.
+
+## Closed — O3: preservation radius, calibrated (2026-09-14)
+
+*The issue, as it stood:* preservation is scoped by file, not by behaviour —
+`complexity.verified_touched` answers "did this story touch a file owned by a
+verified behaviour of another story" by looking the file up through the owning
+story's `write_scope`, which is a proxy for whether the behaviour still holds,
+and the neighbour weight that would widen the blast radius was pinned to 0
+because 0.5 blocked three innocent `e9` stories.  It waited on §3 because
+widening the radius multiplies re-verification cost, unbounded until the budget
+seam could reserve and refund.
+
+O3 asked for that weight to be calibrated on a recorded corpus with **both**
+error rates reported, and for the chosen value to be a config knob with
+the measurement next to it.  Done: the knob is
+`story.verified_touched_weight`, its default is **0.0**, and the table below is
+in `aisef/config.py` beside it.  `validation/o3_preservation_radius.py`
+regenerates every number from `_bmad-output/` — no model calls, no network.
+
+**The `e9` corpus the pinning note cited is gone.** `find` over
+`~/Downloads/projects` and over `~` finds no `e9` directory (only unrelated npm
+and Messages caches).  The three stories the note names (02-03 15.0→17.0,
+03-03 15.5→17.0, 05-01 16.0→17.5) are therefore **not** reproducible on this
+machine and are not carried into the table.  The corpora used instead are
+`todo-oc`, `todo-cli`, `todo` and `todo-e2e`.  `marks-cli` is excluded because
+it was mid-run while this was measured (92 files written in the preceding two
+hours), so its rows would not be stable between two runs of the script.
+
+**A stale input had to be fixed before any weight could be calibrated.**
+`complexity.read_ledger` read `ledger.json`, a file refreshed only at the end of
+a sprint or by `aisef report` — while the gate's preservation check and the
+developer's preservation slot both reproject from evidence
+(`implement._ledger`).  Consequence, measured: **24 of 32** recorded stories
+were scored against fewer neighbours than the evidence projection held; todo-e2e
+STORY-05-01 recorded 0 while the projection held 9, and **12 of the 15** stories
+that really broke a neighbour were scored at 0 — a weight cannot multiply a zero,
+so on the recorded input the dimension was inert exactly where it mattered.
+Calibrating a weight on that input would have been calibrating on a bug, so
+`read_ledger` now returns the
+same projection the gate reads, with `ledger.json` filling in only behaviours
+evidence does not mention.  Cost 44–350 ms per call on 0.8–6 MB of evidence.
+
+**Ground truth — how "was this story actually fine" was derived.** Two
+independent, SHA-bound sources, unioned:
+
+1. the gate's own `preservation` check recorded `failed` in a `gate:verdict`
+   note, which means a VERIFIED behaviour of another story was red at that
+   candidate;
+2. a ledger `REOPENED` entry **corroborated** by red evidence at the same
+   instant — for an `ac` behaviour the named criterion red, for `fr`/`nfr` a
+   criterion of the owning story red, for `qa:*`/`mockup:` a red run.
+
+Corroboration is not ceremony: **29 REOPENED entries across the four corpora
+are not corroborated** and are reported as artifacts rather than counted as
+regressions.  todo-cli STORY-06-01 is the clearest — five requirements flipped
+to REOPENED while every one of its 65 tests was green, because that story
+`covers` the same requirements as three earlier stories and had one criterion
+with no test, so its own rollup wrote them red; `Ledger.observe` then kept the
+red and discarded the green that followed it in the same loop (green on an
+unlanded candidate returns early).  That is a defect in the requirement rollup,
+not a regression, and not O3 — it is recorded here for whoever takes O2.
+
+**The calibration.** 32 scored stories, 15 confirmed regressors, 17 clean.
+Blocked = the story's score crosses `story.max_complexity` (16.0) once the
+neighbour dimension is weighted.
+
+| weight | blocked | innocent blocked | regressors caught | regressions missed |
+|---:|---:|---:|---:|---:|
+| 0 | 0 | 0 | 0 | 15 |
+| 0.25 | 0 | 0 | 0 | 15 |
+| 0.5 | 0 | 0 | 0 | 15 |
+| 1.0 | 0 | 0 | 0 | 15 |
+| 1.5 | 3 | 2 | 1 | 14 |
+| 2.0 | 6 | 3 | 3 | 12 |
+| 2.5 | 7 | 3 | 4 | 11 |
+| 3.0 | 10 | 4 | 6 | 9 |
+| 4.0 | 14 | 6 | 8 | 7 |
+| 5.0 | 18 | 7 | 11 | 4 |
+
+**Why 0.0 is the chosen value.**  No weight at or below 1.0 changes a single
+verdict on these corpora — including the 0.5 the note pinned back, which here is
+indistinguishable from 0.  The first verdict any larger weight changes is a
+false one: todo-oc STORY-04-03 crosses the threshold once w passes 1.08 and broke
+nothing, while the first true positive (todo-e2e STORY-05-01) only arrives at
+1.11.  From there the two error rates move together, never apart: buying 11 of
+the 15 regressors costs blocking 7 of the 17 clean stories, and blocking 18 of
+32 stories is not a gate, it is a stop.  Spearman(neighbour count, broke a
+neighbour) = **0.235**; mean neighbour count 3.13 for regressors against 2.12
+for clean stories.  The count barely ranks the risk it is meant to measure, so
+no positive default is defensible — the knob exists for a project that measures
+its own table and finds otherwise.
+
+**What the measurement says about O3's real question.** The weight was never
+the lever, because the predicate underneath it is nearly always true: **27 of
+the 32** stories touch at least one neighbour — 15 of 15 regressors, but also 12
+of 17 clean stories.  A signal that fires on 84% of stories cannot rank the 47%
+that regress, whatever it is multiplied by; that is what ρ = 0.235 means in one
+sentence.  Widening the radius therefore moves cost, not recall.
+
+The direction that would move recall is scoping preservation by behaviour
+instead of by file — re-verify the neighbour's criteria at the candidate, which
+the ledger already knows how to do — and that is a change to the predicate, not
+to its weight.  Two recorded observations say where it bites.  First, file
+overlap answers a question about *paths* while the ledger's requirement records
+have no paths at all: they are reached only through the owning story's declared
+write scope, which is why todo-cli STORY-06-01 — one changed file, a new
+integration test — overlapped nothing on either its declared scope or its actual
+changed files, yet five requirements of three other stories changed status
+during its run.  Second, the declared scope it was measured against is a plan
+artifact: it need not match what the story changed.  Until the predicate is
+behaviour-shaped, leave this weight at 0.
 
 ## Deferred
 
