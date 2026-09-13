@@ -1,6 +1,26 @@
 # Changelog
 
-## Unreleased
+## 1.5.0 — 2026-09-13
+
+A minor, not a patch, because two behaviours change.
+
+**An API key now goes only to the client that authenticates with it.**
+`ANTHROPIC_*` used to be in the shared environment allowlist, so every client
+session received the host's Anthropic key — and a client that can read such a
+key uses it *instead of* its own login. If you run OpenCode against an
+Anthropic-compatible endpoint using `ANTHROPIC_*` variables, add
+`"clients.env_allow": ["ANTHROPIC_"]` to `.ai/config.json`.
+
+**The acceptance report's traceability column asks whether the requirement has
+tests**, not whether a test command exited 0 in one of its sessions. Projects
+whose test runner ran zero tests will see `—` where they used to see ✅. The
+number under it, `AC w/ Test`, was always the honest one.
+
+Everything below came out of one day of running two projects end to end
+through the framework — a browser app and a command-line tool, both driven by
+a non-frontier model, both starting from a hand-written `docs/requirements.md`.
+Every entry has a regression test and a row in `docs/FAILURE-TAXONOMY.md`;
+`docs/DOGFOOD-2026-09-13.md` is the report.
 
 - **The "criteria demand a file the story may not write" check was switched
   off for every English-language project** (bug 114). It filters backticked
