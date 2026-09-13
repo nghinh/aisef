@@ -271,8 +271,10 @@ class TestVongSuaGap(ImproveTestCase):
         self.assertEqual(rp["epic_id"], "EPIC-RP-01")
         self.assertEqual(rp["repair_of"], "AC-STORY-01-01-1")
         self.assertEqual(rp["loop"], "loop-1")
-        # `src/core` của story gốc + đường harness cấp cho hợp đồng kiểm định (lỗi 21), nằm trong đó.
-        self.assertEqual(rp["write_scope"][0], "src/core")
+        # Gap này là `untested` → story chỉ-viết-test: phạm vi ghi đúng bằng đường
+        # harness cấp cho hợp đồng kiểm định (lỗi 21 — đòi test thì phải cho ghi test),
+        # không có code sản phẩm. `unbuilt` mới được thêm `src/core` của story gốc.
+        self.assertEqual(rp["write_scope"], [TEST_SCRIPT])
         self.assertTrue(all(p.startswith("src/core") for p in rp["write_scope"]), rp["write_scope"])
         self.assertEqual(rp["depends_on"], [])
         self.assertEqual(rp["verification_contract"], ["unit"])
@@ -635,6 +637,75 @@ class TestHangDoiSuaTuDong(ImproveTestCase):
                          max_loops=2)
         self.assertEqual(len(r.loops), 1)
         self.assertIn("truy vết", r.loops[0].stuck)
+        report = r.loops[0].report_path.read_text(encoding="utf-8")
+        self.assertIn(f"aisef evidence {BEHAVIORS[0]} --link", report)
+        self.assertIn("not** a functional improvement", report)
+
+
+class TestDinhTuyenTheoLoaiGap(ImproveTestCase):
+    """ADR-009 O2: ba sự vắng mặt, ba hành động khác nhau — story trả phí cho
+    `unbuilt`, story chỉ-viết-test cho `untested`, sửa siêu dữ liệu bằng harness
+    cho `untraced`. Luật "gap chỉ thiếu truy vết do harness sửa, không do story"
+    (QĐ chủ đầu tư 2026-09-06 §4) phải nằm trong code, không nằm trong văn bản."""
+
+    def test_gap_untraced_khong_vao_hang_doi_sua(self):
+        from aisef.phases.improve import repair_queue
+
+        led = L.Ledger()
+        led.observe("AC-STORY-01-01-1", "ac", ok=False, at=1.0, story="STORY-01-01",
+                    source={"why": L.WHY_UNREADABLE})
+        led.observe("AC-STORY-01-01-2", "ac", ok=False, at=1.0, story="STORY-01-01",
+                    source={"test_id": "t"})
+        self.assertEqual([b.id for b in repair_queue(list(led.behaviors.values()))],
+                         ["AC-STORY-01-01-2"], "untraced không đáng một story trả phí")
+
+    def test_untraced_thi_khong_goi_model_ma_chi_cach_sua_sieu_du_lieu(self):
+        (self.artifacts / "evidence" / "STORY-01-01.jsonl").unlink()
+        EvidenceStore(self.artifacts).tool_run(
+            "STORY-01-01", "test", ok=True, detail={"tail": "1 passed"})
+        self.assertEqual({b.gap_kind for b in self.ledger().behaviors.values()}, {L.UNTRACED})
+        fixer = Fixer(self.artifacts)
+        r = self.improve(fixer, max_loops=5)
+        self.assertEqual(r.loops, [], "không story sửa nào cho gap chỉ thiếu truy vết")
+        self.assertEqual(fixer.develop_calls, [], "không gọi agent → không tốn tiền")
+        self.assertIn("only missing traceability", r.stopped)
+        self.assertIn("--link", r.stopped)
+        self.assertIn(BEHAVIORS[0], r.stopped)
+
+    def test_untested_thi_story_sua_chi_duoc_ghi_duong_test(self):
+        self.improve(Fixer(self.artifacts), max_loops=1)
+        rp = next(s for s in self.index()["stories"] if s["id"] == "STORY-RP-01")
+        self.assertEqual(rp["gap_kind"], L.UNTESTED)
+        self.assertEqual(rp["write_scope"], [TEST_SCRIPT],
+                         "story chỉ-viết-test: phạm vi ghi là đường test, không phải code")
+        body = (self.artifacts / rp["file"]).read_text(encoding="utf-8")
+        self.assertIn("Test-only story", body)
+
+    def test_unbuilt_thi_story_sua_duoc_ghi_ca_code(self):
+        t = tap_name(BEHAVIORS[0])
+        script = self.project / TEST_SCRIPT
+        script.write_text("#!/bin/sh\necho 'TAP version 13'\n"
+                          f"echo 'ok 1 - {BASE_TEST}'\necho 'not ok 2 - {t}'\nexit 1\n",
+                          encoding="utf-8")
+        subprocess.run(["git", "commit", "-aqm", "test đỏ"], cwd=self.project, check=True)
+        EvidenceStore(self.artifacts).tool_run(
+            "STORY-01-01", "test", ok=False,
+            detail={"test_format": "node-tap", "test_ids": [BASE_TEST, t], "failed_ids": [t]})
+        led = self.ledger()
+        self.assertEqual(led.behaviors[BEHAVIORS[0]].gap_kind, L.UNBUILT)
+        self.improve(Fixer(self.artifacts), max_loops=1)
+        rp = next(s for s in self.index()["stories"]
+                  if s.get("repair_of") == BEHAVIORS[0])
+        self.assertEqual(rp["gap_kind"], L.UNBUILT)
+        self.assertIn("src/core", rp["write_scope"])
+
+    def test_be_tac_truy_vet_tieng_anh_cung_duoc_nhan_ra(self):
+        """`_body` dặn người rà soát trả `[stuck] trace: <test id>` bằng tiếng Anh,
+        còn báo cáo chỉ nhận chữ Việt — lời chỉ đường sửa siêu dữ liệu bị mất."""
+        r = self.improve(Fixer(self.artifacts, review=f"[stuck] trace: {BASE_TEST}"),
+                         max_loops=2)
+        self.assertEqual(len(r.loops), 1)
+        self.assertIn("trace:", r.loops[0].stuck)
         report = r.loops[0].report_path.read_text(encoding="utf-8")
         self.assertIn(f"aisef evidence {BEHAVIORS[0]} --link", report)
         self.assertIn("not** a functional improvement", report)

@@ -32,6 +32,7 @@ mechanism as the other eight gates, approval binds to report hash.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -42,7 +43,7 @@ from ..control import ledger as ledger_mod
 from ..control.approvals import ApprovalStore, Gate, Status
 from ..control.change import read_index, register_story
 from ..control.journal import Entry, JournalStore, reconcile_all
-from ..control.ledger import GAP, REOPENED, Behavior, Ledger
+from ..control.ledger import GAP, REOPENED, UNBUILT, UNTESTED, UNTRACED, Behavior, Ledger
 from ..control.normalize import Story, verification_paths
 from ..control.preflight import verification_contract
 from ..control.qualification import (
@@ -182,10 +183,23 @@ def epic_gaps(led: Ledger, epic_id: str) -> list[Behavior]:
 #: on e9: rounds 4-5 received `qa:*`, delta -1/-2.
 QUEUE_RANK = {"ac": 0, "fr": 1, "nfr": 1, "mockup": 2}
 
+#: What closes each kind of absence (ADR-009 O2).  Three absences were recorded as
+#: one GAP and all three got the same paid repair story; only `UNBUILT` is worth
+#: one.  `UNTRACED` never enters the queue: the owner decision of 2026-09-06 §4
+#: ("a gap that is only missing traceability is fixed by the harness, not by a
+#: story") is this dict plus the filter in `repair_queue`.
+REPAIR_ACTION = {UNBUILT: "story", UNTESTED: "test-only story", UNTRACED: "harness metadata fix"}
+
 
 def repair_queue(gaps: list[Behavior]) -> list[Behavior]:
-    """Gaps eligible for auto-repair, REOPENED first, then by `QUEUE_RANK`, then id."""
-    return sorted((b for b in gaps if b.kind in QUEUE_RANK),
+    """Gaps eligible for auto-repair, REOPENED first, then by `QUEUE_RANK`, then id.
+
+    `UNTRACED` is filtered out: the harness has no test name to attach to the
+    behaviour, and no amount of agent time buys one — `aisef evidence <id> --link`
+    (or a reporter that prints test names) does.  Spending a repair story there
+    pays for a metadata edit at story prices.
+    """
+    return sorted((b for b in gaps if b.kind in QUEUE_RANK and b.gap_kind != UNTRACED),
                   key=lambda b: (b.status != REOPENED, QUEUE_RANK[b.kind], b.id))
 
 
@@ -245,6 +259,7 @@ def _body(b: Behavior, owner: Story, story: Story, preservation: list[str], loop
         "",
         f"- Behavior: `{b.id}` — status **{b.status}** in ledger, belongs to {owner.id}"
         + (f" (regression by {b.regressed_by})" if b.regressed_by else ""),
+        f"- Absence: **{b.gap_kind}** → {REPAIR_ACTION.get(b.gap_kind, 'story')} (ADR-009 O2)",
         f"- Source: {_source_line(b)}",
         f"- History: `aisef evidence {b.id}`",
         "",
@@ -262,6 +277,16 @@ def _body(b: Behavior, owner: Story, story: Story, preservation: list[str], loop
         f"{b.id} --link \"<test id>\" --why ...`), not as a functional improvement.",
         "",
     ]
+    if b.gap_kind == UNTESTED:
+        out += [
+            "**Test-only story.** The ledger measured the absence of a *test*, not of "
+            "the behavior: the write scope is the test paths only, the product code is "
+            "out of scope and the scope guard enforces that. Write the tagged test and "
+            "stop. If it turns out red — the behavior really is missing — say so in the "
+            "summary and leave it red: the ledger then records a red test and the next "
+            "round opens a full repair story with the code in scope.",
+            "",
+        ]
     if preservation:
         out += [
             "## Preservation",
@@ -310,10 +335,18 @@ def repair_story(
     """
     owner = _owner(root, b.story)
     kinds, screens = _contract(b, owner)
+    verify_paths = verification_paths(owner, project, config)
     scope = list(owner.write_scope)
-    for p in verification_paths(owner, project, config):
+    for p in verify_paths:
         if p not in scope:
             scope.append(p)
+    if b.gap_kind == UNTESTED and verify_paths:
+        # Test-only story (ADR-009 O2): what the evidence records as missing is the
+        # test, not the code, so the scope is the test paths only — the difference
+        # between the two actions is enforced by the scope guard, not by prose in
+        # the story body.  If the new test comes back red the ledger then records a
+        # red test, the gap becomes `unbuilt`, and the next round gets full scope.
+        scope = list(verify_paths)
     sid = _pick_id(root, state, b.id)
     story = Story(
         id=sid, epic_id=repair_epic(epic_id),
@@ -328,7 +361,7 @@ def repair_story(
         root, story,
         epic_title=f"Fix behavior per ledger — {epic_id}",
         extra={"repair_of": b.id, "loop": f"loop-{loop}", "preservation": preservation,
-               "source": dict(b.source or {})},
+               "gap_kind": b.gap_kind, "source": dict(b.source or {})},
         body=_body(b, owner, story, preservation, loop),
         wave=[sid],   # one story per round: old failed repair stories don't piggyback
     )
@@ -375,10 +408,24 @@ def stop_reason(
     gaps belonging to the epic but outside the auto-repair queue -- named when
     stopping so nobody reads "no gaps left"."""
     if not gaps:
-        if outside:
-            return (f"no gap with specific verifier remaining in epic — {len(outside)} project-level "
-                    f"gap(s) outside auto-repair queue: {', '.join(b.id for b in outside[:5])}"
-                    " (run `aisef qa`)")
+        # Two different reasons to be outside the queue, two different fixes; one
+        # message for both would send the reader to `aisef qa` for a metadata edit.
+        untraced = [b for b in outside if b.gap_kind == UNTRACED]
+        project = [b for b in outside if b.gap_kind != UNTRACED]
+        clauses = []
+        if project:
+            clauses.append(f"{len(project)} project-level gap(s) outside auto-repair queue: "
+                           f"{', '.join(b.id for b in project[:5])} (run `aisef qa`)")
+        if untraced:
+            why = str((untraced[0].source or {}).get("why") or "")
+            clauses.append(
+                f"{len(untraced)} gap(s) only missing traceability — harness metadata fix, "
+                f"not a repair story: {', '.join(b.id for b in untraced[:5])} "
+                + (f"[{why}] " if why else "")
+                + f"(`aisef evidence {untraced[0].id} --link \"<test id>\" --why \"…\"`, or "
+                "make the runner print test names)")
+        if clauses:
+            return "no gap with specific verifier remaining in epic — " + "; ".join(clauses)
         return "no GAP/REOPENED remaining in epic"
     if last is not None and last.stuck:
         return f"plan stuck at {last.story_id} — returning to human: {last.stuck}"
@@ -440,6 +487,14 @@ def _stop_from_verdict(verdict: QVerdict, qualification: list[str]) -> str:
     return joined or verdict.reason
 
 
+#: The reviewer's "only the trace is missing" marker, in both languages the harness
+#: itself asks for: `_body` prescribes `[stuck] trace: <test id>` in English while e9
+#: reviewers returned `[bế tắc] truy vết: <test id>`.  Matching only one of the two
+#: dropped the metadata-fix instruction for the other — the report then read as if the
+#: round had simply failed.
+_TRACE_STUCK = re.compile(r"truy vết|trace:", re.IGNORECASE)
+
+
 def _write_report(root: Path, epic_id: str, lo: Loop, decision: str, spent: float) -> Path:
     b, a = lo.before, lo.after
     lines = [
@@ -459,7 +514,7 @@ def _write_report(root: Path, epic_id: str, lo: Loop, decision: str, spent: floa
         *([f"- Metadata fix, **not** a functional improvement: behavior already proven by existing test "
            f"— `aisef evidence {lo.behavior} --link \"<test id>\" "
            f"--why \"...\"` then `aisef report`"]
-          if "truy vết" in lo.stuck.lower() else []),
+          if _TRACE_STUCK.search(lo.stuck) else []),
         "",
         "## Gate outcome",
         "",
@@ -626,8 +681,10 @@ def _improve_owned(
                 waived_kinds=tuple(qa.waived),
             ),
             behaviors=tuple(
-                QGap(b.id, b.status,
-                     has_verifier=(b.kind in QUEUE_RANK))
+                # Queue-eligible means exactly what `repair_queue` decided, kind and
+                # gap kind together: the unified rule must not see a repairable gap
+                # where the queue sees a metadata fix.
+                QGap(b.id, b.status, has_verifier=(b in queue))
                 for b in gaps),
             approvals=tuple(
                 QApproval(g.value, approvals.status(g).value)

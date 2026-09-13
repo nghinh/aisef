@@ -571,3 +571,120 @@ class TestTruyVetNguoiKhai(LedgerTestCase):
         data = json.loads((self.root / L.TRACE_FILE).read_text(encoding="utf-8"))
         self.assertEqual(data["AC-STORY-01-01-1"]["by"], "nghi")
         self.assertIn("VERIFIED", out)
+
+
+class TestLoaiGap(LedgerTestCase):
+    """ADR-009 O2: sổ ghi "là GAP" mà không ghi **loại** vắng mặt nào.
+
+    Ba sự vắng mặt khác nhau cùng bị ghi là GAP: hành vi chưa được xây
+    (`unbuilt`), hành vi có mà không test nào chạm tới (`untested`), và harness
+    không nối được hành vi → test (`untraced`). Chỉ loại đầu đáng một story sửa
+    có trả phí. Loại được **chiếu** từ `source.why` — đúng bộ câu mà chính sổ
+    viết ra — chứ không đoán.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.index([{"id": "STORY-01-01", "epic_id": "EPIC-01",
+                     "acceptance_criteria": ["a", "b"]}])
+
+    def kind_of(self, bid: str) -> str:
+        return L.build(self.root).behaviors[bid].gap_kind
+
+    def test_test_do_la_unbuilt(self):
+        t = ac_test("STORY-01-01", 1)
+        self.run_tests("STORY-01-01", ids=[t], failed=[t])
+        self.assertEqual(self.kind_of("AC-STORY-01-01-1"), L.UNBUILT)
+
+    def test_khong_co_test_mang_ma_la_untested(self):
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])
+        self.assertEqual(self.kind_of("AC-STORY-01-01-2"), L.UNTESTED)
+
+    def test_khong_doc_duoc_ten_test_la_untraced(self):
+        self.store.tool_run("STORY-01-01", "test", ok=True, detail={"tail": "1 passed"})
+        self.assertEqual(self.kind_of("AC-STORY-01-01-1"), L.UNTRACED)
+
+    def test_khai_truy_vet_ma_test_khong_chay_la_untraced(self):
+        (self.root / L.TRACE_FILE).write_text(json.dumps({
+            "AC-STORY-01-01-2": {"test_id": "src/khac.test.js > không chạy",
+                                 "why": "đã chứng minh", "by": "nghi"}},
+            ensure_ascii=False), encoding="utf-8")
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])
+        b = L.build(self.root).behaviors["AC-STORY-01-01-2"]
+        self.assertEqual(b.gap_kind, L.UNTRACED)
+        self.assertIn("src/khac.test.js", b.source["why"])
+
+    def test_xanh_o_ung_vien_chua_landed_la_unbuilt(self):
+        """Test có, xanh, nhưng trên ứng viên không bao giờ landed: trên nhánh
+        chính không có gì chứng minh hành vi — `unbuilt`, không phải untested."""
+        t = ac_test("STORY-01-01", 1)
+        self.run_tests("STORY-01-01", ids=[t], candidate="a" * 40)
+        (self.root / "journal").mkdir(exist_ok=True)
+        (self.root / "journal" / "STORY-01-01.jsonl").write_text(
+            json.dumps({"step": "candidate.frozen", "data": {"sha": "a" * 40}}) + "\n",
+            encoding="utf-8")
+        b = L.build(self.root).behaviors["AC-STORY-01-01-1"]
+        self.assertEqual(b.status, L.GAP)
+        self.assertEqual(b.gap_kind, L.UNBUILT)
+
+    def test_yeu_cau_thua_huong_loai_gap_cua_tieu_chi(self):
+        """FR/NFR đỏ **qua** tiêu chí của nó: mọi tiêu chí non-green cùng một lý do
+        thì yêu cầu cũng cùng loại ấy. Lý do lẫn lộn thì về `unbuilt` — phía đắt,
+        không bao giờ phía rẻ. Đo trên bốn kho dogfood: chuyển 1 trong 18 gap
+        mức yêu cầu (todo-cli FR-9)."""
+        self.index([{"id": "STORY-01-01", "epic_id": "EPIC-01",
+                     "acceptance_criteria": ["a", "b"], "covers": ["FR-1"]},
+                    {"id": "STORY-01-02", "epic_id": "EPIC-01",
+                     "acceptance_criteria": ["c", "d"], "covers": ["FR-2"]}])
+        # 01-01: cả hai tiêu chí chỉ thiếu test → FR-1 untested.
+        self.run_tests("STORY-01-01", ids=["src/x.ts > không mang mã"])
+        # 01-02: một tiêu chí có test đỏ, một chỉ thiếu test → lẫn lộn → FR-2 unbuilt.
+        t = ac_test("STORY-01-02", 1)
+        self.run_tests("STORY-01-02", ids=[t], failed=[t])
+        led = L.build(self.root)
+        self.assertEqual(led.behaviors["FR-1"].gap_kind, L.UNTESTED)
+        self.assertEqual(led.behaviors["FR-2"].gap_kind, L.UNBUILT)
+
+    def test_ly_do_gap_khong_duoc_cu_khi_bang_chung_moi_noi_khac(self):
+        """Nguồn của gap phải là lý do **mới nhất**: gap thiếu test mà lượt sau
+        có test đỏ là một sự vắng mặt khác, cách sửa khác — sổ giữ lý do cũ thì
+        hàng đợi cứ mở story chỉ-viết-test mãi."""
+        self.run_tests("STORY-01-01", ids=["src/x.ts > không mang mã"])
+        self.assertEqual(self.kind_of("AC-STORY-01-01-1"), L.UNTESTED)
+        t = ac_test("STORY-01-01", 1)
+        self.run_tests("STORY-01-01", ids=[t], failed=[t], attempt=2)
+        b = L.build(self.root).behaviors["AC-STORY-01-01-1"]
+        self.assertEqual(b.status, L.GAP, "vẫn là GAP, không có chuyển trạng thái")
+        self.assertEqual(len(b.history), 1, "không ghi lịch sử vì trạng thái không đổi")
+        self.assertEqual(b.gap_kind, L.UNBUILT)
+        self.assertEqual(b.source["test_id"], t)
+
+    def test_verified_thi_khong_co_loai_gap(self):
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])
+        self.assertEqual(self.kind_of("AC-STORY-01-01-1"), "")
+
+    def test_bang_issues_dem_ba_loai_rieng(self):
+        t1 = ac_test("STORY-01-01", 1)
+        self.run_tests("STORY-01-01", ids=[t1], failed=[t1])     # 1 unbuilt · 1 untested
+        code, out, _ = self.run_cli("issues")
+        self.assertEqual(code, 0, out)
+        self.assertIn("unbuilt 1", out)
+        self.assertIn("untested 1", out)
+        self.assertIn("untraced 0", out)
+        text = (self.root / "ISSUES.md").read_text(encoding="utf-8")
+        self.assertIn("gap_kind", text)
+        self.assertIn("| unbuilt |", text)
+        self.assertIn("| untested |", text)
+
+    def test_loai_gap_vao_ledger_json_va_cot_csv(self):
+        import csv
+
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])
+        led = L.build(self.root)
+        self.assertEqual(led.as_dict()["behaviors"]["AC-STORY-01-01-2"]["gap_kind"], L.UNTESTED)
+        self.assertNotIn("gap_kind", led.as_dict()["behaviors"]["AC-STORY-01-01-1"])
+        self.run_cli("issues", "--format", "csv")
+        with (self.root / "ISSUES.csv").open(encoding="utf-8", newline="") as f:
+            rows = list(csv.DictReader(f))
+        self.assertEqual(tuple(rows[0].keys()), L.ISSUE_COLUMNS)
+        self.assertEqual(rows[0]["gap_kind"], L.UNTESTED)
