@@ -194,6 +194,46 @@ class TestKhongBaoOan(PreflightTestCase):
         self.assertNotIn("code-intelligence", self.caps(pf))
 
 
+class TestDuongDanNgoaiDuAn(PreflightTestCase):
+    """Lỗi 146. Tiêu chí nêu đường dẫn **dữ liệu lúc chạy** —
+    `MARKS_FILE=/tmp/x.json`, "thư mục làm việc là `/foo`" — chứ không phải
+    thứ story phải tạo. Đo trên marks-cli 2026-09-14."""
+
+    def setUp(self):
+        super().setUp()
+        import subprocess
+        for args in (["init", "-q"], ["config", "user.email", "t@t"],
+                     ["config", "user.name", "T"]):
+            subprocess.run(["git", "-C", str(self.project), *args], capture_output=True)
+        (self.project / ".gitignore").write_text(".marks.json\n", encoding="utf-8")
+
+    def test_duong_dan_tuyet_doi_khong_doi_quyen_ghi(self):
+        pf = self.check(self.story(acceptance_criteria=[
+            "Given `MARKS_FILE=/tmp/x.json`, Then Store ghi vào `/tmp/x.json`"
+        ]))
+        self.assertEqual(
+            {c for c in self.caps(pf) if c.startswith("write:")}, set(), pf.summary())
+
+    def test_mot_duong_dan_ngoai_kho_khong_lam_hong_mien_tru_gitignore(self):
+        """`git check-ignore --stdin` chết nguyên mẻ (exit 128) khi gặp đường
+        dẫn ngoài kho, và người gọi đọc tập rỗng thành "không có gì bị bỏ qua".
+        Một tiêu chí nhắc `/tmp/x.json` làm mất luôn miễn trừ của
+        `./.marks.json` — thứ `.gitignore` có phủ."""
+        pf = self.check(self.story(acceptance_criteria=[
+            "Given biến môi trường trỏ tới `/tmp/x.json`, Then Store ghi vào "
+            "`/tmp/x.json`, không phải `./.marks.json`"
+        ]))
+        self.assertEqual(
+            {c for c in self.caps(pf) if c.startswith("write:")}, set(), pf.summary())
+
+    def test_duong_dan_trong_kho_van_bat_nhu_cu(self):
+        pf = self.check(self.story(
+            acceptance_criteria=["Then `src/export/csv.ts` sinh ra tệp CSV"],
+            write_scope=["src/a.ts"],
+        ))
+        self.assertIn("write:src/export/csv.ts", self.caps(pf))
+
+
 class TestUIStory(PreflightTestCase):
     def test_story_ui_thieu_trinh_duyet_thi_truot(self):
         pf = self.check(self.story(screens=["notes-list"]))

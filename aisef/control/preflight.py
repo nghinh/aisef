@@ -446,9 +446,34 @@ def _why_kind(story: Story, kind: str) -> str:
     return f'acceptance criteria mention "{hit}"' if hit else "inferred from story content"
 
 
+def _ngoai_du_an(tok: str) -> bool:
+    """A path that cannot belong to the project: absolute, or climbing out.
+
+    Criteria name these as **runtime data**, never as deliverables —
+    `MARKS_FILE=/tmp/x.json`, "the working directory is `/foo`". No story can
+    be asked to create them, and asking the plan to put them in `write_scope`
+    (which is what the missing-file advice says) produces a scope pointing
+    outside the repository. The write-scope guard refuses such a write anyway,
+    on the project-root check that runs before scope matching — so this is a
+    plan-quality defect, not a hole.
+    """
+    return tok.startswith(("/", "~")) or tok.split("/", 1)[0] == ".."
+
+
 def _git_bo_qua(project: Path, tokens: list[str]) -> set[str]:
-    """Which of these paths `.gitignore` covers — one call, not one per path."""
-    duong_dan = [t for t in tokens if _PATHISH.match(t) and ("/" in t or _EXT.search(t))]
+    """Which of these paths `.gitignore` covers — one call, not one per path.
+
+    Paths outside the repository are dropped **before** the call: `git
+    check-ignore` fails the whole batch on the first one ("is outside
+    repository", exit 128), and the caller then reads an empty set as "nothing
+    is ignored". Measured on marks-cli 2026-09-14 (bug 146): one criterion
+    naming `/tmp/x.json` cost the same story the exemption for `./.marks.json`,
+    which `.gitignore` does cover, and the gate reported three missing files
+    where there were none.
+    """
+    duong_dan = [t for t in tokens
+                 if _PATHISH.match(t) and ("/" in t or _EXT.search(t))
+                 and not _ngoai_du_an(t)]
     if not duong_dan:
         return set()
     try:
@@ -492,6 +517,8 @@ def _needs_from_names(story: Story, project: Path | None) -> list[Need]:
             continue
         la_duong_dan = "/" in tok or _EXT.search(tok)
         if la_duong_dan:
+            if _ngoai_du_an(tok):
+                continue  # runtime data named in a Given clause, not a deliverable
             if _covered(tok, scope):
                 continue
             if tok in bo_qua:

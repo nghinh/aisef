@@ -298,6 +298,25 @@ unlocated items deduped by their own text so two distinct ones stay two.
 Replayed over eight real review files: 29 becomes 2, matching the JSON, and the
 genuine blockers in the other reviews survive.
 
+**Runtime paths named in criteria are no longer treated as deliverables**
+(bug 146). With 144 and 145 in place the gate could finally see marks-cli's
+criteria, and it immediately reported three files STORY-01-01 had to create:
+`/tmp/x.json`, `./.marks.json`, `/foo/.marks.json`. None is a source file —
+they are the store path under `MARKS_FILE` and an example working directory,
+named in Given clauses.
+
+The `.gitignore` exemption that exists for exactly this case never applied:
+`git check-ignore --stdin` fails the entire batch on the first path outside the
+repository, and the caller read the empty result as "nothing is ignored". So one
+mention of `/tmp/x.json` also cost `./.marks.json` its exemption.
+
+Worse, the advice attached to the error — add it to `write_scope` — is what the
+planner then did, producing a write scope pointing outside the repository. That
+authorizes nothing (the write-scope guard refuses any write outside the project
+root before it ever matches scope), but it makes the plan wrong and the error
+permanent. Absolute paths and paths climbing out of the project are now skipped,
+and filtered out before git is asked.
+
 **A plan where every story had zero acceptance criteria passed every gate**
 (bugs 144, 145). Found on the first run of a third dogfood project: `aisef plan`
 reported six stories, and all six story cards printed `(none — machine gate will
