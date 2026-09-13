@@ -392,3 +392,108 @@ class TestThongDiepCongMayDuNgan(unittest.TestCase):
     def test_van_con_thong_diep_de_do(self):
         """Phép thử trên chỉ có nghĩa khi thật sự có thông điệp để đo."""
         self.assertGreaterEqual(len(self._thong_diep()), 10)
+
+
+class TestKhongDungApiChiCoTrenPosix(unittest.TestCase):
+    """Lần thứ ba lặp lại cùng một lớp lỗi: mã chạy xanh trên macOS, đỏ ở CI
+    Windows vì một giả định POSIX. Lỗi 99 là bảng mã, 115 là khoá tệp, lần này
+    là `signal.SIGKILL` — thứ **không tồn tại** trên Windows (`os.kill` ở đó
+    gọi TerminateProcess cho mọi tín hiệu, nên chỉ có một bước dứt khoát).
+
+    Ba lần thì không còn là xui. Phép thử này đọc cây cú pháp: dùng một tên chỉ
+    có trên POSIX thì **hàm chứa nó** phải nhắc `win32` — tức có nhánh riêng cho
+    Windows. Không bắt được mọi cách viết sai, nhưng bắt đúng cách đã sai ba lần:
+    quên mất rằng Windows tồn tại.
+    """
+
+    #: Tên chỉ có trên POSIX, thường gặp trong mã quản lý tiến trình.
+    POSIX_ONLY = {"SIGKILL", "SIGQUIT", "SIGSTOP", "SIGCONT", "SIGHUP",
+                  "fork", "setsid", "getuid", "geteuid", "killpg"}
+
+    #: Cách viết một nhánh nền tảng: `sys.platform`, `os.name`, hoặc một hằng
+    #: kiểu `_WIN` đã tính sẵn ở đầu mô-đun.
+    DAU_HIEU_NEN = ("win32", "os.name", "_WIN", "IS_WINDOWS", "WINDOWS")
+
+    def _duoc_canh(self, src: str, cay) -> set:
+        """Hàm nằm trong một nhánh `if` theo nền tảng — kể cả nhánh `else`.
+
+        `aisef/_compat.py` tách ở **tầng mô-đun** (`if _WIN: … else: …`), nên
+        nhìn trong thân hàm là tố oan: nhánh POSIX không bao giờ chạy trên
+        Windows.
+        """
+        import ast
+
+        an_toan = set()
+        for node in ast.walk(cay):
+            if not isinstance(node, ast.If):
+                continue
+            dieu_kien = ast.get_source_segment(src, node.test) or ""
+            if not any(d in dieu_kien for d in self.DAU_HIEU_NEN):
+                continue
+            for nhanh in (node.body, node.orelse):
+                for con in nhanh:
+                    for x in ast.walk(con):
+                        if isinstance(x, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                            an_toan.add(x)
+        return an_toan
+
+    def test_moi_cho_dung_deu_co_nhanh_windows(self):
+        import ast
+
+        for path in sorted((ROOT / "aisef").rglob("*.py")):
+            src = path.read_text(encoding="utf-8")
+            cay = ast.parse(src, filename=str(path))
+            canh = self._duoc_canh(src, cay)
+            for ham in ast.walk(cay):
+                if not isinstance(ham, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    continue
+                dung = {n.attr for n in ast.walk(ham)
+                        if isinstance(n, ast.Attribute) and n.attr in self.POSIX_ONLY}
+                if not dung:
+                    continue
+                than = ast.get_source_segment(src, ham) or ""
+                if ham in canh or any(d in than for d in self.DAU_HIEU_NEN):
+                    continue
+                with self.subTest(tep=path.name, ham=ham.name):
+                    self.fail(
+                        f"{path.name}::{ham.name} dùng {', '.join(sorted(dung))} — "
+                        f"chỉ có trên POSIX; cần nhánh riêng cho Windows "
+                        f"(`sys.platform == \"win32\"`)")
+
+    def test_phep_quet_that_su_thay_duoc_loi(self):
+        """Phép quét chỉ có nghĩa nếu nó bắt được ca hỏng — và tha ca đã canh."""
+        import ast
+        import tempfile
+
+        hong = ("import os, signal\n"
+                "def dung(p):\n"
+                "    os.kill(p, signal.SIGKILL)\n")
+        canh_trong_ham = ("import os, signal, sys\n"
+                          "def dung(p):\n"
+                          "    s = signal.SIGTERM if sys.platform == 'win32' else signal.SIGKILL\n"
+                          "    os.kill(p, s)\n")
+        canh_tang_module = ("import os, signal, sys\n"
+                            "if sys.platform == 'win32':\n"
+                            "    def dung(p): os.kill(p, signal.SIGTERM)\n"
+                            "else:\n"
+                            "    def dung(p): os.kill(p, signal.SIGKILL)\n")
+        with tempfile.TemporaryDirectory() as d:
+            for ten, ma, cho_phep in (("hong", hong, False),
+                                      ("trong_ham", canh_trong_ham, True),
+                                      ("tang_module", canh_tang_module, True)):
+                p = Path(d) / f"{ten}.py"
+                p.write_text(ma, encoding="utf-8")
+                cay = ast.parse(ma)
+                canh = self._duoc_canh(ma, cay)
+                ok = True
+                for ham in ast.walk(cay):
+                    if not isinstance(ham, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        continue
+                    dung_ten = {n.attr for n in ast.walk(ham)
+                                if isinstance(n, ast.Attribute) and n.attr in self.POSIX_ONLY}
+                    than = ast.get_source_segment(ma, ham) or ""
+                    if dung_ten and ham not in canh and not any(
+                            x in than for x in self.DAU_HIEU_NEN):
+                        ok = False
+                with self.subTest(ca=ten):
+                    self.assertEqual(ok, cho_phep)

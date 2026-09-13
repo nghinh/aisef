@@ -286,7 +286,14 @@ def _giai_phong_cong(pid: str, url: str) -> bool:
         n = int(pid)
     except ValueError:
         return False
-    for sig, cho in ((signal.SIGTERM, 3.0), (signal.SIGKILL, 2.0)):
+    # Windows has no `SIGKILL`, and `os.kill` there calls TerminateProcess for
+    # any signal — one forceful pass is all there is. Escalating SIGTERM →
+    # SIGKILL is the POSIX shape only. Caught by Windows CI, green on macOS:
+    # the third time this repo has shipped a POSIX assumption that way
+    # (lỗi 99, 115).
+    buoc = ([(signal.SIGTERM, 5.0)] if sys.platform == "win32"
+            else [(signal.SIGTERM, 3.0), (signal.SIGKILL, 2.0)])
+    for sig, cho in buoc:
         try:
             os.kill(n, sig)
         except ProcessLookupError:
