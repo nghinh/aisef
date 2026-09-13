@@ -108,6 +108,27 @@ class TestCoverageVaLa(unittest.TestCase):
         log = parse(fx("vitest-verbose") + "\nAll files |   87.5 |    70 |   90 |   87.5 |\n")
         self.assertEqual(log.coverage, 87.5)
 
+    def test_node_experimental_test_coverage(self):
+        """`node --test --experimental-test-coverage` in bảng có tiền tố `ℹ `;
+        cổng vì thế bảo một dự án **đang** in coverage là hãy thêm
+        `--coverage` (lỗi 103)."""
+        log = parse(fx("node-test-pass")
+                    + "\nℹ start of coverage report\n"
+                      "ℹ file      | line % | branch % | funcs % | uncovered lines\n"
+                      "ℹ a.js      |  87.50 |   70.00 |  100.00 | 12\n"
+                      "ℹ all files |  87.50 |   70.00 |  100.00 | \n")
+        self.assertTrue(log.test_ids)
+        self.assertEqual(log.coverage, 87.5)
+
+    def test_khong_test_nao_chay_thi_khong_co_so_coverage(self):
+        """`node --test` trên cây chưa có test in `all files | 100.00` — 100%
+        của không có gì. Ghi con số ấy vào bằng chứng là ghi một điều sai."""
+        log = parse("ℹ tests 0\nℹ pass 0\nℹ fail 0\n"
+                    "ℹ all files | 100.00 |   100.00 |  100.00 | \n")
+        self.assertEqual(log.test_ids, [])
+        self.assertIsNone(log.coverage)
+        self.assertIn("no test ran", log.note)
+
     def test_unknown_output_does_not_guess(self):
         log = parse("Đã chạy.\nTests passed!\n")
         self.assertEqual((log.format, log.test_ids, log.coverage), ("", [], None))

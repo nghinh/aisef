@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **Coverage from `node --test`, and no coverage number without tests**
+  (bug 103). Node prefixes every line of its coverage table with `ℹ `, which
+  neither coverage pattern matched, so a project that had just enabled
+  `--experimental-test-coverage` was told by the gate to add `--coverage`. The
+  same run shows the other half of the problem: with no test files at all,
+  node prints `all files | 100.00` — a ratio with no denominator. A coverage
+  number is now dropped when no test ran, and says why.
+
 - **"Recurring infrastructure error" for a session that simply did nothing**
   (bug 102). A session that writes nothing is flagged `infra` so it does not
   consume one of the story's quality attempts — correct accounting. But the

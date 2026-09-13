@@ -49,9 +49,12 @@ _PYTEST_Q_FAIL = re.compile(r"^(?:FAILED|ERROR) (\S+::\S+)")
 _UNITTEST = re.compile(r"^(\S+) \((\S+)\)(?: \.\.\. (.+))?$")
 _UNITTEST_END = re.compile(r"\.\.\. (ok|FAIL|ERROR|skipped\b.*|expected failure|unexpected success)$")
 _UNITTEST_RAN = re.compile(r"^Ran \d+ tests? in ")
-# coverage: pytest-cov / c8 / istanbul
+# coverage: pytest-cov / c8 / istanbul / `node --test --experimental-test-coverage`
+# (node prefixes its table with `ℹ ` and puts line coverage in the first column
+# — without this the gate told a project that already prints coverage to "add
+# `--coverage`", bug 103).
 _COV = (re.compile(r"^TOTAL\s+\d+\s+\d+(?:\s+\d+\s+\d+)?\s+([\d.]+)%"),
-        re.compile(r"^All files\s*\|\s*([\d.]+)"))
+        re.compile(r"^(?:ℹ\s*)?[Aa]ll files\s*\|\s*([\d.]+)"))
 
 
 @dataclass
@@ -121,6 +124,13 @@ def parse(text: str) -> TestLog:
         _unittest(lines, log)
     elif any("test session starts" in l or _PYTEST.match(l) or "short test summary" in l for l in lines):
         _pytest(lines, log)
+    if log.coverage is not None and not log.test_ids:
+        # "100% of nothing" is the shape a zero-test run produces, and a gate
+        # reading it as a number would record a passing coverage figure for a
+        # suite that ran no test at all. No tests, no measurement (bug 103).
+        log.coverage = None
+        log.note = (log.note or "coverage reported but no test ran — "
+                                "nothing was measured")
     return log
 
 
