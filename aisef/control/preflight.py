@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -223,10 +224,22 @@ _PACKAGEISH = re.compile(r"^(@[a-z0-9][\w.-]*/)?[a-z0-9][a-z0-9._-]*$")
 #: "files in `src/search/` that import React fail the build" references a
 #: directory the story does not own. Measured on e9, the rule without this
 #: clause produced false positives on 2/18 stories on the first run.
+#: Bug 114: every verb here was Vietnamese except `commit`, so on an
+#: English-language project `_ticked_in_mutations` returned nothing and the
+#: whole "criteria require a file the story may not write" check was silent —
+#: measured on `todo-cli`, where a story's criterion named four
+#: `lib/commands/*.js` files outside its write scope and the stories gate said
+#: nothing; the guard blocked the writes three attempts later.
 _MUTATION = (
     "sinh ra", "tạo ", "tạo,", "ghi ", "ghi,", "cập nhật", "thêm vào",
     "sửa ", "xoá ", "xóa ", "commit", "lưu ", "dựng ", "xuất ra",
     "được tạo", "được ghi", "được sinh", "được lưu", "được commit",
+    "create", "creates", "created", "write", "writes", "written",
+    "add ", "adds ", "added", "update", "updates", "updated",
+    "delete", "deletes", "deleted", "remove", "removes", "removed",
+    "generate", "generates", "generated", "save", "saves", "saved",
+    "produce", "produces", "produced", "scaffold", "exists with",
+    "must exist", "exists as", "structured as",
 )
 
 
@@ -426,6 +439,25 @@ def _why_kind(story: Story, kind: str) -> str:
     return f'acceptance criteria mention "{hit}"' if hit else "inferred from story content"
 
 
+def _git_bo_qua(project: Path, tokens: list[str]) -> set[str]:
+    """Which of these paths `.gitignore` covers — one call, not one per path."""
+    duong_dan = [t for t in tokens if _PATHISH.match(t) and ("/" in t or _EXT.search(t))]
+    if not duong_dan:
+        return set()
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(project), "check-ignore", "--stdin"],
+            input="\n".join(duong_dan), capture_output=True, text=True,
+            encoding="utf-8", errors="replace", timeout=10,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return set()
+    # exit 1 = nothing matched, which is not an error here.
+    if proc.returncode not in (0, 1):
+        return set()
+    return {line.strip() for line in proc.stdout.splitlines() if line.strip()}
+
+
 def _needs_from_names(story: Story, project: Path | None) -> list[Need]:
     """Files/packages that acceptance criteria name explicitly but the story
     is not allowed to touch.
@@ -446,12 +478,20 @@ def _needs_from_names(story: Story, project: Path | None) -> list[Need]:
     )
     deps = _declared_deps(project) if project else None
 
-    for tok in _ticked_in_mutations(story):
+    ticked = _ticked_in_mutations(story)
+    bo_qua = _git_bo_qua(project, ticked) if project is not None else set()
+    for tok in ticked:
         if not _PATHISH.match(tok):
             continue
         la_duong_dan = "/" in tok or _EXT.search(tok)
         if la_duong_dan:
             if _covered(tok, scope):
+                continue
+            if tok in bo_qua:
+                # A path git ignores never appears as an out-of-scope change,
+                # so it cannot need write scope: `./.taskbook.json` is the
+                # store the program writes when it runs, not a file the story
+                # delivers.
                 continue
             if project is not None and _exists_anywhere(project, tok):
                 continue  # already exists — story only reads, no write needed

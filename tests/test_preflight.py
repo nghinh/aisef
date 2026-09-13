@@ -457,6 +457,37 @@ class TestDottedNamesAreNotFiles(PreflightTestCase):
         self.assertTrue(any(m.capability == "write:src/ui/new-screen.tsx" for m in pf.missing), [m.line() for m in pf.missing])
 
 
+class TestTieuChiTiengAnhCungDuocDoc(PreflightTestCase):
+    """Lỗi 114: mọi động từ trong `_MUTATION` đều là tiếng Việt (trừ
+    `commit`), nên với dự án viết tiếng Anh, phép kiểm "tiêu chí đòi một tệp
+    story không được ghi" **im lặng hoàn toàn**. Đo trên `todo-cli`: tiêu chí
+    của STORY-01-01 đòi bốn tệp `lib/commands/*.js` nằm ngoài write_scope,
+    cổng `stories` không nói gì, và guard chặn các lượt ghi ấy ba lượt sau."""
+
+    def test_dong_tu_tieng_anh_lam_phep_kiem_no(self):
+        s = self.story(acceptance_criteria=[
+            "Then the project is structured as `lib/commands/add.js` and "
+            "`bin/taskbook.js` exists with a shebang",
+        ])
+        pf = self.check(s)
+        self.assertTrue(any(m.capability == "write:lib/commands/add.js" for m in pf.missing),
+                        [m.line() for m in pf.missing])
+
+    def test_tep_git_bo_qua_khong_can_pham_vi_ghi(self):
+        """`./.taskbook.json` là kho dữ liệu chương trình tự ghi lúc chạy —
+        git bỏ qua nó, nên nó không bao giờ hiện ra như thay đổi ngoài phạm
+        vi, nên nó không cần phạm vi ghi."""
+        import subprocess
+        subprocess.run(["git", "init", "-q"], cwd=self.project, check=True)
+        (self.project / ".gitignore").write_text(".taskbook.json\n", encoding="utf-8")
+        s = self.story(acceptance_criteria=[
+            "Then a task is saved to `./.taskbook.json` and the store is updated",
+        ])
+        pf = self.check(s)
+        self.assertFalse([m for m in pf.missing if m.capability.startswith("write:")],
+                         [m.line() for m in pf.missing])
+
+
 class TestCamMangKhongPhaiCanMang(unittest.TestCase):
     """Lỗi 52. Preflight khớp chữ "third-party" rồi đòi **bật**
     `sandbox.tools_network` — cho một story mà tiêu chí chấp nhận nói *cấm*

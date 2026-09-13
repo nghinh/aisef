@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- **The "criteria demand a file the story may not write" check was switched
+  off for every English-language project** (bug 114). It filters backticked
+  paths by proximity to a mutation verb, and every verb in that table was
+  Vietnamese except `commit` — so the check returned nothing, silently and
+  completely, on any English project. Measured: a story whose acceptance
+  criterion named four `lib/commands/*.js` files outside its write scope
+  passed the stories gate, and the guard blocked those writes three attempts
+  and about twenty agent sessions later. English verbs added; paths covered by
+  `.gitignore` are skipped, since a file git ignores never appears as an
+  out-of-scope change and so cannot need write scope. A keyword heuristic is a
+  heuristic *per language*, and a missing language turns it off rather than
+  degrading it.
+
 - **The project's linter no longer lints the framework's own skills**
   (bug 113). `aisef setup` installs 155 skills into `.claude/`, and the
   project has to commit them — a story worktree is a checkout, so an
