@@ -577,11 +577,16 @@ _AC_BLOCK = re.compile(
 #: went the other way — every line counted as its own criterion, inflating
 #: the count and failing the gate on a story that was the right size.
 _GIVEN = re.compile(
-    r"^\s*(?:\*{0,2}(?:And|Và)\*{0,2}\s+)?\*{0,2}Given\*{0,2}\s",
+    # `**And** when the user runs …` opens a second scenario just as
+    # `**And** **Given**` does — same chaining habit, different keyword
+    # (bug 111): two scenarios of one story parsed as a single criterion, so
+    # one test named after the code satisfied the gate for both.
+    r"^\s*(?:\*{0,2}(?:And|Và)\*{0,2}\s+\*{0,2}(?:Given|When|Khi)\*{0,2}\s"
+    r"|\*{0,2}Given\*{0,2}\s)",
     re.IGNORECASE,
 )
 _AND_PREFIX = re.compile(
-    r"^\s*\*{0,2}(?:And|Và)\*{0,2}\s+(?=\*{0,2}Given)", re.IGNORECASE
+    r"^\s*\*{0,2}(?:And|Và)\*{0,2}\s+(?=\*{0,2}(?:Given|When|Khi)\b)", re.IGNORECASE
 )
 #: `- write_scope: src/notes/, src/db/schema.ts` — including when labels are bold.
 _META_ITEM = re.compile(

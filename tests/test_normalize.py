@@ -394,6 +394,20 @@ class TestEpicsFormats(unittest.TestCase):
         )
         self.assertEqual(len(crit), 2)
 
+    def test_and_when_chain_opens_a_new_criterion(self):
+        """Lỗi 111: cùng thói quen nối của lỗi 91, khác từ khoá. `**And** when
+        the user runs …` là tình huống thứ hai; gộp vào một tiêu chí thì một
+        test mang mã ấy đủ để qua cổng cho **cả hai**."""
+        from aisef.control.normalize import _split_ac
+        crit = _split_ac(
+            "**Given** the store exists\n**When** the user runs add \"x\"\n"
+            "**Then** exit code is 0\n\n"
+            "**And** when the user runs add \"\"\n**Then** exit code is non-zero\n"
+        )
+        self.assertEqual(len(crit), 2)
+        self.assertIn("non-zero", crit[1])
+        self.assertFalse(crit[1].lower().startswith("and"))
+
     def test_and_line_that_is_not_a_new_given_still_continues(self):
         from aisef.control.normalize import _split_ac
         crit = _split_ac(

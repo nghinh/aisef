@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **`**And** when …` opens a new acceptance criterion** (bug 111). Same
+  chaining habit as bug 91, different keyword: every story in a plan came out
+  with exactly one criterion, including stories that plainly described two
+  scenarios. Two scenarios in one criterion means one test carrying that code
+  satisfies the gate for both. Re-splitting the same `epics.md` — no model
+  call — took the plan from 1/1/1/1/1 criteria to 1/2/4/2/2.
+
 - **The framework's own installed skills counted as the project's source code**
   (bug 109). The skip list also existed twice — `baseline.py` kept its own copy
   of the literal, and that copy is the one its directory tree walked, so fixing
