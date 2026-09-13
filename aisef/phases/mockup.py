@@ -74,6 +74,10 @@ class MockupResult:
     def summary(self) -> str:
         if self.error:
             return f"mockup: ✗ {self.error}"
+        if self.experience is not None and getattr(self.experience, "headless", False) \
+                and not self.experience.screens:
+            return ("mockup: no graphical surface declared — empty design contract "
+                    "written, nothing to build")
         n = len(self.experience.screens) if self.experience else 0
         lines = [
             f"mockup: {n} screen(s) — generated {len(self.generated)}, "
@@ -387,6 +391,10 @@ def describe_contract(data: dict, artifact_root: Path) -> str:
     page path; the text only describes what the eye cannot see: which
     components became machine-verified commitments.
     """
+    if not data.get("screens"):
+        # A headless project has an empty contract and no index page: pointing
+        # the reviewer at a file that was never written wastes their click.
+        return "(no screens — this project declares no graphical surface)"
     lines = [f"Open: {artifact_root / MOCKUP_DIR / 'index.html'}", ""]
     for screen in data.get("screens", []):
         head = f"{screen['id']:14} {screen.get('name', '')}"
