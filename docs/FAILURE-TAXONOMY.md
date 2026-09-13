@@ -1,15 +1,42 @@
 # Phân loại lỗi thật của AISEF — để không tái diễn
 
-Bốn mươi bảy lỗi tìm được từ 2026-09-05 → 09 — 21 trong ngày 05/09,
-22–25 đêm 05→06/09, 26–31 trong ngày 06/09 (đổi tên, cài sạch, hợp
-quy CI), và 32–38 ngày 09/09 (dogfood `todo` + bốn vòng báo cáo Windows) —
-**tất cả bằng đo trên agent thật**, không
-lỗi nào bằng đọc code. Mỗi lỗi có một phép hồi quy đỏ khi hoàn nguyên, trừ
-lỗi 22 (lý do ở lớp I); bảng này nhóm chúng theo *lớp nguyên nhân* để lần
-sau, khi một triệu chứng mới xuất hiện, người sửa hỏi đúng câu hỏi trước.
+**147 lỗi** tìm được từ 2026-09-05 → 2026-09-14 (đếm lại 14/09; câu này nói
+"bốn mươi bảy" cho tới khi ấy). Lỗi 1–21 ghi ở `docs/STATUS-2026-09-05.md` §2.4;
+bảng dưới có **124 dòng, mã 22–147** — 26 và 27 không có dòng nào, chúng được
+gộp vào lỗi khác lúc ghi và số bị bỏ trống:
+
+```
+grep -oE '^\| *[0-9]+ *\|' docs/FAILURE-TAXONOMY.md | tr -dc '0-9\n' | sort -n | uniq | wc -l   # → 124
+```
+
+Mốc thời gian, đọc từ **ngày commit đưa dòng ấy vào tệp này**
+(`git log --format=%ad --date=short -S'| N |' -- docs/FAILURE-TAXONOMY.md | tail -1`),
+chứ không từ ngày quan sát — hai ngày ấy thường trùng nhưng không luôn:
+
+| Dải mã | Ngày dòng vào tệp | Sinh ra ở đâu |
+|---|---|---|
+| 1–21 | — (ở `STATUS-2026-09-05.md` §2.4) | e9 EPIC-01, 05/09 |
+| 22–25, 28–31 | 06/09 | vòng `improve` của e9; đổi tên, cài sạch, hợp quy CI |
+| 32–63 | 09/09 | dogfood `todo` + bốn vòng báo cáo Windows |
+| 64–70 | 10/09 | CI Windows, phase 2/3 (ADR-009) |
+| 71–75 | 12/09 | cổng lint vừa bật, bench v1.3, cohort C-1 |
+| 76–141 | 13/09 | dogfood `todo-cli` và `todo-oc` — [DOGFOOD-2026-09-13](DOGFOOD-2026-09-13.md) §2, §5, §7 |
+| 142–147 | 14/09 | `todo-oc` 7/7 (DOGFOOD §8) và `marks-cli`, dự án dogfood thứ ba |
+
+**Tất cả bằng đo trên agent thật**, không lỗi nào bằng đọc code. Mỗi lỗi có một
+phép hồi quy đỏ khi hoàn nguyên, trừ lỗi 22 (lý do ở lớp I); bảng này nhóm chúng
+theo *lớp nguyên nhân* để lần sau, khi một triệu chứng mới xuất hiện, người sửa
+hỏi đúng câu hỏi trước.
 
 Chi tiết từng lỗi (lộ ra ở đâu, sửa gì): `docs/STATUS-2026-09-05.md` §2.4;
 lỗi 22–25 còn có số đo ở `docs/ADR-004-evidence-driven-epic-improvement.md` §6.
+
+> **Phạm vi của bảng lớp ngay dưới** (ghi rõ 14/09): cột "Lỗi" của nó chỉ liệt
+> kê ví dụ tới **lỗi 47** — nó chưa bao giờ được cập nhật theo bảng lỗi. Không
+> phải mọi lỗi 48–147 thiếu lớp: **cột thứ hai của bảng lỗi mới là nơi khai
+> lớp**, và mọi dòng đều có. Bảng lớp dưới đây đọc như *tuyển ví dụ*, không như
+> chỉ mục đầy đủ. Lấp nó cần đọc lại 100 dòng và không sửa được lỗi nào, nên
+> để nguyên có nhãn.
 
 ## Mười một lớp nguyên nhân
 

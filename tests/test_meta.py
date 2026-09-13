@@ -263,6 +263,22 @@ class TestConSoTrongTaiLieuKhopNguonDocDuoc(unittest.TestCase):
         self.assertEqual(int(m.group(1)), len(DEFAULTS),
                          "STABILITY.md nói số khoá khác `len(DEFAULTS)`")
 
+    def test_so_guard_trong_stability_khop_matchers(self):
+        """Cùng lớp với phép trên, cùng tệp, và đã trôi thật: `STABILITY.md`
+        nói "Guards (9 guards)" với bảng thiếu `tool-bypass` khi
+        `GUARD_MATCHERS` đã có 10 (đo 2026-09-14). Phép trước chỉ nối số
+        **khoá cấu hình**, nên con số ngay dưới nó trôi tự do."""
+        from aisef.harness.guardrails import GUARD_MATCHERS
+        text = (self.DOCS / "STABILITY.md").read_text(encoding="utf-8")
+        m = re.search(r"### Guards \((\d+) guards\)", text)
+        self.assertIsNotNone(m, "không đọc được số guard ở STABILITY.md — tiêu đề đã đổi dạng")
+        self.assertEqual(int(m.group(1)), len(GUARD_MATCHERS),
+                         "STABILITY.md nói số guard khác `len(GUARD_MATCHERS)`")
+        for ten in sorted(GUARD_MATCHERS):
+            with self.subTest(guard=ten):
+                self.assertIn(f"| `{ten}` |", text,
+                              f"guard `{ten}` có trong GUARD_MATCHERS nhưng không có dòng nào ở bảng STABILITY.md")
+
     def test_nhom_khoa_trong_stability_phu_het_defaults(self):
         from aisef.config import DEFAULTS
         text = (self.DOCS / "STABILITY.md").read_text(encoding="utf-8")

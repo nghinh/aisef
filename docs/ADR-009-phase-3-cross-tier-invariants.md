@@ -348,12 +348,17 @@ behaviour-shaped, leave this weight at 0.
   multiple candidate branches (re-verify across rebases) need a
   per-branch run id.  Not urgent: ``ready_with_identity`` is
   fail-closed when the run id mismatches.
-- The same-UID same-filesystem hostile-simulator test
+- ~~The same-UID same-filesystem hostile-simulator test
   (``_uid_filesystem_race``) was documented in the audit but not
-  implemented; the lease file uses ``os.O_CLOEXEC`` plus
-  ``flock_ex_nb`` but on a kernel that hands out different UIDs to
-  different processes, ``flock`` semantics differ — a stress test is
-  the right next step before any multi-tenant deployment.
+  implemented~~ — **done 2026-09-13, this bullet corrected 2026-09-14.**
+  The stress test exists as ``tests/test_lease_stress.py``, which cites this
+  deferral in its own docstring and spawns real subprocesses rather than
+  threads (``flock`` grants by open file description, so two threads in one
+  process can both win where two processes cannot). The lease file uses
+  ``os.O_CLOEXEC`` plus ``flock_ex_nb``; on a kernel that hands out different
+  UIDs to different processes ``flock`` semantics still differ, and that
+  cross-UID case remains unmeasured — the test covers same-UID only, which is
+  what the bullet asked for.
 
 ## Follow-up: two cross-tier defects in the budget seam
 

@@ -194,15 +194,24 @@ Do **not** ship any claim that "guards help weak agents" based on simulator resu
 The remaining B/C/D queue is written down in
 [`docs/EXECUTION-PLAN.md` § Hàng đợi bench phase A–D](EXECUTION-PLAN.md#hàng-đợi-bench-phase-ad-chốt-2026-09-12)
 — it did not exist on disk until 2026-09-12, when this pointer was found dangling.
-Next in line: **B-3** (frontier on the 12 A-2 tasks), then **C-1** (a real
-weak model, which is the only condition that can answer the guard question
-this report explicitly declines to answer).
+
+**Queue state corrected 2026-09-14.** This paragraph used to say "next in line:
+B-3, then C-1". The queue was run in the other order: **C-1 closed 2026-09-13**
+([BENCH-REPORT-C1](BENCH-REPORT-C1.md), 12 A-2 tasks × 3 attempts × 2
+conditions on a non-frontier model) and **C-1b** after it
+([BENCH-REPORT-C1B](BENCH-REPORT-C1B.md), the 3 discriminating tasks × 6
+attempts). C-1's answer to the guard question this report declines to answer,
+**within the guard layer it measured, is "no"**. The delta **changed sign**
+between the two cohorts — −0,06 at n=3, +0,06 at n=6 — and C-1b reads that as
+the shape of noise, not of an effect: "no improvement measured, and no
+degradation measured either". **B-3 (frontier on the 12 A-2 tasks) is the one
+still not run** — it needs a credential this environment does not have.
 
 ---
 
 ## 7. Corrected simulator re-run (2026-09-12 follow-up)
 
-Historical numbers in §3 are preserved, **not** retroactively regenerated. After the §3 measurement, three concrete defects were identified in `aisef/clients/simulated.py` and corrected in the worktree but not on the bench path:
+Historical numbers in §3 are preserved, **not** retroactively regenerated. After the §3 measurement, three concrete defects were identified in `aisef/clients/simulated.py` (the path as of 2026-09-12; the file moved to `tests/bench/simulated.py` later that day so the release wheel would stop shipping bench-only code — pointer added 2026-09-14) and corrected in the worktree but not on the bench path:
 
 1. `_read_gold` created `.sim_scratch` and `.sim_clean` inside the frozen `tests/bench/tasks/<id>/` directory. Side-effect: mutated task-directory mtime on every attempt and littered the gitignore-free area inside the dataset fixture.
 2. `_read_gold` did not honor `AISEF_BENCH_AISEF_ROOT` from `RunSpec.env`; it walked four levels up from `task_dir` to find a "repo root". Worked in production (`_runner.run` sets the env var), but unit tests with synthetic worktrees proved ambiguous.

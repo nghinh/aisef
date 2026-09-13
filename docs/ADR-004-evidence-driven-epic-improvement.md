@@ -641,6 +641,20 @@ Dừng: "cải thiện biên ≤ 0 trong 2 vòng liền (loop-4, loop-5)" — `i
 
 **Chưa đo:** đường cong nhiều vòng hơn (còn 15 gap; kỳ vọng phẳng khi tới các gap cần route/màn hình của story sau), và B3/B5/B6 trên `par`.
 
+> **Chú thích 2026-09-14 — "còn 15 gap" không mang được danh sách, và nói ra vì sao.**
+> Luật ở [ADR-009 § Open](ADR-009-phase-3-cross-tier-invariants.md#open--the-four-remaining-semantic-issues-reconstructed-2026-09-12)
+> đòi mọi phát biểu dạng "còn N thứ" phải mang danh sách trên đĩa trong cùng
+> tài liệu. Con số 15 ở trên là ảnh sổ hành vi của `e9` ngày 2026-09-06; danh
+> sách 15 gap ấy sống trong `e9/_bmad-output/ledger.json`, và **cây bằng chứng
+> `e9` không còn trên máy** (`ls -d /Users/nghinh/Downloads/projects/e9` →
+> không có; mất mát này cũng là lý do E4 phải đo trên `todo-e2e`, xem
+> [E4-COST-DECOMPOSITION](E4-COST-DECOMPOSITION.md)). Nên con số này là **chưa
+> kiểm được lại**, không phải đã kiểm. Phép đo duy nhất kết lại được nó: chạy
+> lại `e9` EPIC-01 từ đầu rồi `aisef issues` in bảng gap — tốn tiền thật, và
+> không trả lời câu hỏi nào đang mở. Bài học đã ghi ở
+> [FAILURE-TAXONOMY](FAILURE-TAXONOMY.md) lỗi 129: một con số đếm mà không kèm
+> danh sách thì không kiểm toán được về sau.
+
 **Chưa đo (B1):** e9 EPIC-01 với agent thật — ΔVERIFIED, REOPENED → 0,
 chi phí/vòng so với story trung bình. Rủi ro đã thấy trước: 18 GAP của e9
 01-01/02/03 cùng một gốc (vitest không in tên test) — story sửa cho

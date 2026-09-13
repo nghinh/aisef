@@ -682,10 +682,18 @@ kết quả.
 | **B-1** | Bench smoke: simulator đi hết `R.run` | ✅ `5f8957c` | |
 | **B-2** | **Dataset manifest ghim byte task-fixture** | ✅ `bfb0709` | `MANIFEST.sha256` khớp trước và sau mỗi lần chạy |
 | **B-3** | **Frontier trên 12 task A-2** — 3 lượt × 2 điều kiện = 72 phiên | ⏳ chưa chạy (~$50–80) | pass@1/pass@3, ổn định, tỉ lệ chi phí, số lần guard chặn; kết quả null vẫn ghi |
-| **C-1** | **Cột model yếu *thật*** (model rẻ, không phải simulator) — 12 × 3 × 2 | 🔄 chạy 12/09 19:10 → 13/09, 11/12 task xong, `multi-4` đang chạy. Chi phí nhà cung cấp báo: **0,00 $** | trả lời "guard có cứu agent yếu không"; quan sát ghi trong lúc chạy ở [BENCH-OBSERVATIONS-C1](BENCH-OBSERVATIONS-C1.md) O-1…O-11 |
+| **C-1** | **Cột model yếu *thật*** (model rẻ, không phải simulator) — 12 × 3 × 2 | ✅ **đóng 13/09 01:57** (5,8 giờ, 1 526 turn, 75 lượt; nhà cung cấp báo **0,00 $**) — [BENCH-REPORT-C1](BENCH-REPORT-C1.md). Câu trả lời trong phạm vi tầng guard: **không**. Kéo theo **C-1b** ✅ (13/09 03:15 → 05:34, 3 task phân biệt được × 6 lượt: AISEF 0,94 vs trần 0,89) — [BENCH-REPORT-C1B](BENCH-REPORT-C1B.md). *Ô này còn ghi "🔄 … `multi-4` đang chạy" tới 2026-09-14.* | trả lời "guard có cứu agent yếu không"; quan sát ghi trong lúc chạy ở [BENCH-OBSERVATIONS-C1](BENCH-OBSERVATIONS-C1.md) O-1…O-11 và [BENCH-OBSERVATIONS-C1B](BENCH-OBSERVATIONS-C1B.md) |
 | **C-2** | **Metric "xong giả"**: tuyên bố xong nhưng test đỏ · không có test cho tiêu chí · ghi ngoài scope · hồi quy P2P | ✅ công cụ xong (`python3 -m tests.bench analyze`), đo trên C-1 | bảng hai cột **+ cột "phiên bị CLI cắt"**: 9/10 lượt "xong giả" của nhánh AISEF thật ra là phiên bị cắt, nên metric này không phân biệt được gì trên cohort ấy — và bảng nói ra điều đó |
 | **C-3** | Tỉ lệ chênh chi phí có ngưỡng phát hành (v1.3 §6.4) | ⏳ chờ B-3 | "đạt nếu chi phí AISEF ≤ 2× trần ở ≥80 % task" |
 | **D-1** | `partial` ở mức hunk/hàm thay vì mức tệp (v1.3 §6.2) | ⏳ chỉ làm nếu A-3 còn sống ở v2.0 | 9/12 task A-2 có gold một tệp nên `partial` mức tệp thiên về PASS |
 | **D-2** | Phễu tester: coder gọi tester ở ranh giới eval (v1.3 §6.5) | ⏳ chưa lên lịch | đếm F2P xanh độc lập với đường đi của agent |
 
-Thứ tự thực thi: **B-3 → C-1 → C-2 → C-3**. D chỉ mở sau khi C có số.
+Thứ tự thực thi **dự kiến** (chốt 12/09): B-3 → C-1 → C-2 → C-3. D chỉ mở sau
+khi C có số.
+
+**Thứ tự thực tế** (đính chính 2026-09-14): **C-1 → C-1b → C-2**, còn **B-3
+vẫn chưa chạy**. Lý do đổi thứ tự đã ghi, không im lặng: chủ dự án chỉ đạo
+không dùng Anthropic API key, nên cột frontier thiếu credential trong môi
+trường này — xem [DANH-GIA-360-2026-09-12 § Thay đổi kế hoạch đợt 1](DANH-GIA-360-2026-09-12.md).
+Chạy C-1 trước là được lợi (đó đúng là câu hỏi trung tâm), không phải đành
+chịu. C-3 vẫn chờ B-3 vì ngưỡng chi phí của nó định nghĩa trên cột frontier.

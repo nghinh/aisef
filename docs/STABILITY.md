@@ -25,7 +25,7 @@ Groups: `app.*`, `clients.*`, `context.*`, `cost.*`, `coverage.*`,
 `improve.*`, `memory.*`, `review.*`, `route.*`, `run.*`, `sandbox.*`,
 `security.*`, `skills.*`, `story.*`, `tools.*`, `verify.*`.
 
-### Guards (9 guards)
+### Guards (10 guards)
 
 | Guard | Hook | Tool matcher |
 |---|---|---|
@@ -37,6 +37,7 @@ Groups: `app.*`, `clients.*`, `context.*`, `cost.*`, `coverage.*`,
 | `injection` | `PreToolUse` | `Write\|Edit` |
 | `process-ref` | `PreToolUse` | `Write\|Edit` |
 | `secret` | `PreToolUse` | `Write\|Edit` |
+| `tool-bypass` | `PreToolUse` | `Bash` |
 | `write-scope` | `PreToolUse` | `Write\|Edit\|NotebookEdit` |
 
 New guards may be added. Existing guards keep their name, hook type, and
