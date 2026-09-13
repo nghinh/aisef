@@ -97,7 +97,44 @@ def cmd_init(args) -> int:
     print(f"wrote {path}")
     if stack:
         print(f"stack: {stack} — test/lint/sandbox configured")
+        thieu = _cong_cu_chua_co(Path(args.project), cfg)
+        if thieu:
+            print("\n".join(thieu))
     return EXIT_OK
+
+
+def _cong_cu_chua_co(project: Path, cfg) -> list[str]:
+    """Which configured tool commands cannot run on this machine yet.
+
+    A preset writes a command; whether the binary exists is a property of the
+    machine (bug 82). `npx eslint` in a project with no eslint and no flat
+    config exits non-zero, and nothing notices until a story fails its gate
+    on lint — `provisioned()` asks whether the key is set, not whether the
+    command runs, which is the right question for a configuration check and
+    the wrong one to rely on alone.
+    """
+    ra = []
+    for key in ("tools.test", "tools.lint"):
+        lenh = str(cfg[key] or "").strip()
+        if not lenh:
+            continue
+        phan = lenh.split()
+        ten = phan[0]
+        if ten in ("npx", "npm", "pnpm", "yarn", "bunx"):
+            ten = next((t for t in phan[1:] if not t.startswith("-")), "")
+            if not ten or ten in ("run", "test", "exec"):
+                continue
+            if (project / "node_modules" / ".bin" / ten).exists():
+                continue
+            them = " (and a flat config file)" if ten == "eslint" else ""
+            ra.append(f"  ○ `{key}` = `{lenh}` — needs `{ten}` installed in this "
+                      f"project{them}: `npm i -D {ten}`. Until then "
+                      f"`aisef tool {key.split('.')[1]}` reports not-runnable, and the "
+                      f"story gate fails on it after the session is paid for")
+        elif not shutil.which(ten):
+            ra.append(f"  ○ `{key}` = `{lenh}` — `{ten}` is not on PATH on this machine; "
+                      f"install it or set `{key}` to a command that runs here")
+    return ra
 
 
 def cmd_setup(args) -> int:

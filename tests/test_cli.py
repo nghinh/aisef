@@ -358,6 +358,32 @@ class TestReviewReadinessTinhLaiThieuGi(CliTestCase):
         self.assertIn("configure `tools.test`", out)
 
 
+class TestInitNoiRoCongCuChuaChayDuoc(CliTestCase):
+    """Lỗi 82 lặp lại ở lint: preset ghi ra một lệnh, còn việc lệnh ấy chạy
+    được hay không là thuộc tính của **máy**. `npx eslint` trong một dự án
+    chưa cài eslint thoát khác 0, và không ai biết cho tới khi một story
+    trượt cổng vì lint — sau khi đã trả tiền cho phiên."""
+
+    def test_node_chua_cai_eslint_thi_noi_ra(self):
+        code, out, _ = self.run_cli("init", "--stack", "node")
+        self.assertEqual(code, EXIT_OK)
+        self.assertIn("tools.lint", out)
+        self.assertIn("npm i -D eslint", out)
+
+    def test_da_cai_thi_im_lang(self):
+        (self.project / "node_modules" / ".bin").mkdir(parents=True)
+        (self.project / "node_modules" / ".bin" / "eslint").write_text("", encoding="utf-8")
+        _, out, _ = self.run_cli("init", "--stack", "node")
+        self.assertNotIn("npm i -D eslint", out)
+
+    def test_lenh_tren_path_thi_im_lang(self):
+        """`python -m pytest` / `node --test`: binary có trên PATH thì không nói gì."""
+        from aisef.cli.harness import _cong_cu_chua_co
+        from aisef.config import Config, DEFAULTS
+        cfg = Config({**DEFAULTS, "tools.test": "node --test", "tools.lint": ""})
+        self.assertEqual(_cong_cu_chua_co(self.project, cfg), [])
+
+
 class TestPlanCanhBaoDaCoFile(CliTestCase):
     """Lỗi 110: pha lập kế hoạch chỉ đọc `docs/requirements.md`, nên một kho
     đã có sẵn file vẫn được lập kế hoạch như thư mục rỗng."""
