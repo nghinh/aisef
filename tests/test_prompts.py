@@ -177,6 +177,20 @@ class TestPromptContent(unittest.TestCase):
         self.assertIn("Behaviour another story owns", body)
         self.assertIn("acceptance criteria are the", body)
 
+    def test_nguoi_viet_ma_cung_thay_ca_ke_hoach_de_khong_lam_ho_story_sau(self):
+        """Lỗi 142. Người viết mã chỉ thấy chỉ mục **của epic mình** — trạng
+        thái, không phải đầu việc còn lại. todo-cli 2026-09-13: người viết
+        STORY-03-01 làm luôn `--done`/`--open` (toàn bộ STORY-03-02), người
+        viết STORY-04-01 làm luôn nhánh lỗi `task not found` (toàn bộ
+        STORY-04-02). Hành vi giao sớm nằm sẵn trên nhánh khi story sau bắt
+        đầu, nên không test nào của nó đỏ được ở điểm rẽ nhánh — story chết
+        kẹt, phải sửa kế hoạch bằng tay."""
+        prompt = self.catalog.get("story-implement")
+        self.assertIn("roadmap", prompt.slots)
+        body = prompt.body
+        self.assertIn("someone else's turn", body)
+        self.assertIn("undeliverable", body)
+
 
 class TestSlotBanDoMa(unittest.TestCase):
     """ADR-005 V7: slot `repo_map` ở cả ba vai; knob 0 → slot rỗng và prompt

@@ -1,6 +1,6 @@
 ---
 name: story-implement
-version: 10
+version: 11
 role: developer
 ---
 # {{ story_id }} — {{ story_title }}
@@ -46,6 +46,25 @@ history: for details on a story or a behavior, call
 things you must not break.
 
 {{ index }}
+
+## The rest of the plan
+
+One line per story in the whole plan. Everything here that is not yours is
+**someone else's turn** — do not build it, not even when it is two lines away
+and obviously missing.
+
+A later story has to prove its tests fail without its code. Behaviour you ship
+early is already on the branch when that story starts, so no test its developer
+writes can be red, and the story deadlocks: it cannot be delivered at all.
+Measured on todo-cli 2026-09-13 — STORY-03-01's developer added `--done` and
+`--open` filtering (all of STORY-03-02) and STORY-04-01's added the
+`task not found` error path (all of STORY-04-02). Both later stories were
+unbuildable and had to be amended by hand.
+
+Being minimal is the requirement here, not a style preference. If your criteria
+do not ask for it, leave it undone.
+
+{{ roadmap }}
 
 ## Behaviors to preserve
 
@@ -114,6 +133,9 @@ yourself. Your job is to build the committed components.
   do not install then inform.
 * Do not touch files outside your scope, not even to "clean up while
   you're at it".
+* Do not implement behaviour your criteria do not ask for — see "The rest of
+  the plan". Shipping a later story's behaviour early makes that story
+  undeliverable.
 * Do not rename existing test titles: the harness records test names
   **before** you start; a changed title reads as "lost test" and the
   attempt fails. If you need to tag a criterion, prepend `AC_…:` before

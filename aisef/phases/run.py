@@ -438,6 +438,58 @@ def run_epic(
     return True
 
 
+#: Note kind recording which criteria the story branch was written against.
+_CONTRACT_NOTE = "story:contract"
+
+
+def _contract_fingerprint(story: Story) -> str:
+    """Hash of the acceptance criteria — what this story's tests must prove.
+
+    The criteria only, not the whole story card: the card also carries the
+    harness-added scope paths, and those move with framework upgrades while
+    saying nothing about what the story is.
+    """
+    import hashlib
+
+    text = "\n".join(str(c).strip() for c in (story.acceptance_criteria or []))
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
+
+
+def _drop_branch_written_for_other_criteria(
+    story: Story, *, worktrees: WorktreeManager, artifact_root: Path
+) -> None:
+    """Discard a story branch whose commits were written against other criteria.
+
+    A failed story keeps its branch on purpose: the next attempt builds on the
+    last one. But when the operator amends the story — which is exactly what the
+    plan-deadlock message asks them to do — those commits answer a question no
+    longer being asked, and criteria **codes** survive renumbering. Measured on
+    todo-oc STORY-04-02 2026-09-14: after AC-1 was dropped and AC-2/AC-3 merged,
+    the branch still carried `AC-STORY-04-02-1: textarea has a visible
+    placeholder` — a test that now satisfies the *criteria have tests* check for
+    a criterion about button opacity, while the criterion it claims to cover has
+    no test at all. The developer opened a tree where everything was already
+    green and wrote nothing. No gate can read prose and catch this; the only
+    honest move is to not carry the old work over.
+    """
+    from ..harness.observe import NOTE, Event, EvidenceStore
+    from ..harness.runlog import run_log
+
+    store = EvidenceStore(artifact_root)
+    now = _contract_fingerprint(story)
+    last = store.read(story.id).last(NOTE, _CONTRACT_NOTE)
+    before = str((last.detail if last else {}).get("fingerprint") or "")
+    if before == now:
+        return
+    if before and worktrees.has_branch(story.id):
+        worktrees.remove(story.id, delete_branch=True)
+        run_log(artifact_root,
+                f"story={story.id} criteria changed since the last attempt — "
+                f"story branch discarded, starting from the base again")
+    store.record(story.id, Event(kind=NOTE, name=_CONTRACT_NOTE,
+                                 detail={"fingerprint": now}))
+
+
 def _run_wave(
     story_ids: list[str],
     plan: Plan,
@@ -486,6 +538,9 @@ def _run_wave(
         # it survives even a killed process — that is exactly when it matters.
         with StoryRunTransaction(story_id, artifact_root=artifact_root) as tx:
             workdir = project
+            if worktrees is not None and not verify_only:
+                _drop_branch_written_for_other_criteria(
+                    story, worktrees=worktrees, artifact_root=artifact_root)
             if worktrees is not None:
                 # Re-verification: **do not** bring main into the branch —
                 # the candidate is HEAD of the story branch, the exact

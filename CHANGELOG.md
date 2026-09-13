@@ -298,6 +298,42 @@ unlocated items deduped by their own text so two distinct ones stay two.
 Replayed over eight real review files: 29 becomes 2, matching the JSON, and the
 genuine blockers in the other reviews survive.
 
+**A story branch is discarded when its criteria change** (bug 143). A failed
+story keeps its branch on purpose — the next attempt builds on the last one —
+but nothing tied that branch to the criteria it was written for. Amend the
+story, which is exactly what the plan-deadlock message asks for, and the old
+commits come back to answer a question no longer being asked.
+
+On todo-oc STORY-04-02 the branch still carried `AC-STORY-04-02-1: textarea has
+a visible placeholder` after AC-1 was dropped and AC-2/AC-3 were merged. The
+developer opened a tree where everything already passed and wrote nothing in
+twenty turns. The nop control held — those tests are green at the parent SHA, so
+the gate refused the attempt — but the attempt was spent, and a second identical
+one would have produced the plan-deadlock message, blaming the plan that had
+just been corrected. The case the nop control cannot hold is a stale test that
+*is* red at the parent: it passes the control while its code labels behaviour it
+does not test.
+
+The criteria are now fingerprinted into evidence each run — the criteria alone,
+not the story card, whose harness-added scope paths move with every framework
+upgrade. A changed fingerprint drops the branch and says so in `run.log`.
+`--verify-only` is exempt: it grades the candidate that is already there.
+
+**The developer now sees the whole plan, not just its own epic's status**
+(bug 142). Four todo-cli stories deadlocked on `tests verify story` — their
+criteria were already green at the branch point — and the git history named the
+cause: STORY-03-01's developer had written `--done`/`--open` filtering, all of
+STORY-03-02, and STORY-04-01's had written the `task not found` error path, all
+of STORY-04-02. Not a planner writing redundant stories (bug 128's case) but a
+developer working past its criteria.
+
+Behaviour shipped early is already on the branch when the later story starts,
+so no test that story's developer writes can be red at its branch point, and
+the story becomes undeliverable — two sessions burned, then a hand edit to the
+plan. The reviewer has had the plan-wide `roadmap` slot since bug 58; the
+developer role never got it. It does now, with the consequence spelled out and
+both measured cases named.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on

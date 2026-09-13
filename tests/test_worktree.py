@@ -482,3 +482,84 @@ class TestWorktreeTam(WorktreeTestCase):
             with self.wm.temporary("0000000"):
                 pass
         self.assertEqual([d.name for d in self.wm.root.iterdir() if d.is_dir()], [])
+
+
+class TestNhanhCuKhiTieuChiDoi(WorktreeTestCase):
+    """Lỗi 143. Story hỏng **giữ** nhánh là cố ý: lượt sau đứng trên lượt
+    trước. Nhưng khi người vận hành sửa tiêu chí — đúng việc thông báo chết
+    kẹt bảo họ làm — thì các commit ấy trả lời một câu hỏi không còn được
+    hỏi nữa, trong khi **mã tiêu chí** sống sót qua việc đánh số lại.
+
+    Đo trên todo-oc STORY-04-02 ngày 2026-09-14: bỏ AC-1, gộp AC-2 với AC-3,
+    nhánh vẫn mang `AC-STORY-04-02-1: textarea has a visible placeholder`.
+    Người viết mã mở ra thấy mọi thứ đã xanh nên không viết gì trong 20 lượt.
+    Phép kiểm nop chặn được (test cũ xanh ở điểm rẽ nhánh) nên không có PASS
+    giả — nhưng lượt ấy mất trắng, và lượt sau y hệt sẽ ra thông báo chết kẹt
+    đổ cho *kế hoạch* vừa được sửa đúng.
+    """
+
+    def setUp(self):
+        super().setUp()
+        from aisef.control.normalize import Story
+
+        self.artifacts = Path(self._tmp.name) / "_bmad-output"
+        self.artifacts.mkdir()
+        self.story = Story(id="STORY-01-01", epic_id="EPIC-01", title="t",
+                           acceptance_criteria=["nút mờ khi ô trống"])
+
+    def _chay(self, story):
+        from aisef.phases.run import _drop_branch_written_for_other_criteria
+
+        _drop_branch_written_for_other_criteria(
+            story, worktrees=self.wm, artifact_root=self.artifacts)
+
+    def _nhanh_co_viec(self, story_id: str) -> str:
+        wt = self.wm.create(story_id)
+        (wt.path / "src" / "x.py").write_text("X = 1\n", encoding="utf-8")
+        git(wt.path, "add", "-A")
+        git(wt.path, "commit", "-qm", "attempt 1")
+        sha = git(wt.path, "rev-parse", "HEAD").strip()
+        self.wm.remove(story_id)          # worktree đi, nhánh ở lại
+        return sha
+
+    def test_lan_dau_chi_ghi_nho_khong_xoa_gi(self):
+        sha = self._nhanh_co_viec(self.story.id)
+        self._chay(self.story)
+        self.assertTrue(self.wm.has_branch(self.story.id))
+        self.assertEqual(
+            git(self.repo, "rev-parse", self.wm.branch_for(self.story.id)).strip(), sha)
+
+    def test_tieu_chi_khong_doi_thi_giu_nguyen_viec_cu(self):
+        self._chay(self.story)
+        sha = self._nhanh_co_viec(self.story.id)
+        self._chay(self.story)
+        self.assertTrue(self.wm.has_branch(self.story.id))
+        self.assertEqual(
+            git(self.repo, "rev-parse", self.wm.branch_for(self.story.id)).strip(), sha)
+
+    def test_tieu_chi_doi_thi_bo_nhanh(self):
+        from aisef.control.normalize import Story
+
+        self._chay(self.story)
+        self._nhanh_co_viec(self.story.id)
+        sua = Story(id=self.story.id, epic_id="EPIC-01", title="t",
+                    acceptance_criteria=["nút mờ khi ô trống, sáng khi có chữ"])
+        self._chay(sua)
+        self.assertFalse(self.wm.has_branch(self.story.id),
+                         "nhánh viết cho tiêu chí cũ phải bị bỏ")
+        self._chay(sua)                    # lần sau không còn gì để bỏ
+        self.assertFalse(self.wm.has_branch(self.story.id))
+
+    def test_pham_vi_ghi_doi_khong_phai_ly_do_bo_viec(self):
+        """Thẻ story còn mang các đường dẫn harness tự thêm — chúng đổi theo
+        bản nâng cấp khung, không nói gì về việc story là gì."""
+        from aisef.control.normalize import Story
+
+        self._chay(self.story)
+        sha = self._nhanh_co_viec(self.story.id)
+        self._chay(Story(id=self.story.id, epic_id="EPIC-01", title="t",
+                         acceptance_criteria=list(self.story.acceptance_criteria),
+                         write_scope=["src/", "tests/"]))
+        self.assertTrue(self.wm.has_branch(self.story.id))
+        self.assertEqual(
+            git(self.repo, "rev-parse", self.wm.branch_for(self.story.id)).strip(), sha)
