@@ -22,6 +22,7 @@ the wrong time.
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import sys
@@ -415,6 +416,40 @@ def record(res: ToolResult, story_id: str, artifact_root, candidate: str = "",
     return str(log)
 
 
+def _cung_ban(binary: str) -> bool:
+    """Is the `aisef` on PATH the same installation the harness is running?
+
+    It has to be. The compiled hook, and every tool the agent is told to
+    call, run **that** binary while the story runs on **this** code, and
+    nothing in between says so. Measured 2026-09-13 on `todo-cli`: the
+    harness ran the source tree while `~/.local/bin/aisef` was a pipx
+    install three minor versions behind, so every guard the whole dogfood
+    recorded came from code that had none of the fixes being tested (lỗi
+    119). Skew is silent by construction — the old binary answers every call
+    successfully, by the old rules.
+
+    Identity is the **path this process was started from**, not a version
+    string: `__version__` comes from installed metadata, which in a source
+    checkout is whatever happens to be installed and can match by accident.
+    Started some other way (`python -m aisef.cli`, a test, an embedding)?
+    Then the answer is no, and the fallback — this interpreter plus the
+    module — is the running code by definition.
+    """
+    goc = sys.argv[0] if sys.argv else ""
+    if not goc:
+        return False
+    duong = Path(goc) if (os.sep in goc or (os.altsep or "") in goc) else None
+    if duong is None:
+        tim = shutil.which(goc)
+        if not tim:
+            return False
+        duong = Path(tim)
+    try:
+        return duong.resolve() == Path(binary).resolve()
+    except OSError:
+        return False
+
+
 def aisef_argv() -> list[str]:
     """The framework command as **argv**, which is what every caller needs.
 
@@ -425,7 +460,7 @@ def aisef_argv() -> list[str]:
     block, the whole run finished with zero guards (measured 2026-09-09 on
     `todo`: 46 sessions, 0 guard events, story exhausted on "guard ran").
     """
-    if shutil.which("aisef"):
+    if (tren_path := shutil.which("aisef")) and _cung_ban(tren_path):
         return ["aisef"]
     # Source repo: `bin/aisef` sits next to the package. Wheel installs do
     # **not** have that directory — before 0.2.0 this returned

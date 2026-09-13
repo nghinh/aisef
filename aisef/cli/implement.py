@@ -392,6 +392,13 @@ def cmd_tool(args) -> int:
         config=Config.load(args.project),
     )
     print(res.summary())
+    if not story:
+        # A run that records nothing must not look like a run that does. The
+        # prompt tells the agent "the gate reads evidence, not claims", so a
+        # green summary with no evidence behind it is the worst of both
+        # (lỗi 117): the agent believes the check is banked and stops.
+        print("⚠️  not recorded as evidence: no story id — pass `--story <id>` "
+              "(the harness sets AISEF_STORY_ID inside a story session)")
     # Intentional order (ADR-005 V11 A): machine-readable summary **before**
     # tail — failed test names in the first 5 lines so the agent does not
     # need to re-run the runner to find them.

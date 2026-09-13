@@ -527,6 +527,27 @@ class TestToolCommand(CliTestCase):
         from aisef.harness.observe import EvidenceStore
 
         self.assertTrue(EvidenceStore(self.artifacts).read("STORY-01-01").tests_green())
+        self.assertNotIn("not recorded", out)
+
+    def test_khong_co_story_thi_noi_ro_la_khong_ghi(self):
+        """Lỗi 117: prompt nói "cổng đọc bằng chứng chứ không đọc lời khai",
+        nên một lượt chạy không ghi gì mà in dấu ✅ là tệ nhất — agent tin là
+        đã có bằng chứng rồi dừng."""
+        import os
+
+        (self.project / ".ai").mkdir()
+        (self.project / ".ai" / "config.json").write_text(
+            '{"tools.test": "true"}', encoding="utf-8")
+        cu = os.environ.pop("AISEF_STORY_ID", None)
+        try:
+            code, out, _ = self.run_cli("tool", "test")
+        finally:
+            if cu is not None:
+                os.environ["AISEF_STORY_ID"] = cu
+        self.assertEqual(code, EXIT_OK)
+        self.assertIn("✅ test", out)
+        self.assertIn("not recorded as evidence", out)
+        self.assertIn("--story", out)
 
 
 class TestVerifyCommand(CliTestCase):
@@ -574,7 +595,8 @@ class TestRunCommand(CliTestCase):
         from aisef.cli.implement import _canh_bao_chua_bien_dich_guard
 
         (self.artifacts / "compile-report.json").write_text(
-            json.dumps({"clients": [{"client": "opencode", "blocks_at_source": True}]}),
+            json.dumps({"clients": [{"client": "opencode", "blocks_at_source": True,
+                                     "guards_wired": ["write-scope"]}]}),
             encoding="utf-8")
 
         class Adapter:
@@ -594,7 +616,8 @@ class TestRunCommand(CliTestCase):
         from aisef.cli.implement import _canh_bao_chua_bien_dich_guard
 
         (self.artifacts / "compile-report.json").write_text(
-            json.dumps({"clients": [{"client": "opencode", "blocks_at_source": True}]}),
+            json.dumps({"clients": [{"client": "opencode", "blocks_at_source": True,
+                                     "guards_wired": ["write-scope"]}]}),
             encoding="utf-8")
         plugin = self.project / ".opencode" / "plugin" / "aisef-guard.ts"
         plugin.parent.mkdir(parents=True)

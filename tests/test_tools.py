@@ -210,9 +210,19 @@ class TestLenhGoiFramework(unittest.TestCase):
     """`aisef_command()` là thứ đi vào hook và vào prompt — trỏ sai thì guard
     không chạy mà **không ai báo gì**."""
 
-    def test_uu_tien_ten_tren_path(self):
-        with mock.patch("shutil.which", return_value="/usr/local/bin/aisef"):
+    def test_dung_ten_tren_path_khi_chinh_no_khoi_dong_tien_trinh(self):
+        with mock.patch("shutil.which", return_value="/usr/local/bin/aisef"), \
+             mock.patch.object(sys, "argv", ["/usr/local/bin/aisef", "run"]):
             self.assertEqual(aisef_command(), "aisef")
+
+    def test_ten_tren_path_la_ban_khac_thi_khong_dung(self):
+        """Lỗi 119: "có trên PATH" không bằng "đúng bản đang chạy". Máy dogfood
+        có pipx 1.2.9 trên PATH trong khi harness chạy cây nguồn, nên guard ghi
+        được cả đợt đều do mã cũ chấm — mà mã cũ trả lời **thành công** mọi lời
+        gọi, chỉ bằng luật cũ, nên không có triệu chứng nào để lần."""
+        with mock.patch("shutil.which", return_value="/usr/local/bin/aisef"), \
+             mock.patch.object(sys, "argv", ["/opt/khac/aisef", "run"]):
+            self.assertNotEqual(aisef_argv(), ["aisef"])
 
     @unittest.skipIf(sys.platform == "win32",
                      "bin/aisef là script POSIX; Windows đi thẳng xuống python -m")
@@ -247,7 +257,8 @@ class TestLenhGoiFramework(unittest.TestCase):
         with mock.patch("shutil.which", return_value=None), \
              mock.patch.object(Path, "is_file", return_value=False):
             self.assertEqual(aisef_argv(), [sys.executable, "-m", "aisef.cli"])
-        with mock.patch("shutil.which", return_value="/usr/local/bin/aisef"):
+        with mock.patch("shutil.which", return_value="/usr/local/bin/aisef"), \
+             mock.patch.object(sys, "argv", ["/usr/local/bin/aisef", "run"]):
             self.assertEqual(aisef_argv(), ["aisef"])
 
 

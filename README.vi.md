@@ -65,7 +65,7 @@ nghiệm thu của dự án.
 | 2 | **Tools** | ba tool sinh bằng chứng (`test`, `lint`, `sast`) agent gọi bằng `aisef tool <tên> --story S`, cộng tra tài liệu; mỗi tool kèm câu "khi nào gọi · đọc kết quả thế nào · khi nào KHÔNG gọi" | `harness/tools.py` |
 | 3 | **Sandboxes & execution environments** | bốn bậc quyền, hợp đồng `ExecutionProvider`, năm **bảo đảm có tên** (`network_none`, `read_only_fs`, `non_root`, `no_host_mount`, `secrets_absent`); provider thiếu bảo đảm nào thì nói tên bảo đảm ấy, suy biến được dán nhãn chứ không im lặng | `harness/sandbox.py` |
 | 4 | **Orchestration logic** | định tuyến vai với **reviewer ≠ developer**, máy trạng thái story, xếp đợt theo phụ thuộc *và* phạm vi ghi, gói bàn giao mà mỗi slot ngữ cảnh đều khai nguồn | `control/`, `phases/` |
-| 5 | **Guardrails / hooks** | chín guard trên ba mốc vòng đời, mỗi guard là một lệnh độc lập trả mã thoát, biên dịch ra đúng thứ client hỗ trợ, khai ở một chỗ duy nhất | `harness/guardrails.py` |
+| 5 | **Guardrails / hooks** | mười guard trên ba mốc vòng đời, mỗi guard là một lệnh độc lập trả mã thoát, biên dịch ra đúng thứ client hỗ trợ, khai ở một chỗ duy nhất | `harness/guardrails.py` |
 | 6 | **Observability** | sự kiện có cấu trúc và có provenance, chi phí và độ trễ từng phiên, mọi phép kiểm gắn **SHA của ứng viên**, sổ hành vi, bản ghi bàn giao và phán quyết, kho benchmark | `harness/observe.py`, `control/ledger.py`, `tests/bench/` |
 
 Hai hệ quả đáng nói thẳng. Guard nằm ở nhóm 5 phía framework, nên **client không
@@ -198,11 +198,11 @@ phê duyệt hết hiệu lực, và sửa tầng trên làm mọi tầng dướ
 
 ## Guard
 
-Chín guard, mỗi guard là một lệnh trả mã thoát, nối vào ba mốc vòng đời:
+Mười guard, mỗi guard là một lệnh trả mã thoát, nối vào ba mốc vòng đời:
 
 | Mốc | Guard |
 |---|---|
-| trước mỗi tool | `write-scope` · `destructive` · `secret` · `git-stage` · `injection` · `process-ref` (luật 6: không mã story/epic trong nguồn) · `egress` (chặn kết nối ra host không trong allowlist) |
+| trước mỗi tool | `write-scope` · `destructive` · `secret` · `git-stage` · `injection` · `process-ref` (luật 6: không mã story/epic trong nguồn) · `egress` (chặn kết nối ra host không trong allowlist) · `tool-bypass` (chạy thẳng lệnh test/lint của dự án thay vì qua `aisef tool` — lượt chạy ấy không vào bằng chứng) |
 | sau mỗi tool | `diff-scope` |
 | khi agent định dừng | `completion` |
 
@@ -215,11 +215,14 @@ vào báo cáo thay vì im lặng — năng lực là thứ được **khai và 
 định là "chưa chứng minh", không phải "chắc là được". Từ v1.0.0, OpenCode
 là client **hạng nhất**: guard chặn được, hợp quy 10/10 (ngang Claude — xem
 ADR-006 §4), và `--format json` cho luồng máy đọc được (tool, token, cost
-theo nhà cung cấp).
+theo nhà cung cấp). Một guard là ngoại lệ: plugin API của OpenCode không có
+mốc chặn tương đương `Stop`, nên `completion` **không** được nối ở đó — báo
+cáo biên dịch liệt nó vào hậu kiểm, và cổng story hỏi lại đúng câu ấy từ bằng
+chứng: trượt story chứ không giữ được phiên lại.
 
 ## Lỗi thật đã gặp
 
-115 lỗi tìm bằng đo trên agent thật, xếp theo mười một lớp nguyên nhân kèm phép hồi quy: `docs/FAILURE-TAXONOMY.md`. Lỗi mới thì thêm một dòng vào đó cùng commit với test. Thay đổi theo phiên bản, kèm việc phải làm khi nâng cấp: `CHANGELOG.md`.
+121 lỗi tìm bằng đo trên agent thật, xếp theo mười một lớp nguyên nhân kèm phép hồi quy: `docs/FAILURE-TAXONOMY.md`. Lỗi mới thì thêm một dòng vào đó cùng commit với test. Thay đổi theo phiên bản, kèm việc phải làm khi nâng cấp: `CHANGELOG.md`.
 
 ## Hợp quy client
 

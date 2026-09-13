@@ -69,7 +69,9 @@ class CompileReport:
                 lines.append(f"  guards blocking at other hooks: {moments}")
         if self.guards_post_hoc:
             lines.append(f"  ⚠️  guards post-hoc only: {', '.join(self.guards_post_hoc)}")
-            lines.append("     — blocking does not occur at write time; `aisef verify` checks later")
+            lines.append("     — not wired into this client's hooks at all; the rule is re-asked "
+                         "afterwards from evidence (story gate, `aisef verify`), which cannot "
+                         "stop the action, only fail the story")
         if self.degradations:
             lines.append("  capabilities not at native level:")
             for d in self.degradations:
@@ -199,6 +201,17 @@ export const AisefGuardPlugin: Plugin = async ({{ $, directory, worktree }}) => 
 """
 
 
+#: Hook points each client can actually run a guard at. OpenCode's plugin API
+#: has `tool.execute.before` and `tool.execute.after` and no blocking
+#: equivalent of Stop — `session.idle` is an observer, throwing there does not
+#: hold the session open. Unlisted client: assume every point, and let its
+#: generator be the thing that proves otherwise.
+HOOK_EVENTS: dict[str, tuple[str, ...]] = {
+    "claude": ("PreToolUse", "PostToolUse", "Stop"),
+    "opencode": ("PreToolUse", "PostToolUse"),
+}
+
+
 def compile_for(
     client: str,
     project: Path | str,
@@ -214,8 +227,18 @@ def compile_for(
     report = CompileReport(client=client, degradations=adapter.degradations())
 
     blocks = adapter.supports(Capability.PRE_TOOL_GUARD).blocks_at_source
+    # What the generated file **actually** wires, not what the guard table
+    # lists. `build_opencode_plugin` has only `tool.execute.before/after`, so
+    # `completion` (Stop) is not in it — and the report said it was, for as
+    # long as OpenCode has been supported (lỗi 121). A capability report that
+    # reads its claims off the wrong list is the exact failure it exists to
+    # prevent. The rule it asks is still enforced: the story gate re-runs
+    # `check_completion` from evidence, which is what post-hoc means here.
+    moc = HOOK_EVENTS.get(client, tuple({e for e, _ in GUARD_MATCHERS.values()}))
+    noi_duoc = [k for k, (ev, _) in sorted(GUARD_MATCHERS.items()) if ev in moc]
+    report.guards_post_hoc.extend(k for k in sorted(GUARD_MATCHERS) if k not in noi_duoc)
     target = report.guards_wired if blocks else report.guards_post_hoc
-    target.extend(sorted(GUARD_MATCHERS))
+    target.extend(noi_duoc)
 
     if client == "claude":
         path = project / ".claude" / "settings.json"
@@ -262,9 +285,17 @@ def guard_expected(project: Path | str, client_id: str) -> bool:
     """Whether this project **expects** guards to run in this client's sessions.
 
     The answer lives in `compile-report.json`: if the client's hooks were
-    compiled and it declares `blocks_at_source`, every developer session must
+    compiled and **any** guard is wired into them, every developer session must
     leave at least one guard trace.  Not compiled means no expectation — and
     the gate says "not compiled", not pretending checks ran.
+
+    Read from `guards_wired`, not `blocks_at_source`: the latter says *every*
+    guard blocks at its own hook, which stopped being true for OpenCode the
+    moment `completion` was reported honestly (lỗi 121). Eight guards still
+    block there on every tool call, so "expect a guard trace" is still right —
+    keying the expectation off the stricter flag would have turned the `guard
+    ran` check into "not applicable" for a whole client, which is a gate going
+    quiet as a side effect of a documentation fix.
     """
     path = Path(project) / "_bmad-output" / "compile-report.json"
     if not path.is_file():
@@ -275,5 +306,5 @@ def guard_expected(project: Path | str, client_id: str) -> bool:
         return False
     for c in data.get("clients", []):
         if c.get("client") == client_id:
-            return bool(c.get("blocks_at_source"))
+            return bool(c.get("guards_wired"))
     return False

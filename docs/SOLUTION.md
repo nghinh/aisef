@@ -136,6 +136,7 @@ Hệ quả: **không nhờ thực thể bị giám sát tự giám sát nó.** A
 | `PreToolUse` · `Write\|Edit` | `process-ref` | mã `STORY-…`/`EPIC-…` trong mã nguồn (luật 6); test và tài liệu được phép |
 | `PreToolUse` · `Bash` | `git-stage` | `git add -A` |
 | `PreToolUse` · `Bash` | `destructive` | `rm -rf`, `git reset --hard`, `checkout --`; **mọi** `git push` (kể cả `--dry-run`), `git remote add/set-url`, `git credential*`/`-c credential.helper=` — push/merge là việc của harness sau cổng (ADR-005 V2, hợp quy C10) |
+| `PreToolUse` · `Bash` | `tool-bypass` | chạy thẳng lệnh test/lint/sast của dự án (`npm test`, `pytest -q`…) thay vì `aisef tool <tên>` — lượt chạy ấy không vào bằng chứng, mà cổng đọc bằng chứng chứ không đọc lời khai. Chạy hẹp để gỡ lỗi (thêm tham số, một tệp) **không** bị chặn (lỗi 116) |
 | `PreToolUse` · `WebFetch\|Bash` | `egress` | kết nối tới host chưa khai trong `sandbox.allow_hosts`; rỗng = không kiểm (ADR-005 V12) |
 | `PostToolUse` · `Write\|Edit\|NotebookEdit\|Bash` | `diff-scope` | file không liên quan bị chạm |
 | `Stop` | `completion` | kết thúc khi test chưa xanh — **cho dừng** khi test không chạy được hay chưa khai lệnh, kết cục ghi ở cổng (lỗi 2, 8) |
@@ -410,7 +411,7 @@ aisef change  FR-x "mô tả"           ghi FR, stale PRD trở xuống, sinh st
                                       STORY-CH-nn trong EPIC-CH (sinh bằng code)
 
 # Guard — client gọi vào tại mốc vòng đời (do `compile` nối sẵn)
-aisef guard write-scope|diff-scope|secret|git-stage|destructive|egress|injection|process-ref|completion
+aisef guard write-scope|diff-scope|secret|git-stage|destructive|tool-bypass|egress|injection|process-ref|completion
 
 # Theo dõi
 aisef memory status|providers|audit|consolidate [--json]
@@ -501,7 +502,15 @@ thiếu: `turn_limit: unsupported` (OpenCode không có cờ giới hạn lượ
 * hợp quy client (`docs/CONFORMANCE.md`) chạy cả hai client — cả hai đạt
   10/10 từ 2026-09-08;
 * hạn chế đã biết: OpenCode + Serena ghi `.serena/` ngoài `write_scope` khai
-  — harness từ chối đúng (vấn đề phía agent, không phải framework).
+  — harness từ chối đúng (vấn đề phía agent, không phải framework);
+* hạn chế đã biết (lỗi 121, 2026-09-13): plugin API của OpenCode chỉ có
+  `tool.execute.before/after`, không có mốc chặn tương đương `Stop`, nên
+  `completion` **không được nối** ở client này. Báo cáo biên dịch từng liệt nó
+  là "đã nối, chặn ở hook khác" — đọc lời khai từ `GUARD_MATCHERS` thay vì từ
+  tệp vừa sinh ra. Nay `guards_wired` chỉ liệt thứ có thật trong plugin,
+  `completion` vào `guards_post_hoc`, và kỳ vọng "guard phải để lại dấu vết"
+  đọc từ `guards_wired` chứ không từ `blocks_at_source` — để một đính chính
+  tài liệu không vô tình làm câm một mục cổng.
 
 **Phạm vi V1:** 4 bề mặt của Claude Code và OpenCode (mục 2.1). Antigravity hoãn — chưa test được.
 
@@ -822,7 +831,7 @@ aisef/control/scheduler.py     epic tuần tự, story song song theo đợt
 | 2 | `clients/` + `compile` + golden test | — |
 | 3 | `phases/plan` + normalizer + story splitter | 3 skill BMAD pipeline |
 | 4 | `phases/mockup` + contract extract | 2 skill mockup |
-| 5–6 | `harness/` 6 nhóm + `guardrails` 9 guard | PromptCatalog · 3 agent |
+| 5–6 | `harness/` 6 nhóm + `guardrails` 10 guard | PromptCatalog · 3 agent |
 | 7 | `harness/observe.py` · `control/gate.py` · `phases/qa.py` | kiểm định theo hợp đồng story |
 | 8 | `phases/deploy.py` | DevSecOps · runbook · cổng trước triển khai |
 | 9 | chạy đầu-cuối trên dự án mẫu | hiệu chỉnh |

@@ -686,20 +686,43 @@ def evaluate(
                 evidence=doc_xanh,
             ))
 
+    # Nop control (ADR-005 V3) asks TDD's question directly, so it is computed
+    # first even though it is reported second: when it has actually run and
+    # passed, the story's tests are **proven** red without the story's code —
+    # which is what red-before-green is a proxy for. A proxy must not block
+    # what the direct measurement cleared (lỗi 118): on todo-cli STORY-01-02
+    # the nop control passed ("5 tests with criteria codes are red or absent
+    # at parent SHA") while `TDD` failed, and the story was blocked by the
+    # weaker of the two. Only `PASSED` counts — NOT_APPLICABLE, UNRUNNABLE and
+    # UNCONFIGURED mean the control did not answer, so `TDD` stands alone.
+    nop = _nop_check(evidence, story_id, acceptance=acceptance, candidate=candidate)
+
     # TDD (G8): story added tests must have a red run before the last green.
     if added_tests is not None:
         if not added_tests:
             gate.checks.append(Check("TDD", Outcome.NOT_APPLICABLE, "story did not add tests"))
-        else:
+        elif red_before_green(evidence):
             gate.checks.append(Check(
-                "TDD", red_before_green(evidence),
-                "" if red_before_green(evidence) else
-                f"tests green on first run — not proven to verify anything "
-                f"({', '.join(added_tests[:3])}). Write tests first, see them fail, then write code.",
+                "TDD", True,
                 evidence=[e.seq for e in evidence.of(TOOL_RUN, "test")],   # red/green order read across full sequence
             ))
-    # Nop control (ADR-005 V3) right after TDD: same question, asked directly.
-    gate.checks.append(_nop_check(evidence, story_id, acceptance=acceptance, candidate=candidate))
+        elif nop.outcome is Outcome.PASSED:
+            gate.checks.append(Check(
+                "TDD", True,
+                f"no red run recorded, but the nop control proves the same thing "
+                f"directly — {nop.detail or 'story tests are red without the story code'}",
+                evidence=list(nop.evidence),
+            ))
+        else:
+            gate.checks.append(Check(
+                "TDD", False,
+                f"tests green on first run — not proven to verify anything "
+                f"({', '.join(added_tests[:3])}). Write tests first, run them through "
+                f"the recorded tool, see them fail, then write code — a run the harness "
+                f"did not record cannot prove anything.",
+                evidence=[e.seq for e in evidence.of(TOOL_RUN, "test")],
+            ))
+    gate.checks.append(nop)
 
     # Story verification contract. Unconfigured kinds are recorded as
     # **unconfigured**, not passed — they block at the pre-deploy gate, and

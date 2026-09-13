@@ -66,7 +66,7 @@ the acceptance yardstick for the project itself.
 | 2 | **Tools** | three evidence-producing tools (`test`, `lint`, `sast`) the agent calls as `aisef tool <name> --story S`, plus documentation lookup; every tool carries prose on when to call it, how to read its result, and when *not* to call it | `harness/tools.py` |
 | 3 | **Sandboxes & execution environments** | four permission levels, an `ExecutionProvider` contract, and five **named guarantees** (`network_none`, `read_only_fs`, `non_root`, `no_host_mount`, `secrets_absent`). A provider that cannot offer one says which one is missing; a degraded run is labelled, never silent. Isolation on a machine without Docker is **not** on the roadmap — [ADR-011](docs/ADR-011-sandbox-local-provider.md) says why, and what the `local` provider does and does not promise | `harness/sandbox.py` |
 | 4 | **Orchestration logic** | role routing where **reviewer ≠ developer**, a story state machine, wave scheduling by dependency *and* write scope, and handoff packets whose every context slot declares its source | `control/`, `phases/` |
-| 5 | **Guardrails / hooks** | nine guards on three lifecycle moments, each a standalone command returning an exit code, compiled into whatever the client supports, defined in one place | `harness/guardrails.py` |
+| 5 | **Guardrails / hooks** | ten guards on three lifecycle moments, each a standalone command returning an exit code, compiled into whatever the client supports, defined in one place | `harness/guardrails.py` |
 | 6 | **Observability** | structured events with provenance, cost and latency per session, every check bound to the **SHA of the candidate** it ran on, the behaviour ledger, handoff and verdict records, and a benchmark corpus | `harness/observe.py`, `control/ledger.py`, `tests/bench/` |
 
 Two consequences worth stating plainly. Guards live in group 5 on the framework
@@ -217,12 +217,12 @@ after approval voids it, and re-approving an upper layer marks every layer below
 
 ## Guards
 
-Nine guards, each a command returning an exit code, wired into three lifecycle
+Ten guards, each a command returning an exit code, wired into three lifecycle
 moments:
 
 | Moment | Guards |
 |---|---|
-| before every tool call | `write-scope` · `destructive` · `secret` · `git-stage` · `injection` · `process-ref` (rule 6) · `egress` (network destination allowlist) |
+| before every tool call | `write-scope` · `destructive` · `secret` · `git-stage` · `injection` · `process-ref` (rule 6) · `egress` (network destination allowlist) · `tool-bypass` (running the project's test/lint command directly instead of through `aisef tool`, which records nothing) |
 | after every tool call | `diff-scope` |
 | when the agent tries to stop | `completion` |
 
@@ -235,11 +235,15 @@ assurance in its report instead of staying silent — capability is **declared a
 tested**, defaulting to "unproven", never to "probably fine". Since v1.0.0
 OpenCode is a **first-class** client: guards block, conformance 10/10 (parity
 with Claude — see ADR-006 §4), and `--format json` gives a machine-readable
-stream (tools, tokens, cost per provider).
+stream (tools, tokens, cost per provider). One guard is the exception:
+OpenCode's plugin API has no blocking equivalent of `Stop`, so `completion`
+is not wired there — the compile report lists it as post-hoc, and the story
+gate re-asks the same question from evidence, which fails the story instead
+of stopping the session.
 
 ## Real bugs already hit
 
-115 bugs found by measurement on real agents, grouped into eleven cause
+121 bugs found by measurement on real agents, grouped into eleven cause
 classes with a regression check each: `docs/FAILURE-TAXONOMY.md`. A new bug adds
 a line there in the same commit as its test. Changes per version, and what to do
 when upgrading: `CHANGELOG.md`.

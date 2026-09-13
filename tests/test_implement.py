@@ -227,6 +227,54 @@ class TestHappyPath(ImplementTestCase):
         i_expected = src.index("tests red at parent (expected)")
         self.assertLess(i_unrun, i_expected, "phải hỏi 'chạy được không' trước khi nói 'đỏ đúng như mong đợi'")
 
+    def test_thieu_chinh_ma_cua_story_o_parent_la_do_hop_le(self):
+        """Lỗi 120 (todo-cli STORY-01-01, 2026-09-13): cây nop **cố tình**
+        không có mã của story, nên "cannot find module ../lib/store" là phép
+        đối chứng đang chạy đúng. Luật chung ("chưa test nào xanh thì coi là
+        không chạy được") không phân biệt được, vì story đầu của một dự án
+        greenfield không có test nào khác để in tên — và phép đối chứng mạnh
+        nhất bị ghi là "chưa thực hiện" đúng chỗ cần nó nhất."""
+        from aisef.harness.tools import NO_SETUP, ToolResult
+        from aisef.phases.implement import _vang_ma_cua_story
+
+        thieu_phu_thuoc = NO_SETUP + " — the project's dependencies are not installed here"
+        story = ["lib/store.js", "tests/store.test.js"]
+
+        res = ToolResult("test", ok=False, unrunnable=thieu_phu_thuoc,
+                         stdout="Error: Cannot find module '../lib/store'")
+        self.assertEqual(_vang_ma_cua_story(res, story), "lib/store.js")
+
+        # Thư viện dự án chưa cài: đúng là môi trường hỏng, phải giữ nguyên.
+        res = ToolResult("test", ok=False, unrunnable=thieu_phu_thuoc,
+                         stdout="Error: Cannot find module 'express'")
+        self.assertEqual(_vang_ma_cua_story(res, story), "")
+
+        # Không phải loại "thiếu phụ thuộc" thì không đụng tới.
+        res = ToolResult("test", ok=False, unrunnable="tool not installed or cannot load (exit 127)",
+                         stdout="npm: command not found")
+        self.assertEqual(_vang_ma_cua_story(res, story), "")
+
+        # Python: tên module là dấu chấm, không phải dấu gạch chéo.
+        res = ToolResult("test", ok=False, unrunnable=thieu_phu_thuoc,
+                         stdout="ModuleNotFoundError: No module named 'app.store'")
+        self.assertEqual(_vang_ma_cua_story(res, ["app/store.py"]), "app/store.py")
+
+        # Tệp test của story không tính: nó **có** trong cây nop.
+        res = ToolResult("test", ok=False, unrunnable=thieu_phu_thuoc,
+                         stdout="Cannot find module './tests/store.test'")
+        self.assertEqual(_vang_ma_cua_story(res, ["tests/store.test.js"]), "")
+
+    def test_run_nop_go_co_khong_chay_duoc_khi_thieu_ma_story(self):
+        """Đường thật, không chỉ hàm phụ: `run_nop` phải xoá `unrunnable`
+        trước khi ghi bằng chứng, nếu không cổng vẫn đọc UNRUNNABLE."""
+        import inspect
+        from aisef.phases import implement
+
+        src = inspect.getsource(implement.run_nop)
+        i_go = src.index("res.unrunnable = \"\"")
+        i_ghi = src.index("record_tool(res, story.id")
+        self.assertLess(i_go, i_ghi, "phải phân loại lại **trước** khi ghi")
+
     def test_nguoi_ra_soat_nhan_diff_that_khong_chi_ten_file(self):
         """Danh sách tên file bắt người rà soát dựng lại thứ harness đã
         biết — đo trên e9 là 31–43 lượt cho một story nhỏ."""
@@ -836,9 +884,13 @@ class TestKyVongGuardTheoBaoCaoBienDich(ImplementTestCase):
     và khai chặn tại nguồn thì phiên developer phải để lại dấu vết."""
 
     def bao_cao(self, client_id, blocks):
+        """`guards_wired` phải thật: kỳ vọng đọc từ đó, không từ
+        `blocks_at_source` — một client có 9/10 guard chặn tại nguồn vẫn phải
+        để lại dấu vết (lỗi 121)."""
         import json
         (self.artifacts / "compile-report.json").write_text(json.dumps({
-            "clients": [{"client": client_id, "written": [], "guards_wired": [],
+            "clients": [{"client": client_id, "written": [],
+                         "guards_wired": ["write-scope"] if blocks else [],
                          "guards_post_hoc": [], "blocks_at_source": blocks,
                          "degradations": []}]}), encoding="utf-8")
 

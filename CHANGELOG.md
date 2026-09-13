@@ -1,5 +1,75 @@
 # Changelog
 
+## Unreleased
+
+Measured by reading the developer session OpenCode actually ran, not by
+reasoning about what it should have run.
+
+**A story could not pass the `TDD` check on OpenCode, ever** (bug 116). The
+prompt tells the developer that only runs through `aisef tool` become
+evidence and that the gate reads evidence, not claims. Across ten sessions on
+`todo-cli`, the developer ran `npm test` directly ten times and `aisef tool
+test` zero times — so every `test` event in the story's evidence came from the
+harness's own verify pass, one green run per candidate, and red-before-green
+had nothing to compare. A rule only the prompt states is not a rule. A new
+guard, **`tool-bypass`**, blocks running the project's declared test/lint/sast
+command directly and names the recorded command to use instead. Narrowing a
+run for debugging (extra arguments, a single file) is not blocked — recording
+a subset as `test` would make part of a suite look like a green one.
+
+**A tool run that records nothing said `✅`** (bug 117). `aisef tool test`
+outside a story session ran the command and recorded no evidence, with output
+indistinguishable from a recorded run. It now says so.
+
+**`TDD` no longer blocks what the nop control already cleared** (bug 118).
+Red-before-green is a proxy for "do these tests verify the story"; the nop
+control (ADR-005 V3) asks that question directly, by running the story's tests
+at the parent SHA. On `todo-cli` STORY-01-02 the nop control passed and `TDD`
+failed, and the story was blocked by the weaker of the two — with no legal
+move left for the developer, whose implementation already existed from an
+earlier attempt. A passing nop control now satisfies `TDD`, and says which
+evidence proved it. `UNRUNNABLE`, `NOT_APPLICABLE` and `UNCONFIGURED` mean the
+direct measurement did not answer, so `TDD` still stands alone there.
+
+**The agent was handed a different build of `aisef` than the harness was
+running** (bug 119). `aisef_argv()` returned the name `aisef` whenever that
+name was on PATH. On the dogfood machine that name was a pipx install three
+minor versions behind the source tree the harness ran from — so every guard
+recorded across two days of runs came from code that had none of the fixes
+under test, and nothing said so, because the old binary answers every call
+successfully by the old rules. The name is now used only when `sys.argv[0]`
+points at it; otherwise the harness hands over its own launcher. Version
+strings were not used for this: `__version__` reads installed metadata, which
+in a source checkout can match by accident.
+
+**The nop control reported "not performed" when it had, in fact, worked**
+(bug 120). Its worktree deliberately lacks the story's source, so at the parent
+SHA the story's tests fail to import it — which is the control succeeding. The
+generic rule that classifies "cannot find module" as a missing dependency
+cannot tell that apart, and on a greenfield project's first story there are no
+other tests whose names would prove the runner started. The run now compares
+the missing module against the story's own changed files: the story's code
+missing is the expected red; a real dependency missing still blocks.
+
+**The compile report claimed a guard that was never wired** (bug 121). For
+OpenCode it listed `completion` under "guards blocking at other hooks", while
+the plugin it had just written has only `tool.execute.before` and
+`tool.execute.after` — OpenCode's plugin API has no blocking equivalent of
+`Stop`. `compile_for` read its claims off the guard table instead of the file
+it generated. It now reports the hook points each client actually has;
+`completion` is listed as post-hoc for OpenCode, and a test cross-checks every
+"wired" guard against the plugin's own text. If you read `blocks_at_source`
+from `compile-report.json`, OpenCode now reports `false` — 9 of 10 guards
+still block at source; the flag means *all* of them do. The expectation that a
+developer session leaves a guard trace now reads `guards_wired`, so the `guard
+ran` gate check is unaffected.
+
+**`run.infra_retries`** gives infrastructure errors their own retry budget.
+They score nothing, so they never charged `run.max_retries` — but they shared
+its budget, and on a client with a measured session-cut rate (22–32% on
+OpenCode/mycombo, 2026-09-13) a story can spend everything on sessions that
+produced no verdict. `-1`, the default, keeps the old coupling.
+
 ## 1.5.0 — 2026-09-13
 
 A minor, not a patch, because two behaviours change.

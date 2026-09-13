@@ -356,6 +356,84 @@ class TestTDD(GateTestCase):
         self.green_story()
         self.assertNotIn("TDD", [c.name for c in self.gate().checks])
 
+    def test_feedback_noi_phai_chay_qua_cong_cu_duoc_ghi(self):
+        """Lỗi 116: lượt chạy không được ghi thì không chứng minh được gì —
+        câu feedback cũ ("write tests first") đúng nhưng thiếu chỗ agent trượt."""
+        self.green_story()
+        m = next(c for c in self.gate(added_tests=["tests/x.test.js"]).checks if c.name == "TDD")
+        self.assertIn("recorded", m.detail)
+
+
+class TestTDDVaNopControl(GateTestCase):
+    """Lỗi 118 (todo-cli STORY-01-02, 2026-09-13): `TDD` là **proxy** của câu
+    "test có kiểm được gì không"; nop control hỏi thẳng câu ấy. Lượt chạy thật
+    có nop control ĐẠT ("5 test mang mã đỏ hoặc vắng ở SHA cha") mà story vẫn
+    bị chặn bởi proxy — và developer không còn nước đi hợp lệ nào: mã đã có
+    sẵn từ lượt trước, không cách nào tạo được lần đỏ mà không xoá việc.
+    Proxy không được chặn thứ phép đo trực tiếp đã thông."""
+
+    AC = "tests/test_a.py::test_AC_S_01_1_x"
+
+    def dung_canh(self, nop_ids, nop_failed=()):
+        """Ứng viên xanh, chưa từng có lần đỏ nào được ghi."""
+        self.store.tool_run("S-01", "test:baseline", ok=True, detail={
+            "baseline": True, "test_format": "pytest", "test_ids": ["t1"],
+            "failed_ids": [], "skipped_ids": [],
+        })
+        store = EvidenceStore(self._tmp.name, candidate="aaa")
+        store.file_change("S-01", "src/a.py")
+        store.tool_run("S-01", "test", ok=True, detail={
+            "test_format": "pytest", "test_ids": [self.AC, "t1"], "failed_ids": [],
+        })
+        store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "test:nop", ok=not nop_failed, detail={
+            "nop": True, "parent": "cha0000", "files": ["tests/test_a.py"],
+            "test_format": "pytest", "test_ids": list(nop_ids), "failed_ids": list(nop_failed),
+        })
+        return self.gate(candidate="aaa", acceptance=1, added_tests=["tests/test_a.py"])
+
+    def test_nop_dat_thi_tdd_dat_theo(self):
+        g = self.dung_canh(["t1"])                    # test của story vắng ở SHA cha
+        nop = next(c for c in g.checks if c.name == "tests verify story")
+        tdd = next(c for c in g.checks if c.name == "TDD")
+        self.assertIs(nop.outcome, Outcome.PASSED)
+        self.assertIs(tdd.outcome, Outcome.PASSED, tdd.detail)
+        self.assertIn("nop control", tdd.detail)
+        self.assertTrue(tdd.evidence, "phải trỏ vào bằng chứng nop, không để trống")
+
+    def test_nop_truot_thi_tdd_van_truot(self):
+        g = self.dung_canh([self.AC, "t1"])           # xanh ở SHA cha: không kiểm được gì
+        self.assertEqual(
+            {"TDD", "tests verify story"} & {c.name for c in g.failures},
+            {"TDD", "tests verify story"},
+        )
+
+    def test_nop_khong_chay_duoc_thi_tdd_dung_mot_minh(self):
+        """UNRUNNABLE/NOT_APPLICABLE nghĩa là phép đo trực tiếp **chưa trả lời**
+        — không phải đã thông. Đây đúng là ca STORY-01-01: nop không chạy được
+        ở SHA cha vì worktree không có node_modules."""
+        self.store.tool_run("S-01", "test:baseline", ok=True, detail={
+            "baseline": True, "test_format": "pytest", "test_ids": ["t1"],
+            "failed_ids": [], "skipped_ids": [],
+        })
+        store = EvidenceStore(self._tmp.name, candidate="aaa")
+        store.file_change("S-01", "src/a.py")
+        store.tool_run("S-01", "test", ok=True, detail={
+            "test_format": "pytest", "test_ids": [self.AC, "t1"], "failed_ids": [],
+        })
+        store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "test:nop", ok=False, detail={
+            "nop": True, "parent": "cha0000", "files": ["tests/test_a.py"],
+            "unrunnable": "no runnable setup in this tree",
+        })
+        g = self.gate(candidate="aaa", acceptance=1, added_tests=["tests/test_a.py"])
+        self.assertIs(next(c for c in g.checks if c.name == "TDD").outcome, Outcome.FAILED)
+
+    def test_do_truoc_xanh_van_du_mot_minh_khi_khong_co_nop(self):
+        self.store.tool_run("S-01", "test", ok=False)
+        self.green_story()
+        self.assertTrue(self.gate(added_tests=["tests/x.test.js"]).passed)
+
 
 class TestTestKhongChayDuoc(GateTestCase):
     def test_gate_names_the_environment_not_the_story(self):

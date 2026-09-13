@@ -26,7 +26,7 @@ import json
 import re
 import shutil
 import subprocess
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from ..clients.base import ClientAdapter
 from ..config import Config
@@ -1156,6 +1156,30 @@ def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Co
                            + (f" unrunnable={res.unrunnable}" if res.unrunnable else ""))
 
 
+def _vang_ma_cua_story(res, changed: list[str]) -> str:
+    """The story source file the nop run says is missing — "" if none is.
+
+    Only the story's **own** non-test files count: a dependency the project
+    never installed is a real environment failure and must stay unrunnable.
+    """
+    from ..harness.tools import NO_DEPENDENCIES, NO_SETUP
+
+    if not res.unrunnable.startswith(NO_SETUP):
+        return ""                          # tool missing, no manifest: not this
+    ra = res.output()[0].lower().replace("\\", "/")
+    if not any(m in ra for m in NO_DEPENDENCIES):
+        return ""
+    for f in changed:
+        if is_test_path(f):
+            continue
+        goc = PurePosixPath(f).with_suffix("").as_posix().lower()
+        if len(goc) < 3:
+            continue
+        if goc in ra or goc.replace("/", ".") in ra:
+            return f
+    return ""
+
+
 def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
             candidate: str, base_ref: str, changed: list[str]) -> None:
     """Nop control level 2 (ADR-005 V3): run story tests at **parent SHA**.
@@ -1218,6 +1242,19 @@ def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
             elif dst.exists():
                 dst.unlink()                        # story deleted test file: parent SHA also lacks it
         res = run_tool("test", tmp_path, config=config)   # story_id empty: recorded below, under its own name
+        if (vang := _vang_ma_cua_story(res, changed)):
+            # The nop worktree deliberately lacks the story's source, so
+            # "cannot find module <story file>" is the control **working**,
+            # not a broken environment. Told apart only by *which* module is
+            # missing — and only here, where the story's own changed files
+            # are known (lỗi 120). On a greenfield project's first story
+            # there are no other tests to print a name, so the generic rule
+            # ("unrunnable unless something passed") cannot tell the two
+            # apart, and the strongest control was recorded as not performed
+            # exactly where it matters most (todo-cli STORY-01-01 2026-09-13).
+            run_log(artifact_root, f"story={story.id} nop red vì thiếu {vang} — "
+                                   f"đúng thứ control dựng ra để thấy")
+            res.unrunnable = ""
         record_tool(res, story.id, artifact_root, candidate, name=NOP_RUN, extra={
             "nop": True, "parent": parent_ref, "base_ref": base_ref, "files": test_files[:50]})
         # `ok` here is the **test run**, and for the nop control red is the

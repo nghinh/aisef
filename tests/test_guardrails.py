@@ -1279,3 +1279,142 @@ class TestLoiKhuyenDungNguCanh(unittest.TestCase):
         for lenh in ("rm x.txt", "git stash list", "ls -la"):
             with self.subTest(lenh=lenh):
                 self.assertTrue(check_destructive(lenh).allowed)
+
+
+class TestChayThangLenhCongCu(unittest.TestCase):
+    """Lỗi 116 (todo-cli 2026-09-13, OpenCode/mycombo): developer chạy
+    `npm test 2>&1` ở cả 10 phiên, `aisef tool test` 0 phiên. Không lượt nào
+    vào bằng chứng, nên mọi sự kiện `test` của story đều là lượt verify của
+    harness — một lượt xanh cho mỗi ứng viên — và `red_before_green` không
+    có gì để so: `TDD` đỏ 10 phiên liền trên một bản cài đặt chạy tốt.
+    Lời dặn trong prompt agent bỏ qua được; guard thì không."""
+
+    LENH = {"test": "npm test", "lint": "npx eslint . --max-warnings=0", "sast": ""}
+
+    def _chan(self, cmd: str) -> bool:
+        from aisef.harness.guardrails import check_tool_bypass
+        return not check_tool_bypass(cmd, self.LENH).allowed
+
+    def test_chan_dung_lenh_da_khai(self):
+        self.assertTrue(self._chan("npm test"))
+
+    def test_chan_du_co_chuyen_huong(self):
+        self.assertTrue(self._chan("npm test 2>&1"))
+
+    def test_chan_du_nam_giua_chuoi_lenh(self):
+        self.assertTrue(self._chan("rm -f x && npm test && echo done"))
+
+    def test_npm_run_test_va_npm_test_la_mot(self):
+        self.assertTrue(self._chan("npm run test"))
+
+    def test_co_co_them_tham_so_van_la_chay_ca_bo(self):
+        # `npm test --silent` là thứ `detect_commands` tự dò ra; dự án khai
+        # `npm test`. Hai cách viết, một lượt chạy cả bộ.
+        self.assertTrue(self._chan("npm test --silent"))
+
+    def test_khong_chan_chay_hep_de_go_loi(self):
+        # Chạy hẹp không phải lời khai về cả bộ test, và ghi nó thành bằng
+        # chứng `test` sẽ khiến một phần trông như cả bộ xanh — tệ hơn không ghi.
+        self.assertFalse(self._chan("node --test tests/store.test.js"))
+        self.assertFalse(self._chan("npx eslint lib/"))
+
+    def test_khong_chan_lenh_khong_lien_quan(self):
+        for cmd in ("npm install", "git status", "ls -la", ""):
+            with self.subTest(cmd=cmd):
+                self.assertFalse(self._chan(cmd))
+
+    def test_khong_chan_chinh_aisef_tool(self):
+        self.assertFalse(self._chan("aisef tool test"))
+
+    def test_du_an_chua_khai_lenh_nao_thi_khong_chan_gi(self):
+        from aisef.harness.guardrails import check_tool_bypass
+        self.assertTrue(check_tool_bypass("npm test", {"test": "", "lint": ""}).allowed)
+
+    def test_thong_bao_noi_dung_lenh_thay_the(self):
+        from aisef.harness.guardrails import check_tool_bypass
+        ly_do = check_tool_bypass("npm test", self.LENH).reason
+        self.assertIn("tool test", ly_do)
+        self.assertIn("evidence", ly_do)
+
+    def test_guard_co_trong_bang_moc(self):
+        # Nối vào client là do `GUARD_MATCHERS` sinh ra; quên dòng này thì
+        # guard có mã mà không bao giờ chạy.
+        from aisef.harness.guardrails import GUARD_MATCHERS
+        self.assertEqual(GUARD_MATCHERS["tool-bypass"], ("PreToolUse", "Bash"))
+
+    def test_chay_qua_run_guard(self):
+        """Đi hết đường thật: `run_guard` phải tự đọc lệnh dự án khai."""
+        import json
+        import tempfile
+
+        from aisef.harness.guardrails import run_guard
+        with tempfile.TemporaryDirectory() as tmp:
+            du_an = Path(tmp)
+            (du_an / "package.json").write_text(
+                json.dumps({"name": "x", "scripts": {"test": "node --test"}}), encoding="utf-8")
+            su_kien = {"tool_name": "Bash", "tool_input": {"command": "npm test"}, "cwd": str(du_an)}
+            self.assertFalse(run_guard("tool-bypass", su_kien, project_root=str(du_an)).allowed)
+            su_kien["tool_input"] = {"command": "git status"}
+            self.assertTrue(run_guard("tool-bypass", su_kien, project_root=str(du_an)).allowed)
+
+    def test_chan_ca_than_script_npm(self):
+        """`npm test` và `node --test …` mà nó gọi là **một** lượt chạy; chặn
+        theo chữ `npm test` thôi thì để hở đúng đường vòng hiển nhiên nhất."""
+        import json
+        import tempfile
+        from aisef.harness.guardrails import check_tool_bypass, declared_commands
+
+        with tempfile.TemporaryDirectory() as tmp:
+            du_an = Path(tmp)
+            (du_an / "package.json").write_text(json.dumps(
+                {"name": "x", "scripts": {"test": "node --test --experimental-test-coverage"}}),
+                encoding="utf-8")
+            (du_an / ".ai").mkdir()
+            (du_an / ".ai" / "config.json").write_text(
+                json.dumps({"tools.test": "npm test"}), encoding="utf-8")
+            khai = declared_commands(du_an)
+            self.assertFalse(check_tool_bypass("npm test", khai).allowed)
+            self.assertFalse(
+                check_tool_bypass("node --test --experimental-test-coverage", khai).allowed)
+            self.assertTrue(check_tool_bypass("node --test tests/a.js", khai).allowed)
+
+
+class TestLenhAisefTraChoAgentPhaiCungBan(unittest.TestCase):
+    """Lỗi 119 (todo-cli 2026-09-13): `aisef_argv` lấy `aisef` trên PATH mà
+    không hỏi nó có phải bản đang chạy không. Máy dogfood có pipx 1.2.9 trên
+    PATH trong khi harness chạy cây nguồn, nên mọi guard ghi được trong cả đợt
+    đều do mã cũ chấm — không có bản vá nào đang được thử. Skew im lặng theo
+    đúng thiết kế: binary cũ trả lời mọi lời gọi thành công, bằng luật cũ."""
+
+    def test_dung_ten_tren_path_khi_chinh_no_khoi_dong_tien_trinh(self):
+        import shutil
+        import sys
+        from unittest import mock
+
+        from aisef.harness import tools
+        gia = shutil.which("python3") or sys.executable
+        with mock.patch.object(tools.shutil, "which", return_value=gia), \
+             mock.patch.object(sys, "argv", [gia, "run"]):
+            self.assertEqual(tools.aisef_argv(), ["aisef"])
+
+    def test_khac_duong_dan_thi_khong_dung_ten_tren_path(self):
+        import shutil
+        import sys
+        from unittest import mock
+
+        from aisef.harness import tools
+        gia = shutil.which("python3") or sys.executable
+        with mock.patch.object(tools.shutil, "which", return_value=gia), \
+             mock.patch.object(sys, "argv", ["/mot/noi/khac/aisef", "run"]):
+            self.assertNotEqual(tools.aisef_argv(), ["aisef"])
+
+    def test_khoi_dong_bang_python_m_thi_tra_ve_chinh_ma_dang_chay(self):
+        import sys
+        from unittest import mock
+
+        from aisef.harness import tools
+        with mock.patch.object(sys, "argv", [str(ROOT / "aisef" / "cli" / "__main__.py")]), \
+             mock.patch.object(tools.shutil, "which", return_value="/usr/local/bin/aisef"):
+            argv = tools.aisef_argv()
+        self.assertNotEqual(argv, ["aisef"])
+        self.assertTrue(argv[0].endswith("aisef") or argv[-2:] == ["-m", "aisef.cli"], argv)

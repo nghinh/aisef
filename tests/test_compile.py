@@ -220,9 +220,24 @@ class TestCompileFor(CompileTestCase):
         `rm -rf` không xoá được tệp, và `Write` chứa `os.system` ghép chuỗi
         không để lại tệp nào. Xem docstring `clients/opencode.py`."""
         r = compile_for("opencode", self.project)
-        self.assertTrue(r.blocks_at_source)
-        self.assertEqual(r.guards_post_hoc, [])
-        self.assertEqual(sorted(r.guards_wired), sorted(GUARD_MATCHERS))
+        pre_post = [k for k, (ev, _) in GUARD_MATCHERS.items()
+                    if ev in ("PreToolUse", "PostToolUse")]
+        self.assertEqual(sorted(r.guards_wired), sorted(pre_post))
+
+    def test_opencode_khong_khai_khong_guard_ma_plugin_khong_noi(self):
+        """Lỗi 121: plugin OpenCode chỉ có `tool.execute.before/after`, không
+        có Stop — nhưng báo cáo vẫn liệt `completion` là "đã nối, chặn ở hook
+        khác" kể từ ngày OpenCode được hỗ trợ. Một báo cáo năng lực đọc lời
+        khai từ nhầm danh sách chính là thứ nó sinh ra để chặn."""
+        r = compile_for("opencode", self.project)
+        plugin = (self.project / ".opencode" / "plugin" / "aisef-guard.ts").read_text(encoding="utf-8")
+        for g in r.guards_wired:
+            with self.subTest(guard=g):
+                self.assertIn(f'"{g}"', plugin, "khai là đã nối thì phải có trong plugin")
+        self.assertEqual(r.guards_post_hoc, ["completion"])
+        self.assertNotIn('"completion"', plugin)
+        self.assertFalse(r.blocks_at_source)
+        self.assertIn("completion", r.summary())
 
     def test_opencode_van_bao_cac_muc_thuc_su_kem(self):
         """Chặn được không có nghĩa là ngang Claude Code: OpenCode vẫn
@@ -269,7 +284,10 @@ class TestCompileReport(CompileTestCase):
 
         by_client = {c["client"]: c for c in data["clients"]}
         self.assertTrue(by_client["claude"]["blocks_at_source"])
-        self.assertTrue(by_client["opencode"]["blocks_at_source"])
+        # OpenCode chặn ở 9/10 guard; `completion` không có hook để nối (lỗi 121)
+        self.assertFalse(by_client["opencode"]["blocks_at_source"])
+        self.assertEqual(by_client["opencode"]["guards_post_hoc"], ["completion"])
+        self.assertIn("tool-bypass", by_client["opencode"]["guards_wired"])
 
     def test_report_lists_written_files(self):
         path = write_compile_report(self.project, [compile_for("claude", self.project)])

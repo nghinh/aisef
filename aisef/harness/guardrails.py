@@ -284,6 +284,115 @@ _LOI_KHUYEN = {
 }
 
 
+#: Package managers whose second token *selects* the script. `npm test`,
+#: `npm test --silent` and `npm run test` are one command, and a project that
+#: declares one while the agent types another must still be caught.
+_TRINH_GOI = ("npm", "pnpm", "yarn", "bun")
+#: Shell operators separating one command from the next — `npm test && npx eslint .`
+_NGAT_LENH = re.compile(r"&&|\|\||;|\|")
+#: Redirections say nothing about *which* command this is: `npm test 2>&1`.
+_CHUYEN_HUONG = re.compile(r"(?:\d?>>?&?\d?|<)\s*\S*")
+
+
+def _khoa_lenh(segment: str) -> tuple[str, ...]:
+    """Identity of one shell command: what it runs, not how it is spelled."""
+    argv = parse_command(_CHUYEN_HUONG.sub(" ", segment).strip())
+    if len(argv) > 2 and argv[0] in _TRINH_GOI and argv[1] == "run":
+        argv = [argv[0], *argv[2:]]
+    if len(argv) >= 2 and argv[0] in _TRINH_GOI:
+        return (argv[0], argv[1])
+    return tuple(argv)
+
+
+def check_tool_bypass(command: str, declared: dict[str, str | list[str]]) -> Verdict:
+    """Block running a declared tool command directly instead of via `aisef tool`.
+
+    The prompt already says only runs through `aisef tool` are recorded and
+    that the gate reads evidence, not claims. Measured on todo-cli
+    2026-09-13 (OpenCode/mycombo, session `ses_f67454ae`): the developer ran
+    `npm test 2>&1` in every one of ten sessions and `aisef tool test` in
+    none. Every `test` event in that story's evidence therefore came from
+    the harness's own verify pass — one green run per candidate — so
+    `red_before_green` had nothing to compare and the `TDD` check failed for
+    ten sessions in a row over a working implementation (lỗi 116).
+
+    Instruction the agent can ignore -> guard that blocks at source. The
+    agent gets the same command run for it, plus the evidence.
+
+    A **narrowed** run (`pytest tests/x.py -k foo`) is not blocked: it is
+    debugging, not a claim about the suite, and recording it as `test` would
+    make a subset look like a green suite.
+    """
+    if not command:
+        return ALLOW
+    muc_tieu: dict[tuple[str, ...], str] = {}
+    for ten, lenh in declared.items():
+        cach_viet = [lenh] if isinstance(lenh, str) else list(lenh)
+        for c in cach_viet:
+            khoa = _khoa_lenh(c) if c.strip() else ()
+            if khoa:
+                muc_tieu.setdefault(khoa, ten)
+    if not muc_tieu:
+        return ALLOW
+    for doan in _NGAT_LENH.split(command):
+        ten = muc_tieu.get(_khoa_lenh(doan))
+        if not ten:
+            continue
+        from .tools import aisef_command
+
+        return Verdict(
+            False,
+            f"`{doan.strip()}` is the project's {ten} command run directly, so "
+            f"nothing about it is recorded — and the gate reads evidence, not "
+            f"claims. Run `{aisef_command()} tool {ten}` instead: it runs the "
+            f"same command and records the result, which is what the `TDD`, "
+            f"`test` and `coverage` checks read. Narrowing a run for debugging "
+            f"(extra arguments, a single file) is not blocked.",
+        )
+    return ALLOW
+
+
+def _script_npm(project: Path, command: str) -> list[str]:
+    """`npm test` **and** the script it runs — both are the same suite.
+
+    Judging by the words `npm test` alone leaves the obvious way around open:
+    `node --test --experimental-test-coverage`, which is what that script is.
+    """
+    import json as _json
+
+    argv = parse_command(command)
+    if len(argv) < 2 or argv[0] not in _TRINH_GOI:
+        return []
+    key = argv[2] if argv[1] == "run" and len(argv) > 2 else argv[1]
+    try:
+        scripts = _json.loads((project / "package.json").read_text(encoding="utf-8")).get("scripts") or {}
+    except (OSError, ValueError):
+        return []
+    than = str(scripts.get(key) or "").strip()
+    return [than] if than else []
+
+
+def declared_commands(project: str | Path) -> dict[str, list[str]]:
+    """Every spelling of the tool commands this project declares.
+
+    The configured/detected command is what the prompt shows the agent; the
+    npm script body is the same run under another name.
+    """
+    from ..config import Config
+    from .tools import TOOLS, command_for
+
+    project = Path(project)
+    try:
+        cfg = Config.load(project)
+    except Exception:                       # noqa: BLE001 - a broken config must not
+        cfg = None                          # break every bash call in the session
+    ra = {}
+    for ten in TOOLS:
+        lenh = command_for(ten, project, cfg)
+        ra[ten] = [lenh, *_script_npm(project, lenh)] if lenh else []
+    return ra
+
+
 def check_destructive(command: str) -> Verdict:
     """Block commands that destroy unsaved work."""
     if not command:
@@ -873,6 +982,8 @@ def run_guard(kind: str, event: dict, *, env: dict[str, str] | None = None,
         return check_git_stage(command)
     if kind == "destructive":
         return check_destructive(command)
+    if kind == "tool-bypass":
+        return check_tool_bypass(command, declared_commands(root or project_root or "."))
     if kind == "egress":
         return check_egress(
             str(event.get("tool_name") or ""), tool_input,
@@ -996,6 +1107,7 @@ GUARD_MATCHERS: dict[str, tuple[str, str]] = {
     "process-ref": ("PreToolUse", "Write|Edit"),
     "git-stage": ("PreToolUse", "Bash"),
     "destructive": ("PreToolUse", "Bash"),
+    "tool-bypass": ("PreToolUse", "Bash"),
     "egress":      ("PreToolUse", "WebFetch|Bash"),
     "diff-scope": ("PostToolUse", "Write|Edit|NotebookEdit|Bash"),
     "completion": ("Stop", ""),
