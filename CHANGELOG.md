@@ -282,6 +282,22 @@ question asked afterwards is whether the *port* freed, not whether the pid is
 gone: a child stays a zombie until reaped, so `os.kill(pid, 0)` keeps
 succeeding long after it stops listening.
 
+**A review reported 29 blocking items when it had found 2** (bug 141). A
+reviewer that deliberates at length mentions its tags mid-sentence ("This is a
+[block].", "the [block] tag is fine for this review") and restates its
+conclusions in every summary section. The text parser counted all of them, so
+the next developer received the same two problems fourteen times and the
+operator read "29 blocking items" — while that same review's JSON verdict
+declared exactly two.
+
+The review prompt's format is `[tag] path:line — description`, and the path is
+what separates raising an item from talking about one. A text item now needs a
+real path token to count; `[stuck]` is exempt, being a verdict about the plan
+with no file to point at. Restatements of the same item collapse, with
+unlocated items deduped by their own text so two distinct ones stay two.
+Replayed over eight real review files: 29 becomes 2, matching the JSON, and the
+genuine blockers in the other reviews survive.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on

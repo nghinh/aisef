@@ -1043,6 +1043,48 @@ class TestFindings(unittest.TestCase):
         self.assertEqual(len(found), 1)
         self.assertIn("todo.spec.js:217", found[0])
 
+    def test_nhac_the_giua_van_xuoi_khong_phai_muc_chan(self):
+        """Lỗi 141 (todo-oc STORY-04-02, 2026-09-13): khối JSON khai **2** mục
+        chặn, trình đọc văn bản đếm **29** — cổng in "29 blocking items" và
+        developer lượt sau nhận đúng hai vấn đề ấy mười bốn lần. Người rà soát
+        cân nhắc dài thì nhắc thẻ giữa câu ("This is a [block].", "I'll keep the
+        [block] tag"), và nhắc lại kết luận ở mỗi phần tóm tắt.
+
+        Phân biệt bằng **hình dạng prompt đã quy định**: `[tag] path:line — mô
+        tả`. Có đường dẫn là mục; không có là đang nói *về* thẻ."""
+        for van_xuoi in ("This is a **[block]** — the AC literally says non-whitespace.",
+                         "I'll mark it as a [block] finding.",
+                         "So the [block] tag is fine for this review.",
+                         "- [block] because: the rule is grouped."):
+            with self.subTest(dong=van_xuoi):
+                self.assertEqual(blocking_findings(van_xuoi), [])
+
+    def test_dung_hinh_dang_thi_van_la_muc_chan(self):
+        for dong in ("[block] index.html:171-176 — two selectors share one rule",
+                     "- [block] lib/store.js:83 — wrong syscall in the rethrow",
+                     "**[block] tests/sit/a.test.js:53** — regex has no anchor",
+                     "…detect regressions.[block] tests/todo.spec.js:217 — never fails"):
+            with self.subTest(dong=dong):
+                self.assertEqual(len(blocking_findings(dong)), 1, dong)
+
+    def test_stuck_khong_can_duong_dan(self):
+        """`[stuck]` là kết luận về **kế hoạch** — không có tệp nào để trỏ."""
+        found = blocking_findings(
+            "[stuck] the criteria cannot be met from inside this story's write scope")
+        self.assertEqual(len(found), 1)
+
+    def test_nhac_lai_cung_mot_muc_la_mot_muc(self):
+        from aisef.phases.implement import _gop_trung
+        lap = ["[block] index.html:171 — same rule",
+               "[block] index.html:171 — same rule, restated in the summary",
+               "[block] index.html:587 — another one"]
+        self.assertEqual(len(_gop_trung(lap)), 2)
+
+    def test_hai_muc_khong_co_vi_tri_van_la_hai(self):
+        from aisef.phases.implement import _gop_trung
+        self.assertEqual(len(_gop_trung(["[stuck] criteria A cannot be met",
+                                         "[stuck] criteria B contradicts AD-3"])), 2)
+
     def test_the_trong_dau_nguoc_la_nhac_ten_khong_phai_neu_ra(self):
         """Lỗi 122 (todo-cli 2026-09-13). Hai câu thật, hai story trượt:
 

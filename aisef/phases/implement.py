@@ -2040,6 +2040,29 @@ _TAG_MO_DAU = re.compile(
     re.IGNORECASE)
 
 
+#: A path-like token: has a directory separator or a file extension. The
+#: review prompt's format is `[block] path/file.ts:12 — description`, and that
+#: path is what separates an **item** from the reviewer talking *about* tags
+#: mid-sentence ("This is a [block].", "I'll keep the [block] tag for this
+#: review."). Measured on todo-oc STORY-04-02 2026-09-13: 29 text items, of
+#: which 2 had a path — and the JSON verdict declared exactly those 2.
+_CO_DUONG_DAN = re.compile(r"^[\w.@+-]*[/\\][\w./\\@+-]*|^[\w@+-]+\.[A-Za-z][\w]{0,9}\b")
+
+
+def _la_muc_that(line: str) -> bool:
+    """Does this line follow the format the reviewer was given?
+
+    `[stuck]` is exempt: it is a verdict about the plan ("these criteria
+    cannot be met from inside this story"), which has no file to point at.
+    """
+    m = re.match(r"\s*\[([^\]]*)\]\**\s*(\S*)", line or "")
+    if not m:
+        return False
+    if m.group(1).strip().lower() in _JSON_STUCK_TAGS:
+        return True
+    return bool(_CO_DUONG_DAN.match(m.group(2).strip()))
+
+
 def blocking_findings(text: str) -> list[str]:
     """Extract `[blocker]` and `[stuck]` items from a review report.
 
@@ -2068,7 +2091,7 @@ def blocking_findings(text: str) -> list[str]:
             out[-1] = out[-1] + " " + stripped
         else:
             dang_mo = False
-    return out
+    return [x for x in out if _la_muc_that(x)]
 
 
 def plan_defects(findings: list[str]) -> list[str]:
@@ -2207,9 +2230,40 @@ def _finding_key(line: str) -> tuple[str, str, str]:
     return (kind, filepath, dong.group(1) if dong else "")
 
 
+def _gop_trung(items: list[str]) -> list[str]:
+    """Same finding restated is one finding.
+
+    A reviewer deliberating at length writes its blockers several times —
+    once while reasoning, once per summary section, once in the final list.
+    Measured on todo-oc STORY-04-02 2026-09-13: the JSON verdict carried
+    **2** blocking findings and the text yielded **29**, so the gate line
+    read "29 blocking items" and the next developer received the same two
+    problems fourteen times over (lỗi 141). `_finding_key` already defines
+    when two lines are the same item: same tag, same file, same line.
+
+    An item with no file cannot be keyed that way, so those are deduped by
+    their own text — two distinct unlocated blockers stay two.
+    """
+    ra: list[str] = []
+    thay: set = set()
+    for x in items:
+        khoa = _finding_key(x)
+        # `_finding_key` takes the next token whatever it is, so "criteria"
+        # from `[stuck] criteria A cannot be met` looks like a file. Key by
+        # place only when the token really is one; otherwise by the text.
+        co_noi = bool(_CO_DUONG_DAN.match(khoa[1]))
+        rieng = khoa if co_noi else ("van-ban", " ".join((x or "").split()).lower()[:200], "")
+        if rieng in thay:
+            continue
+        thay.add(rieng)
+        ra.append(x)
+    return ra
+
+
 def merge_findings(text_items: list[str], json_items: list[str]) -> tuple[list[str], bool]:
     """Union two sources and report whether they diverged.  Text first, JSON
     fills in after."""
+    text_items = _gop_trung(text_items)
     khoa_text = {_finding_key(x) for x in text_items}
     khoa_json = {_finding_key(x) for x in json_items}
     them = [x for x in json_items if _finding_key(x) not in khoa_text]
