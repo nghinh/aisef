@@ -275,6 +275,19 @@ class TestTieuChiCoTest(GateTestCase):
         self.assertIn("AC-S-01-2", m.detail)
         self.assertNotIn("AC-S-01-1 ", m.detail + " ")
 
+    def test_thieu_ma_thi_noi_ro_doc_tu_lenh_nao(self):
+        """Agent gắn mã vào tên test e2e rồi nhận "no tests with codes" sẽ
+        đọc ra một mâu thuẫn và tiêu lượt sau để đổi tên thứ đã đúng tên.
+        Thông báo phải nói nó đọc từ **lượt chạy nào**."""
+        self.store.file_change("S-01", "src/a.py")
+        self.store.tool_run("S-01", "test", ok=True,
+                            detail={"test_format": "node-spec", "test_ids": [],
+                                    "command": "node --test"})
+        self.store.tool_run("S-01", "lint", ok=True)
+        m = self.muc(self.gate(acceptance=1))
+        self.assertIn("node --test", m.detail)
+        self.assertIn("e2e", m.detail)
+
     def test_all_criteria_covered_passes(self):
         self.green_with_ids(["AC-S-01-1: a", "nhóm > AC-S-01-2: b 3ms"])
         self.assertTrue(self.gate(acceptance=2).passed)

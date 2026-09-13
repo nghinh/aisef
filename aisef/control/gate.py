@@ -651,11 +651,18 @@ def evaluate(
         ))
     else:
         missing = ac_missing(story_id, acceptance, list(last_green.detail.get("test_ids") or []))
+        lenh = str(last_green.detail.get("command") or "tools.test")
         gate.checks.append(Check(
             "criteria have tests", not missing,
             "" if not missing else
             f"no tests with codes {', '.join(ac_code(story_id, i) for i in missing)} — "
-            f"each criterion needs at least one test named after its code",
+            f"each criterion needs at least one test named after its code. "
+            # Names come from one runner. An agent that put the codes in its
+            # e2e titles reads "no tests with codes" as a contradiction and
+            # spends its next attempt renaming what is already named.
+            f"Names are read from the last green `{lenh}` run only; e2e and the "
+            f"other verification kinds are scored by their own checks and do not "
+            f"count here",
             evidence=doc_xanh,
         ))
 
