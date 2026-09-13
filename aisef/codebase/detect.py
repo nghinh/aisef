@@ -26,6 +26,12 @@ _SKIP_DIRS = {
     "node_modules", ".git", "__pycache__", ".venv", "venv", "dist",
     "build", ".next", ".nuxt", "target", "vendor", "_bmad-output",
     "graphify-out", ".aisef",
+    # What the framework itself installs is not the project's codebase
+    # (bug 109): `aisef setup` writes 155 skills under `.claude/skills`, 213 of
+    # them carrying Python scripts, so every AISEF project — including an
+    # empty one — read as brownfield with a couple of hundred source files and
+    # `py` as its main language, whatever it was actually written in.
+    ".claude", ".opencode", ".serena", ".conformance", ".bench", ".dogfood",
 }
 
 

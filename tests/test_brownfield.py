@@ -26,6 +26,26 @@ class TestBrownfieldDetect(unittest.TestCase):
             self.assertTrue(sig.is_brownfield)
             self.assertIn("py", sig.languages)
 
+    def test_skills_the_framework_installed_are_not_the_project(self):
+        """Lỗi 109: `aisef setup` cài 155 skill vào `.claude/skills`, 213 tệp
+        trong đó là Python. Mọi dự án AISEF — kể cả dự án rỗng — vì thế đọc ra
+        là brownfield với vài trăm tệp nguồn và ngôn ngữ chính là `py`, bất kể
+        nó được viết bằng gì."""
+        from aisef.codebase.detect import detect
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d)
+            (p / ".claude" / "skills" / "mot-skill" / "scripts").mkdir(parents=True)
+            for i in range(5):
+                (p / ".claude" / "skills" / "mot-skill" / "scripts" / f"a{i}.py").write_text(
+                    "x = 1\n", encoding="utf-8")
+            (p / ".opencode" / "plugin").mkdir(parents=True)
+            (p / ".opencode" / "plugin" / "aisef-guard.ts").write_text("//\n", encoding="utf-8")
+            (p / "index.js").write_text("export const x = 1\n", encoding="utf-8")
+            sig = detect(p)
+            self.assertEqual(sig.source_files, 1)
+            self.assertEqual(list(sig.languages), ["js"])
+            self.assertFalse(sig.is_brownfield)
+
     def test_skips_hidden_and_node_modules(self):
         from aisef.codebase.detect import detect
         with tempfile.TemporaryDirectory() as d:

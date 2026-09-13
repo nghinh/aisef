@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+- **The framework's own installed skills counted as the project's source code**
+  (bug 109). `aisef setup` writes 155 skills under `.claude/skills`, 213 of
+  them carrying Python scripts, and the brownfield scan counted every one: a
+  freshly created Node project read as brownfield with 216 source files and
+  `py` as its main language. A survey of a project has to subtract the
+  surveyor's own footprint.
+
+- **`aisef plan` says when it is planning over existing code** (bug 110).
+  Planning reads `docs/requirements.md` and nothing else, so a repository with
+  code already in it gets planned as if the directory were empty. Measured:
+  the first story was "Initialize Node.js project structure" with a criterion
+  opening "Given a fresh directory with no files", for a repository whose
+  `package.json` already had every field it asked for — its tests were green
+  at the parent SHA, the nop control correctly refused them, and three
+  attempts went into work already done. The brownfield mechanism existed
+  (`aisef baseline`); nothing pointed at it.
+
 - **A project that runs `node --test` is no longer granted write scope over
   four test frameworks it does not use** (bug 108). The scope narrows by the
   framework named in the test command; node's built-in runner was not in the

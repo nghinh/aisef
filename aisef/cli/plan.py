@@ -279,6 +279,33 @@ def cmd_auto_approve(args) -> int:
     return EXIT_OK
 
 
+def _canh_bao_da_co_ma_nguon(project) -> None:
+    """Planning reads `docs/requirements.md` and nothing else.
+
+    A project with code already in it therefore gets planned as if the
+    directory were empty — measured on a real run: the first story was
+    "Initialize Node.js project structure", with an acceptance criterion
+    opening "Given a fresh directory with no files", for a repository whose
+    `package.json` already had every field the criterion asked for. Its tests
+    were green at the parent SHA, the nop control correctly refused them, and
+    three attempts and eighteen agent sessions went into work that was already
+    done. `aisef baseline` is what tells the planner what exists.
+    """
+    from ..codebase.detect import detect
+    from ..phases.plan import ARTIFACT_ROOT
+
+    root = Path(project)
+    if (root / ARTIFACT_ROOT / "baseline.md").is_file():
+        return
+    sig = detect(root)
+    if not sig.is_brownfield:
+        return
+    print(f"⚠️  this project already has source code ({sig.summary}) and there is no "
+          f"`{ARTIFACT_ROOT}/baseline.md`.\n   Planning reads only "
+          f"`docs/requirements.md`, so it will write stories for work that may "
+          f"already exist.\n   Build the baseline first:  aisef baseline")
+
+
 def cmd_plan(args) -> int:
     """Run the BMAD phase chain up to the first unapproved gate."""
     from ..phases.plan import run_pipeline
@@ -296,6 +323,8 @@ def cmd_plan(args) -> int:
     git_err = _ensure_git(args.project)
     if git_err is not None:
         return git_err
+
+    _canh_bao_da_co_ma_nguon(args.project)
 
     result = run_pipeline(
         args.project,
