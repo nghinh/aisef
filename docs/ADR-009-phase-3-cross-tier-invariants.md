@@ -224,6 +224,20 @@ exactly that record.
 outcomes (plan-blocked / code-failed / environment-failed / passed) and the net
 VERIFIED behaviours the spend produced.
 
+**Closed 2026-09-14** — `aisef cost` (`aisef/control/attribution.py`) reports
+it; measurements and the decomposition in
+[`docs/handoff/o4-cost-per-outcome.md`](handoff/o4-cost-per-outcome.md).  Two
+corrections to the item as written above.  (a) `e9` and `par` are **not on this
+machine** (`ls /Users/nghinh/Downloads/projects` — `e9` and `par` absent; `find
+/Users/nghinh -maxdepth 4 -type d -name e9 -o -name par` finds only caches), so
+the 36x remains a historical claim, reproduced only as arithmetic over prose
+records: $496/7 stories ÷ $5.79/3 stories = 36.7x, both means quoted from
+`docs/STATUS-2026-09-05.md` and `docs/E4-COST-DECOMPOSITION.md`, neither
+recomputable from evidence.  (b) The unit cannot be dollars on any corpus that
+survives: the provider priced 0% of sessions in three of four, and 1 of 180 in
+the fourth.  `aisef cost` therefore decides the unit from the evidence and
+refuses to average a partial dollar record.
+
 ## Deferred
 
 - Budget cap values are surfaced in ``Config`` defaults but not yet

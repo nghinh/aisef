@@ -1,5 +1,5 @@
 """Implementation and acceptance phase: ``status`` · ``run`` · ``verify`` ·
-``tool`` · ``qa`` · ``devsecops`` · ``pre-deploy`` · ``report``."""
+``tool`` · ``qa`` · ``devsecops`` · ``pre-deploy`` · ``report`` · ``cost``."""
 
 from __future__ import annotations
 
@@ -676,6 +676,26 @@ def cmd_issues(args) -> int:
     path.write_text(ledger_mod.issues_text(rows, args.format), encoding="utf-8")
     reopened = sum(1 for r in rows if r["status"] == ledger_mod.REOPENED)
     print(f"{path} · {len(rows)} behaviours ({reopened} regressions)")
+    return EXIT_OK
+
+
+def cmd_cost(args) -> int:
+    """Attribute spend to outcomes (ADR-009 §Open O4).
+
+    Read-only, like `aisef issues`: a projection over `evidence/` and the
+    behaviour ledger, no gate touched, no model called.
+    """
+    from ..control import attribution
+
+    root = _artifact_root(args)
+    att = attribution.build(root)
+    text = "\n".join(attribution.report_lines(att))
+    print(text)
+    if args.out:
+        path = Path(args.out)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+        print(f"\n{path}")
     return EXIT_OK
 
 
