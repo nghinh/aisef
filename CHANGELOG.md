@@ -144,6 +144,21 @@ so between runs it stood still. After a six-epic run it said every behaviour
 was a `gap` while the projection held 34 verified and 5 reopened, and that file
 gets committed as if it were the truth.
 
+**A session that ran out of turns is now graded, if it left work** (bug 130).
+`if not result.ok: return attempt` sat before the candidate freeze, so a
+session that hit the turn cap was treated as a broken session even when its
+work was sitting committed in the worktree. Measured after switching the model
+behind the dogfood to MiniMax-M3: three sessions in a row hit the 40-turn cap,
+each having committed 68 lines of tests, and the story spent its whole quality
+budget without ever producing a gate verdict — so the next developer got no
+feedback and the deadlock detectors had nothing to read. Running out of *turns*
+is not the same as writing bad code; the gate decides that, and half-finished
+work still fails `test`, `criteria have tests`, the nop control and review.
+Infrastructure statuses still return early, because the retry costs no quality
+attempt and regrades the same tree. Worth noting how it surfaced: the older
+model wrote nothing and stopped, the newer one exhausted the cap — one gap, two
+symptoms, and only one of them had ever been seen.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on

@@ -738,6 +738,78 @@ class TestSchemaRaSoat(ImplementTestCase):
         self.assertNotIn("review:mismatch", notes)
 
 
+class TestHetLuotNhungCoViecDeCham(ImplementTestCase):
+    """Lỗi 130 (todo-cli STORY-03-02, 2026-09-13, MiniMax-M3). Ba phiên liền
+    đụng trần 40 lượt, mỗi phiên đã **commit 68 dòng test** vào worktree, và
+    harness không chấm một dòng nào: `if not result.ok: return attempt` nằm
+    trước chỗ đóng băng ứng viên. Story tiêu sạch ngân sách chất lượng mà không
+    hề có một verdict nào — nên developer lượt sau không có phản hồi, và
+    `nop_deadlock` không có gì để đọc. Hết **lượt** không đồng nghĩa với viết mã
+    sai; cổng mới là thứ phán xử, cái đếm lượt thì không."""
+
+    class HetLuotNhungCoViet(ScriptedClient):
+        """Viết đúng như bình thường rồi báo hết lượt."""
+
+        def run(inner, spec):
+            dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
+            ra = super().run(spec)
+            if dau.startswith("# Review") or dau.startswith("# Security review"):
+                return ra
+            return RunResult(ok=False, error="max_turns: stopped at 40 turns (cap 40)",
+                             num_turns=40, output_tokens=ra.output_tokens,
+                             text=ra.text, tool_uses=ra.tool_uses, cost_usd=ra.cost_usd)
+
+    def test_cham_ung_vien_va_qua_duoc_cong(self):
+        out = self.implement(self.HetLuotNhungCoViet())
+        self.assertIsNotNone(out.attempts[-1].gate, "phải có verdict, không được ném việc đi")
+        self.assertTrue(out.done, out.attempts[-1].gate.summary())
+        self.assertEqual(out.attempts[-1].error, "",
+                         "cổng đã phán xử thì lý do hết lượt không còn là kết cục của lượt")
+
+    def test_ghi_lai_phien_chua_xong_vao_bang_chung(self):
+        """Chấm không có nghĩa là xoá dấu: phải đọc lại được rằng phiên hết lượt."""
+        from aisef.harness.observe import NOTE, EvidenceStore
+
+        self.implement(self.HetLuotNhungCoViet())
+        ghi = EvidenceStore(self.artifacts).read("STORY-01-01").of(NOTE, "session:unfinished")
+        self.assertTrue(ghi, "phải ghi lại phiên chưa xong")
+        self.assertEqual(ghi[-1].detail["exit_status"], "max_turns")
+        self.assertEqual(ghi[-1].detail["turns"], 40)
+
+    def test_het_luot_ma_khong_viet_gi_thi_khong_co_gi_cham(self):
+        class HetLuotTay(ScriptedClient):
+            def run(inner, spec):
+                dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
+                if dau.startswith("# Review") or dau.startswith("# Security review"):
+                    return super().run(spec)
+                return RunResult(ok=False, error="max_turns: stopped at 40 turns (cap 40)",
+                                 num_turns=40, output_tokens=100, cost_usd=0.0)
+
+        out = self.implement(HetLuotTay(), config=self.config(**{"run.max_retries": 0}))
+        self.assertIsNone(out.attempts[-1].gate)
+        self.assertIn("max_turns", out.attempts[-1].error)
+
+    def test_loi_ha_tang_van_tra_ve_ngay_khong_cham(self):
+        """Nhà cung cấp cắt phiên thì lượt thử lại không tốn ngân sách chất
+        lượng và lượt sau chấm đúng cây ấy — đóng băng ở đây chỉ thêm một verdict
+        cho một cây sắp bị viết tiếp."""
+        class BiCatNhungCoViet(ScriptedClient):
+            def run(inner, spec):
+                dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
+                ra = super().run(spec)
+                if dau.startswith("# Review") or dau.startswith("# Security review"):
+                    return ra
+                return RunResult(ok=False, error="api_error 502", num_turns=5,
+                                 output_tokens=ra.output_tokens, tool_uses=ra.tool_uses,
+                                 cost_usd=0.0)
+
+        out = self.implement(BiCatNhungCoViet(),
+                             config=self.config(**{"run.max_retries": 0,
+                                                   "run.infra_retries": 1}))
+        self.assertTrue(all(a.gate is None for a in out.attempts))
+        self.assertTrue(out.attempts[-1].infra)
+
+
 class TestBeTacDoKeHoachTheoNopControl(unittest.TestCase):
     """Lỗi 126 (todo-cli STORY-03-02, 2026-09-13). Bốn tiêu chí của story đã
     được STORY-03-01 làm xong từ sóng trước. `tests verify story` đỏ hai lượt

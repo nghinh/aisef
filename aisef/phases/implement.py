@@ -672,7 +672,29 @@ def run_attempt(
         attempt.error = result.error or "run failed"
         attempt.infra = exit_status_of(result) in INFRA_STATUSES
         attempt.retry_after = retry_delay_seconds(result)
-        return attempt
+        # Running out of *turns* is not the same as writing bad code. Measured
+        # on todo-cli STORY-03-02 2026-09-13 with MiniMax-M3: three sessions in
+        # a row hit the 40-turn cap, each having committed 68 lines of tests
+        # into the worktree, and the harness graded none of it. The story spent
+        # its whole quality budget without ever producing a verdict — so the
+        # next developer got no feedback, and `nop_deadlock` had nothing to
+        # read (lỗi 130). The gate decides whether work is good; a turn
+        # counter cannot. Half-finished work does not sneak through: it fails
+        # `test`, `criteria have tests`, the nop control, review.
+        #
+        # Infra statuses still return here — the provider cut the session, the
+        # retry costs no quality attempt, and the next one grades this tree.
+        if attempt.infra or not changed_files(str(workdir), base_ref=base_ref):
+            return attempt
+        run_log(artifact_root, f"story={story.id}#{number} {exit_status_of(result)} "
+                               f"but the session left work in the tree — grading it")
+        evidence.record(story.id, Event(
+            kind=NOTE, name="session:unfinished", ok=False,
+            detail={"exit_status": exit_status_of(result),
+                    "turns": getattr(result, "num_turns", 0),
+                    "error": attempt.error[:300], "attempt": number},
+        ))
+        attempt.error = ""      # the gate's verdict is this attempt's outcome now
 
     # Developer session ended: **freeze candidate immediately**, before
     # verifying anything (ADR-004 R1).  Verifying first then freezing means
