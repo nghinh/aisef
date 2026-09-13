@@ -851,7 +851,7 @@ class TestSlotDaChungMinh(unittest.TestCase):
                      acceptance_criteria=[f"tiêu chí {i}" for i in range(1, n + 1)])
 
     def _ev(self, events):
-        from aisef.harness.observe import Evidence, Event
+        from aisef.harness.observe import Evidence
         return Evidence(story_id="STORY-01-01", events=events)
 
     def _run(self, **detail):
