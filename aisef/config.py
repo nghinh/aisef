@@ -42,6 +42,31 @@ DEFAULTS: dict[str, Any] = {
     # 23.5 and 01-05 18.0) from the rest (<=15.5).
     # See ``control/complexity.py`` and ADR-004 section 6 R5.
     "story.max_complexity": 16.0,
+    # Points per **neighbouring story** with VERIFIED behaviours whose write
+    # scope this story's overlaps (ADR-009 O3).  Default 0 is a *measured*
+    # value, not a placeholder: `validation/o3_preservation_radius.py` scored
+    # 32 recorded stories from four dogfood corpora (todo-oc, todo-cli, todo,
+    # todo-e2e), 15 of them confirmed to have broken a VERIFIED behaviour of
+    # another story — confirmed meaning the gate's own `preservation` check
+    # recorded FAILED, or a ledger REOPENED backed by a named red test at the
+    # same instant.
+    #
+    # | weight | blocked | innocent blocked | regressors caught | missed |
+    # |---|---|---|---|---|
+    # | 0 – 1.0 | 0 | 0 | 0 | 15 |
+    # | 1.5 | 3 | 2 | 1 | 14 |
+    # | 2.0 | 6 | 3 | 3 | 12 |
+    # | 3.0 | 10 | 4 | 6 | 9 |
+    # | 5.0 | 18 | 7 | 11 | 4 |
+    #
+    # No weight ≤ 1.0 changes a single verdict on those corpora, and the first
+    # verdict any larger weight changes is a **false** block (todo-oc
+    # STORY-04-03, blocked once w passes 1.08, which broke nothing).  Catching
+    # 11 of the 15 regressors costs blocking 7 of the 17 clean stories, and
+    # Spearman(neighbour count, broke a neighbour) is only 0.235 — the count
+    # barely ranks the risk it is supposed to measure.  A project whose stories
+    # sit near the threshold can raise this; raise it with its own table.
+    "story.verified_touched_weight": 0.0,
     # Character cap for the evidence index slice loaded into the prompt (ADR-004
     # R6).  An index instead of dumping history: agent calls ``aisef evidence
     # <id>`` when it needs details, not pre-loading the entire ledger.
@@ -223,6 +248,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "story.max_write_scope_paths": int,
     "story.max_screen_states": int,
     "story.max_complexity": float,
+    "story.verified_touched_weight": float,
     "context.max_index_chars": int,
     "context.max_preservation_chars": int,
     "context.max_repo_map_chars": int,
@@ -356,6 +382,15 @@ def _validate(values: dict[str, Any]) -> None:
         raise ConfigError("memory.max_chars must be in 0..20000")
     if not 0.0 <= values["coverage.min"] <= 1.0:
         raise ConfigError("coverage.min must be in range 0..1")
+    # A negative weight would **subtract** points for touching verified
+    # behaviours — a size gate that grows more permissive the wider the blast
+    # radius. 0 = the dimension is recorded but does not score (ADR-009 O3).
+    if values["story.verified_touched_weight"] < 0:
+        raise ConfigError("story.verified_touched_weight must be >= 0 "
+                          "(0 = recorded but not scored)")
+    # A negative weight would **subtract** points for touching verified
+    # behaviours — a size gate that grows more permissive the wider the blast
+    # radius. 0 = the dimension is recorded but does not score (ADR-009 O3).
     for key in ("run.max_parallel", "run.max_turns", "run.timeout_seconds"):
         if values[key] < 1:
             raise ConfigError(f"{key} must be >= 1")
