@@ -198,6 +198,45 @@ class TestConcurrency(StateTestCase):
         self.assertIn("stories", raw)
 
 
+
+class TestHaiLuongTrongMotTienTrinh(StateTestCase):
+    """Lỗi 115: khoá tệp là khoá cho **tiến trình khác**. Trong cùng một tiến
+    trình nó không đủ trên Windows — khoá vùng byte ở đó thuộc về tiến trình,
+    nên luồng thứ hai mở handle mới là lấy được ngay. Mà một sóng chạy story
+    bằng `ThreadPoolExecutor`. Đo trên CI Windows: hai luồng cùng vào
+    `claim()`, cùng ghi, một luồng chết bằng `PermissionError: [WinError 5]`
+    khi đổi tên tệp tạm **dùng chung**."""
+
+    def test_ghi_song_song_khong_mat_ban_ghi_nao(self):
+        import threading
+        loi = []
+
+        def them(i):
+            try:
+                self.store.register(f"S-{i:03d}", "E-01")
+            except Exception as e:            # noqa: BLE001 — test ghi lại mọi lỗi
+                loi.append(repr(e))
+
+        ts = [threading.Thread(target=them, args=(i,)) for i in range(24)]
+        for t in ts:
+            t.start()
+        for t in ts:
+            t.join()
+        self.assertEqual(loi, [])
+        self.assertEqual(len(self.store.load().stories), 24)
+
+    def test_tep_tam_mang_ten_cua_nguoi_ghi(self):
+        """Tệp tạm dùng chung là một cuộc đua thứ hai chồng lên khoá."""
+        import os
+        import threading
+        self.store.register("S-001", "E-01")
+        chung = self.store.path.with_suffix(".json.tmp")
+        self.assertFalse(chung.exists())
+        # Tên tệp tạm phải mang pid + thread id của người ghi.
+        rieng = self.store.path.with_suffix(
+            f".json.{os.getpid()}.{threading.get_ident()}.tmp")
+        self.assertNotEqual(str(rieng), str(chung))
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
 

@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 import time
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
@@ -164,6 +165,22 @@ class SprintState:
         return [r for r in self.stories.values() if r.cost_usd > median * multiple]
 
 
+#: One `threading.RLock` per state file, so two threads in one process cannot
+#: both be inside a transaction. Keyed by resolved path: unrelated projects in
+#: the same process must not serialise against each other.
+_KHOA_THEO_DUONG: dict[str, threading.RLock] = {}
+_KHOA_BANG = threading.Lock()
+
+
+@contextmanager
+def _khoa_tien_trinh(path: Path) -> Iterator[None]:
+    key = str(Path(path).resolve())
+    with _KHOA_BANG:
+        khoa = _KHOA_THEO_DUONG.setdefault(key, threading.RLock())
+    with khoa:
+        yield
+
+
 class StateStore:
     """Read/write state with exclusive locking and atomic writes."""
 
@@ -177,6 +194,19 @@ class StateStore:
     @contextmanager
     def _locked(self, timeout: float = LOCK_TIMEOUT_SECONDS) -> Iterator[None]:
         self.root.mkdir(parents=True, exist_ok=True)
+        # The file lock is for **other processes**. Within one process it is
+        # not enough on Windows: a byte-range lock there belongs to the
+        # process, so a second handle opened by a second thread takes it
+        # happily — and a wave runs its stories in a ThreadPoolExecutor.
+        # Measured on Windows CI (bug 115): two threads both entered
+        # `claim()`, both wrote the state, and one died with
+        # `PermissionError: [WinError 5]` on the rename.
+        with _khoa_tien_trinh(self.path):
+            with self._khoa_tep(timeout):
+                yield
+
+    @contextmanager
+    def _khoa_tep(self, timeout: float) -> Iterator[None]:
         fd = os.open(self.lock_path, os.O_CREAT | os.O_RDWR, 0o644)
         deadline = time.monotonic() + timeout
         try:
@@ -196,6 +226,25 @@ class StateStore:
                 flock_un(fd)
             finally:
                 os.close(fd)
+
+    def _ghi_nguyen_tu(self, payload: str) -> None:
+        """Write through a temp file **named for this writer**.
+
+        A shared `sprint-status.json.tmp` is a second race on top of the lock:
+        two writers open the same temp path, and on Windows the rename of one
+        fails while the other still holds it (bug 115).
+        """
+        self.root.mkdir(parents=True, exist_ok=True)
+        tmp = self.path.with_suffix(f".json.{os.getpid()}.{threading.get_ident()}.tmp")
+        tmp.write_text(payload, encoding="utf-8")
+        try:
+            tmp.replace(self.path)
+        except OSError:
+            # Windows can refuse the rename while another handle is closing.
+            # One short retry, then let it raise — a silent failure here loses
+            # the sprint's state.
+            time.sleep(0.05)
+            tmp.replace(self.path)
 
     # --------------------------------------------------------- read, write
 
@@ -235,10 +284,7 @@ class StateStore:
         if migrated:
             payload = json.loads(self.path.read_text(encoding="utf-8"))
             payload["stories"] = {sid: asdict(r) for sid, r in stories.items()}
-            tmp = self.path.with_suffix(".json.tmp")
-            tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
-                           encoding="utf-8")
-            tmp.replace(self.path)
+            self._ghi_nguyen_tu(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
 
     def save(self, state: SprintState) -> None:
         state.updated_at = _now()
@@ -249,10 +295,7 @@ class StateStore:
             "started_at": state.started_at,
             "updated_at": state.updated_at,
         }
-        self.root.mkdir(parents=True, exist_ok=True)
-        tmp = self.path.with_suffix(".json.tmp")
-        tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
-        tmp.replace(self.path)
+        self._ghi_nguyen_tu(json.dumps(payload, indent=2, ensure_ascii=False))
 
     @contextmanager
     def transaction(self) -> Iterator[SprintState]:

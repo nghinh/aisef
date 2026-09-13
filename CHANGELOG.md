@@ -4,6 +4,16 @@
 
 A minor, not a patch, because two behaviours change.
 
+- **Parallel stories corrupted the sprint state on Windows** (bug 115). The
+  state store locks with a file lock, which is the right tool for another
+  process and not enough for another thread on Windows, where a byte-range
+  lock belongs to the process — so the second thread of a wave took it
+  happily. Both then wrote through the same shared `sprint-status.json.tmp`,
+  and one died with `PermissionError: [WinError 5]` on the rename, taking the
+  whole sprint with it. A per-path `threading.RLock` now wraps the file lock,
+  and each writer's temp file carries its own pid and thread id. Caught by
+  Windows CI; 2 455 tests were green on Linux and macOS.
+
 **An API key now goes only to the client that authenticates with it.**
 `ANTHROPIC_*` used to be in the shared environment allowlist, so every client
 session received the host's Anthropic key — and a client that can read such a
