@@ -498,3 +498,46 @@ class TestGhiTenTestChoLoaiKiemDinh(unittest.TestCase):
         self.assertLess(i_parse, i_ghi, "phải phân tích trước khi ghi")
         self.assertIn("if doc.format:", src,
                       "đầu ra không phải test log thì không được dựng thành test_ids")
+
+
+class TestTomTatKhongPhaiAccessLog(unittest.TestCase):
+    """Lỗi 137 (todo-oc 2026-09-13): thông báo cổng cho `e2e` và
+    `accessibility` là **năm dòng access log** của dev server. `webServer` của
+    Playwright ghi một dòng mỗi request vào cùng luồng, nên phần đuôi nuốt sạch
+    kết quả test. `ToolResult.tail` đã có `_NOISE` cho đúng chuyện này từ
+    2026-09-09 — nhưng chỉ cho tool `test`; đường `qa:*` tự cắt đuôi riêng."""
+
+    LOG = "\n".join([
+        "Running 2 tests",
+        "  ✘  1 e2e/a.spec.js:3:1 › AC-S-01-1: contrast fails",
+        '[WebServer] ::1 - - [13/Sep/2026 20:47:01] "GET / HTTP/1.1" 200 -',
+        '[WebServer] ::1 - - [13/Sep/2026 20:47:02] "GET / HTTP/1.1" 200 -',
+        '[WebServer] ::1 - - [13/Sep/2026 20:47:03] "GET / HTTP/1.1" 200 -',
+        '[WebServer] ::1 - - [13/Sep/2026 20:47:04] "GET / HTTP/1.1" 200 -',
+        '[WebServer] ::1 - - [13/Sep/2026 20:47:05] "GET / HTTP/1.1" 200 -',
+    ])
+
+    def test_duong_qa_bo_access_log_truoc_khi_cat_duoi(self):
+        import inspect
+        from aisef.phases import qa
+
+        src = inspect.getsource(qa.run_suite)
+        i_loc = src.index("_NOISE.search(x)")
+        i_cat = src.index("result.detail = ")
+        self.assertLess(i_loc, i_cat, "phải lọc trước khi cắt đuôi")
+
+    def test_loc_giu_lai_dong_co_nghia(self):
+        from aisef.harness.tools import _NOISE
+
+        moi = [x for x in self.LOG.splitlines() if not _NOISE.search(x)]
+        self.assertIn("AC-S-01-1: contrast fails", "\n".join(moi[-5:]))
+
+    def test_toan_bo_la_access_log_thi_van_in_cai_co(self):
+        """Lọc sạch thành rỗng thì phải trả lại nguyên bản — thà nhiễu còn hơn
+        không nói gì."""
+        from aisef.harness.tools import _NOISE
+
+        chi_log = "\n".join(self.LOG.splitlines()[2:])
+        moi = [x for x in chi_log.splitlines() if not _NOISE.search(x)]
+        self.assertEqual(moi, [])
+        self.assertTrue((moi or chi_log.splitlines())[-5:])

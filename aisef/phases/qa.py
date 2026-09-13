@@ -480,7 +480,16 @@ def run_suite(
             # Scrub secrets **before** truncation (ADR-005 V1): `tail` goes into
             # `_bmad-output`, a directory committed with the project.
             day_du, che = scrub_secrets((sb.stdout + "\n" + sb.stderr).strip())
-            result.detail = "\n".join(day_du.splitlines()[-5:])
+            # Drop the dev server's access log before taking the tail. Playwright's
+            # `webServer` writes one line per HTTP request into the same stream, so
+            # the last five lines of a failing e2e run were five `GET / 200` lines
+            # and the gate message taught the reader nothing (lỗi 137). Exactly the
+            # problem `ToolResult.tail` was given `_NOISE` for on 2026-09-09 — for
+            # the `test` tool only; this path kept its own truncation.
+            from ..harness.tools import _NOISE
+
+            moi = [x for x in day_du.splitlines() if not _NOISE.search(x)]
+            result.detail = "\n".join((moi or day_du.splitlines())[-5:])
             result.unrunnable = _unrunnable_reason(
                 getattr(sb, "exit_code", 0), day_du, getattr(sb, "provider_error", ""))
             report.results.append(result)

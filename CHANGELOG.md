@@ -241,6 +241,14 @@ through Playwright's own ARIA snapshot, which was already correct. Fixed
 because it is wrong, not because it broke a gate — and it gets no bug number,
 since nothing was measured failing because of it.
 
+**Gate messages for e2e and accessibility were five lines of access log**
+(bug 137). Playwright's `webServer` writes one line per HTTP request into the
+same stream as the test results, so the tail of a failing run said `GET /
+HTTP/1.1 200` five times and nothing about which test failed. `ToolResult.tail`
+was given a noise filter for exactly this in September — for the `test` tool
+only; the `qa:*` path had its own truncation. It now shares the filter, and
+falls back to the raw tail when filtering leaves nothing.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on
