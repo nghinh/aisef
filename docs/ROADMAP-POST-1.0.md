@@ -34,13 +34,13 @@ in-flight reservations in the cap math.  See
 The other four issues are *semantic* and depend on these being
 correct first.  They are now written down — reconstructed from
 on-disk evidence, with that provenance stated — in
-[ADR-009 § Open](ADR-009-phase-3-cross-tier-invariants.md#open--the-three-remaining-semantic-issues-reconstructed-2026-09-12):
+[ADR-009 § Open](ADR-009-phase-3-cross-tier-invariants.md#the-four-semantic-issues-reconstructed-2026-09-12):
 reviewer verdicts are not themselves qualified (O1), the ledger does
 not record what *kind* of gap a GAP is (O2), and spend is attributed
 to calls rather than to outcomes (O4).  Each carries the measurement
 that closes it.  O3 — preservation scoped by file rather than by
 behaviour — closed on 2026-09-14 with its calibration table in
-[ADR-009 § Closed](ADR-009-phase-3-cross-tier-invariants.md#closed--o3-preservation-radius-calibrated-2026-09-14).
+[ADR-009 § Closed](ADR-009-phase-3-cross-tier-invariants.md#o3--preservation-is-scoped-by-file-not-by-behaviour--closed-2026-09-14).
 
 ## 1. External user validation
 

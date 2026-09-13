@@ -298,6 +298,95 @@ unlocated items deduped by their own text so two distinct ones stay two.
 Replayed over eight real review files: 29 becomes 2, matching the JSON, and the
 genuine blockers in the other reviews survive.
 
+**All four remaining semantic issues of ADR-009 are closed** (O1–O4). Each was
+measured on recorded corpora — no new model calls — and each produced a number
+worth stating plainly.
+
+**O1 — the reviewer is now qualified as a check.** `aisef/control/reviewer_qual.py`
+scores every recorded reviewer session into six closed classes using what the
+other layers proved at the same candidate, with the same three controls as the
+machine checks. Over 145 sessions: **false-block rate 10.5%** (6 of 57 blocks, a
+floor), **miss rate 34–39%** (27 of 70 passes), 12.4% undecided and never counted
+as a pass. Direction is roughly 4.5 misses per false block, so probe C11's single
+observation was the common case rather than the exception. The number that needs
+no convention to interpret: of 20 consecutive reviews of an identical tree, **11
+reversed the verdict**.
+
+**O2 — a GAP now says what kind of gap it is.** `Behaviour.gap_kind` is projected
+from the reason sentence the ledger already writes, so `ledger.json` gains no
+hand-writable field. Over 167 behaviours: 40 `unbuilt`, 4 `untested`, 5
+`untraced` — and those 5 were every criterion of one story whose test reporter
+was not installed, which `improve` would otherwise have turned into five paid
+repair stories. `untested` routes to a test-only story whose write scope *is* the
+verification paths, so the guard enforces the distinction instead of prose asking
+for it. One correction to the issue as written: the case it describes — behaviour
+and test both present, only the trace tag missing — is not derivable from
+recorded evidence at all, and has zero instances on disk.
+
+**O3 — the preservation radius is calibrated, and stays at 0.** The weight is now
+`story.verified_touched_weight` with the calibration table beside it in
+`aisef/config.py`, regenerated from evidence by `validation/o3_preservation_radius.py`.
+Nothing below 1.0 changes a single verdict; the first verdict any larger weight
+changes is a *false* block; catching 11 of 15 real regressors costs blocking 7 of
+17 clean stories. The finding that matters more than the coefficient: file overlap
+is true of 27 of 32 stories, so it cannot rank the 47% that regress. That is a
+predicate problem — preservation needs to be scoped by behaviour — not a weight
+problem.
+
+**O4 — `aisef cost` attributes spend to outcomes.** Only **4–22% of spend bought
+an attempt the gate passed**; 78–96% went to sessions no gate ever passed. Named
+causes, not a residual bucket: turn-cap exhaustion (52% of one corpus in 3
+sessions of 165), stories that ended net ≤ 0 (71–84% of spend in three of four
+corpora), gate-blocked rework (32–67%), environment failures (37% vs 2% between
+two corpora). Review and security retry rounds are under 0.15% everywhere — ruled
+out. The unit is stated per corpus and never averaged across kinds: the provider
+priced 0% of sessions in three corpora and 1 of 180 in the fourth, so dollars
+would have been invented. The command reproduces the prior E4 decomposition byte
+for byte as a cross-check.
+
+Two corpora the ADR's numbers rested on, `e9` and `par`, **are not on this
+machine**. The 36x per-story cost gap is therefore a historical claim we could not
+reproduce, and it is now labelled as one. It also needs no exotic explanation:
+within a single surviving corpus the priciest story costs 63x the median and
+bought nothing.
+
+**Five defects found while measuring**, each with a regression test (bugs
+149–153): a gap's reason froze at first observation so `gap_kind` could never
+escalate; the trace-stuck marker matched only Vietnamese while the prompt
+prescribes English; story complexity scored against the end-of-sprint
+`ledger.json` while the gate reprojects from evidence, so 12 of 15 real
+regressors were scored against fewer neighbours than existed — calibrating on
+that would have been calibrating on a bug; `STABILITY.md`, a frozen API contract,
+declared 9 guards against 10 in the code; and two bench runs sharing a directory
+deleted each other's kept worktrees, which are cited as published evidence.
+
+**The documentation was re-measured against the code** and thirteen drifts fixed.
+The roadmap's claim that Serena write-scope interop blocks OpenCode from
+completing dogfood runs is false — `todo-oc` merged 7 of 7 through OpenCode, and
+the fix shipped in v1.3.0 by a route none of the item's three proposals named.
+What still stands is narrower and now written that way. Counts corrected across
+the board: 63 bugs to 147, 9 guards to 10, 58 config keys to 68, one release tag
+three versions stale. Three claims that could not be settled from disk are
+labelled unverified with the measurement that would settle them — including that
+`run.log` never records which client a run used, which is worth fixing on its own.
+
+**The benchmark is ready for its second column.** Correcting my own earlier
+framing: the real-model wiring already existed and had run twice — cohorts C-1
+and C-1b, both against real `9router/mycombo`, with deltas of −0.06 and +0.06.
+Same model, same harness, sign flip: that is the shape of noise, and it sets the
+band at ±0.08. Four measurement holes are now closed: token counts were sitting
+unread in evidence while both reports called the cost column absent (one session
+records 98,392 in / 1,487 out / 581,444 cache-read at $0.00); infrastructure
+failures are classified and retried once, with the status on every row, without
+excluding them from `pass@1` — 6 of 9 cut sessions still passed, so dropping them
+is not a neutral correction; concurrent runs take a lock; and `--max-minutes`
+gives a stopping rule that works when the cost cap cannot, since 72 attempts
+against a turn-cap-exhausting model is 36 hours worst case. The selfcheck drives
+the real runner and scorer against a fake binary, proves the two columns differ
+in exactly the harness — byte-identical prompt, guard plugin on one side — and
+labels itself as not a measurement. Pre-registration for the run is on disk
+before any data exists.
+
 **A story may no longer deliver a placeholder** (bug 148). marks-cli stopped at
 EPIC-02 wave 1 with two of seven stories merged. STORY-01-02 had shipped a
 dispatcher whose commands answer "not implemented", and its criterion — a stub

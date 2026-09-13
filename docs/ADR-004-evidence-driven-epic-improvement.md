@@ -642,7 +642,7 @@ Dừng: "cải thiện biên ≤ 0 trong 2 vòng liền (loop-4, loop-5)" — `i
 **Chưa đo:** đường cong nhiều vòng hơn (còn 15 gap; kỳ vọng phẳng khi tới các gap cần route/màn hình của story sau), và B3/B5/B6 trên `par`.
 
 > **Chú thích 2026-09-14 — "còn 15 gap" không mang được danh sách, và nói ra vì sao.**
-> Luật ở [ADR-009 § Open](ADR-009-phase-3-cross-tier-invariants.md#open--the-four-remaining-semantic-issues-reconstructed-2026-09-12)
+> Luật ở [ADR-009 § Open](ADR-009-phase-3-cross-tier-invariants.md#the-four-semantic-issues-reconstructed-2026-09-12)
 > đòi mọi phát biểu dạng "còn N thứ" phải mang danh sách trên đĩa trong cùng
 > tài liệu. Con số 15 ở trên là ảnh sổ hành vi của `e9` ngày 2026-09-06; danh
 > sách 15 gap ấy sống trong `e9/_bmad-output/ledger.json`, và **cây bằng chứng

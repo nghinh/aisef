@@ -139,7 +139,14 @@ the "unexpected state" branch.
   The bridge (``parse_lines``) keeps the wire format a stable
   intermediate representation.
 
-## Open — the three remaining semantic issues (reconstructed 2026-09-12)
+## The four semantic issues (reconstructed 2026-09-12)
+
+**All four closed 2026-09-14.**  O1 — reviewer qualification scored over 145
+recorded sessions.  O2 — `Behaviour.gap_kind`, with the repair queue routed by
+kind.  O3 — the blast-radius weight calibrated, both error rates reported, left
+at 0 with the reason.  O4 — `aisef cost`, spend attributed to outcomes.  Each
+subsection below carries its own closure note and measurement; the statements of
+the issues are left as they were written so the reader can see what moved.
 
 O3 closed on 2026-09-14; its measurement is recorded below under *Closed — O3*.
 Three remain: O1, O2, O4.
@@ -257,7 +264,7 @@ id.  `Finding.id` collapses verbatim restatements only; the repo's place-key
 and it is the one that fixed lỗi 141.  Every "deduped" count here is therefore
 also a lower bound on how much restatement there was.
 
-### O2 — the ledger records that a behaviour is a GAP, never what kind of gap
+### O2 — the ledger records that a behaviour is a GAP, never what kind of gap — **CLOSED 2026-09-14**
 
 `improve` picks one GAP and writes one repair story.  But three different
 absences are all recorded as GAP: the behaviour was never built, the behaviour
@@ -275,37 +282,20 @@ control provide.
 queue routes each kind to a different action (story / test-only story /
 harness metadata fix), and `aisef issues` reports the three counts separately.
 
-### O4 — spend is attributed to calls, not to outcomes
+**Closed 2026-09-14** — `Behaviour.gap_kind` is a property projected from the
+reason sentence the ledger already writes, so `ledger.json` gains no
+hand-writable field and rebuild-from-evidence still reproduces it.  Measured
+over 167 behaviours in four corpora: 40 `unbuilt`, 4 `untested`, 5 `untraced`.
+Those 5 are every criterion of one story whose test reporter was not installed —
+before this, `improve` would have opened **five paid repair stories for one
+unconfigured reporter**.  One correction to the item as written above: the case
+it describes — behaviour and test both present, only the trace tag missing — is
+**not** derivable from recorded evidence, because deciding it requires reading
+test bodies.  It has 0 instances on disk, and measuring it at all needs the
+reviewer's trace verdict recorded machine-readably first.  Measurements in
+[`docs/handoff/o2-gap-kind.md`](handoff/o2-gap-kind.md).
 
-With reservations correct, the ledger can say what a run cost.  It still cannot
-say what the money bought.  The two dogfood corpora differ by a factor of
-thirty-six per story (`e9` ≈ $70, `par` ≈ $1.9) and nobody has decomposed the
-difference; `docs/ROADMAP-POST-1.0.md` asks for "net VERIFIED behaviour per
-dollar" and no command computes it.
-
-*Why it waited*: attribution needs a cost record that is complete at the moment
-of the call rather than reconciled afterwards — the in-flight reservation is
-exactly that record.
-
-*Closes when*: one command reports, per story, the spend split across attempt
-outcomes (plan-blocked / code-failed / environment-failed / passed) and the net
-VERIFIED behaviours the spend produced.
-
-**Closed 2026-09-14** — `aisef cost` (`aisef/control/attribution.py`) reports
-it; measurements and the decomposition in
-[`docs/handoff/o4-cost-per-outcome.md`](handoff/o4-cost-per-outcome.md).  Two
-corrections to the item as written above.  (a) `e9` and `par` are **not on this
-machine** (`ls /Users/nghinh/Downloads/projects` — `e9` and `par` absent; `find
-/Users/nghinh -maxdepth 4 -type d -name e9 -o -name par` finds only caches), so
-the 36x remains a historical claim, reproduced only as arithmetic over prose
-records: $496/7 stories ÷ $5.79/3 stories = 36.7x, both means quoted from
-`docs/STATUS-2026-09-05.md` and `docs/E4-COST-DECOMPOSITION.md`, neither
-recomputable from evidence.  (b) The unit cannot be dollars on any corpus that
-survives: the provider priced 0% of sessions in three of four, and 1 of 180 in
-the fourth.  `aisef cost` therefore decides the unit from the evidence and
-refuses to average a partial dollar record.
-
-## Closed — O3: preservation radius, calibrated (2026-09-14)
+### O3 — preservation is scoped by file, not by behaviour — **CLOSED 2026-09-14**
 
 *The issue, as it stood:* preservation is scoped by file, not by behaviour —
 `complexity.verified_touched` answers "did this story touch a file owned by a
@@ -415,6 +405,37 @@ changed files, yet five requirements of three other stories changed status
 during its run.  Second, the declared scope it was measured against is a plan
 artifact: it need not match what the story changed.  Until the predicate is
 behaviour-shaped, leave this weight at 0.
+
+
+### O4 — spend is attributed to calls, not to outcomes
+
+With reservations correct, the ledger can say what a run cost.  It still cannot
+say what the money bought.  The two dogfood corpora differ by a factor of
+thirty-six per story (`e9` ≈ $70, `par` ≈ $1.9) and nobody has decomposed the
+difference; `docs/ROADMAP-POST-1.0.md` asks for "net VERIFIED behaviour per
+dollar" and no command computes it.
+
+*Why it waited*: attribution needs a cost record that is complete at the moment
+of the call rather than reconciled afterwards — the in-flight reservation is
+exactly that record.
+
+*Closes when*: one command reports, per story, the spend split across attempt
+outcomes (plan-blocked / code-failed / environment-failed / passed) and the net
+VERIFIED behaviours the spend produced.
+
+**Closed 2026-09-14** — `aisef cost` (`aisef/control/attribution.py`) reports
+it; measurements and the decomposition in
+[`docs/handoff/o4-cost-per-outcome.md`](handoff/o4-cost-per-outcome.md).  Two
+corrections to the item as written above.  (a) `e9` and `par` are **not on this
+machine** (`ls /Users/nghinh/Downloads/projects` — `e9` and `par` absent; `find
+/Users/nghinh -maxdepth 4 -type d -name e9 -o -name par` finds only caches), so
+the 36x remains a historical claim, reproduced only as arithmetic over prose
+records: $496/7 stories ÷ $5.79/3 stories = 36.7x, both means quoted from
+`docs/STATUS-2026-09-05.md` and `docs/E4-COST-DECOMPOSITION.md`, neither
+recomputable from evidence.  (b) The unit cannot be dollars on any corpus that
+survives: the provider priced 0% of sessions in three of four, and 1 of 180 in
+the fourth.  `aisef cost` therefore decides the unit from the evidence and
+refuses to average a partial dollar record.
 
 ## Deferred
 
