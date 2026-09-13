@@ -488,6 +488,26 @@ class TestTieuChiTiengAnhCungDuocDoc(PreflightTestCase):
                          [m.line() for m in pf.missing])
 
 
+class TestBangTuKhoaPhaiCoDuNgonNgu(PreflightTestCase):
+    """Bài học lỗi 114 áp cho các bảng từ khoá còn lại: thiếu một ngôn ngữ thì
+    phép kiểm **tắt** ở ngôn ngữ ấy, không phải yếu đi."""
+
+    def test_goi_api_ngoai_bang_tieng_anh_van_can_mang(self):
+        s = self.story(acceptance_criteria=[
+            "Then the app calls an external API and stores the response",
+        ])
+        pf = self.check(s)
+        self.assertTrue(any(m.capability == "network" for m in pf.needs),
+                        [n.capability for n in pf.needs])
+
+    def test_cam_mang_bang_tieng_anh_van_khong_doi_mang(self):
+        s = self.story(acceptance_criteria=[
+            "Then no outbound network requests are made and no external API is called",
+        ])
+        pf = self.check(s)
+        self.assertFalse([m for m in pf.needs if m.capability == "network"])
+
+
 class TestCamMangKhongPhaiCanMang(unittest.TestCase):
     """Lỗi 52. Preflight khớp chữ "third-party" rồi đòi **bật**
     `sandbox.tools_network` — cho một story mà tiêu chí chấp nhận nói *cấm*

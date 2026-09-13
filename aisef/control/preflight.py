@@ -155,9 +155,14 @@ _SECURITY_MARKERS = (
 )
 
 #: Markers that a story needs network during verification.
+#: Same lesson as bug 114: a keyword table missing a language is a check that
+#: is off in that language, not a check that is weaker there.
 _NETWORK_MARKERS = (
     "gọi api ngoài", "dịch vụ ngoài", "third-party", "bên thứ ba",
     "tải về từ", "cdn", "webhook", "đồng bộ lên máy chủ",
+    "external api", "external service", "remote api", "remote service",
+    "downloads from", "download from", "fetches from", "fetch from",
+    "syncs to", "sync to the server", "upstream service",
 )
 
 #: Words that turn a network marker into a **prohibition** instead of a need.
@@ -196,6 +201,8 @@ _IMPACT_MARKERS = (
     "mọi nơi dùng", "tất cả caller", "mọi lời gọi", "mọi nơi gọi",
     "cross-module", "liên module", "phiên bản api", "api version",
     "breaking change", "thay đổi phá vỡ", "mọi module",
+    "every caller", "all callers", "every call site", "all call sites",
+    "everywhere it is used", "all usages", "every module",
 )
 
 #: Threshold of root modules the write scope touches to be considered cross-module.

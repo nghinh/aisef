@@ -33,7 +33,13 @@ Every entry has a regression test and a row in `docs/FAILURE-TAXONOMY.md`;
   `.gitignore` are skipped, since a file git ignores never appears as an
   out-of-scope change and so cannot need write scope. A keyword heuristic is a
   heuristic *per language*, and a missing language turns it off rather than
-  degrading it.
+  degrading it — so `_NETWORK_MARKERS` and `_IMPACT_MARKERS` got their English
+  entries too, preventively, with no measured failure behind them.
+
+  Validated on the plan that exposed it: the stories gate blocked, the
+  split-retry loop sent it back to the planner, and the new plan's thirteen
+  stories carry write scopes that contain the files their criteria name —
+  zero gate errors.
 
 - **The project's linter no longer lints the framework's own skills**
   (bug 113). `aisef setup` installs 155 skills into `.claude/`, and the
