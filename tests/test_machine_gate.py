@@ -102,6 +102,25 @@ class TestStoryGate(unittest.TestCase):
         self.assertFalse(r.passed)
         self.assertTrue(any("split" in e for e in r.errors))
 
+    def test_khong_co_tieu_chi_nao_thi_chan(self):
+        """Lỗi 145. Story không tiêu chí **không phải** story nhỏ, mà là story
+        không kiểm được: `criteria have tests` không có gì để tìm, còn nop trả
+        PASSED ở nhánh "story declares no criteria". Đo trên marks-cli
+        2026-09-14: nhãn `Acceptance criteria:` trần (lỗi 144) làm cả sáu story
+        về 0 tiêu chí, cổng máy báo `errors: []`, trong khi thẻ story in đúng
+        dòng "(none — machine gate will block)"."""
+        r = check_stories([story("S-1"), story("S-2")],
+                          story_ac_count={"S-1": 0, "S-2": 3})
+        self.assertFalse(r.passed)
+        loi = " ".join(r.errors)
+        self.assertIn("S-1", loi)
+        self.assertNotIn("S-2", loi)
+
+    def test_khong_khai_so_tieu_chi_thi_khong_ket_luan(self):
+        """Người gọi không truyền `story_ac_count` (kiểm bộ phận, luồng cũ) —
+        im lặng không phải là 0."""
+        self.assertTrue(check_stories([story("S-1")]).passed)
+
     def test_ac_limit_respects_config(self):
         cfg = Config({**DEFAULTS, "story.max_acceptance_criteria": 30})
         r = check_stories([story("S-1")], config=cfg, story_ac_count={"S-1": 20})

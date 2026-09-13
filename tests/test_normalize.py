@@ -361,6 +361,43 @@ class TestEpicsFormats(unittest.TestCase):
         )
         self.assertEqual(len(plan.epics[0].stories), 1)
 
+    def test_plain_acceptance_label_is_read(self):
+        """Bug 144. The planner wrote the label as plain text — no bold, no
+        heading — and listed the criteria as bullets carrying their own codes.
+        The block regex knew only `**Acceptance Criteria:**` and `## Acceptance
+        Criteria`, so every story in marks-cli 2026-09-14 came out with zero
+        criteria, and nothing downstream treated that as a problem."""
+        from aisef.control.normalize import parse_epics
+        plan = parse_epics(
+            "## Epic 2: Capture\n\n"
+            "### Story 2.1: `add` command\n\n"
+            "**As a** reader,\n**I want** to save a url,\n**so that** I keep it.\n\n"
+            "Acceptance criteria:\n\n"
+            "- AC-2.1-1 — Given the url is valid, When `marks add` runs, "
+            "Then the store gains one bookmark and the command exits 0.\n"
+            "- AC-2.1-2 — Given the url is empty, When `marks add` runs, "
+            "Then stderr names the problem and nothing is written.\n\n"
+            "**Story metadata:**\n- write_scope: bin/marks.js\n"
+        )
+        crit = plan.epics[0].stories[0].acceptance_criteria
+        self.assertEqual(len(crit), 2, crit)
+        self.assertIn("exits 0", crit[0])
+        self.assertIn("nothing is written", crit[1])
+
+    def test_prose_mentioning_acceptance_criteria_opens_no_block(self):
+        """The label counts only when it stands alone and ends at the colon —
+        otherwise a sentence about acceptance criteria swallows the paragraph
+        after it."""
+        from aisef.control.normalize import parse_epics
+        plan = parse_epics(
+            "## Epic 1: Setup\n\n"
+            "### Story 1.1: Init\n\n"
+            "As a dev,\nI want setup,\nSo that it works.\n\n"
+            "This story has acceptance criteria that the reviewer will check.\n"
+            "It also has none of its own written here.\n"
+        )
+        self.assertEqual(plan.epics[0].stories[0].acceptance_criteria, [])
+
     def test_and_given_chain_is_not_one_giant_criterion(self):
         """Bug 91: told to split an oversized story, the planner chained the
         scenarios as `**And** **Given** …` instead. The parser read all of

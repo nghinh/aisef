@@ -298,6 +298,24 @@ unlocated items deduped by their own text so two distinct ones stay two.
 Replayed over eight real review files: 29 becomes 2, matching the JSON, and the
 genuine blockers in the other reviews survive.
 
+**A plan where every story had zero acceptance criteria passed every gate**
+(bugs 144, 145). Found on the first run of a third dogfood project: `aisef plan`
+reported six stories, and all six story cards printed `(none — machine gate will
+block)` under Acceptance Criteria while the machine gate reported no errors.
+
+The planner had written the label as plain text — `Acceptance criteria:`, no
+bold, no heading — and listed criteria as bullets carrying their own codes. The
+block regex knew only the bold and heading forms, so it matched nothing; the
+bullet-splitting code that would have handled the rest was never reached. The
+label is now recognised standing alone, anchored to its line and required to end
+at the colon, so prose that merely mentions acceptance criteria opens no block.
+
+The gate had a ceiling on criteria count and no floor. A story with none is not
+a small story but an unverifiable one: `criteria have tests` has nothing to look
+for and `tests verify story` returns PASSED on its "story declares no criteria"
+branch. Zero is now an error that names the stories and both likely causes — the
+document has none, or its criteria are in a shape the parser cannot read yet.
+
 **A story branch is discarded when its criteria change** (bug 143). A failed
 story keeps its branch on purpose — the next attempt builds on the last one —
 but nothing tied that branch to the criteria it was written for. Amend the

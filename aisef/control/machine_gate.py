@@ -121,6 +121,22 @@ def check_stories(
     except ValueError as e:
         r.errors.append(str(e))
 
+    # A story with **no** criteria is not a small story, it is an unverifiable
+    # one: `criteria have tests` has nothing to look for, and the nop control
+    # returns PASSED on the "story declares no criteria" branch. So nothing
+    # downstream notices. Measured on marks-cli 2026-09-14, where a label the
+    # parser did not know (bug 144) left all six stories at zero criteria and
+    # the gate reported no errors — the story cards said "(none — machine gate
+    # will block)" while the machine gate passed them.
+    khong_co = sorted(sid for sid, n in (story_ac_count or {}).items() if n <= 0)
+    if khong_co:
+        r.errors.append(
+            f"stories with no acceptance criteria: {', '.join(khong_co)} — nothing to "
+            f"verify and nothing for a test to be named after, so every criteria check "
+            f"passes vacuously. Either `epics.md` has none, or its criteria are written "
+            f"in a shape the parser does not read yet"
+        )
+
     max_ac = cfg["story.max_acceptance_criteria"]
     for sid, n in (story_ac_count or {}).items():
         if n > max_ac:

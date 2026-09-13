@@ -563,12 +563,18 @@ _AC_HEAD = (
     r"|(?:Testable|Verifiable|Acceptance|Verification|Test)\s+(?:criteria|consequences|conditions)"
     r"|Criteria|Tiêu chí|Hệ quả(?:\s+kiểm chứng(?:\s+được)?)?)"
 )
+#: Third form: a **plain** label on its own line — `Acceptance criteria:` with
+#: no bold and no heading (bug 144, marks-cli 2026-09-14, where all six stories
+#: came out with zero criteria and nothing downstream noticed). Anchored to the
+#: line and required to end at the colon, so a sentence that merely mentions
+#: acceptance criteria in prose does not open a block.
 _AC_BLOCK = re.compile(
     r"(?:\*\*" + _AC_HEAD + r"\s*[:：]?\*\*"
-    r"|#{2,5}\s+" + _AC_HEAD + r")"
+    r"|#{2,5}\s+" + _AC_HEAD
+    + r"|^[ \t]*" + _AC_HEAD + r"[ \t]*[:：][ \t]*(?=\n))"
     r"\s*[:：]?\s*\n(.*?)"
     r"(?=\n#{2,5}\s|\n\s*\*\*(?!Given|When|Then|And)[^\n*]+\*\*\s*[:：]?\s*\n|\Z)",
-    re.DOTALL | re.IGNORECASE,
+    re.DOTALL | re.IGNORECASE | re.MULTILINE,
 )
 #: A criterion opens with Given. Two real variants beyond `**Given**` (bug 91,
 #: 2026-09-13): the planner chains scenarios as `**And** **Given** …`, which
