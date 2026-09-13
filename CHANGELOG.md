@@ -85,6 +85,18 @@ deleting the branch. Untracked copies are now removed before the merge and put
 back after; and when nothing is in conflict the error quotes git's own reason
 and says to clean the worktree, which is what actually fixes it.
 
+**Reviewers now see what the candidate already proves** (bug 124). A story
+spent all three attempts blocked by a single security finding — "lstatSync
+swallows ENOENT, so the symlink check never runs" — while the candidate
+shipped a green test named `AC-STORY-01-01-4: save refuses to write to broken
+symlink target`, and `lstat` on a broken symlink does not raise ENOENT at all;
+it returns the link. The reviewer had no way to know either: its `validation`
+slot read "standard gate only". Both review prompts now receive `proven`, the
+story's criterion-tagged tests green at that exact candidate. This is not
+absolution — a green test can sit over broken code, which is worth reporting —
+but a blocking item that contradicts one of them must name the test and say
+why it does not cover the case.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on

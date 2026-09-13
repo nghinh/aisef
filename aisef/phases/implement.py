@@ -34,7 +34,7 @@ from ..control import gate as story_gate
 from ..control import tdd
 from ..kit import registry as skill_registry
 from ..kit import router as skill_router
-from ..control.acceptance import ac_code
+from ..control.acceptance import ac_code, coverage as ac_coverage
 from ..control.design_contract import DesignContract, load as load_contract
 from ..control.impact import analyse as analyse_impact, is_test_path
 from ..control.preflight import verification_contract
@@ -400,6 +400,41 @@ def validation_text(story: Story, items: list[dict], *, max_chars: int) -> str:
     return _cap("\n".join(lines), max_chars) or "_(standard gate only: test, lint, write scope)_"
 
 
+def proven_text(evidence: Evidence, story: Story, *, candidate: str, max_chars: int) -> str:
+    """Slot `proven`: the story's criterion-tagged tests **green at this build**.
+
+    A reviewer that does not know what is already proven blocks on things the
+    suite covers. Measured on todo-cli STORY-01-01 2026-09-13: the security
+    reviewer blocked three attempts with "lstatSync ... swallows ENOENT, so
+    the symlink check never runs", while the candidate shipped a green
+    `AC-STORY-01-01-4: save refuses to write to broken symlink target` — and
+    `lstat` on a broken symlink does not raise ENOENT at all, it returns the
+    link. The story died on a claim one command would have refuted (lỗi 124).
+
+    Not absolution: the prompt asks the reviewer to **name** the test its
+    finding contradicts and say why the test does not cover the case. A
+    finding that can do that still blocks; one that cannot was never a finding.
+    """
+    run = None
+    for e in evidence.of(TOOL_RUN, "test"):
+        if e.ok and (not candidate or str(e.detail.get("candidate") or "") in ("", candidate)):
+            run = e
+    if run is None:
+        return "_(no green test run recorded at this candidate)_"
+    ten = [str(t) for t in (run.detail.get("test_ids") or [])]
+    if not ten:
+        return "_(the test run printed no test names — cannot list what is proven)_"
+    hong = {str(x) for x in (run.detail.get("failed_ids") or [])}
+    hong |= {str(x) for x in (run.detail.get("skipped_ids") or [])}
+    xanh = [t for t in ten if t not in hong]
+    theo_tc = ac_coverage(story.id, len(story.acceptance_criteria), xanh)
+    lines = [f"- AC-{story.id}-{i}: " + ", ".join(f"`{t}`" for t in ts)
+             for i, ts in sorted(theo_tc.items()) if ts]
+    if not lines:
+        return "_(no green test carries a criterion code at this candidate)_"
+    return _cap("\n".join(lines), max_chars)
+
+
 def validation_targets(story: Story, items: list[dict]) -> tuple[list[str], list[str]]:
     """(verification kinds, screens) the harness must run at the candidate --
     story's own plus preservation.  Same function for the slot and for
@@ -428,7 +463,7 @@ SLOT_SOURCE = {
     "tools": "config", "skills": "router", "diff_summary": "git", "impact": "code",
     "repo_map": "code", "blast_radius": "code",
     "index": "ledger", "roadmap": "artifact", "preservation": "ledger", "validation": "ledger",
-    "prior_review": "evidence", "memory": "memory",
+    "prior_review": "evidence", "proven": "evidence", "memory": "memory",
 }
 
 #: Slots allowed to be empty when building the prompt: `repo_map` empty means
@@ -1546,6 +1581,9 @@ def review_story_v2(
     delta = tdd.test_delta(workdir, base_ref=base_ref, changed=changed)
     store = EvidenceStore(artifact_root, candidate=candidate)
     context["prior_review"] = _prior_review(store, story.id, role="review", changed=changed)
+    context["proven"] = proven_text(
+        store.read(story.id), story, candidate=candidate,
+        max_chars=int(config["context.max_preservation_chars"]) if config else 1500)
     store.record(
         story.id, Event(kind=NOTE, name="qa:test-delta", ok=not delta, detail={"files": delta})
     )
@@ -1798,6 +1836,9 @@ def security_review(
     run_log(artifact_root, f"story={story.id}#{number} security START changed={len(changed)}")
     store = EvidenceStore(artifact_root, candidate=candidate)
     context["prior_review"] = _prior_review(store, story.id, role="security", changed=changed)
+    context["proven"] = proven_text(
+        store.read(story.id), story, candidate=candidate,
+        max_chars=int(config["context.max_preservation_chars"]) if config else 1500)
     from ..memory import attach
     attach(context, story, project, config, SECURITY)
     store.handoff(story.id, frm=REVIEWER, to=SECURITY, attempt=number,

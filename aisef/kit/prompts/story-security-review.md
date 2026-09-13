@@ -1,6 +1,6 @@
 ---
 name: story-security-review
-version: 6
+version: 7
 role: security
 ---
 # Security review {{ story_id }} — {{ story_title }}
@@ -41,6 +41,19 @@ passes through, check whether it still holds.
 {{ preservation }}
 
 {{ validation }}
+
+## Already proven green on this build
+
+The story's own criterion-tagged tests that pass at the candidate you are
+reading. This is **not** absolution: a test can be green and the code still
+wrong, and that is exactly the thing worth reporting.
+
+It does mean one thing, though. If your finding says the code fails in a
+case one of these tests covers, say **which** test and **why** it does not
+actually cover that case. A blocking item that contradicts a green test
+without naming it is a guess, and it costs the story a whole attempt.
+
+{{ proven }}
 
 ## What you already said about this story
 

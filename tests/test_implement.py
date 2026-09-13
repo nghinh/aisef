@@ -709,6 +709,73 @@ class TestSchemaRaSoat(ImplementTestCase):
         self.assertNotIn("review:mismatch", notes)
 
 
+class TestSlotDaChungMinh(unittest.TestCase):
+    """Lỗi 124 (todo-cli STORY-01-01, 2026-09-13). Người rà soát bảo mật chặn
+    ba lượt liền với "lstatSync nuốt ENOENT nên phép kiểm symlink không bao giờ
+    chạy" — trong khi ứng viên mang sẵn `AC-STORY-01-01-4: save refuses to write
+    to broken symlink target` **đang xanh**, và `lstat` trên symlink gãy không
+    ném ENOENT (đo bằng node: `isSymbolicLink() === true`). Story chết vì một
+    khẳng định mà một câu lệnh bác bỏ được, và người rà soát không hề biết có
+    test ấy: slot `validation` gửi cho nó là "(standard gate only)"."""
+
+    def _story(self, n=4):
+        from aisef.control.normalize import Story
+        return Story(id="STORY-01-01", epic_id="EPIC-01", title="t",
+                     acceptance_criteria=[f"tiêu chí {i}" for i in range(1, n + 1)])
+
+    def _ev(self, events):
+        from aisef.harness.observe import Evidence, Event
+        return Evidence(story_id="STORY-01-01", events=events)
+
+    def _run(self, **detail):
+        from aisef.harness.observe import Event
+        return Event(kind="tool_run", name="test", ok=detail.pop("ok", True), detail=detail)
+
+    def test_liet_ke_test_xanh_mang_ma_tieu_chi(self):
+        from aisef.phases.implement import proven_text
+        ev = self._ev([self._run(candidate="aaa", test_ids=[
+            "AC-STORY-01-01-4: save refuses to write to broken symlink target",
+            "AC-STORY-01-01-1: load returns empty array",
+            "khong mang ma",
+        ], failed_ids=[])])
+        ra = proven_text(ev, self._story(), candidate="aaa", max_chars=1500)
+        self.assertIn("AC-STORY-01-01-4", ra)
+        self.assertIn("broken symlink target", ra)
+        self.assertNotIn("khong mang ma", ra)
+
+    def test_test_do_hoac_bo_qua_khong_phai_da_chung_minh(self):
+        from aisef.phases.implement import proven_text
+        ev = self._ev([self._run(candidate="aaa", ok=False,
+                                 test_ids=["AC-STORY-01-01-4: x"], failed_ids=["AC-STORY-01-01-4: x"])])
+        self.assertIn("no green test run", proven_text(ev, self._story(), candidate="aaa", max_chars=1500))
+        ev = self._ev([self._run(candidate="aaa", test_ids=["AC-STORY-01-01-4: x"],
+                                 failed_ids=[], skipped_ids=["AC-STORY-01-01-4: x"])])
+        self.assertIn("no green test carries a criterion code",
+                      proven_text(ev, self._story(), candidate="aaa", max_chars=1500))
+
+    def test_lan_chay_o_ung_vien_khac_khong_duoc_tinh(self):
+        """Cùng luật ADR-004 R1 như cổng: bằng chứng của bản khác không chấm
+        bản này — và cũng không được dùng để bảo người rà soát yên tâm."""
+        from aisef.phases.implement import proven_text
+        ev = self._ev([self._run(candidate="bbb", test_ids=["AC-STORY-01-01-4: x"], failed_ids=[])])
+        self.assertIn("no green test run", proven_text(ev, self._story(), candidate="aaa", max_chars=1500))
+
+    def test_runner_khong_in_ten_thi_noi_thang(self):
+        from aisef.phases.implement import proven_text
+        ev = self._ev([self._run(candidate="aaa", test_ids=[], failed_ids=[])])
+        self.assertIn("printed no test names", proven_text(ev, self._story(), candidate="aaa", max_chars=1500))
+
+    def test_ca_hai_vai_ra_soat_deu_nhan_slot(self):
+        from aisef.phases.implement import SLOT_SOURCE
+        self.assertEqual(SLOT_SOURCE["proven"], "evidence")
+        from aisef.phases.implement import load_catalog
+
+        cat = load_catalog()
+        for ten in ("story-review", "story-security-review"):
+            with self.subTest(prompt=ten):
+                self.assertIn("proven", cat.get(ten).slots)
+
+
 class TestFindings(unittest.TestCase):
     def test_only_blocking_items_count(self):
         text = (

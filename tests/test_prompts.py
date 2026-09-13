@@ -45,6 +45,7 @@ STORY_CTX = {
     "roadmap": "- STORY-01-01 — Tạo ghi chú   ← the story under review\n- STORY-02-01 — Lưu ghi chú",
     "preservation": "- `AC-STORY-01-00-1` · STORY-01-00 · test `src/x.test.ts > AC-STORY-01-00-1`",
     "validation": "- test bảo toàn: `src/x.test.ts > AC-STORY-01-00-1`",
+    "proven": "- AC-STORY-01-01-1: `src/notes.test.ts > AC-STORY-01-01-1: tạo được`",
     "skills": "- `x` — dùng khi: y",
     "diff_summary": "3 file đổi",
     "impact": "_Chưa có phân tích ảnh hưởng_",
