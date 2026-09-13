@@ -13,6 +13,34 @@ from ..config import Config, ConfigError
 from ._common import EXIT_NOT_READY, EXIT_OK
 
 
+def _lenh_that_su(project: Path, cmd: str) -> str:
+    """`npm test` resolved through `package.json` scripts, recursively enough.
+
+    Judging a command by its own words is judging `npm test`, which says
+    nothing about anything. The script it runs is the command that matters.
+    """
+    import json as _json
+
+    path = project / "package.json"
+    if not path.is_file():
+        return cmd
+    try:
+        scripts = _json.loads(path.read_text(encoding="utf-8")).get("scripts") or {}
+    except (OSError, ValueError):
+        return cmd
+    ra, seen = cmd, set()
+    for _ in range(3):                      # `test` -> `test:unit` -> real command
+        phan = ra.strip().split()
+        if len(phan) < 2 or phan[0] not in ("npm", "pnpm", "yarn", "bun"):
+            break
+        key = phan[2] if phan[1] == "run" and len(phan) > 2 else phan[1]
+        if key not in scripts or key in seen:
+            break
+        seen.add(key)
+        ra = f"{ra} → {scripts[key]}"       # keep both: the caller shows it to a human
+    return ra
+
+
 def _hook_paths_elsewhere(project: Path) -> list[str] | None:
     """Project paths declared in compiled hook/plugin that **differ** from this project.
     None when there are no hooks to compare."""
@@ -220,22 +248,35 @@ def cmd_doctor(args) -> int:
         check("config", True, cfg.source)
         test_cmd = str(cfg.get("tools.test", "") or "")
         if test_cmd:
-            has_cov = any(k in test_cmd for k in ("--coverage", "--cov", "--experimental-test-coverage", "c8 ", "nyc "))
+            # Evidence first, the command string second — `npm test` says
+            # nothing about coverage, and the script it runs may print it
+            # (bug 112: a project that had just switched to
+            # `node --test --experimental-test-coverage` was told to add
+            # `--experimental-test-coverage`).
+            from ..harness.observe import TOOL_RUN, EvidenceStore
+
+            store = EvidenceStore(project / "_bmad-output")
+            runs = [e for sid in store.stories() for e in store.read(sid).of(TOOL_RUN)
+                    if e.name in ("test", "test:baseline") and not e.detail.get("skipped")]
+            do_lenh = _lenh_that_su(project, test_cmd)
+            co_cov = any(k in do_lenh for k in ("--coverage", "--cov",
+                                                "--experimental-test-coverage", "c8 ", "nyc "))
+            if runs and runs[-1].detail.get("coverage") is not None:
+                has_cov, vi_sao = True, "last test run recorded a coverage number"
+            else:
+                has_cov = co_cov
+                vi_sao = f"`tools.test` = `{do_lenh.strip()}`"
             check(
                 "test command prints coverage", has_cov,
-                "gate `coverage.min` can read the number" if has_cov else
-                f"`tools.test` = `{test_cmd}` does not print coverage — gate coverage check will be **not configured** "
+                f"gate `coverage.min` can read the number ({vi_sao})" if has_cov else
+                f"{vi_sao} does not print coverage — gate coverage check will be **not configured** "
                 "(add `--coverage` / `--cov` / `--experimental-test-coverage`)",
                 required=False,
             )
             # Are test names readable (ADR-005 V9)?  If evidence exists, trust
             # it: the latest `tool_run test` records `test_format`; otherwise
             # guess from command flags.  e9/par: 220/377 test runs had unreadable names.
-            from ..harness.observe import TOOL_RUN, EvidenceStore
-
-            store = EvidenceStore(project / "_bmad-output")
-            runs = [e for sid in store.stories() for e in store.read(sid).of(TOOL_RUN)
-                    if e.name in ("test", "test:baseline") and not e.detail.get("skipped")]
+            test_cmd = do_lenh
             if runs:
                 has_names = bool(runs[-1].detail.get("test_format"))
                 detail = f"last test run recorded test_format={runs[-1].detail.get('test_format') or ''!r}"

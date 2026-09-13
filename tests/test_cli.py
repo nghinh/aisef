@@ -358,6 +358,25 @@ class TestReviewReadinessTinhLaiThieuGi(CliTestCase):
         self.assertIn("configure `tools.test`", out)
 
 
+class TestPresetLintKhongQuetVaoKhung(CliTestCase):
+    """Lỗi 113: khung cài 155 skill vào `.claude/` và **bắt buộc commit**
+    chúng (worktree là bản checkout). Mọi linter dự án cấu hình vì thế đọc
+    luôn mã của khung: `npx eslint .` báo 116 lỗi `no-undef` trong script
+    skill và đánh trượt mục lint của story."""
+
+    def test_preset_js_bo_qua_thu_muc_cua_khung(self):
+        from aisef.cli.harness import STACK_PRESETS
+        for stack in ("node", "react"):
+            lenh = STACK_PRESETS[stack]["tools.lint"]
+            for d in (".claude", ".aisef", ".opencode"):
+                self.assertIn(d, lenh, f"{stack}: {lenh}")
+
+    def test_preset_python_bo_qua_thu_muc_cua_khung(self):
+        from aisef.cli.harness import STACK_PRESETS
+        lenh = STACK_PRESETS["python"]["tools.lint"]
+        self.assertIn("--exclude .claude", lenh)
+
+
 class TestInitNoiRoCongCuChuaChayDuoc(CliTestCase):
     """Lỗi 82 lặp lại ở lint: preset ghi ra một lệnh, còn việc lệnh ấy chạy
     được hay không là thuộc tính của **máy**. `npx eslint` trong một dự án
@@ -936,6 +955,36 @@ class TestDoctorCoverageHint(CliTestCase):
         (self.project / ".ai" / "config.json").write_text(json.dumps({"tools.test": "node --test --experimental-test-coverage src/*.test.js"}), encoding="utf-8")
         code, out, _ = self.run_cli("doctor")
         self.assertIn("✅ test command prints coverage", out)
+
+
+    def test_npm_script_duoc_go_ra_truoc_khi_chan_doan(self):
+        """Lỗi 112: `npm test` không nói gì về coverage — script nó chạy mới
+        nói. Doctor bảo một dự án **đang** in coverage là hãy thêm cờ in
+        coverage, đúng loại lời khuyên làm người đọc mất tin vào cả bảng."""
+        import json
+        (self.project / ".ai").mkdir(exist_ok=True)
+        (self.project / ".ai" / "config.json").write_text(
+            json.dumps({"tools.test": "npm test"}), encoding="utf-8")
+        (self.project / "package.json").write_text(
+            json.dumps({"scripts": {"test": "node --test --experimental-test-coverage"}}),
+            encoding="utf-8")
+        _, out, _ = self.run_cli("doctor")
+        self.assertIn("✅ test command prints coverage", out)
+        self.assertIn("node --test --experimental-test-coverage", out)
+
+    def test_bang_chung_thang_chuoi_lenh(self):
+        """Có số coverage trong bằng chứng thì không đoán từ chuỗi lệnh nữa."""
+        import json
+        (self.project / ".ai").mkdir(exist_ok=True)
+        (self.project / ".ai" / "config.json").write_text(
+            json.dumps({"tools.test": "make test"}), encoding="utf-8")
+        from aisef.harness.observe import EvidenceStore
+        EvidenceStore(self.artifacts).tool_run(
+            "STORY-01-01", "test", ok=True,
+            detail={"test_format": "node-spec", "coverage": 91.0})
+        _, out, _ = self.run_cli("doctor")
+        self.assertIn("✅ test command prints coverage", out)
+        self.assertIn("recorded a coverage number", out)
 
 
 class TestLenhDoc(CliTestCase):

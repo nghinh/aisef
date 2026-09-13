@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+- **The project's linter no longer lints the framework's own skills**
+  (bug 113). `aisef setup` installs 155 skills into `.claude/`, and the
+  project has to commit them — a story worktree is a checkout, so an
+  uncommitted skill is absent where the session runs. Every linter the project
+  configures therefore reads them: `npx eslint .` reported 116 `no-undef`
+  errors in skill scripts and failed a story's lint check. The `node`, `react`
+  and `python` presets now exclude `.claude`, `.aisef` and `.opencode`.
+
+- **`doctor` resolves `npm test` before judging it** (bug 112). It read the
+  command string, which for `npm test` says nothing, and told a project that
+  had just enabled `--experimental-test-coverage` to add
+  `--experimental-test-coverage`. Evidence first: if a recorded test run
+  carries a coverage number, that settles it; otherwise the npm script is
+  resolved through `package.json` and then read.
+
 - **`**And** when …` opens a new acceptance criterion** (bug 111). Same
   chaining habit as bug 91, different keyword: every story in a plan came out
   with exactly one criterion, including stories that plainly described two

@@ -56,10 +56,21 @@ def cmd_baseline(args) -> int:
 #: 'python'` — preset sinh ra một lệnh không chạy được trên máy vừa sinh ra nó.
 _PY = "python" if shutil.which("python") else "python3"
 
+#: The framework installs 155 skills into `.claude/`, and the project must
+#: commit them — a story worktree is a checkout, so an uncommitted skill is
+#: absent where the session runs. Which means every linter the project
+#: configures will read them (bug 113: `npx eslint .` reported 116 `no-undef`
+#: errors in skill scripts and failed the story's lint check). The project's
+#: lint command lints the project.
+_NGOAI_KHUNG_JS = (' --ignore-pattern "**/.claude/**"'
+                   ' --ignore-pattern "**/.aisef/**"'
+                   ' --ignore-pattern "**/.opencode/**"')
+_NGOAI_KHUNG_PY = " --exclude .claude --exclude .aisef --exclude .opencode"
+
 STACK_PRESETS: dict[str, dict[str, object]] = {
     "react": {
         "tools.test": "npx vitest run --reporter=verbose",
-        "tools.lint": "npx eslint . --max-warnings=0",
+        "tools.lint": "npx eslint . --max-warnings=0" + _NGOAI_KHUNG_JS,
         "sandbox.image": "node:22-alpine",
         "sandbox.tools_network": True,
         "sandbox.allow_hosts": ["registry.npmjs.org", "*.npmjs.org"],
@@ -67,7 +78,7 @@ STACK_PRESETS: dict[str, dict[str, object]] = {
     },
     "python": {
         "tools.test": f"{_PY} -m pytest -v",
-        "tools.lint": "ruff check .",
+        "tools.lint": "ruff check ." + _NGOAI_KHUNG_PY,
         "sandbox.image": "python:3.12-slim",
         "sandbox.allow_hosts": ["pypi.org", "files.pythonhosted.org"],
     },
@@ -79,7 +90,7 @@ STACK_PRESETS: dict[str, dict[str, object]] = {
     },
     "node": {
         "tools.test": "npm test",
-        "tools.lint": "npx eslint . --max-warnings=0",
+        "tools.lint": "npx eslint . --max-warnings=0" + _NGOAI_KHUNG_JS,
         "sandbox.image": "node:22-alpine",
         "sandbox.tools_network": True,
         "sandbox.allow_hosts": ["registry.npmjs.org", "*.npmjs.org"],
