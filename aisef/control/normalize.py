@@ -178,6 +178,12 @@ _VERIFY_COMMAND_KEY = {"unit": "tools.test"}
 
 
 _JS_CONFIGS = {
+    # Node's built-in runner has no config file. Naming it here keeps a project
+    # that runs `node --test` from being granted write scope over jest,
+    # vitest, cypress and mocha config files it has never had (bug 108): a
+    # write scope is a permission, and permission to touch a file the project
+    # does not use is not free.
+    "node --test": (),
     "playwright": ("playwright.config.js", "playwright.config.ts"),
     "jest": ("jest.config.js", "jest.config.ts", "jest.config.mjs"),
     "vitest": ("vitest.config.js", "vitest.config.ts", "vitest.config.mts"),

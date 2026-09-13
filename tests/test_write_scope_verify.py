@@ -43,6 +43,21 @@ class TestVerificationPaths(unittest.TestCase):
         got = verification_paths(self.story(["migration"]), self.project, self.cfg)
         self.assertEqual(got, ["src/store/db.test.ts"])
 
+    def test_node_test_khong_cap_pham_vi_cho_framework_khong_dung(self):
+        """Lỗi 108: `node --test` không có tệp cấu hình nào, nhưng vì nó không
+        khớp framework nào trong bảng, dự án được cấp quyền ghi `jest.config`,
+        `vitest.config`, `cypress.config`, `.mocharc` — bốn framework chưa
+        từng xuất hiện trong dự án. Phạm vi ghi là **quyền**, không phải gợi ý."""
+        (self.project / "package.json").write_text(
+            '{"scripts": {"test": "node --test --experimental-test-coverage"}}',
+            encoding="utf-8")
+        cfg = Config({**DEFAULTS, "tools.test": "npm test"})
+        got = verification_paths(self.story(["unit"]), self.project, cfg)
+        self.assertEqual(got, ["tests", "test", "__tests__", "spec", "e2e"])
+        for khong_dung in ("jest.config.js", "vitest.config.ts", "cypress.config.ts",
+                           ".mocharc.yml"):
+            self.assertNotIn(khong_dung, got)
+
     def test_no_contract_adds_nothing(self):
         self.assertEqual(verification_paths(self.story([]), self.project, self.cfg), [])
 

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **A project that runs `node --test` is no longer granted write scope over
+  four test frameworks it does not use** (bug 108). The scope narrows by the
+  framework named in the test command; node's built-in runner was not in the
+  table, so it fell through to "a JS project gets every JS test config" —
+  jest, vitest, cypress and mocha config files, in a project that has never
+  had any of them. A write scope is a permission.
+
 - **A project can say it has no graphical surface** (bug 107). The ux step
   required a screen inventory from every project — "a single-screen app still
   needs its one row" — so a command-line tool had its six commands mapped onto
