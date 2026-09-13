@@ -38,7 +38,7 @@ These need API keys and real project runs. Owner action required.
 |---|---|---|
 | B1 | CONFORMANCE.md ≤ 14 days | `AISEF_CONFORMANCE=1 python3 -m unittest tests.conformance` — last run 2026-09-06, expires 2026-09-20 |
 | B2 | `par` dogfood baseline | Run `par` (3 stories) on both clients, record cost/turns baseline in `tests/dogfood/` |
-| B3 | `e9` EPIC-01 complete | 4 remaining stories need real agent runs (~$40-60) |
+| B3 | `e9` EPIC-01 complete | 4 remaining stories — **STORY-01-04, 01-05, 01-06, 01-07** — need real agent runs (~$40-60). *List added 2026-09-14 under the ADR-009 rule ("a statement of the form 'N items remain' must carry the list, in the same document"); the names come from [EXECUTION-PLAN R2](EXECUTION-PLAN.md), which already carried them.* |
 | B4 | Acceptance report | `aisef pre-deploy` after B3 completes |
 
 ## Decision: what to release

@@ -1,8 +1,20 @@
 # Post-1.0 Roadmap
 
-## Experimental memory follow-up (2026-09-11)
+## Experimental memory follow-up (2026-09-11) — superseded 2026-09-12
 
 Local scoped advisory memory is implemented but default OFF. [P0/P1/P2 research plan](MEMORY-RESEARCH-PLAN.md), [ADR-007](ADR-007-scoped-advisory-memory.md), [operational guide](MEMORY.md), [validation report](MEMORY-VALIDATION.md). Pending: independently reviewed security hardening, verified OpenViking protocol adapter, authorized paired long-horizon real-agent efficacy (primary repeated-error rate), signed promotion/global sharing. Scripted retrieval success is not an enablement criterion.
+
+> **Status correction (2026-09-14).** The paragraph above reads as an open
+> research queue; it is not one any more. [ADR-007 § Addendum — frozen
+> (2026-09-12)](ADR-007-scoped-advisory-memory.md#addendum--frozen-2026-09-12)
+> moved the feature from *EXPERIMENTAL, default OFF* to **FROZEN, default OFF**:
+> code stays, bug and security fixes continue, **no new capability** — so the
+> "pending" items above are not scheduled work. Two measurements drove it: no
+> retrieval-scorer candidate beat the current word-overlap scorer on both of two
+> opposed datasets ([MEMORY-BENCH](MEMORY-BENCH.md)), and no external user has
+> run the lifecycle, so a default-OFF feature produces no demand signal. Thaw
+> condition, quoted: an external user asks for it, **or** a paired measurement
+> on a real agent shows a repeated error the memory would have prevented.
 
 Written 2026-09-08, after v1.0.0 release. Items prioritized by evidence
 from dogfood runs, conformance, and known limitations — not by feature wish.
@@ -53,13 +65,17 @@ build the framework. Record their setup time, friction points, gate pass rate.
 
 ---
 
-## 2. Stronger credential isolation (local provider)
+## 2. Stronger credential isolation (local provider) — **CLOSED by decision, ADR-011** (2026-09-13)
 
 **Problem:** Local sandbox provider honestly reports `unsupported` for S1–S4.
 Docker works but adds setup friction.
 
-**Evidence:** `tests/sandbox_conformance.py` — Docker 5/5, Local 1/5.
-Every local run exposes the host's credentials to the agent.
+**Evidence:** `tests/sandbox_conformance.py` — Docker **5/5**, Local **2/5**
+(S3 "no write outside workspace" ✅ and S5 "timeout leaves no process" ✅; S1,
+S2, S4 ✗ — see the measured table in [SANDBOX-CONFORMANCE](SANDBOX-CONFORMANCE.md),
+run 2026-09-06). *The "Local 1/5" written here on 2026-09-08 never matched that
+table; corrected 2026-09-14.* Every local run exposes the host's credentials to
+the agent.
 
 **Proposed solution:** Investigate `unshare` (Linux) or `sandbox-exec`
 (macOS) for lightweight local isolation without Docker. Alternatively,
@@ -68,43 +84,124 @@ document that Docker is required for credential-sensitive projects.
 **Verification:** S1–S4 pass on local provider, or explicit documented
 decision that Docker-only is acceptable.
 
-**Priority:** P1 — security gap, even if honestly documented.
-**Effort:** Medium (OS-specific sandboxing is non-trivial).
-**Risk:** macOS `sandbox-exec` is deprecated; Linux `unshare` needs root.
-**Release target:** v1.2.0
+The original priority block, kept verbatim:
+
+> **Priority:** P1 — security gap, even if honestly documented.
+> **Effort:** Medium (OS-specific sandboxing is non-trivial).
+> **Risk:** macOS `sandbox-exec` is deprecated; Linux `unshare` needs root.
+> **Release target:** v1.2.0
+
+**Status: CLOSED by decision, 2026-09-13** — the second branch of the
+verification, taken twice. [ADR-006 §5](ADR-006-v1-exit-condition-reconciliation.md)
+(2026-09-08) already ruled Local's lack of isolation a documented known
+limitation rather than a blocked feature; [ADR-011](ADR-011-sandbox-local-provider.md)
+(ACCEPTED 2026-09-13) closes it explicitly: **no isolation layer will be built
+for `local`** — sensitive projects run Docker. Its lead argument is that a
+half-working sandbox would have to declare `network_none: native` where it only
+blocks half, and "declare capabilities honestly" is the most expensive
+invariant in this repo.
+
+**Priority (revised 2026-09-14):** none — closed, superseded by ADR-011. The two
+risks the original block named are exactly the reasons ADR-011 gives for not
+building it, so this item did not go stale so much as get answered.
 
 ---
 
-## 3. OpenCode + Serena write-scope interop
+## 3. OpenCode + Serena write-scope interop — **closed for the known tools, open as a class** (corrected 2026-09-14)
 
-**Problem:** OpenCode's Serena plugin writes `.serena/.gitignore`,
-`.serena/project.yml` into worktrees. These are outside stories' declared
-`write_scope`, so the harness correctly rejects the candidate.
+**Original problem (2026-09-08):** OpenCode's Serena plugin writes
+`.serena/.gitignore`, `.serena/project.yml` into worktrees. These are outside
+stories' declared `write_scope`, so the harness correctly rejects the
+candidate.
 
-**Evidence:** Dogfood par-opencode run — all 3 stories failed because of
-this. The harness behavior is correct; the agent ecosystem is the issue.
+**Original evidence:** Dogfood par-opencode run — all 3 stories failed because
+of this. The harness behavior is correct; the agent ecosystem is the issue.
 
-**Proposed solution:** Options:
-  (a) Auto-add `.serena/**` to `write_scope` when client is OpenCode.
-  (b) Add a `write_scope_ignore` config to exclude infrastructure files.
-  (c) Document as agent-side limitation; wait for Serena fix.
+The original proposal, kept verbatim because the correction below refers to it:
 
-**Verification:** OpenCode dogfood run completes with stories passing.
+> **Proposed solution:** Options:
+>   (a) Auto-add `.serena/**` to `write_scope` when client is OpenCode.
+>   (b) Add a `write_scope_ignore` config to exclude infrastructure files.
+>   (c) Document as agent-side limitation; wait for Serena fix.
+>
+> **Verification:** OpenCode dogfood run completes with stories passing.
+>
+> **Priority:** P1 — blocks OpenCode from completing dogfood runs.
+> **Effort:** Low (option a or b is a few lines).
+> **Risk:** Option (a) is client-specific special-casing; option (b) is generic
+> but might mask real scope violations.
+> **Release target:** v1.1.0
 
-**Priority:** P1 — blocks OpenCode from completing dogfood runs.
-**Effort:** Low (option a or b is a few lines).
-**Risk:** Option (a) is client-specific special-casing; option (b) is generic
-but might mask real scope violations.
-**Release target:** v1.1.0
+**What actually shipped** — none of (a), (b) or (c). `.serena` (alongside
+`.opencode`, `.claude/settings.json`, `.aisef`, the named `_bmad-output/…`
+subpaths the harness itself writes, plus `VENDOR_PATHS`) went into the
+`HARNESS_OWNED` tuple in
+`aisef/harness/guardrails.py`, which every path that reads the candidate diff
+shares (`changed_files`, and the `diff-scope` guard via
+`HARNESS_OWNED + baseline_dirty_from_env(env)`). Landed in `ea4d035`
+("fix: an MCP server's own notes killed a story", 2026-09-09), released in
+v1.3.0:
+
+```
+git log --oneline -S'".serena"' -- aisef/harness/guardrails.py   # → ea4d035
+git tag --contains ea4d035 | sort -V | head -1                  # → v1.3.0
+```
+
+**The "blocks OpenCode from completing dogfood runs" claim is now false.** On
+2026-09-14 `todo-oc` — an OpenCode project, MiniMax-M3 behind the `mycombo`
+alias — merged **7 of 7** stories:
+
+```
+python3 -c "import json;d=json.load(open('/Users/nghinh/Downloads/projects/todo-oc/_bmad-output/sprint-status.json'))['stories'];print(len(d), sorted({s['status'] for s in d.values()}))"
+# → 7 ['done']
+grep -ci serena /Users/nghinh/Downloads/projects/todo-oc/_bmad-output/run.log   # → 0
+```
+
+Zero `serena` and zero `write_scope` lines in a 163 KB run log across seven
+stories. Written up in [DOGFOOD-2026-09-13 §8](DOGFOOD-2026-09-13.md#8-todo-oc-7-of-7--and-why-section-7-named-the-wrong-culprit).
+
+**What still stands.** `HARNESS_OWNED` is a hard-coded inventory of tools the
+framework happens to know about, and there is no config escape hatch —
+`grep -rn 'write_scope_ignore' aisef/` returns nothing. So the *class* of
+failure is not closed: the next MCP server or agent plugin that writes
+somewhere outside that tuple kills a story the same way Serena did on
+`todo-e2e` 2026-09-09, and the only fix is another commit to the framework.
+Whether that is worth a config key is **undecided, and no decision record
+exists either way** — the only thing written down is the Risk line in the quoted
+proposal above ("option (b) is generic but might mask real scope violations"),
+stated as a risk at proposal time, not as a rejection. Nothing has measured it
+since.
+
+**Verification for the part that remains:** a story completes on a project
+whose agent runs a write-happy tool that is *not* in `HARNESS_OWNED`, without
+editing `aisef/`. Not yet measured — no such run exists on disk.
+
+**Priority (revised 2026-09-14):** P3 — no longer blocking anything measured;
+reopen if a third tool costs a story.
+**Effort:** Low (a knob) but the design question is the expensive part.
+**Release target:** none scheduled.
 
 ---
 
 ## 4. Harder benchmark / challenge set
 
-**Problem:** Current bench suite is 15+ bug-fix tasks from a single project
-(the framework itself). Not diverse enough to make strong claims.
+**Problem:** Current bench suite is **30** bug-fix tasks (28 valid) from a
+single project (the framework itself). Not diverse enough to make strong
+claims. *Said "15+" when written 2026-09-08; recounted 2026-09-14.*
 
-**Evidence:** Bench report v0.3.0 — 96 runs, but all Python, all on aisef.
+**Evidence:** Bench report v0.3.0 — 96 runs, but all Python, all on aisef —
+and the A-2 additions did not change that: all 30 task manifests carry
+`"source": "bug"` and a `verify` command of the form
+`python3 -m unittest -v tests.test_*`.
+
+```
+ls -d tests/bench/tasks/*/ | wc -l   # → 30
+python3 -c "import json,pathlib,collections;print(collections.Counter(json.loads(p.read_text())['source'] for p in pathlib.Path('tests/bench/tasks').glob('*/task.json')))"
+# → Counter({'bug': 30})
+```
+
+So of the three verification bars below, only the task count is met: **1
+language, 1 source project, 30 tasks**.
 
 **Proposed solution:** Add tasks from:
   - Different languages (JavaScript/TypeScript via par, Go, Rust)
@@ -146,7 +243,16 @@ current workloads.
 
 **Problem:** No production telemetry. Bug reports come from dogfood and tests.
 
-**Evidence:** 42 bugs found during dogfood (documented in DEEP-REVIEW).
+**Evidence:** 42 bugs found during dogfood as of 2026-09-08 (documented in
+DEEP-REVIEW). Recounted 2026-09-14: [FAILURE-TAXONOMY](FAILURE-TAXONOMY.md)
+now carries **124 rows numbered 22–147** (26 and 27 are absent), on top of bugs
+1–21 in [STATUS-2026-09-05 §2.4](STATUS-2026-09-05.md) — every one of them
+found by running, none by reading code.
+
+```
+grep -oE '^\| *[0-9]+ *\|' docs/FAILURE-TAXONOMY.md | tr -dc '0-9\n' | sort -n | uniq | wc -l   # → 124
+```
+
 Framework is stable but untested at scale.
 
 **Proposed solution:** Track issues from external users (item 1). Fix based
@@ -166,7 +272,9 @@ on real reports, not speculative cleanup.
 - **Large refactors** without evidence of friction.
 - **Version bumps** for the sake of progress.
 - **New features** not driven by user feedback or evidence.
-- **Config key reduction** — already at 0 mandatory, 58 total with defaults.
+- **Config key reduction** — already at 0 mandatory, **68** total with defaults
+  (`python3 -c "from aisef.config import DEFAULTS; print(len(DEFAULTS))"` →
+  `68`, measured 2026-09-14; this line said 58 until then).
 
 ## Lessons from MiMo-Code (2026-09-12)
 
@@ -193,10 +301,16 @@ ingestion, and a second canonical task state.
 
 ## Re-check trigger: `phases/implement.py` (2026-09-12)
 
-The file is 2 581 lines. By this project's own splitting rule — split on
-evidence of real friction, not on a line count — **not splitting is currently
-correct**: no bug in the last three waves was caused by the file's size, and a
-split would move code without fixing anything.
+The file was 2 581 lines when this trigger was written (verified:
+`git show a899fa0:aisef/phases/implement.py | wc -l` → 2581). **2 877 lines on
+2026-09-14** (`wc -l aisef/phases/implement.py`) — +296 across 15 commits
+(`git log --oneline a899fa0..HEAD -- aisef/phases/implement.py | wc -l`),
+the turn-cap grading fix and the plan-deadlock detectors among them. By this
+project's own splitting rule
+— split on evidence of real friction, not on a line count — **not splitting is
+still correct**: none of those bugs was caused by the file's size, and a split
+would move code without fixing anything. The threshold to watch remains the one
+already set: three consecutive bugs concentrated in this file.
 
 Splitting is not free either, so the decision gets a trigger rather than a
 re-argument every release:

@@ -149,8 +149,10 @@ Hai điều `doctor` nói ngay ở lần chạy đầu và **nên đọc kỹ**:
 
 Số khoá `init` ghi vào `.ai/config.json`: **4** (`tools.test`, `tools.lint`,
 `sandbox.image`, `sandbox.allow_hosts`), trong đó **1 khoá bắt buộc khai** là
-`tools.test`. Bản **1.3.0 trên PyPI vẫn ghi cả 68 khoá** — đã sửa trên nhánh
-chính, sẽ có ở bản kế; xem [§6](#6-cấu-hình-aiconfigjson).
+`tools.test`. Bản **1.3.0 trên PyPI ghi cả 68 khoá**; đã sửa từ **1.3.1** và
+đo lại trên `1.5.0` ngày 2026-09-14 — `aisef --project <dir> init --stack python`
+ghi đúng 4 khoá ấy. (Câu này từng nói "sẽ có ở bản kế"; ba bản đã ra từ đó.) Xem
+[§6](#6-cấu-hình-aiconfigjson).
 
 Bản dành cho người muốn sửa framework:
 
