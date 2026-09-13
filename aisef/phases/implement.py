@@ -655,16 +655,34 @@ def run_attempt(
 
     after_sha = head_sha(project) if workdir != project else ""
     if before_sha and after_sha != before_sha:
+        # Who moved main decides what to do about it, and the two answers are
+        # opposite. An agent that escaped its worktree wrote source there, and
+        # the fix is to revert. An operator who committed while the session ran
+        # — measured 2026-09-13 on `todo-oc`, a `chore:` commit of harness
+        # artifacts landing mid-session (lỗi 135) — touched only
+        # `_bmad-output/`, and telling them to revert is telling them to throw
+        # away their own commit. The tree says which: the story's scope is
+        # source, `_bmad-output/` is the harness's own record.
+        moi = changed_files(str(project), base_ref=before_sha)
+        cua_harness = bool(moi) and all(
+            f.startswith(("_bmad-output/", ".aisef/")) for f in moi)
         attempt.error = (
-            f"the run modified the project's main branch ({before_sha[:8]} → {after_sha[:8]}). "
-            f"The story must work in its own worktree; work on the trunk does not "
-            f"pass any gate. Revert and re-run."
+            f"the project's main branch moved during this session "
+            f"({before_sha[:8]} → {after_sha[:8]})"
+            + ((". Only harness artifacts changed (" + ", ".join(sorted(moi)[:3])
+                + ") — this looks like a commit made outside the story while it was "
+                "running, not an agent escaping its worktree. Nothing to revert: "
+                "let the run finish, or stop it before committing to the project.")
+               if cua_harness else
+               ". The story must work in its own worktree; work on the trunk does not "
+               "pass any gate. Revert and re-run.")
         )
         attempt.infra = True   # story was never scored
         attempt.fatal = True   # and retrying is pointless
         evidence.tool_run(
             story.id, "isolation", ok=False,
-            detail={"truoc": before_sha, "sau": after_sha, "attempt": number},
+            detail={"truoc": before_sha, "sau": after_sha, "attempt": number,
+                    "changed": sorted(moi)[:20], "harness_only": cua_harness},
         )
         return attempt
 

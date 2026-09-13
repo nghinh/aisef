@@ -206,6 +206,16 @@ Bug 132's fix also needed a second pass: the `qa:*` recording path calls
 e2e still recorded no test names. Caught because the next run printed exactly
 the sentence the new gate message had been given for it.
 
+**The isolation check no longer tells you to revert your own commit** (bug
+135). It asks whether the main branch moved during a session, then reports one
+cause: the agent escaped its worktree, revert it. A commit made by the operator
+while a run was in flight looks identical from that angle, and "revert and
+re-run" is then advice to throw away their own work. The two causes have
+opposite remedies, and the tree says which: story source is one thing,
+`_bmad-output/` is the harness's own record. When only harness artifacts moved,
+the message says so and does not suggest reverting. Still fatal — that session
+cannot be graded either way.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on

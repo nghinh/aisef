@@ -1121,8 +1121,45 @@ class TestCachLyThanCay(ImplementTestCase):
         truoc = self.head()
         out = self.implement(self.PhaCachLy(self.project), workdir=self.workdir)
         self.assertFalse(out.done)
-        self.assertIn("modified the project's main branch", out.attempts[0].error)
+        self.assertIn("main branch moved during this session", out.attempts[0].error)
         self.assertNotEqual(self.head(), truoc)
+
+    class CommitNgoaiStory(ScriptedClient):
+        """Người vận hành commit **artifact của harness** trong lúc phiên chạy."""
+
+        def __init__(self, project, **kw):
+            super().__init__(**kw)
+            self.project = project
+
+        def build_command(self, spec):
+            return ["true"]
+
+        def run(self, spec: RunSpec):
+            d = self.project / "_bmad-output"
+            d.mkdir(exist_ok=True)
+            tep = d / "ghi-chu.json"
+            if not tep.exists():
+                tep.write_text("{}\n", encoding="utf-8")
+                for cmd in (["git", "add", "-f", "_bmad-output/ghi-chu.json"],
+                            ["git", "commit", "-q", "-m", "chore: state"]):
+                    subprocess.run(cmd, cwd=self.project, check=True)
+            return RunResult(ok=True, text="xong")
+
+    def test_commit_ngoai_story_khong_bi_bao_la_agent_thoat_worktree(self):
+        """Lỗi 135, gặp thật ngày 2026-09-13 trên `todo-oc`: người vận hành
+        commit `_bmad-output/` giữa lúc phiên chạy, và harness bảo "revert" —
+        tức bảo họ vứt chính commit của mình. Ai làm nhánh chính dịch chuyển
+        quyết định phải làm gì, và hai câu trả lời ngược nhau; cây nói ai."""
+        out = self.implement(self.CommitNgoaiStory(self.project), workdir=self.workdir)
+        loi = out.attempts[0].error
+        self.assertIn("main branch moved during this session", loi)
+        self.assertIn("_bmad-output/", loi)
+        self.assertIn("commit made outside the story", loi)
+        self.assertNotIn("Revert and re-run", loi)
+
+        ev = EvidenceStore(self.artifacts).read(self.story.id)
+        muc = [e for e in ev.events if e.name == "isolation"][-1]
+        self.assertTrue(muc.detail["harness_only"])
 
     def test_ghi_vao_bang_chung_de_ve_sau_truy_duoc(self):
         self.implement(self.PhaCachLy(self.project), workdir=self.workdir)
@@ -1142,13 +1179,13 @@ class TestCachLyThanCay(ImplementTestCase):
         out = self.implement(ScriptedClient(), workdir=self.workdir)
         ev = EvidenceStore(self.artifacts).read(self.story.id)
         self.assertEqual([e for e in ev.events if e.name == "isolation"], [])
-        self.assertNotIn("modified the project's main branch", out.attempts[0].error or "")
+        self.assertNotIn("main branch moved during this session", out.attempts[0].error or "")
 
     def test_chay_thang_trong_du_an_thi_khong_kiem(self):
         """`--no-isolate` là cố ý làm việc trên thân cây; kiểm ở đó sẽ
         chặn mọi lượt chạy hợp lệ."""
         out = self.implement(self.PhaCachLy(self.project), workdir=self.project)
-        self.assertNotIn("modified the project's main branch", out.attempts[0].error or "")
+        self.assertNotIn("main branch moved during this session", out.attempts[0].error or "")
 
 
 class TestCachLyVoLaDungHan(TestCachLyThanCay):
@@ -1157,7 +1194,7 @@ class TestCachLyVoLaDungHan(TestCachLyThanCay):
         thêm tiền và làm hỏng sâu hơn."""
         out = self.implement(self.PhaCachLy(self.project), workdir=self.workdir)
         self.assertEqual(len(out.attempts), 1)
-        self.assertIn("modified the project's main branch", out.blocked_reason)
+        self.assertIn("main branch moved during this session", out.blocked_reason)
 
 
 class TestVaiRaSoatKhaiToolBiCam(ImplementTestCase):
