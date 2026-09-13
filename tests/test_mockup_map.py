@@ -435,3 +435,63 @@ class TestTenKhaTruyCapTheoThuTuARIA(unittest.TestCase):
     def test_chi_con_placeholder_hoac_title(self):
         self.assertEqual(self._label('<input placeholder="Tìm">'), "Tìm")
         self.assertEqual(self._label('<input title="Tìm">'), "Tìm")
+
+
+class TestGianhLaiCongCuaChinhMinh(unittest.TestCase):
+    """Lỗi 140 (todo-oc 2026-09-13). Bộ e2e chạy Playwright với `webServer` trên
+    đúng cổng `app.base_url` ngay trước phép so mockup, và không phải lúc nào
+    cũng nhả kịp. Phép so thấy cổng bận → `mockup UNAVAILABLE` → hành vi
+    `mockup:note-list` không kiểm lại được → `preservation` chặn story với lý do
+    "unverifiable". Harness tranh cổng với **chính nó**, còn thông báo thì đổ
+    cho "not this story's app" trong khi in ra đúng worktree của story.
+
+    Bug 15 vẫn đứng: app của người lạ không bao giờ được chấm. Chỉ giành lại khi
+    thư mục làm việc của kẻ chiếm cổng **đúng là** cây của mình."""
+
+    def test_cung_cay_thi_nhan_la_cua_minh(self):
+        import tempfile
+        from aisef.harness.mockup_verify import _cung_cay
+
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertTrue(_cung_cay(tmp, tmp + "/"))
+            self.assertFalse(_cung_cay(tmp, str(Path(tmp).parent)))
+
+    def test_giai_phong_duoc_cong_cua_minh(self):
+        """Câu hỏi là **cổng**, không phải pid: con của tiến trình này thành
+        zombie cho tới khi được thu, nên `os.kill(pid, 0)` vẫn thành công rất
+        lâu sau khi nó thôi lắng nghe."""
+        import subprocess as sp
+        import sys as _s
+        import time as _t
+
+        from aisef.harness.mockup_verify import _giai_phong_cong, _responds
+
+        port = _free_port()
+        url = f"http://127.0.0.1:{port}"
+        p = sp.Popen([_s.executable, "-m", "http.server", str(port)],
+                     stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+        try:
+            het = _t.time() + 10
+            while _t.time() < het and not _responds(url, timeout=1):
+                _t.sleep(0.2)
+            self.assertTrue(_responds(url, timeout=1), "máy chủ thử chưa lên")
+            self.assertTrue(_giai_phong_cong(str(p.pid), url))
+            self.assertFalse(_responds(url, timeout=1))
+        finally:
+            if p.poll() is None:
+                p.kill()
+
+    def test_pid_khong_ton_tai_khong_lam_sap(self):
+        from aisef.harness.mockup_verify import _giai_phong_cong
+        self.assertFalse(_giai_phong_cong("khong-phai-so", "http://127.0.0.1:1"))
+
+    def test_chi_giu_lai_khi_cung_cay(self):
+        """Neo vào mã: phép giành cổng phải nằm **sau** phép so thư mục."""
+        import inspect
+        from aisef.harness import mockup_verify
+
+        src = inspect.getsource(mockup_verify.AppServer.start)
+        i_so = src.index("_cung_cay(cwd, str(self.cwd))")
+        i_dung = src.index("_giai_phong_cong(pid, self.base_url)")
+        self.assertLess(i_so, i_dung)
+        self.assertIn("not this story's app", src, "thông báo cho người lạ phải còn")

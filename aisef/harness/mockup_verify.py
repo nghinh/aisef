@@ -108,6 +108,21 @@ class AppServer:
         if self.already_running():
             if not self.command:
                 return ""  # project has no dev_command: user runs the app themselves, use as-is
+            # Our own leftover, not a stranger. The e2e suite runs Playwright
+            # with a `webServer` on this same port moments earlier and does not
+            # always release it before the mockup comparison starts — measured
+            # on todo-oc 2026-09-13, where the occupant's cwd was this very
+            # story's worktree and the story failed `preservation` as
+            # "unverifiable" (lỗi 140). The harness was racing itself, and the
+            # message blamed a foreign app while printing our own directory.
+            #
+            # Reclaim only when the working directory matches: killing a
+            # process in our own worktree is ours to do, killing anything else
+            # is not (bug 15 stands — a stranger's app must never be graded).
+            pid, cwd = occupant_pid_cwd(self.base_url)
+            if pid and cwd and self.cwd and _cung_cay(cwd, str(self.cwd)):
+                if not _giai_phong_cong(pid, self.base_url):
+                    return ""               # still up, still our own tree: use it
             # dev_command is set but port already has a responder — don't claim it
             # (bug 15, measured 2026-09-05 on e9): vite from a removed worktree still
             # held port 5199, mockup-map gate in the next two rounds "opened the app"
@@ -202,6 +217,30 @@ def _kill_tree(proc: subprocess.Popen) -> None:
         proc.wait(timeout=5)
 
 
+def occupant_pid_cwd(url: str) -> tuple[str, str]:
+    """(pid, cwd) of whoever holds the port — ("", "") when it cannot be told."""
+    from urllib.parse import urlparse
+
+    port = urlparse(url).port
+    if not port:
+        return ("", "")
+    try:
+        out = subprocess.run(["lsof", "-nP", "-t", "-i", f":{port}"], capture_output=True,
+                             text=True, encoding="utf-8", errors="replace", timeout=5).stdout.split()
+    except (OSError, subprocess.SubprocessError):
+        return ("", "")
+    if not out:
+        return ("", "")
+    pid = out[0]
+    try:
+        cwd = subprocess.run(["lsof", "-a", "-d", "cwd", "-p", pid, "-Fn"], capture_output=True,
+                             text=True, encoding="utf-8", errors="replace", timeout=5).stdout
+        where = next((l[1:] for l in cwd.splitlines() if l.startswith("n")), "")
+    except (OSError, subprocess.SubprocessError):
+        where = ""
+    return (pid, where)
+
+
 def occupant(url: str) -> str:
     """Who holds the port — for reporting the exact process, not guessing."""
     from urllib.parse import urlparse
@@ -224,6 +263,42 @@ def occupant(url: str) -> str:
     except (OSError, subprocess.SubprocessError):
         where = ""
     return f"pid {pid}" + (f", cwd {where}" if where else "")
+
+
+def _cung_cay(a: str, b: str) -> bool:
+    """Same directory, symlinks and trailing slashes aside."""
+    try:
+        return Path(a).resolve() == Path(b).resolve()
+    except OSError:
+        return False
+
+
+def _giai_phong_cong(pid: str, url: str) -> bool:
+    """Stop the process holding ``url`` and report whether the **port** freed.
+
+    The port is the question, not the pid: a child of this process stays a
+    zombie until reaped, so `os.kill(pid, 0)` keeps succeeding long after it
+    has stopped listening.
+    """
+    import signal
+
+    try:
+        n = int(pid)
+    except ValueError:
+        return False
+    for sig, cho in ((signal.SIGTERM, 3.0), (signal.SIGKILL, 2.0)):
+        try:
+            os.kill(n, sig)
+        except ProcessLookupError:
+            pass
+        except OSError:
+            return False
+        het = time.time() + cho
+        while time.time() < het:
+            if not _responds(url, timeout=1):
+                return True
+            time.sleep(0.2)
+    return not _responds(url, timeout=1)
 
 
 def _responds(url: str, *, timeout: float = 2) -> bool:

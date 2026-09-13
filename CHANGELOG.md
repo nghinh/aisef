@@ -267,6 +267,21 @@ auditing blocks by name would go and fix the injection rule. `Verdict` carries
 a `rule` now; evidence and the run log use it, keeping `invoked_as` so the
 original guard is not lost.
 
+**The harness raced itself for the app port** (bug 140). The e2e suite runs
+Playwright with a `webServer` on the same port as `app.base_url` immediately
+before the mockup comparison, and does not always release it in time. The
+comparison then refused the port as "already occupied by another process — not
+this story's app", while printing a working directory that was exactly this
+story's worktree. The screen went uncompared, so a behaviour verified through
+it could not be re-verified, and `preservation` blocked the story as
+unverifiable.
+
+Bug 15's rule stands — a stranger's app must never be graded — so the port is
+reclaimed only when the occupant's working directory is our own tree. And the
+question asked afterwards is whether the *port* freed, not whether the pid is
+gone: a child stays a zombie until reaped, so `os.kill(pid, 0)` keeps
+succeeding long after it stops listening.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on
