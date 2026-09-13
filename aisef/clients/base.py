@@ -244,9 +244,10 @@ def child_env(spec_env: dict[str, str], *, allow_prefixes: Iterable[str] = ()) -
     secrets to its own log.  The agent should not hold what it does not need:
     keep `ENV_KEEP` + `ENV_KEEP_PREFIXES` + the adapter's own
     `env_prefixes` + project-declared prefixes from `clients.env_allow`, plus
-    the git credential disabler, then overlay harness `spec_env` on top.  Known limitation: Claude's model token
-    lives in the host's Keychain/OAuth, harness has no broker — the child
-    session still authenticates with the host's account.
+    the git credential disabler, then overlay harness `spec_env` on top.
+    Known limitation: Claude's model token lives in the host's Keychain/OAuth,
+    harness has no broker — the child session still authenticates with the
+    host's account.
     """
     # An empty prefix opens all vars — drop it, not a fatal config error.
     prefixes = tuple(p for p in (*ENV_KEEP_PREFIXES, *allow_prefixes) if p)
