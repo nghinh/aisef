@@ -782,12 +782,55 @@ class TestHetLuotNhungCoViecDeCham(ImplementTestCase):
                 dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
                 if dau.startswith("# Review") or dau.startswith("# Security review"):
                     return super().run(spec)
+                # 40 lượt có gọi tool thật, chỉ là không ghi được gì — khác
+                # hẳn "0 tool call" (model không dùng nổi tool, đã có chẩn đoán
+                # riêng và là fatal).
                 return RunResult(ok=False, error="max_turns: stopped at 40 turns (cap 40)",
-                                 num_turns=40, output_tokens=100, cost_usd=0.0)
+                                 num_turns=40, output_tokens=100,
+                                 tool_uses=[ToolUse(name="bash", tool_use_id="t1", input={})], cost_usd=0.0)
 
         out = self.implement(HetLuotTay(), config=self.config(**{"run.max_retries": 0}))
-        self.assertIsNone(out.attempts[-1].gate)
-        self.assertIn("max_turns", out.attempts[-1].error)
+        cuoi = out.attempts[-1]
+        self.assertIsNone(cuoi.gate, "cổng không hề chạy")
+        # ADR-005 V11 (B), đo trên e9 01-05 (chạm 91/90 hai lần): chạm trần lượt
+        # là lỗi **chất lượng**, thử lại phải tính hạn mức — miễn phí thì agent
+        # loay hoay vô hạn. Kế toán đúng; chỗ sai là câu đóng story.
+        self.assertFalse(cuoi.infra)
+        self.assertFalse(cuoi.noop)
+        self.assertEqual(out.quality_attempts, 1)
+        self.assertIn("nothing to grade", out.blocked_reason)
+        self.assertIn("max_turns", out.blocked_reason)
+        self.assertNotIn("still did not pass gate", out.blocked_reason,
+                         "cổng chưa chạy lần nào thì không được báo là trượt cổng")
+
+    def test_viec_cua_luot_truoc_khong_phai_viec_cua_phien_nay(self):
+        """Bản vá đầu của lỗi 130 hỏi `changed_files` — tức diff so với nhánh
+        gốc, thứ **cũng** mang commit của các lượt trước. Trên đợt chạy thật nó
+        in "max_turns but the session left work in the tree — grading it" ngay
+        trước dòng "NO-OP: 40 turns, 0 files written": đúng cái bẫy mà chính
+        phép kiểm no-op đã ghi lại. "Có để lại việc" phải là **phiên này** làm
+        cây dịch chuyển."""
+        class VietRoiHetLuotTay(ScriptedClient):
+            def run(inner, spec):
+                dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
+                if dau.startswith("# Review") or dau.startswith("# Security review"):
+                    return super().run(spec)
+                if inner.develop_calls == 0:
+                    return super().run(spec)          # lượt 1: có việc, bị cổng đánh trượt
+                inner.develop_calls += 1
+                return RunResult(ok=False, error="max_turns: stopped at 40 turns (cap 40)",
+                                 num_turns=40, output_tokens=500, cost_usd=0.0)
+
+        out = self.implement(VietRoiHetLuotTay(review="[chặn] src/a.py:1 — mất dữ liệu"),
+                             config=self.config(**{"run.max_retries": 1,
+                                                   "run.infra_retries": 2}))
+        from aisef.harness.observe import NOTE, EvidenceStore
+
+        sau = out.attempts[1]
+        self.assertIsNone(sau.gate, "phiên không viết gì thì không có gì để chấm")
+        ghi = EvidenceStore(self.artifacts).read("STORY-01-01").of(NOTE, "session:unfinished")
+        self.assertFalse(ghi[-1].detail["moved_tree"],
+                         "việc của lượt trước không phải việc của phiên này")
 
     def test_loi_ha_tang_van_tra_ve_ngay_khong_cham(self):
         """Nhà cung cấp cắt phiên thì lượt thử lại không tốn ngân sách chất
@@ -1854,7 +1897,9 @@ class TestChoTruocKhiThuLaiKhiBiGioiHanTanSuat(unittest.TestCase):
 
         from aisef.phases import implement
         src = _Path(implement.__file__).read_text(encoding="utf-8")
-        khoi = src[src.index("if attempt.infra:"):]
+        # Neo vào chỗ **của vòng lặp** (`infra_budget`), không vào chuỗi
+        # `if attempt.infra:` — chuỗi ấy còn xuất hiện trong `run_attempt`.
+        khoi = src[src.index("infra_budget -= 1"):]
         khoi = khoi[:khoi.index("continue") + len("continue")]
         self.assertIn("cho = attempt.retry_after", khoi)
         self.assertIn("time.sleep(cho)", khoi)

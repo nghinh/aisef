@@ -684,16 +684,32 @@ def run_attempt(
         #
         # Infra statuses still return here — the provider cut the session, the
         # retry costs no quality attempt, and the next one grades this tree.
-        if attempt.infra or not changed_files(str(workdir), base_ref=base_ref):
+        if attempt.infra:
             return attempt
+        # "Left work" means **this session** moved the tree, not that the diff
+        # against the base branch is non-empty: that diff also carries earlier
+        # attempts' commits. The first cut of this fix asked `changed_files`
+        # and logged "grading it" for a session that had written nothing,
+        # immediately before the no-op check said "0 files written" — the same
+        # trap the no-op check itself documents.
+        da_dong = (head_sha(workdir), _tree_snapshot(workdir)) != tree_before
         run_log(artifact_root, f"story={story.id}#{number} {exit_status_of(result)} "
-                               f"but the session left work in the tree — grading it")
+                + ("but the session left work in the tree — grading it"
+                   if da_dong else "and the tree is untouched — nothing to grade"))
         evidence.record(story.id, Event(
             kind=NOTE, name="session:unfinished", ok=False,
             detail={"exit_status": exit_status_of(result),
                     "turns": getattr(result, "num_turns", 0),
+                    "moved_tree": da_dong,
                     "error": attempt.error[:300], "attempt": number},
         ))
+        if not da_dong:
+            # Untouched tree: nothing to grade, and this **stays** a quality
+            # failure. ADR-005 V11 (B) settled that from measurement (e9 01-05
+            # hit 91/90 twice): a turn-cap retry that costs nothing lets a
+            # thrashing agent retry forever. The accounting is right; what was
+            # wrong is the story's closing line, fixed where it is written.
+            return attempt
         attempt.error = ""      # the gate's verdict is this attempt's outcome now
 
     # Developer session ended: **freeze candidate immediately**, before
@@ -2653,9 +2669,27 @@ def implement_story(
             return outcome
 
         if outcome.quality_attempts > max_retries:
-            outcome.blocked_reason = (
-                f"tried {outcome.quality_attempts} attempts, still did not pass gate"
-            )
+            # "Did not pass gate" is only true if a gate ever ran. A story whose
+            # every session ended out of turns with an untouched tree never
+            # produced a verdict, and closing it with that line sends the reader
+            # to read gate failures that do not exist (lỗi 130). The sessions
+            # are the story here, so say what they did.
+            da_cham = [a for a in outcome.attempts if a.gate is not None]
+            if da_cham:
+                outcome.blocked_reason = (
+                    f"tried {outcome.quality_attempts} attempts, still did not pass gate"
+                )
+            else:
+                ket = sorted({a.error.split(":")[0].strip() for a in outcome.attempts if a.error})
+                n_s = outcome.quality_attempts
+                outcome.blocked_reason = (
+                    f"{n_s} session{'s' if n_s != 1 else ''} ended with nothing to grade "
+                    f"— no gate verdict exists for this story"
+                    + (f" ({', '.join(ket)})" if ket else "")
+                    + ". The sessions are the story: read the last one's turns, and consider "
+                    "whether `run.max_turns` fits this model or the story is too large for "
+                    "one session."
+                )
             _log(f"story={story.id} EXHAUSTED {outcome.quality_attempts} attempts ${outcome.cost_usd:.2f}")
             # What was still blocking when it gave up — the one thing a reader
             # opens the log for after an exhausted story.
