@@ -76,6 +76,11 @@ class Attempt:
     #: Thử lại ngay một lượt bị giới hạn tần suất là cách chắc chắn nhất để
     #: nhận đúng lỗi ấy lần nữa, và ngân sách hạ tầng bốc hơi trong vài giây.
     retry_after: float = 0.0
+    #: The session ran fine and changed nothing. Accounted as `infra` so a
+    #: session with nothing to grade does not consume a quality attempt — but
+    #: it is not an infrastructure fault, and the reason given to the reader
+    #: must not send them to the provider's status page (bug 102).
+    noop: bool = False
     #: Fatal -- retrying is pointless.  E.g. isolation broke: the next
     #: attempt's worktree forks from a dirty trunk, so it only wastes money.
     fatal: bool = False
@@ -698,6 +703,7 @@ def run_attempt(
                    "run — check the main branch before retrying.")
             )
             attempt.infra = True   # never scored, so do not charge the story
+            attempt.noop = True
             run_log(artifact_root, f"story={story.id}#{number} NO-OP: "
                                    f"{result.num_turns} turns, 0 files written")
             return attempt
@@ -2420,8 +2426,13 @@ def implement_story(
                  f"err={attempt.error[:80]} budget={infra_budget}"
                  + (f" wait={cho:.0f}s" if cho else ""))
             if infra_budget <= 0:
-                outcome.blocked_reason = f"recurring infrastructure error: {attempt.error}"
-                _log(f"story={story.id} BLOCKED infra budget exhausted")
+                outcome.blocked_reason = (
+                    f"sessions kept producing nothing to grade: {attempt.error}"
+                    if attempt.noop else
+                    f"recurring infrastructure error: {attempt.error}"
+                )
+                _log(f"story={story.id} BLOCKED "
+                     + ("no-op sessions" if attempt.noop else "infra budget exhausted"))
                 return outcome
             if cho:
                 time.sleep(cho)

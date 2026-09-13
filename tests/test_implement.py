@@ -1370,6 +1370,12 @@ class TestLuotKhongVietGiThiKhongPhaiUngVien(ImplementTestCase):
         im = [a for a in report.attempts if "wrote nothing" in a.error]
         self.assertTrue(im, "phải nói thẳng phiên đã không viết gì")
         self.assertTrue(im[0].infra, "story chưa từng được chấm thì đừng tính lượt của nó")
+        # Lỗi 102: tính như `infra` là đúng về **kế toán**, nhưng lý do đưa
+        # cho người đọc không được nói đây là lỗi hạ tầng.
+        self.assertTrue(im[0].noop)
+        self.assertNotIn("infrastructure", report.blocked_reason)
+        if report.blocked_reason:
+            self.assertIn("nothing to grade", report.blocked_reason)
 
     def test_luot_dau_im_lang_cung_khong_phai_ung_vien(self):
         """`todo-e2e` STORY-03-01 10/09: im lặng ngay **lượt đầu** — chưa có

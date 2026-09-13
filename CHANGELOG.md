@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- **"Recurring infrastructure error" for a session that simply did nothing**
+  (bug 102). A session that writes nothing is flagged `infra` so it does not
+  consume one of the story's quality attempts — correct accounting. But the
+  same flag was also read as the diagnosis, so a story that ended after an
+  agent ran seventeen turns and changed no file reported an infrastructure
+  fault, pointing the reader at the provider. Accounting and diagnosis are now
+  separate; the reason says sessions kept producing nothing to grade.
+
+- **`criteria have tests` names the runner it read.** An agent that puts the
+  criteria codes in its e2e test titles was told "no tests with codes …" with
+  no hint that only the unit run is read there.
+
 - **An API key now goes only to the client that authenticates with it**
   (bug 101). `ANTHROPIC_` sat in the shared env allowlist, so every client
   session received the host's Anthropic key — including OpenCode sessions
