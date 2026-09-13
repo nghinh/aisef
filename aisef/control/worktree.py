@@ -164,6 +164,14 @@ class MergeResult:
 CLIENT_CONFIG = (".claude/settings.json", ".opencode")
 
 
+def _xoa(path: Path) -> None:
+    """Remove a generated file or directory; missing is fine."""
+    if path.is_dir():
+        shutil.rmtree(path, ignore_errors=True)
+    else:
+        path.unlink(missing_ok=True)
+
+
 class WorktreeManager:
     """Create, clean up, and merge story worktrees."""
 
@@ -295,10 +303,24 @@ class WorktreeManager:
         # a worktree reused from an earlier run still carries it, and git
         # refuses to merge over a locally modified tracked file. It is put
         # back immediately after the merge.
+        #
+        # `git checkout --` restores a **tracked** file and does nothing for
+        # an untracked one, which is what these are until the project commits
+        # them. The day the project does commit one, every story worktree
+        # still holds its untracked copy and git refuses the merge with "the
+        # following untracked working tree files would be overwritten" —
+        # nothing conflicted, so the message below named no files and told the
+        # operator to delete a branch carrying three attempts of committed
+        # work (lỗi 123, todo-cli 2026-09-13 on `.claude/settings.json`).
+        # Copied back by `sync_client_config` right after.
         for rel in CLIENT_CONFIG:
-            if (path / rel).exists():
-                subprocess.run(["git", "checkout", "--", rel], cwd=path,
-                               capture_output=True, timeout=30)
+            if not (path / rel).exists():
+                continue
+            subprocess.run(["git", "checkout", "--", rel], cwd=path,
+                           capture_output=True, timeout=30)
+            if _git(path, "ls-files", "--error-unmatch", rel,
+                    check=False).returncode != 0:
+                _xoa(path / rel)
         # Already contains the main branch tip — no merge needed; avoids
         # creating an empty merge commit on every rerun.
         tip = _git(self.repo, "rev-parse", base_branch, check=False).stdout.strip()
@@ -317,9 +339,23 @@ class WorktreeManager:
             if l.strip()
         ]
         _git(path, "merge", "--abort", check=False)
+        if not conflicting:
+            # No file is in conflict, so the merge never got that far: git
+            # refused up front (untracked file in the way, dirty tree, ...).
+            # Advising "delete the branch" here tells the operator to throw
+            # away committed work over something the tree can fix — git's own
+            # first line says what it actually was.
+            ly_do = (proc.stderr or proc.stdout or "").strip().splitlines()
+            raise GitError(
+                f"{story_id}: git refused to merge `{base_branch}` into the story branch "
+                f"before reaching any conflict: "
+                + (" / ".join(x.strip() for x in ly_do[:3]) or "no message from git")
+                + ". The story branch is fine — clean the worktree "
+                f"({path}) and rerun."
+            )
         raise GitError(
             f"{story_id}: cannot merge `{base_branch}` into story branch — conflicts in "
-            f"{', '.join(conflicting[:5]) or 'unknown files'}. Story branch has diverged too "
+            f"{', '.join(conflicting[:5])}. Story branch has diverged too "
             f"far; delete the branch and rerun, or merge manually."
         )
 

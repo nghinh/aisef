@@ -329,6 +329,49 @@ class TestNhanhStoryKhongBiCu(WorktreeTestCase):
         with self.assertRaises(GitError) as e:
             self.wm.create("S-04")
         self.assertIn("chung.txt", str(e.exception))
+        self.assertIn("diverged", str(e.exception))
+
+    def test_cau_hinh_client_chua_theo_doi_khong_chan_duoc_merge(self):
+        """Lỗi 123 (todo-cli 2026-09-13). Harness tự chép `.claude/settings.json`
+        vào worktree dưới dạng **chưa theo dõi**. Ngày dự án commit đúng đường
+        dẫn ấy lên main, git từ chối merge ("untracked working tree files would
+        be overwritten") — không tệp nào xung đột, nên thông báo không nêu được
+        tên tệp nào và khuyên **xoá nhánh**, tức vứt việc đã commit vì một thứ
+        dọn cây là xong."""
+        wt = self.wm.create("S-05")
+        (wt.path / "cua-story.txt").write_text("s", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=wt.path, check=True)
+        subprocess.run(["git", "commit", "-qm", "story"], cwd=wt.path, check=True)
+        # Harness chép vào worktree, không commit — đúng như `sync_client_config`.
+        (wt.path / ".claude").mkdir(exist_ok=True)
+        (wt.path / ".claude" / "settings.json").write_text("{}\n", encoding="utf-8")
+
+        # Dự án commit đúng đường dẫn ấy lên main.
+        (self.repo / ".claude").mkdir(exist_ok=True)
+        (self.repo / ".claude" / "settings.json").write_text('{"hooks": {}}\n', encoding="utf-8")
+        subprocess.run(["git", "add", "-f", ".claude/settings.json"], cwd=self.repo, check=True)
+        subprocess.run(["git", "commit", "-qm", "main: commit hooks"], cwd=self.repo, check=True)
+
+        self.assertEqual(self.wm.refresh("S-05", base="master"), "master")
+        self.assertTrue((wt.path / "cua-story.txt").is_file(), "việc của story còn nguyên")
+
+    def test_git_tu_choi_truoc_khi_xung_dot_thi_khong_khuyen_xoa_nhanh(self):
+        """Không tệp nào xung đột nghĩa là merge chưa đi tới đó. Thông báo phải
+        đưa lý do thật của git, và không được bảo người ta xoá nhánh."""
+        wt = self.wm.create("S-06")
+        (wt.path / "cua-story.txt").write_text("s", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=wt.path, check=True)
+        subprocess.run(["git", "commit", "-qm", "story"], cwd=wt.path, check=True)
+        # Tệp chưa theo dõi **không** thuộc CLIENT_CONFIG: harness không dọn hộ.
+        (wt.path / "chung.txt").write_text("bản chưa theo dõi", encoding="utf-8")
+        self.tien_main("chung.txt", "bản của main")
+
+        with self.assertRaises(GitError) as e:
+            self.wm.refresh("S-06", base="master")
+        loi = str(e.exception)
+        self.assertIn("chung.txt", loi, "phải nêu được tệp git nói")
+        self.assertNotIn("delete the branch", loi)
+        self.assertIn("clean the worktree", loi)
 
 
 

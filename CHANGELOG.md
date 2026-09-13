@@ -74,6 +74,17 @@ JSON verdict said `pass` with no blockers. Both failed a story. A tag after a
 backtick is no longer read as an item; real blockers still reach the gate
 through the JSON block, which the two sources are unioned from.
 
+**A rerun told you to delete a branch holding three attempts of committed
+work** (bug 123). The harness copies `.claude/settings.json` and `.opencode/`
+into each story worktree as untracked files; `refresh` cleared them with `git
+checkout --`, which only restores *tracked* files. The day a project commits
+one of those paths, git refuses the merge before reaching any conflict —
+"untracked working tree files would be overwritten" — so no file was in
+conflict, the message said "conflicts in unknown files", and it advised
+deleting the branch. Untracked copies are now removed before the merge and put
+back after; and when nothing is in conflict the error quotes git's own reason
+and says to clean the worktree, which is what actually fixes it.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on
