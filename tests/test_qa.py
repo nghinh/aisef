@@ -455,3 +455,46 @@ class TestCayKiemSach(QaTestCase):
         self.assertTrue(r.tree.startswith("agent-tree"), r.tree)
         self.assertIn("git", r.tree)
 
+
+
+class TestBoKhongKhopTestNaoKhongPhaiDo(unittest.TestCase):
+    """Lỗi 134 (todo-oc 2026-09-13): `verify.accessibility` là
+    `playwright test --grep @a11y`; chừng nào chưa story nào viết test gắn
+    `@a11y` thì lệnh ấy tìm thấy 0 test. Báo là FAIL nghĩa là "accessibility
+    hỏng" ở **mọi** story của dự án — đúng luật "chưa cấu hình ≠ đỏ" mà tool
+    `test` đã có từ lỗi 2/8, chỉ là chưa áp cho các loại kiểm định khác."""
+
+    def _ly_do(self, out, exit_code=1):
+        from aisef.phases.qa import _unrunnable_reason
+        return _unrunnable_reason(exit_code, out)
+
+    def test_khong_tim_thay_test_nao_la_khong_chay_duoc(self):
+        for out in ("Error: No tests found", "no tests ran", "collected 0 items"):
+            with self.subTest(out=out):
+                self.assertIn("matched no tests", self._ly_do(out))
+
+    def test_test_do_that_van_la_do(self):
+        self.assertEqual(self._ly_do("1 failed\n  ✘ AC-S-01-1: adds a note"), "")
+
+    def test_cong_cu_thieu_van_uu_tien_chan_doan_cu(self):
+        """Chẩn đoán "thiếu công cụ" đã có phải thắng — nó cụ thể hơn."""
+        ly_do = self._ly_do("stryker: command not found", exit_code=127)
+        self.assertNotIn("matched no tests", ly_do)
+        self.assertTrue(ly_do)
+
+
+class TestGhiTenTestChoLoaiKiemDinh(unittest.TestCase):
+    """Lỗi 132, tầng thứ hai: đường ghi của `qa:*` gọi `store.tool_run` trực
+    tiếp, không đi qua `record()` của `harness/tools`, nên bản vá ở đó không
+    tới — bộ e2e vẫn ghi 0 tên test."""
+
+    def test_duong_ghi_qa_phan_tich_ten_test(self):
+        import inspect
+        from aisef.phases import qa
+
+        src = inspect.getsource(qa.run_suite)
+        i_parse = src.index("parse_testlog(day_du)")
+        i_ghi = src.index('f"qa:{kind.id}", ok=sb.ok')
+        self.assertLess(i_parse, i_ghi, "phải phân tích trước khi ghi")
+        self.assertIn("if doc.format:", src,
+                      "đầu ra không phải test log thì không được dựng thành test_ids")

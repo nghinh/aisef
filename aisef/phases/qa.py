@@ -332,8 +332,28 @@ def _project_files(project: Path) -> list[str]:
     return out
 
 
+#: A runner that started fine and matched **zero** tests. Not a red result and
+#: not the story's fault: `verify.accessibility` is `playwright test --grep
+#: @a11y`, and until some story writes an `@a11y` test that command finds
+#: nothing. Reported as FAILED it read as "accessibility is broken" on every
+#: story of the project (lỗi 134, todo-oc 2026-09-13) — the same "not
+#: configured != red" rule the `test` tool has had since lỗi 2/8, applied to
+#: the other verification kinds.
+_KHONG_CO_TEST = ("no tests found", "no tests ran", "found no tests",
+                  "no tests were found", "collected 0 items")
+
+
 def _unrunnable_reason(exit_code: int, detail: str, provider_error: str = "") -> str:
-    return unrunnable_reason("", exit_code, detail, provider_error=provider_error)
+    ly_do = unrunnable_reason("", exit_code, detail, provider_error=provider_error)
+    if ly_do:
+        return ly_do
+    low = detail.lower()
+    if any(m in low for m in _KHONG_CO_TEST):
+        return ("the command matched no tests — it started and found nothing to run, "
+                "which is not a failing test. Either no story has written tests of "
+                "this kind yet, or the selector in the configured command matches "
+                "nothing")
+    return ""
 
 
 def _verification_tree(
@@ -472,10 +492,22 @@ def run_suite(
                 if not sb.ok:
                     run_log(artifact_root, f"qa:{kind.id} output: " + one_line(result.detail))
             if store:
+                # Test **names**, when this suite's output is a log we can read.
+                # The criteria gate reads names to match `AC-<story>-<i>`, and a
+                # story whose criteria are browser behaviour can only name them
+                # in e2e titles (lỗi 132). `record()` in `harness/tools` does
+                # this for the `test` tool; this path never went through it.
+                ten: dict = {}
+                from ..harness.testlog import parse as parse_testlog
+
+                doc = parse_testlog(day_du)
+                if doc.format:
+                    ten = doc.to_evidence()
                 store.tool_run(
                     story_id, f"qa:{kind.id}", ok=sb.ok, duration_ms=sb.duration_ms,
                     detail={"command": command, "tail": result.detail[:500],
                             "tree": report.tree, "clean_tree": report.clean_tree,
+                            **ten,
                             **({"redacted": che} if che else {})},
                 )
 

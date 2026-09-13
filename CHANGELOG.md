@@ -193,6 +193,19 @@ knowing a gate's rules does not negotiate with them. Worth noting the older
 model hid this: it wrote nothing and stopped early, so nobody saw what the turns
 were being spent on.
 
+**A suite that matched no tests is no longer reported as failing** (bug 134).
+`verify.accessibility` is `playwright test --grep @a11y`; until some story
+writes an `@a11y` test that command finds nothing, and every story of the
+project was told accessibility had failed. "Not configured is not red" has been
+the rule for the `test` tool since bugs 2 and 8 — the other verification kinds
+never learned it. They now report it as unrunnable, with a reason that names
+both possibilities, and still block the story, which is the honest outcome.
+
+Bug 132's fix also needed a second pass: the `qa:*` recording path calls
+`store.tool_run` directly and never went through `harness/tools.record`, so
+e2e still recorded no test names. Caught because the next run printed exactly
+the sentence the new gate message had been given for it.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on
