@@ -75,7 +75,11 @@ def env_for(project: Path, workdir: Path, story: str, *, reviewer: bool = False)
     # thì đo một thứ khác với thứ chạy thật. Nó cũng bỏ `CLAUDE_*` của phiên
     # Claude đang chạy bộ hợp quy (C3, 2026-09-05: phiên con thừa hưởng thì
     # tự chuyển sang Bash), và C9 kiểm canary đặt ở tiến trình này không lọt qua.
-    env = child_env({ENV_STORY_ID: story, ENV_WRITE_SCOPE: "src", ENV_WORKDIR: str(workdir)})
+    # `ANTHROPIC_` đi theo adapter chứ không còn nằm trong allowlist chung
+    # (lỗi 101): bộ hợp quy chạy phiên Claude nên nó khai đúng tiền tố của
+    # client ấy, y như harness làm.
+    env = child_env({ENV_STORY_ID: story, ENV_WRITE_SCOPE: "src", ENV_WORKDIR: str(workdir)},
+                    allow_prefixes=ClaudeCodeAdapter.env_prefixes)
     if reviewer:
         env[ENV_DISALLOWED_TOOLS] = "Write,Edit,NotebookEdit"
     return env

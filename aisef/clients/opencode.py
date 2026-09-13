@@ -234,7 +234,8 @@ class OpenCodeAdapter(ClientAdapter):
                 # Allowlist, not `os.environ` (ADR-005 V2): OpenCode once received
                 # the full host environment and logged secrets to its own log.
                 # Providers reading keys from custom env vars declare `clients.env_allow`.
-                env=child_env(spec.env, allow_prefixes=spec.env_allow),
+                env=child_env(spec.env,
+                              allow_prefixes=(*self.env_prefixes, *spec.env_allow)),
                 stdin=subprocess.PIPE,
             )
         except OSError as e:

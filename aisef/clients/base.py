@@ -102,7 +102,13 @@ ENV_KEEP = frozenset({"PATH", "HOME", "LANG", "TERM", "TMPDIR", "SHELL", "USER",
 #: Prefixes kept: locale, Claude model key/URL, harness variables for guards.
 #: Parent session's `CLAUDE*` is **not** here — conformance C3 showed a child
 #: session inheriting them switches to Bash and bypasses Write/Edit guards (error 4).
-ENV_KEEP_PREFIXES = ("LC_", "ANTHROPIC_", "AISEF_")
+#: `ANTHROPIC_` is **not** here: it belongs to the client that authenticates
+#: with it (`ClaudeCodeAdapter.env_prefixes`). Handing it to every client
+#: means a key meant for one provider reaches another — and a client that
+#: reads it outranks its own login, so a session intended for the project's
+#: router silently bills a different account (bug 101). A project that does
+#: want it elsewhere declares `clients.env_allow`.
+ENV_KEEP_PREFIXES = ("LC_", "AISEF_")
 #: Git in agent sessions must not hold the host's credentials: no terminal
 #: prompts, askpass always fails, and `credential.helper=` empty **clears**
 #: the helper list declared at system/global — osxkeychain is not queried
@@ -236,9 +242,9 @@ def child_env(spec_env: dict[str, str], *, allow_prefixes: Iterable[str] = ()) -
     Before: OpenCode received the full `os.environ` (63 vars on the test
     machine), Claude only had `CLAUDE*` removed; OpenCode once logged host
     secrets to its own log.  The agent should not hold what it does not need:
-    keep `ENV_KEEP` + `ENV_KEEP_PREFIXES` + project-declared prefixes from
-    `clients.env_allow`, plus the git credential disabler, then overlay
-    harness `spec_env` on top.  Known limitation: Claude's model token
+    keep `ENV_KEEP` + `ENV_KEEP_PREFIXES` + the adapter's own
+    `env_prefixes` + project-declared prefixes from `clients.env_allow`, plus
+    the git credential disabler, then overlay harness `spec_env` on top.  Known limitation: Claude's model token
     lives in the host's Keychain/OAuth, harness has no broker — the child
     session still authenticates with the host's account.
     """
@@ -260,6 +266,12 @@ class ClientAdapter(ABC):
 
     #: Display name, also the key used in config and reports.
     id: str = ""
+
+    #: Host env-var prefixes **this client** authenticates with. Kept per
+    #: adapter rather than global: a key belongs to the provider it pays for,
+    #: and a client that reads a key it was not meant to use outranks its own
+    #: login without saying so (bug 101).
+    env_prefixes: tuple[str, ...] = ()
 
     #: Optional budget guard injected by ``phases.run``; subclasses and
     #: tests that don't need the budget path leave it ``None`` and pay

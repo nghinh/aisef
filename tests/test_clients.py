@@ -338,7 +338,7 @@ class TestKhongThuaHuongPhienCha(unittest.TestCase):
         from unittest import mock
         from aisef.clients.base import child_env
         with mock.patch.dict(os.environ, {"CLAUDECODE": "1", "CLAUDE_CODE_ENTRYPOINT": "x", "ANTHROPIC_API_KEY": "k"}):
-            env = child_env({})
+            env = child_env({}, allow_prefixes=("ANTHROPIC_",))
         self.assertNotIn("CLAUDECODE", env)
         self.assertNotIn("CLAUDE_CODE_ENTRYPOINT", env)
         self.assertEqual(env["ANTHROPIC_API_KEY"], "k")
@@ -350,7 +350,7 @@ class TestKhongThuaHuongPhienCha(unittest.TestCase):
         may = {"NGHI_CANARY_TOKEN": "bí mật", "FAKE_SECRET_TOKEN": "x", "NINEROUTER_API_KEY": "k9",
                "PATH": "/bin", "HOME": "/h", "LC_ALL": "C", "ANTHROPIC_BASE_URL": "u", "AISEF_PROJECT": "/p"}
         with mock.patch.dict(os.environ, may, clear=True):
-            env = child_env({"AISEF_STORY_ID": "S"})
+            env = child_env({"AISEF_STORY_ID": "S"}, allow_prefixes=("ANTHROPIC_",))
         for k in ("NGHI_CANARY_TOKEN", "FAKE_SECRET_TOKEN", "NINEROUTER_API_KEY"):
             self.assertNotIn(k, env)
         for k in ("PATH", "HOME", "LC_ALL", "ANTHROPIC_BASE_URL", "AISEF_PROJECT", "AISEF_STORY_ID"):

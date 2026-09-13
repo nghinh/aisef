@@ -73,6 +73,9 @@ DEFAULT_TOOLS = ("Read", "Write", "Edit", "Glob", "Grep", "Bash", "NotebookEdit"
 
 class ClaudeCodeAdapter(ClientAdapter):
     id = "claude"
+    #: This is the client that authenticates with an Anthropic key, so this is
+    #: the only client the key is handed to (bug 101).
+    env_prefixes = ("ANTHROPIC_",)
 
     def __init__(self, binary: str = BINARY):
         self.binary = binary
@@ -138,7 +141,7 @@ class ClaudeCodeAdapter(ClientAdapter):
         if not Path(spec.workdir).is_dir():
             return RunResult(ok=False, error=f"workdir does not exist: {spec.workdir}")
 
-        child = child_env(spec.env, allow_prefixes=spec.env_allow)
+        child = child_env(spec.env, allow_prefixes=(*self.env_prefixes, *spec.env_allow))
         try:
             proc = subprocess.Popen(
                 self.build_command(spec),

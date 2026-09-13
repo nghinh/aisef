@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- **An API key now goes only to the client that authenticates with it**
+  (bug 101). `ANTHROPIC_` sat in the shared env allowlist, so every client
+  session received the host's Anthropic key — including OpenCode sessions
+  meant to run through the project's own router. A client that reads such a
+  key uses it *instead of* its own login, as `aisef doctor` itself says, so
+  the run authenticates against, and bills, an account nobody chose. Each
+  adapter now declares what it authenticates with (`claude`: `ANTHROPIC_`;
+  `opencode`: nothing), the shared list keeps only `LC_` and `AISEF_`, and a
+  project that wants more says so in `clients.env_allow`.
+
+  **Upgrade note:** if you run OpenCode against an Anthropic-compatible
+  endpoint using `ANTHROPIC_*` variables, add `"clients.env_allow":
+  ["ANTHROPIC_"]` to `.ai/config.json`.
+
 - **`aisef run` says when guards are not compiled.** The story gate already
   records `guard ran: not applicable — hooks not compiled for this client`,
   which is honest but arrives after the session is paid for. Until now a

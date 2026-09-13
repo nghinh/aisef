@@ -44,9 +44,22 @@ class TestChildEnv(unittest.TestCase):
         self.assertEqual(env["PATH"], "/usr/bin")
 
     @patch.dict("os.environ", CLEAN_ENV, clear=True)
-    def test_keeps_anthropic_prefix(self):
-        env = child_env({})
-        self.assertEqual(env["ANTHROPIC_API_KEY"], "sk-test")
+    def test_anthropic_key_only_for_the_client_that_pays_with_it(self):
+        """Lỗi 101: khoá đi kèm nhà cung cấp nó trả tiền cho. Cho mọi client
+        thì một phiên định chạy qua router của dự án lại xác thực bằng khoá
+        Anthropic của máy — client đọc được nó **đè lên** đăng nhập của chính
+        nó, và người dùng trả tiền cho tài khoản khác mà không ai nói gì."""
+        self.assertNotIn("ANTHROPIC_API_KEY", child_env({}))
+        self.assertEqual(
+            child_env({}, allow_prefixes=("ANTHROPIC_",))["ANTHROPIC_API_KEY"],
+            "sk-test")
+
+    @patch.dict("os.environ", CLEAN_ENV, clear=True)
+    def test_adapter_prefixes_are_what_the_clients_declare(self):
+        from aisef.clients.claude_code import ClaudeCodeAdapter
+        from aisef.clients.opencode import OpenCodeAdapter
+        self.assertEqual(ClaudeCodeAdapter.env_prefixes, ("ANTHROPIC_",))
+        self.assertEqual(OpenCodeAdapter.env_prefixes, ())
 
     @patch.dict("os.environ", CLEAN_ENV, clear=True)
     def test_drops_unknown(self):
