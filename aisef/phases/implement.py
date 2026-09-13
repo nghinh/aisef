@@ -2254,6 +2254,46 @@ def _candidate_moved(workdir: Path, candidate: str) -> str:
     return bay_gio if bay_gio and bay_gio != candidate else ""
 
 
+#: Criterion codes named inside a gate check's detail — the nop control lists
+#: exactly which tests were green at the parent SHA.
+_MA_TIEU_CHI = re.compile(r"\bAC-[A-Za-z0-9_-]*?-\d+(?![0-9A-Za-z_-])")
+
+
+def nop_deadlock(attempts: list[Attempt]) -> str:
+    """The story's criteria are already satisfied without the story.
+
+    `tests verify story` failing with *the same criteria* on two graded
+    attempts is not a developer who has not tried hard enough: no test can be
+    red at the branch point for behaviour that is already on the main branch.
+    Measured on todo-cli STORY-03-02 2026-09-13, whose four criteria were
+    implemented by STORY-03-01 one wave earlier. The developer worked it out
+    and correctly wrote nothing — which the harness read as a no-op session,
+    spent the whole infrastructure budget re-opening it, and reported as
+    "sessions kept producing nothing to grade" (lỗi 126): a plan defect
+    described as a client problem, six sessions after it was knowable.
+    """
+    cham = [a for a in attempts if a.gate is not None and not a.infra]
+    if len(cham) < 2:
+        return ""
+    ma = []
+    for a in cham[-2:]:
+        muc = next((c for c in a.gate.failures if c.name == "tests verify story"), None)
+        if muc is None or "still green without story code" not in muc.detail:
+            return ""
+        ma.append(set(_MA_TIEU_CHI.findall(muc.detail)))
+    if not ma[0] or ma[0] != ma[1]:
+        return ""
+    return (
+        "deadlock due to plan: criteria " + ", ".join(sorted(ma[0]))
+        + " are already satisfied at the branch point — their tests pass with "
+        "the story's code absent, on two attempts running. Either another "
+        "story already shipped this behaviour (check the epic index) or the "
+        "criteria describe something the code already does. No test the "
+        "developer writes can be red at the parent SHA for behaviour that is "
+        "already there; fix the criteria or drop the story, then re-run."
+    )
+
+
 def deadlock_reason(attempts: list[Attempt], write_scope: list[str] | None = None) -> str:
     """Deadlock: two consecutive attempts blocked for the same reason.
     Empty if not deadlocked.
@@ -2540,7 +2580,8 @@ def implement_story(
             _log(f"story={story.id} DEADLOCK plan: {'; '.join(loi_ke_hoach[:2])}")
             return outcome
 
-        van = deadlock_reason(outcome.attempts, effective_write_scope(story, project))
+        van = nop_deadlock(outcome.attempts) or deadlock_reason(
+            outcome.attempts, effective_write_scope(story, project))
         if van:
             outcome.blocked_reason = van
             _log(f"story={story.id} DEADLOCK {van[:120]}")

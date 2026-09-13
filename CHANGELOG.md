@@ -104,6 +104,16 @@ it to do. The guard exists so a run becomes evidence, and evidence is per
 story; a reviewer deliberately has no story id, so `aisef tool test` would
 record nothing for it either. It now applies only where a story id is present.
 
+**A plan defect reported as a client problem, six sessions late** (bug 126).
+A story whose four criteria had already been shipped by an earlier story
+failed `tests verify story` twice with exactly those criteria — no test can be
+red at the branch point for behaviour already on the main branch. The
+developer worked that out and correctly wrote nothing, which the harness read
+as a no-op session, spent the whole infrastructure budget reopening, and
+reported as "sessions kept producing nothing to grade". Two graded attempts
+failing that check with the same criteria now stop the story immediately, as a
+plan deadlock that names the criteria and says to fix or drop them.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on

@@ -709,6 +709,67 @@ class TestSchemaRaSoat(ImplementTestCase):
         self.assertNotIn("review:mismatch", notes)
 
 
+class TestBeTacDoKeHoachTheoNopControl(unittest.TestCase):
+    """Lỗi 126 (todo-cli STORY-03-02, 2026-09-13). Bốn tiêu chí của story đã
+    được STORY-03-01 làm xong từ sóng trước. `tests verify story` đỏ hai lượt
+    liền với **đúng** bốn mã ấy — không test nào developer viết ra có thể đỏ ở
+    điểm rẽ cho hành vi đã nằm sẵn trên nhánh chính. Developer nhận ra và viết
+    0 dòng, đúng; harness đọc thành phiên no-op, tiêu sạch ngân sách hạ tầng
+    mở lại nó sáu lần, rồi báo "sessions kept producing nothing to grade" —
+    một lỗi kế hoạch mô tả thành lỗi client."""
+
+    def _luot(self, ma, *, infra=False):
+        from aisef.control.gate import StoryGate
+        from aisef.control.outcome import Check, Outcome
+        from aisef.phases.implement import Attempt
+        g = StoryGate(story_id="STORY-03-02")
+        g.checks.append(Check("tests verify story", Outcome.FAILED,
+                              "tests verify nothing — still green without story code "
+                              f"(parent SHA a25a56d): {', '.join(m + ': x' for m in ma)}"))
+        a = Attempt(number=1)
+        a.gate = g
+        a.infra = infra
+        return a
+
+    def test_hai_luot_cung_bo_ma_la_be_tac_ke_hoach(self):
+        from aisef.phases.implement import nop_deadlock
+        ma = ["AC-STORY-03-02-1", "AC-STORY-03-02-2"]
+        ly_do = nop_deadlock([self._luot(ma), self._luot(ma)])
+        self.assertIn("already satisfied at the branch point", ly_do)
+        for m in ma:
+            self.assertIn(m, ly_do)
+        self.assertIn("fix the criteria or drop the story", ly_do)
+
+    def test_bo_ma_doi_thi_chua_ket_luan(self):
+        """Developer sửa được: lượt sau đỏ ở tiêu chí khác nghĩa là có tiến bộ."""
+        from aisef.phases.implement import nop_deadlock
+        self.assertEqual(nop_deadlock([self._luot(["AC-STORY-03-02-1", "AC-STORY-03-02-2"]),
+                                       self._luot(["AC-STORY-03-02-2"])]), "")
+
+    def test_mot_luot_thi_chua_ket_luan(self):
+        from aisef.phases.implement import nop_deadlock
+        self.assertEqual(nop_deadlock([self._luot(["AC-STORY-03-02-1"])]), "")
+
+    def test_luot_ha_tang_khong_tinh(self):
+        """Phiên bị cắt không chấm gì; xen vào giữa không được xoá dấu vết
+        của hai lượt đã chấm."""
+        from aisef.phases.implement import nop_deadlock
+        ma = ["AC-STORY-03-02-1"]
+        ly_do = nop_deadlock([self._luot(ma), self._luot([], infra=True), self._luot(ma)])
+        self.assertIn("already satisfied", ly_do)
+
+    def test_truot_vi_ly_do_khac_thi_khong_ket_luan(self):
+        from aisef.control.gate import StoryGate
+        from aisef.control.outcome import Check, Outcome
+        from aisef.phases.implement import Attempt, nop_deadlock
+        def khac():
+            g = StoryGate(story_id="S")
+            g.checks.append(Check("security", Outcome.FAILED, "1 blocking items"))
+            a = Attempt(number=1); a.gate = g
+            return a
+        self.assertEqual(nop_deadlock([khac(), khac()]), "")
+
+
 class TestSlotDaChungMinh(unittest.TestCase):
     """Lỗi 124 (todo-cli STORY-01-01, 2026-09-13). Người rà soát bảo mật chặn
     ba lượt liền với "lstatSync nuốt ENOENT nên phép kiểm symlink không bao giờ

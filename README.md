@@ -243,7 +243,7 @@ of stopping the session.
 
 ## Real bugs already hit
 
-125 bugs found by measurement on real agents, grouped into eleven cause
+126 bugs found by measurement on real agents, grouped into eleven cause
 classes with a regression check each: `docs/FAILURE-TAXONOMY.md`. A new bug adds
 a line there in the same commit as its test. Changes per version, and what to do
 when upgrading: `CHANGELOG.md`.
