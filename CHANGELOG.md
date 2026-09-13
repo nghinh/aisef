@@ -308,11 +308,13 @@ On todo-oc STORY-04-02 the branch still carried `AC-STORY-04-02-1: textarea has
 a visible placeholder` after AC-1 was dropped and AC-2/AC-3 were merged. The
 developer opened a tree where everything already passed and wrote nothing in
 twenty turns. The nop control held — those tests are green at the parent SHA, so
-the gate refused the attempt — but the attempt was spent, and a second identical
-one would have produced the plan-deadlock message, blaming the plan that had
-just been corrected. The case the nop control cannot hold is a stale test that
-*is* red at the parent: it passes the control while its code labels behaviour it
-does not test.
+the gate refused the attempt — and the next attempt recovered, committing
+"tighten tests so they fail at parent SHA". So the run was not lost; what it
+cost was a whole attempt spent discovering the contamination and a second one
+spent rewriting a previous attempt's tests, work that exists only because the
+branch was carried across a contract change. The case the nop control cannot
+hold is a stale test that *is* red at the parent: it passes the control while
+its code labels behaviour it does not test.
 
 The criteria are now fingerprinted into evidence each run — the criteria alone,
 not the story card, whose harness-added scope paths move with every framework

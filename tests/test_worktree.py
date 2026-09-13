@@ -493,9 +493,9 @@ class TestNhanhCuKhiTieuChiDoi(WorktreeTestCase):
     Đo trên todo-oc STORY-04-02 ngày 2026-09-14: bỏ AC-1, gộp AC-2 với AC-3,
     nhánh vẫn mang `AC-STORY-04-02-1: textarea has a visible placeholder`.
     Người viết mã mở ra thấy mọi thứ đã xanh nên không viết gì trong 20 lượt.
-    Phép kiểm nop chặn được (test cũ xanh ở điểm rẽ nhánh) nên không có PASS
-    giả — nhưng lượt ấy mất trắng, và lượt sau y hệt sẽ ra thông báo chết kẹt
-    đổ cho *kế hoạch* vừa được sửa đúng.
+    Phép kiểm nop chặn được (test cũ xanh ở điểm rẽ nhánh) và lượt 2 gỡ được,
+    nên không có PASS giả — cái mất là một lượt trắng cộng một lượt viết lại
+    test của lượt trước.
     """
 
     def setUp(self):
