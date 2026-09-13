@@ -726,6 +726,32 @@ class TestFindings(unittest.TestCase):
     def test_empty_text(self):
         self.assertEqual(blocking_findings(""), [])
 
+    def test_the_van_ban_giua_dong_van_la_muc_chan(self):
+        """Lỗi 16 giữ nguyên: thẻ dán liền vào chữ trước nó vẫn là mục chặn."""
+        found = blocking_findings(
+            "...whether each test can detect regressions.[block] tests/todo.spec.js:217 "
+            "— assertion never fails")
+        self.assertEqual(len(found), 1)
+        self.assertIn("todo.spec.js:217", found[0])
+
+    def test_the_trong_dau_nguoc_la_nhac_ten_khong_phai_neu_ra(self):
+        """Lỗi 122 (todo-cli 2026-09-13). Hai câu thật, hai story trượt:
+
+        * người rà soát nghĩ thành tiếng — "whether this is a `[block]` or
+          `[should fix]`:" — bị đếm thành mục chặn;
+        * người rà soát nhắc lại lượt trước — "The `[block]` item from the
+          previous review (lib/store.js:83) persists" — trong khi khối JSON
+          của **chính** lượt ấy khai `verdict: pass`, không mục chặn nào.
+
+        Trong dấu nháy ngược là **gọi tên** thẻ, không phải giương nó lên.
+        Mục chặn thật vẫn tới cổng qua khối JSON (hợp nhất hai nguồn)."""
+        self.assertEqual(blocking_findings(
+            "Now let me think about whether this is a `[block]` or `[should fix]`:"), [])
+        self.assertEqual(blocking_findings(
+            "The `[block]` item from the previous review (lib/store.js:83) persists — "
+            "the syscall is still `open` when the failure is in `rename`."), [])
+        self.assertEqual(blocking_findings("Đây là `[chặn]` hay `[nên sửa]`?"), [])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

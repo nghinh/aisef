@@ -1928,8 +1928,16 @@ def persist_verdict(artifact_root: Path | str, story_id: str, role: str, number:
 #: todo-e2e/STORY-01-02 2026-09-10 opened with "...whether each test can
 #: detect regressions.[block] tests/todo.spec.js:217 -- ..." on one line, and
 #: a parser that only looked at line starts lost that blocker.  Split there.
+#:
+#: Not after a backtick: there the model is **naming** the tag, not raising
+#: it. Both shapes measured on todo-cli 2026-09-13 (lỗi 122) — the reviewer
+#: thinking out loud ("whether this is a `[block]` or `[should fix]`:") and
+#: the reviewer recalling an earlier review ("The `[block]` item from the
+#: previous review ... persists", whose own JSON verdict listed no blocker).
+#: Both were counted as blocking items and both failed a story on a sentence
+#: that raised nothing.
 _TAG_MO_DAU = re.compile(
-    "(?<=[^\n])(" + "|".join(re.escape(t) for t in _BLOCK_TAGS + _STUCK_TAGS) + ")",
+    "(?<=[^\n`])(" + "|".join(re.escape(t) for t in _BLOCK_TAGS + _STUCK_TAGS) + ")",
     re.IGNORECASE)
 
 

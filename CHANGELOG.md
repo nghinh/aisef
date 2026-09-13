@@ -64,6 +64,16 @@ still block at source; the flag means *all* of them do. The expectation that a
 developer session leaves a guard trace now reads `guards_wired`, so the `guard
 ran` gate check is unaffected.
 
+**A story failed review on a sentence that raised nothing** (bug 122). The
+text parser treats `[block]` anywhere in a line as a blocking item — correct
+for a tag glued to the end of a sentence, wrong for one inside backticks,
+where the reviewer is naming the tag rather than raising it. Measured twice in
+one run: a reviewer thinking out loud ("whether this is a `[block]` or
+`[should fix]`:"), and a reviewer recalling an earlier review while its own
+JSON verdict said `pass` with no blockers. Both failed a story. A tag after a
+backtick is no longer read as an item; real blockers still reach the gate
+through the JSON block, which the two sources are unioned from.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on
