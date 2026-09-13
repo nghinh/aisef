@@ -439,8 +439,16 @@ INJECTION_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
         rf"""(?i)(execute|query|\braw|prepare)\s*\(\s*['"`].*{_SQL}"""
         rf""".*(\$\{{|\+|%s\s*%)"""
     )),
+    # `innerHTML = ""` cannot inject anything: it is the ordinary way to clear a
+    # container before rebuilding it with `createElement`, which is the very
+    # API this rule wants. Blocking it left a vanilla-JS story no legal way to
+    # render a list, and the agent spent two 40-turn sessions reverse-
+    # engineering the harness instead of writing code (lỗi 131). Only the empty
+    # **literal** is exempt — `innerHTML = x` where x happens to be empty at
+    # runtime is not something a regex can know.
     ("chèn HTML thô", re.compile(
-        r"dangerouslySetInnerHTML|\.(inner|outer)HTML\s*=|"
+        r"dangerouslySetInnerHTML|"
+        r"\.(inner|outer)HTML\s*=(?!\s*(?:''|\"\"|``)\s*(?:;|$|\n))|"
         r"\.insertAdjacentHTML\s*\(|document\.write(ln)?\s*\("
     )),
     ("shell với chuỗi ghép", re.compile(
@@ -490,6 +498,26 @@ def check_process_refs(content: str, path: str, *, project_root: str = "") -> Ve
     )
 
 
+#: What to do instead, per rule. A guard that blocks with advice from another
+#: domain is a guard the agent cannot obey: the HTML rule used to answer "use
+#: parameterization", which is SQL advice, and the agent — which had already
+#: written an `escapeHtml` helper — had no idea what would satisfy it (lỗi 131).
+_CACH_KHAC = {
+    "chèn HTML thô": ("Build DOM instead of HTML strings: `textContent` for text, "
+                      "`createElement` + `append` for structure, `replaceChildren()` "
+                      "to clear. Escaping by hand does not lift this rule — the sink "
+                      "does. `innerHTML = \"\"` is allowed, it cannot inject anything."),
+    "nối chuỗi vào câu SQL": ("Use bound parameters (`?`, `$1`, named parameters) and "
+                              "pass the values as arguments — never format them into "
+                              "the statement."),
+    "shell với chuỗi ghép": ("Pass argv as a list and do not use a shell; if a shell is "
+                             "genuinely required, quote with the language's own quoting "
+                             "helper, not with string formatting."),
+    "dựng mã từ chuỗi ghép": ("Do not build code from strings. A lookup table or a "
+                              "closure does what `eval` was reached for."),
+}
+
+
 def check_injection(content: str) -> Verdict:
     if not content:
         return ALLOW
@@ -497,11 +525,7 @@ def check_injection(content: str) -> Verdict:
         m = pattern.search(content)
         if m:
             line_no = content[: m.start()].count("\n") + 1
-            return Verdict(
-                False,
-                f"line {line_no}: {label}. Use parameterization / safe API instead "
-                f"of string concatenation.",
-            )
+            return Verdict(False, f"line {line_no}: {label}. " + _CACH_KHAC[label])
     return ALLOW
 
 

@@ -1442,3 +1442,62 @@ class TestLenhAisefTraChoAgentPhaiCungBan(unittest.TestCase):
             argv = tools.aisef_argv()
         self.assertNotEqual(argv, ["aisef"])
         self.assertTrue(argv[0].endswith("aisef") or argv[-2:] == ["-m", "aisef.cli"], argv)
+
+
+class TestChanHtmlThoConDuongDeTuanThu(unittest.TestCase):
+    """Lỗi 131 (todo-oc 2026-09-13, MiniMax-M3). Luật chặn **mọi**
+    `.innerHTML =`, kể cả `innerHTML = ''` — thứ không chèn được gì và là cách
+    thông thường để dọn container trước khi dựng lại bằng `createElement`,
+    đúng API mà luật này muốn. Còn lời khuyên lại là lời khuyên cho SQL ("use
+    parameterization"), nên agent — đã viết sẵn `escapeHtml` — không biết làm
+    gì cho vừa. Nó đốt hai phiên 40 lượt đọc ngược nội tại của harness, cây
+    làm việc không đổi một dòng."""
+
+    def _chan(self, src: str) -> bool:
+        from aisef.harness.guardrails import check_injection
+        return not check_injection(src).allowed
+
+    def test_gan_chuoi_rong_khong_chen_duoc_gi(self):
+        for src in ("el.innerHTML = '';", 'el.innerHTML = "";', "el.innerHTML = ``;",
+                    'el.innerHTML="";', 'root.innerHTML = "";  // clear'):
+            with self.subTest(src=src):
+                self.assertFalse(self._chan(src))
+
+    def test_chuoi_rong_phai_la_hang_so_that(self):
+        """`innerHTML = x` mà x tình cờ rỗng lúc chạy thì regex không biết —
+        chỉ miễn cho **hằng** rỗng viết thẳng ra."""
+        self.assertTrue(self._chan("el.innerHTML = duoi;"))
+        self.assertTrue(self._chan("el.innerHTML = rong || '';"))
+
+    def test_moi_thu_con_lai_van_chan(self):
+        for src in ("el.innerHTML = html;", "el.innerHTML = '<b>' + x + '</b>';",
+                    "el.outerHTML = y;", 'node.insertAdjacentHTML("beforeend", s)',
+                    "document.write(s)", "<div dangerouslySetInnerHTML={{__html: s}} />"):
+            with self.subTest(src=src):
+                self.assertTrue(self._chan(src))
+
+    def test_api_an_toan_khong_bi_dung_nham(self):
+        for src in ("el.textContent = x;", "el.replaceChildren();",
+                    "el.append(document.createElement('li'));"):
+            with self.subTest(src=src):
+                self.assertFalse(self._chan(src))
+
+    def test_loi_khuyen_dung_nganh(self):
+        """Guard chặn bằng lời khuyên của lĩnh vực khác là guard không tuân
+        theo được. Mỗi luật phải nói **cách làm khác** của chính nó."""
+        from aisef.harness.guardrails import INJECTION_PATTERNS, check_injection
+
+        ly_do = check_injection("el.innerHTML = html;").reason
+        self.assertIn("textContent", ly_do)
+        self.assertIn("createElement", ly_do)
+        self.assertNotIn("parameteriz", ly_do)
+
+        sql = check_injection('cursor.execute("SELECT * FROM t WHERE id = " + i)').reason
+        self.assertIn("bound parameters", sql)
+        self.assertNotIn("textContent", sql)
+
+        # Mọi nhãn đều phải có lời khuyên riêng — thêm luật mà quên là đỏ ở đây.
+        from aisef.harness.guardrails import _CACH_KHAC
+        for nhan, _ in INJECTION_PATTERNS:
+            with self.subTest(nhan=nhan):
+                self.assertIn(nhan, _CACH_KHAC)

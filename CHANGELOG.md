@@ -159,6 +159,16 @@ attempt and regrades the same tree. Worth noting how it surfaced: the older
 model wrote nothing and stopped, the newer one exhausted the cap — one gap, two
 symptoms, and only one of them had ever been seen.
 
+**The injection guard left a vanilla-JS story no legal way to render a list**
+(bug 131). It blocked every `.innerHTML =`, including `innerHTML = ""` — which
+cannot inject anything and is the ordinary way to clear a container before
+rebuilding it with `createElement`, the very API the rule wants. Worse, it
+answered with SQL advice ("use parameterization"), so an agent that had already
+written an `escapeHtml` helper had no idea what would satisfy it: it spent two
+40-turn sessions reading the harness's own evidence files trying to work out
+the rule, and wrote nothing. The empty string literal is now exempt, everything
+else still blocked, and each injection rule states its own alternative.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on
