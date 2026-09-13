@@ -1541,3 +1541,52 @@ class TestEgressKhongChanChinhMayNay(unittest.TestCase):
                          ["[::1]"])
         self.assertEqual(_extract_hosts("Bash", {"command": "curl http://[2001:DB8::1]/x"}),
                          ["[2001:db8::1]"])
+
+
+class TestGhiDungTenLuatDaChan(unittest.TestCase):
+    """Lỗi 139 (todo-oc 2026-09-13): bằng chứng ghi `guard injection BLOCK write
+    · this role is not allowed to use tool write`. Luật vai trò và luật
+    escaped-workdir chạy ở tầng điều phối cho **mọi** loại guard, nên guard nào
+    client gọi trước thì mang tiếng. Ai soi `guard_block` theo tên sẽ kết luận
+    luật injection nổ khi ghi tệp."""
+
+    def test_luat_vai_tro_ghi_ten_cua_no(self):
+        from aisef.harness.guardrails import ENV_DISALLOWED_TOOLS, run_guard
+
+        v = run_guard("injection",
+                      {"tool_name": "Write", "tool_input": {"content": "x = 1"}},
+                      env={ENV_DISALLOWED_TOOLS: "Write,Edit"})
+        self.assertFalse(v.allowed)
+        self.assertEqual(v.rule, "role-tool")
+
+    def test_luat_thoat_worktree_ghi_ten_cua_no(self):
+        import tempfile
+        from aisef.harness.guardrails import ENV_WORKDIR, run_guard
+
+        with tempfile.TemporaryDirectory() as tmp:
+            v = run_guard("git-stage",
+                          {"tool_name": "Bash",
+                           "tool_input": {"command": "git status", "workdir": "/"}},
+                          env={ENV_WORKDIR: tmp})
+            self.assertFalse(v.allowed)
+            self.assertEqual(v.rule, "escaped-workdir")
+
+    def test_guard_binh_thuong_khong_co_ten_rieng(self):
+        from aisef.harness.guardrails import check_git_stage
+        self.assertEqual(check_git_stage("git add -A").rule, "")
+
+    def test_bang_chung_ghi_theo_luat_va_giu_lai_loi_goi(self):
+        import tempfile
+        from pathlib import Path as _P
+
+        from aisef.harness.guardrails import ENV_DISALLOWED_TOOLS, ENV_STORY_ID, record_outcome, run_guard
+        from aisef.harness.observe import GUARD_BLOCK, EvidenceStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            env = {ENV_DISALLOWED_TOOLS: "Write", ENV_STORY_ID: "S-01"}
+            ev = {"tool_name": "Write", "tool_input": {"content": "x"}}
+            v = run_guard("injection", ev, env=env)
+            record_outcome("injection", ev, v, env=env, artifact_root=str(_P(tmp)))
+            chan = EvidenceStore(tmp).read("S-01").of(GUARD_BLOCK)
+            self.assertEqual(chan[-1].name, "role-tool")
+            self.assertEqual(chan[-1].detail["invoked_as"], "injection")

@@ -63,6 +63,14 @@ PLANNING_SCOPE = ("_bmad-output", "docs")
 class Verdict:
     allowed: bool
     reason: str = ""
+    #: Which **rule** decided, when that is not the guard that was invoked.
+    #: Two checks run at the orchestration layer for every guard kind — the
+    #: role's tool allowlist and the escaped-workdir check — so whichever
+    #: guard the client happened to call first carried the block. Evidence
+    #: then read `guard injection BLOCK write · this role is not allowed to
+    #: use tool write`, and anyone auditing blocks by name would conclude the
+    #: injection rule fires on writes (lỗi 139).
+    rule: str = ""
 
     @property
     def exit_code(self) -> int:
@@ -819,6 +827,7 @@ def check_role_tool(tool_name: str, disallowed: list[str]) -> Verdict:
         False,
         f"this role is not allowed to use tool {tool_name} — it reviews, not edits. "
         f"Report findings instead of fixing them yourself.",
+        rule="role-tool",
     )
 
 
@@ -957,6 +966,7 @@ def _escaped_workdir(tool_input: dict, root: str) -> Verdict | None:
         f"command specifies directory {wd}, outside the working tree ({root}). "
         f"Story may only work within its worktree — work placed outside "
         f"bypasses all gates. Remove the directory parameter and retry.",
+        rule="escaped-workdir",
     )
 
 
@@ -1093,7 +1103,7 @@ def record_outcome(
         # phase is blocked" with no way to learn which path or which rule.
         if not verdict.allowed:
             from .runlog import one_line, run_log
-            run_log(artifact_root, f"guard {kind} BLOCK "
+            run_log(artifact_root, f"guard {verdict.rule or kind} BLOCK "
                     + one_line(f"{event.get('tool_name') or '?'} · {verdict.reason}"))
         return
     from .observe import GUARD_BLOCK, GUARD_CHECK, GUARD_SEEN, TOOL_RUN, EvidenceStore, Event
@@ -1118,8 +1128,9 @@ def record_outcome(
 
     if not verdict.allowed:
         store.record(story, Event(
-            kind=GUARD_BLOCK, name=kind, ok=False,
-            detail={"tool": tool, "reason": verdict.reason[:300]},
+            kind=GUARD_BLOCK, name=verdict.rule or kind, ok=False,
+            detail={"tool": tool, "reason": verdict.reason[:300],
+                    **({"invoked_as": kind} if verdict.rule else {})},
         ))
         return
     if kind == "write-scope":

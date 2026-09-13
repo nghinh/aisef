@@ -258,6 +258,15 @@ all its names. A URL-parsing bug came with it: the host pattern stopped at `[`,
 so `http://[::1]:8123/` yielded a host of `"["`. IPv6 literals are parsed now,
 and an IPv6 address that is not this machine still blocks.
 
+**A block now records which rule decided it** (bug 139). The role's tool
+allowlist and the escaped-workdir check run at the orchestration layer for
+every guard kind — deliberately, so all clients enforce them — so whichever
+guard the client happened to invoke first took the credit. Evidence read `guard
+injection BLOCK write · this role is not allowed to use tool write`, and anyone
+auditing blocks by name would go and fix the injection rule. `Verdict` carries
+a `rule` now; evidence and the run log use it, keeping `invoked_as` so the
+original guard is not lost.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on
