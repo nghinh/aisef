@@ -91,6 +91,14 @@ DEFAULTS: dict[str, Any] = {
     "run.max_turns": 40,
     "run.timeout_seconds": 1800,
     "run.max_retries": 2,
+    # Sessions lost to the client, not to the agent: a provider 502, a rate
+    # limit, a tool call the CLI could not parse. They score nothing, so they
+    # are not quality attempts — but the budget for them used to be
+    # `max_retries + 1`, which meant tolerating a flaky client required paying
+    # for more quality attempts too. -1 keeps that old coupling as the default.
+    # Raise it when the client's own failure rate is measured and high: the
+    # C-1b cohort lost 22-32% of sessions to unparsed tool calls.
+    "run.infra_retries": -1,
     # in-flight budget caps (Phase 2/3 wire-up). 0 = unlimited / disabled.
     # Set any non-zero value to engage ``BudgetGuard.reserve(...)`` around
     # every paid client call.  See ``aisef/control/budget.py``.
@@ -227,6 +235,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "run.max_turns": int,
     "run.timeout_seconds": int,
     "run.max_retries": int,
+    "run.infra_retries": int,
     "run.cost_cap_usd": float,
     "run.turn_cap": int,
     "run.wall_clock_cap_seconds": float,
@@ -352,6 +361,9 @@ def _validate(values: dict[str, Any]) -> None:
             raise ConfigError(f"{key} must be >= 1")
     if values["run.max_retries"] < 0:
         raise ConfigError("run.max_retries must be >= 0")
+    if values["run.infra_retries"] < -1:
+        raise ConfigError("run.infra_retries must be >= 0, or -1 for "
+                          "`run.max_retries + 1` (the historical default)")
     for key in ("run.cost_cap_usd", "run.wall_clock_cap_seconds"):
         if values[key] < 0:
             raise ConfigError(f"{key} must be >= 0 (0 = unlimited)")

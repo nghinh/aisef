@@ -322,6 +322,30 @@ class TestRetry(ImplementTestCase):
         self.assertEqual(out.quality_attempts, 2)   # lần đầu + 1 lần thử lại
         self.assertIn("tried", out.blocked_reason)
 
+    def test_ngan_sach_ha_tang_khai_rieng_duoc(self):
+        """Phiên mất vì **client**, không vì agent — 502, rate limit, một lời
+        gọi tool CLI không phân giải nổi — không chấm gì cả. Nhưng ngân sách
+        cho chúng vốn là `max_retries + 1`, nên muốn chịu được một client hay
+        hỏng thì phải trả thêm cho cả lượt chất lượng. Đợt C-1b mất 22–32%
+        phiên vì cú pháp tool call không phân giải được."""
+        class LuonHongHaTang(ScriptedClient):
+            def run(inner, spec):
+                dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
+                if not dau.startswith("# Review") and not dau.startswith("# Security review"):
+                    return RunResult(ok=False, error="api_error 502", cost_usd=0.0)
+                return super().run(spec)
+
+        out = self.implement(LuonHongHaTang(),
+                             config=self.config(**{"run.max_retries": 0,
+                                                   "run.infra_retries": 4}))
+        self.assertEqual(len([a for a in out.attempts if a.infra]), 4,
+                         "phải dùng đúng ngân sách hạ tầng đã khai")
+        self.assertEqual(out.quality_attempts, 0, "hạ tầng không tính lượt chất lượng")
+
+    def test_ngan_sach_ha_tang_mac_dinh_giu_nguyen_hanh_vi_cu(self):
+        from aisef.config import DEFAULTS
+        self.assertEqual(DEFAULTS["run.infra_retries"], -1)
+
     def test_bi_thi_dung_som_thay_vi_dot_het_han_muc(self):
         """Lặp lại **và** trỏ ra ngoài phạm vi ghi thì thử tiếp vô nghĩa.
 

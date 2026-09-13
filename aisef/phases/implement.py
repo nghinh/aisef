@@ -2379,7 +2379,12 @@ def implement_story(
 
     outcome = StoryOutcome(story_id=story.id)
     max_retries = cfg["run.max_retries"]
-    infra_budget = max_retries + 1  # infrastructure errors have their own budget
+    # Infrastructure errors have their own budget: they score nothing, so
+    # spending one is not spending a quality attempt. `-1` keeps the old
+    # coupling to `max_retries`; a project on a client with a measured failure
+    # rate sets its own number (`run.infra_retries`).
+    khai = int(cfg["run.infra_retries"])
+    infra_budget = max_retries + 1 if khai < 0 else khai
     feedback = _unfinished_review(root, story.id, workdir)
 
     _log(f"story={story.id} START max_retries={max_retries}")

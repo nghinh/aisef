@@ -673,6 +673,7 @@ Không để chữ "ngưỡng" chung chung. Mặc định trong `.ai/config.json
 | `run.max_turns` | `40` | vòng lặp tối đa của một phiên story |
 | `run.timeout_seconds` | `1800` | 30 phút cho một story |
 | `run.max_retries` | `2` | số lần thử lại trước khi `blocked` |
+| `run.infra_retries` | `-1` | ngân sách thử lại riêng cho lỗi hạ tầng (`INFRA_STATUSES`: timeout · infra · rate_limit). `-1` = giữ nguyên hành vi cũ (`run.max_retries + 1`); đặt số ≥ 0 để tách hẳn khỏi ngân sách chất lượng khi client hay cắt phiên (dogfood 2026-09-13: 22–32% phiên bị cắt, giết cả hai story dù mã không sai) |
 | `run.cost_cap_usd` | `0` | trần tổng chi phí các lượt gọi model trong một run (USD; `0` = không giới hạn). Bật bằng cách đặt giá trị > 0 → `BudgetGuard.reserve(...)` chặn lượt gọi vượt trần, hoàn lại reservation khi ngoại lệ. Xem `aisef/control/budget.py` |
 | `run.turn_cap` | `0` | trần tổng số turn trong run (`0` = không giới hạn). Cùng cơ chế với `run.cost_cap_usd` |
 | `run.wall_clock_cap_seconds` | `0` | trần tổng thời gian chạy của run, giây (`0` = không giới hạn). Đo từ lúc run bắt đầu, không tính từng lượt gọi |
