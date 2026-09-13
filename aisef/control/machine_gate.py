@@ -232,6 +232,14 @@ def check_experience(exp) -> GateResult:
     """
     r = GateResult(name="ux-spec")
     if not getattr(exp, "screens", None):
+        if getattr(exp, "headless", False):
+            # Declared, not omitted (bug 107). The consumers downstream read
+            # this the same way: no screens to build, no browser contract.
+            r.warnings.append(
+                "EXPERIENCE.md declares no graphical surface — no mockups will be "
+                "built and stories carry no browser or mockup-map contract"
+            )
+            return r
         r.errors.append(
             "EXPERIENCE.md: add a screen inventory **table** under a heading like "
             "`Screen Inventory` / `Screens` / `Information Architecture` — one row per "

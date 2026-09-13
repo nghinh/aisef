@@ -464,6 +464,18 @@ class TestCongUxDoiDanhMucManHinh(unittest.TestCase):
                                "| Todo List | / | Create and manage tasks |\n")
         self.assertTrue(check_experience(exp).passed, check_experience(exp).errors)
 
+    def test_khai_khong_giao_dien_thi_cong_ux_qua(self):
+        """Lỗi 107: một CLI không có màn hình nào để khai. Nhưng "khai là
+        không có" phải khác "quên viết bảng" — phép thử trên vẫn phải đỏ."""
+        from aisef.control.experience import parse_experience
+        from aisef.control.machine_gate import check_experience
+        exp = parse_experience("# EXPERIENCE\n\n## Screens\n\n"
+                               "**Screens:** none — no graphical surface\n\n"
+                               "## Command Signatures\n\n`taskbook add \"<t>\"`\n")
+        r = check_experience(exp)
+        self.assertTrue(r.passed, r.errors)
+        self.assertIn("no graphical surface", " ".join(r.warnings))
+
     def test_prompt_ux_noi_ro_hinh_dang_bang(self):
         """Bên sản xuất phải đọc được yêu cầu, không phải đoán."""
         from aisef.phases.plan import PHASES, build_prompt

@@ -124,6 +124,31 @@ class TestBangKhongNhacManHinhNao(unittest.TestCase):
         self.assertEqual(exp.by_id("settings").components, [])
 
 
+class TestKhaiKhongCoGiaoDien(unittest.TestCase):
+    """Lỗi 107: tài liệu phải **khai** được là sản phẩm không có giao diện —
+    "không có màn hình nào" và "quên viết bảng màn hình" có cùng hình dạng dữ
+    liệu, và hai tình huống ấy phải xử khác nhau."""
+
+    def _co(self, dong: str) -> bool:
+        from aisef.control.experience import parse_experience
+        return parse_experience(f"# X\n\n{dong}\n").headless
+
+    def test_cac_cach_viet_that(self):
+        for dong in ("**Screens:** none — no graphical surface",
+                     "Screens: none - this is a CLI tool, no screens",
+                     "**Screens**: none — headless service",
+                     "Screens: none — không có giao diện đồ hoạ"):
+            with self.subTest(dong=dong):
+                self.assertTrue(self._co(dong))
+
+    def test_khong_nhan_bua(self):
+        for dong in ("Screens: none yet, coming in v2",
+                     "The app has one screen: the note list.",
+                     "## Screen Inventory\n\n| Screen | Route |\n|---|---|\n| A | / |"):
+            with self.subTest(dong=dong):
+                self.assertFalse(self._co(dong))
+
+
 class TestGanTheoLenhVaKhongVoBua(unittest.TestCase):
     """Bảng trạng thái của một CLI mô tả hành vi **theo lệnh** (`done <n>`),
     không theo tên hiển thị của màn hình (`Complete Task`)."""

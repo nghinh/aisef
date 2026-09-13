@@ -175,8 +175,9 @@ def _names_screens(header: list[str]) -> bool:
 #: "none", any dash), written by the ux step when the product is a CLI, a
 #: library or a service.
 _NO_SURFACE = re.compile(
-    r"^\**Screens?\**\s*[:：]?\s*\**\s*(?:none|không|no)\b.{0,80}?"
-    r"(?:no graphical surface|không có giao diện|headless)",
+    r"^\**Screens?\**\s*[:：]?\s*\**\s*(?:none|không|no)\b[^\n]{0,120}?"
+    r"(?:graphical|giao diện|headless|GUI|CLI|command[- ]line|terminal|"
+    r"library|thư viện|service|dịch vụ|API)",
     re.MULTILINE | re.IGNORECASE,
 )
 
