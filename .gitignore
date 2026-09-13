@@ -41,3 +41,6 @@ framework/bench/memory_compare/results/
 # uv lock — not used for this project
 uv.lock
 .bench-c1b/
+# Mỗi cohort ghi vào thư mục riêng (`AISEF_BENCH_DIR=.bench-c2`, …) để không xoá
+# cây làm việc mà báo cáo của cohort trước đang trích dẫn làm bằng chứng.
+.bench-*/
