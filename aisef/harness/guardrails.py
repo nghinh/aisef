@@ -824,7 +824,11 @@ def check_role_tool(tool_name: str, disallowed: list[str]) -> Verdict:
 
 # ------------------------------------------------------------ egress
 
-_URL_RE = re.compile(r"https?://([^/:@\s#?]+)")
+#: Host part of a URL. The bracket branch is for IPv6 literals
+#: (`http://[::1]:8123/`): without it the character class stops at `[`
+#: and the "host" extracted is `"["`, which matches no allowlist and
+#: blocks a connection to this very machine (lỗi 138).
+_URL_RE = re.compile(r"https?://(\[[0-9A-Fa-f:.]+\]|[^/:@\s#?\[]+)")
 _NET_COMMANDS = re.compile(
     r"\b(curl|wget|fetch|http|nc|ncat|ssh|scp|rsync|git\s+clone"
     r"|git\s+push|git\s+pull|git\s+fetch|npm\s+install|npm\s+ci"
@@ -863,6 +867,16 @@ def _host_matches(host: str, allowed: list[str]) -> bool:
     return False
 
 
+#: This machine, by every name it answers to. Not egress: nothing leaves, and
+#: for a web story the app under test **is** here — `app.base_url` is
+#: `http://localhost:8123` and the harness itself opens it. Blocking it stopped
+#: the developer from looking at the page it had just built (lỗi 138, todo-oc
+#: 2026-09-13) while doing nothing for the rule's purpose, which is undeclared
+#: connections **out**.
+_MAY_NAY = ("localhost", "127.0.0.1", "::1", "0.0.0.0", "[::1]",
+            "localhost.localdomain", "host.docker.internal")
+
+
 def check_egress(tool_name: str, tool_input: dict, allow_hosts: list[str]) -> Verdict:
     """V12: block connections to undeclared hosts. Empty allowlist = no check."""
     if not allow_hosts:
@@ -871,6 +885,8 @@ def check_egress(tool_name: str, tool_input: dict, allow_hosts: list[str]) -> Ve
     if not hosts:
         return ALLOW
     for h in hosts:
+        if h.lower() in _MAY_NAY:
+            continue
         if not _host_matches(h, allow_hosts):
             return Verdict(
                 False,

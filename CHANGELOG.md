@@ -249,6 +249,15 @@ was given a noise filter for exactly this in September — for the `test` tool
 only; the `qa:*` path had its own truncation. It now shares the filter, and
 falls back to the raw tail when filtering leaves nothing.
 
+**The egress guard blocked localhost** (bug 138). On a web story whose dev
+server is `localhost:8123` — the address `app.base_url` declares and the
+harness itself opens — the developer was blocked from looking at the page it
+had just built. Localhost is not egress: nothing leaves the machine, and the
+rule exists to stop undeclared connections *out*. This machine is now exempt by
+all its names. A URL-parsing bug came with it: the host pattern stopped at `[`,
+so `http://[::1]:8123/` yielded a host of `"["`. IPv6 literals are parsed now,
+and an IPv6 address that is not this machine still blocks.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on

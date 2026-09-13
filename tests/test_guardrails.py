@@ -1501,3 +1501,43 @@ class TestChanHtmlThoConDuongDeTuanThu(unittest.TestCase):
         for nhan, _ in INJECTION_PATTERNS:
             with self.subTest(nhan=nhan):
                 self.assertIn(nhan, _CACH_KHAC)
+
+
+class TestEgressKhongChanChinhMayNay(unittest.TestCase):
+    """Lỗi 138 (todo-oc 2026-09-13): `guard egress BLOCK bash · host localhost
+    is not in the allowed list`. Story là web app, dev server của chính nó ở
+    `localhost:8123`, `app.base_url` khai đúng địa chỉ ấy và harness cũng mở nó
+    — nhưng developer bị chặn khi nhìn vào trang nó vừa dựng. Localhost không
+    phải egress: không có gì rời khỏi máy, và luật này sinh ra để chặn kết nối
+    **ra ngoài** chưa khai."""
+
+    CHO = ["registry.npmjs.org", "*.npmjs.org"]
+
+    def _v(self, cmd):
+        from aisef.harness.guardrails import check_egress
+        return check_egress("Bash", {"command": cmd}, self.CHO)
+
+    def test_may_nay_moi_ten_deu_qua(self):
+        for cmd in ("curl http://localhost:8123/",
+                    "curl http://127.0.0.1:8123/",
+                    "curl http://[::1]:8123/",
+                    "curl http://0.0.0.0:3000/health"):
+            with self.subTest(cmd=cmd):
+                self.assertTrue(self._v(cmd).allowed, cmd)
+
+    def test_host_ngoai_van_chan(self):
+        self.assertFalse(self._v("curl https://evil.example.com/x").allowed)
+        self.assertFalse(self._v("curl http://[2001:db8::1]/x").allowed,
+                         "IPv6 ngoài máy không được miễn theo")
+
+    def test_host_da_khai_van_qua(self):
+        self.assertTrue(self._v("curl https://registry.npmjs.org/p").allowed)
+
+    def test_ipv6_trong_ngoac_duoc_tach_dung(self):
+        """Trước đó lớp ký tự dừng ở `[`, nên "host" rút ra là `"["` — không
+        khớp allowlist nào và chặn một kết nối tới chính máy này."""
+        from aisef.harness.guardrails import _extract_hosts
+        self.assertEqual(_extract_hosts("Bash", {"command": "curl http://[::1]:8123/"}),
+                         ["[::1]"])
+        self.assertEqual(_extract_hosts("Bash", {"command": "curl http://[2001:DB8::1]/x"}),
+                         ["[2001:db8::1]"])
