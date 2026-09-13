@@ -157,7 +157,11 @@ must carry the list, on disk, in the same document.*
 Each item names the semantic question, why it had to wait for the transactional
 seams, and the measurement that closes it.
 
-### O1 — the reviewer's verdicts are not themselves qualified
+**Status 2026-09-14: O1 is closed with its measurement below; O2–O4 remain
+open.**  The section heading still says four because that is the list as
+reconstructed; the count of *open* items is three.
+
+### O1 — the reviewer's verdicts are not themselves qualified — **CLOSED 2026-09-14**
 
 `review` is the only `model-judge` check in `CHECK_NAMES`.  Every other check
 has three controls certifying the *check*; nothing certifies the *judgement*.
@@ -172,6 +176,82 @@ Stable `Finding.id` (§1) makes the count well-defined.
 *Closes when*: a reviewer-qualification table exists with the same three
 controls as the machine checks, scored over a corpus of recorded reviews —
 false-block rate and miss rate both reported, neither hidden behind a pass.
+
+*Closed by*: `aisef/control/reviewer_qual.py` (the scorer) and
+`tests/test_reviewer_qualification.py` (six judgement classes × the same three
+controls, table read by AST through the **same** reader as the gate table,
+`gate.controls_in`).  Recompute at any time — the corpus is on disk, no model
+call is involved:
+
+```
+python3 -m aisef.control.reviewer_qual \
+  ~/Downloads/projects/{todo-cli,todo-e2e,todo-oc,todo}/_bmad-output
+```
+
+**The corpus.** 145 recorded reviewer sessions (`tool_run review` in
+`_bmad-output/evidence/<story>.jsonl`) across the four dogfood projects,
+2026-09-08 → 2026-09-13, every one a real client session (`ses_…`).  Which
+client and model produced each session is **not** recorded — `agent_run.detail`
+carries `model: ""` and no client field, and `todo-oc` has both a
+`.claude/settings.json` and a `.opencode/plugin` on disk — so these rates are
+across clients, not per client.  Recording client/model on `agent_run` is the
+cheap fix that would let the next pass split them.  The 146
+files under `reviews/` are a *smaller* corpus than this: 71 of them are reviewer
+reports (the other 75 are security reports, retries included), and a re-run
+overwrites the file while the evidence log keeps every session.
+
+**Measured, 2026-09-14.**
+
+| | count | rate |
+|---|---|---|
+| judgements scored | 127 of 145 | undecided 18 (**12.4 %**) |
+| reviewer blocked | 57 | **false block 6 = 10.5 %** (lower bound) |
+| reviewer passed | 70 | **miss 27 = 38.6 %** |
+| blocks resting on the judge's word alone | 21 of 57 (36.8 %) | todo-e2e: 15 of 17 |
+| same-tree consecutive pairs | 20 | **11 reversed the verdict (55 %)** |
+
+*Direction of the disagreement*: 27 misses against 6 false blocks — C11's single
+observation ("cổng máy bắt, người máy không") is the **common** direction, by
+roughly 4.5 to 1.  The reviewer is far more likely to pass a defective candidate
+than to block a sound one.
+
+*Test–retest*: of 20 consecutive pairs where `git diff` between the two
+candidates is empty, 11 changed verdict — 6 `block → pass`, 5 `pass → block`.
+On identical bytes the judge contradicts itself more often than it repeats
+itself.  This is the number that needs no convention: the other two rates
+depend on attributing the error to the earlier judgement of a reversed pair.
+
+*Ground truth, and its limits.* A false block needs positive evidence of
+reversal, read from the project's **git repo**, not from harness bookkeeping:
+either the next session passed on an identical tree (the same candidate commit,
+or two commits `git diff` finds no difference between), or it passed while
+`git diff` never touches any file the blocking findings named (and no changed
+file is named in their bodies either).  All six measured here are the first
+kind, and all six are the *same commit* — the second session re-read the exact
+build the first one blocked.  Both need a next session and
+two resolvable commits, so 10.5 % is a floor, not an estimate.  An earlier pass
+of this measurement trusted `file_change` events instead of git and reported
+16 false blocks (28 %); todo-e2e/STORY-02-02 showed why that is wrong — the
+second developer attempt recorded no `file_change` at all, yet `git diff`
+between the two candidates changes `js/app.js`, the exact file the block named.
+A miss needs a check that says the *candidate* is defective: `FAILED` only
+(`UNRUNNABLE` means "could not run"), and not the `FAILED` reasons that are
+themselves evidence gaps — 17 of 44 `tests verify story` failures say "no test
+run at candidate" or "nothing to verify at parent SHA", and counting those
+would have inflated the miss rate from 38.6 % to 48.6 %.  The 27 misses are
+20 nop-control failures ("tests verify nothing — still green without story
+code"), 5 preservation regressions, 3 self-reversals, 1 candidate whose test
+suite was red.  Read strictly — dropping the three misses whose only failing
+check is a *screen* comparison a read-only reviewer cannot run — the miss rate
+is 34.3 %; the honest statement is **34–39 %**.
+
+*One correction to §1 above.* "Two findings raised against the same defect
+produce the same id, regardless of how the agent rewrites the wording" is not
+what `_digest` does: `body` is part of the identity, so re-wording changes the
+id.  `Finding.id` collapses verbatim restatements only; the repo's place-key
+(`implement._finding_key`: tag + file + line) is what collapses re-wordings,
+and it is the one that fixed lỗi 141.  Every "deduped" count here is therefore
+also a lower bound on how much restatement there was.
 
 ### O2 — the ledger records that a behaviour is a GAP, never what kind of gap
 

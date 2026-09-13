@@ -934,9 +934,21 @@ def qualification_table(test_file: Path | None = None) -> dict[str, dict[str, bo
     none found").
     """
     path = test_file or Path(__file__).resolve().parents[2] / "tests" / "test_gate_qualification.py"
+    return controls_in(path, CHECK_NAMES)
+
+
+def controls_in(path: Path, names: tuple[str, ...]) -> dict[str, dict[str, bool]]:
+    """Which of the three controls `path` holds for each name in `names`.
+
+    The AST walk shared by `qualification_table()` and the reviewer-judgement
+    table (`control/reviewer_qual.py`, ADR-009 O1): both read a test file for
+    classes carrying `TEN = "<name>"` and methods prefixed `test_positive` /
+    `test_negative` / `test_env`. One reader, so the two tables cannot mean
+    different things by "has a control".
+    """
     if not path.is_file():
         return {}
-    table = {name: dict.fromkeys(CONTROLS, False) for name in CHECK_NAMES}
+    table = {name: dict.fromkeys(CONTROLS, False) for name in names}
     for node in ast.parse(path.read_text(encoding="utf-8")).body:
         if not isinstance(node, ast.ClassDef):
             continue
