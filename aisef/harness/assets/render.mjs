@@ -104,10 +104,29 @@ for (const job of input.jobs ?? []) {
         document.querySelector('[data-state="primary"]') ??
         document.querySelector('[data-state]') ??
         document;
+      // Tên khả truy cập theo **đúng thứ tự ARIA**: `aria-labelledby` →
+      // `aria-label` → nhãn gốc (`<label for>`) → placeholder → title. Bản cũ
+      // hỏi `el.labels` trước, nên một trang **đúng chuẩn** — `<label>Search`
+      // kèm `aria-label="Search notes"` — bị đọc tên là "Search" và cổng map
+      // mockup báo thiếu component mà trang có thật (lỗi 137, todo-oc
+      // 2026-09-13). `aria-labelledby` trước đó không được xét lần nào.
+      const accName = (el) => {
+        const by = (el.getAttribute('aria-labelledby') || '')
+          .split(/\s+/).filter(Boolean)
+          .map((id) => document.getElementById(id)?.textContent || '')
+          .join(' ').trim();
+        return (
+          by ||
+          (el.getAttribute('aria-label') || '').trim() ||
+          (el.labels?.[0]?.textContent || '').trim() ||
+          (el.placeholder || '').trim() ||
+          (el.getAttribute('title') || '').trim()
+        );
+      };
       const fields = [...scope.querySelectorAll('input, textarea, select')].map((el) => ({
         name: el.name || el.id || '',
         type: (el.getAttribute('type') || el.tagName).toLowerCase(),
-        label: (el.labels?.[0]?.textContent || el.getAttribute('aria-label') || el.placeholder || '').trim(),
+        label: accName(el),
         required: el.hasAttribute('required'),
         pattern: el.getAttribute('pattern') || '',
         min: el.getAttribute('min') || '',

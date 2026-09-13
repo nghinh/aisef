@@ -380,3 +380,58 @@ class TestDoiTenNhanThiPhaiNoiRa(unittest.TestCase):
         r = compare([Component(role="textbox", name="Description")],
                     [Component(role="heading", name="Description")], screen_id="s")
         self.assertEqual(r.renamed(), [], "cùng tên khác vai không phải đổi tên")
+
+
+@unittest.skipIf(BROWSER_REASON, f"không dựng được mockup: {BROWSER_REASON}")
+class TestTenKhaTruyCapTheoThuTuARIA(unittest.TestCase):
+    """`render.mjs` rút `fields[].label` cho slot **Input constraints** của
+    prompt developer (`harness/mockup_map.py`). Nó tính tên khả truy cập bằng
+    `el.labels[0] || aria-label || placeholder` — ngược thứ tự chuẩn ARIA, và
+    không xét `aria-labelledby` lần nào. Hệ quả: một mockup đúng chuẩn
+    (`<label>Search</label>` kèm `aria-label="Tìm ghi chú"`) báo cho developer
+    tên ràng buộc là "Search".
+
+    Ghi cho người đọc sau: chỗ này **không** phải nguyên nhân của cổng
+    `mockup map` — component đối chiếu qua ARIA snapshot của Playwright, vốn
+    tính đúng. Tôi đã quy kết nhầm một lần rồi mới đo ra; sửa vì nó sai, không
+    vì nó làm hỏng cổng.
+    """
+
+    def _label(self, html: str) -> str:
+        import tempfile as _tf
+
+        from aisef.harness import browser
+        with _tf.TemporaryDirectory() as tmp:
+            f = Path(tmp) / "m.html"
+            f.write_text('<!doctype html><html lang=vi><head><meta charset="utf-8">'
+                         "<title>t</title></head><body>" + html + "</body></html>",
+                         encoding="utf-8")
+            res = browser.render(
+                [{"id": "s", "html": str(f), "png": str(f.with_suffix(".png"))}],
+                project=ROOT)
+            self.assertFalse(res.unavailable, res.unavailable)
+            man = res.screens[0]
+            self.assertFalse(man.error, man.error)
+            return (man.fields[0]["label"] if man.fields else "")
+
+    def test_aria_label_thang_nhan_goc(self):
+        self.assertEqual(
+            self._label('<label for="q">Search</label>'
+                        '<input id="q" aria-label="Tìm ghi chú">'),
+            "Tìm ghi chú")
+
+    def test_aria_labelledby_thang_tat_ca(self):
+        self.assertEqual(
+            self._label('<span id="L">Nội dung ghi chú</span>'
+                        '<label for="q">Search</label>'
+                        '<input id="q" aria-label="khac" aria-labelledby="L">'),
+            "Nội dung ghi chú")
+
+    def test_khong_co_aria_thi_dung_nhan_goc(self):
+        self.assertEqual(
+            self._label('<label for="q">Nội dung ghi chú</label><input id="q">'),
+            "Nội dung ghi chú")
+
+    def test_chi_con_placeholder_hoac_title(self):
+        self.assertEqual(self._label('<input placeholder="Tìm">'), "Tìm")
+        self.assertEqual(self._label('<input title="Tìm">'), "Tìm")

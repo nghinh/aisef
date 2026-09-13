@@ -364,6 +364,52 @@ class TestTieuChiCoTestOBoKhac(GateTestCase):
         self.assertIn("verification contract", m.detail)
 
 
+class TestBangChungCuCuaLoaiKhongChamKhongLamOi(GateTestCase):
+    """Lỗi 136 (todo-oc 2026-09-13): `evidence matches candidate` báo `stale` dù
+    **cả mười hai** bản ghi của lượt ấy đều ở đúng ứng viên. Thủ phạm là
+    `qa:unit`, `qa:security`, `qa:mutation` — ba loại story này không khai, do
+    một lần `aisef qa` toàn bộ chạy trước đó để lại ở SHA cũ. Story không bao
+    giờ chạy lại chúng, nên chúng đứng nguyên ở đó **vĩnh viễn**: mọi story sau
+    của dự án đều bị tuyên stale. Cùng hình dạng với `ONE_SHOT_NAMES`, khác
+    nguyên nhân — chỉ mục cổng **thật sự chấm** mới được làm ôi bằng chứng."""
+
+    def dung(self, *, contract=None):
+        cu = EvidenceStore(self._tmp.name, candidate="cu00000")
+        cu.tool_run("S-01", "qa:mutation", ok=True, detail={})
+        cu.tool_run("S-01", "qa:security", ok=True, detail={})
+        moi = EvidenceStore(self._tmp.name, candidate="aaa")
+        moi.file_change("S-01", "src/a.py")
+        moi.tool_run("S-01", "test", ok=True, detail={"test_format": "pytest", "test_ids": ["t"]})
+        moi.tool_run("S-01", "lint", ok=True)
+        g = self.gate(candidate="aaa", contract=contract)
+        return next(c for c in g.checks if c.name == "evidence matches candidate")
+
+    def test_loai_ngoai_hop_dong_khong_lam_oi(self):
+        m = self.dung(contract=["e2e"])
+        self.assertIs(m.outcome, Outcome.PASSED, m.detail)
+
+    def test_hop_dong_rong_cung_khong_bi_loai_ngoai_lam_oi(self):
+        self.assertIs(self.dung().outcome, Outcome.PASSED)
+
+    def test_loai_trong_hop_dong_van_lam_oi_dung_nhu_cu(self):
+        """Không hạ cổng: loại story **có** khai mà bản ghi mới nhất ở bản khác
+        thì vẫn là bằng chứng ôi — đó chính là câu hỏi ADR-004 R1 đặt ra."""
+        m = self.dung(contract=["mutation"])
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("cu00000", m.detail)
+
+    def test_muc_cong_thuong_van_lam_oi(self):
+        """`test`/`lint`/`review` không phải `qa:*`: chúng luôn được chấm."""
+        cu = EvidenceStore(self._tmp.name, candidate="cu00000")
+        cu.tool_run("S-01", "lint", ok=True)
+        moi = EvidenceStore(self._tmp.name, candidate="aaa")
+        moi.file_change("S-01", "src/a.py")
+        moi.tool_run("S-01", "test", ok=True, detail={"test_format": "pytest", "test_ids": ["t"]})
+        g = self.gate(candidate="aaa", contract=["e2e"])
+        m = next(c for c in g.checks if c.name == "evidence matches candidate")
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE)
+
+
 class TestCoverageMin(GateTestCase):
     """G10b: số coverage đọc từ output runner; không có số là chưa cấu hình."""
 

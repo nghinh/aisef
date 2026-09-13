@@ -216,6 +216,31 @@ opposite remedies, and the tree says which: story source is one thing,
 the message says so and does not suggest reverting. Still fatal — that session
 cannot be graded either way.
 
+**One full `aisef qa` pass could mark every later story stale forever** (bug
+136). `evidence matches candidate` reported stale evidence while all twelve of
+the attempt's own records carried the right build. The culprits were `qa:unit`,
+`qa:security` and `qa:mutation` — kinds the story does not declare, left at an
+old SHA by an earlier full QA pass. The story will never re-run them, so their
+records sit at that candidate permanently and the check blocks every story of
+the project. Only checks the gate actually scores for a story can make its
+evidence stale now; a kind the story *does* declare still can, which is the
+question ADR-004 R1 exists to ask.
+
+**Accessible names follow the ARIA order** (correctness, not a measured
+failure). `render.mjs` computed a field's name as `labels[0] || aria-label ||
+placeholder`, which inverts the spec and never looked at `aria-labelledby`. The
+value feeds the "Input constraints" block of the developer prompt, so a mockup
+that is correct by the spec — `<label>Search</label>` with `aria-label="Tìm ghi
+chú"` — told the developer the constraint belonged to a field called "Search".
+Order is now `aria-labelledby` → `aria-label` → `<label>` → placeholder →
+title, verified in Chromium in both directions.
+
+Recorded plainly because the first diagnosis was wrong: this is *not* what made
+the mockup-map gate fail on the browser project. Component matching goes
+through Playwright's own ARIA snapshot, which was already correct. Fixed
+because it is wrong, not because it broke a gate — and it gets no bug number,
+since nothing was measured failing because of it.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on

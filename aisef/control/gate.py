@@ -127,15 +127,26 @@ class StoryGate:
         return "\n".join(f"- {c.name}: {c.detail}" for c in self.failures)
 
 
-def _stale_candidates(evidence: Evidence, candidate: str) -> list[str]:
+def _stale_candidates(evidence: Evidence, candidate: str,
+                      kinds: tuple[str, ...] | None = None) -> list[str]:
     """Old candidates that the **latest result** of a check still refers to.
 
     Compared per check (kind + name), not per evidence file: the previous
     attempt leaving results at the old candidate is normal — rerunning on
     the new candidate is sufficient. What is abnormal is when the **latest**
     check still belongs to a different candidate: code changed after testing.
+
+    ``kinds`` is this story's verification contract. Only checks the gate
+    actually scores can make it stale — same reasoning as `ONE_SHOT_NAMES`,
+    a different cause. A full `aisef qa` pass records `qa:unit`,
+    `qa:security`, `qa:mutation` at whatever SHA it ran on; a story that
+    declares none of them is never going to re-run them, so their records sit
+    at an old candidate forever and every later story is declared stale
+    (lỗi 136, measured on todo-oc where those three blocked a story whose own
+    twelve records were all at the right build).
     """
-    return sorted({str(e.detail["candidate"]) for e in _latest_per_check(evidence).values()
+    return sorted({str(e.detail["candidate"])
+                   for e in _latest_per_check(evidence, kinds).values()
                    if str(e.detail["candidate"]) != candidate})
 
 
@@ -148,6 +159,9 @@ def _stale_candidates(evidence: Evidence, candidate: str) -> list[str]:
 #: todo/STORY-01-01 exhausted its attempts on a `review:immutable` recorded
 #: three candidates earlier, after its cause was already fixed. Each still
 #: blocks at the moment it fires; only the freshness scan ignores them.
+#: Scored for every story regardless of its verification contract.
+FAKE_TESTS = "qa:fake-tests"
+
 ONE_SHOT_NAMES = ("isolation", "candidate:frozen")
 ONE_SHOT_SUFFIXES = (":immutable", ":candidate")
 
@@ -156,15 +170,23 @@ def _one_shot(name: str) -> bool:
     return name in ONE_SHOT_NAMES or name.endswith(ONE_SHOT_SUFFIXES)
 
 
-def _latest_per_check(evidence: Evidence) -> dict[tuple[str, str], Event]:
+def _latest_per_check(evidence: Evidence,
+                      kinds: tuple[str, ...] | None = None) -> dict[tuple[str, str], Event]:
     """**Latest** result of each check (kind + name) that declares a candidate —
     exactly the events the "evidence matches candidate" check reads, so its
-    `evidence` field points here."""
+    `evidence` field points here.
+
+    ``kinds`` given: `qa:<kind>` records outside this story's verification
+    contract are skipped. `None` keeps every record (replay, old callers)."""
     moi_nhat: dict[tuple[str, str], Event] = {}
     for e in evidence.events:
-        if (e.kind in (TOOL_RUN, MOCKUP_MAP) and e.detail.get("candidate")
+        if not (e.kind in (TOOL_RUN, MOCKUP_MAP) and e.detail.get("candidate")
                 and not _one_shot(e.name)):
-            moi_nhat[(e.kind, e.name)] = e
+            continue
+        if (kinds is not None and e.name.startswith("qa:")
+                and e.name != FAKE_TESTS and e.name[3:] not in kinds):
+            continue                      # not scored for this story
+        moi_nhat[(e.kind, e.name)] = e
     return moi_nhat
 
 
@@ -494,8 +516,9 @@ def evaluate(
     """
     gate = StoryGate(story_id=story_id)
 
-    stale = _stale_candidates(evidence, candidate) if candidate else []
-    moi_nhat = _latest_per_check(evidence)
+    loai = tuple(contract or ())
+    stale = _stale_candidates(evidence, candidate, loai) if candidate else []
+    moi_nhat = _latest_per_check(evidence, loai)
     if not candidate:
         gate.checks.append(Check(
             "evidence matches candidate", Outcome.NOT_APPLICABLE,
@@ -619,7 +642,7 @@ def evaluate(
             else:
                 gate.checks.append(Check("mockup map", True, evidence=doc_map))
 
-    fake = evidence.last(TOOL_RUN, "qa:fake-tests")
+    fake = evidence.last(TOOL_RUN, FAKE_TESTS)
     if fake is not None and not fake.ok:
         files = fake.detail.get("files") or []
         gate.checks.append(
