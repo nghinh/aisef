@@ -126,6 +126,22 @@ class TestStoryGate(unittest.TestCase):
         r = check_stories([story("S-1")], config=cfg, story_ac_count={"S-1": 20})
         self.assertTrue(r.passed)
 
+    def test_pham_vi_ghi_ngoai_du_an_bi_chan(self):
+        """Lỗi 147. Mục phạm vi ngoài gốc dự án không bao giờ ghi được —
+        guard chặn theo gốc dự án **trước** khi so phạm vi — nên nó không phải
+        lỗ hổng mà là rác đánh lừa mọi người đọc sau: cảnh báo độ rộng đếm
+        `tmp` và `foo` thành module gốc của dự án. marks-cli 2026-09-14: người
+        lập kế hoạch khai đúng như lời khuyên của lỗi 146 bảo."""
+        r = check_stories([story("S-1", scope=("bin/marks.js", "/tmp/x.json")),
+                           story("S-2", scope=("src/a.py",))])
+        self.assertFalse(r.passed)
+        loi = " ".join(r.errors)
+        self.assertIn("/tmp/x.json", loi)
+        self.assertNotIn("S-2", loi)
+
+    def test_pham_vi_ghi_tuong_doi_van_qua(self):
+        self.assertTrue(check_stories([story("S-1", scope=("src/a.py", "tests/"))]).passed)
+
     def test_too_wide_write_scope_blocks(self):
         wide = tuple(f"src/{i}.py" for i in range(20))
         r = check_stories([story("S-1", scope=wide)])

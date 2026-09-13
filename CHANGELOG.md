@@ -298,6 +298,13 @@ unlocated items deduped by their own text so two distinct ones stay two.
 Replayed over eight real review files: 29 becomes 2, matching the JSON, and the
 genuine blockers in the other reviews survive.
 
+**A `write_scope` pointing outside the project is now an error** (bug 147).
+The residue of 146: the planner's out-of-repo entries survived the fix, and the
+scope-width warning counted `tmp` and `foo` among the project's root modules.
+Such an entry grants nothing — the guard refuses any write outside the project
+root before it looks at scope — but it misleads every later reader and the plan
+has no signal telling it to drop them.
+
 **Runtime paths named in criteria are no longer treated as deliverables**
 (bug 146). With 144 and 145 in place the gate could finally see marks-cli's
 criteria, and it immediately reported three files STORY-01-01 had to create:

@@ -112,6 +112,25 @@ def check_stories(
             f"cannot schedule in parallel, and guard will block all writes"
         )
 
+    # A scope entry outside the project can never be written: the write-scope
+    # guard refuses anything outside the project root before it compares scope
+    # at all. So the entry is not a hole, it is dead weight that misleads every
+    # later reader — the scope-width warning counted `tmp` and `foo` as root
+    # modules of the project. Measured on marks-cli 2026-09-14: the planner put
+    # `/tmp/x.json` and `/foo/.marks.json` in `write_scope` because that is what
+    # the missing-file advice told it to do (bug 146).
+    ngoai = sorted({
+        f"{s.id}: {p}" for s in stories for p in s.write_scope
+        if p.startswith(("/", "~")) or p.split("/", 1)[0] == ".."
+    })
+    if ngoai:
+        r.errors.append(
+            f"write_scope outside the project: {', '.join(ngoai)} — the guard refuses "
+            f"any write outside the project root before it looks at scope, so this "
+            f"entry grants nothing. Paths a criterion names as runtime data belong in "
+            f"the criteria, not in the scope"
+        )
+
     # Dependency cycle: use the actual scheduler, so the gate and runtime
     # cannot disagree on what is valid.
     try:
