@@ -226,3 +226,54 @@ class TestChuoiHoanToan(unittest.TestCase):
         self.assertIn("EPIC-01", canh[0])
         self.assertNotIn("EPIC-02", canh[0])
 
+
+
+class TestHaiStoryCungPhamViGhi(unittest.TestCase):
+    """Lỗi 128 (todo-cli 2026-09-13, 3/3): mỗi epic bị chia thành "làm lệnh X"
+    và "các ca lỗi của lệnh X", cùng đúng một tệp. Bản cài đặt tử tế của story
+    đầu phủ luôn tiêu chí của story sau, nên story sau **không có việc gì hợp
+    lệ**: test của nó xanh ở điểm rẽ, `tests verify story` chặn, và không test
+    nào developer viết ra có thể đỏ cho hành vi đã merge. Ba trên mười ba story
+    chết như thế, ~45 phút agent — mà kế hoạch đã đọc được ngay ở cổng này."""
+
+    def st(self, sid, epic="EPIC-01", scope=("lib/commands/list.js",), deps=()):
+        return Story(id=sid, epic_id=epic, title=sid,
+                     depends_on=tuple(deps), write_scope=tuple(scope))
+
+    def _canh(self, r):
+        return [w for w in r.warnings if "same epic write exactly the same files" in w]
+
+    def test_canh_bao_khi_hai_story_cung_tep(self):
+        r = check_stories([self.st("S-1"), self.st("S-2", deps=["S-1"])])
+        self.assertTrue(r.passed, r.errors)
+        canh = self._canh(r)
+        self.assertEqual(len(canh), 1)
+        self.assertIn("S-1, S-2", canh[0])
+        self.assertIn("lib/commands/list.js", canh[0])
+
+    def test_pham_vi_khac_thi_khong_canh_bao(self):
+        r = check_stories([self.st("S-1"),
+                           self.st("S-2", deps=["S-1"], scope=("lib/commands/add.js",))])
+        self.assertEqual(self._canh(r), [])
+
+    def test_khac_epic_thi_khong_ket_luan(self):
+        """Epic chạy tuần tự; hai epic chạm cùng tệp là chuyện khác hẳn."""
+        r = check_stories([self.st("S-1", epic="EPIC-01"),
+                           self.st("T-1", epic="EPIC-02")])
+        self.assertEqual(self._canh(r), [])
+
+    def test_lockfile_khong_tinh_vao_so_sanh(self):
+        """Mọi story JS đều mang lockfile trong phạm vi ghi; để nó vào phép so
+        sánh thì hai story chỉ trùng lockfile cũng bị tố oan — hoặc tệ hơn,
+        hai story trùng **thật** lại thoát vì một bên khai thêm `yarn.lock`."""
+        r = check_stories([
+            self.st("S-1", scope=("lib/commands/list.js", "package-lock.json")),
+            self.st("S-2", deps=["S-1"], scope=("lib/commands/list.js", "yarn.lock")),
+        ])
+        canh = self._canh(r)
+        self.assertEqual(len(canh), 1, "lockfile không được che mất chỗ trùng thật")
+        self.assertNotIn("lock", canh[0])
+
+    def test_pham_vi_rong_thi_khong_ket_luan(self):
+        r = check_stories([self.st("S-1", scope=()), self.st("S-2", scope=())])
+        self.assertEqual(self._canh(r), [])

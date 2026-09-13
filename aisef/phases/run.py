@@ -716,6 +716,20 @@ def _run_sprint_owned(
             break
         state.finish_epic(epic_id)
         run_log(artifact_root, f"epic={epic_id} DONE")
+    # Refresh the ledger projection on disk. It is derived from evidence and
+    # every consumer rebuilds it, so nothing depends on the file — but the file
+    # is an artifact people read and commit, and after a sprint it said every
+    # behaviour was a `gap` while the projection held 34 verified and 5
+    # reopened (todo-cli 2026-09-13, lỗi 129). An artifact that contradicts the
+    # machine's own view is worse than an absent one; writing it costs one call.
+    try:
+        from ..control import ledger as ledger_mod
+
+        led = ledger_mod.build(artifact_root)
+        led.write(artifact_root)
+        led.index(artifact_root)
+    except OSError as e:                     # a read-only artifact dir must not
+        run_log(artifact_root, f"ledger refresh skipped: {e}")   # fail the sprint
     run_log(artifact_root, f"sprint DONE ${report.cost_usd:.2f} stopped={report.stopped_at or 'no'}")
     return report
 

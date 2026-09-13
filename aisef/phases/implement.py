@@ -2259,6 +2259,25 @@ def _candidate_moved(workdir: Path, candidate: str) -> str:
 _MA_TIEU_CHI = re.compile(r"\bAC-[A-Za-z0-9_-]*?-\d+(?![0-9A-Za-z_-])")
 
 
+#: Sessions that declined to write, in a row, before the harness stops asking.
+#: A cut session had work in flight and deserves a generous budget; a session
+#: that ran clean and wrote nothing has **decided** — and re-opening it with
+#: identical context returns the same decision. Sharing one budget with cut
+#: sessions meant raising the cut budget to 6 made this case worse, not better
+#: (lỗi 127): STORY-05-02 spent six sessions on a verdict it had after two.
+MAX_NOOP = 2
+
+
+def _noop_lien_tiep(attempts: list[Attempt]) -> int:
+    """No-op sessions at the tail of the list, unbroken."""
+    n = 0
+    for a in reversed(attempts):
+        if not a.noop:
+            break
+        n += 1
+    return n
+
+
 def nop_deadlock(attempts: list[Attempt]) -> str:
     """The story's criteria are already satisfied without the story.
 
@@ -2273,20 +2292,33 @@ def nop_deadlock(attempts: list[Attempt]) -> str:
     described as a client problem, six sessions after it was knowable.
     """
     cham = [a for a in attempts if a.gate is not None and not a.infra]
-    if len(cham) < 2:
+    if not cham:
         return ""
-    ma = []
-    for a in cham[-2:]:
+
+    def _ma(a: Attempt) -> set[str]:
         muc = next((c for c in a.gate.failures if c.name == "tests verify story"), None)
         if muc is None or "still green without story code" not in muc.detail:
-            return ""
-        ma.append(set(_MA_TIEU_CHI.findall(muc.detail)))
-    if not ma[0] or ma[0] != ma[1]:
+            return set()
+        return set(_MA_TIEU_CHI.findall(muc.detail))
+
+    ma = _ma(cham[-1])
+    if not ma:
+        return ""
+    if len(cham) >= 2 and _ma(cham[-2]) == ma:
+        pass                                # two graded attempts, same criteria
+    elif _noop_lien_tiep(attempts) >= 2:
+        # One graded attempt with that verdict, then the developer declining to
+        # write anything, twice. That refusal *is* the second data point: it is
+        # the only way a developer can say "this is already done" (lỗi 127,
+        # todo-cli STORY-05-02 — five no-op sessions after one such verdict,
+        # the whole infrastructure budget spent re-asking).
+        pass
+    else:
         return ""
     return (
-        "deadlock due to plan: criteria " + ", ".join(sorted(ma[0]))
+        "deadlock due to plan: criteria " + ", ".join(sorted(ma))
         + " are already satisfied at the branch point — their tests pass with "
-        "the story's code absent, on two attempts running. Either another "
+        "the story's code absent, and a second session confirmed it. Either another "
         "story already shipped this behaviour (check the epic index) or the "
         "criteria describe something the code already does. No test the "
         "developer writes can be red at the parent SHA for behaviour that is "
@@ -2552,6 +2584,17 @@ def implement_story(
 
         if attempt.infra:
             infra_budget -= 1
+            if (lien := _noop_lien_tiep(outcome.attempts)) >= MAX_NOOP:
+                # Not a failure to retry: a decision, stated twice. Say which
+                # decision, and prefer the plan diagnosis when the last graded
+                # verdict explains it (lỗi 127).
+                outcome.blocked_reason = nop_deadlock(outcome.attempts) or (
+                    f"{lien} sessions in a row ran clean and wrote nothing: {attempt.error} "
+                    f"Re-opening with the same context returns the same decision — "
+                    f"read the last gate verdict and fix what it asks for, or the story."
+                )
+                _log(f"story={story.id} BLOCKED {lien} no-op sessions in a row")
+                return outcome
             cho = attempt.retry_after
             _log(f"story={story.id} attempt={n} INFRA ${attempt.cost_usd:.2f} "
                  f"err={attempt.error[:80]} budget={infra_budget}"

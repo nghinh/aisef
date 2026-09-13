@@ -159,6 +159,35 @@ def check_stories(
                 "truly needs the **output** of an earlier one"
             )
 
+    # Two stories in one epic writing the **same** files, measured 3 for 3 on
+    # todo-cli 2026-09-13: each epic was split into "implement command X" and
+    # "error cases of command X", and a competent implementation of the first
+    # covered the second's criteria. The later story then has nothing it can
+    # do — its tests pass at the branch point, `tests verify story` blocks, and
+    # no test the developer writes can be red for behaviour already merged
+    # (lỗi 128). Three of thirteen stories died that way, ~45 minutes of agent
+    # time, and the plan was knowable at this gate.
+    #
+    # Warning, not blocking: splitting one file across two stories is
+    # sometimes right — a second, genuinely distinct feature in the same
+    # module. The reader decides; the gate only refuses to stay quiet.
+    if not r.errors:
+        theo_pham_vi: dict[tuple[str, tuple[str, ...]], list[str]] = {}
+        for s_ in stories:
+            pham_vi = tuple(sorted(p for p in s_.write_scope if not is_lockfile(p)))
+            if pham_vi and s_.epic_id:
+                theo_pham_vi.setdefault((s_.epic_id, pham_vi), []).append(s_.id)
+        trung = [(k, v) for k, v in theo_pham_vi.items() if len(v) > 1]
+        if trung:
+            r.warnings.append(
+                "stories in the same epic write exactly the same files: "
+                + "; ".join(f"{', '.join(v)} → {', '.join(k[1])}" for k, v in sorted(trung))
+                + " — check that each one adds behaviour the others do not. A story "
+                "whose criteria the earlier story already satisfies cannot pass: its "
+                "tests are green at the branch point, and that is not something the "
+                "developer can fix from inside the story"
+            )
+
     max_paths = cfg["story.max_write_scope_paths"]
     too_wide = [
         s.id

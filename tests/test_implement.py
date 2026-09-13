@@ -30,7 +30,8 @@ from aisef.harness.guardrails import (  # noqa: E402
 )
 from aisef.clients.stream import INFRA_STATUSES, exit_status_of  # noqa: E402
 from aisef.harness.observe import AGENT_RUN, NOTE, Event, EvidenceStore  # noqa: E402
-from aisef.phases.implement import (  # noqa: E402
+from aisef.phases.implement import (  # noqa: F401
+    MAX_NOOP,  # noqa: E402
     _unfinished_review,
     blocking_findings,
     build_context,
@@ -389,6 +390,34 @@ class TestRetry(ImplementTestCase):
         self.assertEqual(len([a for a in out.attempts if a.infra]), 4,
                          "phải dùng đúng ngân sách hạ tầng đã khai")
         self.assertEqual(out.quality_attempts, 0, "hạ tầng không tính lượt chất lượng")
+
+    def test_phien_khong_lam_gi_dung_som_khong_dot_ngan_sach_ha_tang(self):
+        """Lỗi 127. Phiên bị cắt có việc đang dở nên đáng cho ngân sách rộng;
+        phiên chạy sạch mà viết 0 dòng thì đã **quyết định**, mở lại với đúng
+        ngữ cảnh ấy chỉ nhận lại đúng quyết định ấy. Dùng chung một ngân sách
+        nghĩa là nâng ngân sách cắt phiên lên 6 làm ca này **tệ hơn**:
+        STORY-05-02 tiêu sáu phiên cho kết luận nó có sau hai."""
+        class ChiVietLanDau(ScriptedClient):
+            """Lượt 1 có việc để chấm (và trượt); từ lượt 2 trở đi từ chối viết."""
+
+            def run(inner, spec):
+                dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
+                if dau.startswith("# Review") or dau.startswith("# Security review"):
+                    return super().run(spec)
+                if inner.develop_calls == 0:
+                    return super().run(spec)
+                inner.develop_calls += 1
+                return RunResult(ok=True, num_turns=7, output_tokens=200,
+                                 text="nothing to do", cost_usd=0.0)
+
+        out = self.implement(ChiVietLanDau(review="[chặn] src/a.py:1 — mất dữ liệu"),
+                             config=self.config(**{"run.max_retries": 1,
+                                                   "run.infra_retries": 6}))
+        khong_lam = [a for a in out.attempts if a.noop]
+        self.assertEqual(len(khong_lam), 2,
+                         f"phải dừng ở {MAX_NOOP} phiên no-op, không đốt hết 6")
+        self.assertIn("wrote nothing", out.blocked_reason)
+        self.assertIn("same decision", out.blocked_reason)
 
     def test_ngan_sach_ha_tang_mac_dinh_giu_nguyen_hanh_vi_cu(self):
         from aisef.config import DEFAULTS
@@ -757,6 +786,43 @@ class TestBeTacDoKeHoachTheoNopControl(unittest.TestCase):
         ma = ["AC-STORY-03-02-1"]
         ly_do = nop_deadlock([self._luot(ma), self._luot([], infra=True), self._luot(ma)])
         self.assertIn("already satisfied", ly_do)
+
+    def test_mot_luot_cham_roi_hai_phien_khong_lam_gi_cung_du(self):
+        """Lỗi 127, STORY-05-02: chỉ **một** lượt được chấm ra verdict ấy, rồi
+        developer từ chối viết — năm phiên liền. Chính sự từ chối là dữ liệu thứ
+        hai: đó là cách duy nhất developer nói được "việc này xong rồi". Bản vá
+        126 đòi hai lượt được chấm nên trượt ca này, cùng một lỗi kế hoạch mà
+        hai kết cục khác nhau."""
+        from aisef.phases.implement import Attempt, nop_deadlock
+        def khong_lam():
+            a = Attempt(number=1); a.infra = True; a.noop = True
+            return a
+        ma = ["AC-STORY-05-02-1", "AC-STORY-05-02-2"]
+        ly_do = nop_deadlock([self._luot(ma), khong_lam(), khong_lam()])
+        self.assertIn("already satisfied at the branch point", ly_do)
+        for m in ma:
+            self.assertIn(m, ly_do)
+
+    def test_mot_phien_khong_lam_gi_thi_chua_du(self):
+        """Một lần có thể là phiên xui; hai lần là quyết định."""
+        from aisef.phases.implement import Attempt, nop_deadlock
+        a = Attempt(number=1); a.infra = True; a.noop = True
+        self.assertEqual(nop_deadlock([self._luot(["AC-STORY-05-02-1"]), a]), "")
+
+    def test_dem_no_op_lien_tiep(self):
+        from aisef.phases.implement import Attempt, MAX_NOOP, _noop_lien_tiep
+        def khong_lam():
+            a = Attempt(number=1); a.infra = True; a.noop = True
+            return a
+        def bi_cat():
+            a = Attempt(number=1); a.infra = True
+            return a
+        self.assertEqual(MAX_NOOP, 2)
+        self.assertEqual(_noop_lien_tiep([khong_lam(), khong_lam()]), 2)
+        # Phiên bị cắt **ngắt** chuỗi: nó có việc đang dở, không phải quyết định.
+        self.assertEqual(_noop_lien_tiep([khong_lam(), bi_cat()]), 0)
+        self.assertEqual(_noop_lien_tiep([khong_lam(), bi_cat(), khong_lam()]), 1)
+        self.assertEqual(_noop_lien_tiep([]), 0)
 
     def test_truot_vi_ly_do_khac_thi_khong_ket_luan(self):
         from aisef.control.gate import StoryGate

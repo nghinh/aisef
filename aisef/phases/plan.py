@@ -151,7 +151,17 @@ PHASES: tuple[Phase, ...] = (
             "certainly do not depend on each other.\n"
             "- screens: screen IDs from EXPERIENCE.md that this story builds, "
             "or none if the story has no UI\n"
-            "These four lines are a machine-readable contract: missing means the story is blocked."
+            "These four lines are a machine-readable contract: missing means the story is blocked.\n"
+            "Each story must add behaviour **no earlier story already delivers**. A story is "
+            "separable in code, not only in prose: splitting one function's happy path from "
+            "its error cases gives you a second story with nothing to do, because any "
+            "competent implementation of the first handles both. Measured on a real run "
+            "(todo-cli 2026-09-13): three epics split as \"implement command X\" + \"error "
+            "cases of command X\", and all three second stories were unpassable — their "
+            "tests are green before their own code exists, which is not something the "
+            "developer can fix from inside the story. Two stories writing the same file is "
+            "the signal to re-check; if the behaviour cannot be described without "
+            "re-describing the earlier story, it is one story."
         ),
     ),
 )

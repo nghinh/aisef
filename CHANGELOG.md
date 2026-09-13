@@ -114,6 +114,36 @@ reported as "sessions kept producing nothing to grade". Two graded attempts
 failing that check with the same criteria now stop the story immediately, as a
 plan deadlock that names the criteria and says to fix or drop them.
 
+**A session that declines to write is a decision, not a failure to retry**
+(bug 127). Cut sessions and no-op sessions shared one budget although they mean
+opposite things: a cut session had work in flight, a session that ran clean and
+wrote nothing has decided — and re-opening it with identical context returns
+the same decision. Raising the infrastructure budget to survive a client with a
+22–32% cut rate therefore made this case worse: one story spent six sessions on
+a verdict it had after two. Two consecutive no-op sessions now stop the story,
+a cut session breaks the streak, and the plan diagnosis from bug 126 is
+preferred when the last graded verdict explains it.
+
+**The planner's favourite split produces stories that cannot pass** (bug
+128). On a full six-epic run, 4 of 13 stories died because their criteria had
+already been delivered by an earlier story — more than every other cause
+combined. Three epics were split as "implement command X" plus "error cases of
+command X", against the same single file; any competent implementation of the
+first covers both, and the second story then has no legal move, because its
+tests are green before its own code exists. The `stories` gate now warns when
+two stories in one epic declare exactly the same write scope (a warning, not a
+block — splitting one file across two stories is sometimes right), and the
+`epics` phase is told that a story must add behaviour no earlier story
+delivers, and that separability is a property of code, not of prose. Replayed
+against that plan, the warning names all four pairs and no others.
+
+**`ledger.json` is refreshed when a sprint ends** (bug 129). The behaviour
+ledger is a projection every consumer rebuilds from evidence, so nothing
+depended on the file — but only `aisef report` and the improve loop wrote it,
+so between runs it stood still. After a six-epic run it said every behaviour
+was a `gap` while the projection held 34 verified and 5 reopened, and that file
+gets committed as if it were the truth.
+
 **`run.infra_retries`** gives infrastructure errors their own retry budget.
 They score nothing, so they never charged `run.max_retries` — but they shared
 its budget, and on a client with a measured session-cut rate (22–32% on

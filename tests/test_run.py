@@ -1026,3 +1026,24 @@ class TestVerifyOnlyRepeat(RunTestCase):
 
         self.assertTrue(r.ok, r.summary())
         self.assertIsNone(self.evidence().last(NOTE, "verify-only.repeat"))
+
+
+class TestSoSachHanhViTuoiSauDotChay(unittest.TestCase):
+    """Lỗi 129 (todo-cli 2026-09-13). Sổ hành vi là **phép chiếu** từ bằng
+    chứng: mọi người dùng nó đều dựng lại, nên không có gì phụ thuộc vào tệp.
+    Nhưng tệp là artifact người đọc và commit vào git, và sau đợt chạy nó nói
+    mọi hành vi đều là `gap` trong khi phép chiếu có 34 verified, 5 reopened.
+    Một artifact nói ngược lại chính cái máy đang thấy còn tệ hơn không có."""
+
+    def test_ghi_lai_so_sach_cuoi_dot(self):
+        import inspect
+        from aisef.phases import run as run_mod
+
+        src = inspect.getsource(run_mod._run_sprint_owned)
+        i_ghi = src.index("led.write(artifact_root)")
+        i_xong = src.index('f"sprint DONE')
+        self.assertLess(i_ghi, i_xong, "phải ghi trước khi báo xong")
+        self.assertIn("ledger_mod.build(artifact_root)", src,
+                      "phải dựng lại từ bằng chứng, không chép sổ cũ")
+        self.assertIn("except OSError", src,
+                      "thư mục artifact chỉ đọc không được làm sập cả đợt chạy")
