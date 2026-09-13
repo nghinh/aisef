@@ -269,6 +269,15 @@ def check_design_contract(
     r = GateResult("machine gate: mockup")
 
     if not experience.screens:
+        if getattr(experience, "headless", False):
+            # Declared, not forgotten: a CLI, a library or a service has
+            # nothing to mock up, and the gate says so instead of demanding a
+            # screen inventory the product does not have.
+            r.warnings.append(
+                "EXPERIENCE.md declares no graphical surface — nothing to mock up, "
+                "and stories carry no browser or mockup-map contract"
+            )
+            return r
         r.errors.append("EXPERIENCE.md lists no screens")
         return r
 

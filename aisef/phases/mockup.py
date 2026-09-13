@@ -185,6 +185,15 @@ def generate(
 
     res.experience = parse_experience_file(exp_file)
     if not res.experience.screens:
+        if res.experience.headless:
+            # A CLI, a library or a service: nothing to mock up, and no browser
+            # needed to say so. The contract is still written — empty — because
+            # the gate binds to that file and the readiness gate reads it.
+            res.contract = DesignContract()
+            res.contract.write(root)
+            res.gate = check_design_contract(res.contract, res.experience)
+            _log("DONE no graphical surface — empty contract written")
+            return res
         res.error = "EXPERIENCE.md does not list any screens"
         _log(f"ERROR {res.error}")
         return res

@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- **A project can say it has no graphical surface** (bug 107). The ux step
+  required a screen inventory from every project — "a single-screen app still
+  needs its one row" — so a command-line tool had its six commands mapped onto
+  six screens, and every story came out carrying a browser, mockup-map and
+  accessibility contract for something with no DOM. `EXPERIENCE.md` can now
+  say `**Screens:** none — no graphical surface`; the ux prompt asks for that
+  line from a CLI, a library or a service; the mockup gate passes with a
+  warning and writes an empty contract without needing a browser. A UI project
+  that simply forgot its table is still an error, which is why the document
+  declares it rather than the gate guessing from an empty list.
+
 - **Eleven stories vanished because the planner wrote `Story 01-01`**
   (bug 105). The size gate asked for a split, the agent split correctly and
   rewrote the headings with a hyphen instead of a dot — the same shape the

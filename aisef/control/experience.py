@@ -85,6 +85,13 @@ class Experience:
     screens: list[Screen] = field(default_factory=list)
     #: Component name -> behavior rules, for inclusion in mockup generation prompts.
     component_rules: dict[str, str] = field(default_factory=dict)
+    #: The document **declares** the product has no graphical surface — a CLI,
+    #: a library, a service. Distinct from an empty screen list, which is how
+    #: a UI project that described its screens in prose also looks (the case
+    #: `_UX_SCREEN_TABLE` exists for). One means "there is nothing to mock up",
+    #: the other means "the inventory is missing"; the mockup gate has to tell
+    #: them apart, so the document says which it is.
+    headless: bool = False
 
     def by_id(self, screen_id: str) -> Screen | None:
         return next((s for s in self.screens if s.id == screen_id), None)
@@ -164,9 +171,20 @@ def _names_screens(header: list[str]) -> bool:
     return any(lb == n or lb.startswith(n) for lb in labels for n in _STRONG_SCREEN_COLUMNS)
 
 
+#: `**Screens:** none — no graphical surface` (any of the three words for
+#: "none", any dash), written by the ux step when the product is a CLI, a
+#: library or a service.
+_NO_SURFACE = re.compile(
+    r"^\**Screens?\**\s*[:：]?\s*\**\s*(?:none|không|no)\b.{0,80}?"
+    r"(?:no graphical surface|không có giao diện|headless)",
+    re.MULTILINE | re.IGNORECASE,
+)
+
+
 def parse_experience(text: str) -> Experience:
     """`EXPERIENCE.md` -> normalized screen list."""
     exp = Experience()
+    exp.headless = bool(_NO_SURFACE.search(text))
 
     # A document can hold several tables under the same heading, and only one
     # of them is the screen inventory. A real run wrote both a

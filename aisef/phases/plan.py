@@ -355,7 +355,14 @@ _UX_SCREEN_TABLE = (
     "`Route` is the path the app serves the screen at (`/`, `/tasks`, "
     "`/note/:id`) — a path, never a sentence. A single-screen app still needs "
     "its one row: prose describing the screens is not readable by the steps "
-    "that consume this file."
+    "that consume this file.\n\n"
+    "If the product has **no graphical surface at all** — a command-line tool, "
+    "a library, a service — do not invent screens for it. Write exactly this "
+    "line instead of the table:\n\n"
+    "**Screens:** none — no graphical surface\n\n"
+    "Then describe the command signatures or the public API in their own "
+    "section. Mapping commands onto a screen inventory makes every story carry "
+    "a browser, mockup and accessibility contract for something that has no DOM."
 )
 
 

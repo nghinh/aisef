@@ -275,6 +275,45 @@ class TestBrowserUnavailable(unittest.TestCase):
 
 
 
+class TestDuAnKhongCoGiaoDien(unittest.TestCase):
+    """Một CLI không có màn hình nào để dựng. Trước đây khung đòi bằng được
+    một bảng màn hình, nên planner ánh xạ 6 lệnh thành 6 "màn hình" và mọi
+    story mang hợp đồng browser + mockup-map + accessibility cho thứ không có
+    DOM. Nhưng "không khai màn hình" cũng là hình dạng của một dự án UI quên
+    viết bảng — nên tài liệu phải **khai** ra mình thuộc loại nào."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_khai_khong_giao_dien_thi_hop_dong_rong_va_cong_qua(self):
+        from aisef.control.design_contract import CONTRACT_FILE
+        from aisef.phases.mockup import generate as run_mockup
+
+        (self.root / "_bmad-output").mkdir()
+        (self.root / "_bmad-output" / "EXPERIENCE.md").write_text(
+            "# Taskbook — Experience\n\n**Screens:** none — no graphical surface\n\n"
+            "## Command Signatures\n\n`taskbook add \"<title>\"`\n",
+            encoding="utf-8")
+        res = run_mockup(self.root, client=None)
+        self.assertEqual(res.error, "")
+        self.assertTrue((self.root / "_bmad-output" / CONTRACT_FILE).is_file())
+        self.assertTrue(res.gate.passed)
+        self.assertIn("no graphical surface", " ".join(res.gate.warnings))
+
+    def test_quen_viet_bang_van_la_loi(self):
+        from aisef.phases.mockup import generate as run_mockup
+
+        (self.root / "_bmad-output").mkdir()
+        (self.root / "_bmad-output" / "EXPERIENCE.md").write_text(
+            "# App\n\nMột màn hình duy nhất, danh sách ghi chú.\n", encoding="utf-8")
+        res = run_mockup(self.root, client=None)
+        self.assertIn("does not list any screens", res.error)
+
+
 class TestHopDongYeuDiThiNoiRa(unittest.TestCase):
     """`--force` chạy lại agent, và lượt hai không phải lượt một: bản đo trên
     `todo-oc` mất ô tìm kiếm và 2/3 trạng thái. Hợp đồng là thứ khâu kiểm
