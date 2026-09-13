@@ -8,7 +8,9 @@
   uncommitted skill is absent where the session runs. Every linter the project
   configures therefore reads them: `npx eslint .` reported 116 `no-undef`
   errors in skill scripts and failed a story's lint check. The `node`, `react`
-  and `python` presets now exclude `.claude`, `.aisef` and `.opencode`.
+  and `python` presets now exclude `.claude`, `.aisef` and `.opencode`, and so
+  does the fake-test scan behind the blocking `real tests` check — git lists
+  those files as the project's, and they are not.
 
 - **`doctor` resolves `npm test` before judging it** (bug 112). It read the
   command string, which for `npm test` says nothing, and told a project that

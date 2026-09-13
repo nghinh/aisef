@@ -157,6 +157,15 @@ class TestFakeTests(QaTestCase):
         self.write("tests/test_a.py", "def test_gi_do():\n    x = 1 + 1\n")
         self.assertEqual(find_fake_tests(self.project), ["tests/test_a.py"])
 
+    def test_skill_cua_khung_khong_phai_test_cua_du_an(self):
+        """`.claude/skills` do khung cài và **bắt buộc commit**, nên git liệt
+        kê chúng như tệp của dự án. Một test script trong skill không phải
+        test của dự án — mà mục `real tests` là mục **chặn** (họ lỗi 113)."""
+        self.write(".claude/skills/mot-skill/scripts/tests/test_x.py",
+                   "def test_gi_do():\n    x = 1 + 1\n")
+        self.write("tests/test_that.py", "def test_y():\n    assert 1 == 1\n")
+        self.assertEqual(find_fake_tests(self.project), [])
+
     def test_python_test_with_assertion_is_fine(self):
         self.write("tests/test_a.py", "def test_gi_do():\n    assert 1 + 1 == 2\n")
         self.assertEqual(find_fake_tests(self.project), [])

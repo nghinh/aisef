@@ -270,7 +270,11 @@ def find_fake_tests(project: Path | str, files: list[str] | None = None) -> list
     project = Path(project)
     if files is None:
         files = _project_files(project)
-    candidates = [project / f for f in files if _TEST_FILE.search(f)]
+    # `.claude` holds 155 installed skills, and the project must commit them,
+    # so git lists them among its own files. A skill's test script is not the
+    # project's test, and this check blocks a story (bug 113's family).
+    candidates = [project / f for f in files
+                  if _TEST_FILE.search(f) and not f.startswith(_KHUNG)]
 
     out = []
     for path in sorted(candidates):
@@ -286,9 +290,14 @@ def find_fake_tests(project: Path | str, files: list[str] | None = None) -> list
     return out
 
 
+#: The framework's own directories inside a project. Committed on purpose —
+#: a story worktree is a checkout — and therefore listed by git as project
+#: files, which they are not.
+_KHUNG = (".claude/", ".opencode/", ".aisef/", "_bmad-output/")
+
 #: Non-source vendor directories. Only used when git is unavailable.
 _VENDOR = ("node_modules", ".git", ".venv", "venv", "dist", "build", "references",
-           "__pycache__", ".aisef")
+           "__pycache__", ".aisef", ".claude", ".opencode")
 
 
 def _project_files(project: Path) -> list[str]:
