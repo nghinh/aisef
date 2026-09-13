@@ -202,6 +202,25 @@ class TestBaseline(unittest.TestCase):
 
 
 class TestPlanBrownfield(unittest.TestCase):
+    def test_prompt_greenfield_baseline_khong_noi_da_co_ma_nguon(self):
+        """`baseline.md` có thể tồn tại cho một dự án **chưa** brownfield. Nói
+        với planner "dự án ĐÃ CÓ mã nguồn" và "chỉ sinh delta" thì mâu thuẫn
+        ngay với dòng đầu của chính baseline ấy, và có thể làm nó bỏ luôn việc
+        cần lập kế hoạch."""
+        from aisef.phases.plan import PHASES, build_prompt
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d)
+            (p / "_bmad-output").mkdir()
+            (p / "_bmad-output" / "baseline.md").write_text(
+                "# Baseline — Greenfield\n\nChưa có mã nguồn đáng kể.\n\n"
+                "## Đã có sẵn trên đĩa\n\n- `package.json` — `type`; `bin`\n",
+                encoding="utf-8")
+            t = build_prompt(next(x for x in PHASES if x.id == "epics"), p)
+        self.assertIn("Already on disk", t)
+        self.assertIn("package.json", t)
+        self.assertNotIn("ALREADY HAS source code", t)
+        self.assertNotIn("Produce a DELTA", t)
+
     def test_is_brownfield_false_without_baseline(self):
         from aisef.phases.plan import _is_brownfield
         with tempfile.TemporaryDirectory() as d:

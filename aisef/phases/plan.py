@@ -273,6 +273,20 @@ def _brownfield_context(project: Path) -> str:
         text = baseline.read_text(encoding="utf-8")[:4000]
     except OSError:
         return ""
+    if text.lstrip().startswith("# Baseline — Greenfield"):
+        # A baseline can exist for a project that is *not* brownfield — a
+        # manifest and a config file, no real codebase yet. Telling the planner
+        # "this project ALREADY HAS source code" and "produce a delta, do not
+        # regenerate" would contradict the baseline's own first line and could
+        # talk it out of planning the work. What it needs from here is the
+        # short list of things not to plan twice.
+        return (
+            "\n\n## Already on disk\n\n"
+            "The project is greenfield, but some files already exist:\n\n"
+            + text + "\n\n"
+            "Do not write stories to create what is listed above. Plan the work "
+            "that is actually missing.\n"
+        )
     return (
         "\n\n## Brownfield Context\n\n"
         "This project ALREADY HAS source code. Here is the baseline (summary):\n\n"
