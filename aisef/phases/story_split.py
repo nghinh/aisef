@@ -240,6 +240,7 @@ def split(
         config=config,
         story_fr_map={s.id: s.covers for s in stories},
         story_ac_count={s.id: len(s.acceptance_criteria) for s in stories},
+        story_ac_text={s.id: list(s.acceptance_criteria) for s in stories},
     )
 
     # Is the story executable — computed in code, before spending any money.

@@ -84,6 +84,17 @@ def check_prd(prd: PRD) -> GateResult:
     return r
 
 
+#: Criteria that describe a placeholder rather than behaviour. Matched on the
+#: criterion text because the damage is done at plan time — by the time the
+#: runtime can tell (preservation blocking the real story, the nop control
+#: refusing its tests), an epic has already stalled.
+_GIU_CHO = re.compile(
+    r"\bnot[ -]implemented\b|\bunimplemented\b|\bstubs?\b|\bstubbed\b"
+    r"|\bplaceholder\b|\bno-?op\b|\bTODO\b",
+    re.IGNORECASE,
+)
+
+
 def check_stories(
     stories: list[Story],
     prd: PRD | None = None,
@@ -91,6 +102,7 @@ def check_stories(
     config: Config | None = None,
     story_fr_map: dict[str, list[str]] | None = None,
     story_ac_count: dict[str, int] | None = None,
+    story_ac_text: dict[str, list[str]] | None = None,
 ) -> GateResult:
     """Check the story set before starting implementation."""
     r = GateResult("machine gate: stories")
@@ -154,6 +166,32 @@ def check_stories(
             f"verify and nothing for a test to be named after, so every criteria check "
             f"passes vacuously. Either `epics.md` has none, or its criteria are written "
             f"in a shape the parser does not read yet"
+        )
+
+    # A story whose criteria describe a **placeholder** costs an epic. Measured on
+    # marks-cli 2026-09-14: STORY-01-02 shipped a dispatcher whose commands answer
+    # "not implemented", and its criterion "a stub command exits 1, writes one
+    # `marks: ` line, nothing to stdout" was verified into the ledger. Two
+    # consequences, both fatal to the epic. Preservation then blocked STORY-02-01 —
+    # the story that implements `add` — for breaking that behaviour, which it must.
+    # And the stub's blanket failure already satisfied STORY-02-01's own error-path
+    # criterion, whose observable signature is identical, so no test for it could be
+    # red at the branch point: `tests verify story` failed twice and the story
+    # deadlocked, stopping the epic at wave 1 with four stories never reached.
+    giu_cho = sorted(
+        f"{sid}: {', '.join(sorted(hits))}"
+        for sid, hits in ((sid, {m.group(0).lower() for c in (crit or [])
+                                 for m in _GIU_CHO.finditer(c)})
+                          for sid, crit in (story_ac_text or {}).items())
+        if hits
+    )
+    if giu_cho:
+        r.errors.append(
+            f"stories whose criteria describe a placeholder: {'; '.join(giu_cho)} — "
+            f"scaffolding is not behaviour. Verified into the ledger it makes preservation "
+            f"block the story that replaces it, and its blanket failure answers later "
+            f"error-path criteria so their tests cannot be red at the branch point. Fold the "
+            f"scaffolding into the first story that delivers real behaviour through it"
         )
 
     max_ac = cfg["story.max_acceptance_criteria"]

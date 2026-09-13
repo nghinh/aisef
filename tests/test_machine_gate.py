@@ -121,6 +121,31 @@ class TestStoryGate(unittest.TestCase):
         im lặng không phải là 0."""
         self.assertTrue(check_stories([story("S-1")]).passed)
 
+    def test_tieu_chi_ta_thu_giu_cho_thi_chan(self):
+        """Lỗi 148. Story giao **vật giữ chỗ** tốn cả một epic. marks-cli
+        2026-09-14: STORY-01-02 giao dispatcher mà các lệnh trả "not
+        implemented", tiêu chí "lệnh stub thoát 1, một dòng `marks: `, không
+        có stdout" được ghi VERIFIED vào ledger. Hai hậu quả đều chí tử:
+        preservation chặn STORY-02-01 — story hiện thực `add` — vì nó **phải**
+        phá hành vi ấy; và cái thất bại vô điều kiện của stub đã thoả sẵn tiêu
+        chí nhánh lỗi của chính STORY-02-01 (cùng dấu hiệu quan sát: thoát 1,
+        một dòng stderr, store không đổi), nên không test nào của nó đỏ được ở
+        điểm rẽ nhánh. Epic dừng ở wave 1, bốn story sau không bao giờ tới."""
+        r = check_stories(
+            [story("S-1"), story("S-2")],
+            story_ac_text={
+                "S-1": ["Given lệnh còn là stub, Then nó thoát 1 và in `marks: `"],
+                "S-2": ["Given url hợp lệ, Then store có thêm một bản ghi"],
+            },
+        )
+        self.assertFalse(r.passed)
+        loi = " ".join(r.errors)
+        self.assertIn("S-1", loi)
+        self.assertNotIn("S-2", loi)
+
+    def test_khong_truyen_van_ban_tieu_chi_thi_khong_ket_luan(self):
+        self.assertTrue(check_stories([story("S-1")]).passed)
+
     def test_ac_limit_respects_config(self):
         cfg = Config({**DEFAULTS, "story.max_acceptance_criteria": 30})
         r = check_stories([story("S-1")], config=cfg, story_ac_count={"S-1": 20})

@@ -298,6 +298,27 @@ unlocated items deduped by their own text so two distinct ones stay two.
 Replayed over eight real review files: 29 becomes 2, matching the JSON, and the
 genuine blockers in the other reviews survive.
 
+**A story may no longer deliver a placeholder** (bug 148). marks-cli stopped at
+EPIC-02 wave 1 with two of seven stories merged. STORY-01-02 had shipped a
+dispatcher whose commands answer "not implemented", and its criterion — a stub
+command exits 1, writes one `marks: ` line, nothing to stdout — went into the
+ledger as VERIFIED behaviour.
+
+That killed the epic twice over. Preservation blocked STORY-02-01, the story that
+implements `add`, for breaking a behaviour it is required to break. And the stub's
+blanket failure has the same observable signature as STORY-02-01's own error-path
+criterion — exit 1, one stderr line, store untouched — so that criterion was
+already satisfied at the branch point and no test for it could be red. The story
+deadlocked and the four stories behind it were never reached.
+
+This is neither developer overshoot (142) nor a plan that repeats itself in prose
+(128). The epics prompt now forbids a story whose deliverable is scaffolding, and
+requires every criterion to be falsifiable at the branch point: it must assert
+something not already true of the code that exists. The machine gate refuses
+criteria that describe a placeholder, naming the story and the matched words.
+Replayed against the real marks-cli plan it flags STORY-01-02 and none of the
+other six.
+
 **A `write_scope` pointing outside the project is now an error** (bug 147).
 The residue of 146: the planner's out-of-repo entries survived the fix, and the
 scope-width warning counted `tmp` and `foo` among the project's root modules.
