@@ -1,0 +1,63 @@
+{
+  "attempt": "v1.7.0 release, 2026-09-15",
+  "authorized_by": "owner release approval 2026-09-15",
+  "tag": {
+    "name": "v1.7.0",
+    "type": "annotated",
+    "commit": "966add6b484b4b7444c6913b2d45466e2f61137a",
+    "equals_final_closure_target_sha": true,
+    "pushed": true,
+    "moved_or_recreated": false
+  },
+  "workflow": {
+    "run_id": "34908370558",
+    "conclusion": "failure",
+    "failed_job": "build",
+    "failed_step": "Kiem phat hanh (unit + bang hop quy con moi)",
+    "publish_job": "skipped"
+  },
+  "pypi": {
+    "1.7.0_published": false,
+    "latest_still": "1.6.0",
+    "manual_upload_attempted": false
+  },
+  "failure": {
+    "count": 4,
+    "all_same_root_cause": true,
+    "error": "subprocess.CalledProcessError: ['git','archive','--format=tar','db0081275046d687e136bc2540cae78a156e7dd1'] exit 128",
+    "tests": [
+      "test_bench_qualification.TestDuongOngTuyenCap.test_phien_bi_cat_vao_so_dung_nhan_va_ghi_ngay_sau_tung_phien",
+      "test_bench_qualification.TestDuongOngTuyenCap.test_phien_tuyen_giong_hinh_dang_nhanh_AISEF_cua_cohort",
+      "(two further cases in the same class, same call path)"
+    ],
+    "ci_totals": "Ran 3072 tests, errors=4, skipped=81",
+    "local_totals_at_target": "3056 passed, 0 failed, 19 skipped"
+  },
+  "root_cause": {
+    "what": "the tests materialize a bench task by `git archive <task.base>`, and `task.base` for bug-a2-multi-2 is db0081275046d687e136bc2540cae78a156e7dd1 -- a commit in THIS repository's own history.",
+    "why_ci_only": "no workflow declares `fetch-depth`, so actions/checkout@v4 makes a SHALLOW clone (depth 1). The tag commit is present; the task's base commit is not. Locally the full history exists, which is why the same suite is green at the target.",
+    "why_now": "TestDuongOngTuyenCap arrived in 5388ffb (the G5.3 qualification pipeline), which is AFTER v1.6.0. Remote master is 56 commits behind local, so these tests had never run in CI -- this release tag is their first CI exposure. v1.6.0's release run was green.",
+    "not_caused_by": "today's G5.2/G5.6/early-stop work. Those changed aisef/control/{cohort,closure}.py, tests/bench/{_analyze,_runner,__main__}.py and docs; they did not touch materialize() or the task fixtures (MANIFEST.sha256 still matches byte for byte)."
+  },
+  "candidate_fixes": [
+    {
+      "id": "A",
+      "change": "add `with: fetch-depth: 0` to actions/checkout in .github/workflows/release.yml (and tests.yml for the same reason)",
+      "scope": "RELEASE SOURCE",
+      "note": "makes CI able to resolve task.base; keeps the bench tests as real coverage. Costs a full clone per run."
+    },
+    {
+      "id": "B",
+      "change": "skip the bench-materialize tests when task.base does not resolve in the checkout",
+      "scope": "TEST SOURCE",
+      "note": "smaller, but converts real CI coverage into a silent skip -- the exact shape this project has been burned by before (80 skips vs 19)."
+    }
+  ],
+  "blocked_because": "both fixes are source-changing commits, so either produces a NEW final_closure_target_sha. The owner's standing instruction is to stop rather than change release source, and never to move or recreate the tag onto another commit. v1.7.0 therefore remains bound to 966add6, whose release gate is red.",
+  "not_done": [
+    "no manual wheel upload to PyPI",
+    "no tag moved, deleted, or recreated",
+    "no workflow edited to conceal the failure",
+    "no test weakened"
+  ]
+}

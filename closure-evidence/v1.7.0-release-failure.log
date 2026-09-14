@@ -1,0 +1,277 @@
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	﻿2026-09-14T23:20:09.9010474Z ##[group]Run python -m unittest discover -s tests -q
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:09.9012228Z ^[[36;1mpython -m unittest discover -s tests -q^[[0m
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:09.9013967Z ^[[36;1m# `-v`, không `-q`: `-q` in "OK (skipped=1)" — người đọc log phát hành^[[0m
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:09.9015964Z ^[[36;1m# thấy xanh mà không thấy **phép nào** bị bỏ. Phép nghiệm thu dogfood^[[0m
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:09.9018856Z ^[[36;1m# bỏ qua khi thiếu `AISEF_ACCEPTANCE`; `-v` in tên nó kèm lý do.^[[0m
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:09.9022869Z ^[[36;1mAISEF_RELEASE=1 python -m unittest tests.test_release_gate -v^[[0m
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:09.9098904Z shell: /usr/bin/bash -e {0}
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:09.9100922Z env:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:09.9102617Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:09.9105123Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:09.9107637Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:09.9110599Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:09.9114221Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:09.9117320Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:09.9119564Z ##[endgroup]
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:16.7093627Z   ↻ STORY-01-01 claude lượt 1: infra — chạy lại (1/1)
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:16.9727777Z   ↻ STORY-01-01 claude lượt 1: infra — chạy lại (1/1)
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:18.2433924Z sổ rỗng — chưa có phiên tuyển nào
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:18.2446148Z đã ghi docs/BENCH-PAIR-QUALIFICATION.md
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:18.2455205Z TỪ CHỐI: sổ có phiên giả, mà docs/BENCH-PAIR-QUALIFICATION.md là bằng chứng của G5.3. Dùng `--out` khác để xem thử.
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:18.2464099Z đã ghi docs/thu.md
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:18.3486203Z ⚠ ngân sách: đã dùng $0.09 / $0.10 (90% trần usd) — vượt trần sẽ **dừng trước khi gọi model**
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:20:49.6397495Z ✗ no evidence found — run `aisef run` first
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2749201Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=51 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2751012Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2751798Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2753442Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=50 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2754826Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2755650Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2757728Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=49 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2759283Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2760040Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2761551Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=48 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2762656Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2763314Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2764329Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=47 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2765562Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2766292Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2767187Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=46 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2767858Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2768209Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2768977Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=45 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2769960Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2770789Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2771665Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=44 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2772351Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2772710Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2773453Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=43 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2774084Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2774425Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2775203Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=42 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2775834Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2776179Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2776934Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=41 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2777561Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2777900Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2778650Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=40 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2779326Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2779664Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2780785Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=39 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2781418Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2781760Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2782495Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=38 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2783134Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2783473Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2784209Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=37 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2784837Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2785177Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2785921Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=36 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2786550Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2786888Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2787631Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=35 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2788256Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2788593Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2789335Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=34 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2789958Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2790430Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2791170Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=33 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2791947Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2792284Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2793019Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=32 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2793645Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2793982Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2794711Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=31 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2795329Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2795668Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2796416Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=30 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2797050Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2797385Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2798121Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=29 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2798741Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2799076Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2799812Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=28 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2800742Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2801094Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2801987Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=27 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2802628Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2802978Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2803734Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=26 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2804367Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2804710Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2805445Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=25 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2806072Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2806413Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2807162Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=24 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2807786Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2808127Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2808862Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=23 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2809511Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2809854Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2810791Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=22 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2811423Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2811763Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2812508Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=21 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2813304Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2813643Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2814384Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=20 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2815005Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2815346Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2816073Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=19 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2816712Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2817051Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2817786Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=18 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2818414Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2818754Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2819489Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=17 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2820238Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2820583Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2821317Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=16 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2821944Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2822283Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2823164Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=15 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2823791Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2824134Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2824874Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=14 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2825498Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2825835Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2826569Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=13 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2827194Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2827533Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2828269Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=12 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2828925Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2829278Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2830030Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2830787Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2831129Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2831876Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2832506Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2832847Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2833603Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2834363Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2834706Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2835446Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=8 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2836071Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2836411Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2837148Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=7 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2837777Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2838117Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2838855Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=6 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2839480Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2839817Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2840922Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=5 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2841585Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2841940Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2842687Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=4 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2843312Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2843650Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2844567Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=3 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2845185Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2845520Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2846256Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/unittest/case.py:589: ResourceWarning: unclosed file <_io.TextIOWrapper name=52 encoding='utf-8'>
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2846884Z   if method() is not None:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:11.2847219Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8394776Z guard could not run (argument kind: invalid choice: 'nonexistent-guard' (choose from completion, destructive, diff-scope, egress, git-stage, injection, process-ref, secret, tool-bypass, write-scope)) — blocking, not allowing
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8453317Z usage: aisef init [-h] [--stack {react,python,go,node}]
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8454202Z aisef init: error: argument --stack: invalid choice: 'rust' (choose from react, python, go, node)
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8771290Z Environment:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8771938Z   ✅ python >= 3.11 — 3.12.14
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8772318Z   ✅ git
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8772639Z   ○ claude CLI — not found
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8773031Z   ○ opencode CLI — not found
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8773661Z   ✅ agent credential — none in the environment — the client uses its own login
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8774304Z   ✅ docker daemon — running
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8775364Z   ○ playwright + chromium — playwright not installed — run: npm i -D playwright && npx playwright install chromium — cannot extract mockup contracts
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8776331Z Project:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8776744Z   ✅ project directory — /home/runner/work/aisef/aisef
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8777775Z   ✅ sandbox provider — host — guarantees at WORKSPACE_WRITE: network_none, no_host_mount, non_root, read_only_fs, secrets_absent
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8778926Z   ✗ docs/requirements.md — /home/runner/work/aisef/aisef/docs/requirements.md
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8780040Z   ✅ config — defaults
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8780783Z Installed skills:
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8781389Z   ○ setup completed — not yet — run: aisef setup
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8781832Z 
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8782086Z ✗ missing: docs/requirements.md
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8837309Z usage: aisef [-h] [-V] [--project PROJECT]
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8839120Z              {memory,setup,doctor,init,gates,status,change,baseline,doc,skill,review,approve,reject,compile,gate,guard,plan,mockup,run,improve,verify,tool,qa,devsecops,pre-deploy,evidence,ctx,issues,report,cost,auto-approve,dashboard,closure,replay}
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8841002Z              ...
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:21.8842462Z aisef: error: argument command: invalid choice: 'zzz-no-such-cmd' (choose from memory, setup, doctor, init, gates, status, change, baseline, doc, skill, review, approve, reject, compile, gate, guard, plan, mockup, run, improve, verify, tool, qa, devsecops, pre-deploy, evidence, ctx, issues, report, cost, auto-approve, dashboard, closure, replay)
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:22.5835015Z ✗ git user.name / user.email not configured for this repo.
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:22.5835511Z   Run:  git config user.name 'Your Name'
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:22.5835830Z         git config user.email 'you@example.com'
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6491384Z ======================================================================
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6492774Z ERROR: test_dung_som_khi_cap_khong_con_dat_duoc (test_bench_qualification.TestDuongOngTuyenCap.test_dung_som_khi_cap_khong_con_dat_duoc)
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6494318Z Trần của cohort 6 phiên là ⌊6/6⌋ = 1, nên phiên cắt thứ hai chốt xong
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6495035Z ----------------------------------------------------------------------
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6495627Z Traceback (most recent call last):
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6503697Z   File "/home/runner/work/aisef/aisef/tests/test_bench_qualification.py", line 277, in test_dung_som_khi_cap_khong_con_dat_duoc
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6505108Z     rows = Q.chay(self.client, task_id=TASK_RE, phien=6, note="cặp-giả",
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6505627Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6506270Z   File "/home/runner/work/aisef/aisef/tests/bench/_qualify.py", line 347, in chay
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6506915Z     ws = R.materialize(task, thu_muc / "run" / client.id / task.id / f"s{i}",
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6507405Z          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6508012Z   File "/home/runner/work/aisef/aisef/tests/bench/_runner.py", line 134, in materialize
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6508580Z     tar = subprocess.run(["git", "archive", "--format=tar", task.base], cwd=repo,
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6508993Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6509536Z   File "/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/subprocess.py", line 571, in run
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6510439Z     raise CalledProcessError(retcode, process.args,
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6511203Z subprocess.CalledProcessError: Command '['git', 'archive', '--format=tar', 'db0081275046d687e136bc2540cae78a156e7dd1']' returned non-zero exit status 128.
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6511793Z 
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6511911Z ======================================================================
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6512531Z ERROR: test_moi_phien_co_cay_lam_viec_rieng (test_bench_qualification.TestDuongOngTuyenCap.test_moi_phien_co_cay_lam_viec_rieng)
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6513323Z Dùng chung một cây thì phiên sau xoá bằng chứng của phiên trước.
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6513745Z ----------------------------------------------------------------------
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6514099Z Traceback (most recent call last):
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6514710Z   File "/home/runner/work/aisef/aisef/tests/test_bench_qualification.py", line 269, in test_moi_phien_co_cay_lam_viec_rieng
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6515427Z     rows = Q.chay(self.client, task_id=TASK_RE, phien=3, note="cặp-giả",
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6515829Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6516517Z   File "/home/runner/work/aisef/aisef/tests/bench/_qualify.py", line 347, in chay
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6517025Z     ws = R.materialize(task, thu_muc / "run" / client.id / task.id / f"s{i}",
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6517438Z          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6517920Z   File "/home/runner/work/aisef/aisef/tests/bench/_runner.py", line 134, in materialize
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6518453Z     tar = subprocess.run(["git", "archive", "--format=tar", task.base], cwd=repo,
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6518864Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6519372Z   File "/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/subprocess.py", line 571, in run
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6519893Z     raise CalledProcessError(retcode, process.args,
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6520946Z subprocess.CalledProcessError: Command '['git', 'archive', '--format=tar', 'db0081275046d687e136bc2540cae78a156e7dd1']' returned non-zero exit status 128.
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6521525Z 
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6521640Z ======================================================================
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6522416Z ERROR: test_phien_bi_cat_vao_so_dung_nhan_va_ghi_ngay_sau_tung_phien (test_bench_qualification.TestDuongOngTuyenCap.test_phien_bi_cat_vao_so_dung_nhan_va_ghi_ngay_sau_tung_phien)
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6523380Z 7 phiên: trần cắt của cohort ấy là ⌊7/6⌋ = 1, nên một phiên cắt **không**
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6523795Z ----------------------------------------------------------------------
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6524135Z Traceback (most recent call last):
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6524849Z   File "/home/runner/work/aisef/aisef/tests/test_bench_qualification.py", line 258, in test_phien_bi_cat_vao_so_dung_nhan_va_ghi_ngay_sau_tung_phien
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6525635Z     rows = Q.chay(self.client, task_id=TASK_RE, phien=7, note="cặp-giả",
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6526190Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6526669Z   File "/home/runner/work/aisef/aisef/tests/bench/_qualify.py", line 347, in chay
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6527171Z     ws = R.materialize(task, thu_muc / "run" / client.id / task.id / f"s{i}",
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6527573Z          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6528054Z   File "/home/runner/work/aisef/aisef/tests/bench/_runner.py", line 134, in materialize
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6528588Z     tar = subprocess.run(["git", "archive", "--format=tar", task.base], cwd=repo,
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6528997Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6529503Z   File "/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/subprocess.py", line 571, in run
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6530026Z     raise CalledProcessError(retcode, process.args,
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6530991Z subprocess.CalledProcessError: Command '['git', 'archive', '--format=tar', 'db0081275046d687e136bc2540cae78a156e7dd1']' returned non-zero exit status 128.
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6531584Z 
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6531703Z ======================================================================
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6532447Z ERROR: test_phien_tuyen_giong_hinh_dang_nhanh_AISEF_cua_cohort (test_bench_qualification.TestDuongOngTuyenCap.test_phien_tuyen_giong_hinh_dang_nhanh_AISEF_cua_cohort)
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6533330Z Chống trôi: đề bài, env và argv của phiên tuyển phải bằng của
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6533720Z ----------------------------------------------------------------------
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6534061Z Traceback (most recent call last):
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6534712Z   File "/home/runner/work/aisef/aisef/tests/test_bench_qualification.py", line 294, in test_phien_tuyen_giong_hinh_dang_nhanh_AISEF_cua_cohort
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6535388Z     R.run(task, self.client, attempts=1, bare=False, note="cohort")
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6535910Z   File "/home/runner/work/aisef/aisef/tests/bench/_runner.py", line 392, in run
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6536641Z     ws = materialize(task, KEEP_DIR / "run" / condition / task.id / f"a{n}", tests=task.tests_visible)
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6537149Z          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6537650Z   File "/home/runner/work/aisef/aisef/tests/bench/_runner.py", line 134, in materialize
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6538186Z     tar = subprocess.run(["git", "archive", "--format=tar", task.base], cwd=repo,
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6538600Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6539098Z   File "/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/subprocess.py", line 571, in run
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6539614Z     raise CalledProcessError(retcode, process.args,
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6540562Z subprocess.CalledProcessError: Command '['git', 'archive', '--format=tar', 'db0081275046d687e136bc2540cae78a156e7dd1']' returned non-zero exit status 128.
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6541160Z 
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6541307Z ----------------------------------------------------------------------
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6541651Z Ran 3072 tests in 100.845s
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6541802Z 
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6541905Z FAILED (errors=4, skipped=81)
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.6542225Z   git init → /tmp/tmprdwx1n0p
+build	Kiểm phát hành (unit + bảng hợp quy còn mới)	2026-09-14T23:21:53.7085478Z ##[error]Process completed with exit code 1.

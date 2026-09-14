@@ -1,0 +1,15 @@
+{
+  "question": "does docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md hard-code an old AISEF PRODUCT release version, which would make G6 structurally unable to validate 1.7.0?",
+  "answer": "NO -- v1.1.0 is the PROTOCOL/SCHEMA version. Left unchanged, per owner item 0B.",
+  "checked": "2026-09-15, before the v1.7.0 tag",
+  "evidence": [
+    "the protocol file is titled 'External Validation Protocol - v1.1.0': the version qualifies the protocol, not the product under test",
+    "docs/closure-gate.json G6.1 notes: 'docs/EXTERNAL-VALIDATION-v1.1.0.md is the PROTOCOL, not the record' -- v1.1.0 is part of the protocol's identity",
+    "the protocol's `## Protocol` section (the 7 items the onboarding digest covers) pins NO product version: prerequisites are Python >= 3.11 and an agent CLI, materials are pointers",
+    "docs/EXTERNAL-VALIDATION-QUICKSTART.md line 47 installs with `pip install aisef` -- UNPINNED, so it resolves to whatever is current on PyPI (1.7.0 after this release)",
+    "docs/TEMPLATE-EXTERNAL-VALIDATION-REPORT.md line 35 carries a FIELD `AISEF version validated | <aisef --version output>` -- the product version is data the participant records, not a constant in the path",
+    "probe_external_report reads the protocol path only to name it; it binds freshness to closure-evidence/onboarding-digest.json, which covers commands and config defaults, never a version string"
+  ],
+  "stale_prose_noted_not_changed": "the protocol body says 'v1.1.0 ships when an external user completes the full lifecycle', true when written (v1.0.0 was current, v1.1.0 was next). It is historical framing and changes nothing mechanically: no probe, no digest source, and no install command depends on it. Changing it would be a source edit requiring a new final_closure_target_sha for no gate benefit.",
+  "consequence": "G6 can validate aisef==1.7.0 from public PyPI with no source change. Release may proceed."
+}
