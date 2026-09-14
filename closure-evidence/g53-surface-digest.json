@@ -1,0 +1,13 @@
+{
+  "files": {
+    "tests/bench/_qualify.py": "282e6e4e9b0f5b50",
+    "tests/bench/_runner.py": "2a1e4a7793097c34",
+    "tests/bench/__main__.py": "59918172e5f1824e",
+    "aisef/clients/opencode.py": "8f37ff968e410376",
+    "aisef/clients/base.py": "83307c685f05c0bc",
+    "aisef/clients/stream.py": "44fdf54eda5c4a59",
+    "docs/BENCH-PAIR-QUALIFICATION-PROTOCOL.md": "0592260191d25d50"
+  },
+  "combined": "cdd29b27f4455622",
+  "why": "G5.3 evidence depends on exactly this surface: client execution, cut classification, retry semantics, qualification scoring, and the frozen protocol. A later source change that leaves this digest unchanged cannot have affected the qualification, so the evidence survives; if it changes, the run is stale and must be repeated."
+}
