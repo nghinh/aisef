@@ -98,7 +98,17 @@ def main(argv: list[str] | None = None) -> int:
     # dataset làm lời khai "chạy theo thứ tự này" trong báo cáo thành sai mà
     # không ai thấy (đo 2026-09-12: lô `multi-3 multi-1` chạy multi-1 trước).
     by_id = {t.id: t for t in tasks}
-    pick = [by_id[i] for i in ids if i in by_id] if ids else list(tasks)
+    # Tên không có trong bộ dữ liệu là **lỗi**, không phải chuyện bỏ qua được:
+    # một đợt đo tuyển task theo danh sách tên (xem
+    # `docs/BENCH-TASK-DISCRIMINATION.md`) mà đánh sai một tên thì cohort ngắn đi
+    # trong im lặng, và câu "đợt này chạy tuyển chọn X" trong báo cáo thành sai
+    # mà không ai kiểm được. Danh sách hợp lệ thì hành vi **không đổi một chút**.
+    thieu = [i for i in ids if i not in by_id]
+    if thieu:
+        print(f"không có task nào tên: {', '.join(thieu)} — bộ dữ liệu có "
+              f"{len(tasks)} task, xem `tests/bench/tasks/`.", file=sys.stderr)
+        return 2
+    pick = [by_id[i] for i in ids] if ids else list(tasks)
     khoa = _giu_khoa(a.cmd)
     if khoa is False:
         return 3

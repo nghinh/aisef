@@ -96,4 +96,4 @@ chạy theo đúng định nghĩa "một lượt" của C-1**, nên hai cohort s
 | 1 | Lỗi 86 (`ok=True` che phiên bị cắt) | ✅ sửa 13/09, có hiệu lực từ đợt sau |
 | 2 | Cột 2 — đổi model sau alias | ⏳ chờ chủ dự án |
 | 3 | Đo trên cặp model↔CLI **không** có kiểu hỏng phiên bị cắt | ⏳ — đây là việc đáng làm nhất còn lại: 32 %/22 % phiên bị cắt làm mọi hiệu số nhỏ hơn nó trở thành vô nghĩa |
-| 4 | Tuyển task theo tiêu chí "đã từng có nhánh thắng nhánh kia" | ⏳ — C-1 cho 9 lượt có thông tin trên 6 giờ; C-1b cho 36 lượt có thông tin trên 2 giờ |
+| 4 | Tuyển task theo tiêu chí "đã từng có nhánh thắng nhánh kia" | ✅ 14/09 — đo ở [BENCH-TASK-DISCRIMINATION](BENCH-TASK-DISCRIMINATION.md): 3/30 task từng tách được hai nhánh, tuyển chọn cắt ~3/4 hoá đơn mà không mất cặp thông tin nào. Hai con số "9 lượt" và "36 lượt" ở dòng này **không cùng đơn vị** (một nhánh so với hai) và số cặp thật sự mang thông tin là 12 (C-1) so với **0** (C-1b, sau khi bỏ lượt hỏng hạ tầng đúng như giao thức C-1b khai) — nên việc 3 phải làm trước việc này |
