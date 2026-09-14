@@ -1788,3 +1788,50 @@ class TestBangChungTuNoLamMinhCu(unittest.TestCase):
         p = self.probe(repo)
         self.assertIs(p.outcome, Outcome.UNRUNNABLE)
         self.assertIn("re-record", p.detail)
+
+
+class TestChotDichCungTuLamMinhCu(unittest.TestCase):
+    """Anh em của lỗi 162, ở `closure_target_sha`.
+
+    `pin_target` ghi HEAD vào `docs/closure-gate.json` — một tệp **không** nằm
+    dưới `closure-evidence/`. Commit bản ghim ấy làm HEAD đi qua đúng commit vừa
+    ghim, nên vế thứ hai của G1.0 (*HEAD vẫn là đích*) hỏng ngay sau khi chốt.
+    Không commit thì cây bẩn, và `pin_target` từ chối cây bẩn — cùng vòng không
+    lối ra mà 162 đã đo, chỉ đổi tệp.
+
+    Nới cùng một chừng và không hơn: sổ sách đóng dự án (`closure-evidence/` và
+    chính tệp tiêu chí) không phải mã nguồn, nên một commit chỉ đụng chúng không
+    làm bằng chứng hay đích cũ. Một tệp mã đổi thì vẫn cũ.
+    """
+
+    def _repo(self, *, extra: str = ""):
+        c = crit("G1.0", "aisef.control.closure:probe_closure_target",
+                 evidence="closure-evidence/release.json")
+        repo = Repo(spec_of(c))
+        self.addCleanup(repo.close)
+        git(repo.root, "tag", "v9.9.9")
+        repo.write_json("closure-evidence/release.json", {"version": "9.9.9", "tag": "v9.9.9"})
+        git(repo.root, "add", "."); git(repo.root, "commit", "-m", "release record")
+        git(repo.root, "tag", "-f", "v9.9.9")          # tag the revision being certified
+        CL.pin_target(repo.root)                        # ghi đích = HEAD
+        if extra:
+            repo.write(extra, "x\n")
+        git(repo.root, "add", "."); git(repo.root, "commit", "-m", "pin the target")
+        repo.spec = CL.load_spec(repo.root)      # pin_target wrote to disk
+        return repo
+
+    def probe(self, repo):
+        return CL.probe_closure_target(
+            repo.ctx({"evidence": "closure-evidence/release.json"}))
+
+    def test_commit_cua_chinh_ban_ghim_khong_lam_dich_cu(self):
+        repo = self._repo()
+        p = self.probe(repo)
+        self.assertIs(p.outcome, Outcome.PASSED, p.detail)
+
+    def test_commit_dung_ma_nguon_thi_dich_cu(self):
+        """Phép kiểm âm: mã đổi sau khi chốt thì G2–G5 nói về bản khác."""
+        repo = self._repo(extra="aisef/thay_doi.py")
+        p = self.probe(repo)
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("HEAD", p.detail)

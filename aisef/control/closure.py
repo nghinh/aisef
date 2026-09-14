@@ -234,8 +234,8 @@ def _missing(what: str) -> Probed:
     return Probed(Outcome.UNRUNNABLE, f"missing: {what}")
 
 
-def _only_evidence_changed(ctx: Ctx, at: str) -> bool:
-    """True when every file changed between ``at`` and HEAD is recorded evidence.
+def _only_bookkeeping_changed(ctx: Ctx, at: str) -> bool:
+    """True when every file changed between ``at`` and HEAD is closure bookkeeping.
 
     Lỗi 162. Bằng chứng buộc vào `commit` mà **chính nó** được git theo dõi thì
     không bao giờ hiện hành được: ghi ở commit X, rồi commit tệp bằng chứng làm
@@ -249,11 +249,17 @@ def _only_evidence_changed(ctx: Ctx, at: str) -> bool:
     nên câu trả lời vẫn là có. Nới đúng chừng ấy: một tệp nào **ngoài** thư mục
     ấy đổi thì bằng chứng cũ, như trước.
 
+    Tệp tiêu chí (`docs/closure-gate.json`) cùng lớp, và vì cùng lý do: chốt
+    `closure_target_sha` ghi vào nó, nên commit bản ghim làm HEAD đi qua đúng
+    commit vừa chốt và vế *HEAD vẫn là đích* của G1.0 hỏng ngay sau khi chốt —
+    anh em của cùng một lỗi, chỉ đổi tệp. Sổ sách đóng dự án không phải mã nguồn.
+
     Không đọc được danh sách thay đổi → `False`: không biết thì coi là cũ.
     """
     changed = _git_out(ctx.root, "diff", "--name-only", f"{at}..HEAD")
     names = [ln.strip() for ln in changed.splitlines() if ln.strip()]
-    return bool(names) and all(n.startswith(f"{EVIDENCE_DIR}/") for n in names)
+    return bool(names) and all(
+        n.startswith(f"{EVIDENCE_DIR}/") or n == CRITERIA_PATH for n in names)
 
 
 def _at_commit(ctx: Ctx, rec: dict, field_name: str = "commit") -> Probed | None:
@@ -266,7 +272,7 @@ def _at_commit(ctx: Ctx, rec: dict, field_name: str = "commit") -> Probed | None
     if not at:
         return Probed(Outcome.UNRUNNABLE, f"record names no `{field_name}`")
     if not (head.startswith(at) or at.startswith(head)):
-        if _only_evidence_changed(ctx, at):
+        if _only_bookkeeping_changed(ctx, at):
             return None
         return Probed(Outcome.UNRUNNABLE,
                       f"recorded at {at[:7]}, HEAD is {head[:7]} — re-run and re-record")
@@ -926,7 +932,8 @@ def probe_closure_target(ctx: Ctx) -> Probed:
                       f"{target[:12]} — the released artefact and the revision being "
                       f"closed are different software; release the closure candidate, "
                       f"or re-pin the target at the commit actually released")
-    if not (head.startswith(target) or target.startswith(head)):
+    if not (head.startswith(target) or target.startswith(head)) \
+            and not _only_bookkeeping_changed(ctx, target):
         return Probed(Outcome.FAILED,
                       f"HEAD is {head[:12]}, closure targets {target[:12]} — G2 to G5 "
                       f"bind their evidence to HEAD, so that evidence describes a "
