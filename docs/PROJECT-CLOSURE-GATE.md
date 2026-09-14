@@ -1,8 +1,39 @@
 # AISEF Project Closure Gate
 
-**Status: DRAFT — awaiting owner approval. Not in force.**
-Drafted 2026-09-14 against `v1.6.0` + 18 commits. Every number below carries the
-command that produced it; re-run them rather than trusting this document.
+**Status: APPROVED — in force.**
+Approved by the project owner on **2026-09-14**, subject to the rulings recorded
+in §0. Drafted 2026-09-14 against `v1.6.0` + 18 commits. Every number below
+carries the command that produced it; re-run them rather than trusting this
+document.
+
+---
+
+## 0. Owner decision, 2026-09-14
+
+The owner approved this contract as the successor closure definition and issued
+seven rulings. They are recorded here verbatim in effect, and the gate text in
+§5 has been amended to match. Where a ruling overrides what I drafted, the draft
+wording is named so the change is visible.
+
+| # | subject | ruling |
+|---|---|---|
+| 1 | **G2.4b** judge-only blocking | Stays `REQUIRED_WITH_WAIVER_ALLOWED`. The 36.8 % judge-alone rate does **not** become an unconditional hard blocker — a model-judge is probabilistic, not a deterministic guarantee. But before it may be waived, four properties must hold (§5 G2.4b). No reviewer redesign for closure's sake. |
+| 2 | **G4** primary corpus | **`marks-cli` is the primary closure corpus**, because it exercises this wave's fixes. `todo-oc` is fallback **only** for an external/environmental block — never for an unresolved AISEF defect — and invoking it requires owner approval of the named R1 substitution. |
+| 3 | **G5.3** model↔CLI pair | **Not waived now.** A bounded, cheap qualification of available pairs runs first. Column 2 does not start until G5.3 passes. If no pair qualifies → `WAIVER_PENDING` and stop. "An honest INCONCLUSIVE benchmark is acceptable. A contaminated benchmark presented as meaningful is not." |
+| 4 | **G6** staleness | The arbitrary "one minor version" is **replaced**: validation is current when the validated version shares `MAJOR.MINOR` with the closure release **and** a deterministic *onboarding digest* has not materially changed. Patch releases do not invalidate it; cosmetic doc edits must not either. The participant must be a genuinely external **person** — an AI agent or AISEF contributor cannot satisfy G6. |
+| 5 | **G3** conformance timing | Do **not** re-run to refresh a still-valid timestamp. Re-run only if it expires before closure, **or** code touching client adapters, hooks/plugins, isolation, conformance behaviour or first-class-client semantics changes. `RELEASE_CLIENTS` must include **both** `claude` and `opencode`, with regression tests; that change alone does not justify re-running. |
+| 6 | **G2.3** defect source | **Not** GitHub Issues as canonical. A repository-local, version-controlled, machine-readable register is canonical; Issues may mirror it. Closure must not depend on an external tracker. PASS = zero OPEN P0/P1 in the register. |
+| 7 | **G5.1** pre-registration | Promote from a working handoff note to a digest-pinned closure artifact. Its prediction and success criteria are **not** rewritten after data exists; historical text stays historical. |
+
+**Standing constraints from the same decision.** The evaluator is read-only and
+must never launch agents, run paid workloads, modify a corpus, auto-approve,
+turn `UNCONFIGURED` into `PASS`, or silently replace a missing corpus. No
+features are added while executing closure. Criteria are never softened to reach
+`PASS`, and metrics are not optimised after seeing results. `aisef closure
+--approve` is the owner's to run, never mine.
+
+The stated target, quoted: *"produce enough trustworthy evidence that I, as
+owner, can legitimately declare the AISEF engineering project complete."*
 
 This document answers one question the repository could not previously answer:
 **what has to be true for the AISEF engineering project to be declared
@@ -287,6 +318,24 @@ source is itself a closure item** (§7, REQUIRED_FOR_CLOSE, size S). Proposal:
 GitHub Issues with `P0`/`P1` labels, read via `gh issue list --label P0 --state
 open`, with the empty result being a real PASS rather than an absence.
 
+**Owner ruling 6 (2026-09-14) overrides that proposal.** GitHub Issues must
+**not** be canonical — closure cannot depend on an external tracker being
+reachable. The canonical register is **repository-local, version-controlled,
+deterministic, machine-readable**, at `docs/DEFECT-REGISTER.json`: stable defect
+id · severity on the existing P0–P3 scale · status · introduced/fixed version or
+commit where known · regression-test or evidence reference. Issues may *mirror*
+it.
+
+**No duplicate truth with `FAILURE-TAXONOMY.md`.** That file is the *post-mortem*
+record — 133 rows of symptom, root cause, lesson, fix, every one already closed.
+The register is the *open-defect ledger*. The boundary: the taxonomy answers
+"what went wrong and what did we learn"; the register answers "what is
+outstanding now, at what severity". A defect sits in the register while open and
+in the taxonomy once understood, and the register references the taxonomy row by
+id rather than restating it.
+
+**G2.3 PASS condition:** zero **OPEN** P0/P1 defects in the canonical register.
+
 **The severity ladder need not be invented.** `EXTERNAL-VALIDATION-v1.1.0.md`
 already defines P0–P3, and its P0 includes "**incorrect gate result**" — which is
 precisely the false-PASS class G2.4 is about. Reuse that definition for both
@@ -317,10 +366,27 @@ one rather than the convenient one — **split the criterion by check kind**:
 That third condition is currently **not** met and is measurable: 21 of 57 blocks
 (36.8 %) rested on the judge's word alone, and on `todo-e2e` 15 of 17 did. So
 G2.4 decomposes into G2.4a (deterministic false PASS — today PASSED, none known)
-and G2.4b (judge-alone blocking decisions — today **FAILED**). I am flagging
-G2.4b as the criterion most likely to need your ruling: it can be read as a
-closure blocker or as a POST_CLOSE quality target, and I have placed it as
-REQUIRED_WITH_WAIVER_ALLOWED rather than deciding for you.
+and G2.4b (judge-alone blocking decisions).
+
+**Owner ruling 1 (2026-09-14).** G2.4b stays `REQUIRED_WITH_WAIVER_ALLOWED`. The
+measured rate does **not** become an unconditional hard blocker, because a
+model-judge is a probabilistic mechanism, not a deterministic guarantee — its
+error rate must stay published, reproducible from recorded evidence, and clearly
+separated from deterministic checks. **No reviewer architecture redesign is to be
+undertaken merely to close the project.**
+
+Before G2.4b may be waived, four properties must be verified to hold — and if a
+mechanism is missing, the *smallest safe* one is implemented:
+
+| # | property | why it is the real safeguard |
+|---|---|---|
+| G2.4b-i | a judge-only block is **explicitly identifiable** in evidence | an operator must be able to ask "was anything deterministic behind this?" and get an answer from the record, not from a re-read of prose |
+| G2.4b-ii | it is **distinguishable** from deterministic blocking | the two have different trust levels; one record shape for both erases that |
+| G2.4b-iii | it has a **human escape/override path** | a probabilistic blocker with no override is a stop, not a gate — and the measured 34–39 % miss / 11-of-20 reversal rate means it *will* be wrong |
+| G2.4b-iv | it **cannot masquerade** as a deterministic guarantee | the failure this whole contract guards against: a soft signal read as a hard one |
+
+At final closure, if the judge-alone property remains, G2.4b is marked `WAIVED`
+**only** with an explicit owner reason recorded in the closure report.
 
 **Human decision:** only for G2.4b if waived. **Waiver-eligible:** G2.3 and
 G2.4b yes; G2.1, G2.2, G2.4a no.
@@ -365,6 +431,15 @@ framework would be asserting a safety property it has not tested.
 framework's constant. Per your instruction, no re-run is demanded while the
 window is valid; the report prints days remaining.
 
+**Owner ruling 5 (2026-09-14).** Conformance is **not** re-run to refresh a
+still-valid timestamp. It is re-run only when **(A)** it would expire before final
+closure, or **(B)** code changes affecting client adapters, hooks/plugins,
+isolation, conformance behaviour, or first-class-client semantics. Correcting
+`RELEASE_CLIENTS` to include both clients is a **release-policy interpretation**
+change, not a behavioural one, and the table already carries passing 10/10
+columns for both — so it does **not** trigger condition B and no model calls are
+spent on it. At final closure the evidence must still be fresh.
+
 **Today: PASSED, expiring 2026-09-22.**
 
 ```
@@ -406,13 +481,23 @@ corpus exercising this wave's fixes. Those pull in opposite directions:
 - `marks-cli` — **exercises the fixes** (bug 148 was found there, and 155/156
   affect it), but sits at 2 done / 1 failed / 4 never run.
 
-Completing `marks-cli` needs paid agent sessions, which your instruction
-forbids until this contract is approved. So G4 is presently blocked on a
-decision, not on work. My recommendation, for your ruling: require **one**
-corpus to satisfy G4.1–G4.7, prefer `marks-cli` because it exercises the fixes,
-and permit `todo-oc` as the fallback if completing `marks-cli` reveals further
-defects — with the fallback recorded as a named substitution under R1, not as a
-silent swap.
+**Owner ruling 2 (2026-09-14): `marks-cli` is the PRIMARY closure corpus.**
+It directly exercises the fixes of this finishing wave, including the
+planning/falsifiability problems around defect 148. The sequence is: regenerate
+its plan under current rules → verify placeholder/scaffolding criteria are
+rejected → run to completion targeting **7/7 DONE** → canonical
+verification/review/security lifecycle → DevSecOps artefacts → `pre-deploy` →
+prepare `PRE_DEPLOY` for human approval.
+
+**If `marks-cli` discovers a genuine framework defect, the corpus is not
+switched.** Reproduce it, add a regression test, fix it, run the full suite,
+resume `marks-cli`. This is the ruling that gives G4 its teeth: a corpus that may
+be abandoned when it finds a defect tests nothing.
+
+`todo-oc` is **fallback only**, admissible solely when `marks-cli` is blocked by
+an external or environmental condition rather than an unresolved AISEF defect.
+Invoking it requires **stopping and obtaining owner approval** of the named R1
+substitution — it is never a silent swap.
 
 **`todo-oc`'s pre-deploy currently fails for corpus reasons, not framework
 reasons** — measured 2026-09-14: `scope`, `all stories done` and `human gates`
@@ -458,6 +543,13 @@ working note. For it to function as pre-registration it must be digest-pinned so
 it cannot be edited once data exists. Moving or pinning it is a
 REQUIRED_FOR_CLOSE item of size S.
 
+**Owner ruling 7 (2026-09-14).** It is promoted to a digest-pinned closure
+artifact. Its prediction and success criteria are **not** rewritten after data
+exists, and the historical handoff text stays historical; the gate verifies its
+digest. The pin is what gives pre-registration its meaning — an unpinned
+prediction is indistinguishable from a post-hoc one, and this project has already
+published one number (the ±0.08 band) that did not survive re-reading.
+
 **G5.3 is why the 72-attempt run must not start.** Measured this session:
 
 ```
@@ -481,12 +573,26 @@ from C-1b's artifact delta. The "36× cost gap" between `e9` and `par` is the
 standing example of a historical claim that cannot be reproduced and is now
 labelled as such.
 
-**Semantics.** G5.1/G5.4 mechanical. G5.3 `UNRUNNABLE` until a qualifying pair
-exists — blocking, and honestly so. G5.6 `FAILED` on any instance found.
-**Human decision:** no, except to waive G5.3. **Waiver-eligible:** G5.3 only,
-because it can require an endpoint the project cannot procure; waiving it means
-closing with the second column unrun, which must be stated in the closure record
-rather than implied.
+**Owner ruling 3 (2026-09-14): G5.3 is not waived now.** A **bounded
+qualification** of currently available model↔CLI pairs runs first, cheap relative
+to the full benchmark, to establish at least one pair whose session-cut behaviour
+satisfies the pre-registered validity rule. Per pair, the report must state:
+model · client · qualification sessions · cut sessions · cut-session rate ·
+timeout/infra failures · qualifies (yes/no) · evidence path.
+
+- a pair qualifies → it is used for Column 2;
+- no available pair qualifies → G5.3 becomes **`WAIVER_PENDING`**, stating exactly
+  what was tried and why each failed, the 72-attempt run does **not** start, and
+  execution stops for the owner's waiver decision.
+
+Quoted from the decision: *"An honest INCONCLUSIVE benchmark is acceptable. A
+contaminated benchmark presented as meaningful is not."*
+
+**Semantics.** G5.1/G5.4 mechanical. G5.3 `UNRUNNABLE` until qualification runs,
+then `PASSED` or `WAIVER_PENDING` — blocking in every state but `PASSED` and
+`WAIVED`. G5.6 `FAILED` on any instance found. **Human decision:** only to waive
+G5.3. **Waiver-eligible:** G5.3 only; waiving it means closing with the second
+column unrun, which the closure record must state outright rather than imply.
 
 **Today: FAILED** (G5.3 `UNRUNNABLE` — no cut-session-free pair established;
 G5.1 needs pinning; G5.2, G5.4, G5.5 pass; G5.6 passes as of this session's
@@ -546,11 +652,35 @@ waiver is explicitly yours per your brief. **Waiver-eligible:** G6.3 yes; G6.1
 and G6.2 no, because waiving the existence of external validation returns the
 project to measuring only itself.
 
-**Staleness.** Bound to the released version the participant used. A record
-against a version more than one minor behind should be flagged, not auto-failed
-— the onboarding path changes slowly. I suggest you set that tolerance; I have
-put one minor version in the draft schema and flag it as a value I chose
-arbitrarily.
+**Staleness — owner ruling 4 (2026-09-14).** The arbitrary "one minor version"
+tolerance I drafted is **replaced**. External validation is current when **both**
+hold:
+
+1. the validated version shares `MAJOR.MINOR` with the closure release — patch
+   releases within the same minor do **not** invalidate it; **and**
+2. the **onboarding digest** has not materially changed since that validation.
+
+The onboarding digest is a deterministic hash over the *public onboarding
+surface* only, so that cosmetic documentation edits cannot invalidate a real
+validation while a material change cannot hide:
+
+| in the digest | why |
+|---|---|
+| installation instructions | the first thing that can fail |
+| Quick Start section | the path the participant actually follows |
+| the canonical public CLI workflow (verb sequence + flags) | what the protocol asks them to run |
+| config defaults relevant to onboarding | a changed default silently changes their experience |
+| commands required by the external-validation protocol | the protocol's own steps |
+
+Normalisation is part of the definition, not an implementation detail: the digest
+is taken over extracted, normalised content (whitespace collapsed, prose
+reflowing ignored), never over raw file bytes — a byte digest would make a
+typo fix invalidate a real human's validation, which is the outcome this ruling
+exists to prevent.
+
+**The participant must be a genuinely external person.** An AI agent cannot
+satisfy G6, and neither can an AISEF contributor. This is stated as a criterion
+because it is exactly the corner an agent under time pressure would cut.
 
 **Today: UNRUNNABLE** — no audited record. This is the gate with the longest
 lead time, because it needs a volunteer, and it is the one item no amount of
@@ -683,27 +813,30 @@ is the correct route.
 
 ---
 
-## 9. What I did not do, and the decisions I am handing you
+## 9. What was not done at drafting time
 
-**Not done, deliberately:** I wrote no code. `aisef closure`,
-`docs/closure-gate.json`, and the `Gate.CLOSURE` approval entry are *designed*
-in §4 and unimplemented, per your instruction. No paid run was launched. No
-historical document was edited — this document names what it supersedes and
-nothing else changed.
+**At drafting time (before approval):** no code was written — `aisef closure`,
+`docs/closure-gate.json` and the `Gate.CLOSURE` approval entry were designed in
+§4 and left unimplemented; no paid run was launched; no historical document was
+edited. **Since approval** the machinery in §4 is being implemented per §10 wave
+0, and this line stops being the current state — check `git log` for what has
+landed rather than trusting this paragraph.
 
-**Decisions I need from you:**
+**Decisions taken by the owner, 2026-09-14.** All five open questions in the
+draft are answered in §0 and folded into §5. Nothing in this contract is now
+awaiting my judgement.
 
-1. **G2.4b** — is a 36.8 % judge-alone blocking rate a closure blocker or a
-   published property? I placed it as waiver-eligible rather than deciding.
-2. **G4's corpus** — complete `marks-cli` (exercises this wave's fixes, needs
-   paid runs) or accept `todo-oc` (complete, predates the fixes) as a named R1
-   substitution?
-3. **G5.3** — is closing with column 2 unrun acceptable via waiver, or must a
-   clean model↔CLI pair be found first?
-4. **G6's staleness tolerance** — I put "one minor version" in the draft
-   schema. That number is arbitrary and yours to set.
-5. **G3's deadline** — conformance expires **2026-09-22**. Approving after that
-   date starts with a red gate and a ~$1.50 re-run.
+## 10. Execution order, as ruled
+
+| wave | contents | lane |
+|---|---|---|
+| **0** | closure machinery · `RELEASE_CLIENTS` · defect register · pin pre-registration · G2.4b audit/override semantics · docs reconciliation · full suite from the **main** checkout · ruff | free, parallel, merge one at a time with the full suite between each |
+| **1** | `marks-cli` → 7/7 → `pre-deploy` with real agents; framework defects fixed and the corpus resumed, never swapped | paid |
+| **2** | bounded model↔CLI pair qualification; Column 2 **only** if a pair qualifies, else `WAIVER_PENDING` and stop | paid, bounded |
+| **3** | prepare everything a real external participant needs; report `WAITING_FOR_EXTERNAL_PARTICIPANT`; **fabricate nothing** | free |
+| **4** | refresh G1–G3 evidence, confirm G4 approved, G5 PASS or owner-waived, G6 report exists; run `aisef closure`; present the evidence table | owner approves |
+
+`aisef closure --approve` is the owner's command. It is never run on their behalf.
 
 **One thing I want to flag as a risk in my own draft.** G2.3 and G5.1 are items
 this document *creates* — a defect-tracking source and a pinned
