@@ -163,6 +163,47 @@ def materialize(task: Task, dest: Path | str, *, tests: bool = False, gold: bool
     return dest
 
 
+#: Artefacts no bench run may leave at the framework repository root. The repo is
+#: not an AISEF project: it has no `_bmad-output`, and every session has its own
+#: workspace to write into.
+RANH_GIOI = ("_bmad-output",)
+
+
+class RanhGioiViPham(RuntimeError):
+    """A bench run wrote outside its workspace, into the framework repository."""
+
+
+def chup_ranh_gioi(root: Path | None = None) -> dict[str, bool]:
+    """Boundary state **before** a run — what already existed is not this run's doing."""
+    root = root or ROOT
+    return {t: (root / t).exists() for t in RANH_GIOI}
+
+
+def kiem_ranh_gioi(truoc: dict[str, bool], root: Path | None = None) -> str:
+    """Names this run left at the repository root — "" when clean."""
+    root = root or ROOT
+    return ", ".join(t for t, co in truoc.items() if not co and (root / t).exists())
+
+
+def bat_buoc_ranh_gioi(truoc: dict[str, bool], root: Path | None = None) -> None:
+    """Abort the run on a boundary violation — warning is not enough (lỗi 166).
+
+    The arithmetic decides it: column 2 is 72 attempts over many session-hours,
+    so a leak noticed at the end means the whole run happened against a dirty
+    repository, and `closure.pin_target` refuses a dirty tree — the benchmark
+    could block the very closure-target freeze it was run to support, after the
+    money was already spent. Checked after **each task**: stopping early costs
+    one task, stopping late costs the cohort.
+    """
+    ro = kiem_ranh_gioi(truoc, root)
+    if ro:
+        raise RanhGioiViPham(
+            f"bench run left `{ro}` at the framework repository root ({root or ROOT}). "
+            f"Every session has its own workspace; the repo root is not an AISEF project. "
+            f"Aborting rather than continuing against a dirty tree (lỗi 166)."
+        )
+
+
 def _run_tests(ws: Path, **kw):
     return run_tool("test", ws, config=Config.load(ws), **kw)
 

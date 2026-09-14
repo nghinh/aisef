@@ -451,3 +451,52 @@ class TestRanhGioiCayLamViec(unittest.TestCase):
             root = Path(tmp)
             (root / "_bmad-output").mkdir()
             self.assertEqual(Q.ro_ri_ngoai_workspace(root, truoc=True), "")
+
+
+class TestRanhGioiChanDotDo(unittest.TestCase):
+    """Lỗi 166, phần ngăn chặn — với cột 2 thì **cảnh báo là không đủ**.
+
+    Chủ dự án: một vi phạm ranh giới phải **huỷ** đợt đo, không phải ghi một dòng
+    cảnh báo rồi chạy tiếp. Lý do là số học: cột 2 là 72 lượt, nhiều giờ phiên;
+    một rò rỉ phát hiện ở cuối nghĩa là toàn bộ đợt chạy trên một kho đã bẩn, và
+    `closure.pin_target` từ chối cây bẩn — tức đợt đo có thể chặn đúng bước chốt
+    đích đóng dự án, sau khi đã tiêu hết tiền.
+
+    Kiểm sau **từng task** chứ không chỉ ở cuối: chặn sớm thì mất một task, chặn
+    muộn thì mất cả đợt.
+    """
+
+    def test_vi_pham_thi_nem_loi_chu_khong_tra_ve(self):
+        import tempfile
+        from tests.bench import _runner as R
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            truoc = R.chup_ranh_gioi(root)
+            (root / "_bmad-output").mkdir()
+            with self.assertRaises(R.RanhGioiViPham) as e:
+                R.bat_buoc_ranh_gioi(truoc, root)
+            self.assertIn("_bmad-output", str(e.exception))
+
+    def test_sach_thi_khong_nem(self):
+        import tempfile
+        from tests.bench import _runner as R
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            R.bat_buoc_ranh_gioi(R.chup_ranh_gioi(root), root)   # không nổ
+
+    def test_co_tu_truoc_thi_khong_do_cho_dot_chay(self):
+        """Phép kiểm âm: thư mục có sẵn trước đợt chạy không phải do nó tạo ra."""
+        import tempfile
+        from tests.bench import _runner as R
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "_bmad-output").mkdir()
+            truoc = R.chup_ranh_gioi(root)
+            R.bat_buoc_ranh_gioi(truoc, root)                     # không nổ
+
+    def test_qualify_dung_lai_cung_mot_ban_cai_dat(self):
+        """Một công thức, một chỗ: đợt tuyển và cột 2 phải dùng chung, nếu không
+        hai bản sẽ lệch nhau đúng lúc cần nhất."""
+        from tests.bench import _qualify as Q, _runner as R
+        self.assertIs(Q.chup_ranh_gioi, R.chup_ranh_gioi)
+        self.assertIs(Q.RANH_GIOI, R.RANH_GIOI)

@@ -162,7 +162,16 @@ def _dispatch(a, tasks: list, pick: list) -> int:
             print("đặt AISEF_BENCH=1 — chạy client thật tốn tiền", file=sys.stderr)
             return 1
         client = R.make_client(a.client)
-        res = [x for t in pick for x in R.run(t, client, attempts=a.attempts, bare=a.bare, model=a.model, note=a.note)]
+        ranh_gioi_truoc = R.chup_ranh_gioi()
+        res = []
+        for t in pick:
+            res += R.run(t, client, attempts=a.attempts, bare=a.bare, model=a.model, note=a.note)
+            try:
+                R.bat_buoc_ranh_gioi(ranh_gioi_truoc)
+            except R.RanhGioiViPham as e:
+                print(f"\nHUỶ ĐỢT ĐO: {e}", file=sys.stderr)
+                print(R.report(res, tasks))
+                return 4
         print(R.report(res, tasks))
     elif a.cmd == "run-both":
         if a.client not in R.SIMULATED_CLIENTS and not R.ENABLED:
@@ -174,6 +183,10 @@ def _dispatch(a, tasks: list, pick: list) -> int:
         if a.shuffle:
             random.Random(a.shuffle).shuffle(order)
             print(f"thứ tự (hạt giống {a.shuffle}): {', '.join(t.id for t in order)}", file=sys.stderr)
+        # Ranh giới workspace (lỗi 166): chụp trước, kiểm sau **từng task**, và
+        # vi phạm thì **huỷ** — không phải cảnh báo. Cột 2 là 72 lượt nhiều giờ;
+        # một rò rỉ phát hiện ở cuối nghĩa là cả đợt chạy trên một kho đã bẩn.
+        ranh_gioi_truoc = R.chup_ranh_gioi()
         res, bo_qua, vi_sao = [], [], ""
         for i, t in enumerate(order):
             phut = sum(x.duration_ms for x in res) / 60_000
@@ -188,6 +201,12 @@ def _dispatch(a, tasks: list, pick: list) -> int:
                 break
             res += R.run(t, client, attempts=a.attempts, bare=False, model=a.model, note=a.note)
             res += R.run(t, client, attempts=a.attempts, bare=True, model=a.model, note=a.note)
+            try:
+                R.bat_buoc_ranh_gioi(ranh_gioi_truoc)
+            except R.RanhGioiViPham as e:
+                print(f"\nHUỶ ĐỢT ĐO sau {i + 1}/{len(order)} task: {e}", file=sys.stderr)
+                print(R.report(res, tasks))
+                return 4
         if bo_qua:
             print(f"{vi_sao} đạt sau {len(order) - len(bo_qua)}/{len(order)} task "
                   f"(đã tiêu {sum(x.cost_usd for x in res):.2f} USD, "
