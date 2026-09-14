@@ -1,7 +1,7 @@
 """Project closure gate — the evaluator for `docs/PROJECT-CLOSURE-GATE.md`.
 
 The contract is the prose; `docs/closure-gate.json` is the machine form this
-module reads. Nothing here decides policy: the six gates, the 26 criteria,
+module reads. Nothing here decides policy: the six gates, the 27 criteria,
 which of them may be waived and what counts as blocking all come from that
 file. This module only **reads evidence and says what it found**.
 
@@ -854,6 +854,64 @@ def frozen_region_digest(path: Path, region: dict) -> str:
     return hashlib.sha256(found[0].strip("\n").encode("utf-8")).hexdigest()
 
 
+def probe_closure_target(ctx: Ctx) -> Probed:
+    """G1.0 — one revision is being certified, and everything points at it.
+
+    Owner adjustment 2: `release_tag_commit == closure_target_sha`. The gap it
+    closes is not hypothetical — G1 certified the PyPI artefact at the *tag*
+    commit while G2–G5 read *HEAD*, 46 commits later. Those are different
+    software, and a closure record that mixes them certifies nothing. The owner
+    named the three moves to refuse: build HEAD but install an older PyPI
+    version; read packaged data from HEAD and call it proof about the old tag;
+    combine evidence from different source revisions into one G1 PASS.
+
+    One criterion owns the invariant rather than four probes each checking a
+    corner, so the failure says "G1 certifies X, closure targets Y" in one
+    place. Two conjuncts, and it must not pass on one of them (bug 154): the tag
+    resolves to the target, **and** HEAD is still the target — G2–G5 bind their
+    evidence to HEAD, so a HEAD that has moved on means their evidence describes
+    something other than what G1 certifies.
+
+    An unset target is UNRUNNABLE: no candidate has been frozen, so there is no
+    invariant to read, and "nothing to compare" is never a pass.
+    """
+    rel = str(ctx.criterion.get("evidence") or "closure-evidence/release.json")
+    rec = ctx.read_json(rel)
+    if rec is None:
+        return _missing(f"{rel} — the release record naming the certified tag")
+    target = str(ctx.spec.get("closure_target_sha") or "")
+    if not target:
+        return Probed(Outcome.UNRUNNABLE,
+                      "`closure_target_sha` is not set in the criteria file — no closure "
+                      "candidate has been frozen, so there is no single revision to "
+                      "certify; run `aisef closure --pin-target` on the candidate")
+    head = ctx.head
+    if not head:
+        return Probed(Outcome.UNRUNNABLE, "cannot read git HEAD here")
+    tag = str(rec.get("tag") or "")
+    if not tag:
+        return Probed(Outcome.UNRUNNABLE, f"{rel} names no `tag` — nothing to resolve")
+    at_tag = _git_out(ctx.root, "rev-list", "-n", "1", tag)
+    if not at_tag:
+        return Probed(Outcome.UNRUNNABLE,
+                      f"tag {tag} does not resolve in this checkout — a release record "
+                      f"whose tag is absent cannot be bound to a revision")
+    if not (at_tag.startswith(target) or target.startswith(at_tag)):
+        return Probed(Outcome.FAILED,
+                      f"G1 certifies {tag} at {at_tag[:12]}, closure targets "
+                      f"{target[:12]} — the released artefact and the revision being "
+                      f"closed are different software; release the closure candidate, "
+                      f"or re-pin the target at the commit actually released")
+    if not (head.startswith(target) or target.startswith(head)):
+        return Probed(Outcome.FAILED,
+                      f"HEAD is {head[:12]}, closure targets {target[:12]} — G2 to G5 "
+                      f"bind their evidence to HEAD, so that evidence describes a "
+                      f"different revision from the one G1 certifies; re-record it at "
+                      f"the target, or re-pin the target and release again")
+    return Probed(Outcome.PASSED,
+                  f"one revision: {tag}, HEAD and closure target all at {target[:12]}")
+
+
 def probe_prereg_digest(ctx: Ctx) -> Probed:
     """G5.1 — the methodology was pre-registered, and its digest still matches.
 
@@ -1508,6 +1566,33 @@ def pin(root: Path | str, *, force: bool = False) -> dict:
     (root / CRITERIA_PATH).write_text(
         json.dumps(spec, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return pinned
+
+
+def pin_target(root: Path | str, *, force: bool = False) -> str:
+    """Freeze HEAD as the revision this closure certifies (owner adjustment 2).
+
+    Separate from `--pin`, which pins the contract text once and refuses to
+    repeat: the target is chosen much later, when a candidate is actually ready,
+    and it legitimately moves when the candidate is re-cut. Refuses on a dirty
+    tree — a SHA pinned there names a revision that does not describe what was
+    measured, which is the mixing this invariant exists to stop.
+    """
+    root = Path(root).resolve()
+    head = _git_out(root, "rev-parse", "HEAD")
+    if not head:
+        raise ValueError("cannot read git HEAD — not a checkout?")
+    if _git_out(root, "status", "--porcelain"):
+        raise ValueError("working tree is dirty — a target pinned here names a revision "
+                         "that does not describe what was measured; commit or stash first")
+    spec = load_spec(root)
+    old = str(spec.get("closure_target_sha") or "")
+    if old and old != head and not force:
+        raise ValueError(f"closure target already pinned at {old[:12]} — re-pinning "
+                         f"moves what is being certified; pass --force if that is the intent")
+    spec["closure_target_sha"] = head
+    (root / CRITERIA_PATH).write_text(
+        json.dumps(spec, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return head
 
 
 def sign_waiver(root: Path | str, criterion_id: str, reason: str, *, by: str = "") -> dict:

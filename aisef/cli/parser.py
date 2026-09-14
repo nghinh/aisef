@@ -304,6 +304,8 @@ def build_parser() -> argparse.ArgumentParser:
     cl.add_argument("--note", default="", help="note recorded with --approve")
     cl.add_argument("--pin", action="store_true",
                     help="pin contract_sha256 (and the bench pre-registration) in docs/closure-gate.json")
+    cl.add_argument("--pin-target", action="store_true", dest="pin_target",
+                    help="freeze HEAD as closure_target_sha — the one revision being certified (G1.0)")
     cl.add_argument("--force", action="store_true", help="re-pin over an existing pin")
     cl.add_argument("--corpus", default="", metavar="DIR",
                     help="G4 corpus path (default: the primary corpus beside the main checkout)")

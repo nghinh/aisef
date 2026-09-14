@@ -450,7 +450,7 @@ aisef dashboard [--out FILE] [--projects DIR…]
                                       vào một báo cáo — xem offline
 
 # Cổng đóng dự án của **chính kho framework** (docs/PROJECT-CLOSURE-GATE.md) — chỉ đọc, không gọi model
-aisef closure [--corpus DIR]          chấm 26 tiêu chí của 6 cổng theo `docs/closure-gate.json`, in bảng,
+aisef closure [--corpus DIR]          chấm 27 tiêu chí của 6 cổng theo `docs/closure-gate.json`, in bảng,
                                       ghi `closure-evidence/closure-report.json`. Mã thoát **riêng**:
                                       0 đóng được · 1 bị chặn · 2 gõ sai. `UNCONFIGURED` bị nâng thành
                                       `UNRUNNABLE` — không ai cấu hình phép kiểm không phải bằng chứng khoẻ

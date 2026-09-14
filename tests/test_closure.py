@@ -251,7 +251,7 @@ class TestNoCriterionPassesOnAbsence(unittest.TestCase):
         repo = Repo(shipped, pin=False)
         self.addCleanup(repo.close)
         report = repo.evaluate()
-        self.assertEqual(len(report.results), 26)
+        self.assertEqual(len(report.results), 27)
         for r in report.results:
             with self.subTest(criterion=r.id):
                 self.assertTrue(r.outcome.blocks,
@@ -264,9 +264,9 @@ class TestShippedCriteriaFile(unittest.TestCase):
         self.spec = CL.load_spec(ROOT)
         self.criteria = [c for g in self.spec["gates"] for c in g["criteria"]]
 
-    def test_six_gates_twentysix_criteria_unique_ids(self):
+    def test_six_gates_twentyseven_criteria_unique_ids(self):
         self.assertEqual(len(self.spec["gates"]), 6)
-        self.assertEqual(len(self.criteria), 26)
+        self.assertEqual(len(self.criteria), 27)
         ids = [c["id"] for c in self.criteria]
         self.assertEqual(len(set(ids)), len(ids))
 
@@ -1635,9 +1635,9 @@ class TestRealRepository(unittest.TestCase):
     assertions about which cells are green — the point is that all 26 probes
     run, none crashes, and every non-passing one says why."""
 
-    def test_evaluating_this_repository_produces_twentysix_readable_rows(self):
+    def test_evaluating_this_repository_produces_twentyseven_readable_rows(self):
         report = CL.evaluate(ROOT)
-        self.assertEqual(len(report.results), 26)
+        self.assertEqual(len(report.results), 27)
         for r in report.results:
             with self.subTest(criterion=r.id):
                 self.assertIn(r.outcome, tuple(Outcome))
@@ -1650,3 +1650,87 @@ class TestRealRepository(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestMotSHaDuyNhatChoViecDong(unittest.TestCase):
+    """Điều chỉnh 2 của chủ dự án: `release_tag_commit == closure_target_sha`.
+
+    Lỗ nó bịt: G1 chứng nhận gói trên PyPI ở commit của **tag**, còn G2–G5 đọc
+    **HEAD**. Đó là hai phần mềm khác nhau, và một bản ghi đóng dự án trộn chúng
+    lại thì không chứng nhận gì cả. Chủ dự án nói thẳng ba điều không được làm:
+    dựng HEAD mà cài bản PyPI cũ; đọc dữ liệu đóng gói từ HEAD rồi bảo nó chứng
+    minh tag cũ; gộp bằng chứng từ các revision khác nhau thành một G1 PASS.
+
+    Một tiêu chí **giữ** bất biến này, không rải thành bốn: thông báo hỏng phải
+    nói "G1 chứng nhận X, việc đóng nhắm Y" ở đúng một chỗ.
+    """
+
+    def repo_at(self, *, target=None, tag_at_head=True):
+        c = crit("G1.0", "aisef.control.closure:probe_closure_target",
+                 evidence="closure-evidence/release.json")
+        repo = Repo(spec_of(c))
+        self.addCleanup(repo.close)
+        head = repo.head
+        git(repo.root, "tag", "v9.9.9", head if tag_at_head else "HEAD")
+        if not tag_at_head:
+            repo.write("x.txt", "sau khi gắn tag\n")
+            git(repo.root, "add", "."); git(repo.root, "commit", "-m", "sau")
+        repo.write_json("closure-evidence/release.json",
+                        {"version": "9.9.9", "tag": "v9.9.9"})
+        if target is not None:
+            repo.spec["closure_target_sha"] = target or repo.head
+        repo.write_json(CL.CRITERIA_PATH, repo.spec)
+        return repo, head
+
+    def probe(self, repo):
+        return CL.probe_closure_target(repo.ctx({"evidence": "closure-evidence/release.json"}))
+
+    def test_khong_ghim_dich_thi_khong_do_duoc(self):
+        """Chưa chốt ứng viên đóng dự án thì bất biến không có gì để so — chặn,
+        và nói việc phải làm, chứ không đạt."""
+        repo, _ = self.repo_at()
+        p = self.probe(repo)
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("closure_target_sha", p.detail)
+
+    def test_tag_va_head_cung_la_dich_thi_dat(self):
+        repo, head = self.repo_at(target="")
+        p = self.probe(repo)
+        self.assertIs(p.outcome, Outcome.PASSED, p.detail)
+        self.assertIn(head[:12], p.detail)
+
+    def test_tag_tro_vao_commit_khac_dich_thi_do(self):
+        repo, head = self.repo_at(target="0" * 40)
+        p = self.probe(repo)
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn(head[:12], p.detail)
+        self.assertIn("000000", p.detail)
+
+    def test_head_di_tiep_sau_khi_ghim_dich_thi_do(self):
+        """G2–G5 đọc HEAD. HEAD rời khỏi dịch thì bằng chứng của chúng nói về
+        phần mềm khác với cái G1 chứng nhận."""
+        repo, head = self.repo_at(tag_at_head=False)
+        repo.spec["closure_target_sha"] = head
+        repo.write_json(CL.CRITERIA_PATH, repo.spec)
+        p = self.probe(repo)
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("HEAD", p.detail)
+
+    def test_khong_co_ban_ghi_phat_hanh_thi_khong_do_duoc(self):
+        repo, head = self.repo_at(target="")
+        (repo.root / "closure-evidence/release.json").unlink()
+        p = self.probe(repo)
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("release.json", p.detail)
+
+    def test_pin_target_ghi_head_va_tu_choi_cay_ban(self):
+        """Chốt một ứng viên trên cây bẩn là chốt một SHA không tả được cái đã đo."""
+        repo, head = self.repo_at()
+        repo.write("dirty.txt", "chưa commit\n")
+        with self.assertRaises(ValueError) as e:
+            CL.pin_target(repo.root)
+        self.assertIn("dirty", str(e.exception).lower())
+        git(repo.root, "add", "."); git(repo.root, "commit", "-m", "clean")
+        sha = CL.pin_target(repo.root)
+        self.assertEqual(sha, repo.head)
+        self.assertEqual(CL.load_spec(repo.root)["closure_target_sha"], repo.head)

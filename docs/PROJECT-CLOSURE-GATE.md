@@ -281,6 +281,7 @@ failure is invisible from inside the repository.
 
 | criterion | evidence | probe |
 |---|---|---|
+| G1.0 the released tag, HEAD, and the frozen closure target are **one** revision | `closure-evidence/release.json` `tag` resolved by git, vs `closure_target_sha` | compare; unset target → `UNRUNNABLE` |
 | G1.1 CI green on the released tag | GitHub Actions run for `v<version>` | `gh run list --workflow=tests.yml`, matched by commit |
 | G1.2 package checks green | `python -m build` + `twine check` | re-run; both must exit 0 |
 | G1.3 clean-venv install from PyPI serves the released version | `pip install aisef==<version>` in an empty venv → `aisef --version` | re-run |
@@ -294,9 +295,32 @@ mechanical, and waiving it would waive the product's existence.
 **Staleness.** Bound to the release version and the tag's commit. A new release
 invalidates G1 and it must be re-evaluated.
 
-**Today: PASSED** (verified 2026-09-14 — CI green on 7 jobs including Windows
-3.11; `twine check` passed both artifacts; `pip install aisef==1.6.0` in a clean
-venv reported `aisef 1.6.0`; packaged runtime data confirmed).
+**G1.0, added 2026-09-14 under owner adjustment 2.** The invariant is
+`release_tag_commit == closure_target_sha`, and it is a criterion of its own so
+that the failure names both revisions in one place rather than four probes each
+reporting a corner of the same disagreement. It has two conjuncts and must not
+pass on one of them: the tag resolves to the target, **and** HEAD is still the
+target — G2 through G5 bind their evidence to HEAD, so a HEAD that has moved on
+means their evidence describes software other than what G1 certifies. An unset
+target reads `UNRUNNABLE`: no candidate has been frozen, so there is nothing to
+compare, and nothing to compare is not agreement. Freeze it with
+`aisef closure --pin-target`, which refuses on a dirty tree because a SHA pinned
+there names a revision that does not describe what was measured.
+
+This was measured, not anticipated: on 2026-09-14 G1.1 certified `v1.6.0` at
+`2be2a2a`, the packaging record sat at `4ae9baf`, and HEAD was 46 commits further
+on. Three revisions inside one gate reading PASSED. The owner's three prohibitions
+follow directly — do not build HEAD but install an older PyPI version; do not read
+packaged data from HEAD and call it proof about the old tag; do not combine
+evidence from different source revisions into one G1 PASS.
+
+**Today: BLOCKED on G1.0 and G1.2** — G1.1, G1.3 and G1.4 verified 2026-09-14
+(CI green on 7 jobs including Windows 3.11; `pip install aisef==1.6.0` in a clean
+venv reported `aisef 1.6.0`; packaged runtime data confirmed), but those describe
+`v1.6.0` at `2be2a2a`, which is **not** the closure candidate. G1 returns to PASSED
+only when the closure candidate is released and every G1 record is re-taken at that
+one revision. The v1.6.0 evidence remains valid as *current-release* evidence and
+must not be presented as closure evidence.
 
 ### G2 — Core correctness
 

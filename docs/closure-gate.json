@@ -2,7 +2,7 @@
   "_comment": "Machine-readable form of docs/PROJECT-CLOSURE-GATE.md (APPROVED 2026-09-14). The .md is authoritative prose; this file is what `aisef closure` evaluates. `contract_sha256` pins the .md: if it changes, closure is STALE. Probes name callables already in the package wherever one exists, so the gate reads through the SAME reader the product uses.",
   "contract_version": "1",
   "contract_path": "docs/PROJECT-CLOSURE-GATE.md",
-  "contract_sha256": "13a174c509553d54035988cfdbea275aa941d068d9577fc7f6c2111175ad0697",
+  "contract_sha256": "f787dc7c83b79a9851ccbd38626f4b96b87ba0a2036fa9d62cc2ec660489cbe2",
   "approved": {
     "date": "2026-09-14",
     "by": "owner",
@@ -24,6 +24,17 @@
       "waiver_eligible": false,
       "requires_human": false,
       "criteria": [
+        {
+          "id": "G1.0",
+          "statement": "the released tag, HEAD, and the frozen closure target are one revision",
+          "probe": "aisef.control.closure:probe_closure_target",
+          "evidence": "closure-evidence/release.json",
+          "freshness": {
+            "kind": "bound_to",
+            "source": "closure_target_sha"
+          },
+          "notes": "Owner adjustment 2 (2026-09-14). G1 certified the PyPI artefact at the tag commit while G2-G5 read HEAD, measured 46 commits apart -- different software combined into one record. One criterion owns the invariant so the failure names both revisions in one place; two conjuncts (tag resolves to the target, HEAD is still the target) and it must not pass on one of them. An unset target is UNRUNNABLE, never a pass: nothing to compare is not agreement. Set with `aisef closure --pin-target` on the candidate, which refuses on a dirty tree."
+        },
         {
           "id": "G1.1",
           "statement": "CI is green on the commit the released tag points at",
@@ -417,5 +428,6 @@
     "1": "blocked",
     "2": "usage error",
     "_note": "Deliberately NOT the rest of this CLI's convention (1 usage / 2 not-ready). The contract §4.3 specified these numbers; an unrecognised flag is still reported by the top-level parser and exits 1, as for every verb."
-  }
+  },
+  "closure_target_sha": ""
 }

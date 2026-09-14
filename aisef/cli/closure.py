@@ -32,7 +32,7 @@ def _rel(root: Path, path: Path) -> str:
 
 def cmd_closure(args) -> int:
     root = Path(args.project)
-    if args.report and (args.pin or args.waive or args.approve):
+    if args.report and (args.pin or args.pin_target or args.waive or args.approve):
         print("✗ --report renders the last evaluation; run it on its own", file=sys.stderr)
         return EXIT_USAGE
     if args.reason and not args.waive:
@@ -67,6 +67,18 @@ def cmd_closure(args) -> int:
             return EXIT_USAGE
         for what, digest in pinned.items():
             print(f"✅ pinned {what} at {digest[:12]}")
+        print(f"   commit {C.CRITERIA_PATH} — the pin is the record")
+        spec = C.load_spec(root)
+
+    if getattr(args, "pin_target", False):
+        try:
+            sha = C.pin_target(root, force=args.force)
+        except ValueError as e:
+            print(f"✗ {e}", file=sys.stderr)
+            return EXIT_USAGE
+        print(f"✅ closure target pinned at {sha[:12]}")
+        print("   every G1-G5 record must now describe this revision — re-record what "
+              "was measured elsewhere")
         print(f"   commit {C.CRITERIA_PATH} — the pin is the record")
         spec = C.load_spec(root)
 
