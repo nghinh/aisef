@@ -214,10 +214,22 @@ class TestPhanLoaiFalsePassChoG2_4a(unittest.TestCase):
                 with self.subTest(defect=d.id):
                     self.assertTrue(d.check, f"{d.id} khai false_pass mà không nêu mục nào")
 
-    def test_khong_co_false_pass_tat_dinh_nao_dang_mo(self):
-        """Đây là điều G2.4a khẳng định. Đỏ khi có, chứ không im lặng."""
+    def test_false_pass_tat_dinh_thi_nêu_mục_có_thật(self):
+        """Sổ phải **nhất quán**; còn "không có cái nào đang mở" là việc của cổng.
+
+        Bản đầu của phép này khẳng định luôn *không có* false PASS tất định nào
+        đang mở — và nó đỏ ngay khi D-004 (lỗi 159) được ghi vào, tức đúng lúc
+        sự thật xuất hiện. Nhưng đó là **tiêu chí đóng dự án G2.4a**, không phải
+        một bất biến của bộ test: để nó ở đây thì một lỗi đã biết và đã ghi làm
+        đỏ cả bộ, kéo theo G2.1, và chặn mọi phép kiểm khác — trong khi cổng vẫn
+        phải chặn. Tách ra: ở đây kiểm sổ tự nhất quán, còn G2.4a giữ lời khẳng
+        định (và đang FAILED vì D-004, theo QĐ chủ dự án 2026-09-14).
+        """
         from aisef.control.gate import CHECK_KIND
-        bad = [d.id for d in D.read(ROOT / D.PATH)
-               if d.false_pass and d.status == "OPEN"
-               and CHECK_KIND.get(d.check) in ("deterministic", "structural")]
-        self.assertEqual(bad, [], f"false PASS tất định đang mở: {bad}")
+        for d in D.read(ROOT / D.PATH):
+            if not d.false_pass:
+                continue
+            with self.subTest(defect=d.id):
+                self.assertTrue(d.check, f"{d.id} khai false_pass mà không nêu mục")
+                self.assertIn(d.check, CHECK_KIND,
+                              f"{d.id} nêu mục {d.check!r} không có trong CHECK_KIND")

@@ -1,18 +1,18 @@
 # Phân loại lỗi thật của AISEF — để không tái diễn
 
-**Mã cao nhất 158**, ghi từ 2026-09-05 → 2026-09-14 (đếm lại 14/09; câu này nói
+**Mã cao nhất 159**, ghi từ 2026-09-05 → 2026-09-14 (đếm lại 14/09; câu này nói
 "147 lỗi · 124 dòng · mã 22–147" cho tới khi ấy — dòng 148–155 vào sau khi nó
 được viết, đúng cái kiểu trôi mà chính tệp này tồn tại để chặn). Lỗi 1–21 ghi ở
-`docs/STATUS-2026-09-05.md` §2.4; bảng dưới có **135 dòng, mã 22–158** — 26 và
+`docs/STATUS-2026-09-05.md` §2.4; bảng dưới có **136 dòng, mã 22–159** — 26 và
 27 không có dòng nào, chúng được gộp vào lỗi khác lúc ghi và số bị bỏ trống:
 
 ```
-grep -oE '^\| *[0-9]+ *\|' docs/FAILURE-TAXONOMY.md | tr -dc '0-9\n' | sort -n | uniq | wc -l   # → 135
+grep -oE '^\| *[0-9]+ *\|' docs/FAILURE-TAXONOMY.md | tr -dc '0-9\n' | sort -n | uniq | wc -l   # → 136
 grep -oE '^\| *[0-9]+ *\|' docs/FAILURE-TAXONOMY.md | tr -dc '0-9\n' | sort -n | tail -1        # → 155
 ```
 
-**Mã không phải số đếm.** Vì 26 và 27 trống, số lỗi *thật* là 21 + 135 = **156**,
-thấp hơn mã cao nhất hai đơn vị. Hai README khai **158** theo mã cao nhất, và
+**Mã không phải số đếm.** Vì 26 và 27 trống, số lỗi *thật* là 21 + 136 = **157**,
+thấp hơn mã cao nhất hai đơn vị. Hai README khai **159** theo mã cao nhất, và
 `tests/test_meta.py::test_so_loi_trong_readme_khop_bang_phan_loai` ghim đúng
 quy ước ấy — nên hai con số lệch nhau là *có chủ ý*, không phải trôi. Câu cũ
 trộn hai thứ này làm một, nên nó vừa sai số đếm vừa không ai kiểm được.
@@ -30,7 +30,7 @@ chứ không từ ngày quan sát — hai ngày ấy thường trùng nhưng kh�
 | 71–75 | 12/09 | cổng lint vừa bật, bench v1.3, cohort C-1 |
 | 76–141 | 13/09 | dogfood `todo-cli` và `todo-oc` — [DOGFOOD-2026-09-13](DOGFOOD-2026-09-13.md) §2, §5, §7 |
 | 142–147 | 14/09 | `todo-oc` 7/7 (DOGFOOD §8) và `marks-cli`, dự án dogfood thứ ba |
-| 148–158 | 14/09 | `marks-cli`; ADR-009 O2/O3; hợp đồng `STABILITY.md`; bench C-1; cổng phát hành đọc lại trên `todo-oc` |
+| 148–159 | 14/09 | `marks-cli`; ADR-009 O2/O3; hợp đồng `STABILITY.md`; bench C-1; cổng phát hành đọc lại trên `todo-oc` |
 
 **Tất cả bằng đo trên agent thật**, không lỗi nào bằng đọc code. Mỗi lỗi có một
 phép hồi quy đỏ khi hoàn nguyên, trừ lỗi 22 (lý do ở lớp I); bảng này nhóm chúng
@@ -63,7 +63,7 @@ lỗi 22–25 còn có số đo ở `docs/ADR-004-evidence-driven-epic-improveme
 | **J. Hai luật cho một sự thật — sổ và cổng suy cùng một hành vi bằng hai cách** | "Sự thật này còn chỗ nào khác suy nó không? Hai chỗ có dùng chung một hàm, một trường không? Nếu không, chỗ nào là luật?" | 47 `stale_since_last_test` so `seq` trong khi `read()` đã chuyển sang so thời gian · 23 cổng "bảo toàn" hỏi test mang mã của story **sở hữu** FR, sổ xác minh FR **qua** story khác (`source.story`) → sổ nói VERIFIED, cổng nói UNRUNNABLE oan; cùng lớp, không đánh số: R2×R1 (sổ ghi VERIFIED ở ứng viên chưa landed trong khi nhật ký biết), R5×R2 (sổ không ghi tệp, cổng cỡ tra tệp) | `test_preservation.TestCongBaoToan.test_fr_hoi_story_da_xac_minh_no_khong_hoi_story_so_huu` · `test_ledger.TestUngVienChuaLanded` |
 | **K. Cơ chế mới ghi vào artifact mà cổng người cũ đang băm** | "Bước này ghi vào tệp nào? Tệp ấy có cổng người nào băm không? Ai duyệt lại, và có phải mỗi lần không?" | 25 `aisef improve` ghi story sửa vào `stories.index.json` → `stories`/`readiness` đã duyệt thành stale → lần gọi kế bị chính vòng trước chặn (exit 2), 28 | `test_approvals.TestStorySuaKhongLamStaleCongStories` (thêm story sửa không stale; sửa story thật vẫn stale) |
 
-## Lỗi 22–158 — triệu chứng, gốc, bài học
+## Lỗi 22–159 — triệu chứng, gốc, bài học
 
 | # | Lớp | Triệu chứng | Gốc | Bài học | Chặn tái diễn |
 |---|---|---|---|---|---|
@@ -279,6 +279,8 @@ lỗi 22–25 còn có số đo ở `docs/ADR-004-evidence-driven-epic-improveme
 | 157 | K/E | `release_ready` tính tươi/cũ theo **ngày của bảng** (`generated`), không theo `at` của từng client. `.github/workflows/conformance.yml` chạy lại **chỉ** `tests.conformance.test_claude` rồi bảng được đóng dấu ngày hôm nay, nên cột `opencode` đi theo với tuổi tuỳ ý. Tái hiện: `at` của opencode lùi về 2026-07-16, bảng ghi 2026-09-24, `today=2026-09-25` → `(True, 'conformance complete and current')` trên bằng chứng 71 ngày | một con số tổng (ngày của bảng) được dùng thay cho N con số riêng (`at` mỗi lượt chạy) — và `ClientRun.at` vẫn **có** sẵn, chỉ không ai đọc. Trước lỗi 156 vô hại vì `RELEASE_CLIENTS` chỉ có `claude`, nên cột kia không ai đọc; sửa 156 làm nó thành đường chặn phát hành | sửa một cổng để nó đọc thêm một cột thì phải hỏi **bằng chứng cột ấy có tươi không**, không chỉ *có đạt không*. Lỗi 156 đúng và lỗi này là cái nó phơi ra — đo một tập bằng một con số tổng chỉ đúng khi cả tập được đo cùng lúc | `release_ready` kiểm `at` của từng client trong `RELEASE_CLIENTS` theo `MAX_AGE_DAYS`; `at` không đọc được là **không kết luận đạt** (cùng luật `UNRUNNABLE`). Bằng chứng hiện tại qua phép chặt hơn (cả hai 6 ngày) nên **không** phải chạy lại hợp quy — QĐ chủ dự án 5 điều kiện B không nổ. 2 phép thử đỏ trước |
 
 | 158 | F/J | `Finding._LINE_RE` chỉ nhận `[low|medium|high|critical] tệp:dòng thân`, còn `kit/prompts/story-review.md` dặn người rà soát viết `[block] đường/dẫn:dòng — thân`. Đo trên bằng chứng năm corpus: **177 dòng chặn, 0 dòng phân giải được**, nên `implement._same_complaint_by_finding` luôn trả False trên dữ liệu thật — kể cả trong `deadlock_reason`, chỗ quyết định có ngừng đốt lượt hay không; chỉ luật chồng token cũ chạy | hai đầu một sự thật viết bằng hai cú pháp: bên sinh là prompt (`[block]`), bên đọc là regex (`[high]`), không phép nào nối chúng. `tests/test_same_complaint_finding.py` xanh vì nó cho parser ăn `[high] src/pay.py:42` — hình dạng production **không bao giờ** sinh ra | fixture do cùng một tay viết với parser thì không bao giờ bất đồng: phép thử phải lấy dòng **thật** từ bằng chứng đã ghi. Cùng lớp với lỗi 150 (một sự thật hai thứ tiếng) và với ghi chú "đa dạng cú pháp" đã có | `_LINE_RE` nhận cả bốn thẻ của prompt, đổi mức qua `TAG_SEVERITY` đặt trong `findings.py` và `reviewer_qual._SEV` **nhập lại** bảng ấy thay vì giữ bản sao; dấu ngăn `—`/`-`/`:` sau số dòng bị cắt khỏi thân, nếu không cùng một lời than viết hai kiểu ra hai `id`. Sau sửa: **116/177** dòng phân giải được (61 dòng còn lại là văn của harness, không có đường dẫn — đúng là không phải finding). 3 phép thử đỏ trước |
+
+| 159 | K/J | `acceptance.ac_code(story_id, i)` sinh mã tiêu chí từ **vị trí**, nên rút một tiêu chí khỏi kế hoạch làm mọi mã sau nó tụt một bậc, và **không chỗ nào** phát hiện. Corpus thật chứng minh: sau khi rút `AC-1.2-1` của marks-cli STORY-01-02, các phép thử tên `AC-STORY-01-02-1` (vốn khẳng định stub `list` trả not-implemented, exit 1) được người viết mã STORY-02-02 **sửa tại chỗ** thành khẳng định `(no bookmarks)`, exit 0 — tức chúng nay chứng minh hành vi `list` của STORY-02-02 trong khi mã ấy sau khi tụt bậc là tiêu chí *"động từ lạ thì exit 1"*. Thêm `AC-STORY-01-02-4` mồ côi: không còn tiêu chí nào mang mã ấy | danh tính tiêu chí **phái sinh từ thứ tự**, nên nó không phải danh tính. Hai đầu (kế hoạch, tên phép thử) khớp nhau bằng một con số mà bên nào đổi cũng không ai báo | `criteria have tests` là mục chặn **cấu trúc**: một phép thử bị tụt mã thoả nó trong khi chứng minh hành vi khác, nên đây là đường **đạt sai** trong mục chặn — đúng câu G2.4a của hợp đồng đóng dự án hỏi. Người viết mã không thể tránh: nó **không bao giờ thấy** danh sách tiêu chí, nên không lời dặn nào ngăn được — phải là bộ dò, không phải quy ước | *(đang mở — sửa sau khi làn model rảnh, theo QĐ chủ dự án: G2.4a giữ FAILED tới lúc ấy, không miễn, không nới)* |
 
 ## Khi thêm lỗi mới
 

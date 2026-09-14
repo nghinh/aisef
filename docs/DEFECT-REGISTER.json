@@ -42,6 +42,18 @@
       "evidence": "tests/bench/_analyze.py: `_DUONG_DAN_PHIEN = re.compile(r\"\\.bench[\\w.-]*/run/([\\w-]+)/([\\w-]+)/a(\\d+)\")` matches any ledger directory but captures only (condition, task, attempt), so `.bench/run/\u2026` and `.bench-c1b/run/\u2026` land on one key. Recorded in docs/BENCH-TASK-DISCRIMINATION.md \u00a76 with the three affected tasks (`sec-1`, `sec-2`, `state-3`).",
       "notes": "Deliberately not fixed: both published bench reports quote this function's output, so re-keying it makes a re-run of `analyze` print a table that differs from the printed evidence. P2 \u2014 the wrong number is an auxiliary cut-session count in a bench analysis helper, it blocks nothing and sets no gate. The contract lists it POST_CLOSE (\u00a77); that is a scheduling statement, and P2 is the severity \u2014 they agree, and neither is derived from the other. false_pass=false: a bench analysis counter, not a gate check at all.",
       "false_pass": false
+    },
+    {
+      "id": "D-004",
+      "severity": "P1",
+      "status": "OPEN",
+      "title": "criterion identity is positional, so a test can silently become proof for a different criterion",
+      "false_pass": true,
+      "check": "criteria have tests",
+      "taxonomy": 159,
+      "introduced": "pre-dates this wave; surfaced 2026-09-14 by the marks-cli closure corpus",
+      "evidence": "marks-cli _bmad-output/plan-reconciliation.json \u00a7incomplete_withdrawal.how_the_agent_resolved_it; tests named AC-STORY-01-02-1 in marks-cli tests/dispatch.test.js now assert STORY-02-02 `list` behaviour while that code maps to 'unknown verb exits 1'; AC-STORY-01-02-4 is orphaned",
+      "notes": "false_pass=true: `criteria have tests` is a blocking STRUCTURAL check and a shifted test satisfies it while proving another behaviour. This is the first registered true false PASS, so G2.4a moves from PASSED to FAILED \u2014 owner decision 2026-09-14: it stays FAILED until fixed, not waived and not weakened. Not preventable by instruction: the developer never sees the criterion list, so the fix must be a detector plus a stable identity, not a convention. G4 evidence from marks-cli is NOT closure-valid until the corpus is re-verified under corrected identity semantics, even at 7/7."
     }
   ]
 }
