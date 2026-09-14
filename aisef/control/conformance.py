@@ -174,6 +174,21 @@ def release_ready(report: Report, *, today: date | None = None,
         run = report.run_for(client)
         if run is None:
             return False, f"missing column for {client}"
+        # Tươi/cũ phải tính theo `at` của **chính client này**, không chỉ theo
+        # ngày của bảng: `conformance.yml` chạy lại riêng `claude` rồi đóng dấu
+        # ngày hôm nay lên cả bảng, nên cột client kia đi theo mà không ai đo
+        # lại (lỗi 157). Khi chỉ `claude` chặn phát hành thì điều này vô hại;
+        # từ khi `opencode` cũng chặn (ADR-006 §4) thì nó là cổng đạt trên bằng
+        # chứng đã hết hạn. Không đọc được `at` là *không biết*, không phải
+        # *còn mới* — cùng luật với `UNRUNNABLE` của cổng story.
+        try:
+            ran = datetime.fromisoformat(run.at).date()
+        except (TypeError, ValueError):
+            return False, f"{client}: run has no readable timestamp — rerun conformance for {client}"
+        tuoi = (today - ran).days
+        if tuoi > max_age_days:
+            return False, (f"{client}: evidence is {tuoi} days old (> {max_age_days}) "
+                           f"— rerun conformance for {client}")
         if not run.passed:
             broken = [r.probe for r in run.results if not r.passed]
             missing = [p[0] for p in PROBES if p[0] not in {r.probe for r in run.results}]

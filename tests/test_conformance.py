@@ -55,6 +55,30 @@ class TestDuocPhatHanhKhong(unittest.TestCase):
                                            run("opencode", *[True] * len(C.PROBES))), today=date(2026, 9, 10))
         self.assertTrue(ok, why)
 
+    def test_bang_moi_khong_lam_moi_cot_cu_cua_tung_client(self):
+        """Lỗi 157: tươi/cũ tính theo **ngày của bảng**, không theo `at` của
+        từng client — nên một lượt chạy lại chỉ riêng `claude` (đúng việc
+        `.github/workflows/conformance.yml` làm) đóng dấu ngày hôm nay lên cả
+        bảng, và cột `opencode` mang theo có thể cũ tuỳ ý. Trước lỗi 156 điều
+        này vô hại vì không ai đọc cột ấy; từ khi `opencode` chặn phát hành
+        (ADR-006 §4) thì nó là **cổng đạt trên bằng chứng đã hết hạn**.
+        """
+        cl = run("claude", *[True] * len(C.PROBES)); cl.at = "2026-09-24T00:00:00+00:00"
+        oc = run("opencode", *[True] * len(C.PROBES)); oc.at = "2026-07-16T00:00:00+00:00"
+        ok, why = C.release_ready(self.rep(cl, oc, generated="2026-09-24"),
+                                  today=date(2026, 9, 25))
+        self.assertFalse(ok, "bằng chứng opencode 71 ngày mà cổng vẫn đạt")
+        self.assertIn("opencode", why)
+        self.assertIn("old", why)
+
+    def test_at_khong_doc_duoc_thi_khong_ket_luan_la_dat(self):
+        """Thiếu/hỏng `at` là *không biết*, không phải *còn mới*."""
+        cl = run("claude", *[True] * len(C.PROBES)); cl.at = "2026-09-24T00:00:00+00:00"
+        oc = run("opencode", *[True] * len(C.PROBES)); oc.at = "khong-phai-ngay"
+        ok, why = C.release_ready(self.rep(cl, oc, generated="2026-09-24"),
+                                  today=date(2026, 9, 25))
+        self.assertFalse(ok); self.assertIn("opencode", why)
+
     def test_bang_cu_hon_14_ngay_thi_khong(self):
         ok, why = C.release_ready(self.rep(run("claude", *[True] * len(C.PROBES))), today=date(2026, 9, 25))
         self.assertFalse(ok); self.assertIn("old", why)
