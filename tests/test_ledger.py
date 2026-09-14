@@ -746,3 +746,65 @@ class TestLoaiGap(LedgerTestCase):
         self.assertIn("unbuilt 1", out)
         self.assertIn("untested 1", out)
         self.assertNotIn("untraced", out, "loại đếm 0 không có gì để nói")
+
+
+class TestKhongDocDuocKhongPhaiHoiQuy(LedgerTestCase):
+    """D-001 — cùng lớp với dòng phân loại 155 (vắng mặt bị đọc thành hồi quy),
+    ở đúng nhánh mà bản sửa ấy không phủ.
+
+    `_observe_tests`, khi `readable` là sai (không có reporter, suite không chạy
+    được, runner ghi chú), gọi `rollup(line, False, why)` cho story chủ nhà — nên
+    **mọi** requirement story ấy `covers` bị ghi là không-xanh, mà những
+    requirement ấy do các story **trước** sở hữu và đã VERIFIED. Không một phép
+    thử đỏ nào được đọc ở đâu cả.
+
+    Đo trên corpus `todo`: FR-1, FR-2, FR-4 (của STORY-02-01) và FR-9 (của
+    STORY-01-02) cùng lật sang REOPENED do một lượt của STORY-02-02 mà `test`
+    tool_run có `ok=True`.
+
+    Vì sao nó tệ hơn một dòng báo sai: vòng lặp tự tính theo Δverified − Δreopened
+    để quyết định có đi tiếp, nên số học của nó bị bẩn; và chỉ người đọc đối chiếu
+    sổ với bằng chứng mới phân biệt được hiện vật này với một hồi quy thật.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.index([
+            {"id": "STORY-01-01", "epic_id": "EPIC-01",
+             "acceptance_criteria": ["a"], "covers": ["FR-1"]},
+            {"id": "STORY-01-02", "epic_id": "EPIC-01",
+             "acceptance_criteria": ["b"], "covers": ["FR-1"]},
+        ])
+
+    def khong_doc_duoc(self, story, **d):
+        """Một lượt `test` **xanh** mà không đọc được tên phép thử nào."""
+        self.store.tool_run(story, "test", ok=True,
+                            detail={"test_ids": [], "failed_ids": [], **d})
+
+    def test_lot_khong_doc_duoc_khong_lam_requirement_cua_story_khac_reopened(self):
+        # STORY-01-01 chứng minh FR-1 trước.
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])
+        self.assertEqual(L.build(self.root).behaviors["FR-1"].status, L.VERIFIED)
+        # STORY-01-02 chạy, xanh, nhưng không đọc được tên nào.
+        self.khong_doc_duoc("STORY-01-02", test_note="reporter printed no names")
+        led = L.build(self.root)
+        self.assertEqual(led.behaviors["FR-1"].status, L.VERIFIED,
+                         "FR-1 do STORY-01-01 sở hữu và không có gì đỏ được đọc")
+
+    def test_tieu_chi_cua_chinh_story_ay_van_la_gap_co_ly_do(self):
+        """Không đọc được tên thì tiêu chí của **chính** story ấy vẫn chưa được
+        chứng minh — cái bị bỏ là việc lật requirement của người khác, không phải
+        việc ghi nhận rằng story này chưa chứng minh được gì."""
+        self.khong_doc_duoc("STORY-01-02", test_note="reporter printed no names")
+        b = L.build(self.root).behaviors["AC-STORY-01-02-1"]
+        self.assertEqual(b.status, L.GAP)
+        self.assertIn("cannot read test names", b.source.get("why", ""))
+
+    def test_mot_phep_thu_do_that_van_lam_reopened(self):
+        """Phép kiểm âm: bỏ `rollup` ở nhánh không-đọc-được không được làm mất
+        khả năng phát hiện hồi quy thật."""
+        self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])
+        self.assertEqual(L.build(self.root).behaviors["FR-1"].status, L.VERIFIED)
+        self.run_tests("STORY-01-02", ids=[ac_test("STORY-01-01", 1)],
+                       failed=[ac_test("STORY-01-01", 1)])
+        self.assertEqual(L.build(self.root).behaviors["FR-1"].status, L.REOPENED)

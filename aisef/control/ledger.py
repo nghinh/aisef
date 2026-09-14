@@ -680,7 +680,23 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
             why = f"{WHY_UNREADABLE}: {detail}" if detail else WHY_UNREADABLE
             for i in range(1, line.acceptance + 1):
                 note(story_id, i, False, {"why": why})
-            rollup(line, False, why)
+            # **Không** `rollup` ở đây (D-001, cùng lớp với dòng 155 ở nhánh mà bản
+            # sửa ấy không phủ). `rollup` ghi mọi requirement story này `covers` là
+            # không-xanh, mà chúng do các story **trước** sở hữu và đã VERIFIED —
+            # nên một lượt không đọc được tên phép thử lật chúng sang REOPENED
+            # trong khi không một phép thử đỏ nào được đọc ở đâu. Đo trên corpus
+            # `todo`: FR-1, FR-2, FR-4 và FR-9 cùng lật do một lượt của
+            # STORY-02-02 mà `test` tool_run có `ok=True`.
+            #
+            # Tiêu chí của **chính** story này vẫn ghi là chưa chứng minh (các
+            # `note` ở trên, `gap_kind` xếp là UNTRACED): cái bỏ đi là việc lật
+            # bản án của người khác, không phải việc thừa nhận story này chưa
+            # chứng minh gì. Một requirement là hiện vật dùng chung giữa các
+            # story, và nó không được đổi trạng thái vì "không đọc được kết quả".
+            #
+            # Không mở đường đạt-sai: một lượt không đọc được chỉ từng truyền
+            # `False`, nên bỏ lời gọi này chỉ có thể ngăn một REOPENED sai, không
+            # thể sinh ra một VERIFIED.
             continue
 
         cov = ac_coverage(story_id, line.acceptance, ids)
