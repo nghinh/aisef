@@ -83,7 +83,13 @@ def record_lint() -> None:
 def record_bench_selfcheck() -> None:
     """G5.4 nửa sau. Selfcheck chạy với binary giả — không tốn lượt model."""
     code, out = _run(sys.executable, "-m", "tests.bench", "selfcheck", timeout=600)
-    m = re.search(r"(\d+)\s*/\s*(\d+)", out)
+    # Dòng tổng kết, không phải cặp `n/n` **đầu tiên** gặp trong đầu ra: bản đầu
+    # của hàm này bắt `(\d+)/(\d+)` ở bất cứ đâu và ghi **1/1** trong khi
+    # selfcheck báo 19/19 — G5.4 chỉ so `passed == total`, nên một bản ghi 1/1
+    # **đạt** một tiêu chí mà hợp đồng nói là 19 phép. Đúng lớp lỗi "đo được cái
+    # khác rồi gọi là đo được cái này".
+    m = re.search(r"(?m)^\s*(\d+)\s*/\s*(\d+)\s+đạt", out) or \
+        re.search(r"(?m)^\s*(\d+)\s*/\s*(\d+)\b", out)
     _write("bench-selfcheck.json", {
         "commit": _head(), "exit": code,
         "passed": int(m.group(1)) if m else 0, "total": int(m.group(2)) if m else 0,
