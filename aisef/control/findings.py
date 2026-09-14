@@ -109,9 +109,20 @@ REVIEWER_TRUST = {Trust.REVIEWER, Trust.SECURITY, Trust.GATE,
 
 # ── canonical line shape ───────────────────────────────────────
 
+#: Thẻ `kit/prompts/story-review.md` dặn người rà soát viết, đổi sang mức của
+#: dòng canonical. Bảng ở đây (không ở `reviewer_qual`) vì đây là chỗ phân giải
+#: dòng; `reviewer_qual` nhập lại, để hai đầu không trôi khỏi nhau.
+TAG_SEVERITY = {"block": "high", "stuck": "high",
+                "should fix": "medium", "suggestion": "low"}
+
+#: Dòng canonical **và** dòng người rà soát thật sự viết. Lỗi 158: chỉ nhận
+#: dạng canonical thì 177/177 dòng chặn đã ghi không phân giải được, nên
+#: `Finding.id` chưa từng được tính trên đầu ra thật. Dấu ngăn `—`/`-`/`:`
+#: sau số dòng là cách viết, không phải thân — cắt đi, nếu không cùng một lời
+#: than viết hai kiểu sẽ ra hai `id`.
 _LINE_RE = re.compile(
-    r"^\[(?P<sev>low|medium|high|critical)\]\s+"
-    r"(?P<file>[^:\s]+):(?P<line>\d+)\s+(?P<body>.+)$",
+    r"^\[(?P<sev>low|medium|high|critical|block|stuck|should fix|suggestion)\]\s+"
+    r"(?P<file>[^:\s]+):(?P<line>\d+)\s*(?:[—–\-:]\s*)?(?P<body>.+)$",
     re.IGNORECASE,
 )
 
@@ -255,8 +266,9 @@ class Finding:
             m = _LINE_RE.match(line)
             if not m:
                 continue
+            sev = m.group("sev").lower()
             out.append(Finding.make(
-                source=source, trust=trust, severity=m.group("sev").lower(),
+                source=source, trust=trust, severity=TAG_SEVERITY.get(sev, sev),
                 file=m.group("file"), line=int(m.group("line")),
                 body=m.group("body").strip(),
             ))

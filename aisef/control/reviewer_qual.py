@@ -58,7 +58,7 @@ import subprocess
 from dataclasses import dataclass, replace
 from pathlib import Path
 
-from .findings import Finding, SOURCE_REVIEWER, Trust
+from .findings import TAG_SEVERITY, Finding, SOURCE_REVIEWER, Trust
 from .gate import CONTROLS, controls_in
 from ..harness.observe import AGENT_RUN, NOTE, TOOL_RUN, Evidence, EvidenceStore
 
@@ -101,7 +101,9 @@ CLASSES = (
 #: Lý do một phiên review không được tính — harness tự ghi khi nó xảy ra.
 INVALID_RUNS = ("review:immutable", "review:candidate")
 
-_SEV = {"block": "high", "stuck": "high", "should fix": "medium", "suggestion": "low"}
+#: Cùng một bảng với `findings.TAG_SEVERITY` — nhập lại, không viết lại,
+#: vì hai bản sao của cùng một sự thật là chỗ chúng trôi khỏi nhau (lỗi 158).
+_SEV = TAG_SEVERITY
 
 
 @dataclass(frozen=True)

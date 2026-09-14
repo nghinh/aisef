@@ -50,6 +50,39 @@ class TestConstruction(unittest.TestCase):
         self.assertNotEqual(a.id, b.id)
 
 
+class TestDangDongNguoiRaSoatThucSuViet(unittest.TestCase):
+    """Lỗi 158: `_LINE_RE` chỉ nhận `[low|medium|high|critical] tệp:dòng thân`,
+    trong khi `kit/prompts/story-review.md` dặn người rà soát viết
+    `[block] đường/dẫn:dòng — thân`. Đo trên bằng chứng đã ghi của năm corpus:
+    **177 dòng chặn, 0 dòng phân giải được**, nên `Finding.id` không bao giờ
+    được tính trên đầu ra thật và `implement._same_complaint_by_finding` luôn
+    trả False — kể cả bên trong `deadlock_reason`, chỗ quyết định có ngừng đốt
+    lượt hay không. Phép thử cũ xanh vì nó cho parser ăn `[high] src/pay.py:42`,
+    một hình dạng production **không bao giờ** sinh ra (lỗi đa dạng cú pháp).
+    """
+
+    def _one(self, line):
+        return Finding.parse_lines([line], source=SOURCE_REVIEWER, trust="reviewer")
+
+    def test_the_nguoi_ra_soat_that_phan_giai_duoc(self):
+        got = self._one("[block] bin/marks.js:12 — lstatSync swallows ENOENT")
+        self.assertEqual(len(got), 1, "dạng prompt dặn viết mà không đọc được")
+        self.assertEqual(got[0].file, "bin/marks.js")
+        self.assertEqual(got[0].line, 12)
+        self.assertNotIn("—", got[0].body[:2])   # dấu ngăn không phải thân
+
+    def test_bon_the_cua_prompt_deu_doc_duoc_va_doi_dung_muc(self):
+        for tag, sev in (("block", "high"), ("stuck", "high"),
+                         ("should fix", "medium"), ("suggestion", "low")):
+            with self.subTest(tag=tag):
+                got = self._one(f"[{tag}] a/b.js:3 — chuyện gì đó")
+                self.assertEqual(len(got), 1, f"[{tag}] không đọc được")
+                self.assertEqual(got[0].severity, sev)
+
+    def test_dang_cu_van_doc_duoc(self):
+        self.assertEqual(len(self._one("[high] src/pay.py:42 body here")), 1)
+
+
 class TestRoundTrip(unittest.TestCase):
     def test_line_round_trip(self):
         f = Finding.make(SOURCE_REVIEWER, Trust.REVIEWER.value,
