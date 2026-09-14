@@ -693,3 +693,138 @@ class TestKhongApDungKhacVoiChuaCauHinh(QaTestCase):
         self.assertIn("sit", ids)
         self.assertIn("perf", ids)
         self.assertFalse(rep.release_ready)
+
+
+class TestApDungSuyRaTuHinhDangDuAn(QaTestCase):
+    """Lỗi 167 — khung không có cách **suy ra** một loại kiểm thử có áp dụng hay
+    không, nên "chưa ai cấu hình" là câu trả lời duy nhất nó biết nói.
+
+    Hậu quả: người vận hành phải ký một miễn trừ hàng loạt cho `sit`,
+    `api-contract`, `uat`, `perf`, `migration` — năm loại mà một CLI một tiến
+    trình, một tệp JSON **không có bề mặt** để kiểm. Một miễn trừ hàng loạt như
+    thế không phân biệt được "không áp dụng" với "quên cấu hình", nên nó xoá
+    đúng cái tín hiệu mà cổng tồn tại để giữ.
+
+    Nguồn thẩm quyền phải là **có cấu trúc**, không phải văn xuôi — đánh hơi văn
+    xuôi chính là lỗi 163. Hai tín hiệu đã có sẵn và đều đã được người duyệt:
+
+    * `verification_contract` của từng story — kế hoạch khai loại nào chứng minh
+      story ấy;
+    * `covers` của từng story so với danh sách requirement của PRD — kế hoạch có
+      phủ hết yêu cầu hay không.
+
+    Luật: một loại **không** được story nào khai, trên một kế hoạch đã chốt và
+    phủ **hết** requirement, là NOT_APPLICABLE — kế hoạch đã giao việc chứng minh
+    cho loại khác. Còn nếu có requirement **chưa** được phủ thì câu trả lời là
+    UNRESOLVED, không phải NOT_APPLICABLE: lúc ấy ta thực sự không biết, và đó
+    đúng là lưới an toàn cho ca *"perf bị gọi là N/A chỉ vì chưa ai cấu hình
+    ngưỡng"*.
+    """
+
+    def _plan(self, *, contracts, covers, reqs=("FR-1", "FR-2")):
+        import json
+        root = self.project / "_bmad-output"
+        root.mkdir(parents=True, exist_ok=True)
+        (root / "stories.index.json").write_text(json.dumps({"stories": [
+            {"id": f"S-{i}", "verification_contract": list(c), "covers": list(cv), "screens": []}
+            for i, (c, cv) in enumerate(zip(contracts, covers, strict=True), 1)]}), encoding="utf-8")
+        (root / "prd.md").write_text(
+            "# PRD\n\n## 5. Functional Requirements\n\n" + "\n\n".join(
+                f"### {r} — thing {r}\n\nThe product must do {r}." for r in reqs),
+            encoding="utf-8")
+        return self.project
+
+    def verdict(self, kind_id):
+        from aisef.phases.qa import KINDS, applicability
+        return applicability(KINDS[kind_id], self.project)
+
+    def test_khong_story_nao_khai_va_phu_het_thi_khong_ap_dung(self):
+        self._plan(contracts=[["unit"], ["unit"]], covers=[["FR-1"], ["FR-2"]])
+        for kind in ("sit", "api-contract", "uat", "perf", "migration"):
+            v, ly_do = self.verdict(kind)
+            self.assertEqual(v, "not_applicable", f"{kind}: {ly_do}")
+            self.assertIn("covered", ly_do)
+
+    def test_co_story_khai_thi_ap_dung(self):
+        """Phép kiểm âm: kế hoạch khai `perf` thì perf áp dụng, dù chưa có lệnh."""
+        self._plan(contracts=[["unit", "perf"], ["unit"]], covers=[["FR-1"], ["FR-2"]])
+        v, ly_do = self.verdict("perf")
+        self.assertEqual(v, "applicable", ly_do)
+
+    def test_requirement_chua_phu_thi_khong_ket_luan(self):
+        """Lưới an toàn của chủ dự án: yêu cầu còn hở thì **không biết**, và
+        không biết không được lặng lẽ thành không áp dụng."""
+        self._plan(contracts=[["unit"]], covers=[["FR-1"]], reqs=("FR-1", "FR-2"))
+        v, ly_do = self.verdict("perf")
+        self.assertEqual(v, "unresolved", ly_do)
+        self.assertIn("FR-2", ly_do)
+
+    def test_khong_co_ke_hoach_thi_khong_ket_luan(self):
+        v, ly_do = self.verdict("perf")
+        self.assertEqual(v, "unresolved", ly_do)
+
+    def test_unresolved_van_chan(self):
+        """UNRESOLVED phải chặn y như chưa cấu hình — nó là *không biết*."""
+        from aisef.phases.qa import run_suite
+        self._plan(contracts=[["unit"]], covers=[["FR-1"]], reqs=("FR-1", "FR-2"))
+        rep = run_suite(self.project, config=self.config(**{"verify.unit": "true"}),
+                        has_ui=False)
+        self.assertIn("perf", {r.kind.id for r in rep.unconfigured})
+        self.assertFalse(rep.release_ready)
+
+
+class TestMoiTruongCongCuTachKhoiSanPham(QaTestCase):
+    """Lỗi 168 — mọi loại kiểm thử chạy trong **một** ảnh duy nhất
+    (`image_for(project)`), nên công cụ kiểm thử chỉ dùng được khi nó đã nằm
+    trong cây phụ thuộc của **sản phẩm**.
+
+    Đó là trộn hai loại rủi ro khác hẳn nhau. Đo được: cài Stryker vào marks-cli
+    để chạy mutation kéo theo `qs`/`typed-rest-client` và **2 lỗ hổng moderate**
+    vào một dự án mà cả luận điểm an toàn của nó là *không phụ thuộc, không
+    mạng*. Công cụ kiểm thử không được trở thành phụ thuộc của thứ nó kiểm.
+
+    Ranh giới đúng:
+
+        SẢN PHẨM                      MÔI TRƯỜNG CÔNG CỤ
+        không phụ thuộc chạy    ≠     ghim phiên bản, dùng xong bỏ
+        không mạng                    được lấy DB/công cụ qua mạng
+        npm audit sạch                không dính vào cây sản phẩm
+
+    Mạng để tải **cơ sở dữ liệu lỗ hổng** không phải là mạng cấp cho **ứng dụng
+    đang bị kiểm** — hai ranh giới tin cậy khác nhau, và gộp chúng lại là lý do
+    một lần quét ảnh bị coi là bất khả thi.
+    """
+
+    def test_anh_cong_cu_rieng_cho_tung_loai(self):
+        from aisef.phases.qa import tool_image_for
+        cfg = self.config(**{"verify.tool_images": "image-scan=aquasec/trivy:0.58.1"})
+        self.assertEqual(tool_image_for("image-scan", cfg), "aquasec/trivy:0.58.1")
+        self.assertEqual(tool_image_for("unit", cfg), "", "loại khác vẫn dùng ảnh dự án")
+
+    def test_khong_khai_thi_khong_co_anh_rieng(self):
+        from aisef.phases.qa import tool_image_for
+        self.assertEqual(tool_image_for("image-scan", self.config()), "")
+
+    def test_nhieu_loai_mot_khoa(self):
+        from aisef.phases.qa import tool_image_for
+        cfg = self.config(**{"verify.tool_images": "image-scan=a:1, mutation=b:2"})
+        self.assertEqual(tool_image_for("mutation", cfg), "b:2")
+        self.assertEqual(tool_image_for("image-scan", cfg), "a:1")
+
+    def test_anh_cong_cu_thi_bo_entrypoint(self):
+        """Ảnh công cụ thường có ENTRYPOINT riêng (`aquasec/trivy` là `trivy`),
+        nên `cmd` sẽ bị nối vào sau nó và thành `trivy trivy fs …`. Lệnh verify
+        là một dòng lệnh **đầy đủ**; ảnh chỉ là môi trường nó chạy trong đó."""
+        from aisef.harness.sandbox import SandboxSpec, build_docker_args
+        args = build_docker_args(SandboxSpec(
+            workspace=self.project, cmd=["trivy", "--version"],
+            image="aquasec/trivy:0.58.1", entrypoint=""))
+        self.assertIn("--entrypoint", args)
+        self.assertEqual(args[args.index("--entrypoint") + 1], "")
+
+    def test_khong_khai_entrypoint_thi_khong_dung_toi(self):
+        """Phép kiểm âm: ảnh dự án bình thường không bị đụng entrypoint."""
+        from aisef.harness.sandbox import SandboxSpec, build_docker_args
+        args = build_docker_args(SandboxSpec(
+            workspace=self.project, cmd=["pytest", "-q"], image="python:3.12"))
+        self.assertNotIn("--entrypoint", args)

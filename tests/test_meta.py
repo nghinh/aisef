@@ -196,8 +196,11 @@ class TestSolutionKhopMa(unittest.TestCase):
 
     def test_moi_knob_cau_hinh_co_trong_bang_nguong(self):
         from aisef.config import DEFAULTS
+        # `verify.*` knobs that are **not** a verification kind: they configure how
+        # verification runs, so they get their own row rather than the grouped
+        # `verify.*` line that lists the 12 kinds.
         gop = {"verify.waived", "verify.waiver_reason", "verify.baseline", "verify.clean_tree",
-               "verify.nop"}
+               "verify.nop", "verify.tool_images"}
         for key in DEFAULTS:
             with self.subTest(key=key):
                 if key.startswith("verify.") and key not in gop:

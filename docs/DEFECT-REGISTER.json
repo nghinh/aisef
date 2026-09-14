@@ -142,6 +142,30 @@
    "fixed": "",
    "evidence": "_bmad-output/ appeared at the AISEF repo root with 36 log lines (17 pytest, 1 ruff) between 18:51 and 19:45, spanning the run, while every session recorded correctly into its own workspace (s1/s6/s7 each hold _bmad-output/run.log with 21-27 lines) — so it is a distinct set, from a call whose --project fell back to the default '.'. Preserved at scratchpad/leaked-bmad-output-from-g53 rather than deleted.",
    "notes": "Not cleanup: a dirty tree makes closure.pin_target refuse, so a bench run can block the closure-target freeze, and a stray directory at the repo root is easily swept into a commit by `git add -A`.\nOPEN, not closed: the exact call path is NOT reproducible without a paid real session — the fake-client path (`--tu-kiem`) was tried and does not reproduce it, so the trigger lies in real agent behaviour inside a session. Claiming a fix I cannot verify would be worse than leaving this open.\nWhat did ship is the deterministic part: `ro_ri_ngoai_workspace` snapshots the framework root before a run and names anything the run left behind, turning a silent leak into a loud one at the point it happens, with red-first tests and a negative control for a directory that already existed. P2 and non-blocking: it changes no gate verdict and loses no evidence."
+  },
+  {
+   "id": "D-012",
+   "severity": "P1",
+   "status": "CLOSED",
+   "taxonomy": 167,
+   "false_pass": false,
+   "title": "verification applicability cannot be derived, so a blanket waiver is the only exit",
+   "introduced": "pre-dates this wave",
+   "fixed": "HEAD",
+   "evidence": "marks-cli pre-deploy left sit, api-contract, uat, perf, migration unconfigured with no way to say they do not apply, so release_ready required a 5-kind verify.waived. The framework's only applicability rule was Kind.needs_ui, covering 2 of 12 kinds.",
+   "notes": "P1 because the only available exit degraded assurance: a blanket waiver cannot distinguish 'does not apply' from 'forgot to configure', which is the signal the gate exists to keep.\nFixed from structured, already-approved sources — each story's verification_contract, and covers against the PRD's requirement ids — never from requirements prose, since prose sniffing is defect 163. A kind no story declares on a plan covering every requirement is NOT_APPLICABLE with evidence; if any requirement is uncovered the answer is UNRESOLVED and blocks, which is the safety net for 'perf declared N/A merely because nobody configured a threshold'."
+  },
+  {
+   "id": "D-013",
+   "severity": "P1",
+   "status": "CLOSED",
+   "taxonomy": 168,
+   "false_pass": false,
+   "title": "a verification tool must join the product's dependency tree to run",
+   "introduced": "pre-dates this wave",
+   "fixed": "HEAD",
+   "evidence": "Every kind ran in image_for(project), one image for all. Installing @stryker-mutator/core into marks-cli to run mutation pulled qs and typed-rest-client transitively and raised npm audit from 0 to 2 moderate advisories; reverted. Separately, image-scan was reported as blocked because trivy was not installed in the project image.",
+   "notes": "P1: it forces a real choice between running a quality check and keeping the product's security posture, and the posture is what the product exists to demonstrate.\nFixed with `verify.tool_images` (kind=image) plus SandboxSpec.entrypoint, so each kind may run in its own pinned, disposable tool image while the product keeps zero runtime dependencies. The image's entrypoint is cleared because a verify command is a full command line — aquasec/trivy has ENTRYPOINT ['trivy'], which would otherwise run `trivy trivy fs`.\nProven end to end: marks-cli image-scan now runs `trivy fs --severity HIGH,CRITICAL --scanners vuln,secret` in aquasec/trivy:0.58.1 under the sandbox's own hardening (--cap-drop=ALL, --user 1000:1000, read-only workspace) and passes with zero findings. The network trivy uses to fetch its vulnerability database is not network granted to the application under verification."
   }
  ]
 }

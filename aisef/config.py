@@ -151,6 +151,13 @@ DEFAULTS: dict[str, Any] = {
     "verify.image-scan": "",
     #: Explicitly waived types, comma-separated.  Waiving must be a signed
     #: decision, not a consequence of forgetting to configure.
+    #: Pinned tool image per verification kind: `"kind=image,kind=image"`. A
+    #: verification tool must not have to live in the product's dependency tree
+    #: to run (lỗi 168): installing Stryker into marks-cli to run mutation pulled
+    #: `qs`/`typed-rest-client` and two moderate advisories into a project whose
+    #: whole posture is zero dependencies and no network. The tool environment is
+    #: pinned, disposable, and separate from what ships.
+    "verify.tool_images": "",
     "verify.waived": "",
     #: Waiver reason (scope, date, signer).  ``pre-deploy`` requires a reason
     #: when ``verify.waived`` is non-empty and records it in
@@ -279,6 +286,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "verify.migration": str,
     "verify.sbom": str,
     "verify.image-scan": str,
+    "verify.tool_images": str,
     "verify.waived": str,
     "verify.waiver_reason": str,
     "verify.baseline": bool,

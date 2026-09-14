@@ -250,6 +250,90 @@ class QaReport:
         return "\n".join(lines)
 
 
+#: Applicability verdicts. `UNRESOLVED` is a real answer and must block: it says
+#: the framework could not decide, which is different from deciding "no".
+APPLICABLE, NOT_APPLICABLE, UNRESOLVED = "applicable", "not_applicable", "unresolved"
+
+
+def applicability(kind: Kind, project: Path) -> tuple[str, str]:
+    """Does this verification kind apply to this project? `(verdict, evidence)`.
+
+    Derived from **structured, already-approved** plan artifacts — never from
+    requirements prose. Sniffing prose is what made a CLI look like a web app
+    (lỗi 163: `ui` matched inside the phrase "no ui"), so the authority here is
+    two things a human already reviewed at the `stories` gate:
+
+    * each story's `verification_contract` — the plan stating which kinds prove
+      that story;
+    * each story's `covers` against the PRD's requirement ids — whether the plan
+      accounts for every requirement.
+
+    The rule: a kind **no story declares**, on a settled plan that covers **every**
+    requirement, is NOT_APPLICABLE — the plan assigned that proof to another kind.
+    If any requirement is uncovered, the answer is UNRESOLVED rather than
+    NOT_APPLICABLE, and that distinction is the safety net: it is exactly the
+    "perf declared N/A merely because nobody configured a threshold" case, which
+    must block instead of quietly passing.
+
+    Absent or empty plan → UNRESOLVED. Nothing has been decided yet, so there is
+    nothing to read a decision from.
+    """
+    import json as _json
+
+    root = project / "_bmad-output"
+    index = root / "stories.index.json"
+    if not index.is_file():
+        return UNRESOLVED, "no stories index — nothing has been planned to read a decision from"
+    try:
+        stories = (_json.loads(index.read_text(encoding="utf-8")).get("stories")) or []
+    except (OSError, _json.JSONDecodeError) as e:
+        return UNRESOLVED, f"stories index unreadable ({e})"
+    if not stories:
+        return UNRESOLVED, "stories index is empty — no plan decision exists yet"
+
+    declared = {k for s in stories for k in (s.get("verification_contract") or [])}
+    if kind.id in declared:
+        n = sum(1 for s in stories if kind.id in (s.get("verification_contract") or []))
+        return APPLICABLE, f"{n} story/ies declare `{kind.id}` in their verification contract"
+
+    prd_file = root / "prd.md"
+    if not prd_file.is_file():
+        return UNRESOLVED, "no prd.md — cannot tell whether every requirement is covered"
+    from ..control.normalize import parse_prd_file
+
+    want = {r.id for r in parse_prd_file(prd_file).requirements}
+    if not want:
+        return UNRESOLVED, "prd.md declares no requirement ids — nothing to check coverage against"
+    covered = {c for s in stories for c in (s.get("covers") or [])}
+    ho = sorted(want - covered)
+    if ho:
+        return UNRESOLVED, (
+            f"`{kind.id}` is in no verification contract, but {len(ho)} requirement(s) are "
+            f"covered by no story: {', '.join(ho[:5])} — with the plan incomplete this is "
+            f"not knowable, and not knowable is not the same as not applicable")
+    return NOT_APPLICABLE, (
+        f"no story declares `{kind.id}`, and all {len(want)} requirements are covered by "
+        f"stories whose contracts name {', '.join(sorted(declared)) or 'nothing'} — the plan "
+        f"assigned this proof elsewhere")
+
+
+def tool_image_for(kind_id: str, config: Config | None) -> str:
+    """Pinned image this kind's tool runs in — "" means use the project image.
+
+    Keeps tooling risk out of product risk (lỗi 168). The network a scanner needs
+    to fetch its vulnerability database is not the network the application under
+    verification is granted: different trust boundaries, and conflating them is
+    what made an image scan look impossible.
+    """
+    raw = str((config or {}).get("verify.tool_images", "") or "") if config is not None else ""
+    for phan in raw.split(","):
+        if "=" in phan:
+            k, _, v = phan.partition("=")
+            if k.strip() == kind_id:
+                return v.strip()
+    return ""
+
+
 def _tool_present(command: str, project: Path) -> bool:
     """Is the tool this command actually runs installed here?
 
@@ -504,20 +588,32 @@ def run_suite(
 
             command = command_for_kind(kind.id, project, cfg)
             if not command:
-                result.skipped = "command not configured (verify.%s)" % kind.id
+                # No command: the kind's fate is an applicability question, not a
+                # shrug. Derived from the settled plan (lỗi 167) — NOT_APPLICABLE
+                # is an answer and does not block; UNRESOLVED means the framework
+                # could not decide and blocks exactly as an unconfigured kind does.
+                verdict, vi_sao = applicability(kind, project)
+                if verdict == NOT_APPLICABLE:
+                    result.skipped = result.not_applicable = vi_sao
+                else:
+                    result.skipped = ("command not configured (verify.%s) — %s"
+                                      % (kind.id, vi_sao))
                 report.results.append(result)
                 continue
 
 
+            anh_cong_cu = tool_image_for(kind.id, cfg)
             if artifact_root:
                 from ..harness.runlog import run_log
-                run_log(artifact_root, f"qa:{kind.id} RUN cmd={command}")
+                run_log(artifact_root, f"qa:{kind.id} RUN cmd={command}"
+                        + (f" image={anh_cong_cu}" if anh_cong_cu else ""))
             sb = sandbox.run(
                 sandbox.SandboxSpec(
                     workspace=cay,
                     cmd=split_command(command),
                     level=kind.level,
-                    image=image_for(project, cfg),
+                    image=anh_cong_cu or image_for(project, cfg),
+                    entrypoint="" if anh_cong_cu else None,
                     timeout_seconds=cfg["run.timeout_seconds"],
                     allow_degraded=cfg["sandbox.allow_degraded"],
                     use_docker=cfg["sandbox.use_docker"],

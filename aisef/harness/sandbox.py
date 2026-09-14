@@ -110,6 +110,12 @@ class SandboxSpec:
     level: Level = Level.WORKSPACE_WRITE
     image: str = DEFAULT_IMAGE
     env: dict[str, str] = field(default_factory=dict)
+    #: Override the image's ENTRYPOINT. `None` leaves it alone; `""` clears it so
+    #: `cmd` is interpreted literally. A verification **tool image** usually has
+    #: its own entrypoint (`aquasec/trivy` is `trivy`), which would swallow the
+    #: first word of the command and run `trivy trivy fs …`. A verify command is
+    #: a full command line; the image is only the environment it runs in.
+    entrypoint: str | None = None
     timeout_seconds: int = 1800
     #: Allow degraded execution — run on a provider missing guarantees for
     #: this level. Set False when isolation is mandatory and failing is
@@ -202,6 +208,8 @@ def build_docker_args(spec: SandboxSpec, *, name: str = "") -> list[str]:
         "-v", f"{ws}:/workspace:{mount_mode}",
         "-w", "/workspace",
     ]
+    if spec.entrypoint is not None:
+        args += ["--entrypoint", spec.entrypoint]
     if name:
         args += ["--name", name]
     for rel, src in spec.mounts.items():
