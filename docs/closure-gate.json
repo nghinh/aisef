@@ -11,7 +11,10 @@
   "severity_scale": {
     "source": "docs/EXTERNAL-VALIDATION-v1.1.0.md#finding-classification",
     "_comment": "Reused, not redefined. P0 = cannot install, data loss, security issue, incorrect gate result. P1 = cannot complete lifecycle without author assistance.",
-    "blocking": ["P0", "P1"]
+    "blocking": [
+      "P0",
+      "P1"
+    ]
   },
   "unconfigured_is_unrunnable": true,
   "gates": [
@@ -25,29 +28,41 @@
           "id": "G1.1",
           "statement": "CI is green on the commit the released tag points at",
           "probe": "aisef.control.closure:probe_ci_green",
-          "evidence": "github-actions:tests.yml",
-          "freshness": {"kind": "bound_to", "source": "release_tag_commit"}
+          "evidence": "closure-evidence/release.json",
+          "freshness": {
+            "kind": "bound_to",
+            "source": "release_tag_commit"
+          }
         },
         {
           "id": "G1.2",
           "statement": "wheel and sdist build, and twine check passes both",
           "probe": "aisef.control.closure:probe_package_checks",
-          "evidence": "build:dist/",
-          "freshness": {"kind": "bound_to", "source": "commit"}
+          "evidence": "closure-evidence/release.json",
+          "freshness": {
+            "kind": "bound_to",
+            "source": "commit"
+          }
         },
         {
           "id": "G1.3",
           "statement": "a clean venv install from PyPI serves the released version",
           "probe": "aisef.control.closure:probe_pypi_install",
-          "evidence": "pypi:aisef",
-          "freshness": {"kind": "bound_to", "source": "release_version"}
+          "evidence": "closure-evidence/release.json",
+          "freshness": {
+            "kind": "bound_to",
+            "source": "release_version"
+          }
         },
         {
           "id": "G1.4",
           "statement": "runtime package data ships inside the wheel and is non-empty",
           "probe": "aisef.control.closure:probe_packaged_data",
-          "evidence": "wheel:aisef/kit,aisef/harness/assets",
-          "freshness": {"kind": "bound_to", "source": "release_version"}
+          "evidence": "closure-evidence/release.json",
+          "freshness": {
+            "kind": "bound_to",
+            "source": "release_version"
+          }
         }
       ]
     },
@@ -62,7 +77,10 @@
           "statement": "the full test suite is green, run from the MAIN checkout",
           "probe": "aisef.control.closure:probe_suite_green",
           "evidence": "closure-evidence/suite.json",
-          "freshness": {"kind": "bound_to", "source": "commit"},
+          "freshness": {
+            "kind": "bound_to",
+            "source": "commit"
+          },
           "notes": "UNRUNNABLE if not the main working tree: a git worktree skips ~61 more tests because .gitignore excludes references/*, .bench*/, .conformance/, .dogfood/. The probe records the skip count and the tree it ran in."
         },
         {
@@ -70,14 +88,20 @@
           "statement": "the lint gate is clean under the rule set in pyproject.toml",
           "probe": "aisef.control.closure:probe_lint_clean",
           "evidence": "closure-evidence/lint.json",
-          "freshness": {"kind": "bound_to", "source": "commit"}
+          "freshness": {
+            "kind": "bound_to",
+            "source": "commit"
+          }
         },
         {
           "id": "G2.3",
           "statement": "zero OPEN P0/P1 defects in the canonical register",
           "probe": "aisef.control.closure:probe_defect_register",
           "evidence": "docs/DEFECT-REGISTER.json",
-          "freshness": {"kind": "bound_to", "source": "commit"},
+          "freshness": {
+            "kind": "bound_to",
+            "source": "commit"
+          },
           "waiver_eligible": true
         },
         {
@@ -85,14 +109,20 @@
           "statement": "no known false PASS in a deterministic or structural blocking check",
           "probe": "aisef.control.closure:probe_deterministic_false_pass",
           "evidence": "docs/DEFECT-REGISTER.json",
-          "freshness": {"kind": "bound_to", "source": "commit"}
+          "freshness": {
+            "kind": "bound_to",
+            "source": "commit"
+          }
         },
         {
           "id": "G2.4b",
           "statement": "a judge-only block is identifiable, distinguishable, overridable, and cannot masquerade as deterministic",
           "probe": "aisef.control.closure:probe_judge_only_semantics",
           "evidence": "closure-evidence/judge-only-audit.json",
-          "freshness": {"kind": "bound_to", "source": "commit"},
+          "freshness": {
+            "kind": "bound_to",
+            "source": "commit"
+          },
           "waiver_eligible": true,
           "requires_human": true,
           "notes": "Owner ruling 1. The four properties are G2.4b-i..iv in the contract. A WAIVED outcome requires an explicit owner reason; the measured rate (miss 34-39%, 11 of 20 same-tree reversals, 36.8% judge-alone blocks) stays published and recomputable."
@@ -110,8 +140,12 @@
           "statement": "every first-class client has a complete, passing conformance column",
           "probe": "aisef.control.closure:probe_conformance",
           "evidence": "docs/CONFORMANCE.md",
-          "freshness": {"kind": "age_days", "max_from": "aisef.control.conformance:MAX_AGE_DAYS", "source": "report.generated"},
-          "notes": "Reads through conformance.release_ready, which must require both claude and opencode (ADR-006 §4). Owner ruling 5: no re-run merely to refresh a still-valid timestamp; the report prints days remaining."
+          "freshness": {
+            "kind": "age_days",
+            "max_from": "aisef.control.conformance:MAX_AGE_DAYS",
+            "source": "report.generated"
+          },
+          "notes": "Reads through conformance.release_ready, which must require both claude and opencode (ADR-006 \u00a74). Owner ruling 5: no re-run merely to refresh a still-valid timestamp; the report prints days remaining."
         }
       ]
     },
@@ -132,42 +166,60 @@
           "statement": "the corpus is resolvable by path and has an artifact root",
           "probe": "aisef.control.closure:probe_corpus_present",
           "evidence": "corpus:_bmad-output",
-          "freshness": {"kind": "bound_to", "source": "corpus_head"}
+          "freshness": {
+            "kind": "bound_to",
+            "source": "corpus_head"
+          }
         },
         {
           "id": "G4.2",
           "statement": "every upstream human gate is APPROVED and not STALE",
           "probe": "aisef.control.closure:probe_upstream_gates",
           "evidence": "corpus:_bmad-output/approvals",
-          "freshness": {"kind": "approval_digest", "source": "ApprovalStore"}
+          "freshness": {
+            "kind": "approval_digest",
+            "source": "ApprovalStore"
+          }
         },
         {
           "id": "G4.3",
           "statement": "every planned story reached done, and none was never run",
           "probe": "aisef.control.closure:probe_stories_done",
           "evidence": "corpus:_bmad-output/sprint-status.json",
-          "freshness": {"kind": "bound_to", "source": "corpus_head"}
+          "freshness": {
+            "kind": "bound_to",
+            "source": "corpus_head"
+          }
         },
         {
           "id": "G4.4",
           "statement": "independent review and security ran for every story",
           "probe": "aisef.control.closure:probe_review_and_security",
           "evidence": "corpus:_bmad-output/evidence",
-          "freshness": {"kind": "bound_to", "source": "corpus_head"}
+          "freshness": {
+            "kind": "bound_to",
+            "source": "corpus_head"
+          }
         },
         {
           "id": "G4.5",
           "statement": "deterministic verification is recorded at the merged candidate, not a stale one",
           "probe": "aisef.control.closure:probe_evidence_at_candidate",
           "evidence": "corpus:_bmad-output/evidence",
-          "freshness": {"kind": "bound_to", "source": "corpus_head"}
+          "freshness": {
+            "kind": "bound_to",
+            "source": "corpus_head"
+          }
         },
         {
           "id": "G4.6",
           "statement": "pre-deploy passes with its scope declared",
           "probe": "aisef.control.closure:probe_pre_deploy",
           "evidence": "corpus:_bmad-output/pre-deploy-report.json",
-          "freshness": {"kind": "report_digest", "source": "pre-deploy-report.json"},
+          "freshness": {
+            "kind": "report_digest",
+            "source": "pre-deploy-report.json"
+          },
           "waiver_eligible": true,
           "notes": "Only the isolation sub-check is waiver-eligible, via the existing sandbox.pre_deploy_degraded_waiver with its reason. Docker availability is an environment fact."
         },
@@ -176,7 +228,10 @@
           "statement": "the PRE_DEPLOY gate is human-approved against THAT report",
           "probe": "aisef.control.closure:probe_pre_deploy_approved",
           "evidence": "corpus:_bmad-output/approvals/pre-deploy.json",
-          "freshness": {"kind": "approval_digest", "source": "ApprovalStore"},
+          "freshness": {
+            "kind": "approval_digest",
+            "source": "ApprovalStore"
+          },
           "requires_human": true,
           "notes": "aisef closure must never approve this."
         }
@@ -193,7 +248,10 @@
           "statement": "the methodology was pre-registered before any column-2 data existed, and its digest still matches",
           "probe": "aisef.control.closure:probe_prereg_digest",
           "evidence": "docs/BENCH-PREREGISTRATION-C2.md",
-          "freshness": {"kind": "pinned_digest", "source": "prereg_sha256"},
+          "freshness": {
+            "kind": "pinned_digest",
+            "source": "prereg_sha256"
+          },
           "prereg_sha256": "0c4dab0a74b6cb56ecc52c4ee9013a693bbdcf69374728f2951c9fa0c62a44cc",
           "prereg_frozen_region": {
             "_comment": "Owner ruling 7. The digest covers ONLY the frozen region -- the verbatim pre-registration -- not the whole file, so a dated addendum outside the markers does not break the pin while any edit inside it does. It is recorded HERE and nowhere inside the file it pins: a digest living in its own subject is updated in the same motion as the text and pins nothing. `also_in` is the pre-data commit carrying the same bytes; the same recipe must yield the same digest there, and that equality is what dates the text. Verify: docs/BENCH-PREREGISTRATION-C2.md section 1.1.",
@@ -211,14 +269,20 @@
           "statement": "cut sessions are not silently mixed with valid ones",
           "probe": "aisef.control.closure:probe_cut_session_separation",
           "evidence": "bench:results.jsonl",
-          "freshness": {"kind": "bound_to", "source": "cohort_manifest"}
+          "freshness": {
+            "kind": "bound_to",
+            "source": "cohort_manifest"
+          }
         },
         {
           "id": "G5.3",
           "statement": "a model-CLI pair whose cut-session behaviour satisfies the pre-registered validity rule has been established",
           "probe": "aisef.control.closure:probe_pair_qualification",
           "evidence": "docs/BENCH-PAIR-QUALIFICATION.md",
-          "freshness": {"kind": "bound_to", "source": "qualification_run"},
+          "freshness": {
+            "kind": "bound_to",
+            "source": "qualification_run"
+          },
           "waiver_eligible": true,
           "requires_human": true,
           "notes": "Owner ruling 3: not waived pre-emptively. States WAIVER_PENDING when no available pair qualifies; the 72-attempt run does not start until PASSED."
@@ -227,22 +291,31 @@
           "id": "G5.4",
           "statement": "benchmark evidence is reproducible: dataset digest matches and selfcheck passes",
           "probe": "aisef.control.closure:probe_bench_reproducible",
-          "evidence": "tests/bench/MANIFEST.sha256",
-          "freshness": {"kind": "bound_to", "source": "commit"}
+          "evidence": "tests/bench/tasks/MANIFEST.sha256,closure-evidence/bench-selfcheck.json",
+          "freshness": {
+            "kind": "bound_to",
+            "source": "commit"
+          }
         },
         {
           "id": "G5.5",
           "statement": "noise and inconclusive results are reported as such",
           "probe": "aisef.control.closure:probe_inconclusive_reported",
           "evidence": "docs/BENCH-REPORT-*.md",
-          "freshness": {"kind": "bound_to", "source": "commit"}
+          "freshness": {
+            "kind": "bound_to",
+            "source": "commit"
+          }
         },
         {
           "id": "G5.6",
           "statement": "no unreproducible historical claim is presented as current evidence",
           "probe": "aisef.control.closure:probe_no_stale_claims",
           "evidence": "README.md,README.vi.md,landingpage/index.html,docs/SALEKIT.html",
-          "freshness": {"kind": "bound_to", "source": "commit"}
+          "freshness": {
+            "kind": "bound_to",
+            "source": "commit"
+          }
         }
       ]
     },
@@ -257,7 +330,10 @@
           "statement": "the validation report exists at the path the protocol declares, carrying the protocol's metric fields",
           "probe": "aisef.control.closure:probe_external_report",
           "evidence": "docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md",
-          "freshness": {"kind": "onboarding_digest", "source": "closure-evidence/onboarding-digest.json"},
+          "freshness": {
+            "kind": "onboarding_digest",
+            "source": "closure-evidence/onboarding-digest.json"
+          },
           "notes": "docs/EXTERNAL-VALIDATION-v1.1.0.md is the PROTOCOL, not the record. Its existence does not satisfy this."
         },
         {
@@ -265,7 +341,10 @@
           "statement": "the participant is a genuinely external person, not an AI agent and not an AISEF contributor",
           "probe": "aisef.control.closure:probe_participant_external",
           "evidence": "docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md",
-          "freshness": {"kind": "bound_to", "source": "report_digest"},
+          "freshness": {
+            "kind": "bound_to",
+            "source": "report_digest"
+          },
           "requires_human": true,
           "notes": "Owner ruling 4. Not machine-decidable on its own; the probe checks the record asserts it and the owner confirms at approval."
         },
@@ -274,7 +353,10 @@
           "statement": "no unresolved P0/P1 onboarding blocker",
           "probe": "aisef.control.closure:probe_onboarding_blockers",
           "evidence": "docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md",
-          "freshness": {"kind": "bound_to", "source": "report_digest"},
+          "freshness": {
+            "kind": "bound_to",
+            "source": "report_digest"
+          },
           "waiver_eligible": true,
           "requires_human": true
         }
@@ -284,17 +366,45 @@
   "onboarding_digest": {
     "_comment": "Owner ruling 4. Deterministic hash over the PUBLIC ONBOARDING SURFACE only, taken over extracted and normalised content (whitespace collapsed, prose reflow ignored) -- never raw file bytes, because a typo fix must not invalidate a real person's validation.",
     "sources": [
-      {"path": "README.md", "extract": "section:Install"},
-      {"path": "README.md", "extract": "section:Quick Start"},
-      {"path": "docs/USAGE-GUIDE.md", "extract": "canonical_cli_workflow"},
-      {"path": "docs/EXTERNAL-VALIDATION-v1.1.0.md", "extract": "section:Protocol"},
-      {"path": "aisef/config.py", "extract": "onboarding_defaults"}
+      {
+        "path": "README.md",
+        "extract": "section:Install"
+      },
+      {
+        "path": "README.md",
+        "extract": "section:Quick Start"
+      },
+      {
+        "path": "docs/USAGE-GUIDE.md",
+        "extract": "canonical_cli_workflow"
+      },
+      {
+        "path": "docs/EXTERNAL-VALIDATION-v1.1.0.md",
+        "extract": "section:Protocol"
+      },
+      {
+        "path": "aisef/config.py",
+        "extract": "onboarding_defaults"
+      }
     ],
     "onboarding_defaults": [
-      "tools.test", "tools.lint", "tools.sast",
-      "run.max_turns", "run.max_retries", "run.timeout_seconds",
-      "sandbox.provider", "sandbox.use_docker",
-      "clients.env_allow", "skills.offer"
+      "tools.test",
+      "tools.lint",
+      "tools.sast",
+      "run.max_turns",
+      "run.max_retries",
+      "run.timeout_seconds",
+      "sandbox.provider",
+      "sandbox.use_docker",
+      "clients.env_allow",
+      "skills.offer"
     ]
+  },
+  "_evidence_note": "G1.* and G5.4's selfcheck half read recorded verifications (closure-evidence/release.json, closure-evidence/bench-selfcheck.json) because the evaluator is read-only: resolving them live would mean a network call, a build and an install. The CI record is cross-checked against the tag's real commit locally so it cannot self-assert.",
+  "exit_codes": {
+    "0": "closable",
+    "1": "blocked",
+    "2": "usage error",
+    "_note": "Deliberately NOT the rest of this CLI's convention (1 usage / 2 not-ready). The contract \u00a74.3 specified these numbers; an unrecognised flag is still reported by the top-level parser and exits 1, as for every verb."
   }
 }

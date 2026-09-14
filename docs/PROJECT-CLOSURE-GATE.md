@@ -218,8 +218,15 @@ aisef closure --waive G6.3 --reason "..."   # record a waiver (refuses without a
 aisef closure --approve       # human signature; refuses unless every gate is non-blocking
 ```
 
-Exit codes follow the repo's existing convention (`gates` exits 2; `aisef tool`
-exits 2 on a guard block): `0` closable, `1` blocked, `2` usage error.
+Exit codes: `0` closable, `1` blocked, `2` usage error.
+
+> **Correction 2026-09-14.** The draft said these "follow the repo's existing
+> convention (`gates` exits 2)" and then specified the **reverse** of it — this
+> CLI uses 1 for usage and 2 for not-ready. The numbers above are the contract's
+> and are what `aisef closure` implements; the claim that they match the house
+> convention was wrong. One limitation follows from it: only errors the
+> subparser itself raises can be redirected to 2, so an *unrecognised flag* is
+> reported by the top-level parser and still exits 1, as for every other verb.
 
 Design constraints, each with a reason drawn from a defect this project already
 paid for:
@@ -706,7 +713,7 @@ engineering effort can buy.
 | G2 Core correctness | **FAILED** | G2.3 no defect source; G2.4b 36.8 % judge-alone blocks |
 | G3 Client conformance | **PASSED** | expires 2026-09-22 |
 | G4 Real end-to-end delivery | **FAILED** | no corpus with a passing, approved pre-deploy |
-| G5 Benchmark integrity | **FAILED** | G5.3 no cut-session-free model↔CLI pair |
+| G5 Benchmark integrity | **FAILED** | G5.3 no cut-session-free model↔CLI pair; **and G5.5** — `BENCH-REPORT-v0.3.0.md` prints pass@1 deltas and a 1.07× cost ratio while stating neither a noise band nor an inconclusive verdict, which is the one thing G5.5 asks for. The draft's §5 claimed G5.5 passed; measured by the probe, it does not, and the criterion was not weakened to match the claim. |
 | G6 External validation | **UNRUNNABLE** | no audited record |
 
 **2 of 6 pass.** I have not softened anything to improve that ratio; where a
@@ -743,7 +750,7 @@ section, and the release/evidence records.
 | Column-2 benchmark run | G5.3 | may require an endpoint the project cannot procure |
 | Sandbox isolation in the G4 pre-deploy | G4.6 | Docker availability is an environment fact; mechanism already exists |
 | Unresolved P0/P1 onboarding blockers | G6.3 | explicitly yours per the brief |
-| The 4 remaining uncorroborated REOPENED entries | G2.4a | one run where the test tool never started; a distinct semantics decision |
+| The 4 remaining uncorroborated REOPENED entries | *tracked as defect D-001, not a G2.4a waiver* | **Corrected 2026-09-14:** listing this under G2.4a contradicted §5 and the criteria file, where G2.4a is **not** waiver-eligible. Exactly five criteria are waivable — G2.3, G2.4b, G4.6, G5.3, G6.3 — and a test asserts it. The four entries are one run where the test tool never started; they live in the defect register, and G2.3 (which *is* waivable) is where a decision about them lands. |
 
 ### POST_CLOSE
 
