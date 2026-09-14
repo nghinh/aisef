@@ -545,7 +545,8 @@ def probe_judge_only_semantics(ctx: Ctx) -> Probed:
     alone = rec.get("judge_alone_blocks", measured.get("judge_only_records"))
     total = rec.get("blocks_total", measured.get("blocking_records"))
     if alone is None or total is None:
-        return _missing(f"{rel}: judge-alone counts — the rate must stay published")
+        return _missing(f"{rel}: judge_alone_blocks/blocks_total (or measured."
+                        f"judge_only_records/blocking_records) — the rate must stay published")
     broken = [p for p in JUDGE_PROPERTIES if not props[p].get("holds")]
     alone, total = int(alone), int(total) or 1
     rate = f"{alone}/{total} blocks judge-alone ({100 * alone / total:.1f}%)"
