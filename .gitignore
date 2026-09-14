@@ -44,3 +44,10 @@ uv.lock
 # Mỗi cohort ghi vào thư mục riêng (`AISEF_BENCH_DIR=.bench-c2`, …) để không xoá
 # cây làm việc mà báo cáo của cohort trước đang trích dẫn làm bằng chứng.
 .bench-*/
+
+# cổng đóng dự án: báo cáo là **đầu ra**, dựng lại được bằng `aisef closure`.
+# Bản chấm từ một worktree ghi hàng loạt UNRUNNABLE không so sánh được — đừng
+# để nó lọt vào kho như thể là bản ghi. Chữ ký và waiver
+# (`closure-evidence/closure-state.json`) thì **commit**: đó là quyết định.
+closure-evidence/closure-report.json
+docs/CLOSURE-REPORT.md

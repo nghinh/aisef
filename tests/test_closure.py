@@ -1,0 +1,1421 @@
+"""`aisef closure` — the project closure gate evaluator.
+
+The gate exists because two of the four bullets of the old exit condition became
+permanently unsatisfiable, so the tests here are less about "does it compute a
+table" and more about the six things it must never do: launch an agent, run a
+paid workload, modify a corpus, auto-approve, turn `UNCONFIGURED` into `PASS`,
+or silently substitute a missing corpus. Each has a class below.
+
+The rule every probe test asserts in one way or another is bug 154's: a
+criterion is never satisfied by its own absence. Missing evidence is
+`UNRUNNABLE`, which blocks.
+"""
+
+from __future__ import annotations
+
+import ast
+import hashlib
+import io
+import json
+import subprocess
+import sys
+import tempfile
+import unittest
+from contextlib import redirect_stderr, redirect_stdout
+from datetime import date, timedelta
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from aisef.cli import main  # noqa: E402
+from aisef.control import closure as CL  # noqa: E402
+from aisef.control import conformance as CF  # noqa: E402
+from aisef.control.approvals import GATE_ORDER, AUTO_APPROVER, ApprovalStore, Gate  # noqa: E402
+from aisef.control.gate import Outcome  # noqa: E402
+from aisef.control.state import StateStore, StoryStatus, StoryRecord, SprintState  # noqa: E402
+from aisef.harness.observe import EvidenceStore  # noqa: E402
+
+
+# ------------------------------------------------- stub probes for fixtures
+# Referenced from fixture criteria files as `tests.test_closure:stub_*`, the
+# same `module:callable` form the shipped criteria file uses.
+
+def stub_passed(ctx):
+    return CL.Probed(Outcome.PASSED, "stub says yes")
+
+
+def stub_failed(ctx):
+    return CL.Probed(Outcome.FAILED, "stub says no")
+
+
+def stub_unconfigured(ctx):
+    return CL.Probed(Outcome.UNCONFIGURED, "nobody configured it")
+
+
+def stub_raises(ctx):
+    raise RuntimeError("boom")
+
+
+def stub_reads(ctx):
+    """Reads a file, so the report records that path and its digest."""
+    text = ctx.read("evidence.txt")
+    return CL.Probed(Outcome.PASSED if text else Outcome.FAILED, "read the evidence")
+
+
+def git(root: Path, *args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", "-C", str(root), *args], capture_output=True,
+                          text=True, encoding="utf-8", errors="replace")
+
+
+def crit(cid: str, probe: str, **kw) -> dict:
+    return {"id": cid, "statement": f"{cid} statement", "probe": probe, **kw}
+
+
+def spec_of(*criteria: dict, **extra) -> dict:
+    gate = {"id": "GT", "title": "test gate", "waiver_eligible": False,
+            "criteria": list(criteria)}
+    out = {"contract_version": "1", "contract_path": "docs/PROJECT-CLOSURE-GATE.md",
+           "contract_sha256": "", "unconfigured_is_unrunnable": True,
+           "severity_scale": {"blocking": ["P0", "P1"]}, "gates": [gate]}
+    out.update(extra)
+    return out
+
+
+class Repo:
+    """A throwaway framework checkout: contract, criteria file, one commit."""
+
+    CONTRACT = "# closure contract\n"
+
+    def __init__(self, spec: dict | None = None, *, pin: bool = True, commit: bool = True):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name).resolve()
+        (self.root / "docs").mkdir()
+        self.write("docs/PROJECT-CLOSURE-GATE.md", self.CONTRACT)
+        self.spec = spec if spec is not None else spec_of(crit("GT.1", "tests.test_closure:stub_passed"))
+        if pin:
+            self.spec["contract_sha256"] = hashlib.sha256(self.CONTRACT.encode()).hexdigest()
+        self.write_json(CL.CRITERIA_PATH, self.spec)
+        if commit:
+            git(self.root, "init")
+            git(self.root, "config", "user.name", "Test")
+            git(self.root, "config", "user.email", "t@t.t")
+            git(self.root, "add", ".")
+            git(self.root, "commit", "-m", "init")
+
+    def close(self):
+        self._tmp.cleanup()
+
+    @property
+    def head(self) -> str:
+        return git(self.root, "rev-parse", "HEAD").stdout.strip()
+
+    def write(self, rel: str, text: str) -> Path:
+        p = self.root / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8")
+        return p
+
+    def write_json(self, rel: str, obj) -> Path:
+        return self.write(rel, json.dumps(obj, indent=2, ensure_ascii=False))
+
+    def ctx(self, criterion: dict | None = None, *, corpus: str = "") -> CL.Ctx:
+        return CL.Ctx(root=self.root, spec=self.spec, criterion=criterion or {}, corpus_arg=corpus)
+
+    def evaluate(self, **kw) -> CL.Report:
+        return CL.evaluate(self.root, spec=self.spec, **kw)
+
+
+class Corpus:
+    """A throwaway aisef project standing in for the G4 corpus."""
+
+    def __init__(self, stories=("S-1",), *, planned=(), status=StoryStatus.DONE,
+                 approve=True, review=True, candidate_merged=True):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name).resolve()
+        self.art = self.root / CL.ARTIFACT_ROOT
+        self.art.mkdir()
+        (self.root / "src.txt").write_text("code\n", encoding="utf-8")
+        git(self.root, "init")
+        git(self.root, "config", "user.name", "Test")
+        git(self.root, "config", "user.email", "t@t.t")
+        git(self.root, "add", ".")
+        git(self.root, "commit", "-m", "init")
+        self.head = git(self.root, "rev-parse", "HEAD").stdout.strip()
+
+        all_ids = list(stories) + list(planned)
+        (self.art / "stories.index.json").write_text(json.dumps({
+            "stories": [{"id": sid, "epic_id": "EPIC-01"} for sid in all_ids],
+            "epics": [{"id": "EPIC-01"}],
+            "waves": {"1": all_ids},
+        }), encoding="utf-8")
+        StateStore(self.art).save(SprintState(stories={
+            sid: StoryRecord(id=sid, epic_id="EPIC-01", status=status.value) for sid in stories}))
+
+        cand = self.head if candidate_merged else "0" * 40
+        store = EvidenceStore(self.art, candidate=cand)
+        for sid in stories:
+            store.tool_run(sid, "test", ok=True)
+            if review:
+                store.tool_run(sid, "review", ok=True)
+                store.tool_run(sid, "security", ok=True)
+        if approve:
+            approvals = ApprovalStore(self.art)
+            for gate in GATE_ORDER[:-1]:
+                approvals.approve(gate, by="human")
+
+    def close(self):
+        self._tmp.cleanup()
+
+    def pre_deploy(self, *, passed=True, scope="EPIC-01", waivers=None, checks=None):
+        rep = {"passed": passed,
+               "checks": checks or [{"name": "scope", "passed": True, "skipped": False}],
+               "scope": ({"epic": scope} if scope else None), "waivers": waivers or {},
+               "degraded_waiver": ""}
+        (self.art / "pre-deploy-report.json").write_text(json.dumps(rep), encoding="utf-8")
+        return rep
+
+    def digests(self) -> dict[str, str]:
+        """Every file under the corpus with its hash — how "did the evaluator
+        touch the corpus" is answered."""
+        out = {}
+        for p in sorted(self.root.rglob("*")):
+            if p.is_file() and ".git" not in p.parts:
+                out[str(p.relative_to(self.root))] = hashlib.sha256(p.read_bytes()).hexdigest()
+        return out
+
+
+# ------------------------------------------------------------ the vocabulary
+
+
+class TestVocabulary(unittest.TestCase):
+    def test_reuses_the_story_gate_outcome(self):
+        """One outcome type for all gates — not a second enum that drifts."""
+        from aisef.control import outcome as O
+
+        self.assertIs(CL.Outcome, Outcome)
+        self.assertIs(CL.Outcome, O.Outcome)
+
+    def test_hard_kinds_are_real_check_kinds(self):
+        from aisef.control.outcome import CHECK_KINDS
+
+        self.assertTrue(set(CL.HARD_KINDS) <= set(CHECK_KINDS))
+
+
+class TestClosureTightening(unittest.TestCase):
+    """`UNCONFIGURED.blocks` is False for story gates and that is right there.
+    At closure it would let an unconfigured check read as absolution."""
+
+    def test_unconfigured_is_promoted_to_unrunnable_and_blocks(self):
+        repo = Repo(spec_of(crit("GT.1", "tests.test_closure:stub_unconfigured")))
+        self.addCleanup(repo.close)
+        r = repo.evaluate().results[0]
+        self.assertIs(r.outcome, Outcome.UNRUNNABLE)
+        self.assertTrue(r.outcome.blocks)
+        self.assertIn("UNCONFIGURED", r.detail)
+        self.assertIn("nobody configured it", r.detail)
+
+    def test_story_gate_semantics_are_unchanged(self):
+        self.assertFalse(Outcome.UNCONFIGURED.blocks)
+
+    def test_shipped_criteria_file_asks_for_the_tightening(self):
+        spec = CL.load_spec(ROOT)
+        self.assertTrue(spec.get("unconfigured_is_unrunnable"))
+
+    def test_a_probe_that_raises_blocks(self):
+        repo = Repo(spec_of(crit("GT.1", "tests.test_closure:stub_raises")))
+        self.addCleanup(repo.close)
+        r = repo.evaluate().results[0]
+        self.assertIs(r.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("RuntimeError", r.detail)
+
+    def test_an_unresolvable_probe_blocks(self):
+        repo = Repo(spec_of(crit("GT.1", "tests.test_closure:no_such_probe")))
+        self.addCleanup(repo.close)
+        r = repo.evaluate().results[0]
+        self.assertIs(r.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("not resolvable", r.detail)
+
+
+# --------------------------------------------------- no pass by its own absence
+
+
+class TestNoCriterionPassesOnAbsence(unittest.TestCase):
+    """Bug 154: the release gate's one acceptance assertion skipped when an env
+    var was unset and the log read `OK (skipped=1)` — green, on the assertion
+    that had never run. Every one of the 26 probes, given a repository with no
+    evidence at all, must block."""
+
+    def test_every_probe_blocks_in_an_empty_repository(self):
+        shipped = CL.load_spec(ROOT)
+        repo = Repo(shipped, pin=False)
+        self.addCleanup(repo.close)
+        report = repo.evaluate()
+        self.assertEqual(len(report.results), 26)
+        for r in report.results:
+            with self.subTest(criterion=r.id):
+                self.assertTrue(r.outcome.blocks,
+                                f"{r.id} did not block with no evidence: {r.outcome} {r.detail}")
+                self.assertTrue(r.detail, f"{r.id} blocked without saying why")
+
+
+class TestShippedCriteriaFile(unittest.TestCase):
+    def setUp(self):
+        self.spec = CL.load_spec(ROOT)
+        self.criteria = [c for g in self.spec["gates"] for c in g["criteria"]]
+
+    def test_six_gates_twentysix_criteria_unique_ids(self):
+        self.assertEqual(len(self.spec["gates"]), 6)
+        self.assertEqual(len(self.criteria), 26)
+        ids = [c["id"] for c in self.criteria]
+        self.assertEqual(len(set(ids)), len(ids))
+
+    def test_every_named_probe_exists_and_is_callable(self):
+        for c in self.criteria:
+            with self.subTest(criterion=c["id"]):
+                fn = CL._ref(c["probe"])
+                self.assertTrue(callable(fn))
+                self.assertTrue(c["probe"].startswith("aisef.control.closure:"))
+
+    def test_exactly_five_criteria_are_waiver_eligible(self):
+        self.assertEqual(CL.eligible_ids(self.spec), ["G2.3", "G2.4b", "G4.6", "G5.3", "G6.3"])
+
+
+# ------------------------------------------------------------------- G1 probes
+
+
+class TestG1(unittest.TestCase):
+    def setUp(self):
+        self.repo = Repo()
+        self.addCleanup(self.repo.close)
+        git(self.repo.root, "tag", "v9.9.9")
+        self.sha = self.repo.head
+
+    def release(self, **parts):
+        self.repo.write_json(f"{CL.EVIDENCE_DIR}/release.json", parts)
+
+    def test_missing_record_is_unrunnable_for_all_four(self):
+        for probe in (CL.probe_ci_green, CL.probe_package_checks,
+                      CL.probe_pypi_install, CL.probe_packaged_data):
+            with self.subTest(probe=probe.__name__):
+                p = probe(self.repo.ctx())
+                self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+                self.assertIn("closure-evidence/release.json", p.detail)
+
+    def test_ci_green_binds_to_the_tag_commit(self):
+        self.release(ci={"workflow": "tests.yml", "conclusion": "success",
+                         "tag": "v9.9.9", "commit": self.sha})
+        self.assertIs(CL.probe_ci_green(self.repo.ctx()).outcome, Outcome.PASSED)
+
+    def test_ci_green_on_another_commit_fails(self):
+        self.release(ci={"workflow": "tests.yml", "conclusion": "success",
+                         "tag": "v9.9.9", "commit": "0" * 40})
+        p = CL.probe_ci_green(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("points at", p.detail)
+
+    def test_ci_red_fails(self):
+        self.release(ci={"workflow": "tests.yml", "conclusion": "failure",
+                         "tag": "v9.9.9", "commit": self.sha})
+        self.assertIs(CL.probe_ci_green(self.repo.ctx()).outcome, Outcome.FAILED)
+
+    def test_unknown_tag_is_unrunnable(self):
+        self.release(ci={"workflow": "tests.yml", "conclusion": "success",
+                         "tag": "v0.0.0-nope", "commit": self.sha})
+        self.assertIs(CL.probe_ci_green(self.repo.ctx()).outcome, Outcome.UNRUNNABLE)
+
+    def test_package_checks_read_both_exits(self):
+        self.release(package={"build_exit": 0, "twine_exit": 0, "commit": self.sha})
+        self.assertIs(CL.probe_package_checks(self.repo.ctx()).outcome, Outcome.PASSED)
+        self.release(package={"build_exit": 0, "twine_exit": 1, "commit": self.sha})
+        self.assertIs(CL.probe_package_checks(self.repo.ctx()).outcome, Outcome.FAILED)
+
+    def test_package_checks_recorded_at_another_commit_are_unrunnable(self):
+        self.release(package={"build_exit": 0, "twine_exit": 0, "commit": "0" * 40})
+        p = CL.probe_package_checks(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("HEAD is", p.detail)
+
+    def test_package_checks_missing_one_exit_is_unrunnable(self):
+        self.release(package={"build_exit": 0, "commit": self.sha})
+        self.assertIs(CL.probe_package_checks(self.repo.ctx()).outcome, Outcome.UNRUNNABLE)
+
+    def test_pypi_install_must_report_this_version(self):
+        self.repo.write("pyproject.toml", '[project]\nname = "aisef"\nversion = "1.6.0"\n')
+        self.release(pypi_install={"version_reported": "1.6.0"})
+        self.assertIs(CL.probe_pypi_install(self.repo.ctx()).outcome, Outcome.PASSED)
+        self.release(pypi_install={"version_reported": "1.5.0"})
+        self.assertIs(CL.probe_pypi_install(self.repo.ctx()).outcome, Outcome.FAILED)
+
+    def test_packaged_data_needs_every_name_non_empty(self):
+        self.release(packaged_data={n: 3 for n in CL.PACKAGED_DATA})
+        self.assertIs(CL.probe_packaged_data(self.repo.ctx()).outcome, Outcome.PASSED)
+        self.release(packaged_data={**{n: 3 for n in CL.PACKAGED_DATA}, CL.PACKAGED_DATA[0]: 0})
+        self.assertIs(CL.probe_packaged_data(self.repo.ctx()).outcome, Outcome.FAILED)
+        self.release(packaged_data={n: 3 for n in CL.PACKAGED_DATA[1:]})
+        p = CL.probe_packaged_data(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn(CL.PACKAGED_DATA[0], p.detail)
+
+
+# ------------------------------------------------------------------- G2 probes
+
+
+class TestG2Suite(unittest.TestCase):
+    def setUp(self):
+        self.repo = Repo()
+        self.addCleanup(self.repo.close)
+
+    def suite(self, **rec):
+        self.repo.write_json(f"{CL.EVIDENCE_DIR}/suite.json",
+                             {"tree": "main", "commit": self.repo.head, **rec})
+
+    def test_a_worktree_is_unrunnable_not_a_number(self):
+        """A worktree skips ~61 more tests, so its count is not comparable."""
+        self.suite(passed=2682, skipped=19, failed=0)
+        wt = self.repo.root / "wt"
+        git(self.repo.root, "worktree", "add", str(wt))
+        ctx = CL.Ctx(root=wt, spec=self.repo.spec, criterion={})
+        p = CL.probe_suite_green(ctx)
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("not the main checkout", p.detail)
+
+    def test_main_checkout_green_passes_and_records_skips(self):
+        self.suite(passed=2682, skipped=19, failed=0)
+        p = CL.probe_suite_green(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.PASSED)
+        self.assertIn("19 skipped", p.detail)
+        self.assertIn("tree=main", p.detail)
+
+    def test_red_suite_fails(self):
+        self.suite(passed=2600, skipped=19, failed=3)
+        self.assertIs(CL.probe_suite_green(self.repo.ctx()).outcome, Outcome.FAILED)
+
+    def test_run_recorded_in_a_worktree_is_unrunnable(self):
+        self.suite(passed=2608, skipped=80, failed=0, tree="worktree")
+        p = CL.probe_suite_green(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("worktree", p.detail)
+
+    def test_run_from_another_commit_is_unrunnable(self):
+        self.suite(passed=2682, skipped=19, failed=0, commit="0" * 40)
+        self.assertIs(CL.probe_suite_green(self.repo.ctx()).outcome, Outcome.UNRUNNABLE)
+
+
+class TestG2Lint(unittest.TestCase):
+    def setUp(self):
+        self.repo = Repo()
+        self.addCleanup(self.repo.close)
+
+    def test_clean_passes_dirty_fails(self):
+        self.repo.write_json(f"{CL.EVIDENCE_DIR}/lint.json",
+                             {"tool": "ruff", "exit": 0, "commit": self.repo.head})
+        self.assertIs(CL.probe_lint_clean(self.repo.ctx()).outcome, Outcome.PASSED)
+        self.repo.write_json(f"{CL.EVIDENCE_DIR}/lint.json",
+                             {"tool": "ruff", "exit": 1, "commit": self.repo.head})
+        self.assertIs(CL.probe_lint_clean(self.repo.ctx()).outcome, Outcome.FAILED)
+
+
+class TestG2Register(unittest.TestCase):
+    def setUp(self):
+        self.repo = Repo()
+        self.addCleanup(self.repo.close)
+
+    def register(self, *defects):
+        self.repo.write_json("docs/DEFECT-REGISTER.json", {"defects": list(defects)})
+
+    def test_missing_register_is_unrunnable(self):
+        p = CL.probe_defect_register(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("DEFECT-REGISTER.json", p.detail)
+
+    def test_empty_register_is_a_real_pass(self):
+        self.register()
+        self.assertIs(CL.probe_defect_register(self.repo.ctx()).outcome, Outcome.PASSED)
+
+    def test_open_p1_fails_and_is_named(self):
+        self.register({"id": "D-1", "severity": "P1", "status": "OPEN"},
+                      {"id": "D-2", "severity": "P2", "status": "OPEN"})
+        p = CL.probe_defect_register(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("D-1", p.detail)
+        self.assertNotIn("D-2", p.detail)
+
+    def test_closed_p0_passes(self):
+        self.register({"id": "D-1", "severity": "P0", "status": "CLOSED"})
+        self.assertIs(CL.probe_defect_register(self.repo.ctx()).outcome, Outcome.PASSED)
+
+    def test_entry_without_status_is_unrunnable_not_closed(self):
+        self.register({"id": "D-1", "severity": "P0"})
+        p = CL.probe_defect_register(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("D-1", p.detail)
+
+    def test_blocking_severities_come_from_the_criteria_file(self):
+        self.repo.spec["severity_scale"] = {"blocking": ["P0"]}
+        self.register({"id": "D-1", "severity": "P1", "status": "OPEN"})
+        self.assertIs(CL.probe_defect_register(self.repo.ctx()).outcome, Outcome.PASSED)
+
+    def test_unclassified_register_cannot_answer_g2_4a(self):
+        self.register({"id": "D-1", "severity": "P2", "status": "CLOSED"})
+        p = CL.probe_deterministic_false_pass(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("false_pass", p.detail)
+
+    def test_open_false_pass_in_a_deterministic_check_fails(self):
+        self.register({"id": "D-1", "severity": "P0", "status": "OPEN",
+                       "false_pass": True, "check_kind": "deterministic"})
+        p = CL.probe_deterministic_false_pass(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("D-1", p.detail)
+
+    def test_a_judge_false_pass_is_a_published_property_not_a_g2_4a_defect(self):
+        self.register({"id": "D-1", "severity": "P1", "status": "OPEN",
+                       "false_pass": True, "check_kind": "model-judge"})
+        self.assertIs(CL.probe_deterministic_false_pass(self.repo.ctx()).outcome, Outcome.PASSED)
+
+    def test_unknown_check_kind_is_unrunnable(self):
+        self.register({"id": "D-1", "severity": "P1", "status": "OPEN",
+                       "false_pass": True, "check_kind": "vibes"})
+        p = CL.probe_deterministic_false_pass(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("vibes", p.detail)
+
+
+class TestG2JudgeOnly(unittest.TestCase):
+    def setUp(self):
+        self.repo = Repo()
+        self.addCleanup(self.repo.close)
+
+    def audit(self, holds=True, **extra):
+        rec = {p: {"holds": holds, "evidence": "x"} for p in CL.JUDGE_PROPERTIES}
+        rec.update({"judge_alone_blocks": 21, "blocks_total": 57})
+        rec.update(extra)
+        self.repo.write_json(f"{CL.EVIDENCE_DIR}/judge-only-audit.json", rec)
+
+    def test_missing_audit_names_the_four_properties(self):
+        p = CL.probe_judge_only_semantics(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        for name in CL.JUDGE_PROPERTIES:
+            self.assertIn(name, p.detail)
+
+    def test_all_four_holding_passes_and_publishes_the_rate(self):
+        self.audit()
+        p = CL.probe_judge_only_semantics(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.PASSED)
+        self.assertIn("36.8%", p.detail)
+
+    def test_one_property_not_holding_fails(self):
+        self.audit()
+        self.repo.write_json(f"{CL.EVIDENCE_DIR}/judge-only-audit.json", {
+            **json.loads((self.repo.root / CL.EVIDENCE_DIR / "judge-only-audit.json").read_text(encoding="utf-8")),
+            "G2.4b-iii": {"holds": False, "evidence": "no override path"}})
+        p = CL.probe_judge_only_semantics(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("G2.4b-iii", p.detail)
+
+    def test_audit_without_the_counts_is_unrunnable(self):
+        rec = {p: {"holds": True} for p in CL.JUDGE_PROPERTIES}
+        self.repo.write_json(f"{CL.EVIDENCE_DIR}/judge-only-audit.json", rec)
+        p = CL.probe_judge_only_semantics(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("judge_alone_blocks", p.detail)
+
+
+# ------------------------------------------------------------------- G3 probe
+
+
+class TestG3Conformance(unittest.TestCase):
+    def setUp(self):
+        self.repo = Repo()
+        self.addCleanup(self.repo.close)
+
+    def table(self, *, days_old: int = 1, passing: bool = True):
+        runs = []
+        for client in CF.RELEASE_CLIENTS:
+            run = CF.ClientRun(client=client, version="1.0", at="2026-09-08T00:00:00+00:00")
+            for i, (pid, *_rest) in enumerate(CF.PROBES):
+                run.results.append(CF.ProbeResult(pid, passing or i != 0))
+            runs.append(run)
+        generated = (date.today() - timedelta(days=days_old)).isoformat()
+        self.repo.write(CF.REPORT_PATH, CF.Report(runs=runs, generated=generated).to_markdown())
+
+    def criterion(self) -> dict:
+        return {"freshness": {"kind": "age_days",
+                              "max_from": "aisef.control.conformance:MAX_AGE_DAYS"}}
+
+    def test_missing_table_is_unrunnable(self):
+        p = CL.probe_conformance(self.repo.ctx(self.criterion()))
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+
+    def test_fresh_and_passing_passes_and_prints_days_left(self):
+        self.table(days_old=6)
+        p = CL.probe_conformance(self.repo.ctx(self.criterion()))
+        self.assertIs(p.outcome, Outcome.PASSED)
+        self.assertIn("8d left of 14d", p.detail)
+        self.assertIn("release policy reads", p.detail)
+
+    def test_a_lapsed_window_fails_with_the_age(self):
+        self.table(days_old=CF.MAX_AGE_DAYS + 1)
+        p = CL.probe_conformance(self.repo.ctx(self.criterion()))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("days old", p.detail)
+
+    def test_a_failing_cell_fails(self):
+        self.table(passing=False)
+        self.assertIs(CL.probe_conformance(self.repo.ctx(self.criterion())).outcome, Outcome.FAILED)
+
+    def test_max_age_is_read_from_the_module_not_a_literal(self):
+        self.assertIn("aisef.control.conformance:MAX_AGE_DAYS",
+                      json.dumps(CL.load_spec(ROOT)))
+
+
+# ------------------------------------------------------------------- G4 probes
+
+
+class TestG4Corpus(unittest.TestCase):
+    def setUp(self):
+        self.repo = Repo(spec_of(crit("G4.1", "aisef.control.closure:probe_corpus_present")))
+        self.addCleanup(self.repo.close)
+        # `corpus` belongs on the gate, as in the shipped criteria file.
+        self.repo.spec["gates"][0]["corpus"] = {"primary": "marks-cli", "fallback": "todo-oc",
+                                               "fallback_requires_owner_approval": True}
+        self.corpus = Corpus()
+        self.addCleanup(self.corpus.close)
+
+    def ctx(self, criterion=None, *, corpus=None):
+        return self.repo.ctx(criterion or {}, corpus=str(corpus if corpus is not None else self.corpus.root))
+
+    def test_resolvable_corpus_passes_and_records_its_head(self):
+        p = CL.probe_corpus_present(self.ctx())
+        self.assertIs(p.outcome, Outcome.PASSED)
+        self.assertEqual(p.digest, self.corpus.head)
+
+    def test_a_missing_corpus_is_unrunnable_and_the_fallback_is_not_substituted(self):
+        """Owner ruling 2: the fallback is a named R1 substitution the owner
+        approves, never something the evaluator reaches for."""
+        gone = self.corpus.root / "nope"
+        p = CL.probe_corpus_present(self.ctx(corpus=gone))
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("marks-cli", p.detail)
+        self.assertIn("NOT substituted", p.detail)
+
+    def test_every_g4_probe_is_unrunnable_without_the_corpus(self):
+        gone = self.corpus.root / "nope"
+        for probe in (CL.probe_corpus_present, CL.probe_upstream_gates, CL.probe_stories_done,
+                      CL.probe_review_and_security, CL.probe_evidence_at_candidate,
+                      CL.probe_pre_deploy, CL.probe_pre_deploy_approved):
+            with self.subTest(probe=probe.__name__):
+                p = probe(self.ctx(corpus=gone))
+                self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+
+    def test_upstream_gates_all_approved_passes(self):
+        self.assertIs(CL.probe_upstream_gates(self.ctx()).outcome, Outcome.PASSED)
+
+    def test_one_unapproved_upstream_gate_fails_and_is_named(self):
+        (self.corpus.art / "approvals" / "readiness.json").unlink()
+        p = CL.probe_upstream_gates(self.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("readiness", p.detail)
+
+    def test_all_stories_done_passes(self):
+        self.assertIs(CL.probe_stories_done(self.ctx()).outcome, Outcome.PASSED)
+
+    def test_a_planned_story_that_never_ran_is_not_done(self):
+        corpus = Corpus(stories=("S-1",), planned=("S-2",))
+        self.addCleanup(corpus.close)
+        p = CL.probe_stories_done(self.ctx(corpus=corpus.root))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("never run: S-2", p.detail)
+
+    def test_verified_but_unmerged_is_not_done(self):
+        corpus = Corpus(status=StoryStatus.VERIFIED)
+        self.addCleanup(corpus.close)
+        p = CL.probe_stories_done(self.ctx(corpus=corpus.root))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("not merged", p.detail)
+
+    def test_review_and_security_recorded_for_every_story_passes(self):
+        self.assertIs(CL.probe_review_and_security(self.ctx()).outcome, Outcome.PASSED)
+
+    def test_a_story_without_security_fails(self):
+        corpus = Corpus(review=False)
+        self.addCleanup(corpus.close)
+        p = CL.probe_review_and_security(self.ctx(corpus=corpus.root))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("S-1:review", p.detail)
+
+    def test_evidence_at_the_merged_candidate_passes(self):
+        self.assertIs(CL.probe_evidence_at_candidate(self.ctx()).outcome, Outcome.PASSED)
+
+    def test_evidence_at_a_candidate_outside_the_history_fails(self):
+        corpus = Corpus(candidate_merged=False)
+        self.addCleanup(corpus.close)
+        p = CL.probe_evidence_at_candidate(self.ctx(corpus=corpus.root))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("not in the corpus history", p.detail)
+
+    def test_a_check_left_at_an_older_build_fails(self):
+        EvidenceStore(self.corpus.art, candidate="a" * 40).tool_run("S-1", "lint", ok=True)
+        EvidenceStore(self.corpus.art, candidate=self.corpus.head).tool_run("S-1", "test", ok=True)
+        p = CL.probe_evidence_at_candidate(self.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("aaaaaaa", p.detail)
+
+
+class TestG4PreDeploy(unittest.TestCase):
+    def setUp(self):
+        self.repo = Repo()
+        self.addCleanup(self.repo.close)
+        self.corpus = Corpus()
+        self.addCleanup(self.corpus.close)
+
+    def ctx(self):
+        return self.repo.ctx(corpus=str(self.corpus.root))
+
+    def test_no_report_is_unrunnable(self):
+        p = CL.probe_pre_deploy(self.ctx())
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("pre-deploy-report.json", p.detail)
+
+    def test_passing_report_with_scope_passes(self):
+        self.corpus.pre_deploy()
+        self.assertIs(CL.probe_pre_deploy(self.ctx()).outcome, Outcome.PASSED)
+
+    def test_report_without_scope_fails(self):
+        self.corpus.pre_deploy(scope="")
+        p = CL.probe_pre_deploy(self.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("scope", p.detail)
+
+    def test_a_waiver_without_a_reason_is_not_evidence(self):
+        self.corpus.pre_deploy(waivers={"isolation": ""})
+        p = CL.probe_pre_deploy(self.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("without a reason", p.detail)
+
+    def test_a_waiver_with_a_reason_is_accepted(self):
+        self.corpus.pre_deploy(waivers={"isolation": "no docker on this machine"})
+        self.assertIs(CL.probe_pre_deploy(self.ctx()).outcome, Outcome.PASSED)
+
+    def test_red_checks_are_named(self):
+        self.corpus.pre_deploy(passed=False, checks=[{"name": "runbook", "passed": False}])
+        p = CL.probe_pre_deploy(self.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("runbook", p.detail)
+
+    def test_unapproved_gate_fails_and_closure_never_signs_it(self):
+        self.corpus.pre_deploy()
+        p = CL.probe_pre_deploy_approved(self.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("never signs", p.detail)
+
+    def test_auto_approval_is_not_a_human_signature(self):
+        self.corpus.pre_deploy()
+        ApprovalStore(self.corpus.art).auto_approve(Gate.PRE_DEPLOY)
+        p = CL.probe_pre_deploy_approved(self.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn(AUTO_APPROVER, p.detail)
+
+    def test_human_approval_on_that_report_passes(self):
+        self.corpus.pre_deploy()
+        ApprovalStore(self.corpus.art).approve(Gate.PRE_DEPLOY, by="owner")
+        self.assertIs(CL.probe_pre_deploy_approved(self.ctx()).outcome, Outcome.PASSED)
+
+    def test_approval_of_another_report_is_stale_and_fails(self):
+        self.corpus.pre_deploy()
+        ApprovalStore(self.corpus.art).approve(Gate.PRE_DEPLOY, by="owner")
+        self.corpus.pre_deploy(scope="EPIC-02")
+        p = CL.probe_pre_deploy_approved(self.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("stale", p.detail)
+
+
+# ------------------------------------------------------------------- G5 probes
+
+
+class TestG5(unittest.TestCase):
+    def setUp(self):
+        self.repo = Repo()
+        self.addCleanup(self.repo.close)
+
+    def test_unpinned_prereg_is_unrunnable_even_when_it_exists(self):
+        self.repo.write("docs/BENCH-PREREGISTRATION-C2.md", "# prereg\nprediction: none\n")
+        c = {"evidence": "docs/BENCH-PREREGISTRATION-C2.md"}
+        p = CL.probe_prereg_digest(self.repo.ctx(c))
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("not digest-pinned", p.detail)
+
+    def test_pinned_prereg_passes_and_an_edit_fails(self):
+        path = self.repo.write("docs/BENCH-PREREGISTRATION-C2.md", "# prereg\n")
+        c = {"evidence": "docs/BENCH-PREREGISTRATION-C2.md"}
+        self.repo.spec["prereg_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        self.assertIs(CL.probe_prereg_digest(self.repo.ctx(c)).outcome, Outcome.PASSED)
+        path.write_text("# prereg\nrewritten after the data arrived\n", encoding="utf-8")
+        p = CL.probe_prereg_digest(self.repo.ctx(c))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("changed after pinning", p.detail)
+
+    def test_no_bench_results_is_unrunnable(self):
+        p = CL.probe_cut_session_separation(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("results.jsonl", p.detail)
+
+    def test_rows_without_exit_status_fail(self):
+        self.repo.write(".bench-c1b/results.jsonl",
+                        json.dumps({"task_id": "t", "outcome": "PASS"}) + "\n"
+                        + json.dumps({"task_id": "t", "outcome": "PASS", "exit_status": "ok"}) + "\n")
+        p = CL.probe_cut_session_separation(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("1 of 2", p.detail)
+
+    def test_every_row_tagged_passes_and_counts_the_cut_ones(self):
+        self.repo.write(".bench-c2/results.jsonl",
+                        json.dumps({"exit_status": "ok"}) + "\n"
+                        + json.dumps({"exit_status": "timeout"}) + "\n")
+        p = CL.probe_cut_session_separation(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.PASSED)
+        self.assertIn("1 infra/cut", p.detail)
+
+    def test_missing_pair_qualification_is_unrunnable(self):
+        p = CL.probe_pair_qualification(self.repo.ctx({"evidence": "docs/BENCH-PAIR-QUALIFICATION.md"}))
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+
+    def test_no_pair_qualifying_is_waiver_pending_and_blocks(self):
+        self.repo.write("docs/BENCH-PAIR-QUALIFICATION.md", (
+            "| model | client | sessions | cut sessions | cut rate | timeouts | qualifies | evidence |\n"
+            "|---|---|---|---|---|---|---|---|\n"
+            "| mycombo | opencode | 8 | 3 | 0.38 | 0 | no | .bench-q/a |\n"))
+        p = CL.probe_pair_qualification(self.repo.ctx({"evidence": "docs/BENCH-PAIR-QUALIFICATION.md"}))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("WAIVER_PENDING", p.detail)
+        self.assertTrue(p.outcome.blocks)
+
+    def test_one_qualifying_pair_passes(self):
+        self.repo.write("docs/BENCH-PAIR-QUALIFICATION.md", (
+            "| model | client | sessions | cut sessions | cut rate | timeouts | qualifies | evidence |\n"
+            "|---|---|---|---|---|---|---|---|\n"
+            "| sonnet | claude | 8 | 0 | 0.00 | 0 | yes | .bench-q/b |\n"))
+        p = CL.probe_pair_qualification(self.repo.ctx({"evidence": "docs/BENCH-PAIR-QUALIFICATION.md"}))
+        self.assertIs(p.outcome, Outcome.PASSED)
+        self.assertIn("sonnet/claude", p.detail)
+
+    def test_a_table_missing_the_declared_columns_is_unrunnable(self):
+        self.repo.write("docs/BENCH-PAIR-QUALIFICATION.md",
+                        "| pair | qualifies |\n|---|---|\n| x | yes |\n")
+        p = CL.probe_pair_qualification(self.repo.ctx({"evidence": "docs/BENCH-PAIR-QUALIFICATION.md"}))
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("does not state", p.detail)
+
+    def test_bench_reproducible_needs_both_halves(self):
+        """The manifest matching is not enough: a criterion with two conjuncts
+        must not pass on one of them."""
+        p = CL.probe_bench_reproducible(CL.Ctx(root=ROOT, spec=self.repo.spec, criterion={}))
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("bench-selfcheck.json", p.detail)
+
+    def test_a_report_stating_neither_band_nor_inconclusive_fails(self):
+        self.repo.write("docs/BENCH-REPORT-X.md", "# X\n\npass@1 48/48 vs 48/48, delta 0.\n")
+        p = CL.probe_inconclusive_reported(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("BENCH-REPORT-X.md", p.detail)
+
+    def test_a_report_stating_it_is_inconclusive_passes(self):
+        self.repo.write("docs/BENCH-REPORT-X.md", "# X\n\nKhông kết luận được từ 30 task.\n")
+        self.assertIs(CL.probe_inconclusive_reported(self.repo.ctx()).outcome, Outcome.PASSED)
+
+    def test_no_bench_report_at_all_is_unrunnable(self):
+        self.assertIs(CL.probe_inconclusive_reported(self.repo.ctx()).outcome, Outcome.UNRUNNABLE)
+
+    def test_a_retired_claim_on_a_public_surface_fails(self):
+        self.repo.write("README.md", "AISEF has near-zero measured cost overhead.\n")
+        p = CL.probe_no_stale_claims(self.repo.ctx({"evidence": "README.md"}))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("near-zero", p.detail)
+
+    def test_clean_public_surfaces_pass(self):
+        self.repo.write("README.md", "AISEF measured +44% turns on C-1.\n")
+        self.assertIs(CL.probe_no_stale_claims(self.repo.ctx({"evidence": "README.md"})).outcome,
+                      Outcome.PASSED)
+
+    def test_a_missing_public_surface_is_unrunnable(self):
+        p = CL.probe_no_stale_claims(self.repo.ctx({"evidence": "README.md,landingpage/index.html"}))
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+
+
+# ------------------------------------------------------------------- G6 probes
+
+
+PROTOCOL = """# External validation
+
+## Metrics
+
+| Metric | Type |
+|---|---|
+| Install success | bool |
+| Time to first success (any gate passes) | minutes |
+
+## Protocol
+
+Run `aisef doctor`, then `aisef plan`.
+"""
+
+RECORD = """# External validation report
+
+Participant: an external engineer, no AISEF contribution
+
+Install success: yes. Time to first success: 35 minutes.
+
+| Finding | Severity | Status |
+|---|---|---|
+| docs gap | P2 | open |
+"""
+
+
+class TestG6(unittest.TestCase):
+    def setUp(self):
+        self.repo = Repo()
+        self.addCleanup(self.repo.close)
+        self.repo.write("docs/EXTERNAL-VALIDATION-v1.1.0.md", PROTOCOL)
+        self.repo.write("README.md", "## Install\n\npip install aisef\n\n## Quick Start\n\naisef setup\n")
+        self.repo.write("docs/USAGE-GUIDE.md", "aisef doctor\naisef plan\n")
+        self.repo.write("pyproject.toml", '[project]\nname = "aisef"\nversion = "1.6.0"\n')
+        self.repo.spec["onboarding_digest"] = {
+            "sources": [{"path": "README.md", "extract": "section:Install"},
+                        {"path": "README.md", "extract": "section:Quick Start"},
+                        {"path": "docs/USAGE-GUIDE.md", "extract": "canonical_cli_workflow"},
+                        {"path": "docs/EXTERNAL-VALIDATION-v1.1.0.md", "extract": "section:Protocol"},
+                        {"path": "aisef/config.py", "extract": "onboarding_defaults"}],
+            "onboarding_defaults": ["tools.test", "run.max_turns"]}
+        (self.repo.root / "aisef").mkdir(exist_ok=True)
+        self.repo.write("aisef/config.py", "# defaults are read from the module, not this text\n")
+
+    def criterion(self) -> dict:
+        return {"evidence": "docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md"}
+
+    def record(self, text: str = RECORD):
+        self.repo.write("docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md", text)
+
+    def digest_file(self, *, version="1.6.0", sha=None):
+        now, gone = CL.onboarding_digest(self.repo.root, self.repo.spec["onboarding_digest"])
+        self.assertEqual(gone, [])
+        self.repo.write_json(f"{CL.EVIDENCE_DIR}/onboarding-digest.json",
+                             {"sha256": sha or now, "version": version})
+        return now
+
+    def test_the_protocol_existing_does_not_satisfy_g6(self):
+        for probe in (CL.probe_external_report, CL.probe_participant_external,
+                      CL.probe_onboarding_blockers):
+            with self.subTest(probe=probe.__name__):
+                p = probe(self.repo.ctx(self.criterion()))
+                self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+                self.assertIn("protocol, not the record", p.detail)
+
+    def test_record_with_the_protocol_metrics_and_a_matching_digest_passes(self):
+        self.record()
+        self.digest_file()
+        p = CL.probe_external_report(self.repo.ctx(self.criterion()))
+        self.assertIs(p.outcome, Outcome.PASSED)
+
+    def test_a_record_missing_a_protocol_metric_fails(self):
+        self.record("# report\n\nParticipant: external person\n")
+        self.digest_file()
+        p = CL.probe_external_report(self.repo.ctx(self.criterion()))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("Install success", p.detail)
+
+    def test_no_recorded_onboarding_digest_is_unrunnable(self):
+        self.record()
+        p = CL.probe_external_report(self.repo.ctx(self.criterion()))
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("onboarding-digest.json", p.detail)
+
+    def test_a_changed_onboarding_surface_fails(self):
+        self.record()
+        self.digest_file()
+        self.repo.write("README.md", "## Install\n\npip install aisef --pre --extra-index-url x\n"
+                                     "\n## Quick Start\n\naisef setup\n")
+        p = CL.probe_external_report(self.repo.ctx(self.criterion()))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("onboarding surface changed", p.detail)
+
+    def test_prose_reflow_does_not_change_the_digest(self):
+        before, _ = CL.onboarding_digest(self.repo.root, self.repo.spec["onboarding_digest"])
+        self.repo.write("README.md", "## Install\n\npip   install\n    aisef\n\n## Quick Start\n\naisef setup\n")
+        after, _ = CL.onboarding_digest(self.repo.root, self.repo.spec["onboarding_digest"])
+        self.assertEqual(before, after)
+
+    def test_a_different_minor_version_fails(self):
+        self.record()
+        self.digest_file(version="1.5.0")
+        p = CL.probe_external_report(self.repo.ctx(self.criterion()))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("MAJOR.MINOR", p.detail)
+
+    def test_a_vanished_onboarding_default_cannot_be_hashed_silently(self):
+        self.repo.spec["onboarding_digest"]["onboarding_defaults"] = ["tools.test", "gone.key"]
+        digest, gone = CL.onboarding_digest(self.repo.root, self.repo.spec["onboarding_digest"])
+        self.assertEqual(digest, "")
+        self.assertIn("gone.key", " ".join(gone))
+
+    def test_an_ai_participant_cannot_satisfy_g6(self):
+        self.record("# report\n\nParticipant: Claude agent, external to the project\n")
+        p = CL.probe_participant_external(self.repo.ctx(self.criterion()))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("agent cannot satisfy", p.detail)
+
+    def test_a_record_without_a_participant_line_is_unrunnable(self):
+        self.record("# report\n\nInstall success: yes\n")
+        p = CL.probe_participant_external(self.repo.ctx(self.criterion()))
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+
+    def test_an_external_person_passes(self):
+        self.record()
+        self.assertIs(CL.probe_participant_external(self.repo.ctx(self.criterion())).outcome,
+                      Outcome.PASSED)
+
+    def test_an_unresolved_p0_blocker_fails(self):
+        self.record(RECORD.replace("| docs gap | P2 | open |", "| cannot install | P0 | open |"))
+        p = CL.probe_onboarding_blockers(self.repo.ctx(self.criterion()))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("P0", p.detail)
+
+    def test_a_resolved_p0_blocker_passes(self):
+        self.record(RECORD.replace("| docs gap | P2 | open |", "| cannot install | P0 | resolved |"))
+        self.assertIs(CL.probe_onboarding_blockers(self.repo.ctx(self.criterion())).outcome,
+                      Outcome.PASSED)
+
+    def test_a_record_without_a_findings_table_is_unrunnable(self):
+        self.record("# report\n\nParticipant: external person\n")
+        p = CL.probe_onboarding_blockers(self.repo.ctx(self.criterion()))
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+
+
+# ---------------------------------------------------------------- the waivers
+
+
+class TestWaivers(unittest.TestCase):
+    def setUp(self):
+        self.repo = Repo(spec_of(
+            crit("GT.1", "tests.test_closure:stub_failed", waiver_eligible=True),
+            crit("GT.2", "tests.test_closure:stub_failed")))
+        self.addCleanup(self.repo.close)
+
+    def test_a_waiver_without_a_reason_is_refused(self):
+        with self.assertRaises(ValueError) as e:
+            CL.sign_waiver(self.repo.root, "GT.1", "   ")
+        self.assertIn("not evidence", str(e.exception))
+        self.assertEqual(CL.load_state(self.repo.root), {})
+
+    def test_only_waiver_eligible_criteria_may_be_waived(self):
+        with self.assertRaises(ValueError) as e:
+            CL.sign_waiver(self.repo.root, "GT.2", "because I said so")
+        self.assertIn("not waiver-eligible", str(e.exception))
+
+    def test_an_unknown_criterion_is_refused(self):
+        with self.assertRaises(ValueError):
+            CL.sign_waiver(self.repo.root, "G9.9", "reason")
+
+    def test_a_signed_waiver_renders_as_waived_and_does_not_block(self):
+        CL.sign_waiver(self.repo.root, "GT.1", "docker is an environment fact", by="owner")
+        by_id = {r.id: r for r in self.repo.evaluate().results}
+        self.assertIs(by_id["GT.1"].outcome, Outcome.WAIVED)
+        self.assertFalse(by_id["GT.1"].outcome.blocks)
+        self.assertEqual(by_id["GT.1"].outcome.mark, "◇")
+        self.assertIn("docker is an environment fact", by_id["GT.1"].detail)
+        self.assertIn("owner", by_id["GT.1"].detail)
+        self.assertIs(by_id["GT.2"].outcome, Outcome.FAILED)
+
+    def test_the_waiver_records_what_it_hid(self):
+        CL.sign_waiver(self.repo.root, "GT.1", "reason enough")
+        r = {x.id: x for x in self.repo.evaluate().results}["GT.1"]
+        self.assertEqual(r.waiver["was"], "failed")
+        self.assertIn("stub says no", r.waiver["was_detail"])
+
+    def test_a_waiver_never_upgrades_a_passing_criterion(self):
+        repo = Repo(spec_of(crit("GT.1", "tests.test_closure:stub_passed", waiver_eligible=True)))
+        self.addCleanup(repo.close)
+        CL.sign_waiver(repo.root, "GT.1", "not needed")
+        self.assertIs(repo.evaluate().results[0].outcome, Outcome.PASSED)
+
+
+# --------------------------------------------------------------- the approval
+
+
+class TestApproval(unittest.TestCase):
+    def repo(self, *criteria, pin=True) -> Repo:
+        repo = Repo(spec_of(*criteria), pin=pin)
+        self.addCleanup(repo.close)
+        return repo
+
+    def test_approval_is_refused_while_anything_blocks(self):
+        repo = self.repo(crit("GT.1", "tests.test_closure:stub_failed"))
+        with self.assertRaises(ValueError) as e:
+            CL.sign_approval(repo.root)
+        self.assertIn("GT.1", str(e.exception))
+        self.assertEqual(CL.load_state(repo.root), {})
+
+    def test_approval_is_refused_while_the_contract_is_unpinned(self):
+        repo = self.repo(crit("GT.1", "tests.test_closure:stub_passed"), pin=False)
+        with self.assertRaises(ValueError) as e:
+            CL.sign_approval(repo.root)
+        self.assertIn("unpinned", str(e.exception))
+
+    def test_approval_records_who_when_and_the_digest_set(self):
+        repo = self.repo(crit("GT.1", "tests.test_closure:stub_reads"))
+        repo.write("evidence.txt", "evidence\n")
+        rec = CL.sign_approval(repo.root, by="owner", note="ship it")
+        self.assertEqual(rec["by"], "owner")
+        self.assertTrue(rec["at"])
+        self.assertEqual(rec["contract_sha256"], repo.evaluate().contract["sha256"])
+        self.assertTrue(rec["digests"]["GT.1"])
+        self.assertEqual(CL.load_state(repo.root)["approval"]["note"], "ship it")
+
+    def test_an_approved_gate_reads_approved(self):
+        repo = self.repo(crit("GT.1", "tests.test_closure:stub_reads"))
+        repo.write("evidence.txt", "evidence\n")
+        CL.sign_approval(repo.root, by="owner")
+        report = CL.evaluate(repo.root)
+        self.assertEqual(report.approval["status"], "approved")
+        self.assertTrue(report.closable)
+
+    def test_an_evidence_digest_that_moved_makes_the_approval_stale(self):
+        repo = self.repo(crit("GT.1", "tests.test_closure:stub_reads"))
+        repo.write("evidence.txt", "evidence\n")
+        CL.sign_approval(repo.root, by="owner")
+        repo.write("evidence.txt", "different evidence\n")
+        report = CL.evaluate(repo.root)
+        self.assertEqual(report.approval["status"], "stale")
+        self.assertIn("evidence digest changed: GT.1", " ".join(report.approval["stale_because"]))
+
+    def test_editing_the_contract_makes_the_approval_stale(self):
+        repo = self.repo(crit("GT.1", "tests.test_closure:stub_reads"))
+        repo.write("evidence.txt", "evidence\n")
+        CL.sign_approval(repo.root, by="owner")
+        repo.write("docs/PROJECT-CLOSURE-GATE.md", Repo.CONTRACT + "\nedited to be satisfied\n")
+        report = CL.evaluate(repo.root)
+        self.assertEqual(report.contract["state"], "stale")
+        self.assertFalse(report.closable)
+        self.assertIn("contract digest changed", " ".join(report.approval["stale_because"]))
+
+
+class TestStaleness(unittest.TestCase):
+    """Three independent causes, per §4.4. The first two are above; the third is
+    a declared freshness window lapsing, which is the criterion itself turning
+    red rather than a separate mechanism."""
+
+    def test_a_lapsed_freshness_window_blocks_without_anything_else_changing(self):
+        repo = Repo()
+        self.addCleanup(repo.close)
+        runs = [CF.ClientRun(client=c, version="1.0") for c in CF.RELEASE_CLIENTS]
+        for run in runs:
+            run.results = [CF.ProbeResult(p[0], True) for p in CF.PROBES]
+        criterion = {"freshness": {"max_from": "aisef.control.conformance:MAX_AGE_DAYS"}}
+        fresh = (date.today() - timedelta(days=1)).isoformat()
+        repo.write(CF.REPORT_PATH, CF.Report(runs=runs, generated=fresh).to_markdown())
+        self.assertIs(CL.probe_conformance(repo.ctx(criterion)).outcome, Outcome.PASSED)
+        lapsed = (date.today() - timedelta(days=CF.MAX_AGE_DAYS + 1)).isoformat()
+        repo.write(CF.REPORT_PATH, CF.Report(runs=runs, generated=lapsed).to_markdown())
+        p = CL.probe_conformance(repo.ctx(criterion))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertTrue(p.outcome.blocks)
+
+    def test_staleness_reuses_the_approval_status_vocabulary(self):
+        from aisef.control.approvals import Status
+
+        report = CL.Report(contract={"sha256": "x", "state": "pinned"}, results=[])
+        state = {"approval": {"contract_sha256": "y", "digests": {}}}
+        self.assertEqual(CL.approval_state(state, report)["status"], Status.STALE.value)
+        self.assertEqual(CL.approval_state({}, report)["status"], Status.PENDING.value)
+
+
+class TestPin(unittest.TestCase):
+    def test_pin_writes_the_contract_digest_into_the_criteria_file(self):
+        repo = Repo(pin=False)
+        self.addCleanup(repo.close)
+        self.assertEqual(repo.evaluate().contract["state"], "unpinned")
+        pinned = CL.pin(repo.root)
+        self.assertEqual(list(pinned), ["docs/PROJECT-CLOSURE-GATE.md"])
+        spec = CL.load_spec(repo.root)
+        self.assertEqual(spec["contract_sha256"],
+                         hashlib.sha256(Repo.CONTRACT.encode()).hexdigest())
+        self.assertEqual(CL.evaluate(repo.root).contract["state"], "pinned")
+
+    def test_pin_also_pins_the_bench_preregistration_when_it_exists(self):
+        repo = Repo(spec_of(crit("G5.1", "aisef.control.closure:probe_prereg_digest",
+                                 evidence="docs/BENCH-PREREGISTRATION-C2.md")), pin=False)
+        self.addCleanup(repo.close)
+        repo.write("docs/BENCH-PREREGISTRATION-C2.md", "# prereg\n")
+        pinned = CL.pin(repo.root)
+        self.assertIn("docs/BENCH-PREREGISTRATION-C2.md", pinned)
+        self.assertIs(CL.evaluate(repo.root).results[0].outcome, Outcome.PASSED)
+
+    def test_repinning_is_refused_because_it_would_hide_an_edit(self):
+        repo = Repo()
+        self.addCleanup(repo.close)
+        with self.assertRaises(ValueError) as e:
+            CL.pin(repo.root)
+        self.assertIn("already pinned", str(e.exception))
+
+    def test_evaluation_never_computes_the_pin(self):
+        """A pin computed at evaluation time is not a pin."""
+        repo = Repo(spec_of(crit("GT.1", "tests.test_closure:stub_passed")), pin=False)
+        self.addCleanup(repo.close)
+        report = repo.evaluate()
+        self.assertFalse(report.blocking)
+        self.assertFalse(report.closable, "unpinned contract must not be closable")
+        self.assertEqual(CL.load_spec(repo.root)["contract_sha256"], "")
+
+
+# ------------------------------------------------------- the six things it never does
+
+
+class TestNeverDoes(unittest.TestCase):
+    SOURCE = ROOT / "aisef" / "control" / "closure.py"
+    CLI = ROOT / "aisef" / "cli" / "closure.py"
+
+    def calls(self, path: Path) -> list[str]:
+        names = []
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if isinstance(node, ast.Call):
+                f = node.func
+                names.append(f.attr if isinstance(f, ast.Attribute) else getattr(f, "id", ""))
+        return names
+
+    def imports(self, path: Path) -> list[str]:
+        out = []
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if isinstance(node, ast.ImportFrom):
+                out.append(node.module or "")
+            elif isinstance(node, ast.Import):
+                out += [a.name for a in node.names]
+        return out
+
+    def test_never_launches_an_agent(self):
+        """No client adapter, no session runner: the evaluator reads records of
+        runs, it does not start them."""
+        mods = " ".join(self.imports(self.SOURCE))
+        for forbidden in ("aisef.clients.compile", "clients.compile", "phases.run", "phases.qa"):
+            self.assertNotIn(forbidden, mods)
+        for call in ("ADAPTERS", "run_story", "run_session", "run_agent", "compile_all"):
+            self.assertNotIn(call, self.calls(self.SOURCE))
+
+    def test_never_runs_a_paid_workload(self):
+        """Not even a free subprocess of its own: the one process it starts is
+        read-only git, through the existing helper."""
+        for call in ("run", "Popen", "check_output", "check_call", "call",
+                     "run_suite", "run_selfcheck", "score", "evaluate_pre_deploy"):
+            self.assertNotIn(call, self.calls(self.SOURCE), f"closure.py calls {call}")
+
+    def test_never_modifies_a_corpus(self):
+        corpus = Corpus()
+        self.addCleanup(corpus.close)
+        corpus.pre_deploy()
+        ApprovalStore(corpus.art).approve(Gate.PRE_DEPLOY, by="owner")
+        shipped = CL.load_spec(ROOT)
+        repo = Repo(shipped, pin=False)
+        self.addCleanup(repo.close)
+        before = corpus.digests()
+        CL.evaluate(repo.root, corpus=str(corpus.root), spec=shipped)
+        self.assertEqual(corpus.digests(), before)
+
+    def test_never_approves_itself(self):
+        """`sign_approval` exists in the control module and is called nowhere in
+        it — only the CLI calls it, and only behind `--approve`."""
+        self.assertNotIn("sign_approval", self.calls(self.SOURCE))
+        cli = self.CLI.read_text(encoding="utf-8")
+        tree = ast.parse(cli)
+        guarded = [n for n in ast.walk(tree)
+                   if isinstance(n, ast.If) and "approve" in ast.dump(n.test)
+                   and "sign_approval" in ast.dump(n)]
+        self.assertTrue(guarded, "sign_approval is not behind an `--approve` check")
+        self.assertEqual(cli.count("sign_approval"), 1)
+
+    def test_never_turns_unconfigured_into_pass(self):
+        repo = Repo(spec_of(crit("GT.1", "tests.test_closure:stub_unconfigured")))
+        self.addCleanup(repo.close)
+        r = repo.evaluate().results[0]
+        self.assertIsNot(r.outcome, Outcome.PASSED)
+        self.assertIs(r.outcome, Outcome.UNRUNNABLE)
+
+    def test_never_silently_substitutes_a_missing_corpus(self):
+        """The fallback corpus exists on disk and is still not used."""
+        fallback = Corpus()
+        self.addCleanup(fallback.close)
+        shipped = CL.load_spec(ROOT)
+        for gate in shipped["gates"]:
+            if gate.get("corpus"):
+                gate["corpus"]["fallback"] = fallback.root.name
+        repo = Repo(shipped, pin=False)
+        self.addCleanup(repo.close)
+        before = fallback.digests()
+        report = CL.evaluate(repo.root, spec=shipped, corpus=str(repo.root / "no-such-corpus"))
+        g4 = [r for r in report.results if r.gate == "G4"]
+        self.assertEqual(len(g4), 7)
+        for r in g4:
+            with self.subTest(criterion=r.id):
+                self.assertIs(r.outcome, Outcome.UNRUNNABLE)
+                self.assertIn("no-such-corpus", r.detail)
+        self.assertIn("NOT substituted", g4[0].detail)
+        self.assertEqual(fallback.digests(), before)
+
+
+# ---------------------------------------------------------------- the command
+
+
+class TestCli(unittest.TestCase):
+    def run_cli(self, root: Path, *args: str) -> tuple[int, str, str]:
+        out, err = io.StringIO(), io.StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            code = main(["--project", str(root), "closure", *args])
+        return code, out.getvalue(), err.getvalue()
+
+    def test_a_blocked_gate_exits_one_and_a_clean_one_exits_zero(self):
+        blocked = Repo(spec_of(crit("GT.1", "tests.test_closure:stub_failed")))
+        self.addCleanup(blocked.close)
+        code, out, _ = self.run_cli(blocked.root)
+        self.assertEqual(code, 1)
+        self.assertIn("BLOCKED", out)
+        self.assertIn("✗ GT.1", out)
+
+        clean = Repo(spec_of(crit("GT.1", "tests.test_closure:stub_passed")))
+        self.addCleanup(clean.close)
+        code, out, _ = self.run_cli(clean.root)
+        self.assertEqual(code, 0)
+        self.assertIn("CLOSABLE", out)
+
+    def test_a_usage_error_exits_two_not_one(self):
+        """1 means blocked here (contract §4.3), so a usage error must not read
+        as a verdict about the project. Only the subparser's own errors can be
+        redirected: an unrecognised flag is reported by the top-level parser
+        and still exits 1, as it does for every other verb."""
+        repo = Repo()
+        self.addCleanup(repo.close)
+        with self.assertRaises(SystemExit) as e:
+            self.run_cli(repo.root, "--waive")
+        self.assertEqual(e.exception.code, 2)
+
+    def test_no_criteria_file_is_a_usage_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            code, _, err = self.run_cli(Path(tmp))
+            self.assertEqual(code, 2)
+            self.assertIn(CL.CRITERIA_PATH, err)
+
+    def test_the_report_records_probe_evidence_digest_and_time(self):
+        repo = Repo(spec_of(crit("GT.1", "tests.test_closure:stub_reads")))
+        self.addCleanup(repo.close)
+        repo.write("evidence.txt", "evidence\n")
+        code, _, _ = self.run_cli(repo.root)
+        self.assertEqual(code, 0)
+        data = CL.read_report(repo.root)
+        row = data["criteria"][0]
+        self.assertEqual(row["probe"], "tests.test_closure:stub_reads")
+        self.assertEqual(row["evidence"], "evidence.txt")
+        self.assertEqual(row["digest"],
+                         hashlib.sha256(b"evidence\n").hexdigest())
+        self.assertTrue(row["at"])
+
+    def test_report_flag_needs_an_evaluation_first(self):
+        repo = Repo()
+        self.addCleanup(repo.close)
+        code, _, err = self.run_cli(repo.root, "--report")
+        self.assertEqual(code, 2)
+        self.assertIn("run `aisef closure` first", err)
+
+    def test_report_flag_renders_the_human_form(self):
+        repo = Repo(spec_of(crit("GT.1", "tests.test_closure:stub_failed")))
+        self.addCleanup(repo.close)
+        self.run_cli(repo.root)
+        code, out, _ = self.run_cli(repo.root, "--report")
+        self.assertEqual(code, 1)
+        text = (repo.root / CL.REPORT_MD).read_text(encoding="utf-8")
+        self.assertIn("GT.1", text)
+        self.assertIn("What blocks closure", text)
+        self.assertNotIn("](", text)          # docs/*.md links are checked by test_meta
+        self.assertIn(CL.REPORT_MD, out)
+
+    def test_waive_without_a_reason_exits_two(self):
+        repo = Repo(spec_of(crit("GT.1", "tests.test_closure:stub_failed", waiver_eligible=True)))
+        self.addCleanup(repo.close)
+        code, _, err = self.run_cli(repo.root, "--waive", "GT.1")
+        self.assertEqual(code, 2)
+        self.assertIn("not evidence", err)
+
+    def test_waiving_a_criterion_the_contract_protects_exits_two(self):
+        repo = Repo(spec_of(crit("GT.1", "tests.test_closure:stub_failed")))
+        self.addCleanup(repo.close)
+        code, _, err = self.run_cli(repo.root, "--waive", "GT.1", "--reason", "convenient")
+        self.assertEqual(code, 2)
+        self.assertIn("not waiver-eligible", err)
+
+    def test_waiving_an_eligible_criterion_unblocks_it(self):
+        repo = Repo(spec_of(crit("GT.1", "tests.test_closure:stub_failed", waiver_eligible=True)))
+        self.addCleanup(repo.close)
+        code, out, _ = self.run_cli(repo.root, "--waive", "GT.1", "--reason", "environment fact")
+        self.assertEqual(code, 0)
+        self.assertIn("◇ GT.1", out)
+
+    def test_a_reason_without_a_waiver_is_a_usage_error(self):
+        repo = Repo()
+        self.addCleanup(repo.close)
+        code, _, err = self.run_cli(repo.root, "--reason", "dangling")
+        self.assertEqual(code, 2)
+        self.assertIn("--waive", err)
+
+    def test_approve_refuses_while_blocked_and_signs_when_clean(self):
+        repo = Repo(spec_of(crit("GT.1", "tests.test_closure:stub_failed")))
+        self.addCleanup(repo.close)
+        code, _, err = self.run_cli(repo.root, "--approve")
+        self.assertEqual(code, 1)
+        self.assertIn("cannot approve", err)
+        self.assertEqual(CL.load_state(repo.root), {})
+
+        clean = Repo(spec_of(crit("GT.1", "tests.test_closure:stub_passed")))
+        self.addCleanup(clean.close)
+        code, out, _ = self.run_cli(clean.root, "--approve")
+        self.assertEqual(code, 0)
+        self.assertIn("closure approved by", out)
+        self.assertTrue(CL.load_state(clean.root)["approval"]["at"])
+
+    def test_pin_then_evaluate(self):
+        repo = Repo(spec_of(crit("GT.1", "tests.test_closure:stub_passed")), pin=False)
+        self.addCleanup(repo.close)
+        code, out, _ = self.run_cli(repo.root)
+        self.assertEqual(code, 1, "unpinned contract is not closable")
+        code, out, _ = self.run_cli(repo.root, "--pin")
+        self.assertEqual(code, 0)
+        self.assertIn("pinned docs/PROJECT-CLOSURE-GATE.md", out)
+        self.assertIn("CLOSABLE", out)
+
+    def test_the_verb_is_in_the_parser_and_documented(self):
+        import argparse
+
+        from aisef.cli.parser import build_parser
+
+        sub = next(a for a in build_parser()._actions
+                   if isinstance(a, argparse._SubParsersAction))
+        self.assertIn("closure", sub.choices)
+        solution = (ROOT / "docs/SOLUTION.md").read_text(encoding="utf-8")
+        self.assertRegex(solution, r"(?m)^aisef closure(\s|$)")
+
+
+class TestRealRepository(unittest.TestCase):
+    """The shipped criteria file, evaluated against this checkout. No
+    assertions about which cells are green — the point is that all 26 probes
+    run, none crashes, and every non-passing one says why."""
+
+    def test_evaluating_this_repository_produces_twentysix_readable_rows(self):
+        report = CL.evaluate(ROOT)
+        self.assertEqual(len(report.results), 26)
+        for r in report.results:
+            with self.subTest(criterion=r.id):
+                self.assertIn(r.outcome, tuple(Outcome))
+                if r.outcome is not Outcome.PASSED:
+                    self.assertTrue(r.detail)
+                self.assertTrue(r.probe.startswith("aisef.control.closure:"))
+        self.assertIn("Project closure gate", CL.table(report))
+        self.assertIn("| criterion |", CL.render(report.as_dict()))
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -449,6 +449,16 @@ aisef dashboard [--out FILE] [--projects DIR…]
                                       latency), gate verdicts, chi phí. `--projects` gộp nhiều dự án
                                       vào một báo cáo — xem offline
 
+# Cổng đóng dự án của **chính kho framework** (docs/PROJECT-CLOSURE-GATE.md) — chỉ đọc, không gọi model
+aisef closure [--corpus DIR]          chấm 26 tiêu chí của 6 cổng theo `docs/closure-gate.json`, in bảng,
+                                      ghi `closure-evidence/closure-report.json`. Mã thoát **riêng**:
+                                      0 đóng được · 1 bị chặn · 2 gõ sai. `UNCONFIGURED` bị nâng thành
+                                      `UNRUNNABLE` — không ai cấu hình phép kiểm không phải bằng chứng khoẻ
+aisef closure --report                dựng lại `docs/CLOSURE-REPORT.md` từ lần chấm gần nhất
+aisef closure --waive <tiêu chí> --reason "..."   chỉ với tiêu chí `waiver_eligible`; thiếu lý do → 2
+aisef closure --approve [--note ...]  chữ ký của chủ dự án; từ chối khi còn bất kỳ mục nào chặn
+aisef closure --pin [--force]         ghim `contract_sha256` (và bản tiền đăng ký bench) vào tệp tiêu chí
+
 # Bench (ADR-005 V8) — việc của người phát triển harness, không nối vào `aisef`
 python3 -m tests.bench mine [--e9 DIR]           task lỗi kho → tests/bench/tasks/ (commit); story e9 → .bench/tasks/
 python3 -m tests.bench validate [ID…] [--runs 3] base+test đỏ · base+test+gold xanh · test chập chờn loại, nêu tên

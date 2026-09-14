@@ -15,6 +15,7 @@ from ..config import ConfigError
 from ..harness.guardrails import GUARD_MATCHERS
 from ..phases.deploy import INSTALL_SPEC as DEPLOY_INSTALL_SPEC
 from ._common import EXIT_USAGE, _gate_arg
+from .closure import cmd_closure
 from .dashboard import cmd_dashboard
 from .doctor import cmd_doctor
 from .harness import cmd_baseline, cmd_compile, cmd_doc, cmd_gate, cmd_guard, cmd_init, cmd_replay, cmd_setup, cmd_skill
@@ -288,6 +289,26 @@ def build_parser() -> argparse.ArgumentParser:
                     help="additional project directories — merge evidence from multiple projects")
     db.set_defaults(func=cmd_dashboard)
 
+    cl = sub.add_parser("closure", help="score the project closure gate (read-only, no model calls)")
+    # Cùng lý do như `guard`: lệnh này có quy ước mã thoát riêng do hợp đồng
+    # §4.3 định (0 đóng được · 1 bị chặn · 2 gõ sai), nên lỗi gõ phải ra 2 —
+    # mặc định `_Parser` trả 1, và 1 ở đây đọc thành "bị chặn".
+    cl.error = types.MethodType(_closure_error, cl)      # type: ignore[method-assign]
+    cl.add_argument("--report", action="store_true",
+                    help="regenerate docs/CLOSURE-REPORT.md from the last evaluation")
+    cl.add_argument("--waive", default="", metavar="CRITERION",
+                    help="record a waiver for a waiver-eligible criterion (requires --reason)")
+    cl.add_argument("--reason", default="", help="why the gap is accepted — a waiver without a reason is not evidence")
+    cl.add_argument("--approve", action="store_true",
+                    help="owner signature; refuses unless every criterion is non-blocking")
+    cl.add_argument("--note", default="", help="note recorded with --approve")
+    cl.add_argument("--pin", action="store_true",
+                    help="pin contract_sha256 (and the bench pre-registration) in docs/closure-gate.json")
+    cl.add_argument("--force", action="store_true", help="re-pin over an existing pin")
+    cl.add_argument("--corpus", default="", metavar="DIR",
+                    help="G4 corpus path (default: the primary corpus beside the main checkout)")
+    cl.set_defaults(func=cmd_closure)
+
     rpl = sub.add_parser("replay", help="re-score story gates on recorded evidence")
     rpl.add_argument("story", nargs="?", default="", help="story ID; omit with --all")
     rpl.add_argument("--attempt", type=int, default=0, help="only this attempt")
@@ -329,6 +350,18 @@ def _guard_error(self: argparse.ArgumentParser, message: str):
     """
 
     self.exit(2, f"guard could not run ({message}) — blocking, not allowing\n")
+
+
+def _closure_error(self: argparse.ArgumentParser, message: str):
+    """`aisef closure` gõ sai phải thoát **2**, không phải 1.
+
+    Hợp đồng đóng dự án (`docs/PROJECT-CLOSURE-GATE.md` §4.3) định mã thoát của
+    riêng lệnh này: 0 đóng được · 1 **bị chặn** · 2 gõ sai. Nếu để mặc định
+    `_Parser` (1 = gõ sai) thì một cờ viết sai đọc thành "cổng bị chặn" — một
+    lỗi gõ lệnh biến thành một kết luận về dự án.
+    """
+    self.print_usage(sys.stderr)
+    self.exit(2, f"{self.prog}: error: {message}\n")
 
 
 def _cho_moi_lenh_nhan_project(p: argparse.ArgumentParser) -> None:
