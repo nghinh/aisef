@@ -828,3 +828,98 @@ class TestMoiTruongCongCuTachKhoiSanPham(QaTestCase):
         args = build_docker_args(SandboxSpec(
             workspace=self.project, cmd=["pytest", "-q"], image="python:3.12"))
         self.assertNotIn("--entrypoint", args)
+
+
+class TestKhongTheTuBoQuaBangCachQuenKhai(QaTestCase):
+    """Lỗi 167, phần còn thiếu — **sự vắng mặt trong kế hoạch không được tự
+    chứng minh là không cần**.
+
+    Luật ở bản đầu chỉ đọc `verification_contract` + độ phủ requirement, nên một
+    kế hoạch **sót** một loại kiểm thử sẽ dùng chính chỗ sót ấy làm bằng chứng
+    rằng loại đó không cần. Đó là lập luận vòng, và nó im lặng — đúng hình dạng
+    nguy hiểm nhất: một thuộc tính bắt buộc biến mất mà không ai thấy.
+
+    Hướng sai lệch là điều quyết định ở đây. Đòi **nhầm** một loại thì cổng chặn
+    và người phải quyết — tốn công, an toàn. Bỏ **nhầm** một loại thì thuộc tính
+    ấy không bao giờ được kiểm và không ai biết. Nên khi có bất kỳ dấu hiệu cấp
+    cao nào đòi hỏi, câu trả lời phải là APPLICABLE hoặc UNRESOLVED, không bao
+    giờ là NOT_APPLICABLE.
+    """
+
+    def _du_an(self, *, reqs, contracts=(("unit",),), covers=None, files=None, screens=None):
+        import json
+        root = self.project / "_bmad-output"
+        root.mkdir(parents=True, exist_ok=True)
+        covers = covers or [[r] for r in reqs][: len(contracts)]
+        (root / "stories.index.json").write_text(json.dumps({"stories": [
+            {"id": f"S-{i}", "verification_contract": list(c), "covers": list(cv),
+             "screens": list(screens or [])}
+            for i, (c, cv) in enumerate(zip(contracts, covers, strict=True), 1)]}),
+            encoding="utf-8")
+        (root / "prd.md").write_text(
+            "# PRD\n\n## 5. Functional Requirements\n\n" + "\n\n".join(
+                f"### {rid} — {text}\n\n{text}" for rid, text in reqs.items()), encoding="utf-8")
+        for rel, body in (files or {}).items():
+            f = self.project / rel
+            f.parent.mkdir(parents=True, exist_ok=True)
+            f.write_text(body, encoding="utf-8")
+        return self.project
+
+    def verdict(self, kind_id, **kw):
+        from aisef.phases.qa import KINDS, applicability
+        return applicability(KINDS[kind_id], self.project, **kw)
+
+    # ---- A. hiệu năng
+    def test_A_nfr_hieu_nang_do_duoc_thi_perf_khong_duoc_bo_qua(self):
+        self._du_an(reqs={"NFR-1": "The p95 latency of `list` must stay under 200 ms."})
+        v, ly_do = self.verdict("perf")
+        self.assertIn(v, ("applicable", "unresolved"),
+                      f"một NFR nêu ngưỡng đo được mà perf thành N/A: {ly_do}")
+        self.assertIn("NFR-1", ly_do)
+
+    def test_A_am_nfr_khong_phai_hieu_nang_thi_van_duoc_bo_qua(self):
+        """Phép kiểm âm: 'Node 20 or newer' có số nhưng không phải ngưỡng hiệu năng."""
+        self._du_an(reqs={"NFR-1": "The program runs on Node 20 or newer with no dependencies."})
+        self.assertEqual(self.verdict("perf")[0], "not_applicable")
+
+    # ---- B. hợp đồng API
+    def test_B_co_hop_dong_api_thi_khong_duoc_bo_qua(self):
+        self._du_an(reqs={"FR-1": "Serve bookmarks."},
+                    files={"openapi.yaml": "openapi: 3.0.0\n"})
+        v, ly_do = self.verdict("api-contract")
+        self.assertIn(v, ("applicable", "unresolved"), ly_do)
+        self.assertIn("openapi.yaml", ly_do)
+
+    def test_B_yeu_cau_neu_http_api_thi_khong_duoc_bo_qua(self):
+        self._du_an(reqs={"FR-1": "The service exposes a REST endpoint for listing bookmarks."})
+        self.assertIn(self.verdict("api-contract")[0], ("applicable", "unresolved"))
+
+    def test_B_am_cli_thuan_thi_van_duoc_bo_qua(self):
+        self._du_an(reqs={"FR-1": "Add a bookmark from the command line."})
+        self.assertEqual(self.verdict("api-contract")[0], "not_applicable")
+
+    # ---- C. migration
+    def test_C_co_co_che_migration_thi_khong_duoc_bo_qua(self):
+        self._du_an(reqs={"FR-1": "Store bookmarks."},
+                    files={"migrations/001_init.sql": "create table t(id int);\n"})
+        v, ly_do = self.verdict("migration")
+        self.assertIn(v, ("applicable", "unresolved"), ly_do)
+        self.assertIn("migrations", ly_do)
+
+    def test_C_yeu_cau_neu_nang_cap_luoc_do_thi_khong_duoc_bo_qua(self):
+        self._du_an(reqs={"NFR-1": "An existing store must be migrated to the new schema on upgrade."})
+        self.assertIn(self.verdict("migration")[0], ("applicable", "unresolved"))
+
+    def test_C_am_mot_tep_json_phang_thi_van_duoc_bo_qua(self):
+        self._du_an(reqs={"NFR-1": "Storage is a single JSON file."})
+        self.assertEqual(self.verdict("migration")[0], "not_applicable")
+
+    # ---- D. giao diện / accessibility
+    def test_D_co_man_hinh_thi_accessibility_khong_duoc_bo_qua(self):
+        self._du_an(reqs={"FR-1": "Show a list."}, screens=["notes-list"])
+        v, ly_do = self.verdict("accessibility", has_ui=True)
+        self.assertIn(v, ("applicable", "unresolved"), ly_do)
+
+    def test_D_am_khong_man_hinh_thi_van_duoc_bo_qua(self):
+        self._du_an(reqs={"FR-1": "Add from the command line."})
+        self.assertEqual(self.verdict("accessibility", has_ui=False)[0], "not_applicable")

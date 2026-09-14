@@ -255,7 +255,70 @@ class QaReport:
 APPLICABLE, NOT_APPLICABLE, UNRESOLVED = "applicable", "not_applicable", "unresolved"
 
 
-def applicability(kind: Kind, project: Path) -> tuple[str, str]:
+#: Artefacts whose **presence** proves a project has the surface a kind targets.
+#: File evidence first: it cannot be argued with, and it cannot be produced by a
+#: plan forgetting to mention something.
+_CAPABILITY_FILES: dict[str, tuple[str, ...]] = {
+    "api-contract": ("openapi*.y*ml", "openapi*.json", "swagger*.y*ml", "swagger*.json",
+                     "**/*.proto", "**/*.graphql", "schema.graphql"),
+    "migration": ("migrations/**", "**/migrations/**", "**/*.sql", "alembic.ini",
+                  "prisma/schema.prisma", "knexfile*"),
+    "image-scan": ("Dockerfile", "Containerfile", "**/Dockerfile"),
+    "sit": ("docker-compose*.y*ml", "compose*.y*ml"),
+}
+
+#: Requirement wording that **demands** a kind. Deliberately liberal, and safe to
+#: be so: a wrong demand blocks and asks a person, while a wrong dismissal drops
+#: a required property in silence. This is the opposite error-direction from
+#: `Stack.has_ui` (lỗi 163), where a loose match wrongly *imposed* browser
+#: checks — here a loose match only ever refuses to let something be skipped.
+_CAPABILITY_WORDS: dict[str, str] = {
+    "perf": r"(?i)\b(p50|p95|p99|latency|throughput|response time|rps|qps|"
+            r"requests? per second)\b|\b\d+\s*ms\b",
+    "api-contract": r"(?i)\b(rest|http api|endpoint|graphql|grpc|openapi|swagger|"
+                    r"api contract)\b",
+    "migration": r"(?i)\b(migrat\w+|schema upgrade|backfill)\b",
+    "sit": r"(?i)\b(external service|third[- ]party service|message queue|message broker)\b",
+}
+
+#: Kinds no AISEF policy requires of a project. `mutation` is configurable and
+#: nothing in the framework demands it, so NOT_APPLICABLE is honest — but the
+#: reason must say *policy does not require it*, never "no story asked for it",
+#: which would be the plan justifying its own omission.
+_POLICY_OPTIONAL = {"mutation"}
+
+
+def _demanded_by(kind: Kind, project: Path, *, has_ui: bool | None) -> str:
+    """Evidence from a **higher authority** that this kind must be verified — "".
+
+    Authority order (lỗi 167): requirement / architecture / project capability
+    outranks an approved story contract, which outranks project-shape inference.
+    A plan that simply omits a kind must never be able to prove that kind
+    unnecessary — that is circular, and it fails silently.
+    """
+    if kind.needs_ui and has_ui:
+        return "the project has screens in its design artefacts, so this UI check applies"
+
+    for pattern in _CAPABILITY_FILES.get(kind.id, ()):
+        for hit in project.glob(pattern):
+            if hit.is_file() and ".aisef" not in hit.parts and "node_modules" not in hit.parts:
+                return f"the project carries `{hit.relative_to(project)}`, a {kind.id} surface"
+
+    rx = _CAPABILITY_WORDS.get(kind.id)
+    if rx:
+        prd_file = project / "_bmad-output" / "prd.md"
+        if prd_file.is_file():
+            from ..control.normalize import parse_prd_file
+            import re as _re
+            for req in parse_prd_file(prd_file).requirements:
+                text = f"{req.title} {getattr(req, 'text', '')}"
+                if _re.search(rx, text):
+                    return (f"{req.id} states a {kind.id} property that must be verified: "
+                            f"{text.strip()[:120]}")
+    return ""
+
+
+def applicability(kind: Kind, project: Path, *, has_ui: bool | None = None) -> tuple[str, str]:
     """Does this verification kind apply to this project? `(verdict, evidence)`.
 
     Derived from **structured, already-approved** plan artifacts — never from
@@ -279,6 +342,13 @@ def applicability(kind: Kind, project: Path) -> tuple[str, str]:
     nothing to read a decision from.
     """
     import json as _json
+
+    # Authority 1 — a requirement, architecture decision, or project capability
+    # that demands this kind. It outranks everything below, because the plan must
+    # not be able to excuse itself by leaving something out.
+    doi_hoi = _demanded_by(kind, project, has_ui=has_ui)
+    if doi_hoi:
+        return APPLICABLE, doi_hoi
 
     root = project / "_bmad-output"
     index = root / "stories.index.json"
@@ -311,10 +381,15 @@ def applicability(kind: Kind, project: Path) -> tuple[str, str]:
             f"`{kind.id}` is in no verification contract, but {len(ho)} requirement(s) are "
             f"covered by no story: {', '.join(ho[:5])} — with the plan incomplete this is "
             f"not knowable, and not knowable is not the same as not applicable")
+    if kind.id in _POLICY_OPTIONAL:
+        return NOT_APPLICABLE, (
+            f"no AISEF policy requires `{kind.id}` of a project, and nothing in this project's "
+            f"requirements or capabilities demands it — it is configurable via "
+            f"`verify.{kind.id}` when wanted")
     return NOT_APPLICABLE, (
-        f"no story declares `{kind.id}`, and all {len(want)} requirements are covered by "
-        f"stories whose contracts name {', '.join(sorted(declared)) or 'nothing'} — the plan "
-        f"assigned this proof elsewhere")
+        f"no requirement, architecture decision or project capability demands `{kind.id}`, "
+        f"no story declares it, and all {len(want)} requirements are covered by stories whose "
+        f"contracts name {', '.join(sorted(declared)) or 'nothing'}")
 
 
 def tool_image_for(kind_id: str, config: Config | None) -> str:
@@ -592,7 +667,7 @@ def run_suite(
                 # shrug. Derived from the settled plan (lỗi 167) — NOT_APPLICABLE
                 # is an answer and does not block; UNRESOLVED means the framework
                 # could not decide and blocks exactly as an unconfigured kind does.
-                verdict, vi_sao = applicability(kind, project)
+                verdict, vi_sao = applicability(kind, project, has_ui=has_ui)
                 if verdict == NOT_APPLICABLE:
                     result.skipped = result.not_applicable = vi_sao
                 else:
