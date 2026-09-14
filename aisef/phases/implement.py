@@ -1196,6 +1196,14 @@ def verify_candidate(
         for c in attempt.gate.failures:
             _log(f"story={sid}#{number} gate ✗ {c.name} · {c.outcome.value} · "
                  + (one_line(c.detail) or "(no detail recorded)"))
+        # An escape path nobody is told about is not an escape path. When the
+        # only thing between this story and done is a model's opinion, the log
+        # says so and names the command — measured: 15 of todo-e2e's 19
+        # blocking attempts were exactly this shape.
+        if story_gate.judge_only(attempt.gate):
+            _log(f"story={sid}#{number} gate judge-only: `review` is the only blocking "
+                 f"check and it is model-scored. If the claim is wrong: "
+                 f"`aisef gate {sid} --waive-review --reason ...`")
     return attempt
 
 

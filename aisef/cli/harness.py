@@ -367,6 +367,84 @@ def cmd_doc(args) -> int:
     return EXIT_OK
 
 
+def _waive_review(args) -> int:
+    """Record a human override of a review-only block (closure gate G2.4b-iii).
+
+    The `review` check is the only `model-judge` entry in `gate.CHECK_KIND`,
+    and its measured error rate is not hypothetical: 11 of 20 consecutive
+    reviews of an identical tree reversed the verdict. Re-verify keeps a
+    blocking review conclusion at the same SHA on purpose, so a person needs a
+    way to say "this claim is wrong" that does not mean rewriting the story.
+
+    Four refusals, each closing a way this could stop being an escape hatch and
+    start being a bypass: no reason, no gate scoring to override, review was
+    not blocking, or the caller is an agent session (`AISEF_STORY_ID`) — an
+    agent must not sign off its own review. The record is bound to the
+    candidate, so the next build is scored from scratch; and the check it
+    produces is `WAIVED`, which is neither blocking nor a pass.
+    """
+    import os
+
+    from ..control.approvals import _current_user, _now
+    from ..control.gate import REVIEW_WAIVER
+    from ..control.replay import GATE_INPUT, GATE_VERDICT
+    from ..harness.guardrails import ENV_STORY_ID
+    from ..harness.observe import NOTE, Event, EvidenceStore
+
+    if not args.story:
+        print("✗ gate --waive-review requires <story>", file=sys.stderr)
+        return EXIT_USAGE
+    if not args.reason.strip():
+        print("✗ gate --waive-review requires --reason: a waiver with no reason is "
+              "a waiver nobody can audit", file=sys.stderr)
+        return EXIT_USAGE
+    if os.environ.get(ENV_STORY_ID):
+        print(f"✗ refusing: {ENV_STORY_ID} is set, so this is an agent session — the "
+              f"reviewer's block is not the reviewed agent's to waive. Run it from your "
+              f"own shell (`unset {ENV_STORY_ID}` if it is left over from an earlier run).",
+              file=sys.stderr)
+        return EXIT_USAGE
+
+    root = _artifact_root(args)
+    ev = EvidenceStore(root).read(args.story)
+    dau_vao = ev.last(NOTE, GATE_INPUT)
+    if dau_vao is None:
+        print(f"✗ {args.story}: no gate scoring recorded — nothing to override",
+              file=sys.stderr)
+        return EXIT_USAGE
+    chan = [str(x) for x in (dau_vao.detail.get("review_blocking") or [])]
+    candidate = str(dau_vao.detail.get("candidate") or "")
+    if not chan:
+        print(f"✗ {args.story}: review was not blocking at the last gate scoring — "
+              f"nothing to waive", file=sys.stderr)
+        return EXIT_USAGE
+    if not candidate:
+        print(f"✗ {args.story}: the last gate scoring recorded no candidate SHA, so a "
+              f"waiver could not be bound to a build", file=sys.stderr)
+        return EXIT_USAGE
+
+    who = _current_user()
+    EvidenceStore(root, candidate=candidate).record(args.story, Event(
+        # `ok=False`: a waiver is not a pass. What it records is that a person
+        # took responsibility for a block, and the gate still says `◇`, not `✅`.
+        kind=NOTE, name=REVIEW_WAIVER, ok=False,
+        detail={"reason": args.reason.strip(), "by": who, "at": _now(),
+                "waived": chan, "attempt": int(dau_vao.detail.get("attempt") or 0)},
+    ))
+    print(f"◇ review block waived by {who} at candidate {candidate[:7]} "
+          f"({len(chan)} item{'s' if len(chan) != 1 else ''})")
+    for item in chan[:5]:
+        print(f"  - {item[:150]}")
+    verdict = ev.last(NOTE, GATE_VERDICT)
+    khac = [str(n) for n in ((verdict.detail.get("failures") or []) if verdict else [])
+            if n != "review"]
+    if khac:
+        print(f"⚠ still blocking on its own merits: {', '.join(khac)} — the waiver "
+              f"covers `review` only")
+    print(f"next: aisef run --verify-only --story {args.story}")
+    return EXIT_OK
+
+
 def cmd_gate(args) -> int:
     """Re-score story gates on recorded evidence (ADR-005 V4).
 
@@ -379,8 +457,11 @@ def cmd_gate(args) -> int:
     from ..control import replay as R
     from ..harness.observe import EvidenceStore
 
+    if getattr(args, "waive_review", False):
+        return _waive_review(args)
     if not args.replay:
-        print("✗ gate: currently only `--replay` is supported (re-evaluate on recorded evidence)", file=sys.stderr)
+        print("✗ gate: pass `--replay` (re-evaluate on recorded evidence) or "
+              "`--waive-review --reason ...` (override a review-only block)", file=sys.stderr)
         return EXIT_USAGE
     if not args.story and not args.all:
         print("✗ gate --replay requires <story> or --all", file=sys.stderr)

@@ -12,7 +12,9 @@ Nine conditions, each answerable from available data:
 2. lint clean;
 3. changes within ``write_scope``;
 4. screen matches visual contract (UI stories only);
-5. independent review has no blocking items;
+5. independent review has no blocking items — the one `model-judge` check, so
+   the one check a person can override at a named candidate (`REVIEW_WAIVER`),
+   which reads `WAIVED`, never `PASSED`;
 6. no fake tests — tests asserting nothing make condition 1 vacuous;
 7. preservation (ADR-004 R4) — VERIFIED behaviours of other stories whose
    files this story touches are still green at the candidate; unverifiable
@@ -103,6 +105,22 @@ CONTROLS = ("positive", "negative", "env")
 #: Record of `--verify-only --repeat k` (ADR-004 R13): which checks changed
 #: outcome across k runs on the same SHA. Written by `implement._repeat_note`.
 REPEAT_NOTE = "verify-only.repeat"
+
+#: Human override of a **judge-only** block (closure gate G2.4b-iii). Written
+#: by `aisef gate <story> --waive-review --reason ...` from a person's own
+#: shell, read by `review_waiver()` below and **nowhere else**: the only check
+#: a waiver can touch is `review`, the only `model-judge` entry in
+#: `CHECK_KIND`. It is bound to the candidate SHA, so a new build is scored
+#: from scratch, and it produces `WAIVED` — never `PASSED`.
+#:
+#: Why this exists: `review` is scored by a model, and the model's error rate
+#: is measured, not hypothetical — miss 34-39 %, 11 of 20 consecutive reviews
+#: of an identical tree reversed the verdict, and 21 of 57 recorded blocks
+#: rested on the judge's word alone (`control/reviewer_qual.py`). Re-verify
+#: deliberately **keeps** a blocking review conclusion at the same SHA, so
+#: without this the only ways past a wrong block were to change the story or
+#: abandon it. A probabilistic blocker with no override is a stop, not a gate.
+REVIEW_WAIVER = "review:waiver"
 
 
 @dataclass
@@ -493,6 +511,40 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
                  "story tests; use a reporter that prints names (`node --test`, `vitest --reporter=verbose`, `pytest -v`)")
 
 
+def judge_only(gate: StoryGate) -> bool:
+    """Did the **judge alone** stop this story? (closure gate G2.4b-i)
+
+    True when the gate blocked and `review` — the single `model-judge` entry in
+    `CHECK_KIND` — is the only blocking check. This is the question an operator
+    has to be able to ask of a verdict ("was anything deterministic behind
+    this?"), and the answer is one comparison over one record, not a re-read of
+    the reviewer's prose. `gate:verdict` stores `failures` and every check's
+    `outcome`, so the same comparison works on evidence months later.
+
+    `UNRUNNABLE` counts as blocking here, because `Outcome.blocks` says it
+    does: a story also held up by a check that could not run was not stopped by
+    the judge alone, and calling it judge-only would overstate the override's
+    reach.
+    """
+    return [c.name for c in gate.failures] == ["review"]
+
+
+def review_waiver(evidence: Evidence, candidate: str) -> Event | None:
+    """The human override in force for **this** candidate, or None (G2.4b-iii).
+
+    Three conditions, all cheap and all necessary. A waiver needs a
+    ``candidate``, because a person judged one diff and not the next build; it
+    needs a non-empty ``reason``, the same rule `approvals.reject` already
+    applies to a rejection note; and the latest one wins, so a second signature
+    can correct the first without editing the record.
+    """
+    if not candidate:
+        return None
+    return next((e for e in reversed(evidence.of(NOTE, REVIEW_WAIVER))
+                 if str(e.detail.get("candidate") or "") == candidate
+                 and str(e.detail.get("reason") or "").strip()), None)
+
+
 def evaluate(
     story_id: str,
     evidence: Evidence,
@@ -824,13 +876,23 @@ def evaluate(
         gate.checks.append(Check("review", False, "independent review not run"))
     else:
         blocking = review_blocking or []
-        gate.checks.append(
-            Check(
-                "review",
-                not blocking,
-                "" if not blocking else f"{len(blocking)} blocking items: {blocking[0][:200]}",
+        mien = review_waiver(evidence, candidate) if blocking else None
+        if mien is not None:
+            gate.checks.append(Check(
+                "review", Outcome.WAIVED,
+                f"{len(blocking)} blocking items waived by "
+                f"{mien.detail.get('by') or 'unknown'}: {mien.detail.get('reason')} "
+                f"— first item: {str(blocking[0])[:160]}",
+                evidence=[mien.seq],
+            ))
+        else:
+            gate.checks.append(
+                Check(
+                    "review",
+                    not blocking,
+                    "" if not blocking else f"{len(blocking)} blocking items: {blocking[0][:200]}",
+                )
             )
-        )
 
     gate.checks.append(_preservation_check(evidence, preservation or [], candidate))
     # `kind` is stamped from the table in one place, not scattered across checks;
