@@ -153,6 +153,11 @@ def build_parser() -> argparse.ArgumentParser:
                          "print diff against recorded `gate:verdict`")
     gt.add_argument("--attempt", type=int, default=0, help="only this attempt (default: all)")
     gt.add_argument("--all", action="store_true", help="all stories with evidence")
+    gt.add_argument("--waive-review", action="store_true",
+                    help="record your override of a review-only block at the story's current "
+                         "candidate; needs --reason, refuses inside an agent session")
+    gt.add_argument("--reason", default="",
+                    help="why the review block is wrong — recorded in evidence with your name")
     gt.set_defaults(func=cmd_gate)
 
     # `guard` **không** dùng `_Parser`: xem `_GuardParser` — hook coi mã thoát
