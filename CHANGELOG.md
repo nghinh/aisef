@@ -2,8 +2,10 @@
 
 ## Unreleased
 
-Everything below landed **after** `v1.6.0` was tagged and published, so it is not
-in the 1.6.0 wheel. Three of these paragraphs were first written into the 1.6.0
+## 1.7.0 — 2026-09-15
+
+Everything below landed **after** `v1.6.0` was tagged and published, so none of it
+is in the 1.6.0 wheel. Three of these paragraphs were first written into the 1.6.0
 section by parallel agents and moved here: the release was already on PyPI, and a
 changelog that credits a published release with fixes its artifact does not carry
 is the same class of untrue statement this project spends its time removing.
