@@ -250,6 +250,7 @@ English twin.
 | Thing | Why left |
 |---|---|
 | `V1-READINESS.md` A7 "58 keys" / A8 "9 guards" | Correct record of 2026-09-08, in a document whose header already says "**COMPLETED.** … retained as historical record". Rewriting these would falsify the checklist. Only B3's missing list was added, because the ADR-009 rule is about being able to audit a claim, not about the number |
+| `V1-READINESS.md` B1 "last run 2026-09-06, expires 2026-09-20" | *Added by the second pass, 2026-09-14.* Same class as A7/A8, and checked rather than assumed: `git show 8095d9a^:docs/CONFORMANCE.md` shows the table said **2026-09-06** when the row was authored (08:37), and `af827f4` refreshed it to 2026-09-08 at 12:21 the same day. The row was true when written; the real expiry is 2026-09-22. Annotated in place with that date, not rewritten |
 | `RELEASE-CHECKLIST-v0.1.0.md` / `RELEASE-PLAN-v0.1.0.md` "S1 blocked" | v0.1.0 release records. True when written; ADR-011 supersedes the *decision*, not the record. The live document (ROADMAP item 2) is where the correction belongs, and that is where I put it |
 | `DANH-GIA-360-VA-LO-TRINH.md` (dangling `docs/BENCHMARK.md`) | Already labelled historical by its successor's header. Superseded docs keep their dead links here |
 | `FAILURE-TAXONOMY.md` cause-class table stops at bug 47 | Real gap — the class table's example column was never extended past 47. Filling it means re-reading ~100 rows and fixes nothing: **column 2 of the bug table already declares each bug's class**, on every row. Labelled in the doc as a selection of examples rather than an index, which is what it is |
@@ -277,6 +278,26 @@ English twin.
    run log does not record a `client=` line. Settle by adding the client name to
    the `pipeline START` line in `run.log`, which would be worth doing anyway:
    the single most load-bearing fact about a run is not in its own log.
+
+   **Settled for future runs, 2026-09-14** (`0957ddb`). Both start lines now
+   carry the client:
+
+   ```
+   grep -n 'pipeline START' aisef/phases/plan.py
+   # → _run_log(project, f"pipeline START client={getattr(client, 'id', '') or '?'}")
+   grep -n 'sprint START' aisef/phases/run.py
+   # → run_log(artifact_root, f"sprint START client={client.id} "
+   ```
+
+   **It does not settle the item as asked, and that is the point.** The fix is
+   forward-only: no existing corpus gains a `client=` line, so which client
+   produced `todo-oc`, `todo-cli`, `todo` or `todo-e2e` is still an inference
+   from `.opencode/` directories and session-id shapes, not a record. An
+   unverified claim about the past closes by re-running or not at all; what a
+   harness fix buys is that the *next* reader never has to ask. The same
+   asymmetry applies to the client/model split in
+   [`o1-reviewer-qualification.md` § How ground truth is derived, item 5](o1-reviewer-qualification.md) — same
+   commit, same forward-only reach.
 
 ---
 

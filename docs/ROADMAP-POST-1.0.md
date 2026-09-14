@@ -31,16 +31,30 @@ budget seam were caught by the wire-up harness on the same day and
 closed by switching the lock carrier to a sidecar and counting
 in-flight reservations in the cap math.  See
 [ADR-009](ADR-009-phase-3-cross-tier-invariants.md#follow-up-two-cross-tier-defects-in-the-budget-seam).
-The other four issues are *semantic* and depend on these being
-correct first.  They are now written down — reconstructed from
-on-disk evidence, with that provenance stated — in
-[ADR-009 § Open](ADR-009-phase-3-cross-tier-invariants.md#the-four-semantic-issues-reconstructed-2026-09-12):
-reviewer verdicts are not themselves qualified (O1), the ledger does
-not record what *kind* of gap a GAP is (O2), and spend is attributed
-to calls rather than to outcomes (O4).  Each carries the measurement
-that closes it.  O3 — preservation scoped by file rather than by
-behaviour — closed on 2026-09-14 with its calibration table in
-[ADR-009 § Closed](ADR-009-phase-3-cross-tier-invariants.md#o3--preservation-is-scoped-by-file-not-by-behaviour--closed-2026-09-14).
+The other four issues are *semantic* and depended on these being
+correct first.  **All four closed 2026-09-14**, each with its
+measurement, in
+[ADR-009 § The four semantic issues](ADR-009-phase-3-cross-tier-invariants.md#the-four-semantic-issues-reconstructed-2026-09-12):
+reviewer verdicts are not themselves qualified (O1 — `aisef/control/reviewer_qual.py`,
+scored over 145 recorded sessions), the ledger does not record what
+*kind* of gap a GAP is (O2 — `Behavior.gap_kind`, repair queue routed
+by kind), preservation scoped by file rather than by behaviour
+(O3 — the neighbour weight calibrated and left at 0 with the table in
+[ADR-009 § O3](ADR-009-phase-3-cross-tier-invariants.md#o3--preservation-is-scoped-by-file-not-by-behaviour--closed-2026-09-14)),
+and spend attributed to calls rather than to outcomes (O4 — the
+`aisef cost` verb).  Settle any of them without a model call:
+
+```
+python3 -c "import aisef.control.reviewer_qual"                          # O1
+python3 -c "from aisef.control.ledger import Behavior, gap_kind_counts"  # O2
+grep -n 'story.verified_touched_weight' aisef/config.py                 # O3 → 4 lines
+python3 -m aisef.cli cost --help                                        # O4 → usage: aisef cost …
+```
+
+*Until 2026-09-14 this paragraph listed O1, O2 and O4 as still open
+("Each carries the measurement that closes it", future tense) and
+named only O3 as closed.  That was the state for part of one day; the
+last of the four merged the same afternoon.*
 
 ## 1. External user validation
 
@@ -273,9 +287,19 @@ on real reports, not speculative cleanup.
 - **Large refactors** without evidence of friction.
 - **Version bumps** for the sake of progress.
 - **New features** not driven by user feedback or evidence.
-- **Config key reduction** — already at 0 mandatory, **68** total with defaults
+- **Config key reduction** — already at 0 mandatory, **69** total with defaults
   (`python3 -c "from aisef.config import DEFAULTS; print(len(DEFAULTS))"` →
-  `68`, measured 2026-09-14; this line said 58 until then).
+  `69`, measured 2026-09-14).
+
+  *This number has now drifted twice, and the second time is instructive.  The
+  line said 58 until `735f50f` (2026-09-14 06:00) measured 68; four minutes
+  later `9244229` (06:04) added `story.verified_touched_weight` for ADR-009 O3
+  from a parallel worktree, making it 69 — so the freshly measured figure was
+  stale before it was committed.  The guarded copy is
+  [`STABILITY.md`](STABILITY.md) § Config keys, pinned to
+  `len(DEFAULTS)` by
+  `tests/test_meta.py::TestConSoTrongTaiLieuKhopNguonDocDuoc.test_so_khoa_cau_hinh_trong_stability_khop_defaults`.
+  Read the count there; this line is a copy and copies drift.*
 
 ## Lessons from MiMo-Code (2026-09-12)
 

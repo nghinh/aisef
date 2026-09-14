@@ -1,6 +1,9 @@
 # ADR-007 — Scoped advisory long-term memory
 
-Date: 2026-09-11. Status: **EXPERIMENTAL, default OFF**. Research: [inspected sources and P0/P1/P2 plan](MEMORY-RESEARCH-PLAN.md).
+Date: 2026-09-11. Status: **FROZEN, default OFF** (this header read
+**EXPERIMENTAL, default OFF** until 2026-09-14; the *Addendum — frozen (2026-09-12)*
+below changed the status two days earlier and the header was not followed up).
+Research: [inspected sources and P0/P1/P2 plan](MEMORY-RESEARCH-PLAN.md).
 
 ## Decision
 
