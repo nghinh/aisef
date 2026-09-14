@@ -41,6 +41,7 @@ from pathlib import Path
 
 from ..harness.guardrails import check_completion, check_diff_scope
 from .acceptance import (ac_code, coverage as ac_coverage, missing as ac_missing,
+                         overloaded as ac_overloaded,
                          orphans as ac_orphans)
 from .outcome import Check, Outcome
 from .tdd import red_before_green
@@ -763,16 +764,26 @@ def evaluate(
         # sự dịch chuyển còn đọc được từ dữ liệu, nên nó **chặn**: một mục cấu
         # trúc không được đạt khi danh tính của bằng chứng đã trượt.
         mo_coi = ac_orphans(story_id, acceptance, tat_ca)
+        # Lỗi 159, đường thứ ba: **một** phép thử mang **hai** mã thoả cả hai
+        # tiêu chí bằng một hành vi. Không phép đếm nào bắt được — `missing` rỗng
+        # và không mã nào mồ côi — nên nó phải được hỏi riêng.
+        nhap_nhang = ac_overloaded(story_id, tat_ca)
         lenh = str(last_green.detail.get("command") or "tools.test")
         nguon = ", ".join([f"`{lenh}`", *(f"`{k}`" for k in sorted(phu))])
         gate.checks.append(Check(
-            "criteria have tests", not missing and not mo_coi,
+            "criteria have tests", not missing and not mo_coi and not nhap_nhang,
             (f"tests carry codes with no criterion: {', '.join(mo_coi)} — the story "
              f"has {acceptance} criteria, so a test named after a higher code proves "
              f"nothing this story declares, and every code at or below it may have "
              f"shifted onto a different criterion. Re-tag the tests, or restore the "
              f"criteria the codes were written for (lỗi 159)."
              ) if mo_coi and not missing else
+            ("; ".join(
+                f"`{t}` carries {', '.join(ma)}" for t, ma in sorted(nhap_nhang.items()))
+             + " — one test cannot be the proof for more than one criterion: it "
+               "demonstrates one behaviour, so each code it carries is credited from "
+               "evidence written for another. Give each criterion its own test (lỗi 159)."
+             ) if nhap_nhang and not missing else
             "" if not missing else
             f"no tests with codes {', '.join(ac_code(story_id, i) for i in missing)} — "
             f"each criterion needs at least one test named after its code, green at "

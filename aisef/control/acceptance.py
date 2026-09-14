@@ -44,7 +44,7 @@ def missing(story_id: str, n: int, test_ids: list[str]) -> list[int]:
 
 
 def _codes_of(story_id: str) -> re.Pattern:
-    """Mã của **đúng** story này ở tên phép thử: `AC-<story>-<i>`.
+    r"""Mã của **đúng** story này ở tên phép thử: `AC-<story>-<i>`.
 
     Dựng từ `story_id` đã biết, không tách chung `AC-(.+)-(\d+)`: dạng chung
     tách sai ở dấu gạch nào cũng được — không tham thì `AC-STORY-01-02-4` ra
@@ -79,3 +79,55 @@ def orphans(story_id: str, n: int, test_ids: list[str]) -> list[str]:
             if i > n:
                 seen.add(i)
     return [f"AC-{story_id}-{i}" for i in sorted(seen)]
+
+
+def digest(text: str) -> str:
+    """Vân tay nội dung của một tiêu chí — danh tính bền của nó.
+
+    Chuẩn hoá khoảng trắng trước khi băm: thẻ story được **sinh lại** từ
+    `epics.md` mỗi lần `aisef plan` chạy, nên ngắt dòng đổi mà nghĩa không đổi
+    là chuyện thường; báo trượt vì một lần gói dòng là báo động giả, và một cổng
+    hay báo động giả thì bị bỏ qua.
+    """
+    import hashlib
+
+    return hashlib.sha256(" ".join(text.split()).encode("utf-8")).hexdigest()[:12]
+
+
+def identities(story_id: str, criteria: list[str]) -> dict[str, str]:
+    """Mã vị trí -> vân tay nội dung. Cặp `(mã, vân tay)` là danh tính bền."""
+    return {ac_code(story_id, i): digest(str(c)) for i, c in enumerate(criteria, 1)}
+
+
+def drift(before: dict[str, str], now: dict[str, str]) -> list[str]:
+    """Mã có ở **cả hai** lần mà vân tay đã đổi — tức mã ấy giờ mang tiêu chí khác.
+
+    Vì sao đếm là không đủ (lỗi 159, nửa sau): `orphans()` bắt được ca **rút**
+    tiêu chí vì số lượng giảm để lại mã mồ côi. **Đảo thứ tự** hai tiêu chí
+    không đổi số lượng và không để lại mã mồ côi nào, mà vẫn tráo bằng chứng
+    của hai tiêu chí cho nhau. Chỉ nội dung trả lời được câu ấy.
+
+    Mã **mới** (chỉ có ở `now`) không phải trượt — đó là tiêu chí thêm vào, và
+    `missing()` mới là câu hỏi đúng cho nó. Mã **mất** (chỉ có ở `before`) cũng
+    không phải trượt — `orphans()` đã nói.
+    """
+    return sorted(k for k in before.keys() & now.keys() if before[k] != now[k])
+
+
+def overloaded(story_id: str, test_ids: list[str]) -> dict[str, list[str]]:
+    """Phép thử -> các mã của story này mà **tên nó** mang cùng lúc (≥2).
+
+    Một phép thử tên `AC-S-1 and AC-S-2: …` thoả `criteria have tests` cho **cả
+    hai** tiêu chí trong khi chứng minh một hành vi: hai tiêu chí, một bằng
+    chứng. Đó là gán nhập nhằng, và nó là một đường đạt-sai của một mục cấu
+    trúc y như mã tụt bậc.
+
+    Ngược lại, **một** tiêu chí có nhiều phép thử là chuyện bình thường và tốt.
+    """
+    rx = _codes_of(story_id)
+    out: dict[str, list[str]] = {}
+    for t in test_ids:
+        found = sorted({int(m.group(1)) for m in rx.finditer(t.replace("_", "-"))})
+        if len(found) > 1:
+            out[t] = [ac_code(story_id, i) for i in found]
+    return out

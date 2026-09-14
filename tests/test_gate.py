@@ -1080,3 +1080,40 @@ class TestMaMoCoiChanCong(unittest.TestCase):
         self.assertEqual(ac_missing("STORY-01-02", 3, tests), [])
         # Bộ dò bắt được, nên cổng có cái để chặn.
         self.assertEqual(orphans("STORY-01-02", 3, tests), ["AC-STORY-01-02-4"])
+
+
+class TestMotPhepThuHaiMa(GateTestCase):
+    """Lỗi 159, đường đạt-sai thứ ba: **một** phép thử mang **hai** mã.
+
+    `coverage()` hỏi từng tiêu chí "có phép thử nào mang mã của mày không", nên
+    một phép thử tên `AC-S-01-1 and AC-S-01-2: …` trả lời *có* cho cả hai — hai
+    tiêu chí được chứng minh bằng một hành vi, và `missing` rỗng, và không mã nào
+    mồ côi. Không đếm nào bắt được ca này; chỉ đọc tên phép thử mới bắt được.
+    """
+
+    def ghi(self, ids):
+        store = EvidenceStore(self._tmp.name, candidate="aaa")
+        store.file_change("S-01", "src/a.py")
+        store.tool_run("S-01", "test", ok=True, detail={
+            "test_format": "pytest", "test_ids": list(ids), "failed_ids": []})
+        store.tool_run("S-01", "lint", ok=True)
+
+    def muc(self, acceptance=2):
+        return next(c for c in self.gate(candidate="aaa", acceptance=acceptance).checks
+                    if c.name == "criteria have tests")
+
+    def test_mot_phep_thu_mang_ca_hai_ma_thi_do(self):
+        self.ghi(["AC-S-01-1 and AC-S-01-2: dispatcher does both"])
+        m = self.muc()
+        self.assertIsNot(m.outcome, Outcome.PASSED, m.detail)
+        self.assertIn("AC-S-01-1", m.detail)
+        self.assertIn("AC-S-01-2", m.detail)
+
+    def test_moi_tieu_chi_mot_phep_thu_rieng_thi_dat(self):
+        self.ghi(["AC-S-01-1: one", "AC-S-01-2: two"])
+        self.assertIs(self.muc().outcome, Outcome.PASSED, self.muc().detail)
+
+    def test_mot_tieu_chi_nhieu_phep_thu_van_dat(self):
+        """Nhiều phép thử cho **một** tiêu chí là chuyện tốt — không được chặn."""
+        self.ghi(["AC-S-01-1: a", "AC-S-01-1: b", "AC-S-01-2: c"])
+        self.assertIs(self.muc().outcome, Outcome.PASSED, self.muc().detail)

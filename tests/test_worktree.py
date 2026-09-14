@@ -563,3 +563,69 @@ class TestNhanhCuKhiTieuChiDoi(WorktreeTestCase):
         self.assertTrue(self.wm.has_branch(self.story.id))
         self.assertEqual(
             git(self.repo, "rev-parse", self.wm.branch_for(self.story.id)).strip(), sha)
+
+
+class TestStoryDaXongMaTieuChiDoi(WorktreeTestCase):
+    """Lỗ còn lại của lỗi 159: một story đã `DONE` và đã **trộn vào nhánh chính**.
+
+    Lỗi 143 bỏ nhánh story khi tiêu chí đổi, nên ca "lượt sau kế thừa việc viết
+    cho tiêu chí khác" đã bịt. Nhưng việc của một story đã trộn nằm trên nhánh
+    chính — không còn nhánh nào để bỏ — nên bản án `DONE` đứng vĩnh viễn trên
+    bằng chứng đã trượt danh tính, và vòng chạy sau *bỏ qua* nó không một tiếng.
+
+    Đúng ca marks-cli STORY-01-02: rút `AC-1.2-1` sau khi story đã trộn.
+    """
+
+    def setUp(self):
+        super().setUp()
+        from aisef.control.normalize import Story
+
+        self.artifacts = Path(self._tmp.name) / "_bmad-output"
+        self.artifacts.mkdir()
+        self.story = Story(id="STORY-01-02", epic_id="EPIC-01", title="t",
+                           acceptance_criteria=["chỗ giữ", "động từ lạ thì exit 1",
+                                                "package.json không có dependencies"])
+
+    def _moc(self, story):
+        """Ghi mốc danh tính như một lượt chạy thật để lại."""
+        from aisef.phases.run import _drop_branch_written_for_other_criteria
+
+        _drop_branch_written_for_other_criteria(
+            story, worktrees=self.wm, artifact_root=self.artifacts)
+
+    def _truot(self, story):
+        from aisef.phases.run import _done_criteria_drift
+
+        return _done_criteria_drift(story, artifact_root=self.artifacts)
+
+    def test_rut_tieu_chi_dau_thi_moi_ma_con_lai_bao_truot(self):
+        from aisef.control.normalize import Story
+
+        self._moc(self.story)
+        rut = Story(id=self.story.id, epic_id="EPIC-01", title="t",
+                    acceptance_criteria=self.story.acceptance_criteria[1:])
+        co_moc, truot = self._truot(rut)
+        self.assertTrue(co_moc)
+        self.assertEqual(truot, ["AC-STORY-01-02-1", "AC-STORY-01-02-2"])
+
+    def test_khong_doi_thi_khong_truot(self):
+        self._moc(self.story)
+        self.assertEqual(self._truot(self.story), (True, []))
+
+    def test_khong_co_moc_thi_noi_la_khong_biet_chu_khong_noi_la_on(self):
+        """Corpus chạy trước bản sửa này không có mốc. *Không đo được* phải khác
+        *đo ra không sao* — nếu trộn hai cái, mọi dự án cũ lặng lẽ thành hợp lệ."""
+        co_moc, truot = self._truot(self.story)
+        self.assertFalse(co_moc)
+        self.assertEqual(truot, [])
+
+    def test_dao_thu_tu_bi_bat_du_so_luong_khong_doi(self):
+        from aisef.control.normalize import Story
+
+        self._moc(self.story)
+        dao = Story(id=self.story.id, epic_id="EPIC-01", title="t",
+                    acceptance_criteria=[self.story.acceptance_criteria[1],
+                                         self.story.acceptance_criteria[0],
+                                         self.story.acceptance_criteria[2]])
+        self.assertEqual(self._truot(dao),
+                         (True, ["AC-STORY-01-02-1", "AC-STORY-01-02-2"]))

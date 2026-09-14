@@ -76,3 +76,62 @@ class TestDanhTinhTieuChiOnDinh(unittest.TestCase):
         self.assertEqual(
             orphans("STORY-01-02", 3, [*self.TESTS[:3], "AC-STORY-99-01-1: khác"]),
             [])
+
+
+class TestDanhTinhBenTheoNoiDung(unittest.TestCase):
+    """Lỗi 159, nửa còn lại: `orphans()` chỉ bắt được ca **rút** tiêu chí, vì nó
+    đếm. **Đảo thứ tự** hai tiêu chí không đổi số lượng, không để lại mã mồ côi
+    nào, mà vẫn tráo bằng chứng của hai tiêu chí cho nhau — nên đếm là không đủ.
+
+    Danh tính bền phải đến từ **nội dung** tiêu chí, không từ vị trí. Cặp
+    `(mã, vân tay nội dung)` cho danh tính ấy mà không phải đổi tên phép thử:
+    phép thử mang mã `AC-S-1` chỉ còn là bằng chứng cho tiêu chí 1 khi vân tay
+    của tiêu chí 1 hôm nay đúng bằng vân tay lúc phép thử được ghi công.
+    """
+
+    A = "Given an unknown verb, When it runs, Then it exits 1."
+    B = "Given package.json is inspected, Then it declares type module."
+
+    def test_dao_thu_tu_bi_phat_hien_du_so_luong_khong_doi(self):
+        from aisef.control.acceptance import drift, identities
+        truoc = identities("STORY-01-02", [self.A, self.B])
+        sau = identities("STORY-01-02", [self.B, self.A])
+        self.assertEqual(drift(truoc, sau),
+                         ["AC-STORY-01-02-1", "AC-STORY-01-02-2"])
+
+    def test_khong_doi_thi_khong_truot(self):
+        from aisef.control.acceptance import drift, identities
+        x = identities("STORY-01-02", [self.A, self.B])
+        self.assertEqual(drift(x, identities("STORY-01-02", [self.A, self.B])), [])
+
+    def test_ngat_dong_khac_nhau_khong_tinh_la_truot(self):
+        """Thẻ story sinh lại từ `epics.md`; ngắt dòng đổi mà nghĩa không đổi
+        thì báo truợt là báo động giả."""
+        from aisef.control.acceptance import drift, identities
+        truoc = identities("S", ["Given an unknown verb,\n  When it runs."])
+        sau = identities("S", ["Given an unknown   verb, When it runs.  "])
+        self.assertEqual(drift(truoc, sau), [])
+
+    def test_rut_tieu_chi_thi_ma_con_lai_deu_truot(self):
+        """Ca marks-cli thật: rút tiêu chí đầu làm mã 1 mang nội dung cũ của 2."""
+        from aisef.control.acceptance import drift, identities
+        C = "Given a handler returns arrays, Then the dispatcher writes them."
+        truoc = identities("S", ["placeholder", self.A, self.B, C])
+        sau = identities("S", [self.A, self.B, C])
+        self.assertEqual(drift(truoc, sau), ["AC-S-1", "AC-S-2", "AC-S-3"])
+
+    def test_mot_phep_thu_mang_hai_ma_la_gan_nhap_nhang(self):
+        """Một phép thử tên `AC-S-1 AC-S-2` thoả **cả hai** tiêu chí trong khi
+        chứng minh một hành vi — đúng một đường đạt-sai của mục cấu trúc."""
+        from aisef.control.acceptance import overloaded
+        self.assertEqual(
+            overloaded("S", ["AC-S-1 and AC-S-2: both at once", "AC-S-3: fine"]),
+            {"AC-S-1 and AC-S-2: both at once": ["AC-S-1", "AC-S-2"]})
+
+    def test_mot_ma_mot_phep_thu_thi_khong_nhap_nhang(self):
+        from aisef.control.acceptance import overloaded
+        self.assertEqual(overloaded("S", ["AC-S-1: one", "AC-S-1: also one"]), {})
+
+    def test_ma_story_khac_trong_cung_ten_khong_tinh(self):
+        from aisef.control.acceptance import overloaded
+        self.assertEqual(overloaded("S", ["AC-S-1 vs AC-T-2: khác story"]), {})

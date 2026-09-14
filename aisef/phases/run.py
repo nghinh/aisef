@@ -306,6 +306,29 @@ def run_epic(
             state.register(sid, epic_id, wave=index)
             trang_thai = state.load().stories[sid].state
             if trang_thai is StoryStatus.DONE:
+                # Bỏ qua story đã xong là điều kiện để chạy lại được — nhưng chỉ
+                # khi nó **vẫn còn** xong. Tiêu chí bị sửa sau khi story đã trộn
+                # làm mã tiêu chí mang nội dung khác, và bằng chứng ghi công cho
+                # mã ấy giờ chứng minh hành vi khác (lỗi 159). Chạy lại không gỡ
+                # được: việc cũ nằm trên nhánh chính nên người viết mã mở ra thấy
+                # xanh sẵn. Nên dừng và nói, để người vận hành gắn lại mã hoặc
+                # trả tiêu chí về — đây là quyết định của họ, không của khung.
+                story_da_xong = plan.stories.get(sid)
+                _, truot = (_done_criteria_drift(story_da_xong,
+                                                 artifact_root=artifact_root)
+                            if story_da_xong is not None else (False, []))
+                if truot and not report.stopped_at:
+                    report.stopped_at = (
+                        f"{epic_id} · wave {index} ({sid}): acceptance criteria changed "
+                        f"since this story was marked done — {', '.join(truot)} now carry "
+                        f"different criteria, so the tests credited to them prove "
+                        f"something else. Re-tag the tests or restore the criteria the "
+                        f"codes were written for; re-running cannot fix it, the work is "
+                        f"already on the main branch (lỗi 159)")
+                    from ..harness.runlog import run_log
+
+                    run_log(artifact_root, f"story={sid} STOPPED {report.stopped_at}")
+                    return False
                 wave.skipped.append(sid)  # resumable: skip already-done stories
             elif trang_thai is StoryStatus.VERIFIED:
                 # Already passed the gate but not yet merged to main (merge
@@ -455,6 +478,44 @@ def _contract_fingerprint(story: Story) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
 
 
+def _contract_identities(story: Story) -> dict[str, str]:
+    """Danh tính bền **từng** tiêu chí: mã vị trí -> vân tay nội dung.
+
+    Vì sao cần bên cạnh vân tay cả cụm (lỗi 159): vân tay cả cụm chỉ nói *có gì
+    đổi*, nên nó đủ để bỏ nhánh cũ đi (lỗi 143) nhưng không nói được **mã nào**
+    giờ mang tiêu chí khác. Một story đã `DONE` và đã trộn vào nhánh chính không
+    còn nhánh nào để bỏ, nên câu duy nhất còn trả lời được là "mã nào trượt".
+    """
+    from ..control.acceptance import identities
+
+    return identities(story.id, [str(c) for c in (story.acceptance_criteria or [])])
+
+
+def _done_criteria_drift(
+    story: Story, *, artifact_root: Path
+) -> tuple[bool, list[str]]:
+    """`(có mốc, các mã đã trượt)` của một story **đã xong**.
+
+    Lỗ mà lỗi 143 không bịt được: nó bỏ *nhánh* story khi tiêu chí đổi, nên ca
+    "lượt sau kế thừa việc viết cho tiêu chí khác" đã xong. Việc của một story
+    đã trộn vào nhánh chính thì không còn nhánh nào để bỏ — bản án `DONE` đứng
+    trên bằng chứng đã trượt danh tính, và vòng chạy sau *bỏ qua* nó không một
+    tiếng. Đo trên marks-cli STORY-01-02: rút `AC-1.2-1` sau khi đã trộn.
+
+    `có mốc` là `False` khi ghi chú hợp đồng không mang `codes` — corpus chạy
+    trước bản sửa này. *Không đo được* phải khác *đo ra không sao*: trộn hai cái
+    lại thì mọi dự án cũ lặng lẽ thành hợp lệ, đúng lớp lỗi đạt-sai đang sửa.
+    """
+    from ..control.acceptance import drift
+    from ..harness.observe import NOTE, EvidenceStore
+
+    last = EvidenceStore(artifact_root).read(story.id).last(NOTE, _CONTRACT_NOTE)
+    truoc = (last.detail if last else {}).get("codes") or {}
+    if not truoc:
+        return False, []
+    return True, drift(truoc, _contract_identities(story))
+
+
 def _drop_branch_written_for_other_criteria(
     story: Story, *, worktrees: WorktreeManager, artifact_root: Path
 ) -> None:
@@ -478,16 +539,23 @@ def _drop_branch_written_for_other_criteria(
     store = EvidenceStore(artifact_root)
     now = _contract_fingerprint(story)
     last = store.read(story.id).last(NOTE, _CONTRACT_NOTE)
-    before = str((last.detail if last else {}).get("fingerprint") or "")
-    if before == now:
+    truoc = last.detail if last else {}
+    before = str(truoc.get("fingerprint") or "")
+    # `codes` là bản vá muộn (lỗi 159): các corpus đã chạy có ghi chú *không*
+    # mang nó, và nếu chỉ ghi khi vân tay đổi thì chúng **không bao giờ** có
+    # mốc so — tức câu "mã nào trượt" mãi không trả lời được ở đúng những dự án
+    # đã có việc để mất. Nên vẫn ghi lại để điền mốc, nhưng không bỏ nhánh: mốc
+    # thiếu là khiếm khuyết bản ghi, không phải tiêu chí đã đổi.
+    if before == now and truoc.get("codes"):
         return
-    if before and worktrees.has_branch(story.id):
+    if before and before != now and worktrees.has_branch(story.id):
         worktrees.remove(story.id, delete_branch=True)
         run_log(artifact_root,
                 f"story={story.id} criteria changed since the last attempt — "
                 f"story branch discarded, starting from the base again")
     store.record(story.id, Event(kind=NOTE, name=_CONTRACT_NOTE,
-                                 detail={"fingerprint": now}))
+                                 detail={"fingerprint": now,
+                                         "codes": _contract_identities(story)}))
 
 
 def _run_wave(
