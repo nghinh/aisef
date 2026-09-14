@@ -1,5 +1,5 @@
 {
-  "commit": "862d0d4c124fddae3ccf2a6ad31cb297229f79c3",
+  "commit": "46c8e74ee466afe127c52e108ab283a061f8bcae",
   "exit": 0,
   "passed": 19,
   "tool": "python -m tests.bench selfcheck",
