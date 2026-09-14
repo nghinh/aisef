@@ -554,3 +554,80 @@ class TestKhongDungApiChiCoTrenPosix(unittest.TestCase):
                         ok = False
                 with self.subTest(ca=ten):
                     self.assertEqual(ok, cho_phep)
+
+
+class TestTienDangKyCot2BiGhim(unittest.TestCase):
+    """Tiền đăng ký cột 2 phải ghim được, và ghim thật (phán quyết 7, tiêu chí G5.1).
+
+    Một dự đoán không ghim thì không phân biệt được với một dự đoán viết sau khi
+    thấy dữ liệu — và dự án này đã in ra một con số (dải nhiễu ±0,08) không sống
+    nổi một lượt đọc lại. Bốn phép dưới đây là **bản tham chiếu** của công thức
+    digest mà `aisef.control.closure:probe_prereg_digest` phải dùng lại khi máy
+    đóng gate được viết; công thức ấy không được có bản thứ hai.
+    """
+
+    VUNG = r"(?s)<!--\s*PREREG-FROZEN:BEGIN\s*-->\n(.*?)\n<!--\s*PREREG-FROZEN:END\s*-->"
+    GHIM = ROOT / "docs/BENCH-PREREGISTRATION-C2.md"
+    BAN_GIAO = ROOT / "docs/handoff/bench-real-model-wiring.md"
+    CONG = ROOT / "docs/closure-gate.json"
+
+    @classmethod
+    def _vung_ghim(cls, tep: Path) -> str:
+        """Chuẩn hoá xuống dòng, cắt dòng trống đầu/cuối vùng — ngoài ra từng byte."""
+        t = tep.read_text(encoding="utf-8").replace("\r\n", "\n").replace("\r", "\n")
+        khop = re.findall(cls.VUNG, t)
+        if len(khop) != 1:
+            raise AssertionError(f"{tep.name}: {len(khop)} vùng ghim, phải đúng 1")
+        return khop[0].strip("\n")
+
+    @classmethod
+    def _digest(cls, tep: Path) -> str:
+        import hashlib
+        return hashlib.sha256(cls._vung_ghim(tep).encode("utf-8")).hexdigest()
+
+    def _tieu_chi(self) -> dict:
+        import json
+        cong = json.loads(self.CONG.read_text(encoding="utf-8"))
+        for g in cong["gates"]:
+            for c in g["criteria"]:
+                if c["id"] == "G5.1":
+                    return c
+        raise AssertionError("closure-gate.json không còn tiêu chí G5.1")
+
+    def test_digest_khop_gia_tri_ghi_ngoai_tep(self):
+        """Giá trị ghim nằm ở `closure-gate.json`, không nằm trong tệp nó ghim: một
+        digest ghi trong chính chủ thể của nó được cập nhật cùng một động tác với
+        văn bản, nên nó không ghim gì."""
+        c = self._tieu_chi()
+        self.assertEqual(c["evidence"], "docs/BENCH-PREREGISTRATION-C2.md")
+        self.assertEqual(c["freshness"], {"kind": "pinned_digest", "source": "prereg_sha256"})
+        self.assertRegex(c.get("prereg_sha256", ""), r"^[0-9a-f]{64}$",
+                         "G5.1 chưa ghi `prereg_sha256` — UNCONFIGURED, hợp đồng §4.1 đọc thành UNRUNNABLE")
+        self.assertEqual(self._digest(self.GHIM), c["prereg_sha256"],
+                         "vùng ghim §2 đã đổi — hoàn nguyên văn bản, đừng ghi lại digest")
+        self.assertNotIn(c["prereg_sha256"], self.GHIM.read_text(encoding="utf-8"),
+                         "digest bị nhắc lại trong chính tệp nó ghim — một con số có hai nhà là con số sẽ lệch")
+
+    def test_ban_lich_su_ra_dung_cung_digest(self):
+        """Thứ định ngày cho bản ghim là bản lịch sử: cùng văn bản, commit trước khi
+        có một byte dữ liệu cột 2. Hai bản lệch nhau là mất bằng chứng ngày."""
+        self.assertEqual(self._digest(self.BAN_GIAO), self._digest(self.GHIM),
+                         "§7 bản bàn giao không còn trùng vùng ghim của tài liệu đóng")
+
+    def test_ban_giao_giu_muc_7_tai_cho_va_co_con_tro_co_ngay(self):
+        """Văn bản lịch sử ở nguyên chỗ cũ, và nói ra bản ghim nằm đâu."""
+        t = self.BAN_GIAO.read_text(encoding="utf-8")
+        self.assertIn("## 7. Tiền đăng ký — viết trước khi có dữ liệu", t)
+        muc7 = t.split("## 7. ", 1)[1].split("\n## 8. ", 1)[0]
+        self.assertIn("2026-09-14", muc7)
+        self.assertIn("BENCH-PREREGISTRATION-C2.md", muc7)
+
+    def test_phu_luc_hau_nghiem_nam_ngoai_vung_ghim(self):
+        """Ranh giới giữa cam kết và hậu nghiệm: cái học được sau tiền đăng ký có
+        trong tài liệu, và **không** có trong vùng ghim."""
+        vung = self._vung_ghim(self.GHIM)
+        ca_tep = self.GHIM.read_text(encoding="utf-8")
+        for cau in ("BENCH-TASK-DISCRIMINATION", "G5.3", "lỗi 86"):
+            with self.subTest(cau=cau):
+                self.assertIn(cau, ca_tep)
+                self.assertNotIn(cau, vung, f"`{cau}` là hậu nghiệm, không được nằm trong vùng ghim")

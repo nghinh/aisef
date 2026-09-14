@@ -550,6 +550,16 @@ digest. The pin is what gives pre-registration its meaning — an unpinned
 prediction is indistinguishable from a post-hoc one, and this project has already
 published one number (the ±0.08 band) that did not survive re-reading.
 
+> **2026-09-14 — done, and the evidence path moved.** The pinned copy is
+> [BENCH-PREREGISTRATION-C2.md](BENCH-PREREGISTRATION-C2.md) §2, digest recorded
+> in `docs/closure-gate.json` under G5.1 (`prereg_sha256`). The row above and the
+> work item in §7 still name `handoff/bench-real-model-wiring.md` §7: that text
+> stays exactly where it is as the pre-data record, and the pin requires it to
+> keep producing the *same* digest, so the handoff note is now checked evidence
+> rather than the artifact. The addendum dated the same day — the corpus's
+> measured discriminating power — is carried in §3 of the artifact, outside the
+> pinned region, and rewrites nothing.
+
 **G5.3 is why the 72-attempt run must not start.** Measured this session:
 
 ```
