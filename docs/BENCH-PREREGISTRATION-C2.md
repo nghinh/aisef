@@ -372,7 +372,7 @@ chứng của C-1), và `MANIFEST.sha256` khớp từng byte.
 
 | ngày | đổi gì | vì sao | ai |
 |---|---|---|---|
-| – | – | – | – |
+| 2026-09-14 | `<TÊN MODEL>` trong `--note` → `MiniMax-M3` | Chỗ trống ấy được để lại **có chủ ý**: phán quyết 3 nói cặp model↔CLI chỉ được chốt **sau** khi G5.3 tuyển xong, nên ghim tên model từ trước là đóng băng một quyết định chưa được phép ra. G5.3 nay đã chạy và chốt: `mycombo→MiniMax-M3 / opencode`, 28/28 phiên, 0 cắt, tỉ lệ 0,000 ≤ ngưỡng 0,167 (biên trên 95 %: 0,101), chọn theo đúng luật đã ghim (tỉ lệ cắt thấp nhất). Tên `MiniMax-M3` là **quan sát**: alias `mycombo` phân giải xuống nó, xác nhận qua `/v1/chat/completions` trả `model: MiniMax-M3`. Không một biến nào khác của lệnh đổi — 12 task đúng thứ tự, `--attempts 3`, `AISEF_BENCH_DIR=.bench-c2`, `--max-minutes 600` giữ nguyên | nghi |
 
 ## 6. Luật sửa tài liệu này
 
