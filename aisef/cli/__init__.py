@@ -40,6 +40,7 @@ from ._common import (
     _gate_arg,  # noqa: F401 — tái xuất cho tương thích ngược
     _state,  # noqa: F401 — tái xuất cho tương thích ngược
 )
+from .closure import cmd_closure
 from .doctor import _hook_paths_elsewhere, cmd_doctor  # noqa: F401 — tái xuất cho tương thích ngược
 from .harness import cmd_baseline, cmd_compile, cmd_doc, cmd_guard, cmd_init, cmd_setup, cmd_skill
 from .implement import (
@@ -77,6 +78,7 @@ __all__ = [
     "cmd_auto_approve",
     "cmd_baseline",
     "cmd_change",
+    "cmd_closure",
     "cmd_compile",
     "cmd_devsecops",
     "cmd_doc",
