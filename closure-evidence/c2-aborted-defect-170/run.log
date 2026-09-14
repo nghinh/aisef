@@ -1,0 +1,135 @@
+# Bench — 2026-09-14 16:04 UTC
+
+| task | client | lượt | kết cục | F2P | P2P đỏ | $ | turn | ms | tệp/dòng | guard chặn | cách ly | ghi chú |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| bug-a2-sec-4 | opencode | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 4756 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-4 | opencode | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 2046 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-4 | opencode | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 2035 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-4 | opencode-bare | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 752 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-4 | opencode-bare | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 692 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-4 | opencode-bare | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 666 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-3 | opencode | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 2154 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-3 | opencode | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 2061 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-3 | opencode | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 2221 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-3 | opencode-bare | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 696 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-3 | opencode-bare | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 646 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-3 | opencode-bare | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 719 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-1 | opencode | 1 | FAIL | 0/2 | 0 | 0.00 | 0 | 2040 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-1 | opencode | 2 | FAIL | 0/2 | 0 | 0.00 | 0 | 2072 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-1 | opencode | 3 | FAIL | 0/2 | 0 | 0.00 | 0 | 2105 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-1 | opencode-bare | 1 | FAIL | 0/2 | 0 | 0.00 | 0 | 853 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-1 | opencode-bare | 2 | FAIL | 0/2 | 0 | 0.00 | 0 | 705 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-1 | opencode-bare | 3 | FAIL | 0/2 | 0 | 0.00 | 0 | 668 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-3 | opencode | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 2006 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-3 | opencode | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 2518 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-3 | opencode | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 2421 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-3 | opencode-bare | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 705 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-3 | opencode-bare | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 712 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-3 | opencode-bare | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 685 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-2 | opencode | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 2044 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-2 | opencode | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 2038 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-2 | opencode | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 2057 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-2 | opencode-bare | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 681 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-2 | opencode-bare | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 668 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-2 | opencode-bare | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 669 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-2 | opencode | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 1986 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-2 | opencode | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 2047 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-2 | opencode | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 2029 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-2 | opencode-bare | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 655 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-2 | opencode-bare | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 688 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-2 | opencode-bare | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 673 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-1 | opencode | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 2011 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-1 | opencode | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 2022 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-1 | opencode | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 1937 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-1 | opencode-bare | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 668 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-1 | opencode-bare | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 650 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-sec-1 | opencode-bare | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 652 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-1 | opencode | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 2103 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-1 | opencode | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 2088 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-1 | opencode | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 2011 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-1 | opencode-bare | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 712 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-1 | opencode-bare | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 711 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-1 | opencode-bare | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 711 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-2 | opencode | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 4355 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-2 | opencode | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 2161 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-2 | opencode | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 1971 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-2 | opencode-bare | 1 | FAIL | 0/1 | 0 | 0.00 | 0 | 704 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-2 | opencode-bare | 2 | FAIL | 0/1 | 0 | 0.00 | 0 | 700 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-2 | opencode-bare | 3 | FAIL | 0/1 | 0 | 0.00 | 0 | 710 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-3 | opencode | 1 | FAIL | 0/83 | 0 | 0.00 | 0 | 2008 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-3 | opencode | 2 | FAIL | 0/83 | 0 | 0.00 | 0 | 1985 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-3 | opencode | 3 | FAIL | 0/83 | 0 | 0.00 | 0 | 2149 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-3 | opencode-bare | 1 | FAIL | 0/83 | 0 | 0.00 | 0 | 818 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-3 | opencode-bare | 2 | FAIL | 0/83 | 0 | 0.00 | 0 | 659 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-3 | opencode-bare | 3 | FAIL | 0/83 | 0 | 0.00 | 0 | 695 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-4 | opencode | 1 | FAIL | 0/5 | 0 | 0.00 | 0 | 1910 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-4 | opencode | 2 | FAIL | 0/5 | 0 | 0.00 | 0 | 2070 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-4 | opencode | 3 | FAIL | 0/5 | 0 | 0.00 | 0 | 1965 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-4 | opencode-bare | 1 | FAIL | 0/5 | 0 | 0.00 | 0 | 657 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-4 | opencode-bare | 2 | FAIL | 0/5 | 0 | 0.00 | 0 | 677 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-state-4 | opencode-bare | 3 | FAIL | 0/5 | 0 | 0.00 | 0 | 670 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-4 | opencode | 1 | FAIL | 0/10 | 0 | 0.00 | 0 | 2096 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-4 | opencode | 2 | FAIL | 0/10 | 0 | 0.00 | 0 | 2084 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-4 | opencode | 3 | FAIL | 0/10 | 0 | 0.00 | 0 | 2108 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-4 | opencode-bare | 1 | FAIL | 0/10 | 0 | 0.00 | 0 | 697 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-4 | opencode-bare | 2 | FAIL | 0/10 | 0 | 0.00 | 0 | 709 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+| bug-a2-multi-4 | opencode-bare | 3 | FAIL | 0/10 | 0 | 0.00 | 0 | 676 | 0/0 | 0 | local/WORKSPACE_WRITE | [91m[1mError: [0mFailed to change directory to .bench-c2/ |
+
+## Theo task × client
+
+| task | client | pass@1 | pass@k | ổn định | $/lượt | $ lịch sử | tỉ lệ |
+|---|---|---|---|---|---|---|---|
+| bug-a2-multi-1 | opencode | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-multi-1 | opencode-bare | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-multi-2 | opencode | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-multi-2 | opencode-bare | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-multi-3 | opencode | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-multi-3 | opencode-bare | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-multi-4 | opencode | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-multi-4 | opencode-bare | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-sec-1 | opencode | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-sec-1 | opencode-bare | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-sec-2 | opencode | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-sec-2 | opencode-bare | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-sec-3 | opencode | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-sec-3 | opencode-bare | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-sec-4 | opencode | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-sec-4 | opencode-bare | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-state-1 | opencode | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-state-1 | opencode-bare | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-state-2 | opencode | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-state-2 | opencode-bare | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-state-3 | opencode | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-state-3 | opencode-bare | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-state-4 | opencode | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+| bug-a2-state-4 | opencode-bare | 0.00 | 0 | ✓ | 0.00 | 0.00 | – |
+
+**pass@1** 0.00 · **pass@k** 0.00 · **ổn định** 24/24 · **cost ≤ 2× lịch sử** 0/0
+
+## So sánh opencode (AISEF) vs opencode-bare (bare)
+
+| task | AISEF pass@1 | bare pass@1 | delta | AISEF turn | bare turn | AISEF giây | bare giây | AISEF $/lượt | bare $/lượt | guard chặn |
+|---|---|---|---|---|---|---|---|---|---|---|
+| bug-a2-multi-1 | 0.00 | 0.00 | +0.00 | 0 | 0 | 2 | 1 | 0.00 | 0.00 | 0 |
+| bug-a2-multi-2 | 0.00 | 0.00 | +0.00 | 0 | 0 | 2 | 1 | 0.00 | 0.00 | 0 |
+| bug-a2-multi-3 | 0.00 | 0.00 | +0.00 | 0 | 0 | 2 | 1 | 0.00 | 0.00 | 0 |
+| bug-a2-multi-4 | 0.00 | 0.00 | +0.00 | 0 | 0 | 2 | 1 | 0.00 | 0.00 | 0 |
+| bug-a2-sec-1 | 0.00 | 0.00 | +0.00 | 0 | 0 | 2 | 1 | 0.00 | 0.00 | 0 |
+| bug-a2-sec-2 | 0.00 | 0.00 | +0.00 | 0 | 0 | 2 | 1 | 0.00 | 0.00 | 0 |
+| bug-a2-sec-3 | 0.00 | 0.00 | +0.00 | 0 | 0 | 2 | 1 | 0.00 | 0.00 | 0 |
+| bug-a2-sec-4 | 0.00 | 0.00 | +0.00 | 0 | 0 | 2 | 1 | 0.00 | 0.00 | 0 |
+| bug-a2-state-1 | 0.00 | 0.00 | +0.00 | 0 | 0 | 2 | 1 | 0.00 | 0.00 | 0 |
+| bug-a2-state-2 | 0.00 | 0.00 | +0.00 | 0 | 0 | 2 | 1 | 0.00 | 0.00 | 0 |
+| bug-a2-state-3 | 0.00 | 0.00 | +0.00 | 0 | 0 | 2 | 1 | 0.00 | 0.00 | 0 |
+| bug-a2-state-4 | 0.00 | 0.00 | +0.00 | 0 | 0 | 2 | 1 | 0.00 | 0.00 | 0 |
+
+**AISEF pass@1** 0.00 vs **bare pass@1** 0.00 (delta +0.00)
+
+**Turn trung vị (trung bình theo task)** AISEF 0 vs bare 0 · **giây** AISEF 2 vs bare 1
+**Guard chặn tổng** 0 lần trên 12 task
+
+## Task loại / test chập chờn
+
+- `bug-15`: base+test+gold còn đỏ: tests.test_mockup_map.TestLoadHalf.test_loads_only_the_named_screen, tests.test_mockup_map.TestLoadHalf.test_sample_data_is_not_a_commitment, tests.test_mockup_map.TestLoadHalf.test_slice_carries_route_and_components, tests.test_mockup_map.TestLoadHalf.test_slice_points_at_mockup_and_screenshot, tests.test_mockup_map.TestLoadHalf.test_story_without_screens_says_so
+- `bug-6`: chưa đo (không phải oracle hỏng): bộ test ở snapshot gọi Docker thật trong từng ca (~9 phút/lần chạy, 6 lần ≈ 1 giờ) — dừng 2026-09-06 để không chen luồng đo thời gian; chạy lại khi máy rảnh: python3 -m tests.bench validate bug-6
+

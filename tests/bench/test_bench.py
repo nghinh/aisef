@@ -1168,3 +1168,56 @@ class TestMotDotDoMotLuc(unittest.TestCase):
         self.assertEqual(ma, 3)
         self.assertIn("đang chạy", err.getvalue())
 
+
+
+class TestThuMucCohortTuongDoi(unittest.TestCase):
+    """Lỗi 170 — `AISEF_BENCH_DIR` tương đối làm cả cohort **không chạy được**.
+
+    `KEEP_DIR` lấy giá trị biến môi trường **nguyên văn**, trong khi mặc định là
+    `ROOT / ".bench"` — tuyệt đối. Nên đặt `AISEF_BENCH_DIR=.bench-c2` (đúng như
+    lệnh đã tiền đăng ký ở `BENCH-PREREGISTRATION-C2.md` §5 viết) cho ra một
+    đường dẫn tương đối, workspace giao cho client cũng tương đối, và client —
+    chạy với cwd của riêng nó — không `cd` vào được.
+
+    Đo ngày 2026-09-14 khi phóng cột 2: **72/72 lượt FAIL**, 0 turn, 0 USD, mọi
+    dòng cùng một lỗi `Failed to change directory to .bench-c2/`. Không một lượt
+    gọi model nào xảy ra.
+
+    Vì sao là P1 chứ không phải P2: 72 dòng ấy được ghi vào `results.jsonl` với
+    `outcome: FAIL`, nên một người đọc bảng sau này thấy *"AISEF 0/36, trần
+    0/36"* — một thất bại hạ tầng đọc thành một **kết quả đo**. Hỏng im lặng,
+    đúng lớp nguy hiểm nhất, và nó nằm ngay trên đường của lệnh đã tiền đăng ký.
+    """
+
+    def _keep_dir(self, value):
+        import importlib
+        import os
+        from . import _mine
+        cu = os.environ.get("AISEF_BENCH_DIR")
+        try:
+            if value is None:
+                os.environ.pop("AISEF_BENCH_DIR", None)
+            else:
+                os.environ["AISEF_BENCH_DIR"] = value
+            return importlib.reload(_mine).KEEP_DIR
+        finally:
+            if cu is None:
+                os.environ.pop("AISEF_BENCH_DIR", None)
+            else:
+                os.environ["AISEF_BENCH_DIR"] = cu
+            importlib.reload(_mine)
+
+    def test_gia_tri_tuong_doi_neo_vao_goc_kho(self):
+        from . import _mine as M
+        kd = self._keep_dir(".bench-c2")
+        self.assertTrue(kd.is_absolute(), f"{kd} còn tương đối — client không cd vào được")
+        self.assertEqual(kd, M.ROOT / ".bench-c2")
+
+    def test_gia_tri_tuyet_doi_giu_nguyen(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            self.assertEqual(self._keep_dir(d), Path(d))
+
+    def test_mac_dinh_van_la_bench_cua_goc_kho(self):
+        from . import _mine as M
+        self.assertEqual(self._keep_dir(None), M.ROOT / ".bench")

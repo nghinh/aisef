@@ -53,7 +53,27 @@ from aisef.harness.tools import BASELINE_RUN  # noqa: E402
 #: Task lỗi kho — mã của kho, commit được.
 TASKS_DIR = Path(__file__).resolve().parent / "tasks"
 #: Tạo tác bench (task story, bản chép, kết quả) — gitignore.
-KEEP_DIR = Path(os.environ.get("AISEF_BENCH_DIR") or (ROOT / ".bench"))
+def _keep_dir() -> Path:
+    """Cohort directory, always absolute.
+
+    Lỗi 170: giá trị biến môi trường trước đây được dùng **nguyên văn**, trong
+    khi mặc định là `ROOT / ".bench"` — tuyệt đối. Nên `AISEF_BENCH_DIR=.bench-c2`
+    (đúng như lệnh đã tiền đăng ký viết) cho ra đường dẫn tương đối, workspace
+    giao cho client cũng tương đối, và client — chạy với cwd của riêng nó —
+    không `cd` vào được. Đo khi phóng cột 2: 72/72 lượt FAIL, 0 turn, cùng một
+    lỗi `Failed to change directory to .bench-c2/`, không một lượt gọi model nào.
+
+    Neo vào `ROOT` chứ không `Path.cwd()`: cohort thuộc về kho, không thuộc về
+    chỗ người vận hành tình cờ đứng khi gõ lệnh.
+    """
+    raw = os.environ.get("AISEF_BENCH_DIR")
+    if not raw:
+        return ROOT / ".bench"
+    p = Path(raw)
+    return p if p.is_absolute() else ROOT / p
+
+
+KEEP_DIR = _keep_dir()
 #: Story tốn hơn mức này trong lịch sử thì vẫn ghi nhưng đánh dấu `too_big`:
 #: 01-04 $184/17 lượt developer — 3 lượt × 2 client ≈ $1 000, không lặp được.
 TOO_BIG_USD = 100.0

@@ -178,6 +178,18 @@
    "fixed": "HEAD",
    "evidence": "marks-cli: 7/7 stories done, pre-deploy PASS, yet G4.6 read FAILED — 'report declares no acceptance scope (--epic)'. probe_pre_deploy requires rep['scope']['epic'] and pre_deploy left scope None whenever --epic was absent.",
    "notes": "None meant both 'the entire plan' and 'nothing declared'. The only way past the gate was --epic on one epic of four, which would have the signer accept a quarter of what they are actually accepting and contradicts G4.3's 'every planned story reached done'. The strongest scope must be statable, not merely implied. Fixed by declaring {'epic': 'all', 'stories': [every story], 'outside': []} when no epic is given; --epic keeps its narrowing meaning, asserted by a negative control."
+  },
+  {
+   "id": "D-015",
+   "severity": "P1",
+   "status": "CLOSED",
+   "taxonomy": 170,
+   "false_pass": false,
+   "title": "a relative AISEF_BENCH_DIR makes an entire benchmark cohort unrunnable, and the failures look like results",
+   "introduced": "with per-cohort bench directories",
+   "fixed": "HEAD",
+   "evidence": "Column-2 launch 2026-09-14: 72/72 attempts FAIL, 0 turns, 0 USD, every row carrying 'Failed to change directory to .bench-c2/'; no model call occurred. KEEP_DIR used the env value verbatim (relative) while the default ROOT/'.bench' is absolute. The failing command is the pre-registered one, verbatim, from BENCH-PREREGISTRATION-C2.md section 5.",
+   "notes": "P1 rather than P2 because the failure is silent in the worst way: the 72 rows are written to results.jsonl with outcome FAIL, so the cohort reads as 'AISEF 0/36, bare 0/36' — an infrastructure failure indistinguishable from a measured negative result. A reader reconstructing the experiment later would have drawn a conclusion from nothing.\nFixed by anchoring a relative value to ROOT, not Path.cwd(): a cohort belongs to the repository, not to wherever the operator happened to stand. Absolute values and the default are unchanged, each with a negative control.\nThe 72 rows are preserved under closure-evidence/c2-aborted-defect-170/ as evidence of the defect and removed from the cohort, because mixing them into results.jsonl would corrupt the real experiment. This is not rerunning a benchmark to improve its result: nothing ran and nothing was measured.\nG5.3 unaffected: the qualification uses THU_MUC = ROOT/'.aisef-qual', hardcoded absolute and independent of AISEF_BENCH_DIR."
   }
  ]
 }
