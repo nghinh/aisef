@@ -670,7 +670,7 @@ section { padding: 100px 0; }
   <div class="wrap hero-content">
     <div class="hero-badge">
       <span class="dot"></span>
-      v1.0.0 · Open Source · Zero Dependencies
+      v1.6.0 · Open Source · Zero Dependencies
     </div>
     <h1>AI writes code.<br>The harness <span class="accent">proves it works.</span></h1>
     <p class="hero-sub">
@@ -844,14 +844,14 @@ section { padding: 100px 0; }
         <span class="diff-label">Reviewer ≠ developer</span>
         <div class="diff-desc">
           <h3>The review session is a separate agent, forbidden to edit code</h3>
-          <p>Structural guarantee, not a prompt instruction. The model never supervises its own output.</p>
+          <p>Structural guarantee, not a prompt instruction. The model never supervises its own output. It is a separation guarantee, not a safety net &mdash; the measured miss rate below says the machine checks are what hold.</p>
         </div>
       </li>
       <li class="diff-item">
         <span class="diff-label">Qualified gates</span>
         <div class="diff-desc">
           <h3>16 story-level checks, each with positive, negative and environment controls</h3>
-          <p>48 total controls. "Is the gate itself scoring correctly?" is answered by a command, not by hope.</p>
+          <p>48 total controls. "Is the gate itself scoring correctly?" is answered by a command, not by hope. Since 1.6.0 the reviewer's own judgement is scored the same way — 6 judgement classes &times; the same 3 controls, 18 more cells.</p>
         </div>
       </li>
       <li class="diff-item">
@@ -903,20 +903,22 @@ section { padding: 100px 0; }
       been measured, the framework says so — it never defaults to "probably fine".
     </p>
     <div class="evidence-terminal">
-      <div><span class="prompt">$ </span><span class="cmd">aisef doctor</span></div>
+      <div><span class="cmd">AISEF v1.6.0 &mdash; one command behind every row</span></div>
       <br>
-      <div><span class="label">  Tests</span> <span class="val">1,913</span> <span class="ok">✓ all passing</span></div>
-      <div><span class="label">  Guards</span> <span class="val">9</span> <span class="ok">✓ 3 lifecycle moments</span></div>
+      <div><span class="label">  Tests</span> <span class="val">2,688</span> <span class="ok">✓ 0 failing</span></div>
+      <div><span class="label">  Guards</span> <span class="val">10</span> <span class="ok">✓ 3 lifecycle moments</span></div>
       <div><span class="label">  Gate checks</span> <span class="val">48</span> <span class="ok">✓ 16 × 3 controls</span></div>
-      <div><span class="label">  Config keys</span> <span class="val">58</span> <span class="ok">✓ 0 mandatory</span></div>
+      <div><span class="label">  Reviewer cells</span> <span class="val">18</span> <span class="ok">✓ 6 judgement classes × 3</span></div>
+      <div><span class="label">  Config keys</span> <span class="val">69</span> <span class="ok">✓ 0 mandatory</span></div>
       <div><span class="label">  Conformance</span> <span class="val">10/10</span> <span class="ok">✓ Claude + OpenCode</span></div>
       <div><span class="label">  Dependencies</span> <span class="val">0</span> <span class="ok">✓ stdlib only</span></div>
-      <div><span class="label">  Version</span> <span class="val">1.0.0</span> <span class="ok">✓ stable</span></div>
+      <div><span class="label">  Version</span> <span class="val">1.6.0</span> <span class="ok">✓ stable</span></div>
     </div>
     <p class="evidence-note">
       Conformance probes (C1–C10) test destructive guards, injection defense, worktree
       isolation, reviewer role separation, credential stripping, and more. Both Claude Code
-      and OpenCode pass all 10 probes. Run <code style="color:#A1A1AA">aisef doctor</code> yourself to verify.
+      and OpenCode passed all 10 probes in the 2026-09-08 run. Run <code style="color:#A1A1AA">aisef dashboard</code>
+      yourself, or read <code style="color:#A1A1AA">docs/CONFORMANCE.md</code>, to check the table and its age.
     </p>
   </div>
 </section>
@@ -934,17 +936,18 @@ section { padding: 100px 0; }
       <div class="benchmark-col proven">
         <h3><span style="color:var(--verify)">●</span> Measured and verified</h3>
         <ul>
-          <li>On simple bug-fix tasks, correctness was saturated for both harnessed and bare agents. On 12 hard tasks with a non-frontier model (cohort C-1): AISEF pass@1 0.64 vs bare 0.69 — nine of twelve tie, and the harnessed arm spends 44% more turns to get there. No measured improvement, and no measured degradation</li>
-          <li>AISEF added governance and safety layers with near-zero measured cost overhead on those tasks</li>
+          <li>On simple bug-fix tasks, correctness was saturated for both harnessed and bare agents. On the hard tasks with a non-frontier model, two cohorts ran on the same model and the same harness and the delta changed sign: C-1 (12 tasks) −0.06, C-1b (3 tasks, 6 attempts each) +0.06. That puts the noise band at ±0.08, so no correctness claim smaller than that is supportable. Nine of C-1's twelve tasks tie outright</li>
+          <li>The harness is not free, and the price is measured rather than asserted: the harnessed arm spent 44% more turns in C-1 and 27% more in C-1b for the same outcome. <code>aisef cost</code> attributes spend to outcomes and reports that only 4–22% of it bought an attempt the gate passed</li>
           <li>Conformance probes pass 10/10 on two different clients (Claude Code, OpenCode)</li>
-          <li>2,391 unit tests cover all public modules; 303 benchmark runs across 28 challenge tasks (175 of them on real agents, the rest on a simulator that says so)</li>
+          <li>2,688 unit tests cover all public modules; 303 benchmark runs across 30 challenge tasks (207 of them on real agents, the rest on a simulator that says so)</li>
+          <li>The review layer is measured too, and the numbers are not flattering: false block 10.5% (6 of 57 blocks, stated as a floor rather than an estimate), miss 34–39% (27 of 70 passes), and of 20 consecutive reviews of an identical tree, 11 reversed the verdict. Recomputable from evidence on disk, with no model call</li>
           <li>Crash recovery: three interrupted-run paths (journal reconcile, run loop, improve loop) plus a real SIGKILL mid-write — at most the one half-written line is lost</li>
         </ul>
       </div>
       <div class="benchmark-col unproven">
         <h3><span style="color:var(--amber)">●</span> Not yet proven</h3>
         <ul>
-          <li>That the harness helps an agent solve more — three cohorts, three nulls. The measured value is elsewhere: refusing to call unfinished work done, and leaving evidence why</li>
+          <li>That the harness helps an agent solve more — four cohorts, four nulls. The measured value is elsewhere: refusing to call unfinished work done, and leaving evidence why</li>
           <li>No external user has independently adopted the framework — all evidence is internal</li>
           <li>Distributed execution (multi-machine) is designed but untested in production</li>
           <li>Local sandbox provider does not isolate credentials — Docker is required for credential-sensitive projects</li>
@@ -979,7 +982,7 @@ section { padding: 100px 0; }
       </div>
       <div class="arch-card full accent">
         <div class="arch-label">&#9316; GUARDRAILS &amp; HOOKS</div>
-        <div class="arch-detail">9 guards &middot; 3 lifecycle moments &middot; pre-execution + post-execution + post-review &middot; framework-side enforcement</div>
+        <div class="arch-detail">10 guards &middot; 3 lifecycle moments &middot; pre-execution + post-execution + post-review &middot; framework-side enforcement</div>
       </div>
       <div class="arch-card">
         <div class="arch-label">&#9315; ORCHESTRATION</div>
@@ -1001,7 +1004,7 @@ section { padding: 100px 0; }
 <section class="cli-section">
   <div class="wrap">
     <div class="eyebrow">Developer experience</div>
-    <h2>Six commands from init to ship</h2>
+    <h2>Five commands from init to ship</h2>
     <p class="cli-sub">
       One input file. One CLI. Full traceability from requirements to merge.
     </p>
@@ -1066,7 +1069,7 @@ section { padding: 100px 0; }
 <!-- ════════════ Footer ════════════ -->
 <footer class="footer">
   <div class="wrap">
-    AISEF — AI Software Engineering Framework · v1.0.0 · MIT License
+    AISEF — AI Software Engineering Framework · v1.6.0 · MIT License
   </div>
 </footer>
 

@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>AISEF Salekit</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Outfit:wght@300;400;500;600;700&display=swap">
 <style>
@@ -370,7 +371,7 @@ section { padding: 80px 0; }
 <section class="usp">
   <div class="wrap">
     <h2>What exists nowhere else</h2>
-    <p class="subtitle">Nine capabilities that no other agent framework offers in combination. Each one is measured on real agents, not theorized.</p>
+    <p class="subtitle">Ten capabilities that no other agent framework offers in combination. Each one is measured on real agents, not theorized.</p>
     <div class="usp-grid">
       <div class="usp-card">
         <div class="usp-num">01</div>
@@ -381,7 +382,7 @@ section { padding: 80px 0; }
       <div class="usp-card">
         <div class="usp-num">02</div>
         <h3>Reviewer &ne; Developer</h3>
-        <p>The review session is a separate agent instance, forbidden to edit code. It can only read and judge. The model never supervises its own output — that's a structural guarantee, not a prompt instruction.</p>
+        <p>The review session is a separate agent instance, forbidden to edit code. It can only read and judge. The model never supervises its own output — that's a structural guarantee, not a prompt instruction. It guarantees separation, not detection: see capability 10 for what the review layer actually catches.</p>
         <span class="usp-tag">Structural guarantee</span>
       </div>
       <div class="usp-card">
@@ -424,7 +425,13 @@ section { padding: 80px 0; }
         <div class="usp-num">09</div>
         <h3>Brownfield-Ready</h3>
         <p>Existing codebase? One command scans the project, builds a baseline, and switches every planning phase to delta mode. Code graph providers (Graphify or built-in regex) power blast-radius analysis on every story. The framework preserves what works and changes only what the requirement asks.</p>
-        <span class="usp-tag">New in v0.8</span>
+        <span class="usp-tag">Baseline + delta planning</span>
+      </div>
+      <div class="usp-card">
+        <div class="usp-num">10</div>
+        <h3>The Reviewer Is Scored Too</h3>
+        <p>Until v1.6.0 three controls certified every gate <em>check</em> and nothing certified the <em>judgement</em>. Now 6 judgement classes carry the same 3 controls — 18 more qualification cells — and the rates are published with their bounds: false block 10.5&nbsp;% (a floor, not an estimate), miss 34–39&nbsp;%, and of 20 consecutive reviews of an identical tree, 11 reversed the verdict. Recomputable from evidence on disk with no model call. The model review is not the safety net; the machine checks are.</p>
+        <span class="usp-tag">World first</span>
       </div>
     </div>
   </div>
@@ -494,7 +501,7 @@ section { padding: 80px 0; }
             <td class="p">Partial</td>
             <td class="n">No</td>
             <td class="p">Client-side</td>
-            <td class="y aisef-col">9 guards</td>
+            <td class="y aisef-col">10 guards</td>
           </tr>
           <tr>
             <td>Six-outcome classification</td>
@@ -549,16 +556,16 @@ section { padding: 80px 0; }
     <p class="subtitle">Every number below comes from real agent runs on real codebases. Where something hasn't been measured, we say so — that's the whole point.</p>
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-num">23,203</div>
-        <div class="stat-label">Lines of Python, zero dependencies</div>
+        <div class="stat-num">31,913</div>
+        <div class="stat-label">Lines of Python in the framework package, zero dependencies</div>
       </div>
       <div class="stat-card">
-        <div class="stat-num">1,930</div>
-        <div class="stat-label">Unit tests, 189s, no Docker</div>
+        <div class="stat-num">2,688</div>
+        <div class="stat-label">Unit tests, no Docker required</div>
       </div>
       <div class="stat-card">
-        <div class="stat-num">31</div>
-        <div class="stat-label">Real bugs found by measurement</div>
+        <div class="stat-num">130</div>
+        <div class="stat-label">Defects in the failure taxonomy — every one found by running</div>
       </div>
       <div class="stat-card">
         <div class="stat-num">48</div>
@@ -566,7 +573,7 @@ section { padding: 80px 0; }
       </div>
       <div class="stat-card">
         <div class="stat-num">10/10</div>
-        <div class="stat-label">Client conformance probes passing</div>
+        <div class="stat-label">Client conformance probes passing, 2026-09-08 run</div>
       </div>
       <div class="stat-card">
         <div class="stat-num">11</div>
@@ -614,7 +621,7 @@ section { padding: 80px 0; }
         <span class="h-num">5</span>
         <div>
           <h4>Guardrails &amp; Hooks</h4>
-          <p>Nine guards on three lifecycle moments, each a standalone command returning an exit code. Compiled into whatever the client supports, defined in one place.</p>
+          <p>Ten guards on three lifecycle moments, each a standalone command returning an exit code. Compiled into whatever the client supports, defined in one place.</p>
         </div>
       </div>
       <div class="harness-item">
@@ -642,6 +649,6 @@ section { padding: 80px 0; }
 
 <footer class="footer">
   <div class="wrap">
-    AISEF — AI Software Engineering Framework &middot; v0.8.0 &middot; Open Source
+    AISEF — AI Software Engineering Framework &middot; v1.6.0 &middot; Open Source
   </div>
 </footer>
