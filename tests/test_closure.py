@@ -827,10 +827,39 @@ class TestG5(unittest.TestCase):
 
     def test_bench_reproducible_needs_both_halves(self):
         """The manifest matching is not enough: a criterion with two conjuncts
-        must not pass on one of them."""
-        p = CL.probe_bench_reproducible(CL.Ctx(root=ROOT, spec=self.repo.spec, criterion={}))
+        must not pass on one of them.
+
+        Hermetic on purpose. Written against the real `ROOT` it asserted a fact
+        about *this checkout's* evidence — so it passed only while
+        `closure-evidence/bench-selfcheck.json` happened to be absent or stale,
+        and went red the moment that record was written correctly. A test whose
+        verdict depends on today's working tree is measuring the tree, not the
+        logic. The manifest half is read from the real dataset (the probe resolves
+        it through `tests.bench._mine`, which is not redirectable), so only the
+        recorded half is faked here — and faking its *absence* is precisely the
+        conjunct under test.
+        """
+        p = CL.probe_bench_reproducible(
+            CL.Ctx(root=self.repo.root, spec=self.repo.spec, criterion={}))
         self.assertIs(p.outcome, Outcome.UNRUNNABLE)
         self.assertIn("bench-selfcheck.json", p.detail)
+
+    def test_bench_reproducible_passes_only_with_a_full_selfcheck_record(self):
+        """And the recorded half must carry real counts.
+
+        A record of `1/1` satisfied `passed == total` and so passed a criterion
+        whose contract text says nineteen checks — that really happened, in
+        `validation/record_closure_evidence.py`, because its regex matched the
+        first `N/N` anywhere in the output.
+        """
+        self.repo.write("closure-evidence/bench-selfcheck.json",
+                        '{"commit": "deadbee", "exit": 0, "passed": 19, "total": 19}')
+        p = CL.probe_bench_reproducible(
+            CL.Ctx(root=self.repo.root, spec=self.repo.spec, criterion={}))
+        # The manifest half still reads the real dataset, so this asserts the
+        # recorded half stopped being the blocker — not that the whole criterion
+        # passes inside a temporary directory.
+        self.assertNotIn("bench-selfcheck.json", p.detail)
 
     def test_a_report_stating_neither_band_nor_inconclusive_fails(self):
         self.repo.write("docs/BENCH-REPORT-X.md", "# X\n\npass@1 48/48 vs 48/48, delta 0.\n")
