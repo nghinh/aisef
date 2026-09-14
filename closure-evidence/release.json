@@ -1,0 +1,32 @@
+{
+  "ci": {
+    "commit": "2be2a2a7521018349cdd80d3f7ea7880cad013cf",
+    "conclusion": "success",
+    "tag": "v1.6.0",
+    "workflow": "tests"
+  },
+  "package": {
+    "artifacts": [
+      "aisef-1.6.0-py3-none-any.whl",
+      "aisef-1.6.0.tar.gz"
+    ],
+    "build_exit": 0,
+    "commit": "4ae9baf6e8d2230023455ea581f9b54d553587b0",
+    "interpreter": "/Users/nghinh/Downloads/projects/ai-sdlc/.venv/bin/python",
+    "twine_exit": 0
+  },
+  "packaged_data": {
+    "harness/assets": 1,
+    "kit/catalog.json": 1,
+    "kit/prompts": 5,
+    "kit/rules": 2,
+    "kit/skills": 2
+  },
+  "pypi_install": {
+    "install_exit": 0,
+    "version": "1.6.0",
+    "version_reported": "1.6.0"
+  },
+  "tag": "v1.6.0",
+  "version": "1.6.0"
+}
