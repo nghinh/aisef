@@ -1,0 +1,38 @@
+{
+  "_comment": "Onboarding digest for closure gate G6.1 freshness (owner ruling 4). Covers the documented commands of the public onboarding surface plus the ten named config defaults -- never prose, so a typo fix cannot invalidate a real participant's validation. Regenerate: python3 -m aisef.control.onboarding --write",
+  "contract": "docs/closure-gate.json#onboarding_digest",
+  "algorithm": "sha256",
+  "digest": "8b25f481373a6ee6d7dbe9bec3918726465ce02e8d52ea0af8ea1b49dec95b73",
+  "sources": [
+    {
+      "path": "README.md",
+      "extract": "section:Install",
+      "items": 4,
+      "sha256": "35274634b6b7542f91a850e406ad3eeca6f970010ec0c7f5b249560d0f6319c0"
+    },
+    {
+      "path": "README.md",
+      "extract": "section:Quick Start",
+      "items": 18,
+      "sha256": "a23b5c811185d1364df876a7cee825583f5d082754a68d4d16dc480b68160fa4"
+    },
+    {
+      "path": "docs/USAGE-GUIDE.md",
+      "extract": "canonical_cli_workflow",
+      "items": 34,
+      "sha256": "5a96077e0748d5b28065c7e17898199929fec159fa64b1296d1267183f492fab"
+    },
+    {
+      "path": "docs/EXTERNAL-VALIDATION-v1.1.0.md",
+      "extract": "section:Protocol",
+      "items": 7,
+      "sha256": "7578ef19e704c6da94f5a7d01d6bc964ff0289d969729fa1e4a440cfda23e3e5"
+    },
+    {
+      "path": "aisef/config.py",
+      "extract": "onboarding_defaults",
+      "items": 10,
+      "sha256": "587c1c717a19d93281886757fadfd9b58de3e71acc4111f33c3c921ff037ea1b"
+    }
+  ]
+}
