@@ -52,13 +52,22 @@ Each run must answer:
 
 ### Materials (Phase 3 deliverables)
 
-1. **Quick Start** — 5-minute path from install to first successful gate
-2. **User Guide** — full lifecycle reference
-3. **Sample project** — `examples/calculator/` with requirements.md pre-written
-4. **Troubleshooting guide** — common errors and fixes
-5. **Expected outputs** — what success looks like at each step
-6. **Issue template** — structured failure report
-7. **Feedback questionnaire** — post-run survey
+1. **Quick Start** — 5-minute path from install to first successful gate →
+   [EXTERNAL-VALIDATION-QUICKSTART.md](EXTERNAL-VALIDATION-QUICKSTART.md)
+2. **User Guide** — full lifecycle reference → [USAGE-GUIDE.md](USAGE-GUIDE.md)
+   (English), [HUONG-DAN-SU-DUNG.md](HUONG-DAN-SU-DUNG.md) (Vietnamese)
+3. **Sample project** — requirements.md pre-written, in the quickstart's step 6.
+   *(An `examples/calculator/` directory was planned and never created; the
+   four-line sample in the quickstart replaces it.)*
+4. **Troubleshooting guide** — common errors and fixes →
+   [USAGE-GUIDE.md](USAGE-GUIDE.md) §16, plus "When something fails" in the
+   quickstart
+5. **Expected outputs** — what success looks like at each step → the quickstart
+   records the real output of every free step
+6. **Issue template** — structured failure report → §5 and §6 of
+   [TEMPLATE-EXTERNAL-VALIDATION-REPORT.md](TEMPLATE-EXTERNAL-VALIDATION-REPORT.md)
+7. **Feedback questionnaire** — post-run survey → this document's last section,
+   transcribed into §9 of the report template
 
 ### Run procedure
 
