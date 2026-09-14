@@ -146,6 +146,46 @@ class TestStoryGate(unittest.TestCase):
     def test_khong_truyen_van_ban_tieu_chi_thi_khong_ket_luan(self):
         self.assertTrue(check_stories([story("S-1")]).passed)
 
+    def test_hai_tieu_chi_trung_noi_dung_thi_chan(self):
+        """Lỗi 159, mảnh cuối: **danh tính trùng**.
+
+        Danh tính bền của một tiêu chí là vân tay nội dung của nó. Hai tiêu chí
+        cùng chữ thì cùng vân tay — và lúc ấy cơ chế danh tính **mất hiệu lực**
+        ở đúng story ấy: `drift()` không phân biệt được chúng, nên tráo chỗ hai
+        cái là vô hình, và một phép thử mang mã của cái này chứng minh luôn cái
+        kia. Chặn ở lúc lập kế hoạch là chỗ sớm nhất và rẻ nhất: một kế hoạch
+        như thế hỏng trước khi tiêu một đồng nào.
+        """
+        r = check_stories(
+            [story("S-1"), story("S-2")],
+            story_ac_text={
+                "S-1": ["Given url hợp lệ, Then store có thêm một bản ghi",
+                        "Given url hợp lệ, Then store có thêm một bản ghi"],
+                "S-2": ["Given url hợp lệ, Then store có thêm một bản ghi"],
+            },
+        )
+        self.assertFalse(r.passed)
+        loi = " ".join(r.errors)
+        self.assertIn("S-1", loi)
+        # Story **khác** mang cùng câu chữ không phải trùng: danh tính là
+        # (mã, vân tay), và mã mang story id — hai story không thể đụng nhau.
+        self.assertNotIn("S-2", loi)
+
+    def test_khoang_trang_khac_nhau_van_la_trung(self):
+        """Vân tay chuẩn hoá khoảng trắng, nên ngắt dòng khác không cứu được."""
+        r = check_stories(
+            [story("S-1")],
+            story_ac_text={"S-1": ["Given a,\n  Then b", "Given a, Then   b"]},
+        )
+        self.assertFalse(r.passed)
+
+    def test_tieu_chi_khac_nhau_thi_khong_bao(self):
+        r = check_stories(
+            [story("S-1")],
+            story_ac_text={"S-1": ["Given a, Then b", "Given c, Then d"]},
+        )
+        self.assertTrue(r.passed, " ".join(r.errors))
+
     def test_ac_limit_respects_config(self):
         cfg = Config({**DEFAULTS, "story.max_acceptance_criteria": 30})
         r = check_stories([story("S-1")], config=cfg, story_ac_count={"S-1": 20})

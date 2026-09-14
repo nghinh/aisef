@@ -194,6 +194,33 @@ def check_stories(
             f"scaffolding into the first story that delivers real behaviour through it"
         )
 
+    # Lỗi 159, mảnh cuối. Danh tính bền của một tiêu chí là vân tay **nội dung**
+    # của nó (`acceptance.digest`), nên hai tiêu chí cùng chữ trong một story có
+    # cùng danh tính — và lúc ấy cả cơ chế mất hiệu lực ở đúng story ấy: `drift`
+    # không phân biệt được chúng nên tráo chỗ là vô hình, và một phép thử mang mã
+    # của cái này chứng minh luôn cái kia. Chặn lúc lập kế hoạch là chỗ sớm nhất
+    # và rẻ nhất — kế hoạch hỏng trước khi tiêu một đồng nào — và nó không thể
+    # chạm nhầm sang story khác: mã mang story id, nên hai story dùng cùng câu
+    # chữ vẫn là hai danh tính khác nhau.
+    from .acceptance import digest as _ac_digest
+
+    trung = []
+    for sid, crit in sorted((story_ac_text or {}).items()):
+        theo_van_tay: dict[str, list[int]] = {}
+        for i, c in enumerate(crit or [], 1):
+            theo_van_tay.setdefault(_ac_digest(str(c)), []).append(i)
+        lap = [v for v in theo_van_tay.values() if len(v) > 1]
+        if lap:
+            trung.append(f"{sid}: " + "; ".join(
+                "criteria " + ", ".join(str(i) for i in v) for v in sorted(lap)))
+    if trung:
+        r.errors.append(
+            f"stories with two criteria that are the same criterion: {'; '.join(trung)} — "
+            f"a criterion's stable identity is the fingerprint of its text, so duplicates "
+            f"share one identity: reordering them is undetectable and a test named after "
+            f"either proves both. Merge them, or state what actually differs"
+        )
+
     max_ac = cfg["story.max_acceptance_criteria"]
     for sid, n in (story_ac_count or {}).items():
         if n > max_ac:
