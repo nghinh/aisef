@@ -1,0 +1,21 @@
+{
+  "benchmark_execution_sha": "d540cd9d59bf4ee11b653c76a1621171e7e21884",
+  "what_it_identifies": "the framework source revision the Column-2 experiment ran on. Distinct from final_closure_target_sha, which is chosen only after the benchmark completes and any genuine defect it reveals is resolved.",
+  "files": {
+    "tests/bench/_runner.py": "a3314bd3e646057c",
+    "tests/bench/_mine.py": "f1c24b92e95f653d",
+    "tests/bench/__main__.py": "6352d8cc73b1309e",
+    "tests/bench/_analyze.py": "f3137f474776128e",
+    "aisef/clients/opencode.py": "8f37ff968e410376",
+    "aisef/clients/base.py": "83307c685f05c0bc",
+    "aisef/clients/stream.py": "44fdf54eda5c4a59",
+    "docs/BENCH-PREREGISTRATION-C2.md": "bcce3683bd9d89eb"
+  },
+  "preflight": {
+    "g53": "QUALIFIED 28/28, 0 cut, protocol digest bcdf7705… unchanged, non-stale (only `chay` differs and only outside its session loop)",
+    "preregistration": "frozen-region digest 0c4dab0a… matches the pin, and matches the pre-data copy in docs/handoff/bench-real-model-wiring.md",
+    "task_set": "30 tasks, MANIFEST.sha256 matches the dataset byte for byte",
+    "containment": "bug-166 boundary check aborts (exit 4) on any artefact left at the repo root, checked after each task in both `run` and `run-both`; pre-run state snapshotted so a pre-existing directory is not blamed on the run; bench selfcheck 19/19 with no model calls and a clean root afterwards",
+    "pair": "mycombo→MiniMax-M3 on opencode, selected by the pre-registered rule (lowest cut rate)"
+  }
+}
