@@ -1,0 +1,19 @@
+{
+  "criterion": "G5.3",
+  "status": "QUALIFIED, unchanged, not re-run",
+  "measured": "28/28 sessions, 0 cut, rate 0.000 <= threshold 0.167",
+  "what_it_proves": "the selected pair (mycombo->MiniMax-M3 on opencode) completed the QUALIFICATION workload under the frozen protocol without a cut session.",
+  "what_it_does_not_prove": "that any other workload has the same cut rate. One qualification workload and one benchmark workload agreeing is a confirmation, not a law.",
+  "column_2_check": {
+    "predicted_cut_rate": 0.0,
+    "observed_cut_rate": 0.0,
+    "observed_detail": "72 sessions across 72 attempts in .bench-c2, 0 cut, 0 infra attempts, 0 retries",
+    "verdict": "the qualification's prediction HELD on the benchmark workload"
+  },
+  "correction": {
+    "what_was_claimed": "an earlier draft of docs/BENCH-REPORT-C2.md stated that G5.3 predicted 0.000 while production measured 21% (AISEF) and 14% (bare), and concluded the qualification workload is not predictive.",
+    "why_it_was_wrong": "those rates came from defect D-016: session keys discarded the bench directory, so C-1 and C-1b sessions merged into C-2's counts. All 35 cut sessions belonged to the two older cohorts.",
+    "corrected": "docs/BENCH-REPORT-C2.md section 5"
+  },
+  "post_close_limitation": "The qualification protocol still measures a workload of its own choosing rather than the benchmark's. C-2 shows the two agreed for this pair; it does not establish that they must. Sampling the qualification from the benchmark workload would make the guarantee direct instead of inferred. POST_CLOSE, benchmark-design."
+}

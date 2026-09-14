@@ -51,6 +51,30 @@ def _giu_khoa(a):
     return fd
 
 
+def _ghi_quyet_dinh_dung(khai: dict, vi_sao: str, da_chay, bo_qua: list[str],
+                         bo_qua_luat: bool) -> None:
+    """Ghi quyết định dừng vào bằng chứng máy-đọc-được, cạnh chính dữ liệu.
+
+    Dừng mà không để lại dấu thì bảng kết quả đọc ra như một thiết kế 2 task,
+    còn chạy tiếp mà không để lại dấu thì 10 task sau đọc ra như thứ giao thức
+    đã đòi. Cả hai đều là bảng nói dối; tệp này là cái phân biệt chúng.
+    """
+    R.KEEP_DIR.mkdir(parents=True, exist_ok=True)
+    (R.KEEP_DIR / "stop-decision.json").write_text(json.dumps({
+        "fired": True,
+        "honoured": not bo_qua_luat,
+        "reason": vi_sao,
+        "rule": khai.get("rule") or {},
+        "rule_source": khai.get("source") or "",
+        "rule_source_digest": khai.get("source_digest") or "",
+        "tasks_completed": [x.id for x in da_chay],
+        "tasks_not_run": bo_qua if not bo_qua_luat else [],
+        "post_stop_tasks": bo_qua if bo_qua_luat else [],
+        "post_stop_label": ("POST-STOP EXPLORATORY — COLLECTED AFTER THE "
+                            "PRE-REGISTERED STOP CONDITION") if bo_qua_luat else "",
+    }, indent=1, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="python3 -m tests.bench", description=__doc__)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -79,6 +103,10 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--note", default=os.environ.get("AISEF_BENCH_NOTE", ""),
                    help="nhãn cohort do người vận hành khai, ghi vào từng dòng — bắt buộc khi model là alias "
                         "(đổi mô hình nền không đổi một ký tự nào trong dữ liệu)")
+    b.add_argument("--ignore-stop-rule", action="store_true",
+                   help="chạy tiếp sau khi điều kiện dừng đã đóng băng kích hoạt. "
+                        "Phải nêu tường minh và được GHI LẠI vào stop-decision.json: "
+                        "dữ liệu thu sau điểm ấy là hậu-dừng, không phải thứ giao thức đòi")
     b.add_argument("--max-usd", type=float, default=0.0,
                    help="trần chi phí: dừng TRƯỚC task kế nếu đã tiêu quá; 0 = không trần. Cắt ở ranh giới task để mỗi task đo được vẫn đủ thiết kế; task bị bỏ được in ra, không im lặng")
     b.add_argument("--max-minutes", type=float, default=0.0,
@@ -187,6 +215,8 @@ def _dispatch(a, tasks: list, pick: list) -> int:
         # vi phạm thì **huỷ** — không phải cảnh báo. Cột 2 là 72 lượt nhiều giờ;
         # một rò rỉ phát hiện ở cuối nghĩa là cả đợt chạy trên một kho đã bẩn.
         ranh_gioi_truoc = R.chup_ranh_gioi()
+        khai_dung = R.luat_dung()
+        da_ghi_bo_qua = False
         res, bo_qua, vi_sao = [], [], ""
         for i, t in enumerate(order):
             phut = sum(x.duration_ms for x in res) / 60_000
@@ -207,6 +237,23 @@ def _dispatch(a, tasks: list, pick: list) -> int:
                 print(f"\nHUỶ ĐỢT ĐO sau {i + 1}/{len(order)} task: {e}", file=sys.stderr)
                 print(R.report(res, tasks))
                 return 4
+            # Điều kiện dừng đã đóng băng, áp bằng mã chứ không bằng trí nhớ:
+            # trên C-2 nó kích hoạt sau task 2 và mười task nữa vẫn chạy.
+            vi_sao_dung = R.kiem_dung_som(res, [x.id for x in order], khai_dung)
+            if vi_sao_dung and not a.ignore_stop_rule:
+                bo_qua = [x.id for x in order[i + 1:]]
+                _ghi_quyet_dinh_dung(khai_dung, vi_sao_dung, order[:i + 1], bo_qua, False)
+                print(f"\nDỪNG THEO GIAO THỨC sau {i + 1}/{len(order)} task: "
+                      f"{vi_sao_dung}.\nKHÔNG chạy: {', '.join(bo_qua) or '(không còn)'}",
+                      file=sys.stderr)
+                break
+            if vi_sao_dung and a.ignore_stop_rule and not da_ghi_bo_qua:
+                da_ghi_bo_qua = True
+                _ghi_quyet_dinh_dung(khai_dung, vi_sao_dung, order[:i + 1],
+                                     [x.id for x in order[i + 1:]], True)
+                print(f"\nĐIỀU KIỆN DỪNG ĐÃ KÍCH HOẠT sau {i + 1} task nhưng bị "
+                      f"BỎ QUA có chủ ý (--ignore-stop-rule): {vi_sao_dung}. "
+                      f"Mọi task sau đây là dữ liệu HẬU-DỪNG.", file=sys.stderr)
         if bo_qua:
             print(f"{vi_sao} đạt sau {len(order) - len(bo_qua)}/{len(order)} task "
                   f"(đã tiêu {sum(x.cost_usd for x in res):.2f} USD, "

@@ -65,17 +65,34 @@ _CU_PHAP_KHONG_PHAN_GIAI = re.compile(r"<\w+:tool_call>|<invoke name=")
 #: riêng (`AISEF_BENCH_DIR`) để không xoá cây làm việc của cohort trước. Neo
 #: cứng vào `.bench/` nghĩa là chỉ số "phiên bị cắt" **im lặng trả rỗng** cho
 #: mọi cohort chạy ở thư mục khác — mất phép đo mà không có lỗi nào.
-_DUONG_DAN_PHIEN = re.compile(r"\.bench[\w.-]*/run/([\w-]+)/([\w-]+)/a(\d+)")
+#:
+#: Thư mục là **nhóm bắt thứ nhất**, không phải phần bỏ đi. Bỏ nó thì
+#: `(điều kiện, task, lượt)` của ba cohort trộn vào cùng một khoá: đo trên C-2
+#: được 90 khoá trong khi cohort chỉ có 72 lượt, tức 18 khoá đến từ cohort
+#: khác — và những khoá **trùng** task/lượt thì cộng dồn phiên của cohort cũ
+#: vào tỉ lệ cắt của cohort mới mà không có dấu hiệu nào. Danh tính cohort là
+#: điều kiện của G5.2; một chỉ số trộn cohort không chứng minh được gì về
+#: cohort nào cả.
+_DUONG_DAN_PHIEN = re.compile(r"(\.bench[\w.-]*)/run/([\w-]+)/([\w-]+)/a(\d+)")
 #: Kho phiên của OpenCode. Chỉ đọc, không bao giờ ghi.
 KHO_PHIEN = Path.home() / ".local" / "share" / "opencode" / "opencode.db"
 
 
-def cut_sessions(db: Path | None = None) -> dict[tuple[str, str, int], tuple[int, int]]:
-    """(điều kiện, task, lượt) → (số phiên, số phiên bị cắt giữa chừng).
+def session_rows(db: Path | None = None, *, bench_dir: str = "") -> list[dict]:
+    """Một bản ghi cho **mỗi phiên**: phiên nào, thuộc lượt nào, kết thúc ra sao.
 
-    Một phiên tính là **bị cắt** khi phần văn bản cuối của nó chứa cú pháp gọi
-    công cụ chưa phân giải — tức model định gọi công cụ, CLI không hiểu, và
-    phiên kết thúc ở đó. Đây là kiểu hỏng của cặp model↔CLI, **không** của
+    Đây là dạng nguyên thuỷ; `cut_sessions` chỉ là phép gộp của nó. G5.2 hỏi
+    *"mỗi phiên có trạng thái tường minh không"*, và một cặp đếm `(n, cắt)`
+    không trả lời được câu ấy — nó đã bỏ mất danh tính từng phiên trước khi ai
+    kịp hỏi.
+
+    ``bench_dir`` (ví dụ ``".bench-c2"``) giới hạn về **một** cohort. Để trống
+    là gộp mọi cohort, chỉ dùng được cho cái nhìn tổng, không dùng được cho một
+    phát biểu về một cohort.
+
+    Một phiên tính là **bị cắt** (`status="cut"`) khi phần văn bản cuối của nó
+    chứa cú pháp gọi công cụ chưa phân giải — model định gọi công cụ, CLI không
+    hiểu, phiên dừng tại đó. Đây là kiểu hỏng của cặp model↔CLI, **không** của
     harness, nên nó phải đếm được riêng: nếu không, mọi phiên bị cắt sẽ bị cộng
     vào cột "agent sửa sai".
 
@@ -84,8 +101,17 @@ def cut_sessions(db: Path | None = None) -> dict[tuple[str, str, int], tuple[int
     """
     kho = KHO_PHIEN if db is None else db
     if not kho.is_file():
-        return {}
-    ra: dict[tuple[str, str, int], tuple[int, int]] = {}
+        return []
+    # Điều kiện hợp lệ đọc từ **đĩa**, không từ văn bản phiên. Model có thể in
+    # đường dẫn bị ngắt dòng (`open-code` thay vì `opencode`) và `([\w-]+)` nuốt
+    # gọn — thế là một phiên trông như chạm hai cây và bị luật nhập nhằng bỏ đi.
+    # Đo trên C-2: đúng một lượt (`opencode/bug-a2-state-1/a1`) biến mất vì lý do
+    # ấy. Thư mục có thật là bằng chứng; chuỗi trong câu trả lời của model không.
+    hop_le: set[str] = set()
+    if bench_dir:
+        goc = Path(bench_dir)
+        goc = goc if goc.is_absolute() else M.ROOT / goc
+        hop_le = {d.name for d in (goc / "run").glob("*") if d.is_dir()}
     try:
         con = sqlite3.connect(f"file:{kho}?mode=ro", uri=True)
         try:
@@ -104,13 +130,18 @@ def cut_sessions(db: Path | None = None) -> dict[tuple[str, str, int], tuple[int
         finally:
             con.close()
     except sqlite3.Error:
-        return {}
-    for phan in phien.values():
+        return []
+    ra: list[dict] = []
+    for sid, phan in sorted(phien.items()):
         khoa = None
         for d in phan:
             m = _DUONG_DAN_PHIEN.search(d)
             if m:
-                moi = (m.group(1), m.group(2), int(m.group(3)))
+                if bench_dir and m.group(1) != bench_dir:
+                    continue
+                if hop_le and m.group(2) not in hop_le:
+                    continue
+                moi = (m.group(2), m.group(3), int(m.group(4)))
                 if khoa is not None and khoa != moi:   # phiên chạm hai cây: bỏ, không đoán
                     khoa = None
                     break
@@ -118,8 +149,23 @@ def cut_sessions(db: Path | None = None) -> dict[tuple[str, str, int], tuple[int
         if khoa is None:
             continue
         cuoi = next((d for d in reversed(phan) if '"type":"text"' in d), "")
+        ra.append({"session_id": sid, "client": khoa[0], "task_id": khoa[1],
+                   "attempt": khoa[2],
+                   "status": "cut" if _CU_PHAP_KHONG_PHAN_GIAI.search(cuoi) else "ok"})
+    return ra
+
+
+def cut_sessions(db: Path | None = None, *, bench_dir: str = "",
+                 ) -> dict[tuple[str, str, int], tuple[int, int]]:
+    """(điều kiện, task, lượt) → (số phiên, số phiên bị cắt giữa chừng).
+
+    Phép gộp của `session_rows`; xem ở đó cho định nghĩa "bị cắt".
+    """
+    ra: dict[tuple[str, str, int], tuple[int, int]] = {}
+    for s in session_rows(db, bench_dir=bench_dir):
+        khoa = (s["client"], s["task_id"], s["attempt"])
         n, cat = ra.get(khoa, (0, 0))
-        ra[khoa] = (n + 1, cat + bool(_CU_PHAP_KHONG_PHAN_GIAI.search(cuoi)))
+        ra[khoa] = (n + 1, cat + (s["status"] == "cut"))
     return ra
 
 

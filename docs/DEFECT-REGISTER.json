@@ -141,7 +141,7 @@
    "introduced": "observed 2026-09-14 during the G5.3 qualification",
    "fixed": "",
    "evidence": "_bmad-output/ appeared at the AISEF repo root with 36 log lines (17 pytest, 1 ruff) between 18:51 and 19:45, spanning the run, while every session recorded correctly into its own workspace (s1/s6/s7 each hold _bmad-output/run.log with 21-27 lines) — so it is a distinct set, from a call whose --project fell back to the default '.'. Preserved at scratchpad/leaked-bmad-output-from-g53 rather than deleted.",
-   "notes": "Not cleanup: a dirty tree makes closure.pin_target refuse, so a bench run can block the closure-target freeze, and a stray directory at the repo root is easily swept into a commit by `git add -A`.\nOPEN, not closed: the exact call path is NOT reproducible without a paid real session — the fake-client path (`--tu-kiem`) was tried and does not reproduce it, so the trigger lies in real agent behaviour inside a session. Claiming a fix I cannot verify would be worse than leaving this open.\nWhat did ship is the deterministic part: `ro_ri_ngoai_workspace` snapshots the framework root before a run and names anything the run left behind, turning a silent leak into a loud one at the point it happens, with red-first tests and a negative control for a directory that already existed. P2 and non-blocking: it changes no gate verdict and loses no evidence."
+   "notes": "Not cleanup: a dirty tree makes closure.pin_target refuse, so a bench run can block the closure-target freeze, and a stray directory at the repo root is easily swept into a commit by `git add -A`.\nOPEN, not closed: the exact call path is NOT reproducible without a paid real session — the fake-client path (`--tu-kiem`) was tried and does not reproduce it, so the trigger lies in real agent behaviour inside a session. Claiming a fix I cannot verify would be worse than leaving this open.\nWhat did ship is the deterministic part: `ro_ri_ngoai_workspace` snapshots the framework root before a run and names anything the run left behind, turning a silent leak into a loud one at the point it happens, with red-first tests and a negative control for a directory that already existed. P2 and non-blocking: it changes no gate verdict and loses no evidence.\n2026-09-15, Column-2 containment verified: the boundary check ran after every one of the 12 tasks in both arms (snapshot taken before the run so a pre-existing directory is not blamed on it) and never fired. After 72 attempts and 5.5 session-hours the framework repository is clean — `git status --porcelain` empty, HEAD unchanged, no `_bmad-output` at the root. One out-of-workspace write was ATTEMPTED and blocked: the guard's single `write-scope` block in the cohort names `aisef/phases/implement.py`, i.e. a session tried to write into the real repository and was stopped. So containment held under the heaviest run this project has done. Root cause still not reproduced and still P2/POST_CLOSE: reproducing it needs a paid session, and the owner's standing instruction is not to spend model calls solely to reproduce a P2. Worth noting for whoever picks it up: `bat_buoc_ranh_gioi` watches only `_bmad-output` at the root, so a write into `aisef/` would not be caught by it — in the AISEF arm the guard caught it, in the bare arm nothing would."
   },
   {
    "id": "D-012",
@@ -190,6 +190,42 @@
    "fixed": "HEAD",
    "evidence": "Column-2 launch 2026-09-14: 72/72 attempts FAIL, 0 turns, 0 USD, every row carrying 'Failed to change directory to .bench-c2/'; no model call occurred. KEEP_DIR used the env value verbatim (relative) while the default ROOT/'.bench' is absolute. The failing command is the pre-registered one, verbatim, from BENCH-PREREGISTRATION-C2.md section 5.",
    "notes": "P1 rather than P2 because the failure is silent in the worst way: the 72 rows are written to results.jsonl with outcome FAIL, so the cohort reads as 'AISEF 0/36, bare 0/36' — an infrastructure failure indistinguishable from a measured negative result. A reader reconstructing the experiment later would have drawn a conclusion from nothing.\nFixed by anchoring a relative value to ROOT, not Path.cwd(): a cohort belongs to the repository, not to wherever the operator happened to stand. Absolute values and the default are unchanged, each with a negative control.\nThe 72 rows are preserved under closure-evidence/c2-aborted-defect-170/ as evidence of the defect and removed from the cohort, because mixing them into results.jsonl would corrupt the real experiment. This is not rerunning a benchmark to improve its result: nothing ran and nothing was measured.\nG5.3 unaffected: the qualification uses THU_MUC = ROOT/'.aisef-qual', hardcoded absolute and independent of AISEF_BENCH_DIR."
+  },
+  {
+   "id": "D-016",
+   "severity": "P1",
+   "status": "CLOSED",
+   "taxonomy": 171,
+   "false_pass": false,
+   "title": "bench session metrics merge cohorts, so a cut-session rate can belong to another experiment",
+   "introduced": "with per-cohort bench directories (AISEF_BENCH_DIR)",
+   "fixed": "HEAD",
+   "evidence": "`_analyze._DUONG_DAN_PHIEN` matched `.bench*/run/<cond>/<task>/a<n>` but discarded the directory, so sessions from `.bench` (C-1), `.bench-c1b` and `.bench-c2` collapsed into one key space. Measured on C-2: 90 keys for a 72-attempt cohort, 18 belonging to no C-2 attempt, 198 sessions and 35 cut. Scoped per directory the truth is `.bench-c2` 72 sessions / 0 cut, `.bench` 95, `.bench-c1b` 36 — every cut session belonged to the two older cohorts. false_pass=true: the contaminated figures were published in docs/BENCH-REPORT-C2.md as 21%/14% and used to assert that G5.3's qualification had failed to predict production. Both statements were wrong and are corrected in §5 of that report.",
+   "notes": "A second fault surfaced with it: one attempt (opencode/bug-a2-state-1/a1) vanished from the table because the model printed the path line-wrapped as `open-code`, `([\\w-]+)` swallowed it, and the two-trees ambiguity rule dropped the session. Valid conditions now come from directories that exist on disk rather than from strings the model emitted. After both fixes C-2 reconciles exactly: 72 attempts, 72 sessions, 1:1, 0 unmapped, 0 missing.\nfalse_pass=false deliberately, and the distinction matters: this was a false result of a CLOSURE PROBE / a bench metric, not of a gate CHECK_KIND. G2.4a's field is defined against CHECK_KIND, so recording it as a false PASS there would name a check that does not exist. The harm was real and is recorded in `evidence`; what it was not is a verification kind reporting green on red."
+  },
+  {
+   "id": "D-017",
+   "severity": "P1",
+   "status": "CLOSED",
+   "taxonomy": 172,
+   "false_pass": false,
+   "title": "a frozen early-stop rule was enforced only by the operator remembering it",
+   "introduced": "with the C-2 pre-registration",
+   "fixed": "HEAD",
+   "evidence": "The frozen pre-registration says: two opening tasks at 6/6 across both arms means the model is at the dataset ceiling — stop, report, do not burn seven more hours. On C-2 `bug-a2-sec-4` and `bug-a2-sec-3` were both 6/6; the condition fired after task two and ten more tasks ran. The orchestrator held every Result needed to evaluate the rule, so this is an orchestration defect, not an operator slip.",
+   "notes": "Fixed by making the rule data (`tests/bench/stop_rule.json`, carrying its source and the source's digest) evaluated after each task by `_runner.kiem_dung_som`, with the decision written to `stop-decision.json`. Continuing past a fired rule now requires `--ignore-stop-rule` and is recorded with `honoured=false` and the post-stop label. Completed data is never discarded. Red-first: with the check disabled 3 of the 5 regressions fail. C-2 is NOT re-run — its result stands, layered into a confirmatory result and post-stop exploratory data."
+  },
+  {
+   "id": "D-018",
+   "severity": "P2",
+   "status": "CLOSED",
+   "taxonomy": 173,
+   "false_pass": false,
+   "title": "the retired-claim audit matched substrings, so it both missed and invented violations",
+   "introduced": "with G5.6",
+   "fixed": "HEAD",
+   "evidence": "False negative: the matcher knew `±0.08` and not `±0,08`, so the same retired band restated with a decimal comma passed. False positive: docs/BENCH-REPORT-C2.md explains why `±0.08` was withdrawn and the probe read the explanation as the claim. Same shape as AD-22's grep failing on `\"http://\"` inside URL validation — a substring cannot tell asserting from mentioning.",
+   "notes": "Replaced by declared status: a `claim_registry` in the criteria file lists retired claims with every surface form, and prose fences a non-assertion with `<!-- claim:WITHDRAWAL_EXPLANATION -->`. Anything outside a region, inside a CURRENT_ASSERTION region, or inside an unterminated region is an assertion. The audit surface also grew from 4 to 8 to include the BENCH-* reports the contract always said it covered.\nfalse_pass=false deliberately, and the distinction matters: this was a false result of a CLOSURE PROBE / a bench metric, not of a gate CHECK_KIND. G2.4a's field is defined against CHECK_KIND, so recording it as a false PASS there would name a check that does not exist. The harm was real and is recorded in `evidence`; what it was not is a verification kind reporting green on red."
   }
  ]
 }

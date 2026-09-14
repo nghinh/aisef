@@ -49,7 +49,6 @@ from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
-from ..clients.stream import INFRA_STATUSES
 from ..config import DEFAULTS
 from ..harness.observe import TOOL_RUN, EvidenceStore
 from .approvals import (
@@ -62,6 +61,7 @@ from .approvals import (
     _now,
     sha256_of,
 )
+from . import cohort
 from .gate import Outcome, _stale_candidates
 from .gate import CHECK_KIND
 from .outcome import CHECK_KINDS
@@ -1015,36 +1015,46 @@ def probe_prereg_digest(ctx: Ctx) -> Probed:
 def probe_cut_session_separation(ctx: Ctx) -> Probed:
     """G5.2 — cut sessions are not silently mixed with valid ones.
 
-    Every row must carry `exit_status`. A row without one cannot be told apart
-    from a graded attempt, which is how C-1b's three cut sessions read as
-    failures and produced a +0.06 that was an artifact.
+    Evaluated over **cohorts**, not over every row ever written. The question
+    is whether the evidence supporting a *current* claim can show that no cut
+    or infra session was graded as a result — the failure that made C-1b's
+    +0,06 an artifact. A row produced before `exit_status` existed cannot
+    answer that question and must not be made to pretend it can: such cohorts
+    are declared `HISTORICAL_UNCLASSIFIABLE`, their raw bytes pinned and
+    unchanged, their limitation recorded, and they back no current claim.
+
+    For a `CURRENT` cohort the bar is higher than the old one, not lower:
+    attempts, sessions, retries and report totals must reconcile exactly, the
+    rows are pinned by digest so they cannot be re-selected after scoring, and
+    the cohort's identity is bound to the pre-registered protocol digest.
     """
-    files = sorted(ctx.root.glob(".bench*/results.jsonl"))
-    if not files:
-        return _missing(".bench*/results.jsonl — no bench results in this tree")
-    total = blank = infra = 0
-    for path in files:
-        text = ctx.read(path) or ""
-        for line in text.splitlines():
-            if not line.strip():
-                continue
-            try:
-                row = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            total += 1
-            if not str(row.get("exit_status") or ""):
-                blank += 1
-            elif row["exit_status"] in INFRA_STATUSES:
-                infra += 1
-    where = ", ".join(str(p.relative_to(ctx.root)) for p in files)
-    if not total:
-        return Probed(Outcome.UNRUNNABLE, f"no rows in {where}")
-    if blank:
+    decls = cohort.declarations(ctx.root)
+    if not decls:
+        return _missing(f"{cohort.COHORT_DIR}/*.json — no cohort is declared, so "
+                        f"there is no scope over which classification integrity "
+                        f"could be checked")
+    ctx.seen.extend(sorted((ctx.root / cohort.COHORT_DIR).glob("*.json")))
+
+    results = [cohort.verify(ctx.root, d) for d in decls]
+    current = [r for r in results if r.status == cohort.CURRENT]
+    if not current:
+        return Probed(Outcome.UNRUNNABLE,
+                      f"{len(results)} cohort(s) declared, none CURRENT — no "
+                      f"current claim is in scope")
+    bad = [r for r in results if not r.ok]
+    if bad:
+        first = bad[0]
+        more = f" (+{sum(len(r.problems) for r in bad) - 1} more)" if sum(
+            len(r.problems) for r in bad) > 1 else ""
         return Probed(Outcome.FAILED,
-                      f"{blank} of {total} rows carry no exit_status — a cut session is "
-                      f"indistinguishable from a graded one ({where})")
-    return Probed(Outcome.PASSED, f"{total} rows all carry exit_status · {infra} infra/cut ({where})")
+                      f"{first.cohort_id}: {first.problems[0]}{more}")
+    hist = [r for r in results if r.status == cohort.HISTORICAL]
+    facts = "; ".join(
+        f"{r.cohort_id} {r.facts.get('attempts')} attempts / "
+        f"{r.facts.get('sessions')} sessions reconciled" for r in current)
+    return Probed(Outcome.PASSED,
+                  f"{facts} · {len(hist)} historical cohort(s) pinned and "
+                  f"excluded from current claims")
 
 
 def probe_pair_qualification(ctx: Ctx) -> Probed:
@@ -1161,30 +1171,98 @@ def probe_inconclusive_reported(ctx: Ctx) -> Probed:
     return Probed(Outcome.PASSED, f"{len(files)} reports state a band or an inconclusive verdict")
 
 
-#: Claims withdrawn as unreproducible (§5 G5.6). Presenting one as current
-#: evidence is the failure this criterion exists to catch.
+#: Claims withdrawn as unreproducible (§5 G5.6), as a **fallback** for a tree
+#: whose criteria file carries no registry. The registry is data
+#: (`claim_registry` in the criteria file) because a claim's surface forms are
+#: project facts, not framework constants — and because the same claim is
+#: written differently in different locales.
 RETIRED_CLAIMS = ("near-zero measured cost overhead", "near-zero cost overhead",
-                  "36× cost", "36x cost", "±0.08")
+                  "36× cost", "36x cost", "±0.08", "±0,08")
+
+#: A mention inside one of these regions is **not** an assertion. Prose is
+#: allowed to say "±0.08 is retired and must not be used" — that sentence is
+#: the opposite of claiming it. Anything outside an annotated region counts as
+#: a current assertion, so silence is never a way to sneak one through.
+MENTION_OK = ("HISTORICAL", "RETIRED", "WITHDRAWAL_EXPLANATION")
+CLAIM_STATUSES = ("CURRENT_ASSERTION", *MENTION_OK)
+_CLAIM_BEGIN = r"<!--\s*claim:(CURRENT_ASSERTION|HISTORICAL|RETIRED|WITHDRAWAL_EXPLANATION)\s*-->"
+_CLAIM_END = r"<!--\s*/claim\s*-->"
+
+
+def claim_forms(spec: dict) -> list[tuple[str, str]]:
+    """(claim id, surface form) pairs to search for — registry first, else the
+    built-in fallback. Both are compared case-insensitively."""
+    reg = (spec or {}).get("claim_registry") or {}
+    out: list[tuple[str, str]] = []
+    for item in reg.get("retired") or []:
+        cid = str(item.get("id") or "?")
+        out += [(cid, str(f).lower()) for f in (item.get("forms") or []) if str(f).strip()]
+    return out or [(c, c.lower()) for c in RETIRED_CLAIMS]
+
+
+def assertion_text(text: str, spec: dict | None = None) -> str:
+    """`text` with every non-asserting annotated region removed.
+
+    Deliberately not a classifier. A region declares its own status in the
+    source; the probe only honours the declaration. `CURRENT_ASSERTION`
+    regions stay in — annotating a live claim does not excuse it.
+    """
+    reg = ((spec or {}).get("claim_registry") or {}).get("annotation") or {}
+    begin = str(reg.get("begin") or _CLAIM_BEGIN)
+    end = str(reg.get("end") or _CLAIM_END)
+    ok = tuple(reg.get("mention_ok") or MENTION_OK)
+    out, pos = [], 0
+    for m in re.finditer(begin, text):
+        closing = re.search(end, text[m.end():])
+        if closing is None:                      # unterminated: not a shelter
+            continue
+        stop = m.end() + closing.end()
+        if (m.group(1) if m.groups() else "") in ok:
+            out.append(text[pos:m.start()])
+            pos = stop
+    out.append(text[pos:])
+    return "".join(out)
 
 
 def probe_no_stale_claims(ctx: Ctx) -> Probed:
-    """G5.6 — no unreproducible historical claim presented as current evidence."""
+    """G5.6 — no unreproducible historical claim presented as current evidence.
+
+    Two failures this replaces, both measured on this repository:
+
+    * **false negative** — the matcher was a plain substring over ASCII
+      `±0.08`, so the same claim written `±0,08` in a Vietnamese report passed
+      untouched. Retiring a number and then restating it with a decimal comma
+      is not a correction.
+    * **false positive** — `docs/BENCH-REPORT-C2.md` explains *why* `±0.08`
+      was withdrawn, and the old probe read that explanation as the claim. The
+      same shape as AD-22's grep failing on `"http://"` inside URL validation:
+      a substring cannot tell asserting from mentioning.
+
+    The fix is declaration, not inference. Prose marks a mention with
+    ``<!-- claim:WITHDRAWAL_EXPLANATION -->`` … ``<!-- /claim -->``; everything
+    outside such a region is read as a current assertion.
+    """
     rels = [r.strip() for r in str(ctx.criterion.get("evidence") or "").split(",") if r.strip()]
     if not rels:
         return Probed(Outcome.UNRUNNABLE, "criterion names no surfaces to audit")
+    forms = claim_forms(ctx.spec)
     hits, absent = [], []
     for rel in rels:
         text = ctx.read(rel)
         if text is None:
             absent.append(rel)
             continue
-        low = text.lower()
-        hits += [f"{rel}: {claim}" for claim in RETIRED_CLAIMS if claim in low]
+        live = assertion_text(text, ctx.spec).lower()
+        hits += [f"{rel}: {cid}" for cid, form in forms if form in live]
     if absent:
         return _missing(", ".join(absent))
     if hits:
-        return Probed(Outcome.FAILED, f"{len(hits)} retired claims: {'; '.join(hits[:4])}")
-    return Probed(Outcome.PASSED, f"{len(rels)} public surfaces carry no retired claim")
+        return Probed(Outcome.FAILED,
+                      f"{len(hits)} retired claims asserted as current: "
+                      f"{'; '.join(hits[:4])}")
+    return Probed(Outcome.PASSED,
+                  f"{len(rels)} public surfaces carry no retired claim as a "
+                  f"current assertion ({len(forms)} forms checked)")
 
 
 # ---------------------------------------------------- G6 external validation

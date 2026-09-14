@@ -1,0 +1,10 @@
+{
+ "cohort_id": "C-1",
+ "limitation": "Chạy trước khi trường exit_status tồn tại. 303/303 dòng không có phân loại phiên, nên KHÔNG kết luận được từ cohort này rằng phiên bị cắt đã không bị chấm như kết quả — đó chính là cách C-1b sinh ra +0,06 giả. Bằng chứng gốc giữ nguyên từng byte; không back-fill, không đoán. Cohort này không chống đỡ bất kỳ phát biểu hiện hành nào.",
+ "raw_path": ".bench/results.jsonl",
+ "raw_sha256": "972f3f3b9b5495ff9f5af81238400abf4e1fca626307ffbee708d01b34430be6",
+ "report": null,
+ "rows": 303,
+ "rows_without_exit_status": 303,
+ "status": "HISTORICAL_UNCLASSIFIABLE"
+}

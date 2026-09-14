@@ -8,6 +8,15 @@ chạy đủ thiết kế**, không lượt nào bị cắt vì trần thời gi
 hiệu số giữa hai commit là **một tệp sổ sách** (`closure-evidence/c2-execution-sha.json`),
 không dòng mã khung nào. Bộ dữ liệu: `MANIFEST.sha256` khớp từng byte, 120 mục.
 
+Cohort: **C-2**, khai ở `closure-evidence/cohorts/C-2.json`, đóng băng trước khi
+báo cáo này được viết. Mọi con số dưới đây tính lại được từ các dòng đã ghim
+trong bản khai ấy:
+
+    totals_sha256 = dbfb919bf2a14ac2f7e86794eefef5422104cc46991b46ed1339371a07d2fcf3
+
+G5.2 tính lại tổng từ dòng thô và so với chuỗi này. Bỏ một dòng trượt, làm tròn
+một tỉ lệ, đổi bất cứ tổng nào — digest đổi và cổng đỏ.
+
 ## 1. Phán quyết, theo đúng điều kiện đã tiền đăng ký
 
 Giao thức đóng băng (`docs/handoff/bench-real-model-wiring.md`, vùng
@@ -30,6 +39,31 @@ Với nhánh trần ở 36/36, phép đo **không có độ phân giải** để
 không đo được cái không có chỗ để đo. Vì vậy báo cáo dừng ở
 **KHÔNG KẾT LUẬN ĐƯỢC**, không đi tiếp tới một hiệu số — và không được đọc
 thành "hai nhánh như nhau".
+
+## 1b. Hai tầng: kết quả xác nhận, và dữ liệu hậu-dừng
+
+Giao thức đóng băng định một điều kiện **dừng sớm** (§ 9). Nó đã kích hoạt sau
+task thứ hai. Vì vậy đợt đo phải đọc thành hai tầng tách bạch, không phải một
+bảng 72 lượt liền mạch.
+
+### KẾT QUẢ XÁC NHẬN (theo giao thức)
+
+- điểm dừng: **sau task 2** — `bug-a2-sec-4`, `bug-a2-sec-3`
+- 12 lượt: AISEF 6/6 PASS, bare 6/6 PASS
+- điều kiện trần kích hoạt: cả hai task hoà 1,00/1,00
+- **phán quyết tiền đăng ký chính thức: KHÔNG KẾT LUẬN ĐƯỢC**
+
+### POST-STOP EXPLORATORY — COLLECTED AFTER THE PRE-REGISTERED STOP CONDITION
+
+- 10 task còn lại, 60 lượt, thu **sau** khi điều kiện dừng đã kích hoạt
+- AISEF 29/30 PASS (pass@1 0,967) · bare 30/30 PASS (pass@1 1,000)
+- giữ nguyên làm quan sát thật, **không** xoá
+- **không** làm đổi phán quyết xác nhận, và không được trích như thể giao thức
+  đã đòi chúng
+
+Mọi bảng từ § 2 trở đi là **hợp của hai tầng** (72 lượt), ghi rõ ở đây một lần
+để không phải chú thích lại ở từng dòng. Tầng xác nhận một mình đã đủ kích hoạt
+điều kiện trần; 10 task sau chỉ làm nó chắc thêm (11/12 thay vì 2/2).
 
 ## 2. Kết quả
 
@@ -86,29 +120,45 @@ nhánh trần (32). Chi phí dồn vào các lượt bị chặn, không nằm �
 harness. Đây là một phân rã, không phải một lời bào chữa: 16/36 lượt vẫn bị
 chặn, và cái giá tổng vẫn phải trả.
 
-Một phần cái giá ấy **không phải của harness**: xem § 5.
+Cái giá này vẫn **không được đọc thành nhân quả**. Không phải vì tỉ lệ phiên
+bị cắt lệch nhau — § 5 cho thấy cả hai nhánh đều 0 — mà vì việc *bị chặn* không
+phải biến ngẫu nhiên: guard chặn một lượt **vì** lượt ấy đang đi sai, nên
+"lượt bị chặn tốn hơn" một phần là chọn mẫu, không phải tác động. Một cohort,
+một model, trần dữ liệu, không hoán vị thứ tự task: quy nhân quả từ đây là
+vượt quá cái thiết kế cho phép.
 
-## 5. Phiên bị CLI cắt — và một dự đoán sai của G5.3
+## 5. Phiên bị CLI cắt — **0/72**, và một con số tôi đã công bố sai
 
-| điều kiện | phiên | bị cắt | tỉ lệ |
+| điều kiện | lượt | phiên | bị cắt |
 |---|---:|---:|---:|
-| opencode (AISEF) | 104 | 22 | **21 %** |
-| opencode-bare | 94 | 13 | **14 %** |
+| opencode (AISEF) | 36 | 36 | **0** |
+| opencode-bare | 36 | 36 | **0** |
 
-Ở mức **lượt**, cả 72 lượt đều `exit_status = ok` — cơ chế chạy lại trong lượt
-đã hấp thụ hết. Ở mức **phiên** thì không: 35 phiên bị cắt giữa chừng.
+Mỗi lượt đúng **một** phiên, không lượt nào bị cắt, `infra_retries` bằng 0 ở cả
+72 lượt. Ba con số ấy khớp nhau hoàn toàn, và đó là điều kiện đối soát của G5.2.
 
-Điều này **mâu thuẫn với phép tuyển G5.3**, vốn đo 28/28 phiên với **0 phiên
-bị cắt** (tỉ lệ 0,000 ≤ ngưỡng 0,167) và trên cơ sở đó tuyên bố cặp đủ tư cách.
-Tỉ lệ thật trong sản xuất là 21 % / 14 %. Phép tuyển đã **không dự báo được**
-tỉ lệ cắt thực tế — workload của nó khác workload đo. Đây là một hạn chế của
-giao thức tuyển cặp, phải ghi lại, và nó **không** làm hỏng C-2 (điều kiện
-"không kết luận được" số 1 tính ở mức lượt, và ở mức ấy là 0/72).
+**Bản đầu của báo cáo này ghi 22/104 (AISEF) và 13/94 (bare), tức 21 % và 14 %.
+Sai.** Nguồn sai nằm trong `_analyze._DUONG_DAN_PHIEN`: biểu thức khớp
+`.bench*/run/<điều kiện>/<task>/a<n>` nhưng **vứt bỏ** phần thư mục, nên phiên
+của `.bench` (C-1) và `.bench-c1b` (C-1b) rơi vào cùng khoá với phiên của
+`.bench-c2` bất cứ khi nào trùng (điều kiện, task, lượt). Đo lại theo thư mục:
+`.bench-c2` 72 phiên, `.bench` 95, `.bench-c1b` 36. Toàn bộ 35 phiên bị cắt
+thuộc hai cohort cũ; C-2 không có phiên nào.
 
-Hệ quả cho § 4: nhánh AISEF có nhiều phiên hơn (104 vs 94) và nhiều lần cắt hơn
-(22 vs 13). Mỗi lần cắt kéo theo một lần chạy lại, nên **một phần** chênh lệch
-turn/token là thuộc tính của cặp model↔CLI, không phải overhead của harness.
-Dữ liệu hiện có không tách được hai phần ấy.
+Một lỗi thứ hai lộ ra cùng lúc: một lượt (`opencode/bug-a2-state-1/a1`) bị mất
+hẳn khỏi bảng vì model in đường dẫn bị ngắt dòng thành `open-code`, và
+`([\w-]+)` nuốt gọn — phiên trông như chạm hai cây nên luật chống-đoán bỏ nó
+đi. Nay điều kiện hợp lệ đọc từ **thư mục có thật trên đĩa**, không từ văn bản
+model in ra.
+
+**Hai hệ quả, cả hai đều ngược với điều tôi đã viết:**
+
+1. **G5.3 đã dự báo đúng.** Phép tuyển đo 0,000 tỉ lệ cắt; sản xuất đo 0,000.
+   Câu "phép tuyển không dự báo được tỉ lệ cắt thực tế" ở bản đầu là hệ quả của
+   số liệu nhiễm bẩn, và nó sai.
+2. **Không có chênh lệch tỉ lệ cắt nào để giải thích chênh lệch chi phí.** Cả
+   hai nhánh đều 0. Phần § 4 quy một phần overhead cho "nhánh AISEF bị cắt
+   nhiều hơn" không còn cơ sở.
 
 ## 6. Guard đã chặn gì — 27 sự kiện, đọc từ `evidence`
 
@@ -137,6 +187,7 @@ trước thứ harness thật sự bắt. Dữ liệu này **cũng tương thíc
 harness không thêm giá trị gì cho một mô hình đủ khá; C-2 không loại trừ được
 nó và không được trình bày như thể đã loại trừ.
 
+<!-- claim:WITHDRAWAL_EXPLANATION -->
 ## 8. Khai báo nhiễu — và một mâu thuẫn trong chính dự án
 
 Giao thức đóng băng khai ngưỡng nhiễu **±0,08**, suy từ C-1 (−0,06) và C-1b
@@ -160,6 +211,8 @@ dữ liệu, 11/12), vốn không dùng ngưỡng nhiễu nào. Và −0,028 t�
   thành "miễn phí".
 - 5,5 giờ phiên.
 
+<!-- /claim -->
+
 ## 9. Một sai sót quy trình của tôi, ghi lại
 
 Giao thức đóng băng có điều khoản **dừng sớm**: *"nếu hai task đầu đều 6/6 phiên
@@ -178,7 +231,10 @@ vì 2/2). Nhưng nó đã đốt đúng số giờ mà giao thức bảo đừng
 
 1. **Bộ task A2 đã hết tác dụng phân biệt** với model tầm M3. Cohort sau cần
    task khó hơn, hoặc một trục đo khác `pass@1` — không phải chạy lại A2.
-2. **Giao thức tuyển cặp (G5.3) cần đo tỉ lệ cắt trên workload giống đợt đo**,
-   không trên workload tuyển riêng. 0/28 đã dự báo sai 21 %.
+2. **Giao thức tuyển cặp (G5.3) vẫn đo một workload do chính nó chọn.** Ở
+   cohort này hai workload **khớp nhau** — tuyển dự báo 0,000, đợt đo ra 0,000
+   — nên đây là một xác nhận, không phải một luật. Lấy mẫu phép tuyển *từ*
+   workload đo sẽ biến bảo đảm ấy từ suy ra thành trực tiếp. (Bản đầu của mục
+   này nói ngược lại, dựa trên số liệu nhiễm bẩn ở § 5.)
 3. **Nhánh trần cần một thiết bị đo chỉ-quan-sát** (ghi nhận, không chặn) thì
    mới so sánh được lớp hành vi mà guard nhắm tới.

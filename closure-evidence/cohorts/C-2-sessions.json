@@ -1,0 +1,511 @@
+{
+ "bench_dir": ".bench-c2",
+ "cohort_id": "C-2",
+ "sessions": [
+  {
+   "attempt": 3,
+   "client": "opencode-bare",
+   "session_id": "ses_f5e1e34adffezwA283wqVvGToc",
+   "status": "ok",
+   "task_id": "bug-a2-multi-4"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode-bare",
+   "session_id": "ses_f5e2b8d41ffemoWws13P4WKtDt",
+   "status": "ok",
+   "task_id": "bug-a2-multi-4"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode-bare",
+   "session_id": "ses_f5e368f15ffeX431pBQGJ8qFYj",
+   "status": "ok",
+   "task_id": "bug-a2-multi-4"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode",
+   "session_id": "ses_f5e418c75ffeDkpiebISDJtnic",
+   "status": "ok",
+   "task_id": "bug-a2-multi-4"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode",
+   "session_id": "ses_f5e518b3affeTQJg639zVZ8jNE",
+   "status": "ok",
+   "task_id": "bug-a2-multi-4"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode",
+   "session_id": "ses_f5e64b6f2ffefuaUcpR00C4Js9",
+   "status": "ok",
+   "task_id": "bug-a2-multi-4"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode-bare",
+   "session_id": "ses_f5e65fb92ffehUT03IITeKW3pY",
+   "status": "ok",
+   "task_id": "bug-a2-state-4"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode-bare",
+   "session_id": "ses_f5e69475fffeaV75dRM7WQsvnF",
+   "status": "ok",
+   "task_id": "bug-a2-state-4"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode-bare",
+   "session_id": "ses_f5e6c45a5ffeafTdCtIBkjFRon",
+   "status": "ok",
+   "task_id": "bug-a2-state-4"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode",
+   "session_id": "ses_f5e70ac0bffeAG34cSAWhG0jKF",
+   "status": "ok",
+   "task_id": "bug-a2-state-4"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode",
+   "session_id": "ses_f5e735309ffedPrwrr28sM1IiF",
+   "status": "ok",
+   "task_id": "bug-a2-state-4"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode",
+   "session_id": "ses_f5e763f66ffetR65EvOfuwsFsI",
+   "status": "ok",
+   "task_id": "bug-a2-state-4"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode-bare",
+   "session_id": "ses_f5e786d22ffeYzkcBSqSuHVAS2",
+   "status": "ok",
+   "task_id": "bug-a2-state-3"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode-bare",
+   "session_id": "ses_f5e7b829dffeZsD85GhKFeJWLe",
+   "status": "ok",
+   "task_id": "bug-a2-state-3"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode-bare",
+   "session_id": "ses_f5e7e47bdffeBE3RpIj80A9q9U",
+   "status": "ok",
+   "task_id": "bug-a2-state-3"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode",
+   "session_id": "ses_f5e81b9ceffeoHIbctM2a023h8",
+   "status": "ok",
+   "task_id": "bug-a2-state-3"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode",
+   "session_id": "ses_f5e84dc1fffemAKyu6pjDuv7Qd",
+   "status": "ok",
+   "task_id": "bug-a2-state-3"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode",
+   "session_id": "ses_f5e870fc0ffelBbVSIihnYjjY5",
+   "status": "ok",
+   "task_id": "bug-a2-state-3"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode-bare",
+   "session_id": "ses_f5e8a71afffey1t3GE3dHlJOCS",
+   "status": "ok",
+   "task_id": "bug-a2-state-2"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode-bare",
+   "session_id": "ses_f5e8d8be1ffeeGwln3krmlzYqj",
+   "status": "ok",
+   "task_id": "bug-a2-state-2"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode-bare",
+   "session_id": "ses_f5e917ac9ffeE7syRkI7UJsAXC",
+   "status": "ok",
+   "task_id": "bug-a2-state-2"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode",
+   "session_id": "ses_f5e97311effeKOPsQ1xul8h9Qj",
+   "status": "ok",
+   "task_id": "bug-a2-state-2"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode",
+   "session_id": "ses_f5e9ea66cffe1m0TwB8YE5Ohjk",
+   "status": "ok",
+   "task_id": "bug-a2-state-2"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode",
+   "session_id": "ses_f5ea373f6fferaTAZfvZWRgBlw",
+   "status": "ok",
+   "task_id": "bug-a2-state-2"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode-bare",
+   "session_id": "ses_f5eabd6eaffetWcipBZC5H5ek1",
+   "status": "ok",
+   "task_id": "bug-a2-state-1"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode-bare",
+   "session_id": "ses_f5eb1279effeNBLYBrpRkYW1Ln",
+   "status": "ok",
+   "task_id": "bug-a2-state-1"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode-bare",
+   "session_id": "ses_f5ec89b31ffe0zNt67nETPNtj5",
+   "status": "ok",
+   "task_id": "bug-a2-state-1"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode",
+   "session_id": "ses_f5ecd9cecffe9TQwAbR04QtGTY",
+   "status": "ok",
+   "task_id": "bug-a2-state-1"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode",
+   "session_id": "ses_f5ed6c67affePAqsdXr1bY5CQf",
+   "status": "ok",
+   "task_id": "bug-a2-state-1"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode",
+   "session_id": "ses_f5ee1f93bffe1JFy2Qgqkmp599",
+   "status": "ok",
+   "task_id": "bug-a2-state-1"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode-bare",
+   "session_id": "ses_f5ee310caffe1wMMM8VQByq4bL",
+   "status": "ok",
+   "task_id": "bug-a2-sec-1"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode-bare",
+   "session_id": "ses_f5ee3c9b6fferGsILsVljc4UXW",
+   "status": "ok",
+   "task_id": "bug-a2-sec-1"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode-bare",
+   "session_id": "ses_f5ee491e8ffefClezOK5Lw93yQ",
+   "status": "ok",
+   "task_id": "bug-a2-sec-1"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode",
+   "session_id": "ses_f5eeb0517ffe5wrH8hDYUnDXtG",
+   "status": "ok",
+   "task_id": "bug-a2-sec-1"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode",
+   "session_id": "ses_f5eff0100ffeHR0FbbNmYK7pSO",
+   "status": "ok",
+   "task_id": "bug-a2-sec-1"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode",
+   "session_id": "ses_f5f0196bbffeLd92cAFBW8sopn",
+   "status": "ok",
+   "task_id": "bug-a2-sec-1"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f03188bffewbTVDqP57ritD0",
+   "status": "ok",
+   "task_id": "bug-a2-sec-2"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f057be0ffeM0vQ2WSCxCba1r",
+   "status": "ok",
+   "task_id": "bug-a2-sec-2"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f06be9affeJJB6h0xLCHswSV",
+   "status": "ok",
+   "task_id": "bug-a2-sec-2"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode",
+   "session_id": "ses_f5f0b44fcffeUBmg7rqbnSAXpv",
+   "status": "ok",
+   "task_id": "bug-a2-sec-2"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode",
+   "session_id": "ses_f5f121be5fferT1zQxtornNBtQ",
+   "status": "ok",
+   "task_id": "bug-a2-sec-2"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode",
+   "session_id": "ses_f5f1306cdffeyGfiModoGpeyBL",
+   "status": "ok",
+   "task_id": "bug-a2-sec-2"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f146184ffeYU22txLXtaubs9",
+   "status": "ok",
+   "task_id": "bug-a2-multi-2"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f152cd0ffex20T0k9PagE1FJ",
+   "status": "ok",
+   "task_id": "bug-a2-multi-2"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f15a390ffelfj0bzw4xwRDQ6",
+   "status": "ok",
+   "task_id": "bug-a2-multi-2"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode",
+   "session_id": "ses_f5f1666eeffe0mziUGR4RgGHoZ",
+   "status": "ok",
+   "task_id": "bug-a2-multi-2"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode",
+   "session_id": "ses_f5f17742affeIuTcBc63n8QaK1",
+   "status": "ok",
+   "task_id": "bug-a2-multi-2"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode",
+   "session_id": "ses_f5f1a8185ffePYlqaVtu1ono81",
+   "status": "ok",
+   "task_id": "bug-a2-multi-2"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f1d5f94ffewxV5MyuCQISRI8",
+   "status": "ok",
+   "task_id": "bug-a2-multi-3"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f230755ffe9NzxrYraSH7EvR",
+   "status": "ok",
+   "task_id": "bug-a2-multi-3"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f273c95ffe4TLtnaeHDdBVQa",
+   "status": "ok",
+   "task_id": "bug-a2-multi-3"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode",
+   "session_id": "ses_f5f2e591dffeO13UipWKPCvy0p",
+   "status": "ok",
+   "task_id": "bug-a2-multi-3"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode",
+   "session_id": "ses_f5f2f2d75ffe267ySJhhcmkymf",
+   "status": "ok",
+   "task_id": "bug-a2-multi-3"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode",
+   "session_id": "ses_f5f327076ffevs7nw01PDNGzDD",
+   "status": "ok",
+   "task_id": "bug-a2-multi-3"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f335fb6ffeB7bWIaJZaZA9n5",
+   "status": "ok",
+   "task_id": "bug-a2-multi-1"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f34469cffe0xP8gnHemzj8Hs",
+   "status": "ok",
+   "task_id": "bug-a2-multi-1"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f35cf91ffe3wNtLy8uJyTb7T",
+   "status": "ok",
+   "task_id": "bug-a2-multi-1"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode",
+   "session_id": "ses_f5f366a53ffeG14VegTrDuL5Jg",
+   "status": "ok",
+   "task_id": "bug-a2-multi-1"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode",
+   "session_id": "ses_f5f37162cffe5cd2Rxj02ll7os",
+   "status": "ok",
+   "task_id": "bug-a2-multi-1"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode",
+   "session_id": "ses_f5f37cbc7ffejZkmfjYVSqcmX1",
+   "status": "ok",
+   "task_id": "bug-a2-multi-1"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f391350ffeE32uvzibznVW2V",
+   "status": "ok",
+   "task_id": "bug-a2-sec-3"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f3bde0bffehE6bY0ePzWRzOd",
+   "status": "ok",
+   "task_id": "bug-a2-sec-3"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f3cbda0ffehfnGQt87NAiN0o",
+   "status": "ok",
+   "task_id": "bug-a2-sec-3"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode",
+   "session_id": "ses_f5f3d44acffejS7oeemTevr1kt",
+   "status": "ok",
+   "task_id": "bug-a2-sec-3"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode",
+   "session_id": "ses_f5f3f9424ffeGhcxfSX5IYPiI8",
+   "status": "ok",
+   "task_id": "bug-a2-sec-3"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode",
+   "session_id": "ses_f5f4248e6ffeHp23T1LcgM3x7j",
+   "status": "ok",
+   "task_id": "bug-a2-sec-3"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f438152ffe2H5bM79c7rvCaf",
+   "status": "ok",
+   "task_id": "bug-a2-sec-4"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f4488d3ffeybM5CKdvHrO3Ry",
+   "status": "ok",
+   "task_id": "bug-a2-sec-4"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode-bare",
+   "session_id": "ses_f5f4614d0ffeCYQMfcdcDChhSs",
+   "status": "ok",
+   "task_id": "bug-a2-sec-4"
+  },
+  {
+   "attempt": 3,
+   "client": "opencode",
+   "session_id": "ses_f5f480f25ffey3iIxxe47YLJtG",
+   "status": "ok",
+   "task_id": "bug-a2-sec-4"
+  },
+  {
+   "attempt": 2,
+   "client": "opencode",
+   "session_id": "ses_f5f49e540ffea5v6tscr3sIicY",
+   "status": "ok",
+   "task_id": "bug-a2-sec-4"
+  },
+  {
+   "attempt": 1,
+   "client": "opencode",
+   "session_id": "ses_f5f4ddbd6ffe00uLFjVSwwyQnr",
+   "status": "ok",
+   "task_id": "bug-a2-sec-4"
+  }
+ ],
+ "source": "opencode session store (read-only)"
+}

@@ -1,0 +1,13 @@
+{
+  "cohort": "C-2",
+  "checked": "2026-09-15",
+  "boundary_check": "bat_buoc_ranh_gioi after each of 12 tasks in both arms; pre-run snapshot taken so a pre-existing directory is not attributed to the run",
+  "fired": false,
+  "repo_clean_after_run": true,
+  "head_unchanged_during_run": true,
+  "bmad_output_at_root": false,
+  "out_of_workspace_writes_attempted": 1,
+  "out_of_workspace_writes_landed": 0,
+  "attempted_detail": "guard `write-scope` block naming aisef/phases/implement.py -- a session tried to write into the framework repository and was blocked. AISEF arm only; the bare arm has no detector for this class.",
+  "bug_166_disposition": "remains OPEN P2 / POST_CLOSE -- containment verified under the heaviest run to date, root cause not reproduced, and reproducing it costs a paid session"
+}

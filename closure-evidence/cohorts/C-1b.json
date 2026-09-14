@@ -1,0 +1,10 @@
+{
+ "cohort_id": "C-1b",
+ "limitation": "Chạy trước khi trường exit_status tồn tại. 36/36 dòng không có phân loại phiên. Đây là cohort mà ba phiên bị cắt đã được chấm như lượt trượt và tạo ra delta +0,06 — con số đã rút. Bằng chứng gốc giữ nguyên từng byte. Cohort này không chống đỡ bất kỳ phát biểu hiện hành nào, và dải nhiễu ±0.08 suy ra từ nó cũng đã bị rút cùng.",
+ "raw_path": ".bench-c1b/results.jsonl",
+ "raw_sha256": "930319e2ee837369c5726531831c1673e8401ea4ca350abf91fcef0209564eef",
+ "report": null,
+ "rows": 36,
+ "rows_without_exit_status": 36,
+ "status": "HISTORICAL_UNCLASSIFIABLE"
+}

@@ -934,26 +934,210 @@ class TestG5(unittest.TestCase):
         self.assertIs(p.outcome, Outcome.FAILED)
         self.assertIn("WAIVER_PENDING", p.detail)
 
-    def test_no_bench_results_is_unrunnable(self):
-        p = CL.probe_cut_session_separation(self.repo.ctx())
+    # ------------------------------------------------------------ G5.2 cohorts
+    #
+    # The gate asks whether the evidence behind a CURRENT claim can show that no
+    # cut or infra session was graded as a result. Rows written before the
+    # classification schema existed cannot answer that and must not be made to
+    # pretend: they are declared historical. The matrix below is the owner's
+    # anti-cherry-pick list (A-F) — the point of cohort scoping is that it must
+    # be impossible to pick convenient rows *after* seeing the result.
+
+    def cohort(self, **over):
+        """A minimal, fully reconciling CURRENT cohort. Tests break one thing."""
+        rows = [{"client": "x", "task_id": "t1", "attempt": 1, "outcome": "PASS",
+                 "exit_status": "ok", "infra_retries": 0},
+                {"client": "x", "task_id": "t1", "attempt": 2, "outcome": "FAIL",
+                 "exit_status": "ok", "infra_retries": 0}]
+        rows = over.pop("rows", rows)
+        sessions = over.pop("sessions", [
+            {"session_id": f"s{i}", "client": r["client"], "task_id": r["task_id"],
+             "attempt": r["attempt"], "status": "ok"} for i, r in enumerate(rows)])
+        d = CL.cohort.COHORT_DIR
+        ap = self.repo.write(f"{d}/K-attempts.jsonl",
+                             "".join(json.dumps(r) + "\n" for r in rows))
+        sp = self.repo.write_json(f"{d}/K-sessions.json", {"sessions": sessions})
+        totals = over.pop("totals", None)
+        if totals is None:
+            totals = CL.cohort.compute_totals(rows, sessions)
+        decl = {
+            "cohort_id": "K", "status": CL.cohort.CURRENT,
+            "protocol_path": "docs/p.md", "protocol_digest": "d" * 64,
+            "benchmark_execution_sha": "a" * 40, "manifest_sha256": "m" * 64,
+            "scoring_version": "v1", "report": "docs/R.md",
+            "attempts": {"path": f"{d}/K-attempts.jsonl",
+                         "sha256": CL.cohort.sha256_text(ap.read_text(encoding="utf-8")),
+                         "count": len(rows)},
+            "sessions": {"path": f"{d}/K-sessions.json",
+                         "sha256": CL.cohort.sha256_text(sp.read_text(encoding="utf-8")),
+                         "count": len(sessions)},
+            "totals": totals,
+        }
+        decl.update(over)
+        self.repo.write_json(f"{d}/K.json", decl)
+        self.repo.write("docs/R.md",
+                        f"# K\n\ntotals_sha256 = {CL.cohort.totals_digest(totals)}\n")
+        return decl
+
+    def g52(self):
+        return CL.probe_cut_session_separation(self.repo.ctx())
+
+    def test_no_cohort_declared_is_unrunnable(self):
+        p = self.g52()
         self.assertIs(p.outcome, Outcome.UNRUNNABLE)
-        self.assertIn("results.jsonl", p.detail)
+        self.assertIn("cohort", p.detail)
 
-    def test_rows_without_exit_status_fail(self):
-        self.repo.write(".bench-c1b/results.jsonl",
-                        json.dumps({"task_id": "t", "outcome": "PASS"}) + "\n"
-                        + json.dumps({"task_id": "t", "outcome": "PASS", "exit_status": "ok"}) + "\n")
-        p = CL.probe_cut_session_separation(self.repo.ctx())
+    def test_a_fully_reconciling_cohort_passes(self):
+        self.cohort()
+        p = self.g52()
+        self.assertIs(p.outcome, Outcome.PASSED, p.detail)
+        self.assertIn("2 attempts", p.detail)
+
+    # A -- a current report cannot omit failing rows from its declared cohort
+    def test_A_report_omitting_a_failing_row_fails(self):
+        rows = [{"client": "x", "task_id": "t1", "attempt": 1, "outcome": "PASS",
+                 "exit_status": "ok", "infra_retries": 0},
+                {"client": "x", "task_id": "t1", "attempt": 2, "outcome": "FAIL",
+                 "exit_status": "ok", "infra_retries": 0}]
+        # the report is written for a cohort of one PASS: totals claim 1/1
+        self.cohort(rows=rows, totals={"x.attempts": 1, "x.pass": 1})
+        p = self.g52()
         self.assertIs(p.outcome, Outcome.FAILED)
-        self.assertIn("1 of 2", p.detail)
+        self.assertIn("x.attempts declared 1 but the rows give 2", p.detail)
 
-    def test_every_row_tagged_passes_and_counts_the_cut_ones(self):
-        self.repo.write(".bench-c2/results.jsonl",
-                        json.dumps({"exit_status": "ok"}) + "\n"
-                        + json.dumps({"exit_status": "timeout"}) + "\n")
-        p = CL.probe_cut_session_separation(self.repo.ctx())
-        self.assertIs(p.outcome, Outcome.PASSED)
-        self.assertIn("1 infra/cut", p.detail)
+    # B -- a cohort cannot be re-selected after scoring
+    def test_B_editing_rows_after_the_cohort_was_frozen_fails(self):
+        self.cohort()
+        d = CL.cohort.COHORT_DIR
+        self.repo.write(f"{d}/K-attempts.jsonl",
+                        json.dumps({"client": "x", "task_id": "t1", "attempt": 1,
+                                    "outcome": "PASS", "exit_status": "ok",
+                                    "infra_retries": 0}) + "\n")
+        p = self.g52()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("changed after it was frozen", p.detail)
+
+    def test_B_rows_with_no_declared_digest_fail(self):
+        decl = self.cohort()
+        decl["attempts"].pop("sha256")
+        self.repo.write_json(f"{CL.cohort.COHORT_DIR}/K.json", decl)
+        p = self.g52()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("re-selected after scoring", p.detail)
+
+    # C -- cohort identity binds to the pre-registered run/protocol
+    def test_C_cohort_without_protocol_digest_fails(self):
+        decl = self.cohort()
+        decl["protocol_digest"] = ""
+        self.repo.write_json(f"{CL.cohort.COHORT_DIR}/K.json", decl)
+        p = self.g52()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("protocol_digest", p.detail)
+
+    def test_C_cohort_without_execution_sha_fails(self):
+        decl = self.cohort()
+        decl["benchmark_execution_sha"] = ""
+        self.repo.write_json(f"{CL.cohort.COHORT_DIR}/K.json", decl)
+        p = self.g52()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("benchmark_execution_sha", p.detail)
+
+    # D -- attempt/session counts reconcile
+    def test_D_an_attempt_with_no_session_fails(self):
+        rows = [{"client": "x", "task_id": "t1", "attempt": 1, "outcome": "PASS",
+                 "exit_status": "ok", "infra_retries": 0}]
+        self.cohort(rows=rows, sessions=[])
+        p = self.g52()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("no session recorded", p.detail)
+
+    def test_D_a_session_outside_the_cohort_fails(self):
+        self.cohort(sessions=[{"session_id": "s", "client": "x", "task_id": "OTHER",
+                               "attempt": 9, "status": "ok"}])
+        p = self.g52()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("belong to no declared attempt", p.detail)
+
+    def test_D_a_run_no_retry_counter_explains_fails(self):
+        rows = [{"client": "x", "task_id": "t1", "attempt": 1, "outcome": "PASS",
+                 "exit_status": "ok", "infra_retries": 0}]
+        two = [{"session_id": "s1", "client": "x", "task_id": "t1", "attempt": 1,
+                "status": "ok"},
+               {"session_id": "s2", "client": "x", "task_id": "t1", "attempt": 1,
+                "status": "ok"}]
+        self.cohort(rows=rows, sessions=two)
+        p = self.g52()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("sessions != infra_retries + 1", p.detail)
+
+    def test_D_report_not_carrying_the_totals_digest_fails(self):
+        self.cohort()
+        self.repo.write("docs/R.md", "# K\n\nno digest here\n")
+        p = self.g52()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("totals digest", p.detail)
+
+    # the C-1b artifact itself: a cut session graded as a result
+    def test_a_cut_final_session_graded_as_a_result_fails(self):
+        rows = [{"client": "x", "task_id": "t1", "attempt": 1, "outcome": "FAIL",
+                 "exit_status": "ok", "infra_retries": 0}]
+        self.cohort(rows=rows, sessions=[
+            {"session_id": "s1", "client": "x", "task_id": "t1", "attempt": 1,
+             "status": "cut"}])
+        p = self.g52()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("C-1b artifact", p.detail)
+
+    # E -- a current cohort with an unclassified row fails
+    def test_E_a_current_row_without_exit_status_fails(self):
+        rows = [{"client": "x", "task_id": "t1", "attempt": 1, "outcome": "PASS",
+                 "infra_retries": 0}]
+        self.cohort(rows=rows)
+        p = self.g52()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("no exit_status", p.detail)
+
+    # F -- historical rows do NOT fail the probe merely for the old schema
+    def test_F_historical_rows_without_exit_status_do_not_fail(self):
+        self.cohort()
+        self.repo.write(".bench/results.jsonl",
+                        json.dumps({"task_id": "old", "outcome": "PASS"}) + "\n")
+        self.repo.write_json(f"{CL.cohort.COHORT_DIR}/H.json", {
+            "cohort_id": "H", "status": CL.cohort.HISTORICAL,
+            "raw_path": ".bench/results.jsonl", "raw_sha256": "f" * 64,
+            "limitation": "predates exit_status; backs no current claim",
+            "report": None})
+        p = self.g52()
+        self.assertIs(p.outcome, Outcome.PASSED, p.detail)
+        self.assertIn("1 historical", p.detail)
+
+    def test_F_a_historical_cohort_backing_a_report_fails(self):
+        self.cohort()
+        self.repo.write_json(f"{CL.cohort.COHORT_DIR}/H.json", {
+            "cohort_id": "H", "status": CL.cohort.HISTORICAL,
+            "raw_path": ".bench/results.jsonl", "raw_sha256": "f" * 64,
+            "limitation": "predates exit_status",
+            "report": "docs/SOMETHING.md"})
+        p = self.g52()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("may not back a current claim", p.detail)
+
+    def test_F_a_historical_cohort_with_no_limitation_fails(self):
+        self.cohort()
+        self.repo.write_json(f"{CL.cohort.COHORT_DIR}/H.json", {
+            "cohort_id": "H", "status": CL.cohort.HISTORICAL,
+            "raw_path": ".bench/results.jsonl", "raw_sha256": "f" * 64,
+            "report": None})
+        p = self.g52()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("limitation", p.detail)
+
+    def test_post_stop_data_must_be_labelled_in_the_report(self):
+        self.cohort(confirmatory={"confirmatory_attempts": 1, "post_stop_attempts": 1,
+                                  "post_stop_label": "POST-STOP EXPLORATORY"})
+        p = self.g52()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("post-stop label", p.detail)
 
     def test_missing_pair_qualification_is_unrunnable(self):
         p = CL.probe_pair_qualification(self.repo.ctx({"evidence": "docs/BENCH-PAIR-QUALIFICATION.md"}))
@@ -1048,6 +1232,73 @@ class TestG5(unittest.TestCase):
     def test_a_missing_public_surface_is_unrunnable(self):
         p = CL.probe_no_stale_claims(self.repo.ctx({"evidence": "README.md,landingpage/index.html"}))
         self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+
+    # ------------------------------------------------ G5.6 claim status
+    #
+    # A substring cannot tell asserting from mentioning. Both failure
+    # directions were real on this repository: `±0,08` slipped an ASCII-only
+    # matcher, and the C-2 report's explanation of *why* `±0.08` was withdrawn
+    # was read as the claim itself. Status is therefore declared in the source,
+    # never inferred — and anything undeclared counts as a current assertion,
+    # so silence cannot shelter one.
+
+    REGISTRY = {"claim_registry": {
+        "retired": [{"id": "noise-band", "forms": ["±0.08", "±0,08"]}],
+        "annotation": {
+            "begin": r"<!--\s*claim:(CURRENT_ASSERTION|HISTORICAL|RETIRED|WITHDRAWAL_EXPLANATION)\s*-->",
+            "end": r"<!--\s*/claim\s*-->",
+            "mention_ok": ["HISTORICAL", "RETIRED", "WITHDRAWAL_EXPLANATION"]}}}
+
+    def claims(self, body: str):
+        self.repo.write("docs/BENCH-REPORT-X.md", body)
+        self.repo.spec.update(self.REGISTRY)
+        return CL.probe_no_stale_claims(
+            self.repo.ctx({"evidence": "docs/BENCH-REPORT-X.md"}))
+
+    def test_current_assertion_with_ascii_band_fails(self):
+        p = self.claims("# X\n\nThe measured noise band is ±0.08.\n")
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("noise-band", p.detail)
+
+    def test_current_assertion_with_locale_band_fails(self):
+        """`±0,08` is the same claim with a decimal comma. Retiring a number
+        and restating it in another locale is not a correction."""
+        p = self.claims("# X\n\nDải nhiễu đã đo là ±0,08.\n")
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("noise-band", p.detail)
+
+    def test_explaining_that_the_band_is_retired_passes(self):
+        p = self.claims("# X\n\n<!-- claim:WITHDRAWAL_EXPLANATION -->\n"
+                        "±0.08 is retired: it came from C-1b's artifact delta "
+                        "and must not be used.\n<!-- /claim -->\n")
+        self.assertIs(p.outcome, Outcome.PASSED, p.detail)
+
+    def test_a_dated_historical_mention_passes(self):
+        p = self.claims("# X\n\n<!-- claim:HISTORICAL -->\n"
+                        "C-1b (13/09/2026) reported ±0,08.\n<!-- /claim -->\n")
+        self.assertIs(p.outcome, Outcome.PASSED, p.detail)
+
+    def test_an_unlabelled_bench_report_repeating_the_claim_fails(self):
+        """The default is assertion. A report that simply restates a retired
+        number, with no status declared, is making the claim."""
+        p = self.claims("# X\n\nResults sit inside ±0.08 of the control.\n")
+        self.assertIs(p.outcome, Outcome.FAILED)
+
+    def test_annotating_a_live_claim_as_current_does_not_excuse_it(self):
+        p = self.claims("# X\n\n<!-- claim:CURRENT_ASSERTION -->\n"
+                        "The band is ±0.08.\n<!-- /claim -->\n")
+        self.assertIs(p.outcome, Outcome.FAILED)
+
+    def test_an_unterminated_region_is_not_a_shelter(self):
+        """An opening marker with no close would otherwise hide the rest of
+        the file — the easiest possible bypass."""
+        p = self.claims("# X\n\n<!-- claim:RETIRED -->\nThe band is ±0.08.\n")
+        self.assertIs(p.outcome, Outcome.FAILED)
+
+    def test_text_outside_an_annotated_region_is_still_audited(self):
+        p = self.claims("# X\n\n<!-- claim:HISTORICAL -->\nold\n<!-- /claim -->\n"
+                        "And today the band is ±0,08.\n")
+        self.assertIs(p.outcome, Outcome.FAILED)
 
 
 # ------------------------------------------------------------------- G6 probes

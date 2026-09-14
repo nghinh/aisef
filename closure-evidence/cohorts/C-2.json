@@ -1,0 +1,56 @@
+{
+ "attempts": {
+  "count": 72,
+  "path": "closure-evidence/cohorts/C-2-attempts.jsonl",
+  "sha256": "a0995c2ba1d347b4198b45f72d1f2f24f6f8dd6c8705ce51b03d731287c68121"
+ },
+ "benchmark_execution_sha": "1f13de0a5efc5289fb552ab3cb4993cd807c9398",
+ "cohort_id": "C-2",
+ "confirmatory": {
+  "confirmatory_attempts": 12,
+  "fired_after_tasks": [
+   "bug-a2-sec-4",
+   "bug-a2-sec-3"
+  ],
+  "post_stop_attempts": 60,
+  "post_stop_label": "POST-STOP EXPLORATORY — COLLECTED AFTER THE PRE-REGISTERED STOP CONDITION",
+  "stop_rule": "PREREG-FROZEN: hai task đầu đều 6/6 phiên PASS ở cả hai điều kiện → dừng",
+  "verdict": "INCONCLUSIVE"
+ },
+ "excluded": [],
+ "infra_statuses": [
+  "timeout",
+  "infra",
+  "rate_limit"
+ ],
+ "manifest_sha256": "7e10e39afd029030696955d1582fa8ad9ebafefb4e1b1d8c09f461ba0f06900c",
+ "protocol_digest": "0c4dab0a74b6cb56ecc52c4ee9013a693bbdcf69374728f2951c9fa0c62a44cc",
+ "protocol_path": "docs/handoff/bench-real-model-wiring.md",
+ "report": "docs/BENCH-REPORT-C2.md",
+ "scoring_version": "ADR-005-V8",
+ "sessions": {
+  "count": 72,
+  "path": "closure-evidence/cohorts/C-2-sessions.json",
+  "sha256": "3a185d8d569df04f532450d578206bb0fa11e5b07031ef48bd9b254ec6e98113"
+ },
+ "status": "CURRENT",
+ "totals": {
+  "opencode-bare.attempts": 36,
+  "opencode-bare.infra_attempts": 0,
+  "opencode-bare.pass": 36,
+  "opencode-bare.retries": 0,
+  "opencode-bare.sessions": 36,
+  "opencode-bare.sessions_cut": 0,
+  "opencode-bare.tasks": 12,
+  "opencode-bare.tasks_solved": 12,
+  "opencode.attempts": 36,
+  "opencode.infra_attempts": 0,
+  "opencode.pass": 35,
+  "opencode.retries": 0,
+  "opencode.sessions": 36,
+  "opencode.sessions_cut": 0,
+  "opencode.tasks": 12,
+  "opencode.tasks_solved": 12
+ },
+ "totals_sha256": "dbfb919bf2a14ac2f7e86794eefef5422104cc46991b46ed1339371a07d2fcf3"
+}

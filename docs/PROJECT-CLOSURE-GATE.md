@@ -561,11 +561,11 @@ benchmark is worse than none.
 | criterion | evidence |
 |---|---|
 | G5.1 methodology pre-registered before data exists | `docs/handoff/bench-real-model-wiring.md` §7, **digest-pinned** |
-| G5.2 cut sessions not silently mixed with valid ones | `Result.exit_status` per row; `pass@1` excludes nothing silently |
+| G5.2 cut sessions not silently mixed with valid ones, **over the cohort backing the current claim** | `closure-evidence/cohorts/*.json`: attempts, sessions, retries and report totals reconcile exactly |
 | G5.3 valid model↔CLI pairing established | a cohort whose cut-session rate is below a declared threshold |
 | G5.4 evidence reproducible | `MANIFEST.sha256` matches; `python3 -m tests.bench selfcheck` 19/19 |
 | G5.5 noise and inconclusive results reported as such | report states the band or states that the corpus cannot resolve one |
-| G5.6 no unreproducible historical claim presented as current evidence | audit of `README*`, `landingpage/`, `docs/SALEKIT.html`, `BENCH-*` |
+| G5.6 no unreproducible historical claim presented as current evidence | audit of `README*`, `landingpage/`, `docs/SALEKIT.html`, `BENCH-*`, by **declared claim status**, not substring |
 
 **G5.1's artifact exists but is mis-housed.** The pre-registration is real —
 buy / don't-buy / inconclusive definitions and a recorded prediction, written
@@ -638,6 +638,74 @@ column unrun, which the closure record must state outright rather than imply.
 **Today: FAILED** (G5.3 `UNRUNNABLE` — no cut-session-free pair established;
 G5.1 needs pinning; G5.2, G5.4, G5.5 pass; G5.6 passes as of this session's
 corrections).
+
+### G5.2, corrected 2026-09-15 — the cohort is the unit, not the row
+
+The first version of G5.2 asked that **every row in every `.bench*/results.jsonl`
+in the tree** carry `exit_status`. That demand cannot be met and should not be:
+339 of 411 rows were produced before the field existed. Meeting it would require
+inventing a status for sessions that no longer exist — which is precisely the
+guess that made C-1b's +0,06 an artifact, committed a second time and called a
+fix.
+
+The corrected criterion is **not** "ignore old rows so the gate passes". It is:
+
+> evaluate classification integrity over the immutable cohort that supports the
+> current claim, while preserving older incompatible evidence as historical.
+
+A cohort is declared in `closure-evidence/cohorts/<id>.json` **before** it is
+scored, and is one of two things:
+
+* **`CURRENT`** — backs a claim being made now. It must carry a full identity
+  (cohort id, protocol digest, benchmark execution SHA, dataset manifest,
+  scoring version, pinned attempt rows, pinned session ledger, and the report
+  that consumes it), and every one of these must hold: every graded attempt
+  traceable; every session carrying an explicit status; cut and infra sessions
+  visible; retries reconciling (`sessions == infra_retries + 1`); no attempt
+  whose final session was cut carrying a non-infra exit status; no excluded row
+  without a recorded reason; and report totals recomputed from the raw rows
+  matching the declared totals, whose digest the report itself carries.
+* **`HISTORICAL_UNCLASSIFIABLE`** — predates the schema. Its raw bytes are
+  pinned and never rewritten, its limitation is recorded, and it may not name a
+  report. Its old schema is not a defect in the present gate.
+
+This is **stricter**, not looser. The old probe accepted any non-empty string in
+one field; the new one will not let a report drop a failing row, re-select its
+rows after scoring, or summarise numbers that its own evidence does not produce.
+The anti-cherry-pick matrix is tested at `tests/test_closure.py` (A–F).
+
+### G5.6, corrected 2026-09-15 — declared status, not substring matching
+
+The substring matcher failed in both directions on this repository. It missed
+`±0,08` because it only knew the ASCII `±0.08` — retiring a number and restating
+it with a decimal comma is not a correction. And it flagged
+`docs/BENCH-REPORT-C2.md`, which *explains why* `±0.08` was withdrawn, because a
+substring cannot tell asserting from mentioning. That is the same shape as
+AD-22's grep failing on `"http://"` inside URL validation.
+
+Claim status is now **declared in the source**, never inferred. The registry of
+retired claims and their surface forms lives in `claim_registry` in the criteria
+file. Prose marks a non-assertion by fencing it:
+
+    <!-- claim:WITHDRAWAL_EXPLANATION -->  …  <!-- /claim -->
+
+with `HISTORICAL`, `RETIRED` and `WITHDRAWAL_EXPLANATION` all counting as
+mentions. Everything outside such a region — and anything inside a
+`CURRENT_ASSERTION` region, and anything inside an unterminated region — is read
+as a current assertion. Silence is never a shelter. No classifier, no linguistic
+guessing.
+
+### Benchmark integrity is not benchmark effectiveness
+
+These are separate questions and the closure record must keep them separate:
+
+* **G5 asks** — was the experiment conducted and reported honestly?
+* **A cohort asks** — did this cohort resolve AISEF against bare?
+
+`G5 = PASSED` alongside `C-2 = INCONCLUSIVE` is not a contradiction. It is the
+expected and legitimate state: the experiment was run and reported correctly,
+and what it correctly reports is that at this model and this task difficulty it
+had no power to resolve the comparison.
 
 ### G6 — External validation
 

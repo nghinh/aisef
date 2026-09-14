@@ -204,6 +204,53 @@ def bat_buoc_ranh_gioi(truoc: dict[str, bool], root: Path | None = None) -> None
         )
 
 
+# ------------------------------------------------- điều kiện dừng đã đóng băng
+
+#: Bản phiên dịch máy-đọc-được của điều kiện dừng sớm trong tiền đăng ký.
+LUAT_DUNG = Path(__file__).resolve().parent / "stop_rule.json"
+
+
+def luat_dung(path: Path | None = None) -> dict:
+    """Điều kiện dừng đã khai, hoặc `{}` nếu cây này không khai."""
+    p = LUAT_DUNG if path is None else path
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def kiem_dung_som(results: list[Result], thu_tu: list[str], khai: dict) -> str:
+    """Lý do phải dừng, hoặc `""` nếu chưa.
+
+    Vì sao đây là mã chứ không phải một câu trong tài liệu: C-2 là bằng chứng.
+    Điều kiện kích hoạt sau task thứ hai, người vận hành không nhận ra, và mười
+    task nữa chạy tiếp — đúng bảy giờ mà chính giao thức bảo đừng đốt. Một luật
+    mà việc áp dụng phụ thuộc vào việc ai đó nhớ ra thì không phải một luật.
+
+    Chỉ xét các task đã chạy **đủ** thiết kế; một task đang dở không kết luận gì.
+    """
+    r = (khai or {}).get("rule") or {}
+    if r.get("kind") != "ceiling_after_n_tasks":
+        return ""
+    n, moi_nhanh = int(r.get("tasks") or 0), int(r.get("attempts_per_arm") or 0)
+    nhanh = int(r.get("arms") or 0)
+    if not (n and moi_nhanh and nhanh):
+        return ""
+    dau = thu_tu[:n]
+    if len(dau) < n:
+        return ""
+    for tid in dau:
+        cua_task = [x for x in results if x.task_id == tid]
+        dieu_kien = {x.client for x in cua_task}
+        if len(dieu_kien) != nhanh or len(cua_task) != nhanh * moi_nhanh:
+            return ""                      # chưa chạy đủ: không kết luận
+        if not all(x.outcome == PASS for x in cua_task):
+            return ""
+    return (f"{r.get('reason') or 'điều kiện dừng đã khai'} — "
+            f"{n} task đầu ({', '.join(dau)}) hoà {moi_nhanh}/{moi_nhanh} ở cả "
+            f"{nhanh} điều kiện")
+
+
 def _run_tests(ws: Path, **kw):
     return run_tool("test", ws, config=Config.load(ws), **kw)
 

@@ -1,0 +1,14 @@
+{
+ "_comment": "Machine-readable transcription of the early-stop condition in the FROZEN pre-registration. The frozen region is pinned by G5.1 and must not be edited, so the rule cannot live inside it in executable form; it lives here, next to its source and its source's digest, and `tests/test_bench_qualification.py` asserts the two still agree. A rule a human has to remember to apply is not a rule -- C-2 is the proof: it fired after task 2 and ten more tasks ran anyway.",
+ "source": "docs/handoff/bench-real-model-wiring.md#PREREG-FROZEN",
+ "source_digest": "0c4dab0a74b6cb56ecc52c4ee9013a693bbdcf69374728f2951c9fa0c62a44cc",
+ "text": "Dừng sớm, chốt trước (giao thức đã khai): nếu hai task đầu đều 6/6 phiên PASS ở cả hai điều kiện thì model mới cũng chạm trần bộ dữ liệu này — dừng, báo, đừng đốt thêm bảy giờ để lấy một cột toàn số 1,00.",
+ "rule": {
+  "kind": "ceiling_after_n_tasks",
+  "tasks": 2,
+  "arms": 2,
+  "attempts_per_arm": 3,
+  "verdict": "INCONCLUSIVE",
+  "reason": "trần bộ dữ liệu: hai task đầu hoà tuyệt đối ở cả hai điều kiện"
+ }
+}

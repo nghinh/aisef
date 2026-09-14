@@ -552,6 +552,105 @@ class TestTranChiPhiCatOChanhGioiTask(unittest.TestCase):
         self.assertNotIn("TRẦN CHI PHÍ", err.getvalue())
 
 
+class TestDungSomTheoGiaoThuc(unittest.TestCase):
+    """Điều kiện dừng đã đóng băng phải được **mã** áp, không phải trí nhớ.
+
+    Đây là hồi quy cho một sai sót đã xảy ra thật, không phải cho một sai sót
+    tưởng tượng: trên cohort C-2 điều kiện *"hai task đầu đều 6/6 phiên PASS ở
+    cả hai điều kiện thì dừng"* kích hoạt sau task thứ hai, người vận hành
+    không nhận ra, và mười task nữa chạy tiếp — đúng bảy giờ mà chính giao thức
+    bảo đừng đốt. Bộ chạy có đủ thông tin để tự xét: nó giữ mọi `Result` của
+    các task đã xong. Vậy nên đây là khuyết tật của bộ điều phối.
+    """
+
+    KHAI = {"source": "docs/p.md#PREREG-FROZEN", "source_digest": "d" * 64,
+            "rule": {"kind": "ceiling_after_n_tasks", "tasks": 2, "arms": 2,
+                     "attempts_per_arm": 2, "verdict": "INCONCLUSIVE",
+                     "reason": "trần bộ dữ liệu"}}
+
+    def _chay(self, ket_cuc, *, bo_qua=False, so_task=4):
+        """Chạy `run-both` với client giả; trả (task đã gọi, stderr, thư mục)."""
+        import io
+        from contextlib import redirect_stderr, redirect_stdout
+
+        from . import __main__ as CLI
+        tasks = [R.Task(id=f"t{i}", source="bug", dir=M.TASKS_DIR / f"t{i}")
+                 for i in range(so_task)]
+        calls = []
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+
+        def fake_run(task, client, attempts=3, bare=False, model="", note=""):
+            calls.append((task.id, bare))
+            dk = "c-bare" if bare else "c"
+            return [R.Result(task_id=task.id, client=dk, attempt=n,
+                             outcome=ket_cuc(task.id, bare, n)) for n in (1, 2)]
+
+        err = io.StringIO()
+        argv = ["run-both", "--attempts", "2"] + (["--ignore-stop-rule"] if bo_qua else [])
+        giu = []
+        with mock.patch.object(CLI.R, "KEEP_DIR", Path(tmp.name)), \
+             mock.patch.object(CLI.M, "load_tasks", return_value=tasks), \
+             mock.patch.object(CLI.R, "ENABLED", True), \
+             mock.patch.object(CLI.R, "make_client", return_value=object()), \
+             mock.patch.object(CLI.R, "run", fake_run), \
+             mock.patch.object(CLI.R, "luat_dung", return_value=self.KHAI), \
+             mock.patch.object(CLI.R, "report",
+                               side_effect=lambda rs, *a, **k: giu.extend(rs) or ""), \
+             redirect_stdout(io.StringIO()), redirect_stderr(err):
+            CLI.main(argv)
+        self.giu = giu
+        return calls, err.getvalue(), Path(tmp.name)
+
+    def test_dung_xep_task_moi_khi_dieu_kien_kich_hoat(self):
+        calls, err, thu_muc = self._chay(lambda *_: R.PASS)
+        # hai task đầu hoà tuyệt đối -> không được gọi task thứ ba
+        self.assertEqual([c[0] for c in calls], ["t0", "t0", "t1", "t1"])
+        self.assertIn("DỪNG THEO GIAO THỨC", err)
+        self.assertNotIn("t2", [c[0] for c in calls])
+
+        quyet_dinh = json.loads((thu_muc / "stop-decision.json").read_text(encoding="utf-8"))
+        self.assertTrue(quyet_dinh["fired"])
+        self.assertTrue(quyet_dinh["honoured"])
+        self.assertEqual(quyet_dinh["tasks_completed"], ["t0", "t1"])
+        self.assertEqual(quyet_dinh["tasks_not_run"], ["t2", "t3"])
+        self.assertEqual(quyet_dinh["rule_source_digest"], "d" * 64)
+
+    def test_du_lieu_da_thu_duoc_giu_nguyen(self):
+        """Dừng là dừng **xếp task mới**, không phải vứt cái đã đo."""
+        self._chay(lambda *_: R.PASS)
+        self.assertEqual(len(self.giu), 8)      # 2 task × 2 nhánh × 2 lượt
+
+    def test_mot_task_khong_hoa_thi_chay_tiep(self):
+        """Điều kiện là *trần*, không phải "đã chạy hai task"."""
+        calls, err, _ = self._chay(
+            lambda tid, bare, n: R.FAIL if (tid == "t1" and n == 2) else R.PASS)
+        self.assertEqual(len({c[0] for c in calls}), 4)
+        self.assertNotIn("DỪNG THEO GIAO THỨC", err)
+
+    def test_bo_qua_phai_tuong_minh_va_duoc_ghi_lai(self):
+        calls, err, thu_muc = self._chay(lambda *_: R.PASS, bo_qua=True)
+        self.assertEqual(len({c[0] for c in calls}), 4)      # chạy hết
+        self.assertIn("BỎ QUA có chủ ý", err)
+        q = json.loads((thu_muc / "stop-decision.json").read_text(encoding="utf-8"))
+        self.assertTrue(q["fired"])
+        self.assertFalse(q["honoured"])
+        self.assertEqual(q["post_stop_tasks"], ["t2", "t3"])
+        self.assertIn("POST-STOP EXPLORATORY", q["post_stop_label"])
+
+    def test_luat_khai_trong_kho_khop_voi_vung_dong_bang(self):
+        """`stop_rule.json` là bản phiên dịch của một đoạn văn đã bị ghim. Hai
+        bản trôi khỏi nhau thì bộ chạy áp một luật mà giao thức không nói."""
+        khai = R.luat_dung()
+        self.assertEqual(khai["rule"]["kind"], "ceiling_after_n_tasks")
+        van_ban = (M.ROOT / "docs" / "handoff" / "bench-real-model-wiring.md").read_text(
+            encoding="utf-8")
+        # nhấn mạnh markdown không phải nội dung: `**hai task đầu**` là cùng một
+        # câu với `hai task đầu`.
+        phang = " ".join(van_ban.replace("*", "").split())
+        self.assertIn(khai["text"].replace("*", "").split("—")[0].strip(), phang)
+
+
 class TestTranDongHoCatOChanhGioiTask(unittest.TestCase):
     """`--max-usd` là điều kiện dừng duy nhất giao thức khai — và nó **trơ** với
     nhà cung cấp sau `mycombo`: `cost_usd = 0` ở mọi bước, nên trần chi phí
