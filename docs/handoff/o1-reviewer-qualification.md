@@ -159,6 +159,31 @@ says so in its docstring.
    lowercase in all four projects. The rates are therefore across clients. One
    cheap harness fix would settle it for the next pass: record client and model
    on `agent_run`.
+
+   **The harness fix landed 2026-09-14** (`0957ddb`), and the two halves of what
+   that does and does not buy have to be read together.
+
+   *Recorded now.* `observe.py` writes both onto the event, and the scorer splits
+   on them:
+
+   ```
+   grep -n '"model":\|"client": client' aisef/harness/observe.py
+   # → "model": (getattr(result, "model", "") or model),
+   # → "client": client,
+   grep -n 'client/model' aisef/control/reviewer_qual.py
+   # → Reviewer.engine is f"{client or '?'}/{model or '?'}"; report() emits a
+   #   per-engine table only when the corpus holds more than one, and otherwise
+   #   prints "Toàn corpus mang một `client/model`" instead of a column of `?/?`
+   ```
+
+   *Still not recorded.* The 145-session corpus this section measured carries
+   neither field, and nothing writes them retroactively. **Every rate in § The
+   measurement stays "across clients"** — the fix is forward-looking only, and
+   the report's own single-engine branch will say `?/?` on that corpus rather
+   than pretend it split. Re-measuring per client costs paid runs, not a
+   recompute; until someone pays for them, the false-block and miss rates above
+   are properties of the *ensemble* of whatever clients produced those four
+   corpora.
 6. `Finding.id` collapses only verbatim restatements (see the §1 correction
    below), so "355 findings declared" is a lower bound on restatement, and the
    174 lines the gate acted on were parsed by whichever harness version ran

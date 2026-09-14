@@ -142,20 +142,51 @@ the "unexpected state" branch.
 ## The four semantic issues (reconstructed 2026-09-12)
 
 **All four closed 2026-09-14.**  O1 — reviewer qualification scored over 145
-recorded sessions.  O2 — `Behaviour.gap_kind`, with the repair queue routed by
+recorded sessions.  O2 — `Behavior.gap_kind`, with the repair queue routed by
 kind.  O3 — the blast-radius weight calibrated, both error rates reported, left
 at 0 with the reason.  O4 — `aisef cost`, spend attributed to outcomes.  Each
 subsection below carries its own closure note and measurement; the statements of
 the issues are left as they were written so the reader can see what moved.
 
-O3 closed on 2026-09-14; its measurement is recorded below under *Closed — O3*.
-Three remain: O1, O2, O4.
+**Correction 2026-09-14 — this document broke its own rule.**  Two sentences in
+this section outlived the closures and contradicted the headline above.  Kept
+verbatim, because a correction that deletes the old text hides what moved:
+
+> O3 closed on 2026-09-14; its measurement is recorded below under *Closed — O3*.
+> Three remain: O1, O2, O4.
+
+> **Status 2026-09-14: O1 is closed with its measurement below; O2–O4 remain
+> open.**  The section heading still says four because that is the list as
+> reconstructed; the count of *open* items is three.
+
+Each was true when it was typed and stale by the time the next branch merged:
+the four closures landed from **parallel worktrees** on one day, so every
+sentence counting the survivors was counting a number only its own branch could
+see.  Neither holds now.  **Zero remain**, and the list this section's own rule
+demands is the four subsection headings below, all four marked CLOSED.  What
+settles it is code on disk, not this paragraph:
+
+```
+python3 -c "import aisef.control.reviewer_qual"                          # O1 → silent: the scorer exists
+python3 -c "from aisef.control.ledger import Behavior, gap_kind_counts"  # O2 → silent: kind + counts exist
+grep -n 'story.verified_touched_weight' aisef/config.py                 # O3 → 4 lines: default, type, and the range check
+python3 -m aisef.cli cost --help                                        # O4 → usage: aisef cost [-h] [--out OUT] [--project PROJECT]
+```
+
+Worth recording rather than quietly fixing: the rule holds only if something
+re-reads it, and nothing does.  Prose is the one tier in this repo with no
+guard.  The config-key count in `STABILITY.md` is pinned to `len(DEFAULTS)` by
+`tests/test_meta.py::TestConSoTrongTaiLieuKhopNguonDocDuoc` and cannot drift; a
+sentence of the form "three remain" is checked by nobody, and drifted twice in
+one day.
 
 **Provenance, stated plainly.** The pre-Phase-2 audit that produced "seven
 systemic issues" was never written to disk: neither this repository nor any
 reachable session transcript contains the list.  The three transactional ones
 are recoverable because they became code (findings, lease, budget).  The four
-semantic ones (O1, O2, O4 below and O3 under *Closed*) are a **reconstruction**
+semantic ones (O1–O4, each its own subsection below; this read "O1, O2, O4
+below and O3 under *Closed*" from `9244229` until 2026-09-14, naming a
+*Closed* section that never existed as a heading) are a **reconstruction**
 from evidence that *is* on disk — the owner
 decisions of 2026-09-06, the calibration note that pinned the neighbour weight
 to zero, the C11 conformance probe, and the cost figures in
@@ -168,9 +199,9 @@ must carry the list, on disk, in the same document.*
 Each item names the semantic question, why it had to wait for the transactional
 seams, and the measurement that closes it.
 
-**Status 2026-09-14: O1 is closed with its measurement below; O2–O4 remain
-open.**  The section heading still says four because that is the list as
-reconstructed; the count of *open* items is three.
+*(A status line stood here saying "O1 is closed with its measurement below;
+O2–O4 remain open".  It is quoted in full, with why it went stale, under the
+correction above.  All four are closed.)*
 
 ### O1 — the reviewer's verdicts are not themselves qualified — **CLOSED 2026-09-14**
 
@@ -278,12 +309,14 @@ that rule still lives in a decision record rather than in code.
 candidate to be trustworthy, which is what the SHA-bound checks and the nop
 control provide.
 
-*Closes when*: `Behaviour.gap_kind` exists with the three values, the repair
+*Closes when*: `Behavior.gap_kind` exists with the three values, the repair
 queue routes each kind to a different action (story / test-only story /
 harness metadata fix), and `aisef issues` reports the three counts separately.
 
-**Closed 2026-09-14** — `Behaviour.gap_kind` is a property projected from the
-reason sentence the ledger already writes, so `ledger.json` gains no
+**Closed 2026-09-14** — `Behavior.gap_kind` (spelled `Behaviour.gap_kind` in
+this section until 2026-09-14; the class on disk is `Behavior` —
+`grep -n '^class Behav' aisef/control/ledger.py`) is a property projected from
+the reason sentence the ledger already writes, so `ledger.json` gains no
 hand-writable field and rebuild-from-evidence still reproduces it.  Measured
 over 167 behaviours in four corpora: 40 `unbuilt`, 4 `untested`, 5 `untraced`.
 Those 5 are every criterion of one story whose test reporter was not installed —
@@ -407,7 +440,7 @@ artifact: it need not match what the story changed.  Until the predicate is
 behaviour-shaped, leave this weight at 0.
 
 
-### O4 — spend is attributed to calls, not to outcomes
+### O4 — spend is attributed to calls, not to outcomes — **CLOSED 2026-09-14**
 
 With reservations correct, the ledger can say what a run cost.  It still cannot
 say what the money bought.  The two dogfood corpora differ by a factor of

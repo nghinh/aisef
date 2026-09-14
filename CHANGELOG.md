@@ -370,6 +370,27 @@ three versions stale. Three claims that could not be settled from disk are
 labelled unverified with the measurement that would settle them — including that
 `run.log` never records which client a run used, which is worth fixing on its own.
 
+**A second docs pass, eight more drifts, and one of them was the rule's own
+document.** ADR-009 said three things at once about O1–O4: "All four closed",
+"Three remain: O1, O2, O4", and "O2–O4 remain open" — while being the document
+that states the rule *a statement of the form "N items remain" must carry the
+list, on disk, in the same document*. All four are closed, and each stale
+sentence was true when it was typed: the four closures merged from parallel
+worktrees inside one day, so every count of the survivors was a number only its
+own branch could see. Prose is the last tier here with no guard, which is why
+the same thing happened to the config-key count twice — 58 to 68 at 06:00, and
+stale at 06:04 when ADR-009 O3 added the 69th key from another worktree. Also
+corrected: both READMEs still listed the Serena write-scope limitation the
+roadmap had already retracted; ADR-007's header still said EXPERIMENTAL against
+its own frozen addendum; and two "cannot be settled from disk" items are now
+settled forward-only — `run.log` and `agent_run` record the client and the model
+since 1.6.0, which tells the *next* reader what produced a corpus and tells us
+nothing new about the 145 sessions already on disk. Two numbers were checked and
+deliberately **not** changed: the 68 in the 2026-09-12 assessment was correct at
+the SHA that section names, and V1-READINESS's conformance expiry was correct
+four hours before the table was refreshed. Dated measurements get a dated note,
+never a rewrite.
+
 **The benchmark is ready for its second column.** Correcting my own earlier
 framing: the real-model wiring already existed and had run twice — cohorts C-1
 and C-1b, both against real `9router/mycombo`, with deltas of −0.06 and +0.06.

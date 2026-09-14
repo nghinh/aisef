@@ -319,8 +319,19 @@ chứng minh (quyết định chủ đầu tư 2026-09-06, `docs/RELEASE-PLAN-v0
   "ngoài phạm vi", không phải "xong". `e9` chưa phải sản phẩm được nghiệm thu
   hoàn chỉnh; nó là corpus nghiệm thu của framework.
 - **OpenCode là client hạng nhất từ v1.0.0**: hợp quy 10/10 (ngang Claude,
-  xem ADR-006 §4). Hạn chế đã biết: OpenCode + Serena ghi `.serena/` ngoài
-  `write_scope` khai; harness từ chối đúng.
+  xem ADR-006 §4). *Mục này ghi một hạn chế đã biết — "OpenCode + Serena ghi
+  `.serena/` ngoài `write_scope` khai; harness từ chối đúng" — cho tới
+  2026-09-14. Hạn chế ấy đã đóng: `.serena` nằm trong `HARNESS_OWNED`, harness
+  không còn từ chối ghi chú của chính MCP server nữa.*
+
+  ```
+  python3 -c "from aisef.harness.guardrails import HARNESS_OWNED; print('.serena' in HARNESS_OWNED)"   # → True
+  git log --oneline -S'".serena"' -- aisef/harness/guardrails.py   # → ea4d035, phát hành ở v1.3.0
+  ```
+
+  Cái thay chỗ nó hẹp hơn: `HARNESS_OWNED` là danh mục cứng, không có khoá cấu
+  hình để mở, nên **công cụ kế tiếp** ghi ra ngoài danh mục ấy vẫn cần một commit
+  vào framework. Xem [ROADMAP-POST-1.0 § 3](docs/ROADMAP-POST-1.0.md).
 - **Agent trong container chưa có cách ly credential** (S1 blocked): V1 chạy
   agent trên host, chỉ kiểm định trong container; `doctor`/`pre-deploy` nêu
   tên bảo đảm thiếu, không im lặng.

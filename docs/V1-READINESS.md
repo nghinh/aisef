@@ -36,7 +36,7 @@ These need API keys and real project runs. Owner action required.
 
 | # | Condition | What to do |
 |---|---|---|
-| B1 | CONFORMANCE.md ≤ 14 days | `AISEF_CONFORMANCE=1 python3 -m unittest tests.conformance` — last run 2026-09-06, expires 2026-09-20 |
+| B1 | CONFORMANCE.md ≤ 14 days | `AISEF_CONFORMANCE=1 python3 -m unittest tests.conformance` — last run 2026-09-06, expires 2026-09-20. *Correct when written and left as written: the table was refreshed to 2026-09-08 four hours later the same day (`af827f4`, 12:21; this row was authored in `8095d9a`, 08:37), which moves the real expiry to **2026-09-22**. Same reason A7/A8 were left alone — this is a completed checklist, and the live expiry lives in [CONFORMANCE.md](CONFORMANCE.md) plus `aisef/control/conformance.py` `MAX_AGE_DAYS`, not here. Verified 2026-09-14.* |
 | B2 | `par` dogfood baseline | Run `par` (3 stories) on both clients, record cost/turns baseline in `tests/dogfood/` |
 | B3 | `e9` EPIC-01 complete | 4 remaining stories — **STORY-01-04, 01-05, 01-06, 01-07** — need real agent runs (~$40-60). *List added 2026-09-14 under the ADR-009 rule ("a statement of the form 'N items remain' must carry the list, in the same document"); the names come from [EXECUTION-PLAN R2](EXECUTION-PLAN.md), which already carried them.* |
 | B4 | Acceptance report | `aisef pre-deploy` after B3 completes |

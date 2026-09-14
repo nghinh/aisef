@@ -352,9 +352,21 @@ called unproven (owner decision 2026-09-06, `docs/RELEASE-PLAN-v0.1.0.md` §0):
   says "out of acceptance scope", not "done". `e9` is not a finished accepted
   product; it is the framework's acceptance corpus.
 - **OpenCode is a first-class client since v1.0.0**: conformance 10/10 (parity
-  with Claude, see ADR-006 §4). Known agent-side limitation: OpenCode + Serena
-  writes `.serena/` files outside declared `write_scope`; the harness correctly
-  rejects these.
+  with Claude, see ADR-006 §4). *This entry listed a known agent-side
+  limitation — "OpenCode + Serena writes `.serena/` files outside declared
+  `write_scope`; the harness correctly rejects these" — until 2026-09-14. It is
+  closed: `.serena` is inside `HARNESS_OWNED`, so the harness no longer rejects
+  an MCP server's own notes.*
+
+  ```
+  python3 -c "from aisef.harness.guardrails import HARNESS_OWNED; print('.serena' in HARNESS_OWNED)"   # → True
+  git log --oneline -S'".serena"' -- aisef/harness/guardrails.py   # → ea4d035, released in v1.3.0
+  ```
+
+  What replaced it is narrower: `HARNESS_OWNED` is a hard-coded inventory with
+  no config escape hatch, so the *next* tool that writes outside it needs
+  another framework commit. See
+  [ROADMAP-POST-1.0 § 3](docs/ROADMAP-POST-1.0.md).
 - **An agent inside a container still has no credential isolation** (S1): V1
   runs the agent on the host and only the verification suite in a container;
   `doctor` and `pre-deploy` name the missing guarantees instead of staying
