@@ -389,6 +389,24 @@ red and discarded the green that followed it in the same loop (green on an
 unlanded candidate returns early).  That is a defect in the requirement rollup,
 not a regression, and not O3 — it is recorded here for whoever takes O2.
 
+**Correction (2026-09-14, bug 155 — the rollup defect is now fixed).**  The
+paragraph above stands as what the measurement saw; what it filed as an artifact
+was a real defect, and it has been repaired.  `_observe_tests` now judges a
+requirement **once per test run** instead of once per story that covers it:
+several stories may cover the same `FR-x`, and the requirement is green when any
+story judged in that run has all its criteria green, so an absence in a later
+story's own criteria can no longer erase evidence another story left in the same
+event.  The absence keeps being recorded where it belongs — on that story's
+criterion, as `untested`.  Re-running `validation/o3_preservation_radius.py`
+unchanged: uncorroborated `REOPENED` entries **29 → 4** (todo-oc 5→0, todo-cli
+5→0, todo-e2e 15→0, todo 4→4), while the 15 confirmed regressors and every number
+in the calibration table below are unchanged — the fix removes false regressions
+without inventing true ones.  The 4 that remain are one instant in `todo`
+(STORY-02-02) where the runner never started (`tool not installed or cannot
+load`), so no test name existed for any story: a different absence (`untraced`),
+and a separate decision about whether a run that read nothing may flip a VERIFIED
+requirement at all.
+
 **The calibration.** 32 scored stories, 15 confirmed regressors, 17 clean.
 Blocked = the story's score crosses `story.max_complexity` (16.0) once the
 neighbour dimension is weighted.

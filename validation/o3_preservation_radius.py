@@ -30,6 +30,9 @@ Three inputs per corpus, all recorded:
    a regression: measured on todo-cli STORY-06-01, five requirements flipped to
    REOPENED while the run was 65/65 green, because that story `covers` the same
    requirements as three earlier ones and had one criterion without a test.
+   That was a defect in the requirement rollup, fixed 2026-09-14 (bug 155): this
+   script is unchanged and now reports **4** uncorroborated entries instead of 29,
+   all four one `todo` instant where the runner never started.
 
 Usage:
     python3 validation/o3_preservation_radius.py [--counts] [corpus_dir ...]
