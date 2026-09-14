@@ -1,6 +1,6 @@
 # Hướng dẫn sử dụng AISEF
 
-[Bộ nhớ dài hạn thử nghiệm](MEMORY.md): `aisef memory` mặc định TẮT. Hướng dẫn gồm cấu hình, CLI, nguồn/phạm vi, bảo mật và giới hạn benchmark; bộ nhớ không phải bằng chứng cho cổng. Tham khảo: [nghiên cứu/kế hoạch](MEMORY-RESEARCH-PLAN.md), [báo cáo kiểm thử](MEMORY-VALIDATION.md), [ADR-007](ADR-007-scoped-advisory-memory.md).
+[Bộ nhớ dài hạn — **ĐÓNG BĂNG**, mặc định TẮT](MEMORY.md): từ phụ lục ADR-007 ngày 2026-09-12, `aisef memory` không còn là "thử nghiệm, sắp có" mà là **đóng băng**: code còn đó và vẫn được sửa lỗi/lỗ bảo mật, nhưng **không thêm năng lực mới**. Rã băng cần một yêu cầu từ bên ngoài, **hoặc** một phép đo có đối chứng cho thấy một lỗi lặp lại mà bộ nhớ hẳn đã ngăn được. Bộ nhớ **không** phải bằng chứng cho cổng. Tham khảo: [nghiên cứu/kế hoạch](MEMORY-RESEARCH-PLAN.md), [báo cáo kiểm thử](MEMORY-VALIDATION.md), [ADR-007](ADR-007-scoped-advisory-memory.md).
 
 **AISEF** là viết tắt của **AI Software Engineering Framework**. Gói cài, module
 Python và lệnh gõ đều tên `aisef`.
@@ -56,8 +56,11 @@ Vì thế có **hai loại cổng**:
 - **Cổng máy**: code chấm, không hỏi ai. Ví dụ "mọi yêu cầu phải có story phủ",
   "không được ghi ra ngoài phạm vi", "test phải xanh sau lần sửa cuối". Máy
   chấm xong mới tới người.
-- **Cổng người**: bạn đọc và ký. Có **tám** cổng, theo đúng thứ tự:
+- **Cổng người**: bạn đọc và ký. Có **tám** cổng trên đường tới phát hành, theo
+  đúng thứ tự:
   `prd → architecture → ux-spec → epics → stories → mockups → readiness → pre-deploy`.
+  (Còn một cổng thứ chín, `improve`, không nằm trên đường ấy: nó hỏi trước mỗi
+  vòng cải tiến — [§13](#13-vòng-cải-tiến-và-thay-đổi-sau-phát-hành).)
 
 Phê duyệt là **trạng thái trên đĩa**, không phải câu trả lời trong một phiên
 chat. Nó gắn với **băm nội dung** của tài liệu: sửa tài liệu sau khi duyệt thì
@@ -149,10 +152,18 @@ Hai điều `doctor` nói ngay ở lần chạy đầu và **nên đọc kỹ**:
 
 Số khoá `init` ghi vào `.ai/config.json`: **4** (`tools.test`, `tools.lint`,
 `sandbox.image`, `sandbox.allow_hosts`), trong đó **1 khoá bắt buộc khai** là
-`tools.test`. Bản **1.3.0 trên PyPI ghi cả 68 khoá**; đã sửa từ **1.3.1** và
-đo lại trên `1.5.0` ngày 2026-09-14 — `aisef --project <dir> init --stack python`
-ghi đúng 4 khoá ấy. (Câu này từng nói "sẽ có ở bản kế"; ba bản đã ra từ đó.) Xem
-[§6](#6-cấu-hình-aiconfigjson).
+`tools.test`. Bản **1.3.0 trên PyPI ghi cả 68 khoá** — đúng bằng toàn bộ số khoá
+mặc định *của bản 1.3.0*, đây là câu về **quá khứ**, không phải con số hiện tại
+(1.6.0 có **69** khoá, xem [§17](#17-tra-cứu-toàn-bộ-khoá-cấu-hình)). Đã sửa từ
+**1.3.1** và đo lại trên `1.6.0` ngày 2026-09-14:
+
+```bash
+aisef --project <dir> init --stack python
+python3 -c "import json;print(list(json.load(open('<dir>/.ai/config.json'))))"
+# → ['tools.test', 'tools.lint', 'sandbox.image', 'sandbox.allow_hosts']
+```
+
+Xem [§6](#6-cấu-hình-aiconfigjson).
 
 Bản dành cho người muốn sửa framework:
 
@@ -218,6 +229,53 @@ Ba lời khuyên cho tệp này:
    khó phàn nàn về sau.
 3. **Đừng viết thiết kế.** Đừng mô tả bảng cơ sở dữ liệu hay tên hàm; đó là
    việc của bước kiến trúc.
+
+### Dự án **đã có code**: chạy `aisef baseline` trước
+
+Bước lập kế hoạch chỉ đọc `docs/requirements.md` và **không đọc gì khác**. Trong
+một thư mục đã có code, nó vì thế lập kế hoạch như thư mục trống. Đo trên một đợt
+chạy thật: story đầu tiên là "Initialize Node.js project structure", với một tiêu
+chí mở đầu bằng "Given a fresh directory with no files", cho một kho mà
+`package.json` đã có sẵn đúng mọi trường tiêu chí ấy đòi. Test của nó xanh ngay ở
+điểm nhánh, đối chứng nop từ chối đúng, và **ba lượt thử cùng mười tám phiên agent**
+đi vào việc đã xong rồi.
+
+Vì thế `aisef plan` cảnh báo trước khi tiêu tiền:
+
+```
+⚠️  this project already has files (…) and there is no `_bmad-output/baseline.md`.
+   Planning reads only `docs/requirements.md`, so it will write stories for work
+   that may already exist.
+   Build the baseline first:  aisef baseline
+```
+
+Lệnh này đọc code hiện có và ghi `_bmad-output/baseline.md` cho bước lập kế hoạch.
+Nó **không gọi model** — toàn bộ là code, nên không tốn tiền và chạy trong vài giây:
+
+```bash
+aisef baseline                  # dự án đã có code
+aisef baseline --force          # bắt dựng baseline cả khi dự án trông như trống
+aisef baseline --incremental    # cập nhật đồ thị, không dựng lại baseline
+```
+
+Đầu ra thật trên corpus dogfood `todo-cli`:
+
+```
+Baseline: 13 source · 6 test · config: package.json · langs: js(13)
+  provider: basic
+  wrote: .../_bmad-output/baseline.md
+  103 lines
+```
+
+Dự án trống thì nó **từ chối và chỉ đúng chỗ**, không dựng một baseline rỗng:
+
+```
+Greenfield: 0 source files — use `aisef plan` instead of `aisef baseline`.
+  (use --force to build baseline even for greenfield)
+```
+
+`--provider graphify|basic|auto` chọn bộ dựng đồ thị mã; `auto` (mặc định) dùng
+Graphify nếu có, `basic` nếu không. `basic` chỉ dùng thư viện chuẩn.
 
 ---
 
@@ -330,7 +388,7 @@ Toàn bộ khoá có ở [§17](#17-tra-cứu-toàn-bộ-khoá-cấu-hình).
 aisef compile
 ```
 
-Sinh hook/plugin cho client, tức là nối **tám guard** của framework vào phiên
+Sinh hook/plugin cho client, tức là nối **mười guard** của framework vào phiên
 agent. Guard chạy ở phía framework, không phía client — client không được tin.
 
 | Lúc nào | Guard | Chặn gì |
@@ -341,21 +399,123 @@ agent. Guard chạy ở phía framework, không phía client — client không �
 | | `git-stage` | tự ý stage/commit ngoài luồng |
 | | `injection` | nội dung có chỉ dẫn tiêm vào agent |
 | | `process-ref` | viết mã story/epic vào mã nguồn |
+| | `egress` | kết nối tới host không khai trong `sandbox.allow_hosts` (`localhost` luôn được miễn). **Danh sách rỗng = không kiểm gì** — mặc định là rỗng |
+| | `tool-bypass` | chạy thẳng lệnh test/lint/sast của dự án thay vì qua `aisef tool` |
 | sau mỗi tool | `diff-scope` | thay đổi thực tế vượt phạm vi |
 | khi agent định dừng | `completion` | dừng khi test chưa xanh sau lần sửa cuối |
 
-Cuối lệnh nó in một báo cáo năng lực, ví dụ:
+Đây là danh sách máy in ra, không phải danh sách viết tay:
+
+```bash
+python3 -c "from aisef.harness.guardrails import GUARD_MATCHERS; print(len(GUARD_MATCHERS), sorted(GUARD_MATCHERS))"
+# → 10 ['completion', 'destructive', 'diff-scope', 'egress', 'git-stage',
+#       'injection', 'process-ref', 'secret', 'tool-bypass', 'write-scope']
+```
+
+Đầu ra thật của `aisef compile` trên một dự án vừa `init`, có cả hai client:
 
 ```
-  năng lực không đạt mức native:
+client: claude
+  wrote .../.claude/settings.json
+  guards blocking before action: destructive, egress, git-stage, injection, process-ref, secret, tool-bypass, write-scope
+  guards blocking at other hooks: completion (Stop), diff-scope (PostToolUse)
+client: opencode
+  second-tier in V1: cost/turns not measurable from harness — supported, does not block release
+  wrote .../.opencode/plugin/aisef-guard.ts
+  guards blocking before action: destructive, egress, git-stage, injection, process-ref, secret, tool-bypass, write-scope
+  guards blocking at other hooks: diff-scope (PostToolUse)
+  ⚠️  guards post-hoc only: completion
+     — not wired into this client's hooks at all; the rule is re-asked afterwards from evidence (story gate, `aisef verify`), which cannot stop the action, only fail the story
+  capabilities not at native level:
      dir_allowlist: unsupported
      tool_allowlist: emulated
      turn_limit: unsupported
 ```
 
-Đây **không phải lỗi**. Nó nói: client này không tự giới hạn được vài thứ, nên
-framework ghi đúng mức bảo đảm nó đạt được thay vì giả vờ. Guard chính (chặn
-ghi sai phạm vi, chặn lệnh phá huỷ) vẫn chạy.
+Hai điều đáng đọc kỹ trong khối trên:
+
+- **`capabilities not at native level`** không phải lỗi. Nó nói: client này không
+  tự giới hạn được vài thứ, nên framework ghi đúng mức bảo đảm nó đạt được thay
+  vì giả vờ. Guard chính (chặn ghi sai phạm vi, chặn lệnh phá huỷ) vẫn chạy.
+- **Trên OpenCode chỉ 9 trong 10 guard chặn tại nguồn.** API plugin của OpenCode
+  không có chỗ chặn tương đương `Stop`, nên `completion` chỉ được hỏi lại **sau**
+  từ bằng chứng: nó không ngăn được hành động, chỉ làm story trượt. Vì thế
+  `blocks_at_source` trong `compile-report.json` báo `false` cho OpenCode — cờ ấy
+  nghĩa là *tất cả* đều chặn tại nguồn, không phải *phần lớn*.
+
+### `tool-bypass`: vì sao có guard này
+
+Guard mới ở 1.6.0, và là guard dễ làm người dùng bối rối nhất, nên nó cần lý do
+cụ thể. Trên `todo-cli`, qua **mười phiên liên tiếp**, agent gõ `npm test` mười
+lần và `aisef tool test` **không lần nào**. Mọi sự kiện `test` trong bằng chứng
+của story vì thế đến từ lượt kiểm của chính framework — một lần chạy xanh cho mỗi
+ứng viên — nên phép "đỏ trước xanh sau" **không có gì để so**, và mục cổng `TDD`
+trượt mười phiên liền trên một bản cài đặt vốn đã chạy được.
+
+Luật mà chỉ prompt nói thì không phải luật. Guard nói ra đúng lệnh cần dùng:
+
+```bash
+python3 -c "
+from aisef.harness.guardrails import check_tool_bypass
+d = {'test': 'npm test', 'lint': 'npx eslint .'}
+for c in ['npm test', 'npx eslint src/notes.js', 'git status']:
+    v = check_tool_bypass(c, d)
+    print(('ALLOW' if v.allowed else 'BLOCK'), '|', c)
+"
+# → BLOCK | npm test
+# → ALLOW | npx eslint src/notes.js
+# → ALLOW | git status
+```
+
+Lý do nó trả về khi chặn:
+
+```
+`npm test` is the project's test command run directly, so nothing about it is
+recorded — and the gate reads evidence, not claims. Run `aisef tool test`
+instead: it runs the same command and records the result, which is what the
+`TDD`, `test` and `coverage` checks read. Narrowing a run for debugging (extra
+arguments, a single file) is not blocked.
+```
+
+**Thu hẹp một lần chạy để gỡ lỗi thì không bị chặn** — chạy một tệp hay một tên
+test là gỡ lỗi, không phải một khẳng định về cả bộ test, và ghi một tập con vào
+bằng chứng dưới nhãn `test` sẽ làm một phần bộ test trông như cả bộ đã xanh.
+
+Cách nhận diện "thu hẹp" phụ thuộc hình dạng lệnh bạn khai, và đây là chỗ dễ
+ngạc nhiên — đo trên chính hàm ấy:
+
+```bash
+python3 -c "
+from aisef.harness.guardrails import check_tool_bypass
+for d, cs in [({'test': 'python -m pytest -v'},
+               ['python -m pytest -v', 'python -m pytest -v tests/test_notes.py']),
+              ({'test': 'npm test'},
+               ['npm test', 'npm test -- tests/notes.test.js'])]:
+    for c in cs:
+        print(('ALLOW' if check_tool_bypass(c, d).allowed else 'BLOCK'), '|', c)
+"
+# → BLOCK | python -m pytest -v
+# → ALLOW | python -m pytest -v tests/test_notes.py
+# → BLOCK | npm test
+# → BLOCK | npm test -- tests/notes.test.js
+```
+
+Với lệnh gọi thẳng (`pytest`, `npx vitest run …`) thì thêm đối số là một lệnh
+khác và được cho qua. Với `npm`/`pnpm`/`yarn`/`bun` thì **tên script chính là danh
+tính** của lệnh, nên `npm test -- <tệp>` vẫn bị chặn. Muốn chạy hẹp trên dự án
+npm thì gọi trực tiếp runner (`npx vitest run src/notes.test.ts`), đừng qua script.
+
+Guard này chỉ áp dụng khi **có mã story** trong phiên. Phiên rà soát cố ý không
+có mã story — `aisef tool test` cũng sẽ không ghi được gì cho nó — nên
+`tool-bypass` không nổ trong phiên rà soát.
+
+Một chi tiết đi kèm: `aisef tool test` **ngoài** một phiên story trước đây chạy
+lệnh rồi không ghi gì mà vẫn in như một lần chạy đã ghi. Từ 1.6.0 nó nói rõ:
+
+```
+⚠️  not recorded as evidence: no story id — pass `--story <id>`
+    (the harness sets AISEF_STORY_ID inside a story session)
+```
 
 Chạy `aisef compile` lại mỗi khi nâng cấp gói.
 
@@ -370,7 +530,8 @@ aisef doctor
   chỉ ảnh hưởng dự án có giao diện.
 - `✗` — thiếu thứ **bắt buộc**; dòng cuối sẽ nói `✗ thiếu: …`.
 
-Dòng cuối cùng là kết luận: `✅ sẵn sàng` hoặc danh sách thứ còn thiếu.
+Dòng cuối cùng là kết luận: `✅ ready` hoặc danh sách thứ còn thiếu. (CLI in
+tiếng Anh — hướng dẫn này là tiếng Việt, màn hình thì không.)
 
 ---
 
@@ -390,7 +551,15 @@ cổng người kế tiếp:
 | `architecture` | `architecture.md` | `architecture` |
 | `ux` | `DESIGN.md`, `EXPERIENCE.md` | `ux-spec` |
 | `epics` | `epics.md` | `epics` |
-| `stories` | `stories.index.json` + mỗi story một tệp | `stories` |
+| (chẻ story — code, không phải phiên agent) | `stories.index.json` + mỗi story một tệp | `stories` |
+
+Năm pha là năm phiên agent; dòng cuối bảng **không** phải pha thứ sáu — nó là bước
+chẻ story do code làm, không tốn tiền:
+
+```bash
+python3 -c "from aisef.phases.plan import PHASES; print([p.id for p in PHASES])"
+# → ['project-context', 'prd', 'architecture', 'ux', 'epics']
+```
 
 Mọi tệp nằm trong thư mục `_bmad-output/` của dự án.
 
@@ -403,18 +572,23 @@ aisef gates
 Bảng hiện tám cổng, ví dụ ở một dự án vừa tạo:
 
 ```
-  ⏳ prd            pending              [thiếu: prd.md]
-  ⏳ architecture   pending              [thiếu: architecture.md]
-  ⏳ ux-spec        pending              [thiếu: DESIGN.md, EXPERIENCE.md]
-  ⏳ epics          pending              [thiếu: epics.md]
-  ⏳ stories        pending              [thiếu: stories.index.json]
-  ⏳ mockups        pending              [thiếu: design-contract.json]
-  ⏳ readiness      pending              [thiếu: stories.index.json, design-contract.json]
-  ⏳ pre-deploy     pending              [thiếu: pre-deploy-report.json]
+Approval gates — <dự án>/_bmad-output
 
-Cổng kế tiếp cần xử lý: prd
+  ⏳ prd            pending              [missing: prd.md]
+  ⏳ architecture   pending              [missing: architecture.md]
+  ⏳ ux-spec        pending              [missing: DESIGN.md, EXPERIENCE.md]
+  ⏳ epics          pending              [missing: epics.md]
+  ⏳ stories        pending              [missing: stories.index.json]
+  ⏳ mockups        pending              [missing: design-contract.json]
+  ⏳ readiness      pending              [missing: stories.index.json, design-contract.json]
+  ⏳ pre-deploy     pending              [missing: pre-deploy-report.json]
+
+Next gate to handle: prd
   aisef review prd
 ```
+
+Lệnh này trả **mã thoát 2** khi còn cổng chưa đạt — đúng như [§15](#15-xử-lý-sự-cố)
+nói, `2` nghĩa "chưa sẵn sàng", không phải lỗi.
 
 Bốn trạng thái: `pending` (chờ), `approved` (đã duyệt), `stale` (đã duyệt nhưng
 tài liệu đổi sau đó, hoặc tầng trên vừa duyệt lại), `changes_requested` (bạn đã
@@ -513,7 +687,16 @@ nghĩa **khác nhau**, và chỉ hai trong số đó chặn:
 | ◇ | WAIVED | người miễn tường minh, có lý do ghi lại | không |
 | – | NOT_APPLICABLE | không áp dụng (story không có giao diện…) | không |
 
-Các mục cổng bạn sẽ gặp nhiều nhất:
+Cổng story có **16 mục**, và mỗi mục được chứng nhận bằng **ba** đối chứng
+(`positive` — nó có bắt được lỗi thật; `negative` — nó không báo động giả;
+`env` — nó nói thật khi không chạy được), tức 48 ô chứng nhận:
+
+```bash
+python3 -c "from aisef.control.gate import qualification_table, CONTROLS; t=qualification_table(); print(len(t), CONTROLS, len(t)*len(CONTROLS))"
+# → 16 ('positive', 'negative', 'env') 48
+```
+
+Đủ 16 mục, theo đúng thứ tự chúng in ra:
 
 | Mục | Nó hỏi gì |
 |---|---|
@@ -526,16 +709,62 @@ Các mục cổng bạn sẽ gặp nhiều nhất:
 | `map mockup` | màn hình thật có khớp hợp đồng thị giác không |
 | `test thật` | có test nào rỗng khẳng định không |
 | `tiêu chí có test` | mỗi tiêu chí chấp nhận có test mang mã của nó không |
+| `coverage` | coverage có đạt `coverage.min` không |
+| `TDD` | có test đỏ trước khi có code làm nó xanh không |
 | `test có kiểm được story` | test ấy có **thật sự** kiểm phần story vừa viết không, hay chỉ gắn mã vào test cũ |
-| `rà soát` | phiên rà soát độc lập có mục chặn nào không |
+| `<loại>` | loại kiểm định story tự khai (e2e, accessibility…) có đạt không |
 | `bảo mật` | phiên rà soát bảo mật có phát hiện mức cao không |
+| `rà soát` | phiên rà soát độc lập có mục chặn nào không |
 | `bảo toàn` | hành vi của story khác có bị story này làm hỏng không |
+
+Trong 16 mục, **15 là máy chấm** (8 mục tất định, 6 mục cấu trúc, 1 mục bảo mật);
+`rà soát` là mục **duy nhất** do model phán đoán. Điều đó quan trọng — xem ngay
+dưới đây.
 
 Mục `test có kiểm được story` hay làm người mới bối rối. Nó tồn tại vì một
 cách gian dễ gặp: gắn mã tiêu chí vào một test **đã xanh từ trước** rồi bảo
 "tiêu chí đã có test". Framework chạy một đối chứng: nếu test ấy vẫn xanh khi
 chưa có phần cài đặt của story thì nó không chứng minh gì, và mục cổng ✗ kèm
 tên test.
+
+Từ 1.6.0, mục `TDD` **không còn chặn thứ mà đối chứng nop đã cho qua**: "đỏ trước
+xanh sau" chỉ là phép đo gián tiếp cho câu hỏi "test này có kiểm được story
+không", và đối chứng nop hỏi thẳng câu ấy. Khi nop đạt thì `TDD` đạt, kèm tên
+bằng chứng đã chứng minh. Khi nop ra ⚠ / – / ○ thì nó chưa trả lời được, nên
+`TDD` vẫn tự đứng.
+
+### Mục `rà soát` **không** phải lưới an toàn
+
+Đây là mục duy nhất một model phán đoán, và từ 1.6.0 chính nó cũng bị đem ra đo
+bằng đúng ba đối chứng như các mục máy — 6 lớp phán đoán × 3 đối chứng = 18 ô nữa:
+
+```bash
+python3 -c "from aisef.control.reviewer_qual import qualification_table as q, CLASSES; print(len(q()), len(CLASSES)*3, CLASSES)"
+# → 6 18 ('clean pass', 'miss', 'block corroborated', 'block uncorroborated', 'false block', 'undecided')
+```
+
+Số đo trên **145 phiên rà soát đã ghi** của bốn dự án dogfood — chấm lại bất cứ
+lúc nào, không gọi model, không tốn tiền:
+
+```bash
+python3 -m aisef.control.reviewer_qual <dự-án-1>/_bmad-output <dự-án-2>/_bmad-output …
+# → false block rate: 0.1053      (6 trong 57 lần chặn — đây là **sàn**, không phải ước lượng)
+# → miss rate: 0.3857             (27 trong 70 lần cho qua; đọc nghiêm ngặt thì 34,3 % → nói thật là **34–39 %**)
+# → undecided share: 0.1241       (không bao giờ được tính là "đạt")
+# → same-tree consecutive pairs: 20
+# → same-tree verdict reversals: 11
+```
+
+Đọc thẳng: **người rà soát bỏ sót 34–39 % ứng viên có lỗi**, và trên **20 lần rà
+soát liên tiếp cùng một cây code y hệt nhau, 11 lần nó đổi kết luận**. Chặn sai
+10,5 % là **sàn** — con số thật cao hơn, chỉ là phần còn lại không chứng minh được
+từ bằng chứng trên đĩa.
+
+Kết luận thực dụng cho bạn: **thứ giữ chất lượng là 15 mục máy chấm, không phải
+mục `rà soát`.** Một `rà soát` ✅ không có nghĩa code đúng; một `rà soát` ✗ có
+khoảng một phần mười khả năng là báo động giả. Nếu bạn đang tin cổng rà soát như
+một lưới an toàn thì bạn đang tin sai chỗ — hãy khai đủ `tools.test`,
+`tools.lint`, `verify.*` và `coverage.min`, vì đó là phần đo được.
 
 ---
 
@@ -571,23 +800,44 @@ Xem tiến độ và chi phí bất cứ lúc nào (lệnh này **không** tốn
 aisef status
 ```
 
-Dự án chưa chạy story nào thì nó nói thẳng `Chưa có story nào được đăng ký.`
-Dự án đang chạy thì nó in dạng:
+Dự án chưa chạy story nào thì nó nói thẳng `No stories registered.` Dự án đã chạy
+thì nó in dạng dưới đây — đây là đầu ra thật trên corpus dogfood `todo-cli`, đã
+cắt cho gọn:
 
 ```
-Tiến độ: 10/12 story xong
-Epic hiện tại: EPIC-RP-01
+Progress: 7/13 stories done (2 not started)
+Active epics: EPIC-03, EPIC-04, EPIC-05, EPIC-06
 
-  done        10
-  failed      2
+  done        7
+  failed      4
 
-Chi phí: $254.11
-⚠️  1 story tốn hơn 3.0× trung vị:
-    STORY-01-04      $79.67
+Cost: $0.00
+Agent runs: ok 150 · infra 12 · max_turns 3
 
-✗ 2 story chưa qua được:
-    STORY-RP-04      failed   đã thử 3 lần vẫn không qua cổng
+✗ 4 stories not passing:
+    STORY-03-02      failed   deadlock due to plan: criteria AC-STORY-03-02-1, … are
+                              already satisfied at the branch point — their tests pass
+                              with the story's code absent, and a second session
+                              confirmed it. Either another story already shipped this
+                              behaviour (check the epic index) or the criteria describe
+                              something the code already does. … fix the criteria or
+                              drop the story, then re-run.
+    STORY-05-02      failed   sessions kept producing nothing to grade: the session
+                              wrote nothing (8 turns) — the tree is exactly as the
+                              session found it, so the gate has nothing to grade.
+                              Re-running it would return the verdict it already returned.
 ```
+
+Ba dòng cần biết cách đọc:
+
+- **`Cost: $0.00` không có nghĩa là miễn phí.** Nó có nghĩa nhà cung cấp không báo
+  giá cho phiên nào. Muốn biết tiền đi đâu thì dùng `aisef cost` ([§14](#14-chi-phí-thật-và-cách-giảm)).
+- **`Agent runs: ok 150 · infra 12 · max_turns 3`** chẻ riêng ba loại phiên: chạy
+  xong, phiên mất vì client (502, rate limit, lời gọi tool CLI không đọc được), và
+  phiên hết trần lượt. Chúng có cách xử khác nhau — xem ngay dưới.
+- **Lý do trượt bây giờ nói ra chẩn đoán, không chỉ "đã thử 3 lần"** — `deadlock due
+  to plan` và `sessions kept producing nothing to grade` là hai chẩn đoán mới ở
+  1.6.0, và cả hai đều nói **bạn** phải sửa gì.
 
 **Khi một story trượt**, làm theo thứ tự này:
 
@@ -612,7 +862,71 @@ Rồi phân loại:
   tiêu chí mâu thuẫn): sửa `_bmad-output/stories.index.json` và tệp story, duyệt
   lại cổng `stories`, rồi chạy lại.
 
+  Từ 1.6.0 framework **tự nhận ra và dừng sớm** dạng bế tắc phổ biến nhất thay vì
+  đốt hết ngân sách: hai lượt chấm liền trượt `test có kiểm được story` trên cùng
+  bộ tiêu chí thì nó dừng story ngay với chẩn đoán `deadlock due to plan` và nêu
+  tên từng tiêu chí. Nguyên nhân gần như luôn là **một story trước đã làm xong
+  hành vi ấy** — không test nào viết cho nó có thể đỏ ở điểm nhánh nữa. Sửa hoặc bỏ
+  tiêu chí, đừng thử lại. (Đo trên một đợt chạy sáu epic: 4 trong 13 story chết vì
+  đúng lý do này, nhiều hơn mọi nguyên nhân khác cộng lại.)
+
+  Đi kèm: `aisef plan` bây giờ **cảnh báo** khi hai story trong cùng một epic khai
+  y hệt một `write_scope` — chỉ cảnh báo, không chặn, vì chẻ một tệp thành hai
+  story đôi khi là đúng. Và cổng `stories` **chặn** story nào có **không** tiêu chí
+  nào, hoặc tiêu chí chỉ mô tả một bản nháp/giàn giáo ("not implemented"): một
+  story như thế không nhỏ, nó là story **không kiểm được**.
+
+  Còn một chuyện đáng biết khi bạn sửa tiêu chí: nhánh của lượt trước bị **bỏ**, và
+  `run.log` nói ra. Framework lấy dấu tay của bộ tiêu chí mỗi lần chạy; tiêu chí
+  đổi thì các commit cũ đang trả lời một câu hỏi không còn được hỏi nữa.
+  `--verify-only` được miễn — nó chấm đúng ứng viên đang có.
+
+- **Phiên không viết gì** (`sessions kept producing nothing to grade`): đây là một
+  **quyết định**, không phải một lần chạy hỏng. Mở lại phiên với đúng ngữ cảnh ấy
+  thì nó trả về đúng quyết định ấy, nên hai phiên không-viết-gì liên tiếp sẽ dừng
+  story. Đọc `aisef evidence <story>` để biết nó thấy gì, rồi sửa kế hoạch.
+
+- **Phiên hết trần lượt** (`max_turns` trong dòng `Agent runs`): từ 1.6.0 nó
+  **được chấm** nếu có commit trong worktree, thay vì bị coi là phiên hỏng. Hết
+  *lượt* không đồng nghĩa với viết code tệ — cổng sẽ nói; việc dở dang vẫn trượt
+  `test`, `tiêu chí có test`, đối chứng nop và rà soát. Trước 1.6.0 những phiên này
+  ăn hết ngân sách chất lượng mà không để lại kết luận cổng nào, nên lượt sau không
+  có phản hồi gì để đọc.
+
+- **Phiên mất vì client** (`infra` trong dòng `Agent runs`): 502, rate limit, lời
+  gọi tool CLI không đọc được. Chúng không chấm điểm gì nên không tiêu tốn
+  `run.max_retries`, nhưng **trước 1.6.0 chúng dùng chung ngân sách ấy** — chịu
+  đựng một client hay rớt phiên đồng nghĩa với phải trả tiền cho thêm lượt chất
+  lượng. Bây giờ có `run.infra_retries` riêng; mặc định `-1` giữ đúng cách ghép cũ.
+  Chỉ nên tăng khi bạn **đã đo** tỉ lệ rớt phiên của client mình (đo được trên
+  OpenCode/mycombo ngày 2026-09-13: 22–32 %).
+
 - **Trượt vì code sai**: để framework thử lại, hoặc chạy vòng cải tiến ở [§13](#13-vòng-cải-tiến-và-thay-đổi-sau-phát-hành).
+
+Muốn biết mục cổng nào sẽ **đổi kết cục** nếu chấm lại bằng luật hiện tại — hữu ích
+sau khi nâng cấp gói — thì dùng `aisef replay` (không gọi model, không tốn tiền):
+
+```bash
+aisef replay STORY-01-02
+```
+
+```
+replay: re-score gate rules (gate.evaluate from current code) on recorded evidence
+        and reviewer/security findings — no model calls
+
+STORY-01-02 attempt 2 · candidate 4bf26de · recorded: FAIL · now: PASS
+  check                            | recorded | now
+  ...
+  TDD                              |   ✗    | ✅ ≠
+  tests verify story               |   ✅    | ✅
+  ...
+  diff: TDD
+```
+
+Dấu `≠` là chỗ luật đã đổi. Ví dụ trên là thật, lấy từ `todo-cli`: lượt ấy từng
+trượt vì `TDD`, và luật 1.6.0 (nop đạt thì `TDD` đạt) cho nó qua. `aisef replay
+--all` chấm lại mọi story có bằng chứng; `aisef gate <story> --replay` là lối vào
+tương đương.
 
 Muốn xem agent đang được cho những gì:
 
@@ -637,6 +951,21 @@ Chạy toàn bộ loại kiểm định đã khai: `unit`, `sit`, `api-contract`
 aisef qa --only unit,e2e             # chạy vài loại
 aisef qa --story STORY-01-03         # ghi bằng chứng cho một story
 ```
+
+Một trường hợp hay gặp và trước 1.6.0 bị báo sai: bạn khai
+`verify.accessibility = "npx playwright test --grep @a11y"` nhưng chưa story nào
+viết test `@a11y`. Lệnh ấy chạy được và **không tìm thấy test nào** — đó không
+phải một test trượt. Bây giờ nó ra ⚠ (không chạy được) kèm lý do nêu cả hai khả
+năng, chứ không còn báo mọi story là accessibility đã trượt:
+
+```
+the command matched no tests — it started and found nothing to run, which is not
+a failing test. Either no story has written tests of this kind yet, or the
+selector in the configured command matches nothing
+```
+
+⚠ vẫn **chặn** story — đó là kết cục trung thực: "chưa cấu hình ≠ đạt" và
+"không chạy được ≠ trượt" là hai câu khác nhau, và cả hai đều không phải ✅.
 
 Sinh tạo tác vận hành:
 
@@ -702,6 +1031,51 @@ liền không cải thiện, vượt trần chi phí, hoặc story sửa bế t�
 Trước mỗi vòng từ thứ hai, framework dừng lại hỏi bạn (`aisef approve improve`);
 thêm `--auto` để không dừng.
 
+### Một GAP nói rõ **loại vắng mặt** của nó (mới ở 1.6.0)
+
+"GAP" từng là một nhãn duy nhất cho ba tình huống có giá tiền rất khác nhau. Từ
+1.6.0 mỗi hành vi không-xanh mang thêm một `gap_kind`:
+
+| `gap_kind` | Nghĩa | `improve` làm gì |
+|---|---|---|
+| `unbuilt` | không có gì đã hạ cánh chứng minh được hành vi: test đỏ, test xanh trên ứng viên chưa merge, phép kiểm dự án đỏ | một story sửa bình thường |
+| `untested` | lần chạy đọc được, và **không** tên test nào mang mã này | một story **chỉ viết test**, phạm vi ghi *chính là* các đường dẫn kiểm định |
+| `untraced` | harness **không nối được** hành vi → test: không đọc được tên test từ đầu ra runner, hoặc trace khai ra không có trong lần chạy ấy | **không** mở story nào |
+
+`untraced` **không mở story trả tiền**, và đây là chỗ tiết kiệm thật. Đo trên bốn
+corpus dogfood: 167 hành vi, 49 không xanh — **40 `unbuilt` · 4 `untested` ·
+5 `untraced`** — và cả 5 `untraced` ấy là **toàn bộ tiêu chí của một story duy
+nhất mà trình báo cáo test chưa được cài**. Nếu không chẻ ra, `improve` sẽ mở năm
+story sửa trả tiền cho một lỗi cấu hình. Việc cần làm ở đó là sửa siêu dữ liệu:
+
+```bash
+aisef evidence AC-STORY-01-02-1 --link "<tên test>" --why "…"
+```
+
+`gap_kind` là **hình chiếu**, không phải trường bạn ghi tay: nó đọc lại đúng câu lý
+do mà sổ hành vi vốn đã viết, nên `ledger.json` **không** có thêm khoá nào để sửa.
+Loại không đoán được thì mặc định là `unbuilt` — gán nhầm một lỗi thật thành "sửa
+siêu dữ liệu cho rẻ" sẽ che lỗi đi, chiều ngược lại chỉ tốn tiền.
+
+Xem đếm theo loại bằng `aisef issues` (đầu ra thật trên `todo-cli`):
+
+```bash
+aisef issues
+# → .../_bmad-output/ISSUES.md · 27 behaviours (5 regressions) · unbuilt 23 · untested 4 · untraced 0
+```
+
+**Đọc cẩn thận dòng ấy.** Ba loại phủ **mọi** hành vi không xanh, nên chúng cộng
+lại bằng `gap + reopened`, **không** bằng `gap`. Đặt chúng cạnh riêng số `gap` sẽ
+ra một dòng vô nghĩa. Cột `gap_kind` được **thêm vào cuối** bảng CSV, nên công cụ
+theo dõi nào đang đọc theo vị trí cột vẫn đọc đúng như trước.
+
+Một sửa lỗi đi kèm đáng biết nếu bạn commit `ledger.json`: trước 1.6.0 lý do của
+một gap **đóng băng ở lần quan sát đầu**, nên `gap_kind` không bao giờ leo thang
+được; và `ledger.json` chỉ được ghi lại bởi `aisef report` và vòng cải tiến, nên
+giữa các đợt chạy nó đứng yên — sau một đợt sáu epic nó nói mọi hành vi đều là
+`gap` trong khi hình chiếu từ bằng chứng có 34 `VERIFIED`. Tệp ấy là **hình chiếu**
+mọi thứ đều dựng lại từ bằng chứng; bây giờ nó được làm mới khi đợt chạy kết thúc.
+
 **Thay đổi yêu cầu sau khi đã phát hành**:
 
 ```bash
@@ -737,17 +1111,117 @@ Cách giảm:
   được từ bảng trên.
 - Dựng mockup theo đợt bằng `--only`, duyệt sớm.
 - Cắt phạm vi ở cổng `prd`, không cắt ở lúc đang chạy story.
-- Đặt trần cho vòng cải tiến: `improve.cost_cap_usd`.
+- Đặt trần cho vòng cải tiến: `improve.cost_cap_usd`; trần cho cả đợt chạy:
+  `run.cost_cap_usd`, `run.turn_cap`, `run.wall_clock_cap_seconds`.
 - Story trượt vì môi trường thì dùng `--verify-only`, đừng chạy lại cả story.
+
+### `aisef cost` — tiền **đã** đi đâu (mới ở 1.6.0)
+
+`aisef status` cho bạn tổng số. `aisef cost` trả lời câu khác và khó hơn: **tiền
+mua được gì**. Lệnh đọc bằng chứng đã ghi, **không gọi model**, nên chạy bao nhiêu
+lần cũng miễn phí:
+
+```bash
+aisef cost                  # hoặc: aisef cost --out docs/COST.md
+```
+
+Đầu ra thật trên corpus dogfood `todo-cli`, cắt lấy phần quan trọng:
+
+```
+# Spend attribution — `todo-cli`
+
+Unit: **input tokens** — the provider priced 0% of 165 sessions (0.00 USD recorded
+in total), so dollars here would be invented. With `p` = price per 1M input tokens
+and `q` = per 1M output:
+
+    cost ≈ 17.80 × p + 0.309 × q
+
+Cache reads are 84% of prompt tokens (90,821,604 cached vs 17,803,950 fresh); most
+price lists charge them far less, so they are counted separately.
+
+Net VERIFIED per M input tokens: **1.63**
+
+34 verified · 22 gap · 5 reopened → net **29** behaviours for 17,803,950 across
+165 sessions (1,653 turns).
+
+## Where the spend went
+
+| class | sessions | turns | tokens | share |
+|---|---|---|---|---|
+| passed | 27 | 244 | 716,654 | 4% |
+| gate-blocked | 104 | 911 | 5,617,595 | 32% |
+| turn-cap | 3 | 120 | 9,330,721 | 52% |
+| env-failed | 12 | 205 | 283,322 | 2% |
+| no-verdict | 6 | 94 | 1,412,859 | 8% |
+| planning | 13 | 79 | 442,799 | 2% |
+
+Spend on stories that ended with a net VERIFIED behaviour: **14%**.
+```
+
+**Phần hay nhất của lệnh này là chỗ nó từ chối.** Nó tự quyết đơn vị từ bằng chứng,
+và **không** chịu bình quân một bản ghi tiền dở dang: ở `todo-cli` nhà cung cấp báo
+giá cho **0 %** của 165 phiên, nên nếu in ra đô la thì con số ấy là **bịa**. Thay vì
+thế nó chuyển đơn vị sang **token đầu vào** và đưa bạn công thức `cost ≈ 17,80 × p
++ 0,309 × q` để tự nhân với bảng giá của mình. Đơn vị được nêu **theo từng corpus**
+và không bao giờ bình quân giữa các loại — ba trong bốn corpus dogfood có **0 %**
+phiên được báo giá, corpus thứ tư là **1 %** của 180 phiên (tổng 0,79 đô la ghi
+được). Bình quân bốn corpus lại với nhau thì con số đô la ấy là bịa đặt.
+
+Nó cũng cảnh báo khi con số không so sánh được. Trên `todo-oc` (OpenCode), chỉ 4 %
+prompt token là cache đọc lại:
+
+```
+⚠ At 4% cache, this client bills re-sent context as fresh `input`: the totals below
+  are a sum over turns of the whole prompt and are **not** comparable with a corpus
+  that caches.
+```
+
+Số đo nên đọc trước khi bạn quyết chi tiền cho một đợt chạy lớn — bốn corpus
+dogfood, lấy trực tiếp từ hàng `passed`:
+
+| corpus | `passed` | `gate-blocked` | `turn-cap` | `env-failed` |
+|---|---:|---:|---:|---:|
+| `todo-cli` | **4 %** | 32 % | 52 % | 2 % |
+| `todo` | **16 %** | 44 % | — | 37 % |
+| `todo-e2e` | **20 %** | 67 % | — | — |
+| `todo-oc` | **22 %** | 46 % | 32 % | 0 % |
+
+Nói thẳng: **chỉ 4–22 % chi phí mua được một lượt thử mà cổng cho qua**; 78–96 %
+rơi vào những phiên chưa cổng nào cho qua. Nguyên nhân được **nêu tên**, không dồn
+vào một ô "còn lại": hết trần lượt, story kết thúc với net ≤ 0, làm lại vì cổng
+chặn, lỗi môi trường. Vòng thử lại của rà soát và bảo mật dưới **0,15 %** ở mọi
+corpus — tức là chúng *không* phải chỗ tiền đi.
+
+Bảng `Where the spend went` chính là bản đồ việc cần làm:
+
+- **`turn-cap` cao** (52 % ở `todo-cli`, gom trong **3** phiên trên 165) — story quá
+  lớn cho một phiên. Chẻ story; ngưỡng ở `story.max_complexity`.
+- **`gate-blocked` cao** — làm lại vì cổng chặn. Đọc bảng `What the gate blocked on`
+  mà lệnh in ngay bên dưới: nó xếp hạng mục cổng nào chặn nhiều nhất.
+- **`env-failed` cao** (37 % ở `todo` so với 2 % ở `todo-cli`) — vấn đề môi trường
+  của bạn, không phải chất lượng agent. Dựng Docker, sửa cổng, chạy `--verify-only`.
+- **Bảng `Per story`** chỉ ra story nào ngốn tiền mà net = 0. Lưu ý dòng cảnh báo của
+  chính lệnh: cột sổ hành vi **chồng nhau** giữa các story (một FR có thể do hai
+  story phủ), nên chúng **không** cộng lại thành số của cả corpus.
 
 ---
 
 ## 15. Xử lý sự cố
 
+Thông báo trong bảng này là **nguyên văn tiếng Anh** như CLI in ra.
+
 | Bạn thấy | Nghĩa là | Làm gì |
 |---|---|---|
-| `✗ chưa cài claude trên máy này`, lệnh trả mã 2 | máy chưa có client agent | cài client, chạy `claude --version` cho tới khi được |
-| `✗ không có docs/requirements.md` | chưa có đầu vào | tạo tệp theo [§4](#4-tạo-dự-án-và-viết-đầu-vào) |
+| `✗ claude is not installed on this machine`, lệnh trả mã 2 | máy chưa có client agent | cài client, chạy `claude --version` cho tới khi được |
+| `✗ docs/requirements.md` trong `aisef doctor` | chưa có đầu vào | tạo tệp theo [§4](#4-tạo-dự-án-và-viết-đầu-vào) |
+| `⚠️ this project already has files … and there is no _bmad-output/baseline.md` | dự án đã có code mà chưa dựng baseline | `aisef baseline` **trước** khi `aisef plan` ([§4](#4-tạo-dự-án-và-viết-đầu-vào)) |
+| Guard chặn `npm test` / lệnh test của bạn | `tool-bypass`: chạy thẳng thì không có gì được ghi | dùng `aisef tool test`; chạy hẹp thì gọi trực tiếp runner, đừng qua script npm ([§7](#7-aisef-compile-và-aisef-doctor)) |
+| `⚠️ not recorded as evidence: no story id` | `aisef tool …` chạy ngoài một phiên story | thêm `--story <mã>` nếu bạn muốn nó thành bằng chứng |
+| `deadlock due to plan: criteria … are already satisfied at the branch point` | một story trước đã làm xong hành vi ấy | **sửa hoặc bỏ tiêu chí**, đừng thử lại ([§11](#11-bước-hiện-thực-aisef-run)) |
+| `sessions kept producing nothing to grade` | phiên đã **quyết định** không viết gì, hai lần liền | đọc `aisef evidence <story>`, sửa kế hoạch — mở lại phiên sẽ ra đúng kết quả ấy |
+| `the command matched no tests` | lệnh chạy được nhưng bộ chọn không khớp test nào | chưa story nào viết loại test ấy, hoặc bộ chọn sai — sửa `verify.<loại>` |
+| `Cost: $0.00` trong `aisef status` | nhà cung cấp không báo giá phiên nào | dùng `aisef cost`: nó đổi sang token và cho công thức ([§14](#14-chi-phí-thật-và-cách-giảm)) |
+| `infra` cao trong dòng `Agent runs` | client rớt phiên (502, rate limit, tool call không đọc được) | đã **đo** tỉ lệ rớt thì đặt `run.infra_retries`; đừng tăng `run.max_retries` |
 | `aisef gates` báo `stale` | tài liệu đổi sau khi duyệt, hoặc tầng trên vừa được duyệt lại | đọc lại rồi `aisef approve <cổng>` |
 | Cổng `stories` không cho chạy | cổng máy đã bắt lỗi kế hoạch | đọc lý do, sửa `stories.index.json`, duyệt lại |
 | Mục cổng ○ `coverage` | lệnh test không in số coverage | thêm `--coverage` (vitest/c8) hoặc `--cov` (pytest) vào `tools.test` |
@@ -767,22 +1241,28 @@ sẵn sàng (cổng chưa đạt, thiếu công cụ).
 
 ## 16. Tra cứu: toàn bộ lệnh
 
-Mọi lệnh nhận `--project <thư mục>` (mặc định: thư mục hiện tại).
+Mọi lệnh nhận `--project <thư mục>` (mặc định: thư mục hiện tại). Danh sách đầy đủ
+**33 lệnh con** là thứ máy in ra — `aisef --help` luôn là bản chuẩn:
+
+```bash
+aisef --help
+```
 
 **Chuẩn bị**
 
 ```bash
 aisef doctor                              # kiểm môi trường
 aisef setup [--references DIR] [--no-fetch] [--dry-run]
-aisef init                                # ghi .ai/config.json mặc định
+aisef init [--stack react|python|go|node] # ghi .ai/config.json mặc định (4 khoá)
 aisef compile [--client claude|opencode|all] [--bin PATH]
+aisef baseline [--provider graphify|basic|auto] [--force] [--incremental]
 ```
 
 **Lập kế hoạch và cổng người**
 
 ```bash
 aisef plan [--client c] [--auto-approve all|<danh sách>] [--force]
-aisef mockup [--client c] [--only <screen_id>] [--force]
+aisef mockup [--client c] [--only <screen_id>] [--auto-approve ...] [--force]
 aisef gates
 aisef review <cổng> [--lines N]
 aisef approve <cổng> [--note "..."] [--force]
@@ -799,8 +1279,13 @@ aisef improve --epic E [--max-loops N] [--auto] [--client c] [--force]
 aisef tool test|lint|sast [--story S] [--lines N]
 aisef verify [--write-scope ...] [--story S]
 aisef gate <story> [--attempt n] | --all | --replay
+aisef replay [<story> | --all] [--attempt n]   # lối vào riêng của `gate --replay`
 aisef guard <tên guard>                   # framework tự gọi qua hook
 ```
+
+`aisef guard` nhận đúng mười tên: `completion`, `destructive`, `diff-scope`,
+`egress`, `git-stage`, `injection`, `process-ref`, `secret`, `tool-bypass`,
+`write-scope`.
 
 **Kiểm định và phát hành**
 
@@ -813,15 +1298,46 @@ aisef pre-deploy [--skip-qa] [--epic E]
 **Quan sát**
 
 ```bash
-aisef status
+aisef status [--attempts]
+aisef cost [--out FILE]                   # tiền đi đâu, chẻ theo kết cục (§14)
+aisef dashboard [--out FILE] [--projects DIR ...]   # HTML hợp quy, gộp nhiều dự án
 aisef report [--out FILE]
 aisef evidence <id> [--story S] [--link TEST --why "..." --by ai]
 aisef issues [--format md|csv] [--epic E] [--status gap,reopened] [--out FILE]
 aisef ctx [--story S | --file F] [--budget N]
 aisef skill [--story S] [--scan --client c --batch N]
-aisef doc <gói> [--topic T] [--story S]
+aisef doc <gói> [--topic T] [--tokens N] [--story S]
 aisef change FR-x "mô tả"
 ```
+
+Không lệnh nào trong nhóm này gọi model, nên chạy bao nhiêu lần cũng không tốn tiền
+(`aisef doc` có gọi mạng — HTTP tới context7, có cache — nhưng không gọi model).
+`aisef dashboard` in ra đầu ra thật như sau (trên `todo-cli`):
+
+```
+dashboard: .../dashboard.html
+
+Vận hành:
+  chi phí/tuần   — nhà cung cấp không báo chi phí (mọi sự kiện $0)
+  VERIFIED ròng  34 (— (chi phí $0))
+  gap tồn        27 · unbuilt 23 · untested 4
+  tuổi hợp quy   6 ngày (trần 14) ✅
+```
+
+Dòng **`tuổi hợp quy`** là thứ đáng nhìn: bảng hợp quy client có hạn dùng **14
+ngày**. Quá hạn thì bảo đảm "client này chặn được ngần này thứ" là số cũ, và
+dashboard nói ra.
+
+**Bộ nhớ (đóng băng, mặc định TẮT)**
+
+```bash
+aisef memory status|recall|search|show|capture|consolidate|audit|forget|providers
+```
+
+`aisef memory` **đóng băng** theo phụ lục ADR-007 ngày 2026-09-12: code còn đó, lỗi
+và lỗ bảo mật vẫn được sửa, **không thêm năng lực mới**. Nó không phải "thử nghiệm,
+sắp có". Bộ nhớ **không bao giờ** là bằng chứng cho cổng. Chi tiết ở
+[MEMORY.md](MEMORY.md).
 
 ---
 
@@ -852,6 +1368,16 @@ Giá trị trong ngoặc là mặc định.
 | `story.max_write_scope_paths` | `10` | trần số đường dẫn trong phạm vi ghi |
 | `story.max_screen_states` | `8` | trần số trạng thái màn hình |
 | `story.max_complexity` | `16.0` | điểm phức tạp tối đa; vượt thì cổng chặn và đòi chẻ story |
+| `story.verified_touched_weight` | `0.0` | bán kính mục `bảo toàn`: trọng số của hành vi VERIFIED chỉ *chạm* tệp mà story sửa. **Đừng tăng mà không có bảng đo riêng** — xem dưới |
+
+`story.verified_touched_weight` là khoá mới ở 1.6.0 và mặc định **0**, có chủ ý. Bảng
+hiệu chỉnh nằm ngay cạnh nó trong `aisef/config.py`, sinh lại từ bằng chứng bằng
+`validation/o3_preservation_radius.py`. Đo được: **không** trọng số nào ≤ 1,0 làm đổi
+một kết luận nào; kết luận **đầu tiên** bị đổi khi tăng lên trên 1,0 lại là một lần
+**chặn sai**; bắt được 11 trong 15 story thật sự gây hồi quy thì phải chặn oan 7
+trong 17 story sạch. Phát hiện quan trọng hơn cả hệ số: **27 trong 32 story có chồng
+tệp**, nên số tệp chồng nhau không xếp hạng được 47 % story gây hồi quy. Đó là vấn đề
+của *vị từ* — `bảo toàn` cần được khoanh theo **hành vi** — không phải vấn đề trọng số.
 
 **Chạy**
 
@@ -860,7 +1386,12 @@ Giá trị trong ngoặc là mặc định.
 | `run.max_parallel` | `3` | số story chạy song song |
 | `run.max_turns` | `40` | trần số lượt trong một phiên agent |
 | `run.timeout_seconds` | `1800` | trần thời gian một phiên |
-| `run.max_retries` | `2` | số lần thử lại một story |
+| `run.max_retries` | `2` | số lần thử lại một story (lượt **chất lượng**) |
+| `run.infra_retries` | `-1` | ngân sách thử lại riêng cho **phiên mất vì client** (502, rate limit, tool call không đọc được). `-1` giữ cách ghép cũ: dùng chung ngân sách với `run.max_retries`. Chỉ tăng khi đã **đo** tỉ lệ rớt phiên của client mình |
+| `run.cost_cap_usd` | `0.0` | trần chi phí cả đợt chạy; `0` là tắt |
+| `run.turn_cap` | `0` | trần tổng số lượt cả đợt chạy; `0` là tắt |
+| `run.wall_clock_cap_seconds` | `0.0` | trần thời gian thực cả đợt chạy; `0` là tắt |
+| `run.qualify_preflight` | `false` | chạy chính sách chứng nhận trước lượt thử đầu tiên (tuỳ chọn, mặc định tắt) |
 | `cost.warn_multiple` | `3.0` | cảnh báo khi một story tốn hơn ngần này lần trung vị |
 
 **Ứng dụng và mockup**
@@ -879,6 +1410,7 @@ Giá trị trong ngoặc là mặc định.
 | `sandbox.use_docker` | `true` | dùng container cho tool |
 | `sandbox.allow_degraded` | `true` | cho phép chạy khi thiếu bảo đảm, có ghi rõ |
 | `sandbox.image` | `""` | ảnh container |
+| `sandbox.allow_hosts` | `[]` | host mà tool được phép kết nối tới (`egress` đọc danh sách này; `localhost` luôn được miễn) |
 | `sandbox.tools_network` | `false` | cho tool ra mạng hay không |
 | `sandbox.pre_deploy_degraded_waiver` | `""` | lý do chấp nhận kiểm định chạy ngoài Docker ở cổng cuối |
 
@@ -889,12 +1421,22 @@ Giá trị trong ngoặc là mặc định.
 | `context.max_index_chars` | `2000` | trần ký tự cho chỉ mục bằng chứng nạp vào prompt |
 | `context.max_preservation_chars` | `1200` | trần ký tự cho danh sách hành vi phải giữ |
 | `context.max_repo_map_chars` | `0` | trần cho bản đồ mã; `0` là tắt |
+| `context.map_provider` | `""` | lệnh ngoài dựng bản đồ mã (nhận JSON qua stdin, in text). Rỗng = bản dựng sẵn bằng thư viện chuẩn; lệnh lỗi thì quay về bản dựng sẵn và nói rõ là thô |
+| `context.graph_provider` | `"auto"` | bộ dựng đồ thị mã cho dự án đã có code: `auto`, `graphify`, `basic` |
+| `review.impact_provider` | `""` | lệnh ngoài phân tích tác động cho phiên rà soát |
 | `improve.max_loops` | `3` | số vòng cải tiến tối đa cho một epic |
 | `improve.flat_loops` | `2` | dừng khi ngần này vòng liền không cải thiện |
 | `improve.cost_cap_usd` | `0.0` | trần chi phí vòng cải tiến; `0` là không giới hạn |
-| `route.developer_model` · `route.reviewer_model` · `route.designer_model` | `""` | ép model cho từng vai |
+| `route.developer_model` · `route.reviewer_model` · `route.designer_model` · `route.security_model` | `""` | ép model cho từng vai |
 | `clients.env_allow` | `[]` | biến môi trường được phép truyền vào phiên agent |
 | `skills.offer` | `false` | gợi ý skill cho agent; đo chưa thấy lợi nên tắt. Cơ chế thứ hai (`skills.inline`) đã **gỡ** ở 1.4.0 sau hai lần A/B cho `used` 0/0 |
+| `memory.*` (6 khoá) | TẮT | bộ nhớ đóng băng, mặc định TẮT — [MEMORY.md](MEMORY.md) |
+
+Tổng số khoá là **69** ở 1.6.0. Đây là số máy đếm, không phải số viết tay:
+
+```bash
+python3 -c "from aisef.config import DEFAULTS; print(len(DEFAULTS))"   # → 69
+```
 
 ---
 
@@ -910,7 +1452,10 @@ Giá trị trong ngoặc là mặc định.
   trên đó. Bằng chứng không gắn ứng viên thì không chứng minh cho bản nào.
 - **Cổng máy / cổng người** — xem [§1](#1-framework-này-làm-gì).
 - **Sổ hành vi (ledger)** — bảng theo dõi từng hành vi: `VERIFIED` (đã chứng
-  minh), `GAP` (chưa), `REOPENED` (từng đúng, nay hỏng lại).
+  minh), `GAP` (chưa), `REOPENED` (từng đúng, nay hỏng lại). Mọi hành vi không
+  xanh còn mang một **`gap_kind`**: `unbuilt` (chưa làm), `untested` (đã làm,
+  chưa có test mang mã), `untraced` (harness không nối được hành vi → test).
+  Chỉ hai loại đầu mở story trả tiền — xem [§13](#13-vòng-cải-tiến-và-thay-đổi-sau-phát-hành).
 - **Bằng chứng (evidence)** — tệp `.jsonl` ghi mọi lần chạy tool, phiên agent,
   kết luận cổng. Đây là thứ mọi báo cáo đọc lại, không phải lời agent.
 - **Guard** — lệnh của framework chặn thao tác sai ngay trước khi nó xảy ra.
