@@ -120,6 +120,32 @@ class TestCostAndLatency(EvidenceTestCase):
         self.store.agent_run("S-02", parse_file(FIX / "stream-minimal.jsonl"))
         self.assertEqual(self.store.read("S-02").last(AGENT_RUN).detail["exit_status"], "ok")
 
+    def test_ghi_model_luong_noi_va_client_da_chay(self):
+        """Model **quan sát được** thắng model đã yêu cầu, và client vào bản ghi.
+
+        Corpus 145 phiên của ADR-009 O1 mang `model: ""` ở mọi hàng vì chỗ này
+        ghi `spec.model` — rỗng bất cứ khi nào `route.*_model` không được đặt —
+        nên hai tỉ lệ ấy là "qua mọi client", không của client nào.  Client cũng
+        chưa từng được ghi: một dự án tích bằng chứng từ nhiều client qua nhiều
+        lượt chạy, nên nó thuộc về *sự kiện*, không thuộc về dự án.
+        """
+        result = parse_file(FIX / "stream-minimal.jsonl")
+        result.model = "claude-opus-4-5-20251101"
+        self.store.agent_run("S-01", result, model="sonnet", client="claude")
+        e = self.store.read("S-01").last(AGENT_RUN)
+        self.assertEqual(e.detail["model"], "claude-opus-4-5-20251101")
+        self.assertEqual(e.detail["client"], "claude")
+
+    def test_model_da_yeu_cau_la_du_phong_khi_luong_khong_noi(self):
+        """Rỗng nghĩa là *không biết*, không phải "không có model"."""
+        result = parse_file(FIX / "stream-minimal.jsonl")
+        result.model = ""
+        self.store.agent_run("S-01", result, model="9router/mycombo", client="opencode")
+        e = self.store.read("S-01").last(AGENT_RUN)
+        self.assertEqual(e.detail["model"], "9router/mycombo")
+        self.store.agent_run("S-02", result)
+        self.assertEqual(self.store.read("S-02").last(AGENT_RUN).detail["model"], "")
+
     def test_totals_accumulate(self):
         self.store.record("S-01", Event(kind=AGENT_RUN, cost_usd=1.5, duration_ms=100))
         self.store.record("S-01", Event(kind=AGENT_RUN, cost_usd=0.5, duration_ms=200))

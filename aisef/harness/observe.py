@@ -352,7 +352,8 @@ class EvidenceStore:
 
     def agent_run(self, story_id: str, result, *, name: str = "", prompt_chars: int = 0,
                   skills: dict | None = None, role: str = "", model: str = "",
-                  tool_calls: int = -1, response_snippet: str = "") -> Event:
+                  client: str = "", tool_calls: int = -1,
+                  response_snippet: str = "") -> Event:
         """Record one model invocation from `RunResult` — cost and latency
         taken from the client stream, not estimated."""
         return self.record(
@@ -387,7 +388,17 @@ class EvidenceStore:
                     # Skills invited / opened — measured, not guessed (ADR-003 #1).
                     "skills": skills or {},
                     "role": role,
-                    "model": model,
+                    # The model the **stream** reported, with the requested one
+                    # as fallback: `spec.model` is empty whenever no route model
+                    # is configured, which is how all 145 sessions of the O1
+                    # qualification corpus came to carry `model: ""` — a rate
+                    # that cannot be split per model (ADR-009 O1).
+                    "model": (getattr(result, "model", "") or model),
+                    # Which client ran it. One project accumulates evidence from
+                    # several clients across runs (todo-oc holds both a
+                    # `.claude/` and a `.opencode/`), so this belongs on the
+                    # event, not on the project.
+                    "client": client,
                     "tool_calls": tool_calls,
                     "response_snippet": response_snippet[:300] if response_snippet else "",
                 },

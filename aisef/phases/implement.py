@@ -648,7 +648,7 @@ def run_attempt(
     evidence.agent_run(
         story.id, result, name=f"{story.id}#{number}", prompt_chars=len(spec.prompt),
         skills={**context.get("_skills", {}), "used": used},
-        role=DEVELOPER, model=spec.model,
+        role=DEVELOPER, model=spec.model, client=client.id,
         tool_calls=len(result.tool_uses),
         response_snippet=(result.text or "")[:300],
     )
@@ -1536,7 +1536,7 @@ def _review_session(
         result = RunResult(ok=False, error=f"budget exceeded: {e}",
                            cost_usd=0.0, turns=0)
     store.agent_run(story_id, result, name=name, prompt_chars=len(spec.prompt),
-                    role=role, model=spec.model)
+                    role=role, model=spec.model, client=client.id)
     for sk in skills_used(result):
         store.record(story_id, Event(kind=SKILL_USE, name=sk, detail={"role": role}))
     reverted = _revert_reviewer_writes(workdir, before_snap, _tree_snapshot(workdir))

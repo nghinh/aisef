@@ -169,7 +169,7 @@ def scan(
         result = client.run(spec)
         report.cost_usd += float(getattr(result, "cost_usd", 0.0) or 0.0)
         ev.agent_run("skill-scan", result, name=f"skill-scan#{report.batches}",
-                     prompt_chars=len(spec.prompt))
+                     prompt_chars=len(spec.prompt), client=getattr(client, "id", ""))
         got = {v.id: v for v in parse_verdicts(getattr(result, "text", "") or "")}
         for sid, _ in lot:
             if sid in got:

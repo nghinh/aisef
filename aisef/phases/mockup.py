@@ -223,7 +223,8 @@ def generate(
             )
         )
         res.cost_usd += run.cost_usd
-        EvidenceStore(root).agent_run(f"mockup-{screen.id}", run, name=screen.id)
+        EvidenceStore(root).agent_run(f"mockup-{screen.id}", run, name=screen.id,
+                                     client=client.id)
         if not run.ok:
             res.failed[screen.id] = run.error or "run failed"
             _log(f"screen={screen.id} FAIL ${run.cost_usd:.2f} err={res.failed[screen.id][:120]}")

@@ -495,7 +495,8 @@ def run_phase(
         # Planning cost is still cost. Recording only story costs would make
         # the acceptance report total miss the most expensive part of small
         # projects.
-        evidence.agent_run(f"plan-{phase.id}", result, name=phase.id)
+        evidence.agent_run(f"plan-{phase.id}", result, name=phase.id,
+                           client=client.id)
         if result.ok:
             break
         error = result.error or "run failed"
@@ -643,7 +644,7 @@ def run_pipeline(
     cfg = config or Config.load(project)
     approvals = ApprovalStore(project / ARTIFACT_ROOT)
     result = PipelineResult()
-    _run_log(project, "pipeline START")
+    _run_log(project, f"pipeline START client={getattr(client, 'id', '') or '?'}")
 
     for phase in PHASES:
         outcome = run_phase(phase, project, client, config=cfg, force=force)

@@ -714,7 +714,11 @@ def _run_sprint_owned(
         cfg = Config({**cfg.values, "run.max_parallel": 1})
 
     report = RunReport()
-    run_log(artifact_root, f"sprint START epics={only_epic or 'all'} parallel={not sequential} isolate={isolate}")
+    # `client=` is the single most load-bearing fact about a run and was the
+    # one thing its own log did not say: reading a finished corpus, which client
+    # produced it had to be inferred from which config directories exist on disk.
+    run_log(artifact_root, f"sprint START client={client.id} "
+                           f"epics={only_epic or 'all'} parallel={not sequential} isolate={isolate}")
     plan = load_plan(artifact_root)
     if plan.error:
         report.error = plan.error

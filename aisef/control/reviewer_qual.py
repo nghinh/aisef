@@ -125,6 +125,17 @@ class Judgement:
     #: theo `git diff`.  `()` = cùng cây; `None` = chưa/không phân giải được.
     changed_next: tuple[str, ...] | None = None
     project: str = ""
+    #: Client và model của **chính phiên này**, đọc từ `agent_run`.  Corpus
+    #: đo lần đầu (2026-09-14) mang `""` ở cả hai: hai trường ấy chưa được ghi,
+    #: nên 145 phiên là "qua mọi client", không phải của một client nào.  Hàng
+    #: cũ vẫn đọc được — rỗng nghĩa là không biết, và báo cáo nói thế.
+    client: str = ""
+    model: str = ""
+
+    @property
+    def engine(self) -> str:
+        """`client/model` để chẻ tỉ lệ; `?` khi bản ghi không nói."""
+        return f"{self.client or '?'}/{self.model or '?'}"
 
     @property
     def scorable(self) -> bool:
@@ -244,6 +255,8 @@ def judgements(ev: Evidence, *, project: str = "") -> list[Judgement]:
             blocking=block,
             acted=tuple(e.detail.get("findings") or []),
             session=str(run.detail.get("session_id") or "") if run else "",
+            client=str(run.detail.get("client") or "") if run else "",
+            model=str(run.detail.get("model") or "") if run else "",
             invalid=bad.name if bad else (f"review could not run: {loi}" if loi else ""),
             gate_checks=None if gate is None else tuple(
                 (str(c.get("name") or ""), str(c.get("outcome") or ""), str(c.get("detail") or ""))
@@ -415,6 +428,22 @@ def report(roots: dict[str, Path | str]) -> str:
             str(sum(1 for _, c, _ in hang if c == cls)) for cls in CLASSES) + " |")
     ra.append(f"| **all ({len(scored)})** | " + " | ".join(
         f"**{so[cls]}**" for cls in CLASSES) + " |")
+    # Chẻ theo client/model **chỉ khi** corpus có hơn một: một cột lặp lại
+    # `?/?` không nói gì, và in nó ra đọc thành "đã chẻ rồi" (cùng quy ước với
+    # mục token của báo cáo bench).
+    dong_co = sorted({j[0].engine for j in scored})
+    if len(dong_co) > 1:
+        ra.append("")
+        ra.append("| client/model | " + " | ".join(CLASSES) + " |")
+        ra.append("|---|" + "---|" * len(CLASSES))
+        for dc in dong_co:
+            hang = [j for j in scored if j[0].engine == dc]
+            ra.append(f"| {dc} ({len(hang)}) | " + " | ".join(
+                str(sum(1 for _, c, _ in hang if c == cls)) for cls in CLASSES) + " |")
+    elif dong_co:
+        ra.append("")
+        ra.append(f"Toàn corpus mang một `client/model`: `{dong_co[0]}` — "
+                  "tỉ lệ dưới đây **không** chẻ được theo engine.")
     ra.append("")
     for k, v in so.items():
         ra.append(f"- {k}: {v}")

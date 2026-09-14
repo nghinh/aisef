@@ -32,6 +32,7 @@ from aisef.control.findings import Finding, SOURCE_REVIEWER, Trust  # noqa: E402
 from aisef.control.gate import CONTROLS  # noqa: E402
 from aisef.control.reviewer_qual import (  # noqa: E402
     CLASSES, Judgement, changed_between, classify, judgements, qualification_table, rates,
+    report,
 )
 from aisef.harness.observe import AGENT_RUN, NOTE, Event, EvidenceStore  # noqa: E402
 
@@ -279,6 +280,68 @@ class TestDocPhienTuDia(unittest.TestCase):
         rows = judgements(self.store.read("S-01"), project="p")
         self.assertEqual(rows[0].invalid, "review:immutable")
         self.assertEqual(lop(*rows), ["undecided"])
+
+
+class TestCheTiLeTheoClientVaModel(unittest.TestCase):
+    """Hai tỉ lệ của O1 là "qua mọi client" chỉ vì bản ghi không nói client nào.
+
+    Bây giờ `agent_run` ghi cả hai, nên `Judgement` mang chúng và báo cáo chẻ
+    được — nhưng **chỉ khi** corpus có hơn một `client/model`.  Một cột lặp lại
+    `?/?` in ra đọc thành "đã chẻ rồi", đó là câu sai duy nhất mà một lượt chẻ
+    trên corpus một-engine dễ sinh ra nhất (cùng quy ước với mục token của bench).
+    """
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        self.store = EvidenceStore(self.root)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def _phien(self, story: str, *, client: str, model: str, session: str):
+        self.store.record(story, Event(kind=AGENT_RUN, name=f"{story}-review", ok=True,
+                                       detail={"session_id": session, "candidate": "aaa",
+                                               "client": client, "model": model}))
+        self.store.record(story, Event(kind=NOTE, name="review:verdict", ok=True,
+                                       detail={"verdict": "pass", "findings": [],
+                                               "candidate": "aaa"}))
+        self.store.tool_run(story, "review", ok=True,
+                            detail={"findings": [], "attempt": 1, "candidate": "aaa"})
+        self.store.record(story, Event(kind=NOTE, name="gate:verdict", ok=True, detail={
+            "attempt": 1, "failures": [], "candidate": "aaa",
+            "checks": [{"name": "test", "outcome": "passed", "detail": ""}]}))
+
+    def test_judgement_mang_client_va_model_cua_chinh_phien_ay(self):
+        self._phien("S-01", client="opencode", model="9router/mycombo", session="ses_1")
+        r = judgements(self.store.read("S-01"), project="p")[0]
+        self.assertEqual((r.client, r.model), ("opencode", "9router/mycombo"))
+        self.assertEqual(r.engine, "opencode/9router/mycombo")
+
+    def test_ban_ghi_khong_noi_thi_engine_la_dau_hoi_khong_phai_doan(self):
+        self.store.record("S-01", Event(kind=AGENT_RUN, name="S-01-review", ok=True,
+                                        detail={"session_id": "ses_1", "candidate": "aaa"}))
+        self.store.record("S-01", Event(kind=NOTE, name="review:verdict", ok=True,
+                                        detail={"verdict": "pass", "findings": [],
+                                                "candidate": "aaa"}))
+        self.store.tool_run("S-01", "review", ok=True,
+                            detail={"findings": [], "attempt": 1, "candidate": "aaa"})
+        self.store.record("S-01", Event(kind=NOTE, name="gate:verdict", ok=True, detail={
+            "attempt": 1, "failures": [], "candidate": "aaa", "checks": []}))
+        self.assertEqual(judgements(self.store.read("S-01"), project="p")[0].engine, "?/?")
+
+    def test_bao_cao_chi_che_khi_corpus_co_hon_mot_engine(self):
+        self._phien("S-01", client="claude", model="opus", session="ses_1")
+        mot = report({"p": self.root})
+        self.assertIn("Toàn corpus mang một `client/model`", mot)
+        self.assertNotIn("| client/model |", mot)
+
+        self._phien("S-02", client="opencode", model="mycombo", session="ses_2")
+        hai = report({"p": self.root})
+        self.assertIn("| client/model |", hai)
+        self.assertIn("claude/opus", hai)
+        self.assertIn("opencode/mycombo", hai)
+        self.assertNotIn("Toàn corpus mang một", hai)
 
 
 class TestGitLaNguonSuThat(unittest.TestCase):
