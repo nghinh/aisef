@@ -262,6 +262,17 @@ chết), nên "loại hết phiên bị cắt" không phải một phép sửa t
 
 ## 7. Tiền đăng ký — viết trước khi có dữ liệu
 
+> **2026-09-14 — bản ghim nằm ở chỗ khác.** Theo phán quyết 7 của chủ dự án
+> ([../PROJECT-CLOSURE-GATE.md](../PROJECT-CLOSURE-GATE.md) §0), mục này đã được
+> promote thành tài liệu đóng [../BENCH-PREREGISTRATION-C2.md](../BENCH-PREREGISTRATION-C2.md)
+> §2 — **bản ghim** là bản ở đó, ghim bằng digest ghi trong `docs/closure-gate.json`
+> (tiêu chí G5.1). Văn bản dưới đây là **bản lịch sử**: giữ nguyên tại chỗ, không
+> sửa một ký tự. Nó còn làm một việc nữa — nó **định ngày** cho bản ghim, vì hai
+> vùng `PREREG-FROZEN` trùng nhau từng byte và cùng một công thức digest áp lên cả
+> hai tệp phải ra cùng một giá trị. Cái học được **sau** tiền đăng ký này không đi
+> vào đây; nó nằm ở phụ lục có ngày của tài liệu đóng.
+
+<!-- PREREG-FROZEN:BEGIN -->
 Neo từ ba đợt trước, để ngưỡng dưới đây không phải bốc ra: v0.3.0 (frontier, task
 dễ) 100 % vs 100 %; C-1 delta **−0,06**; C-1b delta **+0,06**. Hai cohort cùng
 model, cùng harness, hiệu số **đổi dấu** — đó là hình dạng của nhiễu, và nó định
@@ -327,6 +338,7 @@ Với M3 (model được khai là mạnh hơn M2.7): nhiều task chạm trần 
 hơn** nhánh trần thì đó không phải phát hiện — đó là báo động về đường ống, vì
 nhánh AISEF nhận cùng đề bài **cộng** thông điệp guard, nên nó không thể tiêu ít
 context hơn.
+<!-- PREREG-FROZEN:END -->
 
 ## 8. Thứ tôi cố ý **không** làm
 

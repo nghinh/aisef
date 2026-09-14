@@ -194,6 +194,16 @@
           "probe": "aisef.control.closure:probe_prereg_digest",
           "evidence": "docs/BENCH-PREREGISTRATION-C2.md",
           "freshness": {"kind": "pinned_digest", "source": "prereg_sha256"},
+          "prereg_sha256": "0c4dab0a74b6cb56ecc52c4ee9013a693bbdcf69374728f2951c9fa0c62a44cc",
+          "prereg_frozen_region": {
+            "_comment": "Owner ruling 7. The digest covers ONLY the frozen region -- the verbatim pre-registration -- not the whole file, so a dated addendum outside the markers does not break the pin while any edit inside it does. It is recorded HERE and nowhere inside the file it pins: a digest living in its own subject is updated in the same motion as the text and pins nothing. `also_in` is the pre-data commit carrying the same bytes; the same recipe must yield the same digest there, and that equality is what dates the text. Verify: docs/BENCH-PREREGISTRATION-C2.md section 1.1.",
+            "begin": "<!--\\s*PREREG-FROZEN:BEGIN\\s*-->",
+            "end": "<!--\\s*PREREG-FROZEN:END\\s*-->",
+            "exactly_one_pair": true,
+            "normalise": "CRLF and CR -> LF; strip leading and trailing blank lines of the region; nothing else -- byte-exact inside. Deliberately UNLIKE onboarding_digest: that one normalises content because a typo fix must not invalidate a person's validation; this one must break on a typo fix, because the value it protects is that the text never changes.",
+            "also_in": "docs/handoff/bench-real-model-wiring.md",
+            "reference_check": "tests/test_meta.py::TestTienDangKyCot2BiGhim"
+          },
           "notes": "Owner ruling 7. Prediction and success criteria are never rewritten after data exists."
         },
         {
