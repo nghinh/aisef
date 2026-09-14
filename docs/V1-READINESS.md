@@ -32,6 +32,20 @@ due to this bug (probabilistic).
 
 ## Requires real agent runs — BLOCKED
 
+> **Superseded as a gate, 2026-09-14.** B1–B4 below are retained as a dated
+> record and are no longer closure conditions. The closure gate is
+> [`PROJECT-CLOSURE-GATE.md`](PROJECT-CLOSURE-GATE.md), approved by the owner on
+> 2026-09-14, and §7 of that document re-classifies each of these four
+> explicitly: **B2** (`par` baseline) and **B3** (`e9` EPIC-01) are
+> OBSOLETE — both corpora are absent from this machine — with the property they
+> tested now measured by **G4** on a living corpus; **B4** is superseded by
+> G4.6/G4.7; **B1** (conformance freshness) survives as **G3**, which reads the
+> framework's own `MAX_AGE_DAYS` rather than a date copied into prose.
+>
+> Nothing below is edited. The `**COMPLETED.**` banner at the top of this file
+> refers to the v1.0.0 release, which did happen; this section's four items were
+> never satisfied, and that contradiction is why a successor gate was needed.
+
 These need API keys and real project runs. Owner action required.
 
 | # | Condition | What to do |

@@ -89,6 +89,32 @@ defaults to `docker`; users who set `local` accept the documented trade-off.
 
 **Decision:** Condition met. No further work needed.
 
+> **Addendum 2026-09-14 — this ADR's substitution rule is adopted; its chosen
+> substitutes have decayed.** The *rule* in §1 — "the exit condition tests
+> *framework robustness across project types*, not a specific project" — is
+> carried forward verbatim into
+> [`PROJECT-CLOSURE-GATE.md`](PROJECT-CLOSURE-GATE.md) §3 as substitution rule
+> **R1**, and is the reason that document exists rather than a new invention.
+>
+> Three of the substitutes named in §1 no longer hold, and the closure gate adds
+> a second rule **R2** (a corpus must be locatable by command) because of it:
+>
+> * `par` — cited here as the available Node.js corpus — is **absent** from this
+>   machine, as is `e9`; `find`/`ls` resolve neither.
+> * `calc`, proposed here as a third Python dogfood project, was **never
+>   created**.
+> * "count the bench suite as the second project" **fails R1**: the bench
+>   measures per-task bug fixing, not lifecycle completion, so it does not test
+>   the property `e9` tested. Measured 2026-09-14, it also has very little
+>   resolving power — `validation/bench_discriminating_power.py` reports 12 of
+>   340 cross-arm pairs informative (3.5 %), with 25 of 30 tasks never
+>   separating the two arms.
+>
+> None of the decisions below is withdrawn and no text above is edited. §4
+> (OpenCode first-class) is in fact **strengthened**: the closure gate found that
+> `RELEASE_CLIENTS` still read `("claude",)`, so the release policy had never been
+> brought into line with this ADR.
+
 ## Consequences
 
 - v1.0.0 exit conditions reduce from 20 to 17 actionable items

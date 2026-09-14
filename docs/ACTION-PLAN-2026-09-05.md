@@ -349,6 +349,21 @@ loại trừ đúng bằng điều kiện "diff thêm test". Story sửa test c�
   `accessibility` là PASSED hoặc FAILED — **không** phải UNCONFIGURED;
 * `pip install aisef` trong venv sạch → `setup` → `doctor` xanh.
 
+> **Thay thế 2026-09-14 — bốn gạch đầu dòng trên không còn là cổng.** Cổng
+> đóng dự án nay là [`docs/PROJECT-CLOSURE-GATE.md`](PROJECT-CLOSURE-GATE.md)
+> (chủ dự án duyệt 2026-09-14). Văn bản trên **giữ nguyên** làm bản ghi có
+> ngày, không sửa một chữ.
+>
+> Lý do thay: gạch 2 và 3 gọi tên `par` và `e9`, và **cả hai kho đều không còn
+> trên máy này** (`for d in par e9; do [ -d ~/Downloads/projects/$d ] ...` →
+> absent). Một cổng không đánh giá được thì không phải cổng. Thuộc tính hai
+> gạch ấy đo — "một epic nhiều story đi hết vòng đời với agent thật" — nay do
+> **G4** đo trên một corpus còn sống, theo quy tắc thay thế R1/R2 của contract
+> (kế thừa ADR-006 §1: điều kiện đo *độ bền của khung qua nhiều loại dự án*,
+> không đo một thư mục cụ thể).
+>
+> Hai gạch còn lại **không** mất: gạch 1 nay là G2.1 + G3, gạch 4 là G1.3.
+
 ---
 
 ## Đợt 5 — Cách ly & vòng đời thay đổi (8 ngày, sau phát hành)

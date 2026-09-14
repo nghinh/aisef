@@ -16,6 +16,18 @@ Local scoped advisory memory is implemented but default OFF. [P0/P1/P2 research 
 > condition, quoted: an external user asks for it, **or** a paired measurement
 > on a real agent shows a repeated error the memory would have prevented.
 
+> **2026-09-14 — this file is not a gate, and the closure contract says so
+> explicitly.** [`PROJECT-CLOSURE-GATE.md`](PROJECT-CLOSURE-GATE.md) (owner-
+> approved 2026-09-14) is the sole authoritative definition of "project
+> finished". This roadmap remains a **priority list**, and its §8 rules six
+> items here POST_CLOSE with reasons rather than blocking on them for appearing
+> on a roadmap: benchmark expansion to ≥3 languages/task classes (#4),
+> behaviour-scoped preservation, distributed execution (#5), the PyPI
+> organisation account, skill scanning, and CLI optimisation. Item **#1
+> (external user validation)** is the exception — it is closure gate **G6**, and
+> the chicken-and-egg argument ADR-006 §2 used to defer it has expired now that
+> v1.0.0–v1.6.0 are published.
+
 Written 2026-09-08, after v1.0.0 release. Items prioritized by evidence
 from dogfood runs, conformance, and known limitations — not by feature wish.
 
