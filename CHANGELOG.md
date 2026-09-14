@@ -387,6 +387,31 @@ in exactly the harness — byte-identical prompt, guard plugin on one side — a
 labels itself as not a measurement. Pre-registration for the run is on disk
 before any data exists.
 
+**A verification run that timed out left the project's dev server holding its
+port** (bug 154). The degraded runner — everything outside Docker — killed only
+the direct child, so a server the project's own test command had started,
+Playwright's `webServer`, survived it, reparented to PID 1 and kept port 8123.
+On `todo-oc` such an orphan, whose working directory was a story worktree the
+harness had since deleted, answered 404 to every path; 404 is not enough for
+`reuseExistingServer` to reuse it, so the next `pre-deploy` failed `e2e` and
+`accessibility` with `Address already in use` — a symptom that points at the
+project rather than at the harness. Killing the orphan and rerunning, with
+nothing in the project changed, turned both green. Commands now run in their own
+process group and a timeout kills the whole tree, as the Docker path already did
+with `docker rm -f`; interrupting by hand tears the tree down too, since the
+child no longer receives the terminal's SIGINT.
+
+**The release gate's dogfood acceptance check has not run since 2026-09-06.**
+`release.yml` invokes the gate without `AISEF_ACCEPTANCE`, so that assertion
+skips and the log reads `OK (skipped=1)` — which reads as covered. The corpus it
+was written for (e9) no longer exists on any machine. Re-measured on `todo-oc`:
+scope, story completion and the seven upstream human gates pass; `Dockerfile`,
+`CI workflow`, `runbook`, `isolation` and `verification` do not, for reasons
+that belong to that project, and the `pre-deploy` gate is unapproved because
+approving it is a human decision. The test now states all of that where it
+skips, and the release workflow prints the skip instead of swallowing it. The
+assertion itself was not relaxed.
+
 **A story may no longer deliver a placeholder** (bug 148). marks-cli stopped at
 EPIC-02 wave 1 with two of seven stories merged. STORY-01-02 had shipped a
 dispatcher whose commands answer "not implemented", and its criterion — a stub

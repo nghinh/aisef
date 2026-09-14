@@ -452,6 +452,34 @@ class TestLoiHaTangKhacLenhDo(unittest.TestCase):
         ten = calls[0][calls[0].index("--name") + 1]
         self.assertIn(["docker", "rm", "-f", ten], calls)
 
+
+class TestHetGioGietCaCayTienTrinh(unittest.TestCase):
+    """Nhánh Docker đã dọn (`docker rm -f`, phép thử ngay trên); nhánh suy biến
+    thì chưa: `subprocess.run(timeout=)` chỉ `kill()` đứa con **trực tiếp**, nên
+    cháu mà lệnh kiểm thử dựng lên (webServer của Playwright) sống sót, mồ côi
+    về PID 1 và giữ cổng — đo trên todo-oc 2026-09-14."""
+
+    @unittest.skipIf(sys.platform == "win32", "dùng /bin/sh và os.kill(pid, 0)")
+    def test_het_gio_khong_de_lai_chau_mo_coi(self):
+        import time
+
+        with tempfile.TemporaryDirectory() as d:
+            pidfile = Path(d) / "pid"
+            r = run(SandboxSpec(
+                workspace=Path(d), use_docker=False, timeout_seconds=1,
+                cmd=["/bin/sh", "-c", f"sleep 30 & echo $! > {pidfile}; wait"],
+            ))
+            self.assertTrue(r.timed_out)
+            pid = int(pidfile.read_text(encoding="utf-8").strip())
+            for _ in range(40):
+                try:
+                    os.kill(pid, 0)
+                except OSError:
+                    return                       # cháu chết cùng cây: đúng
+                time.sleep(0.05)
+            os.kill(pid, 9)                      # dọn rác của chính phép thử
+            self.fail(f"cháu {pid} sống sót sau khi lệnh hết giờ bị giết")
+
 class TestMounts(unittest.TestCase):
     """ADR-005 V6: worktree sạch từ SHA không có `node_modules`/venv — mượn của dự án."""
 

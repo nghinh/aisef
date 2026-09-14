@@ -43,6 +43,7 @@ import importlib
 import os
 import shutil
 import subprocess
+import sys
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -460,38 +461,86 @@ def _link_mounts(spec: SandboxSpec) -> None:
             dst.symlink_to(Path(src).resolve())
 
 
+#: Put the child in its own process group so a timeout can kill the **whole
+#: tree**, not only the direct child. Windows has no process groups in the
+#: POSIX sense; `CREATE_NEW_PROCESS_GROUP` is what `taskkill /T` walks.
+_OWN_GROUP: dict = (
+    {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}  # type: ignore[attr-defined]
+    if sys.platform == "win32" else {"start_new_session": True}
+)
+
+
+def _kill_group(proc: subprocess.Popen) -> None:
+    """SIGKILL the command **and everything it spawned**.
+
+    `subprocess.run(timeout=)` only calls `proc.kill()`, which leaves
+    grandchildren alive: a test command that starts a server (Playwright's
+    `webServer`) leaks it, it reparents to PID 1 and keeps holding the port.
+    The Docker path already handles the same hazard with `docker rm -f`.
+    """
+    if sys.platform == "win32":
+        subprocess.call(
+            ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+        return
+    import signal
+    try:
+        os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+    except OSError:
+        proc.kill()          # group already gone, or not ours to signal
+
+
 def _run_degraded(spec: SandboxSpec) -> SandboxResult:
     """Run directly on the host. No isolation — only limits the working directory."""
     _link_mounts(spec)
     started = time.monotonic()
+
+    def elapsed() -> int:
+        return int((time.monotonic() - started) * 1000)
+
     try:
-        proc = subprocess.run(
+        # Popen rather than `subprocess.run`: the timeout branch needs the pid
+        # to kill the process group, and `run` has already discarded it by the
+        # time it raises.
+        proc = subprocess.Popen(
             runnable(spec.cmd),
             cwd=str(spec.workspace),
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True, encoding="utf-8", errors="replace",
-            timeout=spec.timeout_seconds,
             # Inherit host env then overlay `spec.env`. Previously `{**spec.env}
             # or None`: non-empty env lost PATH, commands outside /bin were
             # not found — and that is also why SECRETS_ABSENT is UNSUPPORTED here.
             env={**os.environ, **spec.env},
-        )
-    except subprocess.TimeoutExpired:
-        return SandboxResult(
-            exit_code=124,
-            stderr=f"exceeded {spec.timeout_seconds}s",
-            duration_ms=int((time.monotonic() - started) * 1000),
-            timed_out=True,
+            **_OWN_GROUP,
         )
     except OSError as e:
-        return SandboxResult(
-            exit_code=127,
-            stderr=str(e),
-            duration_ms=int((time.monotonic() - started) * 1000),
-        )
+        return SandboxResult(exit_code=127, stderr=str(e), duration_ms=elapsed())
+
+    with proc:
+        try:
+            out, err = proc.communicate(timeout=spec.timeout_seconds)
+        except subprocess.TimeoutExpired:
+            _kill_group(proc)
+            proc.communicate()            # drain pipes and reap
+            return SandboxResult(
+                exit_code=124,
+                stderr=f"exceeded {spec.timeout_seconds}s",
+                duration_ms=elapsed(),
+                timed_out=True,
+            )
+        except BaseException:
+            # Ctrl-C: the child sits in its own group now, so the terminal's
+            # SIGINT no longer reaches it. Tear the tree down ourselves, or
+            # interrupting by hand leaks exactly what the timeout branch above
+            # was fixed to stop leaking.
+            _kill_group(proc)
+            proc.communicate()
+            raise
     return SandboxResult(
         exit_code=proc.returncode,
-        stdout=proc.stdout,
-        stderr=proc.stderr,
-        duration_ms=int((time.monotonic() - started) * 1000),
+        stdout=out,
+        stderr=err,
+        duration_ms=elapsed(),
     )
