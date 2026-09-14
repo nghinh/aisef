@@ -11,7 +11,7 @@
       "aisef-1.6.0.tar.gz"
     ],
     "build_exit": 0,
-    "commit": "4ae9baf6e8d2230023455ea581f9b54d553587b0",
+    "commit": "862d0d4c124fddae3ccf2a6ad31cb297229f79c3",
     "interpreter": "/Users/nghinh/Downloads/projects/ai-sdlc/.venv/bin/python",
     "twine_exit": 0
   },
