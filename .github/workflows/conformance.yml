@@ -1,6 +1,9 @@
 # Hợp quy client — chạy tạo tác biên dịch trên client THẬT (lớp lỗi D2:
 # hook/plugin sinh ra đúng cú pháp mà chưa từng chạy). Theo lịch tuần và
-# khi gọi tay. Cột claude quyết định phát hành; OpenCode hạng hai V1.
+# khi gọi tay. Cả hai cột claude và opencode quyết định phát hành (ADR-006 §4).
+# Job này chỉ chạy phép thử trên claude: cột opencode được `merge_into_report`
+# giữ lại từ bảng đã commit, nên ngày `generated` mới không có nghĩa là cột ấy
+# vừa chạy — xem báo cáo G3 trong PROJECT-CLOSURE-GATE.
 name: conformance
 on:
   schedule:
