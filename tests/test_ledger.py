@@ -169,6 +169,32 @@ class TestNguonHanhVi(LedgerTestCase):
         led = L.build(self.root)
         self.assertNotIn("AC-STORY-01-02-1", led.behaviors)
 
+    def test_story_sau_thieu_test_khong_lam_do_yeu_cau_story_khac_dang_xanh(self):
+        """Đo trên todo-cli STORY-06-01: năm yêu cầu bật REOPENED trong khi 65/65
+        test xanh. Story ấy `covers` cùng yêu cầu với ba story trước và có một tiêu
+        chí không test nào chạm tới, nên rollup của **chính nó** ghi đỏ; xanh của
+        story chủ sở hữu — đủ tiêu chí, trong **cùng** lần chạy — đến sau nên bị bỏ
+        (xanh ở ứng viên chưa landed trả về sớm). Vắng mặt ở tiêu chí của story sau
+        không xoá được bằng chứng story trước vừa để lại.
+        """
+        from aisef.control.journal import Entry, JournalStore
+
+        self.index([
+            {"id": "STORY-02-01", "acceptance_criteria": ["a"], "covers": ["FR-1"]},
+            {"id": "STORY-06-01", "acceptance_criteria": ["b", "c"], "covers": ["FR-1"]},
+        ])
+        t1, t6 = ac_test("STORY-02-01", 1), ac_test("STORY-06-01", 1)
+        self.run_tests("STORY-02-01", ids=[t1])
+        # Như kho thật: story sau đã đóng băng ứng viên, lần chạy không mang SHA.
+        JournalStore(self.root).record("STORY-06-01", Entry(
+            step="candidate.frozen", attempt=1, data={"sha": "a" * 40}))
+        self.run_tests("STORY-06-01", ids=[t1, t6])   # xanh hết; tiêu chí 2 không có test
+        led = L.build(self.root)
+        self.assertEqual(led.behaviors["AC-STORY-06-01-2"].gap_kind, L.UNTESTED,
+                         "vắng mặt phải ở tiêu chí của chính story sau")
+        self.assertEqual(led.behaviors["FR-1"].status, L.VERIFIED)
+        self.assertEqual(led.summary()["reopen_events"], 0)
+
     def test_su_kien_behavior_do_pha_khac_ghi_cung_vao_so(self):
         self.index([{"id": "STORY-01-01", "acceptance_criteria": ["a"]}])
         self.run_tests("STORY-01-01", ids=[ac_test("STORY-01-01", 1)])

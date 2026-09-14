@@ -619,6 +619,21 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
     Other stories are scored only on criteria that actually have tests in
     this run — a partial test suite must not turn unrelated stories into
     regressions.
+
+    A requirement (`covers`) is judged **once per run**, not once per story that
+    covers it: several stories may cover the same `FR-x`, and the requirement is
+    green when *any* of the stories judged in this run has all its criteria green.
+    An absence in a later story's own criteria is recorded where it belongs — on
+    that criterion, as UNTESTED — and cannot erase evidence another story just
+    left for the same requirement. Measured on todo-cli STORY-06-01: five
+    requirements flipped to REOPENED while all 65 tests were green, because that
+    story covers what three earlier stories cover and one of its eight criteria
+    had no test. Ordering matters for the same reason: `observe` compares events
+    by `(at, sid, seq)`, and the order of `targets` *inside* one event is not an
+    ordering at all — so the verdicts are aggregated before `observe` sees them,
+    instead of letting the last writer of the loop win (it did not: the home
+    story wrote red first and the owner's green, arriving after, was dropped by
+    the unlanded-candidate early return, which stays as it is).
     """
     det = e.detail
     ids = [str(t) for t in det.get("test_ids") or []]
@@ -629,6 +644,15 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
         led.observe(ac_code(story_id, i), "ac", ok=ok, at=at, story=sid,
                     owner=story_id, attempt=attempt, candidate=cand, landed=landed,
                     source={"test_run": e.name, **source})
+
+    # requirement -> (green, why, story it is credited to) for *this* run. Green wins.
+    covered: dict[str, tuple[bool, str, str]] = {}
+
+    def rollup(line: StoryLine, ok: bool, why: str) -> None:
+        for req in line.covers:
+            prev = covered.get(req)
+            if prev is None or (ok and not prev[0]):
+                covered[req] = (ok, why, line.id)
 
     targets: list[tuple[str, StoryLine, bool]] = []
     own = led.stories.get(sid)
@@ -653,8 +677,7 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
             why = f"{WHY_UNREADABLE}: {detail}" if detail else WHY_UNREADABLE
             for i in range(1, line.acceptance + 1):
                 note(story_id, i, False, {"why": why})
-            _observe_covers(led, line, ok=False, at=at, story=sid, attempt=attempt,
-                            cand=cand, why=why, landed=landed)
+            rollup(line, False, why)
             continue
 
         cov = ac_coverage(story_id, line.acceptance, ids)
@@ -707,8 +730,12 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
         why = "" if story_green else (
             gap_whys[0] if landed and gap_whys and len(set(gap_whys)) == 1 and gap_whys[0]
             else "story criteria not yet green")
-        _observe_covers(led, line, ok=story_green, at=at, story=sid, attempt=attempt,
-                        cand=cand, why=why, landed=landed)
+        rollup(line, story_green, why)
+
+    for req, (ok, why, owner) in covered.items():
+        led.observe(req, _kind_of(req), ok=ok, at=at, story=sid, owner=owner,
+                    attempt=attempt, candidate=cand, landed=landed,
+                    source={"story": owner, **({"why": why} if why else {})})
 
 
 def _linked(led: Ledger, story_id: str, ids: list[str]) -> list[tuple[int, str]]:
@@ -720,14 +747,6 @@ def _linked(led: Ledger, story_id: str, ids: list[str]) -> list[tuple[int, str]]
         if lk and str(lk.get("test_id")) in ids:
             out.append((i, str(lk["test_id"])))
     return out
-
-
-def _observe_covers(led: Ledger, line: StoryLine, *, ok: bool, at: float, story: str,
-                    attempt: int, cand: str, why: str, landed: bool = True) -> None:
-    for req in line.covers:
-        led.observe(req, _kind_of(req), ok=ok, at=at, story=story, owner=line.id,
-                    attempt=attempt, candidate=cand, landed=landed,
-                    source={"story": line.id, **({"why": why} if why else {})})
 
 
 def _kind_of(bid: str) -> str:

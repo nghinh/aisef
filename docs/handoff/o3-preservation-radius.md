@@ -90,6 +90,22 @@ neighbour) = **0.235**; mean count 3.13 for regressors against 2.12 for clean.
    discarding the green written for the same requirement moments later in the
    same loop (green on an unlanded candidate returns early). Whoever takes **O2**
    should look here.
+
+   **Corrected 2026-09-14 — this one was taken, and it was a defect, not an
+   artifact** (bug 154 in `docs/FAILURE-TAXONOMY.md`). The text above stands as
+   what the measurement saw. `_observe_tests` now judges a requirement **once per
+   test run** rather than once per story that covers it: green from any story
+   whose criteria are all green in that run wins, and the absence stays recorded
+   on the criterion it belongs to (`untested`). Ordering rule made explicit: the
+   ledger orders events by `(at, sid, seq)` and the order of `targets` *inside*
+   one event is not an ordering, so the verdicts are aggregated before
+   `Ledger.observe` sees them — the unlanded-candidate early return is unchanged.
+   Same script, no change to what counts as corroboration: **29 → 4**
+   uncorroborated (todo-oc 5→0, todo-cli 5→0, todo-e2e 15→0, todo 4→4); the 15
+   confirmed regressors and the whole calibration table above are unchanged. The
+   remaining 4 are one `todo` instant where the runner never started, so no test
+   name existed for anyone — `untraced`, a different absence and a separate
+   decision.
 2. **File overlap is the wrong predicate**, which is the substance of O3's own
    complaint, and the weight was never the lever. The predicate is nearly always
    true: **27 of 32** stories touch at least one neighbour — 15 of 15 regressors,
