@@ -1,5 +1,137 @@
 # Changelog
 
+## Unreleased
+
+Everything below landed **after** `v1.6.0` was tagged and published, so it is not
+in the 1.6.0 wheel. Three of these paragraphs were first written into the 1.6.0
+section by parallel agents and moved here: the release was already on PyPI, and a
+changelog that credits a published release with fixes its artifact does not carry
+is the same class of untrue statement this project spends its time removing.
+
+**A run records which client and which model produced it.** `agent_run` recorded
+`spec.model` — the model *requested* — which is empty whenever no `route.*_model`
+is configured. That is how all 145 sessions of the reviewer-qualification corpus
+came to carry `model: ""`, and why its false-block and miss rates are "across
+clients" rather than per client. It now records the model the **stream** reported,
+with the requested one as fallback, plus a `client` field naming the adapter. Per
+event, not per project: `todo-oc` holds both a `.claude/` and an `.opencode/`, and
+evidence accumulates across runs. `reviewer_qual.report` splits every class count
+by `client/model` — but only when the corpus holds more than one, because a column
+of repeated `?/?` reads as "already split". `sprint START` and `pipeline START` in
+`run.log` now name the client, which was the single most load-bearing fact about a
+run and the one thing its own log did not say. Forward-looking only: no existing
+corpus gains a `client=` line, so which client produced the four dogfood corpora
+is still inference.
+
+**A requirement was judged once per covering story, so the ledger reported 29
+regressions that never happened** (bug 155). A story covering what earlier stories
+already cover wrote those requirements red whenever one of *its own* criteria had
+no test — todo-cli STORY-06-01 flipped five requirements belonging to three other
+stories to REOPENED while all 65 tests in that run were green. The owning stories,
+green in the same test event, wrote them green a moment later and the ledger
+discarded that, correctly, because green on an unlanded candidate is not proof. Red
+kept, green dropped, and which one survived came down to the order of a loop inside
+a single event — which is not an ordering the ledger recognises. A requirement is
+now judged once per run, aggregated before `observe` sees it: green from any story
+whose criteria are all green in that run wins, and the absence stays recorded where
+it belongs, on the criterion that lacks a test, as `untested`. Each false entry was
+the kind that buys a paid repair story, and the O3 calibration had to work around
+them as "artifacts". Re-measured with the same script: **29 → 4**, with the 15
+confirmed regressors and the entire calibration table unchanged. The four that
+remain are one run where the test tool never started, so nothing was read for any
+story — a different absence, and a separate decision.
+
+**`aisef report` and the dashboard reported one `gap` number for three different
+absences** (ADR-009 O2). The ledger has known which kind each gap is since the
+previous release, but `Ledger.summary()` did not carry the split, so the two reports
+an operator actually reads showed a single total. The three counts now sit beside
+the total in both — only when the corpus holds more than one kind, and never the
+kinds counting zero. They cover every non-green behaviour, so they add up to
+`gap + reopened` rather than to `gap`: printed beside `gap` alone, `todo-e2e` would
+have read "1 gap · unbuilt 9". Re-measured over the four corpora: 167 behaviours,
+49 non-green, 40 `unbuilt` · 4 `untested` · 5 `untraced`.
+
+**A budget cap below what the project had already spent read as a framework bug**
+(ADR-009 § Deferred). `run.cost_cap_usd` was validated for type and sign, never
+against the project's own ledger, so a cap of `$0.50` on a project recording `$1.25`
+spent was accepted at load and surfaced only later, as `BudgetGuard` refusing the
+next paid call — the operator sees a refusal, not their own number. `aisef doctor`
+now says it first, with both numbers and the fix, for `run.cost_cap_usd` and
+`run.turn_cap`. Four states rather than pass/fail: no cap configured prints nothing
+and never opens the ledger; cap above spend passes; cap at or below spend fails, at
+equality too; and no ledger yet is neither pass nor fail, because there is nothing
+to compare. The check never takes the ledger's lock and never writes it.
+
+**The outward-facing pages claimed the opposite of what was measured.** The landing
+page said AISEF "added governance and safety layers with near-zero measured cost
+overhead" in the bullet immediately after one stating the harnessed arm spends 44 %
+more turns. C-1 measured **+44 % turns and +51 % time**; C-1b measured +27 % turns.
+The page asserted both at once and the false half was the marketing half. Also
+corrected there: a benchmark bullet quoting only C-1's `0.64 vs 0.69`, which reads
+as a measured degradation of 0.05 when the band is ±0.08 and C-1b reversed the sign;
+a `$ aisef doctor` heading over seven facts that command does not print; and a test
+count given as 1,913 in one place and 2,391 in another. `docs/SALEKIT.html` declared
+**no `<meta charset>`** while containing UTF-8 em dashes, so twelve of them rendered
+as `â€"` — found by loading the page in a browser rather than by reading it. Its
+footer said `v0.8.0`, eight releases stale and predating PyPI. Stale counts fixed
+across both: 58 → 69 config keys, 9 → 10 guards, 28 → 30 bench tasks, 175 → 207
+real-agent sessions, "three cohorts" → four, 31 → 130 taxonomy rows. Both pages now
+carry the reviewer-qualification rates as measured, and neither presents the model
+review as a safety net, because the measurement says it is not one.
+
+**The failure taxonomy's own header had drifted.** It said "147 lỗi · 124 dòng · mã
+22–147" directly above the command that returns 132 rows, and conflated the highest
+bug code with the number of bugs — 26 and 27 have no rows, so the real count is 153
+against a highest code of 155. The header now states both, with the command for
+each, and says the two-unit gap between the READMEs' figure and the true count is
+deliberate and pinned by a meta-test.
+
+**A second docs pass, eight more drifts, and one of them was the rule's own
+document.** ADR-009 said three things at once about O1–O4: "All four closed",
+"Three remain: O1, O2, O4", and "O2–O4 remain open" — while being the document
+that states the rule *a statement of the form "N items remain" must carry the
+list, on disk, in the same document*. All four are closed, and each stale
+sentence was true when it was typed: the four closures merged from parallel
+worktrees inside one day, so every count of the survivors was a number only its
+own branch could see. Prose is the last tier here with no guard, which is why
+the same thing happened to the config-key count twice — 58 to 68 at 06:00, and
+stale at 06:04 when ADR-009 O3 added the 69th key from another worktree. Also
+corrected: both READMEs still listed the Serena write-scope limitation the
+roadmap had already retracted; ADR-007's header still said EXPERIMENTAL against
+its own frozen addendum; and two "cannot be settled from disk" items are now
+settled forward-only — `run.log` and `agent_run` record the client and the model
+since 1.6.0, which tells the *next* reader what produced a corpus and tells us
+nothing new about the 145 sessions already on disk. Two numbers were checked and
+deliberately **not** changed: the 68 in the 2026-09-12 assessment was correct at
+the SHA that section names, and V1-READINESS's conformance expiry was correct
+four hours before the table was refreshed. Dated measurements get a dated note,
+never a rewrite.
+
+**A verification run that timed out left the project's dev server holding its
+port** (bug 154). The degraded runner — everything outside Docker — killed only
+the direct child, so a server the project's own test command had started,
+Playwright's `webServer`, survived it, reparented to PID 1 and kept port 8123.
+On `todo-oc` such an orphan, whose working directory was a story worktree the
+harness had since deleted, answered 404 to every path; 404 is not enough for
+`reuseExistingServer` to reuse it, so the next `pre-deploy` failed `e2e` and
+`accessibility` with `Address already in use` — a symptom that points at the
+project rather than at the harness. Killing the orphan and rerunning, with
+nothing in the project changed, turned both green. Commands now run in their own
+process group and a timeout kills the whole tree, as the Docker path already did
+with `docker rm -f`; interrupting by hand tears the tree down too, since the
+child no longer receives the terminal's SIGINT.
+
+**The release gate's dogfood acceptance check has not run since 2026-09-06.**
+`release.yml` invokes the gate without `AISEF_ACCEPTANCE`, so that assertion
+skips and the log reads `OK (skipped=1)` — which reads as covered. The corpus it
+was written for (e9) no longer exists on any machine. Re-measured on `todo-oc`:
+scope, story completion and the seven upstream human gates pass; `Dockerfile`,
+`CI workflow`, `runbook`, `isolation` and `verification` do not, for reasons
+that belong to that project, and the `pre-deploy` gate is unapproved because
+approving it is a human decision. The test now states all of that where it
+skips, and the release workflow prints the skip instead of swallowing it. The
+assertion itself was not relaxed.
+
 ## 1.6.0 — 2026-09-14
 
 Measured by reading the developer session OpenCode actually ran, not by
@@ -370,27 +502,6 @@ three versions stale. Three claims that could not be settled from disk are
 labelled unverified with the measurement that would settle them — including that
 `run.log` never records which client a run used, which is worth fixing on its own.
 
-**A second docs pass, eight more drifts, and one of them was the rule's own
-document.** ADR-009 said three things at once about O1–O4: "All four closed",
-"Three remain: O1, O2, O4", and "O2–O4 remain open" — while being the document
-that states the rule *a statement of the form "N items remain" must carry the
-list, on disk, in the same document*. All four are closed, and each stale
-sentence was true when it was typed: the four closures merged from parallel
-worktrees inside one day, so every count of the survivors was a number only its
-own branch could see. Prose is the last tier here with no guard, which is why
-the same thing happened to the config-key count twice — 58 to 68 at 06:00, and
-stale at 06:04 when ADR-009 O3 added the 69th key from another worktree. Also
-corrected: both READMEs still listed the Serena write-scope limitation the
-roadmap had already retracted; ADR-007's header still said EXPERIMENTAL against
-its own frozen addendum; and two "cannot be settled from disk" items are now
-settled forward-only — `run.log` and `agent_run` record the client and the model
-since 1.6.0, which tells the *next* reader what produced a corpus and tells us
-nothing new about the 145 sessions already on disk. Two numbers were checked and
-deliberately **not** changed: the 68 in the 2026-09-12 assessment was correct at
-the SHA that section names, and V1-READINESS's conformance expiry was correct
-four hours before the table was refreshed. Dated measurements get a dated note,
-never a rewrite.
-
 **The benchmark is ready for its second column.** Correcting my own earlier
 framing: the real-model wiring already existed and had run twice — cohorts C-1
 and C-1b, both against real `9router/mycombo`, with deltas of −0.06 and +0.06.
@@ -407,31 +518,6 @@ the real runner and scorer against a fake binary, proves the two columns differ
 in exactly the harness — byte-identical prompt, guard plugin on one side — and
 labels itself as not a measurement. Pre-registration for the run is on disk
 before any data exists.
-
-**A verification run that timed out left the project's dev server holding its
-port** (bug 154). The degraded runner — everything outside Docker — killed only
-the direct child, so a server the project's own test command had started,
-Playwright's `webServer`, survived it, reparented to PID 1 and kept port 8123.
-On `todo-oc` such an orphan, whose working directory was a story worktree the
-harness had since deleted, answered 404 to every path; 404 is not enough for
-`reuseExistingServer` to reuse it, so the next `pre-deploy` failed `e2e` and
-`accessibility` with `Address already in use` — a symptom that points at the
-project rather than at the harness. Killing the orphan and rerunning, with
-nothing in the project changed, turned both green. Commands now run in their own
-process group and a timeout kills the whole tree, as the Docker path already did
-with `docker rm -f`; interrupting by hand tears the tree down too, since the
-child no longer receives the terminal's SIGINT.
-
-**The release gate's dogfood acceptance check has not run since 2026-09-06.**
-`release.yml` invokes the gate without `AISEF_ACCEPTANCE`, so that assertion
-skips and the log reads `OK (skipped=1)` — which reads as covered. The corpus it
-was written for (e9) no longer exists on any machine. Re-measured on `todo-oc`:
-scope, story completion and the seven upstream human gates pass; `Dockerfile`,
-`CI workflow`, `runbook`, `isolation` and `verification` do not, for reasons
-that belong to that project, and the `pre-deploy` gate is unapproved because
-approving it is a human decision. The test now states all of that where it
-skips, and the release workflow prints the skip instead of swallowing it. The
-assertion itself was not relaxed.
 
 **A story may no longer deliver a placeholder** (bug 148). marks-cli stopped at
 EPIC-02 wave 1 with two of seven stories merged. STORY-01-02 had shipped a

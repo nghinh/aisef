@@ -1,13 +1,21 @@
 # Phân loại lỗi thật của AISEF — để không tái diễn
 
-**147 lỗi** tìm được từ 2026-09-05 → 2026-09-14 (đếm lại 14/09; câu này nói
-"bốn mươi bảy" cho tới khi ấy). Lỗi 1–21 ghi ở `docs/STATUS-2026-09-05.md` §2.4;
-bảng dưới có **124 dòng, mã 22–147** — 26 và 27 không có dòng nào, chúng được
-gộp vào lỗi khác lúc ghi và số bị bỏ trống:
+**Mã cao nhất 155**, ghi từ 2026-09-05 → 2026-09-14 (đếm lại 14/09; câu này nói
+"147 lỗi · 124 dòng · mã 22–147" cho tới khi ấy — dòng 148–155 vào sau khi nó
+được viết, đúng cái kiểu trôi mà chính tệp này tồn tại để chặn). Lỗi 1–21 ghi ở
+`docs/STATUS-2026-09-05.md` §2.4; bảng dưới có **132 dòng, mã 22–155** — 26 và
+27 không có dòng nào, chúng được gộp vào lỗi khác lúc ghi và số bị bỏ trống:
 
 ```
-grep -oE '^\| *[0-9]+ *\|' docs/FAILURE-TAXONOMY.md | tr -dc '0-9\n' | sort -n | uniq | wc -l   # → 124
+grep -oE '^\| *[0-9]+ *\|' docs/FAILURE-TAXONOMY.md | tr -dc '0-9\n' | sort -n | uniq | wc -l   # → 132
+grep -oE '^\| *[0-9]+ *\|' docs/FAILURE-TAXONOMY.md | tr -dc '0-9\n' | sort -n | tail -1        # → 155
 ```
+
+**Mã không phải số đếm.** Vì 26 và 27 trống, số lỗi *thật* là 21 + 132 = **153**,
+thấp hơn mã cao nhất hai đơn vị. Hai README khai **155** theo mã cao nhất, và
+`tests/test_meta.py::test_so_loi_trong_readme_khop_bang_phan_loai` ghim đúng
+quy ước ấy — nên hai con số lệch nhau là *có chủ ý*, không phải trôi. Câu cũ
+trộn hai thứ này làm một, nên nó vừa sai số đếm vừa không ai kiểm được.
 
 Mốc thời gian, đọc từ **ngày commit đưa dòng ấy vào tệp này**
 (`git log --format=%ad --date=short -S'| N |' -- docs/FAILURE-TAXONOMY.md | tail -1`),
