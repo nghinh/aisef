@@ -1,0 +1,41 @@
+{
+  "_comment": "Canonical defect register — closure criterion G2.3 (`docs/PROJECT-CLOSURE-GATE.md` §5, owner ruling 6). Repository-local and version-controlled on purpose: GitHub Issues are explicitly NOT canonical, because closure must not depend on an external tracker being reachable. Issues may mirror this file. PASS = zero OPEN P0/P1 rows. Read it with `aisef.control.defects:read` — the same reader the closure probe uses, so a report and the gate cannot disagree. This file is missing = UNRUNNABLE at closure; this file present with an empty `defects` = a real PASS.",
+  "_boundary": "`docs/FAILURE-TAXONOMY.md` answers *what went wrong and what did we learn* (133 closed rows: symptom, root cause, lesson, fix). This register answers *what is outstanding now, at what severity*. A defect sits here while open and there once understood, and a row here points at its taxonomy row by id instead of restating it — nothing is copied in either direction. Work that is wanted but whose absence is not a wrong result (the POST_CLOSE list in the contract's §7, `docs/ROADMAP-POST-1.0.md`) is not a defect and is not entered here.",
+  "_fields": "id (stable, never reused) · severity (P0–P3, scale below) · status (OPEN | CLOSED) · title · introduced / fixed (version or commit, where known; empty when it is not) · evidence (the regression test, or the command that recomputes the measurement) · check (optional: the `gate.CHECK_NAMES` entry the defect bears on) · taxonomy (optional: the FAILURE-TAXONOMY.md row id) · notes. No timestamps: the file must digest the same on every read or G2.3's staleness detection reads noise as change.",
+  "register_version": "1",
+  "severity_scale": {
+    "source": "docs/EXTERNAL-VALIDATION-v1.1.0.md#finding-classification",
+    "blocking": ["P0", "P1"],
+    "_comment": "Reused by reference, never redefined here. P0 = cannot install, data loss, security issue, incorrect gate result. P1 = cannot complete the lifecycle without author assistance. P2 = significant confusion / DX friction. P3 = cosmetic or optional. The reader refuses a register that names another source or edits `blocking`."
+  },
+  "defects": [
+    {
+      "id": "D-001",
+      "severity": "P1",
+      "status": "OPEN",
+      "title": "A test run with no readable results records other stories' requirements as regressions",
+      "introduced": "66dfad5",
+      "evidence": "python3 validation/o3_preservation_radius.py → `todo: 4 scored stories, 36 behaviours, 2 confirmed regressors, 4 uncorroborated REOPENED` (FR-1, FR-2, FR-4 owned by STORY-02-01 and FR-9 by STORY-01-02, all flipped by STORY-02-02 at at=1788947583.932249, an event whose `test` tool_run is ok=True exit_code=0 with `test_format: \"\"`, `test_ids: []`, `failed_ids: []`). No regression test yet.",
+      "taxonomy": 155,
+      "notes": "Same class as taxonomy row 155 (absence read as regression), in the branch that fix did not cover: `ledger._observe_tests`, when `readable` is false, calls `rollup(line, False, why)` for the home story, so every requirement that story `covers` — owned by earlier, VERIFIED stories — is observed not-green and `observe` records REOPENED. Nothing red was read anywhere. P1 and not P2 because the loop's own arithmetic is corrupted by it (`improve` stops on Δverified − Δreopened) and only a human comparing the ledger against the evidence can tell the artifact from a regression; P1 and not P0 because no gate verdict is demonstrably wrong on disk — the mechanism by which one could be (a behaviour REOPENED by another story is dropped from that story's `preservation` list, `complexity.verified_touched`) is real but was never reached here: STORY-02-02 was the last story of that corpus and it failed. The trigger is not exotic — any project whose test output AISEF cannot parse yields `test_format: \"\"`."
+    },
+    {
+      "id": "D-002",
+      "severity": "P1",
+      "status": "OPEN",
+      "title": "A blocking gate decision can rest on the model reviewer alone",
+      "evidence": "python3 -m aisef.control.reviewer_qual ~/Downloads/projects/{todo-cli,todo-e2e,todo-oc,todo}/_bmad-output → block uncorroborated 21 of 57 blocks scored (36.8 %), of which todo-e2e 15 of its 17; false block rate 0.1053; same-tree verdict reversals 11 of 20. Lifecycle effect, same corpus: todo-e2e STORY-05-01 ends `failed` after gate:verdict seq 74 and seq 150 where `review` is the only failing check (`coverage` is UNCONFIGURED, non-blocking).",
+      "check": "review",
+      "notes": "Closure criterion G2.4b owns the verdict on this fact (`REQUIRED_WITH_WAIVER_ALLOWED`, owner ruling 1: no reviewer redesign for closure's sake, and the measured rate stays a published property). It is entered here at P1 anyway because the contract's exemption for the model-judge error rate is conditional on 'no blocking decision rests on the judge alone', and that condition is exactly the one that does not hold; P1 by the letter of the scale — a story ended `failed` on the judge's word with no deterministic check disagreeing, which is the lifecycle not completing without author assistance. The argument for P2 is owner ruling 1 read as also excusing it from G2.3; if the owner takes that reading, this row becomes P2 with one edit and G2.4b keeps the verdict alone."
+    },
+    {
+      "id": "D-003",
+      "severity": "P2",
+      "status": "OPEN",
+      "title": "`_analyze.cut_sessions` merges two bench cohorts on the three tasks they share",
+      "introduced": "840c3e0",
+      "evidence": "tests/bench/_analyze.py: `_DUONG_DAN_PHIEN = re.compile(r\"\\.bench[\\w.-]*/run/([\\w-]+)/([\\w-]+)/a(\\d+)\")` matches any ledger directory but captures only (condition, task, attempt), so `.bench/run/…` and `.bench-c1b/run/…` land on one key. Recorded in docs/BENCH-TASK-DISCRIMINATION.md §6 with the three affected tasks (`sec-1`, `sec-2`, `state-3`).",
+      "notes": "Deliberately not fixed: both published bench reports quote this function's output, so re-keying it makes a re-run of `analyze` print a table that differs from the printed evidence. P2 — the wrong number is an auxiliary cut-session count in a bench analysis helper, it blocks nothing and sets no gate. The contract lists it POST_CLOSE (§7); that is a scheduling statement, and P2 is the severity — they agree, and neither is derived from the other."
+    }
+  ]
+}
