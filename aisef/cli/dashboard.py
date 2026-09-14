@@ -339,10 +339,13 @@ def tom_tat_van_hanh(groups) -> str:
 
     tong_verified = tong_gap = 0
     tong_tien = 0.0
+    tong_loai: dict[str, int] = {}
     for name, root, evs in groups:
         s = L.build(root).summary()
         tong_verified += s["verified"]
         tong_gap += s["gap"] + s["reopened"]
+        for loai, n in s["gap_kinds"].items():
+            tong_loai[loai] = tong_loai.get(loai, 0) + n
         tien = sum(e.total_cost_usd for e in evs)
         tong_tien += tien
         if len(groups) > 1:
@@ -350,7 +353,13 @@ def tom_tat_van_hanh(groups) -> str:
                         f"· reopened {s['reopened']} · ${tien:.2f}")
     moi_do = f"{tong_verified / tong_tien:.1f} hành vi/$" if tong_tien else "— (chi phí $0)"
     dong.append(f"  VERIFIED ròng  {tong_verified} ({moi_do})")
-    dong.append(f"  gap tồn        {tong_gap}")
+    # Chẻ `gap tồn` theo loại vắng mặt (ADR-009 O2) **chỉ khi** có hơn một loại:
+    # `unbuilt 2 · untested 0 · untraced 0` đọc thành "đã chẻ rồi mà không thấy
+    # gì" (quy ước của `reviewer_qual.report` và mục token của báo cáo bench).
+    # Loại đếm 0 bị bỏ, nên các số in ra luôn cộng đúng bằng `gap tồn`.
+    co = {k: v for k, v in tong_loai.items() if v}
+    che = " · " + " · ".join(f"{k} {v}" for k, v in co.items()) if len(co) > 1 else ""
+    dong.append(f"  gap tồn        {tong_gap}{che}")
 
     ngay, vi_sao = tuoi_hop_quy()
     if ngay < 0:
