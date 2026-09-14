@@ -54,8 +54,14 @@ TASK_MAC_DINH = "bug-a2-multi-2"
 TOKEN = {"input": 98_392, "output": 1_487, "cache": {"read": 581_444, "write": 0}}
 
 _FAKE = '''#!/usr/bin/env python3
-"""`opencode` GIẢ — phát luồng JSON đã ghi sẵn. Không gọi model, không ra mạng."""
-import json, os, subprocess, sys
+"""`opencode` GIẢ — phát luồng JSON đã ghi sẵn. Không gọi model, không ra mạng.
+
+`AISEF_SELFCHECK_MODE`: `fix` (áp gold) · `cut` (mọi phiên bị cắt) · `cut:2,4`
+(chỉ phiên có số ấy bị cắt — số đọc từ tên cây làm việc `aN`/`sN`). Dạng thứ ba
+để đợt tuyển cặp dựng được một cohort **trộn**: một tỉ lệ cắt 0 % hay 100 %
+không kiểm được số học của tỉ lệ.
+"""
+import json, os, re, subprocess, sys
 
 prompt = sys.stdin.read()
 argv = sys.argv[1:]
@@ -72,7 +78,9 @@ def ev(o):
     print(json.dumps(o), flush=True)
 
 ev({"type": "step_start", "part": {}})
-if os.environ.get("AISEF_SELFCHECK_MODE") == "cut":
+che_do = os.environ.get("AISEF_SELFCHECK_MODE", "")
+so_phien = re.sub(r"\\D", "", os.path.basename(ws.rstrip("/\\\\")))
+if che_do == "cut" or (che_do.startswith("cut:") and so_phien in che_do[4:].split(",")):
     # Chữ ký phiên bị CLI cắt, đúng như đo trên C-1 § O-7: model in cú gọi công
     # cụ ra như văn bản thường, CLI không phân giải được, phiên dừng tại đó —
     # và CLI vẫn thoát 0.

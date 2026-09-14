@@ -285,7 +285,18 @@
           },
           "waiver_eligible": true,
           "requires_human": true,
-          "notes": "Owner ruling 3: not waived pre-emptively. States WAIVER_PENDING when no available pair qualifies; the 72-attempt run does not start until PASSED."
+          "protocol": "docs/BENCH-PAIR-QUALIFICATION-PROTOCOL.md",
+          "protocol_sha256": "bcdf7705f37fb27d3c55d0233901f8874a196b373eef0e860382dcf8975857e4",
+          "protocol_frozen_region": {
+            "_comment": "Owner adjustment 4 (2026-09-14): the qualification protocol is frozen and pinned BEFORE any real session runs -- 'do not inspect qualification results and then choose the threshold'. Same recipe as prereg_frozen_region, different markers, and recorded HERE rather than inside the document it pins. The frozen region carries all nine declared items and the arithmetic that derives the threshold, so a later reader can see the bar predates the data. Section 2.10 of the region restates every constant; tests/bench/_qualify.py is its code copy and the reference check asserts they match, so changing a threshold without re-freezing the text turns the suite red.",
+            "begin": "<!--\\s*QUAL-FROZEN:BEGIN\\s*-->",
+            "end": "<!--\\s*QUAL-FROZEN:END\\s*-->",
+            "exactly_one_pair": true,
+            "normalise": "CRLF and CR -> LF; strip leading and trailing blank lines of the region; nothing else -- byte-exact inside, exactly like prereg_frozen_region and for the same reason.",
+            "code_copy": "tests/bench/_qualify.py",
+            "reference_check": "tests/test_meta.py::TestGiaoThucTuyenCapBiGhim"
+          },
+          "notes": "Owner ruling 3: not waived pre-emptively. States WAIVER_PENDING when no available pair qualifies; the 72-attempt run does not start until PASSED. Adjustment 4: no real qualification session may run before protocol_sha256 above is recorded."
         },
         {
           "id": "G5.4",

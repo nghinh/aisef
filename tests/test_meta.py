@@ -631,3 +631,91 @@ class TestTienDangKyCot2BiGhim(unittest.TestCase):
             with self.subTest(cau=cau):
                 self.assertIn(cau, ca_tep)
                 self.assertNotIn(cau, vung, f"`{cau}` là hậu nghiệm, không được nằm trong vùng ghim")
+
+
+class TestGiaoThucTuyenCapBiGhim(unittest.TestCase):
+    """Giao thức tuyển cặp phải ghim được, và ghim thật (phán quyết bổ sung 4, G5.3).
+
+    Lời của chủ dự án: *"Do not inspect qualification results and then choose the
+    threshold."* Một ngưỡng còn sửa được sau khi số liệu về thì không phân biệt
+    được với một ngưỡng chọn sau khi thấy số. Bốn phép dưới đây là **bản tham
+    chiếu** của cùng công thức digest mà G5.1 đã dùng (`prereg_frozen_region`),
+    khác đúng tên mốc — công thức ấy không được có bản thứ ba.
+
+    Phép thứ tư là thứ làm hằng số trong mã **sửa được bởi người mà không sửa
+    được trong im lặng**: bảng §2.10 của vùng ghim và `tests/bench/_qualify.py`
+    phải khớp từng con số, nên đổi ngưỡng mà không ghim lại văn bản là một phép
+    kiểm đỏ, không phải một lần sửa êm.
+    """
+
+    VUNG = r"(?s)<!--\s*QUAL-FROZEN:BEGIN\s*-->\n(.*?)\n<!--\s*QUAL-FROZEN:END\s*-->"
+    GHIM = ROOT / "docs/BENCH-PAIR-QUALIFICATION-PROTOCOL.md"
+    CONG = ROOT / "docs/closure-gate.json"
+
+    @classmethod
+    def _vung_ghim(cls) -> str:
+        t = cls.GHIM.read_text(encoding="utf-8").replace("\r\n", "\n").replace("\r", "\n")
+        khop = re.findall(cls.VUNG, t)
+        if len(khop) != 1:
+            raise AssertionError(f"{cls.GHIM.name}: {len(khop)} vùng ghim, phải đúng 1")
+        return khop[0].strip("\n")
+
+    def _tieu_chi(self) -> dict:
+        import json
+        cong = json.loads(self.CONG.read_text(encoding="utf-8"))
+        for g in cong["gates"]:
+            for c in g["criteria"]:
+                if c["id"] == "G5.3":
+                    return c
+        raise AssertionError("closure-gate.json không còn tiêu chí G5.3")
+
+    def test_digest_khop_gia_tri_ghi_ngoai_tep(self):
+        import hashlib
+        c = self._tieu_chi()
+        self.assertEqual(c.get("protocol"), "docs/BENCH-PAIR-QUALIFICATION-PROTOCOL.md")
+        self.assertRegex(c.get("protocol_sha256", ""), r"^[0-9a-f]{64}$",
+                         "G5.3 chưa ghi `protocol_sha256` — không phiên tuyển thật nào được chạy")
+        self.assertEqual(hashlib.sha256(self._vung_ghim().encode("utf-8")).hexdigest(),
+                         c["protocol_sha256"],
+                         "vùng ghim §2 đã đổi — hoàn nguyên văn bản, đừng ghi lại digest")
+        self.assertNotIn(c["protocol_sha256"], self.GHIM.read_text(encoding="utf-8"),
+                         "digest bị nhắc lại trong chính tệp nó ghim — một con số có hai nhà là "
+                         "con số sẽ lệch")
+
+    def test_vung_ghim_khai_het_chin_khoan(self):
+        """Chín khoản chủ dự án đòi phải nằm **trong** vùng ghim, không ở phụ lục."""
+        vung = self._vung_ghim()
+        for khoan in ("2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8",
+                      "QUALIFIED", "NOT_QUALIFIED", "INCONCLUSIVE", "36 p² ≤ 1"):
+            with self.subTest(khoan=khoan):
+                self.assertIn(khoan, vung)
+
+    def test_so_lieu_hau_nghiem_khong_nam_trong_vung_ghim(self):
+        """Ranh giới giữa cam kết và dữ liệu: không một con số của đợt tuyển nào
+        được lọt vào vùng ghim — vùng ấy được viết trước khi có phiên đầu tiên."""
+        vung = self._vung_ghim()
+        for cau in ("BENCH-PAIR-QUALIFICATION.md", "bcdf7705"):
+            with self.subTest(cau=cau):
+                self.assertNotIn(cau, vung)
+
+    def test_ban_ma_khop_tung_con_so_cua_bang_hang_so(self):
+        from fractions import Fraction
+
+        from tests.bench import _qualify as Q
+
+        vung = self._vung_ghim()
+        self.assertIn("### 2.10", vung, "vùng ghim không còn bảng hằng số")
+        bang = {}
+        for dong in vung.split("### 2.10", 1)[1].splitlines():
+            o = [c.strip().strip("`") for c in dong.strip().strip("|").split("|")]
+            if len(o) == 2 and o[0].isupper() and o[0].replace("_", "").isalpha():
+                bang[o[0]] = o[1]
+        self.assertEqual(set(bang), {"NGUONG_TI_LE_CAT", "SO_PHIEN_TUYEN", "NGUONG_HONG_HA_TANG",
+                                     "TASK_TUYEN", "TRAN_PHUT", "CLIENT_DO_DUOC"},
+                         f"bảng hằng số §2.10 đọc ra {sorted(bang)}")
+        self.assertAlmostEqual(float(Fraction(bang["NGUONG_TI_LE_CAT"])), Q.NGUONG_TI_LE_CAT)
+        self.assertAlmostEqual(float(Fraction(bang["NGUONG_HONG_HA_TANG"])), Q.NGUONG_HONG_HA_TANG)
+        self.assertEqual(int(bang["SO_PHIEN_TUYEN"]), Q.SO_PHIEN_TUYEN)
+        self.assertEqual(float(bang["TRAN_PHUT"]), Q.TRAN_PHUT)
+        self.assertEqual(bang["TASK_TUYEN"], Q.TASK_TUYEN)
+        self.assertEqual((bang["CLIENT_DO_DUOC"],), Q.CLIENT_DO_DUOC)
