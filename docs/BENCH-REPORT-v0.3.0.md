@@ -60,6 +60,28 @@ untested edits at completion. The guards caught real bad practices but the
 task outcomes were unaffected because the agent self-corrected after each
 block.
 
+> **Dated note, 2026-09-14 — this cohort is INCONCLUSIVE, not a null result.**
+> The original text below stands unedited, as this repository's policy for dated
+> observations requires. But §1 reads "No correctness difference … AISEF guard
+> hooks do not improve or degrade solve rate", and that is a stronger statement
+> than the data can carry: **both arms scored 48/48 (100 %)**, so the task set
+> was fully saturated and could not have revealed a difference in either
+> direction had one existed. A measurement where every cell is at the ceiling
+> reports the ceiling, not the effect.
+>
+> What the corpus can actually resolve was measured later:
+> `validation/bench_discriminating_power.py` finds **12 of 340 cross-arm pairs
+> informative (3.5 %)** across 339 recorded attempts, with **25 of the 30 tasks
+> never separating the two arms even once** — see
+> [BENCH-TASK-DISCRIMINATION.md](BENCH-TASK-DISCRIMINATION.md).
+>
+> The **1.07× cost figure** in §2 is a real measurement of this cohort and is not
+> withdrawn. Note only that a cost ratio measured where both arms saturate says
+> what the harness cost, not what it bought.
+>
+> Closure criterion G5.5 requires noise and inconclusive results to be reported
+> as such; this note is that report.
+
 ## Interpretation
 
 1. **No correctness difference**: both conditions achieve 100% pass@1 across
