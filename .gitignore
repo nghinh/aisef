@@ -41,6 +41,11 @@ framework/bench/memory_compare/results/
 # uv lock — not used for this project
 uv.lock
 .bench-c1b/
+# đợt tuyển cặp model↔CLI (G5.3): cây làm việc + sổ phiên. **Không** đặt tên
+# `.bench-*` có chủ ý — phiên tuyển không phải dữ liệu cohort, và mọi thứ quét
+# `.bench*/results.jsonl` (probe G5.2, `_analyze.cut_sessions`) phải không thấy
+# chúng. Bản sổ được commit là `closure-evidence/bench-pair-qualification.jsonl`.
+.aisef-qual/
 # Mỗi cohort ghi vào thư mục riêng (`AISEF_BENCH_DIR=.bench-c2`, …) để không xoá
 # cây làm việc mà báo cáo của cohort trước đang trích dẫn làm bằng chứng.
 .bench-*/

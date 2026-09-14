@@ -14,8 +14,8 @@ from . import _mine as M
 from . import _runner as R
 
 
-def _giu_khoa(cmd: str):
-    """Khoá độc quyền cho `run`/`run-both`; None với lệnh chỉ đọc.
+def _giu_khoa(a):
+    """Khoá độc quyền cho lệnh gọi client thật; None với lệnh chỉ đọc.
 
     Hai tiến trình bench cùng một `AISEF_BENCH_DIR` **xoá cây làm việc của
     nhau**: `materialize()` gọi `remove_tree(dest)` trước khi dựng, nên lượt
@@ -25,8 +25,15 @@ def _giu_khoa(cmd: str):
 
     Khoá **không** liên tiến trình với dogfood: một `aisef run` đang chạy vẫn
     chiếm endpoint mà bench không thấy. Đó là việc của người vận hành.
+
+    `qualify` lấy **cùng** khoá dù sổ của nó nằm ở `.aisef-qual/`: thứ khoá bảo
+    vệ là *endpoint*, không phải thư mục, và một đợt tuyển chạy song song với
+    một đợt đo làm hỏng **cả hai** phép đo. Ba chế độ không gọi client thật
+    (`--du-toan`, `--bao-cao`, `--tu-kiem`) thì không khoá — chúng chỉ đọc.
     """
-    if cmd not in ("run", "run-both"):
+    if a.cmd not in ("run", "run-both", "qualify"):
+        return None
+    if a.cmd == "qualify" and (a.du_toan or a.bao_cao or a.tu_kiem):
         return None
     from aisef._compat import flock_ex_nb, open_lock_fd
 
@@ -83,6 +90,21 @@ def main(argv: list[str] | None = None) -> int:
                          "sổ là tệp nối thêm, mọi đợt đo nằm chung một chỗ")
     an = sub.add_parser("analyze", help="đo lại sau đợt chạy: xong giả, ghi ngoài phạm vi, lượt trượt sửa ở đâu (đọc cây đã giữ, không đụng scorer)")
     an.add_argument("--client", default="opencode", help="tiền tố mã client cần đọc")
+    q = sub.add_parser("qualify", help="tuyển cặp model↔CLI trước cột 2 (G5.3): đo tỉ lệ phiên bị CLI "
+                                       "cắt, không chấm điểm. Ngưỡng đã ghim ở "
+                                       "docs/BENCH-PAIR-QUALIFICATION-PROTOCOL.md")
+    q.add_argument("--client", default="opencode")
+    q.add_argument("--model", default="", help="model cụ thể (rỗng = mặc định của client)")
+    q.add_argument("--note", default=os.environ.get("AISEF_BENCH_NOTE", ""),
+                   help="nhãn cặp do người vận hành khai — bắt buộc khi model là alias (`mycombo`)")
+    q.add_argument("--phien", type=int, default=0, help="số phiên (0 = cỡ mẫu đã ghim)")
+    q.add_argument("--max-minutes", type=float, default=0.0, help="trần thời gian đợt (0 = đã ghim)")
+    q.add_argument("--du-toan", action="store_true",
+                   help="in hoá đơn sẽ tiêu rồi thoát — KHÔNG gọi client")
+    q.add_argument("--bao-cao", action="store_true", help="chỉ dựng lại báo cáo từ sổ đã ghi")
+    q.add_argument("--tu-kiem", action="store_true",
+                   help="chứng minh đường ống bằng `opencode` GIẢ — 0 phiên thật")
+    q.add_argument("--out", default="docs/BENCH-PAIR-QUALIFICATION.md")
     sc = sub.add_parser("selfcheck", help="chạy đường ống thật với `opencode` GIẢ — chứng minh plumbing "
                                           "trước khi phóng đợt đo thật, không tốn một lượt gọi model nào")
     sc.add_argument("--task", default=None, help="task để tự kiểm (mặc định: task rẻ nhất)")
@@ -109,7 +131,7 @@ def main(argv: list[str] | None = None) -> int:
               f"{len(tasks)} task, xem `tests/bench/tasks/`.", file=sys.stderr)
         return 2
     pick = [by_id[i] for i in ids] if ids else list(tasks)
-    khoa = _giu_khoa(a.cmd)
+    khoa = _giu_khoa(a)
     if khoa is False:
         return 3
     try:
@@ -182,6 +204,27 @@ def _dispatch(a, tasks: list, pick: list) -> int:
                 print(f"không có dòng nào khớp cohort {a.cohort!r}", file=sys.stderr)
                 return 2
         print(R.report(rows, tasks))
+    elif a.cmd == "qualify":
+        from . import _qualify as Q
+        if a.tu_kiem:
+            return Q.tu_kiem()
+        if a.bao_cao:
+            return Q.viet_bao_cao(Q.doc_so(), a.out)
+        phien = a.phien or Q.SO_PHIEN_TUYEN
+        if a.du_toan:
+            print(Q.du_toan(a.client, a.model, Q.TASK_TUYEN, phien,
+                            tran_phut=a.max_minutes or Q.TRAN_PHUT))
+            return 0
+        if a.client not in R.SIMULATED_CLIENTS and not R.ENABLED:
+            print("đặt AISEF_BENCH=1 — chạy client thật tốn tiền", file=sys.stderr)
+            return 1
+        if not a.note:
+            print("thiếu --note: `mycombo` là một alias, nên hai đợt trên hai mô hình nền "
+                  "trông y hệt nhau trong sổ. Khai nhãn cặp.", file=sys.stderr)
+            return 2
+        Q.chay(R.make_client(a.client), phien=phien, model=a.model, note=a.note,
+               tran_phut=a.max_minutes or Q.TRAN_PHUT)
+        return Q.viet_bao_cao(Q.doc_so(), a.out)
     elif a.cmd == "selfcheck":
         from . import _selfcheck as S
         return S.run_selfcheck(a.task or S.TASK_MAC_DINH, model=a.model)
