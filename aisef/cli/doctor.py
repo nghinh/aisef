@@ -246,6 +246,42 @@ def cmd_doctor(args) -> int:
     try:
         cfg = Config.load(project)
         check("config", True, cfg.source)
+
+        # A cap already at or below what this project's own ledger records as
+        # spent is a mis-configuration visible before any call is made:
+        # `BudgetGuard` refuses the next paid call, and the operator reads the
+        # refusal as a framework bug rather than as their own number (ADR-009,
+        # Deferred).  No cap configured means the ledger is never opened — the
+        # guard short-circuits in that case and so does this check.  Read-only:
+        # the ledger belongs to `run`, `doctor` only reports the two numbers.
+        caps = [(key, float(cfg.get(key, 0) or 0), field, fmt)
+                for key, field, fmt in (("run.cost_cap_usd", "spent_usd", "${:.2f}"),
+                                        ("run.turn_cap", "spent_turns", "{:.0f} turns"))
+                if cfg.get(key)]
+        if caps:
+            from ..control.budget import BUDGET_FILE, BudgetLedger
+
+            ledger = BudgetLedger(project)
+            if not ledger.path.is_file():
+                # Cannot tell is not a pass: no ledger means nothing to compare.
+                check("budget cap above recorded spend", False,
+                      f"no `{BUDGET_FILE.as_posix()}` yet — nothing to compare; the "
+                      "first settled call writes it", required=False)
+            else:
+                state, over, room = ledger.load(), [], []
+                for key, cap, field, fmt in caps:
+                    used = getattr(state, field)
+                    (over if used >= cap else room).append(
+                        f"{key} = {fmt.format(cap)}, ledger records {fmt.format(used)} spent")
+                check(
+                    "budget cap above recorded spend", not over,
+                    "; ".join(room) if not over else
+                    "; ".join(over) + " — the next paid call is refused before it "
+                    "dispatches. Raise the cap in `.ai/config.json`, or archive "
+                    f"`{BUDGET_FILE.as_posix()}` to start a new budget period "
+                    "(`doctor` writes neither).",
+                )
+
         test_cmd = str(cfg.get("tools.test", "") or "")
         if test_cmd:
             # Evidence first, the command string second — `npm test` says

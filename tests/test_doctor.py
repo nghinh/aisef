@@ -118,3 +118,91 @@ class TestDoctorNoiRoPhienAgentDangNhapBangGi(unittest.TestCase):
             ra = self._chay({})
         self.assertIn("agent credential", ra)
         self.assertIn("its own login", ra)
+
+
+class TestDoctorTranNganSachSoVoiSoChi(unittest.TestCase):
+    """Trần ngân sách thấp hơn số dự án đã tiêu là cấu hình sai, và `doctor`
+    phải nói ra **trước** khi chạy: nếu không, lần gọi trả tiền kế tiếp bị
+    `BudgetGuard` chặn và người vận hành đọc ra đó là lỗi của khung thay vì là
+    con số của chính mình (ADR-009, mục Deferred).
+    """
+
+    NHAN = "budget cap above recorded spend"
+
+    def _chay(self, cfg: dict | None = None, so: dict | None = None) -> str:
+        import io
+        import json
+        from contextlib import redirect_stdout
+
+        from aisef.cli.doctor import cmd_doctor
+
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d)
+            if cfg is not None:
+                (p / ".ai").mkdir()
+                (p / ".ai" / "config.json").write_text(json.dumps(cfg), encoding="utf-8")
+            if so is not None:
+                (p / "_bmad-output").mkdir()
+                (p / "_bmad-output" / "budget.json").write_text(
+                    json.dumps(so), encoding="utf-8")
+            with redirect_stdout(io.StringIO()) as ra:
+                cmd_doctor(argparse.Namespace(project=str(p)))
+        return ra.getvalue()
+
+    def test_khong_dat_tran_thi_khong_mo_so(self):
+        """Chưa đặt trần thì không phải trả một lần I/O nào cho tính năng này."""
+        from aisef.control import budget
+
+        with mock.patch.object(budget.BudgetLedger, "load",
+                               side_effect=AssertionError("mở sổ khi chưa đặt trần")):
+            ra = self._chay()
+        self.assertNotIn(self.NHAN, ra)
+
+    def test_tran_con_cho_thi_dat(self):
+        ra = self._chay({"run.cost_cap_usd": 5.0}, {"spent_usd": 1.25})
+        self.assertIn(f"✅ {self.NHAN}", ra)
+        self.assertIn("$1.25", ra)
+        self.assertIn("$5.00", ra)
+
+    def test_tran_thap_hon_so_da_tieu_thi_chan(self):
+        ra = self._chay({"run.cost_cap_usd": 0.5}, {"spent_usd": 1.25})
+        self.assertIn(f"✗ {self.NHAN}", ra)
+        self.assertIn("$0.50", ra)
+        self.assertIn("$1.25", ra)
+        self.assertIn("run.cost_cap_usd", ra)
+        # Nêu ra thôi chưa đủ: phải tính vào danh sách chặn, vì chạy tiếp là mất lượt.
+        self.assertRegex(ra, r"✗ missing:.*" + self.NHAN)
+
+    def test_tran_bang_so_da_tieu_cung_la_chan(self):
+        """Bằng nhau cũng chặn: lượt kế tiếp nào cũng vượt trần."""
+        ra = self._chay({"run.turn_cap": 40}, {"spent_turns": 40})
+        self.assertIn(f"✗ {self.NHAN}", ra)
+        self.assertIn("40", ra)
+
+    def test_doctor_khong_ghi_vao_so(self):
+        """`doctor` chẩn đoán, không sửa: sổ chi và khoá của nó phải y nguyên."""
+        import io
+        import json
+        from contextlib import redirect_stdout
+
+        from aisef.cli.doctor import cmd_doctor
+
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d)
+            (p / ".ai").mkdir()
+            (p / ".ai" / "config.json").write_text(json.dumps({"run.cost_cap_usd": 0.5}))
+            (p / "_bmad-output").mkdir()
+            so = p / "_bmad-output" / "budget.json"
+            so.write_text(json.dumps({"spent_usd": 1.25}))
+            truoc = (so.read_bytes(), sorted(x.name for x in (p / "_bmad-output").iterdir()))
+            with redirect_stdout(io.StringIO()):
+                cmd_doctor(argparse.Namespace(project=str(p)))
+            self.assertEqual(
+                truoc, (so.read_bytes(), sorted(x.name for x in (p / "_bmad-output").iterdir())))
+
+    def test_chua_co_so_thi_khong_ket_luan(self):
+        """Không có sổ để so là "không biết" — không phải đạt, cũng không phải chặn."""
+        ra = self._chay({"run.cost_cap_usd": 5.0})
+        self.assertIn(f"○ {self.NHAN}", ra)
+        self.assertNotIn(f"✅ {self.NHAN}", ra)
+        self.assertNotRegex(ra, r"✗ missing:.*" + self.NHAN)
