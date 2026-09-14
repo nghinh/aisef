@@ -236,6 +236,16 @@ def pre_deploy(
 
     inside = _scope(report, artifact_root, epic) if epic else None
     state = StateStore(artifact_root).load()
+    if inside is None:
+        # Declare whole-plan scope explicitly (lỗi 169). `None` used to mean both
+        # "the entire plan" and "nothing was declared", and the closure gate reads
+        # the report the signer reads: marks-cli finished 7/7 with pre-deploy PASS
+        # and still failed G4.6 for "declares no acceptance scope". The only way
+        # through was `--epic` on one epic of four — the signer accepting a quarter
+        # of what they are actually accepting, which contradicts G4.3's "every
+        # story is done". The strongest scope must be statable, not merely implied.
+        _tat_ca = sorted(r.id for r in state.stories.values())
+        report.scope = {"epic": "all", "stories": _tat_ca, "outside": []}
     records = [r for r in state.stories.values() if inside is None or r.id in inside]
     if not records:
         report.checks.append(Check(

@@ -617,3 +617,64 @@ class TestMienTuongMinhCoLyDo(DeployTestCase):
     def test_khong_mien_gi_thi_khong_co_muc(self):
         report = pre_deploy(self.project, has_ui=False, config=self.config())
         self.assertNotIn("explicit waiver", [c.name for c in report.checks])
+
+
+class TestPhamViToanKeHoach(DeployTestCase):
+    """Lỗi 169 — không có cách **khai** rằng phạm vi nghiệm thu là *toàn bộ kế
+    hoạch*: không truyền `--epic` thì `scope` là `None`, và `None` vừa có nghĩa
+    "cả kế hoạch" vừa có nghĩa "chưa khai gì".
+
+    Cùng lớp với lỗi 165 (vắng mặt lẫn với câu trả lời). Hậu quả đo được: tiêu
+    chí đóng dự án G4.6 đòi báo cáo khai phạm vi, và một dự án đã xong **toàn
+    bộ** — marks-cli, 7/7, `pre-deploy` PASS — vẫn trượt G4.6 với lý do *"report
+    declares no acceptance scope"*. Cách duy nhất để qua là `--epic` một epic
+    trong bốn, tức người ký chỉ nhận một phần tư thứ họ thật sự nhận, và điều đó
+    lại mâu thuẫn với G4.3 (*mọi story đều xong*).
+
+    Phạm vi mạnh nhất phải khai được, không chỉ suy ra được.
+    """
+
+    def ready(self, index: dict):
+        import json
+        from aisef.control.approvals import GATE_ARTIFACTS
+        self.approve_everything()
+        self.finish_a_story()
+        (self.artifacts / "stories.index.json").write_text(
+            json.dumps(index, ensure_ascii=False), encoding="utf-8")
+        store = ApprovalStore(self.artifacts)
+        for gate in GATE_ARTIFACTS:
+            if gate is not Gate.PRE_DEPLOY:
+                store.approve(gate, by="nghi")
+        write_ci_workflow(self.project)
+        (self.project / "Dockerfile").write_text("FROM alpine\n", encoding="utf-8")
+        (self.project / RUNBOOK_PATH).parent.mkdir(parents=True, exist_ok=True)
+        (self.project / RUNBOOK_PATH).write_text(GOOD_RUNBOOK, encoding="utf-8")
+
+    ONE = {"stories": [{"id": "STORY-01-01", "epic_id": "EPIC-01", "title": "a"}],
+           "waves": {"EPIC-01": [["STORY-01-01"]]}, "epics": [{"id": "EPIC-01"}]}
+
+    def test_khong_truyen_epic_thi_khai_ro_la_toan_bo_ke_hoach(self):
+        self.ready(self.ONE)
+        report = pre_deploy(self.project, config=self.config(), skip_qa=True)
+        self.assertTrue(report.passed, report.summary())
+        d = report.as_dict()
+        self.assertIsNotNone(d["scope"], "phạm vi phải được **khai**, không để None")
+        self.assertEqual(d["scope"]["epic"], "all")
+        self.assertEqual(d["scope"]["stories"], ["STORY-01-01"])
+        self.assertEqual(d["scope"]["outside"], [], "toàn bộ kế hoạch thì không có gì ngoài")
+
+    def test_nguoi_ky_doc_duoc_pham_vi_tren_dong_dau(self):
+        self.ready(self.ONE)
+        report = pre_deploy(self.project, config=self.config(), skip_qa=True)
+        self.assertIn("scope all", report.summary().splitlines()[0])
+
+    def test_khai_mot_epic_van_giu_nguyen_nghia_cu(self):
+        """Phép kiểm âm: `--epic` vẫn thu hẹp đúng như trước."""
+        idx = {"stories": [{"id": "STORY-01-01", "epic_id": "EPIC-01", "title": "a"},
+                           {"id": "STORY-02-01", "epic_id": "EPIC-02", "title": "b"}],
+               "waves": {"EPIC-01": [["STORY-01-01"]], "EPIC-02": [["STORY-02-01"]]},
+               "epics": [{"id": "EPIC-01"}, {"id": "EPIC-02"}]}
+        self.ready(idx)
+        report = pre_deploy(self.project, config=self.config(), skip_qa=True, epic="EPIC-01")
+        self.assertEqual(report.as_dict()["scope"]["epic"], "EPIC-01")
+        self.assertEqual(report.as_dict()["scope"]["outside"], ["STORY-02-01"])
