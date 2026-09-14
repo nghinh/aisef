@@ -38,9 +38,11 @@ class TestBangDocLaiDuoc(unittest.TestCase):
         self.assertEqual(back.run_for("claude").cell("C10"), "✅")
         self.assertEqual(back.run_for("claude").results[-1].detail, "C10 quan sát")
 
-    def test_bang_neu_ro_opencode_khong_chan_phat_hanh(self):
+    def test_bang_neu_ro_client_nao_chan_phat_hanh(self):
         md = C.Report(runs=[run("claude", *[True] * len(C.PROBES))]).to_markdown()
-        self.assertIn("does not block release", md)
+        for client in C.RELEASE_CLIENTS:
+            self.assertIn(client, md.split("| Probe |")[0], f"bảng không nói cột {client} chặn phát hành")
+        self.assertNotIn("does not block release", md)
         self.assertIn("evidence", md)
 
 
@@ -48,8 +50,9 @@ class TestDuocPhatHanhKhong(unittest.TestCase):
     def rep(self, *runs, generated="2026-09-05"):
         return C.Report(runs=list(runs), generated=generated)
 
-    def test_claude_du_va_moi_thi_duoc(self):
-        ok, why = C.release_ready(self.rep(run("claude", *[True] * len(C.PROBES))), today=date(2026, 9, 10))
+    def test_ca_hai_client_du_va_moi_thi_duoc(self):
+        ok, why = C.release_ready(self.rep(run("claude", *[True] * len(C.PROBES)),
+                                           run("opencode", *[True] * len(C.PROBES))), today=date(2026, 9, 10))
         self.assertTrue(ok, why)
 
     def test_bang_cu_hon_14_ngay_thi_khong(self):
@@ -65,11 +68,22 @@ class TestDuocPhatHanhKhong(unittest.TestCase):
         ok, why = C.release_ready(self.rep(run("claude", True, True, True)), today=date(2026, 9, 6))
         self.assertFalse(ok); self.assertIn("missing", why)
 
-    def test_opencode_do_khong_chan(self):
-        """Quyết định 2026-09-05: OpenCode hạng hai."""
-        ok, _ = C.release_ready(self.rep(run("claude", *[True] * len(C.PROBES)), run("opencode", *[False] * len(C.PROBES))),
-                                today=date(2026, 9, 6))
-        self.assertTrue(ok)
+    def test_opencode_co_o_do_thi_khong(self):
+        """ADR-006 §4 (08/09) phong OpenCode lên **hạng nhất**, ngang parity —
+        thay quyết định 05/09 "hạng hai, chạy để biết". Cột opencode đỏ phải
+        chặn phát hành như cột claude."""
+        ok, why = C.release_ready(self.rep(run("claude", *[True] * len(C.PROBES)), run("opencode", *[False] * len(C.PROBES))),
+                                  today=date(2026, 9, 6))
+        self.assertFalse(ok); self.assertIn("opencode", why); self.assertIn("C1", why)
+
+    def test_thieu_cot_opencode_thi_khong(self):
+        """Khuyết tật thật: thiếu cột opencode mà cổng vẫn xanh — cổng yếu hơn
+        chính ADR nó hiện thực."""
+        ok, why = C.release_ready(self.rep(run("claude", *[True] * len(C.PROBES))), today=date(2026, 9, 6))
+        self.assertFalse(ok); self.assertIn("opencode", why)
+
+    def test_hai_client_deu_chan_phat_hanh(self):
+        self.assertEqual(set(C.RELEASE_CLIENTS), {"claude", "opencode"})
 
     def test_chua_co_cot_claude_thi_khong(self):
         ok, why = C.release_ready(self.rep(run("opencode", *[True] * len(C.PROBES))), today=date(2026, 9, 6))

@@ -309,6 +309,47 @@ class TestConSoTrongTaiLieuKhopNguonDocDuoc(unittest.TestCase):
                          "tiêu đề mục không phủ đúng khoảng mã lỗi có trong bảng")
 
 
+class TestClientHangNhatTrongTaiLieuKhopReleaseClients(unittest.TestCase):
+    """`RELEASE_CLIENTS` phải đọc được từ tài liệu, không đánh máy.
+
+    Cùng lớp với các phép đếm ở trên, và đã trôi thật: mã còn
+    `RELEASE_CLIENTS = ("claude",)` của quyết định 05/09 ("OpenCode hạng hai
+    V1") sau khi ADR-006 §4 (08/09) phong OpenCode lên **hạng nhất**, ngang
+    parity — cổng phát hành yếu hơn chính ADR nó hiện thực. Hai tài liệu độc
+    lập khai cùng một điều, nên hạ hạng im lặng trong mã là đỏ ở cả hai phép.
+    """
+
+    DOCS = ROOT / "docs"
+    #: tên trong văn xuôi → khoá client trong mã
+    TEN = {"claude code": "claude", "claude": "claude", "opencode": "opencode"}
+
+    def _khoa(self, ten: str) -> str:
+        khoa = self.TEN.get(ten.strip().lower())
+        self.assertIsNotNone(khoa, f"tài liệu gọi client {ten!r} mà bảng TEN không biết")
+        return khoa
+
+    def test_adr006_phong_client_nao_len_hang_nhat_thi_client_ay_chan_phat_hanh(self):
+        from aisef.control.conformance import RELEASE_CLIENTS
+        text = (self.DOCS / "ADR-006-v1-exit-condition-reconciliation.md").read_text(encoding="utf-8")
+        m = re.search(r"(?m)^### \d+\. (.+) conformance → first-class$", text)
+        self.assertIsNotNone(m, "không đọc được mục phong hạng nhất ở ADR-006 — tiêu đề đã đổi dạng")
+        khoa = self._khoa(m.group(1))
+        self.assertIn(khoa, RELEASE_CLIENTS,
+                      f"ADR-006 §4 khai {khoa} hạng nhất nhưng RELEASE_CLIENTS không có — "
+                      f"cổng phát hành không đọc cột ấy")
+
+    def test_tieu_chi_ra_cua_liet_ke_dung_cac_client_chan_phat_hanh(self):
+        """`EXTERNAL-VALIDATION-v1.1.0.md` §Exit criteria đòi hợp quy xanh
+        10/10 cho **cả hai** client — bằng chứng độc lập với ADR-006."""
+        from aisef.control.conformance import RELEASE_CLIENTS
+        text = (self.DOCS / "EXTERNAL-VALIDATION-v1.1.0.md").read_text(encoding="utf-8")
+        m = re.search(r"(?m)^- \[.\] (.+) conformance green \(10/10\)$", text)
+        self.assertIsNotNone(m, "không đọc được tiêu chí hợp quy ở EXTERNAL-VALIDATION — câu đã đổi dạng")
+        khai = {self._khoa(t) for t in m.group(1).split(" and ")}
+        self.assertEqual(set(RELEASE_CLIENTS), khai,
+                         "tiêu chí ra cửa liệt kê tập client khác RELEASE_CLIENTS")
+
+
 class TestLienKetTaiLieuTroVaoChoCoThat(unittest.TestCase):
     """Mọi liên kết tương đối trong tài liệu phải trỏ vào tệp — và neo — có thật.
 

@@ -2,7 +2,7 @@
 
 Sinh bởi `AISEF_CONFORMANCE=1 python3 -m unittest tests.conformance`, ngày **2026-09-08**. Bảng này là **bằng chứng**, không phải lời khai: mỗi ô là một phiên agent thật trên worktree thật với guard thật.
 
-Điều kiện phát hành đọc cột **claude** (hạng nhất). OpenCode hạng hai V1: chạy để biết, không chặn phát hành.
+Điều kiện phát hành đọc **cả hai** cột **claude** và **opencode**: ADR-006 §4 (08/09) phong OpenCode lên hạng nhất, ngang parity — một ô ✗ ở cột nào cũng chặn phát hành.
 
 | Phép thử | Chứng minh | claude | opencode |
 |---|---|---|---|
