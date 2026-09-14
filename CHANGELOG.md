@@ -8,6 +8,61 @@ section by parallel agents and moved here: the release was already on PyPI, and 
 changelog that credits a published release with fixes its artifact does not carry
 is the same class of untrue statement this project spends its time removing.
 
+**The closure gate asks about classification integrity over a cohort, not over
+every row ever written.** G5.2 used to demand `exit_status` on every row of every
+`.bench*/results.jsonl` in the tree. 339 of 411 rows were produced before that
+field existed, and the only way to satisfy the old rule was to invent a status
+for sessions that no longer exist — the same guess that turned three cut sessions
+into C-1b's +0,06 artifact. A cohort is now declared in
+`closure-evidence/cohorts/<id>.json` before it is scored, and the bar for one
+backing a current claim is higher than the rule it replaces: identity bound to
+the pre-registered protocol digest and the benchmark execution SHA, attempt rows
+and a session ledger pinned by digest, every session carrying an explicit status,
+retries reconciling as `sessions == infra_retries + 1`, no attempt whose final
+session was cut carrying a non-infra exit status, no exclusion without a recorded
+reason, and totals recomputed from the raw rows against a digest the report
+itself must carry — so a report cannot drop a failing row, re-select its rows
+after scoring, or state a number its own evidence does not produce. Cohorts
+predating the schema stay `HISTORICAL_UNCLASSIFIABLE`: bytes pinned, never
+rewritten, limitation recorded, and forbidden from naming a report.
+
+**The retired-claim audit reads declared status instead of matching substrings.**
+It failed in both directions on this repository. It missed `±0,08` because it
+only knew the ASCII `±0.08` — retiring a number and restating it with a decimal
+comma is not a correction — and it flagged the C-2 report for *explaining why*
+`±0.08` was withdrawn, which is the opposite of asserting it. That is AD-22's
+grep failing on `"http://"` inside URL validation, one gate over. A
+`claim_registry` in the criteria file now lists each retired claim with every
+surface form, and prose fences a mention with
+`<!-- claim:WITHDRAWAL_EXPLANATION -->`. Text outside a region, inside a
+`CURRENT_ASSERTION` region, or inside an unterminated region all count as current
+assertions, so silence is never a shelter. The audited surface grew from four
+files to eight, finally including the `BENCH-*` reports the contract always said
+it covered.
+
+**A frozen early-stop rule is enforced by the orchestrator, not by the operator
+remembering it.** The C-2 pre-registration says two opening tasks at 6/6 across
+both arms means the model is at the dataset ceiling — stop, report, do not burn
+seven more hours for a column of 1,00s. On C-2 it fired after task two and ten
+more tasks ran anyway. `tests/bench/stop_rule.json` transcribes the rule with its
+source and that source's digest, `run-both` evaluates it after every task, and
+the decision lands in `stop-decision.json`. Continuing past a fired rule now
+requires `--ignore-stop-rule` and is recorded with `honoured=false` plus the
+post-stop label, so data gathered afterwards cannot read as something the
+protocol required. Already-collected data is never discarded: stopping means
+stopping the scheduling of new tasks.
+
+**Bench session metrics no longer merge cohorts.** The session-path pattern
+matched `.bench*/run/<condition>/<task>/a<n>` but discarded the directory, so
+three cohorts shared one key space and any overlap silently summed. Measured on
+C-2: 90 keys for a 72-attempt cohort, 198 sessions, 35 cut. Scoped per directory
+the truth is `.bench-c2` 72 sessions and **zero** cut, with all 35 cuts belonging
+to C-1 and C-1b. The contaminated rates had already been published and two
+conclusions built on them; both are corrected in the C-2 report. A second fault
+fell out with it — one attempt vanished because the model printed its path
+line-wrapped as `open-code` — so valid conditions now come from directories that
+exist on disk rather than from strings a model emitted.
+
 **A run records which client and which model produced it.** `agent_run` recorded
 `spec.model` — the model *requested* — which is empty whenever no `route.*_model`
 is configured. That is how all 145 sessions of the reviewer-qualification corpus
