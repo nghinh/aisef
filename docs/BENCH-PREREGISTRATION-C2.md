@@ -384,3 +384,35 @@ chứng của C-1), và `MANIFEST.sha256` khớp từng byte.
    **tài liệu mới**, ghim riêng, không phải một bản sửa của §2.
 4. `docs/handoff/bench-real-model-wiring.md` §7 là bản lịch sử. Nó giữ nguyên tại
    chỗ và phải tiếp tục ra **cùng** digest; probe kiểm điều ấy (§1.5 bước 4).
+
+## 7. Phụ lục 2026-09-14 (muộn) — probe đã được viết, và một chỗ lệch §1.5
+
+Hậu nghiệm, ngoài vùng ghim, thêm chứ không sửa — theo đúng luật §6.
+
+**§1.5 đã cũ ở một câu.** Nó viết `aisef.control.closure` *chưa tồn tại* và
+`tests/test_meta.py::TestTienDangKyCot2BiGhim` là bản tham chiếu chạy được. Máy
+đóng gate nay đã có, và `probe_prereg_digest` dùng lại đúng công thức ấy qua
+`closure.frozen_region_digest`, lấy mốc **từ dữ liệu** (`prereg_frozen_region`
+trong `docs/closure-gate.json`) chứ không viết cứng trong mã — nên vẫn không có
+bản thứ hai của công thức, đúng yêu cầu §1.1.
+
+**Một chỗ lệch, nêu ra chứ không lặng lẽ.** §1.5 bước 2 nói số vùng ghim khác 1
+thì `FAILED`. Probe trả `UNRUNNABLE`. Lý do: không có một vùng duy nhất thì không
+có gì để so, còn `FAILED` khẳng định một sự việc — rằng văn bản đã bị viết lại —
+mà phép đo chưa hề dựng được. Cả hai đều **chặn**, nên không một kết cục đóng dự
+án nào đổi theo chỗ lệch này; ghi ra vì một tài liệu nói khác mã là một tài liệu
+sẽ bị tin sai lần sau.
+
+**Một khiếm khuyết đã sửa, ghi lại vì nó là đúng lớp lỗi §1.2 cảnh báo.** Cho đến
+hôm nay `probe_prereg_digest` đọc `prereg_sha256` ở **mức trên cùng** của
+`docs/closure-gate.json`, và giá trị ở đó là digest **cả tệp**
+(`36c6b4c5eba1…`), trong khi digest **vùng ghim** (`0c4dab0a74b6…`) nằm ở mức
+tiêu chí và không ai đọc. Một con số có hai nhà, đúng thứ §1.4 nói sẽ lệch. Hệ
+quả thật: phụ lục §7 này — một phần thêm mà §6 cho phép — sẽ làm G5.1 `FAILED`,
+và đó là FAILED giả mà §1.2 dựng cơ chế vùng để tránh. `aisef closure --pin` nay
+ghi digest vùng ghim vào **tiêu chí** và xoá khoá ở mức trên cùng; khoá ấy đã
+được xoá khỏi kho. Phép kiểm: phụ lục này thêm vào mà G5.1 vẫn `PASSED`.
+
+Probe cũng kiểm bước 4 thật sự từ hôm nay: thiếu `docs/handoff/bench-real-model-wiring.md`
+là `UNRUNNABLE` (pin chứng minh văn bản không đổi, nhưng **không** chứng minh nó
+có trước dữ liệu), và bản lịch sử lệch là `FAILED`.

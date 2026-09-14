@@ -63,6 +63,7 @@ from .approvals import (
     sha256_of,
 )
 from .gate import Outcome, _stale_candidates
+from .gate import CHECK_KIND
 from .outcome import CHECK_KINDS
 from .state import StateStore, StoryStatus
 from .worktree import GitError, _git, main_repo
@@ -501,14 +502,29 @@ def probe_deterministic_false_pass(ctx: Ctx) -> Probed:
         return Probed(Outcome.UNRUNNABLE,
                       "register carries no `false_pass`/`check_kind` classification — "
                       "G2.4a cannot be read from it")
-    bad_kind = [f"{e.get('id') or '?'}={e.get('check_kind') or 'none'}" for e in open_
-                if e.get("false_pass") and str(e.get("check_kind") or "") not in CHECK_KINDS]
+    lech = [f"{e.get('id') or '?'}: `{e.get('check')}` is "
+            f"{CHECK_KIND[str(e.get('check'))]}, register says "
+            f"{e.get('check_kind')}"
+            for e in open_
+            if e.get("false_pass") and str(e.get("check")) in CHECK_KIND
+            and e.get("check_kind")
+            and str(e.get("check_kind")) != CHECK_KIND[str(e.get("check"))]]
+    if lech:
+        return Probed(Outcome.UNRUNNABLE,
+                      "register contradicts `gate.CHECK_KIND` on "
+                      + "; ".join(lech[:5])
+                      + " — a structural false PASS declared `model-judge` is "
+                        "exactly how one would walk past G2.4a, so the two "
+                        "disagreeing means neither can be trusted here")
+    bad_kind = [f"{e.get('id') or '?'}={_kind_of(e) or 'none'}" for e in open_
+                if e.get("false_pass") and _kind_of(e) not in CHECK_KINDS]
     if bad_kind:
         return Probed(Outcome.UNRUNNABLE,
                       f"unknown check_kind on {', '.join(bad_kind[:5])} — "
-                      f"expected one of {', '.join(CHECK_KINDS)}")
+                      f"expected one of {', '.join(CHECK_KINDS)}, or a `check` "
+                      f"naming one of the gate's own checks")
     hit = [str(e.get("id") or "?") for e in open_
-           if e.get("false_pass") and str(e.get("check_kind") or "") in HARD_KINDS]
+           if e.get("false_pass") and _kind_of(e) in HARD_KINDS]
     if hit:
         return Probed(Outcome.FAILED,
                       f"{len(hit)} open false PASS in a {'/'.join(HARD_KINDS)} check: "
@@ -516,6 +532,22 @@ def probe_deterministic_false_pass(ctx: Ctx) -> Probed:
     return Probed(Outcome.PASSED,
                   f"no open false PASS in a {'/'.join(HARD_KINDS)} check "
                   f"({len(entries)} registered defects)")
+
+
+def _kind_of(entry: dict) -> str:
+    """Loại của mục cổng mà một khiếm khuyết nói về — **suy ra** trước, khai sau.
+
+    `gate.CHECK_KIND` là nguồn duy nhất phân loại ai chấm mỗi mục, nên khi mục
+    ghi `check` là tên một mục cổng thật thì câu trả lời đã có sẵn và việc bắt
+    người ghi tay thêm `check_kind` chỉ mở một đường lách: khai `model-judge`
+    cho một mục **cấu trúc** là cách hợp lệ hoá đúng cái PASS giả mà G2.4a hỏi
+    về. Lời khai chỉ dùng khi `check` không phải mục cổng nào — khiếm khuyết
+    ngoài cổng vẫn có thật.
+    """
+    ten = str(entry.get("check") or "")
+    if ten in CHECK_KIND:
+        return CHECK_KIND[ten]
+    return str(entry.get("check_kind") or "")
 
 
 #: The four properties of §5 G2.4b, in the contract's own numbering.
@@ -784,6 +816,44 @@ def probe_pre_deploy_approved(ctx: Ctx) -> Probed:
 # ---------------------------------------------------- G5 benchmark integrity
 
 
+class AmbiguousRegion(ValueError):
+    """Số vùng ghim khác 1 — không đo được, chứ không phải đo ra sai."""
+
+    def __init__(self, n: int):
+        self.n = n
+        super().__init__(f"{n} frozen regions, expected exactly 1")
+
+
+def frozen_region_digest(path: Path, region: dict) -> str:
+    """Digest của **vùng ghim**, theo đúng công thức `BENCH-PREREGISTRATION-C2.md` §1.1.
+
+    Mốc và luật đến **từ dữ liệu** (`prereg_frozen_region` trong tệp tiêu chí),
+    không viết cứng ở đây: §1.1 nói công thức không được có bản thứ hai, và một
+    bản sao trong mã là bản thứ hai kể cả khi hôm nay nó trùng.
+
+    Chuẩn hoá đúng **hai** khoản: CRLF/CR → LF, và cắt dòng trống ở hai đầu vùng.
+    Ngoài hai khoản ấy, từng byte. Không chuẩn hoá nội dung — ngược hẳn với
+    `onboarding_digest`, và có chủ ý: ở đó một lỗi chính tả không được làm mất
+    hiệu lực công của một người thật, còn ở đây giá trị cần bảo vệ **là** việc
+    văn bản không đổi, nên vỡ pin vì một lỗi chính tả là yêu cầu, không phải
+    khiếm khuyết. Vùng ghim mang ngưỡng số trong văn xuôi (`≥ 3`, `±0,08`), và
+    gộp khoảng trắng cho phép đổi cách viết chúng mà digest không đổi.
+
+    Khoản LF thì buộc phải có: kho không có `.gitattributes` và CI chạy cả trên
+    Windows, nên một checkout bật `core.autocrlf` sẽ làm digest lệch trên một tệp
+    không ai chạm — một FAILED giả.
+    """
+    import hashlib
+
+    bd = str(region.get("begin") or r"<!--\s*PREREG-FROZEN:BEGIN\s*-->")
+    kt = str(region.get("end") or r"<!--\s*PREREG-FROZEN:END\s*-->")
+    text = path.read_text(encoding="utf-8").replace("\r\n", "\n").replace("\r", "\n")
+    found = re.findall(rf"(?s){bd}\n(.*?)\n{kt}", text)
+    if len(found) != 1:
+        raise AmbiguousRegion(len(found))
+    return hashlib.sha256(found[0].strip("\n").encode("utf-8")).hexdigest()
+
+
 def probe_prereg_digest(ctx: Ctx) -> Probed:
     """G5.1 — the methodology was pre-registered, and its digest still matches.
 
@@ -791,21 +861,66 @@ def probe_prereg_digest(ctx: Ctx) -> Probed:
     ruling 7), so an unpinned pre-registration is UNRUNNABLE rather than a
     pass. The pin lives in the criteria file next to `contract_sha256` and is
     written by `aisef closure --pin`, never at evaluation time.
+
+    The digest covers the **frozen region**, not the whole file, and there is no
+    fallback to whole-file hashing: this file is required to grow (a dated
+    addendum, the G5.3 status, a pointer to the column-2 report), so a whole-file
+    digest breaks on every such addition — and a pin that breaks routinely turns
+    "digest mismatch" into noise that a real edit to the prediction then walks
+    through unseen. Hashing the whole file when the markers cannot be found is
+    hashing something else and calling it this measurement, which is the
+    false-PASS class §4.1 of the contract exists to forbid.
+
+    Five steps, as §1.5 of the pre-registration declares them. It calls an
+    ambiguous marker pair FAILED; this reads it UNRUNNABLE, because with no
+    single region there is nothing to compare and FAILED would assert a fact —
+    that the text was rewritten — which has not been established. Both block, so
+    no closure outcome turns on the difference (see §3 of that file, dated).
     """
     rel = str((ctx.criterion.get("evidence") or "docs/BENCH-PREREGISTRATION-C2.md"))
-    text = ctx.read(rel)
-    if text is None:
+    if ctx.read(rel) is None:
         return _missing(f"{rel} — the pre-registration promoted to a closure artifact")
-    pin = str(ctx.spec.get("prereg_sha256") or "")
-    now = sha256_of(ctx.path(rel))
+    region = ctx.criterion.get("prereg_frozen_region") or {}
+    try:
+        now = frozen_region_digest(ctx.path(rel), region)
+    except AmbiguousRegion as e:
+        return Probed(Outcome.UNRUNNABLE,
+                      f"{rel} has {e.n} `PREREG-FROZEN` regions, expected exactly 1 — "
+                      f"with no single region there is nothing to compare, and hashing "
+                      f"the whole file instead would measure something else")
+    pin = str(ctx.criterion.get("prereg_sha256") or ctx.spec.get("prereg_sha256") or "")
     if not pin:
         return Probed(Outcome.UNRUNNABLE,
                       f"{rel} exists but is not digest-pinned — run `aisef closure --pin`")
     if pin != now:
         return Probed(Outcome.FAILED,
-                      f"{rel} changed after pinning ({pin[:12]} → {now[:12]}) — "
-                      "prediction and success criteria are not rewritten after data exists")
-    return Probed(Outcome.PASSED, f"pinned at {pin[:12]}, unchanged")
+                      f"{rel} changed after pinning inside the frozen region "
+                      f"({pin[:12]} → {now[:12]}) — prediction and success criteria "
+                      f"are not rewritten after data exists; restore the text rather "
+                      f"than re-recording the digest")
+    # Bản lịch sử là thứ **định ngày** cho tiền đăng ký. Nó lệch thì bằng chứng
+    # "viết trước khi có một byte dữ liệu" đã mất, dù bản ghim vẫn khớp — nên đây
+    # là một bước riêng, không phải một chú thích.
+    also = str(region.get("also_in") or "")
+    if also:
+        if ctx.read(also) is None:
+            return Probed(Outcome.UNRUNNABLE,
+                          f"missing {also} — the pre-data copy that dates the "
+                          f"pre-registration; without it the pin proves the text is "
+                          f"unchanged but not that it predates the data")
+        try:
+            xua = frozen_region_digest(ctx.path(also), region)
+        except AmbiguousRegion as e:
+            return Probed(Outcome.UNRUNNABLE,
+                          f"{also} has {e.n} `PREREG-FROZEN` regions, expected exactly 1")
+        if xua != now:
+            return Probed(Outcome.FAILED,
+                          f"{also} no longer carries the same frozen region "
+                          f"({xua[:12]} vs {now[:12]}) — the historical copy is what "
+                          f"dates the text, so the two must agree byte for byte")
+    return Probed(Outcome.PASSED,
+                  f"frozen region pinned at {pin[:12]}, unchanged"
+                  + (f", and matched in {also}" if also else ""))
 
 
 def probe_cut_session_separation(ctx: Ctx) -> Probed:
@@ -1347,10 +1462,18 @@ def pin(root: Path | str, *, force: bool = False) -> dict:
     pinned = {rel: digest}
     prereg = _find(spec, "G5.1")
     if prereg:
-        path = root / str(prereg[1].get("evidence") or "")
+        crit = prereg[1]
+        path = root / str(crit.get("evidence") or "")
         if path.is_file():
-            spec["prereg_sha256"] = sha256_of(path)
-            pinned[str(path.relative_to(root))] = spec["prereg_sha256"]
+            # Ghi vào **tiêu chí**, cạnh `prereg_frozen_region` mô tả mốc, không
+            # ghi ở mức trên cùng: giá trị và luật sinh ra nó phải ở cùng một chỗ,
+            # còn một con số có hai nhà là một con số sẽ lệch (§1.4). Bản trước
+            # giữ cả hai — một digest cả tệp ở mức trên cùng mà probe đọc, và một
+            # digest vùng ghim ở mức tiêu chí không ai đọc.
+            crit["prereg_sha256"] = frozen_region_digest(
+                path, crit.get("prereg_frozen_region") or {})
+            spec.pop("prereg_sha256", None)
+            pinned[str(path.relative_to(root))] = crit["prereg_sha256"]
     (root / CRITERIA_PATH).write_text(
         json.dumps(spec, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return pinned

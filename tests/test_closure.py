@@ -499,6 +499,36 @@ class TestG2Register(unittest.TestCase):
         self.assertIs(p.outcome, Outcome.UNRUNNABLE)
         self.assertIn("vibes", p.detail)
 
+    def test_kind_is_derived_from_the_named_gate_check(self):
+        """Một mục nêu `check` là tên một mục cổng thật thì loại của nó đã được
+        khung tự phân — `gate.CHECK_KIND` là nguồn duy nhất. Bắt người ghi tay
+        thêm `check_kind` mở ra đúng một đường lách: ghi `model-judge` cho một
+        mục **cấu trúc** là cách hợp lệ hoá một PASS giả mà G2.4a hỏi về."""
+        self.register({"id": "D-1", "severity": "P1", "status": "OPEN",
+                       "false_pass": True, "check": "criteria have tests"})
+        p = CL.probe_deterministic_false_pass(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("D-1", p.detail)
+
+    def test_a_hand_written_kind_cannot_contradict_the_framework(self):
+        """`criteria have tests` là `structural` theo khung; khai `model-judge`
+        không được phép biến nó thành không-chặn."""
+        self.register({"id": "D-1", "severity": "P1", "status": "OPEN",
+                       "false_pass": True, "check": "criteria have tests",
+                       "check_kind": "model-judge"})
+        p = CL.probe_deterministic_false_pass(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("criteria have tests", p.detail)
+
+    def test_a_defect_outside_any_gate_check_still_needs_a_hand_written_kind(self):
+        """Không phải khiếm khuyết nào cũng nằm ở một mục cổng — khi `check`
+        không có trong bản đồ, lời khai là thứ duy nhất còn lại."""
+        self.register({"id": "D-1", "severity": "P1", "status": "OPEN",
+                       "false_pass": True, "check": "pre-deploy readiness",
+                       "check_kind": "deterministic"})
+        p = CL.probe_deterministic_false_pass(self.repo.ctx())
+        self.assertIs(p.outcome, Outcome.FAILED)
+
 
 class TestG2JudgeOnly(unittest.TestCase):
     def setUp(self):
@@ -757,22 +787,94 @@ class TestG5(unittest.TestCase):
         self.repo = Repo()
         self.addCleanup(self.repo.close)
 
+    #: Đúng mốc và luật mà `docs/BENCH-PREREGISTRATION-C2.md` §1.1 khai, ở dạng
+    #: máy đọc được — probe lấy mốc **từ dữ liệu**, nên chỉ có một công thức.
+    REGION = {"begin": r"<!--\s*PREREG-FROZEN:BEGIN\s*-->",
+              "end": r"<!--\s*PREREG-FROZEN:END\s*-->",
+              "exactly_one_pair": True,
+              "also_in": "docs/handoff/bench.md"}
+
+    def prereg(self, than="ngưỡng ≥ 3, dải ±0,08", *, ngoai="", tep=None):
+        """Một tiền đăng ký có mốc thật. `ngoai` là phụ lục **ngoài** vùng ghim."""
+        text = ("# prereg\n\n"
+                "<!-- PREREG-FROZEN:BEGIN -->\n" + than + "\n<!-- PREREG-FROZEN:END -->\n"
+                + ngoai)
+        return self.repo.write(tep or "docs/BENCH-PREREGISTRATION-C2.md", text)
+
+    def crit_prereg(self, **kw):
+        c = {"evidence": "docs/BENCH-PREREGISTRATION-C2.md",
+             "prereg_frozen_region": dict(self.REGION)}
+        c.update(kw)
+        return c
+
     def test_unpinned_prereg_is_unrunnable_even_when_it_exists(self):
-        self.repo.write("docs/BENCH-PREREGISTRATION-C2.md", "# prereg\nprediction: none\n")
-        c = {"evidence": "docs/BENCH-PREREGISTRATION-C2.md"}
-        p = CL.probe_prereg_digest(self.repo.ctx(c))
+        self.prereg()
+        p = CL.probe_prereg_digest(self.repo.ctx(self.crit_prereg()))
         self.assertIs(p.outcome, Outcome.UNRUNNABLE)
         self.assertIn("not digest-pinned", p.detail)
 
-    def test_pinned_prereg_passes_and_an_edit_fails(self):
-        path = self.repo.write("docs/BENCH-PREREGISTRATION-C2.md", "# prereg\n")
-        c = {"evidence": "docs/BENCH-PREREGISTRATION-C2.md"}
-        self.repo.spec["prereg_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+    def test_pinned_prereg_passes_and_an_edit_inside_the_region_fails(self):
+        path = self.prereg()
+        self.prereg(tep=self.REGION["also_in"])
+        c = self.crit_prereg(prereg_sha256=CL.frozen_region_digest(path, self.REGION))
         self.assertIs(CL.probe_prereg_digest(self.repo.ctx(c)).outcome, Outcome.PASSED)
-        path.write_text("# prereg\nrewritten after the data arrived\n", encoding="utf-8")
+        self.prereg("ngưỡng ≥ 2, dải ±0,08")          # một byte trong vùng ghim
         p = CL.probe_prereg_digest(self.repo.ctx(c))
         self.assertIs(p.outcome, Outcome.FAILED)
         self.assertIn("changed after pinning", p.detail)
+
+    def test_a_dated_addendum_outside_the_region_keeps_the_pin(self):
+        """Tệp này **phải** mọc thêm (§1.2): phụ lục có ngày, trạng thái G5.3, con
+        trỏ tới báo cáo. Digest cả tệp làm mỗi lần thêm như thế vỡ pin, và một pin
+        vỡ thường xuyên thì lần sửa thật vào vùng ghim đi qua giữa tiếng ồn ấy."""
+        path = self.prereg()
+        self.prereg(tep=self.REGION["also_in"])
+        c = self.crit_prereg(prereg_sha256=CL.frozen_region_digest(path, self.REGION))
+        self.prereg(ngoai="\n## 3. Học được sau — 2026-09-14\n\nG5.3 chưa chạy.\n")
+        self.assertIs(CL.probe_prereg_digest(self.repo.ctx(c)).outcome, Outcome.PASSED)
+
+    def test_crlf_checkout_does_not_break_the_pin(self):
+        """Kho không có `.gitattributes` và CI chạy cả trên Windows, nên một
+        checkout bật `core.autocrlf` là FAILED giả nếu không chuẩn hoá LF."""
+        path = self.prereg()
+        self.prereg(tep=self.REGION["also_in"])
+        c = self.crit_prereg(prereg_sha256=CL.frozen_region_digest(path, self.REGION))
+        path.write_bytes(path.read_text(encoding="utf-8").replace("\n", "\r\n").encode())
+        self.assertIs(CL.probe_prereg_digest(self.repo.ctx(c)).outcome, Outcome.PASSED)
+
+    def test_no_markers_is_unrunnable_and_never_falls_back_to_the_whole_file(self):
+        """Không mốc thì **không đo được**, và băm cả tệp thay vào là băm một thứ
+        khác rồi gọi là đã đo thứ này — đúng lớp lỗi đạt-sai hợp đồng cấm."""
+        path = self.repo.write("docs/BENCH-PREREGISTRATION-C2.md", "# prereg\nkhông mốc\n")
+        c = self.crit_prereg(prereg_sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+        p = CL.probe_prereg_digest(self.repo.ctx(c))
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("0", p.detail)
+
+    def test_two_frozen_regions_is_unrunnable_not_a_pass(self):
+        """Hai vùng ghim thì không biết vùng nào là cam kết."""
+        path = self.prereg()
+        path.write_text(path.read_text(encoding="utf-8") * 2, encoding="utf-8")
+        p = CL.probe_prereg_digest(self.repo.ctx(self.crit_prereg(prereg_sha256="0" * 64)))
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("2", p.detail)
+
+    def test_the_historical_copy_must_carry_the_same_bytes(self):
+        """Bản lịch sử là thứ **định ngày** cho tiền đăng ký; nó lệch thì cái
+        chứng minh "viết trước khi có dữ liệu" đã mất, dù bản ghim vẫn khớp."""
+        path = self.prereg()
+        self.prereg("ngưỡng ≥ 9, khác hẳn", tep=self.REGION["also_in"])
+        c = self.crit_prereg(prereg_sha256=CL.frozen_region_digest(path, self.REGION))
+        p = CL.probe_prereg_digest(self.repo.ctx(c))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("bench.md", p.detail)
+
+    def test_a_missing_historical_copy_is_unrunnable(self):
+        path = self.prereg()
+        c = self.crit_prereg(prereg_sha256=CL.frozen_region_digest(path, self.REGION))
+        p = CL.probe_prereg_digest(self.repo.ctx(c))
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("bench.md", p.detail)
 
     def test_no_bench_results_is_unrunnable(self):
         p = CL.probe_cut_session_separation(self.repo.ctx())
@@ -1192,10 +1294,34 @@ class TestPin(unittest.TestCase):
         repo = Repo(spec_of(crit("G5.1", "aisef.control.closure:probe_prereg_digest",
                                  evidence="docs/BENCH-PREREGISTRATION-C2.md")), pin=False)
         self.addCleanup(repo.close)
-        repo.write("docs/BENCH-PREREGISTRATION-C2.md", "# prereg\n")
+        than = ("# prereg\n\n<!-- PREREG-FROZEN:BEGIN -->\nngưỡng ≥ 3\n"
+                "<!-- PREREG-FROZEN:END -->\n")
+        repo.write("docs/BENCH-PREREGISTRATION-C2.md", than)
         pinned = CL.pin(repo.root)
         self.assertIn("docs/BENCH-PREREGISTRATION-C2.md", pinned)
         self.assertIs(CL.evaluate(repo.root).results[0].outcome, Outcome.PASSED)
+
+    def test_pin_writes_the_frozen_region_digest_not_the_whole_file(self):
+        """Bản trước ghim cả tệp ở mức trên cùng và để digest vùng ghim ở mức tiêu
+        chí không ai đọc — hai nhà cho một con số, và probe đọc nhà sai."""
+        crit_g5 = crit("G5.1", "aisef.control.closure:probe_prereg_digest",
+                       evidence="docs/BENCH-PREREGISTRATION-C2.md")
+        crit_g5["prereg_frozen_region"] = {
+            "begin": r"<!--\s*PREREG-FROZEN:BEGIN\s*-->",
+            "end": r"<!--\s*PREREG-FROZEN:END\s*-->"}
+        repo = Repo(spec_of(crit_g5), pin=False)
+        self.addCleanup(repo.close)
+        than = ("# prereg\n\n<!-- PREREG-FROZEN:BEGIN -->\nngưỡng ≥ 3\n"
+                "<!-- PREREG-FROZEN:END -->\n\n## 3. phụ lục có ngày\n")
+        path = repo.write("docs/BENCH-PREREGISTRATION-C2.md", than)
+        CL.pin(repo.root)
+        spec = CL.load_spec(repo.root)
+        self.assertNotIn("prereg_sha256", spec)
+        c = CL._find(spec, "G5.1")[1]
+        self.assertEqual(c["prereg_sha256"],
+                         CL.frozen_region_digest(path, c["prereg_frozen_region"]))
+        self.assertNotEqual(c["prereg_sha256"],
+                            hashlib.sha256(path.read_bytes()).hexdigest())
 
     def test_repinning_is_refused_because_it_would_hide_an_edit(self):
         repo = Repo()

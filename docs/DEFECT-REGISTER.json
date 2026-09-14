@@ -1,59 +1,60 @@
 {
-  "_comment": "Canonical defect register \u2014 closure criterion G2.3 (`docs/PROJECT-CLOSURE-GATE.md` \u00a75, owner ruling 6). Repository-local and version-controlled on purpose: GitHub Issues are explicitly NOT canonical, because closure must not depend on an external tracker being reachable. Issues may mirror this file. PASS = zero OPEN P0/P1 rows. Read it with `aisef.control.defects:read` \u2014 the same reader the closure probe uses, so a report and the gate cannot disagree. This file is missing = UNRUNNABLE at closure; this file present with an empty `defects` = a real PASS.",
-  "_boundary": "`docs/FAILURE-TAXONOMY.md` answers *what went wrong and what did we learn* (133 closed rows: symptom, root cause, lesson, fix). This register answers *what is outstanding now, at what severity*. A defect sits here while open and there once understood, and a row here points at its taxonomy row by id instead of restating it \u2014 nothing is copied in either direction. Work that is wanted but whose absence is not a wrong result (the POST_CLOSE list in the contract's \u00a77, `docs/ROADMAP-POST-1.0.md`) is not a defect and is not entered here.",
-  "_fields": "id (stable, never reused) \u00b7 severity (P0\u2013P3, scale below) \u00b7 status (OPEN | CLOSED) \u00b7 title \u00b7 introduced / fixed (version or commit, where known; empty when it is not) \u00b7 evidence (the regression test, or the command that recomputes the measurement) \u00b7 check (optional: the `gate.CHECK_NAMES` entry the defect bears on) \u00b7 taxonomy (optional: the FAILURE-TAXONOMY.md row id) \u00b7 notes. No timestamps: the file must digest the same on every read or G2.3's staleness detection reads noise as change.",
-  "register_version": "1",
-  "severity_scale": {
-    "source": "docs/EXTERNAL-VALIDATION-v1.1.0.md#finding-classification",
-    "blocking": [
-      "P0",
-      "P1"
-    ],
-    "_comment": "Reused by reference, never redefined here. P0 = cannot install, data loss, security issue, incorrect gate result. P1 = cannot complete the lifecycle without author assistance. P2 = significant confusion / DX friction. P3 = cosmetic or optional. The reader refuses a register that names another source or edits `blocking`."
+ "_comment": "Canonical defect register — closure criterion G2.3 (`docs/PROJECT-CLOSURE-GATE.md` §5, owner ruling 6). Repository-local and version-controlled on purpose: GitHub Issues are explicitly NOT canonical, because closure must not depend on an external tracker being reachable. Issues may mirror this file. PASS = zero OPEN P0/P1 rows. Read it with `aisef.control.defects:read` — the same reader the closure probe uses, so a report and the gate cannot disagree. This file is missing = UNRUNNABLE at closure; this file present with an empty `defects` = a real PASS.",
+ "_boundary": "`docs/FAILURE-TAXONOMY.md` answers *what went wrong and what did we learn* (133 closed rows: symptom, root cause, lesson, fix). This register answers *what is outstanding now, at what severity*. A defect sits here while open and there once understood, and a row here points at its taxonomy row by id instead of restating it — nothing is copied in either direction. Work that is wanted but whose absence is not a wrong result (the POST_CLOSE list in the contract's §7, `docs/ROADMAP-POST-1.0.md`) is not a defect and is not entered here.",
+ "_fields": "id (stable, never reused) · severity (P0–P3, scale below) · status (OPEN | CLOSED) · title · introduced / fixed (version or commit, where known; empty when it is not) · evidence (the regression test, or the command that recomputes the measurement) · check (optional: the `gate.CHECK_NAMES` entry the defect bears on) · taxonomy (optional: the FAILURE-TAXONOMY.md row id) · notes. No timestamps: the file must digest the same on every read or G2.3's staleness detection reads noise as change.",
+ "register_version": "1",
+ "severity_scale": {
+  "source": "docs/EXTERNAL-VALIDATION-v1.1.0.md#finding-classification",
+  "blocking": [
+   "P0",
+   "P1"
+  ],
+  "_comment": "Reused by reference, never redefined here. P0 = cannot install, data loss, security issue, incorrect gate result. P1 = cannot complete the lifecycle without author assistance. P2 = significant confusion / DX friction. P3 = cosmetic or optional. The reader refuses a register that names another source or edits `blocking`."
+ },
+ "defects": [
+  {
+   "id": "D-001",
+   "severity": "P1",
+   "status": "OPEN",
+   "title": "A test run with no readable results records other stories' requirements as regressions",
+   "introduced": "66dfad5",
+   "evidence": "python3 validation/o3_preservation_radius.py → `todo: 4 scored stories, 36 behaviours, 2 confirmed regressors, 4 uncorroborated REOPENED` (FR-1, FR-2, FR-4 owned by STORY-02-01 and FR-9 by STORY-01-02, all flipped by STORY-02-02 at at=1788947583.932249, an event whose `test` tool_run is ok=True exit_code=0 with `test_format: \"\"`, `test_ids: []`, `failed_ids: []`). No regression test yet.",
+   "taxonomy": 155,
+   "notes": "Same class as taxonomy row 155 (absence read as regression), in the branch that fix did not cover: `ledger._observe_tests`, when `readable` is false, calls `rollup(line, False, why)` for the home story, so every requirement that story `covers` — owned by earlier, VERIFIED stories — is observed not-green and `observe` records REOPENED. Nothing red was read anywhere. P1 and not P2 because the loop's own arithmetic is corrupted by it (`improve` stops on Δverified − Δreopened) and only a human comparing the ledger against the evidence can tell the artifact from a regression; P1 and not P0 because no gate verdict is demonstrably wrong on disk — the mechanism by which one could be (a behaviour REOPENED by another story is dropped from that story's `preservation` list, `complexity.verified_touched`) is real but was never reached here: STORY-02-02 was the last story of that corpus and it failed. The trigger is not exotic — any project whose test output AISEF cannot parse yields `test_format: \"\"`. false_pass=false: false FAIL, not false PASS: an unreadable test run marks other stories' requirements REOPENED — it invents a regression, it does not pass a defect. Lives in the ledger projection, not in a gate check.",
+   "false_pass": false
   },
-  "defects": [
-    {
-      "id": "D-001",
-      "severity": "P1",
-      "status": "OPEN",
-      "title": "A test run with no readable results records other stories' requirements as regressions",
-      "introduced": "66dfad5",
-      "evidence": "python3 validation/o3_preservation_radius.py \u2192 `todo: 4 scored stories, 36 behaviours, 2 confirmed regressors, 4 uncorroborated REOPENED` (FR-1, FR-2, FR-4 owned by STORY-02-01 and FR-9 by STORY-01-02, all flipped by STORY-02-02 at at=1788947583.932249, an event whose `test` tool_run is ok=True exit_code=0 with `test_format: \"\"`, `test_ids: []`, `failed_ids: []`). No regression test yet.",
-      "taxonomy": 155,
-      "notes": "Same class as taxonomy row 155 (absence read as regression), in the branch that fix did not cover: `ledger._observe_tests`, when `readable` is false, calls `rollup(line, False, why)` for the home story, so every requirement that story `covers` \u2014 owned by earlier, VERIFIED stories \u2014 is observed not-green and `observe` records REOPENED. Nothing red was read anywhere. P1 and not P2 because the loop's own arithmetic is corrupted by it (`improve` stops on \u0394verified \u2212 \u0394reopened) and only a human comparing the ledger against the evidence can tell the artifact from a regression; P1 and not P0 because no gate verdict is demonstrably wrong on disk \u2014 the mechanism by which one could be (a behaviour REOPENED by another story is dropped from that story's `preservation` list, `complexity.verified_touched`) is real but was never reached here: STORY-02-02 was the last story of that corpus and it failed. The trigger is not exotic \u2014 any project whose test output AISEF cannot parse yields `test_format: \"\"`. false_pass=false: false FAIL, not false PASS: an unreadable test run marks other stories' requirements REOPENED \u2014 it invents a regression, it does not pass a defect. Lives in the ledger projection, not in a gate check.",
-      "false_pass": false
-    },
-    {
-      "id": "D-002",
-      "severity": "P1",
-      "status": "OPEN",
-      "title": "A blocking gate decision can rest on the model reviewer alone",
-      "evidence": "python3 -m aisef.control.reviewer_qual ~/Downloads/projects/{todo-cli,todo-e2e,todo-oc,todo}/_bmad-output \u2192 block uncorroborated 21 of 57 blocks scored (36.8 %), of which todo-e2e 15 of its 17; false block rate 0.1053; same-tree verdict reversals 11 of 20. Lifecycle effect, same corpus: todo-e2e STORY-05-01 ends `failed` after gate:verdict seq 74 and seq 150 where `review` is the only failing check (`coverage` is UNCONFIGURED, non-blocking).",
-      "check": "review",
-      "notes": "Closure criterion G2.4b owns the verdict on this fact (`REQUIRED_WITH_WAIVER_ALLOWED`, owner ruling 1: no reviewer redesign for closure's sake, and the measured rate stays a published property). It is entered here at P1 anyway because the contract's exemption for the model-judge error rate is conditional on 'no blocking decision rests on the judge alone', and that condition is exactly the one that does not hold; P1 by the letter of the scale \u2014 a story ended `failed` on the judge's word with no deterministic check disagreeing, which is the lifecycle not completing without author assistance. The argument for P2 is owner ruling 1 read as also excusing it from G2.3; if the owner takes that reading, this row becomes P2 with one edit and G2.4b keeps the verdict alone. false_pass=false: concerns `review`, the only model-judge check (CHECK_KIND). G2.4a is scoped to deterministic/structural checks by owner ruling 1; this one is G2.4b's subject.",
-      "false_pass": false
-    },
-    {
-      "id": "D-003",
-      "severity": "P2",
-      "status": "OPEN",
-      "title": "`_analyze.cut_sessions` merges two bench cohorts on the three tasks they share",
-      "introduced": "840c3e0",
-      "evidence": "tests/bench/_analyze.py: `_DUONG_DAN_PHIEN = re.compile(r\"\\.bench[\\w.-]*/run/([\\w-]+)/([\\w-]+)/a(\\d+)\")` matches any ledger directory but captures only (condition, task, attempt), so `.bench/run/\u2026` and `.bench-c1b/run/\u2026` land on one key. Recorded in docs/BENCH-TASK-DISCRIMINATION.md \u00a76 with the three affected tasks (`sec-1`, `sec-2`, `state-3`).",
-      "notes": "Deliberately not fixed: both published bench reports quote this function's output, so re-keying it makes a re-run of `analyze` print a table that differs from the printed evidence. P2 \u2014 the wrong number is an auxiliary cut-session count in a bench analysis helper, it blocks nothing and sets no gate. The contract lists it POST_CLOSE (\u00a77); that is a scheduling statement, and P2 is the severity \u2014 they agree, and neither is derived from the other. false_pass=false: a bench analysis counter, not a gate check at all.",
-      "false_pass": false
-    },
-    {
-      "id": "D-004",
-      "severity": "P1",
-      "status": "OPEN",
-      "title": "criterion identity is positional, so a test can silently become proof for a different criterion",
-      "false_pass": true,
-      "check": "criteria have tests",
-      "taxonomy": 159,
-      "introduced": "pre-dates this wave; surfaced 2026-09-14 by the marks-cli closure corpus",
-      "evidence": "marks-cli _bmad-output/plan-reconciliation.json \u00a7incomplete_withdrawal.how_the_agent_resolved_it; tests named AC-STORY-01-02-1 in marks-cli tests/dispatch.test.js now assert STORY-02-02 `list` behaviour while that code maps to 'unknown verb exits 1'; AC-STORY-01-02-4 is orphaned",
-      "notes": "false_pass=true: `criteria have tests` is a blocking STRUCTURAL check and a shifted test satisfies it while proving another behaviour. This is the first registered true false PASS, so G2.4a moves from PASSED to FAILED \u2014 owner decision 2026-09-14: it stays FAILED until fixed, not waived and not weakened. Not preventable by instruction: the developer never sees the criterion list, so the fix must be a detector plus a stable identity, not a convention. G4 evidence from marks-cli is NOT closure-valid until the corpus is re-verified under corrected identity semantics, even at 7/7."
-    }
-  ]
+  {
+   "id": "D-002",
+   "severity": "P1",
+   "status": "OPEN",
+   "title": "A blocking gate decision can rest on the model reviewer alone",
+   "evidence": "python3 -m aisef.control.reviewer_qual ~/Downloads/projects/{todo-cli,todo-e2e,todo-oc,todo}/_bmad-output → block uncorroborated 21 of 57 blocks scored (36.8 %), of which todo-e2e 15 of its 17; false block rate 0.1053; same-tree verdict reversals 11 of 20. Lifecycle effect, same corpus: todo-e2e STORY-05-01 ends `failed` after gate:verdict seq 74 and seq 150 where `review` is the only failing check (`coverage` is UNCONFIGURED, non-blocking).",
+   "check": "review",
+   "notes": "Closure criterion G2.4b owns the verdict on this fact (`REQUIRED_WITH_WAIVER_ALLOWED`, owner ruling 1: no reviewer redesign for closure's sake, and the measured rate stays a published property). It is entered here at P1 anyway because the contract's exemption for the model-judge error rate is conditional on 'no blocking decision rests on the judge alone', and that condition is exactly the one that does not hold; P1 by the letter of the scale — a story ended `failed` on the judge's word with no deterministic check disagreeing, which is the lifecycle not completing without author assistance. The argument for P2 is owner ruling 1 read as also excusing it from G2.3; if the owner takes that reading, this row becomes P2 with one edit and G2.4b keeps the verdict alone. false_pass=false: concerns `review`, the only model-judge check (CHECK_KIND). G2.4a is scoped to deterministic/structural checks by owner ruling 1; this one is G2.4b's subject.",
+   "false_pass": false
+  },
+  {
+   "id": "D-003",
+   "severity": "P2",
+   "status": "OPEN",
+   "title": "`_analyze.cut_sessions` merges two bench cohorts on the three tasks they share",
+   "introduced": "840c3e0",
+   "evidence": "tests/bench/_analyze.py: `_DUONG_DAN_PHIEN = re.compile(r\"\\.bench[\\w.-]*/run/([\\w-]+)/([\\w-]+)/a(\\d+)\")` matches any ledger directory but captures only (condition, task, attempt), so `.bench/run/…` and `.bench-c1b/run/…` land on one key. Recorded in docs/BENCH-TASK-DISCRIMINATION.md §6 with the three affected tasks (`sec-1`, `sec-2`, `state-3`).",
+   "notes": "Deliberately not fixed: both published bench reports quote this function's output, so re-keying it makes a re-run of `analyze` print a table that differs from the printed evidence. P2 — the wrong number is an auxiliary cut-session count in a bench analysis helper, it blocks nothing and sets no gate. The contract lists it POST_CLOSE (§7); that is a scheduling statement, and P2 is the severity — they agree, and neither is derived from the other. false_pass=false: a bench analysis counter, not a gate check at all.",
+   "false_pass": false
+  },
+  {
+   "id": "D-004",
+   "severity": "P1",
+   "status": "CLOSED",
+   "title": "criterion identity is positional, so a test can silently become proof for a different criterion",
+   "false_pass": true,
+   "check": "criteria have tests",
+   "taxonomy": 159,
+   "introduced": "pre-dates this wave; surfaced 2026-09-14 by the marks-cli closure corpus",
+   "evidence": "marks-cli _bmad-output/plan-reconciliation.json §incomplete_withdrawal.how_the_agent_resolved_it; tests named AC-STORY-01-02-1 in marks-cli tests/dispatch.test.js now assert STORY-02-02 `list` behaviour while that code maps to 'unknown verb exits 1'; AC-STORY-01-02-4 is orphaned",
+   "notes": "false_pass=true: `criteria have tests` is a blocking STRUCTURAL check and a shifted test satisfies it while proving another behaviour. First registered true false PASS, so G2.4a moved PASSED -> FAILED; owner decision 2026-09-14 was that it stays FAILED until fixed, not waived and not weakened. Not preventable by instruction: the developer never sees the criterion list, so the fix had to be a detector plus a stable identity, not a convention.\nCLOSED 2026-09-14 in two commits, against the owner's five acceptance points:\n  (1) delete/reorder cannot silently change identity — identity is now the pair (code, content digest); `acceptance.drift()` names the codes whose criterion text moved. Reorder is the case a count cannot see: same count, nothing orphaned, each test proving the other's criterion.\n  (2) a test cannot silently become proof for another criterion — same digest pair; for a story already merged DONE, `run._done_criteria_drift` compares the recorded contract note against today's criteria and the epic STOPS instead of skipping it silently. Re-running cannot repair that case: the work is on the main branch, so the developer would open an already-green tree (bug 143's measured failure).\n  (3) orphaned AC ids detected — `acceptance.orphans()`, blocking in the gate.\n  (4) duplicate/mismatched mappings detected — `acceptance.overloaded()` blocks a test whose name carries two codes of one story (two criteria, one behaviour: no count sees it, `missing` is empty and nothing is orphaned). Separately, the register's `check_kind` is now DERIVED from `gate.CHECK_KIND` and a hand-written kind that contradicts the framework reads UNRUNNABLE — declaring a structural false PASS as `model-judge` was itself a way past G2.4a.\n  (5) the gate cannot PASS `criteria have tests` on drifted identity — orphans and ambiguous mappings block there; drift is caught at plan level because within one attempt the criteria and the note are the same text by construction, so a drift comparison inside `evaluate()` could never fire.\nNo baseline reads as CANNOT DECIDE, never as fine — merging those two is the same false-PASS class. The note is therefore also written when an existing one lacks the digest map, so corpora that already have work to lose acquire a baseline.\nCorpus status: the identity sweep over all 7 marks-cli stories finds exactly one residual problem, STORY-01-02's orphaned AC-STORY-01-02-4 — a present-state defect the replay cannot see, because ADR-005 V4 replays with the acceptance count recorded at that attempt (4), which was correct then. G4 evidence stays not-closure-valid until that orphan is resolved, at 7/7 or not.",
+   "fixed": "0ab947a + c4bfd5c"
+  }
+ ]
 }
