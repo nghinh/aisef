@@ -970,6 +970,37 @@ def probe_pair_qualification(ctx: Ctx) -> Probed:
     text = ctx.read(rel)
     if text is None:
         return _missing(f"{rel} — the bounded pair qualification has not run")
+    # Owner adjustment 4: the threshold and the sample size are frozen BEFORE any
+    # session runs — "do not inspect qualification results and then choose the
+    # threshold". A report is therefore unreadable except against the protocol it
+    # was produced under, so the pin is checked before the table: a good-looking
+    # table on a protocol edited afterwards is exactly the move being forbidden.
+    protocol = str(ctx.criterion.get("protocol") or "")
+    pin = str(ctx.criterion.get("protocol_sha256") or "")
+    if protocol and pin:
+        if ctx.read(protocol) is None:
+            return _missing(f"{protocol} — the pinned qualification protocol")
+        try:
+            now = frozen_region_digest(
+                ctx.path(protocol), ctx.criterion.get("protocol_frozen_region") or {})
+        except AmbiguousRegion as e:
+            return Probed(Outcome.UNRUNNABLE,
+                          f"{protocol} has {e.n} `QUAL-FROZEN` regions, expected exactly 1")
+        if now != pin:
+            return Probed(Outcome.FAILED,
+                          f"{protocol} changed after pinning ({pin[:12]} → {now[:12]}) — "
+                          f"the threshold and sample size are frozen before any session "
+                          f"runs, so a report scored against an edited protocol is a "
+                          f"post-hoc bar wearing a pre-registered label")
+        # Cột digest của báo cáo phải là **cùng** giao thức. Một bảng sinh dưới
+        # giao thức khác đọc bằng giao thức này là so hai thứ khác nhau.
+        khai = re.findall(r"`([0-9a-f]{12,64})…?`", text)
+        if not any(pin.startswith(k) for k in khai):
+            return Probed(Outcome.UNRUNNABLE,
+                          f"{rel} does not state the protocol digest it was produced "
+                          f"under" + (f" (it names {', '.join(k[:8] for k in khai[:3])}, "
+                                      f"the pin is {pin[:8]})" if khai else "")
+                          + " — without it the table cannot be bound to a frozen bar")
     head, rows = _md_table(text, "qualifies")
     if not head:
         return Probed(Outcome.UNRUNNABLE, f"{rel} has no table with a `qualifies` column")

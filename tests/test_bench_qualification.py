@@ -366,3 +366,42 @@ class TestCliKhongTieuGiKhiChuaDuocPhep(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestTienKiemTruocKhiTuyen(unittest.TestCase):
+    """Chủ dự án, ràng buộc 2: *trước* bất kỳ phiên tuyển model↔CLI **thật** nào,
+    phải kiểm và ghi bốn thứ — `PREREG_FROZEN` đúng, `protocol_digest` bằng bản
+    ghim, selfcheck 19/19, và ngưỡng đã cố định trước khi có dữ liệu. *"Do not
+    launch qualification if any of these is false."*
+
+    Vì sao là một cửa chặn chứ không phải một bản ghi: một bản ghi kiểm xong rồi
+    vẫn phóng được. Cửa nằm ở đúng lệnh tiêu tiền.
+    """
+
+    def test_tien_kiem_dat_tren_kho_that(self):
+        from tests.bench import _qualify as Q
+        ok, hong, rec = Q.tien_kiem()
+        self.assertTrue(ok, f"tiền kiểm hỏng: {hong}")
+        self.assertTrue(rec["prereg_frozen"])
+        self.assertRegex(rec["protocol_digest"], r"^[0-9a-f]{64}$")
+        self.assertEqual((rec["selfcheck_passed"], rec["selfcheck_total"]), (19, 19))
+        self.assertTrue(rec["thresholds_fixed_before_data"])
+
+    def test_selfcheck_thieu_thi_tien_kiem_hong(self):
+        """Không có bản ghi selfcheck là *không biết*, và không biết thì không phóng."""
+        from tests.bench import _qualify as Q
+        ok, hong, _ = Q.tien_kiem(selfcheck=Path("/khong/co/that.json"))
+        self.assertFalse(ok)
+        self.assertTrue(any("selfcheck" in h for h in hong), hong)
+
+    def test_mot_hang_so_lech_van_ban_ghim_thi_tien_kiem_hong(self):
+        """Đổi ngưỡng trong mã mà không ghim lại văn bản: bar hậu nghiệm."""
+        from tests.bench import _qualify as Q
+        goc = Q.SO_PHIEN_TUYEN
+        try:
+            Q.SO_PHIEN_TUYEN = goc + 1
+            ok, hong, _ = Q.tien_kiem()
+            self.assertFalse(ok)
+            self.assertTrue(any("SO_PHIEN_TUYEN" in h for h in hong), hong)
+        finally:
+            Q.SO_PHIEN_TUYEN = goc

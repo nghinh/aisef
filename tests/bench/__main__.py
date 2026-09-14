@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import json
 import sys
 
 from . import _mine as M
@@ -222,6 +223,19 @@ def _dispatch(a, tasks: list, pick: list) -> int:
             print("thiếu --note: `mycombo` là một alias, nên hai đợt trên hai mô hình nền "
                   "trông y hệt nhau trong sổ. Khai nhãn cặp.", file=sys.stderr)
             return 2
+        # Ràng buộc 2 của chủ dự án: bốn điều kiện phải đúng **trước** một phiên
+        # tuyển thật nào. Cửa nằm ở đây chứ không ở một bản ghi, vì một bản ghi thì
+        # kiểm xong vẫn phóng được.
+        ok, hong, rec = Q.tien_kiem()
+        (R.ROOT / "closure-evidence").mkdir(exist_ok=True)
+        (R.ROOT / "closure-evidence/g5-preflight.json").write_text(
+            json.dumps({**rec, "ok": ok, "blockers": hong}, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8")
+        if not ok:
+            print("tiền kiểm G5 không đạt — không phóng đợt tuyển:", file=sys.stderr)
+            for h in hong:
+                print(f"  ✗ {h}", file=sys.stderr)
+            return 3
         Q.chay(R.make_client(a.client), phien=phien, model=a.model, note=a.note,
                tran_phut=a.max_minutes or Q.TRAN_PHUT)
         return Q.viet_bao_cao(Q.doc_so(), a.out)

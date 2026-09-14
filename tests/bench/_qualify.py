@@ -121,7 +121,11 @@ BANNER_GIA = ("KHÔNG PHẢI KẾT QUẢ ĐO — phiên do một binary GIẢ ph
               "không model nào được gọi.")
 
 GIAO_THUC = "docs/BENCH-PAIR-QUALIFICATION-PROTOCOL.md"
-VUNG_GHIM = r"(?s)<!--\s*QUAL-FROZEN:BEGIN\s*-->\n(.*?)\n<!--\s*QUAL-FROZEN:END\s*-->"
+MOC_DAU = r"<!--\s*QUAL-FROZEN:BEGIN\s*-->"
+MOC_CUOI = r"<!--\s*QUAL-FROZEN:END\s*-->"
+#: Giữ lại cho `tests/test_bench_qualification.py`, dựng từ hai mốc trên để hai
+#: chỗ không thể lệch nhau.
+VUNG_GHIM = rf"(?s){MOC_DAU}\n(.*?)\n{MOC_CUOI}"
 
 
 # ------------------------------------------------------------------ số học
@@ -370,18 +374,122 @@ def _digest_giao_thuc(root: Path) -> str:
     In vào báo cáo để người đọc sau thấy dữ liệu này bị chấm bằng **văn bản
     nào**. Giá trị ghim thì sống ở `docs/closure-gate.json`, không ở đây và
     không ở trong chính tệp nó ghim.
+
+    Công thức gọi sang `closure.frozen_region_digest` chứ không tự băm: bản đầu
+    của hàm này là **bản thứ ba** của cùng một công thức (probe G5.1, test_meta,
+    và đây), mà `BENCH-PREREGISTRATION-C2.md` §1.1 nói thẳng là không được có bản
+    thứ hai. Ba bản thì hai trong ba có thể lệch mà không ai thấy, và cái lệch ấy
+    đọc thành "digest không khớp" ở đúng chỗ nó phải khớp.
     """
-    import hashlib
-    import re
+    from aisef.control.closure import AmbiguousRegion, frozen_region_digest
 
     p = root / GIAO_THUC
     if not p.is_file():
         return ""
-    t = p.read_text(encoding="utf-8").replace("\r\n", "\n").replace("\r", "\n")
-    khop = re.findall(VUNG_GHIM, t)
-    if len(khop) != 1:
+    try:
+        return frozen_region_digest(p, {"begin": MOC_DAU, "end": MOC_CUOI})
+    except AmbiguousRegion:
         return ""
-    return hashlib.sha256(khop[0].strip("\n").encode("utf-8")).hexdigest()
+
+
+#: Hằng số ↔ nhãn của nó trong bảng §2.10 của vùng ghim. Bản mã phải khớp từng
+#: con số; đổi ở một chỗ mà không ghim lại chỗ kia là một bar hậu nghiệm.
+_HANG_SO_GHIM = (
+    ("NGUONG_TI_LE_CAT", lambda: "1/6"),
+    ("SO_PHIEN_TUYEN", lambda: str(SO_PHIEN_TUYEN)),
+    ("NGUONG_HONG_HA_TANG", lambda: "1/3"),
+    ("TASK_TUYEN", lambda: TASK_TUYEN),
+    ("TRAN_PHUT", lambda: f"{TRAN_PHUT:.0f}"),
+    ("CLIENT_DO_DUOC", lambda: "opencode"),
+)
+
+
+def tien_kiem(root: Path | None = None, *, selfcheck: Path | None = None
+              ) -> tuple[bool, list[str], dict]:
+    """Bốn điều kiện, kiểm **trước** khi một phiên tuyển thật nào chạy.
+
+    Ràng buộc 2 của chủ dự án: `PREREG_FROZEN` đúng, `protocol_digest` bằng bản
+    ghim, selfcheck 19/19, ngưỡng cố định trước khi có dữ liệu — *"do not launch
+    qualification if any of these is false."*
+
+    Là một **cửa**, không phải một bản ghi: một bản ghi thì kiểm xong vẫn phóng
+    được, nên cửa nằm ở đúng lệnh tiêu tiền. Thiếu bằng chứng đọc là *không biết*
+    và không biết thì không phóng — một tiền kiểm vắng mặt không được đọc thành
+    một tiền kiểm đạt.
+    """
+    import json as _json
+
+    from aisef.control.closure import AmbiguousRegion, frozen_region_digest
+
+    root = root or R.ROOT
+    hong: list[str] = []
+    rec: dict = {"prereg_frozen": False, "protocol_digest": "",
+                 "selfcheck_passed": 0, "selfcheck_total": 0,
+                 "thresholds_fixed_before_data": False}
+
+    spec = _json.loads((root / "docs/closure-gate.json").read_text(encoding="utf-8"))
+    crit = {c["id"]: c for g in spec["gates"] for c in g["criteria"]}
+
+    def ghim(cid: str, khoa_pin: str, khoa_vung: str, nhan: str) -> str:
+        c = crit.get(cid) or {}
+        tep = root / str(c.get("protocol") or c.get("evidence") or "")
+        pin = str(c.get(khoa_pin) or "")
+        if not pin:
+            hong.append(f"{nhan}: {cid} has no {khoa_pin} recorded")
+            return ""
+        if not tep.is_file():
+            hong.append(f"{nhan}: missing {tep.name}")
+            return ""
+        try:
+            now = frozen_region_digest(tep, c.get(khoa_vung) or {})
+        except AmbiguousRegion as e:
+            hong.append(f"{nhan}: {tep.name} has {e.n} frozen regions, expected 1")
+            return ""
+        if now != pin:
+            hong.append(f"{nhan}: {tep.name} changed after pinning "
+                        f"({pin[:12]} → {now[:12]})")
+            return ""
+        return now
+
+    rec["prereg_frozen"] = bool(
+        ghim("G5.1", "prereg_sha256", "prereg_frozen_region", "PREREG_FROZEN"))
+    rec["protocol_digest"] = ghim(
+        "G5.3", "protocol_sha256", "protocol_frozen_region", "protocol_digest")
+
+    sc = selfcheck if selfcheck is not None else root / "closure-evidence/bench-selfcheck.json"
+    if not sc.is_file():
+        hong.append(f"selfcheck: no record at {sc} — run `python3 -m tests.bench selfcheck`"
+                    " and record it; an absent selfcheck is not a passing one")
+    else:
+        d = _json.loads(sc.read_text(encoding="utf-8"))
+        rec["selfcheck_passed"] = int(d.get("passed") or 0)
+        rec["selfcheck_total"] = int(d.get("total") or 0)
+        if rec["selfcheck_passed"] != rec["selfcheck_total"] or rec["selfcheck_total"] < 19:
+            hong.append(f"selfcheck: {rec['selfcheck_passed']}/{rec['selfcheck_total']}, "
+                        f"expected 19/19")
+
+    # Ngưỡng cố định trước dữ liệu: bản mã phải khớp bảng hằng số **trong** vùng
+    # ghim. Vùng ghim có trước một phiên nào chạy (digest ở trên), nên hai cái
+    # khớp nhau là cách đọc được rằng bar này không được chọn sau khi thấy số.
+    gt = root / GIAO_THUC
+    vung = ""
+    if gt.is_file():
+        import re as _re
+        khop = _re.findall(VUNG_GHIM, gt.read_text(encoding="utf-8").replace("\r\n", "\n"))
+        vung = khop[0] if len(khop) == 1 else ""
+    if not vung:
+        hong.append(f"thresholds: cannot read the frozen region of {GIAO_THUC}")
+    else:
+        lech = [ten for ten, gia_tri in _HANG_SO_GHIM
+                if f"| `{ten}` | {gia_tri()} |" not in vung]
+        if lech:
+            hong.append("thresholds: the code copy no longer matches the frozen table for "
+                        + ", ".join(lech) + " — a constant changed without re-freezing the "
+                        "text is a post-hoc bar wearing a pre-registered label")
+        else:
+            rec["thresholds_fixed_before_data"] = True
+
+    return not hong, hong, rec
 
 
 def bao_cao(rows: list[dict], *, root: Path | None = None) -> str:

@@ -1,0 +1,11 @@
+{
+  "blockers": [],
+  "commit": "dbcddeb2c558dc015da5e60f423d0722a0d083b0",
+  "ok": true,
+  "prereg_frozen": true,
+  "protocol_digest": "bcdf7705f37fb27d3c55d0233901f8874a196b373eef0e860382dcf8975857e4",
+  "selfcheck_passed": 19,
+  "selfcheck_total": 19,
+  "thresholds_fixed_before_data": true,
+  "why": "owner constraint 2: verified and recorded BEFORE any real model-CLI qualification session; `tests.bench qualify` refuses to launch when ok is false"
+}

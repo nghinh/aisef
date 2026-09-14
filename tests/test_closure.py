@@ -876,6 +876,64 @@ class TestG5(unittest.TestCase):
         self.assertIs(p.outcome, Outcome.UNRUNNABLE)
         self.assertIn("bench.md", p.detail)
 
+    #: Giao thức tuyển, ở dạng máy đọc được như `closure-gate.json` khai.
+    QREGION = {"begin": r"<!--\s*QUAL-FROZEN:BEGIN\s*-->",
+               "end": r"<!--\s*QUAL-FROZEN:END\s*-->"}
+
+    def qual(self, nguong="ngưỡng 15 %, cỡ mẫu 12", *, digest=None, qualifies="có"):
+        """Giao thức + báo cáo đúng hình dạng probe G5.3 đọc."""
+        gt = self.repo.write(
+            "docs/QUAL-PROTOCOL.md",
+            "# gt\n\n<!-- QUAL-FROZEN:BEGIN -->\n" + nguong + "\n<!-- QUAL-FROZEN:END -->\n")
+        pin = CL.frozen_region_digest(gt, self.QREGION)
+        self.repo.write("docs/BENCH-PAIR-QUALIFICATION.md",
+                        f"# tuyển\n\ndigest vùng ghim `{(digest or pin)[:16]}…`\n\n"
+                        "| model | client | phiên | cut | rate | infra | qualifies | evidence |\n"
+                        "|---|---|---|---|---|---|---|---|\n"
+                        f"| m | opencode | 12 | 1 | 8,3 % | 0 | {qualifies} | e.jsonl |\n")
+        return {"evidence": "docs/BENCH-PAIR-QUALIFICATION.md",
+                "protocol": "docs/QUAL-PROTOCOL.md",
+                "protocol_sha256": pin,
+                "protocol_frozen_region": dict(self.QREGION)}, gt
+
+    def test_a_qualifying_pair_passes_when_the_protocol_pin_still_holds(self):
+        c, _ = self.qual()
+        p = CL.probe_pair_qualification(self.repo.ctx(c))
+        self.assertIs(p.outcome, Outcome.PASSED, p.detail)
+
+    def test_a_protocol_edited_after_pinning_fails_however_good_the_report(self):
+        """Chủ dự án: *"do not inspect qualification results and then choose the
+        threshold."* Báo cáo đẹp trên một giao thức đã sửa là đúng thứ ấy, nên
+        probe phải đọc pin trước khi đọc bảng."""
+        c, gt = self.qual()
+        gt.write_text(gt.read_text(encoding="utf-8").replace("15 %", "40 %"), encoding="utf-8")
+        p = CL.probe_pair_qualification(self.repo.ctx(c))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("after", p.detail.lower())
+
+    def test_a_report_naming_another_protocol_digest_cannot_be_read(self):
+        """Một bảng sinh dưới giao thức khác đọc bằng giao thức này là so hai
+        thứ khác nhau rồi gọi là một."""
+        c, _ = self.qual(digest="f" * 64)
+        p = CL.probe_pair_qualification(self.repo.ctx(c))
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("ffffffff", p.detail)
+
+    def test_a_report_stating_no_protocol_digest_is_unrunnable(self):
+        c, _ = self.qual()
+        self.repo.write("docs/BENCH-PAIR-QUALIFICATION.md",
+                        "# tuyển\n\n| model | client | cut | rate | qualifies | evidence |\n"
+                        "|---|---|---|---|---|---|\n| m | opencode | 1 | 8,3 % | có | e |\n")
+        p = CL.probe_pair_qualification(self.repo.ctx(c))
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("digest", p.detail)
+
+    def test_no_pair_qualifying_still_blocks_with_the_pin_intact(self):
+        c, _ = self.qual(qualifies="chưa kết luận")
+        p = CL.probe_pair_qualification(self.repo.ctx(c))
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("WAIVER_PENDING", p.detail)
+
     def test_no_bench_results_is_unrunnable(self):
         p = CL.probe_cut_session_separation(self.repo.ctx())
         self.assertIs(p.outcome, Outcome.UNRUNNABLE)
