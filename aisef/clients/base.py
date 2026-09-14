@@ -218,21 +218,48 @@ AUTH_ENV_NAMES = ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUT
                   "ANTHROPIC_BASE_URL")
 
 
-def auth_hint(env: dict[str, str]) -> str:
-    """One sentence naming what the rejected session authenticated with.
+#: Clients that actually read `AUTH_ENV_NAMES`.  Naming those variables for any
+#: other client points the reader at a credential the failed request never
+#: touched — and the variable being *present in the shell* is not evidence it
+#: was used (lỗi 160).
+ENV_AUTH_CLIENTS = ("claude",)
+
+
+def auth_hint(env: dict[str, str], *, client: str = "", model: str = "") -> str:
+    """One sentence naming **which path** was rejected, and what it authenticated with.
 
     Never the value — only the variable name, which is what the operator needs
-    to act.  Empty when nothing in the child environment explains it, because a
-    guess here would send the reader to the wrong place.
+    to act.
+
+    The client and model come first because they are what attributes a 401 to a
+    request (lỗi 160).  Measured on this repository 2026-09-14: the marks-cli
+    corpus runs `client=opencode model=9router/mycombo`, an `aisef run` without
+    `--client opencode` fell back to the `claude` default, and the resulting
+    message named `ANTHROPIC_API_KEY`.  That was true of that session, but it
+    described the *credential source* and not the *path*, and the reader
+    concluded the project's key had expired — on a project whose OpenCode config
+    sets `disabled_providers: ["anthropic"]` and so can never take that path at
+    all.  On a project with more than one client configured, only the client and
+    model attribute the failure.
+
+    Environment variables are named only for clients that actually read them:
+    `opencode` authenticates from its own config or auth store, so listing an
+    Anthropic variable there sends the reader somewhere the request never went.
     """
-    present = [n for n in AUTH_ENV_NAMES if env.get(n)]
+    where = f"client `{client}`" if client else "this session"
+    if model:
+        where += f" with model `{model}`"
+    present = [n for n in AUTH_ENV_NAMES if env.get(n)] \
+        if (not client or client in ENV_AUTH_CLIENTS) else []
     if not present:
-        return ("the provider rejected the credential; this session used the client's own login "
-                "(no auth variable was passed to it)")
-    return ("the provider rejected the credential; this session authenticated with "
+        return (f"the provider rejected the credential for {where}; it authenticated with the "
+                f"client's own login or configured provider credential (no auth variable was "
+                f"passed to it) — check that client's own credential, not another provider's")
+    return (f"the provider rejected the credential for {where}; it authenticated with "
             + ", ".join(present)
             + " from the environment, which outranks a `claude.ai` login — unset it to fall back "
-              "to that login, or replace it")
+              "to that login, or replace it. If this is not the client you meant to run, pass "
+              "`--client` explicitly: the wrong client is a likelier cause than a rotated key")
 
 
 def child_env(spec_env: dict[str, str], *, allow_prefixes: Iterable[str] = ()) -> dict[str, str]:

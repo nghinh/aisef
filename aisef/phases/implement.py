@@ -692,6 +692,22 @@ def run_attempt(
         attempt.error = result.error or "run failed"
         attempt.infra = exit_status_of(result) in INFRA_STATUSES
         attempt.retry_after = retry_delay_seconds(result)
+        if exit_status_of(result) == "auth":
+            # `auth` is kept out of `INFRA_STATUSES` on purpose and that reasoning
+            # stands: a rejected credential is not transient, so retrying it burns
+            # the infra budget on a failure that repeats identically (measured
+            # 2026-09-12). But *excluding* it did not achieve the stated intent —
+            # it only moved the cost to the **quality** budget and retried anyway.
+            # Measured on marks-cli 2026-09-14: `attempt=1 FAIL … attempt=2 START`
+            # on a 401, with `moved_tree: false` and nothing to grade, so the story
+            # spent quality attempts on a session the agent had no part in (lỗi
+            # 161 — the shape lỗi 130 measured for `max_turns`).
+            #
+            # The idiom already in this function for "not the agent's fault **and**
+            # retrying is pointless" is both flags at once, as the isolation branch
+            # above uses it.
+            attempt.infra = True   # the provider refused: nothing was ever scored
+            attempt.fatal = True   # and a rejected credential repeats identically
         # Running out of *turns* is not the same as writing bad code. Measured
         # on todo-cli STORY-03-02 2026-09-13 with MiniMax-M3: three sessions in
         # a row hit the 40-turn cap, each having committed 68 lines of tests

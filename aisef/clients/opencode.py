@@ -31,8 +31,9 @@ import subprocess
 import time
 from pathlib import Path
 
-from .base import Capability, ClientAdapter, RunSpec, Support, _stream_with_timeout, child_env, resolve_binary
-from .stream import GUARD_MESSAGE, RunResult
+from .base import (Capability, ClientAdapter, RunSpec, Support, _stream_with_timeout,
+                   auth_hint, child_env, resolve_binary)
+from .stream import GUARD_MESSAGE, RunResult, exit_status_of
 
 BINARY = "opencode"
 
@@ -295,4 +296,12 @@ class OpenCodeAdapter(ClientAdapter):
         # Lời khai, không phải quan sát: luồng của OpenCode không mang tên
         # model. Ghi cái đã yêu cầu còn hơn để trống, miễn là nói rõ.
         res.model = spec.model or configured_model(spec.workdir)
+        if exit_status_of(res) == "auth":
+            # Trước bản này nhánh opencode **không** nói gì về xác thực, nên một
+            # 401 thật từ 9router trả về một dòng trống nghĩa. Nêu client và
+            # model; không nêu biến môi trường Anthropic — opencode xác thực từ
+            # cấu hình/kho auth của chính nó, và chỉ vào một biến nó không đọc
+            # là chỉ người đọc sang một thông tin xác thực mà yêu cầu này chưa
+            # hề chạm tới (lỗi 160).
+            res.error = f"{res.error}: {auth_hint({}, client=self.id, model=res.model)}"
         return res

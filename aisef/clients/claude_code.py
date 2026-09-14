@@ -184,7 +184,9 @@ class ClaudeCodeAdapter(ClientAdapter):
         if not result.raw_result and stderr.strip() and not timed_out:
             result.error = result.error or stderr.strip()[:500]
         if exit_status_of(result) == "auth":
-            # "401" is not something an operator can act on.  Name the
-            # variable that decided who this session was.
-            result.error = f"{result.error}: {auth_hint(child)}"
+            # "401" is not something an operator can act on.  Name the **path**
+            # — client and model — and then the variable that decided who this
+            # session was.  Without the path, a 401 on a project that also runs
+            # another client is read as "our key expired" (lỗi 160).
+            result.error = f"{result.error}: {auth_hint(child, client=self.id, model=spec.model)}"
         return result
