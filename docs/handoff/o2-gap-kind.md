@@ -167,8 +167,13 @@ skipped, 1025 subtests** (trước lượt này 2522 passed).
   máy đọc được (hôm nay nó chỉ là chuỗi trong `Loop.stuck` và một dòng trong
   `LOOP-REPORT-<n>.md`), rồi vòng sau đọc lại thành `WHY_TRACE_ABSENT`. Đó là
   một bản ghi mới, không phải một heuristic — nên để riêng.
-* `Ledger.summary()` chưa mang ba số; `aisef report` và dashboard vẫn in một
-  con số `gap`. Thêm khi có người đọc cần.
+* ~~`Ledger.summary()` chưa mang ba số; `aisef report` và dashboard vẫn in một
+  con số `gap`.~~ Xong: `summary()["gap_kinds"]` mang ba số, `aisef report` và
+  `gap tồn` của dashboard chẻ ra — **chỉ khi** corpus có hơn một loại. Ba số ấy
+  đếm mọi hành vi non-green nên cộng lại bằng `gap + reopened`, *không* bằng
+  `gap`: dán chúng cạnh con số `gap` thì `todo-e2e` đọc thành "1 gap · unbuilt
+  9". `ledger.json` vẫn không có trường nào mới (`snapshot()` chọn khoá phẳng,
+  đo lại trên cả bốn kho).
 
 ---
 

@@ -276,6 +276,9 @@ class Ledger:
             "reopen_events": self.reopen_events,
             "cross_reopens": len(self.cross_reopens),
             "unlanded_green": self.unlanded_green,
+            # The three absences (ADR-009 O2) counted over **every** non-green
+            # behaviour, so they add up to `gap + reopened` -- not to `gap`.
+            "gap_kinds": gap_kind_counts(self.issues()),
         }
 
     def epic_of(self, story_id: str) -> str:

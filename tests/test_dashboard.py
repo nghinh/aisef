@@ -211,6 +211,36 @@ class TestMultiProjectDashboard(unittest.TestCase):
             self.assertIn(nhan, ra)
         self.assertIn("không báo chi phí", ra)   # fixture không có cost_usd
 
+    def test_gap_ton_che_theo_loai_chi_khi_co_hon_mot_loai(self):
+        """`gap tồn` là **một** con số: người vận hành không thấy được gap thiếu
+        truy vết (harness sửa, không tốn model) khác gap chưa xây (mỗi cái một
+        story trả phí). Chẻ theo loại vắng mặt — nhưng chỉ khi corpus có hơn một
+        loại, vì `unbuilt 2 · untested 0 · untraced 0` đọc thành "đã chẻ rồi mà
+        không thấy gì" (quy ước của `reviewer_qual.report` và mục token bench)."""
+        import json
+
+        from aisef.cli.dashboard import tom_tat_van_hanh
+        self._seed(self.store_a, "SA-01")
+        (self.proj_a / "stories.index.json").write_text(json.dumps(
+            {"stories": [{"id": "STORY-01-01", "epic_id": "EPIC-01",
+                          "acceptance_criteria": ["a", "b"]}]}), encoding="utf-8")
+
+        def chay(ids, failed=(), attempt=1):
+            self.store_a.tool_run("STORY-01-01", "test", ok=not failed, detail={
+                "test_format": "vitest", "test_ids": list(ids),
+                "failed_ids": list(failed), "attempt": attempt})
+
+        nhom = [("a", self.proj_a, [self.store_a.read("SA-01")])]
+        chay(["src/x.ts > không mang mã"])                 # hai tiêu chí, cùng untested
+        ra = tom_tat_van_hanh(nhom)
+        self.assertIn("gap tồn        2", ra)
+        self.assertNotIn("untested", ra, "một loại duy nhất: không được chẻ")
+        t1 = "src/x.ts > nhóm > AC-STORY-01-01-1: a"
+        chay([t1], failed=[t1], attempt=2)                 # một chuyển thành unbuilt
+        ra = tom_tat_van_hanh(nhom)
+        self.assertIn("gap tồn        2 · unbuilt 1 · untested 1", ra)
+        self.assertNotIn("untraced", ra, "loại đếm 0 không có gì để nói")
+
     def test_chi_phi_theo_tuan_gom_dung_tuan_iso(self):
         from aisef.cli.dashboard import chi_phi_theo_tuan
         from aisef.harness.observe import AGENT_RUN, Event

@@ -723,5 +723,14 @@ def cmd_report(args) -> int:
     print(f"  behaviour ledger: {s['verified']} verified · {s['gap']} gap · "
           f"{s['reopened']} reopened (resolved {s['resolved']}, "
           f"cross-story regressions {s['cross_reopens']})")
+    # Split the absences (ADR-009 O2) only when more than one kind is present:
+    # "unbuilt 2 · untested 0 · untraced 0" reads as "split, found nothing"
+    # (same convention as `reviewer_qual.report` and the bench token section).
+    # Kinds counting 0 are dropped, so what is printed adds up to the total
+    # beside it -- and that total is gap + reopened, not gap alone.
+    kinds = {k: v for k, v in s["gap_kinds"].items() if v}
+    if len(kinds) > 1:
+        print(f"    {sum(kinds.values())} non-green by absence: "
+              + " · ".join(f"{k} {v}" for k, v in kinds.items()))
     print(f"  {led.write(_artifact_root(args))}\n  {led.index(_artifact_root(args))}")
     return EXIT_OK if not report.uncovered else EXIT_NOT_READY

@@ -688,3 +688,35 @@ class TestLoaiGap(LedgerTestCase):
             rows = list(csv.DictReader(f))
         self.assertEqual(tuple(rows[0].keys()), L.ISSUE_COLUMNS)
         self.assertEqual(rows[0]["gap_kind"], L.UNTESTED)
+
+    def test_summary_mang_ba_so_va_dem_ca_reopened(self):
+        """`summary()` là chỗ `aisef report` và dashboard đọc; thiếu ba số ở đây
+        thì hai bản báo cáo ấy chỉ in một con số `gap`.
+
+        Ba số đếm **mọi** hành vi non-green, kể cả REOPENED — nên chúng cộng lại
+        bằng `gap + reopened`, *không* bằng `gap`: bốn kho dogfood có 32 gap + 17
+        reopened = 49 = 40 + 4 + 5.
+        """
+        t1 = ac_test("STORY-01-01", 1)
+        self.run_tests("STORY-01-01", ids=[t1])                            # 1 xanh, 2 thiếu test
+        self.run_tests("STORY-01-01", ids=[t1], failed=[t1], attempt=2)    # 1 đỏ lại
+        s = L.build(self.root).summary()
+        self.assertEqual((s["gap"], s["reopened"]), (1, 1))
+        self.assertEqual(s["gap_kinds"], {L.UNBUILT: 1, L.UNTESTED: 1, L.UNTRACED: 0})
+        self.assertEqual(sum(s["gap_kinds"].values()), s["gap"] + s["reopened"])
+
+    def test_report_che_ba_so_chi_khi_corpus_co_hon_mot_loai(self):
+        """`aisef report` phải nói loại vắng mặt nào — nhưng chỉ khi có hơn một
+        loại. Một dòng `unbuilt 2 · untested 0 · untraced 0` đọc thành "đã chẻ
+        rồi mà không thấy gì" (cùng quy ước với `reviewer_qual.report` và mục
+        token của báo cáo bench)."""
+        self.run_tests("STORY-01-01", ids=["src/x.ts > không mang mã"])     # cả hai untested
+        code, out, err = self.run_cli("report")
+        self.assertIn("behaviour ledger", out + err)
+        self.assertNotIn("untested", out, "một loại duy nhất: không được chẻ")
+        t1 = ac_test("STORY-01-01", 1)
+        self.run_tests("STORY-01-01", ids=[t1], failed=[t1], attempt=2)     # thêm 1 unbuilt
+        code, out, err = self.run_cli("report")
+        self.assertIn("unbuilt 1", out)
+        self.assertIn("untested 1", out)
+        self.assertNotIn("untraced", out, "loại đếm 0 không có gì để nói")
