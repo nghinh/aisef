@@ -88,5 +88,10 @@
   "workspace_leak_fix_analysis": "The lỗi-166 change only observes the framework repo root before and after the run and prints a warning. It relocates no artifact, writes no session file, and touches no session outcome, classification, or score. The 28 recorded sessions were produced by code whose decision units are byte-identical to HEAD's.",
   "stale": false,
   "reason": "Every decision unit the frozen protocol depends on is byte-identical between the run commit and HEAD, verified by AST digest rather than by inspection. The single changed unit (`chay`) changed only outside its session loop, by additive observation statements. The other two fixes are unreachable from the qualification path by import analysis. The 28/28, 0-cut result stands; re-running would measure the same code and spend ~2 session-hours and ~87M tokens to reproduce it.",
-  "head_at_audit": "b716f3877b89e8efd112d8e49ec4caee3b2fb0a7"
+  "head_at_audit": "b716f3877b89e8efd112d8e49ec4caee3b2fb0a7",
+  "reverified_at": "65d5a1922d187e27f3fd88ce071823fad5f3fa4c",
+  "reverified_changed_units": [
+    "chay"
+  ],
+  "reverified_note": "Re-checked after the applicability, tool-image and scope fixes. Only `chay` differs, and only outside its session loop (a filesystem snapshot before it and a warning after). None of the later fixes touches tests/bench or aisef/clients; aisef.phases.qa, aisef.phases.deploy and aisef.harness.sandbox are not imported by the qualification path."
 }
