@@ -93,6 +93,55 @@
    "fixed": "HEAD",
    "evidence": "Measured on this repository: suite.json recorded at 9fe6d6f, committing it moved HEAD to 91781e8, and G2.1 read UNRUNNABLE 'recorded at 9fe6d6f, HEAD is 91781e8'. Leaving it uncommitted instead makes the tree dirty, and `closure.pin_target` refuses a dirty tree. `git diff --name-only 9fe6d6f..HEAD` listed only closure-evidence/*.json -- no source file changed.",
    "notes": "A contradiction the closure machinery created for itself, and it blocked the last step of closing the project: 'G2.1/G2.2/G5.4 green' and 'closure_target_sha pinnable' were mutually exclusive, because `closure-evidence/` is tracked and recording evidence is itself a commit.\nThe measurement interfered with what it measured: the probe asks whether the evidence describes the current SOURCE, but decided it by comparing HEAD's SHA, which moves because of the act of recording.\nThe same trap exists at `closure_target_sha`, which `pin_target` writes into `docs/closure-gate.json`: committing the pin moves HEAD past the very commit just pinned, so G1.0's second conjunct (HEAD is still the target) fails immediately after pinning, and not committing leaves the tree dirty which `pin_target` refuses. Same loop, different file -- found by testing for it rather than waiting for it to bite at release time.\nFixed narrowly: a commit touching ONLY closure bookkeeping (`closure-evidence/` or the criteria file) changes no source line, so the evidence still describes the tree. Any file outside that directory still invalidates it, and an unreadable diff reads as stale -- the negative control (`test_commit_dung_ma_nguon_thi_bang_chung_cu`) asserts a real source change is still caught.\nP1 not P2: it blocked closure outright. false_pass=false -- it produced a false UNRUNNABLE, which blocks; it never let anything through."
+  },
+  {
+   "id": "D-008",
+   "severity": "P2",
+   "status": "CLOSED",
+   "taxonomy": 163,
+   "false_pass": false,
+   "title": "a CLI whose requirements say it has no UI is treated as having one",
+   "introduced": "pre-dates this wave",
+   "fixed": "HEAD",
+   "evidence": "_project_has_ui(marks-cli) returned True with all 7 stories carrying screens: [] and docs/requirements.md reading 'no server, no network, no ui'. detect_file reports frontend: [], mobile: [], undetermined: ['frontend', ...]; Stack.has_ui counts 'frontend' in undetermined, appended whenever a WEB_MARKER matches. Two matched: 'browser' in 'browser profile' and 'ui' inside the denial 'no ui'.",
+   "notes": "The gate then demanded browser E2E (Playwright) and accessibility of a command-line tool. General, not corpus-specific: any CLI, library or daemon mentioning the web in passing. Fixed by letting a settled plan answer both ways, which the function's own docstring already argued for; an empty index is still not negative evidence."
+  },
+  {
+   "id": "D-009",
+   "severity": "P1",
+   "status": "CLOSED",
+   "taxonomy": 164,
+   "false_pass": false,
+   "check": "",
+   "introduced": "pre-dates this wave",
+   "fixed": "HEAD",
+   "title": "an inferred verification command is used without checking the tool exists, turning a missing tool into a FAILED check",
+   "evidence": "marks-cli mutation reported FAILED with 'npm error code EAI_AGAIN … request to https://registry.npmjs.org/stryker failed' because command_for_kind returned _DEFAULTS['node']['mutation'] = 'npx stryker run' unconditionally, while the network-isolated verification sandbox correctly has no network.",
+   "notes": "P1, and false_pass=false: it is a false FAILED, which blocks rather than lets through — but it inverts what a red gate means, reporting a machine that cannot run a check as a project that failed one. `_UNIVERSAL` six lines below already stated the rule it broke. which(argv[0]) is insufficient for a launcher: argv[0] is npx and npx IS installed, so the check must ask whether the tool resolves project-locally. Host PATH is the wrong question entirely — measured: playwright is on this host's PATH while the Docker run still reported 'tool not installed', because a global npm bin does not exist in the container."
+  },
+  {
+   "id": "D-010",
+   "severity": "P2",
+   "status": "CLOSED",
+   "taxonomy": 165,
+   "false_pass": false,
+   "title": "a kind the framework proved inapplicable still counts as unconfigured and blocks",
+   "introduced": "pre-dates this wave",
+   "fixed": "HEAD",
+   "evidence": "run_suite marks needs_ui kinds 'project has no UI' via result.skipped, and QaReport.unconfigured counts every skipped kind, so release_ready was unreachable for any project without a UI.",
+   "notes": "Conflates an absence (nobody configured a command — must block) with an answer (the framework derived that the kind cannot apply — must not). It forced the operator to sign a waiver for something already proven mechanically, which drains meaning from every real waiver. Fixed with a distinct `not_applicable` state that is still printed in the report: not applicable never means hidden from the signer."
+  },
+  {
+   "id": "D-011",
+   "severity": "P2",
+   "status": "OPEN",
+   "taxonomy": 166,
+   "false_pass": false,
+   "title": "a bench run writes artifacts into the framework repository root, outside its session workspaces",
+   "introduced": "observed 2026-09-14 during the G5.3 qualification",
+   "fixed": "",
+   "evidence": "_bmad-output/ appeared at the AISEF repo root with 36 log lines (17 pytest, 1 ruff) between 18:51 and 19:45, spanning the run, while every session recorded correctly into its own workspace (s1/s6/s7 each hold _bmad-output/run.log with 21-27 lines) — so it is a distinct set, from a call whose --project fell back to the default '.'. Preserved at scratchpad/leaked-bmad-output-from-g53 rather than deleted.",
+   "notes": "Not cleanup: a dirty tree makes closure.pin_target refuse, so a bench run can block the closure-target freeze, and a stray directory at the repo root is easily swept into a commit by `git add -A`.\nOPEN, not closed: the exact call path is NOT reproducible without a paid real session — the fake-client path (`--tu-kiem`) was tried and does not reproduce it, so the trigger lies in real agent behaviour inside a session. Claiming a fix I cannot verify would be worse than leaving this open.\nWhat did ship is the deterministic part: `ro_ri_ngoai_workspace` snapshots the framework root before a run and names anything the run left behind, turning a silent leak into a loud one at the point it happens, with red-first tests and a negative control for a directory that already existed. P2 and non-blocking: it changes no gate verdict and loses no evidence."
   }
  ]
 }

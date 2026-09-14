@@ -278,6 +278,31 @@ def du_toan(client: str, model: str, task_id: str, phien: int, *, tran_phut: flo
 # -------------------------------------------------------------------- chạy
 
 
+#: Tạo tác mà **không** đợt bench nào được để lại ở gốc kho khung. Kho khung
+#: không phải một dự án AISEF; nó không có `_bmad-output`, và mọi phiên có
+#: workspace riêng để ghi vào.
+RANH_GIOI = ("_bmad-output",)
+
+
+def ro_ri_ngoai_workspace(root: Path, truoc: bool) -> str:
+    """Tên tạo tác mà đợt chạy để lại ở gốc kho khung — "" nếu sạch.
+
+    Lỗi 166. Đo sau đợt tuyển G5.3: `_bmad-output/` xuất hiện ở gốc kho AISEF
+    trong khi **mỗi phiên vẫn ghi đúng vào workspace của mình** — một tập khác,
+    từ một lượt gọi mà `--project` rơi về mặc định `"."`.
+
+    Vì sao phải nói to chứ không chỉ dọn: cây bẩn làm `closure.pin_target` từ
+    chối, nên một đợt bench có thể chặn đúng bước chốt đích đóng dự án; và một
+    thư mục lạ ở gốc kho dễ bị `git add -A` quét vào một commit.
+
+    `truoc` là trạng thái **trước** đợt chạy: thư mục có sẵn từ trước không phải
+    do đợt này tạo ra, và đổ lỗi cho nó là báo sai.
+    """
+    if truoc:
+        return ""
+    return ", ".join(t for t in RANH_GIOI if (root / t).exists())
+
+
 def _phien(task, client, ws: Path, model: str):
     """Một phiên **đúng hình dạng nhánh AISEF của cohort**, không chấm điểm.
 
@@ -315,6 +340,9 @@ def chay(client, *, task_id: str = TASK_TUYEN, phien: int = SO_PHIEN_TUYEN, mode
     biết ("dừng sớm, chốt trước", đúng tinh thần luật đã đăng ký của cohort).
     """
     thu_muc = thu_muc or THU_MUC
+    # Ranh giới workspace (lỗi 166): chụp trạng thái gốc kho **trước** khi chạy,
+    # để cuối đợt nói được "đợt này để lại cái gì" thay vì "gốc kho có cái gì".
+    ranh_gioi_truoc = {t: (R.ROOT / t).exists() for t in RANH_GIOI}
     tasks = {t.id: t for t in M.load_tasks(M.TASKS_DIR, M.KEEP_DIR / "tasks")}
     if task_id not in tasks:
         raise ValueError(f"không có task {task_id!r}")
@@ -354,6 +382,13 @@ def chay(client, *, task_id: str = TASK_TUYEN, phien: int = SO_PHIEN_TUYEN, mode
             print(f"DỪNG SỚM: {cat} phiên bị cắt > trần {tran_cat} — cặp này không còn đạt được "
                   f"dù {phien - i} phiên còn lại đều sạch", file=out)
             break
+    ro = ", ".join(t for t, co_truoc in ranh_gioi_truoc.items()
+                   if not co_truoc and (R.ROOT / t).exists())
+    if ro:
+        print(f"CẢNH BÁO ranh giới workspace: đợt này để lại `{ro}` ở gốc kho khung "
+              f"({R.ROOT}). Mỗi phiên có workspace riêng; gốc kho không phải một dự "
+              f"án AISEF. Cây bẩn làm `closure --pin-target` từ chối, và `git add -A` "
+              f"dễ quét nhầm nó vào một commit (lỗi 166).", file=out)
     return moi
 
 

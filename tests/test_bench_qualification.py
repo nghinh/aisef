@@ -405,3 +405,49 @@ class TestTienKiemTruocKhiTuyen(unittest.TestCase):
             self.assertTrue(any("SO_PHIEN_TUYEN" in h for h in hong), hong)
         finally:
             Q.SO_PHIEN_TUYEN = goc
+
+
+class TestRanhGioiCayLamViec(unittest.TestCase):
+    """Lỗi 166 — một đợt bench ghi tạo tác vào **kho khung**, ngoài workspace của nó.
+
+    Đo sau đợt tuyển G5.3 2026-09-14: `_bmad-output/` xuất hiện ở gốc kho AISEF
+    với 36 dòng (17 `pytest`, 1 `ruff`) trong khoảng 18:51–19:45, tức suốt đợt
+    chạy. Mỗi phiên **vẫn** ghi đúng vào workspace của mình (s1/s6/s7 đều có
+    `_bmad-output/run.log` riêng, 21–27 dòng), nên đây là một tập **khác**, do
+    một lượt gọi mà `--project` rơi về mặc định `"."` — và `"."` lúc ấy là kho
+    khung, vốn không phải một dự án AISEF và không được có `_bmad-output`.
+
+    Vì sao không phải chuyện dọn dẹp: nó làm cây bẩn, mà `closure.pin_target`
+    **từ chối** cây bẩn — nên một đợt bench có thể chặn đúng bước chốt đích đóng
+    dự án. Nó cũng dễ bị `git add -A` quét vào một commit.
+
+    Không tái hiện được bằng client giả (đã thử: `--tu-kiem` không tạo ra nó), nên
+    đường gây lỗi nằm trong hành vi của agent thật bên trong phiên. Thứ **kiểm
+    được** một cách tất định là ranh giới: một đợt chạy không được để lại gì ở
+    gốc kho khung, và nếu có thì phải **nói to** ngay tại chỗ thay vì âm thầm.
+    """
+
+    def test_ranh_gioi_bi_pha_thi_bao_ngay(self):
+        import tempfile
+        from tests.bench import _qualify as Q
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "_bmad-output").mkdir()          # giả lập rò rỉ
+            vi_pham = Q.ro_ri_ngoai_workspace(root, truoc=False)
+            self.assertTrue(vi_pham)
+            self.assertIn("_bmad-output", vi_pham)
+
+    def test_khong_ro_ri_thi_im_lang(self):
+        import tempfile
+        from tests.bench import _qualify as Q
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(Q.ro_ri_ngoai_workspace(Path(tmp), truoc=False), "")
+
+    def test_da_co_tu_truoc_thi_khong_do_cho_dot_chay(self):
+        """Phép kiểm âm: thư mục có **trước** đợt chạy không phải do nó tạo ra."""
+        import tempfile
+        from tests.bench import _qualify as Q
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "_bmad-output").mkdir()
+            self.assertEqual(Q.ro_ri_ngoai_workspace(root, truoc=True), "")

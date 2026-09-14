@@ -1,0 +1,92 @@
+{
+  "qualification_run_id": "b716f38 (evidence commit) · ledger closure-evidence/bench-pair-qualification.jsonl, 28 rows",
+  "qualification_protocol_digest": "bcdf7705f37fb27d3c55d0233901f8874a196b373eef0e860382dcf8975857e4",
+  "qualification_relevant_source_digest": {
+    "at_run": {
+      "tests/bench/_qualify.py": "282e6e4e9b0f5b50",
+      "tests/bench/_runner.py": "2a1e4a7793097c34",
+      "tests/bench/__main__.py": "59918172e5f1824e",
+      "aisef/clients/opencode.py": "8f37ff968e410376",
+      "aisef/clients/base.py": "83307c685f05c0bc",
+      "aisef/clients/stream.py": "44fdf54eda5c4a59",
+      "docs/BENCH-PAIR-QUALIFICATION-PROTOCOL.md": "0592260191d25d50"
+    },
+    "now": {
+      "tests/bench/_qualify.py": "a16563f45222e850",
+      "tests/bench/_runner.py": "2a1e4a7793097c34",
+      "tests/bench/__main__.py": "59918172e5f1824e",
+      "aisef/clients/opencode.py": "8f37ff968e410376",
+      "aisef/clients/base.py": "83307c685f05c0bc",
+      "aisef/clients/stream.py": "44fdf54eda5c4a59",
+      "docs/BENCH-PAIR-QUALIFICATION-PROTOCOL.md": "0592260191d25d50"
+    }
+  },
+  "changes_since_run": {
+    "tests/bench/_qualify.py": "15 executable lines, all ADDITIVE: constant RANH_GIOI; pure function ro_ri_ngoai_workspace(root, truoc) which only reads filesystem existence; a dict-comprehension snapshot before the session loop; a join+if+print after it. No line inside the loop changed, none removed, none modified.",
+    "aisef/phases/qa.py": "verification applicability (_tool_present, not_applicable) — NOT on the surface",
+    "aisef/cli/implement.py": "_project_has_ui settled-plan rule — NOT on the surface"
+  },
+  "dependency_analysis": {
+    "method": "AST digest per decision unit at b716f38 vs HEAD, plus an import-reachability check",
+    "client invocation": {
+      "unit": "_phien",
+      "digest": "5635e1ea3e78 -> 5635e1ea3e78",
+      "affected": false
+    },
+    "model routing": {
+      "unit": "_phien env/RunSpec",
+      "digest": "unchanged with _phien",
+      "affected": false
+    },
+    "session completion": {
+      "unit": "_phien",
+      "digest": "unchanged",
+      "affected": false
+    },
+    "cut-session detection": {
+      "unit": "phan_loai",
+      "digest": "f9482695e5da -> f9482695e5da",
+      "affected": false
+    },
+    "timeout classification": {
+      "unit": "phan_loai/exit_status_of",
+      "digest": "unchanged",
+      "affected": false
+    },
+    "infra classification": {
+      "unit": "phan_loai + NGUONG_HONG_HA_TANG",
+      "digest": "unchanged",
+      "affected": false
+    },
+    "retry semantics": {
+      "unit": "chay loop body",
+      "digest": "loop body unchanged; only pre/post statements added",
+      "affected": false
+    },
+    "qualification denominator": {
+      "unit": "tong_hop + SO_PHIEN_TUYEN",
+      "digest": "6f132bd2e82b / ebad280ecd70 unchanged",
+      "affected": false
+    },
+    "qualification threshold": {
+      "unit": "NGUONG_TI_LE_CAT",
+      "digest": "5dc2a09d5b76 unchanged",
+      "affected": false
+    },
+    "scoring": {
+      "unit": "phan_quyet",
+      "digest": "2d5118abe530 -> 2d5118abe530",
+      "affected": false
+    },
+    "pair-selection rule": {
+      "unit": "chon_cap",
+      "digest": "c7c814cbb015 -> c7c814cbb015",
+      "affected": false
+    }
+  },
+  "import_reachability": "tests.bench._qualify imports 19 aisef modules; aisef.phases.qa and aisef.cli.implement are NOT among them, so the verification-applicability fixes cannot reach the qualification path at all.",
+  "workspace_leak_fix_analysis": "The lỗi-166 change only observes the framework repo root before and after the run and prints a warning. It relocates no artifact, writes no session file, and touches no session outcome, classification, or score. The 28 recorded sessions were produced by code whose decision units are byte-identical to HEAD's.",
+  "stale": false,
+  "reason": "Every decision unit the frozen protocol depends on is byte-identical between the run commit and HEAD, verified by AST digest rather than by inspection. The single changed unit (`chay`) changed only outside its session loop, by additive observation statements. The other two fixes are unreachable from the qualification path by import analysis. The 28/28, 0-cut result stands; re-running would measure the same code and spend ~2 session-hours and ~87M tokens to reproduce it.",
+  "head_at_audit": "b716f3877b89e8efd112d8e49ec4caee3b2fb0a7"
+}

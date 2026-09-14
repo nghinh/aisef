@@ -124,6 +124,12 @@ class KindResult:
     #: Conflating the two makes the report point at the wrong fix — measured
     #: on e9, `pre-deploy` reported "✗ unit" when the root cause was a missing `npm ci`.
     unrunnable: str = ""
+    #: The framework **determined** this kind cannot apply to this project —
+    #: a fact it derived, not a gap someone left (lỗi 165). Distinct from
+    #: `skipped`, which means "nobody configured a command": that is an absence
+    #: and must block, while this is an answer and must not. Rendered in the
+    #: report either way — not applicable never means hidden from the signer.
+    not_applicable: str = ""
     #: Ran outside Docker (degraded). Results still count, but the lower
     #: isolation level must be visible — the pre-deploy gate reads this flag.
     degraded: bool = False
@@ -192,7 +198,20 @@ class QaReport:
 
     @property
     def unconfigured(self) -> list[KindResult]:
-        return [r for r in self.results if r.skipped and r.kind.id not in self.waived]
+        """Kinds nobody configured — an absence, so it blocks.
+
+        Excludes kinds the framework itself ruled inapplicable: a project with
+        no UI cannot have browser E2E, and counting that as "never verified"
+        would force the operator to sign a waiver for something already proven
+        mechanically — which drains the meaning out of every real waiver.
+        """
+        return [r for r in self.results
+                if r.skipped and not r.not_applicable and r.kind.id not in self.waived]
+
+    @property
+    def not_applicable(self) -> list[KindResult]:
+        """Kinds the framework determined cannot apply, with the reason it derived."""
+        return [r for r in self.results if r.not_applicable]
 
     @property
     def passed(self) -> bool:
@@ -231,6 +250,38 @@ class QaReport:
         return "\n".join(lines)
 
 
+def _tool_present(command: str, project: Path) -> bool:
+    """Is the tool this command actually runs installed here?
+
+    Declaring a command whose tool is absent makes the kind report "ran and
+    red", which misreports the root cause: the project did not fail a check, the
+    machine could not run one. That is `unconfigured`.
+
+    `which(argv[0])` is not enough for a launcher. `npx playwright test` has
+    argv[0] = `npx`, which *is* installed — npx would then try to **download**
+    playwright, and inside a network-isolated verification sandbox that surfaces
+    as a failing test run. For a launcher the honest question is whether the tool
+    resolves **locally**, so `npx X` is checked against `node_modules/.bin/X`
+    (and a global X, for a tool installed machine-wide).
+    """
+    import shutil as _shutil
+
+    argv = command.split()
+    if not argv:
+        return False
+    if argv[0] == "npx" and len(argv) > 1:
+        # Project-local only, deliberately — **not** a host-PATH fallback. The
+        # command runs inside the verification sandbox, and a globally installed
+        # npm bin does not exist in that container; `node_modules/` travels with
+        # the workspace, so it is the only signal that survives the boundary.
+        # Measured: playwright is on this host's PATH
+        # (~/.npm-global/bin/playwright) while the Docker run still reported
+        # "tool not installed" — asking the host would have answered a question
+        # about the wrong machine.
+        return (project / "node_modules" / ".bin" / argv[1]).exists()
+    return bool(_shutil.which(argv[0]))
+
+
 def command_for_kind(kind_id: str, project: Path, config: Config | None) -> str:
     """Command for a kind: explicit config wins, then stack-based defaults."""
     if config is not None:
@@ -246,16 +297,20 @@ def command_for_kind(kind_id: str, project: Path, config: Config | None) -> str:
     marker = "node" if (project / "package.json").is_file() else (
         "python" if (project / "pyproject.toml").is_file() else ""
     )
+    # Inferred commands — stack and universal alike — only when the tool is
+    # actually present. The rule was already written for `_UNIVERSAL` one branch
+    # below; `_DEFAULTS` returned unconditionally and so broke it (lỗi 164).
+    # Measured on marks-cli: `npx stryker run` was handed back with stryker
+    # absent, and `mutation` reported FAILED — `npm error EAI_AGAIN …
+    # registry.npmjs.org` — because the verification sandbox is correctly
+    # network-isolated. A missing tool recorded as a failing verification of the
+    # project inverts what a red gate means.
     default = _DEFAULTS.get(marker, {}).get(kind_id, "")
-    if default:
+    if default and _tool_present(default, project):
         return default
 
-    # Universal tools only used when actually present: declaring a non-existent
-    # command makes the kind "ran and red", misreporting the root cause — it is unconfigured.
-    import shutil as _shutil
-
     universal = _UNIVERSAL.get(kind_id, "")
-    if universal and _shutil.which(universal.split()[0]):
+    if universal and _tool_present(universal, project):
         return universal
     return ""
 
@@ -440,7 +495,10 @@ def run_suite(
                 report.results.append(result)
                 continue
             if kind.needs_ui and not has_ui:
-                result.skipped = "project has no UI"
+                # Derived from the settled plan (screens across every story),
+                # not from operator judgement — so it is `not_applicable`, which
+                # is stated in the report but does not block release_ready.
+                result.skipped = result.not_applicable = "project has no UI"
                 report.results.append(result)
                 continue
 

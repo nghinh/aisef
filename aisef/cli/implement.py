@@ -517,8 +517,24 @@ def _project_has_ui(project: Path) -> bool:
     if index.is_file():
         try:
             raw = json.loads(index.read_text(encoding="utf-8"))
-            if any(s.get("screens") for s in raw.get("stories", [])):
-                return True
+            stories = raw.get("stories") or []
+            if stories:
+                # A **settled** plan answers both ways (lỗi 163). This branch used
+                # to return True on a screen and otherwise fall through to sniffing
+                # the requirements prose — so "no story has a screen" was never
+                # heard, and the prose got the last word after architecture had
+                # already decided. Measured on marks-cli: all 7 stories carry
+                # `screens: []` and the requirements say "no server, no network,
+                # no ui", yet this returned True, because `Stack.has_ui` counts
+                # `undetermined: frontend`, which is appended whenever a WEB_MARKER
+                # matches — and two matched: `browser` in "browser profile" (where
+                # the user's bookmarks live today) and `ui` inside the denial "no
+                # ui". Word boundaries do not save a negation. The gate then asked
+                # a CLI for browser E2E and accessibility.
+                #
+                # An **empty** index is still not negative evidence: nothing has
+                # been decided yet, so the prose below still gets to speak.
+                return any(s.get("screens") for s in stories)
         except (OSError, json.JSONDecodeError):
             pass
 
