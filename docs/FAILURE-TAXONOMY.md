@@ -1,18 +1,18 @@
 # Phân loại lỗi thật của AISEF — để không tái diễn
 
-**Mã cao nhất 155**, ghi từ 2026-09-05 → 2026-09-14 (đếm lại 14/09; câu này nói
+**Mã cao nhất 156**, ghi từ 2026-09-05 → 2026-09-14 (đếm lại 14/09; câu này nói
 "147 lỗi · 124 dòng · mã 22–147" cho tới khi ấy — dòng 148–155 vào sau khi nó
 được viết, đúng cái kiểu trôi mà chính tệp này tồn tại để chặn). Lỗi 1–21 ghi ở
-`docs/STATUS-2026-09-05.md` §2.4; bảng dưới có **132 dòng, mã 22–155** — 26 và
+`docs/STATUS-2026-09-05.md` §2.4; bảng dưới có **133 dòng, mã 22–156** — 26 và
 27 không có dòng nào, chúng được gộp vào lỗi khác lúc ghi và số bị bỏ trống:
 
 ```
-grep -oE '^\| *[0-9]+ *\|' docs/FAILURE-TAXONOMY.md | tr -dc '0-9\n' | sort -n | uniq | wc -l   # → 132
+grep -oE '^\| *[0-9]+ *\|' docs/FAILURE-TAXONOMY.md | tr -dc '0-9\n' | sort -n | uniq | wc -l   # → 133
 grep -oE '^\| *[0-9]+ *\|' docs/FAILURE-TAXONOMY.md | tr -dc '0-9\n' | sort -n | tail -1        # → 155
 ```
 
-**Mã không phải số đếm.** Vì 26 và 27 trống, số lỗi *thật* là 21 + 132 = **153**,
-thấp hơn mã cao nhất hai đơn vị. Hai README khai **155** theo mã cao nhất, và
+**Mã không phải số đếm.** Vì 26 và 27 trống, số lỗi *thật* là 21 + 133 = **154**,
+thấp hơn mã cao nhất hai đơn vị. Hai README khai **156** theo mã cao nhất, và
 `tests/test_meta.py::test_so_loi_trong_readme_khop_bang_phan_loai` ghim đúng
 quy ước ấy — nên hai con số lệch nhau là *có chủ ý*, không phải trôi. Câu cũ
 trộn hai thứ này làm một, nên nó vừa sai số đếm vừa không ai kiểm được.
@@ -30,7 +30,7 @@ chứ không từ ngày quan sát — hai ngày ấy thường trùng nhưng kh�
 | 71–75 | 12/09 | cổng lint vừa bật, bench v1.3, cohort C-1 |
 | 76–141 | 13/09 | dogfood `todo-cli` và `todo-oc` — [DOGFOOD-2026-09-13](DOGFOOD-2026-09-13.md) §2, §5, §7 |
 | 142–147 | 14/09 | `todo-oc` 7/7 (DOGFOOD §8) và `marks-cli`, dự án dogfood thứ ba |
-| 148–155 | 14/09 | `marks-cli`; ADR-009 O2/O3; hợp đồng `STABILITY.md`; bench C-1; cổng phát hành đọc lại trên `todo-oc` |
+| 148–156 | 14/09 | `marks-cli`; ADR-009 O2/O3; hợp đồng `STABILITY.md`; bench C-1; cổng phát hành đọc lại trên `todo-oc` |
 
 **Tất cả bằng đo trên agent thật**, không lỗi nào bằng đọc code. Mỗi lỗi có một
 phép hồi quy đỏ khi hoàn nguyên, trừ lỗi 22 (lý do ở lớp I); bảng này nhóm chúng
@@ -63,7 +63,7 @@ lỗi 22–25 còn có số đo ở `docs/ADR-004-evidence-driven-epic-improveme
 | **J. Hai luật cho một sự thật — sổ và cổng suy cùng một hành vi bằng hai cách** | "Sự thật này còn chỗ nào khác suy nó không? Hai chỗ có dùng chung một hàm, một trường không? Nếu không, chỗ nào là luật?" | 47 `stale_since_last_test` so `seq` trong khi `read()` đã chuyển sang so thời gian · 23 cổng "bảo toàn" hỏi test mang mã của story **sở hữu** FR, sổ xác minh FR **qua** story khác (`source.story`) → sổ nói VERIFIED, cổng nói UNRUNNABLE oan; cùng lớp, không đánh số: R2×R1 (sổ ghi VERIFIED ở ứng viên chưa landed trong khi nhật ký biết), R5×R2 (sổ không ghi tệp, cổng cỡ tra tệp) | `test_preservation.TestCongBaoToan.test_fr_hoi_story_da_xac_minh_no_khong_hoi_story_so_huu` · `test_ledger.TestUngVienChuaLanded` |
 | **K. Cơ chế mới ghi vào artifact mà cổng người cũ đang băm** | "Bước này ghi vào tệp nào? Tệp ấy có cổng người nào băm không? Ai duyệt lại, và có phải mỗi lần không?" | 25 `aisef improve` ghi story sửa vào `stories.index.json` → `stories`/`readiness` đã duyệt thành stale → lần gọi kế bị chính vòng trước chặn (exit 2), 28 | `test_approvals.TestStorySuaKhongLamStaleCongStories` (thêm story sửa không stale; sửa story thật vẫn stale) |
 
-## Lỗi 22–155 — triệu chứng, gốc, bài học
+## Lỗi 22–156 — triệu chứng, gốc, bài học
 
 | # | Lớp | Triệu chứng | Gốc | Bài học | Chặn tái diễn |
 |---|---|---|---|---|---|
@@ -273,6 +273,8 @@ lỗi 22–25 còn có số đo ở `docs/ADR-004-evidence-driven-epic-improveme
 | 153 | C | hai đợt đo chạy cùng `AISEF_BENCH_DIR` xoá worktree của nhau, im lặng | `materialize()` gọi `remove_tree(dest)` trước khi dựng; không có khoá nào giữa hai tiến trình bench | 12 worktree mà BENCH-REPORT-C1 dẫn làm bằng chứng có thể bị một lần chạy sau xoá sạch — mất bằng chứng đã phát hành, không phải chỉ mất thời gian | `flock` trên `bench.lock`, thoát 3 kèm câu nói rõ ai đang giữ. Phép thử giữ khoá thật rồi đòi lần hai trong `tests/bench/test_bench.py` |
 | 154 | C | `pre-deploy --epic EPIC-01` trên `todo-oc`: `e2e` và `accessibility` đỏ với `[WebServer] OSError: [Errno 48] Address already in use`. Cổng 8123 do một `python3 -m http.server 8123` **mồ côi** (PPID 1) giữ, cwd là `.aisef/worktrees/STORY-04-03` — worktree chính harness đã xoá — nên nó trả 404 cho mọi đường dẫn và `reuseExistingServer: true` của Playwright không nhận ra là dùng lại được | `_run_degraded` chạy lệnh bằng `subprocess.run(timeout=)`, thứ chỉ `proc.kill()` **đứa con trực tiếp**. `npx playwright test` chết, `webServer` nó dựng lên sống tiếp. Nhánh Docker đã xử đúng cùng hiểm hoạ ấy từ hợp quy S5 (`docker rm -f <tên>`); nhánh suy biến bị bỏ | rác của lần chạy trước làm đỏ cổng phát hành của lần chạy sau, và triệu chứng trỏ vào dự án chứ không vào harness. A/B trên đúng corpus ấy: giết tiến trình mồ côi rồi chạy lại ⇒ `e2e` và `accessibility` xanh, không sửa một dòng nào của dự án. Cùng gốc lỗi 15, khác chỗ: lỗi 15 ở `AppServer` của mockup, lỗi này ở sandbox — nơi **mọi** lệnh kiểm thử đi qua | `Popen(start_new_session=True)` + `_kill_group` (SIGKILL cả nhóm; `taskkill /F /T` trên Windows), và nhánh `BaseException` dọn cây khi bị Ctrl-C vì đứa con không còn nhận SIGINT của terminal. `tests/test_sandbox.py::TestHetGioGietCaCayTienTrinh::test_het_gio_khong_de_lai_chau_mo_coi` |
 | 155 | E/J | O3 đo trên 4 corpus: **29 mục REOPENED không có bằng chứng đỏ nào** ở cùng thời điểm. Ca rõ nhất todo-cli STORY-06-01: năm yêu cầu (`FR-1`, `FR-2`, `FR-3`, `NFR-2`, `NFR-4`, của ba story khác) bật REOPENED trong khi lần chạy ấy **65/65 test xanh**, `failed_ids` rỗng | `_observe_tests` chấm yêu cầu **mỗi story một lần**: story sau `covers` cùng yêu cầu với ba story trước và có 1/8 tiêu chí không test nào mang mã, nên rollup của chính nó ghi cả năm yêu cầu đỏ. Chủ sở hữu — đủ tiêu chí, xanh, **trong cùng một sự kiện** — ghi lại xanh sau đó thì bị `Ledger.observe` bỏ (xanh ở ứng viên chưa landed trả về sớm, đúng luật của nó). Thứ tự trong một sự kiện quyết định kết quả, mà nó không phải thứ tự nào cả | một vắng mặt ở tiêu chí của story sau bị đọc thành "hành vi từng đúng rồi hỏng" của story trước — sai loại kết cục, và nó **định giá**: REOPENED mở story sửa có trả phí, `untested` chỉ cần một test. Sổ nói 29 hồi quy không có thật, đúng con số ADR-004 sinh ra để đo | yêu cầu được chấm **một lần mỗi lần chạy**, không phải một lần mỗi story: xanh của bất kỳ story nào đủ tiêu chí trong lần chạy ấy thắng, vắng mặt vẫn ghi đúng chỗ của nó (tiêu chí của story sau, `untested`). Gom phán quyết **trước** khi `observe` thấy, nên thứ tự `targets` trong một sự kiện không còn quyết định gì; luật trả về sớm của ứng viên chưa landed giữ nguyên. Đo lại `validation/o3_preservation_radius.py`: **29 → 4**, 15 story gây hồi quy thật và cả bảng hiệu chỉnh không đổi. `tests/test_ledger.py::test_story_sau_thieu_test_khong_lam_do_yeu_cau_story_khac_dang_xanh` |
+
+| 156 | F/D | Thông báo của `tool-bypass` kết thúc bằng "Narrowing a run for debugging (extra arguments, a single file) is not blocked" — nhưng trên dự án npm/pnpm/yarn/bun thì `npm test -- tests/a.ts` **bị chặn**, in ra đúng câu ấy. Đo: pytest thu hẹp → ALLOW, `npm test -- <tệp>` → BLOCK, cùng một guard | `_khoa_lenh` gộp trình gọi về `(argv[0], argv[1])` để một khác biệt **chỉ-cờ** (`npm test --silent`) không lách được guard; phép gộp ấy cũng xoá đối số **vị trí**, nên lượt chạy hẹp thật cùng khoá với cả bộ | một thông báo hứa nước đi nào thì nước đi ấy phải hợp lệ — không thì đúng là lớp lỗi 118 ("không còn nước đi hợp lệ nào"), chỉ tệ hơn vì guard tự nói ngược lại mình. Phép gộp không sai; cái sai là suy ra "thu hẹp" từ **khoá** thay vì từ đối số | `_chay_hep_qua_trinh_goi`: token không mở đầu `-` sau tên script, hay bất cứ thứ gì sau `--`, là thu hẹp → cho qua; chỉ-cờ vẫn chặn. Hai guide đã sửa lại chỗ ghi cách lách cũ; 1 phép thử đỏ trước |
 
 ## Khi thêm lỗi mới
 

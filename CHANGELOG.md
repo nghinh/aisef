@@ -79,6 +79,21 @@ real-agent sessions, "three cohorts" → four, 31 → 130 taxonomy rows. Both pa
 carry the reviewer-qualification rates as measured, and neither presents the model
 review as a safety net, because the measurement says it is not one.
 
+**The `tool-bypass` message promised a move the guard refused** (bug 156). Its
+block text ends with "Narrowing a run for debugging (extra arguments, a single
+file) is not blocked" — and on an npm / pnpm / yarn / bun project it printed that
+sentence while blocking exactly that: `npm test -- tests/a.ts`. The command key
+collapses those managers to `(manager, script)` so a flag-only difference cannot
+slip past (a project declaring `npm test` must not be bypassed by `npm test
+--silent`), but the same collapse discarded positional arguments, so a genuine
+narrowed run carried the identity of the whole suite. A developer on a Node
+project therefore had no legal way to narrow a run while debugging — the dead end
+of bug 118, made worse by a guard contradicting itself in the same breath. The
+collapse stays; narrowing is now decided on positional arguments — a token not
+starting with `-` after the script name, or anything after `--`. Found twice
+independently while re-measuring the two usage guides against the code, which is
+also why both guides had written down the old workaround.
+
 **The failure taxonomy's own header had drifted.** It said "147 lỗi · 124 dòng · mã
 22–147" directly above the command that returns 132 rows, and conflated the highest
 bug code with the number of bugs — 26 and 27 have no rows, so the real count is 153

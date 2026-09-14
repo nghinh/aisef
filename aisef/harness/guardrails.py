@@ -302,14 +302,41 @@ _NGAT_LENH = re.compile(r"&&|\|\||;|\|")
 _CHUYEN_HUONG = re.compile(r"(?:\d?>>?&?\d?|<)\s*\S*")
 
 
-def _khoa_lenh(segment: str) -> tuple[str, ...]:
-    """Identity of one shell command: what it runs, not how it is spelled."""
+def _argv_goi(segment: str) -> list[str]:
+    """argv của một đoạn lệnh, đã bỏ chuyển hướng và chuẩn hoá `npm run x` → `npm x`."""
     argv = parse_command(_CHUYEN_HUONG.sub(" ", segment).strip())
     if len(argv) > 2 and argv[0] in _TRINH_GOI and argv[1] == "run":
         argv = [argv[0], *argv[2:]]
+    return argv
+
+
+def _khoa_lenh(segment: str) -> tuple[str, ...]:
+    """Identity of one shell command: what it runs, not how it is spelled."""
+    argv = _argv_goi(segment)
     if len(argv) >= 2 and argv[0] in _TRINH_GOI:
         return (argv[0], argv[1])
     return tuple(argv)
+
+
+def _chay_hep_qua_trinh_goi(segment: str) -> bool:
+    """`npm test -- tests/a.ts` là chạy **hẹp**, `npm test --silent` thì không.
+
+    `_khoa_lenh` gộp trình gọi về `(trình gọi, script)` để một khác biệt
+    chỉ-cờ không lách được guard: dự án khai `npm test`, agent chạy
+    `npm test --silent`, vẫn là cả bộ. Cái giá của phép gộp ấy là nó cũng
+    xoá đối số **vị trí** — nên một lượt chạy hẹp thật cũng cùng khoá, và
+    người viết mã trên dự án Node không còn nước đi hợp lệ nào để gỡ lỗi
+    (lỗi 156; cùng lớp với 118). Phân biệt bằng đối số vị trí, không bằng
+    khoá: token không mở đầu bằng `-` sau tên script, hay bất cứ thứ gì sau
+    `--`, là thu hẹp phạm vi lượt chạy.
+    """
+    argv = _argv_goi(segment)
+    if len(argv) < 2 or argv[0] not in _TRINH_GOI:
+        return False
+    con_lai = argv[2:]
+    if "--" in con_lai:
+        return bool(con_lai[con_lai.index("--") + 1:])
+    return any(not t.startswith("-") for t in con_lai)
 
 
 def check_tool_bypass(command: str, declared: dict[str, str | list[str]]) -> Verdict:
@@ -345,6 +372,10 @@ def check_tool_bypass(command: str, declared: dict[str, str | list[str]]) -> Ver
     for doan in _NGAT_LENH.split(command):
         ten = muc_tieu.get(_khoa_lenh(doan))
         if not ten:
+            continue
+        # Thu hẹp phạm vi thì không phải lời khai về cả bộ — và thông báo dưới
+        # đây vẫn hứa như thế, nên nó phải đúng cả với npm/pnpm/yarn/bun.
+        if _chay_hep_qua_trinh_goi(doan):
             continue
         from .tools import aisef_command
 

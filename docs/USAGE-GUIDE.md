@@ -545,12 +545,21 @@ row over a working implementation. A rule only the prompt states is not a rule.
 Two boundaries, both deliberate:
 
 - **Narrowing for debugging is not blocked**, because recording a subset as `test`
-  would make part of a suite look like a green one. What counts as narrowing is
-  whether the command's own identity changes: `python -m pytest -v tests/x.py -k foo`
-  and `npx vitest run tests/a.test.ts` are allowed where the bare declared command
-  is not. With `npm` / `pnpm` / `yarn` / `bun` the script name *is* the identity, so
-  `npm test -- tests/a.ts` is still blocked — reach for the underlying runner
-  instead.
+  would make part of a suite look like a green one. What counts as narrowing is a
+  *positional* argument the declared command does not have: `python -m pytest -v
+  tests/x.py -k foo`, `npx vitest run tests/a.test.ts` and `npm test --
+  tests/a.ts` are all allowed where the bare declared command is not. A
+  **flag-only** difference is not narrowing and stays blocked — `npm test
+  --silent` is the whole suite, spelled differently.
+
+  *Corrected 2026-09-14 (bug 156).* Until then `npm test -- tests/a.ts` **was**
+  blocked, because the command key collapsed `npm` / `pnpm` / `yarn` / `bun` to
+  `(manager, script)` and discarded everything after the script name — while the
+  block message the developer reads ended with "Narrowing a run for debugging …
+  is not blocked". On a Node project there was therefore no legal way to narrow a
+  run while debugging, which is the same dead end as bug 118. The collapse is
+  kept, so a flag-only difference still cannot slip past; the distinction is now
+  drawn on positional arguments instead.
 - **It does not fire in review sessions.** It applies only where a story id is
   present, because evidence is recorded per story and a reviewer deliberately has
   none — `aisef tool test` would record nothing for it either.

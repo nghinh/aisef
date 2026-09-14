@@ -497,13 +497,22 @@ for d, cs in [({'test': 'python -m pytest -v'},
 # → BLOCK | python -m pytest -v
 # → ALLOW | python -m pytest -v tests/test_notes.py
 # → BLOCK | npm test
-# → BLOCK | npm test -- tests/notes.test.js
+# → ALLOW | npm test -- tests/notes.test.js
 ```
 
 Với lệnh gọi thẳng (`pytest`, `npx vitest run …`) thì thêm đối số là một lệnh
-khác và được cho qua. Với `npm`/`pnpm`/`yarn`/`bun` thì **tên script chính là danh
-tính** của lệnh, nên `npm test -- <tệp>` vẫn bị chặn. Muốn chạy hẹp trên dự án
-npm thì gọi trực tiếp runner (`npx vitest run src/notes.test.ts`), đừng qua script.
+khác và được cho qua. Với `npm`/`pnpm`/`yarn`/`bun` cũng vậy **kể từ lỗi 156**:
+`npm test -- <tệp>` được cho qua, còn khác biệt **chỉ-cờ** (`npm test --silent`)
+thì không — đó vẫn là chạy cả bộ, chỉ viết khác đi.
+
+> **Sửa 2026-09-14 (lỗi 156).** Trước bản này, `_khoa_lenh` gộp trình gọi về
+> `(trình gọi, script)` nên mọi đối số sau tên script bị xoá, và
+> `npm test -- <tệp>` **bị chặn** — trong khi chính thông báo chặn mà người viết
+> mã đọc được lại kết thúc bằng "Narrowing a run for debugging … is not blocked".
+> Trên dự án Node, người viết mã do đó không còn nước đi hợp lệ nào để chạy hẹp
+> mà gỡ lỗi: đúng lớp lỗi 118. Phép gộp vẫn giữ (để `npm test --silent` không
+> lách được), nhưng nay phân biệt bằng **đối số vị trí** — token không mở đầu
+> bằng `-` sau tên script, hay bất cứ thứ gì sau `--`.
 
 Guard này chỉ áp dụng khi **có mã story** trong phiên. Phiên rà soát cố ý không
 có mã story — `aisef tool test` cũng sẽ không ghi được gì cho nó — nên

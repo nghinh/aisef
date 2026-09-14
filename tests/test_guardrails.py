@@ -1318,6 +1318,24 @@ class TestChayThangLenhCongCu(unittest.TestCase):
         self.assertFalse(self._chan("node --test tests/store.test.js"))
         self.assertFalse(self._chan("npx eslint lib/"))
 
+    def test_khong_chan_chay_hep_cua_npm(self):
+        """Thông báo của guard hứa "chạy hẹp không bị chặn" — với npm thì nó nói dối.
+
+        `_khoa_lenh` gộp npm/pnpm/yarn/bun về `(trình gọi, script)`, nên mọi
+        đối số sau tên script bị bỏ: `npm test -- tests/a.ts` cùng khoá với
+        `npm test`. Hệ quả là người viết mã trên dự án Node **không có nước đi
+        hợp lệ nào** để chạy hẹp mà gỡ lỗi, trong khi chính thông báo chặn nó
+        đọc được lại bảo là có — đúng lớp lỗi 118 ("không còn nước đi hợp lệ").
+        Khác biệt chỉ-cờ vẫn phải chặn (xem phép ngay trên), vì `npm test
+        --silent` vẫn là chạy cả bộ.
+        """
+        self.assertFalse(self._chan("npm test -- tests/a.ts"))
+        self.assertFalse(self._chan("npm run test -- tests/a.ts"))
+        self.assertFalse(self._chan("npm test -- --grep store"))
+        # Chỉ-cờ thì không phải chạy hẹp: vẫn cả bộ, vẫn chặn.
+        self.assertTrue(self._chan("npm test --silent"))
+        self.assertTrue(self._chan("npm test"))
+
     def test_khong_chan_lenh_khong_lien_quan(self):
         for cmd in ("npm install", "git status", "ls -la", ""):
             with self.subTest(cmd=cmd):
