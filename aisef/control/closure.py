@@ -533,15 +533,22 @@ def probe_judge_only_semantics(ctx: Ctx) -> Probed:
     rec = ctx.read_json(rel)
     if rec is None:
         return _missing(f"{rel} — the G2.4b-i..iv audit ({', '.join(JUDGE_PROPERTIES)})")
-    absent = [p for p in JUDGE_PROPERTIES if not isinstance(rec.get(p), dict)]
+    # `reviewer_qual.judge_only_audit` nests the four properties under
+    # `properties` and the counters under `measured`. Chấp nhận cả dạng phẳng:
+    # hai hình dạng cùng một sự thật thì đọc cả hai, đừng bắt bên sinh dẹt đi —
+    # bản lồng còn mang `assertions` và **hai** mẫu số, thứ bản phẳng đánh mất.
+    props = rec.get("properties") if isinstance(rec.get("properties"), dict) else rec
+    absent = [p for p in JUDGE_PROPERTIES if not isinstance(props.get(p), dict)]
     if absent:
         return _missing(f"{rel}: {', '.join(absent)}")
-    counts = [k for k in ("judge_alone_blocks", "blocks_total") if rec.get(k) is None]
-    if counts:
-        return _missing(f"{rel}: {', '.join(counts)} — the rate must stay published")
-    broken = [p for p in JUDGE_PROPERTIES if not rec[p].get("holds")]
-    alone, total = int(rec["judge_alone_blocks"]), int(rec["blocks_total"]) or 1
-    rate = f"{alone}/{rec['blocks_total']} blocks judge-alone ({100 * alone / total:.1f}%)"
+    measured = rec.get("measured") if isinstance(rec.get("measured"), dict) else {}
+    alone = rec.get("judge_alone_blocks", measured.get("judge_only_records"))
+    total = rec.get("blocks_total", measured.get("blocking_records"))
+    if alone is None or total is None:
+        return _missing(f"{rel}: judge-alone counts — the rate must stay published")
+    broken = [p for p in JUDGE_PROPERTIES if not props[p].get("holds")]
+    alone, total = int(alone), int(total) or 1
+    rate = f"{alone}/{total} blocks judge-alone ({100 * alone / total:.1f}%)"
     if broken:
         return Probed(Outcome.FAILED, f"{', '.join(broken)} does not hold · {rate}")
     return Probed(Outcome.PASSED, f"{', '.join(JUDGE_PROPERTIES)} hold · {rate}")

@@ -91,6 +91,12 @@ class Defect:
     #: exist, and so a caller asking a narrower question (is this a false pass
     #: in a *deterministic* check?) reads `gate.CHECK_KIND`, not a second table.
     check: str = ""
+    #: Có phải một mục cổng **đạt sai** (false PASS) hay không. G2.4a hỏi đúng
+    #: câu này và chỉ hỏi về mục **tất định/cấu trúc**; im lặng thì probe chấm
+    #: `UNRUNNABLE`, vì "chưa ai phân loại" không phải bằng chứng khoẻ. Một
+    #: hồi quy sai (false FAIL) hay một điểm yếu bỏ sót **không** phải false
+    #: PASS — hai thứ khác nhau, và gộp chúng làm G2.4a vô nghĩa.
+    false_pass: bool = False
     #: `docs/FAILURE-TAXONOMY.md` row id — a pointer, never a copy.
     taxonomy: int | None = None
     notes: str = ""

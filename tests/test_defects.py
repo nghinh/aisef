@@ -191,3 +191,33 @@ class TestTheRepositoryRegister(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestPhanLoaiFalsePassChoG2_4a(unittest.TestCase):
+    """G2.4a hỏi "có false PASS nào ở mục **tất định/cấu trúc** đang chặn không".
+
+    Sổ phải **trả lời** được câu ấy. Im lặng thì probe đúng khi chấm
+    `UNRUNNABLE` — nhưng một sổ không phân loại gì biến một tiêu chí *đang
+    đạt* thành chưa chạy được, và "chưa ai phân loại" không phải bằng chứng
+    khoẻ (cùng luật `UNCONFIGURED` → `UNRUNNABLE` của hợp đồng).
+    """
+
+    def test_moi_dong_khai_ro_co_phai_false_pass_khong(self):
+        for d in D.read(ROOT / D.PATH):
+            with self.subTest(defect=d.id):
+                self.assertIn(d.false_pass, (True, False),
+                              f"{d.id} không nói nó có phải false PASS hay không")
+
+    def test_false_pass_o_muc_tat_dinh_thi_phai_ten_muc(self):
+        for d in D.read(ROOT / D.PATH):
+            if d.false_pass:
+                with self.subTest(defect=d.id):
+                    self.assertTrue(d.check, f"{d.id} khai false_pass mà không nêu mục nào")
+
+    def test_khong_co_false_pass_tat_dinh_nao_dang_mo(self):
+        """Đây là điều G2.4a khẳng định. Đỏ khi có, chứ không im lặng."""
+        from aisef.control.gate import CHECK_KIND
+        bad = [d.id for d in D.read(ROOT / D.PATH)
+               if d.false_pass and d.status == "OPEN"
+               and CHECK_KIND.get(d.check) in ("deterministic", "structural")]
+        self.assertEqual(bad, [], f"false PASS tất định đang mở: {bad}")

@@ -361,6 +361,24 @@ class TestG1(unittest.TestCase):
 # ------------------------------------------------------------------- G2 probes
 
 
+class TestDocDungHinhDangArtifactThat(unittest.TestCase):
+    """Bộ chấm phải đọc **hình dạng artifact thật sự có trên đĩa**.
+
+    Hai agent định nghĩa hình dạng độc lập nhau trong cùng một đợt: bên sinh
+    (`reviewer_qual.judge_only_audit`) lồng bốn thuộc tính dưới `properties` và
+    các con số dưới `measured`; bên đọc (probe) chờ khoá phẳng. Kết quả là một
+    tiêu chí **đang đạt** bị chấm `UNRUNNABLE` — false FAIL, đúng thứ Phase B
+    gọi là lỗi cổng đóng dự án phải sửa trước khi đi tiếp.
+    """
+
+    def test_artifact_that_tren_dia_doc_duoc(self):
+        from aisef.control.closure import Ctx, probe_judge_only_semantics
+        got = probe_judge_only_semantics(Ctx(root=ROOT, spec={}))
+        self.assertEqual(got.outcome, Outcome.PASSED,
+                         f"artifact có thật, bốn thuộc tính đều holds, mà chấm ra {got.outcome}: {got.detail}")
+        self.assertIn("%", got.detail, "tỉ lệ judge-alone phải in ra, không được ẩn sau một PASS")
+
+
 class TestG2Suite(unittest.TestCase):
     def setUp(self):
         self.repo = Repo()
