@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.6.0 — 2026-09-14
 
 Measured by reading the developer session OpenCode actually ran, not by
 reasoning about what it should have run.
