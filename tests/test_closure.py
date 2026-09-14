@@ -1734,3 +1734,57 @@ class TestMotSHaDuyNhatChoViecDong(unittest.TestCase):
         sha = CL.pin_target(repo.root)
         self.assertEqual(sha, repo.head)
         self.assertEqual(CL.load_spec(repo.root)["closure_target_sha"], repo.head)
+
+
+class TestBangChungTuNoLamMinhCu(unittest.TestCase):
+    """Dòng phân loại 162 — bằng chứng buộc vào `commit` mà **chính nó** phải được
+    commit thì không bao giờ hiện hành được.
+
+    Mâu thuẫn đo được trên chính kho này 2026-09-14:
+
+    * G2.1 đòi `suite.json.commit == HEAD`;
+    * `closure-evidence/` được **theo dõi** bởi git;
+    * commit tệp bằng chứng làm HEAD đi qua đúng commit nó ghi → G2.1 cũ;
+    * **không** commit thì cây bẩn → `pin_target` từ chối.
+
+    Nên "G2.1 xanh" và "chốt được `closure_target_sha`" loại trừ nhau — một vòng
+    không lối ra mà máy đóng gate tự tạo cho mình.
+
+    Câu probe **thật sự** hỏi là "bằng chứng này có tả đúng **mã nguồn** hiện tại
+    không". Một commit chỉ đụng `closure-evidence/` không đổi một dòng mã nào,
+    nên câu trả lời vẫn là có. Nới đúng chừng ấy, không hơn: một commit đụng bất
+    kỳ tệp nào **ngoài** thư mục ấy vẫn làm bằng chứng cũ.
+    """
+
+    def repo_with(self, *, extra: str = ""):
+        """Một kho **duy nhất**: commit mã, ghi bằng chứng mang SHA ấy, rồi commit
+        chính tệp bằng chứng — đúng trình tự sinh ra mâu thuẫn."""
+        c = crit("GT.1", "aisef.control.closure:probe_suite_green",
+                 evidence="closure-evidence/suite.json")
+        repo = Repo(spec_of(c))
+        self.addCleanup(repo.close)
+        at = repo.head                     # mã nguồn ở đây
+        repo.write_json("closure-evidence/suite.json",
+                        {"commit": at, "exit": 0, "passed": 10, "failed": 0,
+                         "errors": 0, "skipped": 0, "tree": "main"})
+        if extra:
+            repo.write(extra, "x\n")
+        git(repo.root, "add", ".")
+        git(repo.root, "commit", "-m", "record evidence")
+        return repo, at
+
+    def probe(self, repo):
+        return CL.probe_suite_green(repo.ctx({"evidence": "closure-evidence/suite.json"}))
+
+    def test_commit_chi_dung_bang_chung_thi_van_hien_hanh(self):
+        repo, at = self.repo_with()
+        self.assertNotEqual(repo.head, at, "HEAD phải đã đi qua commit ấy")
+        p = self.probe(repo)
+        self.assertIs(p.outcome, Outcome.PASSED, p.detail)
+
+    def test_commit_dung_ma_nguon_thi_bang_chung_cu(self):
+        """Phép kiểm âm — nới này không được che một thay đổi mã thật."""
+        repo, _ = self.repo_with(extra="aisef/thay_doi.py")
+        p = self.probe(repo)
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("re-record", p.detail)

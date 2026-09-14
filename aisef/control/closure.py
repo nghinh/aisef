@@ -234,6 +234,28 @@ def _missing(what: str) -> Probed:
     return Probed(Outcome.UNRUNNABLE, f"missing: {what}")
 
 
+def _only_evidence_changed(ctx: Ctx, at: str) -> bool:
+    """True when every file changed between ``at`` and HEAD is recorded evidence.
+
+    Lỗi 162. Bằng chứng buộc vào `commit` mà **chính nó** được git theo dõi thì
+    không bao giờ hiện hành được: ghi ở commit X, rồi commit tệp bằng chứng làm
+    HEAD đi qua X, nên phép so `== HEAD` cũ ngay lập tức; còn không commit thì
+    cây bẩn và `pin_target` từ chối. "G2.1 xanh" và "chốt được
+    `closure_target_sha`" loại trừ nhau — một vòng không lối ra mà máy đóng gate
+    tự tạo cho mình, đo trên chính kho này 2026-09-14.
+
+    Câu probe **thật sự** hỏi là "bằng chứng này có tả đúng **mã nguồn** hiện tại
+    không". Một commit chỉ đụng `closure-evidence/` không đổi một dòng mã nào,
+    nên câu trả lời vẫn là có. Nới đúng chừng ấy: một tệp nào **ngoài** thư mục
+    ấy đổi thì bằng chứng cũ, như trước.
+
+    Không đọc được danh sách thay đổi → `False`: không biết thì coi là cũ.
+    """
+    changed = _git_out(ctx.root, "diff", "--name-only", f"{at}..HEAD")
+    names = [ln.strip() for ln in changed.splitlines() if ln.strip()]
+    return bool(names) and all(n.startswith(f"{EVIDENCE_DIR}/") for n in names)
+
+
 def _at_commit(ctx: Ctx, rec: dict, field_name: str = "commit") -> Probed | None:
     """Freshness ``bound_to: commit``. Evidence recorded at another commit does
     not describe this one, and "cannot tell" is UNRUNNABLE, not a pass."""
@@ -244,6 +266,8 @@ def _at_commit(ctx: Ctx, rec: dict, field_name: str = "commit") -> Probed | None
     if not at:
         return Probed(Outcome.UNRUNNABLE, f"record names no `{field_name}`")
     if not (head.startswith(at) or at.startswith(head)):
+        if _only_evidence_changed(ctx, at):
+            return None
         return Probed(Outcome.UNRUNNABLE,
                       f"recorded at {at[:7]}, HEAD is {head[:7]} — re-run and re-record")
     return None

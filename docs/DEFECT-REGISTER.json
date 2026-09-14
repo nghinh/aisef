@@ -80,6 +80,19 @@
    "fixed": "HEAD",
    "evidence": "marks-cli run.log 2026-09-14 12:58:44: `attempt=1 FAIL ... attempt=2 START` on a 401 whose session note records moved_tree: false and 'auth and the tree is untouched -- nothing to grade'. quality_attempts counts attempts where not a.infra, and `auth` is not in INFRA_STATUSES, so the story spent quality budget on a session the agent had no part in.",
    "notes": "`auth` is kept OUT of INFRA_STATUSES deliberately and that reasoning is sound and measured: a rejected credential is not transient, so retrying spends the infra budget on a failure that repeats identically (2026-09-12: 176 s per attempt, $0, three attempts, nothing learned). The defect is that excluding it did not achieve the stated intent -- it only moved the cost to the QUALITY budget and retried anyway. Classifying a status controls accounting, not whether a retry happens; the comment assumed it controlled both.\nFixed with the idiom already in the same function for 'not the agent's fault AND retrying is pointless', which the isolation branch uses: infra=True (nothing was ever scored, so no quality attempt is charged) plus fatal=True (stop now). `auth` stays out of INFRA_STATUSES, so the measured no-retry finding is preserved.\nSame shape as taxonomy row 130, which measured it for max_turns: a story spending its whole budget without ever producing a verdict leaves the next developer no feedback."
+  },
+  {
+   "id": "D-007",
+   "severity": "P1",
+   "status": "CLOSED",
+   "taxonomy": 162,
+   "title": "closure evidence bound to a commit can never be current once it is itself committed",
+   "false_pass": false,
+   "check": "",
+   "introduced": "2026-09-14, with the closure evaluator itself",
+   "fixed": "HEAD",
+   "evidence": "Measured on this repository: suite.json recorded at 9fe6d6f, committing it moved HEAD to 91781e8, and G2.1 read UNRUNNABLE 'recorded at 9fe6d6f, HEAD is 91781e8'. Leaving it uncommitted instead makes the tree dirty, and `closure.pin_target` refuses a dirty tree. `git diff --name-only 9fe6d6f..HEAD` listed only closure-evidence/*.json -- no source file changed.",
+   "notes": "A contradiction the closure machinery created for itself, and it blocked the last step of closing the project: 'G2.1/G2.2/G5.4 green' and 'closure_target_sha pinnable' were mutually exclusive, because `closure-evidence/` is tracked and recording evidence is itself a commit.\nThe measurement interfered with what it measured: the probe asks whether the evidence describes the current SOURCE, but decided it by comparing HEAD's SHA, which moves because of the act of recording.\nFixed narrowly: a commit touching ONLY `closure-evidence/` changes no source line, so the evidence still describes the tree. Any file outside that directory still invalidates it, and an unreadable diff reads as stale -- the negative control (`test_commit_dung_ma_nguon_thi_bang_chung_cu`) asserts a real source change is still caught.\nP1 not P2: it blocked closure outright. false_pass=false -- it produced a false UNRUNNABLE, which blocks; it never let anything through."
   }
  ]
 }
