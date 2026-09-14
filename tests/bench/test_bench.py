@@ -730,6 +730,31 @@ class TestThuTuTaskTheoLoiNguoiGoi(unittest.TestCase):
             CLI.main(["run-both", "c", "a"])
         self.assertEqual([g for i, g in enumerate(goi) if i % 2 == 0], ["c", "a"])
 
+    def test_ten_task_sai_thi_dung_han_chu_khong_chay_it_hon(self):
+        """Một đợt tuyển task theo danh sách tên phải nổ khi đánh sai một tên.
+
+        `docs/BENCH-TASK-DISCRIMINATION.md` đề nghị chạy cohort sau trên đúng ba
+        task; nếu một tên sai bị lặng lẽ bỏ, cohort ngắn đi mà báo cáo vẫn khai
+        là đã chạy tuyển chọn ấy — sai mà không kiểm được.
+        """
+        import io
+        from contextlib import redirect_stderr, redirect_stdout
+
+        from . import __main__ as CLI
+        tasks = [R.Task(id=n, source="bug", dir=M.TASKS_DIR / n) for n in ("a", "b")]
+        goi = []
+        err = io.StringIO()
+        with mock.patch.object(CLI.M, "load_tasks", return_value=tasks), \
+             mock.patch.object(CLI.R, "ENABLED", True), \
+             mock.patch.object(CLI.R, "make_client", return_value=object()), \
+             mock.patch.object(CLI.R, "run", lambda *a, **k: goi.append(1) or []), \
+             mock.patch.object(CLI.R, "report", return_value=""), \
+             redirect_stdout(io.StringIO()), redirect_stderr(err):
+            ma = CLI.main(["run-both", "a", "bug-khong-ton-tai"])
+        self.assertEqual(ma, 2)
+        self.assertEqual(goi, [])                      # không chạy task nào
+        self.assertIn("bug-khong-ton-tai", err.getvalue())
+
 
 class TestNhanCohortDoNguoiVanHanhKhai(unittest.TestCase):
     """Khi model là **alias**, dữ liệu không tự phân biệt được hai cột.
