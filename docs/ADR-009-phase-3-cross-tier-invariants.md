@@ -439,11 +439,26 @@ refuses to average a partial dollar record.
 
 ## Deferred
 
-- Budget cap values are surfaced in ``Config`` defaults but not yet
+- ~~Budget cap values are surfaced in ``Config`` defaults but not yet
   validated against the per-project ledger at startup (a project
   might set ``run.cost_cap_usd=0.50`` even when prior runs already
   exceeded that).  The next iteration adds a "set down" hook in
-  ``aisef doctor``.
+  ``aisef doctor``~~ — **done 2026-09-14.**  ``aisef doctor`` now carries the
+  check ``budget cap above recorded spend``: it compares
+  ``run.cost_cap_usd`` / ``run.turn_cap`` against ``spent_usd`` /
+  ``spent_turns`` in ``_bmad-output/budget.json`` and names both numbers.
+  Four distinct states, not two: no cap configured prints nothing and never
+  opens the ledger (the guard short-circuits there, so the check must not make
+  an unconfigured project pay the I/O); cap above spend passes; cap **at or
+  below** spend fails required — at equality every next call already exceeds —
+  and the message says the next paid call is refused before it dispatches, so
+  the operator reads it as their own number rather than as a framework bug;
+  no ledger yet is ``○``, neither pass nor fail, because nothing can be
+  compared.  The check is read-only, including the equality case: it never
+  takes the sidecar lock and never writes the ledger — ``run`` owns it.
+  Pinned by ``TestDoctorTranNganSachSoVoiSoChi`` in ``tests/test_doctor.py``,
+  one test per state plus one that asserts the ledger bytes and the
+  ``_bmad-output`` listing are unchanged after a ``doctor`` run.
 - ``mockup_verify`` derives ``run_id`` from
   ``artifact_root / story_id``; flows where one story runs against
   multiple candidate branches (re-verify across rebases) need a
