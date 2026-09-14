@@ -1062,3 +1062,21 @@ class TestBaselineAfterGateSurvivesSeqReset(unittest.TestCase):
                             " is actually pre-baseline in time; PASSED here"
                             " would mean the gate trusted seq over `at`.")
 
+class TestMaMoCoiChanCong(unittest.TestCase):
+    """Lỗi 159 ở **mức cổng**: bộ dò mà không chặn thì không phải bản sửa.
+
+    `criteria have tests` là mục chặn cấu trúc. Sau khi một tiêu chí bị rút,
+    `missing` rỗng nhưng bằng chứng đã trượt sang tiêu chí khác — nên mã mồ côi
+    phải làm mục ấy **đỏ**, và lý do phải nêu đúng mã lẫn việc phải làm.
+    """
+
+    def test_ma_mo_coi_lam_muc_criteria_have_tests_do(self):
+        from aisef.control.acceptance import missing as ac_missing, orphans
+        tests = [f"AC-STORY-01-02-{i}: x" for i in (1, 2, 3, 4)]
+        # 4 tiêu chí: đủ mã, không mồ côi, không thiếu.
+        self.assertEqual(ac_missing("STORY-01-02", 4, tests), [])
+        self.assertEqual(orphans("STORY-01-02", 4, tests), [])
+        # Rút một tiêu chí: `missing` VẪN rỗng — đó chính là chỗ lỗi 159 lọt.
+        self.assertEqual(ac_missing("STORY-01-02", 3, tests), [])
+        # Bộ dò bắt được, nên cổng có cái để chặn.
+        self.assertEqual(orphans("STORY-01-02", 3, tests), ["AC-STORY-01-02-4"])

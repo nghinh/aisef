@@ -40,7 +40,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..harness.guardrails import check_completion, check_diff_scope
-from .acceptance import ac_code, coverage as ac_coverage, missing as ac_missing
+from .acceptance import (ac_code, coverage as ac_coverage, missing as ac_missing,
+                         orphans as ac_orphans)
 from .outcome import Check, Outcome
 from .tdd import red_before_green
 from .security import DEFAULT_BLOCKING
@@ -755,10 +756,23 @@ def evaluate(
         for ids in phu.values():
             tat_ca.extend(ids)
         missing = ac_missing(story_id, acceptance, tat_ca)
+        # Lỗi 159: `missing` chỉ hỏi "tiêu chí nào thiếu phép thử". Sau khi một
+        # tiêu chí bị rút, mọi mã sau nó tụt một bậc và câu ấy trả **rỗng** —
+        # mỗi tiêu chí vẫn có phép thử mang mã đúng, chỉ là phép thử ấy chứng
+        # minh hành vi khác. Mã mồ côi (i > số tiêu chí) là dấu vết duy nhất của
+        # sự dịch chuyển còn đọc được từ dữ liệu, nên nó **chặn**: một mục cấu
+        # trúc không được đạt khi danh tính của bằng chứng đã trượt.
+        mo_coi = ac_orphans(story_id, acceptance, tat_ca)
         lenh = str(last_green.detail.get("command") or "tools.test")
         nguon = ", ".join([f"`{lenh}`", *(f"`{k}`" for k in sorted(phu))])
         gate.checks.append(Check(
-            "criteria have tests", not missing,
+            "criteria have tests", not missing and not mo_coi,
+            (f"tests carry codes with no criterion: {', '.join(mo_coi)} — the story "
+             f"has {acceptance} criteria, so a test named after a higher code proves "
+             f"nothing this story declares, and every code at or below it may have "
+             f"shifted onto a different criterion. Re-tag the tests, or restore the "
+             f"criteria the codes were written for (lỗi 159)."
+             ) if mo_coi and not missing else
             "" if not missing else
             f"no tests with codes {', '.join(ac_code(story_id, i) for i in missing)} — "
             f"each criterion needs at least one test named after its code, green at "
