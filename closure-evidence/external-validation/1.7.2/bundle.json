@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "product_version": "1.7.2",
+  "release_tag": "v1.7.2",
+  "release_source_sha": "d092b25fb94ec463347e6a5a04d1cc43a7fc2df8",
+  "wheel_sha256": "d97ca56db1499f7eaf97ee0e1a4c3eff54acf08a7c6c66bd892c6943c1db63f9",
+  "sdist_sha256": "7fe16a4f1fd26a56e5cba9717592082f503336ca41c517de395192ce189ef7a6",
+  "protocol_version": "v1.1.0",
+  "instructions_digest": "77295c3fe687f3970f1d84dcb801f39e4ed57f909cbeca83bf65bcaa0689f6d5",
+  "instructions_files": [
+    "INSTRUCTIONS.md",
+    "REPORT-TEMPLATE.md"
+  ],
+  "record_path": "closure-evidence/external-validation/1.7.2/REPORT.md",
+  "_note": "instructions_digest is the SHA-256 over `name:sha256(bytes)` of the files listed, sorted; REPORT.md and this file are excluded. G6.1 recomputes it from the directory."
+}

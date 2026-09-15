@@ -1,5 +1,5 @@
 {
-  "_comment": "Supersession chain for the frozen closure target. Historical entries are never rewritten -- a target that was superseded is evidence of why, not a mistake to erase.",
+  "_comment": "Supersession chain for the frozen closure target. Historical entries are never rewritten -- a target that was superseded is evidence of why, not a mistake to erase. Since adjustment 8 (2026-09-15) a target is superseded only when the PRODUCT identity changes; evidence commits after a target do not supersede it.",
   "chain": [
     {
       "sha": "8302946181979b13630e020c0d8245dd9e22842c",
@@ -23,10 +23,19 @@
       "sha": "5c5ba52fa0c98bd276b074b7bc3e1d112dd49fd5",
       "tag": "v1.7.1",
       "version": "1.7.1",
-      "status": "FINAL CLOSURE TARGET",
-      "why": "the corrected candidate. Carries D-019 (full-history CI checkout), D-020 (two POSIX assumptions in test helpers) and D-021 (pin keys and reported paths normalised to POSIX). Remote CI run 34917002995 is green on exactly this commit across all four Ubuntu suite jobs, Windows, lint and wheel.",
+      "status": "RELEASED -- SUPERSEDED AS CLOSURE TARGET BY 1.7.2 (D-022)",
+      "why": "the corrected candidate. Carries D-019 (full-history CI checkout), D-020 (two POSIX assumptions in test helpers) and D-021 (pin keys and reported paths normalised to POSIX). Remote CI run 34917002995 is green on exactly this commit across all four Ubuntu suite jobs, Windows, lint and wheel. Superseded 2026-09-15: closure could not converge on it -- recording post-release evidence moved HEAD and G1.0 read FAILED (D-022, a closure-architecture defect, not a product one). The tag and the PyPI artefacts stand unchanged; closure-evidence/releases/1.7.1.json binds them to this commit member by member.",
       "ci_run": "34917002995",
       "ci_head_sha": "5c5ba52fa0c98bd276b074b7bc3e1d112dd49fd5"
+    },
+    {
+      "sha": "d092b25fb94ec463347e6a5a04d1cc43a7fc2df8",
+      "tag": "v1.7.2",
+      "version": "1.7.2",
+      "status": "FINAL CLOSURE TARGET",
+      "why": "the D-022/D-023 correction: release identity by product digest (aisef/control/planes.py, docs/closure-gate.json#planes), G1.0 comparing product identity between the release and HEAD, G6 bound to a release node with an immutable instructions bundle. Remote CI run 34925033781 green on exactly this commit across Ubuntu 3.11-3.14, Windows 3.11, lint and wheel (the 3.13 job needed one re-run: a temp-dir cleanup race in a bench test helper, D-024, unrelated to the change). The pin commit 25ed1ed sits after this commit and is EVIDENCE_ONLY, which is now allowed.",
+      "ci_run": "34925033781",
+      "ci_head_sha": "d092b25fb94ec463347e6a5a04d1cc43a7fc2df8"
     }
   ],
   "defect_chain_note": "D-019, D-020 and D-021 form one chain: history-dependent tests could not run at all, which hid two POSIX assumptions in the helpers, which in turn hid a genuine cross-platform product bug in the pin key. Each was only visible once the previous one was fixed. Choosing to fix the environment rather than skip the tests is what surfaced all three."

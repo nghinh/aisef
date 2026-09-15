@@ -286,6 +286,17 @@
    "fixed": "1.7.2",
    "evidence": "closure-evidence/onboarding-digest.json is written by `aisef.control.onboarding` with the value under `digest` and no `version` field; `closure.probe_external_report` read `rec.get('sha256')` and `rec.get('version')` and recomputed the digest with a second implementation (`closure.onboarding_digest`, whitespace-normalised prose) that differs from the recorded one (commands + defaults only). With a record present the probe would have read version '' -> FAILED 'different MAJOR.MINOR', and with that fixed, '' != digest -> FAILED 'onboarding surface changed'. Latent only because no record existed yet (G6 UNRUNNABLE hid it).",
    "notes": "Two implementations of one digest and two spellings of one key -- the class J shape ('two rules for one truth'). Fixed by deleting the probe's copy: G6.1 now reads the record and recomputes through `aisef.control.onboarding.compute_onboarding_digest`, the function that wrote it. The MAJOR.MINOR clause of ruling 4 is subsumed by G6.1's exact release binding (adjustment 8). false_pass=false: it would have blocked, not passed; P1 because closure could not have completed without an author fixing the gate."
+  },
+  {
+   "id": "D-024",
+   "severity": "P3",
+   "status": "OPEN",
+   "false_pass": false,
+   "title": "bench-qualification test helper: TemporaryDirectory cleanup raced a writer inside a session's .git (once, Linux 3.13)",
+   "introduced": "unknown -- first seen on CI run 34925033781, first attempt, ubuntu-latest/3.13",
+   "fixed": "",
+   "evidence": "tests/test_bench_qualification.py::TestDuongOngTuyenCap::test_moi_phien_co_cay_lam_viec_rieng: assertions passed, then `_tra_lai` -> TemporaryDirectory.cleanup() raised OSError [Errno 39] Directory not empty: .../q/run/opencode/bug-a2-multi-2/s2/.git (Python 3.13 _rmtree_safe_fd: an entry appeared between scandir and rmdir). Same commit (d092b25): 3.11, 3.12, 3.14 and Windows green; the 3.13 job re-run green; locally 0/30 failures on 3.12 and 3.14. The commit under test touched no bench code.",
+   "notes": "A test-infrastructure race, not a product defect and not a gate defect: it fires after the test's assertions, in cleanup. The writer is not identified -- the fake opencode client and materialize() both finish synchronously, git gc --auto is far below its threshold on a ~600-object repo, and the CI log carries no background-git message -- so no fix is claimed. Recorded rather than papered over with ignore_cleanup_errors, which would hide the writer for good. Re-open as P2 if it recurs; then capture `ls -la .git` and `ps` at cleanup time in the helper."
   }
  ]
 }

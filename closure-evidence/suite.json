@@ -1,9 +1,9 @@
 {
-  "commit": "8b3eadaf5fd36348826ebd431c378291e61fa132",
+  "commit": "25ed1edda1c52ebdb6082b834db5858a59f1ce8b",
   "errors": 0,
   "exit": 0,
   "failed": 0,
-  "passed": 3059,
+  "passed": 3100,
   "skipped": 19,
   "tool": "python -m pytest -q",
   "tree": "main"
