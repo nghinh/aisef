@@ -1,24 +1,25 @@
 # G6 return playbook — what happens when `REPORT.md` arrives
 
-Operator procedure for the external-validation record of **AISEF 1.7.2**. It
+Operator procedure for the external-validation record of **AISEF 1.7.3**. It
 changes no gate semantics: every check below is either a command that already
 exists or a comparison the closure probes already make. The authority on what
 G6 *means* is `docs/PROJECT-CLOSURE-GATE.md` (§5 G6, §0b); this file only says
 what to do, in what order, and when to stop.
 
 Identity of the run this playbook serves (from
-`closure-evidence/external-validation/1.7.2.bundle.json`):
+`closure-evidence/external-validation/1.7.3.bundle.json`):
 
 | field | value |
 |---|---|
-| product | `aisef==1.7.2` from public PyPI |
-| release tag | `v1.7.2` |
-| release_source_sha | `d092b25fb94ec463347e6a5a04d1cc43a7fc2df8` |
-| wheel sha256 | `d97ca56db1499f7eaf97ee0e1a4c3eff54acf08a7c6c66bd892c6943c1db63f9` |
-| sdist sha256 | `7fe16a4f1fd26a56e5cba9717592082f503336ca41c517de395192ce189ef7a6` |
+| product | `aisef==1.7.3` from public PyPI |
+| release tag | `v1.7.3` |
+| release_source_sha | `cfee273074af2000e0839c71333cf84ee8b5b73b` |
+| bundle_source_sha | `30f820f84402bde86c3a91a6b07c259f039ff73c` (the documentation commit the bundle was frozen from) |
+| wheel sha256 | `97cd7a0fcaf3940b83fd5e83760da616632c4836208079398273c89b5fea6dcf` |
+| sdist sha256 | `7eafcc12aa6ddaa5ce07a93cab28795a0a3b7c49ac9a3fd3509eb290a032344d` |
 | protocol version | v1.1.0 |
-| instructions_digest | `376c6e600865060a963b8cd3e4c5a12c918ca7a7b2e0d5125b0f88725698a973` |
-| record path | `closure-evidence/external-validation/1.7.2/REPORT.md` |
+| instructions_digest | `e6526b93716e81648a7bc8fd50f2c0f4153f67f38f186e22a67f5c455680ef17` |
+| record path | `closure-evidence/external-validation/1.7.3/REPORT.md` |
 
 Standing rules while the run is open: the bundle directory and the handoff
 record are frozen; nobody on the implementation side writes `REPORT.md`; an AI
@@ -32,17 +33,17 @@ is not a participant; the participant is not coached toward any result.
    shasum -a 256 <returned REPORT.md>
    ```
 
-2. Place it, unmodified, at `closure-evidence/external-validation/1.7.2/REPORT.md`.
+2. Place it, unmodified, at `closure-evidence/external-validation/1.7.3/REPORT.md`.
    It is the **only** file added to that directory. Transcripts, screenshots or
    archives the participant returns go to
-   `closure-evidence/external-validation/1.7.2-attachments/`, never inside the
+   `closure-evidence/external-validation/1.7.3-attachments/`, never inside the
    hashed directory.
 3. Commit it alone, with the digest from step 1 in the commit message. This
    commit is `EVIDENCE_ONLY` under `docs/closure-gate.json#planes`; it moves
    HEAD and does not touch G1.0 (see L).
 4. If the record needs normalising (encoding, line endings, a table the
    probes cannot read), write the normalised form as a **derived** file
-   (`closure-evidence/external-validation/1.7.2-derived/REPORT.normalised.md`)
+   (`closure-evidence/external-validation/1.7.3-derived/REPORT.normalised.md`)
    with the original's digest in its header. The original is never edited; a
    correction from the participant is a dated addendum they write.
 
@@ -55,8 +56,8 @@ release manifest. The reader is the probe's own:
 python3 - <<'EOF'
 import json, sys; sys.path.insert(0, ".")
 from aisef.control.closure import declared_identity
-rec = json.load(open("closure-evidence/external-validation/1.7.2.bundle.json"))
-got = declared_identity(open("closure-evidence/external-validation/1.7.2/REPORT.md", encoding="utf-8").read())
+rec = json.load(open("closure-evidence/external-validation/1.7.3.bundle.json"))
+got = declared_identity(open("closure-evidence/external-validation/1.7.3/REPORT.md", encoding="utf-8").read())
 for k in ("product_version", "release_tag", "release_source_sha", "wheel_sha256", "sdist_sha256", "protocol_version", "instructions_digest"):
     print(f"{k:22s} declared={got.get(k, '—')[:20]:22s} expected={str(rec[k])[:20]:22s} {'OK' if got.get(k, '') == str(rec[k]) else 'MISMATCH'}")
 EOF
@@ -67,7 +68,7 @@ a transcription error the participant corrects by addendum, or evidence that a
 different release or different instructions were validated (→ H, INVALID RUN).
 The instructions digest is recomputed by the probe from the directory, so if
 the directory holds anything but the six frozen files plus `REPORT.md`, remove
-what does not belong (attachments go to `1.7.2-attachments/`) — never edit the
+what does not belong (attachments go to `1.7.3-attachments/`) — never edit the
 frozen files.
 
 ## C. Participant-required fields
@@ -98,7 +99,7 @@ Findings stay in the participant's words. Severity is the protocol's own
 ladder (P0 cannot install / data loss / security / incorrect gate result; P1
 cannot complete without author help; P2 friction; P3 cosmetic). For each
 finding, add a **derived** classification record (not in the report) under
-`closure-evidence/external-validation/1.7.2-derived/findings.json`:
+`closure-evidence/external-validation/1.7.3-derived/findings.json`:
 
 | field | meaning |
 |---|---|
@@ -112,13 +113,7 @@ Class decides consequences (I, J); severity decides G6.3. A finding whose class
 is ambiguous is recorded as `UNRESOLVED` and taken to the owner, never rounded
 down to harmless.
 
-**Known potential finding, recorded in advance:** the frozen `QUICKSTART.md`
-in the bundle, copied verbatim from the tag, says *"Expect: Successfully
-installed aisef-1.7.1"* and *"aisef --version → aisef 1.7.1"* in steps 1–2,
-while `INSTRUCTIONS.md` pins `aisef==1.7.2`. The participant will see 1.7.2 and
-may log the discrepancy. It is not pre-classified here and the participant is
-not told about it; whatever they observe and however they grade it is the
-record. The bundle is not edited for it.
+**Version expectations in the bundle:** the four public documents were frozen from `bundle_source_sha` (`30f820f`), a documentation commit after the tag, because the quickstart at the tag still said *Expect: aisef-1.7.2*; the frozen QUICKSTART.md expects `aisef-1.7.3`, and `1.7.3.bundle.json` records both commits. The 1.7.2 bundle is untouched and remains the record of that release.
 
 ## F. Run G6.1 → G6.2 → G6.3
 
@@ -139,12 +134,11 @@ waiver. A criterion is never edited to fit the record.
 
 ## G. Full closure projection
 
-The same command prints all 27 criteria. Expected after a clean G6 **on a
-release with no open P1**: 27 passed, `CLOSABLE`, approval `pending`. Since the
-LedgerLock dogfood intake (2026-09-15) 1.7.2 carries three OPEN P1 defects
-(D-026, D-028, D-029) and G2.3 reads FAILED, so a clean G6 on 1.7.2 projects to
-26 of 27 at best; closing needs the owner's decision on a patch release (I, J). Re-check that G1.0 still reads PASSED with the
-record committed — it will, unless a product path changed (L).
+The same command prints all 27 criteria. Expected after a clean G6: 27 passed,
+`CLOSABLE`, approval `pending`. Re-check that G1.0 still reads PASSED with the
+record committed — it will, unless a product path changed (L). (1.7.2 could not
+have closed: the LedgerLock dogfood intake left G2.3 FAILED on D-026, D-028 and
+D-029; 1.7.3 closed them and reads 24 of 27 before G6.)
 
 ## H. Name the outcome
 
