@@ -1,0 +1,38 @@
+{"seq": 1, "step": "attempt.started", "at": 1789481470.21, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 2, "step": "worktree.created", "at": 1789481470.621, "attempt": 1, "data": {"path": "/Users/nghinh/Downloads/projects/ledgerlock-aiseftest-run2/.aisef/worktrees/STORY-01-06"}, "undo": {"worktree.remove": "STORY-01-06"}}
+{"seq": 3, "step": "status.running", "at": 1789481470.623, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 4, "step": "changes.detected", "at": 1789481569.272, "attempt": 1, "data": {"luot": 1, "files": ["ledgerlock/ledger.py", "tests/test_conflict.py"], "count": 2}, "undo": {}}
+{"seq": 5, "step": "candidate.frozen", "at": 1789481569.272, "attempt": 1, "data": {"luot": 1, "sha": "b75c0b2126e44ef3ad693f1fe54ab868515e5182", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 6, "step": "changes.detected", "at": 1789482173.27, "attempt": 1, "data": {"luot": 2, "files": ["ledgerlock/ledger.py", "tests/test_conflict.py"], "count": 2}, "undo": {}}
+{"seq": 7, "step": "candidate.frozen", "at": 1789482173.27, "attempt": 1, "data": {"luot": 2, "sha": "eed6f87afc51022fc8dbdec185609922f5fbda68", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 8, "step": "verification.completed", "at": 1789482516.736, "attempt": 1, "data": {"ok": false, "attempts": 2, "cost_usd": 0.0}, "undo": {}}
+{"seq": 9, "step": "review.completed", "at": 1789482516.737, "attempt": 1, "data": {"blocked": ["review could not run: max_turns: stopped at 40 turns (cap 40)"]}, "undo": {}}
+{"seq": 10, "step": "attempt.committed", "at": 1789482516.742, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 11, "step": "attempt.started", "at": 1789482633.871, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 12, "step": "worktree.created", "at": 1789482634.349, "attempt": 1, "data": {"path": "/Users/nghinh/Downloads/projects/ledgerlock-aiseftest-run2/.aisef/worktrees/STORY-01-06"}, "undo": {"worktree.remove": "STORY-01-06"}}
+{"seq": 13, "step": "status.running", "at": 1789482634.35, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 14, "step": "verification.completed", "at": 1789482707.846, "attempt": 1, "data": {"ok": false, "attempts": 0, "cost_usd": 0.0}, "undo": {}}
+{"seq": 15, "step": "review.completed", "at": 1789482707.846, "attempt": 1, "data": {"blocked": []}, "undo": {}}
+{"seq": 16, "step": "attempt.committed", "at": 1789482707.85, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 17, "step": "attempt.started", "at": 1789490759.185, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 18, "step": "worktree.created", "at": 1789490759.634, "attempt": 1, "data": {"path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/replay174/ledgerlock/.aisef/worktrees/STORY-01-06"}, "undo": {"worktree.remove": "STORY-01-06"}}
+{"seq": 19, "step": "status.running", "at": 1789490759.636, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 20, "step": "changes.detected", "at": 1789490760.142, "attempt": 1, "data": {"luot": 3, "files": ["ledgerlock/ledger.py", "tests/test_conflict.py"], "count": 2}, "undo": {}}
+{"seq": 21, "step": "candidate.frozen", "at": 1789490760.142, "attempt": 1, "data": {"luot": 3, "sha": "eed6f87afc51022fc8dbdec185609922f5fbda68", "error": "", "verify_only": true}, "undo": {}}
+{"seq": 22, "step": "verification.completed", "at": 1789490964.404, "attempt": 1, "data": {"ok": false, "attempts": 0, "cost_usd": 0.0}, "undo": {}}
+{"seq": 23, "step": "review.completed", "at": 1789490964.404, "attempt": 1, "data": {"blocked": ["[block] ledgerlock/ledger.py:21 — append unpacks 5-tuples only, so the contract's delete shape append((\"delete\", k, rid, ts)) raises ValueError: not enough values to unpack; the only working tombstone call is an undocumented 5-tuple with a silently ignored value, and the green AC-3/AC-4 tests use that undocumented shape"], "outcome": "BLOCK", "review_executions": 1, "developer_attempts": 0}, "undo": {}}
+{"seq": 24, "step": "attempt.committed", "at": 1789490964.407, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 25, "step": "attempt.started", "at": 1789491090.937, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 26, "step": "worktree.created", "at": 1789491091.66, "attempt": 1, "data": {"path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/replay174/ledgerlock/.aisef/worktrees/STORY-01-06"}, "undo": {"worktree.remove": "STORY-01-06"}}
+{"seq": 27, "step": "status.running", "at": 1789491091.663, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 28, "step": "attempt.reconciled", "at": 1789491177.127, "attempt": 1, "data": {"action": "undo", "from": "running"}, "undo": {}}
+{"seq": 29, "step": "attempt.started", "at": 1789491178.895, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 30, "step": "worktree.created", "at": 1789491179.365, "attempt": 1, "data": {"path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/replay174/ledgerlock/.aisef/worktrees/STORY-01-06"}, "undo": {"worktree.remove": "STORY-01-06"}}
+{"seq": 31, "step": "status.running", "at": 1789491179.366, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 32, "step": "changes.detected", "at": 1789491481.325, "attempt": 1, "data": {"luot": 1, "files": ["ledgerlock/ledger.py", "tests/test_conflict.py"], "count": 2}, "undo": {}}
+{"seq": 33, "step": "candidate.frozen", "at": 1789491481.326, "attempt": 1, "data": {"luot": 1, "sha": "32d57071ad6e9ce7065849ddf386043be673764a", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 34, "step": "verification.completed", "at": 1789491851.555, "attempt": 1, "data": {"ok": true, "attempts": 1, "cost_usd": 1.9729}, "undo": {}}
+{"seq": 35, "step": "review.completed", "at": 1789491851.556, "attempt": 1, "data": {"blocked": [], "outcome": "PASS", "review_executions": 1, "developer_attempts": 1}, "undo": {}}
+{"seq": 36, "step": "attempt.aborted", "at": 1789491851.56, "attempt": 1, "data": {"reason": "abnormal termination"}, "undo": {}}
+{"seq": 37, "step": "merge.completed", "at": 1789492046.209, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 38, "step": "attempt.committed", "at": 1789492046.368, "attempt": 1, "data": {}, "undo": {}}

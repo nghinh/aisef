@@ -1,0 +1,79 @@
+{
+ "version": "1.7.4",
+ "tag": "v1.7.4",
+ "release_source_sha": "9dcd402d9e922ba4d5541f9f4cb85078b902168c",
+ "product_digest": {
+  "9dcd402": "ace201236f34b5497a4e30ddb8ff1f7f05742b541b3785625cbde306a7d17c06",
+  "rule": "aisef.control.planes.identity over PRODUCT_AFFECTING paths (docs/closure-gate.json#planes), 111 files, [] unresolved"
+ },
+ "rejected_candidates": [],
+ "ci": {
+  "run_id": "34994305762",
+  "event": "pull_request (PR #3, release/1.7.4 -> master)",
+  "head_sha": "9dcd402d9e922ba4d5541f9f4cb85078b902168c",
+  "jobs": {
+   "lint": "success",
+   "wheel": "success",
+   "unit (ubuntu-latest, 3.13)": "success",
+   "unit (windows-latest, 3.11)": "success — Ran 3163 tests in 1225.771s, OK (skipped=84)",
+   "unit (ubuntu-latest, 3.11)": "success",
+   "unit (ubuntu-latest, 3.14)": "success",
+   "unit (ubuntu-latest, 3.12)": "success"
+  }
+ },
+ "windows_regression": {
+  "job": "unit (windows-latest, 3.11)",
+  "result": "green",
+  "tests_collected": 3163,
+  "note": "3150 on 1.7.3 (cfee273); 3163 here = +12 tests of tests/test_run2_review_recovery.py (D-032 regression, 6 tests + 2 subtests red on master before the fix) + 1 test_release_identity::test_docs_can_be_frozen_from_a_later_documentation_commit (bundle --docs, commit 3ae0e3b, after the 1.7.3 tag); no test removed (git diff cfee273..9dcd402 -- tests/: 13 added, 0 removed)"
+ },
+ "full_suite_local": {
+  "commit": "9dcd402",
+  "command": "python3 -m pytest tests/ -q",
+  "result": "3147 passed, 19 skipped, 1409 subtests passed",
+  "ruff": "All checks passed"
+ },
+ "d032_regression": {
+  "file": "tests/test_run2_review_recovery.py",
+  "red_before_on_master": "8 failed (6 tests + 2 subtests), 6 controls passed — measured on a pre-fix master worktree with the final test file",
+  "green_after": "12 passed (2 subtests)",
+  "adapted_expectations": [
+   "tests/test_candidate.py::TestReviewerDoiUngVien (reviewer commit → REVIEW_UNRUNNABLE, worktree restored to the candidate)",
+   "tests/test_implement.py::TestNguoiRaSoatKhongDuocSuaCay (reviewer tree edit → REVIEW_UNRUNNABLE)"
+  ]
+ },
+ "dogfood_suite": {
+  "file": "tests/test_dogfood_ledgerlock.py",
+  "result": "30 passed"
+ },
+ "verification_image": {
+  "name": "aisef-verify-python:b2c7afff2aed",
+  "image_id": "sha256:e456ae8a7c729d1e02567995b138d485a4859a9cd878ea53c5b41ebacb4222c4",
+  "note": "unchanged since 1.7.3 (no PRODUCT change touches aisef/harness/verify_image.py)"
+ },
+ "public_package_qualification": {
+  "installed_from": "public PyPI, fresh venv outside the checkout (pip install --no-cache-dir aisef==1.7.4)",
+  "version_reported": "aisef 1.7.4",
+  "module_path": "<venv>/lib/python3.14/site-packages/aisef/__init__.py",
+  "artifact_digests_match_pypi": true,
+  "doctor": "✅ ready — both declared tools present in aisef-verify-python:b2c7afff2aed (pytest 9.1.1, ruff 0.16.7 probed in the image; image_id sha256:e456ae8a7c72…)",
+  "tool_test_in_sandbox": "1 passed",
+  "dogfood_suite_against_installed_package": "Ran 30 tests in 3.216s",
+  "d032_regression_against_installed_package": "Ran 12 tests in 3.639s",
+  "log": "closure-evidence/releases/1.7.4.qualification.log (verbatim output of the fresh-venv qualification script)"
+ },
+ "recorded_at": "2026-09-15T17:09:08+00:00",
+ "ci_master_push": {
+  "run_id": "34996611648",
+  "event": "push (master fast-forwarded to 9dcd402)",
+  "jobs": {
+   "wheel": "success",
+   "unit (ubuntu-latest, 3.14)": "success",
+   "lint": "success",
+   "unit (ubuntu-latest, 3.12)": "success",
+   "unit (ubuntu-latest, 3.13)": "success",
+   "unit (ubuntu-latest, 3.11)": "success",
+   "unit (windows-latest, 3.11)": "success — Ran 3163 tests in 1541.629s, OK (skipped=84)"
+  }
+ }
+}

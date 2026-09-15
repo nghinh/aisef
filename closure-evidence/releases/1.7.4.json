@@ -1,0 +1,94 @@
+{
+ "artifacts": {
+  "sdist": {
+   "filename": "aisef-1.7.4.tar.gz",
+   "sha256": "163ffa28e7e986959913755757a06bc0029679d24d4c2890dc3322d4e40b75ae",
+   "size": 995813,
+   "upload_time": "2026-09-15T16:44:16.331515Z",
+   "url": "https://files.pythonhosted.org/packages/92/78/7377ec88e1dc2f8bebebcbc9b8e5d420c8bd39bf57842071e8edd77e9932/aisef-1.7.4.tar.gz"
+  },
+  "wheel": {
+   "filename": "aisef-1.7.4-py3-none-any.whl",
+   "sha256": "200928a2eb8bc8abe8a5a0fe2704c053379e2f699ece92818872995e58ec5950",
+   "size": 610172,
+   "upload_time": "2026-09-15T16:44:14.515167Z",
+   "url": "https://files.pythonhosted.org/packages/c6/fa/2981eddf0f3d86052b5ead2eddc7f7e30e7579578dbc2be458614d816f17/aisef-1.7.4-py3-none-any.whl"
+  }
+ },
+ "observed": {
+  "sdist": {
+   "matches_published": true,
+   "members_checked": 218,
+   "mismatched": [],
+   "sha256": "163ffa28e7e986959913755757a06bc0029679d24d4c2890dc3322d4e40b75ae",
+   "size": 995813,
+   "unmapped": [],
+   "url": "https://files.pythonhosted.org/packages/92/78/7377ec88e1dc2f8bebebcbc9b8e5d420c8bd39bf57842071e8edd77e9932/aisef-1.7.4.tar.gz"
+  },
+  "wheel": {
+   "matches_published": true,
+   "members_checked": 110,
+   "mismatched": [],
+   "sha256": "200928a2eb8bc8abe8a5a0fe2704c053379e2f699ece92818872995e58ec5950",
+   "size": 610172,
+   "unmapped": [],
+   "url": "https://files.pythonhosted.org/packages/c6/fa/2981eddf0f3d86052b5ead2eddc7f7e30e7579578dbc2be458614d816f17/aisef-1.7.4-py3-none-any.whl"
+  }
+ },
+ "product": {
+  "digest": "ace201236f34b5497a4e30ddb8ff1f7f05742b541b3785625cbde306a7d17c06",
+  "files": 111,
+  "parts": {
+   "build_config": "c09aea41d86bef9844165ee3ebfb8907d81f6b3f138be396fa126b14fa6b0d93",
+   "package_data": "2ee6f395b89217409076d36e944abf06d3cd3a7294bbb648498664d9e4c010f6",
+   "runtime_source": "4f68bd3e748b93579007a2d8b34d095aaee0747ed63e07b424e8fcfff02b0d80"
+  },
+  "rev": "9dcd402d9e922ba4d5541f9f4cb85078b902168c",
+  "unresolved": []
+ },
+ "product_not_shipped": [],
+ "readme_blob_at_release": "4d4e765c4fe3e869b7d0cf6ba4ea995e2c9c729f",
+ "recorded_at": "2026-09-15T17:08:51+00:00",
+ "recorded_at_commit": "cc9399ee97c3ea965b485c45476f7191e451a0f4",
+ "release_run": {
+  "conclusion": "success",
+  "created_at": "2026-09-15T16:41:53Z",
+  "id": "34996625553"
+ },
+ "release_source_sha": "9dcd402d9e922ba4d5541f9f4cb85078b902168c",
+ "schema_version": 1,
+ "tag": "v1.7.4",
+ "tooling": {
+  "built_by": "github release workflow (trusted publishing)",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "recorder_python": "3.14.7"
+ },
+ "version": "1.7.4",
+ "qualification": {
+  "record": "closure-evidence/releases/1.7.4.qualification.json",
+  "ci_run": "34994305762",
+  "ci_head_sha": "9dcd402d9e922ba4d5541f9f4cb85078b902168c",
+  "windows_regression": "green — success — Ran 3163 tests in 1225.771s, OK (skipped=84)",
+  "full_suite": "3147 passed, 19 skipped, 1409 subtests passed",
+  "lint": "All checks passed",
+  "dogfood_suite": "30 passed",
+  "d032_regression": "12 passed (red on master before the fix: 8)",
+  "verification_image": {
+   "name": "aisef-verify-python:b2c7afff2aed",
+   "image_id": "sha256:e456ae8a7c729d1e02567995b138d485a4859a9cd878ea53c5b41ebacb4222c4",
+   "note": "unchanged since 1.7.3 (no PRODUCT change touches aisef/harness/verify_image.py)"
+  },
+  "public_package_qualification": {
+   "installed_from": "public PyPI, fresh venv outside the checkout (pip install --no-cache-dir aisef==1.7.4)",
+   "version_reported": "aisef 1.7.4",
+   "module_path": "<venv>/lib/python3.14/site-packages/aisef/__init__.py",
+   "artifact_digests_match_pypi": true,
+   "doctor": "✅ ready — both declared tools present in aisef-verify-python:b2c7afff2aed (pytest 9.1.1, ruff 0.16.7 probed in the image; image_id sha256:e456ae8a7c72…)",
+   "tool_test_in_sandbox": "1 passed",
+   "dogfood_suite_against_installed_package": "Ran 30 tests in 3.216s",
+   "d032_regression_against_installed_package": "Ran 12 tests in 3.639s",
+   "log": "closure-evidence/releases/1.7.4.qualification.log (verbatim output of the fresh-venv qualification script)"
+  },
+  "rejected_candidate": null
+ }
+}

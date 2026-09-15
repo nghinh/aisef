@@ -1,0 +1,50 @@
+{
+ "what": "LedgerLock Run #2 replay on public aisef==1.7.4 — owner's post-release confirmation for D-032",
+ "state_source": "COPY of the preserved Run #2 state (ledgerlock-aiseftest-run2.zip, read-only extract), never the original; fresh venv with aisef==1.7.4 from public PyPI (wheel sha256 200928a2…)",
+ "preserved_failure_state": {
+  "story": "STORY-01-06",
+  "candidate": "eed6f87a",
+  "status_before": "failed — '2 sessions in a row ran clean and wrote nothing' (1.7.3)",
+  "evidence_before": "gate:verdict at eed6f87a failures=['review']; review tool_run findings=['review could not run: max_turns: stopped at 40 turns (cap 40)']; 1 review agent_run at eed6f87a"
+ },
+ "step1": {
+  "command": "aisef run --verify-only --story STORY-01-06",
+  "candidate": "eed6f87a (unchanged)",
+  "deterministic_checks": "test, lint, test:nop, qa:fake-tests, security KEPT (reuse) — all green",
+  "review": "NOT reused (incomplete 1.7.3 record) → re-run on the same candidate: reviewer completed, 12 turns, $1.13 → genuine BLOCK (1 finding: ledgerlock/ledger.py:21 append unpacks 5-tuples only; the delete shape raises ValueError)",
+  "evidence": "tool_run review at eed6f87a: outcome=BLOCK, review_attempt=2; journal review.completed: outcome=BLOCK, review_executions=1, developer_attempts=0",
+  "developer_sessions": 0,
+  "noop_loop": false,
+  "verify_only_gate": "✗ review (genuine block) plus ✗ guard ran / no baseline regression / TDD / tests verify story — pre-existing R13 properties of a verify-only pass on this preserved state (no developer session in a verify-only run; the forced resume in Run #2 re-ran the baseline after the last test run at the candidate), not part of D-032; recorded as an observation, not fixed (owner scope)",
+  "exit": 2
+ },
+ "step2": {
+  "command": "aisef run --epic EPIC-01",
+  "worktree": "refresh merged the copy's master 28b7162 (operator's evidence-only commit, made after the fork) into the story branch → 3c10587; candidate lineage eed6f87a → 3c10587 → 32d57071",
+  "flow": "genuine BLOCK returned to the developer: developer session 34 turns $1.97 wrote the fix (changed_files=2) → candidate 32d57071 → nop red at parent → test PASS → lint PASS → review PASS (19 turns, $1.41) → security PASS (12 turns, $0.78) → gate PASSED → STORY-01-06 DONE",
+  "merge": "first merge attempt refused ('candidate changed or missing; re-verification required') because the story worktree carried untracked generated client config (.opencode/, .claude/settings.json) from an `aisef compile` this replay had run — a deviation from the preserved state (Run #2 had no compiled plugin); reverted the deviation (tracked .claude/skills restored from git), no product change",
+  "exit": 2
+ },
+ "step3": {
+  "command": "aisef run --epic EPIC-01",
+  "result": "STORY-01-06 merged; the copy's master fast-forwarded 28b7162 → 32d5707; EPIC-01 6/6 done",
+  "exit": 0
+ },
+ "step4": {
+  "command": "aisef run (remaining epics)",
+  "result": "launched detached at 17:08Z on 2026-09-16 per owner ('allow the preserved Run #2 project to continue remaining stories'); state at report time is in the final report; log <scratch>/replay174/step4-run-all.log"
+ },
+ "confirmation": {
+  "eed6f87a_deterministic_checks_pass": true,
+  "reviewer_reran_on_same_candidate": true,
+  "developer_noop_loop": false,
+  "story_01_06_final": "genuine BLOCK on eed6f87a (step 1) → developer fix → PASS on 32d57071 (step 2) → merged (step 3)",
+  "never_observed": "'2 sessions in a row ran clean and wrote nothing'"
+ },
+ "observations_out_of_scope": [
+  "verify-only pass on a preserved candidate reports ✗ guard ran / no baseline regression / TDD / tests verify story when the baseline was re-run after the last test run at the candidate and no session wrote in the verify-only pass (R13, pre-1.7.4 behaviour) — P3 backlog candidate, not investigated (owner scope)",
+  "merge_story refuses with 'candidate changed or missing; re-verification required' when the story worktree holds untracked generated client config (.opencode/, .claude/settings.json) — message names the wrong cause; a project that does not ignore the generated config cannot merge — P2/P3 backlog candidate, not investigated (owner scope)",
+  "the copy's master carried the operator's evidence-only commit made after the story fork, so a plain resume merges it into the story branch and the candidate SHA moves by design (worktree.refresh); the exact-SHA confirmation therefore used --verify-only first"
+ ],
+ "recorded_at": "2026-09-15T17:10:37+00:00"
+}

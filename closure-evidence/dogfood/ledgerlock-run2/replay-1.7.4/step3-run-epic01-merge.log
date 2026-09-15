@@ -1,0 +1,16 @@
+== aisef run --epic EPIC-01 (merge STORY-01-06) start 17:07:23Z story branch 32d5707 master 28b7162
+⚠️  guards are not compiled for `claude` — nothing blocks a write at the source in this run, and the story gate will record `guard ran` as not applicable.
+   Compile them first:  aisef compile --client claude
+EPIC-01 · wave 1
+  ○ STORY-01-01: already done, skipped
+EPIC-01 · wave 2
+  ○ STORY-01-02: already done, skipped
+EPIC-01 · wave 3
+  ○ STORY-01-03: already done, skipped
+EPIC-01 · wave 4
+  ○ STORY-01-04: already done, skipped
+EPIC-01 · wave 5
+  ○ STORY-01-05: already done, skipped
+EPIC-01 · wave 6
+exit 0 (end 17:07:26Z)
+== master now 32d5707

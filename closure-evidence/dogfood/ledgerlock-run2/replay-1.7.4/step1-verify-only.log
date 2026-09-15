@@ -1,0 +1,60 @@
+== doctor (aisef 1.7.4)
+  ✅ no offensive skills — clean
+
+✅ ready
+== HEAD story branch eed6f87 master 28b7162
+== aisef run --verify-only --story STORY-01-06  (start 16:45:58Z)
+EPIC-01 · wave 1
+STORY-01-06: NOT DONE
+  [re-verify] gate failed
+  candidate eed6f87: reran review · kept test:nop, test, lint, qa:fake-tests, security
+    ✅ evidence matches candidate
+    ✗ guard ran — guard did not evaluate any write in this session — hook cannot reach worktree? (.claude/ not committed, or --settings not passed). A story that writes nothing also lands here, and that is correct.
+    ✅ test
+    ✗ no baseline regression — no test run at candidate after baseline — cannot compare
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✗ TDD — tests green on first run — not proven to verify anything (tests/test_conflict.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.
+    ✗ tests verify story — no test run at candidate — cannot determine which tests are green to compare with parent SHA
+    ✅ security
+    ✗ review — 1 blocking items: [block] ledgerlock/ledger.py:21 — append unpacks 5-tuples only, so the contract's delete shape append(("delete", k, rid, ts)) raises ValueError: not enough values to unpack; the only working tombstone
+    ✅ preservation — 5 behaviours of other stories still green
+  ✗ re-verify candidate eed6f87 did not pass gate: guard ran; no baseline regression; TDD; tests verify story; review
+
+⏸ stopped at EPIC-01 · wave 1
+exit 2 (end 16:49:24Z)
+== run.log tail
+[2026-09-15 21:31:14] story=STORY-01-06#1 agent DONE ok=True $0.00 turns=17 out_tokens=1251 err=
+[2026-09-15 21:31:14] story=STORY-01-06#1 NO-OP: 17 turns, 0 files written
+[2026-09-15 21:31:14] story=STORY-01-06 attempt=1 INFRA $0.00 err=the session wrote nothing (17 turns) — the tree is exactly as the session found  budget=2
+[2026-09-15 21:31:14] story=STORY-01-06 attempt=1 START
+[2026-09-15 21:31:14] story=STORY-01-06#1 agent START timeout=1800s scope=ledgerlock/ledger.py,tests/test_conflict.py,pyproject.toml,tests,test,poetry.lock,uv.lock,pdm.lock
+[2026-09-15 21:31:47] story=STORY-01-06#1 agent DONE ok=True $0.00 turns=15 out_tokens=1363 err=
+[2026-09-15 21:31:47] story=STORY-01-06#1 NO-OP: 15 turns, 0 files written
+[2026-09-15 21:31:47] story=STORY-01-06 BLOCKED 2 no-op sessions in a row
+[2026-09-15 21:31:47] wave=EPIC-01/w6 DONE 0/1 passed $0.00
+[2026-09-15 21:31:48] epic=EPIC-01 STOPPED at=EPIC-01 · wave 6
+[2026-09-15 21:31:48] sprint DONE $0.00 stopped=EPIC-01 · wave 6
+[2026-09-15 23:45:59] wave=EPIC-01/w1 START stories=STORY-01-06
+[2026-09-15 23:46:00] story=STORY-01-06#3 verify START sha=eed6f87a
+[2026-09-15 23:46:00] story=STORY-01-06#3 test:nop KEPT (reuse)
+[2026-09-15 23:46:00] story=STORY-01-06#3 test KEPT (reuse)
+[2026-09-15 23:46:00] story=STORY-01-06#3 lint KEPT (reuse)
+[2026-09-15 23:46:00] story=STORY-01-06#3 qa:fake-tests KEPT (reuse)
+[2026-09-15 23:46:00] story=STORY-01-06#3 review START changed=2
+[2026-09-15 23:46:00] story=STORY-01-06#3 review agent START prompt=28996ch
+[2026-09-15 23:49:24] story=STORY-01-06#3 review agent DONE ok=True $1.13 turns=12
+[2026-09-15 23:49:24] story=STORY-01-06#3 review FAIL blocking=1
+[2026-09-15 23:49:24] story=STORY-01-06#3 review ✗ [block] ledgerlock/ledger.py:21 — append unpacks 5-tuples only, so the contract's delete shape append(("delete", k, rid, ts)) raises ValueError: not enough values to
+[2026-09-15 23:49:24] story=STORY-01-06#3 security KEPT (reuse)
+[2026-09-15 23:49:24] story=STORY-01-06#3 gate FAILED: guard ran,no baseline regression,TDD,tests verify story,review
+[2026-09-15 23:49:24] story=STORY-01-06#3 gate ✗ guard ran · failed · guard did not evaluate any write in this session — hook cannot reach worktree? (.claude/ not committed, or --settings not passed). A story that 
+[2026-09-15 23:49:24] story=STORY-01-06#3 gate ✗ no baseline regression · failed · no test run at candidate after baseline — cannot compare
+[2026-09-15 23:49:24] story=STORY-01-06#3 gate ✗ TDD · failed · tests green on first run — not proven to verify anything (tests/test_conflict.py). Write tests first, run them through the recorded tool, see them fai
+[2026-09-15 23:49:24] story=STORY-01-06#3 gate ✗ tests verify story · failed · no test run at candidate — cannot determine which tests are green to compare with parent SHA
+[2026-09-15 23:49:24] story=STORY-01-06#3 gate ✗ review · failed · 1 blocking items: [block] ledgerlock/ledger.py:21 — append unpacks 5-tuples only, so the contract's delete shape append(("delete", k, rid, ts)) rai
+[2026-09-15 23:49:24] wave=EPIC-01/w1 DONE 0/1 passed $0.00
