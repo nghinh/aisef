@@ -59,7 +59,7 @@ whose `claimed_by` is a dead process on this host is reported as `ORPHANED`;
 the read model changes nothing on disk — the next `aisef run` reconciles, as
 before, and the guide now says so.
 
-Regression coverage: `tests/test_dogfood_ledgerlock.py` (26 tests), plus
+Regression coverage: `tests/test_dogfood_ledgerlock.py` (30 tests), plus
 existing tests updated where they scripted a text-only reviewer.
 
 ## 1.7.2 — 2026-09-15
