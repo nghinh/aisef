@@ -243,9 +243,10 @@ of stopping the session.
 
 ## Real bugs already hit
 
-185 bugs found by measurement on real agents, grouped into eleven cause
+186 bugs found by measurement on real agents, grouped into eleven cause
 classes with a regression check each (179–185 came from the first dogfood run
-of the public 1.7.2 package and are fixed in 1.7.3): `docs/FAILURE-TAXONOMY.md`. A new bug adds
+of the public 1.7.2 package and are fixed in 1.7.3; 186 came from the second
+run, on 1.7.3, and is open): `docs/FAILURE-TAXONOMY.md`. A new bug adds
 a line there in the same commit as its test. Changes per version, and what to do
 when upgrading: `CHANGELOG.md`.
 

@@ -1,0 +1,31 @@
+{
+ "id": "F-A",
+ "observed_at": "2026-09-15T21:25:15+07:00",
+ "aisef_version": "aisef 1.7.3 (evidence/00-env.txt of the package; public PyPI wheel 97cd7a0f…)",
+ "client": "opencode via the harness adapter; model not recorded in the evidence (cost $0.00 throughout) -> unknown",
+ "package": "ledgerlock-aiseftest-run2.zip (received 2026-09-15): _bmad-output/run.log (400 lines), journal/, evidence/, reviews/, sprint-status.json, .ai/config.json, evidence/00-env.txt…07-run.log",
+ "project_commit": "LedgerLock run2; STORY-01-06 candidates b75c0b2126e44ef3ad693f1fe54ab868515e5182 (attempt 1) and eed6f87afc51022fc8dbdec185609922f5fbda68 (attempt 2)",
+ "investigation_scope": "bounded by the owner to Findings A and B under the 1.7.3 stabilization freeze; nothing else in the package was audited",
+ "reproduction": [
+  "Deterministic, no OpenCode: `python3 -m pytest tests/test_run2_review_recovery.py -v` on 1.7.3 — `test_review_execution_failure_retries_the_reviewer_on_the_same_candidate` and `test_persistent_review_failure_ends_as_review_unrunnable_not_as_a_developer_noop` are RED with calls = ['develop', 'review', 'security', 'security', 'develop', 'develop'] and blocked_reason '2 sessions in a row ran clean and wrote nothing…'; the three controls (genuine [block] returns to the developer; deterministic lint failure returns to the developer; review sessions bounded) are GREEN.",
+  "From the package: run.log lines 340–376 (attempt 2 candidate eed6f87a: nop red at parent, test PASS, lint PASS, `review agent DONE ok=False turns=40`, `review ✗ review could not run: max_turns: stopped at 40 turns (cap 40)`, security PASS, `gate FAILED: review`, attempt 3 developer NO-OP 32 turns, attempt 3 developer NO-OP 27 turns, `BLOCKED 2 no-op sessions in a row`) and 387–400 (forced resume: two more NO-OP developer sessions, BLOCKED again)."
+ ],
+ "gate_or_evidence": "gate check `review` (aisef/control/gate.py: a review tool_run with ok=False is '1 blocking items'); aisef/phases/implement.py review_story_v2 (`return [f\"review could not run: {result.error}\"], None`), run_attempt no-op detection (`head_sha in cham_roi` → attempt.noop/infra), implement_story loop (`_noop_lien_tiep >= MAX_NOOP` → terminal); journal/STORY-01-06.jsonl review.completed {'blocked': ['review could not run: …']}",
+ "observed": "The reviewer's execution failure (max_turns, no verdict) was recorded as a blocking review finding on candidate eed6f87a; the gate scored `review` FAILED; the loop opened a developer session (not a review retry) against a candidate with nothing left to fix; the developer correctly wrote nothing; the tree already carried a gate:verdict so the session was classified NO-OP; after two no-ops the story was terminal: '2 sessions in a row ran clean and wrote nothing … read the last gate verdict and fix what it asks for'. A forced resume repeated it (two more no-ops, blocked). Even `aisef run --verify-only` (R13) would keep the failed review: verify_candidate keeps existing review evidence whenever a review agent_run exists at that candidate, regardless of ok.",
+ "expected": "docs/USAGE-GUIDE.md and the gate's own vocabulary: a check that could not run is UNRUNNABLE, not a verdict about the code (D-029 made this explicit for tools). For the model-judged review: retain the candidate, retry the REVIEW stage within a bound, and end in PASS, a genuine structured BLOCK, or an explicit REVIEW_UNRUNNABLE. A reviewer execution failure must not require a developer change; a correct developer no-op after it must not make the story terminal.",
+ "root_cause": "Two rules for one truth (taxonomy class E/J): `review could not run` is stored in the same slot as a reviewer's blocking findings, so the gate and the retry loop cannot tell 'the reviewer said no' from 'the reviewer did not run'. The loop has exactly one recovery move — a new developer attempt — and the no-op policy then reads the developer's correct silence as the story's failure.",
+ "hidden_oracle": "not_applicable",
+ "severity": "P1",
+ "severity_note": "'cannot complete the lifecycle without author assistance': a correct candidate (deterministic gates green, security clean) is terminal after one reviewer cut, and re-running reproduces it; the operator's only exits are `--waive-review` (a waiver of a check that never ran) or editing the story. Not P0: no incorrect PASS; the failure direction is closed.",
+ "class": "FRAMEWORK_PRODUCT_DEFECT",
+ "affects_v1_closure": "yes",
+ "requires_product_change": "yes",
+ "evidence": [
+  "run.log:329-376,387-400",
+  "journal/STORY-01-06.jsonl",
+  "reviews/STORY-01-06-review-2.md",
+  "sprint-status.json (STORY-01-06 failed, attempts 2)",
+  "tests/test_run2_review_recovery.py (RED on 1.7.3)"
+ ],
+ "register": "D-032"
+}

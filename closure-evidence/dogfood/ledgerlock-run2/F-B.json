@@ -1,0 +1,30 @@
+{
+ "id": "F-B",
+ "observed_at": "2026-09-15T20:42:24+07:00",
+ "aisef_version": "aisef 1.7.3 (evidence/00-env.txt of the package; public PyPI wheel 97cd7a0f…)",
+ "client": "opencode via the harness adapter; model not recorded in the evidence (cost $0.00 throughout) -> unknown",
+ "package": "ledgerlock-aiseftest-run2.zip (received 2026-09-15): _bmad-output/run.log (400 lines), journal/, evidence/, reviews/, sprint-status.json, .ai/config.json, evidence/00-env.txt…07-run.log",
+ "project_commit": "LedgerLock run2; STORY-01-06 candidates b75c0b2126e44ef3ad693f1fe54ab868515e5182 (attempt 1) and eed6f87afc51022fc8dbdec185609922f5fbda68 (attempt 2)",
+ "investigation_scope": "bounded by the owner to Findings A and B under the 1.7.3 stabilization freeze; nothing else in the package was audited",
+ "reproduction": [
+  "From the exact Run #2 config (.ai/config.json declares tools.test, tools.lint, sandbox.image, sandbox.allow_hosts — no tools.sast): `verify_image.declared_tools(cfg)` → ['tools.test', 'tools.lint']; `command_for('sast', project, cfg)` → 'bandit -q -r .' by stack detection (`_STACK_COMMANDS`, pyproject.toml marker); `aisef/control/gate.py` contains no sast check; the tool is offered to the agent by prompt ('Before committing, when the story touches authentication…').",
+  "run.log: 12 `tool=sast RUN cmd=bandit -q -r .` lines, every one inside a developer session (STORY-01-02#1, 01-03#1, 01-04#1, 01-05#2 …), each `FAIL exit=127 TOOL_UNRUNNABLE unrunnable=tool not installed or cannot load (not found)`; evidence tool_run events for sast: 4, outcome TOOL_UNRUNNABLE in all."
+ ],
+ "gate_or_evidence": "aisef/harness/tools.py command_for (config wins, detection fallback) and TOOLS['sast'] prompt; aisef/harness/verify_image.declared_tools (declared keys only); run.log tool=sast lines; doctor at run start (evidence/01-doctor.txt: image ✅, no sast row)",
+ "observed": "bandit was never declared; the harness auto-detected it as the project's sast command and offered `aisef tool sast` to the developer agent; agents invoked it 12 times; each call was classified TOOL_UNRUNNABLE (correct: bandit is not in the pinned verification image and was never declared for it); no gate consumed sast evidence; no story outcome depended on it.",
+ "expected": "D-028: every DECLARED evidence-producing tool is probed where it runs before story execution — satisfied (test, lint probed, present). An undeclared, auto-detected tool the agent may call is outside D-028's statement. The cost is agent turns spent on a tool the environment does not carry.",
+ "classification": "B — optional / undeclared / agent-initiated. D-028 is not incomplete against its own statement.",
+ "hidden_oracle": "not_applicable",
+ "severity": "P3",
+ "severity_note": "cosmetic/efficiency: correctly labelled UNRUNNABLE, no verdict affected. Backlog observation: doctor could also probe stack-detected defaults the harness offers to the agent, or the harness could stop offering a tool whose resolved command is absent from the declared image. Not changed in 1.7.3 (freeze; not a broadening of the verification image).",
+ "class": "NOT_A_FRAMEWORK_DEFECT",
+ "affects_v1_closure": "no",
+ "requires_product_change": "no",
+ "evidence": [
+  "run.log:101-103,147-149,208-210,277-279",
+  ".ai/config.json",
+  "evidence/01-doctor.txt",
+  "aisef/harness/tools.py (_STACK_COMMANDS, command_for)"
+ ],
+ "register": ""
+}

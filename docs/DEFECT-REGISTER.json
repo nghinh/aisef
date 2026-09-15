@@ -383,6 +383,19 @@
    "fixed": "1.7.3",
    "evidence": "closure-evidence/dogfood/ledgerlock/F-8.json (LedgerLock dogfood 2026-09-15, aisef 1.7.2 from PyPI, OpenCode 1.18.29, Windows 11); regression: tests/test_dogfood_ledgerlock.py (red on 1.7.2, green on 1.7.3)::(latent; no merge reached — reproduce by merging any two of the preserved wave-1 candidates)",
    "notes": "Three wave-1 stories each created conftest.py and pytest.ini with different content (288/287/895 B; 85/84/424 B). Two rules for one truth (taxonomy class J): scopes_conflict sees declared scopes only. Fix is in aisef/control/scheduler.py or the allowance. Fixed in 1.7.3: aisef/control/normalize.py (bootstrap_grants), aisef/phases/run.py (_effective_waves)."
+  },
+  {
+   "id": "D-032",
+   "severity": "P1",
+   "status": "OPEN",
+   "taxonomy": 186,
+   "false_pass": false,
+   "check": "review",
+   "title": "review execution failure scored as a review verdict: story re-enters the developer stage and dies by the no-op policy",
+   "introduced": "review_story_v2 'review could not run' finding (1.4.x) + no-op policy MAX_NOOP (1.6.x, lỗi 127); first observed on public 1.7.3",
+   "fixed": "",
+   "evidence": "closure-evidence/dogfood/ledgerlock-run2/F-A.json (LedgerLock Run #2, 2026-09-15, aisef 1.7.3 from PyPI, STORY-01-06 candidate eed6f87a); regression tests/test_run2_review_recovery.py — 2 RED on 1.7.3 (review execution failure retries the reviewer on the same candidate; persistent review failure ends as REVIEW_UNRUNNABLE not as a developer no-op), 3 controls GREEN (genuine block returns to the developer; deterministic lint failure returns to the developer; review sessions bounded).",
+   "notes": "Deterministic gates green, security clean, reviewer cut at max_turns with no verdict → 'review could not run' stored as a blocking review finding → gate FAILED review → the loop's only recovery is a new developer attempt → the developer correctly writes nothing → the tree already carries a gate:verdict → NO-OP → after two, terminal. A forced resume repeats it. Two rules for one truth: 'the reviewer said no' and 'the reviewer did not run' share one slot. Required semantics (owner, 2026-09-15): retain the candidate, bounded REVIEW retry, end in PASS / structured BLOCK / explicit REVIEW_UNRUNNABLE. Not fixed: 1.7.3 stabilization freeze reopened by this P1; fix is a product change in aisef/phases/implement.py (and the gate's review outcome vocabulary)."
   }
  ]
 }
