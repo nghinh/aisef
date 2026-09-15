@@ -88,6 +88,13 @@ class Attempt:
     cost_usd: float = 0.0
     gate: story_gate.StoryGate | None = None
     review_findings: list[str] = field(default_factory=list)
+    #: Stuck items from the reviewer's **machine-readable** verdict only.
+    #: A terminal plan deadlock rests on this list, never on `review_findings`:
+    #: the text parser splits a tag out of running prose, and on LedgerLock
+    #: STORY-01-03 (2026-09-15, lỗi 180 / D-026) the sentence "So [stuck]
+    #: doesn't apply." — a reviewer *rejecting* the tag — became the story's
+    #: terminal verdict while its JSON said `block` with three real findings.
+    plan_findings: list[str] = field(default_factory=list)
     security: SecurityReport | None = None
     #: Frozen candidate SHA -- all evidence from this attempt points to it.
     candidate: str = ""
@@ -1098,8 +1105,9 @@ def verify_candidate(
     review_ev = _at(ev, TOOL_RUN, "review", sha) if reuse else None
     if keep("review", bool(review_ev and _at(ev, AGENT_RUN, f"{sid}-review", sha))):
         attempt.review_findings = list(review_ev.detail.get("findings") or [])
+        attempt.plan_findings = list(review_ev.detail.get("plan") or [])
     else:
-        attempt.review_findings = review_story(
+        attempt.review_findings, verdict = review_story_v2(
             story,
             workdir=workdir,
             base_ref=base_ref,
@@ -1113,6 +1121,7 @@ def verify_candidate(
             candidate=sha,
             preservation=preservation,
         )
+        attempt.plan_findings = structured_plan_defects(verdict)
         # Blocking items must live in evidence, not just in the truncated
         # summary printed to screen -- when checking whether this attempt and
         # the previous were blocked for the same reason, the full text must
@@ -1123,7 +1132,8 @@ def verify_candidate(
             sid,
             "review",
             ok=not attempt.review_findings,
-            detail={"findings": attempt.review_findings, "attempt": number},
+            detail={"findings": attempt.review_findings, "plan": attempt.plan_findings,
+                    "attempt": number},
         )
         n_blocking = len(attempt.review_findings)
         _log(f"story={sid}#{number} review {'PASS' if not n_blocking else f'FAIL blocking={n_blocking}'}")
@@ -2118,9 +2128,23 @@ def blocking_findings(text: str) -> list[str]:
     return [x for x in out if _la_muc_that(x)]
 
 
-def plan_defects(findings: list[str]) -> list[str]:
-    """Items the reviewer marked as stuck due to the plan, not the code."""
-    return [f for f in findings if f.strip().lower().startswith(_STUCK_TAGS)]
+def structured_plan_defects(verdict: "Verdict | None") -> list[str]:
+    """Stuck items the reviewer declared in the **JSON verdict** — the only
+    evidence a terminal plan deadlock may rest on.
+
+    Text is still read for blocking (`blocking_findings`, unioned in
+    `_reconcile`), but a `[stuck]` that appears only in prose blocks the
+    attempt and nothing more: prose is where a reviewer thinks aloud, and
+    "So [stuck] doesn't apply." is a rejection of the tag, not a verdict
+    (LedgerLock STORY-01-03 2026-09-15, lỗi 180 / D-026). No JSON after the
+    schema reminder means the structured output is malformed: fail closed
+    (the text items still block), never terminal. A JSON verdict of `stuck`
+    with no items keeps `Verdict.blocking()`'s synthesised line — the
+    reviewer did conclude it, in the field the gate reads.
+    """
+    if verdict is None:
+        return []
+    return [x for x in verdict.blocking() if x.lower().startswith("[stuck]")]
 
 
 # --- Machine-readable review verdicts (ADR-004 R8) ----------------------------
@@ -2748,7 +2772,7 @@ def implement_story(
                 time.sleep(cho)
             continue
 
-        loi_ke_hoach = plan_defects(attempt.review_findings)
+        loi_ke_hoach = attempt.plan_findings
         if loi_ke_hoach:
             outcome.blocked_reason = (
                 "deadlock due to plan, reviewer verified: "

@@ -447,12 +447,27 @@ class TestRetry(ImplementTestCase):
         """
         c = ScriptedClient(review=(
             "[bế tắc] TCCN 1 — cần chỉ mục trên `updatedAt` trong "
-            "`src/store/db.ts`, ngoài write_scope. Đã kiểm chứng: đúng."
+            "`src/store/db.ts`, ngoài write_scope. Đã kiểm chứng: đúng.\n\n"
+            '```json\n{"verdict": "stuck", "findings": [{"tag": "stuck", '
+            '"file": "src/store/db.ts", "why": "TCCN 1 cần chỉ mục trên updatedAt, '
+            'ngoài write_scope"}]}\n```\n'
         ))
         out = self.implement(c, config=self.config(**{"run.max_retries": 5}))
         self.assertEqual(out.quality_attempts, 1, "phải dừng ngay lượt đầu")
         self.assertIn("deadlock due to plan", out.blocked_reason)
         self.assertIn("src/store/db.ts", out.blocked_reason)
+
+    def test_be_tac_chi_trong_van_xuoi_thi_chan_nhung_khong_ket_thuc(self):
+        """D-026 (LedgerLock 2026-09-15): `[stuck]` trong văn xuôi — kể cả câu
+        *phủ định* thẻ — không được tự nó kết thúc story. Không có JSON là
+        đầu ra có cấu trúc hỏng: chặn (fail-closed), thử lại, không terminal."""
+        c = ScriptedClient(review=(
+            "The file IS there. So [stuck] doesn't apply.\n"
+            "[bế tắc] TCCN 1 — cần chỉ mục trong `src/store/db.ts`, ngoài write_scope."
+        ))
+        out = self.implement(c, config=self.config(**{"run.max_retries": 2}))
+        self.assertNotIn("deadlock due to plan", out.blocked_reason)
+        self.assertGreater(out.quality_attempts, 1, "văn xuôi chặn lượt, không kết thúc story")
 
     def test_muc_chan_thuong_van_duoc_thu_lai(self):
         """`[chặn]` là lỗi code — sửa được, nên vẫn thử tiếp."""

@@ -468,9 +468,13 @@ class TestDieuKienDung(ImproveTestCase):
 
     def test_be_tac_ke_hoach_dung_va_tra_nguoi_kem_loi_reviewer(self):
         # Test xanh để tới được lượt rà soát; người rà soát kết luận bế tắc.
+        # D-026: the terminal verdict is the reviewer's **structured** one —
+        # the text alone would block the attempt, not stop the loop.
         c = Fixer(self.artifacts, review=(
             "[bế tắc] TCCN 1 — cần chỉ mục trong src/store/db.ts, ngoài "
-            "write_scope. Đã kiểm chứng: đúng."
+            "write_scope. Đã kiểm chứng: đúng.\n\n"
+            '```json\n{"verdict": "stuck", "findings": [{"tag": "stuck", "file": "src/store/db.ts", '
+            '"why": "TCCN 1 cần chỉ mục trong src/store/db.ts, ngoài write_scope"}]}\n```\n'
         ))
         r = self.improve(c, max_loops=5)
         self.assertEqual(len(r.loops), 1)
@@ -633,7 +637,10 @@ class TestHangDoiSuaTuDong(ImproveTestCase):
         self.assertIn(f"aisef evidence {BEHAVIORS[0]} --link", body)
 
     def test_be_tac_truy_vet_thi_bao_cao_chi_cach_sua_sieu_du_lieu(self):
-        r = self.improve(Fixer(self.artifacts, review=f"[bế tắc] truy vết: {BASE_TEST}"),
+        r = self.improve(Fixer(self.artifacts, review=(
+            f"[bế tắc] truy vết: {BASE_TEST}\n\n"
+            '```json\n{"verdict": "stuck", "findings": [{"tag": "stuck", "file": "", '
+            f'"why": "truy vết: {BASE_TEST}"}}]}}\n```\n')),
                          max_loops=2)
         self.assertEqual(len(r.loops), 1)
         self.assertIn("truy vết", r.loops[0].stuck)
@@ -702,7 +709,10 @@ class TestDinhTuyenTheoLoaiGap(ImproveTestCase):
     def test_be_tac_truy_vet_tieng_anh_cung_duoc_nhan_ra(self):
         """`_body` dặn người rà soát trả `[stuck] trace: <test id>` bằng tiếng Anh,
         còn báo cáo chỉ nhận chữ Việt — lời chỉ đường sửa siêu dữ liệu bị mất."""
-        r = self.improve(Fixer(self.artifacts, review=f"[stuck] trace: {BASE_TEST}"),
+        r = self.improve(Fixer(self.artifacts, review=(
+            f"[stuck] trace: {BASE_TEST}\n\n"
+            '```json\n{"verdict": "stuck", "findings": [{"tag": "stuck", "file": "", '
+            f'"why": "trace: {BASE_TEST}"}}]}}\n```\n')),
                          max_loops=2)
         self.assertEqual(len(r.loops), 1)
         self.assertIn("trace:", r.loops[0].stuck)

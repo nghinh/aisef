@@ -60,7 +60,6 @@ from ..control.state import StateStore, StoryStatus
 from ..control.worktree import GitError, RunOwnedError, WorktreeManager, run_ownership
 from ..harness.guardrails import head_sha
 from ..harness.observe import EvidenceStore
-from .implement import plan_defects
 from .plan import ARTIFACT_ROOT
 from .qa import KINDS as QA_KINDS, run_suite
 from .run import RunReport, load_plan, run_epic
@@ -764,8 +763,9 @@ def _improve_owned(
         # Two independent models both conclude the repair story is wrong from
         # the plan: the next round with the same gap reaches the same conclusion
         # -- return to human with reviewer's note.
-        findings = [f for o in rr.outcomes for a in o.attempts for f in a.review_findings]
-        stuck = plan_defects(findings)
+        # Structured verdicts only (D-026): a `[stuck]` the reviewer wrote in
+        # prose blocks an attempt, it does not send the loop back to a human.
+        stuck = [f for o in rr.outcomes for a in o.attempts for f in a.plan_findings]
         if stuck:
             loop.stuck = next((o.blocked_reason for o in rr.outcomes if o.blocked_reason),
                               "; ".join(stuck))

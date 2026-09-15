@@ -40,30 +40,47 @@ from aisef.phases import implement as I  # noqa: E402
 
 
 class TestStuckMentionIsNotAPlanVerdict(unittest.TestCase):
-    """F-1 — STORY-01-03 was declared "deadlock due to plan, reviewer verified:
-    [stuck] doesn't apply." after ONE attempt and marked terminal ("retrying
-    will not resolve this"). The reviewer's JSON verdict was `block` with three
-    `block` findings and no stuck item; the words came from its reasoning
-    prose — "The file IS there. So [stuck] doesn't apply." — where the tag was
-    not in backticks, so `_TAG_MO_DAU` split it out as an item and `_la_muc_that`
-    exempted `[stuck]` from needing a path. A mention that negates the tag became
-    the story's terminal verdict.
+    """F-2 / D-026 — STORY-01-03 was declared "deadlock due to plan, reviewer
+    verified: [stuck] doesn't apply." after ONE attempt and marked terminal
+    ("retrying will not resolve this"). The reviewer's JSON verdict was `block`
+    with three `block` findings and no stuck item; the words came from its
+    reasoning prose — "The file IS there. So [stuck] doesn't apply." — where
+    the tag was not in backticks, so the text parser split it out as an item
+    and the union with the JSON made it the story's terminal verdict.
+
+    Rule (1.7.3): a terminal plan deadlock rests on the structured verdict
+    only. Prose still blocks (fail closed); it never terminates.
     """
 
-    SENTENCE = "The file IS there. So [stuck] doesn't apply."
+    PROSE = "The file IS there. So [stuck] doesn't apply.\n\n"
+    BLOCK_JSON = ('```json\n{"verdict": "block", "findings": [{"tag": "block", '
+                  '"file": "src/ledgerlock/io.py", "line": 62, "why": "AD-3 mandates fsync"}]}\n```\n')
+    STUCK_JSON = ('```json\n{"verdict": "stuck", "findings": [{"tag": "stuck", "file": "docs/ops.md", '
+                  '"why": "AC-3 needs docs/ops.md, outside write_scope"}]}\n```\n')
 
-    def test_a_negated_prose_mention_of_the_stuck_tag_is_not_an_item(self):
-        self.assertEqual(I.blocking_findings(self.SENTENCE), [])
+    def test_a_prose_stuck_mention_beside_a_structured_block_verdict_is_not_a_plan_deadlock(self):
+        verdict = I.review_verdict(self.PROSE + self.BLOCK_JSON)
+        self.assertEqual(verdict.verdict, "block")
+        self.assertEqual(I.structured_plan_defects(verdict), [])
+        # the text parser may still read the sentence as a blocking item — that
+        # is fail-closed, not terminal
+        self.assertTrue(any(x.startswith("[block]") for x in verdict.blocking()))
 
-    def test_a_stuck_item_that_names_no_criterion_or_path_is_not_a_plan_defect(self):
-        items = I.blocking_findings("- [stuck] doesn't apply.\n")
-        self.assertEqual(I.plan_defects(items), [],
-                         "a stuck verdict must name what cannot be met from inside the story")
+    def test_a_structured_stuck_finding_still_is_a_plan_deadlock(self):
+        got = I.structured_plan_defects(I.review_verdict(self.PROSE + self.STUCK_JSON))
+        self.assertEqual(len(got), 1)
+        self.assertIn("docs/ops.md", got[0])
 
-    def test_a_real_stuck_item_still_counts(self):
-        """Negative control: the shape the prompt asks for keeps working."""
-        text = "- [stuck] AC-STORY-01-03-3 requires writing `docs/ops.md`, which is outside write_scope\n"
-        self.assertEqual(len(I.plan_defects(I.blocking_findings(text))), 1)
+    def test_a_stuck_verdict_without_findings_stays_fail_closed(self):
+        got = I.structured_plan_defects(I.Verdict("stuck", []))
+        self.assertEqual(len(got), 1, "a `stuck` verdict field is structured evidence, even with no items")
+
+    def test_a_prose_only_review_never_terminates_a_story(self):
+        """No JSON after the schema reminder: malformed structured output.
+        The text items block the attempt; nothing here is terminal."""
+        self.assertEqual(I.structured_plan_defects(None), [])
+        self.assertEqual(I.blocking_findings("- [stuck] AC-3 needs `docs/ops.md`, outside write_scope\n"),
+                         ["[stuck] AC-3 needs `docs/ops.md`, outside write_scope"])
 
 
 # ---------------------------------------------------------------- F-2 (B)
