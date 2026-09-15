@@ -224,6 +224,8 @@ chứng: trượt story chứ không giữ được phiên lại.
 
 178 lỗi tìm bằng đo trên agent thật, xếp theo mười một lớp nguyên nhân kèm phép hồi quy: `docs/FAILURE-TAXONOMY.md`. Lỗi mới thì thêm một dòng vào đó cùng commit với test. Thay đổi theo phiên bản, kèm việc phải làm khi nâng cấp: `CHANGELOG.md`.
 
+Khung áp chuẩn ấy lên chính nó. `docs/PROJECT-CLOSURE-GATE.md` là hợp đồng do chủ dự án duyệt để tuyên bố dự án kỹ thuật hoàn tất, và `aisef closure` chấm 27 tiêu chí của nó từ bằng chứng trên đĩa, không gọi model. Trên 1.7.2 đạt 24/27; ba tiêu chí còn mở là xác nhận ngoài bởi một người ngoài dự án — thứ không việc nội bộ nào thay được. Một bản phát hành được nhận diện bằng sản phẩm nó chứa — digest nội dung trên cây của tag và digest wheel/sdist trên PyPI — chứ không bằng commit đang là HEAD, nên ghi bằng chứng về một bản phát hành không làm mất hiệu lực chính bản ấy (D-022, sửa ở 1.7.2).
+
 ## Hợp quy client
 
 Hook và plugin là tạo tác **biên dịch ra** — đúng cú pháp không có nghĩa là

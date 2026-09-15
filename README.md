@@ -248,6 +248,15 @@ classes with a regression check each: `docs/FAILURE-TAXONOMY.md`. A new bug adds
 a line there in the same commit as its test. Changes per version, and what to do
 when upgrading: `CHANGELOG.md`.
 
+The framework applies the same standard to itself. `docs/PROJECT-CLOSURE-GATE.md`
+is the owner-approved contract for calling the engineering project complete, and
+`aisef closure` scores its 27 criteria from evidence on disk without calling a
+model. On 1.7.2 it passes 24 of 27; the three open criteria are external
+validation by a person outside the project, which no amount of internal work can
+satisfy. A release is identified by the product it ships — a content digest over
+the tag's tree and the wheel/sdist digests on PyPI — not by which commit is HEAD,
+so recording evidence about a release does not invalidate it (D-022, fixed in 1.7.2).
+
 ## Client conformance
 
 Hooks and plugins are **compiled artifacts** — being syntactically valid does not

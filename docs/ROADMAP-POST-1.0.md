@@ -26,8 +26,8 @@ Local scoped advisory memory is implemented but default OFF. [P0/P1/P2 research 
 > organisation account, skill scanning, and CLI optimisation. Item **#1
 > (external user validation)** is the exception — it is closure gate **G6**, and
 > the chicken-and-egg argument ADR-006 §2 used to defer it has expired now that
-> v1.0.0–v1.7.1 are published (1.7.0 excepted: tagged, release CI failed, never
-> reached PyPI).
+> v1.0.0–v1.7.2 are published (1.7.0 excepted: tagged, release CI failed, never
+> reached PyPI). 1.7.2 is the release under G6 validation.
 
 Written 2026-09-08, after v1.0.0 release. Items prioritized by evidence
 from dogfood runs, conformance, and known limitations — not by feature wish.

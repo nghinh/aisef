@@ -140,10 +140,13 @@ The package, Python module, and CLI command are all named `aisef`.
 `aisef --version` prints the version; to inspect the whole environment, use
 `aisef doctor`.
 
-This guide describes **1.7.1** (released 2026-09-15; 1.0.0 was 2026-09-08, and
-1.2.x, 1.3.0, 1.3.1, 1.4.0, 1.5.0, 1.6.0 came between). 1.7.0 was tagged but its
-release CI failed, so it never reached PyPI — if you see that number anywhere it
-is not a release. Check what you actually have, and read the number rather than
+This guide describes **1.7.2** (released 2026-09-15; 1.0.0 was 2026-09-08, and
+1.2.x, 1.3.0, 1.3.1, 1.4.0, 1.5.0, 1.6.0, 1.7.1 came between). 1.7.2 changes
+nothing in the CLI or the workflow described here: it corrects the framework's
+own project-closure gate, which identified a release by the repository's HEAD
+commit instead of by the product it ships (`CHANGELOG.md`, D-022). 1.7.0 was
+tagged but its release CI failed, so it never reached PyPI — if you see that
+number anywhere it is not a release. Check what you actually have, and read the number rather than
 assuming:
 
 ```bash
@@ -198,7 +201,7 @@ For contributors who want to modify the framework:
 
 ```bash
 git clone <repo> aisef && cd aisef && pip install -e .
-python3 -m unittest discover -s tests -q     # 2685 tests, OK (skipped=78)
+python3 -m unittest discover -s tests -q     # 3122 tests, OK (skipped=19) — measured 2026-09-15 on 1.7.2
 ```
 
 (A checkout run from a git *worktree* skips about 60 more, because `.gitignore`

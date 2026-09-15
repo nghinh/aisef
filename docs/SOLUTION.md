@@ -458,6 +458,14 @@ aisef closure --report                dựng lại `docs/CLOSURE-REPORT.md` từ
 aisef closure --waive <tiêu chí> --reason "..."   chỉ với tiêu chí `waiver_eligible`; thiếu lý do → 2
 aisef closure --approve [--note ...]  chữ ký của chủ dự án; từ chối khi còn bất kỳ mục nào chặn
 aisef closure --pin [--force]         ghim `contract_sha256` (và bản tiền đăng ký bench) vào tệp tiêu chí
+aisef closure --pin-target [--force]  chốt HEAD làm `closure_target_sha` — commit nguồn của bản phát hành;
+                                      từ chối cây bẩn; `--force` khi đổi ứng viên (ghi vào chuỗi kế thừa)
+python3 validation/record_closure_evidence.py [suite|lint|bench|release|manifest]
+                                      ghi bằng chứng mà bộ chấm chỉ đọc; `manifest` = danh tính phát hành
+                                      lấy từ **tag + PyPI công khai** (tải về, băm lại, so từng thành viên
+                                      wheel/sdist với blob của tag) → closure-evidence/releases/<ver>.json
+python3 validation/make_validation_bundle.py <ver>   bundle bất biến cho G6: hồ sơ định danh nằm NGOÀI thư mục
+                                      được băm, tài liệu công khai đóng băng nguyên văn từ tag, mẫu báo cáo
 
 # Bench (ADR-005 V8) — việc của người phát triển harness, không nối vào `aisef`
 python3 -m tests.bench mine [--e9 DIR]           task lỗi kho → tests/bench/tasks/ (commit); story e9 → .bench/tasks/
@@ -465,6 +473,15 @@ python3 -m tests.bench validate [ID…] [--runs 3] base+test đỏ · base+test+
 python3 -m tests.bench run --client c [--attempts 3] [ID…]   AISEF_BENCH=1; guard như hợp quy, `note mode=bench`
 python3 -m tests.bench report | export ID --out DIR          pass@1/pass@k/ổn định/cost so lịch sử · thư mục Harbor
 ```
+
+Từ 1.7.2, cổng đóng dự án tách hai **mặt phẳng** (`aisef/control/planes.py`, luật ở
+`docs/closure-gate.json#planes`, hợp đồng §0b): mặt phẳng **sản phẩm** (mã runtime, dữ liệu
+gói, cấu hình dựng) có danh tính là digest nội dung trên cây của tag cộng digest wheel/sdist
+trên PyPI; mặt phẳng **bảo đảm** (test, bằng chứng, hồ sơ, tài liệu) được phép đi tiếp sau khi
+công bố. G1.0 so digest sản phẩm giữa commit phát hành và HEAD chứ không so SHA commit, nên
+ghi bằng chứng *về* một bản phát hành không còn làm mất hiệu lực chính bản ấy (lỗi 177, D-022);
+đường dẫn không luật nào phân loại là `UNRESOLVED` và chặn. G6 buộc bản ghi xác nhận ngoài vào
+đúng một release node (version, tag, SHA nguồn, digest artifact, digest bộ hướng dẫn).
 
 `report` chiếu bằng chứng thành **sổ hành vi** (ADR-004 R2): mỗi tiêu chí,
 yêu cầu, loại kiểm định và màn hình là một hành vi có trạng thái
