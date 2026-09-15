@@ -4,6 +4,15 @@
 
 ## 1.7.1 — 2026-09-15
 
+**A pinned path is the same string on every platform.** `aisef closure --pin`
+built its record key with `str(path.relative_to(root))`, which on Windows yields
+`docs\BENCH-PREREGISTRATION-C2.md` and elsewhere `docs/BENCH-PREREGISTRATION-C2.md`
+— one file with two identities in a file that is committed and shared, so a pin
+written on Windows is silently invisible to a probe reading it on Linux. The CLI
+had the same bug in what it printed, disagreeing with the `REPORT_MD` constant it
+echoes. Both now use `as_posix()`.
+
+
 **Two POSIX assumptions in test helpers, found the moment CI could reach them.**
 The full-history fix let the Windows job run tests that had never run there, and
 16 of them failed for exactly two reasons. The closure-gate test helper pinned a

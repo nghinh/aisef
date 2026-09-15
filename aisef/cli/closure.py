@@ -24,10 +24,17 @@ EXIT_USAGE = 2
 
 
 def _rel(root: Path, path: Path) -> str:
+    """Đường dẫn tương đối, **luôn** dấu `/`.
+
+    Đây là đường dẫn người đọc rồi gõ lại, và là chuỗi tài liệu đối chiếu với
+    hằng `closure.REPORT_MD`. `str()` trên Windows cho `docs\\CLOSURE-REPORT.md`
+    — cùng tệp, khác chữ, và không khớp hằng ấy nữa (đo ở CI Windows, run
+    34915208534).
+    """
     try:
-        return str(path.relative_to(root))
+        return path.relative_to(root).as_posix()
     except ValueError:
-        return str(path)
+        return Path(path).as_posix()
 
 
 def cmd_closure(args) -> int:

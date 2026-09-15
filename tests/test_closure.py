@@ -1614,6 +1614,31 @@ class TestPin(unittest.TestCase):
         self.assertIn("docs/BENCH-PREREGISTRATION-C2.md", pinned)
         self.assertIs(CL.evaluate(repo.root).results[0].outcome, Outcome.PASSED)
 
+    def test_pinned_keys_are_posix_on_every_platform(self):
+        """Khoá ghim đi vào **tệp tiêu chí đã commit**, nên nó phải là cùng một
+        chuỗi ở mọi nền.
+
+        `str(path.relative_to(root))` cho `docs\\BENCH-PREREGISTRATION-C2.md`
+        trên Windows và `docs/BENCH-PREREGISTRATION-C2.md` ở nơi khác: cùng một
+        tệp, hai danh tính, và một bản ghim viết ở Windows không tra được ở
+        Linux. Đo ở CI Windows, run 34915208534.
+
+        Nói thẳng giới hạn: trên POSIX phép này gần như hiển nhiên đúng, vì
+        `as_posix()` và `str()` trùng nhau. Nó có giá trị chứng minh **ở job
+        Windows của CI** — và job ấy có thật, nên đây là phép kiểm thật chứ
+        không phải phép kiểm trang trí.
+        """
+        repo = Repo(spec_of(crit("G5.1", "aisef.control.closure:probe_prereg_digest",
+                                 evidence="docs/BENCH-PREREGISTRATION-C2.md")), pin=False)
+        self.addCleanup(repo.close)
+        repo.write("docs/BENCH-PREREGISTRATION-C2.md",
+                   "# prereg\n\n<!-- PREREG-FROZEN:BEGIN -->\nx\n<!-- PREREG-FROZEN:END -->\n")
+        pinned = CL.pin(repo.root)
+        for k in pinned:
+            with self.subTest(key=k):
+                self.assertNotIn("\\", k, "khoá ghim mang dấu phân cách của nền")
+                self.assertEqual(k, Path(k).as_posix())
+
     def test_pin_writes_the_frozen_region_digest_not_the_whole_file(self):
         """Bản trước ghim cả tệp ở mức trên cùng và để digest vùng ghim ở mức tiêu
         chí không ai đọc — hai nhà cho một con số, và probe đọc nhà sai."""

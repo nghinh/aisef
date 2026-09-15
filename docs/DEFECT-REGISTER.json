@@ -250,6 +250,18 @@
    "fixed": "HEAD",
    "evidence": "CI run 34913237817, job `unit (windows-latest, 3.11)`: Ran 3074 tests, failures=10 errors=6, while all four ubuntu jobs, lint and wheel were green. Two root causes and nothing else.\n(A) 13 failures in test_closure.py TestApproval/TestCli/TestPin, all reading `contract is stale`. The Repo helper pinned sha256 over CONTRACT with `\\n` but wrote the file with `write_text(..., encoding='utf-8')`, whose default newline translation emits `\\r\\n` on Windows -- so the digest of the bytes on disk could never match the pin.\n(B) 3 failures in tests/bench (selfcheck + TestDuongOngTuyenCap) with `FileNotFoundError: calls.jsonl`. The fake `opencode` is a Python script written with a shebang and chmod 0o755; Windows does not honour shebangs, so the adapter could not launch it, no session wrote its log, and every attempt read as `hạ tầng` (infra).",
    "notes": "Neither is a product defect -- both are test-harness portability bugs -- and neither had ever run on Windows CI: both files arrived after the old remote master (9a91f9c), which sat 56 commits behind. The previous Windows run failed on exactly one unrelated test (test_memory.test_concurrent_writers), which passes now.\nFixed, not skipped. (A) `Repo.write` uses `newline=''` so the platform cannot rewrite the bytes a digest is taken over. (B) one helper `_selfcheck.viet_client_gia()` now materialises the fake client for all three call sites, and on Windows writes `opencode.py` plus a one-line `opencode.bat` launching the running interpreter -- same script, same stream, only the way the OS starts it differs. The three sites had duplicated the write-and-chmod, which is why one platform bug could appear three times.\nFound only because D-019's `fetch-depth: 0` let the suite reach these tests at all."
+  },
+  {
+   "id": "D-021",
+   "severity": "P1",
+   "status": "CLOSED",
+   "taxonomy": 176,
+   "false_pass": false,
+   "title": "a pin key and a reported path carry the platform's separator, so the same file has two identities",
+   "introduced": "with the closure gate (575bb02)",
+   "fixed": "HEAD",
+   "evidence": "CI run 34915208534, Windows job: two failures, both the same shape. `pin()` recorded `{'docs\\\\\\\\BENCH-PREREGISTRATION-C2.md': ...}` because it built the key with `str(path.relative_to(root))`, and the CLI printed `docs\\\\\\\\CLOSURE-REPORT.md` where `closure.REPORT_MD` is the documented `docs/CLOSURE-REPORT.md`.",
+   "notes": "The pin half is the serious one and it is a PRODUCT defect, not a test defect: the key goes into `docs/closure-gate.json`, which is committed and shared. A pin written on Windows would not be found by a probe reading it on Linux -- one file, two identities, and the mismatch is silent. The printed path is cosmetic but was inconsistent with the constant it is supposed to echo.\nBoth fixed with `as_posix()` rather than `str()`. Regression `test_pinned_keys_are_posix_on_every_platform` asserts no key carries a backslash and each equals its own as_posix form. Stated plainly in its docstring: on POSIX the assertion is nearly tautological because as_posix() and str() coincide, so its proving power lives in the Windows CI job -- which is real and runs, so this is a genuine check rather than a decorative one.\nThird defect in the chain that only became visible once D-019 let the suite run: 16 Windows failures became 2, and those 2 were a real cross-platform product bug underneath."
   }
  ]
 }

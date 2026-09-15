@@ -1671,7 +1671,13 @@ def pin(root: Path | str, *, force: bool = False) -> dict:
             crit["prereg_sha256"] = frozen_region_digest(
                 path, crit.get("prereg_frozen_region") or {})
             spec.pop("prereg_sha256", None)
-            pinned[str(path.relative_to(root))] = crit["prereg_sha256"]
+            # `as_posix()`, không `str()`: khoá này đi vào **tệp tiêu chí đã
+            # commit**, nên nó phải giống nhau trên mọi nền. `str()` cho
+            # `docs\\BENCH-PREREGISTRATION-C2.md` trên Windows và
+            # `docs/BENCH-PREREGISTRATION-C2.md` ở nơi khác — cùng một tệp, hai
+            # danh tính, và một bản ghim viết ở Windows không tra được ở Linux.
+            # Đo ở CI Windows (run 34915208534).
+            pinned[path.relative_to(root).as_posix()] = crit["prereg_sha256"]
     (root / CRITERIA_PATH).write_text(
         json.dumps(spec, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return pinned
