@@ -30,11 +30,11 @@ chứ không từ ngày quan sát — hai ngày ấy thường trùng nhưng kh�
 | 71–75 | 12/09 | cổng lint vừa bật, bench v1.3, cohort C-1 |
 | 76–141 | 13/09 | dogfood `todo-cli` và `todo-oc` — [DOGFOOD-2026-09-13](DOGFOOD-2026-09-13.md) §2, §5, §7 |
 | 142–147 | 14/09 | `todo-oc` 7/7 (DOGFOOD §8) và `marks-cli`, dự án dogfood thứ ba |
-| 179–185 | 15/09 | dogfood **LedgerLock** (AI vận hành, `aisef==1.7.2` từ PyPI + OpenCode 1.18.29, Windows 11) — hồ sơ `closure-evidence/dogfood/ledgerlock/`, phép hồi quy đỏ trên nhánh `dogfood/ledgerlock-red`; **chưa sửa** (1.7.2 đóng băng chờ G6) |
+| 179–185 | 15/09 | dogfood **LedgerLock** (AI vận hành, `aisef==1.7.2` từ PyPI + OpenCode 1.18.29, Windows 11) — hồ sơ `closure-evidence/dogfood/ledgerlock/`; sửa ở **1.7.3** cùng ngày, phép hồi quy `tests/test_dogfood_ledgerlock.py` |
 | 148–159 | 14/09 | `marks-cli`; ADR-009 O2/O3; hợp đồng `STABILITY.md`; bench C-1; cổng phát hành đọc lại trên `todo-oc` |
 
 **Tất cả bằng đo trên agent thật**, không lỗi nào bằng đọc code. Mỗi lỗi có một
-phép hồi quy đỏ khi hoàn nguyên, trừ lỗi 22 (lý do ở lớp I) và trừ lỗi 179–185 — còn **mở**, phép hồi quy đang đỏ trên nhánh `dogfood/ledgerlock-red` (D-025…D-031); bảng này nhóm chúng
+phép hồi quy đỏ khi hoàn nguyên, trừ lỗi 22 (lý do ở lớp I); lỗi 179–185 (D-025…D-031) sửa ở **1.7.3**, phép hồi quy ở `tests/test_dogfood_ledgerlock.py`; bảng này nhóm chúng
 theo *lớp nguyên nhân* để lần sau, khi một triệu chứng mới xuất hiện, người sửa
 hỏi đúng câu hỏi trước.
 

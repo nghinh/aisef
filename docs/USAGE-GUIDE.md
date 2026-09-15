@@ -112,9 +112,10 @@ measure, not whether it works:
 
 Two OpenCode specifics worth knowing before the first run: `run.max_turns` is
 enforced by the adapter counting turns on the event stream (the CLI has no
-`--max-turns`, so the number was ignored before 1.4.0), and the host's
-`ANTHROPIC_*` variables are **not** passed to it — see
-[§6](#6-configuring-aiconfigjson).
+`--max-turns`, so the number was ignored before 1.4.0; since 1.7.3 the stop
+takes down the whole process tree — the npm shim on Windows used to die while
+node kept running), and the host's `ANTHROPIC_*` variables are **not** passed
+to it — see [§6](#6-configuring-aiconfigjson).
 
 ---
 
@@ -195,7 +196,13 @@ Two things `doctor` tells you on that first run, both worth reading:
 `init` writes **4 keys** into `.ai/config.json` (`tools.test`, `tools.lint`,
 `sandbox.image`, `sandbox.allow_hosts`), of which exactly **one must be
 declared**: `tools.test`. Version 1.3.0 on PyPI still wrote all 68 defaults;
-1.3.1 does not.
+1.3.1 does not. Since 1.7.3 the python preset's `sandbox.image` is an image the
+harness **builds** (`aisef-verify-python:<recipe digest>` — `python:3.12-slim`
+pinned by digest plus pytest, pytest-cov and ruff pinned by version), because
+the bare `python:3.12-slim` it named before carries no test runner. `aisef
+doctor` builds it on first use and probes every declared tool inside it;
+`aisef run` refuses to start a session when a declared image lacks a declared
+tool. A project that declares its own `sandbox.image` is probed the same way.
 
 For contributors who want to modify the framework:
 
@@ -983,6 +990,13 @@ Agent runs: ok 150 · infra 12 · max_turns 3
       returned.
 ```
 
+If a story shows `running` long after nothing is happening, look for the line
+`⚠️  N stories ORPHANED — claimed by a process that no longer exists on this
+host` (1.7.3): the orchestrator died mid-wave and the claim names a dead PID.
+Nothing is lost — worktrees, candidates and journals are intact — and `status`
+changes nothing on disk; the next `aisef run` reconciles the journal and
+re-claims those stories before starting.
+
 Note `Cost: $0.00`. That is not a free run — it is the provider reporting no price.
 Across the four dogfood corpora the provider priced **0 %** of sessions in three of
 them and 1 of 180 in the fourth. When the dollar column is empty, the question "what
@@ -1742,7 +1756,7 @@ Values shown are the defaults.
 | Key | Default | Meaning |
 |---|---|---|
 | `run.max_parallel` | `3` | stories running in parallel |
-| `run.max_turns` | `40` | maximum turns in one agent session. Enforced on OpenCode since 1.4.0 by the adapter counting turns itself |
+| `run.max_turns` | `40` | maximum turns in one agent session. Enforced on OpenCode since 1.4.0 by the adapter counting turns itself; since 1.7.3 the stop kills the whole process tree |
 | `run.timeout_seconds` | `1800` | maximum time for one session |
 | `run.max_retries` | `2` | quality retries for one story |
 | `run.infra_retries` | `-1` | separate budget for sessions lost to the client (provider 502, rate limit, unparsable tool call). They score nothing, so they are not quality attempts. `-1` keeps the old coupling to `max_retries + 1`; raise it only with a measured client failure rate — see [§11](#11-implementation-step-aisef-run) |
@@ -1765,7 +1779,7 @@ Values shown are the defaults.
 | `sandbox.provider` | `"docker"` | where to run commands: `docker` or `local` |
 | `sandbox.use_docker` | `true` | use a container for tools |
 | `sandbox.allow_degraded` | `true` | allow running when some guarantees are missing, with explicit logging |
-| `sandbox.image` | `""` | container image |
+| `sandbox.image` | `""` | container image. The python preset names a harness-built, pinned image (`aisef-verify-python:<digest>`); `aisef doctor` probes every declared tool inside whatever image is declared |
 | `sandbox.tools_network` | `false` | allow tools network access |
 | `sandbox.allow_hosts` | `[]` | hosts tools may reach; also what the `egress` guard allows. `localhost` is exempt by all its names, IPv6 included — nothing leaves the machine |
 | `sandbox.pre_deploy_degraded_waiver` | `""` | reason for accepting verification outside Docker at the final gate |

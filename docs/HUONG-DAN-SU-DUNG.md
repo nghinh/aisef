@@ -1393,7 +1393,7 @@ của *vị từ* — `bảo toàn` cần được khoanh theo **hành vi** — 
 | Khoá | Mặc định | Nghĩa |
 |---|---|---|
 | `run.max_parallel` | `3` | số story chạy song song |
-| `run.max_turns` | `40` | trần số lượt trong một phiên agent |
+| `run.max_turns` | `40` | trần số lượt trong một phiên agent; từ 1.7.3 lệnh dừng giết cả cây tiến trình (shim `opencode.CMD` trên Windows từng chết mà node vẫn chạy) |
 | `run.timeout_seconds` | `1800` | trần thời gian một phiên |
 | `run.max_retries` | `2` | số lần thử lại một story (lượt **chất lượng**) |
 | `run.infra_retries` | `-1` | ngân sách thử lại riêng cho **phiên mất vì client** (502, rate limit, tool call không đọc được). `-1` giữ cách ghép cũ: dùng chung ngân sách với `run.max_retries`. Chỉ tăng khi đã **đo** tỉ lệ rớt phiên của client mình |
@@ -1418,7 +1418,7 @@ của *vị từ* — `bảo toàn` cần được khoanh theo **hành vi** — 
 | `sandbox.provider` | `"docker"` | nơi chạy lệnh: `docker` hoặc `local` |
 | `sandbox.use_docker` | `true` | dùng container cho tool |
 | `sandbox.allow_degraded` | `true` | cho phép chạy khi thiếu bảo đảm, có ghi rõ |
-| `sandbox.image` | `""` | ảnh container |
+| `sandbox.image` | `""` | ảnh container. Preset python đặt ảnh do khung **tự dựng** và ghim (`aisef-verify-python:<digest>`: `python:3.12-slim` ghim theo digest + pytest, pytest-cov, ruff ghim theo phiên bản) vì `python:3.12-slim` trơn không có pytest; `aisef doctor` dựng ảnh và dò từng công cụ đã khai ngay trong ảnh, `aisef run` từ chối mở phiên khi ảnh đã khai thiếu công cụ đã khai (1.7.3) |
 | `sandbox.allow_hosts` | `[]` | host mà tool được phép kết nối tới (`egress` đọc danh sách này; `localhost` luôn được miễn) |
 | `sandbox.tools_network` | `false` | cho tool ra mạng hay không |
 | `sandbox.pre_deploy_degraded_waiver` | `""` | lý do chấp nhận kiểm định chạy ngoài Docker ở cổng cuối |

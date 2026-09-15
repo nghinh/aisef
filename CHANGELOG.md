@@ -2,6 +2,66 @@
 
 ## Unreleased
 
+## 1.7.3 — 2026-09-15
+
+A corrective release for the defects the first dogfood run of the public
+`aisef==1.7.2` package found (LedgerLock, OpenCode 1.18.29, Windows 11, Docker
+Desktop — intake `closure-evidence/dogfood/ledgerlock/`). No feature, no gate
+softened, no waiver; every fix has a regression that was red on 1.7.2
+(`tests/test_dogfood_ledgerlock.py`).
+
+**A terminal plan deadlock rests on the structured verdict only (D-026, lỗi 180).**
+The reviewer wrote "So [stuck] doesn't apply." in its reasoning; the text parser
+split the tag out, exempted `[stuck]` from needing a path, and the union with the
+JSON made one negated sentence the story's terminal verdict — while the JSON said
+`block` with three real findings. Text still blocks (fail closed); only the
+machine-readable verdict can end a story or an `improve` loop, and a `stuck`
+verdict with no items keeps its synthesised line. `Attempt.plan_findings`,
+evidence detail `plan`.
+
+**The python preset's image now contains the tools it declares (D-028, lỗi 182).**
+`python:3.12-slim` carried neither pytest nor ruff; every tool call is a fresh
+`docker run --rm`; `aisef doctor` called the image "(matches stack)". The preset
+names an image the harness **builds** from a pinned recipe
+(`aisef.harness.verify_image`: base by digest, tools by version, name carrying
+the recipe digest — `aisef-verify-python:<digest>`); `aisef doctor` builds it and
+probes every declared tool where it will run; `aisef run` refuses to start
+sessions when a declared image lacks a declared tool; tool evidence records the
+image name **and** content id. Measured 2026-09-15: the old image — `MISSING`
+pytest and ruff; the built image — both present, 15 s to build.
+
+**A missing test runner is UNRUNNABLE, never a red test (D-029, lỗi 183).**
+`No module named pytest` (exit 1) was read as "the most recent test run is still
+failing" and sent three sessions after code that was not at fault. Every
+non-passing tool run now carries an outcome kind in evidence and the run log —
+`TEST_FAILED` / `TOOL_FAILED` / `TOOL_UNRUNNABLE` / `ENVIRONMENT_FAILURE`.
+
+**The turn cap and the clock kill the whole process tree (D-027, lỗi 181).**
+Sessions ran 75–186 turns against a cap of 40: `proc.kill()` hit the `opencode.CMD`
+shim, node lived on holding the pipes. Clients spawn in their own process group;
+the cap, the timeout and an interrupted orchestrator tear the group down
+(`taskkill /T` on Windows, `killpg` elsewhere).
+
+**Coverage data files are the test tool's, not the agent's (D-030, lỗi 184).**
+`.coverage` / `tests/.coverage` no longer trip `diff-scope` and are taken back
+out of the candidate before it is frozen.
+
+**Parallel scheduling weighs the effective write scope (D-031, lỗi 185).** The
+shared verification config files (`pytest.ini`, `conftest.py`, JS runner
+configs) are a *bootstrap* grant: a story may create them undeclared only while
+no story of the sprint has merged and the file does not exist. Two stories
+holding the same grant do not run in one wave — `aisef run` re-splits a planned
+wave at run time, the first story runs alone, and after it merges the rest run
+in parallel as planned. A later story that must touch such a file declares it.
+
+**`aisef status` names an orphaned claim (D-025, lỗi 179).** A `running` story
+whose `claimed_by` is a dead process on this host is reported as `ORPHANED`;
+the read model changes nothing on disk — the next `aisef run` reconciles, as
+before, and the guide now says so.
+
+Regression coverage: `tests/test_dogfood_ledgerlock.py` (26 tests), plus
+existing tests updated where they scripted a text-only reviewer.
+
 ## 1.7.2 — 2026-09-15
 
 **A release is identified by its product, not by which commit is HEAD (D-022).**
