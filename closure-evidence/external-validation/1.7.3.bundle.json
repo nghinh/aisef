@@ -1,0 +1,62 @@
+{
+  "schema_version": 2,
+  "product_version": "1.7.3",
+  "release_tag": "v1.7.3",
+  "release_source_sha": "cfee273074af2000e0839c71333cf84ee8b5b73b",
+  "install_target": "aisef==1.7.3",
+  "pypi_project": "aisef",
+  "wheel": {
+    "filename": "aisef-1.7.3-py3-none-any.whl",
+    "sha256": "97cd7a0fcaf3940b83fd5e83760da616632c4836208079398273c89b5fea6dcf"
+  },
+  "sdist": {
+    "filename": "aisef-1.7.3.tar.gz",
+    "sha256": "7eafcc12aa6ddaa5ce07a93cab28795a0a3b7c49ac9a3fd3509eb290a032344d"
+  },
+  "wheel_sha256": "97cd7a0fcaf3940b83fd5e83760da616632c4836208079398273c89b5fea6dcf",
+  "sdist_sha256": "7eafcc12aa6ddaa5ce07a93cab28795a0a3b7c49ac9a3fd3509eb290a032344d",
+  "protocol_version": "v1.1.0",
+  "bundle_dir": "closure-evidence/external-validation/1.7.3",
+  "instructions_digest": "e6526b93716e81648a7bc8fd50f2c0f4153f67f38f186e22a67f5c455680ef17",
+  "instructions_digest_rule": "sha256 over `name:sha256(bytes)` of every file in bundle_dir except REPORT.md, sorted by path; the same call the closure probe makes (aisef.control.planes.bundle_digest)",
+  "files": {
+    "INSTRUCTIONS.md": "b9560aad3c90709f8c675ed32237d5749ba711ed76aee705d1738e97d85ae095",
+    "PROTOCOL.md": "9f0719be2f7ff0941fb69232df0768cc7b75d169a740da71cd78260e7a35f282",
+    "QUICKSTART.md": "11dcccb18cea09cfe4c42cd5e62e1bc694b191282212586b5d9e5dafdddff796",
+    "README.md": "79bf9b2a76a9bf3a5f9da566c81d835a52c43742e096d0f752032810ec77355a",
+    "REPORT-TEMPLATE.md": "56c3115857ed79f489e9980ed7d9aa60245c2da141f73003b4b5f0659010cc76",
+    "USAGE-GUIDE.md": "3d9d52ee9e09a8a7a5ce3ab9447ee043df31f48aae615d4108a07c705bd58d77"
+  },
+  "bundle_source_sha": "30f820f84402bde86c3a91a6b07c259f039ff73c",
+  "frozen_from": {
+    "tag": "v1.7.3",
+    "sha": "cfee273074af2000e0839c71333cf84ee8b5b73b",
+    "docs_ref": "30f820f",
+    "docs_sha": "30f820f84402bde86c3a91a6b07c259f039ff73c",
+    "sources": {
+      "README.md": "README.md",
+      "QUICKSTART.md": "docs/EXTERNAL-VALIDATION-QUICKSTART.md",
+      "USAGE-GUIDE.md": "docs/USAGE-GUIDE.md",
+      "PROTOCOL.md": "docs/EXTERNAL-VALIDATION-v1.1.0.md",
+      "REPORT-TEMPLATE.md": "docs/TEMPLATE-EXTERNAL-VALIDATION-REPORT.md"
+    }
+  },
+  "report_schema": {
+    "path": "closure-evidence/external-validation/1.7.3/REPORT.md",
+    "template": "closure-evidence/external-validation/1.7.3/REPORT-TEMPLATE.md",
+    "identity_rows": [
+      "Product version",
+      "Release tag",
+      "Release source SHA",
+      "Wheel sha256",
+      "Sdist sha256",
+      "Protocol version",
+      "Instructions digest"
+    ],
+    "metrics": "every row of PROTOCOL.md \u00a7 Metrics, labels unchanged",
+    "participant_line": "a `Participant:` row asserting external, human status (G6.2)",
+    "findings": "a table with a `severity` column on the protocol's P0-P3 ladder (G6.3)"
+  },
+  "attachments": "handed back separately; never placed inside bundle_dir",
+  "generated_at": "2026-09-15T12:50:07+00:00"
+}
