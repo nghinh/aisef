@@ -830,7 +830,7 @@ There are **sixteen** checks, and the table prints them in this order
 | `tests verify story` | that test **actually** verifies the part of the story just written, rather than just tagging an existing test with the criterion code |
 | `<kind>` | **one row per verification kind the story declares** — you will see `e2e`, `accessibility`, `sit` … by name, not the literal word `<kind>` |
 | `security` | the security review session found no high-severity issues |
-| `review` | the independent review session has no blocking items |
+| `review` | the independent review session has no blocking items; ⚠ when that session produced no verdict at all (1.7.4) |
 | `preservation` | behavior from other stories wasn't broken by this story |
 
 By kind: **8 deterministic, 6 structural, 1 security, and exactly 1 model
@@ -927,6 +927,19 @@ Four things about that loop that only show up once you run it:
   ran clean and wrote nothing has decided, and re-opening it with identical context
   returns the same decision. A cut session breaks the streak, because that one had
   work in flight.
+- **A reviewer that did not run is not a verdict (1.7.4).** When the deterministic
+  checks pass and the review session ends without one — cut at `max_turns`, timed
+  out, transport failure, no readable verdict — the gate marks `review` ⚠
+  UNRUNNABLE, keeps the candidate exactly as frozen and re-runs **only the review
+  stage** on the same SHA, at most twice more. No developer session is opened for
+  it: there is nothing for a developer to change. (Before 1.7.4 that reopened
+  developer session wrote nothing, counted as a no-op, and after two the story
+  died with `sessions kept producing nothing to grade` — D-032, found by the
+  second LedgerLock run.) If the reviewer still produces no verdict the story
+  ends `REVIEW_UNRUNNABLE`, naming the last failure; `aisef run --verify-only
+  --story <id>` re-runs the review stage later on the same candidate, and a plain
+  `aisef run` resumes such a story at the review stage. A structured `block` is a
+  verdict and still returns the story to the developer.
 - **Two graded attempts failing `tests verify story` on the same criteria stop the
   story immediately**, as a plan deadlock that names the criteria. No test can be
   red at the branch point for behaviour already on the main branch, so there is no
@@ -1600,6 +1613,7 @@ money and left the project worse, which is the number to look for first.
 | Gate item ✗ `TDD`, while the nop control passed | you are before 1.6.0 | upgrade: a passing nop control now satisfies `TDD`, and the gate says which evidence proved it |
 | `aisef guard tool-bypass: … is the project's test command run directly` | the agent ran your declared command instead of `aisef tool test`; nothing was recorded | this is the guard working. Use `aisef tool test`. To narrow a run for debugging, change the command's own identity (`pytest tests/x.py -k foo`); with `npm`/`yarn`/`pnpm`/`bun` the script name *is* the identity, so call the underlying runner |
 | Story `failed`, reason `deadlock due to plan` | the story's criteria are already satisfied at its branch point — usually an earlier story shipped the behaviour | fix or drop the criteria named in the message, then re-run. Amending them drops the stale branch automatically |
+| Story `failed`, reason `REVIEW_UNRUNNABLE: the reviewer did not produce a verdict …` | deterministic checks passed; the review session produced no verdict in three executions on the same candidate (1.7.4) | nothing to fix in the code — the candidate is kept. Look at the reviewer client (`run.max_turns`, timeouts, provider), then `aisef run --verify-only --story <id>` re-runs the review stage on that candidate |
 | Story `failed`, reason `sessions kept producing nothing to grade` | the session ran clean and wrote nothing — a decision, not a fault | do not re-run it; read the last graded verdict. Two consecutive no-op sessions stop the story on purpose |
 | Attempts ending at `max_turns` | `run.max_turns` (default 40) reached | the session is still graded if it committed work. Check `aisef status --attempts`; if the agent was reading `_bmad-output/` to work out gate rules, raising the cap does not help |
 | `Cost: $0.00` on a real run | the provider reported no price, not a free run | use `aisef cost` ([§15.2](#152-aisef-cost--what-the-spend-bought)); it switches to input tokens and hands you the price formula |

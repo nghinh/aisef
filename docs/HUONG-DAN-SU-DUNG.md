@@ -910,6 +910,20 @@ Rồi phân loại:
   Chỉ nên tăng khi bạn **đã đo** tỉ lệ rớt phiên của client mình (đo được trên
   OpenCode/mycombo ngày 2026-09-13: 22–32 %).
 
+- **Người rà soát không chạy được** (`REVIEW_UNRUNNABLE`, từ 1.7.4): các phép kiểm
+  tất định xanh nhưng phiên rà soát kết thúc không có verdict — bị cắt ở
+  `max_turns`, hết giờ, lỗi đường truyền, không đọc được verdict. Cổng ghi `review`
+  ⚠ (không chạy được), **không** ✗; ứng viên được giữ nguyên đúng SHA đã đóng băng và
+  chỉ **giai đoạn rà soát** được chạy lại trên chính SHA ấy, tối đa hai lần nữa.
+  Không mở phiên developer cho việc này — developer không có gì để sửa. (Trước
+  1.7.4 phiên developer bị mở lại ấy không viết gì, bị tính là no-op, hai lần thì
+  story chết với `sessions kept producing nothing to grade` — D-032, lần chạy
+  LedgerLock thứ hai tìm ra.) Nếu người rà soát vẫn không ra verdict, story kết thúc
+  `REVIEW_UNRUNNABLE` kèm lỗi cuối; `aisef run --verify-only --story <mã>` chạy lại
+  giai đoạn rà soát sau đó trên đúng ứng viên ấy, và `aisef run` thường sẽ tiếp
+  tục story ấy từ giai đoạn rà soát. Verdict `block` có cấu trúc vẫn là verdict và
+  vẫn trả story về developer.
+
 - **Trượt vì code sai**: để framework thử lại, hoặc chạy vòng cải tiến ở [§13](#13-vòng-cải-tiến-và-thay-đổi-sau-phát-hành).
 
 Muốn biết mục cổng nào sẽ **đổi kết cục** nếu chấm lại bằng luật hiện tại — hữu ích
@@ -1227,6 +1241,7 @@ Thông báo trong bảng này là **nguyên văn tiếng Anh** như CLI in ra.
 | Guard chặn `npm test` / lệnh test của bạn | `tool-bypass`: chạy thẳng thì không có gì được ghi | dùng `aisef tool test`; chạy hẹp thì gọi trực tiếp runner, đừng qua script npm ([§7](#7-aisef-compile-và-aisef-doctor)) |
 | `⚠️ not recorded as evidence: no story id` | `aisef tool …` chạy ngoài một phiên story | thêm `--story <mã>` nếu bạn muốn nó thành bằng chứng |
 | `deadlock due to plan: criteria … are already satisfied at the branch point` | một story trước đã làm xong hành vi ấy | **sửa hoặc bỏ tiêu chí**, đừng thử lại ([§11](#11-bước-hiện-thực-aisef-run)) |
+| `REVIEW_UNRUNNABLE: the reviewer did not produce a verdict …` | phép kiểm tất định xanh; phiên rà soát không ra verdict sau ba lần trên cùng ứng viên (1.7.4) | không có gì phải sửa trong code — ứng viên được giữ. Xem client rà soát (`run.max_turns`, hết giờ, nhà cung cấp), rồi `aisef run --verify-only --story <mã>` chạy lại giai đoạn rà soát trên ứng viên ấy |
 | `sessions kept producing nothing to grade` | phiên đã **quyết định** không viết gì, hai lần liền | đọc `aisef evidence <story>`, sửa kế hoạch — mở lại phiên sẽ ra đúng kết quả ấy |
 | `the command matched no tests` | lệnh chạy được nhưng bộ chọn không khớp test nào | chưa story nào viết loại test ấy, hoặc bộ chọn sai — sửa `verify.<loại>` |
 | `Cost: $0.00` trong `aisef status` | nhà cung cấp không báo giá phiên nào | dùng `aisef cost`: nó đổi sang token và cho công thức ([§14](#14-chi-phí-thật-và-cách-giảm)) |

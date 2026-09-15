@@ -32,7 +32,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+import subprocess  # noqa: E402
+
 from aisef.clients.base import RunResult  # noqa: E402
+from aisef.harness.observe import AGENT_RUN, NOTE, TOOL_RUN, Event, EvidenceStore  # noqa: E402
+from aisef.phases import implement as I  # noqa: E402
 from tests.test_implement import ImplementTestCase, ScriptedClient  # noqa: E402
 
 CUT = "max_turns: stopped at 40 turns (cap 40)"
@@ -121,6 +125,132 @@ class TestReviewExecutionFailureRecovery(ImplementTestCase):
         self.assertFalse(out.done)
         self.assertLessEqual(c.review_calls, 2 * (3 + 1),
                              f"review must not be retried without bound: {c.review_calls} sessions")
+
+
+class TestReviewEvidenceAndReuse(ImplementTestCase):
+    """Requirements 5–8: deterministic failures still reach the developer; the
+    candidate SHA is preserved across a review retry and every review execution
+    is recorded against it; a complete prior review is reused; an incomplete
+    one (new shape or the ≤ 1.7.3 finding text) is not; a resumed story picks
+    up at the review stage."""
+
+    def setUp(self):
+        super().setUp()
+        for args in (["config", "user.email", "t@t.t"], ["config", "user.name", "t"],
+                     ["commit", "-q", "--allow-empty", "-m", "base"]):
+            subprocess.run(["git", *args], cwd=self.project, check=True)
+        self.sha = I.head_sha(self.project)
+        self.assertTrue(self.sha)
+
+    def _stage_args(self):
+        from aisef.control.normalize import effective_write_scope
+        from aisef.harness.guardrails import changed_files
+        from aisef.harness.prompts import load_catalog
+        return dict(project=self.project, workdir=self.project, artifact_root=self.artifacts,
+                    config=self.config(), catalog=load_catalog(), architecture=None, contract=None,
+                    base_ref="", scope=effective_write_scope(self.story, self.project),
+                    changed=changed_files(str(self.project)), preservation=[])
+
+    def test_a_deterministic_test_failure_still_returns_to_the_developer(self):
+        c = ReviewerCut(fail_reviews=0, noop_after_first=False)
+        out = self.implement(c, config=self.config(**{"run.max_retries": 1, "tools.test": "false",
+                                                      "sandbox.use_docker": False}))
+        self.assertGreaterEqual(c.develop_calls, 2, f"calls={c.calls}")
+        self.assertFalse(out.done)
+
+    def test_candidate_is_preserved_and_every_review_execution_is_recorded_against_it(self):
+        c = ReviewerCut(fail_reviews=1)
+        out = self.implement(c, config=self.config(**{"run.max_retries": 2}))
+        self.assertTrue(out.done, out.blocked_reason)
+        shas = {a.candidate for a in out.attempts}
+        self.assertEqual(shas, {self.sha}, "the review retry must run on the same frozen candidate")
+        ev = EvidenceStore(self.artifacts).read(self.story.id)
+        reviews = [e for e in ev.of(TOOL_RUN, "review") if e.detail.get("candidate") == self.sha]
+        self.assertEqual([e.detail["outcome"] for e in reviews], ["REVIEW_UNRUNNABLE", "PASS"])
+        self.assertEqual([e.detail["review_attempt"] for e in reviews], [1, 2])
+        self.assertTrue(reviews[0].detail["unrunnable"].startswith("max_turns"))
+        self.assertEqual(out.quality_attempts, 1, "developer attempts are counted apart from review executions")
+        self.assertEqual(sum(1 for a in out.attempts if a.verify_only), 1)
+
+    def test_successful_prior_review_evidence_is_reused(self):
+        c = ReviewerCut(fail_reviews=0)
+        out = self.implement(c)
+        self.assertTrue(out.done, out.blocked_reason)
+        before = c.review_calls
+        again = I.Attempt(number=2, verify_only=True); again.candidate = self.sha
+        again = I.verify_candidate(self.story, client=c, attempt=again, reuse=True, **self._stage_args())
+        self.assertEqual(c.review_calls, before, "a complete prior review at this candidate is reused")
+        self.assertTrue(again.ok, again.gate.summary() if again.gate else "")
+        self.assertIn("review", again.kept)
+
+    def _seed_incomplete_review(self, *, legacy: bool):
+        # The candidate's work is in the tree (as in Run #2's worktree); the
+        # non-isolated harness freezes HEAD as the candidate and reviews the diff.
+        (self.project / "src").mkdir(exist_ok=True)
+        (self.project / "src" / "a.py").write_text("x = 1\n", encoding="utf-8")
+        store = EvidenceStore(self.artifacts, candidate=self.sha)
+        store.record(self.story.id, Event(kind=AGENT_RUN, name=f"{self.story.id}-review", ok=False,
+                                          detail={"error": CUT, "num_turns": 40}))
+        if legacy:   # the exact 1.7.3 shape from LedgerLock Run #2
+            store.tool_run(self.story.id, "review", ok=False,
+                           detail={"findings": [f"review could not run: {CUT}"], "plan": [], "attempt": 1})
+        else:
+            store.tool_run(self.story.id, "review", ok=False,
+                           detail={"findings": [], "plan": [], "attempt": 1, "outcome": "REVIEW_UNRUNNABLE",
+                                   "unrunnable": CUT, "review_attempt": 1})
+        return store
+
+    def test_incomplete_prior_review_evidence_is_not_reused_by_verify_only(self):
+        for legacy in (True, False):
+            with self.subTest(legacy=legacy):
+                self._seed_incomplete_review(legacy=legacy)
+                c = ReviewerCut(fail_reviews=0)
+                again = I.Attempt(number=2, verify_only=True); again.candidate = self.sha
+                again = I.verify_candidate(self.story, client=c, attempt=again, reuse=True, **self._stage_args())
+                self.assertEqual(c.review_calls, 1, "an unrunnable prior review must be re-run")
+                self.assertIn("review", again.reran)
+                self.assertEqual(again.review_unrunnable, "")
+
+    def test_verify_only_ends_review_unrunnable_when_the_rerun_is_cut_again(self):
+        """`--verify-only` on an incomplete review re-runs the reviewer once; cut
+        again, the outcome is named REVIEW_UNRUNNABLE with the actual failure —
+        not a generic `did not pass gate: review`."""
+        self._seed_incomplete_review(legacy=True)
+        c = ReviewerCut(fail_reviews=1)
+        out = I.verify_only(self.story, project=self.project, workdir=self.project,
+                            artifact_root=self.artifacts, client=c, config=self.config())
+        self.assertEqual(c.review_calls, 1, f"calls={c.calls}")
+        self.assertFalse(out.done)
+        self.assertTrue(out.blocked_reason.startswith("REVIEW_UNRUNNABLE"), out.blocked_reason)
+        self.assertIn("max_turns", out.blocked_reason)
+
+    def test_a_resumed_story_picks_up_at_the_review_stage_without_a_developer_session(self):
+        """The Run #2 forced-resume state: the worktree HEAD is a candidate whose
+        only failing check was a reviewer that did not run (recorded in the
+        1.7.3 shape). Resuming must retry the review, not open a developer."""
+        store = self._seed_incomplete_review(legacy=True)
+        store.record(self.story.id, Event(kind=NOTE, name="gate:verdict", ok=False,
+                                          detail={"failures": ["review"], "attempt": 1, "checks": []}))
+        c = ReviewerCut(fail_reviews=0)
+        out = self.implement(c, config=self.config(**{"run.max_retries": 2}))
+        self.assertEqual(c.develop_calls, 0, f"calls={c.calls}")
+        self.assertEqual(c.review_calls, 1)
+        self.assertTrue(out.done, out.blocked_reason)
+        self.assertEqual(out.attempts[-1].candidate, self.sha)
+
+    def test_a_resumed_story_with_the_review_budget_spent_ends_review_unrunnable(self):
+        store = self._seed_incomplete_review(legacy=True)
+        for _ in range(I.MAX_REVIEW_RETRIES):
+            store.record(self.story.id, Event(kind=AGENT_RUN, name=f"{self.story.id}-review", ok=False,
+                                              detail={"error": CUT}))
+        store.record(self.story.id, Event(kind=NOTE, name="gate:verdict", ok=False,
+                                          detail={"failures": ["review"], "attempt": 1, "checks": []}))
+        c = ReviewerCut(fail_reviews=99)
+        out = self.implement(c, config=self.config(**{"run.max_retries": 2}))
+        self.assertEqual(c.develop_calls, 0, f"calls={c.calls}")
+        self.assertFalse(out.done)
+        self.assertIn("REVIEW_UNRUNNABLE", out.blocked_reason)
+        self.assertNotIn("wrote nothing", out.blocked_reason)
 
 
 if __name__ == "__main__":

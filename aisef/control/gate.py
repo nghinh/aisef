@@ -528,7 +528,8 @@ def judge_only(gate: StoryGate) -> bool:
     the judge alone, and calling it judge-only would overstate the override's
     reach.
     """
-    return [c.name for c in gate.failures] == ["review"]
+    return [c.name for c in gate.failures] == ["review"] and all(
+        c.outcome is not Outcome.UNRUNNABLE for c in gate.failures)
 
 
 def review_waiver(evidence: Evidence, candidate: str) -> Event | None:
@@ -557,6 +558,7 @@ def evaluate(
     contract: list[str] | None = None,
     review_blocking: list[str] | None = None,
     review_ran: bool = True,
+    review_unrunnable: str = "",
     security=None,
     block_severities=None,
     guard_expected: bool = False,
@@ -897,7 +899,14 @@ def evaluate(
             "" if not blocking else f"{len(blocking)} blocking items: {blocking[0].line()[:200]}",
         ))
 
-    if not review_ran:
+    if review_unrunnable:
+        # The reviewer did not execute: no verdict exists about this candidate.
+        # UNRUNNABLE blocks (fail closed) and names the execution failure, so
+        # the retry loop retries the REVIEW stage instead of the developer,
+        # and nobody is invited to waive a check that never ran (D-032).
+        gate.checks.append(Check("review", Outcome.UNRUNNABLE,
+                                 f"reviewer did not run ({review_unrunnable}) — no verdict about the candidate"))
+    elif not review_ran:
         gate.checks.append(Check("review", False, "independent review not run"))
     else:
         blocking = review_blocking or []

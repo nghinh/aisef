@@ -2,6 +2,51 @@
 
 ## Unreleased
 
+## 1.7.4 — 2026-09-15
+
+One defect, found by the second LedgerLock dogfood run on the public
+`aisef==1.7.3` package (intake `closure-evidence/dogfood/ledgerlock-run2/`).
+No feature, no gate softened, no waiver, nothing else touched; the regression
+was red on 1.7.3 (`tests/test_run2_review_recovery.py`: 6 tests and 2 subtests
+red, 6 controls green — all green on 1.7.4; two existing reviewer-integrity
+tests changed expectation with it, see below).
+
+**A review that did not run is not a review verdict (D-032, lỗi 186).**
+STORY-01-06: tests and lint green, security clean, the reviewer cut at
+`max_turns` with no verdict. `review could not run: …` was stored as a blocking
+review finding, the gate failed `review`, the loop's only recovery was a new
+developer session, the developer correctly wrote nothing, two no-ops ended the
+story as `sessions kept producing nothing to grade`, and a resume repeated it
+exactly. A review now has three outcomes — `PASS`, `BLOCK`, `REVIEW_UNRUNNABLE`
+— and the gate scores an execution failure (cut at `max_turns`, timeout,
+transport failure, no valid verdict, reviewer modified the tree, candidate
+moved during the session) as `review` ⚠ UNRUNNABLE, never ✗. The candidate is
+kept exactly as frozen; only the review stage is re-run, on the same SHA, at
+most two more times; no developer session is opened for it. If the reviewer
+still produces no verdict the story ends `REVIEW_UNRUNNABLE`, naming the last
+failure and the command that re-runs the review stage later
+(`aisef run --verify-only --story <id>`). A structured `block` is still a
+verdict and still returns the story to the developer; so do failed tests and
+lint, as before. Evidence: the `review` tool run carries `outcome`, `unrunnable`
+and `review_attempt`; every review execution is recorded against the candidate
+SHA; the journal's `review.completed` step records `outcome`,
+`review_executions` and `developer_attempts`. Prior review evidence is reused
+only when it holds a completed verdict — an incomplete review, including the
+1.7.3 shape `review could not run: …`, never satisfies freshness, and
+`--verify-only` re-runs the review on the same candidate. A story resumed with
+deterministic checks green on its HEAD and an incomplete last review resumes at
+the review stage, without a developer session. `--verify-only` names the same
+outcome when its single re-run is cut again. Two reviewer-integrity cases that
+were `[block]` findings are execution failures now, retried the same way: a
+reviewer that modified the working tree (reverted, as before) and a reviewer
+that committed — the candidate moved — and the worktree is put back on the
+frozen candidate so the retry reads the version being scored; the reviewer's
+commit never becomes a candidate.
+
+Unchanged on purpose: a reviewer answer with no JSON block is still read by the
+text parser as a verdict (as since 1.4.x); Bandit/SAST behaviour; every other
+open defect (D-002, D-003, D-011, D-024).
+
 ## 1.7.3 — 2026-09-15
 
 A corrective release for the defects the first dogfood run of the public

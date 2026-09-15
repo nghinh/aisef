@@ -64,7 +64,8 @@ from ..harness.observe import AGENT_RUN, MOCKUP_MAP, NOTE, SKILL_USE, TOOL_RUN, 
 from ..harness.prompts import Catalog, load_catalog
 from ..harness.routing import DEVELOPER, REVIEWER, ROLES, SECURITY, build_spec
 from ..harness.testlog import MAX_IDS, parse as parse_testlog
-from ..harness.tools import BASELINE_RUN, NOP_RUN, describe_tools, record as record_tool, run_tool
+from ..harness.tools import (BASELINE_RUN, NOP_RUN, aisef_command, describe_tools, record as record_tool,
+                             run_tool)
 from .qa import KINDS, find_fake_tests, run_suite
 
 @dataclass
@@ -88,6 +89,13 @@ class Attempt:
     cost_usd: float = 0.0
     gate: story_gate.StoryGate | None = None
     review_findings: list[str] = field(default_factory=list)
+    #: Why the reviewer did **not execute** on this candidate (max_turns, timeout,
+    #: transport error, tree modified, candidate moved) — "" when it did.  A
+    #: reviewer that did not run has said nothing about the code: not a BLOCK,
+    #: not a PASS, and never a reason to reopen the developer (D-032, lỗi 186).
+    review_unrunnable: str = ""
+    #: 1-based count of reviewer executions on this candidate, this one included.
+    review_attempt: int = 0
     #: Stuck items from the reviewer's **machine-readable** verdict only.
     #: A terminal plan deadlock rests on this list, never on `review_findings`:
     #: the text parser splits a tag out of running prose, and on LedgerLock
@@ -1102,12 +1110,18 @@ def verify_candidate(
                     detail={"unavailable": mv_result.unavailable, "candidate": sha},
                 ))
 
+    # Reused only when the record carries a verdict: a review that did not
+    # execute (max_turns, timeout, tree modified, candidate moved) is not
+    # evidence about the candidate, however recent (D-032).
     review_ev = _at(ev, TOOL_RUN, "review", sha) if reuse else None
-    if keep("review", bool(review_ev and _at(ev, AGENT_RUN, f"{sid}-review", sha))):
+    if keep("review", bool(review_ev and _at(ev, AGENT_RUN, f"{sid}-review", sha)
+                           and _review_complete(review_ev))):
         attempt.review_findings = list(review_ev.detail.get("findings") or [])
         attempt.plan_findings = list(review_ev.detail.get("plan") or [])
+        attempt.review_unrunnable = ""
+        attempt.review_attempt = int(review_ev.detail.get("review_attempt") or 0)
     else:
-        attempt.review_findings, verdict = review_story_v2(
+        attempt.review_findings, verdict, attempt.review_unrunnable = review_story_v2(
             story,
             workdir=workdir,
             base_ref=base_ref,
@@ -1122,6 +1136,9 @@ def verify_candidate(
             preservation=preservation,
         )
         attempt.plan_findings = structured_plan_defects(verdict)
+        attempt.review_attempt = _review_executions(evidence.read(sid), sid, sha)
+        review_outcome = (REVIEW_UNRUNNABLE if attempt.review_unrunnable
+                          else REVIEW_BLOCK if attempt.review_findings else REVIEW_PASS)
         # Blocking items must live in evidence, not just in the truncated
         # summary printed to screen -- when checking whether this attempt and
         # the previous were blocked for the same reason, the full text must
@@ -1131,12 +1148,18 @@ def verify_candidate(
         evidence.tool_run(
             sid,
             "review",
-            ok=not attempt.review_findings,
+            ok=review_outcome == REVIEW_PASS,
             detail={"findings": attempt.review_findings, "plan": attempt.plan_findings,
-                    "attempt": number},
+                    "attempt": number, "outcome": review_outcome,
+                    "unrunnable": attempt.review_unrunnable,
+                    "review_attempt": attempt.review_attempt},
         )
         n_blocking = len(attempt.review_findings)
-        _log(f"story={sid}#{number} review {'PASS' if not n_blocking else f'FAIL blocking={n_blocking}'}")
+        if attempt.review_unrunnable:
+            _log(f"story={sid}#{number} review UNRUNNABLE (execution {attempt.review_attempt}) "
+                 f"· {one_line(attempt.review_unrunnable)}")
+        else:
+            _log(f"story={sid}#{number} review {'PASS' if not n_blocking else f'FAIL blocking={n_blocking}'}")
         for f in attempt.review_findings:
             _log(f"story={sid}#{number} review ✗ {one_line(f)}")
 
@@ -1186,6 +1209,7 @@ def verify_candidate(
         screens=list(story.screens),
         contract=verification_contract(story),
         review_blocking=attempt.review_findings,
+        review_unrunnable=attempt.review_unrunnable,
         security=attempt.security,
         block_severities=config["security.block_severities"],
         guard_expected=guard_expected(project, getattr(client, "id", "")),
@@ -1538,12 +1562,13 @@ def review_story(
     Signature kept for the old call flow; machine-readable version is in
     `review_story_v2`.
     """
-    return review_story_v2(
+    findings, _verdict, unrunnable = review_story_v2(
         story, workdir=workdir, base_ref=base_ref, project=project,
         artifact_root=artifact_root, client=client, config=config,
         catalog=catalog, architecture=architecture, number=number,
         candidate=candidate, preservation=preservation,
-    )[0]
+    )
+    return findings if not unrunnable else [f"{_LEGACY_UNRUN} {unrunnable}"]
 
 
 def _review_session(
@@ -1629,9 +1654,11 @@ def review_story_v2(
     number: int = 0,
     candidate: str = "",
     preservation: list[dict] | None = None,
-) -> tuple[list[str], Verdict | None]:
+) -> tuple[list[str], Verdict | None, str]:
     """Like `review_story`, but also returns the machine-readable version
-    (`behavior_id`, etc.).
+    (`behavior_id`, etc.) and, third, **why the reviewer did not execute**
+    ("" when it did). A non-empty third value is REVIEW_UNRUNNABLE: the
+    findings are then empty — an absent reviewer has no findings (D-032).
 
     The behavior ledger flow (R2) reads `note:review:verdict` in evidence to
     record GAP with source `reviewer`; here it just returns for any caller
@@ -1648,7 +1675,7 @@ def review_story_v2(
             "story's work is already on the main branch (worktree forked "
             "from it so diff is empty). Check the main branch first; if "
             "the work is already there, this story is done."
-        ], None
+        ], None, ""
 
     context = build_context(
         story,
@@ -1727,11 +1754,10 @@ def review_story_v2(
         store.tool_run(
             story.id, "review:immutable", ok=False, detail={"changed": reverted[:20]},
         )
-        return [
-            "[block] reviewer modified the working tree "
+        return [], None, (
+            "reviewer modified the working tree "
             f"({', '.join(reverted[:3])}) — reverted; this review attempt does not "
-            "count. Review is a report, not a fix."
-        ], None
+            "count. Review is a report, not a fix.")
 
     lech = _candidate_moved(workdir, candidate)
     if lech:
@@ -1741,21 +1767,26 @@ def review_story_v2(
         # candidate.
         store.tool_run(story.id, "review:candidate", ok=False,
                        detail={"expected": candidate, "got": lech, "attempt": number})
-        return [
-            f"[block] candidate changed during review session ({candidate[:7]} → {lech[:7]}) — "
+        # Put the worktree back on the frozen candidate: the review retry
+        # (D-032) must read the version being scored, not the reviewer's
+        # commit -- which is not a candidate and never becomes one.
+        subprocess.run(["git", "reset", "-q", "--hard", candidate], cwd=workdir, check=False,
+                       capture_output=True)
+        return [], None, (
+            f"candidate changed during review session ({candidate[:7]} → {lech[:7]}) — "
             "this review attempt does not count. Review reads the frozen candidate, "
-            "it does not create a new one."
-        ], None
+            "it does not create a new one.")
 
     if not result.ok:
-        # Cannot review means **not** treated as clean.
-        return [f"review could not run: {result.error}"], None
+        # The reviewer did not execute: no verdict, not a clean pass, not a
+        # block — REVIEW_UNRUNNABLE, retried on the same candidate (D-032).
+        return [], None, str(result.error or "reviewer session did not complete")
 
     text, verdict = _with_schema(
         client, spec, result, store=store, story_id=story.id,
         artifact_root=artifact_root, workdir=workdir, role="review", number=number,
     )
-    return _reconcile(story.id, store, text, verdict, role="review"), verdict
+    return _reconcile(story.id, store, text, verdict, role="review"), verdict, ""
 
 
 def _reconcile(story_id: str, ev: EvidenceStore, text: str,
@@ -2427,6 +2458,65 @@ _MA_TIEU_CHI = re.compile(r"\bAC-[A-Za-z0-9_-]*?-\d+(?![0-9A-Za-z_-])")
 #: (lỗi 127): STORY-05-02 spent six sessions on a verdict it had after two.
 MAX_NOOP = 2
 
+#: Review outcomes (D-032). PASS and BLOCK are the reviewer's verdicts about the
+#: candidate; REVIEW_UNRUNNABLE is the reviewer's *absence* — max_turns,
+#: timeout, transport failure, a session that modified the tree, a candidate
+#: that moved under it. LedgerLock Run #2 STORY-01-06 (2026-09-15, 1.7.3):
+#: deterministic gates green, security clean, reviewer cut at 40 turns; the
+#: loop's only move was a new developer session, the developer correctly wrote
+#: nothing, and the no-op policy made the story terminal.
+REVIEW_PASS = "PASS"
+REVIEW_BLOCK = "BLOCK"
+REVIEW_UNRUNNABLE = "REVIEW_UNRUNNABLE"
+#: Reviewer executions on one candidate after the first, before the story ends
+#: as REVIEW_UNRUNNABLE. A cut reviewer is retried on the **same** frozen
+#: candidate; nothing about the code changed, so nothing else is re-asked.
+MAX_REVIEW_RETRIES = 2
+#: Legacy prefix (≤ 1.7.3) under which an execution failure was stored as a
+#: finding; read so a resumed pre-1.7.4 run is recovered, never written again.
+_LEGACY_UNRUN = "review could not run:"
+
+
+def _review_complete(ev: Event | None) -> bool:
+    """Does this `tool_run review` carry a reviewer's **verdict** (PASS or
+    BLOCK)? An execution failure recorded there — new `unrunnable`/`outcome`
+    fields, or the ≤ 1.7.3 finding text — is not evidence about the candidate
+    and must not be reused as if it were (D-032)."""
+    if ev is None:
+        return False
+    d = ev.detail
+    if d.get("unrunnable") or d.get("outcome") == REVIEW_UNRUNNABLE:
+        return False
+    return not any(str(f).startswith(_LEGACY_UNRUN) for f in (d.get("findings") or []))
+
+
+def _review_executions(ev: Evidence, story_id: str, sha: str) -> int:
+    """Reviewer sessions already spent on this candidate."""
+    return sum(1 for e in ev.of(AGENT_RUN, f"{story_id}-review")
+               if str(e.detail.get("candidate") or "") == sha)
+
+
+def _only_review_unrunnable(attempt: Attempt) -> bool:
+    """The gate failed on the reviewer's absence and nothing else."""
+    return bool(attempt.review_unrunnable) and attempt.gate is not None and (
+        [c.name for c in attempt.gate.failures] == ["review"])
+
+
+def _pending_review(root: Path, story_id: str, workdir: Path) -> str:
+    """Candidate at the worktree HEAD whose last verdict failed **only**
+    because the reviewer did not run — the state a resumed run must pick up
+    at the review stage, not with a developer session (Run #2's forced resume
+    opened two developer sessions on exactly this state and blocked again)."""
+    sha = head_sha(workdir)
+    if not sha:
+        return ""
+    ev = EvidenceStore(root).read(story_id)
+    verdict = next((e for e in reversed(list(ev.of(NOTE, "gate:verdict")))
+                    if str(e.detail.get("candidate") or "") == sha), None)
+    if verdict is None or list(verdict.detail.get("failures") or []) != ["review"]:
+        return ""
+    return sha if not _review_complete(_at(ev, TOOL_RUN, "review", sha)) else ""
+
 
 def _noop_lien_tiep(attempts: list[Attempt]) -> int:
     """No-op sessions at the tail of the list, unbroken."""
@@ -2714,6 +2804,61 @@ def implement_story(
 
     run_baseline(story, workdir=workdir, artifact_root=root, config=cfg, base_ref=base_ref)
 
+    def _review_stage(attempt: Attempt) -> Attempt:
+        """Retry the REVIEW stage on the same frozen candidate while the gate
+        fails only because the reviewer did not run — bounded — and end the
+        story as REVIEW_UNRUNNABLE when the budget is spent. Never a developer
+        session: nothing about the code has been said (D-032)."""
+        sha = attempt.candidate
+        scope = effective_write_scope(story, project)
+        changed = changed_files(str(workdir), base_ref=base_ref)
+        preservation = preservation_items(story, project=project, ledger=_ledger(root))
+        while _only_review_unrunnable(attempt) and attempt.review_attempt <= MAX_REVIEW_RETRIES:
+            _log(f"story={story.id}#{attempt.number} review UNRUNNABLE on candidate {sha[:8]} "
+                 f"— retrying the review stage ({attempt.review_attempt}/{1 + MAX_REVIEW_RETRIES} "
+                 f"executions spent): {attempt.review_unrunnable[:80]}")
+            lai = Attempt(number=attempt.number, verify_only=True)
+            lai.candidate = sha
+            lai = verify_candidate(
+                story, project=project, workdir=workdir, artifact_root=root, client=client,
+                config=cfg, catalog=cat, architecture=architecture, contract=contract,
+                attempt=lai, base_ref=base_ref, scope=scope, changed=changed,
+                preservation=preservation, reuse=True,
+            )
+            outcome.attempts.append(lai)
+            attempt = lai
+        if _only_review_unrunnable(attempt):
+            outcome.blocked_reason = (
+                f"{REVIEW_UNRUNNABLE}: the reviewer did not produce a verdict on candidate "
+                f"{sha[:8]} in {attempt.review_attempt} executions — last: "
+                f"{attempt.review_unrunnable}. Deterministic checks passed and the candidate is "
+                f"kept; no developer change is needed. Re-run the review stage when the reviewer "
+                f"can run: `{aisef_command()} run --verify-only --story {story.id}`."
+            )
+            _log(f"story={story.id} {REVIEW_UNRUNNABLE} after {attempt.review_attempt} "
+                 f"review executions on {sha[:8]}")
+        return attempt
+
+    # A resumed story whose worktree already carries a candidate that failed
+    # only because the reviewer did not run picks up at the review stage.
+    pending = _pending_review(root, story.id, workdir)
+    if pending:
+        _log(f"story={story.id} resuming at the review stage on candidate {pending[:8]}")
+        attempt = Attempt(number=outcome.quality_attempts + 1, verify_only=True)
+        attempt.candidate = pending
+        attempt.review_unrunnable = "pending from a previous run"
+        attempt.review_attempt = _review_executions(EvidenceStore(root).read(story.id), story.id, pending)
+        attempt.gate = story_gate.StoryGate(story_id=story.id, checks=[
+            story_gate.Check("review", story_gate.Outcome.UNRUNNABLE, "pending from a previous run")])
+        attempt = _review_stage(attempt)
+        if attempt.ok:
+            _log(f"story={story.id} review stage OK on resumed candidate {pending[:8]}")
+            return outcome
+        if outcome.blocked_reason:
+            return outcome
+        # A genuine verdict now exists: the loop below reads it as feedback.
+        feedback = feedback or _unfinished_review(root, story.id, workdir)
+
     while True:
         n = outcome.quality_attempts + 1
         _log(f"story={story.id} attempt={n} START")
@@ -2732,6 +2877,13 @@ def implement_story(
             base_ref=base_ref,
         )
         outcome.attempts.append(attempt)
+
+        # The reviewer did not run on an otherwise-good candidate: retry the
+        # review stage, bounded, before anything else is decided (D-032).
+        if _only_review_unrunnable(attempt):
+            attempt = _review_stage(attempt)
+            if outcome.blocked_reason:
+                return outcome
 
         if attempt.ok:
             _log(f"story={story.id} attempt={n} OK ${attempt.cost_usd:.2f}")
@@ -2917,7 +3069,16 @@ def verify_only(
         },
     ))
     outcome.attempts.append(attempt)
-    if not attempt.ok:
+    if _only_review_unrunnable(attempt):
+        # The reviewer did not run again: name that, not a failed gate (D-032).
+        outcome.blocked_reason = (
+            f"{REVIEW_UNRUNNABLE}: the reviewer did not produce a verdict on candidate "
+            f"{attempt.candidate[:8]} (execution {attempt.review_attempt}) — "
+            f"{attempt.review_unrunnable}. Deterministic checks passed and the candidate is "
+            f"kept; re-run `{aisef_command()} run --verify-only --story {story.id}` when the "
+            f"reviewer can run."
+        )
+    elif not attempt.ok:
         outcome.blocked_reason = (
             f"re-verify candidate {attempt.candidate[:7]} did not pass gate: "
             + "; ".join(c.name for c in attempt.gate.failures)

@@ -643,9 +643,14 @@ def _run_wave(
                 attempts=outcome.quality_attempts,
                 cost_usd=round(outcome.cost_usd, 4),
             )
+            last = outcome.attempts[-1] if outcome.attempts else None
             tx.record("review.completed", blocked=[
                 f for a in outcome.attempts for f in a.review_findings
-            ][:5])
+            ][:5], outcome=("REVIEW_UNRUNNABLE" if last is not None and last.review_unrunnable
+                             else "BLOCK" if last is not None and last.review_findings
+                             else "PASS" if last is not None and last.ok else "NONE"),
+                review_executions=sum(1 for a in outcome.attempts if a.review_attempt),
+                developer_attempts=outcome.quality_attempts)
             # Story-level gate calibration (ADR-004 R5): predicted score vs
             # actual developer attempts. Recorded here because this is the
             # first place both values are available, and the story's evidence

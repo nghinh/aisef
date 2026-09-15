@@ -306,14 +306,23 @@ class TestReviewerDoiUngVien(WorktreeCase):
     """Hoàn nguyên cây không thấy một `git commit` — nên HEAD phải được so."""
 
     def test_ra_soat_tao_commit_thi_luot_khong_duoc_tinh(self):
-        out = self.implement(Client(review_commits=True))
+        """Từ 1.7.4 (D-032) lượt ấy là REVIEW_UNRUNNABLE — không phải mục chặn
+        của người rà soát — được thử lại trên đúng ứng viên, và cây được đưa
+        về lại ứng viên đã đóng băng: commit của người rà soát không thành
+        ứng viên."""
+        client = Client(review_commits=True)
+        out = self.implement(client)
         self.assertFalse(out.done, out.summary())
-        finding = " ".join(out.attempts[-1].review_findings)
-        self.assertIn("candidate changed", finding)
+        self.assertEqual(out.attempts[-1].review_findings, [])
+        self.assertIn("candidate changed", out.attempts[-1].review_unrunnable)
+        self.assertIn("REVIEW_UNRUNNABLE", out.blocked_reason)
+        self.assertEqual(client.calls.count("develop"), 1, "không mở lại developer cho lỗi rà soát")
         got = self.evidence().last(TOOL_RUN, "review:candidate")
         self.assertIsNotNone(got, "phải ghi bằng chứng lượt rà soát không tính")
         self.assertFalse(got.ok)
         self.assertEqual(got.detail["expected"], out.attempts[-1].candidate)
+        self.assertEqual(head_sha(self.work), out.attempts[-1].candidate,
+                         "cây phải nằm lại trên ứng viên đã đóng băng, không phải commit của người rà soát")
 
 
 class TestHopQuyC8(WorktreeCase):

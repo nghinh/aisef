@@ -1387,8 +1387,12 @@ class TestNguoiRaSoatKhongDuocSuaCay(ImplementTestCase):
         self._init_git()
         out = self.implement(self.ReviewerGhi())
         self.assertFalse((self.project / "src" / "reviewer-da-ghi.py").exists(), "phải hoàn nguyên")
-        chan = out.attempts[-1].review_findings
-        self.assertTrue(any("modified the working tree" in f for f in chan), chan)
+        # D-032: một phiên rà soát tự sửa cây là phiên **không chạy được** — thử
+        # lại giai đoạn rà soát trên đúng ứng viên (có giới hạn), không phải một
+        # mục chặn của người rà soát và không mở lại developer.
+        self.assertIn("modified the working tree", out.attempts[-1].review_unrunnable)
+        self.assertEqual(out.attempts[-1].review_findings, [])
+        self.assertIn("REVIEW_UNRUNNABLE", out.blocked_reason)
         ev = EvidenceStore(self.artifacts).read(self.story.id)
         self.assertTrue(any(e.name == "review:immutable" and not e.ok for e in ev.events))
 
