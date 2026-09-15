@@ -27,6 +27,17 @@ asserts the two agree on a generated bundle.
 
     python3 validation/make_validation_bundle.py            # for pyproject's version
     python3 validation/make_validation_bundle.py 1.7.2      # explicit
+    python3 validation/make_validation_bundle.py 1.7.3 --docs HEAD   # docs from HEAD
+
+``--docs <ref>`` freezes the four public documents and the template from that
+commit instead of the release tag. The product is identified by the tag; the
+documentation is its own plane (owner adjustment 8) and may be corrected after
+the tag — the 1.7.3 tag's quickstart still said *Expect: aisef-1.7.2*, which
+a participant would have read as an error. The record names both commits
+explicitly: ``release_source_sha`` (the product) and ``bundle_source_sha``
+(the exact commit the frozen files were taken from — never "current HEAD"),
+and ``instructions_digest`` binds whatever was frozen; later HEAD movement
+cannot alter it.
 
 Refuses to overwrite an existing bundle: it is immutable once a participant
 may have read it. A new release gets a new directory; a handoff defect found
@@ -184,13 +195,18 @@ Rules:
 """
 
 
-def build(version: str, *, force: bool = False) -> Path:
+def build(version: str, *, force: bool = False, docs_ref: str = "") -> Path:
     manifest = ROOT / "closure-evidence" / "releases" / f"{version}.json"
     if not manifest.is_file():
         raise SystemExit(f"{manifest.relative_to(ROOT)} does not exist — record the manifest first "
                          f"(validation/record_closure_evidence.py manifest)")
     m = json.loads(manifest.read_text(encoding="utf-8"))
     tag = m["tag"]
+    src_ref = docs_ref or tag
+    docs_sha = subprocess.run(["git", "-C", str(ROOT), "rev-parse", f"{src_ref}^{{commit}}"],
+                              capture_output=True, text=True, encoding="utf-8").stdout.strip()
+    if not docs_sha:
+        raise SystemExit(f"cannot resolve {src_ref!r} to a commit")
     out = ROOT / "closure-evidence" / "external-validation" / version
     record = out.parent / f"{version}.bundle.json"
     if (out.exists() or record.exists()) and not force:
@@ -201,8 +217,8 @@ def build(version: str, *, force: bool = False) -> Path:
     out.mkdir(parents=True, exist_ok=True)
     (out / "INSTRUCTIONS.md").write_text(instructions(m, version), encoding="utf-8")
     for name, src in FROZEN.items():
-        (out / name).write_text(_at_tag(tag, src), encoding="utf-8")
-    template = (_at_tag(tag, TEMPLATE)
+        (out / name).write_text(_at_tag(src_ref, src), encoding="utf-8")
+    template = (_at_tag(src_ref, TEMPLATE)
                 .replace("`<e.g. 1.7.2>`", f"`{m['version']}`")
                 .replace("`<e.g. v1.7.2>`", f"`{tag}`")
                 .replace("`<40-hex commit from bundle.json>`", f"`{m['release_source_sha']}`")
@@ -235,7 +251,9 @@ def build(version: str, *, force: bool = False) -> Path:
                                      "sorted by path; the same call the closure probe makes "
                                      "(aisef.control.planes.bundle_digest)"),
         "files": files,
+        "bundle_source_sha": docs_sha,
         "frozen_from": {"tag": tag, "sha": m["release_source_sha"],
+                        "docs_ref": src_ref, "docs_sha": docs_sha,
                         "sources": {**{k: v for k, v in FROZEN.items()}, "REPORT-TEMPLATE.md": TEMPLATE}},
         "report_schema": {
             "path": f"closure-evidence/external-validation/{version}/REPORT.md",
@@ -254,7 +272,12 @@ def build(version: str, *, force: bool = False) -> Path:
 if __name__ == "__main__":
     force = "--force" in sys.argv
     args = [a for a in sys.argv[1:] if a != "--force"]
-    path = build(args[0] if args else _version(), force=force)
+    docs_ref = ""
+    if "--docs" in args:
+        i = args.index("--docs")
+        docs_ref = args[i + 1]
+        del args[i:i + 2]
+    path = build(args[0] if args else _version(), force=force, docs_ref=docs_ref)
     rec = json.loads((path.parent / f"{path.name}.bundle.json").read_text())
     print(f"bundle at {path.relative_to(ROOT)} ({len(rec['files'])} files) — "
           f"instructions_digest {rec['instructions_digest'][:12]} · record {path.name}.bundle.json")

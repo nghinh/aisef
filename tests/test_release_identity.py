@@ -496,6 +496,31 @@ class TestValidationBundleGenerator(unittest.TestCase):
         self.assertIn("<instructions_digest from 9.9.9.bundle.json", template)
         self.assertNotIn(rec["instructions_digest"], template, "a file inside the digest cannot carry it")
 
+    def test_docs_can_be_frozen_from_a_later_documentation_commit(self):
+        """The tag fixes the product; the documents may be corrected after it
+        (1.7.3: the tag's quickstart still expected aisef-1.7.2). `--docs`
+        freezes them from the named commit and the record says so; the
+        release identity does not move."""
+        import validation.make_validation_bundle as B
+        out, rec, sha = self._build()
+        root = B.ROOT
+        (root / "docs" / "EXTERNAL-VALIDATION-QUICKSTART.md").write_text(
+            "# quickstart\n\nExpect: `Successfully installed aisef-9.9.9`\n", encoding="utf-8")
+        git(root, "add", "."); git(root, "commit", "-qm", "docs: corrected expectations")
+        docs_sha = git(root, "rev-parse", "HEAD").stdout.strip()
+        self.assertNotEqual(docs_sha, sha)
+        out2 = B.build("9.9.9", force=True, docs_ref="HEAD")
+        rec2 = json.loads((out2.parent / "9.9.9.bundle.json").read_text(encoding="utf-8"))
+        self.assertIn("aisef-9.9.9", (out2 / "QUICKSTART.md").read_text(encoding="utf-8"))
+        self.assertEqual(rec2["release_source_sha"], sha)
+        self.assertEqual(rec2["frozen_from"]["sha"], sha)
+        self.assertEqual(rec2["frozen_from"]["docs_sha"], docs_sha)
+        self.assertEqual(rec2["bundle_source_sha"], docs_sha)
+        self.assertEqual(rec["bundle_source_sha"], sha, "frozen from the tag: bundle source is the release commit")
+        self.assertNotEqual(rec2["instructions_digest"], rec["instructions_digest"])
+        probe_side, _ = planes.bundle_digest(out2, exclude=("REPORT.md",))
+        self.assertEqual(rec2["instructions_digest"], probe_side)
+
     def test_a_filled_report_passes_g6_1_against_the_generated_bundle(self):
         """End to end: the template, filled with the record's values, is read by
         the same probe that will read the real participant's report."""
