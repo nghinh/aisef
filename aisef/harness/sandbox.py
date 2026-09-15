@@ -43,7 +43,6 @@ import importlib
 import os
 import shutil
 import subprocess
-import sys
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -489,34 +488,10 @@ def _link_mounts(spec: SandboxSpec) -> None:
             dst.symlink_to(Path(src).resolve())
 
 
-#: Put the child in its own process group so a timeout can kill the **whole
-#: tree**, not only the direct child. Windows has no process groups in the
-#: POSIX sense; `CREATE_NEW_PROCESS_GROUP` is what `taskkill /T` walks.
-_OWN_GROUP: dict = (
-    {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}  # type: ignore[attr-defined]
-    if sys.platform == "win32" else {"start_new_session": True}
-)
-
-
-def _kill_group(proc: subprocess.Popen) -> None:
-    """SIGKILL the command **and everything it spawned**.
-
-    `subprocess.run(timeout=)` only calls `proc.kill()`, which leaves
-    grandchildren alive: a test command that starts a server (Playwright's
-    `webServer`) leaks it, it reparents to PID 1 and keeps holding the port.
-    The Docker path already handles the same hazard with `docker rm -f`.
-    """
-    if sys.platform == "win32":
-        subprocess.call(
-            ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-        )
-        return
-    import signal
-    try:
-        os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
-    except OSError:
-        proc.kill()          # group already gone, or not ours to signal
+#: Process-group spawn and tree kill live in `clients.base` (the lower module
+#: in the import graph); the same rule serves tool runs and agent sessions.
+from ..clients.base import OWN_GROUP as _OWN_GROUP  # noqa: E402
+from ..clients.base import kill_tree as _kill_group  # noqa: E402
 
 
 def _run_degraded(spec: SandboxSpec) -> SandboxResult:

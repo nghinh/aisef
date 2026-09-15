@@ -40,6 +40,61 @@ def machine_id() -> str:
     """Unique machine identifier for claims — hostname + pid."""
     import socket
     return f"{socket.gethostname()}:{os.getpid()}"
+
+
+def pid_alive(pid: int) -> bool:
+    """Whether a process with this id exists **on this host**. Read-only.
+
+    POSIX: signal 0. A `PermissionError` means it exists and is not ours.
+    Windows: open the process for limited query and read its exit code —
+    `STILL_ACTIVE` (259) means running; a handle that cannot be opened means
+    gone (or not ours — reported as alive, never as dead, since a wrong
+    "dead" is the costlier mistake).
+    """
+    if pid <= 0:
+        return False
+    if os.name == "nt":
+        import ctypes
+        from ctypes import wintypes
+
+        k32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
+        h = k32.OpenProcess(0x1000, False, wintypes.DWORD(pid))   # PROCESS_QUERY_LIMITED_INFORMATION
+        if not h:
+            return ctypes.get_last_error() == 5                    # ERROR_ACCESS_DENIED: exists
+        try:
+            code = wintypes.DWORD()
+            if not k32.GetExitCodeProcess(h, ctypes.byref(code)):
+                return True
+            return code.value == 259                               # STILL_ACTIVE
+        finally:
+            k32.CloseHandle(h)
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def claim_owner(claimed_by: str) -> tuple[str, int]:
+    """`(host, pid)` from a `claimed_by` value; pid 0 when unreadable."""
+    host, _, pid = str(claimed_by or "").rpartition(":")
+    try:
+        return host, int(pid)
+    except ValueError:
+        return host, 0
+
+
+def claim_is_orphaned(claimed_by: str) -> bool:
+    """True when the claim names a process **on this host** that no longer
+    exists. Another host's claim cannot be judged from here and is never
+    called orphaned (LedgerLock 2026-09-15, lỗi 179 / D-025)."""
+    import socket
+    host, pid = claim_owner(claimed_by)
+    if not host or not pid or host != socket.gethostname():
+        return False
+    return not pid_alive(pid)
 LOCK_TIMEOUT_SECONDS = 30
 
 

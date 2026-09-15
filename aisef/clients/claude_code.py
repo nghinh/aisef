@@ -56,8 +56,8 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
-from .base import (Capability, ClientAdapter, RunSpec, Support, _stream_with_timeout, auth_hint,
-                   child_env, resolve_binary)
+from .base import (OWN_GROUP, Capability, ClientAdapter, RunSpec, Support,
+                   _stream_with_timeout, auth_hint, child_env, resolve_binary)
 from .stream import RunResult, exit_status_of, parse_stream
 
 BINARY = "claude"
@@ -153,6 +153,7 @@ class ClaudeCodeAdapter(ClientAdapter):
                 # The prompt is written and stdin closed straight away; an open
                 # stdin makes the CLI wait 3s on every call.
                 stdin=subprocess.PIPE,
+                **OWN_GROUP,
             )
         except OSError as e:
             return RunResult(ok=False, error=f"cannot run: {e}")

@@ -31,8 +31,8 @@ import subprocess
 import time
 from pathlib import Path
 
-from .base import (Capability, ClientAdapter, RunSpec, Support, _stream_with_timeout,
-                   auth_hint, child_env, resolve_binary)
+from .base import (OWN_GROUP, Capability, ClientAdapter, RunSpec, Support,
+                   _stream_with_timeout, auth_hint, child_env, resolve_binary)
 from .stream import GUARD_MESSAGE, RunResult, exit_status_of
 
 BINARY = "opencode"
@@ -238,6 +238,7 @@ class OpenCodeAdapter(ClientAdapter):
                 env=child_env(spec.env,
                               allow_prefixes=(*self.env_prefixes, *spec.env_allow)),
                 stdin=subprocess.PIPE,
+                **OWN_GROUP,
             )
         except OSError as e:
             return RunResult(ok=False, error=f"cannot run: {e}")

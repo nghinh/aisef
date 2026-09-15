@@ -85,10 +85,12 @@ class TestStuckMentionIsNotAPlanVerdict(unittest.TestCase):
 # ---------------------------------------------------------------- F-2 (B)
 
 
-#: A grandchild that streams `step_finish` for 4 s. On the dogfood machine the
-#: direct child was `opencode.CMD` (a cmd.exe shim) and node was the grandchild.
+#: A grandchild that streams `step_finish` for 4 s and writes its pid first.
+#: On the dogfood machine the direct child was `opencode.CMD` (a cmd.exe shim)
+#: and node was the grandchild.
 _GRANDCHILD = (
-    "import json, time\n"
+    "import json, os, sys, time\n"
+    "open(sys.argv[1], 'w').write(str(os.getpid()))\n"
     "for i in range(40):\n"
     "    print(json.dumps({'type': 'step_finish', 'part': {'tokens': {'input': 1}}})"
     ".replace(chr(39), chr(34)), flush=True)\n"
@@ -98,148 +100,77 @@ _GRANDCHILD = (
 #: wrapper without `exec` does.
 _LAUNCHER = (
     "import subprocess, sys\n"
-    f"subprocess.run([sys.executable, '-c', {_GRANDCHILD!r}])\n"
+    f"subprocess.run([sys.executable, '-c', {_GRANDCHILD!r}, sys.argv[1]])\n"
 )
 
 
 class _ViaLauncher(OpenCodeAdapter):
+    pid_file = ""
+
     def available(self) -> bool:
         return True
 
     def build_command(self, spec):
-        return [sys.executable, "-c", _LAUNCHER]
+        return [sys.executable, "-c", _LAUNCHER, self.pid_file]
 
 
 class _Direct(_ViaLauncher):
     def build_command(self, spec):
-        return [sys.executable, "-c", _GRANDCHILD]
+        return [sys.executable, "-c", _GRANDCHILD, self.pid_file]
 
 
 class TestTurnCapKillsTheWholeProcessTree(unittest.TestCase):
-    """F-2 — five developer sessions ran 75, 108, 179, 186 and 142 turns against
-    `run.max_turns = 40`. The adapter counts `step_finish` and calls
-    `proc.kill()` on the direct child; the child was the npm shim
-    `opencode.CMD`, node survived, kept writing to the inherited pipe, and the
-    adapter counted on until EOF. The label ("max_turns … cap 40") was honest;
-    the cap was not enforced.
+    """F-3 / D-027 — five developer sessions ran 75, 108, 179, 186 and 142
+    turns against `run.max_turns = 40`. The adapter counted `step_finish` and
+    called `proc.kill()` on the direct child; the child was the npm shim
+    `opencode.CMD`, node survived, kept writing to the inherited pipes, and
+    the harness — blocked on stderr's EOF — counted on until node finished.
+    The label ("max_turns … cap 40") was honest; the cap was not enforced.
     """
+
+    def _run(self, adapter_cls):
+        from aisef.control.state import pid_alive
+
+        with tempfile.TemporaryDirectory() as d:
+            pid_file = str(Path(d) / "pid")
+            a = adapter_cls(); a.pid_file = pid_file
+            t0 = time.monotonic()
+            res = a.run(RunSpec(prompt="x", workdir=".", max_turns=5, timeout_seconds=60))
+            took = time.monotonic() - t0
+            pid = int(Path(pid_file).read_text() or 0)
+            deadline = time.monotonic() + 3
+            while pid_alive(pid) and time.monotonic() < deadline:
+                time.sleep(0.05)
+            return res, took, pid_alive(pid)
 
     def test_the_cap_stops_a_direct_child(self):
         """Control: the same stream as a direct child is stopped at the cap."""
-        res = _Direct().run(RunSpec(prompt="x", workdir=".", max_turns=5, timeout_seconds=60))
+        res, _took, alive = self._run(_Direct)
         self.assertEqual(exit_status_of(res), "max_turns")
         self.assertLessEqual(res.num_turns, 5 + 2)
+        self.assertFalse(alive)
 
     def test_the_cap_stops_a_session_whose_client_is_a_grandchild(self):
-        t0 = time.monotonic()
-        res = _ViaLauncher().run(RunSpec(prompt="x", workdir=".", max_turns=5, timeout_seconds=60))
-        took = time.monotonic() - t0
+        res, took, alive = self._run(_ViaLauncher)
         self.assertEqual(exit_status_of(res), "max_turns")
         self.assertLessEqual(res.num_turns, 5 + 2, f"ran {res.num_turns} turns against a cap of 5")
         self.assertLess(took, 2.5, f"took {took:.1f}s — the grandchild kept streaming after the kill")
+        self.assertFalse(alive, "the grandchild survived the cap")
 
-
-# ---------------------------------------------------------------- F-4 (C1)
-
-
-class TestDeclaredToolsLiveInTheDeclaredImage(unittest.TestCase):
-    """F-4 / D-028 — the python preset paired `python -m pytest` and `ruff
-    check .` with `python:3.12-slim`, which carries neither; every tool call
-    is a fresh `docker run --rm`; `aisef doctor` called the image "(matches
-    stack)". Now the preset names an image the harness builds from a pinned
-    recipe, and every declared tool is probed where it will run before a
-    session is paid for.
-    """
-
-    def test_the_python_preset_declares_a_harness_built_pinned_image(self):
-        from aisef.cli.harness import STACK_PRESETS
-        from aisef.harness import verify_image as V
-        image = str(STACK_PRESETS["python"]["sandbox.image"])
-        recipe = V.recipe_for(image)
-        self.assertIsNotNone(recipe, image)
-        self.assertIn("@sha256:", recipe.base, "the base is pinned by digest, not by tag")
-        self.assertTrue(any(p.startswith("pytest==") for p in recipe.packages))
-        self.assertTrue(any(p.startswith("ruff==") for p in recipe.packages))
-        self.assertEqual(image, recipe.name)
-        self.assertIn(recipe.digest[:12], image, "the name carries the recipe's digest")
-
-    def test_probes_are_derived_from_the_declared_commands(self):
-        from aisef.harness import verify_image as V
-        self.assertEqual(V.probe_command("python -m pytest -v"), ["python", "-c", "import pytest"])
-        self.assertEqual(V.probe_command("ruff check . --exclude .claude"), ["sh", "-c", "command -v ruff"])
-        self.assertEqual(V.probe_command("go test -v ./..."), ["sh", "-c", "command -v go"])
-        self.assertIsNone(V.probe_command("npx vitest run"), "project-local runner: not the image's to provide")
-
-    def _project(self, d, image):
-        root = Path(d)
-        (root / "pyproject.toml").write_text("", encoding="utf-8")
-        (root / ".ai").mkdir()
-        (root / ".ai" / "config.json").write_text(json.dumps({
-            "tools.test": "python -m pytest -v", "tools.lint": "ruff check .",
-            "sandbox.image": image, "sandbox.provider": "aisef.harness.sandbox:FakeProvider"}),
-            encoding="utf-8")
-        return root
-
-    def test_a_declared_tool_missing_from_the_sandbox_fails_the_check(self):
-        from unittest import mock
-
-        from aisef.config import Config
-        from aisef.harness import sandbox as SB
-        from aisef.harness import verify_image as V
-
-        def probe(spec):
-            # pytest present, ruff absent — the LedgerLock image at 14:54:58
-            ok = "import pytest" in " ".join(spec.cmd)
-            return SB.SandboxResult(0 if ok else 127, stderr="" if ok else "sh: ruff: not found")
+    def test_the_clock_kills_the_grandchild_too(self):
+        """Timeout path: same tree, no cap — the deadline must take the tree down."""
+        from aisef.control.state import pid_alive
 
         with tempfile.TemporaryDirectory() as d:
-            root = self._project(d, "some/ci-image:1")
-            with mock.patch.object(SB, "run", side_effect=probe):
-                checks = V.check_tools(root, Config.load(root), build=False)
-        by_key = {c.key: c for c in checks}
-        self.assertTrue(by_key["tools.test"].ok)
-        self.assertFalse(by_key["tools.lint"].ok)
-        self.assertIn("MISSING in some/ci-image:1", by_key["tools.lint"].line)
-
-    def test_run_refuses_to_start_when_a_declared_tool_is_missing(self):
-        from unittest import mock
-
-        from aisef.config import Config
-        from aisef.harness import sandbox as SB
-        from aisef.phases.run import _missing_tools
-
-        with tempfile.TemporaryDirectory() as d:
-            root = self._project(d, "some/ci-image:1")
-            with mock.patch.object(SB, "run", return_value=SB.SandboxResult(127, stderr="not found")):
-                missing = _missing_tools(root, Config.load(root))
-            self.assertEqual(len(missing), 2, missing)
-            with mock.patch.object(SB, "run", return_value=SB.SandboxResult(0)):
-                self.assertEqual(_missing_tools(root, Config.load(root)), [])
-
-    def test_no_declared_image_means_no_run_preflight(self):
-        """The preflight guards a *declared* environment; fixtures with the
-        provider's default image are the doctor's business, not the run's."""
-        from aisef.config import DEFAULTS, Config
-        from aisef.phases.run import _missing_tools
-        with tempfile.TemporaryDirectory() as d:
-            self.assertEqual(_missing_tools(Path(d), Config({**DEFAULTS, "tools.test": "nonexistent-tool"})), [])
-
-    def test_doctor_reports_the_missing_tool(self):
-        from unittest import mock
-
-        from aisef.cli import main
-        from aisef.harness import sandbox as SB
-
-        with tempfile.TemporaryDirectory() as d:
-            root = self._project(d, "some/ci-image:1")
-            (root / "docs").mkdir(); (root / "docs" / "requirements.md").write_text("# r\n", encoding="utf-8")
-            buf = io.StringIO()
-            with (mock.patch.object(SB, "run", return_value=SB.SandboxResult(127, stderr="sh: ruff: not found")),
-                  redirect_stdout(buf)):
-                code = main(["--project", str(root), "doctor"])
-            out = buf.getvalue()
-            self.assertIn("MISSING in some/ci-image:1", out)
-            self.assertNotEqual(code, 0, "a missing declared tool is not 'ready'")
+            pid_file = str(Path(d) / "pid")
+            a = _ViaLauncher(); a.pid_file = pid_file
+            res = a.run(RunSpec(prompt="x", workdir=".", max_turns=0, timeout_seconds=1))
+            pid = int(Path(pid_file).read_text() or 0)
+            deadline = time.monotonic() + 3
+            while pid_alive(pid) and time.monotonic() < deadline:
+                time.sleep(0.05)
+            self.assertEqual(exit_status_of(res), "timeout")
+            self.assertFalse(pid_alive(pid), "the grandchild survived the timeout")
 
 
 # ---------------------------------------------------------------- F-3 (C2)

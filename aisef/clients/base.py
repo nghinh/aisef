@@ -24,6 +24,7 @@ import sys
 import threading
 import time
 from abc import ABC, abstractmethod
+
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import Enum
@@ -345,6 +346,37 @@ class ClientAdapter(ABC):
         return sorted(out)
 
 
+# ------------------------------------------------------------ process trees
+#
+# Put a child in its own process group so a stop can kill the **whole tree**,
+# not only the direct child. Windows has no process groups in the POSIX sense;
+# `CREATE_NEW_PROCESS_GROUP` is what `taskkill /T` walks. First measured on a
+# tool run that started a server (Playwright's `webServer`, lỗi 15); the same
+# hazard on the agent side: `opencode.CMD` is a cmd.exe shim around node, so
+# `proc.kill()` at the turn cap killed the shim, node kept the pipes, and the
+# harness — blocked on their EOF — counted 186 turns against a cap of 40
+# (LedgerLock 2026-09-15, lỗi 181 / D-027).
+OWN_GROUP: dict = (
+    {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}  # type: ignore[attr-defined]
+    if sys.platform == "win32" else {"start_new_session": True}
+)
+
+
+def kill_tree(proc: subprocess.Popen) -> None:
+    """SIGKILL the process **and everything it spawned**."""
+    if sys.platform == "win32":
+        subprocess.call(
+            ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+        return
+    import signal
+    try:
+        os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+    except OSError:
+        proc.kill()          # group already gone, or not ours to signal
+
+
 # ------------------------------------------------------------ partial-stream capture
 #
 # `subprocess.communicate(timeout=)` is unsafe for clients whose output we
@@ -430,35 +462,48 @@ def _stream_with_timeout(proc, *, timeout_seconds: int, stop_when=None
     )
     reader.start()
 
+    # `kill_tree`, never `proc.kill()`: the direct child may be a launcher
+    # (`opencode.CMD` on Windows is a cmd.exe shim around node). Killing the
+    # shim left node alive, still writing to the inherited pipes, and the
+    # harness — blocked on that pipe's EOF — counted every turn it wrote:
+    # 186 turns against a cap of 40 (LedgerLock 2026-09-15, lỗi 181 / D-027).
+    # The adapters spawn with `OWN_GROUP` so the whole tree is addressable.
     timed_out = False
-    if stop_when is None:
-        try:
-            proc.wait(timeout=timeout_seconds)
-        except subprocess.TimeoutExpired:
-            timed_out = True
-            proc.kill()
-            # No timeout — the child is dying, the OS will reap it.
-            proc.wait()
-    else:
-        han = time.monotonic() + timeout_seconds
-        da_doc = 0
-        while True:
+    try:
+        if stop_when is None:
             try:
-                proc.wait(timeout=0.5)
-                break
+                proc.wait(timeout=timeout_seconds)
             except subprocess.TimeoutExpired:
-                pass
-            with lock:
-                moi, da_doc = lines[da_doc:], len(lines)
-            if moi and stop_when(moi):
-                proc.kill()
-                proc.wait()
-                break
-            if time.monotonic() >= han:
                 timed_out = True
-                proc.kill()
+                kill_tree(proc)
                 proc.wait()
-                break
+        else:
+            han = time.monotonic() + timeout_seconds
+            da_doc = 0
+            while True:
+                try:
+                    proc.wait(timeout=0.5)
+                    break
+                except subprocess.TimeoutExpired:
+                    pass
+                with lock:
+                    moi, da_doc = lines[da_doc:], len(lines)
+                if moi and stop_when(moi):
+                    kill_tree(proc)
+                    proc.wait()
+                    break
+                if time.monotonic() >= han:
+                    timed_out = True
+                    kill_tree(proc)
+                    proc.wait()
+                    break
+    except BaseException:
+        # Ctrl-C or a dying orchestrator: the child sits in its own group and
+        # would outlive us, streaming into a pipe nobody reads. Take the tree
+        # down before propagating — an interrupted run must not leave a
+        # session running against the worktree.
+        kill_tree(proc)
+        raise
 
     reader.join(timeout=2.0)
     if proc.stderr:
