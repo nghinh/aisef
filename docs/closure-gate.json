@@ -430,7 +430,7 @@
     "2": "usage error",
     "_note": "Deliberately NOT the rest of this CLI's convention (1 usage / 2 not-ready). The contract §4.3 specified these numbers; an unrecognised flag is still reported by the top-level parser and exits 1, as for every verb."
   },
-  "closure_target_sha": "5c5ba52fa0c98bd276b074b7bc3e1d112dd49fd5",
+  "closure_target_sha": "d092b25fb94ec463347e6a5a04d1cc43a7fc2df8",
   "release_manifest": {
     "_comment": "Machine-readable release identity, written by `validation/record_closure_evidence.py release` from the TAG's tree and the PUBLIC PyPI artifacts, never from HEAD. `{version}` is pyproject's version. Fields: version, tag, release_source_sha, product (digest + parts, per `planes`), artifacts (PyPI sha256), observed (download re-hashed and every member compared byte-for-byte with the tag's blobs), readme blob, tooling.",
     "path": "closure-evidence/releases/{version}.json",
