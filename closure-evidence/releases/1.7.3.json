@@ -1,0 +1,108 @@
+{
+ "artifacts": {
+  "sdist": {
+   "filename": "aisef-1.7.3.tar.gz",
+   "sha256": "7eafcc12aa6ddaa5ce07a93cab28795a0a3b7c49ac9a3fd3509eb290a032344d",
+   "size": 988644,
+   "upload_time": "2026-09-15T12:31:28.712629Z",
+   "url": "https://files.pythonhosted.org/packages/60/1f/fcc31baffd85be9dc82b9f96dcac0d149c963c81bbea917a1286cd266cca/aisef-1.7.3.tar.gz"
+  },
+  "wheel": {
+   "filename": "aisef-1.7.3-py3-none-any.whl",
+   "sha256": "97cd7a0fcaf3940b83fd5e83760da616632c4836208079398273c89b5fea6dcf",
+   "size": 607456,
+   "upload_time": "2026-09-15T12:31:27.163470Z",
+   "url": "https://files.pythonhosted.org/packages/2f/cb/f8f2b55de3523d661f6702b458bb6de283eb37fea63b150a71cac2498ee3/aisef-1.7.3-py3-none-any.whl"
+  }
+ },
+ "observed": {
+  "sdist": {
+   "matches_published": true,
+   "members_checked": 217,
+   "mismatched": [],
+   "sha256": "7eafcc12aa6ddaa5ce07a93cab28795a0a3b7c49ac9a3fd3509eb290a032344d",
+   "size": 988644,
+   "unmapped": [],
+   "url": "https://files.pythonhosted.org/packages/60/1f/fcc31baffd85be9dc82b9f96dcac0d149c963c81bbea917a1286cd266cca/aisef-1.7.3.tar.gz"
+  },
+  "wheel": {
+   "matches_published": true,
+   "members_checked": 110,
+   "mismatched": [],
+   "sha256": "97cd7a0fcaf3940b83fd5e83760da616632c4836208079398273c89b5fea6dcf",
+   "size": 607456,
+   "unmapped": [],
+   "url": "https://files.pythonhosted.org/packages/2f/cb/f8f2b55de3523d661f6702b458bb6de283eb37fea63b150a71cac2498ee3/aisef-1.7.3-py3-none-any.whl"
+  }
+ },
+ "product": {
+  "digest": "2705ee331de292bae32b6f293529b33f2db5664254ebae6bfb5883ea1a017b11",
+  "files": 111,
+  "parts": {
+   "build_config": "10646a3eb37b9ad9aa22c0de79429e8e73fbace0af3af0eea9f60b177a3827e1",
+   "package_data": "2ee6f395b89217409076d36e944abf06d3cd3a7294bbb648498664d9e4c010f6",
+   "runtime_source": "34afa16c5317953a8bb0753eedd5a60f6a21ade94002f812951732662187ca69"
+  },
+  "rev": "cfee273074af2000e0839c71333cf84ee8b5b73b",
+  "unresolved": []
+ },
+ "product_not_shipped": [],
+ "readme_blob_at_release": "f8dfb4f7ee244f260944483f83eaf2efa9ee5143",
+ "recorded_at": "2026-09-15T12:34:27+00:00",
+ "recorded_at_commit": "3ae0e3bb41df1a54152cf8caa884f487befbd21d",
+ "release_run": {
+  "conclusion": "success",
+  "created_at": "2026-09-15T12:29:13Z",
+  "id": "34969121198"
+ },
+ "release_source_sha": "cfee273074af2000e0839c71333cf84ee8b5b73b",
+ "schema_version": 1,
+ "tag": "v1.7.3",
+ "tooling": {
+  "built_by": "github release workflow (trusted publishing)",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "recorder_python": "3.14.7"
+ },
+ "version": "1.7.3",
+ "qualification": {
+  "record": "closure-evidence/releases/1.7.3.qualification.json",
+  "ci_run": "34966086751",
+  "ci_head_sha": "cfee273074af2000e0839c71333cf84ee8b5b73b",
+  "windows_regression": "green — success — Ran 3150 tests in 1502.749s, OK (skipped=84)",
+  "full_suite": "3134 passed, 19 skipped, 1403 subtests passed",
+  "lint": "All checks passed",
+  "dogfood_suite": "30 passed",
+  "verification_image": {
+   "name": "aisef-verify-python:b2c7afff2aed",
+   "image_id": "sha256:e456ae8a7c729d1e02567995b138d485a4859a9cd878ea53c5b41ebacb4222c4"
+  },
+  "public_package_qualification": {
+   "installed_from": "public PyPI, fresh venv outside the checkout (pip install --no-cache-dir aisef==1.7.3)",
+   "version_reported": "aisef 1.7.3",
+   "module_path": "<venv>/lib/python3.14/site-packages/aisef/__init__.py",
+   "artifact_digests_match_pypi": true,
+   "doctor": "✅ ready — both declared tools present in aisef-verify-python:b2c7afff2aed",
+   "tool_test_in_sandbox": "1 passed",
+   "dogfood_suite_against_installed_package": "Ran 30 tests, OK"
+  },
+  "rejected_candidate": {
+   "sha": "edcd5ecc0a773545b05448f97fe0d601a4626092",
+   "product_digest": "12512411b378e7f11bbd68e0d0028087acdf9d114d91be17c844c3f58f299f52",
+   "ci_run": "34959902843",
+   "job": "unit (windows-latest, 3.11)",
+   "test": "test_clients.TestTranLuotDoAdapterThiHanh.test_cham_tran_thi_dung_tien_trinh_va_goi_ten_dung",
+   "observed": "AssertionError: 6 != 5",
+   "reason": "real Windows max_turns regression (expected 5, observed 6); kill_tree spawned taskkill, ~0.2 s at 0.1 s per turn. Rejected by the owner 2026-09-15; not waived."
+  },
+  "ci_master_push": {
+   "run_id": "34968979318",
+   "event": "push (master fast-forwarded to cfee273)",
+   "first_attempt": {
+    "windows": "success — the process-tree regression green a second time",
+    "ubuntu-3.14": "failure — D-024 recurrence (TemporaryDirectory cleanup race in a bench-qualification test helper), test-infrastructure, not product",
+    "others": "success"
+   },
+   "action": "failed job re-run; D-024 raised P3 -> P2 in docs/DEFECT-REGISTER.json per its own rule"
+  }
+ }
+}

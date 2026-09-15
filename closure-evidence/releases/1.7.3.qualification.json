@@ -64,5 +64,15 @@
    "✅ ready"
   ]
  },
- "recorded_at": "2026-09-15T12:29:03+00:00"
+ "recorded_at": "2026-09-15T12:29:03+00:00",
+ "ci_master_push": {
+  "run_id": "34968979318",
+  "event": "push (master fast-forwarded to cfee273)",
+  "first_attempt": {
+   "windows": "success — the process-tree regression green a second time",
+   "ubuntu-3.14": "failure — D-024 recurrence (TemporaryDirectory cleanup race in a bench-qualification test helper), test-infrastructure, not product",
+   "others": "success"
+  },
+  "action": "failed job re-run; D-024 raised P3 -> P2 in docs/DEFECT-REGISTER.json per its own rule"
+ }
 }

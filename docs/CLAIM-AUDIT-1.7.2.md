@@ -20,7 +20,7 @@ presented as such) · **UNSUPPORTED** (no artifact; corrected).
 | current public version 1.7.2 | VERIFIED | `https://pypi.org/pypi/aisef/1.7.2/json`; `closure-evidence/releases/1.7.2.json` |
 | release tag `v1.7.2` → `d092b25fb94ec463347e6a5a04d1cc43a7fc2df8` | VERIFIED | `git rev-list -n 1 v1.7.2`; `docs/closure-gate.json#closure_target_sha` |
 | wheel `d97ca56d…`, sdist `7fe16a4f…` observed on PyPI, every member byte-equal to the tag | VERIFIED | `closure-evidence/releases/1.7.2.json#observed` (109 + 215 members, 0 mismatched, 0 unmapped) |
-| closure 24 of 27, only G6.1–G6.3 open | HISTORICAL — superseded 2026-09-15 by the LedgerLock dogfood intake: G2.3 FAILED on D-026/D-028/D-029 (P1, OPEN); now 23 passed · 1 failed · 3 unrunnable | `python3 bin/aisef closure`; `closure-evidence/dogfood/ledgerlock/SUMMARY.md` |
+| closure 24 of 27, only G6.1–G6.3 open | HISTORICAL for 1.7.2 — the LedgerLock dogfood intake made G2.3 FAILED (D-026/D-028/D-029); 1.7.3 (tag `v1.7.3` = `cfee273`, released 2026-09-15) closed them and reads 24 passed · 3 unrunnable again, measured after the 1.7.3 manifest and bundle | `python3 bin/aisef closure`; `closure-evidence/releases/1.7.3.json`; `closure-evidence/dogfood/ledgerlock/SUMMARY.md` |
 | zero waivers | VERIFIED | no `closure-evidence/closure-state.json`; report tally has no `waived` |
 | C-2 = INCONCLUSIVE, not rerun | VERIFIED | `docs/BENCH-REPORT-C2.md` §1; `closure-evidence/cohorts/C-2.json`; G5.1/G5.2 PASSED |
 | D-024 OPEN P3, non-blocking | VERIFIED | `docs/DEFECT-REGISTER.json`; G2.3 PASSED ("0 open P0/P1 of 24") |
