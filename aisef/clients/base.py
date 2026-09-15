@@ -365,16 +365,78 @@ OWN_GROUP: dict = (
 def kill_tree(proc: subprocess.Popen) -> None:
     """SIGKILL the process **and everything it spawned**."""
     if sys.platform == "win32":
-        subprocess.call(
-            ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-        )
+        # In-process first: spawning `taskkill` costs ~0.2 s on a CI runner,
+        # and at one turn per 0.1 s that is one turn past the cap (measured
+        # 2026-09-15, CI run 34959902843: 6 turns against a cap of 5, where
+        # 1.7.2's direct TerminateProcess stopped at exactly 5). The snapshot
+        # walk terminates the same tree `taskkill /T` walks, without the spawn.
+        if not _kill_tree_win32(proc.pid):
+            subprocess.call(
+                ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
         return
     import signal
     try:
         os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
     except OSError:
         proc.kill()          # group already gone, or not ours to signal
+
+
+def _kill_tree_win32(root_pid: int) -> bool:
+    """Terminate `root_pid` and every descendant through the Win32 API.
+
+    One process snapshot (`CreateToolhelp32Snapshot`), a parent→children map,
+    the root first (so it spawns nothing more), then every descendant found in
+    the snapshot. False when the API is unavailable — the caller falls back to
+    `taskkill`. A descendant created between snapshot and kill is the same
+    race `taskkill /T` has; the window here is milliseconds, not a spawn.
+    """
+    if sys.platform != "win32":
+        return False
+    import ctypes
+    from ctypes import wintypes
+    k32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
+
+    class PROCESSENTRY32W(ctypes.Structure):
+        _fields_ = [("dwSize", wintypes.DWORD), ("cntUsage", wintypes.DWORD),
+                    ("th32ProcessID", wintypes.DWORD), ("th32DefaultHeapID", ctypes.c_size_t),
+                    ("th32ModuleID", wintypes.DWORD), ("cntThreads", wintypes.DWORD),
+                    ("th32ParentProcessID", wintypes.DWORD), ("pcPriClassBase", ctypes.c_long),
+                    ("dwFlags", wintypes.DWORD), ("szExeFile", ctypes.c_wchar * 260)]
+
+    k32.CreateToolhelp32Snapshot.restype = wintypes.HANDLE
+    k32.Process32FirstW.argtypes = [wintypes.HANDLE, ctypes.POINTER(PROCESSENTRY32W)]
+    k32.Process32NextW.argtypes = [wintypes.HANDLE, ctypes.POINTER(PROCESSENTRY32W)]
+    k32.OpenProcess.restype = wintypes.HANDLE
+    k32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+    k32.TerminateProcess.argtypes = [wintypes.HANDLE, wintypes.UINT]
+    k32.CloseHandle.argtypes = [wintypes.HANDLE]
+    invalid = ctypes.c_void_p(-1).value
+    snap = k32.CreateToolhelp32Snapshot(0x2, 0)          # TH32CS_SNAPPROCESS
+    if not snap or snap == invalid:
+        return False
+    children: dict[int, list[int]] = {}
+    try:
+        e = PROCESSENTRY32W()
+        e.dwSize = ctypes.sizeof(e)
+        ok = k32.Process32FirstW(snap, ctypes.byref(e))
+        while ok:
+            children.setdefault(int(e.th32ParentProcessID), []).append(int(e.th32ProcessID))
+            ok = k32.Process32NextW(snap, ctypes.byref(e))
+    finally:
+        k32.CloseHandle(snap)
+    order, stack = [], [root_pid]
+    while stack:
+        pid = stack.pop()
+        order.append(pid)
+        stack.extend(children.get(pid, []))
+    for pid in order:                                     # root first
+        h = k32.OpenProcess(0x0001, False, pid)           # PROCESS_TERMINATE
+        if h:
+            k32.TerminateProcess(h, 1)
+            k32.CloseHandle(h)
+    return True
 
 
 # ------------------------------------------------------------ partial-stream capture
