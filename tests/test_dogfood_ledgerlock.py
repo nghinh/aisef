@@ -246,28 +246,60 @@ class TestMissingTestRunnerIsUnrunnableNotRed(unittest.TestCase):
 
 
 class TestCoverageDataFileIsNotAStoryChange(unittest.TestCase):
-    """F-4 — `tools.test` ran with `--cov`; pytest-cov wrote `.coverage` at the
-    worktree root; the `diff-scope` guard then blocked every bash call with
-    "1 files changed outside write_scope: .coverage" (20 blocks in six minutes
-    on STORY-01-03). A file the harness's own tool writes is not the agent's
-    change. `VENDOR_PATHS` lists the `coverage/` directory but not the data file.
+    """F-6 / D-030 — `tools.test` ran with `--cov`; pytest-cov wrote `.coverage`
+    at the worktree root (and `tests/.coverage` where `.coveragerc` pointed);
+    the `diff-scope` guard then blocked every bash call with "1 files changed
+    outside write_scope: .coverage" (21 blocks in six minutes on STORY-01-03)
+    and `tests/.coverage` was frozen into every STORY-01-01/02 candidate. A
+    file the harness's own tool writes is not the agent's change.
     """
+
+    def _repo(self, d):
+        root = Path(d)
+        for args in (["init", "-q"], ["config", "user.email", "t@t.t"], ["config", "user.name", "t"]):
+            subprocess.run(["git", "-C", d, *args], check=True)
+        (root / "src").mkdir(); (root / "tests").mkdir()
+        (root / "src" / "x.py").write_text("x = 1\n", encoding="utf-8")
+        (root / "tests" / "test_x.py").write_text("def test_x(): pass\n", encoding="utf-8")
+        subprocess.run(["git", "-C", d, "add", "."], check=True)
+        subprocess.run(["git", "-C", d, "commit", "-qm", "base"], check=True)
+        return root
 
     def test_a_coverage_data_file_written_by_the_test_tool_is_ignored(self):
         with tempfile.TemporaryDirectory() as d:
-            root = Path(d)
-            subprocess.run(["git", "-C", d, "init", "-q"], check=True)
-            subprocess.run(["git", "-C", d, "config", "user.email", "t@t.t"], check=True)
-            subprocess.run(["git", "-C", d, "config", "user.name", "t"], check=True)
-            (root / "src").mkdir()
-            (root / "src" / "x.py").write_text("x = 1\n", encoding="utf-8")
-            subprocess.run(["git", "-C", d, "add", "."], check=True)
-            subprocess.run(["git", "-C", d, "commit", "-qm", "base"], check=True)
+            root = self._repo(d)
             (root / ".coverage").write_bytes(b"SQLite format 3\x00")
+            (root / "tests" / ".coverage").write_bytes(b"SQLite format 3\x00")
+            (root / ".coverage.host.1234.567").write_bytes(b"SQLite format 3\x00")
             (root / "src" / "x.py").write_text("x = 2\n", encoding="utf-8")
             changed = G.changed_files(d)
-            self.assertNotIn(".coverage", changed, changed)
-            self.assertTrue(G.check_diff_scope(changed, ["src/x.py"]).ok)
+            self.assertEqual(changed, ["src/x.py"], changed)
+            self.assertTrue(G.check_diff_scope(changed, ["src/x.py"]).allowed)
+
+    def test_a_coverage_data_file_cannot_enter_the_frozen_candidate(self):
+        """`commit_paths` stages by scope; a scope of `tests` swept
+        `tests/.coverage` into the candidate commit. It must not."""
+        from aisef.control.worktree import commit_paths
+
+        with tempfile.TemporaryDirectory() as d:
+            root = self._repo(d)
+            (root / "tests" / ".coverage").write_bytes(b"SQLite format 3\x00")
+            (root / ".coverage").write_bytes(b"SQLite format 3\x00")
+            (root / "tests" / "test_y.py").write_text("def test_y(): pass\n", encoding="utf-8")
+            self.assertTrue(commit_paths(root, "candidate", paths=["tests", "src/x.py", ".coverage"]))
+            shown = subprocess.run(["git", "-C", d, "show", "--name-only", "--format=", "HEAD"],
+                                   capture_output=True, text=True, encoding="utf-8",
+                                   check=True).stdout.split()
+            self.assertIn("tests/test_y.py", shown)
+            self.assertNotIn("tests/.coverage", shown, shown)
+            self.assertNotIn(".coverage", shown, shown)
+
+    def test_the_agents_own_files_are_still_its_change(self):
+        """Control: a real file under `tests/` is still reported and committed."""
+        with tempfile.TemporaryDirectory() as d:
+            root = self._repo(d)
+            (root / "tests" / "coverage_report.py").write_text("", encoding="utf-8")
+            self.assertEqual(G.changed_files(d), ["tests/coverage_report.py"])
 
 
 # --------------------------------------------- orphaned running state (GREEN)

@@ -81,10 +81,24 @@ def commit_paths(path: Path, message: str, *, paths: list[str] | None = None) ->
                    if (path / p).exists() or _git(path, "ls-files", "-z", "--", spec).stdout]
         if matched:
             _git(path, "add", "-A", "--", *matched)
+    _unstage_tool_artifacts(path)
     if not _git(path, "diff", "--cached", "--name-only", check=False).stdout.strip():
         return False
     _git(path, "commit", "-q", "-m", message)
     return True
+
+
+def _unstage_tool_artifacts(path: Path) -> None:
+    """A scope of `tests` stages `tests/.coverage` along with the tests. The
+    coverage data file is the test tool's output, not the story's work
+    (D-030): take it back out before the candidate is frozen, so no gate
+    ever scores a binary the next run rewrites."""
+    from ..harness.guardrails import is_tool_artifact
+
+    staged = [p for p in _git(path, "diff", "--cached", "--name-only", "-z", check=False)
+              .stdout.split("\0") if p and is_tool_artifact(p)]
+    if staged:
+        _git(path, "reset", "-q", "--", *staged)
 
 
 def main_repo(path: Path | str) -> Path:
