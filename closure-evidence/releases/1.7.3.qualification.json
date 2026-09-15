@@ -1,0 +1,68 @@
+{
+ "version": "1.7.3",
+ "tag": "v1.7.3",
+ "release_source_sha": "cfee273074af2000e0839c71333cf84ee8b5b73b",
+ "product_digest": {
+  "cfee273": "2705ee331de292bae32b6f293529b33f2db5664254ebae6bfb5883ea1a017b11",
+  "rule": "aisef.control.planes.identity over PRODUCT_AFFECTING paths (docs/closure-gate.json#planes), 111 files, 0 unresolved"
+ },
+ "rejected_candidates": [
+  {
+   "sha": "edcd5ecc0a773545b05448f97fe0d601a4626092",
+   "product_digest": "12512411b378e7f11bbd68e0d0028087acdf9d114d91be17c844c3f58f299f52",
+   "ci_run": "34959902843",
+   "job": "unit (windows-latest, 3.11)",
+   "test": "test_clients.TestTranLuotDoAdapterThiHanh.test_cham_tran_thi_dung_tien_trinh_va_goi_ten_dung",
+   "observed": "AssertionError: 6 != 5",
+   "reason": "real Windows max_turns regression (expected 5, observed 6); kill_tree spawned taskkill, ~0.2 s at 0.1 s per turn. Rejected by the owner 2026-09-15; not waived."
+  }
+ ],
+ "ci": {
+  "run_id": "34966086751",
+  "event": "pull_request (PR #2, release/1.7.3 -> master)",
+  "head_sha": "cfee273074af2000e0839c71333cf84ee8b5b73b",
+  "jobs": {
+   "lint": "success",
+   "wheel": "success",
+   "unit (ubuntu-latest, 3.11)": "success",
+   "unit (ubuntu-latest, 3.12)": "success",
+   "unit (ubuntu-latest, 3.13)": "success",
+   "unit (ubuntu-latest, 3.14)": "success",
+   "unit (windows-latest, 3.11)": "success — Ran 3150 tests in 1502.749s, OK (skipped=84)"
+  }
+ },
+ "windows_regression": {
+  "job": "unit (windows-latest, 3.11)",
+  "result": "green",
+  "tests_collected": 3150,
+  "note": "3119 before 1.7.3: the 30 tests of tests/test_dogfood_ledgerlock.py (incl. TestTurnCapKillsTheWholeProcessTree) and one improve test are the difference; the 1.7.2-era turn-cap test test_cham_tran_thi_dung_tien_trinh_va_goi_ten_dung passes at exactly 5 turns on this commit"
+ },
+ "full_suite_local": {
+  "commit": "cfee273",
+  "command": "python3 -m pytest tests/ -q",
+  "result": "3134 passed, 19 skipped, 1403 subtests passed",
+  "ruff": "All checks passed"
+ },
+ "dogfood_suite": {
+  "file": "tests/test_dogfood_ledgerlock.py",
+  "result": "30 passed"
+ },
+ "verification_image": {
+  "name": "aisef-verify-python:b2c7afff2aed",
+  "image_id": "sha256:e456ae8a7c729d1e02567995b138d485a4859a9cd878ea53c5b41ebacb4222c4",
+  "base": "python:3.12-slim@sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea",
+  "packages": [
+   "pytest==9.1.1",
+   "pytest-cov==7.1.0",
+   "ruff==0.16.7"
+  ],
+  "doctor_at_cfee273": [
+   "✅ playwright + chromium — ready",
+   "  ✅ sandbox image — aisef-verify-python:b2c7afff2aed — built by the harness: pinned base, pinned tool versions",
+   "  ✅ tool tools.test — `tools.test` = `python3 -m pytest -v` — present in aisef-verify-python:b2c7afff2aed",
+   "  ✅ tool tools.lint — `tools.lint` = `ruff check . --exclude .claude --exclude .aisef --exclude .opencode` — present in aisef-verify-python:b2c7afff2aed",
+   "✅ ready"
+  ]
+ },
+ "recorded_at": "2026-09-15T12:29:03+00:00"
+}
