@@ -15,7 +15,9 @@ Hai test này rẻ và chặn cả lớp tái sinh ở mọi hạng mục sau.
 from __future__ import annotations
 
 import importlib
+import json
 import re
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -722,3 +724,74 @@ class TestGiaoThucTuyenCapBiGhim(unittest.TestCase):
         self.assertEqual(float(bang["TRAN_PHUT"]), Q.TRAN_PHUT)
         self.assertEqual(bang["TASK_TUYEN"], Q.TASK_TUYEN)
         self.assertEqual((bang["CLIENT_DO_DUOC"],), Q.CLIENT_DO_DUOC)
+
+
+class TestCheckoutDuLichSuChoPhepThuCanLichSu(unittest.TestCase):
+    """Job CI nào chạy cả bộ test thì phải checkout **đủ lịch sử**.
+
+    Hồi quy cho một khuyết tật đã làm đỏ một đợt phát hành thật. Bộ test có
+    phép cố ý dựng lại một commit gốc trong lịch sử chính kho này
+    (`R.materialize` → `git archive <task.base>`, task bench A-2). Checkout mặc
+    định của `actions/checkout` là **shallow** (depth 1), nên commit ấy không
+    tồn tại và phép thử **lỗi** — không bỏ qua, không cảnh báo. Đợt v1.7.0
+    (run 34908370558) đỏ đúng như thế với 4 lỗi `git archive … exit 128`, trong
+    khi cùng commit ấy xanh 3056/0 ở máy có lịch sử đầy đủ: phép thử đúng, môi
+    trường thiếu.
+
+    Kiểm tĩnh, đọc YAML như văn bản: không thêm phụ thuộc, không dựng một hệ
+    kiểm-workflow cho đúng một bất biến. Neo vào *lệnh* (`unittest discover`)
+    chứ không vào tên job, để một job mới chạy cả bộ test cũng bị đòi.
+    """
+
+    WORKFLOWS = Path(__file__).resolve().parent.parent / ".github" / "workflows"
+    LENH_CA_BO = "unittest discover"
+
+    def _jobs(self, text: str) -> dict[str, str]:
+        """Tên job → khối văn bản của nó. Job là khoá thụt **2 space** sau `jobs:`."""
+        sau = text.split("\njobs:", 1)
+        if len(sau) == 1:
+            return {}
+        moc = [(m.group(1), m.start()) for m in
+               re.finditer(r"(?m)^  ([A-Za-z_][\w-]*):[ \t]*$", sau[1])]
+        return {ten: sau[1][dau:(moc[i + 1][1] if i + 1 < len(moc) else len(sau[1]))]
+                for i, (ten, dau) in enumerate(moc)}
+
+    def test_job_chay_ca_bo_test_phai_khai_fetch_depth_0(self):
+        thay = 0
+        for f in sorted(self.WORKFLOWS.glob("*.yml")):
+            text = f.read_text(encoding="utf-8")
+            for ten, khoi in self._jobs(text).items():
+                if self.LENH_CA_BO not in khoi:
+                    continue
+                thay += 1
+                with self.subTest(workflow=f.name, job=ten):
+                    # Bỏ dòng chú thích: một lời giải thích không phải một cấu hình.
+                    cau_hinh = "\n".join(d for d in khoi.splitlines()
+                                         if not d.lstrip().startswith("#"))
+                    self.assertIn("actions/checkout", cau_hinh,
+                                  f"{f.name}:{ten} chạy cả bộ test mà không checkout")
+                    self.assertRegex(
+                        cau_hinh, r"fetch-depth:\s*0",
+                        f"{f.name}:{ten} chạy `{self.LENH_CA_BO}` với checkout shallow — "
+                        f"phép thử dựng lại commit gốc trong lịch sử kho sẽ LỖI, không bỏ qua")
+        self.assertGreaterEqual(thay, 2, "không tìm thấy job nào chạy cả bộ test — "
+                                         "regex tên job hoặc lệnh đã lệch khỏi workflow")
+
+    def test_commit_goc_ma_phep_thu_can_thuc_su_phan_giai_duoc(self):
+        """Mặt còn lại: phép thử đòi lịch sử thì lịch sử ấy phải có thật.
+
+        Không mock. Nếu checkout thiếu chiều sâu thì `git cat-file` trả về khác
+        `commit`, và đó đúng là cách đợt v1.7.0 hỏng.
+        """
+        from tests.bench import _mine as M
+
+        canh = M.TASKS_DIR / "bug-a2-multi-2" / "task.json"
+        if not canh.is_file():
+            self.skipTest("không có task fixture bug-a2-multi-2")
+        base = json.loads(canh.read_text(encoding="utf-8")).get("base") or ""
+        self.assertTrue(base, "task fixture không khai `base`")
+        ra = subprocess.run(["git", "cat-file", "-t", base], cwd=M.ROOT,
+                            capture_output=True, text=True, encoding="utf-8")
+        self.assertEqual(ra.stdout.strip(), "commit",
+                         f"commit gốc {base[:12]} không phân giải được trong checkout này — "
+                         f"lịch sử bị cắt, và mọi phép thử `materialize` sẽ lỗi")

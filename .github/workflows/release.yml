@@ -20,7 +20,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # fetch-depth: 0 — bộ test có phép **cố ý** dựng lại một commit gốc
+      # trong lịch sử chính kho này (`git archive <task.base>`, bench A-2).
+      # Checkout mặc định là shallow (depth 1), nên commit ấy không tồn tại và
+      # phép thử **lỗi** chứ không bỏ qua. Đo được: đợt phát hành v1.7.0
+      # (run 34908370558) đỏ với 4 lỗi `git archive … exit 128`, trong khi cùng
+      # commit ấy xanh 3056/0 ở máy có lịch sử đầy đủ. Không sửa phép thử: nó
+      # đúng, môi trường thiếu.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

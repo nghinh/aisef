@@ -2,7 +2,23 @@
 
 ## Unreleased
 
-## 1.7.0 — 2026-09-15
+## 1.7.1 — 2026-09-15
+
+**The release CI checks out full history, so tests that rebuild a historical
+commit run instead of erroring.** 1.7.1 is the corrected publishable release of
+the 1.7 feature set; **1.7.0 was never published to PyPI**. The v1.7.0 tag was
+pushed and its release workflow failed at the release-gate step with four
+`git archive … exit 128` errors: the qualification-pipeline tests deliberately
+rebuild a bench task from a commit in this repository's own history, and
+`actions/checkout` clones at depth 1 by default, so that commit was absent. The
+gate behaved correctly — `publish` was skipped and no invalid package reached
+PyPI. The fix is `fetch-depth: 0` on every job that runs the whole suite; no test
+was skipped and no materialization coverage was weakened. Two static checks now
+hold the invariant, anchored on the command rather than the job name so a new
+job running the suite is caught too. The functional 1.7 feature set is unchanged,
+which is why this is a patch bump.
+
+## 1.7.0 — 2026-09-15 (tagged, release CI failed, never published)
 
 Everything below landed **after** `v1.6.0` was tagged and published, so none of it
 is in the 1.6.0 wheel. Three of these paragraphs were first written into the 1.6.0

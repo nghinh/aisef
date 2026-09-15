@@ -226,6 +226,18 @@
    "fixed": "HEAD",
    "evidence": "False negative: the matcher knew `±0.08` and not `±0,08`, so the same retired band restated with a decimal comma passed. False positive: docs/BENCH-REPORT-C2.md explains why `±0.08` was withdrawn and the probe read the explanation as the claim. Same shape as AD-22's grep failing on `\"http://\"` inside URL validation — a substring cannot tell asserting from mentioning.",
    "notes": "Replaced by declared status: a `claim_registry` in the criteria file lists retired claims with every surface form, and prose fences a non-assertion with `<!-- claim:WITHDRAWAL_EXPLANATION -->`. Anything outside a region, inside a CURRENT_ASSERTION region, or inside an unterminated region is an assertion. The audit surface also grew from 4 to 8 to include the BENCH-* reports the contract always said it covered.\nfalse_pass=false deliberately, and the distinction matters: this was a false result of a CLOSURE PROBE / a bench metric, not of a gate CHECK_KIND. G2.4a's field is defined against CHECK_KIND, so recording it as a false PASS there would name a check that does not exist. The harm was real and is recorded in `evidence`; what it was not is a verification kind reporting green on red."
+  },
+  {
+   "id": "D-019",
+   "severity": "P1",
+   "status": "CLOSED",
+   "taxonomy": 174,
+   "false_pass": false,
+   "title": "CI checks out shallow, so tests that rebuild a historical commit error instead of running",
+   "introduced": "with the G5.3 qualification pipeline tests (5388ffb), after v1.6.0",
+   "fixed": "HEAD",
+   "evidence": "v1.7.0 release run 34908370558 failed: 4 errors, all `subprocess.CalledProcessError: ['git','archive','--format=tar', 'db0081275046d687e136bc2540cae78a156e7dd1'] exit 128`. That SHA is bug-a2-multi-2's `task.base` -- a commit in this repository's own history that `R.materialize` rebuilds on purpose. No workflow declared `fetch-depth`, so actions/checkout@v4 cloned at depth 1 and the commit was absent. The same suite at the same commit is green locally (3056/0) because the full history is present. CI ran 3072 tests, errors=4.",
+   "notes": "Scope: PRODUCT RUNTIME WAS NOT BROKEN. The wheel built, twine passed, and `aisef --version` reported 1.7.0 from the target's own wheel. What was broken is the release CI environment, and the release gate did its job -- `publish` was skipped and no invalid package reached PyPI, which still served 1.6.0.\nWhy it surfaced only at v1.7.0: TestDuongOngTuyenCap arrived after v1.6.0 and remote master was 56 commits behind local, so the tag push was those tests' first CI exposure. v1.6.0's release run was green.\nFixed in the environment, not the test (owner ruling: option A): `fetch-depth: 0` on the checkout of every job that runs `unittest discover` -- tests.yml::unit and release.yml::build. No skip was added and no materialization coverage was weakened. Two static regressions in tests/test_meta.py, red-first verified: one asserts any job running the whole suite declares full-history checkout (anchored on the COMMAND, so a new job is caught too), the other resolves the task's base commit with `git cat-file` so a truncated history fails loudly rather than silently.\nv1.7.0 is preserved as historical evidence: the remote tag stays on 966add6b484b4b7444c6913b2d45466e2f61137a, never moved or recreated, and the corrected candidate ships as 1.7.1. Failure artefacts kept at closure-evidence/v1.7.0-release-failure.log and v1.7.0-release-attempt.json, not rewritten."
   }
  ]
 }
