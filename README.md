@@ -253,10 +253,11 @@ when upgrading: `CHANGELOG.md`.
 The framework applies the same standard to itself. `docs/PROJECT-CLOSURE-GATE.md`
 is the owner-approved contract for calling the engineering project complete, and
 `aisef closure` scores its 27 criteria from evidence on disk without calling a
-model. On 1.7.3 it passes 24 of 27; the three open criteria are external
+model. On 1.7.4 it passes 24 of 27; the three open criteria are external
 validation by a person outside the project, which no amount of internal work can
 satisfy. (1.7.2 read 23 of 27: its first dogfood run found three P1 defects,
-D-026, D-028 and D-029, fixed in 1.7.3.) A release is identified by the product it ships — a content digest over
+D-026, D-028 and D-029, fixed in 1.7.3; the second run, on 1.7.3, found D-032,
+fixed in 1.7.4.) A release is identified by the product it ships — a content digest over
 the tag's tree and the wheel/sdist digests on PyPI — not by which commit is HEAD,
 so recording evidence about a release does not invalidate it (D-022, fixed in 1.7.2).
 
