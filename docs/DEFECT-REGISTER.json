@@ -297,6 +297,92 @@
    "fixed": "",
    "evidence": "tests/test_bench_qualification.py::TestDuongOngTuyenCap::test_moi_phien_co_cay_lam_viec_rieng: assertions passed, then `_tra_lai` -> TemporaryDirectory.cleanup() raised OSError [Errno 39] Directory not empty: .../q/run/opencode/bug-a2-multi-2/s2/.git (Python 3.13 _rmtree_safe_fd: an entry appeared between scandir and rmdir). Same commit (d092b25): 3.11, 3.12, 3.14 and Windows green; the 3.13 job re-run green; locally 0/30 failures on 3.12 and 3.14. The commit under test touched no bench code.",
    "notes": "A test-infrastructure race, not a product defect and not a gate defect: it fires after the test's assertions, in cleanup. The writer is not identified -- the fake opencode client and materialize() both finish synchronously, git gc --auto is far below its threshold on a ~600-object repo, and the CI log carries no background-git message -- so no fix is claimed. Recorded rather than papered over with ignore_cleanup_errors, which would hide the writer for good. Re-open as P2 if it recurs; then capture `ls -la .git` and `ps` at cleanup time in the helper.\n2026-09-15 later, macOS 3.14, HEAD 7e34467: one full `python3 -m unittest discover -s tests -q` run ended `FAILED (failures=1, skipped=19)` — an assertion failure this time, not a cleanup error — with the test name lost to a `tail -3`; the immediate re-run of the same command passed 3122/OK, and the two modules changed since 1.7.2 pass alone. Two symptoms, one observation each, name unknown for the second: still P3, but the next full run must capture complete output so a name can be attached."
+  },
+  {
+   "id": "D-025",
+   "severity": "P2",
+   "status": "OPEN",
+   "taxonomy": 179,
+   "false_pass": false,
+   "title": "`aisef status` reports `running` for a claim whose owning process is dead; recovery on the next run is undocumented",
+   "introduced": "1.x — claimed_by carries HOST:PID since StateStore.claim(); status never reads it",
+   "fixed": "",
+   "evidence": "closure-evidence/dogfood/ledgerlock/F-1.json (LedgerLock dogfood 2026-09-15, aisef 1.7.2 from PyPI, OpenCode 1.18.29, Windows 11); regression: branch dogfood/ledgerlock-red tests/test_dogfood_ledgerlock.py::TestStatusNamesADeadClaim (red) and TestOrphanedRunningClaimIsReclaimedOnTheNextRun (green)",
+   "notes": "Orchestrator and both OpenCode sessions vanished together after 15:03:09 with no unwinding (cause not in the evidence). reconcile_all on the preserved state returns both stories to pending and they are claimable: recovery works and is not the defect. The defect is that the operator's instrument said `running 2` for 39 minutes about a dead process, and no public document says that re-running reconciles. Product path aisef/cli (status) + DOCUMENTATION."
+  },
+  {
+   "id": "D-026",
+   "severity": "P1",
+   "status": "OPEN",
+   "taxonomy": 180,
+   "false_pass": false,
+   "title": "a prose mention `[stuck] doesn't apply` became a terminal plan deadlock after one attempt, attributed to the reviewer",
+   "introduced": "with plan_defects / deadlock-on-plan (1.6.x)",
+   "fixed": "",
+   "evidence": "closure-evidence/dogfood/ledgerlock/F-2.json (LedgerLock dogfood 2026-09-15, aisef 1.7.2 from PyPI, OpenCode 1.18.29, Windows 11); regression: branch dogfood/ledgerlock-red tests/test_dogfood_ledgerlock.py::TestStuckMentionIsNotAPlanVerdict",
+   "notes": "_TAG_MO_DAU splits a tag out of running prose, _la_muc_that exempts [stuck] from the path requirement, plan_defects accepts any stuck item, and _reconcile unions text items with the JSON verdict — so one negated sentence outranked a structured `block` verdict with three findings and stopped the epic. The blocked_reason says 'reviewer verified', which the reviewer did not. Fix is in aisef/phases/implement.py; not applied while 1.7.2 is frozen.",
+   "check": "review"
+  },
+  {
+   "id": "D-027",
+   "severity": "P2",
+   "status": "OPEN",
+   "taxonomy": 181,
+   "false_pass": false,
+   "title": "OpenCode turn cap not enforced when the client is a launcher (opencode.CMD): proc.kill() leaves node streaming",
+   "introduced": "with the emulated turn cap (_dem_luot) — TURN_LIMIT declared UNSUPPORTED",
+   "fixed": "",
+   "evidence": "closure-evidence/dogfood/ledgerlock/F-3.json (LedgerLock dogfood 2026-09-15, aisef 1.7.2 from PyPI, OpenCode 1.18.29, Windows 11); regression: branch dogfood/ledgerlock-red tests/test_dogfood_ledgerlock.py::TestTurnCapKillsTheWholeProcessTree (direct child green, launcher red)",
+   "notes": "Six sessions ran 75–186 turns against cap 40; each labelled honestly. _stream_with_timeout kills the direct child only; on Windows the npm shim dies and node keeps the pipe. Fix is in aisef/clients/base.py (kill the tree / process group); same class as taxonomy 15."
+  },
+  {
+   "id": "D-028",
+   "severity": "P1",
+   "status": "OPEN",
+   "taxonomy": 182,
+   "false_pass": false,
+   "title": "python preset pairs pytest/ruff with python:3.12-slim, which has neither; doctor calls that image a stack match",
+   "introduced": "STACK_PRESETS since harness init (1.3.x); doctor image check since 1.4.x",
+   "fixed": "",
+   "evidence": "closure-evidence/dogfood/ledgerlock/F-4.json (LedgerLock dogfood 2026-09-15, aisef 1.7.2 from PyPI, OpenCode 1.18.29, Windows 11); regression: branch dogfood/ledgerlock-red tests/test_dogfood_ledgerlock.py::(no unit test: reproduce with `docker run --rm python:3.12-slim python -m pytest --version`)",
+   "notes": "Every tool call is `docker run --rm`, so nothing survives between calls and the image must carry the toolchain. With the shipped defaults a Python project cannot verify inside the sandbox until the operator supplies an image by hand; in the dogfood run the image acquired pytest at ~14:40 and ruff at ~14:55 (F-9). Fix touches aisef/cli/harness.py and aisef/cli/doctor.py (and the guide); the owner may rule the preset a placeholder, in which case doctor's 'matches stack' is the defect."
+  },
+  {
+   "id": "D-029",
+   "severity": "P1",
+   "status": "OPEN",
+   "taxonomy": 183,
+   "false_pass": false,
+   "title": "`No module named pytest` (exit 1) read as 'the most recent test run is still failing' instead of UNRUNNABLE",
+   "introduced": "unrunnable_reason / MISSING_TOOL (1.4.x)",
+   "fixed": "",
+   "evidence": "closure-evidence/dogfood/ledgerlock/F-5.json (LedgerLock dogfood 2026-09-15, aisef 1.7.2 from PyPI, OpenCode 1.18.29, Windows 11); regression: branch dogfood/ledgerlock-red tests/test_dogfood_ledgerlock.py::TestMissingTestRunnerIsUnrunnableNotRed",
+   "notes": "MISSING_TOOL recognises exit 127 and shell-style 'not found' strings; Python's 'No module named X' on exit 1 is not among them, so the gate told three sessions (108, 179, 75 turns) that their tests were red when the runner never started. The ruff failure (exit 127) in the same run was classified correctly. Taxonomy class E. Fix is in aisef/harness/tools.py.",
+   "check": "test"
+  },
+  {
+   "id": "D-030",
+   "severity": "P2",
+   "status": "OPEN",
+   "taxonomy": 184,
+   "false_pass": false,
+   "title": "coverage data file written by tools.test counted as the agent's change: diff-scope blocks, candidates carry it",
+   "introduced": "guardrails VENDOR_PATHS (excludes coverage/ dir, not the data file)",
+   "fixed": "",
+   "evidence": "closure-evidence/dogfood/ledgerlock/F-6.json (LedgerLock dogfood 2026-09-15, aisef 1.7.2 from PyPI, OpenCode 1.18.29, Windows 11); regression: branch dogfood/ledgerlock-red tests/test_dogfood_ledgerlock.py::TestCoverageDataFileIsNotAStoryChange",
+   "notes": "21 diff-scope blocks in six minutes on STORY-01-03; tests/.coverage frozen into every STORY-01-01/02 candidate and flagged by the reviewer. Both `.coverage` (root) and `tests/.coverage` (pytest-cov data_file) are affected. Fix is in aisef/harness/guardrails.py (VENDOR_PATHS or HARNESS_OWNED)."
+  },
+  {
+   "id": "D-031",
+   "severity": "P2",
+   "status": "OPEN",
+   "taxonomy": 185,
+   "false_pass": false,
+   "title": "scheduler waves by declared write_scope; the guard lets every story write conftest.py/pytest.ini too: add/add conflict",
+   "introduced": "with the shared verification-path allowance (bug 21) — scheduler never updated",
+   "fixed": "",
+   "evidence": "closure-evidence/dogfood/ledgerlock/F-8.json (LedgerLock dogfood 2026-09-15, aisef 1.7.2 from PyPI, OpenCode 1.18.29, Windows 11); regression: branch dogfood/ledgerlock-red tests/test_dogfood_ledgerlock.py::(latent; no merge reached — reproduce by merging any two of the preserved wave-1 candidates)",
+   "notes": "Three wave-1 stories each created conftest.py and pytest.ini with different content (288/287/895 B; 85/84/424 B). Two rules for one truth (taxonomy class J): scopes_conflict sees declared scopes only. Fix is in aisef/control/scheduler.py or the allowance; not applied while 1.7.2 is frozen."
   }
  ]
 }

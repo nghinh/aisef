@@ -222,9 +222,9 @@ chứng: trượt story chứ không giữ được phiên lại.
 
 ## Lỗi thật đã gặp
 
-178 lỗi tìm bằng đo trên agent thật, xếp theo mười một lớp nguyên nhân kèm phép hồi quy: `docs/FAILURE-TAXONOMY.md`. Lỗi mới thì thêm một dòng vào đó cùng commit với test. Thay đổi theo phiên bản, kèm việc phải làm khi nâng cấp: `CHANGELOG.md`.
+185 lỗi tìm bằng đo trên agent thật, xếp theo mười một lớp nguyên nhân kèm phép hồi quy (179–185 còn mở, phép hồi quy đang đỏ trên nhánh riêng tới bản vá kế tiếp): `docs/FAILURE-TAXONOMY.md`. Lỗi mới thì thêm một dòng vào đó cùng commit với test. Thay đổi theo phiên bản, kèm việc phải làm khi nâng cấp: `CHANGELOG.md`.
 
-Khung áp chuẩn ấy lên chính nó. `docs/PROJECT-CLOSURE-GATE.md` là hợp đồng do chủ dự án duyệt để tuyên bố dự án kỹ thuật hoàn tất, và `aisef closure` chấm 27 tiêu chí của nó từ bằng chứng trên đĩa, không gọi model. Trên 1.7.2 đạt 24/27; ba tiêu chí còn mở là xác nhận ngoài bởi một người ngoài dự án — thứ không việc nội bộ nào thay được. Một bản phát hành được nhận diện bằng sản phẩm nó chứa — digest nội dung trên cây của tag và digest wheel/sdist trên PyPI — chứ không bằng commit đang là HEAD, nên ghi bằng chứng về một bản phát hành không làm mất hiệu lực chính bản ấy (D-022, sửa ở 1.7.2).
+Khung áp chuẩn ấy lên chính nó. `docs/PROJECT-CLOSURE-GATE.md` là hợp đồng do chủ dự án duyệt để tuyên bố dự án kỹ thuật hoàn tất, và `aisef closure` chấm 27 tiêu chí của nó từ bằng chứng trên đĩa, không gọi model. Trên 1.7.2 đọc 23/27: G2.3 đỏ vì ba lỗi P1 còn mở do lần dogfood đầu tiên trên gói 1.7.2 công khai tìm ra (D-026, D-028, D-029, chưa sửa khi bản phát hành còn đóng băng), và ba tiêu chí G6 là xác nhận ngoài bởi một người ngoài dự án — thứ không việc nội bộ nào thay được. Một bản phát hành được nhận diện bằng sản phẩm nó chứa — digest nội dung trên cây của tag và digest wheel/sdist trên PyPI — chứ không bằng commit đang là HEAD, nên ghi bằng chứng về một bản phát hành không làm mất hiệu lực chính bản ấy (D-022, sửa ở 1.7.2).
 
 ## Hợp quy client
 

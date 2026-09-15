@@ -1,0 +1,36 @@
+{
+ "id": "F-1",
+ "observed_at": "2026-09-15T15:42:14+07:00",
+ "project_commit": "LedgerLock master ddbc10361765b6497c47f989a41d198cc404e3ed (13-git-head.txt); candidates: STORY-01-01 52664fa60a8cdea09922d2d563393ace8d02ef2e (round 3), STORY-01-02 c155f38a83c7b251e2d34b2fe252f7b194f02880, STORY-01-03 (see journal)",
+ "aisef_version": "aisef 1.7.2 (01-aisef-version.txt; .venv\\Scripts\\aisef.exe)",
+ "client": "opencode 1.18.29 via C:\\Users\\nguye\\AppData\\Roaming\\npm\\opencode.CMD (18-environment.txt); model: not recorded in the evidence (`model` field empty in every evidence row; no route.* keys in config.json) -> unknown",
+ "environment": "Microsoft Windows 11 Pro 10.0.26200; Python 3.13.15; Docker Desktop 4.61.0; sandbox.image python:3.12-slim; tools.test `python -m pytest -v --cov=ledgerlock --cov-report=term-missing --cov-fail-under=85`; tools.lint `ruff check . --exclude .claude --exclude .aisef --exclude .opencode`",
+ "reproduction": [
+  "Recovery (GREEN): `git checkout dogfood/ledgerlock-red && python3 -m pytest tests/test_dogfood_ledgerlock.py -k Orphaned` — rebuilds the preserved shape (two stories `running`, claimed_by `EDU-BGD-1143:36316`, journal ending at `candidate.frozen`, no `attempt.aborted`) and runs `reconcile_all`, which is what `aisef run`/`aisef improve` run first (aisef/phases/run.py:807,921; aisef/phases/improve.py:585). Both stories return to `pending`, `claimed_by` cleared, `claim()` succeeds.",
+  "Observability (RED): `python3 -m pytest tests/test_dogfood_ledgerlock.py -k StatusNamesADeadClaim` — `aisef status` on a state whose claim names a dead PID prints `running 1` and nothing else.",
+  "On the evidence itself: unpack preserved/ and run `from aisef.control.journal import reconcile_all` on it (done 2026-09-15, same result: both undo, both pending, both claimable)."
+ ],
+ "gate_or_evidence": "_bmad-output/sprint-status.json; _bmad-output/journal/STORY-01-01.jsonl, STORY-01-02.jsonl; 03-aisef-status.txt; 17-running-processes.txt; run.log tail",
+ "observed": "sprint-status.json: STORY-01-01 and STORY-01-02 `status: running`, `claimed_by: EDU-BGD-1143:36316`, `updated_at` 07:09:43Z / 07:09:39Z (14:09 +07:00). Journals end at `candidate.frozen` (STORY-01-01 round 3, 14:54:38; STORY-01-02 round 1, 14:35:46) with no `attempt.aborted`, `attempt.committed` or `status.*` after. run.log continues past both (STORY-01-01#3 test PASS 14:54:57, lint FAIL exit=127 14:54:58, `review agent START` 14:55:00; STORY-01-02#2 developer session started 14:41:32; tool calls until `tool=lint PASS exit=0` at 15:03:09) and then stops mid-flight: no wave/epic summary line, no agent DONE for either session. 17-running-processes.txt (15:42) is empty. `aisef status` at 15:42 prints `running 2 · failed 1` and `Agent runs: ok 15 · max_turns 6 · infra 1` with no indication that the owning process is gone.",
+ "expected": "Two different statements. (1) After an orchestrator death the next `aisef run` reconciles the journal (`StoryRunTransaction` ABORTED/RECONCILED, aisef/control/journal.py) — this is what the code does and what the test confirms; docs/USAGE-GUIDE.md and README.md contain no sentence about it (grep -i reconcil: 0 hits), so the operator had no way to know that `running` is recoverable by re-running. (2) `aisef status` reports the state file verbatim; `claimed_by` carries HOST:PID, so on the same host a dead claim is knowable, and the guide describes `status` as the operator's view of the run.",
+ "termination_cause": "INSUFFICIENT EVIDENCE. The last orchestrator line is 15:03:09; at 15:42 no aisef, python or opencode process exists; nothing was written by any thread (no ABORTED, no state change, no traceback in run.log). A KeyboardInterrupt in the main thread would not by itself silence the worker threads and their children; the pattern (orchestrator and both OpenCode sessions gone together, no unwinding) is consistent with a console-level termination of the whole tree (window closed, Ctrl+Break, logoff, reboot) or an out-of-band kill. The evidence package contains no event log, no exit code and no operator note for 15:03–15:42, so no cause is asserted.",
+ "hidden_oracle": "not_applicable",
+ "severity": "P2",
+ "severity_note": "Not P1: nothing was lost (worktrees, candidates and journals are intact) and the recovery path exists and works; the run can be resumed by the documented entry point without author help. Not P3: the operator's only instrument said `running` for 39 minutes about a process that did not exist, and the recovery is undocumented.",
+ "class": "FRAMEWORK_PRODUCT_DEFECT",
+ "class_note": "Observability half (status) is product code (aisef/cli); the missing sentence about reconciliation is DOCUMENTATION. The owner's stated hypothesis 'aisef did not reconcile' is NOT confirmed as a recovery defect: reconciliation is by design deferred to the next run/improve and works on this exact state.",
+ "affects_v1_closure": "no",
+ "requires_product_change": "yes",
+ "evidence": [
+  "preserved/sprint-status.json",
+  "preserved/journal/STORY-01-01.jsonl",
+  "preserved/journal/STORY-01-02.jsonl",
+  "03-aisef-status.txt",
+  "04-aisef-status-attempts.txt",
+  "17-running-processes.txt",
+  "run.log:296-326",
+  "branch dogfood/ledgerlock-red (63cfe97), tests/test_dogfood_ledgerlock.py — red on 1.7.2, not fixed"
+ ],
+ "package": "ledgerlock-dogfood-evidence/20260915-154214+0700 (zip sha256 a57594a02da163aa343c91c5bfb8d6aa76ce0fc54692b0f14265a1a9000ce5fe; MANIFEST.digest b8d57952866a68be056f312bd118a3261fee47a7736934cef8fc3bc0156e25ad; 15506 files in MANIFEST.sha256) + run.log (the orchestrator log, 326 lines, 14:0x–15:03:09 +07:00)",
+ "register": "D-025"
+}

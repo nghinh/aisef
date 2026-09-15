@@ -1,0 +1,29 @@
+{
+ "id": "F-5",
+ "observed_at": "2026-09-15T14:28:37+07:00",
+ "project_commit": "LedgerLock master ddbc10361765b6497c47f989a41d198cc404e3ed (13-git-head.txt); candidates: STORY-01-01 52664fa60a8cdea09922d2d563393ace8d02ef2e (round 3), STORY-01-02 c155f38a83c7b251e2d34b2fe252f7b194f02880, STORY-01-03 (see journal)",
+ "aisef_version": "aisef 1.7.2 (01-aisef-version.txt; .venv\\Scripts\\aisef.exe)",
+ "client": "opencode 1.18.29 via C:\\Users\\nguye\\AppData\\Roaming\\npm\\opencode.CMD (18-environment.txt); model: not recorded in the evidence (`model` field empty in every evidence row; no route.* keys in config.json) -> unknown",
+ "environment": "Microsoft Windows 11 Pro 10.0.26200; Python 3.13.15; Docker Desktop 4.61.0; sandbox.image python:3.12-slim; tools.test `python -m pytest -v --cov=ledgerlock --cov-report=term-missing --cov-fail-under=85`; tools.lint `ruff check . --exclude .claude --exclude .aisef --exclude .opencode`",
+ "reproduction": [
+  "`git checkout dogfood/ledgerlock-red && python3 -m pytest tests/test_dogfood_ledgerlock.py -k MissingTestRunner` — `unrunnable_reason(\"test\", 1, \"/usr/local/bin/python: No module named pytest\")` returns `\"\"` (red). Same call with exit 127 or with the substring `not found` returns a reason (the rule that classified the ruff failure correctly)."
+ ],
+ "gate_or_evidence": "test gate (`test`), aisef/harness/tools.py `unrunnable_reason` / `MISSING_TOOL`; run.log:123,206 and the 16 `No module named pytest` outputs",
+ "observed": "`tool=test FAIL exit=1` with output `/usr/local/bin/python: No module named pytest`, then `gate ✗ test · failed · the most recent test run is still failing, the story cannot be finished.` (STORY-01-01#1 14:28:37, STORY-01-02#1 14:40:12, 3 occurrences). The developer sessions were told their tests were red; they were never run. Contrast: `ruff` missing (exit 127) was read as `unrunnable=tool not installed or cannot load (not found)`.",
+ "expected": "docs/USAGE-GUIDE.md and the gate's own vocabulary: a tool that cannot start is UNRUNNABLE ('set up the environment or fix the command and retry'), never 'tests failing'. docs/DOGFOOD-FINDING-INTAKE.md §2 ENVIRONMENT/INFRA: if AISEF labels an environment failure as a product failure, that is a FRAMEWORK_PRODUCT_DEFECT.",
+ "root_cause": "`unrunnable_reason` recognises exit 127 or the substrings in `MISSING_TOOL` ('command not found', 'not found', 'cannot find module', 'module_not_found', 'no such file or directory', 'is not recognized…'); Python's `No module named X` on exit 1 matches none of them.",
+ "hidden_oracle": "not_applicable",
+ "severity": "P1",
+ "severity_note": "A false statement of fact from a gate ('tests are red') that misdirected three sessions (108, 179 and 75 turns) toward code that was not at fault; together with F-4 it made the run unable to proceed without author intervention. Not P0: the direction of failure is closed (no story passed on the wrong reason), so no incorrect PASS was produced.",
+ "class": "FRAMEWORK_PRODUCT_DEFECT",
+ "affects_v1_closure": "yes",
+ "requires_product_change": "yes",
+ "evidence": [
+  "run.log:60,67,123,206",
+  "preserved/evidence/STORY-01-01.jsonl, STORY-01-02.jsonl (tool_run test, exit 1)",
+  "aisef/harness/tools.py (MISSING_TOOL, unrunnable_reason)",
+  "branch dogfood/ledgerlock-red (63cfe97), tests/test_dogfood_ledgerlock.py — red on 1.7.2, not fixed"
+ ],
+ "package": "ledgerlock-dogfood-evidence/20260915-154214+0700 (zip sha256 a57594a02da163aa343c91c5bfb8d6aa76ce0fc54692b0f14265a1a9000ce5fe; MANIFEST.digest b8d57952866a68be056f312bd118a3261fee47a7736934cef8fc3bc0156e25ad; 15506 files in MANIFEST.sha256) + run.log (the orchestrator log, 326 lines, 14:0x–15:03:09 +07:00)",
+ "register": "D-029"
+}

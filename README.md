@@ -243,15 +243,18 @@ of stopping the session.
 
 ## Real bugs already hit
 
-178 bugs found by measurement on real agents, grouped into eleven cause
-classes with a regression check each: `docs/FAILURE-TAXONOMY.md`. A new bug adds
+185 bugs found by measurement on real agents, grouped into eleven cause
+classes with a regression check each (179–185 are open, their checks red on a
+branch until the next patch release): `docs/FAILURE-TAXONOMY.md`. A new bug adds
 a line there in the same commit as its test. Changes per version, and what to do
 when upgrading: `CHANGELOG.md`.
 
 The framework applies the same standard to itself. `docs/PROJECT-CLOSURE-GATE.md`
 is the owner-approved contract for calling the engineering project complete, and
 `aisef closure` scores its 27 criteria from evidence on disk without calling a
-model. On 1.7.2 it passes 24 of 27; the three open criteria are external
+model. On 1.7.2 it reads 23 of 27: G2.3 fails on three open P1 defects that the
+first dogfood run of the public 1.7.2 package found (D-026, D-028, D-029, not
+fixed while the release is frozen), and the three G6 criteria are external
 validation by a person outside the project, which no amount of internal work can
 satisfy. A release is identified by the product it ships — a content digest over
 the tag's tree and the wheel/sdist digests on PyPI — not by which commit is HEAD,

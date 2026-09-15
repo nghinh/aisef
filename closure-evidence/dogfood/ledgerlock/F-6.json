@@ -1,0 +1,29 @@
+{
+ "id": "F-6",
+ "observed_at": "2026-09-15T14:40:30+07:00",
+ "project_commit": "LedgerLock master ddbc10361765b6497c47f989a41d198cc404e3ed (13-git-head.txt); candidates: STORY-01-01 52664fa60a8cdea09922d2d563393ace8d02ef2e (round 3), STORY-01-02 c155f38a83c7b251e2d34b2fe252f7b194f02880, STORY-01-03 (see journal)",
+ "aisef_version": "aisef 1.7.2 (01-aisef-version.txt; .venv\\Scripts\\aisef.exe)",
+ "client": "opencode 1.18.29 via C:\\Users\\nguye\\AppData\\Roaming\\npm\\opencode.CMD (18-environment.txt); model: not recorded in the evidence (`model` field empty in every evidence row; no route.* keys in config.json) -> unknown",
+ "environment": "Microsoft Windows 11 Pro 10.0.26200; Python 3.13.15; Docker Desktop 4.61.0; sandbox.image python:3.12-slim; tools.test `python -m pytest -v --cov=ledgerlock --cov-report=term-missing --cov-fail-under=85`; tools.lint `ruff check . --exclude .claude --exclude .aisef --exclude .opencode`",
+ "reproduction": [
+  "`git checkout dogfood/ledgerlock-red && python3 -m pytest tests/test_dogfood_ledgerlock.py -k CoverageDataFile` — a git repo with one in-scope edit and an untracked `.coverage`: `changed_files()` returns both and `check_diff_scope` fails (red)."
+ ],
+ "gate_or_evidence": "guard `diff-scope` (aisef/harness/guardrails.py `changed_files`, `VENDOR_PATHS`, `HARNESS_OWNED`); journal `changes.detected`; preserved/reviews/STORY-01-01-review-2.md finding on tests/.coverage",
+ "observed": "21 × `guard diff-scope BLOCK bash · 1 files changed outside write_scope: .coverage. Revert them, or stop and report that the story's scope is incomplete.` (STORY-01-03, 14:40:30–14:46:07). In every `changes.detected` of STORY-01-01 (rounds 1–3) and STORY-01-02, `tests/.coverage` is listed as a story change and therefore frozen into the candidate; the reviewer flagged it: 'Binary coverage data file (53248 bytes) committed to the repo'. `tools.test` itself (`--cov`) writes these files.",
+ "expected": "Files written by the harness's own tool run are not the agent's change: `VENDOR_PATHS` already excludes `__pycache__`, `.pytest_cache`, `.ruff_cache` and the `coverage/` directory for that reason; the data file `.coverage` (root or under `tests/`, as pytest-cov's `data_file` places it) is the same category.",
+ "hidden_oracle": "not_applicable",
+ "severity": "P2",
+ "severity_note": "A false block (20 blocks in six minutes) and a binary artifact committed into candidates; the run continued. Cost measurable, no verdict wrong.",
+ "class": "FALSE_POSITIVE_GATE",
+ "affects_v1_closure": "no",
+ "requires_product_change": "yes",
+ "evidence": [
+  "run.log:213-282 (21 diff-scope blocks)",
+  "preserved/journal/STORY-01-01.jsonl, STORY-01-02.jsonl (changes.detected)",
+  "preserved/reviews/STORY-01-01-review-2.md:53-58",
+  "preserved/.aisef/worktrees/STORY-01-01/tests/.coveragerc",
+  "branch dogfood/ledgerlock-red (63cfe97), tests/test_dogfood_ledgerlock.py — red on 1.7.2, not fixed"
+ ],
+ "package": "ledgerlock-dogfood-evidence/20260915-154214+0700 (zip sha256 a57594a02da163aa343c91c5bfb8d6aa76ce0fc54692b0f14265a1a9000ce5fe; MANIFEST.digest b8d57952866a68be056f312bd118a3261fee47a7736934cef8fc3bc0156e25ad; 15506 files in MANIFEST.sha256) + run.log (the orchestrator log, 326 lines, 14:0x–15:03:09 +07:00)",
+ "register": "D-030"
+}

@@ -139,8 +139,11 @@ waiver. A criterion is never edited to fit the record.
 
 ## G. Full closure projection
 
-The same command prints all 27 criteria. Expected after a clean G6: 27 passed,
-`CLOSABLE`, approval `pending`. Re-check that G1.0 still reads PASSED with the
+The same command prints all 27 criteria. Expected after a clean G6 **on a
+release with no open P1**: 27 passed, `CLOSABLE`, approval `pending`. Since the
+LedgerLock dogfood intake (2026-09-15) 1.7.2 carries three OPEN P1 defects
+(D-026, D-028, D-029) and G2.3 reads FAILED, so a clean G6 on 1.7.2 projects to
+26 of 27 at best; closing needs the owner's decision on a patch release (I, J). Re-check that G1.0 still reads PASSED with the
 record committed — it will, unless a product path changed (L).
 
 ## H. Name the outcome

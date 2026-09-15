@@ -1,0 +1,29 @@
+{
+ "id": "F-8",
+ "observed_at": "2026-09-15T14:35:46+07:00",
+ "project_commit": "LedgerLock master ddbc10361765b6497c47f989a41d198cc404e3ed (13-git-head.txt); candidates: STORY-01-01 52664fa60a8cdea09922d2d563393ace8d02ef2e (round 3), STORY-01-02 c155f38a83c7b251e2d34b2fe252f7b194f02880, STORY-01-03 (see journal)",
+ "aisef_version": "aisef 1.7.2 (01-aisef-version.txt; .venv\\Scripts\\aisef.exe)",
+ "client": "opencode 1.18.29 via C:\\Users\\nguye\\AppData\\Roaming\\npm\\opencode.CMD (18-environment.txt); model: not recorded in the evidence (`model` field empty in every evidence row; no route.* keys in config.json) -> unknown",
+ "environment": "Microsoft Windows 11 Pro 10.0.26200; Python 3.13.15; Docker Desktop 4.61.0; sandbox.image python:3.12-slim; tools.test `python -m pytest -v --cov=ledgerlock --cov-report=term-missing --cov-fail-under=85`; tools.lint `ruff check . --exclude .claude --exclude .aisef --exclude .opencode`",
+ "reproduction": [
+  "From preserved/.aisef/worktrees: `conftest.py` sha256 8a7da210… (288 B) / 1bb9c7fc… (287 B) / 8561f558… (895 B) and `pytest.ini` 6de60283… (85 B) / a4d22bf7… (84 B) / f6eb5a53… (424 B) in STORY-01-01 / 01-02 / 01-03; `tests/.coveragerc` in 01-01 and 01-02, different. All three were scheduled in one wave (stories.index.json waves EPIC-01 = [[01-01, 01-02, 01-03]]) because their declared write_scopes are disjoint; every session was allowed to write those files because the guard scope is `write_scope + tests,test,pytest.ini,conftest.py` (run.log:212,244 `scope=…,tests,test,pytest.ini,conftest.py`).",
+  "Merging the second candidate after the first would be an add/add conflict on `conftest.py` and `pytest.ini`. Not observed: no merge happened in this run (F-1, F-2)."
+ ],
+ "gate_or_evidence": "aisef/control/scheduler.py `scopes_conflict` (declared write_scope only) vs the shared verification-path allowance fed to the diff-scope guard (bug 21); journal `changes.detected`; worktrees",
+ "observed": "Three parallel stories each created `conftest.py` and `pytest.ini` with different content; two created `tests/.coveragerc`. None of these paths is in any story's `write_scope`; all are in every story's guard scope.",
+ "expected": "The scheduler's non-overlap guarantee (docs/USAGE-GUIDE.md, waves) is stated over what stories may write; the guard lets every story write four shared paths the scheduler does not see, so two stories in one wave can both create the same file — a merge conflict the wave design promises not to produce.",
+ "hidden_oracle": "not_applicable",
+ "severity": "P2",
+ "severity_note": "Latent in this run (no merge reached). When it fires it is a merge failure with a clear reason, not a wrong pass.",
+ "class": "FRAMEWORK_PRODUCT_DEFECT",
+ "affects_v1_closure": "no",
+ "requires_product_change": "yes",
+ "evidence": [
+  "preserved/stories.index.json (waves, write_scope)",
+  "preserved/.aisef/worktrees/STORY-01-0{1,2,3}/{conftest.py,pytest.ini}",
+  "preserved/journal/*.jsonl (changes.detected)",
+  "run.log:212,244"
+ ],
+ "package": "ledgerlock-dogfood-evidence/20260915-154214+0700 (zip sha256 a57594a02da163aa343c91c5bfb8d6aa76ce0fc54692b0f14265a1a9000ce5fe; MANIFEST.digest b8d57952866a68be056f312bd118a3261fee47a7736934cef8fc3bc0156e25ad; 15506 files in MANIFEST.sha256) + run.log (the orchestrator log, 326 lines, 14:0x–15:03:09 +07:00)",
+ "register": "D-031"
+}
