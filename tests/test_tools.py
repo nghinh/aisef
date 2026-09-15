@@ -96,7 +96,8 @@ class TestSandboxImage(ToolTestCase):
 
     def test_python_stack(self):
         self.write("pyproject.toml", "")
-        self.assertEqual(image_for(self.project, self.cfg), "python:3.12-alpine")
+        from aisef.harness import verify_image
+        self.assertEqual(image_for(self.project, self.cfg), verify_image.RECIPES["python"].name)
 
     def test_config_wins(self):
         self.write("package.json", "{}")

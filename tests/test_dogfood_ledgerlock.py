@@ -139,6 +139,109 @@ class TestTurnCapKillsTheWholeProcessTree(unittest.TestCase):
         self.assertLess(took, 2.5, f"took {took:.1f}s — the grandchild kept streaming after the kill")
 
 
+# ---------------------------------------------------------------- F-4 (C1)
+
+
+class TestDeclaredToolsLiveInTheDeclaredImage(unittest.TestCase):
+    """F-4 / D-028 — the python preset paired `python -m pytest` and `ruff
+    check .` with `python:3.12-slim`, which carries neither; every tool call
+    is a fresh `docker run --rm`; `aisef doctor` called the image "(matches
+    stack)". Now the preset names an image the harness builds from a pinned
+    recipe, and every declared tool is probed where it will run before a
+    session is paid for.
+    """
+
+    def test_the_python_preset_declares_a_harness_built_pinned_image(self):
+        from aisef.cli.harness import STACK_PRESETS
+        from aisef.harness import verify_image as V
+        image = str(STACK_PRESETS["python"]["sandbox.image"])
+        recipe = V.recipe_for(image)
+        self.assertIsNotNone(recipe, image)
+        self.assertIn("@sha256:", recipe.base, "the base is pinned by digest, not by tag")
+        self.assertTrue(any(p.startswith("pytest==") for p in recipe.packages))
+        self.assertTrue(any(p.startswith("ruff==") for p in recipe.packages))
+        self.assertEqual(image, recipe.name)
+        self.assertIn(recipe.digest[:12], image, "the name carries the recipe's digest")
+
+    def test_probes_are_derived_from_the_declared_commands(self):
+        from aisef.harness import verify_image as V
+        self.assertEqual(V.probe_command("python -m pytest -v"), ["python", "-c", "import pytest"])
+        self.assertEqual(V.probe_command("ruff check . --exclude .claude"), ["sh", "-c", "command -v ruff"])
+        self.assertEqual(V.probe_command("go test -v ./..."), ["sh", "-c", "command -v go"])
+        self.assertIsNone(V.probe_command("npx vitest run"), "project-local runner: not the image's to provide")
+
+    def _project(self, d, image):
+        root = Path(d)
+        (root / "pyproject.toml").write_text("", encoding="utf-8")
+        (root / ".ai").mkdir()
+        (root / ".ai" / "config.json").write_text(json.dumps({
+            "tools.test": "python -m pytest -v", "tools.lint": "ruff check .",
+            "sandbox.image": image, "sandbox.provider": "aisef.harness.sandbox:FakeProvider"}),
+            encoding="utf-8")
+        return root
+
+    def test_a_declared_tool_missing_from_the_sandbox_fails_the_check(self):
+        from unittest import mock
+
+        from aisef.config import Config
+        from aisef.harness import sandbox as SB
+        from aisef.harness import verify_image as V
+
+        def probe(spec):
+            # pytest present, ruff absent — the LedgerLock image at 14:54:58
+            ok = "import pytest" in " ".join(spec.cmd)
+            return SB.SandboxResult(0 if ok else 127, stderr="" if ok else "sh: ruff: not found")
+
+        with tempfile.TemporaryDirectory() as d:
+            root = self._project(d, "some/ci-image:1")
+            with mock.patch.object(SB, "run", side_effect=probe):
+                checks = V.check_tools(root, Config.load(root), build=False)
+        by_key = {c.key: c for c in checks}
+        self.assertTrue(by_key["tools.test"].ok)
+        self.assertFalse(by_key["tools.lint"].ok)
+        self.assertIn("MISSING in some/ci-image:1", by_key["tools.lint"].line)
+
+    def test_run_refuses_to_start_when_a_declared_tool_is_missing(self):
+        from unittest import mock
+
+        from aisef.config import Config
+        from aisef.harness import sandbox as SB
+        from aisef.phases.run import _missing_tools
+
+        with tempfile.TemporaryDirectory() as d:
+            root = self._project(d, "some/ci-image:1")
+            with mock.patch.object(SB, "run", return_value=SB.SandboxResult(127, stderr="not found")):
+                missing = _missing_tools(root, Config.load(root))
+            self.assertEqual(len(missing), 2, missing)
+            with mock.patch.object(SB, "run", return_value=SB.SandboxResult(0)):
+                self.assertEqual(_missing_tools(root, Config.load(root)), [])
+
+    def test_no_declared_image_means_no_run_preflight(self):
+        """The preflight guards a *declared* environment; fixtures with the
+        provider's default image are the doctor's business, not the run's."""
+        from aisef.config import DEFAULTS, Config
+        from aisef.phases.run import _missing_tools
+        with tempfile.TemporaryDirectory() as d:
+            self.assertEqual(_missing_tools(Path(d), Config({**DEFAULTS, "tools.test": "nonexistent-tool"})), [])
+
+    def test_doctor_reports_the_missing_tool(self):
+        from unittest import mock
+
+        from aisef.cli import main
+        from aisef.harness import sandbox as SB
+
+        with tempfile.TemporaryDirectory() as d:
+            root = self._project(d, "some/ci-image:1")
+            (root / "docs").mkdir(); (root / "docs" / "requirements.md").write_text("# r\n", encoding="utf-8")
+            buf = io.StringIO()
+            with (mock.patch.object(SB, "run", return_value=SB.SandboxResult(127, stderr="sh: ruff: not found")),
+                  redirect_stdout(buf)):
+                code = main(["--project", str(root), "doctor"])
+            out = buf.getvalue()
+            self.assertIn("MISSING in some/ci-image:1", out)
+            self.assertNotEqual(code, 0, "a missing declared tool is not 'ready'")
+
+
 # ---------------------------------------------------------------- F-3 (C2)
 
 

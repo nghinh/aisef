@@ -810,6 +810,14 @@ def _run_sprint_owned(
 
     epics_hint = [only_epic] if only_epic else (plan.epic_order or sorted(plan.waves))
 
+    thieu = _missing_tools(project, cfg)
+    if thieu:
+        report.error = ("verification tools missing where they will run — "
+                        + "; ".join(thieu) + " — fix the environment (`aisef doctor`) "
+                        "before paying for a session (D-028)")
+        run_log(artifact_root, f"sprint ERROR {report.error}")
+        return report
+
     # Pre-flight qualification is **available** (see
     # ``_run_preflight_qualify``), but the wiring is opt-in via config
     # ``run.qualify_preflight=true`` so existing tests and callers are
@@ -859,6 +867,23 @@ def _run_sprint_owned(
         run_log(artifact_root, f"ledger refresh skipped: {e}")   # fail the sprint
     run_log(artifact_root, f"sprint DONE ${report.cost_usd:.2f} stopped={report.stopped_at or 'no'}")
     return report
+
+
+def _missing_tools(project: Path, cfg: Config) -> list[str]:
+    """Declared tools absent from the **declared** image, one line each.
+
+    Only when the project declares `sandbox.image`: an explicitly chosen
+    environment is checked before any session is paid for. With no image
+    declared the provider picks a default and `aisef doctor` is the place to
+    look — a probe per `aisef run` would tax every test fixture for a
+    question the fixture never asked.
+    """
+    if not str(cfg.get("sandbox.image", "") or "").strip():
+        return []
+    from ..harness import verify_image
+
+    return [tc.line for tc in verify_image.check_tools(project, cfg, build=True)
+            if not tc.ok]
 
 
 def run_verify_only(

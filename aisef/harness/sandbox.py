@@ -156,6 +156,12 @@ class SandboxResult:
     #: "test failed" turns out to be Docker broken, and someone fixes tests
     #: when the fix belongs to the machine (SWE-ReX 511).
     provider_error: str = ""
+    #: The image the command ran in — name **and** local content id, so
+    #: evidence can tell two images under one tag apart: on LedgerLock the
+    #: tag `python:3.12-slim` stayed while the image changed twice mid-run
+    #: (D-028 / F-9).
+    image: str = ""
+    image_id: str = ""
 
     @property
     def ok(self) -> bool:
@@ -171,6 +177,8 @@ class SandboxResult:
             "missing": list(self.missing),
             "timed_out": self.timed_out,
             "provider_error": self.provider_error,
+            "image": self.image,
+            "image_id": self.image_id,
         }
 
 
@@ -421,9 +429,19 @@ _DOCKER_INFRA_EXIT = 125
 
 
 def _run_docker(spec: SandboxSpec) -> SandboxResult:
+    from . import verify_image
+
     name = f"aisef-{uuid.uuid4().hex[:12]}"
     args = build_docker_args(spec, name=name)
     started = time.monotonic()
+    khong_dung = verify_image.ensure(spec.image)
+    if khong_dung:
+        return SandboxResult(
+            exit_code=_DOCKER_INFRA_EXIT, stderr=khong_dung,
+            duration_ms=int((time.monotonic() - started) * 1000),
+            provider_error=f"verification image unavailable: {khong_dung}",
+            image=spec.image,
+        )
     try:
         proc = subprocess.run(
             args, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=spec.timeout_seconds
@@ -456,6 +474,8 @@ def _run_docker(spec: SandboxSpec) -> SandboxResult:
         stderr=proc.stderr,
         duration_ms=int((time.monotonic() - started) * 1000),
         provider_error=provider_error,
+        image=spec.image,
+        image_id=verify_image.image_id(spec.image),
     )
 
 

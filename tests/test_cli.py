@@ -796,7 +796,9 @@ class TestInit(CliTestCase):
         cfg = json.loads((self.project / ".ai" / "config.json").read_text(encoding="utf-8"))
         from aisef.cli.harness import _PY
         self.assertEqual(cfg["tools.test"], f"{_PY} -m pytest -v")
-        self.assertEqual(cfg["sandbox.image"], "python:3.12-slim")
+        from aisef.harness import verify_image
+        self.assertEqual(cfg["sandbox.image"], verify_image.RECIPES["python"].name)
+        self.assertTrue(cfg["sandbox.image"].startswith("aisef-verify-python:"))
         self.assertIn("pypi.org", cfg["sandbox.allow_hosts"])
 
     def test_lenh_test_cua_preset_chay_duoc_tren_may_nay(self):

@@ -4,6 +4,9 @@
 from __future__ import annotations
 
 import shutil
+
+from ..harness import sandbox as _sandbox
+from ..harness import verify_image as _verify_image
 import sys
 from pathlib import Path
 
@@ -67,6 +70,13 @@ _NGOAI_KHUNG_JS = (' --ignore-pattern "**/.claude/**"'
                    ' --ignore-pattern "**/.opencode/**"')
 _NGOAI_KHUNG_PY = " --exclude .claude --exclude .aisef --exclude .opencode"
 
+#: The python preset's image is one the harness **builds** (`harness.verify_image`):
+#: pytest and ruff pinned by version on a base pinned by digest. `python:3.12-slim`
+#: carried neither tool, every call is a fresh container, and the first dogfood
+#: run of 1.7.2 printed `No module named pytest` sixteen times before the
+#: operator rebuilt the image by hand (LedgerLock 2026-09-15, lỗi 182 / D-028).
+_PY_IMAGE = _verify_image.RECIPES["python"].name
+
 STACK_PRESETS: dict[str, dict[str, object]] = {
     "react": {
         "tools.test": "npx vitest run --reporter=verbose",
@@ -79,7 +89,7 @@ STACK_PRESETS: dict[str, dict[str, object]] = {
     "python": {
         "tools.test": f"{_PY} -m pytest -v",
         "tools.lint": "ruff check ." + _NGOAI_KHUNG_PY,
-        "sandbox.image": "python:3.12-slim",
+        "sandbox.image": _PY_IMAGE,
         "sandbox.allow_hosts": ["pypi.org", "files.pythonhosted.org"],
     },
     "go": {
@@ -111,6 +121,9 @@ def cmd_init(args) -> int:
         thieu = _cong_cu_chua_co(Path(args.project), cfg)
         if thieu:
             print("\n".join(thieu))
+        if _verify_image.is_managed(str(cfg.get("sandbox.image", "") or "")):
+            print(f"  ○ `sandbox.image` = `{cfg['sandbox.image']}` — built by the harness on the "
+                  f"first `aisef doctor` or tool run (pinned base + pinned pytest/ruff)")
     return EXIT_OK
 
 
@@ -125,12 +138,18 @@ def _cong_cu_chua_co(project: Path, cfg) -> list[str]:
     the wrong one to rely on alone.
     """
     ra = []
+    # Tools run inside the sandbox image when Docker is in use; the host's PATH
+    # says nothing about that image. `aisef doctor` probes the image itself
+    # (D-028); only project-local runners (`node_modules/.bin`) are the host's.
+    trong_anh = bool(cfg.get("sandbox.use_docker", True)) and _sandbox.docker_available()
     for key in ("tools.test", "tools.lint"):
         lenh = str(cfg[key] or "").strip()
         if not lenh:
             continue
         phan = lenh.split()
         ten = phan[0]
+        if trong_anh and ten not in ("npx", "npm", "pnpm", "yarn", "bunx"):
+            continue
         if ten in ("npx", "npm", "pnpm", "yarn", "bunx"):
             ten = next((t for t in phan[1:] if not t.startswith("-")), "")
             if not ten or ten in ("run", "test", "exec"):

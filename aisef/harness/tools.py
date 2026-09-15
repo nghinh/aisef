@@ -31,7 +31,7 @@ from pathlib import Path
 
 from ..clients.base import quote_command, split_command
 from ..config import Config
-from . import sandbox
+from . import sandbox, verify_image
 from .guardrails import scrub_secrets
 from .observe import EvidenceStore
 
@@ -45,8 +45,10 @@ TAIL_LINES = 20
 #: and a gate reporting red for the wrong reason gets ignored for two days.
 STACK_IMAGES: list[tuple[str, str]] = [
     ("package.json", "node:22-alpine"),
-    ("pyproject.toml", "python:3.12-alpine"),
-    ("setup.py", "python:3.12-alpine"),
+    # A bare python image has no test runner; the harness-built image does
+    # (`verify_image.RECIPES`, D-028).
+    ("pyproject.toml", verify_image.RECIPES["python"].name),
+    ("setup.py", verify_image.RECIPES["python"].name),
     ("go.mod", "golang:1.23-alpine"),
     ("Cargo.toml", "rust:1-alpine"),
     ("composer.json", "php:8-cli-alpine"),

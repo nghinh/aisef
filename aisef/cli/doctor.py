@@ -153,15 +153,36 @@ def cmd_doctor(args) -> int:
                if missing else ""),
             required=False,
         )
+    from ..harness import verify_image
+
     if prov is not None and prov.id == "docker":
         # Only Docker discusses the image; other providers use the host's tools.
-        check(
-            "sandbox image",
-            image != "alpine:latest",
-            image + (" — no stack tools, tests will fail due to missing tools"
-                     if image == "alpine:latest" else " (matches stack)"),
-            required=False,
-        )
+        loi_anh = verify_image.ensure(image, log=lambda m: lines.append(f"  … {m}"))
+        if verify_image.is_managed(image):
+            check("sandbox image", not loi_anh,
+                  image + (" — built by the harness: pinned base, pinned tool versions"
+                           if not loi_anh else f" — {loi_anh}"))
+        else:
+            check(
+                "sandbox image",
+                image != "alpine:latest",
+                image + (" — no stack tools, tests will fail due to missing tools"
+                         if image == "alpine:latest" else " — declared by the project"),
+                required=False,
+            )
+    # Every declared evidence-producing tool must load **where it will run** —
+    # the image under Docker, this host otherwise. "(matches stack)" above was
+    # said of an image with no pytest; sixteen `No module named pytest` runs
+    # on LedgerLock were knowable here, before any session was paid for (D-028).
+    if prov is not None:
+        try:
+            cfg_tools = Config.load(project)
+        except ConfigError:
+            cfg_tools = None
+        if cfg_tools is not None:
+            for tc in verify_image.check_tools(project, cfg_tools, build=True,
+                                               log=lambda m: lines.append(f"  … {m}")):
+                check(f"tool {tc.key}", tc.ok, tc.line)
     req = project / "docs" / "requirements.md"
     check("docs/requirements.md", req.is_file(), str(req))
 
