@@ -429,7 +429,7 @@
     "2": "usage error",
     "_note": "Deliberately NOT the rest of this CLI's convention (1 usage / 2 not-ready). The contract §4.3 specified these numbers; an unrecognised flag is still reported by the top-level parser and exits 1, as for every verb."
   },
-  "closure_target_sha": "966add6b484b4b7444c6913b2d45466e2f61137a",
+  "closure_target_sha": "5c5ba52fa0c98bd276b074b7bc3e1d112dd49fd5",
   "claim_registry": {
     "_comment": "Claims withdrawn as unreproducible (G5.6). `forms` lists every surface spelling that counts as the same claim -- including locale variants, because retiring `±0.08` and then writing `±0,08` is not a correction. A mention inside a region marked `<!-- claim:WITHDRAWAL_EXPLANATION -->` ... `<!-- /claim -->` is not an assertion; anything outside such a region is.",
     "retired": [

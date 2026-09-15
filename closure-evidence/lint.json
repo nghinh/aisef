@@ -1,5 +1,5 @@
 {
-  "commit": "966add6b484b4b7444c6913b2d45466e2f61137a",
+  "commit": "5c5ba52fa0c98bd276b074b7bc3e1d112dd49fd5",
   "exit": 0,
   "summary": "All checks passed!",
   "tool": "ruff check ."

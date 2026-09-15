@@ -1,0 +1,33 @@
+{
+  "_comment": "Supersession chain for the frozen closure target. Historical entries are never rewritten -- a target that was superseded is evidence of why, not a mistake to erase.",
+  "chain": [
+    {
+      "sha": "8302946181979b13630e020c0d8245dd9e22842c",
+      "status": "SUPERSEDED",
+      "why": "provisional target pinned before the C-2 corrections; never released. The owner ruled out reusing it."
+    },
+    {
+      "sha": "39f172356c8b5759952b4d59e8470c1941303b7a",
+      "status": "SUPERSEDED",
+      "why": "intermediate target, frozen before the 1.7.0 release commit existed. Superseded within the same session so the target would BE the released revision rather than an ancestor of it."
+    },
+    {
+      "sha": "966add6b484b4b7444c6913b2d45466e2f61137a",
+      "tag": "v1.7.0",
+      "version": "1.7.0",
+      "status": "FAILED RELEASE TARGET -- PRESERVED",
+      "why": "tagged and pushed under owner approval. The release workflow failed at the release-gate step with four `git archive ... exit 128` errors (D-019); `publish` was skipped and PyPI never received a package. The tag remains on this commit, never moved, deleted or recreated, and its failure artefacts are kept unrewritten at closure-evidence/v1.7.0-release-failure.log and v1.7.0-release-attempt.json.",
+      "pypi_published": false
+    },
+    {
+      "sha": "5c5ba52fa0c98bd276b074b7bc3e1d112dd49fd5",
+      "tag": "v1.7.1",
+      "version": "1.7.1",
+      "status": "FINAL CLOSURE TARGET",
+      "why": "the corrected candidate. Carries D-019 (full-history CI checkout), D-020 (two POSIX assumptions in test helpers) and D-021 (pin keys and reported paths normalised to POSIX). Remote CI run 34917002995 is green on exactly this commit across all four Ubuntu suite jobs, Windows, lint and wheel.",
+      "ci_run": "34917002995",
+      "ci_head_sha": "5c5ba52fa0c98bd276b074b7bc3e1d112dd49fd5"
+    }
+  ],
+  "defect_chain_note": "D-019, D-020 and D-021 form one chain: history-dependent tests could not run at all, which hid two POSIX assumptions in the helpers, which in turn hid a genuine cross-platform product bug in the pin key. Each was only visible once the previous one was fixed. Choosing to fix the environment rather than skip the tests is what surfaced all three."
+}
