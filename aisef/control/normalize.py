@@ -236,7 +236,74 @@ def _stack_test_paths(project: Path, commands: list[str]) -> tuple[list[str], li
     return dirs, cfgs
 
 
-def verification_paths(story: Story, project: Path, config=None) -> list[str]:
+#: Where `sprint-status.json` lives relative to the project — read here to
+#: learn whether any story has already merged, without importing the state
+#: machine into the scope model.
+_STATE_FILE = Path("_bmad-output") / "sprint-status.json"
+
+
+def bootstrapping(project: Path) -> bool:
+    """No story of this sprint has merged yet.
+
+    While that holds, the tree has no test infrastructure a story could have
+    left behind, and the first story may create the shared verification
+    config files without declaring them. Once any story is `done`, the
+    infrastructure the project needs is on the main branch — a later story
+    that must touch `pytest.ini` or `conftest.py` declares it, like any other
+    file, so the scheduler sees the overlap (D-031).
+    """
+    try:
+        import json
+
+        data = json.loads((Path(project) / _STATE_FILE).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return True
+    return not any(str(r.get("status")) == "done" for r in (data.get("stories") or {}).values())
+
+
+def bootstrap_grants(story: Story, project: Path, config=None, *,
+                     bootstrap: bool | None = None) -> list[str]:
+    """Shared verification **config files** this story may create because the
+    tree has none yet: `pytest.ini`/`conftest.py` for pytest, the framework
+    config for a JS runner. Empty once the file exists or once the sprint is
+    past bootstrap (`bootstrapping`).
+
+    These are exactly the files two stories of one wave both created on
+    LedgerLock (2026-09-15, lỗi 185 / D-031) — different content, an add/add
+    conflict waiting at merge — so the scheduler treats them as part of the
+    story's effective scope: two stories holding the same grant do not run
+    in the same wave.
+    """
+    kinds = [k.strip().lower() for k in (story.verification_contract or []) if k.strip()]
+    if not any(k in kinds for k in ("unit", "e2e", "accessibility", "integration")):
+        return []
+    if bootstrap is None:
+        bootstrap = bootstrapping(project)
+    if not bootstrap:
+        return []
+    if config is None:
+        from ..config import Config
+
+        try:
+            config = Config.load(project)
+        except Exception:  # noqa: BLE001 — no config means nothing to infer
+            return []
+    commands = []
+    for kind in kinds:
+        key = _VERIFY_COMMAND_KEY.get(kind, f"verify.{kind}")
+        try:
+            cmd = str(config[key] or "")
+        except KeyError:
+            continue
+        if cmd:
+            commands.append(cmd)
+    _dirs, cfgs = _stack_test_paths(project, commands)
+    declared = set(story.write_scope)
+    return [c for c in cfgs if c not in declared and not (Path(project) / c).is_file()]
+
+
+def verification_paths(story: Story, project: Path, config=None, *,
+                       bootstrap: bool | None = None) -> list[str]:
     """Test directories/files the **story's verification contract** requires.
 
     Bug 21 (e9 2026-09-05): story declared `e2e` and `accessibility` but
@@ -247,6 +314,11 @@ def verification_paths(story: Story, project: Path, config=None) -> list[str]:
     that **exist**, but in a greenfield project the test directory doesn't
     exist yet — the story must CREATE it. Now also adds conventional test
     dirs and config files when the verification contract requires test kinds.
+
+    D-031 (LedgerLock 2026-09-15): the shared config files are granted only
+    while the sprint is bootstrapping and the file does not exist yet
+    (`bootstrap_grants`); test **directories** stay granted — two stories
+    adding their own files under `tests/` do not collide.
     """
     kinds = [k.strip().lower() for k in (story.verification_contract or []) if k.strip()]
     if not kinds:
@@ -286,11 +358,11 @@ def verification_paths(story: Story, project: Path, config=None) -> list[str]:
                 continue
             if cmd:
                 commands.append(cmd)
-        dirs, cfgs = _stack_test_paths(project, commands)
+        dirs, _cfgs = _stack_test_paths(project, commands)
         for d in dirs:
             if d not in out:
                 out.append(d)
-        for cfg in cfgs:
+        for cfg in bootstrap_grants(story, project, config, bootstrap=bootstrap):
             if cfg not in out:
                 out.append(cfg)
 

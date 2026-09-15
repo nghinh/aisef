@@ -690,29 +690,31 @@ class TestDoneChiSauMerge(RunTestCase):
     trước `merge.completed` của nhật ký."""
 
     def test_merge_dung_thi_verified_khong_phai_done(self):
-        """Hai story cùng đợt cố ý chạm một tệp → merge story thứ hai đụng."""
-        # STORY-01-02 (src/a) và STORY-01-03 (src/b) cùng đợt 2. Ép đụng bằng
-        # cách để agent giả của 01-03 cũng ghi vào src/a/STORY-01-02.py.
+        """Hai story cùng đợt cố ý chạm một tệp → merge story thứ hai đụng.
+
+        Trước 1.7.3 phép này ép đụng bằng cách khai `src/a` cho cả 01-03; từ
+        1.7.3 `run` tách lại đợt theo phạm vi ghi hiệu lực (D-031), nên hai
+        story khai chồng nhau không còn chạy cùng đợt nữa. Tệp mà hai story
+        cùng đợt **vẫn** được phép sửa là manifest (`package.json`, cấp theo
+        `MANIFESTS` khi tệp có sẵn) — scheduler cố ý không xét manifest để
+        khỏi giết song song, nên đây là chỗ đụng còn lại và đúng chỗ để kiểm
+        bất biến G12."""
         class Dung(Agent):
             def run(self, spec):
                 r = super().run(spec)
-                if spec.env.get("AISEF_STORY_ID") == "STORY-01-03":
-                    p = Path(spec.workdir) / "src" / "a" / "STORY-01-02.py"
-                    p.parent.mkdir(parents=True, exist_ok=True)
-                    p.write_text("# đụng\n", encoding="utf-8")
+                sid = spec.env.get("AISEF_STORY_ID")
+                if sid in ("STORY-01-02", "STORY-01-03"):
+                    (Path(spec.workdir) / "package.json").write_text(
+                        '{"name": "%s"}\n' % sid, encoding="utf-8")
                 return r
-        # cho 01-03 quyền ghi src/a để guard `phạm vi ghi` không chặn trước.
         # Hai story **cùng đợt** (đợt 2 của INDEX) và cùng rẽ từ một gốc:
-        # 01-02 merge trước, 01-03 mang cùng đường dẫn nội dung khác → đụng.
-        idx = json.loads((self.artifacts / "stories.index.json").read_text(encoding="utf-8"))
-        for st in idx["stories"]:
-            if st["id"] == "STORY-01-03":
-                st["write_scope"] = ["src/b", "src/a"]
-        (self.artifacts / "stories.index.json").write_text(json.dumps(idx), encoding="utf-8")
+        # 01-02 merge trước, 01-03 mang cùng tệp nội dung khác → đụng.
+        (self.project / "package.json").write_text('{"name": "base"}\n', encoding="utf-8")
         subprocess.run(["git", "add", "-A"], cwd=self.project, check=True)
-        subprocess.run(["git", "commit", "-qm", "ép đụng"], cwd=self.project, check=True)
+        subprocess.run(["git", "commit", "-qm", "manifest"], cwd=self.project, check=True)
 
-        r = self.run_sprint(Dung(), only_epic="EPIC-01")
+        r = self.run_sprint(Dung(), only_epic="EPIC-01",
+                            config=self.config(**{"sandbox.use_docker": False}))
         st = self.state()
         self.assertIn("STORY-01-03", [w for wv in r.waves for w in wv.merge_conflicts])
         self.assertIs(st.stories["STORY-01-03"].state, StoryStatus.VERIFIED)

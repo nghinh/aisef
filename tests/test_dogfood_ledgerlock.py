@@ -302,6 +302,91 @@ class TestCoverageDataFileIsNotAStoryChange(unittest.TestCase):
             self.assertEqual(G.changed_files(d), ["tests/coverage_report.py"])
 
 
+# ---------------------------------------------------------------- F-8 (F)
+
+
+class TestOverlappingEffectiveScopesDoNotRunTogether(unittest.TestCase):
+    """F-8 / D-031 — three wave-1 stories with disjoint declared scopes each
+    created `conftest.py` and `pytest.ini` with different content (288/287/895
+    B; 85/84/424 B): the guard let every story write those files, the
+    scheduler only ever saw the declared scopes. Two rules for one scope.
+    """
+
+    def _story(self, sid, *files):
+        from aisef.control.normalize import Story
+        return Story(id=sid, epic_id="EPIC-01", title=sid, write_scope=list(files),
+                     verification_contract=["unit"])
+
+    def _cfg(self):
+        from aisef.config import DEFAULTS, Config
+        return Config({**DEFAULTS, "tools.test": "python -m pytest -v"})
+
+    def _waves(self, project, stories, *, bootstrap=None):
+        from aisef.control import scheduler
+        from aisef.control.normalize import bootstrap_grants
+        sched = [scheduler.Story(id=s.id, write_scope=tuple(s.write_scope) + tuple(
+            bootstrap_grants(s, project, self._cfg(), bootstrap=bootstrap))) for s in stories]
+        return [[s.id for s in w] for w in scheduler.build_waves(sched)]
+
+    def test_stories_that_may_both_create_the_shared_config_do_not_share_a_wave(self):
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "pyproject.toml").write_text("", encoding="utf-8")
+            a = self._story("STORY-01-01", "src/keys.py", "tests/test_keys.py")
+            b = self._story("STORY-01-02", "src/hash.py", "tests/test_hash.py")
+            self.assertEqual(self._waves(Path(d), [a, b]), [["STORY-01-01"], ["STORY-01-02"]])
+
+    def test_stories_with_disjoint_effective_scopes_still_run_in_parallel(self):
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "pyproject.toml").write_text("", encoding="utf-8")
+            (Path(d) / "conftest.py").write_text("", encoding="utf-8")
+            (Path(d) / "pytest.ini").write_text("[pytest]\n", encoding="utf-8")
+            a = self._story("STORY-01-01", "src/keys.py", "tests/test_keys.py")
+            b = self._story("STORY-01-02", "src/hash.py", "tests/test_hash.py")
+            self.assertEqual(self._waves(Path(d), [a, b]), [["STORY-01-01", "STORY-01-02"]])
+
+    def test_past_bootstrap_the_grant_is_gone_and_parallelism_returns(self):
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "pyproject.toml").write_text("", encoding="utf-8")
+            a = self._story("STORY-01-02", "src/hash.py", "tests/test_hash.py")
+            b = self._story("STORY-01-03", "src/io.py", "tests/test_io.py")
+            self.assertEqual(self._waves(Path(d), [a, b], bootstrap=False),
+                             [["STORY-01-02", "STORY-01-03"]])
+
+    def test_the_guard_scope_and_the_scheduler_scope_are_one_rule(self):
+        """What the guard lets a story write is what the scheduler weighs."""
+        from aisef.control.normalize import effective_write_scope
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "pyproject.toml").write_text("", encoding="utf-8")
+            (Path(d) / ".ai").mkdir()
+            (Path(d) / ".ai" / "config.json").write_text('{"tools.test": "python -m pytest -v"}',
+                                                          encoding="utf-8")
+            a = self._story("STORY-01-01", "src/keys.py", "tests/test_keys.py")
+            scope = effective_write_scope(a, Path(d))
+            self.assertIn("conftest.py", scope); self.assertIn("pytest.ini", scope)
+            (Path(d) / "conftest.py").write_text("", encoding="utf-8")
+            scope = effective_write_scope(a, Path(d))
+            self.assertNotIn("conftest.py", scope, "an existing shared file must be declared to be touched")
+
+    def test_run_splits_the_planned_wave_and_reunites_it_after_the_first_merge(self):
+        from aisef.phases.run import Plan, _effective_waves
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d); (root / "pyproject.toml").write_text("", encoding="utf-8")
+            art = root / "_bmad-output"; art.mkdir()
+            st = StateStore(art)
+            stories = {s.id: s for s in (self._story("STORY-01-01", "src/keys.py", "tests/test_keys.py"),
+                                         self._story("STORY-01-02", "src/hash.py", "tests/test_hash.py"),
+                                         self._story("STORY-01-03", "src/io.py", "tests/test_io.py"))}
+            plan = Plan(stories=stories, waves={"EPIC-01": [["STORY-01-01", "STORY-01-02", "STORY-01-03"]]})
+            st.save(SprintState(stories={sid: StoryRecord(id=sid, epic_id="EPIC-01") for sid in stories}))
+            gen = _effective_waves(plan, "EPIC-01", project=root, config=self._cfg(), state=st)
+            self.assertEqual(next(gen), (1, ["STORY-01-01"]))
+            # the first story merged: the tree is bootstrapped now
+            (root / "conftest.py").write_text("", encoding="utf-8")
+            s = st.load(); s.stories["STORY-01-01"].status = "done"; st.save(s)
+            self.assertEqual(next(gen), (1, ["STORY-01-02", "STORY-01-03"]))
+            self.assertEqual(list(gen), [])
+
+
 # --------------------------------------------- orphaned running state (GREEN)
 
 

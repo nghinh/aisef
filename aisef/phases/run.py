@@ -296,7 +296,9 @@ def run_epic(
     catalog = load_catalog()
     state.set_current_epic(epic_id)
 
-    for index, wave_ids in enumerate(plan.waves.get(epic_id, []), 1):
+    for index, wave_ids in _effective_waves(plan, epic_id, project=project,
+                                            config=config, state=state,
+                                            artifact_root=artifact_root):
         wave = WaveReport(epic_id=epic_id, index=index)
         report.waves.append(wave)
 
@@ -685,6 +687,50 @@ def _run_wave(
     passed = sum(1 for o in wave.outcomes if o.done)
     wave_cost = sum(o.cost_usd for o in wave.outcomes)
     run_log(artifact_root, f"wave={wave.epic_id}/w{wave.index} DONE {passed}/{len(wave.outcomes)} passed ${wave_cost:.2f}")
+
+
+def _effective_waves(plan: "Plan", epic_id: str, *, project: Path, config: Config,
+                     state: StateStore, artifact_root: Path | None = None):
+    """Yield `(index, story_ids)` for the epic: the planned waves, each
+    re-split by **effective** write scope at the moment it is about to run.
+
+    The plan's waves were cut from declared scopes. The guard grants every
+    test-bearing story the shared verification config files while the sprint
+    is bootstrapping (`normalize.bootstrap_grants`), so in a fresh tree every
+    story of the first wave may create `conftest.py`/`pytest.ini` — three did
+    on LedgerLock, with different content, and their merges would have
+    collided (lỗi 185 / D-031). Stories holding the same grant do not run
+    together: the first runs alone, merges, and — the tree now bootstrapped
+    — the rest run in parallel as planned. A lazy generator so each split is
+    computed **after** the previous group merged.
+    """
+    from ..control import scheduler
+    from ..control.normalize import bootstrap_grants, bootstrapping
+
+    for index, ids in enumerate(plan.waves.get(epic_id, []), 1):
+        pending = list(ids)
+        while pending:
+            bootstrap = bootstrapping(project) and not any(
+                r.state is StoryStatus.DONE for r in state.load().stories.values())
+            sched = []
+            grants: dict[str, list[str]] = {}
+            for sid in pending:
+                story = plan.stories.get(sid)
+                declared = tuple(story.write_scope) if story else ()
+                grants[sid] = (bootstrap_grants(story, project, config, bootstrap=bootstrap)
+                               if story else [])
+                sched.append(scheduler.Story(id=sid, write_scope=declared + tuple(grants[sid])))
+            group = [s.id for s in scheduler.build_waves(sched)[0]] if sched else []
+            if len(group) < len(pending) and artifact_root is not None:
+                from ..harness.runlog import run_log
+
+                held = sorted({g for sid in group for g in grants.get(sid, [])})
+                run_log(artifact_root, (
+                    f"epic={epic_id} wave {index} split: {', '.join(group)} first"
+                    + (f" (may create {', '.join(held)})" if held else "")
+                    + f"; {', '.join(s for s in pending if s not in group)} after it merges"))
+            yield index, group
+            pending = [s for s in pending if s not in group]
 
 
 def _safe_transition(state: StateStore, story_id: str, to: StoryStatus, **kw) -> None:
