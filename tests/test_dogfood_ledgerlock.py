@@ -32,7 +32,6 @@ from aisef.clients.stream import exit_status_of  # noqa: E402
 from aisef.control.journal import Entry, JournalStore, reconcile_all  # noqa: E402
 from aisef.control.state import SprintState, StateStore, StoryRecord, StoryStatus  # noqa: E402
 from aisef.harness import guardrails as G  # noqa: E402
-from aisef.harness.tools import unrunnable_reason  # noqa: E402
 from aisef.phases import implement as I  # noqa: E402
 
 
@@ -144,16 +143,69 @@ class TestTurnCapKillsTheWholeProcessTree(unittest.TestCase):
 
 
 class TestMissingTestRunnerIsUnrunnableNotRed(unittest.TestCase):
-    """F-3 — `python:3.12-slim` has no pytest; every `aisef tool test` printed
-    `/usr/local/bin/python: No module named pytest`, exit 1, and the gate read
-    it as "the most recent test run is still failing". Three agents spent their
-    sessions on a red test that never ran. `ruff` (exit 127) was classified
-    correctly; the missing *module* was not.
+    """F-5 / D-029 — `python:3.12-slim` has no pytest; every `aisef tool test`
+    printed `/usr/local/bin/python: No module named pytest`, exit 1, and the
+    gate read it as "the most recent test run is still failing". Three agents
+    spent their sessions on a red test that never ran. `ruff` (exit 127) was
+    classified correctly; the missing *module* was not.
     """
 
+    LAUNCHER = "/usr/local/bin/python: No module named pytest"
+
+    def _res(self, name, code, out):
+        from aisef.harness.tools import ToolResult, unrunnable_reason
+        r = ToolResult(name=name, ok=code == 0, exit_code=code, stdout=out)
+        r.unrunnable = unrunnable_reason(name, code, out)
+        return r
+
     def test_no_module_named_the_runner_is_unrunnable(self):
-        why = unrunnable_reason("test", 1, "/usr/local/bin/python: No module named pytest")
-        self.assertTrue(why, "a missing test runner is 'could not run', not 'tests are red'")
+        from aisef.harness.tools import TOOL_UNRUNNABLE, outcome_kind
+        r = self._res("test", 1, self.LAUNCHER)
+        self.assertTrue(r.unrunnable, "a missing test runner is 'could not run', not 'tests are red'")
+        self.assertEqual(outcome_kind(r), TOOL_UNRUNNABLE)
+
+    def test_a_missing_project_dependency_is_an_environment_failure(self):
+        from aisef.harness.tools import ENVIRONMENT_FAILURE, outcome_kind
+        r = self._res("test", 1, "ImportError while importing test module 'tests/test_x.py'\n"
+                                 "ModuleNotFoundError: No module named 'requests'")
+        self.assertEqual(outcome_kind(r), ENVIRONMENT_FAILURE)
+
+    def test_a_red_test_that_mentions_a_module_is_still_a_red_test(self):
+        """Control: pytest ran, one test passed, one failed on an import — that
+        is behavioural evidence and stays TEST_FAILED."""
+        from aisef.harness.tools import TEST_FAILED, outcome_kind
+        r = self._res("test", 1, "tests/a.py::test_ok PASSED\ntests/a.py::test_x FAILED\n"
+                                 "E   ModuleNotFoundError: No module named 'foo'")
+        self.assertEqual(r.unrunnable, "")
+        self.assertEqual(outcome_kind(r), TEST_FAILED)
+
+    def test_the_lint_tool_missing_is_still_classified_as_before(self):
+        from aisef.harness.tools import TOOL_UNRUNNABLE, outcome_kind
+        r = self._res("lint", 127, 'exec: "ruff": executable file not found in $PATH')
+        self.assertEqual(outcome_kind(r), TOOL_UNRUNNABLE)
+
+    def test_the_completion_guard_does_not_call_an_unrun_suite_red(self):
+        """The gate message the agents saw. With `unrunnable` set the guard
+        lets the session stop with the right reason instead of "still failing"."""
+        from aisef.harness.guardrails import check_completion
+        from aisef.harness.observe import TOOL_RUN, Event
+
+        class _Ev:
+            def __init__(self, detail):
+                self._e = Event(kind=TOOL_RUN, name="test", ok=False, detail=detail)
+
+            def last(self, kind, name):
+                return self._e if (kind, name) == (TOOL_RUN, "test") else None
+
+            def stale_since_last_test(self):
+                return []
+
+            def of(self, *a):
+                return [self._e]
+
+        r = self._res("test", 1, self.LAUNCHER)
+        v = check_completion(_Ev({"unrunnable": r.unrunnable, "tail": self.LAUNCHER}))
+        self.assertTrue(v.allowed, v.reason)
 
 
 # ---------------------------------------------------------------- F-4 (D)

@@ -273,7 +273,7 @@ def run_tool(
     if artifact_root:
         from .runlog import one_line, run_log
         status = "SKIP" if res.skipped else ("PASS" if res.ok else "FAIL")
-        unrun = f" unrunnable={res.unrunnable}" if res.unrunnable else ""
+        unrun = f" {outcome_kind(res)} unrunnable={res.unrunnable}" if res.unrunnable else ""
         run_log(artifact_root, f"tool={name} {status} exit={sb.exit_code} {sb.duration_ms}ms{unrun}")
         if not res.ok and not res.skipped:
             # Exit code alone does not say what broke, and the reader then has
@@ -297,7 +297,23 @@ MISSING_TOOL = (
     "module_not_found",
     "no such file or directory",
     "is not recognized as an internal or external command",
+    # `python -m pytest` in an image without pytest prints
+    # `/usr/local/bin/python: No module named pytest` and exits 1 — the
+    # runner never started, yet 1.7.2 read it as "tests are red" and told
+    # three sessions to fix code that was not at fault (LedgerLock
+    # 2026-09-15, lỗi 183 / D-029). The same words from *inside* a test
+    # (`ModuleNotFoundError: No module named 'x'`) are a missing project
+    # dependency — `NO_DEPENDENCIES` routes those to `NO_SETUP`.
+    "no module named",
 )
+
+#: What a non-passing tool run **is** (D-029). Three different next actions:
+#: fix the code, install the tool, or fix the environment — and the gate,
+#: the run log and the evidence must say which, not just "not ok".
+TEST_FAILED = "TEST_FAILED"
+TOOL_FAILED = "TOOL_FAILED"
+TOOL_UNRUNNABLE = "TOOL_UNRUNNABLE"
+ENVIRONMENT_FAILURE = "ENVIRONMENT_FAILURE"
 
 
 #: Manifests whose absence means **the project is not here**, not that the
@@ -352,6 +368,21 @@ def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error:
     return f"tool not installed or cannot load ({hit or 'exit 127'}) — set up the environment or fix the command and retry"
 
 
+def outcome_kind(res: "ToolResult") -> str:
+    """Classify a finished tool run: ``""`` when it passed or was skipped,
+    otherwise one of `TEST_FAILED` / `TOOL_FAILED` (a real result),
+    `TOOL_UNRUNNABLE` (the declared tool is absent or cannot load) or
+    `ENVIRONMENT_FAILURE` (the project's setup or the sandbox itself).
+    The lack of a test runner is never behavioural evidence."""
+    if res.ok or res.skipped:
+        return ""
+    if not res.unrunnable:
+        return TEST_FAILED if res.name == "test" else TOOL_FAILED
+    if res.unrunnable.startswith(NO_SETUP) or res.unrunnable.startswith("sandbox infrastructure error"):
+        return ENVIRONMENT_FAILURE
+    return TOOL_UNRUNNABLE
+
+
 #: Evidence name for baseline (ADR-004 R9) — test suite run at the parent
 #: candidate **before** the developer session. Not recorded as `test`:
 #: guard `completion`, TDD `red_before_green`, "criteria with tests", and
@@ -389,6 +420,7 @@ def record(res: ToolResult, story_id: str, artifact_root, candidate: str = "",
         "exit_code": res.exit_code,
         "skipped": res.skipped,
         "unrunnable": res.unrunnable,
+        "outcome": outcome_kind(res),
         "degraded": res.degraded,
         "tail": "\n".join(lines[-TAIL_LINES:]),
         **res.detail,
