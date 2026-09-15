@@ -13,7 +13,8 @@ one step for ten minutes — and when you do ask, the help you get is recorded a
 
 Record everything in a copy of
 [`TEMPLATE-EXTERNAL-VALIDATION-REPORT.md`](TEMPLATE-EXTERNAL-VALIDATION-REPORT.md),
-saved as `docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md`. The full protocol and the
+saved as `closure-evidence/external-validation/<version>/REPORT.md` next to the
+instructions bundle you were given. The full protocol and the
 observer's rules are in
 [`EXTERNAL-VALIDATION-v1.1.0.md`](EXTERNAL-VALIDATION-v1.1.0.md); the reference
 manual, if you want it, is [`USAGE-GUIDE.md`](USAGE-GUIDE.md).

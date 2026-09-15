@@ -262,6 +262,30 @@
    "fixed": "HEAD",
    "evidence": "CI run 34915208534, Windows job: two failures, both the same shape. `pin()` recorded `{'docs\\\\\\\\BENCH-PREREGISTRATION-C2.md': ...}` because it built the key with `str(path.relative_to(root))`, and the CLI printed `docs\\\\\\\\CLOSURE-REPORT.md` where `closure.REPORT_MD` is the documented `docs/CLOSURE-REPORT.md`.",
    "notes": "The pin half is the serious one and it is a PRODUCT defect, not a test defect: the key goes into `docs/closure-gate.json`, which is committed and shared. A pin written on Windows would not be found by a probe reading it on Linux -- one file, two identities, and the mismatch is silent. The printed path is cosmetic but was inconsistent with the constant it is supposed to echo.\nBoth fixed with `as_posix()` rather than `str()`. Regression `test_pinned_keys_are_posix_on_every_platform` asserts no key carries a backslash and each equals its own as_posix form. Stated plainly in its docstring: on POSIX the assertion is nearly tautological because as_posix() and str() coincide, so its proving power lives in the Windows CI job -- which is real and runs, so this is a genuine check rather than a decorative one.\nThird defect in the chain that only became visible once D-019 let the suite run: 16 Windows failures became 2, and those 2 were a real cross-platform product bug underneath."
+  },
+  {
+   "id": "D-022",
+   "severity": "P1",
+   "status": "CLOSED",
+   "taxonomy": 177,
+   "false_pass": false,
+   "title": "release identity conflated with repository HEAD: recording post-release evidence invalidated the release",
+   "introduced": "with G1.0 (owner adjustment 2, 2026-09-14)",
+   "fixed": "1.7.2",
+   "evidence": "Measured on this repository 2026-09-15: v1.7.1 published at 5c5ba52, G1 PASSED (64deed9); commit 8b3eada synced public docs (docs/*.md, landingpage/, SALEKIT.html) and touched nothing that ships; G1.0 read FAILED 'HEAD is 0e68b96, closure targets 5c5ba52'. Red-first regression tests/test_release_identity.py::TestV1AFixedPoint: 2 of 5 red against the old probe (an external-validation report commit and a documentation-sync commit both invalidated the release), the negative control (a runtime change still blocks) green.",
+   "notes": "A closure ARCHITECTURE defect, not a probe bug: the exception `_only_bookkeeping_changed` was a filename allowlist (closure-evidence/ and the criteria file) standing in for a model of what the product is. Any evidence outside those two places -- an external-validation record, a handoff sheet, a doc sync -- moved HEAD and made G1 red, so release R needed release R+1 to be closable, whose evidence would need R+2. No fixed point.\nFixed by stating the model (`aisef/control/planes.py`, rules in docs/closure-gate.json#planes): a PRODUCT plane (runtime source, package data, build config) identified by a content digest over the tag's tree and by the PyPI artifact digests, and an ASSURANCE plane (tests, evidence, records) allowed to move after publication. G1.0 compares product identity between the release commit and HEAD; commit-bound evidence is stale only when a PRODUCT or ASSURANCE path changed; a path no rule classifies is UNRESOLVED and blocks. Release manifest per version records release_source_sha, product digests and the artifacts observed on PyPI with every member compared to the tag's blobs. Fixed-point invariant kept as a permanent test: release R -> validate R -> record -> close R converges without R+1 unless the product identity changes.\nP1: it blocked closure outright and could only be escaped by a release that would re-create it. false_pass=false: it produced false FAILEDs, never a pass."
+  },
+  {
+   "id": "D-023",
+   "severity": "P1",
+   "status": "CLOSED",
+   "taxonomy": 178,
+   "false_pass": false,
+   "title": "G6.1 read the onboarding digest under a key its writer never wrote (latent false FAIL)",
+   "introduced": "7a450ce (onboarding digest module) alongside the older probe",
+   "fixed": "1.7.2",
+   "evidence": "closure-evidence/onboarding-digest.json is written by `aisef.control.onboarding` with the value under `digest` and no `version` field; `closure.probe_external_report` read `rec.get('sha256')` and `rec.get('version')` and recomputed the digest with a second implementation (`closure.onboarding_digest`, whitespace-normalised prose) that differs from the recorded one (commands + defaults only). With a record present the probe would have read version '' -> FAILED 'different MAJOR.MINOR', and with that fixed, '' != digest -> FAILED 'onboarding surface changed'. Latent only because no record existed yet (G6 UNRUNNABLE hid it).",
+   "notes": "Two implementations of one digest and two spellings of one key -- the class J shape ('two rules for one truth'). Fixed by deleting the probe's copy: G6.1 now reads the record and recomputes through `aisef.control.onboarding.compute_onboarding_digest`, the function that wrote it. The MAJOR.MINOR clause of ruling 4 is subsumed by G6.1's exact release binding (adjustment 8). false_pass=false: it would have blocked, not passed; P1 because closure could not have completed without an author fixing the gate."
   }
  ]
 }

@@ -1,5 +1,11 @@
 # External validation handoff — AISEF 1.7.1
 
+> **Superseded 2026-09-15, kept as history.** 1.7.1 will not be externally
+> validated: the closure gate's release-identity defect (D-022) is fixed in
+> 1.7.2, and G6 now binds a record to one exact release through an immutable
+> bundle at `closure-evidence/external-validation/<version>/`. Use that bundle,
+> not this sheet. Nothing below has been edited.
+
 Everything a participant needs, without any knowledge of this repository.
 
 > **Placement note (for the project owner, not the participant).** This file

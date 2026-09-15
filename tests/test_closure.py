@@ -72,14 +72,58 @@ def crit(cid: str, probe: str, **kw) -> dict:
     return {"id": cid, "statement": f"{cid} statement", "probe": probe, **kw}
 
 
+#: Plane rules every fixture spec carries (adjustment 8, D-022). Same shape as
+#: the shipped `docs/closure-gate.json#planes`, smaller: first match wins, and a
+#: path outside every rule is UNRESOLVED.
+PLANES = {"schema_version": 1, "rules": [
+    {"class": "PRODUCT_AFFECTING", "part": "package_data", "match": "aisef/kit/*"},
+    {"class": "PRODUCT_AFFECTING", "part": "runtime_source", "match": "aisef/*"},
+    {"class": "PRODUCT_AFFECTING", "part": "build_config", "match": "pyproject.toml"},
+    {"class": "EVIDENCE_ONLY", "match": "closure-evidence/*"},
+    {"class": "EVIDENCE_ONLY", "match": "docs/closure-gate.json"},
+    {"class": "EVIDENCE_ONLY", "match": "docs/EXTERNAL-VALIDATION-REPORT-*.md"},
+    {"class": "ASSURANCE_AFFECTING", "match": "tests/*"},
+    {"class": "DOCUMENTATION", "match": "docs/*"},
+    {"class": "DOCUMENTATION", "match": "README.md"},
+]}
+RELEASE_MANIFEST = {"path": "closure-evidence/releases/{version}.json",
+                    "external_validation_bundle": "closure-evidence/external-validation/{version}"}
+PYPROJECT = '[project]\nname = "aisef"\nversion = "9.9.9"\n'
+
+
 def spec_of(*criteria: dict, **extra) -> dict:
     gate = {"id": "GT", "title": "test gate", "waiver_eligible": False,
             "criteria": list(criteria)}
     out = {"contract_version": "1", "contract_path": "docs/PROJECT-CLOSURE-GATE.md",
            "contract_sha256": "", "unconfigured_is_unrunnable": True,
-           "severity_scale": {"blocking": ["P0", "P1"]}, "gates": [gate]}
+           "severity_scale": {"blocking": ["P0", "P1"]}, "gates": [gate],
+           "planes": json.loads(json.dumps(PLANES)), "release_manifest": dict(RELEASE_MANIFEST)}
     out.update(extra)
     return out
+
+
+WHEEL_SHA = "a1" * 32   # hex, as a real digest is — the record reader extracts hex runs
+SDIST_SHA = "b2" * 32
+
+
+def write_manifest(repo, *, version="9.9.9", tag="v9.9.9", rev="", **over) -> dict:
+    """The release manifest the recorder would write for `tag`: product identity
+    taken from the TAG's tree under the repo's own plane rules, artifacts as
+    published, `observed` as if downloaded, re-hashed and bound to the source."""
+    from aisef.control import planes
+
+    rev = rev or git(repo.root, "rev-list", "-n", "1", tag).stdout.strip()
+    ident = planes.identity(repo.root, rev, planes.rules_from(repo.spec))
+    m = {"schema_version": 1, "version": version, "tag": tag, "release_source_sha": ident.rev,
+         "product": ident.as_dict(),
+         "artifacts": {"wheel": {"filename": f"aisef-{version}-py3-none-any.whl", "sha256": WHEEL_SHA},
+                       "sdist": {"filename": f"aisef-{version}.tar.gz", "sha256": SDIST_SHA}},
+         "observed": {"wheel": {"sha256": WHEEL_SHA, "mismatched": [], "unmapped": []},
+                      "sdist": {"sha256": SDIST_SHA, "mismatched": [], "unmapped": []}},
+         "product_not_shipped": []}
+    m.update(over)
+    repo.write_json(f"closure-evidence/releases/{version}.json", m)
+    return m
 
 
 class Repo:
@@ -1319,8 +1363,15 @@ PROTOCOL = """# External validation
 
 ## Protocol
 
-Run `aisef doctor`, then `aisef plan`.
+```sh
+aisef doctor
+aisef plan
+```
 """
+
+#: Onboarding surface as the digest reads it: commands live in fenced blocks or
+#: list items, never in paragraphs (`aisef.control.onboarding._commands`).
+README_FIXTURE = "## Install\n\n```sh\npip install aisef\n```\n\n## Quick Start\n\n```sh\naisef setup\n```\n"
 
 RECORD = """# External validation report
 
@@ -1335,13 +1386,23 @@ Install success: yes. Time to first success: 35 minutes.
 
 
 class TestG6(unittest.TestCase):
+    """G6 is bound to a **release node** (adjustment 8): the record must name the
+    exact public release and the exact instructions it followed, and both must
+    agree with what is on disk. Owner ruling 4's onboarding digest is the second
+    clock, read through the module that wrote it (D-023)."""
+
+    BUNDLE = "closure-evidence/external-validation/9.9.9"
+
     def setUp(self):
-        self.repo = Repo()
+        from aisef.control import onboarding, planes
+
+        self.repo = Repo(commit=False)
         self.addCleanup(self.repo.close)
         self.repo.write("docs/EXTERNAL-VALIDATION-v1.1.0.md", PROTOCOL)
-        self.repo.write("README.md", "## Install\n\npip install aisef\n\n## Quick Start\n\naisef setup\n")
-        self.repo.write("docs/USAGE-GUIDE.md", "aisef doctor\naisef plan\n")
-        self.repo.write("pyproject.toml", '[project]\nname = "aisef"\nversion = "1.6.0"\n')
+        self.repo.write("README.md", README_FIXTURE)
+        self.repo.write("docs/USAGE-GUIDE.md", "```sh\naisef doctor\naisef plan\n```\n")
+        self.repo.write("pyproject.toml", PYPROJECT)
+        self.repo.write("aisef/config.py", "# defaults are read from the module, not this text\n")
         self.repo.spec["onboarding_digest"] = {
             "sources": [{"path": "README.md", "extract": "section:Install"},
                         {"path": "README.md", "extract": "section:Quick Start"},
@@ -1349,21 +1410,37 @@ class TestG6(unittest.TestCase):
                         {"path": "docs/EXTERNAL-VALIDATION-v1.1.0.md", "extract": "section:Protocol"},
                         {"path": "aisef/config.py", "extract": "onboarding_defaults"}],
             "onboarding_defaults": ["tools.test", "run.max_turns"]}
-        (self.repo.root / "aisef").mkdir(exist_ok=True)
-        self.repo.write("aisef/config.py", "# defaults are read from the module, not this text\n")
+        self.repo.write_json(CL.CRITERIA_PATH, self.repo.spec)
+        git(self.repo.root, "init"); git(self.repo.root, "config", "user.name", "T")
+        git(self.repo.root, "config", "user.email", "t@t.t")
+        git(self.repo.root, "add", "."); git(self.repo.root, "commit", "-m", "release")
+        git(self.repo.root, "tag", "v9.9.9")
+        self.manifest = write_manifest(self.repo)
+        self.repo.write(f"{self.BUNDLE}/INSTRUCTIONS.md", "pip install aisef==9.9.9\n")
+        self.bundle_digest, _ = planes.bundle_digest(self.repo.root / self.BUNDLE, exclude=("REPORT.md",))
+        self.onboarding = onboarding
 
     def criterion(self) -> dict:
-        return {"evidence": "docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md"}
+        return {"evidence": f"{self.BUNDLE}/REPORT.md"}
 
-    def record(self, text: str = RECORD):
-        self.repo.write("docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md", text)
+    def identity(self, **over) -> str:
+        fields = {"Product version": "9.9.9", "Release tag": "v9.9.9",
+                  "Release SHA": self.manifest["release_source_sha"],
+                  "Wheel sha256": WHEEL_SHA, "Sdist sha256": SDIST_SHA,
+                  "Protocol version": "v1.1.0", "Instructions digest": self.bundle_digest}
+        fields.update(over)
+        return "".join(f"{k}: {v}\n" for k, v in fields.items())
 
-    def digest_file(self, *, version="1.6.0", sha=None):
-        now, gone = CL.onboarding_digest(self.repo.root, self.repo.spec["onboarding_digest"])
-        self.assertEqual(gone, [])
-        self.repo.write_json(f"{CL.EVIDENCE_DIR}/onboarding-digest.json",
-                             {"sha256": sha or now, "version": version})
+    def record(self, text: str = RECORD, **over):
+        self.repo.write(f"{self.BUNDLE}/REPORT.md", text + "\n" + self.identity(**over))
+
+    def digest_file(self, *, digest=None):
+        now = self.onboarding.compute_onboarding_digest(self.repo.root)["digest"]
+        self.repo.write_json(f"{CL.EVIDENCE_DIR}/onboarding-digest.json", {"digest": digest or now})
         return now
+
+    def probe(self):
+        return CL.probe_external_report(self.repo.ctx(self.criterion()))
 
     def test_the_protocol_existing_does_not_satisfy_g6(self):
         for probe in (CL.probe_external_report, CL.probe_participant_external,
@@ -1373,52 +1450,117 @@ class TestG6(unittest.TestCase):
                 self.assertIs(p.outcome, Outcome.UNRUNNABLE)
                 self.assertIn("protocol, not the record", p.detail)
 
-    def test_record_with_the_protocol_metrics_and_a_matching_digest_passes(self):
+    def test_record_bound_to_this_release_with_a_matching_digest_passes(self):
         self.record()
         self.digest_file()
-        p = CL.probe_external_report(self.repo.ctx(self.criterion()))
-        self.assertIs(p.outcome, Outcome.PASSED)
+        p = self.probe()
+        self.assertIs(p.outcome, Outcome.PASSED, p.detail)
+        self.assertIn("v9.9.9", p.detail)
 
     def test_a_record_missing_a_protocol_metric_fails(self):
         self.record("# report\n\nParticipant: external person\n")
         self.digest_file()
-        p = CL.probe_external_report(self.repo.ctx(self.criterion()))
+        p = self.probe()
         self.assertIs(p.outcome, Outcome.FAILED)
         self.assertIn("Install success", p.detail)
 
+    def test_a_record_declaring_no_release_identity_is_unrunnable(self):
+        self.repo.write(f"{self.BUNDLE}/REPORT.md", RECORD)
+        self.digest_file()
+        p = self.probe()
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("release_source_sha", p.detail)
+
+    def test_a_record_for_another_release_cannot_satisfy_this_one(self):
+        """Validation of release A is not evidence about release B."""
+        self.record(**{"Release SHA": "0" * 40})
+        self.digest_file()
+        p = self.probe()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("release_source_sha", p.detail)
+        self.assertIn("not evidence about another", p.detail)
+
+    def test_a_record_for_another_version_fails(self):
+        self.record(**{"Product version": "9.9.8", "Release tag": "v9.9.8"})
+        self.digest_file()
+        self.assertIs(self.probe().outcome, Outcome.FAILED)
+
+    def test_a_record_for_other_artifacts_fails(self):
+        self.record(**{"Wheel sha256": "f" * 64})
+        self.digest_file()
+        p = self.probe()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("wheel_sha256", p.detail)
+
+    def test_instructions_edited_after_the_run_cannot_relabel_the_record(self):
+        self.record()
+        self.digest_file()
+        self.repo.write(f"{self.BUNDLE}/INSTRUCTIONS.md", "pip install aisef==9.9.9 --pre\n")
+        p = self.probe()
+        self.assertIs(p.outcome, Outcome.FAILED)
+        self.assertIn("instructions changed", p.detail)
+
+    def test_a_missing_bundle_is_unrunnable(self):
+        self.record()
+        self.digest_file()
+        (self.repo.root / self.BUNDLE / "INSTRUCTIONS.md").unlink()
+        p = self.probe()
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("bundle", p.detail)
+
     def test_no_recorded_onboarding_digest_is_unrunnable(self):
         self.record()
-        p = CL.probe_external_report(self.repo.ctx(self.criterion()))
+        p = self.probe()
         self.assertIs(p.outcome, Outcome.UNRUNNABLE)
         self.assertIn("onboarding-digest.json", p.detail)
 
     def test_a_changed_onboarding_surface_fails(self):
         self.record()
         self.digest_file()
-        self.repo.write("README.md", "## Install\n\npip install aisef --pre --extra-index-url x\n"
-                                     "\n## Quick Start\n\naisef setup\n")
-        p = CL.probe_external_report(self.repo.ctx(self.criterion()))
+        self.repo.write("README.md", README_FIXTURE.replace("pip install aisef", "pip install aisef --pre"))
+        p = self.probe()
         self.assertIs(p.outcome, Outcome.FAILED)
         self.assertIn("onboarding surface changed", p.detail)
 
-    def test_prose_reflow_does_not_change_the_digest(self):
-        before, _ = CL.onboarding_digest(self.repo.root, self.repo.spec["onboarding_digest"])
-        self.repo.write("README.md", "## Install\n\npip   install\n    aisef\n\n## Quick Start\n\naisef setup\n")
-        after, _ = CL.onboarding_digest(self.repo.root, self.repo.spec["onboarding_digest"])
-        self.assertEqual(before, after)
-
-    def test_a_different_minor_version_fails(self):
+    def test_the_probe_reads_the_digest_the_writer_wrote(self):
+        """D-023: the record is `{"digest": ...}` from `aisef.control.onboarding`;
+        the probe must read that key and recompute with that function."""
         self.record()
-        self.digest_file(version="1.5.0")
-        p = CL.probe_external_report(self.repo.ctx(self.criterion()))
+        self.repo.write_json(f"{CL.EVIDENCE_DIR}/onboarding-digest.json",
+                             {"sha256": "not the key the writer uses"})
+        p = self.probe()
         self.assertIs(p.outcome, Outcome.FAILED)
-        self.assertIn("MAJOR.MINOR", p.detail)
+        self.digest_file()
+        self.assertIs(self.probe().outcome, Outcome.PASSED)
 
-    def test_a_vanished_onboarding_default_cannot_be_hashed_silently(self):
-        self.repo.spec["onboarding_digest"]["onboarding_defaults"] = ["tools.test", "gone.key"]
-        digest, gone = CL.onboarding_digest(self.repo.root, self.repo.spec["onboarding_digest"])
-        self.assertEqual(digest, "")
-        self.assertIn("gone.key", " ".join(gone))
+    def test_identity_is_read_from_tables_and_from_prose_alike(self):
+        """The template writes a table; a participant may write `key: value`
+        lines with the digest inside a sentence. Both bind the same way."""
+        sha = self.manifest["release_source_sha"]
+        table = ("| field | value |\n|---|---|\n| Product version | `9.9.9` |\n| Release tag | `v9.9.9` |\n"
+                 f"| Release source SHA | `{sha}` |\n| Wheel sha256 | `{WHEEL_SHA}` |\n"
+                 f"| Sdist sha256 | `{SDIST_SHA}` |\n| Protocol version | `v1.1.0` |\n"
+                 f"| Instructions digest | `{self.bundle_digest}` |\n")
+        prose = (f"product version: 9.9.9\ntag: v9.9.9\nrelease SHA: {sha}\n"
+                 f"Wheel: aisef-9.9.9-py3-none-any.whl · sha256 {WHEEL_SHA}\n"
+                 f"Sdist: aisef-9.9.9.tar.gz · sha256 {SDIST_SHA}\nprotocol: v1.1.0\n"
+                 f"bundle digest: {self.bundle_digest}\n")
+        for text in (table, prose):
+            got = CL.declared_identity(text)
+            self.assertEqual(got["release_source_sha"], sha)
+            self.assertEqual(got["wheel_sha256"], WHEEL_SHA)
+            self.assertEqual(got["sdist_sha256"], SDIST_SHA)
+            self.assertEqual(got["instructions_digest"], self.bundle_digest)
+            self.assertEqual(got["product_version"], "9.9.9")
+            self.repo.write(f"{self.BUNDLE}/REPORT.md", RECORD + "\n" + text)
+            self.digest_file()
+            self.assertIs(self.probe().outcome, Outcome.PASSED, self.probe().detail)
+
+    def test_prose_reflow_does_not_change_the_digest(self):
+        before = self.onboarding.compute_onboarding_digest(self.repo.root)["digest"]
+        self.repo.write("README.md", README_FIXTURE.replace("## Install\n", "## Install\n\nSome   reflowed\nprose here.\n"))
+        after = self.onboarding.compute_onboarding_digest(self.repo.root)["digest"]
+        self.assertEqual(before, after)
 
     def test_an_ai_participant_cannot_satisfy_g6(self):
         self.record("# report\n\nParticipant: Claude agent, external to the project\n")
@@ -1937,29 +2079,36 @@ class TestMotSHaDuyNhatChoViecDong(unittest.TestCase):
 
     Lỗ nó bịt: G1 chứng nhận gói trên PyPI ở commit của **tag**, còn G2–G5 đọc
     **HEAD**. Đó là hai phần mềm khác nhau, và một bản ghi đóng dự án trộn chúng
-    lại thì không chứng nhận gì cả. Chủ dự án nói thẳng ba điều không được làm:
-    dựng HEAD mà cài bản PyPI cũ; đọc dữ liệu đóng gói từ HEAD rồi bảo nó chứng
-    minh tag cũ; gộp bằng chứng từ các revision khác nhau thành một G1 PASS.
+    lại thì không chứng nhận gì cả.
 
-    Một tiêu chí **giữ** bất biến này, không rải thành bốn: thông báo hỏng phải
-    nói "G1 chứng nhận X, việc đóng nhắm Y" ở đúng một chỗ.
+    Điều chỉnh 8 (D-022) đổi vế thứ hai: không còn hỏi *HEAD có là đích không*
+    mà hỏi *sản phẩm ở HEAD có là sản phẩm đã phát hành không* — so digest mặt
+    phẳng sản phẩm, không so SHA commit. Phần "cùng một bản" của điều chỉnh 2
+    vẫn nguyên: tag phải trỏ đúng đích.
     """
 
-    def repo_at(self, *, target=None, tag_at_head=True):
+    def repo_at(self, *, target=None, tag_at_head=True, manifest=True):
         c = crit("G1.0", "aisef.control.closure:probe_closure_target",
                  evidence="closure-evidence/release.json")
-        repo = Repo(spec_of(c))
+        repo = Repo(spec_of(c), commit=False)
         self.addCleanup(repo.close)
+        repo.write("pyproject.toml", PYPROJECT)
+        repo.write("aisef/__init__.py", "x = 1\n")
+        git(repo.root, "init"); git(repo.root, "config", "user.name", "T")
+        git(repo.root, "config", "user.email", "t@t.t")
+        git(repo.root, "add", "."); git(repo.root, "commit", "-m", "init")
         head = repo.head
         git(repo.root, "tag", "v9.9.9", head if tag_at_head else "HEAD")
         if not tag_at_head:
-            repo.write("x.txt", "sau khi gắn tag\n")
+            repo.write("aisef/sau.py", "sau khi gắn tag\n")
             git(repo.root, "add", "."); git(repo.root, "commit", "-m", "sau")
         repo.write_json("closure-evidence/release.json",
                         {"version": "9.9.9", "tag": "v9.9.9"})
         if target is not None:
             repo.spec["closure_target_sha"] = target or repo.head
         repo.write_json(CL.CRITERIA_PATH, repo.spec)
+        if manifest:
+            write_manifest(repo)
         return repo, head
 
     def probe(self, repo):
@@ -1986,15 +2135,19 @@ class TestMotSHaDuyNhatChoViecDong(unittest.TestCase):
         self.assertIn(head[:12], p.detail)
         self.assertIn("000000", p.detail)
 
-    def test_head_di_tiep_sau_khi_ghim_dich_thi_do(self):
-        """G2–G5 đọc HEAD. HEAD rời khỏi dịch thì bằng chứng của chúng nói về
-        phần mềm khác với cái G1 chứng nhận."""
-        repo, head = self.repo_at(tag_at_head=False)
+    def test_head_mang_san_pham_khac_thi_do_va_doi_phat_hanh_moi(self):
+        """HEAD đi tiếp **bằng một thay đổi sản phẩm** thì bản phát hành không
+        còn mô tả HEAD: đỏ, nói phần nào đổi, và lối ra là phát hành mới — không
+        phải ghim lại đích."""
+        repo, head = self.repo_at(tag_at_head=False, manifest=False)
         repo.spec["closure_target_sha"] = head
         repo.write_json(CL.CRITERIA_PATH, repo.spec)
+        write_manifest(repo)
         p = self.probe(repo)
         self.assertIs(p.outcome, Outcome.FAILED)
-        self.assertIn("HEAD", p.detail)
+        self.assertIn("runtime_source", p.detail)
+        self.assertIn("new release", p.detail)
+        self.assertIn("aisef/sau.py", p.detail)
 
     def test_khong_co_ban_ghi_phat_hanh_thi_khong_do_duoc(self):
         repo, head = self.repo_at(target="")
@@ -2002,6 +2155,12 @@ class TestMotSHaDuyNhatChoViecDong(unittest.TestCase):
         p = self.probe(repo)
         self.assertIs(p.outcome, Outcome.UNRUNNABLE)
         self.assertIn("release.json", p.detail)
+
+    def test_khong_co_manifest_thi_khong_do_duoc(self):
+        repo, _ = self.repo_at(target="", manifest=False)
+        p = self.probe(repo)
+        self.assertIs(p.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("releases/9.9.9.json", p.detail)
 
     def test_pin_target_ghi_head_va_tu_choi_cay_ban(self):
         """Chốt một ứng viên trên cây bẩn là chốt một SHA không tả được cái đã đo."""
@@ -2087,17 +2246,22 @@ class TestChotDichCungTuLamMinhCu(unittest.TestCase):
     def _repo(self, *, extra: str = ""):
         c = crit("G1.0", "aisef.control.closure:probe_closure_target",
                  evidence="closure-evidence/release.json")
-        repo = Repo(spec_of(c))
+        repo = Repo(spec_of(c), commit=False)
         self.addCleanup(repo.close)
-        git(repo.root, "tag", "v9.9.9")
+        repo.write("pyproject.toml", PYPROJECT)
+        repo.write("aisef/__init__.py", "x = 1\n")
+        git(repo.root, "init"); git(repo.root, "config", "user.name", "T")
+        git(repo.root, "config", "user.email", "t@t.t")
+        git(repo.root, "add", "."); git(repo.root, "commit", "-m", "init")
         repo.write_json("closure-evidence/release.json", {"version": "9.9.9", "tag": "v9.9.9"})
         git(repo.root, "add", "."); git(repo.root, "commit", "-m", "release record")
-        git(repo.root, "tag", "-f", "v9.9.9")          # tag the revision being certified
+        git(repo.root, "tag", "v9.9.9")                 # tag the revision being certified
         CL.pin_target(repo.root)                        # ghi đích = HEAD
+        repo.spec = CL.load_spec(repo.root)             # pin_target wrote to disk
+        write_manifest(repo)                            # sổ sách, cũng như bản ghim
         if extra:
             repo.write(extra, "x\n")
         git(repo.root, "add", "."); git(repo.root, "commit", "-m", "pin the target")
-        repo.spec = CL.load_spec(repo.root)      # pin_target wrote to disk
         return repo
 
     def probe(self, repo):
@@ -2110,8 +2274,9 @@ class TestChotDichCungTuLamMinhCu(unittest.TestCase):
         self.assertIs(p.outcome, Outcome.PASSED, p.detail)
 
     def test_commit_dung_ma_nguon_thi_dich_cu(self):
-        """Phép kiểm âm: mã đổi sau khi chốt thì G2–G5 nói về bản khác."""
+        """Phép kiểm âm: mã đổi sau khi chốt thì sản phẩm ở HEAD không còn là
+        sản phẩm đã phát hành."""
         repo = self._repo(extra="aisef/thay_doi.py")
         p = self.probe(repo)
         self.assertIs(p.outcome, Outcome.FAILED)
-        self.assertIn("HEAD", p.detail)
+        self.assertIn("new release", p.detail)

@@ -2,7 +2,7 @@
   "_comment": "Machine-readable form of docs/PROJECT-CLOSURE-GATE.md (APPROVED 2026-09-14). The .md is authoritative prose; this file is what `aisef closure` evaluates. `contract_sha256` pins the .md: if it changes, closure is STALE. Probes name callables already in the package wherever one exists, so the gate reads through the SAME reader the product uses.",
   "contract_version": "1",
   "contract_path": "docs/PROJECT-CLOSURE-GATE.md",
-  "contract_sha256": "da6fbe25519206c85492adcf9b6dcd3d1a50ed5e4ee40a8d3c50260f2aa75db1",
+  "contract_sha256": "55406989cc7e4afdbccfb8d0b99c063056613f333baef913f123069f2caa683b",
   "approved": {
     "date": "2026-09-14",
     "by": "owner",
@@ -26,14 +26,14 @@
       "criteria": [
         {
           "id": "G1.0",
-          "statement": "the released tag, HEAD, and the frozen closure target are one revision",
+          "statement": "one release: the tag, the frozen target, the release manifest and the published artifacts agree, and HEAD carries the same product",
           "probe": "aisef.control.closure:probe_closure_target",
           "evidence": "closure-evidence/release.json",
           "freshness": {
             "kind": "bound_to",
-            "source": "closure_target_sha"
+            "source": "product_digest"
           },
-          "notes": "Owner adjustment 2 (2026-09-14). G1 certified the PyPI artefact at the tag commit while G2-G5 read HEAD, measured 46 commits apart -- different software combined into one record. One criterion owns the invariant so the failure names both revisions in one place; two conjuncts (tag resolves to the target, HEAD is still the target) and it must not pass on one of them. An unset target is UNRUNNABLE, never a pass: nothing to compare is not agreement. Set with `aisef closure --pin-target` on the candidate, which refuses on a dirty tree."
+          "notes": "Owner adjustment 2 (2026-09-14) kept: tag == closure_target_sha, one criterion owns the invariant. Owner adjustment 8 (2026-09-15, D-022) replaced the second conjunct. It used to be `HEAD == target` with a filename allowlist, which made recording post-release evidence invalidate the release it was evidence for. Now: the product identity (`planes`) at HEAD must equal the product identity at the target, the release manifest must name the target as release_source_sha with the same product digest, and the artifacts observed on PyPI must carry the manifest's digests with every member byte-equal to the tag's blobs. A path no plane rule classifies is UNRESOLVED and blocks. A product change is FAILED and says which part moved: the answer is a new release, never a re-pin."
         },
         {
           "id": "G1.1",
@@ -349,20 +349,21 @@
       "criteria": [
         {
           "id": "G6.1",
-          "statement": "the validation report exists at the path the protocol declares, carrying the protocol's metric fields",
+          "statement": "the validation record exists in the release's bundle, carries the protocol's metric fields, names this exact public release, and the instructions it was run against are unchanged",
           "probe": "aisef.control.closure:probe_external_report",
-          "evidence": "docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md",
+          "evidence": "closure-evidence/external-validation/{version}/REPORT.md",
           "freshness": {
-            "kind": "onboarding_digest",
-            "source": "closure-evidence/onboarding-digest.json"
+            "kind": "release_node",
+            "source": "closure-evidence/releases/{version}.json",
+            "also": "closure-evidence/onboarding-digest.json"
           },
-          "notes": "docs/EXTERNAL-VALIDATION-v1.1.0.md is the PROTOCOL, not the record. Its existence does not satisfy this."
+          "notes": "Owner adjustment 8 (2026-09-15). The record is bound to a RELEASE NODE, not to a filename and not to HEAD: it must declare product_version, release_tag, release_source_sha, wheel_sha256, sdist_sha256, protocol_version and instructions_digest, and every one of them must equal the release manifest and the bundle on disk. A record for release A cannot satisfy G6 for release B; instructions edited after the run cannot relabel an old record. Owner ruling 4's onboarding digest is kept as the second freshness clock, read through `aisef.control.onboarding` -- the same reader that wrote the record (D-023)."
         },
         {
           "id": "G6.2",
           "statement": "the participant is a genuinely external person, not an AI agent and not an AISEF contributor",
           "probe": "aisef.control.closure:probe_participant_external",
-          "evidence": "docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md",
+          "evidence": "closure-evidence/external-validation/{version}/REPORT.md",
           "freshness": {
             "kind": "bound_to",
             "source": "report_digest"
@@ -374,7 +375,7 @@
           "id": "G6.3",
           "statement": "no unresolved P0/P1 onboarding blocker",
           "probe": "aisef.control.closure:probe_onboarding_blockers",
-          "evidence": "docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md",
+          "evidence": "closure-evidence/external-validation/{version}/REPORT.md",
           "freshness": {
             "kind": "bound_to",
             "source": "report_digest"
@@ -422,7 +423,7 @@
       "skills.offer"
     ]
   },
-  "_evidence_note": "G1.* and G5.4's selfcheck half read recorded verifications (closure-evidence/release.json, closure-evidence/bench-selfcheck.json) because the evaluator is read-only: resolving them live would mean a network call, a build and an install. The CI record is cross-checked against the tag's real commit locally so it cannot self-assert.",
+  "_evidence_note": "G1.* and G5.4's selfcheck half read recorded verifications (closure-evidence/release.json, closure-evidence/bench-selfcheck.json) because the evaluator is read-only: resolving them live would mean a network call, a build and an install. The CI record is cross-checked against the tag's real commit locally so it cannot self-assert. Commit-bound records (`bound_to: commit`) are stale when any PRODUCT_AFFECTING or ASSURANCE_AFFECTING path changed since the recorded commit, fresh when only EVIDENCE_ONLY/DOCUMENTATION paths did, and UNRUNNABLE when an UNRESOLVED path did (`planes`, adjustment 8).",
   "exit_codes": {
     "0": "closable",
     "1": "blocked",
@@ -430,6 +431,153 @@
     "_note": "Deliberately NOT the rest of this CLI's convention (1 usage / 2 not-ready). The contract §4.3 specified these numbers; an unrecognised flag is still reported by the top-level parser and exits 1, as for every verb."
   },
   "closure_target_sha": "5c5ba52fa0c98bd276b074b7bc3e1d112dd49fd5",
+  "release_manifest": {
+    "_comment": "Machine-readable release identity, written by `validation/record_closure_evidence.py release` from the TAG's tree and the PUBLIC PyPI artifacts, never from HEAD. `{version}` is pyproject's version. Fields: version, tag, release_source_sha, product (digest + parts, per `planes`), artifacts (PyPI sha256), observed (download re-hashed and every member compared byte-for-byte with the tag's blobs), readme blob, tooling.",
+    "path": "closure-evidence/releases/{version}.json",
+    "external_validation_bundle": "closure-evidence/external-validation/{version}"
+  },
+  "planes": {
+    "_comment": "Owner adjustment 8 (2026-09-15, D-022). Every tracked path belongs to exactly one plane, decided by the FIRST matching rule; a path no rule matches is UNRESOLVED, which blocks and names the path -- ambiguity is never classified as harmless. PRODUCT_AFFECTING = ships in the wheel/sdist or decides how they are built (a change requires a new release). ASSURANCE_AFFECTING = anything a recorded run depends on (a change stales commit-bound evidence). EVIDENCE_ONLY = records; DOCUMENTATION = prose, governed by G5.6/G6.1 not by staleness. The product identity of a revision is the digest over its PRODUCT_AFFECTING tree (`aisef.control.planes:identity`), and G1.0 compares that identity between the release commit and HEAD instead of comparing commit SHAs. README.md is DOCUMENTATION although its text is the wheel's long description: nothing executes it and the published artifact does not change when it is edited; the release manifest records its blob so the provenance stays auditable.",
+    "schema_version": 1,
+    "rules": [
+      {
+        "class": "PRODUCT_AFFECTING",
+        "part": "package_data",
+        "match": "aisef/kit/*"
+      },
+      {
+        "class": "PRODUCT_AFFECTING",
+        "part": "package_data",
+        "match": "aisef/harness/assets/*"
+      },
+      {
+        "class": "PRODUCT_AFFECTING",
+        "part": "runtime_source",
+        "match": "aisef/*"
+      },
+      {
+        "class": "PRODUCT_AFFECTING",
+        "part": "build_config",
+        "match": "pyproject.toml"
+      },
+      {
+        "class": "PRODUCT_AFFECTING",
+        "part": "build_config",
+        "match": "LICENSE*"
+      },
+      {
+        "class": "PRODUCT_AFFECTING",
+        "part": "build_config",
+        "match": "MANIFEST.in"
+      },
+      {
+        "class": "PRODUCT_AFFECTING",
+        "part": "build_config",
+        "match": "setup.py"
+      },
+      {
+        "class": "PRODUCT_AFFECTING",
+        "part": "build_config",
+        "match": "setup.cfg"
+      },
+      {
+        "class": "EVIDENCE_ONLY",
+        "match": "closure-evidence/*"
+      },
+      {
+        "class": "EVIDENCE_ONLY",
+        "match": "docs/closure-gate.json"
+      },
+      {
+        "class": "EVIDENCE_ONLY",
+        "match": "docs/EXTERNAL-VALIDATION-REPORT-*.md"
+      },
+      {
+        "class": "EVIDENCE_ONLY",
+        "match": "docs/CLOSURE-REPORT.md"
+      },
+      {
+        "class": "EVIDENCE_ONLY",
+        "match": "docs/BASELINE-v1-CLOSED.md"
+      },
+      {
+        "class": "EVIDENCE_ONLY",
+        "match": "docs/DEFECT-REGISTER.json"
+      },
+      {
+        "class": "EVIDENCE_ONLY",
+        "match": "docs/CONFORMANCE.md"
+      },
+      {
+        "class": "EVIDENCE_ONLY",
+        "match": "docs/BENCH-REPORT-*.md"
+      },
+      {
+        "class": "EVIDENCE_ONLY",
+        "match": "docs/BENCH-PAIR-QUALIFICATION.md"
+      },
+      {
+        "class": "ASSURANCE_AFFECTING",
+        "match": "tests/*"
+      },
+      {
+        "class": "ASSURANCE_AFFECTING",
+        "match": "validation/*"
+      },
+      {
+        "class": "ASSURANCE_AFFECTING",
+        "match": "framework/*"
+      },
+      {
+        "class": "ASSURANCE_AFFECTING",
+        "match": ".github/*"
+      },
+      {
+        "class": "ASSURANCE_AFFECTING",
+        "match": "bin/*"
+      },
+      {
+        "class": "ASSURANCE_AFFECTING",
+        "match": ".gitignore"
+      },
+      {
+        "class": "ASSURANCE_AFFECTING",
+        "match": ".gitattributes"
+      },
+      {
+        "class": "ASSURANCE_AFFECTING",
+        "match": "references/*"
+      },
+      {
+        "class": "ASSURANCE_AFFECTING",
+        "match": "spike/*"
+      },
+      {
+        "class": "DOCUMENTATION",
+        "match": "docs/*"
+      },
+      {
+        "class": "DOCUMENTATION",
+        "match": "landingpage/*"
+      },
+      {
+        "class": "DOCUMENTATION",
+        "match": "README.md"
+      },
+      {
+        "class": "DOCUMENTATION",
+        "match": "README.vi.md"
+      },
+      {
+        "class": "DOCUMENTATION",
+        "match": "CHANGELOG.md"
+      },
+      {
+        "class": "DOCUMENTATION",
+        "match": "salekit-usp.png"
+      }
+    ]
+  },
   "claim_registry": {
     "_comment": "Claims withdrawn as unreproducible (G5.6). `forms` lists every surface spelling that counts as the same claim -- including locale variants, because retiring `±0.08` and then writing `±0,08` is not a correction. A mention inside a region marked `<!-- claim:WITHDRAWAL_EXPLANATION -->` ... `<!-- /claim -->` is not an assertion; anything outside such a region is.",
     "retired": [

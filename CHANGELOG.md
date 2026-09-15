@@ -2,6 +2,46 @@
 
 ## Unreleased
 
+## 1.7.2 — 2026-09-15
+
+**A release is identified by its product, not by which commit is HEAD (D-022).**
+After 1.7.1 was published and G1 read PASSED, one documentation-sync commit —
+touching nothing that ships — made G1.0 FAILED, because the criterion was
+`HEAD == closure_target_sha` with a two-entry filename allowlist as the only
+exception. Recording evidence *about* a release invalidated the release, so the
+cure was another release whose evidence would invalidate it again: a loop with
+no fixed point. The closure gate now models two planes. The **product plane**
+(runtime source, package data, build configuration) is identified by
+`release_source_sha`, a content digest over the tag's tree, and the wheel/sdist
+digests on PyPI; the **assurance plane** (tests, evidence, records, docs) may
+move after publication. G1.0 compares the product digest at HEAD with the one
+at the release, and binds the artifacts observed on PyPI to the tag's blobs
+member by member; commit-bound evidence is stale only when a product or
+assurance path changed; a path no rule classifies is `UNRESOLVED` and blocks.
+The classification lives in `docs/closure-gate.json#planes`, the mechanism in
+`aisef.control.planes`, the release manifest in
+`closure-evidence/releases/<version>.json`, written from the tag and public PyPI
+by `validation/record_closure_evidence.py manifest`.
+
+**G6 is bound to a release node (adjustment 8).** The external-validation record
+must declare the product version, tag, `release_source_sha`, artifact digests,
+protocol version and the digest of the immutable instructions bundle it
+followed, and each is compared with the manifest and the bundle on disk. A
+record for one release is not evidence about another; instructions edited after
+the run cannot relabel an old record. The record lives inside the bundle at
+`closure-evidence/external-validation/<version>/REPORT.md`.
+
+**G6.1 read the onboarding digest under a key its writer never wrote (D-023).**
+The probe looked for `sha256` and `version` and recomputed the digest with its
+own copy of the algorithm, while `aisef.control.onboarding` writes `digest` and
+hashes commands only. The first real record would have failed as "onboarding
+surface changed". The copy is deleted; the probe reads through the writer.
+
+Nothing else changed: no feature, no gate softened, no waiver. Regression
+matrix in `tests/test_release_identity.py`, including the permanent fixed-point
+invariant (release → validate → record → close converges without another
+release unless the product changes).
+
 ## 1.7.1 — 2026-09-15
 
 **A pinned path is the same string on every platform.** `aisef closure --pin`

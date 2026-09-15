@@ -1,0 +1,67 @@
+{
+  "artifacts": {
+    "sdist": {
+      "filename": "aisef-1.7.1.tar.gz",
+      "sha256": "4026bb3752a4726ac2a6a4d162ebbcd92902dd422a2709189376117184c67f0a",
+      "size": 951543,
+      "upload_time": "2026-09-15T01:51:28.261255Z",
+      "url": "https://files.pythonhosted.org/packages/9b/f6/70981611b2a0243b91bc3595d09ebe1aa60b564da6571018f5c4661c478a/aisef-1.7.1.tar.gz"
+    },
+    "wheel": {
+      "filename": "aisef-1.7.1-py3-none-any.whl",
+      "sha256": "064c27f0f9663c1b1a9ef3a6e766c6d05a8b4b07c1bdd044d01a48b21a97ce39",
+      "size": 588261,
+      "upload_time": "2026-09-15T01:51:26.291991Z",
+      "url": "https://files.pythonhosted.org/packages/fc/2f/24c235e0e287ab8b12b8cb9c292c0a0c534000198ea72d74f2f5d9f0a850/aisef-1.7.1-py3-none-any.whl"
+    }
+  },
+  "observed": {
+    "sdist": {
+      "matches_published": true,
+      "members_checked": 213,
+      "mismatched": [],
+      "sha256": "4026bb3752a4726ac2a6a4d162ebbcd92902dd422a2709189376117184c67f0a",
+      "size": 951543,
+      "unmapped": [],
+      "url": "https://files.pythonhosted.org/packages/9b/f6/70981611b2a0243b91bc3595d09ebe1aa60b564da6571018f5c4661c478a/aisef-1.7.1.tar.gz"
+    },
+    "wheel": {
+      "matches_published": true,
+      "members_checked": 108,
+      "mismatched": [],
+      "sha256": "064c27f0f9663c1b1a9ef3a6e766c6d05a8b4b07c1bdd044d01a48b21a97ce39",
+      "size": 588261,
+      "unmapped": [],
+      "url": "https://files.pythonhosted.org/packages/fc/2f/24c235e0e287ab8b12b8cb9c292c0a0c534000198ea72d74f2f5d9f0a850/aisef-1.7.1-py3-none-any.whl"
+    }
+  },
+  "product": {
+    "digest": "e86354f3787af079b2b1608193f65b0501666d55321ffa2be2a86f1ed0586a8a",
+    "files": 109,
+    "parts": {
+      "build_config": "16e3d34431d5008981b70d93cce1283dc93821a64062f725df60aacbe74e2f59",
+      "package_data": "2ee6f395b89217409076d36e944abf06d3cd3a7294bbb648498664d9e4c010f6",
+      "runtime_source": "98dd43a6675daeb2868d990881bbf4f8adaa830ccc7130d124c42f35cb091bd9"
+    },
+    "rev": "5c5ba52fa0c98bd276b074b7bc3e1d112dd49fd5",
+    "unresolved": []
+  },
+  "product_not_shipped": [],
+  "readme_blob_at_release": "b3615b79894366b1d0a6fa33e11ce7b4cdeaa5db",
+  "recorded_at": "2026-09-15T03:10:33+00:00",
+  "recorded_at_commit": "0e68b9615e82471b02f20a0adfc33b594be51cc9",
+  "release_run": {
+    "conclusion": "success",
+    "created_at": "2026-09-15T01:48:36Z",
+    "id": "34918726837"
+  },
+  "release_source_sha": "5c5ba52fa0c98bd276b074b7bc3e1d112dd49fd5",
+  "schema_version": 1,
+  "tag": "v1.7.1",
+  "tooling": {
+    "built_by": "github release workflow (trusted publishing)",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "recorder_python": "3.14.7"
+  },
+  "version": "1.7.1"
+}

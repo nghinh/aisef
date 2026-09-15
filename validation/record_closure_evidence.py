@@ -21,15 +21,29 @@ cài từ PyPI (~30 giây, cần mạng).
 
 from __future__ import annotations
 
+import hashlib
+import io
 import json
+import platform
 import re
 import subprocess
 import sys
+import tarfile
 import tempfile
+import urllib.request
+import zipfile
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "closure-evidence"
+sys.path.insert(0, str(ROOT))
+
+from aisef.control import planes  # noqa: E402
+
+#: Members of a distribution that the build tool generates rather than copies —
+#: they have no blob in the source tree and are not compared.
+GENERATED = ("PKG-INFO", "setup.cfg")
 
 
 def _run(*argv: str, cwd: Path | None = None, timeout: int = 1800) -> tuple[int, str]:
@@ -42,7 +56,7 @@ def _head() -> str:
 
 
 def _write(name: str, payload: dict) -> None:
-    OUT.mkdir(exist_ok=True)
+    (OUT / name).parent.mkdir(parents=True, exist_ok=True)
     (OUT / name).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(f"  wrote closure-evidence/{name}")
 
@@ -175,8 +189,127 @@ def record_release() -> None:
     _write("release.json", rec)
 
 
+# ---------------------------------------------------------- G1.0 / G6.1 manifest
+
+
+def _blob(rev: str, path: str) -> bytes | None:
+    p = subprocess.run(["git", "-C", str(ROOT), "show", f"{rev}:{path}"], capture_output=True)
+    return p.stdout if p.returncode == 0 else None
+
+
+def _members(kind: str, data: bytes, ver: str) -> list[tuple[str, bytes]]:
+    """`(source path, bytes)` for every file a distribution carries that maps
+    onto the source tree. dist-info / egg-info / PKG-INFO are generated."""
+    out = []
+    if kind == "wheel":
+        with zipfile.ZipFile(io.BytesIO(data)) as z:
+            for info in z.infolist():
+                if info.is_dir() or ".dist-info/" in info.filename:
+                    continue
+                out.append((info.filename, z.read(info)))
+    else:
+        prefix = f"aisef-{ver}/"
+        with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz") as tf:
+            for m in tf.getmembers():
+                if not m.isfile() or not m.name.startswith(prefix):
+                    continue
+                rel = m.name[len(prefix):]
+                if rel in GENERATED or ".egg-info/" in rel:
+                    continue
+                f = tf.extractfile(m)
+                out.append((rel, f.read() if f else b""))
+    return out
+
+
+def _observe(kind: str, url: str, want_sha: str, ver: str, at_tag: str) -> dict:
+    """Download the public artifact, re-hash it, and compare every member with
+    the blob at the tag. `mismatched` and `unmapped` non-empty mean the artifact
+    was not built from the release source — G1.0 blocks on either."""
+    data = urllib.request.urlopen(url, timeout=120).read()
+    got = hashlib.sha256(data).hexdigest()
+    checked, mismatched, unmapped = 0, [], []
+    for path, body in _members(kind, data, ver):
+        blob = _blob(at_tag, path)
+        if blob is None:
+            unmapped.append(path)
+        elif hashlib.sha256(blob).hexdigest() != hashlib.sha256(body).hexdigest():
+            mismatched.append(path)
+        else:
+            checked += 1
+    return {"url": url, "size": len(data), "sha256": got, "matches_published": got == want_sha,
+            "members_checked": checked, "mismatched": mismatched, "unmapped": unmapped}
+
+
+def record_manifest() -> None:
+    """Release manifest — the release node G1.0 and G6.1 bind to (D-022).
+
+    Taken from the **tag's** tree and the **public** PyPI artifacts, never from
+    HEAD or a local build: `release_source_sha` is what the tag resolves to, the
+    product digests are `planes.identity` at that commit under the rules in
+    `docs/closure-gate.json`, the artifact digests are what PyPI publishes, and
+    `observed` is the same files downloaded, re-hashed, and every member
+    compared byte-for-byte with the tag's blobs. Runs anywhere with git and the
+    network; the evaluator only ever reads the result.
+    """
+    ver = _version()
+    tag = f"v{ver}"
+    at_tag = _run("git", "rev-list", "-n", "1", tag)[1].strip()
+    if not at_tag:
+        raise SystemExit(f"tag {tag} does not resolve — tag the release before recording its manifest")
+    spec = json.loads((ROOT / "docs/closure-gate.json").read_text(encoding="utf-8"))
+    rules = planes.rules_from(spec)
+    ident = planes.identity(ROOT, at_tag, rules)
+    if ident.unresolved:
+        print(f"  ! {len(ident.unresolved)} tracked path(s) at {tag} have no plane rule — "
+              f"G1.0 will block until docs/closure-gate.json#planes classifies them: "
+              f"{', '.join(ident.unresolved[:6])}")
+    meta = json.load(urllib.request.urlopen(f"https://pypi.org/pypi/aisef/{ver}/json", timeout=60))
+    artifacts, observed = {}, {}
+    for u in meta.get("urls") or []:
+        kind = "wheel" if u.get("packagetype") == "bdist_wheel" else "sdist"
+        artifacts[kind] = {"filename": u.get("filename"), "sha256": (u.get("digests") or {}).get("sha256"),
+                           "size": u.get("size"), "upload_time": u.get("upload_time_iso_8601"),
+                           "url": u.get("url")}
+        observed[kind] = _observe(kind, u["url"], artifacts[kind]["sha256"], ver, at_tag)
+        print(f"  {kind}: {observed[kind]['members_checked']} members bound to {tag}, "
+              f"{len(observed[kind]['mismatched'])} mismatched, {len(observed[kind]['unmapped'])} unmapped")
+    shipped = set()
+    if "sdist" in observed:
+        data = urllib.request.urlopen(artifacts["sdist"]["url"], timeout=120).read()
+        shipped = {path for path, _ in _members("sdist", data, ver)}
+    not_shipped = sorted(p for p in ident.paths if p not in shipped) if shipped else []
+    if not_shipped:
+        print(f"  ! {len(not_shipped)} PRODUCT_AFFECTING path(s) are not in the sdist: "
+              f"{', '.join(not_shipped[:6])} — classification or build config is wrong")
+    run: dict = {}
+    code, out = _run("gh", "run", "list", "--workflow=release.yml", "--limit", "20",
+                     "--json", "headSha,conclusion,databaseId,createdAt", timeout=120)
+    if code == 0:
+        for row in json.loads(out or "[]"):
+            if str(row.get("headSha", "")).startswith(at_tag[:12]):
+                run = {"id": str(row.get("databaseId")), "conclusion": row.get("conclusion"),
+                       "created_at": row.get("createdAt")}
+                break
+    readme = _run("git", "rev-parse", f"{at_tag}:README.md")[1].strip()
+    _write(f"releases/{ver}.json", {
+        "schema_version": 1,
+        "version": ver, "tag": tag, "release_source_sha": at_tag,
+        "recorded_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "recorded_at_commit": _head(),
+        "product": ident.as_dict(),
+        "product_not_shipped": not_shipped,
+        "readme_blob_at_release": readme,
+        "artifacts": artifacts,
+        "observed": observed,
+        "release_run": run,
+        "tooling": {"recorder_python": platform.python_version(), "platform": platform.platform(),
+                    "built_by": "github release workflow (trusted publishing)" if run else ""},
+    })
+
+
 STEPS = {"suite": record_suite, "lint": record_lint,
-         "bench": record_bench_selfcheck, "release": record_release}
+         "bench": record_bench_selfcheck, "release": record_release,
+         "manifest": record_manifest}
 
 if __name__ == "__main__":
     want = sys.argv[1:] or list(STEPS)

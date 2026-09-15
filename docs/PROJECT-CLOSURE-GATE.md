@@ -35,6 +35,106 @@ features are added while executing closure. Criteria are never softened to reach
 The stated target, quoted: *"produce enough trustworthy evidence that I, as
 owner, can legitimately declare the AISEF engineering project complete."*
 
+
+## 0b. Owner adjustment 8, 2026-09-15 — release identity and the closure fixed point
+
+**What was measured.** `v1.7.1` was published from `5c5ba52`; G1 read PASSED
+(`64deed9`). One commit later, `8b3eada` synced the public documentation —
+`docs/*.md`, `landingpage/`, `SALEKIT.html` — and touched nothing that ships.
+G1.0 went FAILED: *"HEAD is 0e68b96, closure targets 5c5ba52"*. Recording
+evidence **about** a release had invalidated the release it was evidence
+**for**. The only way to make G1 green again was another release, whose own
+evidence (external validation, closure record) would land in a later commit and
+invalidate it in turn. Release → validate → record → G1 stale → release again:
+a loop with no fixed point. Registered as **D-022** (P1, closure architecture),
+taxonomy row 177.
+
+**Root cause.** G1.0's second conjunct was `HEAD == closure_target_sha`, and the
+exception carved out of it (`_only_bookkeeping_changed`, lỗi 162) was a filename
+allowlist of one directory and one file. It named two places the loop had
+already bitten; it did not say what the product *is*. The gate confused two
+questions that have different answers.
+
+**The model that replaces it.** Two planes, linked by explicit identities and
+decided by classification and digest — never by "the diff looks harmless".
+
+| plane | what is in it | identity | may move after publication? |
+|---|---|---|---|
+| **product** | runtime source (`aisef/**/*.py`), package data (`aisef/kit/*`, `aisef/harness/assets/*`), build configuration (`pyproject.toml`, license files) | `release_source_sha` (the tag's commit) · `product_digest` (SHA-256 over `mode blob path` of every product path in that commit's tree, with per-part sub-digests) · `release_artifact_identity` (the wheel and sdist SHA-256 on PyPI) | **no** — a change is a new release |
+| **assurance** | tests, CI, validation tooling (`ASSURANCE_AFFECTING`); evidence, approvals, reports, the criteria file (`EVIDENCE_ONLY`); prose and public pages (`DOCUMENTATION`) | `closure_record_sha` (the commit carrying the closure report and the owner's signature) | **yes** |
+
+Every tracked path belongs to exactly one class, decided by the **first matching
+rule** in `docs/closure-gate.json#planes`. A path no rule matches is
+`UNRESOLVED`: it blocks and is named, so the rule list is made complete on
+purpose rather than assumed complete by default. The rules live in the criteria
+file, not in the package, so classifying a new directory after a release is an
+assurance-plane edit and cannot itself force a release.
+
+**Invariant.** A later commit may coexist with release R when its product digest
+equals R's. `closure_record_sha == release_source_sha` is **not** required after
+public release, and must not be reintroduced.
+
+**What each gate now answers.**
+
+* **G1** — *is the public release authentic, reproducible and bound to the
+  intended product source?* — not *has nobody committed since the release?*
+  G1.0 holds four things together: the tag resolves to `closure_target_sha`
+  (adjustment 2, unchanged); the release manifest names that commit as
+  `release_source_sha` and carries the product digest the tag's tree produces
+  under the current rules; the product digest at HEAD equals it; and the
+  artifacts observed on PyPI — downloaded, re-hashed, every member compared
+  byte-for-byte with the tag's blobs — carry the digests PyPI publishes. A
+  product change is FAILED and names which part moved; the remedy is a release,
+  never a re-pin. A digest mismatch on the artifacts is FAILED whatever HEAD is.
+* **Commit-bound evidence** (G1.2, G2.1, G2.2, G5.4) — stale when a
+  `PRODUCT_AFFECTING` or `ASSURANCE_AFFECTING` path changed since the recorded
+  commit; fresh when only evidence or documentation did; UNRUNNABLE when an
+  `UNRESOLVED` path did. Staleness is by dependency, not by HEAD movement.
+* **G6** — *has a genuine external participant validated this exact public
+  release?* The record is bound to a **release node**, not to a filename and
+  not to HEAD: it declares product version, tag, `release_source_sha`, wheel
+  and sdist digests, protocol version and the digest of the instructions bundle
+  it followed, and each must equal the release manifest and the bundle on disk.
+  A record for release A cannot satisfy G6 for release B; instructions edited
+  after the run cannot relabel an old record. Ruling 4's onboarding digest stays
+  as the second clock and is read through the module that writes it (D-023
+  closed a probe that read the record under a key its writer never wrote).
+  Ruling 4's `MAJOR.MINOR` clause is subsumed: exact binding is stricter.
+* **Final closure** = release identity (`release_source_sha`, product digest,
+  artifact digests) + assurance evidence + the closure record's identity
+  (`closure_record_sha`), stated in `docs/BASELINE-v1-CLOSED.md` — three
+  identities, not one commit.
+
+**The external-validation bundle.** Each public release gets an immutable
+bundle at `closure-evidence/external-validation/<version>/`: the exact PyPI
+version, tag, `release_source_sha`, artifact digests, the clean-install command,
+the canonical workflow, the expected evidence, the report template with the
+identity block, and the success/failure recording rules, plus a `bundle.json`
+carrying the same identity and the bundle's own `instructions_digest`. The
+participant is never told to use "the latest docs". The product version and the
+protocol version (v1.1.0) are separate fields. The record is written into that
+directory as `REPORT.md`; the digest excludes it.
+
+**Regression matrix, permanent.** `tests/test_release_identity.py` pins: runtime
+source change → stale; package data change → stale; external-validation report
+added → valid; closure evidence added → valid; documentation change → not a
+product change; a manifest or record for release A cannot pass for release B;
+editing recorded evidence is caught by its digest; the bundle digest is
+byte-exact; an artifact digest mismatch fails whatever HEAD is; an evidence-only
+commit with the same artifacts passes; and **fixed-point convergence** —
+release R → validate R → record → close R converges without R+1 unless the
+product identity changes. The V1-A class was red against the old probe before
+the model existed (2 of 5 red, negative control green).
+
+**Where it was measured.** `closure-evidence/releases/1.7.1.json` is the first
+manifest, recorded from the `v1.7.1` tag and public PyPI: 108 wheel members
+and 213 sdist members bound byte-for-byte to `5c5ba52`, 0 mismatched, 0
+unmapped, 0 unclassified paths. Under this model the doc-sync commit `8b3eada`
+carries the released product (`TestTheDefectInstance`). HEAD after this
+adjustment does **not**: `aisef/control/closure.py` and the new
+`aisef/control/planes.py` are product, so G1.0 correctly reads FAILED with
+*"a new release is required"* — which is 1.7.2.
+
 This document answers one question the repository could not previously answer:
 **what has to be true for the AISEF engineering project to be declared
 complete?** It is a product/acceptance contract, so its content is the owner's
@@ -281,7 +381,7 @@ failure is invisible from inside the repository.
 
 | criterion | evidence | probe |
 |---|---|---|
-| G1.0 the released tag, HEAD, and the frozen closure target are **one** revision | `closure-evidence/release.json` `tag` resolved by git, vs `closure_target_sha` | compare; unset target → `UNRUNNABLE` |
+| G1.0 one release: tag, frozen target, release manifest and published artifacts agree, and HEAD carries the same **product** | `closure-evidence/release.json` `tag` resolved by git, vs `closure_target_sha`; `closure-evidence/releases/<version>.json`; product digest at target and at HEAD (`#planes`) | compare identities; unset target, missing manifest or an `UNRESOLVED` path → `UNRUNNABLE`; a product change or an artifact mismatch → `FAILED` |
 | G1.1 CI green on the released tag | GitHub Actions run for `v<version>` | `gh run list --workflow=tests.yml`, matched by commit |
 | G1.2 package checks green | `python -m build` + `twine check` | re-run; both must exit 0 |
 | G1.3 clean-venv install from PyPI serves the released version | `pip install aisef==<version>` in an empty venv → `aisef --version` | re-run |
@@ -292,16 +392,19 @@ failure is invisible from inside the repository.
 **Human decision:** no. **Waiver-eligible:** no — this gate is entirely
 mechanical, and waiving it would waive the product's existence.
 
-**Staleness.** Bound to the release version and the tag's commit. A new release
-invalidates G1 and it must be re-evaluated.
+**Staleness.** Bound to the product identity (§0b): a change to any
+`PRODUCT_AFFECTING` path after the release makes G1.0 FAILED and requires a new
+release; evidence and documentation commits after the release do not touch it.
+G1.2's build record is stale by dependency like every commit-bound record.
 
 **G1.0, added 2026-09-14 under owner adjustment 2.** The invariant is
 `release_tag_commit == closure_target_sha`, and it is a criterion of its own so
 that the failure names both revisions in one place rather than four probes each
 reporting a corner of the same disagreement. It has two conjuncts and must not
-pass on one of them: the tag resolves to the target, **and** HEAD is still the
-target — G2 through G5 bind their evidence to HEAD, so a HEAD that has moved on
-means their evidence describes software other than what G1 certifies. An unset
+pass on one of them: the tag resolves to the target, **and** — since adjustment
+8 (§0b) — the **product** at HEAD is the product at the target, decided by
+digest over the product plane rather than by `HEAD == target`, which had made
+recording post-release evidence invalidate the release (D-022). An unset
 target reads `UNRUNNABLE`: no candidate has been frozen, so there is nothing to
 compare, and nothing to compare is not agreement. Freeze it with
 `aisef closure --pin-target`, which refuses on a dirty tree because a SHA pinned
@@ -735,12 +838,13 @@ machinery than I first assumed:
 - its **Finding classification** already defines P0/P1/P2/P3 — P0 is "cannot
   install, data loss, security issue, **incorrect gate result**", P1 is "cannot
   complete lifecycle without author assistance";
-- it already declares the record's path:
-  `docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md`, which does **not** yet exist.
+- it declares the record's path, since adjustment 8 inside the release's
+  bundle: `closure-evidence/external-validation/<version>/REPORT.md`, which
+  does **not** yet exist for any release.
 
 | criterion | evidence |
 |---|---|
-| G6.1 the validation **report** exists at the path the protocol declares | `docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md`, carrying the protocol's Metrics fields |
+| G6.1 the validation **report** exists in the release's bundle, carries the protocol's Metrics fields, names **this** public release, and the instructions it followed are unchanged | `closure-evidence/external-validation/<version>/REPORT.md` — identity block compared with `closure-evidence/releases/<version>.json` and the bundle digest (§0b) |
 | G6.2 the participant did not implement AISEF | stated in the report; the protocol's own wording is "genuinely external" |
 | G6.3 no unresolved P0/P1 onboarding blocker | severities per the protocol's Finding classification, each resolved or waived |
 
@@ -761,9 +865,13 @@ waiver is explicitly yours per your brief. **Waiver-eligible:** G6.3 yes; G6.1
 and G6.2 no, because waiving the existence of external validation returns the
 project to measuring only itself.
 
-**Staleness — owner ruling 4 (2026-09-14).** The arbitrary "one minor version"
-tolerance I drafted is **replaced**. External validation is current when **both**
-hold:
+**Staleness — owner ruling 4 (2026-09-14), tightened by adjustment 8 (§0b).**
+The record is bound to the exact public release it names (version, tag,
+`release_source_sha`, artifact digests, instructions digest); a patch release is
+a new release node and needs its own record. Within that binding, ruling 4's
+onboarding clock still applies. The ruling as issued — the arbitrary "one minor
+version" tolerance I drafted is **replaced**; external validation is current
+when **both** hold:
 
 1. the validated version shares `MAJOR.MINOR` with the closure release — patch
    releases within the same minor do **not** invalidate it; **and**

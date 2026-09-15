@@ -8,7 +8,8 @@
 > not measured, not that it was zero or fine.
 >
 > The record this form produces belongs at
-> **`docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md`** — the path
+> **`closure-evidence/external-validation/<version>/REPORT.md`** — inside the
+> immutable bundle for the release being validated, the path
 > [`docs/EXTERNAL-VALIDATION-v1.1.0.md`](EXTERNAL-VALIDATION-v1.1.0.md) declares
 > and gate **G6.1** reads. That file does not exist yet and must not be created
 > by anyone other than a real participant (or an observer transcribing one).
@@ -29,8 +30,21 @@ protocol and the observer rules are in
 
 ## 1. Run identity
 
+The first seven rows bind this record to **one public release** and to the
+**exact instructions** followed. Gate G6.1 compares each of them with the
+release manifest and the bundle on disk: a record for another release, or one
+run against edited instructions, is not evidence for this closure. Copy the
+values from the bundle's `bundle.json`; do not type them from memory.
+
 | field | value |
 |---|---|
+| Product version | `<e.g. 1.7.2>` |
+| Release tag | `<e.g. v1.7.2>` |
+| Release source SHA | `<40-hex commit from bundle.json>` |
+| Wheel sha256 | `<from bundle.json>` |
+| Sdist sha256 | `<from bundle.json>` |
+| Protocol version | `v1.1.0` |
+| Instructions digest | `<instructions_digest from bundle.json>` |
 | Report date | `<YYYY-MM-DD>` |
 | AISEF version validated | `<aisef --version output>` |
 | Onboarding digest at validation time | `<digest from closure-evidence/onboarding-digest.json>` |

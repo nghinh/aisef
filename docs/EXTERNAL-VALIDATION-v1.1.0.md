@@ -136,7 +136,7 @@ All of:
 - [ ] Claude Code and OpenCode conformance green (10/10)
 - [ ] OpenCode+Serena write-scope behavior resolved or documented
 - [ ] Public docs match actual workflow
-- [ ] External validation report published (`docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md`)
+- [ ] External validation report published (`closure-evidence/external-validation/<version>/REPORT.md`, bound to the release it validates — see `PROJECT-CLOSURE-GATE.md` §0b)
 
 ## Feedback questionnaire
 

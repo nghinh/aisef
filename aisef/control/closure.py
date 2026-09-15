@@ -30,7 +30,8 @@ written, by the probes:
 | `lint.json` | G2.2 | `{"tool": "ruff", "exit": 0, "commit": sha}` |
 | `judge-only-audit.json` | G2.4b | `{"G2.4b-i".."iv": {"holds": bool, "evidence": str}, "judge_alone_blocks": n, "blocks_total": n}` |
 | `bench-selfcheck.json` | G5.4 | `{"passed": n, "total": n, "commit": sha}` |
-| `onboarding-digest.json` | G6.1 | `{"sha256": ..., "version": "1.6.0"}` |
+| `onboarding-digest.json` | G6.1 | `{"digest": ...}` written by `aisef.control.onboarding` |
+| `releases/<version>.json` | G1.0, G6.1 | the release manifest: `release_source_sha`, product digests, PyPI artifacts observed and bound to the tag's tree |
 
 The evaluator writes exactly two files, both outputs: the machine report
 `closure-evidence/closure-report.json` and, on `--report`, `docs/CLOSURE-REPORT.md`.
@@ -49,7 +50,6 @@ from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
-from ..config import DEFAULTS
 from ..harness.observe import TOOL_RUN, EvidenceStore
 from .approvals import (
     GATE_ORDER,
@@ -61,7 +61,7 @@ from .approvals import (
     _now,
     sha256_of,
 )
-from . import cohort
+from . import cohort, onboarding, planes
 from .gate import Outcome, _stale_candidates
 from .gate import CHECK_KIND
 from .outcome import CHECK_KINDS
@@ -234,49 +234,70 @@ def _missing(what: str) -> Probed:
     return Probed(Outcome.UNRUNNABLE, f"missing: {what}")
 
 
-def _only_bookkeeping_changed(ctx: Ctx, at: str) -> bool:
-    """True when every file changed between ``at`` and HEAD is closure bookkeeping.
-
-    Lỗi 162. Bằng chứng buộc vào `commit` mà **chính nó** được git theo dõi thì
-    không bao giờ hiện hành được: ghi ở commit X, rồi commit tệp bằng chứng làm
-    HEAD đi qua X, nên phép so `== HEAD` cũ ngay lập tức; còn không commit thì
-    cây bẩn và `pin_target` từ chối. "G2.1 xanh" và "chốt được
-    `closure_target_sha`" loại trừ nhau — một vòng không lối ra mà máy đóng gate
-    tự tạo cho mình, đo trên chính kho này 2026-09-14.
-
-    Câu probe **thật sự** hỏi là "bằng chứng này có tả đúng **mã nguồn** hiện tại
-    không". Một commit chỉ đụng `closure-evidence/` không đổi một dòng mã nào,
-    nên câu trả lời vẫn là có. Nới đúng chừng ấy: một tệp nào **ngoài** thư mục
-    ấy đổi thì bằng chứng cũ, như trước.
-
-    Tệp tiêu chí (`docs/closure-gate.json`) cùng lớp, và vì cùng lý do: chốt
-    `closure_target_sha` ghi vào nó, nên commit bản ghim làm HEAD đi qua đúng
-    commit vừa chốt và vế *HEAD vẫn là đích* của G1.0 hỏng ngay sau khi chốt —
-    anh em của cùng một lỗi, chỉ đổi tệp. Sổ sách đóng dự án không phải mã nguồn.
-
-    Không đọc được danh sách thay đổi → `False`: không biết thì coi là cũ.
-    """
-    changed = _git_out(ctx.root, "diff", "--name-only", f"{at}..HEAD")
-    names = [ln.strip() for ln in changed.splitlines() if ln.strip()]
-    return bool(names) and all(
-        n.startswith(f"{EVIDENCE_DIR}/") or n == CRITERIA_PATH for n in names)
-
-
 def _at_commit(ctx: Ctx, rec: dict, field_name: str = "commit") -> Probed | None:
-    """Freshness ``bound_to: commit``. Evidence recorded at another commit does
-    not describe this one, and "cannot tell" is UNRUNNABLE, not a pass."""
+    """Freshness ``bound_to: commit`` — does this record still describe the tree?
+
+    Answered by **what changed**, not by **whether HEAD moved** (D-022). A
+    record taken at commit X describes HEAD when nothing HEAD depends on has
+    changed since X: no PRODUCT_AFFECTING path (the record would describe another
+    product) and no ASSURANCE_AFFECTING path (the record would describe another
+    measurement). Evidence and documentation commits are exactly the commits a
+    closure produces, and they change neither. The classes come from
+    `docs/closure-gate.json#planes`; a changed path no rule classifies is
+    UNRUNNABLE and named — "cannot tell" is never "it is fine".
+
+    Lỗi 162 is the ancestor of this rule: evidence bound to a commit while itself
+    being committed could never be current, and the first fix was a two-entry
+    filename allowlist. The allowlist is gone; the model replaces it.
+    """
     head = ctx.head
     at = str(rec.get(field_name) or "")
     if not head:
         return Probed(Outcome.UNRUNNABLE, "cannot read git HEAD here")
     if not at:
         return Probed(Outcome.UNRUNNABLE, f"record names no `{field_name}`")
-    if not (head.startswith(at) or at.startswith(head)):
-        if _only_bookkeeping_changed(ctx, at):
-            return None
+    if head.startswith(at) or at.startswith(head):
+        return None
+    rules = _rules(ctx)
+    if not rules:
         return Probed(Outcome.UNRUNNABLE,
-                      f"recorded at {at[:7]}, HEAD is {head[:7]} — re-run and re-record")
+                      f"recorded at {at[:7]}, HEAD is {head[:7]}, and {CRITERIA_PATH} declares no "
+                      f"`{planes.SPEC_KEY}` rules — cannot tell whether what changed matters")
+    ch = planes.changes(ctx.root, at, head, rules)
+    if not ch.readable:
+        return Probed(Outcome.UNRUNNABLE,
+                      f"recorded at {at[:7]}, HEAD is {head[:7]} — cannot read what changed between them")
+    if ch.unresolved:
+        return Probed(Outcome.UNRUNNABLE,
+                      f"recorded at {at[:7]}; {len(ch.unresolved)} changed path(s) since have no plane "
+                      f"rule: {', '.join(ch.unresolved[:4])} — classify them in {CRITERIA_PATH}#planes")
+    if ch.staling:
+        return Probed(Outcome.UNRUNNABLE,
+                      f"recorded at {at[:7]}, HEAD is {head[:7]} — {len(ch.staling)} product/assurance "
+                      f"path(s) changed since ({', '.join(ch.staling[:4])}); re-run and re-record")
     return None
+
+
+def _rules(ctx: Ctx) -> tuple[planes.Rule, ...]:
+    """Plane rules from the criteria file; malformed rules are a usage error
+    surfaced by the probe as UNRUNNABLE rather than swallowed."""
+    return planes.rules_from(ctx.spec)
+
+
+def _versioned(ctx: Ctx, template: str) -> str:
+    """Fill `{version}` from `pyproject.toml` — the release being closed."""
+    return template.replace("{version}", _version(ctx.root))
+
+
+def _manifest(ctx: Ctx) -> tuple[dict, str, Probed | None]:
+    """The release manifest for the version this tree declares."""
+    rel = _versioned(ctx, str((ctx.spec.get("release_manifest") or {}).get("path")
+                             or "closure-evidence/releases/{version}.json"))
+    data = ctx.read_json(rel)
+    if data is None:
+        return {}, rel, _missing(f"{rel} — the release manifest (record it with "
+                                 f"`validation/record_closure_evidence.py release`)")
+    return data, rel, None
 
 
 def _release(ctx: Ctx, key: str) -> tuple[dict, Probed | None]:
@@ -885,25 +906,30 @@ def frozen_region_digest(path: Path, region: dict) -> str:
 
 
 def probe_closure_target(ctx: Ctx) -> Probed:
-    """G1.0 — one revision is being certified, and everything points at it.
+    """G1.0 — one release, identified by content: tag, frozen target, release
+    manifest and the artifacts on PyPI agree, and HEAD carries the same product.
 
-    Owner adjustment 2: `release_tag_commit == closure_target_sha`. The gap it
-    closes is not hypothetical — G1 certified the PyPI artefact at the *tag*
-    commit while G2–G5 read *HEAD*, 46 commits later. Those are different
-    software, and a closure record that mixes them certifies nothing. The owner
-    named the three moves to refuse: build HEAD but install an older PyPI
-    version; read packaged data from HEAD and call it proof about the old tag;
-    combine evidence from different source revisions into one G1 PASS.
+    Owner adjustment 2 kept the first conjunct: the tag resolves to
+    `closure_target_sha`, so G1 cannot certify one revision while closure
+    targets another (measured 2026-09-14: 46 commits apart inside one PASS).
 
-    One criterion owns the invariant rather than four probes each checking a
-    corner, so the failure says "G1 certifies X, closure targets Y" in one
-    place. Two conjuncts, and it must not pass on one of them (bug 154): the tag
-    resolves to the target, **and** HEAD is still the target — G2–G5 bind their
-    evidence to HEAD, so a HEAD that has moved on means their evidence describes
-    something other than what G1 certifies.
+    Owner adjustment 8 (D-022) replaced the second. It used to read
+    `HEAD == target` with a filename allowlist, which meant recording evidence
+    *about* a release invalidated it. Now the question is the one that was
+    always meant: **is the product at HEAD the product that was released?**
+    Answered by `planes.identity` — a digest over the PRODUCT_AFFECTING tree —
+    at the target and at HEAD. Equal digests: the release describes HEAD, and
+    the evidence commits between them are allowed to exist. Different digests:
+    FAILED, naming which part moved, and the remedy is a new release, never a
+    re-pin. A tracked path no rule classifies is UNRUNNABLE and named.
 
-    An unset target is UNRUNNABLE: no candidate has been frozen, so there is no
-    invariant to read, and "nothing to compare" is never a pass.
+    The manifest binds the source to the public artifacts: it must name the
+    target as `release_source_sha`, carry the same product digest (else it was
+    recorded under another tree or another classification and must be
+    re-recorded), and its `observed` block — the artifacts downloaded from PyPI,
+    re-hashed, every member compared byte-for-byte with the tag's blobs — must
+    agree with the digests PyPI publishes. That is what "authentic, reproducible
+    and bound to the intended product source" means in this gate.
     """
     rel = str(ctx.criterion.get("evidence") or "closure-evidence/release.json")
     rec = ctx.read_json(rel)
@@ -932,15 +958,89 @@ def probe_closure_target(ctx: Ctx) -> Probed:
                       f"{target[:12]} — the released artefact and the revision being "
                       f"closed are different software; release the closure candidate, "
                       f"or re-pin the target at the commit actually released")
-    if not (head.startswith(target) or target.startswith(head)) \
-            and not _only_bookkeeping_changed(ctx, target):
+
+    manifest, mrel, err = _manifest(ctx)
+    if err:
+        return err
+    src = str(manifest.get("release_source_sha") or "")
+    if not src:
+        return Probed(Outcome.UNRUNNABLE, f"{mrel} names no `release_source_sha`")
+    if not (src.startswith(target) or target.startswith(src)):
         return Probed(Outcome.FAILED,
-                      f"HEAD is {head[:12]}, closure targets {target[:12]} — G2 to G5 "
-                      f"bind their evidence to HEAD, so that evidence describes a "
-                      f"different revision from the one G1 certifies; re-record it at "
-                      f"the target, or re-pin the target and release again")
+                      f"{mrel} describes release source {src[:12]}, closure targets "
+                      f"{target[:12]} — the manifest is for another release")
+    if str(manifest.get("tag") or "") != tag:
+        return Probed(Outcome.FAILED,
+                      f"{mrel} is for {manifest.get('tag') or '?'}, {rel} certifies {tag}")
+
+    rules = _rules(ctx)
+    if not rules:
+        return Probed(Outcome.UNRUNNABLE,
+                      f"{CRITERIA_PATH} declares no `{planes.SPEC_KEY}` rules — the product "
+                      f"plane is undefined, so no identity can be taken")
+    released = planes.identity(ctx.root, target, rules)
+    if not released.digest:
+        return Probed(Outcome.UNRUNNABLE, f"cannot read the tree at {target[:12]}")
+    if released.unresolved:
+        return Probed(Outcome.UNRUNNABLE,
+                      f"{len(released.unresolved)} tracked path(s) at {target[:12]} have no plane "
+                      f"rule: {', '.join(released.unresolved[:4])} — classify them in "
+                      f"{CRITERIA_PATH}#planes; an unclassified path may be product")
+    recorded = str((manifest.get("product") or {}).get("digest") or "")
+    if not recorded:
+        return Probed(Outcome.UNRUNNABLE, f"{mrel} carries no `product.digest`")
+    if recorded != released.digest:
+        return Probed(Outcome.UNRUNNABLE,
+                      f"{mrel} records product digest {recorded[:12]} but the tree at "
+                      f"{target[:12]} digests to {released.digest[:12]} under the current "
+                      f"plane rules — the manifest was recorded under another tree or another "
+                      f"classification; re-record it from the tag, do not edit it")
+    current = planes.identity(ctx.root, head, rules)
+    if current.unresolved:
+        return Probed(Outcome.UNRUNNABLE,
+                      f"{len(current.unresolved)} tracked path(s) at HEAD have no plane rule: "
+                      f"{', '.join(current.unresolved[:4])} — classify them in {CRITERIA_PATH}#planes")
+    if current.digest != released.digest:
+        moved = sorted(k for k in set(current.parts) | set(released.parts)
+                       if current.parts.get(k) != released.parts.get(k))
+        ch = planes.changes(ctx.root, target, head, rules)
+        return Probed(Outcome.FAILED,
+                      f"the product at HEAD ({head[:12]}) is not the product released as {tag} "
+                      f"({target[:12]}): {', '.join(moved) or 'product'} changed "
+                      f"({len(ch.product)} path(s): {', '.join(ch.product[:4])}) — a new "
+                      f"release is required; re-pinning the target would certify unreleased code")
+
+    arts = manifest.get("artifacts") if isinstance(manifest.get("artifacts"), dict) else {}
+    seen = manifest.get("observed") if isinstance(manifest.get("observed"), dict) else {}
+    for kind in ("wheel", "sdist"):
+        pub = str((arts.get(kind) or {}).get("sha256") or "")
+        obs = (seen.get(kind) or {}) if isinstance(seen.get(kind), dict) else {}
+        if not pub:
+            return _missing(f"{mrel}#artifacts.{kind}.sha256 — the published digest")
+        if not obs.get("sha256"):
+            return _missing(f"{mrel}#observed.{kind}.sha256 — the {kind} was not downloaded "
+                            f"and re-hashed, so its identity is asserted, not observed")
+        if str(obs["sha256"]) != pub:
+            return Probed(Outcome.FAILED,
+                          f"{kind} on PyPI digests to {str(obs['sha256'])[:12]}, the manifest "
+                          f"says {pub[:12]} — the public artifact is not the one recorded")
+        bad = list(obs.get("mismatched") or [])
+        if bad:
+            return Probed(Outcome.FAILED,
+                          f"{len(bad)} member(s) of the published {kind} differ from the "
+                          f"tree at {target[:12]}: {', '.join(str(b) for b in bad[:4])} — the "
+                          f"artifact was not built from the release source")
+        lost = list(obs.get("unmapped") or [])
+        if lost:
+            return Probed(Outcome.UNRUNNABLE,
+                          f"{len(lost)} member(s) of the published {kind} exist in no tree at "
+                          f"{target[:12]}: {', '.join(str(b) for b in lost[:4])} — cannot bind "
+                          f"the artifact to the source")
     return Probed(Outcome.PASSED,
-                  f"one revision: {tag}, HEAD and closure target all at {target[:12]}")
+                  f"one release: {tag} = source {target[:12]} = product {released.digest[:12]} "
+                  f"({released.files} files), carried unchanged by HEAD {head[:12]}; wheel "
+                  f"{str(arts['wheel']['sha256'])[:12]} · sdist {str(arts['sdist']['sha256'])[:12]} "
+                  f"observed on PyPI and bound to the source")
 
 
 def probe_prereg_digest(ctx: Ctx) -> Probed:
@@ -1286,56 +1386,69 @@ def _section(text: str, name: str) -> str:
     return "\n".join(out).strip()
 
 
-def _cli_workflow(text: str) -> str:
-    """The canonical public CLI workflow: the `aisef …` verb sequence with its
-    flags, in document order."""
-    return _norm(" ".join(re.findall(r"(?m)^\s*(?:\$\s*)?(aisef\s+[^\n`]*)$", text)))
+#: Identity fields a validation record must declare (adjustment 8). Each is
+#: compared with the release manifest, so a record for release A cannot satisfy
+#: G6 for release B, and instructions edited after the run cannot relabel it.
+RECORD_IDENTITY = ("product_version", "release_tag", "release_source_sha",
+                   "wheel_sha256", "sdist_sha256", "protocol_version", "instructions_digest")
 
 
-def onboarding_digest(root: Path, spec: dict) -> tuple[str, list[str]]:
-    """Deterministic hash over the PUBLIC ONBOARDING SURFACE (owner ruling 4).
-
-    Taken over extracted, normalised content — whitespace collapsed, prose
-    reflow ignored — never raw file bytes: a typo fix must not invalidate a
-    real person's validation, while a changed install step or a changed
-    onboarding default must not hide.
-
-    Returns `(digest, missing)`; a non-empty `missing` means the digest could
-    not be taken and the caller must say so rather than hash less.
-    """
-    parts, missing = [], []
-    for src in spec.get("sources") or []:
-        rel, extract = str(src.get("path") or ""), str(src.get("extract") or "")
-        path = root / rel
-        if not path.is_file():
-            missing.append(rel)
+def record_fields(text: str) -> dict[str, str]:
+    """`key: value` declarations in a record, keyed lower-case with spaces and
+    hyphens folded to `_` — so `Release SHA:` and `release_source_sha:` are one
+    field. Markdown table rows (`| key | value |`) are read the same way."""
+    out: dict[str, str] = {}
+    for line in text.splitlines():
+        raw = line.strip().strip("|").strip()
+        m = re.match(r"^\**\s*([A-Za-z][\w .()/-]{1,60}?)\s*\**\s*(?::|\|)\s*(.+?)\s*$", raw)
+        if not m:
             continue
-        text = path.read_text(encoding="utf-8", errors="replace")
-        if extract.startswith("section:"):
-            piece = _norm(_section(text, extract[len("section:"):]))
-        elif extract == "canonical_cli_workflow":
-            piece = _cli_workflow(text)
-        elif extract == "onboarding_defaults":
-            keys = list(spec.get("onboarding_defaults") or [])
-            gone = [k for k in keys if k not in DEFAULTS]
-            if gone:
-                missing.append(f"config defaults {', '.join(gone)}")
+        key = re.sub(r"[\s-]+", "_", m.group(1).strip().lower())
+        val = m.group(2).strip().strip("|").strip().strip("`*").strip()
+        out.setdefault(key, val)
+    return out
+
+
+#: Spellings a record may use for each identity field.
+_ALIASES = {
+    "product_version": ("product_version", "aisef_product_version_validated", "aisef_version_validated",
+                        "version_validated", "product_version_validated"),
+    "release_tag": ("release_tag", "tag"),
+    "release_source_sha": ("release_source_sha", "release_sha", "release_commit_sha", "release_commit"),
+    "wheel_sha256": ("wheel_sha256", "wheel"),
+    "sdist_sha256": ("sdist_sha256", "sdist"),
+    "protocol_version": ("protocol_version", "protocol"),
+    "instructions_digest": ("instructions_digest", "bundle_digest"),
+}
+
+
+#: How many hex digits each identity field carries; the value is read out of
+#: whatever prose surrounds it ("aisef-1.7.2.whl · sha256 064c…" still names
+#: one digest), so a participant's formatting cannot fail their own record.
+_HEX = {"release_source_sha": 7, "wheel_sha256": 64, "sdist_sha256": 64, "instructions_digest": 64}
+
+
+def declared_identity(text: str) -> dict[str, str]:
+    fields = record_fields(text)
+    out = {}
+    for name in RECORD_IDENTITY:
+        for alias in _ALIASES[name]:
+            val = fields.get(alias, "")
+            if not val:
                 continue
-            piece = json.dumps({k: DEFAULTS[k] for k in keys}, sort_keys=True, ensure_ascii=False)
-        else:
-            missing.append(f"{rel}#{extract} (unknown extract)")
-            continue
-        if not piece:
-            missing.append(f"{rel}#{extract} (empty)")
-            continue
-        parts.append(f"{rel}#{extract}:{piece}")
-    if missing:
-        return "", missing
-    return hashlib.sha256("\n".join(parts).encode()).hexdigest(), []
+            if name in _HEX:
+                m = re.search(r"\b[0-9a-f]{%d,64}\b" % _HEX[name], val.lower())
+                if not m:
+                    continue
+                val = m.group(0)
+            out[name] = val
+            break
+    return out
 
 
 def _external_report(ctx: Ctx) -> tuple[str, Probed | None]:
-    rel = str(ctx.criterion.get("evidence") or "docs/EXTERNAL-VALIDATION-REPORT-v1.1.0.md")
+    rel = _versioned(ctx, str(ctx.criterion.get("evidence")
+                              or "closure-evidence/external-validation/{version}/REPORT.md"))
     text = ctx.read(rel)
     if text is None:
         return "", _missing(f"{rel} — the validation RECORD "
@@ -1344,11 +1457,21 @@ def _external_report(ctx: Ctx) -> tuple[str, Probed | None]:
 
 
 def probe_external_report(ctx: Ctx) -> Probed:
-    """G6.1 — the record exists at the declared path, carrying the protocol's
-    metric fields, and the onboarding surface has not moved under it.
+    """G6.1 — the record exists, carries the protocol's metric fields, names
+    **this** public release, was run against instructions that are unchanged,
+    and the onboarding surface has not moved under it.
 
-    The metric list is read from the protocol's own Metrics table, not copied
-    into this file: two lists drift.
+    Bound to a release node (adjustment 8, D-022): the record declares the
+    product version, tag, `release_source_sha`, wheel and sdist digests,
+    protocol version and the digest of the instructions bundle it followed, and
+    each must equal the release manifest and the bundle on disk. This is
+    `ExternalValidation VALIDATES Release BUILT_FROM release_source_sha` as
+    data, not as a filename convention.
+
+    Owner ruling 4's onboarding digest is the second freshness clock, read
+    through `aisef.control.onboarding` — the module that wrote the record
+    (D-023: the probe used to recompute it with its own copy and read a key the
+    writer never wrote).
     """
     text, err = _external_report(ctx)
     if err:
@@ -1366,23 +1489,68 @@ def probe_external_report(ctx: Ctx) -> Probed:
     if absent:
         return Probed(Outcome.FAILED,
                       f"{len(absent)} of {len(labels)} protocol metrics absent: {', '.join(absent[:5])}")
-    rec = ctx.read_json(f"{EVIDENCE_DIR}/onboarding-digest.json")
-    if rec is None:
-        return _missing(f"{EVIDENCE_DIR}/onboarding-digest.json — the onboarding digest "
-                        "the validation was taken against (owner ruling 4)")
-    now, gone = onboarding_digest(ctx.root, ctx.spec.get("onboarding_digest") or {})
-    if gone:
-        return Probed(Outcome.UNRUNNABLE, f"cannot take the onboarding digest: {', '.join(gone)}")
-    version, release = str(rec.get("version") or ""), _version(ctx.root)
-    if version.split(".")[:2] != release.split(".")[:2]:
+
+    manifest, mrel, err = _manifest(ctx)
+    if err:
+        return err
+    declared = declared_identity(text)
+    missing_fields = [f for f in RECORD_IDENTITY if f not in declared]
+    if missing_fields:
+        return Probed(Outcome.UNRUNNABLE,
+                      f"the record declares no {', '.join(missing_fields[:4])} — without them it "
+                      f"cannot be bound to a release; the bundle's REPORT template carries the fields")
+    arts = manifest.get("artifacts") if isinstance(manifest.get("artifacts"), dict) else {}
+    expect = {
+        "product_version": str(manifest.get("version") or ""),
+        "release_tag": str(manifest.get("tag") or ""),
+        "release_source_sha": str(manifest.get("release_source_sha") or ""),
+        "wheel_sha256": str((arts.get("wheel") or {}).get("sha256") or ""),
+        "sdist_sha256": str((arts.get("sdist") or {}).get("sha256") or ""),
+    }
+    for name, want in expect.items():
+        got = declared[name]
+        same = got == want or (name == "release_source_sha" and want and got and
+                               (want.startswith(got) or got.startswith(want)) and len(got) >= 12)
+        if not same:
+            return Probed(Outcome.FAILED,
+                          f"the record validates {name}={got[:24]}, this closure is for "
+                          f"{name}={want[:24] or '?'} ({mrel}) — a validation of one release "
+                          f"is not evidence about another")
+    spec_pv = str(ctx.criterion.get("protocol_version") or "v1.1.0")
+    if declared["protocol_version"].lstrip("v") != spec_pv.lstrip("v"):
         return Probed(Outcome.FAILED,
-                      f"validated on {version or '?'}, closing {release} — different MAJOR.MINOR")
-    if str(rec.get("sha256") or "") != now:
+                      f"the record follows protocol {declared['protocol_version']}, this gate "
+                      f"reads protocol {spec_pv}")
+    bundle_rel = _versioned(ctx, str((ctx.spec.get("release_manifest") or {})
+                                     .get("external_validation_bundle")
+                                     or "closure-evidence/external-validation/{version}"))
+    digest, names = planes.bundle_digest(ctx.path(bundle_rel), exclude=("REPORT.md",))
+    if not digest:
+        return _missing(f"{bundle_rel}/ — the instructions bundle the participant followed")
+    ctx.seen.extend(ctx.path(bundle_rel) / n for n in names)
+    if declared["instructions_digest"] != digest:
+        return Probed(Outcome.FAILED,
+                      f"the record was run against instructions {declared['instructions_digest'][:12]}, "
+                      f"the bundle at {bundle_rel} digests to {digest[:12]} — the instructions changed "
+                      f"after the run (or the participant used other ones); an old record cannot be "
+                      f"relabelled for new instructions")
+
+    rec = ctx.read_json(onboarding.EVIDENCE_PATH)
+    if rec is None:
+        return _missing(f"{onboarding.EVIDENCE_PATH} — the onboarding digest "
+                        "the validation was taken against (owner ruling 4)")
+    try:
+        now = onboarding.compute_onboarding_digest(ctx.root)["digest"]
+    except (OSError, KeyError, ValueError) as e:
+        return Probed(Outcome.UNRUNNABLE, f"cannot take the onboarding digest: {e}")
+    if str(rec.get("digest") or "") != now:
         return Probed(Outcome.FAILED,
                       "the public onboarding surface changed since the validation "
-                      f"({str(rec.get('sha256'))[:12]} → {now[:12]})")
+                      f"({str(rec.get('digest'))[:12]} → {now[:12]})")
     return Probed(Outcome.PASSED,
-                  f"{len(labels)} protocol metrics present · onboarding digest {now[:12]} unchanged")
+                  f"{len(labels)} protocol metrics present · validates {expect['release_tag']} at "
+                  f"{expect['release_source_sha'][:12]} · instructions {digest[:12]} unchanged · "
+                  f"onboarding digest {now[:12]} unchanged")
 
 
 def probe_participant_external(ctx: Ctx) -> Probed:
@@ -1466,6 +1634,10 @@ class Report:
     results: list[Result]
     at: str = ""
     approval: dict = field(default_factory=dict)
+    #: The commit the evaluation read. The commit that later *carries* this
+    #: report is the closure record's identity (`closure_record_sha`), and it
+    #: may differ from `release_source_sha` — that is the point of D-022.
+    head: str = ""
 
     @property
     def blocking(self) -> list[Result]:
@@ -1484,8 +1656,8 @@ class Report:
         return out
 
     def as_dict(self) -> dict:
-        return {"at": self.at, "contract": self.contract, "closable": self.closable,
-                "tally": self.tally(), "approval": self.approval,
+        return {"at": self.at, "head": self.head, "contract": self.contract,
+                "closable": self.closable, "tally": self.tally(), "approval": self.approval,
                 "criteria": [r.as_dict() for r in self.results]}
 
 
@@ -1603,7 +1775,8 @@ def evaluate(root: Path | str, *, corpus: str = "", spec: dict | None = None,
                 evidence=probed.evidence or ctx.evidence() or str(crit.get("evidence") or ""),
                 digest=probed.digest or ctx.digest(), at=at, waiver=waiver,
             ))
-    report = Report(contract=contract_state(root, spec), results=results, at=at)
+    report = Report(contract=contract_state(root, spec), results=results, at=at,
+                    head=_git_out(root, "rev-parse", "HEAD"))
     report.approval = approval_state(state, report)
     return report
 
