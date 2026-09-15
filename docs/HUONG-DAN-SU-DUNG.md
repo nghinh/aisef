@@ -154,8 +154,8 @@ Số khoá `init` ghi vào `.ai/config.json`: **4** (`tools.test`, `tools.lint`,
 `sandbox.image`, `sandbox.allow_hosts`), trong đó **1 khoá bắt buộc khai** là
 `tools.test`. Bản **1.3.0 trên PyPI ghi cả 68 khoá** — đúng bằng toàn bộ số khoá
 mặc định *của bản 1.3.0*, đây là câu về **quá khứ**, không phải con số hiện tại
-(1.6.0 có **69** khoá, xem [§17](#17-tra-cứu-toàn-bộ-khoá-cấu-hình)). Đã sửa từ
-**1.3.1** và đo lại trên `1.6.0` ngày 2026-09-14:
+(1.7.1 có **70** khoá, xem [§17](#17-tra-cứu-toàn-bộ-khoá-cấu-hình)). Đã sửa từ
+**1.3.1** và đo lại trên `1.7.1` ngày 2026-09-15:
 
 ```bash
 aisef --project <dir> init --stack python

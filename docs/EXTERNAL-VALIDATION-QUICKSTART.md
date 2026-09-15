@@ -35,9 +35,14 @@ manual, if you want it, is [`USAGE-GUIDE.md`](USAGE-GUIDE.md).
 
 ## Steps 1–8 — deterministic, no money
 
-Every output below was produced on 2026-09-14 on macOS with Python 3.14.7 and
-`aisef 1.6.0` from PyPI. Yours should match in shape; version and paths will
-differ.
+Every output below was produced on macOS with Python 3.14.7 and `aisef` from
+PyPI. Yours should match in shape; version and paths will differ.
+
+Steps 1, 2, 4, 5, 7 and 8 (`gates`) were **re-run and re-verified on 1.7.1** on
+2026-09-15 and behave exactly as written. Step 8's `aisef setup` line still
+carries its 1.6.0 measurement: re-running it means a ~93 MB reference fetch,
+which was not repeated, so treat that one count as indicative rather than
+freshly measured.
 
 **1. Clean venv.**
 
@@ -47,13 +52,17 @@ source ~/.venvs/aisef/bin/activate
 pip install aisef
 ```
 
-Expect: `Successfully installed aisef-1.6.0`, and no other package pulled in —
-AISEF has no dependencies outside the standard library.
+Expect: `Successfully installed aisef-1.7.1`, and no other package pulled in —
+AISEF has no dependencies outside the standard library. (Verified 2026-09-15:
+`pip list` in that venv shows exactly `aisef==1.7.1` and nothing else.)
+
+If pip claims the version does not exist, add `--no-cache-dir`: a stale index
+cache can hide a freshly published release.
 
 **2. Confirm what you got.**
 
 ```bash
-aisef --version        # → aisef 1.6.0
+aisef --version        # → aisef 1.7.1
 which aisef            # → …/.venvs/aisef/bin/aisef
 ```
 

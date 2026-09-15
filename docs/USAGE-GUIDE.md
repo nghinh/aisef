@@ -140,9 +140,11 @@ The package, Python module, and CLI command are all named `aisef`.
 `aisef --version` prints the version; to inspect the whole environment, use
 `aisef doctor`.
 
-This guide describes **1.6.0** (released 2026-09-14; 1.0.0 was 2026-09-08, and
-1.2.x, 1.3.0, 1.3.1, 1.4.0, 1.5.0 came between). Check what you actually have,
-and read the number rather than assuming:
+This guide describes **1.7.1** (released 2026-09-15; 1.0.0 was 2026-09-08, and
+1.2.x, 1.3.0, 1.3.1, 1.4.0, 1.5.0, 1.6.0 came between). 1.7.0 was tagged but its
+release CI failed, so it never reached PyPI — if you see that number anywhere it
+is not a release. Check what you actually have, and read the number rather than
+assuming:
 
 ```bash
 aisef --version
