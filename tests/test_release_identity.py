@@ -37,6 +37,7 @@ invalidated the release), the negative control green.
 
 from __future__ import annotations
 
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -431,6 +432,90 @@ class TestPlanes(unittest.TestCase):
         self.assertEqual(planes.class_of("docs/closure-gate.json", rules), planes.EVIDENCE)
         self.assertEqual(planes.class_of("docs/USAGE-GUIDE.md", rules), planes.DOCUMENTATION)
         self.assertEqual(planes.class_of("landingpage/index.html", rules), planes.DOCUMENTATION)
+
+
+class TestValidationBundleGenerator(unittest.TestCase):
+    """The bundle generator and the G6.1 probe must compute the same digest.
+
+    Measured 2026-09-15 before the first handoff: the generator recorded a
+    digest that excluded its own `bundle.json`, the probe hashed the whole
+    directory, and a correctly filled report would have read FAILED. The
+    handoff record therefore lives outside the hashed directory, and this test
+    holds the two sides together on a bundle built from a real manifest.
+    """
+
+    def _build(self):
+        import shutil
+        import tempfile
+
+        import validation.make_validation_bundle as B
+
+        tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, tmp, True)
+        root = tmp / "repo"
+        shutil.copytree(ROOT / "docs", root / "docs",
+                        ignore=lambda d, names: [n for n in names if not n.endswith((".md", ".json"))])
+        shutil.copy(ROOT / "README.md", root / "README.md")
+        (root / "pyproject.toml").write_text(PYPROJECT, encoding="utf-8")
+        git(root, "init", "-q"); git(root, "config", "user.name", "T")
+        git(root, "config", "user.email", "t@t.t")
+        git(root, "add", "."); git(root, "commit", "-qm", "release"); git(root, "tag", "v9.9.9")
+        sha = git(root, "rev-parse", "HEAD").stdout.strip()
+        (root / "closure-evidence/releases").mkdir(parents=True)
+        (root / "closure-evidence/releases/9.9.9.json").write_text(json.dumps({
+            "version": "9.9.9", "tag": "v9.9.9", "release_source_sha": sha,
+            "artifacts": {"wheel": {"filename": "aisef-9.9.9-py3-none-any.whl", "sha256": WHEEL_SHA},
+                          "sdist": {"filename": "aisef-9.9.9.tar.gz", "sha256": "b2" * 32}}}), encoding="utf-8")
+        old = B.ROOT
+        B.ROOT = root
+        self.addCleanup(setattr, B, "ROOT", old)
+        out = B.build("9.9.9")
+        rec = json.loads((out.parent / "9.9.9.bundle.json").read_text(encoding="utf-8"))
+        return out, rec, sha
+
+    def test_recorded_digest_is_what_the_probe_computes(self):
+        out, rec, _ = self._build()
+        probe_side, names = planes.bundle_digest(out, exclude=("REPORT.md",))
+        self.assertEqual(rec["instructions_digest"], probe_side)
+        self.assertEqual(sorted(rec["files"]), sorted(names))
+        self.assertNotIn("bundle.json", names, "the record must not sit inside the hashed directory")
+        self.assertEqual(sorted(names), ["INSTRUCTIONS.md", "PROTOCOL.md", "QUICKSTART.md", "README.md",
+                                         "REPORT-TEMPLATE.md", "USAGE-GUIDE.md"])
+
+    def test_the_bundle_names_one_release_and_no_moving_documentation(self):
+        out, rec, sha = self._build()
+        ins = (out / "INSTRUCTIONS.md").read_text(encoding="utf-8")
+        for needle in ("aisef==9.9.9", "v9.9.9", sha, WHEEL_SHA, "v1.1.0"):
+            self.assertIn(needle, ins)
+        self.assertEqual(rec["install_target"], "aisef==9.9.9")
+        self.assertEqual(rec["release_source_sha"], sha)
+        self.assertEqual(rec["frozen_from"]["sha"], sha)
+        self.assertNotIn("github.com", ins.lower())
+        template = (out / "REPORT-TEMPLATE.md").read_text(encoding="utf-8")
+        self.assertIn(sha, template)
+        self.assertIn("<instructions_digest from 9.9.9.bundle.json", template)
+        self.assertNotIn(rec["instructions_digest"], template, "a file inside the digest cannot carry it")
+
+    def test_a_filled_report_passes_g6_1_against_the_generated_bundle(self):
+        """End to end: the template, filled with the record's values, is read by
+        the same probe that will read the real participant's report."""
+        out, rec, _ = self._build()
+        root = out.parent.parent.parent
+        template = (out / "REPORT-TEMPLATE.md").read_text(encoding="utf-8")
+        report = (template.replace("<instructions_digest from 9.9.9.bundle.json, next to this folder>",
+                                   rec["instructions_digest"])
+                  + "\n\nParticipant: an external engineer, not an AISEF contributor\n")
+        (out / "REPORT.md").write_text(report, encoding="utf-8")
+        from aisef.control import onboarding
+
+        spec = json.loads((root / "docs/closure-gate.json").read_text(encoding="utf-8"))
+        (root / "closure-evidence/onboarding-digest.json").write_text(
+            json.dumps({"digest": onboarding.compute_onboarding_digest(root)["digest"]}), encoding="utf-8")
+        ctx = CL.Ctx(root=root, spec=spec, criterion={"evidence": f"{rec['bundle_dir']}/REPORT.md"})
+        p = CL.probe_external_report(ctx)
+        self.assertIs(p.outcome, Outcome.PASSED, p.detail)
+        self.assertIn("v9.9.9", p.detail)
+        self.assertIs(CL.probe_participant_external(ctx).outcome, Outcome.PASSED)
 
 
 class TestTheDefectInstance(unittest.TestCase):

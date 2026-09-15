@@ -34,7 +34,7 @@ The first seven rows bind this record to **one public release** and to the
 **exact instructions** followed. Gate G6.1 compares each of them with the
 release manifest and the bundle on disk: a record for another release, or one
 run against edited instructions, is not evidence for this closure. Copy the
-values from the bundle's `bundle.json`; do not type them from memory.
+values from `1.7.2.bundle.json` next to this folder; do not type them from memory.
 
 | field | value |
 |---|---|
@@ -44,7 +44,7 @@ values from the bundle's `bundle.json`; do not type them from memory.
 | Wheel sha256 | `d97ca56db1499f7eaf97ee0e1a4c3eff54acf08a7c6c66bd892c6943c1db63f9` |
 | Sdist sha256 | `7fe16a4f1fd26a56e5cba9717592082f503336ca41c517de395192ce189ef7a6` |
 | Protocol version | `v1.1.0` |
-| Instructions digest | `<instructions_digest from bundle.json>` |
+| Instructions digest | `<instructions_digest from 1.7.2.bundle.json, next to this folder>` |
 | Report date | `<YYYY-MM-DD>` |
 | AISEF version validated | `<aisef --version output>` |
 | Onboarding digest at validation time | `<digest from closure-evidence/onboarding-digest.json>` |
