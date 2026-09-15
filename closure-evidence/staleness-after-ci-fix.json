@@ -1,0 +1,50 @@
+{
+  "question": "the candidate source revision changed (966add6 -> the 1.7.1 candidate). Which closure evidence becomes stale, and which is preserved?",
+  "decided": "2026-09-15, mechanically from each criterion's declared freshness in docs/closure-gate.json -- not by judgement",
+  "source_change": {
+    "files": [".github/workflows/release.yml", ".github/workflows/tests.yml", "tests/test_meta.py",
+              "pyproject.toml (version only)", "CHANGELOG.md", "README.md", "README.vi.md",
+              "docs/DEFECT-REGISTER.json", "docs/FAILURE-TAXONOMY.md", "docs/closure-gate.json",
+              "closure-evidence/*"],
+    "touches_model_routing": false,
+    "touches_benchmark_scoring": false,
+    "touches_benchmark_task_content": false,
+    "touches_guard_semantics": false,
+    "touches_application_behaviour": false,
+    "touches_session_classification": false,
+    "note": "aisef/ has ZERO changed files between 966add6 and the 1.7.1 candidate except none at all -- the diff is CI config, one test module, docs, and version metadata."
+  },
+  "stale_must_re_record": {
+    "G1.2": "freshness bound to commit -- wheel/sdist/twine",
+    "G2.1": "freshness bound to commit -- full suite from MAIN",
+    "G2.2": "freshness bound to commit -- lint",
+    "G5.4": "freshness bound to commit -- dataset digest + bench selfcheck"
+  },
+  "preserved_not_rerun": {
+    "C-2 benchmark data": {
+      "why": "G5.2's cohort declaration pins the attempt rows and the session ledger by sha256. Neither file changed, so the digests still match and the probe still PASSES. No dependency of the cohort (protocol digest, benchmark_execution_sha 1f13de0a, dataset manifest, scoring version) was touched.",
+      "verified": "G5.2 = PASSED after the change"
+    },
+    "G5.3 pair qualification": {
+      "why": "freshness declares `bound_to: qualification_run`, not the framework SHA. The qualification run did not change.",
+      "verified": "G5.3 = PASSED after the change"
+    },
+    "marks-cli G4 corpus": {
+      "why": "G4.5 declares `bound_to: corpus_head` -- the CORPUS's head, not this repository's. marks-cli was not touched.",
+      "verified": "G4.1-G4.7 all PASSED after the change"
+    },
+    "G3.1 conformance": {
+      "why": "freshness declares `kind: age_days` from `report.generated` against aisef.control.conformance:MAX_AGE_DAYS -- DATE-bound, not revision-bound. The policy permits reuse and 7 of 14 days remain. Not rerun, and NOT waived.",
+      "verified": "G3.1 = PASSED, '7d left of 14d'"
+    },
+    "G2.3 / G2.4a / G2.4b defect register": {
+      "why": "read from the register itself, which was appended to (D-019) rather than invalidated.",
+      "verified": "PASSED"
+    },
+    "G5.1 / G5.5 / G5.6": {
+      "why": "G5.1 pins the pre-registration's frozen region (untouched); G5.5 and G5.6 read report prose and claim status (unchanged in substance).",
+      "verified": "PASSED"
+    }
+  },
+  "rule_applied": "re-record only what a criterion's own freshness declaration binds to the commit. Nothing expensive was rerun because HEAD moved: no model call, no benchmark, no qualification, no corpus story."
+}
