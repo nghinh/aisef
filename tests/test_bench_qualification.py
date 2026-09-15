@@ -227,9 +227,7 @@ class _Gia(unittest.TestCase):
 
         self._tmp = tempfile.TemporaryDirectory()
         self.tmp = Path(self._tmp.name)
-        fake = self.tmp / "opencode"
-        fake.write_text(S._FAKE.replace("TOKEN", json.dumps(S.TOKEN)), encoding="utf-8")
-        fake.chmod(0o755)
+        fake = S.viet_client_gia(self.tmp)
         self.log = self.tmp / "calls.jsonl"
         self.client = OpenCodeAdapter(binary=str(fake))
         self.giu = R.KEEP_DIR

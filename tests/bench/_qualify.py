@@ -632,7 +632,6 @@ def tu_kiem(out=sys.stdout) -> int:
     dừng sớm thật sự nổ. Rồi kiểm phán quyết trên số, và kiểm rằng báo cáo **từ
     chối** ghi vào đường dẫn bằng chứng của G5.3.
     """
-    import json as _json
     import tempfile
 
     from aisef.clients.opencode import OpenCodeAdapter
@@ -647,9 +646,7 @@ def tu_kiem(out=sys.stdout) -> int:
     giu = R.KEEP_DIR
     with tempfile.TemporaryDirectory() as d:
         tmp = Path(d)
-        fake = tmp / "opencode"
-        fake.write_text(S._FAKE.replace("TOKEN", _json.dumps(S.TOKEN)), encoding="utf-8")
-        fake.chmod(0o755)
+        fake = S.viet_client_gia(tmp)
         cu = {k: os.environ.get(k) for k in ("AISEF_SELFCHECK_MODE", "AISEF_SELFCHECK_GOLD")}
         os.environ["AISEF_SELFCHECK_MODE"] = "cut:2,4"
         os.environ.pop("AISEF_SELFCHECK_GOLD", None)

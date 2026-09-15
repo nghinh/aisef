@@ -113,7 +113,11 @@ class Repo:
     def write(self, rel: str, text: str) -> Path:
         p = self.root / rel
         p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(text, encoding="utf-8")
+        # newline="" — không để nền tảng dịch `\n` thành `\r\n`. Ghim hợp đồng
+        # là digest trên **byte**, nên một lần dịch đầu dòng làm mọi phép thử
+        # approval/pin đọc ra `contract is stale`. Đo ở CI Windows (run
+        # 34913237817): 13 phép thử đỏ vì đúng một ký tự này.
+        p.write_text(text, encoding="utf-8", newline="")
         return p
 
     def write_json(self, rel: str, obj) -> Path:

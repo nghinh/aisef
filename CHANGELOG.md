@@ -4,6 +4,23 @@
 
 ## 1.7.1 — 2026-09-15
 
+**Two POSIX assumptions in test helpers, found the moment CI could reach them.**
+The full-history fix let the Windows job run tests that had never run there, and
+16 of them failed for exactly two reasons. The closure-gate test helper pinned a
+digest over bytes containing `\n` but wrote the file with default newline
+translation, so on Windows the file held `\r\n` and every approval and pin test
+read `contract is stale`. And the fake `opencode` used in bench selfcheck and
+qualification is a Python script with a shebang and `chmod 0o755` — Windows does
+not honour shebangs, so the adapter could not launch it, no session wrote its
+log, and every attempt read as infrastructure failure. Neither is a product
+defect. Both are fixed rather than skipped: the helper writes with `newline=""`
+so the platform cannot rewrite the bytes a digest is taken over, and one shared
+helper now materialises the fake client for all three call sites, adding a
+one-line `.bat` launcher on Windows — same script, same stream, only the way the
+OS starts it differs. Those three sites had duplicated the write-and-chmod, which
+is why one platform bug appeared three times.
+
+
 **The release CI checks out full history, so tests that rebuild a historical
 commit run instead of erroring.** 1.7.1 is the corrected publishable release of
 the 1.7 feature set; **1.7.0 was never published to PyPI**. The v1.7.0 tag was

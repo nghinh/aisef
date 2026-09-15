@@ -95,6 +95,34 @@ else:
 ev({"type": "step_finish", "part": {"tokens": TOKEN, "cost": 0}})
 '''
 
+
+def viet_client_gia(thu_muc: Path) -> Path:
+    """Dựng `opencode` GIẢ trong `thu_muc`, chạy được trên **cả** Windows.
+
+    Vì sao cần một hàm chứ không phải ba chỗ tự ghi: bản cũ ghi script rồi
+    `chmod(0o755)` và trỏ `binary=` vào chính nó. POSIX chạy được nhờ shebang;
+    **Windows không đọc shebang**, nên `subprocess.run([binary, …])` hỏng, không
+    phiên nào ghi được `calls.jsonl`, và mọi lượt đọc ra "hạ tầng". Đo ở CI
+    Windows (run 34913237817): 3 phép thử đỏ vì đúng lý do ấy — và chúng chưa
+    từng chạy trên Windows trước đó.
+
+    Trên Windows: ghi `opencode.py` rồi một `opencode.bat` một dòng gọi chính
+    interpreter đang chạy. Không bỏ qua phép thử: cùng một script, cùng một
+    luồng, chỉ khác cách hệ điều hành khởi động nó.
+    """
+    ma = _FAKE.replace("TOKEN", json.dumps(TOKEN))
+    if os.name == "nt":
+        py = thu_muc / "opencode.py"
+        py.write_text(ma, encoding="utf-8", newline="")
+        bat = thu_muc / "opencode.bat"
+        bat.write_text(f'@"{sys.executable}" "{py}" %*\n', encoding="utf-8", newline="")
+        return bat
+    fake = thu_muc / "opencode"
+    fake.write_text(ma, encoding="utf-8", newline="")
+    fake.chmod(0o755)
+    return fake
+
+
 BANNER = "KHÔNG PHẢI KẾT QUẢ ĐO — luồng phiên là fixture đã ghi sẵn, không model nào được gọi."
 
 
@@ -134,9 +162,7 @@ def run_selfcheck(task_id: str = TASK_MAC_DINH, model: str = "", out=sys.stdout)
     giu = R.KEEP_DIR
     with tempfile.TemporaryDirectory() as d:
         tmp = Path(d)
-        fake = tmp / "opencode"
-        fake.write_text(_FAKE.replace("TOKEN", json.dumps(TOKEN)), encoding="utf-8")
-        fake.chmod(0o755)
+        fake = viet_client_gia(tmp)
         log = tmp / "calls.jsonl"
         client = OpenCodeAdapter(binary=str(fake))
         R.KEEP_DIR = tmp / "bench"
