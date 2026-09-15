@@ -119,6 +119,13 @@ class _Direct(_ViaLauncher):
         return [sys.executable, "-c", _GRANDCHILD, self.pid_file]
 
 
+#: The adapter checks the cap between 0.5 s polls of the child; at one turn per
+#: 0.1 s that is up to five extra turns per poll, plus kill latency under load.
+#: The defect ran the whole stream (40 turns, > 4 s); ten of slack keeps the
+#: two apart on a busy CI box.
+SLACK = 10
+
+
 class TestTurnCapKillsTheWholeProcessTree(unittest.TestCase):
     """F-3 / D-027 — five developer sessions ran 75, 108, 179, 186 and 142
     turns against `run.max_turns = 40`. The adapter counted `step_finish` and
@@ -147,14 +154,14 @@ class TestTurnCapKillsTheWholeProcessTree(unittest.TestCase):
         """Control: the same stream as a direct child is stopped at the cap."""
         res, _took, alive = self._run(_Direct)
         self.assertEqual(exit_status_of(res), "max_turns")
-        self.assertLessEqual(res.num_turns, 5 + 2)
+        self.assertLessEqual(res.num_turns, 5 + SLACK)
         self.assertFalse(alive)
 
     def test_the_cap_stops_a_session_whose_client_is_a_grandchild(self):
         res, took, alive = self._run(_ViaLauncher)
         self.assertEqual(exit_status_of(res), "max_turns")
-        self.assertLessEqual(res.num_turns, 5 + 2, f"ran {res.num_turns} turns against a cap of 5")
-        self.assertLess(took, 2.5, f"took {took:.1f}s — the grandchild kept streaming after the kill")
+        self.assertLessEqual(res.num_turns, 5 + SLACK, f"ran {res.num_turns} turns against a cap of 5")
+        self.assertLess(took, 3.0, f"took {took:.1f}s — the grandchild kept streaming after the kill")
         self.assertFalse(alive, "the grandchild survived the cap")
 
     def test_the_clock_kills_the_grandchild_too(self):
@@ -427,37 +434,70 @@ class TestOrphanedRunningClaimIsReclaimedOnTheNextRun(unittest.TestCase):
 
 
 class TestStatusNamesADeadClaim(unittest.TestCase):
-    """F-5 — the observability half of the priority finding. Thirty-six minutes
-    after the last orchestrator line, `aisef status` still printed `running 2`
-    with no hint that `claimed_by` named a process that no longer existed.
-    `running` from a live process and `running` from a dead one are different
-    facts; the record carries `HOST:PID`, so on the same host the difference is
-    knowable.
+    """F-1 / D-025 — the observability half of the priority finding.
+    Thirty-nine minutes after the last orchestrator line, `aisef status` still
+    printed `running 2` with no hint that `claimed_by` named a process that no
+    longer existed. `running` from a live process and `running` from a dead
+    one are different facts; the record carries `HOST:PID`, so on the same
+    host the difference is knowable. The read model says so; the disk is not
+    touched — recovery stays with `reconcile_all` (test above).
     """
+
+    def _project(self, root: Path, claimed_by: str):
+        (root / "docs").mkdir()
+        (root / "docs" / "requirements.md").write_text("# r\n", encoding="utf-8")
+        art = root / "_bmad-output"
+        art.mkdir()
+        (art / "stories.index.json").write_text(json.dumps({
+            "stories": [{"id": "STORY-01-01", "epic_id": "EPIC-01"}],
+            "epics": [{"id": "EPIC-01"}], "waves": {"EPIC-01": [["STORY-01-01"]]}}), encoding="utf-8")
+        StateStore(art).save(SprintState(stories={
+            "STORY-01-01": StoryRecord(id="STORY-01-01", epic_id="EPIC-01", status="running",
+                                       claimed_by=claimed_by)}))
+        return art / "sprint-status.json"
+
+    def _status(self, root: Path) -> str:
+        from aisef.cli import main
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            main(["--project", str(root), "status"])
+        return buf.getvalue()
 
     def test_status_says_when_the_claiming_process_is_gone(self):
         import socket
-        from aisef.cli import main
 
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
-            (root / "docs").mkdir()
-            (root / "docs" / "requirements.md").write_text("# r\n", encoding="utf-8")
-            art = root / "_bmad-output"
-            art.mkdir()
-            (art / "stories.index.json").write_text(json.dumps({
-                "stories": [{"id": "STORY-01-01", "epic_id": "EPIC-01"}],
-                "epics": [{"id": "EPIC-01"}], "waves": {"EPIC-01": [["STORY-01-01"]]}}), encoding="utf-8")
             dead = f"{socket.gethostname()}:{2**22 - 7}"
-            StateStore(art).save(SprintState(stories={
-                "STORY-01-01": StoryRecord(id="STORY-01-01", epic_id="EPIC-01", status="running", claimed_by=dead)}))
-            buf = io.StringIO()
-            with redirect_stdout(buf):
-                main(["--project", str(root), "status"])
-            text = buf.getvalue().lower()
-            self.assertIn("running", text)
-            self.assertTrue(any(w in text for w in ("orphan", "no such process", "dead", "not running")),
-                            f"status must say the claim is dead:\n{buf.getvalue()}")
+            self._project(root, dead)
+            text = self._status(root)
+            self.assertIn("running", text.lower())
+            self.assertIn("ORPHANED", text)
+            self.assertIn(dead, text)
+
+    def test_status_does_not_mutate_the_state_file(self):
+        import hashlib
+        import socket
+
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            state_file = self._project(root, f"{socket.gethostname()}:{2**22 - 7}")
+            before = hashlib.sha256(state_file.read_bytes()).hexdigest()
+            self._status(root)
+            self.assertEqual(hashlib.sha256(state_file.read_bytes()).hexdigest(), before,
+                             "status is a read model; reconciliation belongs to run/improve")
+
+    def test_a_live_claim_and_a_foreign_hosts_claim_are_not_called_orphaned(self):
+        import socket
+
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            self._project(root, f"{socket.gethostname()}:{__import__('os').getpid()}")
+            self.assertNotIn("ORPHANED", self._status(root))
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            self._project(root, "some-other-host:4242")
+            self.assertNotIn("ORPHANED", self._status(root), "another host's claim cannot be judged here")
 
 
 if __name__ == "__main__":

@@ -135,6 +135,24 @@ def cmd_status(args) -> int:
         if n:
             print(f"  {status.value:11} {n}")
 
+    # `running` written by a live process and `running` left by a dead one
+    # are two facts; the record carries HOST:PID, so on this host they can be
+    # told apart. Read model only — nothing here touches the state file: the
+    # next `aisef run`/`improve` reconciles the journal and takes the claim
+    # back (LedgerLock 2026-09-15: `running 2` for 39 minutes after the
+    # orchestrator died, lỗi 179 / D-025).
+    from ..control.state import claim_is_orphaned
+
+    mo_coi = [r for st_ in (StoryStatus.RUNNING, StoryStatus.VERIFYING)
+              for r in state.by_status(st_) if claim_is_orphaned(r.claimed_by)]
+    if mo_coi:
+        print(f"\n⚠️  {len(mo_coi)} stories ORPHANED — claimed by a process that no longer exists "
+              f"on this host: "
+              + ", ".join(f"{r.id} ({r.claimed_by})" for r in mo_coi[:5])
+              + (f", +{len(mo_coi) - 5} more" if len(mo_coi) > 5 else "")
+              + ". Nothing is lost: `aisef run` reconciles the journal and re-claims them "
+              "before starting.")
+
     print(f"\nCost: ${state.total_cost_usd:.2f}")
     outliers = state.cost_outliers(cfg["cost.warn_multiple"])
     if outliers:
