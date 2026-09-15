@@ -1,0 +1,32 @@
+{
+  "release": "v1.7.1",
+  "verified": "2026-09-15",
+  "tag_commit": "5c5ba52fa0c98bd276b074b7bc3e1d112dd49fd5",
+  "equals_final_closure_target_sha": true,
+  "release_run": {"id": "34918726837", "conclusion": "success", "build": "success", "publish": "success"},
+  "pypi": {
+    "version": "1.7.1",
+    "1.7.0_present": false,
+    "1.7.0_http": 404,
+    "artifacts": [
+      {"filename": "aisef-1.7.1-py3-none-any.whl", "size": 588261,
+       "sha256": "064c27f0f9663c1b1a9ef3a6e766c6d05a8b4b07c1bdd044d01a48b21a97ce39"},
+      {"filename": "aisef-1.7.1.tar.gz", "size": 951543,
+       "sha256": "4026bb3752a4726ac2a6a4d162ebbcd92902dd422a2709189376117184c67f0a"}
+    ]
+  },
+  "clean_env_check": {
+    "how": "python3 -m venv + pip install --no-cache-dir aisef==1.7.1 from PUBLIC PyPI, run with cwd OUTSIDE the repository",
+    "why_outside_the_repo": "a stale gitignored aisef.egg-info at version 1.7.0 sits in the repo root; running python from there puts cwd on sys.path and importlib.metadata resolves that instead of the venv. It produced a false 1.7.0 reading earlier in this session.",
+    "pip_show_version": "1.7.1",
+    "import": "ok",
+    "__version__": "1.7.1",
+    "metadata_version": "1.7.1",
+    "cli_version": "aisef 1.7.1",
+    "runtime_package_data": {"kit/prompts": 5, "kit/rules": 2, "kit/skills": 1,
+                             "harness/assets": 1, "kit/catalog.json": true},
+    "doctor": "runs, reports environment checks",
+    "help": "runs, lists all subcommands"
+  },
+  "v1_7_0_disposition": "tag still on 966add6, never moved/deleted/recreated; never published to PyPI (HTTP 404). Preserved as evidence of the failed release attempt."
+}

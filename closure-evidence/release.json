@@ -1,9 +1,9 @@
 {
   "ci": {
-    "commit": "fatal: ambiguous argument 'v1.7.1': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'",
-    "conclusion": "",
+    "commit": "5c5ba52fa0c98bd276b074b7bc3e1d112dd49fd5",
+    "conclusion": "success",
     "tag": "v1.7.1",
-    "workflow": "tests.yml"
+    "workflow": "tests"
   },
   "package": {
     "artifacts": [
@@ -11,7 +11,7 @@
       "aisef-1.7.1.tar.gz"
     ],
     "build_exit": 0,
-    "commit": "5c5ba52fa0c98bd276b074b7bc3e1d112dd49fd5",
+    "commit": "2cf3ac8d76b5a468118b1e21f246e30b4de3ed3f",
     "interpreter": "/Users/nghinh/Downloads/projects/ai-sdlc/.venv/bin/python",
     "twine_exit": 0
   },
@@ -23,9 +23,9 @@
     "kit/skills": 2
   },
   "pypi_install": {
-    "install_exit": 1,
+    "install_exit": 0,
     "version": "1.7.1",
-    "version_reported": ""
+    "version_reported": "1.7.1"
   },
   "tag": "v1.7.1",
   "version": "1.7.1"
