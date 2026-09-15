@@ -909,7 +909,7 @@ section { padding: 100px 0; }
       <div><span class="label">  Guards</span> <span class="val">10</span> <span class="ok">✓ 3 lifecycle moments</span></div>
       <div><span class="label">  Gate checks</span> <span class="val">48</span> <span class="ok">✓ 16 × 3 controls</span></div>
       <div><span class="label">  Reviewer cells</span> <span class="val">18</span> <span class="ok">✓ 6 judgement classes × 3</span></div>
-      <div><span class="label">  Config keys</span> <span class="val">70</span> <span class="ok">✓ 0 mandatory</span></div>
+      <div><span class="label">  Config keys</span> <span class="val">70</span> <span class="ok">✓ every key has a default</span></div>
       <div><span class="label">  Conformance</span> <span class="val">10/10</span> <span class="ok">✓ Claude + OpenCode</span></div>
       <div><span class="label">  Dependencies</span> <span class="val">0</span> <span class="ok">✓ stdlib only</span></div>
       <div><span class="label">  Version</span> <span class="val">1.7.2</span> <span class="ok">✓ stable</span></div>
@@ -949,8 +949,8 @@ section { padding: 100px 0; }
       <div class="benchmark-col unproven">
         <h3><span style="color:var(--amber)">●</span> Not yet proven</h3>
         <ul>
-          <li>That the harness helps an agent solve more — four cohorts, four nulls. The measured value is elsewhere: refusing to call unfinished work done, and leaving evidence why</li>
-          <li>No external user has independently adopted the framework — all evidence is internal. External validation of the public 1.7.2 release (closure gate G6) is in the hands of an external participant with a frozen instruction bundle; until their report is in, this line stands</li>
+          <li>That the harness helps an agent solve more — every cohort so far (v0.3.0, C-1, C-1b, C-2) returned a null or an inconclusive result. The measured value is elsewhere: refusing to call unfinished work done, and leaving evidence why</li>
+          <li>No external user has independently adopted the framework — all evidence is internal. The G6 handoff bundle for the public 1.7.2 release is ready and frozen; independent external-human validation is awaited, and until a genuine participant's report is in, this line stands</li>
           <li>Distributed execution (multi-machine) is designed but untested in production</li>
           <li>Local sandbox provider does not isolate credentials — Docker is required for credential-sensitive projects</li>
           <li>Performance at scale (50+ stories, large codebases) is untested</li>

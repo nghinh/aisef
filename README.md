@@ -35,7 +35,7 @@ AISEF_TEST_DOCKER=1 python3 -m unittest tests.test_sandbox tests.test_tools -q  
 
 The reference skill repositories need **no manual clone**: `aisef setup` fetches
 them into `~/.cache/aisef/references` at the exact commit pinned by
-`aisef/kit/catalog.json` (about 93 MB, once for every project). Offline machines
+`aisef/kit/catalog.json` (about 91 MB by `du -sh` on 2026-09-15, once for every project). Offline machines
 and CI can point elsewhere with `AISEF_REFERENCES=/path`, or use
 `aisef setup --no-fetch` to work with whatever is already on disk.
 
@@ -322,13 +322,14 @@ tag.
 
 ### What the benchmarks measured
 
-Three cohorts, three null results, reported because a null is a result:
+Four cohorts, four null or inconclusive results, reported because a null is a result:
 
 | cohort | model | tasks | AISEF pass@1 | bare pass@1 |
 |---|---|---|---|---|
 | v0.3.0 | frontier | easy | 1.00 | 1.00 |
 | v1.3 simulator | scripted weak agent | 12 hard | — (by construction, no guards involved) | — |
 | **C-1 (2026-09-12)** | **non-frontier, real** | **12 hard** | **0.64** | **0.69** |
+| **C-2 (2026-09-15)** | **non-frontier, real, G5.3-qualified pair** | **12 hard** | **0.97** | **1.00** — [INCONCLUSIVE](docs/BENCH-REPORT-C2.md): 11 of 12 tasks at the ceiling, no resolution to measure a difference |
 
 On [C-1](docs/BENCH-REPORT-C1.md): nine of twelve tasks tie, AISEF loses two
 and wins one, and at three attempts per task that −0.05 is not distinguishable
@@ -356,10 +357,13 @@ done, and leave evidence that says why.
 Declared here because every claim needs evidence; what has not been proven is
 called unproven (owner decision 2026-09-06, `docs/RELEASE-PLAN-v0.1.0.md` §0):
 
-- **The dogfood acceptance scope is EPIC-01 of `e9`** (7 stories, `aisef
-  pre-deploy --epic EPIC-01`). EPIC-02..05 (16 stories) never ran — the report
-  says "out of acceptance scope", not "done". `e9` is not a finished accepted
-  product; it is the framework's acceptance corpus.
+- **The closure corpus is `marks-cli`** (owner ruling 2 in
+  `docs/PROJECT-CLOSURE-GATE.md`): 7 of 7 stories done and merged, pre-deploy
+  passed with its scope declared, and the PRE_DEPLOY gate signed by the owner on
+  2026-09-14 — closure criteria G4.1–G4.7 all read PASSED from that project's
+  evidence. *Historically* (v0.1.0–v1.0.0) the dogfood acceptance scope was
+  EPIC-01 of `e9` (7 stories); EPIC-02..05 of `e9` never ran, and `e9` is no
+  longer on disk.
 - **OpenCode is a first-class client since v1.0.0**: conformance 10/10 (parity
   with Claude, see ADR-006 §4). *This entry listed a known agent-side
   limitation — "OpenCode + Serena writes `.serena/` files outside declared

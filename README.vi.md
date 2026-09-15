@@ -36,7 +36,7 @@ AISEF_TEST_DOCKER=1 python3 -m unittest tests.test_sandbox tests.test_tools -q  
 
 Kho skill tham chiếu **không cần clone tay**: `aisef setup` tự lấy về
 `~/.cache/aisef/references` đúng commit mà `aisef/kit/catalog.json`
-ghim (khoảng 93 MB, một lần cho mọi dự án). Máy ngoại tuyến hoặc CI trỏ
+ghim (khoảng 91 MB theo `du -sh` ngày 15/09/2026, một lần cho mọi dự án). Máy ngoại tuyến hoặc CI trỏ
 sang chỗ khác bằng `AISEF_REFERENCES=/duong/dan`, hoặc dùng
 `aisef setup --no-fetch` để chỉ xài những gì đã có trên đĩa.
 
@@ -283,13 +283,14 @@ dự án thử `par` từ đầu vào trong kho và so với mốc đã đo — 
 
 ### Benchmark đã đo được gì
 
-Ba đợt đo, ba kết quả null — báo ra vì null cũng là kết quả:
+Bốn đợt đo, bốn kết quả null hoặc không kết luận được — báo ra vì null cũng là kết quả:
 
 | đợt | model | task | AISEF pass@1 | trần pass@1 |
 |---|---|---|---|---|
 | v0.3.0 | frontier | dễ | 1,00 | 1,00 |
 | v1.3 simulator | agent yếu theo kịch bản | 12 khó | — (guard không tham gia, theo thiết kế) | — |
 | **C-1 (12/09/2026)** | **không frontier, thật** | **12 khó** | **0,64** | **0,69** |
+| **C-2 (15/09/2026)** | **không frontier, thật, cặp đã tuyển theo G5.3** | **12 khó** | **0,97** | **1,00** — [KHÔNG KẾT LUẬN ĐƯỢC](docs/BENCH-REPORT-C2.md): 11/12 task hoà ở trần, không còn độ phân giải để đo khác biệt |
 
 [C-1](docs/BENCH-REPORT-C1.md): 9/12 task hoà, AISEF kém 2 task và hơn 1 task;
 với 3 lượt mỗi task thì −0,05 không phân biệt được với nhiễu. Nhánh có harness
@@ -316,10 +317,12 @@ xong**, và để lại bằng chứng nói rõ vì sao.
 Khai ở đây vì mọi claim phải có bằng chứng; thứ chưa chứng minh gọi là chưa
 chứng minh (quyết định chủ đầu tư 2026-09-06, `docs/RELEASE-PLAN-v0.1.0.md` §0):
 
-- **Phạm vi nghiệm thu dogfood là EPIC-01 của `e9`** (7 story, `aisef
-  pre-deploy --epic EPIC-01`). EPIC-02..05 (16 story) chưa chạy — báo cáo ghi
-  "ngoài phạm vi", không phải "xong". `e9` chưa phải sản phẩm được nghiệm thu
-  hoàn chỉnh; nó là corpus nghiệm thu của framework.
+- **Corpus đóng dự án là `marks-cli`** (ruling 2 của chủ dự án trong
+  `docs/PROJECT-CLOSURE-GATE.md`): 7/7 story done và đã merge, pre-deploy đạt
+  với phạm vi khai rõ, cổng PRE_DEPLOY do chủ dự án ký ngày 14/09/2026 — các
+  tiêu chí G4.1–G4.7 đều PASSED từ bằng chứng của dự án ấy. *Trước đây*
+  (v0.1.0–v1.0.0) phạm vi nghiệm thu dogfood là EPIC-01 của `e9` (7 story);
+  EPIC-02..05 của `e9` chưa từng chạy, và `e9` không còn trên đĩa.
 - **OpenCode là client hạng nhất từ v1.0.0**: hợp quy 10/10 (ngang Claude,
   xem ADR-006 §4). *Mục này ghi một hạn chế đã biết — "OpenCode + Serena ghi
   `.serena/` ngoài `write_scope` khai; harness từ chối đúng" — cho tới

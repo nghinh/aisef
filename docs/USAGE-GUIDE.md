@@ -1607,8 +1607,11 @@ means "not blocked" — a mistyped guard name must block, not silently pass.
 
 ## 17. Reference: all commands
 
-All 33 verbs, from `aisef --help`. Every one accepts `--project <directory>`
-(default: current directory), **before or after** the verb.
+`aisef --help` lists 34 verbs. The 33 below are the ones a project uses; the
+34th, `aisef closure`, scores the framework repository's own project-closure
+gate and is documented in `docs/SOLUTION.md` and `docs/PROJECT-CLOSURE-GATE.md`,
+not here. Every verb accepts `--project <directory>` (default: current
+directory), **before or after** the verb.
 
 **Preparation**
 
@@ -1685,19 +1688,19 @@ soon". The code stays and keeps its bug and security fixes; no new capability is
 added, and it is never gate evidence. Full documentation in
 [MEMORY.md](MEMORY.md).
 
-`docs/STABILITY.md` freezes 14 of the 33 verbs as a contract (`doctor`, `setup`,
+`docs/STABILITY.md` freezes 14 of the 34 verbs as a contract (`doctor`, `setup`,
 `init`, `compile`, `run`, `status`, `dashboard`, `guard`, `gate`, `replay`, `skill`,
 `doc`, `change`, `baseline`). The contract permits adding subcommands, so the other
-19 are not frozen — but they are real, and this section is the list.
+20 are not frozen — but they are real, and this section is the list.
 
 ---
 
 ## 18. Reference: all configuration keys
 
-There are **69** keys, and the number is guarded by a test:
+There are **70** keys, and the number is guarded by a test (`tests/test_meta.py`, against `docs/STABILITY.md`):
 
 ```bash
-python3 -c "from aisef.config import DEFAULTS; print(len(DEFAULTS))"    # → 69
+python3 -c "from aisef.config import DEFAULTS; print(len(DEFAULTS))"    # → 70
 ```
 
 Every key is part of the frozen contract: keys may be added, never removed or

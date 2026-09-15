@@ -290,7 +290,7 @@ danh mục, **lọc bỏ skill tấn công**, cài chúng vào dự án, sinh `C
 `AGENTS.md` (luật mà agent phải theo), và ghi `.ai/config.json` mặc định.
 
 Lần đầu chạy trên một máy, nó tải kho skill tham chiếu về
-`~/.cache/aisef/references` (khoảng 93 MB, dùng chung cho mọi dự án). Máy
+`~/.cache/aisef/references` (khoảng 91 MB theo `du -sh` ngày 15/09/2026, dùng chung cho mọi dự án). Máy
 không có mạng:
 
 ```bash
@@ -1251,7 +1251,7 @@ sẵn sàng (cổng chưa đạt, thiếu công cụ).
 ## 16. Tra cứu: toàn bộ lệnh
 
 Mọi lệnh nhận `--project <thư mục>` (mặc định: thư mục hiện tại). Danh sách đầy đủ
-**33 lệnh con** là thứ máy in ra — `aisef --help` luôn là bản chuẩn:
+`aisef --help` in ra **34 lệnh con**; 33 lệnh dưới đây là của một dự án, lệnh thứ 34 — `aisef closure` — chấm cổng đóng dự án của chính kho framework, mô tả ở `docs/SOLUTION.md` và `docs/PROJECT-CLOSURE-GATE.md`. `aisef --help` luôn là bản chuẩn:
 
 ```bash
 aisef --help

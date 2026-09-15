@@ -132,7 +132,7 @@ aisef gates
 ```
 
 - `aisef setup` fetches the pinned reference repositories into
-  `~/.cache/aisef/references` (about 93 MB, once per machine — the first run is
+  `~/.cache/aisef/references` (about 91 MB, once per machine — the first run is
   the slow one), detects your stack, installs skills, and writes `CLAUDE.md` and
   `AGENTS.md`. Expect `installed 150 · unchanged 0 · removed 0 · total 150` and
   `✅ done`. On an offline machine use `aisef setup --no-fetch`.
