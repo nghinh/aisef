@@ -177,9 +177,9 @@ class TestCF08BaselineDuringResume(_Case):
 
 # --------------------------------------------------------------- CF-09 client drift during replay
 class TestCF09ClientDriftDuringReplay(unittest.TestCase):
-    @unittest.expectedFailure   # INV-S.1 MISSING (Phase 17) — no replay manifest / preflight exists yet
+    # GREEN since Phase 17 (INV-S.1: replay manifest + preflight), 2026-09-17
     def test_a_replay_declared_for_opencode_but_run_with_claude_stops_before_the_first_agent_call(self):
-        from aisef.control import replay  # noqa: F401  — ImportError IS the red result today
+        from aisef.control import replay
         source = replay.ReplayManifest(framework_version="1.7.6", client="opencode", client_version="1.18.29", model="mycombo",
                                        route="9router", config_digest="c", requirements_digest="r", story_contract_digests={},
                                        environment_digest="e", sandbox_digests={}, baseline_identities={}, source_run="run-1")
@@ -318,6 +318,58 @@ class TestCF12ApprovalInvalidationDuringResume(unittest.TestCase):
             root = Path(tmp); store = self._store(root)
             (root / "prd.md").write_text("# PRD v2\n", encoding="utf-8")
             self.assertIs(store.status(Gate.READINESS), Status.STALE)
+
+
+class TestCF13OwnerArbitrationIsAnEpoch(unittest.TestCase):
+    """FM-C-13 (INV-Q.2): an owner decision — amending a story's acceptance criteria after a failed attempt — is a
+    NEW CONTRACT EPOCH with deterministic invalidation: the branch written for the old criteria is dropped, the
+    contract note carries the new fingerprint, evidence of the old epoch is not fresh for the new one, and the
+    readiness approval over the stories index is STALE. (The baseline's recapture at the integrated parent is
+    INV-B.2's D-033 test.) Composed from the pieces that each hold alone."""
+
+    def test_amended_criteria_drop_the_branch_stale_the_evidence_and_the_readiness_approval(self):
+        import json
+
+        from aisef.control.identity import EvidenceIdentity
+        from aisef.control.normalize import Story
+        from aisef.harness.observe import NOTE, TOOL_RUN, EvidenceStore
+        from aisef.phases.run import _CONTRACT_NOTE, _contract_fingerprint
+        from tests.test_worktree import TestNhanhCuKhiTieuChiDoi as Fixture
+        case = Fixture("test_tieu_chi_doi_thi_bo_nhanh"); case.setUp()
+        try:
+            story, art = case.story, case.artifacts
+            case._chay(story)                                   # epoch 1: the contract note is written
+            sha = case._nhanh_co_viec(story.id)                 # work committed for the epoch-1 criteria
+            e1 = _contract_fingerprint(story)
+            EvidenceStore(art, identity=EvidenceIdentity(story_id=story.id, story_epoch=e1, candidate_sha=sha, stage="gate")
+                          ).tool_run(story.id, "test", ok=True)
+            index = {"stories": [{"id": story.id, "epic_id": story.epic_id, "acceptance_criteria": list(story.acceptance_criteria)}],
+                     "epics": [{"id": story.epic_id}]}
+            (art / "stories.index.json").write_text(json.dumps(index), encoding="utf-8")
+            (art / "design-contract.json").write_text("{}", encoding="utf-8")
+            approvals = ApprovalStore(art); approvals.approve(Gate.READINESS, by="owner")
+            self.assertIs(approvals.status(Gate.READINESS), Status.APPROVED, "precondition")
+            self.assertTrue(case.wm.has_branch(story.id), "precondition: the epoch-1 branch exists")
+            same = EvidenceIdentity(story_id=story.id, story_epoch=e1, candidate_sha=sha, stage="gate")
+            self.assertIsNotNone(EvidenceStore(art).read(story.id).last_fresh(TOOL_RUN, "test", same),
+                                 "control: within the epoch the evidence is fresh")
+
+            amended = Story(id=story.id, epic_id=story.epic_id, title=story.title,
+                            acceptance_criteria=["nút mờ khi ô trống, sáng khi có chữ"])   # the owner's decision
+            case._chay(amended)
+            e2 = _contract_fingerprint(amended)
+            self.assertNotEqual(e1, e2)
+            self.assertFalse(case.wm.has_branch(story.id), "the branch written for the old criteria is dropped")
+            note = EvidenceStore(art).read(story.id).last(NOTE, _CONTRACT_NOTE)
+            self.assertEqual(note.detail.get("fingerprint"), e2, "the contract note carries the new epoch")
+            now = EvidenceIdentity(story_id=story.id, story_epoch=e2, candidate_sha=sha, stage="gate")
+            self.assertIsNone(EvidenceStore(art).read(story.id).last_fresh(TOOL_RUN, "test", now),
+                              "evidence of the old epoch never scores the new one")
+            index["stories"][0]["acceptance_criteria"] = list(amended.acceptance_criteria)
+            (art / "stories.index.json").write_text(json.dumps(index), encoding="utf-8")
+            self.assertIs(approvals.status(Gate.READINESS), Status.STALE, "the dependent approval is stale")
+        finally:
+            case.tearDown()
 
 
 if __name__ == "__main__":

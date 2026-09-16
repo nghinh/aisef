@@ -124,11 +124,12 @@ def reap(pids: set[int] | list[int], *, grace: float = GRACE_SECONDS) -> list[in
     deadline = time.monotonic() + grace
     while time.monotonic() < deadline and any(pid_alive(p) for p in live):
         time.sleep(0.05)
-    for p in live:
-        try:
-            os.waitpid(p, os.WNOHANG)          # reap a zombie child of ours; harmless for a non-child
-        except (ChildProcessError, OSError):
-            pass
+    if hasattr(os, "WNOHANG"):                 # POSIX only: Windows has no zombies (F6 CI on 023d6ce: every reap crashed here)
+        for p in live:
+            try:
+                os.waitpid(p, os.WNOHANG)      # reap a zombie child of ours; harmless for a non-child
+            except (ChildProcessError, OSError):
+                pass
     return [p for p in live if not pid_alive(p)]
 
 

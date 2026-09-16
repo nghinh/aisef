@@ -167,6 +167,10 @@ def _stale_for(evidence: Evidence, current: EvidenceIdentity,
 
 #: Where a verifier that did not execute used to be written (≤ 1.7.3): a finding whose text starts with this.
 LEGACY_UNRUN = "review could not run:"
+#: Tool runs that are UNBOUND BY CONSTRUCTION, not by age: the baseline describes the epoch's root, captured before
+#: any candidate exists, and is compared against — never scored as — the candidate (INV-C.1). Every other unbound
+#: tool run on the story path is a manual or ≤ 1.7.6 in-session run: shown, never scored (Phase 16).
+UNBOUND_BY_DESIGN = ("test:baseline",)
 
 
 def verdict_recorded(event: Event | None) -> bool:
@@ -720,6 +724,14 @@ def evaluate(
         # After stating it, drop evidence that is not fresh for this identity: a check from another build,
         # another tree state or another configuration must not silently make any check pass.
         evidence = evidence.for_identity(current)
+        if story_path:
+            # Phase 16: an UNBOUND tool run — no candidate, no session: a manual `aisef tool`, or a ≤ 1.7.6
+            # in-session run — can be shown, never scored for a story attempt; it speaks for no build. Measured
+            # on the archived 1.7.4 replays: `test`, `lint` and `security` scored PASSED from such records.
+            evidence = Evidence(story_id=evidence.story_id,
+                                events=[e for e in evidence.events
+                                        if e.kind != TOOL_RUN or e.name in UNBOUND_BY_DESIGN
+                                        or EvidenceIdentity.of(e, evidence.story_id).bound])
 
     # Hook generated != hook running. Claude Code only reads `.claude/settings.json`
     # of the tree it stands in; worktree lacking that directory (project didn't

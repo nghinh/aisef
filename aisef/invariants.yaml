@@ -281,13 +281,15 @@ invariants:
       - tests/test_closure.py::TestStaleness
       - tests/test_release_identity.py::TestCommitBoundEvidenceStaleness
       - tests/test_approvals.py::TestContentBinding
-    model_tests: []
-    fault_injection_tests: []
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_3_no_pass_on_foreign_evidence
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults
     linked_defects:
       - D-035
       - SS-06
       - SS-07
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-E.3
     domain: evidence freshness
     statement: A resumed story receives the recorded rejection of the candidate it resumes on; feedback does not die with the process.
@@ -483,12 +485,13 @@ invariants:
     deterministic_tests:
       - tests/test_implement.py::TestLuotKhongVietGiThiKhongPhaiUngVien
       - tests/test_implement.py::TestBeTacDoKeHoachTheoNopControl
-    model_tests: []
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_5_noop_never_terminates_on_stale_evidence
     fault_injection_tests:
       - tests/hardening/test_fault_matrix.py::TestDeveloperFaults
     linked_defects:
       - D-032
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-H.2
     domain: no-op semantics
     statement: Before a no-op may end a story the kernel re-evaluates the current frozen candidate against fresh valid evidence, reruns model stages whose inputs changed, and classifies NO-OP terminal only when that evidence proves unresolved developer work.
@@ -754,10 +757,11 @@ invariants:
       - tests/test_qa.py::TestMoiTruongCongCuTachKhoiSanPham
       - tests/test_sandbox.py::TestMounts
     model_tests: []
-    fault_injection_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestSandboxIdentityFaults
     linked_defects:
       - F-9
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-O.1
     domain: scheduler isolation
     statement: Stories that run in parallel have non-overlapping effective write scopes.
@@ -846,11 +850,13 @@ invariants:
     deterministic_tests:
       - tests/test_worktree.py::TestNhanhCuKhiTieuChiDoi
       - tests/test_approvals.py::TestCascade
-    model_tests: []
-    fault_injection_tests: []
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_4_resume_keeps_the_baseline_within_the_epoch
+    fault_injection_tests:
+      - tests/hardening/test_compound_faults.py::TestCF13OwnerArbitrationIsAnEpoch
     linked_defects:
       - AC4-ARBITRATION
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-R.1
     domain: release identity
     statement: Product release identity is immutable and content-bound (product plane digest, manifest bound to tag and PyPI); assurance and documentation evidence may move after release without changing it.
@@ -890,14 +896,19 @@ invariants:
     statement: A replay binds framework version, client and version, model and route, configuration digest, sandbox identity, requirements digest, story contracts and baseline identities; material drift fails preflight or is declared before execution.
     why: The Claude-vs-OpenCode replay ran to completion before anyone noticed the client had changed.
     severity_if_violated: P1
-    enforcement_points: []
-    deterministic_tests: []
+    enforcement_points:
+      - aisef/control/replay_manifest.py::preflight
+      - aisef/cli/implement.py::cmd_run
+    deterministic_tests:
+      - tests/hardening/test_replay_contract.py::TestPreflight
+      - tests/hardening/test_replay_contract.py::TestCliStopsBeforeTheFirstAgentCall
     model_tests: []
     fault_injection_tests:
       - tests/hardening/test_fault_matrix.py::TestReplayFaults
+      - tests/hardening/test_compound_faults.py::TestCF09ClientDriftDuringReplay
     linked_defects:
       - REPLAY-DRIFT
-    status: MISSING
+    status: PROVEN
   - invariant_id: INV-T.1
     domain: pass safety
     statement: No story or project PASSES without every required valid proof; absence, a foreign candidate, a demoted blocker, an erased environment failure or a filtered critical finding never produce a PASS.

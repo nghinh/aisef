@@ -1,7 +1,7 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "phase": 7,
- "generated": "2026-09-16T16:26:05+00:00",
+ "generated": "2026-09-16T16:52:41+00:00",
  "stages": [
   "Developer",
   "Test",
@@ -673,7 +673,7 @@
    "expected_recovery": "—",
    "invariants": "INV-S.1",
    "test": "tests/hardening/test_fault_matrix.py::TestReplayFaults::test_client_drift_is_detected_before_execution",
-   "status": "RED (MISSING, Phase 10)"
+   "status": "GREEN (P17)"
   },
   {
    "id": "FM-C-01",
@@ -805,7 +805,7 @@
    "expected_recovery": "owner approval",
    "invariants": "INV-S.1",
    "test": "tests/hardening/test_compound_faults.py::TestCF09ClientDriftDuringReplay::test_a_replay_declared_for_opencode_but_run_with_claude_stops_before_the_first_agent_call",
-   "status": "RED (MISSING, Phase 17)"
+   "status": "GREEN (P17)"
   },
   {
    "id": "FM-C-10",
@@ -854,11 +854,47 @@
    "invariants": "INV-P.1",
    "test": "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume::test_the_cli_precheck_blocks_a_resume_after_an_upstream_edit",
    "status": "GREEN"
+  },
+  {
+   "id": "FM-E-07",
+   "stage": "Evidence",
+   "fault": "INJECTED",
+   "scenario": "three records that look valid by an old reading: the LATEST (another candidate), one that EXISTS (legacy, schema 1), one whose SHA MATCHES but whose tree digest differs",
+   "expected_state": "no check scores; the stale record is named with its reason",
+   "expected_evidence": "freshness reasons per check",
+   "expected_recovery": "re-verify at the identity",
+   "invariants": "INV-E.2",
+   "test": "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults::test_latest_exists_and_sha_match_each_score_nothing",
+   "status": "GREEN (P11)"
+  },
+  {
+   "id": "FM-N-03",
+   "stage": "Tool",
+   "fault": "INJECTED",
+   "scenario": "the sandboxed run times out / docker cannot be invoked",
+   "expected_state": "the result still names image and digest",
+   "expected_evidence": "image + image_id on the failed record",
+   "expected_recovery": "re-run the tool",
+   "invariants": "INV-N.2",
+   "test": "tests/hardening/test_fault_matrix.py::TestSandboxIdentityFaults",
+   "status": "GREEN (P11)"
+  },
+  {
+   "id": "FM-C-13",
+   "stage": "Compound",
+   "fault": "INJECTED",
+   "scenario": "the owner amends a story's acceptance criteria after a failed attempt",
+   "expected_state": "new epoch: branch dropped, contract note updated, old-epoch evidence not fresh, readiness approval STALE",
+   "expected_evidence": "story:contract note + freshness reason + approval status",
+   "expected_recovery": "re-approve readiness, re-run the story",
+   "invariants": "INV-Q.2",
+   "test": "tests/hardening/test_compound_faults.py::TestCF13OwnerArbitrationIsAnEpoch::test_amended_criteria_drop_the_branch_stale_the_evidence_and_the_readiness_approval",
+   "status": "GREEN (P11)"
   }
  ],
  "status_count": {
-  "GREEN": 67,
-  "RED": 2,
+  "GREEN": 72,
+  "RED": 0,
   "NEEDS_TEST": 0
  }
 }

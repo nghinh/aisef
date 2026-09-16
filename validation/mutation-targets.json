@@ -1,0 +1,239 @@
+{
+ "phase": 13,
+ "note": "decision-critical kernel functions; every mutant must be killed by the named tests or justified as equivalent",
+ "targets": [
+  {
+   "module": "aisef/control/identity.py",
+   "function": "fresh",
+   "tests": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults"
+   ]
+  },
+  {
+   "module": "aisef/control/gate.py",
+   "function": "_stale_for",
+   "tests": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ]
+  },
+  {
+   "module": "aisef/control/gate.py",
+   "function": "_latest_per_check",
+   "tests": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ]
+  },
+  {
+   "module": "aisef/control/gate.py",
+   "function": "verdict_recorded",
+   "tests": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults"
+   ]
+  },
+  {
+   "module": "aisef/control/closure.py",
+   "function": "_is_ancestor",
+   "tests": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ]
+  },
+  {
+   "module": "aisef/control/closure.py",
+   "function": "probe_review_and_security",
+   "tests": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py"
+   ]
+  },
+  {
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "tests": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ]
+  },
+  {
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.status",
+   "tests": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/hardening/test_compound_faults.py::TestCF13OwnerArbitrationIsAnEpoch",
+    "tests/test_approvals.py"
+   ]
+  },
+  {
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.content_hash",
+   "tests": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS54RepairStoriesAreCoveredByAnApproval",
+    "tests/hardening/scan8a/test_group_d.py::TestSS55GateConfigIsBoundByReadiness",
+    "tests/test_approvals.py"
+   ]
+  },
+  {
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore._upstream_stale",
+   "tests": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/test_approvals.py"
+   ]
+  },
+  {
+   "module": "aisef/control/state.py",
+   "function": "claim_is_live",
+   "tests": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py",
+    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun"
+   ]
+  },
+  {
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "tests": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ]
+  },
+  {
+   "module": "aisef/control/budget.py",
+   "function": "_reservation_live",
+   "tests": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ]
+  },
+  {
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "tests": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ]
+  },
+  {
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "tests": [
+    "tests/hardening/test_ownership.py"
+   ]
+  },
+  {
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "tests": [
+    "tests/hardening/test_process_owner.py"
+   ]
+  },
+  {
+   "module": "aisef/harness/process_owner.py",
+   "function": "survivors",
+   "tests": [
+    "tests/hardening/test_process_owner.py"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "deadlock_reason",
+   "tests": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "tests": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "tests": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "finding_bound",
+   "tests": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "Verdict.bound_blocking",
+   "tests": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "structured_plan_defects",
+   "tests": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "_verifier_budget_cap",
+   "tests": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "_absent_stages",
+   "tests": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "tests": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ]
+  },
+  {
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "tests": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ]
+  },
+  {
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "tests": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ]
+  }
+ ],
+ "equivalent": []
+}

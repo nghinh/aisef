@@ -86,4 +86,11 @@ suite run started; it is compile-checked and its POSIX-reachable callers passed,
 its test. Fault matrix 67 GREEN / 2 RED / 0 NEEDS_TEST (the 2 RED are FM-X-01 and FM-C-09, INV-S.1 replay, Phase 17).
 Registry 45 PROVEN / 4 PARTIAL / 1 MISSING (INV-R.2, INV-F.3, INV-P.1 promoted; INV-E.2, H.1, N.2, Q.2 remain PARTIAL
 for Phase 11; INV-S.1 MISSING for Phase 17). Defect set 72 FIXED / 1 SUPERSEDED / 0 OPEN. No `expectedFailure` marker
-names a frozen-set id. Linux + Windows CI: recorded here when the run completes.
+names a frozen-set id.
+
+CI on 023d6ce (run 35121954443): Linux 3.11–3.14, lint, wheel green; Windows 3.11 RED on one cause — the reaper's
+zombie collection (`process_owner.reap`: `os.waitpid(pid, os.WNOHANG)`) has no Windows path, so every reap crashed
+(9 errors) and the CI differential sample's two orphan-leaving seeds (100008, 100028) saw the sleeper survive (1
+failure, `orphans_surviving`). The unified snapshot walker of this commit did its job (no `PROCESSENTRY32` error
+remains). Fixed in the next commit: the zombie collection is POSIX-only (Windows has no zombies; `pid_alive` reads
+the process handle); that commit's Windows job re-qualifies F5, F6 and the phases it carries.

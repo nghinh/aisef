@@ -196,6 +196,12 @@ def build_parser() -> argparse.ArgumentParser:
                     help="with --verify-only: run each check K times on the same SHA; tests that "
                          "flip results between runs → gate records UNRUNNABLE 'flaky' naming them, "
                          "not a failure (error 22: e2e sensitive to machine load). Default 1")
+    r2.add_argument("--replay-of", default="", metavar="RUN",
+                    help="replay the conditions of a recorded run (run id or manifest path): a material difference "
+                         "— client, model, route, config, requirements, story contracts, environment — stops before "
+                         "the first agent call (REPLAY_CONDITION_DRIFT) unless named in --accept-drift")
+    r2.add_argument("--accept-drift", default="", metavar="FIELDS",
+                    help="comma-separated manifest fields whose drift the owner accepts for this replay")
     r2.set_defaults(func=cmd_run)
 
     im = sub.add_parser("improve", help="evidence-driven improvement loop for an epic: QA → behaviour ledger → "

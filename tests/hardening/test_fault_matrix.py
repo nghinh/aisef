@@ -126,6 +126,33 @@ class TestToolFaults(_Case):
         self.assertIs(check.outcome, Outcome.UNRUNNABLE, check.detail)
 
 
+class TestSandboxIdentityFaults(unittest.TestCase):
+    """FM-N-03 (INV-N.2): the environment identity — image name and digest — is recorded with EVERY sandboxed tool
+    result, the failed ones included: a timed-out run and a docker that cannot be invoked still name the image they
+    were meant to run in. Phase 11 (2026-09-17): `_run_docker` returned both without `image`/`image_id`."""
+
+    def _docker(self, boom):
+        from unittest import mock
+        from aisef.harness import sandbox as SB
+        from aisef.harness import verify_image as VI
+        spec = SB.SandboxSpec(workspace=Path("."), cmd=["true"], image="ghcr.io/x/ci:1", timeout_seconds=1)
+        with mock.patch.object(VI, "ensure", return_value=""), \
+             mock.patch.object(VI, "image_id", return_value="sha256:feedface"), \
+             mock.patch.object(SB.subprocess, "run", side_effect=[boom, mock.Mock(returncode=0)]):   # 2nd: `docker rm`
+            return SB._run_docker(spec)
+
+    def test_a_timed_out_run_still_records_image_and_digest(self):
+        import subprocess as sp
+        res = self._docker(sp.TimeoutExpired(cmd="docker", timeout=1))
+        self.assertTrue(res.timed_out)
+        self.assertEqual((res.image, res.image_id), ("ghcr.io/x/ci:1", "sha256:feedface"), res.to_evidence())
+
+    def test_a_docker_that_cannot_be_invoked_still_records_image_and_digest(self):
+        res = self._docker(OSError("docker: not found"))
+        self.assertTrue(res.provider_error)
+        self.assertEqual((res.image, res.image_id), ("ghcr.io/x/ci:1", "sha256:feedface"), res.to_evidence())
+
+
 class TestReviewFaults(_Case):
     def test_structured_block_is_developer_feedback(self):
         c, out = self.run_script(Script(review=[Step.block([{"tag": "block", "file": "src/a.py", "line": 1, "why": "off by one"}]), Step.passes()]))
@@ -201,6 +228,41 @@ class TestEvidenceFaults(unittest.TestCase):
             ev = store.read("S")
             self.assertEqual([e.name for e in ev.events], ["test", "after"])
             self.assertIsNone(ev.last(TOOL_RUN, "lint"), "a half-written record is no record")
+
+
+class TestEvidenceValidityFaults(unittest.TestCase):
+    """FM-E-07 (INV-E.2): three records that each LOOK valid by a reading the kernel once used — the LATEST record
+    (written last, at another candidate), a record that EXISTS (legacy, candidate-only, schema 1) and a record whose
+    candidate SHA MATCHES but whose tree digest differs (the D-035 shape) — and the freshness readers score none of
+    them: no record is fresh for the identity being decided on, and the stale one is named with its reason."""
+
+    def test_latest_exists_and_sha_match_each_score_nothing(self):
+        from aisef.control.gate import _stale_for
+        from aisef.control.identity import EvidenceIdentity
+        sha = "c" * 40
+        now = EvidenceIdentity(story_id="S", story_epoch="e1", candidate_sha=sha, tree_state_digest="tree-now",
+                               verifier_config_digest="cfg", environment_digest="env", baseline_root="r" * 40, stage="gate")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            # SHA MATCHES, tree differs: the verdict was computed over another tree of the same commit
+            EvidenceStore(root, identity=EvidenceIdentity(**{**now.__dict__, "tree_state_digest": "tree-before"})
+                          ).tool_run("S", "test", ok=True)
+            # EXISTS: a legacy record — candidate only, no identity (schema 1)
+            EvidenceStore(root, candidate=sha).tool_run("S", "lint", ok=True)
+            # LATEST: the newest record of all, at another candidate
+            EvidenceStore(root, identity=EvidenceIdentity(**{**now.__dict__, "candidate_sha": "d" * 40})
+                          ).tool_run("S", "test", ok=True)
+            ev = EvidenceStore(root).read("S")
+            self.assertEqual(len(ev.of(TOOL_RUN)), 3, "three records exist, all green")
+            for name in ("test", "lint"):
+                self.assertIsNone(ev.last_fresh(TOOL_RUN, name, now), f"{name}: a record that is not fresh scores nothing")
+            self.assertEqual(ev.for_identity(now).of(TOOL_RUN), [], "nothing speaks for the identity being decided on")
+            stale = _stale_for(ev, now)
+            self.assertIn("test", stale, stale)
+            self.assertTrue(stale["test"], "the stale record is named with its reason, never silently dropped")
+            # control: the same readers DO accept a record written under exactly this identity
+            EvidenceStore(root, identity=now).tool_run("S", "test", ok=True)
+            self.assertIsNotNone(EvidenceStore(root).read("S").last_fresh(TOOL_RUN, "test", now))
 
 
 class TestStaleFaults(unittest.TestCase):
@@ -280,10 +342,12 @@ class TestProcessFaults(unittest.TestCase):
 
 
 class TestReplayFaults(unittest.TestCase):
-    @unittest.expectedFailure   # INV-S.1 MISSING — Phase 10 defines the replay manifest and its preflight
+    """FM-X-01: a replay with a different client / model than the source is stopped BEFORE execution."""
+
+    # GREEN since Phase 17 (INV-S.1: replay manifest + preflight), 2026-09-17
     def test_client_drift_is_detected_before_execution(self):
-        from aisef.control import replay_manifest  # noqa: F401 — does not exist yet
-        self.fail("unreachable until the manifest exists")
+        from tests.hardening.test_replay_contract import TestCliStopsBeforeTheFirstAgentCall as T
+        T("test_client_drift_stops_the_run_with_a_typed_record_and_no_agent_call").test_client_drift_stops_the_run_with_a_typed_record_and_no_agent_call()
 
 
 if __name__ == "__main__":
