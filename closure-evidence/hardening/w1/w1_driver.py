@@ -36,6 +36,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
 MARKERS = ["wave=EPIC-01/w3 DONE", "wave=EPIC-03/w1 DONE"]  # P20 procedure 3: the forced-resume boundaries
+EXPECTED = {"client": "opencode", "opencode_version": "1.18.31", "model": "9router/mycombo", "stories": 16, "fresh_root": "8ff9f13",
+            "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+            "sandbox_image": "aisef-verify-python:b2c7afff2aed"}   # owner item 9: asserted mechanically BEFORE the first model call
 STALL_S = 2 * 3600
 ARB1_NOTE = ("ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for byte-identical content after the hash-method change "
              "(SS-55 verifier-config digest); not a waiver; kernel refusal recorded first; conditions measured in "
@@ -160,15 +163,45 @@ class Driver:
         t = P["fresh_topology"]
         P["fresh_topology_ok"] = t["head_branch"] == "master" and t["ledgerlock_dir_absent_at_master"] and not t["remotes"] and len(after) <= 3 \
             and all(("cost_cap" in ln or "guard plugin" in ln) for ln in after)
+        # owner item 9 — W1 freshness preflight, every check mechanical; any failure STOPS before the first model call
+        idx = json.loads((self.art / "stories.index.json").read_text(encoding="utf-8"))
+        stories = idx["stories"] if isinstance(idx, dict) and "stories" in idx else idx
+        req = self.project / "docs/requirements.md"
+        model = subprocess.run([self.a.python, "-c", "from aisef.clients.opencode import configured_model; print(configured_model(%r))" % str(self.project)],
+                               capture_output=True, text=True, cwd=str(self.run_dir), env=self.env()).stdout.strip()
+        status_text = self.cli("status", timeout=120)["stdout_tail"]
+        plugin_bin = P["guard_plugin"]["bin_line"] or ""
+        img_id = P["docker_image"]["id"]
+        frozen_img = (P.get("freeze") or {}).get("docker_image_id")
+        P["preflight"] = {
+            "trunk_is_the_approved_fresh_root": t["head_branch"] == "master" and self.git("merge-base", "--is-ancestor", EXPECTED["fresh_root"], "master") == "" and t["ledgerlock_dir_absent_at_master"],
+            "zero_prior_delivery_commits": all(("cost_cap" in ln or "guard plugin" in ln) for ln in after),
+            "expected_story_count": len(stories) == EXPECTED["stories"],
+            "expected_story_state_none_registered": "No stories registered" in status_text,
+            "no_candidate_branches": t["branches"] == ["master"],
+            "artifacts_match_frozen_requirements": req.is_file() and sha(req) == EXPECTED["requirements_sha256"],
+            "client_is_opencode": EXPECTED["client"] == "opencode",
+            "expected_opencode_version": P["opencode_version"] == EXPECTED["opencode_version"],
+            "expected_model_route": model == EXPECTED["model"],
+            "guard_plugin_bound_to_the_frozen_candidate": self.a.aisef in plugin_bin,
+            "no_stale_story_worktrees": len(self.git("worktree", "list").splitlines()) == 1,
+            "sandbox_image_declared": P["config"].get("sandbox.image") == EXPECTED["sandbox_image"],
+            "sandbox_image_present": bool(img_id),
+            "environment_identity_matches_freeze": (img_id == frozen_img) if frozen_img else "no freeze record given — not compared",
+            "no_remotes": not t["remotes"],
+        }
+        P["preflight_measured"] = {"model": model, "opencode_version": P["opencode_version"], "plugin_bin": plugin_bin, "worktrees": self.git("worktree", "list").splitlines(),
+                                   "stories": len(stories), "docker_image_id": img_id}
+        P["preflight_ok"] = all(v is True or v == "no freeze record given — not compared" for v in P["preflight"].values())
         P["gates"] = self.gates()
         P["agent_starts_before"] = self.agent_starts()
         P["story_evidence_before"] = self.story_evidence()
         P["ok"] = P["aisef_from_the_wheel_not_the_checkout"] and P["oracle_ok"] and P["guard_plugin"]["tracked_now"] and P["gates"].get("readiness") == "stale" \
-            and P["fresh_topology_ok"] \
+            and P["fresh_topology_ok"] and P["preflight_ok"] \
             and all(v == "approved" for g, v in P["gates"].items() if g not in ("readiness", "pre-deploy")) and not P["story_evidence_before"]
         self.rec["phases"]["prepare"] = P
         self.save()
-        self.say(f"prepare ok={P['ok']} aisef={P['aisef_version']} wheel={P['aisef_from_the_wheel_not_the_checkout']} oracle={P['oracle_ok']} guard={P['guard_plugin']['tracked_now']} topology={P['fresh_topology_ok']} gates={P['gates']} doctor_red={P['doctor_red']}")
+        self.say(f"prepare ok={P['ok']} aisef={P['aisef_version']} wheel={P['aisef_from_the_wheel_not_the_checkout']} oracle={P['oracle_ok']} guard={P['guard_plugin']['tracked_now']} topology={P['fresh_topology_ok']} preflight={P['preflight_ok']} failed={[k for k, v in P['preflight'].items() if v is not True and not isinstance(v, str)]} gates={P['gates']} doctor_red={P['doctor_red']}")
         return P["ok"]
 
     def kernel_first(self) -> bool:

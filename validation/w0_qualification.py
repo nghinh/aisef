@@ -49,8 +49,9 @@ def criteria(ci: dict) -> list[dict]:
         ("fault matrix GREEN", by_status.get("RED", 0) == 0 and by_status.get("GREEN", 0) == len(cells), {"cells": len(cells), "fault_matrix": by_status}),
         ("0 MISSING/PARTIAL invariants", reg["PARTIAL"] == 0 and reg["MISSING"] == 0 and reg["PROVEN"] == 50, {"registry": reg}),
         ("0 expected-red tests", not red_markers, {"files_with_red_markers": red_markers}),
-        ("0 unexplained model/kernel gaps (100 000 traces)", bool(diff) and diff.get("unexplained") == 0 and diff.get("traces", 0) >= 100000,
-         {"differential": {k: diff.get(k) for k in ("traces", "matched", "unexplained", "traces_per_s", "elapsed_s", "chunks")}}),
+        ("0 unexplained model/kernel gaps (100 000 traces)", bool(diff) and diff.get("unexplained") == 0 and diff.get("traces", 0) >= 100000
+         and (diff.get("manifest") or {}).get("pass") is True and diff.get("invariant_violations") == 0,
+         {"differential": {k: diff.get(k) for k in ("traces", "matched", "unexplained", "invariant_violations", "exceptions", "silent_skips", "traces_per_s", "elapsed_s", "chunks", "manifest", "coverage")}}),
         ("KNOWN_DEVIATIONS empty", bool(diff) and not diff.get("known_deviations"), {"known_deviations": diff.get("known_deviations")}),
         ("0 safety-significant mutation survivors", bool(mut) and not unclassified and all(r.get("classification") in ("EQUIVALENT", "NOT_SIGNIFICANT", "KILLED_BY_NEW_TEST") for r in survivors),
          {"mutation": {k: mut.get(k) for k in ("mutations_generated", "killed", "survived", "equivalent")}, "unclassified_survivors": unclassified}),
