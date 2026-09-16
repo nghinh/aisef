@@ -1,0 +1,78 @@
+{
+ "version": "1.7.6",
+ "tag": "v1.7.6",
+ "release_source_sha": "939f2abdfa1f3afe7a2ea083513edf6449cbfe67",
+ "product_digest": {
+  "939f2ab": "878b8d8fbced83404733b039ff202cb1cb29c1db430d20b52502ffd6d2c0dde5",
+  "rule": "aisef.control.planes.identity over PRODUCT_AFFECTING paths (docs/closure-gate.json#planes), 111 files, [] unresolved"
+ },
+ "rejected_candidates": [],
+ "ci": {
+  "run_id": "35064549771",
+  "event": "pull_request (PR #5, release/1.7.6 -> master)",
+  "head_sha": "939f2abdfa1f3afe7a2ea083513edf6449cbfe67",
+  "jobs": {
+   "lint": "success",
+   "wheel": "success",
+   "unit (ubuntu-latest, 3.11)": "success",
+   "unit (windows-latest, 3.11)": "success — Ran 3190 tests in 1482.707s, OK (skipped=84)",
+   "unit (ubuntu-latest, 3.12)": "success",
+   "unit (ubuntu-latest, 3.13)": "success",
+   "unit (ubuntu-latest, 3.14)": "success"
+  }
+ },
+ "windows_regression": {
+  "job": "unit (windows-latest, 3.11)",
+  "result": "green",
+  "tests_collected": 3190,
+  "note": "3177 on 1.7.5: the difference is the D-034 regression file tests/test_retry_hygiene.py (13 tests, 9 red on master before the fix) and no other collection change — verified by git diff v1.7.5..<tag> -- tests/"
+ },
+ "full_suite_local": {
+  "commit": "939f2ab",
+  "command": "python3 -m pytest tests/ -q",
+  "result": "3174 passed, 19 skipped, 1413 subtests passed",
+  "ruff": "All checks passed"
+ },
+ "d034_regression": {
+  "file": "tests/test_retry_hygiene.py",
+  "red_before_on_master": "9 failed, 4 controls passed — measured on a pristine worktree of master 06c44d3 with the final test file",
+  "green_after": "13 passed",
+  "adapted_expectations": []
+ },
+ "dogfood_suite": {
+  "file": "tests/test_dogfood_ledgerlock.py",
+  "result": "30 passed"
+ },
+ "verification_image": {
+  "name": "aisef-verify-python:b2c7afff2aed",
+  "image_id": "sha256:e456ae8a7c729d1e02567995b138d485a4859a9cd878ea53c5b41ebacb4222c4",
+  "note": "unchanged since 1.7.3 (no PRODUCT change touches aisef/harness/verify_image.py)"
+ },
+ "public_package_qualification": {
+  "installed_from": "public PyPI, fresh venv outside the checkout (pip install --no-cache-dir aisef==1.7.6)",
+  "version_reported": "aisef 1.7.6",
+  "module_path": "<venv>/lib/python3.14/site-packages/aisef/__init__.py",
+  "artifact_digests_match_pypi": true,
+  "doctor": "✅ ready",
+  "tool_test_in_sandbox": "1 passed",
+  "dogfood_suite_against_installed_package": "Ran 30 tests in 2.756s",
+  "d032_regression_against_installed_package": "Ran 12 tests in 4.162s",
+  "d033_regression_against_installed_package": "Ran 14 tests in 1.145s",
+  "d034_regression_against_installed_package": "Ran 13 tests in 14.193s",
+  "log": "closure-evidence/releases/1.7.6.qualification.log"
+ },
+ "recorded_at": "2026-09-16T07:26:45+00:00",
+ "ci_master_push": {
+  "run_id": "35066620279",
+  "event": "push (master fast-forwarded to the 1.7.6 release source)",
+  "jobs": {
+   "wheel": "success",
+   "unit (ubuntu-latest, 3.11)": "success",
+   "unit (ubuntu-latest, 3.14)": "success",
+   "unit (ubuntu-latest, 3.13)": "success",
+   "lint": "success",
+   "unit (windows-latest, 3.11)": "success — Ran 3190 tests in 1244.343s, OK (skipped=84)",
+   "unit (ubuntu-latest, 3.12)": "success"
+  }
+ }
+}

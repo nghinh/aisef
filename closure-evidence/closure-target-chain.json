@@ -65,10 +65,20 @@
    "sha": "23116245e43348513620168387fc40f9ca27d77d",
    "tag": "v1.7.5",
    "version": "1.7.5",
-   "status": "FINAL CLOSURE TARGET",
+   "status": "RELEASED -- SUPERSEDED AS CLOSURE TARGET BY 1.7.6 (D-034)",
    "why": "the D-033 correction (clean OpenCode replay of LedgerLock Run #2 on public 1.7.4, 2026-09-16): a story's regression baseline is immutable within its epoch — captured once at the integrated parent, reused on retry/resume/verify-only, never the story's own candidate; absent or provenance-invalid baseline fails closed as BASELINE_UNAVAILABLE. Remote CI run 35047338646 (pull_request, PR #4) green on exactly this commit across Ubuntu 3.11-3.14, Windows 3.11 (success — Ran 3177 tests in 1158.202s, OK (skipped=84)), lint and wheel. Nothing else changed in the product plane (narrow patch, owner scope).",
    "ci_run": "35047338646",
    "ci_head_sha": "23116245e43348513620168387fc40f9ca27d77d",
+   "rejected_candidate": null
+  },
+  {
+   "sha": "939f2abdfa1f3afe7a2ea083513edf6449cbfe67",
+   "tag": "v1.7.6",
+   "version": "1.7.6",
+   "status": "FINAL CLOSURE TARGET",
+   "why": "the D-034 correction (clean OpenCode replay of LedgerLock Run #2 continued on public 1.7.5, 2026-09-16): a developer retry opens on a tree clean of out-of-scope changes — what a session left outside write_scope is recorded, restored from the frozen candidate before the next attempt (path-specific), never touched when no attempt is on record for it. Remote CI run 35064549771 (pull_request, PR #5) green on exactly this commit across Ubuntu 3.11-3.14, Windows 3.11 (success — Ran 3190 tests in 1482.707s, OK (skipped=84)), lint and wheel. Nothing else changed in the product plane (narrow patch, owner scope).",
+   "ci_run": "35064549771",
+   "ci_head_sha": "939f2abdfa1f3afe7a2ea083513edf6449cbfe67",
    "rejected_candidate": null
   }
  ],
