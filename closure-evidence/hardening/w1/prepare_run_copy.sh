@@ -11,7 +11,10 @@ git clone -q --no-hardlinks "$REF" "$DST"
 cd "$DST"
 git checkout -q -B master 8ff9f13
 git remote remove origin
-git fetch -q "$P/w1-run-1" fd4c644 && git cherry-pick -q --no-edit FETCH_HEAD
+git fetch -q "$P/w1-run-1" master          # brings the objects; fd4c644 (the cost-cap commit) is then cherry-picked by SHA
+git cherry-pick -q --no-edit fd4c644
+cap=$(python3 -c "import json; print(json.load(open('.ai/config.json')).get('run.cost_cap_usd'))")
+[ "$cap" = "80.0" ] || { echo "REFUSED: cost cap not applied (run.cost_cap_usd=$cap)"; exit 1; }
 git for-each-ref --format='%(refname)' | grep -v '^refs/heads/master$' | while read r; do git update-ref -d "$r"; done
 echo "w1-run-$n: HEAD=$(git rev-parse --short HEAD) branch=$(git rev-parse --abbrev-ref HEAD) refs=[$(git for-each-ref --format='%(refname:short)' | tr '\n' ' ')] remotes=[$(git remote | tr '\n' ' ')]"
 echo "commits after 8ff9f13: $(git log --oneline 8ff9f13..master | tr '\n' ';')"
