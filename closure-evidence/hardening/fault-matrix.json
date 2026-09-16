@@ -1,7 +1,7 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "phase": 7,
- "generated": "2026-09-16T16:52:41+00:00",
+ "generated": "2026-09-16T21:50:26+00:00",
  "stages": [
   "Developer",
   "Test",
@@ -890,10 +890,22 @@
    "invariants": "INV-Q.2",
    "test": "tests/hardening/test_compound_faults.py::TestCF13OwnerArbitrationIsAnEpoch::test_amended_criteria_drop_the_branch_stale_the_evidence_and_the_readiness_approval",
    "status": "GREEN (P11)"
+  },
+  {
+   "id": "FM-R-09",
+   "stage": "Review",
+   "fault": "INJECTED",
+   "scenario": "the retried review produces a verdict while the retried security session hits the budget cap",
+   "expected_state": "BUDGET stop; no developer, review or security session opens past the cap",
+   "expected_evidence": "verifier `unrunnable` names the cap; terminal BUDGET",
+   "expected_recovery": "raise the cap, re-run --verify-only",
+   "invariants": "INV-G.5",
+   "test": "tests/hardening/test_differential.py::TestSeed34999ACapInsideARegradedVerifierStopsTheRun",
+   "status": "GREEN (P12)"
   }
  ],
  "status_count": {
-  "GREEN": 72,
+  "GREEN": 73,
   "RED": 0,
   "NEEDS_TEST": 0
  }

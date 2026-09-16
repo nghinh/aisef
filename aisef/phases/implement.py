@@ -3422,9 +3422,12 @@ def implement_story(
             outcome.attempts.append(lai)
             attempt = lai
             absent = _absent_stages(attempt)
-        if absent and _verifier_budget_cap(attempt):
+        if (cap := _verifier_budget_cap(attempt)):
+            # The cap is a run-level condition (INV-G.5): it wins whether or not a stage is still absent. Phase 12 seed
+            # 34999: the retried review produced a BLOCK while the retried security session hit the cap; with `absent`
+            # empty the cap fell through to quality routing and a developer session was opened past the cap (SS-64).
             outcome.block(StageOutcome.BUDGET, f"budget cap reached inside a verifier session on candidate {sha[:8]}: "
-                                               f"{_verifier_budget_cap(attempt)}. The candidate is kept; raise the cap and re-run "
+                                               f"{cap}. The candidate is kept; raise the cap and re-run "
                                                f"`{aisef_command()} run --verify-only --story {story.id}`.")
             _log(f"story={story.id} BUDGET cap inside a verifier on {sha[:8]}")
         elif absent:
@@ -3708,7 +3711,13 @@ def verify_only(
     ))
     outcome.attempts.append(attempt)
     absent = _absent_stages(attempt)
-    if absent:
+    if (cap := _verifier_budget_cap(attempt)):
+        # SS-64 sibling: a cap reached inside a verifier during --verify-only is the run-level BUDGET stop, not a
+        # stage that "could not run" to be retried when it can (INV-G.5).
+        outcome.block(StageOutcome.BUDGET, f"budget cap reached inside a verifier session on candidate "
+                                           f"{attempt.candidate[:8]}: {cap}. The candidate is kept; raise the cap and re-run "
+                                           f"`{aisef_command()} run --verify-only --story {story.id}`.")
+    elif absent:
         # A verifier or tool did not run again: name that, not a failed gate (D-032; SS-13/14).
         stages = {_stage_of(n) for n in absent}
         label = (REVIEW_UNRUNNABLE if "review" in stages and "tools" not in stages

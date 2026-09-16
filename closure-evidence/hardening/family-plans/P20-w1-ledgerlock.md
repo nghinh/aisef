@@ -72,3 +72,18 @@ excessive, the number is reported first — the target (3 runs) is not reduced u
 `closure-evidence/hardening/W1-LEDGERLOCK-<n>.json` per run (candidate SHA, manifest, per-story framework verdict,
 oracle results, resumes, drift records, cost, duration, every operator arbitration) and
 `W1-LEDGERLOCK-SUMMARY.json` across the three; `docs/SCALE-QUALIFICATION.md` status row updated only from those.
+
+## Preparation record (2026-09-17, before the freeze)
+
+- Fresh copy made: `~/Downloads/projects/w1-run-1` = clone of the reference project at `8ff9f13`, branch `w1-run-1`,
+  plus one project-side commit `fd4c644` (`run.cost_cap_usd = 80` — the plan's safety cap; a project config, not an
+  AISEF change). The copy has the 16-story index, the 7 gate approvals and no run state (`aisef status`: no stories
+  registered).
+- **Expected arbitration, stated before the run:** under the frozen candidate the `readiness` approval reads STALE
+  although `stories.index.json` and `design-contract.json` are byte-identical to what the owner approved — Phase 16
+  / SS-55 added the verifier-configuration digest to the readiness hash, and `approvals.py` states that a hash-method
+  change stales previously signed `stories`/`readiness` approvals once. At W1 start the operator re-approves
+  `readiness` for the same content and records that re-approval (gate, digest before/after, reason) in the run's W1
+  record as arbitration #1. No other gate is expected to change; any other STALE is a finding, not an arbitration.
+- The oracle's interpreter: `scratchpad/w1-oracle-venv` (coverage 7.16.1, pytest 9.1.1); the oracle itself is
+  unchanged since its calibration.

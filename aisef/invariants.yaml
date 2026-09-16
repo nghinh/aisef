@@ -469,8 +469,10 @@ invariants:
       - tests/hardening/test_sibling_scan.py::TestSS12BudgetRejectionInReviewDoesNotCrash
       - tests/test_budget_integration.py::TestBudgetBlocksBeforeDispatch
     model_tests: []
-    fault_injection_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_differential.py::TestSeed34999ACapInsideARegradedVerifierStopsTheRun
     linked_defects:
+      - SS-64
       - SS-12
       - SS-21
     status: PROVEN

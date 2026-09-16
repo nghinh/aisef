@@ -57,6 +57,47 @@ class TestSeed232ReviewerCommitOnTheSchemaRetry(unittest.TestCase):
         self.assertEqual(real.developer_sessions, 1, real.events)
 
 
+class TestSeed34999ACapInsideARegradedVerifierStopsTheRun(unittest.TestCase):
+    """SS-64 — found by Phase 12 differential seed 34999 (chunk 30000, 2026-09-17); a KERNEL defect against INV-G.5
+    (a budget cap reached inside a verifier session is a run-level condition: no further session may be opened).
+    The reviewer committed on the first execution, so the review stage was retried; the retried review produced a
+    BLOCK and the retried security session hit the cap. With a FAILED check present `_absent_stages` was empty, the
+    review stage's cap check was gated on absences, and the cap fell through to quality routing: a second developer
+    session, a third review and a third security session were opened past the cap. RED before the fix: the frozen
+    record `closure-evidence/hardening/phase12/unexplained-34999.json` and its ten identical replays."""
+
+    def test_the_model_and_the_kernel_agree_and_no_session_opens_past_the_cap(self):
+        sc = D.Scenario(34999, ["CHANGED_ARTIFACT", "CHANGED_ARTIFACT", "NOOP", "CONTEXT", "CHANGED_RED", "NOOP"],
+                        ["COMMIT", "BLOCK"], ["UNRUNNABLE", "BUDGET"], max_retries=1, test_tool_missing=False)
+        real, model = D.real_run(sc), D.model_run(sc)
+        self.assertEqual(real.diff(model), [])
+        self.assertEqual(real.terminal, "blocked:budget cap")
+        self.assertEqual((real.developer_sessions, real.review_executions, real.security_executions, real.quality_attempts), (1, 2, 2, 1))
+
+
+class TestSS64SiblingVerifyOnlyCapIsABudgetStop(unittest.TestCase):
+    """SS-64 sibling: during `--verify-only` a budget cap reached inside the security verifier is the run-level BUDGET
+    stop ("raise the cap"), never a stage that "could not run" to be retried when it can (INV-G.5)."""
+
+    def test_a_cap_inside_the_security_verifier_of_a_verify_only_run_is_typed_budget(self):
+        from aisef.clients.synthetic import Script, Step, SyntheticClientAdapter
+        from aisef.config import DEFAULTS, Config
+        from aisef.control.outcome import StageOutcome
+        from aisef.phases.implement import verify_only
+        case = D._Case("runTest"); case.setUp()
+        try:
+            first = D.Scenario(0, ["CHANGED"], ["BLOCK"], ["PASS"], max_retries=0, test_tool_missing=False)
+            client, out = case.run_scenario(first)                      # a frozen candidate, blocked by the reviewer
+            self.assertFalse(out.done)
+            cfg = Config({**DEFAULTS, "tools.test": "true", "tools.lint": "true", "run.max_retries": 0})
+            again = SyntheticClientAdapter(Script(review=[Step("PASS")], security=[Step("BUDGET")]))
+            res = verify_only(case.story, project=case.project, workdir=case.work, artifact_root=case.artifacts, client=again, config=cfg)
+            self.assertEqual(res.terminal, StageOutcome.BUDGET.value, res.summary())
+            self.assertIn("budget cap reached inside a verifier", res.blocked_reason)
+        finally:
+            case.tearDown()
+
+
 class TestSeed569ARegradedPositionIsNotItsOwnPredecessor(unittest.TestCase):
     """Found by differential seed 569 during F5 (2026-09-17) — a MODEL defect, the kernel was right: the model kept
     one out-of-scope flag per candidate, so when a no-op session was re-graded on the same candidate (T6') the second

@@ -6,7 +6,9 @@
  "counts": {
   "CONFIRMED": 67,
   "NEEDS_TEST": 0,
-  "NOT_A_DEFECT": 6
+  "NOT_A_DEFECT": 6,
+  "entries": 74,
+  "confirmed": 68
  },
  "entries": [
   {
@@ -991,6 +993,19 @@
    "severity_proposed": "P1",
    "reproducer": "tests/hardening/adapters/test_conformance.py::TestC13LateOutputAfterTimeout::test_claude",
    "notes": "found by the Phase 15 adapter conformance suite (recorded streams, real adapter run()) on 2026-09-16"
+  },
+  {
+   "id": "SS-64",
+   "site": "aisef/phases/implement.py::_review_stage (cap check gated on `absent`); verify-only path",
+   "family": "FAM-BUDGET",
+   "invariants": [
+    "INV-G.5"
+   ],
+   "semantic_context": "a budget cap reached inside a RETRIED verifier session was ignored once the retried review produced a verdict: `_absent_stages` is empty when a check FAILED, so the review stage's cap check (gated on absences) was skipped and the cap fell through to quality routing — a developer, a review and a security session opened past the cap",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_differential.py::TestSeed34999ACapInsideARegradedVerifierStopsTheRun",
+   "notes": "found by Phase 12 differential seed 34999 (chunk 30000, 2026-09-17); frozen record + 10 deterministic replays under closure-evidence/hardening/phase12/; sibling: the verify-only path typed the same cap UNRUNNABLE (TestSS64SiblingVerifyOnlyCapIsABudgetStop); FIXED the same day (cap precedence over absence)"
   }
  ]
 }

@@ -5,7 +5,7 @@
  "generated": "2026-09-16T10:12:06+00:00",
  "rule": "No broad speculative sweep while fixing. A sibling found during implementation is classified, assigned to an already-frozen family where it belongs, and added here with explicit provenance (commit + finding source).",
  "counts": {
-  "total": 73,
+  "total": 74,
   "by_severity": {
    "P1": 13,
    "P2": 40,
@@ -22,7 +22,7 @@
   "fixed": 16,
   "by_status": {
    "OPEN": 0,
-   "FIXED": 72,
+   "FIXED": 73,
    "SUPERSEDED": 1
   }
  },
@@ -765,6 +765,23 @@
     "status": "FIXED",
     "belongs_to_frozen_family": true,
     "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-64",
+    "family": "FAM-BUDGET",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P2",
+    "invariants": [
+     "INV-G.5"
+    ],
+    "site": "aisef/phases/implement.py::_review_stage (cap check gated on `absent`); run_verify_only path (cap typed UNRUNNABLE)",
+    "statement": "a budget cap reached inside a RETRIED verifier session is ignored when the retried review produced a verdict: `_absent_stages` is empty once a check FAILED, the review stage's cap check was gated on absences, and the cap fell through to quality routing — a developer session, a review and a security session were opened past the cap (one quality attempt charged). Sibling: during --verify-only the same cap was typed as a stage that 'could not run' (retry when it can) instead of the run-level BUDGET stop.",
+    "reproducer": "tests/hardening/test_differential.py::TestSeed34999ACapInsideARegradedVerifierStopsTheRun::test_the_model_and_the_kernel_agree_and_no_session_opens_past_the_cap",
+    "provenance": "Phase 12 differential, chunk 30000, seed 34999 (2026-09-17): frozen record closure-evidence/hardening/phase12/unexplained-34999.json, 10/10 deterministic replays; classification A (REAL KERNEL DEFECT): the model follows INV-G.5, the kernel did not",
+    "status": "FIXED",
+    "fixed_by": "Phase 12 (seed 34999) — cap precedence over absence in _review_stage and in the verify-only path, 2026-09-17",
+    "disposition_required": "FIXED / NOT_A_DEFECT with proof / SUPERSEDED",
+    "severity_note": "P2: no false PASS and no money past the cap in production (BudgetGuard refuses the paid call); the control flow deviated from INV-G.5 and one quality attempt was charged wrongly"
    }
   ],
   "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE": [
@@ -1319,5 +1336,5 @@
    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `deadlock_reason` skips attempts whose review was UNRUNNABLE"
   }
  ],
- "updated": "2026-09-16T16:26:05+00:00 @ 612efce"
+ "updated": "2026-09-16T21:50:26+00:00 @ d956249"
 }

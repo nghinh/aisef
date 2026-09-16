@@ -331,7 +331,12 @@ def run_one(seed: int) -> dict:
 
 
 def _worker(seeds: list[int]) -> list[dict]:
-    return [run_one(s) for s in seeds]
+    out = []
+    for i, s in enumerate(seeds, 1):
+        out.append(run_one(s))
+        if i % 250 == 0:                                     # Phase 12 watchdog: measurable progress per worker
+            print(f"progress worker seeds={seeds[0]}.. done={i}/{len(seeds)}", file=sys.stderr, flush=True)
+    return out
 
 
 def run_many(traces: int, workers: int = 1, start: int = 0) -> dict:
@@ -350,10 +355,12 @@ def run_many(traces: int, workers: int = 1, start: int = 0) -> dict:
     matched = [r for r in rows if not r["diff"]]
     attributed = Counter(a for r in rows if r["diff"] and r["attributed"] for a in r["attributed"][:1])
     unexplained = [r for r in rows if r["diff"] and not r["attributed"]]
+    _rows = rows
     return {"traces": traces, "workers": workers, "elapsed_s": round(elapsed, 1),
             "traces_per_s": round(traces / elapsed, 2) if elapsed else None,
             "model_transitions": sum(r["model_steps"] for r in rows),
             "real_stage_events": sum(r["real_events"] for r in rows),
+            "_rows": _rows,
             "matched": len(matched), "mismatched_attributed": dict(attributed),
             "unexplained_count": len(unexplained), "unexplained": unexplained[:100],
             "known_deviations": sorted(KNOWN), "vocabulary": {"developer": DEV, "review": REV, "security": SEC}}
@@ -371,7 +378,17 @@ def main(argv=None) -> int:
         print(json.dumps(run_one(a.seed), ensure_ascii=False, indent=1))
         return 0
     res = run_many(a.traces, a.workers, a.start)
+    rows = res.pop("_rows", [])
     Path(a.out).write_text(json.dumps(res, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    if rows:                                                 # Phase 12 integrity: one compact record per trace, beside the summary
+        with open(str(Path(a.out).with_suffix(".rows.jsonl")), "w", encoding="utf-8") as fh:
+            for r in rows:
+                fh.write(json.dumps({"seed": r["seed"], "scenario": r["scenario"], "diff": r["diff"],
+                                     "real_terminal": r["real"]["terminal"], "model_terminal": r["model"]["terminal"],
+                                     "model_events": r["model"]["events"], "real_events": r["real"]["events"][:-1],
+                                     "counts": {k: r["real"][k] for k in ("developer_sessions", "review_executions", "security_executions",
+                                                                          "quality_attempts", "infra_attempts", "candidates_frozen", "orphans_surviving")}},
+                                    ensure_ascii=False) + "\n")
     print(json.dumps({k: v for k, v in res.items() if k not in ("unexplained", "vocabulary")}, ensure_ascii=False))
     for r in res["unexplained"][:15]:
         print("UNEXPLAINED", r["seed"], r["scenario"], r["diff"])
