@@ -265,6 +265,10 @@ class _LeavesAServer(Agent):
         if spec.prompt.lstrip().startswith("# ") and not spec.prompt.lstrip().startswith("# Review") and not spec.prompt.lstrip().startswith("# Security review"):
             self.children.append(subprocess.Popen([sys.executable, "-c", "import time; time.sleep(120)"], cwd=spec.workdir,
                                                   start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
+            res = super().run(spec)
+            # an in-process session DECLARES what it started (a real adapter's tree is its process group / job object)
+            res.raw_result = {**(res.raw_result or {}), "spawned": [self.children[-1].pid]}
+            return res
         return super().run(spec)
 
 

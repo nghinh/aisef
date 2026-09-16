@@ -22,3 +22,38 @@ Rule (owner directive): **no surviving P0/P1-significant mutation is acceptable.
 with the reason, and counted separately. Nothing is left unclassified. The run is executed with no other CPU-heavy
 job on the machine (a timing failure would count as a kill and hide a survivor). Results:
 `closure-evidence/hardening/mutation-results.json`; the survivor classification is appended to this file.
+
+## Run 1 (2026-09-17, bb31522 tree, 4 workers, no other CPU-heavy job)
+
+271 mutants generated, 210 killed, 61 survived, 0 declared equivalent; 1326 s. Survivors by function: nop_deadlock 12,
+_same_complaint 8, StateStore.transition 8, reap 7, _paths_outside 5, exit_status_of 4, _verifier_budget_cap 3,
+unrunnable_reason 3, claim_is_live 3, fresh 3, deadlock_reason 2, _check_caps 2, _upstream_stale 1.
+
+Classification of run 1's survivors (every one):
+
+- **Cited-test gap, not a proof gap** — the target named test files that never reach the function; the tests that
+  do exist elsewhere and are now cited: nop_deadlock (`test_implement::TestBeTacDoKeHoachTheoNopControl`,
+  scan8a `TestSS32…`), _same_complaint (`test_same_complaint_finding.py`, `test_findings.py`), _paths_outside
+  (`test_sibling_scan::TestSS25…`), fresh (`test_evidence_schema.py`), exit_status_of (`test_stream::TestExitStatus`).
+- **Real gaps, killed by new tests** (each names the mutant's site and the invariant): `_verifier_budget_cap`
+  (a cap in EITHER verifier; lock contention is not a cap — `TestVerifierBudgetCapReadsBothVerifiers`);
+  `deadlock_reason` line 3129 (an infra attempt between two positions does not break the pair —
+  `TestDeadlockPairSurvivesAnInfraAttempt`); `claim_is_live` ×3 and `transition` ×8 (no claim is not live; an
+  orphaned claim is not live even with a term; a term-less foreign claim is not live; an unattributed write is
+  refused against a foreign live claim but not a local one; only the owner's write refreshes the term; evidence and
+  worktree survive a transition that does not name them — `TestLeaseEdges`); `reap` (SIGTERM first with a grace
+  wait, hard kill for a SIGTERM-ignoring child — `TestReapTerminatesGracefullyBeforeItKills`); `unrunnable_reason`
+  (exit 127 alone; missing manifest vs missing dependencies vs missing tool — `TestUnrunnableReasonBranches`);
+  `exit_status_of` (max_cost alone; 429 status alone and rate-limit text alone; connection text alone; permission
+  vs plain error — `TestExitStatusBranches`); `fresh` (unbound never fresh; legacy record fresh for a legacy decider,
+  with and without the file's story — `TestFreshEdges`); `_check_caps` (wall-clock cap — `TestWallClockCap`);
+  `_upstream_stale` (a gate outside the order has no upstream — `TestGatesOutsideTheOrderHaveNoUpstream`).
+- **EQUIVALENT** (declared in `validation/mutation-targets.json` with the reason): `deadlock_reason` line 3141
+  (`or`→`and` falls through to `_same_complaint(x, [])`, which returns False — the same ""); `reap` lines 120/126
+  (dropping `time.sleep` inside the deadline loop is a busy wait with the same exit condition).
+- **NOT SIGNIFICANT**: `reap` line 125 (`Lt → GtE` skips the second grace wait: the return value still filters by
+  `pid_alive`, and `survivors()` verifies afterwards — latency, never a wrong "dead"); `fresh` line 122 (the branch
+  chooses between two reason WORDINGS of the same `Freshness(False)` — control never reads the wording; the
+  Phase 16 test does assert "schema 1" in the stale reason, so this one is also expected to be killed by run 2).
+
+Run 2 (same tree + the new tests, cited): __RUN2__

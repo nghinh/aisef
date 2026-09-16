@@ -346,7 +346,9 @@ class TestAWorkspaceHeldByASurvivorIsKept(RunTestCase):
 
             def run(self, spec):
                 self.left.append(sp.Popen([sys.executable, "-c", "import time; time.sleep(60)"]))
-                return super().run(spec)
+                res = super().run(spec)
+                res.raw_result = {**(res.raw_result or {}), "spawned": [self.left[-1].pid]}   # the session declares it
+                return res
 
         agent = Leaves()
         try:

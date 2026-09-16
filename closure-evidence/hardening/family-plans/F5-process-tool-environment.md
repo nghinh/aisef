@@ -126,3 +126,13 @@ classes on the shared `ctypes.windll.kernel32`, whose per-function argument type
 Windows crashed at the reaper's first snapshot (`expected LP_PROCESSENTRY32W instance`). Fixed in the F6 commit: one
 walker (`process_owner._snapshot_win32`) behind a private `WinDLL` with explicit prototypes, used by `children_of`,
 `kill_tree` and the job object; the F6 commit's Windows job re-qualifies both families.
+
+Correction with provenance (Windows CI on bb31522, run 35129943791 — 3 failures in `tests/test_run.py`, all under
+parallel waves): `_owned_run` reaped "every new child of the harness process" after a session; under parallel waves
+a SIBLING story's `git` is a child of that process too, and on Windows git is slow enough to lose the race, so the
+reaper killed it and the sibling failed. Ownership is now POSITIVE (INV-L.1 read literally — the session's tree,
+never the harness's): a real adapter's tree is its process group / job object, reaped in
+`clients/base._stream_with_timeout`; an in-process client DECLARES what it started (`raw_result["spawned"]`), and
+exactly those are terminated, reaped and verified, a survivor typed as before. The synthetic client, the CF-11
+agent and the reaper tests declare their spawns; `children_of` / `survivors` remain as helpers. Linux never showed it
+because git finishes before the snapshot; the rule was wrong on both.

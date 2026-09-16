@@ -277,3 +277,15 @@ class TestAReservationReleaseIsRecorded(unittest.TestCase):
         why = {r["id"]: r["why"] for r in st.released}
         self.assertEqual(why, {"r-dead": "owner dead", "r-old": "term expired"})
         self.assertEqual(BudgetState.from_dict(st.to_dict() if hasattr(st, "to_dict") else __import__("dataclasses").asdict(st)).released, st.released)
+
+
+class TestWallClockCap(unittest.TestCase):
+    """Phase 13 mutants of `_check_caps`: the wall-clock cap raises only once elapsed + estimate exceeds it."""
+
+    def test_elapsed_plus_estimate_over_the_cap_raises_and_under_it_does_not(self):
+        import time
+        from aisef.control.budget import BudgetExceeded, BudgetState, _check_caps
+        st = BudgetState(cap_seconds=100.0, started_at=time.time() - 90)
+        _check_caps(st, est_usd=0.0, est_turns=0, est_seconds=5.0)
+        with self.assertRaises(BudgetExceeded):
+            _check_caps(st, est_usd=0.0, est_turns=0, est_seconds=20.0)

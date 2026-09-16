@@ -1,0 +1,5095 @@
+{
+ "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
+ "phase": 13,
+ "generated": "2026-09-17T01:06:00",
+ "targets": [
+  "aisef/control/identity.py::fresh",
+  "aisef/control/gate.py::_stale_for",
+  "aisef/control/gate.py::_latest_per_check",
+  "aisef/control/gate.py::verdict_recorded",
+  "aisef/control/closure.py::_is_ancestor",
+  "aisef/control/closure.py::probe_review_and_security",
+  "aisef/control/closure.py::probe_evidence_at_candidate",
+  "aisef/control/approvals.py::ApprovalStore.status",
+  "aisef/control/approvals.py::ApprovalStore.content_hash",
+  "aisef/control/approvals.py::ApprovalStore._upstream_stale",
+  "aisef/control/state.py::claim_is_live",
+  "aisef/control/state.py::StateStore.transition",
+  "aisef/control/budget.py::_reservation_live",
+  "aisef/control/budget.py::_check_caps",
+  "aisef/harness/ownership.py::classify",
+  "aisef/harness/process_owner.py::reap",
+  "aisef/harness/process_owner.py::survivors",
+  "aisef/phases/implement.py::deadlock_reason",
+  "aisef/phases/implement.py::_same_complaint",
+  "aisef/phases/implement.py::_paths_outside",
+  "aisef/phases/implement.py::finding_bound",
+  "aisef/phases/implement.py::Verdict.bound_blocking",
+  "aisef/phases/implement.py::structured_plan_defects",
+  "aisef/phases/implement.py::_verifier_budget_cap",
+  "aisef/phases/implement.py::_absent_stages",
+  "aisef/phases/implement.py::nop_deadlock",
+  "aisef/clients/stream.py::exit_status_of",
+  "aisef/harness/tools.py::unrunnable_reason"
+ ],
+ "operators": [
+  "CMP",
+  "NOT",
+  "ANDOR",
+  "BOOL",
+  "STR",
+  "VERDICT",
+  "INCR",
+  "RET",
+  "DROPCALL"
+ ],
+ "mutations_generated": 271,
+ "killed": 210,
+ "survived": 61,
+ "equivalent": 0,
+ "survivors": [
+  {
+   "id": "24c90b8e2b",
+   "module": "aisef/control/identity.py",
+   "function": "fresh",
+   "operator": "NOT",
+   "site": "line 122: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 4.4,
+   "last_line": ""
+  },
+  {
+   "id": "47bd4f4a36",
+   "module": "aisef/control/identity.py",
+   "function": "fresh",
+   "operator": "ANDOR",
+   "site": "line 113: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 4.4,
+   "last_line": ""
+  },
+  {
+   "id": "d683b516ed",
+   "module": "aisef/control/identity.py",
+   "function": "fresh",
+   "operator": "BOOL",
+   "site": "line 115: False → True",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 4.3,
+   "last_line": ""
+  },
+  {
+   "id": "9d973424ec",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore._upstream_stale",
+   "operator": "BOOL",
+   "site": "line 320: False → True",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 0.7,
+   "last_line": ""
+  },
+  {
+   "id": "545593fc69",
+   "module": "aisef/control/state.py",
+   "function": "claim_is_live",
+   "operator": "CMP",
+   "site": "line 194: Eq → NotEq",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py",
+    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.3,
+   "last_line": ""
+  },
+  {
+   "id": "c69eb99a2c",
+   "module": "aisef/control/state.py",
+   "function": "claim_is_live",
+   "operator": "BOOL",
+   "site": "line 186: False → True",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py",
+    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.1,
+   "last_line": ""
+  },
+  {
+   "id": "1242ed0dd8",
+   "module": "aisef/control/state.py",
+   "function": "claim_is_live",
+   "operator": "BOOL",
+   "site": "line 188: False → True",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py",
+    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.2,
+   "last_line": ""
+  },
+  {
+   "id": "ae96cedd46",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "CMP",
+   "site": "line 453: NotEq → Eq",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.0,
+   "last_line": ""
+  },
+  {
+   "id": "2ac62b01ab",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "CMP",
+   "site": "line 457: Eq → NotEq",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.2,
+   "last_line": ""
+  },
+  {
+   "id": "ea3c9070e4",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "NOT",
+   "site": "line 457: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.0,
+   "last_line": ""
+  },
+  {
+   "id": "05b4cef4fd",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "NOT",
+   "site": "line 471: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.1,
+   "last_line": ""
+  },
+  {
+   "id": "8b805aaf81",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "NOT",
+   "site": "line 473: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.0,
+   "last_line": ""
+  },
+  {
+   "id": "a96962ce8a",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "ANDOR",
+   "site": "line 453: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.2,
+   "last_line": ""
+  },
+  {
+   "id": "192e5a90e3",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "ANDOR",
+   "site": "line 456: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.0,
+   "last_line": ""
+  },
+  {
+   "id": "d3a7c8455e",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "ANDOR",
+   "site": "line 457: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.0,
+   "last_line": ""
+  },
+  {
+   "id": "be2161c91b",
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "operator": "CMP",
+   "site": "line 314: Gt → LtE",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 0.7,
+   "last_line": ""
+  },
+  {
+   "id": "4e9163fc58",
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "operator": "NOT",
+   "site": "line 314: negate if-condition",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 0.6,
+   "last_line": ""
+  },
+  {
+   "id": "6597155f10",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "CMP",
+   "site": "line 119: Lt → GtE",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 3.2,
+   "last_line": ""
+  },
+  {
+   "id": "bdb6f16992",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "CMP",
+   "site": "line 125: Lt → GtE",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 3.1,
+   "last_line": ""
+  },
+  {
+   "id": "0f233ecf10",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "NOT",
+   "site": "line 122: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 5.4,
+   "last_line": ""
+  },
+  {
+   "id": "cf30c84bb8",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "DROPCALL",
+   "site": "line 117: drop call _terminate(...)",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 5.2,
+   "last_line": ""
+  },
+  {
+   "id": "a328285194",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "DROPCALL",
+   "site": "line 120: drop call time.sleep(...)",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 5.1,
+   "last_line": ""
+  },
+  {
+   "id": "445a21a4e9",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "DROPCALL",
+   "site": "line 123: drop call _terminate(...)",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 5.3,
+   "last_line": ""
+  },
+  {
+   "id": "6365821dcd",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "DROPCALL",
+   "site": "line 126: drop call time.sleep(...)",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 5.2,
+   "last_line": ""
+  },
+  {
+   "id": "76f145ab0f",
+   "module": "aisef/phases/implement.py",
+   "function": "deadlock_reason",
+   "operator": "ANDOR",
+   "site": "line 3129: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 23.4,
+   "last_line": ""
+  },
+  {
+   "id": "e549affe13",
+   "module": "aisef/phases/implement.py",
+   "function": "deadlock_reason",
+   "operator": "ANDOR",
+   "site": "line 3141: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 22.5,
+   "last_line": ""
+  },
+  {
+   "id": "990ae2056c",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "CMP",
+   "site": "line 3185: Lt → GtE",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.3,
+   "last_line": ""
+  },
+  {
+   "id": "cbb4eee2e8",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "CMP",
+   "site": "line 3187: GtE → Lt",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.1,
+   "last_line": ""
+  },
+  {
+   "id": "bb2de60b03",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "NOT",
+   "site": "line 3180: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.7,
+   "last_line": ""
+  },
+  {
+   "id": "c1a75443f6",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "NOT",
+   "site": "line 3185: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.2,
+   "last_line": ""
+  },
+  {
+   "id": "1fd98c125d",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "NOT",
+   "site": "line 3187: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.4,
+   "last_line": ""
+  },
+  {
+   "id": "fed654c05c",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "ANDOR",
+   "site": "line 3180: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.2,
+   "last_line": ""
+  },
+  {
+   "id": "f6301fa81c",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "BOOL",
+   "site": "line 3183: True → False",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.1,
+   "last_line": ""
+  },
+  {
+   "id": "9d7fb090a5",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "BOOL",
+   "site": "line 3188: True → False",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.1,
+   "last_line": ""
+  },
+  {
+   "id": "a0761e309f",
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "operator": "CMP",
+   "site": "line 3254: NotIn → In",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.2,
+   "last_line": ""
+  },
+  {
+   "id": "c6c29aadbf",
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "operator": "CMP",
+   "site": "line 3254: NotIn → In",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.8,
+   "last_line": ""
+  },
+  {
+   "id": "b154c50df1",
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "operator": "ANDOR",
+   "site": "line 3250: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.4,
+   "last_line": ""
+  },
+  {
+   "id": "c2a08aabcc",
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "operator": "ANDOR",
+   "site": "line 3254: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.9,
+   "last_line": ""
+  },
+  {
+   "id": "5098222703",
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "operator": "ANDOR",
+   "site": "line 3254: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.6,
+   "last_line": ""
+  },
+  {
+   "id": "77ade90fd6",
+   "module": "aisef/phases/implement.py",
+   "function": "_verifier_budget_cap",
+   "operator": "CMP",
+   "site": "line 3016: NotIn → In",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 20.6,
+   "last_line": ""
+  },
+  {
+   "id": "6b06220bd7",
+   "module": "aisef/phases/implement.py",
+   "function": "_verifier_budget_cap",
+   "operator": "ANDOR",
+   "site": "line 3015: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 20.5,
+   "last_line": ""
+  },
+  {
+   "id": "a218501c76",
+   "module": "aisef/phases/implement.py",
+   "function": "_verifier_budget_cap",
+   "operator": "ANDOR",
+   "site": "line 3015: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 20.6,
+   "last_line": ""
+  },
+  {
+   "id": "6456d5a0e4",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "CMP",
+   "site": "line 3068: IsNot → Is",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.7,
+   "last_line": ""
+  },
+  {
+   "id": "4c24ed83a8",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "CMP",
+   "site": "line 3073: Eq → NotEq",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 20.0,
+   "last_line": ""
+  },
+  {
+   "id": "a54dfdd27b",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "CMP",
+   "site": "line 3077: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.6,
+   "last_line": ""
+  },
+  {
+   "id": "44636024c5",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "CMP",
+   "site": "line 3084: GtE → Lt",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.9,
+   "last_line": ""
+  },
+  {
+   "id": "d041cf14c0",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "CMP",
+   "site": "line 3084: Eq → NotEq",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.9,
+   "last_line": ""
+  },
+  {
+   "id": "2d88620440",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "CMP",
+   "site": "line 3086: GtE → Lt",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.6,
+   "last_line": ""
+  },
+  {
+   "id": "49f78c931f",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "NOT",
+   "site": "line 3077: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.7,
+   "last_line": ""
+  },
+  {
+   "id": "d3613c1a11",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "NOT",
+   "site": "line 3084: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.3,
+   "last_line": ""
+  },
+  {
+   "id": "c72ac1c734",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "NOT",
+   "site": "line 3086: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.8,
+   "last_line": ""
+  },
+  {
+   "id": "d75dbd8a82",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "ANDOR",
+   "site": "line 3068: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.8,
+   "last_line": ""
+  },
+  {
+   "id": "7ad904c0b5",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "ANDOR",
+   "site": "line 3076: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.6,
+   "last_line": ""
+  },
+  {
+   "id": "65112ae536",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "ANDOR",
+   "site": "line 3084: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 21.7,
+   "last_line": ""
+  },
+  {
+   "id": "3a2f07afc8",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "CMP",
+   "site": "line 250: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 12.5,
+   "last_line": ""
+  },
+  {
+   "id": "49c858c21e",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "NOT",
+   "site": "line 254: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 12.3,
+   "last_line": ""
+  },
+  {
+   "id": "c7a9b688b7",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "ANDOR",
+   "site": "line 224: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 12.7,
+   "last_line": ""
+  },
+  {
+   "id": "85472cd16f",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "ANDOR",
+   "site": "line 244: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 12.7,
+   "last_line": ""
+  },
+  {
+   "id": "d64e58dccb",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "CMP",
+   "site": "line 358: NotEq → Eq",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 3.1,
+   "last_line": ""
+  },
+  {
+   "id": "dd051aabe0",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "CMP",
+   "site": "line 364: In → NotIn",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 3.0,
+   "last_line": ""
+  },
+  {
+   "id": "5b479bdc93",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "ANDOR",
+   "site": "line 370: and ↔ or",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 3.0,
+   "last_line": ""
+  }
+ ],
+ "elapsed_s": 1326.4,
+ "workers": 4,
+ "rows": [
+  {
+   "id": "c905ceedb8",
+   "module": "aisef/control/identity.py",
+   "function": "fresh",
+   "operator": "CMP",
+   "site": "line 121: NotEq → Eq",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 3.4,
+   "last_line": "1 failed in 3.03s"
+  },
+  {
+   "id": "10380b9f12",
+   "module": "aisef/control/identity.py",
+   "function": "fresh",
+   "operator": "NOT",
+   "site": "line 114: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 3.4,
+   "last_line": "1 failed in 3.03s"
+  },
+  {
+   "id": "c25572146f",
+   "module": "aisef/control/identity.py",
+   "function": "fresh",
+   "operator": "NOT",
+   "site": "line 118: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.5,
+   "last_line": "1 failed, 1 passed in 4.14s"
+  },
+  {
+   "id": "fa35b0cfbd",
+   "module": "aisef/control/identity.py",
+   "function": "fresh",
+   "operator": "NOT",
+   "site": "line 121: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 3.4,
+   "last_line": "1 failed in 3.03s"
+  },
+  {
+   "id": "24c90b8e2b",
+   "module": "aisef/control/identity.py",
+   "function": "fresh",
+   "operator": "NOT",
+   "site": "line 122: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 4.4,
+   "last_line": ""
+  },
+  {
+   "id": "47bd4f4a36",
+   "module": "aisef/control/identity.py",
+   "function": "fresh",
+   "operator": "ANDOR",
+   "site": "line 113: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 4.4,
+   "last_line": ""
+  },
+  {
+   "id": "d683b516ed",
+   "module": "aisef/control/identity.py",
+   "function": "fresh",
+   "operator": "BOOL",
+   "site": "line 115: False → True",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 4.3,
+   "last_line": ""
+  },
+  {
+   "id": "db523fd880",
+   "module": "aisef/control/identity.py",
+   "function": "fresh",
+   "operator": "BOOL",
+   "site": "line 123: False → True",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.4,
+   "last_line": "1 failed, 2 passed in 4.13s"
+  },
+  {
+   "id": "52c2cab38f",
+   "module": "aisef/control/identity.py",
+   "function": "fresh",
+   "operator": "BOOL",
+   "site": "line 124: False → True",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.0,
+   "last_line": "1 failed, 1 passed in 3.79s"
+  },
+  {
+   "id": "f0835eecc7",
+   "module": "aisef/control/identity.py",
+   "function": "fresh",
+   "operator": "BOOL",
+   "site": "line 125: True → False",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 3.0,
+   "last_line": "1 failed in 2.79s"
+  },
+  {
+   "id": "72ca02833e",
+   "module": "aisef/control/gate.py",
+   "function": "_stale_for",
+   "operator": "CMP",
+   "site": "line 162: IsNot → Is",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.4,
+   "last_line": "1 failed in 2.20s"
+  },
+  {
+   "id": "75d3a7d769",
+   "module": "aisef/control/gate.py",
+   "function": "_stale_for",
+   "operator": "NOT",
+   "site": "line 160: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.2,
+   "last_line": "1 failed, 2 passed in 3.97s"
+  },
+  {
+   "id": "c89459e374",
+   "module": "aisef/control/gate.py",
+   "function": "_stale_for",
+   "operator": "NOT",
+   "site": "line 162: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.5,
+   "last_line": "1 failed in 2.23s"
+  },
+  {
+   "id": "33570e3fec",
+   "module": "aisef/control/gate.py",
+   "function": "_latest_per_check",
+   "operator": "CMP",
+   "site": "line 252: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.4,
+   "last_line": "1 failed, 1 passed in 4.15s"
+  },
+  {
+   "id": "ce14d44746",
+   "module": "aisef/control/gate.py",
+   "function": "_latest_per_check",
+   "operator": "CMP",
+   "site": "line 255: IsNot → Is",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.4,
+   "last_line": "1 failed, 39 passed in 4.12s"
+  },
+  {
+   "id": "bf1638e169",
+   "module": "aisef/control/gate.py",
+   "function": "_latest_per_check",
+   "operator": "CMP",
+   "site": "line 256: NotEq → Eq",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.3,
+   "last_line": "1 failed, 39 passed in 4.07s"
+  },
+  {
+   "id": "9c6f9d12e3",
+   "module": "aisef/control/gate.py",
+   "function": "_latest_per_check",
+   "operator": "CMP",
+   "site": "line 257: NotIn → In",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.3,
+   "last_line": "1 failed, 39 passed in 4.05s"
+  },
+  {
+   "id": "0394d55e0f",
+   "module": "aisef/control/gate.py",
+   "function": "_latest_per_check",
+   "operator": "CMP",
+   "site": "line 257: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.3,
+   "last_line": "1 failed, 40 passed in 4.06s"
+  },
+  {
+   "id": "bad47e9b63",
+   "module": "aisef/control/gate.py",
+   "function": "_latest_per_check",
+   "operator": "NOT",
+   "site": "line 252: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.4,
+   "last_line": "1 failed, 1 passed in 4.13s"
+  },
+  {
+   "id": "f038d5994f",
+   "module": "aisef/control/gate.py",
+   "function": "_latest_per_check",
+   "operator": "NOT",
+   "site": "line 255: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.2,
+   "last_line": "1 failed, 2 passed in 3.96s"
+  },
+  {
+   "id": "503f19b41a",
+   "module": "aisef/control/gate.py",
+   "function": "_latest_per_check",
+   "operator": "ANDOR",
+   "site": "line 252: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.4,
+   "last_line": "1 failed, 1 passed in 4.14s"
+  },
+  {
+   "id": "53ee81f53f",
+   "module": "aisef/control/gate.py",
+   "function": "_latest_per_check",
+   "operator": "ANDOR",
+   "site": "line 257: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.3,
+   "last_line": "1 failed, 39 passed in 4.10s"
+  },
+  {
+   "id": "f28bdbfb4d",
+   "module": "aisef/control/gate.py",
+   "function": "_latest_per_check",
+   "operator": "ANDOR",
+   "site": "line 255: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.3,
+   "last_line": "1 failed, 2 passed in 4.02s"
+  },
+  {
+   "id": "79ddfd39cc",
+   "module": "aisef/control/gate.py",
+   "function": "verdict_recorded",
+   "operator": "CMP",
+   "site": "line 181: Is → IsNot",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.7,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.48s"
+  },
+  {
+   "id": "a55e65e0f8",
+   "module": "aisef/control/gate.py",
+   "function": "verdict_recorded",
+   "operator": "NOT",
+   "site": "line 181: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.8,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.57s"
+  },
+  {
+   "id": "b9ac456f54",
+   "module": "aisef/control/gate.py",
+   "function": "verdict_recorded",
+   "operator": "NOT",
+   "site": "line 184: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 3.0,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.71s"
+  },
+  {
+   "id": "068f6cf42e",
+   "module": "aisef/control/gate.py",
+   "function": "verdict_recorded",
+   "operator": "NOT",
+   "site": "line 186: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 3.0,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.75s"
+  },
+  {
+   "id": "cc1fd55cb4",
+   "module": "aisef/control/gate.py",
+   "function": "verdict_recorded",
+   "operator": "ANDOR",
+   "site": "line 186: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.8,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.56s"
+  },
+  {
+   "id": "6d0298057a",
+   "module": "aisef/control/gate.py",
+   "function": "verdict_recorded",
+   "operator": "ANDOR",
+   "site": "line 188: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.1,
+   "last_line": "1 failed in 0.82s"
+  },
+  {
+   "id": "8941a571cb",
+   "module": "aisef/control/gate.py",
+   "function": "verdict_recorded",
+   "operator": "BOOL",
+   "site": "line 182: False → True",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.8,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.58s"
+  },
+  {
+   "id": "022c5e7395",
+   "module": "aisef/control/gate.py",
+   "function": "verdict_recorded",
+   "operator": "BOOL",
+   "site": "line 185: False → True",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.8,
+   "last_line": "1 failed in 0.52s"
+  },
+  {
+   "id": "f2c9c6c6aa",
+   "module": "aisef/control/gate.py",
+   "function": "verdict_recorded",
+   "operator": "BOOL",
+   "site": "line 187: False → True",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 3.0,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.71s"
+  },
+  {
+   "id": "aa3eb063c6",
+   "module": "aisef/control/gate.py",
+   "function": "verdict_recorded",
+   "operator": "RET",
+   "site": "line 188: return X → return not X",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.8,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.58s"
+  },
+  {
+   "id": "c9cf87a50e",
+   "module": "aisef/control/closure.py",
+   "function": "_is_ancestor",
+   "operator": "CMP",
+   "site": "line 141: Eq → NotEq",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.0,
+   "last_line": "1 failed in 0.76s"
+  },
+  {
+   "id": "e94b5c7be0",
+   "module": "aisef/control/closure.py",
+   "function": "_is_ancestor",
+   "operator": "BOOL",
+   "site": "line 138: False → True",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 3.0,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.73s"
+  },
+  {
+   "id": "d8623217d8",
+   "module": "aisef/control/closure.py",
+   "function": "_is_ancestor",
+   "operator": "BOOL",
+   "site": "line 140: False → True",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 3.0,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.75s"
+  },
+  {
+   "id": "df1bb5f303",
+   "module": "aisef/control/closure.py",
+   "function": "_is_ancestor",
+   "operator": "RET",
+   "site": "line 141: return X → return not X",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.0,
+   "last_line": "1 failed in 0.76s"
+  },
+  {
+   "id": "90cfb00cca",
+   "module": "aisef/control/closure.py",
+   "function": "probe_review_and_security",
+   "operator": "CMP",
+   "site": "line 771: Is → IsNot",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.8,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.54s"
+  },
+  {
+   "id": "db74573fd9",
+   "module": "aisef/control/closure.py",
+   "function": "probe_review_and_security",
+   "operator": "NOT",
+   "site": "line 771: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.8,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.58s"
+  },
+  {
+   "id": "51d75e45f1",
+   "module": "aisef/control/closure.py",
+   "function": "probe_review_and_security",
+   "operator": "NOT",
+   "site": "line 775: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.9,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.64s"
+  },
+  {
+   "id": "04215a2165",
+   "module": "aisef/control/closure.py",
+   "function": "probe_review_and_security",
+   "operator": "NOT",
+   "site": "line 782: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.9,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.58s"
+  },
+  {
+   "id": "1844eef554",
+   "module": "aisef/control/closure.py",
+   "function": "probe_review_and_security",
+   "operator": "NOT",
+   "site": "line 788: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.9,
+   "last_line": "1 failed in 0.63s"
+  },
+  {
+   "id": "56561beeb5",
+   "module": "aisef/control/closure.py",
+   "function": "probe_review_and_security",
+   "operator": "ANDOR",
+   "site": "line 784: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.8,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.56s"
+  },
+  {
+   "id": "5951e211c2",
+   "module": "aisef/control/closure.py",
+   "function": "probe_review_and_security",
+   "operator": "STR",
+   "site": "line 780: 'review' → 'security'",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.9,
+   "last_line": "1 failed in 0.67s"
+  },
+  {
+   "id": "1c6d9a4e72",
+   "module": "aisef/control/closure.py",
+   "function": "probe_review_and_security",
+   "operator": "VERDICT",
+   "site": "line 772: .UNRUNNABLE → .FAILED",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.8,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.59s"
+  },
+  {
+   "id": "ca2b7233f8",
+   "module": "aisef/control/closure.py",
+   "function": "probe_review_and_security",
+   "operator": "VERDICT",
+   "site": "line 776: .UNRUNNABLE → .FAILED",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.9,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.62s"
+  },
+  {
+   "id": "4f229f766d",
+   "module": "aisef/control/closure.py",
+   "function": "probe_review_and_security",
+   "operator": "VERDICT",
+   "site": "line 789: .FAILED → .PASSED",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.9,
+   "last_line": "1 failed in 0.67s"
+  },
+  {
+   "id": "ea32699dd5",
+   "module": "aisef/control/closure.py",
+   "function": "probe_review_and_security",
+   "operator": "VERDICT",
+   "site": "line 792: .PASSED → .FAILED",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.9,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.63s"
+  },
+  {
+   "id": "620f9a5c30",
+   "module": "aisef/control/closure.py",
+   "function": "probe_review_and_security",
+   "operator": "DROPCALL",
+   "site": "line 786: drop call gaps.append(...)",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.9,
+   "last_line": "1 failed in 0.66s"
+  },
+  {
+   "id": "a0471547e1",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "CMP",
+   "site": "line 809: Is → IsNot",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.9,
+   "last_line": "1 failed in 0.67s"
+  },
+  {
+   "id": "f5a149a4b7",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "NOT",
+   "site": "line 809: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.9,
+   "last_line": "1 failed in 0.68s"
+  },
+  {
+   "id": "f9c6db3969",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "NOT",
+   "site": "line 812: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.9,
+   "last_line": "1 failed in 0.66s"
+  },
+  {
+   "id": "41acf76c1c",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "NOT",
+   "site": "line 815: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.0,
+   "last_line": "1 failed in 0.69s"
+  },
+  {
+   "id": "1d6f05a3ab",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "NOT",
+   "site": "line 822: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.9,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.60s"
+  },
+  {
+   "id": "ddf33ba931",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "NOT",
+   "site": "line 826: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.9,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.62s"
+  },
+  {
+   "id": "4a88f80c8b",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "NOT",
+   "site": "line 828: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.0,
+   "last_line": "1 failed in 0.73s"
+  },
+  {
+   "id": "6860c8a1a5",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "NOT",
+   "site": "line 832: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.0,
+   "last_line": "1 failed in 0.69s"
+  },
+  {
+   "id": "5740ca5737",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "VERDICT",
+   "site": "line 810: .UNRUNNABLE → .FAILED",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.9,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.69s"
+  },
+  {
+   "id": "62c23f1868",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "VERDICT",
+   "site": "line 813: .UNRUNNABLE → .FAILED",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 2.9,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.67s"
+  },
+  {
+   "id": "1dc06468c1",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "VERDICT",
+   "site": "line 816: .UNRUNNABLE → .FAILED",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 3.0,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.73s"
+  },
+  {
+   "id": "3a2be6af10",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "VERDICT",
+   "site": "line 833: .FAILED → .PASSED",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.0,
+   "last_line": "1 failed in 0.73s"
+  },
+  {
+   "id": "9944f5e807",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "VERDICT",
+   "site": "line 835: .PASSED → .FAILED",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 3.0,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.74s"
+  },
+  {
+   "id": "9835156290",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "DROPCALL",
+   "site": "line 823: drop call problems.append(...)",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 3.0,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.73s"
+  },
+  {
+   "id": "8d410f2d04",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "DROPCALL",
+   "site": "line 827: drop call problems.append(...)",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 3.0,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.70s"
+  },
+  {
+   "id": "1707185810",
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "operator": "DROPCALL",
+   "site": "line 829: drop call problems.append(...)",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.0,
+   "last_line": "1 failed in 0.76s"
+  },
+  {
+   "id": "68f89f5f25",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.status",
+   "operator": "CMP",
+   "site": "line 302: Is → IsNot",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/hardening/test_compound_faults.py::TestCF13OwnerArbitrationIsAnEpoch",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed in 0.33s"
+  },
+  {
+   "id": "5be82c3249",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.status",
+   "operator": "CMP",
+   "site": "line 304: Eq → NotEq",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/hardening/test_compound_faults.py::TestCF13OwnerArbitrationIsAnEpoch",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed in 0.32s"
+  },
+  {
+   "id": "edf8ecdf0f",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.status",
+   "operator": "CMP",
+   "site": "line 306: NotEq → Eq",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/hardening/test_compound_faults.py::TestCF13OwnerArbitrationIsAnEpoch",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed in 0.35s"
+  },
+  {
+   "id": "a2aa13d3a2",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.status",
+   "operator": "CMP",
+   "site": "line 309: NotEq → Eq",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/hardening/test_compound_faults.py::TestCF13OwnerArbitrationIsAnEpoch",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed in 0.33s"
+  },
+  {
+   "id": "bc8b3ada72",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.status",
+   "operator": "NOT",
+   "site": "line 302: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/hardening/test_compound_faults.py::TestCF13OwnerArbitrationIsAnEpoch",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed in 0.32s"
+  },
+  {
+   "id": "d68c68b1c1",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.status",
+   "operator": "NOT",
+   "site": "line 304: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/hardening/test_compound_faults.py::TestCF13OwnerArbitrationIsAnEpoch",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed in 0.31s"
+  },
+  {
+   "id": "cd48df0cd4",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.status",
+   "operator": "NOT",
+   "site": "line 306: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/hardening/test_compound_faults.py::TestCF13OwnerArbitrationIsAnEpoch",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed in 0.32s"
+  },
+  {
+   "id": "3ce9a3c9b9",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.status",
+   "operator": "NOT",
+   "site": "line 309: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/hardening/test_compound_faults.py::TestCF13OwnerArbitrationIsAnEpoch",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed in 0.38s"
+  },
+  {
+   "id": "229f7c25e5",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.status",
+   "operator": "NOT",
+   "site": "line 311: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/hardening/test_compound_faults.py::TestCF13OwnerArbitrationIsAnEpoch",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.9,
+   "last_line": "1 failed, 3 passed in 0.63s"
+  },
+  {
+   "id": "156cd58996",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.status",
+   "operator": "NOT",
+   "site": "line 313: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/hardening/test_compound_faults.py::TestCF13OwnerArbitrationIsAnEpoch",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed in 0.33s"
+  },
+  {
+   "id": "91147d9032",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.content_hash",
+   "operator": "CMP",
+   "site": "line 270: Is → IsNot",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS54RepairStoriesAreCoveredByAnApproval",
+    "tests/hardening/scan8a/test_group_d.py::TestSS55GateConfigIsBoundByReadiness",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed, 1 passed in 0.29s"
+  },
+  {
+   "id": "8ba15c345d",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.content_hash",
+   "operator": "CMP",
+   "site": "line 272: Is → IsNot",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS54RepairStoriesAreCoveredByAnApproval",
+    "tests/hardening/scan8a/test_group_d.py::TestSS55GateConfigIsBoundByReadiness",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 22 passed in 0.37s"
+  },
+  {
+   "id": "0444071ce1",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.content_hash",
+   "operator": "NOT",
+   "site": "line 270: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS54RepairStoriesAreCoveredByAnApproval",
+    "tests/hardening/scan8a/test_group_d.py::TestSS55GateConfigIsBoundByReadiness",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 1 passed in 0.37s"
+  },
+  {
+   "id": "c4e3d61a86",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.content_hash",
+   "operator": "NOT",
+   "site": "line 272: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS54RepairStoriesAreCoveredByAnApproval",
+    "tests/hardening/scan8a/test_group_d.py::TestSS55GateConfigIsBoundByReadiness",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "1 failed, 22 passed in 0.41s"
+  },
+  {
+   "id": "ef7ef8b763",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.content_hash",
+   "operator": "DROPCALL",
+   "site": "line 271: drop call parts.append(...)",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS54RepairStoriesAreCoveredByAnApproval",
+    "tests/hardening/scan8a/test_group_d.py::TestSS55GateConfigIsBoundByReadiness",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 1 passed in 0.29s"
+  },
+  {
+   "id": "6c0027f851",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.content_hash",
+   "operator": "DROPCALL",
+   "site": "line 273: drop call parts.append(...)",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS54RepairStoriesAreCoveredByAnApproval",
+    "tests/hardening/scan8a/test_group_d.py::TestSS55GateConfigIsBoundByReadiness",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed in 0.33s"
+  },
+  {
+   "id": "ea7dbe3427",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore._upstream_stale",
+   "operator": "CMP",
+   "site": "line 319: NotIn → In",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed in 0.32s"
+  },
+  {
+   "id": "accb243e9d",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore._upstream_stale",
+   "operator": "CMP",
+   "site": "line 322: Is → IsNot",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed in 0.32s"
+  },
+  {
+   "id": "535a33bc20",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore._upstream_stale",
+   "operator": "NOT",
+   "site": "line 319: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "1 failed in 0.39s"
+  },
+  {
+   "id": "9d973424ec",
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore._upstream_stale",
+   "operator": "BOOL",
+   "site": "line 320: False → True",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/test_approvals.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 0.7,
+   "last_line": ""
+  },
+  {
+   "id": "0615046fa8",
+   "module": "aisef/control/state.py",
+   "function": "claim_is_live",
+   "operator": "CMP",
+   "site": "line 190: Gt → LtE",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py",
+    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 5 passed in 0.33s"
+  },
+  {
+   "id": "545593fc69",
+   "module": "aisef/control/state.py",
+   "function": "claim_is_live",
+   "operator": "CMP",
+   "site": "line 194: Eq → NotEq",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py",
+    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.3,
+   "last_line": ""
+  },
+  {
+   "id": "3305f61567",
+   "module": "aisef/control/state.py",
+   "function": "claim_is_live",
+   "operator": "NOT",
+   "site": "line 185: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py",
+    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 5 passed in 0.34s"
+  },
+  {
+   "id": "d066049ccf",
+   "module": "aisef/control/state.py",
+   "function": "claim_is_live",
+   "operator": "NOT",
+   "site": "line 187: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py",
+    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 5 passed in 0.36s"
+  },
+  {
+   "id": "b019ff5f22",
+   "module": "aisef/control/state.py",
+   "function": "claim_is_live",
+   "operator": "NOT",
+   "site": "line 189: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py",
+    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.8,
+   "last_line": "1 failed, 6 passed in 0.37s"
+  },
+  {
+   "id": "40d7fe1e73",
+   "module": "aisef/control/state.py",
+   "function": "claim_is_live",
+   "operator": "ANDOR",
+   "site": "line 194: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py",
+    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.1,
+   "last_line": "1 failed, 56 passed in 0.85s"
+  },
+  {
+   "id": "c69eb99a2c",
+   "module": "aisef/control/state.py",
+   "function": "claim_is_live",
+   "operator": "BOOL",
+   "site": "line 186: False → True",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py",
+    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.1,
+   "last_line": ""
+  },
+  {
+   "id": "1242ed0dd8",
+   "module": "aisef/control/state.py",
+   "function": "claim_is_live",
+   "operator": "BOOL",
+   "site": "line 188: False → True",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py",
+    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.2,
+   "last_line": ""
+  },
+  {
+   "id": "2dd23458d3",
+   "module": "aisef/control/state.py",
+   "function": "claim_is_live",
+   "operator": "RET",
+   "site": "line 190: return X → return not X",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py",
+    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 5 passed in 0.35s"
+  },
+  {
+   "id": "2076572db9",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "CMP",
+   "site": "line 445: Is → IsNot",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.8,
+   "last_line": "1 failed, 13 passed in 0.59s"
+  },
+  {
+   "id": "1ddbdf333c",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "CMP",
+   "site": "line 450: IsNot → Is",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.8,
+   "last_line": "1 failed, 15 passed in 0.50s"
+  },
+  {
+   "id": "ddb7286e43",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "CMP",
+   "site": "line 450: NotIn → In",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.8,
+   "last_line": "1 failed, 13 passed in 0.53s"
+  },
+  {
+   "id": "4251a1acd8",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "CMP",
+   "site": "line 452: NotEq → Eq",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "1 failed, 6 passed in 0.34s"
+  },
+  {
+   "id": "ae96cedd46",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "CMP",
+   "site": "line 453: NotEq → Eq",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.0,
+   "last_line": ""
+  },
+  {
+   "id": "2ac62b01ab",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "CMP",
+   "site": "line 457: Eq → NotEq",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.2,
+   "last_line": ""
+  },
+  {
+   "id": "a59e1ec8ab",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "NOT",
+   "site": "line 445: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "1 failed, 13 passed in 0.48s"
+  },
+  {
+   "id": "c64e554c5a",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "NOT",
+   "site": "line 450: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.8,
+   "last_line": "1 failed, 13 passed in 0.49s"
+  },
+  {
+   "id": "f2bd31d156",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "NOT",
+   "site": "line 452: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 6 passed in 0.34s"
+  },
+  {
+   "id": "ea3c9070e4",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "NOT",
+   "site": "line 457: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.0,
+   "last_line": ""
+  },
+  {
+   "id": "34a014a0f7",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "NOT",
+   "site": "line 460: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "1 failed, 13 passed in 0.46s"
+  },
+  {
+   "id": "896c9ab228",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "NOT",
+   "site": "line 465: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.9,
+   "last_line": "1 failed, 14 passed in 0.63s"
+  },
+  {
+   "id": "4cb4f1b7a5",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "NOT",
+   "site": "line 467: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.8,
+   "last_line": "1 failed, 16 passed in 0.56s"
+  },
+  {
+   "id": "059cc9d759",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "NOT",
+   "site": "line 469: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "1 failed, 16 passed in 0.49s"
+  },
+  {
+   "id": "05b4cef4fd",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "NOT",
+   "site": "line 471: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.1,
+   "last_line": ""
+  },
+  {
+   "id": "8b805aaf81",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "NOT",
+   "site": "line 473: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.0,
+   "last_line": ""
+  },
+  {
+   "id": "842c8d0b03",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "ANDOR",
+   "site": "line 450: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.8,
+   "last_line": "1 failed, 13 passed in 0.56s"
+  },
+  {
+   "id": "a96962ce8a",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "ANDOR",
+   "site": "line 453: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.2,
+   "last_line": ""
+  },
+  {
+   "id": "9b9d894d1f",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "ANDOR",
+   "site": "line 452: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "1 failed, 13 passed in 0.48s"
+  },
+  {
+   "id": "192e5a90e3",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "ANDOR",
+   "site": "line 456: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.0,
+   "last_line": ""
+  },
+  {
+   "id": "d3a7c8455e",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "ANDOR",
+   "site": "line 457: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 1.0,
+   "last_line": ""
+  },
+  {
+   "id": "60061c7068",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "INCR",
+   "site": "line 461: += n → += 0 (no increment)",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "1 failed, 13 passed in 0.41s"
+  },
+  {
+   "id": "e744f9af8d",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "INCR",
+   "site": "line 468: += n → += 0 (no increment)",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.8,
+   "last_line": "1 failed, 16 passed in 0.58s"
+  },
+  {
+   "id": "8a19a4fa3a",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "operator": "INCR",
+   "site": "line 470: += n → += 0 (no increment)",
+   "kills_expected_by": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 16 passed in 0.40s"
+  },
+  {
+   "id": "7a680faec0",
+   "module": "aisef/control/budget.py",
+   "function": "_reservation_live",
+   "operator": "CMP",
+   "site": "line 276: Gt → LtE",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed, 20 passed in 0.31s"
+  },
+  {
+   "id": "540b6e188c",
+   "module": "aisef/control/budget.py",
+   "function": "_reservation_live",
+   "operator": "NOT",
+   "site": "line 273: negate if-condition",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 9 passed in 0.28s"
+  },
+  {
+   "id": "db3471ec2c",
+   "module": "aisef/control/budget.py",
+   "function": "_reservation_live",
+   "operator": "ANDOR",
+   "site": "line 272: and ↔ or",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 20 passed in 0.37s"
+  },
+  {
+   "id": "6628bc02e4",
+   "module": "aisef/control/budget.py",
+   "function": "_reservation_live",
+   "operator": "ANDOR",
+   "site": "line 273: and ↔ or",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 20 passed in 0.33s"
+  },
+  {
+   "id": "f875a65630",
+   "module": "aisef/control/budget.py",
+   "function": "_reservation_live",
+   "operator": "ANDOR",
+   "site": "line 275: and ↔ or",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed, 9 passed in 0.29s"
+  },
+  {
+   "id": "bb746a087b",
+   "module": "aisef/control/budget.py",
+   "function": "_reservation_live",
+   "operator": "ANDOR",
+   "site": "line 276: and ↔ or",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed, 9 passed in 0.29s"
+  },
+  {
+   "id": "00b0ae95cb",
+   "module": "aisef/control/budget.py",
+   "function": "_reservation_live",
+   "operator": "BOOL",
+   "site": "line 274: False → True",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 20 passed in 0.40s"
+  },
+  {
+   "id": "d65baddba2",
+   "module": "aisef/control/budget.py",
+   "function": "_reservation_live",
+   "operator": "RET",
+   "site": "line 276: return X → return not X",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed, 9 passed in 0.28s"
+  },
+  {
+   "id": "6cdbb276dd",
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "operator": "CMP",
+   "site": "line 301: Gt → LtE",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed in 0.28s"
+  },
+  {
+   "id": "9e6d9fe260",
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "operator": "CMP",
+   "site": "line 307: Gt → LtE",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed, 4 passed in 0.29s"
+  },
+  {
+   "id": "be2161c91b",
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "operator": "CMP",
+   "site": "line 314: Gt → LtE",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 0.7,
+   "last_line": ""
+  },
+  {
+   "id": "31a2eab978",
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "operator": "NOT",
+   "site": "line 300: negate if-condition",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed in 0.27s"
+  },
+  {
+   "id": "c79a452b0e",
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "operator": "NOT",
+   "site": "line 301: negate if-condition",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed in 0.28s"
+  },
+  {
+   "id": "ec62f14551",
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "operator": "NOT",
+   "site": "line 306: negate if-condition",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed in 0.29s"
+  },
+  {
+   "id": "2c3b751299",
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "operator": "NOT",
+   "site": "line 307: negate if-condition",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed, 4 passed in 0.31s"
+  },
+  {
+   "id": "bb4402363d",
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "operator": "NOT",
+   "site": "line 312: negate if-condition",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed in 0.28s"
+  },
+  {
+   "id": "4e9163fc58",
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "operator": "NOT",
+   "site": "line 314: negate if-condition",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 0.6,
+   "last_line": ""
+  },
+  {
+   "id": "4b89b9d1cb",
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "operator": "ANDOR",
+   "site": "line 298: and ↔ or",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed, 9 passed in 0.29s"
+  },
+  {
+   "id": "27599a6a93",
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "operator": "ANDOR",
+   "site": "line 299: and ↔ or",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "1 failed, 10 passed in 0.45s"
+  },
+  {
+   "id": "67c9cfc020",
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "operator": "ANDOR",
+   "site": "line 312: and ↔ or",
+   "kills_expected_by": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed in 0.28s"
+  },
+  {
+   "id": "84a105348a",
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "operator": "CMP",
+   "site": "line 82: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/test_ownership.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.17s"
+  },
+  {
+   "id": "ed54b2ddec",
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "operator": "CMP",
+   "site": "line 84: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/test_ownership.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.19s"
+  },
+  {
+   "id": "b003c27c79",
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "operator": "CMP",
+   "site": "line 84: Eq → NotEq",
+   "kills_expected_by": [
+    "tests/hardening/test_ownership.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.19s"
+  },
+  {
+   "id": "3c550b2211",
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "operator": "CMP",
+   "site": "line 87: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/test_ownership.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.17s"
+  },
+  {
+   "id": "ea28111d93",
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "operator": "CMP",
+   "site": "line 92: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/test_ownership.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed, 1 passed in 0.19s"
+  },
+  {
+   "id": "a314ab3394",
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "operator": "CMP",
+   "site": "line 94: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/test_ownership.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed, 1 passed in 0.17s"
+  },
+  {
+   "id": "a31a1eb06f",
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "operator": "NOT",
+   "site": "line 82: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_ownership.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed in 0.21s"
+  },
+  {
+   "id": "04f2644f37",
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "operator": "NOT",
+   "site": "line 84: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_ownership.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.18s"
+  },
+  {
+   "id": "3d49b928f9",
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "operator": "NOT",
+   "site": "line 87: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_ownership.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.18s"
+  },
+  {
+   "id": "b3d62c2737",
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "operator": "NOT",
+   "site": "line 92: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_ownership.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed, 1 passed in 0.19s"
+  },
+  {
+   "id": "c49b94afcd",
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "operator": "NOT",
+   "site": "line 94: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_ownership.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed, 1 passed in 0.19s"
+  },
+  {
+   "id": "63b39be592",
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "operator": "NOT",
+   "site": "line 96: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_ownership.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed, 1 passed in 0.19s"
+  },
+  {
+   "id": "3067a4fe8c",
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "operator": "ANDOR",
+   "site": "line 82: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_ownership.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed, 1 passed in 0.17s"
+  },
+  {
+   "id": "2413d0ea09",
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "operator": "ANDOR",
+   "site": "line 84: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_ownership.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed, 1 passed in 0.20s"
+  },
+  {
+   "id": "2095f624fe",
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "operator": "ANDOR",
+   "site": "line 87: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_ownership.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed, 1 passed in 0.18s"
+  },
+  {
+   "id": "6597155f10",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "CMP",
+   "site": "line 119: Lt → GtE",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 3.2,
+   "last_line": ""
+  },
+  {
+   "id": "bdb6f16992",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "CMP",
+   "site": "line 125: Lt → GtE",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 3.1,
+   "last_line": ""
+  },
+  {
+   "id": "92b85ff130",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "NOT",
+   "site": "line 114: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed in 0.29s"
+  },
+  {
+   "id": "0f233ecf10",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "NOT",
+   "site": "line 122: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 5.4,
+   "last_line": ""
+  },
+  {
+   "id": "1b2149d0b3",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "NOT",
+   "site": "line 127: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.5,
+   "last_line": "1 failed in 4.29s"
+  },
+  {
+   "id": "d4dbad2e20",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "ANDOR",
+   "site": "line 119: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 900.0,
+   "last_line": "timeout (treated as killed: the mutant hung the suite)"
+  },
+  {
+   "id": "9dadd0605f",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "ANDOR",
+   "site": "line 125: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 900.0,
+   "last_line": "timeout (treated as killed: the mutant hung the suite)"
+  },
+  {
+   "id": "cf30c84bb8",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "DROPCALL",
+   "site": "line 117: drop call _terminate(...)",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 5.2,
+   "last_line": ""
+  },
+  {
+   "id": "a328285194",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "DROPCALL",
+   "site": "line 120: drop call time.sleep(...)",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 5.1,
+   "last_line": ""
+  },
+  {
+   "id": "445a21a4e9",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "DROPCALL",
+   "site": "line 123: drop call _terminate(...)",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 5.3,
+   "last_line": ""
+  },
+  {
+   "id": "6365821dcd",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "DROPCALL",
+   "site": "line 126: drop call time.sleep(...)",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 5.2,
+   "last_line": ""
+  },
+  {
+   "id": "fc9f0e5209",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "operator": "DROPCALL",
+   "site": "line 130: drop call os.waitpid(...)",
+   "kills_expected_by": [
+    "tests/hardening/test_process_owner.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.5,
+   "last_line": "1 failed in 4.34s"
+  },
+  {
+   "id": "3f5f5c7bbb",
+   "module": "aisef/phases/implement.py",
+   "function": "deadlock_reason",
+   "operator": "CMP",
+   "site": "line 3126: Lt → GtE",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 9.0,
+   "last_line": "1 failed, 6 passed in 8.76s"
+  },
+  {
+   "id": "1332250396",
+   "module": "aisef/phases/implement.py",
+   "function": "deadlock_reason",
+   "operator": "NOT",
+   "site": "line 3126: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 9.5,
+   "last_line": "1 failed, 6 passed in 9.27s"
+  },
+  {
+   "id": "9d9964f021",
+   "module": "aisef/phases/implement.py",
+   "function": "deadlock_reason",
+   "operator": "NOT",
+   "site": "line 3129: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 14.5,
+   "last_line": "1 failed, 6 passed in 14.32s"
+  },
+  {
+   "id": "84698abc3e",
+   "module": "aisef/phases/implement.py",
+   "function": "deadlock_reason",
+   "operator": "NOT",
+   "site": "line 3131: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 13.8,
+   "last_line": "1 failed, 6 passed in 13.63s"
+  },
+  {
+   "id": "39e93ea150",
+   "module": "aisef/phases/implement.py",
+   "function": "deadlock_reason",
+   "operator": "NOT",
+   "site": "line 3142: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 13.8,
+   "last_line": "1 failed, 6 passed in 13.61s"
+  },
+  {
+   "id": "546f6a80b6",
+   "module": "aisef/phases/implement.py",
+   "function": "deadlock_reason",
+   "operator": "ANDOR",
+   "site": "line 3125: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 19.1,
+   "last_line": "1 failed, 9 passed in 18.87s"
+  },
+  {
+   "id": "76f145ab0f",
+   "module": "aisef/phases/implement.py",
+   "function": "deadlock_reason",
+   "operator": "ANDOR",
+   "site": "line 3129: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 23.4,
+   "last_line": ""
+  },
+  {
+   "id": "e549affe13",
+   "module": "aisef/phases/implement.py",
+   "function": "deadlock_reason",
+   "operator": "ANDOR",
+   "site": "line 3141: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 22.5,
+   "last_line": ""
+  },
+  {
+   "id": "f3df5c5167",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "CMP",
+   "site": "line 3182: Eq → NotEq",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 15.7,
+   "last_line": "1 failed, 8 passed in 15.54s"
+  },
+  {
+   "id": "990ae2056c",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "CMP",
+   "site": "line 3185: Lt → GtE",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.3,
+   "last_line": ""
+  },
+  {
+   "id": "cbb4eee2e8",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "CMP",
+   "site": "line 3187: GtE → Lt",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.1,
+   "last_line": ""
+  },
+  {
+   "id": "c910001e99",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "NOT",
+   "site": "line 3176: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 16.2,
+   "last_line": "1 failed, 8 passed in 15.96s"
+  },
+  {
+   "id": "bb2de60b03",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "NOT",
+   "site": "line 3180: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.7,
+   "last_line": ""
+  },
+  {
+   "id": "d6c4855fff",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "NOT",
+   "site": "line 3182: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 16.0,
+   "last_line": "1 failed, 8 passed in 15.76s"
+  },
+  {
+   "id": "c1a75443f6",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "NOT",
+   "site": "line 3185: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.2,
+   "last_line": ""
+  },
+  {
+   "id": "1fd98c125d",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "NOT",
+   "site": "line 3187: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.4,
+   "last_line": ""
+  },
+  {
+   "id": "fed654c05c",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "ANDOR",
+   "site": "line 3180: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.2,
+   "last_line": ""
+  },
+  {
+   "id": "1c0f8d0f9e",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "BOOL",
+   "site": "line 3177: True → False",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 13.9,
+   "last_line": "1 failed, 6 passed in 13.64s"
+  },
+  {
+   "id": "f6301fa81c",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "BOOL",
+   "site": "line 3183: True → False",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.1,
+   "last_line": ""
+  },
+  {
+   "id": "9d7fb090a5",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "BOOL",
+   "site": "line 3188: True → False",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.1,
+   "last_line": ""
+  },
+  {
+   "id": "8d35245dd0",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "operator": "BOOL",
+   "site": "line 3189: False → True",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 15.8,
+   "last_line": "1 failed, 8 passed in 15.57s"
+  },
+  {
+   "id": "6ec1ba33e6",
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "operator": "CMP",
+   "site": "line 3254: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 13.8,
+   "last_line": "1 failed, 6 passed in 13.61s"
+  },
+  {
+   "id": "a0761e309f",
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "operator": "CMP",
+   "site": "line 3254: NotIn → In",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.2,
+   "last_line": ""
+  },
+  {
+   "id": "c6c29aadbf",
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "operator": "CMP",
+   "site": "line 3254: NotIn → In",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.8,
+   "last_line": ""
+  },
+  {
+   "id": "beca5a756f",
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "operator": "NOT",
+   "site": "line 3249: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 13.3,
+   "last_line": "1 failed, 6 passed in 13.13s"
+  },
+  {
+   "id": "27eee1bcd1",
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "operator": "NOT",
+   "site": "line 3254: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 14.0,
+   "last_line": "1 failed, 6 passed in 13.77s"
+  },
+  {
+   "id": "bcd2ac7062",
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "operator": "NOT",
+   "site": "line 3256: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 14.0,
+   "last_line": "1 failed, 6 passed in 13.79s"
+  },
+  {
+   "id": "b154c50df1",
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "operator": "ANDOR",
+   "site": "line 3250: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.4,
+   "last_line": ""
+  },
+  {
+   "id": "c2a08aabcc",
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "operator": "ANDOR",
+   "site": "line 3254: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.9,
+   "last_line": ""
+  },
+  {
+   "id": "5098222703",
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "operator": "ANDOR",
+   "site": "line 3254: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 18.6,
+   "last_line": ""
+  },
+  {
+   "id": "419d724e54",
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "operator": "DROPCALL",
+   "site": "line 3257: drop call out.append(...)",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 14.2,
+   "last_line": "1 failed, 6 passed in 13.97s"
+  },
+  {
+   "id": "2af07a8278",
+   "module": "aisef/phases/implement.py",
+   "function": "finding_bound",
+   "operator": "ANDOR",
+   "site": "line 2518: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.22s"
+  },
+  {
+   "id": "79e48be9e7",
+   "module": "aisef/phases/implement.py",
+   "function": "finding_bound",
+   "operator": "ANDOR",
+   "site": "line 2519: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed, 1 passed in 0.23s"
+  },
+  {
+   "id": "34cf8717df",
+   "module": "aisef/phases/implement.py",
+   "function": "finding_bound",
+   "operator": "ANDOR",
+   "site": "line 2519: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.23s"
+  },
+  {
+   "id": "48dc1edbca",
+   "module": "aisef/phases/implement.py",
+   "function": "finding_bound",
+   "operator": "ANDOR",
+   "site": "line 2519: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.22s"
+  },
+  {
+   "id": "fbe113af71",
+   "module": "aisef/phases/implement.py",
+   "function": "structured_plan_defects",
+   "operator": "CMP",
+   "site": "line 2433: Is → IsNot",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed, 2 passed in 0.21s"
+  },
+  {
+   "id": "386dc12f4a",
+   "module": "aisef/phases/implement.py",
+   "function": "structured_plan_defects",
+   "operator": "NOT",
+   "site": "line 2433: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.4,
+   "last_line": "1 failed, 2 passed in 0.22s"
+  },
+  {
+   "id": "cce3de2f4c",
+   "module": "aisef/phases/implement.py",
+   "function": "_verifier_budget_cap",
+   "operator": "CMP",
+   "site": "line 3016: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 9.5,
+   "last_line": "1 failed, 1 passed in 9.27s"
+  },
+  {
+   "id": "77ade90fd6",
+   "module": "aisef/phases/implement.py",
+   "function": "_verifier_budget_cap",
+   "operator": "CMP",
+   "site": "line 3016: NotIn → In",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 20.6,
+   "last_line": ""
+  },
+  {
+   "id": "6c692f0558",
+   "module": "aisef/phases/implement.py",
+   "function": "_verifier_budget_cap",
+   "operator": "NOT",
+   "site": "line 3016: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 9.3,
+   "last_line": "1 failed, 1 passed in 9.14s"
+  },
+  {
+   "id": "6b06220bd7",
+   "module": "aisef/phases/implement.py",
+   "function": "_verifier_budget_cap",
+   "operator": "ANDOR",
+   "site": "line 3015: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 20.5,
+   "last_line": ""
+  },
+  {
+   "id": "a218501c76",
+   "module": "aisef/phases/implement.py",
+   "function": "_verifier_budget_cap",
+   "operator": "ANDOR",
+   "site": "line 3015: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 20.6,
+   "last_line": ""
+  },
+  {
+   "id": "8d604ca9fc",
+   "module": "aisef/phases/implement.py",
+   "function": "_verifier_budget_cap",
+   "operator": "ANDOR",
+   "site": "line 3016: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 9.3,
+   "last_line": "1 failed, 1 passed in 9.14s"
+  },
+  {
+   "id": "04c17646de",
+   "module": "aisef/phases/implement.py",
+   "function": "_absent_stages",
+   "operator": "CMP",
+   "site": "line 3001: Is → IsNot",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 6.7,
+   "last_line": "1 failed, 1 passed in 6.50s"
+  },
+  {
+   "id": "cce42f220b",
+   "module": "aisef/phases/implement.py",
+   "function": "_absent_stages",
+   "operator": "CMP",
+   "site": "line 3004: Is → IsNot",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 10.4,
+   "last_line": "1 failed, 1 passed in 10.20s"
+  },
+  {
+   "id": "6e20e13290",
+   "module": "aisef/phases/implement.py",
+   "function": "_absent_stages",
+   "operator": "CMP",
+   "site": "line 3006: Is → IsNot",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 10.5,
+   "last_line": "1 failed, 1 passed in 10.24s"
+  },
+  {
+   "id": "ef8f9427a6",
+   "module": "aisef/phases/implement.py",
+   "function": "_absent_stages",
+   "operator": "NOT",
+   "site": "line 3001: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 6.7,
+   "last_line": "1 failed, 1 passed in 6.56s"
+  },
+  {
+   "id": "5fee977cc2",
+   "module": "aisef/phases/implement.py",
+   "function": "_absent_stages",
+   "operator": "NOT",
+   "site": "line 3004: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 9.1,
+   "last_line": "1 failed, 1 passed in 8.90s"
+  },
+  {
+   "id": "ba4f8e4cb3",
+   "module": "aisef/phases/implement.py",
+   "function": "_absent_stages",
+   "operator": "ANDOR",
+   "site": "line 3001: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 6.7,
+   "last_line": "1 failed, 1 passed in 6.55s"
+  },
+  {
+   "id": "d2e98334a8",
+   "module": "aisef/phases/implement.py",
+   "function": "_absent_stages",
+   "operator": "VERDICT",
+   "site": "line 3004: .FAILED → .PASSED",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 9.3,
+   "last_line": "1 failed, 1 passed in 9.11s"
+  },
+  {
+   "id": "9912b6955e",
+   "module": "aisef/phases/implement.py",
+   "function": "_absent_stages",
+   "operator": "VERDICT",
+   "site": "line 3006: .UNRUNNABLE → .FAILED",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 10.5,
+   "last_line": "1 failed, 1 passed in 10.26s"
+  },
+  {
+   "id": "6456d5a0e4",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "CMP",
+   "site": "line 3068: IsNot → Is",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.7,
+   "last_line": ""
+  },
+  {
+   "id": "4c24ed83a8",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "CMP",
+   "site": "line 3073: Eq → NotEq",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 20.0,
+   "last_line": ""
+  },
+  {
+   "id": "1000dfa075",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "CMP",
+   "site": "line 3074: Is → IsNot",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 6.2,
+   "last_line": "1 failed, 1 passed in 5.96s"
+  },
+  {
+   "id": "a54dfdd27b",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "CMP",
+   "site": "line 3077: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.6,
+   "last_line": ""
+  },
+  {
+   "id": "44636024c5",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "CMP",
+   "site": "line 3084: GtE → Lt",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.9,
+   "last_line": ""
+  },
+  {
+   "id": "d041cf14c0",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "CMP",
+   "site": "line 3084: Eq → NotEq",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.9,
+   "last_line": ""
+  },
+  {
+   "id": "2d88620440",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "CMP",
+   "site": "line 3086: GtE → Lt",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.6,
+   "last_line": ""
+  },
+  {
+   "id": "9eda3d91c3",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "NOT",
+   "site": "line 3069: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 18.9,
+   "last_line": "1 failed, 10 passed in 18.66s"
+  },
+  {
+   "id": "43f71064de",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "NOT",
+   "site": "line 3074: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 6.2,
+   "last_line": "1 failed, 1 passed in 5.93s"
+  },
+  {
+   "id": "49f78c931f",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "NOT",
+   "site": "line 3077: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.7,
+   "last_line": ""
+  },
+  {
+   "id": "80b8865f45",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "NOT",
+   "site": "line 3082: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 8.6,
+   "last_line": "1 failed, 1 passed in 8.32s"
+  },
+  {
+   "id": "d3613c1a11",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "NOT",
+   "site": "line 3084: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.3,
+   "last_line": ""
+  },
+  {
+   "id": "c72ac1c734",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "NOT",
+   "site": "line 3086: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.8,
+   "last_line": ""
+  },
+  {
+   "id": "d75dbd8a82",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "ANDOR",
+   "site": "line 3068: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.8,
+   "last_line": ""
+  },
+  {
+   "id": "7ad904c0b5",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "ANDOR",
+   "site": "line 3076: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 19.6,
+   "last_line": ""
+  },
+  {
+   "id": "65112ae536",
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "operator": "ANDOR",
+   "site": "line 3084: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 21.7,
+   "last_line": ""
+  },
+  {
+   "id": "cb7f47841d",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "CMP",
+   "site": "line 227: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.6,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.44s"
+  },
+  {
+   "id": "c0fdd2b244",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "CMP",
+   "site": "line 231: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.6,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.42s"
+  },
+  {
+   "id": "5ee58fa2d3",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "CMP",
+   "site": "line 231: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.7,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.43s"
+  },
+  {
+   "id": "32689ce01a",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "CMP",
+   "site": "line 233: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.6,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.40s"
+  },
+  {
+   "id": "d3453e0983",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "CMP",
+   "site": "line 238: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.5,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.34s"
+  },
+  {
+   "id": "a1cfb7319b",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "CMP",
+   "site": "line 244: Eq → NotEq",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.4,
+   "last_line": "1 failed, 18 passed, 1 skipped in 4.21s"
+  },
+  {
+   "id": "51f7e9a204",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "CMP",
+   "site": "line 245: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.3,
+   "last_line": "1 failed, 18 passed, 1 skipped in 4.11s"
+  },
+  {
+   "id": "3a2f07afc8",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "CMP",
+   "site": "line 250: In → NotIn",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 12.5,
+   "last_line": ""
+  },
+  {
+   "id": "de1dd9ede1",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "NOT",
+   "site": "line 217: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.3,
+   "last_line": "1 failed, 1 skipped in 1.09s"
+  },
+  {
+   "id": "f27f17eb6b",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "NOT",
+   "site": "line 227: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.7,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.51s"
+  },
+  {
+   "id": "553759bbeb",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "NOT",
+   "site": "line 229: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.1,
+   "last_line": "1 failed, 12 passed, 1 skipped in 3.89s"
+  },
+  {
+   "id": "a2ad19ee94",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "NOT",
+   "site": "line 231: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.7,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.49s"
+  },
+  {
+   "id": "9ef41e27da",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "NOT",
+   "site": "line 233: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.5,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.34s"
+  },
+  {
+   "id": "dd6efdc0e7",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "NOT",
+   "site": "line 238: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.6,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.41s"
+  },
+  {
+   "id": "6977f84dc5",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "NOT",
+   "site": "line 244: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.4,
+   "last_line": "1 failed, 18 passed, 1 skipped in 4.17s"
+  },
+  {
+   "id": "861f3c73d7",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "NOT",
+   "site": "line 249: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.6,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.40s"
+  },
+  {
+   "id": "49c858c21e",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "NOT",
+   "site": "line 254: negate if-condition",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 12.3,
+   "last_line": ""
+  },
+  {
+   "id": "43dd5b3d7a",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "ANDOR",
+   "site": "line 219: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.4,
+   "last_line": "1 failed, 18 passed, 1 skipped in 4.24s"
+  },
+  {
+   "id": "fc48f15838",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "ANDOR",
+   "site": "line 220: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.6,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.35s"
+  },
+  {
+   "id": "c7a9b688b7",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "ANDOR",
+   "site": "line 224: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 12.7,
+   "last_line": ""
+  },
+  {
+   "id": "e667245aba",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "ANDOR",
+   "site": "line 231: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 4.7,
+   "last_line": "1 failed, 27 passed, 1 skipped in 4.47s"
+  },
+  {
+   "id": "85472cd16f",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "ANDOR",
+   "site": "line 244: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 12.7,
+   "last_line": ""
+  },
+  {
+   "id": "24bed6b5ae",
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "operator": "ANDOR",
+   "site": "line 249: and ↔ or",
+   "kills_expected_by": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 1.6,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.37s"
+  },
+  {
+   "id": "8eedb86658",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "CMP",
+   "site": "line 357: In → NotIn",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "1 failed, 44 passed, 2 skipped, 2 subtests passed in 0.50s"
+  },
+  {
+   "id": "d64e58dccb",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "CMP",
+   "site": "line 358: NotEq → Eq",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 3.1,
+   "last_line": ""
+  },
+  {
+   "id": "2db8853978",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "CMP",
+   "site": "line 360: Eq → NotEq",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "1 failed, 35 passed, 2 skipped in 0.47s"
+  },
+  {
+   "id": "92262deff7",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "CMP",
+   "site": "line 364: Eq → NotEq",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "1 failed, 44 passed, 2 skipped, 1 subtests passed in 0.54s"
+  },
+  {
+   "id": "dd051aabe0",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "CMP",
+   "site": "line 364: In → NotIn",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 3.0,
+   "last_line": ""
+  },
+  {
+   "id": "aa2200d696",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "CMP",
+   "site": "line 366: In → NotIn",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "2 failed, 44 passed, 2 skipped in 0.51s"
+  },
+  {
+   "id": "1d8a6a05a8",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "NOT",
+   "site": "line 354: negate if-condition",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.5,
+   "last_line": "1 failed, 22 passed in 0.37s"
+  },
+  {
+   "id": "70eef46d96",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "NOT",
+   "site": "line 358: negate if-condition",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "1 failed, 34 passed, 2 skipped in 0.46s"
+  },
+  {
+   "id": "cc5db3bd5b",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "NOT",
+   "site": "line 360: negate if-condition",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 35 passed, 2 skipped in 0.43s"
+  },
+  {
+   "id": "3d69436dee",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "NOT",
+   "site": "line 362: negate if-condition",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 34 passed, 2 skipped in 0.42s"
+  },
+  {
+   "id": "4d3c726e84",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "NOT",
+   "site": "line 364: negate if-condition",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 34 passed, 2 skipped in 0.41s"
+  },
+  {
+   "id": "07ea4972a6",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "NOT",
+   "site": "line 366: negate if-condition",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 34 passed, 2 skipped in 0.45s"
+  },
+  {
+   "id": "9e3b3eabee",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "ANDOR",
+   "site": "line 358: and ↔ or",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.6,
+   "last_line": "1 failed, 34 passed, 2 skipped in 0.40s"
+  },
+  {
+   "id": "8896e26e66",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "ANDOR",
+   "site": "line 364: and ↔ or",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "1 failed, 44 passed, 2 skipped, 1 subtests passed in 0.51s"
+  },
+  {
+   "id": "5b479bdc93",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "ANDOR",
+   "site": "line 370: and ↔ or",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "SURVIVED",
+   "seconds": 3.0,
+   "last_line": ""
+  },
+  {
+   "id": "917902693d",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "operator": "STR",
+   "site": "line 360: 'test' → 'lint'",
+   "kills_expected_by": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py"
+   ],
+   "decision": "",
+   "status": "KILLED",
+   "seconds": 0.7,
+   "last_line": "1 failed, 35 passed, 2 skipped in 0.47s"
+  }
+ ]
+}

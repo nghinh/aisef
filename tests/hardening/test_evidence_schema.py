@@ -125,5 +125,21 @@ class TestSchema2RoundTripAndMixedFiles(_Archive):
         self.assertEqual([n for n, o in scored.items() if o is Outcome.PASSED], ["test"], f"only the new record: {scored}")
 
 
+class TestFreshEdges(unittest.TestCase):
+    """Phase 13 mutants of `identity.fresh`: an unbound record is never fresh; a schema-1 record IS fresh for a
+    candidate-only (legacy) decider whose story is known from the file — and not when the story is not given."""
+
+    def test_unbound_never_and_legacy_for_a_legacy_decider(self):
+        from aisef.control.identity import fresh
+        from aisef.harness.observe import Event
+        sha = "c" * 40
+        legacy = Event(kind=TOOL_RUN, name="test", ok=True, detail={"candidate": sha})
+        unbound = Event(kind=TOOL_RUN, name="test", ok=True, detail={})
+        decider = EvidenceIdentity(story_id="S", candidate_sha=sha)
+        self.assertFalse(fresh(unbound, decider, story_id="S").ok)
+        self.assertTrue(fresh(legacy, decider, story_id="S").ok, "a candidate-only decider accepts a candidate-bound legacy record")
+        self.assertTrue(fresh(legacy, decider).ok, "the decider's own story stands in when the file's is not given")
+
+
 if __name__ == "__main__":
     unittest.main()

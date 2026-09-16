@@ -1,10 +1,12 @@
-"""F5 — the attempt owns its process tree (INV-L.1, INV-L.2): what a session leaves behind is terminated, reaped and
-VERIFIED dead before the session is scored, and the pids are recorded — never a silent side effect."""
+"""F5 — the attempt owns its process tree (INV-L.1, INV-L.2): what a session STARTED (a real adapter's process group /
+job object; an in-process client's declared `spawned`) is terminated, reaped and VERIFIED dead before the session is
+scored, and the pids are recorded — never a silent side effect, never a sibling story's process."""
 from __future__ import annotations
 
 import os
 import subprocess
 import sys
+import tempfile
 import time
 import unittest
 from pathlib import Path
@@ -26,7 +28,7 @@ class TestASessionsLeftoversDieWithTheSession(unittest.TestCase):
         class Leaves:
             def run(self, spec):
                 left.append(subprocess.Popen(SLEEPER))
-                return SimpleNamespace(ok=True, cost_usd=0.0, num_turns=1, raw_result={})
+                return SimpleNamespace(ok=True, cost_usd=0.0, num_turns=1, raw_result={"spawned": [left[-1].pid]})
         try:
             res = I._owned_run(Leaves(), SimpleNamespace(prompt=""))
             self.assertEqual(res.raw_result.get("reaped"), [left[0].pid])
@@ -81,7 +83,7 @@ class TestASurvivorOfTheReaperIsTypedAndKeepsTheWorkspace(unittest.TestCase):
         class Leaves:
             def run(self, spec):
                 left.append(subprocess.Popen(SLEEPER))
-                return SimpleNamespace(ok=True, cost_usd=0.0, num_turns=1, raw_result={})
+                return SimpleNamespace(ok=True, cost_usd=0.0, num_turns=1, raw_result={"spawned": [left[-1].pid]})
         try:
             with self._no_reap():
                 res = I._owned_run(Leaves(), None)
@@ -114,3 +116,38 @@ class TestASurvivorOfTheReaperIsTypedAndKeepsTheWorkspace(unittest.TestCase):
                     p.kill(); p.wait()
         finally:
             case.tearDown()
+
+
+@unittest.skipIf(sys.platform == "win32", "POSIX signals")
+class TestReapTerminatesGracefullyBeforeItKills(unittest.TestCase):
+    """Phase 13 mutants of `reap` (INV-L.1): SIGTERM first and a grace wait — a child that handles SIGTERM exits on its
+    own terms and leaves its marker; a child that IGNORES SIGTERM is still dead after the hard kill."""
+
+    def test_a_child_that_handles_sigterm_gets_to_exit_cleanly(self):
+        with tempfile.TemporaryDirectory() as d:
+            marker = Path(d) / "clean-exit"
+            child = subprocess.Popen([sys.executable, "-c",
+                                      "import signal, sys, time, pathlib\n"
+                                      f"pathlib.Path({str(marker)!r})\n"
+                                      "def bye(*_):\n    time.sleep(0.3); pathlib.Path(%r).write_text('term'); sys.exit(0)\n"
+                                      "signal.signal(signal.SIGTERM, bye)\nprint('ready', flush=True)\ntime.sleep(60)" % str(marker)],
+                                     stdout=subprocess.PIPE, text=True, encoding="utf-8")
+            child.stdout.readline()
+            try:
+                self.assertEqual(P.reap([child.pid]), [child.pid])
+                self.assertEqual(marker.read_text(), "term", "SIGTERM was sent first and the grace wait let the handler finish")
+            finally:
+                child.kill(); child.wait()
+
+    def test_a_child_that_ignores_sigterm_is_hard_killed(self):
+        child = subprocess.Popen([sys.executable, "-c",
+                                  "import signal, time\nsignal.signal(signal.SIGTERM, signal.SIG_IGN)\nprint('ready', flush=True)\ntime.sleep(60)"],
+                                 stdout=subprocess.PIPE, text=True, encoding="utf-8")
+        child.stdout.readline()
+        try:
+            t0 = time.monotonic()
+            self.assertEqual(P.reap([child.pid], grace=0.5), [child.pid])
+            self.assertLess(time.monotonic() - t0, 5.0)
+            self.assertFalse(P.pid_alive(child.pid))
+        finally:
+            child.kill(); child.wait()

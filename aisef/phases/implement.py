@@ -588,24 +588,29 @@ def _reserved_client_run(client: ClientAdapter, spec, *, story_id: str,
 
 
 def _owned_run(client: ClientAdapter, spec):
-    """The attempt owns the session's process tree (F5 / INV-L.1): every child of this process that the session
-    leaves behind — a real client's, or one an in-process client spawned — is terminated, reaped and verified dead
-    before the session is scored; the pids are recorded on the result (`raw_result["reaped"]`), never silent."""
+    """The attempt owns the session's process tree (F5 / INV-L.1) — what the SESSION started, never whatever else the
+    harness process happens to have spawned: under parallel waves a sibling story's `git` is a child of this process
+    too, and the first rule ("every new child") killed it (Windows CI on bb31522, where git is slow enough to lose the
+    race). A real adapter's tree is its process group / job object, reaped in `clients/base._stream_with_timeout` and
+    recorded as `raw_result["reaped"]`; an in-process client DECLARES what it started as `raw_result["spawned"]`.
+    Declared processes are terminated, reaped and VERIFIED dead before the session is scored; a survivor is typed
+    (`raw_result["orphans"]`), never silent."""
     from ..harness import process_owner as _po
-    before = _po.children_of()
     result = client.run(spec)
-    reaped = _po.reap_new_children(before)
-    left = _po.survivors(before)              # VERIFY: what terminate → kill could not end is typed, never silent
-    if reaped or left:
-        raw = dict(getattr(result, "raw_result", None) or {})
-        if reaped:
-            raw["reaped"] = sorted(set(raw.get("reaped") or []) | set(reaped))
-        if left:
-            raw["orphans"] = left
-        try:
-            result.raw_result = raw
-        except AttributeError:
-            pass
+    raw = dict(getattr(result, "raw_result", None) or {})
+    spawned = [int(p) for p in (raw.get("spawned") or []) if str(p).lstrip("-").isdigit()]
+    if not spawned:
+        return result
+    reaped = _po.reap(spawned)
+    left = [p for p in spawned if _po.pid_alive(p)]        # VERIFY: what terminate → kill could not end is typed
+    if reaped:
+        raw["reaped"] = sorted(set(raw.get("reaped") or []) | set(reaped))
+    if left:
+        raw["orphans"] = left
+    try:
+        result.raw_result = raw
+    except AttributeError:
+        pass
     return result
 
 

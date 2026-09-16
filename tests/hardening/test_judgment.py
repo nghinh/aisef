@@ -53,3 +53,51 @@ class TestABlockerBindsToWhatItBlocks(unittest.TestCase):
     def test_the_model_agrees_on_the_unbound_block(self):
         sc = D.Scenario(4001, ["CHANGED"], ["BLOCK_UNBOUND"], ["PASS"], max_retries=1)
         self.assertEqual(D.real_run(sc).diff(D.model_run(sc)), [])
+
+
+class TestVerifierBudgetCapReadsBothVerifiers(unittest.TestCase):
+    """Phase 13 mutants of `_verifier_budget_cap` (INV-G.5 / SS-12, SS-21): a budget cap in EITHER verifier is a
+    run-level stop; lock contention is not a cap; a review absent for another reason never hides the security cap."""
+
+    def _attempt(self, review="", security=""):
+        from types import SimpleNamespace
+        from aisef.phases.implement import Attempt
+        a = Attempt(number=1); a.review_unrunnable = review
+        a.security = SimpleNamespace(unrunnable=security) if security else None
+        return a
+
+    def test_a_cap_in_the_review_is_the_reason(self):
+        from aisef.phases.implement import _verifier_budget_cap
+        self.assertEqual(_verifier_budget_cap(self._attempt(review="budget exceeded: $12.00 of $10.00")), "budget exceeded: $12.00 of $10.00")
+
+    def test_lock_contention_is_not_a_cap(self):
+        from aisef.phases.implement import _verifier_budget_cap
+        self.assertEqual(_verifier_budget_cap(self._attempt(review="budget exceeded — ledger locked by another run")), "")
+
+    def test_a_review_absent_for_another_reason_does_not_hide_the_security_cap(self):
+        from aisef.phases.implement import _verifier_budget_cap
+        self.assertEqual(_verifier_budget_cap(self._attempt(review="exceeded 1800s", security="budget exceeded: cap")), "budget exceeded: cap")
+        self.assertEqual(_verifier_budget_cap(self._attempt(review="exceeded 1800s", security="exceeded 1800s")), "")
+
+
+class TestDeadlockPairSurvivesAnInfraAttempt(unittest.TestCase):
+    """Phase 13 mutant of `deadlock_reason` (SS-63's rule): an infra attempt between two graded positions is not a
+    position and must not break the pair; two consecutive identical out-of-scope blocks are a plan conflict."""
+
+    def _graded(self, findings):
+        from aisef.phases.implement import Attempt
+        a = Attempt(number=1); a.review_findings = list(findings); a.infra = False; a.review_unrunnable = ""
+        return a
+
+    def _infra(self):
+        from aisef.phases.implement import Attempt
+        a = Attempt(number=2); a.infra = True; a.review_findings = []; a.review_unrunnable = ""
+        return a
+
+    def test_two_identical_outside_blocks_around_an_infra_cut_are_stuck(self):
+        from aisef.phases.implement import deadlock_reason
+        block = ["[block] ledgerlock/ledger.py:1 — the ledger must reject a short row"]
+        stuck = deadlock_reason([self._graded(block), self._infra(), self._graded(block)], ["ledgerlock/cli.py"])
+        self.assertIn("stuck", stuck); self.assertIn("ledgerlock/ledger.py", stuck)
+        self.assertEqual(deadlock_reason([self._graded(block), self._infra()], ["ledgerlock/cli.py"]), "",
+                         "one position and an infra cut: no pair")

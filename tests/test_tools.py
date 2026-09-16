@@ -575,3 +575,19 @@ class TestGhiTenTestChoMoiBoDocDuoc(ToolTestCase):
         e = self._ghi("qa:e2e", "stryker: command not found", ok=False,
                       unrunnable="tool not installed")
         self.assertIsNone(e.detail.get("test_format"))
+
+
+class TestUnrunnableReasonBranches(unittest.TestCase):
+    """Phase 13 mutants of `unrunnable_reason` (INV-N.1, INV-F.3): exit 127 alone is unrunnable; a missing manifest,
+    missing dependencies and a plain missing tool each name their own reason; a real result is ""."""
+
+    def test_exit_127_without_a_known_message_is_unrunnable(self):
+        from aisef.harness.tools import unrunnable_reason
+        self.assertIn("tool not installed", unrunnable_reason("lint", 127, ""))
+        self.assertEqual(unrunnable_reason("lint", 1, "E501 line too long"), "")
+
+    def test_a_missing_manifest_and_missing_dependencies_are_named(self):
+        from aisef.harness.tools import NO_MANIFEST, NO_SETUP, unrunnable_reason
+        self.assertEqual(unrunnable_reason("test", 127, "sh: no such file or directory: package.json"), NO_MANIFEST)
+        self.assertNotEqual(unrunnable_reason("test", 127, "sh: no such file or directory: ./run.sh"), NO_MANIFEST)
+        self.assertIn(NO_SETUP, unrunnable_reason("test", 1, "ModuleNotFoundError: No module named 'pytest'"))

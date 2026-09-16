@@ -7,7 +7,8 @@
    "function": "fresh",
    "tests": [
     "tests/hardening/test_verdict_freshness.py",
-    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults"
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/hardening/test_evidence_schema.py"
    ]
   },
   {
@@ -86,7 +87,8 @@
    "tests": [
     "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
     "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
-    "tests/test_approvals.py"
+    "tests/test_approvals.py",
+    "tests/test_approvals.py::TestGatesOutsideTheOrderHaveNoUpstream"
    ]
   },
   {
@@ -95,7 +97,8 @@
    "tests": [
     "tests/hardening/scan8a/test_group_d.py",
     "tests/test_state.py",
-    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun"
+    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun",
+    "tests/test_state.py::TestLeaseEdges"
    ]
   },
   {
@@ -103,7 +106,8 @@
    "function": "StateStore.transition",
    "tests": [
     "tests/hardening/scan8a/test_group_d.py",
-    "tests/test_state.py"
+    "tests/test_state.py",
+    "tests/test_state.py::TestLeaseEdges"
    ]
   },
   {
@@ -119,7 +123,8 @@
    "function": "_check_caps",
    "tests": [
     "tests/test_budget.py",
-    "tests/hardening/scan8a/test_group_d.py"
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_budget.py::TestWallClockCap"
    ]
   },
   {
@@ -133,7 +138,8 @@
    "module": "aisef/harness/process_owner.py",
    "function": "reap",
    "tests": [
-    "tests/hardening/test_process_owner.py"
+    "tests/hardening/test_process_owner.py",
+    "tests/hardening/test_process_owner.py::TestReapTerminatesGracefullyBeforeItKills"
    ]
   },
   {
@@ -149,7 +155,8 @@
    "tests": [
     "tests/hardening/test_judgment.py",
     "tests/hardening/test_differential.py",
-    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults",
+    "tests/hardening/test_judgment.py::TestDeadlockPairSurvivesAnInfraAttempt"
    ]
   },
   {
@@ -157,7 +164,9 @@
    "function": "_same_complaint",
    "tests": [
     "tests/hardening/test_judgment.py",
-    "tests/hardening/test_differential.py"
+    "tests/hardening/test_differential.py",
+    "tests/test_same_complaint_finding.py",
+    "tests/test_findings.py"
    ]
   },
   {
@@ -165,7 +174,8 @@
    "function": "_paths_outside",
    "tests": [
     "tests/hardening/test_judgment.py",
-    "tests/hardening/test_differential.py"
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_sibling_scan.py::TestSS25ScopeVerdictComesFromFindingsNotProse"
    ]
   },
   {
@@ -198,7 +208,8 @@
    "tests": [
     "tests/hardening/test_differential.py",
     "tests/hardening/test_fault_matrix.py::TestReviewFaults",
-    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults",
+    "tests/hardening/test_judgment.py::TestVerifierBudgetCapReadsBothVerifiers"
    ]
   },
   {
@@ -215,7 +226,9 @@
    "function": "nop_deadlock",
    "tests": [
     "tests/hardening/test_differential.py",
-    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults"
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults",
+    "tests/test_implement.py::TestBeTacDoKeHoachTheoNopControl",
+    "tests/hardening/scan8a/test_group_a.py::TestSS32DeadlockDiagnosisReadsDataNotProse"
    ]
   },
   {
@@ -223,7 +236,9 @@
    "function": "exit_status_of",
    "tests": [
     "tests/hardening/adapters/test_conformance.py",
-    "tests/test_clients.py"
+    "tests/test_clients.py",
+    "tests/test_stream.py::TestExitStatus",
+    "tests/test_stream.py::TestExitStatusBranches"
    ]
   },
   {
@@ -231,9 +246,32 @@
    "function": "unrunnable_reason",
    "tests": [
     "tests/test_tools.py",
-    "tests/hardening/scan8a/test_group_c.py"
+    "tests/hardening/scan8a/test_group_c.py",
+    "tests/test_tools.py::TestUnrunnableReasonBranches"
    ]
   }
  ],
- "equivalent": []
+ "equivalent": [
+  {
+   "id": "a328285194",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "site": "line 120: drop call time.sleep(...)",
+   "why": "dropping the sleep inside `while monotonic() < deadline and any(alive)` turns the grace wait into a busy wait with the same deadline and the same exit condition; the outcome (which pids are dead, and when) is unchanged."
+  },
+  {
+   "id": "6365821dcd",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "site": "line 126: drop call time.sleep(...)",
+   "why": "dropping the sleep inside `while monotonic() < deadline and any(alive)` turns the grace wait into a busy wait with the same deadline and the same exit condition; the outcome (which pids are dead, and when) is unchanged."
+  },
+  {
+   "id": "e549affe13",
+   "module": "aisef/phases/implement.py",
+   "function": "deadlock_reason",
+   "site": "line 3141: and ↔ or",
+   "why": "`if not last.review_findings or not prev.review_findings: return \"\"` → with `and`, a single empty list falls through to `_same_complaint(x, [])`, which iterates nothing and returns False — the same \"\" result; no observable decision changes."
+  }
+ ]
 }

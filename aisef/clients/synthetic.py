@@ -203,7 +203,10 @@ class SyntheticClientAdapter(ClientAdapter):
                 # step is being served again.
                 files = {rel: f"{body}# attempt {self.develop_calls}\n" for rel, body in files.items()}
             self._write(wd, files)
-            return RunResult(ok=True, text=step.text or "done", num_turns=step.turns, cost_usd=step.cost_usd, output_tokens=200)
+            # an in-process client DECLARES what it started (`spawned`): the attempt owns exactly that (INV-L.1)
+            spawned = {"spawned": [self.orphans[-1].pid]} if k == "CHANGED_ORPHAN" else None
+            return RunResult(ok=True, text=step.text or "done", num_turns=step.turns, cost_usd=step.cost_usd, output_tokens=200,
+                             raw_result=spawned)
         if k == "NOOP":
             # A real no-op session reads and reasons (tool calls happen) and writes nothing; the stream
             # token count is what separates it from ZERO_OUTPUT (tokens, no tools, no files — a model
