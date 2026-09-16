@@ -206,7 +206,7 @@ class TestEvidenceFaults(unittest.TestCase):
 class TestStaleFaults(unittest.TestCase):
     """Stale evidence replayed against a changed tree (FM-D-07 / FM-E-03) — the D-035 scenario."""
 
-    @unittest.expectedFailure   # D-035
+    # GREEN since F1 (D-035), 2026-09-16
     def test_a_stale_verdict_is_not_reused_after_hygiene_changed_the_tree(self):
         from tests.hardening.test_verdict_freshness import reproduce
         case = HygieneCase("runTest"); case.setUp()

@@ -110,7 +110,7 @@ class TestSS09ResumeRefreshDoesNotSilentlyInvalidateTheCandidate(HygieneCase):
     """SS-09 — `run.py:616` merges main into the story branch before `_pending_review` looks for the
     REVIEW_UNRUNNABLE candidate at HEAD; HEAD is now a merge commit, nothing is found, a developer opens."""
 
-    @unittest.expectedFailure   # SS-09: the resumed run opened a developer session (develop_calls=1) and wrote no record naming C or the merge commit
+    # GREEN since F1 (SS-09: typed invalidation when HEAD moved off the candidate of record), 2026-09-16
     def test_resume_after_main_advanced_retries_the_review_or_records_the_invalidation(self):
         c1 = SyntheticClientAdapter(Script(developer=[Step.changed(CLI_WORK)], review=[Step.unrunnable()]))
         out1 = self.implement(c1)
@@ -142,7 +142,7 @@ class TestSS16WaveEndCommitOfAFailedStoryIsRecorded(RunTestCase):
     """SS-16 — `run.py:371-381` commits a failed story's leftover in-scope work on top of the frozen
     candidate and removes the worktree; nothing in evidence or the journal names the new branch tip."""
 
-    @unittest.expectedFailure   # SS-16: branch tip moved past the frozen candidate; no evidence event and no journal entry names the new SHA
+    # GREEN since F1 (SS-16: wave-end commit of leftover work is recorded as a moved tip), 2026-09-16
     def test_leftover_work_committed_at_wave_end_is_named_by_a_record(self):
         c = _WritesThenTimesOut(Script(developer=[Step.changed({"src/core/a.py": "x = 1\n"}), Step.timeout()],
                                        review=[Step.block(), Step.passes()]))
@@ -197,12 +197,12 @@ class TestSS20ReviewRetryScoresThePinnedPreservationList(_Case):
     """SS-20 — R4 pins the preservation list once per attempt (`run_attempt`); `_review_stage` recomputes
     it from the ledger, so the re-review of the same candidate is scored against a different list."""
 
-    @unittest.expectedFailure   # SS-20: attempt 1 gate:input preservation=[]; the review-stage retry of the same attempt recorded preservation=[ITEM]
+    # GREEN since F1 (SS-20: the review-stage retry scores the list pinned in the attempt's gate:input), 2026-09-16
     def test_the_review_stage_retry_uses_the_list_the_attempt_was_pinned_to(self):
         c = _LedgerMovesDuringReview(Script(review=[Step.unrunnable(), Step.passes()]))
         with patch.object(I, "preservation_items", side_effect=lambda *a, **k: [dict(ITEM)] if c.moved else []) as pi:
             self.implement(c, config=self.config(**{"run.max_retries": 0}))
-        self.assertGreaterEqual(pi.call_count, 2)
+        self.assertGreaterEqual(pi.call_count, 1)   # F1: the retry reads the pinned list, it no longer recomputes
         inputs = EvidenceStore(self.artifacts).read(self.story.id).of(NOTE, "gate:input")
         self.assertEqual(len(inputs), 2, [e.detail.get("attempt") for e in inputs])
         self.assertEqual(inputs[0].detail["attempt"], inputs[1].detail["attempt"], "same attempt, review retried")
@@ -246,7 +246,7 @@ class TestSS22NopParentMatchesTheBaselineRoot(HygieneCase):
     """SS-22 — `implement_story` recomputes `base_ref` (fork point) on every call; after a refresh the
     baseline is reused at its recorded root while `run_nop` builds the parent at the new fork point."""
 
-    @unittest.expectedFailure   # SS-22: after main advanced, test:nop.parent == the new fork point (main tip) while the reused baseline root is the story-entry SHA; no mismatch record
+    # GREEN since F1 (SS-22), 2026-09-16
     def test_the_nop_control_runs_at_the_baseline_root_or_records_the_mismatch(self):
         test_file = "def test_AC_STORY_04_01_1_repair():\n    pass\n"
         c1 = SyntheticClientAdapter(Script(developer=[Step.changed({**CLI_WORK, SCOPE[1]: test_file})]))
@@ -281,7 +281,7 @@ class TestSS10ResetAfterAMovedCandidateIsRecorded(HygieneCase):
     commit: the reset destroys out-of-scope dirt a `write-scope:violation` note still describes, and its
     result is neither checked nor recorded."""
 
-    @unittest.expectedFailure   # SS-A10a: ledger.py was restored to the candidate by the reset; after review:candidate {expected, got} only gate:input.changed / gate:verdict.checks mention the path — nothing names the destroyed dirt
+    # GREEN since F1 (SS-A10: soft reset + selective restore, recorded ok or not), 2026-09-16
     def test_dirt_destroyed_by_the_reset_is_preserved_or_named(self):
         c = Developer(first=_dirty_then_stage_nothing, then=None, reviewer_writes=_reviewer_commits)
         out = self.implement(c, retries=0)
@@ -297,7 +297,7 @@ class TestSS10ResetAfterAMovedCandidateIsRecorded(HygieneCase):
                  if any("ledgerlock/ledger.py" in json.dumps(e.detail.get(k, "")) for k in keys)]
         self.assertTrue(kept or named, "out-of-scope dirt destroyed by the reset with no record naming it")
 
-    @unittest.expectedFailure   # SS-A10b: `git reset --hard` returned 128 and HEAD stayed on the reviewer's commit; no event mentions the reset
+    # GREEN since F1 (SS-A10: soft reset + selective restore, recorded ok or not), 2026-09-16
     def test_a_failing_reset_is_recorded(self):
         real = subprocess.run
 
@@ -327,16 +327,18 @@ class TestSS15RefusedFreezeIsNotGradedUnderTheParent(HygieneCase):
     """SS-A15 — `freeze_candidate` swallows GitError and returns HEAD: the gate then grades a worktree that
     holds the story's work while every record is stamped with the parent SHA."""
 
-    @unittest.expectedFailure   # SS-A15: candidate:frozen ok=False recorded, yet gate:input.candidate == the story-entry parent and test/lint ran on the dirty tree under it
+    # GREEN since F1 (SS-A15: typed freeze outcome / session-bound proofs), 2026-09-16
     def test_a_refused_freeze_does_not_grade_the_tree_under_the_parent_sha(self):
         c = Developer(first=_stage_out_of_scope, then=None)
         out = self.implement(c, retries=0)
         ev = EvidenceStore(self.artifacts).read(HSID)
         self.assertIsNotNone(ev.last(TOOL_RUN, "candidate:frozen"), "precondition: the freeze was refused")
-        self.assertEqual(out.attempts[0].candidate, self.entry, "precondition: HEAD is still the parent")
         gi = ev.last(NOTE, "gate:input")
         graded = str(gi.detail.get("candidate") or "") if gi else ""
         self.assertNotEqual(graded, self.entry, "the gate graded the worktree's work under the parent SHA")
+        self.assertFalse(out.done)
+        self.assertTrue(out.attempts and out.attempts[0].infra and not out.attempts[0].candidate,
+                        "a refused freeze is a typed environment outcome with no candidate, never a grading")
 
 
 # ---------------------------------------------------------------- FAM-IDENTITY / INV-D.1
@@ -345,7 +347,7 @@ class TestSSC2CandidateOfRecordIsTheGradedCandidate(unittest.TestCase):
     """SS-C2 — `Evidence.candidate` returns the newest `detail['candidate']` of any event; a
     `retry:recovery` note naming another SHA after the last `gate:input` becomes the candidate of record."""
 
-    @unittest.expectedFailure   # SS-C2: Evidence.candidate returned the retry:recovery SHA (C1), not the graded gate:input SHA (C2)
+    # GREEN since F1 (candidate of record / identity-bound proofs), 2026-09-16
     def test_a_recovery_note_after_the_gate_does_not_change_the_candidate_of_record(self):
         ev = _ev(
             {"kind": TOOL_RUN, "name": "test", "ok": True, "detail": {"candidate": C2}},
@@ -361,7 +363,7 @@ class TestSST1TddVerdictFollowsPositionAndCandidateNotSeq(unittest.TestCase):
     """SS-T1 — `tdd.red_before_green` compares `e.seq < last_green.seq`; `read()` orders by (at, seq), so a
     seq that disagrees with position (reset counter, clock skew across machines) decides the verdict."""
 
-    @unittest.expectedFailure   # SS-T1: red_before_green returned True for [green(at=1, seq=5), red(at=2, seq=1)] — seq, not position, decided
+    # GREEN since F1 (SS-T1: TDD verdict by position within the candidate's evidence), 2026-09-16
     def test_a_red_run_positioned_after_the_green_does_not_prove_tdd(self):
         ev = Evidence(story_id=SID, events=[
             Event(kind=TOOL_RUN, name="test", ok=True, seq=5, at=1.0, detail={"candidate": C2}),
@@ -389,7 +391,7 @@ class TestSSX1WaiverBindsToTheStorysCandidate(unittest.TestCase):
     """SS-X1 — `_waive_review` binds the operator's waiver to the newest `gate:input`'s candidate; a later
     scoring at another SHA (a `--no-isolate` verify at the trunk) silently takes the signature."""
 
-    @unittest.expectedFailure   # SS-X1: the waiver was recorded at the trunk SHA of the later gate:input, not at the story branch tip the operator was looking at; exit 0
+    # GREEN since F1 (SS-X1: waiver bound to the story branch tip), 2026-09-16
     def test_a_waiver_is_refused_or_bound_to_the_story_branch_tip_not_the_latest_scoring(self):
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp); _git(repo, "init", "-q", "-b", "main"); _git(repo, "config", "user.email", "t@t"); _git(repo, "config", "user.name", "t")

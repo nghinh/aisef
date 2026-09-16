@@ -114,6 +114,13 @@ class ImplementTestCase(unittest.TestCase):
         self._tmp = tempfile.TemporaryDirectory()
         self.project = Path(self._tmp.name)
         subprocess.run(["git", "init", "-q"], cwd=self.project, check=True)
+        # A project has a HEAD: without one every candidate freeze fails ("cannot read HEAD") and the loop
+        # is exercised on its unfrozen path only (found while resolving SS-01/SS-60, 2026-09-16).
+        subprocess.run(["git", "config", "user.email", "t@t"], cwd=self.project, check=True)
+        subprocess.run(["git", "config", "user.name", "t"], cwd=self.project, check=True)
+        (self.project / "README.md").write_text("project\n", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=self.project, check=True)
+        subprocess.run(["git", "commit", "-qm", "entry"], cwd=self.project, check=True)
         self.artifacts = self.project / "_bmad-output"
         self.artifacts.mkdir()
         self.story = Story(
@@ -1346,7 +1353,12 @@ class TestKyVongGuardTheoBaoCaoBienDich(ImplementTestCase):
         def run_va_ghi(spec):
             r = goc(spec)
             if spec.env.get("AISEF_STORY_ID"):
-                EvidenceStore(self.artifacts).file_change(spec.env["AISEF_STORY_ID"], "src/a.py")
+                # the guard hook runs inside the session and stamps it (control/identity.py, SS-02): a trace
+                # that names no session proves nothing about the session that produced the candidate
+                from aisef.control.identity import EvidenceIdentity
+                who = EvidenceIdentity(story_id=spec.env["AISEF_STORY_ID"], session_id=spec.env.get("AISEF_SESSION_ID", ""),
+                                       attempt=int(spec.env.get("AISEF_ATTEMPT") or 0))
+                EvidenceStore(self.artifacts, identity=who).file_change(spec.env["AISEF_STORY_ID"], "src/a.py")
             return r
         client.run = run_va_ghi
         out = self.implement(client)
@@ -1800,9 +1812,11 @@ class TestLuotBiNgatGiuLaiLoiRaSoat(ImplementTestCase):
                               capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
 
     def _ghi(self, sha: str, findings: list[str]) -> None:
+        # the reviewer's verdict is recorded as `reviewer:verdict` — `NOTE review` was never written by the
+        # kernel, which is why the reader stayed dead until F1 (SS-04)
         EvidenceStore(self.artifacts, candidate=sha).record("STORY-01-01", Event(
-            kind=NOTE, name="review", ok=not findings,
-            detail={"findings": findings, "attempt": 2}))
+            kind=NOTE, name="reviewer:verdict", ok=not findings,
+            detail={"verdict": "block" if findings else "pass", "findings": findings, "attempt": 2}))
 
     def test_muc_chan_con_lai_duoc_giao_lai_cho_luot_dau(self):
         self._ghi(self._head(), ["[block] tests/a.spec.js:217 — không chạm JSON.stringify"])
@@ -1871,7 +1885,10 @@ class TestLuotKhongVietGiThiKhongPhaiUngVien(ImplementTestCase):
             artifact_root=self.artifacts, client=client, config=self.config())
 
     def test_khong_ra_soat_lai_cay_y_het_va_khong_tinh_luot(self):
-        client = self.ImLang(writes=("src/a.py", "tests/test_a.py"),
+        # Both writes inside the write scope: an out-of-scope write would be restored by retry hygiene before
+        # attempt 2, and a tree that hygiene changed is legitimately re-graded (D-035 / INV-E.1) — that is not
+        # the "identical tree" this test is about.
+        client = self.ImLang(writes=("src/a.py", "src/b.py"),
                              review="[chặn] src/a.py:1 — thiếu kiểm tra")
         report = self.chay(client)
         self.assertEqual(self.so_lan_ra_soat(), 1,

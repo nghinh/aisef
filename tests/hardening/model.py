@@ -92,6 +92,7 @@ class Story:
     #: review QUALITY_BLOCK per candidate: True when its findings point outside the write scope
     block_outside: dict = field(default_factory=dict)
     prev_graded_candidate: int = 0   # the graded candidate before the current one, 0 = none / an ungraded session between
+    last_session_graded: bool = False  # the previous developer session produced a candidate (real: attempts[-2] not infra)
     noop_streak: int = 0
     merged: bool = False
     human_reason: str = ""
@@ -213,7 +214,10 @@ class Kernel:
     # developer
     def _freeze(self) -> None:
         s = self.s
-        s.prev_graded_candidate = s.candidate if s.candidate in s.graded_candidates else 0
+        # the deadlock pair is "two CONSECUTIVE graded attempts": an infra / no-op / capped session between them
+        # breaks the pair (the real kernel reads attempts[-1] and attempts[-2] and requires neither to be infra)
+        s.prev_graded_candidate = s.candidate if (s.candidate in s.graded_candidates and s.last_session_graded) else 0
+        s.last_session_graded = True
         s.candidate = 1000 * s.epoch + s.developer_sessions
         s.review_execs_here = s.security_execs_here = 0
         s.invalidate_dependent()              # a new candidate: every verdict over the old one is stale
@@ -242,7 +246,7 @@ class Kernel:
     def _develop_noop(self) -> str:
         s = self.s
         s.developer_sessions += 1
-        s.prev_graded_candidate = 0
+        s.last_session_graded = False
         s.infra_attempts += 1                 # a session with nothing to grade spends the same budget as an infra cut
         if s.candidate == 0:
             s.noop_streak += 1                # nothing frozen: a decision, stated (T6)
@@ -253,6 +257,8 @@ class Kernel:
             return NOOP
         verdict = s.fresh("gate")
         if verdict is None:                   # T6': stale or absent verdict → re-grade the frozen candidate
+            s.infra_attempts -= 1             # a graded session is not a "nothing to grade" session
+            self._charge_quality()            # ...it is a developer attempt whose tree the gate scores
             s.stage = VERIFY
             return NOOP
         if verdict.outcome == QUALITY_BLOCK:  # T6: proven unresolved work, decision stated
@@ -274,7 +280,8 @@ class Kernel:
     def _infra(self) -> str:
         s = self.s
         s.developer_sessions += 1
-        s.prev_graded_candidate = 0            # an ungraded session breaks the "two consecutive" deadlock pair
+        s.last_session_graded = False          # an ungraded session breaks the "two consecutive" deadlock pair
+        s.noop_streak = 0                      # ...and the no-op streak (the real kernel counts TRAILING no-ops)
         s.infra_attempts += 1
         if s.infra_attempts >= MAX_RETRIES + 1:
             s.status, s.terminal_reason = FAILED, "recurring infrastructure error"
@@ -295,7 +302,8 @@ class Kernel:
         attempt without a verdict (ADR-005 V11 (B): a free capped retry lets a thrashing agent retry forever)."""
         s = self.s
         s.developer_sessions += 1
-        s.prev_graded_candidate = 0
+        s.last_session_graded = False
+        s.noop_streak = 0
         s.quality_attempts += 1
         if s.quality_attempts > MAX_RETRIES:
             s.status, s.terminal_reason = FAILED, "did not pass gate"
@@ -447,14 +455,14 @@ class Kernel:
 
     # gate
     def _charge_quality(self) -> None:
-        """`quality_attempts` is the real kernel's `StoryOutcome.quality_attempts`: every developer attempt that
-        is not infra — i.e. every frozen candidate — counted once, whatever grading then says (PASS, QUALITY_BLOCK,
-        a stage that could not run, or a review that never ended). Infra exits (crash, timeout, auth, context) never reach the gate and are never charged;
-        that is INV-G.4. The exhaustion decision (MAX_RETRIES) is taken only on QUALITY_BLOCK."""
+        """`quality_attempts` is the real kernel's `StoryOutcome.quality_attempts`: every developer SESSION whose
+        tree gets graded — a new candidate, or the same candidate re-graded after a no-op over a stale verdict
+        (T6') — whatever grading then says (PASS, QUALITY_BLOCK, a stage that could not run, a review that never
+        ended). Infra exits (crash, timeout, auth, context) never reach the gate and are never charged (INV-G.4).
+        The exhaustion decision (MAX_RETRIES) is taken only on QUALITY_BLOCK."""
         s = self.s
-        if s.candidate not in s.graded_candidates:
-            s.graded_candidates.add(s.candidate)
-            s.quality_attempts += 1
+        s.graded_candidates.add(s.candidate)
+        s.quality_attempts += 1
 
     def _gate(self) -> str:
         s = self.s

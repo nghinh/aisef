@@ -60,8 +60,10 @@ def red_before_green(evidence: Evidence) -> bool:
     greens = [e for e in runs if e.ok]
     if not greens:
         return False
-    last_green = greens[-1]
-    return any((not e.ok) and not e.detail.get("skipped") and e.seq < last_green.seq for e in runs)
+    # position in the (time-ordered) evidence, never `seq`: sequence numbers restart when a writer could not
+    # read the file's tail (bug 42) and are audit metadata, not order (SS-T1, INV-D.2)
+    last_green_at = runs.index(greens[-1])
+    return any((not e.ok) and not e.detail.get("skipped") for e in runs[:last_green_at])
 
 
 def test_delta(workdir: Path | str, *, base_ref: str, changed: list[str]) -> list[str]:

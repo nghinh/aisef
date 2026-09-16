@@ -99,14 +99,25 @@ class TestBangChungDungCandidate(Muc):
         self.assertIn("test", [c.name for c in g.failures], "lần test ở bbb không được dùng cho aaa")
 
     def test_env_stale_la_unrunnable_neu_dung_hai_sha(self):
-        self.xanh(sha="aaa")
-        cu = self.kho("bbb").tool_run("S-01", "test", ok=True)
-        m = self.muc(self.gate(candidate="aaa"))
+        """F1 (INV-A.2/D.1): freshness, not recency, decides. A check with no record for THIS candidate but a
+        record at another SHA is stale — named with both SHAs, pointing at the foreign record."""
+        self.xanh(sha="aaa")                                   # test + lint at aaa
+        self.kho("bbb").tool_run("S-01", "test", ok=True)      # bbb: a test run, no lint run
+        cu = [e for e in self.store.read("S-01").events if e.name == "lint"][-1]
+        m = self.muc(self.gate(candidate="bbb"))
         self.assertIs(m.outcome, Outcome.UNRUNNABLE)
         self.assertTrue(m.outcome.must_be_named)
         self.assertIn("bbb", m.detail)
         self.assertIn("aaa", m.detail)
         self.assertEqual(m.evidence, [cu.seq], "trỏ đúng sự kiện stale, không trỏ cả tệp")
+
+    def test_env_ban_ghi_cu_dung_candidate_van_hop_le_du_co_ban_ghi_moi_o_sha_khac(self):
+        """The inverse (CF-06): a record fresh for this candidate stays valid however many records of OTHER
+        builds were appended later — sequence is audit metadata, never correctness."""
+        self.xanh(sha="aaa")
+        self.kho("bbb").tool_run("S-01", "test", ok=True)
+        m = self.muc(self.gate(candidate="aaa"))
+        self.assertIs(m.outcome, Outcome.PASSED, m.detail)
 
 
 class TestGuardCoChay(Muc):

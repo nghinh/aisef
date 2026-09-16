@@ -38,12 +38,20 @@ invariants:
     enforcement_points:
       - aisef/control/gate.py::_stale_candidates
       - aisef/harness/observe.py::Evidence.for_candidate
+      - aisef/control/identity.py::fresh
+      - aisef/harness/observe.py::Evidence.for_identity
+      - aisef/control/gate.py::_stale_for
+      - aisef/phases/implement.py::run_attempt (no candidate → typed UNRUNNABLE, nothing graded)
     deterministic_tests:
       - tests/test_candidate.py::TestGateCandidate
       - tests/test_gate_qualification.py::TestBangChungDungCandidate
       - tests/test_preservation.py::TestCongBaoToan
-      - tests/hardening/test_sibling_scan.py::TestSS02GuardHeartbeatIsBoundToTheGradedSession (RED)
-      - tests/hardening/test_sibling_scan.py::TestSS03CriteriaProofBindsToTheCandidate (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS02GuardHeartbeatIsBoundToTheGradedSession
+      - tests/hardening/test_sibling_scan.py::TestSS03CriteriaProofBindsToTheCandidate
+      - tests/hardening/test_sibling_scan.py::TestSS02GuardHeartbeatIsBoundToTheGradedSession
+      - tests/hardening/test_sibling_scan.py::TestSS03CriteriaProofBindsToTheCandidate
+      - tests/hardening/scan8a/test_group_b.py::TestSS15RefusedFreezeIsNotGradedUnderTheParent
+      - tests/hardening/scan8a/test_group_e.py::TestSS60ADoneStoryHasAFrozenCandidate
     model_tests:
       - tests/hardening/test_state_model.py::TestKernelModel::test_property_3_no_pass_on_foreign_evidence
     fault_injection_tests:
@@ -51,7 +59,7 @@ invariants:
     linked_defects:
       - SS-02
       - SS-03
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-A.3
     domain: candidate identity
     statement: The candidate that merges is the candidate that was verified, on a tree clean of story changes; harness-owned and tool-written paths are not story changes.
@@ -60,10 +68,12 @@ invariants:
     enforcement_points:
       - aisef/control/worktree.py::WorktreeManager._merge_story_inner
       - aisef/phases/run.py (merge_wave candidates)
+      - aisef/phases/run.py::_record_tip_after_failed_story
     deterministic_tests:
       - tests/test_worktree.py::TestCandidateInvariants
       - tests/test_run.py::TestDoneChiSauMerge
       - tests/hardening/test_sibling_scan.py::TestSS17MergeDirtCheckHonoursOwnership (RED)
+      - tests/hardening/scan8a/test_group_b.py::TestSS16WaveEndCommitOfAFailedStoryIsRecorded
     model_tests:
       - tests/hardening/test_state_model.py::TestKernelModel::test_property_7_complete_needs_every_proof
     fault_injection_tests:
@@ -159,14 +169,16 @@ invariants:
     statement: A baseline that could not be captured (tool unrunnable) is recaptured at the known root once the tool is available; it does not block the story forever.
     why: The root SHA is recorded; a transient environment failure must not become a permanent BASELINE_UNAVAILABLE.
     severity_if_violated: P2
-    enforcement_points: []
+    enforcement_points:
+      - aisef/phases/implement.py::run_baseline (temporary worktree at the epoch's root)
     deterministic_tests:
-      - tests/hardening/test_sibling_scan.py::TestSS18TransientBaselineFailureIsNotPermanent (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS18TransientBaselineFailureIsNotPermanent
+      - tests/test_baseline_provenance.py::TestBaselineProducer
     model_tests: []
     fault_injection_tests: []
     linked_defects:
       - SS-18
-    status: MISSING
+    status: PROVEN
   - invariant_id: INV-D.1
     domain: evidence provenance
     statement: Evidence may satisfy a gate only when every identity the decision depends on matches — run, story, story epoch, candidate, baseline root, stage, verifier configuration, environment.
@@ -175,9 +187,18 @@ invariants:
     enforcement_points:
       - aisef/control/gate.py::_at
       - aisef/phases/implement.py::_at
+      - aisef/control/identity.py::fresh
+      - aisef/control/gate.py::_stale_for
+      - aisef/harness/observe.py::Evidence.candidate
+      - aisef/harness/guardrails.py::run_guard (session-stamped records)
     deterministic_tests:
       - tests/test_gate.py::TestBangChungCuCuaLoaiKhongChamKhongLamOi
       - tests/test_ledger.py::TestUngVienChuaLanded
+      - tests/hardening/test_sibling_scan.py::TestSS02GuardHeartbeatIsBoundToTheGradedSession
+      - tests/hardening/test_sibling_scan.py::TestSS03CriteriaProofBindsToTheCandidate
+      - tests/hardening/scan8a/test_group_b.py::TestSSC2CandidateOfRecordIsTheGradedCandidate
+      - tests/hardening/scan8a/test_group_b.py::TestSS20ReviewRetryScoresThePinnedPreservationList
+      - tests/hardening/test_compound_faults.py::TestCF06DuplicateEventAfterResume
     model_tests:
       - tests/hardening/test_state_model.py::TestKernelModel::test_property_3_no_pass_on_foreign_evidence
     fault_injection_tests:
@@ -186,7 +207,7 @@ invariants:
       - SS-02
       - SS-03
       - SS-08
-    status: MISSING
+    status: PROVEN
   - invariant_id: INV-D.2
     domain: evidence provenance
     statement: The sequence number orders the audit trail; it is never a correctness identity.
@@ -195,15 +216,17 @@ invariants:
     enforcement_points:
       - aisef/harness/observe.py::Evidence.after_event
       - aisef/harness/observe.py::EvidenceStore._next_seq
+      - aisef/control/tdd.py::red_before_green (position, never seq)
     deterministic_tests:
       - tests/test_observe.py::TestSoThuTuKhongDuocDatLai
       - tests/test_observe.py::TestAfterEventByPosition
       - tests/test_gate.py::TestBaselineAfterGateSurvivesSeqReset
+      - tests/hardening/scan8a/test_group_b.py::TestSST1TddVerdictFollowsPositionAndCandidateNotSeq
     model_tests: []
     fault_injection_tests: []
     linked_defects:
       - SS-T1
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-D.3
     domain: evidence provenance
     statement: Merge authorization binds the verified SHA — verification.completed names the candidate it verified, and the merge compares identities, not journal order.
@@ -211,21 +234,31 @@ invariants:
     severity_if_violated: P1
     enforcement_points:
       - aisef/phases/run.py (candidate.frozen / verification.completed validity)
+      - aisef/control/worktree.py::merge_story (expected_candidate)
+      - aisef/phases/run.py (verification.completed carries candidate)
     deterministic_tests:
       - tests/test_run.py::TestDoneChiSauMerge
+      - tests/hardening/scan8a/test_group_b.py::TestSS08MergeAuthorizationBindsTheVerifiedSha
     model_tests: []
     fault_injection_tests: []
     linked_defects:
       - SS-08
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-E.1
     domain: evidence freshness
     statement: A verdict carries the identity of the state it was computed over; any change to that state (recovery, refresh, cleanup, config) makes the verdict stale for control.
     why: D-035 — the candidate SHA was unchanged, the evaluated tree was not, and the stale verdict ended the story.
     severity_if_violated: P1
-    enforcement_points: []
+    enforcement_points:
+      - aisef/control/identity.py::fresh
+      - aisef/harness/observe.py::Evidence.last_fresh
+      - aisef/phases/implement.py::run_attempt (no-op reads a FRESH verdict)
+      - aisef/phases/implement.py::_record_head_moved
     deterministic_tests:
-      - tests/hardening/test_verdict_freshness.py::TestInvariantEH (RED)
+      - tests/hardening/test_verdict_freshness.py::TestInvariantEH
+      - tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate
+      - tests/hardening/test_compound_faults.py::TestCF06DuplicateEventAfterResume
+      - tests/hardening/scan8a/test_group_b.py::TestSS09ResumeRefreshDoesNotSilentlyInvalidateTheCandidate
     model_tests:
       - tests/hardening/test_state_model.py::TestKernelModel::test_property_2_recovery_invalidates_dependent_evidence
       - tests/hardening/test_state_model.py::TestKernelModel::test_property_5_noop_never_terminates_on_stale_evidence
@@ -233,7 +266,7 @@ invariants:
       - tests/hardening/test_fault_matrix.py::TestStaleFaults
     linked_defects:
       - D-035
-    status: MISSING
+    status: PROVEN
   - invariant_id: INV-E.2
     domain: evidence freshness
     statement: Evidence is not valid merely because it is the latest record, because a file or session exists, or because its candidate SHA matches.
@@ -262,13 +295,14 @@ invariants:
     severity_if_violated: P2
     enforcement_points:
       - aisef/phases/implement.py::_unfinished_review
+      - aisef/phases/implement.py::_unfinished_review (reads reviewer:verdict)
     deterministic_tests:
-      - tests/hardening/test_sibling_scan.py::TestSS04ResumeFeedbackReaderIsAlive (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS04ResumeFeedbackReaderIsAlive
     model_tests: []
     fault_injection_tests: []
     linked_defects:
       - SS-04
-    status: MISSING
+    status: PROVEN
   - invariant_id: INV-F.1
     domain: typed outcomes
     statement: Control state uses the six typed outcomes; UNCONFIGURED and UNRUNNABLE never share a symbol with PASSED, and every non-PASSED line carries a reason.
@@ -460,16 +494,17 @@ invariants:
     statement: Before a no-op may end a story the kernel re-evaluates the current frozen candidate against fresh valid evidence, reruns model stages whose inputs changed, and classifies NO-OP terminal only when that evidence proves unresolved developer work.
     why: D-035 — the candidate was complete; the harness cited a verdict about dirt it had itself removed.
     severity_if_violated: P1
-    enforcement_points: []
+    enforcement_points:
+      - aisef/phases/implement.py::run_attempt (last_fresh gate:verdict before any no-op decision)
     deterministic_tests:
-      - tests/hardening/test_verdict_freshness.py::TestInvariantEH (RED)
+      - tests/hardening/test_verdict_freshness.py::TestInvariantEH
     model_tests:
       - tests/hardening/test_state_model.py::TestKernelModel::test_property_5_noop_never_terminates_on_stale_evidence
     fault_injection_tests:
       - tests/hardening/test_fault_matrix.py::TestStaleFaults
     linked_defects:
       - D-035
-    status: MISSING
+    status: PROVEN
   - invariant_id: INV-I.1
     domain: workspace ownership
     statement: Every changed path has an owner (developer, harness, verifier, generated client config, pre-existing dirt, external); harness, tool and generated paths are never attributed to the developer.
@@ -581,16 +616,19 @@ invariants:
     statement: Recovery itself changes evidence freshness — every verdict computed over the restored state is stale for control.
     why: D-035.
     severity_if_violated: P1
-    enforcement_points: []
+    enforcement_points:
+      - aisef/phases/implement.py::_invalidate_after_tree_change
+      - aisef/phases/implement.py::_record_head_moved
     deterministic_tests:
-      - tests/hardening/test_verdict_freshness.py::TestInvariantEH (RED)
+      - tests/hardening/test_verdict_freshness.py::TestInvariantEH
+      - tests/hardening/test_verdict_freshness.py::TestInvariantEH::test_recovery_records_a_typed_invalidation_naming_the_stale_verdict
     model_tests:
       - tests/hardening/test_state_model.py::TestKernelModel::test_property_2_recovery_invalidates_dependent_evidence
     fault_injection_tests:
       - tests/hardening/test_fault_matrix.py::TestStaleFaults
     linked_defects:
       - D-035
-    status: MISSING
+    status: PROVEN
   - invariant_id: INV-K.3
     domain: retry hygiene
     statement: Every recovery action is recorded as evidence with its exact effect (retry:recovery, review:immutable, review:candidate); none runs unrecorded.
@@ -599,14 +637,16 @@ invariants:
     enforcement_points:
       - aisef/phases/implement.py::recover_out_of_scope
       - aisef/phases/implement.py::_revert_reviewer_writes
+      - aisef/phases/implement.py::_restore_candidate_after_review_commit
     deterministic_tests:
       - tests/test_retry_hygiene.py::TestRetryStartsClean::test_I_evidence_records_the_violation_and_the_recovery_with_exact_paths
       - tests/test_implement.py::TestNguoiRaSoatKhongDuocSuaCay
+      - tests/hardening/scan8a/test_group_b.py::TestSS10ResetAfterAMovedCandidateIsRecorded
     model_tests: []
     fault_injection_tests: []
     linked_defects:
       - SS-A10
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-L.1
     domain: process lifecycle
     statement: Cancellation and timeout own and terminate the complete process tree of a session and of a sandboxed tool.
@@ -756,9 +796,11 @@ invariants:
     enforcement_points:
       - aisef/control/gate.py::review_waiver
       - aisef/phases/deploy.py
+      - aisef/cli/harness.py::_story_tip (waiver bound to the story branch tip)
     deterministic_tests:
       - tests/test_judge_only.py
       - tests/test_deploy.py::TestPlannedButNeverRun
+      - tests/hardening/scan8a/test_group_b.py::TestSSX1WaiverBindsToTheStorysCandidate
     model_tests: []
     fault_injection_tests: []
     linked_defects:

@@ -1,7 +1,7 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "phase": 7,
- "generated": "2026-09-16T10:30:12+00:00",
+ "generated": "2026-09-16T11:44:38+00:00",
  "stages": [
   "Developer",
   "Test",
@@ -121,7 +121,7 @@
    "expected_recovery": "re-grade before any no-op decision",
    "invariants": "INV-E.1, INV-H.2, INV-K.2",
    "test": "tests/hardening/test_verdict_freshness.py::TestInvariantEH",
-   "status": "RED (D-035)"
+   "status": "GREEN (F1)"
   },
   {
    "id": "FM-D-08",
@@ -565,7 +565,7 @@
    "expected_recovery": "re-grade",
    "invariants": "INV-E.1",
    "test": "tests/hardening/test_verdict_freshness.py::TestInvariantEH",
-   "status": "RED (D-035)"
+   "status": "GREEN (F1)"
   },
   {
    "id": "FM-E-04",
@@ -601,7 +601,7 @@
    "expected_recovery": "—",
    "invariants": "INV-A.2, INV-D.1",
    "test": "tests/hardening/test_sibling_scan.py::TestSS02GuardHeartbeatIsBoundToTheGradedSession",
-   "status": "RED (SS-02, SS-03)"
+   "status": "GREEN (F1)"
   },
   {
    "id": "FM-W-01",
@@ -661,7 +661,7 @@
    "expected_recovery": "refresh with a record",
    "invariants": "INV-E.1",
    "test": "tests/hardening/scan8a/test_group_b.py::TestSS09ResumeRefreshDoesNotSilentlyInvalidateTheCandidate::test_resume_after_main_advanced_retries_the_review_or_records_the_invalidation",
-   "status": "RED (SS-09, SS-16)"
+   "status": "GREEN (F1)"
   },
   {
    "id": "FM-X-01",
@@ -745,7 +745,7 @@
    "expected_recovery": "reconcile then merge",
    "invariants": "INV-E.1, INV-H.2, INV-M.1",
    "test": "tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate::test_the_rerun_converges_to_done_with_exactly_one_integration",
-   "status": "RED (SS-61)"
+   "status": "GREEN (F1)"
   },
   {
    "id": "FM-C-05b",
@@ -769,7 +769,7 @@
    "expected_recovery": "none",
    "invariants": "INV-A.2, INV-D.1",
    "test": "tests/hardening/test_compound_faults.py::TestCF06DuplicateEventAfterResume::test_a_replayed_old_record_never_outranks_the_candidates_own_result",
-   "status": "RED (F1)"
+   "status": "GREEN (F1)"
   },
   {
    "id": "FM-C-07",
@@ -781,7 +781,7 @@
    "expected_recovery": "re-grade",
    "invariants": "INV-E.1, INV-H.2, INV-K.2",
    "test": "tests/hardening/test_verdict_freshness.py::TestInvariantEH",
-   "status": "RED (D-035)"
+   "status": "GREEN (F1)"
   },
   {
    "id": "FM-C-08",
@@ -857,8 +857,8 @@
   }
  ],
  "status_count": {
-  "GREEN": 43,
-  "RED": 26,
+  "GREEN": 50,
+  "RED": 19,
   "NEEDS_TEST": 0
  }
 }

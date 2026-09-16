@@ -15,6 +15,14 @@ from ..harness.tools import aisef_argv
 from ._common import ARTIFACT_ROOT, EXIT_NOT_READY, EXIT_OK, EXIT_USAGE, _artifact_root, _client
 
 
+def _story_tip(project: Path, story_id: str) -> str:
+    """The story branch's current commit ("" when the branch does not exist)."""
+    import subprocess
+    r = subprocess.run(["git", "rev-parse", "--verify", "--quiet", f"story/{story_id}"], cwd=project,
+                       capture_output=True, text=True, encoding="utf-8", errors="replace")
+    return r.stdout.strip() if r.returncode == 0 else ""
+
+
 def cmd_baseline(args) -> int:
     """Build baseline for brownfield: analyse the existing codebase."""
     from ..codebase.baseline import build_baseline
@@ -426,7 +434,18 @@ def _waive_review(args) -> int:
 
     root = _artifact_root(args)
     ev = EvidenceStore(root).read(args.story)
-    dau_vao = ev.last(NOTE, GATE_INPUT)
+    # A waiver binds to the story's CURRENT build — the story branch tip — not to whatever gate scoring was
+    # recorded last (a --verify-only run at another SHA, SS-X1 / INV-P.2).
+    tip = _story_tip(Path(args.project), args.story)
+    scorings = list(ev.of(NOTE, GATE_INPUT))
+    dau_vao = next((e for e in reversed(scorings) if not tip or str(e.detail.get("candidate") or "") == tip), None)
+    if dau_vao is None and scorings and tip:
+        latest = str(scorings[-1].detail.get("candidate") or "")
+        print(f"✗ {args.story}: the story branch stands at {tip[:8]} but the last gate scoring is of "
+              f"{latest[:8] or 'no candidate'} — a waiver cannot be bound to a build that was not scored. "
+              f"Re-verify the branch tip (`aisef run --verify-only --story {args.story}`), then waive.",
+              file=sys.stderr)
+        return EXIT_USAGE
     if dau_vao is None:
         print(f"✗ {args.story}: no gate scoring recorded — nothing to override",
               file=sys.stderr)

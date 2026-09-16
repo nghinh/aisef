@@ -378,6 +378,7 @@ def run_epic(
                     f"{o.story_id}: dở dang, chốt để không mất",
                     paths=list(story.write_scope) if story else None,
                 )
+                _record_tip_after_failed_story(o.story_id, artifact_root, worktrees)
                 worktrees.remove(o.story_id, delete_branch=False)
 
         if not all(o.done for o in wave.outcomes):
@@ -640,6 +641,8 @@ def _run_wave(
                 ok=outcome.done,
                 attempts=outcome.quality_attempts,
                 cost_usd=round(outcome.cost_usd, 4),
+                # the build this verification is about (SS-08, INV-D.3): merge authorisation names its SHA
+                candidate=(outcome.attempts[-1].candidate if outcome.attempts else ""),
             )
             last = outcome.attempts[-1] if outcome.attempts else None
             tx.record("review.completed", blocked=[
@@ -793,6 +796,26 @@ def _qualify_wave(
                          for m in (merges or [])),
         ),
     ).decision
+
+
+def _record_tip_after_failed_story(story_id: str, artifact_root: Path, worktrees: WorktreeManager) -> None:
+    """The wave end committed a failed story's leftover work onto its branch: if the tip moved past the
+    candidate of record, say so — in evidence and in the journal — so no later reader mistakes the new tip
+    for a graded build (SS-16, INV-A.3 / INV-E.1)."""
+    import subprocess
+    from ..harness.observe import NOTE, EvidenceStore, Event
+    store = EvidenceStore(artifact_root)
+    frozen = store.read(story_id).candidate
+    tip = subprocess.run(["git", "rev-parse", "--verify", f"story/{story_id}"], cwd=worktrees.repo, capture_output=True,
+                         text=True, encoding="utf-8", errors="replace").stdout.strip()
+    if not frozen or not tip or tip == frozen:
+        return
+    store.record(story_id, Event(kind=NOTE, name="candidate:moved", ok=True, detail={
+        "reason": "wave-end commit of unfinished work", "candidate": frozen, "head": tip,
+        "note": "the branch tip is not a graded build; --verify-only grades it as a new candidate"}))
+    journal = JournalStore(artifact_root)
+    journal.record(story_id, JEntry(step="candidate.moved", attempt=journal.read(story_id).attempt_no or 0,
+                                    data={"from": frozen, "to": tip, "reason": "wave-end commit of unfinished work"}))
 
 
 def run_sprint(

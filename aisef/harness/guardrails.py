@@ -27,6 +27,9 @@ from .observe import TOOL_RUN
 
 ENV_WRITE_SCOPE = "AISEF_WRITE_SCOPE"
 ENV_STORY_ID = "AISEF_STORY_ID"
+#: the developer session this hook runs inside (control/identity.py) and its attempt number
+ENV_SESSION_ID = "AISEF_SESSION_ID"
+ENV_ATTEMPT = "AISEF_ATTEMPT"
 ENV_BASE_REF = "AISEF_BASE_REF"
 #: Story working tree. The harness **knows** this path — it creates the
 #: worktree itself — so there is no need to ask the client. If the client
@@ -1162,18 +1165,27 @@ def record_outcome(
             run_log(artifact_root, f"guard {verdict.rule or kind} BLOCK "
                     + one_line(f"{event.get('tool_name') or '?'} · {verdict.reason}"))
         return
+    from ..control.identity import SESSION_FIELDS, EvidenceIdentity, fresh
     from .observe import GUARD_BLOCK, GUARD_CHECK, GUARD_SEEN, TOOL_RUN, EvidenceStore, Event
 
-    store = EvidenceStore(artifact_root)
+    # The guard runs inside the client's session: its records bind to that session (SS-02), so a heartbeat
+    # left by attempt N cannot prove attempt N+1's hook ran.
+    _env = env if env is not None else os.environ
+    session = EvidenceIdentity(story_id=story, session_id=str(_env.get(ENV_SESSION_ID) or ""),
+                               attempt=int(_env.get(ENV_ATTEMPT) or 0))
+    store = EvidenceStore(artifact_root, identity=session if session.session_id else None)
     tool_input = event.get("tool_input") or {}
     tool = str(event.get("tool_name") or "")
     hien_co = store.read(story)
 
-    # Heartbeat: once per story. Measured on `par`: sessions using only Bash
+    # Heartbeat: once per session. Measured on `par`: sessions using only Bash
     # to write files have no Write/Edit going through `write-scope`, and
     # nothing gets blocked — evidence is empty despite the hook running 17
     # times. "Hook reachable" must be its own event, not inferred from others.
-    if not hien_co.of(GUARD_SEEN):
+    seen = hien_co.of(GUARD_SEEN)
+    if session.session_id:
+        seen = [e for e in seen if fresh(e, session, SESSION_FIELDS).ok]
+    if not seen:
         store.record(story, Event(kind=GUARD_SEEN, name=kind, detail={"tool": tool}))
 
     store.record(story, Event(

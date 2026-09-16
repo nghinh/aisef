@@ -46,6 +46,7 @@ from .acceptance import (ac_code, coverage as ac_coverage, missing as ac_missing
 from .outcome import Check, Outcome
 from .tdd import red_before_green
 from .security import DEFAULT_BLOCKING
+from .identity import CONTROL_FIELDS, SESSION_FIELDS, EvidenceIdentity, fresh  # noqa: F401
 from ..harness.observe import FILE_CHANGE, GUARD_BLOCK, GUARD_SEEN, MOCKUP_MAP, NOTE, TOOL_RUN, Event, Evidence
 from ..harness.testlog import MAX_IDS
 from ..harness.tools import BASELINE_RUN, NO_MANIFEST, NO_SETUP, NOP_RUN
@@ -145,6 +146,23 @@ class StoryGate:
     def feedback(self) -> str:
         """Feedback to pass back to the agent on the next attempt."""
         return "\n".join(f"- {c.name}: {c.detail}" for c in self.failures)
+
+
+def _stale_for(evidence: Evidence, current: EvidenceIdentity,
+               kinds: tuple[str, ...] | None = None) -> dict[str, str]:
+    """Checks whose evidence does not speak for `current`: no record fresh for this identity exists, yet a
+    bound record does — the code, the tree, the contract or the configuration changed after the check.
+    Keyed by check name, valued by the reason the latest bound record is not fresh. Sequence never decides:
+    an older record fresh for this identity is valid, a newer foreign one is not staleness (CF-06)."""
+    out: dict[str, str] = {}
+    for key, latest in _latest_per_check(evidence, kinds).items():
+        kind, name = key if isinstance(key, tuple) else (TOOL_RUN, key)
+        if not EvidenceIdentity.of(latest, evidence.story_id).bound:
+            continue          # never candidate-bound (a manual run, a legacy log): not staleness of this build
+        if evidence.last_fresh(kind, name, current) is not None:
+            continue
+        out[name] = fresh(latest, current, story_id=evidence.story_id).reason
+    return out
 
 
 def _stale_candidates(evidence: Evidence, candidate: str,
@@ -624,6 +642,7 @@ def evaluate(
     added_tests: list[str] | None = None,
     candidate: str = "",
     preservation: list[dict] | None = None,
+    identity: EvidenceIdentity | None = None,
 ) -> StoryGate:
     """Score a story from recorded evidence.
 
@@ -637,11 +656,24 @@ def evaluate(
     not applicable, so old callers see no change in outcome.
     """
     gate = StoryGate(story_id=story_id)
+    # The state being decided on. A story attempt passes its full identity (control/identity.py); a manual
+    # `aisef gate` passes a candidate only, and then binds on nothing but the candidate (legacy mode).
+    story_path = identity is not None
+    current = identity if identity is not None else EvidenceIdentity(story_id=story_id, candidate_sha=candidate)
+    if story_path:
+        candidate = current.candidate_sha
 
     loai = tuple(contract or ())
-    stale = _stale_candidates(evidence, candidate, loai) if candidate else []
     moi_nhat = _latest_per_check(evidence, loai)
-    if not candidate:
+    stale = _stale_for(evidence, current, loai) if candidate else {}
+    if not candidate and story_path:
+        # A story attempt without a frozen candidate: nothing can be graded (SS-60, SS-A15). Only a manual
+        # `aisef gate` with no candidate is "not applicable".
+        gate.checks.append(Check(
+            "evidence matches candidate", Outcome.UNRUNNABLE,
+            "no candidate was frozen for this attempt — nothing can be graded; the freeze failed or HEAD is unreadable",
+        ))
+    elif not candidate:
         gate.checks.append(Check(
             "evidence matches candidate", Outcome.NOT_APPLICABLE,
             "no candidate passed — cannot verify which build evidence belongs to",
@@ -649,17 +681,17 @@ def evaluate(
     elif stale:
         gate.checks.append(Check(
             "evidence matches candidate", Outcome.UNRUNNABLE,
-            f"stale: recorded at {', '.join(s[:7] for s in stale)}, "
-            f"current candidate is {candidate[:7]} — rerun checks on this build",
-            evidence=[e.seq for e in moi_nhat.values() if str(e.detail["candidate"]) != candidate],
+            "stale: " + "; ".join(f"{name}: {why}" for name, why in list(stale.items())[:4])
+            + f" — current candidate is {candidate[:7]}; rerun those checks on this build",
+            evidence=[e.seq for key, e in moi_nhat.items() if (key[1] if isinstance(key, tuple) else key) in stale],
         ))
     else:
         gate.checks.append(Check("evidence matches candidate", True,
                                  evidence=[e.seq for e in moi_nhat.values()]))
     if candidate:
-        # After stating it, drop stale evidence: a check from another build
-        # must not silently make any check pass.
-        evidence = evidence.for_candidate(candidate)
+        # After stating it, drop evidence that is not fresh for this identity: a check from another build,
+        # another tree state or another configuration must not silently make any check pass.
+        evidence = evidence.for_identity(current)
 
     # Hook generated != hook running. Claude Code only reads `.claude/settings.json`
     # of the tree it stands in; worktree lacking that directory (project didn't
@@ -673,11 +705,16 @@ def evaluate(
             "hooks not compiled for this client — not expected",
         ))
     else:
-        # First trace is enough to answer "did the hook fire".
-        dau_vet = evidence.of(GUARD_SEEN) or evidence.of(GUARD_BLOCK) or evidence.of(FILE_CHANGE)
+        # First trace is enough to answer "did the hook fire" — of THIS session (SS-02): a heartbeat left by
+        # an earlier attempt proves nothing about the session that produced this candidate.
+        traces = evidence.of(GUARD_SEEN) + evidence.of(GUARD_BLOCK) + evidence.of(FILE_CHANGE)
+        if current.session_id:
+            traces = [e for e in traces if fresh(e, current, SESSION_FIELDS).ok]
+        dau_vet = traces[:1]
+        reached = bool(traces)
         gate.checks.append(Check(
-            "guard ran", evidence.guard_reached,
-            "" if evidence.guard_reached else (
+            "guard ran", reached,
+            "" if reached else (
                 "guard did not evaluate any write in this session — hook cannot "
                 "reach worktree? (.claude/ not committed, or --settings not "
                 "passed). A story that writes nothing also lands here, and that is correct."
@@ -808,6 +845,8 @@ def evaluate(
         for e in evidence.of(TOOL_RUN):
             if not e.ok or not e.name.startswith("qa:"):
                 continue
+            if candidate and not EvidenceIdentity.of(e).bound:
+                continue          # SS-03: an unstamped run proves nothing about this build
             hong = {str(x) for x in (e.detail.get("failed_ids") or [])}
             ids = [str(t) for t in (e.detail.get("test_ids") or []) if str(t) not in hong]
             if ids:

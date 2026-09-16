@@ -18,7 +18,8 @@
    "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE": 12,
    "F6-BENCH-RELEASE-APPROVAL": 6,
    "F5-PROCESS-TOOL-ENVIRONMENT": 10
-  }
+  },
+  "fixed": 16
  },
  "fix_families": {
   "F1-IDENTITY-PROVENANCE-FRESHNESS": [
@@ -62,7 +63,8 @@
     "statement": "`guard ran` reads GUARD_SEEN, written once per story and never stamped; for_candidate keeps unstamped events, so attempt N's heartbeat proves attempt N+1's guard ran",
     "reproducer": "tests/hardening/test_sibling_scan.py::TestSS02GuardHeartbeatIsBoundToTheGradedSession",
     "provenance": "Phase 3 sweep",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-03",
@@ -77,7 +79,8 @@
     "statement": "`criteria have tests` harvests test ids from any green qa:* run kept by for_candidate, including unstamped pre-freeze runs",
     "reproducer": "tests/hardening/test_sibling_scan.py::TestSS03CriteriaProofBindsToTheCandidate",
     "provenance": "Phase 3 sweep",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-04",
@@ -92,7 +95,8 @@
     "statement": "reads NOTE named `review`; verdicts are recorded as `reviewer:verdict` — the function always returns empty, the resume-feedback feature never worked",
     "reproducer": "tests/hardening/test_sibling_scan.py::TestSS04ResumeFeedbackReaderIsAlive",
     "provenance": "Phase 3 sweep",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-18",
@@ -107,7 +111,8 @@
     "statement": "an `unrunnable` baseline is never reused; once the worktree has commits, head != root records BASELINE_UNAVAILABLE on every run although root is known",
     "reproducer": "tests/hardening/test_sibling_scan.py::TestSS18TransientBaselineFailureIsNotPermanent",
     "provenance": "Phase 3 sweep",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "D-035",
@@ -123,7 +128,8 @@
     "statement": "no-op shortcut keyed on the candidate SHA having any verdict; recovery changed the evaluated tree without invalidating it",
     "reproducer": "tests/hardening/test_verdict_freshness.py::TestInvariantEH",
     "provenance": "Phase 3 sweep",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-09",
@@ -138,7 +144,8 @@
     "statement": "the worktree refresh merges main before the resume looks for a pending review; HEAD moves, the frozen candidate is invalidated with no record, and a REVIEW_UNRUNNABLE story reopens a developer",
     "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS09ResumeRefreshDoesNotSilentlyInvalidateTheCandidate::test_resume_after_main_advanced_retries_the_review_or_records_the_invalidation",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-16",
@@ -153,7 +160,8 @@
     "statement": "leftover in-scope work is committed on top of the frozen candidate with no journal/evidence record; `--verify-only` then finds no evidence at the new HEAD; paths=declared scope loses harness-granted files",
     "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS16WaveEndCommitOfAFailedStoryIsRecorded::test_leftover_work_committed_at_wave_end_is_named_by_a_record",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-20",
@@ -167,7 +175,8 @@
     "statement": "R4 pins the preservation list once per attempt; the review-stage retry and verify-only rebuild it from the ledger, so the re-review scores a different list than the candidate was written against",
     "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS20ReviewRetryScoresThePinnedPreservationList::test_the_review_stage_retry_uses_the_list_the_attempt_was_pinned_to",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-22",
@@ -182,7 +191,8 @@
     "statement": "fork_point is recomputed every implement_story call; the baseline is reused at its recorded root while nop level 2 and review_diff use the new base_ref",
     "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS22NopParentMatchesTheBaselineRoot::test_the_nop_control_runs_at_the_baseline_root_or_records_the_mismatch",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-A10",
@@ -196,7 +206,8 @@
     "statement": "the reset result is not checked or recorded; --hard also destroys out-of-scope dirt a write-scope:violation note still describes",
     "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS10ResetAfterAMovedCandidateIsRecorded::test_dirt_destroyed_by_the_reset_is_preserved_or_named",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-A15",
@@ -210,7 +221,8 @@
     "statement": "on a refused freeze the gate grades the worktree while stamping the parent SHA; run.py refuses the merge later, so no false merge, but a misleading gate result",
     "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS15RefusedFreezeIsNotGradedUnderTheParent::test_a_refused_freeze_does_not_grade_the_tree_under_the_parent_sha",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-T1",
@@ -224,7 +236,8 @@
     "statement": "the last seq comparison in the codebase; read() re-sorts by (at, seq) so it is position-consistent today",
     "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSST1TddVerdictFollowsPositionAndCandidateNotSeq::test_a_red_run_positioned_after_the_green_does_not_prove_tdd",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-X1",
@@ -238,7 +251,8 @@
     "statement": "an operator waiver binds to the most recent gate:input, which may be a verify-only run at another SHA",
     "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSSX1WaiverBindsToTheStorysCandidate::test_a_waiver_is_refused_or_bound_to_the_story_branch_tip_not_the_latest_scoring",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-C2",
@@ -252,7 +266,8 @@
     "statement": "the 'candidate of record' for closure G4.5 is whichever event was written last with a candidate key — gate:input and the new retry:recovery note both qualify",
     "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSSC2CandidateOfRecordIsTheGradedCandidate::test_a_recovery_note_after_the_gate_does_not_change_the_candidate_of_record",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-60",
@@ -267,7 +282,8 @@
     "statement": "a failed freeze (cannot read HEAD) leaves candidate \"\"; the identity check is NOT_APPLICABLE and the story completes DONE bound to no candidate (merge refuses later — fail-closed downstream)",
     "reproducer": "tests/hardening/scan8a/test_group_e.py::TestSS60ADoneStoryHasAFrozenCandidate::test_a_story_whose_freeze_failed_is_not_done",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-61",
@@ -282,9 +298,10 @@
     "statement": "the gate PASSED and gate:verdict was written, the process died before verification.completed; the rerun reconciles the transaction to pending, the developer's identical write is a no-op 'returning the verdict it already returned' (a PASS!), and the story ends FAILED 'sessions kept producing nothing to grade' — a fully verified candidate needs manual intervention",
     "reproducer": "tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate::test_the_rerun_converges_to_done_with_exactly_one_integration",
     "provenance": "Phase 14 compound fault CF-05, commit after 259e587 (branch hardening/systematic-v1), 2026-09-16",
-    "status": "OPEN",
+    "status": "FIXED",
     "belongs_to_frozen_family": true,
-    "site": "aisef/phases/implement.py::run_attempt (no-op shortcut) + control/journal reconcile (attempt.aborted → pending)"
+    "site": "aisef/phases/implement.py::run_attempt (no-op shortcut) + control/journal reconcile (attempt.aborted → pending)",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
    }
   ],
   "F3-STRUCTURED-JUDGMENT-AUTHORITY": [
@@ -1104,8 +1121,9 @@
    "statement": "the gate PASSED and gate:verdict was written, the process died before verification.completed; the rerun reconciles the transaction to pending, the developer's identical write is a no-op 'returning the verdict it already returned' (a PASS!), and the story ends FAILED 'sessions kept producing nothing to grade' — a fully verified candidate needs manual intervention",
    "reproducer": "tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate::test_the_rerun_converges_to_done_with_exactly_one_integration",
    "provenance": "Phase 14 compound fault CF-05, commit after 259e587 (branch hardening/systematic-v1), 2026-09-16",
-   "status": "OPEN",
-   "belongs_to_frozen_family": true
+   "status": "FIXED",
+   "belongs_to_frozen_family": true,
+   "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
   },
   {
    "id": "AD-01",

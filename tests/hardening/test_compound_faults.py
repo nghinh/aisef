@@ -138,7 +138,7 @@ class TestCF04FreezeThenCrashBeforeEvidence(_Case):
 
 # --------------------------------------------------------------- CF-06 duplicate (replayed) event after resume
 class TestCF06DuplicateEventAfterResume(unittest.TestCase):
-    @unittest.expectedFailure   # F1 — the gate reads the LATEST record by position; a replayed old record becomes 'latest' and declares the candidate stale
+    # GREEN since F1 (CF-06 identity-bound staleness), 2026-09-16
     def test_a_replayed_old_record_never_outranks_the_candidates_own_result(self):
         C1, C2 = "1" * 40, "2" * 40
         events = [Event(kind=TOOL_RUN, name="test", ok=True, detail={"candidate": C1}),
@@ -218,7 +218,7 @@ class TestCF05EvidenceWrittenThenCrashBeforeStateUpdate(_RunCase):
         self.assertTrue(report.reconciled, "the orphaned transaction is reconciled before any new session")
         self.assertNotEqual(str(self.state().stories["STORY-01-01"].status), str(StoryStatus.RUNNING.value))
 
-    @unittest.expectedFailure   # SS-61 (F1) — the no-op shortcut reads 'any verdict at this SHA', not a FRESH PASSING one: the rerun's identical write is a no-op, the story ends FAILED
+    # GREEN since F1 (SS-61), 2026-09-16
     def test_the_rerun_converges_to_done_with_exactly_one_integration(self):
         self._crash_after_the_verdict()
         report = self.run_sprint(Agent(), only_epic="EPIC-01")

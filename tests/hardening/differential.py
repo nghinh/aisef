@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import re
 import sys
 import time
 import traceback
@@ -229,34 +230,42 @@ class _Case(HygieneCase):
         return client, out
 
 
-def _terminal_class(out, frozen: int = 0) -> str:
-    """The real kernel's terminal reason is prose (a Family 2 gap); classify it from typed facts where the prose
-    is ambiguous — the two no-op terminals differ by whether a candidate was ever frozen, not by wording."""
+def _terminal_class(out, frozen: int = 0, max_retries: int = 1) -> str:
+    """The real kernel's terminal reason is prose (a Family 2 gap). Classify from TYPED facts first — the
+    attempt flags and the budgets — and read wording only where no typed fact exists yet (plan deadlock,
+    tool-unrunnable environment)."""
     if out.done:
         return "done"
-    r = (out.blocked_reason or (out.attempts[-1].error if out.attempts else "") or "").lower()
-    if "credential" in r or "401" in r or "authentication" in r:
-        return "blocked:credential rejected"
-    if "isolation" in r or "revert and re-run" in r or "outside the worktree" in r:
-        return "blocked:isolation breach"
-    if "0 tool calls" in r or "cannot write code" in r:
-        return "blocked:zero output: model cannot use tools"
+    attempts = out.attempts
+    last = attempts[-1] if attempts else None
+    r = (out.blocked_reason or (last.error if last else "") or "").lower()
+    if last is not None and last.fatal:
+        if "isolation" in r or "revert and re-run" in r or "outside the worktree" in r:
+            return "blocked:isolation breach"
+        if "0 tool calls" in r or "cannot write code" in r:
+            return "blocked:zero output: model cannot use tools"
+        if "credential" in r or "authentication" in r or re.search(r"\b40[13]\b", r):
+            return "blocked:credential rejected"       # a bare '401' also occurs inside commit hashes
+        return f"blocked:FATAL:{r[:80]}"
     if "review_unrunnable" in r or "reviewer could not" in r or "review could not" in r:
         return "blocked:REVIEW_UNRUNNABLE"
-    if "kept producing nothing to grade" in r:
-        return "blocked:no-op: budget exhausted"
-    if "wrote nothing" in r or "ran clean" in r or "no-op" in r:
-        return ("blocked:no-op: developer declined proven work twice" if frozen
-                else "blocked:no-op: nothing to grade twice")
-    if "infrastructure" in r or "infra" in r:
-        return "failed:recurring infrastructure error"
-    if "budget" in r:
-        return "blocked:budget cap"
-    if ("did not pass gate" in r or ("tried" in r and "attempt" in r) or "exhausted" in r
-            or "ended with nothing to grade" in r):
-        return "failed:did not pass gate"
     if "deadlock" in r or "stuck" in r or "plan" in r:
         return "human:plan conflict"
+    if out.quality_attempts > max_retries:
+        return "failed:did not pass gate"
+    trailing_noops = 0
+    for a in reversed(attempts):
+        if not a.noop:
+            break
+        trailing_noops += 1
+    if trailing_noops >= 2:
+        return ("blocked:no-op: developer declined proven work twice" if frozen
+                else "blocked:no-op: nothing to grade twice")
+    infra = [a for a in attempts if a.infra and not a.fatal]
+    if len(infra) >= max_retries + 1:
+        return "blocked:no-op: budget exhausted" if (last is not None and last.noop) else "failed:recurring infrastructure error"
+    if "budget" in r:
+        return "blocked:budget cap"
     if "unrunnable" in r or "environment" in r:
         return "blocked:environment: test tool unrunnable"
     return f"blocked:UNMAPPED:{r[:90]}"
@@ -276,7 +285,7 @@ def real_run(sc: Scenario) -> Observation:
         infra = len([a for a in out.attempts if a.infra and not a.fatal])
         events = [f"{c.role}:{c.step}" for c in client.calls]
         events.append(out.summary().replace("\n", " | ")[:300])
-        return Observation(_terminal_class(out, len(frozen)), client.develop_calls,
+        return Observation(_terminal_class(out, len(frozen), sc.max_retries), client.develop_calls,
                            len([c for c in client.calls if c.role == "review"]),
                            len([c for c in client.calls if c.role == "security"]),
                            out.quality_attempts, infra, len(frozen), events)
@@ -286,6 +295,7 @@ def real_run(sc: Scenario) -> Observation:
 
 # ------------------------------------------------------------ attribution of a mismatch to an OPEN defect
 # Each rule: (defect id, predicate over the scenario). Emptied as families close (W0: KNOWN == {}).
+# Removed: D-035 (F1, 2026-09-16 — the no-op decision reads a fresh verdict; the kernel agrees with the model).
 KNOWN = {
     "SS-14": lambda sc: sc.test_tool_missing,
     "SS-15": lambda sc: "CONTEXT" in sc.developer,
@@ -293,7 +303,6 @@ KNOWN = {
     "SS-12": lambda sc: "BUDGET" in sc.review or "BUDGET" in sc.security,
     "SS-13": lambda sc: "UNRUNNABLE" in sc.security or "MALFORMED" in sc.security,
     "SS-57": lambda sc: "MALFORMED" in sc.review,
-    "D-035": lambda sc: "SCOPE_VIOLATION" in sc.developer and "NOOP" in sc.developer,
     # SS-59: on a retry the zero-output check diffs against the base branch, sees the frozen candidate's files
     # and never fires — the session is recorded as a no-op decision instead of a fatal environment failure
     "SS-59": lambda sc: "ZERO_OUTPUT" in sc.developer and any(

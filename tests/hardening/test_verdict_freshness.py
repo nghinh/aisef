@@ -91,7 +91,7 @@ class TestInvariantEH(HygieneCase):
     """Invariant E/H: a no-op cannot terminate the story on stale failed evidence; the clean frozen
     candidate must be re-graded with current evidence. RED on the 1.7.6 baseline (D-035)."""
 
-    @unittest.expectedFailure   # D-035 — remove this marker in the commit that fixes it
+    # GREEN since F1 (D-035), 2026-09-16
     def test_D_035_the_clean_candidate_is_regraded_and_the_story_completes(self):
         f = reproduce(self)
         self.assertTrue(f["regraded_after_recovery"],
@@ -102,3 +102,16 @@ class TestInvariantEH(HygieneCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_recovery_records_a_typed_invalidation_naming_the_stale_verdict(self):
+        """INV-K.2: recovery that changes the evaluated tree writes `evidence:invalidated` naming the verdict
+        records computed over the previous tree state — the refusal is visible, not only enforced."""
+        f = reproduce(self)
+        ev = EvidenceStore(self.artifacts).read(self.story.id)
+        notes = ev.of(NOTE, "evidence:invalidated")
+        self.assertTrue(notes, "no typed invalidation after retry hygiene changed the tree")
+        first_verdict = ev.of(NOTE, "gate:verdict")[0]
+        self.assertIn(first_verdict.seq, notes[0].detail.get("invalidated", []),
+                      f"the invalidation must name the stale verdict: {notes[0].detail}")
+        self.assertEqual(notes[0].detail.get("reason"), "retry:recovery")
+        self.assertTrue(f["done"], f["blocked_reason"])

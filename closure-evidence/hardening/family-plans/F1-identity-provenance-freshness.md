@@ -75,3 +75,29 @@ RED before / GREEN after for every member above (`tests/hardening/test_verdict_f
 freshness records agree with the kernel (differential `KNOWN` loses `D-035`); fault cells FM-D-07, FM-E-03, FM-E-06,
 FM-W-05 GREEN; INV-A.*, C.1, C.3, D.*, E.1, E.3, K.2, K.3, P.2 PROVEN; negative controls, full suite, ruff, Linux and
 Windows CI green. No STORY-04-01 special case anywhere.
+
+## 7. Closure record (2026-09-16, branch hardening/systematic-v1)
+
+Implemented as designed: `aisef/control/identity.py` (identity tuple, `fresh()`, `tree_state_digest`, harness-path
+exclusions, `CURRENT` context so every store of an attempt stamps the attempt's identity), `Event.identity` +
+schema-1 migration on read, `Evidence.for_identity` / `last_fresh` / candidate of record, gate `_stale_for` (freshness,
+never recency; evidence pointer at the foreign record), typed UNRUNNABLE for a story attempt without a candidate,
+session-bound guard proofs, `run_attempt` no-op decision on a FRESH verdict (T6/T6'), freeze returns no candidate on
+failure, `_invalidate_after_tree_change` (recovery) and `_record_head_moved` (refresh / wave-end / manual move),
+soft reset + selective restore after a reviewer commit, pinned preservation list on review retries, nop control at
+the epoch's baseline root (when it precedes the candidate), baseline re-captured at the root through a temporary
+worktree, resume feedback read from `reviewer:verdict`, TDD verdict by position, waiver bound to the story tip,
+`verification.completed` carries the candidate.
+
+Members RED → GREEN (markers removed in this commit): D-035, SS-61, SS-02, SS-03, SS-04, SS-09, SS-16, SS-18, SS-20,
+SS-22, SS-A10 (2), SS-A15, SS-C2, SS-T1, SS-X1, SS-60; compound CF-05, CF-06; fault cell TestStaleFaults.
+Fault matrix 50 GREEN / 19 RED (was 43 / 26). Registry 22 PROVEN / 24 PARTIAL / 4 MISSING (was 12 / 28 / 10).
+Differential: 400 traces on the baseline seed range, 0 unexplained, `KNOWN` no longer lists D-035. State model
+10 000 traces, 0 violations, 18 conformance scenarios agree or deviate where SS-12/13/14/15/57/59 predict.
+
+Existing tests adapted to the new contract (each change names why): the implement fixture has a HEAD; simulated
+guard traces stamp their session; the identical-tree retry writes in scope (an out-of-scope write is restored by
+hygiene and legitimately re-graded); the review-recovery fixture seeds identity-stamped evidence; the D-033
+fail-closed test now expects capture at the integrated parent (INV-C.3); the gate-qualification staleness test asserts
+"no fresh record" rather than "latest record elsewhere", with the inverse as a companion; the interrupted-review test
+seeds `reviewer:verdict`.

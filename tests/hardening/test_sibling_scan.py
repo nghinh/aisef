@@ -57,11 +57,13 @@ class TestSS02GuardHeartbeatIsBoundToTheGradedSession(unittest.TestCase):
     """SS-02 — `guard ran` reads a once-per-story, unstamped GUARD_SEEN heartbeat; a later attempt whose
     session left no guard trace still passes. Invariant D/E: a proof binds to the graded session."""
 
-    @unittest.expectedFailure   # SS-02
+    # GREEN since F1 (SS-02: typed freeze outcome / session-bound proofs), 2026-09-16
     def test_a_heartbeat_from_attempt_1_does_not_prove_attempt_2s_guard_ran(self):
+        from aisef.control.identity import EvidenceIdentity
+        s1 = {"story_id": SID, "session_id": "sess-1", "attempt": 1, "schema_version": 2}   # what the guard hook stamps
         ev = _ev(
-            {"kind": GUARD_SEEN, "name": "write-scope", "detail": {"tool": "Write"}},
-            {"kind": AGENT_RUN, "name": f"{SID}#1", "detail": {"role": "developer"}},
+            {"kind": GUARD_SEEN, "name": "write-scope", "detail": {"tool": "Write"}, "identity": s1},
+            {"kind": AGENT_RUN, "name": f"{SID}#1", "detail": {"role": "developer"}, "identity": s1},
             {"kind": TOOL_RUN, "name": "test", "ok": True, "detail": {"candidate": C1, "test_format": "pytest", "test_ids": []}},
             {"kind": NOTE, "name": "gate:verdict", "ok": False, "detail": {"candidate": C1, "attempt": 1, "failures": ["review"]}},
             {"kind": AGENT_RUN, "name": f"{SID}#2", "detail": {"role": "developer"}},   # no guard event in this session
@@ -69,7 +71,8 @@ class TestSS02GuardHeartbeatIsBoundToTheGradedSession(unittest.TestCase):
             {"kind": TOOL_RUN, "name": "lint", "ok": True, "detail": {"candidate": C2}},
         )
         g = gate.evaluate(SID, ev, changed=["src/a.py"], write_scope=["src"], screens=[], guard_expected=True,
-                          candidate=C2, review_blocking=[])
+                          candidate=C2, review_blocking=[],
+                          identity=EvidenceIdentity(story_id=SID, candidate_sha=C2, session_id="sess-2", attempt=2))
         self.assertIsNot(_check(g, "guard ran").outcome, Outcome.PASSED,
                          "attempt 2's session has no guard trace; attempt 1's heartbeat is not about it")
 
@@ -78,7 +81,7 @@ class TestSS03CriteriaProofBindsToTheCandidate(unittest.TestCase):
     """SS-03 — `criteria have tests` harvests test ids from ANY green `qa:*` run kept by `for_candidate`,
     including unstamped runs from before the freeze. Invariant D: a proof carries the candidate."""
 
-    @unittest.expectedFailure   # SS-03
+    # GREEN since F1 (candidate of record / identity-bound proofs), 2026-09-16
     def test_an_unstamped_qa_run_cannot_satisfy_a_criterion_the_candidates_run_does_not(self):
         ev = _ev(
             {"kind": TOOL_RUN, "name": "qa:unit", "ok": True,          # pre-freeze, unstamped
@@ -96,7 +99,7 @@ class TestSS04ResumeFeedbackReaderIsAlive(unittest.TestCase):
     """SS-04 — `_unfinished_review` reads `NOTE "review"`, a record nothing writes (verdicts are
     `reviewer:verdict`); a resumed story never receives the reviewer's rejection. Invariant E/G."""
 
-    @unittest.expectedFailure   # SS-04
+    # GREEN since F1 (SS-04: the resume reader reads reviewer:verdict), 2026-09-16
     def test_a_recorded_rejection_at_head_is_handed_to_the_resumed_developer(self):
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp); _git(repo, "init", "-q"); _git(repo, "config", "user.email", "t@t"); _git(repo, "config", "user.name", "t")
@@ -228,7 +231,7 @@ class TestSS18TransientBaselineFailureIsNotPermanent(unittest.TestCase):
     has commits `head != root` records BASELINE_UNAVAILABLE forever. Invariant C/N: the root is known,
     the baseline can be captured there."""
 
-    @unittest.expectedFailure   # SS-18
+    # GREEN since F1 (SS-18: baseline recaptured at the known root), 2026-09-16
     def test_the_baseline_is_recaptured_at_the_known_root_once_the_tool_is_back(self):
         from aisef.harness.tools import BASELINE_RUN
         with tempfile.TemporaryDirectory() as tmp:
