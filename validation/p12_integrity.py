@@ -201,6 +201,7 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(); ap.add_argument("--out", default=str(ROOT / "closure-evidence/hardening/phase12/integrity.json"))
     ap.add_argument("--glob", default=str(ROOT / "closure-evidence/hardening/differential-p12-*[0-9].json"))
     ap.add_argument("--summary", default=str(ROOT / "closure-evidence/hardening/differential-p12-summary.json"), help="the W0 builder's input, derived from this consolidation")
+    ap.add_argument("--kernel-split", default=str(ROOT / "closure-evidence/hardening/phase12/kernel-split.json"), help="per-chunk kernel attribution (validation/p12_kernel_split.py)")
     a = ap.parse_args(argv)
     files = sorted(f for f in glob.glob(a.glob) if "rerun" not in Path(f).name); t0 = time.time()
     rerun = superseded(sorted(glob.glob(str(Path(a.glob).parent / "differential-p12-rerun-*.json"))))
@@ -216,7 +217,7 @@ def main(argv=None) -> int:
     print("historical mismatches:", c["mismatches"], "| effective after reruns:", c["mismatches_effective_after_reruns"], "| reruns:", c["reruns"])
     chunks = [json.load(open(f, encoding="utf-8")) for f in files]
     # candidate-kernel evidence per seed (phase12/kernel-split.json): a chunk that ran on the candidate, or a seed re-run on it
-    split_path = Path(a.out).parent / "kernel-split.json"
+    split_path = Path(a.kernel_split)
     split = json.loads(split_path.read_text(encoding="utf-8")) if split_path.is_file() else {"chunks": []}
     cand_chunks = {c["chunk"] for c in split["chunks"] if c.get("candidate_kernel")}
     direct_seeds = {s for f, d in zip(files, chunks, strict=True) if Path(f).stem.split("-")[-1] in cand_chunks
