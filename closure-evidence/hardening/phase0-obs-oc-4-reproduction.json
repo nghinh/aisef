@@ -1,0 +1,54 @@
+{
+ "defect": "D-035 (OBS-OC-4)",
+ "reproducer": "tests/hardening/test_verdict_freshness.py::reproduce (no OpenCode, LedgerLock-shaped fixture)",
+ "measured_on": "hardening/systematic-v1 at the 1.7.6 baseline",
+ "recorded": "2026-09-16T08:38:50+00:00",
+ "expected_facts": {
+  "1_C_failed_only_on_write_scope": true,
+  "2_hygiene_restored_dirt": true,
+  "3_candidate_sha_unchanged": true,
+  "4_developer_wrote_nothing": true,
+  "5_previous_verdict_stale_state_changed": true,
+  "6_framework_did_NOT_regrade": true,
+  "7_noop_terminated_on_stale_evidence": true
+ },
+ "facts": {
+  "candidate_C": "c9e0772603ca3203d74c6730ea44b72c5842acbb",
+  "attempt1_failures": [
+   "write scope"
+  ],
+  "recovery": [
+   {
+    "tracked": [
+     "ledgerlock/ledger.py",
+     "ledgerlock/store.py"
+    ],
+    "untracked": [],
+    "ok": true,
+    "candidate": "c9e0772603ca3203d74c6730ea44b72c5842acbb"
+   }
+  ],
+  "head_at_attempt2": "c9e0772603ca3203d74c6730ea44b72c5842acbb",
+  "developer_sessions": 3,
+  "developer_wrote_on_retry": false,
+  "tree_at_attempt2": {
+   "status": "",
+   "guard_allowed": true,
+   "ledger_restored": true,
+   "store_restored": true
+  },
+  "gate_verdicts": [
+   {
+    "attempt": 1,
+    "candidate": "c9e0772603ca3203d74c6730ea44b72c5842acbb",
+    "failures": [
+     "write scope"
+    ]
+   }
+  ],
+  "regraded_after_recovery": false,
+  "done": false,
+  "blocked_reason": "2 sessions in a row ran clean and wrote nothing: the session wrote nothing (0 turns) — the tree is exactly as the session found it, so the gate has nothing to grade. Re-running it would return the verdict it already returned. Re-opening with the same context returns the same decision — read the last gate verdict and fix what it asks for, or the story."
+ },
+ "verdict": "REPRODUCED — register as D-035, family EVIDENCE/VERDICT FRESHNESS + RETRY/RECOVERY SEMANTICS, P1; no fix in Phase 0"
+}

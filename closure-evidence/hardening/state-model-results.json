@@ -1,0 +1,274 @@
+{
+ "traces": 10000,
+ "steps": 105949,
+ "violations": [],
+ "violation_count": 0,
+ "terminal_classes": {
+  "done:COMPLETE": 3489,
+  "blocked:credential rejected": 1890,
+  "blocked:isolation breach": 1834,
+  "failed:did not pass gate": 941,
+  "blocked:owner declined: plan": 562,
+  "blocked:owner declined: merge": 309,
+  "failed:recurring infrastructure error": 192,
+  "blocked:REVIEW_UNRUNNABLE": 177,
+  "blocked:SECURITY_UNRUNNABLE": 176,
+  "blocked:no-op: nothing to grade twice": 125,
+  "running:GATE": 123,
+  "blocked:environment: test tool unrunnable": 65,
+  "orphaned:GATE": 57,
+  "blocked:no-op: developer declined proven work twice": 48,
+  "running:DEVELOP": 4,
+  "running:REVIEW": 3,
+  "running:SECURITY": 2,
+  "orphaned:DEVELOP": 2,
+  "orphaned:MERGE": 1
+ },
+ "events_exercised": {
+  "RECLAIM": 14735,
+  "PROCESS_DEATH": 12958,
+  "DEVELOP_CHANGED": 11365,
+  "TEST_PASS": 9968,
+  "GATE_EVALUATE": 6940,
+  "REVIEW_PASS": 6552,
+  "SECURITY_PASS": 4771,
+  "MERGE_OK": 3489,
+  "DEVELOP_TIMEOUT": 1983,
+  "DEVELOP_CONTEXT": 1949,
+  "STALE_REPLAY": 1947,
+  "DEVELOP_NOOP": 1919,
+  "CONTRACT_CHANGE": 1900,
+  "DEVELOP_SCOPE_VIOLATION": 1890,
+  "DEVELOP_AUTH": 1890,
+  "DEVELOP_CRASH": 1864,
+  "LEASE_EXPIRED": 1837,
+  "DEVELOP_TRUNK_COMMIT": 1834,
+  "WRONG_CANDIDATE_EVIDENCE": 1821,
+  "TEST_FAIL": 1652,
+  "TEST_UNRUNNABLE": 1647,
+  "CORRUPT_EVIDENCE": 1625,
+  "REVIEW_MUTATE": 1144,
+  "REVIEW_BLOCK": 1091,
+  "REVIEW_STUCK": 1090,
+  "REVIEW_UNRUNNABLE": 1089,
+  "REVIEW_MALFORMED": 1063,
+  "HUMAN_DECLINES": 871,
+  "HUMAN_ARBITRATION": 845,
+  "SECURITY_UNRUNNABLE": 797,
+  "SECURITY_BLOCK": 797,
+  "MERGE_CONFLICT": 626
+ },
+ "model": "tests/hardening/model.py (docs/ASSURANCE-KERNEL.md §6)",
+ "conformance": [
+  {
+   "scenario": "C1 happy path",
+   "expected": [
+    true,
+    1,
+    1
+   ],
+   "actual": [
+    true,
+    1,
+    1
+   ],
+   "known_deviation": null
+  },
+  {
+   "scenario": "C2 review unrunnable then pass",
+   "expected": [
+    true,
+    1,
+    1
+   ],
+   "actual": [
+    true,
+    1,
+    1
+   ],
+   "known_deviation": null
+  },
+  {
+   "scenario": "C3 review unrunnable exhausted",
+   "expected": [
+    false,
+    1,
+    1
+   ],
+   "actual": [
+    false,
+    1,
+    1
+   ],
+   "known_deviation": null
+  },
+  {
+   "scenario": "C4 security unrunnable then pass",
+   "expected": [
+    true,
+    1,
+    1
+   ],
+   "actual": [
+    true,
+    2,
+    2
+   ],
+   "known_deviation": "SS-13"
+  },
+  {
+   "scenario": "C5 review block then pass",
+   "expected": [
+    true,
+    2,
+    2
+   ],
+   "actual": [
+    true,
+    2,
+    2
+   ],
+   "known_deviation": null
+  },
+  {
+   "scenario": "C6 review stuck",
+   "expected": [
+    false,
+    1,
+    1
+   ],
+   "actual": [
+    false,
+    1,
+    1
+   ],
+   "known_deviation": null
+  },
+  {
+   "scenario": "C7 developer no-op twice with nothing frozen",
+   "expected": [
+    false,
+    2,
+    0
+   ],
+   "actual": [
+    false,
+    2,
+    0
+   ],
+   "known_deviation": null
+  },
+  {
+   "scenario": "C8 context window then changed",
+   "expected": [
+    true,
+    2,
+    1
+   ],
+   "actual": [
+    true,
+    2,
+    2
+   ],
+   "known_deviation": "SS-15"
+  },
+  {
+   "scenario": "C9 credential rejected",
+   "expected": [
+    false,
+    1,
+    0
+   ],
+   "actual": [
+    false,
+    1,
+    0
+   ],
+   "known_deviation": null
+  },
+  {
+   "scenario": "C10 test tool unrunnable",
+   "expected": [
+    false,
+    1,
+    1
+   ],
+   "actual": [
+    false,
+    2,
+    2
+   ],
+   "known_deviation": "SS-14"
+  },
+  {
+   "scenario": "C11 review budget rejection",
+   "expected": [
+    true,
+    1,
+    1
+   ],
+   "actual": [
+    "EXCEPTION ImportError",
+    1,
+    -1
+   ],
+   "known_deviation": "SS-12"
+  },
+  {
+   "scenario": "C12 scope violation then honest no-op (D-035)",
+   "expected": [
+    true,
+    2,
+    1
+   ],
+   "actual": [
+    false,
+    3,
+    1
+   ],
+   "known_deviation": "D-035"
+  },
+  {
+   "scenario": "C13 reviewer mutates then pass",
+   "expected": [
+    true,
+    1,
+    1
+   ],
+   "actual": [
+    true,
+    1,
+    1
+   ],
+   "known_deviation": null
+  },
+  {
+   "scenario": "C14 security block then pass",
+   "expected": [
+    true,
+    2,
+    2
+   ],
+   "actual": [
+    true,
+    2,
+    2
+   ],
+   "known_deviation": null
+  },
+  {
+   "scenario": "C15 developer commits on the trunk",
+   "expected": [
+    false,
+    1,
+    0
+   ],
+   "actual": [
+    false,
+    1,
+    0
+   ],
+   "known_deviation": null
+  }
+ ]
+}

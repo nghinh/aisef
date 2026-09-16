@@ -1,0 +1,898 @@
+{
+ "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
+ "phase": 3,
+ "generated": "2026-09-16T09:23:24+00:00",
+ "method": "five read-only sweeps over aisef/ (recency-as-identity; prose-to-control-state; retry locality and recovery; ownership, tools, leases, scope; plus a test-inventory map), every candidate then verified in code by hand; CONFIRMED requires a deterministic RED reproducer that failed on the invariant assertion (tests/hardening/test_sibling_scan.py, run 2026-09-16 on the 1.7.6 baseline: 21 expected failures, 0 unexpected successes)",
+ "counts": {
+  "CONFIRMED": 23,
+  "NEEDS_TEST": 38,
+  "NOT_A_DEFECT": 5
+ },
+ "entries": [
+  {
+   "id": "SS-02",
+   "site": "aisef/control/gate.py:677-686 + aisef/harness/guardrails.py:1173",
+   "family": "FAM-IDENTITY",
+   "invariants": [
+    "INV-A.2",
+    "INV-D.1"
+   ],
+   "semantic_context": "`guard ran` reads GUARD_SEEN, written once per story and never stamped; for_candidate keeps unstamped events, so attempt N's heartbeat proves attempt N+1's guard ran",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS02GuardHeartbeatIsBoundToTheGradedSession",
+   "notes": "false PASS of a structural check under client/session change — the exact shape of the mixed-client replay drift"
+  },
+  {
+   "id": "SS-03",
+   "site": "aisef/control/gate.py:808-817",
+   "family": "FAM-IDENTITY",
+   "invariants": [
+    "INV-A.2",
+    "INV-D.1"
+   ],
+   "semantic_context": "`criteria have tests` harvests test ids from any green qa:* run kept by for_candidate, including unstamped pre-freeze runs",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS03CriteriaProofBindsToTheCandidate",
+   "notes": "false PASS path: ids from a run on a tree that is not the candidate satisfy a criterion the candidate's own run does not"
+  },
+  {
+   "id": "SS-04",
+   "site": "aisef/phases/implement.py::_unfinished_review",
+   "family": "FAM-RECOVERY",
+   "invariants": [
+    "INV-E.3",
+    "INV-G.1"
+   ],
+   "semantic_context": "reads NOTE named `review`; verdicts are recorded as `reviewer:verdict` — the function always returns empty, the resume-feedback feature never worked",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS04ResumeFeedbackReaderIsAlive",
+   "notes": "dead guard; the documented todo-e2e resume bug is live"
+  },
+  {
+   "id": "SS-05",
+   "site": "aisef/phases/implement.py::_no_escalation",
+   "family": "FAM-JUDGE",
+   "invariants": [
+    "INV-B.2",
+    "INV-T.1"
+   ],
+   "semantic_context": "demotes today's block findings to advisory when the same (file, behavior_id) was advisory on ANY earlier candidate — across a contract change — and flips the verdict to pass",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS05EscalationDemotionStaysInsideTheEpoch",
+   "notes": "false PASS via the judge across epochs; within an epoch the demotion is a documented design choice"
+  },
+  {
+   "id": "SS-12",
+   "site": "aisef/phases/implement.py:1625 `from .mockup import RunResult`",
+   "family": "FAM-RETRY",
+   "invariants": [
+    "INV-G.5",
+    "INV-F.1"
+   ],
+   "semantic_context": "BudgetExceeded inside a review or security session is handled by importing a class aisef.phases.mockup does not define",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS12BudgetRejectionInReviewDoesNotCrash",
+   "notes": "ImportError escapes implement_story and kills the sprint; only reachable with a budget cap configured"
+  },
+  {
+   "id": "SS-13",
+   "site": "aisef/control/gate.py:949-950 + aisef/phases/implement.py:1171-1174",
+   "family": "FAM-RETRY",
+   "invariants": [
+    "INV-G.2",
+    "INV-F.3"
+   ],
+   "semantic_context": "a security SESSION failure (timeout, cut, tree modified) becomes Check('security', FAILED), is cached at the candidate (no _security_complete), and the loop reopens the developer",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS13SecurityExecutionFailureIsNotAVerdict",
+   "notes": "D-032's shape on the security stage; verify-only re-runs everything except the failed security session"
+  },
+  {
+   "id": "SS-14",
+   "site": "aisef/phases/implement.py::implement_story (no branch for gate blocked only on UNRUNNABLE)",
+   "family": "FAM-RETRY",
+   "invariants": [
+    "INV-G.3",
+    "INV-N.1"
+   ],
+   "semantic_context": "an UNRUNNABLE deterministic check (runner missing in the sandbox) blocks the gate; the only move is a new developer session charged to quality until max_retries",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS14ToolEnvironmentFailureIsNotADeveloperAttempt",
+   "notes": "tools.outcome_kind computes TOOL_UNRUNNABLE/ENVIRONMENT_FAILURE and nothing consumes it"
+  },
+  {
+   "id": "SS-15",
+   "site": "aisef/phases/implement.py:711-768 + aisef/clients/stream.py:199",
+   "family": "FAM-RETRY",
+   "invariants": [
+    "INV-G.4"
+   ],
+   "semantic_context": "`context`, `permission`, `cost` exit statuses leave the tree untouched and are charged to the quality budget (D-006's shape); only `auth` was compensated",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS15EnvironmentExitStatusesAreNotQualityAttempts",
+   "notes": "sibling of D-006"
+  },
+  {
+   "id": "SS-17",
+   "site": "aisef/control/worktree.py:492",
+   "family": "FAM-OWNERSHIP",
+   "invariants": [
+    "INV-A.3",
+    "INV-I.2"
+   ],
+   "semantic_context": "merge_story refuses a passed candidate when raw `git status --porcelain` is non-empty — including `.coverage` left by the test tool and client config the harness copied",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS17MergeDirtCheckHonoursOwnership",
+   "notes": "matches the replay observation OBS-OC-merge (merge refused for generated client config)"
+  },
+  {
+   "id": "SS-18",
+   "site": "aisef/phases/implement.py::run_baseline 1305-1327",
+   "family": "FAM-RECOVERY",
+   "invariants": [
+    "INV-C.3",
+    "INV-N.1"
+   ],
+   "semantic_context": "an `unrunnable` baseline is never reused; once the worktree has commits, head != root records BASELINE_UNAVAILABLE on every run although root is known",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS18TransientBaselineFailureIsNotPermanent",
+   "notes": "recapture at root via a temporary worktree is possible (worktree.temporary)"
+  },
+  {
+   "id": "SS-23",
+   "site": "aisef/harness/tools.py:298 (`not found` in MISSING_TOOL) + unrunnable_reason",
+   "family": "FAM-PROSE",
+   "invariants": [
+    "INV-F.3",
+    "INV-N.1"
+   ],
+   "semantic_context": "an all-red suite whose assertion messages contain `not found` is TOOL_UNRUNNABLE because the only escape is `.passed` non-empty; failed_ids already prove the runner ran",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS23RedTestsAreNotAMissingTool",
+   "notes": "D-029 with the polarity reversed; check_completion then lets the agent stop with red tests"
+  },
+  {
+   "id": "SS-24",
+   "site": "aisef/phases/implement.py::_reconcile (union of text items and JSON verdict)",
+   "family": "FAM-PROSE",
+   "invariants": [
+    "INV-F.2"
+   ],
+   "semantic_context": "a prose `[block] path` line blocks a candidate whose structured verdict is pass with no findings",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS24ProseNeverOverridesAStructuredVerdict",
+   "notes": "D-026 fixed the terminal half only; the blocking half still reads prose"
+  },
+  {
+   "id": "SS-25",
+   "site": "aisef/phases/implement.py::_paths_outside",
+   "family": "FAM-PROSE",
+   "invariants": [
+    "INV-F.2",
+    "INV-Q.1"
+   ],
+   "semantic_context": "regexes `word.ext` tokens out of reviewer prose to decide a repeated complaint points outside the write scope, which is what makes deadlock_reason terminal",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS25ScopeVerdictComesFromFindingsNotProse",
+   "notes": "verdict.findings[i]['file'] exists and is not used"
+  },
+  {
+   "id": "SS-26",
+   "site": "aisef/phases/implement.py::_vang_ma_cua_story",
+   "family": "FAM-PROSE",
+   "invariants": [
+    "INV-F.3",
+    "INV-T.1"
+   ],
+   "semantic_context": "clears an environment failure when a changed file's stem appears anywhere in the traceback (a third-party ModuleNotFoundError raised while importing that file); nop then scores red-as-intended and TDD passes on a suite that never ran",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS26EnvironmentFailureIsNotErasedBySubstring",
+   "notes": "false PASS path (tests verify story + TDD)"
+  },
+  {
+   "id": "SS-27",
+   "site": "aisef/control/security.py::is_noise",
+   "family": "FAM-PROSE",
+   "invariants": [
+    "INV-F.2",
+    "INV-T.1"
+   ],
+   "semantic_context": "drops a finding of any severity whose body mentions rate limiting/throttling/DoS; a critical auth-bypass finding worded with `no rate limit` stops blocking; JSON findings are re-parsed through the same filter",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS27NoiseFilterHasASeverityFloor",
+   "notes": "false PASS of the security check"
+  },
+  {
+   "id": "SS-28",
+   "site": "aisef/clients/stream.py::exit_status_of (auth branch)",
+   "family": "FAM-PROSE",
+   "invariants": [
+    "INV-F.4"
+   ],
+   "semantic_context": "classifies `auth` (fatal) from substrings of the agent's final text (`raw['result']`), before the structured api_error_status branch",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS28ExitStatusReadsTheProviderNotTheAgentsProse",
+   "notes": "any story about 401 handling can end as a fatal credential rejection"
+  },
+  {
+   "id": "SS-30",
+   "site": "aisef/control/machine_gate.py::_GIU_CHO",
+   "family": "FAM-PROSE",
+   "invariants": [
+    "INV-F.2"
+   ],
+   "semantic_context": "the stories machine gate rejects any criterion matching `\\bTODO\\b` (also stub, placeholder, no-op) — every to-do application, including this framework's dogfood corpora, fails plan approval",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS30PlaceholderRegexDoesNotBlockTodoApps",
+   "notes": "false BLOCK of a plan"
+  },
+  {
+   "id": "SS-35",
+   "site": "aisef/harness/guardrails.py:747-750 + aisef/phases/implement.py::_tree_snapshot",
+   "family": "FAM-OWNERSHIP",
+   "invariants": [
+    "INV-I.1",
+    "INV-J.1"
+   ],
+   "semantic_context": "`git status --porcelain -z` emits a rename as two NUL fields; `entry[3:]` on the bare original path yields a phantom `/a.py` outside every scope",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS35RenamedPathsKeepTheirIdentity",
+   "notes": "a staged `git mv` blocks every later tool call and, through hygiene, the next attempt"
+  },
+  {
+   "id": "SS-36",
+   "site": "aisef/phases/implement.py::_tree_snapshot (no is_tool_artifact)",
+   "family": "FAM-OWNERSHIP",
+   "invariants": [
+    "INV-I.1",
+    "INV-A.1"
+   ],
+   "semantic_context": "a reviewer that runs the suite and leaves `.coverage` is scored as having modified the tree: review discarded, REVIEW_UNRUNNABLE after the retry budget",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS36ToolArtifactsAreNotReviewerWrites",
+   "notes": "the no-op comparison has the same gap: a tool artifact makes a silent session look like work"
+  },
+  {
+   "id": "SS-39",
+   "site": "aisef/phases/implement.py::_tree_snapshot vs aisef/harness/guardrails.py::changed_files (VENDOR_PATHS by segment)",
+   "family": "FAM-OWNERSHIP",
+   "invariants": [
+    "INV-I.2",
+    "INV-K.1"
+   ],
+   "semantic_context": "the snapshot skips vendor paths only at the root; a nested node_modules the session installed is recorded as a violation and DELETED by retry hygiene, while the guard never counted it",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "tests/hardening/test_sibling_scan.py::TestSS39VendorPathsShareOneOwnershipRule",
+   "notes": "destructive: two ownership rules for one truth (class J)"
+  },
+  {
+   "id": "SS-57",
+   "site": "aisef/phases/implement.py::_reconcile (verdict None → text-only fallback)",
+   "family": "FAM-PROSE",
+   "invariants": [
+    "INV-F.2"
+   ],
+   "semantic_context": "a reviewer that never produces a structured verdict (twice) is scored from prose: no blocking lines → the review PASSES; a PASS came from the absence of a verdict",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "tests/hardening/test_fault_matrix.py::TestReviewFaults::test_a_malformed_verdict_never_passes_the_review",
+   "notes": "found by the Phase 7 fault matrix (FM-R-05) before any project hit it; the correct outcome is REVIEW_UNRUNNABLE"
+  },
+  {
+   "id": "SS-58",
+   "site": "aisef/control/gate.py (lint branch has no unrunnable path)",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-F.3",
+    "INV-N.1"
+   ],
+   "semantic_context": "the `test` check maps detail.unrunnable to UNRUNNABLE; the `lint` check maps a missing linter (ENOENT / exit 127) to FAILED — D-029's shape on the lint tool",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_fault_matrix.py::TestToolFaults::test_missing_linter_is_unrunnable",
+   "notes": "found by the Phase 7 fault matrix (FM-L-02) before any project hit it"
+  },
+  {
+   "id": "D-035",
+   "site": "aisef/phases/implement.py::run_attempt (cham_roi)",
+   "family": "FAM-RECOVERY",
+   "invariants": [
+    "INV-E.1",
+    "INV-H.2",
+    "INV-K.2"
+   ],
+   "semantic_context": "no-op shortcut keyed on the candidate SHA having any verdict; recovery changed the evaluated tree without invalidating it",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "tests/hardening/test_verdict_freshness.py::TestInvariantEH",
+   "notes": "registered Phase 0"
+  },
+  {
+   "id": "SS-01",
+   "site": "aisef/control/gate.py:767-776 (`real tests` PASSED when no qa:fake-tests record)",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-T.1"
+   ],
+   "semantic_context": "absence of the fake-tests record scores PASSED. In the story path verify_candidate always records the scan; in qa.run_suite the record is written only when fakes are found — so absence is the encoded clean result there. The gap: 'scan did not run' is indistinguishable from 'clean'",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending — record the scan outcome explicitly in run_suite and read absence as UNRUNNABLE",
+   "notes": "design gap rather than a live false pass"
+  },
+  {
+   "id": "SS-06",
+   "site": "aisef/control/closure.py:802 (`rev-parse --verify` in G4.5)",
+   "family": "FAM-RELEASE",
+   "invariants": [
+    "INV-R.2"
+   ],
+   "semantic_context": "object existence stands in for ancestry: a candidate frozen on an unmerged story branch resolves in the shared object store and passes 'in the corpus history'",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending — tests/test_closure.py Corpus fixture with an unmerged story candidate; expect G4.5 FAILED",
+   "notes": "the idiom `merge-base --is-ancestor` is already used in implement.py"
+  },
+  {
+   "id": "SS-07",
+   "site": "aisef/control/closure.py:758-760 (G4.4)",
+   "family": "FAM-RELEASE",
+   "invariants": [
+    "INV-R.2",
+    "INV-F.3"
+   ],
+   "semantic_context": "any TOOL_RUN review/security record of any outcome (including unrunnable and D-032 execution-failure shapes) satisfies 'review and security recorded'",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending — Corpus fixture with review record detail.unrunnable set; expect G4.4 not PASSED",
+   "notes": ""
+  },
+  {
+   "id": "SS-08",
+   "site": "aisef/phases/run.py:392-398 + journal verification.completed",
+   "family": "FAM-IDENTITY",
+   "invariants": [
+    "INV-D.3"
+   ],
+   "semantic_context": "merge authorization: verification.completed carries no SHA; validity = seq order + attempt number, and StoryRunTransaction always passes attempt=1",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending — journal with two candidate.frozen and one verification.completed; assert the merged SHA is the verified one by identity",
+   "notes": "Phase 9 identity binding"
+  },
+  {
+   "id": "SS-09",
+   "site": "aisef/phases/implement.py::_pending_review vs run.py:616 refresh",
+   "family": "FAM-RECOVERY",
+   "invariants": [
+    "INV-E.1",
+    "INV-A.1"
+   ],
+   "semantic_context": "the worktree refresh merges main before the resume looks for a pending review; HEAD moves, the frozen candidate is invalidated with no record, and a REVIEW_UNRUNNABLE story reopens a developer",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending — resume with main advanced; assert an invalidation record exists and the resume states why it re-verifies",
+   "notes": "sibling of D-035: state changed, no invalidation recorded"
+  },
+  {
+   "id": "SS-16",
+   "site": "aisef/phases/run.py:371-381 (wave-end commit_story + remove for failed stories)",
+   "family": "FAM-RECOVERY",
+   "invariants": [
+    "INV-A.3",
+    "INV-E.1"
+   ],
+   "semantic_context": "leftover in-scope work is committed on top of the frozen candidate with no journal/evidence record; `--verify-only` then finds no evidence at the new HEAD; paths=declared scope loses harness-granted files",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending — failed story with uncommitted in-scope work at run end; assert the branch tip equals the recorded candidate or a record names the new SHA",
+   "notes": "in the LedgerLock case nothing was left so HEAD stayed de2d3244"
+  },
+  {
+   "id": "SS-19",
+   "site": "aisef/phases/implement.py::_only_review_unrunnable",
+   "family": "FAM-RETRY",
+   "invariants": [
+    "INV-G.1"
+   ],
+   "semantic_context": "D-032 recovery requires review to be the SOLE failure; any co-blocking UNRUNNABLE (stale evidence, preservation unverifiable, flaky test) routes a reviewer absence back to the developer",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending — gate with review UNRUNNABLE and preservation UNRUNNABLE; assert review stage retried",
+   "notes": ""
+  },
+  {
+   "id": "SS-20",
+   "site": "aisef/phases/implement.py::_review_stage / verify_only (preservation recomputed)",
+   "family": "FAM-RECOVERY",
+   "invariants": [
+    "INV-D.1"
+   ],
+   "semantic_context": "R4 pins the preservation list once per attempt; the review-stage retry and verify-only rebuild it from the ledger, so the re-review scores a different list than the candidate was written against",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending",
+   "notes": ""
+  },
+  {
+   "id": "SS-21",
+   "site": "aisef/phases/implement.py:648-654 + aisef/control/budget.py:171-177",
+   "family": "FAM-RETRY",
+   "invariants": [
+    "INV-G.5"
+   ],
+   "semantic_context": "a developer BudgetExceeded is charged to quality; a non-blocking lock failure on the budget ledger raises BudgetExceeded, so lock contention between parallel stories is reported as a cap",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending — two threads reserve concurrently; assert no quality attempt is spent",
+   "notes": ""
+  },
+  {
+   "id": "SS-22",
+   "site": "aisef/phases/implement.py:2964-2969 + run_nop (base_ref recomputed per run)",
+   "family": "FAM-RECOVERY",
+   "invariants": [
+    "INV-C.1",
+    "INV-D.1"
+   ],
+   "semantic_context": "fork_point is recomputed every implement_story call; the baseline is reused at its recorded root while nop level 2 and review_diff use the new base_ref",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending",
+   "notes": "D-033 guards the baseline only"
+  },
+  {
+   "id": "SS-29",
+   "site": "aisef/control/closure.py:101 RESOLVED substring in G6.3",
+   "family": "FAM-PROSE",
+   "invariants": [
+    "INV-R.2",
+    "INV-F.2"
+   ],
+   "semantic_context": "`not resolved`, `unresolved`, `will be fixed` contain a RESOLVED marker, so an open P0/P1 onboarding blocker counts as done in a release gate",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P1",
+   "reproducer": "pending — external report table with status `not resolved`; expect G6.3 FAILED",
+   "notes": "release-gate false PASS; reproducer needs the Ctx fixture"
+  },
+  {
+   "id": "SS-31",
+   "site": "aisef/control/experience.py::_NO_SURFACE",
+   "family": "FAM-PROSE",
+   "invariants": [
+    "INV-F.2"
+   ],
+   "semantic_context": "one prose line in EXPERIENCE.md (`Screens: none … API only for now`) marks every UI verification kind NOT_APPLICABLE",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending",
+   "notes": "EXPERIENCE.md is an approved artifact; the risk is the regex, not the source"
+  },
+  {
+   "id": "SS-32",
+   "site": "aisef/phases/implement.py::nop_deadlock regexing gate.py:559's English sentence",
+   "family": "FAM-PROSE",
+   "invariants": [
+    "INV-F.2"
+   ],
+   "semantic_context": "the still-green criteria list is data at the producer and is re-derived from a sentence at the consumer; rewording disables the deadlock diagnosis silently",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending — carry the codes in Check detail data",
+   "notes": "internal coupling"
+  },
+  {
+   "id": "SS-33",
+   "site": "aisef/harness/testlog.py MAX_IDS + gate.py:397-400",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-T.1"
+   ],
+   "semantic_context": "test ids are truncated at 500; the baseline check disables lost/renamed under truncation but not newly_red, so a regression can be absent from both lists and pass vacuously; preservation has no guard",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending — 600-test baseline and candidate with one newly red test beyond the cut",
+   "notes": "false PASS path on large suites"
+  },
+  {
+   "id": "SS-34",
+   "site": "aisef/phases/qa.py:744-752 (qa:<kind> record lacks `unrunnable`)",
+   "family": "FAM-TOOL",
+   "invariants": [
+    "INV-N.1",
+    "INV-F.3"
+   ],
+   "semantic_context": "run_suite computes result.unrunnable and drops it before recording; the story gate scores an unrunnable qa kind (missing playwright) as FAILED deterministic",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P1",
+   "reproducer": "pending — run_suite with a FakeProvider exit 127; assert the qa:<kind> evidence carries unrunnable",
+   "notes": "verified in code; sibling of D-029 for contract kinds"
+  },
+  {
+   "id": "SS-37",
+   "site": "aisef/phases/implement.py:618-625 (no ENV_BASELINE_DIRTY for story sessions)",
+   "family": "FAM-OWNERSHIP",
+   "invariants": [
+    "INV-I.3"
+   ],
+   "semantic_context": "planning/mockup sessions declare pre-existing dirt to the guard; story sessions do not, so in --no-isolate an operator's dirty file blocks every tool call",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending",
+   "notes": ""
+  },
+  {
+   "id": "SS-38",
+   "site": "aisef/harness/guardrails.py HARNESS_OWNED (`.claude/settings.json` only)",
+   "family": "FAM-OWNERSHIP",
+   "invariants": [
+    "INV-I.1"
+   ],
+   "semantic_context": "Claude Code writes `.claude/settings.local.json`; it is not harness-owned and blocks the session as an out-of-scope write",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending",
+   "notes": ""
+  },
+  {
+   "id": "SS-40",
+   "site": "aisef/cli/implement.py:371-379 (`aisef verify` without --write-scope in CI)",
+   "family": "FAM-OWNERSHIP",
+   "invariants": [
+    "INV-J.1"
+   ],
+   "semantic_context": "the generated CI step runs verify with no scope on a clean checkout: exits 0 forever",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending",
+   "notes": "assurance layer that proves nothing"
+  },
+  {
+   "id": "SS-41",
+   "site": "aisef/control/worktree.py::commit_paths (`git add -A -- <granted dirs>`)",
+   "family": "FAM-OWNERSHIP",
+   "invariants": [
+    "INV-I.1"
+   ],
+   "semantic_context": "anything under a granted directory (tests/) becomes the candidate — operator fixtures, verifier snapshots — unless named by is_tool_artifact",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending",
+   "notes": ""
+  },
+  {
+   "id": "SS-42",
+   "site": "aisef/phases/deploy.py:487-494 (devsecops session without scope env)",
+   "family": "FAM-OWNERSHIP",
+   "invariants": [
+    "INV-J.1"
+   ],
+   "semantic_context": "the devsecops session runs with no AISEF_WRITE_SCOPE; with compiled hooks the guard falls back to the planning scope and blocks writing Dockerfile at the root",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending — devsecops with a compiled claude hook; assert Dockerfile can be written",
+   "notes": "deadlock: pre-deploy then fails 'Dockerfile missing'"
+  },
+  {
+   "id": "SS-43",
+   "site": "aisef/phases/deploy.py:316-324 vs :293 (pre-deploy mixes committed tree and working tree)",
+   "family": "FAM-OWNERSHIP",
+   "invariants": [
+    "INV-P.1",
+    "INV-A.3"
+   ],
+   "semantic_context": "the suite runs on a clean worktree of HEAD while Dockerfile/CI/runbook are checked on the working tree; the signed report can bind uncommitted content",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending",
+   "notes": ""
+  },
+  {
+   "id": "SS-45",
+   "site": "aisef/harness/verify_image.py:165-178 (doctor probes configured commands only)",
+   "family": "FAM-TOOL",
+   "invariants": [
+    "INV-N.1"
+   ],
+   "semantic_context": "auto-detected defaults (bandit, gosec, cargo audit, npm test) are never probed; doctor prints ready while `aisef tool sast` is unrunnable forever",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending — python project without tools.sast; assert doctor names bandit as missing",
+   "notes": "matches LedgerLock Run #2 Finding B"
+  },
+  {
+   "id": "SS-46",
+   "site": "aisef/phases/run.py:921-935 (_missing_tools returns [] without sandbox.image)",
+   "family": "FAM-TOOL",
+   "invariants": [
+    "INV-N.1"
+   ],
+   "semantic_context": "the pre-flight tool probe is disabled for every project that did not run `aisef init --stack`; image_for still picks a stack image",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending",
+   "notes": ""
+  },
+  {
+   "id": "SS-47",
+   "site": "aisef/harness/verify_image.py:244-246 (`probe is None → ok=True`)",
+   "family": "FAM-TOOL",
+   "invariants": [
+    "INV-N.1"
+   ],
+   "semantic_context": "a project-local runner that cannot be judged in the image is reported present",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending",
+   "notes": ""
+  },
+  {
+   "id": "SS-48",
+   "site": "aisef/control/preflight.py:618-650 (`provisioned` = non-empty config string)",
+   "family": "FAM-TOOL",
+   "invariants": [
+    "INV-N.1"
+   ],
+   "semantic_context": "a non-empty tools.test string provisions verify.unit; a paid session starts on a command the sandbox cannot run",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending",
+   "notes": ""
+  },
+  {
+   "id": "SS-49",
+   "site": "aisef/control/journal.py:298-311 (reconcile_story resets stale RUNNING without liveness)",
+   "family": "FAM-PROCESS",
+   "invariants": [
+    "INV-M.1"
+   ],
+   "semantic_context": "reconciliation resets RUNNING claims to pending without asking claim_is_orphaned; on one host run.lock prevents a second run, so this is reachable only cross-host or via a symlinked path",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending — two hosts sharing a state file",
+   "notes": "mitigated by run_ownership on a single host"
+  },
+  {
+   "id": "SS-50",
+   "site": "aisef/control/state.py::claim (no lease term, never re-validated)",
+   "family": "FAM-PROCESS",
+   "invariants": [
+    "INV-M.1"
+   ],
+   "semantic_context": "a claim has no expiry or heartbeat and transition() writes regardless of who holds it",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending",
+   "notes": "Phase 8 design: lease with TTL + owner check on transition"
+  },
+  {
+   "id": "SS-51",
+   "site": "aisef/harness/server_identity.py:183 (port lease keyed by run_id) + mockup_verify.py:99-107",
+   "family": "FAM-PROCESS",
+   "invariants": [
+    "INV-M.1"
+   ],
+   "semantic_context": "two stories contending for one base_url lock two different files and both win; the identity check passes on 404",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending",
+   "notes": ""
+  },
+  {
+   "id": "SS-52",
+   "site": "aisef/control/budget.py:183-204 (reservations without owner/TTL)",
+   "family": "FAM-PROCESS",
+   "invariants": [
+    "INV-M.1"
+   ],
+   "semantic_context": "a SIGKILLed run leaves reservations that count against the cap forever; doctor cannot explain it",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending",
+   "notes": ""
+  },
+  {
+   "id": "SS-53",
+   "site": "aisef/phases/run.py:713-736 vs normalize.py::effective_write_scope",
+   "family": "FAM-SCHEDULER",
+   "invariants": [
+    "INV-O.1",
+    "INV-J.1"
+   ],
+   "semantic_context": "the scheduler partitions on declared scope + bootstrap grants; manifests, lockfiles and verification directories the guard grants to every story are invisible to scopes_conflict",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending — two stories, project with package.json; assert non-overlapping effective scopes per wave or a narrowed grant",
+   "notes": "D-031 closed one hole"
+  },
+  {
+   "id": "SS-54",
+   "site": "aisef/control/approvals.py:151-170 (repair stories excluded from the stories/readiness digest)",
+   "family": "FAM-APPROVAL",
+   "invariants": [
+    "INV-P.1"
+   ],
+   "semantic_context": "repair stories execute under an approval whose digest excludes them; the improve gate compensates unless --auto",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending",
+   "notes": "deliberate narrowing (bug 25/28); the compensating control has a bypass"
+  },
+  {
+   "id": "SS-55",
+   "site": "aisef/control/approvals.py:79-96 (no gate digest covers .ai/config.json)",
+   "family": "FAM-APPROVAL",
+   "invariants": [
+    "INV-P.1"
+   ],
+   "semantic_context": "verify.*, coverage.min, security.block_severities reinterpret the approved plan and are not bound by any approval",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P2",
+   "reproducer": "pending — approve readiness, weaken coverage.min; assert something goes stale",
+   "notes": ""
+  },
+  {
+   "id": "SS-56",
+   "site": "aisef/control/approvals.py:279-287 (_upstream_decided_after)",
+   "family": "FAM-APPROVAL",
+   "invariants": [
+    "INV-P.1"
+   ],
+   "semantic_context": "downstream gates report APPROVED after an upstream content edit until a new upstream decision; entry points use blocking(), programmatic callers do not",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending",
+   "notes": "mitigated at every CLI entry point"
+  },
+  {
+   "id": "SS-A10",
+   "site": "aisef/phases/implement.py:1793-1809 (`git reset --hard candidate` after a moved candidate)",
+   "family": "FAM-RECOVERY",
+   "invariants": [
+    "INV-K.3"
+   ],
+   "semantic_context": "the reset result is not checked or recorded; --hard also destroys out-of-scope dirt a write-scope:violation note still describes",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending",
+   "notes": ""
+  },
+  {
+   "id": "SS-A15",
+   "site": "aisef/phases/implement.py::freeze_candidate (GitError → returns HEAD without the work)",
+   "family": "FAM-IDENTITY",
+   "invariants": [
+    "INV-A.2"
+   ],
+   "semantic_context": "on a refused freeze the gate grades the worktree while stamping the parent SHA; run.py refuses the merge later, so no false merge, but a misleading gate result",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending — gate should read candidate:frozen error as UNRUNNABLE evidence-matches-candidate",
+   "notes": ""
+  },
+  {
+   "id": "SS-T1",
+   "site": "aisef/control/tdd.py:63-64 (`e.seq < last_green.seq`)",
+   "family": "FAM-IDENTITY",
+   "invariants": [
+    "INV-D.2"
+   ],
+   "semantic_context": "the last seq comparison in the codebase; read() re-sorts by (at, seq) so it is position-consistent today",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending — use after_event for consistency",
+   "notes": ""
+  },
+  {
+   "id": "SS-X1",
+   "site": "aisef/cli/harness.py:429-443 (waiver bound to the last gate:input's candidate)",
+   "family": "FAM-IDENTITY",
+   "invariants": [
+    "INV-P.2"
+   ],
+   "semantic_context": "an operator waiver binds to the most recent gate:input, which may be a verify-only run at another SHA",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending — compare against the story worktree HEAD and refuse on mismatch",
+   "notes": ""
+  },
+  {
+   "id": "SS-C2",
+   "site": "aisef/harness/observe.py::Evidence.candidate (any detail['candidate'] of any NOTE)",
+   "family": "FAM-IDENTITY",
+   "invariants": [
+    "INV-D.1"
+   ],
+   "semantic_context": "the 'candidate of record' for closure G4.5 is whichever event was written last with a candidate key — gate:input and the new retry:recovery note both qualify",
+   "classification": "NEEDS_TEST",
+   "severity_proposed": "P3",
+   "reproducer": "pending — rename retry:recovery's key to restore_source (Phase 8 with D-035)",
+   "notes": "self-inflicted by 1.7.6; harmless while HEAD == candidate"
+  },
+  {
+   "id": "SS-A11",
+   "site": "aisef/phases/implement.py::_attributed_out_of_scope (last violation record only)",
+   "family": "FAM-RECOVERY",
+   "invariants": [
+    "INV-K.1"
+   ],
+   "semantic_context": "claim: dirt from attempt 1 is shadowed by attempt 2's record. Proof it cannot happen: record_scope_violation lists every out-of-scope path dirty at session end that was not dirty at session start; recovery runs before every attempt and blocks (ok=False) if anything attributed is left, so a path dirty before attempt 2 either was restored (clean) or blocked the run; attempt 2's record therefore lists all dirt present at its end",
+   "classification": "NOT_A_DEFECT",
+   "severity_proposed": "-",
+   "reproducer": "tests/test_retry_hygiene.py::TestRetryStartsClean (A, D, J)",
+   "notes": "union of records would widen deletion power without a reachable case"
+  },
+  {
+   "id": "SS-A12",
+   "site": "aisef/phases/implement.py::run_attempt cham_roi across epochs",
+   "family": "FAM-RECOVERY",
+   "invariants": [
+    "INV-B.2"
+   ],
+   "semantic_context": "claim: a SHA graded under an old contract short-circuits a session in a new epoch. Proof: _drop_branch_written_for_other_criteria discards the branch and recreates the worktree at the base when the fingerprint changes, so the old SHA cannot be HEAD again; a commit SHA embeds its parent and metadata and cannot be re-produced",
+   "classification": "NOT_A_DEFECT",
+   "severity_proposed": "-",
+   "reproducer": "tests/test_worktree.py::TestNhanhCuKhiTieuChiDoi",
+   "notes": "the D-035 fix should still key on epoch for clarity"
+  },
+  {
+   "id": "SS-J1",
+   "site": "aisef/control/journal.py::merged (existence of merge.completed)",
+   "family": "FAM-IDENTITY",
+   "invariants": [
+    "INV-D.3"
+   ],
+   "semantic_context": "claim: existence used as validity. Assessment: merge.completed is written by the harness immediately after a successful merge (point of no return) and by nothing else; its existence IS the recorded fact. Recording the merged SHA would strengthen audit (Phase 9) but no wrong decision is reachable from its absence",
+   "classification": "NOT_A_DEFECT",
+   "severity_proposed": "-",
+   "reproducer": "tests/test_run.py::TestDoneChiSauMerge",
+   "notes": "Phase 9 may add the SHA for identity, not for correctness"
+  },
+  {
+   "id": "SS-T2",
+   "site": "aisef/control/tdd.py::red_before_green counting unstamped red runs",
+   "family": "FAM-IDENTITY",
+   "invariants": [
+    "INV-D.1"
+   ],
+   "semantic_context": "claim: an unstamped red run satisfies TDD. Assessment: in-session `aisef tool test --story` runs happen before the freeze and are unstamped BY DESIGN — they are the TDD signal (red in-session, green after). The stamped post-freeze run is the green",
+   "classification": "NOT_A_DEFECT",
+   "severity_proposed": "-",
+   "reproducer": "tests/test_tdd.py::TestDoTruocXanh",
+   "notes": "the seq comparison (SS-T1) is the only residue"
+  },
+  {
+   "id": "SS-G13",
+   "site": "aisef/control/gate.py::review_waiver (latest exact-candidate waiver wins)",
+   "family": "FAM-IDENTITY",
+   "invariants": [
+    "INV-P.2"
+   ],
+   "semantic_context": "latest-wins among waivers bound to the exact candidate with a non-empty reason is the stated intent (a second signature corrects the first)",
+   "classification": "NOT_A_DEFECT",
+   "severity_proposed": "-",
+   "reproducer": "tests/test_judge_only.py",
+   "notes": "identity-bound"
+  }
+ ]
+}

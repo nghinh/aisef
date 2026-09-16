@@ -1,0 +1,893 @@
+# AISEF invariant registry — systematic hardening v1, Phase 1.
+# Read by aisef/control/invariants.py (a small YAML subset: two-space indent, `key: value`, `- item`).
+# docs/INVARIANTS.md is rendered from this file; tests/hardening/test_invariants_registry.py checks that
+# every referenced test exists and that the rendered document is in sync.
+# Status: PROVEN = enforced and covered by deterministic tests with no known open sibling;
+#         PARTIAL = enforced somewhere, with a confirmed gap (RED reproducer named);
+#         MISSING = the kernel does not enforce it yet.
+program: AISEF SYSTEMATIC HARDENING PROGRAM v1
+baseline: aisef==1.7.6 (tag v1.7.6 = 939f2ab)
+invariants:
+  - invariant_id: INV-A.1
+    domain: candidate identity
+    statement: A frozen candidate is immutable. Verification, review and security sessions never mutate it; a mutation is reverted, recorded, and that session does not count.
+    why: Every check must describe one exact tree; a reviewer that edits code is a second developer whose work nobody graded (bug 3, D-032).
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/phases/implement.py::freeze_candidate
+      - aisef/phases/implement.py::_revert_reviewer_writes
+      - aisef/phases/implement.py::_candidate_moved
+    deterministic_tests:
+      - tests/test_candidate.py::TestReviewerDoiUngVien
+      - tests/test_implement.py::TestNguoiRaSoatKhongDuocSuaCay
+      - tests/test_run2_review_recovery.py
+      - tests/hardening/test_sibling_scan.py::TestSS36ToolArtifactsAreNotReviewerWrites (RED)
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_8_verification_never_mutates_the_candidate
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestReviewFaults
+    linked_defects:
+      - D-032
+      - SS-36
+    status: PARTIAL
+  - invariant_id: INV-A.2
+    domain: candidate identity
+    statement: Evidence satisfies a gate only when it is bound to the exact candidate being scored; evidence of another build is stated as stale and never scores.
+    why: ADR-004 R1 — "which code did this test run on" must have one answer.
+    severity_if_violated: P0
+    enforcement_points:
+      - aisef/control/gate.py::_stale_candidates
+      - aisef/harness/observe.py::Evidence.for_candidate
+    deterministic_tests:
+      - tests/test_candidate.py::TestGateCandidate
+      - tests/test_gate_qualification.py::TestBangChungDungCandidate
+      - tests/test_preservation.py::TestCongBaoToan
+      - tests/hardening/test_sibling_scan.py::TestSS02GuardHeartbeatIsBoundToTheGradedSession (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS03CriteriaProofBindsToTheCandidate (RED)
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_3_no_pass_on_foreign_evidence
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestEvidenceFaults
+    linked_defects:
+      - SS-02
+      - SS-03
+    status: PARTIAL
+  - invariant_id: INV-A.3
+    domain: candidate identity
+    statement: The candidate that merges is the candidate that was verified, on a tree clean of story changes; harness-owned and tool-written paths are not story changes.
+    why: G12 — done is written only after merge.completed; a dirty check that counts the harness's own files refuses a passed candidate for the wrong reason.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/control/worktree.py::WorktreeManager._merge_story_inner
+      - aisef/phases/run.py (merge_wave candidates)
+    deterministic_tests:
+      - tests/test_worktree.py::TestCandidateInvariants
+      - tests/test_run.py::TestDoneChiSauMerge
+      - tests/hardening/test_sibling_scan.py::TestSS17MergeDirtCheckHonoursOwnership (RED)
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_7_complete_needs_every_proof
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestMergeFaults
+    linked_defects:
+      - SS-17
+      - SS-16
+    status: PARTIAL
+  - invariant_id: INV-B.1
+    domain: story epoch
+    statement: A story contract has an explicit epoch, the fingerprint of its acceptance criteria, recorded as the story:contract note.
+    why: Without an identity for "which criteria", a verdict, a baseline or a test can silently refer to a different story (D-004, D-033).
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/control/acceptance.py::contract_fingerprint
+      - aisef/phases/run.py (story:contract note)
+    deterministic_tests:
+      - tests/test_baseline_provenance.py::TestGateSelectsTheStoryEntryBaseline
+      - tests/test_acceptance.py::TestDanhTinhTieuChiOnDinh
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - D-004
+      - D-033
+    status: PROVEN
+  - invariant_id: INV-B.2
+    domain: story epoch
+    statement: A contract change creates a new epoch — the branch is dropped, the baseline is recaptured at the integrated parent, and evidence of the old epoch never scores the new one.
+    why: A verdict about other criteria is not about this story (bug 143, D-033).
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/phases/run.py::_drop_branch_written_for_other_criteria
+      - aisef/control/gate.py::authoritative_baseline
+    deterministic_tests:
+      - tests/test_worktree.py::TestNhanhCuKhiTieuChiDoi
+      - tests/test_baseline_provenance.py::TestBaselineProducer
+      - tests/hardening/test_sibling_scan.py::TestSS05EscalationDemotionStaysInsideTheEpoch (RED)
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - SS-05
+    status: PARTIAL
+  - invariant_id: INV-B.3
+    domain: story epoch
+    statement: Retries and resumes never create a new epoch silently.
+    why: The same story must be graded against the same contract until a human changes it.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/phases/implement.py::run_baseline
+    deterministic_tests:
+      - tests/test_baseline_provenance.py::TestBaselineProducer
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_4_resume_keeps_the_baseline_within_the_epoch
+    fault_injection_tests: []
+    linked_defects:
+      - D-033
+    status: PROVEN
+  - invariant_id: INV-C.1
+    domain: baseline identity
+    statement: The regression baseline is captured once per story epoch at the integrated parent, carries root and epoch, and is reused by retries, resumes and verify-only.
+    why: D-033 — a baseline recorded at the story's own candidate turned renaming its own tests into a regression.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/phases/implement.py::run_baseline
+      - aisef/control/gate.py::authoritative_baseline
+    deterministic_tests:
+      - tests/test_baseline_provenance.py::TestBaselineProducer
+      - tests/test_implement.py::TestBaselineTruocKhiSua
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_4_resume_keeps_the_baseline_within_the_epoch
+    fault_injection_tests: []
+    linked_defects:
+      - D-033
+    status: PROVEN
+  - invariant_id: INV-C.2
+    domain: baseline identity
+    statement: Candidate state never becomes its own baseline; absent or provenance-invalid baseline fails closed as BASELINE_UNAVAILABLE.
+    why: A baseline the story wrote proves nothing about what existed before it.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/control/gate.py::_baseline_check
+      - aisef/control/gate.py::_baseline_unavailable
+    deterministic_tests:
+      - tests/test_baseline_provenance.py::TestGateSelectsTheStoryEntryBaseline
+      - tests/test_gate.py::TestKhongLamDoTestCoSan
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - D-033
+    status: PROVEN
+  - invariant_id: INV-C.3
+    domain: baseline identity
+    statement: A baseline that could not be captured (tool unrunnable) is recaptured at the known root once the tool is available; it does not block the story forever.
+    why: The root SHA is recorded; a transient environment failure must not become a permanent BASELINE_UNAVAILABLE.
+    severity_if_violated: P2
+    enforcement_points: []
+    deterministic_tests:
+      - tests/hardening/test_sibling_scan.py::TestSS18TransientBaselineFailureIsNotPermanent (RED)
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - SS-18
+    status: MISSING
+  - invariant_id: INV-D.1
+    domain: evidence provenance
+    statement: Evidence may satisfy a gate only when every identity the decision depends on matches — run, story, story epoch, candidate, baseline root, stage, verifier configuration, environment.
+    why: A record stamped with the right candidate but computed under another tool configuration or another epoch is not about the decision being made.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/control/gate.py::_at
+      - aisef/phases/implement.py::_at
+    deterministic_tests:
+      - tests/test_gate.py::TestBangChungCuCuaLoaiKhongChamKhongLamOi
+      - tests/test_ledger.py::TestUngVienChuaLanded
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_3_no_pass_on_foreign_evidence
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestEvidenceFaults
+    linked_defects:
+      - SS-02
+      - SS-03
+      - SS-08
+    status: MISSING
+  - invariant_id: INV-D.2
+    domain: evidence provenance
+    statement: The sequence number orders the audit trail; it is never a correctness identity.
+    why: Bug 42/47 — a seq reset made an old event look newer; positions and identities decide, not counters.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/harness/observe.py::Evidence.after_event
+      - aisef/harness/observe.py::EvidenceStore._next_seq
+    deterministic_tests:
+      - tests/test_observe.py::TestSoThuTuKhongDuocDatLai
+      - tests/test_observe.py::TestAfterEventByPosition
+      - tests/test_gate.py::TestBaselineAfterGateSurvivesSeqReset
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - SS-T1
+    status: PARTIAL
+  - invariant_id: INV-D.3
+    domain: evidence provenance
+    statement: Merge authorization binds the verified SHA — verification.completed names the candidate it verified, and the merge compares identities, not journal order.
+    why: Today verification.completed carries no SHA; validity rests on seq order and an attempt number that is always 1.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/phases/run.py (candidate.frozen / verification.completed validity)
+    deterministic_tests:
+      - tests/test_run.py::TestDoneChiSauMerge
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - SS-08
+    status: PARTIAL
+  - invariant_id: INV-E.1
+    domain: evidence freshness
+    statement: A verdict carries the identity of the state it was computed over; any change to that state (recovery, refresh, cleanup, config) makes the verdict stale for control.
+    why: D-035 — the candidate SHA was unchanged, the evaluated tree was not, and the stale verdict ended the story.
+    severity_if_violated: P1
+    enforcement_points: []
+    deterministic_tests:
+      - tests/hardening/test_verdict_freshness.py::TestInvariantEH (RED)
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_2_recovery_invalidates_dependent_evidence
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_5_noop_never_terminates_on_stale_evidence
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestStaleFaults
+    linked_defects:
+      - D-035
+    status: MISSING
+  - invariant_id: INV-E.2
+    domain: evidence freshness
+    statement: Evidence is not valid merely because it is the latest record, because a file or session exists, or because its candidate SHA matches.
+    why: Bug 136, D-007, D-022, D-033 — "latest" and "exists" were each read as "valid" and each produced a wrong gate.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/control/gate.py::_latest_per_check
+      - aisef/control/approvals.py::Approvals.status
+      - aisef/control/closure.py (staleness probes)
+    deterministic_tests:
+      - tests/test_gate.py::TestBangChungCuCuaLoaiKhongChamKhongLamOi
+      - tests/test_closure.py::TestStaleness
+      - tests/test_release_identity.py::TestCommitBoundEvidenceStaleness
+      - tests/test_approvals.py::TestContentBinding
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - D-035
+      - SS-06
+      - SS-07
+    status: PARTIAL
+  - invariant_id: INV-E.3
+    domain: evidence freshness
+    statement: A resumed story receives the recorded rejection of the candidate it resumes on; feedback does not die with the process.
+    why: The reader of that record looks for a note nothing writes, so the documented resume bug (todo-e2e STORY-01-02) is still live.
+    severity_if_violated: P2
+    enforcement_points:
+      - aisef/phases/implement.py::_unfinished_review
+    deterministic_tests:
+      - tests/hardening/test_sibling_scan.py::TestSS04ResumeFeedbackReaderIsAlive (RED)
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - SS-04
+    status: MISSING
+  - invariant_id: INV-F.1
+    domain: typed outcomes
+    statement: Control state uses the six typed outcomes; UNCONFIGURED and UNRUNNABLE never share a symbol with PASSED, and every non-PASSED line carries a reason.
+    why: Bugs 33/36/37 — four outcomes collapsed into two showed "unconfigured" as passed.
+    severity_if_violated: P0
+    enforcement_points:
+      - aisef/control/outcome.py::Outcome
+    deterministic_tests:
+      - tests/test_outcome.py
+      - tests/test_qa.py::TestKhongApDungKhacVoiChuaCauHinh
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - D-010
+    status: PROVEN
+  - invariant_id: INV-F.2
+    domain: typed outcomes
+    statement: PASS, BLOCK, stuck/PLAN_CONFLICT and security severity come only from the structured verdict block; free-form prose is diagnostic and never adds or removes a blocker.
+    why: D-026 — one negated sentence outranked a structured verdict; the terminal half was fixed, the blocking half was not.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/phases/implement.py::structured_plan_defects
+      - aisef/phases/implement.py::_reconcile
+      - aisef/control/security.py::parse
+    deterministic_tests:
+      - tests/test_dogfood_ledgerlock.py::TestStuckMentionIsNotAPlanVerdict
+      - tests/hardening/test_sibling_scan.py::TestSS24ProseNeverOverridesAStructuredVerdict (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS25ScopeVerdictComesFromFindingsNotProse (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS27NoiseFilterHasASeverityFloor (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS30PlaceholderRegexDoesNotBlockTodoApps (RED)
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_9_plan_conflict_is_not_developer_work
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestReviewFaults
+    linked_defects:
+      - D-026
+      - SS-24
+      - SS-25
+      - SS-27
+      - SS-30
+    status: PARTIAL
+  - invariant_id: INV-F.3
+    domain: typed outcomes
+    statement: A stage that did not execute produces UNRUNNABLE of that stage, never a FAILED verdict about the work, and never a PASS.
+    why: D-029, D-032 — "could not run" was read as red tests and as a review verdict.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/harness/tools.py::unrunnable_reason
+      - aisef/harness/tools.py::outcome_kind
+      - aisef/control/gate.py (review_unrunnable branch)
+    deterministic_tests:
+      - tests/test_run2_review_recovery.py
+      - tests/test_dogfood_ledgerlock.py::TestMissingTestRunnerIsUnrunnableNotRed
+      - tests/test_tools.py::TestKhongChayDuocKhacDo
+      - tests/hardening/test_sibling_scan.py::TestSS13SecurityExecutionFailureIsNotAVerdict (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS23RedTestsAreNotAMissingTool (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS26EnvironmentFailureIsNotErasedBySubstring (RED)
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_1_unrunnable_review_is_never_developer_quality
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_10_environment_failure_is_not_behavioural_evidence
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestToolFaults
+      - tests/hardening/test_fault_matrix.py::TestSecurityFaults
+    linked_defects:
+      - D-029
+      - D-032
+      - SS-13
+      - SS-23
+      - SS-26
+      - SS-34
+    status: PARTIAL
+  - invariant_id: INV-F.4
+    domain: typed outcomes
+    statement: The exit status of a session is read from the provider's structured fields; the agent's own text never classifies the session.
+    why: A story about 401 handling must not end as a fatal credential rejection.
+    severity_if_violated: P2
+    enforcement_points:
+      - aisef/clients/stream.py::exit_status_of
+    deterministic_tests:
+      - tests/test_stream.py::TestExitStatus
+      - tests/hardening/test_sibling_scan.py::TestSS28ExitStatusReadsTheProviderNotTheAgentsProse (RED)
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - SS-28
+    status: PARTIAL
+  - invariant_id: INV-G.1
+    domain: retry locality
+    statement: A review that did not run is retried at the review stage on the same frozen candidate, bounded, and ends as REVIEW_UNRUNNABLE — never a developer session.
+    why: D-032.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/phases/implement.py::implement_story (_review_stage)
+    deterministic_tests:
+      - tests/test_run2_review_recovery.py
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_1_unrunnable_review_is_never_developer_quality
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestReviewFaults
+    linked_defects:
+      - D-032
+    status: PROVEN
+  - invariant_id: INV-G.2
+    domain: retry locality
+    statement: A security review that did not run is retried at the security stage on the same candidate and never scored as a security verdict.
+    why: The security stage has no equivalent of the D-032 recovery; its execution failure is a FAILED check cached at the candidate.
+    severity_if_violated: P1
+    enforcement_points: []
+    deterministic_tests:
+      - tests/hardening/test_sibling_scan.py::TestSS13SecurityExecutionFailureIsNotAVerdict (RED)
+    model_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestSecurityFaults
+    linked_defects:
+      - SS-13
+    status: MISSING
+  - invariant_id: INV-G.3
+    domain: retry locality
+    statement: A tool or environment failure retries the tool stage on the infra budget; it never opens a developer session and never spends a quality attempt.
+    why: An UNRUNNABLE deterministic check blocks the gate and the loop's only move today is a new developer session.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/phases/implement.py::implement_story
+    deterministic_tests:
+      - tests/test_implement.py::TestRetry
+      - tests/hardening/test_sibling_scan.py::TestSS14ToolEnvironmentFailureIsNotADeveloperAttempt (RED)
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_10_environment_failure_is_not_behavioural_evidence
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestToolFaults
+    linked_defects:
+      - SS-14
+      - SS-34
+    status: PARTIAL
+  - invariant_id: INV-G.4
+    domain: retry locality
+    statement: Provider statuses that repeat identically (auth) or describe the environment (context, permission, cost) never charge the quality budget; auth is fatal, the others are infra.
+    why: D-006 fixed auth alone; the sibling statuses still spend developer attempts on sessions the developer had no part in.
+    severity_if_violated: P2
+    enforcement_points:
+      - aisef/phases/implement.py::run_attempt
+      - aisef/clients/stream.py::INFRA_STATUSES
+    deterministic_tests:
+      - tests/test_client_base.py::TestTuChoiXacThucLaHaTang
+      - tests/hardening/test_sibling_scan.py::TestSS15EnvironmentExitStatusesAreNotQualityAttempts (RED)
+    model_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestDeveloperFaults
+    linked_defects:
+      - D-006
+      - SS-15
+    status: PARTIAL
+  - invariant_id: INV-G.5
+    domain: retry locality
+    statement: A budget rejection is a typed infra outcome of the stage it interrupted; it never crashes the run and never spends a quality attempt.
+    why: The review/security handler imports a class that does not exist; a developer rejection is charged to quality; lock contention is reported as a cap.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/phases/implement.py::_review_session
+      - aisef/phases/implement.py::run_attempt
+    deterministic_tests:
+      - tests/hardening/test_sibling_scan.py::TestSS12BudgetRejectionInReviewDoesNotCrash (RED)
+      - tests/test_budget_integration.py::TestBudgetBlocksBeforeDispatch
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - SS-12
+      - SS-21
+    status: MISSING
+  - invariant_id: INV-H.1
+    domain: no-op semantics
+    statement: A developer session that changes nothing is a statement, not a failure; it is never charged to quality and is terminal only after a second identical decision, stated from evidence.
+    why: Bug 127 / ADR-005 V11 — a decision stated twice, not a fault to retry.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/phases/implement.py::run_attempt
+      - aisef/phases/implement.py::nop_deadlock
+    deterministic_tests:
+      - tests/test_implement.py::TestLuotKhongVietGiThiKhongPhaiUngVien
+      - tests/test_implement.py::TestBeTacDoKeHoachTheoNopControl
+    model_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestDeveloperFaults
+    linked_defects:
+      - D-032
+    status: PARTIAL
+  - invariant_id: INV-H.2
+    domain: no-op semantics
+    statement: Before a no-op may end a story the kernel re-evaluates the current frozen candidate against fresh valid evidence, reruns model stages whose inputs changed, and classifies NO-OP terminal only when that evidence proves unresolved developer work.
+    why: D-035 — the candidate was complete; the harness cited a verdict about dirt it had itself removed.
+    severity_if_violated: P1
+    enforcement_points: []
+    deterministic_tests:
+      - tests/hardening/test_verdict_freshness.py::TestInvariantEH (RED)
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_5_noop_never_terminates_on_stale_evidence
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestStaleFaults
+    linked_defects:
+      - D-035
+    status: MISSING
+  - invariant_id: INV-I.1
+    domain: workspace ownership
+    statement: Every changed path has an owner (developer, harness, verifier, generated client config, pre-existing dirt, external); harness, tool and generated paths are never attributed to the developer.
+    why: D-030, bug 46, bug 7 — files a run produces were blamed on the story.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/harness/guardrails.py::changed_files
+      - aisef/harness/guardrails.py::is_tool_artifact
+      - aisef/harness/guardrails.py::HARNESS_OWNED
+    deterministic_tests:
+      - tests/test_guardrails.py::TestCauHinhClientKhongPhaiThayDoiCuaStory
+      - tests/test_guardrails.py::TestSanPhamBuildKhongPhaiViecCuaStory
+      - tests/test_dogfood_ledgerlock.py::TestCoverageDataFileIsNotAStoryChange
+      - tests/hardening/test_sibling_scan.py::TestSS35RenamedPathsKeepTheirIdentity (RED)
+    model_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestWorkspaceFaults
+    linked_defects:
+      - D-030
+      - SS-35
+      - SS-36
+    status: PARTIAL
+  - invariant_id: INV-I.2
+    domain: workspace ownership
+    statement: One ownership rule is shared by the guard, the tree snapshot, retry hygiene and the merge dirt check; a path one of them ignores none of them attributes.
+    why: Two rules for one truth (class J) — the snapshot skips vendor paths only at the root, so hygiene deleted a nested node_modules the guard never counted.
+    severity_if_violated: P1
+    enforcement_points: []
+    deterministic_tests:
+      - tests/hardening/test_sibling_scan.py::TestSS39VendorPathsShareOneOwnershipRule (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS17MergeDirtCheckHonoursOwnership (RED)
+    model_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestWorkspaceFaults
+    linked_defects:
+      - SS-39
+      - SS-17
+    status: MISSING
+  - invariant_id: INV-I.3
+    domain: workspace ownership
+    statement: Dirt already present when a session opens is not the session's doing; it is listed apart, never restored or deleted, and never counted against the session by the guard.
+    why: Bug 38 introduced the baseline-dirty subtraction for planning sessions; story sessions do not declare it.
+    severity_if_violated: P2
+    enforcement_points:
+      - aisef/harness/guardrails.py::baseline_dirty_from_env
+      - aisef/phases/implement.py::record_scope_violation
+    deterministic_tests:
+      - tests/test_guardrails.py::TestBanDauDaBanThiKhongPhaiLoiCuaPhien
+      - tests/test_retry_hygiene.py::TestRetryStartsClean::test_J_dirt_no_attempt_of_this_story_made_is_never_deleted_and_no_session_is_launched
+    model_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestWorkspaceFaults
+    linked_defects:
+      - SS-37
+    status: PARTIAL
+  - invariant_id: INV-J.1
+    domain: write scope
+    statement: The effective write scope is declared scope plus every legitimately granted path (manifests, verification directories, lockfiles, bootstrap files), and the guard, the freeze and the scheduler read the same effective scope.
+    why: D-031 — the scheduler partitioned on declared scope while the guard granted more.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/control/normalize.py::effective_write_scope
+      - aisef/control/normalize.py::bootstrap_grants
+      - aisef/phases/run.py::_effective_waves
+    deterministic_tests:
+      - tests/test_write_scope_verify.py
+      - tests/test_guardrails.py::TestEffectiveScope
+      - tests/test_dogfood_ledgerlock.py::TestOverlappingEffectiveScopesDoNotRunTogether
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - D-031
+      - SS-53
+    status: PARTIAL
+  - invariant_id: INV-J.2
+    domain: write scope
+    statement: Out-of-scope developer writes are attributable exactly — recorded with the paths, the attempt and the candidate.
+    why: D-034 — without the record the retry inherited the dirt blind.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/phases/implement.py::record_scope_violation
+    deterministic_tests:
+      - tests/test_retry_hygiene.py::TestRetryStartsClean::test_I_evidence_records_the_violation_and_the_recovery_with_exact_paths
+      - tests/test_retry_hygiene.py::TestRetryStartsClean::test_H_a_genuine_write_scope_violation_still_fails_the_attempt
+    model_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestWorkspaceFaults
+    linked_defects:
+      - D-034
+    status: PROVEN
+  - invariant_id: INV-K.1
+    domain: retry hygiene
+    statement: Retry cleanup restores only proven attempt-owned dirt, path by path, from the frozen candidate; unattributed or pre-existing data is never deleted, and the attempt does not open on it.
+    why: D-034 and the owner's safety constraint — never a broad destructive recovery.
+    severity_if_violated: P0
+    enforcement_points:
+      - aisef/phases/implement.py::recover_out_of_scope
+    deterministic_tests:
+      - tests/test_retry_hygiene.py::TestRetryStartsClean
+    model_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestWorkspaceFaults
+    linked_defects:
+      - D-034
+      - SS-39
+    status: PARTIAL
+  - invariant_id: INV-K.2
+    domain: retry hygiene
+    statement: Recovery itself changes evidence freshness — every verdict computed over the restored state is stale for control.
+    why: D-035.
+    severity_if_violated: P1
+    enforcement_points: []
+    deterministic_tests:
+      - tests/hardening/test_verdict_freshness.py::TestInvariantEH (RED)
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_2_recovery_invalidates_dependent_evidence
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestStaleFaults
+    linked_defects:
+      - D-035
+    status: MISSING
+  - invariant_id: INV-K.3
+    domain: retry hygiene
+    statement: Every recovery action is recorded as evidence with its exact effect (retry:recovery, review:immutable, review:candidate); none runs unrecorded.
+    why: The candidate reset after a reviewer commit runs git reset --hard and records nothing about the reset itself.
+    severity_if_violated: P2
+    enforcement_points:
+      - aisef/phases/implement.py::recover_out_of_scope
+      - aisef/phases/implement.py::_revert_reviewer_writes
+    deterministic_tests:
+      - tests/test_retry_hygiene.py::TestRetryStartsClean::test_I_evidence_records_the_violation_and_the_recovery_with_exact_paths
+      - tests/test_implement.py::TestNguoiRaSoatKhongDuocSuaCay
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - SS-A10
+    status: PARTIAL
+  - invariant_id: INV-L.1
+    domain: process lifecycle
+    statement: Cancellation and timeout own and terminate the complete process tree of a session and of a sandboxed tool.
+    why: D-027, bug 15 — a shim died and node kept the pipe or the port.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/clients/base.py::kill_tree
+      - aisef/harness/sandbox.py
+    deterministic_tests:
+      - tests/test_dogfood_ledgerlock.py::TestTurnCapKillsTheWholeProcessTree
+      - tests/test_sandbox.py::TestHetGioGietCaCayTienTrinh
+      - tests/test_clients.py::TestTimeoutCapturesPartialStream
+    model_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestProcessFaults
+    linked_defects:
+      - D-027
+    status: PROVEN
+  - invariant_id: INV-L.2
+    domain: process lifecycle
+    statement: No orphan process remains while state claims terminal completion; a killed attempt is never counted as gate-passed.
+    why: D-024's unidentified writer in a session's .git shows the tree-down is not yet proven for fake sessions.
+    severity_if_violated: P2
+    enforcement_points:
+      - aisef/control/journal.py::StoryRunTransaction
+    deterministic_tests:
+      - tests/test_crash_recovery.py
+      - tests/test_journal.py::TestCrashRecovery
+    model_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestProcessFaults
+    linked_defects:
+      - D-024
+    status: PARTIAL
+  - invariant_id: INV-M.1
+    domain: claim / lease state
+    statement: RUNNING corresponds to a live claim on this host; a claim whose process is dead becomes ORPHANED/reclaimable, never RUNNING forever, and a live claim is never reset.
+    why: D-025 fixed the display; the claim still has no lease term and reconciliation does not ask about liveness.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/control/state.py::claim_is_orphaned
+      - aisef/control/journal.py::reconcile_story
+    deterministic_tests:
+      - tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun
+      - tests/test_dogfood_ledgerlock.py::TestStatusNamesADeadClaim
+      - tests/test_state.py::TestClaim
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_6_running_needs_a_live_lease
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestProcessFaults
+    linked_defects:
+      - D-025
+      - SS-49
+    status: PARTIAL
+  - invariant_id: INV-M.2
+    domain: claim / lease state
+    statement: A run owns the project exclusively while it runs; competing entry points neither reconcile nor create worktrees.
+    why: Two orchestrators on one tree would double-drive the same branch.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/control/worktree.py::run_ownership
+    deterministic_tests:
+      - tests/test_run.py::TestTransaction
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects: []
+    status: PROVEN
+  - invariant_id: INV-N.1
+    domain: tool capability
+    statement: Every evidence-producing tool — declared, inferred or auto-detected — exists in the declared execution environment before a paid session starts; a missing capability is UNRUNNABLE/ENVIRONMENT, never behavioural RED, for every stage including qa kinds.
+    why: D-028, D-029, D-009 — and the qa kind record still drops its unrunnable reason.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/harness/verify_image.py
+      - aisef/phases/run.py::_missing_tools
+      - aisef/harness/tools.py::unrunnable_reason
+    deterministic_tests:
+      - tests/test_dogfood_ledgerlock.py::TestDeclaredToolsLiveInTheDeclaredImage
+      - tests/test_dogfood_ledgerlock.py::TestMissingTestRunnerIsUnrunnableNotRed
+      - tests/test_tools.py::TestThieuDuAnKhacThieuCongCu
+    model_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestToolFaults
+    linked_defects:
+      - D-028
+      - D-029
+      - SS-34
+      - SS-45
+      - SS-46
+    status: PARTIAL
+  - invariant_id: INV-N.2
+    domain: tool capability
+    statement: The environment identity (image name and digest) is recorded with every sandboxed tool result.
+    why: F-9 — an image mutated mid-run and nothing in the evidence could say so.
+    severity_if_violated: P2
+    enforcement_points:
+      - aisef/harness/sandbox.py::SandboxResult.to_evidence
+    deterministic_tests:
+      - tests/test_qa.py::TestMoiTruongCongCuTachKhoiSanPham
+      - tests/test_sandbox.py::TestMounts
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - F-9
+    status: PARTIAL
+  - invariant_id: INV-O.1
+    domain: scheduler isolation
+    statement: Stories that run in parallel have non-overlapping effective write scopes.
+    why: D-031 — a merge conflict on a harness-granted path was blamed on the plan.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/control/scheduler.py
+      - aisef/phases/run.py::_effective_waves
+    deterministic_tests:
+      - tests/test_scheduler.py
+      - tests/test_dogfood_ledgerlock.py::TestOverlappingEffectiveScopesDoNotRunTogether
+    model_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestMergeFaults
+    linked_defects:
+      - D-031
+      - SS-53
+    status: PARTIAL
+  - invariant_id: INV-P.1
+    domain: approval invalidation
+    statement: An approval binds to the digest of the exact artifacts it covers; editing an artifact makes it stale, and a new upstream decision makes every dependent approval stale.
+    why: Content, not mtime or existence, is what a person approved.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/control/approvals.py::Approvals.status
+    deterministic_tests:
+      - tests/test_approvals.py::TestContentBinding
+      - tests/test_approvals.py::TestCascade
+      - tests/test_release_identity.py::TestV1GRegressionMatrix
+    model_tests: []
+    fault_injection_tests:
+      - tests/test_approvals.py::TestContentBinding
+    linked_defects:
+      - SS-55
+      - SS-56
+    status: PARTIAL
+  - invariant_id: INV-P.2
+    domain: approval invalidation
+    statement: Human decisions that gate execution (stop rules, acceptance scope, waivers) are data with a source digest, never operator memory or an implicit default.
+    why: D-014, D-017.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/control/gate.py::review_waiver
+      - aisef/phases/deploy.py
+    deterministic_tests:
+      - tests/test_judge_only.py
+      - tests/test_deploy.py::TestPlannedButNeverRun
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - D-014
+      - D-017
+    status: PROVEN
+  - invariant_id: INV-Q.1
+    domain: human arbitration
+    statement: A requirement or plan conflict transitions explicitly to HUMAN_REQUIRED from a structured verdict or a deterministic control (criteria green at the parent, the same criterion failing twice); it is never developer remediation and never derived from prose.
+    why: D-026, OBS-OC-2, the STORY-04-01 AC-4 arbitration.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/phases/implement.py::structured_plan_defects
+      - aisef/phases/implement.py::nop_deadlock
+      - aisef/control/gate.py::_nop_check
+    deterministic_tests:
+      - tests/test_dogfood_ledgerlock.py::TestStuckMentionIsNotAPlanVerdict
+      - tests/test_qualification.py::TestRunPhase
+      - tests/hardening/test_sibling_scan.py::TestSS25ScopeVerdictComesFromFindingsNotProse (RED)
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_9_plan_conflict_is_not_developer_work
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestReviewFaults
+    linked_defects:
+      - D-026
+      - SS-25
+      - OBS-OC-2
+    status: PARTIAL
+  - invariant_id: INV-Q.2
+    domain: human arbitration
+    statement: An owner decision creates a new contract epoch with deterministic invalidation of the branch, the baseline and the dependent approvals.
+    why: Arbitration is a contract change, not a hint to the next developer.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/phases/run.py::_drop_branch_written_for_other_criteria
+      - aisef/control/approvals.py
+    deterministic_tests:
+      - tests/test_worktree.py::TestNhanhCuKhiTieuChiDoi
+      - tests/test_approvals.py::TestCascade
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - AC4-ARBITRATION
+    status: PARTIAL
+  - invariant_id: INV-R.1
+    domain: release identity
+    statement: Product release identity is immutable and content-bound (product plane digest, manifest bound to tag and PyPI); assurance and documentation evidence may move after release without changing it.
+    why: D-007, D-022 — the release→validate→record loop had no fixed point.
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/control/planes.py
+      - validation/record_closure_evidence.py
+    deterministic_tests:
+      - tests/test_release_identity.py::TestPlanes
+      - tests/test_release_identity.py::TestV1GRegressionMatrix
+      - tests/test_closure.py::TestMotSHaDuyNhatChoViecDong
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - D-007
+      - D-022
+    status: PROVEN
+  - invariant_id: INV-R.2
+    domain: release identity
+    statement: Closure probes read identities (ancestry, outcome, digest), never object existence or record existence.
+    why: G4.5 accepts any object in the store as merged; G4.4 accepts an unrunnable review record as a review.
+    severity_if_violated: P2
+    enforcement_points:
+      - aisef/control/closure.py::probe_evidence_at_candidate
+    deterministic_tests:
+      - tests/test_closure.py::TestNoCriterionPassesOnAbsence
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - SS-06
+      - SS-07
+      - SS-29
+    status: PARTIAL
+  - invariant_id: INV-S.1
+    domain: replay identity
+    statement: A replay binds framework version, client and version, model and route, configuration digest, sandbox identity, requirements digest, story contracts and baseline identities; material drift fails preflight or is declared before execution.
+    why: The Claude-vs-OpenCode replay ran to completion before anyone noticed the client had changed.
+    severity_if_violated: P1
+    enforcement_points: []
+    deterministic_tests: []
+    model_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestReplayFaults
+    linked_defects:
+      - REPLAY-DRIFT
+    status: MISSING
+  - invariant_id: INV-T.1
+    domain: pass safety
+    statement: No story or project PASSES without every required valid proof; absence, a foreign candidate, a demoted blocker, an erased environment failure or a filtered critical finding never produce a PASS.
+    why: A false PASS is the one outcome the framework exists to prevent.
+    severity_if_violated: P0
+    enforcement_points:
+      - aisef/control/gate.py::evaluate
+      - aisef/control/closure.py
+    deterministic_tests:
+      - tests/test_gate_qualification.py
+      - tests/test_closure.py::TestNoCriterionPassesOnAbsence
+      - tests/test_tdd.py::TestDoTruocXanh
+      - tests/test_qa.py::TestFakeTests
+      - tests/hardening/test_sibling_scan.py::TestSS05EscalationDemotionStaysInsideTheEpoch (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS26EnvironmentFailureIsNotErasedBySubstring (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS27NoiseFilterHasASeverityFloor (RED)
+    model_tests:
+      - tests/hardening/test_state_model.py::TestKernelModel::test_property_7_complete_needs_every_proof
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestEvidenceFaults
+    linked_defects:
+      - D-004
+      - SS-05
+      - SS-26
+      - SS-27
+      - SS-33
+    status: PARTIAL
+  - invariant_id: INV-T.2
+    domain: pass safety
+    statement: A blocking decision that rests on the model judge alone is measured, named and published; it never masquerades as a deterministic result.
+    why: D-002 / G2.4b.
+    severity_if_violated: P2
+    enforcement_points:
+      - aisef/control/gate.py::judge_only
+    deterministic_tests:
+      - tests/test_judge_only.py
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - D-002
+    status: PROVEN
