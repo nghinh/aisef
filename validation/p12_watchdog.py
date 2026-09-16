@@ -76,7 +76,7 @@ def running_chunk(ps_output: str | None) -> tuple[int, int] | None | bool:
 
 def read_ps() -> str | None:
     try:
-        return subprocess.run(["ps", "-eo", "pid=,command="], capture_output=True, text=True, timeout=30, check=True).stdout
+        return subprocess.run(["ps", "-eo", "pid=,command="], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30, check=True).stdout
     except (OSError, subprocess.SubprocessError):
         return None
 
