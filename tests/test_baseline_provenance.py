@@ -166,10 +166,10 @@ class TestBaselineProducer(unittest.TestCase):
         _git(self.project, "init", "-q")
         _git(self.project, "config", "user.email", "t@t.t")
         _git(self.project, "config", "user.name", "t")
-        fake = self.project / "fake_pytest.sh"
-        fake.write_text("#!/bin/sh\nprintf 'tests/test_a.py::test_a PASSED\\ntests/test_b.py::test_b PASSED\\n'\n",
+        from aisef.clients.base import quote_command
+        fake = self.project / "fake_pytest.py"      # portable: no shell, runs on Windows too
+        fake.write_text("print('tests/test_a.py::test_a PASSED')\nprint('tests/test_b.py::test_b PASSED')\n",
                         encoding="utf-8")
-        fake.chmod(0o755)
         (self.project / "src").mkdir()
         (self.project / "src" / "a.py").write_text("x = 1\n", encoding="utf-8")
         _git(self.project, "add", "-A")
@@ -179,7 +179,7 @@ class TestBaselineProducer(unittest.TestCase):
         self.root.mkdir()
         self.story = Story(id=SID, epic_id="EPIC-03", title="t", acceptance_criteria=["AC one", "AC two"],
                            covers=["FR-1"], write_scope=["src"])
-        self.cfg = Config({**DEFAULTS, "tools.test": str(fake), "tools.lint": "true",
+        self.cfg = Config({**DEFAULTS, "tools.test": quote_command([sys.executable, str(fake)]), "tools.lint": "true",
                            "sandbox.use_docker": False, "run.max_retries": 1})
 
     def tearDown(self):
