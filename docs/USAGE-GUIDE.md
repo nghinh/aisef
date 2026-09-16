@@ -819,7 +819,7 @@ There are **sixteen** checks, and the table prints them in this order
 | `evidence matches candidate` | all test results were actually run against the code version being scored |
 | `guard ran` | guards actually evaluated write operations during the session |
 | `test` | the last test run passed, and it happened after the last file edit |
-| `no baseline regression` | tests that were already green before remain green and still exist |
+| `no baseline regression` | tests that were already green at the story-entry baseline remain green and still exist (1.7.5: measured against the baseline captured at the integrated parent when the story began, never against a candidate the story produced) |
 | `lint` | lint is clean |
 | `write scope` | the story didn't write outside its `write_scope` |
 | `mockup map` | the actual screen matches the visual contract |
@@ -940,6 +940,20 @@ Four things about that loop that only show up once you run it:
   --story <id>` re-runs the review stage later on the same candidate, and a plain
   `aisef run` resumes such a story at the review stage. A structured `block` is a
   verdict and still returns the story to the developer.
+- **A story's baseline is immutable within its epoch (1.7.5).** `no baseline
+  regression` compares the candidate with the test suite as it stood at the
+  integrated parent when the story began. That record is captured once per
+  story contract and reused by retries, resumed runs and `--verify-only`
+  (`baseline REUSED` in `run.log`); a candidate the story produced never becomes
+  its own baseline, so renaming or dropping a test the story itself wrote is not
+  a regression, while losing a test that existed at story entry still is. A new
+  baseline exists only when the story's criteria change — the branch is
+  discarded and the story restarts from its base. If baseline records exist but
+  none was captured at the parent for the current contract, the check reads ⚠
+  `BASELINE_UNAVAILABLE` and blocks rather than baselining the story's own
+  build. (Before 1.7.5 a resumed story re-baselined at its previous candidate,
+  and a correct candidate could not complete — D-033, found by the OpenCode
+  replay of the second LedgerLock run.)
 - **Two graded attempts failing `tests verify story` on the same criteria stop the
   story immediately**, as a plan deadlock that names the criteria. No test can be
   red at the branch point for behaviour already on the main branch, so there is no
@@ -1613,6 +1627,7 @@ money and left the project worse, which is the number to look for first.
 | Gate item ✗ `TDD`, while the nop control passed | you are before 1.6.0 | upgrade: a passing nop control now satisfies `TDD`, and the gate says which evidence proved it |
 | `aisef guard tool-bypass: … is the project's test command run directly` | the agent ran your declared command instead of `aisef tool test`; nothing was recorded | this is the guard working. Use `aisef tool test`. To narrow a run for debugging, change the command's own identity (`pytest tests/x.py -k foo`); with `npm`/`yarn`/`pnpm`/`bun` the script name *is* the identity, so call the underlying runner |
 | Story `failed`, reason `deadlock due to plan` | the story's criteria are already satisfied at its branch point — usually an earlier story shipped the behaviour | fix or drop the criteria named in the message, then re-run. Amending them drops the stale branch automatically |
+| Gate item ⚠ `no baseline regression` — `BASELINE_UNAVAILABLE: …` | baseline records exist but none was captured at the integrated parent for the story's current contract (1.7.5) | re-run the story from its base — `aisef run` discards the branch when the criteria changed; do not add or restore tests to satisfy the gate |
 | Story `failed`, reason `REVIEW_UNRUNNABLE: the reviewer did not produce a verdict …` | deterministic checks passed; the review session produced no verdict in three executions on the same candidate (1.7.4) | nothing to fix in the code — the candidate is kept. Look at the reviewer client (`run.max_turns`, timeouts, provider), then `aisef run --verify-only --story <id>` re-runs the review stage on that candidate |
 | Story `failed`, reason `sessions kept producing nothing to grade` | the session ran clean and wrote nothing — a decision, not a fault | do not re-run it; read the last graded verdict. Two consecutive no-op sessions stop the story on purpose |
 | Attempts ending at `max_turns` | `run.max_turns` (default 40) reached | the session is still graded if it committed work. Check `aisef status --attempts`; if the agent was reading `_bmad-output/` to work out gate rules, raising the cap does not help |

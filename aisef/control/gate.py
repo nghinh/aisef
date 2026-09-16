@@ -266,6 +266,55 @@ def _class_of(test_id: str) -> str:
     return leaf
 
 
+def authoritative_baseline(evidence: Evidence, *, epoch: str | None = None) -> Event | None:
+    """The story-entry baseline (D-033, lỗi 187): captured at the **integrated
+    parent** when the story began, for the **current story epoch**. Never a
+    record taken at the story's own candidate — a resumed run's worktree HEAD
+    (LedgerLock STORY-03-01: seq 393, parent ca37cc44 ≠ base_ref 9cf22f5c) —
+    and never one from an earlier contract.
+
+    Epoch = the contract fingerprint (`story:contract` note, written by run.py
+    when the criteria change). Records from 1.7.5 carry it as `epoch`; older
+    records are trusted only when they stand at the branch point (`parent ==
+    base_ref`, or no provenance recorded at all) and were recorded after the
+    current contract note. Returns None when nothing qualifies — the caller
+    tells "no baseline ever" (NOT_APPLICABLE) from "records exist, none
+    authoritative" (UNRUNNABLE, fail closed)."""
+    note = evidence.last(NOTE, "story:contract")
+    if epoch is None and note is not None:
+        epoch = str(note.detail.get("fingerprint") or "") or None
+    events = list(evidence.events)
+    note_pos = next((i for i, e in enumerate(events) if e is note), -1)
+    chosen = None
+    for pos, e in enumerate(events):
+        if e.kind != TOOL_RUN or e.name != BASELINE_RUN:
+            continue
+        d = e.detail
+        if "epoch" in d:
+            if epoch and str(d.get("epoch")) != epoch:
+                continue
+            chosen = e
+            continue
+        if pos < note_pos:
+            continue                     # a record from before the current contract
+        parent, base_ref = str(d.get("parent") or ""), str(d.get("base_ref") or "")
+        if parent and base_ref and parent != base_ref:
+            continue                     # taken at the story's own build, not at the parent
+        chosen = e
+    return chosen
+
+
+def _baseline_unavailable(name: str, evidence: Evidence) -> Check:
+    last = evidence.last(TOOL_RUN, BASELINE_RUN)
+    return Check(name, Outcome.UNRUNNABLE,
+                 "BASELINE_UNAVAILABLE: baseline records exist but none was captured at the integrated "
+                 "parent for this story epoch (last record: parent "
+                 f"{str(last.detail.get('parent') or '?')[:8]}, base_ref "
+                 f"{str(last.detail.get('base_ref') or '?')[:8]}) — a story never scores against its own "
+                 "candidate; re-run the story from its base",
+                 evidence=[last.seq])
+
+
 def _baseline_check(evidence: Evidence, candidate: str) -> Check:
     """Check "no baseline regression" (ADR-004 R9).
 
@@ -289,8 +338,10 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
     clear explanation.
     """
     name = "no baseline regression"
-    base_ev = evidence.last(TOOL_RUN, BASELINE_RUN)
+    base_ev = authoritative_baseline(evidence)
     if base_ev is None:
+        if evidence.last(TOOL_RUN, BASELINE_RUN) is not None:
+            return _baseline_unavailable(name, evidence)
         return Check(name, Outcome.NOT_APPLICABLE,
                      "harness recorded no baseline (manual run, old journal) — cannot compare")
     seqs = [base_ev.seq]     # events read: baseline, then test run at candidate
@@ -418,7 +469,13 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
     -> NOT_APPLICABLE with reason.
     """
     name = "tests verify story"
-    base_ev = evidence.last(TOOL_RUN, BASELINE_RUN)
+    base_ev = authoritative_baseline(evidence)
+    if base_ev is None:
+        # Only a record at the story's own build exists (a rerun): keep it so level 1
+        # says "cannot compare" and level 2 decides — it never scores anything here.
+        last = evidence.last(TOOL_RUN, BASELINE_RUN)
+        if last is not None and str(last.detail.get("parent") or "") not in ("", str(last.detail.get("base_ref") or "")):
+            base_ev = last
     # Same position-vs-seq reasoning as ``_baseline_check``: ``after_event``
     # for the events that came after the baseline, not numeric comparison.
     post = [e for e in evidence.after_event(base_ev) if e.kind == TOOL_RUN and e.name == "test"

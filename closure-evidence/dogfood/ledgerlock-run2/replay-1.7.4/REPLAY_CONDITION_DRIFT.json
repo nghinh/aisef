@@ -1,0 +1,9 @@
+{
+ "classification": "REPLAY_CONDITION_DRIFT",
+ "replay": "<scratch>/replay174/ledgerlock (preserved, not deleted, not rewritten)",
+ "drift": "every model session of this replay (from the step-1 verify-only review of eed6f87a through STORY-03-02 attempt on 718bbee5) ran on client=claude, model claude-opus-5[1m], because `aisef run` was invoked without --client and the default resolved to claude; Run #2's original conditions were client=opencode, model 9router/mycombo. Guards were not compiled for claude, so `guard ran` scored not-applicable throughout.",
+ "what_remains_valid": "the D-032 framework behaviour observed in step 1 (incomplete 1.7.3 review not reused; reviewer re-run on the same candidate; no developer session; no no-op loop) is client-independent and stands as evidence; the model-produced code and verdicts after that point are NOT accepted as the confirmation run (owner decision 2026-09-16)",
+ "owner_decision": "do not accept the mixed replay as the final confirmation; preserve as evidence; perform one clean replay under original OpenCode conditions at <scratch>/replay174-opencode/ledgerlock",
+ "state_when_stopped": "master b0fb68d (9/16 done); STORY-03-02 attempt on 718bbee5 cancelled during its security session; arbitration record and re-approvals present; bf50fcbb tagged",
+ "recorded": "2026-09-15T23:17:45+00:00"
+}

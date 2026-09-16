@@ -81,6 +81,17 @@ def orphans(story_id: str, n: int, test_ids: list[str]) -> list[str]:
     return [f"AC-{story_id}-{i}" for i in sorted(seen)]
 
 
+def contract_fingerprint(criteria) -> str:
+    """Hash of the acceptance criteria — the **story epoch**: what the story's
+    tests must prove. Written to the `story:contract` note (run.py) and onto
+    the story baseline (D-033), so a baseline never outlives the contract it
+    was captured for. Criteria only, not the whole card: harness-added scope
+    paths move with framework upgrades while saying nothing about the story."""
+    import hashlib
+    text = "\n".join(str(c).strip() for c in (criteria or []))
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
+
+
 def digest(text: str) -> str:
     """Vân tay nội dung của một tiêu chí — danh tính bền của nó.
 

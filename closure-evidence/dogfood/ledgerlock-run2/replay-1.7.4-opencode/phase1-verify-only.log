@@ -1,0 +1,26 @@
+== PHASE 1: aisef run --client opencode --verify-only --story STORY-01-06 (start 23:17:45Z) story branch eed6f87 master 28b7162
+⚠️  `.opencode/plugin` is compiled but not committed — a story worktree is a fresh checkout, so the session will run with no guard at all, and the gate will fail `guard ran`.
+   Commit it first:  git add .opencode && git commit -m 'guard plugin'
+EPIC-01 · wave 1
+STORY-01-06: NOT DONE
+  [re-verify] gate failed
+  candidate eed6f87: reran review · kept test:nop, test, lint, qa:fake-tests, security
+    ✅ evidence matches candidate
+    ✗ guard ran — guard did not evaluate any write in this session — hook cannot reach worktree? (.claude/ not committed, or --settings not passed). A story that writes nothing also lands here, and that is correct.
+    ✅ test
+    ✗ no baseline regression — no test run at candidate after baseline — cannot compare
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✗ TDD — tests green on first run — not proven to verify anything (tests/test_conflict.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.
+    ✗ tests verify story — no test run at candidate — cannot determine which tests are green to compare with parent SHA
+    ✅ security
+    ✅ review
+    ✅ preservation — 5 behaviours of other stories still green
+  ✗ re-verify candidate eed6f87 did not pass gate: guard ran; no baseline regression; TDD; tests verify story
+
+⏸ stopped at EPIC-01 · wave 1
+exit 2 (end 23:20:32Z)

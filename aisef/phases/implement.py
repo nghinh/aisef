@@ -1286,18 +1286,44 @@ def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Co
     are already green there -- nop level 1 must know to avoid false
     positives (ADR-005 V3).
     """
+    from ..control.acceptance import contract_fingerprint
     from ..harness.runlog import run_log
     run_log(artifact_root, f"story={story.id} baseline START")
+    store = EvidenceStore(artifact_root)
+    head = head_sha(workdir)
+    root = base_ref or head              # the integrated parent at story entry (project HEAD without a worktree)
+    epoch = contract_fingerprint(story.acceptance_criteria)
+    # Immutable within the story epoch (D-033): a retry, a resumed run or a
+    # re-verification reuses the record captured when the story began. Taking
+    # a new one at the worktree HEAD of a resumed story would baseline the
+    # story's own candidate (LedgerLock STORY-03-01, ca37cc44).
+    have = story_gate.authoritative_baseline(store.read(story.id), epoch=epoch)
+    if have is not None and not have.detail.get("unrunnable"):
+        run_log(artifact_root, f"story={story.id} baseline REUSED seq={have.seq} root={root[:8]} "
+                               f"— immutable within the story epoch")
+        return
     if not config.get("verify.baseline", True):
-        EvidenceStore(artifact_root).tool_run(story.id, BASELINE_RUN, ok=False, detail={
-            "baseline": True, "disabled": True,
+        store.tool_run(story.id, BASELINE_RUN, ok=False, detail={
+            "baseline": True, "disabled": True, "root": root, "epoch": epoch,
             "skipped": "disabled by config `verify.baseline`",
         })
+        return
+    if base_ref and head and head != root:
+        # No baseline for this epoch and the worktree is not at the parent:
+        # fail closed rather than synthesise one from the story's own build.
+        store.tool_run(story.id, BASELINE_RUN, ok=False, detail={
+            "baseline": True, "root": root, "epoch": epoch, "parent": head, "base_ref": base_ref,
+            "unrunnable": (f"BASELINE_UNAVAILABLE: no baseline exists for this story epoch and the worktree "
+                           f"stands at {head[:8]}, not at the integrated parent {root[:8]} — a baseline taken "
+                           "here would be the story's own build. Re-run the story from its base (`aisef run` "
+                           "discards the branch when the criteria changed)"),
+        })
+        run_log(artifact_root, f"story={story.id} baseline UNAVAILABLE head={head[:8]} root={root[:8]}")
         return
     res = run_tool("test", workdir, config=config)   # story_id empty: recorded below, under its own name
     log = parse_testlog(res.stdout + "\n" + res.stderr)
     record_tool(res, story.id, artifact_root, name=BASELINE_RUN, extra={
-        "baseline": True, "parent": head_sha(workdir), "base_ref": base_ref,
+        "baseline": True, "root": root, "epoch": epoch, "parent": head, "base_ref": base_ref,
         "red_before": log.failed[:MAX_IDS],
     })
     # Say *why* when it could not run: `ok=False` alone sends the reader to the
@@ -1371,7 +1397,7 @@ def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
         store.tool_run(story.id, NOP_RUN, ok=False, detail={
             "nop": True, "files": [], "skipped": "story did not add/modify test files"})
         return
-    base_ev = EvidenceStore(artifact_root).read(story.id).last(TOOL_RUN, BASELINE_RUN)
+    base_ev = story_gate.authoritative_baseline(EvidenceStore(artifact_root).read(story.id))
     parent_ref = base_ref or (str(base_ev.detail.get("parent") or "") if base_ev is not None else "")
     if not parent_ref:
         store.tool_run(story.id, NOP_RUN, ok=False, detail={

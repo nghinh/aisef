@@ -2,6 +2,48 @@
 
 ## Unreleased
 
+## 1.7.5 — 2026-09-16
+
+One defect, found by the clean OpenCode replay of the second LedgerLock run on
+the public `aisef==1.7.4` package (STORY-03-01; record
+`closure-evidence/dogfood/ledgerlock-run2/replay-1.7.4-opencode/`). No feature,
+no gate softened, no waiver, nothing else touched; the regression was red on
+1.7.4 (`tests/test_baseline_provenance.py`: 10 red, 4 controls green — all
+green on 1.7.5).
+
+**A story's regression baseline is immutable within its epoch (D-033, lỗi 187).**
+`run_baseline` ran on every `implement_story` invocation at the worktree HEAD,
+so a story resumed from its own branch re-baselined at its previous candidate
+(ca37cc44), and the `no baseline regression` check read the newest record.
+The story's own earlier tests became "tests present at baseline"; when the
+developer renamed two of them (dropping a wrong criterion code) the gate
+scored "lost 2 tests present at baseline", and a candidate green on every
+other check could not complete without operator intervention — nothing
+present at story entry (parent 9cf22f5c) had been lost. Now the baseline is
+captured **once per story epoch** (the acceptance-criteria fingerprint,
+`acceptance.contract_fingerprint`, the same hash the `story:contract` note
+carries) **at the integrated parent** when the story begins, and carries
+`root` and `epoch`. Retries, resumed runs and `--verify-only` reuse that exact
+record (`baseline REUSED` in the run log); a candidate the story produced never
+becomes its baseline. The gate (`gate.authoritative_baseline`) scores against
+the story-entry record for the current epoch — records from earlier releases
+are accepted only when they stand at the branch point — so deleting or
+renaming a test the story itself wrote is not a regression, while losing a
+test that existed at story entry still is. A new baseline exists only for a
+new epoch (criteria changed: the branch is discarded and the story restarts
+from its base). Absent or provenance-invalid baseline → fail closed: the
+producer records `BASELINE_UNAVAILABLE` instead of baselining a resumed
+story's HEAD, and the check reads ⚠ UNRUNNABLE `BASELINE_UNAVAILABLE` when
+records exist but none was captured at the parent for the current contract;
+a journal with no baseline at all still reads "cannot compare"
+(NOT_APPLICABLE), as before. The `tests verify story` level-1 comparison and
+the nop control's parent fallback use the same selection.
+
+Unchanged on purpose: the pytest node-id rename heuristic (`_class_of`) —
+against the correct baseline the story's renamed tests are not baseline tests
+at all, so no independent red case exists; recorded as backlog. Also unchanged:
+`run.max_turns`, reviewer semantics, Bandit/SAST, every other open defect.
+
 ## 1.7.4 — 2026-09-15
 
 One defect, found by the second LedgerLock dogfood run on the public

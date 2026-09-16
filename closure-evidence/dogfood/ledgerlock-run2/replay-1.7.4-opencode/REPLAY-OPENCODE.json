@@ -1,0 +1,105 @@
+{
+ "what": "clean replay of the preserved LedgerLock Run #2 failure state on public aisef==1.7.4 under the ORIGINAL client conditions (opencode, 9router/mycombo)",
+ "source": {
+  "path": "<scratch>/ll2/ledgerlock-aiseftest-run2 (read-only extract of ledgerlock-aiseftest-run2.zip; not altered)",
+  "master_sha": "28b71626ff9cba42aa872fa7b78685c8423e095f",
+  "story_branch": "story/STORY-01-06 = eed6f87afc51022fc8dbdec185609922f5fbda68",
+  "evidence_digest": "sha256 e4ea22421d8cd26336f1afa6b61301dd1ab4bca8b1343fef50ce544ceba64037 over 135 files of _bmad-output (path+content, .DS_Store excluded)",
+  "state": "5/16 stories done; STORY-01-06 failed under 1.7.3 (2 no-op sessions after a review cut at max_turns)"
+ },
+ "replay": {
+  "path": "<scratch>/replay174-opencode/ledgerlock",
+  "venv": "<scratch>/replay174-opencode/venv",
+  "created": "2026-09-15T23:17:45+00:00"
+ },
+ "aisef": {
+  "version": "aisef 1.7.4",
+  "which": "<scratch>/replay174-opencode/venv/bin/aisef",
+  "module": "<scratch>/replay174-opencode/venv/lib/python3.14/site-packages/aisef/__init__.py",
+  "pip_list": "aisef==1.7.4 only",
+  "install": "pip install --no-cache-dir aisef==1.7.4 (public PyPI)",
+  "wheel_sha256_pypi": "200928a2eb8bc8abe8a5a0fe2704c053379e2f699ece92818872995e58ec5950",
+  "release_source_sha": "9dcd402d9e922ba4d5541f9f4cb85078b902168c"
+ },
+ "python": "Python 3.14.7",
+ "client": {
+  "name": "opencode",
+  "binary": "/Users/nghinh/.opencode/bin/opencode",
+  "version": "1.18.31",
+  "route_model": "9router/mycombo (~/.config/opencode/opencode.json `model`)",
+  "rule": "every execution passes --client opencode explicitly"
+ },
+ "guards": {
+  "setup": "aisef compile --client opencode (before any story execution)",
+  "written": [
+   ".opencode/plugin/aisef-guard.ts"
+  ],
+  "guards_wired": [
+   "destructive",
+   "diff-scope",
+   "egress",
+   "git-stage",
+   "injection",
+   "process-ref",
+   "secret",
+   "tool-bypass",
+   "write-scope"
+  ],
+  "post_hoc": [
+   "completion"
+  ],
+  "degradations": [
+   "dir_allowlist: unsupported",
+   "tool_allowlist: emulated",
+   "turn_limit: unsupported"
+  ],
+  "local_exclude": ".git/info/exclude += .opencode/, .claude/settings.json, _bmad-output/compile-report.json (tracked .gitignore untouched)",
+  "tracked_changes_after_setup": "none (git status --porcelain shows only .DS_Store)",
+  "runtime_confirmation": "gate item `guard ran` per story (recorded as the run proceeds)"
+ },
+ "deviations": [
+  {
+   "kind": "REPLAY CONDITION DEVIATION",
+   "key": "run.max_turns",
+   "old": 40,
+   "new": 80,
+   "reason": "repeated route truncation under opencode/9router/mycombo",
+   "scope": "LedgerLock replay only",
+   "file": ".ai/config.json",
+   "decided_by": "owner (2026-09-16)",
+   "recorded": "2026-09-16T00:18:23+00:00",
+   "record": "_bmad-output/decisions/REPLAY-CONDITION-DEVIATION-max_turns.md"
+  }
+ ],
+ "observations_p2_p3_record_only": [
+  {
+   "id": "OBS-OC-1",
+   "severity_candidate": "P1 (provisional, owner diagnostic 2026-09-16)",
+   "recorded": "2026-09-16T00:44:33+00:00",
+   "title": "resumed story: baseline taken at the story's own previous candidate makes removing its own mislabeled tests a 'no baseline regression' failure",
+   "where": "STORY-03-01 phase 3 (run.max_turns=80): baseline ran at ca37cc44 (the branch head from the previous run) instead of the branch point 9cf22f5; attempt 3 (01c1d304) removed the two tests coded AC-STORY-03-01-6 that `criteria have tests` had rejected; the gate then failed `no baseline regression` (lost 2 tests present at baseline) while `tests verify story` itself noted 'level 1 cannot compare: baseline ran at ca37cc4 — the story's own build (rerun), not the branch point'",
+   "effect": "a story resumed from its own prior candidate cannot delete or rename a test it wrote earlier without failing the gate; combined with the retry budget this ended STORY-03-01 EXHAUSTED although test, lint, criteria have tests, TDD, security and review were all green on 01c1d304",
+   "classification": "framework observation, fail-closed (no false pass); not D-032; not fixed here (owner scope: record only)",
+   "evidence": "_bmad-output/run.log lines 801-802 and 870-873; evidence/STORY-03-01.jsonl gate:verdict at 01c1d304",
+   "owner_diagnostic_2026_09_16": {
+    "step1_baseline_records": "seq 2: parent 9cf22f5c base_ref 9cf22f5c 71 ids (Phase 2, story entry); seq 393: parent ca37cc44 base_ref 9cf22f5c 79 ids (Phase 3 resume, run_baseline at worktree HEAD = the story's own candidate)",
+    "selection_rule": "aisef/control/gate.py::_baseline_check uses evidence.last(TOOL_RUN, BASELINE_RUN) — the newest record — and ignores parent/base_ref provenance; aisef/phases/implement.py::run_baseline runs on every implement_story invocation at head_sha(workdir)",
+    "step2_verify_only": "candidate 01c1d304; baseline used seq 393 (parent ca37cc44); baseline ids 79; candidate ids 79; lost: the two AC-STORY-03-01-6-coded tests (renamed at 01c1d304 without the code); verdict FAILED only on 'no baseline regression' (evidence seqs [393, 1694]); no baseline refreshed by verify-only",
+    "lost_vs_entry_baseline_seq2": "none (0 lost) — the two tests did not exist at 9cf22f5 nor at c1c3dd83; created by STORY-03-01 in bdc21244, kept in ca37cc44, renamed in 01c1d304",
+    "classification": "Case B — FRAMEWORK ASSURANCE DEFECT: retry/candidate state contaminated the immutable baseline",
+    "provisional_severity": "P1 (same rule as D-032: a correct candidate cannot complete the lifecycle without operator intervention; fail-closed, no false pass)",
+    "red_reproducer": "AISEF repo branch dogfood/baseline-provenance-red commit 282ebf3, tests/test_baseline_provenance.py — 1 RED (resumed re-baseline) + 1 GREEN control, red against both the repo product (f214146 == v1.7.4) and the installed public wheel; master untouched",
+    "recorded": "2026-09-16T01:30:57+00:00"
+   }
+  }
+ ],
+ "phase3": {
+  "run": "aisef run --client opencode, run.max_turns=80",
+  "result": "STORY-03-01 EXHAUSTED after 3 quality attempts; run stopped at EPIC-03 wave 1; master unchanged 9cf22f5c",
+  "developer_sessions": "80 turns untouched (fail), 73 turns no-op (infra), 80 turns untouched (fail), 80 turns with work (graded → 01c1d304)",
+  "reviewer": "44 turns PASS (completed under the 80 cap where it was cut at 40)",
+  "security": "47 turns PASS",
+  "gate_01c1d304": "only `no baseline regression` failed (see OBS-OC-1)",
+  "recorded": "2026-09-16T00:44:33+00:00"
+ }
+}

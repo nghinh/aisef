@@ -1,0 +1,121 @@
+== PHASE 2: aisef run --client opencode (all epics) start 23:21:37Z master 28b7162
+⚠️  `.opencode/plugin` is compiled but not committed — a story worktree is a fresh checkout, so the session will run with no guard at all, and the gate will fail `guard ran`.
+   Commit it first:  git add .opencode && git commit -m 'guard plugin'
+EPIC-01 · wave 1
+  ○ STORY-01-01: already done, skipped
+EPIC-01 · wave 2
+  ○ STORY-01-02: already done, skipped
+EPIC-01 · wave 3
+  ○ STORY-01-03: already done, skipped
+EPIC-01 · wave 4
+  ○ STORY-01-04: already done, skipped
+EPIC-01 · wave 5
+  ○ STORY-01-05: already done, skipped
+EPIC-01 · wave 6
+STORY-01-06: DONE
+  [attempt 1] ok
+EPIC-02 · wave 1
+STORY-02-01: DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✗ test — the most recent test run is still failing, the story cannot be finished.
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✗ criteria have tests — no tests with codes AC-STORY-02-01-1, AC-STORY-02-01-2, AC-STORY-02-01-3, AC-STORY-02-01-4, AC-STORY-02-01-5 — each criterion needs at least one test named after its code, green at this build. Names were read from `python3 -m pytest -v` — no other suite recorded test names at this candidate, so if the codes are in e2e titles, check that the e2e run is in this story's verification contract and that its reporter prints names
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD — no red run recorded, but the nop control proves the same thing directly — 4 tests with criteria codes are red or absent at parent SHA 12248bc
+    ✅ tests verify story — 4 tests with criteria codes are red or absent at parent SHA 12248bc
+    ○ e2e — not configured — does not count as passed
+    ✅ security
+    ✗ review — 1 blocking items: [block] ledgerlock/ledger.py:25 — `verify` passes bytes where `line_hash` expects a dict; crashes on every non-empty ledger
+    ✅ preservation — 13 behaviours of other stories still green
+  [attempt 2] ok
+EPIC-02 · wave 2
+STORY-02-02: DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✗ lint —    |
+  64 |             ledger = Ledger(path)
+  65 |             ledger.append(("put", "k", "v", "r1", 1))
+  66 |             with self.assertRaises(Exception):
+     |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  67 |                 ledger.append(("delete", "k", None, "r2", 2))
+     |
+  
+  B017 Do not assert bl
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD
+    ✗ tests verify story — tests verify nothing — still green without story code (parent SHA a2481e9): tests/test_snapshot_determinism.py::TestSnapshotExcludesDeletedKey::test_AC_STORY_02_02_2_snapshot_omits_put_then_tombstone
+    ✅ security
+    ✅ review
+    ✅ preservation — 20 behaviours of other stories still green
+  [attempt 2] ok
+EPIC-03 · wave 1
+STORY-03-01: NOT DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD
+    ✅ tests verify story — 6 tests with criteria codes are red or absent at parent SHA 9cf22f5
+    ○ e2e — not configured — does not count as passed
+    ✗ security — 2 blocking items: [high] ledgerlock/ledger.py:108 — apply_batch lacks the process-wide lock specified by AD-7 ("under the Ledger._lock"). Two concurrent apply_batch calls can interleave between read_bytes (line 164) an
+    ✅ review
+    ✅ preservation — 25 behaviours of other stories still green
+  [attempt 2] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✗ test — the most recent test run is still failing, the story cannot be finished.
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD
+    ✅ tests verify story — 6 tests with criteria codes are red or absent at parent SHA 9cf22f5
+    ○ e2e — not configured — does not count as passed
+    ✗ security — 1 blocking items: [high] ledgerlock/ledger.py:108 — apply_batch reads existing bytes, writes them plus new lines to a temp file, and os.replace over the JSONL without any process-wide lock. Two concurrent apply_batch c
+    ✗ review — 1 blocking items: [block] ledgerlock/ledger.py:13 — `Ledger.__init__` does not initialize `self._lock`, so `apply_batch` (and `append`) run without the process-wide lock required by FR-8 / AD-7. Why: AD-7 step 1 explic
+    ✅ preservation — 25 behaviours of other stories still green
+  [attempt 3] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✗ criteria have tests — tests carry codes with no criterion: AC-STORY-03-01-6 — the story has 5 criteria, so a test named after a higher code proves nothing this story declares, and every code at or below it may have shifted onto a different criterion. Re-tag the tests, or restore the criteria the codes were written for (lỗi 159).
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD
+    ✅ tests verify story — 6 tests with criteria codes are red or absent at parent SHA 9cf22f5
+    ○ e2e — not configured — does not count as passed
+    ✅ security
+    ⚠ review — reviewer did not run (max_turns: stopped at 40 turns (cap 40)) — no verdict about the candidate
+    ✅ preservation — 25 behaviours of other stories still green
+  ✗ tried 3 attempts, still did not pass gate
+
+⏸ stopped at EPIC-03 · wave 1
+exit 2 (end 00:12:22Z)
+== master now 9cf22f5

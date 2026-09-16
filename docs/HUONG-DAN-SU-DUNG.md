@@ -924,6 +924,19 @@ Rồi phân loại:
   tục story ấy từ giai đoạn rà soát. Verdict `block` có cấu trúc vẫn là verdict và
   vẫn trả story về developer.
 
+- **Mốc "trước" của story là bất biến trong một epoch** (từ 1.7.5): mục `no
+  baseline regression` so ứng viên với bộ test **ở cha tích hợp lúc story bắt
+  đầu**. Mốc ấy chụp một lần cho mỗi hợp đồng story và được dùng lại khi thử lại,
+  chạy tiếp hay `--verify-only` (`baseline REUSED` trong `run.log`); ứng viên do
+  chính story tạo ra không bao giờ thành mốc của nó, nên đổi tên hay bỏ một test
+  do story tự viết không phải hồi quy, còn mất một test đã có lúc story bắt đầu
+  thì vẫn là. Mốc mới chỉ có khi tiêu chí đổi — nhánh bị bỏ và story chạy lại từ
+  gốc. Nếu có bản ghi mốc nhưng không bản nào chụp ở cha cho hợp đồng hiện tại,
+  mục ấy ra ⚠ `BASELINE_UNAVAILABLE` và chặn, thay vì lấy chính bản build của
+  story làm mốc. (Trước 1.7.5 story chạy tiếp tự chụp mốc ở ứng viên cũ của
+  mình, và một ứng viên đúng không thể qua — D-033, replay OpenCode của lần
+  chạy LedgerLock thứ hai tìm ra.)
+
 - **Trượt vì code sai**: để framework thử lại, hoặc chạy vòng cải tiến ở [§13](#13-vòng-cải-tiến-và-thay-đổi-sau-phát-hành).
 
 Muốn biết mục cổng nào sẽ **đổi kết cục** nếu chấm lại bằng luật hiện tại — hữu ích
@@ -1241,6 +1254,7 @@ Thông báo trong bảng này là **nguyên văn tiếng Anh** như CLI in ra.
 | Guard chặn `npm test` / lệnh test của bạn | `tool-bypass`: chạy thẳng thì không có gì được ghi | dùng `aisef tool test`; chạy hẹp thì gọi trực tiếp runner, đừng qua script npm ([§7](#7-aisef-compile-và-aisef-doctor)) |
 | `⚠️ not recorded as evidence: no story id` | `aisef tool …` chạy ngoài một phiên story | thêm `--story <mã>` nếu bạn muốn nó thành bằng chứng |
 | `deadlock due to plan: criteria … are already satisfied at the branch point` | một story trước đã làm xong hành vi ấy | **sửa hoặc bỏ tiêu chí**, đừng thử lại ([§11](#11-bước-hiện-thực-aisef-run)) |
+| Mục cổng ⚠ `no baseline regression` — `BASELINE_UNAVAILABLE: …` | có bản ghi mốc nhưng không bản nào chụp ở cha tích hợp cho hợp đồng hiện tại của story (1.7.5) | chạy lại story từ gốc — `aisef run` bỏ nhánh khi tiêu chí đổi; không thêm hay khôi phục test để qua cổng |
 | `REVIEW_UNRUNNABLE: the reviewer did not produce a verdict …` | phép kiểm tất định xanh; phiên rà soát không ra verdict sau ba lần trên cùng ứng viên (1.7.4) | không có gì phải sửa trong code — ứng viên được giữ. Xem client rà soát (`run.max_turns`, hết giờ, nhà cung cấp), rồi `aisef run --verify-only --story <mã>` chạy lại giai đoạn rà soát trên ứng viên ấy |
 | `sessions kept producing nothing to grade` | phiên đã **quyết định** không viết gì, hai lần liền | đọc `aisef evidence <story>`, sửa kế hoạch — mở lại phiên sẽ ra đúng kết quả ấy |
 | `the command matched no tests` | lệnh chạy được nhưng bộ chọn không khớp test nào | chưa story nào viết loại test ấy, hoặc bộ chọn sai — sửa `verify.<loại>` |

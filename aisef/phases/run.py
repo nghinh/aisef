@@ -474,10 +474,8 @@ def _contract_fingerprint(story: Story) -> str:
     harness-added scope paths, and those move with framework upgrades while
     saying nothing about what the story is.
     """
-    import hashlib
-
-    text = "\n".join(str(c).strip() for c in (story.acceptance_criteria or []))
-    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
+    from ..control.acceptance import contract_fingerprint
+    return contract_fingerprint(story.acceptance_criteria)
 
 
 def _contract_identities(story: Story) -> dict[str, str]:

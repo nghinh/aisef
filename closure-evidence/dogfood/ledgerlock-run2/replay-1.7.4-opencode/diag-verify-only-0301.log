@@ -1,0 +1,25 @@
+⚠️  `.opencode/plugin` is compiled but not committed — a story worktree is a fresh checkout, so the session will run with no guard at all, and the gate will fail `guard ran`.
+   Commit it first:  git add .opencode && git commit -m 'guard plugin'
+EPIC-03 · wave 1
+STORY-03-01: NOT DONE
+  [re-verify] gate failed
+  candidate 01c1d30: reran qa:e2e · kept test:nop, test, lint, qa:fake-tests, review, security
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✗ no baseline regression — lost 2 tests present at baseline: tests/test_atomic_batch.py::TestApplyBatchProcessWideLock::test_AC_STORY_03_01_6_concurrent_apply_batch_calls_serialize_via_lock, tests/test_atomic_batch.py::TestApplyBatchProcessWideLock::test_AC_STORY_03_01_6_ledger_has_a_process_wide_lock_attribute — deleting or renaming existing tests must be declared in the story; evidence cannot infer intent so this counts as regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD
+    ✅ tests verify story — 6 tests with criteria codes are red or absent at parent SHA 9cf22f5; level 1 cannot compare: baseline ran at ca37cc4 — the story's own build (rerun), not the branch point 9cf22f5
+    ○ e2e — not configured — does not count as passed
+    ✅ security
+    ✅ review
+    ✅ preservation — 25 behaviours of other stories still green
+  ✗ re-verify candidate 01c1d30 did not pass gate: no baseline regression
+
+⏸ stopped at EPIC-03 · wave 1
