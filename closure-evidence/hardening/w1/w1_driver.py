@@ -168,7 +168,7 @@ class Driver:
         stories = idx["stories"] if isinstance(idx, dict) and "stories" in idx else idx
         req = self.project / "docs/requirements.md"
         model = subprocess.run([self.a.python, "-c", "from aisef.clients.opencode import configured_model; print(configured_model(%r))" % str(self.project)],
-                               capture_output=True, text=True, cwd=str(self.run_dir), env=self.env()).stdout.strip()
+                               capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(self.run_dir), env=self.env()).stdout.strip()
         status_text = self.cli("status", timeout=120)["stdout_tail"]
         plugin_bin = P["guard_plugin"]["bin_line"] or ""
         img_id = P["docker_image"]["id"]

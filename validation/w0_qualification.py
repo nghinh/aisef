@@ -64,7 +64,7 @@ def ci_state(run_id: str) -> dict:
     if not run_id:
         return {"all_green": None, "why": "no run id given"}
     try:
-        out = subprocess.run(["gh", "run", "view", run_id, "--json", "jobs,headSha,conclusion"], capture_output=True, text=True, encoding="utf-8", errors="replace",
+        out = subprocess.run(["gh", "run", "view", run_id, "--json", "jobs,headSha,conclusion"], capture_output=True, text=True,
                              encoding="utf-8", timeout=60, check=True).stdout
     except (OSError, subprocess.SubprocessError) as e:
         return {"all_green": None, "why": f"gh unavailable: {e}"}
