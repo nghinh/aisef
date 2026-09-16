@@ -123,3 +123,23 @@ oracle results, resumes, drift records, cost, duration, every operator arbitrati
   replay` cannot exercise on archived evidence; the runner executes `test_verdict_freshness`, `test_retry_hygiene`
   and `test_baseline_provenance` on the candidate instead (29 passed). Any other changed row on the frozen candidate
   is a finding.
+- **Procedure additions from the driver rehearsal (scratch copy of w1-run-1, dry wheel venv, $0 — `w1/w1_driver.py`).**
+  (1) *Guard plugin*: the reference project has no `.opencode/plugin`; `aisef run` then records `guard ran` as not
+  applicable for every story (guards not compiled), and a compiled-but-uncommitted plugin fails `guard ran` in every
+  worktree (the 1.7.4 replay's warning). Preparation step, per run, before `kernel-first`: `aisef compile --client
+  opencode --bin <run venv>/bin/aisef` with the CANDIDATE's aisef, then commit `.opencode/` and the compile report to the
+  run copy (a project-side commit like the cost cap; the plugin embeds the candidate binary's path; OpenCode's
+  capability report — dir_allowlist unsupported, tool_allowlist emulated, turn_limit unsupported — is archived with
+  the run). (2) *Known environment condition*: `aisef doctor` reports `tools.sast` (auto-detected `bandit -q -r .` for a
+  pyproject project) missing in `aisef-verify-python:b2c7afff2aed`; the gate reads no sast (run-2's F-B), so the
+  reference environment is kept as is and every sast TOOL_UNRUNNABLE record must be typed correctly — recorded, not
+  fixed. (3) *Kernel path first, measured*: `aisef run --client opencode` on the stale readiness with no `--force`
+  exits 2 with `gate not approved: readiness`, no agent session, no story evidence; only then `aisef approve
+  readiness --note ARB-1`, after which exactly one gate changed (readiness → approved). (4) *Finish*: the hidden oracle
+  runs on a clean `git clone --branch master` of the run copy, never on the run's working tree; the oracle's sha is
+  checked against ORACLE-INDEPENDENCE.json before every run; a red oracle test is a FALSE PASS iff every story
+  covering its FRs (`w1/oracle-fr-map.json`, predeclared) is DONE, or the run is complete; otherwise it is a
+  correctly classified product failure. (5) *Forced resumes*: SIGTERM to the `aisef run` process group at the first
+  `wave=EPIC-01/w3 DONE` and `wave=EPIC-03/w1 DONE` lines of run.log, `aisef run` started again; survivors of the
+  kill and 90 s after the resume start are measured and recorded, never silently killed. (6) *Stall*: no log growth
+  for 2 h → SIGTERM, recorded as a measured stop.

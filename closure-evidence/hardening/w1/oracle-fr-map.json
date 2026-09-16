@@ -1,0 +1,12 @@
+{
+ "_what": "Predeclared BEFORE any W1 run: which PRD functional requirements (the stories' `covers` ids) each hidden-oracle test exercises, derived from the PRD's FR titles (FR-1 NFC keys, FR-2 hash chain, FR-3 idempotent replay, FR-4 conflict by rid, FR-5 tombstones, FR-6 verify from disk, FR-7 verifier trusts no cache, FR-8 atomic apply_batch, FR-9 deterministic snapshot, FR-10 repair truncated tail only, FR-11 CLI subcommands, FR-12 exit-code contract, FR-13 fsync, FR-14 no network/subprocess/extra files). Used by w1_driver.py to decide whether a red oracle test sits on a story the framework marked DONE (FALSE PASS) or on one it did not (a correctly classified product failure). A complete run (every story DONE) makes every red test a FALSE PASS regardless of the map.",
+ "test_14_1_verify_exits_0_on_a_fresh_ledger": ["FR-6", "FR-11", "FR-12"],
+ "test_14_2_snapshot_is_byte_deterministic": ["FR-1", "FR-4", "FR-9", "FR-11", "FR-12"],
+ "test_14_3_apply_batch_commits_atomically": ["FR-2", "FR-8", "FR-11"],
+ "test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": ["FR-2", "FR-6", "FR-10", "FR-11", "FR-12"],
+ "test_14_5_coverage_at_least_85_percent_with_unittest_discover": [],
+ "test_14_6_no_third_party_imports_at_runtime": ["FR-14"],
+ "test_replay_is_idempotent_and_a_different_rid_conflicts": ["FR-3", "FR-4", "FR-6"],
+ "test_a_tombstone_conflicts_like_a_live_value": ["FR-3", "FR-4", "FR-5"],
+ "test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": ["FR-4", "FR-8", "FR-11", "FR-12"]
+}
