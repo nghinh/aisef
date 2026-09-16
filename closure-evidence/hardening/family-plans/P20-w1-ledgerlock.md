@@ -87,3 +87,22 @@ oracle results, resumes, drift records, cost, duration, every operator arbitrati
   record as arbitration #1. No other gate is expected to change; any other STALE is a finding, not an arbitration.
 - The oracle's interpreter: `scratchpad/w1-oracle-venv` (coverage 7.16.1, pytest 9.1.1); the oracle itself is
   unchanged since its calibration.
+
+## Sanity-check additions (2026-09-17, owner rules C and D — before the freeze)
+
+- **Oracle v2 (rule C).** v1's calibration against the archived run-2 delivery is disowned: every expectation was
+  re-derived from the frozen requirements alone and the corrections are recorded (C1–C7). The oracle is calibrated
+  on `oracle/reference/` — a LedgerLock written from §3–§9/§12/§13, never from AISEF output — and ten one-line
+  mutants, each of which turns its target test red (`oracle/CALIBRATION.json`). `ORACLE-INDEPENDENCE.json`: PASS
+  (8/8 checks); it pins the oracle's sha256, which W1 verifies before every oracle run. Seven assumptions the
+  requirements leave open carry a predeclared arbitration each: an assumption failure is escalated to the owner,
+  never counted as FALSE PASS or product failure, never fixed by editing the oracle.
+- **Arbitration #1 restated in the required form (rule D)** — `ARBITRATION-PREDECLARED.json`, measured on the W1
+  copy: only `readiness` is STALE; recomputing the signed hash method over its two artifacts reproduces the stored
+  digest exactly, so the artifacts are byte-identical to what the owner signed and the hash-method change is the
+  only cause. Procedure at W1 start, so that the arbitration is not a hidden waiver: `aisef run` is started WITHOUT
+  re-approval and WITHOUT `--force`; the kernel's own refusal on the STALE gate is recorded (exit, message, no agent
+  call); only then is `readiness` re-approved through `aisef approve readiness` for the identical content, recorded
+  (seq, digest before/after, decided_by, note = ARB-1), and the gate statuses are measured again. No new epoch; no
+  approval invalidated. The owner has not separately signed this re-approval: if the owner rejects it, the re-approval
+  and every run resting on it are void.
