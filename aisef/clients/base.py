@@ -517,6 +517,8 @@ def _stream_with_timeout(proc, *, timeout_seconds: int, stop_when=None
     # The reader thread reads from the live pipe.  Even if `proc.wait`
     # times out and the child is killed, the thread keeps draining until
     # EOF, so the partial stream survives whatever event forced the kill.
+    from ..harness.process_owner import reap_group, win_job
+    job = win_job(proc)                        # Windows: descendants die when the job closes (F5 / D-024)
     reader = threading.Thread(
         target=_drain,
         args=(proc.stdout, lines, partial, lock),
@@ -568,6 +570,10 @@ def _stream_with_timeout(proc, *, timeout_seconds: int, stop_when=None
         raise
 
     reader.join(timeout=2.0)
+    # F5 / INV-L.2: members of the session's process group that outlived the leader (a dev server, a `git gc`)
+    # are terminated and verified dead here, on EVERY exit — before anything removes the workspace (D-024)
+    proc.aisef_reaped = reap_group(proc)
+    job.close()
     if proc.stderr:
         try:
             stderr = proc.stderr.read()

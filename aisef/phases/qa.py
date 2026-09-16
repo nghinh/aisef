@@ -745,6 +745,8 @@ def run_suite(
                     story_id, f"qa:{kind.id}", ok=sb.ok, duration_ms=sb.duration_ms,
                     detail={"command": command, "tail": result.detail[:500],
                             "tree": report.tree, "clean_tree": report.clean_tree,
+                            # SS-34 / INV-F.3: a kind whose runner could not run is an absence, recorded as such
+                            **({"unrunnable": result.unrunnable, "outcome": "TOOL_UNRUNNABLE"} if result.unrunnable else {}),
                             **ten,
                             **({"redacted": che} if che else {})},
                 )

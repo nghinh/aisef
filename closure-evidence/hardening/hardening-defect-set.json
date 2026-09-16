@@ -21,8 +21,8 @@
   },
   "fixed": 16,
   "by_status": {
-   "OPEN": 16,
-   "FIXED": 56,
+   "OPEN": 6,
+   "FIXED": 66,
    "SUPERSEDED": 1
   }
  },
@@ -1055,7 +1055,8 @@
     "statement": "run_suite computes result.unrunnable and drops it before recording; the story gate scores an unrunnable qa kind (missing playwright) as FAILED deterministic",
     "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS34UnrunnableQaKindIsNotAFailedCheck::test_a_missing_runner_scores_the_qa_kind_unrunnable_not_failed",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
    },
    {
     "id": "SS-45",
@@ -1069,7 +1070,8 @@
     "statement": "auto-detected defaults (bandit, gosec, cargo audit, npm test) are never probed; doctor prints ready while `aisef tool sast` is unrunnable forever",
     "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS45AutoDetectedToolsAreProbed::test_the_default_sast_command_of_a_python_project_is_probed",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
    },
    {
     "id": "SS-46",
@@ -1083,7 +1085,8 @@
     "statement": "the pre-flight tool probe is disabled for every project that did not run `aisef init --stack`; image_for still picks a stack image",
     "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS46PreflightProbeRunsWithoutADeclaredImage::test_a_stack_image_is_probed_even_when_not_declared",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
    },
    {
     "id": "SS-47",
@@ -1097,7 +1100,8 @@
     "statement": "a project-local runner that cannot be judged in the image is reported present",
     "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS47UnjudgeableProbeIsNotPresent::test_a_tool_the_probe_cannot_build_is_not_reported_present",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
    },
    {
     "id": "SS-48",
@@ -1111,7 +1115,8 @@
     "statement": "a non-empty tools.test string provisions verify.unit; a paid session starts on a command the sandbox cannot run",
     "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS48ProvisionedMeansRunnable::test_a_test_command_the_probe_reports_missing_does_not_provision_verify_unit",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
    },
    {
     "id": "SS-49",
@@ -1125,7 +1130,8 @@
     "statement": "reconciliation resets RUNNING claims to pending without asking claim_is_orphaned; on one host run.lock prevents a second run, so this is reachable only cross-host or via a symlinked path",
     "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS49ReconcileDoesNotResetALiveClaim::test_a_running_claim_whose_owner_is_alive_is_left_alone",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
    },
    {
     "id": "SS-50",
@@ -1139,7 +1145,8 @@
     "statement": "a claim has no expiry or heartbeat and transition() writes regardless of who holds it",
     "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS50TransitionIsBoundToTheClaimHolder::test_a_non_owner_cannot_move_a_claimed_story",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
    },
    {
     "id": "SS-51",
@@ -1153,7 +1160,8 @@
     "statement": "two stories contending for one base_url lock two different files and both win; the identity check passes on 404",
     "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS51OneBaseUrlOneLease::test_a_second_run_contending_for_the_same_base_url_is_refused",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
    },
    {
     "id": "SS-52",
@@ -1167,7 +1175,8 @@
     "statement": "a SIGKILLed run leaves reservations that count against the cap forever; doctor cannot explain it",
     "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS52ReservationsOfADeadRunDoNotCountForever::test_a_killed_runs_reservation_does_not_block_the_next_run",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
    },
    {
     "id": "D-024",
@@ -1179,8 +1188,10 @@
     "statement": "bench-qualification test helper: TemporaryDirectory cleanup races a writer inside a session's .git (twice: 3.13, 3.14)",
     "reproducer": "",
     "provenance": "DEFECT-REGISTER (open before the program)",
-    "status": "OPEN",
-    "disposition_required": "FIXED / NOT_A_DEFECT with proof / SUPERSEDED"
+    "status": "FIXED",
+    "disposition_required": "FIXED / NOT_A_DEFECT with proof / SUPERSEDED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)",
+    "disposition": "FIXED: the attempt owns its process tree (harness/process_owner.py): every session's process group is reaped on EVERY exit of the stream (POSIX group; Windows job object), every child an in-process client leaves is reaped and VERIFIED before the session is scored (_owned_run), and a survivor is typed ENVIRONMENT_FAILURE with the workspace kept — so a grandchild left by a cut session no longer races the workspace removal. Evidence: tests/hardening/test_process_owner.py, CF-11 green, three consecutive full runs of test_bench_qualification without the race."
    }
   ]
  },
@@ -1301,5 +1312,5 @@
    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `deadlock_reason` skips attempts whose review was UNRUNNABLE"
   }
  ],
- "updated": "2026-09-16T14:46:28+00:00 @ 7161991"
+ "updated": "2026-09-16T16:00:57+00:00 @ 397d52a"
 }

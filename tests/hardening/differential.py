@@ -42,14 +42,15 @@ RESULTS = ROOT / "closure-evidence/hardening/differential-results.json"
 
 # ------------------------------------------------------------ the scenario vocabulary
 # (kind, weight). Every kind has a deterministic real-kernel realisation AND a model event.
-DEV = [("CHANGED", 30), ("CHANGED_RED", 8), ("CHANGED_ARTIFACT", 3), ("NOOP", 8), ("TIMEOUT", 4), ("CRASH", 4), ("RATE_LIMIT", 2),
+DEV = [("CHANGED", 30), ("CHANGED_RED", 8), ("CHANGED_ARTIFACT", 3), ("CHANGED_ORPHAN", 3), ("NOOP", 8), ("TIMEOUT", 4), ("CRASH", 4), ("RATE_LIMIT", 2),
        ("CONTEXT", 3), ("AUTH", 2), ("SCOPE_VIOLATION", 6), ("TRUNK_COMMIT", 1), ("ZERO_OUTPUT", 2),
        ("MAX_TURNS_WORK", 3), ("MAX_TURNS_UNTOUCHED", 3), ("BUDGET", 2)]
 REV = [("PASS", 30), ("BLOCK", 7), ("BLOCK_OUTSIDE", 4), ("STUCK", 2), ("MALFORMED", 4), ("UNRUNNABLE", 5), ("MUTATE", 2),
        ("COMMIT", 2), ("BUDGET", 1), ("BLOCK_UNBOUND", 2)]
 SEC = [("PASS", 30), ("BLOCK", 6), ("UNRUNNABLE", 4), ("MALFORMED", 3), ("BUDGET", 1)]
 
-DEV_EVENT = {"CHANGED": "DEVELOP_CHANGED", "CHANGED_RED": "DEVELOP_CHANGED", "CHANGED_ARTIFACT": "DEVELOP_CHANGED", "NOOP": "DEVELOP_NOOP",
+DEV_EVENT = {"CHANGED": "DEVELOP_CHANGED", "CHANGED_RED": "DEVELOP_CHANGED", "CHANGED_ARTIFACT": "DEVELOP_CHANGED",
+             "CHANGED_ORPHAN": "DEVELOP_CHANGED", "NOOP": "DEVELOP_NOOP",
              "TIMEOUT": "DEVELOP_TIMEOUT", "CRASH": "DEVELOP_CRASH", "RATE_LIMIT": "DEVELOP_RATE_LIMIT",
              "CONTEXT": "DEVELOP_CONTEXT", "AUTH": "DEVELOP_AUTH", "SCOPE_VIOLATION": "DEVELOP_SCOPE_VIOLATION",
              "TRUNK_COMMIT": "DEVELOP_TRUNK_COMMIT", "ZERO_OUTPUT": "DEVELOP_ZERO_OUTPUT",
@@ -106,6 +107,8 @@ def to_script(sc: Scenario) -> Script:
             dev.append(Step("CHANGED", files=_green(i)))
         elif k == "CHANGED_RED":
             dev.append(Step("CHANGED", files=_red(i)))
+        elif k == "CHANGED_ORPHAN":                 # F5: the session leaves a background process; the kernel must reap it
+            dev.append(Step("CHANGED_ORPHAN", files=_green(i)))
         elif k == "CHANGED_ARTIFACT":               # F4: the session also leaves a tool artifact and a nested vendor tree —
             dev.append(Step("CHANGED", files={**_green(i), ".coverage": f"\x00{i}",   # VERIFIER-class paths, never a write
                                               "packages/web/node_modules/left-pad/index.js": "module.exports = 1\n"}))
@@ -147,9 +150,10 @@ class Observation:
     infra_attempts: int
     candidates_frozen: int
     events: list[str] = field(default_factory=list)   # canonical stage/outcome stream (diagnostic, not compared)
+    orphans_surviving: int = 0    # F5 / INV-L.1: processes a developer session left behind that outlived the story (model: 0)
 
     COMPARED = ("terminal", "developer_sessions", "review_executions", "security_executions", "quality_attempts",
-                "infra_attempts", "candidates_frozen")
+                "infra_attempts", "candidates_frozen", "orphans_surviving")
 
     def diff(self, other: "Observation") -> list[str]:
         return [f"{f}: real={getattr(self, f)!r} model={getattr(other, f)!r}"
@@ -184,7 +188,7 @@ def model_run(sc: Scenario, max_steps: int = 80) -> Observation:
                 break
             if s.stage == M.DEVELOP:
                 kind = dev.next()
-                tree_red = kind == "CHANGED_RED" if kind in ("CHANGED", "CHANGED_RED", "CHANGED_ARTIFACT", "MAX_TURNS_WORK", "SCOPE_VIOLATION") else tree_red
+                tree_red = kind == "CHANGED_RED" if kind in ("CHANGED", "CHANGED_RED", "CHANGED_ARTIFACT", "CHANGED_ORPHAN", "MAX_TURNS_WORK", "SCOPE_VIOLATION") else tree_red
                 ev = DEV_EVENT[kind]
             elif s.stage == M.VERIFY:
                 ev = "TEST_UNRUNNABLE" if sc.test_tool_missing else ("TEST_FAIL" if tree_red else "TEST_PASS")
@@ -294,9 +298,12 @@ def real_run(sc: Scenario) -> Observation:
         events = [f"{c.role}:{c.step}" for c in client.calls]
         events.append(out.summary().replace("\n", " | ")[:300])
         runs = [e.name for e in EvidenceStore(case.artifacts).read(SID).of(AGENT_RUN)]
+        surviving = [p for p in client.orphans if p.poll() is None]       # F5: the attempt owns the process tree
+        for p in surviving:                                                # never leak a sleeper into the next trace
+            p.kill(); p.wait()
         return Observation(_terminal_class(out, len(frozen), sc.max_retries), client.develop_calls,
                            runs.count(f"{SID}-review"), runs.count(f"{SID}-security"),   # executions, not sessions
-                           out.quality_attempts, infra, len(frozen), events)
+                           out.quality_attempts, infra, len(frozen), events, len(surviving))
     finally:
         case.tearDown()
 

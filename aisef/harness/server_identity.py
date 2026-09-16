@@ -132,19 +132,12 @@ def remove_lease(root: Path, run_id: str) -> None:
 
 
 def ready_with_identity(base_url: str, run_id: str, *,
-                        timeout: float = 2.0, attempts: int = 3) -> bool:
-    """Return True iff ``base_url`` answers with the expected ``run_id``.
-
-    The dev server, if it was launched under a lease, must expose its
-    ``run_id`` on the well-known path ``/_aisef/identity``.  Any other
-    responder — a stale process, an unrelated project — cannot produce the
-    matching id, so the gate can refuse to grade it.
-
-    The check is permissive: the endpoint may 404 and the lease id is
-    treated as "not yet wired", which means the caller falls back to the
-    existing dev-server alive check.  This keeps projects that have not
-    been updated working while making it possible for new projects to opt
-    into the stricter mode just by exposing the path.
+                        timeout: float = 2.0, attempts: int = 3) -> bool | None:
+    """Does ``base_url`` answer with the expected ``run_id``? ``True`` when the well-known path
+    ``/_aisef/identity`` echoes it; ``False`` when it echoes something ELSE (another server — refuse);
+    ``None`` when there is no identity endpoint or no answer — which proves NOTHING (SS-51 / INV-R.2): the
+    caller may still have a structural proof (a free port taken by its own process under its own lease),
+    but a 404 is not one.
     """
     url = base_url.rstrip("/") + "/_aisef/identity"
     for _ in range(max(1, attempts)):
@@ -157,12 +150,11 @@ def ready_with_identity(base_url: str, run_id: str, *,
                     return False
         except urllib.error.HTTPError as e:
             if e.code == 404:
-                # No endpoint yet — fall back to liveness; caller decides.
-                return True
+                return None
         except (urllib.error.URLError, OSError, socket.timeout, ValueError):
             pass
         time.sleep(0.2)
-    return False
+    return None
 
 
 # ── port lease ──────────────────────────────────────────────────
@@ -194,7 +186,7 @@ def acquire_port_lease(root: Path, run_id: str, base_url: str) -> int | None:
     different ``base_url`` — the previous ``AppServer`` logic already
     reports this case, the lease just makes it deterministic.
     """
-    path = root / LEASE_ROOT / f"port-{run_id}.lock"
+    path = root / LEASE_ROOT / f"port-{_port_key(base_url)}.lock"     # SS-51: the LEASE is the port, not the run
     path.parent.mkdir(parents=True, exist_ok=True)
     fd = open_lock_fd(path)
     try:
@@ -221,12 +213,26 @@ def release_port_lease(root: Path, run_id: str, fd: int = -1) -> None:
                 os.close(fd)
             except OSError:
                 pass
-    for suffix in ("", ".owner"):
-        path = root / LEASE_ROOT / f"port-{run_id}.lock{suffix}"
+    lease_dir = root / LEASE_ROOT
+    if not lease_dir.is_dir():
+        return
+    for owner in lease_dir.glob("port-*.lock.owner"):                  # release the port(s) THIS run holds
         try:
-            path.unlink()
-        except FileNotFoundError:
-            pass
+            if json.loads(owner.read_text(encoding="utf-8")).get("run_id") != run_id:
+                continue
+        except (OSError, ValueError):
+            continue
+        for path in (owner, owner.with_name(owner.name[: -len(".owner")])):
+            try:
+                path.unlink()
+            except FileNotFoundError:
+                pass
+
+
+def _port_key(base_url: str) -> str:
+    from urllib.parse import urlparse
+    u = urlparse(base_url if "://" in base_url else f"http://{base_url}")
+    return f"{u.hostname or 'localhost'}-{u.port or (443 if u.scheme == 'https' else 80)}"
 
 
 def port_owned_by_other_run(root: Path, run_id: str, base_url: str) -> bool:

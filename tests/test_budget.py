@@ -254,3 +254,26 @@ class TestCanhBaoTruocKhiCham(unittest.TestCase):
         with contextlib.redirect_stderr(err), self.guard.reserve(est_turns=1) as r:
             r.actual_turns = 9
         self.assertIn("9 lượt / 10 lượt", err.getvalue())
+
+
+class TestAReservationReleaseIsRecorded(unittest.TestCase):
+    """F5 / SS-52: a reservation whose owner died or whose term expired is released AND recorded — `released` names
+    the reservation, the owner and why — and the record survives a save/load round trip."""
+
+    def test_dead_owner_and_expired_term_are_released_with_their_reason(self):
+        import os
+        import socket
+        import time
+        from aisef.control.budget import BudgetState, _prune_dead_reservations
+        now = time.time()
+        dead_pid = 2 ** 22 - 7                     # never a live pid on a developer box
+        st = BudgetState(reservations=[
+            {"id": "r-dead", "owner": f"{socket.gethostname()}:{dead_pid}", "est_usd": 1.5, "expires_at": now + 600},
+            {"id": "r-old", "owner": "other-host:1", "est_usd": 2.0, "expires_at": now - 1},
+            {"id": "r-live", "owner": f"{socket.gethostname()}:{os.getpid()}", "est_usd": 0.5, "expires_at": now + 600}])
+        dead = _prune_dead_reservations(st)
+        self.assertEqual(sorted(r["id"] for r in dead), ["r-dead", "r-old"])
+        self.assertEqual([r["id"] for r in st.reservations], ["r-live"])
+        why = {r["id"]: r["why"] for r in st.released}
+        self.assertEqual(why, {"r-dead": "owner dead", "r-old": "term expired"})
+        self.assertEqual(BudgetState.from_dict(st.to_dict() if hasattr(st, "to_dict") else __import__("dataclasses").asdict(st)).released, st.released)

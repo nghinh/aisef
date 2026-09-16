@@ -259,7 +259,9 @@ class TestDeclaredToolsLiveInTheDeclaredImage(unittest.TestCase):
             root = self._project(d, "some/ci-image:1")
             with mock.patch.object(SB, "run", return_value=SB.SandboxResult(127, stderr="not found")):
                 missing = _missing_tools(root, Config.load(root))
-            self.assertEqual(len(missing), 2, missing)
+            # F5: declared tools resolve through `command_for`, so the default `tools.sast` command is probed too
+            self.assertGreaterEqual({m.split("`")[1] for m in missing}, {"tools.test", "tools.lint"}, missing)
+            self.assertTrue(all("MISSING in some/ci-image:1" in m for m in missing), missing)
             with mock.patch.object(SB, "run", return_value=SB.SandboxResult(0)):
                 self.assertEqual(_missing_tools(root, Config.load(root)), [])
 

@@ -372,6 +372,14 @@ def run_epic(
             for o in wave.outcomes:
                 if o.done:
                     continue
+                kept = sorted({p for a in o.attempts for p in getattr(a, "orphans", [])})
+                if kept:
+                    from ..harness.runlog import run_log
+                    # F5 / INV-L.1 — terminate, reap, VERIFY, then remove: verification failed, so the tree is
+                    # still in use; the path is kept and the pids are named, never removed under a live process.
+                    run_log(artifact_root, f"story={o.story_id} workspace kept: process(es) {kept} left by the "
+                                           "session survived termination — end them, then re-run")
+                    continue
                 story = plan.stories.get(o.story_id)
                 worktrees.commit_story(
                     o.story_id,
@@ -751,8 +759,9 @@ def _safe_transition(state: StateStore, story_id: str, to: StoryStatus, **kw) ->
     transition deserves a log entry, not a lost run.
     """
     try:
+        from ..control.state import machine_id
         state.transition(story_id, to, cost_usd=kw.get("cost", 0.0), reason=kw.get("reason", ""),
-                         attempts=kw.get("attempts", 0))
+                         attempts=kw.get("attempts", 0), owner=machine_id())     # F5 / SS-50: a write is bound to its owner
     except TransitionError as e:
         # Log it. Silently swallowing this masked a real bug: a story would
         # complete and merge, but the state record stayed at its old failure.
@@ -947,20 +956,23 @@ def _run_sprint_owned(
 
 
 def _missing_tools(project: Path, cfg: Config) -> list[str]:
-    """Declared tools absent from the **declared** image, one line each.
+    """Declared tools absent from the environment the sessions will run in, one line each.
 
-    Only when the project declares `sandbox.image`: an explicitly chosen
-    environment is checked before any session is paid for. With no image
-    declared the provider picks a default and `aisef doctor` is the place to
-    look — a probe per `aisef run` would tax every test fixture for a
-    question the fixture never asked.
+    SS-46 / INV-N.1: the environment is probed when it is CHOSEN — a declared `sandbox.image`, a stack image
+    `image_for` picks, or this host when docker is off — not only when the image was typed by hand. The fake
+    provider has nothing to probe. UNJUDGED tools (None) are stated by `aisef doctor`, never a stop.
     """
-    if not str(cfg.get("sandbox.image", "") or "").strip():
-        return []
+    from ..harness import sandbox as _sb
     from ..harness import verify_image
-
-    return [tc.line for tc in verify_image.check_tools(project, cfg, build=True)
-            if not tc.ok]
+    from ..harness.tools import image_for
+    if str(cfg.get("sandbox.provider", "") or "") == "fake":
+        return []
+    declared = bool(str(cfg.get("sandbox.image", "") or "").strip())
+    use_docker = bool(cfg.get("sandbox.use_docker", True))
+    if use_docker and not declared and image_for(project, cfg) == _sb.DEFAULT_IMAGE:
+        return []
+    return [tc.line for tc in verify_image.check_tools(project, cfg, build=declared or not use_docker)
+            if tc.ok is False]
 
 
 def run_verify_only(

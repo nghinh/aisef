@@ -302,6 +302,14 @@ def cmd_doctor(args) -> int:
                     f"`{BUDGET_FILE.as_posix()}` to start a new budget period "
                     "(`doctor` writes neither).",
                 )
+                from ..control.budget import _prune_dead_reservations
+                dead = _prune_dead_reservations(state)          # judged, not saved: `doctor` writes nothing
+                live = [f"{r.get('id')} by {r.get('owner') or '?'} ${float(r.get('est_usd') or 0):.2f}"
+                        for r in state.reservations]
+                check("budget reservations", True,
+                      (f"{len(live)} live: " + "; ".join(live) if live else "none live")
+                      + (f"; {len(dead)} dead or expired (released on the next paid call)" if dead else ""),
+                      required=False)
 
         test_cmd = str(cfg.get("tools.test", "") or "")
         if test_cmd:

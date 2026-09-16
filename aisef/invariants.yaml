@@ -680,7 +680,7 @@ invariants:
       - tests/hardening/test_fault_matrix.py::TestProcessFaults
     linked_defects:
       - D-024
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-M.1
     domain: claim / lease state
     statement: RUNNING corresponds to a live claim on this host; a claim whose process is dead becomes ORPHANED/reclaimable, never RUNNING forever, and a live claim is never reset.
@@ -700,7 +700,7 @@ invariants:
     linked_defects:
       - D-025
       - SS-49
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-M.2
     domain: claim / lease state
     statement: A run owns the project exclusively while it runs; competing entry points neither reconcile nor create worktrees.
@@ -728,11 +728,11 @@ invariants:
       - tests/test_dogfood_ledgerlock.py::TestMissingTestRunnerIsUnrunnableNotRed
       - tests/test_tools.py::TestThieuDuAnKhacThieuCongCu
       - tests/hardening/test_sibling_scan.py::TestSS23RedTestsAreNotAMissingTool
-      - tests/hardening/scan8a/test_group_d.py::TestSS34UnrunnableQaKindIsNotAFailedCheck (RED)
-      - tests/hardening/scan8a/test_group_d.py::TestSS45AutoDetectedToolsAreProbed (RED)
-      - tests/hardening/scan8a/test_group_d.py::TestSS46PreflightProbeRunsWithoutADeclaredImage (RED)
-      - tests/hardening/scan8a/test_group_d.py::TestSS47UnjudgeableProbeIsNotPresent (RED)
-      - tests/hardening/scan8a/test_group_d.py::TestSS48ProvisionedMeansRunnable (RED)
+      - tests/hardening/scan8a/test_group_d.py::TestSS34UnrunnableQaKindIsNotAFailedCheck
+      - tests/hardening/scan8a/test_group_d.py::TestSS45AutoDetectedToolsAreProbed
+      - tests/hardening/scan8a/test_group_d.py::TestSS46PreflightProbeRunsWithoutADeclaredImage
+      - tests/hardening/scan8a/test_group_d.py::TestSS47UnjudgeableProbeIsNotPresent
+      - tests/hardening/scan8a/test_group_d.py::TestSS48ProvisionedMeansRunnable
     model_tests: []
     fault_injection_tests:
       - tests/hardening/test_fault_matrix.py::TestToolFaults
@@ -742,7 +742,7 @@ invariants:
       - SS-34
       - SS-45
       - SS-46
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-N.2
     domain: tool capability
     statement: The environment identity (image name and digest) is recorded with every sandboxed tool result.

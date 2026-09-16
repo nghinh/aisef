@@ -59,7 +59,7 @@ class TestSS34UnrunnableQaKindIsNotAFailedCheck(unittest.TestCase):
     """SS-34 — `run_suite` computes `KindResult.unrunnable` (exit 127, runner missing) and records the
     `qa:<kind>` event without it; the story gate's contract loop then scores `ran.ok` → FAILED."""
 
-    @unittest.expectedFailure   # SS-34 — qa.py:744-752 records qa:e2e without `unrunnable`; gate.py:935 scores ran.ok → FAILED
+    # GREEN since F5 (SS-34: tool presence is measured, never inferred), 2026-09-17
     def test_a_missing_runner_scores_the_qa_kind_unrunnable_not_failed(self):
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp); artifacts = project / "_bmad-output"; artifacts.mkdir()
@@ -80,7 +80,7 @@ class TestSS45AutoDetectedToolsAreProbed(unittest.TestCase):
     """SS-45 — `check_tools` probes `declared_tools(cfg)`: non-empty config strings only. The sast command a
     python project actually runs (`command_for` → `bandit -q -r .`) is never probed, so doctor stays silent."""
 
-    @unittest.expectedFailure   # SS-45 — declared_tools() skips empty tools.sast; check_tools probes nothing, doctor prints no tool line
+    # GREEN since F5 (SS-45: tool presence is measured, never inferred), 2026-09-17
     def test_the_default_sast_command_of_a_python_project_is_probed(self):
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp); _pyproject(project)
@@ -97,7 +97,7 @@ class TestSS46PreflightProbeRunsWithoutADeclaredImage(unittest.TestCase):
     """SS-46 — `_missing_tools` returns [] when `sandbox.image` is empty although `image_for` still picks the
     stack image every tool will run in; the session is paid for before anything is probed."""
 
-    @unittest.expectedFailure   # SS-46 — run.py:930 returns [] before check_tools is ever called when sandbox.image is ""
+    # GREEN since F5 (SS-46: tool presence is measured, never inferred), 2026-09-17
     def test_a_stack_image_is_probed_even_when_not_declared(self):
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp); _pyproject(project)
@@ -117,7 +117,7 @@ class TestSS47UnjudgeableProbeIsNotPresent(unittest.TestCase):
     """SS-47 — `probe_command` returns None for a project-local runner (`npx …`) and `check_tools` reports it
     `ok=True` ("present"): a status the check did not measure."""
 
-    @unittest.expectedFailure   # SS-47 — verify_image.py:244-246: probe None → ToolCheck(ok=True, "present in this host")
+    # GREEN since F5 (SS-47: tool presence is measured, never inferred), 2026-09-17
     def test_a_tool_the_probe_cannot_build_is_not_reported_present(self):
         with tempfile.TemporaryDirectory() as tmp:
             cfg = Config({**DEFAULTS, "tools.test": "npx vitest run", "sandbox.use_docker": False})
@@ -130,7 +130,7 @@ class TestSS48ProvisionedMeansRunnable(unittest.TestCase):
     """SS-48 — `preflight.provisioned` marks `verify.unit` provisioned because `tools.test` is a non-empty
     string; the probe's verdict about that command is never consulted."""
 
-    @unittest.expectedFailure   # SS-48 — preflight.py:640: `if tools.test.strip(): have.add("verify.unit")`; no probe consulted
+    # GREEN since F5 (SS-48: tool presence is measured, never inferred), 2026-09-17
     def test_a_test_command_the_probe_reports_missing_does_not_provision_verify_unit(self):
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp)
@@ -147,7 +147,7 @@ class TestSS49ReconcileDoesNotResetALiveClaim(unittest.TestCase):
     """SS-49 — `reconcile_story` resets every RUNNING story without an open journal attempt to pending and
     never asks `claim_is_orphaned`; a claim held by a live process is reset under it. FM-P-05."""
 
-    @unittest.expectedFailure   # SS-49 — journal.py:299-307: stale=RUNNING → reset_for_retry; live pid reset to pending ("undo")
+    # GREEN since F5 (SS-49: a claim is a lease with an owner and a term), 2026-09-17
     def test_a_running_claim_whose_owner_is_alive_is_left_alone(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp); state = StateStore(root)
@@ -165,7 +165,7 @@ class TestSS50TransitionIsBoundToTheClaimHolder(unittest.TestCase):
     """SS-50 — `claim` has no lease term and `transition` takes no owner: any process moves a story that
     another process holds."""
 
-    @unittest.expectedFailure   # SS-50 — state.py:401 transition() has no owner parameter; host-b moved host-a's story to verifying
+    # GREEN since F5 (SS-50: a claim is a lease with an owner and a term), 2026-09-17
     def test_a_non_owner_cannot_move_a_claimed_story(self):
         with tempfile.TemporaryDirectory() as tmp:
             state = StateStore(Path(tmp)); state.register(SID, "EPIC-01", wave=1)
@@ -189,7 +189,7 @@ class TestSS51OneBaseUrlOneLease(unittest.TestCase):
 
     URL = "http://127.0.0.1:1"      # never bound
 
-    @unittest.expectedFailure   # SS-51 — server_identity.py:184-197 locks port-<run_id>.lock; run-a and run-b both hold the URL
+    # GREEN since F5 (SS-51: a claim is a lease with an owner and a term), 2026-09-17
     def test_a_second_run_contending_for_the_same_base_url_is_refused(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -204,7 +204,7 @@ class TestSS51OneBaseUrlOneLease(unittest.TestCase):
                 if b is not None:
                     release_port_lease(root, "run-b", b)
 
-    @unittest.expectedFailure   # SS-51 — server_identity.py:159-161: HTTPError 404 → return True ("not yet wired")
+    # GREEN since F5 (SS-51: a claim is a lease with an owner and a term), 2026-09-17
     def test_a_404_from_the_server_does_not_prove_identity(self):
         err = urllib.error.HTTPError(self.URL + "/_aisef/identity", 404, "Not Found", {}, None)
         with mock.patch("urllib.request.urlopen", side_effect=err) as opened:
@@ -217,7 +217,7 @@ class TestSS52ReservationsOfADeadRunDoNotCountForever(unittest.TestCase):
     """SS-52 — a reservation carries no owner and no TTL; a run SIGKILLed inside `reserve` leaves an estimate
     that `_check_caps` counts against the cap on every later call."""
 
-    @unittest.expectedFailure   # SS-52 — budget.py:183-187 reservation has no owner/TTL; _check_caps sums it: "reserved=$0.90"
+    # GREEN since F5 (SS-52: a claim is a lease with an owner and a term), 2026-09-17
     def test_a_killed_runs_reservation_does_not_block_the_next_run(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

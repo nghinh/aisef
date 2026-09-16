@@ -148,6 +148,8 @@ class SandboxResult:
     timed_out: bool = False
     #: ``"<provider>/<level>"`` — e.g. ``docker/WORKSPACE_WRITE``, ``local/READ_ONLY``.
     isolation: str = ""
+    #: pids of processes the tool left in its group, terminated and verified dead after the run (F5)
+    reaped: list = field(default_factory=list)
     #: Guarantee names required by this level that the provider lacks. Empty when all met.
     missing: list[str] = field(default_factory=list)
     #: **Infrastructure** error — daemon unresponsive, cannot pull image —
@@ -521,9 +523,12 @@ def _run_degraded(spec: SandboxSpec) -> SandboxResult:
     except OSError as e:
         return SandboxResult(exit_code=127, stderr=str(e), duration_ms=elapsed())
 
+    reaped: list[int] = []
     with proc:
         try:
             out, err = proc.communicate(timeout=spec.timeout_seconds)
+            from .process_owner import reap_group
+            reaped = reap_group(proc)      # F5: what the tool left behind dies here, verified
         except subprocess.TimeoutExpired:
             _kill_group(proc)
             proc.communicate()            # drain pipes and reap
@@ -546,4 +551,5 @@ def _run_degraded(spec: SandboxSpec) -> SandboxResult:
         stdout=out,
         stderr=err,
         duration_ms=elapsed(),
+        reaped=reaped,
     )

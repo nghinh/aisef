@@ -990,6 +990,9 @@ def evaluate(
         elif ran.detail.get("skipped"):
             gate.checks.append(Check(kind, Outcome.UNCONFIGURED, str(ran.detail["skipped"]),
                                      kind=CHECK_KIND["<kind>"], evidence=[ran.seq]))
+        elif ran.detail.get("unrunnable"):                               # SS-34: the runner did not run — not a verdict
+            gate.checks.append(Check(kind, Outcome.UNRUNNABLE, str(ran.detail["unrunnable"])[:200],
+                                     kind=CHECK_KIND["<kind>"], evidence=[ran.seq]))
         elif _flaky_note(evidence, f"qa:{kind}"):
             gate.checks.append(Check(kind, Outcome.UNRUNNABLE, _flaky_note(evidence, f"qa:{kind}"),
                                      kind=CHECK_KIND["<kind>"], evidence=[ran.seq]))

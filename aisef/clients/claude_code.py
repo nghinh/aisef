@@ -175,6 +175,8 @@ class ClaudeCodeAdapter(ClientAdapter):
                                                        timeout_seconds=spec.timeout_seconds)
 
         result = parse_stream(lines)
+        if getattr(proc, "aisef_reaped", None):
+            result.raw_result = {**(result.raw_result or {}), "reaped": list(proc.aisef_reaped)}
         if timed_out:
             # Infrastructure signal: keep it on the error string so the
             # caller distinguishes a hard wall-clock kill from any

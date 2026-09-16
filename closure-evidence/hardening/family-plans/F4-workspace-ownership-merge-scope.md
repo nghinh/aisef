@@ -111,3 +111,5 @@ extended vocabulary, all matched, 0 unexplained, `KNOWN = {}` (`differential-f4-
 full suite 3 345 passed / 20 skipped / 19 expected-red, every expected-red tagged with a defect id of F5 or F6; ruff clean.
 Frozen defect set {'OPEN': 16, 'FIXED': 56, 'SUPERSEDED': 1} of 73 (D-011 FIXED BY CONSTRUCTION with its disposition
 recorded). Fault matrix {'GREEN': 63, 'RED': 6, 'NEEDS_TEST': 0}. Registry {'PROVEN': 39, 'PARTIAL': 10, 'MISSING': 1}. Linux and Windows CI on this commit are read from the PR checks.
+
+CI on 397d52a (run 35110871918): 7/7 green — Linux 3.11–3.14, Windows 3.11, lint, wheel (2026-09-16).

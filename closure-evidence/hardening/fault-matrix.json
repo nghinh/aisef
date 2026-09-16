@@ -1,7 +1,7 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "phase": 7,
- "generated": "2026-09-16T14:46:28+00:00",
+ "generated": "2026-09-16T16:00:57+00:00",
  "stages": [
   "Developer",
   "Test",
@@ -529,7 +529,7 @@
    "expected_recovery": "lease check before reset",
    "invariants": "INV-M.1",
    "test": "tests/hardening/scan8a/test_group_d.py::TestSS49ReconcileDoesNotResetALiveClaim::test_a_running_claim_whose_owner_is_alive_is_left_alone",
-   "status": "RED (SS-49)"
+   "status": "GREEN (F5)"
   },
   {
    "id": "FM-E-01",
@@ -829,7 +829,7 @@
    "expected_recovery": "kill tree, verify, remove",
    "invariants": "INV-L.1, INV-L.2",
    "test": "tests/hardening/test_compound_faults.py::TestCF11OrphanProcessDuringCleanup::test_a_process_left_by_the_session_is_dead_before_the_workspace_is_removed",
-   "status": "RED (F5)"
+   "status": "GREEN (F5)"
   },
   {
    "id": "FM-C-12",
@@ -857,8 +857,8 @@
   }
  ],
  "status_count": {
-  "GREEN": 63,
-  "RED": 6,
+  "GREEN": 65,
+  "RED": 4,
   "NEEDS_TEST": 0
  }
 }

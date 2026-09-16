@@ -420,7 +420,7 @@ class Kernel:
         s.review_execs_here += 1
         s.record("review", QUALITY_BLOCK)
         s.reviewed_candidates.add(s.candidate)
-        s.block_outside[s.candidate] = outside
+        s.block_outside.setdefault(s.candidate, []).append(outside)   # per POSITION: a re-graded candidate keeps its earlier one
         self._after_review()
         return QUALITY_BLOCK
 
@@ -506,8 +506,14 @@ class Kernel:
             return PASS
         if any(r is not None and r.outcome == QUALITY_BLOCK for r in proofs.values()):
             s.record("gate", QUALITY_BLOCK)              # T25
-            if (review is not None and review.outcome == QUALITY_BLOCK and s.block_outside.get(s.candidate)
-                    and s.prev_graded_candidate and s.block_outside.get(s.prev_graded_candidate)):
+            here = s.block_outside.get(s.candidate) or []
+            # the predecessor POSITION: the same candidate's earlier review when it was re-graded (T6'), else the
+            # previous graded candidate's last review (differential seed 569, F5: overwriting the flag per candidate
+            # made a re-graded position its own predecessor and over-reported a plan conflict)
+            before = (here[-2:-1] if s.prev_graded_candidate == s.candidate
+                      else (s.block_outside.get(s.prev_graded_candidate) or [])[-1:])
+            if (review is not None and review.outcome == QUALITY_BLOCK and here and here[-1]
+                    and s.prev_graded_candidate and before and before[0]):
                 # two consecutive attempts blocked for the same out-of-scope reason: the next attempt cannot fix it
                 s.status, s.terminal_reason, s.human_reason, s.stage = WAITING_HUMAN, "plan conflict", "plan", HUMAN
                 return PLAN_CONFLICT

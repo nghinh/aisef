@@ -57,6 +57,20 @@ class TestSeed232ReviewerCommitOnTheSchemaRetry(unittest.TestCase):
         self.assertEqual(real.developer_sessions, 1, real.events)
 
 
+class TestSeed569ARegradedPositionIsNotItsOwnPredecessor(unittest.TestCase):
+    """Found by differential seed 569 during F5 (2026-09-17) — a MODEL defect, the kernel was right: the model kept
+    one out-of-scope flag per candidate, so when a no-op session was re-graded on the same candidate (T6') the second
+    review overwrote the first and the gate read that candidate as both positions of a plan-conflict pair. The kernel
+    pairs the two real complaints (cli.py in scope, then ledger.py outside) and correctly lets the retry limit decide."""
+
+    def test_the_model_agrees_with_the_kernel(self):
+        sc = D.Scenario(569, ["SCOPE_VIOLATION", "NOOP", "CHANGED", "CHANGED", "MAX_TURNS_UNTOUCHED"],
+                        ["BLOCK", "BLOCK_OUTSIDE", "BLOCK"], ["PASS", "PASS"], max_retries=2, test_tool_missing=False)
+        real, model = D.real_run(sc), D.model_run(sc)
+        self.assertEqual(real.diff(model), [])
+        self.assertEqual(real.terminal, "failed:did not pass gate")
+
+
 class TestSeed2624PlanConflictSurvivesAVerifierRerun(unittest.TestCase):
     """SS-63 — found by differential seed 2624 during F2 (2026-09-16): `deadlock_reason` compared ADJACENT attempt
     records; when the reviewer's session on the second candidate had to be re-run (a tree mutation, D-032 retry), the

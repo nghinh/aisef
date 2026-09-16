@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import json
 import os
+import socket
 import threading
 import time
 from contextlib import contextmanager
@@ -167,11 +168,30 @@ class StoryRecord:
     duration_ms: int = 0
     blocked_reason: str = ""
     claimed_by: str = ""
+    lease_until: float = 0.0          # epoch seconds; 0 = no term recorded (legacy claim) — F5 / SS-50
     updated_at: str = field(default_factory=_now)
 
     @property
     def state(self) -> StoryStatus:
         return StoryStatus(self.status)
+
+
+LEASE_SECONDS = 6 * 3600   # ponytail: one term per claim, refreshed on every owner write; a heartbeat thread if a story outruns it
+
+
+def claim_is_live(rec: "StoryRecord") -> bool:
+    """A claim is LIVE when its owner is not known dead on this host and its term has not expired (INV-M.1). Another
+    host's claim cannot be judged by pid — only its term decides."""
+    if not rec.claimed_by:
+        return False
+    if claim_is_orphaned(rec.claimed_by):
+        return False
+    if rec.lease_until:
+        return rec.lease_until > time.time()
+    # A claim without a term is a pre-F5 (legacy) claim, not a lease: only a live process on THIS host keeps it;
+    # another host's term-less claim is reclaimable exactly as before F5 (orphan state must never be permanent).
+    host, pid = claim_owner(rec.claimed_by)
+    return bool(host and pid and host == socket.gethostname() and pid_alive(pid))
 
 
 @dataclass
@@ -409,8 +429,11 @@ class StateStore:
         evidence: str = "",
         worktree: str = "",
         attempts: int = 0,
+        owner: str = "",
     ) -> StoryRecord:
-        """Transition state; rejects invalid jumps.
+        """Transition state; rejects invalid jumps — and, since F5 / SS-50, a write from a non-owner while the
+        claim is live (`owner` is the writer's `machine_id()`; an unattributed write is refused against a live
+        claim of another host).
 
         `attempts` is the **developer turn count** for this run, accumulated
         into the record. Previously counted each time `run` touched a story
@@ -426,6 +449,13 @@ class StateStore:
             current = rec.state
             if to is not current and to not in ALLOWED[current]:
                 raise TransitionError(f"{story_id}: {current.value} → {to.value} is not a valid transition")
+            if claim_is_live(rec) and owner != rec.claimed_by and (
+                    owner or claim_owner(rec.claimed_by)[0] != socket.gethostname()):
+                # F5 / SS-50 / INV-M.1: a write is bound to the claim holder while the lease is live
+                raise TransitionError(f"{story_id}: claimed by {rec.claimed_by} (lease live) — "
+                                      f"{owner or 'an unattributed writer'} may not move it")
+            if owner and owner == rec.claimed_by:
+                rec.lease_until = time.time() + LEASE_SECONDS      # an owner's write refreshes the term
 
             if attempts:
                 rec.attempts += attempts
@@ -457,6 +487,18 @@ class StateStore:
                 return False
             rec.status = StoryStatus.RUNNING.value
             rec.claimed_by = owner
+            rec.lease_until = time.time() + LEASE_SECONDS          # F5 / SS-50: a claim is a lease with a term
+            rec.updated_at = _now()
+            return True
+
+    def heartbeat(self, story_id: str, owner: str = "") -> bool:
+        """Extend the owner's lease; False when the story is not claimed by ``owner``."""
+        owner = owner or machine_id()
+        with self.transaction() as st:
+            rec = st.stories.get(story_id)
+            if rec is None or rec.claimed_by != owner:
+                return False
+            rec.lease_until = time.time() + LEASE_SECONDS
             rec.updated_at = _now()
             return True
 

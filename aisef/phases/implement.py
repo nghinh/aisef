@@ -97,6 +97,8 @@ class Attempt:
     review_findings: list[str] = field(default_factory=list)
     #: The developer session that produced this attempt (control/identity.py); guard records bind to it.
     session_id: str = ""
+    #: Processes the session left behind that survived the reaper (F5 / INV-L.1): the workspace is kept for them.
+    orphans: list[int] = field(default_factory=list)
     #: Typed outcome of the attempt (control/outcome.StageOutcome) — the routing key; the booleans above are derived.
     outcome: str = ""
     #: The identity tuple the verdict was computed under — what `gate:verdict` was stamped with.
@@ -575,14 +577,36 @@ def _reserved_client_run(client: ClientAdapter, spec, *, story_id: str,
     """
     guard = getattr(client, "_budget_guard", None)
     if not isinstance(guard, BudgetGuard):
-        return client.run(spec)
+        return _owned_run(client, spec)
     with guard.reserve(
         story_id=story_id, est_usd=estimate_usd, est_turns=estimate_turns,
     ) as token:
-        result = client.run(spec)
+        result = _owned_run(client, spec)
         token.actual_usd = float(getattr(result, "cost_usd", 0.0) or 0.0)
         token.actual_turns = int(getattr(result, "num_turns", 1) or 1)
         return result
+
+
+def _owned_run(client: ClientAdapter, spec):
+    """The attempt owns the session's process tree (F5 / INV-L.1): every child of this process that the session
+    leaves behind — a real client's, or one an in-process client spawned — is terminated, reaped and verified dead
+    before the session is scored; the pids are recorded on the result (`raw_result["reaped"]`), never silent."""
+    from ..harness import process_owner as _po
+    before = _po.children_of()
+    result = client.run(spec)
+    reaped = _po.reap_new_children(before)
+    left = _po.survivors(before)              # VERIFY: what terminate → kill could not end is typed, never silent
+    if reaped or left:
+        raw = dict(getattr(result, "raw_result", None) or {})
+        if reaped:
+            raw["reaped"] = sorted(set(raw.get("reaped") or []) | set(reaped))
+        if left:
+            raw["orphans"] = left
+        try:
+            result.raw_result = raw
+        except AttributeError:
+            pass
+    return result
 
 
 def run_attempt(
@@ -746,6 +770,20 @@ def run_attempt(
             detail={"truoc": before_sha, "sau": after_sha, "attempt": number,
                     "changed": sorted(moi)[:20], "harness_only": cua_harness},
         )
+        return attempt
+
+    orphans = list((getattr(result, "raw_result", None) or {}).get("orphans") or [])
+    if orphans:
+        # F5 / INV-L.1 (terminate, reap, VERIFY, then remove): a process the session left behind survived SIGTERM
+        # and SIGKILL, so the tree is still in use — nothing is graded, the run loop keeps the workspace
+        # (`attempt.orphans`), and retrying inside it is pointless. Typed and recorded, never silent.
+        attempt.error = f"process(es) {orphans} left by the session survived termination — workspace kept"
+        attempt.outcome = StageOutcome.ENVIRONMENT_FAILURE.value
+        attempt.infra = True
+        attempt.fatal = True
+        attempt.orphans = orphans
+        evidence.tool_run(story.id, "process", ok=False,
+                          detail={"orphans": orphans, "attempt": number, "workdir": str(workdir)})
         return attempt
 
     if not result.ok:

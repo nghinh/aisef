@@ -327,6 +327,43 @@ class TestStopsOnFailure(RunTestCase):
         self.assertIn("write_scope", report.summary())
 
 
+class TestAWorkspaceHeldByASurvivorIsKept(RunTestCase):
+    """F5 / INV-L.1 — terminate, reap, VERIFY, then remove. When a process the session left behind survives the
+    reaper, the wave loop must not remove a tree that is still in use: the attempt is a fatal ENVIRONMENT_FAILURE,
+    the worktree stays registered, and the run log names the pids."""
+
+    def test_the_worktree_of_the_story_stays_and_the_pids_are_named(self):
+        import subprocess as sp
+        import sys
+        from unittest import mock
+
+        from aisef.harness import process_owner as P
+
+        class Leaves(Agent):
+            def __init__(self):
+                super().__init__()
+                self.left: list[sp.Popen] = []
+
+            def run(self, spec):
+                self.left.append(sp.Popen([sys.executable, "-c", "import time; time.sleep(60)"]))
+                return super().run(spec)
+
+        agent = Leaves()
+        try:
+            with mock.patch.object(P, "reap", lambda pids, *, grace=P.GRACE_SECONDS: []):   # the reaper cannot end it
+                report = self.run_sprint(agent)
+            self.assertFalse(report.ok)
+            last = report.outcomes[0].attempts[-1]
+            self.assertEqual(last.orphans, [agent.left[0].pid])
+            listed = sp.run(["git", "worktree", "list", "--porcelain"], cwd=self.project, capture_output=True, text=True, encoding="utf-8").stdout
+            self.assertIn("STORY-01-01", listed, "the tree a live process holds is kept, never removed")
+            log = (self.artifacts / "run.log").read_text(encoding="utf-8") if (self.artifacts / "run.log").is_file() else ""
+            self.assertIn("workspace kept", log)
+        finally:
+            for p in agent.left:
+                p.kill(); p.wait()
+
+
 class TestResume(RunTestCase):
     def test_finished_stories_are_not_rerun(self):
         first = Agent()

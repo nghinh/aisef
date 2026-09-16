@@ -162,11 +162,19 @@ _LAUNCHERS = ("python", "python3", "py")
 _LOCAL_RUNNERS = ("npx", "npm", "pnpm", "yarn", "bunx", "bun")
 
 
-def declared_tools(cfg) -> list[tuple[str, str]]:
-    """`(config key, command)` for every non-empty evidence-producing command."""
+def declared_tools(cfg, project: Path | str | None = None) -> list[tuple[str, str]]:
+    """`(config key, command)` for every evidence-producing command the harness will RUN — with ``project`` the
+    RESOLVED command per tool (auto-detected defaults included: bandit, gosec, cargo audit, npm test — SS-45), so the
+    probe measures exactly what `aisef tool <kind>` executes; without it, the configured strings only."""
     out = []
     for key in _TOOL_KEYS:
         cmd = str(cfg.get(key, "") or "").strip()
+        if project is not None:
+            from .tools import command_for
+            try:
+                cmd = str(command_for(key.split(".", 1)[1], project, cfg) or "").strip()
+            except Exception:  # noqa: BLE001 — resolution needs a manifest this project lacks: keep the configured string
+                pass
         if cmd:
             out.append((key, cmd))
     for key in sorted(k for k in cfg.values if k.startswith("verify.")
@@ -203,14 +211,14 @@ def probe_command(command: str) -> list[str] | None:
 class ToolCheck:
     key: str
     command: str
-    ok: bool
+    ok: bool | None            # True present · False MISSING · None UNJUDGED (no probe can be built — SS-47)
     where: str
     detail: str = ""
     probe: list[str] = field(default_factory=list)
 
     @property
     def line(self) -> str:
-        state = "present" if self.ok else "MISSING"
+        state = "present" if self.ok else ("UNJUDGED" if self.ok is None else "MISSING")
         return f"`{self.key}` = `{self.command}` — {state} in {self.where}" + (
             f": {self.detail}" if self.detail and not self.ok else "")
 
@@ -239,11 +247,12 @@ def check_tools(project: Path | str, cfg, *, build: bool = True, log=None) -> li
         in_sandbox, err = False, ""
     where = image if in_sandbox else "this host"
     out: list[ToolCheck] = []
-    for key, command in declared_tools(cfg):
+    for key, command in declared_tools(cfg, project):
         probe = probe_command(command)
         if probe is None:
-            out.append(ToolCheck(key, command, True, where,
-                                 "project-local runner; checked against node_modules by `aisef init`"))
+            # SS-47 / INV-N.1: a tool the probe cannot judge is UNJUDGED — stated, never reported present
+            out.append(ToolCheck(key, command, None, where,
+                                 "project-local runner: unmeasured here; the story's first tool run is the proof"))
             continue
         if err:
             out.append(ToolCheck(key, command, False, where, err, probe))

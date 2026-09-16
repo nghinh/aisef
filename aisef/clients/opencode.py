@@ -276,6 +276,8 @@ class OpenCodeAdapter(ClientAdapter):
         # / `step_finish` (tokens, cost). Cost is the provider-reported number —
         # 9router reports 0, that is the provider's truth, not the harness's.
         res = parse_json_events(lines)
+        if getattr(proc, "aisef_reaped", None):
+            res.raw_result = {**(res.raw_result or {}), "reaped": list(proc.aisef_reaped)}
         saw_event = any(ln.lstrip().startswith("{") for ln in lines)
         if not saw_event and not timed_out and not cham_tran and not res.error:
             # AD-01: a child that exits (even with 0) having said nothing produced no result — the same

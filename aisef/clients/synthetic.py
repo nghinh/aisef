@@ -142,6 +142,7 @@ class SyntheticClientAdapter(ClientAdapter):
         self.calls: list[Call] = []
         self.develop_calls = 0
         self._served: dict[int, int] = {}
+        self.orphans: list[subprocess.Popen] = []     # CHANGED_ORPHAN sleepers; the harness asserts none survives (F5)
 
     def available(self) -> bool:
         return True
@@ -188,7 +189,13 @@ class SyntheticClientAdapter(ClientAdapter):
     def _developer(self, step: Step, spec: RunSpec) -> RunResult:
         wd = Path(spec.workdir)
         k = step.kind
-        if k in ("CHANGED", "SCOPE_VIOLATION"):
+        if k in ("CHANGED", "SCOPE_VIOLATION", "CHANGED_ORPHAN"):
+            if k == "CHANGED_ORPHAN":
+                # F5 / INV-L.1: the session leaves a background process behind (a dev server, a watcher); the
+                # attempt owns the process tree and must reap it before the session is scored.
+                import sys
+                self.orphans.append(subprocess.Popen([sys.executable, "-c", "import time; time.sleep(600)"],
+                                                     stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
             files = dict(step.files or DEFAULT_FILES)
             if (step.files is None and self.develop_calls > 1) or self._served.get(id(step), 0) > 1:
                 # A real developer's retry changes something; writing identical bytes again is a no-op

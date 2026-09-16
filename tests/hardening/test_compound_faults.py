@@ -270,7 +270,7 @@ class _LeavesAServer(Agent):
 
 @unittest.skipIf(os.name == "nt", "process groups: POSIX semantics; the Windows tree kill is covered by tests/test_clients.py")
 class TestCF11OrphanProcessDuringCleanup(_RunCase):
-    @unittest.expectedFailure   # F5 — the kernel owns no per-story process tree; a grandchild left by the session survives workspace removal
+    # GREEN since F5 (FM-C-11: the attempt owns its process tree — terminate, reap, verify, then remove), 2026-09-17
     def test_a_process_left_by_the_session_is_dead_before_the_workspace_is_removed(self):
         agent = _LeavesAServer()
         try:
