@@ -669,6 +669,11 @@ def run_attempt(
     )
     for sk in used:
         evidence.record(story.id, Event(kind=SKILL_USE, name=sk, detail={"role": DEVELOPER}))
+    # D-034: what this session wrote outside its scope goes on record **before**
+    # any exit below — the next attempt's hygiene reads this record, and a
+    # session cut by the turn cap or the provider leaves the same dirt behind.
+    record_scope_violation(evidence, story.id, workdir=workdir, scope=scope, before=tree_before[1],
+                           attempt=number, artifact_root=artifact_root)
 
     after_sha = head_sha(project) if workdir != project else ""
     if before_sha and after_sha != before_sha:
@@ -2459,6 +2464,139 @@ def _revert_reviewer_writes(workdir: Path, before_snap: dict, after_snap: dict) 
     return changed
 
 
+# ------------------------------------------------------------ retry hygiene (D-034)
+
+#: Evidence names of retry hygiene (D-034, lỗi 188).
+SCOPE_VIOLATION = "write-scope:violation"
+RETRY_RECOVERY = "retry:recovery"
+
+
+def _dirt_outside_scope(workdir: Path, scope: list[str]) -> dict[str, bytes | None]:
+    """Paths dirty against HEAD that lie outside the write scope: the out-of-scope
+    part of what `_tree_snapshot` sees (harness-owned paths already skipped),
+    minus tool artifacts — a run produces those, no agent writes them."""
+    from ..harness.guardrails import _within, is_tool_artifact
+    return {rel: content for rel, content in _tree_snapshot(workdir).items()
+            if not is_tool_artifact(rel) and not any(_within(rel, s) for s in scope)}
+
+
+def _tracked_at_head(workdir: Path, rel: str) -> bool:
+    r = subprocess.run(["git", "cat-file", "-e", f"HEAD:{rel}"], cwd=workdir,
+                       capture_output=True, timeout=30)
+    return r.returncode == 0
+
+
+def record_scope_violation(evidence: EvidenceStore, story_id: str, *, workdir: Path, scope: list[str],
+                           before: dict, attempt: int, artifact_root: Path) -> Event | None:
+    """What **this** developer session left outside the write scope, on record the
+    moment the session ends (D-034, lỗi 188).
+
+    Measured on LedgerLock STORY-04-01 (1.7.5): `ruff format ledgerlock/` reformatted
+    two files outside scope; `freeze_candidate` rightly kept them out of the
+    candidate, and nothing named them afterwards — so both retries inherited them,
+    and the `diff-scope` after-hook blocked every one of their tool calls from the
+    first `ls`. A path already dirty when the session opened is not this session's
+    doing and is listed apart (`preexisting`)."""
+    dirt = _dirt_outside_scope(workdir, scope)
+    tracked, untracked, preexisting = [], [], []
+    for rel in sorted(dirt):
+        if rel in before:
+            preexisting.append(rel)
+        elif _tracked_at_head(workdir, rel):
+            tracked.append(rel)
+        else:
+            untracked.append(rel)
+    if not tracked and not untracked:
+        return None
+    from ..harness.runlog import run_log
+    run_log(artifact_root, f"story={story_id}#{attempt} wrote outside write_scope: "
+                           f"{', '.join(tracked + untracked)} — on record; restored before the next attempt")
+    return evidence.record(story_id, Event(kind=NOTE, name=SCOPE_VIOLATION, ok=False, detail={
+        "attempt": attempt, "head": head_sha(workdir), "tracked": tracked, "untracked": untracked,
+        "preexisting": preexisting, "scope": list(scope)}))
+
+
+def _attributed_out_of_scope(ev: Evidence, scope: list[str]) -> tuple[set[str], int]:
+    """Out-of-scope paths an attempt of this story is on record for, and that
+    attempt's number. The `write-scope:violation` note is the record; a tree left
+    by a harness that wrote none (≤ 1.7.5) is read through the last `gate:input`,
+    whose `changed` list is exactly what the gate failed `write scope` on."""
+    from ..harness.guardrails import _within
+    recs = ev.of(NOTE, SCOPE_VIOLATION)
+    if recs:
+        last = recs[-1]
+        paths = set(last.detail.get("tracked") or []) | set(last.detail.get("untracked") or [])
+        return paths, int(last.detail.get("attempt") or 0)
+    gi = ev.last(NOTE, "gate:input")
+    if gi is None:
+        return set(), 0
+    paths = {p for p in (gi.detail.get("changed") or []) if not any(_within(p, s) for s in scope)}
+    return paths, int(gi.detail.get("attempt") or 0)
+
+
+def recover_out_of_scope(evidence: EvidenceStore, story_id: str, *, workdir: Path, scope: list[str],
+                         next_attempt: int, artifact_root: Path) -> Event | None:
+    """Before a developer attempt opens in a story worktree: put the out-of-scope
+    paths an earlier attempt of this story left dirty back to the frozen candidate
+    — tracked paths restored from HEAD, untracked ones removed, and only those —
+    then check the tree is clean of out-of-scope changes (D-034, lỗi 188).
+
+    Dirt no attempt of this story is on record for is **not** touched: it is
+    someone's uncommitted work, and deleting it is not the harness's call. The
+    attempt does not open on it either — a developer on that tree can only be
+    blocked by the guard — and the event says what to clean. Returns None when
+    there was nothing to do; otherwise the recorded event, `ok` meaning clean."""
+    dirt = _dirt_outside_scope(workdir, scope)
+    if not dirt:
+        return None
+    attributed, failed_attempt = _attributed_out_of_scope(evidence.read(story_id), scope)
+    candidate = head_sha(workdir)
+    tracked = [p for p in sorted(dirt) if p in attributed and _tracked_at_head(workdir, p)]
+    untracked = [p for p in sorted(dirt) if p in attributed and not _tracked_at_head(workdir, p)]
+    unattributed = [p for p in sorted(dirt) if p not in attributed]
+    actions: list[str] = []
+    if tracked:
+        r = subprocess.run(["git", "restore", "--source", candidate, "--staged", "--worktree", "--", *tracked],
+                           cwd=workdir, capture_output=True, text=True, encoding="utf-8", errors="replace",
+                           timeout=60)
+        actions.append(f"git restore --source {candidate[:8]} --staged --worktree -- {' '.join(tracked)}"
+                       + ("" if r.returncode == 0 else f" → exit {r.returncode}: {r.stderr.strip()[:200]}"))
+    for rel in untracked:
+        # A new file the agent also staged must leave the index, not only the disk.
+        subprocess.run(["git", "rm", "-q", "--cached", "--ignore-unmatch", "--", rel], cwd=workdir,
+                       capture_output=True, timeout=30)
+        p = Path(workdir) / rel
+        try:
+            p.unlink()
+            actions.append(f"rm {rel}")
+        except FileNotFoundError:
+            actions.append(f"rm {rel} (already gone)")
+        except OSError as e:
+            actions.append(f"rm {rel} → {e}")
+    after = sorted(_dirt_outside_scope(workdir, scope))
+    ok = not after
+    reason = ""
+    if not ok:
+        reason = (
+            f"the story worktree still has changes outside write_scope before attempt {next_attempt}: "
+            f"{', '.join(after[:5])}" + (f" (+{len(after) - 5} more)" if len(after) > 5 else "")
+            + ((". No attempt of this story is on record for " + ", ".join(unattributed[:5])
+                + " — the harness does not delete what it did not make: commit or remove them, then re-run.")
+               if unattributed else
+               ". Restoring them from the frozen candidate did not leave the tree clean — see the "
+               "retry:recovery evidence.")
+            + " A developer session on this tree would be blocked by the guard on every call."
+        )
+    from ..harness.runlog import run_log
+    run_log(artifact_root, f"story={story_id} retry recovery before attempt {next_attempt}: "
+            + (f"restored {', '.join(tracked + untracked)} to candidate {candidate[:8]}; tree clean"
+               if ok else reason[:200]))
+    return evidence.record(story_id, Event(kind=NOTE, name=RETRY_RECOVERY, ok=ok, detail={
+        "attempt": failed_attempt, "next_attempt": next_attempt, "candidate": candidate,
+        "tracked": tracked, "untracked": untracked, "unattributed": unattributed,
+        "actions": actions, "status_after": after, "ok": ok, "reason": reason}))
+
+
 def _candidate_moved(workdir: Path, candidate: str) -> str:
     """Current HEAD if it has moved away from the candidate; "" if still at
     the correct version.
@@ -2887,6 +3025,17 @@ def implement_story(
 
     while True:
         n = outcome.quality_attempts + 1
+        if workdir != project:
+            # D-034: a developer attempt opens on a tree clean of out-of-scope
+            # changes, or does not open. Restoration is path-specific and only
+            # for what an attempt of this story is on record for.
+            hygiene = recover_out_of_scope(EvidenceStore(root), story.id, workdir=workdir,
+                                           scope=effective_write_scope(story, project),
+                                           next_attempt=n, artifact_root=root)
+            if hygiene is not None and not hygiene.ok:
+                outcome.blocked_reason = hygiene.detail["reason"]
+                _log(f"story={story.id} BLOCKED retry hygiene: {hygiene.detail['reason'][:160]}")
+                return outcome
         _log(f"story={story.id} attempt={n} START")
         attempt = run_attempt(
             story,

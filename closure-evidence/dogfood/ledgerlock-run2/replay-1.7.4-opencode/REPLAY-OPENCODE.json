@@ -1,21 +1,21 @@
 {
  "what": "clean replay of the preserved LedgerLock Run #2 failure state on public aisef==1.7.4 under the ORIGINAL client conditions (opencode, 9router/mycombo)",
  "source": {
-  "path": "<scratch>/ll2/ledgerlock-aiseftest-run2 (read-only extract of ledgerlock-aiseftest-run2.zip; not altered)",
+  "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/ll2/ledgerlock-aiseftest-run2 (read-only extract of ledgerlock-aiseftest-run2.zip; not altered)",
   "master_sha": "28b71626ff9cba42aa872fa7b78685c8423e095f",
   "story_branch": "story/STORY-01-06 = eed6f87afc51022fc8dbdec185609922f5fbda68",
   "evidence_digest": "sha256 e4ea22421d8cd26336f1afa6b61301dd1ab4bca8b1343fef50ce544ceba64037 over 135 files of _bmad-output (path+content, .DS_Store excluded)",
   "state": "5/16 stories done; STORY-01-06 failed under 1.7.3 (2 no-op sessions after a review cut at max_turns)"
  },
  "replay": {
-  "path": "<scratch>/replay174-opencode/ledgerlock",
-  "venv": "<scratch>/replay174-opencode/venv",
+  "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/replay174-opencode/ledgerlock",
+  "venv": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/replay174-opencode/venv",
   "created": "2026-09-15T23:17:45+00:00"
  },
  "aisef": {
   "version": "aisef 1.7.4",
-  "which": "<scratch>/replay174-opencode/venv/bin/aisef",
-  "module": "<scratch>/replay174-opencode/venv/lib/python3.14/site-packages/aisef/__init__.py",
+  "which": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/replay174-opencode/venv/bin/aisef",
+  "module": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/replay174-opencode/venv/lib/python3.14/site-packages/aisef/__init__.py",
   "pip_list": "aisef==1.7.4 only",
   "install": "pip install --no-cache-dir aisef==1.7.4 (public PyPI)",
   "wheel_sha256_pypi": "200928a2eb8bc8abe8a5a0fe2704c053379e2f699ece92818872995e58ec5950",
@@ -91,6 +91,14 @@
     "red_reproducer": "AISEF repo branch dogfood/baseline-provenance-red commit 282ebf3, tests/test_baseline_provenance.py — 1 RED (resumed re-baseline) + 1 GREEN control, red against both the repo product (f214146 == v1.7.4) and the installed public wheel; master untouched",
     "recorded": "2026-09-16T01:30:57+00:00"
    }
+  },
+  {
+   "id": "OBS-OC-2",
+   "severity_candidate": "P3",
+   "recorded": "2026-09-16T04:08:13+00:00",
+   "title": "plan-deadlock diagnosis not raised although the same criterion (AC-STORY-04-01-4) failed the nop control in two consecutive graded attempts",
+   "where": "STORY-04-01 attempts 2 and 3 both flagged exactly tests/test_cli_exit_codes.py::TestCliRepairTailSubcommand::test_AC_STORY_04_01_4_* as green without story code; the story ended 'tried 3 attempts' instead of 'deadlock due to plan' naming AC-4 (attempt 2 also had a red test run and review blocks)",
+   "classification": "framework observation, fail-closed (the story stopped either way); record only"
   }
  ],
  "phase3": {
@@ -101,5 +109,73 @@
   "security": "47 turns PASS",
   "gate_01c1d304": "only `no baseline regression` failed (see OBS-OC-1)",
   "recorded": "2026-09-16T00:44:33+00:00"
+ },
+ "phase4_175": {
+  "aisef": "1.7.5 (public wheel f6973900…) installed into the replay venv",
+  "command": "aisef run --client opencode --verify-only --story STORY-03-01",
+  "result": "candidate 01c1d304 DONE: `no baseline regression` PASSED against baseline seq 2 (parent = base_ref = 9cf22f5c, 71 ids), evidence [2, 1694]; test/lint/nop/review/security reused; no new baseline record; merged → master 01c1d30",
+  "recorded": "2026-09-16T04:08:13+00:00"
+ },
+ "phase5_175": {
+  "command": "aisef run --client opencode (run.max_turns=80, aisef 1.7.5)",
+  "result": "STORY-03-02 DONE on attempt 3 under the arbitrated repair-tail semantics (attempt 1 a024a416 review BLOCK ×2 on the tail guard; attempt 2 5a47defc; attempt 3 passed) → master a4e3dc4, EPIC-03 complete (10/16); STORY-04-01 EXHAUSTED 3 attempts → run stopped at EPIC-04 wave 1 (exit 2, 04:06Z)",
+  "story_04_01": {
+   "attempt1": "gate ✗ TDD, ✗ tests verify story (AC-1/AC-2 tests green at parent a4e3dc4 — weak tests); review PASS, security PASS",
+   "attempt2": "gate ✗ test (red), ✗ TDD, ✗ tests verify story (the two AC-4 tests green at parent), ✗ review (4 blocks: main() stub)",
+   "attempt3": "candidate ef5d6460: test PASS, lint PASS, nop red at parent (expected) but ✗ tests verify story (the same two AC-4 tests green at parent); review UNRUNNABLE (reviewer modified tests/test_cli_exit_codes.py — reverted; not retried because a deterministic failure co-occurred, by design); security PASS; EXHAUSTED",
+   "branch_head": "ef5d6460 (preserved)",
+   "cost_reported": "$0.00 (provider reports no price)"
+  },
+  "recorded": "2026-09-16T04:08:13+00:00"
+ },
+ "terminal_blocker_after_175": {
+  "kind": "PROJECT_REQUIREMENT — criterion not falsifiable against the integrated parent (owner arbitration needed)",
+  "detail": "AC-STORY-04-01-4: 'Given a clean JSONL, `python -m ledgerlock repair-tail <ledger>` exits 0, stdout is empty, and the JSONL is byte-identical before and after.' The CLI stub already at the parent (ledgerlock/cli.py main(): parse_args, return 0, prints nothing, writes nothing) satisfies all three clauses, so every faithful AC-4 test is green without the story's code and the nop control (`tests verify story`, level 2 at parent a4e3dc4) rejects it on every attempt. No test can be red at the parent for this criterion as written; the observable effect that would distinguish the implementation (the `repair-tail: ok (no change)` stderr line) belongs to STORY-04-03's criteria.",
+  "not_a_framework_defect": "the gate is right that such a test verifies nothing of the story; fail-closed",
+  "recorded": "2026-09-16T04:08:13+00:00"
+ },
+ "phase6_175": {
+  "trigger": "owner arbitration STORY-04-01 AC-4 (2026-09-16): criterion replaced by the missing-newline repair integration; epics/stories/mockups/readiness re-approved; candidate ef5d6460 tagged",
+  "command": "aisef run --client opencode (aisef 1.7.5, run.max_turns=80)",
+  "baseline": "contract changed → new story:contract note (seq 717, 43e89ef8ca94f502) → 1.7.5 captured a NEW-epoch baseline at the integrated parent: seq 718 parent=root=a4e3dc4d, epoch 43e89ef8ca94f502, 97 ids (old-epoch record seq 2 not reused) — requirement G observed on a real project",
+  "parent_control": "nop at parent a4e3dc4: tests red (expected); gate `tests verify story` ✅ '4 tests with criteria codes are red or absent at parent SHA a4e3dc4' — the corrected AC-4 is falsifiable",
+  "attempt1": "candidate de2d3244: test/lint/TDD/tests verify story/security ✅; ✗ write scope (developer made cosmetic edits to ledgerlock/ledger.py and ledgerlock/store.py outside scope); ✗ review 7 blocks (same scope violation + a text-only [stuck]; structured verdict plan=[] → no deadlock)",
+  "attempt2": "developer 80 turns, tree untouched → nothing to grade → FAIL",
+  "attempt3": "developer 80 turns, tree untouched → nothing to grade → FAIL; EXHAUSTED",
+  "state": "master a4e3dc4 unchanged (10/16 done); story/STORY-04-01 branch preserved with de2d3244 in history; run stopped at EPIC-04 wave 1, exit 2, no process alive",
+  "classification": "OBS-OC-3: reproducible AISEF harness defect (P1 candidate) — after a write-scope gate failure the out-of-scope modifications stay in the worktree; every retry starts with the OpenCode diff-scope after-hook throwing on every Bash/Write/Edit call, so the retry can neither act nor revert",
+  "recorded": "2026-09-16T04:57:15+00:00",
+  "classification_first": "stop condition 'max_turns=80 repeatedly preventing legitimate completion' (route opencode/9router/mycombo: two consecutive 80-turn sessions with no write on this story, after the same pattern on STORY-03-01); not a requirement ambiguity, not an AISEF defect — WITHDRAWN after measuring the three developer sessions (see OBS-OC-3)"
+ },
+ "OBS-OC-3": {
+  "title": "write-scope failure poisons every retry: out-of-scope worktree changes are never restored between attempts, and the OpenCode diff-scope after-hook then blocks 100% of tool calls",
+  "severity_proposed": "P1 (D-032 rule: a legitimate story cannot complete without operator intervention; three attempts and ~240 developer turns consumed with no possible outcome)",
+  "where": "STORY-04-01 phase 6 (after the AC-4 arbitration), aisef 1.7.5, --client opencode, run.max_turns=80",
+  "mechanism": [
+   "attempt 1, developer turn 69: `ruff format ledgerlock/ tests/test_cli_exit_codes.py` reformatted ledgerlock/ledger.py (dict/signature layout) and ledgerlock/store.py (trailing newline) — cosmetic, outside write_scope (session ses_f57805398ffegv3f0TVCWMLZL3, tool parts [68]-[69])",
+   "the guard plugin's AFTER hook `diff-scope` (matches Write|Edit|NotebookEdit|Bash) threw on that call and on every later call (turns 69-79: `type -a git`, `ls`… all 'aisef guard diff-scope: 2 files changed outside write_scope … Revert them'); session hit the 80-turn cap",
+   "freeze_candidate commits only in-scope paths (implement.py: commit_paths(paths=scope)) → de2d3244 = cli.py + tests only; ledger.py/store.py remain modified in the worktree; gate ✗ write scope (correct for attempt 1); reviewer graded a diff that included the two files (review-1.md lines 32-49)",
+   "no code path restores out-of-scope files before the next attempt (reviewer edits are restored by _revert_review_changes/_tree_snapshot; developer out-of-scope edits are not)",
+   "attempts 2 and 3 (ses_f57757fa6ffeCuPCy4Z4CmKZQD, ses_f5771afa2ffe4rhSW3wYsjdQfT): first Bash call (`ls -la`) already throws; 48/41 Bash calls all blocked incl. `echo hello`, `/bin/true`, `false`; 0 Write/Edit; moved_tree=false; 80 turns each",
+   "no permitted revert is named: `git checkout -- <file>` and `git reset --hard` are blocked by the BEFORE guard (guardrails.py 244-245), Write/Edit on ledger.py/store.py blocked by write-scope (outside scope) and by diff-scope after-hook; `git restore`/`git stash push` would pass but the message 'Revert them' does not say so and the model never found it"
+  ],
+  "evidence": [
+   "_bmad-output/evidence/STORY-04-01.jsonl seq 1004-1005, 1020-1021, 1308-1309, 1551-1552 (guard_blocked=true, guard_messages, moved_tree, exit_status=max_turns)",
+   "_bmad-output/run.log lines 1191-1247 (candidate frozen 11:41:24 → diff-scope BLOCK from 11:41:38 through the security session)",
+   "OpenCode db session dumps: scratchpad/replay174-opencode/story0401-sessions.txt",
+   "git: story/STORY-04-01 = de2d3244 touches only ledgerlock/cli.py and tests/test_cli_exit_codes.py"
+  ],
+  "not_the_cause": [
+   "route/model truncation: earlier max_turns sessions (STORY-03-01 phase 3/5, STORY-03-02) show guard_blocked=false → the max_turns 40→80 deviation record stands as written",
+   "the arbitrated AC-4: tests verify story ✅ red at parent a4e3dc4; TDD ✅; test ✅ on attempt 1",
+   "the user's global OpenCode plugin ~/.config/opencode/plugins/rtk.ts (rewrites commands to `rtk …`): present in every replay phase, the after-hook throws regardless of the command — disclosed as an environment condition, not a cause"
+  ],
+  "fix_proposed_not_implemented": "before starting any retry (and after a write-scope gate failure), restore the out-of-scope paths to the frozen candidate / delete untracked out-of-scope files, record an evidence note naming them, and have the gate message name a permitted revert; regression test RED-before: attempt N fails write scope with a dirty out-of-scope file → attempt N+1's worktree must be clean of it",
+  "side_observations_p3": [
+   "developer Read tool reads files outside the working tree (~/.config/opencode/*) — only Bash `ls /tmp` is blocked as destructive",
+   "review consumed a diff that included cosmetic out-of-scope files the story did not intend"
+  ],
+  "recorded": "2026-09-16T05:07:25+00:00",
+  "status": "REPORTED TO OWNER — STOP; no AISEF change, no max_turns change, no release"
  }
 }

@@ -937,6 +937,20 @@ Rồi phân loại:
   mình, và một ứng viên đúng không thể qua — D-033, replay OpenCode của lần
   chạy LedgerLock thứ hai tìm ra.)
 
+- **Lượt thử lại mở trên cây sạch thay đổi ngoài phạm vi** (từ 1.7.6): khi một
+  phiên developer kết thúc, thứ nó để lại ngoài `write_scope` được ghi đúng
+  đường dẫn (`write-scope:violation` trong bằng chứng). Trước khi lượt
+  developer kế mở trong worktree của story, harness khôi phục các tệp tracked
+  ấy từ ứng viên đã đóng băng, xoá đúng các tệp untracked ấy, giữ mọi thay đổi
+  trong phạm vi, kiểm cây rồi ghi lại việc đã làm (`retry:recovery`, và dòng
+  `retry recovery` trong `run.log`). Thay đổi ngoài phạm vi không do lượt nào
+  của story để lại thì không bị đụng — và lượt cũng không mở trên đó; story
+  dừng, nêu tên đường dẫn: commit hoặc xoá chúng rồi chạy lại. Thông điệp
+  `write scope` nói harness sẽ khôi phục và nêu cách thoát hợp lệ trong phiên
+  (`git restore -- <tệp>`). Chạy không cách ly thì chỉ ghi, không dọn. (Trước
+  1.7.6 lượt sau kế thừa tệp bẩn và guard chặn mọi lệnh của nó — D-034, replay
+  OpenCode của lần chạy LedgerLock thứ hai tiếp trên 1.7.5 tìm ra.)
+
 - **Trượt vì code sai**: để framework thử lại, hoặc chạy vòng cải tiến ở [§13](#13-vòng-cải-tiến-và-thay-đổi-sau-phát-hành).
 
 Muốn biết mục cổng nào sẽ **đổi kết cục** nếu chấm lại bằng luật hiện tại — hữu ích
@@ -1255,6 +1269,7 @@ Thông báo trong bảng này là **nguyên văn tiếng Anh** như CLI in ra.
 | `⚠️ not recorded as evidence: no story id` | `aisef tool …` chạy ngoài một phiên story | thêm `--story <mã>` nếu bạn muốn nó thành bằng chứng |
 | `deadlock due to plan: criteria … are already satisfied at the branch point` | một story trước đã làm xong hành vi ấy | **sửa hoặc bỏ tiêu chí**, đừng thử lại ([§11](#11-bước-hiện-thực-aisef-run)) |
 | Mục cổng ⚠ `no baseline regression` — `BASELINE_UNAVAILABLE: …` | có bản ghi mốc nhưng không bản nào chụp ở cha tích hợp cho hợp đồng hiện tại của story (1.7.5) | chạy lại story từ gốc — `aisef run` bỏ nhánh khi tiêu chí đổi; không thêm hay khôi phục test để qua cổng |
+| Story `failed`, lý do `the story worktree still has changes outside write_scope before attempt …` | worktree của story có thay đổi ngoài phạm vi không do lượt nào của story để lại (1.7.6) — harness không xoá thứ nó không tạo | commit hoặc xoá các tệp được nêu trong worktree rồi chạy lại; thứ chính lượt trước để lại ngoài phạm vi thì được khôi phục tự động, bạn không phải làm gì |
 | `REVIEW_UNRUNNABLE: the reviewer did not produce a verdict …` | phép kiểm tất định xanh; phiên rà soát không ra verdict sau ba lần trên cùng ứng viên (1.7.4) | không có gì phải sửa trong code — ứng viên được giữ. Xem client rà soát (`run.max_turns`, hết giờ, nhà cung cấp), rồi `aisef run --verify-only --story <mã>` chạy lại giai đoạn rà soát trên ứng viên ấy |
 | `sessions kept producing nothing to grade` | phiên đã **quyết định** không viết gì, hai lần liền | đọc `aisef evidence <story>`, sửa kế hoạch — mở lại phiên sẽ ra đúng kết quả ấy |
 | `the command matched no tests` | lệnh chạy được nhưng bộ chọn không khớp test nào | chưa story nào viết loại test ấy, hoặc bộ chọn sai — sửa `verify.<loại>` |

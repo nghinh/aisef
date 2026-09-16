@@ -599,11 +599,19 @@ def check_diff_scope(changed: list[str], scope: list[str]) -> Verdict:
     # harness adds the verification directories, and every consumer folds this
     # message to one line — so the one thing the reader needs was always the
     # part that got cut (measured on `todo-e2e`, 2026-09-09).
+    # "Revert them" named no permitted way (`git checkout --` and `reset --hard`
+    # are blocked, Write/Edit outside scope is blocked): on LedgerLock STORY-04-01
+    # (1.7.5) the developer searched 160 turns for one. The harness restores
+    # these paths before the next attempt (D-034); the one allowed in-session
+    # move is spelled out.
     return Verdict(
         False,
         f"{len(outside)} files changed outside write_scope: {', '.join(outside[:5])}"
         f"{f' (+{len(outside) - 5} more)' if len(outside) > 5 else ''}. "
-        f"Revert them, or stop and report that the story's scope is incomplete. "
+        f"Do not write outside the scope. The harness restores these paths to the frozen "
+        f"candidate before the next attempt; to keep working in this session run "
+        f"`git restore -- {' '.join(outside[:5])}` (allowed; delete any new file you created "
+        f"there), or stop and report that the story's scope is incomplete if the story needs them. "
         f"Scope: {', '.join(scope[:12])}"
         f"{f' (+{len(scope) - 12} more)' if len(scope) > 12 else ''}",
     )

@@ -2,6 +2,52 @@
 
 ## Unreleased
 
+## 1.7.6 — 2026-09-16
+
+One defect, found by the clean OpenCode replay of the second LedgerLock run
+continued on the public `aisef==1.7.5` package (STORY-04-01 after the owner's
+AC-4 arbitration; record
+`closure-evidence/dogfood/ledgerlock-run2/replay-1.7.4-opencode/`, OBS-OC-3).
+No feature, no gate softened, no waiver, nothing else touched; the regression
+was red on 1.7.5 (`tests/test_retry_hygiene.py`: 9 red, 4 controls green — all
+green on 1.7.6).
+
+**A developer retry opens on a tree clean of out-of-scope changes (D-034, lỗi 188).**
+Attempt 1's developer session ran `ruff format ledgerlock/ …`, which
+reformatted `ledgerlock/ledger.py` and `ledgerlock/store.py` — cosmetic,
+outside the write scope. The freeze rightly committed only in-scope paths and
+the gate rightly failed `write scope`; but nothing restored the two files
+before the retry. Attempts 2 and 3 opened on the same dirty tree, the OpenCode
+`diff-scope` after-hook threw on every Bash/Write/Edit call from the first
+`ls -la`, the developer could neither act nor revert (`git checkout --` and
+`git reset --hard` are blocked, Write/Edit on the two files is outside scope),
+and both sessions ended at the 80-turn cap having written nothing — 160 turns,
+nothing graded, a story that could not complete without operator intervention.
+
+Now, the moment a developer session ends, what it left outside the write scope
+goes on record (`write-scope:violation`: attempt, tracked and untracked paths;
+a path already dirty when the session opened is listed apart and not
+attributed). Before the next developer attempt opens in a story worktree, the
+harness restores the recorded tracked paths from the frozen candidate
+(`git restore --source <candidate> --staged --worktree -- <paths>`), removes
+only the recorded untracked ones, keeps every in-scope change — committed or
+not — re-checks the tree, and records what it did (`retry:recovery`: failed
+attempt, next attempt, candidate SHA, paths, actions, post-recovery status).
+Dirt no attempt of this story is on record for is never touched, and the
+attempt does not open on it either: the story stops with a reason naming the
+paths, since a developer on that tree could only be blocked by the guard.
+Trees left by 1.7.5 and earlier (no violation record) are read through the
+last `gate:input`, whose `changed` list is exactly what the gate failed
+`write scope` on. The write-scope message no longer says "Revert them" with no
+permitted way to do so: it states that the harness restores these paths before
+the next attempt and names the one allowed in-session move
+(`git restore -- <paths>`). Reviewer-tree restoration is unchanged;
+`--no-isolate` runs (the user's own tree) are recorded but never restored or
+cleaned by the harness.
+
+Unchanged on purpose: `run.max_turns`, reviewer semantics, Bandit/SAST, every
+other open defect (D-002/D-003/D-011/D-024, all P2), the LedgerLock stories.
+
 ## 1.7.5 — 2026-09-16
 
 One defect, found by the clean OpenCode replay of the second LedgerLock run on

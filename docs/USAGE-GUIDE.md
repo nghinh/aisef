@@ -821,7 +821,7 @@ There are **sixteen** checks, and the table prints them in this order
 | `test` | the last test run passed, and it happened after the last file edit |
 | `no baseline regression` | tests that were already green at the story-entry baseline remain green and still exist (1.7.5: measured against the baseline captured at the integrated parent when the story began, never against a candidate the story produced) |
 | `lint` | lint is clean |
-| `write scope` | the story didn't write outside its `write_scope` |
+| `write scope` | the story didn't write outside its `write_scope` (1.7.6: what a failed attempt left outside the scope is restored from the frozen candidate before the next attempt, and recorded) |
 | `mockup map` | the actual screen matches the visual contract |
 | `real tests` | no test is an empty assertion |
 | `criteria have tests` | each acceptance criterion has a test carrying its code |
@@ -954,6 +954,20 @@ Four things about that loop that only show up once you run it:
   build. (Before 1.7.5 a resumed story re-baselined at its previous candidate,
   and a correct candidate could not complete — D-033, found by the OpenCode
   replay of the second LedgerLock run.)
+- **A retry opens on a tree clean of out-of-scope changes (1.7.6).** When a
+  developer session ends, whatever it left outside the `write_scope` goes on
+  record (`write-scope:violation` in the evidence, with the exact paths). Before
+  the next developer attempt opens in the story worktree, the harness restores
+  those tracked paths from the frozen candidate, removes only those untracked
+  ones, keeps every in-scope change, checks the tree and records what it did
+  (`retry:recovery`, and a `retry recovery` line in `run.log`). Out-of-scope
+  changes no attempt of the story is on record for are never touched — and the
+  attempt does not open on them either; the story stops naming the paths, so
+  commit or remove them and re-run. The `write scope` message says the harness
+  will restore, and names the one allowed in-session move (`git restore -- <paths>`).
+  Runs without isolation are recorded but never cleaned. (Before 1.7.6 the
+  retry inherited the dirt and the guard blocked its every command — D-034,
+  found by the OpenCode replay of the second LedgerLock run continued on 1.7.5.)
 - **Two graded attempts failing `tests verify story` on the same criteria stop the
   story immediately**, as a plan deadlock that names the criteria. No test can be
   red at the branch point for behaviour already on the main branch, so there is no
@@ -1628,6 +1642,7 @@ money and left the project worse, which is the number to look for first.
 | `aisef guard tool-bypass: … is the project's test command run directly` | the agent ran your declared command instead of `aisef tool test`; nothing was recorded | this is the guard working. Use `aisef tool test`. To narrow a run for debugging, change the command's own identity (`pytest tests/x.py -k foo`); with `npm`/`yarn`/`pnpm`/`bun` the script name *is* the identity, so call the underlying runner |
 | Story `failed`, reason `deadlock due to plan` | the story's criteria are already satisfied at its branch point — usually an earlier story shipped the behaviour | fix or drop the criteria named in the message, then re-run. Amending them drops the stale branch automatically |
 | Gate item ⚠ `no baseline regression` — `BASELINE_UNAVAILABLE: …` | baseline records exist but none was captured at the integrated parent for the story's current contract (1.7.5) | re-run the story from its base — `aisef run` discards the branch when the criteria changed; do not add or restore tests to satisfy the gate |
+| Story `failed`, reason `the story worktree still has changes outside write_scope before attempt …` | the story worktree holds out-of-scope changes no attempt of this story is on record for (1.7.6) — the harness does not delete what it did not make | commit or remove the named paths in the worktree, then re-run; what a failed attempt itself left outside the scope is restored automatically and needs nothing from you |
 | Story `failed`, reason `REVIEW_UNRUNNABLE: the reviewer did not produce a verdict …` | deterministic checks passed; the review session produced no verdict in three executions on the same candidate (1.7.4) | nothing to fix in the code — the candidate is kept. Look at the reviewer client (`run.max_turns`, timeouts, provider), then `aisef run --verify-only --story <id>` re-runs the review stage on that candidate |
 | Story `failed`, reason `sessions kept producing nothing to grade` | the session ran clean and wrote nothing — a decision, not a fault | do not re-run it; read the last graded verdict. Two consecutive no-op sessions stop the story on purpose |
 | Attempts ending at `max_turns` | `run.max_turns` (default 40) reached | the session is still graded if it committed work. Check `aisef status --attempts`; if the agent was reading `_bmad-output/` to work out gate rules, raising the cap does not help |
