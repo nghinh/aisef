@@ -69,7 +69,7 @@ def build_parser() -> argparse.ArgumentParser:
         description="AISEF — orchestrate the AI-assisted software development lifecycle",
     )
     p.add_argument("-V", "--version", action="version", version=f"%(prog)s {__version__}")
-    p.add_argument("--project", default=".", help="project directory (default: current directory)")
+    p.add_argument("--project", default=None, help="project directory (default: current directory)")
     sub = p.add_subparsers(dest="command", required=True, parser_class=_Parser)
 
     from .memory import cmd_memory
@@ -389,7 +389,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     _cho_moi_lenh_nhan_project(parser)
     args = parser.parse_args(argv)
-    args.project = str(Path(args.project).resolve())
+    # D-011: an IMPLICIT project (no --project anywhere) is remembered — evidence roots refuse to appear in a
+    # directory that is not an AISEF project when the caller never named one
+    args.project_defaulted = getattr(args, "project", None) in (None, argparse.SUPPRESS)
+    args.project = str(Path(args.project or ".").resolve())
     try:
         return args.func(args)
     except ConfigError as e:

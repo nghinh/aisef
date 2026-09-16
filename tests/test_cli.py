@@ -552,7 +552,12 @@ class TestToolCommand(CliTestCase):
 
 class TestVerifyCommand(CliTestCase):
     def test_clean_tree_passes(self):
+        # F4 (SS-40 / INV-J.1): without a scope the guard has nothing to guard — UNCONFIGURED is never a pass,
+        # a clean tree included; with the scope given, a clean tree passes
         code, out, _ = self.run_cli("verify")
+        self.assertNotEqual(code, EXIT_OK)
+        self.assertIn("UNCONFIGURED", out)
+        code, out, _ = self.run_cli("verify", "--write-scope", "src")
         self.assertEqual(code, EXIT_OK)
         self.assertIn("post-check passed", out)
 

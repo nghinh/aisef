@@ -21,7 +21,7 @@ invariants:
       - tests/test_candidate.py::TestReviewerDoiUngVien
       - tests/test_implement.py::TestNguoiRaSoatKhongDuocSuaCay
       - tests/test_run2_review_recovery.py
-      - tests/hardening/test_sibling_scan.py::TestSS36ToolArtifactsAreNotReviewerWrites (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS36ToolArtifactsAreNotReviewerWrites
     model_tests:
       - tests/hardening/test_state_model.py::TestKernelModel::test_property_8_verification_never_mutates_the_candidate
     fault_injection_tests:
@@ -29,7 +29,7 @@ invariants:
     linked_defects:
       - D-032
       - SS-36
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-A.2
     domain: candidate identity
     statement: Evidence satisfies a gate only when it is bound to the exact candidate being scored; evidence of another build is stated as stale and never scores.
@@ -72,7 +72,7 @@ invariants:
     deterministic_tests:
       - tests/test_worktree.py::TestCandidateInvariants
       - tests/test_run.py::TestDoneChiSauMerge
-      - tests/hardening/test_sibling_scan.py::TestSS17MergeDirtCheckHonoursOwnership (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS17MergeDirtCheckHonoursOwnership
       - tests/hardening/scan8a/test_group_b.py::TestSS16WaveEndCommitOfAFailedStoryIsRecorded
     model_tests:
       - tests/hardening/test_state_model.py::TestKernelModel::test_property_7_complete_needs_every_proof
@@ -81,7 +81,7 @@ invariants:
     linked_defects:
       - SS-17
       - SS-16
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-B.1
     domain: story epoch
     statement: A story contract has an explicit epoch, the fingerprint of its acceptance criteria, recorded as the story:contract note.
@@ -518,7 +518,7 @@ invariants:
       - tests/test_guardrails.py::TestCauHinhClientKhongPhaiThayDoiCuaStory
       - tests/test_guardrails.py::TestSanPhamBuildKhongPhaiViecCuaStory
       - tests/test_dogfood_ledgerlock.py::TestCoverageDataFileIsNotAStoryChange
-      - tests/hardening/test_sibling_scan.py::TestSS35RenamedPathsKeepTheirIdentity (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS35RenamedPathsKeepTheirIdentity
     model_tests: []
     fault_injection_tests:
       - tests/hardening/test_fault_matrix.py::TestWorkspaceFaults
@@ -526,7 +526,7 @@ invariants:
       - D-030
       - SS-35
       - SS-36
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-I.2
     domain: workspace ownership
     statement: One ownership rule is shared by the guard, the tree snapshot, retry hygiene and the merge dirt check; a path one of them ignores none of them attributes.
@@ -534,15 +534,15 @@ invariants:
     severity_if_violated: P1
     enforcement_points: []
     deterministic_tests:
-      - tests/hardening/test_sibling_scan.py::TestSS39VendorPathsShareOneOwnershipRule (RED)
-      - tests/hardening/test_sibling_scan.py::TestSS17MergeDirtCheckHonoursOwnership (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS39VendorPathsShareOneOwnershipRule
+      - tests/hardening/test_sibling_scan.py::TestSS17MergeDirtCheckHonoursOwnership
     model_tests: []
     fault_injection_tests:
       - tests/hardening/test_fault_matrix.py::TestWorkspaceFaults
     linked_defects:
       - SS-39
       - SS-17
-    status: MISSING
+    status: PROVEN
   - invariant_id: INV-I.3
     domain: workspace ownership
     statement: Dirt already present when a session opens is not the session's doing; it is listed apart, never restored or deleted, and never counted against the session by the guard.
@@ -559,7 +559,7 @@ invariants:
       - tests/hardening/test_fault_matrix.py::TestWorkspaceFaults
     linked_defects:
       - SS-37
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-J.1
     domain: write scope
     statement: The effective write scope is declared scope plus every legitimately granted path (manifests, verification directories, lockfiles, bootstrap files), and the guard, the freeze and the scheduler read the same effective scope.
@@ -578,7 +578,7 @@ invariants:
     linked_defects:
       - D-031
       - SS-53
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-J.2
     domain: write scope
     statement: Out-of-scope developer writes are attributable exactly — recorded with the paths, the attempt and the candidate.
@@ -610,7 +610,7 @@ invariants:
     linked_defects:
       - D-034
       - SS-39
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-K.2
     domain: retry hygiene
     statement: Recovery itself changes evidence freshness — every verdict computed over the restored state is stale for control.
@@ -775,7 +775,7 @@ invariants:
     linked_defects:
       - D-031
       - SS-53
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-P.1
     domain: approval invalidation
     statement: An approval binds to the digest of the exact artifacts it covers; editing an artifact makes it stale, and a new upstream decision makes every dependent approval stale.

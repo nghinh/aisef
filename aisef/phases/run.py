@@ -46,7 +46,7 @@ from ..control.qualification import (
     StorySnapshot as QStory,
     qualify as q_qualify,
 )
-from ..control.normalize import Story, parse_architecture_file
+from ..control.normalize import Story, effective_write_scope, parse_architecture_file
 from ..control.preflight import STORY_NOT_EXECUTABLE, check_story, screen_owners
 from ..control.state import StateStore, StoryStatus, TransitionError
 from ..control.worktree import GitError, RunOwnedError, WorktreeManager, run_ownership
@@ -725,7 +725,12 @@ def _effective_waves(plan: "Plan", epic_id: str, *, project: Path, config: Confi
                 declared = tuple(story.write_scope) if story else ()
                 grants[sid] = (bootstrap_grants(story, project, config, bootstrap=bootstrap)
                                if story else [])
-                sched.append(scheduler.Story(id=sid, write_scope=declared + tuple(grants[sid])))
+                # SS-53 / INV-O.1: two stories that may both write the same FILE (a manifest, a lockfile the guard
+                # grants to every story) do not share a wave; DIRECTORY grants (`tests/`) do not conflict by
+                # themselves — stories create distinct files there and the merge is exact
+                file_grants = tuple(f for f in (effective_write_scope(story, project) if story else [])
+                                    if f not in declared and (project / f).is_file()) if story else ()
+                sched.append(scheduler.Story(id=sid, write_scope=declared + tuple(grants[sid]) + file_grants))
             group = [s.id for s in scheduler.build_waves(sched)[0]] if sched else []
             if len(group) < len(pending) and artifact_root is not None:
                 from ..harness.runlog import run_log

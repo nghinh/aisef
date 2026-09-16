@@ -21,8 +21,8 @@
   },
   "fixed": 16,
   "by_status": {
-   "OPEN": 28,
-   "FIXED": 44,
+   "OPEN": 16,
+   "FIXED": 56,
    "SUPERSEDED": 1
   }
  },
@@ -781,7 +781,8 @@
     "statement": "merge_story refuses a passed candidate when raw `git status --porcelain` is non-empty — including `.coverage` left by the test tool and client config the harness copied",
     "reproducer": "tests/hardening/test_sibling_scan.py::TestSS17MergeDirtCheckHonoursOwnership",
     "provenance": "Phase 3 sweep",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-35",
@@ -796,7 +797,8 @@
     "statement": "`git status --porcelain -z` emits a rename as two NUL fields; `entry[3:]` on the bare original path yields a phantom `/a.py` outside every scope",
     "reproducer": "tests/hardening/test_sibling_scan.py::TestSS35RenamedPathsKeepTheirIdentity",
     "provenance": "Phase 3 sweep",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-36",
@@ -811,7 +813,8 @@
     "statement": "a reviewer that runs the suite and leaves `.coverage` is scored as having modified the tree: review discarded, REVIEW_UNRUNNABLE after the retry budget",
     "reproducer": "tests/hardening/test_sibling_scan.py::TestSS36ToolArtifactsAreNotReviewerWrites",
     "provenance": "Phase 3 sweep",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-39",
@@ -826,7 +829,8 @@
     "statement": "the snapshot skips vendor paths only at the root; a nested node_modules the session installed is recorded as a violation and DELETED by retry hygiene, while the guard never counted it",
     "reproducer": "tests/hardening/test_sibling_scan.py::TestSS39VendorPathsShareOneOwnershipRule",
     "provenance": "Phase 3 sweep",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-37",
@@ -840,7 +844,8 @@
     "statement": "planning/mockup sessions declare pre-existing dirt to the guard; story sessions do not, so in --no-isolate an operator's dirty file blocks every tool call",
     "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS37StorySessionDeclaresPreexistingDirt::test_operator_dirt_outside_scope_does_not_block_the_developers_first_tool_call",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-38",
@@ -854,7 +859,8 @@
     "statement": "Claude Code writes `.claude/settings.local.json`; it is not harness-owned and blocks the session as an out-of-scope write",
     "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS38ClientLocalSettingsAreClientOwned::test_settings_local_json_is_not_a_story_change",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-40",
@@ -868,7 +874,8 @@
     "statement": "the generated CI step runs verify with no scope on a clean checkout: exits 0 forever",
     "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS40VerifyWithoutScopeIsNotAPass::test_bare_verify_as_generated_for_ci_does_not_exit_ok",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-41",
@@ -882,7 +889,8 @@
     "statement": "anything under a granted directory (tests/) becomes the candidate — operator fixtures, verifier snapshots — unless named by is_tool_artifact",
     "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS41PreexistingInScopeFileIsNotSweptIntoTheCandidate::test_an_untracked_operator_fixture_under_scope_is_not_committed_as_the_developers_work",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-42",
@@ -896,7 +904,8 @@
     "statement": "the devsecops session runs with no AISEF_WRITE_SCOPE; with compiled hooks the guard falls back to the planning scope and blocks writing Dockerfile at the root",
     "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS42DevsecopsSessionCarriesAWriteScope::test_the_guard_env_handed_to_the_devsecops_client_allows_writing_the_dockerfile",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-43",
@@ -911,7 +920,8 @@
     "statement": "the suite runs on a clean worktree of HEAD while Dockerfile/CI/runbook are checked on the working tree; the signed report can bind uncommitted content",
     "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS43PreDeployGradesOneTree::test_an_uncommitted_dockerfile_is_not_a_pass_bound_to_head",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-53",
@@ -926,7 +936,8 @@
     "statement": "the scheduler partitions on declared scope + bootstrap grants; manifests, lockfiles and verification directories the guard grants to every story are invisible to scopes_conflict",
     "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS53SchedulerReadsTheEffectiveScope::test_stories_sharing_a_granted_path_do_not_share_a_wave",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "D-011",
@@ -938,8 +949,10 @@
     "statement": "a bench run writes artifacts into the framework repository root, outside its session workspaces",
     "reproducer": "",
     "provenance": "DEFECT-REGISTER (open before the program)",
-    "status": "OPEN",
-    "disposition_required": "FIXED / NOT_A_DEFECT with proof / SUPERSEDED"
+    "status": "FIXED",
+    "disposition_required": "FIXED / NOT_A_DEFECT with proof / SUPERSEDED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)",
+    "disposition": "FIXED BY CONSTRUCTION: the leak's trigger (a real agent's `aisef …` call whose --project fell back to `.` inside the framework repository) is not reproducible without a paid session, as the register says; what is deterministic is that an IMPLICIT project must be an AISEF project — `_artifact_root` refuses to create `_bmad-output/` in a directory carrying no project marker when no --project was given (`aisef/cli/_common.py`, `parser.main` records `project_defaulted`). The framework root carries no marker, so the recorded call would have been refused. Test: tests/hardening/test_ownership.py::TestNoArtifactsOutsideAProject; the detector `ro_ri_ngoai_workspace` stays."
    }
   ],
   "F6-BENCH-RELEASE-APPROVAL": [
@@ -1288,5 +1301,5 @@
    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `deadlock_reason` skips attempts whose review was UNRUNNABLE"
   }
  ],
- "updated": "2026-09-16T14:04:41+00:00 @ 18b2d4a"
+ "updated": "2026-09-16T14:46:28+00:00 @ 7161991"
 }

@@ -128,3 +128,7 @@ full suite 3 329 passed / 20 skipped / 30 expected-red, every expected-red tagge
 ruff clean. Frozen defect set {'OPEN': 28, 'FIXED': 44, 'SUPERSEDED': 1} of 73 (D-002 SUPERSEDED with its
 disposition recorded). Fault matrix {'GREEN': 60, 'RED': 9, 'NEEDS_TEST': 0}. Registry {'PROVEN': 31, 'PARTIAL': 17, 'MISSING': 2}. Linux and Windows CI on this commit are read
 from the PR checks.
+
+**CI on 7161991 (PR #6)**: lint, wheel, Linux 3.11 / 3.12 / 3.13 / 3.14 and Windows 3.11 all green — the family's
+definition of done is met in full, Linux and Windows included. (The D-024 cleanup race seen once on the F2 commit did
+not recur; it stays open under F5 regardless.)

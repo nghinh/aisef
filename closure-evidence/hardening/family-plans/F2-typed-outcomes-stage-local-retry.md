@@ -158,6 +158,6 @@ test_phien_bi_cat_vao_so_dung_nhan_va_ghi_ngay_sau_tung_phien` failed in its cle
 raised `Directory not empty: '.git'`, the signature of a process left by the CUT session (the fake client or a git
 child it spawned) still writing while the workspace was being removed. That is the F5 fault the compound cell
 FM-C-11 (`TestCF11OrphanProcessDuringCleanup`) already holds red: the kernel owns no per-story process tree, so a cut
-session's children are not terminated, reaped and verified before the workspace goes. It is timing-dependent (the
+session's children are not terminated, reaped and verified before the workspace goes — and it is the registered defect **D-024** (FAM-PROCESS, F5: "bench-qualification test helper: TemporaryDirectory cleanup races a writer inside a session's .git", seen twice before on 3.13 and 3.14). It is timing-dependent (the
 slowest of the four Linux jobs, once; the 8B baseline and the other three jobs passed) and it is not a regression of
 this family. F5 closes it; this record names it so no CI failure stays unexplained.

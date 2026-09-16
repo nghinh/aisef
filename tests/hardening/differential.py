@@ -42,14 +42,14 @@ RESULTS = ROOT / "closure-evidence/hardening/differential-results.json"
 
 # ------------------------------------------------------------ the scenario vocabulary
 # (kind, weight). Every kind has a deterministic real-kernel realisation AND a model event.
-DEV = [("CHANGED", 30), ("CHANGED_RED", 8), ("NOOP", 8), ("TIMEOUT", 4), ("CRASH", 4), ("RATE_LIMIT", 2),
+DEV = [("CHANGED", 30), ("CHANGED_RED", 8), ("CHANGED_ARTIFACT", 3), ("NOOP", 8), ("TIMEOUT", 4), ("CRASH", 4), ("RATE_LIMIT", 2),
        ("CONTEXT", 3), ("AUTH", 2), ("SCOPE_VIOLATION", 6), ("TRUNK_COMMIT", 1), ("ZERO_OUTPUT", 2),
        ("MAX_TURNS_WORK", 3), ("MAX_TURNS_UNTOUCHED", 3), ("BUDGET", 2)]
 REV = [("PASS", 30), ("BLOCK", 7), ("BLOCK_OUTSIDE", 4), ("STUCK", 2), ("MALFORMED", 4), ("UNRUNNABLE", 5), ("MUTATE", 2),
        ("COMMIT", 2), ("BUDGET", 1), ("BLOCK_UNBOUND", 2)]
 SEC = [("PASS", 30), ("BLOCK", 6), ("UNRUNNABLE", 4), ("MALFORMED", 3), ("BUDGET", 1)]
 
-DEV_EVENT = {"CHANGED": "DEVELOP_CHANGED", "CHANGED_RED": "DEVELOP_CHANGED", "NOOP": "DEVELOP_NOOP",
+DEV_EVENT = {"CHANGED": "DEVELOP_CHANGED", "CHANGED_RED": "DEVELOP_CHANGED", "CHANGED_ARTIFACT": "DEVELOP_CHANGED", "NOOP": "DEVELOP_NOOP",
              "TIMEOUT": "DEVELOP_TIMEOUT", "CRASH": "DEVELOP_CRASH", "RATE_LIMIT": "DEVELOP_RATE_LIMIT",
              "CONTEXT": "DEVELOP_CONTEXT", "AUTH": "DEVELOP_AUTH", "SCOPE_VIOLATION": "DEVELOP_SCOPE_VIOLATION",
              "TRUNK_COMMIT": "DEVELOP_TRUNK_COMMIT", "ZERO_OUTPUT": "DEVELOP_ZERO_OUTPUT",
@@ -106,6 +106,9 @@ def to_script(sc: Scenario) -> Script:
             dev.append(Step("CHANGED", files=_green(i)))
         elif k == "CHANGED_RED":
             dev.append(Step("CHANGED", files=_red(i)))
+        elif k == "CHANGED_ARTIFACT":               # F4: the session also leaves a tool artifact and a nested vendor tree —
+            dev.append(Step("CHANGED", files={**_green(i), ".coverage": f"\x00{i}",   # VERIFIER-class paths, never a write
+                                              "packages/web/node_modules/left-pad/index.js": "module.exports = 1\n"}))
         elif k == "SCOPE_VIOLATION":
             dev.append(Step("SCOPE_VIOLATION", files={**_green(i), OUT_OF_SCOPE: f"# reformatted {i}\n"}))
         elif k == "TRUNK_COMMIT":
@@ -181,7 +184,7 @@ def model_run(sc: Scenario, max_steps: int = 80) -> Observation:
                 break
             if s.stage == M.DEVELOP:
                 kind = dev.next()
-                tree_red = kind == "CHANGED_RED" if kind in ("CHANGED", "CHANGED_RED", "MAX_TURNS_WORK", "SCOPE_VIOLATION") else tree_red
+                tree_red = kind == "CHANGED_RED" if kind in ("CHANGED", "CHANGED_RED", "CHANGED_ARTIFACT", "MAX_TURNS_WORK", "SCOPE_VIOLATION") else tree_red
                 ev = DEV_EVENT[kind]
             elif s.stage == M.VERIFY:
                 ev = "TEST_UNRUNNABLE" if sc.test_tool_missing else ("TEST_FAIL" if tree_red else "TEST_PASS")

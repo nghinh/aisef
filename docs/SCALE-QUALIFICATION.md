@@ -17,7 +17,7 @@ framework correctness is not.
 |---|---|---|---|---|---|---|
 | story count | 0 (scripted scenarios) | 12–20 (reference: 16) | 30–50 | 60–100 | 120–180 | 250+ |
 | dependency depth (longest story chain) | n/a | ≤ 4 | ≤ 6 | ≤ 8 | ≤ 10 | ≤ 12, across service boundaries |
-| parallel width (stories per wave) | n/a | ≤ 3 | ≤ 4 | ≤ 6 | ≤ 8 | ≤ 12 |
+| parallel width (stories per wave) | n/a | ≤ 3 planned; actual width = stories whose EFFECTIVE write scopes are disjoint (INV-O.1 — a manifest or lockfile granted to two stories serialises them; F4/SS-53) | ≤ 4, same rule | ≤ 6, same rule | ≤ 8, same rule | ≤ 12, same rule |
 | shared-file contention | scripted (scope violations, manifests) | manifests + one shared module | manifests, migrations, shared schema, auth middleware | + event schemas, queue contracts, role matrices | + shared libraries across modules, generated clients | + cross-service API contracts, shared infra manifests |
 | resume count exercised | every trace class (model) + scripted resume | ≥ 2 forced resumes per run | ≥ 3 | ≥ 5 | ≥ 8 | ≥ 12, incl. resume after host change |
 | failure injection profile | full fault matrix (54 cells) + compound faults + 100 000 differential traces | targeted historical replays (D-032, baseline provenance, retry hygiene, D-035) + natural model failures | fault matrix subset run live: review cut, security cut, tool unrunnable, process death | + lease expiry, orphan reclaim, contract change mid-epic | + multi-host claim contention, budget exhaustion, approval invalidation mid-run | + partial service outage, cross-service merge conflict |

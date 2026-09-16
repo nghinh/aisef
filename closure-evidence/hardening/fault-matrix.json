@@ -1,7 +1,7 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "phase": 7,
- "generated": "2026-09-16T14:04:41+00:00",
+ "generated": "2026-09-16T14:46:28+00:00",
  "stages": [
   "Developer",
   "Test",
@@ -421,7 +421,7 @@
    "expected_recovery": "none needed",
    "invariants": "INV-A.3, INV-I.2",
    "test": "tests/hardening/test_sibling_scan.py::TestSS17MergeDirtCheckHonoursOwnership",
-   "status": "RED (SS-17)"
+   "status": "GREEN (F4)"
   },
   {
    "id": "FM-M-03",
@@ -637,7 +637,7 @@
    "expected_recovery": "—",
    "invariants": "INV-I.2",
    "test": "tests/hardening/test_sibling_scan.py::TestSS39VendorPathsShareOneOwnershipRule",
-   "status": "RED (SS-39)"
+   "status": "GREEN (F4)"
   },
   {
    "id": "FM-W-04",
@@ -649,7 +649,7 @@
    "expected_recovery": "—",
    "invariants": "INV-I.1",
    "test": "tests/hardening/test_sibling_scan.py::TestSS35RenamedPathsKeepTheirIdentity",
-   "status": "RED (SS-35)"
+   "status": "GREEN (F4)"
   },
   {
    "id": "FM-W-05",
@@ -857,8 +857,8 @@
   }
  ],
  "status_count": {
-  "GREEN": 60,
-  "RED": 9,
+  "GREEN": 63,
+  "RED": 6,
   "NEEDS_TEST": 0
  }
 }

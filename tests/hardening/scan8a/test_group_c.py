@@ -69,7 +69,7 @@ class TestSS37StorySessionDeclaresPreexistingDirt(ImplementTestCase):
     and `recover_out_of_scope` only runs when workdir != project; under --no-isolate an operator's dirty
     tracked file outside scope is blamed on the developer by every `diff-scope` call. Invariant I.3."""
 
-    @unittest.expectedFailure   # SS-37: observed `diff-scope` BLOCK "1 files changed outside write_scope: notes.txt"
+    # GREEN since F4 (SS-37: one ownership rule for every consumer), 2026-09-16
     def test_operator_dirt_outside_scope_does_not_block_the_developers_first_tool_call(self):
         _git(self.project, "config", "user.email", "t@t"); _git(self.project, "config", "user.name", "t")
         (self.project / "notes.txt").write_text("v1\n", encoding="utf-8"); _git(self.project, "add", "-A"); _git(self.project, "commit", "-qm", "c")
@@ -88,7 +88,7 @@ class TestSS38ClientLocalSettingsAreClientOwned(unittest.TestCase):
     grants in `.claude/settings.local.json` (this repository carries one, hidden only by the user's global
     gitignore), which `changed_files` then attributes to the story. Invariant I.1."""
 
-    @unittest.expectedFailure   # SS-38: observed changed_files == ['.claude/settings.local.json']
+    # GREEN since F4 (SS-38: one ownership rule for every consumer), 2026-09-16
     def test_settings_local_json_is_not_a_story_change(self):
         with tempfile.TemporaryDirectory() as tmp:
             repo = _repo(Path(tmp) / "repo")
@@ -106,7 +106,7 @@ class TestSS41PreexistingInScopeFileIsNotSweptIntoTheCandidate(ImplementTestCase
     granted directory before the session opened becomes part of the frozen candidate, attributed to the
     developer, although `run_attempt` snapshotted it as pre-existing. Invariant I.1."""
 
-    @unittest.expectedFailure   # SS-41: observed candidate commit contains src/fixtures/operator.json
+    # GREEN since F4 (SS-41: one ownership rule for every consumer), 2026-09-16
     def test_an_untracked_operator_fixture_under_scope_is_not_committed_as_the_developers_work(self):
         _git(self.project, "config", "user.email", "t@t"); _git(self.project, "config", "user.name", "t")
         (self.project / "goc.txt").write_text("g\n", encoding="utf-8"); _git(self.project, "add", "-A"); _git(self.project, "commit", "-qm", "goc")
@@ -130,13 +130,15 @@ class TestSS40VerifyWithoutScopeIsNotAPass(unittest.TestCase):
     check and exits 0, so the "post-hoc guard" step is green on every checkout. Invariant J.1 (the guard reads
     the effective scope — an unconfigured guard is not a passing one)."""
 
-    @unittest.expectedFailure   # SS-40: observed rc == 0 with "○ no --write-scope given, skipping scope check"
+    # GREEN since F4 (SS-40: one ownership rule for every consumer), 2026-09-16
     def test_bare_verify_as_generated_for_ci_does_not_exit_ok(self):
         with tempfile.TemporaryDirectory() as tmp:
             repo = _repo(tmp)
             ci = write_ci_workflow(repo).read_text(encoding="utf-8")
             step = next(line for line in ci.splitlines() if line.strip().startswith("run:") and " verify" in line)
-            self.assertNotIn("--write-scope", step, step)   # this is what CI really runs
+            # F4 (SS-40): the generated step now carries the scope source (a repository variable; empty fails closed) —
+            # and a BARE verify, however invoked, is UNCONFIGURED, never a pass
+            self.assertIn("--write-scope", step, step)
             with redirect_stdout(io.StringIO()) as out:
                 rc = cmd_verify(SimpleNamespace(project=str(repo), write_scope="", story=""))
             self.assertNotEqual(rc, EXIT_OK, out.getvalue())
@@ -157,7 +159,7 @@ class TestSS42DevsecopsSessionCarriesAWriteScope(DeployTestCase):
     hooks (`.claude/settings.json`, loaded as project settings) then evaluates `effective_scope({})` ==
     PLANNING_SCOPE and blocks the Dockerfile the phase itself demands. Invariant J.1."""
 
-    @unittest.expectedFailure   # SS-42: observed write-scope BLOCK "Dockerfile is outside the story's write_scope (_bmad-output, docs)"
+    # GREEN since F4 (SS-42: one ownership rule for every consumer), 2026-09-16
     def test_the_guard_env_handed_to_the_devsecops_client_allows_writing_the_dockerfile(self):
         client = _CaptureSpec()
         generate(self.project, client, config=self.config())
@@ -174,7 +176,7 @@ class TestSS43PreDeployGradesOneTree(DeployTestCase):
     Dockerfile / CI / runbook on the working tree: the report can say "Dockerfile: PASS" for a candidate that
     has no Dockerfile. Invariant P.1 / A.3."""
 
-    @unittest.expectedFailure   # SS-43: observed Dockerfile PASSED (detail '') while qa.clean_tree = HEAD without a Dockerfile
+    # GREEN since F4 (SS-43: one ownership rule for every consumer), 2026-09-16
     def test_an_uncommitted_dockerfile_is_not_a_pass_bound_to_head(self):
         _git(self.project, "init", "-q"); _git(self.project, "config", "user.email", "t@t"); _git(self.project, "config", "user.name", "t")
         _git(self.project, "add", "-A"); _git(self.project, "commit", "-qm", "head without Dockerfile")
@@ -197,7 +199,7 @@ class TestSS53SchedulerReadsTheEffectiveScope(unittest.TestCase):
     directories `effective_write_scope` grants to every story never reach `scopes_conflict`, so two stories
     both allowed to edit `pyproject.toml` run in one wave. Invariant O.1 / J.1 (one effective scope)."""
 
-    @unittest.expectedFailure   # SS-53: observed one wave ['STORY-01-01', 'STORY-01-02'] whose effective scopes share pyproject.toml, tests
+    # GREEN since F4 (SS-53: one ownership rule for every consumer), 2026-09-16
     def test_stories_sharing_a_granted_path_do_not_share_a_wave(self):
         def story(sid, path):
             return Story(id=sid, epic_id="EPIC-01", title=sid, write_scope=[path], verification_contract=["unit"])

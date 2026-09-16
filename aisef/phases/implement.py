@@ -49,6 +49,7 @@ from ..control import identity as ident
 from ..control.budget import BudgetLocked
 from ..control.outcome import StageOutcome
 from ..harness.guardrails import (
+    ENV_BASELINE_DIRTY,
     ENV_ALLOW_HOSTS,
     ENV_DISALLOWED_TOOLS,
     ENV_PROJECT,
@@ -636,6 +637,9 @@ def run_attempt(
     _hosts = ",".join(config["sandbox.allow_hosts"]) if config else ""
     spec.env = {
         ENV_WRITE_SCOPE: ",".join(scope),
+        # SS-37 / INV-I.3: what was already dirty before this session is PREEXISTING to the guard, exactly as the
+        # planning and mockup sessions declare it — under --no-isolate an operator's file is not the developer's write
+        ENV_BASELINE_DIRTY: ",".join(changed_files(str(workdir))[:200]),
         ENV_STORY_ID: story.id,
         ENV_BASE_REF: base_ref,
         ENV_WORKDIR: str(workdir),
@@ -718,7 +722,8 @@ def run_attempt(
         # `_bmad-output/`, and telling them to revert is telling them to throw
         # away their own commit. The tree says which: the story's scope is
         # source, `_bmad-output/` is the harness's own record.
-        moi = changed_files(str(project), base_ref=before_sha)
+        from ..harness.guardrails import _git_lines
+        moi = _git_lines(str(project), ["diff", "--name-only", "-z", before_sha, after_sha])   # raw: harness paths too
         cua_harness = bool(moi) and all(
             f.startswith(("_bmad-output/", ".aisef/")) for f in moi)
         attempt.error = (
@@ -897,10 +902,15 @@ def run_attempt(
                                + ("a fresh passing verdict the run never acted on — re-scoring it"
                                   if verdict is not None else "no fresh verdict — grading it"))
     run_log(artifact_root, f"story={story.id}#{number} changed_files={len(changed_now)}")
+    # F4 / SS-41: a path that was already there before the session and is byte-identical now is PREEXISTING —
+    # an operator fixture under a granted directory is not the developer's work and never enters the candidate
+    snap_now = _tree_snapshot(workdir)
+    preexisting = sorted(rel for rel, content in tree_before[1].items()
+                         if rel in snap_now and snap_now[rel] == content and content is not None)
     attempt.candidate = freeze_candidate(
         workdir, story=story, scope=scope, isolated=workdir != project,
         evidence=evidence, artifact_root=artifact_root, number=number,
-        changed=changed_now,
+        changed=changed_now, preexisting=preexisting,
     )
     if not attempt.candidate:
         # The freeze is authoritative: no candidate means nothing can be graded and nothing may be stamped
@@ -1605,9 +1615,11 @@ def freeze_candidate(
     number: int,
     changed: list[str],
     verify_only: bool = False,
+    preexisting: list[str] | None = None,
 ) -> str:
     """Freeze the developer session's work into **one version** and return
-    its SHA.
+    its SHA. ``preexisting`` paths (there before the session, unchanged by it) are left out of the candidate and
+    recorded (F4 / SS-41).
 
     This is what HoH calls *frozen candidate*: from here to end of attempt,
     nothing may modify the tree, and all checks refer to exactly this version.
@@ -1627,7 +1639,7 @@ def freeze_candidate(
     error = ""
     if isolated:
         try:
-            commit_paths(Path(workdir), f"{story.id}: candidate attempt {number}", paths=scope)
+            commit_paths(Path(workdir), f"{story.id}: candidate attempt {number}", paths=scope, exclude=preexisting or None)
         except GitError as e:
             error = str(e)
     sha = head_sha(workdir)
@@ -1640,7 +1652,7 @@ def freeze_candidate(
     giao_dich = journal.read(story.id).attempt_no or number
     journal.record(story.id, JEntry(
         step="changes.detected", attempt=giao_dich,
-        data={"luot": number, "files": changed[:50], "count": len(changed)}))
+        data={"luot": number, "files": changed[:50], "preexisting_excluded": (preexisting or [])[:20], "count": len(changed)}))
     journal.record(story.id, JEntry(
         step="candidate.frozen", attempt=giao_dich,
         data={"luot": number, "sha": sha, "error": error, "verify_only": verify_only}))
@@ -2619,20 +2631,10 @@ def _tree_snapshot(workdir: Path) -> dict[str, bytes | None]:
     changed or untracked (None if too large to hold).  Skips harness-written
     paths (`_bmad-output/`, `.aisef/`): evidence from this session is written
     during the session, counting it is a false positive."""
-    from ..harness.guardrails import HARNESS_OWNED
+    from ..harness.ownership import NOT_A_WRITE, classify, porcelain_entries
     out: dict[str, bytes | None] = {}
-    try:
-        r = subprocess.run(["git", "status", "--porcelain", "-z", "-uall"],
-                           cwd=workdir, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30)
-    except (OSError, subprocess.SubprocessError):
-        return out
-    for item in r.stdout.split("\0"):
-        if len(item) < 4:
-            continue
-        rel = item[3:]
-        if rel.startswith((".aisef/", *[f"{h}/" for h in HARNESS_OWNED])) or rel in HARNESS_OWNED:
-            continue
-        if "/__pycache__/" in rel or rel.endswith(".pyc"):
+    for _, rel in porcelain_entries(workdir):                                # renames yield the real path (SS-35)
+        if classify(rel) in NOT_A_WRITE:                                     # harness, tool artifact, vendor, client (F4)
             continue
         p = Path(workdir) / rel
         try:

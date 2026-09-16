@@ -499,7 +499,12 @@ class TestOverlappingEffectiveScopesDoNotRunTogether(unittest.TestCase):
             # the first story merged: the tree is bootstrapped now
             (root / "conftest.py").write_text("", encoding="utf-8")
             s = st.load(); s.stories["STORY-01-01"].status = "done"; st.save(s)
-            self.assertEqual(next(gen), (1, ["STORY-01-02", "STORY-01-03"]))
+            # F4 (SS-53 / INV-O.1 "non-overlapping EFFECTIVE write scopes"): the two remaining stories are both
+            # granted `pyproject.toml` and the `conftest.py` the first one created — files both may write — so they
+            # do not share a wave either; parallel width is a property of grant overlap (SCALE-QUALIFICATION)
+            self.assertEqual(next(gen), (1, ["STORY-01-02"]))
+            s = st.load(); s.stories["STORY-01-02"].status = "done"; st.save(s)
+            self.assertEqual(next(gen), (1, ["STORY-01-03"]))
             self.assertEqual(list(gen), [])
 
 

@@ -376,7 +376,10 @@ def cmd_verify(args) -> int:
         if not v.allowed:
             problems.append("write scope")
     else:
-        print("  ○ no --write-scope given, skipping scope check")
+        # SS-40 / INV-J.1: without a scope the guard has nothing to guard — UNCONFIGURED, never a pass
+        print("  ⚠ no --write-scope given: the scope check is UNCONFIGURED (pass --write-scope, or --story for the "
+              "story's declared scope); a check that cannot run is not a pass")
+        problems.append("write scope unconfigured")
 
     if args.story:
         evidence = EvidenceStore(_artifact_root(args)).read(args.story)

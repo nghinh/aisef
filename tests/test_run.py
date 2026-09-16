@@ -713,8 +713,21 @@ class TestDoneChiSauMerge(RunTestCase):
         subprocess.run(["git", "add", "-A"], cwd=self.project, check=True)
         subprocess.run(["git", "commit", "-qm", "manifest"], cwd=self.project, check=True)
 
-        r = self.run_sprint(Dung(), only_epic="EPIC-01",
-                            config=self.config(**{"sandbox.use_docker": False}))
+        # F4 (SS-53 / INV-O.1): two stories granted the same manifest no longer share a wave, so the collision this
+        # invariant needs is injected where it really arises — a trunk commit touching `package.json` between the
+        # story's freeze and its merge (an operator, another run) — right before STORY-01-03 merges
+        from unittest import mock
+        from aisef.control.worktree import WorktreeManager
+        goc = WorktreeManager.merge_story
+        def dung_khi_merge(wm, story_id, *a, **kw):
+            if story_id == "STORY-01-03":
+                (self.project / "package.json").write_text('{"name": "trunk-moved"}\n', encoding="utf-8")
+                subprocess.run(["git", "add", "-A"], cwd=self.project, check=True)
+                subprocess.run(["git", "commit", "-qm", "operator edit on trunk"], cwd=self.project, check=True)
+            return goc(wm, story_id, *a, **kw)
+        with mock.patch.object(WorktreeManager, "merge_story", dung_khi_merge):
+            r = self.run_sprint(Dung(), only_epic="EPIC-01",
+                                config=self.config(**{"sandbox.use_docker": False}))
         st = self.state()
         self.assertIn("STORY-01-03", [w for wv in r.waves for w in wv.merge_conflicts])
         self.assertIs(st.stories["STORY-01-03"].state, StoryStatus.VERIFIED)

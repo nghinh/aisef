@@ -61,3 +61,53 @@ unattributed never deleted; PREEXISTING never staged); fault cells FM-M-02, FM-W
 I.3, J.1, K.1, O.1 PROVEN (A.1/A.3/P.1 lose their F4 reds); model: the ownership classes appear as scripted
 workspace events (VERIFIER artifact, nested vendor, pre-existing dirt) and the differential agrees; full suite, ruff,
 Linux + Windows CI.
+
+## 4. Closure record (2026-09-16, branch hardening/systematic-v1) — implementation
+
+- **One classifier** — `aisef/harness/ownership.py`: `Ownership` (HARNESS, VERIFIER, CLIENT_GENERATED, DEVELOPER,
+  PREEXISTING, EXTERNAL_UNATTRIBUTED), `classify(rel, baseline=, session_writes=, scope=)`, `porcelain_entries`
+  (a rename's original path is consumed, never a phantom — SS-35), `NOT_A_WRITE`. Consumers: `changed_files`
+  (SS-35, SS-38 with SS-36's `.coverage`), `_tree_snapshot` → `_revert_reviewer_writes` and `_dirt_outside_scope`
+  (SS-36, SS-39: a nested vendor tree is neither a mutation nor a violation nor deleted; D-034's rule that
+  unattributed dirt is named and never removed stands), `merge_story` (SS-17: only an uncommitted WRITE refuses the
+  merge, named), `commit_paths(exclude=)` + `freeze_candidate(preexisting=)` (SS-41: a path present and byte-identical
+  before and after the session is PREEXISTING, unstaged, recorded in the journal as `preexisting_excluded`).
+- **Scope declared where it was missing** — the developer session declares `AISEF_BASELINE_DIRTY` like planning and
+  mockup (SS-37); the devsecops session carries `DEVSECOPS_SCOPE` in its env and the guard reads it (SS-42); a bare
+  `aisef verify` is UNCONFIGURED and exits non-zero, and the generated CI step passes `--write-scope
+  "$AISEF_WRITE_SCOPE"` from a repository variable, empty failing closed (SS-40).
+- **One tree** — pre-deploy grades the Dockerfile, CI workflow and runbook at HEAD whenever the suite ran on the clean
+  worktree of HEAD (`_tree_file`, `check_runbook(text=, present=)`); an uncommitted file never passes bound to a commit
+  (SS-43).
+- **Scheduler** — waves partition on declared scope + FILE grants (manifests, lockfiles); directory grants do not
+  conflict by themselves (SS-53).
+- **D-011** — an IMPLICIT project must be an AISEF project: `parser.main` records `project_defaulted`;
+  `_artifact_root` raises `ConfigError` and writes nothing when the directory carries no marker (`.ai/config.json`,
+  `docs/requirements.md`, `.aisef/`, `_bmad-output/`) — the framework root carries none, so the recorded leaking call
+  would have been refused. FIXED BY CONSTRUCTION; the register's "not reproducible" note stands and the detector stays.
+
+Members RED → GREEN (markers removed in this commit): SS-17, SS-35, SS-36, SS-37, SS-38, SS-39, SS-40, SS-41, SS-42,
+SS-43, SS-53. New tests: `tests/hardening/test_ownership.py` (classifier positives and negatives, rename, tool/client/
+harness paths, implicit-project refusal, explicit project honoured). Existing tests adapted (each names why): the SS-40
+reproducer's precondition now asserts the CI step carries its scope source.
+
+**Decision recorded — INV-O.1 read literally.** The registry says "stories that run in parallel have non-overlapping
+EFFECTIVE write scopes"; `effective_write_scope` grants existing manifests to every story, so two stories both granted
+`pyproject.toml` do not share a wave (SS-53) even after the bootstrap phase that D-031 (1.7.3) had exempted. The cost is
+parallel width — a Python project whose stories all receive the manifest grant runs them one at a time — and it is now a
+stated property of the scale contract (`docs/SCALE-QUALIFICATION.md`), not a hidden collision handled at merge. The two
+tests that encoded the exemption were adapted, each naming why: the D-031 reunite test expects singleton waves; the G12
+merge-to-done test injects its collision where it really arises (a trunk commit touching the manifest between the
+story's freeze and its merge) instead of relying on two stories sharing a wave.
+
+Other tests adapted to the F4 contracts (each names why): `aisef verify` on a clean tree without a scope is UNCONFIGURED
+and non-zero, with `--write-scope` it passes; the parser leaves an absent `--project` as `None` so `main` can flag an
+implicit project; the trunk-move detection reads the raw commit diff (harness paths included) so a harness-only trunk
+change is still told apart from an agent escaping its worktree; the classifier does not treat the whole of
+`_bmad-output` as harness — an agent editing the PRD while writing code stays visible.
+
+**Final state at closure (this commit)**: differential 400 traces (seeds 0–399) and 2 000 traces (seeds 1000–2999) on the
+extended vocabulary, all matched, 0 unexplained, `KNOWN = {}` (`differential-f4-400.json`, `differential-f4-2000.json`);
+full suite 3 345 passed / 20 skipped / 19 expected-red, every expected-red tagged with a defect id of F5 or F6; ruff clean.
+Frozen defect set {'OPEN': 16, 'FIXED': 56, 'SUPERSEDED': 1} of 73 (D-011 FIXED BY CONSTRUCTION with its disposition
+recorded). Fault matrix {'GREEN': 63, 'RED': 6, 'NEEDS_TEST': 0}. Registry {'PROVEN': 39, 'PARTIAL': 10, 'MISSING': 1}. Linux and Windows CI on this commit are read from the PR checks.

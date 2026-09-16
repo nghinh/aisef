@@ -742,27 +742,18 @@ def changed_files(
     skipped: an agent sneaking edits to the PRD or visual contract while
     writing code must be visible.
     """
-    paths: list[str] = []
-    seen: set[str] = set()
+    from .ownership import NOT_A_WRITE, classify, porcelain_entries
 
-    # `git status` includes untracked files — which `git diff` does not see.
-    for entry in _git_lines(
-        project_root, ["status", "--porcelain", "-z", "--untracked-files=all"]
-    ):
-        if len(entry) > 3:
-            paths.append(entry[3:])
-
-    # `git diff <base>` compares the **working tree** against the fork point,
-    # so it covers both committed and uncommitted work.
+    paths: list[str] = [p for _, p in porcelain_entries(project_root)]     # renames yield the real path (SS-35)
     if base_ref:
         paths += _git_lines(project_root, ["diff", "--name-only", "-z", base_ref])
-
+    seen: set[str] = set()
     out: list[str] = []
     for path in paths:
         if path in seen:
             continue
         seen.add(path)
-        if is_tool_artifact(path):
+        if classify(path) in NOT_A_WRITE:                                    # harness, tool artifact, vendor, client (F4)
             continue
         if any(_within(path, skip) or skip in Path(path).parts for skip in ignore):
             continue

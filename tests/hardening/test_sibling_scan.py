@@ -211,7 +211,7 @@ class TestSS17MergeDirtCheckHonoursOwnership(unittest.TestCase):
     """SS-17 — `merge_story` refuses a passed candidate when raw `git status` is non-empty, including the
     harness's own tool artifacts (`.coverage`) and copied client config. Invariant I."""
 
-    @unittest.expectedFailure   # SS-17
+    # GREEN since F4 (SS-17: one ownership rule for every consumer), 2026-09-16
     def test_a_tool_artifact_in_the_worktree_does_not_block_the_merge_of_the_frozen_candidate(self):
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp); _git(repo, "init", "-q", "-b", "main"); _git(repo, "config", "user.email", "t@t"); _git(repo, "config", "user.name", "t")
@@ -341,7 +341,7 @@ class TestSS35RenamedPathsKeepTheirIdentity(unittest.TestCase):
     staged rename emits the original path as a bare field and becomes a phantom `/…` path outside every
     scope. Invariant I/J."""
 
-    @unittest.expectedFailure   # SS-35
+    # GREEN since F4 (SS-35: one ownership rule for every consumer), 2026-09-16
     def test_a_staged_rename_yields_real_paths_only(self):
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp); _git(repo, "init", "-q"); _git(repo, "config", "user.email", "t@t"); _git(repo, "config", "user.name", "t")
@@ -365,7 +365,7 @@ class TestSS36ToolArtifactsAreNotReviewerWrites(ImplementTestCase):
     the suite (allowed, expected) and leaves `.coverage` is scored as having modified the tree: review
     discarded, REVIEW_UNRUNNABLE after the retry budget. Invariant I."""
 
-    @unittest.expectedFailure   # SS-36
+    # GREEN since F4 (SS-36: one ownership rule for every consumer), 2026-09-16
     def test_a_reviewer_that_only_ran_the_tests_is_not_a_tree_mutation(self):
         subprocess.run(["git", "config", "user.email", "t@t"], cwd=self.project, check=True)
         subprocess.run(["git", "config", "user.name", "t"], cwd=self.project, check=True)
@@ -380,7 +380,7 @@ class TestSS39VendorPathsShareOneOwnershipRule(HygieneCase):
     `_tree_snapshot`/`_dirt_outside_scope` skip them only at the root. A nested `node_modules` the session
     installed is recorded as a violation and DELETED by retry hygiene. Invariant I/K (two rules, one truth)."""
 
-    @unittest.expectedFailure   # SS-39
+    # GREEN since F4 (SS-39: one ownership rule for every consumer), 2026-09-16
     def test_a_nested_vendor_directory_is_neither_a_violation_nor_deleted(self):
         def first(work):
             ledgerlock_pattern(work)
