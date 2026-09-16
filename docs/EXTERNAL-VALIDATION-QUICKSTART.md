@@ -39,7 +39,7 @@ manual, if you want it, is [`USAGE-GUIDE.md`](USAGE-GUIDE.md).
 Every output below was produced on macOS with Python 3.14.7 and `aisef` from
 PyPI. Yours should match in shape; version and paths will differ.
 
-Steps 1, 2, 4, 5 and 7 were **re-run and re-verified on 1.7.5** on
+Steps 1, 2, 4, 5 and 7 were **re-run and re-verified on 1.7.6** on
 2026-09-15, from the public PyPI package in a fresh venv, and behave exactly as
 written. Step 8's `aisef setup` count below was measured on 1.7.2 the same day;
 the skills come from the references source `aisef setup` fetches, not from the
@@ -53,9 +53,9 @@ source ~/.venvs/aisef/bin/activate
 pip install aisef
 ```
 
-Expect: `Successfully installed aisef-1.7.5`, and no other package pulled in —
+Expect: `Successfully installed aisef-1.7.6`, and no other package pulled in —
 AISEF has no dependencies outside the standard library. (Verified 2026-09-15:
-`pip list` in that venv shows exactly `aisef==1.7.5` and nothing else.)
+`pip list` in that venv shows exactly `aisef==1.7.6` and nothing else.)
 
 If pip claims the version does not exist, add `--no-cache-dir`: a stale index
 cache can hide a freshly published release.
@@ -63,7 +63,7 @@ cache can hide a freshly published release.
 **2. Confirm what you got.**
 
 ```bash
-aisef --version        # → aisef 1.7.5
+aisef --version        # → aisef 1.7.6
 which aisef            # → …/.venvs/aisef/bin/aisef
 ```
 
