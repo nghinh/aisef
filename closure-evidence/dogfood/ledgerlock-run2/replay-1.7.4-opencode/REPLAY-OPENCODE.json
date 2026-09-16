@@ -176,6 +176,38 @@
    "review consumed a diff that included cosmetic out-of-scope files the story did not intend"
   ],
   "recorded": "2026-09-16T05:07:25+00:00",
-  "status": "REPORTED TO OWNER — STOP; no AISEF change, no max_turns change, no release"
+  "status": "FIXED in aisef 1.7.6 (D-034, tag v1.7.6 = 939f2ab; tests/test_retry_hygiene.py 9 red on 1.7.5 → 13 green)"
+ },
+ "phase7_176": {
+  "command": "aisef run --client opencode (public aisef 1.7.6 in the replay venv, run.max_turns=80, 9router/mycombo); resume from STORY-04-01",
+  "start": "2026-09-16T07:27:51Z",
+  "master": "a4e3dc4",
+  "log": "phase7-run-176.log",
+  "preserved_state_note": "the 1.7.5 run had already removed the STORY-04-01 worktree when the story failed (run.py: commit_story + remove), keeping only branch story/STORY-04-01 = de2d3244 (in-scope files only). The resume therefore opened a FRESH, clean worktree: no out-of-scope dirt existed, so the D-034 recovery had nothing to restore and no retry:recovery event was recorded. The dirty-tree scenario itself is reproduced by tests/test_retry_hygiene.py (deterministic, no OpenCode).",
+  "baseline": "REUSED seq=718 root=a4e3dc4d (D-033 behaviour, epoch unchanged)",
+  "attempt1": "80 turns, guard_blocked=false, 0 writes, tree untouched (ran pytest: 101/101 green; bandit unrunnable in the image, exit 127 — Finding B, backlog) → max_turns, nothing to grade",
+  "attempt2": "NO-OP 25 turns, 0 files written — developer: 'No code changes needed — attempt 1 already satisfies all ACs' (4 AC tests pass, 101/101, lint clean, in-scope only)",
+  "attempt3": "NO-OP 53 turns, 0 files written — same conclusion → 'BLOCKED 2 no-op sessions in a row'",
+  "end": "sprint stopped EPIC-04 · wave 1; STORY-04-01 failed, attempts=7 cumulative; 10/16 done; master a4e3dc4; no process alive",
+  "recorded": "2026-09-16T07:45:47+00:00"
+ },
+ "OBS-OC-4": {
+  "title": "a complete frozen candidate is never re-graded after retry hygiene: the no-op rule cites a verdict whose only cause (out-of-scope dirt) no longer exists",
+  "severity_proposed": "P1 (D-032 rule: a correct candidate cannot complete without operator intervention — `aisef run --verify-only` would grade it)",
+  "where": "STORY-04-01 phase 7 on aisef 1.7.6; candidate de2d3244",
+  "mechanism": [
+   "phase 6 gate:verdict on de2d3244 (seq 1021): failures = write scope (stale formatter dirt on ledger.py/store.py) + review; the reviewer's STRUCTURED verdict (reviews/STORY-04-01-review-1.md) has exactly one finding: block ledgerlock/ledger.py:82 'modified outside write_scope (reformatting + trailing newlines)' — i.e. the same dirt; no code finding",
+   "phase 7 opens a clean worktree at de2d3244 (D-034 semantics / fresh worktree): write scope would now pass — git diff a4e3dc4..de2d3244 touches only ledgerlock/cli.py and tests/test_cli_exit_codes.py, both in scope",
+   "the developer correctly writes nothing (work already done) → run_attempt NO-OP shortcut: `head_sha(workdir) in cham_roi` (the SHA already has a gate:verdict) → 'Re-running it would return the verdict it already returned' → after two no-ops the story is BLOCKED",
+   "that sentence is false here: the verdict depended on tree dirt the harness has since removed, not on the candidate SHA; the correct move is to re-grade (verify) the frozen candidate on the clean tree"
+  ],
+  "reproduction_deterministic": "tests/test_retry_hygiene.py fixture with Developer(then=None) (attempt 1 = LedgerLock pattern; the retry developer changes nothing): retry:recovery ok=True restores ledger.py/store.py, attempt 2 sees a clean tree and an allowing guard, yet no gate verdict after attempt 1 exists, done=False, blocked_reason '2 sessions in a row ran clean and wrote nothing … would return the verdict it already returned' — see repro-noop-after-hygiene.txt",
+  "fix_proposed_not_implemented": "in run_attempt's no-op branch (or right after recover_out_of_scope restored something): when HEAD's last gate:verdict failed only on `write scope` (or its review findings are all scope-related) and the tree is now clean of out-of-scope changes, re-verify the frozen candidate (verify_candidate on HEAD, as --verify-only does) instead of declaring a no-op; regression RED-before = the reproduction above expecting done=True",
+  "not_the_cause": [
+   "route/model: guard_blocked=false, developers reasoned correctly and stated why they wrote nothing",
+   "D-034 recovery: worked in the deterministic reproduction; on the real replay it had nothing to do (worktree recreated clean)"
+  ],
+  "status": "REPORTED TO OWNER — STOP; no AISEF change; --verify-only NOT run (owner decision)",
+  "recorded": "2026-09-16T07:45:47+00:00"
  }
 }

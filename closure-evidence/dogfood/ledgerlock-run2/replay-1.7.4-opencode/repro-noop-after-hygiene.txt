@@ -1,0 +1,11 @@
+----------------------------------------------------------------------
+Ran 1 test in 1.105s
+
+OK
+developer sessions: 3
+tree seen by attempt 2: status= '' guard_allowed= True
+retry:recovery events: [(['ledgerlock/ledger.py', 'ledgerlock/store.py'], True)]
+gate verdicts (attempt → failures): [(1, ['write scope'])]
+candidate graded after hygiene? False
+done: False
+blocked_reason: 2 sessions in a row ran clean and wrote nothing: the session wrote nothing (0 turns) — the tree is exactly as the session found it, so the gate has nothing to grade. Re-running it would return the verdict it already returned. Re-opening with the same context r
