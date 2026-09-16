@@ -1,17 +1,17 @@
 {
   "ci": {
-    "commit": "9dcd402d9e922ba4d5541f9f4cb85078b902168c",
+    "commit": "23116245e43348513620168387fc40f9ca27d77d",
     "conclusion": "success",
-    "tag": "v1.7.4",
+    "tag": "v1.7.5",
     "workflow": "tests"
   },
   "package": {
     "artifacts": [
-      "aisef-1.7.4-py3-none-any.whl",
-      "aisef-1.7.4.tar.gz"
+      "aisef-1.7.5-py3-none-any.whl",
+      "aisef-1.7.5.tar.gz"
     ],
     "build_exit": 0,
-    "commit": "cc9399ee97c3ea965b485c45476f7191e451a0f4",
+    "commit": "b1b670f7846b04ee912b25f90f1aec46d4fc8409",
     "interpreter": "/Users/nghinh/Downloads/projects/ai-sdlc/.venv/bin/python",
     "twine_exit": 0
   },
@@ -24,9 +24,9 @@
   },
   "pypi_install": {
     "install_exit": 0,
-    "version": "1.7.4",
-    "version_reported": "1.7.4"
+    "version": "1.7.5",
+    "version_reported": "1.7.5"
   },
-  "tag": "v1.7.4",
-  "version": "1.7.4"
+  "tag": "v1.7.5",
+  "version": "1.7.5"
 }

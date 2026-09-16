@@ -1,0 +1,39 @@
+== install from public PyPI
+Successfully installed aisef-1.7.5
+== version
+aisef 1.7.5
+== pip list (must be aisef only)
+aisef==1.7.5
+== module path
+<scratch>/qual-1.7.5/venv/lib/python3.14/site-packages/aisef/__init__.py
+== download artifacts and hash
+f69739007e67224049c65b09ffdfa79e83c1b90ee961ac7aa28f97563ef3007a  dl/aisef-1.7.5-py3-none-any.whl
+23300c372961a7aed3ab50c9eed72eb2ed2ada4837359058ef646d0b55ed7809  dl/aisef-1.7.5.tar.gz
+== doctor on a fresh python project (preset image, declared-tool probes)
+stack: python — test/lint/sandbox configured
+  ○ `sandbox.image` = `aisef-verify-python:b2c7afff2aed` — built by the harness on the first `aisef doctor` or tool run (pinned base + pinned pytest/ruff)
+  ✅ sandbox image — aisef-verify-python:b2c7afff2aed — built by the harness: pinned base, pinned tool versions
+  ✅ tool tools.test — `tools.test` = `python3 -m pytest -v` — present in aisef-verify-python:b2c7afff2aed
+  ✅ tool tools.lint — `tools.lint` = `ruff check . --exclude .claude --exclude .aisef --exclude .opencode` — present in aisef-verify-python:b2c7afff2aed
+✅ ready
+== tool test through the declared sandbox
+
+============================== 1 passed in 0.01s ===============================
+== pytest and ruff inside the declared image (direct probe)
+OK   pytest 9.1.1 | image aisef-verify-python:b2c7afff2aed sha256:e456ae8a7c72
+OK   ruff 0.16.7 | image aisef-verify-python:b2c7afff2aed sha256:e456ae8a7c72
+== dogfood regression suite against the PUBLIC package
+aisef imported from <scratch>/qual-1.7.5/venv/lib/python3.14/site-packages/aisef/__init__.py
+-- 1.7.3 dogfood regressions (D-025…D-031)
+Ran 30 tests in 2.943s
+
+OK
+-- 1.7.4 D-032 regressions (red on 1.7.3)
+Ran 12 tests in 4.433s
+
+OK
+-- 1.7.5 D-033 regressions (red on 1.7.4)
+Ran 14 tests in 1.142s
+
+OK
+qualification exit 0

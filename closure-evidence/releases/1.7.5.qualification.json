@@ -1,0 +1,77 @@
+{
+ "version": "1.7.5",
+ "tag": "v1.7.5",
+ "release_source_sha": "23116245e43348513620168387fc40f9ca27d77d",
+ "product_digest": {
+  "2311624": "5a313582920d823614b605c8e3e764bb45d823b1f2c9dade59e1852fa2e926e2",
+  "rule": "aisef.control.planes.identity over PRODUCT_AFFECTING paths (docs/closure-gate.json#planes), 111 files, [] unresolved"
+ },
+ "rejected_candidates": [],
+ "ci": {
+  "run_id": "35047338646",
+  "event": "pull_request (PR #4, release/1.7.5 -> master)",
+  "head_sha": "23116245e43348513620168387fc40f9ca27d77d",
+  "jobs": {
+   "wheel": "success",
+   "unit (ubuntu-latest, 3.11)": "success",
+   "lint": "success",
+   "unit (ubuntu-latest, 3.14)": "success",
+   "unit (windows-latest, 3.11)": "success — Ran 3177 tests in 1158.202s, OK (skipped=84)",
+   "unit (ubuntu-latest, 3.13)": "success",
+   "unit (ubuntu-latest, 3.12)": "success"
+  }
+ },
+ "windows_regression": {
+  "job": "unit (windows-latest, 3.11)",
+  "result": "green",
+  "tests_collected": 3177,
+  "note": "3163 on 1.7.4: the difference is the D-033 regression file tests/test_baseline_provenance.py (14 tests, 10 red on master before the fix) and no other collection change — verified by git diff v1.7.4..<tag> -- tests/"
+ },
+ "full_suite_local": {
+  "commit": "2311624",
+  "command": "python3 -m pytest tests/ -q",
+  "result": "3161 passed, 19 skipped, 1413 subtests passed",
+  "ruff": "All checks passed"
+ },
+ "d033_regression": {
+  "file": "tests/test_baseline_provenance.py",
+  "red_before_on_master": "10 failed, 4 controls passed — measured on a pre-fix master worktree with the final test file",
+  "green_after": "14 passed",
+  "adapted_expectations": []
+ },
+ "dogfood_suite": {
+  "file": "tests/test_dogfood_ledgerlock.py",
+  "result": "30 passed"
+ },
+ "verification_image": {
+  "name": "aisef-verify-python:b2c7afff2aed",
+  "image_id": "sha256:e456ae8a7c729d1e02567995b138d485a4859a9cd878ea53c5b41ebacb4222c4",
+  "note": "unchanged since 1.7.3 (no PRODUCT change touches aisef/harness/verify_image.py)"
+ },
+ "public_package_qualification": {
+  "installed_from": "public PyPI, fresh venv outside the checkout (pip install --no-cache-dir aisef==1.7.5)",
+  "version_reported": "aisef 1.7.5",
+  "module_path": "<venv>/lib/python3.14/site-packages/aisef/__init__.py",
+  "artifact_digests_match_pypi": true,
+  "doctor": "✅ ready — both declared tools present in aisef-verify-python:b2c7afff2aed (pytest 9.1.1, ruff 0.16.7 probed in the image; image_id sha256:e456ae8a7c72…)",
+  "tool_test_in_sandbox": "1 passed",
+  "dogfood_suite_against_installed_package": "Ran 30 tests in 2.943s",
+  "d032_regression_against_installed_package": "Ran 12 tests in 4.433s",
+  "log": "closure-evidence/releases/1.7.5.qualification.log (verbatim output of the fresh-venv qualification script)"
+ },
+ "recorded_at": "2026-09-16T03:01:24+00:00",
+ "ci_master_push": {
+  "run_id": "35048648476",
+  "event": "push (master fast-forwarded to the 1.7.5 release source)",
+  "jobs": {
+   "unit (ubuntu-latest, 3.12)": "success",
+   "unit (ubuntu-latest, 3.11)": "success",
+   "lint": "success",
+   "unit (windows-latest, 3.11)": "success — Ran 3177 tests in 1224.113s, OK (skipped=84)",
+   "unit (ubuntu-latest, 3.14)": "success",
+   "unit (ubuntu-latest, 3.13)": "success",
+   "wheel": "success"
+  },
+  "note": "first attempt: unit (ubuntu-latest, 3.12) failed in TemporaryDirectory cleanup of tests/test_bench_qualification.py (D-024, third occurrence, test infrastructure, not product); the failed job was re-run and is green; every other job green on the first attempt; the pull_request run of the same commit was green 7/7 on the first attempt"
+ }
+}

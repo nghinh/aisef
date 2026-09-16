@@ -55,10 +55,20 @@
    "sha": "9dcd402d9e922ba4d5541f9f4cb85078b902168c",
    "tag": "v1.7.4",
    "version": "1.7.4",
-   "status": "FINAL CLOSURE TARGET",
+   "status": "RELEASED -- SUPERSEDED AS CLOSURE TARGET BY 1.7.5 (D-033)",
    "why": "the D-032 correction (LedgerLock Run #2 on public 1.7.3, 2026-09-15): a review that did not execute is REVIEW_UNRUNNABLE — the frozen candidate is kept, only the review stage is retried on the same SHA (bounded), a persistent failure ends the story REVIEW_UNRUNNABLE naming the failure, prior review evidence is reused only with a completed verdict, and a resumed story picks up at the review stage; never a developer no-op. Remote CI run 34994305762 (pull_request, PR #3) green on exactly this commit across Ubuntu 3.11-3.14, Windows 3.11 (success — Ran 3163 tests in 1225.771s, OK (skipped=84)), lint and wheel. Nothing else changed in the product plane (narrow patch, owner scope).",
    "ci_run": "34994305762",
    "ci_head_sha": "9dcd402d9e922ba4d5541f9f4cb85078b902168c",
+   "rejected_candidate": null
+  },
+  {
+   "sha": "23116245e43348513620168387fc40f9ca27d77d",
+   "tag": "v1.7.5",
+   "version": "1.7.5",
+   "status": "FINAL CLOSURE TARGET",
+   "why": "the D-033 correction (clean OpenCode replay of LedgerLock Run #2 on public 1.7.4, 2026-09-16): a story's regression baseline is immutable within its epoch — captured once at the integrated parent, reused on retry/resume/verify-only, never the story's own candidate; absent or provenance-invalid baseline fails closed as BASELINE_UNAVAILABLE. Remote CI run 35047338646 (pull_request, PR #4) green on exactly this commit across Ubuntu 3.11-3.14, Windows 3.11 (success — Ran 3177 tests in 1158.202s, OK (skipped=84)), lint and wheel. Nothing else changed in the product plane (narrow patch, owner scope).",
+   "ci_run": "35047338646",
+   "ci_head_sha": "23116245e43348513620168387fc40f9ca27d77d",
    "rejected_candidate": null
   }
  ],
