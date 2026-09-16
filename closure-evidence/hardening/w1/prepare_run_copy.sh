@@ -9,10 +9,11 @@ P=~/Downloads/projects; REF=$P/ledgerlock-aiseftest-run2; DST=$P/w1-run-$n
 [ -d "$DST" ] && { echo "REFUSED: $DST exists"; exit 1; }
 git clone -q --no-hardlinks "$REF" "$DST"
 cd "$DST"
+git config user.name "AISEF W1 operator"; git config user.email "w1-operator@aisef.local"     # the same local identity as w1-run-1 (a fresh clone has none)
 git checkout -q -B master 8ff9f13
 git remote remove origin
 git fetch -q "$P/w1-run-1" master          # brings the objects; fd4c644 (the cost-cap commit) is then cherry-picked by SHA
-git cherry-pick -q --no-edit fd4c644
+git cherry-pick --no-edit fd4c644 >/dev/null
 cap=$(python3 -c "import json; print(json.load(open('.ai/config.json')).get('run.cost_cap_usd'))")
 [ "$cap" = "80.0" ] || { echo "REFUSED: cost cap not applied (run.cost_cap_usd=$cap)"; exit 1; }
 git for-each-ref --format='%(refname)' | grep -v '^refs/heads/master$' | while read r; do git update-ref -d "$r"; done
