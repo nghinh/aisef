@@ -218,9 +218,11 @@ def exit_status_of(res: RunResult) -> str:
         return "ok"
     raw = res.raw_result or {}
     err = (res.error or "").lower()
+    # the provider's structured fields and the adapter's error only — never `raw["result"]`, the agent's own final
+    # text (SS-28 / INV-F.4: a story about 401 handling is not a credential rejection)
     why = " ".join(
-        [str(raw.get(k) or "") for k in ("subtype", "terminal_reason", "stop_reason")]
-        + [str(raw.get("result") or "")[:300], err]
+        [str(raw.get(k) or "") for k in ("subtype", "terminal_reason", "stop_reason", "api_error_type", "api_error_message")]
+        + [err]
     ).lower()
     if "max_turns" in why:
         return "max_turns"
@@ -393,16 +395,29 @@ def parse_stream(lines: Iterable[str]) -> RunResult:
                 )
 
             if ev.get("is_error") or ev.get("api_error_status"):
-                # Order is intentional.  ``subtype`` is still "success" even
-                # when ``is_error`` is true, so extracting it would yield an
-                # error message of "success" — meaningless to the reader and
-                # to retry logic.
-                res.error = str(
-                    ev.get("api_error_status")
-                    or ev.get("terminal_reason")
-                    or (ev.get("result") or "").strip()[:200]
-                    or "unknown error"
-                )
+                # The PROVIDER's error is structured: Claude Code prints it as `API Error: <status> {json}` — status,
+                # `error.type` and `error.message` are recorded as fields. Anything else in `result` on an error is
+                # the agent's final text and classifies nothing (SS-28 / INV-F.4).
+                txt = (ev.get("result") or "").strip()
+                m = re.match(r"API Error:\s*(\d{3})\b\s*(.*)$", txt, re.S)
+                if m:                                                   # the provider's error, prefixed by the CLI
+                    ev.setdefault("api_error_status", int(m.group(1)))
+                    rest = (m.group(2) or "").strip()
+                    body: dict = {}
+                    if rest.startswith("{"):
+                        try:
+                            body = json.loads(rest)
+                        except ValueError:
+                            body = {}
+                    inner = body.get("error") if isinstance(body, dict) and isinstance(body.get("error"), dict) else {}
+                    ev["api_error_type"] = str(inner.get("type") or "")
+                    ev["api_error_message"] = str(inner.get("message") or rest)[:300]
+                    res.error = f"{m.group(1)} {ev['api_error_type']}: {ev['api_error_message']}".replace(" :", ":").strip(": ")
+                elif txt and txt not in assistant_text:                 # the CLI's own message: no assistant turn said it
+                    ev["api_error_message"] = txt[:300]
+                    res.error = str(ev.get("api_error_status") or ev.get("terminal_reason") or txt[:200])
+                else:                                                   # the agent's final text repeated on error: not a status
+                    res.error = str(ev.get("api_error_status") or ev.get("terminal_reason") or "unknown error")
 
     res.texts = assistant_text
     if not res.text and assistant_text:

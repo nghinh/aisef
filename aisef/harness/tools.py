@@ -359,7 +359,7 @@ def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error:
         return ""
     if name == "test":
         from .testlog import parse as parse_testlog
-        if parse_testlog(output).passed:
+        if parse_testlog(output).test_ids:      # any named test — passed OR failed — proves the runner ran (SS-23)
             return ""
     if hit == "no such file or directory" and any(m in low for m in MANIFESTS):
         return NO_MANIFEST

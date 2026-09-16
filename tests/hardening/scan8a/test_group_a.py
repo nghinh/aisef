@@ -165,7 +165,7 @@ class TestSS29ResolvedIsAStatusNotASubstring(unittest.TestCase):
     """SS-29 — G6.3 (closure.py ~1598) closes a finding when any RESOLVED marker is a substring of its
     status cell; `unresolved`, `not resolved`, `will be fixed` all contain one. INV-R.2/F.2."""
 
-    @unittest.expectedFailure   # SS-29 — observed: status "unresolved" → PASSED "no unresolved P0/P1 in 1 findings"
+    # GREEN since F3 (SS-29: prose has no authority over control state), 2026-09-16
     def test_an_open_p1_blocker_worded_unresolved_does_not_pass_g6_3(self):
         fx = TC.TestG6("test_an_unresolved_p0_blocker_fails")
         fx.setUp()
@@ -182,7 +182,7 @@ class TestSS31NoSurfaceIsAnchoredToTheStatement(unittest.TestCase):
     of ~15 keywords (`API`, `service`, …). mockup.py:192 consults `headless` exactly when the document has
     no screen table — the case where the prose is the only source. INV-F.2."""
 
-    @unittest.expectedFailure   # SS-31 — observed: headless=True for "Screens: none of the legacy screens … three screens … billing API"
+    # GREEN since F3 (SS-31: prose has no authority over control state), 2026-09-16
     def test_a_line_that_announces_screens_is_not_headless(self):
         self.assertTrue(parse_experience("**Screens:** none — no graphical surface (CLI)\n").headless)
         prose = ("Screens: none of the legacy screens are kept; the new dashboard has three screens, "
@@ -202,7 +202,7 @@ class TestSS32DeadlockDiagnosisReadsDataNotProse(unittest.TestCase):
         return [I.Attempt(number=n, candidate=C1,
                           gate=gate.StoryGate(SID, [Check("tests verify story", False, detail)])) for n in (1, 2)]
 
-    @unittest.expectedFailure   # SS-32 — observed: nop_deadlock returned "" once the sentence no longer contained "still green without story code"
+    # GREEN since F3 (SS-32: prose has no authority over control state), 2026-09-16
     def test_rewording_the_gate_sentence_does_not_silence_the_diagnosis(self):
         produced = f"tests verify nothing — still green without story code (parent SHA abc1234): {self.IDS}"
         self.assertIn("AC-STORY-01-01-1", I.nop_deadlock(self._attempts(produced)))   # today's wording: diagnosed

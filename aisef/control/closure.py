@@ -101,6 +101,16 @@ NOISE_MARKERS = ("inconclusive", "không kết luận", "chưa kết luận", "n
 RESOLVED = ("resolved", "fixed", "closed", "waived", "đã sửa", "đã xử lý")
 
 
+def _is_resolved(status: str) -> bool:
+    """The status CELL is a status token: `resolved`, `fixed (1.7.7)`, `closed — see #12`. `unresolved`, `not resolved`
+    and `will be fixed` are open (SS-29 / INV-R.2: a substring is not a status)."""
+    s = status.strip().lower()
+    if not s:
+        return False
+    first = re.split(r"[\s(\[—–:;,.]+", s, maxsplit=1)[0]
+    return first in RESOLVED or any(s.startswith(m) for m in RESOLVED if " " in m)
+
+
 # --------------------------------------------------------------- plumbing
 
 
@@ -1595,7 +1605,7 @@ def probe_onboarding_blockers(ctx: Ctx) -> Probed:
         if sev not in blocking:
             continue
         status = _cell(head, row, "status").strip().lower()
-        if not any(done in status for done in RESOLVED):
+        if not _is_resolved(status):
             open_.append(f"{sev} {row[0][:40]} ({status or 'no status'})")
     if open_:
         return Probed(Outcome.FAILED, f"{len(open_)} unresolved: {'; '.join(open_[:4])}")

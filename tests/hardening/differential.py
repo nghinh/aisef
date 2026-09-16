@@ -46,7 +46,7 @@ DEV = [("CHANGED", 30), ("CHANGED_RED", 8), ("NOOP", 8), ("TIMEOUT", 4), ("CRASH
        ("CONTEXT", 3), ("AUTH", 2), ("SCOPE_VIOLATION", 6), ("TRUNK_COMMIT", 1), ("ZERO_OUTPUT", 2),
        ("MAX_TURNS_WORK", 3), ("MAX_TURNS_UNTOUCHED", 3), ("BUDGET", 2)]
 REV = [("PASS", 30), ("BLOCK", 7), ("BLOCK_OUTSIDE", 4), ("STUCK", 2), ("MALFORMED", 4), ("UNRUNNABLE", 5), ("MUTATE", 2),
-       ("COMMIT", 2), ("BUDGET", 1)]
+       ("COMMIT", 2), ("BUDGET", 1), ("BLOCK_UNBOUND", 2)]
 SEC = [("PASS", 30), ("BLOCK", 6), ("UNRUNNABLE", 4), ("MALFORMED", 3), ("BUDGET", 1)]
 
 DEV_EVENT = {"CHANGED": "DEVELOP_CHANGED", "CHANGED_RED": "DEVELOP_CHANGED", "NOOP": "DEVELOP_NOOP",
@@ -55,7 +55,7 @@ DEV_EVENT = {"CHANGED": "DEVELOP_CHANGED", "CHANGED_RED": "DEVELOP_CHANGED", "NO
              "TRUNK_COMMIT": "DEVELOP_TRUNK_COMMIT", "ZERO_OUTPUT": "DEVELOP_ZERO_OUTPUT",
              "MAX_TURNS_WORK": "DEVELOP_MAX_TURNS_WORK", "MAX_TURNS_UNTOUCHED": "DEVELOP_MAX_TURNS_UNTOUCHED",
              "BUDGET": "DEVELOP_BUDGET"}
-REV_EVENT = {"PASS": "REVIEW_PASS", "BLOCK": "REVIEW_BLOCK", "BLOCK_OUTSIDE": "REVIEW_BLOCK_OUTSIDE", "STUCK": "REVIEW_STUCK", "MALFORMED": "REVIEW_MALFORMED",
+REV_EVENT = {"PASS": "REVIEW_PASS", "BLOCK": "REVIEW_BLOCK", "BLOCK_OUTSIDE": "REVIEW_BLOCK_OUTSIDE", "STUCK": "REVIEW_STUCK", "MALFORMED": "REVIEW_MALFORMED", "BLOCK_UNBOUND": "REVIEW_BLOCK_UNBOUND",
              "UNRUNNABLE": "REVIEW_UNRUNNABLE", "MUTATE": "REVIEW_MUTATE", "COMMIT": "REVIEW_MUTATE", "BUDGET": "REVIEW_BUDGET"}
 SEC_EVENT = {"PASS": "SECURITY_PASS", "BLOCK": "SECURITY_BLOCK", "UNRUNNABLE": "SECURITY_UNRUNNABLE",
              "MALFORMED": "SECURITY_MALFORMED", "BUDGET": "SECURITY_BUDGET"}
@@ -187,7 +187,7 @@ def model_run(sc: Scenario, max_steps: int = 80) -> Observation:
                 ev = "TEST_UNRUNNABLE" if sc.test_tool_missing else ("TEST_FAIL" if tree_red else "TEST_PASS")
             elif s.stage == M.REVIEW:
                 kind = rev.next()
-                ev = REV_EVENT[rev.next() if kind == "MALFORMED" else kind]     # the schema retry consumes the next step
+                ev = REV_EVENT[rev.next() if kind in ("MALFORMED", "BLOCK_UNBOUND") else kind]   # the retry consumes the next step
             elif s.stage == M.SECURITY:
                 kind = sec.next()
                 ev = SEC_EVENT[sec.next() if kind == "MALFORMED" else kind]

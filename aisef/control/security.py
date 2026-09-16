@@ -31,6 +31,7 @@ _LINE = re.compile(
 #: Categories dropped entirely from the report. Borrowed from
 #: `claude-code-security-review`: these are almost always noise on a
 #: story-sized diff, and a noisy report goes unread.
+NOISE_FLOOR = ("critical", "high")   # findings at these severities are never filtered by wording (SS-27)
 NOISE = (
     ("từ chối dịch vụ", "denial of service", "dos ", "cạn bộ nhớ",
      "cạn cpu", "resource exhaustion"),
@@ -115,7 +116,8 @@ def parse(text: str) -> SecurityReport:
         if not m:
             continue
         f = Finding(m.group("sev").lower(), m.group("body").strip())
-        (rep.filtered if is_noise(f.text) else rep.findings).append(f)
+        # SS-27 / INV-F.2: wording never removes a blocking-severity finding — the noise filter has a severity floor
+        (rep.filtered if is_noise(f.text) and f.severity not in NOISE_FLOOR else rep.findings).append(f)
 
     rep.findings.sort(key=lambda f: -f.rank)
     if not rep.findings and not rep.filtered:

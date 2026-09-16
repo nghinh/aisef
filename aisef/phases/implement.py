@@ -1480,13 +1480,18 @@ def _vang_ma_cua_story(res, changed: list[str]) -> str:
     ra = res.output()[0].lower().replace("\\", "/")
     if not any(m in ra for m in NO_DEPENDENCIES):
         return ""
+    # SS-26 / INV-F.3: the missing module is the NAME the exception names, not a substring of the traceback — a
+    # third-party import failing while the story's file loads is still an environment failure
+    import re as _re
+    missing = {n.strip("./").rstrip("/").replace(".", "/").lower()
+               for n in _re.findall(r"(?:cannot find (?:module|package)|no module named)\s*['\"]([^'\"]+)['\"]", ra)}
     for f in changed:
         if is_test_path(f):
             continue
         goc = PurePosixPath(f).with_suffix("").as_posix().lower()
         if len(goc) < 3:
             continue
-        if goc in ra or goc.replace("/", ".") in ra:
+        if any(n == goc or goc.endswith("/" + n) or n.endswith("/" + goc) for n in missing if len(n) >= 3):
             return f
     return ""
 
@@ -1777,10 +1782,15 @@ def _with_schema(client: ClientAdapter, spec, result, *, store: EvidenceStore,
     tree) so the caller reports that, never "answered in prose twice" (SS-12/F2).
     """
     verdict = review_verdict(result.text)
-    if verdict is not None:
+    if verdict is not None and (role != "review" or verdict.verdict == "pass" or verdict.bound_blocking()):
         return result.text, verdict, ""
+    reminder = SCHEMA_REMINDER
+    if verdict is not None:                                    # a verdict whose blockers bind to nothing (F3 / D-002)
+        store.record(story_id, Event(kind=NOTE, name=f"{role}:unbound", ok=False,
+                                     detail={"verdict": verdict.verdict, "findings": verdict.unbound(), "retried": True}))
+        reminder = BINDING_REMINDER
     lai, reverted = _review_session(
-        client, replace(spec, prompt=spec.prompt + SCHEMA_REMINDER), store=store,
+        client, replace(spec, prompt=spec.prompt + reminder), store=store,
         story_id=story_id, artifact_root=artifact_root, workdir=workdir,
         name=f"{story_id}-{role}-retry", role=f"{role}-retry", number=number,
     )
@@ -1807,7 +1817,14 @@ def _with_schema(client: ClientAdapter, spec, result, *, store: EvidenceStore,
     if not lai.ok:
         return result.text, None, f"could not run the schema retry: {lai.error}"
     verdict = review_verdict(lai.text)
-    return (lai.text, verdict, "") if verdict is not None else (result.text, None, "")
+    if verdict is None:
+        return result.text, None, ""
+    if role == "review" and verdict.verdict != "pass" and not verdict.bound_blocking():
+        store.record(story_id, Event(kind=NOTE, name=f"{role}:unbound", ok=False,
+                                     detail={"verdict": verdict.verdict, "findings": verdict.unbound(), "retried": False}))
+        return lai.text, None, ("the reviewer's blockers bind to no file, behaviour or criterion — twice; a blocker "
+                                "must name what it blocks (INV-F.2)")
+    return lai.text, verdict, ""
 
 
 def review_story_v2(
@@ -1970,35 +1987,30 @@ def review_story_v2(
 
 def _reconcile(story_id: str, ev: EvidenceStore, text: str,
                verdict: Verdict | None, *, role: str) -> list[str]:
-    """Reconcile machine-readable with human-readable version, record evidence,
-    return the **union**."""
+    """The reviewer's blockers are the STRUCTURED verdict's (F3 / INV-F.2). Prose `[block]` lines are diagnostic:
+    compared with the JSON, recorded as `<role>:mismatch` when they diverge, shown to the developer — never scored
+    (SS-24). Without a verdict nothing blocks from prose (F2 makes that execution UNRUNNABLE)."""
     tu_van_ban = blocking_findings(text)
     if verdict is None:
-        # Both attempts lack schema: use text as before R8, and note the
-        # fallback -- silence means nobody knows to fix the prompt next time.
         ev.record(story_id, Event(kind=NOTE, name=f"{role}:no-schema", ok=False,
                                   detail={"findings": tu_van_ban, "retried": True}))
-        return tu_van_ban
-    ha_cap = _no_escalation(story_id, ev, verdict, role=role)
-    if ha_cap:
-        # Text version repeats the same items; drop the ones whose file no
-        # longer has a blocking finding, or the union would put them back.
-        tu_van_ban = [
-            x for x in tu_van_ban
-            if not (_finding_key(x)[0] == "block" and _finding_key(x)[1] in ha_cap)
-        ]
-    tu_json = verdict.blocking()
-    hop, lech = merge_findings(tu_van_ban, tu_json)
+        return []
+    _no_escalation(story_id, ev, verdict, role=role)
+    tu_json = verdict.bound_blocking() if role == "review" else verdict.blocking()
+    if role == "review" and verdict.unbound():
+        ev.record(story_id, Event(kind=NOTE, name=f"{role}:unbound", ok=False,
+                                  detail={"verdict": verdict.verdict, "findings": verdict.unbound(), "retried": False}))
+    _, lech = merge_findings(tu_van_ban, tu_json)
     if lech:
         ev.record(story_id, Event(
             kind=NOTE, name=f"{role}:mismatch", ok=False,
             detail={"text": tu_van_ban, "json": tu_json},
         ))
     ev.record(story_id, Event(
-        kind=NOTE, name=f"{role}:verdict", ok=not hop,
+        kind=NOTE, name=f"{role}:verdict", ok=not tu_json,
         detail={"verdict": verdict.verdict, "findings": verdict.findings},
     ))
-    return hop
+    return tu_json
 
 
 def _prior_review(ev: EvidenceStore, story_id: str, *, role: str,
@@ -2055,9 +2067,22 @@ def _no_escalation(story_id: str, ev: EvidenceStore, verdict: Verdict, *,
     line in the report, erring the other way costs the whole story.
     """
     truoc: set[tuple[str, str]] = set()
-    for e in ev.read(story_id).of(NOTE, f"{role}:verdict"):
+    evidence = ev.read(story_id)
+    # SS-05 / INV-B.2: a contract change starts from zero — a verdict of another epoch says nothing about this one.
+    # An event's epoch is its identity's `story_epoch` (schema 2) or, for legacy records, the `story:contract`
+    # fingerprint in force when it was written; the current epoch is the latest fingerprint recorded.
+    epoch_at: dict[int, str] = {}
+    cur = ""
+    for e in evidence.events:
+        if e.kind == NOTE and e.name == "story:contract":
+            cur = str(e.detail.get("fingerprint") or "")
+        epoch_at[e.seq] = str((getattr(e, "identity", None) or {}).get("story_epoch") or cur)
+    epoch_now = cur
+    for e in evidence.of(NOTE, f"{role}:verdict"):
         if str(e.detail.get("candidate") or "") == ev.candidate:
             continue  # this build's own verdict, not a previous position
+        if epoch_at.get(e.seq, "") != epoch_now:
+            continue  # another epoch: not a position on this contract
         for f in e.detail.get("findings") or []:
             if str(f.get("tag") or "").lower() not in _JSON_BLOCK_TAGS + _JSON_STUCK_TAGS:
                 truoc.add((str(f.get("file") or ""), str(f.get("behavior_id") or "")))
@@ -2357,7 +2382,7 @@ def structured_plan_defects(verdict: "Verdict | None") -> list[str]:
     """
     if verdict is None:
         return []
-    return [x for x in verdict.blocking() if x.lower().startswith("[stuck]")]
+    return [x for x in verdict.bound_blocking() if x.lower().startswith("[stuck]")]   # a [stuck] on nothing named is not terminal (F3)
 
 
 # --- Machine-readable review verdicts (ADR-004 R8) ----------------------------
@@ -2376,6 +2401,13 @@ _JSON_STUCK_TAGS = ("bế tắc", "be tac", "stuck", "blocked-by-plan", "stuck-b
 #: Remind the schema when the first attempt lacks a JSON block.  Exactly
 #: **once**: if the second attempt still lacks it, the model cannot do it,
 #: retrying further wastes money.
+BINDING_REMINDER = (
+    "\n\n---\n\n**Your blockers name nothing.** Every `block` or `stuck` finding must bind to what it blocks: the "
+    "`file` (with `line` where possible), the `behavior_id` from the contract, or the criterion code (`AC-…`) in `why`. "
+    "A blocker that names no file, behaviour or criterion cannot be acted on and does not count. Reply **again** in "
+    "full, and end with exactly one ```json``` block per the schema, each blocker bound.\n"
+)
+
 SCHEMA_REMINDER = (
     "\n\n---\n\n**Missing JSON block per schema.** Your previous reply was plain "
     "text without a machine-readable JSON block, so the gate could not read your "
@@ -2394,14 +2426,29 @@ class Verdict:
     verdict: str
     findings: list[dict] = field(default_factory=list)
 
-    def blocking(self) -> list[str]:
-        """Blocking/stuck items, formatted as text-version lines."""
-        out = []
+    def _blocking_items(self) -> list[tuple[dict, str]]:
+        out: list[tuple[dict, str]] = []
         for f in self.findings:
             if f["tag"] in _JSON_STUCK_TAGS:
-                out.append("[stuck] " + _finding_body(f))
+                out.append((f, "[stuck] " + _finding_body(f)))
             elif f["tag"] in _JSON_BLOCK_TAGS:
-                out.append("[block] " + _finding_body(f))
+                out.append((f, "[block] " + _finding_body(f)))
+        return out
+
+    def bound_blocking(self) -> list[str]:
+        """Blocking/stuck items that BIND to an identity — a file, a `behavior_id`, or a criterion code in the reason
+        (F3 / INV-F.2; D-002's structural property: a judge-only block names what it blocks). A `block`/`stuck`
+        verdict whose items bind to nothing has no blocker here — `_with_schema` asks once more, then the review is
+        UNRUNNABLE; it never PASSes and never opens a developer session."""
+        return [line for f, line in self._blocking_items() if finding_bound(f)]
+
+    def unbound(self) -> list[dict]:
+        """Blocking/stuck items that bind to nothing — recorded as `review:unbound`, never scored."""
+        return [f for f, _ in self._blocking_items() if not finding_bound(f)]
+
+    def blocking(self) -> list[str]:
+        """Blocking/stuck items, formatted as text-version lines (every item, bound or not)."""
+        out = [line for _, line in self._blocking_items()]
         if self.verdict != "pass" and not out:
             # Verdict says blocked but lists no items: keep the verdict, do
             # not let it pass.  Do not trust the client -- even when it
@@ -2410,6 +2457,17 @@ class Verdict:
             out.append(f"{tag} reviewer concluded `{self.verdict}` "
                        "but listed no findings in the JSON block")
         return out
+
+
+_TRACE_MARK = re.compile(r"^\s*(?:trace|truy vết)\s*:\s*\S", re.IGNORECASE)
+
+
+def finding_bound(f: dict) -> bool:
+    """A finding binds when it names a file, a behaviour id, a criterion code (`AC-<story>-<n>`) in its reason, or —
+    the improve loop's own protocol — a test identity after the `trace:` marker it asks the reviewer to use."""
+    why = str(f.get("why") or "")
+    return bool(str(f.get("file") or "").strip() or str(f.get("behavior_id") or "").strip()
+                or _MA_TIEU_CHI.search(why) or _TRACE_MARK.match(why))
 
 
 def _finding_body(f: dict) -> str:
@@ -2978,9 +3036,12 @@ def nop_deadlock(attempts: list[Attempt]) -> str:
 
     def _ma(a: Attempt) -> set[str]:
         muc = next((c for c in a.gate.failures if c.name == "tests verify story"), None)
-        if muc is None or "still green without story code" not in muc.detail:
+        if muc is None:
             return set()
-        return set(_MA_TIEU_CHI.findall(muc.detail))
+        data = getattr(muc, "data", None) or {}
+        if "still_green" in data:                                  # SS-32: the producer's list, not its sentence
+            return set(_MA_TIEU_CHI.findall(" ".join(map(str, data["still_green"]))))
+        return set(_MA_TIEU_CHI.findall(muc.detail))               # legacy check without data: the criterion CODES only
 
     ma = _ma(cham[-1])
     if not ma:
@@ -3141,23 +3202,24 @@ def _tokens(finding: str) -> set[str]:
     }
 
 
-def _paths_outside(findings: list[str], scope: list[str]) -> list[str]:
-    """Files the blocking item mentions but the story is not allowed to write.
-
-    This is the concrete answer to "why is retrying pointless", and it is
-    read from existing data rather than guessed.
-    """
+def _paths_outside(findings: list, scope: list[str]) -> list[str]:
+    """Files the blocking items point at that the story is not allowed to write — the concrete answer to "why is
+    retrying pointless". The location is the finding's IDENTITY: a structured finding's `file`, or the leading
+    `path[:line]` token of the kernel's canonical line `[tag] path:line — why`. A technology name or a filename
+    mentioned in the prose is not a path (SS-25 / INV-F.2, INV-Q.1)."""
     import re as _re
-
     from ..harness.guardrails import _within
-
     out: list[str] = []
     for f in findings:
-        for m in _re.findall(r"[\w./-]+\.[a-z]{2,4}\b", f):
-            if m in out or "/" not in m and "." not in m:
-                continue
-            if not any(_within(m, s) for s in scope):
-                out.append(m)
+        if isinstance(f, dict):
+            loc = str(f.get("file") or "")
+        else:
+            m = _re.match(r"\s*\[[^\]]*\]\s*(\S+?)(?::\d+)?(?=\s|$)", str(f))
+            loc = m.group(1) if m else ""
+        if not loc or loc in out or ("/" not in loc and "." not in loc):
+            continue
+        if not any(_within(loc, s) for s in scope):
+            out.append(loc)
     return out[:3]
 
 

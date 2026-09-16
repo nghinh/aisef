@@ -89,8 +89,13 @@ def check_prd(prd: PRD) -> GateResult:
 #: runtime can tell (preservation blocking the real story, the nop control
 #: refusing its tests), an epic has already stalled.
 _GIU_CHO = re.compile(
-    r"\bnot[ -]implemented\b|\bunimplemented\b|\bstubs?\b|\bstubbed\b"
-    r"|\bplaceholder\b|\bno-?op\b|\bTODO\b",
+    # Two kinds of placeholder criterion (SS-30 / lỗi 148). Implementation-STATE words — a command that is "still a
+    # stub", "not implemented", a "no-op" — describe a placeholder wherever they stand (marks-cli 2026-09-14: the
+    # criterion "the stub command exits 1" was VERIFIED and killed the epic). The MARKERS TODO / TBD / FIXME are also
+    # domain nouns (every to-do application), so they count only as the criterion's own token: at the start, then
+    # nothing or a separator — "a TODO item can be marked done" is a real criterion.
+    r"\bnot[ -]implemented\b|\bunimplemented\b|\bstubs?\b|\bstubbed\b|\bplaceholder\b|\bno-?op\b"
+    r"|^\W*(?:TODO|TBD|FIXME)\b\W*(?:$|[:—–\-(])",
     re.IGNORECASE,
 )
 

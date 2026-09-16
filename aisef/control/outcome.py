@@ -109,6 +109,7 @@ class Check:
     detail: str = ""
     kind: str = ""
     evidence: list[int] = field(default_factory=list)
+    data: dict = field(default_factory=dict)   # typed payload a consumer may read (SS-32); `detail` stays prose for humans
 
     def __post_init__(self) -> None:
         if isinstance(self.outcome, bool):
@@ -133,4 +134,4 @@ class Check:
     def as_dict(self) -> dict:
         return {"name": self.name, "outcome": self.outcome.value, "passed": self.passed,
                 "skipped": self.skipped, "detail": self.detail,
-                "kind": self.kind, "evidence": list(self.evidence)}
+                "kind": self.kind, "evidence": list(self.evidence), **({"data": self.data} if self.data else {})}

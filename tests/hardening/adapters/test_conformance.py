@@ -334,14 +334,14 @@ class TestC06bProviderErrorWithAuthProse(_Pair):
         self.assertFalse(res.ok)
         self.assertEqual(exit_status_of(res), "infra", f"error={res.error!r} raw={res.raw_result}")
 
-    @unittest.expectedFailure   # AD-02 Claude: 502 + final text about 401 → "auth" — prose outranks api_error_status (SS-28)
+    # GREEN since F3 (AD-02 / SS-28: the status comes from the provider's fields, never the agent's text), 2026-09-16
     def test_claude(self):
         self._check(self.claude)
 
     def test_opencode(self):
         self._check(self.opencode)
 
-    @unittest.expectedFailure   # AD-02 claude=auth vs opencode=infra on the same 502
+    # GREEN since F3 (AD-02 / SS-28: the status comes from the provider's fields, never the agent's text), 2026-09-16
     def test_cross_adapter_same_exit_status(self):
         super().test_cross_adapter_same_exit_status()
 

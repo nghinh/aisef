@@ -44,7 +44,7 @@ EVENTS = {
               "PROCESS_DEATH", "LEASE_EXPIRED", "CONTRACT_CHANGE", "STALE_REPLAY", "WRONG_CANDIDATE_EVIDENCE"],
     VERIFY: ["TEST_PASS", "TEST_FAIL", "TEST_UNRUNNABLE", "PROCESS_DEATH", "CORRUPT_EVIDENCE"],
     REVIEW: ["REVIEW_PASS", "REVIEW_BLOCK", "REVIEW_BLOCK_OUTSIDE", "REVIEW_STUCK", "REVIEW_UNRUNNABLE", "REVIEW_MUTATE",
-             "REVIEW_MALFORMED", "REVIEW_BUDGET", "PROCESS_DEATH"],
+             "REVIEW_MALFORMED", "REVIEW_BLOCK_UNBOUND", "REVIEW_BUDGET", "PROCESS_DEATH"],
     SECURITY: ["SECURITY_PASS", "SECURITY_BLOCK", "SECURITY_UNRUNNABLE", "SECURITY_MALFORMED", "SECURITY_BUDGET", "PROCESS_DEATH"],
     GATE: ["GATE_EVALUATE", "PROCESS_DEATH"],
     MERGE: ["MERGE_OK", "MERGE_CONFLICT", "PROCESS_DEATH"],
@@ -447,6 +447,9 @@ class Kernel:
     def _review_mutate(self) -> str:          # T20: tree restored, the execution said nothing about the candidate
         return self._review_unrunnable()
 
+    def _review_block_unbound(self) -> str:   # F3: blockers naming no file/behaviour/criterion — not a position, retried
+        return self._review_unrunnable()
+
     def _review_malformed(self) -> str:       # no structured verdict: never PASS, never BLOCK — a retry of the verifier
         return self._review_unrunnable()
 
@@ -580,7 +583,7 @@ def check_properties(k: Kernel) -> list[str]:
     ev, out = s.last_event, s.last_outcome
     stage_before = s.stage_log[-1] if s.stage_log else DEVELOP
     # 1. UNRUNNABLE review can never become developer quality failure
-    if ev in ("REVIEW_UNRUNNABLE", "REVIEW_MUTATE", "REVIEW_MALFORMED") and (s.stage == DEVELOP and not s.terminal):
+    if ev in ("REVIEW_UNRUNNABLE", "REVIEW_MUTATE", "REVIEW_MALFORMED", "REVIEW_BLOCK_UNBOUND") and (s.stage == DEVELOP and not s.terminal):
         v.append("P1: review unrunnable routed to the developer")
     if ev.startswith("REVIEW_") and out == UNRUNNABLE and s.quality_attempts != getattr(k, "_q_before", s.quality_attempts):
         v.append("P1: review unrunnable charged quality")

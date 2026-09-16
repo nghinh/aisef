@@ -110,12 +110,12 @@ invariants:
     deterministic_tests:
       - tests/test_worktree.py::TestNhanhCuKhiTieuChiDoi
       - tests/test_baseline_provenance.py::TestBaselineProducer
-      - tests/hardening/test_sibling_scan.py::TestSS05EscalationDemotionStaysInsideTheEpoch (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS05EscalationDemotionStaysInsideTheEpoch
     model_tests: []
     fault_injection_tests: []
     linked_defects:
       - SS-05
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-B.3
     domain: story epoch
     statement: Retries and resumes never create a new epoch silently.
@@ -329,10 +329,10 @@ invariants:
       - aisef/control/security.py::parse
     deterministic_tests:
       - tests/test_dogfood_ledgerlock.py::TestStuckMentionIsNotAPlanVerdict
-      - tests/hardening/test_sibling_scan.py::TestSS24ProseNeverOverridesAStructuredVerdict (RED)
-      - tests/hardening/test_sibling_scan.py::TestSS25ScopeVerdictComesFromFindingsNotProse (RED)
-      - tests/hardening/test_sibling_scan.py::TestSS27NoiseFilterHasASeverityFloor (RED)
-      - tests/hardening/test_sibling_scan.py::TestSS30PlaceholderRegexDoesNotBlockTodoApps (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS24ProseNeverOverridesAStructuredVerdict
+      - tests/hardening/test_sibling_scan.py::TestSS25ScopeVerdictComesFromFindingsNotProse
+      - tests/hardening/test_sibling_scan.py::TestSS27NoiseFilterHasASeverityFloor
+      - tests/hardening/test_sibling_scan.py::TestSS30PlaceholderRegexDoesNotBlockTodoApps
     model_tests:
       - tests/hardening/test_state_model.py::TestKernelModel::test_property_9_plan_conflict_is_not_developer_work
     fault_injection_tests:
@@ -343,7 +343,7 @@ invariants:
       - SS-25
       - SS-27
       - SS-30
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-F.3
     domain: typed outcomes
     statement: A stage that did not execute produces UNRUNNABLE of that stage, never a FAILED verdict about the work, and never a PASS.
@@ -358,8 +358,8 @@ invariants:
       - tests/test_dogfood_ledgerlock.py::TestMissingTestRunnerIsUnrunnableNotRed
       - tests/test_tools.py::TestKhongChayDuocKhacDo
       - tests/hardening/test_sibling_scan.py::TestSS13SecurityExecutionFailureIsNotAVerdict
-      - tests/hardening/test_sibling_scan.py::TestSS23RedTestsAreNotAMissingTool (RED)
-      - tests/hardening/test_sibling_scan.py::TestSS26EnvironmentFailureIsNotErasedBySubstring (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS23RedTestsAreNotAMissingTool
+      - tests/hardening/test_sibling_scan.py::TestSS26EnvironmentFailureIsNotErasedBySubstring
     model_tests:
       - tests/hardening/test_state_model.py::TestKernelModel::test_property_1_unrunnable_review_is_never_developer_quality
       - tests/hardening/test_state_model.py::TestKernelModel::test_property_10_environment_failure_is_not_behavioural_evidence
@@ -383,12 +383,12 @@ invariants:
       - aisef/clients/stream.py::exit_status_of
     deterministic_tests:
       - tests/test_stream.py::TestExitStatus
-      - tests/hardening/test_sibling_scan.py::TestSS28ExitStatusReadsTheProviderNotTheAgentsProse (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS28ExitStatusReadsTheProviderNotTheAgentsProse
     model_tests: []
     fault_injection_tests: []
     linked_defects:
       - SS-28
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-G.1
     domain: retry locality
     statement: A review that did not run is retried at the review stage on the same frozen candidate, bounded, and ends as REVIEW_UNRUNNABLE — never a developer session.
@@ -727,7 +727,7 @@ invariants:
       - tests/test_dogfood_ledgerlock.py::TestDeclaredToolsLiveInTheDeclaredImage
       - tests/test_dogfood_ledgerlock.py::TestMissingTestRunnerIsUnrunnableNotRed
       - tests/test_tools.py::TestThieuDuAnKhacThieuCongCu
-      - tests/hardening/test_sibling_scan.py::TestSS23RedTestsAreNotAMissingTool (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS23RedTestsAreNotAMissingTool
       - tests/hardening/scan8a/test_group_d.py::TestSS34UnrunnableQaKindIsNotAFailedCheck (RED)
       - tests/hardening/scan8a/test_group_d.py::TestSS45AutoDetectedToolsAreProbed (RED)
       - tests/hardening/scan8a/test_group_d.py::TestSS46PreflightProbeRunsWithoutADeclaredImage (RED)
@@ -825,7 +825,7 @@ invariants:
     deterministic_tests:
       - tests/test_dogfood_ledgerlock.py::TestStuckMentionIsNotAPlanVerdict
       - tests/test_qualification.py::TestRunPhase
-      - tests/hardening/test_sibling_scan.py::TestSS25ScopeVerdictComesFromFindingsNotProse (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS25ScopeVerdictComesFromFindingsNotProse
     model_tests:
       - tests/hardening/test_state_model.py::TestKernelModel::test_property_9_plan_conflict_is_not_developer_work
     fault_injection_tests:
@@ -834,7 +834,7 @@ invariants:
       - D-026
       - SS-25
       - OBS-OC-2
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-Q.2
     domain: human arbitration
     statement: An owner decision creates a new contract epoch with deterministic invalidation of the branch, the baseline and the dependent approvals.
@@ -911,9 +911,9 @@ invariants:
       - tests/test_closure.py::TestNoCriterionPassesOnAbsence
       - tests/test_tdd.py::TestDoTruocXanh
       - tests/test_qa.py::TestFakeTests
-      - tests/hardening/test_sibling_scan.py::TestSS05EscalationDemotionStaysInsideTheEpoch (RED)
-      - tests/hardening/test_sibling_scan.py::TestSS26EnvironmentFailureIsNotErasedBySubstring (RED)
-      - tests/hardening/test_sibling_scan.py::TestSS27NoiseFilterHasASeverityFloor (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS05EscalationDemotionStaysInsideTheEpoch
+      - tests/hardening/test_sibling_scan.py::TestSS26EnvironmentFailureIsNotErasedBySubstring
+      - tests/hardening/test_sibling_scan.py::TestSS27NoiseFilterHasASeverityFloor
     model_tests:
       - tests/hardening/test_state_model.py::TestKernelModel::test_property_7_complete_needs_every_proof
     fault_injection_tests:
@@ -924,7 +924,7 @@ invariants:
       - SS-26
       - SS-27
       - SS-33
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-T.2
     domain: pass safety
     statement: A blocking decision that rests on the model judge alone is measured, named and published; it never masquerades as a deterministic result.

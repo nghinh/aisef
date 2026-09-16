@@ -1,7 +1,7 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "phase": 7,
- "generated": "2026-09-16T12:37:32+00:00",
+ "generated": "2026-09-16T14:04:41+00:00",
  "stages": [
   "Developer",
   "Test",
@@ -241,7 +241,7 @@
    "expected_recovery": "developer retry",
    "invariants": "INV-F.3",
    "test": "tests/hardening/test_sibling_scan.py::TestSS23RedTestsAreNotAMissingTool",
-   "status": "RED (SS-23)"
+   "status": "GREEN (F3)"
   },
   {
    "id": "FM-L-01",
@@ -857,8 +857,8 @@
   }
  ],
  "status_count": {
-  "GREEN": 59,
-  "RED": 10,
+  "GREEN": 60,
+  "RED": 9,
   "NEEDS_TEST": 0
  }
 }

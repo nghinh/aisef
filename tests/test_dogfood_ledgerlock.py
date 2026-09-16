@@ -71,8 +71,14 @@ class TestStuckMentionIsNotAPlanVerdict(unittest.TestCase):
         self.assertIn("docs/ops.md", got[0])
 
     def test_a_stuck_verdict_without_findings_stays_fail_closed(self):
-        got = I.structured_plan_defects(I.Verdict("stuck", []))
-        self.assertEqual(len(got), 1, "a `stuck` verdict field is structured evidence, even with no items")
+        """F3 (binding rule): a `stuck` with no items binds to nothing — it is no longer a PLAN defect (that would end
+        the story on a verdict naming nothing), and it is still fail-closed: the diagnostic line exists, and
+        `_with_schema` asks once for bindings, then the review is REVIEW_UNRUNNABLE — never a PASS, never a developer
+        session (tests/hardening/test_judgment.py)."""
+        v = I.Verdict("stuck", [])
+        self.assertEqual(I.structured_plan_defects(v), [], "a stuck on nothing named is not a plan conflict")
+        self.assertEqual(v.bound_blocking(), [], "…and blocks nothing by itself")
+        self.assertEqual(len(v.blocking()), 1, "the diagnostic line is still shown: the reviewer concluded stuck")
 
     def test_a_prose_only_review_never_terminates_a_story(self):
         """No JSON after the schema reminder: malformed structured output.

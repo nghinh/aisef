@@ -249,6 +249,11 @@ class SyntheticClientAdapter(ClientAdapter):
             body = json.dumps({"verdict": tag, "findings": findings})
             lines = "\n".join(f"- [{tag}] {f.get('file', '')}:{f.get('line', 1)} — {f.get('why', '')}" for f in findings)
             return RunResult(ok=True, text=f"{lines}\n```json\n{body}\n```\n", num_turns=step.turns, cost_usd=step.cost_usd)
+        if k == "BLOCK_UNBOUND":              # a `block` verdict whose findings name no file, behaviour or criterion (F3)
+            findings = [{"tag": "block", "file": "", "line": "", "why": "the overall approach is wrong"}]
+            return RunResult(ok=True, text="- [block] the overall approach is wrong\n```json\n"
+                             + json.dumps({"verdict": "block", "findings": findings}) + "\n```\n",
+                             num_turns=step.turns, cost_usd=step.cost_usd)
         if k == "MALFORMED":
             return RunResult(ok=True, text=step.text or "I think this is mostly fine but I am not sure about the edge cases.",
                              num_turns=step.turns, cost_usd=step.cost_usd)

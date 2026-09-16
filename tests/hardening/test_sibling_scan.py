@@ -116,7 +116,7 @@ class TestSS05EscalationDemotionStaysInsideTheEpoch(unittest.TestCase):
     """SS-05 — `_no_escalation` demotes today's blockers because the same (file, behaviour) was advisory
     on ANY earlier candidate, across a contract change, and flips the verdict to pass. Invariant B/T."""
 
-    @unittest.expectedFailure   # SS-05
+    # GREEN since F3 (SS-05: prose has no authority over control state), 2026-09-16
     def test_an_advisory_from_a_previous_epoch_cannot_demote_a_blocker_into_a_pass(self):
         with tempfile.TemporaryDirectory() as tmp:
             store = EvidenceStore(Path(tmp))
@@ -256,7 +256,7 @@ class TestSS23RedTestsAreNotAMissingTool(unittest.TestCase):
     missing tool when no test PASSED; an all-red suite whose assertions say "not found" becomes
     TOOL_UNRUNNABLE. Invariant F: failed_ids already prove the runner ran."""
 
-    @unittest.expectedFailure   # SS-23
+    # GREEN since F3 (SS-23: prose has no authority over control state), 2026-09-16
     def test_an_all_red_suite_mentioning_not_found_is_a_test_failure(self):
         out = ("tests/test_a.py::test_lookup FAILED\n"
                "tests/test_a.py::test_other FAILED\n"
@@ -270,7 +270,7 @@ class TestSS24ProseNeverOverridesAStructuredVerdict(unittest.TestCase):
     """SS-24 — `_reconcile` unions text-derived `[block]` items with the JSON verdict; a prose line blocks a
     candidate whose structured verdict is `pass` with no findings. Invariant F."""
 
-    @unittest.expectedFailure   # SS-24
+    # GREEN since F3 (SS-24: prose has no authority over control state), 2026-09-16
     def test_a_prose_block_line_does_not_block_when_the_structured_verdict_passes(self):
         with tempfile.TemporaryDirectory() as tmp:
             store = EvidenceStore(Path(tmp))
@@ -285,7 +285,7 @@ class TestSS25ScopeVerdictComesFromFindingsNotProse(unittest.TestCase):
     """SS-25 — `_paths_outside` regexes any `word.ext` token out of reviewer prose to decide that a repeated
     complaint points OUTSIDE the write scope, which makes the story terminally stuck. Invariant F/Q."""
 
-    @unittest.expectedFailure   # SS-25
+    # GREEN since F3 (SS-25: prose has no authority over control state), 2026-09-16
     def test_a_technology_name_in_prose_is_not_a_path_outside_scope(self):
         self.assertEqual(I._paths_outside(["[block] src/list.ts:4 — follow the Node.js convention here"], ["src"]), [])
 
@@ -295,7 +295,7 @@ class TestSS26EnvironmentFailureIsNotErasedBySubstring(unittest.TestCase):
     in the traceback; the nop then scores as correctly red and TDD passes on a suite that never ran.
     Invariant F/N/T."""
 
-    @unittest.expectedFailure   # SS-26
+    # GREEN since F3 (SS-26: prose has no authority over control state), 2026-09-16
     def test_a_third_party_import_error_stays_an_environment_failure(self):
         res = SimpleNamespace(
             unrunnable=f"{NO_SETUP} — dependencies missing",
@@ -308,7 +308,7 @@ class TestSS27NoiseFilterHasASeverityFloor(unittest.TestCase):
     """SS-27 — `is_noise` drops a finding of ANY severity whose body mentions rate limiting or throttling;
     a critical auth-bypass finding worded with "no rate limit" stops blocking. Invariant F/T."""
 
-    @unittest.expectedFailure   # SS-27
+    # GREEN since F3 (SS-27: prose has no authority over control state), 2026-09-16
     def test_a_critical_finding_mentioning_rate_limits_still_blocks(self):
         rep = parse_security("[critical] auth bypass: the login endpoint has no rate limit, so credential stuffing succeeds\n")
         self.assertTrue(rep.blocking(("critical", "high")), (rep.findings, getattr(rep, "filtered", None)))
@@ -318,7 +318,7 @@ class TestSS28ExitStatusReadsTheProviderNotTheAgentsProse(unittest.TestCase):
     """SS-28 — `exit_status_of` classifies `auth` from substrings of the agent's own final text; a story
     about 401 handling ends as a fatal credential rejection. Invariant F."""
 
-    @unittest.expectedFailure   # SS-28
+    # GREEN since F3 (SS-28: prose has no authority over control state), 2026-09-16
     def test_a_final_message_about_401_handling_is_not_an_auth_failure(self):
         res = RunResult(ok=False, error="process exited 1 without a result event",
                         raw_result={"result": "I implemented the 401 Unauthorized handler for invalid API key requests."})
@@ -329,7 +329,7 @@ class TestSS30PlaceholderRegexDoesNotBlockTodoApps(unittest.TestCase):
     """SS-30 — the stories machine gate rejects criteria matching `\\bTODO\\b`; every to-do application
     (this framework's own dogfood corpora) fails plan approval. Invariant F."""
 
-    @unittest.expectedFailure   # SS-30
+    # GREEN since F3 (SS-30: prose has no authority over control state), 2026-09-16
     def test_a_criterion_about_todo_items_is_not_a_placeholder(self):
         self.assertIsNone(_GIU_CHO.search("a TODO item can be marked done"))
 

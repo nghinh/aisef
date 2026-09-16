@@ -508,8 +508,8 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
     # Event pointers read: baseline, test run at candidate, nop — whichever exist.
     seqs = [e.seq for e in (base_ev, latest, nop) if e is not None]
 
-    def check_result(outcome, detail: str = "") -> Check:
-        return Check(name, outcome, detail, evidence=seqs)
+    def check_result(outcome, detail: str = "", data: dict | None = None) -> Check:
+        return Check(name, outcome, detail, evidence=seqs, data=data or {})
 
     # Tests with criteria codes **green** at candidate — subject of both levels.
     ac: list[str] = []
@@ -583,7 +583,8 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
         still_green = [t for t in ac if t in nop_green]
         if still_green:
             return check_result(False, f"tests verify nothing — still green without story code "
-                                     f"(parent SHA {parent}): {_head(still_green)}")
+                                     f"(parent SHA {parent}): {_head(still_green)}",
+                                data={"still_green": list(still_green), "parent": parent})   # SS-32: data, not a sentence
         return check_result(True, f"{len(ac)} tests with criteria codes are red or absent at parent SHA {parent}"
                                 + (f"; {detail_note}" if detail_note else ""))
     if nop.ok:

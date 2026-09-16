@@ -7,7 +7,7 @@ Rendered from `closure-evidence/hardening/fault-matrix.json` by `validation/rend
 | stage | QUALITY | INFRA | TIMEOUT | CRASH | MALFORMED | NOOP | STALE | INJECTED |
 |---|---|---|---|---|---|---|---|---|
 | Developer | FM-D-01 (GREEN) | FM-D-02 (GREEN) | FM-D-03 (GREEN) | FM-D-04 (GREEN (F2)) | FM-D-05 (GREEN), FM-D-11 (GREEN (F2)) | FM-D-06 (GREEN) | FM-D-07 (GREEN (F1)) | FM-D-08 (GREEN), FM-D-09 (GREEN), FM-D-10 (GREEN) |
-| Test | FM-T-01 (GREEN) | FM-T-02 (GREEN), FM-T-03 (GREEN (F2)) | FM-T-04 (GREEN (existing)) | — | FM-T-05 (GREEN (existing)) | — | FM-T-06 (GREEN (existing)) | FM-T-07 (RED (SS-23)) |
+| Test | FM-T-01 (GREEN) | FM-T-02 (GREEN), FM-T-03 (GREEN (F2)) | FM-T-04 (GREEN (existing)) | — | FM-T-05 (GREEN (existing)) | — | FM-T-06 (GREEN (existing)) | FM-T-07 (GREEN (F3)) |
 | Lint | FM-L-01 (GREEN) | FM-L-02 (GREEN (F2)) | — | — | — | — | — | — |
 | Review | FM-R-01 (GREEN) | FM-R-02 (GREEN (existing)) | FM-R-03 (GREEN (existing)) | FM-R-04 (GREEN (F2)) | FM-R-05 (GREEN (F2)) | — | FM-R-08 (GREEN (existing)) | FM-R-06 (GREEN), FM-R-07 (GREEN) |
 | Security | FM-S-01 (GREEN) | FM-S-02 (GREEN (F2)) | — | — | FM-S-03 (GREEN (F2)) | — | — | — |
@@ -40,7 +40,7 @@ Rendered from `closure-evidence/hardening/fault-matrix.json` by `validation/rend
 | FM-T-04 | Test | TIMEOUT | sandboxed tool exceeds its timeout | UNRUNNABLE; no orphan grandchild | tool_run unrunnable | tool stage | INV-L.1 | tests/test_sandbox.py::TestHetGioGietCaCayTienTrinh | GREEN (existing) |
 | FM-T-05 | Test | MALFORMED | runner output without readable test names | criteria have tests UNCONFIGURED, not PASSED | tool_run without test_format | configure a verbose reporter | INV-F.1, INV-T.1 | tests/test_gate.py::TestTestCoKiemDuocStory | GREEN (existing) |
 | FM-T-06 | Test | STALE | green test evidence recorded at another candidate | evidence matches candidate UNRUNNABLE; stale evidence never scores | gate lists the stale SHA | re-run at the candidate | INV-A.2 | tests/test_candidate.py::TestGateCandidate | GREEN (existing) |
-| FM-T-07 | Test | INJECTED | an all-red suite whose messages say `not found` | test FAILED (behavioural), not UNRUNNABLE | tool_run ok=False, no unrunnable | developer retry | INV-F.3 | tests/hardening/test_sibling_scan.py::TestSS23RedTestsAreNotAMissingTool | RED (SS-23) |
+| FM-T-07 | Test | INJECTED | an all-red suite whose messages say `not found` | test FAILED (behavioural), not UNRUNNABLE | tool_run ok=False, no unrunnable | developer retry | INV-F.3 | tests/hardening/test_sibling_scan.py::TestSS23RedTestsAreNotAMissingTool | GREEN (F3) |
 | FM-L-01 | Lint | QUALITY | lint red | gate check lint FAILED; developer retry | lint tool_run ok=False | developer | INV-F.1 | tests/hardening/test_fault_matrix.py::TestToolFaults::test_red_lint_is_a_quality_failure | GREEN |
 | FM-L-02 | Lint | INFRA | linter missing | lint UNRUNNABLE, never FAILED | tool_run unrunnable | tool stage | INV-F.3, INV-N.1 | tests/hardening/test_fault_matrix.py::TestToolFaults::test_missing_linter_is_unrunnable | GREEN (F2) |
 | FM-R-01 | Review | QUALITY | structured block | QUALITY_BLOCK → developer retry with findings | reviewer:verdict block | developer | INV-F.2 | tests/hardening/test_fault_matrix.py::TestReviewFaults::test_structured_block_is_developer_feedback | GREEN |
@@ -93,4 +93,4 @@ Rendered from `closure-evidence/hardening/fault-matrix.json` by `validation/rend
 | FM-C-12 | Compound | INJECTED | approval invalidated (PRD edited) while a story is stopped, then resume | resume refused at the entry point; programmatic status STALE | approval cascade | re-approve | INV-P.1 | tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume::test_the_programmatic_readiness_status_is_stale_after_an_upstream_edit | RED (SS-56) |
 | FM-C-12b | Compound | INJECTED | same — the CLI precheck | blocking() names the stale upstream gate | — | re-approve | INV-P.1 | tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume::test_the_cli_precheck_blocks_a_resume_after_an_upstream_edit | GREEN |
 
-**Status count:** GREEN 27 · GREEN (F1) 7 · GREEN (F2) 9 · GREEN (existing) 16 · RED (F5) 1 · RED (MISSING, Phase 10) 1 · RED (MISSING, Phase 17) 1 · RED (SS-17) 1 · RED (SS-23) 1 · RED (SS-35) 1 · RED (SS-39) 1 · RED (SS-49) 1 · RED (SS-55) 1 · RED (SS-56) 1 of 69 scenarios.
+**Status count:** GREEN 27 · GREEN (F1) 7 · GREEN (F2) 9 · GREEN (F3) 1 · GREEN (existing) 16 · RED (F5) 1 · RED (MISSING, Phase 10) 1 · RED (MISSING, Phase 17) 1 · RED (SS-17) 1 · RED (SS-35) 1 · RED (SS-39) 1 · RED (SS-49) 1 · RED (SS-55) 1 · RED (SS-56) 1 of 69 scenarios.

@@ -82,7 +82,8 @@ class TestLyDoTrongNhatKy(unittest.TestCase):
 
     def test_muc_chan_cua_reviewer_nam_trong_nhat_ky(self):
         log = self.chay(review=chan("[chặn] src/a.py:1 — mất dữ liệu khi lưu"))
-        self.assertIn("review ✗ [chặn] src/a.py:1 — mất dữ liệu khi lưu", log)
+        # F3 (SS-24): the log carries the STRUCTURED finding — tag normalised, location and reason from the JSON verdict
+        self.assertIn("review ✗ [block] src/a.py:1 — mất dữ liệu khi lưu", log)
 
     def test_baseline_khong_chay_duoc_thi_noi_ra_ngay_trong_nhat_ky(self):
         """`baseline DONE ok=False` một mình không phân biệt "đỏ" với "chưa
