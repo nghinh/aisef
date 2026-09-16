@@ -215,6 +215,16 @@ def main(argv=None) -> int:
           and not c["missing_intended_ranges"] and not c["unhit_reachable"] and c["total_traces"] >= 100000)
     print("historical mismatches:", c["mismatches"], "| effective after reruns:", c["mismatches_effective_after_reruns"], "| reruns:", c["reruns"])
     chunks = [json.load(open(f, encoding="utf-8")) for f in files]
+    # candidate-kernel evidence per seed (phase12/kernel-split.json): a chunk that ran on the candidate, or a seed re-run on it
+    split_path = Path(a.out).parent / "kernel-split.json"
+    split = json.loads(split_path.read_text(encoding="utf-8")) if split_path.is_file() else {"chunks": []}
+    cand_chunks = {c["chunk"] for c in split["chunks"] if c.get("candidate_kernel")}
+    direct_seeds = {s for f, d in zip(files, chunks, strict=True) if Path(f).stem.split("-")[-1] in cand_chunks
+                    for s in range(int(Path(f).stem.split("-")[-1]), int(Path(f).stem.split("-")[-1]) + d["traces"])}
+    kernel_evidence = {"chunks_on_the_candidate": sorted(cand_chunks), "seeds_direct": len(direct_seeds), "seeds_rerun_on_the_candidate": len(rerun),
+                       "seeds_with_candidate_kernel_evidence": len(direct_seeds | set(rerun)),
+                       "seeds_resting_on_the_measured_diff": c["total_traces"] - len(direct_seeds | set(rerun)),
+                       "kernel_classes": {ch["chunk"]: ch["kernel_class"] for ch in split["chunks"]}}
     summary = {"phase": 12, "source": "validation/p12_integrity.py (this summary is derived from phase12/integrity.json — one consolidation)",
                "chunks": len(chunks), "traces": c["total_traces"], "matched": c["matched"],
                "unexplained": c["mismatches_effective_after_reruns"],
@@ -225,7 +235,8 @@ def main(argv=None) -> int:
                "model_transitions": sum(d["model_transitions"] for d in chunks), "real_stage_events": sum(d["real_stage_events"] for d in chunks),
                "known_deviations": sorted({k for d in chunks for k in (d.get("known_deviations") or [])}),
                "kernel_by_chunk": {Path(f).stem.split("-")[-1]: (d.get("kernel") or {}).get("head") for f, d in zip(files, chunks, strict=True)},
-               "seed_ranges": [Path(f).stem.split("-")[-1] for f in files], "workers": chunks[0]["workers"] if chunks else 0, "pass": ok}
+               "seed_ranges": [Path(f).stem.split("-")[-1] for f in files], "workers": chunks[0]["workers"] if chunks else 0,
+               "candidate_kernel_evidence": kernel_evidence, "pass": ok}
     summary["traces_per_s"] = round(summary["traces"] / summary["elapsed_s"], 2) if summary["elapsed_s"] else 0
     Path(a.summary).write_text(json.dumps(summary, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     return 0 if ok else 1
