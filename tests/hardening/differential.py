@@ -339,9 +339,9 @@ def _worker(seeds: list[int]) -> list[dict]:
     return out
 
 
-def run_many(traces: int, workers: int = 1, start: int = 0) -> dict:
+def run_many(traces: int, workers: int = 1, start: int = 0, seeds: list[int] | None = None) -> dict:
     t0 = time.time()
-    seeds = list(range(start, start + traces))
+    seeds = list(seeds) if seeds is not None else list(range(start, start + traces))
     if workers <= 1:
         rows = _worker(seeds)
     else:
@@ -366,6 +366,24 @@ def run_many(traces: int, workers: int = 1, start: int = 0) -> dict:
             "known_deviations": sorted(KNOWN), "vocabulary": {"developer": DEV, "review": REV, "security": SEC}}
 
 
+def _kernel_identity() -> dict:
+    """The kernel this run exercises, as git sees it when the run STARTS (the workers are spawned then): HEAD and
+    whether `aisef/` is dirty against it. Phase 12 rule A wants this DIRECTLY_RECORDED by every chunk, never derived
+    from timestamps."""
+    import subprocess
+
+    root = Path(__file__).resolve().parents[2]
+
+    def git(*args: str) -> str:
+        try:
+            return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, timeout=30).stdout.strip()
+        except (OSError, subprocess.SubprocessError):
+            return ""
+
+    return {"head": git("rev-parse", "HEAD"), "dirty_aisef": git("status", "--porcelain", "--", "aisef").splitlines(),
+            "started_at": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--traces", type=int, default=200)
@@ -373,12 +391,19 @@ def main(argv=None) -> int:
     ap.add_argument("--start", type=int, default=0)
     ap.add_argument("--out", default=str(RESULTS))
     ap.add_argument("--seed", type=int, help="run one seed verbosely")
+    ap.add_argument("--seeds-file", default="", help="JSON with a `seeds` list: run exactly those seeds (a targeted re-run)")
     a = ap.parse_args(argv)
     if a.seed is not None:
         print(json.dumps(run_one(a.seed), ensure_ascii=False, indent=1))
         return 0
-    res = run_many(a.traces, a.workers, a.start)
+    kernel = _kernel_identity()                                          # recorded at START, beside the summary
+    if a.seeds_file:
+        seeds = [int(s) for s in json.loads(Path(a.seeds_file).read_text(encoding="utf-8"))["seeds"]]
+        res = run_many(len(seeds), a.workers, 0, seeds=seeds)
+    else:
+        res = run_many(a.traces, a.workers, a.start)
     rows = res.pop("_rows", [])
+    res["kernel"] = kernel
     Path(a.out).write_text(json.dumps(res, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     if rows:                                                 # Phase 12 integrity: one compact record per trace, beside the summary
         with open(str(Path(a.out).with_suffix(".rows.jsonl")), "w", encoding="utf-8") as fh:
