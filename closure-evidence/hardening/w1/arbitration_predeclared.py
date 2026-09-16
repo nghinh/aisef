@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 import aisef.control.approvals as ap  # noqa: E402
 
 OUT = Path(__file__).resolve().parent / "ARBITRATION-PREDECLARED.json"
+FROZEN_REQUIREMENTS_SHA256 = "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc"  # docs/requirements.md, identical in the reference project
 
 
 def measure(project: Path) -> dict:
@@ -26,8 +27,11 @@ def measure(project: Path) -> dict:
     rec = a.load(ap.Gate.READINESS)
     arts = a.artifact_paths(ap.Gate.READINESS)
     signed_method = hashlib.sha256("\n".join(f"{p.relative_to(root)}:{ap._artifact_hash(p)}" for p in arts).encode()).hexdigest()
+    req = project / "docs/requirements.md"
     return {
         "project": str(project), "measured_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "requirements_sha256": hashlib.sha256(req.read_bytes()).hexdigest() if req.is_file() else None,
+        "other_gates_approved_for_their_current_digests": all(a.status(g) is ap.Status.APPROVED for g in ap.GATE_ORDER if g not in (ap.Gate.READINESS, ap.Gate.PRE_DEPLOY)),
         "gate_statuses": {g.value: a.status(g).value for g in ap.GATE_ORDER},
         "gates_stale": [g.value for g in ap.GATE_ORDER if a.status(g) is ap.Status.STALE],
         "readiness": {
@@ -76,8 +80,21 @@ def main(argv: list[str]) -> int:
         },
         "decision": "Re-approve `readiness` for the byte-identical content through the normal CLI (`aisef approve readiness`), never a "
                     "state edit; record seq, digest before/after, decided_by and a note naming this record (ARB-1) in W1-LEDGERLOCK-<n>.json.",
+        "owner_decision": {
+            "decision": "OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL",
+            "given": "2026-09-17, owner message 'OWNER DECISION — FINALIZE PHASE 12 WITH SINGLE-KERNEL EVIDENCE' §1",
+            "scope": "ONLY the reported hash-method migration case; this is NOT a waiver; void if any content difference is found — the normal approval flow then runs",
+            "conditions_measured": {
+                "readiness_content_unchanged": r["artifacts_byte_identical_to_what_was_signed"],
+                "both_bound_artifacts_unchanged": r["artifacts_byte_identical_to_what_was_signed"],
+                "historical_hash_method_reproduces_stored_digest_exactly": r["digest_recomputed_by_the_signed_method"] == r["stored_digest"],
+                "stale_caused_only_by_the_framework_hash_method_change": only_readiness and r["digest_recomputed_by_the_signed_method"] == r["stored_digest"],
+                "no_requirement_story_architecture_ac_or_implementation_change_hidden": m["other_gates_approved_for_their_current_digests"]
+                    and m["requirements_sha256"] == FROZEN_REQUIREMENTS_SHA256,
+            },
+        },
         "decision_authority": {
-            "owner_decision_given_for_this_specific_re_approval": False,
+            "owner_decision_given_for_this_specific_re_approval": True,
             "basis": [
                 "the content is byte-identical to what the owner (`" + str(r["stored_decided_by"]) + "`) signed on " + str(r["stored_decided_at"]),
                 "the approvals module states that a hash-method change stales `stories`/`readiness` once — the re-approval is the module's own documented remedy",
@@ -110,7 +127,8 @@ def main(argv: list[str]) -> int:
     out = {"generated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "rule": "Do not let a predeclared arbitration become a hidden waiver.",
            "arbitrations": [arb1], "requirement_ambiguities": requirement_ambiguities,
            "checks": {"artifacts_byte_identical_to_what_was_signed": r["artifacts_byte_identical_to_what_was_signed"], "only_readiness_is_stale": only_readiness,
-                      "readiness_signed_by_a_person": r["stored_decided_by"] not in ("auto", "", None)},
+                      "readiness_signed_by_a_person": r["stored_decided_by"] not in ("auto", "", None),
+                      "owner_conditions_all_met": all(arb1["owner_decision"]["conditions_measured"].values())},
            }
     out["verdict"] = "DECLARED" if all(out["checks"].values()) else "MEASUREMENT DOES NOT MATCH THE DECLARATION — do not start W1"
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")

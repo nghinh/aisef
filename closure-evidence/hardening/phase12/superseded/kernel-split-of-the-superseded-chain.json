@@ -1,0 +1,201 @@
+{
+ "generated": "2026-09-17T06:04:04+0700",
+ "candidate_aisef_tree": [
+  "84014c980e75"
+ ],
+ "aisef_tree_identical_since_fix": true,
+ "kernel_variants": {
+  "A (chunks 00000, 10000)": "NOT_AVAILABLE — bounded between 023d6ce/bb31522 and the following commit; re-run in full on the candidate",
+  "B (chunks 20000–40000)": "d956249 aisef tree",
+  "C (chunks 50000–90000 + every re-run)": "f0cd772 aisef tree = the candidate"
+ },
+ "aisef_diff_A_upper_bound": {
+  "summary": " 10 files changed, 326 insertions(+), 41 deletions(-)",
+  "files": [
+   "aisef/cli/implement.py",
+   "aisef/cli/parser.py",
+   "aisef/clients/synthetic.py",
+   "aisef/control/gate.py",
+   "aisef/control/replay.py",
+   "aisef/control/replay_manifest.py",
+   "aisef/harness/process_owner.py",
+   "aisef/harness/sandbox.py",
+   "aisef/invariants.yaml",
+   "aisef/phases/implement.py"
+  ]
+ },
+ "aisef_diff_B_to_candidate": {
+  "summary": " 2 files changed, 15 insertions(+), 4 deletions(-)",
+  "files": [
+   "aisef/invariants.yaml",
+   "aisef/phases/implement.py"
+  ],
+  "semantics": "SS-64 only: the verifier budget cap precedes stage absence in _review_stage and the verify-only path; invariants.yaml is data"
+ },
+ "commits": [
+  {
+   "commit": "023d6ce09307",
+   "committed_at": "2026-09-16T23:26:47+0700",
+   "ct": 1789576007,
+   "aisef_tree": "83ee310ef20a",
+   "subject": "hardening(10/F6): BENCH / RELEASE / APPROVAL — closure probes read ident"
+  },
+  {
+   "commit": "bb31522366fa",
+   "committed_at": "2026-09-17T00:43:17+0700",
+   "ct": 1789580597,
+   "aisef_tree": "201812e0e532",
+   "subject": "hardening(11/14/16/17): REGISTRY 50/50 PROVEN, FAULT MATRIX 72/72 GREEN,"
+  },
+  {
+   "commit": "9e8fc7790b3a",
+   "committed_at": "2026-09-17T02:07:41+0700",
+   "ct": 1789585661,
+   "aisef_tree": "e9fb9b927972",
+   "subject": "hardening(13): MUTATION TESTING — 271 mutants over 28 decision-critical "
+  },
+  {
+   "commit": "ed5085a1f4a5",
+   "committed_at": "2026-09-17T03:06:01+0700",
+   "ct": 1789589161,
+   "aisef_tree": "e9fb9b927972",
+   "subject": "hardening(13/final): MUTATION TESTING CLOSED — 271 mutants, 265 killed, "
+  },
+  {
+   "commit": "d956249ef407",
+   "committed_at": "2026-09-17T03:09:10+0700",
+   "ct": 1789589350,
+   "aisef_tree": "e9fb9b927972",
+   "subject": "hardening(15): ADAPTER CONFORMANCE — deterministic suite 45 green (no mo"
+  },
+  {
+   "commit": "f0cd77268ccb",
+   "committed_at": "2026-09-17T04:58:35+0700",
+   "ct": 1789595915,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12): UNEXPLAINED TRACE 34999 RESOLVED — SS-64 (P2, INV-G.5): a"
+  },
+  {
+   "commit": "4bd220337046",
+   "committed_at": "2026-09-17T05:26:56+0700",
+   "ct": 1789597616,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12): INTEGRITY TOOLING — per-chunk integrity records + consoli"
+  },
+  {
+   "commit": "308dcf46b565",
+   "committed_at": "2026-09-17T05:33:12+0700",
+   "ct": 1789597992,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(20/prep): ORACLE INDEPENDENCE — the W1 oracle re-derived from "
+  },
+  {
+   "commit": "e5d451b31d17",
+   "committed_at": "2026-09-17T05:35:38+0700",
+   "ct": 1789598138,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(20/prep): PREDECLARED ARBITRATION in the required form — ARB-1"
+  },
+  {
+   "commit": "6d84446157dc",
+   "committed_at": "2026-09-17T05:45:48+0700",
+   "ct": 1789598748,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(20/prep): HISTORICAL REPLAYS (step 5) — runner with every clas"
+  },
+  {
+   "commit": "7351e898c234",
+   "committed_at": "2026-09-17T05:54:51+0700",
+   "ct": 1789599291,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(20/prep): W1 DRIVER — prepare / kernel-first / approve / run ("
+  },
+  {
+   "commit": "4e04fec54708",
+   "committed_at": "2026-09-17T05:56:47+0700",
+   "ct": 1789599407,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(20/prep): fresh-trunk topology — the W1 copy's master re-point"
+  },
+  {
+   "commit": "e8bd51ad5ff8",
+   "committed_at": "2026-09-17T06:00:00+0700",
+   "ct": 1789599600,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12): integrity tool reads gzipped rows (the repo keeps 350 KB,"
+  }
+ ],
+ "chunks": [
+  {
+   "chunk": "00000",
+   "log_birth": "2026-09-16T23:30:27+0700",
+   "head_at_birth": "023d6ce",
+   "kernel_class": "NOT_AVAILABLE",
+   "kernel_head_recorded": null,
+   "kernel_dirty_aisef_recorded": null,
+   "candidate_kernel": false,
+   "attribution": "working tree at start = HEAD 023d6ce plus edits in progress toward the next commit (P16/P17 gate narrowing, process ownership, replay manifest for 00000; P13 positive session ownership for 10000) — which edits were on disk when the workers were spawned is not recoverable; every seed of the chunk is RE-RUN IN FULL on the candidate kernel"
+  },
+  {
+   "chunk": "10000",
+   "log_birth": "2026-09-17T01:06:33+0700",
+   "head_at_birth": "bb31522",
+   "kernel_class": "NOT_AVAILABLE",
+   "kernel_head_recorded": null,
+   "kernel_dirty_aisef_recorded": null,
+   "candidate_kernel": false,
+   "attribution": "working tree at start = HEAD bb31522 plus edits in progress toward the next commit (P16/P17 gate narrowing, process ownership, replay manifest for 00000; P13 positive session ownership for 10000) — which edits were on disk when the workers were spawned is not recoverable; every seed of the chunk is RE-RUN IN FULL on the candidate kernel"
+  },
+  {
+   "chunk": "20000",
+   "log_birth": "2026-09-17T03:09:15+0700",
+   "head_at_birth": "d956249",
+   "kernel_class": "DERIVABLE_FROM_RAW_EVIDENCE",
+   "kernel_head_recorded": null,
+   "kernel_dirty_aisef_recorded": null,
+   "candidate_kernel": false,
+   "attribution": "d956249's aisef tree exactly: the chain started 5 s after that commit with a clean tree and f0cd772's only aisef change is SS-64; the 4267 seeds whose scenario contains a verifier BUDGET step — the only path SS-64 changes — are re-run on the candidate, plus a 500-seed control sample"
+  },
+  {
+   "chunk": "30000",
+   "log_birth": "2026-09-17T03:49:34+0700",
+   "head_at_birth": "d956249",
+   "kernel_class": "DERIVABLE_FROM_RAW_EVIDENCE",
+   "kernel_head_recorded": null,
+   "kernel_dirty_aisef_recorded": null,
+   "candidate_kernel": false,
+   "attribution": "d956249's aisef tree exactly: the chain started 5 s after that commit with a clean tree and f0cd772's only aisef change is SS-64; the 4267 seeds whose scenario contains a verifier BUDGET step — the only path SS-64 changes — are re-run on the candidate, plus a 500-seed control sample"
+  },
+  {
+   "chunk": "40000",
+   "log_birth": "2026-09-17T04:27:28+0700",
+   "head_at_birth": "d956249",
+   "kernel_class": "DERIVABLE_FROM_RAW_EVIDENCE",
+   "kernel_head_recorded": null,
+   "kernel_dirty_aisef_recorded": null,
+   "candidate_kernel": false,
+   "attribution": "d956249's aisef tree exactly: the chain started 5 s after that commit with a clean tree and f0cd772's only aisef change is SS-64; the 4267 seeds whose scenario contains a verifier BUDGET step — the only path SS-64 changes — are re-run on the candidate, plus a 500-seed control sample"
+  },
+  {
+   "chunk": "50000",
+   "log_birth": "2026-09-17T05:13:43+0700",
+   "head_at_birth": "f0cd772",
+   "kernel_class": "DERIVABLE_FROM_RAW_EVIDENCE",
+   "kernel_head_recorded": null,
+   "kernel_dirty_aisef_recorded": null,
+   "candidate_kernel": true,
+   "attribution": "started after the SS-64 commit; the aisef tree is identical from f0cd772 to HEAD"
+  },
+  {
+   "chunk": "60000",
+   "log_birth": "2026-09-17T05:53:29+0700",
+   "head_at_birth": "6d84446",
+   "kernel_class": "DERIVABLE_FROM_RAW_EVIDENCE",
+   "kernel_head_recorded": null,
+   "kernel_dirty_aisef_recorded": null,
+   "candidate_kernel": true,
+   "attribution": "started after the SS-64 commit; the aisef tree is identical from f0cd772 to HEAD"
+  }
+ ],
+ "rule": "Old evidence must never silently satisfy new gates: every seed either has candidate-kernel evidence (chunks 50000–90000, the full re-run of 00000–19999, the targeted SS-64 re-run and the control sample) or rests on the measured B→candidate diff whose only changed path it does not exercise."
+}

@@ -14,6 +14,7 @@ CLI (the big run):  python3 -m tests.hardening.differential --traces 100000 --wo
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import random
 import sys
@@ -151,6 +152,7 @@ class Observation:
     candidates_frozen: int
     events: list[str] = field(default_factory=list)   # canonical stage/outcome stream (diagnostic, not compared)
     orphans_surviving: int = 0    # F5 / INV-L.1: processes a developer session left behind that outlived the story (model: 0)
+    invariant_violations: list[str] = field(default_factory=list)   # model: check_properties after EVERY transition (owner item 5)
 
     COMPARED = ("terminal", "developer_sessions", "review_executions", "security_executions", "quality_attempts",
                 "infra_attempts", "candidates_frozen", "orphans_surviving")
@@ -179,6 +181,7 @@ def model_run(sc: Scenario, max_steps: int = 80) -> Observation:
     M.MAX_RETRIES_SAVED = getattr(M, "MAX_RETRIES_SAVED", M.MAX_RETRIES)
     dev, rev, sec = _Queue(sc.developer), _Queue(sc.review), _Queue(sc.security)
     tree_red = False
+    violations: list[str] = []
     old = M.MAX_RETRIES
     M.MAX_RETRIES = sc.max_retries
     try:
@@ -202,7 +205,10 @@ def model_run(sc: Scenario, max_steps: int = 80) -> Observation:
                 ev = "GATE_EVALUATE"
             else:
                 break
+            k._q_before = k.s.quality_attempts
+            k._c_before = k.s.candidate
             k.apply(ev)
+            violations.extend(f"step {len(k.s.trace)} {ev}: {b}" for b in M.check_properties(k))
     finally:
         M.MAX_RETRIES = old
     s = k.s
@@ -217,7 +223,7 @@ def model_run(sc: Scenario, max_steps: int = 80) -> Observation:
     else:
         terminal = f"running:{s.stage}"
     return Observation(terminal, s.developer_sessions, s.review_executions, s.security_executions, s.quality_attempts,
-                       s.infra_attempts, len(s.graded_candidates), [f"{e}->{o}" for e, o, _ in s.trace])
+                       s.infra_attempts, len(s.graded_candidates), [f"{e}->{o}" for e, o, _ in s.trace], invariant_violations=violations)
 
 
 # ------------------------------------------------------------ real side
@@ -324,8 +330,10 @@ def attribute(sc: Scenario) -> list[str]:
 def run_one(seed: int) -> dict:
     sc = generate(seed)
     real, model = real_run(sc), model_run(sc)
-    diff = real.diff(model)
-    return {"seed": seed, "scenario": sc.summary(), "diff": diff, "attributed": attribute(sc) if diff else [],
+    obs_diff = real.diff(model)
+    diff = obs_diff + [f"invariant: {v}" for v in model.invariant_violations]
+    return {"seed": seed, "scenario": sc.summary(), "diff": diff, "attributed": attribute(sc) if obs_diff else [],
+            "invariant_violations": list(model.invariant_violations),
             "real": asdict(real), "model": asdict(model), "model_steps": len(model.events),
             "real_events": len(real.events) - 1}
 
@@ -333,7 +341,11 @@ def run_one(seed: int) -> dict:
 def _worker(seeds: list[int]) -> list[dict]:
     out = []
     for i, s in enumerate(seeds, 1):
-        out.append(run_one(s))
+        try:
+            out.append(run_one(s))
+        except Exception as e:  # noqa: BLE001 — recorded as a failure with its traceback; the chunk goes on
+            out.append({"seed": s, "scenario": "", "diff": [f"EXCEPTION: {type(e).__name__}: {e}"], "attributed": [], "invariant_violations": [],
+                        "exception": traceback.format_exc()[-2000:], "real": None, "model": None, "model_steps": 0, "real_events": 0})
         if i % 250 == 0:                                     # Phase 12 watchdog: measurable progress per worker
             print(f"progress worker seeds={seeds[0]}.. done={i}/{len(seeds)}", file=sys.stderr, flush=True)
     return out
@@ -363,6 +375,9 @@ def run_many(traces: int, workers: int = 1, start: int = 0, seeds: list[int] | N
             "_rows": _rows,
             "matched": len(matched), "mismatched_attributed": dict(attributed),
             "unexplained_count": len(unexplained), "unexplained": unexplained[:100],
+            "invariant_violations": sum(len(r.get("invariant_violations") or []) for r in rows),
+            "exceptions": sum(1 for r in rows if r.get("exception")),
+            "silent_skips": len(seeds) - len(rows),
             "known_deviations": sorted(KNOWN), "vocabulary": {"developer": DEV, "review": REV, "security": SEC}}
 
 
@@ -380,8 +395,24 @@ def _kernel_identity() -> dict:
         except (OSError, subprocess.SubprocessError):
             return ""
 
+    def digest(p: Path) -> str:
+        return hashlib.sha256(p.read_bytes()).hexdigest()
+
+    def content_digest(d: Path) -> str:
+        h = hashlib.sha256()
+        for f in sorted(x for x in d.rglob("*") if x.is_file() and "__pycache__" not in x.parts):
+            h.update(str(f.relative_to(d)).encode("utf-8") + b"\0" + f.read_bytes() + b"\0")
+        return h.hexdigest()
+
     return {"head": git("rev-parse", "HEAD"), "dirty_aisef": git("status", "--porcelain", "--", "aisef").splitlines(),
-            "started_at": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
+            "started_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+            "aisef_tree": git("rev-parse", "HEAD:aisef"),                       # PHASE12_KERNEL_DIGEST: the product tree object
+            "aisef_content_sha256": content_digest(root / "aisef"),              # the product tree as loaded from disk
+            "invariants_registry_sha256": digest(root / "aisef" / "invariants.yaml"),
+            "synthetic_adapter_sha256": digest(root / "aisef" / "clients" / "synthetic.py"),
+            "model_sha256": digest(root / "tests" / "hardening" / "model.py"),
+            "comparator_sha256": digest(root / "tests" / "hardening" / "differential.py"),
+            "hygiene_case_sha256": digest(root / "tests" / "test_retry_hygiene.py")}
 
 
 def main(argv=None) -> int:
@@ -408,11 +439,13 @@ def main(argv=None) -> int:
     if rows:                                                 # Phase 12 integrity: one compact record per trace, beside the summary
         with open(str(Path(a.out).with_suffix(".rows.jsonl")), "w", encoding="utf-8") as fh:
             for r in rows:
+                real, model = r.get("real") or {}, r.get("model") or {}
                 fh.write(json.dumps({"seed": r["seed"], "scenario": r["scenario"], "diff": r["diff"],
-                                     "real_terminal": r["real"]["terminal"], "model_terminal": r["model"]["terminal"],
-                                     "model_events": r["model"]["events"], "real_events": r["real"]["events"][:-1],
-                                     "counts": {k: r["real"][k] for k in ("developer_sessions", "review_executions", "security_executions",
-                                                                          "quality_attempts", "infra_attempts", "candidates_frozen", "orphans_surviving")}},
+                                     "invariant_violations": r.get("invariant_violations") or [], "exception": r.get("exception"),
+                                     "real_terminal": real.get("terminal"), "model_terminal": model.get("terminal"),
+                                     "model_events": model.get("events") or [], "real_events": (real.get("events") or [])[:-1],
+                                     "counts": {k: real.get(k) for k in ("developer_sessions", "review_executions", "security_executions",
+                                                                         "quality_attempts", "infra_attempts", "candidates_frozen", "orphans_surviving")}},
                                     ensure_ascii=False) + "\n")
     print(json.dumps({k: v for k, v in res.items() if k not in ("unexplained", "vocabulary")}, ensure_ascii=False))
     for r in res["unexplained"][:15]:

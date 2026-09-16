@@ -37,8 +37,9 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
 MARKERS = ["wave=EPIC-01/w3 DONE", "wave=EPIC-03/w1 DONE"]  # P20 procedure 3: the forced-resume boundaries
 STALL_S = 2 * 3600
-ARB1_NOTE = ("ARB-1: re-approval for byte-identical content after the hash-method change (SS-55 verifier-config digest); "
-             "kernel refusal recorded first; see closure-evidence/hardening/w1/ARBITRATION-PREDECLARED.json")
+ARB1_NOTE = ("ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for byte-identical content after the hash-method change "
+             "(SS-55 verifier-config digest); not a waiver; kernel refusal recorded first; conditions measured in "
+             "closure-evidence/hardening/w1/ARBITRATION-PREDECLARED.json")
 
 
 def now() -> str:

@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-16T22:35:37Z",
+ "generated": "2026-09-16T23:10:24Z",
  "rule": "Do not let a predeclared arbitration become a hidden waiver.",
  "arbitrations": [
   {
@@ -54,8 +54,20 @@
     "procedure": "At W1 start `aisef run` is invoked with NO re-approval and NO `--force`. The kernel's own readiness check must refuse or stop on the STALE gate before any agent call; its exit code, message and the absence of any agent session are recorded in the run's W1 record. Only after that observation is the gate re-approved. A run that proceeds past a STALE readiness without `--force` is a P0 finding and stops W1."
    },
    "decision": "Re-approve `readiness` for the byte-identical content through the normal CLI (`aisef approve readiness`), never a state edit; record seq, digest before/after, decided_by and a note naming this record (ARB-1) in W1-LEDGERLOCK-<n>.json.",
+   "owner_decision": {
+    "decision": "OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL",
+    "given": "2026-09-17, owner message 'OWNER DECISION — FINALIZE PHASE 12 WITH SINGLE-KERNEL EVIDENCE' §1",
+    "scope": "ONLY the reported hash-method migration case; this is NOT a waiver; void if any content difference is found — the normal approval flow then runs",
+    "conditions_measured": {
+     "readiness_content_unchanged": true,
+     "both_bound_artifacts_unchanged": true,
+     "historical_hash_method_reproduces_stored_digest_exactly": true,
+     "stale_caused_only_by_the_framework_hash_method_change": true,
+     "no_requirement_story_architecture_ac_or_implementation_change_hidden": true
+    }
+   },
    "decision_authority": {
-    "owner_decision_given_for_this_specific_re_approval": false,
+    "owner_decision_given_for_this_specific_re_approval": true,
     "basis": [
      "the content is byte-identical to what the owner (`nghinh`) signed on 2026-09-15T13:32:32+00:00",
      "the approvals module states that a hash-method change stales `stories`/`readiness` once — the re-approval is the module's own documented remedy",
@@ -94,7 +106,8 @@
  "checks": {
   "artifacts_byte_identical_to_what_was_signed": true,
   "only_readiness_is_stale": true,
-  "readiness_signed_by_a_person": true
+  "readiness_signed_by_a_person": true,
+  "owner_conditions_all_met": true
  },
  "verdict": "DECLARED"
 }
