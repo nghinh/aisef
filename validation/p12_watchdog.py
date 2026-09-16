@@ -82,14 +82,14 @@ def read_ps() -> str | None:
 
 
 def alive(pid: int) -> bool | None:
+    """Liveness through the product's own cross-platform probe (aisef.control.state.pid_alive — proven on Linux, macOS and
+    Windows CI). `os.kill(pid, 0)` is NOT a probe on Windows (it can terminate the process); any failure of the probe
+    itself is None → TOOL_UNAVAILABLE, never a false stall or a false death."""
     try:
-        os.kill(pid, 0)
-        return True
-    except ProcessLookupError:
-        return False
-    except PermissionError:
-        return True
-    except OSError:
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+        from aisef.control.state import pid_alive
+        return bool(pid_alive(pid))
+    except Exception:  # noqa: BLE001 — the probe is unavailable, which is the explicit class for it
         return None
 
 

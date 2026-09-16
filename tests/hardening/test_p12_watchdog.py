@@ -46,10 +46,10 @@ class TestSignalProviders(unittest.TestCase):
         self.assertIs(running_chunk("  9 other\n"), False)              # none running (a chunk boundary or a dead chain)
         self.assertIsNone(running_chunk(None))                          # ps unreadable → TOOL_UNAVAILABLE upstream
 
-    def test_alive_uses_signal_zero_not_a_platform_field(self):
+    def test_alive_uses_the_products_cross_platform_probe_not_a_platform_field(self):
         import os
         self.assertTrue(alive(os.getpid()))
-        self.assertFalse(alive(2_000_000_000))                          # no such pid → dead, not unmeasurable
+        self.assertIs(alive(2_000_000_000), False)                      # no such pid → dead (on every CI platform), not unmeasurable
 
 
 if __name__ == "__main__":
