@@ -180,10 +180,20 @@ class ClaudeCodeAdapter(ClientAdapter):
             # caller distinguishes a hard wall-clock kill from any
             # parse-derived message.  The reader thread kept collecting
             # lines up to the kill instant, so the cost/turn signal may
-            # already be in `result` regardless.
+            # already be in `result` regardless — and a result event that
+            # slipped in after the kill decision must never turn the cut
+            # session into a success (AD-05).
             result.error = f"exceeded {spec.timeout_seconds}s"
-        if not result.raw_result and stderr.strip() and not timed_out:
-            result.error = result.error or stderr.strip()[:500]
+            result.ok = False
+        no_result_event = not result.raw_result or "without a result event" in (result.error or "")
+        if no_result_event and not timed_out:
+            # AD-04: no result event — record how the child ended so a heap crash is not read as a cut
+            rc = proc.returncode
+            tail = stderr.strip()[:500]
+            if rc not in (0, None) or tail:
+                result.error = (f"child exited {rc}: {tail[:300]}" if tail else f"child exited {rc}") + (
+                    f" ({result.error})" if result.error else "")
+                result.raw_result = {**result.raw_result, "exit_code": rc, "returncode": rc, **({"stderr": tail} if tail else {})}
         if exit_status_of(result) == "auth":
             # "401" is not something an operator can act on.  Name the **path**
             # — client and model — and then the variable that decided who this

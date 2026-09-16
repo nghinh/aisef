@@ -16,7 +16,6 @@ from __future__ import annotations
 import argparse
 import json
 import random
-import re
 import sys
 import time
 import traceback
@@ -34,6 +33,7 @@ from aisef.clients.base import quote_command  # noqa: E402
 from aisef.clients.synthetic import Script, Step, SyntheticClientAdapter  # noqa: E402
 from aisef.config import DEFAULTS, Config  # noqa: E402
 from aisef.control.journal import JournalStore  # noqa: E402
+from aisef.harness.observe import AGENT_RUN, EvidenceStore  # noqa: E402
 from aisef.phases.implement import implement_story  # noqa: E402
 from tests.hardening import model as M  # noqa: E402
 from tests.test_retry_hygiene import SID, HygieneCase  # noqa: E402
@@ -186,9 +186,11 @@ def model_run(sc: Scenario, max_steps: int = 80) -> Observation:
             elif s.stage == M.VERIFY:
                 ev = "TEST_UNRUNNABLE" if sc.test_tool_missing else ("TEST_FAIL" if tree_red else "TEST_PASS")
             elif s.stage == M.REVIEW:
-                ev = REV_EVENT[rev.next()]
+                kind = rev.next()
+                ev = REV_EVENT[rev.next() if kind == "MALFORMED" else kind]     # the schema retry consumes the next step
             elif s.stage == M.SECURITY:
-                ev = SEC_EVENT[sec.next()]
+                kind = sec.next()
+                ev = SEC_EVENT[sec.next() if kind == "MALFORMED" else kind]
             elif s.stage == M.GATE:
                 ev = "GATE_EVALUATE"
             else:
@@ -231,44 +233,47 @@ class _Case(HygieneCase):
 
 
 def _terminal_class(out, frozen: int = 0, max_retries: int = 1) -> str:
-    """The real kernel's terminal reason is prose (a Family 2 gap). Classify from TYPED facts first — the
-    attempt flags and the budgets — and read wording only where no typed fact exists yet (plan deadlock,
-    tool-unrunnable environment)."""
+    """Classify the real kernel's terminal from TYPED facts only: `StoryOutcome.terminal` (the stage-outcome
+    vocabulary, F2), the last attempt's flags and the two constant stage labels the kernel puts in front of an
+    UNRUNNABLE terminal. No wording is read; an untyped terminal is a mismatch by construction."""
+    from aisef.control.outcome import StageOutcome as SO
+    from aisef.phases.implement import REVIEW_UNRUNNABLE, SECURITY_UNRUNNABLE
     if out.done:
         return "done"
     attempts = out.attempts
     last = attempts[-1] if attempts else None
-    r = (out.blocked_reason or (last.error if last else "") or "").lower()
-    if last is not None and last.fatal:
-        if "isolation" in r or "revert and re-run" in r or "outside the worktree" in r:
-            return "blocked:isolation breach"
-        if "0 tool calls" in r or "cannot write code" in r:
-            return "blocked:zero output: model cannot use tools"
-        if "credential" in r or "authentication" in r or re.search(r"\b40[13]\b", r):
-            return "blocked:credential rejected"       # a bare '401' also occurs inside commit hashes
-        return f"blocked:FATAL:{r[:80]}"
-    if "review_unrunnable" in r or "reviewer could not" in r or "review could not" in r:
-        return "blocked:REVIEW_UNRUNNABLE"
-    if "deadlock" in r or "stuck" in r or "plan" in r:
-        return "human:plan conflict"
-    if out.quality_attempts > max_retries:
-        return "failed:did not pass gate"
-    trailing_noops = 0
-    for a in reversed(attempts):
-        if not a.noop:
-            break
-        trailing_noops += 1
-    if trailing_noops >= 2:
-        return ("blocked:no-op: developer declined proven work twice" if frozen
-                else "blocked:no-op: nothing to grade twice")
-    infra = [a for a in attempts if a.infra and not a.fatal]
-    if len(infra) >= max_retries + 1:
-        return "blocked:no-op: budget exhausted" if (last is not None and last.noop) else "failed:recurring infrastructure error"
-    if "budget" in r:
+    t, r = out.terminal, out.blocked_reason or ""
+    if t == SO.ISOLATION_BREACH.value:
+        return "blocked:isolation breach"
+    if t == SO.AUTH_FAILURE.value:
+        return "blocked:credential rejected"
+    if t == SO.BUDGET.value:
         return "blocked:budget cap"
-    if "unrunnable" in r or "environment" in r:
-        return "blocked:environment: test tool unrunnable"
-    return f"blocked:UNMAPPED:{r[:90]}"
+    if t == SO.PLAN_CONFLICT.value:
+        return "human:plan conflict"
+    if t == SO.QUALITY_BLOCK.value:
+        return "failed:did not pass gate"
+    if t == SO.UNRUNNABLE.value:
+        return "blocked:REVIEW_UNRUNNABLE" if r.startswith(REVIEW_UNRUNNABLE) else (
+            "blocked:SECURITY_UNRUNNABLE" if r.startswith(SECURITY_UNRUNNABLE) else f"blocked:UNRUNNABLE:{r[:60]}")
+    if t == SO.NOOP.value:
+        trailing = 0
+        for a in reversed(attempts):
+            if not a.noop:
+                break
+            trailing += 1
+        if trailing >= 2:
+            return "blocked:no-op: developer declined proven work twice" if frozen else "blocked:no-op: nothing to grade twice"
+        return "blocked:no-op: budget exhausted"
+    if t == SO.INFRA_FAILURE.value:
+        return "failed:recurring infrastructure error"
+    if t == SO.ENVIRONMENT_FAILURE.value:
+        if last is not None and last.fatal:
+            return "blocked:zero output: model cannot use tools"            # the only fatal environment exit in the vocabulary
+        if last is not None and last.infra and not last.verify_only:
+            return "failed:recurring infrastructure error"                  # developer sessions kept exiting on the environment
+        return "blocked:environment: test tool unrunnable"                  # a tool stage that never ran
+    return f"blocked:UNTYPED:{t or '-'}:{r[:70]}"
 
 
 def real_run(sc: Scenario) -> Observation:
@@ -285,9 +290,9 @@ def real_run(sc: Scenario) -> Observation:
         infra = len([a for a in out.attempts if a.infra and not a.fatal])
         events = [f"{c.role}:{c.step}" for c in client.calls]
         events.append(out.summary().replace("\n", " | ")[:300])
+        runs = [e.name for e in EvidenceStore(case.artifacts).read(SID).of(AGENT_RUN)]
         return Observation(_terminal_class(out, len(frozen), sc.max_retries), client.develop_calls,
-                           len([c for c in client.calls if c.role == "review"]),
-                           len([c for c in client.calls if c.role == "security"]),
+                           runs.count(f"{SID}-review"), runs.count(f"{SID}-security"),   # executions, not sessions
                            out.quality_attempts, infra, len(frozen), events)
     finally:
         case.tearDown()
@@ -296,18 +301,9 @@ def real_run(sc: Scenario) -> Observation:
 # ------------------------------------------------------------ attribution of a mismatch to an OPEN defect
 # Each rule: (defect id, predicate over the scenario). Emptied as families close (W0: KNOWN == {}).
 # Removed: D-035 (F1, 2026-09-16 — the no-op decision reads a fresh verdict; the kernel agrees with the model).
-KNOWN = {
-    "SS-14": lambda sc: sc.test_tool_missing,
-    "SS-15": lambda sc: "CONTEXT" in sc.developer,
-    "SS-21": lambda sc: "BUDGET" in sc.developer,
-    "SS-12": lambda sc: "BUDGET" in sc.review or "BUDGET" in sc.security,
-    "SS-13": lambda sc: "UNRUNNABLE" in sc.security or "MALFORMED" in sc.security,
-    "SS-57": lambda sc: "MALFORMED" in sc.review,
-    # SS-59: on a retry the zero-output check diffs against the base branch, sees the frozen candidate's files
-    # and never fires — the session is recorded as a no-op decision instead of a fatal environment failure
-    "SS-59": lambda sc: "ZERO_OUTPUT" in sc.developer and any(
-        k in ("CHANGED", "CHANGED_RED", "SCOPE_VIOLATION", "MAX_TURNS_WORK")
-        for k in sc.developer[:sc.developer.index("ZERO_OUTPUT")]),
+KNOWN: dict = {
+    # F2 (2026-09-16) removed SS-12, SS-13, SS-14, SS-15, SS-21, SS-57, SS-59: typed outcomes and stage-local retry
+    # landed; the model and the kernel must now agree on every one of those scenarios.
 }
 
 

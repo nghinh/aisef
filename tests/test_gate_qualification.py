@@ -324,14 +324,14 @@ class TestTestThat(Muc):
         self.assertIn("tests/test_a.py", m.detail)
 
     def test_env_chua_quet_thi_khong_tro_su_kien_nao(self):
-        """`run_attempt` luôn ghi `qa:fake-tests`; chỉ chạy tay mới không có.
-        Hôm nay mã cho PASSED khi vắng quét (SOLUTION §12 ghi ✗ — lệch, ghi ở
-        ADR-005 §9 V9); control này giữ điều đúng ở cả hai: không quét thì
-        `evidence` rỗng, người đọc `gate:verdict` thấy ngay mục không trỏ gì."""
+        """`run_attempt` luôn ghi `qa:fake-tests`, và từ F2 (SS-01) `qa.run_suite`
+        cũng ghi cả khi sạch; chỉ bằng chứng chép tay mới thiếu. Vắng quét là
+        "quét chưa chạy", không phải "quét sạch": UNRUNNABLE, `evidence` rỗng
+        (INV-T.1 — vắng mặt không bao giờ sinh PASS)."""
         self.xanh()
         m = self.muc(self.gate())
         self.assertEqual(m.evidence, [])
-        self.assertFalse(m.outcome.blocks)
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE)
 
 
 class TestTieuChiCoTest(Muc):

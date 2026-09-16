@@ -21,9 +21,10 @@ class TestSS60ADoneStoryHasAFrozenCandidate(ImplementTestCase):
 
     def setUp(self):
         super().setUp()
-        # back to an unborn HEAD: the fixture's entry commit is what SS-60 is about NOT having
-        import shutil
-        shutil.rmtree(self.project / ".git")
+        # back to an unborn HEAD: the fixture's entry commit is what SS-60 is about NOT having.
+        # Windows marks .git/objects read-only — plain rmtree raised WinError 5 on CI (run 35092276631)
+        from aisef.kit.fetch import remove_tree
+        remove_tree(self.project / ".git")
         subprocess.run(["git", "init", "-q"], cwd=self.project, check=True)
 
     # GREEN since F1 (SS-60: typed freeze outcome / session-bound proofs), 2026-09-16

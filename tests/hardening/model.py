@@ -32,6 +32,7 @@ PASS, QUALITY_BLOCK, UNRUNNABLE, ENVIRONMENT_FAILURE, INFRA_FAILURE, AUTH_FAILUR
 MAX_RETRIES = 2          # quality attempts beyond the first
 INFRA_BUDGET = MAX_RETRIES + 1   # the real kernel's default: `run.max_infra_retries < 0 → max_retries + 1`
 MAX_REVIEW_RETRIES = 2
+MAX_TOOL_RETRIES = 2     # tool-stage re-runs per candidate (real: implement.MAX_TOOL_RETRIES); never the infra budget
 MAX_NOOP = 2
 REQUIRED_PROOFS = ("test", "lint", "scope", "review", "security")
 
@@ -83,12 +84,14 @@ class Story:
     lease_live: bool = True
     quality_attempts: int = 0
     graded_candidates: set = field(default_factory=set)
+    reviewed_candidates: set = field(default_factory=set)   # candidates the reviewer took a position on (a verdict)
     infra_attempts: int = 0
     review_executions: int = 0
     security_executions: int = 0
     #: verifier executions on the CURRENT candidate — the retry bound is per candidate (the real `review_attempt`)
     review_execs_here: int = 0
     security_execs_here: int = 0
+    tool_execs_here: int = 0          # tool-stage executions on the current candidate (SS-14: bounded, not infra)
     #: review QUALITY_BLOCK per candidate: True when its findings point outside the write scope
     block_outside: dict = field(default_factory=dict)
     prev_graded_candidate: int = 0   # the graded candidate before the current one, 0 = none / an ungraded session between
@@ -216,10 +219,18 @@ class Kernel:
         s = self.s
         # the deadlock pair is "two CONSECUTIVE graded attempts": an infra / no-op / capped session between them
         # breaks the pair (the real kernel reads attempts[-1] and attempts[-2] and requires neither to be infra)
-        s.prev_graded_candidate = s.candidate if (s.candidate in s.graded_candidates and s.last_session_graded) else 0
+        # the deadlock pair is two consecutive REVIEWED positions (real: deadlock_reason pairs graded attempts whose
+        # reviewer produced a verdict; infra cuts, no-op decisions and review-absent candidates are not positions —
+        # SS-63; a capped session without a candidate IS a graded attempt without findings and breaks the pair)
+        if not s.last_session_graded:
+            s.prev_graded_candidate = 0
+        elif s.candidate in s.reviewed_candidates:
+            s.prev_graded_candidate = s.candidate
+        elif s.candidate not in s.graded_candidates:
+            s.prev_graded_candidate = 0
         s.last_session_graded = True
         s.candidate = 1000 * s.epoch + s.developer_sessions
-        s.review_execs_here = s.security_execs_here = 0
+        s.review_execs_here = s.security_execs_here = s.tool_execs_here = 0
         s.invalidate_dependent()              # a new candidate: every verdict over the old one is stale
         s.stage = VERIFY
         self._charge_quality()                # a frozen candidate is a non-infra attempt, whatever grading then says
@@ -245,8 +256,7 @@ class Kernel:
 
     def _develop_noop(self) -> str:
         s = self.s
-        s.developer_sessions += 1
-        s.last_session_graded = False
+        s.developer_sessions += 1             # a no-op decision is not a position (real: infra-flagged, filtered by deadlock_reason)
         s.infra_attempts += 1                 # a session with nothing to grade spends the same budget as an infra cut
         if s.candidate == 0:
             s.noop_streak += 1                # nothing frozen: a decision, stated (T6)
@@ -259,6 +269,10 @@ class Kernel:
         if verdict is None:                   # T6': stale or absent verdict → re-grade the frozen candidate
             s.infra_attempts -= 1             # a graded session is not a "nothing to grade" session
             self._charge_quality()            # ...it is a developer attempt whose tree the gate scores
+            # a re-graded no-op IS a graded position: the same candidate blocked twice for the same out-of-scope
+            # reason pairs with its previous grade (real: deadlock_reason pairs graded attempts; seed 2531)
+            s.prev_graded_candidate = s.candidate if s.candidate in s.graded_candidates else 0
+            s.last_session_graded = True
             s.stage = VERIFY
             return NOOP
         if verdict.outcome == QUALITY_BLOCK:  # T6: proven unresolved work, decision stated
@@ -280,8 +294,7 @@ class Kernel:
     def _infra(self) -> str:
         s = self.s
         s.developer_sessions += 1
-        s.last_session_graded = False          # an ungraded session breaks the "two consecutive" deadlock pair
-        s.noop_streak = 0                      # ...and the no-op streak (the real kernel counts TRAILING no-ops)
+        s.noop_streak = 0                      # the no-op streak (the real kernel counts TRAILING no-ops); an infra cut is not a position
         s.infra_attempts += 1
         if s.infra_attempts >= MAX_RETRIES + 1:
             s.status, s.terminal_reason = FAILED, "recurring infrastructure error"
@@ -350,43 +363,53 @@ class Kernel:
         return ISOLATION_BREACH
 
     # deterministic verification
+    def _after_test(self) -> None:
+        s = self.s
+        r = s.fresh("review")
+        if r is None or r.outcome == UNRUNNABLE:
+            s.stage = REVIEW                  # no verdict yet (or an absence): the reviewer runs
+        else:
+            self._after_review()              # a fresh verdict is kept on a tool re-run (reuse)
+
     def _test_pass(self) -> str:
         s = self.s
+        s.tool_execs_here += 1
         s.record("test", PASS)
         s.record("lint", PASS)
         s.record("scope", QUALITY_BLOCK if s.tree_state else PASS)
-        s.stage = REVIEW
+        self._after_test()
         return PASS
 
     def _test_fail(self) -> str:
         s = self.s
+        s.tool_execs_here += 1
         s.record("test", QUALITY_BLOCK)
         s.record("lint", PASS)
         s.record("scope", QUALITY_BLOCK if s.tree_state else PASS)
-        s.stage = REVIEW                      # the reviewer and the security pass still run: one complete round of feedback
+        self._after_test()                    # the reviewer and the security pass still run: one complete round of feedback
         return QUALITY_BLOCK
 
     def _test_unrunnable(self) -> str:        # T16: tool stage failure — never a developer attempt (INV-G.3)
         s = self.s
+        s.tool_execs_here += 1
         s.record("test", UNRUNNABLE)
-        s.infra_attempts += 1
-        if s.infra_attempts >= MAX_RETRIES + 1:
-            s.status, s.terminal_reason = BLOCKED, "environment: test tool unrunnable"
-            s.human_reason = "environment"
-        else:
-            s.stage = VERIFY                  # retry the tool stage
+        s.record("lint", PASS)
+        s.record("scope", QUALITY_BLOCK if s.tree_state else PASS)
+        self._after_test()                    # the verifiers still run; the gate decides what the absence means (SS-14)
         return ENVIRONMENT_FAILURE
 
     # review — every review outcome is recorded; the security pass runs once per candidate; the GATE decides
     # what a missing verdict means (stage-local retry, bounded) and what a block means (developer, deadlock)
     def _after_review(self) -> None:
         s = self.s
-        s.stage = GATE if s.fresh("security") is not None else SECURITY
+        r = s.fresh("security")
+        s.stage = GATE if r is not None and r.outcome != UNRUNNABLE else SECURITY   # an absence is re-run (INV-G.2)
 
     def _review_pass(self) -> str:
         s = self.s
         s.review_executions += 1
         s.review_execs_here += 1
+        s.reviewed_candidates.add(s.candidate)
         s.record("review", PASS)
         self._after_review()
         return PASS
@@ -396,6 +419,7 @@ class Kernel:
         s.review_executions += 1
         s.review_execs_here += 1
         s.record("review", QUALITY_BLOCK)
+        s.reviewed_candidates.add(s.candidate)
         s.block_outside[s.candidate] = outside
         self._after_review()
         return QUALITY_BLOCK
@@ -407,6 +431,7 @@ class Kernel:
         s = self.s
         s.review_executions += 1
         s.review_execs_here += 1
+        s.reviewed_candidates.add(s.candidate)
         s.record("review", PLAN_CONFLICT)
         self._after_review()
         return PLAN_CONFLICT
@@ -492,7 +517,11 @@ class Kernel:
         # only absences remain: retry the stage that said nothing, bounded, never the developer (INV-G.1/G.2/G.3)
         s.record("gate", UNRUNNABLE)
         if proofs["test"] is not None and proofs["test"].outcome == UNRUNNABLE:
-            s.stage = VERIFY
+            if s.tool_execs_here >= 1 + MAX_TOOL_RETRIES:                      # bounded per candidate, never infra budget
+                s.status, s.terminal_reason = BLOCKED, "environment: test tool unrunnable"
+                s.human_reason = "environment"
+            else:
+                s.stage = VERIFY                                             # re-run the tool stage; fresh verdicts are kept
             return UNRUNNABLE
         if review is not None and review.outcome == UNRUNNABLE:
             if s.review_execs_here >= 1 + MAX_REVIEW_RETRIES:

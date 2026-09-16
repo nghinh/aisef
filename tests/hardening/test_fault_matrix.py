@@ -66,7 +66,7 @@ class TestDeveloperFaults(_Case):
         self.assertIn("0 tool calls", out.blocked_reason)
         self.assertEqual(c.develop_calls, 1)
 
-    @unittest.expectedFailure   # SS-59 — on a retry `changed_files(base_ref)` shows the frozen candidate, the zero-output check never fires
+    # GREEN since F2 (SS-59: zero output on a retry is fatal), 2026-09-16
     def test_zero_output_on_a_retry_is_still_fatal_not_a_noop_decision(self):
         c, out = self.run_script(Script(developer=[Step.changed(), Step("ZERO_OUTPUT"), Step("ZERO_OUTPUT")],
                                         review=[Step.block(), Step.passes()]))
@@ -118,7 +118,7 @@ class TestToolFaults(_Case):
         self.assertFalse(out.done)
         self.assertTrue(any(x.name == "lint" for x in out.attempts[0].gate.failures))
 
-    @unittest.expectedFailure   # SS-58 — the gate's lint branch has no UNRUNNABLE path: a missing linter is FAILED
+    # GREEN since F2 (SS-58: absence is never a verdict; a missing linter is unrunnable), 2026-09-16
     def test_missing_linter_is_unrunnable(self):
         from aisef.control.outcome import Outcome
         c, out = self.run_script(Script(), **{"tools.lint": "aisef-no-such-linter-xyz"})
@@ -132,7 +132,7 @@ class TestReviewFaults(_Case):
         self.assertTrue(out.done, out.summary())
         self.assertTrue(any("off by one" in f for f in out.attempts[0].review_findings), out.attempts[0].review_findings)
 
-    @unittest.expectedFailure   # SS-57 — a malformed verdict passes the review through the prose fallback
+    # GREEN since F2 (SS-57: absence is never a verdict; a missing linter is unrunnable), 2026-09-16
     def test_a_malformed_verdict_never_passes_the_review(self):
         c, out = self.run_script(Script(review=[Step.malformed()]))
         self.assertFalse(out.done, "no structured verdict exists — nothing may PASS the review")
@@ -160,7 +160,7 @@ class TestSecurityFaults(_Case):
         self.assertEqual(c.develop_calls, 2)
         self.assertTrue(any(x.name == "security" for x in out.attempts[0].gate.failures))
 
-    @unittest.expectedFailure   # SS-13 — a security report that cannot be scored is FAILED, not UNRUNNABLE
+    # GREEN since F2 (SS-13: absence is never a verdict; a missing linter is unrunnable), 2026-09-16
     def test_malformed_security_report_is_unrunnable_not_a_verdict(self):
         from aisef.control.outcome import Outcome
         c, out = self.run_script(Script(security=[Step.malformed()]))

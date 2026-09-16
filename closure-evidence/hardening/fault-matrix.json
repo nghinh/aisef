@@ -1,7 +1,7 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "phase": 7,
- "generated": "2026-09-16T11:44:38+00:00",
+ "generated": "2026-09-16T12:37:32+00:00",
  "stages": [
   "Developer",
   "Test",
@@ -73,7 +73,7 @@
    "expected_recovery": "same stage, infra budget",
    "invariants": "INV-G.4",
    "test": "tests/hardening/test_sibling_scan.py::TestSS15EnvironmentExitStatusesAreNotQualityAttempts",
-   "status": "RED (SS-15)"
+   "status": "GREEN (F2)"
   },
   {
    "id": "FM-D-05",
@@ -97,7 +97,7 @@
    "expected_recovery": "none — configuration",
    "invariants": "INV-F.1, INV-G.4",
    "test": "tests/hardening/test_fault_matrix.py::TestDeveloperFaults::test_zero_output_on_a_retry_is_still_fatal_not_a_noop_decision",
-   "status": "RED (SS-59)"
+   "status": "GREEN (F2)"
   },
   {
    "id": "FM-D-06",
@@ -188,12 +188,12 @@
    "stage": "Test",
    "fault": "INFRA",
    "scenario": "runner missing in the sandbox — routing",
-   "expected_state": "no developer session is re-opened; infra budget",
+   "expected_state": "no developer session is re-opened; the tool stage is re-run, bounded per candidate (MAX_TOOL_RETRIES), never on the infra budget and never charged to quality",
    "expected_evidence": "no second developer agent_run",
    "expected_recovery": "retry the tool stage",
    "invariants": "INV-G.3",
    "test": "tests/hardening/test_sibling_scan.py::TestSS14ToolEnvironmentFailureIsNotADeveloperAttempt",
-   "status": "RED (SS-14)"
+   "status": "GREEN (F2)"
   },
   {
    "id": "FM-T-04",
@@ -265,7 +265,7 @@
    "expected_recovery": "tool stage",
    "invariants": "INV-F.3, INV-N.1",
    "test": "tests/hardening/test_fault_matrix.py::TestToolFaults::test_missing_linter_is_unrunnable",
-   "status": "RED (SS-58)"
+   "status": "GREEN (F2)"
   },
   {
    "id": "FM-R-01",
@@ -313,7 +313,7 @@
    "expected_recovery": "review stage",
    "invariants": "INV-G.5",
    "test": "tests/hardening/test_sibling_scan.py::TestSS12BudgetRejectionInReviewDoesNotCrash",
-   "status": "RED (SS-12)"
+   "status": "GREEN (F2)"
   },
   {
    "id": "FM-R-05",
@@ -325,7 +325,7 @@
    "expected_recovery": "review stage retry then unrunnable",
    "invariants": "INV-F.2",
    "test": "tests/hardening/test_fault_matrix.py::TestReviewFaults::test_a_malformed_verdict_never_passes_the_review",
-   "status": "RED (SS-57)"
+   "status": "GREEN (F2)"
   },
   {
    "id": "FM-R-06",
@@ -385,7 +385,7 @@
    "expected_recovery": "security stage",
    "invariants": "INV-G.2",
    "test": "tests/hardening/test_sibling_scan.py::TestSS13SecurityExecutionFailureIsNotAVerdict",
-   "status": "RED (SS-13)"
+   "status": "GREEN (F2)"
   },
   {
    "id": "FM-S-03",
@@ -397,7 +397,7 @@
    "expected_recovery": "security stage retry",
    "invariants": "INV-F.3",
    "test": "tests/hardening/test_fault_matrix.py::TestSecurityFaults::test_malformed_security_report_is_unrunnable_not_a_verdict",
-   "status": "RED (SS-13)"
+   "status": "GREEN (F2)"
   },
   {
    "id": "FM-M-01",
@@ -697,7 +697,7 @@
    "expected_recovery": "security stage only",
    "invariants": "INV-G.2",
    "test": "tests/hardening/test_compound_faults.py::TestCF02SecurityTimeoutAfterBlockRemediation::test_security_absence_after_a_fixed_block_retries_security_not_the_developer",
-   "status": "RED (SS-13)"
+   "status": "GREEN (F2)"
   },
   {
    "id": "FM-C-03",
@@ -857,8 +857,8 @@
   }
  ],
  "status_count": {
-  "GREEN": 50,
-  "RED": 19,
+  "GREEN": 59,
+  "RED": 10,
   "NEEDS_TEST": 0
  }
 }

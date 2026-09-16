@@ -418,6 +418,7 @@ def probe_c8(project: Path, workdir: Path) -> ProbeResult:
     store_a.file_change(story, "src/c8.js")
     store_a.tool_run(story, "test", ok=True)
     store_a.tool_run(story, "lint", ok=True)
+    store_a.tool_run(story, "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the story path records the scan
 
     def cham(sha: str):
         return evaluate(story, EvidenceStore(root).read(story), changed=["src/c8.js"],

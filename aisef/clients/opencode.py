@@ -276,6 +276,11 @@ class OpenCodeAdapter(ClientAdapter):
         # / `step_finish` (tokens, cost). Cost is the provider-reported number —
         # 9router reports 0, that is the provider's truth, not the harness's.
         res = parse_json_events(lines)
+        saw_event = any(ln.lstrip().startswith("{") for ln in lines)
+        if not saw_event and not timed_out and not cham_tran and not res.error:
+            # AD-01: a child that exits (even with 0) having said nothing produced no result — the same
+            # infrastructure outcome the Claude adapter reports, never `ok`
+            res.error = "stream ended without a result event"
         # `not res.error` là phần đắt nhất của dòng này: khi phiên bị CLI cắt,
         # OpenCode vẫn **thoát 0** (nó tưởng phiên kết thúc bình thường), nên
         # `ok` sẽ là True và `exit_status_of` trả `"ok"` ngay ở dòng đầu —
@@ -291,8 +296,11 @@ class OpenCodeAdapter(ClientAdapter):
         elif timed_out:
             res.error = f"exceeded {spec.timeout_seconds}s"
         elif proc.returncode != 0:
-            # Keep what the stream already explained; stderr is empty here.
-            res.error = res.error or stderr.strip()[:500] or "exit != 0"
+            # AD-03: a child that died (mid-line, heap limit, exit 3) said nothing about the work — infra, never
+            # a quality `error`. Keep what the stream already explained, then name the exit.
+            tail = stderr.strip()[:500]
+            res.error = res.error or (f"child exited {proc.returncode}: {tail}" if tail else f"child exited {proc.returncode} (exit != 0)")
+            res.raw_result = {"exit_code": proc.returncode, **({"stderr": tail} if tail else {}), **res.raw_result}
         res.raw_result = {"returncode": proc.returncode, **res.raw_result}
         # Lời khai, không phải quan sát: luồng của OpenCode không mang tên
         # model. Ghi cái đã yêu cầu còn hơn để trống, miễn là nói rõ.

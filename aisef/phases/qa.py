@@ -750,7 +750,8 @@ def run_suite(
                 )
 
     report.fake_tests = find_fake_tests(project, changed)
-    if store and report.fake_tests:
-        store.tool_run(story_id, "qa:fake-tests", ok=False,
+    if store:
+        # SS-01: a clean scan is recorded too — the gate must be able to tell "scan ran clean" from "scan never ran"
+        store.tool_run(story_id, "qa:fake-tests", ok=not report.fake_tests,
                        detail={"files": report.fake_tests})
     return report

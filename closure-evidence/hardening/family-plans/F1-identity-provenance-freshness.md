@@ -101,3 +101,9 @@ hygiene and legitimately re-graded); the review-recovery fixture seeds identity-
 fail-closed test now expects capture at the integrated parent (INV-C.3); the gate-qualification staleness test asserts
 "no fresh record" rather than "latest record elsewhere", with the inverse as a companion; the interrupted-review test
 seeds `reviewer:verdict`.
+
+CI on c384383 (run 35092276631): Linux 3.11–3.14, lint, wheel green; Windows 3.11 red on two test-side errors (the
+SS-60 fixture's `.git` removal on read-only objects; the concurrent memory-writers test's 2 s lock timeout under
+contention) — explained and fixed in the F2 commit, which re-qualifies Windows for both families. One member added after
+closure with provenance: SS-62 (a reviewer commit on the schema-retry session was not restored), found by the
+differential during F2 and fixed there — see the F2 record.

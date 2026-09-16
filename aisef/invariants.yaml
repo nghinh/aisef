@@ -357,7 +357,7 @@ invariants:
       - tests/test_run2_review_recovery.py
       - tests/test_dogfood_ledgerlock.py::TestMissingTestRunnerIsUnrunnableNotRed
       - tests/test_tools.py::TestKhongChayDuocKhacDo
-      - tests/hardening/test_sibling_scan.py::TestSS13SecurityExecutionFailureIsNotAVerdict (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS13SecurityExecutionFailureIsNotAVerdict
       - tests/hardening/test_sibling_scan.py::TestSS23RedTestsAreNotAMissingTool (RED)
       - tests/hardening/test_sibling_scan.py::TestSS26EnvironmentFailureIsNotErasedBySubstring (RED)
     model_tests:
@@ -412,13 +412,13 @@ invariants:
     severity_if_violated: P1
     enforcement_points: []
     deterministic_tests:
-      - tests/hardening/test_sibling_scan.py::TestSS13SecurityExecutionFailureIsNotAVerdict (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS13SecurityExecutionFailureIsNotAVerdict
     model_tests: []
     fault_injection_tests:
       - tests/hardening/test_fault_matrix.py::TestSecurityFaults
     linked_defects:
       - SS-13
-    status: MISSING
+    status: PROVEN
   - invariant_id: INV-G.3
     domain: retry locality
     statement: A tool or environment failure retries the tool stage on the infra budget; it never opens a developer session and never spends a quality attempt.
@@ -428,7 +428,7 @@ invariants:
       - aisef/phases/implement.py::implement_story
     deterministic_tests:
       - tests/test_implement.py::TestRetry
-      - tests/hardening/test_sibling_scan.py::TestSS14ToolEnvironmentFailureIsNotADeveloperAttempt (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS14ToolEnvironmentFailureIsNotADeveloperAttempt
     model_tests:
       - tests/hardening/test_state_model.py::TestKernelModel::test_property_10_environment_failure_is_not_behavioural_evidence
     fault_injection_tests:
@@ -436,7 +436,7 @@ invariants:
     linked_defects:
       - SS-14
       - SS-34
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-G.4
     domain: retry locality
     statement: Provider statuses that repeat identically (auth) or describe the environment (context, permission, cost) never charge the quality budget; auth is fatal, the others are infra.
@@ -447,14 +447,14 @@ invariants:
       - aisef/clients/stream.py::INFRA_STATUSES
     deterministic_tests:
       - tests/test_client_base.py::TestTuChoiXacThucLaHaTang
-      - tests/hardening/test_sibling_scan.py::TestSS15EnvironmentExitStatusesAreNotQualityAttempts (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS15EnvironmentExitStatusesAreNotQualityAttempts
     model_tests: []
     fault_injection_tests:
       - tests/hardening/test_fault_matrix.py::TestDeveloperFaults
     linked_defects:
       - D-006
       - SS-15
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-G.5
     domain: retry locality
     statement: A budget rejection is a typed infra outcome of the stage it interrupted; it never crashes the run and never spends a quality attempt.
@@ -464,14 +464,14 @@ invariants:
       - aisef/phases/implement.py::_review_session
       - aisef/phases/implement.py::run_attempt
     deterministic_tests:
-      - tests/hardening/test_sibling_scan.py::TestSS12BudgetRejectionInReviewDoesNotCrash (RED)
+      - tests/hardening/test_sibling_scan.py::TestSS12BudgetRejectionInReviewDoesNotCrash
       - tests/test_budget_integration.py::TestBudgetBlocksBeforeDispatch
     model_tests: []
     fault_injection_tests: []
     linked_defects:
       - SS-12
       - SS-21
-    status: MISSING
+    status: PROVEN
   - invariant_id: INV-H.1
     domain: no-op semantics
     statement: A developer session that changes nothing is a statement, not a failure; it is never charged to quality and is terminal only after a second identical decision, stated from evidence.
@@ -727,6 +727,12 @@ invariants:
       - tests/test_dogfood_ledgerlock.py::TestDeclaredToolsLiveInTheDeclaredImage
       - tests/test_dogfood_ledgerlock.py::TestMissingTestRunnerIsUnrunnableNotRed
       - tests/test_tools.py::TestThieuDuAnKhacThieuCongCu
+      - tests/hardening/test_sibling_scan.py::TestSS23RedTestsAreNotAMissingTool (RED)
+      - tests/hardening/scan8a/test_group_d.py::TestSS34UnrunnableQaKindIsNotAFailedCheck (RED)
+      - tests/hardening/scan8a/test_group_d.py::TestSS45AutoDetectedToolsAreProbed (RED)
+      - tests/hardening/scan8a/test_group_d.py::TestSS46PreflightProbeRunsWithoutADeclaredImage (RED)
+      - tests/hardening/scan8a/test_group_d.py::TestSS47UnjudgeableProbeIsNotPresent (RED)
+      - tests/hardening/scan8a/test_group_d.py::TestSS48ProvisionedMeansRunnable (RED)
     model_tests: []
     fault_injection_tests:
       - tests/hardening/test_fault_matrix.py::TestToolFaults

@@ -5,21 +5,25 @@
  "generated": "2026-09-16T10:12:06+00:00",
  "rule": "No broad speculative sweep while fixing. A sibling found during implementation is classified, assigned to an already-frozen family where it belongs, and added here with explicit provenance (commit + finding source).",
  "counts": {
-  "total": 71,
+  "total": 73,
   "by_severity": {
    "P1": 13,
    "P2": 40,
    "P3": 18
   },
   "by_fix_family": {
-   "F1-IDENTITY-PROVENANCE-FRESHNESS": 16,
-   "F3-STRUCTURED-JUDGMENT-AUTHORITY": 13,
+   "F1-IDENTITY-PROVENANCE-FRESHNESS": 17,
+   "F3-STRUCTURED-JUDGMENT-AUTHORITY": 14,
    "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY": 14,
    "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE": 12,
    "F6-BENCH-RELEASE-APPROVAL": 6,
    "F5-PROCESS-TOOL-ENVIRONMENT": 10
   },
-  "fixed": 16
+  "fixed": 16,
+  "by_status": {
+   "OPEN": 40,
+   "FIXED": 33
+  }
  },
  "fix_families": {
   "F1-IDENTITY-PROVENANCE-FRESHNESS": [
@@ -302,6 +306,22 @@
     "belongs_to_frozen_family": true,
     "site": "aisef/phases/implement.py::run_attempt (no-op shortcut) + control/journal reconcile (attempt.aborted → pending)",
     "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-62",
+    "family": "FAM-RECOVERY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P2",
+    "invariants": [
+     "INV-A.1",
+     "INV-K.2"
+    ],
+    "site": "aisef/phases/implement.py::_with_schema (candidate moved on the schema retry)",
+    "statement": "a reviewer commit made during the SCHEMA-RETRY session was recorded (review:candidate) but not restored — F1 (SS-A10) restored a commit made in the first review session only; HEAD stayed off the frozen candidate, the gate failed on stale identity and a second developer session opened over a candidate that no longer existed",
+    "reproducer": "tests/hardening/test_differential.py::TestSeed232ReviewerCommitOnTheSchemaRetry",
+    "provenance": "found during F2 implementation by the 400-trace differential (seed 232, unexplained after KNOWN was emptied), 2026-09-16; reproducer RED at c384383 (F1 closure commit, run in a throwaway worktree), GREEN after the fix in this commit",
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `_with_schema` restores the candidate exactly as the first session does"
    }
   ],
   "F3-STRUCTURED-JUDGMENT-AUTHORITY": [
@@ -434,7 +454,8 @@
     "statement": "a reviewer that never produces a structured verdict (twice) is scored from prose: no blocking lines → the review PASSES; a PASS came from the absence of a verdict",
     "reproducer": "tests/hardening/test_fault_matrix.py::TestReviewFaults::test_a_malformed_verdict_never_passes_the_review",
     "provenance": "Phase 3 sweep",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — a FAM-PROSE member fixed by F2's rule 'absence of a structured verdict is UNRUNNABLE, never PASS'; F3's family closure re-verifies it"
    },
    {
     "id": "SS-29",
@@ -491,6 +512,21 @@
     "provenance": "DEFECT-REGISTER (open before the program)",
     "status": "OPEN",
     "disposition_required": "FIXED / NOT_A_DEFECT with proof / SUPERSEDED"
+   },
+   {
+    "id": "SS-63",
+    "family": "FAM-JUDGE",
+    "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+    "severity": "P2",
+    "invariants": [
+     "INV-Q.1"
+    ],
+    "site": "aisef/phases/implement.py::deadlock_reason (attempts[-1], attempts[-2])",
+    "statement": "the plan-conflict detector compared ADJACENT attempt records; when the reviewer's session on the second candidate had to be re-run (tree mutation → D-032 review-stage retry), the developer attempt in between carried no verdict and two identical out-of-scope blocks were never paired — the plan conflict was reported as `did not pass gate` and the developer budget burned",
+    "reproducer": "tests/hardening/test_differential.py::TestSeed2624PlanConflictSurvivesAVerifierRerun",
+    "provenance": "found during F2 implementation by the 2000-trace differential (seed 2624, unexplained with KNOWN empty), 2026-09-16; reproducer RED at c384383 (throwaway worktree), GREEN after `deadlock_reason` pairs graded positions (attempts whose reviewer produced a verdict)",
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `deadlock_reason` skips attempts whose review was UNRUNNABLE"
    }
   ],
   "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY": [
@@ -507,7 +543,8 @@
     "statement": "BudgetExceeded inside a review or security session is handled by importing a class aisef.phases.mockup does not define",
     "reproducer": "tests/hardening/test_sibling_scan.py::TestSS12BudgetRejectionInReviewDoesNotCrash",
     "provenance": "Phase 3 sweep",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-13",
@@ -522,7 +559,8 @@
     "statement": "a security SESSION failure (timeout, cut, tree modified) becomes Check('security', FAILED), is cached at the candidate (no _security_complete), and the loop reopens the developer",
     "reproducer": "tests/hardening/test_sibling_scan.py::TestSS13SecurityExecutionFailureIsNotAVerdict",
     "provenance": "Phase 3 sweep",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-14",
@@ -537,7 +575,8 @@
     "statement": "an UNRUNNABLE deterministic check (runner missing in the sandbox) blocks the gate; the only move is a new developer session charged to quality until max_retries",
     "reproducer": "tests/hardening/test_sibling_scan.py::TestSS14ToolEnvironmentFailureIsNotADeveloperAttempt",
     "provenance": "Phase 3 sweep",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-15",
@@ -551,7 +590,8 @@
     "statement": "`context`, `permission`, `cost` exit statuses leave the tree untouched and are charged to the quality budget (D-006's shape); only `auth` was compensated",
     "reproducer": "tests/hardening/test_sibling_scan.py::TestSS15EnvironmentExitStatusesAreNotQualityAttempts",
     "provenance": "Phase 3 sweep",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-58",
@@ -566,7 +606,8 @@
     "statement": "the `test` check maps detail.unrunnable to UNRUNNABLE; the `lint` check maps a missing linter (ENOENT / exit 127) to FAILED — D-029's shape on the lint tool",
     "reproducer": "tests/hardening/test_fault_matrix.py::TestToolFaults::test_missing_linter_is_unrunnable",
     "provenance": "Phase 3 sweep",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-01",
@@ -580,7 +621,8 @@
     "statement": "absence of the fake-tests record scores PASSED. In the story path verify_candidate always records the scan; in qa.run_suite the record is written only when fakes are found — so absence is the encoded clean result there. The gap: 'scan did not run' is indistinguishable from 'clean'",
     "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS01RealTestsNeedsARecordedScan::test_no_fake_tests_record_is_not_a_pass",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-19",
@@ -594,7 +636,8 @@
     "statement": "D-032 recovery requires review to be the SOLE failure; any co-blocking UNRUNNABLE (stale evidence, preservation unverifiable, flaky test) routes a reviewer absence back to the developer",
     "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS19CoBlockingUnrunnableKeepsTheReviewerAbsenceAtTheReviewStage::test_two_unrunnable_checks_never_open_a_developer",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-21",
@@ -608,7 +651,8 @@
     "statement": "a developer BudgetExceeded is charged to quality; a non-blocking lock failure on the budget ledger raises BudgetExceeded, so lock contention between parallel stories is reported as a cap",
     "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS21BudgetLockContentionIsInfraNotACap::test_a_held_ledger_lock_is_an_environment_outcome",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-33",
@@ -622,7 +666,8 @@
     "statement": "test ids are truncated at 500; the baseline check disables lost/renamed under truncation but not newly_red, so a regression can be absent from both lists and pass vacuously; preservation has no guard",
     "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS33TruncationNeverYieldsAVacuousPass::test_a_baseline_green_test_beyond_the_cut_turning_red_is_not_a_pass",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "SS-59",
@@ -637,7 +682,8 @@
     "statement": "on a retry the zero-output check diffs against the base branch, sees the frozen candidate's files and never fires; the session is recorded as a no-op decision instead of a fatal environment failure",
     "reproducer": "tests/hardening/test_fault_matrix.py::TestDeveloperFaults::test_zero_output_on_a_retry_is_still_fatal_not_a_noop_decision",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "AD-01",
@@ -652,8 +698,9 @@
     "statement": "an OpenCode child that exits 0 having emitted zero events returns ok=True — a result with nothing in it; Claude's adapter returns infra 'stream ended without a result event'",
     "reproducer": "tests/hardening/adapters/test_conformance.py::TestC03EmptyResponse::test_opencode",
     "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
-    "status": "OPEN",
-    "belongs_to_frozen_family": true
+    "status": "FIXED",
+    "belongs_to_frozen_family": true,
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "AD-03",
@@ -668,8 +715,9 @@
     "statement": "an OpenCode child dying mid-line or with exit 3 and a stderr heap-limit message is classified `error` (quality, charged to the developer) while Claude's adapter classifies the same death `infra`",
     "reproducer": "tests/hardening/adapters/test_conformance.py::TestC11PartialStream::test_opencode",
     "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
-    "status": "OPEN",
-    "belongs_to_frozen_family": true
+    "status": "FIXED",
+    "belongs_to_frozen_family": true,
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "AD-04",
@@ -683,8 +731,9 @@
     "statement": "when the Claude child dies without a result event the exit code and stderr are dropped (raw_result={}) — the operator cannot tell a heap crash from a cut",
     "reproducer": "tests/hardening/adapters/test_conformance.py::TestC12ProcessDeath::test_claude",
     "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
-    "status": "OPEN",
-    "belongs_to_frozen_family": true
+    "status": "FIXED",
+    "belongs_to_frozen_family": true,
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
    },
    {
     "id": "AD-05",
@@ -699,8 +748,9 @@
     "statement": "a result event that arrives after the adapter decided timeout flips ok=True while error still says 'exceeded 1s' — a cut session is reported as a successful one",
     "reproducer": "tests/hardening/adapters/test_conformance.py::TestC13LateOutputAfterTimeout::test_claude",
     "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
-    "status": "OPEN",
-    "belongs_to_frozen_family": true
+    "status": "FIXED",
+    "belongs_to_frozen_family": true,
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
    }
   ],
   "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE": [
@@ -1138,8 +1188,9 @@
    "statement": "an OpenCode child that exits 0 having emitted zero events returns ok=True — a result with nothing in it; Claude's adapter returns infra 'stream ended without a result event'",
    "reproducer": "tests/hardening/adapters/test_conformance.py::TestC03EmptyResponse::test_opencode",
    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
-   "status": "OPEN",
-   "belongs_to_frozen_family": true
+   "status": "FIXED",
+   "belongs_to_frozen_family": true,
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
   },
   {
    "id": "AD-03",
@@ -1154,8 +1205,9 @@
    "statement": "an OpenCode child dying mid-line or with exit 3 and a stderr heap-limit message is classified `error` (quality, charged to the developer) while Claude's adapter classifies the same death `infra`",
    "reproducer": "tests/hardening/adapters/test_conformance.py::TestC11PartialStream::test_opencode",
    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
-   "status": "OPEN",
-   "belongs_to_frozen_family": true
+   "status": "FIXED",
+   "belongs_to_frozen_family": true,
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
   },
   {
    "id": "AD-04",
@@ -1169,8 +1221,9 @@
    "statement": "when the Claude child dies without a result event the exit code and stderr are dropped (raw_result={}) — the operator cannot tell a heap crash from a cut",
    "reproducer": "tests/hardening/adapters/test_conformance.py::TestC12ProcessDeath::test_claude",
    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
-   "status": "OPEN",
-   "belongs_to_frozen_family": true
+   "status": "FIXED",
+   "belongs_to_frozen_family": true,
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
   },
   {
    "id": "AD-05",
@@ -1185,8 +1238,41 @@
    "statement": "a result event that arrives after the adapter decided timeout flips ok=True while error still says 'exceeded 1s' — a cut session is reported as a successful one",
    "reproducer": "tests/hardening/adapters/test_conformance.py::TestC13LateOutputAfterTimeout::test_claude",
    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
-   "status": "OPEN",
-   "belongs_to_frozen_family": true
+   "status": "FIXED",
+   "belongs_to_frozen_family": true,
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+  },
+  {
+   "id": "SS-62",
+   "family": "FAM-RECOVERY",
+   "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+   "severity": "P2",
+   "invariants": [
+    "INV-A.1",
+    "INV-K.2"
+   ],
+   "site": "aisef/phases/implement.py::_with_schema (candidate moved on the schema retry)",
+   "statement": "a reviewer commit made during the SCHEMA-RETRY session was recorded (review:candidate) but not restored — F1 (SS-A10) restored a commit made in the first review session only; HEAD stayed off the frozen candidate, the gate failed on stale identity and a second developer session opened over a candidate that no longer existed",
+   "reproducer": "tests/hardening/test_differential.py::TestSeed232ReviewerCommitOnTheSchemaRetry",
+   "provenance": "found during F2 implementation by the 400-trace differential (seed 232, unexplained after KNOWN was emptied), 2026-09-16; reproducer RED at c384383 (F1 closure commit, run in a throwaway worktree), GREEN after the fix in this commit",
+   "status": "FIXED",
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `_with_schema` restores the candidate exactly as the first session does"
+  },
+  {
+   "id": "SS-63",
+   "family": "FAM-JUDGE",
+   "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+   "severity": "P2",
+   "invariants": [
+    "INV-Q.1"
+   ],
+   "site": "aisef/phases/implement.py::deadlock_reason (attempts[-1], attempts[-2])",
+   "statement": "the plan-conflict detector compared ADJACENT attempt records; when the reviewer's session on the second candidate had to be re-run (tree mutation → D-032 review-stage retry), the developer attempt in between carried no verdict and two identical out-of-scope blocks were never paired — the plan conflict was reported as `did not pass gate` and the developer budget burned",
+   "reproducer": "tests/hardening/test_differential.py::TestSeed2624PlanConflictSurvivesAVerifierRerun",
+   "provenance": "found during F2 implementation by the 2000-trace differential (seed 2624, unexplained with KNOWN empty), 2026-09-16; reproducer RED at c384383 (throwaway worktree), GREEN after `deadlock_reason` pairs graded positions (attempts whose reviewer produced a verdict)",
+   "status": "FIXED",
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `deadlock_reason` skips attempts whose review was UNRUNNABLE"
   }
- ]
+ ],
+ "updated": "2026-09-16T12:55:09+00:00"
 }

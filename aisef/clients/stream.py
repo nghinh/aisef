@@ -197,6 +197,9 @@ EXIT_STATUSES = ("ok", "max_turns", "timeout", "cost", "context", "permission", 
 #: seconds and fails the story with a provider that was merely asking for a
 #: pause (three attempts of `RP-05` on `e9` went this way).
 INFRA_STATUSES = ("timeout", "infra", "rate_limit")
+#: Limitations of the environment the session ran in — the developer's work is untouched by them and they are
+#: never charged to quality (SS-15, INV-G.4): the prompt did not fit, a tool was refused, the provider's own cap.
+ENVIRONMENT_STATUSES = ("context", "permission", "cost")
 
 
 def exit_status_of(res: RunResult) -> str:
@@ -241,11 +244,11 @@ def exit_status_of(res: RunResult) -> str:
                            "quota exceeded")
     ):
         return "rate_limit"
-    if raw.get("api_error_status") or raw.get("retryable") or any(
+    if raw.get("api_error_status") or raw.get("retryable") or raw.get("exit_code") or any(
         m in why for m in ("api_error", "overloaded", "connection",
-                           "cannot run", "without a result event")
+                           "cannot run", "without a result event", "exit != 0", "child exited")
     ):
-        return "infra"
+        return "infra"          # a child that died says nothing about the work (AD-03/AD-04)
     if res.permission_limited:
         return "permission"
     return "error"

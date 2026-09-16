@@ -1,75 +1,79 @@
 {
  "traces": 10000,
- "steps": 103358,
+ "steps": 104578,
  "violations": [],
  "violation_count": 0,
  "terminal_classes": {
-  "blocked:budget cap": 2659,
-  "done:COMPLETE": 1985,
-  "blocked:zero output: model cannot use tools": 1084,
-  "blocked:credential rejected": 1078,
-  "blocked:isolation breach": 1014,
-  "blocked:SECURITY_UNRUNNABLE": 729,
-  "failed:recurring infrastructure error": 356,
-  "blocked:owner declined: plan": 276,
-  "failed:did not pass gate": 257,
-  "blocked:owner declined: merge": 154,
-  "blocked:environment: test tool unrunnable": 134,
-  "blocked:no-op: budget exhausted": 63,
-  "blocked:REVIEW_UNRUNNABLE": 55,
-  "blocked:no-op: nothing to grade twice": 45,
-  "running:GATE": 45,
-  "orphaned:GATE": 20,
-  "running:SECURITY": 13,
-  "blocked:no-op: developer declined proven work twice": 10,
-  "running:DEVELOP": 9,
-  "verified:MERGE": 6,
-  "running:REVIEW": 5,
-  "running:VERIFY": 2,
-  "orphaned:DEVELOP": 1
+  "blocked:budget cap": 2686,
+  "done:COMPLETE": 2045,
+  "blocked:credential rejected": 1086,
+  "blocked:zero output: model cannot use tools": 1085,
+  "blocked:isolation breach": 1024,
+  "blocked:SECURITY_UNRUNNABLE": 710,
+  "failed:recurring infrastructure error": 348,
+  "blocked:owner declined: plan": 297,
+  "failed:did not pass gate": 272,
+  "blocked:owner declined: merge": 166,
+  "blocked:no-op: budget exhausted": 65,
+  "running:GATE": 46,
+  "blocked:REVIEW_UNRUNNABLE": 45,
+  "blocked:no-op: nothing to grade twice": 44,
+  "orphaned:GATE": 21,
+  "running:SECURITY": 17,
+  "running:DEVELOP": 11,
+  "verified:MERGE": 7,
+  "blocked:no-op: developer declined proven work twice": 7,
+  "blocked:environment: test tool unrunnable": 6,
+  "running:REVIEW": 4,
+  "running:VERIFY": 3,
+  "orphaned:DEVELOP": 1,
+  "human_required:plan conflict": 1,
+  "orphaned:SECURITY": 1,
+  "orphaned:MERGE": 1,
+  "orphaned:VERIFY": 1
  },
  "events_exercised": {
-  "RECLAIM": 18507,
-  "PROCESS_DEATH": 17521,
-  "GATE_EVALUATE": 13541,
-  "TEST_PASS": 6376,
-  "DEVELOP_CHANGED": 6360,
-  "SECURITY_PASS": 6152,
-  "REVIEW_PASS": 3796,
-  "MERGE_OK": 1985,
-  "DEVELOP_ZERO_OUTPUT": 1084,
-  "DEVELOP_AUTH": 1078,
-  "DEVELOP_SCOPE_VIOLATION": 1076,
-  "DEVELOP_CRASH": 1067,
-  "TEST_FAIL": 1063,
-  "CORRUPT_EVIDENCE": 1050,
-  "TEST_UNRUNNABLE": 1045,
-  "SECURITY_MALFORMED": 1042,
-  "DEVELOP_BUDGET": 1037,
-  "SECURITY_BLOCK": 1036,
-  "STALE_REPLAY": 1030,
-  "CONTRACT_CHANGE": 1030,
-  "DEVELOP_MAX_TURNS_WORK": 1016,
-  "DEVELOP_TRUNK_COMMIT": 1014,
-  "DEVELOP_TIMEOUT": 1011,
-  "WRONG_CANDIDATE_EVIDENCE": 1011,
-  "DEVELOP_NOOP": 1010,
-  "LEASE_EXPIRED": 1007,
-  "DEVELOP_MAX_TURNS_UNTOUCHED": 1005,
-  "DEVELOP_RATE_LIMIT": 993,
-  "DEVELOP_CONTEXT": 987,
-  "SECURITY_BUDGET": 981,
-  "SECURITY_UNRUNNABLE": 975,
-  "REVIEW_MALFORMED": 646,
-  "REVIEW_BUDGET": 641,
-  "REVIEW_MUTATE": 634,
-  "REVIEW_UNRUNNABLE": 621,
-  "REVIEW_BLOCK_OUTSIDE": 611,
-  "REVIEW_BLOCK": 585,
-  "REVIEW_STUCK": 583,
-  "HUMAN_DECLINES": 430,
-  "HUMAN_ARBITRATION": 420,
-  "MERGE_CONFLICT": 301
+  "RECLAIM": 18828,
+  "PROCESS_DEATH": 17831,
+  "GATE_EVALUATE": 13762,
+  "DEVELOP_CHANGED": 6376,
+  "SECURITY_PASS": 6297,
+  "TEST_PASS": 6152,
+  "REVIEW_PASS": 3906,
+  "MERGE_OK": 2045,
+  "DEVELOP_AUTH": 1086,
+  "DEVELOP_ZERO_OUTPUT": 1085,
+  "DEVELOP_SCOPE_VIOLATION": 1078,
+  "SECURITY_BLOCK": 1069,
+  "DEVELOP_CRASH": 1062,
+  "SECURITY_MALFORMED": 1059,
+  "DEVELOP_BUDGET": 1051,
+  "DEVELOP_MAX_TURNS_WORK": 1034,
+  "STALE_REPLAY": 1028,
+  "CONTRACT_CHANGE": 1028,
+  "DEVELOP_NOOP": 1025,
+  "DEVELOP_TRUNK_COMMIT": 1024,
+  "LEASE_EXPIRED": 1022,
+  "DEVELOP_TIMEOUT": 1021,
+  "TEST_FAIL": 1018,
+  "WRONG_CANDIDATE_EVIDENCE": 1018,
+  "DEVELOP_MAX_TURNS_UNTOUCHED": 1011,
+  "DEVELOP_RATE_LIMIT": 1006,
+  "DEVELOP_CONTEXT": 1006,
+  "TEST_UNRUNNABLE": 992,
+  "CORRUPT_EVIDENCE": 992,
+  "SECURITY_UNRUNNABLE": 986,
+  "SECURITY_BUDGET": 974,
+  "REVIEW_MALFORMED": 683,
+  "REVIEW_BUDGET": 661,
+  "REVIEW_UNRUNNABLE": 653,
+  "REVIEW_BLOCK_OUTSIDE": 633,
+  "REVIEW_MUTATE": 630,
+  "REVIEW_BLOCK": 622,
+  "REVIEW_STUCK": 614,
+  "HUMAN_DECLINES": 463,
+  "HUMAN_ARBITRATION": 435,
+  "MERGE_CONFLICT": 312
  },
  "model": "tests/hardening/model.py (docs/ASSURANCE-KERNEL.md §6)",
  "conformance": [
@@ -98,15 +102,8 @@
    "scenario": "C4 security unrunnable then pass",
    "real": "done",
    "model": "done",
-   "diff": [
-    "developer_sessions: real=2 model=1",
-    "review_executions: real=2 model=1",
-    "quality_attempts: real=2 model=1",
-    "candidates_frozen: real=2 model=1"
-   ],
-   "known_deviation": [
-    "SS-13"
-   ]
+   "diff": [],
+   "known_deviation": []
   },
   {
    "scenario": "C5 review block then pass",
@@ -133,13 +130,8 @@
    "scenario": "C8 context exit then pass",
    "real": "done",
    "model": "done",
-   "diff": [
-    "quality_attempts: real=2 model=1",
-    "infra_attempts: real=0 model=1"
-   ],
-   "known_deviation": [
-    "SS-15"
-   ]
+   "diff": [],
+   "known_deviation": []
   },
   {
    "scenario": "C9 credential rejected",
@@ -150,35 +142,17 @@
   },
   {
    "scenario": "C10 test tool unrunnable",
-   "real": "failed:did not pass gate",
+   "real": "blocked:environment: test tool unrunnable",
    "model": "blocked:environment: test tool unrunnable",
-   "diff": [
-    "terminal: real='failed:did not pass gate' model='blocked:environment: test tool unrunnable'",
-    "developer_sessions: real=2 model=1",
-    "review_executions: real=2 model=0",
-    "security_executions: real=2 model=0",
-    "quality_attempts: real=2 model=1",
-    "infra_attempts: real=0 model=2",
-    "candidates_frozen: real=2 model=1"
-   ],
-   "known_deviation": [
-    "SS-14"
-   ]
+   "diff": [],
+   "known_deviation": []
   },
   {
    "scenario": "C11 budget rejected in review",
-   "real": "crash:ImportError",
+   "real": "blocked:budget cap",
    "model": "blocked:budget cap",
-   "diff": [
-    "terminal: real='crash:ImportError' model='blocked:budget cap'",
-    "developer_sessions: real=0 model=1",
-    "review_executions: real=0 model=1",
-    "quality_attempts: real=0 model=1",
-    "candidates_frozen: real=0 model=1"
-   ],
-   "known_deviation": [
-    "SS-12"
-   ]
+   "diff": [],
+   "known_deviation": []
   },
   {
    "scenario": "C12 scope violation then no-op",
@@ -224,16 +198,10 @@
   },
   {
    "scenario": "C18 zero output on a retry",
-   "real": "blocked:no-op: developer declined proven work twice",
+   "real": "blocked:zero output: model cannot use tools",
    "model": "blocked:zero output: model cannot use tools",
-   "diff": [
-    "terminal: real='blocked:no-op: developer declined proven work twice' model='blocked:zero output: model cannot use tools'",
-    "developer_sessions: real=3 model=2",
-    "infra_attempts: real=2 model=0"
-   ],
-   "known_deviation": [
-    "SS-59"
-   ]
+   "diff": [],
+   "known_deviation": []
   }
  ]
 }

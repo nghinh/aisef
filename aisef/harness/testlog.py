@@ -28,7 +28,8 @@ import json
 import re
 from dataclasses import dataclass, field
 
-MAX_IDS = 500
+MAX_IDS = 5000   # ponytail: evidence-size cap on id lists; beyond it the gate's baseline comparison is UNRUNNABLE
+                 # (SS-33 — never a vacuous PASS); make it configurable if a qualified project outgrows it
 
 _ANSI = re.compile(r"\x1b\[[0-9;]*m")
 

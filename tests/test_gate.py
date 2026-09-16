@@ -27,6 +27,7 @@ class GateTestCase(unittest.TestCase):
         self.store.file_change("S-01", "src/a.py")
         self.store.tool_run("S-01", "test", ok=True)
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
 
     def gate(self, **kw):
         params = {
@@ -51,6 +52,7 @@ class TestKhongOnDinh(GateTestCase):
     def ghi(self, **d):
         store = EvidenceStore(self._tmp.name, candidate="aaa")
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         store.record("S-01", Event(kind=NOTE, name="verify-only.repeat", ok=False, detail={
             "k": 3, "checks": ["test"], "flaky_ids": [], "stable_red": [], "flaky_checks": [], **d}))
 
@@ -96,11 +98,13 @@ class TestHappyPath(GateTestCase):
 class TestTests(GateTestCase):
     def test_no_test_run_fails(self):
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         self.assertFalse(self.gate().passed)
 
     def test_red_test_fails(self):
         self.store.tool_run("S-01", "test", ok=False)
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         self.assertFalse(self.gate().passed)
 
     def test_edit_after_green_fails(self):
@@ -217,6 +221,7 @@ class TestGuardCoChay(unittest.TestCase):
         self.store = EvidenceStore(self._tmp.name)
         self.store.tool_run("S-01", "test", ok=True)
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
 
     def tearDown(self):
         self._tmp.cleanup()
@@ -263,6 +268,7 @@ class TestTieuChiCoTest(GateTestCase):
         self.store.tool_run("S-01", "test", ok=True,
                             detail={"test_format": fmt, "test_ids": ids, **extra})
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
 
     def muc(self, g):
         return next(c for c in g.checks if c.name == "criteria have tests")
@@ -284,6 +290,7 @@ class TestTieuChiCoTest(GateTestCase):
                             detail={"test_format": "node-spec", "test_ids": [],
                                     "command": "node --test"})
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         m = self.muc(self.gate(acceptance=1))
         self.assertIn("node --test", m.detail)
         self.assertIn("e2e", m.detail)
@@ -324,6 +331,7 @@ class TestTieuChiCoTestOBoKhac(GateTestCase):
             "command": "node --test",
         })
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         if qa is not None:
             store.tool_run("S-01", "qa:e2e", ok=qa_ok, detail={
                 "test_format": "playwright-list", "test_ids": list(qa),
@@ -381,6 +389,7 @@ class TestBangChungCuCuaLoaiKhongChamKhongLamOi(GateTestCase):
         moi.file_change("S-01", "src/a.py")
         moi.tool_run("S-01", "test", ok=True, detail={"test_format": "pytest", "test_ids": ["t"]})
         moi.tool_run("S-01", "lint", ok=True)
+        moi.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         g = self.gate(candidate="aaa", contract=contract)
         return next(c for c in g.checks if c.name == "evidence matches candidate")
 
@@ -412,6 +421,7 @@ class TestBangChungCuCuaLoaiKhongChamKhongLamOi(GateTestCase):
         moi.file_change("S-01", "src/a.py")
         moi.tool_run("S-01", "test", ok=True, detail={"test_format": "pytest", "test_ids": ["t"]})
         moi.tool_run("S-01", "lint", ok=True)
+        moi.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         g = self.gate(candidate="aaa", contract=["unit", "e2e", "accessibility", "mockup-map"])
         m = next(c for c in g.checks if c.name == "evidence matches candidate")
         self.assertIs(m.outcome, Outcome.PASSED, m.detail)
@@ -432,6 +442,7 @@ class TestBangChungCuCuaLoaiKhongChamKhongLamOi(GateTestCase):
         """`test`/`lint`/`review` không phải `qa:*`: chúng luôn được chấm."""
         cu = EvidenceStore(self._tmp.name, candidate="cu00000")
         cu.tool_run("S-01", "lint", ok=True)
+        cu.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         moi = EvidenceStore(self._tmp.name, candidate="aaa")
         moi.file_change("S-01", "src/a.py")
         moi.tool_run("S-01", "test", ok=True, detail={"test_format": "pytest", "test_ids": ["t"]})
@@ -447,6 +458,7 @@ class TestCoverageMin(GateTestCase):
         self.store.file_change("S-01", "src/a.py")
         self.store.tool_run("S-01", "test", ok=True, detail={"test_format": "pytest", "test_ids": ["t"], "coverage": value})
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         return next(c for c in self.gate(coverage_min=0.85).checks if c.name == "coverage")
 
     def test_no_number_is_unconfigured_with_the_fix(self):
@@ -520,6 +532,7 @@ class TestTDDVaNopControl(GateTestCase):
             "test_format": "pytest", "test_ids": [self.AC, "t1"], "failed_ids": [],
         })
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         store.tool_run("S-01", "test:nop", ok=not nop_failed, detail={
             "nop": True, "parent": "cha0000", "files": ["tests/test_a.py"],
             "test_format": "pytest", "test_ids": list(nop_ids), "failed_ids": list(nop_failed),
@@ -556,6 +569,7 @@ class TestTDDVaNopControl(GateTestCase):
             "test_format": "pytest", "test_ids": [self.AC, "t1"], "failed_ids": [],
         })
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         store.tool_run("S-01", "test:nop", ok=False, detail={
             "nop": True, "parent": "cha0000", "files": ["tests/test_a.py"],
             "unrunnable": "no runnable setup in this tree",
@@ -574,6 +588,7 @@ class TestTestKhongChayDuoc(GateTestCase):
         self.store.file_change("S-01", "src/a.py")
         self.store.tool_run("S-01", "test", ok=False, detail={"unrunnable": "công cụ chưa cài hoặc không nạp được (module_not_found)"})
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         g = self.gate()
         m = next(c for c in g.checks if c.name == "test")
         self.assertIs(m.outcome, Outcome.UNRUNNABLE)
@@ -616,6 +631,7 @@ class TestKhongLamDoTestCoSan(GateTestCase):
             "test_format": "pytest", "test_ids": list(ids), "failed_ids": list(failed), **detail,
         })
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
 
     def muc(self, g):
         return next(c for c in g.checks if c.name == self.TEN)
@@ -821,6 +837,7 @@ class TestTestCoKiemDuocStory(GateTestCase):
             "test_format": "pytest", "test_ids": list(ids), "failed_ids": list(failed), **detail,
         })
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
 
     def nop(self, ids=None, failed=(), sha="aaa", ok=None, files=("tests/test_a.py",), **detail):
         d = {"nop": True, "parent": "cha0000", "files": list(files), **detail}
@@ -968,6 +985,7 @@ class TestTestCoKiemDuocStory(GateTestCase):
         store = EvidenceStore(self._tmp.name, candidate="aaa")
         store.tool_run("S-01", "test", ok=True)
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         self.nop(ok=True)
         m = self.cham()
         self.assertIs(m.outcome, Outcome.FAILED)
@@ -1097,6 +1115,7 @@ class TestMotPhepThuHaiMa(GateTestCase):
         store.tool_run("S-01", "test", ok=True, detail={
             "test_format": "pytest", "test_ids": list(ids), "failed_ids": []})
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
 
     def muc(self, acceptance=2):
         return next(c for c in self.gate(candidate="aaa", acceptance=acceptance).checks

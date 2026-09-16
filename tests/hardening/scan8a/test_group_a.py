@@ -43,7 +43,7 @@ class TestSS01RealTestsNeedsARecordedScan(unittest.TestCase):
     """SS-01 — `real tests` (gate.py ~767-776) scores PASSED when no `qa:fake-tests` record exists:
     "scan never ran" reads exactly like "scan ran clean". INV-T.1: absence never produces a PASS."""
 
-    @unittest.expectedFailure   # SS-01 — observed: `real tests` PASSED with evidence=[] (no record was read)
+    # GREEN since F2 (SS-01: absence and truncation are UNRUNNABLE, never PASS), 2026-09-16
     def test_no_fake_tests_record_is_not_a_pass(self):
         ev = _ev({"kind": TOOL_RUN, "name": "test", "ok": True,
                   "detail": {"candidate": C1, "test_format": "pytest", "test_ids": []}},
@@ -100,7 +100,7 @@ class TestSS33TruncationNeverYieldsAVacuousPass(unittest.TestCase):
         return gate.evaluate(SID, ev, changed=["src/a.py"], write_scope=["src"], screens=[],
                              candidate=C1, review_blocking=[])
 
-    @unittest.expectedFailure   # SS-33a — observed: PASSED "truncated at 500 names — can only compare red tests" while the red test is in failed_ids
+    # GREEN since F2 (SS-33a: absence and truncation are UNRUNNABLE, never PASS), 2026-09-16
     def test_a_baseline_green_test_beyond_the_cut_turning_red_is_not_a_pass(self):
         cand = _log([t for t in self.IDS if t != self.VICTIM], failed=[self.VICTIM])
         self.assertIn(self.VICTIM, cand["failed_ids"])               # the gate CAN see it is red …
@@ -108,7 +108,7 @@ class TestSS33TruncationNeverYieldsAVacuousPass(unittest.TestCase):
         c = _check(self._gate(cand, ok=False), "no baseline regression")
         self.assertIsNot(c.outcome, Outcome.PASSED, f"{c.outcome.value}: {c.detail}")
 
-    @unittest.expectedFailure   # SS-33b — observed: PASSED with the same caveat and the WHOLE gate passed (gate passed=True)
+    # GREEN since F2 (SS-33b: absence and truncation are UNRUNNABLE, never PASS), 2026-09-16
     def test_a_baseline_test_deleted_beyond_the_cut_is_not_a_pass(self):
         g = self._gate(_log([t for t in self.IDS if t != self.VICTIM]), ok=True)
         c = _check(g, "no baseline regression")

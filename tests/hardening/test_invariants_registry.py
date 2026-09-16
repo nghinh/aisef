@@ -67,6 +67,21 @@ class TestTheRegistryLoads(unittest.TestCase):
         missing = sorted({d for inv in self.invs for d in inv.linked_defects if d not in known})
         self.assertEqual(missing, [], "link only ids the register, the family map or the sibling scan carry")
 
+    def test_a_proven_invariant_is_claimed_by_no_open_defect_of_the_frozen_set(self):
+        """A green citation list is not proof while a CONFIRMED defect against the invariant is still open
+        (Phase 10 definition of done: no CONFIRMED unfixed member, invariants PROVEN)."""
+        frozen = json.loads((ROOT / "closure-evidence/hardening/hardening-defect-set.json").read_text(encoding="utf-8"))
+        members = [m for ms in frozen["defects_by_fix_family"].values() for m in ms] + list(frozen.get("additions_after_freeze") or [])
+        open_against: dict[str, list[str]] = {}
+        for m in members:
+            if str(m.get("status", "OPEN")).upper() == "OPEN":
+                for inv in m.get("invariants") or []:
+                    open_against.setdefault(inv, []).append(m["id"])
+        for inv in self.invs:
+            if inv.status == "PROVEN":
+                self.assertNotIn(inv.invariant_id, open_against,
+                                 f"{inv.invariant_id} is PROVEN while {open_against.get(inv.invariant_id)} stand open against it")
+
     def test_a_proven_invariant_cites_a_deterministic_test_and_no_red_reproducer(self):
         for inv in self.invs:
             if inv.status == "PROVEN":

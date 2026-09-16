@@ -51,6 +51,12 @@ class BudgetExceeded(RuntimeError):
     """Raised when a reservation would exceed the configured cap."""
 
 
+class BudgetLocked(BudgetExceeded):
+    """The ledger is locked by another writer: contention, not a cap. Kept a subclass so every handler that
+    catches `BudgetExceeded` still does; the kernel tells them apart (SS-21: contention was reported as a cap
+    and charged to the developer)."""
+
+
 @dataclass
 class BudgetState:
     """Pure data: current ledger entries plus the global cap."""
@@ -173,7 +179,7 @@ class BudgetGuard:
             flock_ex_nb(fd)
         except (BlockingIOError, OSError) as e:
             os.close(fd)
-            raise BudgetExceeded(
+            raise BudgetLocked(
                 f"budget ledger locked by another writer ({e})") from e
         try:
             state = self.ledger.load()

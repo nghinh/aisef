@@ -144,7 +144,7 @@ class TestSS12BudgetRejectionInReviewDoesNotCrash(ImplementTestCase):
     """SS-12 — `_review_session` handles BudgetExceeded with `from .mockup import RunResult`, a name that
     module does not define: the whole sprint dies with ImportError. Invariant G/F (typed outcome)."""
 
-    @unittest.expectedFailure   # SS-12
+    # GREEN since F2 (SS-12: one RunResult type; budget in a verifier is typed), 2026-09-16
     def test_review_budget_rejection_is_a_typed_outcome_not_an_import_error(self):
         out = self.implement(_ReviewBudgetCut())
         self.assertIsNotNone(out)
@@ -162,15 +162,15 @@ class TestSS13SecurityExecutionFailureIsNotAVerdict(ImplementTestCase):
     """SS-13 — a security SESSION failure becomes `Check("security", FAILED)` and is cached as a verdict at
     the candidate; the loop reopens the developer (D-032's shape, security stage). Invariant G/F."""
 
-    @unittest.expectedFailure   # SS-13a
+    # GREEN since F2 (SS-13: an execution failure is UNRUNNABLE and retries its own stage), 2026-09-16
     def test_gate_scores_a_security_execution_failure_as_unrunnable(self):
         ev = _ev({"kind": TOOL_RUN, "name": "test", "ok": True, "detail": {"candidate": C1}},
                  {"kind": TOOL_RUN, "name": "lint", "ok": True, "detail": {"candidate": C1}})
         g = gate.evaluate(SID, ev, changed=["src/a.py"], write_scope=["src"], screens=[], candidate=C1,
-                          review_blocking=[], security=SecurityReport(error="could not run: exceeded 10s"))
+                          review_blocking=[], security=SecurityReport(unrunnable="could not run: exceeded 10s"))   # F2: the kernel records an execution failure as `unrunnable`, not `error`
         self.assertIs(_check(g, "security").outcome, Outcome.UNRUNNABLE)
 
-    @unittest.expectedFailure   # SS-13b
+    # GREEN since F2 (SS-13: an execution failure is UNRUNNABLE and retries its own stage), 2026-09-16
     def test_a_cut_security_session_retries_security_not_the_developer(self):
         c = _SecurityCut()
         self.implement(c)
@@ -181,7 +181,7 @@ class TestSS14ToolEnvironmentFailureIsNotADeveloperAttempt(ImplementTestCase):
     """SS-14 — an UNRUNNABLE deterministic check (runner missing in the sandbox) blocks the gate and the
     loop's only move is a new developer session, charged to quality. Invariant G/N."""
 
-    @unittest.expectedFailure   # SS-14
+    # GREEN since F2 (SS-14: an execution failure is UNRUNNABLE and retries its own stage), 2026-09-16
     def test_a_missing_test_runner_does_not_spend_developer_attempts(self):
         c = ScriptedClient()
         self.implement(c, config=self.config(**{"tools.test": "aisef-no-such-runner-xyz"}))
@@ -200,7 +200,7 @@ class TestSS15EnvironmentExitStatusesAreNotQualityAttempts(ImplementTestCase):
     """SS-15 — `context`, `permission`, `cost` exit statuses leave the tree untouched and are charged to the
     developer's quality budget (D-006's shape). Invariant G."""
 
-    @unittest.expectedFailure   # SS-15
+    # GREEN since F2 (SS-15: environment exits are not quality), 2026-09-16
     def test_a_context_window_exit_is_infra_not_quality(self):
         self.assertEqual(exit_status_of(RunResult(ok=False, error="prompt is too long: 210000 tokens")), "context")
         out = self.implement(_ContextCut())

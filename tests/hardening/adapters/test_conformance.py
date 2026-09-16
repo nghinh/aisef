@@ -244,11 +244,11 @@ class TestC03EmptyResponse(_Pair):
     def test_claude(self):
         self._check(self.claude)
 
-    @unittest.expectedFailure   # AD-01 OpenCode: an empty stream with exit 0 is ok=True — no terminal event required
+    # GREEN since F2 (AD-01: typed infra outcome from the adapter), 2026-09-16
     def test_opencode(self):
         self._check(self.opencode)
 
-    @unittest.expectedFailure   # AD-01 claude=infra ("stream ended without a result event") vs opencode=ok
+    # GREEN since F2 (AD-01: typed infra outcome from the adapter), 2026-09-16
     def test_cross_adapter_same_exit_status(self):
         super().test_cross_adapter_same_exit_status()
 
@@ -445,11 +445,11 @@ class TestC11PartialStream(_Pair):
     def test_claude(self):
         self._check(self.claude)
 
-    @unittest.expectedFailure   # AD-03 OpenCode: child dead mid-line (exit 1, no error event) → "error", charged to quality
+    # GREEN since F2 (AD-03: typed infra outcome from the adapter), 2026-09-16
     def test_opencode(self):
         self._check(self.opencode)
 
-    @unittest.expectedFailure   # AD-03 claude=infra vs opencode=error for the same truncated stream
+    # GREEN since F2 (AD-03: typed infra outcome from the adapter), 2026-09-16
     def test_cross_adapter_same_exit_status(self):
         super().test_cross_adapter_same_exit_status()
 
@@ -468,15 +468,15 @@ class TestC12ProcessDeath(_Pair):
                         f"exit code not recorded: error={res.error!r} raw={res.raw_result}")
         self.assertIn(exit_status_of(res), INFRA_STATUSES, f"a dead child is infra, got error={res.error!r}")
 
-    @unittest.expectedFailure   # AD-04 Claude: exit code 3 and stderr dropped — error is the generic "no result event"
+    # GREEN since F2 (AD-04: exit code and stderr recorded when no result event), 2026-09-16
     def test_claude(self):
         self._check(self.claude)
 
-    @unittest.expectedFailure   # AD-03 OpenCode: exit 3 recorded in raw_result but classified "error", not infra
+    # GREEN since F2 (AD-03: typed infra outcome from the adapter), 2026-09-16
     def test_opencode(self):
         self._check(self.opencode)
 
-    @unittest.expectedFailure   # AD-03 claude=infra vs opencode=error for the same exit-3 death
+    # GREEN since F2 (AD-03: typed infra outcome from the adapter), 2026-09-16
     def test_cross_adapter_same_exit_status(self):
         super().test_cross_adapter_same_exit_status()
 
@@ -499,14 +499,14 @@ class TestC13LateOutputAfterTimeout(_Pair):
         self.assertEqual(exit_status_of(res), "timeout")
         self.assertEqual(res.error, "exceeded 1s")
 
-    @unittest.expectedFailure   # AD-05 Claude: a result event after the timeout kill → ok=True, exit_status "ok"
+    # GREEN since F2 (AD-05: typed infra outcome from the adapter), 2026-09-16
     def test_claude(self):
         self._check(self.claude, self.claude.raw_result.get("result") == "late verdict")
 
     def test_opencode(self):
         self._check(self.opencode, "late verdict" in self.opencode.text)
 
-    @unittest.expectedFailure   # AD-05 claude=ok vs opencode=timeout after the same late line
+    # GREEN since F2 (AD-05: typed infra outcome from the adapter), 2026-09-16
     def test_cross_adapter_same_exit_status(self):
         super().test_cross_adapter_same_exit_status()
 

@@ -87,9 +87,9 @@ class Agent(ClientAdapter):
     def run(self, spec: RunSpec) -> RunResult:
         dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
         if dau.startswith("# Security review"):
-            return RunResult(ok=True, text="không có phát hiện bảo mật", cost_usd=0.1)
+            return RunResult(ok=True, text="không có phát hiện bảo mật\n\n```json\n{\"verdict\": \"pass\", \"findings\": []}\n```\n", cost_usd=0.1)
         if dau.startswith("# Review"):
-            return RunResult(ok=True, text="không có mục chặn", cost_usd=0.1)
+            return RunResult(ok=True, text="không có mục chặn\n\n```json\n{\"verdict\": \"pass\", \"findings\": []}\n```\n", cost_usd=0.1)
 
         story_id = spec.env.get("AISEF_STORY_ID", "")
         scope = spec.env.get("AISEF_WRITE_SCOPE", "src").split(",")[0]

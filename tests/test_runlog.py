@@ -11,6 +11,8 @@ from __future__ import annotations
 import sys
 import tempfile
 import unittest
+
+from tests.test_implement import chan  # noqa: E402
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -70,7 +72,7 @@ class TestLyDoTrongNhatKy(unittest.TestCase):
         return (self.case.artifacts / "run.log").read_text(encoding="utf-8")
 
     def test_moi_phep_kiem_truot_co_mot_dong_ly_do(self):
-        log = self.chay(review="[chặn] src/a.py:1 — mất dữ liệu khi lưu")
+        log = self.chay(review=chan("[chặn] src/a.py:1 — mất dữ liệu khi lưu"))
         ten = [d.split("gate FAILED: ", 1)[1].strip()
                for d in log.splitlines() if "gate FAILED: " in d]
         self.assertTrue(ten, log)
@@ -79,7 +81,7 @@ class TestLyDoTrongNhatKy(unittest.TestCase):
                           f"phép kiểm `{name}` trượt mà không có dòng lý do")
 
     def test_muc_chan_cua_reviewer_nam_trong_nhat_ky(self):
-        log = self.chay(review="[chặn] src/a.py:1 — mất dữ liệu khi lưu")
+        log = self.chay(review=chan("[chặn] src/a.py:1 — mất dữ liệu khi lưu"))
         self.assertIn("review ✗ [chặn] src/a.py:1 — mất dữ liệu khi lưu", log)
 
     def test_baseline_khong_chay_duoc_thi_noi_ra_ngay_trong_nhat_ky(self):

@@ -72,7 +72,7 @@ class TestCF01ReviewerTimeoutAfterRecovery(_Case):
 
 # --------------------------------------------------------------- CF-02 security timeout after reviewer BLOCK remediation
 class TestCF02SecurityTimeoutAfterBlockRemediation(_Case):
-    @unittest.expectedFailure   # SS-13 (F2) — a security SESSION failure is a FAILED check and reopens the developer
+    # GREEN since F2 (SS-13 (F2): security absence retries security), 2026-09-16
     def test_security_absence_after_a_fixed_block_retries_security_not_the_developer(self):
         c = SyntheticClientAdapter(Script(developer=[Step("CHANGED", files=_green(1)), Step("CHANGED", files=_green(2))],
                                           review=[Step.block(_block_in()), Step.passes()],

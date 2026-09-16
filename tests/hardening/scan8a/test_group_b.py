@@ -168,7 +168,7 @@ class TestSS19CoBlockingUnrunnableKeepsTheReviewerAbsenceAtTheReviewStage(_Case)
     developer session. (A missing test runner is not usable as the co-blocker: it also makes
     `criteria have tests` FAILED, and a FAILED check legitimately reopens the developer.)"""
 
-    @unittest.expectedFailure   # SS-19: gate failures were review+preservation, both UNRUNNABLE, yet develop_calls=2 and the review stage was never retried
+    # GREEN since F2 (SS-19: absent stages are retried, never the developer), 2026-09-16
     def test_two_unrunnable_checks_never_open_a_developer(self):
         with patch.object(I, "preservation_items", return_value=[dict(ITEM)]):
             c, out = self.run_script(Script(review=[Step.unrunnable()]))
@@ -220,7 +220,7 @@ class TestSS21BudgetLockContentionIsInfraNotACap(_Case):
     """SS-21 — `BudgetGuard.reserve` raises BudgetExceeded when the ledger lock is merely held by another
     writer; `run_attempt` charges every BudgetExceeded to quality and words it as a cap."""
 
-    @unittest.expectedFailure   # SS-21: attempt.infra=False, quality_attempts=2, error="budget exceeded: budget ledger locked by another writer (...)"
+    # GREEN since F2 (SS-21: ledger lock is infra, never a cap), 2026-09-16
     def test_a_held_ledger_lock_is_an_environment_outcome(self):
         guard = BudgetGuard(BudgetLedger(self.project))
         guard.configure(BudgetConfig(cap_usd=100.0))

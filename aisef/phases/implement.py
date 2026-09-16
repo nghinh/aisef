@@ -44,8 +44,10 @@ from ..control.normalize import Architecture, Story, effective_write_scope
 from ..harness import context as code_map
 from ..harness import mockup_verify
 from ..clients.compile import guard_expected
-from ..clients.stream import INFRA_STATUSES, exit_status_of, retry_delay_seconds
+from ..clients.stream import ENVIRONMENT_STATUSES, INFRA_STATUSES, RunResult, exit_status_of, retry_delay_seconds
 from ..control import identity as ident
+from ..control.budget import BudgetLocked
+from ..control.outcome import StageOutcome
 from ..harness.guardrails import (
     ENV_ALLOW_HOSTS,
     ENV_DISALLOWED_TOOLS,
@@ -94,6 +96,8 @@ class Attempt:
     review_findings: list[str] = field(default_factory=list)
     #: The developer session that produced this attempt (control/identity.py); guard records bind to it.
     session_id: str = ""
+    #: Typed outcome of the attempt (control/outcome.StageOutcome) — the routing key; the booleans above are derived.
+    outcome: str = ""
     #: The identity tuple the verdict was computed under — what `gate:verdict` was stamped with.
     identity: dict = field(default_factory=dict)
     #: Why the reviewer did **not execute** on this candidate (max_turns, timeout,
@@ -126,6 +130,13 @@ class StoryOutcome:
     story_id: str
     attempts: list[Attempt] = field(default_factory=list)
     blocked_reason: str = ""
+    #: Typed terminal (control/outcome.StageOutcome value) — what `blocked_reason` says, as data. "" while running
+    #: or when the story is done. Readers decide on this, never on the prose.
+    terminal: str = ""
+
+    def block(self, kind: StageOutcome, reason: str) -> None:
+        self.terminal = kind.value
+        self.blocked_reason = reason
 
     @property
     def done(self) -> bool:
@@ -657,9 +668,21 @@ def run_attempt(
         result = _reserved_client_run(
             client, spec, story_id=story.id, estimate_turns=1,
         )
+    except BudgetLocked as e:
+        # ledger contention between parallel stories: infrastructure, retried after a short wait — never a cap,
+        # never the developer's quality budget (SS-21)
+        attempt.error = f"budget ledger locked by another writer — retrying shortly ({e})"
+        attempt.infra = True
+        attempt.retry_after = 2.0
+        attempt.outcome = StageOutcome.INFRA_FAILURE.value
+        attempt.ok = False
+        return attempt
     except BudgetExceeded as e:
-        attempt.error = f"budget exceeded: {e}"
-        attempt.fatal = False
+        # the kernel's cost cap: a run-level decision, typed and terminal — not a developer failure (INV-G.5)
+        attempt.error = f"budget cap reached: {e}"
+        attempt.fatal = True
+        attempt.infra = True     # never scored, never charged
+        attempt.outcome = StageOutcome.BUDGET.value
         attempt.ok = False
         return attempt
     attempt.cost_usd = result.cost_usd
@@ -709,6 +732,8 @@ def run_attempt(
                ". The story must work in its own worktree; work on the trunk does not "
                "pass any gate. Revert and re-run.")
         )
+        # typed at the source (F2): a harness-only trunk change is an environment event, a story write is a breach
+        attempt.outcome = (StageOutcome.ENVIRONMENT_FAILURE if cua_harness else StageOutcome.ISOLATION_BREACH).value
         attempt.infra = True   # story was never scored
         attempt.fatal = True   # and retrying is pointless
         evidence.tool_run(
@@ -720,7 +745,12 @@ def run_attempt(
 
     if not result.ok:
         attempt.error = result.error or "run failed"
-        attempt.infra = exit_status_of(result) in INFRA_STATUSES
+        status = exit_status_of(result)
+        attempt.infra = status in INFRA_STATUSES or status in ENVIRONMENT_STATUSES
+        attempt.outcome = (StageOutcome.INFRA_FAILURE.value if status in INFRA_STATUSES else
+                           StageOutcome.ENVIRONMENT_FAILURE.value if status in ENVIRONMENT_STATUSES else "")
+        # `context`, `permission`, `cost`: the environment limited the session — the tree is untouched and the
+        # developer wrote no wrong code; retried on the infra budget, never charged to quality (SS-15, INV-G.4)
         attempt.retry_after = retry_delay_seconds(result)
         if exit_status_of(result) == "auth":
             # `auth` is kept out of `INFRA_STATUSES` on purpose and that reasoning
@@ -788,7 +818,10 @@ def run_attempt(
     # Claude Code's tools (common when an API proxy silently routes to a
     # different model).  Only fires when output_tokens > 0 (real stream
     # data, not a mock that omits it).
-    if not changed_now and not result.tool_uses and result.output_tokens > 0:
+    untouched = (head_sha(workdir), _tree_snapshot(workdir)) == tree_before
+    if untouched and not result.tool_uses and result.output_tokens > 0:
+        # THIS session's change, not the diff against the base branch: on a retry that diff carries the frozen
+        # candidate's files and the check never fired (SS-59)
         snippet = (result.text or "")[:200].strip()
         attempt.error = (
             f"agent responded ({result.output_tokens} tokens, {result.num_turns} turns) "
@@ -957,6 +990,7 @@ def _security_from_evidence(e: Event) -> SecurityReport:
     both live and persisted reports."""
     rep = parse_security("\n".join(e.detail.get("findings") or []))
     rep.error = str(e.detail.get("error") or "")
+    rep.unrunnable = str(e.detail.get("unrunnable") or "")
     return rep
 
 
@@ -1241,9 +1275,12 @@ def _verify_candidate_under(now: ident.EvidenceIdentity, story: Story, *, projec
         for f in attempt.review_findings:
             _log(f"story={sid}#{number} review ✗ {one_line(f)}")
 
-    if config.get("security.semantic_review", True):
+    if _verifier_budget_cap(attempt):
+        _log(f"story={sid}#{number} security SKIPPED — budget cap reached in the review session (no further session)")
+    elif config.get("security.semantic_review", True):
         security_ev = _at(ev, TOOL_RUN, "security", now) if reuse else None
-        if keep("security", bool(security_ev and _at(ev, AGENT_RUN, f"{sid}-security", now))):
+        if keep("security", bool(security_ev and not security_ev.detail.get("unrunnable")
+                                 and _at(ev, AGENT_RUN, f"{sid}-security", now))):
             attempt.security = _security_from_evidence(security_ev)
         else:
             attempt.security = security_review(
@@ -1260,7 +1297,7 @@ def _verify_candidate_under(now: ident.EvidenceIdentity, story: Story, *, projec
                 candidate=sha,
                 preservation=preservation,
             )
-            sec_ok = not (attempt.security.error
+            sec_ok = not (attempt.security.error or attempt.security.unrunnable
                          or attempt.security.blocking(config["security.block_severities"]))
             evidence.tool_run(
                 sid,
@@ -1270,11 +1307,16 @@ def _verify_candidate_under(now: ident.EvidenceIdentity, story: Story, *, projec
                     "findings": [f.line() for f in attempt.security.findings],
                     "filtered": len(attempt.security.filtered),
                     "error": attempt.security.error,
+                    "unrunnable": attempt.security.unrunnable,
+                    "outcome": (SECURITY_UNRUNNABLE if attempt.security.unrunnable else
+                                "PASS" if sec_ok else "BLOCK"),
                     "attempt": number,
                 },
             )
-            _log(f"story={sid}#{number} security {'PASS' if sec_ok else 'FAIL'} "
-                 f"findings={len(attempt.security.findings)} filtered={len(attempt.security.filtered)}")
+            _log(f"story={sid}#{number} security "
+                 f"{'UNRUNNABLE' if attempt.security.unrunnable else 'PASS' if sec_ok else 'FAIL'} "
+                 f"findings={len(attempt.security.findings)} filtered={len(attempt.security.filtered)}"
+                 + (f" · {one_line(attempt.security.unrunnable)}" if attempt.security.unrunnable else ""))
             if not sec_ok:
                 if attempt.security.error:
                     _log(f"story={sid}#{number} security ✗ {one_line(attempt.security.error)}")
@@ -1710,9 +1752,10 @@ def _review_session(
         # result so the rest of the pipeline can react.  Attempt is left
         # at its previous `ok` state and the failure is surfaced through
         # the evidence store as ``infra``.
-        from .mockup import RunResult
-        result = RunResult(ok=False, error=f"budget exceeded: {e}",
-                           cost_usd=0.0, turns=0)
+        # SS-12: one RunResult type (clients.stream), never the mockup phase's. A cap and a locked ledger are
+        # different outcomes; `raw_result` says which so the stage routes typed (SS-21).
+        result = RunResult(ok=False, error=f"budget exceeded: {e}", cost_usd=0.0, num_turns=0,
+                           raw_result={"budget": "locked" if isinstance(e, BudgetLocked) else "cap"})
     store.agent_run(story_id, result, name=name, prompt_chars=len(spec.prompt),
                     role=role, model=spec.model, client=client.id)
     for sk in skills_used(result):
@@ -1728,12 +1771,14 @@ def _with_schema(client: ClientAdapter, spec, result, *, store: EvidenceStore,
     """Demand JSON block per schema; missing means retry **exactly once**
     (R8).
 
-    Returns `(text, verdict)`: `text` is the human-readable version -- second
-    attempt if it has correct schema, otherwise the first attempt's text.
+    Returns `(text, verdict, why)`: `text` is the human-readable version -- second
+    attempt if it has correct schema, otherwise the first attempt's text; `why` names
+    the reason the retry could not EXECUTE (budget cap, cut, moved candidate, reverted
+    tree) so the caller reports that, never "answered in prose twice" (SS-12/F2).
     """
     verdict = review_verdict(result.text)
     if verdict is not None:
-        return result.text, verdict
+        return result.text, verdict, ""
     lai, reverted = _review_session(
         client, replace(spec, prompt=spec.prompt + SCHEMA_REMINDER), store=store,
         story_id=story_id, artifact_root=artifact_root, workdir=workdir,
@@ -1745,7 +1790,11 @@ def _with_schema(client: ClientAdapter, spec, result, *, store: EvidenceStore,
         store.tool_run(story_id, f"{role}:candidate", ok=False,
                        detail={"expected": store.candidate, "got": lech,
                                "attempt": number, "retry": True})
-        return result.text, None
+        # SS-A10 (schema-retry half, differential seed 232): the reviewer's commit is undone here too, or the frozen
+        # candidate is gone for every later reader
+        _restore_candidate_after_review_commit(store, story_id, workdir, candidate=store.candidate, got=lech,
+                                               number=number)
+        return result.text, None, f"candidate changed during the schema retry ({store.candidate[:7]} → {lech[:7]}) — restored"
     if reverted:
         # Retry is also checked by the "review does not write tree" invariant;
         # discard its words, and say so -- silent revert means nobody knows.
@@ -1753,10 +1802,12 @@ def _with_schema(client: ClientAdapter, spec, result, *, store: EvidenceStore,
             story_id, f"{role}:immutable", ok=False,
             detail={"changed": reverted[:20], "retry": True},
         )
-    if reverted or not lai.ok:
-        return result.text, None
+    if reverted:
+        return result.text, None, "the reviewer modified the working tree during the schema retry — reverted"
+    if not lai.ok:
+        return result.text, None, f"could not run the schema retry: {lai.error}"
     verdict = review_verdict(lai.text)
-    return (lai.text, verdict) if verdict is not None else (result.text, None)
+    return (lai.text, verdict, "") if verdict is not None else (result.text, None, "")
 
 
 def review_story_v2(
@@ -1903,10 +1954,17 @@ def review_story_v2(
         # block — REVIEW_UNRUNNABLE, retried on the same candidate (D-032).
         return [], None, str(result.error or "reviewer session did not complete")
 
-    text, verdict = _with_schema(
+    text, verdict, why = _with_schema(
         client, spec, result, store=store, story_id=story.id,
         artifact_root=artifact_root, workdir=workdir, role="review", number=number,
     )
+    if verdict is None:
+        # Two answers without a structured verdict: the reviewer said nothing the kernel can score. Prose
+        # findings are recorded as observations only — never a PASS, never a BLOCK (SS-57, INV-F.2).
+        store.record(story.id, Event(kind=NOTE, name="review:no-schema", ok=False,
+                                     detail={"findings": blocking_findings(text), "retried": True}))
+        return [], None, why or ("no structured verdict after the schema retry — the reviewer answered in prose twice; "
+                          "nothing was said about the candidate")
     return _reconcile(story.id, store, text, verdict, role="review"), verdict, ""
 
 
@@ -2120,27 +2178,27 @@ def security_review(
         store.tool_run(
             story.id, "security:immutable", ok=False, detail={"changed": reverted[:20]},
         )
-        return SecurityReport(error=f"security reviewer modified the working tree ({', '.join(reverted[:3])}) — reverted, this attempt does not count")
+        return SecurityReport(unrunnable=f"security reviewer modified the working tree ({', '.join(reverted[:3])}) — reverted, this execution does not count")
     lech = _candidate_moved(workdir, candidate)
     if lech:
         store.tool_run(story.id, "security:candidate", ok=False,
                        detail={"expected": candidate, "got": lech, "attempt": number})
         return SecurityReport(
-            error=f"candidate changed during security review session ({candidate[:7]} → "
-                  f"{lech[:7]}) — this attempt does not count"
+            unrunnable=f"candidate changed during security review session ({candidate[:7]} → "
+                       f"{lech[:7]}) — this execution does not count"
         )
     if not result.ok:
-        return SecurityReport(error=f"could not run: {result.error}")
+        return SecurityReport(unrunnable=f"could not run: {result.error}")
 
-    text, verdict = _with_schema(
+    text, verdict, why = _with_schema(
         client, spec, result, store=store, story_id=story.id,
         artifact_root=artifact_root, workdir=workdir, role="security", number=number,
     )
-    return _reconcile_security(story.id, store, text, verdict)
+    return _reconcile_security(story.id, store, text, verdict, why=why)
 
 
 def _reconcile_security(story_id: str, ev: EvidenceStore, text: str,
-                        verdict: Verdict | None) -> SecurityReport:
+                        verdict: Verdict | None, *, why: str = "") -> SecurityReport:
     """Same rule as `_reconcile`, but the unit is severity level.
 
     JSON items not in the text are re-parsed via `parse_security` so exactly
@@ -2148,10 +2206,13 @@ def _reconcile_security(story_id: str, ev: EvidenceStore, text: str,
     """
     rep = parse_security(text)
     if verdict is None:
+        # Two answers without a structured verdict: nothing was SAID about the candidate. Prose findings are
+        # recorded as observations; they never PASS and never BLOCK (SS-13 / SS-57, INV-F.2).
         ev.record(story_id, Event(kind=NOTE, name="security:no-schema", ok=False,
                                   detail={"findings": [f.line() for f in rep.findings],
                                           "retried": True}))
-        return rep
+        return SecurityReport(unrunnable=why or "no structured verdict after the schema retry — the security reviewer "
+                                         "answered in prose twice; nothing was said about the candidate")
 
     tu_van_ban = [f.line() for f in rep.findings + rep.filtered]
     tu_json = [f"[{f['severity']}] " + _finding_body(f)
@@ -2789,6 +2850,9 @@ MAX_NOOP = 2
 REVIEW_PASS = "PASS"
 REVIEW_BLOCK = "BLOCK"
 REVIEW_UNRUNNABLE = "REVIEW_UNRUNNABLE"
+SECURITY_UNRUNNABLE = "SECURITY_UNRUNNABLE"
+#: bounded re-runs of a deterministic stage (test/lint/qa) that could not run, per candidate
+MAX_TOOL_RETRIES = 2
 #: Reviewer executions on one candidate after the first, before the story ends
 #: as REVIEW_UNRUNNABLE. A cut reviewer is retried on the **same** frozen
 #: candidate; nothing about the code changed, so nothing else is re-asked.
@@ -2817,10 +2881,56 @@ def _review_executions(ev: Evidence, story_id: str, sha: str) -> int:
                if str(e.detail.get("candidate") or "") == sha)
 
 
+def _security_executions(ev: Evidence, story_id: str, sha: str) -> int:
+    """Security reviewer EXECUTIONS already spent on this candidate — a schema retry belongs to the execution that
+    asked for it, exactly as `Attempt.review_attempt` counts the reviewer's (one bound, in executions, per stage)."""
+    return sum(1 for e in ev.of(AGENT_RUN) if e.name == f"{story_id}-security"
+               and str(e.detail.get("candidate") or "") == sha)
+
+
 def _only_review_unrunnable(attempt: Attempt) -> bool:
     """The gate failed on the reviewer's absence and nothing else."""
     return bool(attempt.review_unrunnable) and attempt.gate is not None and (
         [c.name for c in attempt.gate.failures] == ["review"])
+
+
+def exit_status_of_error(error: str) -> str:
+    """Classify a stored attempt error the way `exit_status_of` classifies a live result (fatal attempts keep
+    only the text)."""
+    return exit_status_of(RunResult(ok=False, error=error))
+
+
+def _absent_stages(attempt: Attempt) -> list[str]:
+    """Stages the gate is blocked on ONLY because they said nothing (UNRUNNABLE): review, security, a tool that
+    could not run, stale evidence. Empty when any check FAILED — then something deterministic is wrong with the
+    work and the developer is the right next stage (with every finding as feedback). Never a developer when
+    only absences remain (SS-13, SS-14, SS-19, INV-G.1–G.3)."""
+    if attempt.gate is None or attempt.ok:
+        return []
+    failures = list(attempt.gate.failures)
+    if any(c.outcome is story_gate.Outcome.FAILED for c in failures):
+        return []
+    return [c.name for c in failures if c.outcome is story_gate.Outcome.UNRUNNABLE]
+
+
+def _verifier_budget_cap(attempt: Attempt) -> str:
+    """The budget cap reached inside a verifier session of this attempt ("" otherwise). A cap is a run-level
+    condition: no further session may be opened, whatever else the gate says (SS-12, INV-G.5). Lock contention
+    (`locked`) is an ordinary infra absence and is retried (SS-21)."""
+    # both verifiers are read: a review absent for another reason must not hide the security session's cap
+    # (differential seeds 1330–2574 after F2: `or` stopped at the review's text)
+    for why in (attempt.review_unrunnable or "", getattr(attempt.security, "unrunnable", "") or ""):
+        if "budget exceeded" in why and "locked" not in why:
+            return why
+    return ""
+
+
+def _stage_of(check_name: str) -> str:
+    if check_name == "review":
+        return "review"
+    if check_name == "security":
+        return "security"
+    return "tools"
 
 
 def _pending_review(root: Path, story_id: str, workdir: Path) -> str:
@@ -2913,11 +3023,13 @@ def deadlock_reason(attempts: list[Attempt], write_scope: list[str] | None = Non
     matched, so the string-comparison detector stayed silent the whole time
     and the story burned its retry budget: $10.39.
     """
-    if len(attempts) < 2:
+    # Consecutive GRADED positions: an attempt whose reviewer said nothing (UNRUNNABLE, re-run by the review stage)
+    # is not a position and must not break the pair — the re-run's verdict is that candidate's position (SS-63,
+    # differential seed 2624: a reviewer mutation between two identical out-of-scope blocks hid the plan conflict).
+    graded = [a for a in attempts if not a.infra and not getattr(a, "review_unrunnable", "")]
+    if len(graded) < 2:
         return ""
-    last_attempt, prev_attempt = attempts[-1], attempts[-2]
-    if last_attempt.infra or prev_attempt.infra:
-        return ""
+    last_attempt, prev_attempt = graded[-1], graded[-2]
     if not last_attempt.review_findings or not prev_attempt.review_findings:
         return ""
     if not _same_complaint(last_attempt.review_findings, prev_attempt.review_findings):
@@ -3163,11 +3275,13 @@ def implement_story(
     run_baseline(story, workdir=workdir, artifact_root=root, config=cfg, base_ref=base_ref)
 
     def _review_stage(attempt: Attempt) -> Attempt:
-        """Retry the REVIEW stage on the same frozen candidate while the gate
-        fails only because the reviewer did not run — bounded — and end the
-        story as REVIEW_UNRUNNABLE when the budget is spent. Never a developer
-        session: nothing about the code has been said (D-032)."""
+        """Retry the stages that said NOTHING about the frozen candidate — the reviewer, the security reviewer,
+        a tool that could not run — while the gate is blocked only by such absences. Bounded per stage and per
+        candidate; the terminal names the stage (REVIEW_UNRUNNABLE / SECURITY_UNRUNNABLE / ENVIRONMENT_FAILURE)
+        and keeps the candidate. Never a developer session: nothing about the code has been said (D-032 for the
+        reviewer; SS-13, SS-14, SS-19 for the rest)."""
         sha = attempt.candidate
+        tool_retries = 0
         scope = effective_write_scope(story, project)
         changed = changed_files(str(workdir), base_ref=base_ref)
         # the list the attempt was written and first scored against, pinned in its gate:input (SS-20, INV-D.1);
@@ -3176,10 +3290,25 @@ def implement_story(
                        if str(e.detail.get("candidate") or "") == attempt.candidate), None)
         preservation = (list(pinned.detail.get("preservation") or []) if pinned is not None
                         else preservation_items(story, project=project, ledger=_ledger(root)))
-        while _only_review_unrunnable(attempt) and attempt.review_attempt <= MAX_REVIEW_RETRIES:
-            _log(f"story={story.id}#{attempt.number} review UNRUNNABLE on candidate {sha[:8]} "
-                 f"— retrying the review stage ({attempt.review_attempt}/{1 + MAX_REVIEW_RETRIES} "
-                 f"executions spent): {attempt.review_unrunnable[:80]}")
+        def _budget_left(absent: list[str]) -> bool:
+            stages = {_stage_of(n) for n in absent}
+            ev_now = EvidenceStore(root).read(story.id)
+            if "review" in stages and attempt.review_attempt > MAX_REVIEW_RETRIES:
+                return False
+            if "security" in stages and _security_executions(ev_now, story.id, sha) > MAX_REVIEW_RETRIES:
+                return False
+            if "tools" in stages and tool_retries > MAX_TOOL_RETRIES:
+                return False
+            return True
+
+
+        absent = _absent_stages(attempt)
+        while absent and _budget_left(absent) and not _verifier_budget_cap(attempt):
+            _log(f"story={story.id}#{attempt.number} {', '.join(absent)} UNRUNNABLE on candidate {sha[:8]} "
+                 f"— retrying the {'/'.join(sorted({_stage_of(n) for n in absent}))} stage(s), not the developer: "
+                 f"{(attempt.review_unrunnable or getattr(attempt.security, 'unrunnable', '') or absent[0])[:80]}")
+            if "tools" in {_stage_of(n) for n in absent}:
+                tool_retries += 1
             lai = Attempt(number=attempt.number, verify_only=True)
             lai.candidate = sha
             lai = verify_candidate(
@@ -3190,16 +3319,36 @@ def implement_story(
             )
             outcome.attempts.append(lai)
             attempt = lai
-        if _only_review_unrunnable(attempt):
-            outcome.blocked_reason = (
-                f"{REVIEW_UNRUNNABLE}: the reviewer did not produce a verdict on candidate "
-                f"{sha[:8]} in {attempt.review_attempt} executions — last: "
-                f"{attempt.review_unrunnable}. Deterministic checks passed and the candidate is "
-                f"kept; no developer change is needed. Re-run the review stage when the reviewer "
-                f"can run: `{aisef_command()} run --verify-only --story {story.id}`."
-            )
-            _log(f"story={story.id} {REVIEW_UNRUNNABLE} after {attempt.review_attempt} "
-                 f"review executions on {sha[:8]}")
+            absent = _absent_stages(attempt)
+        if absent and _verifier_budget_cap(attempt):
+            outcome.block(StageOutcome.BUDGET, f"budget cap reached inside a verifier session on candidate {sha[:8]}: "
+                                               f"{_verifier_budget_cap(attempt)}. The candidate is kept; raise the cap and re-run "
+                                               f"`{aisef_command()} run --verify-only --story {story.id}`.")
+            _log(f"story={story.id} BUDGET cap inside a verifier on {sha[:8]}")
+        elif absent:
+            stages = {_stage_of(n) for n in absent}
+            hint = f"`{aisef_command()} run --verify-only --story {story.id}`"
+            if "tools" not in stages and "review" in stages:
+                stages = {"review"}          # both verifiers absent: the reviewer's absence names the terminal
+            if stages == {"review"}:
+                outcome.block(StageOutcome.UNRUNNABLE, (
+                    f"{REVIEW_UNRUNNABLE}: the reviewer did not produce a verdict on candidate "
+                    f"{sha[:8]} in {attempt.review_attempt} executions — last: "
+                    f"{attempt.review_unrunnable}. Deterministic checks passed and the candidate is "
+                    f"kept; no developer change is needed. Re-run the review stage when the reviewer "
+                    f"can run: {hint}."))
+            elif stages == {"security"}:
+                outcome.block(StageOutcome.UNRUNNABLE, (
+                    f"{SECURITY_UNRUNNABLE}: the security reviewer did not produce a verdict on candidate "
+                    f"{sha[:8]} — last: {getattr(attempt.security, 'unrunnable', '')}. The candidate is kept; "
+                    f"no developer change is needed. Re-run when it can: {hint}."))
+            else:
+                names = ", ".join(absent)
+                outcome.block(StageOutcome.ENVIRONMENT_FAILURE, (
+                    f"ENVIRONMENT_FAILURE: {names} could not run on candidate {sha[:8]} after "
+                    f"{tool_retries} re-run(s) — the environment, not the work, is what failed. The candidate "
+                    f"is kept; fix the environment and re-run: {hint}."))
+            _log(f"story={story.id} {outcome.terminal} after retrying {'/'.join(sorted(stages))} on {sha[:8]}")
         return attempt
 
     # A resumed story whose worktree already carries a candidate that failed
@@ -3232,7 +3381,7 @@ def implement_story(
                                            scope=effective_write_scope(story, project),
                                            next_attempt=n, artifact_root=root)
             if hygiene is not None and not hygiene.ok:
-                outcome.blocked_reason = hygiene.detail["reason"]
+                outcome.block(StageOutcome.ENVIRONMENT_FAILURE, hygiene.detail["reason"])
                 _log(f"story={story.id} BLOCKED retry hygiene: {hygiene.detail['reason'][:160]}")
                 return outcome
         _log(f"story={story.id} attempt={n} START")
@@ -3252,9 +3401,15 @@ def implement_story(
         )
         outcome.attempts.append(attempt)
 
-        # The reviewer did not run on an otherwise-good candidate: retry the
-        # review stage, bounded, before anything else is decided (D-032).
-        if _only_review_unrunnable(attempt):
+        # A verifier or a tool did not run on an otherwise-good candidate: retry THAT stage, bounded, before
+        # anything else is decided (D-032; SS-13, SS-14, SS-19).
+        if (cap := _verifier_budget_cap(attempt)):
+            outcome.block(StageOutcome.BUDGET, f"budget cap reached inside a verifier session on candidate "
+                                               f"{attempt.candidate[:8]}: {cap}. The candidate is kept; raise the cap and "
+                                               f"re-run `{aisef_command()} run --verify-only --story {story.id}`.")
+            _log(f"story={story.id} BUDGET cap inside a verifier on {attempt.candidate[:8]}")
+            return outcome
+        if _absent_stages(attempt):
             attempt = _review_stage(attempt)
             if outcome.blocked_reason:
                 return outcome
@@ -3264,8 +3419,12 @@ def implement_story(
             return outcome
 
         if attempt.fatal:
-            outcome.blocked_reason = attempt.error
-            _log(f"story={story.id} attempt={n} FATAL ${attempt.cost_usd:.2f} err={attempt.error[:120]}")
+            kind = (StageOutcome(attempt.outcome) if attempt.outcome in StageOutcome._value2member_map_ else
+                    StageOutcome.AUTH_FAILURE if exit_status_of_error(attempt.error) == "auth" else
+                    StageOutcome.ISOLATION_BREACH if "isolation" in attempt.error.lower() else
+                    StageOutcome.ENVIRONMENT_FAILURE)
+            outcome.block(kind, attempt.error)
+            _log(f"story={story.id} attempt={n} FATAL {kind.value} ${attempt.cost_usd:.2f} err={attempt.error[:120]}")
             return outcome
 
         if attempt.infra:
@@ -3274,11 +3433,12 @@ def implement_story(
                 # Not a failure to retry: a decision, stated twice. Say which
                 # decision, and prefer the plan diagnosis when the last graded
                 # verdict explains it (lỗi 127).
-                outcome.blocked_reason = nop_deadlock(outcome.attempts) or (
+                plan = nop_deadlock(outcome.attempts)
+                outcome.block(StageOutcome.PLAN_CONFLICT if plan else StageOutcome.NOOP, plan or (
                     f"{lien} sessions in a row ran clean and wrote nothing: {attempt.error} "
                     f"Re-opening with the same context returns the same decision — "
                     f"read the last gate verdict and fix what it asks for, or the story."
-                )
+                ))
                 _log(f"story={story.id} BLOCKED {lien} no-op sessions in a row")
                 return outcome
             cho = attempt.retry_after
@@ -3286,11 +3446,13 @@ def implement_story(
                  f"err={attempt.error[:80]} budget={infra_budget}"
                  + (f" wait={cho:.0f}s" if cho else ""))
             if infra_budget <= 0:
-                outcome.blocked_reason = (
+                outcome.block(StageOutcome.NOOP if attempt.noop else
+                              StageOutcome(attempt.outcome) if attempt.outcome in StageOutcome._value2member_map_ else
+                              StageOutcome.INFRA_FAILURE, (
                     f"sessions kept producing nothing to grade: {attempt.error}"
                     if attempt.noop else
                     f"recurring infrastructure error: {attempt.error}"
-                )
+                ))
                 _log(f"story={story.id} BLOCKED "
                      + ("no-op sessions" if attempt.noop else "infra budget exhausted"))
                 return outcome
@@ -3300,19 +3462,19 @@ def implement_story(
 
         loi_ke_hoach = attempt.plan_findings
         if loi_ke_hoach:
-            outcome.blocked_reason = (
+            outcome.block(StageOutcome.PLAN_CONFLICT, (
                 "deadlock due to plan, reviewer verified: "
                 + "; ".join(loi_ke_hoach[:2])
                 + ". Fix the acceptance criteria or the story's write_scope, then "
                 "re-run — retrying will not resolve this."
-            )
+            ))
             _log(f"story={story.id} DEADLOCK plan: {'; '.join(loi_ke_hoach[:2])}")
             return outcome
 
         van = nop_deadlock(outcome.attempts) or deadlock_reason(
             outcome.attempts, effective_write_scope(story, project))
         if van:
-            outcome.blocked_reason = van
+            outcome.block(StageOutcome.PLAN_CONFLICT, van)
             _log(f"story={story.id} DEADLOCK {van[:120]}")
             return outcome
 
@@ -3324,12 +3486,12 @@ def implement_story(
             # are the story here, so say what they did.
             da_cham = [a for a in outcome.attempts if a.gate is not None]
             if da_cham:
-                outcome.blocked_reason = (
-                    f"tried {outcome.quality_attempts} attempts, still did not pass gate"
-                )
+                outcome.block(StageOutcome.QUALITY_BLOCK,
+                              f"tried {outcome.quality_attempts} attempts, still did not pass gate")
             else:
                 ket = sorted({a.error.split(":")[0].strip() for a in outcome.attempts if a.error})
                 n_s = outcome.quality_attempts
+                outcome.terminal = StageOutcome.QUALITY_BLOCK.value
                 outcome.blocked_reason = (
                     f"{n_s} session{'s' if n_s != 1 else ''} ended with nothing to grade "
                     f"— no gate verdict exists for this story"
@@ -3443,18 +3605,21 @@ def verify_only(
         },
     ))
     outcome.attempts.append(attempt)
-    if _only_review_unrunnable(attempt):
-        # The reviewer did not run again: name that, not a failed gate (D-032).
-        outcome.blocked_reason = (
-            f"{REVIEW_UNRUNNABLE}: the reviewer did not produce a verdict on candidate "
-            f"{attempt.candidate[:8]} (execution {attempt.review_attempt}) — "
-            f"{attempt.review_unrunnable}. Deterministic checks passed and the candidate is "
-            f"kept; re-run `{aisef_command()} run --verify-only --story {story.id}` when the "
-            f"reviewer can run."
-        )
+    absent = _absent_stages(attempt)
+    if absent:
+        # A verifier or tool did not run again: name that, not a failed gate (D-032; SS-13/14).
+        stages = {_stage_of(n) for n in absent}
+        label = (REVIEW_UNRUNNABLE if "review" in stages and "tools" not in stages
+                 else SECURITY_UNRUNNABLE if stages == {"security"} else "ENVIRONMENT_FAILURE")
+        why = attempt.review_unrunnable or getattr(attempt.security, "unrunnable", "") or ", ".join(absent)
+        outcome.block(StageOutcome.UNRUNNABLE if label != "ENVIRONMENT_FAILURE" else StageOutcome.ENVIRONMENT_FAILURE, (
+            f"{label}: {', '.join(absent)} did not produce a verdict on candidate "
+            f"{attempt.candidate[:8]} — {why}. Deterministic checks passed and the candidate is "
+            f"kept; re-run `{aisef_command()} run --verify-only --story {story.id}` when it can run."
+        ))
     elif not attempt.ok:
-        outcome.blocked_reason = (
+        outcome.block(StageOutcome.QUALITY_BLOCK, (
             f"re-verify candidate {attempt.candidate[:7]} did not pass gate: "
             + "; ".join(c.name for c in attempt.gate.failures)
-        )
+        ))
     return outcome

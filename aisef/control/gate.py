@@ -433,6 +433,12 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
                        "existing tests must be declared in the story; evidence cannot infer intent "
                        "so this counts as regression")
         return Check(name, False, "; ".join(errors), evidence=seqs)
+    if cat:
+        # SS-33 / INV-T.1: beyond the cap a baseline-green test can turn red or vanish unseen — no vacuous PASS
+        return Check(name, Outcome.UNRUNNABLE,
+                     f"test list truncated at {MAX_IDS} names — the baseline comparison cannot see every test "
+                     f"(baseline {len(base_ids)}, candidate {len(current_ids)}); split the suite or raise the cap",
+                     evidence=seqs)
     pre_red = list(base_ev.detail.get("red_before") or base_ev.detail.get("failed_ids") or [])
     if renamed:
         return Check(name, True, f"{len(renamed)} tests renamed but leaf title still present, not counted as lost: {_head(renamed)}",
@@ -442,9 +448,6 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
                      evidence=seqs)
     if flaky:
         return Check(name, True, f"{len(flaky)} flaky tests not counted here (see test check): {_head(flaky)}",
-                     evidence=seqs)
-    if cat:
-        return Check(name, True, f"test list truncated at {MAX_IDS} names — can only compare red tests, cannot detect lost tests",
                      evidence=seqs)
     return Check(name, True, evidence=seqs)
 
@@ -530,7 +533,12 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
             current_ids = set(latest.detail.get("test_ids") or [])
             near_match = [t for t in ac if t in base_green]
             cat = len(base_ids) >= MAX_IDS or len(current_ids) >= MAX_IDS
-            lost_classes = set() if cat else {_class_of(t) for t in base_green if t not in current_ids}
+            if cat:
+                # SS-33 / INV-T.1: the rename detection cannot see past the cap — state it, never conclude
+                return Check(name, Outcome.UNRUNNABLE,
+                             f"test list truncated at {MAX_IDS} names — cannot tell tagged or renamed existing tests "
+                             f"from new ones", evidence=seqs)
+            lost_classes = {_class_of(t) for t in base_green if t not in current_ids}
             changed = [t for t in ac if t not in base_ids and _class_of(t) in lost_classes]
             errors = []
             if near_match:
@@ -745,6 +753,11 @@ def evaluate(
         gate.checks.append(
             Check("lint", Outcome.UNCONFIGURED, str(lint.detail["skipped"]), evidence=[lint.seq])
         )
+    elif lint.detail.get("unrunnable"):
+        # a linter that is not there is not a red lint (SS-58 — D-029's shape on the lint tool)
+        gate.checks.append(
+            Check("lint", Outcome.UNRUNNABLE, str(lint.detail["unrunnable"])[:300], evidence=[lint.seq])
+        )
     elif _flaky_note(evidence, "lint"):
         gate.checks.append(Check("lint", Outcome.UNRUNNABLE, _flaky_note(evidence, "lint"),
                                  evidence=[lint.seq]))
@@ -809,8 +822,12 @@ def evaluate(
                   f"{len(files)} tests have no assertions: {', '.join(files[:3])}",
                   evidence=[fake.seq])
         )
+    elif fake is None:
+        # SS-01 / INV-T.1: "the scan never ran" must not read like "the scan ran clean"
+        gate.checks.append(Check("real tests", Outcome.UNRUNNABLE,
+                                 f"no `{FAKE_TESTS}` record — the assertion scan did not run for this candidate"))
     else:
-        gate.checks.append(Check("real tests", True, evidence=[fake.seq] if fake is not None else []))
+        gate.checks.append(Check("real tests", True, evidence=[fake.seq]))
 
     # Criteria have tests (G5): `AC-<story>-<i>` code must appear in the name
     # of a test in the last green run — names read from runner output, not
@@ -821,6 +838,11 @@ def evaluate(
     doc_xanh = [last_green.seq] if last_green is not None else []
     if acceptance <= 0:
         gate.checks.append(Check("criteria have tests", Outcome.NOT_APPLICABLE, "story declares no criteria"))
+    elif last_green is None and last_test is not None and last_test.detail.get("unrunnable"):
+        # the runner itself could not run: no test evidence exists either way — an absence, not a red story
+        # (INV-F.3; a derived FAILED here would reopen the developer for an environment fault, SS-14)
+        gate.checks.append(Check("criteria have tests", Outcome.UNRUNNABLE,
+                                 "no test run could execute — see `test`", evidence=[last_test.seq]))
     elif last_green is None:
         gate.checks.append(Check("criteria have tests", False, "no green test run yet"))
     elif not last_green.detail.get("test_format"):
@@ -985,6 +1007,12 @@ def evaluate(
         gate.checks.append(
             Check("security", Outcome.UNCONFIGURED, "security review not configured")
         )
+    elif getattr(security, "unrunnable", ""):
+        # The security reviewer did not execute: no verdict exists about this candidate. UNRUNNABLE blocks
+        # (fail closed) and names the execution failure, so the loop retries the SECURITY stage, never the
+        # developer (SS-13 — D-032's rule on the security stage).
+        gate.checks.append(Check("security", Outcome.UNRUNNABLE,
+                                 f"security reviewer did not run ({security.unrunnable}) — no verdict about the candidate"))
     elif security.error:
         gate.checks.append(Check("security", False, security.error))
     else:

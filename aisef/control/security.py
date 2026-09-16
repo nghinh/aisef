@@ -59,6 +59,10 @@ class SecurityReport:
     #: disclosing what was filtered makes the filter itself unauditable.
     filtered: list[Finding] = field(default_factory=list)
     error: str = ""
+    #: Why the security reviewer did **not execute** on this candidate (cut, moved tree, modified tree, budget,
+    #: no structured verdict after the schema retry) — "" when it did. A reviewer that did not run has said
+    #: nothing about the code: not a BLOCK, not a PASS, never a reason to reopen the developer (SS-13, INV-G.2).
+    unrunnable: str = ""
 
     def of(self, *severities: str) -> list[Finding]:
         want = {s.lower() for s in severities}
