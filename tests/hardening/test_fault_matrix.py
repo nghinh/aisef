@@ -66,6 +66,14 @@ class TestDeveloperFaults(_Case):
         self.assertIn("0 tool calls", out.blocked_reason)
         self.assertEqual(c.develop_calls, 1)
 
+    @unittest.expectedFailure   # SS-59 — on a retry `changed_files(base_ref)` shows the frozen candidate, the zero-output check never fires
+    def test_zero_output_on_a_retry_is_still_fatal_not_a_noop_decision(self):
+        c, out = self.run_script(Script(developer=[Step.changed(), Step("ZERO_OUTPUT"), Step("ZERO_OUTPUT")],
+                                        review=[Step.block(), Step.passes()]))
+        self.assertFalse(out.done)
+        self.assertIn("0 tool calls", out.blocked_reason, out.blocked_reason)
+        self.assertEqual(c.develop_calls, 2, "a fatal environment failure is not retried")
+
     def test_two_noops_with_nothing_frozen_end_the_story_without_quality_cost(self):
         c, out = self.run_script(Script(developer=[Step.noop()]))
         self.assertFalse(out.done)

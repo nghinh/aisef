@@ -1,12 +1,12 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
- "phase": 3,
- "generated": "2026-09-16T09:23:24+00:00",
+ "phase": "3 + 8A",
+ "generated": "2026-09-16T10:10:16+00:00",
  "method": "five read-only sweeps over aisef/ (recency-as-identity; prose-to-control-state; retry locality and recovery; ownership, tools, leases, scope; plus a test-inventory map), every candidate then verified in code by hand; CONFIRMED requires a deterministic RED reproducer that failed on the invariant assertion (tests/hardening/test_sibling_scan.py, run 2026-09-16 on the 1.7.6 baseline: 21 expected failures, 0 unexpected successes)",
  "counts": {
-  "CONFIRMED": 23,
-  "NEEDS_TEST": 38,
-  "NOT_A_DEFECT": 5
+  "CONFIRMED": 62,
+  "NEEDS_TEST": 0,
+  "NOT_A_DEFECT": 6
  },
  "entries": [
   {
@@ -335,10 +335,10 @@
     "INV-T.1"
    ],
    "semantic_context": "absence of the fake-tests record scores PASSED. In the story path verify_candidate always records the scan; in qa.run_suite the record is written only when fakes are found — so absence is the encoded clean result there. The gap: 'scan did not run' is indistinguishable from 'clean'",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending — record the scan outcome explicitly in run_suite and read absence as UNRUNNABLE",
-   "notes": "design gap rather than a live false pass"
+   "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS01RealTestsNeedsARecordedScan::test_no_fake_tests_record_is_not_a_pass",
+   "notes": "design gap rather than a live false pass | 8A: absence of the qa:fake-tests record scores PASSED; the story path always writes the record (green control), so a design gap"
   },
   {
    "id": "SS-06",
@@ -348,10 +348,10 @@
     "INV-R.2"
    ],
    "semantic_context": "object existence stands in for ancestry: a candidate frozen on an unmerged story branch resolves in the shared object store and passes 'in the corpus history'",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending — tests/test_closure.py Corpus fixture with an unmerged story candidate; expect G4.5 FAILED",
-   "notes": "the idiom `merge-base --is-ancestor` is already used in implement.py"
+   "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry::test_a_candidate_on_an_unmerged_branch_is_not_in_the_corpus_history",
+   "notes": "the idiom `merge-base --is-ancestor` is already used in implement.py | 8A: G4.5 object existence stands in for ancestry: a candidate parked on an unmerged branch passes 'in the corpus history'"
   },
   {
    "id": "SS-07",
@@ -362,10 +362,10 @@
     "INV-F.3"
    ],
    "semantic_context": "any TOOL_RUN review/security record of any outcome (including unrunnable and D-032 execution-failure shapes) satisfies 'review and security recorded'",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending — Corpus fixture with review record detail.unrunnable set; expect G4.4 not PASSED",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict::test_an_unrunnable_review_record_does_not_count_as_review_recorded",
+   "notes": "8A: G4.4 counts an UNRUNNABLE review record (the loop's own D-032 shape) as 'review recorded'"
   },
   {
    "id": "SS-08",
@@ -375,10 +375,10 @@
     "INV-D.3"
    ],
    "semantic_context": "merge authorization: verification.completed carries no SHA; validity = seq order + attempt number, and StoryRunTransaction always passes attempt=1",
-   "classification": "NEEDS_TEST",
+   "classification": "NOT_A_DEFECT",
    "severity_proposed": "P2",
-   "reproducer": "pending — journal with two candidate.frozen and one verification.completed; assert the merged SHA is the verified one by identity",
-   "notes": "Phase 9 identity binding"
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS08MergeAuthorizationBindsTheVerifiedSha::test_a_branch_tip_that_moved_after_verification_is_not_merged",
+   "notes": "Phase 9 identity binding | 8A: merge_story merges the frozen SHA, never the branch tip; a moved tip is refused (worktree.py 489-495) — the missing SHA in verification.completed has no exploitable path"
   },
   {
    "id": "SS-09",
@@ -389,10 +389,10 @@
     "INV-A.1"
    ],
    "semantic_context": "the worktree refresh merges main before the resume looks for a pending review; HEAD moves, the frozen candidate is invalidated with no record, and a REVIEW_UNRUNNABLE story reopens a developer",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending — resume with main advanced; assert an invalidation record exists and the resume states why it re-verifies",
-   "notes": "sibling of D-035: state changed, no invalidation recorded"
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS09ResumeRefreshDoesNotSilentlyInvalidateTheCandidate::test_resume_after_main_advanced_retries_the_review_or_records_the_invalidation",
+   "notes": "sibling of D-035: state changed, no invalidation recorded | 8A: resume refresh moved HEAD to a merge commit; a REVIEW_UNRUNNABLE candidate was abandoned for a developer session with no invalidation record"
   },
   {
    "id": "SS-16",
@@ -403,10 +403,10 @@
     "INV-E.1"
    ],
    "semantic_context": "leftover in-scope work is committed on top of the frozen candidate with no journal/evidence record; `--verify-only` then finds no evidence at the new HEAD; paths=declared scope loses harness-granted files",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending — failed story with uncommitted in-scope work at run end; assert the branch tip equals the recorded candidate or a record names the new SHA",
-   "notes": "in the LedgerLock case nothing was left so HEAD stayed de2d3244"
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS16WaveEndCommitOfAFailedStoryIsRecorded::test_leftover_work_committed_at_wave_end_is_named_by_a_record",
+   "notes": "in the LedgerLock case nothing was left so HEAD stayed de2d3244 | 8A: wave-end commit_story of a failed story moves the branch tip past the frozen candidate; no evidence or journal names the new SHA"
   },
   {
    "id": "SS-19",
@@ -416,10 +416,10 @@
     "INV-G.1"
    ],
    "semantic_context": "D-032 recovery requires review to be the SOLE failure; any co-blocking UNRUNNABLE (stale evidence, preservation unverifiable, flaky test) routes a reviewer absence back to the developer",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending — gate with review UNRUNNABLE and preservation UNRUNNABLE; assert review stage retried",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS19CoBlockingUnrunnableKeepsTheReviewerAbsenceAtTheReviewStage::test_two_unrunnable_checks_never_open_a_developer",
+   "notes": "8A: review UNRUNNABLE + preservation UNRUNNABLE (nothing FAILED) reopened a developer instead of retrying the review stage"
   },
   {
    "id": "SS-20",
@@ -429,10 +429,10 @@
     "INV-D.1"
    ],
    "semantic_context": "R4 pins the preservation list once per attempt; the review-stage retry and verify-only rebuild it from the ledger, so the re-review scores a different list than the candidate was written against",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS20ReviewRetryScoresThePinnedPreservationList::test_the_review_stage_retry_uses_the_list_the_attempt_was_pinned_to",
+   "notes": "8A: the review-stage retry rescored the same attempt against a recomputed preservation list (fails closed, identity drifts)"
   },
   {
    "id": "SS-21",
@@ -442,10 +442,10 @@
     "INV-G.5"
    ],
    "semantic_context": "a developer BudgetExceeded is charged to quality; a non-blocking lock failure on the budget ledger raises BudgetExceeded, so lock contention between parallel stories is reported as a cap",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending — two threads reserve concurrently; assert no quality attempt is spent",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS21BudgetLockContentionIsInfraNotACap::test_a_held_ledger_lock_is_an_environment_outcome",
+   "notes": "8A: a held budget-ledger lock raised BudgetExceeded before dispatch: infra=False, charged to quality, message claims a cap"
   },
   {
    "id": "SS-22",
@@ -456,10 +456,10 @@
     "INV-D.1"
    ],
    "semantic_context": "fork_point is recomputed every implement_story call; the baseline is reused at its recorded root while nop level 2 and review_diff use the new base_ref",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending",
-   "notes": "D-033 guards the baseline only"
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS22NopParentMatchesTheBaselineRoot::test_the_nop_control_runs_at_the_baseline_root_or_records_the_mismatch",
+   "notes": "D-033 guards the baseline only | 8A: after refresh the nop control ran at the new fork point while the baseline root is the story-entry parent; no mismatch record"
   },
   {
    "id": "SS-29",
@@ -470,10 +470,10 @@
     "INV-F.2"
    ],
    "semantic_context": "`not resolved`, `unresolved`, `will be fixed` contain a RESOLVED marker, so an open P0/P1 onboarding blocker counts as done in a release gate",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P1",
-   "reproducer": "pending — external report table with status `not resolved`; expect G6.3 FAILED",
-   "notes": "release-gate false PASS; reproducer needs the Ctx fixture"
+   "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS29ResolvedIsAStatusNotASubstring::test_an_open_p1_blocker_worded_unresolved_does_not_pass_g6_3",
+   "notes": "release-gate false PASS; reproducer needs the Ctx fixture | 8A: G6.3: 'unresolved', 'not resolved', 'will be fixed', 'unfixed' all contain the RESOLVED marker — an open P1 onboarding blocker passes the release gate"
   },
   {
    "id": "SS-31",
@@ -483,10 +483,10 @@
     "INV-F.2"
    ],
    "semantic_context": "one prose line in EXPERIENCE.md (`Screens: none … API only for now`) marks every UI verification kind NOT_APPLICABLE",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending",
-   "notes": "EXPERIENCE.md is an approved artifact; the risk is the regex, not the source"
+   "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS31NoSurfaceIsAnchoredToTheStatement::test_a_line_that_announces_screens_is_not_headless",
+   "notes": "EXPERIENCE.md is an approved artifact; the risk is the regex, not the source | 8A: _NO_SURFACE's lazy 120-char window reads 'Screens: none of the legacy screens … billing API' as headless; a screen table always wins, so bounded"
   },
   {
    "id": "SS-32",
@@ -496,10 +496,10 @@
     "INV-F.2"
    ],
    "semantic_context": "the still-green criteria list is data at the producer and is re-derived from a sentence at the consumer; rewording disables the deadlock diagnosis silently",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending — carry the codes in Check detail data",
-   "notes": "internal coupling"
+   "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS32DeadlockDiagnosisReadsDataNotProse::test_rewording_the_gate_sentence_does_not_silence_the_diagnosis",
+   "notes": "internal coupling | 8A: nop_deadlock re-derives the still-green criteria from gate.py's sentence; rewording silences the diagnosis (Check has no structured field). Also: _MA_TIEU_CHI needs dashed AC ids, pytest ids carry underscores — silent for every Python corpus"
   },
   {
    "id": "SS-33",
@@ -509,10 +509,10 @@
     "INV-T.1"
    ],
    "semantic_context": "test ids are truncated at 500; the baseline check disables lost/renamed under truncation but not newly_red, so a regression can be absent from both lists and pass vacuously; preservation has no guard",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending — 600-test baseline and candidate with one newly red test beyond the cut",
-   "notes": "false PASS path on large suites"
+   "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS33TruncationNeverYieldsAVacuousPass::test_a_baseline_green_test_beyond_the_cut_turning_red_is_not_a_pass",
+   "notes": "false PASS path on large suites | 8A: 600-test suite, victim at 550: a baseline-green test turning red beyond the 500-id cut passes 'no baseline regression' vacuously; a deleted one passes the WHOLE gate"
   },
   {
    "id": "SS-34",
@@ -523,10 +523,10 @@
     "INV-F.3"
    ],
    "semantic_context": "run_suite computes result.unrunnable and drops it before recording; the story gate scores an unrunnable qa kind (missing playwright) as FAILED deterministic",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P1",
-   "reproducer": "pending — run_suite with a FakeProvider exit 127; assert the qa:<kind> evidence carries unrunnable",
-   "notes": "verified in code; sibling of D-029 for contract kinds"
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS34UnrunnableQaKindIsNotAFailedCheck::test_a_missing_runner_scores_the_qa_kind_unrunnable_not_failed",
+   "notes": "verified in code; sibling of D-029 for contract kinds | 8A: qa:e2e with `playwright: command not found` (exit 127) is scored FAILED, not UNRUNNABLE; `unit` is exempt (KHONG_PHAI_QA), every other contract kind is affected"
   },
   {
    "id": "SS-37",
@@ -536,10 +536,10 @@
     "INV-I.3"
    ],
    "semantic_context": "planning/mockup sessions declare pre-existing dirt to the guard; story sessions do not, so in --no-isolate an operator's dirty file blocks every tool call",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS37StorySessionDeclaresPreexistingDirt::test_operator_dirt_outside_scope_does_not_block_the_developers_first_tool_call",
+   "notes": "8A: story sessions never declare pre-existing dirt (only plan/mockup do) and recover_out_of_scope is gated on isolation; under --no-isolate the guard blocks the developer's first tool call"
   },
   {
    "id": "SS-38",
@@ -549,10 +549,10 @@
     "INV-I.1"
    ],
    "semantic_context": "Claude Code writes `.claude/settings.local.json`; it is not harness-owned and blocks the session as an out-of-scope write",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS38ClientLocalSettingsAreClientOwned::test_settings_local_json_is_not_a_story_change",
+   "notes": "8A: .claude/settings.local.json (written by Claude Code) is attributed to the story; only settings.json is HARNESS_OWNED"
   },
   {
    "id": "SS-40",
@@ -562,10 +562,10 @@
     "INV-J.1"
    ],
    "semantic_context": "the generated CI step runs verify with no scope on a clean checkout: exits 0 forever",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending",
-   "notes": "assurance layer that proves nothing"
+   "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS40VerifyWithoutScopeIsNotAPass::test_bare_verify_as_generated_for_ci_does_not_exit_ok",
+   "notes": "assurance layer that proves nothing | 8A: the generated CI step is `aisef verify` with no scope and no base ref: exit 0 on every committed checkout"
   },
   {
    "id": "SS-41",
@@ -575,10 +575,10 @@
     "INV-I.1"
    ],
    "semantic_context": "anything under a granted directory (tests/) becomes the candidate — operator fixtures, verifier snapshots — unless named by is_tool_artifact",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS41PreexistingInScopeFileIsNotSweptIntoTheCandidate::test_an_untracked_operator_fixture_under_scope_is_not_committed_as_the_developers_work",
+   "notes": "8A: commit_paths `git add -A -- src` sweeps a pre-existing untracked operator fixture into the candidate with no attribution"
   },
   {
    "id": "SS-42",
@@ -588,10 +588,10 @@
     "INV-J.1"
    ],
    "semantic_context": "the devsecops session runs with no AISEF_WRITE_SCOPE; with compiled hooks the guard falls back to the planning scope and blocks writing Dockerfile at the root",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending — devsecops with a compiled claude hook; assert Dockerfile can be written",
-   "notes": "deadlock: pre-deploy then fails 'Dockerfile missing'"
+   "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS42DevsecopsSessionCarriesAWriteScope::test_the_guard_env_handed_to_the_devsecops_client_allows_writing_the_dockerfile",
+   "notes": "deadlock: pre-deploy then fails 'Dockerfile missing' | 8A: the devsecops RunSpec.env is {}; the guard falls back to PLANNING_SCOPE and blocks Dockerfile — a deterministic pre-deploy deadlock"
   },
   {
    "id": "SS-43",
@@ -602,10 +602,10 @@
     "INV-A.3"
    ],
    "semantic_context": "the suite runs on a clean worktree of HEAD while Dockerfile/CI/runbook are checked on the working tree; the signed report can bind uncommitted content",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS43PreDeployGradesOneTree::test_an_uncommitted_dockerfile_is_not_a_pass_bound_to_head",
+   "notes": "8A: pre-deploy's Dockerfile check reads the working tree and PASSES bound to a HEAD that has no Dockerfile"
   },
   {
    "id": "SS-45",
@@ -615,10 +615,10 @@
     "INV-N.1"
    ],
    "semantic_context": "auto-detected defaults (bandit, gosec, cargo audit, npm test) are never probed; doctor prints ready while `aisef tool sast` is unrunnable forever",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending — python project without tools.sast; assert doctor names bandit as missing",
-   "notes": "matches LedgerLock Run #2 Finding B"
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS45AutoDetectedToolsAreProbed::test_the_default_sast_command_of_a_python_project_is_probed",
+   "notes": "matches LedgerLock Run #2 Finding B | 8A: doctor probes configured commands only; `bandit -q -r .` (auto-detected sast default) is never probed"
   },
   {
    "id": "SS-46",
@@ -628,10 +628,10 @@
     "INV-N.1"
    ],
    "semantic_context": "the pre-flight tool probe is disabled for every project that did not run `aisef init --stack`; image_for still picks a stack image",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS46PreflightProbeRunsWithoutADeclaredImage::test_a_stack_image_is_probed_even_when_not_declared",
+   "notes": "8A: _missing_tools returns [] without sandbox.image although image_for picks a stack image: the run pays for a session in an unprobed image"
   },
   {
    "id": "SS-47",
@@ -641,10 +641,10 @@
     "INV-N.1"
    ],
    "semantic_context": "a project-local runner that cannot be judged in the image is reported present",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS47UnjudgeableProbeIsNotPresent::test_a_tool_the_probe_cannot_build_is_not_reported_present",
+   "notes": "8A: probe None → ok=True: `npx vitest run` reported present without measurement"
   },
   {
    "id": "SS-48",
@@ -654,10 +654,10 @@
     "INV-N.1"
    ],
    "semantic_context": "a non-empty tools.test string provisions verify.unit; a paid session starts on a command the sandbox cannot run",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS48ProvisionedMeansRunnable::test_a_test_command_the_probe_reports_missing_does_not_provision_verify_unit",
+   "notes": "8A: a tools.test string the probe reports MISSING still provisions verify.unit"
   },
   {
    "id": "SS-49",
@@ -667,10 +667,10 @@
     "INV-M.1"
    ],
    "semantic_context": "reconciliation resets RUNNING claims to pending without asking claim_is_orphaned; on one host run.lock prevents a second run, so this is reachable only cross-host or via a symlinked path",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending — two hosts sharing a state file",
-   "notes": "mitigated by run_ownership on a single host"
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS49ReconcileDoesNotResetALiveClaim::test_a_running_claim_whose_owner_is_alive_is_left_alone",
+   "notes": "mitigated by run_ownership on a single host | 8A: reconcile_story reset a RUNNING claim whose owner pid is alive (this process) to pending — resolves FM-P-05"
   },
   {
    "id": "SS-50",
@@ -680,10 +680,10 @@
     "INV-M.1"
    ],
    "semantic_context": "a claim has no expiry or heartbeat and transition() writes regardless of who holds it",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending",
-   "notes": "Phase 8 design: lease with TTL + owner check on transition"
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS50TransitionIsBoundToTheClaimHolder::test_a_non_owner_cannot_move_a_claimed_story",
+   "notes": "Phase 8 design: lease with TTL + owner check on transition | 8A: transition() has no owner parameter: host-b moved a story claimed by host-a"
   },
   {
    "id": "SS-51",
@@ -693,10 +693,10 @@
     "INV-M.1"
    ],
    "semantic_context": "two stories contending for one base_url lock two different files and both win; the identity check passes on 404",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS51OneBaseUrlOneLease::test_a_second_run_contending_for_the_same_base_url_is_refused",
+   "notes": "8A: two runs hold the same base_url via two lock files; AppServer.start ignores a refused lease; a 404 responder is accepted as the run's server"
   },
   {
    "id": "SS-52",
@@ -706,10 +706,10 @@
     "INV-M.1"
    ],
    "semantic_context": "a SIGKILLed run leaves reservations that count against the cap forever; doctor cannot explain it",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS52ReservationsOfADeadRunDoNotCountForever::test_a_killed_runs_reservation_does_not_block_the_next_run",
+   "notes": "8A: a SIGKILLed child's reservation still counts: 'cost cap reached: spent=$0.00, reserved=$0.90'"
   },
   {
    "id": "SS-53",
@@ -720,10 +720,10 @@
     "INV-J.1"
    ],
    "semantic_context": "the scheduler partitions on declared scope + bootstrap grants; manifests, lockfiles and verification directories the guard grants to every story are invisible to scopes_conflict",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending — two stories, project with package.json; assert non-overlapping effective scopes per wave or a narrowed grant",
-   "notes": "D-031 closed one hole"
+   "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS53SchedulerReadsTheEffectiveScope::test_stories_sharing_a_granted_path_do_not_share_a_wave",
+   "notes": "D-031 closed one hole | 8A: two stories with disjoint declared scopes share a wave while both may write pyproject.toml/lockfiles/tests/ — deliberate in normalize.effective_write_scope; INV-O.1 to be refined to file grants (manifests, lockfiles) in Family 4"
   },
   {
    "id": "SS-54",
@@ -733,10 +733,10 @@
     "INV-P.1"
    ],
    "semantic_context": "repair stories execute under an approval whose digest excludes them; the improve gate compensates unless --auto",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending",
-   "notes": "deliberate narrowing (bug 25/28); the compensating control has a bypass"
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS54RepairStoriesAreCoveredByAnApproval::test_under_auto_a_new_repair_story_is_covered_by_a_gate_digest",
+   "notes": "deliberate narrowing (bug 25/28); the compensating control has a bypass | 8A: a repair story enters the index under --auto (and on round 1) with no gate digest change; readiness stays approved"
   },
   {
    "id": "SS-55",
@@ -746,10 +746,10 @@
     "INV-P.1"
    ],
    "semantic_context": "verify.*, coverage.min, security.block_severities reinterpret the approved plan and are not bound by any approval",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P2",
-   "reproducer": "pending — approve readiness, weaken coverage.min; assert something goes stale",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS55GateConfigIsBoundByReadiness::test_weakening_coverage_min_after_readiness_approval_makes_it_stale",
+   "notes": "8A: coverage.min 0.85→0.1 and block_severities narrowed after readiness approval: readiness still APPROVED — resolves FM-A-03"
   },
   {
    "id": "SS-56",
@@ -759,10 +759,10 @@
     "INV-P.1"
    ],
    "semantic_context": "downstream gates report APPROVED after an upstream content edit until a new upstream decision; entry points use blocking(), programmatic callers do not",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending",
-   "notes": "mitigated at every CLI entry point"
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream::test_editing_the_prd_makes_the_approved_architecture_stale",
+   "notes": "mitigated at every CLI entry point | 8A: architecture approved against PRD v1 reports APPROVED programmatically after the PRD changed (CLI blocking() compensates)"
   },
   {
    "id": "SS-A10",
@@ -772,10 +772,10 @@
     "INV-K.3"
    ],
    "semantic_context": "the reset result is not checked or recorded; --hard also destroys out-of-scope dirt a write-scope:violation note still describes",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS10ResetAfterAMovedCandidateIsRecorded::test_dirt_destroyed_by_the_reset_is_preserved_or_named",
+   "notes": "8A: reset --hard after a reviewer commit destroyed out-of-scope dirt with no record; a failing reset leaves HEAD on the reviewer's commit unrecorded"
   },
   {
    "id": "SS-A15",
@@ -785,10 +785,10 @@
     "INV-A.2"
    ],
    "semantic_context": "on a refused freeze the gate grades the worktree while stamping the parent SHA; run.py refuses the merge later, so no false merge, but a misleading gate result",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending — gate should read candidate:frozen error as UNRUNNABLE evidence-matches-candidate",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS15RefusedFreezeIsNotGradedUnderTheParent::test_a_refused_freeze_does_not_grade_the_tree_under_the_parent_sha",
+   "notes": "8A: candidate:frozen ok=False yet gate:input.candidate is the parent SHA and test/lint ran on the dirty tree under it (merge later refused)"
   },
   {
    "id": "SS-T1",
@@ -798,10 +798,10 @@
     "INV-D.2"
    ],
    "semantic_context": "the last seq comparison in the codebase; read() re-sorts by (at, seq) so it is position-consistent today",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending — use after_event for consistency",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSST1TddVerdictFollowsPositionAndCandidateNotSeq::test_a_red_run_positioned_after_the_green_does_not_prove_tdd",
+   "notes": "8A: candidate binding is filtered first (green control); residual: seq decides over position — green(at=1,seq=5), red(at=2,seq=1) proves TDD"
   },
   {
    "id": "SS-X1",
@@ -811,10 +811,10 @@
     "INV-P.2"
    ],
    "semantic_context": "an operator waiver binds to the most recent gate:input, which may be a verify-only run at another SHA",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending — compare against the story worktree HEAD and refuse on mismatch",
-   "notes": ""
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSSX1WaiverBindsToTheStorysCandidate::test_a_waiver_is_refused_or_bound_to_the_story_branch_tip_not_the_latest_scoring",
+   "notes": "8A: `gate --waive-review` exit 0 bound the waiver to the trunk SHA of a later gate:input, not the story branch tip"
   },
   {
    "id": "SS-C2",
@@ -824,10 +824,10 @@
     "INV-D.1"
    ],
    "semantic_context": "the 'candidate of record' for closure G4.5 is whichever event was written last with a candidate key — gate:input and the new retry:recovery note both qualify",
-   "classification": "NEEDS_TEST",
+   "classification": "CONFIRMED",
    "severity_proposed": "P3",
-   "reproducer": "pending — rename retry:recovery's key to restore_source (Phase 8 with D-035)",
-   "notes": "self-inflicted by 1.7.6; harmless while HEAD == candidate"
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSSC2CandidateOfRecordIsTheGradedCandidate::test_a_recovery_note_after_the_gate_does_not_change_the_candidate_of_record",
+   "notes": "self-inflicted by 1.7.6; harmless while HEAD == candidate | 8A: Evidence.candidate returned the retry:recovery SHA written after gate:input"
   },
   {
    "id": "SS-A11",
@@ -893,6 +893,34 @@
    "severity_proposed": "-",
    "reproducer": "tests/test_judge_only.py",
    "notes": "identity-bound"
+  },
+  {
+   "id": "SS-59",
+   "site": "aisef/phases/implement.py::run_attempt (zero-output check reads changed_files(base_ref))",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-F.1",
+    "INV-G.4"
+   ],
+   "semantic_context": "on a retry the zero-output check diffs against the base branch, sees the frozen candidate's files and never fires; the session is recorded as a no-op decision instead of a fatal environment failure",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_fault_matrix.py::TestDeveloperFaults::test_zero_output_on_a_retry_is_still_fatal_not_a_noop_decision",
+   "notes": "found by the Phase 12 differential harness (seed 19) before any project hit it"
+  },
+  {
+   "id": "SS-60",
+   "site": "aisef/phases/implement.py::freeze_candidate → gate `evidence matches candidate` NOT_APPLICABLE on an empty candidate",
+   "family": "FAM-IDENTITY",
+   "invariants": [
+    "INV-A.2",
+    "INV-D.1"
+   ],
+   "semantic_context": "a failed freeze (cannot read HEAD) leaves candidate \"\"; the identity check is NOT_APPLICABLE and the story completes DONE bound to no candidate (merge refuses later — fail-closed downstream)",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_e.py::TestSS60ADoneStoryHasAFrozenCandidate::test_a_story_whose_freeze_failed_is_not_done",
+   "notes": "found by group A's fixture check while resolving SS-01 (2026-09-16)"
   }
  ]
 }

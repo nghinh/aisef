@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import json
 import os
-import subprocess
 import sys
 import unittest
 from collections import Counter
@@ -25,10 +24,7 @@ sys.path.insert(0, str(ROOT))
 
 import tests  # noqa: E402,F401
 
-from aisef.clients.synthetic import Script, Step, SyntheticClientAdapter  # noqa: E402
 from tests.hardening import model as M  # noqa: E402
-from tests.test_implement import ImplementTestCase  # noqa: E402
-from tests.test_retry_hygiene import HygieneCase  # noqa: E402
 
 TRACES = int(os.environ.get("AISEF_MODEL_TRACES", "10000"))
 RESULTS = ROOT / "closure-evidence/hardening/state-model-results.json"
@@ -85,104 +81,55 @@ class TestKernelModel(unittest.TestCase):
 
 # ------------------------------------------------------------ conformance against the real kernel
 
-def _expect(events: list[str]) -> tuple[bool, int, int]:
-    k = M.Kernel(0)
-    for ev in events:
-        if k.s.terminal:
-            break
-        k.apply(ev)
-    return (k.s.status in (M.VERIFIED, M.DONE), k.s.developer_sessions, k.s.quality_attempts)
+from tests.hardening import differential as D  # noqa: E402
 
-
-class _Fresh(ImplementTestCase):
-    def runTest(self):
-        pass
-
-
-def _real(client, *, worktree: bool = False, **cfg) -> tuple[bool, int, int]:
-    """Run the real loop on a fresh project (or story worktree) and return the same triple."""
-    case = HygieneCase("runTest") if worktree else _Fresh("runTest")
-    case.setUp()
-    try:
-        if not worktree:
-            subprocess.run(["git", "config", "user.email", "t@t"], cwd=case.project, check=True)
-            subprocess.run(["git", "config", "user.name", "t"], cwd=case.project, check=True)
-            out = case.implement(client, config=case.config(**cfg)) if cfg else case.implement(client)
-        else:
-            out = case.implement(client, retries=2)
-        return (out.done, client.develop_calls, out.quality_attempts)
-    finally:
-        case.tearDown()
-
-
-VIOL = {"ledgerlock/cli.py": "def main(argv=None):\n    return 0\n\n\ndef repair(argv):\n    return 0\n",
-        "ledgerlock/ledger.py": "def repair_tail(lines):\n    return {\n        'ok': False}\n"}
-
+# (label, developer steps, review steps, security steps, options) — the same vocabulary as the differential harness
 SCENARIOS = [
-    ("C1 happy path", Script(), {},
-     ["DEVELOP_CHANGED", "TEST_PASS", "REVIEW_PASS", "SECURITY_PASS"], False),
-    ("C2 review unrunnable then pass", Script(review=[Step.unrunnable(), Step.passes()]), {},
-     ["DEVELOP_CHANGED", "TEST_PASS", "REVIEW_UNRUNNABLE", "REVIEW_PASS", "SECURITY_PASS"], False),
-    ("C3 review unrunnable exhausted", Script(review=[Step.unrunnable()]), {},
-     ["DEVELOP_CHANGED", "TEST_PASS", "REVIEW_UNRUNNABLE", "REVIEW_UNRUNNABLE", "REVIEW_UNRUNNABLE", "REVIEW_UNRUNNABLE"], False),
-    ("C4 security unrunnable then pass", Script(security=[Step.unrunnable(), Step.passes()]), {},
-     ["DEVELOP_CHANGED", "TEST_PASS", "REVIEW_PASS", "SECURITY_UNRUNNABLE", "SECURITY_PASS"], False),
-    ("C5 review block then pass", Script(review=[Step.block(), Step.passes()]), {},
-     ["DEVELOP_CHANGED", "TEST_PASS", "REVIEW_BLOCK", "DEVELOP_CHANGED", "TEST_PASS", "REVIEW_PASS", "SECURITY_PASS"], False),
-    ("C6 review stuck", Script(review=[Step.stuck()]), {},
-     ["DEVELOP_CHANGED", "TEST_PASS", "REVIEW_STUCK"], False),
-    ("C7 developer no-op twice with nothing frozen", Script(developer=[Step.noop()]), {},
-     ["DEVELOP_NOOP", "DEVELOP_NOOP"], False),
-    ("C8 context window then changed", Script(developer=[Step.context(), Step.changed()]), {},
-     ["DEVELOP_CONTEXT", "DEVELOP_CHANGED", "TEST_PASS", "REVIEW_PASS", "SECURITY_PASS"], False),
-    ("C9 credential rejected", Script(developer=[Step.auth()]), {},
-     ["DEVELOP_AUTH"], False),
-    ("C10 test tool unrunnable", Script(), {"tools.test": "aisef-no-such-runner-xyz"},
-     ["DEVELOP_CHANGED", "TEST_UNRUNNABLE", "TEST_UNRUNNABLE", "TEST_UNRUNNABLE", "TEST_UNRUNNABLE"], False),
-    ("C11 review budget rejection", Script(review=[Step.budget(), Step.passes()]), {},
-     ["DEVELOP_CHANGED", "TEST_PASS", "REVIEW_UNRUNNABLE", "REVIEW_PASS", "SECURITY_PASS"], False),
-    ("C12 scope violation then honest no-op (D-035)", Script(developer=[Step.scope_violation(VIOL), Step.noop()]), {},
-     ["DEVELOP_SCOPE_VIOLATION", "TEST_PASS", "REVIEW_PASS", "SECURITY_PASS", "DEVELOP_NOOP", "TEST_PASS", "REVIEW_PASS", "SECURITY_PASS"], True),
-    ("C13 reviewer mutates then pass", Script(review=[Step.mutate(), Step.passes()]), {},
-     ["DEVELOP_CHANGED", "TEST_PASS", "REVIEW_MUTATE", "REVIEW_PASS", "SECURITY_PASS"], False),
-    ("C14 security block then pass", Script(security=[Step.block(), Step.passes()]), {},
-     ["DEVELOP_CHANGED", "TEST_PASS", "REVIEW_PASS", "SECURITY_BLOCK", "DEVELOP_CHANGED", "TEST_PASS", "REVIEW_PASS", "SECURITY_PASS"], False),
-    ("C15 developer commits on the trunk", Script(developer=[Step.trunk_commit()]), {},
-     ["DEVELOP_TRUNK_COMMIT"], True),
+    ("C1 happy path", ["CHANGED"], ["PASS"], ["PASS"], {}),
+    ("C2 review unrunnable then pass", ["CHANGED"], ["UNRUNNABLE", "PASS"], ["PASS"], {}),
+    ("C3 review unrunnable exhausted", ["CHANGED"], ["UNRUNNABLE"], ["PASS"], {}),
+    ("C4 security unrunnable then pass", ["CHANGED"], ["PASS"], ["UNRUNNABLE", "PASS"], {}),
+    ("C5 review block then pass", ["CHANGED"], ["BLOCK", "PASS"], ["PASS"], {}),
+    ("C6 review stuck", ["CHANGED"], ["STUCK"], ["PASS"], {}),
+    ("C7 developer no-op twice with nothing frozen", ["NOOP"], ["PASS"], ["PASS"], {}),
+    ("C8 context exit then pass", ["CONTEXT", "CHANGED"], ["PASS"], ["PASS"], {}),
+    ("C9 credential rejected", ["AUTH"], ["PASS"], ["PASS"], {}),
+    ("C10 test tool unrunnable", ["CHANGED"], ["PASS"], ["PASS"], {"test_tool_missing": True}),
+    ("C11 budget rejected in review", ["CHANGED"], ["BUDGET"], ["PASS"], {}),
+    ("C12 scope violation then no-op", ["SCOPE_VIOLATION", "NOOP"], ["PASS"], ["PASS"], {}),
+    ("C13 reviewer mutates then pass", ["CHANGED"], ["MUTATE", "PASS"], ["PASS"], {}),
+    ("C14 security block then pass", ["CHANGED"], ["PASS"], ["BLOCK", "PASS"], {}),
+    ("C15 trunk commit", ["TRUNK_COMMIT"], ["PASS"], ["PASS"], {}),
+    ("C16 two out-of-scope blocks are a plan conflict", ["CHANGED"], ["BLOCK_OUTSIDE"], ["PASS"], {"max_retries": 2}),
+    ("C17 red tests then green", ["CHANGED_RED", "CHANGED"], ["PASS"], ["PASS"], {}),
+    ("C18 zero output on a retry", ["CHANGED", "ZERO_OUTPUT"], ["BLOCK", "PASS"], ["PASS"], {}),
 ]
-
-#: scenario → registered defect whose fix will make the real kernel agree with the model
-KNOWN_DEVIATIONS = {
-    "C4 security unrunnable then pass": "SS-13",
-    "C8 context window then changed": "SS-15",
-    "C10 test tool unrunnable": "SS-14",
-    "C11 review budget rejection": "SS-12",
-    "C12 scope violation then honest no-op (D-035)": "D-035",
-}
 
 
 class TestConformance(unittest.TestCase):
-    """Real kernel vs reference model on scripted scenarios (no model calls)."""
+    """Real kernel (synthetic client, real worktree) vs the reference model on scripted scenarios. A difference
+    must be attributed to a registered open defect (differential.KNOWN, emptied as families close); anything else
+    is a NEW kernel defect. A registered deviation must still deviate — when the fix lands, its entry goes."""
 
     def test_real_kernel_matches_the_model_except_where_a_registered_defect_says_otherwise(self):
         results = []
-        for label, script, cfg, events, worktree in SCENARIOS:
+        for label, dev, rev, sec, opt in SCENARIOS:
+            sc = D.Scenario(0, dev, rev, sec, **opt)
             with self.subTest(scenario=label):
-                expected = _expect(events)
-                client = SyntheticClientAdapter(script)
-                try:
-                    actual = _real(client, worktree=worktree, **cfg)
-                except Exception as e:  # a crash is the worst deviation
-                    actual = (f"EXCEPTION {type(e).__name__}", client.develop_calls, -1)
-                known = KNOWN_DEVIATIONS.get(label)
-                results.append({"scenario": label, "expected": expected, "actual": actual, "known_deviation": known})
+                real, model = D.real_run(sc), D.model_run(sc)
+                diff = real.diff(model)
+                known = D.attribute(sc)
+                results.append({"scenario": label, "real": real.terminal, "model": model.terminal, "diff": diff,
+                                "known_deviation": known})
                 if known:
-                    self.assertNotEqual(actual, expected, f"{label}: the real kernel now agrees with the model — {known} is fixed; remove it from KNOWN_DEVIATIONS")
+                    self.assertNotEqual(diff, [], f"{label}: the real kernel now agrees with the model — {known} is fixed; "
+                                                  f"remove its rule from differential.KNOWN")
                 else:
-                    self.assertEqual(actual, expected, f"{label}: real (done, developer sessions, quality attempts) ≠ model — an unregistered kernel defect")
-        out = json.loads(RESULTS.read_text(encoding="utf-8")) if RESULTS.exists() else {}
-        out["conformance"] = results
-        RESULTS.write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+                    self.assertEqual(diff, [], f"{label}: real ≠ model (an unregistered kernel defect): {diff}\n"
+                                               f"real events {real.events}\nmodel {model.events}")
+        data = json.loads(RESULTS.read_text(encoding="utf-8")) if RESULTS.exists() else {}
+        data["conformance"] = results
+        RESULTS.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

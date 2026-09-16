@@ -30,7 +30,7 @@ PASS, QUALITY_BLOCK, UNRUNNABLE, ENVIRONMENT_FAILURE, INFRA_FAILURE, AUTH_FAILUR
         "PLAN_CONFLICT", "ISOLATION_BREACH", "MERGE_CONFLICT", "HUMAN_REQUIRED")
 
 MAX_RETRIES = 2          # quality attempts beyond the first
-INFRA_BUDGET = 3
+INFRA_BUDGET = MAX_RETRIES + 1   # the real kernel's default: `run.max_infra_retries < 0 → max_retries + 1`
 MAX_REVIEW_RETRIES = 2
 MAX_NOOP = 2
 REQUIRED_PROOFS = ("test", "lint", "scope", "review", "security")
@@ -38,11 +38,13 @@ REQUIRED_PROOFS = ("test", "lint", "scope", "review", "security")
 # events the trace generator may inject, by stage
 EVENTS = {
     DEVELOP: ["DEVELOP_CHANGED", "DEVELOP_NOOP", "DEVELOP_TIMEOUT", "DEVELOP_CRASH", "DEVELOP_AUTH", "DEVELOP_CONTEXT",
-              "DEVELOP_SCOPE_VIOLATION", "DEVELOP_TRUNK_COMMIT", "PROCESS_DEATH", "LEASE_EXPIRED", "CONTRACT_CHANGE",
-              "STALE_REPLAY", "WRONG_CANDIDATE_EVIDENCE"],
+              "DEVELOP_SCOPE_VIOLATION", "DEVELOP_TRUNK_COMMIT", "DEVELOP_ZERO_OUTPUT", "DEVELOP_MAX_TURNS_WORK",
+              "DEVELOP_MAX_TURNS_UNTOUCHED", "DEVELOP_BUDGET", "DEVELOP_RATE_LIMIT",
+              "PROCESS_DEATH", "LEASE_EXPIRED", "CONTRACT_CHANGE", "STALE_REPLAY", "WRONG_CANDIDATE_EVIDENCE"],
     VERIFY: ["TEST_PASS", "TEST_FAIL", "TEST_UNRUNNABLE", "PROCESS_DEATH", "CORRUPT_EVIDENCE"],
-    REVIEW: ["REVIEW_PASS", "REVIEW_BLOCK", "REVIEW_STUCK", "REVIEW_UNRUNNABLE", "REVIEW_MUTATE", "REVIEW_MALFORMED", "PROCESS_DEATH"],
-    SECURITY: ["SECURITY_PASS", "SECURITY_BLOCK", "SECURITY_UNRUNNABLE", "PROCESS_DEATH"],
+    REVIEW: ["REVIEW_PASS", "REVIEW_BLOCK", "REVIEW_BLOCK_OUTSIDE", "REVIEW_STUCK", "REVIEW_UNRUNNABLE", "REVIEW_MUTATE",
+             "REVIEW_MALFORMED", "REVIEW_BUDGET", "PROCESS_DEATH"],
+    SECURITY: ["SECURITY_PASS", "SECURITY_BLOCK", "SECURITY_UNRUNNABLE", "SECURITY_MALFORMED", "SECURITY_BUDGET", "PROCESS_DEATH"],
     GATE: ["GATE_EVALUATE", "PROCESS_DEATH"],
     MERGE: ["MERGE_OK", "MERGE_CONFLICT", "PROCESS_DEATH"],
     HUMAN: ["HUMAN_ARBITRATION", "HUMAN_DECLINES"],
@@ -83,6 +85,13 @@ class Story:
     graded_candidates: set = field(default_factory=set)
     infra_attempts: int = 0
     review_executions: int = 0
+    security_executions: int = 0
+    #: verifier executions on the CURRENT candidate — the retry bound is per candidate (the real `review_attempt`)
+    review_execs_here: int = 0
+    security_execs_here: int = 0
+    #: review QUALITY_BLOCK per candidate: True when its findings point outside the write scope
+    block_outside: dict = field(default_factory=dict)
+    prev_graded_candidate: int = 0   # the graded candidate before the current one, 0 = none / an ungraded session between
     noop_streak: int = 0
     merged: bool = False
     human_reason: str = ""
@@ -204,7 +213,9 @@ class Kernel:
     # developer
     def _freeze(self) -> None:
         s = self.s
+        s.prev_graded_candidate = s.candidate if s.candidate in s.graded_candidates else 0
         s.candidate = 1000 * s.epoch + s.developer_sessions
+        s.review_execs_here = s.security_execs_here = 0
         s.invalidate_dependent()              # a new candidate: every verdict over the old one is stale
         s.stage = VERIFY
         self._charge_quality()                # a frozen candidate is a non-infra attempt, whatever grading then says
@@ -231,10 +242,14 @@ class Kernel:
     def _develop_noop(self) -> str:
         s = self.s
         s.developer_sessions += 1
+        s.prev_graded_candidate = 0
+        s.infra_attempts += 1                 # a session with nothing to grade spends the same budget as an infra cut
         if s.candidate == 0:
             s.noop_streak += 1                # nothing frozen: a decision, stated (T6)
             if s.noop_streak >= MAX_NOOP:
                 s.status, s.terminal_reason = BLOCKED, "no-op: nothing to grade twice"
+            elif s.infra_attempts >= MAX_RETRIES + 1:
+                s.status, s.terminal_reason = BLOCKED, "no-op: budget exhausted"
             return NOOP
         verdict = s.fresh("gate")
         if verdict is None:                   # T6': stale or absent verdict → re-grade the frozen candidate
@@ -244,6 +259,8 @@ class Kernel:
             s.noop_streak += 1
             if s.noop_streak >= MAX_NOOP:
                 s.status, s.terminal_reason = BLOCKED, "no-op: developer declined proven work twice"
+            elif s.infra_attempts >= MAX_RETRIES + 1:
+                s.status, s.terminal_reason = BLOCKED, "no-op: budget exhausted"
             return NOOP
         s.stage = GATE                        # a fresh passing verdict: nothing to do but proceed
         return NOOP
@@ -257,13 +274,59 @@ class Kernel:
     def _infra(self) -> str:
         s = self.s
         s.developer_sessions += 1
+        s.prev_graded_candidate = 0            # an ungraded session breaks the "two consecutive" deadlock pair
         s.infra_attempts += 1
-        if s.infra_attempts > INFRA_BUDGET:
+        if s.infra_attempts >= MAX_RETRIES + 1:
             s.status, s.terminal_reason = FAILED, "recurring infrastructure error"
         return INFRA_FAILURE
 
     def _develop_context(self) -> str:        # environment limitation, not quality (INV-G.4)
         return self._infra()
+
+    def _develop_rate_limit(self) -> str:     # provider back-pressure → infra, retried after the delay
+        return self._infra()
+
+    def _develop_max_turns_work(self) -> str:
+        """The cap hit after the session moved the tree: the work is graded (lỗi 130 — a turn counter is not a verdict)."""
+        return self._develop_changed()
+
+    def _develop_max_turns_untouched(self) -> str:
+        """The cap hit with nothing written: the session was the developer's and produced no candidate — a quality
+        attempt without a verdict (ADR-005 V11 (B): a free capped retry lets a thrashing agent retry forever)."""
+        s = self.s
+        s.developer_sessions += 1
+        s.prev_graded_candidate = 0
+        s.quality_attempts += 1
+        if s.quality_attempts > MAX_RETRIES:
+            s.status, s.terminal_reason = FAILED, "did not pass gate"
+        return QUALITY_BLOCK
+
+    def _develop_zero_output(self) -> str:
+        """Tokens, no tool calls, no files: the model cannot use tools — a configuration failure, fatal and free."""
+        s = self.s
+        s.developer_sessions += 1
+        s.status, s.terminal_reason = BLOCKED, "zero output: model cannot use tools"
+        s.human_reason = "environment"
+        return ENVIRONMENT_FAILURE
+
+    def _budget(self) -> str:
+        """A run-level cost cap is an operator decision, not a developer fault: typed, terminal, uncharged (INV-G.5)."""
+        s = self.s
+        s.status, s.terminal_reason = BLOCKED, "budget cap"
+        s.human_reason = "budget"
+        return HUMAN_REQUIRED
+
+    def _develop_budget(self) -> str:
+        self.s.developer_sessions += 1
+        return self._budget()
+
+    def _review_budget(self) -> str:
+        self.s.review_executions += 1
+        return self._budget()
+
+    def _security_budget(self) -> str:
+        self.s.security_executions += 1
+        return self._budget()
 
     def _develop_auth(self) -> str:           # T10 fatal
         s = self.s
@@ -290,76 +353,97 @@ class Kernel:
     def _test_fail(self) -> str:
         s = self.s
         s.record("test", QUALITY_BLOCK)
-        return self._gate()
+        s.record("lint", PASS)
+        s.record("scope", QUALITY_BLOCK if s.tree_state else PASS)
+        s.stage = REVIEW                      # the reviewer and the security pass still run: one complete round of feedback
+        return QUALITY_BLOCK
 
     def _test_unrunnable(self) -> str:        # T16: tool stage failure — never a developer attempt (INV-G.3)
         s = self.s
         s.record("test", UNRUNNABLE)
         s.infra_attempts += 1
-        if s.infra_attempts > INFRA_BUDGET:
+        if s.infra_attempts >= MAX_RETRIES + 1:
             s.status, s.terminal_reason = BLOCKED, "environment: test tool unrunnable"
             s.human_reason = "environment"
         else:
             s.stage = VERIFY                  # retry the tool stage
         return ENVIRONMENT_FAILURE
 
-    # review
+    # review — every review outcome is recorded; the security pass runs once per candidate; the GATE decides
+    # what a missing verdict means (stage-local retry, bounded) and what a block means (developer, deadlock)
+    def _after_review(self) -> None:
+        s = self.s
+        s.stage = GATE if s.fresh("security") is not None else SECURITY
+
     def _review_pass(self) -> str:
         s = self.s
         s.review_executions += 1
+        s.review_execs_here += 1
         s.record("review", PASS)
-        s.stage = SECURITY
+        self._after_review()
         return PASS
 
-    def _review_block(self) -> str:
+    def _review_block(self, outside: bool = False) -> str:
         s = self.s
         s.review_executions += 1
+        s.review_execs_here += 1
         s.record("review", QUALITY_BLOCK)
-        return self._gate()
+        s.block_outside[s.candidate] = outside
+        self._after_review()
+        return QUALITY_BLOCK
 
-    def _review_stuck(self) -> str:           # T19
+    def _review_block_outside(self) -> str:   # findings point outside the write scope — beyond the agent's reach
+        return self._review_block(outside=True)
+
+    def _review_stuck(self) -> str:           # T19: a structured [stuck] verdict is a plan finding, decided at the gate
         s = self.s
         s.review_executions += 1
+        s.review_execs_here += 1
         s.record("review", PLAN_CONFLICT)
-        s.status, s.terminal_reason = WAITING_HUMAN, "plan conflict"
-        s.human_reason = "plan"
-        s.stage = HUMAN
+        self._after_review()
         return PLAN_CONFLICT
 
-    def _review_unrunnable(self) -> str:      # T20/T21
+    def _review_unrunnable(self) -> str:      # T20/T21: no verdict — nothing was said; the gate retries the stage
         s = self.s
         s.review_executions += 1
-        if s.review_executions > 1 + MAX_REVIEW_RETRIES:
-            s.status, s.terminal_reason = BLOCKED, "REVIEW_UNRUNNABLE"
-        else:
-            s.stage = REVIEW
+        s.review_execs_here += 1
+        s.record("review", UNRUNNABLE)
+        self._after_review()
         return UNRUNNABLE
 
-    def _review_mutate(self) -> str:          # T20: tree restored, execution does not count
+    def _review_mutate(self) -> str:          # T20: tree restored, the execution said nothing about the candidate
         return self._review_unrunnable()
 
-    def _review_malformed(self) -> str:
+    def _review_malformed(self) -> str:       # no structured verdict: never PASS, never BLOCK — a retry of the verifier
         return self._review_unrunnable()
 
     # security
     def _security_pass(self) -> str:
         s = self.s
+        s.security_executions += 1
+        s.security_execs_here += 1
         s.record("security", PASS)
-        return self._gate()
+        s.stage = GATE
+        return PASS
 
     def _security_block(self) -> str:
         s = self.s
+        s.security_executions += 1
+        s.security_execs_here += 1
         s.record("security", QUALITY_BLOCK)
-        return self._gate()
+        s.stage = GATE
+        return QUALITY_BLOCK
 
-    def _security_unrunnable(self) -> str:    # INV-G.2: security stage retried, never the developer
+    def _security_unrunnable(self) -> str:    # INV-G.2: no verdict; the gate retries the security stage, never the developer
         s = self.s
-        s.review_executions += 1
-        if s.review_executions > 1 + MAX_REVIEW_RETRIES:
-            s.status, s.terminal_reason = BLOCKED, "SECURITY_UNRUNNABLE"
-        else:
-            s.stage = SECURITY
+        s.security_executions += 1
+        s.security_execs_here += 1
+        s.record("security", UNRUNNABLE)
+        s.stage = GATE
         return UNRUNNABLE
+
+    def _security_malformed(self) -> str:     # no structured verdict: nothing was said — never PASS, never BLOCK
+        return self._security_unrunnable()
 
     # gate
     def _charge_quality(self) -> None:
@@ -375,20 +459,44 @@ class Kernel:
     def _gate(self) -> str:
         s = self.s
         proofs = {p: s.fresh(p) for p in REQUIRED_PROOFS}
+        review = proofs["review"]
+        if review is not None and review.outcome == PLAN_CONFLICT:                 # T19: [stuck] → owner
+            s.record("gate", PLAN_CONFLICT)
+            s.status, s.terminal_reason, s.human_reason, s.stage = WAITING_HUMAN, "plan conflict", "plan", HUMAN
+            return PLAN_CONFLICT
         if all(r is not None and r.outcome == PASS for r in proofs.values()):
             s.record("gate", PASS)
             s.status, s.stage = VERIFIED, MERGE          # T24
             return PASS
-        if any(r is not None and r.outcome == UNRUNNABLE for r in proofs.values()):
-            s.record("gate", UNRUNNABLE)
-            return UNRUNNABLE
-        s.record("gate", QUALITY_BLOCK)                  # T25
-        if s.quality_attempts > MAX_RETRIES:
-            s.status, s.terminal_reason = FAILED, "did not pass gate"
+        if any(r is not None and r.outcome == QUALITY_BLOCK for r in proofs.values()):
+            s.record("gate", QUALITY_BLOCK)              # T25
+            if (review is not None and review.outcome == QUALITY_BLOCK and s.block_outside.get(s.candidate)
+                    and s.prev_graded_candidate and s.block_outside.get(s.prev_graded_candidate)):
+                # two consecutive attempts blocked for the same out-of-scope reason: the next attempt cannot fix it
+                s.status, s.terminal_reason, s.human_reason, s.stage = WAITING_HUMAN, "plan conflict", "plan", HUMAN
+                return PLAN_CONFLICT
+            if s.quality_attempts > MAX_RETRIES:
+                s.status, s.terminal_reason = FAILED, "did not pass gate"
+                return QUALITY_BLOCK
+            self._recover()                              # T3: hygiene before the next developer attempt
+            s.stage = DEVELOP
             return QUALITY_BLOCK
-        self._recover()                                  # T3: hygiene before the next developer attempt
-        s.stage = DEVELOP
-        return QUALITY_BLOCK
+        # only absences remain: retry the stage that said nothing, bounded, never the developer (INV-G.1/G.2/G.3)
+        s.record("gate", UNRUNNABLE)
+        if proofs["test"] is not None and proofs["test"].outcome == UNRUNNABLE:
+            s.stage = VERIFY
+            return UNRUNNABLE
+        if review is not None and review.outcome == UNRUNNABLE:
+            if s.review_execs_here >= 1 + MAX_REVIEW_RETRIES:
+                s.status, s.terminal_reason = BLOCKED, "REVIEW_UNRUNNABLE"
+            else:
+                s.stage = REVIEW
+            return UNRUNNABLE
+        if s.security_execs_here >= 1 + MAX_REVIEW_RETRIES:
+            s.status, s.terminal_reason = BLOCKED, "SECURITY_UNRUNNABLE"
+        else:
+            s.stage = SECURITY
+        return UNRUNNABLE
 
     def _recover(self) -> None:
         s = self.s

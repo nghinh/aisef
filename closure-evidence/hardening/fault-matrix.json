@@ -1,7 +1,7 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "phase": 7,
- "generated": "2026-09-16T09:23:24+00:00",
+ "generated": "2026-09-16T10:10:16+00:00",
  "stages": [
   "Developer",
   "Test",
@@ -85,6 +85,18 @@
    "invariants": "INV-F.1",
    "test": "tests/hardening/test_fault_matrix.py::TestDeveloperFaults::test_zero_output_session_is_fatal_not_quality",
    "status": "GREEN"
+  },
+  {
+   "id": "FM-D-11",
+   "stage": "Developer",
+   "fault": "MALFORMED",
+   "scenario": "zero-output session on a RETRY (a candidate is frozen)",
+   "expected_state": "blocked fatal (ZERO-OUTPUT), never a no-op decision",
+   "expected_evidence": "run.log ZERO-OUTPUT line; no NO-OP line",
+   "expected_recovery": "none — configuration",
+   "invariants": "INV-F.1, INV-G.4",
+   "test": "tests/hardening/test_fault_matrix.py::TestDeveloperFaults::test_zero_output_on_a_retry_is_still_fatal_not_a_noop_decision",
+   "status": "RED (SS-59)"
   },
   {
    "id": "FM-D-06",
@@ -451,12 +463,12 @@
    "stage": "Approval",
    "fault": "INJECTED",
    "scenario": "gate-relevant config (coverage.min, verify.*) weakened after readiness approval",
-   "expected_state": "something goes stale",
-   "expected_evidence": "—",
+   "expected_state": "readiness approval STALE",
+   "expected_evidence": "approval digest covers .ai/config.json gate keys",
    "expected_recovery": "re-approve",
    "invariants": "INV-P.1",
-   "test": "pending (SS-55)",
-   "status": "NEEDS_TEST"
+   "test": "tests/hardening/scan8a/test_group_d.py::TestSS55GateConfigIsBoundByReadiness::test_weakening_coverage_min_after_readiness_approval_makes_it_stale",
+   "status": "RED (SS-55)"
   },
   {
    "id": "FM-P-01",
@@ -511,12 +523,12 @@
    "stage": "Process/lease",
    "fault": "STALE",
    "scenario": "live claim from another host or a symlinked path",
-   "expected_state": "never reset while alive",
-   "expected_evidence": "—",
+   "expected_state": "claim of a live owner never reset",
+   "expected_evidence": "reconcile records the liveness check",
    "expected_recovery": "lease check before reset",
    "invariants": "INV-M.1",
-   "test": "pending (SS-49/SS-50)",
-   "status": "NEEDS_TEST"
+   "test": "tests/hardening/scan8a/test_group_d.py::TestSS49ReconcileDoesNotResetALiveClaim::test_a_running_claim_whose_owner_is_alive_is_left_alone",
+   "status": "RED (SS-49)"
   },
   {
    "id": "FM-E-01",
@@ -643,12 +655,12 @@
    "stage": "Workspace",
    "fault": "STALE",
    "scenario": "stale branch/worktree from a previous run",
-   "expected_state": "worktree recreated from the branch; refresh recorded",
-   "expected_evidence": "—",
-   "expected_recovery": "refresh",
+   "expected_state": "frozen candidate kept or typed invalidation recorded",
+   "expected_evidence": "evidence:invalidated naming old and new HEAD",
+   "expected_recovery": "refresh with a record",
    "invariants": "INV-E.1",
-   "test": "pending (SS-09/SS-16)",
-   "status": "NEEDS_TEST"
+   "test": "tests/hardening/scan8a/test_group_b.py::TestSS09ResumeRefreshDoesNotSilentlyInvalidateTheCandidate::test_resume_after_main_advanced_retries_the_review_or_records_the_invalidation",
+   "status": "RED (SS-09, SS-16)"
   },
   {
    "id": "FM-X-01",
@@ -665,7 +677,7 @@
  ],
  "status_count": {
   "GREEN": 35,
-  "RED": 15,
-  "NEEDS_TEST": 3
+  "RED": 19,
+  "NEEDS_TEST": 0
  }
 }

@@ -141,6 +141,7 @@ class SyntheticClientAdapter(ClientAdapter):
                         SECURITY: list(self.script.security)}
         self.calls: list[Call] = []
         self.develop_calls = 0
+        self._served: dict[int, int] = {}
 
     def available(self) -> bool:
         return True
@@ -151,7 +152,9 @@ class SyntheticClientAdapter(ClientAdapter):
     # ------------------------------------------------------------ dispatch
     def _next(self, role: str) -> Step:
         q = self._queues[role]
-        return q.pop(0) if len(q) > 1 else q[0]
+        step = q.pop(0) if len(q) > 1 else q[0]
+        self._served[id(step)] = self._served.get(id(step), 0) + 1
+        return step
 
     @staticmethod
     def _role_of(spec: RunSpec) -> str:
@@ -187,9 +190,10 @@ class SyntheticClientAdapter(ClientAdapter):
         k = step.kind
         if k in ("CHANGED", "SCOPE_VIOLATION"):
             files = dict(step.files or DEFAULT_FILES)
-            if step.files is None and self.develop_calls > 1:
+            if (step.files is None and self.develop_calls > 1) or self._served.get(id(step), 0) > 1:
                 # A real developer's retry changes something; writing identical bytes again is a no-op
-                # to the kernel (correctly), which is not what CHANGED means.
+                # to the kernel (correctly), which is not what CHANGED means — also when the script's last
+                # step is being served again.
                 files = {rel: f"{body}# attempt {self.develop_calls}\n" for rel, body in files.items()}
             self._write(wd, files)
             return RunResult(ok=True, text=step.text or "done", num_turns=step.turns, cost_usd=step.cost_usd, output_tokens=200)
@@ -203,7 +207,9 @@ class SyntheticClientAdapter(ClientAdapter):
             return RunResult(ok=True, text=step.text or "I would implement this by …", num_turns=2, output_tokens=300)
         if k == "MAX_TURNS":
             if step.files:
-                self._write(wd, step.files)
+                files = step.files if self._served.get(id(step), 0) <= 1 else {
+                    rel: f"{body}# attempt {self.develop_calls}\n" for rel, body in step.files.items()}
+                self._write(wd, files)
             return RunResult(ok=False, error="max_turns: stopped at 80 turns (cap 80)", num_turns=80, cost_usd=step.cost_usd,
                              raw_result={"terminal_reason": "max_turns"})
         if k == "TIMEOUT":
