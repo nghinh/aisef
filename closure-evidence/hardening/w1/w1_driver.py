@@ -110,7 +110,7 @@ class Driver:
         return sorted(p.name for p in d.glob("STORY-*.jsonl")) if d.is_dir() else []
 
     def processes(self) -> list[dict]:
-        ps = subprocess.run(["ps", "-eo", "pid=,pgid=,etime=,command="], capture_output=True, text=True).stdout
+        ps = subprocess.run(["ps", "-eo", "pid=,pgid=,etime=,command="], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
         out = []
         for ln in ps.splitlines():
             parts = ln.split(None, 3)
@@ -123,20 +123,20 @@ class Driver:
         self.say("phase prepare")
         P = {"at": now()}
         P["aisef_version"] = self.cli("--version", timeout=60)["stdout_tail"].strip()
-        ident = subprocess.run([self.a.python, "-c", "import aisef, sys; print(aisef.__file__); print(sys.prefix)"], capture_output=True, text=True,
+        ident = subprocess.run([self.a.python, "-c", "import aisef, sys; print(aisef.__file__); print(sys.prefix)"], capture_output=True, text=True, encoding="utf-8", errors="replace",
                                cwd=str(self.run_dir), env=self.env()).stdout.split()
         P["aisef_file"] = ident[0] if ident else ""
         P["aisef_from_the_wheel_not_the_checkout"] = bool(ident) and "site-packages" in ident[0] and str(REPO / "aisef") not in ident[0]
-        P["venv_packages"] = subprocess.run([self.a.python, "-m", "pip", "list", "--format", "json"], capture_output=True, text=True, env=self.env()).stdout[:2000]
+        P["venv_packages"] = subprocess.run([self.a.python, "-m", "pip", "list", "--format", "json"], capture_output=True, text=True, encoding="utf-8", errors="replace", env=self.env()).stdout[:2000]
         if self.a.freeze:
             P["freeze"] = json.loads(Path(self.a.freeze).read_text(encoding="utf-8"))
         P["project_git"] = {"head": self.git("rev-parse", "HEAD"), "branch": self.git("rev-parse", "--abbrev-ref", "HEAD"),
                             "status": self.git("status", "--porcelain").splitlines(), "log": self.git("log", "--oneline", "-5").splitlines()}
         P["config"] = json.loads((self.project / ".ai/config.json").read_text(encoding="utf-8"))
-        P["opencode_version"] = subprocess.run(["opencode", "--version"], capture_output=True, text=True).stdout.strip()
+        P["opencode_version"] = subprocess.run(["opencode", "--version"], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
         P["opencode_binary"] = shutil.which("opencode")
         img = P["config"].get("sandbox.image", "")
-        P["docker_image"] = {"name": img, "id": subprocess.run(["docker", "image", "inspect", img, "--format", "{{.Id}}"], capture_output=True, text=True).stdout.strip()}
+        P["docker_image"] = {"name": img, "id": subprocess.run(["docker", "image", "inspect", img, "--format", "{{.Id}}"], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()}
         P["doctor"] = self.cli("doctor", timeout=300, save_as="doctor.txt")
         P["doctor_red"] = [ln.strip() for ln in P["doctor"]["stdout_tail"].splitlines() if ln.strip().startswith("✗")]
         indep = json.loads((HERE / "ORACLE-INDEPENDENCE.json").read_text(encoding="utf-8"))
@@ -338,7 +338,7 @@ class Driver:
         with tempfile.TemporaryDirectory() as td:
             deliv = Path(td) / "delivered"
             subprocess.run(["git", "clone", "--quiet", "--branch", "master", str(self.project), str(deliv)], check=True)
-            F["delivered"] = {"master_head": subprocess.run(["git", "-C", str(deliv), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip(),
+            F["delivered"] = {"master_head": subprocess.run(["git", "-C", str(deliv), "rev-parse", "HEAD"], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip(),
                               "has_package": (deliv / "ledgerlock").is_dir(), "files": sorted(str(p.relative_to(deliv)) for p in deliv.rglob("*.py") if ".git" not in p.parts)[:80]}
             obs = self.run_dir / "oracle-observations.jsonl"
             env = dict(self.env(), AISEF_W1_PROJECT=str(deliv), AISEF_W1_ORACLE_OBSERVATIONS=str(obs))

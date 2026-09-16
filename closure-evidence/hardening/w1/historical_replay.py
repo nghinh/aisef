@@ -132,8 +132,8 @@ def main() -> int:
         sys.path.insert(0, str(Path(a.aisef_root).resolve()))
     import aisef  # noqa: E402
 
-    head = subprocess.run(["git", "-C", str(REPO), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
-    dirty = subprocess.run(["git", "-C", str(REPO), "status", "--porcelain", "--", "aisef"], capture_output=True, text=True).stdout.strip()
+    head = subprocess.run(["git", "-C", str(REPO), "rev-parse", "HEAD"], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
+    dirty = subprocess.run(["git", "-C", str(REPO), "status", "--porcelain", "--", "aisef"], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
     t0 = time.time()
     rows = [row for name, spec in STATES.items() for row in replay_state(name, spec)]
     suites = None if a.no_suites else run_suites()

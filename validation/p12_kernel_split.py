@@ -24,7 +24,7 @@ FIRST = "023d6ce"        # HEAD when chunk 00000 started
 
 
 def git(*a: str) -> str:
-    return subprocess.run(["git", "-C", str(ROOT), *a], capture_output=True, text=True).stdout.strip()
+    return subprocess.run(["git", "-C", str(ROOT), *a], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
 
 
 def main() -> int:

@@ -53,10 +53,10 @@ def main() -> int:
     ds = json.loads((E / "hardening-defect-set.json").read_text(encoding="utf-8"))
     d64 = find(ds, lambda d: d.get("id") == "SS-64")
     rep = json.loads((E / "phase12/unexplained-34999-replays.json").read_text(encoding="utf-8"))
-    ci_raw = subprocess.run(["gh", "run", "view", CI_RUN, "--json", "conclusion,headSha,jobs"], capture_output=True, text=True).stdout
+    ci_raw = subprocess.run(["gh", "run", "view", CI_RUN, "--json", "conclusion,headSha,jobs"], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
     ci = json.loads(ci_raw) if ci_raw.strip().startswith("{") else {"jobs": [], "raw": ci_raw[:200]}
     jobs = ci.get("jobs", [])
-    adapters_changed = subprocess.run(["git", "-C", str(ROOT), "diff", "--stat", "d956249", "HEAD", "--", "aisef/clients"], capture_output=True, text=True).stdout.strip()
+    adapters_changed = subprocess.run(["git", "-C", str(ROOT), "diff", "--stat", "d956249", "HEAD", "--", "aisef/clients"], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
     req = {
         "deterministic_seed_34999_reproducer_RED_before_fix": {"ok": "2 failed" in red, "measured": red.strip().splitlines()[-1] if red.strip() else "", "how": "the current tests/hardening overlaid on a git worktree at d956249 (pre-fix aisef tree e9fb9b92…)"},
         "10_of_10_deterministic_mismatch_before_fix": {"ok": rep.get("all_replays_identical_on_compared_and_event_streams") is True and rep.get("classification") == "DETERMINISTIC_MISMATCH" and len(rep.get("replays", [])) >= 10,
