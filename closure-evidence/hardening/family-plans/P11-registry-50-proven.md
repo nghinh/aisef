@@ -35,3 +35,5 @@ render, full suite, ruff, Linux + Windows CI green. No status is edited without 
 
 Registry 49 PROVEN / 0 PARTIAL / 1 MISSING. Fault matrix: FM-E-07, FM-N-03, FM-C-13 added GREEN (P11) —
 70 GREEN / 2 RED (FM-X-01, FM-C-09 — INV-S.1, Phase 17) / 0 NEEDS_TEST, 72 scenarios. Registry and matrix rule tests green. Full suite / ruff / CI: full suite 3392 passed / 20 skipped / 0 expected-red / 0 failed (1444 subtests, 568 s), ruff clean; Linux + Windows CI recorded on the commit that carries this phase (see the F6 record for the Windows reaper cause it also fixes).
+
+CI on 9e8fc77 (run of 2026-09-16, PR #6): 7/7 green — Linux 3.11–3.14, Windows 3.11, lint, wheel. Windows is green with the unified snapshot walker, the POSIX-only zombie collection and positive session ownership all in place: this family is re-qualified on both operating systems.

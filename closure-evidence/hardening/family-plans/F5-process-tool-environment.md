@@ -136,3 +136,5 @@ never the harness's): a real adapter's tree is its process group / job object, r
 exactly those are terminated, reaped and verified, a survivor typed as before. The synthetic client, the CF-11
 agent and the reaper tests declare their spawns; `children_of` / `survivors` remain as helpers. Linux never showed it
 because git finishes before the snapshot; the rule was wrong on both.
+
+CI on 9e8fc77 (run of 2026-09-16, PR #6): 7/7 green — Linux 3.11–3.14, Windows 3.11, lint, wheel. Windows is green with the unified snapshot walker, the POSIX-only zombie collection and positive session ownership all in place: this family is re-qualified on both operating systems.

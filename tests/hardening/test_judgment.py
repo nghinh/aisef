@@ -101,3 +101,76 @@ class TestDeadlockPairSurvivesAnInfraAttempt(unittest.TestCase):
         self.assertIn("stuck", stuck); self.assertIn("ledgerlock/ledger.py", stuck)
         self.assertEqual(deadlock_reason([self._graded(block), self._infra()], ["ledgerlock/cli.py"]), "",
                          "one position and an infra cut: no pair")
+
+
+class TestLegacyTokenOverlapRule(unittest.TestCase):
+    """Phase 13 mutants of `_same_complaint`'s legacy token path (lines without a structured finding id): a verbatim
+    repeat is the same complaint; two shared proper nouns with ≥ 40 % overlap are; one shared noun is not; two nouns
+    with low overlap are not."""
+
+    def test_verbatim_and_overlap_thresholds(self):
+        from aisef.phases.implement import _same_complaint
+        a = ["missing fake-indexeddb in package.json devDependencies"]
+        self.assertTrue(_same_complaint(a, list(a)), "verbatim repeat")
+        self.assertTrue(_same_complaint(a, ["fake-indexeddb not declared in package.json"]), "two shared nouns, high overlap")
+        self.assertFalse(_same_complaint(a, ["package.json has a wrong license field"]), "one shared noun is progress, not deadlock")
+        long_a = ["missing fake-indexeddb in package.json devDependencies section for the vitest environment setup script and the coverage reporter"]
+        self.assertFalse(_same_complaint(long_a, ["fake-indexeddb package.json alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu nu"]),
+                         "two shared nouns but overlap below the ratio (the ratio divides by the SHORTER token set)")
+        self.assertFalse(_same_complaint(a, []), "nothing to compare with")
+
+
+class TestPathsOutsideEdges(unittest.TestCase):
+    """Phase 13 mutants of `_paths_outside` (SS-25 / INV-F.2): a manifest at the root is a path (dot, no slash); a
+    bare technology word is not; an in-scope path is not reported; a duplicate is reported once; a structured
+    finding's `file` counts like a canonical line's leading token."""
+
+    def test_edges(self):
+        from aisef.phases.implement import _paths_outside
+        scope = ["src/"]
+        self.assertEqual(_paths_outside(["[block] package.json:1 — devDependency missing"], scope), ["package.json"])
+        self.assertEqual(_paths_outside(["[block] docker — the image is wrong"], scope), [], "a technology name is not a path")
+        self.assertEqual(_paths_outside(["[block] src/app.py:3 — wrong"], scope), [], "inside the scope: not yet fixed, not cannot fix")
+        self.assertEqual(_paths_outside(["[block] lib/x.py:1 — a", "[block] lib/x.py:9 — b"], scope), ["lib/x.py"], "once")
+        self.assertEqual(_paths_outside([{"file": "lib/y.py", "why": "w"}], scope), ["lib/y.py"])
+        self.assertEqual(_paths_outside(["[block] lib/x.py:1 — a"], []), ["lib/x.py"], "an empty scope allows nothing")
+
+
+class TestNopDeadlockPositions(unittest.TestCase):
+    """Phase 13 mutants of `nop_deadlock`: one graded verdict naming still-green criteria plus two consecutive no-op
+    sessions is the plan diagnosis; one graded verdict alone is not (and must not crash)."""
+
+    def _graded(self, codes):
+        from aisef.control.outcome import Check, Outcome
+        from aisef.phases.implement import Attempt
+        a = Attempt(number=1); a.infra = False
+        chk = Check("tests verify story", Outcome.FAILED, "still green at the parent", data={"still_green": list(codes)})
+        a.gate = type("G", (), {"failures": [chk], "checks": [chk]})()
+        return a
+
+    def _noop(self, n):
+        from aisef.phases.implement import Attempt
+        a = Attempt(number=n); a.infra = True; a.noop = True
+        return a
+
+    def test_one_verdict_then_two_noops_is_the_plan_diagnosis_and_one_verdict_alone_is_not(self):
+        from aisef.phases.implement import nop_deadlock
+        codes = ["AC-STORY-03-02-1", "AC-STORY-03-02-2"]
+        self.assertEqual(nop_deadlock([self._graded(codes)]), "")
+        self.assertIn("deadlock due to plan", nop_deadlock([self._graded(codes), self._noop(2), self._noop(3)]))
+        self.assertIn("AC-STORY-03-02-1", nop_deadlock([self._graded(codes), self._graded(codes)]))
+
+
+class TestInScopeRepeatIsNotStuck(unittest.TestCase):
+    """Phase 13 mutant of `deadlock_reason` (`write_scope or []` → `and`): two identical blocks on a file INSIDE a
+    non-empty write scope are "not yet fixed", never "cannot fix" — the retry limit decides."""
+
+    def test_two_identical_in_scope_blocks_are_not_a_plan_conflict(self):
+        from aisef.phases.implement import Attempt, deadlock_reason
+
+        def graded(findings):
+            a = Attempt(number=1); a.review_findings = list(findings); a.infra = False; a.review_unrunnable = ""
+            return a
+        block = ["[block] src/app/list-notes.ts:12 — AR-7 violation"]
+        self.assertEqual(deadlock_reason([graded(block), graded(block)], ["src/app/"]), "")
+        self.assertIn("stuck", deadlock_reason([graded(block), graded(block)], ["docs/"]), "the same block outside the scope IS stuck")

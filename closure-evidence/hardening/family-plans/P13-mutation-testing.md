@@ -56,4 +56,21 @@ Classification of run 1's survivors (every one):
   chooses between two reason WORDINGS of the same `Freshness(False)` — control never reads the wording; the
   Phase 16 test does assert "schema 1" in the stale reason, so this one is also expected to be killed by run 2).
 
-Run 2 (same tree + the new tests, cited): __RUN2__
+Run 2 (same tree + the new tests, cited; 1240 s): 271 generated, 251 killed, 17 survived, 3 excluded as equivalent.
+The 17: `_same_complaint` ×8 — the legacy token-overlap fallback, unreached by the finding-id tests
+(`TestLegacyTokenOverlapRule` now pins the verbatim, two-noun, one-noun and low-ratio cases; the `not x or not y`
+guard is EQUIVALENT); `_paths_outside` ×5 (`TestPathsOutsideEdges`: a root manifest is a path, a technology word is
+not, in-scope is not reported, duplicates once, a dict finding's file, an empty scope); `nop_deadlock` ×1
+(`TestNopDeadlockPositions`: one verdict alone is "", one verdict plus two no-ops is the plan diagnosis);
+`deadlock_reason` ×1 — the review_findings `or` → `and`, EQUIVALENT (the same-complaint check of an empty list is
+False), declared by its own id; `StateStore.transition` ×1 — the `or` inside the refusal MESSAGE, NOT SIGNIFICANT;
+`unrunnable_reason` ×1 — the `or` inside the generic reason MESSAGE, NOT SIGNIFICANT. One correction on the way: run
+1's equivalence entry named the wrong site (it pointed at `write_scope or []` → `and`, which turns a non-empty scope
+into an empty one and would report an in-scope repeat as stuck — SIGNIFICANT); that entry was removed and the mutant
+is killed by `TestInScopeRepeatIsNotStuck`. `validation/mutate.py` gained a `not_significant` list (reported with its
+reason, never a survivor) beside `equivalent`.
+
+Run 3 (authoritative, quiet CPU, 1172 s): **271 generated, 265 killed, 0 survived, 6 excluded** — 4 EQUIVALENT
+(`deadlock_reason` review_findings guard; `_same_complaint` empty-token guard; `reap` busy-wait ×2) and 2 NOT
+SIGNIFICANT (two message wordings), each declared by mutant id with its reason in `validation/mutation-targets.json`.
+No surviving mutation of any significance: the owner's rule holds. Results: `closure-evidence/hardening/mutation-results.json`.

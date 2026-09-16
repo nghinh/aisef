@@ -94,3 +94,5 @@ zombie collection (`process_owner.reap`: `os.waitpid(pid, os.WNOHANG)`) has no W
 failure, `orphans_surviving`). The unified snapshot walker of this commit did its job (no `PROCESSENTRY32` error
 remains). Fixed in the next commit: the zombie collection is POSIX-only (Windows has no zombies; `pid_alive` reads
 the process handle); that commit's Windows job re-qualifies F5, F6 and the phases it carries.
+
+CI on 9e8fc77 (run of 2026-09-16, PR #6): 7/7 green — Linux 3.11–3.14, Windows 3.11, lint, wheel. Windows is green with the unified snapshot walker, the POSIX-only zombie collection and positive session ownership all in place: this family is re-qualified on both operating systems.

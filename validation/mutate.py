@@ -191,6 +191,10 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     spec = json.loads(Path(a.targets).read_text(encoding="utf-8"))
     equivalent = {e["id"]: e["why"] for e in spec.get("equivalent", [])}
+    # NOT_SIGNIFICANT: the mutant changes a message, a log line or an ordering with no control effect — listed with
+    # its reason, reported separately, never counted as a survivor (Phase 13 plan, class c)
+    not_significant = {e["id"]: e["why"] for e in spec.get("not_significant", [])}
+    equivalent = {**equivalent, **{k: "NOT_SIGNIFICANT: " + v for k, v in not_significant.items()}}
     jobs, catalog = [], []
     for t in spec["targets"]:
         key = f"{t['module']}::{t['function']}"

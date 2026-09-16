@@ -156,7 +156,8 @@
     "tests/hardening/test_judgment.py",
     "tests/hardening/test_differential.py",
     "tests/hardening/test_fault_matrix.py::TestDeveloperFaults",
-    "tests/hardening/test_judgment.py::TestDeadlockPairSurvivesAnInfraAttempt"
+    "tests/hardening/test_judgment.py::TestDeadlockPairSurvivesAnInfraAttempt",
+    "tests/hardening/test_judgment.py::TestInScopeRepeatIsNotStuck"
    ]
   },
   {
@@ -166,7 +167,8 @@
     "tests/hardening/test_judgment.py",
     "tests/hardening/test_differential.py",
     "tests/test_same_complaint_finding.py",
-    "tests/test_findings.py"
+    "tests/test_findings.py",
+    "tests/hardening/test_judgment.py::TestLegacyTokenOverlapRule"
    ]
   },
   {
@@ -175,7 +177,8 @@
    "tests": [
     "tests/hardening/test_judgment.py",
     "tests/hardening/test_differential.py",
-    "tests/hardening/test_sibling_scan.py::TestSS25ScopeVerdictComesFromFindingsNotProse"
+    "tests/hardening/test_sibling_scan.py::TestSS25ScopeVerdictComesFromFindingsNotProse",
+    "tests/hardening/test_judgment.py::TestPathsOutsideEdges"
    ]
   },
   {
@@ -228,7 +231,8 @@
     "tests/hardening/test_differential.py",
     "tests/hardening/test_fault_matrix.py::TestDeveloperFaults",
     "tests/test_implement.py::TestBeTacDoKeHoachTheoNopControl",
-    "tests/hardening/scan8a/test_group_a.py::TestSS32DeadlockDiagnosisReadsDataNotProse"
+    "tests/hardening/scan8a/test_group_a.py::TestSS32DeadlockDiagnosisReadsDataNotProse",
+    "tests/hardening/test_judgment.py::TestNopDeadlockPositions"
    ]
   },
   {
@@ -267,11 +271,34 @@
    "why": "dropping the sleep inside `while monotonic() < deadline and any(alive)` turns the grace wait into a busy wait with the same deadline and the same exit condition; the outcome (which pids are dead, and when) is unchanged."
   },
   {
-   "id": "e549affe13",
+   "id": "76f145ab0f",
    "module": "aisef/phases/implement.py",
    "function": "deadlock_reason",
-   "site": "line 3141: and ↔ or",
-   "why": "`if not last.review_findings or not prev.review_findings: return \"\"` → with `and`, a single empty list falls through to `_same_complaint(x, [])`, which iterates nothing and returns False — the same \"\" result; no observable decision changes."
+   "site": "review_findings check: or → and",
+   "why": "`if not last.review_findings or not prev.review_findings: return \"\"` → with `and`, a single empty list falls through to `_same_complaint(x, [])`, which iterates nothing and returns False — the same \"\"; no decision changes."
+  },
+  {
+   "id": "fed654c05c",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "site": "token loop: `not x or not y` → and",
+   "why": "with `and`, a pair where exactly one token set is empty is not skipped, but `chung = x & y` is then empty and `len(_rieng(∅)) < 2` skips it anyway — the same result for every input."
+  }
+ ],
+ "not_significant": [
+  {
+   "id": "192e5a90e3",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "site": "TransitionError message: `owner or 'an unattributed writer'` → and",
+   "why": "inside the f-string of the refusal message only; the refusal itself (raise) is unchanged and is asserted by TestLeaseEdges."
+  },
+  {
+   "id": "5b479bdc93",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "site": "final message: `hit or 'exit 127'` → and",
+   "why": "the wording of the generic unrunnable reason; control reads only that the reason is non-empty (UNRUNNABLE), which is unchanged."
   }
  ]
 }

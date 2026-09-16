@@ -82,3 +82,5 @@ same identity proceeds; accepted drift proceeds and stays on the record; a chang
 framework patch is immaterial, a minor bump is not; a client patch is immaterial, a major is not; a field the
 source never recorded is not compared. FM-X-01 and FM-C-09 turned GREEN; INV-S.1 PROVEN — registry 50 PROVEN / 0 PARTIAL / 0 MISSING of 50.
 Scope guard held: capture, preflight, record and the one flag; no other replay surface.
+
+CI on 9e8fc77 (run of 2026-09-16, PR #6): 7/7 green — Linux 3.11–3.14, Windows 3.11, lint, wheel. Windows is green with the unified snapshot walker, the POSIX-only zombie collection and positive session ownership all in place: this family is re-qualified on both operating systems.
