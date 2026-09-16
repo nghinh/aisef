@@ -62,7 +62,7 @@ from .approvals import (
     sha256_of,
 )
 from . import cohort, onboarding, planes
-from .gate import Outcome, _stale_candidates
+from .gate import Outcome, _stale_candidates, verdict_recorded
 from .gate import CHECK_KIND
 from .outcome import CHECK_KINDS
 from .state import StateStore, StoryStatus
@@ -129,6 +129,16 @@ def _git_out(repo: Path, *args: str) -> str:
     except (OSError, GitError, subprocess.TimeoutExpired):
         return ""
     return proc.stdout.strip() if proc.returncode == 0 else ""
+
+
+def _is_ancestor(repo: Path, sha: str) -> bool:
+    """ANCESTRY, not object existence (SS-06 / INV-R.2): a candidate frozen on a branch nobody merged lives in the
+    same object store as the trunk. Story branches merge with `git merge` (never squashed), so merged ⇒ ancestor."""
+    try:
+        proc = _git(repo, "merge-base", "--is-ancestor", sha, "HEAD", check=False)
+    except (OSError, GitError, subprocess.TimeoutExpired):
+        return False
+    return proc.returncode == 0
 
 
 def _norm(text: str) -> str:
@@ -765,9 +775,15 @@ def probe_review_and_security(ctx: Ctx) -> Probed:
     if not stories:
         return Probed(Outcome.UNRUNNABLE, "no stories in the corpus plan or state")
     store = EvidenceStore(art)
-    gaps = [f"{sid}:{name}" for sid in stories
-            for name in ("review", "security")
-            if not store.read(sid).of(TOOL_RUN, name)]
+    gaps = []
+    for sid in stories:
+        for name in ("review", "security"):
+            recs = store.read(sid).of(TOOL_RUN, name)
+            if any(verdict_recorded(r) for r in recs):          # SS-07 / INV-R.2: a record is not a verdict
+                continue
+            why = next((str(r.detail.get("unrunnable") or r.detail.get("outcome") or "no verdict")
+                        for r in reversed(recs)), "")
+            gaps.append(f"{sid}:{name}" + (f" (recorded, no verdict: {why[:60]})" if recs else ""))
     digest = _git_out(art.parent, "rev-parse", "HEAD")
     if gaps:
         return Probed(Outcome.FAILED,
@@ -809,8 +825,9 @@ def probe_evidence_at_candidate(ctx: Ctx) -> Probed:
         stale = _stale_candidates(ev, cand, ())
         if stale:
             problems.append(f"{sid}: checks at {', '.join(s[:7] for s in stale)} ≠ {cand[:7]}")
-        elif not _git_out(corpus, "rev-parse", "--verify", f"{cand}^{{commit}}"):
-            problems.append(f"{sid}: candidate {cand[:7]} is not in the corpus history")
+        elif not _is_ancestor(corpus, cand):
+            problems.append(f"{sid}: candidate {cand[:7]} is not in the corpus history "
+                            "(not an ancestor of HEAD — verified on a build nobody merged)")
     digest = _git_out(corpus, "rev-parse", "HEAD")
     if problems:
         return Probed(Outcome.FAILED, f"{len(problems)} of {len(registered)}: {'; '.join(problems[:4])}",

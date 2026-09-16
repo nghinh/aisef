@@ -107,11 +107,15 @@ def session_rows(db: Path | None = None, *, bench_dir: str = "") -> list[dict]:
     # gọn — thế là một phiên trông như chạm hai cây và bị luật nhập nhằng bỏ đi.
     # Đo trên C-2: đúng một lượt (`opencode/bug-a2-state-1/a1`) biến mất vì lý do
     # ấy. Thư mục có thật là bằng chứng; chuỗi trong câu trả lời của model không.
-    hop_le: set[str] = set()
+    # D-003 (F6): a bench number belongs to exactly one cohort. Without `bench_dir` the rows are those of the cohort
+    # the report collects from (`R.KEEP_DIR`) — never every `.bench*` directory the session store has ever seen,
+    # which merged another cohort's sessions into this cohort's (condition, task, attempt) rows.
     if bench_dir:
         goc = Path(bench_dir)
         goc = goc if goc.is_absolute() else M.ROOT / goc
-        hop_le = {d.name for d in (goc / "run").glob("*") if d.is_dir()}
+    else:
+        bench_dir, goc = R.KEEP_DIR.name, R.KEEP_DIR
+    hop_le = {d.name for d in (goc / "run").glob("*") if d.is_dir()}
     try:
         con = sqlite3.connect(f"file:{kho}?mode=ro", uri=True)
         try:

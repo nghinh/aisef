@@ -1,7 +1,7 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "phase": 7,
- "generated": "2026-09-16T16:00:57+00:00",
+ "generated": "2026-09-16T16:26:05+00:00",
  "stages": [
   "Developer",
   "Test",
@@ -469,7 +469,7 @@
    "expected_recovery": "re-approve",
    "invariants": "INV-P.1",
    "test": "tests/hardening/scan8a/test_group_d.py::TestSS55GateConfigIsBoundByReadiness::test_weakening_coverage_min_after_readiness_approval_makes_it_stale",
-   "status": "RED (SS-55)"
+   "status": "GREEN (F6)"
   },
   {
    "id": "FM-P-01",
@@ -841,7 +841,7 @@
    "expected_recovery": "re-approve",
    "invariants": "INV-P.1",
    "test": "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume::test_the_programmatic_readiness_status_is_stale_after_an_upstream_edit",
-   "status": "RED (SS-56)"
+   "status": "GREEN (F6)"
   },
   {
    "id": "FM-C-12b",
@@ -857,8 +857,8 @@
   }
  ],
  "status_count": {
-  "GREEN": 65,
-  "RED": 4,
+  "GREEN": 67,
+  "RED": 2,
   "NEEDS_TEST": 0
  }
 }

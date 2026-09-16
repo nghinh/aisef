@@ -121,7 +121,7 @@ class TestSS06CorpusHistoryMeansAncestry(unittest.TestCase):
     """SS-06 — G4.5 (closure.py ~802) asks `rev-parse --verify <cand>^{commit}`: object existence. A
     candidate frozen on a story branch nobody merged lives in the same object store. INV-R.2: ancestry."""
 
-    @unittest.expectedFailure   # SS-06 — observed: PASSED "1 stories verified at a merged candidate" for an unmerged branch SHA
+    # GREEN since F6 (SS-06: closure probes read identities, never existence), 2026-09-17
     def test_a_candidate_on_an_unmerged_branch_is_not_in_the_corpus_history(self):
         corpus = TC.Corpus()
         self.addCleanup(corpus.close)
@@ -143,7 +143,7 @@ class TestSS07ARecordedReviewIsAVerdict(unittest.TestCase):
     loop itself writes one for a reviewer that did NOT execute (`outcome: REVIEW_UNRUNNABLE`, D-032), and
     its own `_review_complete` refuses to reuse that record. INV-R.2/F.3: absence of a stage is not a stage."""
 
-    @unittest.expectedFailure   # SS-07 — observed: PASSED "review and security recorded" on a REVIEW_UNRUNNABLE-only record
+    # GREEN since F6 (SS-07: closure probes read identities, never existence), 2026-09-17
     def test_an_unrunnable_review_record_does_not_count_as_review_recorded(self):
         corpus = TC.Corpus(review=False)
         self.addCleanup(corpus.close)

@@ -2957,7 +2957,7 @@ MAX_TOOL_RETRIES = 2
 MAX_REVIEW_RETRIES = 2
 #: Legacy prefix (≤ 1.7.3) under which an execution failure was stored as a
 #: finding; read so a resumed pre-1.7.4 run is recovered, never written again.
-_LEGACY_UNRUN = "review could not run:"
+from ..control.gate import LEGACY_UNRUN as _LEGACY_UNRUN, verdict_recorded  # noqa: E402 — one definition (SS-07)
 
 
 def _review_complete(ev: Event | None) -> bool:
@@ -2965,12 +2965,7 @@ def _review_complete(ev: Event | None) -> bool:
     BLOCK)? An execution failure recorded there — new `unrunnable`/`outcome`
     fields, or the ≤ 1.7.3 finding text — is not evidence about the candidate
     and must not be reused as if it were (D-032)."""
-    if ev is None:
-        return False
-    d = ev.detail
-    if d.get("unrunnable") or d.get("outcome") == REVIEW_UNRUNNABLE:
-        return False
-    return not any(str(f).startswith(_LEGACY_UNRUN) for f in (d.get("findings") or []))
+    return verdict_recorded(ev)
 
 
 def _review_executions(ev: Evidence, story_id: str, sha: str) -> int:

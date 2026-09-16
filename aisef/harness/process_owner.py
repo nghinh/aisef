@@ -57,30 +57,43 @@ def children_of(pid: int | None = None) -> set[int]:
     return kids
 
 
-def _children_win32(root: int) -> set[int]:
+def _snapshot_win32() -> dict[int, list[int]]:
+    """One toolhelp snapshot → parent pid → child pids. The ONLY walker in the tree (`clients/base.kill_tree` uses it
+    too): ctypes caches argument types per function on the shared `windll.kernel32`, so two walkers with two struct
+    classes broke each other — F5 CI on 612efce, Windows: `expected LP_PROCESSENTRY32W instance instead of pointer to
+    PROCESSENTRY32` on every story. A private `WinDLL` keeps these prototypes ours; empty when the API is unavailable."""
     import ctypes
     from ctypes import wintypes
-    k32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
+    k32 = ctypes.WinDLL("kernel32", use_last_error=True)
 
-    class PROCESSENTRY32(ctypes.Structure):
+    class PROCESSENTRY32W(ctypes.Structure):
         _fields_ = [("dwSize", wintypes.DWORD), ("cntUsage", wintypes.DWORD), ("th32ProcessID", wintypes.DWORD),
-                    ("th32DefaultHeapID", ctypes.c_void_p), ("th32ModuleID", wintypes.DWORD),
+                    ("th32DefaultHeapID", ctypes.c_size_t), ("th32ModuleID", wintypes.DWORD),
                     ("cntThreads", wintypes.DWORD), ("th32ParentProcessID", wintypes.DWORD),
                     ("pcPriClassBase", ctypes.c_long), ("dwFlags", wintypes.DWORD), ("szExeFile", ctypes.c_wchar * 260)]
-    snap = k32.CreateToolhelp32Snapshot(0x2, 0)
-    if snap == ctypes.c_void_p(-1).value or not snap:
-        return set()
-    kids: set[int] = set()
+    k32.CreateToolhelp32Snapshot.restype = wintypes.HANDLE
+    k32.CreateToolhelp32Snapshot.argtypes = [wintypes.DWORD, wintypes.DWORD]
+    k32.Process32FirstW.restype = k32.Process32NextW.restype = wintypes.BOOL
+    k32.Process32FirstW.argtypes = k32.Process32NextW.argtypes = [wintypes.HANDLE, ctypes.POINTER(PROCESSENTRY32W)]
+    k32.CloseHandle.argtypes = [wintypes.HANDLE]
+    snap = k32.CreateToolhelp32Snapshot(0x2, 0)          # TH32CS_SNAPPROCESS
+    if not snap or snap == ctypes.c_void_p(-1).value:
+        return {}
+    children: dict[int, list[int]] = {}
     try:
-        e = PROCESSENTRY32(); e.dwSize = ctypes.sizeof(PROCESSENTRY32)
+        e = PROCESSENTRY32W()
+        e.dwSize = ctypes.sizeof(e)
         ok = k32.Process32FirstW(snap, ctypes.byref(e))
         while ok:
-            if int(e.th32ParentProcessID) == root:
-                kids.add(int(e.th32ProcessID))
+            children.setdefault(int(e.th32ParentProcessID), []).append(int(e.th32ProcessID))
             ok = k32.Process32NextW(snap, ctypes.byref(e))
     finally:
         k32.CloseHandle(snap)
-    return kids
+    return children
+
+
+def _children_win32(root: int) -> set[int]:
+    return set(_snapshot_win32().get(root, []))
 
 
 def _terminate(pid: int, hard: bool) -> None:
@@ -181,7 +194,12 @@ class win_job:
         try:
             import ctypes
             from ctypes import wintypes
-            k32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
+            k32 = ctypes.WinDLL("kernel32", use_last_error=True)      # private: prototypes below are ours alone
+            k32.CreateJobObjectW.restype = wintypes.HANDLE
+            k32.CreateJobObjectW.argtypes = [ctypes.c_void_p, wintypes.LPCWSTR]
+            k32.SetInformationJobObject.argtypes = [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD]
+            k32.AssignProcessToJobObject.argtypes = [wintypes.HANDLE, wintypes.HANDLE]
+            k32.CloseHandle.argtypes = [wintypes.HANDLE]
 
             class IO_COUNTERS(ctypes.Structure):
                 _fields_ = [(n, ctypes.c_ulonglong) for n in ("ReadOperationCount", "WriteOperationCount", "OtherOperationCount",
@@ -213,5 +231,8 @@ class win_job:
     def close(self) -> None:
         if self.handle is not None and sys.platform == "win32":
             import ctypes
-            ctypes.windll.kernel32.CloseHandle(self.handle)  # type: ignore[attr-defined]
+            from ctypes import wintypes
+            k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+            k32.CloseHandle.argtypes = [wintypes.HANDLE]
+            k32.CloseHandle(self.handle)
             self.handle = None

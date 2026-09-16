@@ -118,5 +118,11 @@ Final numbers (2026-09-17): differential `differential-f5-400.json` 400/400 matc
 fixed before the re-run). Full suite 3365 passed / 20 skipped / 8 expected-red / 0 failed (1444 subtests, 565 s); ruff
 clean. Fault matrix 65 GREEN / 4 RED / 0 NEEDS_TEST (was 63 / 6). Registry 42 PROVEN / 7 PARTIAL / 1 MISSING (was
 39 / 10 / 1): INV-N.1, INV-L.1, INV-L.2, INV-M.1 promoted; INV-F.3 stays PARTIAL while an OPEN F6 member claims it.
-Defect set 66 FIXED / 1 SUPERSEDED / 6 OPEN (was 56 / 1 / 16); the 6 OPEN are F6's. Linux + Windows CI: see the
-commit's PR checks (recorded here when the run completes).
+Defect set 66 FIXED / 1 SUPERSEDED / 6 OPEN (was 56 / 1 / 16); the 6 OPEN are F6's.
+
+CI on 612efce (run 35119273174): Linux 3.11–3.14, lint, wheel green; Windows 3.11 RED on one cause — two toolhelp
+snapshot walkers (`clients/base.kill_tree`, F1-era, and the new `process_owner._children_win32`) with two struct
+classes on the shared `ctypes.windll.kernel32`, whose per-function argument types are cached, so every story on
+Windows crashed at the reaper's first snapshot (`expected LP_PROCESSENTRY32W instance`). Fixed in the F6 commit: one
+walker (`process_owner._snapshot_win32`) behind a private `WinDLL` with explicit prototypes, used by `children_of`,
+`kill_tree` and the job object; the F6 commit's Windows job re-qualifies both families.

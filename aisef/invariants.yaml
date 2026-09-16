@@ -373,7 +373,7 @@ invariants:
       - SS-23
       - SS-26
       - SS-34
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-F.4
     domain: typed outcomes
     statement: The exit status of a session is read from the provider's structured fields; the agent's own text never classifies the session.
@@ -793,7 +793,7 @@ invariants:
     linked_defects:
       - SS-55
       - SS-56
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-P.2
     domain: approval invalidation
     statement: Human decisions that gate execution (stop rules, acceptance scope, waivers) are data with a source digest, never operator memory or an implicit default.
@@ -884,7 +884,7 @@ invariants:
       - SS-06
       - SS-07
       - SS-29
-    status: PARTIAL
+    status: PROVEN
   - invariant_id: INV-S.1
     domain: replay identity
     statement: A replay binds framework version, client and version, model and route, configuration digest, sandbox identity, requirements digest, story contracts and baseline identities; material drift fails preflight or is declared before execution.

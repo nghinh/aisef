@@ -248,7 +248,7 @@ class TestSS54RepairStoriesAreCoveredByAnApproval(unittest.TestCase):
     the `improve` gate is the compensating approval and `stop_reason` waives it under `--auto` (and never
     asks before round 1). The repair story must still be covered by some approval's digest."""
 
-    @unittest.expectedFailure   # SS-54 — improve.py:441 `not auto` waives the gate; no digest (stories/readiness/improve) sees STORY-RP-01
+    # GREEN since F6 (SS-54: an approval binds to everything it covers and staleness cascades), 2026-09-17
     def test_under_auto_a_new_repair_story_is_covered_by_a_gate_digest(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp); store = ApprovalStore(root)
@@ -275,7 +275,7 @@ class TestSS55GateConfigIsBoundByReadiness(unittest.TestCase):
     """SS-55 — no gate digest covers `.ai/config.json`; weakening `coverage.min` / `security.block_severities`
     after the readiness approval reinterprets the approved plan and nothing goes stale. FM-A-03."""
 
-    @unittest.expectedFailure   # SS-55 — approvals.py:79-96 GATE_ARTIFACTS has no entry for .ai/config.json; readiness stays approved
+    # GREEN since F6 (SS-55: an approval binds to everything it covers and staleness cascades), 2026-09-17
     def test_weakening_coverage_min_after_readiness_approval_makes_it_stale(self):
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp); root = project / "_bmad-output"; root.mkdir()
@@ -298,7 +298,7 @@ class TestSS56UpstreamContentEditStalesDownstream(unittest.TestCase):
     upstream *content edit*: after `prd.md` changes, `architecture` still reports APPROVED to programmatic
     callers (CLI entry points compensate through `blocking()`)."""
 
-    @unittest.expectedFailure   # SS-56 — approvals.py:279-287 compares upstream `seq` only; PRD edited, no new PRD decision → APPROVED
+    # GREEN since F6 (SS-56: an approval binds to everything it covers and staleness cascades), 2026-09-17
     def test_editing_the_prd_makes_the_approved_architecture_stale(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp); store = ApprovalStore(root)

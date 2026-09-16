@@ -165,6 +165,25 @@ def _stale_for(evidence: Evidence, current: EvidenceIdentity,
     return out
 
 
+#: Where a verifier that did not execute used to be written (≤ 1.7.3): a finding whose text starts with this.
+LEGACY_UNRUN = "review could not run:"
+
+
+def verdict_recorded(event: Event | None) -> bool:
+    """Does this `tool_run review` / `tool_run security` carry a VERDICT (PASS or BLOCK)? A stage that did not
+    execute writes a record too — `unrunnable`, an UNRUNNABLE `outcome`, or the ≤ 1.7.3 finding text — and that
+    record is not evidence about the work (INV-F.3, INV-R.2; D-032, SS-07). The one definition, for the story loop
+    (`_review_complete`) and the closure probe G4.4 alike."""
+    if event is None:
+        return False
+    d = event.detail
+    if d.get("unrunnable"):
+        return False
+    if str(d.get("outcome") or "").endswith("UNRUNNABLE"):
+        return False
+    return not any(str(f).startswith(LEGACY_UNRUN) for f in (d.get("findings") or []))
+
+
 def _stale_candidates(evidence: Evidence, candidate: str,
                       kinds: tuple[str, ...] | None = None) -> list[str]:
     """Old candidates that the **latest result** of a check still refers to.

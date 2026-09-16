@@ -312,7 +312,7 @@ class TestCF12ApprovalInvalidationDuringResume(unittest.TestCase):
             self.assertIs(store.status(Gate.PRD), Status.STALE)
             self.assertIn(Gate.PRD, store.blocking(Gate.READINESS), "the resume entry point (aisef run) sees the cascade")
 
-    @unittest.expectedFailure   # SS-56 (F6) — programmatic status cascades only on a new upstream DECISION, not on an upstream edit
+    # GREEN since F6 (SS-56: an approval binds to everything it covers and staleness cascades), 2026-09-17
     def test_the_programmatic_readiness_status_is_stale_after_an_upstream_edit(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp); store = self._store(root)

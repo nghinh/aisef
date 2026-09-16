@@ -21,8 +21,8 @@
   },
   "fixed": 16,
   "by_status": {
-   "OPEN": 6,
-   "FIXED": 66,
+   "OPEN": 0,
+   "FIXED": 72,
    "SUPERSEDED": 1
   }
  },
@@ -968,7 +968,8 @@
     "statement": "object existence stands in for ancestry: a candidate frozen on an unmerged story branch resolves in the shared object store and passes 'in the corpus history'",
     "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry::test_a_candidate_on_an_unmerged_branch_is_not_in_the_corpus_history",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F6 bench / release / approval (branch hardening/systematic-v1, 2026-09-17)"
    },
    {
     "id": "SS-07",
@@ -983,7 +984,8 @@
     "statement": "any TOOL_RUN review/security record of any outcome (including unrunnable and D-032 execution-failure shapes) satisfies 'review and security recorded'",
     "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict::test_an_unrunnable_review_record_does_not_count_as_review_recorded",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F6 bench / release / approval (branch hardening/systematic-v1, 2026-09-17)"
    },
    {
     "id": "SS-54",
@@ -997,7 +999,8 @@
     "statement": "repair stories execute under an approval whose digest excludes them; the improve gate compensates unless --auto",
     "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS54RepairStoriesAreCoveredByAnApproval::test_under_auto_a_new_repair_story_is_covered_by_a_gate_digest",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F6 bench / release / approval (branch hardening/systematic-v1, 2026-09-17)"
    },
    {
     "id": "SS-55",
@@ -1011,7 +1014,8 @@
     "statement": "verify.*, coverage.min, security.block_severities reinterpret the approved plan and are not bound by any approval",
     "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS55GateConfigIsBoundByReadiness::test_weakening_coverage_min_after_readiness_approval_makes_it_stale",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F6 bench / release / approval (branch hardening/systematic-v1, 2026-09-17)"
    },
    {
     "id": "SS-56",
@@ -1025,7 +1029,8 @@
     "statement": "downstream gates report APPROVED after an upstream content edit until a new upstream decision; entry points use blocking(), programmatic callers do not",
     "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream::test_editing_the_prd_makes_the_approved_architecture_stale",
     "provenance": "Phase 8A",
-    "status": "OPEN"
+    "status": "FIXED",
+    "fixed_by": "F6 bench / release / approval (branch hardening/systematic-v1, 2026-09-17)"
    },
    {
     "id": "D-003",
@@ -1037,8 +1042,10 @@
     "statement": "`_analyze.cut_sessions` merges two bench cohorts on the three tasks they share",
     "reproducer": "",
     "provenance": "DEFECT-REGISTER (open before the program)",
-    "status": "OPEN",
-    "disposition_required": "FIXED / NOT_A_DEFECT with proof / SUPERSEDED"
+    "status": "FIXED",
+    "disposition_required": "FIXED / NOT_A_DEFECT with proof / SUPERSEDED",
+    "fixed_by": "F6 bench / release / approval (branch hardening/systematic-v1, 2026-09-17)",
+    "disposition": "FIXED: `tests/bench/_analyze.session_rows` defaults `bench_dir` to the cohort the report collects from (`R.KEEP_DIR`), so `cut_sessions()` at the report's own call site never merges another cohort's sessions into this cohort's (condition, task, attempt) rows; naming a cohort still counts it. Reproducer (RED before, GREEN after): tests/bench/test_bench.py::TestLenhAnalyzeCoThat::test_mot_con_so_bench_thuoc_ve_dung_mot_cohort."
    }
   ],
   "F5-PROCESS-TOOL-ENVIRONMENT": [
@@ -1312,5 +1319,5 @@
    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `deadlock_reason` skips attempts whose review was UNRUNNABLE"
   }
  ],
- "updated": "2026-09-16T16:00:57+00:00 @ 397d52a"
+ "updated": "2026-09-16T16:26:05+00:00 @ 612efce"
 }
