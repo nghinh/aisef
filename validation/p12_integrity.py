@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import glob
+import gzip
 import json
 import sys
 import time
@@ -80,13 +81,34 @@ def _sequence_transitions(steps: list[tuple[str, str]], terminal: str) -> list[s
     return out
 
 
+
+def _rows_file(summary_file: str) -> Path | None:
+    """The per-trace rows beside a chunk summary: `<name>.rows.jsonl` or its gzipped form (the repo keeps the gzipped
+    form: 7 MB → 350 KB per chunk); None when the chunk ran before the rows existed — its metrics are then
+    DERIVABLE_FROM_RAW_EVIDENCE or NOT_AVAILABLE, never guessed."""
+    base = Path(summary_file).with_suffix(".rows.jsonl")
+    if base.is_file():
+        return base
+    gz = base.with_suffix(".jsonl.gz")
+    return gz if gz.is_file() else None
+
+
+def _read_rows(summary_file: str) -> list[dict]:
+    rf = _rows_file(summary_file)
+    if rf is None:
+        return []
+    opener = gzip.open if rf.suffix == ".gz" else open
+    with opener(rf, "rt", encoding="utf-8") as fh:
+        return [json.loads(line) for line in fh]
+
+
 def chunk_records(files: list[str]) -> list[dict]:
     recs = []
     for f in files:
         d = json.load(open(f, encoding="utf-8"))
         start = int(Path(f).stem.split("-")[-1]); n = d["traces"]
-        rows_file = Path(f).with_suffix(".rows.jsonl")
-        rows = [json.loads(l) for l in open(rows_file, encoding="utf-8")] if rows_file.is_file() else []
+
+        rows = _read_rows(f)
         rec = {"chunk_id": Path(f).stem, "seed_start": start, "seed_end": start + n - 1, "trace_count": n,
                "runtime_s": d["elapsed_s"], "transition_count_model": d["model_transitions"], "stage_event_count_real": d["real_stage_events"],
                "matched": d["matched"], "mismatch_count": d["unexplained_count"] + sum(d["mismatched_attributed"].values()),
@@ -137,10 +159,8 @@ def superseded(rerun_files: list[str]) -> dict[int, bool]:
     record; the consolidated view reports the historical mismatches AND the effective ones after supersession."""
     out: dict[int, bool] = {}
     for f in rerun_files:
-        rows_file = Path(f).with_suffix(".rows.jsonl")
-        if rows_file.is_file():
-            for line in open(rows_file, encoding="utf-8"):
-                r = json.loads(line); out[r["seed"]] = not r["diff"]
+        for r in _read_rows(f):
+            out[r["seed"]] = not r["diff"]
     return out
 
 
@@ -180,6 +200,7 @@ def consolidate(recs: list[dict], intended: list[int], rerun: dict[int, bool] | 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(); ap.add_argument("--out", default=str(ROOT / "closure-evidence/hardening/phase12/integrity.json"))
     ap.add_argument("--glob", default=str(ROOT / "closure-evidence/hardening/differential-p12-*[0-9].json"))
+    ap.add_argument("--summary", default=str(ROOT / "closure-evidence/hardening/differential-p12-summary.json"), help="the W0 builder's input, derived from this consolidation")
     a = ap.parse_args(argv)
     files = sorted(f for f in glob.glob(a.glob) if "rerun" not in Path(f).name); t0 = time.time()
     rerun = superseded(sorted(glob.glob(str(Path(a.glob).parent / "differential-p12-rerun-*.json"))))
@@ -193,6 +214,20 @@ def main(argv=None) -> int:
     ok = (not c["mismatches_effective_after_reruns"] and not c["reruns"]["mismatched"] and not c["ranges_overlap"]
           and not c["missing_intended_ranges"] and not c["unhit_reachable"] and c["total_traces"] >= 100000)
     print("historical mismatches:", c["mismatches"], "| effective after reruns:", c["mismatches_effective_after_reruns"], "| reruns:", c["reruns"])
+    chunks = [json.load(open(f, encoding="utf-8")) for f in files]
+    summary = {"phase": 12, "source": "validation/p12_integrity.py (this summary is derived from phase12/integrity.json — one consolidation)",
+               "chunks": len(chunks), "traces": c["total_traces"], "matched": c["matched"],
+               "unexplained": c["mismatches_effective_after_reruns"],
+               "unexplained_historical": c["mismatches"],
+               "unexplained_note": "historical = mismatches as the chunks recorded them (a chunk record is never edited); effective = after the targeted "
+                                   "re-run of the minimum affected seed set following a registered fix superseded a seed's verdict with rows",
+               "reruns": c["reruns"], "elapsed_s": round(sum(d["elapsed_s"] for d in chunks), 1),
+               "model_transitions": sum(d["model_transitions"] for d in chunks), "real_stage_events": sum(d["real_stage_events"] for d in chunks),
+               "known_deviations": sorted({k for d in chunks for k in (d.get("known_deviations") or [])}),
+               "kernel_by_chunk": {Path(f).stem.split("-")[-1]: (d.get("kernel") or {}).get("head") for f, d in zip(files, chunks, strict=True)},
+               "seed_ranges": [Path(f).stem.split("-")[-1] for f in files], "workers": chunks[0]["workers"] if chunks else 0, "pass": ok}
+    summary["traces_per_s"] = round(summary["traces"] / summary["elapsed_s"], 2) if summary["elapsed_s"] else 0
+    Path(a.summary).write_text(json.dumps(summary, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     return 0 if ok else 1
 
 
