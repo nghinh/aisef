@@ -150,14 +150,24 @@ class Driver:
                              "sha256": sha(plugin) if plugin.is_file() else None,
                              "bin_line": next((ln.strip() for ln in plugin.read_text(encoding="utf-8").splitlines() if "BIN" in ln), None) if plugin.is_file() else None,
                              "compile_report": json.loads((self.art / "compile-report.json").read_text(encoding="utf-8")) if (self.art / "compile-report.json").is_file() else None}
+        # fresh-trunk topology (rehearsal finding): the run copy's trunk must be the FRESH plan state — 8ff9f13 plus the
+        # named preparation commits only — with no run-2 delivery on it and no remote to fetch one from
+        after = [ln for ln in self.git("log", "--oneline", "8ff9f13..master").splitlines() if ln.strip()]
+        P["fresh_topology"] = {"head_branch": self.git("rev-parse", "--abbrev-ref", "HEAD"), "master": self.git("rev-parse", "master"),
+                               "commits_after_8ff9f13": after, "ledgerlock_dir_absent_at_master": "ledgerlock" not in self.git("ls-tree", "--name-only", "master").split(),
+                               "remotes": self.git("remote").split(), "branches": self.git("branch", "--list").replace("*", "").split()}
+        t = P["fresh_topology"]
+        P["fresh_topology_ok"] = t["head_branch"] == "master" and t["ledgerlock_dir_absent_at_master"] and not t["remotes"] and len(after) <= 3 \
+            and all(("cost_cap" in ln or "guard plugin" in ln) for ln in after)
         P["gates"] = self.gates()
         P["agent_starts_before"] = self.agent_starts()
         P["story_evidence_before"] = self.story_evidence()
         P["ok"] = P["aisef_from_the_wheel_not_the_checkout"] and P["oracle_ok"] and P["guard_plugin"]["tracked_now"] and P["gates"].get("readiness") == "stale" \
+            and P["fresh_topology_ok"] \
             and all(v == "approved" for g, v in P["gates"].items() if g not in ("readiness", "pre-deploy")) and not P["story_evidence_before"]
         self.rec["phases"]["prepare"] = P
         self.save()
-        self.say(f"prepare ok={P['ok']} aisef={P['aisef_version']} wheel={P['aisef_from_the_wheel_not_the_checkout']} oracle={P['oracle_ok']} guard={P['guard_plugin']['tracked_now']} gates={P['gates']} doctor_red={P['doctor_red']}")
+        self.say(f"prepare ok={P['ok']} aisef={P['aisef_version']} wheel={P['aisef_from_the_wheel_not_the_checkout']} oracle={P['oracle_ok']} guard={P['guard_plugin']['tracked_now']} topology={P['fresh_topology_ok']} gates={P['gates']} doctor_red={P['doctor_red']}")
         return P["ok"]
 
     def kernel_first(self) -> bool:
@@ -330,6 +340,7 @@ class Driver:
             "resumes_forced": len(run.get("resumes", [])), "markers_not_reached": run.get("markers_not_reached"),
             "stops": [ln for ln in run.get("runlog_lines_epic", []) if "STOPPED" in ln],
         }
+        F["ok"] = bool(F["oracle"]["results"]) and F["progress"] is not None
         self.rec["phases"]["finish"] = F
         self.save()
         rec = {"run": self.a.run, "generated": now(), "candidate": self.rec["phases"].get("prepare", {}).get("freeze"),

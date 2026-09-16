@@ -143,3 +143,12 @@ oracle results, resumes, drift records, cost, duration, every operator arbitrati
   `wave=EPIC-01/w3 DONE` and `wave=EPIC-03/w1 DONE` lines of run.log, `aisef run` started again; survivors of the
   kill and 90 s after the resume start are measured and recorded, never silently killed. (6) *Stall*: no log growth
   for 2 h → SIGTERM, recorded as a measured stop.
+- **Trunk topology corrected (rehearsal finding, 2026-09-17).** The fresh copy had been prepared as branch `w1-run-1`
+  (8ff9f13 + fd4c644) while its `master` and `origin/*` still carried run-2's delivered state (47b3eb7, 5 stories,
+  the `ledgerlock/` package). The run loop integrates into the CURRENT branch (`control/worktree.py` resolves HEAD), so
+  the run itself would have been fresh, but the driver's finish clones `master` and nothing should be able to fetch a
+  delivery from a remote. Preparation now: `git checkout -B master w1-run-1`, `git branch -D w1-run-1`,
+  `git remote remove origin` — master = fd4c644 (8ff9f13 + the cost-cap commit), no `ledgerlock/` at master, no
+  remotes, one branch. The driver's prepare phase asserts exactly this (`fresh_topology_ok`: HEAD on master, only the
+  named preparation commits after 8ff9f13, no `ledgerlock/`, no remotes) before anything else runs. Runs 2 and 3 are
+  prepared the same way from the reference project at 8ff9f13.
