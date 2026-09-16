@@ -1,7 +1,7 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "phase": 7,
- "generated": "2026-09-16T10:10:16+00:00",
+ "generated": "2026-09-16T10:30:12+00:00",
  "stages": [
   "Developer",
   "Test",
@@ -13,7 +13,8 @@
   "Process/lease",
   "Evidence",
   "Workspace",
-  "Replay"
+  "Replay",
+  "Compound"
  ],
  "faults": [
   "QUALITY",
@@ -673,11 +674,191 @@
    "invariants": "INV-S.1",
    "test": "tests/hardening/test_fault_matrix.py::TestReplayFaults::test_client_drift_is_detected_before_execution",
    "status": "RED (MISSING, Phase 10)"
+  },
+  {
+   "id": "FM-C-01",
+   "stage": "Compound",
+   "fault": "INJECTED",
+   "scenario": "reviewer timeout AFTER retry hygiene restored an out-of-scope violation",
+   "expected_state": "blocked REVIEW_UNRUNNABLE; candidate kept; developer_sessions=2",
+   "expected_evidence": "retry:recovery tracked=[ledger.py]; 3 review executions on candidate 2",
+   "expected_recovery": "review stage only",
+   "invariants": "INV-G.1, INV-K.1",
+   "test": "tests/hardening/test_compound_faults.py::TestCF01ReviewerTimeoutAfterRecovery::test_recovery_then_reviewer_absence_keeps_the_candidate_and_never_reopens_the_developer",
+   "status": "GREEN"
+  },
+  {
+   "id": "FM-C-02",
+   "stage": "Compound",
+   "fault": "INJECTED",
+   "scenario": "security timeout AFTER a reviewer BLOCK was remediated",
+   "expected_state": "blocked SECURITY_UNRUNNABLE; developer_sessions=2",
+   "expected_evidence": "security executions on candidate 2 only",
+   "expected_recovery": "security stage only",
+   "invariants": "INV-G.2",
+   "test": "tests/hardening/test_compound_faults.py::TestCF02SecurityTimeoutAfterBlockRemediation::test_security_absence_after_a_fixed_block_retries_security_not_the_developer",
+   "status": "RED (SS-13)"
+  },
+  {
+   "id": "FM-C-03",
+   "stage": "Compound",
+   "fault": "INJECTED",
+   "scenario": "dirty tree (attributable) + process crash, then resume",
+   "expected_state": "retry:recovery restores; story completes",
+   "expected_evidence": "retry:recovery tracked=[ledger.py]",
+   "expected_recovery": "path-specific restore",
+   "invariants": "INV-K.1, INV-I.3",
+   "test": "tests/hardening/test_compound_faults.py::TestCF03DirtyTreeThenCrashThenResume::test_attributable_dirt_is_restored_on_resume_and_the_story_completes",
+   "status": "GREEN"
+  },
+  {
+   "id": "FM-C-03b",
+   "stage": "Compound",
+   "fault": "INJECTED",
+   "scenario": "dirty tree (attributable + UNATTRIBUTED) + crash, then resume",
+   "expected_state": "no session opens; unattributed file preserved; typed reason names it",
+   "expected_evidence": "retry:recovery ok=False unattributed=[…]",
+   "expected_recovery": "operator",
+   "invariants": "INV-I.3, INV-K.1",
+   "test": "tests/hardening/test_compound_faults.py::TestCF03DirtyTreeThenCrashThenResume::test_unattributed_dirt_is_never_deleted_and_no_session_opens",
+   "status": "GREEN"
+  },
+  {
+   "id": "FM-C-04",
+   "stage": "Compound",
+   "fault": "CRASH",
+   "scenario": "candidate committed, crash before the journal/evidence write, then resume with a no-op developer",
+   "expected_state": "the committed tree is graded (no fresh verdict) and completes",
+   "expected_evidence": "gate:verdict at the committed SHA",
+   "expected_recovery": "grade before any no-op decision",
+   "invariants": "INV-E.1, INV-H.2",
+   "test": "tests/hardening/test_compound_faults.py::TestCF04FreezeThenCrashBeforeEvidence::test_a_committed_but_unrecorded_candidate_is_graded_on_resume_not_treated_as_a_noop",
+   "status": "GREEN"
+  },
+  {
+   "id": "FM-C-05",
+   "stage": "Compound",
+   "fault": "CRASH",
+   "scenario": "gate PASSED + verdict written, crash before verification.completed, then rerun",
+   "expected_state": "rerun converges to DONE with exactly one integration",
+   "expected_evidence": "reconciled transaction; fresh PASS reused",
+   "expected_recovery": "reconcile then merge",
+   "invariants": "INV-E.1, INV-H.2, INV-M.1",
+   "test": "tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate::test_the_rerun_converges_to_done_with_exactly_one_integration",
+   "status": "RED (SS-61)"
+  },
+  {
+   "id": "FM-C-05b",
+   "stage": "Compound",
+   "fault": "CRASH",
+   "scenario": "same crash — the orphaned RUNNING claim",
+   "expected_state": "reconciled before any new session",
+   "expected_evidence": "RunReport.reconciled non-empty",
+   "expected_recovery": "reconcile",
+   "invariants": "INV-M.1",
+   "test": "tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate::test_the_rerun_reconciles_the_orphaned_claim",
+   "status": "GREEN"
+  },
+  {
+   "id": "FM-C-06",
+   "stage": "Compound",
+   "fault": "STALE",
+   "scenario": "duplicate (replayed) old record appended after resume",
+   "expected_state": "the candidate's own result decides; no false staleness",
+   "expected_evidence": "identity-bound latest",
+   "expected_recovery": "none",
+   "invariants": "INV-A.2, INV-D.1",
+   "test": "tests/hardening/test_compound_faults.py::TestCF06DuplicateEventAfterResume::test_a_replayed_old_record_never_outranks_the_candidates_own_result",
+   "status": "RED (F1)"
+  },
+  {
+   "id": "FM-C-07",
+   "stage": "Compound",
+   "fault": "STALE",
+   "scenario": "stale evidence after recovery (scope violation → hygiene → no-op)",
+   "expected_state": "re-graded, done",
+   "expected_evidence": "fresh gate:verdict on the same SHA",
+   "expected_recovery": "re-grade",
+   "invariants": "INV-E.1, INV-H.2, INV-K.2",
+   "test": "tests/hardening/test_verdict_freshness.py::TestInvariantEH",
+   "status": "RED (D-035)"
+  },
+  {
+   "id": "FM-C-08",
+   "stage": "Compound",
+   "fault": "STALE",
+   "scenario": "main advanced during a stopped story; resume merges it (refresh)",
+   "expected_state": "baseline stays the epoch's root, REUSED; story completes",
+   "expected_evidence": "one test:baseline at the entry parent",
+   "expected_recovery": "reuse",
+   "invariants": "INV-C.1",
+   "test": "tests/hardening/test_compound_faults.py::TestCF08BaselineDuringResume::test_the_baseline_stays_the_epochs_root_after_main_advanced",
+   "status": "GREEN"
+  },
+  {
+   "id": "FM-C-09",
+   "stage": "Compound",
+   "fault": "INJECTED",
+   "scenario": "client drift during replay (declared opencode, run with claude)",
+   "expected_state": "STOP / DECLARE_DRIFT before the first agent call",
+   "expected_evidence": "REPLAY_CONDITION_DRIFT record",
+   "expected_recovery": "owner approval",
+   "invariants": "INV-S.1",
+   "test": "tests/hardening/test_compound_faults.py::TestCF09ClientDriftDuringReplay::test_a_replay_declared_for_opencode_but_run_with_claude_stops_before_the_first_agent_call",
+   "status": "RED (MISSING, Phase 17)"
+  },
+  {
+   "id": "FM-C-10",
+   "stage": "Compound",
+   "fault": "INJECTED",
+   "scenario": "trunk conflict AFTER the gate passed (verifier completion)",
+   "expected_state": "never DONE; run stops and says so; branch kept; trunk never overwritten",
+   "expected_evidence": "merge_conflicts in the wave",
+   "expected_recovery": "human",
+   "invariants": "INV-A.3, INV-R.1",
+   "test": "tests/hardening/test_compound_faults.py::TestCF10MergeConflictAfterVerification::test_a_trunk_conflict_after_the_gate_passed_is_typed_never_done_and_keeps_the_branch",
+   "status": "GREEN"
+  },
+  {
+   "id": "FM-C-11",
+   "stage": "Compound",
+   "fault": "INJECTED",
+   "scenario": "orphan process left by the session during workspace cleanup",
+   "expected_state": "terminated and reaped before the workspace is removed",
+   "expected_evidence": "process ownership record",
+   "expected_recovery": "kill tree, verify, remove",
+   "invariants": "INV-L.1, INV-L.2",
+   "test": "tests/hardening/test_compound_faults.py::TestCF11OrphanProcessDuringCleanup::test_a_process_left_by_the_session_is_dead_before_the_workspace_is_removed",
+   "status": "RED (F5)"
+  },
+  {
+   "id": "FM-C-12",
+   "stage": "Compound",
+   "fault": "INJECTED",
+   "scenario": "approval invalidated (PRD edited) while a story is stopped, then resume",
+   "expected_state": "resume refused at the entry point; programmatic status STALE",
+   "expected_evidence": "approval cascade",
+   "expected_recovery": "re-approve",
+   "invariants": "INV-P.1",
+   "test": "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume::test_the_programmatic_readiness_status_is_stale_after_an_upstream_edit",
+   "status": "RED (SS-56)"
+  },
+  {
+   "id": "FM-C-12b",
+   "stage": "Compound",
+   "fault": "INJECTED",
+   "scenario": "same — the CLI precheck",
+   "expected_state": "blocking() names the stale upstream gate",
+   "expected_evidence": "—",
+   "expected_recovery": "re-approve",
+   "invariants": "INV-P.1",
+   "test": "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume::test_the_cli_precheck_blocks_a_resume_after_an_upstream_edit",
+   "status": "GREEN"
   }
  ],
  "status_count": {
-  "GREEN": 35,
-  "RED": 19,
+  "GREEN": 43,
+  "RED": 26,
   "NEEDS_TEST": 0
  }
 }

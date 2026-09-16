@@ -9,7 +9,8 @@
   "not_a_defect": 1,
   "new_sites_from_harness": [
    "SS-59",
-   "SS-60"
+   "SS-60",
+   "SS-61"
   ],
   "fault_cells_resolved": {
    "FM-A-03": "RED (SS-55)",
@@ -440,6 +441,23 @@
     "tests/hardening/scan8a/test_group_e.py::TestSS60ADoneStoryHasAFrozenCandidate::test_a_story_whose_freeze_failed_is_not_done"
    ],
    "notes_8a": "found by group A's fixture check while resolving SS-01 (2026-09-16)"
+  },
+  "SS-61": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "family": "FAM-RECOVERY",
+   "invariants": [
+    "INV-E.1",
+    "INV-H.2",
+    "INV-K.2"
+   ],
+   "site": "aisef/phases/implement.py::run_attempt (no-op shortcut) + control/journal reconcile (attempt.aborted → pending)",
+   "semantic_context": "the gate PASSED and gate:verdict was written, the process died before verification.completed; the rerun reconciles the transaction to pending, the developer's identical write is a no-op 'returning the verdict it already returned' (a PASS!), and the story ends FAILED 'sessions kept producing nothing to grade' — a fully verified candidate needs manual intervention",
+   "reproducer": "tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate::test_the_rerun_converges_to_done_with_exactly_one_integration",
+   "reproducers": [
+    "tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate::test_the_rerun_converges_to_done_with_exactly_one_integration"
+   ],
+   "notes_8a": "found by Phase 14 compound fault CF-05 (evidence write + crash before state update) on 2026-09-16; the no-op path never reads the verdict's OUTCOME, only its existence (D-035's sibling in the passing direction)"
   }
  }
 }

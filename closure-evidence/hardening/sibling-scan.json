@@ -1,10 +1,10 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "phase": "3 + 8A",
- "generated": "2026-09-16T10:10:16+00:00",
+ "generated": "2026-09-16T10:30:12+00:00",
  "method": "five read-only sweeps over aisef/ (recency-as-identity; prose-to-control-state; retry locality and recovery; ownership, tools, leases, scope; plus a test-inventory map), every candidate then verified in code by hand; CONFIRMED requires a deterministic RED reproducer that failed on the invariant assertion (tests/hardening/test_sibling_scan.py, run 2026-09-16 on the 1.7.6 baseline: 21 expected failures, 0 unexpected successes)",
  "counts": {
-  "CONFIRMED": 62,
+  "CONFIRMED": 63,
   "NEEDS_TEST": 0,
   "NOT_A_DEFECT": 6
  },
@@ -921,6 +921,21 @@
    "severity_proposed": "P3",
    "reproducer": "tests/hardening/scan8a/test_group_e.py::TestSS60ADoneStoryHasAFrozenCandidate::test_a_story_whose_freeze_failed_is_not_done",
    "notes": "found by group A's fixture check while resolving SS-01 (2026-09-16)"
+  },
+  {
+   "id": "SS-61",
+   "site": "aisef/phases/implement.py::run_attempt (no-op shortcut) + control/journal reconcile (attempt.aborted → pending)",
+   "family": "FAM-RECOVERY",
+   "invariants": [
+    "INV-E.1",
+    "INV-H.2",
+    "INV-K.2"
+   ],
+   "semantic_context": "the gate PASSED and gate:verdict was written, the process died before verification.completed; the rerun reconciles the transaction to pending, the developer's identical write is a no-op 'returning the verdict it already returned' (a PASS!), and the story ends FAILED 'sessions kept producing nothing to grade' — a fully verified candidate needs manual intervention",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate::test_the_rerun_converges_to_done_with_exactly_one_integration",
+   "notes": "found by Phase 14 compound fault CF-05 (evidence write + crash before state update) on 2026-09-16; the no-op path never reads the verdict's OUTCOME, only its existence (D-035's sibling in the passing direction)"
   }
  ]
 }
