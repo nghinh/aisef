@@ -5,16 +5,16 @@
  "generated": "2026-09-16T10:12:06+00:00",
  "rule": "No broad speculative sweep while fixing. A sibling found during implementation is classified, assigned to an already-frozen family where it belongs, and added here with explicit provenance (commit + finding source).",
  "counts": {
-  "total": 67,
+  "total": 71,
   "by_severity": {
-   "P1": 12,
-   "P2": 38,
-   "P3": 17
+   "P1": 13,
+   "P2": 40,
+   "P3": 18
   },
   "by_fix_family": {
    "F1-IDENTITY-PROVENANCE-FRESHNESS": 16,
    "F3-STRUCTURED-JUDGMENT-AUTHORITY": 13,
-   "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY": 10,
+   "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY": 14,
    "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE": 12,
    "F6-BENCH-RELEASE-APPROVAL": 6,
    "F5-PROCESS-TOOL-ENVIRONMENT": 10
@@ -621,6 +621,69 @@
     "reproducer": "tests/hardening/test_fault_matrix.py::TestDeveloperFaults::test_zero_output_on_a_retry_is_still_fatal_not_a_noop_decision",
     "provenance": "Phase 8A",
     "status": "OPEN"
+   },
+   {
+    "id": "AD-01",
+    "family": "FAM-OUTCOME",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P2",
+    "invariants": [
+     "INV-F.1",
+     "INV-F.4"
+    ],
+    "site": "aisef/clients/opencode.py::OpenCodeAdapter.run (empty stream + exit 0)",
+    "statement": "an OpenCode child that exits 0 having emitted zero events returns ok=True — a result with nothing in it; Claude's adapter returns infra 'stream ended without a result event'",
+    "reproducer": "tests/hardening/adapters/test_conformance.py::TestC03EmptyResponse::test_opencode",
+    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
+    "status": "OPEN",
+    "belongs_to_frozen_family": true
+   },
+   {
+    "id": "AD-03",
+    "family": "FAM-OUTCOME",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P2",
+    "invariants": [
+     "INV-F.4",
+     "INV-G.4"
+    ],
+    "site": "aisef/clients/opencode.py::OpenCodeAdapter.run (child death / truncated stream)",
+    "statement": "an OpenCode child dying mid-line or with exit 3 and a stderr heap-limit message is classified `error` (quality, charged to the developer) while Claude's adapter classifies the same death `infra`",
+    "reproducer": "tests/hardening/adapters/test_conformance.py::TestC11PartialStream::test_opencode",
+    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
+    "status": "OPEN",
+    "belongs_to_frozen_family": true
+   },
+   {
+    "id": "AD-04",
+    "family": "FAM-OUTCOME",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P3",
+    "invariants": [
+     "INV-F.4"
+    ],
+    "site": "aisef/clients/claude_code.py::ClaudeCodeAdapter.run (no result event)",
+    "statement": "when the Claude child dies without a result event the exit code and stderr are dropped (raw_result={}) — the operator cannot tell a heap crash from a cut",
+    "reproducer": "tests/hardening/adapters/test_conformance.py::TestC12ProcessDeath::test_claude",
+    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
+    "status": "OPEN",
+    "belongs_to_frozen_family": true
+   },
+   {
+    "id": "AD-05",
+    "family": "FAM-OUTCOME",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P1",
+    "invariants": [
+     "INV-F.4",
+     "INV-L.1"
+    ],
+    "site": "aisef/clients/claude_code.py::ClaudeCodeAdapter.run (result event after the timeout kill)",
+    "statement": "a result event that arrives after the adapter decided timeout flips ok=True while error still says 'exceeded 1s' — a cut session is reported as a successful one",
+    "reproducer": "tests/hardening/adapters/test_conformance.py::TestC13LateOutputAfterTimeout::test_claude",
+    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
+    "status": "OPEN",
+    "belongs_to_frozen_family": true
    }
   ],
   "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE": [
@@ -1041,6 +1104,69 @@
    "statement": "the gate PASSED and gate:verdict was written, the process died before verification.completed; the rerun reconciles the transaction to pending, the developer's identical write is a no-op 'returning the verdict it already returned' (a PASS!), and the story ends FAILED 'sessions kept producing nothing to grade' — a fully verified candidate needs manual intervention",
    "reproducer": "tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate::test_the_rerun_converges_to_done_with_exactly_one_integration",
    "provenance": "Phase 14 compound fault CF-05, commit after 259e587 (branch hardening/systematic-v1), 2026-09-16",
+   "status": "OPEN",
+   "belongs_to_frozen_family": true
+  },
+  {
+   "id": "AD-01",
+   "family": "FAM-OUTCOME",
+   "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+   "severity": "P2",
+   "invariants": [
+    "INV-F.1",
+    "INV-F.4"
+   ],
+   "site": "aisef/clients/opencode.py::OpenCodeAdapter.run (empty stream + exit 0)",
+   "statement": "an OpenCode child that exits 0 having emitted zero events returns ok=True — a result with nothing in it; Claude's adapter returns infra 'stream ended without a result event'",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC03EmptyResponse::test_opencode",
+   "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
+   "status": "OPEN",
+   "belongs_to_frozen_family": true
+  },
+  {
+   "id": "AD-03",
+   "family": "FAM-OUTCOME",
+   "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+   "severity": "P2",
+   "invariants": [
+    "INV-F.4",
+    "INV-G.4"
+   ],
+   "site": "aisef/clients/opencode.py::OpenCodeAdapter.run (child death / truncated stream)",
+   "statement": "an OpenCode child dying mid-line or with exit 3 and a stderr heap-limit message is classified `error` (quality, charged to the developer) while Claude's adapter classifies the same death `infra`",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC11PartialStream::test_opencode",
+   "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
+   "status": "OPEN",
+   "belongs_to_frozen_family": true
+  },
+  {
+   "id": "AD-04",
+   "family": "FAM-OUTCOME",
+   "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+   "severity": "P3",
+   "invariants": [
+    "INV-F.4"
+   ],
+   "site": "aisef/clients/claude_code.py::ClaudeCodeAdapter.run (no result event)",
+   "statement": "when the Claude child dies without a result event the exit code and stderr are dropped (raw_result={}) — the operator cannot tell a heap crash from a cut",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC12ProcessDeath::test_claude",
+   "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
+   "status": "OPEN",
+   "belongs_to_frozen_family": true
+  },
+  {
+   "id": "AD-05",
+   "family": "FAM-OUTCOME",
+   "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+   "severity": "P1",
+   "invariants": [
+    "INV-F.4",
+    "INV-L.1"
+   ],
+   "site": "aisef/clients/claude_code.py::ClaudeCodeAdapter.run (result event after the timeout kill)",
+   "statement": "a result event that arrives after the adapter decided timeout flips ok=True while error still says 'exceeded 1s' — a cut session is reported as a successful one",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC13LateOutputAfterTimeout::test_claude",
+   "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
    "status": "OPEN",
    "belongs_to_frozen_family": true
   }

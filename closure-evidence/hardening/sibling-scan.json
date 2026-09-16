@@ -1,10 +1,10 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "phase": "3 + 8A",
- "generated": "2026-09-16T10:30:12+00:00",
+ "generated": "2026-09-16T10:38:22+00:00",
  "method": "five read-only sweeps over aisef/ (recency-as-identity; prose-to-control-state; retry locality and recovery; ownership, tools, leases, scope; plus a test-inventory map), every candidate then verified in code by hand; CONFIRMED requires a deterministic RED reproducer that failed on the invariant assertion (tests/hardening/test_sibling_scan.py, run 2026-09-16 on the 1.7.6 baseline: 21 expected failures, 0 unexpected successes)",
  "counts": {
-  "CONFIRMED": 63,
+  "CONFIRMED": 67,
   "NEEDS_TEST": 0,
   "NOT_A_DEFECT": 6
  },
@@ -936,6 +936,61 @@
    "severity_proposed": "P1",
    "reproducer": "tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate::test_the_rerun_converges_to_done_with_exactly_one_integration",
    "notes": "found by Phase 14 compound fault CF-05 (evidence write + crash before state update) on 2026-09-16; the no-op path never reads the verdict's OUTCOME, only its existence (D-035's sibling in the passing direction)"
+  },
+  {
+   "id": "AD-01",
+   "site": "aisef/clients/opencode.py::OpenCodeAdapter.run (empty stream + exit 0)",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-F.1",
+    "INV-F.4"
+   ],
+   "semantic_context": "an OpenCode child that exits 0 having emitted zero events returns ok=True — a result with nothing in it; Claude's adapter returns infra 'stream ended without a result event'",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC03EmptyResponse::test_opencode",
+   "notes": "found by the Phase 15 adapter conformance suite (recorded streams, real adapter run()) on 2026-09-16"
+  },
+  {
+   "id": "AD-03",
+   "site": "aisef/clients/opencode.py::OpenCodeAdapter.run (child death / truncated stream)",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-F.4",
+    "INV-G.4"
+   ],
+   "semantic_context": "an OpenCode child dying mid-line or with exit 3 and a stderr heap-limit message is classified `error` (quality, charged to the developer) while Claude's adapter classifies the same death `infra`",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC11PartialStream::test_opencode",
+   "notes": "found by the Phase 15 adapter conformance suite (recorded streams, real adapter run()) on 2026-09-16"
+  },
+  {
+   "id": "AD-04",
+   "site": "aisef/clients/claude_code.py::ClaudeCodeAdapter.run (no result event)",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-F.4"
+   ],
+   "semantic_context": "when the Claude child dies without a result event the exit code and stderr are dropped (raw_result={}) — the operator cannot tell a heap crash from a cut",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC12ProcessDeath::test_claude",
+   "notes": "found by the Phase 15 adapter conformance suite (recorded streams, real adapter run()) on 2026-09-16"
+  },
+  {
+   "id": "AD-05",
+   "site": "aisef/clients/claude_code.py::ClaudeCodeAdapter.run (result event after the timeout kill)",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-F.4",
+    "INV-L.1"
+   ],
+   "semantic_context": "a result event that arrives after the adapter decided timeout flips ok=True while error still says 'exceeded 1s' — a cut session is reported as a successful one",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC13LateOutputAfterTimeout::test_claude",
+   "notes": "found by the Phase 15 adapter conformance suite (recorded streams, real adapter run()) on 2026-09-16"
   }
  ]
 }

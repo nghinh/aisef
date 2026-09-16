@@ -10,7 +10,11 @@
   "new_sites_from_harness": [
    "SS-59",
    "SS-60",
-   "SS-61"
+   "SS-61",
+   "AD-01",
+   "AD-03",
+   "AD-04",
+   "AD-05"
   ],
   "fault_cells_resolved": {
    "FM-A-03": "RED (SS-55)",
@@ -458,6 +462,85 @@
     "tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate::test_the_rerun_converges_to_done_with_exactly_one_integration"
    ],
    "notes_8a": "found by Phase 14 compound fault CF-05 (evidence write + crash before state update) on 2026-09-16; the no-op path never reads the verdict's OUTCOME, only its existence (D-035's sibling in the passing direction)"
+  },
+  "AD-01": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-F.1",
+    "INV-F.4"
+   ],
+   "site": "aisef/clients/opencode.py::OpenCodeAdapter.run (empty stream + exit 0)",
+   "semantic_context": "an OpenCode child that exits 0 having emitted zero events returns ok=True — a result with nothing in it; Claude's adapter returns infra 'stream ended without a result event'",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC03EmptyResponse::test_opencode",
+   "reproducers": [
+    "tests/hardening/adapters/test_conformance.py::TestC03EmptyResponse::test_opencode"
+   ],
+   "notes_8a": "found by the Phase 15 adapter conformance suite (recorded streams, real adapter run()) on 2026-09-16"
+  },
+  "AD-03": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-F.4",
+    "INV-G.4"
+   ],
+   "site": "aisef/clients/opencode.py::OpenCodeAdapter.run (child death / truncated stream)",
+   "semantic_context": "an OpenCode child dying mid-line or with exit 3 and a stderr heap-limit message is classified `error` (quality, charged to the developer) while Claude's adapter classifies the same death `infra`",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC11PartialStream::test_opencode",
+   "reproducers": [
+    "tests/hardening/adapters/test_conformance.py::TestC11PartialStream::test_opencode"
+   ],
+   "notes_8a": "found by the Phase 15 adapter conformance suite (recorded streams, real adapter run()) on 2026-09-16"
+  },
+  "AD-04": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-F.4"
+   ],
+   "site": "aisef/clients/claude_code.py::ClaudeCodeAdapter.run (no result event)",
+   "semantic_context": "when the Claude child dies without a result event the exit code and stderr are dropped (raw_result={}) — the operator cannot tell a heap crash from a cut",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC12ProcessDeath::test_claude",
+   "reproducers": [
+    "tests/hardening/adapters/test_conformance.py::TestC12ProcessDeath::test_claude"
+   ],
+   "notes_8a": "found by the Phase 15 adapter conformance suite (recorded streams, real adapter run()) on 2026-09-16"
+  },
+  "AD-05": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-F.4",
+    "INV-L.1"
+   ],
+   "site": "aisef/clients/claude_code.py::ClaudeCodeAdapter.run (result event after the timeout kill)",
+   "semantic_context": "a result event that arrives after the adapter decided timeout flips ok=True while error still says 'exceeded 1s' — a cut session is reported as a successful one",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC13LateOutputAfterTimeout::test_claude",
+   "reproducers": [
+    "tests/hardening/adapters/test_conformance.py::TestC13LateOutputAfterTimeout::test_claude"
+   ],
+   "notes_8a": "found by the Phase 15 adapter conformance suite (recorded streams, real adapter run()) on 2026-09-16"
+  },
+  "SS-28-adapter": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "family": "FAM-PROSE",
+   "invariants": [
+    "INV-F.4"
+   ],
+   "site": "aisef/clients/stream.py::exit_status_of via ClaudeCodeAdapter (502 + final text mentioning 401)",
+   "alias_of": "SS-28",
+   "semantic_context": "AD-02: the same SS-28 defect reproduced through the real Claude adapter — a 502 with a final text about a 401 handler is classified `auth`; OpenCode's adapter says `infra`",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC06bProviderErrorWithAuthProse::test_claude",
+   "reproducers": [
+    "tests/hardening/adapters/test_conformance.py::TestC06bProviderErrorWithAuthProse::test_claude"
+   ],
+   "notes_8a": "Phase 15; not a new defect id — SS-28's adapter-level reproducer"
   }
  }
 }
