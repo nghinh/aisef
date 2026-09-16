@@ -1,0 +1,635 @@
+{
+  "source": "epics.md",
+  "epics": [
+    {
+      "id": "EPIC-01",
+      "title": "Foundation, Hash-Chain Append & Rid Semantics",
+      "goal": "A Python developer can import `ledgerlock`, open a `Ledger` at a path, and append `put`/`delete` mutations that are durably committed to a SHA-256-chained JSONL file. The on-disk format — line shape, canonical-bytes encoding, `GENESIS` `prev_hash`, NFC key normalization, `os.fsync` before return — is frozen. `append` enforces idempotent replay by `rid`, conflict detection by `rid`, and tombstone semantics for `delete` in one rid-lookup code path. **FRs covered:** FR-1, FR-2, FR-3, FR-4, FR-5, FR-13, FR-14.",
+      "stories": [
+        "STORY-01-01",
+        "STORY-01-02",
+        "STORY-01-03",
+        "STORY-01-04",
+        "STORY-01-05",
+        "STORY-01-06"
+      ]
+    },
+    {
+      "id": "EPIC-02",
+      "title": "Independent Verify & Deterministic Snapshot",
+      "goal": "A library caller (or CI operator) calls `Ledger.verify()` and gets a verdict computed end-to-end from disk with no reliance on `append`-time cache; the verifier detects byte edits committed between `append` and `verify`. A separate caller materializes the current state via `Ledger.snapshot()` as a UTF-8-codepoint-sorted JSON object, byte-stable for a given chain. **FRs covered:** FR-6, FR-7, FR-9.",
+      "stories": [
+        "STORY-02-01",
+        "STORY-02-02"
+      ]
+    },
+    {
+      "id": "EPIC-03",
+      "title": "Atomic Batch & Repair-Tail Recovery",
+      "goal": "A library caller commits N mutations atomically: a crash anywhere leaves the JSONL either fully updated or byte-identical to its pre-batch state; any conflict inside the batch rejects the whole batch. A separate operator strips a truncated final line from a JSONL whose last line is unparseable, leaving a clean chain; mid-chain corruption is refused. **FRs covered:** FR-8, FR-10.",
+      "stories": [
+        "STORY-03-01",
+        "STORY-03-02"
+      ]
+    },
+    {
+      "id": "EPIC-04",
+      "title": "CLI Surface & Exit-Code Contract",
+      "goal": "An operator runs `python -m ledgerlock <verify|snapshot|apply|repair-tail> <args>` and gets a stable exit-code contract (0/2/3/4/5) and a one-line stderr status line per invocation; stdout stays silent on success so CI pipelines and `|` consumers do not parse human prose. **FRs covered:** FR-11, FR-12.",
+      "stories": [
+        "STORY-04-01",
+        "STORY-04-02",
+        "STORY-04-03"
+      ]
+    },
+    {
+      "id": "EPIC-05",
+      "title": "Quality Gates — Coverage, Parity & No-Side-Channels",
+      "goal": "A maintainer runs the test suite under both `unittest discover` and `pytest` and gets identical pass/fail outcomes; `coverage report` shows ≥85% line coverage against `ledgerlock/`; the runtime import surface contains only the stdlib allowlist — no `socket`, `subprocess`, `os.system`, or any networking module. **FRs covered:** FR-14.",
+      "stories": [
+        "STORY-05-01",
+        "STORY-05-02",
+        "STORY-05-03"
+      ]
+    }
+  ],
+  "stories": [
+    {
+      "id": "STORY-01-01",
+      "epic_id": "EPIC-01",
+      "title": "Package skeleton, CLI surface, and NFC key normalization",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given any string `s`, `from ledgerlock.format import normalize_key; normalize_key(s)` returns `unicodedata.normalize(\"NFC\", s)` byte-for-byte.",
+        "Given the NFC string `\"\\u00e9\"` (U+00E9) and its NFD decomposition `\"e\\u0301\"`, calling `normalize_key` on each returns byte-identical results equal to `\"\\u00e9\"`.",
+        "Given a fresh `pyproject.toml` declaring `name = \"ledgerlock\"` and `requires-python = \">=3.11\"`, an empty `ledgerlock/` package, and an empty `tests/` directory, `python -c \"import ledgerlock; print(ledgerlock.__file__)\"` prints a path ending in `ledgerlock/__init__.py` with no exception.",
+        "Given the same checkout, `python -m ledgerlock --help` in a subprocess exits `0` and the stdout argparse usage line contains each of the literal strings `verify`, `snapshot`, `apply`, and `repair-tail`.",
+        "Given the `ledgerlock/` package source tree, `grep -RE \"^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)\" ledgerlock/` exits `1` (zero matches).",
+        "Given the `ledgerlock/` package source tree, `grep -RE \"os\\.system|subprocess\\.|socket\\.\" ledgerlock/` exits `1` (zero matches).",
+        "Given an `__init__.py`, `from ledgerlock import Ledger, ConflictError` returns both names without exception and `Ledger` is a callable class."
+      ],
+      "covers": [
+        "FR-1",
+        "FR-14"
+      ],
+      "write_scope": [
+        "pyproject.toml",
+        "ledgerlock/__init__.py",
+        "ledgerlock/__main__.py",
+        "ledgerlock/format.py",
+        "ledgerlock/cli.py",
+        "tests/__init__.py",
+        "tests/test_skeleton.py",
+        "tests/test_nfc_normalization.py",
+        "README.md",
+        "poetry.lock",
+        "uv.lock",
+        "pdm.lock"
+      ],
+      "verification_contract": [
+        "unit"
+      ],
+      "depends_on": [],
+      "screens": [],
+      "file": "stories/EPIC-01/STORY-01-01.md"
+    },
+    {
+      "id": "STORY-01-02",
+      "epic_id": "EPIC-01",
+      "title": "`format.canonical_bytes` and `format.GENESIS` constant",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given a dict `line` whose `hash` and `prev_hash` are unset, `canonical_bytes(line)` returns exactly `json.dumps(line, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False).encode(\"utf-8\")`.",
+        "Given a second dict element-equal to the first, `canonical_bytes` on it returns bytes byte-identical to the first call's bytes.",
+        "Given a dict whose value includes a non-ASCII string (e.g. `\"é\"` U+00E9), `canonical_bytes` encodes it as UTF-8 literal (`\\xc3\\xa9`, not `\\u00e9`) and is byte-stable across two invocations.",
+        "Given two dicts whose keys differ only in insertion order, `canonical_bytes` returns byte-identical bytes.",
+        "Given `from ledgerlock.format import GENESIS`, `GENESIS == \"GENESIS\"` (literal seven-character string, distinct from any 64-char hex string).",
+        "Given `canonical_bytes` called twice on the same dict after round-tripping through `json.loads`, the returned bytes equal the original bytes."
+      ],
+      "covers": [
+        "FR-2"
+      ],
+      "write_scope": [
+        "ledgerlock/format.py",
+        "tests/test_format.py"
+      ],
+      "verification_contract": [
+        "unit",
+        "security"
+      ],
+      "depends_on": [
+        "STORY-01-01"
+      ],
+      "screens": [],
+      "file": "stories/EPIC-01/STORY-01-02.md"
+    },
+    {
+      "id": "STORY-01-03",
+      "epic_id": "EPIC-01",
+      "title": "`format.line_hash` SHA-256 hex digest",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given a `prev_hash` string and a line dict with hash fields emptied, `line_hash(prev_hash, line)` returns exactly 64 lowercase hex characters.",
+        "Given two distinct `prev_hash` values against the same line, `line_hash` on each returns different results.",
+        "Given a line dict whose `hash` and `prev_hash` are already set, `line_hash` ignores them (it operates on a copy with those fields emptied).",
+        "Given the same `(prev_hash, line)` pair, `line_hash` returns the same digest across two invocations.",
+        "Given a `prev_hash` of literal `\"GENESIS\"`, `line_hash` accepts the non-hex seven-character string without raising."
+      ],
+      "covers": [
+        "FR-2"
+      ],
+      "write_scope": [
+        "ledgerlock/format.py",
+        "tests/test_format.py"
+      ],
+      "verification_contract": [
+        "unit",
+        "security"
+      ],
+      "depends_on": [
+        "STORY-01-02"
+      ],
+      "screens": [],
+      "file": "stories/EPIC-01/STORY-01-03.md"
+    },
+    {
+      "id": "STORY-01-04",
+      "epic_id": "EPIC-01",
+      "title": "`store.read_lines` and `store.write_atomic` (pure I/O primitives)",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given a JSONL with N lines, `store.read_lines(path)` returns a list of N `bytes` objects, each line's trailing `\\n` stripped.",
+        "Given a missing file path, `store.read_lines(path)` raises `FileNotFoundError`.",
+        "Given an empty file (zero bytes), `store.read_lines(path)` returns an empty list.",
+        "Given `store.write_atomic(path, [b\"{...}\\n\", b\"{...}\\n\"])`, the path's bytes equal the concatenation and a separate `read_lines` call returns the two lines.",
+        "Given `store.write_atomic` called with a non-empty existing path, a simulated crash between temp-write and `os.replace` (e.g. patching `os.replace` to raise) leaves the original path byte-identical.",
+        "Given a call to `store.write_atomic`, the temp file used is created in the same directory as the target path (so `os.replace` is atomic on POSIX)."
+      ],
+      "covers": [
+        "FR-13"
+      ],
+      "write_scope": [
+        "ledgerlock/store.py",
+        "tests/test_store.py"
+      ],
+      "verification_contract": [
+        "unit"
+      ],
+      "depends_on": [
+        "STORY-01-03"
+      ],
+      "screens": [],
+      "file": "stories/EPIC-01/STORY-01-04.md"
+    },
+    {
+      "id": "STORY-01-05",
+      "epic_id": "EPIC-01",
+      "title": "`Ledger.append` writes a hash-chained line with fsync and rejects empty keys",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given a fresh `Ledger(path)` whose JSONL does not yet exist, `append((\"put\", \"k\", {\"v\": 1}, \"r1\", 100))` creates the file with exactly one line terminated by `\\n` whose `op == \"put\"`, `key == \"k\"`, `id == \"r1\"`, `ts == 100`, `value == {\"v\": 1}`, `prev_hash == \"GENESIS\"`, and `hash == format.line_hash(\"GENESIS\", line_with_hash_fields_emptied)`.",
+        "Given a second `append` after the first, the new line's `prev_hash` equals the first line's stored `hash` and its own `hash` equals `line_hash(first_hash, new_line_emptied)`.",
+        "Given `append((\"put\", \"\", \"v\", \"r\", 1))` against an empty ledger, `ValueError` is raised and no file is created.",
+        "Given an existing JSONL written by a previous `Ledger` instance, a fresh `Ledger` opened on the same path computes its first `append`'s `prev_hash` from the tail of the file (the new instance reads the tail from disk, not from any in-memory state).",
+        "Given `append` returns successfully on an empty path, a separate process opening the same path finds the new line present and the file terminated by `\\n`."
+      ],
+      "covers": [
+        "FR-1",
+        "FR-2",
+        "FR-13"
+      ],
+      "write_scope": [
+        "ledgerlock/ledger.py",
+        "ledgerlock/__init__.py",
+        "tests/test_ledger.py"
+      ],
+      "verification_contract": [
+        "unit",
+        "security"
+      ],
+      "depends_on": [
+        "STORY-01-04"
+      ],
+      "screens": [],
+      "file": "stories/EPIC-01/STORY-01-05.md"
+    },
+    {
+      "id": "STORY-01-06",
+      "epic_id": "EPIC-01",
+      "title": "`Ledger.append` enforces rid-based replay, conflict, and tombstone semantics",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given a committed `put(\"k\", \"v1\", \"r1\", 100)`, `append((\"put\", \"k\", \"anything\", \"r1\", 999))` (same `rid`, different value and ts) returns the original line dict byte-for-byte with `replayed is True`, `committed is False`, and the chain length is unchanged.",
+        "Given the same committed line, `append((\"put\", \"k\", \"v2\", \"r2\", 200))` (different `rid`) raises `ConflictError` with `key == \"k\"`, `incoming_rid == \"r2\"`, `committed_rid == \"r1\"`, `batch_index is None`, and the JSONL is byte-identical to its pre-call state.",
+        "Given a committed `delete(\"k\", \"r1\", 100)`, `append((\"put\", \"k\", \"v\", \"r2\", 200))` (different `rid`) raises `ConflictError`.",
+        "Given the same committed `delete(\"k\", \"r1\", 100)`, `append((\"put\", \"k\", \"v\", \"r1\", 200))` (same `rid`) returns the delete line dict byte-for-byte with `replayed is True`, `committed is False`.",
+        "Given a key committed with NFC form `\"\\u00e9\"` (U+00E9) and `rid == \"r1\"`, `append((\"put\", \"e\\u0301\", \"v2\", \"r1\", 200))` (NFD form, same `rid`) is a replay: the returned line dict's `key` equals `\"\\u00e9\"` byte-exact, `replayed is True`, and the chain length is unchanged."
+      ],
+      "covers": [
+        "FR-3",
+        "FR-4",
+        "FR-5"
+      ],
+      "write_scope": [
+        "ledgerlock/ledger.py",
+        "tests/test_conflict.py"
+      ],
+      "verification_contract": [
+        "unit"
+      ],
+      "depends_on": [
+        "STORY-01-05"
+      ],
+      "screens": [],
+      "file": "stories/EPIC-01/STORY-01-06.md"
+    },
+    {
+      "id": "STORY-02-01",
+      "epic_id": "EPIC-02",
+      "title": "End-to-end verify from disk ignores in-memory state",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given a JSONL with N valid lines written through `Ledger.append`, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` without raising.",
+        "Given a zero-byte JSONL, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` without raising.",
+        "Given a missing JSONL file path, `verify()` raises `FileNotFoundError`.",
+        "Given a JSONL whose line at index `i` has had its `hash` field overwritten with `\"0\" * 64` out-of-band after `append` returned, `verify()` from a fresh `Ledger` instance returns `{\"ok\": False, \"first_bad_index\": i}` (or the earlier index whose chain is now broken).",
+        "Given a JSONL whose `value` field on line `i` is mutated out-of-band after `append` (e.g. `\"v1\"` → `\"v2\"`), `verify()` from a fresh `Ledger` instance returns `{\"ok\": False, \"first_bad_index\": i}`."
+      ],
+      "covers": [
+        "FR-6",
+        "FR-7"
+      ],
+      "write_scope": [
+        "ledgerlock/ledger.py",
+        "tests/test_verify_independent.py"
+      ],
+      "verification_contract": [
+        "unit",
+        "e2e",
+        "security"
+      ],
+      "depends_on": [
+        "STORY-01-06"
+      ],
+      "screens": [],
+      "file": "stories/EPIC-02/STORY-02-01.md"
+    },
+    {
+      "id": "STORY-02-02",
+      "epic_id": "EPIC-02",
+      "title": "Deterministic snapshot sorted by NFC key",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given `put(\"a\", 1, r, t)`, `put(\"c\", 3, r, t)`, `put(\"b\", 2, r, t)` written in that order, two calls to `snapshot()` with no intervening mutations return equal dicts and `json.dumps(result, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False)` lists keys in `a, b, c` order.",
+        "Given `put(\"k\", \"v\", r1, t1)` followed by `delete(\"k\", r2, t2)`, `snapshot()` returns a dict with no key `\"k\"`.",
+        "Given `put(\"e\\u0301\", \"v\", r, t)` (NFD form) and a follow-up `put(\"\\u00e9\", \"v2\", r, t)` with the same `rid` (idempotent replay), `snapshot()` returns a dict with the NFC key `\"\\u00e9\"` and value `\"v\"`.",
+        "Given two `Ledger` instances opened in succession over the same on-disk chain, each `snapshot()` returns equal dicts."
+      ],
+      "covers": [
+        "FR-9"
+      ],
+      "write_scope": [
+        "ledgerlock/ledger.py",
+        "tests/test_snapshot_determinism.py"
+      ],
+      "verification_contract": [
+        "unit"
+      ],
+      "depends_on": [
+        "STORY-02-01"
+      ],
+      "screens": [],
+      "file": "stories/EPIC-02/STORY-02-02.md"
+    },
+    {
+      "id": "STORY-03-01",
+      "epic_id": "EPIC-03",
+      "title": "Atomic `apply_batch` rejects on any conflict",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given an empty ledger and a batch of 3 conflict-free `put` elements, `apply_batch(ops)` produces a JSONL with exactly 3 new lines whose chain verifies end-to-end and whose first batch line's `prev_hash` equals `\"GENESIS\"`.",
+        "Given a ledger with one committed `put(\"k\", \"v1\", \"r1\", 100)` and a batch `[(\"put\", \"k\", \"v2\", \"r1\", 200), (\"put\", \"k2\", 2, \"r2\", 201)]`, the first element is an idempotent replay against the pre-batch state and the batch appends exactly one new line (for `k2`); the JSONL gains exactly one line.",
+        "Given an empty ledger and a batch `[(\"put\", \"k\", \"v1\", \"r1\", 100), (\"put\", \"k\", \"v2\", \"r2\", 200)]`, `apply_batch` raises `ConflictError` with `key == \"k\"`, `incoming_rid == \"r2\"`, `committed_rid == \"r1\"`, `batch_index == 1`, and the JSONL on disk is byte-identical to its pre-batch state.",
+        "Given a ledger whose most recent committed mutation on `k` has `rid == \"r1\"` and a batch whose element 0 targets `k` with `rid == \"r2\"`, `apply_batch` raises `ConflictError` with `batch_index == 0` and the JSONL is unchanged.",
+        "Given a simulated crash between temp-file write and `os.replace` (e.g. by patching `os.replace` to raise), `apply_batch` against a non-empty ledger leaves the JSONL byte-identical to its pre-batch state and `verify()` returns `{\"ok\": True, \"first_bad_index\": None}`."
+      ],
+      "covers": [
+        "FR-8",
+        "FR-13"
+      ],
+      "write_scope": [
+        "ledgerlock/ledger.py",
+        "tests/test_atomic_batch.py"
+      ],
+      "verification_contract": [
+        "unit",
+        "e2e",
+        "security"
+      ],
+      "depends_on": [
+        "STORY-02-01"
+      ],
+      "screens": [],
+      "file": "stories/EPIC-03/STORY-03-01.md"
+    },
+    {
+      "id": "STORY-03-02",
+      "epic_id": "EPIC-03",
+      "title": "`repair_tail` repairs only the tail: terminates a valid unterminated record, strips a truncated fragment, refuses otherwise",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given a JSONL whose final line parses, satisfies the line schema, carries the correct `prev_hash`/`hash` for its chain position and valid request-id semantics, but whose last byte is not `\\n`: `verify()` returns `{\"ok\": False, \"first_bad_index\": <index of that final line>, \"reason\": \"unterminated\"}` (a repairable tail-integrity condition, not a clean ledger); `repair_tail()` appends exactly one `b\"\\n\"` and changes no other byte — the file afterwards equals the original bytes plus `b\"\\n\"`, no record is removed — and a subsequent `verify()` returns `{\"ok\": True, \"first_bad_index\": None}`.",
+        "Given a JSONL whose bytes after the last complete `\\n`-terminated line are an incomplete JSON fragment (e.g. ends mid-`{`) and whose preceding lines form a valid chain, `repair_tail()` truncates only that fragment back to the last complete record boundary: every preserved line's bytes are unchanged, the new final byte is `\\n`, and a subsequent `verify()` returns `{\"ok\": True, \"first_bad_index\": None}`.",
+        "Given a JSONL whose final line parses as JSON but whose own `hash` does not equal the recomputed chain hash (tail tampering, not truncation), `repair_tail()` refuses: the file is byte-identical before and after, no record is deleted, and the corruption is reported via the verify verdict (`ok=False`, `first_bad_index` = that line's index).",
+        "Given a JSONL whose final line parses as JSON but fails any other integrity rule — its `prev_hash` does not match the preceding line's `hash` (wrong chain position), a schema violation (missing or extra field, wrong type), a key that is not NFC-normalized, or a request-id that violates the ledger's rid semantics — `repair_tail()` refuses: byte-identical before and after, no record deleted, and the verify verdict reports the failure.",
+        "Given a JSONL with any corruption at an index earlier than the final line (mid-chain), with or without a damaged tail, `repair_tail()` refuses: the file is byte-identical before and after and the verify verdict reports the earliest corruption.",
+        "Given a JSONL whose final record is valid but unterminated (as in criterion 1), `Ledger.append(...)` and `apply_batch(...)` never write a new record directly after it: either the mutation first repairs the tail by appending the missing `\\n` and then appends normally, or it fails safely by raising without modifying the file; in both cases the previously committed record is preserved on its own line, no line ever holds two records, and `verify()` afterwards never reports a concatenated line.",
+        "Given a clean, `\\n`-terminated JSONL whose every line parses and verifies, `repair_tail()` returns without raising and the file is byte-identical before and after."
+      ],
+      "covers": [
+        "FR-10"
+      ],
+      "write_scope": [
+        "ledgerlock/ledger.py",
+        "tests/test_repair_tail.py"
+      ],
+      "verification_contract": [
+        "unit",
+        "security"
+      ],
+      "depends_on": [
+        "STORY-03-01"
+      ],
+      "screens": [],
+      "file": "stories/EPIC-03/STORY-03-02.md"
+    },
+    {
+      "id": "STORY-04-01",
+      "epic_id": "EPIC-04",
+      "title": "CLI subcommands wire library operations and write the snapshot to `--out`",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given a fresh JSONL written via `Ledger.append`, `python -m ledgerlock verify <ledger>` in a subprocess exits `0`, stdout is empty, and stderr contains exactly one line whose first word is `verify` and which contains the substring `ok`.",
+        "Given the same fresh JSONL, `python -m ledgerlock snapshot <ledger> --out <snap>` exits `0`, stdout is empty, and the contents of `<snap>` equal `json.dumps(Ledger.snapshot(), sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False).encode(\"utf-8\") + b\"\\n\"` byte-for-byte.",
+        "Given a `batch.json` containing three conflict-free `put` elements and a fresh ledger, `python -m ledgerlock apply --batch <batch.json> <ledger>` exits `0`, stdout is empty, and the JSONL contains exactly the lines from the batch (verified by `verify()`).",
+        "Given a clean JSONL, `python -m ledgerlock repair-tail <ledger>` exits `0`, stdout is empty, and the JSONL is byte-identical before and after."
+      ],
+      "covers": [
+        "FR-11"
+      ],
+      "write_scope": [
+        "ledgerlock/cli.py",
+        "ledgerlock/__main__.py",
+        "tests/test_cli_exit_codes.py"
+      ],
+      "verification_contract": [
+        "unit"
+      ],
+      "depends_on": [
+        "STORY-03-02"
+      ],
+      "screens": [],
+      "file": "stories/EPIC-04/STORY-04-01.md"
+    },
+    {
+      "id": "STORY-04-02",
+      "epic_id": "EPIC-04",
+      "title": "Exact exit-code contract for the CLI",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given any subcommand invoked with the wrong number of positional arguments, the CLI exits with code `2` and writes nothing to stdout.",
+        "Given `apply --batch` invoked with a missing batch file, the CLI exits `3` and writes nothing to stdout.",
+        "Given a JSONL with one committed `put(\"k\", \"v1\", \"r1\", 100)` and a batch file whose element 0 is `(\"put\", \"k\", \"v2\", \"r2\", 200)`, `apply --batch <b.json> <ledger>` exits `4`, writes nothing to stdout, and leaves the JSONL byte-identical to its pre-call state.",
+        "Given a JSONL whose line 17 has been mutated out-of-band on disk, `verify` exits `5` and writes nothing to stdout.",
+        "Given a JSONL with mid-chain corruption at line 17, `repair-tail` exits `5` and writes nothing to stdout.",
+        "Given `snapshot` invoked without `--out`, the CLI exits `2`."
+      ],
+      "covers": [
+        "FR-12"
+      ],
+      "write_scope": [
+        "ledgerlock/cli.py",
+        "tests/test_cli_exit_codes.py"
+      ],
+      "verification_contract": [
+        "unit"
+      ],
+      "depends_on": [
+        "STORY-04-01"
+      ],
+      "screens": [],
+      "file": "stories/EPIC-04/STORY-04-02.md"
+    },
+    {
+      "id": "STORY-04-03",
+      "epic_id": "EPIC-04",
+      "title": "Stderr status shapes on success",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given every success path for `verify ok`, the CLI writes nothing to stdout and a single line beginning with `verify` to stderr.",
+        "Given every success path for `apply` (atomic batch committed), the CLI writes nothing to stdout and a single line beginning with `apply` to stderr that mentions the count of appended lines.",
+        "Given every success path for `snapshot`, the CLI writes nothing to stdout and a single line beginning with `snapshot` to stderr that mentions the destination path.",
+        "Given every success path for `repair-tail` (clean chain or successful repair), the CLI writes nothing to stdout and a single line beginning with `repair-tail` to stderr.",
+        "Given any success path, the captured stdout via `subprocess.PIPE` equals `b\"\"`."
+      ],
+      "covers": [
+        "FR-12"
+      ],
+      "write_scope": [
+        "ledgerlock/cli.py",
+        "tests/test_cli_exit_codes.py"
+      ],
+      "verification_contract": [
+        "unit"
+      ],
+      "depends_on": [
+        "STORY-04-02"
+      ],
+      "screens": [],
+      "file": "stories/EPIC-04/STORY-04-03.md"
+    },
+    {
+      "id": "STORY-05-01",
+      "epic_id": "EPIC-05",
+      "title": "Property-based round-trip test for hash chain and snapshot stability",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given the library at this point in the epic chain, when the property test runs 50 random mutation sequences against a temp JSONL (each sequence a list of `(op, key, value, rid, ts)` tuples; seeded with a fixed seed for reproducibility), then for every sequence that did not raise `ConflictError`, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` AND two calls to `snapshot()` return equal dicts.",
+        "Given the same property test, when a sequence raises `ConflictError`, the JSONL on disk after the sequence is byte-identical to its pre-sequence state for any prefix up to (and including) the offending element, and the chain length did not grow past that prefix.",
+        "Given the same property test, when it is executed under `python -m unittest discover` and again under `pytest`, both runs report the same total passed/failed counts for the property-test module."
+      ],
+      "covers": [
+        "FR-2",
+        "FR-3",
+        "FR-4",
+        "FR-9"
+      ],
+      "write_scope": [
+        "tests/test_property_roundtrip.py"
+      ],
+      "verification_contract": [
+        "unit",
+        "security"
+      ],
+      "depends_on": [
+        "STORY-03-01"
+      ],
+      "screens": [],
+      "file": "stories/EPIC-05/STORY-05-01.md"
+    },
+    {
+      "id": "STORY-05-02",
+      "epic_id": "EPIC-05",
+      "title": "Coverage ≥85% and unittest/pytest parity gate",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given the full test suite at this point in the epic chain, `coverage run -m unittest discover && coverage report --include=ledgerlock/*` shows a `ledgerlock/` total line coverage ≥85%.",
+        "Given the same full test suite, `pytest` discovers and runs the same suite and reports the same total passed/failed counts as `python -m unittest discover`.",
+        "Given the full test suite at this point, the `tests/` source itself is excluded from the coverage measurement."
+      ],
+      "covers": [
+        "FR-14"
+      ],
+      "write_scope": [
+        "tests/test_coverage_gate.py",
+        "pyproject.toml",
+        "poetry.lock",
+        "uv.lock",
+        "pdm.lock"
+      ],
+      "verification_contract": [
+        "unit"
+      ],
+      "depends_on": [
+        "STORY-05-01"
+      ],
+      "screens": [],
+      "file": "stories/EPIC-05/STORY-05-02.md"
+    },
+    {
+      "id": "STORY-05-03",
+      "epic_id": "EPIC-05",
+      "title": "No-side-channels grep guard test",
+      "as_a": "",
+      "i_want": "",
+      "so_that": "",
+      "acceptance_criteria": [
+        "Given the `ledgerlock/` source tree, `grep -RE \"^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)\" ledgerlock/` returns no matches and the test passes.",
+        "Given the `ledgerlock/` source tree, `grep -RE \"os\\.system|subprocess\\.|socket\\.\" ledgerlock/` returns no matches and the test passes.",
+        "Given the same test module, when it is executed under `python -m unittest discover` and again under `pytest`, both runners discover and execute the test."
+      ],
+      "covers": [
+        "FR-14"
+      ],
+      "write_scope": [
+        "tests/test_no_side_channels.py"
+      ],
+      "verification_contract": [
+        "unit"
+      ],
+      "depends_on": [
+        "STORY-05-01"
+      ],
+      "screens": [],
+      "file": "stories/EPIC-05/STORY-05-03.md"
+    }
+  ],
+  "waves": {
+    "EPIC-01": [
+      [
+        "STORY-01-01"
+      ],
+      [
+        "STORY-01-02"
+      ],
+      [
+        "STORY-01-03"
+      ],
+      [
+        "STORY-01-04"
+      ],
+      [
+        "STORY-01-05"
+      ],
+      [
+        "STORY-01-06"
+      ]
+    ],
+    "EPIC-02": [
+      [
+        "STORY-02-01"
+      ],
+      [
+        "STORY-02-02"
+      ]
+    ],
+    "EPIC-03": [
+      [
+        "STORY-03-01"
+      ],
+      [
+        "STORY-03-02"
+      ]
+    ],
+    "EPIC-04": [
+      [
+        "STORY-04-01"
+      ],
+      [
+        "STORY-04-02"
+      ],
+      [
+        "STORY-04-03"
+      ]
+    ],
+    "EPIC-05": [
+      [
+        "STORY-05-01"
+      ],
+      [
+        "STORY-05-02",
+        "STORY-05-03"
+      ]
+    ]
+  },
+  "gate": {
+    "passed": true,
+    "errors": [],
+    "warnings": [
+      "epics are fully serialized, no stories can run in parallel: EPIC-01 (6 story) — review `depends_on`, only declare when a story truly needs the **output** of an earlier one",
+      "stories in the same epic write exactly the same files: STORY-01-02, STORY-01-03 → ledgerlock/format.py, tests/test_format.py; STORY-04-02, STORY-04-03 → ledgerlock/cli.py, tests/test_cli_exit_codes.py — check that each one adds behaviour the others do not. A story whose criteria the earlier story already satisfies cannot pass: its tests are green at the branch point, and that is not something the developer can fix from inside the story",
+      "STORY-02-01 missing prerequisites to run: verify.e2e — story declares in `verification_contract`. configure `verify.e2e` — these keys live in `.ai/config.json`",
+      "STORY-03-01 missing prerequisites to run: verify.e2e — story declares in `verification_contract`. configure `verify.e2e` — these keys live in `.ai/config.json`"
+    ]
+  }
+}

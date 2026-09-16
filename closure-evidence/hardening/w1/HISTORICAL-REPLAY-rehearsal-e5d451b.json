@@ -1,0 +1,446 @@
+{
+ "generated": "2026-09-16T22:45:05Z",
+ "label": "rehearsal-e5d451b",
+ "candidate": {
+  "aisef_file": "/Users/nghinh/Downloads/projects/ai-sdlc/aisef/__init__.py",
+  "aisef_version": "1.7.6",
+  "checkout_head": "e5d451b31d17a2c4c1828de84093797af6a5bc26",
+  "checkout_aisef_dirty": [],
+  "python": "3.14.7"
+ },
+ "archive": {
+  "1.7.4": {
+   "STORY-01-06": {
+    "path": "closure-evidence/dogfood/ledgerlock-run2/replay-1.7.4/STORY-01-06.evidence.jsonl",
+    "sha256": "f5298a0ca13d9d7ba1e5a62ac614009ce9ca7912bf2d5b3cbb515a77a3b47163"
+   }
+  },
+  "1.7.4-opencode": {
+   "STORY-03-01": {
+    "path": "closure-evidence/dogfood/ledgerlock-run2/replay-1.7.4-opencode/STORY-03-01.evidence.jsonl",
+    "sha256": "a2052657e0e520795350742f6d99799e731061459511ad4aa87cd1dabf9d9de7"
+   },
+   "STORY-04-01": {
+    "path": "closure-evidence/dogfood/ledgerlock-run2/replay-1.7.4-opencode/STORY-04-01.evidence.jsonl",
+    "sha256": "665e4fab948a3b4fe98e4dda5c422c75320bf6084b9fb701759d4c81e8f1af87"
+   }
+  }
+ },
+ "state_snapshots": {
+  "1.7.4": "closure-evidence/hardening/w1/historical-replay/state-1.7.4",
+  "1.7.4-opencode": "closure-evidence/hardening/w1/historical-replay/state-1.7.4-opencode"
+ },
+ "expected_changes_declared": {
+  "1.7.4|STORY-01-06|3|eed6f87": {
+   "no baseline regression": {
+    "recorded": "failed",
+    "now": "passed",
+    "why": "the baseline of record is the epoch root's record (seq 2), not the re-run the forced resume made AFTER the candidate's test run (seq 41), which 1.7.4 selected by recency; compared with the candidate's test run (seq 24) nothing is lost — SS-22 / baseline provenance (owner rule: sequence never determines correctness)"
+   },
+   "TDD": {
+    "recorded": "failed",
+    "now": "passed",
+    "why": "the nop control bound to the candidate proves the criteria tests red or absent at the parent; read by candidate binding, not by recency (SS-T1)"
+   },
+   "tests verify story": {
+    "recorded": "failed",
+    "now": "passed",
+    "why": "same nop control, same binding"
+   }
+  },
+  "1.7.4-opencode|STORY-03-01|3|01c1d30": {
+   "no baseline regression": {
+    "recorded": "failed",
+    "now": "passed",
+    "why": "the archive's own OBS-OC-1 (FRAMEWORK ASSURANCE DEFECT, 1.7.5): 1.7.4 compared against the newest baseline (seq 393, taken at the story's own candidate ca37cc44 on resume); the hardened kernel compares against the epoch's baseline at the parent 9cf22f5c (seq 2): the two tests the story itself created and renamed are not a regression — the verdict becomes PASS, as 1.7.5's phase 4 measured on the live project"
+   }
+  },
+  "1.7.4-opencode|STORY-03-01|5|01c1d30": {
+   "no baseline regression": {
+    "recorded": "failed",
+    "now": "passed",
+    "why": "same record, same cause as attempt 3 (verify-only re-score at 01c1d30)"
+   }
+  }
+ },
+ "attempts": [
+  {
+   "state": "1.7.4",
+   "story": "STORY-01-06",
+   "attempt": 1,
+   "seq": 19,
+   "candidate": "b75c0b2126e44ef3ad693f1fe54ab868515e5182",
+   "recorded_blocking": [
+    "lint"
+   ],
+   "now_blocking": [
+    "lint"
+   ],
+   "verdict": {
+    "recorded": "FAIL",
+    "now": "FAIL"
+   },
+   "changed_rows": {},
+   "unexpected_changes": {},
+   "expected_changes_missing": {},
+   "note": null,
+   "pass": true
+  },
+  {
+   "state": "1.7.4",
+   "story": "STORY-01-06",
+   "attempt": 2,
+   "seq": 35,
+   "candidate": "eed6f87afc51022fc8dbdec185609922f5fbda68",
+   "recorded_blocking": [
+    "review"
+   ],
+   "now_blocking": [
+    "review"
+   ],
+   "verdict": {
+    "recorded": "FAIL",
+    "now": "FAIL"
+   },
+   "changed_rows": {},
+   "unexpected_changes": {},
+   "expected_changes_missing": {},
+   "note": "D-032 on a 1.7.3 record: the review tool_run is a STRUCTURED ok=False whose prose says 'could not run: max_turns'; a legacy record is never upgraded by reading prose (Phase 16), so it scores as recorded (✗). The typed UNRUNNABLE exists only in records written by ≥ 1.7.4 — STORY-04-01 attempt 3 keeps ⚠ both.",
+   "pass": true
+  },
+  {
+   "state": "1.7.4",
+   "story": "STORY-01-06",
+   "attempt": 3,
+   "seq": 52,
+   "candidate": "eed6f87afc51022fc8dbdec185609922f5fbda68",
+   "recorded_blocking": [
+    "guard ran",
+    "no baseline regression",
+    "TDD",
+    "tests verify story",
+    "review"
+   ],
+   "now_blocking": [
+    "guard ran",
+    "review"
+   ],
+   "verdict": {
+    "recorded": "FAIL",
+    "now": "FAIL"
+   },
+   "changed_rows": {
+    "no baseline regression": {
+     "recorded": "failed",
+     "now": "passed",
+     "reason_now": "",
+     "evidence_seqs": [
+      2,
+      24
+     ],
+     "expected_why": "the baseline of record is the epoch root's record (seq 2), not the re-run the forced resume made AFTER the candidate's test run (seq 41), which 1.7.4 selected by recency; compared with the candidate's test run (seq 24) nothing is lost — SS-22 / baseline provenance (owner rule: sequence never determines correctness)"
+    },
+    "TDD": {
+     "recorded": "failed",
+     "now": "passed",
+     "reason_now": "no red run recorded, but the nop control proves the same thing directly — 6 tests with criteria codes are red or absent at parent SHA ecb6b15",
+     "evidence_seqs": [
+      2,
+      24,
+      23
+     ],
+     "expected_why": "the nop control bound to the candidate proves the criteria tests red or absent at the parent; read by candidate binding, not by recency (SS-T1)"
+    },
+    "tests verify story": {
+     "recorded": "failed",
+     "now": "passed",
+     "reason_now": "6 tests with criteria codes are red or absent at parent SHA ecb6b15",
+     "evidence_seqs": [
+      2,
+      24,
+      23
+     ],
+     "expected_why": "same nop control, same binding"
+    }
+   },
+   "unexpected_changes": {},
+   "expected_changes_missing": {},
+   "note": "1.7.4's REPLAY.json step1 called these ✗ 'pre-existing R13 properties of a verify-only pass … the forced resume re-ran the baseline after the last test run' — a misclassification the hardened kernel corrects; the verdict stays FAIL (guard ran, review).",
+   "pass": true
+  },
+  {
+   "state": "1.7.4",
+   "story": "STORY-01-06",
+   "attempt": 1,
+   "seq": 204,
+   "candidate": "32d57071ad6e9ce7065849ddf386043be673764a",
+   "recorded_blocking": [],
+   "now_blocking": [],
+   "verdict": {
+    "recorded": "PASS",
+    "now": "PASS"
+   },
+   "changed_rows": {},
+   "unexpected_changes": {},
+   "expected_changes_missing": {},
+   "note": null,
+   "pass": true
+  },
+  {
+   "state": "1.7.4-opencode",
+   "story": "STORY-03-01",
+   "attempt": 1,
+   "seq": 160,
+   "candidate": "c1c3dd83df396346d4b5a9a14a3a5d67ddb59543",
+   "recorded_blocking": [
+    "security"
+   ],
+   "now_blocking": [
+    "security"
+   ],
+   "verdict": {
+    "recorded": "FAIL",
+    "now": "FAIL"
+   },
+   "changed_rows": {},
+   "unexpected_changes": {},
+   "expected_changes_missing": {},
+   "note": null,
+   "pass": true
+  },
+  {
+   "state": "1.7.4-opencode",
+   "story": "STORY-03-01",
+   "attempt": 2,
+   "seq": 325,
+   "candidate": "bdc21244f6eb8b5d1824dd83c2bfb0a7d764be7c",
+   "recorded_blocking": [
+    "test",
+    "security",
+    "review"
+   ],
+   "now_blocking": [
+    "test",
+    "security",
+    "review"
+   ],
+   "verdict": {
+    "recorded": "FAIL",
+    "now": "FAIL"
+   },
+   "changed_rows": {},
+   "unexpected_changes": {},
+   "expected_changes_missing": {},
+   "note": null,
+   "pass": true
+  },
+  {
+   "state": "1.7.4-opencode",
+   "story": "STORY-03-01",
+   "attempt": 3,
+   "seq": 391,
+   "candidate": "ca37cc44c0989fb32d8d575adea590d669d7b9a8",
+   "recorded_blocking": [
+    "criteria have tests",
+    "review"
+   ],
+   "now_blocking": [
+    "criteria have tests",
+    "review"
+   ],
+   "verdict": {
+    "recorded": "FAIL",
+    "now": "FAIL"
+   },
+   "changed_rows": {},
+   "unexpected_changes": {},
+   "expected_changes_missing": {},
+   "note": null,
+   "pass": true
+  },
+  {
+   "state": "1.7.4-opencode",
+   "story": "STORY-03-01",
+   "attempt": 3,
+   "seq": 1706,
+   "candidate": "01c1d304960970d0388d5da38736c420037db240",
+   "recorded_blocking": [
+    "no baseline regression"
+   ],
+   "now_blocking": [],
+   "verdict": {
+    "recorded": "FAIL",
+    "now": "PASS"
+   },
+   "changed_rows": {
+    "no baseline regression": {
+     "recorded": "failed",
+     "now": "passed",
+     "reason_now": "",
+     "evidence_seqs": [
+      2,
+      1694
+     ],
+     "expected_why": "the archive's own OBS-OC-1 (FRAMEWORK ASSURANCE DEFECT, 1.7.5): 1.7.4 compared against the newest baseline (seq 393, taken at the story's own candidate ca37cc44 on resume); the hardened kernel compares against the epoch's baseline at the parent 9cf22f5c (seq 2): the two tests the story itself created and renamed are not a regression — the verdict becomes PASS, as 1.7.5's phase 4 measured on the live project"
+    }
+   },
+   "unexpected_changes": {},
+   "expected_changes_missing": {},
+   "note": null,
+   "pass": true
+  },
+  {
+   "state": "1.7.4-opencode",
+   "story": "STORY-03-01",
+   "attempt": 5,
+   "seq": 1708,
+   "candidate": "01c1d304960970d0388d5da38736c420037db240",
+   "recorded_blocking": [
+    "no baseline regression"
+   ],
+   "now_blocking": [],
+   "verdict": {
+    "recorded": "FAIL",
+    "now": "PASS"
+   },
+   "changed_rows": {
+    "no baseline regression": {
+     "recorded": "failed",
+     "now": "passed",
+     "reason_now": "",
+     "evidence_seqs": [
+      2,
+      1694
+     ],
+     "expected_why": "same record, same cause as attempt 3 (verify-only re-score at 01c1d30)"
+    }
+   },
+   "unexpected_changes": {},
+   "expected_changes_missing": {},
+   "note": null,
+   "pass": true
+  },
+  {
+   "state": "1.7.4-opencode",
+   "story": "STORY-04-01",
+   "attempt": 1,
+   "seq": 259,
+   "candidate": "42689c84bac69181ac7c763128f9402c262f1f8e",
+   "recorded_blocking": [
+    "TDD",
+    "tests verify story"
+   ],
+   "now_blocking": [
+    "TDD",
+    "tests verify story"
+   ],
+   "verdict": {
+    "recorded": "FAIL",
+    "now": "FAIL"
+   },
+   "changed_rows": {},
+   "unexpected_changes": {},
+   "expected_changes_missing": {},
+   "note": null,
+   "pass": true
+  },
+  {
+   "state": "1.7.4-opencode",
+   "story": "STORY-04-01",
+   "attempt": 2,
+   "seq": 598,
+   "candidate": "d3f666fabb35283955522eaa8127d3b522758cf9",
+   "recorded_blocking": [
+    "test",
+    "TDD",
+    "tests verify story",
+    "review"
+   ],
+   "now_blocking": [
+    "test",
+    "TDD",
+    "tests verify story",
+    "review"
+   ],
+   "verdict": {
+    "recorded": "FAIL",
+    "now": "FAIL"
+   },
+   "changed_rows": {},
+   "unexpected_changes": {},
+   "expected_changes_missing": {},
+   "note": null,
+   "pass": true
+  },
+  {
+   "state": "1.7.4-opencode",
+   "story": "STORY-04-01",
+   "attempt": 3,
+   "seq": 715,
+   "candidate": "ef5d6460df8ec0fa357b298a2e58309dc6921f57",
+   "recorded_blocking": [
+    "tests verify story",
+    "review"
+   ],
+   "now_blocking": [
+    "tests verify story",
+    "review"
+   ],
+   "verdict": {
+    "recorded": "FAIL",
+    "now": "FAIL"
+   },
+   "changed_rows": {},
+   "unexpected_changes": {},
+   "expected_changes_missing": {},
+   "note": null,
+   "pass": true
+  },
+  {
+   "state": "1.7.4-opencode",
+   "story": "STORY-04-01",
+   "attempt": 1,
+   "seq": 1020,
+   "candidate": "de2d3244e159026d9260cc6994cfba505d56e503",
+   "recorded_blocking": [
+    "write scope",
+    "review"
+   ],
+   "now_blocking": [
+    "write scope",
+    "review"
+   ],
+   "verdict": {
+    "recorded": "FAIL",
+    "now": "FAIL"
+   },
+   "changed_rows": {},
+   "unexpected_changes": {},
+   "expected_changes_missing": {},
+   "note": null,
+   "pass": true
+  }
+ ],
+ "suites": {
+  "suites": [
+   "tests/hardening/test_verdict_freshness.py",
+   "tests/test_retry_hygiene.py",
+   "tests/test_baseline_provenance.py"
+  ],
+  "exit": 0,
+  "summary": "29 passed in 30.56s",
+  "pass": true
+ },
+ "totals": {
+  "attempts": 13,
+  "attempts_with_changed_rows": 3,
+  "verdict_flips": [
+   "1.7.4-opencode STORY-03-01 attempt 3 01c1d30: FAIL→PASS",
+   "1.7.4-opencode STORY-03-01 attempt 5 01c1d30: FAIL→PASS"
+  ],
+  "unexpected": 0,
+  "expected_missing": 0
+ },
+ "elapsed_s": 31.2,
+ "pass": true
+}

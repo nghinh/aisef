@@ -106,3 +106,20 @@ oracle results, resumes, drift records, cost, duration, every operator arbitrati
   (seq, digest before/after, decided_by, note = ARB-1), and the gate statuses are measured again. No new epoch; no
   approval invalidated. The owner has not separately signed this re-approval: if the owner rejects it, the re-approval
   and every run resting on it are void.
+- **Step 5 restated precisely (rehearsed on e5d451b, `w1/HISTORICAL-REPLAY-rehearsal-e5d451b.json`, PASS).** The archive
+  keeps the 1.7.4 replays' evidence as flat `<STORY>.evidence.jsonl` files; `aisef replay` needs the story index, story
+  files and config of the state that produced them, now kept as `w1/historical-replay/state-1.7.4{,-opencode}/`
+  (README records provenance; replaying the archived files over the snapshot reproduces the working copy row for
+  row). A bare layout mis-keys the story (`STORY-01-06.evidence`) and flips `criteria have tests` — a fixture
+  artefact, not kernel behaviour, and the reason `w1/historical_replay.py` renames the files. Expected
+  classifications, stated before the frozen run and reproduced in the rehearsal: 13 attempts; exactly five changed
+  rows — STORY-01-06 attempt 3 @ eed6f87 (`no baseline regression`, `TDD`, `tests verify story` ✗→✅: the epoch
+  root's baseline seq 2 is compared, not the resume's re-run seq 41 that 1.7.4 chose by recency; verdict stays
+  FAIL on `guard ran` + `review`) and STORY-03-01 attempts 3 and 5 @ 01c1d30 (`no baseline regression` ✗→✅,
+  FAIL→PASS — the archive's own OBS-OC-1 baseline-provenance defect, 1.7.5's correction reproduced: seq 2 at
+  9cf22f5c compared, seq 393 at the story's own candidate ignored). D-032 on archived records: the 1.7.3 review
+  record is a structured ok=False and stays ✗ (prose never upgrades a legacy record); the typed UNRUNNABLE of the
+  1.7.4 opencode record (STORY-04-01 attempt 3) stays ⚠. D-035 and retry hygiene are run-loop properties `aisef
+  replay` cannot exercise on archived evidence; the runner executes `test_verdict_freshness`, `test_retry_hygiene`
+  and `test_baseline_provenance` on the candidate instead (29 passed). Any other changed row on the frozen candidate
+  is a finding.
