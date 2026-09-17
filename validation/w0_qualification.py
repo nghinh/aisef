@@ -26,9 +26,18 @@ def _json(p: Path):
 
 def criteria(ci: dict) -> list[dict]:
     defects = _json(EV / "hardening-defect-set.json")
-    members = [m for ms in defects["defects_by_fix_family"].values() for m in ms]
-    open_members = [m["id"] for m in members if m["status"] == "OPEN"]
-    open_p01 = [m["id"] for m in members if m["status"] == "OPEN" and m["severity"] in ("P0", "P1")]
+    # The frozen families AND everything registered after the freeze (SS-61…): a defect found after the freeze is exactly
+    # the kind this gate exists to catch, and reading only `defects_by_fix_family` made it invisible (found 2026-09-17,
+    # when SS-65 was registered OPEN and this builder still printed QUALIFIED).
+    additions = list(defects.get("additions_after_freeze") or [])
+    members = [m for ms in defects["defects_by_fix_family"].values() for m in ms] + additions
+    def _status(m: dict) -> str:
+        return str(m.get("status", "")).upper()
+    open_members = [m["id"] for m in members if _status(m) == "OPEN"]
+    open_p01 = [m["id"] for m in members if _status(m) == "OPEN" and m.get("severity") in ("P0", "P1")]
+    no_status = [m["id"] for m in members if not _status(m)]
+    declared_open = int(defects.get("counts", {}).get("by_status", {}).get("OPEN", 0))
+    scan_agrees = len(open_members) == declared_open
     matrix = _json(EV / "fault-matrix.json")
     cells = next(v for v in matrix.values() if isinstance(v, list) and v and isinstance(v[0], dict))
     by_status: dict[str, int] = {}
@@ -43,8 +52,10 @@ def criteria(ci: dict) -> list[dict]:
     survivors = [r for r in mut.get("results", []) if r.get("status") == "SURVIVED"]
     unclassified = [r["id"] for r in survivors if not r.get("classification")]
     rows = [
-        ("0 P0/P1 open", not open_p01, {"open_p0_p1": open_p01}),
-        ("0 unfixed confirmed defects from the frozen set", not open_members, {"open": open_members, "counts": defects["counts"]["by_status"]}),
+        ("0 P0/P1 open", not open_p01, {"open_p0_p1": open_p01, "scanned": len(members), "additions_after_freeze_scanned": len(additions)}),
+        ("0 unfixed confirmed defects from the frozen set", not open_members and scan_agrees,
+         {"open": open_members, "counts": defects["counts"]["by_status"], "scan_agrees_with_declared_counts": scan_agrees,
+          "members_without_an_explicit_status": no_status}),
         ("0 NEEDS_TEST fault cells", by_status.get("NEEDS_TEST", 0) == 0, {"fault_matrix": by_status}),
         ("fault matrix GREEN", by_status.get("RED", 0) == 0 and by_status.get("GREEN", 0) == len(cells), {"cells": len(cells), "fault_matrix": by_status}),
         ("0 MISSING/PARTIAL invariants", reg["PARTIAL"] == 0 and reg["MISSING"] == 0 and reg["PROVEN"] == 50, {"registry": reg}),
