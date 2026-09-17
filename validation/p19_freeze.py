@@ -30,6 +30,11 @@ def git(*a: str) -> str:
     return run(["git", "-C", str(ROOT), *a]).stdout.strip()
 
 
+def _aisef_tree_of(w0: dict | None) -> str:
+    """The W0 record qualifies a product tree, not a commit message: a later evidence commit keeps the tree."""
+    return git("rev-parse", f"{((w0 or {}).get('sha') or (w0 or {}).get('candidate_sha') or '')}:aisef") if w0 else ""
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--ci-run", required=True)
@@ -74,7 +79,8 @@ def main() -> int:
         run([sys.executable, "-m", "venv", str(ovenv)])
         run([str(ovenv / "bin/pip"), "install", "-q", *a.oracle_pins.split()])
     opins = run([str(ovenv / "bin/pip"), "list", "--format", "json"]).stdout
-    img = "aisef-verify-python:b2c7afff2aed"
+    # SS-65: never a second copy of an image name — the registry that the product resolves from is the only source.
+    img = run([str(venv / "bin/python"), "-c", "from aisef.harness.capabilities import profile_by_stack; print(profile_by_stack('python').image)"]).stdout.strip()
     img_id = run(["docker", "image", "inspect", img, "--format", "{{.Id}}"]).stdout.strip()
     ci = run(["gh", "run", "view", a.ci_run, "--json", "conclusion,headSha,jobs"]).stdout
     ci = json.loads(ci) if ci.strip().startswith("{") else {"raw": ci[:200]}
@@ -85,9 +91,10 @@ def main() -> int:
            "oracle_venv": {"path": str(ovenv), "packages": [p for p in json.loads(opins) if p["name"] in ("coverage", "pytest")] if opins.strip().startswith("[") else opins[:200]},
            "docker_image": {"name": img, "id": img_id}, "docker_image_id": img_id, "opencode_version": run(["opencode", "--version"]).stdout.strip(),
            "ci": {"run": a.ci_run, "sha": ci.get("headSha"), "conclusion": ci.get("conclusion"), "jobs": {j.get("name"): j.get("conclusion") for j in ci.get("jobs", [])}},
-           "ci_matches_candidate": ci.get("headSha") == sha, "w0": {"path": a.w0, "qualified": (w0 or {}).get("qualified"), "sha": (w0 or {}).get("sha") or (w0 or {}).get("candidate_sha")},
+           "ci_matches_candidate": ci.get("headSha") == sha, "w0": {"path": a.w0, "qualified": (w0 or {}).get("qualified"), "sha": (w0 or {}).get("sha") or (w0 or {}).get("candidate_sha"),
+                  "aisef_tree": _aisef_tree_of(w0), "tree_matches_frozen": _aisef_tree_of(w0) == tree},
            "no_tag_no_publish": True, "rule": "W1 runs use run_venv's aisef only; any aisef/ change after this record voids it and the W1 runs that rest on it"}
-    rec["pass"] = rec["tree_equals_phase12_kernel"] and rec["run_venv"]["installed_from_the_wheel"] and rec["ci_matches_candidate"] and rec["ci"]["conclusion"] == "success" and bool(img_id)
+    rec["pass"] = rec["tree_equals_phase12_kernel"] and rec["w0"]["qualified"] is True and rec["w0"]["tree_matches_frozen"] and rec["run_venv"]["installed_from_the_wheel"] and rec["ci_matches_candidate"] and rec["ci"]["conclusion"] == "success" and bool(img_id)
     Path(a.out).write_text(json.dumps(rec, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(json.dumps({k: rec[k] for k in ("candidate_sha", "tree_equals_phase12_kernel", "version_string", "ci_matches_candidate", "pass")}, indent=1))
     print("wheel sha256:", wsha, "| run venv:", venv)

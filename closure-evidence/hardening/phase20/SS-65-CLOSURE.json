@@ -1,0 +1,155 @@
+{
+ "generated": "2026-09-18T06:28:47+0700",
+ "defect": "SS-65",
+ "severity": "P1",
+ "status": "FIXED",
+ "invariant": "INV-N.DEFAULT-CAPABILITY",
+ "candidate_sha": "0a7cab86086ebc496bcda1559142082c89506c29",
+ "candidate_aisef_tree": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+ "requirements": {
+  "original_python_reproducer_RED_before_fix": {
+   "ok": true,
+   "how": "tests/hardening/test_ss65_reproducers.py on a worktree at abad2a6"
+  },
+  "original_go_reproducer_RED_before_fix": {
+   "ok": true
+  },
+  "reproducers_GREEN_after_fix": {
+   "ok": true,
+   "measured": "2 passed in 0.04s"
+  },
+  "python_managed_image_runs_bandit": {
+   "ok": true,
+   "image": "aisef-verify-python:84adf1d8eaf9",
+   "image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+   "observed": "bandit 1.9.4"
+  },
+  "go_managed_image_runs_gosec": {
+   "ok": true,
+   "image": "aisef-verify-go:6a26aba68eaa",
+   "image_id": "sha256:83a2677a619a55e3f8649061c8e44068854ff5b17639ff294afe7b70c12627b2",
+   "observed": "/usr/local/bin/gosec: go1.26.8"
+  },
+  "all_supported_stack_profiles_audited": {
+   "ok": true,
+   "stacks": {
+    "node": "QUALIFIED",
+    "python": "QUALIFIED",
+    "go": "QUALIFIED",
+    "rust": "QUALIFIED",
+    "ruby": "QUALIFIED",
+    "php": "QUALIFIED",
+    "flutter": "QUALIFIED"
+   }
+  },
+  "capability_registry_is_the_single_source_of_truth": {
+   "ok": true,
+   "test": "tests/hardening/test_tool_capability.py::TestRegistryIsTheOnlySource"
+  },
+  "real_image_qualification_passes_for_this_tree": {
+   "ok": true,
+   "matrix_tree": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+   "candidate_tree": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+   "totals": {
+    "profiles": 7,
+    "capabilities": 21,
+    "qualified": 11,
+    "none_declared": 10,
+    "failed": [],
+    "presets_failed": []
+   }
+  },
+  "invariants_PROVEN": {
+   "ok": true,
+   "status": {
+    "INV-N.DEFAULT-CAPABILITY": "PROVEN",
+    "INV-N.1": "PROVEN",
+    "INV-T.QUALIFICATION-REGISTER": "PROVEN"
+   }
+  },
+  "no_remaining_confirmed_capability_mismatch": {
+   "ok": true,
+   "family": {
+    "SS-65": [
+     "P1",
+     "FIXED"
+    ],
+    "SS-67": [
+     "P1",
+     "FIXED"
+    ],
+    "SS-68": [
+     "P1",
+     "FIXED"
+    ],
+    "SS-69": [
+     "P2",
+     "FIXED"
+    ],
+    "SS-70": [
+     "P2",
+     "FIXED"
+    ],
+    "SS-71": [
+     "P1",
+     "FIXED"
+    ],
+    "SS-72": [
+     "P2",
+     "FIXED"
+    ],
+    "SS-73": [
+     "P2",
+     "FIXED"
+    ],
+    "SS-74": [
+     "P2",
+     "FIXED"
+    ],
+    "SS-75": [
+     "P2",
+     "FIXED"
+    ],
+    "SS-76": [
+     "P3",
+     "FIXED"
+    ]
+   }
+  },
+  "fault_matrix_cells_GREEN": {
+   "ok": true,
+   "cells": {
+    "FM-N-04": "GREEN (SS-65)",
+    "FM-N-05": "GREEN (SS-65)",
+    "FM-N-06": "GREEN (SS-65)",
+    "FM-N-07": "GREEN (SS-65)",
+    "FM-N-08": "GREEN (SS-65)",
+    "FM-A-04": "GREEN (SS-66)"
+   }
+  },
+  "full_suite_GREEN": {
+   "ok": true,
+   "summary": "3466 passed, 20 skipped, 1484 subtests passed in 524.32s (0:08:44)"
+  },
+  "ruff_GREEN": {
+   "ok": true
+  },
+  "Linux_CI_GREEN": {
+   "ok": true,
+   "run": "35284491057",
+   "jobs": {
+    "unit (ubuntu-latest, 3.12)": "success",
+    "unit (ubuntu-latest, 3.11)": "success",
+    "lint": "success",
+    "unit (ubuntu-latest, 3.14)": "success",
+    "wheel": "success",
+    "unit (ubuntu-latest, 3.13)": "success",
+    "unit (windows-latest, 3.11)": "success"
+   }
+  },
+  "Windows_CI_GREEN": {
+   "ok": true
+  }
+ },
+ "all_met": true
+}

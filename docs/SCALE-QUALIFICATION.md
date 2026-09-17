@@ -45,6 +45,6 @@ recorded separately from framework outcome. A framework misclassification is a q
 
 | level | status |
 |---|---|
-| W0 | **qualified** at candidate `abad2a6af796` (2026-09-17; `closure-evidence/hardening/AISEF-W0-QUALIFICATION.json`, 10/10 criteria; Phase 12: 100 000 single-kernel traces, 0 unexplained) |
+| W0 | **qualified** at candidate `0a7cab86086e` (2026-09-18; `closure-evidence/hardening/AISEF-W0-QUALIFICATION.json`, 11/11 criteria; Phase 12: 100 000 single-kernel traces on product tree `02a34e0e…`, 0 unexplained; default tool capabilities qualified on real images). The earlier qualification at `abad2a6af796` is **VOID** — W1 run 1 found SS-65 (P1) on that candidate; it is kept unedited under `closure-evidence/hardening/voided-abad2a6/` and is not qualification evidence for anything |
 | W1 | in progress — 3 fresh LedgerLock runs on the frozen candidate (`closure-evidence/hardening/P19-FREEZE.json`); not claimed until `W1-LEDGERLOCK-SUMMARY.json` |
 | W2–W5 | not qualified; not claimed |
