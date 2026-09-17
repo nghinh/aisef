@@ -45,6 +45,6 @@ recorded separately from framework outcome. A framework misclassification is a q
 
 | level | status |
 |---|---|
-| W0 | in progress — SYSTEMATIC HARDENING PROGRAM v1 Phases 10–18 |
-| W1 | not started (blocked on W0) |
+| W0 | **qualified** at candidate `abad2a6af796` (2026-09-17; `closure-evidence/hardening/AISEF-W0-QUALIFICATION.json`, 10/10 criteria; Phase 12: 100 000 single-kernel traces, 0 unexplained) |
+| W1 | in progress — 3 fresh LedgerLock runs on the frozen candidate (`closure-evidence/hardening/P19-FREEZE.json`); not claimed until `W1-LEDGERLOCK-SUMMARY.json` |
 | W2–W5 | not qualified; not claimed |

@@ -1,0 +1,141 @@
+{
+ "level": "W0",
+ "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
+ "candidate_sha": "abad2a6af79696a24898f87d554ef4740a9e12c0",
+ "generated": "2026-09-17T06:59:51+00:00",
+ "qualified": true,
+ "criteria": [
+  {
+   "criterion": "0 P0/P1 open",
+   "holds": true,
+   "measured": {
+    "open_p0_p1": []
+   }
+  },
+  {
+   "criterion": "0 unfixed confirmed defects from the frozen set",
+   "holds": true,
+   "measured": {
+    "open": [],
+    "counts": {
+     "OPEN": 0,
+     "FIXED": 73,
+     "SUPERSEDED": 1
+    }
+   }
+  },
+  {
+   "criterion": "0 NEEDS_TEST fault cells",
+   "holds": true,
+   "measured": {
+    "fault_matrix": {
+     "GREEN": 73
+    }
+   }
+  },
+  {
+   "criterion": "fault matrix GREEN",
+   "holds": true,
+   "measured": {
+    "cells": 73,
+    "fault_matrix": {
+     "GREEN": 73
+    }
+   }
+  },
+  {
+   "criterion": "0 MISSING/PARTIAL invariants",
+   "holds": true,
+   "measured": {
+    "registry": {
+     "PROVEN": 50,
+     "PARTIAL": 0,
+     "MISSING": 0
+    }
+   }
+  },
+  {
+   "criterion": "0 expected-red tests",
+   "holds": true,
+   "measured": {
+    "files_with_red_markers": []
+   }
+  },
+  {
+   "criterion": "0 unexplained model/kernel gaps (100 000 traces)",
+   "holds": true,
+   "measured": {
+    "differential": {
+     "traces": 100000,
+     "matched": 100000,
+     "unexplained": 0,
+     "invariant_violations": 0,
+     "exceptions": 0,
+     "silent_skips": 0,
+     "traces_per_s": 4.12,
+     "elapsed_s": 24259.7,
+     "chunks": 10,
+     "manifest": {
+      "path": "closure-evidence/hardening/phase12/PHASE12-DATASET-MANIFEST.json",
+      "pass": true,
+      "kernel_digests": [
+       "84014c980e75f3924c2d5a834f58d6b91e64bd47"
+      ]
+     },
+     "coverage": {
+      "reachable_transitions": 26,
+      "reachable_total": 26,
+      "typed_outcomes": 10,
+      "fault_kinds": "28/28",
+      "compound_pairs": "378/378"
+     }
+    }
+   }
+  },
+  {
+   "criterion": "KNOWN_DEVIATIONS empty",
+   "holds": true,
+   "measured": {
+    "known_deviations": []
+   }
+  },
+  {
+   "criterion": "0 safety-significant mutation survivors",
+   "holds": true,
+   "measured": {
+    "mutation": {
+     "mutations_generated": 271,
+     "killed": 265,
+     "survived": 0,
+     "equivalent": 6
+    },
+    "unclassified_survivors": []
+   }
+  },
+  {
+   "criterion": "Linux + Windows CI green on the candidate",
+   "holds": true,
+   "measured": {
+    "ci": {
+     "run_id": "35190345959",
+     "head_sha": "abad2a6af79696a24898f87d554ef4740a9e12c0",
+     "candidate_sha": "abad2a6af79696a24898f87d554ef4740a9e12c0",
+     "head_matches_candidate": true,
+     "jobs": {
+      "wheel": "success",
+      "lint": "success",
+      "unit (windows-latest, 3.11)": "success",
+      "unit (ubuntu-latest, 3.14)": "success",
+      "unit (ubuntu-latest, 3.13)": "success",
+      "unit (ubuntu-latest, 3.12)": "success",
+      "unit (ubuntu-latest, 3.11)": "success"
+     },
+     "all_green": true
+    }
+   }
+  }
+ ],
+ "hidden_oracle": "reference model (tests/hardening/model.py) + differential harness (tests/hardening/differential.py)",
+ "repeat_runs": "1 (deterministic; seeds recorded in the differential chunk files)",
+ "known_deviations": []
+}
