@@ -39,8 +39,8 @@ def main() -> int:
     ap.add_argument("--oracle-pins", default="coverage==7.16.1 pytest==9.1.1")
     ap.add_argument("--out", default=str(OUT), help="rehearsals write elsewhere; the real record is closure-evidence/hardening/P19-FREEZE.json")
     a = ap.parse_args()
-    if git("status", "--porcelain"):
-        print("REFUSED: the checkout is dirty:", git("status", "--porcelain")[:300])
+    if git("status", "--porcelain", "--", "aisef", "tests", "pyproject.toml", "bin"):      # the wheel's inputs must be committed; evidence may be pending
+        print("REFUSED: product inputs are dirty:", git("status", "--porcelain", "--", "aisef", "tests", "pyproject.toml", "bin")[:300])
         return 1
     sha = git("rev-parse", "HEAD")
     tree = git("rev-parse", "HEAD:aisef")
@@ -55,8 +55,8 @@ def main() -> int:
     if b.returncode or not wheels:
         print("BUILD FAILED", b.stdout[-500:], b.stderr[-800:])
         return 1
-    if git("status", "--porcelain"):
-        print("REFUSED: the build dirtied the checkout:", git("status", "--porcelain")[:300])
+    if git("status", "--porcelain", "--", "aisef", "tests", "pyproject.toml", "bin"):
+        print("REFUSED: the build dirtied the product inputs:", git("status", "--porcelain")[:300])
         return 1
     wheel = wheels[0]
     wsha = hashlib.sha256(wheel.read_bytes()).hexdigest()
