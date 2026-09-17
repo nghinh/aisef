@@ -3,7 +3,7 @@
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "candidate_sha": "abad2a6af79696a24898f87d554ef4740a9e12c0",
  "generated": "2026-09-17T06:59:51+00:00",
- "qualified": true,
+ "qualified": false,
  "criteria": [
   {
    "criterion": "0 P0/P1 open",
@@ -137,5 +137,12 @@
  ],
  "hidden_oracle": "reference model (tests/hardening/model.py) + differential harness (tests/hardening/differential.py)",
  "repeat_runs": "1 (deterministic; seeds recorded in the differential chunk files)",
- "known_deviations": []
+ "known_deviations": [],
+ "voided": {
+  "at": "2026-09-17T15:14:37+0700",
+  "reason": "SS-65 (P1, OPEN) was found after this record was written, by W1 run 1 on this very candidate. The criterion '0 P0/P1 open' no longer holds for abad2a6, so this W0 qualification is VOID and is retained as the record of what was measured, not as a claim.",
+  "defect": "SS-65",
+  "found_by": "W1 run 1 tools preflight, 2026-09-17 14:00",
+  "consequence": "the candidate is not qualified; the freeze P19-FREEZE.json rests on it and is void with it; W1 is stopped."
+ }
 }

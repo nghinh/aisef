@@ -1,14 +1,14 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "phase": "3 + 8A",
- "generated": "2026-09-16T11:44:38+00:00",
+ "generated": "2026-09-17T15:14:37+0700",
  "method": "five read-only sweeps over aisef/ (recency-as-identity; prose-to-control-state; retry locality and recovery; ownership, tools, leases, scope; plus a test-inventory map), every candidate then verified in code by hand; CONFIRMED requires a deterministic RED reproducer that failed on the invariant assertion (tests/hardening/test_sibling_scan.py, run 2026-09-16 on the 1.7.6 baseline: 21 expected failures, 0 unexpected successes)",
  "counts": {
-  "CONFIRMED": 67,
+  "CONFIRMED": 68,
   "NEEDS_TEST": 0,
   "NOT_A_DEFECT": 6,
-  "entries": 74,
-  "confirmed": 68
+  "entries": 75,
+  "confirmed": 69
  },
  "entries": [
   {
@@ -1006,6 +1006,19 @@
    "severity_proposed": "P2",
    "reproducer": "tests/hardening/test_differential.py::TestSeed34999ACapInsideARegradedVerifierStopsTheRun",
    "notes": "found by Phase 12 differential seed 34999 (chunk 30000, 2026-09-17); frozen record + 10 deterministic replays under closure-evidence/hardening/phase12/; sibling: the verify-only path typed the same cap UNRUNNABLE (TestSS64SiblingVerifyOnlyCapIsABudgetStop); FIXED the same day (cap precedence over absence)"
+  },
+  {
+   "id": "SS-65",
+   "site": "aisef/harness/verify_image.py::RECIPES['python'] (packages) and aisef/harness/tools.py::STACK_IMAGES (go)",
+   "family": "FAM-PROCESS",
+   "invariants": [
+    "INV-N.1"
+   ],
+   "semantic_context": "the harness declares a sast tool it then refuses to run: `command_for` auto-detects `bandit -q -r .` for any project with a pyproject.toml/setup.py (SS-45 made auto-detected commands part of `declared_tools`), but the python preset image the harness BUILDS ITSELF installs only pytest, pytest-cov and ruff — so `_missing_tools` reports `tools.sast … MISSING in aisef-verify-python:b2c7afff2aed: exit 127` and `aisef run` stops at `sprint ERROR` before any session. There is no configuration escape: an empty `tools.sast` means auto-detect, so the command cannot be withdrawn. Sibling: go.mod projects get `gosec ./...` against `golang:1.23-alpine`, which does not carry gosec (measured, exit 127). Rust and Ruby pass (their chosen images do carry `cargo audit` / `bundle`), Node is UNJUDGED by design (project-local runner, SS-47).",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "none committed yet — a RED test would break CI and the W0 '0 expected-red' criterion; the measurement is in closure-evidence/hardening/phase20/SS-65-ENVIRONMENT-CONTRACT.json and the test ships with the fix",
+   "notes": "found 2026-09-17 14:00 by W1 run 1 on the frozen candidate abad2a6: driver phases prepare/kernel-first/approve passed and `aisef run --client opencode` stopped after 5 s at the tools preflight, $0, no model call (closure-evidence/hardening/w1/run-1-aborted-sast-preflight/). Not reachable by the Phase 12 differential: the synthetic adapter never executes a real tool probe."
   }
  ]
 }

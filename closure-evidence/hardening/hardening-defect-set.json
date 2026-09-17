@@ -5,9 +5,9 @@
  "generated": "2026-09-16T10:12:06+00:00",
  "rule": "No broad speculative sweep while fixing. A sibling found during implementation is classified, assigned to an already-frozen family where it belongs, and added here with explicit provenance (commit + finding source).",
  "counts": {
-  "total": 74,
+  "total": 75,
   "by_severity": {
-   "P1": 13,
+   "P1": 14,
    "P2": 40,
    "P3": 18
   },
@@ -17,11 +17,11 @@
    "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY": 14,
    "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE": 12,
    "F6-BENCH-RELEASE-APPROVAL": 6,
-   "F5-PROCESS-TOOL-ENVIRONMENT": 10
+   "F5-PROCESS-TOOL-ENVIRONMENT": 11
   },
   "fixed": 16,
   "by_status": {
-   "OPEN": 0,
+   "OPEN": 1,
    "FIXED": 73,
    "SUPERSEDED": 1
   }
@@ -1334,7 +1334,32 @@
    "provenance": "found during F2 implementation by the 2000-trace differential (seed 2624, unexplained with KNOWN empty), 2026-09-16; reproducer RED at c384383 (throwaway worktree), GREEN after `deadlock_reason` pairs graded positions (attempts whose reviewer produced a verdict)",
    "status": "FIXED",
    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `deadlock_reason` skips attempts whose review was UNRUNNABLE"
+  },
+  {
+   "id": "SS-65",
+   "family": "FAM-PROCESS",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P1",
+   "invariants": [
+    "INV-N.1"
+   ],
+   "site": "aisef/harness/verify_image.py::RECIPES['python'] (packages) and aisef/harness/tools.py::STACK_IMAGES (go)",
+   "statement": "the harness declares a sast tool it then refuses to run: `command_for` auto-detects `bandit -q -r .` for any project with a pyproject.toml/setup.py (SS-45 made auto-detected commands part of `declared_tools`), but the python preset image the harness BUILDS ITSELF installs only pytest, pytest-cov and ruff — so `_missing_tools` reports `tools.sast … MISSING in aisef-verify-python:b2c7afff2aed: exit 127` and `aisef run` stops at `sprint ERROR` before any session. There is no configuration escape: an empty `tools.sast` means auto-detect, so the command cannot be withdrawn. Sibling: go.mod projects get `gosec ./...` against `golang:1.23-alpine`, which does not carry gosec (measured, exit 127). Rust and Ruby pass (their chosen images do carry `cargo audit` / `bundle`), Node is UNJUDGED by design (project-local runner, SS-47).",
+   "status": "OPEN",
+   "provenance": "found 2026-09-17 14:00 by W1 run 1 on the frozen candidate abad2a6: driver phases prepare/kernel-first/approve passed and `aisef run --client opencode` stopped after 5 s at the tools preflight, $0, no model call (closure-evidence/hardening/w1/run-1-aborted-sast-preflight/). Not reachable by the Phase 12 differential: the synthetic adapter never executes a real tool probe.",
+   "measured": {
+    "python_default_config": "image aisef-verify-python:b2c7afff2aed (the harness's own preset) — tools.sast `bandit -q -r .` exit 127",
+    "go_default_config": "image golang:1.23-alpine — tools.sast `gosec ./...` exit 127",
+    "rust_default_config": "image rust:1-alpine — all three present",
+    "ruby_default_config": "image ruby:3-alpine — all three present",
+    "node_default_config": "image node:22-alpine — `npm audit --omit=dev` UNJUDGED (project-local runner), never a stop",
+    "workaround_none": "tools.sast='' means auto-detect (aisef/harness/tools.py::command_for); no key withdraws a tool",
+    "affects_declared_and_undeclared_images": "measured with sandbox.image declared and removed: the same stop"
+   },
+   "regression_of": "b7733db (2026-09-15, D-028) states the rule 'the environment a preset declares contains every tool the preset declares' and built the python recipe for test and lint; the sast default was added to the probe set by SS-45 afterwards and the recipe was never extended, so the framework's own rule is violated by its own image.",
+   "why_no_test_caught_it": "tests/test_dogfood_ledgerlock.py proves the PREFLIGHT reports a missing tool (with a mocked sandbox and a fictional image `some/ci-image:1`); no test asserts the real invariant — that every tool `declared_tools` resolves for a stack is present in the image `image_for` picks for that stack. That test is part of the fix.",
+   "proposed_fix": "PROPOSAL, NOT IMPLEMENTED (a change under aisef/ voids PHASE12_KERNEL_DIGEST, the W0 record and the freeze; owner rule 3): add `bandit==1.9.4` to RECIPES['python'].packages — the recipe digest and image name become aisef-verify-python:<new>, so the reference project's pinned `sandbox.image` must be re-pinned too; for go, either build a managed go recipe carrying gosec or stop auto-detecting a tool the chosen image cannot run. Plus the missing invariant test. Measured viable: the base image with bandit 1.9.4 builds and all four tools run in it."
   }
  ],
- "updated": "2026-09-16T21:50:26+00:00 @ d956249"
+ "updated": "2026-09-17T15:14:37+0700"
 }
