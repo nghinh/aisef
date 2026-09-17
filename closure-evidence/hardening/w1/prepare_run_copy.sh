@@ -2,24 +2,25 @@
 # Prepare a FRESH W1 run copy exactly like w1-run-1 (P20 + the trunk-topology correction): a clone of the reference
 # project with master := 8ff9f13 (the approved plan, no story work), the cost-cap commit cherry-picked from w1-run-1,
 # no remote, one branch. The guard plugin is compiled and committed by the driver's prepare phase with the frozen aisef.
-#   closure-evidence/hardening/w1/prepare_run_copy.sh <n>
+#   closure-evidence/hardening/w1/prepare_run_copy.sh <n> [<venv> <dest-dir>]   (the two optional arguments: rehearsal only)
 set -e
-n=$1; [ -n "$n" ] || { echo "usage: prepare_run_copy.sh <n>"; exit 2; }
-P=~/Downloads/projects; REF=$P/ledgerlock-aiseftest-run2; DST=$P/w1-run-$n
+n=$1; [ -n "$n" ] || { echo "usage: prepare_run_copy.sh <n> [<venv> <dest-dir>]"; exit 2; }
+P=~/Downloads/projects; REF=$P/ledgerlock-aiseftest-run2; DST=${3:-$P/w1-run-$n}
+COSTCAP_SRC=$P/w1-run-1-aborted-sast; [ -d "$COSTCAP_SRC" ] || COSTCAP_SRC=$P/w1-run-1
 [ -d "$DST" ] && { echo "REFUSED: $DST exists"; exit 1; }
 git clone -q --no-hardlinks "$REF" "$DST"
 cd "$DST"
 git config user.name "AISEF W1 operator"; git config user.email "w1-operator@aisef.local"     # the same local identity as w1-run-1 (a fresh clone has none)
 git checkout -q -B master 8ff9f13
 git remote remove origin
-git fetch -q "$P/w1-run-1" master          # brings the objects; fd4c644 (the cost-cap commit) is then cherry-picked by SHA
+git fetch -q "$COSTCAP_SRC" master        # brings the objects; fd4c644 (the cost-cap commit) is then cherry-picked by SHA
 git cherry-pick --no-edit fd4c644 >/dev/null
 cap=$(python3 -c "import json; print(json.load(open('.ai/config.json')).get('run.cost_cap_usd'))")
 [ "$cap" = "80.0" ] || { echo "REFUSED: cost cap not applied (run.cost_cap_usd=$cap)"; exit 1; }
 # SS-65: the reference project pins the python environment by name; the name carries the recipe digest, so the frozen
 # candidate's environment has a new name. Re-pin to exactly the frozen candidate's python profile image.
 F=/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/P19-FREEZE.json
-VENV=$(python3 -c "import json; print(json.load(open('$F'))['run_venv']['path'])")
+VENV=${2:-$(python3 -c "import json; print(json.load(open('$F'))['run_venv']['path'])")}
 IMG=$("$VENV/bin/python" -c "from aisef.harness.capabilities import profile_by_stack; print(profile_by_stack('python').image)")
 [ -n "$IMG" ] || { echo "REFUSED: cannot read the frozen candidate's python image"; exit 1; }
 python3 - "$IMG" <<'PYI'

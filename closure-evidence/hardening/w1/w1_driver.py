@@ -45,6 +45,15 @@ ARB1_NOTE = ("ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for by
              "closure-evidence/hardening/w1/ARBITRATION-PREDECLARED.json")
 
 
+#: The only commits a fresh run copy may carry after 8ff9f13 — the named preparation steps, nothing else.
+PREPARATION_COMMITS = ("run.cost_cap_usd=80", "sandbox.image re-pinned to the frozen candidate", "guard plugin compiled by")
+
+
+def _is_preparation_commit(line: str) -> bool:
+    subject = line.split(" ", 1)[1] if " " in line else ""
+    return subject.startswith("w1-run-") and any(marker in subject for marker in PREPARATION_COMMITS)
+
+
 def now() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S%z")
 
@@ -162,7 +171,7 @@ class Driver:
                                "remotes": self.git("remote").split(), "branches": self.git("branch", "--list").replace("*", "").split()}
         t = P["fresh_topology"]
         P["fresh_topology_ok"] = t["head_branch"] == "master" and t["ledgerlock_dir_absent_at_master"] and not t["remotes"] and len(after) <= 3 \
-            and all(("cost_cap" in ln or "guard plugin" in ln) for ln in after)
+            and all(_is_preparation_commit(ln) for ln in after)
         # owner item 9 — W1 freshness preflight, every check mechanical; any failure STOPS before the first model call
         idx = json.loads((self.art / "stories.index.json").read_text(encoding="utf-8"))
         stories = idx["stories"] if isinstance(idx, dict) and "stories" in idx else idx
@@ -196,7 +205,7 @@ class Driver:
         frozen_img = (P.get("freeze") or {}).get("docker_image_id")
         P["preflight"] = {
             "trunk_is_the_approved_fresh_root": t["head_branch"] == "master" and self.git("merge-base", "--is-ancestor", EXPECTED["fresh_root"], "master") == "" and t["ledgerlock_dir_absent_at_master"],
-            "zero_prior_delivery_commits": all(("cost_cap" in ln or "guard plugin" in ln) for ln in after),
+            "zero_prior_delivery_commits": all(_is_preparation_commit(ln) for ln in after),
             "expected_story_count": len(stories) == EXPECTED["stories"],
             "expected_story_state_none_registered": "No stories registered" in status_text,
             "no_candidate_branches": t["branches"] == ["master"],
