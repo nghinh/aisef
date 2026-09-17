@@ -166,3 +166,24 @@ and `aisef run` cannot start at all for any Python project under default configu
 `phase20/SS-65-ENVIRONMENT-CONTRACT.json`; W1 is stopped and the W0 record for abad2a6 is void. The lesson for this
 plan: a red line from `aisef doctor` about the framework's own image is a framework finding, never an accepted
 condition of the run.
+
+## Re-qualification preparation after SS-65 (2026-09-17, owner decision "FIX SS-65 AT CAPABILITY-MODEL LEVEL")
+
+- **The first W1 run 1 attempt is void** (stopped at the tools preflight, $0, archived in
+  `w1/run-1-aborted-sast-preflight/`). Its run copy is kept as `~/Downloads/projects/w1-run-1-aborted-sast` (it carries
+  the attempt's ARB-1 re-approval, guard-plugin commit and replay manifest) and a new `w1-run-1` is prepared from the
+  reference project by `w1/prepare_run_copy.sh`, like runs 2 and 3.
+- **Environment contract changes with the candidate, declared here, not an arbitration.** The Python environment's
+  name carries its recipe digest, and the SS-65 recipe adds `bandit==1.9.4`, so the reference project's pinned
+  `sandbox.image` (`aisef-verify-python:b2c7afff2aed`, now unknown to the candidate) is re-pinned in each run copy to
+  exactly the frozen candidate's Python profile image, read from the frozen wheel by the preparation script and
+  committed as a project-side preparation commit. `sandbox.*` is not part of the readiness verifier digest.
+- **ARB-1 still applies unchanged, measured with the SS-65 code on the W1 project:** readiness content hash
+  `32736048f968…` and verifier-config digest `7dc71c3fe52b42d3` are byte-identical to the readings under abad2a6 —
+  the new `tools.disabled` key contributes nothing at its default (`control/identity.py::DIGEST_NEUTRAL_DEFAULTS`,
+  proven by `tests/hardening/test_tool_capability.py::TestTheNewKeyDoesNotMoveSignedDigests`). The owner's conditions
+  for OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL are re-measured by `w1/arbitration_predeclared.py` before each run.
+- **Capability preflight before the first model call (owner item 15):** the driver's prepare phase records, with the
+  frozen candidate's own code, every resolved role (stack, tool, mode, provision, pinned version), every probe
+  (state, observed version, image and image id) and refuses to continue unless every selected tool is present; a
+  missing default tool is a W0 regression and stops W1.

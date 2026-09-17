@@ -180,6 +180,16 @@ def cmd_doctor(args) -> int:
         except ConfigError:
             cfg_tools = None
         if cfg_tools is not None:
+            # SS-65: say what each role resolved to — including a role the profile leaves empty or the project
+            # disabled — before probing what will run.
+            from ..harness import capabilities as _cap
+            for row in _cap.resolve(project, cfg_tools):
+                cap = row.capability
+                if row.command:
+                    how = (f"auto: {cap.tool_id} ({cap.provision.value}, {cap.version_policy})" if cap else row.mode.value)
+                    lines.append(f"  · role {row.role.value} — {how} → `{row.command}`")
+                else:
+                    lines.append(f"  ○ role {row.role.value} — {row.mode.value}: no tool runs — {row.why}")
             for tc in verify_image.check_tools(project, cfg_tools, build=True,
                                                log=lambda m: lines.append(f"  … {m}")):
                 check(f"tool {tc.key}", tc.ok, tc.line)

@@ -205,9 +205,11 @@ class TestDeclaredToolsLiveInTheDeclaredImage(unittest.TestCase):
         recipe = V.recipe_for(image)
         self.assertIsNotNone(recipe, image)
         self.assertIn("@sha256:", recipe.base, "the base is pinned by digest, not by tag")
-        self.assertTrue(any(p.startswith("pytest==") for p in recipe.packages))
-        self.assertTrue(any(p.startswith("ruff==") for p in recipe.packages))
-        self.assertEqual(image, recipe.name)
+        installs = [spec for cap in recipe.capabilities for spec in cap.install]   # SS-65: rendered from the registry
+        self.assertTrue(any(p.startswith("pip:pytest==") for p in installs), installs)
+        self.assertTrue(any(p.startswith("pip:ruff==") for p in installs), installs)
+        self.assertTrue(any(p.startswith("pip:bandit==") for p in installs), "SS-65: the sast the profile selects is installed")
+        self.assertEqual(image, recipe.image)
         self.assertIn(recipe.digest[:12], image, "the name carries the recipe's digest")
 
     def test_probes_are_derived_from_the_declared_commands(self):

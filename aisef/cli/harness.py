@@ -6,6 +6,7 @@ from __future__ import annotations
 import shutil
 
 from ..harness import sandbox as _sandbox
+from ..harness import capabilities as _capabilities
 from ..harness import verify_image as _verify_image
 import sys
 from pathlib import Path
@@ -83,33 +84,38 @@ _NGOAI_KHUNG_PY = " --exclude .claude --exclude .aisef --exclude .opencode"
 #: carried neither tool, every call is a fresh container, and the first dogfood
 #: run of 1.7.2 printed `No module named pytest` sixteen times before the
 #: operator rebuilt the image by hand (LedgerLock 2026-09-15, lỗi 182 / D-028).
-_PY_IMAGE = _verify_image.RECIPES["python"].name
+_PY_IMAGE = _verify_image.RECIPES["python"].image
+#: SS-65: every preset's image and every tool it inherits come from the stack profile (harness.capabilities); the
+#: go preset used to write `golangci-lint run`, which golang:1.23-alpine never carried (measured 2026-09-17).
+_GO = _capabilities.profile_by_stack("go")
+_PY_LINT = _capabilities.profile_by_stack("python").capability(_capabilities.Role.LINT).command
+_NODE_IMAGE = _capabilities.profile_by_stack("node").image
 
 STACK_PRESETS: dict[str, dict[str, object]] = {
     "react": {
         "tools.test": "npx vitest run --reporter=verbose",
         "tools.lint": "npx eslint . --max-warnings=0" + _NGOAI_KHUNG_JS,
-        "sandbox.image": "node:22-alpine",
+        "sandbox.image": _NODE_IMAGE,
         "sandbox.tools_network": True,
         "sandbox.allow_hosts": ["registry.npmjs.org", "*.npmjs.org"],
         "app.dev_command": "npm run dev",
     },
     "python": {
         "tools.test": f"{_PY} -m pytest -v",
-        "tools.lint": "ruff check ." + _NGOAI_KHUNG_PY,
+        "tools.lint": _PY_LINT + _NGOAI_KHUNG_PY,
         "sandbox.image": _PY_IMAGE,
         "sandbox.allow_hosts": ["pypi.org", "files.pythonhosted.org"],
     },
     "go": {
         "tools.test": "go test -v ./...",
-        "tools.lint": "golangci-lint run",
-        "sandbox.image": "golang:1.23-alpine",
+        "tools.lint": _GO.capability(_capabilities.Role.LINT).command,
+        "sandbox.image": _GO.image,
         "sandbox.allow_hosts": ["proxy.golang.org", "sum.golang.org"],
     },
     "node": {
         "tools.test": "npm test",
         "tools.lint": "npx eslint . --max-warnings=0" + _NGOAI_KHUNG_JS,
-        "sandbox.image": "node:22-alpine",
+        "sandbox.image": _NODE_IMAGE,
         "sandbox.tools_network": True,
         "sandbox.allow_hosts": ["registry.npmjs.org", "*.npmjs.org"],
     },
@@ -131,7 +137,7 @@ def cmd_init(args) -> int:
             print("\n".join(thieu))
         if _verify_image.is_managed(str(cfg.get("sandbox.image", "") or "")):
             print(f"  ○ `sandbox.image` = `{cfg['sandbox.image']}` — built by the harness on the "
-                  f"first `aisef doctor` or tool run (pinned base + pinned pytest/ruff)")
+                  f"first `aisef doctor` or tool run (pinned base + the stack profile's pinned tools)")
     return EXIT_OK
 
 

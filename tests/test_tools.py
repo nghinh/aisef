@@ -92,12 +92,13 @@ class TestSandboxImage(ToolTestCase):
 
     def test_image_follows_the_stack(self):
         self.write("package.json", "{}")
-        self.assertEqual(image_for(self.project, self.cfg), "node:22-alpine")
+        # SS-65: the node profile's image, pinned by digest (harness.capabilities)
+        self.assertTrue(image_for(self.project, self.cfg).startswith("node:22-alpine@sha256:"))
 
     def test_python_stack(self):
         self.write("pyproject.toml", "")
         from aisef.harness import verify_image
-        self.assertEqual(image_for(self.project, self.cfg), verify_image.RECIPES["python"].name)
+        self.assertEqual(image_for(self.project, self.cfg), verify_image.RECIPES["python"].image)
 
     def test_config_wins(self):
         self.write("package.json", "{}")

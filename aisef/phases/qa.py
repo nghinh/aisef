@@ -94,7 +94,7 @@ KINDS: dict[str, Kind] = {
 #: Default commands when the project does not declare one. Only set for kinds
 #: with near-standard tooling; the rest stay empty and report "unconfigured".
 _DEFAULTS: dict[str, dict[str, str]] = {
-    "python": {"security": "bandit -q -r .", "mutation": "mutmut run"},
+    "python": {"mutation": "mutmut run"},
     "node": {"e2e": "npx playwright test", "mutation": "npx stryker run"},
 }
 
@@ -409,7 +409,7 @@ def tool_image_for(kind_id: str, config: Config | None) -> str:
     return ""
 
 
-def _tool_present(command: str, project: Path) -> bool:
+def _tool_present(command: str, project: Path, config: Config | None = None, kind_id: str = "") -> bool:
     """Is the tool this command actually runs installed here?
 
     Declaring a command whose tool is absent makes the kind report "ran and
@@ -438,7 +438,25 @@ def _tool_present(command: str, project: Path) -> bool:
         # "tool not installed" — asking the host would have answered a question
         # about the wrong machine.
         return (project / "node_modules" / ".bin" / argv[1]).exists()
+    # SS-65 family: the kind runs in the sandbox image when docker is in use, and this host's PATH says nothing
+    # about that image (mutmut on the host, absent from the python image, was selected and then unrunnable). Under
+    # docker a non-project-local default is selected only when the operator named the image it runs in
+    # (`verify.tool_images`); on the local provider the host IS where it runs.
+    if config is not None and _runs_in_an_image(project, config):
+        return bool(kind_id) and bool(tool_image_for(kind_id, config))
     return bool(_shutil.which(argv[0]))
+
+
+def _runs_in_an_image(project: Path, config: Config) -> bool:
+    """Whether the sandbox will run a kind inside a container — the provider the sandbox itself would select."""
+    try:
+        provider, _ = sandbox.select_provider(sandbox.SandboxSpec(
+            workspace=project, cmd=["true"], allow_degraded=True,
+            use_docker=bool(config.get("sandbox.use_docker", True)),
+            provider=str(config.get("sandbox.provider", "") or "")))
+    except Exception:  # noqa: BLE001 — no provider can be selected: nothing runs in an image
+        return False
+    return provider.id == "docker"
 
 
 def command_for_kind(kind_id: str, project: Path, config: Config | None) -> str:
@@ -450,9 +468,9 @@ def command_for_kind(kind_id: str, project: Path, config: Config | None) -> str:
     if kind_id == "unit":
         return command_for("test", project, config)
     if kind_id == "security":
-        configured = command_for("sast", project, config)
-        if configured:
-            return configured
+        # The stack profile is the only default (SS-65): an AUTO sast row, the project's explicit one, or nothing —
+        # a disabled or NONE role never falls through to another table.
+        return command_for("sast", project, config)
     marker = "node" if (project / "package.json").is_file() else (
         "python" if (project / "pyproject.toml").is_file() else ""
     )
@@ -465,11 +483,11 @@ def command_for_kind(kind_id: str, project: Path, config: Config | None) -> str:
     # network-isolated. A missing tool recorded as a failing verification of the
     # project inverts what a red gate means.
     default = _DEFAULTS.get(marker, {}).get(kind_id, "")
-    if default and _tool_present(default, project):
+    if default and _tool_present(default, project, config, kind_id):
         return default
 
     universal = _UNIVERSAL.get(kind_id, "")
-    if universal and _tool_present(universal, project):
+    if universal and _tool_present(universal, project, config, kind_id):
         return universal
     return ""
 

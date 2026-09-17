@@ -38,7 +38,7 @@ REPO = HERE.parents[2]
 MARKERS = ["wave=EPIC-01/w3 DONE", "wave=EPIC-03/w1 DONE"]  # P20 procedure 3: the forced-resume boundaries
 EXPECTED = {"client": "opencode", "opencode_version": "1.18.31", "model": "9router/mycombo", "stories": 16, "fresh_root": "8ff9f13",
             "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
-            "sandbox_image": "aisef-verify-python:b2c7afff2aed"}   # owner item 9: asserted mechanically BEFORE the first model call
+            }   # owner item 9: asserted mechanically BEFORE the first model call; the image comes from the frozen candidate
 STALL_S = 2 * 3600
 ARB1_NOTE = ("ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for byte-identical content after the hash-method change "
              "(SS-55 verifier-config digest); not a waiver; kernel refusal recorded first; conditions measured in "
@@ -171,6 +171,27 @@ class Driver:
                                capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(self.run_dir), env=self.env()).stdout.strip()
         status_text = self.cli("status", timeout=120)["stdout_tail"]
         plugin_bin = P["guard_plugin"]["bin_line"] or ""
+        # owner item 15: the resolved capabilities and their probes, measured with the FROZEN candidate's own code in the
+        # environment the run will use — before the first model call. Any selected tool not present → STOP.
+        cap_src = ("import json, sys\nfrom aisef.config import Config\nfrom aisef.harness import capabilities as C, verify_image as V\n"
+                   "p = sys.argv[1]; cfg = Config.load(p)\n"
+                   "rows = [dict(role=r.role.value, mode=r.mode.value, command=r.command, stack=r.stack, image=r.image, why=r.why,\n"
+                   "             tool=(r.capability.tool_id if r.capability else ''), provision=(r.capability.provision.value if r.capability else ''),\n"
+                   "             version=(r.capability.version if r.capability else '')) for r in C.resolve(p, cfg)]\n"
+                   "checks = [dict(key=c.key, command=c.command, state=c.state, ok=c.ok, mode=c.mode, tool=c.tool_id, version=c.version,\n"
+                   "               observed=c.observed, detail=c.detail, where=c.where) for c in V.check_tools(p, cfg, build=True)]\n"
+                   "img = rows[0]['image'] if rows else ''\n"
+                   "print(json.dumps(dict(resolved=rows, checks=checks, image=img, image_id=V.image_id(img),\n"
+                   "                      expected_python_image=C.profile_by_stack('python').image)))\n")
+        cp = subprocess.run([self.a.python, "-c", cap_src, str(self.project)], capture_output=True, text=True, encoding="utf-8",
+                            errors="replace", cwd=str(self.run_dir), env=self.env(), timeout=2400)
+        try:
+            P["capability_preflight"] = json.loads(cp.stdout.strip().splitlines()[-1])
+        except (ValueError, IndexError):
+            P["capability_preflight"] = {"error": (cp.stderr or cp.stdout)[-800:]}
+        capp = P["capability_preflight"]
+        capp_ok = "error" not in capp and all(c["state"] == "present" or (c["state"] == "UNJUDGED" and c["command"].split()[0] in ("npx", "npm"))
+                                              for c in capp.get("checks", [])) and bool(capp.get("checks"))
         img_id = P["docker_image"]["id"]
         frozen_img = (P.get("freeze") or {}).get("docker_image_id")
         P["preflight"] = {
@@ -185,7 +206,8 @@ class Driver:
             "expected_model_route": model == EXPECTED["model"],
             "guard_plugin_bound_to_the_frozen_candidate": self.a.aisef in plugin_bin,
             "no_stale_story_worktrees": len(self.git("worktree", "list").splitlines()) == 1,
-            "sandbox_image_declared": P["config"].get("sandbox.image") == EXPECTED["sandbox_image"],
+            "sandbox_image_is_the_frozen_candidates_python_environment": P["config"].get("sandbox.image") == capp.get("expected_python_image"),
+            "every_selected_tool_probed_present_before_the_first_model_call": capp_ok,
             "sandbox_image_present": bool(img_id),
             "environment_identity_matches_freeze": (img_id == frozen_img) if frozen_img else "no freeze record given — not compared",
             "no_remotes": not t["remotes"],

@@ -738,6 +738,7 @@ invariants:
       - tests/hardening/scan8a/test_group_d.py::TestSS46PreflightProbeRunsWithoutADeclaredImage
       - tests/hardening/scan8a/test_group_d.py::TestSS47UnjudgeableProbeIsNotPresent
       - tests/hardening/scan8a/test_group_d.py::TestSS48ProvisionedMeansRunnable
+      - tests/hardening/test_tool_capability.py::TestEnvironmentFailuresAreNeverBehaviouralRed
     model_tests: []
     fault_injection_tests:
       - tests/hardening/test_fault_matrix.py::TestToolFaults
@@ -747,6 +748,10 @@ invariants:
       - SS-34
       - SS-45
       - SS-46
+      - SS-65
+      - SS-67
+      - SS-68
+      - SS-71
     status: PROVEN
   - invariant_id: INV-N.2
     domain: tool capability
@@ -763,6 +768,41 @@ invariants:
       - tests/hardening/test_fault_matrix.py::TestSandboxIdentityFaults
     linked_defects:
       - F-9
+    status: PROVEN
+  - invariant_id: INV-N.DEFAULT-CAPABILITY
+    domain: tool capability
+    statement: "If AISEF selects an evidence-producing tool by default for a stack, that exact tool is executable in the environment AISEF selects for that stack — AUTO_SELECTED(tool, stack, profile) => AVAILABLE(tool, resolved_environment) — and both sides come from one registry (aisef/harness/capabilities.py). A role a profile leaves empty is stated with its reason and runs nothing; empty config means AUTO only, and a role is switched off only by `tools.disabled` (required roles cannot be)."
+    why: "SS-65 — the python profile selected bandit and its own image never installed it; every default Python run stopped at the tools preflight (W1 run 1, 2026-09-17). The capability sweep found the same shape for Go, Rust, Ruby, PHP, Flutter, the go preset and the qa kind defaults (SS-67…SS-76)."
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/harness/capabilities.py::resolve
+      - aisef/harness/capabilities.py::StackProfile.dockerfile
+      - aisef/harness/verify_image.py::check_tools
+      - aisef/harness/tools.py::command_for
+      - aisef/phases/qa.py::command_for_kind
+      - validation/tool_capability_qualification.py
+    deterministic_tests:
+      - tests/hardening/test_ss65_reproducers.py::TestSS65PythonDefaultSastIsInThePythonImage
+      - tests/hardening/test_ss65_reproducers.py::TestSS65GoDefaultSastIsInTheGoImage
+      - tests/hardening/test_tool_capability.py::TestRegistryIsTheOnlySource
+      - tests/hardening/test_tool_capability.py::TestPythonAndGoKeepTheirSecurityDefault
+      - tests/hardening/test_tool_capability.py::TestNegativeControls
+      - tests/hardening/test_tool_capability.py::TestTheContractDocumentIsRendered
+      - tests/hardening/test_tool_capability.py::TestTheNewKeyDoesNotMoveSignedDigests
+    model_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_fault_matrix.py::TestToolFaults
+    linked_defects:
+      - SS-65
+      - SS-67
+      - SS-69
+      - SS-70
+      - SS-71
+      - SS-72
+      - SS-73
+      - SS-74
+      - SS-75
+      - SS-76
     status: PROVEN
   - invariant_id: INV-O.1
     domain: scheduler isolation
@@ -951,4 +991,18 @@ invariants:
     fault_injection_tests: []
     linked_defects:
       - D-002
+    status: PROVEN
+  - invariant_id: INV-T.QUALIFICATION-REGISTER
+    domain: pass safety
+    statement: W0 may be QUALIFIED only when the COMPLETE current defect register — the frozen fix families and every entry added after the freeze, whenever registered, unique by id — holds no OPEN P0 or P1, and the register's entries agree with its declared counts.
+    why: SS-66 — the W0 builder read only the frozen families and printed QUALIFIED with SS-65 (P1) OPEN in additions_after_freeze (2026-09-17).
+    severity_if_violated: P1
+    enforcement_points:
+      - validation/w0_qualification.py::criteria
+    deterministic_tests:
+      - tests/hardening/test_w0_gate.py::TestAPostFreezeP1RefusesQualification
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects:
+      - SS-66
     status: PROVEN

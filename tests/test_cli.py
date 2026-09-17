@@ -802,7 +802,7 @@ class TestInit(CliTestCase):
         from aisef.cli.harness import _PY
         self.assertEqual(cfg["tools.test"], f"{_PY} -m pytest -v")
         from aisef.harness import verify_image
-        self.assertEqual(cfg["sandbox.image"], verify_image.RECIPES["python"].name)
+        self.assertEqual(cfg["sandbox.image"], verify_image.RECIPES["python"].image)
         self.assertTrue(cfg["sandbox.image"].startswith("aisef-verify-python:"))
         self.assertIn("pypi.org", cfg["sandbox.allow_hosts"])
 

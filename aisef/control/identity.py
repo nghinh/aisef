@@ -33,6 +33,10 @@ CONTROL_FIELDS = ("story_id", "story_epoch", "candidate_sha", "tree_state_digest
 SESSION_FIELDS = ("story_id", "session_id")
 #: config keys whose change changes what a verdict means
 VERIFIER_KEY_PREFIXES = ("tools.", "verify.", "coverage.", "security.", "review.")
+#: Verifier keys introduced after verdicts were already signed, with the value that reproduces the earlier behaviour
+#: exactly. At that value the key contributes nothing to the digest, so every existing verdict and approval keeps
+#: its digest byte for byte (SS-65 added `tools.disabled`; `[]` = nothing disabled = the pre-SS-65 behaviour).
+DIGEST_NEUTRAL_DEFAULTS = {"tools.disabled": []}
 
 #: notes that carry a candidate SHA without being a grading of it — never the candidate of record
 NON_CANDIDATE_NOTES = ("retry:recovery", "evidence:invalidated")
@@ -194,7 +198,8 @@ def verifier_config_digest(config) -> str:
     values = getattr(config, "values", None)
     if not isinstance(values, dict):
         return ""
-    picked = {k: values[k] for k in sorted(values) if k.startswith(VERIFIER_KEY_PREFIXES)}
+    picked = {k: values[k] for k in sorted(values) if k.startswith(VERIFIER_KEY_PREFIXES)
+              and not (k in DIGEST_NEUTRAL_DEFAULTS and values[k] == DIGEST_NEUTRAL_DEFAULTS[k])}
     return _sha([json.dumps(picked, sort_keys=True, default=str)])
 
 

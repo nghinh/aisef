@@ -16,6 +16,18 @@ git fetch -q "$P/w1-run-1" master          # brings the objects; fd4c644 (the co
 git cherry-pick --no-edit fd4c644 >/dev/null
 cap=$(python3 -c "import json; print(json.load(open('.ai/config.json')).get('run.cost_cap_usd'))")
 [ "$cap" = "80.0" ] || { echo "REFUSED: cost cap not applied (run.cost_cap_usd=$cap)"; exit 1; }
+# SS-65: the reference project pins the python environment by name; the name carries the recipe digest, so the frozen
+# candidate's environment has a new name. Re-pin to exactly the frozen candidate's python profile image.
+F=/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/P19-FREEZE.json
+VENV=$(python3 -c "import json; print(json.load(open('$F'))['run_venv']['path'])")
+IMG=$("$VENV/bin/python" -c "from aisef.harness.capabilities import profile_by_stack; print(profile_by_stack('python').image)")
+[ -n "$IMG" ] || { echo "REFUSED: cannot read the frozen candidate's python image"; exit 1; }
+python3 - "$IMG" <<'PYI'
+import json, sys
+p = ".ai/config.json"; c = json.load(open(p)); old = c.get("sandbox.image"); c["sandbox.image"] = sys.argv[1]
+open(p, "w").write(json.dumps(c, indent=2, ensure_ascii=False) + "\n"); print(f"sandbox.image: {old} -> {sys.argv[1]}")
+PYI
+git commit -q -am "w1-run-$n: sandbox.image re-pinned to the frozen candidate's python environment $IMG (SS-65: the recipe now carries bandit)"
 git for-each-ref --format='%(refname)' | grep -v '^refs/heads/master$' | while read r; do git update-ref -d "$r"; done
 echo "w1-run-$n: HEAD=$(git rev-parse --short HEAD) branch=$(git rev-parse --abbrev-ref HEAD) refs=[$(git for-each-ref --format='%(refname:short)' | tr '\n' ' ')] remotes=[$(git remote | tr '\n' ' ')]"
 echo "commits after 8ff9f13: $(git log --oneline 8ff9f13..master | tr '\n' ';')"

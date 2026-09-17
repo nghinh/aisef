@@ -1,7 +1,7 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "phase": 7,
- "generated": "2026-09-16T21:50:26+00:00",
+ "generated": "2026-09-17T14:44:31+00:00",
  "stages": [
   "Developer",
   "Test",
@@ -902,10 +902,82 @@
    "invariants": "INV-G.5",
    "test": "tests/hardening/test_differential.py::TestSeed34999ACapInsideARegradedVerifierStopsTheRun",
    "status": "GREEN (P12)"
+  },
+  {
+   "id": "FM-N-04",
+   "stage": "Tool",
+   "fault": "INJECTED",
+   "scenario": "the stack's managed image lacks a tool the profile selects (the SS-65 bandit case)",
+   "expected_state": "preflight MISSING; no session opens",
+   "expected_evidence": "tools.<role> MISSING in <managed image>",
+   "expected_recovery": "rebuild the recipe",
+   "invariants": "INV-N.DEFAULT-CAPABILITY, INV-N.1",
+   "test": "tests/hardening/test_tool_capability.py::TestNegativeControls::test_declared_tool_missing_from_the_image_fails_the_check_and_blocks_the_run",
+   "status": "GREEN (SS-65)"
+  },
+  {
+   "id": "FM-N-05",
+   "stage": "Tool",
+   "fault": "INJECTED",
+   "scenario": "the managed image answers a different version than the profile pins",
+   "expected_state": "VERSION_MISMATCH blocks; a project-declared image is reported, not blocked",
+   "expected_evidence": "expected vs found in the check",
+   "expected_recovery": "rebuild the recipe",
+   "invariants": "INV-N.DEFAULT-CAPABILITY",
+   "test": "tests/hardening/test_tool_capability.py::TestNegativeControls::test_a_version_mismatch_in_the_managed_image_blocks",
+   "status": "GREEN (SS-65)"
+  },
+  {
+   "id": "FM-N-06",
+   "stage": "Tool",
+   "fault": "INJECTED",
+   "scenario": "a project declares another stack's managed image",
+   "expected_state": "every selected tool MISSING there; nothing is satisfied by the wrong image",
+   "expected_evidence": "MISSING per role",
+   "expected_recovery": "declare the stack's image",
+   "invariants": "INV-N.DEFAULT-CAPABILITY",
+   "test": "tests/hardening/test_tool_capability.py::TestNegativeControls::test_another_stacks_image_cannot_satisfy_a_capability",
+   "status": "GREEN (SS-65)"
+  },
+  {
+   "id": "FM-N-07",
+   "stage": "Tool",
+   "fault": "INJECTED",
+   "scenario": "the image carries a scanner the profile does not select, or sast is disabled",
+   "expected_state": "nothing runs; typed skip; no qa fallback; no evidence of a scan",
+   "expected_evidence": "tool_run skipped with the reason (mode disabled / NONE)",
+   "expected_recovery": "none",
+   "invariants": "INV-N.DEFAULT-CAPABILITY",
+   "test": "tests/hardening/test_tool_capability.py::TestNegativeControls::test_disabling_an_optional_tool_is_typed_and_never_falls_through",
+   "status": "GREEN (SS-65)"
+  },
+  {
+   "id": "FM-N-08",
+   "stage": "Tool",
+   "fault": "INFRA",
+   "scenario": "a cargo subcommand absent / the sandbox denies network / the sandbox user cannot write the toolchain cache",
+   "expected_state": "TOOL_UNRUNNABLE or ENVIRONMENT_FAILURE — never TEST_FAILED / TOOL_FAILED",
+   "expected_evidence": "unrunnable reason on the tool_run",
+   "expected_recovery": "fix the environment",
+   "invariants": "INV-N.1",
+   "test": "tests/hardening/test_tool_capability.py::TestEnvironmentFailuresAreNeverBehaviouralRed",
+   "status": "GREEN (SS-65)"
+  },
+  {
+   "id": "FM-A-04",
+   "stage": "Approval",
+   "fault": "INJECTED",
+   "scenario": "a P1 is registered after the defect-set freeze",
+   "expected_state": "the W0 builder refuses qualification",
+   "expected_evidence": "'0 P0/P1 open' fails naming the id",
+   "expected_recovery": "fix, then re-qualify",
+   "invariants": "INV-T.QUALIFICATION-REGISTER",
+   "test": "tests/hardening/test_w0_gate.py::TestAPostFreezeP1RefusesQualification",
+   "status": "GREEN (SS-66)"
   }
  ],
  "status_count": {
-  "GREEN": 73,
+  "GREEN": 79,
   "RED": 0,
   "NEEDS_TEST": 0
  }

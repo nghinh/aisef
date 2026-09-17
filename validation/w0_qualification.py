@@ -24,13 +24,31 @@ def _json(p: Path):
     return json.loads(p.read_text(encoding="utf-8"))
 
 
-def criteria(ci: dict) -> list[dict]:
+def _aisef_tree(sha: str) -> str:
+    if not sha:
+        return ""
+    return subprocess.run(["git", "rev-parse", f"{sha}:aisef"], capture_output=True, text=True, encoding="utf-8",
+                          cwd=ROOT).stdout.strip()
+
+
+def _status_of(m: dict) -> str:
+    return str(m.get("status", "")).upper()
+
+
+def criteria(ci: dict, sha: str = "") -> list[dict]:
+    """INV-T.QUALIFICATION-REGISTER: W0 is QUALIFIED only when the COMPLETE current defect register — the frozen
+    families and every later addition, whenever registered — holds no OPEN P0/P1."""
     defects = _json(EV / "hardening-defect-set.json")
     # The frozen families AND everything registered after the freeze (SS-61…): a defect found after the freeze is exactly
     # the kind this gate exists to catch, and reading only `defects_by_fix_family` made it invisible (found 2026-09-17,
     # when SS-65 was registered OPEN and this builder still printed QUALIFIED).
     additions = list(defects.get("additions_after_freeze") or [])
-    members = [m for ms in defects["defects_by_fix_family"].values() for m in ms] + additions
+    register: dict[str, dict] = {}
+    for m in [m for ms in defects["defects_by_fix_family"].values() for m in ms] + additions:
+        if m["id"] in register and _status_of(register[m["id"]]) != _status_of(m):
+            register[m["id"]] = {**m, "status": "OPEN"}      # two copies that disagree: the register is not trustworthy → OPEN
+        register.setdefault(m["id"], m)
+    members = list(register.values())
     def _status(m: dict) -> str:
         return str(m.get("status", "")).upper()
     open_members = [m["id"] for m in members if _status(m) == "OPEN"]
@@ -45,6 +63,10 @@ def criteria(ci: dict) -> list[dict]:
         by_status[c["status"].split(" ")[0]] = by_status.get(c["status"].split(" ")[0], 0) + 1
     registry = (ROOT / "aisef" / "invariants.yaml").read_text(encoding="utf-8")
     reg = {k: registry.count(f"status: {k}") for k in ("PROVEN", "PARTIAL", "MISSING")}
+    reg["registered"] = len(re.findall(r"^\s*- invariant_id:", registry, re.M))
+    matrix_path = EV / "tool-capability-matrix.json"
+    matrix = _json(matrix_path) if matrix_path.is_file() else {}
+    tree = _aisef_tree(sha)
     red_markers = [str(p.relative_to(ROOT)) for p in (ROOT / "tests").rglob("*.py")
                    if re.search(r"^\s*@unittest\.expectedFailure", p.read_text(encoding="utf-8"), re.M)]
     diff = _json(EV / "differential-p12-summary.json") if (EV / "differential-p12-summary.json").is_file() else {}
@@ -58,7 +80,11 @@ def criteria(ci: dict) -> list[dict]:
           "members_without_an_explicit_status": no_status}),
         ("0 NEEDS_TEST fault cells", by_status.get("NEEDS_TEST", 0) == 0, {"fault_matrix": by_status}),
         ("fault matrix GREEN", by_status.get("RED", 0) == 0 and by_status.get("GREEN", 0) == len(cells), {"cells": len(cells), "fault_matrix": by_status}),
-        ("0 MISSING/PARTIAL invariants", reg["PARTIAL"] == 0 and reg["MISSING"] == 0 and reg["PROVEN"] == 50, {"registry": reg}),
+        ("0 MISSING/PARTIAL invariants", reg["PARTIAL"] == 0 and reg["MISSING"] == 0 and reg["PROVEN"] == reg["registered"] >= 50,
+         {"registry": reg}),
+        ("default tool capabilities qualified on real images for this product tree (INV-N.DEFAULT-CAPABILITY)",
+         matrix.get("pass") is True and bool(tree) and matrix.get("aisef_tree") == tree,
+         {"matrix": {k: matrix.get(k) for k in ("generated", "aisef_tree", "pass", "totals")}, "candidate_aisef_tree": tree}),
         ("0 expected-red tests", not red_markers, {"files_with_red_markers": red_markers}),
         ("0 unexplained model/kernel gaps (100 000 traces)", bool(diff) and diff.get("unexplained") == 0 and diff.get("traces", 0) >= 100000
          and (diff.get("manifest") or {}).get("pass") is True and diff.get("invariant_violations") == 0,
@@ -95,7 +121,7 @@ def main(argv=None) -> int:
     ap.add_argument("--out", default=str(EV / "AISEF-W0-QUALIFICATION.json"))
     a = ap.parse_args(argv)
     sha = a.sha or subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, encoding="utf-8", cwd=ROOT).stdout.strip()
-    rows = criteria(ci_state(a.ci_run, a.sha))
+    rows = criteria(ci_state(a.ci_run, a.sha), sha)
     rec = {"level": "W0", "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1", "candidate_sha": sha,
            "generated": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
            "qualified": all(r["holds"] for r in rows), "criteria": rows,

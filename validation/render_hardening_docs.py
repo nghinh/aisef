@@ -4,6 +4,7 @@
     python3 validation/render_hardening_docs.py invariants # docs/INVARIANTS.md from aisef/invariants.yaml
     python3 validation/render_hardening_docs.py families   # docs/DEFECT-FAMILY-MAP.md from closure-evidence/hardening/defect-family-map.json
     python3 validation/render_hardening_docs.py faults     # docs/FAULT-MATRIX.md from closure-evidence/hardening/fault-matrix.json
+    python3 validation/render_hardening_docs.py capabilities # docs/TOOL-CAPABILITIES.md from aisef/harness/capabilities.py
 
 The JSON/YAML files are the sources; the markdown is derived and `tests/hardening/test_invariants_registry.py`
 asserts the rendered documents are in sync.
@@ -86,14 +87,57 @@ def render_faults() -> str:
     return "\n".join(md) + "\n"
 
 
+def render_capabilities() -> str:
+    """The product contract for default evidence tools (SS-65) — rendered from the registry, never written by hand."""
+    from aisef.harness import capabilities as C
+    md = ["# Default tool capabilities", "",
+          "Rendered from `aisef/harness/capabilities.py` by `validation/render_hardening_docs.py capabilities`; "
+          "`tests/hardening/test_tool_capability.py` keeps it in sync. This is the product contract for the evidence "
+          "tools AISEF selects when a project leaves `tools.<role>` empty (INV-N.DEFAULT-CAPABILITY): every tool listed "
+          "as selected is executable in the environment listed for its stack, proven on real images by "
+          "`validation/tool_capability_qualification.py` (`closure-evidence/hardening/tool-capability-matrix.json`).", "",
+          "## Configuration semantics", "",
+          "| `tools.<role>` | `tools.disabled` | meaning |", "|---|---|---|",
+          "| empty | role not listed | **AUTO** — the stack profile below decides; this is the only meaning of empty |",
+          "| a command | role not listed | **EXPLICIT** — the project's command, probed where it runs |",
+          "| empty | role listed | **DISABLED** — typed off: never run, never evidence, recorded as such |",
+          "| a command | role listed | refused at config load (contradiction) |", "",
+          f"Required roles ({', '.join(r.value for r in C.REQUIRED_ROLES)}) cannot be disabled. A role a profile leaves "
+          "empty (**none** below) runs nothing and says why; the gate never pretends such a tool exists.", "",
+          "Provision: **managed** = installed by the harness-built image at the pinned version; **toolchain** = part of the "
+          "digest-pinned base image; **project** = the project declares it (the image provides the runtime); "
+          "**none** = no default tool for the role.", "",
+          "## Profiles", ""]
+    for p in C.PROFILES:
+        md += [f"### {p.stack}", "",
+               f"- markers: {', '.join(f'`{m}`' for m in p.markers)}",
+               f"- environment: `{p.image}`" + (f" (built from `{p.base}`)" if p.managed else ""),
+               ""]
+        if p.managed:
+            md += ["```dockerfile", p.dockerfile().rstrip(), "```", ""]
+        md += ["| role | tool | command | provision | version | evidence | note |", "|---|---|---|---|---|---|---|"]
+        for c in p.capabilities:
+            md.append(f"| {c.role.value} | {c.tool_id if c.provision is not C.Provision.NONE else '—'} | "
+                      f"{('`' + c.command + '`') if c.command else '—'} | {c.provision.value} | {c.version_policy} | "
+                      f"{c.evidence or '—'} | {c.note.replace('|', '/') or '—'} |")
+        if p.runtime:
+            md += ["", "Runtime probes: " + ", ".join(f"`{' '.join(r.argv)}`" + (f" → `{r.expect}`" if r.expect else "")
+                                                     for r in p.runtime)]
+        md.append("")
+    md.append("Any project without a marker runs its explicit tools in `" + C.FALLBACK_IMAGE + "`, which carries no stack tool.")
+    return "\n".join(md) + "\n"
+
+
 def main(argv: list[str]) -> int:
-    which = set(argv[1:]) or {"invariants", "families", "faults"}
+    which = set(argv[1:]) or {"invariants", "families", "faults", "capabilities"}
     if "invariants" in which:
         (ROOT / "docs/INVARIANTS.md").write_text(render_invariants(), encoding="utf-8"); print("wrote docs/INVARIANTS.md")
     if "families" in which:
         (ROOT / "docs/DEFECT-FAMILY-MAP.md").write_text(render_families(), encoding="utf-8"); print("wrote docs/DEFECT-FAMILY-MAP.md")
     if "faults" in which and (ROOT / "closure-evidence/hardening/fault-matrix.json").exists():
         (ROOT / "docs/FAULT-MATRIX.md").write_text(render_faults(), encoding="utf-8"); print("wrote docs/FAULT-MATRIX.md")
+    if "capabilities" in which:
+        (ROOT / "docs/TOOL-CAPABILITIES.md").write_text(render_capabilities(), encoding="utf-8"); print("wrote docs/TOOL-CAPABILITIES.md")
     return 0
 
 

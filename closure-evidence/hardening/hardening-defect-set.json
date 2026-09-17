@@ -5,26 +5,26 @@
  "generated": "2026-09-16T10:12:06+00:00",
  "rule": "No broad speculative sweep while fixing. A sibling found during implementation is classified, assigned to an already-frozen family where it belongs, and added here with explicit provenance (commit + finding source).",
  "counts": {
-  "total": 75,
+  "total": 86,
   "by_severity": {
-   "P1": 14,
-   "P2": 40,
-   "P3": 18
+   "P2": 49,
+   "P1": 18,
+   "P3": 19
   },
   "by_fix_family": {
    "F1-IDENTITY-PROVENANCE-FRESHNESS": 17,
    "F3-STRUCTURED-JUDGMENT-AUTHORITY": 14,
-   "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY": 14,
+   "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY": 15,
    "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE": 12,
-   "F6-BENCH-RELEASE-APPROVAL": 6,
-   "F5-PROCESS-TOOL-ENVIRONMENT": 11
+   "F6-BENCH-RELEASE-APPROVAL": 7,
+   "F5-PROCESS-TOOL-ENVIRONMENT": 21
   },
   "fixed": 16,
   "by_status": {
-   "OPEN": 1,
-   "FIXED": 73,
+   "FIXED": 85,
    "SUPERSEDED": 1
-  }
+  },
+  "counting_rule": "unique by id: AD-01/03/04/05 and SS-61/62/63 are listed both in their fix family and in additions_after_freeze (provenance) and count once; recounted from the entries on 2026-09-17 (the hand-maintained counts before this had by_severity summing to 72 of 75)"
  },
  "fix_families": {
   "F1-IDENTITY-PROVENANCE-FRESHNESS": [
@@ -1337,15 +1337,16 @@
   },
   {
    "id": "SS-65",
-   "family": "FAM-PROCESS",
+   "family": "FAM-TOOL",
    "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
    "severity": "P1",
    "invariants": [
+    "INV-N.DEFAULT-CAPABILITY",
     "INV-N.1"
    ],
    "site": "aisef/harness/verify_image.py::RECIPES['python'] (packages) and aisef/harness/tools.py::STACK_IMAGES (go)",
    "statement": "the harness declares a sast tool it then refuses to run: `command_for` auto-detects `bandit -q -r .` for any project with a pyproject.toml/setup.py (SS-45 made auto-detected commands part of `declared_tools`), but the python preset image the harness BUILDS ITSELF installs only pytest, pytest-cov and ruff — so `_missing_tools` reports `tools.sast … MISSING in aisef-verify-python:b2c7afff2aed: exit 127` and `aisef run` stops at `sprint ERROR` before any session. There is no configuration escape: an empty `tools.sast` means auto-detect, so the command cannot be withdrawn. Sibling: go.mod projects get `gosec ./...` against `golang:1.23-alpine`, which does not carry gosec (measured, exit 127). Rust and Ruby pass (their chosen images do carry `cargo audit` / `bundle`), Node is UNJUDGED by design (project-local runner, SS-47).",
-   "status": "OPEN",
+   "status": "FIXED",
    "provenance": "found 2026-09-17 14:00 by W1 run 1 on the frozen candidate abad2a6: driver phases prepare/kernel-first/approve passed and `aisef run --client opencode` stopped after 5 s at the tools preflight, $0, no model call (closure-evidence/hardening/w1/run-1-aborted-sast-preflight/). Not reachable by the Phase 12 differential: the synthetic adapter never executes a real tool probe.",
    "measured": {
     "python_default_config": "image aisef-verify-python:b2c7afff2aed (the harness's own preset) — tools.sast `bandit -q -r .` exit 127",
@@ -1358,8 +1359,201 @@
    },
    "regression_of": "b7733db (2026-09-15, D-028) states the rule 'the environment a preset declares contains every tool the preset declares' and built the python recipe for test and lint; the sast default was added to the probe set by SS-45 afterwards and the recipe was never extended, so the framework's own rule is violated by its own image.",
    "why_no_test_caught_it": "tests/test_dogfood_ledgerlock.py proves the PREFLIGHT reports a missing tool (with a mocked sandbox and a fictional image `some/ci-image:1`); no test asserts the real invariant — that every tool `declared_tools` resolves for a stack is present in the image `image_for` picks for that stack. That test is part of the fix.",
-   "proposed_fix": "PROPOSAL, NOT IMPLEMENTED (a change under aisef/ voids PHASE12_KERNEL_DIGEST, the W0 record and the freeze; owner rule 3): add `bandit==1.9.4` to RECIPES['python'].packages — the recipe digest and image name become aisef-verify-python:<new>, so the reference project's pinned `sandbox.image` must be re-pinned too; for go, either build a managed go recipe carrying gosec or stop auto-detecting a tool the chosen image cannot run. Plus the missing invariant test. Measured viable: the base image with bandit 1.9.4 builds and all four tools run in it."
+   "proposed_fix": "PROPOSAL, NOT IMPLEMENTED (a change under aisef/ voids PHASE12_KERNEL_DIGEST, the W0 record and the freeze; owner rule 3): add `bandit==1.9.4` to RECIPES['python'].packages — the recipe digest and image name become aisef-verify-python:<new>, so the reference project's pinned `sandbox.image` must be re-pinned too; for go, either build a managed go recipe carrying gosec or stop auto-detecting a tool the chosen image cannot run. Plus the missing invariant test. Measured viable: the base image with bandit 1.9.4 builds and all four tools run in it.",
+   "reproducer": "tests/hardening/test_ss65_reproducers.py::TestSS65PythonDefaultSastIsInThePythonImage",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — one registry drives selection, recipes, presets and probes; python image carries bandit==1.9.4, go image carries gosec v2.29.0; real-image qualification closure-evidence/hardening/tool-capability-matrix.json",
+   "siblings": [
+    "SS-67",
+    "SS-68",
+    "SS-69",
+    "SS-70",
+    "SS-71",
+    "SS-72",
+    "SS-73",
+    "SS-74",
+    "SS-75",
+    "SS-76"
+   ],
+   "reproducer_go": "tests/hardening/test_ss65_reproducers.py::TestSS65GoDefaultSastIsInTheGoImage"
+  },
+  {
+   "id": "SS-66",
+   "family": "FAM-RELEASE",
+   "fix_family": "F6-BENCH-RELEASE-APPROVAL",
+   "severity": "P1",
+   "invariants": [
+    "INV-T.QUALIFICATION-REGISTER"
+   ],
+   "site": "validation/w0_qualification.py::criteria",
+   "statement": "the W0 builder read only `defects_by_fix_family`; every defect registered after the freeze was invisible to '0 P0/P1 open' — it printed QUALIFIED with SS-65 (P1) OPEN",
+   "reproducer": "tests/hardening/test_w0_gate.py::TestAPostFreezeP1RefusesQualification",
+   "provenance": "found 2026-09-17 while registering SS-65 (negative control run against abad2a6)",
+   "fixed_by": "e02c5a4 (post-freeze additions scanned) + this commit (scan cross-checked against the declared counts; permanent negative control)",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+  },
+  {
+   "id": "SS-67",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P1",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY",
+    "INV-N.1"
+   ],
+   "site": "aisef/harness/tools.py::STACK_IMAGES (rust:1-alpine) + aisef/harness/verify_image.py::probe_command",
+   "statement": "Rust's default lint (`cargo clippy`) and security scan (`cargo audit`) are absent from rust:1-alpine (no clippy component, no cargo-audit), and the first-word probe `command -v cargo` reported both present, so the preflight passed and every run failed after the session was paid",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestRegistryIsTheOnlySource",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — managed rust recipe (clippy, cargo-audit 0.22.2, pinned advisory-db) and capability probes per tool",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+  },
+  {
+   "id": "SS-68",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P1",
+   "invariants": [
+    "INV-N.1"
+   ],
+   "site": "aisef/harness/tools.py::unrunnable_reason",
+   "statement": "a missing cargo subcommand (`no such command`), a tool refused network by the sandbox (`EAI_AGAIN`) and an unwritable Go build cache were scored as real results — TEST_FAILED / TOOL_FAILED, a behavioural RED for a missing capability",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestEnvironmentFailuresAreNeverBehaviouralRed",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — MISSING_TOOL += `no such command`; NO_NETWORK / NO_WRITABLE_CACHE typed ENVIRONMENT_FAILURE",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+  },
+  {
+   "id": "SS-69",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P2",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY"
+   ],
+   "site": "aisef/harness/tools.py::_from_package_json (sast: npm audit --omit=dev)",
+   "statement": "Node's default security command `npm audit` is a dependency audit that needs the npm registry, and the security sandbox has no network: on any project with dependencies it can never run (measured: EAI_AGAIN)",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestPythonAndGoKeepTheirSecurityDefault",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — Node profile declares sast NONE with the reason; documented in docs/TOOL-CAPABILITIES.md",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+  },
+  {
+   "id": "SS-70",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P2",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY"
+   ],
+   "site": "aisef/cli/harness.py::STACK_PRESETS['go']",
+   "statement": "`init --stack go` declared `golangci-lint run`, which golang:1.23-alpine never carried: the preflight refused every such project (typed, before spend) and the preset disagreed with the auto-detected `go vet`",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestRegistryIsTheOnlySource",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — presets take image and lint from the profile",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+  },
+  {
+   "id": "SS-71",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P1",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY",
+    "INV-N.1"
+   ],
+   "site": "aisef/harness/tools.py::STACK_IMAGES (golang:1.23-alpine) under the sandbox user 1000:1000",
+   "statement": "every Go command failed for the sandbox's non-root user without a home (`failed to initialize build cache at /.cache/go-build: permission denied`, measured on golang:1.23-alpine and on the first managed go image), and the kernel scored `go test` TEST_FAILED",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestEnvironmentFailuresAreNeverBehaviouralRed",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL'); confirmed pre-existing on the frozen candidate's image",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — managed go recipe sets GOCACHE=/tmp/go-build, probed",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+  },
+  {
+   "id": "SS-72",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P2",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY"
+   ],
+   "site": "aisef/harness/tools.py::_STACK_COMMANDS (Gemfile)",
+   "statement": "Ruby's defaults `bundle exec rspec/rubocop/brakeman` run the project's own gems, absent from ruby:3-alpine and not installable offline; the first-word probe reported `bundle` present",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestRegistryIsTheOnlySource",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — Ruby profile selects nothing (NONE with reason)",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+  },
+  {
+   "id": "SS-73",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P2",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY"
+   ],
+   "site": "aisef/harness/tools.py::_STACK_COMMANDS (composer.json)",
+   "statement": "PHP's defaults `composer test/lint` need composer, absent from php:8-cli-alpine: the preflight refused every PHP project (typed, before spend)",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestRegistryIsTheOnlySource",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — PHP profile selects nothing (NONE with reason)",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+  },
+  {
+   "id": "SS-74",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P2",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY"
+   ],
+   "site": "aisef/harness/tools.py::_STACK_COMMANDS (pubspec.yaml) + image_for fallback",
+   "statement": "Flutter's defaults `flutter test/analyze` were selected while the project ran in alpine:latest, which has no flutter, and the run preflight does not probe the fallback image",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestRegistryIsTheOnlySource",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — Flutter profile selects nothing (NONE with reason)",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+  },
+  {
+   "id": "SS-75",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P2",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY"
+   ],
+   "site": "aisef/phases/qa.py::_tool_present / _DEFAULTS",
+   "statement": "qa kind defaults (mutmut, syft, trivy) were selected when present on the HOST and then run in the sandbox image; the security kind also carried its own `bandit` default beside the tool registry",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestNegativeControls",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — presence judged where the kind runs; the security kind reads the registry only",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+  },
+  {
+   "id": "SS-76",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P3",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY"
+   ],
+   "site": "aisef/harness/tools.py::command_for (empty tools.* = auto-detect)",
+   "statement": "an empty `tools.<role>` meant auto-detect and there was no other way to switch a role off, so an optional tool could not be disabled with a typed record",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestNegativeControls",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — `tools.disabled` (typed; required roles refused; contradiction refused); empty = AUTO only",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
   }
  ],
- "updated": "2026-09-17T15:14:37+0700"
+ "updated": "2026-09-17T21:44:31+0700"
 }
