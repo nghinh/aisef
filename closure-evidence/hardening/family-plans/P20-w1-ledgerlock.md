@@ -152,3 +152,17 @@ oracle results, resumes, drift records, cost, duration, every operator arbitrati
   remotes, one branch. The driver's prepare phase asserts exactly this (`fresh_topology_ok`: HEAD on master, only the
   named preparation commits after 8ff9f13, no `ledgerlock/`, no remotes) before anything else runs. Runs 2 and 3 are
   prepared the same way from the reference project at 8ff9f13.
+
+## Correction (2026-09-17 14:20) — the "known environment condition" judgement was wrong
+
+The rehearsal note above recorded `aisef doctor`'s red line (`tools.sast` = `bandit -q -r .` missing from
+`aisef-verify-python:b2c7afff2aed`) as a known condition of the reference environment, to be kept as is and reported
+through typed TOOL_UNRUNNABLE records, on the precedent of run-2's F-B (classified at 1.7.3 as not a framework defect:
+undeclared, auto-detected, agent-initiated, and the gate read no sast). That precedent no longer holds on the hardened
+candidate. SS-45 made auto-detected commands part of `declared_tools`, and D-028's preflight refuses a run when a
+declared tool is absent where it will run — so the framework now declares a tool its own preset image does not carry,
+and `aisef run` cannot start at all for any Python project under default configuration. W1 run 1 hit exactly that
+(14:00, $0, no model call). It is registered as SS-65 (P1, INV-N.1, F5) with the measurement in
+`phase20/SS-65-ENVIRONMENT-CONTRACT.json`; W1 is stopped and the W0 record for abad2a6 is void. The lesson for this
+plan: a red line from `aisef doctor` about the framework's own image is a framework finding, never an accepted
+condition of the run.
