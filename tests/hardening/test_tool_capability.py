@@ -110,11 +110,11 @@ class TestRegistryIsTheOnlySource(unittest.TestCase):
             self.assertFalse(any(w in src for w in ("run_tool", "sandbox", "subprocess", "command_for")),
                              f"{rel} is exempt only while it runs nothing")
         for f in sorted((ROOT / "aisef").rglob("*.py")):
-            if f.name == "capabilities.py" or str(f.relative_to(ROOT)) in self.ADVISORY:
+            if f.name == "capabilities.py" or f.relative_to(ROOT).as_posix() in self.ADVISORY:
                 continue
             for node in ast.walk(ast.parse(f.read_text(encoding="utf-8"))):
                 if isinstance(node, ast.Constant) and isinstance(node.value, str) and node.value in defaults:
-                    offenders.append(f"{f.relative_to(ROOT)}:{node.lineno} {node.value!r}")
+                    offenders.append(f"{f.relative_to(ROOT).as_posix()}:{node.lineno} {node.value!r}")
         self.assertEqual(offenders, [])
 
     def test_the_fallback_image_is_the_sandbox_default(self):

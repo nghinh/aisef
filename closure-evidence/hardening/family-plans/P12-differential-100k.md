@@ -60,3 +60,17 @@ the day; the qualification chain was restarted from chunk 00000 after the last o
 
 **Verification after the dataset.** Full local suite 3 428 passed / 20 skipped / 1 444 subtests (528 s); `ruff check .` clean; the
 product tree unchanged since PHASE12-KERNEL-IDENTITY. CI on this commit is recorded by the W0 qualification record.
+
+## Re-run on the SS-65 kernel (owner decision "FIX SS-65 AT CAPABILITY-MODEL LEVEL AND RE-QUALIFY", item 12)
+
+The SS-65 fix changes `aisef/` (tree `84014c98…` → `02a34e0e…`), so the dataset above is moved, unedited, to
+`phase12/history-kernel-84014c98/` and marked VALID HISTORICAL EVIDENCE — NOT FINAL QUALIFICATION EVIDENCE. The full
+100 000-trace set is re-run against the new product tree after Linux and Windows CI are green on it, with a new
+PHASE12-KERNEL-IDENTITY recorded first; every chunk must carry that exact tree, and the consolidation lists both
+earlier datasets under their markers.
+
+**Execution mode (item 13): unchanged — sequential chunks, 8 workers each.** Measured on this host: 8 logical cores
+(4 performance + 4 efficiency); one chunk already runs 8 worker processes plus their git and sandbox subprocesses
+(load average 15–18 during the previous dataset). Running chunks concurrently cannot add throughput here and only adds
+contention, and no deterministic test proves concurrent chunks safe (the comparator mutates module state per process,
+chunks share the evidence directory). The known-safe mode is kept; expected wall clock ≈ 6 h 45.

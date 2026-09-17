@@ -52,8 +52,10 @@ def main() -> int:
     for e in m["chunks"]:
         lines.append(f"| {e['chunk'][-5:]} | {e['seed_range'][0]}–{e['seed_range'][1]} | {e['trace_count']} | {e['transition_count']} | {e['runtime_s']} | {e['mismatches']} | "
                      f"{e['invariant_violations']} | {e['rows_count']} | {e['product_tree_digest'][:12]} | {e['comparator_digest'][:12]} |")
-    lines += ["", "## Superseded runs (not qualification evidence)", "",
-              f"`{m['superseded_runs']['marker']}` — {len(m['superseded_runs']['files'])} files under `phase12/superseded/` (see its README).", ""]
+    lines += ["", "## Earlier runs (not final qualification evidence)", ""]
+    for h in m["superseded_runs"]:
+        lines.append(f"- `{h['marker']}` — {len(h['files'])} files under `{h['dir']}` (see its README)")
+    lines.append("")
     (P / "COVERAGE-REPORT.md").write_text("\n".join(lines), encoding="utf-8")
     print("wrote", P / "COVERAGE-REPORT.md", "| reachable", c["reachable_transitions"]["hit"], "/", c["reachable_transitions"]["total"], "| pairs", comp["distinct_pairs_hit"], "/", comp["possible_pairs"])
     return 0

@@ -282,10 +282,16 @@ def manifest(recs: list[dict], identity: dict | None, superseded_dir: Path) -> d
            "silent_skips_0": sum(e["silent_skips"] or 0 for e in ent) == 0 and all(e["rows_count"] == e["trace_count"] for e in ent),
            "every_chunk_complete_with_rows": all(e["completion_status"] == "COMPLETE" for e in ent) and len(ent) == 10,
            "no_dirty_product_tree": all(e["dirty_aisef"] == [] for e in ent)}
-    sup = sorted(_rel(p) for p in superseded_dir.glob("differential-p12-*")) if superseded_dir.is_dir() else []
+    phase12 = superseded_dir.parent
+    history = [{"marker": "SUPERSEDED_NOT_QUALIFICATION_EVIDENCE", "dir": _rel(superseded_dir),
+                "files": sorted(_rel(p) for p in superseded_dir.glob("differential-p12-*")) if superseded_dir.is_dir() else []}]
+    for d in sorted(phase12.glob("history-kernel-*")):
+        history.append({"marker": "VALID_HISTORICAL_EVIDENCE_NOT_FINAL_QUALIFICATION", "dir": _rel(d),
+                        "kernel": d.name.removeprefix("history-kernel-"),
+                        "files": sorted(_rel(p) for p in d.glob("differential-p12-*"))})
     return {"PHASE12_KERNEL_DIGEST": expected, "identity_record": "closure-evidence/hardening/phase12/PHASE12-KERNEL-IDENTITY.json", "chunks": ent,
             "kernel_digests_seen": sorted(d for d in digests if d), "hard_requirements": req, "pass": all(req.values()),
-            "superseded_runs": {"marker": "SUPERSEDED_NOT_QUALIFICATION_EVIDENCE", "files": sup, "readme": "closure-evidence/hardening/phase12/superseded/README.md"}}
+            "superseded_runs": history}
 
 
 def main(argv=None) -> int:
