@@ -107,10 +107,15 @@ def main() -> int:
     ap.add_argument("--log-prefix", default="diff-p12v2")
     ap.add_argument("--starts", type=int, nargs="+", default=list(range(0, 100000, 10000)))
     ap.add_argument("--interval", type=float, default=60.0)
+    ap.add_argument("--heartbeat", type=float, default=1800.0, help="print a one-line heartbeat this often so a silent death is distinguishable from a quiet watch")
     a = ap.parse_args()
     ev, logs = Path(a.evidence), Path(a.logs)
     tracker, current = None, None
+    last_beat = time.time()
     while True:
+        if time.time() - last_beat >= a.heartbeat:
+            print(f"heartbeat {time.strftime('%H:%M:%S')}: watching chunk {current} — {len(list(ev.glob(a.prefix + '-*[0-9].json')))} chunks complete", flush=True)
+            last_beat = time.time()
         done = {}
         for s in a.starts:
             f = ev / f"{a.prefix}-{s:05d}.json"
