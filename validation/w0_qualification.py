@@ -60,7 +60,9 @@ def criteria(ci: dict) -> list[dict]:
     return [{"criterion": name, "holds": bool(ok), "measured": data} for name, ok, data in rows]
 
 
-def ci_state(run_id: str) -> dict:
+def ci_state(run_id: str, sha: str = "") -> dict:
+    """Green only when the run is fully green AND its head is the candidate: a green run of another SHA is old evidence and
+    must never satisfy this gate silently."""
     if not run_id:
         return {"all_green": None, "why": "no run id given"}
     try:
@@ -70,8 +72,9 @@ def ci_state(run_id: str) -> dict:
         return {"all_green": None, "why": f"gh unavailable: {e}"}
     d = json.loads(out)
     jobs = {j["name"]: j.get("conclusion") for j in d.get("jobs", [])}
-    return {"run_id": run_id, "head_sha": d.get("headSha"), "jobs": jobs,
-            "all_green": bool(jobs) and all(v == "success" for v in jobs.values()) and any("windows" in k for k in jobs)}
+    head_matches = bool(sha) and d.get("headSha") == sha
+    return {"run_id": run_id, "head_sha": d.get("headSha"), "candidate_sha": sha, "head_matches_candidate": head_matches, "jobs": jobs,
+            "all_green": bool(jobs) and all(v == "success" for v in jobs.values()) and any("windows" in k for k in jobs) and head_matches}
 
 
 def main(argv=None) -> int:
@@ -81,7 +84,7 @@ def main(argv=None) -> int:
     ap.add_argument("--out", default=str(EV / "AISEF-W0-QUALIFICATION.json"))
     a = ap.parse_args(argv)
     sha = a.sha or subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, encoding="utf-8", cwd=ROOT).stdout.strip()
-    rows = criteria(ci_state(a.ci_run))
+    rows = criteria(ci_state(a.ci_run, a.sha))
     rec = {"level": "W0", "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1", "candidate_sha": sha,
            "generated": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
            "qualified": all(r["holds"] for r in rows), "criteria": rows,
