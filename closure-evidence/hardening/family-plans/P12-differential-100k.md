@@ -74,3 +74,16 @@ earlier datasets under their markers.
 (load average 15–18 during the previous dataset). Running chunks concurrently cannot add throughput here and only adds
 contention, and no deterministic test proves concurrent chunks safe (the comparator mutates module state per process,
 chunks share the evidence directory). The known-safe mode is kept; expected wall clock ≈ 6 h 45.
+
+### Closure record — SS-65 kernel (2026-09-18 05:42)
+
+Ten chunks of 10 000 seeds (0–99 999), 2026-09-17 23:08 → 2026-09-18 05:42, sequential chunks × 8 workers (the mode
+kept by the measurement above), ≈ 4.2 traces/s: **100 000 / 100 000 matched, 0 unexplained, 0 invariant violations,
+0 exceptions, 0 silent skips**, ranges disjoint and complete. Every chunk recorded the same product identity:
+`aisef/` tree `02a34e0e63ed…` = PHASE12_KERNEL_DIGEST (`phase12/PHASE12-KERNEL-IDENTITY.json`, git 82433cd, CI 7/7
+green on it), content `62b80525…`, registry `29e220c4…`, adapter `8aeb2319…`, model `983dc3bb…`, comparator
+`f8f3a954…`, `dirty_aisef = []` everywhere. Manifest: all hard requirements met (`phase12/PHASE12-DATASET-MANIFEST.json`).
+Coverage unchanged from the previous kernel and re-measured here: 26/26 reachable transitions (all by seed 9 999),
+10 typed outcomes, 4 terminal classes both sides, 28/28 injected fault kinds, 378/378 fault pairs, 92 789 traces with
+two or more faults (`phase12/COVERAGE-REPORT.md`). Full suite 3 466 passed / 20 skipped / 1 484 subtests; ruff clean;
+the product tree is still the Phase 12 kernel after the run.
