@@ -1553,7 +1553,39 @@
    "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — `tools.disabled` (typed; required roles refused; contradiction refused); empty = AUTO only",
    "status": "FIXED",
    "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+  },
+  {
+   "id": "SS-77",
+   "family": "FAM-QUALIFICATION-MEASUREMENT",
+   "fix_family": "F6-QUALIFICATION-INFRASTRUCTURE",
+   "severity": "P1",
+   "invariants": [
+    "INV-T.QUALIFICATION-REGISTER"
+   ],
+   "site": "closure-evidence/hardening/w1/w1_driver.py::finish (the W1 false-pass exit criterion)",
+   "statement": "the W1 false-pass detector derived its set of DONE stories by parsing `aisef status`, which prints only the stories that are NOT passing; on any partial run that set was empty, so the rule `owners and all(o in done for o in owners)` could never fire and `false_pass = 0` was reported for a reason unrelated to whether a false pass had occurred. A red oracle test that no story covers was also dropped by the same `owners and …` shortcut.",
+   "reproducer": "closure-evidence/hardening/w1/run-1/SS-77-REPRODUCER.json — on run 1's own evidence the old derivation yields 0 done stories while the framework's state store holds 11",
+   "provenance": "found by reading the W1 run 1 result instead of accepting it, 2026-09-18; no W1 verdict had yet been claimed on it",
+   "fixed_by": "w1_driver.py reads the framework's structured state (_bmad-output/sprint-status.json); an empty state store now makes every red a false pass and fails the phase (`F['ok']`); unattributed red tests are reported as `unattributed_oracle_failures`, never swallowed",
+   "status": "FIXED",
+   "severity_rule": "P1: a qualification gate that cannot fail is a gate that passes falsely (docs/SCALE-QUALIFICATION.md W1 exit criteria)"
+  },
+  {
+   "id": "SS-78",
+   "family": "FAM-QUALIFICATION-MEASUREMENT",
+   "fix_family": "F6-QUALIFICATION-INFRASTRUCTURE",
+   "severity": "P2",
+   "invariants": [
+    "INV-T.QUALIFICATION-REGISTER"
+   ],
+   "site": "closure-evidence/hardening/w1/w1_driver.py::processes / survivors_after_kill (the W1 orphan-state exit criterion)",
+   "statement": "after SIGTERM to one process group the driver called every process whose command merely contains 'opencode' a survivor, so the operator's own OpenCode desktop app (11-17 days of etime, started long before the run) was recorded as orphan state — the criterion reported a problem that had not happened and would have buried a real orphan in the noise",
+   "reproducer": "run 1's own preserved listings: 13 'survivors' after each kill, 0 of them in the killed process group (closure-evidence/hardening/w1/run-1/driver.json, resumes[].kill)",
+   "provenance": "found while reading the W1 run 1 exit criteria, 2026-09-18, in the same pass as SS-77",
+   "fixed_by": "a survivor is a process still in the killed pgid; the broader listing is kept as `processes_after` (nothing measured is discarded). Run 1 recomputed from its preserved evidence: orphan_state 0",
+   "status": "FIXED",
+   "severity_rule": "P2: a false RED in a stop criterion — it cannot produce a false qualification, but it degrades a measurement the program relies on"
   }
  ],
- "updated": "2026-09-17T21:44:31+0700"
+ "updated": "2026-09-18: +SS-77 (W1 false-pass detector vacuous on partial runs), +SS-78 (orphan-state criterion counted unrelated processes) — both found by reading the W1 run 1 result instead of accepting it, both fixed before any W1 verdict rested on them"
 }

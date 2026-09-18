@@ -346,7 +346,12 @@ class Driver:
                         killed["sigkill_after_120s"] = True
                     time.sleep(5)
                     killed["exit"] = proc.poll()
-                    killed["survivors_after_kill"] = [p for p in self.processes() if p["pid"] != proc.pid]
+                    # SS-78: the SIGTERM went to ONE process group; a survivor is a process still in it. Matching
+                    # every command that merely contains "opencode" catches the operator's own desktop app (days of
+                    # etime, unrelated to this run) and turns the orphan criterion into noise. Both lists are kept.
+                    after = [p for p in self.processes() if p["pid"] != proc.pid]
+                    killed["processes_after"] = after
+                    killed["survivors_after_kill"] = [p for p in after if p["pgid"] == inv["pgid"]]
                     break
             out.close()
             inv["exit"] = proc.returncode
@@ -421,26 +426,45 @@ class Driver:
         idx = json.loads((self.art / "stories.index.json").read_text(encoding="utf-8"))
         stories = idx["stories"] if isinstance(idx, dict) and "stories" in idx else idx
         covers = {s["id"]: s.get("covers", []) for s in (stories if isinstance(stories, list) else stories.values())}
-        done = {sid for sid, s in F["stories"].items() if s.get("status") == "done"}
+        # SS-77: `aisef status` prints only the stories that are NOT passing, so a set built from it holds no done
+        # story and the false-pass rule below can never fire. Read the framework's own structured state instead.
+        sprint = self.art / "sprint-status.json"
+        state = json.loads(sprint.read_text(encoding="utf-8")).get("stories", {}) if sprint.is_file() else {}
+        for sid, st in state.items():
+            F["stories"].setdefault(sid, {}).setdefault("status", st.get("status"))
+            F["stories"][sid]["state_status"] = st.get("status")
+            F["stories"][sid]["attempts"] = st.get("attempts")
+        F["story_state_source"] = str(sprint.relative_to(self.project)) if sprint.is_file() else None
+        done = {sid for sid, st in state.items() if st.get("status") == "done"}
+        if not state:                     # no structured state = no verdict; never a silent pass
+            F["story_state_missing"] = True
         complete = bool(F["progress"]) and F["progress"]["done"] == F["progress"]["total"]
-        false_pass = []
+        false_pass, unattributed = [], []
         for test, verdict in F["oracle"]["results"].items():
             if verdict in ("PASSED", "SKIPPED"):
                 continue
             frs = fr_map.get(test.split("::")[-1], [])
             owners = [sid for sid, c in covers.items() if any(fr in c for fr in frs)]
-            if complete or (owners and all(o in done for o in owners)):
+            if complete or not state or (owners and all(o in done for o in owners)):
                 false_pass.append({"test": test, "frs": frs, "stories_done": owners, "run_complete": complete})
+            elif not owners:
+                # SS-77: a red test the map cannot attribute to any story is not evidence of a pass. It is reported
+                # for judgement, never swallowed by the `owners and …` shortcut.
+                unattributed.append({"test": test, "frs": frs, "why": "no story covers these FRs (or the test carries none)"})
+            else:
+                F.setdefault("reds_on_undelivered_stories", []).append(
+                    {"test": test, "not_done_owners": [o for o in owners if o not in done]})
         run = self.rec["phases"].get("run", {})
         F["exit_criteria"] = {
             "false_pass": false_pass, "false_pass_count": len(false_pass),
+            "unattributed_oracle_failures": unattributed, "unattributed_count": len(unattributed),
             "manual_state_repair": 0, "manual_state_repair_note": "the driver never writes _bmad-output; the only project writes are the guard commit and the ARB-1 re-approval through the CLI",
             "orphan_state": [k for k in run.get("resumes", []) if k["kill"].get("survivors_after_kill")],
             "drift_records": F["drift_records"], "oracle_ran": bool(F["oracle"]["results"]),
             "resumes_forced": len(run.get("resumes", [])), "markers_not_reached": run.get("markers_not_reached"),
             "stops": [ln for ln in run.get("runlog_lines_epic", []) if "STOPPED" in ln],
         }
-        F["ok"] = bool(F["oracle"]["results"]) and F["progress"] is not None
+        F["ok"] = bool(F["oracle"]["results"]) and F["progress"] is not None and bool(state)
         self.rec["phases"]["finish"] = F
         self.save()
         rec = {"run": self.a.run, "generated": now(), "candidate": self.rec["phases"].get("prepare", {}).get("freeze"),

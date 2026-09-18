@@ -1,0 +1,14 @@
+{"seq": 1, "step": "attempt.started", "at": 1789692046.803, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 2, "step": "worktree.created", "at": 1789692047.264, "attempt": 1, "data": {"path": "/Users/nghinh/Downloads/projects/w1-run-1/.aisef/worktrees/STORY-01-06"}, "undo": {"worktree.remove": "STORY-01-06"}}
+{"seq": 3, "step": "status.running", "at": 1789692047.265, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 4, "step": "changes.detected", "at": 1789692247.426, "attempt": 1, "data": {"luot": 1, "files": ["ledgerlock/ledger.py", "tests/test_conflict.py"], "preexisting_excluded": [], "count": 2}, "undo": {}}
+{"seq": 5, "step": "candidate.frozen", "at": 1789692247.427, "attempt": 1, "data": {"luot": 1, "sha": "911fae7bf51b3c166f3bd4817ebc9fbb37035461", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 6, "step": "changes.detected", "at": 1789692687.006, "attempt": 1, "data": {"luot": 2, "files": ["ledgerlock/ledger.py", "tests/test_conflict.py"], "preexisting_excluded": [], "count": 2}, "undo": {}}
+{"seq": 7, "step": "candidate.frozen", "at": 1789692687.006, "attempt": 1, "data": {"luot": 2, "sha": "da2ffc6113b73a1efc32a7c5f03db4ca6401b8f7", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 8, "step": "changes.detected", "at": 1789692923.879, "attempt": 1, "data": {"luot": 3, "files": ["ledgerlock/ledger.py", "tests/test_conflict.py"], "preexisting_excluded": [], "count": 2}, "undo": {}}
+{"seq": 9, "step": "candidate.frozen", "at": 1789692923.879, "attempt": 1, "data": {"luot": 3, "sha": "715ba2607f0d577b17205423c2393b80a2d04680", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 10, "step": "verification.completed", "at": 1789693069.013, "attempt": 1, "data": {"ok": true, "attempts": 3, "cost_usd": 0.0, "candidate": "715ba2607f0d577b17205423c2393b80a2d04680"}, "undo": {}}
+{"seq": 11, "step": "review.completed", "at": 1789693069.013, "attempt": 1, "data": {"blocked": ["[block] ledgerlock/ledger.py:55 — _read_tail() reads only the literal final line; AD-4 requires the most-recent line in the JSONL whose NFC-normalized key matches. With chain [put a/r1, put b/r2], append(('put','a','anything','r1',300)) appends a new line instead of replaying, and append(('put','a','va2','WRONG',300)) skips ConflictError. FR-3/FR-4/FR-5 / AC-4 / AC-5 pass only because each AC test arranges the matching key as the literal tail."], "outcome": "PASS", "review_executions": 3, "developer_attempts": 3}, "undo": {}}
+{"seq": 12, "step": "attempt.aborted", "at": 1789693069.02, "attempt": 1, "data": {"reason": "abnormal termination"}, "undo": {}}
+{"seq": 13, "step": "merge.completed", "at": 1789693069.094, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 14, "step": "attempt.committed", "at": 1789693069.528, "attempt": 1, "data": {}, "undo": {}}

@@ -1,0 +1,12 @@
+{"seq": 1, "step": "attempt.started", "at": 1789693071.834, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 2, "step": "worktree.created", "at": 1789693072.38, "attempt": 1, "data": {"path": "/Users/nghinh/Downloads/projects/w1-run-1/.aisef/worktrees/STORY-02-01"}, "undo": {"worktree.remove": "STORY-02-01"}}
+{"seq": 3, "step": "status.running", "at": 1789693072.383, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 4, "step": "changes.detected", "at": 1789693199.798, "attempt": 1, "data": {"luot": 1, "files": ["ledgerlock/ledger.py", "tests/test_verify_independent.py"], "preexisting_excluded": [], "count": 2}, "undo": {}}
+{"seq": 5, "step": "candidate.frozen", "at": 1789693199.798, "attempt": 1, "data": {"luot": 1, "sha": "0a573e1597faa605d955ddf7ac474bc4e3bbdfe8", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 6, "step": "changes.detected", "at": 1789693386.927, "attempt": 1, "data": {"luot": 2, "files": ["tests/test_verify_independent.py", "ledgerlock/ledger.py"], "preexisting_excluded": [], "count": 2}, "undo": {}}
+{"seq": 7, "step": "candidate.frozen", "at": 1789693386.927, "attempt": 1, "data": {"luot": 2, "sha": "a4fdbe91e27664167ca8a6fdd799cccf43814b57", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 8, "step": "verification.completed", "at": 1789693637.75, "attempt": 1, "data": {"ok": true, "attempts": 2, "cost_usd": 0.0, "candidate": "a4fdbe91e27664167ca8a6fdd799cccf43814b57"}, "undo": {}}
+{"seq": 9, "step": "review.completed", "at": 1789693637.751, "attempt": 1, "data": {"blocked": [], "outcome": "PASS", "review_executions": 2, "developer_attempts": 2}, "undo": {}}
+{"seq": 10, "step": "attempt.aborted", "at": 1789693637.756, "attempt": 1, "data": {"reason": "abnormal termination"}, "undo": {}}
+{"seq": 11, "step": "merge.completed", "at": 1789693637.819, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 12, "step": "attempt.committed", "at": 1789693638.35, "attempt": 1, "data": {}, "undo": {}}

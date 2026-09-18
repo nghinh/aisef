@@ -1,0 +1,92 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 26 items
+
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_1_matches_json_dumps_contract PASSED [  3%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_2_element_equal_dicts_produce_identical_bytes PASSED [  7%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_3_non_ascii_utf8_literal_and_byte_stable PASSED [ 11%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_4_insertion_order_irrelevant PASSED [ 15%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_5_genesis_is_seven_character_literal PASSED [ 19%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_6_round_trip_through_json_loads_is_byte_stable PASSED [ 23%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_1_returns_64_lowercase_hex_characters PASSED [ 26%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_2_distinct_prev_hash_yields_distinct_digest PASSED [ 30%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_3_existing_hash_and_prev_hash_fields_are_ignored PASSED [ 34%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_4_same_input_produces_same_digest PASSED [ 38%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_5_genesis_non_hex_seven_char_string_accepted PASSED [ 42%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_byte_for_byte 
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_byte_for_byte PASSED [ 46%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_returns_nfc_bytes 
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_returns_nfc_bytes PASSED [ 50%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_2_nfc_and_nfd_collide_to_nfc PASSED [ 53%]
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path PASSED [ 57%]
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_4_python_m_ledgerlock_help_lists_subcommands 
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_4_python_m_ledgerlock_help_lists_subcommands PASSED [ 61%]
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_5_no_forbidden_imports_in_package PASSED [ 65%]
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_6_no_forbidden_calls_in_package PASSED [ 69%]
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_7_ledger_and_conflict_error_importable PASSED [ 73%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_1_jsonl_with_n_lines_returns_n_bytes_with_newline_stripped PASSED [ 76%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_2_missing_file_raises_file_not_found PASSED [ 80%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_3_empty_file_returns_empty_list PASSED [ 84%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_write_atomic_overwrites_existing_content PASSED [ 88%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_writes_concatenated_bytes_and_read_lines_returns_them PASSED [ 92%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_5_crash_between_temp_write_and_replace_leaves_original_intact PASSED [ 96%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_6_temp_file_created_in_same_directory_as_target FAILED [100%]
+
+=================================== FAILURES ===================================
+_ TestWriteAtomic.test_AC_STORY_01_04_6_temp_file_created_in_same_directory_as_target _
+
+self = <tests.test_store.TestWriteAtomic testMethod=test_AC_STORY_01_04_6_temp_file_created_in_same_directory_as_target>
+
+    def test_AC_STORY_01_04_6_temp_file_created_in_same_directory_as_target(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            target_dir = Path(tmp_dir) / "nested"
+            target_dir.mkdir()
+            path = target_dir / "ledger.jsonl"
+            observed: dict[str, str] = {}
+    
+            def _spy_replace(src: str, dst: str) -> None:
+                observed["src"] = src
+                observed["dst"] = dst
+                store.os.replace.__wrapped__(src, dst)  # type: ignore[attr-defined]
+    
+            with mock.patch.object(store.os, "replace", side_effect=_spy_replace):
+>               store.write_atomic(str(path), [b'{"x":1}\n'])
+
+tests/test_store.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+ledgerlock/store.py:31: in write_atomic
+    os.replace(temp_path, path)
+/usr/local/lib/python3.12/unittest/mock.py:1139: in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/unittest/mock.py:1143: in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/unittest/mock.py:1204: in _execute_mock_call
+    result = effect(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_store.py:82: in _spy_replace
+    store.os.replace.__wrapped__(src, dst)  # type: ignore[attr-defined]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <MagicMock name='replace' id='281472800625232'>, name = '__wrapped__'
+
+    def __getattr__(self, name):
+        if name in {'_mock_methods', '_mock_unsafe'}:
+            raise AttributeError(name)
+        elif self._mock_methods is not None:
+            if name not in self._mock_methods or name in _all_magics:
+                raise AttributeError("Mock object has no attribute %r" % name)
+        elif _is_magic(name):
+>           raise AttributeError(name)
+E           AttributeError: __wrapped__
+
+/usr/local/lib/python3.12/unittest/mock.py:662: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_6_temp_file_created_in_same_directory_as_target
+=============== 1 failed, 25 passed, 16 subtests passed in 0.23s ===============
