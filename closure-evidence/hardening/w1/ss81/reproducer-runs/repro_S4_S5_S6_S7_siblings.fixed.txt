@@ -1,0 +1,12 @@
+...........................................................
+----------------------------------------------------------------------
+Ran 59 tests in 0.084s
+
+OK
+S4b TDD: Outcome.FAILED | tests green on first run — not proven to verify anything (tests/test_a.py). Write tests first, run them through the reco
+
+S4 TDD: Outcome.FAILED | tests green on first run — not proven to verify anything (tests/test_a.py). Write tests first, run them through the reco
+S5 nop(acceptance=0): Outcome.UNRUNNABLE | story declares no criteria — no criterion test exists for the control to prove red at parent SHA cha0000
+S6 baseline: Outcome.UNRUNNABLE | the baseline run stopped at collection — tests in files that did collect never ran, so which were green there is unknown
+S7 ledger: {'AC-S-01-1': 'gap', 'FR-1': 'gap'}
+exit=0

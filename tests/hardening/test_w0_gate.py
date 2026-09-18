@@ -98,5 +98,52 @@ class TestAPostFreezeP1RefusesQualification(unittest.TestCase):
                 self.assertTrue(_row(W.criteria({}, "sha"), name)["holds"])
 
 
+class TestSS90EvidenceOfAnotherKernelRefuses(unittest.TestCase):
+    """SS-90 — the Phase 12 and mutation rows read their records without the kernel they measured: a 100 000-trace
+    dataset or a mutation run of another aisef/ tree satisfied W0, and survivors were read from a key (`results`)
+    mutate.py never writes, so no survivor could ever refuse."""
+
+    HEAD = W.subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, encoding="utf-8", cwd=ROOT).stdout.strip()
+
+    def _rows(self, diff=None, mut=None):
+        tree = W._aisef_tree(self.HEAD)
+        targets = [f"{t['module']}::{t['function']}" for t in W._json(ROOT / "validation/mutation-targets.json")["targets"]]
+        base_mut = {"aisef_tree": tree, "only": "", "targets": targets, "survived": 0,
+                    "rows": [{"id": "m1", "status": "KILLED"}, {"id": "m2", "status": "EQUIVALENT"}]}
+        with tempfile.TemporaryDirectory() as tmp:
+            ev = Path(tmp)
+            for name in NEEDED:
+                if (W.EV / name).is_file():
+                    shutil.copy(W.EV / name, ev / name)
+            d = json.loads((ev / "differential-p12-summary.json").read_text(encoding="utf-8"))
+            d["manifest"] = {**(d.get("manifest") or {}), "pass": True, "kernel_digests": [tree]}
+            (ev / "differential-p12-summary.json").write_text(json.dumps({**d, **(diff or {})}), encoding="utf-8")
+            (ev / "mutation-results.json").write_text(json.dumps({**base_mut, **(mut or {})}), encoding="utf-8")
+            with mock.patch.object(W, "EV", ev):
+                rows = W.criteria({"all_green": True}, self.HEAD)
+        return _row(rows, "0 unexplained model/kernel gaps (100 000 traces)"), _row(rows, "0 safety-significant mutation survivors")
+
+    def test_control_records_of_the_candidates_own_tree_hold(self):
+        p12, mut = self._rows()
+        self.assertTrue(p12["holds"], p12["measured"])
+        self.assertTrue(mut["holds"], mut["measured"])
+
+    def test_a_phase12_dataset_of_another_kernel_refuses(self):
+        d = json.loads((W.EV / "differential-p12-summary.json").read_text(encoding="utf-8"))
+        p12, _ = self._rows(diff={"manifest": {**d["manifest"], "pass": True, "kernel_digests": ["0" * 40]}})
+        self.assertFalse(p12["holds"])
+
+    def test_a_mutation_run_of_another_kernel_or_of_no_recorded_kernel_refuses(self):
+        self.assertFalse(self._rows(mut={"aisef_tree": "0" * 40})[1]["holds"])
+        self.assertFalse(self._rows(mut={"aisef_tree": ""})[1]["holds"])
+
+    def test_a_surviving_mutant_refuses(self):
+        self.assertFalse(self._rows(mut={"survived": 1, "rows": [{"id": "m1", "status": "SURVIVED"}]})[1]["holds"])
+
+    def test_a_partial_mutation_run_refuses(self):
+        self.assertFalse(self._rows(mut={"only": "aisef/control/proof.py::classify"})[1]["holds"])
+        self.assertFalse(self._rows(mut={"targets": ["aisef/control/proof.py::classify"]})[1]["holds"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,9 @@
+......................................
+----------------------------------------------------------------------
+Ran 38 tests in 0.057s
+
+OK
+
+S8 R9: Outcome.FAILED | silenced 1 tests green at baseline — skipped at this candidate, so they no longer execute: tests/test_old.py::test_AC_S_00_1_old_behaviour —
+S9 preservation: Outcome.UNRUNNABLE | cannot verify at candidate aaa: AC-S-00-1 (not executed: tests/test_old.py::test_AC_S_00_1_old_behaviour) — no test with code / check skippe
+exit=0

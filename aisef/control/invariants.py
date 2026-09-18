@@ -43,7 +43,8 @@ class Invariant:
 
     @property
     def family(self) -> str:
-        return self.invariant_id.split("-")[1].split(".")[0]
+        seg = self.invariant_id.split("-")[1].split(".")[0]
+        return seg[:1]            # an owner-named id (INV-TDD-NOP-PROOF) sits in the family its first letter names
 
 
 # ------------------------------------------------------------ a YAML subset

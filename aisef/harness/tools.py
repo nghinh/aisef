@@ -309,6 +309,26 @@ NO_SETUP = "no runnable setup in this tree"
 NO_MANIFEST = f"{NO_SETUP} — there is no project manifest here"
 
 
+#: pytest ends the whole session when one test file fails to collect ("Interrupted: N errors during collection"), so
+#: one legitimate story-owned ImportError hides every other file's tests (SS-81). The flag keeps it going. node,
+#: vitest, jest and unittest already run each file on its own and need nothing. Qualified on the pinned pytest 9.1.1
+#: in the managed Python image (closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json).
+PYTEST_CONTINUE = "--continue-on-collection-errors"
+
+
+def collection_continuation_args(command: str) -> list[str]:
+    """Extra args for the harness's own control runs (baseline, nop): the pytest flag when `command` runs pytest
+    directly as one of its argv words — never inside a shell string, where an appended word would change meaning."""
+    try:
+        argv = split_command(command or "")
+    except ValueError:
+        return []
+    names = [Path(a).name for a in argv]
+    runs_pytest = "pytest" in names or "py.test" in names or any(
+        a == "-m" and i + 1 < len(argv) and argv[i + 1] == "pytest" for i, a in enumerate(argv))
+    return [PYTEST_CONTINUE] if runs_pytest and PYTEST_CONTINUE not in argv else []
+
+
 def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error: str = "") -> str:
     """One-line reason if the run is "unrunnable"; "" if it is a real result.
     For `test`, only conclude unrunnable when **no test passed** — a failing

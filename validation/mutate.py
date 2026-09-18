@@ -230,7 +230,11 @@ def main(argv=None) -> int:
             row |= {k: by_id[m["id"]][k] for k in ("status", "seconds", "last_line")}
         result_rows.append(row)
     counts = {s: sum(1 for r in result_rows if r["status"] == s) for s in ("KILLED", "SURVIVED", "EQUIVALENT")}
+    # the kernel these mutants were cut from — W0 accepts only a record of the candidate's own aisef/ tree (SS-90)
+    dirty = subprocess.run(["git", "status", "--porcelain", "--", "aisef"], capture_output=True, text=True, encoding="utf-8", cwd=ROOT).stdout.strip()
+    tree = "" if dirty else subprocess.run(["git", "rev-parse", "HEAD:aisef"], capture_output=True, text=True, encoding="utf-8", cwd=ROOT).stdout.strip()
     out = {"program": "AISEF SYSTEMATIC HARDENING PROGRAM v1", "phase": 13, "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
+           "aisef_tree": tree, "aisef_dirty": bool(dirty), "only": a.only or "",
            "targets": [f"{t['module']}::{t['function']}" for t in spec["targets"]], "operators": list(OPERATORS),
            "mutations_generated": len(result_rows), **{k.lower(): v for k, v in counts.items()},
            "survivors": [r for r in result_rows if r["status"] == "SURVIVED"],

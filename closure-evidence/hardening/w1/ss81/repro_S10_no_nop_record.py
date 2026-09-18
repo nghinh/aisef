@@ -2,7 +2,7 @@
 the gate returns NOT_APPLICABLE, which does not block (Outcome.blocks is FAILED/UNRUNNABLE only)."""
 import sys, unittest
 sys.path.insert(0, "tests")
-from test_gate import TestTestCoKiemDuocStory, Outcome
+from test_gate import TestTestCoKiemDuocStory
 
 
 class S10_NoNopRecord(TestTestCoKiemDuocStory):

@@ -5,11 +5,11 @@
  "generated": "2026-09-16T10:12:06+00:00",
  "rule": "No broad speculative sweep while fixing. A sibling found during implementation is classified, assigned to an already-frozen family where it belongs, and added here with explicit provenance (commit + finding source).",
  "counts": {
-  "total": 86,
+  "total": 100,
   "by_severity": {
-   "P2": 49,
-   "P1": 18,
-   "P3": 19
+   "P2": 54,
+   "P1": 25,
+   "P3": 21
   },
   "by_fix_family": {
    "F1-IDENTITY-PROVENANCE-FRESHNESS": 17,
@@ -17,11 +17,13 @@
    "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY": 15,
    "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE": 12,
    "F6-BENCH-RELEASE-APPROVAL": 7,
-   "F5-PROCESS-TOOL-ENVIRONMENT": 21
+   "F5-PROCESS-TOOL-ENVIRONMENT": 21,
+   "F6-QUALIFICATION-INFRASTRUCTURE": 5,
+   "F7-EXECUTION-EVIDENCE-VALIDITY": 9
   },
   "fixed": 16,
   "by_status": {
-   "FIXED": 85,
+   "FIXED": 99,
    "SUPERSEDED": 1
   },
   "counting_rule": "unique by id: AD-01/03/04/05 and SS-61/62/63 are listed both in their fix family and in additions_after_freeze (provenance) and count once; recounted from the entries on 2026-09-17 (the hand-maintained counts before this had by_severity summing to 72 of 75)"
@@ -1669,7 +1671,7 @@
    "family": "FAM-EVIDENCE-SEMANTICS",
    "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
    "severity": "P1",
-   "status": "OPEN",
+   "status": "FIXED",
    "defect_class": "PRODUCT_KERNEL",
    "defect_class_basis": "site in aisef/: aisef/control/gate.py and the nop run in aisef/phases/implement.py",
    "invariants": [
@@ -1681,16 +1683,23 @@
    "reproducer": "closure-evidence/hardening/w1/ss81/repro_A_unrunnable_nop_with_pytest_format.py (gate level, the suite's own fixtures; control case UNRUNNABLE, defect case PASSED) and repro_B_collection_interruption_masks_tests.py (real pytest 9.1.1 output at the parent run through the kernel's own parser and gate: PASSED with a tautology). Both deterministic, no model.",
    "provenance": "found reading the gate record of PROFILE-W1-OC-GPT56SOL-T80 run 1 (STORY-01-01, seq 113 vs 129): the run log said the nop control was NOT performed while the gate scored it PASSED — 2026-09-18",
    "impact_on_accepted_evidence": "measured: 14 stories across the 4 W1 run copies had 'tests verify story' PASS; 6 of the DONE ones rested on nothing having executed at the parent. Re-run at their real parent SHAs with --continue-on-collection-errors: 0 AC-coded tests green at the parent in all 6 (closure-evidence/hardening/w1/ss81/IMPACT-REMEASURE-accepted-runs.json). The defect did not produce a false pass in any accepted run; the W1 false-pass count stands. It weakens a guarantee, it did not break one here.",
-   "fixed_by": null,
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
    "not_fixed_because": "owner decision 'EXECUTION PROFILE NOT QUALIFIED' section 2: any product-tree change invalidates this program and requires owner approval",
-   "severity_rule": "P1: a deterministic qualification control passes without its evidence having executed (reachable; not observed as a false DONE)"
+   "severity_rule": "P1: a deterministic qualification control passes without its evidence having executed (reachable; not observed as a false DONE)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::R01ThirdPartyMissingAtParent",
+    "tests/hardening/test_ss81_family.py::R02CollectionFailureDoesNotHideATautology",
+    "tests/hardening/test_ss81_family.py::R10PartialOutputCannotPass",
+    "tests/hardening/test_ss81_family.py::R11TestFormatDoesNotChangeTruth"
+   ],
+   "reproducer_green_after_fix": true
   },
   {
    "id": "SS-82",
    "family": "FAM-EVIDENCE-SEMANTICS",
    "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
    "severity": "P3",
-   "status": "OPEN",
+   "status": "FIXED",
    "defect_class": "PRODUCT_KERNEL",
    "defect_class_basis": "site in aisef/: aisef/phases/implement.py::_vang_ma_cua_story",
    "invariants": [
@@ -1701,16 +1710,23 @@
    "statement": "the detector that recognises 'the missing module is the story's own code' matches a module name against changed file stems, but has no package rule: `No module named 'ledgerlock'` does not match `ledgerlock/__init__.py`. A greenfield story's legitimate red at the parent is logged as 'control NOT performed' while the gate (via SS-81's path) scores the same record as proof — two kernel records disagree about one piece of evidence.",
    "reproducer": "W1 PROFILE-W1-OC-GPT56SOL-T80 run 1, STORY-01-01: changed files ledgerlock/__init__.py…, nop seq 113 says unrunnable (dependencies not installed), gate seq 129 says 'tests verify story -> passed'",
    "provenance": "same reading as SS-81, 2026-09-18",
-   "fixed_by": null,
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
    "not_fixed_because": "owner approval required for any product-tree change",
-   "severity_rule": "P3: a misleading operator record; the verdict itself is decided elsewhere (SS-81)"
+   "severity_rule": "P3: a misleading operator record; the verdict itself is decided elsewhere (SS-81)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::R07PackageRoot",
+    "tests/hardening/test_ss81_family.py::ReauditSubmoduleTheStoryAdds",
+    "tests/test_implement.py (nop summary through proof.bound)"
+   ],
+   "reproducer_green_after_fix": true,
+   "disposition": "FIXED in the family: a package root binds to its __init__.py; a missing symbol binds only to its module's own file the story changes or a submodule the story adds; the run-log summary calls the gate's own proof.bound, so the log cannot contradict the gate. Package matching alone binds nothing (owner section 6)."
   },
   {
    "id": "SS-83",
    "family": "FAM-EVIDENCE-SEMANTICS",
    "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
    "severity": "P1",
-   "status": "OPEN",
+   "status": "FIXED",
    "defect_class": "PRODUCT_KERNEL",
    "defect_class_basis": "site in aisef/: aisef/control/tdd.py",
    "invariants": [
@@ -1722,14 +1738,18 @@
    "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py::S4_TddCountsUnrunnableAsRed (both cases PASSED on the frozen kernel)",
    "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
    "sibling_of": "SS-81",
-   "fixed_by": null
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::SS83TddRed"
+   ],
+   "reproducer_green_after_fix": true
   },
   {
    "id": "SS-84",
    "family": "FAM-EVIDENCE-SEMANTICS",
    "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
    "severity": "P2",
-   "status": "OPEN",
+   "status": "FIXED",
    "defect_class": "PRODUCT_KERNEL",
    "defect_class_basis": "site in aisef/: aisef/control/gate.py",
    "invariants": [
@@ -1741,14 +1761,18 @@
    "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py::S5_NoCriteriaAnyRedAtParent (PASSED)",
    "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
    "sibling_of": "SS-81",
-   "fixed_by": null
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::SS84NoCriteria"
+   ],
+   "reproducer_green_after_fix": true
   },
   {
    "id": "SS-85",
    "family": "FAM-EVIDENCE-SEMANTICS",
    "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
    "severity": "P2",
-   "status": "OPEN",
+   "status": "FIXED",
    "defect_class": "PRODUCT_KERNEL",
    "defect_class_basis": "site in aisef/: aisef/control/gate.py",
    "invariants": [
@@ -1760,14 +1784,18 @@
    "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py::S6_BaselineAbortedCollection (PASSED)",
    "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
    "sibling_of": "SS-81",
-   "fixed_by": null
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::SS85BaselineNotExecuted"
+   ],
+   "reproducer_green_after_fix": true
   },
   {
    "id": "SS-86",
    "family": "FAM-EVIDENCE-SEMANTICS",
    "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
    "severity": "P1",
-   "status": "OPEN",
+   "status": "FIXED",
    "defect_class": "PRODUCT_KERNEL",
    "defect_class_basis": "site in aisef/: aisef/control/gate.py",
    "invariants": [
@@ -1779,14 +1807,18 @@
    "reproducer": "closure-evidence/hardening/w1/ss81/repro_S8_S9_skipped_as_green.py::S8_BaselineSkippedAtCandidate (PASSED)",
    "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
    "sibling_of": "SS-81",
-   "fixed_by": null
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::SS86BaselineSkipped"
+   ],
+   "reproducer_green_after_fix": true
   },
   {
    "id": "SS-87",
    "family": "FAM-EVIDENCE-SEMANTICS",
    "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
    "severity": "P1",
-   "status": "OPEN",
+   "status": "FIXED",
    "defect_class": "PRODUCT_KERNEL",
    "defect_class_basis": "site in aisef/: aisef/control/gate.py",
    "invariants": [
@@ -1798,14 +1830,18 @@
    "reproducer": "closure-evidence/hardening/w1/ss81/repro_S8_S9_skipped_as_green.py::S9_PreservationSkipped (PASSED: '1 behaviours of other stories still green')",
    "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
    "sibling_of": "SS-81",
-   "fixed_by": null
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::SS87PreservationSkipped"
+   ],
+   "reproducer_green_after_fix": true
   },
   {
    "id": "SS-88",
    "family": "FAM-EVIDENCE-SEMANTICS",
    "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
    "severity": "P2",
-   "status": "OPEN",
+   "status": "FIXED",
    "defect_class": "PRODUCT_KERNEL",
    "defect_class_basis": "site in aisef/: aisef/control/ledger.py",
    "invariants": [
@@ -1817,14 +1853,18 @@
    "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py::S7_LedgerSkippedIsNotVerified (state printed: AC-S-01-1 verified, FR-1 verified)",
    "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
    "sibling_of": "SS-81",
-   "fixed_by": null
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::SS88LedgerSkipped"
+   ],
+   "reproducer_green_after_fix": true
   },
   {
    "id": "SS-89",
    "family": "FAM-EVIDENCE-SEMANTICS",
    "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
    "severity": "P3",
-   "status": "OPEN",
+   "status": "FIXED",
    "defect_class": "PRODUCT_KERNEL",
    "defect_class_basis": "site in aisef/: aisef/control/gate.py",
    "invariants": [
@@ -1836,10 +1876,36 @@
    "reproducer": "closure-evidence/hardening/w1/ss81/repro_S10_no_nop_record.py (NOT_APPLICABLE, blocks=False)",
    "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
    "sibling_of": "SS-81",
-   "fixed_by": null
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::SS89NoNopRecord"
+   ],
+   "reproducer_green_after_fix": true
+  },
+  {
+   "id": "SS-90",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F6-QUALIFICATION-INFRASTRUCTURE",
+   "severity": "P1",
+   "status": "FIXED",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: validation/w0_qualification.py, validation/mutate.py",
+   "invariants": [
+    "INV-T.QUALIFICATION-REGISTER"
+   ],
+   "site": "validation/w0_qualification.py::criteria (Phase 12 and mutation rows) + validation/mutate.py::main",
+   "statement": "the W0 builder read the Phase 12 summary and the mutation record without the kernel they measured: (a) the 100 000-trace row checked traces, mismatches, violations and manifest.pass but not that manifest.kernel_digests equals the candidate's aisef/ tree, so a dataset of another kernel satisfied it; (b) the mutation record carried no tree at all, and a partial --only run was indistinguishable from the full set; (c) survivors were read from mut['results'], a key mutate.py never writes, so no surviving mutant could ever refuse W0.",
+   "measured": "at 580be54 the old builder accepts a Phase 12 manifest of kernel 0000…, a mutation record of tree 0000… or of no tree, a record with a SURVIVED row, and a partial run (4 negative controls FAIL on the old builder, PASS on the fix). Historical exposure: the voided W0 at af94372 accepted the mutation record generated 2026-09-17T03:05 — before ec876ff changed aisef/ — without any binding; its Phase 12 row was bound in fact (manifest 02a34e0e == its tree).",
+   "provenance": "found 2026-09-18 while preparing the post-SS-81 W0: the owner requires a NEW Phase 12 for the new kernel, and reading the builder showed nothing would have refused the old one",
+   "reproducer": "tests/hardening/test_w0_gate.py::TestSS90EvidenceOfAnotherKernelRefuses",
+   "regression_tests": [
+    "tests/hardening/test_w0_gate.py::TestSS90EvidenceOfAnotherKernelRefuses"
+   ],
+   "fixed_by": "validation/w0_qualification.py: Phase 12 row requires manifest.kernel_digests == [candidate aisef tree]; mutation row requires the record's aisef_tree == candidate tree, no --only, the full target set, and reads survivors from `rows`; validation/mutate.py records aisef_tree (empty when aisef/ is dirty), aisef_dirty and only",
+   "note_on_stop_rule": "qualification infrastructure, not product kernel: the fix only adds refusals and cannot produce a PASS; continued under the precedent of SS-66/SS-77/SS-79 and reported at the checkpoint"
   }
  ],
- "updated": "2026-09-18: SS-81 family registered — SS-81 (P1), SS-82 (P3) and siblings SS-83..SS-89 from the section-7 sweep, all OPEN with deterministic reproducers",
+ "updated": "2026-09-18: SS-81 family registered — SS-81 (P1), SS-82 (P3) and siblings SS-83..SS-89 from the section-7 sweep, all OPEN with deterministic reproducers; 2026-09-18: SS-81..SS-89 FIXED by the F7-EXECUTION-EVIDENCE-VALIDITY family fix (counts recounted unique by id); 2026-09-18: SS-90 (P1, QUALIFICATION_INFRASTRUCTURE) registered FIXED — W0 evidence rows bound to the candidate's kernel",
  "defect_classes": {
   "PRODUCT_KERNEL": "a defect in aisef/ — invalidates evidence produced by the product (kernel qualification, W0)",
   "QUALIFICATION_INFRASTRUCTURE": "a defect in the tooling that measures the product (W1 driver, oracle harness) — invalidates the measurements it produced, not the product; its fix never changes aisef/"

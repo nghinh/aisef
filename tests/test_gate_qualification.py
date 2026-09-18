@@ -389,12 +389,20 @@ class TestTDD(Muc):
     TEN = "TDD"
 
     def test_positive_do_truoc_xanh(self):
-        do = self.store.tool_run("S-01", "test", ok=False)
-        xanh = self.xanh()
-        m = self.muc(self.gate(added_tests=["tests/x.test.js"]))
+        # SS-83: the red run must show the story's own test red by name — a bare non-ok run is no longer enough
+        t = "tests/test_x.py::test_a"
+        do = self.store.tool_run("S-01", "test", ok=False, detail={"test_format": "pytest", "test_ids": [t], "failed_ids": [t]})
+        xanh = self.xanh(ids=[t])
+        m = self.muc(self.gate(added_tests=["tests/test_x.py"]))
         self.assertIs(m.outcome, Outcome.PASSED)
         self.assertEqual(m.evidence, [do.seq, xanh.seq])
         self.assertIs(self.muc(self.gate(added_tests=[])).outcome, Outcome.NOT_APPLICABLE)
+
+    def test_negative_lan_do_tran_khong_ten_khong_chung_minh_gi(self):
+        """SS-83: a non-ok run with no test names (a crash, an unreadable reporter) shows nothing about the story."""
+        self.store.tool_run("S-01", "test", ok=False)
+        self.xanh(ids=["tests/test_x.py::test_a"])
+        self.assertIs(self.muc(self.gate(added_tests=["tests/test_x.py"])).outcome, Outcome.FAILED)
 
     def test_negative_xanh_ngay_lan_dau(self):
         self.xanh()
@@ -662,6 +670,10 @@ class TestBangChungNhan(Muc):
         st.record("S-01", Event(kind=MOCKUP_MAP, name="danh-sach", ok=True,
                                 detail={"missing": [], "missing_data_roles": []}))
         st.tool_run("S-01", "qa:e2e", ok=True)
+        # SS-89: the nop control is part of complete evidence — the criterion test executed red at the parent
+        st.tool_run("S-01", "test:nop", ok=False, detail={"nop": True, "parent": "cha0000", "files": ["tests/test_a.py"],
+                                                          "test_format": "pytest", "test_ids": ["AC-S-01-1: a"],
+                                                          "failed_ids": ["AC-S-01-1: a"], "output_complete": True})
         return self.gate(candidate="aaa", screens=["danh-sach"], contract=["unit", "e2e"],
                          security=SecurityReport(), guard_expected=True, acceptance=1,
                          coverage_min=0.85, added_tests=["tests/test_a.py"],

@@ -26,7 +26,7 @@ from aisef.control.budget import BudgetConfig, BudgetGuard, BudgetLedger  # noqa
 from aisef.control.journal import JournalStore  # noqa: E402
 from aisef.control.outcome import Outcome  # noqa: E402
 from aisef.control.state import StoryStatus  # noqa: E402
-from aisef.control.tdd import red_before_green  # noqa: E402
+from aisef.control.tdd import runs_before_last_green  # noqa: E402
 from aisef.control.worktree import WorktreeManager  # noqa: E402
 from aisef.harness.guardrails import head_sha  # noqa: E402
 from aisef.harness.observe import NOTE, TOOL_RUN, Event, Evidence, EvidenceStore  # noqa: E402
@@ -360,8 +360,9 @@ class TestSSC2CandidateOfRecordIsTheGradedCandidate(unittest.TestCase):
 # ---------------------------------------------------------------- FAM-IDENTITY / INV-D.2
 
 class TestSST1TddVerdictFollowsPositionAndCandidateNotSeq(unittest.TestCase):
-    """SS-T1 — `tdd.red_before_green` compares `e.seq < last_green.seq`; `read()` orders by (at, seq), so a
-    seq that disagrees with position (reset counter, clock skew across machines) decides the verdict."""
+    """SS-T1 — `tdd.red_before_green` compared `e.seq < last_green.seq`; `read()` orders by (at, seq), so a
+    seq that disagrees with position (reset counter, clock skew across machines) decided the verdict. The ordering now
+    lives in `tdd.runs_before_last_green` (SS-81 family moved the *proof* question to `proven_red_before_green`)."""
 
     # GREEN since F1 (SS-T1: TDD verdict by position within the candidate's evidence), 2026-09-16
     def test_a_red_run_positioned_after_the_green_does_not_prove_tdd(self):
@@ -369,7 +370,7 @@ class TestSST1TddVerdictFollowsPositionAndCandidateNotSeq(unittest.TestCase):
             Event(kind=TOOL_RUN, name="test", ok=True, seq=5, at=1.0, detail={"candidate": C2}),
             Event(kind=TOOL_RUN, name="test", ok=False, seq=1, at=2.0, detail={"candidate": C2}),
         ])
-        self.assertFalse(red_before_green(ev), "green then red is not red-before-green")
+        self.assertFalse(runs_before_last_green(ev), "green then red is not red-before-green")
 
     def test_control_a_red_run_at_another_candidate_is_filtered_before_the_seq_comparison(self):
         ev = _ev(
@@ -377,11 +378,11 @@ class TestSST1TddVerdictFollowsPositionAndCandidateNotSeq(unittest.TestCase):
             {"kind": TOOL_RUN, "name": "test", "ok": True, "detail": {"candidate": C2}},
             {"kind": TOOL_RUN, "name": "lint", "ok": True, "detail": {"candidate": C2}},
         )
-        self.assertTrue(red_before_green(ev), "unfiltered, the foreign red would count")
+        self.assertTrue(runs_before_last_green(ev), "unfiltered, the foreign red would count")
         g = gate.evaluate(SID, ev, changed=["tests/test_a.py"], write_scope=["tests"], screens=[], candidate=C2,
                           review_blocking=[], added_tests=["tests/test_a.py"])
         # Safe by construction: `gate.evaluate` applies `evidence.for_candidate(candidate)` (gate.py:659-662)
-        # before any check, so `red_before_green` only ever compares seq within one candidate.
+        # before any check, so the ordering only ever compares position within one candidate.
         self.assertIsNot(_check(g, "TDD").outcome, Outcome.PASSED, _check(g, "TDD").detail)
 
 

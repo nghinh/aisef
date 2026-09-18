@@ -11,7 +11,6 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
@@ -295,13 +294,19 @@ class TestSS26EnvironmentFailureIsNotErasedBySubstring(unittest.TestCase):
     in the traceback; the nop then scores as correctly red and TDD passes on a suite that never ran.
     Invariant F/N/T."""
 
-    # GREEN since F3 (SS-26: prose has no authority over control state), 2026-09-16
+    # GREEN since F3 (SS-26: prose has no authority over control state), 2026-09-16. SS-81 family: the substring
+    # matcher `_vang_ma_cua_story` is gone; the same case is now asked of the proof model that replaced it.
     def test_a_third_party_import_error_stays_an_environment_failure(self):
-        res = SimpleNamespace(
-            unrunnable=f"{NO_SETUP} — dependencies missing",
-            output=lambda: ('Traceback (most recent call last):\n  File "/w/src/config.py", line 3, in <module>\n'
-                            "    import requests\nModuleNotFoundError: No module named 'requests'\n", ""))
-        self.assertEqual(I._vang_ma_cua_story(res, ["src/config.py"]), "")
+        from aisef.control.proof import Proof, bound, classify
+        from aisef.harness.testlog import missing_import
+        text = ('Traceback (most recent call last):\n  File "/w/src/config.py", line 3, in <module>\n'
+                "    import requests\nModuleNotFoundError: No module named 'requests'\n")
+        err = {"error": "module_not_found", "file": "tests/test_config.py", **missing_import(text)}
+        self.assertEqual(bound(err, ["src/config.py"], ["src/config.py"]), (False, ""))
+        st = classify({"test_format": "pytest", "test_ids": [], "unrunnable": f"{NO_SETUP} — dependencies missing",
+                       "collection_errors": [err]}, ["tests/test_config.py::test_AC_S_01_1_x"], ["src/config.py"],
+                      added=["src/config.py"])
+        self.assertIs(st["tests/test_config.py::test_AC_S_01_1_x"][0], Proof.DEPENDENCY_UNRUNNABLE)
 
 
 class TestSS27NoiseFilterHasASeverityFloor(unittest.TestCase):

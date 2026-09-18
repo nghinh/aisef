@@ -1,6 +1,6 @@
 """Candidate siblings of SS-81 — each driven on the frozen kernel with the suite's own fixtures. A failing assertion
 here means the candidate is CONFIRMED (the kernel accepted non-execution / non-behavioural red as proof)."""
-import sys, tempfile, unittest
+import sys, unittest
 sys.path.insert(0, "tests")
 from test_gate import GateTestCase, TestTestCoKiemDuocStory, Outcome
 from aisef.harness.observe import EvidenceStore
@@ -68,7 +68,9 @@ class S7_LedgerSkippedIsNotVerified(unittest.TestCase):
         st = {k: (v.status if hasattr(v, "status") else v) for k, v in led.behaviors.items()} if hasattr(led, "behaviors") else {}
         print("S7 ledger:", st)
         ac = next((v for k, v in led.behaviors.items() if k.endswith("S-01-1")), None)
-        self.assertNotEqual(getattr(ac, "status", None), "VERIFIED", "a skipped test verified nothing")
+        # corrected 2026-09-18: the ledger writes the lowercase value, so comparing with "VERIFIED" passed trivially on the
+        # frozen kernel while the printed state showed the defect ('AC-S-01-1': 'verified')
+        self.assertNotEqual(str(getattr(ac, "status", "")).lower(), "verified", "a skipped test verified nothing")
 
 
 if __name__ == "__main__":

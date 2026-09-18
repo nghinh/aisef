@@ -1,6 +1,6 @@
 {
  "phase": 13,
- "note": "decision-critical kernel functions; every mutant must be killed by the named tests or justified as equivalent",
+ "note": "decision-critical kernel functions; every mutant must be killed by the named tests or justified as equivalent; 2026-09-18: F7 proof model targets added (SS-81 family)",
  "targets": [
   {
    "module": "aisef/control/identity.py",
@@ -253,6 +253,213 @@
     "tests/hardening/scan8a/test_group_c.py",
     "tests/test_tools.py::TestUnrunnableReasonBranches"
    ]
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "classify",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_gate.py",
+    "tests/test_tdd.py",
+    "tests/hardening/test_sibling_scan.py::TestSS26EnvironmentFailureIsNotErasedBySubstring"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "bound",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/hardening/test_sibling_scan.py::TestSS26EnvironmentFailureIsNotErasedBySubstring"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "story_file_for",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_implement.py::TestHappyPath::test_thieu_chinh_ma_cua_story_o_parent_la_do_hop_le"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "not_green",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_gate.py",
+    "tests/test_ledger.py",
+    "tests/test_preservation.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "executed_green",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_gate.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "aborted",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_gate.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "files_of",
+   "tests": [
+    "tests/hardening/test_ss81_family.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "summarize",
+   "tests": [
+    "tests/hardening/test_ss81_family.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "run_proves_red",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_tdd.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/gate.py",
+   "function": "_nop_check",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_gate.py",
+    "tests/test_gate_qualification.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/gate.py",
+   "function": "_baseline_check",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_gate.py",
+    "tests/test_gate_qualification.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/gate.py",
+   "function": "_preservation_check",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_preservation.py",
+    "tests/test_gate.py",
+    "tests/test_gate_qualification.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/tdd.py",
+   "function": "proven_red_before_green",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_tdd.py",
+    "tests/test_gate.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/tdd.py",
+   "function": "runs_before_last_green",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_tdd.py",
+    "tests/hardening/scan8a/test_group_b.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/tdd.py",
+   "function": "tdd_subjects",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_tdd.py",
+    "tests/test_gate.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/ledger.py",
+   "function": "_observe_tests",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_ledger.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/harness/tools.py",
+   "function": "collection_continuation_args",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_tools.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/harness/testlog.py",
+   "function": "missing_import",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_testlog.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/harness/testlog.py",
+   "function": "_pytest",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_testlog.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/harness/testlog.py",
+   "function": "_pytest_blocks",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_testlog.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/harness/testlog.py",
+   "function": "_unittest_errors",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_testlog.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/harness/testlog.py",
+   "function": "_js_import_errors",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_testlog.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
   }
  ],
  "equivalent": [

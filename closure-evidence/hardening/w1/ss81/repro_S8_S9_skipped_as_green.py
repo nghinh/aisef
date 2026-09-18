@@ -2,7 +2,6 @@
 import sys, unittest
 sys.path.insert(0, "tests")
 from test_gate import TestTestCoKiemDuocStory, Outcome
-from aisef.harness.observe import EvidenceStore
 
 OLD = "tests/test_old.py::test_AC_S_00_1_old_behaviour"
 

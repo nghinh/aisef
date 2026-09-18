@@ -1,0 +1,12 @@
+<repo>/closure-evidence/hardening/w1/ss81/repro_B_collection_interruption_masks_tests.py:15: ResourceWarning: unclosed file <_io.TextIOWrapper name='<repo>/closure-evidence/hardening/w1/ss81/reproB-pytest-at-parent.txt' mode='r' encoding='utf-8'>
+  parent = parse(open(f"{SP}/reproB-pytest-at-parent.txt").read()).to_evidence()   # the real pytest output at the parent
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.004s
+
+OK
+
+parsed at parent: {'test_format': 'pytest', 'test_ids': [], 'failed_ids': []}
+B outcome: Outcome.UNRUNNABLE | no proof at parent SHA cha0000 for 2 of 2 criterion tests: tests/test_a.py::test_AC_S_01_1_normalizes — ABSENT: the run completed without it; tests/test_b.py::test_AC_S_01_2_tautology — ABSENT: the run completed without it
+exit=0

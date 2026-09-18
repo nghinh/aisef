@@ -66,6 +66,15 @@ class TestLog:
     skipped: list[str] = field(default_factory=list)
     coverage: float | None = None
     note: str = ""      # why test names are absent — so the gate points to the fix
+    # SS-81 family (INV-TDD-NOP-PROOF): what did NOT execute, and why. An id missing from `test_ids` is not a red
+    # test — it is a test the runner never ran, and the proof model (control/proof.py) must be told which.
+    errored: list[str] = field(default_factory=list)             # ran into an error before/around its body (setup)
+    collection_errors: list[dict] = field(default_factory=list)  # {file, module, error, missing_module, missing_name}
+    collection_aborted: bool = False                             # the runner stopped the whole session at collection
+    failure_imports: dict = field(default_factory=dict)          # test id -> {missing_module, missing_name}
+    # The runner's own totals reconciled with the ids read: False = the output was cut or mis-read, so an id missing
+    # from it proves nothing; None = this format prints no totals to check against.
+    output_complete: bool | None = None
 
     @property
     def test_ids(self) -> list[str]:
@@ -83,6 +92,11 @@ class TestLog:
         }
         if self.note:
             out["test_note"] = self.note
+        out["errored_ids"] = self.errored[:MAX_IDS]
+        out["collection_errors"] = self.collection_errors[:MAX_IDS]
+        out["collection_aborted"] = self.collection_aborted
+        out["failure_imports"] = dict(list(self.failure_imports.items())[:MAX_IDS])
+        out["output_complete"] = self.output_complete
         return out
 
 
@@ -125,6 +139,10 @@ def parse(text: str) -> TestLog:
         _unittest(lines, log)
     elif any("test session starts" in l or _PYTEST.match(l) or "short test summary" in l for l in lines):
         _pytest(lines, log)
+    if log.format == "unittest":
+        _unittest_errors(lines, log)
+    elif log.format in ("node-spec", "node-tap", "vitest", "ctrf", "playwright-list"):
+        _js_import_errors(text or "", log)
     if log.coverage is not None and not log.test_ids:
         # "100% of nothing" is the shape a zero-test run produces, and a gate
         # reading it as a number would record a passing coverage figure for a
@@ -133,6 +151,33 @@ def parse(text: str) -> TestLog:
         log.note = (log.note or "coverage reported but no test ran — "
                                 "nothing was measured")
     return log
+
+
+#: The runtime's own sentence for "this import target does not exist". Python names a dotted module or a symbol and
+#: its module; node, vitest and jest name a path. Read once, here, so every consumer agrees on what was missing.
+_PY_NO_MODULE = re.compile(r"(?:ModuleNotFoundError|ImportError): No module named '([^']+)'")
+_PY_NO_NAME = re.compile(r"ImportError: cannot import name '([^']+)' from '([^']+)'")
+_PY_SYNTAX = re.compile(r"\b(?:SyntaxError|IndentationError|TabError)\b")
+_JS_NODE = re.compile(r"Cannot find (?:module|package) '([^']+)' imported from (\S+)")
+_JS_VITEST = re.compile(r'Failed to (?:resolve|load) (?:import|url) "([^"]+)" (?:from|in) "([^"]+)"')
+_JS_JEST = re.compile(r"Cannot find module '([^']+)' from '([^']+)'")
+
+
+def missing_import(text: str) -> dict:
+    """What an import failure says is missing: {error, missing_module, missing_name}; error "" when none is named."""
+    m = _PY_NO_NAME.search(text)
+    if m:
+        return {"error": "import_name", "missing_module": m.group(2), "missing_name": m.group(1)}
+    m = _PY_NO_MODULE.search(text)
+    if m:
+        return {"error": "module_not_found", "missing_module": m.group(1), "missing_name": ""}
+    for rx in (_JS_NODE, _JS_VITEST, _JS_JEST):
+        m = rx.search(text)
+        if m:
+            return {"error": "module_not_found", "missing_module": m.group(1), "missing_name": "", "importer": m.group(2)}
+    if _PY_SYNTAX.search(text):
+        return {"error": "syntax", "missing_module": "", "missing_name": ""}
+    return {"error": "", "missing_module": "", "missing_name": ""}
 
 
 def _add(log: TestLog, name: str, mark: str) -> None:
@@ -287,6 +332,29 @@ def _unittest(lines: list[str], log: TestLog) -> None:
         pending = ""
 
 
+_PYTEST_HEADER = re.compile(r"^_{3,} (.+?) _{3,}$")
+_PYTEST_ABORT = re.compile(r"Interrupted: \d+ errors? during collection")
+_PYTEST_TOTAL = re.compile(r"\bin [\d.]+s\b")
+_PYTEST_COUNT = re.compile(r"(\d+) (passed|failed|errors?|skipped|xfailed|xpassed)\b")
+
+
+def _pytest_blocks(lines: list[str]) -> list[tuple[str, list[str]]]:
+    """The `ERRORS` / `FAILURES` sections: (header, body) per `____ header ____` block."""
+    out, cur, body = [], None, []
+    for line in lines:
+        h = _PYTEST_HEADER.match(line)
+        if h or line.startswith("====="):
+            if cur is not None:
+                out.append((cur, body))
+            cur, body = (h.group(1) if h else None), []
+            continue
+        if cur is not None:
+            body.append(line)
+    if cur is not None:
+        out.append((cur, body))
+    return out
+
+
 def _pytest(lines: list[str], log: TestLog) -> None:
     log.format = "pytest"
     for line in lines:
@@ -295,9 +363,86 @@ def _pytest(lines: list[str], log: TestLog) -> None:
             mark = {"PASSED": "pass", "XPASS": "pass", "FAILED": "fail", "ERROR": "fail",
                     "SKIPPED": "skip", "XFAIL": "skip"}[m.group(2)]
             _add(log, m.group(1), mark)
+            if m.group(2) == "ERROR":
+                log.errored.append(m.group(1).strip())
+    log.collection_aborted = any(_PYTEST_ABORT.search(l) for l in lines)
+    summary = next((l for l in reversed(lines) if _PYTEST_TOTAL.search(l) or "no tests ran" in l), "")
+    if not summary:
+        log.output_complete = False
+    else:
+        n = {k: 0 for k in ("passed", "failed", "error", "skipped", "xfailed", "xpassed")}
+        for c, w in _PYTEST_COUNT.findall(summary):
+            n[w.rstrip("s") if w.startswith("error") else w] += int(c)
+        executed = n["passed"] + n["failed"] + n["skipped"] + n["xfailed"] + n["xpassed"] + n["error"]
+        # pytest counts a file that failed to collect as an error too; those are not ids
+        log.output_complete = executed - len([b for b in _pytest_blocks(lines) if b[0].startswith("ERROR collecting ")]) \
+            == len(log.passed) + len(log.failed) + len(log.skipped)
+    ids = [t for t in log.passed + log.failed + log.skipped]
+    for header, body in _pytest_blocks(lines):
+        text = "\n".join(body)
+        if header.startswith("ERROR collecting "):
+            f = header[len("ERROR collecting "):].strip()
+            log.collection_errors.append({"file": f, "module": f[:-3].replace("/", ".") if f.endswith(".py") else "",
+                                          **missing_import(text)})
+            continue
+        name = header.split(" of ", 1)[1].strip() if header.startswith(("ERROR at setup of ", "ERROR at teardown of ")) else header
+        leaf = "::" + name.replace(".", "::")
+        tid = next((t for t in ids if t.endswith(leaf)), "")
+        mi = missing_import(text)
+        if tid and mi["missing_module"]:
+            log.failure_imports[tid] = {"missing_module": mi["missing_module"], "missing_name": mi["missing_name"]}
     if not log.test_ids:
         for line in lines:
             m = _PYTEST_Q_FAIL.match(line)
             if m:
                 _add(log, m.group(1), "fail")
         log.note = "pytest without `-v`: can only read failing test names, cannot tell which passed"
+
+
+_UT_ERR = re.compile(r"^(?:ERROR|FAIL): (\S+) \((\S+)\)")
+
+
+_UT_RAN_N = re.compile(r"^Ran (\d+) tests? in ")
+
+
+def _unittest_errors(lines: list[str], log: TestLog) -> None:
+    """`unittest` turns a module that cannot import into a `_FailedTest` — the rest of the suite still runs, so it
+    is a collection error of that one module, never a red test of the story."""
+    cur, body, blocks = None, [], []
+    for line in lines:
+        m = _UT_ERR.match(line)
+        if m or line.startswith("=====") or _UNITTEST_RAN.match(line):
+            if cur is not None:
+                blocks.append((cur, "\n".join(body)))
+            cur, body = (m.groups() if m else None), []
+            continue
+        if cur is not None:
+            body.append(line)
+    if cur is not None:
+        blocks.append((cur, "\n".join(body)))
+    ran = next((int(m.group(1)) for m in (_UT_RAN_N.match(l) for l in lines) if m), None)
+    log.output_complete = ran is not None and ran == len(log.test_ids)
+    for (name, full), text in blocks:
+        mi = missing_import(text)
+        if "_FailedTest" in full:
+            mod = full.split("_FailedTest.", 1)[1]
+            log.collection_errors.append({"file": mod.replace(".", "/") + ".py", "module": mod, **mi})
+        elif mi["missing_module"]:
+            tid = full if full.endswith("." + name) else f"{full}.{name}"
+            log.failure_imports[tid] = {"missing_module": mi["missing_module"], "missing_name": mi["missing_name"]}
+
+
+def _js_import_errors(text: str, log: TestLog) -> None:
+    """node/vitest/jest run each test file on its own, so a file that cannot import is reported as that file and
+    the others still run. The error names both the importer and the missing target — kept relative to the project."""
+    files = [t for t in log.failed if re.search(r"\.(?:test|spec)\.[cm]?[jt]sx?$", t) or t.endswith((".js", ".ts", ".mjs"))]
+    for rx in (_JS_NODE, _JS_VITEST, _JS_JEST):
+        for m in rx.finditer(text):
+            target, importer = m.group(1), m.group(2).strip("'\"")
+            f = next((x for x in files if importer.endswith(x)), importer)
+            root = importer[: -len(f)] if importer.endswith(f) and f != importer else ""
+            if root and target.startswith(root):
+                target = target[len(root):]
+            if not any(c["file"] == f and c["missing_module"] == target for c in log.collection_errors):
+                log.collection_errors.append({"file": f, "module": "", "error": "module_not_found",
+                                              "missing_module": target, "missing_name": "", "importer": f})

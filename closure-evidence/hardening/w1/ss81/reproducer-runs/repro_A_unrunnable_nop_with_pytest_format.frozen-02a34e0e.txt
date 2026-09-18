@@ -1,0 +1,19 @@
+F.
+======================================================================
+FAIL: test_A_third_party_missing_with_pytest_format (__main__.Repro.test_A_third_party_missing_with_pytest_format)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/closure-evidence/hardening/w1/ss81/repro_A_unrunnable_nop_with_pytest_format.py", line 20, in test_A_third_party_missing_with_pytest_format
+    self.assertIsNot(m.outcome, Outcome.PASSED, "an environment failure at the parent proved nothing")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly identical: <Outcome.PASSED: 'passed'> : an environment failure at the parent proved nothing
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.004s
+
+FAILED (failures=1)
+
+A outcome: Outcome.PASSED | 1 tests with criteria codes are red or absent at parent SHA cha0000
+
+A-control outcome: Outcome.UNRUNNABLE | nop at parent SHA unrunnable (no runnable setup in this tree — the project's dependencies are not installed here) — cannot compare
+exit=1

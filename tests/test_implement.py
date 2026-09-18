@@ -236,62 +236,43 @@ class TestHappyPath(ImplementTestCase):
         """Lỗi 46b. Với phép đối chứng nop, đỏ ở parent là kết quả **cần**.
         Nhưng lệnh test không khởi chạy được (exit 127 trên Windows) cũng cho
         `ok=False`, và gọi đó là "expected" là báo một phép đối chứng chưa hề
-        xảy ra."""
-        import inspect
-        from aisef.phases import implement
-        src = inspect.getsource(implement.run_nop)
-        self.assertIn("control NOT performed", src)
-        i_unrun = src.index("res.unrunnable")
-        i_expected = src.index("tests red at parent (expected)")
-        self.assertLess(i_unrun, i_expected, "phải hỏi 'chạy được không' trước khi nói 'đỏ đúng như mong đợi'")
+        xảy ra. (Ported from a source-text check to behaviour, SS-81 family.)"""
+        from aisef.harness.tools import ToolResult
+        from aisef.phases.implement import _nop_summary
+
+        res = ToolResult("test", ok=False, exit_code=127, unrunnable="tool not installed or cannot load (exit 127)",
+                         stdout="sh: pytest: command not found")
+        line = _nop_summary(res, ["src/a.py"], ["src/a.py"])
+        self.assertIn("did not execute", line)
+        self.assertNotIn("expected", line)
 
     def test_thieu_chinh_ma_cua_story_o_parent_la_do_hop_le(self):
         """Lỗi 120 (todo-cli STORY-01-01, 2026-09-13): cây nop **cố tình**
         không có mã của story, nên "cannot find module ../lib/store" là phép
-        đối chứng đang chạy đúng. Luật chung ("chưa test nào xanh thì coi là
-        không chạy được") không phân biệt được, vì story đầu của một dự án
-        greenfield không có test nào khác để in tên — và phép đối chứng mạnh
-        nhất bị ghi là "chưa thực hiện" đúng chỗ cần nó nhất."""
-        from aisef.harness.tools import NO_SETUP, ToolResult
-        from aisef.phases.implement import _vang_ma_cua_story
+        đối chứng đang chạy đúng — một thư viện chưa cài thì vẫn là môi trường.
+        SS-82: the matcher now lives in `control.proof.story_file_for` (package roots, import-root anchoring)."""
+        from aisef.control.proof import story_file_for
 
-        thieu_phu_thuoc = NO_SETUP + " — the project's dependencies are not installed here"
-        story = ["lib/store.js", "tests/store.test.js"]
-
-        res = ToolResult("test", ok=False, unrunnable=thieu_phu_thuoc,
-                         stdout="Error: Cannot find module '../lib/store'")
-        self.assertEqual(_vang_ma_cua_story(res, story), "lib/store.js")
-
-        # Thư viện dự án chưa cài: đúng là môi trường hỏng, phải giữ nguyên.
-        res = ToolResult("test", ok=False, unrunnable=thieu_phu_thuoc,
-                         stdout="Error: Cannot find module 'express'")
-        self.assertEqual(_vang_ma_cua_story(res, story), "")
-
-        # Không phải loại "thiếu phụ thuộc" thì không đụng tới.
-        res = ToolResult("test", ok=False, unrunnable="tool not installed or cannot load (exit 127)",
-                         stdout="npm: command not found")
-        self.assertEqual(_vang_ma_cua_story(res, story), "")
-
-        # Python: tên module là dấu chấm, không phải dấu gạch chéo.
-        res = ToolResult("test", ok=False, unrunnable=thieu_phu_thuoc,
-                         stdout="ModuleNotFoundError: No module named 'app.store'")
-        self.assertEqual(_vang_ma_cua_story(res, ["app/store.py"]), "app/store.py")
-
-        # Tệp test của story không tính: nó **có** trong cây nop.
-        res = ToolResult("test", ok=False, unrunnable=thieu_phu_thuoc,
-                         stdout="Cannot find module './tests/store.test'")
-        self.assertEqual(_vang_ma_cua_story(res, ["tests/store.test.js"]), "")
+        story = ["lib/store.js"]                                  # callers pass the story's NON-test files only
+        self.assertEqual(story_file_for("../lib/store", story, importer="tests/store.test.js"), "lib/store.js")
+        self.assertEqual(story_file_for("express", story, importer="tests/store.test.js"), "")
+        self.assertEqual(story_file_for("app.store", ["app/store.py"]), "app/store.py")    # Python: dotted
+        self.assertEqual(story_file_for("ledgerlock", ["ledgerlock/__init__.py"]), "ledgerlock/__init__.py")  # SS-82
+        self.assertEqual(story_file_for("yaml", ["config/yaml.py"]), "")                  # regression 8: anchored
 
     def test_run_nop_go_co_khong_chay_duoc_khi_thieu_ma_story(self):
-        """Đường thật, không chỉ hàm phụ: `run_nop` phải xoá `unrunnable`
-        trước khi ghi bằng chứng, nếu không cổng vẫn đọc UNRUNNABLE."""
-        import inspect
-        from aisef.phases import implement
+        """Đường thật: bản ghi nop phải mang **nguyên nhân** theo từng tệp để cổng tự phân loại — trước đây run_nop
+        xoá `unrunnable` rồi mới ghi; nay cổng đọc lỗi thu thập của chính tệp test và ràng nó vào mã của story."""
+        from aisef.control.proof import Proof, classify
+        from aisef.harness.testlog import parse
 
-        src = inspect.getsource(implement.run_nop)
-        i_go = src.index("res.unrunnable = \"\"")
-        i_ghi = src.index("record_tool(res, story.id")
-        self.assertLess(i_go, i_ghi, "phải phân loại lại **trước** khi ghi")
+        text = ("tests/test_b.py::test_other PASSED\n"
+                "_______ ERROR collecting tests/test_a.py _______\n"
+                "E   ModuleNotFoundError: No module named 'app.store'\n"
+                "=========== 1 passed, 1 error in 0.02s ===========\n")
+        rec = parse("============ test session starts ============\n" + text).to_evidence()
+        st = classify(rec, ["tests/test_a.py::test_AC_S_1"], ["app/store.py"], added=["app/store.py"])
+        self.assertIs(st["tests/test_a.py::test_AC_S_1"][0], Proof.RED_COLLECTION_BOUND_TO_STORY)
 
     def test_nguoi_ra_soat_nhan_diff_that_khong_chi_ten_file(self):
         """Danh sách tên file bắt người rà soát dựng lại thứ harness đã
@@ -1656,6 +1637,9 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         "                              text=True).stdout.strip())\n"
         'text = "\\n".join(x for x in out if x)\n'
         "print(text)\n"
+        # real pytest always ends with its totals; without them the parser reads the output as incomplete (SS-81)
+        'n_f, n_p = text.count(" FAILED"), text.count(" PASSED")\n'
+        'print(f"===== {n_f} failed, {n_p} passed in 0.01s =====")\n'
         'sys.exit(1 if "FAILED" in text else 0)\n'
     )
 
@@ -1702,8 +1686,11 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         out = self.chay(self.THAT)
         m = self.muc(out)
         self.assertIs(m.outcome, Outcome.PASSED, out.summary())
-        self.assertIn("red or absent", m.detail)
+        self.assertIn("proven red at parent SHA", m.detail)
+        self.assertEqual(m.data["proof"]["AC-STORY-01-01-1"]["tests"][self.AC]["state"], "RED_EXECUTED")
         nop = self.evidence().last(TOOL_RUN, "test:nop")
+        self.assertEqual(nop.detail["proof_schema"], 2)
+        self.assertEqual(nop.detail["absent_at_parent"], ["src/a.py"])
         self.assertEqual(nop.detail["candidate"], out.attempts[-1].candidate)
         self.assertEqual(nop.detail["files"], ["tests/test_ac.py"])
         self.assertEqual(nop.detail["parent"], head_sha(self.project))

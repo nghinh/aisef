@@ -1,0 +1,1421 @@
+{
+ "generated": "2026-09-18T19:14:30+0700",
+ "owner_decision": "FIX SS-81 FAMILY (2026-09-18), section 9",
+ "kernel": "580be5436945c14c2e4f965a6c2ecb64edec0fba + uncommitted SS-81 family fix (working tree)",
+ "method": [
+  "",
+  "Per story, with the FIXED kernel and no model call:",
+  "  A. replay   \u2014 `control.replay` (the kernel's own `aisef gate --replay`) on the evidence exactly as recorded;",
+  "  B. measure  \u2014 the kernel's own `implement.run_nop` in the real image, at the recorded parent SHA, with the",
+  "                qualified collection strategy, on a throw-away clone (the historical repository is never written);",
+  "                the new record is spliced in before the accepted attempt's `gate:input` and `gate.evaluate` re-scores",
+  "                it with that attempt's recorded inputs.",
+  "",
+  "A historical PASS is a REAL FALSE PASS only when B observes a criterion test executed GREEN at the parent \u2014 the",
+  "story's tests pass without the story's code. B returning no proof is an assurance gap, reported, not a false PASS."
+ ],
+ "cases": [
+  {
+   "run": "w1-run-1",
+   "story": "STORY-01-02",
+   "attempt": 1,
+   "candidate": "7c33573bb448f5b637d9a4a01f88bbc75b4aacd6",
+   "parent": "3f074f9b6c2606730930ced5f330deb017ffadae",
+   "changed": [
+    "ledgerlock/format.py",
+    "tests/test_format.py"
+   ],
+   "acceptance": 6,
+   "recorded": {
+    "TDD": "passed",
+    "tests verify story": "passed"
+   },
+   "A_replay_on_recorded_evidence": {
+    "TDD": {
+     "outcome": "failed",
+     "detail": "tests green on first run \u2014 not proven to verify anything (tests/test_format.py). Write tests first, run them through the recorded tool, see them fail, then write code \u2014 a run the harness did not record cannot prove anything.",
+     "proof": null
+    },
+    "tests verify story": {
+     "outcome": "unrunnable",
+     "detail": "no proof at parent SHA 3f074f9 for 6 of 6 criterion tests: tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_1_matches_json_dumps_contract \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it; tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_2_element_equal_dicts_produce_identical_bytes \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it; tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_3_non_ascii_utf8_literal_and_byte_stable \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it\u2026",
+     "proof": {
+      "AC-STORY-01-02-1": {
+       "tests": {
+        "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_1_matches_json_dumps_contract": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-02-2": {
+       "tests": {
+        "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_2_element_equal_dicts_produce_identical_bytes": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-02-3": {
+       "tests": {
+        "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_3_non_ascii_utf8_literal_and_byte_stable": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-02-4": {
+       "tests": {
+        "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_4_insertion_order_irrelevant": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-02-5": {
+       "tests": {
+        "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_5_genesis_is_seven_character_literal": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-02-6": {
+       "tests": {
+        "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_6_round_trip_through_json_loads_is_byte_stable": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      }
+     }
+    }
+   },
+   "B_remeasured_nop": {
+    "command": "python3 -m pytest -v",
+    "collection_strategy": "--continue-on-collection-errors",
+    "proof_schema": 2,
+    "image": "aisef-verify-python:84adf1d8eaf9",
+    "image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "exit_code": 1,
+    "unrunnable": "",
+    "test_format": "pytest",
+    "test_ids": [
+     "tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_byte_for_byte",
+     "tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_returns_nfc_bytes",
+     "tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_2_nfc_and_nfd_collide_to_nfc",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_4_python_m_ledgerlock_help_lists_subcommands",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_5_no_forbidden_imports_in_package",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_6_no_forbidden_calls_in_package",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_7_ledger_and_conflict_error_importable"
+    ],
+    "failed_ids": [],
+    "errored_ids": [],
+    "skipped_ids": [],
+    "collection_errors": [
+     {
+      "file": "tests/test_format.py",
+      "module": "tests.test_format",
+      "error": "import_name",
+      "missing_module": "ledgerlock.format",
+      "missing_name": "GENESIS"
+     }
+    ],
+    "collection_aborted": false,
+    "output_complete": true,
+    "absent_at_parent": [],
+    "ac_code_files": {
+     "AC-STORY-01-02-1": [
+      "tests/test_format.py"
+     ],
+     "AC-STORY-01-02-2": [
+      "tests/test_format.py"
+     ],
+     "AC-STORY-01-02-3": [
+      "tests/test_format.py"
+     ],
+     "AC-STORY-01-02-4": [
+      "tests/test_format.py"
+     ],
+     "AC-STORY-01-02-5": [
+      "tests/test_format.py"
+     ],
+     "AC-STORY-01-02-6": [
+      "tests/test_format.py"
+     ]
+    },
+    "tail": "es.\nTraceback:\n/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_format.py:6: in <module>\n    from ledgerlock.format import GENESIS, canonical_bytes\nE   ImportError: cannot import name 'GENESIS' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)\n=========================== short test summary info ============================\nERROR tests/test_format.py\n================ 8 passed, 1 error, 16 subtests passed in 0.09s ================"
+   },
+   "B_nop_log": [
+    "[2026-09-18 19:14:16] story=STORY-01-02 nop START parent=3f074f9b test_files=1",
+    "[2026-09-18 19:14:18] story=STORY-01-02 nop DONE executed 8 (8 green, 0 red, 0 skipped) \u00b7 tests/test_format.py: cannot import ledgerlock.format \u2014 ledgerlock/format.py is this story's 659ms"
+   ],
+   "B_gate_with_remeasured_nop": {
+    "TDD": {
+     "outcome": "passed",
+     "detail": "no red run recorded, but the nop control proves the same thing directly \u2014 6 tests with criteria codes proven red at parent SHA 3f074f9: 0 executed red, 6 unable to import code this story introduces",
+     "proof": null
+    },
+    "tests verify story": {
+     "outcome": "passed",
+     "detail": "6 tests with criteria codes proven red at parent SHA 3f074f9: 0 executed red, 6 unable to import code this story introduces",
+     "proof": {
+      "AC-STORY-01-02-1": {
+       "tests": {
+        "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_1_matches_json_dumps_contract": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `GENESIS` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-02-2": {
+       "tests": {
+        "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_2_element_equal_dicts_produce_identical_bytes": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `GENESIS` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-02-3": {
+       "tests": {
+        "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_3_non_ascii_utf8_literal_and_byte_stable": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `GENESIS` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-02-4": {
+       "tests": {
+        "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_4_insertion_order_irrelevant": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `GENESIS` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-02-5": {
+       "tests": {
+        "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_5_genesis_is_seven_character_literal": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `GENESIS` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-02-6": {
+       "tests": {
+        "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_6_round_trip_through_json_loads_is_byte_stable": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `GENESIS` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      }
+     }
+    }
+   },
+   "classification": "HISTORICAL_PASS_NOW_PROVEN",
+   "green_at_parent": []
+  },
+  {
+   "run": "w1-run-1",
+   "story": "STORY-01-03",
+   "attempt": 1,
+   "candidate": "ad584612552495018d592dc94a5fbd40e05660d4",
+   "parent": "7c33573bb448f5b637d9a4a01f88bbc75b4aacd6",
+   "changed": [
+    "ledgerlock/format.py",
+    "tests/test_format.py"
+   ],
+   "acceptance": 5,
+   "recorded": {
+    "TDD": "passed",
+    "tests verify story": "passed"
+   },
+   "A_replay_on_recorded_evidence": {
+    "TDD": {
+     "outcome": "failed",
+     "detail": "tests green on first run \u2014 not proven to verify anything (tests/test_format.py). Write tests first, run them through the recorded tool, see them fail, then write code \u2014 a run the harness did not record cannot prove anything.",
+     "proof": null
+    },
+    "tests verify story": {
+     "outcome": "unrunnable",
+     "detail": "no proof at parent SHA 7c33573 for 5 of 5 criterion tests: tests/test_format.py::TestLineHash::test_AC_STORY_01_03_1_returns_64_lowercase_hex_characters \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it; tests/test_format.py::TestLineHash::test_AC_STORY_01_03_2_distinct_prev_hash_yields_distinct_digest \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it; tests/test_format.py::TestLineHash::test_AC_STORY_01_03_3_existing_hash_and_prev_hash_fields_are_ignored \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it\u2026",
+     "proof": {
+      "AC-STORY-01-03-1": {
+       "tests": {
+        "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_1_returns_64_lowercase_hex_characters": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-03-2": {
+       "tests": {
+        "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_2_distinct_prev_hash_yields_distinct_digest": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-03-3": {
+       "tests": {
+        "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_3_existing_hash_and_prev_hash_fields_are_ignored": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-03-4": {
+       "tests": {
+        "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_4_same_input_produces_same_digest": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-03-5": {
+       "tests": {
+        "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_5_genesis_non_hex_seven_char_string_accepted": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      }
+     }
+    }
+   },
+   "B_remeasured_nop": {
+    "command": "python3 -m pytest -v",
+    "collection_strategy": "--continue-on-collection-errors",
+    "proof_schema": 2,
+    "image": "aisef-verify-python:84adf1d8eaf9",
+    "image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "exit_code": 1,
+    "unrunnable": "",
+    "test_format": "pytest",
+    "test_ids": [
+     "tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_byte_for_byte",
+     "tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_returns_nfc_bytes",
+     "tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_2_nfc_and_nfd_collide_to_nfc",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_4_python_m_ledgerlock_help_lists_subcommands",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_5_no_forbidden_imports_in_package",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_6_no_forbidden_calls_in_package",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_7_ledger_and_conflict_error_importable"
+    ],
+    "failed_ids": [],
+    "errored_ids": [],
+    "skipped_ids": [],
+    "collection_errors": [
+     {
+      "file": "tests/test_format.py",
+      "module": "tests.test_format",
+      "error": "import_name",
+      "missing_module": "ledgerlock.format",
+      "missing_name": "line_hash"
+     }
+    ],
+    "collection_aborted": false,
+    "output_complete": true,
+    "absent_at_parent": [],
+    "ac_code_files": {
+     "AC-STORY-01-03-1": [
+      "tests/test_format.py"
+     ],
+     "AC-STORY-01-03-2": [
+      "tests/test_format.py"
+     ],
+     "AC-STORY-01-03-3": [
+      "tests/test_format.py"
+     ],
+     "AC-STORY-01-03-4": [
+      "tests/test_format.py"
+     ],
+     "AC-STORY-01-03-5": [
+      "tests/test_format.py"
+     ]
+    },
+    "tail": ":\n/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_format.py:7: in <module>\n    from ledgerlock.format import GENESIS, canonical_bytes, line_hash\nE   ImportError: cannot import name 'line_hash' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)\n=========================== short test summary info ============================\nERROR tests/test_format.py\n================ 8 passed, 1 error, 16 subtests passed in 0.09s ================"
+   },
+   "B_nop_log": [
+    "[2026-09-18 19:14:19] story=STORY-01-03 nop START parent=7c33573b test_files=1",
+    "[2026-09-18 19:14:20] story=STORY-01-03 nop DONE executed 8 (8 green, 0 red, 0 skipped) \u00b7 tests/test_format.py: cannot import ledgerlock.format \u2014 ledgerlock/format.py is this story's 529ms"
+   ],
+   "B_gate_with_remeasured_nop": {
+    "TDD": {
+     "outcome": "passed",
+     "detail": "no red run recorded, but the nop control proves the same thing directly \u2014 5 tests with criteria codes proven red at parent SHA 7c33573: 0 executed red, 5 unable to import code this story introduces",
+     "proof": null
+    },
+    "tests verify story": {
+     "outcome": "passed",
+     "detail": "5 tests with criteria codes proven red at parent SHA 7c33573: 0 executed red, 5 unable to import code this story introduces",
+     "proof": {
+      "AC-STORY-01-03-1": {
+       "tests": {
+        "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_1_returns_64_lowercase_hex_characters": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `line_hash` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-03-2": {
+       "tests": {
+        "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_2_distinct_prev_hash_yields_distinct_digest": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `line_hash` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-03-3": {
+       "tests": {
+        "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_3_existing_hash_and_prev_hash_fields_are_ignored": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `line_hash` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-03-4": {
+       "tests": {
+        "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_4_same_input_produces_same_digest": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `line_hash` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-03-5": {
+       "tests": {
+        "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_5_genesis_non_hex_seven_char_string_accepted": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `line_hash` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      }
+     }
+    }
+   },
+   "classification": "HISTORICAL_PASS_NOW_PROVEN",
+   "green_at_parent": []
+  },
+  {
+   "run": "w1-run-1",
+   "story": "STORY-01-04",
+   "attempt": 1,
+   "candidate": "013cede650a64b26f65af7c056ab67f5165e007f",
+   "parent": "ad584612552495018d592dc94a5fbd40e05660d4",
+   "changed": [
+    "ledgerlock/store.py",
+    "tests/test_store.py"
+   ],
+   "acceptance": 6,
+   "recorded": {
+    "TDD": "passed",
+    "tests verify story": "passed"
+   },
+   "A_replay_on_recorded_evidence": {
+    "TDD": {
+     "outcome": "passed",
+     "detail": "red before green: run #109 shows the story's tests red for a reason the story's code decides",
+     "proof": null
+    },
+    "tests verify story": {
+     "outcome": "unrunnable",
+     "detail": "no proof at parent SHA ad58461 for 7 of 7 criterion tests: tests/test_store.py::TestReadLines::test_AC_STORY_01_04_1_jsonl_with_n_lines_returns_n_bytes_with_newline_stripped \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it; tests/test_store.py::TestReadLines::test_AC_STORY_01_04_2_missing_file_raises_file_not_found \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it; tests/test_store.py::TestReadLines::test_AC_STORY_01_04_3_empty_file_returns_empty_list \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it\u2026",
+     "proof": {
+      "AC-STORY-01-04-1": {
+       "tests": {
+        "tests/test_store.py::TestReadLines::test_AC_STORY_01_04_1_jsonl_with_n_lines_returns_n_bytes_with_newline_stripped": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-04-2": {
+       "tests": {
+        "tests/test_store.py::TestReadLines::test_AC_STORY_01_04_2_missing_file_raises_file_not_found": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-04-3": {
+       "tests": {
+        "tests/test_store.py::TestReadLines::test_AC_STORY_01_04_3_empty_file_returns_empty_list": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-04-4": {
+       "tests": {
+        "tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_write_atomic_overwrites_existing_content": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        },
+        "tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_writes_concatenated_bytes_and_read_lines_returns_them": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-04-5": {
+       "tests": {
+        "tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_5_crash_between_temp_write_and_replace_leaves_original_intact": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-04-6": {
+       "tests": {
+        "tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_6_temp_file_created_in_same_directory_as_target": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      }
+     }
+    }
+   },
+   "B_remeasured_nop": {
+    "command": "python3 -m pytest -v",
+    "collection_strategy": "--continue-on-collection-errors",
+    "proof_schema": 2,
+    "image": "aisef-verify-python:84adf1d8eaf9",
+    "image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "exit_code": 1,
+    "unrunnable": "",
+    "test_format": "pytest",
+    "test_ids": [
+     "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_1_matches_json_dumps_contract",
+     "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_2_element_equal_dicts_produce_identical_bytes",
+     "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_3_non_ascii_utf8_literal_and_byte_stable",
+     "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_4_insertion_order_irrelevant",
+     "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_5_genesis_is_seven_character_literal",
+     "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_6_round_trip_through_json_loads_is_byte_stable",
+     "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_1_returns_64_lowercase_hex_characters",
+     "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_2_distinct_prev_hash_yields_distinct_digest",
+     "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_3_existing_hash_and_prev_hash_fields_are_ignored",
+     "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_4_same_input_produces_same_digest",
+     "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_5_genesis_non_hex_seven_char_string_accepted",
+     "tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_byte_for_byte",
+     "tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_returns_nfc_bytes",
+     "tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_2_nfc_and_nfd_collide_to_nfc",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_4_python_m_ledgerlock_help_lists_subcommands",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_5_no_forbidden_imports_in_package",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_6_no_forbidden_calls_in_package",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_7_ledger_and_conflict_error_importable"
+    ],
+    "failed_ids": [],
+    "errored_ids": [],
+    "skipped_ids": [],
+    "collection_errors": [
+     {
+      "file": "tests/test_store.py",
+      "module": "tests.test_store",
+      "error": "import_name",
+      "missing_module": "ledgerlock",
+      "missing_name": "store"
+     }
+    ],
+    "collection_aborted": false,
+    "output_complete": true,
+    "absent_at_parent": [
+     "ledgerlock/store.py"
+    ],
+    "ac_code_files": {
+     "AC-STORY-01-04-1": [
+      "tests/test_store.py"
+     ],
+     "AC-STORY-01-04-2": [
+      "tests/test_store.py"
+     ],
+     "AC-STORY-01-04-3": [
+      "tests/test_store.py"
+     ],
+     "AC-STORY-01-04-4": [
+      "tests/test_store.py"
+     ],
+     "AC-STORY-01-04-5": [
+      "tests/test_store.py"
+     ],
+     "AC-STORY-01-04-6": [
+      "tests/test_store.py"
+     ]
+    },
+    "tail": "ules/packages have valid Python names.\nTraceback:\n/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_store.py:9: in <module>\n    from ledgerlock import store\nE   ImportError: cannot import name 'store' from 'ledgerlock' (/workspace/ledgerlock/__init__.py)\n=========================== short test summary info ============================\nERROR tests/test_store.py\n=============== 19 passed, 1 error, 16 subtests passed in 0.17s ================"
+   },
+   "B_nop_log": [
+    "[2026-09-18 19:14:21] story=STORY-01-04 nop START parent=ad584612 test_files=1",
+    "[2026-09-18 19:14:22] story=STORY-01-04 nop DONE executed 19 (19 green, 0 red, 0 skipped) \u00b7 tests/test_store.py: cannot import ledgerlock \u2014 ledgerlock/store.py is this story's 661ms"
+   ],
+   "B_gate_with_remeasured_nop": {
+    "TDD": {
+     "outcome": "passed",
+     "detail": "red before green: run #109 shows the story's tests red for a reason the story's code decides",
+     "proof": null
+    },
+    "tests verify story": {
+     "outcome": "passed",
+     "detail": "7 tests with criteria codes proven red at parent SHA ad58461: 0 executed red, 7 unable to import code this story introduces",
+     "proof": {
+      "AC-STORY-01-04-1": {
+       "tests": {
+        "tests/test_store.py::TestReadLines::test_AC_STORY_01_04_1_jsonl_with_n_lines_returns_n_bytes_with_newline_stripped": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_store.py cannot import `store` from ledgerlock \u2014 ledgerlock/store.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-04-2": {
+       "tests": {
+        "tests/test_store.py::TestReadLines::test_AC_STORY_01_04_2_missing_file_raises_file_not_found": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_store.py cannot import `store` from ledgerlock \u2014 ledgerlock/store.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-04-3": {
+       "tests": {
+        "tests/test_store.py::TestReadLines::test_AC_STORY_01_04_3_empty_file_returns_empty_list": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_store.py cannot import `store` from ledgerlock \u2014 ledgerlock/store.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-04-4": {
+       "tests": {
+        "tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_write_atomic_overwrites_existing_content": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_store.py cannot import `store` from ledgerlock \u2014 ledgerlock/store.py is this story's"
+        },
+        "tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_writes_concatenated_bytes_and_read_lines_returns_them": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_store.py cannot import `store` from ledgerlock \u2014 ledgerlock/store.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-04-5": {
+       "tests": {
+        "tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_5_crash_between_temp_write_and_replace_leaves_original_intact": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_store.py cannot import `store` from ledgerlock \u2014 ledgerlock/store.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-04-6": {
+       "tests": {
+        "tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_6_temp_file_created_in_same_directory_as_target": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_store.py cannot import `store` from ledgerlock \u2014 ledgerlock/store.py is this story's"
+        }
+       },
+       "proven": true
+      }
+     }
+    }
+   },
+   "classification": "HISTORICAL_PASS_NOW_PROVEN",
+   "green_at_parent": []
+  },
+  {
+   "run": "w1-run-1",
+   "story": "STORY-01-06",
+   "attempt": 3,
+   "candidate": "715ba2607f0d577b17205423c2393b80a2d04680",
+   "parent": "9dcf9461c9d210417cc11eaa2f441f290142ee4d",
+   "changed": [
+    "ledgerlock/ledger.py",
+    "tests/test_conflict.py"
+   ],
+   "acceptance": 5,
+   "recorded": {
+    "TDD": "passed",
+    "tests verify story": "passed"
+   },
+   "A_replay_on_recorded_evidence": {
+    "TDD": {
+     "outcome": "passed",
+     "detail": "red before green: run #111 shows the story's tests red for a reason the story's code decides",
+     "proof": null
+    },
+    "tests verify story": {
+     "outcome": "unrunnable",
+     "detail": "no proof at parent SHA 9dcf946 for 6 of 6 criterion tests: tests/test_conflict.py::TestRidReplay::test_AC_STORY_01_06_1_replay_canonical_bytes_match_stored_line \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it; tests/test_conflict.py::TestRidReplay::test_AC_STORY_01_06_1_replay_returns_original_line_dict_with_replayed_true \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it; tests/test_conflict.py::TestRidConflict::test_AC_STORY_01_06_2_conflict_raises_with_carried_fields_and_does_not_write \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it\u2026",
+     "proof": {
+      "AC-STORY-01-06-1": {
+       "tests": {
+        "tests/test_conflict.py::TestRidReplay::test_AC_STORY_01_06_1_replay_canonical_bytes_match_stored_line": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        },
+        "tests/test_conflict.py::TestRidReplay::test_AC_STORY_01_06_1_replay_returns_original_line_dict_with_replayed_true": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-06-2": {
+       "tests": {
+        "tests/test_conflict.py::TestRidConflict::test_AC_STORY_01_06_2_conflict_raises_with_carried_fields_and_does_not_write": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-06-3": {
+       "tests": {
+        "tests/test_conflict.py::TestRidConflict::test_AC_STORY_01_06_3_delete_then_put_different_rid_conflicts": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-06-4": {
+       "tests": {
+        "tests/test_conflict.py::TestRidConflict::test_AC_STORY_01_06_4_delete_then_put_same_rid_is_replay": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-06-5": {
+       "tests": {
+        "tests/test_conflict.py::TestNfcKeyReplay::test_AC_STORY_01_06_5_nfd_key_collides_with_nfc_committed_key": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      }
+     }
+    }
+   },
+   "B_remeasured_nop": {
+    "command": "python3 -m pytest -v",
+    "collection_strategy": "--continue-on-collection-errors",
+    "proof_schema": 2,
+    "image": "aisef-verify-python:84adf1d8eaf9",
+    "image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "exit_code": 1,
+    "unrunnable": "",
+    "test_format": "pytest",
+    "test_ids": [
+     "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_1_matches_json_dumps_contract",
+     "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_2_element_equal_dicts_produce_identical_bytes",
+     "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_3_non_ascii_utf8_literal_and_byte_stable",
+     "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_4_insertion_order_irrelevant",
+     "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_5_genesis_is_seven_character_literal",
+     "tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_6_round_trip_through_json_loads_is_byte_stable",
+     "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_1_returns_64_lowercase_hex_characters",
+     "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_2_distinct_prev_hash_yields_distinct_digest",
+     "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_3_existing_hash_and_prev_hash_fields_are_ignored",
+     "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_4_same_input_produces_same_digest",
+     "tests/test_format.py::TestLineHash::test_AC_STORY_01_03_5_genesis_non_hex_seven_char_string_accepted",
+     "tests/test_ledger.py::TestLedgerAppendFreshFile::test_AC_STORY_01_05_1_first_append_creates_file_with_genesis_chain",
+     "tests/test_ledger.py::TestLedgerAppendChain::test_AC_STORY_01_05_2_second_append_links_prev_hash_to_first_hash",
+     "tests/test_ledger.py::TestLedgerAppendValidation::test_AC_STORY_01_05_3_empty_key_raises_value_error_and_does_not_create_file",
+     "tests/test_ledger.py::TestLedgerAppendReloadTail::test_AC_STORY_01_05_4_fresh_instance_reads_prev_hash_from_existing_file",
+     "tests/test_ledger.py::TestLedgerAppendFsyncAndChildView::test_AC_STORY_01_05_5_separate_process_reads_appended_line_terminated_by_newline",
+     "tests/test_ledger.py::TestLedgerAppendFsync::test_append_invokes_os_fsync_before_return",
+     "tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_byte_for_byte",
+     "tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_returns_nfc_bytes",
+     "tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_2_nfc_and_nfd_collide_to_nfc",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_4_python_m_ledgerlock_help_lists_subcommands",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_5_no_forbidden_imports_in_package",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_6_no_forbidden_calls_in_package",
+     "tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_7_ledger_and_conflict_error_importable",
+     "tests/test_store.py::TestReadLines::test_AC_STORY_01_04_1_jsonl_with_n_lines_returns_n_bytes_with_newline_stripped",
+     "tests/test_store.py::TestReadLines::test_AC_STORY_01_04_2_missing_file_raises_file_not_found",
+     "tests/test_store.py::TestReadLines::test_AC_STORY_01_04_3_empty_file_returns_empty_list",
+     "tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_write_atomic_overwrites_existing_content",
+     "tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_writes_concatenated_bytes_and_read_lines_returns_them",
+     "tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_5_crash_between_temp_write_and_replace_leaves_original_intact",
+     "tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_6_temp_file_created_in_same_directory_as_target"
+    ],
+    "failed_ids": [],
+    "errored_ids": [],
+    "skipped_ids": [],
+    "collection_errors": [
+     {
+      "file": "tests/test_conflict.py",
+      "module": "tests.test_conflict",
+      "error": "import_name",
+      "missing_module": "ledgerlock.ledger",
+      "missing_name": "ConflictError"
+     }
+    ],
+    "collection_aborted": false,
+    "output_complete": true,
+    "absent_at_parent": [],
+    "ac_code_files": {
+     "AC-STORY-01-06-1": [
+      "tests/test_conflict.py"
+     ],
+     "AC-STORY-01-06-2": [
+      "tests/test_conflict.py"
+     ],
+     "AC-STORY-01-06-3": [
+      "tests/test_conflict.py"
+     ],
+     "AC-STORY-01-06-4": [
+      "tests/test_conflict.py"
+     ],
+     "AC-STORY-01-06-5": [
+      "tests/test_conflict.py"
+     ]
+    },
+    "tail": "es.\nTraceback:\n/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_conflict.py:10: in <module>\n    from ledgerlock.ledger import ConflictError\nE   ImportError: cannot import name 'ConflictError' from 'ledgerlock.ledger' (/workspace/ledgerlock/ledger.py)\n=========================== short test summary info ============================\nERROR tests/test_conflict.py\n=============== 32 passed, 1 error, 16 subtests passed in 0.27s ================"
+   },
+   "B_nop_log": [
+    "[2026-09-18 19:14:24] story=STORY-01-06 nop START parent=9dcf9461 test_files=1",
+    "[2026-09-18 19:14:25] story=STORY-01-06 nop DONE executed 32 (32 green, 0 red, 0 skipped) \u00b7 tests/test_conflict.py: cannot import ledgerlock.ledger \u2014 ledgerlock/ledger.py is this story's 677ms"
+   ],
+   "B_gate_with_remeasured_nop": {
+    "TDD": {
+     "outcome": "passed",
+     "detail": "red before green: run #111 shows the story's tests red for a reason the story's code decides",
+     "proof": null
+    },
+    "tests verify story": {
+     "outcome": "passed",
+     "detail": "6 tests with criteria codes proven red at parent SHA 9dcf946: 0 executed red, 6 unable to import code this story introduces",
+     "proof": {
+      "AC-STORY-01-06-1": {
+       "tests": {
+        "tests/test_conflict.py::TestRidReplay::test_AC_STORY_01_06_1_replay_canonical_bytes_match_stored_line": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_conflict.py cannot import `ConflictError` from ledgerlock.ledger \u2014 ledgerlock/ledger.py is this story's"
+        },
+        "tests/test_conflict.py::TestRidReplay::test_AC_STORY_01_06_1_replay_returns_original_line_dict_with_replayed_true": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_conflict.py cannot import `ConflictError` from ledgerlock.ledger \u2014 ledgerlock/ledger.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-06-2": {
+       "tests": {
+        "tests/test_conflict.py::TestRidConflict::test_AC_STORY_01_06_2_conflict_raises_with_carried_fields_and_does_not_write": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_conflict.py cannot import `ConflictError` from ledgerlock.ledger \u2014 ledgerlock/ledger.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-06-3": {
+       "tests": {
+        "tests/test_conflict.py::TestRidConflict::test_AC_STORY_01_06_3_delete_then_put_different_rid_conflicts": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_conflict.py cannot import `ConflictError` from ledgerlock.ledger \u2014 ledgerlock/ledger.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-06-4": {
+       "tests": {
+        "tests/test_conflict.py::TestRidConflict::test_AC_STORY_01_06_4_delete_then_put_same_rid_is_replay": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_conflict.py cannot import `ConflictError` from ledgerlock.ledger \u2014 ledgerlock/ledger.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-06-5": {
+       "tests": {
+        "tests/test_conflict.py::TestNfcKeyReplay::test_AC_STORY_01_06_5_nfd_key_collides_with_nfc_committed_key": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_conflict.py cannot import `ConflictError` from ledgerlock.ledger \u2014 ledgerlock/ledger.py is this story's"
+        }
+       },
+       "proven": true
+      }
+     }
+    }
+   },
+   "classification": "HISTORICAL_PASS_NOW_PROVEN",
+   "green_at_parent": []
+  },
+  {
+   "run": "w1-run-3",
+   "story": "STORY-01-01",
+   "attempt": 3,
+   "candidate": "463b80719dadb85d679686f15e3236747ccbd8f3",
+   "parent": "c3ab20f59f18145a27e29d2bb6e79c561f331c8b",
+   "changed": [
+    "tests/test_skeleton.py",
+    "ledgerlock/__init__.py",
+    "ledgerlock/__main__.py",
+    "ledgerlock/cli.py",
+    "ledgerlock/format.py",
+    "tests/__init__.py",
+    "tests/test_nfc_normalization.py"
+   ],
+   "acceptance": 7,
+   "recorded": {
+    "TDD": "passed",
+    "tests verify story": "passed"
+   },
+   "A_replay_on_recorded_evidence": {
+    "TDD": {
+     "outcome": "failed",
+     "detail": "tests green on first run \u2014 not proven to verify anything (tests/test_skeleton.py, tests/__init__.py, tests/test_nfc_normalization.py). Write tests first, run them through the recorded tool, see them fail, then write code \u2014 a run the harness did not record cannot prove anything.",
+     "proof": null
+    },
+    "tests verify story": {
+     "outcome": "unrunnable",
+     "detail": "no proof at parent SHA c3ab20f for 7 of 7 criterion tests: tests/test_nfc_normalization.py::AC_STORY_01_01_1_NormalizeKeyEqualsUnicodedataNFC::test_returns_unicodedata_nfc_byte_for_byte \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it; tests/test_nfc_normalization.py::AC_STORY_01_01_2_NFCAndNFDCollapseToSameBytes::test_nfc_and_nfd_return_byte_identical_nfc \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it; tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportsCleanly::test_import_ledgerlock_prints_init_path \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it\u2026",
+     "proof": {
+      "AC-STORY-01-01-1": {
+       "tests": {
+        "tests/test_nfc_normalization.py::AC_STORY_01_01_1_NormalizeKeyEqualsUnicodedataNFC::test_returns_unicodedata_nfc_byte_for_byte": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-01-2": {
+       "tests": {
+        "tests/test_nfc_normalization.py::AC_STORY_01_01_2_NFCAndNFDCollapseToSameBytes::test_nfc_and_nfd_return_byte_identical_nfc": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-01-3": {
+       "tests": {
+        "tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportsCleanly::test_import_ledgerlock_prints_init_path": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-01-4": {
+       "tests": {
+        "tests/test_skeleton.py::AC_STORY_01_01_4_CLIAdvertisesAllSubcommands::test_help_lists_verify_snapshot_apply_repair_tail": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-01-5": {
+       "tests": {
+        "tests/test_skeleton.py::AC_STORY_01_01_5_NoForbiddenTopLevelImports::test_no_top_level_forbidden_imports": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-01-6": {
+       "tests": {
+        "tests/test_skeleton.py::AC_STORY_01_01_6_NoForbiddenRuntimeCalls::test_no_forbidden_runtime_calls": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-01-7": {
+       "tests": {
+        "tests/test_skeleton.py::AC_STORY_01_01_7_PublicAPIExportsLedgerAndConflictError::test_ledger_and_conflict_error_importable": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      }
+     }
+    }
+   },
+   "B_remeasured_nop": {
+    "command": "python3 -m pytest -v",
+    "collection_strategy": "--continue-on-collection-errors",
+    "proof_schema": 2,
+    "image": "aisef-verify-python:84adf1d8eaf9",
+    "image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "exit_code": 1,
+    "unrunnable": "",
+    "test_format": "pytest",
+    "test_ids": [
+     "tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportsCleanly::test_import_ledgerlock_prints_init_path",
+     "tests/test_skeleton.py::AC_STORY_01_01_4_CLIAdvertisesAllSubcommands::test_help_lists_verify_snapshot_apply_repair_tail",
+     "tests/test_skeleton.py::AC_STORY_01_01_5_NoForbiddenTopLevelImports::test_no_top_level_forbidden_imports",
+     "tests/test_skeleton.py::AC_STORY_01_01_6_NoForbiddenRuntimeCalls::test_no_forbidden_runtime_calls",
+     "tests/test_skeleton.py::AC_STORY_01_01_7_PublicAPIExportsLedgerAndConflictError::test_ledger_and_conflict_error_importable"
+    ],
+    "failed_ids": [
+     "tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportsCleanly::test_import_ledgerlock_prints_init_path",
+     "tests/test_skeleton.py::AC_STORY_01_01_4_CLIAdvertisesAllSubcommands::test_help_lists_verify_snapshot_apply_repair_tail",
+     "tests/test_skeleton.py::AC_STORY_01_01_5_NoForbiddenTopLevelImports::test_no_top_level_forbidden_imports",
+     "tests/test_skeleton.py::AC_STORY_01_01_6_NoForbiddenRuntimeCalls::test_no_forbidden_runtime_calls",
+     "tests/test_skeleton.py::AC_STORY_01_01_7_PublicAPIExportsLedgerAndConflictError::test_ledger_and_conflict_error_importable"
+    ],
+    "errored_ids": [],
+    "skipped_ids": [],
+    "collection_errors": [
+     {
+      "file": "tests/test_nfc_normalization.py",
+      "module": "tests.test_nfc_normalization",
+      "error": "module_not_found",
+      "missing_module": "ledgerlock",
+      "missing_name": ""
+     }
+    ],
+    "collection_aborted": false,
+    "output_complete": true,
+    "absent_at_parent": [
+     "ledgerlock/__init__.py",
+     "ledgerlock/__main__.py",
+     "ledgerlock/cli.py",
+     "ledgerlock/format.py"
+    ],
+    "ac_code_files": {
+     "AC-STORY-01-01-1": [
+      "tests/test_nfc_normalization.py"
+     ],
+     "AC-STORY-01-01-2": [
+      "tests/test_nfc_normalization.py"
+     ],
+     "AC-STORY-01-01-3": [
+      "tests/test_skeleton.py"
+     ],
+     "AC-STORY-01-01-4": [
+      "tests/test_skeleton.py"
+     ],
+     "AC-STORY-01-01-5": [
+      "tests/test_skeleton.py"
+     ],
+     "AC-STORY-01-01-6": [
+      "tests/test_skeleton.py"
+     ],
+     "AC-STORY-01-01-7": [
+      "tests/test_skeleton.py"
+     ]
+    },
+    "tail": "it_path\nFAILED tests/test_skeleton.py::AC_STORY_01_01_4_CLIAdvertisesAllSubcommands::test_help_lists_verify_snapshot_apply_repair_tail\nFAILED tests/test_skeleton.py::AC_STORY_01_01_5_NoForbiddenTopLevelImports::test_no_top_level_forbidden_imports\nFAILED tests/test_skeleton.py::AC_STORY_01_01_6_NoForbiddenRuntimeCalls::test_no_forbidden_runtime_calls\nFAILED tests/test_skeleton.py::AC_STORY_01_01_7_PublicAPIExportsLedgerAndConflictError::test_ledger_and_conflict_error_importable\nERROR tests/test_nfc_normalization.py\n========================== 5 failed, 1 error in 0.08s =========================="
+   },
+   "B_nop_log": [
+    "[2026-09-18 19:14:26] story=STORY-01-01 nop START parent=c3ab20f5 test_files=3",
+    "[2026-09-18 19:14:27] story=STORY-01-01 nop DONE executed 5 (0 green, 5 red, 0 skipped) \u00b7 tests/test_nfc_normalization.py: cannot import ledgerlock \u2014 ledgerlock/__init__.py is this story's 509ms"
+   ],
+   "B_gate_with_remeasured_nop": {
+    "TDD": {
+     "outcome": "passed",
+     "detail": "no red run recorded, but the nop control proves the same thing directly \u2014 7 tests with criteria codes proven red at parent SHA c3ab20f: 5 executed red, 2 unable to import code this story introduces",
+     "proof": null
+    },
+    "tests verify story": {
+     "outcome": "passed",
+     "detail": "7 tests with criteria codes proven red at parent SHA c3ab20f: 5 executed red, 2 unable to import code this story introduces",
+     "proof": {
+      "AC-STORY-01-01-1": {
+       "tests": {
+        "tests/test_nfc_normalization.py::AC_STORY_01_01_1_NormalizeKeyEqualsUnicodedataNFC::test_returns_unicodedata_nfc_byte_for_byte": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_nfc_normalization.py cannot import ledgerlock \u2014 ledgerlock/__init__.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-01-2": {
+       "tests": {
+        "tests/test_nfc_normalization.py::AC_STORY_01_01_2_NFCAndNFDCollapseToSameBytes::test_nfc_and_nfd_return_byte_identical_nfc": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_nfc_normalization.py cannot import ledgerlock \u2014 ledgerlock/__init__.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-01-3": {
+       "tests": {
+        "tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportsCleanly::test_import_ledgerlock_prints_init_path": {
+         "state": "RED_EXECUTED",
+         "why": "ran and failed"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-01-4": {
+       "tests": {
+        "tests/test_skeleton.py::AC_STORY_01_01_4_CLIAdvertisesAllSubcommands::test_help_lists_verify_snapshot_apply_repair_tail": {
+         "state": "RED_EXECUTED",
+         "why": "ran and failed"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-01-5": {
+       "tests": {
+        "tests/test_skeleton.py::AC_STORY_01_01_5_NoForbiddenTopLevelImports::test_no_top_level_forbidden_imports": {
+         "state": "RED_EXECUTED",
+         "why": "ran and failed"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-01-6": {
+       "tests": {
+        "tests/test_skeleton.py::AC_STORY_01_01_6_NoForbiddenRuntimeCalls::test_no_forbidden_runtime_calls": {
+         "state": "RED_EXECUTED",
+         "why": "cannot run without ledgerlock/__init__.py, which this story introduces"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-01-7": {
+       "tests": {
+        "tests/test_skeleton.py::AC_STORY_01_01_7_PublicAPIExportsLedgerAndConflictError::test_ledger_and_conflict_error_importable": {
+         "state": "RED_EXECUTED",
+         "why": "ran and failed"
+        }
+       },
+       "proven": true
+      }
+     }
+    }
+   },
+   "classification": "HISTORICAL_PASS_NOW_PROVEN",
+   "green_at_parent": []
+  },
+  {
+   "run": "w1-run-3",
+   "story": "STORY-01-02",
+   "attempt": 1,
+   "candidate": "b1599804ad28b514906135cc0b1b8c35c4adb1e1",
+   "parent": "463b80719dadb85d679686f15e3236747ccbd8f3",
+   "changed": [
+    "ledgerlock/format.py",
+    "tests/test_format.py"
+   ],
+   "acceptance": 6,
+   "recorded": {
+    "TDD": "passed",
+    "tests verify story": "passed"
+   },
+   "A_replay_on_recorded_evidence": {
+    "TDD": {
+     "outcome": "failed",
+     "detail": "tests green on first run \u2014 not proven to verify anything (tests/test_format.py). Write tests first, run them through the recorded tool, see them fail, then write code \u2014 a run the harness did not record cannot prove anything.",
+     "proof": null
+    },
+    "tests verify story": {
+     "outcome": "unrunnable",
+     "detail": "no proof at parent SHA 463b807 for 6 of 6 criterion tests: tests/test_format.py::AC_STORY_01_02_1_CanonicalBytesUnsetHashFields::test_canonical_bytes_matches_exact_json_dumps_encoding \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it; tests/test_format.py::AC_STORY_01_02_2_CanonicalBytesIsDeterministic::test_canonical_bytes_returns_byte_identical_bytes_for_equal_dicts \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it; tests/test_format.py::AC_STORY_01_02_3_CanonicalBytesNonASCIILiteralUTF8::test_canonical_bytes_encodes_non_ascii_as_utf8_literal_and_is_stable \u2014 COLLECTION_ABORTED: the session stopped at collection before reaching it\u2026",
+     "proof": {
+      "AC-STORY-01-02-1": {
+       "tests": {
+        "tests/test_format.py::AC_STORY_01_02_1_CanonicalBytesUnsetHashFields::test_canonical_bytes_matches_exact_json_dumps_encoding": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-02-2": {
+       "tests": {
+        "tests/test_format.py::AC_STORY_01_02_2_CanonicalBytesIsDeterministic::test_canonical_bytes_returns_byte_identical_bytes_for_equal_dicts": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-02-3": {
+       "tests": {
+        "tests/test_format.py::AC_STORY_01_02_3_CanonicalBytesNonASCIILiteralUTF8::test_canonical_bytes_encodes_non_ascii_as_utf8_literal_and_is_stable": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-02-4": {
+       "tests": {
+        "tests/test_format.py::AC_STORY_01_02_4_CanonicalBytesIgnoresInsertionOrder::test_canonical_bytes_is_byte_identical_across_key_insertion_order": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-02-5": {
+       "tests": {
+        "tests/test_format.py::AC_STORY_01_02_5_GenesisConstant::test_genesis_is_literal_seven_character_string": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      },
+      "AC-STORY-01-02-6": {
+       "tests": {
+        "tests/test_format.py::AC_STORY_01_02_6_CanonicalBytesStableAcrossJSONRoundTrip::test_canonical_bytes_byte_equal_after_json_round_trip": {
+         "state": "COLLECTION_ABORTED",
+         "why": "the session stopped at collection before reaching it"
+        }
+       },
+       "proven": false
+      }
+     }
+    }
+   },
+   "B_remeasured_nop": {
+    "command": "python3 -m pytest -v",
+    "collection_strategy": "--continue-on-collection-errors",
+    "proof_schema": 2,
+    "image": "aisef-verify-python:84adf1d8eaf9",
+    "image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "exit_code": 1,
+    "unrunnable": "",
+    "test_format": "pytest",
+    "test_ids": [
+     "tests/test_nfc_normalization.py::AC_STORY_01_01_1_NormalizeKeyEqualsUnicodedataNFC::test_returns_unicodedata_nfc_byte_for_byte",
+     "tests/test_nfc_normalization.py::AC_STORY_01_01_2_NFCAndNFDCollapseToSameBytes::test_nfc_and_nfd_return_byte_identical_nfc",
+     "tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportsCleanly::test_import_ledgerlock_prints_init_path",
+     "tests/test_skeleton.py::AC_STORY_01_01_4_CLIAdvertisesAllSubcommands::test_help_lists_verify_snapshot_apply_repair_tail",
+     "tests/test_skeleton.py::AC_STORY_01_01_5_NoForbiddenTopLevelImports::test_no_top_level_forbidden_imports",
+     "tests/test_skeleton.py::AC_STORY_01_01_6_NoForbiddenRuntimeCalls::test_no_forbidden_runtime_calls",
+     "tests/test_skeleton.py::AC_STORY_01_01_7_PublicAPIExportsLedgerAndConflictError::test_ledger_and_conflict_error_importable"
+    ],
+    "failed_ids": [],
+    "errored_ids": [],
+    "skipped_ids": [],
+    "collection_errors": [
+     {
+      "file": "tests/test_format.py",
+      "module": "tests.test_format",
+      "error": "import_name",
+      "missing_module": "ledgerlock.format",
+      "missing_name": "GENESIS"
+     }
+    ],
+    "collection_aborted": false,
+    "output_complete": true,
+    "absent_at_parent": [],
+    "ac_code_files": {
+     "AC-STORY-01-02-1": [
+      "tests/test_format.py"
+     ],
+     "AC-STORY-01-02-2": [
+      "tests/test_format.py"
+     ],
+     "AC-STORY-01-02-3": [
+      "tests/test_format.py"
+     ],
+     "AC-STORY-01-02-4": [
+      "tests/test_format.py"
+     ],
+     "AC-STORY-01-02-5": [
+      "tests/test_format.py"
+     ],
+     "AC-STORY-01-02-6": [
+      "tests/test_format.py"
+     ]
+    },
+    "tail": "es.\nTraceback:\n/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_format.py:6: in <module>\n    from ledgerlock.format import GENESIS, canonical_bytes\nE   ImportError: cannot import name 'GENESIS' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)\n=========================== short test summary info ============================\nERROR tests/test_format.py\n================ 7 passed, 1 error, 10 subtests passed in 0.08s ================"
+   },
+   "B_nop_log": [
+    "[2026-09-18 19:14:28] story=STORY-01-02 nop START parent=463b8071 test_files=1",
+    "[2026-09-18 19:14:29] story=STORY-01-02 nop DONE executed 7 (7 green, 0 red, 0 skipped) \u00b7 tests/test_format.py: cannot import ledgerlock.format \u2014 ledgerlock/format.py is this story's 471ms"
+   ],
+   "B_gate_with_remeasured_nop": {
+    "TDD": {
+     "outcome": "passed",
+     "detail": "no red run recorded, but the nop control proves the same thing directly \u2014 6 tests with criteria codes proven red at parent SHA 463b807: 0 executed red, 6 unable to import code this story introduces",
+     "proof": null
+    },
+    "tests verify story": {
+     "outcome": "passed",
+     "detail": "6 tests with criteria codes proven red at parent SHA 463b807: 0 executed red, 6 unable to import code this story introduces",
+     "proof": {
+      "AC-STORY-01-02-1": {
+       "tests": {
+        "tests/test_format.py::AC_STORY_01_02_1_CanonicalBytesUnsetHashFields::test_canonical_bytes_matches_exact_json_dumps_encoding": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `GENESIS` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-02-2": {
+       "tests": {
+        "tests/test_format.py::AC_STORY_01_02_2_CanonicalBytesIsDeterministic::test_canonical_bytes_returns_byte_identical_bytes_for_equal_dicts": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `GENESIS` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-02-3": {
+       "tests": {
+        "tests/test_format.py::AC_STORY_01_02_3_CanonicalBytesNonASCIILiteralUTF8::test_canonical_bytes_encodes_non_ascii_as_utf8_literal_and_is_stable": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `GENESIS` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-02-4": {
+       "tests": {
+        "tests/test_format.py::AC_STORY_01_02_4_CanonicalBytesIgnoresInsertionOrder::test_canonical_bytes_is_byte_identical_across_key_insertion_order": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `GENESIS` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-02-5": {
+       "tests": {
+        "tests/test_format.py::AC_STORY_01_02_5_GenesisConstant::test_genesis_is_literal_seven_character_string": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `GENESIS` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      },
+      "AC-STORY-01-02-6": {
+       "tests": {
+        "tests/test_format.py::AC_STORY_01_02_6_CanonicalBytesStableAcrossJSONRoundTrip::test_canonical_bytes_byte_equal_after_json_round_trip": {
+         "state": "RED_COLLECTION_BOUND_TO_STORY",
+         "why": "its file tests/test_format.py cannot import `GENESIS` from ledgerlock.format \u2014 ledgerlock/format.py is this story's"
+        }
+       },
+       "proven": true
+      }
+     }
+    }
+   },
+   "classification": "HISTORICAL_PASS_NOW_PROVEN",
+   "green_at_parent": []
+  }
+ ],
+ "real_false_pass": [],
+ "stop": false,
+ "summary": {
+  "STORY-01-02@w1-run-1": {
+   "recorded": "passed",
+   "replay_on_recorded_evidence": "unrunnable",
+   "remeasured": "passed",
+   "classification": "HISTORICAL_PASS_NOW_PROVEN"
+  },
+  "STORY-01-03@w1-run-1": {
+   "recorded": "passed",
+   "replay_on_recorded_evidence": "unrunnable",
+   "remeasured": "passed",
+   "classification": "HISTORICAL_PASS_NOW_PROVEN"
+  },
+  "STORY-01-04@w1-run-1": {
+   "recorded": "passed",
+   "replay_on_recorded_evidence": "unrunnable",
+   "remeasured": "passed",
+   "classification": "HISTORICAL_PASS_NOW_PROVEN"
+  },
+  "STORY-01-06@w1-run-1": {
+   "recorded": "passed",
+   "replay_on_recorded_evidence": "unrunnable",
+   "remeasured": "passed",
+   "classification": "HISTORICAL_PASS_NOW_PROVEN"
+  },
+  "STORY-01-01@w1-run-3": {
+   "recorded": "passed",
+   "replay_on_recorded_evidence": "unrunnable",
+   "remeasured": "passed",
+   "classification": "HISTORICAL_PASS_NOW_PROVEN"
+  },
+  "STORY-01-02@w1-run-3": {
+   "recorded": "passed",
+   "replay_on_recorded_evidence": "unrunnable",
+   "remeasured": "passed",
+   "classification": "HISTORICAL_PASS_NOW_PROVEN"
+  }
+ },
+ "reading": "0 REAL FALSE PASS. Every one of the six historical PASSes was resting on a record that executed no story test (replay on the recorded evidence alone: UNRUNNABLE under the new model \u2014 the invalidated assurance). Re-measured through the kernel's own run_nop in the pinned image at the recorded parent, every criterion test is RED_EXECUTED or RED_COLLECTION_BOUND_TO_STORY: the stories' tests did verify them. No story is reclassified.",
+ "fix_iteration_1": {
+  "result": {
+   "w1-run-1 STORY-01-02": "ASSURANCE_GAP_NO_PROOF",
+   "w1-run-1 STORY-01-03": "ASSURANCE_GAP_NO_PROOF",
+   "w1-run-1 STORY-01-04": "ASSURANCE_GAP_NO_PROOF",
+   "w1-run-1 STORY-01-06": "ASSURANCE_GAP_NO_PROOF",
+   "w1-run-3 STORY-01-01": "ASSURANCE_GAP_NO_PROOF",
+   "w1-run-3 STORY-01-02": "ASSURANCE_GAP_NO_PROOF"
+  },
+  "what_it_showed": "all six ASSURANCE_GAP_NO_PROOF with DEPENDENCY_UNRUNNABLE 'needs ledgerlock.format, which is not part of this story' although the story's diff changes ledgerlock/format.py \u2014 contradicted by the diff, so measured, not accepted",
+  "defects_in_the_uncommitted_fix": [
+   {
+    "where": "gate._nop_check level 1",
+    "defect": "the new `changed` parameter was rebound to level 1's renamed-tests list; whenever level 1 ran (a named baseline at the branch point \u2014 every historical case) level 2 bound nothing to the story",
+    "direction": "fail-closed (UNRUNNABLE), never a false PASS",
+    "frozen_kernel": "not affected \u2014 02a34e0e's _nop_check had no `changed` parameter",
+    "fix": "local renamed to `renamed`",
+    "regression": "tests/hardening/test_ss81_family.py::ReauditSymbolFromAChangedModule (RED with the shadowing, GREEN fixed)"
+   },
+   {
+    "where": "proof.story_file_for / bound for import_name",
+    "defect": "`cannot import name X from pkg` bound to ANY story .py under pkg/ \u2014 package matching, forbidden by section 6",
+    "direction": "fail-open",
+    "frozen_kernel": "not affected \u2014 new code",
+    "fix": "a missing symbol binds only to its module's own file the story changes, or to the submodule pkg/X the story adds",
+    "regression": "tests/hardening/test_ss81_family.py::ReauditSubmoduleTheStoryAdds (package-matching case RED with the old rule, GREEN fixed)"
+   },
+   {
+    "where": "implement._nop_summary",
+    "defect": "the run-log line still had its own binding call \u2014 the SS-82 shape (log able to disagree with the gate)",
+    "fix": "calls proof.bound, the gate's own binding"
+   }
+  ]
+ },
+ "historical_repositories_unchanged": {
+  "before": [
+   "w1-run-1 fa1ae2faa9c4 82d833b2d806",
+   "w1-run-3 54b7c61fe65b d957ab592eec"
+  ],
+  "after": [
+   "w1-run-1 fa1ae2faa9c4 82d833b2d806",
+   "w1-run-3 54b7c61fe65b d957ab592eec"
+  ],
+  "columns": "repo, sha1(git status -uall), sha1(every file incl .git)"
+ }
+}

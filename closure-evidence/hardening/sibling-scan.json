@@ -4,11 +4,11 @@
  "generated": "2026-09-17T21:44:31+0700",
  "method": "five read-only sweeps over aisef/ (recency-as-identity; prose-to-control-state; retry locality and recovery; ownership, tools, leases, scope; plus a test-inventory map), every candidate then verified in code by hand; CONFIRMED requires a deterministic RED reproducer that failed on the invariant assertion (tests/hardening/test_sibling_scan.py, run 2026-09-16 on the 1.7.6 baseline: 21 expected failures, 0 unexpected successes)",
  "counts": {
-  "CONFIRMED": 80,
+  "CONFIRMED": 90,
   "NEEDS_TEST": 0,
   "NOT_A_DEFECT": 6,
-  "entries": 86,
-  "confirmed": 80
+  "entries": 96,
+  "confirmed": 90
  },
  "entries": [
   {
@@ -1166,6 +1166,177 @@
    "severity_proposed": "P3",
    "reproducer": "tests/hardening/test_tool_capability.py::TestNegativeControls",
    "notes": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL'). severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+  },
+  {
+   "id": "SS-81",
+   "site": "aisef/control/gate.py::_nop_check (the `unrunnable and not test_format` branch; 'red or absent' at level 2) + aisef/phases/implement.py::run_nop (pytest collection interruption)",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "semantic_context": "the deterministic 'tests verify story' control — and TDD, which defers to it ('the nop control proves the same thing directly') — can PASS on tests that never executed at the parent SHA. (A) A nop run that failed because a third-party dependency is missing is recorded with `unrunnable` AND `test_format` (pytest printed its collection error); the gate's UNRUNNABLE branch requires `not test_format`, so it falls through and scores the absent tests as red: PASSED. The same record without test_format is UNRUNNABLE, as SS-26/INV-F.3 intend. (B) When one story test file fails to import at the parent (the legitimate red), pytest interrupts the whole session; the story's other test files never run, the kernel's parser reports no test ids, and 'red or absent' scores a tautological AC test (`assert True`) in another file as verified: PASSED.",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_A_unrunnable_nop_with_pytest_format.py",
+   "regression": [
+    "tests/hardening/test_ss81_family.py::R01ThirdPartyMissingAtParent",
+    "tests/hardening/test_ss81_family.py::R02CollectionFailureDoesNotHideATautology",
+    "tests/hardening/test_ss81_family.py::R10PartialOutputCannotPass",
+    "tests/hardening/test_ss81_family.py::R11TestFormatDoesNotChangeTruth"
+   ],
+   "notes": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18; reproducer FAILS on the frozen kernel 02a34e0e and passes on the F7 fix"
+  },
+  {
+   "id": "SS-82",
+   "site": "aisef/phases/implement.py::_vang_ma_cua_story",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "semantic_context": "the detector that recognises 'the missing module is the story's own code' matches a module name against changed file stems, but has no package rule: `No module named 'ledgerlock'` does not match `ledgerlock/__init__.py`. A greenfield story's legitimate red at the parent is logged as 'control NOT performed' while the gate (via SS-81's path) scores the same record as proof — two kernel records disagree about one piece of evidence.",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_B_collection_interruption_masks_tests.py",
+   "regression": [
+    "tests/hardening/test_ss81_family.py::R07PackageRoot",
+    "tests/hardening/test_ss81_family.py::ReauditSubmoduleTheStoryAdds",
+    "tests/test_implement.py (nop summary through proof.bound)"
+   ],
+   "notes": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18; reproducer FAILS on the frozen kernel 02a34e0e and passes on the F7 fix"
+  },
+  {
+   "id": "SS-83",
+   "site": "aisef/control/tdd.py::red_before_green (consumed by the TDD check in aisef/control/gate.py::evaluate)",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "semantic_context": "TDD's 'red before green' accepts any non-ok test run as the red: a run that could not execute at all (unrunnable — tool/environment) and a run red only because an UNRELATED pre-existing test failed both make TDD PASS, although neither shows the story's tests failing without the story's code.",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py",
+   "regression": [
+    "tests/hardening/test_ss81_family.py::SS83TddRed"
+   ],
+   "notes": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18; reproducer FAILS on the frozen kernel 02a34e0e and passes on the F7 fix"
+  },
+  {
+   "id": "SS-84",
+   "site": "aisef/control/gate.py::_nop_check (the `acceptance <= 0` branch)",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "semantic_context": "a story that declares no criteria passes 'tests verify story' whenever the parent run is red for ANY reason — environment, collection, unrelated failures. Plan-time machine gate blocks zero-criteria plans, which is why this is P2, not P1.",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py",
+   "regression": [
+    "tests/hardening/test_ss81_family.py::SS84NoCriteria"
+   ],
+   "notes": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18; reproducer FAILS on the frozen kernel 02a34e0e and passes on the F7 fix"
+  },
+  {
+   "id": "SS-85",
+   "site": "aisef/control/gate.py::_baseline_check (baseline unrunnable NO_SETUP branch; aborted collection)",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "semantic_context": "'no baseline regression' passes vacuously when the baseline did not execute: a collection-aborted baseline yields no green ids, and a dependency-unrunnable baseline is read as 'no test was ever green there' — so an existing test the story deletes is never seen as lost.",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py",
+   "regression": [
+    "tests/hardening/test_ss81_family.py::SS85BaselineNotExecuted"
+   ],
+   "notes": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18; reproducer FAILS on the frozen kernel 02a34e0e and passes on the F7 fix"
+  },
+  {
+   "id": "SS-86",
+   "site": "aisef/control/gate.py::_baseline_check (red = failed_ids only)",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "semantic_context": "a test green at baseline and SKIPPED at the candidate is neither 'red' nor 'lost' to R9, so a story can silence an existing test with a skip marker and 'no baseline regression' passes.",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py",
+   "regression": [
+    "tests/hardening/test_ss81_family.py::SS86BaselineSkipped"
+   ],
+   "notes": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18; reproducer FAILS on the frozen kernel 02a34e0e and passes on the F7 fix"
+  },
+  {
+   "id": "SS-87",
+   "site": "aisef/control/gate.py::_preservation_check (red = failed_ids only)",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "semantic_context": "a VERIFIED behaviour of another story whose test is SKIPPED at the candidate is reported 'still green' by preservation. Stories whose write scope includes tests/ can do this; the fake-test scan only looks for assertion-free tests, so no deterministic check catches it.",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S8_S9_skipped_as_green.py",
+   "regression": [
+    "tests/hardening/test_ss81_family.py::SS87PreservationSkipped"
+   ],
+   "notes": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18; reproducer FAILS on the frozen kernel 02a34e0e and passes on the F7 fix"
+  },
+  {
+   "id": "SS-88",
+   "site": "aisef/control/ledger.py::_observe_tests (red = failed_ids only)",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "semantic_context": "the behaviour ledger records an acceptance criterion whose only test was SKIPPED as VERIFIED, and rolls its requirement (FR) up to VERIFIED — a verification claim with no executed evidence. The ledger feeds preservation obligations and the repair queue, not the story gate directly (hence P2).",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S8_S9_skipped_as_green.py",
+   "regression": [
+    "tests/hardening/test_ss81_family.py::SS88LedgerSkipped"
+   ],
+   "notes": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18; reproducer FAILS on the frozen kernel 02a34e0e and passes on the F7 fix"
+  },
+  {
+   "id": "SS-89",
+   "site": "aisef/control/gate.py::_nop_check (`nop is None` branch)",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "semantic_context": "when no nop record exists for the candidate, 'tests verify story' is NOT_APPLICABLE, which does not block, so the gate passes without the control having run. Latent: the kernel's own flow always records a nop.",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S10_no_nop_record.py",
+   "regression": [
+    "tests/hardening/test_ss81_family.py::SS89NoNopRecord"
+   ],
+   "notes": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18; reproducer FAILS on the frozen kernel 02a34e0e and passes on the F7 fix"
+  },
+  {
+   "id": "SS-90",
+   "site": "validation/w0_qualification.py::criteria (Phase 12 and mutation rows) + validation/mutate.py::main",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "invariants": [
+    "INV-T.QUALIFICATION-REGISTER"
+   ],
+   "semantic_context": "the W0 builder read the Phase 12 summary and the mutation record without the kernel they measured: (a) the 100 000-trace row checked traces, mismatches, violations and manifest.pass but not that manifest.kernel_digests equals the candidate's aisef/ tree, so a dataset of another kernel satisfied it; (b) the mutation record carried no tree at all, and a partial --only run was indistinguishable from the full set; (c) survivors were read from mut['results'], a key mutate.py never writes, so no surviving mutant could ever refuse W0.",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "tests/hardening/test_w0_gate.py::TestSS90EvidenceOfAnotherKernelRefuses",
+   "notes": "found 2026-09-18 while preparing the post-SS-81 W0: the owner requires a NEW Phase 12 for the new kernel, and reading the builder showed nothing would have refused the old one"
   }
  ]
 }

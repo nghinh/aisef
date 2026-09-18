@@ -26,7 +26,7 @@ import json
 import re
 import shutil
 import subprocess
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 
 from ..clients.base import ClientAdapter
 from ..config import Config
@@ -1009,9 +1009,16 @@ def _nop_at(ev: Evidence, sha) -> bool:
     Not kept when unrunnable, disabled by config, or missing test command:
     all three may have changed."""
     e = _at(ev, TOOL_RUN, NOP_RUN, sha)
-    if e is None or e.detail.get("unrunnable") or e.detail.get("disabled"):
+    if e is None or e.detail.get("disabled"):
         return False
-    return not e.detail.get("skipped") or ("files" in e.detail and not e.detail["files"])
+    if e.detail.get("skipped"):
+        return "files" in e.detail and not e.detail["files"]
+    # SS-81 family: a record from before the proof model was taken with a pytest session that stopped at the first
+    # import error — what it never saw must be measured again, not reused. A run whose files all failed to import is
+    # still an observation (the proof model reads each file's error), so it is kept like any other result.
+    if e.detail.get("proof_schema") != NOP_PROOF_SCHEMA:
+        return False
+    return not e.detail.get("unrunnable") or bool(e.detail.get("collection_errors"))
 
 
 def _security_as_dict(rep: SecurityReport | None) -> dict | None:
@@ -1490,11 +1497,12 @@ def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Co
             with WorktreeManager(Path(workdir)).temporary(root, label="baseline") as tmp:
                 run_log(artifact_root, f"story={story.id} baseline at root {root[:8]} via a temporary worktree "
                                        f"(head={head[:8]})")
-                res = run_tool("test", tmp, config=config)
+                res = _control_run(Path(tmp), config)
                 log = parse_testlog(res.stdout + "\n" + res.stderr)
                 record_tool(res, story.id, artifact_root, name=BASELINE_RUN, extra={
                     "baseline": True, "root": root, "epoch": epoch, "parent": root, "base_ref": base_ref,
                     "captured_at": "temporary worktree at root", "red_before": log.failed[:MAX_IDS],
+                    "test_files_in_tree": _test_files_in(Path(tmp)),
                 })
                 run_log(artifact_root, f"story={story.id} baseline DONE ok={res.ok} red_before={len(log.failed)}"
                                        + (f" unrunnable={res.unrunnable}" if res.unrunnable else ""))
@@ -1507,11 +1515,11 @@ def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Co
             })
             run_log(artifact_root, f"story={story.id} baseline UNAVAILABLE head={head[:8]} root={root[:8]}: {e}")
             return
-    res = run_tool("test", workdir, config=config)   # story_id empty: recorded below, under its own name
+    res = _control_run(Path(workdir), config)   # story_id empty: recorded below, under its own name
     log = parse_testlog(res.stdout + "\n" + res.stderr)
     record_tool(res, story.id, artifact_root, name=BASELINE_RUN, extra={
         "baseline": True, "root": root, "epoch": epoch, "parent": head, "base_ref": base_ref,
-        "red_before": log.failed[:MAX_IDS],
+        "red_before": log.failed[:MAX_IDS], "test_files_in_tree": _test_files_in(Path(workdir)),
     })
     # Say *why* when it could not run: `ok=False` alone sends the reader to the
     # evidence JSONL to find out whether the baseline was red or never started.
@@ -1520,33 +1528,70 @@ def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Co
                            + (f" unrunnable={res.unrunnable}" if res.unrunnable else ""))
 
 
-def _vang_ma_cua_story(res, changed: list[str]) -> str:
-    """The story source file the nop run says is missing — "" if none is.
+def _test_files_in(tree: Path) -> int:
+    """How many test files the tree holds (tracked or not) — "nothing to regress" rests on this being 0 (SS-85)."""
+    try:
+        r = subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard"], cwd=str(tree),
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
+    except (OSError, subprocess.SubprocessError):
+        return -1                     # unknown: never read as zero
+    return sum(1 for f in r.stdout.splitlines() if is_test_path(f)) if r.returncode == 0 else -1
 
-    Only the story's **own** non-test files count: a dependency the project
-    never installed is a real environment failure and must stay unrunnable.
-    """
-    from ..harness.tools import NO_DEPENDENCIES, NO_SETUP
 
-    if not res.unrunnable.startswith(NO_SETUP):
-        return ""                          # tool missing, no manifest: not this
-    ra = res.output()[0].lower().replace("\\", "/")
-    if not any(m in ra for m in NO_DEPENDENCIES):
-        return ""
-    # SS-26 / INV-F.3: the missing module is the NAME the exception names, not a substring of the traceback — a
-    # third-party import failing while the story's file loads is still an environment failure
-    import re as _re
-    missing = {n.strip("./").rstrip("/").replace(".", "/").lower()
-               for n in _re.findall(r"(?:cannot find (?:module|package)|no module named)\s*['\"]([^'\"]+)['\"]", ra)}
-    for f in changed:
-        if is_test_path(f):
+#: Version of the nop record's shape. `_nop_at` reuses only records of this version — an older one was taken with a
+#: pytest session that stopped at the first import error, so what it did not see must be measured again.
+NOP_PROOF_SCHEMA = 2
+
+
+def _control_args(path: Path, config: Config) -> list[str]:
+    from ..harness.tools import collection_continuation_args, command_for
+    return collection_continuation_args(command_for("test", path, config))
+
+
+def _control_run(path: Path, config: Config):
+    """A harness control run (baseline, nop): the project's test command, plus what keeps one file's collection
+    error from hiding every other file's tests (SS-81 B)."""
+    return run_tool("test", path, config=config, extra_args=_control_args(path, config))
+
+
+def _ac_code_files(story: Story, workdir: Path, test_files: list[str]) -> dict[str, list[str]]:
+    """Criterion code -> the story test files that mention it. A pytest id carries its file; a node/vitest id is a
+    title, and this is how the proof model knows which file a collection error belongs to."""
+    from ..control.acceptance import _pattern
+    out: dict[str, list[str]] = {}
+    texts = {}
+    for f in test_files:
+        try:
+            texts[f] = (workdir / f).read_text(encoding="utf-8", errors="replace").replace("_", "-")
+        except OSError:
             continue
-        goc = PurePosixPath(f).with_suffix("").as_posix().lower()
-        if len(goc) < 3:
-            continue
-        if any(n == goc or goc.endswith("/" + n) or n.endswith("/" + goc) for n in missing if len(n) >= 3):
-            return f
-    return ""
+    for i in range(1, len(story.acceptance_criteria) + 1):
+        code = ac_code(story.id, i)
+        rx = _pattern(code)
+        hits = sorted(f for f, t in texts.items() if rx.search(t))
+        if hits:
+            out[code] = hits
+    return out
+
+
+def _nop_summary(res, story_src: list[str], absent: list[str]) -> str:
+    """What the parent run showed, in the proof model's own terms — never "control NOT performed" next to a gate
+    that scored the same record (SS-82)."""
+    from ..control.proof import bound
+    from ..harness.testlog import parse as parse_testlog
+
+    log = parse_testlog(res.output()[0])
+    parts = [f"executed {len(log.test_ids)} ({len(log.passed)} green, {len(log.failed)} red, {len(log.skipped)} skipped)"]
+    for e in log.collection_errors[:4]:
+        f = bound(e, story_src, absent)[1]           # the gate's own binding — the log cannot disagree with it
+        parts.append(f"{e.get('file')}: " + (f"cannot import {e.get('missing_module')} — {f} is this story's" if f else
+                                             f"needs {e.get('missing_module')}, not this story's" if e.get("missing_module") else
+                                             f"did not collect ({e.get('error') or 'unknown'})"))
+    if log.collection_aborted:
+        parts.append("session stopped at collection — unobserved tests prove nothing")
+    if res.unrunnable and not log.test_ids and not log.collection_errors:
+        parts.append(f"did not execute: {res.unrunnable}")
+    return " · ".join(parts)
 
 
 def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
@@ -1610,34 +1655,17 @@ def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
                 shutil.copy2(src, dst)
             elif dst.exists():
                 dst.unlink()                        # story deleted test file: parent SHA also lacks it
-        res = run_tool("test", tmp_path, config=config)   # story_id empty: recorded below, under its own name
-        if (vang := _vang_ma_cua_story(res, changed)):
-            # The nop worktree deliberately lacks the story's source, so
-            # "cannot find module <story file>" is the control **working**,
-            # not a broken environment. Told apart only by *which* module is
-            # missing — and only here, where the story's own changed files
-            # are known (lỗi 120). On a greenfield project's first story
-            # there are no other tests to print a name, so the generic rule
-            # ("unrunnable unless something passed") cannot tell the two
-            # apart, and the strongest control was recorded as not performed
-            # exactly where it matters most (todo-cli STORY-01-01 2026-09-13).
-            run_log(artifact_root, f"story={story.id} nop red vì thiếu {vang} — "
-                                   f"đúng thứ control dựng ra để thấy")
-            res.unrunnable = ""
+        # SS-81 family: what the parent lacks, and which story test file declares each criterion — the gate's proof
+        # model reads both. `absent_at_parent` is measured here, where the parent tree exists; the gate never guesses it.
+        story_src = [f for f in changed if not is_test_path(f)]
+        absent = [f for f in story_src if not (tmp_path / f).exists()]
+        ac_files = _ac_code_files(story, Path(workdir), test_files)
+        res = _control_run(tmp_path, config)   # story_id empty: recorded below, under its own name
         record_tool(res, story.id, artifact_root, candidate, name=NOP_RUN, extra={
-            "nop": True, "parent": parent_ref, "base_ref": base_ref, "files": test_files[:50]})
-        # `ok` here is the **test run**, and for the nop control red is the
-        # wanted result: green at the parent SHA means the tests do not verify
-        # the story. `ok=False` read as a failure for months; say what it means.
-        # "Could not run" is not "red". A test command that fails to start
-        # (exit 127 on Windows before 1.2.29) makes `ok=False`, and calling
-        # that the expected result reports a control that never happened.
-        ket = ("could not run at parent — control NOT performed: " + res.unrunnable
-               if res.unrunnable else
-               "tests red at parent (expected)" if not res.ok else
-               "tests GREEN at parent — they do not verify the story")
-        run_log(artifact_root,
-                f"story={story.id} nop DONE {ket} {res.duration_ms}ms")
+            "nop": True, "parent": parent_ref, "base_ref": base_ref, "files": test_files[:50],
+            "proof_schema": NOP_PROOF_SCHEMA, "collection_strategy": " ".join(_control_args(tmp_path, config)) or "runner default",
+            "absent_at_parent": absent[:200], "ac_code_files": ac_files})
+        run_log(artifact_root, f"story={story.id} nop DONE {_nop_summary(res, story_src, absent)} {res.duration_ms}ms")
     except GitError as e:
         run_log(artifact_root, f"story={story.id} nop ERROR {e}")
         store.tool_run(story.id, NOP_RUN, ok=False, detail={

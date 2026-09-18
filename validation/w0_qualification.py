@@ -71,7 +71,13 @@ def criteria(ci: dict, sha: str = "") -> list[dict]:
                    if re.search(r"^\s*@unittest\.expectedFailure", p.read_text(encoding="utf-8"), re.M)]
     diff = _json(EV / "differential-p12-summary.json") if (EV / "differential-p12-summary.json").is_file() else {}
     mut = _json(EV / "mutation-results.json") if (EV / "mutation-results.json").is_file() else {}
-    survivors = [r for r in mut.get("results", []) if r.get("status") == "SURVIVED"]
+    # SS-90: the record's rows are `rows` — reading a key mutate.py never writes made every survivor invisible
+    survivors = [r for r in mut.get("rows", []) if r.get("status") == "SURVIVED"]
+    # SS-90: traces and mutants measured on another kernel say nothing about this one — both must name the candidate's tree
+    p12_digests = list((diff.get("manifest") or {}).get("kernel_digests") or [])
+    p12_on_candidate = bool(tree) and p12_digests == [tree]
+    spec = _json(ROOT / "validation" / "mutation-targets.json")
+    mutation_targets = {f"{t['module']}::{t['function']}" for t in spec["targets"]}      # a partial (--only) run is not the set
     unclassified = [r["id"] for r in survivors if not r.get("classification")]
     rows = [
         ("0 P0/P1 open", not open_p01, {"open_p0_p1": open_p01, "scanned": len(members), "additions_after_freeze_scanned": len(additions)}),
@@ -87,11 +93,15 @@ def criteria(ci: dict, sha: str = "") -> list[dict]:
          {"matrix": {k: matrix.get(k) for k in ("generated", "aisef_tree", "pass", "totals")}, "candidate_aisef_tree": tree}),
         ("0 expected-red tests", not red_markers, {"files_with_red_markers": red_markers}),
         ("0 unexplained model/kernel gaps (100 000 traces)", bool(diff) and diff.get("unexplained") == 0 and diff.get("traces", 0) >= 100000
-         and (diff.get("manifest") or {}).get("pass") is True and diff.get("invariant_violations") == 0,
-         {"differential": {k: diff.get(k) for k in ("traces", "matched", "unexplained", "invariant_violations", "exceptions", "silent_skips", "traces_per_s", "elapsed_s", "chunks", "manifest", "coverage")}}),
+         and (diff.get("manifest") or {}).get("pass") is True and diff.get("invariant_violations") == 0 and p12_on_candidate,
+         {"differential": {k: diff.get(k) for k in ("traces", "matched", "unexplained", "invariant_violations", "exceptions", "silent_skips", "traces_per_s", "elapsed_s", "chunks", "manifest", "coverage")},
+          "phase12_kernel_digests": p12_digests, "candidate_aisef_tree": tree}),
         ("KNOWN_DEVIATIONS empty", bool(diff) and not diff.get("known_deviations"), {"known_deviations": diff.get("known_deviations")}),
-        ("0 safety-significant mutation survivors", bool(mut) and not unclassified and all(r.get("classification") in ("EQUIVALENT", "NOT_SIGNIFICANT", "KILLED_BY_NEW_TEST") for r in survivors),
-         {"mutation": {k: mut.get(k) for k in ("mutations_generated", "killed", "survived", "equivalent")}, "unclassified_survivors": unclassified}),
+        ("0 safety-significant mutation survivors", bool(mut.get("rows")) and not unclassified and all(r.get("classification") in ("EQUIVALENT", "NOT_SIGNIFICANT", "KILLED_BY_NEW_TEST") for r in survivors)
+         and bool(tree) and mut.get("aisef_tree") == tree and not mut.get("only")
+         and set(mut.get("targets") or []) == mutation_targets,
+         {"mutation": {k: mut.get(k) for k in ("mutations_generated", "killed", "survived", "equivalent", "aisef_tree")}, "unclassified_survivors": unclassified,
+          "candidate_aisef_tree": tree}),
         ("Linux + Windows CI green on the candidate", ci.get("all_green") is True, {"ci": ci}),
     ]
     return [{"criterion": name, "holds": bool(ok), "measured": data} for name, ok, data in rows]

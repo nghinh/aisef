@@ -974,11 +974,120 @@
    "invariants": "INV-T.QUALIFICATION-REGISTER",
    "test": "tests/hardening/test_w0_gate.py::TestAPostFreezeP1RefusesQualification",
    "status": "GREEN (SS-66)"
+  },
+  {
+   "id": "FM-T-08",
+   "stage": "Test",
+   "fault": "INFRA",
+   "scenario": "a third-party package the story's tests import is missing at the parent (nop control)",
+   "expected_state": "tests verify story UNRUNNABLE — DEPENDENCY_UNRUNNABLE per test, never PASS",
+   "expected_evidence": "test:nop collection_errors + gate data.proof per criterion",
+   "expected_recovery": "fix the environment, re-run the control",
+   "invariants": "INV-TDD-NOP-PROOF",
+   "test": "tests/hardening/test_ss81_family.py::R01ThirdPartyMissingAtParent",
+   "status": "GREEN (F7)"
+  },
+  {
+   "id": "FM-T-09",
+   "stage": "Test",
+   "fault": "INJECTED",
+   "scenario": "file A cannot import the story's new module at the parent (legitimate red); file B holds a tautological criterion test",
+   "expected_state": "B observed GREEN_EXECUTED at the parent → tests verify story FAILED (still_green)",
+   "expected_evidence": "test:nop run with --continue-on-collection-errors; data.still_green",
+   "expected_recovery": "developer writes a real test",
+   "invariants": "INV-TDD-NOP-PROOF",
+   "test": "tests/hardening/test_ss81_family.py::R02CollectionFailureDoesNotHideATautology",
+   "status": "GREEN (F7)"
+  },
+  {
+   "id": "FM-T-10",
+   "stage": "Test",
+   "fault": "MALFORMED",
+   "scenario": "the runner stops the whole session at the first collection error (no continuation)",
+   "expected_state": "tests in other files COLLECTION_ABORTED — no proof, never red",
+   "expected_evidence": "collection_aborted on the record (or read from a legacy tail)",
+   "expected_recovery": "re-run with the collection strategy",
+   "invariants": "INV-TDD-NOP-PROOF",
+   "test": "tests/hardening/test_ss81_family.py::R02CollectionFailureDoesNotHideATautology",
+   "status": "GREEN (F7)"
+  },
+  {
+   "id": "FM-T-11",
+   "stage": "Test",
+   "fault": "MALFORMED",
+   "scenario": "the parent run's output is truncated before its summary (totals do not match the ids read)",
+   "expected_state": "tests verify story UNRUNNABLE (output_complete False)",
+   "expected_evidence": "output_complete on the record",
+   "expected_recovery": "re-run the control",
+   "invariants": "INV-TDD-NOP-PROOF",
+   "test": "tests/hardening/test_ss81_family.py::R10PartialOutputCannotPass",
+   "status": "GREEN (F7)"
+  },
+  {
+   "id": "FM-T-12",
+   "stage": "Test",
+   "fault": "INFRA",
+   "scenario": "the test tool or its sandbox cannot run at the parent",
+   "expected_state": "ENVIRONMENT_UNRUNNABLE per test; control UNRUNNABLE, never PASS",
+   "expected_evidence": "unrunnable reason on test:nop",
+   "expected_recovery": "fix the environment",
+   "invariants": "INV-TDD-NOP-PROOF",
+   "test": "tests/hardening/test_ss81_family.py::R09ToolEnvironmentFailure",
+   "status": "GREEN (F7)"
+  },
+  {
+   "id": "FM-T-13",
+   "stage": "Test",
+   "fault": "INJECTED",
+   "scenario": "the only red run before the last green is red for an unrelated test or did not execute",
+   "expected_state": "TDD does not accept it as the story's red",
+   "expected_evidence": "tool_run test sequence classified per story test",
+   "expected_recovery": "nop control or a real red run",
+   "invariants": "INV-TDD-NOP-PROOF",
+   "test": "tests/hardening/test_ss81_family.py::SS83TddRed",
+   "status": "GREEN (F7)"
+  },
+  {
+   "id": "FM-T-14",
+   "stage": "Test",
+   "fault": "STALE",
+   "scenario": "no nop record exists for the candidate",
+   "expected_state": "tests verify story UNRUNNABLE, never NOT_APPLICABLE",
+   "expected_evidence": "gate check names the missing control",
+   "expected_recovery": "run the control",
+   "invariants": "INV-TDD-NOP-PROOF",
+   "test": "tests/hardening/test_ss81_family.py::SS89NoNopRecord",
+   "status": "GREEN (F7)"
+  },
+  {
+   "id": "FM-T-15",
+   "stage": "Test",
+   "fault": "INJECTED",
+   "scenario": "a test green at the baseline is skipped at the candidate / in a preservation run / in a ledger observation",
+   "expected_state": "baseline FAILED (silenced), preservation UNRUNNABLE, criterion not verified",
+   "expected_evidence": "skipped_ids on the records",
+   "expected_recovery": "un-skip or re-run",
+   "invariants": "INV-T.EXECUTED-EVIDENCE",
+   "test": "tests/hardening/test_ss81_family.py::SS86BaselineSkipped",
+   "status": "GREEN (F7)"
+  },
+  {
+   "id": "FM-T-16",
+   "stage": "Test",
+   "fault": "INFRA",
+   "scenario": "the baseline run executed nothing while the tree holds test files",
+   "expected_state": "no baseline regression UNRUNNABLE — 'nothing to regress' only for a tree without tests",
+   "expected_evidence": "test_files_in_tree on test:baseline",
+   "expected_recovery": "fix the environment, re-run the baseline",
+   "invariants": "INV-T.EXECUTED-EVIDENCE",
+   "test": "tests/hardening/test_ss81_family.py::SS85BaselineNotExecuted",
+   "status": "GREEN (F7)"
   }
  ],
  "status_count": {
-  "GREEN": 79,
+  "GREEN": 88,
   "RED": 0,
   "NEEDS_TEST": 0
- }
+ },
+ "updated_2026-09-18": "SS-81 family (F7-EXECUTION-EVIDENCE-VALIDITY): FM-T-08..FM-T-16 added, each GREEN on the fixed kernel"
 }
