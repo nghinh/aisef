@@ -1,7 +1,7 @@
 {
  "profile": "PROFILE-W1-OC-GPT56SOL-T80",
  "profile_id": "sha256:24ab3ec1d95bafb20ae70c009b080c57240d987a61af5e4a42c87f614af7b8dc",
- "status": "UNDER_QUALIFICATION",
+ "status": "STOPPED \u2014 kernel P1 SS-81 found in run 1; runs 2-3 not started",
  "identity": {
   "kernel": {
    "candidate_sha": "af94372dd1861e2fcac1c5f6e3c4102efa27e829",
@@ -110,5 +110,18 @@
   "cx is a Codex backend on a ChatGPT account: usage limits per window are not visible to the operator and may surface mid-run as rate limits (classified ENVIRONMENT/INFRA, never as model quality)",
   "pricing is not reported on this route: cost_cap_status will be UNVERIFIABLE; cost is informational only (owner section 8)"
  ],
- "qualification_rule": "W1 DELIVERY QUALIFIED only if >= 2 of 3 fresh runs reach DELIVERY_COMPLETE, every completed delivery passes the hidden oracle completely, and every safety count is 0 (owner section 8). Stop early on a kernel P0/P1, a false pass, material drift, or repeated budget exhaustion at 80 turns (section 7)."
+ "qualification_rule": "W1 DELIVERY QUALIFIED only if >= 2 of 3 fresh runs reach DELIVERY_COMPLETE, every completed delivery passes the hidden oracle completely, and every safety count is 0 (owner section 8). Stop early on a kernel P0/P1, a false pass, material drift, or repeated budget exhaustion at 80 turns (section 7).",
+ "result_so_far": {
+  "runs_executed": 1,
+  "runs_complete": "0/1",
+  "run_1": "LEGITIMATE_MODEL_PROJECT_STOP 0/16 \u2014 reviewer tree mutation (uv run), not budget",
+  "kernel_safety_counts_run_1": {
+   "false_pass": 0,
+   "false_block": 0,
+   "manual_state_repair": 0,
+   "orphan_state": 0,
+   "drift": 0
+  },
+  "delivery_reliability": "NOT DETERMINED \u2014 stopped before 3 runs"
+ }
 }

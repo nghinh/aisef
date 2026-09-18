@@ -1663,9 +1663,49 @@
    "severity_rule": "P2: the tooling failed loudly and lost a record; it never made an unqualified run look qualified",
    "defect_class": "QUALIFICATION_INFRASTRUCTURE",
    "defect_class_basis": "site outside aisef/: closure-evidence/hardening/w1/w1_driver.py"
+  },
+  {
+   "id": "SS-81",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "PENDING-OWNER-APPROVAL",
+   "severity": "P1",
+   "status": "OPEN",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/gate.py and the nop run in aisef/phases/implement.py",
+   "invariants": [
+    "absence of a structured verdict can never PASS",
+    "INV-F.3 (SS-26): a dependency the project never installed stays an environment failure"
+   ],
+   "site": "aisef/control/gate.py::_nop_check (the `unrunnable and not test_format` branch; 'red or absent' at level 2) + aisef/phases/implement.py::run_nop (pytest collection interruption)",
+   "statement": "the deterministic 'tests verify story' control — and TDD, which defers to it ('the nop control proves the same thing directly') — can PASS on tests that never executed at the parent SHA. (A) A nop run that failed because a third-party dependency is missing is recorded with `unrunnable` AND `test_format` (pytest printed its collection error); the gate's UNRUNNABLE branch requires `not test_format`, so it falls through and scores the absent tests as red: PASSED. The same record without test_format is UNRUNNABLE, as SS-26/INV-F.3 intend. (B) When one story test file fails to import at the parent (the legitimate red), pytest interrupts the whole session; the story's other test files never run, the kernel's parser reports no test ids, and 'red or absent' scores a tautological AC test (`assert True`) in another file as verified: PASSED.",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_A_unrunnable_nop_with_pytest_format.py (gate level, the suite's own fixtures; control case UNRUNNABLE, defect case PASSED) and repro_B_collection_interruption_masks_tests.py (real pytest 9.1.1 output at the parent run through the kernel's own parser and gate: PASSED with a tautology). Both deterministic, no model.",
+   "provenance": "found reading the gate record of PROFILE-W1-OC-GPT56SOL-T80 run 1 (STORY-01-01, seq 113 vs 129): the run log said the nop control was NOT performed while the gate scored it PASSED — 2026-09-18",
+   "impact_on_accepted_evidence": "measured: 14 stories across the 4 W1 run copies had 'tests verify story' PASS; 6 of the DONE ones rested on nothing having executed at the parent. Re-run at their real parent SHAs with --continue-on-collection-errors: 0 AC-coded tests green at the parent in all 6 (closure-evidence/hardening/w1/ss81/IMPACT-REMEASURE-accepted-runs.json). The defect did not produce a false pass in any accepted run; the W1 false-pass count stands. It weakens a guarantee, it did not break one here.",
+   "fixed_by": null,
+   "not_fixed_because": "owner decision 'EXECUTION PROFILE NOT QUALIFIED' section 2: any product-tree change invalidates this program and requires owner approval",
+   "severity_rule": "P1: a deterministic qualification control passes without its evidence having executed (reachable; not observed as a false DONE)"
+  },
+  {
+   "id": "SS-82",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "PENDING-OWNER-APPROVAL",
+   "severity": "P3",
+   "status": "OPEN",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/phases/implement.py::_vang_ma_cua_story",
+   "invariants": [
+    "the run log and the gate record must not contradict each other about the same evidence"
+   ],
+   "site": "aisef/phases/implement.py::_vang_ma_cua_story",
+   "statement": "the detector that recognises 'the missing module is the story's own code' matches a module name against changed file stems, but has no package rule: `No module named 'ledgerlock'` does not match `ledgerlock/__init__.py`. A greenfield story's legitimate red at the parent is logged as 'control NOT performed' while the gate (via SS-81's path) scores the same record as proof — two kernel records disagree about one piece of evidence.",
+   "reproducer": "W1 PROFILE-W1-OC-GPT56SOL-T80 run 1, STORY-01-01: changed files ledgerlock/__init__.py…, nop seq 113 says unrunnable (dependencies not installed), gate seq 129 says 'tests verify story -> passed'",
+   "provenance": "same reading as SS-81, 2026-09-18",
+   "fixed_by": null,
+   "not_fixed_because": "owner approval required for any product-tree change",
+   "severity_rule": "P3: a misleading operator record; the verdict itself is decided elsewhere (SS-81)"
   }
  ],
- "updated": "2026-09-18: +SS-77, +SS-78, +SS-79, +SS-80 — four W1 measurement/robustness defects, each found by reading a run's own output rather than accepting it",
+ "updated": "2026-09-18: +SS-81 (P1 OPEN, product kernel: the nop control can pass on non-execution) +SS-82 (P3 OPEN, product kernel: package-level missing-module not recognised) — found reading PROFILE-W1-OC-GPT56SOL-T80 run 1; not fixed, owner approval required",
  "defect_classes": {
   "PRODUCT_KERNEL": "a defect in aisef/ — invalidates evidence produced by the product (kernel qualification, W0)",
   "QUALIFICATION_INFRASTRUCTURE": "a defect in the tooling that measures the product (W1 driver, oracle harness) — invalidates the measurements it produced, not the product; its fix never changes aisef/"
