@@ -187,3 +187,22 @@ condition of the run.
   frozen candidate's own code, every resolved role (stack, tool, mode, provision, pinned version), every probe
   (state, observed version, image and image id) and refuses to continue unless every selected tool is present; a
   missing default tool is a W0 regression and stops W1.
+
+## W1 run 1 (second attempt) — the re-qualified candidate, 2026-09-18
+
+Executed only after the owner's strict order completed: SS-65 family fix → sibling sweep → real-image capability
+qualification → suite + ruff → Linux/Windows CI → new Phase-12 kernel → a complete new 100 000-trace differential run →
+integrity/coverage consolidation → W0 on the exact CI-green SHA → freeze.
+
+| step | record | result |
+|---|---|---|
+| SS-65 closure | `phase20/SS-65-CLOSURE.json` | 15/15 conditions met at `0a7cab86086e` |
+| W0 re-qualification | `AISEF-W0-QUALIFICATION.json` | **QUALIFIED** at `0a7cab86086e`, 11/11 criteria |
+| candidate freeze | `P19-FREEZE.json` | `af94372dd186`, tree `02a34e0e` = PHASE12_KERNEL_DIGEST, wheel sha256 `2e08d43b…`, CI 35287072415 7/7 |
+| fresh run copy | `prepare_run_copy.sh 1` | trunk `8ff9f13` + cost cap `fd4c644` + image re-pin; `sandbox.image` → `aisef-verify-python:84adf1d8eaf9` |
+| prepare / preflight | `w1/run-1/driver.json` | 16/16 rows true, `doctor_red` empty, aisef from the wheel not the checkout |
+| kernel-first | same | `aisef run` exit 2 — the kernel refused the STALE readiness gate before any agent call |
+| ARB-1 | `w1/run-1/ARB-1-MEASURED.json` | recomputing the signed method reproduces `4f2c3b84…` exactly; negative control flips it |
+| run | `w1/run-1/` | started 2026-09-18 07:03, cost cap $80 |
+
+The previous W0 qualification and the freeze it rested on are void and kept unedited under `voided-abad2a6/`.
