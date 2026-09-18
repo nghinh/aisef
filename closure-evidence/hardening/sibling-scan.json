@@ -4,11 +4,11 @@
  "generated": "2026-09-17T21:44:31+0700",
  "method": "five read-only sweeps over aisef/ (recency-as-identity; prose-to-control-state; retry locality and recovery; ownership, tools, leases, scope; plus a test-inventory map), every candidate then verified in code by hand; CONFIRMED requires a deterministic RED reproducer that failed on the invariant assertion (tests/hardening/test_sibling_scan.py, run 2026-09-16 on the 1.7.6 baseline: 21 expected failures, 0 unexpected successes)",
  "counts": {
-  "CONFIRMED": 90,
+  "CONFIRMED": 91,
   "NEEDS_TEST": 0,
   "NOT_A_DEFECT": 6,
-  "entries": 96,
-  "confirmed": 90
+  "entries": 97,
+  "confirmed": 91
  },
  "entries": [
   {
@@ -1337,6 +1337,17 @@
    "severity_proposed": "P1",
    "reproducer": "tests/hardening/test_w0_gate.py::TestSS90EvidenceOfAnotherKernelRefuses",
    "notes": "found 2026-09-18 while preparing the post-SS-81 W0: the owner requires a NEW Phase 12 for the new kernel, and reading the builder showed nothing would have refused the old one"
+  },
+  {
+   "id": "SS-91",
+   "site": "aisef/memory.py::safe_path",
+   "family": "FAM-PROCESS",
+   "invariants": [],
+   "semantic_context": "on Windows, concurrent memory writers are intermittently refused with 'memory path escapes project': safe_path compares Path.resolve() of _bmad-output/memory/store.json with the resolved project root textually, and CPython's Windows realpath keeps the \\\\?\\ extended-length prefix when the file exists at its first lookup but not at its second — another writer atomically replacing the store between the two. Fail-closed: the write is refused, nothing is corrupted, no gate is affected.",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/test_ss81_family.py::KillMemoryResolveOnWindows",
+   "notes": "found 2026-09-18 by Linux/Windows CI of the SS-81 family candidate"
   }
  ]
 }

@@ -62,7 +62,7 @@ def safe_path(root, relative):
         raise MemoryError('unsafe memory path')
     current = Path(root)
     try:
-        resolved_root = Path(root).resolve()
+        resolved_root = _resolved(root)
     except (OSError, RuntimeError) as exc:
         raise MemoryError('memory path escapes project') from exc
     for part in p.parts:
@@ -73,12 +73,24 @@ def safe_path(root, relative):
         except OSError as err:
             raise MemoryError('unsafe memory path') from err
     try:
-        resolved = current.resolve()
+        resolved = _resolved(current)
     except (OSError, RuntimeError) as err:
         raise MemoryError('unsafe memory path') from err
     if not (resolved == resolved_root or resolved_root in resolved.parents):
         raise MemoryError('memory path escapes project')
     return Path(resolved_root) / PurePosixPath(relative)
+
+
+def _resolved(p) -> Path:
+    r"""`Path.resolve()` without the extended-length prefix. On Windows, CPython's realpath keeps `\\?\` when the
+    file exists at its first lookup but not at its second — another process atomically replacing the store between
+    the two (SS-91, CI 2026-09-18: 2 of 8 concurrent writers refused with 'memory path escapes project')."""
+    s = str(Path(p).resolve())
+    if s.startswith('\\\\?\\UNC\\'):
+        s = '\\\\' + s[8:]
+    elif s.startswith('\\\\?\\'):
+        s = s[4:]
+    return Path(s)
 
 
 def digest(root, relative):

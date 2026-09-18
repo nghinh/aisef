@@ -490,6 +490,20 @@
    "function": "_same_complaint",
    "site": "token loop: `not x or not y` → and",
    "why": "with `and`, a pair where exactly one token set is empty is not skipped, but `chung = x & y` is then empty and `len(_rieng(∅)) < 2` skips it anyway — the same result for every input."
+  },
+  {
+   "id": "98ed31b7a6",
+   "module": "aisef/control/ledger.py",
+   "function": "_observe_tests",
+   "site": "line 711: drop call cov.setdefault(...)",
+   "why": "aisef/control/ledger.py::_observe_tests `cov.setdefault(i, [])` is dead: `cov = ac_coverage(story_id, line.acceptance, ids)` returns a key for EVERY i in 1..line.acceptance (control/acceptance.py::coverage), and `_linked(led, story_id, ids)` yields only i in 1..led.stories[story_id].acceptance — the same StoryLine, so every linked i is already a key. Dropping the call changes no state."
+  },
+  {
+   "id": "2b5fc3de4b",
+   "module": "aisef/harness/testlog.py",
+   "function": "_js_import_errors",
+   "site": "line 443: and ↔ or",
+   "why": "aisef/harness/testlog.py::_js_import_errors `importer.endswith(f) and f != importer` -> `or`: `f` is either a failed file the importer ends with, or the importer itself, so `importer.endswith(f)` is always True; when f == importer the original gives \"\" and the mutant gives importer[:-len(importer)] == \"\" — identical in every reachable state."
   }
  ],
  "not_significant": [

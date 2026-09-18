@@ -323,9 +323,12 @@ def collection_continuation_args(command: str) -> list[str]:
         argv = split_command(command or "")
     except ValueError:
         return []
-    names = [Path(a).name for a in argv]
-    runs_pytest = "pytest" in names or "py.test" in names or any(
-        a == "-m" and i + 1 < len(argv) and argv[i + 1] == "pytest" for i, a in enumerate(argv))
+    # pytest must be the program run — not any argv word: `tox -e pytest` or `make pytest` would receive the flag
+    names = [Path(a).name.removesuffix(".exe") for a in argv]
+    if names[:1] in (["uv"], ["poetry"], ["pdm"]) and names[1:2] == ["run"]:
+        names = names[2:]
+    runs_pytest = names[:1] in (["pytest"], ["py.test"]) or (names[:1] != [] and names[0].startswith("python")
+                                                             and names[1:3] == ["-m", "pytest"])
     return [PYTEST_CONTINUE] if runs_pytest and PYTEST_CONTINUE not in argv else []
 
 

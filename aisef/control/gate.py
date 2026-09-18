@@ -518,13 +518,15 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
     compare, stated, level 2 decides (worktree at the correct branch point).
 
     **Level 2 (`test:nop`, harness runs after freeze):** at the parent SHA
-    with story test files copied in, tests carrying codes must be **red or
-    absent** — import errors at parent SHA count as red and are valid. Green
-    -> FAILED naming the tests. Other outcomes per invariant: nop unrunnable
-    -> UNRUNNABLE; reporter doesn't print names (only knows test suite is
-    red, not whose) -> UNCONFIGURED; story didn't add/modify test files,
-    disabled by `verify.nop`, or harness recorded no nop (journal before V3)
-    -> NOT_APPLICABLE with reason.
+    with story test files copied in, every criterion test green at the
+    candidate must be PROVEN red there (the proof model, `control/proof.py`):
+    executed red, or unable to import a module or symbol this story
+    introduces — bound through that test's own file. Green -> FAILED naming
+    the tests. Anything that is not proof (not collected, session aborted,
+    dependency or environment unrunnable, incomplete output, absent) ->
+    UNRUNNABLE; no nop recorded for the candidate, or no criteria -> UNRUNNABLE
+    (SS-84, SS-89); reporter doesn't print names -> UNCONFIGURED; story didn't
+    add/modify test files or `verify.nop` disabled -> NOT_APPLICABLE.
     """
     name = "tests verify story"
     base_ev = authoritative_baseline(evidence)

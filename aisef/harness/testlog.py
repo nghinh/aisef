@@ -366,7 +366,7 @@ def _pytest(lines: list[str], log: TestLog) -> None:
             if m.group(2) == "ERROR":
                 log.errored.append(m.group(1).strip())
     log.collection_aborted = any(_PYTEST_ABORT.search(l) for l in lines)
-    summary = next((l for l in reversed(lines) if _PYTEST_TOTAL.search(l) or "no tests ran" in l), "")
+    summary = next((l for l in reversed(lines) if _PYTEST_TOTAL.search(l)), "")     # "no tests ran in 0.01s" too
     if not summary:
         log.output_complete = False
     else:

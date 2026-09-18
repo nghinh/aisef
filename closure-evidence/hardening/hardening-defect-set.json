@@ -5,9 +5,9 @@
  "generated": "2026-09-16T10:12:06+00:00",
  "rule": "No broad speculative sweep while fixing. A sibling found during implementation is classified, assigned to an already-frozen family where it belongs, and added here with explicit provenance (commit + finding source).",
  "counts": {
-  "total": 100,
+  "total": 101,
   "by_severity": {
-   "P2": 54,
+   "P2": 55,
    "P1": 25,
    "P3": 21
   },
@@ -17,13 +17,13 @@
    "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY": 15,
    "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE": 12,
    "F6-BENCH-RELEASE-APPROVAL": 7,
-   "F5-PROCESS-TOOL-ENVIRONMENT": 21,
+   "F5-PROCESS-TOOL-ENVIRONMENT": 22,
    "F6-QUALIFICATION-INFRASTRUCTURE": 5,
    "F7-EXECUTION-EVIDENCE-VALIDITY": 9
   },
   "fixed": 16,
   "by_status": {
-   "FIXED": 99,
+   "FIXED": 100,
    "SUPERSEDED": 1
   },
   "counting_rule": "unique by id: AD-01/03/04/05 and SS-61/62/63 are listed both in their fix family and in additions_after_freeze (provenance) and count once; recounted from the entries on 2026-09-17 (the hand-maintained counts before this had by_severity summing to 72 of 75)"
@@ -1903,9 +1903,29 @@
    ],
    "fixed_by": "validation/w0_qualification.py: Phase 12 row requires manifest.kernel_digests == [candidate aisef tree]; mutation row requires the record's aisef_tree == candidate tree, no --only, the full target set, and reads survivors from `rows`; validation/mutate.py records aisef_tree (empty when aisef/ is dirty), aisef_dirty and only",
    "note_on_stop_rule": "qualification infrastructure, not product kernel: the fix only adds refusals and cannot produce a PASS; continued under the precedent of SS-66/SS-77/SS-79 and reported at the checkpoint"
+  },
+  {
+   "id": "SS-91",
+   "family": "FAM-PROCESS",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P2",
+   "status": "FIXED",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/memory.py",
+   "invariants": [],
+   "invariants_note": "no registry invariant covers the memory store; its containment rule is aisef/memory.py::safe_path's own",
+   "site": "aisef/memory.py::safe_path",
+   "statement": "on Windows, concurrent memory writers are intermittently refused with 'memory path escapes project': safe_path compares Path.resolve() of _bmad-output/memory/store.json with the resolved project root textually, and CPython's Windows realpath keeps the \\\\?\\ extended-length prefix when the file exists at its first lookup but not at its second — another writer atomically replacing the store between the two. Fail-closed: the write is refused, nothing is corrupted, no gate is affected.",
+   "measured": "CI run 35345117442 (e60cba2), windows-latest 3.11: tests/test_memory.py::BoundaryTests::test_process_concurrency — 2 of 8 concurrent writers exited 1 with MemoryError('memory path escapes project'); first occurrence in the last 30 Windows runs of this branch (scanned). aisef/memory.py is unchanged by e60cba2.",
+   "provenance": "found 2026-09-18 by Linux/Windows CI of the SS-81 family candidate",
+   "reproducer": "tests/hardening/test_ss81_family.py::KillMemoryResolveOnWindows",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::KillMemoryResolveOnWindows"
+   ],
+   "fixed_by": "aisef/memory.py::_resolved — Path.resolve() with a leading \\\\?\\ (or \\\\?\\UNC\\) stripped, used for both sides of safe_path's containment check"
   }
  ],
- "updated": "2026-09-18: SS-81 family registered — SS-81 (P1), SS-82 (P3) and siblings SS-83..SS-89 from the section-7 sweep, all OPEN with deterministic reproducers; 2026-09-18: SS-81..SS-89 FIXED by the F7-EXECUTION-EVIDENCE-VALIDITY family fix (counts recounted unique by id); 2026-09-18: SS-90 (P1, QUALIFICATION_INFRASTRUCTURE) registered FIXED — W0 evidence rows bound to the candidate's kernel",
+ "updated": "2026-09-18: SS-81 family registered — SS-81 (P1), SS-82 (P3) and siblings SS-83..SS-89 from the section-7 sweep, all OPEN with deterministic reproducers; 2026-09-18: SS-81..SS-89 FIXED by the F7-EXECUTION-EVIDENCE-VALIDITY family fix (counts recounted unique by id); 2026-09-18: SS-90 (P1, QUALIFICATION_INFRASTRUCTURE) registered FIXED — W0 evidence rows bound to the candidate's kernel; 2026-09-18: SS-91 (P2, PRODUCT_KERNEL, Windows memory-store race) registered FIXED",
  "defect_classes": {
   "PRODUCT_KERNEL": "a defect in aisef/ — invalidates evidence produced by the product (kernel qualification, W0)",
   "QUALIFICATION_INFRASTRUCTURE": "a defect in the tooling that measures the product (W1 driver, oracle harness) — invalidates the measurements it produced, not the product; its fix never changes aisef/"
