@@ -338,7 +338,8 @@ class Driver:
                                "commits_after_8ff9f13": after, "ledgerlock_dir_absent_at_master": "ledgerlock" not in self.git("ls-tree", "--name-only", "master").split(),
                                "remotes": self.git("remote").split(), "branches": self.git("branch", "--list").replace("*", "").split()}
         t = P["fresh_topology"]
-        P["fresh_topology_ok"] = t["head_branch"] == "master" and t["ledgerlock_dir_absent_at_master"] and not t["remotes"] and len(after) <= 3 \
+        # cost cap + image re-pin + guard plugin, and exactly one execution-profile commit when a profile is in force
+        P["fresh_topology_ok"] = t["head_branch"] == "master" and t["ledgerlock_dir_absent_at_master"] and not t["remotes"] and len(after) <= 3 + bool(self.a.profile) \
             and all(_is_preparation_commit(ln) for ln in after)
         # owner item 9 — W1 freshness preflight, every check mechanical; any failure STOPS before the first model call
         idx = json.loads((self.art / "stories.index.json").read_text(encoding="utf-8"))
