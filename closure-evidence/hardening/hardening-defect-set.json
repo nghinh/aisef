@@ -1235,7 +1235,9 @@
    "provenance": "Phase 14 compound fault CF-05, commit after 259e587 (branch hardening/systematic-v1), 2026-09-16",
    "status": "FIXED",
    "belongs_to_frozen_family": true,
-   "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "recovery defect in the kernel (fixed by F1 in aisef/); its site field was left empty when registered"
   },
   {
    "id": "AD-01",
@@ -1252,7 +1254,9 @@
    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
    "status": "FIXED",
    "belongs_to_frozen_family": true,
-   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/clients/opencode.py"
   },
   {
    "id": "AD-03",
@@ -1269,7 +1273,9 @@
    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
    "status": "FIXED",
    "belongs_to_frozen_family": true,
-   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/clients/opencode.py"
   },
   {
    "id": "AD-04",
@@ -1285,7 +1291,9 @@
    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
    "status": "FIXED",
    "belongs_to_frozen_family": true,
-   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/clients/claude_code.py"
   },
   {
    "id": "AD-05",
@@ -1302,7 +1310,9 @@
    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
    "status": "FIXED",
    "belongs_to_frozen_family": true,
-   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/clients/claude_code.py"
   },
   {
    "id": "SS-62",
@@ -1318,7 +1328,9 @@
    "reproducer": "tests/hardening/test_differential.py::TestSeed232ReviewerCommitOnTheSchemaRetry",
    "provenance": "found during F2 implementation by the 400-trace differential (seed 232, unexplained after KNOWN was emptied), 2026-09-16; reproducer RED at c384383 (F1 closure commit, run in a throwaway worktree), GREEN after the fix in this commit",
    "status": "FIXED",
-   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `_with_schema` restores the candidate exactly as the first session does"
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `_with_schema` restores the candidate exactly as the first session does",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/phases/implement.py"
   },
   {
    "id": "SS-63",
@@ -1333,7 +1345,9 @@
    "reproducer": "tests/hardening/test_differential.py::TestSeed2624PlanConflictSurvivesAVerifierRerun",
    "provenance": "found during F2 implementation by the 2000-trace differential (seed 2624, unexplained with KNOWN empty), 2026-09-16; reproducer RED at c384383 (throwaway worktree), GREEN after `deadlock_reason` pairs graded positions (attempts whose reviewer produced a verdict)",
    "status": "FIXED",
-   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `deadlock_reason` skips attempts whose review was UNRUNNABLE"
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `deadlock_reason` skips attempts whose review was UNRUNNABLE",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/phases/implement.py"
   },
   {
    "id": "SS-65",
@@ -1374,7 +1388,9 @@
     "SS-75",
     "SS-76"
    ],
-   "reproducer_go": "tests/hardening/test_ss65_reproducers.py::TestSS65GoDefaultSastIsInTheGoImage"
+   "reproducer_go": "tests/hardening/test_ss65_reproducers.py::TestSS65GoDefaultSastIsInTheGoImage",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/verify_image.py"
   },
   {
    "id": "SS-66",
@@ -1390,7 +1406,9 @@
    "provenance": "found 2026-09-17 while registering SS-65 (negative control run against abad2a6)",
    "fixed_by": "e02c5a4 (post-freeze additions scanned) + this commit (scan cross-checked against the declared counts; permanent negative control)",
    "status": "FIXED",
-   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: validation/w0_qualification.py"
   },
   {
    "id": "SS-67",
@@ -1407,7 +1425,9 @@
    "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
    "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — managed rust recipe (clippy, cargo-audit 0.22.2, pinned advisory-db) and capability probes per tool",
    "status": "FIXED",
-   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
   },
   {
    "id": "SS-68",
@@ -1423,7 +1443,9 @@
    "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
    "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — MISSING_TOOL += `no such command`; NO_NETWORK / NO_WRITABLE_CACHE typed ENVIRONMENT_FAILURE",
    "status": "FIXED",
-   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
   },
   {
    "id": "SS-69",
@@ -1439,7 +1461,9 @@
    "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
    "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — Node profile declares sast NONE with the reason; documented in docs/TOOL-CAPABILITIES.md",
    "status": "FIXED",
-   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
   },
   {
    "id": "SS-70",
@@ -1455,7 +1479,9 @@
    "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
    "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — presets take image and lint from the profile",
    "status": "FIXED",
-   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/cli/harness.py"
   },
   {
    "id": "SS-71",
@@ -1472,7 +1498,9 @@
    "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL'); confirmed pre-existing on the frozen candidate's image",
    "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — managed go recipe sets GOCACHE=/tmp/go-build, probed",
    "status": "FIXED",
-   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
   },
   {
    "id": "SS-72",
@@ -1488,7 +1516,9 @@
    "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
    "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — Ruby profile selects nothing (NONE with reason)",
    "status": "FIXED",
-   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
   },
   {
    "id": "SS-73",
@@ -1504,7 +1534,9 @@
    "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
    "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — PHP profile selects nothing (NONE with reason)",
    "status": "FIXED",
-   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
   },
   {
    "id": "SS-74",
@@ -1520,7 +1552,9 @@
    "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
    "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — Flutter profile selects nothing (NONE with reason)",
    "status": "FIXED",
-   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
   },
   {
    "id": "SS-75",
@@ -1536,7 +1570,9 @@
    "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
    "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — presence judged where the kind runs; the security kind reads the registry only",
    "status": "FIXED",
-   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/phases/qa.py"
   },
   {
    "id": "SS-76",
@@ -1552,7 +1588,9 @@
    "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
    "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — `tools.disabled` (typed; required roles refused; contradiction refused); empty = AUTO only",
    "status": "FIXED",
-   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics"
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
   },
   {
    "id": "SS-77",
@@ -1568,7 +1606,9 @@
    "provenance": "found by reading the W1 run 1 result instead of accepting it, 2026-09-18; no W1 verdict had yet been claimed on it",
    "fixed_by": "w1_driver.py reads the framework's structured state (_bmad-output/sprint-status.json); an empty state store now makes every red a false pass and fails the phase (`F['ok']`); unattributed red tests are reported as `unattributed_oracle_failures`, never swallowed",
    "status": "FIXED",
-   "severity_rule": "P1: a qualification gate that cannot fail is a gate that passes falsely (docs/SCALE-QUALIFICATION.md W1 exit criteria)"
+   "severity_rule": "P1: a qualification gate that cannot fail is a gate that passes falsely (docs/SCALE-QUALIFICATION.md W1 exit criteria)",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: closure-evidence/hardening/w1/w1_driver.py"
   },
   {
    "id": "SS-78",
@@ -1584,7 +1624,9 @@
    "provenance": "found while reading the W1 run 1 exit criteria, 2026-09-18, in the same pass as SS-77",
    "fixed_by": "a survivor is a process still in the killed pgid; the broader listing is kept as `processes_after` (nothing measured is discarded). Run 1 recomputed from its preserved evidence: orphan_state 0",
    "status": "FIXED",
-   "severity_rule": "P2: a false RED in a stop criterion — it cannot produce a false qualification, but it degrades a measurement the program relies on"
+   "severity_rule": "P2: a false RED in a stop criterion — it cannot produce a false qualification, but it degrades a measurement the program relies on",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: closure-evidence/hardening/w1/w1_driver.py"
   },
   {
    "id": "SS-79",
@@ -1600,7 +1642,9 @@
    "provenance": "found by reading W1 run 2's empty red_classes instead of accepting it, 2026-09-18; run 2 delivered nothing, so every oracle check skipped",
    "fixed_by": "pytest runs with -v and parse_oracle() reconciles the recovered outcomes against pytest's own totals — a parse that does not account for every counted outcome fails the phase; SKIPPED/XFAIL are classified ORACLE_NOT_EXECUTED on a complete delivery (blocks qualification) and INCOMPLETE_DELIVERY_EXPECTED_SKIP otherwise; `oracle_passed_completely` requires a complete delivery with every check green",
    "status": "FIXED",
-   "severity_rule": "P1: a check that did not execute reading as a check that passed is a qualification gate passing falsely"
+   "severity_rule": "P1: a check that did not execute reading as a check that passed is a qualification gate passing falsely",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: closure-evidence/hardening/w1/w1_driver.py"
   },
   {
    "id": "SS-80",
@@ -1616,8 +1660,14 @@
    "provenance": "found when W1 run 3's driver exited with a traceback instead of a record, 2026-09-18",
    "fixed_by": "the signal is conditional on the process still running (recorded as `process_alive_when_marker_seen`), and every killpg goes through _signal_group(), which records a refusal instead of propagating it. Run 3's record was repaired from the run's own log, with the unrecorded exit code left null rather than assumed.",
    "status": "FIXED",
-   "severity_rule": "P2: the tooling failed loudly and lost a record; it never made an unqualified run look qualified"
+   "severity_rule": "P2: the tooling failed loudly and lost a record; it never made an unqualified run look qualified",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: closure-evidence/hardening/w1/w1_driver.py"
   }
  ],
- "updated": "2026-09-18: +SS-77, +SS-78, +SS-79, +SS-80 — four W1 measurement/robustness defects, each found by reading a run's own output rather than accepting it"
+ "updated": "2026-09-18: +SS-77, +SS-78, +SS-79, +SS-80 — four W1 measurement/robustness defects, each found by reading a run's own output rather than accepting it",
+ "defect_classes": {
+  "PRODUCT_KERNEL": "a defect in aisef/ — invalidates evidence produced by the product (kernel qualification, W0)",
+  "QUALIFICATION_INFRASTRUCTURE": "a defect in the tooling that measures the product (W1 driver, oracle harness) — invalidates the measurements it produced, not the product; its fix never changes aisef/"
+ }
 }

@@ -29,6 +29,15 @@ p = ".ai/config.json"; c = json.load(open(p)); old = c.get("sandbox.image"); c["
 open(p, "w").write(json.dumps(c, indent=2, ensure_ascii=False) + "\n"); print(f"sandbox.image: {old} -> {sys.argv[1]}")
 PYI
 git commit -q -am "w1-run-$n: sandbox.image re-pinned to the frozen candidate's python environment $IMG (SS-65: the recipe now carries bandit)"
+# Execution profile (owner decision "EXECUTION PROFILE NOT QUALIFIED", section 3): PROFILE=<profile.json> applies the
+# profile's typed settings — run.max_turns, route.<role>_model, the project-level model declaration — as one named
+# preparation commit. Without PROFILE the copy is the original PROFILE-W1-OC-MYCOMBO-T40 configuration.
+if [ -n "$PROFILE" ]; then
+  files=$(python3 /Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/execution_profile.py apply "$PROFILE" "$DST")
+  PNAME=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['profile'])" "$PROFILE")
+  git add ${=files}
+  git commit -q -m "w1-run-$n: execution profile $PNAME applied (run.max_turns, route.<role>_model, project model declaration — an execution-profile setting, not an AISEF change)"
+fi
 git for-each-ref --format='%(refname)' | grep -v '^refs/heads/master$' | while read r; do git update-ref -d "$r"; done
 echo "w1-run-$n: HEAD=$(git rev-parse --short HEAD) branch=$(git rev-parse --abbrev-ref HEAD) refs=[$(git for-each-ref --format='%(refname:short)' | tr '\n' ' ')] remotes=[$(git remote | tr '\n' ' ')]"
 echo "commits after 8ff9f13: $(git log --oneline 8ff9f13..master | tr '\n' ';')"

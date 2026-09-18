@@ -1,0 +1,114 @@
+{
+ "profile": "PROFILE-W1-OC-GPT56SOL-T80",
+ "profile_id": "sha256:24ab3ec1d95bafb20ae70c009b080c57240d987a61af5e4a42c87f614af7b8dc",
+ "status": "UNDER_QUALIFICATION",
+ "identity": {
+  "kernel": {
+   "candidate_sha": "af94372dd1861e2fcac1c5f6e3c4102efa27e829",
+   "product_tree": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+   "wheel_sha256": "2e08d43b61d6647692b731943741f64f7fa8f107e53dacf06bb92bbc1c9bfe8e"
+  },
+  "client": "opencode",
+  "client_version": "1.18.31",
+  "routes": {
+   "developer": "9router/cx/gpt-5.6-sol",
+   "reviewer": "9router/cx/gpt-5.6-sol",
+   "security": "9router/cx/gpt-5.6-sol",
+   "designer": "9router/cx/gpt-5.6-sol"
+  },
+  "max_turns": 80,
+  "max_retries": 2,
+  "max_infra_retries": -1,
+  "context_window": {
+   "developer": {
+    "context": 200000,
+    "output": 32768
+   },
+   "reviewer": {
+    "context": 200000,
+    "output": 32768
+   },
+   "security": {
+    "context": 200000,
+    "output": 32768
+   },
+   "designer": {
+    "context": 200000,
+    "output": 32768
+   }
+  },
+  "small_model": "9router/fast",
+  "sandbox_tool_profile": {
+   "sandbox.image": "aisef-verify-python:84adf1d8eaf9",
+   "tools": {
+    "tools.disabled": [],
+    "tools.lint": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+    "tools.sast": "",
+    "tools.test": "python3 -m pytest -v"
+   },
+   "capability_matrix_sha256": "1cf70d1e09bc7e4af55adec18355edade0f38a3afd08604d892c79be6faf72f9"
+  },
+  "guard_digest": "6bb33819798f8aa3e1ed1491005279be344f624b8f9926eab3f9a0330d77800f",
+  "prompt_catalog_digest": "c613e68adb58f368202b4f6f78b8b127ea0ff38dbc91fae9e7f27294c0065db2",
+  "client_config_digest": "92f4d35d59638a4d0bf00f22812a78c9e1ef43df623731e9a03ae56a6dd08614",
+  "cost_cap_usd": 80.0,
+  "route_config": {
+   "developer": "9router/cx/gpt-5.6-sol",
+   "reviewer": "9router/cx/gpt-5.6-sol",
+   "security": "9router/cx/gpt-5.6-sol",
+   "designer": "9router/cx/gpt-5.6-sol"
+  },
+  "project_opencode": {
+   "$schema": "https://opencode.ai/config.json",
+   "model": "9router/cx/gpt-5.6-sol",
+   "provider": {
+    "9router": {
+     "models": {
+      "cx/gpt-5.6-sol": {
+       "name": "cx/gpt-5.6-sol",
+       "limit": {
+        "context": 200000,
+        "output": 32768
+       }
+      }
+     }
+    }
+   }
+  },
+  "route_resolution": {
+   "developer": {
+    "route_kind": "FIXED_MODEL",
+    "resolved_model": "gpt-5.6-sol",
+    "evidence": "router lists cx/gpt-5.6-sol owned_by 'cx'; answered_by 'gpt-5.6-sol' on the probe; OpenCode tool-use smoke 2/2 (apply_patch + bash, file written) \u2014 profiles/ROUTE-RESOLUTION-2026-09-18.json"
+   },
+   "reviewer": {
+    "route_kind": "FIXED_MODEL",
+    "resolved_model": "gpt-5.6-sol",
+    "evidence": "router lists cx/gpt-5.6-sol owned_by 'cx'; answered_by 'gpt-5.6-sol' on the probe; OpenCode tool-use smoke 2/2 (apply_patch + bash, file written) \u2014 profiles/ROUTE-RESOLUTION-2026-09-18.json"
+   },
+   "security": {
+    "route_kind": "FIXED_MODEL",
+    "resolved_model": "gpt-5.6-sol",
+    "evidence": "router lists cx/gpt-5.6-sol owned_by 'cx'; answered_by 'gpt-5.6-sol' on the probe; OpenCode tool-use smoke 2/2 (apply_patch + bash, file written) \u2014 profiles/ROUTE-RESOLUTION-2026-09-18.json"
+   },
+   "designer": {
+    "route_kind": "FIXED_MODEL",
+    "resolved_model": "gpt-5.6-sol",
+    "evidence": "router lists cx/gpt-5.6-sol owned_by 'cx'; answered_by 'gpt-5.6-sol' on the probe; OpenCode tool-use smoke 2/2 (apply_patch + bash, file written) \u2014 profiles/ROUTE-RESOLUTION-2026-09-18.json"
+   }
+  }
+ },
+ "defined_from": "a rehearsal copy prepared exactly like a run copy (prepare_run_copy.sh + PROFILE, then `aisef compile` with the frozen wheel) that never ran \u2014 so no run copy verifies against a profile measured from itself",
+ "differs_from_PROFILE-W1-OC-MYCOMBO-T40_in": [
+  "client_config_digest",
+  "max_turns",
+  "routes"
+ ],
+ "why_these_and_only_these": "owner section 5: same client, same project/tool environment, same frozen kernel, a higher-quality fixed model, max_turns 80. The context window is pinned to the failed profile's 200000/32768 so only the model and the turn budget change.",
+ "choice_rationale": "of the frozen-kernel-compatible fixed-model routes that pass an OpenCode tool-use smoke run today (cx/gpt-5.6-sol, cx/gpt-5.5, ds/deepseek-v4-pro), gpt-5.6-sol is the newest generation and the largest-context 5.6 variant. This is an availability-and-tier judgement, not a benchmark.",
+ "known_risks": [
+  "cx is a Codex backend on a ChatGPT account: usage limits per window are not visible to the operator and may surface mid-run as rate limits (classified ENVIRONMENT/INFRA, never as model quality)",
+  "pricing is not reported on this route: cost_cap_status will be UNVERIFIABLE; cost is informational only (owner section 8)"
+ ],
+ "qualification_rule": "W1 DELIVERY QUALIFIED only if >= 2 of 3 fresh runs reach DELIVERY_COMPLETE, every completed delivery passes the hidden oracle completely, and every safety count is 0 (owner section 8). Stop early on a kernel P0/P1, a false pass, material drift, or repeated budget exhaustion at 80 turns (section 7)."
+}

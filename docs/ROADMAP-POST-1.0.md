@@ -359,3 +359,12 @@ re-argument every release:
 Bugs are counted from the numbered bug log in `CHANGELOG.md`. Three bugs in one
 file is the point where "the file is fine" stops being a claim about evidence
 and starts being a habit.
+
+## Backlog — typed terminal reason for attempt exhaustion (from W1, 2026-09-18)
+
+When a developer exhausts its quality attempts on a clear story, the kernel records `tried N attempts, still did not pass
+gate` and stops the epic. That is accurate, and the owner ruled it is not a kernel defect and must not become
+HUMAN_REQUIRED (that class is for semantic decisions: requirement ambiguity, plan conflict, owner policy, arbitration).
+A distinct typed reason — `DELIVERY_ATTEMPTS_EXHAUSTED`, or `MODEL_CAPABILITY_EXHAUSTED` when every attempt ended on the
+turn cap — would let an operator tell "the model could not do this within its budget" from "the work was judged and
+refused" without reading the run log. UX improvement only; no change during the frozen-kernel qualification cycle.

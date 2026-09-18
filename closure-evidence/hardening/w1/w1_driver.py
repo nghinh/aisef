@@ -34,6 +34,7 @@ import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
 REPO = HERE.parents[2]
 MARKERS = ["wave=EPIC-01/w3 DONE", "wave=EPIC-03/w1 DONE"]  # P20 procedure 3: the forced-resume boundaries
 EXPECTED = {"client": "opencode", "opencode_version": "1.18.31", "model": "9router/mycombo", "stories": 16, "fresh_root": "8ff9f13",
@@ -47,7 +48,8 @@ ARB1_NOTE = ("ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for by
 
 
 #: The only commits a fresh run copy may carry after 8ff9f13 — the named preparation steps, nothing else.
-PREPARATION_COMMITS = ("run.cost_cap_usd=80", "sandbox.image re-pinned to the frozen candidate", "guard plugin compiled by")
+PREPARATION_COMMITS = ("run.cost_cap_usd=80", "sandbox.image re-pinned to the frozen candidate", "guard plugin compiled by",
+                       "execution profile PROFILE-")
 
 
 def _is_preparation_commit(line: str) -> bool:
@@ -369,6 +371,21 @@ class Driver:
                                               for c in capp.get("checks", [])) and bool(capp.get("checks"))
         img_id = P["docker_image"]["id"]
         frozen_img = (P.get("freeze") or {}).get("docker_image_id")
+        # --- execution profile (owner decision "EXECUTION PROFILE NOT QUALIFIED", section 3) -------------------------
+        # The expected model and turn budget come from the profile the run is qualifying, and the copy must measure to
+        # that profile's exact identity before the first model call. No profile = the original T40 configuration.
+        import execution_profile as _ep
+        if self.a.profile:
+            prof = json.loads(Path(self.a.profile).read_text(encoding="utf-8"))
+            prof_expect = {"model": prof["identity"]["routes"]["developer"], "max_turns": prof["identity"]["max_turns"]}
+            try:
+                prof_check = _ep.verify(prof, self.project, Path(self.a.python).parents[1], Path(self.a.freeze))
+            except Exception as e:                        # a verification that cannot run is a failed row, never a pass
+                prof_check = {"matches": False, "error": f"{type(e).__name__}: {e}"}
+        else:
+            prof_expect = {"model": EXPECTED["model"], "max_turns": EXPECTED["max_turns"]}
+            prof_check = {"matches": True, "note": "no --profile: the original PROFILE-W1-OC-MYCOMBO-T40 configuration, checked by the two rows above"}
+        P["execution_profile"] = {"path": self.a.profile or None, "expected": prof_expect, "check": prof_check}
         # --- section-4 measurements, taken before the rows above are evaluated -------------------------------------
         fr = json.loads(Path(self.a.freeze).read_text(encoding="utf-8")) if self.a.freeze and Path(self.a.freeze).is_file() else {}
         wheel = Path(fr.get("wheel", {}).get("file", ""))
@@ -404,7 +421,7 @@ class Driver:
             "artifacts_match_frozen_requirements": req.is_file() and sha(req) == EXPECTED["requirements_sha256"],
             "client_is_opencode": EXPECTED["client"] == "opencode",
             "expected_opencode_version": P["opencode_version"] == EXPECTED["opencode_version"],
-            "expected_model_route": model == EXPECTED["model"],
+            "expected_model_route": model == prof_expect["model"],
             "guard_plugin_bound_to_the_frozen_candidate": self.a.aisef in plugin_bin,
             "no_stale_story_worktrees": len(self.git("worktree", "list").splitlines()) == 1,
             "sandbox_image_is_the_frozen_candidates_python_environment": P["config"].get("sandbox.image") == capp.get("expected_python_image"),
@@ -415,7 +432,8 @@ class Driver:
             # owner decision "COMPLETE W1 RUNS 2-3", section 4 — proven for every run, not inherited from run 1
             "frozen_wheel_digest_identical": wheel_ok,
             "product_tree_digest_identical": tree_ok,
-            "same_max_turn_configuration": max_turns == EXPECTED["max_turns"],
+            "same_max_turn_configuration": max_turns == prof_expect["max_turns"],
+            "execution_profile_identity_matches": prof_check.get("matches") is True,
             "same_capability_matrix": cap_matrix_ok,
             "no_stale_evidence": not stale_evidence,
             "readiness_hash_migration_check_passes_mechanically": bool(arb1.get("stale_caused_by_the_hash_method_alone")),
@@ -695,12 +713,13 @@ class Driver:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--run", type=int, required=True)
+    ap.add_argument("--run", required=True, help="run id: 1-3 for PROFILE-W1-OC-MYCOMBO-T40, or <profile-tag>-<n>")
     ap.add_argument("--project", required=True)
     ap.add_argument("--aisef", required=True, help="the CANDIDATE's console script (run venv)")
     ap.add_argument("--python", required=True, help="the run venv's python")
     ap.add_argument("--oracle-python", required=True)
     ap.add_argument("--freeze", default="", help="P19 freeze record (JSON)")
+    ap.add_argument("--profile", default="", help="execution profile (JSON); without it the copy must be PROFILE-W1-OC-MYCOMBO-T40")
     ap.add_argument("--phase", default="all", choices=["all", "prepare", "kernel-first", "approve", "run", "finish"])
     a = ap.parse_args()
     d = Driver(a)

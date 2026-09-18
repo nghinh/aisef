@@ -2,7 +2,7 @@
  "level": "W0",
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "candidate_sha": "0a7cab86086ebc496bcda1559142082c89506c29",
- "generated": "2026-09-18T03:56:52+00:00",
+ "generated": "2026-09-18T05:06:30+00:00",
  "qualified": true,
  "criteria": [
   {
