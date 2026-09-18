@@ -115,8 +115,10 @@ class TestSS90EvidenceOfAnotherKernelRefuses(unittest.TestCase):
             for name in NEEDED:
                 if (W.EV / name).is_file():
                     shutil.copy(W.EV / name, ev / name)
-            d = json.loads((ev / "differential-p12-summary.json").read_text(encoding="utf-8"))
-            d["manifest"] = {**(d.get("manifest") or {}), "pass": True, "kernel_digests": [tree]}
+            # a minimal passing summary of the candidate's own kernel — never the live evidence, which a running
+            # Phase 12 chain may have moved away
+            d = {"traces": 100000, "unexplained": 0, "invariant_violations": 0, "known_deviations": [],
+                 "manifest": {"pass": True, "kernel_digests": [tree]}}
             (ev / "differential-p12-summary.json").write_text(json.dumps({**d, **(diff or {})}), encoding="utf-8")
             (ev / "mutation-results.json").write_text(json.dumps({**base_mut, **(mut or {})}), encoding="utf-8")
             with mock.patch.object(W, "EV", ev):
@@ -129,9 +131,10 @@ class TestSS90EvidenceOfAnotherKernelRefuses(unittest.TestCase):
         self.assertTrue(mut["holds"], mut["measured"])
 
     def test_a_phase12_dataset_of_another_kernel_refuses(self):
-        d = json.loads((W.EV / "differential-p12-summary.json").read_text(encoding="utf-8"))
-        p12, _ = self._rows(diff={"manifest": {**d["manifest"], "pass": True, "kernel_digests": ["0" * 40]}})
+        p12, _ = self._rows(diff={"manifest": {"pass": True, "kernel_digests": ["0" * 40]}})
         self.assertFalse(p12["holds"])
+        p12, _ = self._rows(diff={"manifest": {"pass": True, "kernel_digests": ["0" * 40, W._aisef_tree(self.HEAD)]}})
+        self.assertFalse(p12["holds"], "a dataset that mixes kernels is not the candidate's")
 
     def test_a_mutation_run_of_another_kernel_or_of_no_recorded_kernel_refuses(self):
         self.assertFalse(self._rows(mut={"aisef_tree": "0" * 40})[1]["holds"])

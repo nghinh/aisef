@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-18T19:01:18+0700",
+ "generated": "2026-09-18T20:50:09+0700",
  "image": "aisef-verify-python:84adf1d8eaf9",
  "image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
  "pytest_in_image": "pytest 9.1.1",
@@ -35,7 +35,7 @@
     }
    },
    "control_verdict": "FAILED (tautology observed green)",
-   "tail": "    from src.a import f          # src/a.py: this story's, absent at the parent\n    ^^^^^^^^^^^^^^^^^^^\nE   ModuleNotFoundError: No module named 'src'\n=========================== short test summary info ============================\nERROR tests/test_a.py\n========================== 1 passed, 1 error in 0.02s =========================="
+   "tail": "    from src.a import f          # src/a.py: this story's, absent at the parent\n    ^^^^^^^^^^^^^^^^^^^\nE   ModuleNotFoundError: No module named 'src'\n=========================== short test summary info ============================\nERROR tests/test_a.py\n========================== 1 passed, 1 error in 0.01s =========================="
   },
   "runner_default": {
    "extra_args": [],
@@ -63,7 +63,7 @@
     }
    },
    "control_verdict": "UNRUNNABLE (no proof)",
-   "tail": "    ^^^^^^^^^^^^^^^^^^^\nE   ModuleNotFoundError: No module named 'src'\n=========================== short test summary info ============================\nERROR tests/test_a.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.07s ==============================="
+   "tail": "    ^^^^^^^^^^^^^^^^^^^\nE   ModuleNotFoundError: No module named 'src'\n=========================== short test summary info ============================\nERROR tests/test_a.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.06s ==============================="
   }
  },
  "requirements": {

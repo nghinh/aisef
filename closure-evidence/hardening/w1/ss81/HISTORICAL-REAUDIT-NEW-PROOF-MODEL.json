@@ -1,7 +1,7 @@
 {
- "generated": "2026-09-18T19:14:30+0700",
+ "generated": "2026-09-18T20:50:23+0700",
  "owner_decision": "FIX SS-81 FAMILY (2026-09-18), section 9",
- "kernel": "580be5436945c14c2e4f965a6c2ecb64edec0fba + uncommitted SS-81 family fix (working tree)",
+ "kernel": "d32031dbe2081d0a34368b63b992ec5a5cd3694e",
  "method": [
   "",
   "Per story, with the FIXED kernel and no model call:",
@@ -151,11 +151,11 @@
       "tests/test_format.py"
      ]
     },
-    "tail": "es.\nTraceback:\n/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_format.py:6: in <module>\n    from ledgerlock.format import GENESIS, canonical_bytes\nE   ImportError: cannot import name 'GENESIS' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)\n=========================== short test summary info ============================\nERROR tests/test_format.py\n================ 8 passed, 1 error, 16 subtests passed in 0.09s ================"
+    "tail": "es.\nTraceback:\n/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_format.py:6: in <module>\n    from ledgerlock.format import GENESIS, canonical_bytes\nE   ImportError: cannot import name 'GENESIS' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)\n=========================== short test summary info ============================\nERROR tests/test_format.py\n================ 8 passed, 1 error, 16 subtests passed in 0.08s ================"
    },
    "B_nop_log": [
-    "[2026-09-18 19:14:16] story=STORY-01-02 nop START parent=3f074f9b test_files=1",
-    "[2026-09-18 19:14:18] story=STORY-01-02 nop DONE executed 8 (8 green, 0 red, 0 skipped) \u00b7 tests/test_format.py: cannot import ledgerlock.format \u2014 ledgerlock/format.py is this story's 659ms"
+    "[2026-09-18 20:50:12] story=STORY-01-02 nop START parent=3f074f9b test_files=1",
+    "[2026-09-18 20:50:13] story=STORY-01-02 nop DONE executed 8 (8 green, 0 red, 0 skipped) \u00b7 tests/test_format.py: cannot import ledgerlock.format \u2014 ledgerlock/format.py is this story's 514ms"
    ],
    "B_gate_with_remeasured_nop": {
     "TDD": {
@@ -351,11 +351,11 @@
       "tests/test_format.py"
      ]
     },
-    "tail": ":\n/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_format.py:7: in <module>\n    from ledgerlock.format import GENESIS, canonical_bytes, line_hash\nE   ImportError: cannot import name 'line_hash' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)\n=========================== short test summary info ============================\nERROR tests/test_format.py\n================ 8 passed, 1 error, 16 subtests passed in 0.09s ================"
+    "tail": ":\n/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_format.py:7: in <module>\n    from ledgerlock.format import GENESIS, canonical_bytes, line_hash\nE   ImportError: cannot import name 'line_hash' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)\n=========================== short test summary info ============================\nERROR tests/test_format.py\n================ 8 passed, 1 error, 16 subtests passed in 0.08s ================"
    },
    "B_nop_log": [
-    "[2026-09-18 19:14:19] story=STORY-01-03 nop START parent=7c33573b test_files=1",
-    "[2026-09-18 19:14:20] story=STORY-01-03 nop DONE executed 8 (8 green, 0 red, 0 skipped) \u00b7 tests/test_format.py: cannot import ledgerlock.format \u2014 ledgerlock/format.py is this story's 529ms"
+    "[2026-09-18 20:50:14] story=STORY-01-03 nop START parent=7c33573b test_files=1",
+    "[2026-09-18 20:50:15] story=STORY-01-03 nop DONE executed 8 (8 green, 0 red, 0 skipped) \u00b7 tests/test_format.py: cannot import ledgerlock.format \u2014 ledgerlock/format.py is this story's 490ms"
    ],
    "B_gate_with_remeasured_nop": {
     "TDD": {
@@ -571,11 +571,11 @@
       "tests/test_store.py"
      ]
     },
-    "tail": "ules/packages have valid Python names.\nTraceback:\n/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_store.py:9: in <module>\n    from ledgerlock import store\nE   ImportError: cannot import name 'store' from 'ledgerlock' (/workspace/ledgerlock/__init__.py)\n=========================== short test summary info ============================\nERROR tests/test_store.py\n=============== 19 passed, 1 error, 16 subtests passed in 0.17s ================"
+    "tail": "ules/packages have valid Python names.\nTraceback:\n/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_store.py:9: in <module>\n    from ledgerlock import store\nE   ImportError: cannot import name 'store' from 'ledgerlock' (/workspace/ledgerlock/__init__.py)\n=========================== short test summary info ============================\nERROR tests/test_store.py\n=============== 19 passed, 1 error, 16 subtests passed in 0.16s ================"
    },
    "B_nop_log": [
-    "[2026-09-18 19:14:21] story=STORY-01-04 nop START parent=ad584612 test_files=1",
-    "[2026-09-18 19:14:22] story=STORY-01-04 nop DONE executed 19 (19 green, 0 red, 0 skipped) \u00b7 tests/test_store.py: cannot import ledgerlock \u2014 ledgerlock/store.py is this story's 661ms"
+    "[2026-09-18 20:50:16] story=STORY-01-04 nop START parent=ad584612 test_files=1",
+    "[2026-09-18 20:50:17] story=STORY-01-04 nop DONE executed 19 (19 green, 0 red, 0 skipped) \u00b7 tests/test_store.py: cannot import ledgerlock \u2014 ledgerlock/store.py is this story's 553ms"
    ],
    "B_gate_with_remeasured_nop": {
     "TDD": {
@@ -803,11 +803,11 @@
       "tests/test_conflict.py"
      ]
     },
-    "tail": "es.\nTraceback:\n/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_conflict.py:10: in <module>\n    from ledgerlock.ledger import ConflictError\nE   ImportError: cannot import name 'ConflictError' from 'ledgerlock.ledger' (/workspace/ledgerlock/ledger.py)\n=========================== short test summary info ============================\nERROR tests/test_conflict.py\n=============== 32 passed, 1 error, 16 subtests passed in 0.27s ================"
+    "tail": "es.\nTraceback:\n/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_conflict.py:10: in <module>\n    from ledgerlock.ledger import ConflictError\nE   ImportError: cannot import name 'ConflictError' from 'ledgerlock.ledger' (/workspace/ledgerlock/ledger.py)\n=========================== short test summary info ============================\nERROR tests/test_conflict.py\n=============== 32 passed, 1 error, 16 subtests passed in 0.25s ================"
    },
    "B_nop_log": [
-    "[2026-09-18 19:14:24] story=STORY-01-06 nop START parent=9dcf9461 test_files=1",
-    "[2026-09-18 19:14:25] story=STORY-01-06 nop DONE executed 32 (32 green, 0 red, 0 skipped) \u00b7 tests/test_conflict.py: cannot import ledgerlock.ledger \u2014 ledgerlock/ledger.py is this story's 677ms"
+    "[2026-09-18 20:50:18] story=STORY-01-06 nop START parent=9dcf9461 test_files=1",
+    "[2026-09-18 20:50:19] story=STORY-01-06 nop DONE executed 32 (32 green, 0 red, 0 skipped) \u00b7 tests/test_conflict.py: cannot import ledgerlock.ledger \u2014 ledgerlock/ledger.py is this story's 688ms"
    ],
    "B_gate_with_remeasured_nop": {
     "TDD": {
@@ -1035,11 +1035,11 @@
       "tests/test_skeleton.py"
      ]
     },
-    "tail": "it_path\nFAILED tests/test_skeleton.py::AC_STORY_01_01_4_CLIAdvertisesAllSubcommands::test_help_lists_verify_snapshot_apply_repair_tail\nFAILED tests/test_skeleton.py::AC_STORY_01_01_5_NoForbiddenTopLevelImports::test_no_top_level_forbidden_imports\nFAILED tests/test_skeleton.py::AC_STORY_01_01_6_NoForbiddenRuntimeCalls::test_no_forbidden_runtime_calls\nFAILED tests/test_skeleton.py::AC_STORY_01_01_7_PublicAPIExportsLedgerAndConflictError::test_ledger_and_conflict_error_importable\nERROR tests/test_nfc_normalization.py\n========================== 5 failed, 1 error in 0.08s =========================="
+    "tail": "it_path\nFAILED tests/test_skeleton.py::AC_STORY_01_01_4_CLIAdvertisesAllSubcommands::test_help_lists_verify_snapshot_apply_repair_tail\nFAILED tests/test_skeleton.py::AC_STORY_01_01_5_NoForbiddenTopLevelImports::test_no_top_level_forbidden_imports\nFAILED tests/test_skeleton.py::AC_STORY_01_01_6_NoForbiddenRuntimeCalls::test_no_forbidden_runtime_calls\nFAILED tests/test_skeleton.py::AC_STORY_01_01_7_PublicAPIExportsLedgerAndConflictError::test_ledger_and_conflict_error_importable\nERROR tests/test_nfc_normalization.py\n========================== 5 failed, 1 error in 0.07s =========================="
    },
    "B_nop_log": [
-    "[2026-09-18 19:14:26] story=STORY-01-01 nop START parent=c3ab20f5 test_files=3",
-    "[2026-09-18 19:14:27] story=STORY-01-01 nop DONE executed 5 (0 green, 5 red, 0 skipped) \u00b7 tests/test_nfc_normalization.py: cannot import ledgerlock \u2014 ledgerlock/__init__.py is this story's 509ms"
+    "[2026-09-18 20:50:20] story=STORY-01-01 nop START parent=c3ab20f5 test_files=3",
+    "[2026-09-18 20:50:21] story=STORY-01-01 nop DONE executed 5 (0 green, 5 red, 0 skipped) \u00b7 tests/test_nfc_normalization.py: cannot import ledgerlock \u2014 ledgerlock/__init__.py is this story's 523ms"
    ],
    "B_gate_with_remeasured_nop": {
     "TDD": {
@@ -1258,8 +1258,8 @@
     "tail": "es.\nTraceback:\n/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_format.py:6: in <module>\n    from ledgerlock.format import GENESIS, canonical_bytes\nE   ImportError: cannot import name 'GENESIS' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)\n=========================== short test summary info ============================\nERROR tests/test_format.py\n================ 7 passed, 1 error, 10 subtests passed in 0.08s ================"
    },
    "B_nop_log": [
-    "[2026-09-18 19:14:28] story=STORY-01-02 nop START parent=463b8071 test_files=1",
-    "[2026-09-18 19:14:29] story=STORY-01-02 nop DONE executed 7 (7 green, 0 red, 0 skipped) \u00b7 tests/test_format.py: cannot import ledgerlock.format \u2014 ledgerlock/format.py is this story's 471ms"
+    "[2026-09-18 20:50:22] story=STORY-01-02 nop START parent=463b8071 test_files=1",
+    "[2026-09-18 20:50:23] story=STORY-01-02 nop DONE executed 7 (7 green, 0 red, 0 skipped) \u00b7 tests/test_format.py: cannot import ledgerlock.format \u2014 ledgerlock/format.py is this story's 482ms"
    ],
    "B_gate_with_remeasured_nop": {
     "TDD": {
@@ -1334,41 +1334,49 @@
  ],
  "real_false_pass": [],
  "stop": false,
+ "aisef_tree": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+ "aisef_dirty": false,
  "summary": {
   "STORY-01-02@w1-run-1": {
    "recorded": "passed",
    "replay_on_recorded_evidence": "unrunnable",
    "remeasured": "passed",
+   "tdd_remeasured": "passed",
    "classification": "HISTORICAL_PASS_NOW_PROVEN"
   },
   "STORY-01-03@w1-run-1": {
    "recorded": "passed",
    "replay_on_recorded_evidence": "unrunnable",
    "remeasured": "passed",
+   "tdd_remeasured": "passed",
    "classification": "HISTORICAL_PASS_NOW_PROVEN"
   },
   "STORY-01-04@w1-run-1": {
    "recorded": "passed",
    "replay_on_recorded_evidence": "unrunnable",
    "remeasured": "passed",
+   "tdd_remeasured": "passed",
    "classification": "HISTORICAL_PASS_NOW_PROVEN"
   },
   "STORY-01-06@w1-run-1": {
    "recorded": "passed",
    "replay_on_recorded_evidence": "unrunnable",
    "remeasured": "passed",
+   "tdd_remeasured": "passed",
    "classification": "HISTORICAL_PASS_NOW_PROVEN"
   },
   "STORY-01-01@w1-run-3": {
    "recorded": "passed",
    "replay_on_recorded_evidence": "unrunnable",
    "remeasured": "passed",
+   "tdd_remeasured": "passed",
    "classification": "HISTORICAL_PASS_NOW_PROVEN"
   },
   "STORY-01-02@w1-run-3": {
    "recorded": "passed",
    "replay_on_recorded_evidence": "unrunnable",
    "remeasured": "passed",
+   "tdd_remeasured": "passed",
    "classification": "HISTORICAL_PASS_NOW_PROVEN"
   }
  },
@@ -1406,6 +1414,47 @@
     "fix": "calls proof.bound, the gate's own binding"
    }
   ]
+ },
+ "iteration_2_on_e60cba2": {
+  "result": {
+   "STORY-01-02@w1-run-1": {
+    "recorded": "passed",
+    "replay_on_recorded_evidence": "unrunnable",
+    "remeasured": "passed",
+    "classification": "HISTORICAL_PASS_NOW_PROVEN"
+   },
+   "STORY-01-03@w1-run-1": {
+    "recorded": "passed",
+    "replay_on_recorded_evidence": "unrunnable",
+    "remeasured": "passed",
+    "classification": "HISTORICAL_PASS_NOW_PROVEN"
+   },
+   "STORY-01-04@w1-run-1": {
+    "recorded": "passed",
+    "replay_on_recorded_evidence": "unrunnable",
+    "remeasured": "passed",
+    "classification": "HISTORICAL_PASS_NOW_PROVEN"
+   },
+   "STORY-01-06@w1-run-1": {
+    "recorded": "passed",
+    "replay_on_recorded_evidence": "unrunnable",
+    "remeasured": "passed",
+    "classification": "HISTORICAL_PASS_NOW_PROVEN"
+   },
+   "STORY-01-01@w1-run-3": {
+    "recorded": "passed",
+    "replay_on_recorded_evidence": "unrunnable",
+    "remeasured": "passed",
+    "classification": "HISTORICAL_PASS_NOW_PROVEN"
+   },
+   "STORY-01-02@w1-run-3": {
+    "recorded": "passed",
+    "replay_on_recorded_evidence": "unrunnable",
+    "remeasured": "passed",
+    "classification": "HISTORICAL_PASS_NOW_PROVEN"
+   }
+  },
+  "note": "same six outcomes on the first committed fix; re-run here on the final kernel"
  },
  "historical_repositories_unchanged": {
   "before": [

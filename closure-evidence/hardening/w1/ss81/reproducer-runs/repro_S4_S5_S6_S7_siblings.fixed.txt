@@ -1,6 +1,6 @@
 ...........................................................
 ----------------------------------------------------------------------
-Ran 59 tests in 0.084s
+Ran 59 tests in 0.071s
 
 OK
 S4b TDD: Outcome.FAILED | tests green on first run — not proven to verify anything (tests/test_a.py). Write tests first, run them through the reco

@@ -3,7 +3,7 @@
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 .
 ----------------------------------------------------------------------
-Ran 1 test in 0.004s
+Ran 1 test in 0.006s
 
 OK
 

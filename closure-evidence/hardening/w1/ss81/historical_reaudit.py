@@ -112,8 +112,10 @@ def main() -> int:
         print("   ", (tv.get("detail") or "")[:220])
     false_pass = [f"{r['run']} {r['story']}" for r in rows if r.get("classification") == "REAL_FALSE_PASS"]
     rec = {"generated": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "owner_decision": "FIX SS-81 FAMILY (2026-09-18), section 9",
-           "kernel": subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
-                     + " + uncommitted SS-81 family fix (working tree)",
+           "kernel": subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip(),
+           "aisef_tree": subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD:aisef"], capture_output=True, text=True).stdout.strip(),
+           "aisef_dirty": bool(subprocess.run(["git", "-C", str(ROOT), "status", "--porcelain", "--", "aisef"], capture_output=True,
+                                              text=True).stdout.strip()),
            "method": __doc__.strip().splitlines()[2:12], "cases": rows, "real_false_pass": false_pass,
            "stop": bool(false_pass)}
     OUT.write_text(json.dumps(rec, indent=1, default=str) + "\n", encoding="utf-8")
