@@ -1,0 +1,6 @@
+[2026-09-18T10:01:28+0700] phase prepare
+[2026-09-18T10:01:35+0700] prepare ok=False aisef=aisef 1.7.6 wheel=True oracle=True guard=True topology=True preflight=False failed=['no_stale_evidence'] gates={'prd': 'approved', 'architecture': 'approved', 'ux-spec': 'approved', 'epics': 'approved', 'stories': 'approved', 'mockups': 'approved', 'readiness': 'stale', 'pre-deploy': 'pending'} doctor_red=[]
+[2026-09-18T10:01:35+0700] STOP at phase prepare — see /Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/run-2/driver.json
+[2026-09-18T10:02:23+0700] phase prepare
+[2026-09-18T10:02:29+0700] prepare ok=True aisef=aisef 1.7.6 wheel=True oracle=True guard=True topology=True preflight=True failed=[] gates={'prd': 'approved', 'architecture': 'approved', 'ux-spec': 'approved', 'epics': 'approved', 'stories': 'approved', 'mockups': 'approved', 'readiness': 'stale', 'pre-deploy': 'pending'} doctor_red=[]
+[2026-09-18T10:02:29+0700] W1 driver complete

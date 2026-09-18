@@ -37,6 +37,7 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
 MARKERS = ["wave=EPIC-01/w3 DONE", "wave=EPIC-03/w1 DONE"]  # P20 procedure 3: the forced-resume boundaries
 EXPECTED = {"client": "opencode", "opencode_version": "1.18.31", "model": "9router/mycombo", "stories": 16, "fresh_root": "8ff9f13",
+            "max_turns": 40,          # owner section 4: the same max-turn configuration in every qualified run
             "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
             }   # owner item 9: asserted mechanically BEFORE the first model call; the image comes from the frozen candidate
 STALL_S = 2 * 3600
@@ -52,6 +53,91 @@ PREPARATION_COMMITS = ("run.cost_cap_usd=80", "sandbox.image re-pinned to the fr
 def _is_preparation_commit(line: str) -> bool:
     subject = line.split(" ", 1)[1] if " " in line else ""
     return subject.startswith("w1-run-") and any(marker in subject for marker in PREPARATION_COMMITS)
+
+
+# ---- oracle ownership model (owner decision "COMPLETE W1 RUNS 2-3", section 1) ---------------------------------------
+# Pure so it can carry deterministic negative controls: tests/hardening/test_w1_oracle_ownership.py.
+def cost_semantics(cost_md: str, cap_usd) -> dict:
+    """Owner decision section 2: a cap the provider never priced is UNVERIFIABLE, not "not reached". Usage is preserved
+    as measured; prices are never invented. If pricing appears later, cost = input_tokens/1e6 * p + output_tokens/1e6 * q."""
+    def _num(pat, cast=float, default=None):
+        m = re.search(pat, cost_md)
+        return cast(m.group(1).replace(",", "")) if m else default
+    priced_pct = _num(r"the provider priced (\d+)% of", int)
+    usd = _num(r"\((\d+\.?\d*) USD recorded in total\)")
+    sessions = _num(r"across (\d+) sessions", int) or _num(r"(\d+) sessions", int)
+    turns = _num(r"\(([\d,]+) turns\)", int)
+    fresh = _num(r"vs ([\d,]+) fresh", int)
+    cached = _num(r"\(([\d,]+) cached vs", int)
+    out_m = _num(r"× p \+ ([\d.]+) × q")
+    covered = priced_pct == 100
+    return {"provider_pricing_coverage_pct": priced_pct, "usd_recorded_by_the_provider": usd,
+            "cost_cap_usd": cap_usd,
+            "cost_cap_status": "VERIFIED" if covered else "UNVERIFIABLE",
+            "cost_cap_note": ("the provider priced every session" if covered else
+                              "the provider priced no session on this route, so no dollar figure exists: the cap is neither "
+                              "reached nor not reached, and this run is not proof that the cap holds for this route"),
+            "usage_measured": {"sessions": sessions, "turns": turns, "input_tokens_fresh": fresh,
+                               "input_tokens_cached": cached, "output_tokens": int(out_m * 1e6) if out_m is not None else None},
+            "prices_estimated": False,
+            "recompute_rule": "cost = input_tokens/1e6 * price_per_M_input + output_tokens/1e6 * price_per_M_output, once the route publishes prices"}
+
+
+def classify_oracle(results: dict, fr_map: dict, covers: dict, state: dict) -> dict:
+    """Classify every oracle check against the delivery. Nothing red is ever discarded.
+
+    STORY_OWNED   red, every owner story DONE          -> POTENTIAL_FALSE_PASS (counts as a false pass)
+    STORY_OWNED   red, an owner story not DONE         -> INCOMPLETE_DELIVERY_EXPECTED_RED
+    PROJECT_GLOBAL red, delivery complete              -> FALSE_PASS
+    PROJECT_GLOBAL red, delivery incomplete            -> INCOMPLETE_DELIVERY_EXPECTED_RED
+    undeclared, or STORY_OWNED with no owner story     -> ORACLE_MAPPING_ERROR (qualification fails until mapped)
+    """
+    ownership = fr_map.get("ownership", {})
+    done = {sid for sid, st in state.items() if st.get("status") == "done"}
+    complete = bool(state) and len(state) == len(covers) and all(st.get("status") == "done" for st in state.values())
+    rows, counts = [], {}
+    for test, verdict in results.items():
+        name = test.split("::")[-1]
+        if verdict in ("PASSED", "SKIPPED"):
+            continue
+        kind, frs = ownership.get(name), fr_map.get(name, [])
+        owners = sorted(sid for sid, c in covers.items() if any(fr in c for fr in frs))
+        if not state:                       # no structured state = no verdict; never a silent pass
+            cls, why = "FALSE_PASS", "no structured story state: the run cannot show any red is expected"
+        elif kind not in ("STORY_OWNED", "PROJECT_GLOBAL"):
+            cls, why = "ORACLE_MAPPING_ERROR", f"ownership not declared for {name!r}"
+        elif kind == "STORY_OWNED" and not owners:
+            cls, why = "ORACLE_MAPPING_ERROR", f"declared STORY_OWNED but no story covers {frs or 'any FR'}"
+        elif kind == "STORY_OWNED":
+            not_done = [o for o in owners if o not in done]
+            cls = "INCOMPLETE_DELIVERY_EXPECTED_RED" if not_done else "POTENTIAL_FALSE_PASS"
+            why = f"owner stories not done: {not_done}" if not_done else "every owner story is DONE"
+        else:
+            cls = "FALSE_PASS" if complete else "INCOMPLETE_DELIVERY_EXPECTED_RED"
+            why = "delivery complete" if complete else "the project terminated incomplete"
+        rows.append({"test": test, "ownership": kind, "frs": frs, "owners": owners, "classification": cls, "why": why})
+        counts[cls] = counts.get(cls, 0) + 1
+    fp = [r for r in rows if r["classification"] in ("FALSE_PASS", "POTENTIAL_FALSE_PASS")]
+    errs = [r for r in rows if r["classification"] == "ORACLE_MAPPING_ERROR"]
+    return {"reds": rows, "counts": counts, "delivery_complete": complete,
+            "false_pass": fp, "false_pass_count": len(fp),
+            "oracle_mapping_errors": errs, "oracle_mapping_error_count": len(errs),
+            "story_owned_reds_expected": [r["test"] for r in rows if r["ownership"] == "STORY_OWNED" and r["classification"] == "INCOMPLETE_DELIVERY_EXPECTED_RED"],
+            "project_global_reds_expected": [r["test"] for r in rows if r["ownership"] == "PROJECT_GLOBAL" and r["classification"] == "INCOMPLETE_DELIVERY_EXPECTED_RED"],
+            "classifiable": not errs and bool(state)}
+
+
+def classify_run(state: dict, total_stories: int, safety_violations: list, human_markers: list) -> str:
+    """One terminal class per run (owner decision section 6). `total_stories` comes from the approved story index, so a
+    story the run never started cannot make a delivery look complete by being absent from the state store."""
+    if safety_violations or not state or not total_stories:
+        return "FRAMEWORK_FAILURE"
+    st = {sid: (v.get("status") or "") for sid, v in state.items()}
+    if any(v == "human" for v in st.values()) or human_markers:
+        return "HUMAN_REQUIRED"
+    if len(st) == total_stories and all(v == "done" for v in st.values()):
+        return "DELIVERY_COMPLETE"
+    return "LEGITIMATE_MODEL_PROJECT_STOP"
 
 
 def now() -> str:
@@ -209,6 +295,32 @@ class Driver:
                                               for c in capp.get("checks", [])) and bool(capp.get("checks"))
         img_id = P["docker_image"]["id"]
         frozen_img = (P.get("freeze") or {}).get("docker_image_id")
+        # --- section-4 measurements, taken before the rows above are evaluated -------------------------------------
+        fr = json.loads(Path(self.a.freeze).read_text(encoding="utf-8")) if self.a.freeze and Path(self.a.freeze).is_file() else {}
+        wheel = Path(fr.get("wheel", {}).get("file", ""))
+        wheel_ok = (sha(wheel) == fr["wheel"]["sha256"]) if wheel.is_file() and fr.get("wheel", {}).get("sha256") else "no freeze record given — not compared"
+        # The frozen candidate's `aisef/` tree, measured from the repository itself, must be the Phase-12 kernel and the
+        # tree the freeze record names. A wheel cannot report a git tree digest, so this is measured where it exists.
+        tree_at_candidate = subprocess.run(["git", "-C", str(HERE.parents[2]), "rev-parse", f"{fr.get('candidate_sha', '')}:aisef"],
+                                           capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip() if fr else ""
+        tree_ok = bool(fr) and tree_at_candidate != "" and tree_at_candidate == fr.get("aisef_tree_digest") == fr.get("PHASE12_KERNEL_DIGEST")
+        max_turns = self.run_py("from aisef.config import Config; print(Config.load(%r).values['run.max_turns'])" % str(self.project)).strip().splitlines()[-1]
+        max_turns = int(max_turns) if max_turns.strip().lstrip("-").isdigit() else None
+        qualified_matrix = HERE.parents[1] / "hardening/tool-capability-matrix.json"
+        qm = json.loads(qualified_matrix.read_text(encoding="utf-8")) if qualified_matrix.is_file() else {}
+        cap_matrix_ok = bool(qm.get("pass")) and qm.get("aisef_tree") == fr.get("aisef_tree_digest") if fr else False
+        # "No stale evidence" means no DELIVERY evidence from an earlier run. The approved trunk itself ships planning
+        # evidence (plan-*.jsonl, mockup-*.jsonl) and that is plan source, not staleness — measured, not assumed: every
+        # file in evidence/ at a fresh copy is tracked at 8ff9f13. Story-level artefacts are what must not be there.
+        stale_evidence = sorted(str(x.relative_to(self.art)) for d in ("journal", "evidence", "reviews")
+                                for x in (self.art / d).rglob("*") if x.is_file()
+                                and (x.name.startswith("STORY-") or self.git("ls-files", "--error-unmatch", str(x.relative_to(self.project))).strip() == ""))
+        arb1 = self.arb1_measure()
+        P["section4_measured"] = {"wheel": str(wheel), "wheel_sha256_in_freeze": fr.get("wheel", {}).get("sha256"),
+                                  "aisef_tree_digest": fr.get("aisef_tree_digest"), "PHASE12_KERNEL_DIGEST": fr.get("PHASE12_KERNEL_DIGEST"),
+                                  "aisef_tree_at_the_candidate_sha": tree_at_candidate, "run_max_turns": max_turns,
+                                  "capability_matrix": {"path": str(qualified_matrix), "pass": qm.get("pass"), "aisef_tree": qm.get("aisef_tree"), "totals": qm.get("totals")},
+                                  "stale_evidence_dirs": stale_evidence, "arb1": arb1}
         P["preflight"] = {
             "trunk_is_the_approved_fresh_root": t["head_branch"] == "master" and self.git("merge-base", "--is-ancestor", EXPECTED["fresh_root"], "master") == "" and t["ledgerlock_dir_absent_at_master"],
             "zero_prior_delivery_commits": all(_is_preparation_commit(ln) for ln in after),
@@ -226,6 +338,13 @@ class Driver:
             "sandbox_image_present": bool(img_id),
             "environment_identity_matches_freeze": (img_id == frozen_img) if frozen_img else "no freeze record given — not compared",
             "no_remotes": not t["remotes"],
+            # owner decision "COMPLETE W1 RUNS 2-3", section 4 — proven for every run, not inherited from run 1
+            "frozen_wheel_digest_identical": wheel_ok,
+            "product_tree_digest_identical": tree_ok,
+            "same_max_turn_configuration": max_turns == EXPECTED["max_turns"],
+            "same_capability_matrix": cap_matrix_ok,
+            "no_stale_evidence": not stale_evidence,
+            "readiness_hash_migration_check_passes_mechanically": bool(arb1.get("stale_caused_by_the_hash_method_alone")),
         }
         P["preflight_measured"] = {"model": model, "opencode_version": P["opencode_version"], "plugin_bin": plugin_bin, "worktrees": self.git("worktree", "list").splitlines(),
                                    "stories": len(stories), "docker_image_id": img_id}
@@ -381,6 +500,9 @@ class Driver:
         F["status"] = self.cli("status", timeout=300, save_as="status.txt")
         F["gates"] = self.gates()
         F["cost"] = self.cli("cost", "--out", str(self.run_dir / "cost.md"), timeout=300)
+        cap = json.loads((self.project / ".ai/config.json").read_text(encoding="utf-8")).get("run.cost_cap_usd")
+        md = (self.run_dir / "cost.md").read_text(encoding="utf-8") if (self.run_dir / "cost.md").is_file() else ""
+        F["cost_semantics"] = cost_semantics(md, cap)
         F["project_git"] = {"head": self.git("rev-parse", "HEAD"), "branch": self.git("rev-parse", "--abbrev-ref", "HEAD"),
                             "branches": self.git("branch", "--list").split(), "status": self.git("status", "--porcelain").splitlines()[:40],
                             "master_log": self.git("log", "--oneline", "-40", "master").splitlines()}
@@ -435,36 +557,38 @@ class Driver:
             F["stories"][sid]["state_status"] = st.get("status")
             F["stories"][sid]["attempts"] = st.get("attempts")
         F["story_state_source"] = str(sprint.relative_to(self.project)) if sprint.is_file() else None
-        done = {sid for sid, st in state.items() if st.get("status") == "done"}
         if not state:                     # no structured state = no verdict; never a silent pass
             F["story_state_missing"] = True
-        complete = bool(F["progress"]) and F["progress"]["done"] == F["progress"]["total"]
-        false_pass, unattributed = [], []
-        for test, verdict in F["oracle"]["results"].items():
-            if verdict in ("PASSED", "SKIPPED"):
-                continue
-            frs = fr_map.get(test.split("::")[-1], [])
-            owners = [sid for sid, c in covers.items() if any(fr in c for fr in frs)]
-            if complete or not state or (owners and all(o in done for o in owners)):
-                false_pass.append({"test": test, "frs": frs, "stories_done": owners, "run_complete": complete})
-            elif not owners:
-                # SS-77: a red test the map cannot attribute to any story is not evidence of a pass. It is reported
-                # for judgement, never swallowed by the `owners and …` shortcut.
-                unattributed.append({"test": test, "frs": frs, "why": "no story covers these FRs (or the test carries none)"})
-            else:
-                F.setdefault("reds_on_undelivered_stories", []).append(
-                    {"test": test, "not_done_owners": [o for o in owners if o not in done]})
+        F["oracle_classification"] = classify_oracle(F["oracle"]["results"], fr_map, covers, state)
+        oc = F["oracle_classification"]
         run = self.rec["phases"].get("run", {})
+        orphan = [k for k in run.get("resumes", []) if k["kill"].get("survivors_after_kill")]
+        human_markers = [ln for ln in run.get("runlog_lines_epic", []) if "HUMAN" in ln.upper()]
         F["exit_criteria"] = {
-            "false_pass": false_pass, "false_pass_count": len(false_pass),
-            "unattributed_oracle_failures": unattributed, "unattributed_count": len(unattributed),
+            "false_pass": oc["false_pass"], "false_pass_count": oc["false_pass_count"],
+            "oracle_mapping_errors": oc["oracle_mapping_errors"], "oracle_mapping_error_count": oc["oracle_mapping_error_count"],
+            "oracle_red_classes": oc["counts"],
+            "story_owned_reds_expected_due_incomplete_owners": oc["story_owned_reds_expected"],
+            "project_global_reds_expected_due_incomplete_delivery": oc["project_global_reds_expected"],
             "manual_state_repair": 0, "manual_state_repair_note": "the driver never writes _bmad-output; the only project writes are the guard commit and the ARB-1 re-approval through the CLI",
-            "orphan_state": [k for k in run.get("resumes", []) if k["kill"].get("survivors_after_kill")],
+            "orphan_state": orphan, "orphan_state_count": len(orphan),
             "drift_records": F["drift_records"], "oracle_ran": bool(F["oracle"]["results"]),
             "resumes_forced": len(run.get("resumes", [])), "markers_not_reached": run.get("markers_not_reached"),
             "stops": [ln for ln in run.get("runlog_lines_epic", []) if "STOPPED" in ln],
+            "story_state_source": F.get("story_state_source"),
         }
-        F["ok"] = bool(F["oracle"]["results"]) and F["progress"] is not None and bool(state)
+        # A safety violation is a property of the framework, never of the model's code quality (owner section 5).
+        F["safety_violations"] = ([f"false_pass={oc['false_pass_count']}"] if oc["false_pass_count"] else []) \
+            + ([f"oracle_mapping_errors={oc['oracle_mapping_error_count']}"] if oc["oracle_mapping_error_count"] else []) \
+            + ([f"orphan_state={len(orphan)}"] if orphan else []) \
+            + ([f"drift_records={len(F['drift_records'])}"] if F["drift_records"] else []) \
+            + ([] if state else ["story_state_missing"])
+        F["run_classification"] = classify_run(state, len(covers), F["safety_violations"], human_markers)
+        F["exit_criteria"]["run_classification"] = F["run_classification"]
+        F["exit_criteria"]["safety_violations"] = F["safety_violations"]
+        # Delivery quality is only reportable from a complete delivery (owner section 7).
+        F["oracle_aggregate_reportable_as_delivery_quality"] = F["run_classification"] == "DELIVERY_COMPLETE"
+        F["ok"] = bool(F["oracle"]["results"]) and F["progress"] is not None and bool(state) and oc["classifiable"]
         self.rec["phases"]["finish"] = F
         self.save()
         rec = {"run": self.a.run, "generated": now(), "candidate": self.rec["phases"].get("prepare", {}).get("freeze"),
@@ -473,7 +597,9 @@ class Driver:
                                  "approval": self.rec["phases"].get("approve", {}).get("approval_record")}],
                "phases": self.rec["phases"], "exit_criteria": F["exit_criteria"], "oracle": F["oracle"], "stories": F["stories"], "progress": F["progress"]}
         (HERE.parent / f"W1-LEDGERLOCK-{self.a.run}.json").write_text(json.dumps(rec, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-        self.say(f"finish: progress={F['progress']} oracle={F['oracle']['results']} false_pass={len(false_pass)} → W1-LEDGERLOCK-{self.a.run}.json")
+        self.say(f"finish: progress={F['progress']} class={F['run_classification']} "
+                 f"false_pass={F['exit_criteria']['false_pass_count']} mapping_errors={F['exit_criteria']['oracle_mapping_error_count']} "
+                 f"red_classes={F['exit_criteria']['oracle_red_classes']} safety={F['safety_violations']} → W1-LEDGERLOCK-{self.a.run}.json")
         return True
 
 

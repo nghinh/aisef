@@ -35,10 +35,10 @@ ___ TestIdempotencyAndConflict.test_a_tombstone_conflicts_like_a_live_value ____
 oracle/test_oracle.py:198: in test_a_tombstone_conflicts_like_a_live_value
     led.apply_batch([("delete", "t", None, "d1", 1)])  # §4.4: a delete produces a tombstone line
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/private/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmpg_7sew1e/delivered/ledgerlock/ledger.py:106: in apply_batch
+/private/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmpe48742kv/delivered/ledgerlock/ledger.py:106: in apply_batch
     return self._apply_batch_locked(ops)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/private/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmpg_7sew1e/delivered/ledgerlock/ledger.py:129: in _apply_batch_locked
+/private/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmpe48742kv/delivered/ledgerlock/ledger.py:129: in _apply_batch_locked
     _op, key, rid, ts = op
     ^^^^^^^^^^^^^^^^^
 E   ValueError: too many values to unpack (expected 4, got 5)
@@ -68,6 +68,6 @@ FAILED oracle/test_oracle.py::TestAcceptance::test_14_6_no_third_party_imports_a
 FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli
 FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value
 FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts
-8 failed, 1 passed in 1.07s
+8 failed, 1 passed in 1.13s
 
 --- stderr ---
