@@ -1,0 +1,13 @@
+#!/bin/sh
+# Execution profile PROFILE-W1-OC-GPT56SOL-T80-RO — stage-specific dependency environment (owner decision
+# "FIX SS-81 FAMILY", section 11). Put first on PATH for `aisef run`. The frozen kernel gives the reviewer and the
+# security session, and only them, AISEF_DISALLOWED_TOOLS and no AISEF_STORY_ID (aisef/phases/implement.py). In such a
+# session uv runs read-only: UV_FROZEN (no lock written), UV_NO_SYNC (no environment synced) and an environment
+# outside every worktree (none created in the tree). Measured on uv 0.11.3 with the workload's exact reviewer command:
+# the tree stays byte-identical. Every other session gets the real uv, unchanged.
+REAL_UV="${PROFILE_REAL_UV:-/Users/nghinh/.local/bin/uv}"
+if [ -n "${AISEF_DISALLOWED_TOOLS:-}" ] && [ -z "${AISEF_STORY_ID:-}" ]; then
+  UV_FROZEN=1 UV_NO_SYNC=1 UV_PROJECT_ENVIRONMENT="${PROFILE_VERIFIER_UV_ENV:-/Users/nghinh/Downloads/projects/aisef-freeze/40393cda89db/verifier-uv-env}" \
+    exec "$REAL_UV" "$@"
+fi
+exec "$REAL_UV" "$@"

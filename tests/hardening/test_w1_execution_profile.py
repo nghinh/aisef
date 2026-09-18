@@ -8,6 +8,9 @@ from __future__ import annotations
 
 import copy
 import importlib.util
+import os
+import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -90,6 +93,68 @@ class TestRedaction(unittest.TestCase):
         self.assertEqual(red["provider"]["x"]["options"]["apiKey"], "<redacted>")
         self.assertEqual(red["token"], "<redacted>")
         self.assertEqual(red["provider"]["x"]["options"]["baseURL"], "u")
+
+
+WRAPPER = ROOT / "closure-evidence/hardening/w1/profiles/stage-env-ro-uv/bin/uv"
+STAGE = {"resolved_uv": "closure-evidence/hardening/w1/profiles/stage-env-ro-uv/bin/uv", "wrapper_sha256": "w1",
+         "real_uv": "/u/uv", "real_uv_version": "uv 0.11.3"}
+
+
+class TestStageEnv(unittest.TestCase):
+    """Owner decision "FIX SS-81 FAMILY", section 11: the reviewer/security dependency environment is part of the
+    profile's identity; a profile that declares none keeps the id it always had."""
+
+    def test_a_profile_without_a_stage_environment_keeps_its_id(self):
+        self.assertEqual(ep.profile_id(BASE), ep.profile_id({**BASE, "stage_env": None}))
+
+    def test_the_stage_environment_moves_the_id(self):
+        self.assertNotEqual(ep.profile_id({**BASE, "stage_env": STAGE}),
+                            ep.profile_id({**BASE, "stage_env": {**STAGE, "wrapper_sha256": "w2"}}))
+
+    def _verify(self, profile_identity: dict, measured: dict) -> dict:
+        m = {k: v for k, v in measured.items() if k != "route_resolution"}
+        with mock.patch.object(ep, "measure", return_value=m):
+            return ep.verify(profile_of(profile_identity), Path("/nonexistent"), Path("/nonexistent"))
+
+    def test_a_copy_launched_without_the_profiles_wrapper_is_refused(self):
+        plain = {"resolved_uv": "/u/uv", "wrapper_sha256": None, "real_uv": "/u/uv", "real_uv_version": "uv 0.11.3"}
+        self.assertTrue(self._verify({**BASE, "stage_env": STAGE}, {**BASE, "stage_env": STAGE})["matches"])
+        self.assertFalse(self._verify({**BASE, "stage_env": STAGE}, {**BASE, "stage_env": plain})["matches"])
+        self.assertTrue(self._verify(BASE, {**BASE, "stage_env": plain})["matches"], "a profile without one ignores it")
+
+    @unittest.skipUnless(os.name == "posix", "the wrapper is a POSIX shell script")
+    def test_the_wrapper_makes_uv_read_only_for_the_verifier_sessions_only(self):
+        with tempfile.TemporaryDirectory() as td:
+            fake = Path(td) / "uv"
+            fake.write_text('#!/bin/sh\necho "F=${UV_FROZEN:-} S=${UV_NO_SYNC:-} E=${UV_PROJECT_ENVIRONMENT:-} A=$*"\n', encoding="utf-8")
+            fake.chmod(0o755)
+            base = {"PATH": os.environ.get("PATH", ""), "PROFILE_REAL_UV": str(fake), "PROFILE_VERIFIER_UV_ENV": "/outside"}
+
+            def run(**env):
+                return subprocess.run([str(WRAPPER), "run", "x.py"], env={**base, **env}, capture_output=True, text=True,
+                                      check=True).stdout.strip()
+            self.assertEqual(run(AISEF_DISALLOWED_TOOLS="Write,Edit"), "F=1 S=1 E=/outside A=run x.py")
+            self.assertEqual(run(AISEF_DISALLOWED_TOOLS="Write,Edit", AISEF_STORY_ID="S-1"), "F= S= E= A=run x.py")
+            self.assertEqual(run(AISEF_STORY_ID="S-1"), "F= S= E= A=run x.py")
+            self.assertEqual(run(), "F= S= E= A=run x.py")
+
+    @unittest.skipUnless(os.name == "posix", "the wrapper is a POSIX shell script")
+    def test_stage_env_names_the_wrapper_on_path_and_the_real_uv_behind_it(self):
+        with tempfile.TemporaryDirectory() as td:
+            real = Path(td) / "real-uv"
+            real.write_text('#!/bin/sh\necho "uv 9.9.9"\n', encoding="utf-8")
+            real.chmod(0o755)
+            wdir = Path(td) / "bin"
+            wdir.mkdir()
+            w = wdir / "uv"
+            w.write_text(WRAPPER.read_text(encoding="utf-8").replace("/Users/nghinh/.local/bin/uv", str(real)), encoding="utf-8")
+            w.chmod(0o755)
+            got = ep.stage_env(f"{wdir}{os.pathsep}{td}")
+            self.assertEqual((got["real_uv"], got["real_uv_version"]), (str(real), "uv 9.9.9"))
+            self.assertEqual(got["wrapper_sha256"], ep._sha(w.read_bytes()))
+            plain = ep.stage_env(td + os.pathsep)
+            self.assertIsNone(plain["resolved_uv"], "no `uv` named on that path")
+            self.assertEqual(ep.stage_env("/nonexistent-dir")["resolved_uv"], None)
 
 
 if __name__ == "__main__":

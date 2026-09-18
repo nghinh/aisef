@@ -18,9 +18,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -33,7 +36,15 @@ ROLES = ("developer", "reviewer", "security", "designer")
 CONFIG_FIELDS = ("kernel", "client", "client_version", "routes", "max_turns", "max_retries", "max_infra_retries",
                  "context_window", "small_model", "sandbox_tool_profile", "guard_digest", "prompt_catalog_digest",
                  "client_config_digest", "cost_cap_usd")
+#: declared by a profile only when it has one; a profile that does not declare it keeps its original id
+OPTIONAL_FIELDS = ("stage_env",)
 SECRET = re.compile(r"key|token|secret|auth|password", re.I)
+#: The reviewer's dependency command exactly as the workload's review skills write it (.claude/skills/bmad-code-review/
+#: SKILL.md, bmad-review/SKILL.md), {project-root} and {skill-root} filled in (owner decision "FIX SS-81 FAMILY", s. 11).
+REVIEWER_DEP_CMD = ("uv run {p}/_bmad/scripts/resolve_customization.py --skill {p}/.claude/skills/bmad-code-review "
+                    "--project-root {p} --key workflow")
+#: how a session's shell may run it: plain sh, zsh, and an interactive zsh that reads the operator's rc files
+SHELLS = (("/bin/sh", "-c"), ("/bin/zsh", "-c"), ("/bin/zsh", "-ic"))
 
 
 def _sha(b: bytes) -> str:
@@ -83,7 +94,77 @@ def _effective_routes(copy: Path, cfg: dict) -> dict:
     return {r: (cfg.get(f"route.{r}_model") or default) for r in ROLES}
 
 
-def measure(copy: Path, venv: Path, freeze: Path = FREEZE) -> dict:
+def stage_env(path: str) -> dict:
+    """The `uv` a session resolves on `path` — the profile's wrapper or not — and the real uv behind it."""
+    uv = shutil.which("uv", path=path)
+    if not uv:
+        return {"resolved_uv": None}
+    p = Path(uv).resolve()
+    with open(p, "rb") as fh:
+        head = fh.read(65536)
+    m = re.search(rb'PROFILE_REAL_UV:-([^}"]+)', head)
+    real = m.group(1).decode() if m else str(p)
+    try:
+        ver = subprocess.run([real, "--version"], capture_output=True, text=True, timeout=30).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        ver = ""                                   # unmeasurable: recorded empty, so it can never match a profile's version
+    return {"resolved_uv": str(p.relative_to(ROOT)) if p.is_relative_to(ROOT) else str(p),
+            "wrapper_sha256": _sha(p.read_bytes()) if m else None, "real_uv": real, "real_uv_version": ver}
+
+
+def _role_env(venv: Path, role: str, path: str, copy: Path) -> dict:
+    """The environment the FROZEN kernel gives a `role` session: its spec.env markers through its own child_env."""
+    code = ("import json, sys\n"
+            "from aisef.clients.base import child_env\n"
+            "from aisef.clients.opencode import OpenCodeAdapter\n"
+            "from aisef.harness import guardrails as G\n"
+            "from aisef.harness.routing import ROLES\n"
+            "role, wd = sys.argv[1], sys.argv[2]\n"
+            "spec = {G.ENV_WORKDIR: wd, G.ENV_PROJECT: wd}\n"
+            "if role == 'developer':\n"
+            "    spec[G.ENV_STORY_ID] = 'PREFLIGHT'\n"
+            "else:\n"
+            "    spec[G.ENV_DISALLOWED_TOOLS] = ','.join(ROLES[role].disallowed_tools)\n"
+            "print(json.dumps(child_env(spec, allow_prefixes=OpenCodeAdapter.env_prefixes)))\n")
+    r = subprocess.run([_venv_python(venv), "-c", code, role, str(copy)], capture_output=True, text=True, check=True,
+                       env={**os.environ, "PATH": path})
+    return json.loads(r.stdout)
+
+
+def _snapshot(tree: Path) -> str:
+    """Everything a session could have changed: git's view (tracked, untracked, ignored) and every file's bytes."""
+    st = subprocess.run(["git", "-C", str(tree), "status", "--porcelain=v1", "--ignored", "-uall"], capture_output=True, text=True).stdout
+    files = sorted(f for f in tree.rglob("*") if f.is_file() and ".git" not in f.relative_to(tree).parts[:1])
+    return _sha(st.encode() + b"".join(str(f.relative_to(tree)).encode() + b"\0" + _sha(f.read_bytes()).encode() for f in files))
+
+
+def stage_env_check(copy: Path, venv: Path, path: str) -> dict:
+    """Preflight (owner s. 11): the exact reviewer dependency command, run with the reviewer's and the security
+    session's environment as the frozen kernel builds it, in every shell form, leaves the tree byte-identical; the
+    developer's session, in a throw-away clone, still gets the real uv (it writes the lock) — so the check has teeth."""
+    rows = {}
+    for role in ("reviewer", "security"):
+        env = _role_env(venv, role, path, copy)
+        for sh in SHELLS:
+            before = _snapshot(copy)
+            r = subprocess.run([*sh, REVIEWER_DEP_CMD.format(p=copy)], cwd=str(copy), env=env, capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", timeout=300)
+            rows[f"{role} {' '.join(sh)}"] = {"identical": _snapshot(copy) == before, "exit": r.returncode,
+                                              "tail": (r.stdout + r.stderr).strip()[-240:]}
+    with tempfile.TemporaryDirectory() as td:
+        clone = Path(td) / "clone"
+        subprocess.run(["git", "clone", "-q", "--no-hardlinks", str(copy), str(clone)], check=True)
+        env = _role_env(venv, "developer", path, clone)
+        before = _snapshot(clone)
+        subprocess.run(["/bin/sh", "-c", REVIEWER_DEP_CMD.format(p=clone)], cwd=str(clone), env=env, capture_output=True, timeout=300)
+        new = subprocess.run(["git", "-C", str(clone), "status", "--porcelain=v1", "--ignored", "-uall"], capture_output=True,
+                             text=True).stdout.split("\n")
+        control = {"developer_tree_changed": _snapshot(clone) != before, "new": sorted({ln[3:].split("/")[0] for ln in new if ln})}
+    return {"command": REVIEWER_DEP_CMD, "path": path, "stage_env": stage_env(path), "per_role_shell": rows,
+            "developer_control": control, "pass": all(v["identical"] for v in rows.values()) and control["developer_tree_changed"]}
+
+
+def measure(copy: Path, venv: Path, freeze: Path = FREEZE, path: str | None = None) -> dict:
     fr = json.loads(freeze.read_text(encoding="utf-8"))
     py = _venv_python(venv)
     cfg = _config(copy, py)
@@ -111,12 +192,14 @@ def measure(copy: Path, venv: Path, freeze: Path = FREEZE) -> dict:
         "prompt_catalog_digest": catalog,
         "client_config_digest": _sha(json.dumps({"global": _redact(glob), "project": _redact(proj)}, sort_keys=True).encode()),
         "cost_cap_usd": cfg.get("run.cost_cap_usd"),
+        "stage_env": stage_env(path if path is not None else os.environ.get("PATH", "")),
     }
 
 
 def profile_id(identity: dict) -> str:
     """Digest over the configuration-determined fields plus the declared route resolution."""
     picked = {k: identity[k] for k in CONFIG_FIELDS}
+    picked.update({k: identity[k] for k in OPTIONAL_FIELDS if identity.get(k) is not None})
     picked["route_resolution"] = {r: {k: v for k, v in (identity.get("route_resolution") or {}).get(r, {}).items()
                                       if k in ("route_kind", "resolved_model")} for r in ROLES}
     return "sha256:" + _sha(json.dumps(picked, sort_keys=True, default=str).encode())
@@ -139,10 +222,14 @@ def apply(profile: dict, copy: Path) -> list[str]:
     return changed
 
 
-def verify(profile: dict, copy: Path, venv: Path, freeze: Path = FREEZE) -> dict:
-    got = measure(copy, venv, freeze)
+def verify(profile: dict, copy: Path, venv: Path, freeze: Path = FREEZE, path: str | None = None) -> dict:
+    got = measure(copy, venv, freeze, path)
     got["route_resolution"] = profile["identity"].get("route_resolution")
-    diffs = {k: {"profile": profile["identity"].get(k), "copy": got.get(k)} for k in CONFIG_FIELDS if profile["identity"].get(k) != got.get(k)}
+    fields = CONFIG_FIELDS + tuple(k for k in OPTIONAL_FIELDS if profile["identity"].get(k) is not None)
+    for k in OPTIONAL_FIELDS:
+        if profile["identity"].get(k) is None:
+            got.pop(k, None)                  # a profile that declares no stage environment is not measured on one
+    diffs = {k: {"profile": profile["identity"].get(k), "copy": got.get(k)} for k in fields if profile["identity"].get(k) != got.get(k)}
     pid = profile_id(got)
     return {"profile": profile["profile"], "profile_id": profile["profile_id"], "copy_id": pid,
             "matches": not diffs and pid == profile["profile_id"], "differences": diffs}
@@ -154,16 +241,23 @@ def main() -> int:
     m = sub.add_parser("measure"); m.add_argument("copy"); m.add_argument("--venv"); m.add_argument("--freeze", default=str(FREEZE))
     a_ = sub.add_parser("apply"); a_.add_argument("profile"); a_.add_argument("copy")
     v = sub.add_parser("verify"); v.add_argument("profile"); v.add_argument("copy"); v.add_argument("--venv"); v.add_argument("--freeze", default=str(FREEZE))
+    c = sub.add_parser("stage-check"); c.add_argument("copy"); c.add_argument("--venv")
+    for sp in (m, v, c):
+        sp.add_argument("--path", default=None, help="the PATH `aisef run` will use (default: this process's)")
     a = ap.parse_args()
     venv = Path(getattr(a, "venv", None) or json.loads(FREEZE.read_text(encoding="utf-8"))["run_venv"]["path"])
     if a.cmd == "measure":
-        print(json.dumps(measure(Path(a.copy).expanduser(), venv, Path(a.freeze)), indent=1, default=str))
+        print(json.dumps(measure(Path(a.copy).expanduser(), venv, Path(a.freeze), a.path), indent=1, default=str))
         return 0
+    if a.cmd == "stage-check":
+        out = stage_env_check(Path(a.copy).expanduser(), venv, a.path or os.environ.get("PATH", ""))
+        print(json.dumps(out, indent=1, default=str))
+        return 0 if out["pass"] else 1
     prof = json.loads(Path(a.profile).read_text(encoding="utf-8"))
     if a.cmd == "apply":
         print(" ".join(apply(prof, Path(a.copy).expanduser())))
         return 0
-    out = verify(prof, Path(a.copy).expanduser(), venv, Path(a.freeze))
+    out = verify(prof, Path(a.copy).expanduser(), venv, Path(a.freeze), a.path)
     print(json.dumps(out, indent=1, default=str))
     return 0 if out["matches"] else 1
 

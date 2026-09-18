@@ -234,6 +234,14 @@ class Driver:
         self.rec_path = self.run_dir / "driver.json"
         self.rec = json.loads(self.rec_path.read_text(encoding="utf-8")) if self.rec_path.is_file() else {"run": a.run, "project": str(self.project), "phases": {}}
         self.log = open(self.run_dir / "driver.log", "a", encoding="utf-8")
+        # Owner decision "FIX SS-81 FAMILY", section 11: a profile's stage-specific dependency environment is a `uv`
+        # wrapper first on PATH for the whole `aisef run`; ~/.local/bin follows it so an interactive shell's rc (which
+        # prepends ~/.local/bin only when absent) cannot reorder them. No stage environment = the process's PATH.
+        self.path = ""
+        stage = (json.loads(Path(a.profile).read_text(encoding="utf-8"))["identity"].get("stage_env") or {}) if a.profile else {}
+        if stage.get("resolved_uv"):
+            wrapper_dir = (HERE.parents[2] / stage["resolved_uv"]).parent
+            self.path = os.pathsep.join([str(wrapper_dir), str(Path.home() / ".local/bin"), os.environ.get("PATH", "")])
 
     # ---- plumbing ------------------------------------------------------------------------------------------------
     def say(self, msg: str) -> None:
@@ -248,6 +256,8 @@ class Driver:
 
     def env(self) -> dict:
         e = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
+        if self.path:
+            e["PATH"] = self.path
         return e
 
     def cli(self, *args: str, timeout: int = 900, cwd: Path | None = None, save_as: str | None = None) -> dict:
@@ -380,13 +390,20 @@ class Driver:
             prof = json.loads(Path(self.a.profile).read_text(encoding="utf-8"))
             prof_expect = {"model": prof["identity"]["routes"]["developer"], "max_turns": prof["identity"]["max_turns"]}
             try:
-                prof_check = _ep.verify(prof, self.project, Path(self.a.python).parents[1], Path(self.a.freeze))
+                prof_check = _ep.verify(prof, self.project, Path(self.a.python).parents[1], Path(self.a.freeze),
+                                        self.path or os.environ.get("PATH", ""))
             except Exception as e:                        # a verification that cannot run is a failed row, never a pass
                 prof_check = {"matches": False, "error": f"{type(e).__name__}: {e}"}
         else:
             prof_expect = {"model": EXPECTED["model"], "max_turns": EXPECTED["max_turns"]}
             prof_check = {"matches": True, "note": "no --profile: the original PROFILE-W1-OC-MYCOMBO-T40 configuration, checked by the two rows above"}
         P["execution_profile"] = {"path": self.a.profile or None, "expected": prof_expect, "check": prof_check}
+        # section 11 preflight: the reviewer's exact dependency command leaves the tree byte-identical before any model call
+        if self.path:
+            try:
+                P["stage_env_check"] = _ep.stage_env_check(self.project, Path(self.a.python).parents[1], self.path)
+            except Exception as e:                        # a check that cannot run is a failed row, never a pass
+                P["stage_env_check"] = {"pass": False, "error": f"{type(e).__name__}: {e}"}
         # --- section-4 measurements, taken before the rows above are evaluated -------------------------------------
         fr = json.loads(Path(self.a.freeze).read_text(encoding="utf-8")) if self.a.freeze and Path(self.a.freeze).is_file() else {}
         wheel = Path(fr.get("wheel", {}).get("file", ""))
@@ -439,6 +456,8 @@ class Driver:
             "no_stale_evidence": not stale_evidence,
             "readiness_hash_migration_check_passes_mechanically": bool(arb1.get("stale_caused_by_the_hash_method_alone")),
         }
+        if self.path:
+            P["preflight"]["reviewer_dependency_command_leaves_the_tree_byte_identical"] = P["stage_env_check"].get("pass") is True
         P["preflight_measured"] = {"model": model, "opencode_version": P["opencode_version"], "plugin_bin": plugin_bin, "worktrees": self.git("worktree", "list").splitlines(),
                                    "stories": len(stories), "docker_image_id": img_id}
         P["preflight_ok"] = all(v is True or v == "no freeze record given — not compared" for v in P["preflight"].values())
