@@ -1,0 +1,25 @@
+{
+  "stories": {
+    "STORY-01-01": {
+      "id": "STORY-01-01",
+      "epic_id": "EPIC-01",
+      "status": "failed",
+      "attempts": 3,
+      "wave": 1,
+      "worktree": "",
+      "evidence": "",
+      "cost_usd": 0.0,
+      "duration_ms": 0,
+      "blocked_reason": "tried 3 attempts, still did not pass gate",
+      "claimed_by": "MacBookPro:50956",
+      "lease_until": 1789722892.345647,
+      "updated_at": "2026-09-18T03:14:52+00:00"
+    }
+  },
+  "current_epic": "EPIC-01",
+  "active_epics": [
+    "EPIC-01"
+  ],
+  "started_at": "2026-09-18T03:03:21+00:00",
+  "updated_at": "2026-09-18T03:14:52+00:00"
+}

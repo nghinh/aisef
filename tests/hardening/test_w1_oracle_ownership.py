@@ -113,5 +113,53 @@ class TestRunClassification(unittest.TestCase):
         self.assertEqual(classify_run({}, 2, [], []), "FRAMEWORK_FAILURE")
 
 
+
+class TestOracleResultParsing(unittest.TestCase):
+    """SS-79: nine skipped checks once collapsed into one entry called "[1]" and eight outcomes were lost."""
+
+    VERBOSE_SKIPS = "\n".join(
+        f"oracle/test_oracle.py::TestAcceptance::test_{i} SKIPPED (AISEF_W1_PROJECT must point at a delivered LedgerLock) [ 11%]"
+        for i in range(1, 10)) + "\n" + "\n".join(
+        f"SKIPPED [1] oracle/test_oracle.py:{70 + i}: AISEF_W1_PROJECT must point at a delivered LedgerLock" for i in range(9)) + \
+        "\n9 skipped in 0.01s\n"
+
+    def test_every_skipped_check_is_recovered_with_its_own_name(self):
+        out = _mod.parse_oracle(self.VERBOSE_SKIPS)
+        self.assertEqual(out["parsed"], 9)
+        self.assertTrue(out["complete"])
+        self.assertEqual(set(out["results"].values()), {"SKIPPED"})
+
+    def test_a_parse_that_loses_outcomes_is_rejected(self):
+        # pytest counted 9, only one per-test line present: the parse must not be believed.
+        out = _mod.parse_oracle("oracle/test_oracle.py::T::test_1 SKIPPED (why) [100%]\n9 skipped in 0.01s\n")
+        self.assertFalse(out["complete"])
+        self.assertIn("recovered 1", out["why"])
+
+    def test_mixed_outcomes_reconcile(self):
+        stdout = ("oracle/test_oracle.py::T::test_a PASSED [ 50%]\n"
+                  "oracle/test_oracle.py::T::test_b FAILED [100%]\n"
+                  "1 failed, 1 passed in 0.10s\n")
+        out = _mod.parse_oracle(stdout)
+        self.assertTrue(out["complete"])
+        self.assertEqual(out["results"], {"T::test_a": "PASSED", "T::test_b": "FAILED"})
+
+
+class TestSkippedIsNeverAPass(unittest.TestCase):
+    def test_a_skipped_check_on_a_complete_delivery_blocks_qualification(self):
+        out = classify_oracle({"T::t_story": "SKIPPED"}, MAP, COVERS, ALL_DONE)
+        self.assertEqual(out["skipped"][0]["classification"], "ORACLE_NOT_EXECUTED")
+        self.assertFalse(out["classifiable"])
+        self.assertFalse(out["oracle_passed_completely"])
+
+    def test_a_skipped_check_on_an_incomplete_delivery_is_expected(self):
+        out = classify_oracle({"T::t_story": "SKIPPED"}, MAP, COVERS, ONE_OPEN)
+        self.assertEqual(out["skipped"][0]["classification"], "INCOMPLETE_DELIVERY_EXPECTED_SKIP")
+        self.assertTrue(out["classifiable"])
+
+    def test_oracle_passed_completely_needs_every_check_green_on_a_complete_delivery(self):
+        self.assertTrue(classify_oracle({"T::t_story": "PASSED", "T::t_global": "PASSED"}, MAP, COVERS, ALL_DONE)["oracle_passed_completely"])
+        self.assertFalse(classify_oracle({"T::t_story": "PASSED", "T::t_global": "FAILED"}, MAP, COVERS, ALL_DONE)["oracle_passed_completely"])
+        self.assertFalse(classify_oracle({}, MAP, COVERS, ALL_DONE)["oracle_passed_completely"])
+
 if __name__ == "__main__":
     unittest.main()

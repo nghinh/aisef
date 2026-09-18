@@ -1,0 +1,146 @@
+[2026-09-15 20:00:37] pipeline START client=opencode
+[2026-09-15 20:00:37] phase=project-context START timeout=1800s
+[2026-09-15 20:01:24] phase=project-context OK $0.00 status=ok
+[2026-09-15 20:01:24] phase=prd START timeout=1800s
+[2026-09-15 20:03:42] phase=prd OK $0.00 status=complete
+[2026-09-15 20:03:42] phase=architecture START timeout=1800s
+[2026-09-15 20:09:08] phase=architecture OK $0.00 status=complete
+[2026-09-15 20:09:08] phase=ux START timeout=1800s
+[2026-09-15 20:10:41] pipeline START client=opencode
+[2026-09-15 20:10:41] phase=project-context SKIP (artifacts exist)
+[2026-09-15 20:10:41] phase=prd SKIP (artifacts exist)
+[2026-09-15 20:10:41] phase=architecture SKIP (artifacts exist)
+[2026-09-15 20:10:41] phase=ux START timeout=1800s
+[2026-09-15 20:11:41] phase=ux OK $0.00 status=complete
+[2026-09-15 20:11:41] phase=epics START timeout=1800s
+[2026-09-15 20:17:10] phase=epics OK $0.00 status=ok
+[2026-09-15 20:17:10] phase=split attempt=1 GATE-FAIL stories=17 stories whose criteria describe a placeholder: STORY-02-01: no-op; STORY-04-02: no-op — scaffolding is not behaviour. Verified into the ledger it makes preservation block the story that replaces it, and its blanket failure answers later error-path criteria so their tests cannot be red at the branch point. Fold the scaffolding into the first story that delivers real behaviour through it
+[2026-09-15 20:17:10] phase=epics START timeout=1800s
+[2026-09-15 20:21:41] phase=epics OK $0.00 status=ok
+[2026-09-15 20:21:41] phase=split attempt=2 GATE-FAIL stories=13 stories whose criteria describe a placeholder: STORY-01-03: no-op; STORY-01-04: no-op — scaffolding is not behaviour. Verified into the ledger it makes preservation block the story that replaces it, and its blanket failure answers later error-path criteria so their tests cannot be red at the branch point. Fold the scaffolding into the first story that delivers real behaviour through it
+[2026-09-15 20:21:41] phase=epics START timeout=1800s
+[2026-09-15 20:24:32] phase=epics OK $0.00 status=ok
+[2026-09-15 20:24:32] phase=split attempt=3 GATE-FAIL stories=13 stories whose criteria describe a placeholder: STORY-01-02: no-op; STORY-01-04: no-op — scaffolding is not behaviour. Verified into the ledger it makes preservation block the story that replaces it, and its blanket failure answers later error-path criteria so their tests cannot be red at the branch point. Fold the scaffolding into the first story that delivers real behaviour through it; stories with two criteria that are the same criterion: STORY-01-01: criteria 13, 16; criteria 15, 18; STORY-01-03: criteria 13, 16; STORY-01-04: criteria 7, 10; criteria 16, 19; criteria 18, 27; STORY-02-01: criteria 2, 5, 8; criteria 3, 6; STORY-02-02: criteria 5, 8, 14; STORY-03-01: criteria 5, 8, 11; STORY-03-02: criteria 2, 5, 8, 11; STORY-04-02: criteria 2, 5, 17, 20; STORY-05-01: criteria 4, 7; STORY-05-02: criteria 7, 10, 13; criteria 9, 12, 15; STORY-05-03: criteria 1, 4; criteria 2, 5 — a criterion's stable identity is the fingerprint of its text, so duplicates share one identity: reordering them is undetectable and a test named after either proves both. Merge them, or state what actually differs; STORY-01-01 has 18 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-01-02 has 18 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-01-03 has 24 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-01-04 has 27 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-02-01 has 16 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-02-02 has 15 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-03-01 has 18 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-03-02 has 12 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-04-01 has 12 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-04-02 has 24 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-05-01 has 9 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-05-02 has 15 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-05-03 has 9 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY_NOT_EXECUTABLE STORY-01-01: size — size score 23 = acceptance 18×1 = 18 + write_scope 8×0.5 = 4 (`ledgerlock/__init__.py`, `ledgerlock/__main__.py`, `ledgerlock/format.py`, `ledgerlock/cli.py`…) + fan_in 1×1 = 1 exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–9, next story keeps AC 10–18; divide `write_scope` to match the two groups (8 paths); STORY_NOT_EXECUTABLE STORY-01-02: size — size score 20 = acceptance 18×1 = 18 + write_scope 2×0.5 = 1 (`ledgerlock/format.py`, `tests/test_format.py`) + fan_in 1×1 = 1 exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–9, next story keeps AC 10–18; divide `write_scope` to match the two groups (2 paths); STORY_NOT_EXECUTABLE STORY-01-03: size — size score 28 = acceptance 24×1 = 24 + write_scope 6×0.5 = 3 (`ledgerlock/ledger.py`, `ledgerlock/store.py`, `ledgerlock/__init__.py`, `tests/test_ledger.py`…) + fan_in 1×1 = 1 exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–12, next story keeps AC 13–24; divide `write_scope` to match the two groups (6 paths); STORY_NOT_EXECUTABLE STORY-01-04: size — size score 29.5 = acceptance 27×1 = 27 + write_scope 3×0.5 = 1.5 (`ledgerlock/ledger.py`, `tests/test_ledger.py`, `tests/test_conflict.py`) + fan_in 1×1 = 1 exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–14, next story keeps AC 15–27; divide `write_scope` to match the two groups (3 paths); STORY_NOT_EXECUTABLE STORY-02-01: size — size score 20 = acceptance 16×1 = 16 + write_scope 4×0.5 = 2 (`ledgerlock/ledger.py`, `ledgerlock/store.py`, `tests/test_ledger.py`, `tests/test_verify_independent.py`) + fan_in 2×1 = 2 exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–8, next story keeps AC 9–16; divide `write_scope` to match the two groups (4 paths); STORY_NOT_EXECUTABLE STORY-02-02: size — size score 16.5 = acceptance 15×1 = 15 + write_scope 3×0.5 = 1.5 (`ledgerlock/ledger.py`, `tests/test_ledger.py`, `tests/test_snapshot_determinism.py`) exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–8, next story keeps AC 9–15; divide `write_scope` to match the two groups (3 paths); STORY_NOT_EXECUTABLE STORY-03-01: size — size score 22 = acceptance 18×1 = 18 + write_scope 4×0.5 = 2 (`ledgerlock/ledger.py`, `ledgerlock/store.py`, `tests/test_ledger.py`, `tests/test_atomic_batch.py`) + fan_in 2×1 = 2 exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–9, next story keeps AC 10–18; divide `write_scope` to match the two groups (4 paths); STORY_NOT_EXECUTABLE STORY-04-02: size — size score 25 = acceptance 24×1 = 24 + write_scope 2×0.5 = 1 (`ledgerlock/cli.py`, `tests/test_cli_exit_codes.py`) exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–12, next story keeps AC 13–24; divide `write_scope` to match the two groups (2 paths)
+[2026-09-15 20:27:08] pipeline START client=opencode
+[2026-09-15 20:27:08] phase=project-context SKIP (artifacts exist)
+[2026-09-15 20:27:08] phase=prd SKIP (artifacts exist)
+[2026-09-15 20:27:08] phase=architecture SKIP (artifacts exist)
+[2026-09-15 20:27:08] phase=ux SKIP (artifacts exist)
+[2026-09-15 20:27:08] phase=epics SKIP (artifacts exist)
+[2026-09-15 20:27:08] phase=split attempt=1 OK stories=16
+[2026-09-15 20:27:08] pipeline DONE $0.00
+[2026-09-15 20:28:15] mockup START screens=all force=False
+[2026-09-15 20:28:15] mockup screens_found=5
+[2026-09-15 20:28:15] mockup screen=verify agent START
+[2026-09-15 20:28:43] mockup screen=verify OK $0.00
+[2026-09-15 20:28:43] mockup screen=snapshot agent START
+[2026-09-15 20:29:11] mockup screen=snapshot OK $0.00
+[2026-09-15 20:29:11] mockup screen=apply agent START
+[2026-09-15 20:30:00] mockup screen=apply OK $0.00
+[2026-09-15 20:30:00] mockup screen=repair-tail agent START
+[2026-09-15 20:30:33] mockup screen=repair-tail OK $0.00
+[2026-09-15 20:30:33] mockup screen=help-version agent START
+[2026-09-15 20:31:20] mockup screen=help-version OK $0.00
+[2026-09-15 20:31:22] mockup DONE generated=5 skipped=0 failed=0 $0.00
+[2026-09-18 10:03:19] sprint START client=opencode epics=all parallel=True isolate=True
+[2026-09-18 10:03:21] epic=EPIC-01 START
+[2026-09-18 10:03:21] wave=EPIC-01/w1 START stories=STORY-01-01
+[2026-09-18 10:03:23] story=STORY-01-01 START max_retries=2
+[2026-09-18 10:03:23] story=STORY-01-01 baseline START
+[2026-09-18 10:03:24] story=STORY-01-01 baseline DONE ok=False red_before=0
+[2026-09-18 10:03:24] story=STORY-01-01 attempt=1 START
+[2026-09-18 10:03:24] story=STORY-01-01#1 agent START timeout=1800s scope=pyproject.toml,ledgerlock/__init__.py,ledgerlock/__main__.py,ledgerlock/format.py,ledgerlock/cli.py,tests/__init__.py,tests/test_skeleton.py,tests/test_nfc_normalization.py,README.md,poetry.lock,uv.lock,pdm.lock,tests,test,pytest.ini,conftest.py
+[2026-09-18 10:05:04] tool=test RUN cmd=python3 -m pytest -v
+[2026-09-18 10:05:06] tool=test FAIL exit=1 721ms
+[2026-09-18 10:05:06] tool=test output: E       AssertionError: 1 != 0 : stdout='' stderr="/usr/local/bin/python3: No module named ledgerlock.__main__; 'ledgerlock' is a package and cannot be directly executed\n" · tests/test_skeleton.py:38: AssertionError · _ ACStory0101SkeletonTests.test_AC_STORY_01_01_7_ledger_and_conflict_error_exported _ · self = <tests.test_skeleton.ACStory0101SkeletonTests testMethod=test_AC_STORY_01_01_7_ledger_and_conflict_error_exported> · def test_AC_STORY_01_01_7_ledger_and_conflict_error_exported(self) -> …(+1057 chars, see evidence)
+[2026-09-18 10:05:35] tool=test RUN cmd=python3 -m pytest -v
+[2026-09-18 10:05:37] tool=test FAIL exit=1 716ms
+[2026-09-18 10:05:37] tool=test output: def test_AC_STORY_01_01_2_nfc_and_nfd_forms_normalize_to_identical(self) -> None: · from ledgerlock.format import normalize_key · nfc_form = "\u00e9" · nfd_form = "e\u0301" · self.assertNotEqual(nfc_form, nfd_form) · result_nfc = normalize_key(nfc_form) · result_nfd = normalize_key(nfd_form) · >       self.assertEqual(result_nfc, nfd_form.encode("utf-8").decode("utf-8")) · E       AssertionError: 'é' != 'é' · E       - é · E       + é · tests/test_nfc_normalization.py:36: AssertionError · ==== …(+298 chars, see evidence)
+[2026-09-18 10:05:48] tool=test RUN cmd=python3 -m pytest -v
+[2026-09-18 10:05:48] tool=test PASS exit=0 482ms
+[2026-09-18 10:06:00] tool=lint RUN cmd=ruff check . --exclude .claude --exclude .aisef --exclude .opencode
+[2026-09-18 10:06:01] tool=lint FAIL exit=1 449ms
+[2026-09-18 10:06:01] tool=lint output: F401 [*] `os` imported but unused · --> tests/test_skeleton.py:3:8 · | · 1 | from __future__ import annotations · 2 | · 3 | import os · |        ^^ · 4 | import re · 5 | import subprocess · | · help: Remove unused import: `os` · | · 2 | · - import os · 3 | import re · | · Found 3 errors. · [*] 3 fixable with the `--fix` option.
+[2026-09-18 10:06:04] tool=lint RUN cmd=ruff check . --exclude .claude --exclude .aisef --exclude .opencode
+[2026-09-18 10:06:04] tool=lint FAIL exit=1 288ms
+[2026-09-18 10:06:04] tool=lint output: F401 [*] `os` imported but unused · --> tests/test_skeleton.py:3:8 · | · 1 | from __future__ import annotations · 2 | · 3 | import os · |        ^^ · 4 | import re · 5 | import subprocess · | · help: Remove unused import: `os` · | · 2 | · - import os · 3 | import re · | · Found 3 errors. · [*] 3 fixable with the `--fix` option.
+[2026-09-18 10:06:18] tool=lint RUN cmd=ruff check . --exclude .claude --exclude .aisef --exclude .opencode
+[2026-09-18 10:06:18] tool=lint FAIL exit=1 284ms
+[2026-09-18 10:06:18] tool=lint output: I001 [*] Import block is un-sorted or un-formatted · --> ledgerlock/__main__.py:1:1 · | · 1 | / from __future__ import annotations · 2 | | · 3 | | from ledgerlock.cli import main · | |_______________________________^ · help: Organize imports · | · 4 | · - · 5 | if __name__ == "__main__": · | · Found 1 error. · [*] 1 fixable with the `--fix` option.
+[2026-09-18 10:06:22] tool=lint RUN cmd=ruff check . --exclude .claude --exclude .aisef --exclude .opencode
+[2026-09-18 10:06:22] tool=lint FAIL exit=1 292ms
+[2026-09-18 10:06:22] tool=lint output: I001 [*] Import block is un-sorted or un-formatted · --> ledgerlock/__main__.py:1:1 · | · 1 | / from __future__ import annotations · 2 | | · 3 | | from ledgerlock.cli import main · | |_______________________________^ · help: Organize imports · | · 4 | · - · 5 | if __name__ == "__main__": · | · Found 1 error. · [*] 1 fixable with the `--fix` option.
+[2026-09-18 10:06:30] story=STORY-01-01#1 agent DONE ok=False $0.00 turns=40 out_tokens=6006 err=max_turns: stopped at 40 turns (cap 40)
+[2026-09-18 10:06:30] story=STORY-01-01#1 max_turns but the session left work in the tree — grading it
+[2026-09-18 10:06:30] story=STORY-01-01#1 changed_files=7
+[2026-09-18 10:06:31] story=STORY-01-01#1 candidate frozen sha=36fa2756
+[2026-09-18 10:06:31] story=STORY-01-01#1 verify START sha=36fa2756
+[2026-09-18 10:06:31] story=STORY-01-01 nop START parent=19839746 test_files=3
+[2026-09-18 10:06:32] story=STORY-01-01 nop DONE tests red at parent (expected) 514ms
+[2026-09-18 10:06:32] tool=test RUN cmd=python3 -m pytest -v
+[2026-09-18 10:06:33] tool=test PASS exit=0 478ms
+[2026-09-18 10:06:33] story=STORY-01-01#1 test PASS
+[2026-09-18 10:06:33] tool=lint RUN cmd=ruff check . --exclude .claude --exclude .aisef --exclude .opencode
+[2026-09-18 10:06:33] tool=lint FAIL exit=1 230ms
+[2026-09-18 10:06:33] tool=lint output: I001 [*] Import block is un-sorted or un-formatted · --> ledgerlock/__main__.py:1:1 · | · 1 | / from __future__ import annotations · 2 | | · 3 | | from ledgerlock.cli import main · | |_______________________________^ · help: Organize imports · | · 4 | · - · 5 | if __name__ == "__main__": · | · Found 1 error. · [*] 1 fixable with the `--fix` option.
+[2026-09-18 10:06:33] story=STORY-01-01#1 lint FAIL
+[2026-09-18 10:06:33] story=STORY-01-01#1 review START changed=7
+[2026-09-18 10:06:33] story=STORY-01-01#1 review agent START prompt=26111ch
+[2026-09-18 10:08:16] story=STORY-01-01#1 review agent DONE ok=True $0.00 turns=11
+[2026-09-18 10:08:16] story=STORY-01-01#1 review FAIL blocking=1
+[2026-09-18 10:08:16] story=STORY-01-01#1 review ✗ [block] ledgerlock/__init__.py:36 — File has no trailing newline; pyproject.toml has no [tool.ruff] config so ruff's default 'format' rule applies; AGENTS.md mandates `ruff format --check .` as a quality gate. Same defect on 6 other files in the changeset.
+[2026-09-18 10:08:16] story=STORY-01-01#1 security START changed=7
+[2026-09-18 10:08:16] story=STORY-01-01#1 security agent START prompt=21889ch
+[2026-09-18 10:08:34] story=STORY-01-01#1 security agent DONE ok=True $0.00 turns=2
+[2026-09-18 10:08:34] story=STORY-01-01#1 security PASS findings=0 filtered=0
+[2026-09-18 10:08:34] story=STORY-01-01#1 gate FAILED: lint,TDD,tests verify story,review
+[2026-09-18 10:08:34] story=STORY-01-01#1 gate ✗ lint · failed · I001 [*] Import block is un-sorted or un-formatted · --> ledgerlock/__main__.py:1:1 · | · 1 | / from __future__ import annotations · 2 | | · 3 | | from ledgerlock.cli import main · | |_______________________________^ · help: Organize imports · | · 4 | · - · 5 | if __name__ == "__main__": · | · Found 1 error. · [*]
+[2026-09-18 10:08:34] story=STORY-01-01#1 gate ✗ TDD · failed · tests green on first run — not proven to verify anything (tests/__init__.py, tests/test_nfc_normalization.py, tests/test_skeleton.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.
+[2026-09-18 10:08:34] story=STORY-01-01#1 gate ✗ tests verify story · failed · tests verify nothing — still green without story code (parent SHA 1983974): tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_5_no_forbidden_top_level_imports, tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_6_no_forbidden_runtime_calls
+[2026-09-18 10:08:34] story=STORY-01-01#1 gate ✗ review · failed · 1 blocking items: [block] ledgerlock/__init__.py:36 — File has no trailing newline; pyproject.toml has no [tool.ruff] config so ruff's default 'format' rule applies; AGENTS.md mandates `ruff format --check .` as a qual
+[2026-09-18 10:08:34] story=STORY-01-01 attempt=1 FAIL $0.00 gate=lint,TDD,tests verify story,review
+[2026-09-18 10:08:34] story=STORY-01-01 attempt=2 START
+[2026-09-18 10:08:34] story=STORY-01-01#2 agent START timeout=1800s scope=pyproject.toml,ledgerlock/__init__.py,ledgerlock/__main__.py,ledgerlock/format.py,ledgerlock/cli.py,tests/__init__.py,tests/test_skeleton.py,tests/test_nfc_normalization.py,README.md,poetry.lock,uv.lock,pdm.lock,tests,test,pytest.ini,conftest.py
+[2026-09-18 10:09:11] tool=test RUN cmd=python3 -m pytest -v
+[2026-09-18 10:09:13] tool=test PASS exit=0 653ms
+[2026-09-18 10:09:15] tool=lint RUN cmd=ruff check . --exclude .claude --exclude .aisef --exclude .opencode
+[2026-09-18 10:09:16] tool=lint FAIL exit=1 287ms
+[2026-09-18 10:09:16] tool=lint output: I001 [*] Import block is un-sorted or un-formatted · --> ledgerlock/__main__.py:1:1 · | · 1 | / from __future__ import annotations · 2 | | · 3 | | from ledgerlock.cli import main · | |_______________________________^ · help: Organize imports · | · 4 | · - · 5 | if __name__ == "__main__": · | · Found 1 error. · [*] 1 fixable with the `--fix` option.
+[2026-09-18 10:10:31] story=STORY-01-01#2 agent DONE ok=False $0.00 turns=40 out_tokens=3949 err=max_turns: stopped at 40 turns (cap 40)
+[2026-09-18 10:10:31] story=STORY-01-01#2 max_turns but the session left work in the tree — grading it
+[2026-09-18 10:10:31] story=STORY-01-01#2 changed_files=7
+[2026-09-18 10:10:32] story=STORY-01-01#2 candidate frozen sha=5aa443e3
+[2026-09-18 10:10:32] story=STORY-01-01#2 verify START sha=5aa443e3
+[2026-09-18 10:10:32] story=STORY-01-01 nop START parent=19839746 test_files=3
+[2026-09-18 10:10:33] story=STORY-01-01 nop DONE tests red at parent (expected) 669ms
+[2026-09-18 10:10:34] tool=test RUN cmd=python3 -m pytest -v
+[2026-09-18 10:10:34] tool=test PASS exit=0 471ms
+[2026-09-18 10:10:34] story=STORY-01-01#2 test PASS
+[2026-09-18 10:10:34] tool=lint RUN cmd=ruff check . --exclude .claude --exclude .aisef --exclude .opencode
+[2026-09-18 10:10:35] tool=lint PASS exit=0 245ms
+[2026-09-18 10:10:35] story=STORY-01-01#2 lint PASS
+[2026-09-18 10:10:35] story=STORY-01-01#2 review START changed=7
+[2026-09-18 10:10:35] story=STORY-01-01#2 review agent START prompt=26323ch
+[2026-09-18 10:12:40] story=STORY-01-01#2 review agent DONE ok=True $0.00 turns=21
+[2026-09-18 10:12:40] story=STORY-01-01#2 review PASS
+[2026-09-18 10:12:40] story=STORY-01-01#2 security START changed=7
+[2026-09-18 10:12:40] story=STORY-01-01#2 security agent START prompt=21853ch
+[2026-09-18 10:13:04] story=STORY-01-01#2 security agent DONE ok=True $0.00 turns=7
+[2026-09-18 10:13:04] story=STORY-01-01#2 security PASS findings=0 filtered=0
+[2026-09-18 10:13:04] story=STORY-01-01#2 gate FAILED: TDD,tests verify story
+[2026-09-18 10:13:04] story=STORY-01-01#2 gate ✗ TDD · failed · tests green on first run — not proven to verify anything (tests/__init__.py, tests/test_nfc_normalization.py, tests/test_skeleton.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.
+[2026-09-18 10:13:04] story=STORY-01-01#2 gate ✗ tests verify story · failed · tests verify nothing — still green without story code (parent SHA 1983974): tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_5_no_forbidden_top_level_imports, tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_6_no_forbidden_runtime_calls
+[2026-09-18 10:13:04] story=STORY-01-01 attempt=2 FAIL $0.00 gate=TDD,tests verify story
+[2026-09-18 10:13:04] story=STORY-01-01 attempt=3 START
+[2026-09-18 10:13:05] story=STORY-01-01#3 agent START timeout=1800s scope=pyproject.toml,ledgerlock/__init__.py,ledgerlock/__main__.py,ledgerlock/format.py,ledgerlock/cli.py,tests/__init__.py,tests/test_skeleton.py,tests/test_nfc_normalization.py,README.md,poetry.lock,uv.lock,pdm.lock,tests,test,pytest.ini,conftest.py
+[2026-09-18 10:14:01] tool=test RUN cmd=python3 -m pytest -v
+[2026-09-18 10:14:02] tool=test PASS exit=0 640ms
+[2026-09-18 10:14:47] tool=test RUN cmd=python3 -m pytest -v
+[2026-09-18 10:14:48] tool=test FAIL exit=1 665ms
+[2026-09-18 10:14:48] tool=test output: E       AssertionError: 1 != 0 : stdout='' stderr="/usr/local/bin/python3: No module named ledgerlock.__main__; 'ledgerlock' is a package and cannot be directly executed\n" · tests/test_skeleton.py:37: AssertionError · _ ACStory0101SkeletonTests.test_AC_STORY_01_01_7_ledger_and_conflict_error_exported _ · self = <tests.test_skeleton.ACStory0101SkeletonTests testMethod=test_AC_STORY_01_01_7_ledger_and_conflict_error_exported> · def test_AC_STORY_01_01_7_ledger_and_conflict_error_exported(self) -> …(+1057 chars, see evidence)
+[2026-09-18 10:14:52] story=STORY-01-01#3 agent DONE ok=False $0.00 turns=40 out_tokens=4388 err=max_turns: stopped at 40 turns (cap 40)
+[2026-09-18 10:14:52] story=STORY-01-01#3 max_turns and the tree is untouched — nothing to grade
+[2026-09-18 10:14:52] story=STORY-01-01 EXHAUSTED 3 attempts $0.00
+[2026-09-18 10:14:52] wave=EPIC-01/w1 DONE 0/1 passed $0.00
+[2026-09-18 10:14:52] epic=EPIC-01 STOPPED at=EPIC-01 · wave 1
+[2026-09-18 10:14:52] sprint DONE $0.00 stopped=EPIC-01 · wave 1

@@ -1585,7 +1585,23 @@
    "fixed_by": "a survivor is a process still in the killed pgid; the broader listing is kept as `processes_after` (nothing measured is discarded). Run 1 recomputed from its preserved evidence: orphan_state 0",
    "status": "FIXED",
    "severity_rule": "P2: a false RED in a stop criterion — it cannot produce a false qualification, but it degrades a measurement the program relies on"
+  },
+  {
+   "id": "SS-79",
+   "family": "FAM-QUALIFICATION-MEASUREMENT",
+   "fix_family": "F6-QUALIFICATION-INFRASTRUCTURE",
+   "severity": "P1",
+   "invariants": [
+    "INV-T.QUALIFICATION-REGISTER"
+   ],
+   "site": "closure-evidence/hardening/w1/w1_driver.py::finish (hidden-oracle result parsing) and classify_oracle (SKIPPED handling)",
+   "statement": "the oracle's per-test outcomes were read from pytest's `-rA` short summary, where a skip line carries no test id ('SKIPPED [1] file.py:72: reason'): W1 run 2's nine skipped checks collapsed into ONE entry named '[1]' and eight outcomes were lost from the record. Compounding it, SKIPPED was treated like PASSED by the classifier, so on a DELIVERY_COMPLETE run an oracle that never executed would have read as an oracle that passed — the exact shape of a false qualification.",
+   "reproducer": "tests/hardening/test_w1_oracle_ownership.py::TestOracleResultParsing (nine verbose skip lines must yield nine named outcomes; a parse that loses outcomes is rejected) and ::TestSkippedIsNeverAPass",
+   "provenance": "found by reading W1 run 2's empty red_classes instead of accepting it, 2026-09-18; run 2 delivered nothing, so every oracle check skipped",
+   "fixed_by": "pytest runs with -v and parse_oracle() reconciles the recovered outcomes against pytest's own totals — a parse that does not account for every counted outcome fails the phase; SKIPPED/XFAIL are classified ORACLE_NOT_EXECUTED on a complete delivery (blocks qualification) and INCOMPLETE_DELIVERY_EXPECTED_SKIP otherwise; `oracle_passed_completely` requires a complete delivery with every check green",
+   "status": "FIXED",
+   "severity_rule": "P1: a check that did not execute reading as a check that passed is a qualification gate passing falsely"
   }
  ],
- "updated": "2026-09-18: +SS-77 (W1 false-pass detector vacuous on partial runs), +SS-78 (orphan-state criterion counted unrelated processes) — both found by reading the W1 run 1 result instead of accepting it, both fixed before any W1 verdict rested on them"
+ "updated": "2026-09-18: +SS-77, +SS-78, +SS-79 — three W1 measurement defects, each found by reading a run's own result rather than accepting it, each fixed before any W1 verdict rested on it"
 }

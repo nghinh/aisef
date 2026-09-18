@@ -57,6 +57,25 @@ def _is_preparation_commit(line: str) -> bool:
 
 # ---- oracle ownership model (owner decision "COMPLETE W1 RUNS 2-3", section 1) ---------------------------------------
 # Pure so it can carry deterministic negative controls: tests/hardening/test_w1_oracle_ownership.py.
+def parse_oracle(stdout: str) -> dict:
+    """SS-79: per-test outcomes from `pytest -v`, reconciled against pytest's own totals.
+
+    The previous parser read the `-rA` short summary, where a skip line carries no test id
+    ("SKIPPED [1] file.py:72: reason"): nine skipped checks collapsed into one entry called "[1]" and eight outcomes
+    were lost. A parse that does not account for every test pytest counted is rejected, never quietly believed.
+    """
+    res = {}
+    for m in re.finditer(r"^(\S+::\S+?)\s+(PASSED|FAILED|ERROR|SKIPPED|XFAIL|XPASS)\b", stdout, re.M):
+        res[m.group(1).split("::", 1)[1] if "::" in m.group(1) else m.group(1)] = m.group(2)
+    totals, tail = {}, stdout.strip().splitlines()[-1] if stdout.strip() else ""
+    for n, word in re.findall(r"(\d+) (passed|failed|error|errors|skipped|xfailed|xpassed)", tail):
+        totals[word.rstrip("s") if word != "passed" else word] = totals.get(word, 0) + int(n)
+    counted = sum(totals.values())
+    return {"results": res, "pytest_totals": totals, "parsed": len(res),
+            "complete": bool(res) and counted == len(res),
+            "why": "" if (res and counted == len(res)) else f"pytest counted {counted} outcomes, the parse recovered {len(res)}"}
+
+
 def cost_semantics(cost_md: str, cap_usd) -> dict:
     """Owner decision section 2: a cap the provider never priced is UNVERIFIABLE, not "not reached". Usage is preserved
     as measured; prices are never invented. If pricing appears later, cost = input_tokens/1e6 * p + output_tokens/1e6 * q."""
@@ -95,10 +114,16 @@ def classify_oracle(results: dict, fr_map: dict, covers: dict, state: dict) -> d
     ownership = fr_map.get("ownership", {})
     done = {sid for sid, st in state.items() if st.get("status") == "done"}
     complete = bool(state) and len(state) == len(covers) and all(st.get("status") == "done" for st in state.values())
-    rows, counts = [], {}
+    rows, counts, skipped = [], {}, []
     for test, verdict in results.items():
         name = test.split("::")[-1]
-        if verdict in ("PASSED", "SKIPPED"):
+        if verdict == "PASSED":
+            continue
+        if verdict in ("SKIPPED", "XFAIL"):
+            # SS-79: a check that did not execute is not a check that passed. On a complete delivery that is a gap in
+            # the oracle evidence; on an incomplete one it is the expected consequence of nothing being delivered.
+            skipped.append({"test": test, "verdict": verdict,
+                            "classification": "ORACLE_NOT_EXECUTED" if complete else "INCOMPLETE_DELIVERY_EXPECTED_SKIP"})
             continue
         kind, frs = ownership.get(name), fr_map.get(name, [])
         owners = sorted(sid for sid, c in covers.items() if any(fr in c for fr in frs))
@@ -119,12 +144,15 @@ def classify_oracle(results: dict, fr_map: dict, covers: dict, state: dict) -> d
         counts[cls] = counts.get(cls, 0) + 1
     fp = [r for r in rows if r["classification"] in ("FALSE_PASS", "POTENTIAL_FALSE_PASS")]
     errs = [r for r in rows if r["classification"] == "ORACLE_MAPPING_ERROR"]
+    not_executed = [x for x in skipped if x["classification"] == "ORACLE_NOT_EXECUTED"]
     return {"reds": rows, "counts": counts, "delivery_complete": complete,
+            "skipped": skipped, "oracle_not_executed": not_executed, "oracle_not_executed_count": len(not_executed),
+            "oracle_passed_completely": complete and not rows and not skipped and bool(results),
             "false_pass": fp, "false_pass_count": len(fp),
             "oracle_mapping_errors": errs, "oracle_mapping_error_count": len(errs),
             "story_owned_reds_expected": [r["test"] for r in rows if r["ownership"] == "STORY_OWNED" and r["classification"] == "INCOMPLETE_DELIVERY_EXPECTED_RED"],
             "project_global_reds_expected": [r["test"] for r in rows if r["ownership"] == "PROJECT_GLOBAL" and r["classification"] == "INCOMPLETE_DELIVERY_EXPECTED_RED"],
-            "classifiable": not errs and bool(state)}
+            "classifiable": not errs and bool(state) and not not_executed}
 
 
 def classify_run(state: dict, total_stories: int, safety_violations: list, human_markers: list) -> str:
@@ -535,13 +563,13 @@ class Driver:
                               "has_package": (deliv / "ledgerlock").is_dir(), "files": sorted(str(p.relative_to(deliv)) for p in deliv.rglob("*.py") if ".git" not in p.parts)[:80]}
             obs = self.run_dir / "oracle-observations.jsonl"
             env = dict(self.env(), AISEF_W1_PROJECT=str(deliv), AISEF_W1_ORACLE_OBSERVATIONS=str(obs))
-            r = subprocess.run([self.a.oracle_python, "-m", "pytest", str(HERE / "oracle/test_oracle.py"), "-q", "-rA", "-p", "no:cacheprovider", "--tb=short"],
+            r = subprocess.run([self.a.oracle_python, "-m", "pytest", str(HERE / "oracle/test_oracle.py"), "-v", "-rA", "-p", "no:cacheprovider", "--tb=short"],
                                capture_output=True, text=True, encoding="utf-8", errors="replace", env=env, cwd=str(HERE), timeout=1800)
             (self.run_dir / "oracle.txt").write_text(r.stdout + "\n--- stderr ---\n" + r.stderr, encoding="utf-8")
-            res = {}
-            for mm in re.finditer(r"^(PASSED|FAILED|ERROR|SKIPPED) (\S+)", r.stdout, re.M):
-                res[mm.group(2).split("::", 1)[1] if "::" in mm.group(2) else mm.group(2)] = mm.group(1)
+            parsed = parse_oracle(r.stdout)
+            res = parsed["results"]
             F["oracle"] = {"sha256": sha(HERE / "oracle/test_oracle.py"), "exit": r.returncode, "results": res,
+                           "pytest_totals": parsed["pytest_totals"], "parse_complete": parsed["complete"], "parse_note": parsed["why"],
                            "observations": [json.loads(l) for l in obs.read_text(encoding="utf-8").splitlines()] if obs.is_file() else []}
         # exit criteria (SCALE-QUALIFICATION W1) — computed, not asserted
         fr_map = json.loads((HERE / "oracle-fr-map.json").read_text(encoding="utf-8")) if (HERE / "oracle-fr-map.json").is_file() else {}
@@ -567,7 +595,8 @@ class Driver:
         F["exit_criteria"] = {
             "false_pass": oc["false_pass"], "false_pass_count": oc["false_pass_count"],
             "oracle_mapping_errors": oc["oracle_mapping_errors"], "oracle_mapping_error_count": oc["oracle_mapping_error_count"],
-            "oracle_red_classes": oc["counts"],
+            "oracle_red_classes": oc["counts"], "oracle_skipped": oc["skipped"],
+            "oracle_not_executed_count": oc["oracle_not_executed_count"], "oracle_passed_completely": oc["oracle_passed_completely"],
             "story_owned_reds_expected_due_incomplete_owners": oc["story_owned_reds_expected"],
             "project_global_reds_expected_due_incomplete_delivery": oc["project_global_reds_expected"],
             "manual_state_repair": 0, "manual_state_repair_note": "the driver never writes _bmad-output; the only project writes are the guard commit and the ARB-1 re-approval through the CLI",
@@ -582,13 +611,16 @@ class Driver:
             + ([f"oracle_mapping_errors={oc['oracle_mapping_error_count']}"] if oc["oracle_mapping_error_count"] else []) \
             + ([f"orphan_state={len(orphan)}"] if orphan else []) \
             + ([f"drift_records={len(F['drift_records'])}"] if F["drift_records"] else []) \
-            + ([] if state else ["story_state_missing"])
+            + ([] if state else ["story_state_missing"]) \
+            + ([] if F["oracle"]["parse_complete"] else [f"oracle_parse_incomplete: {F['oracle']['parse_note']}"]) \
+            + ([f"oracle_not_executed={oc['oracle_not_executed_count']}"] if oc["oracle_not_executed"] else [])
         F["run_classification"] = classify_run(state, len(covers), F["safety_violations"], human_markers)
         F["exit_criteria"]["run_classification"] = F["run_classification"]
         F["exit_criteria"]["safety_violations"] = F["safety_violations"]
         # Delivery quality is only reportable from a complete delivery (owner section 7).
         F["oracle_aggregate_reportable_as_delivery_quality"] = F["run_classification"] == "DELIVERY_COMPLETE"
-        F["ok"] = bool(F["oracle"]["results"]) and F["progress"] is not None and bool(state) and oc["classifiable"]
+        F["ok"] = bool(F["oracle"]["results"]) and F["oracle"]["parse_complete"] and F["progress"] is not None \
+            and bool(state) and oc["classifiable"]
         self.rec["phases"]["finish"] = F
         self.save()
         rec = {"run": self.a.run, "generated": now(), "candidate": self.rec["phases"].get("prepare", {}).get("freeze"),

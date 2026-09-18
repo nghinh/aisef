@@ -1,6 +1,104 @@
 {
  "run": 2,
- "project": "/Users/nghinh/Downloads/projects/w1-run-2",
+ "generated": "2026-09-18T10:24:18+0700",
+ "candidate": {
+  "generated": "2026-09-18T06:58:42+0700",
+  "candidate_sha": "af94372dd1861e2fcac1c5f6e3c4102efa27e829",
+  "aisef_tree_digest": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+  "PHASE12_KERNEL_DIGEST": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+  "tree_equals_phase12_kernel": true,
+  "version_string": "aisef 1.7.6",
+  "wheel": {
+   "file": "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/dist/aisef-1.7.6-py3-none-any.whl",
+   "sha256": "2e08d43b61d6647692b731943741f64f7fa8f107e53dacf06bb92bbc1c9bfe8e",
+   "bytes": 667615,
+   "built_with": "build 1.6.1 (/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/build-venv/lib/python3.14/site-packages/build)"
+  },
+  "run_venv": {
+   "path": "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv",
+   "aisef_file": "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/lib/python3.14/site-packages/aisef/__init__.py",
+   "installed_from_the_wheel": true
+  },
+  "oracle_venv": {
+   "path": "/Users/nghinh/Downloads/projects/aisef-freeze/oracle-venv",
+   "packages": [
+    {
+     "name": "coverage",
+     "version": "7.16.1"
+    },
+    {
+     "name": "pytest",
+     "version": "9.1.1"
+    }
+   ]
+  },
+  "docker_image": {
+   "name": "aisef-verify-python:84adf1d8eaf9",
+   "id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+  },
+  "docker_image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+  "opencode_version": "1.18.31",
+  "ci": {
+   "run": "35287072415",
+   "sha": "af94372dd1861e2fcac1c5f6e3c4102efa27e829",
+   "conclusion": "success",
+   "jobs": {
+    "wheel": "success",
+    "unit (ubuntu-latest, 3.14)": "success",
+    "lint": "success",
+    "unit (ubuntu-latest, 3.12)": "success",
+    "unit (windows-latest, 3.11)": "success",
+    "unit (ubuntu-latest, 3.11)": "success",
+    "unit (ubuntu-latest, 3.13)": "success"
+   }
+  },
+  "ci_matches_candidate": true,
+  "w0": {
+   "path": "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/AISEF-W0-QUALIFICATION.json",
+   "qualified": true,
+   "sha": "0a7cab86086ebc496bcda1559142082c89506c29",
+   "aisef_tree": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+   "tree_matches_frozen": true
+  },
+  "no_tag_no_publish": true,
+  "rule": "W1 runs use run_venv's aisef only; any aisef/ change after this record voids it and the W1 runs that rest on it",
+  "pass": true
+ },
+ "aisef": {
+  "aisef_version": "aisef 1.7.6",
+  "aisef_file": "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/lib/python3.14/site-packages/aisef/__init__.py",
+  "opencode_version": "1.18.31",
+  "docker_image": {
+   "name": "aisef-verify-python:84adf1d8eaf9",
+   "id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+  }
+ },
+ "arbitrations": [
+  {
+   "id": "ARB-1",
+   "kernel_first": "kernel refused the STALE gate before any agent call (ARB-1 kernel path first)",
+   "approval": {
+    "gate": "readiness",
+    "artifact": "stories.index.json, design-contract.json",
+    "artifact_sha256": "32736048f968b74ec2cce5f010d465f045b4048b097d36476d13d3e6ada6a206",
+    "status": "approved",
+    "seq": 11,
+    "decided_by": "nghinh",
+    "decided_at": "2026-09-18T03:03:12+00:00",
+    "note": "ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for byte-identical content after the hash-method change (SS-55 verifier-config digest); not a waiver; kernel refusal recorded first; conditions measured in closure-evidence/hardening/w1/ARBITRATION-PREDECLARED.json",
+    "machine_checks": {},
+    "history": [
+     {
+      "status": "approved",
+      "decided_by": "nghinh",
+      "decided_at": "2026-09-15T13:32:32+00:00",
+      "note": "",
+      "artifact_sha256": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838"
+     }
+    ]
+   }
+  }
+ ],
  "phases": {
   "prepare": {
    "at": "2026-09-18T10:02:23+0700",
@@ -845,5 +943,114 @@
    "ok": true
   }
  },
- "updated": "2026-09-18T10:24:18+0700"
+ "exit_criteria": {
+  "false_pass": [],
+  "false_pass_count": 0,
+  "oracle_mapping_errors": [],
+  "oracle_mapping_error_count": 0,
+  "oracle_red_classes": {},
+  "oracle_skipped": [
+   {
+    "test": "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger",
+    "verdict": "SKIPPED",
+    "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+   },
+   {
+    "test": "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+    "verdict": "SKIPPED",
+    "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+   },
+   {
+    "test": "TestAcceptance::test_14_3_apply_batch_commits_atomically",
+    "verdict": "SKIPPED",
+    "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+   },
+   {
+    "test": "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
+    "verdict": "SKIPPED",
+    "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+   },
+   {
+    "test": "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover",
+    "verdict": "SKIPPED",
+    "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+   },
+   {
+    "test": "TestAcceptance::test_14_6_no_third_party_imports_at_runtime",
+    "verdict": "SKIPPED",
+    "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+   },
+   {
+    "test": "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
+    "verdict": "SKIPPED",
+    "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+   },
+   {
+    "test": "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value",
+    "verdict": "SKIPPED",
+    "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+   },
+   {
+    "test": "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts",
+    "verdict": "SKIPPED",
+    "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+   }
+  ],
+  "oracle_not_executed_count": 0,
+  "oracle_passed_completely": false,
+  "story_owned_reds_expected_due_incomplete_owners": [],
+  "project_global_reds_expected_due_incomplete_delivery": [],
+  "manual_state_repair": 0,
+  "manual_state_repair_note": "the driver never writes _bmad-output; the only project writes are the guard commit and the ARB-1 re-approval through the CLI",
+  "orphan_state": [],
+  "orphan_state_count": 0,
+  "drift_records": [],
+  "oracle_ran": true,
+  "resumes_forced": 0,
+  "markers_not_reached": [
+   "wave=EPIC-01/w3 DONE",
+   "wave=EPIC-03/w1 DONE"
+  ],
+  "stops": [
+   "[2026-09-18 10:14:52] epic=EPIC-01 STOPPED at=EPIC-01 · wave 1"
+  ],
+  "story_state_source": "_bmad-output/sprint-status.json",
+  "run_classification": "LEGITIMATE_MODEL_PROJECT_STOP",
+  "safety_violations": []
+ },
+ "oracle": {
+  "sha256": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+  "exit": 0,
+  "results": {
+   "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "SKIPPED",
+   "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "SKIPPED",
+   "TestAcceptance::test_14_3_apply_batch_commits_atomically": "SKIPPED",
+   "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "SKIPPED",
+   "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "SKIPPED",
+   "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "SKIPPED",
+   "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "SKIPPED",
+   "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "SKIPPED",
+   "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "SKIPPED"
+  },
+  "pytest_totals": {
+   "skipped": 9
+  },
+  "parse_complete": true,
+  "parse_note": "",
+  "observations": []
+ },
+ "stories": {
+  "STORY-01-01": {
+   "status": "failed",
+   "reason": "tried 3 attempts, still did not pass gate",
+   "journal_last_step": "attempt.committed",
+   "journal_records": 10,
+   "state_status": "failed",
+   "attempts": 3
+  }
+ },
+ "progress": {
+  "done": 0,
+  "total": 16
+ }
 }

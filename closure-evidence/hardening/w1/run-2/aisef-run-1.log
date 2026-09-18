@@ -1,0 +1,53 @@
+EPIC-01 · wave 1
+STORY-01-01: NOT DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✗ lint — I001 [*] Import block is un-sorted or un-formatted
+   --> ledgerlock/__main__.py:1:1
+    |
+  1 | / from __future__ import annotations
+  2 | |
+  3 | | from ledgerlock.cli import main
+    | |_______________________________^
+  help: Organize imports
+    |
+  4 |
+    -
+  5 | if __name__ == "__main__":
+    |
+  
+  Found 1 error.
+  [*] 
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✗ TDD — tests green on first run — not proven to verify anything (tests/__init__.py, tests/test_nfc_normalization.py, tests/test_skeleton.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.
+    ✗ tests verify story — tests verify nothing — still green without story code (parent SHA 1983974): tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_5_no_forbidden_top_level_imports, tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_6_no_forbidden_runtime_calls
+    ✅ security
+    ✗ review — 1 blocking items: [block] ledgerlock/__init__.py:36 — File has no trailing newline; pyproject.toml has no [tool.ruff] config so ruff's default 'format' rule applies; AGENTS.md mandates `ruff format --check .` as a qual
+    – preservation — story does not touch any VERIFIED behaviour of other stories
+  [attempt 2] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✗ TDD — tests green on first run — not proven to verify anything (tests/__init__.py, tests/test_nfc_normalization.py, tests/test_skeleton.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.
+    ✗ tests verify story — tests verify nothing — still green without story code (parent SHA 1983974): tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_5_no_forbidden_top_level_imports, tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_6_no_forbidden_runtime_calls
+    ✅ security
+    ✅ review
+    – preservation — story does not touch any VERIFIED behaviour of other stories
+  [attempt 3] max_turns: stopped at 40 turns (cap 40)
+  ✗ tried 3 attempts, still did not pass gate
+
+⏸ stopped at EPIC-01 · wave 1
