@@ -1,9 +1,9 @@
 {
- "run": 2,
- "project": "/Users/nghinh/Downloads/projects/w1-run-2",
+ "run": 3,
+ "project": "/Users/nghinh/Downloads/projects/w1-run-3",
  "phases": {
   "prepare": {
-   "at": "2026-09-18T10:02:23+0700",
+   "at": "2026-09-18T10:25:11+0700",
    "aisef_version": "aisef 1.7.6",
    "aisef_file": "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/lib/python3.14/site-packages/aisef/__init__.py",
    "aisef_from_the_wheel_not_the_checkout": true,
@@ -72,15 +72,15 @@
     "pass": true
    },
    "project_git": {
-    "head": "198397460b58803fe111f0650cd17ba4ea1ecf2f",
+    "head": "53a6425d7cdafb3741571194ff8acc2c72dc45a5",
     "branch": "master",
     "status": [],
     "log": [
-     "1983974 w1-run-2: guard plugin compiled by aisef 1.7.6 — a story worktree is a fresh checkout (P20 preparation, not an AISEF change)",
-     "e01ed3b w1-run-2: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
-     "3767a80 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)",
+     "53a6425 w1-run-3: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "2655265 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)",
      "8ff9f13 epics.md: split to 16 stories (each ≤7 AC, ≤16 complexity) — second plan attempt passed",
-     "35f33e7 evidence: initial AISEF plan attempt, machine-gate failures captured"
+     "35f33e7 evidence: initial AISEF plan attempt, machine-gate failures captured",
+     "6a8d60c docs: initial LedgerLock requirements (NFC, hash chain, idempotency, atomic batch, exit codes, 3.11+ stdlib)"
     ]
    },
    "config": {
@@ -105,8 +105,8 @@
      "doctor"
     ],
     "exit": 0,
-    "seconds": 2.8,
-    "stdout_tail": "Environment:\n  ✅ python >= 3.11 — 3.14.7\n  ✅ git\n  ✅ claude CLI — /opt/homebrew/bin/claude\n  ✅ opencode CLI — /Users/nghinh/.opencode/bin/opencode\n  ✅ agent credential — ANTHROPIC_BASE_URL set in the environment — these outrank the client's own login; unset them to use it\n  ✅ docker daemon — running\n  ○ playwright + chromium — playwright not installed — run: npm i -D playwright && npx playwright install chromium — cannot extract mockup contracts\nProject:\n  ✅ project directory — /Users/nghinh/Downloads/projects/w1-run-2\n  ✅ sandbox provider — docker — guarantees at WORKSPACE_WRITE: network_none, non_root, secrets_absent\n  ✅ sandbox image — aisef-verify-python:84adf1d8eaf9 — built by the harness: pinned base, pinned tool versions\n  · role test — explicit → `python3 -m pytest -v`\n  · role lint — explicit → `ruff check . --exclude .claude --exclude .aisef --exclude .opencode`\n  · role sast — auto: bandit (managed, pinned 1.9.4) → `bandit -q -r .`\n  ✅ tool tools.test — `tools.test` = `python3 -m pytest -v` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ tool tools.lint — `tools.lint` = `ruff check . --exclude .claude --exclude .aisef --exclude .opencode` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ tool tools.sast — `tools.sast` = `bandit -q -r .` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ docs/requirements.md — /Users/nghinh/Downloads/projects/w1-run-2/docs/requirements.md\n  ✅ OpenCode plugin in worktree — `.opencode/plugin` committed — worktree has plugin\n  ✅ hook opencode has all guards — 10 guards\n  ✅ hook points to this project — `--project`/`PROJECT` path in hook matches this directory\n  ✅ config — defaults → /Users/nghinh/Downloads/projects/w1-run-2/.ai/config.json\n  ○ budget cap above recorded spend — no `_bmad-output/budget.json` yet — nothing to compare; the first settled call writes it\n  ○ test command prints coverage — `tools.test` = `python3 -m pytest -v` does not print coverage — gate coverage check will be **not configured** (add `--coverage` / `--cov` / `--experimental-test-coverage`)\n  ✅ test command prints test names — gate can read test names (no evidence yet — guessing from command flags)\nInstalled skills:\n  ✅ has skills — 158 directories\n  ✅ framework skills up to date — matches source\n  ✅ no offensive skills — clean\n\n✅ ready\n",
+    "seconds": 2.6,
+    "stdout_tail": "Environment:\n  ✅ python >= 3.11 — 3.14.7\n  ✅ git\n  ✅ claude CLI — /opt/homebrew/bin/claude\n  ✅ opencode CLI — /Users/nghinh/.opencode/bin/opencode\n  ✅ agent credential — ANTHROPIC_BASE_URL set in the environment — these outrank the client's own login; unset them to use it\n  ✅ docker daemon — running\n  ○ playwright + chromium — playwright not installed — run: npm i -D playwright && npx playwright install chromium — cannot extract mockup contracts\nProject:\n  ✅ project directory — /Users/nghinh/Downloads/projects/w1-run-3\n  ✅ sandbox provider — docker — guarantees at WORKSPACE_WRITE: network_none, non_root, secrets_absent\n  ✅ sandbox image — aisef-verify-python:84adf1d8eaf9 — built by the harness: pinned base, pinned tool versions\n  · role test — explicit → `python3 -m pytest -v`\n  · role lint — explicit → `ruff check . --exclude .claude --exclude .aisef --exclude .opencode`\n  · role sast — auto: bandit (managed, pinned 1.9.4) → `bandit -q -r .`\n  ✅ tool tools.test — `tools.test` = `python3 -m pytest -v` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ tool tools.lint — `tools.lint` = `ruff check . --exclude .claude --exclude .aisef --exclude .opencode` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ tool tools.sast — `tools.sast` = `bandit -q -r .` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ docs/requirements.md — /Users/nghinh/Downloads/projects/w1-run-3/docs/requirements.md\n  ✅ config — defaults → /Users/nghinh/Downloads/projects/w1-run-3/.ai/config.json\n  ○ budget cap above recorded spend — no `_bmad-output/budget.json` yet — nothing to compare; the first settled call writes it\n  ○ test command prints coverage — `tools.test` = `python3 -m pytest -v` does not print coverage — gate coverage check will be **not configured** (add `--coverage` / `--cov` / `--experimental-test-coverage`)\n  ✅ test command prints test names — gate can read test names (no evidence yet — guessing from command flags)\nInstalled skills:\n  ✅ has skills — 158 directories\n  ✅ framework skills up to date — matches source\n  ✅ no offensive skills — clean\n\n✅ ready\n",
     "stderr_tail": ""
    },
    "doctor_red": [],
@@ -116,9 +116,24 @@
     "independence_verdict": "PASS"
    },
    "oracle_ok": true,
+   "compile": {
+    "cmd": [
+     "aisef",
+     "compile",
+     "--client",
+     "opencode",
+     "--bin",
+     "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/bin/aisef"
+    ],
+    "exit": 0,
+    "seconds": 0.1,
+    "stdout_tail": "client: opencode\n  second-tier in V1: cost/turns not measurable from harness — supported, does not block release\n  wrote /Users/nghinh/Downloads/projects/w1-run-3/.opencode/plugin/aisef-guard.ts\n  guards blocking before action: destructive, egress, git-stage, injection, process-ref, secret, tool-bypass, write-scope\n  guards blocking at other hooks: diff-scope (PostToolUse)\n  ⚠️  guards post-hoc only: completion\n     — not wired into this client's hooks at all; the rule is re-asked afterwards from evidence (story gate, `aisef verify`), which cannot stop the action, only fail the story\n  capabilities not at native level:\n     dir_allowlist: unsupported\n     tool_allowlist: emulated\n     turn_limit: unsupported\n\nreport: /Users/nghinh/Downloads/projects/w1-run-3/_bmad-output/compile-report.json\n\n⚠️  some clients can only be checked later — lower assurance, noted in report\n",
+    "stderr_tail": ""
+   },
+   "guard_commit": "c3ab20f59f18145a27e29d2bb6e79c561f331c8b",
    "guard_plugin": {
     "tracked_now": true,
-    "sha256": "70912bc11bda039343bfb01acb5aa392ff789fa3774fcbc72e6f4591302d4953",
+    "sha256": "ac496617b64a3c3d1ec31893431df732f481253da6dd4c72a8fb25beee4efdec",
     "bin_line": "const BIN = [\"/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/bin/aisef\"]",
     "compile_report": {
      "clients": [
@@ -153,11 +168,11 @@
    },
    "fresh_topology": {
     "head_branch": "master",
-    "master": "198397460b58803fe111f0650cd17ba4ea1ecf2f",
+    "master": "c3ab20f59f18145a27e29d2bb6e79c561f331c8b",
     "commits_after_8ff9f13": [
-     "1983974 w1-run-2: guard plugin compiled by aisef 1.7.6 — a story worktree is a fresh checkout (P20 preparation, not an AISEF change)",
-     "e01ed3b w1-run-2: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
-     "3767a80 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)"
+     "c3ab20f w1-run-3: guard plugin compiled by aisef 1.7.6 — a story worktree is a fresh checkout (P20 preparation, not an AISEF change)",
+     "53a6425 w1-run-3: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "2655265 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)"
     ],
     "ledgerlock_dir_absent_at_master": true,
     "remotes": [],
@@ -306,7 +321,7 @@
     "opencode_version": "1.18.31",
     "plugin_bin": "const BIN = [\"/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/bin/aisef\"]",
     "worktrees": [
-     "/Users/nghinh/Downloads/projects/w1-run-2 1983974 [master]"
+     "/Users/nghinh/Downloads/projects/w1-run-3 c3ab20f [master]"
     ],
     "stories": 16,
     "docker_image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
@@ -327,7 +342,7 @@
    "ok": true
   },
   "kernel_first": {
-   "at": "2026-09-18T10:03:07+0700",
+   "at": "2026-09-18T10:25:17+0700",
    "agent_starts_before": 5,
    "evidence_before": [],
    "gates_before": {
@@ -360,7 +375,7 @@
    "classification": "kernel refused the STALE gate before any agent call (ARB-1 kernel path first)"
   },
   "approve": {
-   "at": "2026-09-18T10:03:07+0700",
+   "at": "2026-09-18T10:25:18+0700",
    "gates_before": {
     "prd": "approved",
     "architecture": "approved",
@@ -391,7 +406,7 @@
      "ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for byte-identical content after the hash-method change (SS-55 verifier-config digest); not a waiver; kernel refusal recorded first; conditions measured in closure-evidence/hardening/w1/ARBITRATION-PREDECLARED.json"
     ],
     "exit": 0,
-    "seconds": 4.2,
+    "seconds": 3.2,
     "stdout_tail": "\n✗ 2/16 stories not yet eligible:\n  MISSING EVIDENCE STORY-02-01\n    - verify.e2e — story declares in `verification_contract`. configure `verify.e2e`\n  MISSING EVIDENCE STORY-03-01\n    - verify.e2e — story declares in `verification_contract`. configure `verify.e2e`\n✅ readiness approved by nghinh\n",
     "stderr_tail": ""
    },
@@ -412,7 +427,7 @@
     "status": "approved",
     "seq": 11,
     "decided_by": "nghinh",
-    "decided_at": "2026-09-18T03:03:12+00:00",
+    "decided_at": "2026-09-18T03:25:21+00:00",
     "note": "ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for byte-identical content after the hash-method change (SS-55 verifier-config digest); not a waiver; kernel refusal recorded first; conditions measured in closure-evidence/hardening/w1/ARBITRATION-PREDECLARED.json",
     "machine_checks": {},
     "history": [
@@ -431,45 +446,15 @@
    "ok": true
   },
   "run": {
-   "at": "2026-09-18T10:03:18+0700",
+   "at": "2026-09-18T10:25:28+0700",
    "invocations": [
     {
      "k": 1,
-     "pid": 50956,
-     "pgid": 50956,
-     "started": "2026-09-18T10:03:18+0700",
-     "t0": 1789700598.980057,
-     "exit": 2,
-     "ended": "2026-09-18T10:14:54+0700",
-     "seconds": 696.0,
-     "killed": null,
-     "stdout_tail": [
-      "    ✗ TDD — tests green on first run — not proven to verify anything (tests/__init__.py, tests/test_nfc_normalization.py, tests/test_skeleton.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.",
-      "    ✗ tests verify story — tests verify nothing — still green without story code (parent SHA 1983974): tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_5_no_forbidden_top_level_imports, tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_6_no_forbidden_runtime_calls",
-      "    ✅ security",
-      "    ✗ review — 1 blocking items: [block] ledgerlock/__init__.py:36 — File has no trailing newline; pyproject.toml has no [tool.ruff] config so ruff's default 'format' rule applies; AGENTS.md mandates `ruff format --check .` as a qual",
-      "    – preservation — story does not touch any VERIFIED behaviour of other stories",
-      "  [attempt 2] gate failed",
-      "    ✅ evidence matches candidate",
-      "    ✅ guard ran",
-      "    ✅ test",
-      "    ✅ no baseline regression",
-      "    ✅ lint",
-      "    ✅ write scope",
-      "    – mockup map — story has no UI",
-      "    ✅ real tests",
-      "    ✅ criteria have tests",
-      "    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command",
-      "    ✗ TDD — tests green on first run — not proven to verify anything (tests/__init__.py, tests/test_nfc_normalization.py, tests/test_skeleton.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.",
-      "    ✗ tests verify story — tests verify nothing — still green without story code (parent SHA 1983974): tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_5_no_forbidden_top_level_imports, tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_6_no_forbidden_runtime_calls",
-      "    ✅ security",
-      "    ✅ review",
-      "    – preservation — story does not touch any VERIFIED behaviour of other stories",
-      "  [attempt 3] max_turns: stopped at 40 turns (cap 40)",
-      "  ✗ tried 3 attempts, still did not pass gate",
-      "",
-      "⏸ stopped at EPIC-01 · wave 1"
-     ]
+     "pid": 59086,
+     "pgid": 59086,
+     "started": "2026-09-18T10:25:28+0700",
+     "t0": 1789701928.647854,
+     "crashed_driver": true
     }
    ],
    "resumes": [],
@@ -478,22 +463,21 @@
     "wave=EPIC-03/w1 DONE"
    ],
    "runlog_offset_at_start": 9298,
-   "ended": "2026-09-18T10:14:54+0700",
-   "terminal_exit": 2,
-   "markers_not_reached": [
-    "wave=EPIC-01/w3 DONE",
-    "wave=EPIC-03/w1 DONE"
-   ],
-   "runlog_lines_epic": [
-    "[2026-09-18 10:03:21] epic=EPIC-01 START",
-    "[2026-09-18 10:03:21] wave=EPIC-01/w1 START stories=STORY-01-01",
-    "[2026-09-18 10:14:52] wave=EPIC-01/w1 DONE 0/1 passed $0.00",
-    "[2026-09-18 10:14:52] epic=EPIC-01 STOPPED at=EPIC-01 · wave 1"
-   ],
-   "ok": true
+   "reconstructed_after_SS80": {
+    "what_happened": "the driver read the 'wave=EPIC-01/w3 DONE' marker at 10:46:15 and signalled the process group, but the aisef run had already ended by itself at 10:46:13 (sprint DONE). os.killpg raised PermissionError and the driver died before writing the invocation's exit code.",
+    "measured_now": {
+     "processes_left_in_pgid_59086": 0,
+     "aisef_or_driver_processes_alive": 0,
+     "sprint_terminal_line": "[2026-09-18 10:46:13] sprint DONE $0.00 stopped=EPIC-01 · wave 3"
+    },
+    "exit_code_of_the_aisef_run": null,
+    "exit_code_not_recorded_because": "the driver crashed before reading it; it is left null rather than assumed from runs 1-2",
+    "run_outcome_is_unaffected": "the sprint had already reached its own terminal state; no story work happened after 10:46:13",
+    "defect": "SS-80"
+   }
   },
   "finish": {
-   "at": "2026-09-18T10:56:26+0700",
+   "at": "2026-09-18T10:56:29+0700",
    "status": {
     "cmd": [
      "aisef",
@@ -501,7 +485,7 @@
     ],
     "exit": 2,
     "seconds": 0.2,
-    "stdout_tail": "Progress: 0/16 stories done (15 not started)\nActive epics: EPIC-01\n\n  failed      1\n\nCost: $0.00\nAgent runs: ok 16 · max_turns 3\n\n✗ 1 stories not passing:\n    STORY-01-01      failed   tried 3 attempts, still did not pass gate\n",
+    "stdout_tail": "Progress: 2/16 stories done (13 not started)\nActive epics: EPIC-01\n\n  done        2\n  failed      1\n\nCost: $0.00\nAgent runs: ok 22 · max_turns 3\n\n✗ 1 stories not passing:\n    STORY-01-03      failed   deadlock due to plan, reviewer verified: [stuck] ledgerlock/format.py:36 — __all__ does not list line_hash; adding the function without extending __all__ violates the public-API expectation in architecture.md. Fixable inside write_scope once the function is added (finding #1).. Fix the acceptance criteria or the story's write_scope, then re-run — retrying will not resolve this.\n",
     "stderr_tail": ""
    },
    "gates": {
@@ -519,11 +503,11 @@
      "aisef",
      "cost",
      "--out",
-     "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/run-2/cost.md"
+     "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/run-3/cost.md"
     ],
     "exit": 0,
     "seconds": 0.1,
-    "stdout_tail": "# Spend attribution — `w1-run-2`\n\nUnit: **input tokens** — the provider priced 0% of 19 sessions (0.00 USD recorded in total), so dollars here would be invented. With `p` = price per 1M input tokens and `q` = per 1M output:\n\n    cost ≈ 23.94 × p + 0.136 × q\n\nCache reads are 0% of prompt tokens (0 cached vs 23,936,975 fresh); most price lists charge them far less, so they are counted separately.\n\n⚠ At 0% cache, this client bills re-sent context as fresh `input`: the totals below are a sum over turns of the whole prompt and are **not** comparable with a corpus that caches.\n\nNet VERIFIED per M input tokens: **0.00**\n\n0 verified · 10 gap · 0 reopened → net **0** behaviours for 23,936,975 across 19 sessions (309 turns).\n\n## Where the spend went\n\n| class | sessions | turns | tokens | share |\n|---|---|---|---|---|\n| gate-blocked | 4 | 41 | 2,835,576 | 12% |\n| turn-cap | 3 | 120 | 8,591,440 | 36% |\n| planning | 12 | 148 | 12,509,959 | 52% |\n\nSpend on stories that ended with a net VERIFIED behaviour: **0%**.\n\n## Per story\n\nLedger columns **overlap** between stories (one FR can be covered by two), so they do not sum to the corpus counts above.\n\n| story | attempts | tokens | share | passed | gate-blocked | turn-cap | env-failed | no-verdict | verified | gap | reopened | net |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|\n| STORY-01-01 | 2 | 11,427,016 | 48% | — | 2,835,576 | 8,591,440 | — | — | 0 | 10 | 0 | 0 |\n| plan-epics | 0 | 5,687,131 | 24% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-architecture | 0 | 1,344,422 | 6% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-apply | 0 | 1,142,062 | 5% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-project-context | 0 | 960,795 | 4% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-ux | 0 | 675,905 | 3% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-prd | 0 | 642,950 | 3% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-help-version | 0 | 634,922 | 3% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-snapshot | 0 | 553,491 | 2% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-verify | 0 | 500,041 | 2% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-repair-tail | 0 | 368,240 | 2% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| STORY-01-05 | 0 | 0 | 0% | — | — | — | — | — | 0 | 1 | 0 | 0 |\n| STORY-05-02 | 0 | 0 | 0% | — | — | — | — | — | 0 | 1 | 0 | 0 |\n| STORY-05-03 | 0 | 0 | 0% | — | — | — | — | — | 0 | 1 | 0 | 0 |\n\n## What the gate blocked on\n\n| check | blocks |\n|---|---|\n| TDD | 2 |\n| tests verify story | 2 |\n| lint | 1 |\n| review | 1 |\n\n## By role\n\n| role | sessions | turns | tokens | share |\n|---|---|---|---|---|\n| ? | 12 | 148 | 12,509,959 | 52% |\n| developer | 3 | 120 | 8,591,440 | 36% |\n| review | 2 | 32 | 2,261,698 | 9% |\n| security | 2 | 9 | 573,878 | 2% |\n\n\n/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/run-2/cost.md\n",
+    "stdout_tail": "er 1M input tokens and `q` = per 1M output:\n\n    cost ≈ 31.87 × p + 0.149 × q\n\nCache reads are 0% of prompt tokens (0 cached vs 31,868,689 fresh); most price lists charge them far less, so they are counted separately.\n\n⚠ At 0% cache, this client bills re-sent context as fresh `input`: the totals below are a sum over turns of the whole prompt and are **not** comparable with a corpus that caches.\n\nNet VERIFIED per M input tokens: **0.53**\n\n17 verified · 5 gap · 0 reopened → net **17** behaviours for 31,868,689 across 25 sessions (435 turns).\n\n## Where the spend went\n\n| class | sessions | turns | tokens | share |\n|---|---|---|---|---|\n| passed | 5 | 80 | 5,335,419 | 17% |\n| gate-blocked | 5 | 87 | 5,755,875 | 18% |\n| turn-cap | 3 | 120 | 8,267,436 | 26% |\n| planning | 12 | 148 | 12,509,959 | 39% |\n\nSpend on stories that ended with a net VERIFIED behaviour: **61%**.\n\n## Per story\n\nLedger columns **overlap** between stories (one FR can be covered by two), so they do not sum to the corpus counts above.\n\n| story | attempts | tokens | share | passed | gate-blocked | turn-cap | env-failed | no-verdict | verified | gap | reopened | net |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|\n| STORY-01-01 | 2 | 13,921,849 | 44% | 2,749,838 | 2,904,575 | 8,267,436 | — | — | 10 | 0 | 0 | 10 |\n| plan-epics | 0 | 5,687,131 | 18% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| STORY-01-03 | 1 | 2,851,300 | 9% | — | 2,851,300 | — | — | — | 1 | 5 | 0 | 1 |\n| STORY-01-02 | 1 | 2,585,581 | 8% | 2,585,581 | — | — | — | — | 7 | 0 | 0 | 7 |\n| plan-architecture | 0 | 1,344,422 | 4% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-apply | 0 | 1,142,062 | 4% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-project-context | 0 | 960,795 | 3% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-ux | 0 | 675,905 | 2% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-prd | 0 | 642,950 | 2% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-help-version | 0 | 634,922 | 2% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-snapshot | 0 | 553,491 | 2% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-verify | 0 | 500,041 | 2% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-repair-tail | 0 | 368,240 | 1% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| STORY-01-05 | 0 | 0 | 0% | — | — | — | — | — | 2 | 0 | 0 | 2 |\n| STORY-05-01 | 0 | 0 | 0% | — | — | — | — | — | 1 | 0 | 0 | 1 |\n| STORY-05-02 | 0 | 0 | 0% | — | — | — | — | — | 1 | 0 | 0 | 1 |\n| STORY-05-03 | 0 | 0 | 0% | — | — | — | — | — | 1 | 0 | 0 | 1 |\n\n## What the gate blocked on\n\n| check | blocks |\n|---|---|\n| lint | 2 |\n| criteria have tests | 1 |\n| no baseline regression | 1 |\n| preservation | 1 |\n| review | 1 |\n| test | 1 |\n| tests verify story | 1 |\n\n## By role\n\n| role | sessions | turns | tokens | share |\n|---|---|---|---|---|\n| ? | 12 | 148 | 12,509,959 | 39% |\n| developer | 5 | 155 | 10,495,299 | 33% |\n| review | 4 | 110 | 7,498,353 | 24% |\n| security | 4 | 22 | 1,365,078 | 4% |\n\n\n/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/run-3/cost.md\n",
     "stderr_tail": ""
    },
    "cost_semantics": {
@@ -533,36 +517,52 @@
     "cost_cap_status": "UNVERIFIABLE",
     "cost_cap_note": "the provider priced no session on this route, so no dollar figure exists: the cap is neither reached nor not reached, and this run is not proof that the cap holds for this route",
     "usage_measured": {
-     "sessions": 19,
-     "turns": 309,
-     "input_tokens_fresh": 23936975,
+     "sessions": 25,
+     "turns": 435,
+     "input_tokens_fresh": 31868689,
      "input_tokens_cached": 0,
-     "output_tokens": 136000
+     "output_tokens": 149000
     },
     "prices_estimated": false,
     "recompute_rule": "cost = input_tokens/1e6 * price_per_M_input + output_tokens/1e6 * price_per_M_output, once the route publishes prices"
    },
    "project_git": {
-    "head": "198397460b58803fe111f0650cd17ba4ea1ecf2f",
+    "head": "b1599804ad28b514906135cc0b1b8c35c4adb1e1",
     "branch": "master",
     "branches": [
      "*",
      "master",
-     "story/STORY-01-01"
+     "story/STORY-01-01",
+     "story/STORY-01-02",
+     "story/STORY-01-03"
     ],
     "status": [
-     "M _bmad-output/approvals/readiness.json",
+     "M .DS_Store",
+     " M _bmad-output/approvals/readiness.json",
      " M _bmad-output/run.log",
      "?? _bmad-output/INDEX.md",
      "?? _bmad-output/complexity.json",
-     "?? _bmad-output/evidence/STORY-01-01-lint-160.log",
-     "?? _bmad-output/evidence/STORY-01-01-lint-166.log",
-     "?? _bmad-output/evidence/STORY-01-01-test-107.log",
-     "?? _bmad-output/evidence/STORY-01-01-test-137.log",
-     "?? _bmad-output/evidence/STORY-01-01-test-516.log",
-     "?? _bmad-output/evidence/STORY-01-01-test-nop-205.log",
-     "?? _bmad-output/evidence/STORY-01-01-test-nop-379.log",
+     "?? _bmad-output/evidence/STORY-01-01-lint-134.log",
+     "?? _bmad-output/evidence/STORY-01-01-lint-140.log",
+     "?? _bmad-output/evidence/STORY-01-01-lint-185.log",
+     "?? _bmad-output/evidence/STORY-01-01-lint-435.log",
+     "?? _bmad-output/evidence/STORY-01-01-lint-441.log",
+     "?? _bmad-output/evidence/STORY-01-01-test-nop-183.log",
+     "?? _bmad-output/evidence/STORY-01-01-test-nop-478.log",
      "?? _bmad-output/evidence/STORY-01-01.jsonl",
+     "?? _bmad-output/evidence/STORY-01-02-sast-49.log",
+     "?? _bmad-output/evidence/STORY-01-02-sast-60.log",
+     "?? _bmad-output/evidence/STORY-01-02-sast-66.log",
+     "?? _bmad-output/evidence/STORY-01-02-test-25.log",
+     "?? _bmad-output/evidence/STORY-01-02-test-37.log",
+     "?? _bmad-output/evidence/STORY-01-02-test-90.log",
+     "?? _bmad-output/evidence/STORY-01-02-test-nop-89.log",
+     "?? _bmad-output/evidence/STORY-01-02.jsonl",
+     "?? _bmad-output/evidence/STORY-01-03-lint-34.log",
+     "?? _bmad-output/evidence/STORY-01-03-test-33.log",
+     "?? _bmad-output/evidence/STORY-01-03-test-baseline-2.log",
+     "?? _bmad-output/evidence/STORY-01-03-test-nop-32.log",
+     "?? _bmad-output/evidence/STORY-01-03.jsonl",
      "?? _bmad-output/journal/",
      "?? _bmad-output/ledger.json",
      "?? _bmad-output/replay/",
@@ -571,9 +571,12 @@
      "?? _bmad-output/sprint-status.json.lock"
     ],
     "master_log": [
-     "1983974 w1-run-2: guard plugin compiled by aisef 1.7.6 — a story worktree is a fresh checkout (P20 preparation, not an AISEF change)",
-     "e01ed3b w1-run-2: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
-     "3767a80 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)",
+     "b159980 STORY-01-02: add canonical_bytes and GENESIS constant",
+     "463b807 STORY-01-01: candidate attempt 3",
+     "21a8bff STORY-01-01: candidate attempt 1",
+     "c3ab20f w1-run-3: guard plugin compiled by aisef 1.7.6 — a story worktree is a fresh checkout (P20 preparation, not an AISEF change)",
+     "53a6425 w1-run-3: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "2655265 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)",
      "8ff9f13 epics.md: split to 16 stories (each ≤7 AC, ≤16 complexity) — second plan attempt passed",
      "35f33e7 evidence: initial AISEF plan attempt, machine-gate failures captured",
      "6a8d60c docs: initial LedgerLock requirements (NFC, hash chain, idempotency, atomic batch, exit codes, 3.11+ stdlib)"
@@ -581,22 +584,36 @@
    },
    "drift_records": [],
    "progress": {
-    "done": 0,
+    "done": 2,
     "total": 16
    },
    "stories": {
-    "STORY-01-01": {
+    "STORY-01-03": {
      "status": "failed",
-     "reason": "tried 3 attempts, still did not pass gate",
+     "reason": "deadlock due to plan, reviewer verified: [stuck] ledgerlock/format.py:36 — __all__ does not list line_hash; adding the function without extending __all__ violates the public-API expectation in architecture.md. Fixable inside write_scope once the function is added (finding #1).. Fix the acceptance cr",
+     "journal_last_step": "attempt.committed",
+     "journal_records": 8,
+     "state_status": "failed",
+     "attempts": 1
+    },
+    "STORY-01-01": {
+     "journal_last_step": "attempt.committed",
+     "journal_records": 12,
+     "status": "done",
+     "state_status": "done",
+     "attempts": 3
+    },
+    "STORY-01-02": {
      "journal_last_step": "attempt.committed",
      "journal_records": 10,
-     "state_status": "failed",
-     "attempts": 3
+     "status": "done",
+     "state_status": "done",
+     "attempts": 1
     }
    },
    "delivered": {
-    "master_head": "198397460b58803fe111f0650cd17ba4ea1ecf2f",
-    "has_package": false,
+    "master_head": "b1599804ad28b514906135cc0b1b8c35c4adb1e1",
+    "has_package": true,
     "files": [
      ".claude/skills/achieving-cmmc-level-2-compliance/scripts/process.py",
      ".claude/skills/analyzing-sbom-for-supply-chain-vulnerabilities/scripts/agent.py",
@@ -682,20 +699,20 @@
    },
    "oracle": {
     "sha256": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
-    "exit": 0,
+    "exit": 1,
     "results": {
-     "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "SKIPPED",
-     "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "SKIPPED",
-     "TestAcceptance::test_14_3_apply_batch_commits_atomically": "SKIPPED",
-     "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "SKIPPED",
-     "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "SKIPPED",
-     "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "SKIPPED",
-     "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "SKIPPED",
-     "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "SKIPPED",
-     "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "SKIPPED"
+     "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "FAILED",
+     "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "FAILED",
+     "TestAcceptance::test_14_3_apply_batch_commits_atomically": "FAILED",
+     "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "FAILED",
+     "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "FAILED",
+     "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "FAILED",
+     "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "FAILED",
+     "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "FAILED",
+     "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "FAILED"
     },
     "pytest_totals": {
-     "skipped": 9
+     "failed": 9
     },
     "parse_complete": true,
     "parse_note": "",
@@ -703,56 +720,169 @@
    },
    "story_state_source": "_bmad-output/sprint-status.json",
    "oracle_classification": {
-    "reds": [],
-    "counts": {},
-    "delivery_complete": false,
-    "skipped": [
+    "reds": [
      {
       "test": "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-6",
+       "FR-11",
+       "FR-12"
+      ],
+      "owners": [
+       "STORY-02-01",
+       "STORY-04-01",
+       "STORY-04-02",
+       "STORY-04-03"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-02-01', 'STORY-04-01', 'STORY-04-02', 'STORY-04-03']"
      },
      {
       "test": "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-1",
+       "FR-4",
+       "FR-9",
+       "FR-11",
+       "FR-12"
+      ],
+      "owners": [
+       "STORY-01-01",
+       "STORY-01-05",
+       "STORY-01-06",
+       "STORY-02-02",
+       "STORY-04-01",
+       "STORY-04-02",
+       "STORY-04-03",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-01-05', 'STORY-01-06', 'STORY-02-02', 'STORY-04-01', 'STORY-04-02', 'STORY-04-03', 'STORY-05-01']"
      },
      {
       "test": "TestAcceptance::test_14_3_apply_batch_commits_atomically",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-2",
+       "FR-8",
+       "FR-11"
+      ],
+      "owners": [
+       "STORY-01-02",
+       "STORY-01-03",
+       "STORY-01-05",
+       "STORY-03-01",
+       "STORY-04-01",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-01-03', 'STORY-01-05', 'STORY-03-01', 'STORY-04-01', 'STORY-05-01']"
      },
      {
       "test": "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-2",
+       "FR-6",
+       "FR-10",
+       "FR-11",
+       "FR-12"
+      ],
+      "owners": [
+       "STORY-01-02",
+       "STORY-01-03",
+       "STORY-01-05",
+       "STORY-02-01",
+       "STORY-03-02",
+       "STORY-04-01",
+       "STORY-04-02",
+       "STORY-04-03",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-01-03', 'STORY-01-05', 'STORY-02-01', 'STORY-03-02', 'STORY-04-01', 'STORY-04-02', 'STORY-04-03', 'STORY-05-01']"
      },
      {
       "test": "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+      "ownership": "PROJECT_GLOBAL",
+      "frs": [],
+      "owners": [],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "the project terminated incomplete"
      },
      {
       "test": "TestAcceptance::test_14_6_no_third_party_imports_at_runtime",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-14"
+      ],
+      "owners": [
+       "STORY-01-01",
+       "STORY-05-02",
+       "STORY-05-03"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-05-02', 'STORY-05-03']"
      },
      {
       "test": "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-4",
+       "FR-8",
+       "FR-11",
+       "FR-12"
+      ],
+      "owners": [
+       "STORY-01-06",
+       "STORY-03-01",
+       "STORY-04-01",
+       "STORY-04-02",
+       "STORY-04-03",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-01-06', 'STORY-03-01', 'STORY-04-01', 'STORY-04-02', 'STORY-04-03', 'STORY-05-01']"
      },
      {
       "test": "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-3",
+       "FR-4",
+       "FR-5"
+      ],
+      "owners": [
+       "STORY-01-06",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-01-06', 'STORY-05-01']"
      },
      {
       "test": "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-3",
+       "FR-4",
+       "FR-6"
+      ],
+      "owners": [
+       "STORY-01-06",
+       "STORY-02-01",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-01-06', 'STORY-02-01', 'STORY-05-01']"
      }
     ],
+    "counts": {
+     "INCOMPLETE_DELIVERY_EXPECTED_RED": 9
+    },
+    "delivery_complete": false,
+    "skipped": [],
     "oracle_not_executed": [],
     "oracle_not_executed_count": 0,
     "oracle_passed_completely": false,
@@ -760,8 +890,19 @@
     "false_pass_count": 0,
     "oracle_mapping_errors": [],
     "oracle_mapping_error_count": 0,
-    "story_owned_reds_expected": [],
-    "project_global_reds_expected": [],
+    "story_owned_reds_expected": [
+     "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger",
+     "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+     "TestAcceptance::test_14_3_apply_batch_commits_atomically",
+     "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
+     "TestAcceptance::test_14_6_no_third_party_imports_at_runtime",
+     "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
+     "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value",
+     "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts"
+    ],
+    "project_global_reds_expected": [
+     "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+    ],
     "classifiable": true
    },
    "exit_criteria": {
@@ -769,58 +910,25 @@
     "false_pass_count": 0,
     "oracle_mapping_errors": [],
     "oracle_mapping_error_count": 0,
-    "oracle_red_classes": {},
-    "oracle_skipped": [
-     {
-      "test": "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
-     },
-     {
-      "test": "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
-     },
-     {
-      "test": "TestAcceptance::test_14_3_apply_batch_commits_atomically",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
-     },
-     {
-      "test": "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
-     },
-     {
-      "test": "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
-     },
-     {
-      "test": "TestAcceptance::test_14_6_no_third_party_imports_at_runtime",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
-     },
-     {
-      "test": "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
-     },
-     {
-      "test": "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
-     },
-     {
-      "test": "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts",
-      "verdict": "SKIPPED",
-      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
-     }
-    ],
+    "oracle_red_classes": {
+     "INCOMPLETE_DELIVERY_EXPECTED_RED": 9
+    },
+    "oracle_skipped": [],
     "oracle_not_executed_count": 0,
     "oracle_passed_completely": false,
-    "story_owned_reds_expected_due_incomplete_owners": [],
-    "project_global_reds_expected_due_incomplete_delivery": [],
+    "story_owned_reds_expected_due_incomplete_owners": [
+     "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger",
+     "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+     "TestAcceptance::test_14_3_apply_batch_commits_atomically",
+     "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
+     "TestAcceptance::test_14_6_no_third_party_imports_at_runtime",
+     "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
+     "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value",
+     "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts"
+    ],
+    "project_global_reds_expected_due_incomplete_delivery": [
+     "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+    ],
     "manual_state_repair": 0,
     "manual_state_repair_note": "the driver never writes _bmad-output; the only project writes are the guard commit and the ARB-1 re-approval through the CLI",
     "orphan_state": [],
@@ -828,38 +936,38 @@
     "drift_records": [],
     "oracle_ran": true,
     "resumes_forced": 0,
-    "markers_not_reached": [
-     "wave=EPIC-01/w3 DONE",
-     "wave=EPIC-03/w1 DONE"
-    ],
+    "markers_not_reached": null,
     "stops": [
-     "[2026-09-18 10:14:52] epic=EPIC-01 STOPPED at=EPIC-01 · wave 1"
+     "[2026-09-18 10:46:13] epic=EPIC-01 STOPPED at=EPIC-01 · wave 3"
     ],
     "story_state_source": "_bmad-output/sprint-status.json",
     "false_block_count": 0,
     "false_block": [],
     "run_classification": "LEGITIMATE_MODEL_PROJECT_STOP",
-    "safety_violations": []
+    "safety_violations": [],
+    "stops_source": "read from the run's own run.log: the driver's in-memory epic lines were lost when it crashed (SS-80)"
    },
    "safety_violations": [],
    "run_metrics": {
-    "developer_agent_runs": 3,
+    "developer_agent_runs": 5,
     "developer_retries": 2,
-    "reviewer_executions": 2,
+    "reviewer_executions": 4,
     "reviewer_retries": 0,
-    "security_executions": 2,
+    "security_executions": 4,
     "security_retries": 0,
     "max_turn_events": 3,
     "human_arbitrations_during_the_run": 0,
-    "stories_done": 0,
+    "stories_done": 2,
     "stories_failed": [
-     "STORY-01-01"
+     "STORY-01-03"
     ],
-    "stories_never_started": 15,
+    "stories_never_started": 13,
     "false_block": [],
     "false_block_count": 0,
     "false_block_measurable_for": [
-     "STORY-01-01"
+     "STORY-01-01",
+     "STORY-01-02",
+     "STORY-01-03"
     ]
    },
    "run_classification": "LEGITIMATE_MODEL_PROJECT_STOP",
@@ -867,5 +975,5 @@
    "ok": true
   }
  },
- "updated": "2026-09-18T10:56:29+0700"
+ "updated": "2026-09-18T10:56:32+0700"
 }

@@ -1601,7 +1601,23 @@
    "fixed_by": "pytest runs with -v and parse_oracle() reconciles the recovered outcomes against pytest's own totals — a parse that does not account for every counted outcome fails the phase; SKIPPED/XFAIL are classified ORACLE_NOT_EXECUTED on a complete delivery (blocks qualification) and INCOMPLETE_DELIVERY_EXPECTED_SKIP otherwise; `oracle_passed_completely` requires a complete delivery with every check green",
    "status": "FIXED",
    "severity_rule": "P1: a check that did not execute reading as a check that passed is a qualification gate passing falsely"
+  },
+  {
+   "id": "SS-80",
+   "family": "FAM-QUALIFICATION-MEASUREMENT",
+   "fix_family": "F6-QUALIFICATION-INFRASTRUCTURE",
+   "severity": "P2",
+   "invariants": [
+    "INV-T.QUALIFICATION-REGISTER"
+   ],
+   "site": "closure-evidence/hardening/w1/w1_driver.py::run (forced-resume signal path)",
+   "statement": "the driver signalled the run's process group as soon as it read a wave marker, without checking whether the run had already ended. In W1 run 3 the sprint reached its own terminal state two seconds before the marker was read; os.killpg then raised PermissionError and killed the DRIVER, so a completed run lost its run-phase record (exit code, resumes) even though the run itself was unaffected.",
+   "reproducer": "W1 run 3, 2026-09-18 10:46:13 sprint DONE vs 10:46:15 SIGTERM — traceback in the run-3 task output; the repaired record carries `reconstructed_after_SS80` with what was measured and what is left null",
+   "provenance": "found when W1 run 3's driver exited with a traceback instead of a record, 2026-09-18",
+   "fixed_by": "the signal is conditional on the process still running (recorded as `process_alive_when_marker_seen`), and every killpg goes through _signal_group(), which records a refusal instead of propagating it. Run 3's record was repaired from the run's own log, with the unrecorded exit code left null rather than assumed.",
+   "status": "FIXED",
+   "severity_rule": "P2: the tooling failed loudly and lost a record; it never made an unqualified run look qualified"
   }
  ],
- "updated": "2026-09-18: +SS-77, +SS-78, +SS-79 — three W1 measurement defects, each found by reading a run's own result rather than accepting it, each fixed before any W1 verdict rested on it"
+ "updated": "2026-09-18: +SS-77, +SS-78, +SS-79, +SS-80 — four W1 measurement/robustness defects, each found by reading a run's own output rather than accepting it"
 }

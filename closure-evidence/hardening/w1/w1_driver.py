@@ -57,6 +57,16 @@ def _is_preparation_commit(line: str) -> bool:
 
 # ---- oracle ownership model (owner decision "COMPLETE W1 RUNS 2-3", section 1) ---------------------------------------
 # Pure so it can carry deterministic negative controls: tests/hardening/test_w1_oracle_ownership.py.
+def _signal_group(pgid: int, sig, record: dict, label: str) -> bool:
+    """Signal a process group, recording refusal instead of dying on it (SS-80)."""
+    try:
+        os.killpg(pgid, sig)
+        return True
+    except OSError as e:
+        record[f"{label}_error"] = f"{type(e).__name__}: {e}"
+        return False
+
+
 def run_metrics(runlog: str, state: dict, covers: dict, fr_map: dict, oracle_results: dict) -> dict:
     """The per-run numbers the owner's report table asks for (section 10), measured from the run's own log and state.
 
@@ -520,13 +530,21 @@ class Driver:
                     R["markers_pending"] = [m for m in R["markers_pending"] if m != killed["marker"]]
                     self.say(f"SIGTERM process group {inv['pgid']}: {killed}")
                     killed["processes_before"] = self.processes()
-                    os.killpg(inv["pgid"], signal.SIGTERM)
-                    t = time.time()
-                    while proc.poll() is None and time.time() - t < 120:
-                        time.sleep(2)
+                    # SS-80: a run that reached its own end before the marker was read is not something to signal.
+                    # Signalling it anyway raced the exit and killed the DRIVER (PermissionError from killpg), losing
+                    # the run record of a completed run. Every signal is conditional and every failure is recorded.
+                    killed["process_alive_when_marker_seen"] = proc.poll() is None
+                    killed["signal_sent"] = False
                     if proc.poll() is None:
-                        os.killpg(inv["pgid"], signal.SIGKILL)
-                        killed["sigkill_after_120s"] = True
+                        killed["signal_sent"] = _signal_group(inv["pgid"], signal.SIGTERM, killed, "sigterm")
+                        t = time.time()
+                        while proc.poll() is None and time.time() - t < 120:
+                            time.sleep(2)
+                        if proc.poll() is None:
+                            _signal_group(inv["pgid"], signal.SIGKILL, killed, "sigkill")
+                            killed["sigkill_after_120s"] = True
+                    else:
+                        killed["kind"] += " — the run had already exited on its own; no signal sent"
                     time.sleep(5)
                     killed["exit"] = proc.poll()
                     # SS-78: the SIGTERM went to ONE process group; a survivor is a process still in it. Matching

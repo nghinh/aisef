@@ -1349,7 +1349,7 @@
    "ok": true
   },
   "finish": {
-   "at": "2026-09-18T10:24:12+0700",
+   "at": "2026-09-18T10:56:22+0700",
    "status": {
     "cmd": [
      "aisef",
@@ -1891,14 +1891,46 @@
      "[2026-09-18 09:11:44] epic=EPIC-04 STOPPED at=EPIC-04 · wave 2"
     ],
     "story_state_source": "_bmad-output/sprint-status.json",
+    "false_block_count": 0,
+    "false_block": [],
     "run_classification": "LEGITIMATE_MODEL_PROJECT_STOP",
     "safety_violations": []
    },
    "safety_violations": [],
+   "run_metrics": {
+    "developer_agent_runs": 21,
+    "developer_retries": 9,
+    "reviewer_executions": 22,
+    "reviewer_retries": 0,
+    "security_executions": 19,
+    "security_retries": 0,
+    "max_turn_events": 22,
+    "human_arbitrations_during_the_run": 0,
+    "stories_done": 11,
+    "stories_failed": [
+     "STORY-04-02"
+    ],
+    "stories_never_started": 4,
+    "false_block": [],
+    "false_block_count": 0,
+    "false_block_measurable_for": [
+     "STORY-01-01",
+     "STORY-01-02",
+     "STORY-01-03",
+     "STORY-01-05",
+     "STORY-01-06",
+     "STORY-02-01",
+     "STORY-02-02",
+     "STORY-03-01",
+     "STORY-03-02",
+     "STORY-04-01",
+     "STORY-04-02"
+    ]
+   },
    "run_classification": "LEGITIMATE_MODEL_PROJECT_STOP",
    "oracle_aggregate_reportable_as_delivery_quality": false,
    "ok": true
   }
  },
- "updated": "2026-09-18T10:24:16+0700"
+ "updated": "2026-09-18T10:56:26+0700"
 }

@@ -1,0 +1,64 @@
+EPIC-01 · wave 1
+STORY-01-01: DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✗ lint — 61 |         proc = subprocess.run(
+     |                ^^^^^^^^^^^^^^
+  62 |             [
+  63 |                 "grep",
+     |
+  help: Add explicit `check=False`
+  
+  PLW1510 `subprocess.run` without explicit `check` argument
+    --> tests/test_skeleton.py:84:16
+     |
+  82 |         if not LEDGERLOCK_DIR.is_dir()
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD — no red run recorded, but the nop control proves the same thing directly — 7 tests with criteria codes are red or absent at parent SHA c3ab20f
+    ✅ tests verify story — 7 tests with criteria codes are red or absent at parent SHA c3ab20f
+    ✅ security
+    ✅ review
+    – preservation — story does not touch any VERIFIED behaviour of other stories
+  [attempt 2] max_turns: stopped at 40 turns (cap 40)
+  [attempt 3] ok
+EPIC-01 · wave 2
+STORY-01-02: DONE
+  [attempt 1] ok
+EPIC-01 · wave 3
+STORY-01-03: NOT DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✗ test — the most recent test run is still failing, the story cannot be finished.
+    ✗ no baseline regression — lost 13 tests present at baseline: tests/test_format.py::AC_STORY_01_02_1_CanonicalBytesUnsetHashFields::test_canonical_bytes_matches_exact_json_dumps_encoding, tests/test_format.py::AC_STORY_01_02_2_CanonicalBytesIsDeterministic::test_canonical_bytes_returns_byte_identical_bytes_for_equal_dicts, tests/test_format.py::AC_STORY_01_02_3_CanonicalBytesNonASCIILiteralUTF8::test_canonical_bytes_encodes_non_ascii_as_utf8_literal_and_is_stable, tests/test_format.py::AC_STORY_01_02_4_CanonicalBytesIgnoresInsertionOrder::test_canonical_bytes_is_byte_identical_across_key_insertion_order, tests/test_format.py::AC_STORY_01_02_5_GenesisConstant::test_genesis_is_literal_seven_character_string (+8) — deleting or renaming existing tests must be declared in the story; evidence cannot infer intent so this counts as regression
+    ✗ lint — 3 | import json
+    |
+  
+  F401 [*] `ledgerlock.format.line_hash` imported but unused
+   --> tests/test_format.py:7:57
+    |
+  5 | import unittest
+  6 |
+  7 | from ledgerlock.format import GENESIS, canonical_bytes, line_hash
+    |                                                         ^^^^^^^^^
+  help: Remove unused i
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✗ criteria have tests — no green test run yet
+    ○ coverage — no green test run to measure
+    – TDD — story did not add tests
+    ✗ tests verify story — no tests with criteria codes green at candidate — nothing to verify at parent SHA (see criteria have tests check)
+    ✅ security
+    ✗ review — 4 blocking items: [block] ledgerlock/format.py:36 — line_hash is not implemented; AD-5 freezes the formula but no function exists. Every AC of this story and every downstream hash-chain consumer (STORY-01-05, STORY-02-
+    ⚠ preservation — cannot verify at candidate f495d7e: AC-STORY-01-01-1, AC-STORY-01-01-2, AC-STORY-01-01-3… — no test with code / check skipped / screen not compared; unverifiable is not a pass
+  ✗ deadlock due to plan, reviewer verified: [stuck] ledgerlock/format.py:36 — __all__ does not list line_hash; adding the function without extending __all__ violates the public-API expectation in architecture.md. Fixable inside write_scope once the function is added (finding #1).. Fix the acceptance criteria or the story's write_scope, then re-run — retrying will not resolve this.
+
+⏸ stopped at EPIC-01 · wave 3

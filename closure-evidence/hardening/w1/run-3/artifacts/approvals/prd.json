@@ -1,0 +1,16 @@
+{
+  "gate": "prd",
+  "artifact": "prd.md",
+  "artifact_sha256": "d293e6206cdfdef4e1bdd3034a3f282302290edf2c0bf53664c828f450b52574",
+  "status": "approved",
+  "seq": 1,
+  "decided_by": "auto",
+  "decided_at": "2026-09-15T13:03:42+00:00",
+  "note": "auto-approved (--auto-approve); BMAD reported complete with 5 open questions",
+  "machine_checks": {
+    "bmad_status": "complete",
+    "machine gate": "pass",
+    "warnings": "5 open questions need human decision: OQ-1, OQ-2, OQ-3, OQ-4, OQ-5; no non-functional requirements — rarely correct"
+  },
+  "history": []
+}

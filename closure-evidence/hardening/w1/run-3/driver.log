@@ -1,0 +1,15 @@
+[2026-09-18T10:25:11+0700] phase prepare
+[2026-09-18T10:25:17+0700] prepare ok=True aisef=aisef 1.7.6 wheel=True oracle=True guard=True topology=True preflight=True failed=[] gates={'prd': 'approved', 'architecture': 'approved', 'ux-spec': 'approved', 'epics': 'approved', 'stories': 'approved', 'mockups': 'approved', 'readiness': 'stale', 'pre-deploy': 'pending'} doctor_red=[]
+[2026-09-18T10:25:17+0700] W1 driver complete
+[2026-09-18T10:25:17+0700] phase kernel-first: aisef run with NO re-approval, NO --force
+[2026-09-18T10:25:18+0700] kernel-first ok=True exit=2 kernel refused the STALE gate before any agent call (ARB-1 kernel path first)
+[2026-09-18T10:25:18+0700] W1 driver complete
+[2026-09-18T10:25:18+0700] phase approve: ARB-1 re-approval of readiness for byte-identical content
+[2026-09-18T10:25:21+0700] approve ok=True changed=['readiness'] gates={'prd': 'approved', 'architecture': 'approved', 'ux-spec': 'approved', 'epics': 'approved', 'stories': 'approved', 'mockups': 'approved', 'readiness': 'approved', 'pre-deploy': 'pending'}
+[2026-09-18T10:25:21+0700] W1 driver complete
+[2026-09-18T10:25:28+0700] phase run
+[2026-09-18T10:25:28+0700] aisef run #1 pid=59086 pgid=59086
+[2026-09-18T10:46:15+0700] SIGTERM process group 59086: {'marker': 'wave=EPIC-01/w3 DONE', 'at': '2026-09-18T10:46:15+0700', 'line': '[2026-09-18 10:46:12] wave=EPIC-01/w3 DONE 0/1 passed $0.00', 'kind': 'forced resume (P20 procedure 3)'}
+[2026-09-18T10:56:29+0700] phase finish
+[2026-09-18T10:56:32+0700] finish: progress={'done': 2, 'total': 16} class=LEGITIMATE_MODEL_PROJECT_STOP false_pass=0 mapping_errors=0 red_classes={'INCOMPLETE_DELIVERY_EXPECTED_RED': 9} safety=[] → W1-LEDGERLOCK-3.json
+[2026-09-18T10:56:32+0700] W1 driver complete

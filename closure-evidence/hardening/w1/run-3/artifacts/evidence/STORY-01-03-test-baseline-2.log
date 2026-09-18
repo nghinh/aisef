@@ -1,0 +1,24 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 13 items
+
+tests/test_format.py::AC_STORY_01_02_1_CanonicalBytesUnsetHashFields::test_canonical_bytes_matches_exact_json_dumps_encoding PASSED [  7%]
+tests/test_format.py::AC_STORY_01_02_2_CanonicalBytesIsDeterministic::test_canonical_bytes_returns_byte_identical_bytes_for_equal_dicts PASSED [ 15%]
+tests/test_format.py::AC_STORY_01_02_3_CanonicalBytesNonASCIILiteralUTF8::test_canonical_bytes_encodes_non_ascii_as_utf8_literal_and_is_stable PASSED [ 23%]
+tests/test_format.py::AC_STORY_01_02_4_CanonicalBytesIgnoresInsertionOrder::test_canonical_bytes_is_byte_identical_across_key_insertion_order PASSED [ 30%]
+tests/test_format.py::AC_STORY_01_02_5_GenesisConstant::test_genesis_is_literal_seven_character_string PASSED [ 38%]
+tests/test_format.py::AC_STORY_01_02_6_CanonicalBytesStableAcrossJSONRoundTrip::test_canonical_bytes_byte_equal_after_json_round_trip PASSED [ 46%]
+tests/test_nfc_normalization.py::AC_STORY_01_01_1_NormalizeKeyEqualsUnicodedataNFC::test_returns_unicodedata_nfc_byte_for_byte 
+tests/test_nfc_normalization.py::AC_STORY_01_01_1_NormalizeKeyEqualsUnicodedataNFC::test_returns_unicodedata_nfc_byte_for_byte PASSED [ 53%]
+tests/test_nfc_normalization.py::AC_STORY_01_01_2_NFCAndNFDCollapseToSameBytes::test_nfc_and_nfd_return_byte_identical_nfc PASSED [ 61%]
+tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportsCleanly::test_import_ledgerlock_prints_init_path PASSED [ 69%]
+tests/test_skeleton.py::AC_STORY_01_01_4_CLIAdvertisesAllSubcommands::test_help_lists_verify_snapshot_apply_repair_tail PASSED [ 76%]
+tests/test_skeleton.py::AC_STORY_01_01_5_NoForbiddenTopLevelImports::test_no_top_level_forbidden_imports PASSED [ 84%]
+tests/test_skeleton.py::AC_STORY_01_01_6_NoForbiddenRuntimeCalls::test_no_forbidden_runtime_calls PASSED [ 92%]
+tests/test_skeleton.py::AC_STORY_01_01_7_PublicAPIExportsLedgerAndConflictError::test_ledger_and_conflict_error_importable PASSED [100%]
+
+==================== 13 passed, 10 subtests passed in 0.09s ====================
