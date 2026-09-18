@@ -1667,14 +1667,14 @@
   {
    "id": "SS-81",
    "family": "FAM-EVIDENCE-SEMANTICS",
-   "fix_family": "PENDING-OWNER-APPROVAL",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
    "severity": "P1",
    "status": "OPEN",
    "defect_class": "PRODUCT_KERNEL",
    "defect_class_basis": "site in aisef/: aisef/control/gate.py and the nop run in aisef/phases/implement.py",
    "invariants": [
-    "absence of a structured verdict can never PASS",
-    "INV-F.3 (SS-26): a dependency the project never installed stays an environment failure"
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
    ],
    "site": "aisef/control/gate.py::_nop_check (the `unrunnable and not test_format` branch; 'red or absent' at level 2) + aisef/phases/implement.py::run_nop (pytest collection interruption)",
    "statement": "the deterministic 'tests verify story' control — and TDD, which defers to it ('the nop control proves the same thing directly') — can PASS on tests that never executed at the parent SHA. (A) A nop run that failed because a third-party dependency is missing is recorded with `unrunnable` AND `test_format` (pytest printed its collection error); the gate's UNRUNNABLE branch requires `not test_format`, so it falls through and scores the absent tests as red: PASSED. The same record without test_format is UNRUNNABLE, as SS-26/INV-F.3 intend. (B) When one story test file fails to import at the parent (the legitimate red), pytest interrupts the whole session; the story's other test files never run, the kernel's parser reports no test ids, and 'red or absent' scores a tautological AC test (`assert True`) in another file as verified: PASSED.",
@@ -1688,13 +1688,14 @@
   {
    "id": "SS-82",
    "family": "FAM-EVIDENCE-SEMANTICS",
-   "fix_family": "PENDING-OWNER-APPROVAL",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
    "severity": "P3",
    "status": "OPEN",
    "defect_class": "PRODUCT_KERNEL",
    "defect_class_basis": "site in aisef/: aisef/phases/implement.py::_vang_ma_cua_story",
    "invariants": [
-    "the run log and the gate record must not contradict each other about the same evidence"
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
    ],
    "site": "aisef/phases/implement.py::_vang_ma_cua_story",
    "statement": "the detector that recognises 'the missing module is the story's own code' matches a module name against changed file stems, but has no package rule: `No module named 'ledgerlock'` does not match `ledgerlock/__init__.py`. A greenfield story's legitimate red at the parent is logged as 'control NOT performed' while the gate (via SS-81's path) scores the same record as proof — two kernel records disagree about one piece of evidence.",
@@ -1703,9 +1704,142 @@
    "fixed_by": null,
    "not_fixed_because": "owner approval required for any product-tree change",
    "severity_rule": "P3: a misleading operator record; the verdict itself is decided elsewhere (SS-81)"
+  },
+  {
+   "id": "SS-83",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P1",
+   "status": "OPEN",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/tdd.py",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/control/tdd.py::red_before_green (consumed by the TDD check in aisef/control/gate.py::evaluate)",
+   "statement": "TDD's 'red before green' accepts any non-ok test run as the red: a run that could not execute at all (unrunnable — tool/environment) and a run red only because an UNRELATED pre-existing test failed both make TDD PASS, although neither shows the story's tests failing without the story's code.",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py::S4_TddCountsUnrunnableAsRed (both cases PASSED on the frozen kernel)",
+   "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
+   "sibling_of": "SS-81",
+   "fixed_by": null
+  },
+  {
+   "id": "SS-84",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P2",
+   "status": "OPEN",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/gate.py",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/control/gate.py::_nop_check (the `acceptance <= 0` branch)",
+   "statement": "a story that declares no criteria passes 'tests verify story' whenever the parent run is red for ANY reason — environment, collection, unrelated failures. Plan-time machine gate blocks zero-criteria plans, which is why this is P2, not P1.",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py::S5_NoCriteriaAnyRedAtParent (PASSED)",
+   "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
+   "sibling_of": "SS-81",
+   "fixed_by": null
+  },
+  {
+   "id": "SS-85",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P2",
+   "status": "OPEN",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/gate.py",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/control/gate.py::_baseline_check (baseline unrunnable NO_SETUP branch; aborted collection)",
+   "statement": "'no baseline regression' passes vacuously when the baseline did not execute: a collection-aborted baseline yields no green ids, and a dependency-unrunnable baseline is read as 'no test was ever green there' — so an existing test the story deletes is never seen as lost.",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py::S6_BaselineAbortedCollection (PASSED)",
+   "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
+   "sibling_of": "SS-81",
+   "fixed_by": null
+  },
+  {
+   "id": "SS-86",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P1",
+   "status": "OPEN",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/gate.py",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/control/gate.py::_baseline_check (red = failed_ids only)",
+   "statement": "a test green at baseline and SKIPPED at the candidate is neither 'red' nor 'lost' to R9, so a story can silence an existing test with a skip marker and 'no baseline regression' passes.",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S8_S9_skipped_as_green.py::S8_BaselineSkippedAtCandidate (PASSED)",
+   "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
+   "sibling_of": "SS-81",
+   "fixed_by": null
+  },
+  {
+   "id": "SS-87",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P1",
+   "status": "OPEN",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/gate.py",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/control/gate.py::_preservation_check (red = failed_ids only)",
+   "statement": "a VERIFIED behaviour of another story whose test is SKIPPED at the candidate is reported 'still green' by preservation. Stories whose write scope includes tests/ can do this; the fake-test scan only looks for assertion-free tests, so no deterministic check catches it.",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S8_S9_skipped_as_green.py::S9_PreservationSkipped (PASSED: '1 behaviours of other stories still green')",
+   "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
+   "sibling_of": "SS-81",
+   "fixed_by": null
+  },
+  {
+   "id": "SS-88",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P2",
+   "status": "OPEN",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/ledger.py",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/control/ledger.py::_observe_tests (red = failed_ids only)",
+   "statement": "the behaviour ledger records an acceptance criterion whose only test was SKIPPED as VERIFIED, and rolls its requirement (FR) up to VERIFIED — a verification claim with no executed evidence. The ledger feeds preservation obligations and the repair queue, not the story gate directly (hence P2).",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py::S7_LedgerSkippedIsNotVerified (state printed: AC-S-01-1 verified, FR-1 verified)",
+   "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
+   "sibling_of": "SS-81",
+   "fixed_by": null
+  },
+  {
+   "id": "SS-89",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P3",
+   "status": "OPEN",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/gate.py",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/control/gate.py::_nop_check (`nop is None` branch)",
+   "statement": "when no nop record exists for the candidate, 'tests verify story' is NOT_APPLICABLE, which does not block, so the gate passes without the control having run. Latent: the kernel's own flow always records a nop.",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S10_no_nop_record.py (NOT_APPLICABLE, blocks=False)",
+   "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
+   "sibling_of": "SS-81",
+   "fixed_by": null
   }
  ],
- "updated": "2026-09-18: +SS-81 (P1 OPEN, product kernel: the nop control can pass on non-execution) +SS-82 (P3 OPEN, product kernel: package-level missing-module not recognised) — found reading PROFILE-W1-OC-GPT56SOL-T80 run 1; not fixed, owner approval required",
+ "updated": "2026-09-18: SS-81 family registered — SS-81 (P1), SS-82 (P3) and siblings SS-83..SS-89 from the section-7 sweep, all OPEN with deterministic reproducers",
  "defect_classes": {
   "PRODUCT_KERNEL": "a defect in aisef/ — invalidates evidence produced by the product (kernel qualification, W0)",
   "QUALIFICATION_INFRASTRUCTURE": "a defect in the tooling that measures the product (W1 driver, oracle harness) — invalidates the measurements it produced, not the product; its fix never changes aisef/"
