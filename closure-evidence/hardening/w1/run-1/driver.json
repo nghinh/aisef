@@ -1,0 +1,412 @@
+{
+ "run": 1,
+ "project": "/Users/nghinh/Downloads/projects/w1-run-1",
+ "phases": {
+  "prepare": {
+   "at": "2026-09-18T06:59:12+0700",
+   "aisef_version": "aisef 1.7.6",
+   "aisef_file": "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/lib/python3.14/site-packages/aisef/__init__.py",
+   "aisef_from_the_wheel_not_the_checkout": true,
+   "venv_packages": "[{\"name\": \"aisef\", \"version\": \"1.7.6\"}, {\"name\": \"pip\", \"version\": \"26.2.1\"}]\n",
+   "freeze": {
+    "generated": "2026-09-18T06:58:42+0700",
+    "candidate_sha": "af94372dd1861e2fcac1c5f6e3c4102efa27e829",
+    "aisef_tree_digest": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+    "PHASE12_KERNEL_DIGEST": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+    "tree_equals_phase12_kernel": true,
+    "version_string": "aisef 1.7.6",
+    "wheel": {
+     "file": "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/dist/aisef-1.7.6-py3-none-any.whl",
+     "sha256": "2e08d43b61d6647692b731943741f64f7fa8f107e53dacf06bb92bbc1c9bfe8e",
+     "bytes": 667615,
+     "built_with": "build 1.6.1 (/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/build-venv/lib/python3.14/site-packages/build)"
+    },
+    "run_venv": {
+     "path": "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv",
+     "aisef_file": "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/lib/python3.14/site-packages/aisef/__init__.py",
+     "installed_from_the_wheel": true
+    },
+    "oracle_venv": {
+     "path": "/Users/nghinh/Downloads/projects/aisef-freeze/oracle-venv",
+     "packages": [
+      {
+       "name": "coverage",
+       "version": "7.16.1"
+      },
+      {
+       "name": "pytest",
+       "version": "9.1.1"
+      }
+     ]
+    },
+    "docker_image": {
+     "name": "aisef-verify-python:84adf1d8eaf9",
+     "id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+    },
+    "docker_image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "opencode_version": "1.18.31",
+    "ci": {
+     "run": "35287072415",
+     "sha": "af94372dd1861e2fcac1c5f6e3c4102efa27e829",
+     "conclusion": "success",
+     "jobs": {
+      "wheel": "success",
+      "unit (ubuntu-latest, 3.14)": "success",
+      "lint": "success",
+      "unit (ubuntu-latest, 3.12)": "success",
+      "unit (windows-latest, 3.11)": "success",
+      "unit (ubuntu-latest, 3.11)": "success",
+      "unit (ubuntu-latest, 3.13)": "success"
+     }
+    },
+    "ci_matches_candidate": true,
+    "w0": {
+     "path": "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/AISEF-W0-QUALIFICATION.json",
+     "qualified": true,
+     "sha": "0a7cab86086ebc496bcda1559142082c89506c29",
+     "aisef_tree": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+     "tree_matches_frozen": true
+    },
+    "no_tag_no_publish": true,
+    "rule": "W1 runs use run_venv's aisef only; any aisef/ change after this record voids it and the W1 runs that rest on it",
+    "pass": true
+   },
+   "project_git": {
+    "head": "7e2f79822cc5f624458259fdc50d0ea398f93db7",
+    "branch": "master",
+    "status": [],
+    "log": [
+     "7e2f798 w1-run-1: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "a4267b8 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)",
+     "8ff9f13 epics.md: split to 16 stories (each ≤7 AC, ≤16 complexity) — second plan attempt passed",
+     "35f33e7 evidence: initial AISEF plan attempt, machine-gate failures captured",
+     "6a8d60c docs: initial LedgerLock requirements (NFC, hash chain, idempotency, atomic batch, exit codes, 3.11+ stdlib)"
+    ]
+   },
+   "config": {
+    "tools.test": "python3 -m pytest -v",
+    "tools.lint": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+    "sandbox.image": "aisef-verify-python:84adf1d8eaf9",
+    "sandbox.allow_hosts": [
+     "pypi.org",
+     "files.pythonhosted.org"
+    ],
+    "run.cost_cap_usd": 80.0
+   },
+   "opencode_version": "1.18.31",
+   "opencode_binary": "/Users/nghinh/.opencode/bin/opencode",
+   "docker_image": {
+    "name": "aisef-verify-python:84adf1d8eaf9",
+    "id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+   },
+   "doctor": {
+    "cmd": [
+     "aisef",
+     "doctor"
+    ],
+    "exit": 0,
+    "seconds": 4.6,
+    "stdout_tail": "Environment:\n  ✅ python >= 3.11 — 3.14.7\n  ✅ git\n  ✅ claude CLI — /opt/homebrew/bin/claude\n  ✅ opencode CLI — /Users/nghinh/.opencode/bin/opencode\n  ✅ agent credential — ANTHROPIC_BASE_URL set in the environment — these outrank the client's own login; unset them to use it\n  ✅ docker daemon — running\n  ○ playwright + chromium — playwright not installed — run: npm i -D playwright && npx playwright install chromium — cannot extract mockup contracts\nProject:\n  ✅ project directory — /Users/nghinh/Downloads/projects/w1-run-1\n  ✅ sandbox provider — docker — guarantees at WORKSPACE_WRITE: network_none, non_root, secrets_absent\n  ✅ sandbox image — aisef-verify-python:84adf1d8eaf9 — built by the harness: pinned base, pinned tool versions\n  · role test — explicit → `python3 -m pytest -v`\n  · role lint — explicit → `ruff check . --exclude .claude --exclude .aisef --exclude .opencode`\n  · role sast — auto: bandit (managed, pinned 1.9.4) → `bandit -q -r .`\n  ✅ tool tools.test — `tools.test` = `python3 -m pytest -v` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ tool tools.lint — `tools.lint` = `ruff check . --exclude .claude --exclude .aisef --exclude .opencode` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ tool tools.sast — `tools.sast` = `bandit -q -r .` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ docs/requirements.md — /Users/nghinh/Downloads/projects/w1-run-1/docs/requirements.md\n  ✅ config — defaults → /Users/nghinh/Downloads/projects/w1-run-1/.ai/config.json\n  ○ budget cap above recorded spend — no `_bmad-output/budget.json` yet — nothing to compare; the first settled call writes it\n  ○ test command prints coverage — `tools.test` = `python3 -m pytest -v` does not print coverage — gate coverage check will be **not configured** (add `--coverage` / `--cov` / `--experimental-test-coverage`)\n  ✅ test command prints test names — gate can read test names (no evidence yet — guessing from command flags)\nInstalled skills:\n  ✅ has skills — 158 directories\n  ✅ framework skills up to date — matches source\n  ✅ no offensive skills — clean\n\n✅ ready\n",
+    "stderr_tail": ""
+   },
+   "doctor_red": [],
+   "oracle": {
+    "sha256_now": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+    "sha256_pinned": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+    "independence_verdict": "PASS"
+   },
+   "oracle_ok": true,
+   "compile": {
+    "cmd": [
+     "aisef",
+     "compile",
+     "--client",
+     "opencode",
+     "--bin",
+     "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/bin/aisef"
+    ],
+    "exit": 0,
+    "seconds": 0.1,
+    "stdout_tail": "client: opencode\n  second-tier in V1: cost/turns not measurable from harness — supported, does not block release\n  wrote /Users/nghinh/Downloads/projects/w1-run-1/.opencode/plugin/aisef-guard.ts\n  guards blocking before action: destructive, egress, git-stage, injection, process-ref, secret, tool-bypass, write-scope\n  guards blocking at other hooks: diff-scope (PostToolUse)\n  ⚠️  guards post-hoc only: completion\n     — not wired into this client's hooks at all; the rule is re-asked afterwards from evidence (story gate, `aisef verify`), which cannot stop the action, only fail the story\n  capabilities not at native level:\n     dir_allowlist: unsupported\n     tool_allowlist: emulated\n     turn_limit: unsupported\n\nreport: /Users/nghinh/Downloads/projects/w1-run-1/_bmad-output/compile-report.json\n\n⚠️  some clients can only be checked later — lower assurance, noted in report\n",
+    "stderr_tail": ""
+   },
+   "guard_commit": "31a5da567c9469725a559318d59e0bfa146bf410",
+   "guard_plugin": {
+    "tracked_now": true,
+    "sha256": "b10cc852f8cf1df1203c85640b86a7c3922919ac52312e566486314d3fc9f28c",
+    "bin_line": "const BIN = [\"/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/bin/aisef\"]",
+    "compile_report": {
+     "clients": [
+      {
+       "client": "opencode",
+       "written": [
+        ".opencode/plugin/aisef-guard.ts"
+       ],
+       "guards_wired": [
+        "destructive",
+        "diff-scope",
+        "egress",
+        "git-stage",
+        "injection",
+        "process-ref",
+        "secret",
+        "tool-bypass",
+        "write-scope"
+       ],
+       "guards_post_hoc": [
+        "completion"
+       ],
+       "blocks_at_source": false,
+       "degradations": [
+        "dir_allowlist: unsupported",
+        "tool_allowlist: emulated",
+        "turn_limit: unsupported"
+       ]
+      }
+     ]
+    }
+   },
+   "fresh_topology": {
+    "head_branch": "master",
+    "master": "31a5da567c9469725a559318d59e0bfa146bf410",
+    "commits_after_8ff9f13": [
+     "31a5da5 w1-run-1: guard plugin compiled by aisef 1.7.6 — a story worktree is a fresh checkout (P20 preparation, not an AISEF change)",
+     "7e2f798 w1-run-1: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "a4267b8 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)"
+    ],
+    "ledgerlock_dir_absent_at_master": true,
+    "remotes": [],
+    "branches": [
+     "master"
+    ]
+   },
+   "fresh_topology_ok": true,
+   "capability_preflight": {
+    "resolved": [
+     {
+      "role": "test",
+      "mode": "explicit",
+      "command": "python3 -m pytest -v",
+      "stack": "python",
+      "image": "aisef-verify-python:84adf1d8eaf9",
+      "why": "",
+      "tool": "",
+      "provision": "",
+      "version": ""
+     },
+     {
+      "role": "lint",
+      "mode": "explicit",
+      "command": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+      "stack": "python",
+      "image": "aisef-verify-python:84adf1d8eaf9",
+      "why": "",
+      "tool": "",
+      "provision": "",
+      "version": ""
+     },
+     {
+      "role": "sast",
+      "mode": "auto",
+      "command": "bandit -q -r .",
+      "stack": "python",
+      "image": "aisef-verify-python:84adf1d8eaf9",
+      "why": "",
+      "tool": "bandit",
+      "provision": "managed",
+      "version": "1.9.4"
+     }
+    ],
+    "checks": [
+     {
+      "key": "tools.test",
+      "command": "python3 -m pytest -v",
+      "state": "present",
+      "ok": true,
+      "mode": "explicit",
+      "tool": "",
+      "version": "",
+      "observed": "",
+      "detail": "the project's declared command",
+      "where": "aisef-verify-python:84adf1d8eaf9"
+     },
+     {
+      "key": "tools.lint",
+      "command": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+      "state": "present",
+      "ok": true,
+      "mode": "explicit",
+      "tool": "",
+      "version": "",
+      "observed": "/usr/local/bin/ruff",
+      "detail": "the project's declared command",
+      "where": "aisef-verify-python:84adf1d8eaf9"
+     },
+     {
+      "key": "tools.sast",
+      "command": "bandit -q -r .",
+      "state": "present",
+      "ok": true,
+      "mode": "auto",
+      "tool": "bandit",
+      "version": "1.9.4",
+      "observed": "bandit 1.9.4",
+      "detail": "bandit (pinned 1.9.4)",
+      "where": "aisef-verify-python:84adf1d8eaf9"
+     }
+    ],
+    "image": "aisef-verify-python:84adf1d8eaf9",
+    "image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "expected_python_image": "aisef-verify-python:84adf1d8eaf9"
+   },
+   "preflight": {
+    "trunk_is_the_approved_fresh_root": true,
+    "zero_prior_delivery_commits": true,
+    "expected_story_count": true,
+    "expected_story_state_none_registered": true,
+    "no_candidate_branches": true,
+    "artifacts_match_frozen_requirements": true,
+    "client_is_opencode": true,
+    "expected_opencode_version": true,
+    "expected_model_route": true,
+    "guard_plugin_bound_to_the_frozen_candidate": true,
+    "no_stale_story_worktrees": true,
+    "sandbox_image_is_the_frozen_candidates_python_environment": true,
+    "every_selected_tool_probed_present_before_the_first_model_call": true,
+    "sandbox_image_present": true,
+    "environment_identity_matches_freeze": true,
+    "no_remotes": true
+   },
+   "preflight_measured": {
+    "model": "9router/mycombo",
+    "opencode_version": "1.18.31",
+    "plugin_bin": "const BIN = [\"/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/bin/aisef\"]",
+    "worktrees": [
+     "/Users/nghinh/Downloads/projects/w1-run-1 31a5da5 [master]"
+    ],
+    "stories": 16,
+    "docker_image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+   },
+   "preflight_ok": true,
+   "gates": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "stale",
+    "pre-deploy": "pending"
+   },
+   "agent_starts_before": 5,
+   "story_evidence_before": [],
+   "ok": true
+  },
+  "kernel_first": {
+   "at": "2026-09-18T06:59:59+0700",
+   "agent_starts_before": 5,
+   "evidence_before": [],
+   "gates_before": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "stale",
+    "pre-deploy": "pending"
+   },
+   "run": {
+    "cmd": [
+     "aisef",
+     "run",
+     "--client",
+     "opencode"
+    ],
+    "exit": 2,
+    "seconds": 0.2,
+    "stdout_tail": "",
+    "stderr_tail": "✗ gate not approved: readiness\n  aisef review readiness\n"
+   },
+   "agent_starts_after": 5,
+   "evidence_after": [],
+   "refused_on_readiness": true,
+   "no_agent_call": true,
+   "ok": true,
+   "classification": "kernel refused the STALE gate before any agent call (ARB-1 kernel path first)"
+  },
+  "approve": {
+   "at": "2026-09-18T07:00:00+0700",
+   "gates_before": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "stale",
+    "pre-deploy": "pending"
+   },
+   "approve": {
+    "cmd": [
+     "aisef",
+     "approve",
+     "readiness",
+     "--note",
+     "ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for byte-identical content after the hash-method change (SS-55 verifier-config digest); not a waiver; kernel refusal recorded first; conditions measured in closure-evidence/hardening/w1/ARBITRATION-PREDECLARED.json"
+    ],
+    "exit": 0,
+    "seconds": 4.0,
+    "stdout_tail": "\n✗ 2/16 stories not yet eligible:\n  MISSING EVIDENCE STORY-02-01\n    - verify.e2e — story declares in `verification_contract`. configure `verify.e2e`\n  MISSING EVIDENCE STORY-03-01\n    - verify.e2e — story declares in `verification_contract`. configure `verify.e2e`\n✅ readiness approved by nghinh\n",
+    "stderr_tail": ""
+   },
+   "gates_after": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "approved",
+    "pre-deploy": "pending"
+   },
+   "approval_record": {
+    "gate": "readiness",
+    "artifact": "stories.index.json, design-contract.json",
+    "artifact_sha256": "32736048f968b74ec2cce5f010d465f045b4048b097d36476d13d3e6ada6a206",
+    "status": "approved",
+    "seq": 11,
+    "decided_by": "nghinh",
+    "decided_at": "2026-09-18T00:00:04+00:00",
+    "note": "ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for byte-identical content after the hash-method change (SS-55 verifier-config digest); not a waiver; kernel refusal recorded first; conditions measured in closure-evidence/hardening/w1/ARBITRATION-PREDECLARED.json",
+    "machine_checks": {},
+    "history": [
+     {
+      "status": "approved",
+      "decided_by": "nghinh",
+      "decided_at": "2026-09-15T13:32:32+00:00",
+      "note": "",
+      "artifact_sha256": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838"
+     }
+    ]
+   },
+   "changed_gates": [
+    "readiness"
+   ],
+   "ok": true,
+   "arb1_measured": {
+    "artifacts": [
+     "stories.index.json",
+     "design-contract.json"
+    ],
+    "signed_digest": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+    "digest_recomputed_by_the_signed_method": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+    "byte_identical_to_what_was_signed": true,
+    "current_method_digest": "32736048f968b74ec2cce5f010d465f045b4048b097d36476d13d3e6ada6a206",
+    "stale_caused_by_the_hash_method_alone": true
+   },
+   "arb1_note": "measured after the fact for run 1 by the same driver method, then made a precondition of approve() for every later run (ARB-1-MEASURED.json carries the negative control)"
+  }
+ },
+ "updated": "2026-09-18T07:00:04+0700"
+}

@@ -98,6 +98,12 @@ class Driver:
             (self.run_dir / save_as).write_text(r.stdout + ("\n--- stderr ---\n" + r.stderr if r.stderr else ""), encoding="utf-8")
         return out
 
+    def run_py(self, code: str) -> str:
+        """Run a snippet with the frozen candidate's python — never this checkout's."""
+        r = subprocess.run([self.a.python, "-c", code], capture_output=True, text=True, encoding="utf-8", errors="replace",
+                           timeout=120, cwd=str(self.project), env=self.env())
+        return r.stdout + (("\n" + r.stderr) if r.returncode else "")
+
     def git(self, *args: str) -> str:
         return subprocess.run(["git", "-C", str(self.project), *args], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
 
@@ -250,9 +256,38 @@ class Driver:
         self.say(f"kernel-first ok={K['ok']} exit={K['run']['exit']} {K['classification']}")
         return K["ok"]
 
+    def arb1_measure(self) -> dict:
+        """The owner's re-approval covers ONE case: the hash method changed, the content did not. It is void if any
+        content difference is found, so the driver measures that here, on this copy, before it approves anything."""
+        out = self.run_py(
+            "import hashlib, json, pathlib\n"
+            "from aisef.control.approvals import ApprovalStore, Gate, _artifact_hash\n"
+            f"ART = pathlib.Path({str(self.art)!r})\n"
+            "s = ApprovalStore(ART); paths = s.artifact_paths(Gate.READINESS)\n"
+            "rec = json.loads((ART / 'approvals/readiness.json').read_text(encoding='utf-8'))\n"
+            "signed = (rec.get('history') or [rec])[0]['artifact_sha256']\n"
+            "legacy = hashlib.sha256('\\n'.join(f'{p.relative_to(ART)}:{_artifact_hash(p)}' for p in paths).encode()).hexdigest()\n"
+            "print(json.dumps({'artifacts': [str(p.relative_to(ART)) for p in paths], 'signed_digest': signed,\n"
+            "  'digest_recomputed_by_the_signed_method': legacy, 'byte_identical_to_what_was_signed': legacy == signed,\n"
+            "  'current_method_digest': s.content_hash(Gate.READINESS)}))")
+        try:
+            m = json.loads(out.strip().splitlines()[-1])
+        except (ValueError, IndexError):
+            m = {"error": out[-400:], "byte_identical_to_what_was_signed": False}
+        m["stale_caused_by_the_hash_method_alone"] = bool(m.get("byte_identical_to_what_was_signed")) and m.get("current_method_digest") != m.get("signed_digest")
+        return m
+
     def approve(self) -> bool:
         self.say("phase approve: ARB-1 re-approval of readiness for byte-identical content")
-        A = {"at": now(), "gates_before": self.gates()}
+        A = {"at": now(), "gates_before": self.gates(), "arb1_measured": self.arb1_measure()}
+        if not A["arb1_measured"].get("stale_caused_by_the_hash_method_alone"):
+            A["ok"] = False
+            A["refused"] = ("OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL is void: the readiness content is not byte-identical "
+                            "to what was signed, so this is not the approved hash-migration case. STOP and report.")
+            self.rec["phases"]["approve"] = A
+            self.save()
+            self.say("approve REFUSED: " + A["refused"])
+            return False
         A["approve"] = self.cli("approve", "readiness", "--note", ARB1_NOTE, timeout=120, save_as="approve.txt")
         A["gates_after"] = self.gates()
         rec = self.art / "approvals" / "readiness.json"

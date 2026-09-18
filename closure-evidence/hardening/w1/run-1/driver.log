@@ -1,0 +1,9 @@
+[2026-09-18T06:59:12+0700] phase prepare
+[2026-09-18T06:59:20+0700] prepare ok=True aisef=aisef 1.7.6 wheel=True oracle=True guard=True topology=True preflight=True failed=[] gates={'prd': 'approved', 'architecture': 'approved', 'ux-spec': 'approved', 'epics': 'approved', 'stories': 'approved', 'mockups': 'approved', 'readiness': 'stale', 'pre-deploy': 'pending'} doctor_red=[]
+[2026-09-18T06:59:20+0700] W1 driver complete
+[2026-09-18T06:59:59+0700] phase kernel-first: aisef run with NO re-approval, NO --force
+[2026-09-18T07:00:00+0700] kernel-first ok=True exit=2 kernel refused the STALE gate before any agent call (ARB-1 kernel path first)
+[2026-09-18T07:00:00+0700] W1 driver complete
+[2026-09-18T07:00:00+0700] phase approve: ARB-1 re-approval of readiness for byte-identical content
+[2026-09-18T07:00:04+0700] approve ok=True changed=['readiness'] gates={'prd': 'approved', 'architecture': 'approved', 'ux-spec': 'approved', 'epics': 'approved', 'stories': 'approved', 'mockups': 'approved', 'readiness': 'approved', 'pre-deploy': 'pending'}
+[2026-09-18T07:00:04+0700] W1 driver complete

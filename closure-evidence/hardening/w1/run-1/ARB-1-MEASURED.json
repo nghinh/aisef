@@ -1,0 +1,23 @@
+{
+ "measured_on": "the fresh w1-run-1 copy, 2026-09-18, by the driver's own arb1_measure()",
+ "owner_condition": "OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL is void if any content difference is found",
+ "measurement": {
+  "artifacts": [
+   "stories.index.json",
+   "design-contract.json"
+  ],
+  "signed_digest": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+  "digest_recomputed_by_the_signed_method": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+  "byte_identical_to_what_was_signed": true,
+  "current_method_digest": "32736048f968b74ec2cce5f010d465f045b4048b097d36476d13d3e6ada6a206",
+  "stale_caused_by_the_hash_method_alone": true
+ },
+ "negative_control": {
+  "control": "ARB-1 negative control: a one-key content change to design-contract.json on a throwaway copy",
+  "clean_copy_holds": true,
+  "tampered_copy_holds": false,
+  "tampered_recomputed_digest": "a6ab46e586a81ca535e28bdc2e49fa0bd3b7dc52e84c0df85fdaf2715e8e58d0",
+  "signed_digest": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+  "gate_refuses_the_tampered_copy": true
+ }
+}
