@@ -161,5 +161,35 @@ class TestSkippedIsNeverAPass(unittest.TestCase):
         self.assertFalse(classify_oracle({"T::t_story": "PASSED", "T::t_global": "FAILED"}, MAP, COVERS, ALL_DONE)["oracle_passed_completely"])
         self.assertFalse(classify_oracle({}, MAP, COVERS, ALL_DONE)["oracle_passed_completely"])
 
+
+class TestFalseBlock(unittest.TestCase):
+    """The mirror of a false pass: work the framework refused although the oracle says it is good."""
+
+    FR_MAP = {"t_story": ["FR-1"], "t_global": []}
+
+    def test_a_failed_story_whose_oracle_checks_are_all_green_is_a_false_block(self):
+        m = _mod.run_metrics("", {"STORY-A": {"status": "failed", "attempts": 3}}, COVERS, self.FR_MAP, {"T::t_story": "PASSED"})
+        self.assertEqual(m["false_block_count"], 1)
+        self.assertEqual(m["false_block"][0]["story"], "STORY-A")
+
+    def test_a_failed_story_whose_oracle_checks_are_red_is_not_a_false_block(self):
+        m = _mod.run_metrics("", {"STORY-A": {"status": "failed", "attempts": 3}}, COVERS, self.FR_MAP, {"T::t_story": "FAILED"})
+        self.assertEqual(m["false_block_count"], 0)
+
+    def test_a_done_story_is_never_a_false_block(self):
+        m = _mod.run_metrics("", {"STORY-A": {"status": "done", "attempts": 1}}, COVERS, self.FR_MAP, {"T::t_story": "PASSED"})
+        self.assertEqual(m["false_block_count"], 0)
+
+    def test_a_story_no_oracle_check_covers_is_reported_as_not_measurable(self):
+        m = _mod.run_metrics("", {"STORY-B": {"status": "failed", "attempts": 3}}, COVERS, self.FR_MAP, {"T::t_story": "PASSED"})
+        self.assertEqual(m["false_block_count"], 0)
+        self.assertNotIn("STORY-B", m["false_block_measurable_for"])
+
+    def test_retries_come_from_the_state_store_not_the_log(self):
+        m = _mod.run_metrics("", {"STORY-A": {"status": "done", "attempts": 3}, "STORY-B": {"status": "done", "attempts": 1}},
+                             COVERS, self.FR_MAP, {})
+        self.assertEqual(m["developer_retries"], 2)
+        self.assertEqual(m["stories_done"], 2)
+
 if __name__ == "__main__":
     unittest.main()

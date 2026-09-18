@@ -57,6 +57,42 @@ def _is_preparation_commit(line: str) -> bool:
 
 # ---- oracle ownership model (owner decision "COMPLETE W1 RUNS 2-3", section 1) ---------------------------------------
 # Pure so it can carry deterministic negative controls: tests/hardening/test_w1_oracle_ownership.py.
+def run_metrics(runlog: str, state: dict, covers: dict, fr_map: dict, oracle_results: dict) -> dict:
+    """The per-run numbers the owner's report table asks for (section 10), measured from the run's own log and state.
+
+    false BLOCK is the mirror of false pass: a story the framework did NOT complete although every hidden-oracle check
+    that covers its requirements is green. It is only measurable for stories whose FRs some oracle check covers.
+    """
+    dev_done = re.findall(r"#(\d+) agent DONE ok=(\w+).*?turns=(\d+)", runlog)
+    metrics = {
+        "developer_agent_runs": len(dev_done),
+        "developer_retries": sum(max((st.get("attempts") or 1) - 1, 0) for st in state.values()),
+        "reviewer_executions": len(re.findall(r"review agent DONE", runlog)),
+        "reviewer_retries": max(len(re.findall(r"review agent DONE", runlog)) - len(re.findall(r"review START", runlog)), 0),
+        "security_executions": len(re.findall(r"security agent DONE", runlog)),
+        "security_retries": max(len(re.findall(r"security agent DONE", runlog)) - len(re.findall(r"security START", runlog)), 0),
+        "max_turn_events": len(re.findall(r"err=max_turns: stopped at", runlog)) + len(re.findall(r"review UNRUNNABLE \(execution \d+\) · max_turns", runlog)),
+        "human_arbitrations_during_the_run": len(re.findall(r"HUMAN_ARBITRATION|human arbitration", runlog)),
+        "stories_done": sum(1 for st in state.values() if st.get("status") == "done"),
+        "stories_failed": sorted(sid for sid, st in state.items() if st.get("status") == "failed"),
+        "stories_never_started": max(len(covers) - len(state), 0),
+    }
+    passed = {t.split("::")[-1] for t, v in oracle_results.items() if v == "PASSED"}
+    all_named = {t.split("::")[-1] for t in oracle_results}
+    false_block = []
+    for sid, st in state.items():
+        if st.get("status") == "done":
+            continue
+        cov = [t for t in all_named if any(fr in covers.get(sid, []) for fr in fr_map.get(t, []))]
+        if cov and all(t in passed for t in cov):
+            false_block.append({"story": sid, "status": st.get("status"), "oracle_checks_covering_it": cov})
+    metrics["false_block"] = false_block
+    metrics["false_block_count"] = len(false_block)
+    metrics["false_block_measurable_for"] = sorted(sid for sid in state
+                                                   if any(any(fr in covers.get(sid, []) for fr in fr_map.get(t, [])) for t in all_named))
+    return metrics
+
+
 def parse_oracle(stdout: str) -> dict:
     """SS-79: per-test outcomes from `pytest -v`, reconciled against pytest's own totals.
 
@@ -614,6 +650,10 @@ class Driver:
             + ([] if state else ["story_state_missing"]) \
             + ([] if F["oracle"]["parse_complete"] else [f"oracle_parse_incomplete: {F['oracle']['parse_note']}"]) \
             + ([f"oracle_not_executed={oc['oracle_not_executed_count']}"] if oc["oracle_not_executed"] else [])
+        runlog_text = (self.art / "run.log").read_text(encoding="utf-8") if (self.art / "run.log").is_file() else ""
+        F["run_metrics"] = run_metrics(runlog_text, state, covers, fr_map, F["oracle"]["results"])
+        F["exit_criteria"]["false_block_count"] = F["run_metrics"]["false_block_count"]
+        F["exit_criteria"]["false_block"] = F["run_metrics"]["false_block"]
         F["run_classification"] = classify_run(state, len(covers), F["safety_violations"], human_markers)
         F["exit_criteria"]["run_classification"] = F["run_classification"]
         F["exit_criteria"]["safety_violations"] = F["safety_violations"]
