@@ -1,7 +1,7 @@
 {
  "profile": "PROFILE-W1-OC-MINIMAXM3-T80-RO",
  "profile_id": "sha256:ae9adf64987f08ed498c0672325e81defa596d14e30822b8b8970847a320b1f3",
- "status": "UNDER_QUALIFICATION",
+ "status": "FAILED_W1_DELIVERY_QUALIFICATION",
  "identity": {
   "kernel": {
    "candidate_sha": "40393cda89dbfbb887c9c901872256a5fdc5bea0",
@@ -134,5 +134,23 @@
    "result": "PASS — 3/3 chat probes (MiniMax-M3), 3/3 tool smokes, reviewer read-only environment clean (per-role shells identical + developer control)"
   }
  ],
- "run_rule": "each run re-runs the provider preflight first (probes + smokes); a failing route creates no run copy"
+ "run_rule": "each run re-runs the provider preflight first (probes + smokes); a failing route creates no run copy",
+ "qualification_result": {
+  "decided": "2026-09-20T01:39:00+0700",
+  "valid_runs": [
+   "minimax-ro-1",
+   "minimax-ro-2"
+  ],
+  "delivery_complete": 0,
+  "excluded_provider_interrupted_runs": [],
+  "rule": "owner section 8: >= 2 of 3 valid runs DELIVERY_COMPLETE",
+  "why_no_third_run": "0 of 2 valid runs delivered; a third cannot reach 2 of 3",
+  "stopped_at": {
+   "minimax-ro-1": "STORY-04-02 (11/16)",
+   "minimax-ro-2": "STORY-02-02 (7/16, plan deadlock)"
+  },
+  "false_pass": 0,
+  "false_block": 0,
+  "section_9": "the second fixed-model profile to fail W1 delivery qualification (after PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO) -> STOP and DELIVERY FAILURE DECOMPOSITION"
+ }
 }

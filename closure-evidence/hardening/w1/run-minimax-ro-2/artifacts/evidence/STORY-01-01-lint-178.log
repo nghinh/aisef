@@ -1,0 +1,39 @@
+I001 [*] Import block is un-sorted or un-formatted
+ --> tests/test_nfc_normalization.py:1:1
+  |
+1 | / from __future__ import annotations
+2 | |
+3 | | import subprocess
+4 | | import unittest
+5 | | import unicodedata
+6 | | from pathlib import Path
+  | |________________________^
+help: Organize imports
+  |
+3 | import subprocess
+4 + import unicodedata
+5 | import unittest
+  - import unicodedata
+6 | from pathlib import Path
+  |
+
+RUF100 [*] Unused `noqa` directive (unused: `F401`)
+  --> tests/test_skeleton.py:57:55
+   |
+55 | class AC_STORY_01_01_7_PackageExportsTest(unittest.TestCase):
+56 |     def test_AC_STORY_01_01_7_ledger_and_conflicterror_exported(self) -> None:
+57 |         from ledgerlock import ConflictError, Ledger  # noqa: F401
+   |                                                       ^^^^^^^^^^^^
+58 |
+59 |         self.assertTrue(callable(Ledger))
+   |
+help: Remove unused `noqa` directive
+   |
+56 |     def test_AC_STORY_01_01_7_ledger_and_conflicterror_exported(self) -> None:
+   -         from ledgerlock import ConflictError, Ledger  # noqa: F401
+57 +         from ledgerlock import ConflictError, Ledger
+58 |
+   |
+
+Found 2 errors.
+[*] 2 fixable with the `--fix` option.

@@ -1,0 +1,86 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 13 items
+
+tests/test_format.py::AC_STORY_01_02_1_CanonicalBytesEqualsJsonDumpsTest::test_AC_STORY_01_02_1_canonical_bytes_matches_json_dumps_reference FAILED [  7%]
+tests/test_format.py::AC_STORY_01_02_2_ByteStabilityTest::test_AC_STORY_01_02_2_canonical_bytes_is_byte_stable FAILED [ 15%]
+tests/test_format.py::AC_STORY_01_02_3_NonAsciiUtf8LiteralTest::test_AC_STORY_01_02_3_non_ascii_uses_utf8_literal FAILED [ 23%]
+tests/test_format.py::AC_STORY_01_02_4_KeyOrderInvarianceTest::test_AC_STORY_01_02_4_key_insertion_order_does_not_affect_bytes FAILED [ 30%]
+tests/test_format.py::AC_STORY_01_02_5_GenesisConstantTest::test_AC_STORY_01_02_5_genesis_is_literal_seven_character_string FAILED [ 38%]
+tests/test_format.py::AC_STORY_01_02_6_JsonRoundTripByteStabilityTest::test_AC_STORY_01_02_6_canonical_bytes_stable_through_json_round_trip FAILED [ 46%]
+tests/test_nfc_normalization.py::AC_STORY_01_01_1_IdentityTest::test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte PASSED [ 53%]
+tests/test_nfc_normalization.py::AC_STORY_01_01_2_NFCEquivalenceTest::test_AC_STORY_01_01_2_nfc_and_nfd_are_byte_identical PASSED [ 61%]
+tests/test_nfc_normalization.py::SideChannelsGuardTest::test_AC_STORY_01_01_5_no_forbidden_top_level_imports PASSED [ 69%]
+tests/test_nfc_normalization.py::SideChannelsGuardTest::test_AC_STORY_01_01_6_no_forbidden_calls PASSED [ 76%]
+tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportTest::test_AC_STORY_01_01_3_import_ledgerlock_returns_init_path PASSED [ 84%]
+tests/test_skeleton.py::AC_STORY_01_01_4_CLIHelpTest::test_AC_STORY_01_01_4_cli_help_lists_subcommands PASSED [ 92%]
+tests/test_skeleton.py::AC_STORY_01_01_7_PackageExportsTest::test_AC_STORY_01_01_7_ledger_and_conflicterror_exported PASSED [100%]
+
+=================================== FAILURES ===================================
+_ AC_STORY_01_02_1_CanonicalBytesEqualsJsonDumpsTest.test_AC_STORY_01_02_1_canonical_bytes_matches_json_dumps_reference _
+
+self = <tests.test_format.AC_STORY_01_02_1_CanonicalBytesEqualsJsonDumpsTest testMethod=test_AC_STORY_01_02_1_canonical_bytes_matches_json_dumps_reference>
+
+    def test_AC_STORY_01_02_1_canonical_bytes_matches_json_dumps_reference(self) -> None:
+>       from ledgerlock.format import canonical_bytes
+E       ImportError: cannot import name 'canonical_bytes' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)
+
+tests/test_format.py:9: ImportError
+_ AC_STORY_01_02_2_ByteStabilityTest.test_AC_STORY_01_02_2_canonical_bytes_is_byte_stable _
+
+self = <tests.test_format.AC_STORY_01_02_2_ByteStabilityTest testMethod=test_AC_STORY_01_02_2_canonical_bytes_is_byte_stable>
+
+    def test_AC_STORY_01_02_2_canonical_bytes_is_byte_stable(self) -> None:
+>       from ledgerlock.format import canonical_bytes
+E       ImportError: cannot import name 'canonical_bytes' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)
+
+tests/test_format.py:23: ImportError
+_ AC_STORY_01_02_3_NonAsciiUtf8LiteralTest.test_AC_STORY_01_02_3_non_ascii_uses_utf8_literal _
+
+self = <tests.test_format.AC_STORY_01_02_3_NonAsciiUtf8LiteralTest testMethod=test_AC_STORY_01_02_3_non_ascii_uses_utf8_literal>
+
+    def test_AC_STORY_01_02_3_non_ascii_uses_utf8_literal(self) -> None:
+>       from ledgerlock.format import canonical_bytes
+E       ImportError: cannot import name 'canonical_bytes' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)
+
+tests/test_format.py:32: ImportError
+_ AC_STORY_01_02_4_KeyOrderInvarianceTest.test_AC_STORY_01_02_4_key_insertion_order_does_not_affect_bytes _
+
+self = <tests.test_format.AC_STORY_01_02_4_KeyOrderInvarianceTest testMethod=test_AC_STORY_01_02_4_key_insertion_order_does_not_affect_bytes>
+
+    def test_AC_STORY_01_02_4_key_insertion_order_does_not_affect_bytes(self) -> None:
+>       from ledgerlock.format import canonical_bytes
+E       ImportError: cannot import name 'canonical_bytes' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)
+
+tests/test_format.py:44: ImportError
+_ AC_STORY_01_02_5_GenesisConstantTest.test_AC_STORY_01_02_5_genesis_is_literal_seven_character_string _
+
+self = <tests.test_format.AC_STORY_01_02_5_GenesisConstantTest testMethod=test_AC_STORY_01_02_5_genesis_is_literal_seven_character_string>
+
+    def test_AC_STORY_01_02_5_genesis_is_literal_seven_character_string(self) -> None:
+>       from ledgerlock.format import GENESIS
+E       ImportError: cannot import name 'GENESIS' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)
+
+tests/test_format.py:53: ImportError
+_ AC_STORY_01_02_6_JsonRoundTripByteStabilityTest.test_AC_STORY_01_02_6_canonical_bytes_stable_through_json_round_trip _
+
+self = <tests.test_format.AC_STORY_01_02_6_JsonRoundTripByteStabilityTest testMethod=test_AC_STORY_01_02_6_canonical_bytes_stable_through_json_round_trip>
+
+    def test_AC_STORY_01_02_6_canonical_bytes_stable_through_json_round_trip(self) -> None:
+>       from ledgerlock.format import canonical_bytes
+E       ImportError: cannot import name 'canonical_bytes' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)
+
+tests/test_format.py:63: ImportError
+=========================== short test summary info ============================
+FAILED tests/test_format.py::AC_STORY_01_02_1_CanonicalBytesEqualsJsonDumpsTest::test_AC_STORY_01_02_1_canonical_bytes_matches_json_dumps_reference
+FAILED tests/test_format.py::AC_STORY_01_02_2_ByteStabilityTest::test_AC_STORY_01_02_2_canonical_bytes_is_byte_stable
+FAILED tests/test_format.py::AC_STORY_01_02_3_NonAsciiUtf8LiteralTest::test_AC_STORY_01_02_3_non_ascii_uses_utf8_literal
+FAILED tests/test_format.py::AC_STORY_01_02_4_KeyOrderInvarianceTest::test_AC_STORY_01_02_4_key_insertion_order_does_not_affect_bytes
+FAILED tests/test_format.py::AC_STORY_01_02_5_GenesisConstantTest::test_AC_STORY_01_02_5_genesis_is_literal_seven_character_string
+FAILED tests/test_format.py::AC_STORY_01_02_6_JsonRoundTripByteStabilityTest::test_AC_STORY_01_02_6_canonical_bytes_stable_through_json_round_trip
+========================= 6 failed, 7 passed in 0.08s ==========================
