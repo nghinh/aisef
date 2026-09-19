@@ -1,0 +1,14 @@
+{
+ "record": "OPERATOR_ENVIRONMENT incidents — not kernel defects",
+ "decision": "OWNER DECISION — CONTINUE W1 PROFILE QUALIFICATION, KERNEL FROZEN (2026-09-19), section 10",
+ "incidents": [
+  {
+   "id": "OP-ENV-2026-09-19-1",
+   "classification": "OPERATOR_ENVIRONMENT",
+   "when": "2026-09-19 ~06:48 (+07)",
+   "what": "a `python -c 'import aisef'` run with cwd=/private/tmp imported /private/tmp/inspect.py (a 2026-09-16 diagnostic script of another project) in place of the stdlib module: it ran `df -h` (read-only) and four `sudo docker exec goe-worker-1 ...` calls, all refused for lack of a password — nothing changed",
+   "impact": "none — every sudo call was refused (no password); df -h is read-only",
+   "rule_from_now": "qualification scripts never execute Python from shared writable directories such as /tmp: ad-hoc and scripted `python -c` use -P (safe_path) and a dedicated qualification workspace (~/Downloads/projects/aisef-qualification-ws) for temporary trees; the product kernel is not modified for this"
+  }
+ ]
+}

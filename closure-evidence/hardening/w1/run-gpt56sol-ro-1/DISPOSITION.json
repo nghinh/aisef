@@ -53,5 +53,18 @@
  "kernel_behaviour_on_the_outage": "verifier UNRUNNABLE retried on the same candidate without re-opening the developer (SS-14); developer provider errors charged to the infra budget, never to quality; typed stop — as designed",
  "qualification_counting": "owner decision: whether a run the provider stopped counts toward the profile's three runs, and whether the profile needs a different route, is the owner's (sections 12-13 forbid changing the reviewer model on my own)",
  "driver_classification_corrected": "the driver first labelled this LEGITIMATE_MODEL_PROJECT_STOP — its classifier read nothing about why a run stopped (SS-94, fixed; first record kept at scratch, finish re-run with the fix)",
- "new_findings": "FINDINGS-DURING-RUN.json (SS-92, SS-93 OPEN P2; incident: foreign /tmp script executed read-only)"
+ "new_findings": "FINDINGS-DURING-RUN.json (SS-92, SS-93 OPEN P2; incident: foreign /tmp script executed read-only)",
+ "owner_disposition": {
+  "decision": "OWNER DECISION — CONTINUE W1 PROFILE QUALIFICATION, KERNEL FROZEN (2026-09-19), section 1",
+  "recorded": "2026-09-19T10:27:49+0700",
+  "classification": "ENVIRONMENT_OR_PROVIDER_STOP",
+  "not": [
+   "DELIVERY_FAILURE",
+   "MODEL_QUALITY_FAILURE",
+   "KERNEL_FAILURE"
+  ],
+  "counts_toward_the_three_W1_delivery_runs": false,
+  "accepted_as": "environment/resilience evidence: the kernel classified the provider failure as infrastructure, charged no developer quality budget, produced no false PASS and corrupted no state",
+  "preserved": "exactly as recorded — nothing edited"
+ }
 }

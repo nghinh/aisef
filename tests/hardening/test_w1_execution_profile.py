@@ -104,6 +104,13 @@ class TestStageEnv(unittest.TestCase):
     """Owner decision "FIX SS-81 FAMILY", section 11: the reviewer/security dependency environment is part of the
     profile's identity; a profile that declares none keeps the id it always had."""
 
+    def test_the_declared_provider_preflight_is_part_of_the_id_and_carried_by_verify(self):
+        pre = {"route": "9router/cx/gpt-5.5", "route_kind": "FIXED_MODEL", "resolved_model": "gpt-5.5", "chat_probes": "3/3"}
+        self.assertEqual(ep.profile_id(BASE), ep.profile_id({**BASE, "provider_preflight": None}))
+        self.assertNotEqual(ep.profile_id({**BASE, "provider_preflight": pre}),
+                            ep.profile_id({**BASE, "provider_preflight": {**pre, "resolved_model": "gpt-5.4"}}))
+        self.assertTrue(self._verify({**BASE, "provider_preflight": pre}, BASE)["matches"])
+
     def test_a_profile_without_a_stage_environment_keeps_its_id(self):
         self.assertEqual(ep.profile_id(BASE), ep.profile_id({**BASE, "stage_env": None}))
 

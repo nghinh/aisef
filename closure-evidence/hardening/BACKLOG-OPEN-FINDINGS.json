@@ -1,0 +1,43 @@
+{
+ "record": "OPEN BACKLOG FINDINGS — visible, not fixed in this cycle",
+ "decision": "OWNER DECISION — CONTINUE W1 PROFILE QUALIFICATION, KERNEL FROZEN (2026-09-19), section 2",
+ "recorded": "2026-09-19T10:27:49+0700",
+ "rule": "do not reopen the product kernel for these in this cycle; do not mark them FIXED; do not weaken any current invariant merely to register them (so they are not linked into the frozen defect register, whose PROVEN invariants they would contradict)",
+ "findings": [
+  {
+   "id": "SS-92",
+   "severity": "P2",
+   "defect_class": "PRODUCT_KERNEL",
+   "family": "FAM-TYPED-OUTCOMES (sibling of SS-23)",
+   "invariants_it_would_downgrade": [
+    "INV-F.3",
+    "INV-N.1"
+   ],
+   "site": "aisef/harness/tools.py::unrunnable_reason",
+   "statement": "a lint or sast run that EXECUTED and reported findings is recorded TOOL_UNRUNNABLE ('tool not installed or cannot load (not found)') when its findings quote source text containing a MISSING_TOOL marker; SS-23 fixed the same shape for `test` only",
+   "measured": "run 1: bandit scanned 51 187 lines, 1039/31/26 low/medium/high issues, exit 1 — recorded TOOL_UNRUNNABLE because a quoted test line reads `assert \"not found: Ghost\" in err` (evidence/STORY-01-01-sast-62.log)",
+   "impact_in_this_run": "none on any gate: every story's contract is ['unit']; the sast runs were the developer's own `aisef tool sast` checks (implement prompt step 4) — the developer was told its scanner is missing",
+   "worst_case": "fail-closed misrouting: with a `security` contract or at pre-deploy, a finding-bearing scan (or a lint failure quoting such a line) is UNRUNNABLE instead of FAILED — the tool stage is retried as an environment problem, the developer never receives the findings; never a false PASS",
+   "reproducer": "closure-evidence/hardening/w1/run-gpt56sol-ro-1/repro_SS92_quoted_source_reads_as_missing_tool.py (2 FAIL on the frozen wheel, control OK)",
+   "status": "OPEN",
+   "disposition": "P2 backlog — fail-closed, no false PASS in the run that found it"
+  },
+  {
+   "id": "SS-93",
+   "severity": "P2",
+   "defect_class": "PRODUCT_KERNEL",
+   "family": "FAM-OWNERSHIP (bug 113's family)",
+   "invariants_it_would_downgrade": [
+    "INV-I.1"
+   ],
+   "site": "aisef/harness/capabilities.py (python SAST capability `bandit -q -r .`) vs aisef/phases/qa.py::_KHUNG",
+   "statement": "the default python sast command scans the framework directories the kernel itself declares are not the project's code (.claude/, .opencode/, .aisef/, _bmad-output/)",
+   "measured": "run 1: 1 093 of 1 096 bandit findings located under ./.claude (the workload's installed skills)",
+   "impact_in_this_run": "none on any gate (no `security` contract)",
+   "worst_case": "a story or pre-deploy with a `security` contract is FAILED on findings in files the developer does not own — fail-closed, delivery-blocking noise; never a false PASS",
+   "reproducer": "closure-evidence/hardening/w1/run-gpt56sol-ro-1/repro_SS93_default_sast_scans_framework_dirs.py (FAIL on the frozen wheel)",
+   "status": "OPEN",
+   "disposition": "P2 backlog — fail-closed, no false PASS in the run that found it"
+  }
+ ]
+}

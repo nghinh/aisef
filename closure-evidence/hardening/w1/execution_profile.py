@@ -27,6 +27,16 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+#: OPERATOR_ENVIRONMENT rule (owner decision 2026-09-19, section 10): temporary trees live in a dedicated qualification
+#: workspace, never a shared writable directory; every `python -c` runs with -P (no cwd on sys.path)
+QUAL_WS = Path.home() / "Downloads/projects/aisef-qualification-ws"
+
+
+def _ws() -> str:
+    QUAL_WS.mkdir(parents=True, exist_ok=True)
+    return str(QUAL_WS)
+
+
 ROOT = HERE.parents[2]
 FREEZE = ROOT / "closure-evidence/hardening/P19-FREEZE.json"
 MATRIX = ROOT / "closure-evidence/hardening/tool-capability-matrix.json"
@@ -66,7 +76,7 @@ def _venv_python(venv: Path) -> str:
 def _config(copy: Path, py: str) -> dict:
     code = ("import json,sys; from aisef.config import Config; "
             "print(json.dumps(Config.load(sys.argv[1]).values, default=str))")
-    return json.loads(subprocess.run([py, "-c", code, str(copy)], capture_output=True, text=True, check=True).stdout)
+    return json.loads(subprocess.run([py, "-P", "-c", code, str(copy)], capture_output=True, text=True, check=True).stdout)
 
 
 def _declared_limit(copy: Path, route: str) -> dict | None:
@@ -126,7 +136,7 @@ def _role_env(venv: Path, role: str, path: str, copy: Path) -> dict:
             "else:\n"
             "    spec[G.ENV_DISALLOWED_TOOLS] = ','.join(ROLES[role].disallowed_tools)\n"
             "print(json.dumps(child_env(spec, allow_prefixes=OpenCodeAdapter.env_prefixes)))\n")
-    r = subprocess.run([_venv_python(venv), "-c", code, role, str(copy)], capture_output=True, text=True, check=True,
+    r = subprocess.run([_venv_python(venv), "-P", "-c", code, role, str(copy)], capture_output=True, text=True, check=True,
                        env={**os.environ, "PATH": path})
     return json.loads(r.stdout)
 
@@ -151,7 +161,7 @@ def stage_env_check(copy: Path, venv: Path, path: str) -> dict:
                                encoding="utf-8", errors="replace", timeout=300)
             rows[f"{role} {' '.join(sh)}"] = {"identical": _snapshot(copy) == before, "exit": r.returncode,
                                               "tail": (r.stdout + r.stderr).strip()[-240:]}
-    with tempfile.TemporaryDirectory() as td:
+    with tempfile.TemporaryDirectory(dir=_ws()) as td:
         clone = Path(td) / "clone"
         subprocess.run(["git", "clone", "-q", "--no-hardlinks", str(copy), str(clone)], check=True)
         env = _role_env(venv, "developer", path, clone)
@@ -169,7 +179,7 @@ def measure(copy: Path, venv: Path, freeze: Path = FREEZE, path: str | None = No
     py = _venv_python(venv)
     cfg = _config(copy, py)
     routes = _effective_routes(copy, cfg)
-    prompts = Path(subprocess.run([py, "-c", "import aisef, pathlib; print(pathlib.Path(aisef.__file__).parent / 'kit/prompts')"],
+    prompts = Path(subprocess.run([py, "-P", "-c", "import aisef, pathlib; print(pathlib.Path(aisef.__file__).parent / 'kit/prompts')"],
                                   capture_output=True, text=True, check=True).stdout.strip())
     catalog = _sha(b"".join(f.name.encode() + b"\0" + f.read_bytes() for f in sorted(prompts.glob("*.md"))))
     plugin = copy / ".opencode/plugin/aisef-guard.ts"
@@ -200,6 +210,8 @@ def profile_id(identity: dict) -> str:
     """Digest over the configuration-determined fields plus the declared route resolution."""
     picked = {k: identity[k] for k in CONFIG_FIELDS}
     picked.update({k: identity[k] for k in OPTIONAL_FIELDS if identity.get(k) is not None})
+    if identity.get("provider_preflight") is not None:     # owner decision 2026-09-19 s.5: declared at definition
+        picked["provider_preflight"] = identity["provider_preflight"]
     picked["route_resolution"] = {r: {k: v for k, v in (identity.get("route_resolution") or {}).get(r, {}).items()
                                       if k in ("route_kind", "resolved_model")} for r in ROLES}
     return "sha256:" + _sha(json.dumps(picked, sort_keys=True, default=str).encode())
@@ -225,6 +237,8 @@ def apply(profile: dict, copy: Path) -> list[str]:
 def verify(profile: dict, copy: Path, venv: Path, freeze: Path = FREEZE, path: str | None = None) -> dict:
     got = measure(copy, venv, freeze, path)
     got["route_resolution"] = profile["identity"].get("route_resolution")
+    if profile["identity"].get("provider_preflight") is not None:
+        got["provider_preflight"] = profile["identity"]["provider_preflight"]    # declared; each run re-probes it
     fields = CONFIG_FIELDS + tuple(k for k in OPTIONAL_FIELDS if profile["identity"].get(k) is not None)
     for k in OPTIONAL_FIELDS:
         if profile["identity"].get(k) is None:

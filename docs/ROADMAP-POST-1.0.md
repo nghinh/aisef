@@ -368,3 +368,16 @@ HUMAN_REQUIRED (that class is for semantic decisions: requirement ambiguity, pla
 A distinct typed reason — `DELIVERY_ATTEMPTS_EXHAUSTED`, or `MODEL_CAPABILITY_EXHAUSTED` when every attempt ended on the
 turn cap — would let an operator tell "the model could not do this within its budget" from "the work was judged and
 refused" without reading the run log. UX improvement only; no change during the frozen-kernel qualification cycle.
+
+## Backlog — OPEN P2 findings from W1 (2026-09-19): SS-92, SS-93
+
+Owner decision 2026-09-19: not fixed in the frozen-kernel qualification cycle, not marked FIXED, no invariant weakened
+to register them — kept visible in `closure-evidence/hardening/BACKLOG-OPEN-FINDINGS.json` (reproducers there FAIL on
+the frozen kernel 40393cd). Both fail closed; neither produced a false PASS.
+
+- **SS-92** — `harness/tools.py::unrunnable_reason`: a lint or sast run that executed and reported findings is recorded
+  TOOL_UNRUNNABLE when the findings quote source text containing a missing-tool marker (`"not found"`). SS-23 fixed the
+  same shape for `test` only. Fix direction: a run whose output parses as the tool's own report is a result.
+- **SS-93** — the default python sast command `bandit -q -r .` scans `.claude/`, `.opencode/`, `.aisef/`,
+  `_bmad-output/`, which `phases/qa.py::_KHUNG` already declares are not the project's code (1 093 of 1 096 findings
+  under `.claude` in W1). Fix direction: exclude the framework directories from the default scope.

@@ -1902,7 +1902,8 @@
     "tests/hardening/test_w0_gate.py::TestSS90EvidenceOfAnotherKernelRefuses"
    ],
    "fixed_by": "validation/w0_qualification.py: Phase 12 row requires manifest.kernel_digests == [candidate aisef tree]; mutation row requires the record's aisef_tree == candidate tree, no --only, the full target set, and reads survivors from `rows`; validation/mutate.py records aisef_tree (empty when aisef/ is dirty), aisef_dirty and only",
-   "note_on_stop_rule": "qualification infrastructure, not product kernel: the fix only adds refusals and cannot produce a PASS; continued under the precedent of SS-66/SS-77/SS-79 and reported at the checkpoint"
+   "note_on_stop_rule": "qualification infrastructure, not product kernel: the fix only adds refusals and cannot produce a PASS; continued under the precedent of SS-66/SS-77/SS-79 and reported at the checkpoint",
+   "owner_disposition": "OWNER DECISION — CONTINUE W1 PROFILE QUALIFICATION, KERNEL FROZEN (2026-09-19), section 3: accepted as a QUALIFICATION-INFRASTRUCTURE P1, not a product-kernel defect; fix accepted (strengthens refusal, no product-tree change, deterministic negative controls, W0 recomputed after it); both the flawed historical evidence (voided W0 AISEF-W0-QUALIFICATION.json, mutation record in git history) and the corrected result are preserved; no new Phase-12 run required for it"
   },
   {
    "id": "SS-91",

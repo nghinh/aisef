@@ -34,6 +34,16 @@ import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+#: OPERATOR_ENVIRONMENT rule (owner decision 2026-09-19, section 10): temporary trees live in a dedicated qualification
+#: workspace, never a shared writable directory; every `python -c` runs with -P (no cwd on sys.path)
+QUAL_WS = Path.home() / "Downloads/projects/aisef-qualification-ws"
+
+
+def _ws() -> str:
+    QUAL_WS.mkdir(parents=True, exist_ok=True)
+    return str(QUAL_WS)
+
+
 sys.path.insert(0, str(HERE))
 REPO = HERE.parents[2]
 MARKERS = ["wave=EPIC-01/w3 DONE", "wave=EPIC-03/w1 DONE"]  # P20 procedure 3: the forced-resume boundaries
@@ -282,7 +292,7 @@ class Driver:
 
     def run_py(self, code: str) -> str:
         """Run a snippet with the frozen candidate's python — never this checkout's."""
-        r = subprocess.run([self.a.python, "-c", code], capture_output=True, text=True, encoding="utf-8", errors="replace",
+        r = subprocess.run([self.a.python, "-P", "-c", code], capture_output=True, text=True, encoding="utf-8", errors="replace",
                            timeout=120, cwd=str(self.project), env=self.env())
         return r.stdout + (("\n" + r.stderr) if r.returncode else "")
 
@@ -320,7 +330,7 @@ class Driver:
         self.say("phase prepare")
         P = {"at": now()}
         P["aisef_version"] = self.cli("--version", timeout=60)["stdout_tail"].strip()
-        ident = subprocess.run([self.a.python, "-c", "import aisef, sys; print(aisef.__file__); print(sys.prefix)"], capture_output=True, text=True, encoding="utf-8", errors="replace",
+        ident = subprocess.run([self.a.python, "-P", "-c", "import aisef, sys; print(aisef.__file__); print(sys.prefix)"], capture_output=True, text=True, encoding="utf-8", errors="replace",
                                cwd=str(self.run_dir), env=self.env()).stdout.split()
         P["aisef_file"] = ident[0] if ident else ""
         P["aisef_from_the_wheel_not_the_checkout"] = bool(ident) and "site-packages" in ident[0] and str(REPO / "aisef") not in ident[0]
@@ -365,7 +375,7 @@ class Driver:
         idx = json.loads((self.art / "stories.index.json").read_text(encoding="utf-8"))
         stories = idx["stories"] if isinstance(idx, dict) and "stories" in idx else idx
         req = self.project / "docs/requirements.md"
-        model = subprocess.run([self.a.python, "-c", "from aisef.clients.opencode import configured_model; print(configured_model(%r))" % str(self.project)],
+        model = subprocess.run([self.a.python, "-P", "-c", "from aisef.clients.opencode import configured_model; print(configured_model(%r))" % str(self.project)],
                                capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(self.run_dir), env=self.env()).stdout.strip()
         status_text = self.cli("status", timeout=120)["stdout_tail"]
         plugin_bin = P["guard_plugin"]["bin_line"] or ""
@@ -381,7 +391,7 @@ class Driver:
                    "img = rows[0]['image'] if rows else ''\n"
                    "print(json.dumps(dict(resolved=rows, checks=checks, image=img, image_id=V.image_id(img),\n"
                    "                      expected_python_image=C.profile_by_stack('python').image)))\n")
-        cp = subprocess.run([self.a.python, "-c", cap_src, str(self.project)], capture_output=True, text=True, encoding="utf-8",
+        cp = subprocess.run([self.a.python, "-P", "-c", cap_src, str(self.project)], capture_output=True, text=True, encoding="utf-8",
                             errors="replace", cwd=str(self.run_dir), env=self.env(), timeout=2400)
         try:
             P["capability_preflight"] = json.loads(cp.stdout.strip().splitlines()[-1])
@@ -658,7 +668,7 @@ class Driver:
             F["stories"].setdefault(jf.stem, {})["journal_last_step"] = recs[-1].get("step") if recs else None
             F["stories"][jf.stem]["journal_records"] = len(recs)
         # the hidden oracle on a clean clone of master (never the run's working tree)
-        with tempfile.TemporaryDirectory() as td:
+        with tempfile.TemporaryDirectory(dir=_ws()) as td:
             deliv = Path(td) / "delivered"
             subprocess.run(["git", "clone", "--quiet", "--branch", "master", str(self.project), str(deliv)], check=True)
             F["delivered"] = {"master_head": subprocess.run(["git", "-C", str(deliv), "rev-parse", "HEAD"], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip(),
