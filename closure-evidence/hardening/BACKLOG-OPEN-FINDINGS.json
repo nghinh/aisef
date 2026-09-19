@@ -38,6 +38,16 @@
    "reproducer": "closure-evidence/hardening/w1/run-gpt56sol-ro-1/repro_SS93_default_sast_scans_framework_dirs.py (FAIL on the frozen wheel)",
    "status": "OPEN",
    "disposition": "P2 backlog — fail-closed, no false PASS in the run that found it"
+  },
+  {
+   "id": "OBS-CI-2026-09-20-1",
+   "severity": "P3",
+   "defect_class": "TEST_INFRASTRUCTURE_OBSERVATION",
+   "status": "OBSERVED_NOT_REPRODUCED",
+   "site": "tests/test_run.py::RunTestCase.tearDown (TemporaryDirectory.cleanup)",
+   "statement": "CI of 93ec460 (evidence-only commit), unit (ubuntu-latest, 3.14): test_run.TestDoneChiSauMerge.test_merge_dung_thi_verified_khong_phai_done errored in tearDown — `OSError: [Errno 39] Directory not empty: '/tmp/.../.git'` (something wrote into .git while it was being removed)",
+   "measured": "first occurrence in the branch's CI history (5 earlier failed runs checked: none); the failed job re-run passed (run 35457412276 attempt 2); 0 failures in 40 local runs of the class on Python 3.14; the product's wave workers run inside `with ThreadPoolExecutor(...)` (aisef/phases/run.py:699), so no worker thread outlives run_sprint; remaining unmeasured candidate: a detached git housekeeping process (gc/maintenance --auto) on the runner",
+   "action": "none in this cycle — kernel frozen; not a kernel defect on this evidence; watch for recurrence"
   }
  ]
 }
