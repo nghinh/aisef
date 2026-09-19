@@ -1,0 +1,37 @@
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:36:16
+   |
+34 | class AC_STORY_01_01_4_CLIAdvertisesAllSubcommands(unittest.TestCase):
+35 |     def test_help_lists_verify_snapshot_apply_repair_tail(self) -> None:
+36 |         proc = subprocess.run(
+   |                ^^^^^^^^^^^^^^
+37 |             [_python(), "-m", "ledgerlock", "--help"],
+38 |             cwd=REPO_ROOT,
+   |
+help: Add explicit `check=False`
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:61:16
+   |
+59 |         if not LEDGERLOCK_DIR.is_dir():
+60 |             self.fail(f"missing ledgerlock package at {LEDGERLOCK_DIR}")
+61 |         proc = subprocess.run(
+   |                ^^^^^^^^^^^^^^
+62 |             [
+63 |                 "grep",
+   |
+help: Add explicit `check=False`
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:84:16
+   |
+82 |         if not LEDGERLOCK_DIR.is_dir():
+83 |             self.fail(f"missing ledgerlock package at {LEDGERLOCK_DIR}")
+84 |         proc = subprocess.run(
+   |                ^^^^^^^^^^^^^^
+85 |             [
+86 |                 "grep",
+   |
+help: Add explicit `check=False`
+
+Found 3 errors.

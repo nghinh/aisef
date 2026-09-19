@@ -1,0 +1,7 @@
+
+✗ 2/16 stories not yet eligible:
+  MISSING EVIDENCE STORY-02-01
+    - verify.e2e — story declares in `verification_contract`. configure `verify.e2e`
+  MISSING EVIDENCE STORY-03-01
+    - verify.e2e — story declares in `verification_contract`. configure `verify.e2e`
+✅ readiness approved by nghinh

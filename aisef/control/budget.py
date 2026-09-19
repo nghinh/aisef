@@ -51,6 +51,12 @@ class BudgetExceeded(RuntimeError):
     """Raised when a reservation would exceed the configured cap."""
 
 
+class BudgetLocked(BudgetExceeded):
+    """The ledger is locked by another writer: contention, not a cap. Kept a subclass so every handler that
+    catches `BudgetExceeded` still does; the kernel tells them apart (SS-21: contention was reported as a cap
+    and charged to the developer)."""
+
+
 @dataclass
 class BudgetState:
     """Pure data: current ledger entries plus the global cap."""
@@ -62,6 +68,8 @@ class BudgetState:
     spent_turns: int = 0
     started_at: float = 0.0
     reservations: list[dict] = field(default_factory=list)
+    #: Reservations released because their owner died or their term expired (F5 / SS-52) — the last 50, with why.
+    released: list[dict] = field(default_factory=list)
     #: Chiều đã cảnh báo ("usd"/"turns"/"seconds"). Ghi xuống đĩa để một lần
     #: chạm ngưỡng kêu **một lần**, không kêu ở mọi lượt gọi còn lại.
     warned: list[str] = field(default_factory=list)
@@ -77,6 +85,7 @@ class BudgetState:
             "spent_turns": self.spent_turns,
             "started_at": self.started_at,
             "reservations": list(self.reservations),
+            "released": list(self.released),
             "warned": list(self.warned),
         }
 
@@ -91,6 +100,7 @@ class BudgetState:
             spent_turns=int(d.get("spent_turns") or 0),
             started_at=float(d.get("started_at") or 0.0),
             reservations=list(d.get("reservations") or []),
+            released=list(d.get("released") or []),
             warned=[str(x) for x in (d.get("warned") or [])],
         )
 
@@ -173,17 +183,20 @@ class BudgetGuard:
             flock_ex_nb(fd)
         except (BlockingIOError, OSError) as e:
             os.close(fd)
-            raise BudgetExceeded(
+            raise BudgetLocked(
                 f"budget ledger locked by another writer ({e})") from e
         try:
             state = self.ledger.load()
             _check_caps(state, est_usd=est_usd, est_turns=est_turns,
                         est_seconds=est_seconds)
+            _prune_dead_reservations(state)                          # SS-52: a killed run's reservation dies with it
             rid = f"{int(time.time() * 1000)}-{attempt}-{story_id}"
+            from .state import machine_id
             state.reservations.append({
                 "id": rid, "story": story_id, "label": label,
                 "est_usd": float(est_usd), "est_turns": int(est_turns),
                 "est_seconds": float(est_seconds), "at": time.time(),
+                "owner": machine_id(), "expires_at": time.time() + max(2 * float(est_seconds or 0), 600.0),
             })
             self.ledger.save(state)
             token = _Reservation(
@@ -253,16 +266,37 @@ def _has_at_least_one(state: BudgetState) -> bool:
                 or state.spent_usd or state.spent_turns or state.started_at)
 
 
+def _reservation_live(r: dict) -> bool:
+    """A reservation counts while its owner is not known dead on this host and its term has not expired (SS-52)."""
+    from .state import claim_is_orphaned
+    owner = str(r.get("owner") or "")
+    if owner and claim_is_orphaned(owner):
+        return False
+    exp = float(r.get("expires_at") or 0.0)
+    return not exp or exp > time.time()
+
+
+def _prune_dead_reservations(state: BudgetState) -> list[dict]:
+    dead = [r for r in state.reservations if not _reservation_live(r)]
+    if dead:
+        state.reservations = [r for r in state.reservations if _reservation_live(r)]
+        for r in dead:
+            why = "term expired" if float(r.get("expires_at") or 0.0) <= time.time() else "owner dead"
+            state.released = (state.released + [{**r, "released_at": time.time(), "why": why}])[-50:]   # the record
+            print(f"budget: released reservation {r.get('id')} of {r.get('owner') or 'an unknown owner'} "
+                  f"({why}): ${float(r.get('est_usd') or 0):.2f}", file=sys.stderr)
+    return dead
+
+
 def _check_caps(state: BudgetState, *, est_usd: float, est_turns: int,
                 est_seconds: float) -> None:
     # In-flight reservations must count toward cap usage; otherwise two
     # reserves that each fit below the cap but together exceed it slip
     # through the per-call check and only blow the cap at settle time,
     # after the spend has already happened.
-    reserved_usd = sum(float(r.get("est_usd") or 0.0)
-                       for r in state.reservations)
-    reserved_turns = sum(int(r.get("est_turns") or 0)
-                         for r in state.reservations)
+    live = [r for r in state.reservations if _reservation_live(r)]      # SS-52: the dead and the expired do not count
+    reserved_usd = sum(float(r.get("est_usd") or 0.0) for r in live)
+    reserved_turns = sum(int(r.get("est_turns") or 0) for r in live)
     if state.cap_usd:
         if state.spent_usd + reserved_usd + est_usd > state.cap_usd:
             raise BudgetExceeded(

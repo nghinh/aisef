@@ -1,0 +1,124 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 43 items
+
+tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_1_put_same_rid_replays_original_line_byte_for_byte PASSED [  2%]
+tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_2_put_different_rid_raises_conflict PASSED [  4%]
+tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_3_delete_then_put_different_rid_raises_conflict PASSED [  6%]
+tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_4_delete_same_rid_replays_delete_line_byte_for_byte PASSED [  9%]
+tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_5_nfd_same_rid_replays_nfc_key_byte_exact PASSED [ 11%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_1_matches_json_dumps PASSED [ 13%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_2_byte_identical_across_element_equal_dicts PASSED [ 16%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_3_non_ascii_encoded_as_utf8_literal PASSED [ 18%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_4_key_order_independent PASSED [ 20%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_5_genesis_is_literal_seven_char_string PASSED [ 23%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_6_round_trip_through_json_loads PASSED [ 25%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_1_returns_64_lowercase_hex PASSED [ 27%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_2_distinct_prev_hash_distinct_digest PASSED [ 30%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_3_ignores_existing_hash_fields PASSED [ 32%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_4_deterministic_across_invocations PASSED [ 34%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_5_accepts_genesis_prev_hash PASSED [ 37%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_1_first_append_writes_single_chained_line PASSED [ 39%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_2_second_append_chains_prev_hash PASSED [ 41%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_3_empty_key_raises_value_error_no_file PASSED [ 44%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_4_fresh_instance_reads_tail_from_disk PASSED [ 46%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_5_other_instance_sees_line_and_trailing_newline PASSED [ 48%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte PASSED [ 51%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_2_nfc_and_nfd_forms_are_equivalent PASSED [ 53%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_3_import_prints_init_path PASSED [ 55%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_4_cli_help_lists_subcommands PASSED [ 58%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_5_no_forbidden_imports PASSED [ 60%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_6_no_side_channel_calls PASSED [ 62%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_7_ledger_and_conflict_error_importable PASSED [ 65%]
+tests/test_snapshot_determinism.py::TestSnapshotDeterminism::test_AC_STORY_02_02_1_sorted_deterministic_equal_dicts FAILED [ 67%]
+tests/test_snapshot_determinism.py::TestSnapshotDeterminism::test_AC_STORY_02_02_2_put_then_delete_absent FAILED [ 69%]
+tests/test_snapshot_determinism.py::TestSnapshotDeterminism::test_AC_STORY_02_02_3_nfd_replay_nfc_key_value FAILED [ 72%]
+tests/test_snapshot_determinism.py::TestSnapshotDeterminism::test_AC_STORY_02_02_4_two_instances_equal FAILED [ 74%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_1_returns_n_bytes_with_trailing_newline_stripped PASSED [ 76%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_2_missing_file_raises_file_not_found PASSED [ 79%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_3_empty_file_returns_empty_list PASSED [ 81%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_writes_concatenation_and_round_trips PASSED [ 83%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_5_crash_before_replace_leaves_original_intact PASSED [ 86%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_6_temp_file_created_in_same_directory PASSED [ 88%]
+tests/test_verify_independent.py::TestVerifyIndependent::test_AC_STORY_02_01_1_n_valid_lines_verify_ok PASSED [ 90%]
+tests/test_verify_independent.py::TestVerifyIndependent::test_AC_STORY_02_01_2_zero_byte_jsonl_verify_ok PASSED [ 93%]
+tests/test_verify_independent.py::TestVerifyIndependent::test_AC_STORY_02_01_3_missing_file_raises_file_not_found PASSED [ 95%]
+tests/test_verify_independent.py::TestVerifyIndependent::test_AC_STORY_02_01_4_hash_overwritten_out_of_band_detected PASSED [ 97%]
+tests/test_verify_independent.py::TestVerifyIndependent::test_AC_STORY_02_01_5_value_mutated_out_of_band_detected PASSED [100%]
+
+=================================== FAILURES ===================================
+_ TestSnapshotDeterminism.test_AC_STORY_02_02_1_sorted_deterministic_equal_dicts _
+
+self = <tests.test_snapshot_determinism.TestSnapshotDeterminism testMethod=test_AC_STORY_02_02_1_sorted_deterministic_equal_dicts>
+
+    def test_AC_STORY_02_02_1_sorted_deterministic_equal_dicts(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "ledger.jsonl"
+            ledger = Ledger(path)
+            ledger.append(("put", "a", 1, "ra", 1))
+            ledger.append(("put", "c", 3, "rc", 3))
+            ledger.append(("put", "b", 2, "rb", 2))
+>           first = ledger.snapshot()
+                    ^^^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'snapshot'
+
+tests/test_snapshot_determinism.py:45: AttributeError
+_____ TestSnapshotDeterminism.test_AC_STORY_02_02_2_put_then_delete_absent _____
+
+self = <tests.test_snapshot_determinism.TestSnapshotDeterminism testMethod=test_AC_STORY_02_02_2_put_then_delete_absent>
+
+    def test_AC_STORY_02_02_2_put_then_delete_absent(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "ledger.jsonl"
+            _write_chain(
+                path,
+                [
+                    ("put", "k", "v", "r1", 1),
+                    ("delete", "k", "r2", 2),
+                ],
+            )
+>           self.assertNotIn("k", Ledger(path).snapshot())
+                                  ^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'snapshot'
+
+tests/test_snapshot_determinism.py:66: AttributeError
+____ TestSnapshotDeterminism.test_AC_STORY_02_02_3_nfd_replay_nfc_key_value ____
+
+self = <tests.test_snapshot_determinism.TestSnapshotDeterminism testMethod=test_AC_STORY_02_02_3_nfd_replay_nfc_key_value>
+
+    def test_AC_STORY_02_02_3_nfd_replay_nfc_key_value(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "ledger.jsonl"
+            ledger = Ledger(path)
+            ledger.append(("put", "e\u0301", "v", "r", 1))
+            ledger.append(("put", "\u00e9", "v2", "r", 2))
+>           self.assertEqual(ledger.snapshot(), {"\u00e9": "v"})
+                             ^^^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'snapshot'
+
+tests/test_snapshot_determinism.py:74: AttributeError
+______ TestSnapshotDeterminism.test_AC_STORY_02_02_4_two_instances_equal _______
+
+self = <tests.test_snapshot_determinism.TestSnapshotDeterminism testMethod=test_AC_STORY_02_02_4_two_instances_equal>
+
+    def test_AC_STORY_02_02_4_two_instances_equal(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "ledger.jsonl"
+            ledger = Ledger(path)
+            ledger.append(("put", "a", 1, "ra", 1))
+            ledger.append(("put", "b", {"n": 2}, "rb", 2))
+>           self.assertEqual(Ledger(path).snapshot(), Ledger(path).snapshot())
+                             ^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'snapshot'
+
+tests/test_snapshot_determinism.py:82: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_snapshot_determinism.py::TestSnapshotDeterminism::test_AC_STORY_02_02_1_sorted_deterministic_equal_dicts
+FAILED tests/test_snapshot_determinism.py::TestSnapshotDeterminism::test_AC_STORY_02_02_2_put_then_delete_absent
+FAILED tests/test_snapshot_determinism.py::TestSnapshotDeterminism::test_AC_STORY_02_02_3_nfd_replay_nfc_key_value
+FAILED tests/test_snapshot_determinism.py::TestSnapshotDeterminism::test_AC_STORY_02_02_4_two_instances_equal
+========================= 4 failed, 39 passed in 0.27s =========================

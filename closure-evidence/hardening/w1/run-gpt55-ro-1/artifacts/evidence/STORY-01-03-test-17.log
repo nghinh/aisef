@@ -1,0 +1,82 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 18 items
+
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_1_matches_json_dumps_contract PASSED [  5%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_2_equal_dicts_return_byte_identical_bytes PASSED [ 11%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_3_non_ascii_is_utf8_literal_and_stable PASSED [ 16%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_4_insertion_order_does_not_change_bytes PASSED [ 22%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_5_genesis_is_literal_string PASSED [ 27%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_6_json_round_trip_preserves_canonical_bytes PASSED [ 33%]
+tests/test_format.py::LineHashTests::test_AC_STORY_01_03_1_returns_64_lowercase_hex_characters FAILED [ 38%]
+tests/test_format.py::LineHashTests::test_AC_STORY_01_03_2_distinct_prev_hash_values_change_digest FAILED [ 44%]
+tests/test_format.py::LineHashTests::test_AC_STORY_01_03_3_ignores_existing_hash_fields FAILED [ 50%]
+tests/test_format.py::LineHashTests::test_AC_STORY_01_03_4_same_input_returns_same_digest FAILED [ 55%]
+tests/test_format.py::LineHashTests::test_AC_STORY_01_03_5_accepts_genesis_prev_hash FAILED [ 61%]
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_normalize_key_matches_unicodedata_nfc 
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_normalize_key_matches_unicodedata_nfc PASSED [ 66%]
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_2_nfc_and_nfd_e_acute_normalize_identically PASSED [ 72%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_3_package_import_prints_init_file_path PASSED [ 77%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_4_module_help_lists_required_subcommands PASSED [ 83%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_5_runtime_has_no_forbidden_imports PASSED [ 88%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_6_runtime_has_no_forbidden_process_or_socket_calls PASSED [ 94%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_7_package_exports_ledger_and_conflict_error PASSED [100%]
+
+=================================== FAILURES ===================================
+___ LineHashTests.test_AC_STORY_01_03_1_returns_64_lowercase_hex_characters ____
+
+self = <tests.test_format.LineHashTests testMethod=test_AC_STORY_01_03_1_returns_64_lowercase_hex_characters>
+
+    def test_AC_STORY_01_03_1_returns_64_lowercase_hex_characters(self):
+>       from ledgerlock.format import line_hash
+E       ImportError: cannot import name 'line_hash' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)
+
+tests/test_format.py:65: ImportError
+_ LineHashTests.test_AC_STORY_01_03_2_distinct_prev_hash_values_change_digest __
+
+self = <tests.test_format.LineHashTests testMethod=test_AC_STORY_01_03_2_distinct_prev_hash_values_change_digest>
+
+    def test_AC_STORY_01_03_2_distinct_prev_hash_values_change_digest(self):
+>       from ledgerlock.format import line_hash
+E       ImportError: cannot import name 'line_hash' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)
+
+tests/test_format.py:74: ImportError
+_______ LineHashTests.test_AC_STORY_01_03_3_ignores_existing_hash_fields _______
+
+self = <tests.test_format.LineHashTests testMethod=test_AC_STORY_01_03_3_ignores_existing_hash_fields>
+
+    def test_AC_STORY_01_03_3_ignores_existing_hash_fields(self):
+>       from ledgerlock.format import line_hash
+E       ImportError: cannot import name 'line_hash' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)
+
+tests/test_format.py:84: ImportError
+______ LineHashTests.test_AC_STORY_01_03_4_same_input_returns_same_digest ______
+
+self = <tests.test_format.LineHashTests testMethod=test_AC_STORY_01_03_4_same_input_returns_same_digest>
+
+    def test_AC_STORY_01_03_4_same_input_returns_same_digest(self):
+>       from ledgerlock.format import line_hash
+E       ImportError: cannot import name 'line_hash' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)
+
+tests/test_format.py:100: ImportError
+________ LineHashTests.test_AC_STORY_01_03_5_accepts_genesis_prev_hash _________
+
+self = <tests.test_format.LineHashTests testMethod=test_AC_STORY_01_03_5_accepts_genesis_prev_hash>
+
+    def test_AC_STORY_01_03_5_accepts_genesis_prev_hash(self):
+>       from ledgerlock.format import GENESIS, line_hash
+E       ImportError: cannot import name 'line_hash' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)
+
+tests/test_format.py:110: ImportError
+=========================== short test summary info ============================
+FAILED tests/test_format.py::LineHashTests::test_AC_STORY_01_03_1_returns_64_lowercase_hex_characters
+FAILED tests/test_format.py::LineHashTests::test_AC_STORY_01_03_2_distinct_prev_hash_values_change_digest
+FAILED tests/test_format.py::LineHashTests::test_AC_STORY_01_03_3_ignores_existing_hash_fields
+FAILED tests/test_format.py::LineHashTests::test_AC_STORY_01_03_4_same_input_returns_same_digest
+FAILED tests/test_format.py::LineHashTests::test_AC_STORY_01_03_5_accepts_genesis_prev_hash
+=============== 5 failed, 13 passed, 6 subtests passed in 0.09s ================

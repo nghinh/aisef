@@ -1,0 +1,9 @@
+{
+  "tools.test": "python3 -m pytest -v",
+  "tools.lint": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+  "sandbox.image": "aisef-verify-python:b2c7afff2aed",
+  "sandbox.allow_hosts": [
+    "pypi.org",
+    "files.pythonhosted.org"
+  ]
+}

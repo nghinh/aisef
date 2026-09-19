@@ -1,0 +1,55 @@
+{
+  "stories": {
+    "STORY-01-01": {
+      "id": "STORY-01-01",
+      "epic_id": "EPIC-01",
+      "status": "done",
+      "attempts": 3,
+      "wave": 1,
+      "worktree": "",
+      "evidence": "",
+      "cost_usd": 0.0,
+      "duration_ms": 0,
+      "blocked_reason": "",
+      "claimed_by": "MacBookPro:59086",
+      "lease_until": 1789724310.7556322,
+      "updated_at": "2026-09-18T03:38:30+00:00"
+    },
+    "STORY-01-02": {
+      "id": "STORY-01-02",
+      "epic_id": "EPIC-01",
+      "status": "done",
+      "attempts": 1,
+      "wave": 2,
+      "worktree": "",
+      "evidence": "",
+      "cost_usd": 0.0,
+      "duration_ms": 0,
+      "blocked_reason": "",
+      "claimed_by": "MacBookPro:59086",
+      "lease_until": 1789724557.6728508,
+      "updated_at": "2026-09-18T03:42:37+00:00"
+    },
+    "STORY-01-03": {
+      "id": "STORY-01-03",
+      "epic_id": "EPIC-01",
+      "status": "failed",
+      "attempts": 1,
+      "wave": 3,
+      "worktree": "",
+      "evidence": "",
+      "cost_usd": 0.0,
+      "duration_ms": 0,
+      "blocked_reason": "deadlock due to plan, reviewer verified: [stuck] ledgerlock/format.py:36 — __all__ does not list line_hash; adding the function without extending __all__ violates the public-API expectation in architecture.md. Fixable inside write_scope once the function is added (finding #1).. Fix the acceptance criteria or the story's write_scope, then re-run — retrying will not resolve this.",
+      "claimed_by": "MacBookPro:59086",
+      "lease_until": 1789724772.6917691,
+      "updated_at": "2026-09-18T03:46:12+00:00"
+    }
+  },
+  "current_epic": "EPIC-01",
+  "active_epics": [
+    "EPIC-01"
+  ],
+  "started_at": "2026-09-18T03:25:31+00:00",
+  "updated_at": "2026-09-18T03:46:12+00:00"
+}

@@ -46,7 +46,7 @@ from ..control.qualification import (
     StorySnapshot as QStory,
     qualify as q_qualify,
 )
-from ..control.normalize import Story, parse_architecture_file
+from ..control.normalize import Story, effective_write_scope, parse_architecture_file
 from ..control.preflight import STORY_NOT_EXECUTABLE, check_story, screen_owners
 from ..control.state import StateStore, StoryStatus, TransitionError
 from ..control.worktree import GitError, RunOwnedError, WorktreeManager, run_ownership
@@ -372,12 +372,21 @@ def run_epic(
             for o in wave.outcomes:
                 if o.done:
                     continue
+                kept = sorted({p for a in o.attempts for p in getattr(a, "orphans", [])})
+                if kept:
+                    from ..harness.runlog import run_log
+                    # F5 / INV-L.1 — terminate, reap, VERIFY, then remove: verification failed, so the tree is
+                    # still in use; the path is kept and the pids are named, never removed under a live process.
+                    run_log(artifact_root, f"story={o.story_id} workspace kept: process(es) {kept} left by the "
+                                           "session survived termination — end them, then re-run")
+                    continue
                 story = plan.stories.get(o.story_id)
                 worktrees.commit_story(
                     o.story_id,
                     f"{o.story_id}: dở dang, chốt để không mất",
                     paths=list(story.write_scope) if story else None,
                 )
+                _record_tip_after_failed_story(o.story_id, artifact_root, worktrees)
                 worktrees.remove(o.story_id, delete_branch=False)
 
         if not all(o.done for o in wave.outcomes):
@@ -640,6 +649,8 @@ def _run_wave(
                 ok=outcome.done,
                 attempts=outcome.quality_attempts,
                 cost_usd=round(outcome.cost_usd, 4),
+                # the build this verification is about (SS-08, INV-D.3): merge authorisation names its SHA
+                candidate=(outcome.attempts[-1].candidate if outcome.attempts else ""),
             )
             last = outcome.attempts[-1] if outcome.attempts else None
             tx.record("review.completed", blocked=[
@@ -722,7 +733,12 @@ def _effective_waves(plan: "Plan", epic_id: str, *, project: Path, config: Confi
                 declared = tuple(story.write_scope) if story else ()
                 grants[sid] = (bootstrap_grants(story, project, config, bootstrap=bootstrap)
                                if story else [])
-                sched.append(scheduler.Story(id=sid, write_scope=declared + tuple(grants[sid])))
+                # SS-53 / INV-O.1: two stories that may both write the same FILE (a manifest, a lockfile the guard
+                # grants to every story) do not share a wave; DIRECTORY grants (`tests/`) do not conflict by
+                # themselves — stories create distinct files there and the merge is exact
+                file_grants = tuple(f for f in (effective_write_scope(story, project) if story else [])
+                                    if f not in declared and (project / f).is_file()) if story else ()
+                sched.append(scheduler.Story(id=sid, write_scope=declared + tuple(grants[sid]) + file_grants))
             group = [s.id for s in scheduler.build_waves(sched)[0]] if sched else []
             if len(group) < len(pending) and artifact_root is not None:
                 from ..harness.runlog import run_log
@@ -743,8 +759,9 @@ def _safe_transition(state: StateStore, story_id: str, to: StoryStatus, **kw) ->
     transition deserves a log entry, not a lost run.
     """
     try:
+        from ..control.state import machine_id
         state.transition(story_id, to, cost_usd=kw.get("cost", 0.0), reason=kw.get("reason", ""),
-                         attempts=kw.get("attempts", 0))
+                         attempts=kw.get("attempts", 0), owner=machine_id())     # F5 / SS-50: a write is bound to its owner
     except TransitionError as e:
         # Log it. Silently swallowing this masked a real bug: a story would
         # complete and merge, but the state record stayed at its old failure.
@@ -793,6 +810,26 @@ def _qualify_wave(
                          for m in (merges or [])),
         ),
     ).decision
+
+
+def _record_tip_after_failed_story(story_id: str, artifact_root: Path, worktrees: WorktreeManager) -> None:
+    """The wave end committed a failed story's leftover work onto its branch: if the tip moved past the
+    candidate of record, say so — in evidence and in the journal — so no later reader mistakes the new tip
+    for a graded build (SS-16, INV-A.3 / INV-E.1)."""
+    import subprocess
+    from ..harness.observe import NOTE, EvidenceStore, Event
+    store = EvidenceStore(artifact_root)
+    frozen = store.read(story_id).candidate
+    tip = subprocess.run(["git", "rev-parse", "--verify", f"story/{story_id}"], cwd=worktrees.repo, capture_output=True,
+                         text=True, encoding="utf-8", errors="replace").stdout.strip()
+    if not frozen or not tip or tip == frozen:
+        return
+    store.record(story_id, Event(kind=NOTE, name="candidate:moved", ok=True, detail={
+        "reason": "wave-end commit of unfinished work", "candidate": frozen, "head": tip,
+        "note": "the branch tip is not a graded build; --verify-only grades it as a new candidate"}))
+    journal = JournalStore(artifact_root)
+    journal.record(story_id, JEntry(step="candidate.moved", attempt=journal.read(story_id).attempt_no or 0,
+                                    data={"from": frozen, "to": tip, "reason": "wave-end commit of unfinished work"}))
 
 
 def run_sprint(
@@ -919,20 +956,23 @@ def _run_sprint_owned(
 
 
 def _missing_tools(project: Path, cfg: Config) -> list[str]:
-    """Declared tools absent from the **declared** image, one line each.
+    """Declared tools absent from the environment the sessions will run in, one line each.
 
-    Only when the project declares `sandbox.image`: an explicitly chosen
-    environment is checked before any session is paid for. With no image
-    declared the provider picks a default and `aisef doctor` is the place to
-    look — a probe per `aisef run` would tax every test fixture for a
-    question the fixture never asked.
+    SS-46 / INV-N.1: the environment is probed when it is CHOSEN — a declared `sandbox.image`, a stack image
+    `image_for` picks, or this host when docker is off — not only when the image was typed by hand. The fake
+    provider has nothing to probe. UNJUDGED tools (None) are stated by `aisef doctor`, never a stop.
     """
-    if not str(cfg.get("sandbox.image", "") or "").strip():
-        return []
+    from ..harness import sandbox as _sb
     from ..harness import verify_image
-
-    return [tc.line for tc in verify_image.check_tools(project, cfg, build=True)
-            if not tc.ok]
+    from ..harness.tools import image_for
+    if str(cfg.get("sandbox.provider", "") or "") == "fake":
+        return []
+    declared = bool(str(cfg.get("sandbox.image", "") or "").strip())
+    use_docker = bool(cfg.get("sandbox.use_docker", True))
+    if use_docker and not declared and image_for(project, cfg) == _sb.DEFAULT_IMAGE:
+        return []
+    return [tc.line for tc in verify_image.check_tools(project, cfg, build=declared or not use_docker)
+            if tc.ok is False]
 
 
 def run_verify_only(

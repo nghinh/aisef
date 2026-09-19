@@ -1,0 +1,105 @@
+{
+ "generated": "2026-09-19T17:44:42+0700",
+ "route": "9router/ds/deepseek-v4-pro",
+ "listing": {
+  "http": 200,
+  "listed": true,
+  "owned_by": "ds",
+  "route_kind": "FIXED_MODEL"
+ },
+ "chat_probes": [
+  {
+   "http": 200,
+   "seconds": 1.7,
+   "answered_by": "deepseek-v4-pro",
+   "usage": {
+    "prompt_tokens": 2090,
+    "completion_tokens": 14,
+    "total_tokens": 2104,
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 12
+    }
+   }
+  },
+  {
+   "http": 200,
+   "seconds": 3.2,
+   "answered_by": "deepseek-v4-pro",
+   "usage": {
+    "prompt_tokens": 2090,
+    "completion_tokens": 12,
+    "total_tokens": 2102,
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 10
+    }
+   }
+  },
+  {
+   "http": 200,
+   "seconds": 3.2,
+   "answered_by": "deepseek-v4-pro",
+   "usage": {
+    "prompt_tokens": 2090,
+    "completion_tokens": 16,
+    "total_tokens": 2106,
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 16
+    }
+   }
+  }
+ ],
+ "tool_smokes": [
+  {
+   "ok": true,
+   "file_written": true,
+   "tools": [
+    "write",
+    "bash"
+   ],
+   "errors": [],
+   "exit": 0,
+   "seconds": 16.6
+  },
+  {
+   "ok": true,
+   "file_written": true,
+   "tools": [
+    "write",
+    "bash",
+    "bash"
+   ],
+   "errors": [],
+   "exit": 0,
+   "seconds": 19.0
+  }
+ ],
+ "stage_env_check": null,
+ "requirements": {
+  "exact_fixed_route_resolves": true,
+  "no_4xx_or_other_error_on_any_probe": true,
+  "tool_calling_works": true,
+  "model_identity_constant_between_probes": true,
+  "reviewer_read_only_environment_clean": "not measured here (driver preflight row)"
+ },
+ "pass": true,
+ "summary_for_identity": {
+  "route": "9router/ds/deepseek-v4-pro",
+  "route_kind": "FIXED_MODEL",
+  "resolved_model": "deepseek-v4-pro",
+  "chat_probes": "3/3",
+  "tool_smokes": "2/2",
+  "declared_limit": {
+   "context": 200000,
+   "output": 32768
+  }
+ }
+}

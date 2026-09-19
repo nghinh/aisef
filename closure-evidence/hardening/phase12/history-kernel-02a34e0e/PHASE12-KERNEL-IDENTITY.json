@@ -1,0 +1,23 @@
+{
+ "generated": "2026-09-17T23:07:56+0700",
+ "PHASE12_KERNEL_DIGEST": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+ "git_sha": "82433cda3908ca37fc6740662d43264d52a48730",
+ "aisef_content_sha256": "62b8052564be215a2f5ccfe72dbe18672c07ac2deb77bc5913f2bd9b0d60496e",
+ "invariants_registry_sha256": "29e220c434f640dc3f749b2554f1b10893521b0abeee3aa660dcdfa938f947b3",
+ "transition_model_sha256": "983dc3bb479f6484125a91e64e13f8b7715563ab112f53ddf1a52ac055b00890",
+ "synthetic_adapter_sha256": "8aeb2319363c3f80ce812e48f3a8d7116fc632fcc613c5d58f295be5605caa33",
+ "comparator_sha256": "f8f3a954bc206e2753f28202a92c9a2411b2b82cda0268737c464ac7d346db79",
+ "hygiene_case_sha256": "59308863db2b45a9972ae6deb69b9822945fcf67fc361bf08cf19985cc6afbd6",
+ "fault_matrix": {
+  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
+  "phase": 7,
+  "generated": "2026-09-17T14:44:31+00:00",
+  "status_count": {
+   "GREEN": 79,
+   "RED": 0,
+   "NEEDS_TEST": 0
+  }
+ },
+ "rule": "From this point until Phase 12 closes: NO production code change. Evidence-only/docs-only commits are allowed only while the aisef/ tree digest stays identical. Any production change creates a new kernel identity, invalidates every final trace of the previous kernel and requires the full qualification set again — never hidden behind commit equivalence.",
+ "dataset_rule": "every chunk of the final dataset must record kernel.aisef_tree == PHASE12_KERNEL_DIGEST and the same model and comparator digests"
+}

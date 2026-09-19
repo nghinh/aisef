@@ -1,0 +1,86 @@
+UP035 [*] Import from `collections.abc` instead: `Iterable`
+  --> ledgerlock/store.py:8:1
+   |
+ 6 | import tempfile
+ 7 | from pathlib import Path
+ 8 | from typing import Iterable, Union
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 9 |
+10 | PathLike = Union[str, os.PathLike[str]]
+   |
+help: Import from `collections.abc`
+   |
+7  | from pathlib import Path
+   - from typing import Iterable, Union
+8  + from typing import Union
+9  + from collections.abc import Iterable
+10 |
+   |
+
+UP007 Use `X | Y` for type annotations
+  --> ledgerlock/store.py:10:12
+   |
+ 8 | from typing import Iterable, Union
+ 9 |
+10 | PathLike = Union[str, os.PathLike[str]]
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: Convert to `X | Y`
+
+FURB129 [*] Instead of calling `readlines()`, iterate over file object directly
+  --> ledgerlock/store.py:22:48
+   |
+20 |     p = Path(path)
+21 |     with open(p, "rb") as handle:
+22 |         return [line.rstrip(b"\n") for line in handle.readlines()]
+   |                                                ^^^^^^^^^^^^^^^^^^
+help: Remove `readlines()`
+   |
+21 |     with open(p, "rb") as handle:
+   -         return [line.rstrip(b"\n") for line in handle.readlines()]
+22 +         return [line.rstrip(b"\n") for line in handle]
+23 |
+   |
+
+F401 [*] `os` imported but unused
+ --> tests/test_store.py:5:8
+  |
+3 | from __future__ import annotations
+4 |
+5 | import os
+  |        ^^
+6 | import tempfile
+7 | import unittest
+  |
+help: Remove unused import: `os`
+  |
+4 |
+  - import os
+5 | import tempfile
+  |
+
+SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+   --> tests/test_store.py:141:13
+    |
+139 |                   raise OSError("simulated crash between temp-write and os.replace")
+140 |
+141 | /             with mock.patch.object(store.os, "replace", side_effect=raise_on_replace):
+142 | |                 with self.assertRaises(OSError):
+    | |________________________________________________^
+143 |                       store.write_atomic(target, new_lines)
+    |
+help: Combine `with` statements
+
+SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+   --> tests/test_store.py:157:13
+    |
+155 |                   raise OSError("simulated crash")
+156 |
+157 | /             with mock.patch.object(store.os, "replace", side_effect=raise_on_replace):
+158 | |                 with self.assertRaises(OSError):
+    | |________________________________________________^
+159 |                       store.write_atomic(target, [b'{"new": 1}\n'])
+    |
+help: Combine `with` statements
+
+Found 6 errors.
+[*] 3 fixable with the `--fix` option.

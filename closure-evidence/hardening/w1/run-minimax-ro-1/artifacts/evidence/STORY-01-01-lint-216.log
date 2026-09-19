@@ -1,0 +1,69 @@
+I001 [*] Import block is un-sorted or un-formatted
+ --> conftest.py:3:1
+  |
+1 |   """Test configuration — keeps ``pytest`` and ``python -m unittest discover`` aligned."""
+2 |
+3 | / from __future__ import annotations
+4 | |
+5 | | from pathlib import Path
+6 | | import sys
+  | |__________^
+help: Organize imports
+  |
+4 |
+  - from pathlib import Path
+5 | import sys
+  -
+6 + from pathlib import Path
+7 |
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> ledgerlock/__main__.py:3:1
+  |
+1 |   """Allow ``python -m ledgerlock`` to invoke the CLI."""
+2 |
+3 | / from __future__ import annotations
+4 | |
+5 | | from ledgerlock.cli import main
+6 | | import sys
+  | |__________^
+help: Organize imports
+  |
+4 |
+  - from ledgerlock.cli import main
+5 | import sys
+6 |
+7 + from ledgerlock.cli import main
+8 |
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests/test_skeleton.py:3:1
+   |
+ 1 |   """AC-STORY-01-01-1..7 — package skeleton, CLI surface, NFC normalization."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import os
+ 6 | | from pathlib import Path
+ 7 | | import subprocess
+ 8 | | import sys
+ 9 | | import unicodedata
+10 | | import unittest
+   | |_______________^
+help: Organize imports
+   |
+5  | import os
+   - from pathlib import Path
+6  | import subprocess
+7  | import sys
+8  | import unicodedata
+9  | import unittest
+   -
+10 + from pathlib import Path
+11 |
+   |
+
+Found 3 errors.
+[*] 3 fixable with the `--fix` option.

@@ -71,8 +71,14 @@ class TestStuckMentionIsNotAPlanVerdict(unittest.TestCase):
         self.assertIn("docs/ops.md", got[0])
 
     def test_a_stuck_verdict_without_findings_stays_fail_closed(self):
-        got = I.structured_plan_defects(I.Verdict("stuck", []))
-        self.assertEqual(len(got), 1, "a `stuck` verdict field is structured evidence, even with no items")
+        """F3 (binding rule): a `stuck` with no items binds to nothing — it is no longer a PLAN defect (that would end
+        the story on a verdict naming nothing), and it is still fail-closed: the diagnostic line exists, and
+        `_with_schema` asks once for bindings, then the review is REVIEW_UNRUNNABLE — never a PASS, never a developer
+        session (tests/hardening/test_judgment.py)."""
+        v = I.Verdict("stuck", [])
+        self.assertEqual(I.structured_plan_defects(v), [], "a stuck on nothing named is not a plan conflict")
+        self.assertEqual(v.bound_blocking(), [], "…and blocks nothing by itself")
+        self.assertEqual(len(v.blocking()), 1, "the diagnostic line is still shown: the reviewer concluded stuck")
 
     def test_a_prose_only_review_never_terminates_a_story(self):
         """No JSON after the schema reminder: malformed structured output.
@@ -199,9 +205,11 @@ class TestDeclaredToolsLiveInTheDeclaredImage(unittest.TestCase):
         recipe = V.recipe_for(image)
         self.assertIsNotNone(recipe, image)
         self.assertIn("@sha256:", recipe.base, "the base is pinned by digest, not by tag")
-        self.assertTrue(any(p.startswith("pytest==") for p in recipe.packages))
-        self.assertTrue(any(p.startswith("ruff==") for p in recipe.packages))
-        self.assertEqual(image, recipe.name)
+        installs = [spec for cap in recipe.capabilities for spec in cap.install]   # SS-65: rendered from the registry
+        self.assertTrue(any(p.startswith("pip:pytest==") for p in installs), installs)
+        self.assertTrue(any(p.startswith("pip:ruff==") for p in installs), installs)
+        self.assertTrue(any(p.startswith("pip:bandit==") for p in installs), "SS-65: the sast the profile selects is installed")
+        self.assertEqual(image, recipe.image)
         self.assertIn(recipe.digest[:12], image, "the name carries the recipe's digest")
 
     def test_probes_are_derived_from_the_declared_commands(self):
@@ -253,7 +261,9 @@ class TestDeclaredToolsLiveInTheDeclaredImage(unittest.TestCase):
             root = self._project(d, "some/ci-image:1")
             with mock.patch.object(SB, "run", return_value=SB.SandboxResult(127, stderr="not found")):
                 missing = _missing_tools(root, Config.load(root))
-            self.assertEqual(len(missing), 2, missing)
+            # F5: declared tools resolve through `command_for`, so the default `tools.sast` command is probed too
+            self.assertGreaterEqual({m.split("`")[1] for m in missing}, {"tools.test", "tools.lint"}, missing)
+            self.assertTrue(all("MISSING in some/ci-image:1" in m for m in missing), missing)
             with mock.patch.object(SB, "run", return_value=SB.SandboxResult(0)):
                 self.assertEqual(_missing_tools(root, Config.load(root)), [])
 
@@ -493,7 +503,12 @@ class TestOverlappingEffectiveScopesDoNotRunTogether(unittest.TestCase):
             # the first story merged: the tree is bootstrapped now
             (root / "conftest.py").write_text("", encoding="utf-8")
             s = st.load(); s.stories["STORY-01-01"].status = "done"; st.save(s)
-            self.assertEqual(next(gen), (1, ["STORY-01-02", "STORY-01-03"]))
+            # F4 (SS-53 / INV-O.1 "non-overlapping EFFECTIVE write scopes"): the two remaining stories are both
+            # granted `pyproject.toml` and the `conftest.py` the first one created — files both may write — so they
+            # do not share a wave either; parallel width is a property of grant overlap (SCALE-QUALIFICATION)
+            self.assertEqual(next(gen), (1, ["STORY-01-02"]))
+            s = st.load(); s.stories["STORY-01-02"].status = "done"; st.save(s)
+            self.assertEqual(next(gen), (1, ["STORY-01-03"]))
             self.assertEqual(list(gen), [])
 
 

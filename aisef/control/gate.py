@@ -37,18 +37,21 @@ from __future__ import annotations
 
 import ast
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from ..harness.guardrails import check_completion, check_diff_scope
 from .acceptance import (ac_code, coverage as ac_coverage, missing as ac_missing,
                          overloaded as ac_overloaded,
                          orphans as ac_orphans)
 from .outcome import Check, Outcome
-from .tdd import red_before_green
+from .impact import is_test_path
+from .tdd import proven_red_before_green
 from .security import DEFAULT_BLOCKING
+from .identity import CONTROL_FIELDS, SESSION_FIELDS, EvidenceIdentity, fresh  # noqa: F401
 from ..harness.observe import FILE_CHANGE, GUARD_BLOCK, GUARD_SEEN, MOCKUP_MAP, NOTE, TOOL_RUN, Event, Evidence
 from ..harness.testlog import MAX_IDS
 from ..harness.tools import BASELINE_RUN, NO_MANIFEST, NO_SETUP, NOP_RUN
+from . import proof
 
 #: Story gate check names — **closed** list (ADR-005 V9). Every `Check(...)` in
 #: this file must use a name from here (test meta grep AST), and each name has
@@ -145,6 +148,46 @@ class StoryGate:
     def feedback(self) -> str:
         """Feedback to pass back to the agent on the next attempt."""
         return "\n".join(f"- {c.name}: {c.detail}" for c in self.failures)
+
+
+def _stale_for(evidence: Evidence, current: EvidenceIdentity,
+               kinds: tuple[str, ...] | None = None) -> dict[str, str]:
+    """Checks whose evidence does not speak for `current`: no record fresh for this identity exists, yet a
+    bound record does — the code, the tree, the contract or the configuration changed after the check.
+    Keyed by check name, valued by the reason the latest bound record is not fresh. Sequence never decides:
+    an older record fresh for this identity is valid, a newer foreign one is not staleness (CF-06)."""
+    out: dict[str, str] = {}
+    for key, latest in _latest_per_check(evidence, kinds).items():
+        kind, name = key if isinstance(key, tuple) else (TOOL_RUN, key)
+        if not EvidenceIdentity.of(latest, evidence.story_id).bound:
+            continue          # never candidate-bound (a manual run, a legacy log): not staleness of this build
+        if evidence.last_fresh(kind, name, current) is not None:
+            continue
+        out[name] = fresh(latest, current, story_id=evidence.story_id).reason
+    return out
+
+
+#: Where a verifier that did not execute used to be written (≤ 1.7.3): a finding whose text starts with this.
+LEGACY_UNRUN = "review could not run:"
+#: Tool runs that are UNBOUND BY CONSTRUCTION, not by age: the baseline describes the epoch's root, captured before
+#: any candidate exists, and is compared against — never scored as — the candidate (INV-C.1). Every other unbound
+#: tool run on the story path is a manual or ≤ 1.7.6 in-session run: shown, never scored (Phase 16).
+UNBOUND_BY_DESIGN = ("test:baseline",)
+
+
+def verdict_recorded(event: Event | None) -> bool:
+    """Does this `tool_run review` / `tool_run security` carry a VERDICT (PASS or BLOCK)? A stage that did not
+    execute writes a record too — `unrunnable`, an UNRUNNABLE `outcome`, or the ≤ 1.7.3 finding text — and that
+    record is not evidence about the work (INV-F.3, INV-R.2; D-032, SS-07). The one definition, for the story loop
+    (`_review_complete`) and the closure probe G4.4 alike."""
+    if event is None:
+        return False
+    d = event.detail
+    if d.get("unrunnable"):
+        return False
+    if str(d.get("outcome") or "").endswith("UNRUNNABLE"):
+        return False
+    return not any(str(f).startswith(LEGACY_UNRUN) for f in (d.get("findings") or []))
 
 
 def _stale_candidates(evidence: Evidence, candidate: str,
@@ -350,15 +393,20 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
     if base_ev.detail.get("skipped"):
         return Check(name, Outcome.UNCONFIGURED, f"no baseline: {base_ev.detail['skipped']}", evidence=seqs)
     if base_ev.detail.get("unrunnable"):
-        if str(base_ev.detail["unrunnable"]).startswith(NO_SETUP):
+        # SS-85: "nothing ran" is evidence of nothing unless the tree held no project or no test at all — then there
+        # was genuinely nothing green to protect. Tests that existed but could not run are simply unobserved.
+        why = str(base_ev.detail["unrunnable"])
+        if why == NO_MANIFEST or (why.startswith(NO_SETUP) and base_ev.detail.get("test_files_in_tree") == 0):
             return Check(name, Outcome.NOT_APPLICABLE,
-                         "nothing runnable at the baseline commit — no test was ever "
-                         "green there, so there is nothing to regress "
-                         f"({base_ev.detail['unrunnable']})",
-                         evidence=seqs)
+                         f"the baseline commit had no {'project' if why == NO_MANIFEST else 'test file'} — nothing was "
+                         f"ever green there, so there is nothing to regress ({why})", evidence=seqs)
         return Check(name, Outcome.UNRUNNABLE,
-                     f"baseline unrunnable ({base_ev.detail['unrunnable']}) — cannot compare existing tests",
-                     evidence=seqs)
+                     f"baseline did not execute ({why}) — the tests that existed there were never observed green, so "
+                     "the comparison has nothing to stand on", evidence=seqs)
+    if proof.aborted(base_ev.detail):
+        return Check(name, Outcome.UNRUNNABLE,
+                     "the baseline run stopped at collection — tests in files that did collect never ran, so which "
+                     "were green there is unknown", evidence=seqs)
     if not base_ev.detail.get("test_format"):
         return Check(name, Outcome.UNCONFIGURED, str(base_ev.detail.get("test_note") or "")
                      or "cannot read test names from baseline — use a reporter that prints names "
@@ -386,15 +434,18 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
                      or "cannot read test names at candidate — use a reporter that prints names", evidence=seqs)
 
     base_ids = list(base_ev.detail.get("test_ids") or [])
-    not_green = set(base_ev.detail.get("failed_ids") or []) | set(base_ev.detail.get("skipped_ids") or [])
-    base_green = [t for t in base_ids if t not in not_green]
+    base_executed_green = proof.executed_green(base_ev.detail)
+    base_green = [t for t in base_ids if t in base_executed_green]
     # `--repeat k`: tests changing outcome across k runs at candidate are not
     # "broke" — the "test" check already records UNRUNNABLE naming them;
     # excluded here, and stated.
     flaky = _flaky_ids(evidence)
-    red = set(latest.detail.get("failed_ids") or []) - set(flaky)
+    # SS-86: not green = failed, errored OR skipped — a test green at baseline that no longer executes is not intact
+    skipped_now = {str(t) for t in latest.detail.get("skipped_ids") or []} - set(flaky)
+    red = proof.not_green(latest.detail) - set(flaky) - skipped_now
     current_ids = set(latest.detail.get("test_ids") or [])
     newly_red = [t for t in base_green if t in red]
+    silenced = [t for t in base_green if t in skipped_now]
     # ponytail: testlog truncates list at MAX_IDS — test suites larger than
     # that cannot conclude "lost" (name may be beyond the cutoff), only compare red.
     cat = len(base_ids) >= MAX_IDS or len(current_ids) >= MAX_IDS
@@ -406,15 +457,24 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
     current_classes = {_class_of(t) for t in current_ids}
     renamed = [] if cat else [t for t in base_green if t not in current_ids and _class_of(t) in current_classes]
     lost = [] if cat else [t for t in base_green if t not in current_ids and _class_of(t) not in current_classes]
-    if newly_red or lost:
+    if newly_red or lost or silenced:
         errors = []
         if newly_red:
             errors.append(f"broke {len(newly_red)} tests green at baseline: {_head(newly_red)}")
+        if silenced:
+            errors.append(f"silenced {len(silenced)} tests green at baseline — skipped at this candidate, so they no "
+                          f"longer execute: {_head(silenced)} — un-skip them or declare the removal in the story")
         if lost:
             errors.append(f"lost {len(lost)} tests present at baseline: {_head(lost)} — deleting or renaming "
                        "existing tests must be declared in the story; evidence cannot infer intent "
                        "so this counts as regression")
         return Check(name, False, "; ".join(errors), evidence=seqs)
+    if cat:
+        # SS-33 / INV-T.1: beyond the cap a baseline-green test can turn red or vanish unseen — no vacuous PASS
+        return Check(name, Outcome.UNRUNNABLE,
+                     f"test list truncated at {MAX_IDS} names — the baseline comparison cannot see every test "
+                     f"(baseline {len(base_ids)}, candidate {len(current_ids)}); split the suite or raise the cap",
+                     evidence=seqs)
     pre_red = list(base_ev.detail.get("red_before") or base_ev.detail.get("failed_ids") or [])
     if renamed:
         return Check(name, True, f"{len(renamed)} tests renamed but leaf title still present, not counted as lost: {_head(renamed)}",
@@ -425,13 +485,11 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
     if flaky:
         return Check(name, True, f"{len(flaky)} flaky tests not counted here (see test check): {_head(flaky)}",
                      evidence=seqs)
-    if cat:
-        return Check(name, True, f"test list truncated at {MAX_IDS} names — can only compare red tests, cannot detect lost tests",
-                     evidence=seqs)
     return Check(name, True, evidence=seqs)
 
 
-def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate: str) -> Check:
+def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate: str,
+               changed: list[str] | None = None) -> Check:
     """Check "tests verify story" — nop control (ADR-005 V3).
 
     The question from Terminal-Bench (nop < 1), BERBench (`base_fail`) and
@@ -460,13 +518,15 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
     compare, stated, level 2 decides (worktree at the correct branch point).
 
     **Level 2 (`test:nop`, harness runs after freeze):** at the parent SHA
-    with story test files copied in, tests carrying codes must be **red or
-    absent** — import errors at parent SHA count as red and are valid. Green
-    -> FAILED naming the tests. Other outcomes per invariant: nop unrunnable
-    -> UNRUNNABLE; reporter doesn't print names (only knows test suite is
-    red, not whose) -> UNCONFIGURED; story didn't add/modify test files,
-    disabled by `verify.nop`, or harness recorded no nop (journal before V3)
-    -> NOT_APPLICABLE with reason.
+    with story test files copied in, every criterion test green at the
+    candidate must be PROVEN red there (the proof model, `control/proof.py`):
+    executed red, or unable to import a module or symbol this story
+    introduces — bound through that test's own file. Green -> FAILED naming
+    the tests. Anything that is not proof (not collected, session aborted,
+    dependency or environment unrunnable, incomplete output, absent) ->
+    UNRUNNABLE; no nop recorded for the candidate, or no criteria -> UNRUNNABLE
+    (SS-84, SS-89); reporter doesn't print names -> UNCONFIGURED; story didn't
+    add/modify test files or `verify.nop` disabled -> NOT_APPLICABLE.
     """
     name = "tests verify story"
     base_ev = authoritative_baseline(evidence)
@@ -487,14 +547,13 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
     # Event pointers read: baseline, test run at candidate, nop — whichever exist.
     seqs = [e.seq for e in (base_ev, latest, nop) if e is not None]
 
-    def check_result(outcome, detail: str = "") -> Check:
-        return Check(name, outcome, detail, evidence=seqs)
+    def check_result(outcome, detail: str = "", data: dict | None = None) -> Check:
+        return Check(name, outcome, detail, evidence=seqs, data=data or {})
 
     # Tests with criteria codes **green** at candidate — subject of both levels.
     ac: list[str] = []
     if latest is not None and latest.detail.get("test_format") and acceptance > 0:
-        red = set(latest.detail.get("failed_ids") or []) | set(latest.detail.get("skipped_ids") or [])
-        new_green = [t for t in latest.detail.get("test_ids") or [] if t not in red]
+        new_green = [t for t in latest.detail.get("test_ids") or [] if t in proof.executed_green(latest.detail)]
         for tests in ac_coverage(story_id, acceptance, new_green).values():
             ac.extend(t for t in tests if t not in ac)
 
@@ -512,22 +571,36 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
             current_ids = set(latest.detail.get("test_ids") or [])
             near_match = [t for t in ac if t in base_green]
             cat = len(base_ids) >= MAX_IDS or len(current_ids) >= MAX_IDS
-            lost_classes = set() if cat else {_class_of(t) for t in base_green if t not in current_ids}
-            changed = [t for t in ac if t not in base_ids and _class_of(t) in lost_classes]
+            if cat:
+                # SS-33 / INV-T.1: the rename detection cannot see past the cap — state it, never conclude
+                return Check(name, Outcome.UNRUNNABLE,
+                             f"test list truncated at {MAX_IDS} names — cannot tell tagged or renamed existing tests "
+                             f"from new ones", evidence=seqs)
+            lost_classes = {_class_of(t) for t in base_green if t not in current_ids}
+            # not `changed`: that name is the story's file list, which level 2 binds import failures to
+            renamed = [t for t in ac if t not in base_ids and _class_of(t) in lost_classes]
             errors = []
             if near_match:
                 errors.append(f"tagged existing tests: {len(near_match)} tests with criteria codes were already green at "
                            f"baseline under the same name — green before the story wrote a line: {_head(near_match)}")
-            if changed:
-                errors.append(f"renamed existing tests to carry codes: {len(changed)} tests were green at baseline under "
-                           f"their old name — criteria code became a label, not a verification: {_head(changed)}")
+            if renamed:
+                errors.append(f"renamed existing tests to carry codes: {len(renamed)} tests were green at baseline under "
+                           f"their old name — criteria code became a label, not a verification: {_head(renamed)}")
             if errors:
                 return check_result(False, "; ".join(errors) + ". Write new tests for criteria, keep existing tests under their original names")
 
-    # ---- level 2
+    # ---- level 2 — the proof model (SS-81 family, INV-TDD-NOP-PROOF): PASS only on positive, per-test evidence
+    # that every criterion test green at the candidate is red at the parent. Absence of execution is never proof.
+    readable = latest is not None and bool(latest.detail.get("test_format"))
     if nop is None:
-        return check_result(Outcome.NOT_APPLICABLE,
-                     "harness ran no nop (manual run, journal before ADR-005 V3) — cannot compare")
+        if acceptance <= 0:
+            return check_result(Outcome.NOT_APPLICABLE, "harness ran no nop and the story declares no criteria")
+        if not readable:
+            return check_result(Outcome.UNCONFIGURED, "cannot read test names at the candidate, and no nop control was "
+                                                      "recorded — use a reporter that prints names (`pytest -v`, …)")
+        # SS-89: the control never ran for this candidate — that is not "not applicable"
+        return check_result(Outcome.UNRUNNABLE, "no nop control was recorded for this candidate — the story's tests "
+                                                "were never run at the parent SHA, so nothing shows they verify it")
     d = nop.detail
     if d.get("disabled"):
         return check_result(Outcome.NOT_APPLICABLE, "disabled by `verify.nop` config")
@@ -535,39 +608,54 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
         if "files" in d and not d["files"]:
             return check_result(Outcome.NOT_APPLICABLE, "story did not add/modify test files")
         return check_result(Outcome.UNCONFIGURED, f"no nop: {d['skipped']}")
-    if d.get("unrunnable") and not d.get("test_format"):
-        # The parent SHA having no project at all is not a broken environment:
-        # it is the strongest form of the answer this control asks for. A
-        # greenfield project's first story creates the manifest, so the tests
-        # provably cannot have been green before it.
-        if str(d["unrunnable"]) == NO_MANIFEST:
-            return check_result(True, f"parent SHA {str(d.get('parent') or '')[:7] or 'cha'} has nothing to run — "
-                                      "the story's tests cannot have been green there")
-        return check_result(Outcome.UNRUNNABLE,
-                     f"nop at parent SHA unrunnable ({d['unrunnable']}) — cannot compare")
     parent = str(d.get("parent") or "")[:7] or "cha"
+    if acceptance <= 0:             # SS-84: a red parent run proves nothing about criteria that do not exist
+        return check_result(Outcome.UNRUNNABLE, "story declares no criteria — no criterion test exists for the control to "
+                                                f"prove red at parent SHA {parent}")
+    if d.get("unrunnable") and not d.get("test_format") and not d.get("collection_errors"):
+        # The control did not execute at all. Only one such case is proof: the parent has no project, and THIS story
+        # is what creates it — no test of the project could have passed where the project did not exist.
+        made = [f for f in d.get("absent_at_parent") or [] if PurePosixPath(f).name.lower() in proof.MANIFESTS]
+        if str(d["unrunnable"]) == NO_MANIFEST and made:
+            return check_result(True, f"parent SHA {parent} has no project at all — this story creates it ({made[0]}), "
+                                      "so none of its tests can have been green there")
+        return check_result(Outcome.UNRUNNABLE,
+                            f"nop at parent SHA unrunnable ({d['unrunnable']}) — the control did not execute, so it proves nothing")
     if latest is None:
         return check_result(False, "no test run at candidate — cannot determine which tests are green to compare with parent SHA")
-    if d.get("test_format") and latest.detail.get("test_format") and acceptance > 0:
-        if not ac:
-            return check_result(False, "no tests with criteria codes green at candidate — nothing "
-                                     "to verify at parent SHA (see criteria have tests check)")
-        not_passing = set(d.get("failed_ids") or []) | set(d.get("skipped_ids") or [])
-        nop_green = {t for t in d.get("test_ids") or [] if t not in not_passing}
-        still_green = [t for t in ac if t in nop_green]
-        if still_green:
-            return check_result(False, f"tests verify nothing — still green without story code "
-                                     f"(parent SHA {parent}): {_head(still_green)}")
-        return check_result(True, f"{len(ac)} tests with criteria codes are red or absent at parent SHA {parent}"
-                                + (f"; {detail_note}" if detail_note else ""))
-    if nop.ok:
-        return check_result(False, f"test suite green at parent SHA {parent} with story test files copied in — "
-                                 f"story tests verify nothing ({_head(list(d.get('files') or []), 3)})")
-    if acceptance <= 0:
-        return check_result(True, f"test suite red at parent SHA {parent} — story declares no criteria, not compared by code")
-    return check_result(Outcome.UNCONFIGURED,
-                 "cannot read test names — only know test suite is red at parent SHA, cannot tell if those are "
-                 "story tests; use a reporter that prints names (`node --test`, `vitest --reporter=verbose`, `pytest -v`)")
+    if not readable:
+        if nop.ok:              # positive evidence even without names: the whole suite passed with the story's tests in
+            return check_result(False, f"test suite green at parent SHA {parent} with story test files copied in — "
+                                       f"story tests verify nothing ({_head(list(d.get('files') or []), 3)})")
+        return check_result(Outcome.UNCONFIGURED,
+                            "cannot read test names at the candidate — the control needs the criterion tests by name; use a "
+                            "reporter that prints names (`node --test`, `vitest --reporter=verbose`, `pytest -v`)")
+    if not ac:
+        return check_result(False, "no tests with criteria codes green at candidate — nothing "
+                                 "to verify at parent SHA (see criteria have tests check)")
+    story_files = [f for f in (changed or []) if not is_test_path(f)]
+    states = proof.classify(d, ac, story_files, added=d.get("absent_at_parent"),
+                            files=proof.files_of(ac, story_id, acceptance, d.get("ac_code_files")))
+    per_ac = proof.summarize(states, story_id, acceptance)
+    data = {"parent": parent, "proof": per_ac, "strategy": d.get("collection_strategy") or ""}
+    still_green = [t for t, (p, _) in states.items() if p is proof.Proof.GREEN_EXECUTED]
+    if still_green:
+        return check_result(False, f"tests verify nothing — still green without story code "
+                                   f"(parent SHA {parent}): {_head(still_green)}",
+                            data={**data, "still_green": list(still_green)})   # SS-32: data, not a sentence
+    if d.get("output_complete") is False:
+        return check_result(Outcome.UNRUNNABLE, f"the nop output at parent SHA {parent} is incomplete — its own totals do "
+                                                "not match the tests read, so nothing it omits can count as red", data=data)
+    unproven = {t: st for t, st in states.items() if st[0] not in proof.PROVES_RED}
+    if unproven:
+        head = "; ".join(f"{t} — {p.value}: {why}" for t, (p, why) in list(unproven.items())[:3])
+        return check_result(Outcome.UNRUNNABLE,
+                            f"no proof at parent SHA {parent} for {len(unproven)} of {len(ac)} criterion tests: {head}"
+                            + ("…" if len(unproven) > 3 else ""), data=data)
+    ran = sum(1 for p, _ in states.values() if p is proof.Proof.RED_EXECUTED)
+    return check_result(True, f"{len(ac)} tests with criteria codes proven red at parent SHA {parent}: {ran} executed red, "
+                              f"{len(ac) - ran} unable to import code this story introduces"
+                              + (f"; {detail_note}" if detail_note else ""), data=data)
 
 
 def judge_only(gate: StoryGate) -> bool:
@@ -624,6 +712,7 @@ def evaluate(
     added_tests: list[str] | None = None,
     candidate: str = "",
     preservation: list[dict] | None = None,
+    identity: EvidenceIdentity | None = None,
 ) -> StoryGate:
     """Score a story from recorded evidence.
 
@@ -637,11 +726,24 @@ def evaluate(
     not applicable, so old callers see no change in outcome.
     """
     gate = StoryGate(story_id=story_id)
+    # The state being decided on. A story attempt passes its full identity (control/identity.py); a manual
+    # `aisef gate` passes a candidate only, and then binds on nothing but the candidate (legacy mode).
+    story_path = identity is not None
+    current = identity if identity is not None else EvidenceIdentity(story_id=story_id, candidate_sha=candidate)
+    if story_path:
+        candidate = current.candidate_sha
 
     loai = tuple(contract or ())
-    stale = _stale_candidates(evidence, candidate, loai) if candidate else []
     moi_nhat = _latest_per_check(evidence, loai)
-    if not candidate:
+    stale = _stale_for(evidence, current, loai) if candidate else {}
+    if not candidate and story_path:
+        # A story attempt without a frozen candidate: nothing can be graded (SS-60, SS-A15). Only a manual
+        # `aisef gate` with no candidate is "not applicable".
+        gate.checks.append(Check(
+            "evidence matches candidate", Outcome.UNRUNNABLE,
+            "no candidate was frozen for this attempt — nothing can be graded; the freeze failed or HEAD is unreadable",
+        ))
+    elif not candidate:
         gate.checks.append(Check(
             "evidence matches candidate", Outcome.NOT_APPLICABLE,
             "no candidate passed — cannot verify which build evidence belongs to",
@@ -649,17 +751,25 @@ def evaluate(
     elif stale:
         gate.checks.append(Check(
             "evidence matches candidate", Outcome.UNRUNNABLE,
-            f"stale: recorded at {', '.join(s[:7] for s in stale)}, "
-            f"current candidate is {candidate[:7]} — rerun checks on this build",
-            evidence=[e.seq for e in moi_nhat.values() if str(e.detail["candidate"]) != candidate],
+            "stale: " + "; ".join(f"{name}: {why}" for name, why in list(stale.items())[:4])
+            + f" — current candidate is {candidate[:7]}; rerun those checks on this build",
+            evidence=[e.seq for key, e in moi_nhat.items() if (key[1] if isinstance(key, tuple) else key) in stale],
         ))
     else:
         gate.checks.append(Check("evidence matches candidate", True,
                                  evidence=[e.seq for e in moi_nhat.values()]))
     if candidate:
-        # After stating it, drop stale evidence: a check from another build
-        # must not silently make any check pass.
-        evidence = evidence.for_candidate(candidate)
+        # After stating it, drop evidence that is not fresh for this identity: a check from another build,
+        # another tree state or another configuration must not silently make any check pass.
+        evidence = evidence.for_identity(current)
+        if story_path:
+            # Phase 16: an UNBOUND tool run — no candidate, no session: a manual `aisef tool`, or a ≤ 1.7.6
+            # in-session run — can be shown, never scored for a story attempt; it speaks for no build. Measured
+            # on the archived 1.7.4 replays: `test`, `lint` and `security` scored PASSED from such records.
+            evidence = Evidence(story_id=evidence.story_id,
+                                events=[e for e in evidence.events
+                                        if e.kind != TOOL_RUN or e.name in UNBOUND_BY_DESIGN
+                                        or EvidenceIdentity.of(e, evidence.story_id).bound])
 
     # Hook generated != hook running. Claude Code only reads `.claude/settings.json`
     # of the tree it stands in; worktree lacking that directory (project didn't
@@ -673,11 +783,16 @@ def evaluate(
             "hooks not compiled for this client — not expected",
         ))
     else:
-        # First trace is enough to answer "did the hook fire".
-        dau_vet = evidence.of(GUARD_SEEN) or evidence.of(GUARD_BLOCK) or evidence.of(FILE_CHANGE)
+        # First trace is enough to answer "did the hook fire" — of THIS session (SS-02): a heartbeat left by
+        # an earlier attempt proves nothing about the session that produced this candidate.
+        traces = evidence.of(GUARD_SEEN) + evidence.of(GUARD_BLOCK) + evidence.of(FILE_CHANGE)
+        if current.session_id:
+            traces = [e for e in traces if fresh(e, current, SESSION_FIELDS).ok]
+        dau_vet = traces[:1]
+        reached = bool(traces)
         gate.checks.append(Check(
-            "guard ran", evidence.guard_reached,
-            "" if evidence.guard_reached else (
+            "guard ran", reached,
+            "" if reached else (
                 "guard did not evaluate any write in this session — hook cannot "
                 "reach worktree? (.claude/ not committed, or --settings not "
                 "passed). A story that writes nothing also lands here, and that is correct."
@@ -707,6 +822,11 @@ def evaluate(
     elif lint.detail.get("skipped"):
         gate.checks.append(
             Check("lint", Outcome.UNCONFIGURED, str(lint.detail["skipped"]), evidence=[lint.seq])
+        )
+    elif lint.detail.get("unrunnable"):
+        # a linter that is not there is not a red lint (SS-58 — D-029's shape on the lint tool)
+        gate.checks.append(
+            Check("lint", Outcome.UNRUNNABLE, str(lint.detail["unrunnable"])[:300], evidence=[lint.seq])
         )
     elif _flaky_note(evidence, "lint"):
         gate.checks.append(Check("lint", Outcome.UNRUNNABLE, _flaky_note(evidence, "lint"),
@@ -772,8 +892,12 @@ def evaluate(
                   f"{len(files)} tests have no assertions: {', '.join(files[:3])}",
                   evidence=[fake.seq])
         )
+    elif fake is None:
+        # SS-01 / INV-T.1: "the scan never ran" must not read like "the scan ran clean"
+        gate.checks.append(Check("real tests", Outcome.UNRUNNABLE,
+                                 f"no `{FAKE_TESTS}` record — the assertion scan did not run for this candidate"))
     else:
-        gate.checks.append(Check("real tests", True, evidence=[fake.seq] if fake is not None else []))
+        gate.checks.append(Check("real tests", True, evidence=[fake.seq]))
 
     # Criteria have tests (G5): `AC-<story>-<i>` code must appear in the name
     # of a test in the last green run — names read from runner output, not
@@ -784,6 +908,11 @@ def evaluate(
     doc_xanh = [last_green.seq] if last_green is not None else []
     if acceptance <= 0:
         gate.checks.append(Check("criteria have tests", Outcome.NOT_APPLICABLE, "story declares no criteria"))
+    elif last_green is None and last_test is not None and last_test.detail.get("unrunnable"):
+        # the runner itself could not run: no test evidence exists either way — an absence, not a red story
+        # (INV-F.3; a derived FAILED here would reopen the developer for an environment fault, SS-14)
+        gate.checks.append(Check("criteria have tests", Outcome.UNRUNNABLE,
+                                 "no test run could execute — see `test`", evidence=[last_test.seq]))
     elif last_green is None:
         gate.checks.append(Check("criteria have tests", False, "no green test run yet"))
     elif not last_green.detail.get("test_format"):
@@ -808,6 +937,8 @@ def evaluate(
         for e in evidence.of(TOOL_RUN):
             if not e.ok or not e.name.startswith("qa:"):
                 continue
+            if candidate and not EvidenceIdentity.of(e).bound:
+                continue          # SS-03: an unstamped run proves nothing about this build
             hong = {str(x) for x in (e.detail.get("failed_ids") or [])}
             ids = [str(t) for t in (e.detail.get("test_ids") or []) if str(t) not in hong]
             if ids:
@@ -884,15 +1015,20 @@ def evaluate(
     # at parent SHA") while `TDD` failed, and the story was blocked by the
     # weaker of the two. Only `PASSED` counts — NOT_APPLICABLE, UNRUNNABLE and
     # UNCONFIGURED mean the control did not answer, so `TDD` stands alone.
-    nop = _nop_check(evidence, story_id, acceptance=acceptance, candidate=candidate)
+    nop = _nop_check(evidence, story_id, acceptance=acceptance, candidate=candidate, changed=changed)
 
-    # TDD (G8): story added tests must have a red run before the last green.
+    # TDD (G8): story added tests must have a red run before the last green. SS-83: "red" is read through the same
+    # proof model as the nop control — a run that could not execute, or that is red only because of an unrelated test,
+    # shows nothing about the story's tests.
     if added_tests is not None:
+        red_run = proven_red_before_green(evidence, story_id, acceptance=acceptance, added_tests=added_tests,
+                                          changed=changed) if added_tests else None
         if not added_tests:
             gate.checks.append(Check("TDD", Outcome.NOT_APPLICABLE, "story did not add tests"))
-        elif red_before_green(evidence):
+        elif red_run is not None:
             gate.checks.append(Check(
-                "TDD", True,
+                "TDD", True, f"red before green: run #{red_run.seq} shows the story's tests red for a reason the "
+                             f"story's code decides",
                 evidence=[e.seq for e in evidence.of(TOOL_RUN, "test")],   # red/green order read across full sequence
             ))
         elif nop.outcome is Outcome.PASSED:
@@ -928,6 +1064,9 @@ def evaluate(
         elif ran.detail.get("skipped"):
             gate.checks.append(Check(kind, Outcome.UNCONFIGURED, str(ran.detail["skipped"]),
                                      kind=CHECK_KIND["<kind>"], evidence=[ran.seq]))
+        elif ran.detail.get("unrunnable"):                               # SS-34: the runner did not run — not a verdict
+            gate.checks.append(Check(kind, Outcome.UNRUNNABLE, str(ran.detail["unrunnable"])[:200],
+                                     kind=CHECK_KIND["<kind>"], evidence=[ran.seq]))
         elif _flaky_note(evidence, f"qa:{kind}"):
             gate.checks.append(Check(kind, Outcome.UNRUNNABLE, _flaky_note(evidence, f"qa:{kind}"),
                                      kind=CHECK_KIND["<kind>"], evidence=[ran.seq]))
@@ -946,6 +1085,12 @@ def evaluate(
         gate.checks.append(
             Check("security", Outcome.UNCONFIGURED, "security review not configured")
         )
+    elif getattr(security, "unrunnable", ""):
+        # The security reviewer did not execute: no verdict exists about this candidate. UNRUNNABLE blocks
+        # (fail closed) and names the execution failure, so the loop retries the SECURITY stage, never the
+        # developer (SS-13 — D-032's rule on the security stage).
+        gate.checks.append(Check("security", Outcome.UNRUNNABLE,
+                                 f"security reviewer did not run ({security.unrunnable}) — no verdict about the candidate"))
     elif security.error:
         gate.checks.append(Check("security", False, security.error))
     else:
@@ -1026,6 +1171,8 @@ def _preservation_check(evidence: Evidence, preservation: list[dict], candidate:
     ids = ([str(t) for t in test.detail.get("test_ids") or []]
            if test is not None and test.detail.get("test_format") else [])
     failed = {str(t) for t in test.detail.get("failed_ids") or []} if test is not None else set()
+    # SS-87: a skipped or errored test did not execute — a behaviour resting on it is unobserved, not still green
+    unexecuted = (proof.not_green(test.detail) - failed) if test is not None else set()
 
     broken, missing = [], []
     for it in preservation:
@@ -1061,6 +1208,9 @@ def _preservation_check(evidence: Evidence, preservation: list[dict], candidate:
         red = [t for t in tests if t in failed]
         if red:
             broken.append(f"{bid} ({red[0]})")
+            continue
+        if all(t in unexecuted for t in tests):
+            missing.append(f"{bid} (not executed: {tests[0]})")
 
     if broken:
         return Check("preservation", Outcome.FAILED,

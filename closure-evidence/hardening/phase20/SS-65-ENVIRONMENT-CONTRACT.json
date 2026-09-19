@@ -1,0 +1,97 @@
+{
+ "generated": "2026-09-17T15:15:52+0700",
+ "defect": "SS-65",
+ "severity": "P1",
+ "status": "OPEN",
+ "invariant": "INV-N.1",
+ "family": "FAM-PROCESS",
+ "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+ "found_by": {
+  "what": "W1 run 1 on the frozen candidate abad2a6",
+  "when": "2026-09-17T14:00:39+0700",
+  "cost_usd": 0.0,
+  "model_calls": 0,
+  "driver_phases_passed": [
+   "prepare (15/15 preflight)",
+   "kernel-first (exit 2, no agent call)",
+   "approve (ARB-1, only readiness changed)"
+  ],
+  "stop": "sprint ERROR verification tools missing where they will run — `tools.sast` = `bandit -q -r .` — MISSING in aisef-verify-python:b2c7afff2aed: exit 127 — fix the environment (`aisef doctor`) before paying for a session (D-028)",
+  "classification_of_the_stop": "CORRECT — the kernel refused before spending; the defect is that it must refuse at all"
+ },
+ "measurement": {
+  "how": "the FROZEN candidate's own code (aisef-freeze/abad2a6af796/w1-venv) against bare projects carrying only a stack marker file, default configuration, no .ai/config.json",
+  "per_stack": {
+   "pyproject.toml": {
+    "image": "aisef-verify-python:b2c7afff2aed (harness-built preset)",
+    "tools": {
+     "test": "pytest -q OK",
+     "lint": "ruff check . OK",
+     "sast": "bandit -q -r . exit 127"
+    },
+    "sprint": "BLOCKED"
+   },
+   "go.mod": {
+    "image": "golang:1.23-alpine (upstream)",
+    "tools": {
+     "test": "go test ./... OK",
+     "lint": "go vet ./... OK",
+     "sast": "gosec ./... exit 127"
+    },
+    "sprint": "BLOCKED"
+   },
+   "Cargo.toml": {
+    "image": "rust:1-alpine",
+    "tools": {
+     "sast": "cargo audit OK"
+    },
+    "sprint": "OK"
+   },
+   "Gemfile": {
+    "image": "ruby:3-alpine",
+    "tools": {
+     "sast": "bundle exec brakeman -q OK"
+    },
+    "sprint": "OK"
+   },
+   "package.json": {
+    "image": "node:22-alpine",
+    "tools": {
+     "sast": "npm audit --omit=dev UNJUDGED (project-local runner, SS-47)"
+    },
+    "sprint": "OK"
+   }
+  },
+  "with_and_without_a_declared_image": "identical stop — measured with sandbox.image declared (the reference project) and removed (image_for picks the same preset)",
+  "configuration_escape": "none — aisef/harness/tools.py::command_for treats an empty tools.* as 'auto-detect', so a declared tool cannot be withdrawn; verify.waived covers verify.* keys, not tools.*",
+  "blast_radius": "every Python and Go project under default configuration cannot start `aisef run` with this candidate"
+ },
+ "why_the_program_did_not_catch_it": {
+  "phase_12_differential": "out of reach by construction — the synthetic adapter runs no real tool probe; the 100 000 traces exercise routing, not the environment contract",
+  "existing_tests": "tests/test_dogfood_ledgerlock.py proves the preflight REPORTS a missing tool, using a mocked sandbox and a fictional image; nothing asserts that the image `image_for` picks for a stack contains every tool `declared_tools` resolves for it",
+  "aisef_doctor": "did report it — `✗ tool tools.sast … MISSING` appeared in the driver's prepare phase output and in the P20 plan's known-conditions note, where it was recorded as an accepted environment condition rather than treated as a framework defect. That judgement was wrong: doctor's red line is the framework declaring a tool its own image lacks."
+ },
+ "provenance_of_the_regression": {
+  "b7733db (2026-09-15, D-028)": "introduced the rule 'the environment a preset declares contains every tool the preset declares' and built the python recipe with pytest, pytest-cov, ruff",
+  "SS-45": "made auto-detected defaults (bandit, gosec, cargo audit, npm test) part of `declared_tools`, so they are probed and can block",
+  "result": "the probe set grew to include a tool the recipe never installed; the framework's own rule is violated by its own image"
+ },
+ "proposed_fix_NOT_APPLIED": {
+  "why_not_applied": "a change under aisef/ creates a new PHASE12_KERNEL_DIGEST and, per the owner's rule 3, invalidates the 100 000-trace dataset and requires the full qualification set again; that spend is the owner's decision",
+  "python": "add bandit to RECIPES['python'].packages — measured viable: base python:3.12-slim@sha256:78387bc3… with pytest==9.1.1, pytest-cov==7.1.0, ruff==0.16.7, bandit==1.9.4 builds and all four tools run (bandit 1.9.4, pytest 9.1.1, ruff 0.16.7)",
+  "consequence_of_that_line": "the recipe digest changes the image NAME: aisef-verify-python:b2c7afff2aed → aisef-verify-python:<new 12 hex>; every project that pinned the old name (the LedgerLock reference project included) must re-pin, and that is a change to the W1 environment contract",
+  "go": "either a managed go recipe that carries gosec, or stop auto-detecting a tool the chosen upstream image cannot run",
+  "missing_test": "for every stack marker: every tool `declared_tools` resolves is present in the image `image_for` picks — the invariant b7733db stated but never asserted",
+  "patch_proposal": "scratchpad/ss65-proposal.patch (not applied to the working tree)"
+ },
+ "cost_of_the_full_remedy": {
+  "phase_12_rerun": "10 chunks × ~41 min ≈ 6 h 45 on this host",
+  "then": "W0 record, freeze, W1 run 1 restart",
+  "wall_clock_estimate_hours": 7.5
+ },
+ "state_left_behind": {
+  "product_tree": "unchanged — aisef/ tree 84014c980e75… (PHASE12_KERNEL_DIGEST); nothing under aisef/ was edited",
+  "w1_run_copy": "~/Downloads/projects/w1-run-1 carries the ARB-1 readiness re-approval, the guard-plugin commit and a replay manifest from the aborted attempt; a clean run 1 re-prepares it with w1/prepare_run_copy.sh",
+  "w0_and_freeze": "AISEF-W0-QUALIFICATION.json marked voided (qualified=false); P19-FREEZE.json rests on it and is void with it"
+ }
+}

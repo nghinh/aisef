@@ -1,0 +1,87 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 7 items
+
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_normalize_key_matches_unicodedata_nfc FAILED [ 14%]
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_2_nfc_and_nfd_e_acute_normalize_identically FAILED [ 28%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_3_package_import_prints_init_file_path FAILED [ 42%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_4_module_help_lists_required_subcommands FAILED [ 57%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_5_runtime_has_no_forbidden_imports PASSED [ 71%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_6_runtime_has_no_forbidden_process_or_socket_calls PASSED [ 85%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_7_package_exports_ledger_and_conflict_error FAILED [100%]
+
+=================================== FAILURES ===================================
+_ NormalizeKeyTests.test_AC_STORY_01_01_1_normalize_key_matches_unicodedata_nfc _
+
+self = <tests.test_nfc_normalization.NormalizeKeyTests testMethod=test_AC_STORY_01_01_1_normalize_key_matches_unicodedata_nfc>
+
+    def test_AC_STORY_01_01_1_normalize_key_matches_unicodedata_nfc(self):
+>       from ledgerlock.format import normalize_key
+E       ModuleNotFoundError: No module named 'ledgerlock'
+
+tests/test_nfc_normalization.py:7: ModuleNotFoundError
+_ NormalizeKeyTests.test_AC_STORY_01_01_2_nfc_and_nfd_e_acute_normalize_identically _
+
+self = <tests.test_nfc_normalization.NormalizeKeyTests testMethod=test_AC_STORY_01_01_2_nfc_and_nfd_e_acute_normalize_identically>
+
+    def test_AC_STORY_01_01_2_nfc_and_nfd_e_acute_normalize_identically(self):
+>       from ledgerlock.format import normalize_key
+E       ModuleNotFoundError: No module named 'ledgerlock'
+
+tests/test_nfc_normalization.py:18: ModuleNotFoundError
+___ SkeletonTests.test_AC_STORY_01_01_3_package_import_prints_init_file_path ___
+
+self = <tests.test_skeleton.SkeletonTests testMethod=test_AC_STORY_01_01_3_package_import_prints_init_file_path>
+
+    def test_AC_STORY_01_01_3_package_import_prints_init_file_path(self):
+        result = subprocess.run(
+            [sys.executable, "-c", "import ledgerlock; print(ledgerlock.__file__)"],
+            cwd=PROJECT_ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    
+>       self.assertEqual(result.returncode, 0, result.stderr)
+E       AssertionError: 1 != 0 : Traceback (most recent call last):
+E         File "<string>", line 1, in <module>
+E       ModuleNotFoundError: No module named 'ledgerlock'
+
+tests/test_skeleton.py:21: AssertionError
+__ SkeletonTests.test_AC_STORY_01_01_4_module_help_lists_required_subcommands __
+
+self = <tests.test_skeleton.SkeletonTests testMethod=test_AC_STORY_01_01_4_module_help_lists_required_subcommands>
+
+    def test_AC_STORY_01_01_4_module_help_lists_required_subcommands(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "ledgerlock", "--help"],
+            cwd=PROJECT_ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    
+>       self.assertEqual(result.returncode, 0, result.stderr)
+E       AssertionError: 1 != 0 : /usr/local/bin/python3: No module named ledgerlock
+
+tests/test_skeleton.py:33: AssertionError
+_ SkeletonTests.test_AC_STORY_01_01_7_package_exports_ledger_and_conflict_error _
+
+self = <tests.test_skeleton.SkeletonTests testMethod=test_AC_STORY_01_01_7_package_exports_ledger_and_conflict_error>
+
+    def test_AC_STORY_01_01_7_package_exports_ledger_and_conflict_error(self):
+>       from ledgerlock import ConflictError, Ledger
+E       ModuleNotFoundError: No module named 'ledgerlock'
+
+tests/test_skeleton.py:76: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_normalize_key_matches_unicodedata_nfc
+FAILED tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_2_nfc_and_nfd_e_acute_normalize_identically
+FAILED tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_3_package_import_prints_init_file_path
+FAILED tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_4_module_help_lists_required_subcommands
+FAILED tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_7_package_exports_ledger_and_conflict_error
+========================= 5 failed, 2 passed in 0.13s ==========================

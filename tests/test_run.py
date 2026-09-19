@@ -87,9 +87,9 @@ class Agent(ClientAdapter):
     def run(self, spec: RunSpec) -> RunResult:
         dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
         if dau.startswith("# Security review"):
-            return RunResult(ok=True, text="không có phát hiện bảo mật", cost_usd=0.1)
+            return RunResult(ok=True, text="không có phát hiện bảo mật\n\n```json\n{\"verdict\": \"pass\", \"findings\": []}\n```\n", cost_usd=0.1)
         if dau.startswith("# Review"):
-            return RunResult(ok=True, text="không có mục chặn", cost_usd=0.1)
+            return RunResult(ok=True, text="không có mục chặn\n\n```json\n{\"verdict\": \"pass\", \"findings\": []}\n```\n", cost_usd=0.1)
 
         story_id = spec.env.get("AISEF_STORY_ID", "")
         scope = spec.env.get("AISEF_WRITE_SCOPE", "src").split(",")[0]
@@ -325,6 +325,45 @@ class TestStopsOnFailure(RunTestCase):
         report = self.run_sprint(Agent(out_of_scope={"STORY-01-01"}))
         self.assertFalse(report.ok)
         self.assertIn("write_scope", report.summary())
+
+
+class TestAWorkspaceHeldByASurvivorIsKept(RunTestCase):
+    """F5 / INV-L.1 — terminate, reap, VERIFY, then remove. When a process the session left behind survives the
+    reaper, the wave loop must not remove a tree that is still in use: the attempt is a fatal ENVIRONMENT_FAILURE,
+    the worktree stays registered, and the run log names the pids."""
+
+    def test_the_worktree_of_the_story_stays_and_the_pids_are_named(self):
+        import subprocess as sp
+        import sys
+        from unittest import mock
+
+        from aisef.harness import process_owner as P
+
+        class Leaves(Agent):
+            def __init__(self):
+                super().__init__()
+                self.left: list[sp.Popen] = []
+
+            def run(self, spec):
+                self.left.append(sp.Popen([sys.executable, "-c", "import time; time.sleep(60)"]))
+                res = super().run(spec)
+                res.raw_result = {**(res.raw_result or {}), "spawned": [self.left[-1].pid]}   # the session declares it
+                return res
+
+        agent = Leaves()
+        try:
+            with mock.patch.object(P, "reap", lambda pids, *, grace=P.GRACE_SECONDS: []):   # the reaper cannot end it
+                report = self.run_sprint(agent)
+            self.assertFalse(report.ok)
+            last = report.outcomes[0].attempts[-1]
+            self.assertEqual(last.orphans, [agent.left[0].pid])
+            listed = sp.run(["git", "worktree", "list", "--porcelain"], cwd=self.project, capture_output=True, text=True, encoding="utf-8").stdout
+            self.assertIn("STORY-01-01", listed, "the tree a live process holds is kept, never removed")
+            log = (self.artifacts / "run.log").read_text(encoding="utf-8") if (self.artifacts / "run.log").is_file() else ""
+            self.assertIn("workspace kept", log)
+        finally:
+            for p in agent.left:
+                p.kill(); p.wait()
 
 
 class TestResume(RunTestCase):
@@ -713,8 +752,21 @@ class TestDoneChiSauMerge(RunTestCase):
         subprocess.run(["git", "add", "-A"], cwd=self.project, check=True)
         subprocess.run(["git", "commit", "-qm", "manifest"], cwd=self.project, check=True)
 
-        r = self.run_sprint(Dung(), only_epic="EPIC-01",
-                            config=self.config(**{"sandbox.use_docker": False}))
+        # F4 (SS-53 / INV-O.1): two stories granted the same manifest no longer share a wave, so the collision this
+        # invariant needs is injected where it really arises — a trunk commit touching `package.json` between the
+        # story's freeze and its merge (an operator, another run) — right before STORY-01-03 merges
+        from unittest import mock
+        from aisef.control.worktree import WorktreeManager
+        goc = WorktreeManager.merge_story
+        def dung_khi_merge(wm, story_id, *a, **kw):
+            if story_id == "STORY-01-03":
+                (self.project / "package.json").write_text('{"name": "trunk-moved"}\n', encoding="utf-8")
+                subprocess.run(["git", "add", "-A"], cwd=self.project, check=True)
+                subprocess.run(["git", "commit", "-qm", "operator edit on trunk"], cwd=self.project, check=True)
+            return goc(wm, story_id, *a, **kw)
+        with mock.patch.object(WorktreeManager, "merge_story", dung_khi_merge):
+            r = self.run_sprint(Dung(), only_epic="EPIC-01",
+                                config=self.config(**{"sandbox.use_docker": False}))
         st = self.state()
         self.assertIn("STORY-01-03", [w for wv in r.waves for w in wv.merge_conflicts])
         self.assertIs(st.stories["STORY-01-03"].state, StoryStatus.VERIFIED)

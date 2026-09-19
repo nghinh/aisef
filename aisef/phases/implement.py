@@ -26,7 +26,7 @@ import json
 import re
 import shutil
 import subprocess
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 
 from ..clients.base import ClientAdapter
 from ..config import Config
@@ -34,7 +34,7 @@ from ..control import gate as story_gate
 from ..control import tdd
 from ..kit import registry as skill_registry
 from ..kit import router as skill_router
-from ..control.acceptance import ac_code, coverage as ac_coverage
+from ..control.acceptance import contract_fingerprint, ac_code, coverage as ac_coverage
 from ..control.design_contract import DesignContract, load as load_contract
 from ..control.impact import analyse as analyse_impact, is_test_path
 from ..control.preflight import verification_contract
@@ -44,14 +44,20 @@ from ..control.normalize import Architecture, Story, effective_write_scope
 from ..harness import context as code_map
 from ..harness import mockup_verify
 from ..clients.compile import guard_expected
-from ..clients.stream import INFRA_STATUSES, exit_status_of, retry_delay_seconds
+from ..clients.stream import ENVIRONMENT_STATUSES, INFRA_STATUSES, RunResult, exit_status_of, retry_delay_seconds
+from ..control import identity as ident
+from ..control.budget import BudgetLocked
+from ..control.outcome import StageOutcome
 from ..harness.guardrails import (
+    ENV_BASELINE_DIRTY,
     ENV_ALLOW_HOSTS,
     ENV_DISALLOWED_TOOLS,
     ENV_PROJECT,
     ENV_WORKDIR,
     ENV_BASE_REF,
     ENV_STORY_ID,
+    ENV_SESSION_ID,
+    ENV_ATTEMPT,
     ENV_WRITE_SCOPE,
     changed_files,
     fork_point,
@@ -89,6 +95,14 @@ class Attempt:
     cost_usd: float = 0.0
     gate: story_gate.StoryGate | None = None
     review_findings: list[str] = field(default_factory=list)
+    #: The developer session that produced this attempt (control/identity.py); guard records bind to it.
+    session_id: str = ""
+    #: Processes the session left behind that survived the reaper (F5 / INV-L.1): the workspace is kept for them.
+    orphans: list[int] = field(default_factory=list)
+    #: Typed outcome of the attempt (control/outcome.StageOutcome) — the routing key; the booleans above are derived.
+    outcome: str = ""
+    #: The identity tuple the verdict was computed under — what `gate:verdict` was stamped with.
+    identity: dict = field(default_factory=dict)
     #: Why the reviewer did **not execute** on this candidate (max_turns, timeout,
     #: transport error, tree modified, candidate moved) — "" when it did.  A
     #: reviewer that did not run has said nothing about the code: not a BLOCK,
@@ -119,6 +133,13 @@ class StoryOutcome:
     story_id: str
     attempts: list[Attempt] = field(default_factory=list)
     blocked_reason: str = ""
+    #: Typed terminal (control/outcome.StageOutcome value) — what `blocked_reason` says, as data. "" while running
+    #: or when the story is done. Readers decide on this, never on the prose.
+    terminal: str = ""
+
+    def block(self, kind: StageOutcome, reason: str) -> None:
+        self.terminal = kind.value
+        self.blocked_reason = reason
 
     @property
     def done(self) -> bool:
@@ -556,14 +577,41 @@ def _reserved_client_run(client: ClientAdapter, spec, *, story_id: str,
     """
     guard = getattr(client, "_budget_guard", None)
     if not isinstance(guard, BudgetGuard):
-        return client.run(spec)
+        return _owned_run(client, spec)
     with guard.reserve(
         story_id=story_id, est_usd=estimate_usd, est_turns=estimate_turns,
     ) as token:
-        result = client.run(spec)
+        result = _owned_run(client, spec)
         token.actual_usd = float(getattr(result, "cost_usd", 0.0) or 0.0)
         token.actual_turns = int(getattr(result, "num_turns", 1) or 1)
         return result
+
+
+def _owned_run(client: ClientAdapter, spec):
+    """The attempt owns the session's process tree (F5 / INV-L.1) — what the SESSION started, never whatever else the
+    harness process happens to have spawned: under parallel waves a sibling story's `git` is a child of this process
+    too, and the first rule ("every new child") killed it (Windows CI on bb31522, where git is slow enough to lose the
+    race). A real adapter's tree is its process group / job object, reaped in `clients/base._stream_with_timeout` and
+    recorded as `raw_result["reaped"]`; an in-process client DECLARES what it started as `raw_result["spawned"]`.
+    Declared processes are terminated, reaped and VERIFIED dead before the session is scored; a survivor is typed
+    (`raw_result["orphans"]`), never silent."""
+    from ..harness import process_owner as _po
+    result = client.run(spec)
+    raw = dict(getattr(result, "raw_result", None) or {})
+    spawned = [int(p) for p in (raw.get("spawned") or []) if str(p).lstrip("-").isdigit()]
+    if not spawned:
+        return result
+    reaped = _po.reap(spawned)
+    left = [p for p in spawned if _po.pid_alive(p)]        # VERIFY: what terminate → kill could not end is typed
+    if reaped:
+        raw["reaped"] = sorted(set(raw.get("reaped") or []) | set(reaped))
+    if left:
+        raw["orphans"] = left
+    try:
+        result.raw_result = raw
+    except AttributeError:
+        pass
+    return result
 
 
 def run_attempt(
@@ -583,6 +631,7 @@ def run_attempt(
 ) -> Attempt:
     """One attempt: agent writes code, then harness self-verifies."""
     attempt = Attempt(number=number)
+    attempt.session_id = ident.new_session_id()
     evidence = EvidenceStore(artifact_root)
 
     context = build_context(
@@ -617,11 +666,16 @@ def run_attempt(
     _hosts = ",".join(config["sandbox.allow_hosts"]) if config else ""
     spec.env = {
         ENV_WRITE_SCOPE: ",".join(scope),
+        # SS-37 / INV-I.3: what was already dirty before this session is PREEXISTING to the guard, exactly as the
+        # planning and mockup sessions declare it — under --no-isolate an operator's file is not the developer's write
+        ENV_BASELINE_DIRTY: ",".join(changed_files(str(workdir))[:200]),
         ENV_STORY_ID: story.id,
         ENV_BASE_REF: base_ref,
         ENV_WORKDIR: str(workdir),
         ENV_PROJECT: str(project),
         ENV_ALLOW_HOSTS: _hosts,
+        ENV_SESSION_ID: attempt.session_id,
+        ENV_ATTEMPT: str(number),
     }
 
     # Isolation must be **verified**, not assumed.  Worktrees prevent
@@ -647,9 +701,21 @@ def run_attempt(
         result = _reserved_client_run(
             client, spec, story_id=story.id, estimate_turns=1,
         )
+    except BudgetLocked as e:
+        # ledger contention between parallel stories: infrastructure, retried after a short wait — never a cap,
+        # never the developer's quality budget (SS-21)
+        attempt.error = f"budget ledger locked by another writer — retrying shortly ({e})"
+        attempt.infra = True
+        attempt.retry_after = 2.0
+        attempt.outcome = StageOutcome.INFRA_FAILURE.value
+        attempt.ok = False
+        return attempt
     except BudgetExceeded as e:
-        attempt.error = f"budget exceeded: {e}"
-        attempt.fatal = False
+        # the kernel's cost cap: a run-level decision, typed and terminal — not a developer failure (INV-G.5)
+        attempt.error = f"budget cap reached: {e}"
+        attempt.fatal = True
+        attempt.infra = True     # never scored, never charged
+        attempt.outcome = StageOutcome.BUDGET.value
         attempt.ok = False
         return attempt
     attempt.cost_usd = result.cost_usd
@@ -685,7 +751,8 @@ def run_attempt(
         # `_bmad-output/`, and telling them to revert is telling them to throw
         # away their own commit. The tree says which: the story's scope is
         # source, `_bmad-output/` is the harness's own record.
-        moi = changed_files(str(project), base_ref=before_sha)
+        from ..harness.guardrails import _git_lines
+        moi = _git_lines(str(project), ["diff", "--name-only", "-z", before_sha, after_sha])   # raw: harness paths too
         cua_harness = bool(moi) and all(
             f.startswith(("_bmad-output/", ".aisef/")) for f in moi)
         attempt.error = (
@@ -699,6 +766,8 @@ def run_attempt(
                ". The story must work in its own worktree; work on the trunk does not "
                "pass any gate. Revert and re-run.")
         )
+        # typed at the source (F2): a harness-only trunk change is an environment event, a story write is a breach
+        attempt.outcome = (StageOutcome.ENVIRONMENT_FAILURE if cua_harness else StageOutcome.ISOLATION_BREACH).value
         attempt.infra = True   # story was never scored
         attempt.fatal = True   # and retrying is pointless
         evidence.tool_run(
@@ -708,9 +777,28 @@ def run_attempt(
         )
         return attempt
 
+    orphans = list((getattr(result, "raw_result", None) or {}).get("orphans") or [])
+    if orphans:
+        # F5 / INV-L.1 (terminate, reap, VERIFY, then remove): a process the session left behind survived SIGTERM
+        # and SIGKILL, so the tree is still in use — nothing is graded, the run loop keeps the workspace
+        # (`attempt.orphans`), and retrying inside it is pointless. Typed and recorded, never silent.
+        attempt.error = f"process(es) {orphans} left by the session survived termination — workspace kept"
+        attempt.outcome = StageOutcome.ENVIRONMENT_FAILURE.value
+        attempt.infra = True
+        attempt.fatal = True
+        attempt.orphans = orphans
+        evidence.tool_run(story.id, "process", ok=False,
+                          detail={"orphans": orphans, "attempt": number, "workdir": str(workdir)})
+        return attempt
+
     if not result.ok:
         attempt.error = result.error or "run failed"
-        attempt.infra = exit_status_of(result) in INFRA_STATUSES
+        status = exit_status_of(result)
+        attempt.infra = status in INFRA_STATUSES or status in ENVIRONMENT_STATUSES
+        attempt.outcome = (StageOutcome.INFRA_FAILURE.value if status in INFRA_STATUSES else
+                           StageOutcome.ENVIRONMENT_FAILURE.value if status in ENVIRONMENT_STATUSES else "")
+        # `context`, `permission`, `cost`: the environment limited the session — the tree is untouched and the
+        # developer wrote no wrong code; retried on the infra budget, never charged to quality (SS-15, INV-G.4)
         attempt.retry_after = retry_delay_seconds(result)
         if exit_status_of(result) == "auth":
             # `auth` is kept out of `INFRA_STATUSES` on purpose and that reasoning
@@ -778,7 +866,10 @@ def run_attempt(
     # Claude Code's tools (common when an API proxy silently routes to a
     # different model).  Only fires when output_tokens > 0 (real stream
     # data, not a mock that omits it).
-    if not changed_now and not result.tool_uses and result.output_tokens > 0:
+    untouched = (head_sha(workdir), _tree_snapshot(workdir)) == tree_before
+    if untouched and not result.tool_uses and result.output_tokens > 0:
+        # THIS session's change, not the diff against the base branch: on a retry that diff carries the frozen
+        # candidate's files and the check never fired (SS-59)
         snippet = (result.text or "")[:200].strip()
         attempt.error = (
             f"agent responded ({result.output_tokens} tokens, {result.num_turns} turns) "
@@ -811,60 +902,99 @@ def run_attempt(
     # (review and security), to establish what `changed_files` already knew.
     # Nothing was written, so there is nothing to grade: the gate would return
     # either the verdict it already returned, or "no changes to review".
+    reuse = False
     if (head_sha(workdir), _tree_snapshot(workdir)) == tree_before:
-        # ...unless this tree has never been graded.  A verdict is not a pure
-        # function of the tree: it also depends on the spec the gate reads.
-        # todo-e2e/STORY-03-01 2026-09-10 -- a reviewer stopped the story
-        # `[stuck]` on a contradiction between AD-9 and an accepted criterion,
-        # AD-9 was amended, the worktree merged the amendment, and the agent
-        # then correctly wrote nothing because the work was already done.
-        # Skipping there would bury finished work under "already known".
-        cham_roi = {str(e.detail.get("candidate") or "")
-                    for e in evidence.read(story.id).of(NOTE, "gate:verdict")}
-        if not changed_now or head_sha(workdir) in cham_roi:
+        # The session wrote nothing. What that means depends on what is already known about THIS state —
+        # the tree as it stands now, under this contract, configuration and baseline — not on whether a
+        # verdict was ever recorded at this SHA (D-035: hygiene changed the tree, the SHA stayed; SS-61: the
+        # verdict at this SHA was a PASS the run never acted on). `last_fresh` is the only question asked.
+        now = _identity_now(story, workdir=workdir, config=config, candidate=head_sha(workdir),
+                            artifact_root=artifact_root, session_id=attempt.session_id, attempt=number)
+        verdict = evidence.read(story.id).last_fresh(NOTE, "gate:verdict", now)
+        if verdict is not None and not verdict.ok:
+            # T6: a fresh QUALITY_BLOCK over exactly this state — proven unresolved work, decision stated.
             attempt.error = (
                 f"the session wrote nothing ({result.num_turns} turns) — the tree is "
-                f"exactly as the session found it, so the gate has nothing to grade. "
-                + ("Re-running it would return the verdict it already returned."
-                   if changed_now else
-                   "If the story's work is already on the main branch, the worktree "
-                   "forked from it and the diff stays empty however many sessions "
-                   "run — check the main branch before retrying.")
+                f"exactly as the session found it, so the gate has nothing to grade: its verdict is still "
+                f"current, and re-running the gate would return the block it already returned."
             )
             attempt.infra = True   # never scored, so do not charge the story
             attempt.noop = True
             run_log(artifact_root, f"story={story.id}#{number} NO-OP: "
-                                   f"{result.num_turns} turns, 0 files written")
+                                   f"{result.num_turns} turns, 0 files written, fresh block at {now.candidate_sha[:8]}")
             return attempt
-        run_log(artifact_root, f"story={story.id}#{number} wrote nothing, but this "
-                               f"tree has no verdict yet — grading it")
+        if not changed_now and verdict is None:
+            # Nothing frozen, nothing changed against the base: there is nothing to grade at all.
+            attempt.error = (
+                f"the session wrote nothing ({result.num_turns} turns) — the tree is "
+                f"exactly as the session found it, so the gate has nothing to grade. "
+                "If the story's work is already on the main branch, the worktree "
+                "forked from it and the diff stays empty however many sessions "
+                "run — check the main branch before retrying."
+            )
+            attempt.infra = True
+            attempt.noop = True
+            run_log(artifact_root, f"story={story.id}#{number} NO-OP: "
+                                   f"{result.num_turns} turns, 0 files written, nothing to grade")
+            return attempt
+        # T6': no fresh verdict over this state (the tree, the contract or the configuration changed since
+        # the last one) — or a fresh PASS the run never acted on: grade it. Fresh green evidence is kept,
+        # everything else re-runs; nothing is paid for twice and nothing stale scores.
+        reuse = True
+        run_log(artifact_root, f"story={story.id}#{number} wrote nothing, but this state has "
+                               + ("a fresh passing verdict the run never acted on — re-scoring it"
+                                  if verdict is not None else "no fresh verdict — grading it"))
     run_log(artifact_root, f"story={story.id}#{number} changed_files={len(changed_now)}")
+    # F4 / SS-41: a path that was already there before the session and is byte-identical now is PREEXISTING —
+    # an operator fixture under a granted directory is not the developer's work and never enters the candidate
+    snap_now = _tree_snapshot(workdir)
+    preexisting = sorted(rel for rel, content in tree_before[1].items()
+                         if rel in snap_now and snap_now[rel] == content and content is not None)
     attempt.candidate = freeze_candidate(
         workdir, story=story, scope=scope, isolated=workdir != project,
         evidence=evidence, artifact_root=artifact_root, number=number,
-        changed=changed_now,
+        changed=changed_now, preexisting=preexisting,
     )
+    if not attempt.candidate:
+        # The freeze is authoritative: no candidate means nothing can be graded and nothing may be stamped
+        # under the parent SHA (SS-A15, SS-60). An environment outcome, not the developer's.
+        attempt.error = ("candidate could not be frozen — the attempt's work cannot be bound to a version, "
+                         "so nothing is graded; see the candidate:frozen evidence")
+        attempt.infra = True
+        evidence.record(story.id, Event(kind=NOTE, name="attempt:unrunnable", ok=False,
+                                        detail={"attempt": number, "reason": "freeze failed",
+                                                "session_id": attempt.session_id}))
+        run_log(artifact_root, f"story={story.id}#{number} UNRUNNABLE: candidate could not be frozen")
+        return attempt
     run_log(artifact_root, f"story={story.id}#{number} candidate frozen sha={attempt.candidate[:8]}")
     return verify_candidate(
         story, project=project, workdir=workdir, artifact_root=artifact_root,
         client=client, config=config, catalog=catalog, architecture=architecture,
         contract=contract, attempt=attempt, base_ref=base_ref, scope=scope,
-        changed=changed_now, preservation=preservation,
+        changed=changed_now, preservation=preservation, reuse=reuse,
     )
 
 
-def _at(ev: Evidence, kind: str, name: str, sha: str) -> Event | None:
-    """**Latest** event of a check, only if it carries the correct candidate SHA.
+def _identity_now(story: Story, *, workdir: Path, config: Config, candidate: str, artifact_root: Path,
+                  session_id: str = "", attempt: int = 0) -> ident.EvidenceIdentity:
+    """The identity of the state a decision is about to be made on (control/identity.py)."""
+    epoch = contract_fingerprint(story.acceptance_criteria)
+    have = story_gate.authoritative_baseline(EvidenceStore(artifact_root).read(story.id), epoch=epoch)
+    root = str((have.detail.get("root") or have.detail.get("parent") or "")) if have is not None else ""
+    return ident.current(story_id=story.id, story_epoch=epoch, candidate_sha=candidate, baseline_root=root,
+                         workdir=workdir, config=config, session_id=session_id, attempt=attempt)
 
-    Latest, not "any": same rule as `gate._stale_candidates` -- the latest
-    result belonging to a different version means code changed after the check,
-    and an older green result does not save it.
-    """
-    e = ev.last(kind, name)
-    return e if e is not None and str(e.detail.get("candidate") or "") == sha else None
+
+def _at(ev: Evidence, kind: str, name: str, now: "ident.EvidenceIdentity | str") -> Event | None:
+    """The most recent record of a check that is **fresh** for the state being verified — the same SHA,
+    tree state, contract, configuration and environment (control/identity.py). A record of another state
+    is a historical fact, not something to keep. `now` may be a bare SHA for callers that know nothing else."""
+    if isinstance(now, str):
+        now = ident.EvidenceIdentity(candidate_sha=now)
+    return ev.last_fresh(kind, name, now)
 
 
-def _green_at(ev: Evidence, kind: str, name: str, sha: str) -> bool:
+def _green_at(ev: Evidence, kind: str, name: str, sha) -> bool:
     """Evidence at the candidate sufficient to **keep**: genuinely green -- not
     skipped (unconfigured) or unrunnable; those are cheap to re-run and may
     have changed (tool just installed, command just declared)."""
@@ -872,16 +1002,23 @@ def _green_at(ev: Evidence, kind: str, name: str, sha: str) -> bool:
     return bool(e and e.ok and not e.detail.get("skipped") and not e.detail.get("unrunnable"))
 
 
-def _nop_at(ev: Evidence, sha: str) -> bool:
+def _nop_at(ev: Evidence, sha) -> bool:
     """Nop evidence at the candidate sufficient to **keep**: a real result (red
     or green are both data -- green is a deterministic fail, re-running gives
     the same answer) or "story did not add/modify test files" (a SHA fact).
     Not kept when unrunnable, disabled by config, or missing test command:
     all three may have changed."""
     e = _at(ev, TOOL_RUN, NOP_RUN, sha)
-    if e is None or e.detail.get("unrunnable") or e.detail.get("disabled"):
+    if e is None or e.detail.get("disabled"):
         return False
-    return not e.detail.get("skipped") or ("files" in e.detail and not e.detail["files"])
+    if e.detail.get("skipped"):
+        return "files" in e.detail and not e.detail["files"]
+    # SS-81 family: a record from before the proof model was taken with a pytest session that stopped at the first
+    # import error — what it never saw must be measured again, not reused. A run whose files all failed to import is
+    # still an observation (the proof model reads each file's error), so it is kept like any other result.
+    if e.detail.get("proof_schema") != NOP_PROOF_SCHEMA:
+        return False
+    return not e.detail.get("unrunnable") or bool(e.detail.get("collection_errors"))
 
 
 def _security_as_dict(rep: SecurityReport | None) -> dict | None:
@@ -913,6 +1050,7 @@ def _security_from_evidence(e: Event) -> SecurityReport:
     both live and persisted reports."""
     rep = parse_security("\n".join(e.detail.get("findings") or []))
     rep.error = str(e.detail.get("error") or "")
+    rep.unrunnable = str(e.detail.get("unrunnable") or "")
     return rep
 
 
@@ -1014,13 +1152,37 @@ def verify_candidate(
     paths -- no relaxation, just no paying to rebuild what already exists.
     """
     sid, sha, number = story.id, attempt.candidate, attempt.number
-    from ..harness.runlog import one_line, run_log
+    from ..harness.runlog import run_log
 
     def _log(msg: str) -> None:
         run_log(artifact_root, msg)
 
     _log(f"story={sid}#{number} verify START sha={sha[:8]}")
-    evidence = EvidenceStore(artifact_root, candidate=sha)
+    now = _identity_now(story, workdir=workdir, config=config, candidate=sha, artifact_root=artifact_root,
+                        session_id=attempt.session_id, attempt=number)
+    attempt.identity = now.as_dict()
+    token = ident.CURRENT.set(now)      # every store built below stamps this attempt's identity
+    try:
+        return _verify_candidate_under(now, story, project=project, workdir=workdir, artifact_root=artifact_root,
+                                       client=client, config=config, catalog=catalog, architecture=architecture,
+                                       contract=contract, attempt=attempt, base_ref=base_ref, scope=scope,
+                                       changed=changed, preservation=preservation, reuse=reuse, repeat=repeat)
+    finally:
+        ident.CURRENT.reset(token)
+
+
+def _verify_candidate_under(now: ident.EvidenceIdentity, story: Story, *, project: Path, workdir: Path,
+                            artifact_root: Path, client: ClientAdapter, config: Config, catalog: Catalog,
+                            architecture: Architecture | None, contract: DesignContract | None, attempt: Attempt,
+                            base_ref: str, scope: list[str], changed: list[str], preservation: list[dict],
+                            reuse: bool, repeat: int) -> Attempt:
+    sid, sha, number = story.id, attempt.candidate, attempt.number
+    from ..harness.runlog import one_line, run_log
+
+    def _log(msg: str) -> None:
+        run_log(artifact_root, msg)
+
+    evidence = EvidenceStore(artifact_root, identity=now)
     # Read **once, before** re-running anything: re-run checks write new
     # events, and keep/run decisions must be based on evidence at entry time.
     ev = evidence.read(sid) if reuse else None
@@ -1035,15 +1197,20 @@ def verify_candidate(
         return sufficient
 
     # Nop control (ADR-005 V3) right after freeze: story's tests at parent SHA.
-    if not keep(NOP_RUN, reuse and _nop_at(ev, sha)):
+    if not keep(NOP_RUN, reuse and _nop_at(ev, now)):
+        # the parent the control compares against is the epoch's baseline root — not a fork point recomputed
+        # after main moved (SS-22, INV-C.1)
+        # ...a root that stands BEFORE the story: in a non-isolated project the baseline root is HEAD itself,
+        # which is the story's own build, and the control stays unrunnable there as before
+        nop_ref = now.baseline_root if (now.baseline_root and now.baseline_root != sha) else base_ref
         run_nop(story, workdir=workdir, artifact_root=artifact_root, config=config,
-                candidate=sha, base_ref=base_ref, changed=changed)
+                candidate=sha, base_ref=nop_ref, changed=changed)
 
     # Harness re-runs tests and lint: evidence must be recorded by the
     # harness, and the agent may have "forgotten" to run after the last edit.
     chay_lai: list[str] = []  # checks run this attempt -- `_repeat_note` compares across k runs
     for tool in ("test", "lint"):
-        if not keep(tool, reuse and _green_at(ev, TOOL_RUN, tool, sha)):
+        if not keep(tool, reuse and _green_at(ev, TOOL_RUN, tool, now)):
             _repeat_runs(repeat, partial(
                 run_tool, tool, workdir, story_id=sid, artifact_root=artifact_root,
                 config=config, candidate=sha,
@@ -1054,7 +1221,7 @@ def verify_candidate(
 
     # Tests always green because they assert nothing is worse than no tests:
     # it makes the "tests green" gate meaningless.  Checking is cheap, run every attempt.
-    if not keep("qa:fake-tests", reuse and _green_at(ev, TOOL_RUN, "qa:fake-tests", sha)):
+    if not keep("qa:fake-tests", reuse and _green_at(ev, TOOL_RUN, "qa:fake-tests", now)):
         fake = find_fake_tests(workdir, changed)
         evidence.tool_run(sid, "qa:fake-tests", ok=not fake, detail={"files": fake})
         if fake:
@@ -1069,7 +1236,7 @@ def verify_candidate(
     # candidate, and "not run" means it says UNRUNNABLE, not passed.
     hop_dong, man_hinh = validation_targets(story, preservation)
     kinds = [k for k in hop_dong
-             if not keep(f"qa:{k}", reuse and _green_at(ev, TOOL_RUN, f"qa:{k}", sha))]
+             if not keep(f"qa:{k}", reuse and _green_at(ev, TOOL_RUN, f"qa:{k}", now))]
     if kinds:
         # `clean=False`: worktree is already frozen at the correct SHA and
         # write-scope guard blocked out-of-scope changes -- clean worktree
@@ -1093,7 +1260,7 @@ def verify_candidate(
         _repeat_note(evidence, sid, sha, k=repeat, checks=chay_lai, attempt=number)
 
     screens = [m for m in man_hinh
-               if not keep(f"mockup:{m}", reuse and _green_at(ev, MOCKUP_MAP, m, sha))]
+               if not keep(f"mockup:{m}", reuse and _green_at(ev, MOCKUP_MAP, m, now))]
     if screens and contract:
         _log(f"story={sid}#{number} mockup verify screens={','.join(screens)}")
         mv_result = mockup_verify.verify_screens(
@@ -1118,7 +1285,7 @@ def verify_candidate(
     # Reused only when the record carries a verdict: a review that did not
     # execute (max_turns, timeout, tree modified, candidate moved) is not
     # evidence about the candidate, however recent (D-032).
-    review_ev = _at(ev, TOOL_RUN, "review", sha) if reuse else None
+    review_ev = _at(ev, TOOL_RUN, "review", now) if reuse else None
     if keep("review", bool(review_ev and _at(ev, AGENT_RUN, f"{sid}-review", sha)
                            and _review_complete(review_ev))):
         attempt.review_findings = list(review_ev.detail.get("findings") or [])
@@ -1168,9 +1335,12 @@ def verify_candidate(
         for f in attempt.review_findings:
             _log(f"story={sid}#{number} review ✗ {one_line(f)}")
 
-    if config.get("security.semantic_review", True):
-        security_ev = _at(ev, TOOL_RUN, "security", sha) if reuse else None
-        if keep("security", bool(security_ev and _at(ev, AGENT_RUN, f"{sid}-security", sha))):
+    if _verifier_budget_cap(attempt):
+        _log(f"story={sid}#{number} security SKIPPED — budget cap reached in the review session (no further session)")
+    elif config.get("security.semantic_review", True):
+        security_ev = _at(ev, TOOL_RUN, "security", now) if reuse else None
+        if keep("security", bool(security_ev and not security_ev.detail.get("unrunnable")
+                                 and _at(ev, AGENT_RUN, f"{sid}-security", now))):
             attempt.security = _security_from_evidence(security_ev)
         else:
             attempt.security = security_review(
@@ -1187,7 +1357,7 @@ def verify_candidate(
                 candidate=sha,
                 preservation=preservation,
             )
-            sec_ok = not (attempt.security.error
+            sec_ok = not (attempt.security.error or attempt.security.unrunnable
                          or attempt.security.blocking(config["security.block_severities"]))
             evidence.tool_run(
                 sid,
@@ -1197,11 +1367,16 @@ def verify_candidate(
                     "findings": [f.line() for f in attempt.security.findings],
                     "filtered": len(attempt.security.filtered),
                     "error": attempt.security.error,
+                    "unrunnable": attempt.security.unrunnable,
+                    "outcome": (SECURITY_UNRUNNABLE if attempt.security.unrunnable else
+                                "PASS" if sec_ok else "BLOCK"),
                     "attempt": number,
                 },
             )
-            _log(f"story={sid}#{number} security {'PASS' if sec_ok else 'FAIL'} "
-                 f"findings={len(attempt.security.findings)} filtered={len(attempt.security.filtered)}")
+            _log(f"story={sid}#{number} security "
+                 f"{'UNRUNNABLE' if attempt.security.unrunnable else 'PASS' if sec_ok else 'FAIL'} "
+                 f"findings={len(attempt.security.findings)} filtered={len(attempt.security.filtered)}"
+                 + (f" · {one_line(attempt.security.unrunnable)}" if attempt.security.unrunnable else ""))
             if not sec_ok:
                 if attempt.security.error:
                     _log(f"story={sid}#{number} security ✗ {one_line(attempt.security.error)}")
@@ -1227,7 +1402,7 @@ def verify_candidate(
     # Inputs recorded **before** reading evidence to score: replay rebuilds
     # exactly the event set the gate saw by cutting at this record's seq (V4).
     _record_gate_input(evidence, sid, attempt=number, **dau_vao)
-    attempt.gate = story_gate.evaluate(sid, evidence.read(sid), **dau_vao)
+    attempt.gate = story_gate.evaluate(sid, evidence.read(sid), identity=now, **dau_vao)
     attempt.ok = attempt.gate.passed
     # Gate outcome goes into evidence, carrying candidate SHA: the behavior
     # ledger (R2) treats "passed gate at this candidate" as a per-attempt
@@ -1314,22 +1489,37 @@ def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Co
         })
         return
     if base_ref and head and head != root:
-        # No baseline for this epoch and the worktree is not at the parent:
-        # fail closed rather than synthesise one from the story's own build.
-        store.tool_run(story.id, BASELINE_RUN, ok=False, detail={
-            "baseline": True, "root": root, "epoch": epoch, "parent": head, "base_ref": base_ref,
-            "unrunnable": (f"BASELINE_UNAVAILABLE: no baseline exists for this story epoch and the worktree "
-                           f"stands at {head[:8]}, not at the integrated parent {root[:8]} — a baseline taken "
-                           "here would be the story's own build. Re-run the story from its base (`aisef run` "
-                           "discards the branch when the criteria changed)"),
-        })
-        run_log(artifact_root, f"story={story.id} baseline UNAVAILABLE head={head[:8]} root={root[:8]}")
-        return
-    res = run_tool("test", workdir, config=config)   # story_id empty: recorded below, under its own name
+        # The worktree stands at the story's own build; the baseline belongs at the integrated parent. The
+        # root is known, so capture it THERE — a temporary worktree at `root` (SS-18, INV-C.3) — rather than
+        # declaring the baseline unavailable for the whole epoch. Never synthesise one from the story's build.
+        from ..control.worktree import WorktreeManager
+        try:
+            with WorktreeManager(Path(workdir)).temporary(root, label="baseline") as tmp:
+                run_log(artifact_root, f"story={story.id} baseline at root {root[:8]} via a temporary worktree "
+                                       f"(head={head[:8]})")
+                res = _control_run(Path(tmp), config)
+                log = parse_testlog(res.stdout + "\n" + res.stderr)
+                record_tool(res, story.id, artifact_root, name=BASELINE_RUN, extra={
+                    "baseline": True, "root": root, "epoch": epoch, "parent": root, "base_ref": base_ref,
+                    "captured_at": "temporary worktree at root", "red_before": log.failed[:MAX_IDS],
+                    "test_files_in_tree": _test_files_in(Path(tmp)),
+                })
+                run_log(artifact_root, f"story={story.id} baseline DONE ok={res.ok} red_before={len(log.failed)}"
+                                       + (f" unrunnable={res.unrunnable}" if res.unrunnable else ""))
+                return
+        except Exception as e:  # noqa: BLE001 — a refused temporary worktree is a typed, recorded outcome
+            store.tool_run(story.id, BASELINE_RUN, ok=False, detail={
+                "baseline": True, "root": root, "epoch": epoch, "parent": head, "base_ref": base_ref,
+                "unrunnable": (f"BASELINE_UNAVAILABLE: the worktree stands at {head[:8]}, not at the integrated "
+                               f"parent {root[:8]}, and a temporary worktree at the root could not be created: {e}"),
+            })
+            run_log(artifact_root, f"story={story.id} baseline UNAVAILABLE head={head[:8]} root={root[:8]}: {e}")
+            return
+    res = _control_run(Path(workdir), config)   # story_id empty: recorded below, under its own name
     log = parse_testlog(res.stdout + "\n" + res.stderr)
     record_tool(res, story.id, artifact_root, name=BASELINE_RUN, extra={
         "baseline": True, "root": root, "epoch": epoch, "parent": head, "base_ref": base_ref,
-        "red_before": log.failed[:MAX_IDS],
+        "red_before": log.failed[:MAX_IDS], "test_files_in_tree": _test_files_in(Path(workdir)),
     })
     # Say *why* when it could not run: `ok=False` alone sends the reader to the
     # evidence JSONL to find out whether the baseline was red or never started.
@@ -1338,28 +1528,70 @@ def run_baseline(story: Story, *, workdir: Path, artifact_root: Path, config: Co
                            + (f" unrunnable={res.unrunnable}" if res.unrunnable else ""))
 
 
-def _vang_ma_cua_story(res, changed: list[str]) -> str:
-    """The story source file the nop run says is missing — "" if none is.
+def _test_files_in(tree: Path) -> int:
+    """How many test files the tree holds (tracked or not) — "nothing to regress" rests on this being 0 (SS-85)."""
+    try:
+        r = subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard"], cwd=str(tree),
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
+    except (OSError, subprocess.SubprocessError):
+        return -1                     # unknown: never read as zero
+    return sum(1 for f in r.stdout.splitlines() if is_test_path(f)) if r.returncode == 0 else -1
 
-    Only the story's **own** non-test files count: a dependency the project
-    never installed is a real environment failure and must stay unrunnable.
-    """
-    from ..harness.tools import NO_DEPENDENCIES, NO_SETUP
 
-    if not res.unrunnable.startswith(NO_SETUP):
-        return ""                          # tool missing, no manifest: not this
-    ra = res.output()[0].lower().replace("\\", "/")
-    if not any(m in ra for m in NO_DEPENDENCIES):
-        return ""
-    for f in changed:
-        if is_test_path(f):
+#: Version of the nop record's shape. `_nop_at` reuses only records of this version — an older one was taken with a
+#: pytest session that stopped at the first import error, so what it did not see must be measured again.
+NOP_PROOF_SCHEMA = 2
+
+
+def _control_args(path: Path, config: Config) -> list[str]:
+    from ..harness.tools import collection_continuation_args, command_for
+    return collection_continuation_args(command_for("test", path, config))
+
+
+def _control_run(path: Path, config: Config):
+    """A harness control run (baseline, nop): the project's test command, plus what keeps one file's collection
+    error from hiding every other file's tests (SS-81 B)."""
+    return run_tool("test", path, config=config, extra_args=_control_args(path, config))
+
+
+def _ac_code_files(story: Story, workdir: Path, test_files: list[str]) -> dict[str, list[str]]:
+    """Criterion code -> the story test files that mention it. A pytest id carries its file; a node/vitest id is a
+    title, and this is how the proof model knows which file a collection error belongs to."""
+    from ..control.acceptance import _pattern
+    out: dict[str, list[str]] = {}
+    texts = {}
+    for f in test_files:
+        try:
+            texts[f] = (workdir / f).read_text(encoding="utf-8", errors="replace").replace("_", "-")
+        except OSError:
             continue
-        goc = PurePosixPath(f).with_suffix("").as_posix().lower()
-        if len(goc) < 3:
-            continue
-        if goc in ra or goc.replace("/", ".") in ra:
-            return f
-    return ""
+    for i in range(1, len(story.acceptance_criteria) + 1):
+        code = ac_code(story.id, i)
+        rx = _pattern(code)
+        hits = sorted(f for f, t in texts.items() if rx.search(t))
+        if hits:
+            out[code] = hits
+    return out
+
+
+def _nop_summary(res, story_src: list[str], absent: list[str]) -> str:
+    """What the parent run showed, in the proof model's own terms — never "control NOT performed" next to a gate
+    that scored the same record (SS-82)."""
+    from ..control.proof import bound
+    from ..harness.testlog import parse as parse_testlog
+
+    log = parse_testlog(res.output()[0])
+    parts = [f"executed {len(log.test_ids)} ({len(log.passed)} green, {len(log.failed)} red, {len(log.skipped)} skipped)"]
+    for e in log.collection_errors[:4]:
+        f = bound(e, story_src, absent)[1]           # the gate's own binding — the log cannot disagree with it
+        parts.append(f"{e.get('file')}: " + (f"cannot import {e.get('missing_module')} — {f} is this story's" if f else
+                                             f"needs {e.get('missing_module')}, not this story's" if e.get("missing_module") else
+                                             f"did not collect ({e.get('error') or 'unknown'})"))
+    if log.collection_aborted:
+        parts.append("session stopped at collection — unobserved tests prove nothing")
+    if res.unrunnable and not log.test_ids and not log.collection_errors:
+        parts.append(f"did not execute: {res.unrunnable}")
+    return " · ".join(parts)
 
 
 def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
@@ -1423,34 +1655,17 @@ def run_nop(story: Story, *, workdir: Path, artifact_root: Path, config: Config,
                 shutil.copy2(src, dst)
             elif dst.exists():
                 dst.unlink()                        # story deleted test file: parent SHA also lacks it
-        res = run_tool("test", tmp_path, config=config)   # story_id empty: recorded below, under its own name
-        if (vang := _vang_ma_cua_story(res, changed)):
-            # The nop worktree deliberately lacks the story's source, so
-            # "cannot find module <story file>" is the control **working**,
-            # not a broken environment. Told apart only by *which* module is
-            # missing — and only here, where the story's own changed files
-            # are known (lỗi 120). On a greenfield project's first story
-            # there are no other tests to print a name, so the generic rule
-            # ("unrunnable unless something passed") cannot tell the two
-            # apart, and the strongest control was recorded as not performed
-            # exactly where it matters most (todo-cli STORY-01-01 2026-09-13).
-            run_log(artifact_root, f"story={story.id} nop red vì thiếu {vang} — "
-                                   f"đúng thứ control dựng ra để thấy")
-            res.unrunnable = ""
+        # SS-81 family: what the parent lacks, and which story test file declares each criterion — the gate's proof
+        # model reads both. `absent_at_parent` is measured here, where the parent tree exists; the gate never guesses it.
+        story_src = [f for f in changed if not is_test_path(f)]
+        absent = [f for f in story_src if not (tmp_path / f).exists()]
+        ac_files = _ac_code_files(story, Path(workdir), test_files)
+        res = _control_run(tmp_path, config)   # story_id empty: recorded below, under its own name
         record_tool(res, story.id, artifact_root, candidate, name=NOP_RUN, extra={
-            "nop": True, "parent": parent_ref, "base_ref": base_ref, "files": test_files[:50]})
-        # `ok` here is the **test run**, and for the nop control red is the
-        # wanted result: green at the parent SHA means the tests do not verify
-        # the story. `ok=False` read as a failure for months; say what it means.
-        # "Could not run" is not "red". A test command that fails to start
-        # (exit 127 on Windows before 1.2.29) makes `ok=False`, and calling
-        # that the expected result reports a control that never happened.
-        ket = ("could not run at parent — control NOT performed: " + res.unrunnable
-               if res.unrunnable else
-               "tests red at parent (expected)" if not res.ok else
-               "tests GREEN at parent — they do not verify the story")
-        run_log(artifact_root,
-                f"story={story.id} nop DONE {ket} {res.duration_ms}ms")
+            "nop": True, "parent": parent_ref, "base_ref": base_ref, "files": test_files[:50],
+            "proof_schema": NOP_PROOF_SCHEMA, "collection_strategy": " ".join(_control_args(tmp_path, config)) or "runner default",
+            "absent_at_parent": absent[:200], "ac_code_files": ac_files})
+        run_log(artifact_root, f"story={story.id} nop DONE {_nop_summary(res, story_src, absent)} {res.duration_ms}ms")
     except GitError as e:
         run_log(artifact_root, f"story={story.id} nop ERROR {e}")
         store.tool_run(story.id, NOP_RUN, ok=False, detail={
@@ -1471,9 +1686,11 @@ def freeze_candidate(
     number: int,
     changed: list[str],
     verify_only: bool = False,
+    preexisting: list[str] | None = None,
 ) -> str:
     """Freeze the developer session's work into **one version** and return
-    its SHA.
+    its SHA. ``preexisting`` paths (there before the session, unchanged by it) are left out of the candidate and
+    recorded (F4 / SS-41).
 
     This is what HoH calls *frozen candidate*: from here to end of attempt,
     nothing may modify the tree, and all checks refer to exactly this version.
@@ -1493,7 +1710,7 @@ def freeze_candidate(
     error = ""
     if isolated:
         try:
-            commit_paths(Path(workdir), f"{story.id}: candidate attempt {number}", paths=scope)
+            commit_paths(Path(workdir), f"{story.id}: candidate attempt {number}", paths=scope, exclude=preexisting or None)
         except GitError as e:
             error = str(e)
     sha = head_sha(workdir)
@@ -1506,7 +1723,7 @@ def freeze_candidate(
     giao_dich = journal.read(story.id).attempt_no or number
     journal.record(story.id, JEntry(
         step="changes.detected", attempt=giao_dich,
-        data={"luot": number, "files": changed[:50], "count": len(changed)}))
+        data={"luot": number, "files": changed[:50], "preexisting_excluded": (preexisting or [])[:20], "count": len(changed)}))
     journal.record(story.id, JEntry(
         step="candidate.frozen", attempt=giao_dich,
         data={"luot": number, "sha": sha, "error": error, "verify_only": verify_only}))
@@ -1516,6 +1733,7 @@ def freeze_candidate(
         # here would leave a gate scoring on sand.
         evidence.tool_run(story.id, "candidate:frozen", ok=False,
                           detail={"error": error or "cannot read HEAD", "attempt": number})
+        return ""      # no candidate: the caller must not grade (SS-A15, SS-60)
     return sha
 
 
@@ -1622,9 +1840,10 @@ def _review_session(
         # result so the rest of the pipeline can react.  Attempt is left
         # at its previous `ok` state and the failure is surfaced through
         # the evidence store as ``infra``.
-        from .mockup import RunResult
-        result = RunResult(ok=False, error=f"budget exceeded: {e}",
-                           cost_usd=0.0, turns=0)
+        # SS-12: one RunResult type (clients.stream), never the mockup phase's. A cap and a locked ledger are
+        # different outcomes; `raw_result` says which so the stage routes typed (SS-21).
+        result = RunResult(ok=False, error=f"budget exceeded: {e}", cost_usd=0.0, num_turns=0,
+                           raw_result={"budget": "locked" if isinstance(e, BudgetLocked) else "cap"})
     store.agent_run(story_id, result, name=name, prompt_chars=len(spec.prompt),
                     role=role, model=spec.model, client=client.id)
     for sk in skills_used(result):
@@ -1640,14 +1859,21 @@ def _with_schema(client: ClientAdapter, spec, result, *, store: EvidenceStore,
     """Demand JSON block per schema; missing means retry **exactly once**
     (R8).
 
-    Returns `(text, verdict)`: `text` is the human-readable version -- second
-    attempt if it has correct schema, otherwise the first attempt's text.
+    Returns `(text, verdict, why)`: `text` is the human-readable version -- second
+    attempt if it has correct schema, otherwise the first attempt's text; `why` names
+    the reason the retry could not EXECUTE (budget cap, cut, moved candidate, reverted
+    tree) so the caller reports that, never "answered in prose twice" (SS-12/F2).
     """
     verdict = review_verdict(result.text)
-    if verdict is not None:
-        return result.text, verdict
+    if verdict is not None and (role != "review" or verdict.verdict == "pass" or verdict.bound_blocking()):
+        return result.text, verdict, ""
+    reminder = SCHEMA_REMINDER
+    if verdict is not None:                                    # a verdict whose blockers bind to nothing (F3 / D-002)
+        store.record(story_id, Event(kind=NOTE, name=f"{role}:unbound", ok=False,
+                                     detail={"verdict": verdict.verdict, "findings": verdict.unbound(), "retried": True}))
+        reminder = BINDING_REMINDER
     lai, reverted = _review_session(
-        client, replace(spec, prompt=spec.prompt + SCHEMA_REMINDER), store=store,
+        client, replace(spec, prompt=spec.prompt + reminder), store=store,
         story_id=story_id, artifact_root=artifact_root, workdir=workdir,
         name=f"{story_id}-{role}-retry", role=f"{role}-retry", number=number,
     )
@@ -1657,7 +1883,11 @@ def _with_schema(client: ClientAdapter, spec, result, *, store: EvidenceStore,
         store.tool_run(story_id, f"{role}:candidate", ok=False,
                        detail={"expected": store.candidate, "got": lech,
                                "attempt": number, "retry": True})
-        return result.text, None
+        # SS-A10 (schema-retry half, differential seed 232): the reviewer's commit is undone here too, or the frozen
+        # candidate is gone for every later reader
+        _restore_candidate_after_review_commit(store, story_id, workdir, candidate=store.candidate, got=lech,
+                                               number=number)
+        return result.text, None, f"candidate changed during the schema retry ({store.candidate[:7]} → {lech[:7]}) — restored"
     if reverted:
         # Retry is also checked by the "review does not write tree" invariant;
         # discard its words, and say so -- silent revert means nobody knows.
@@ -1665,10 +1895,19 @@ def _with_schema(client: ClientAdapter, spec, result, *, store: EvidenceStore,
             story_id, f"{role}:immutable", ok=False,
             detail={"changed": reverted[:20], "retry": True},
         )
-    if reverted or not lai.ok:
-        return result.text, None
+    if reverted:
+        return result.text, None, "the reviewer modified the working tree during the schema retry — reverted"
+    if not lai.ok:
+        return result.text, None, f"could not run the schema retry: {lai.error}"
     verdict = review_verdict(lai.text)
-    return (lai.text, verdict) if verdict is not None else (result.text, None)
+    if verdict is None:
+        return result.text, None, ""
+    if role == "review" and verdict.verdict != "pass" and not verdict.bound_blocking():
+        store.record(story_id, Event(kind=NOTE, name=f"{role}:unbound", ok=False,
+                                     detail={"verdict": verdict.verdict, "findings": verdict.unbound(), "retried": False}))
+        return lai.text, None, ("the reviewer's blockers bind to no file, behaviour or criterion — twice; a blocker "
+                                "must name what it blocks (INV-F.2)")
+    return lai.text, verdict, ""
 
 
 def review_story_v2(
@@ -1800,9 +2039,11 @@ def review_story_v2(
                        detail={"expected": candidate, "got": lech, "attempt": number})
         # Put the worktree back on the frozen candidate: the review retry
         # (D-032) must read the version being scored, not the reviewer's
-        # commit -- which is not a candidate and never becomes one.
-        subprocess.run(["git", "reset", "-q", "--hard", candidate], cwd=workdir, check=False,
-                       capture_output=True)
+        # commit -- which is not a candidate and never becomes one. Only what
+        # the reviewer committed is undone; anything else in the tree (dirt an
+        # open write-scope:violation still describes) is not the review's to
+        # destroy, and the result is recorded, ok or not (SS-A10, INV-K.3).
+        _restore_candidate_after_review_commit(store, story.id, workdir, candidate=candidate, got=lech, number=number)
         return [], None, (
             f"candidate changed during review session ({candidate[:7]} → {lech[:7]}) — "
             "this review attempt does not count. Review reads the frozen candidate, "
@@ -1813,44 +2054,46 @@ def review_story_v2(
         # block — REVIEW_UNRUNNABLE, retried on the same candidate (D-032).
         return [], None, str(result.error or "reviewer session did not complete")
 
-    text, verdict = _with_schema(
+    text, verdict, why = _with_schema(
         client, spec, result, store=store, story_id=story.id,
         artifact_root=artifact_root, workdir=workdir, role="review", number=number,
     )
+    if verdict is None:
+        # Two answers without a structured verdict: the reviewer said nothing the kernel can score. Prose
+        # findings are recorded as observations only — never a PASS, never a BLOCK (SS-57, INV-F.2).
+        store.record(story.id, Event(kind=NOTE, name="review:no-schema", ok=False,
+                                     detail={"findings": blocking_findings(text), "retried": True}))
+        return [], None, why or ("no structured verdict after the schema retry — the reviewer answered in prose twice; "
+                          "nothing was said about the candidate")
     return _reconcile(story.id, store, text, verdict, role="review"), verdict, ""
 
 
 def _reconcile(story_id: str, ev: EvidenceStore, text: str,
                verdict: Verdict | None, *, role: str) -> list[str]:
-    """Reconcile machine-readable with human-readable version, record evidence,
-    return the **union**."""
+    """The reviewer's blockers are the STRUCTURED verdict's (F3 / INV-F.2). Prose `[block]` lines are diagnostic:
+    compared with the JSON, recorded as `<role>:mismatch` when they diverge, shown to the developer — never scored
+    (SS-24). Without a verdict nothing blocks from prose (F2 makes that execution UNRUNNABLE)."""
     tu_van_ban = blocking_findings(text)
     if verdict is None:
-        # Both attempts lack schema: use text as before R8, and note the
-        # fallback -- silence means nobody knows to fix the prompt next time.
         ev.record(story_id, Event(kind=NOTE, name=f"{role}:no-schema", ok=False,
                                   detail={"findings": tu_van_ban, "retried": True}))
-        return tu_van_ban
-    ha_cap = _no_escalation(story_id, ev, verdict, role=role)
-    if ha_cap:
-        # Text version repeats the same items; drop the ones whose file no
-        # longer has a blocking finding, or the union would put them back.
-        tu_van_ban = [
-            x for x in tu_van_ban
-            if not (_finding_key(x)[0] == "block" and _finding_key(x)[1] in ha_cap)
-        ]
-    tu_json = verdict.blocking()
-    hop, lech = merge_findings(tu_van_ban, tu_json)
+        return []
+    _no_escalation(story_id, ev, verdict, role=role)
+    tu_json = verdict.bound_blocking() if role == "review" else verdict.blocking()
+    if role == "review" and verdict.unbound():
+        ev.record(story_id, Event(kind=NOTE, name=f"{role}:unbound", ok=False,
+                                  detail={"verdict": verdict.verdict, "findings": verdict.unbound(), "retried": False}))
+    _, lech = merge_findings(tu_van_ban, tu_json)
     if lech:
         ev.record(story_id, Event(
             kind=NOTE, name=f"{role}:mismatch", ok=False,
             detail={"text": tu_van_ban, "json": tu_json},
         ))
     ev.record(story_id, Event(
-        kind=NOTE, name=f"{role}:verdict", ok=not hop,
+        kind=NOTE, name=f"{role}:verdict", ok=not tu_json,
         detail={"verdict": verdict.verdict, "findings": verdict.findings},
     ))
-    return hop
+    return tu_json
 
 
 def _prior_review(ev: EvidenceStore, story_id: str, *, role: str,
@@ -1907,9 +2150,22 @@ def _no_escalation(story_id: str, ev: EvidenceStore, verdict: Verdict, *,
     line in the report, erring the other way costs the whole story.
     """
     truoc: set[tuple[str, str]] = set()
-    for e in ev.read(story_id).of(NOTE, f"{role}:verdict"):
+    evidence = ev.read(story_id)
+    # SS-05 / INV-B.2: a contract change starts from zero — a verdict of another epoch says nothing about this one.
+    # An event's epoch is its identity's `story_epoch` (schema 2) or, for legacy records, the `story:contract`
+    # fingerprint in force when it was written; the current epoch is the latest fingerprint recorded.
+    epoch_at: dict[int, str] = {}
+    cur = ""
+    for e in evidence.events:
+        if e.kind == NOTE and e.name == "story:contract":
+            cur = str(e.detail.get("fingerprint") or "")
+        epoch_at[e.seq] = str((getattr(e, "identity", None) or {}).get("story_epoch") or cur)
+    epoch_now = cur
+    for e in evidence.of(NOTE, f"{role}:verdict"):
         if str(e.detail.get("candidate") or "") == ev.candidate:
             continue  # this build's own verdict, not a previous position
+        if epoch_at.get(e.seq, "") != epoch_now:
+            continue  # another epoch: not a position on this contract
         for f in e.detail.get("findings") or []:
             if str(f.get("tag") or "").lower() not in _JSON_BLOCK_TAGS + _JSON_STUCK_TAGS:
                 truoc.add((str(f.get("file") or ""), str(f.get("behavior_id") or "")))
@@ -2030,27 +2286,27 @@ def security_review(
         store.tool_run(
             story.id, "security:immutable", ok=False, detail={"changed": reverted[:20]},
         )
-        return SecurityReport(error=f"security reviewer modified the working tree ({', '.join(reverted[:3])}) — reverted, this attempt does not count")
+        return SecurityReport(unrunnable=f"security reviewer modified the working tree ({', '.join(reverted[:3])}) — reverted, this execution does not count")
     lech = _candidate_moved(workdir, candidate)
     if lech:
         store.tool_run(story.id, "security:candidate", ok=False,
                        detail={"expected": candidate, "got": lech, "attempt": number})
         return SecurityReport(
-            error=f"candidate changed during security review session ({candidate[:7]} → "
-                  f"{lech[:7]}) — this attempt does not count"
+            unrunnable=f"candidate changed during security review session ({candidate[:7]} → "
+                       f"{lech[:7]}) — this execution does not count"
         )
     if not result.ok:
-        return SecurityReport(error=f"could not run: {result.error}")
+        return SecurityReport(unrunnable=f"could not run: {result.error}")
 
-    text, verdict = _with_schema(
+    text, verdict, why = _with_schema(
         client, spec, result, store=store, story_id=story.id,
         artifact_root=artifact_root, workdir=workdir, role="security", number=number,
     )
-    return _reconcile_security(story.id, store, text, verdict)
+    return _reconcile_security(story.id, store, text, verdict, why=why)
 
 
 def _reconcile_security(story_id: str, ev: EvidenceStore, text: str,
-                        verdict: Verdict | None) -> SecurityReport:
+                        verdict: Verdict | None, *, why: str = "") -> SecurityReport:
     """Same rule as `_reconcile`, but the unit is severity level.
 
     JSON items not in the text are re-parsed via `parse_security` so exactly
@@ -2058,10 +2314,13 @@ def _reconcile_security(story_id: str, ev: EvidenceStore, text: str,
     """
     rep = parse_security(text)
     if verdict is None:
+        # Two answers without a structured verdict: nothing was SAID about the candidate. Prose findings are
+        # recorded as observations; they never PASS and never BLOCK (SS-13 / SS-57, INV-F.2).
         ev.record(story_id, Event(kind=NOTE, name="security:no-schema", ok=False,
                                   detail={"findings": [f.line() for f in rep.findings],
                                           "retried": True}))
-        return rep
+        return SecurityReport(unrunnable=why or "no structured verdict after the schema retry — the security reviewer "
+                                         "answered in prose twice; nothing was said about the candidate")
 
     tu_van_ban = [f.line() for f in rep.findings + rep.filtered]
     tu_json = [f"[{f['severity']}] " + _finding_body(f)
@@ -2206,7 +2465,7 @@ def structured_plan_defects(verdict: "Verdict | None") -> list[str]:
     """
     if verdict is None:
         return []
-    return [x for x in verdict.blocking() if x.lower().startswith("[stuck]")]
+    return [x for x in verdict.bound_blocking() if x.lower().startswith("[stuck]")]   # a [stuck] on nothing named is not terminal (F3)
 
 
 # --- Machine-readable review verdicts (ADR-004 R8) ----------------------------
@@ -2225,6 +2484,13 @@ _JSON_STUCK_TAGS = ("bế tắc", "be tac", "stuck", "blocked-by-plan", "stuck-b
 #: Remind the schema when the first attempt lacks a JSON block.  Exactly
 #: **once**: if the second attempt still lacks it, the model cannot do it,
 #: retrying further wastes money.
+BINDING_REMINDER = (
+    "\n\n---\n\n**Your blockers name nothing.** Every `block` or `stuck` finding must bind to what it blocks: the "
+    "`file` (with `line` where possible), the `behavior_id` from the contract, or the criterion code (`AC-…`) in `why`. "
+    "A blocker that names no file, behaviour or criterion cannot be acted on and does not count. Reply **again** in "
+    "full, and end with exactly one ```json``` block per the schema, each blocker bound.\n"
+)
+
 SCHEMA_REMINDER = (
     "\n\n---\n\n**Missing JSON block per schema.** Your previous reply was plain "
     "text without a machine-readable JSON block, so the gate could not read your "
@@ -2243,14 +2509,29 @@ class Verdict:
     verdict: str
     findings: list[dict] = field(default_factory=list)
 
-    def blocking(self) -> list[str]:
-        """Blocking/stuck items, formatted as text-version lines."""
-        out = []
+    def _blocking_items(self) -> list[tuple[dict, str]]:
+        out: list[tuple[dict, str]] = []
         for f in self.findings:
             if f["tag"] in _JSON_STUCK_TAGS:
-                out.append("[stuck] " + _finding_body(f))
+                out.append((f, "[stuck] " + _finding_body(f)))
             elif f["tag"] in _JSON_BLOCK_TAGS:
-                out.append("[block] " + _finding_body(f))
+                out.append((f, "[block] " + _finding_body(f)))
+        return out
+
+    def bound_blocking(self) -> list[str]:
+        """Blocking/stuck items that BIND to an identity — a file, a `behavior_id`, or a criterion code in the reason
+        (F3 / INV-F.2; D-002's structural property: a judge-only block names what it blocks). A `block`/`stuck`
+        verdict whose items bind to nothing has no blocker here — `_with_schema` asks once more, then the review is
+        UNRUNNABLE; it never PASSes and never opens a developer session."""
+        return [line for f, line in self._blocking_items() if finding_bound(f)]
+
+    def unbound(self) -> list[dict]:
+        """Blocking/stuck items that bind to nothing — recorded as `review:unbound`, never scored."""
+        return [f for f, _ in self._blocking_items() if not finding_bound(f)]
+
+    def blocking(self) -> list[str]:
+        """Blocking/stuck items, formatted as text-version lines (every item, bound or not)."""
+        out = [line for _, line in self._blocking_items()]
         if self.verdict != "pass" and not out:
             # Verdict says blocked but lists no items: keep the verdict, do
             # not let it pass.  Do not trust the client -- even when it
@@ -2259,6 +2540,17 @@ class Verdict:
             out.append(f"{tag} reviewer concluded `{self.verdict}` "
                        "but listed no findings in the JSON block")
         return out
+
+
+_TRACE_MARK = re.compile(r"^\s*(?:trace|truy vết)\s*:\s*\S", re.IGNORECASE)
+
+
+def finding_bound(f: dict) -> bool:
+    """A finding binds when it names a file, a behaviour id, a criterion code (`AC-<story>-<n>`) in its reason, or —
+    the improve loop's own protocol — a test identity after the `trace:` marker it asks the reviewer to use."""
+    why = str(f.get("why") or "")
+    return bool(str(f.get("file") or "").strip() or str(f.get("behavior_id") or "").strip()
+                or _MA_TIEU_CHI.search(why) or _TRACE_MARK.match(why))
 
 
 def _finding_body(f: dict) -> str:
@@ -2410,20 +2702,10 @@ def _tree_snapshot(workdir: Path) -> dict[str, bytes | None]:
     changed or untracked (None if too large to hold).  Skips harness-written
     paths (`_bmad-output/`, `.aisef/`): evidence from this session is written
     during the session, counting it is a false positive."""
-    from ..harness.guardrails import HARNESS_OWNED
+    from ..harness.ownership import NOT_A_WRITE, classify, porcelain_entries
     out: dict[str, bytes | None] = {}
-    try:
-        r = subprocess.run(["git", "status", "--porcelain", "-z", "-uall"],
-                           cwd=workdir, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30)
-    except (OSError, subprocess.SubprocessError):
-        return out
-    for item in r.stdout.split("\0"):
-        if len(item) < 4:
-            continue
-        rel = item[3:]
-        if rel.startswith((".aisef/", *[f"{h}/" for h in HARNESS_OWNED])) or rel in HARNESS_OWNED:
-            continue
-        if "/__pycache__/" in rel or rel.endswith(".pyc"):
+    for _, rel in porcelain_entries(workdir):                                # renames yield the real path (SS-35)
+        if classify(rel) in NOT_A_WRITE:                                     # harness, tool artifact, vendor, client (F4)
             continue
         p = Path(workdir) / rel
         try:
@@ -2575,6 +2857,9 @@ def recover_out_of_scope(evidence: EvidenceStore, story_id: str, *, workdir: Pat
             actions.append(f"rm {rel} → {e}")
     after = sorted(_dirt_outside_scope(workdir, scope))
     ok = not after
+    if actions:
+        _invalidate_after_tree_change(evidence, story_id, candidate=candidate, workdir=workdir,
+                                      reason="retry:recovery", actions=actions)
     reason = ""
     if not ok:
         reason = (
@@ -2595,6 +2880,70 @@ def recover_out_of_scope(evidence: EvidenceStore, story_id: str, *, workdir: Pat
         "attempt": failed_attempt, "next_attempt": next_attempt, "candidate": candidate,
         "tracked": tracked, "untracked": untracked, "unattributed": unattributed,
         "actions": actions, "status_after": after, "ok": ok, "reason": reason}))
+
+
+def _invalidate_after_tree_change(evidence: EvidenceStore, story_id: str, *, candidate: str, workdir: Path,
+                                  reason: str, actions: list[str]) -> Event | None:
+    """The evaluated tree changed (a restore, a reset, a refresh): every verdict computed over the previous
+    tree state of this candidate is now a historical fact. Say so, in one typed record naming them
+    (INV-K.2) — the freshness function already refuses them; this makes the refusal visible."""
+    digest = ident.tree_state_digest(workdir)
+    ev = evidence.read(story_id)
+    stale = []
+    for e in ev.events:
+        if e.kind not in (NOTE, TOOL_RUN) or e.name in ident.NON_CANDIDATE_NOTES:
+            continue
+        rec = ident.EvidenceIdentity.of(e, story_id)
+        if rec.candidate_sha != candidate:
+            continue
+        if rec.tree_state_digest != digest:
+            stale.append(e)
+    if not stale and not actions:
+        return None
+    return evidence.record(story_id, Event(kind=NOTE, name=ident.INVALIDATED, ok=True, detail={
+        "reason": reason, "candidate": candidate, "tree_state_after": digest, "actions": actions,
+        "invalidated": [e.seq for e in stale][:200], "names": sorted({e.name for e in stale})[:40],
+        "schema_1": [e.seq for e in stale if not e.identity][:200]}))
+
+
+def _restore_candidate_after_review_commit(store: EvidenceStore, story_id: str, workdir: Path, *, candidate: str,
+                                           got: str, number: int) -> bool:
+    """HEAD back on `candidate` without a hard reset: a soft reset moves HEAD, then only the paths the
+    reviewer's commit touched are put back (restored from the candidate, or removed when the candidate never
+    had them). Everything else in the working tree survives. One typed record names what was done and
+    whether HEAD is on the candidate afterwards."""
+    def _git(*args):
+        return subprocess.run(["git", *args], cwd=workdir, capture_output=True, text=True, encoding="utf-8",
+                              errors="replace", timeout=60)
+    diff = _git("diff", "--name-only", candidate, got)
+    paths = [x for x in diff.stdout.split("\n") if x.strip()]
+    actions: list[str] = []
+    r = _git("reset", "-q", "--soft", candidate)
+    ok = r.returncode == 0
+    actions.append(f"git reset --soft {candidate[:8]}" + ("" if ok else f" → exit {r.returncode}: {r.stderr.strip()[:200]}"))
+    if ok:
+        for rel in paths:
+            exists = _git("cat-file", "-e", f"{candidate}:{rel}").returncode == 0
+            if exists:
+                r2 = _git("restore", "--source", candidate, "--staged", "--worktree", "--", rel)
+                actions.append(f"git restore --source {candidate[:8]} -- {rel}" + ("" if r2.returncode == 0 else f" → exit {r2.returncode}"))
+                ok = ok and r2.returncode == 0
+            else:
+                _git("rm", "-q", "--cached", "--ignore-unmatch", "--", rel)
+                try:
+                    (Path(workdir) / rel).unlink()
+                    actions.append(f"rm {rel} (the reviewer created it)")
+                except FileNotFoundError:
+                    actions.append(f"rm {rel} (already gone)")
+                except OSError as e:
+                    actions.append(f"rm {rel} → {e}")
+                    ok = False
+    after = head_sha(workdir)
+    ok = ok and after == candidate
+    store.record(story_id, Event(kind=NOTE, name=ident.INVALIDATED, ok=ok, detail={
+        "reason": "review:candidate-moved", "candidate": candidate, "got": got, "restored": paths[:50],
+        "actions": actions, "head_after": after, "attempt": number}))
+    return ok
 
 
 def _candidate_moved(workdir: Path, candidate: str) -> str:
@@ -2632,13 +2981,16 @@ MAX_NOOP = 2
 REVIEW_PASS = "PASS"
 REVIEW_BLOCK = "BLOCK"
 REVIEW_UNRUNNABLE = "REVIEW_UNRUNNABLE"
+SECURITY_UNRUNNABLE = "SECURITY_UNRUNNABLE"
+#: bounded re-runs of a deterministic stage (test/lint/qa) that could not run, per candidate
+MAX_TOOL_RETRIES = 2
 #: Reviewer executions on one candidate after the first, before the story ends
 #: as REVIEW_UNRUNNABLE. A cut reviewer is retried on the **same** frozen
 #: candidate; nothing about the code changed, so nothing else is re-asked.
 MAX_REVIEW_RETRIES = 2
 #: Legacy prefix (≤ 1.7.3) under which an execution failure was stored as a
 #: finding; read so a resumed pre-1.7.4 run is recovered, never written again.
-_LEGACY_UNRUN = "review could not run:"
+from ..control.gate import LEGACY_UNRUN as _LEGACY_UNRUN, verdict_recorded  # noqa: E402 — one definition (SS-07)
 
 
 def _review_complete(ev: Event | None) -> bool:
@@ -2646,12 +2998,7 @@ def _review_complete(ev: Event | None) -> bool:
     BLOCK)? An execution failure recorded there — new `unrunnable`/`outcome`
     fields, or the ≤ 1.7.3 finding text — is not evidence about the candidate
     and must not be reused as if it were (D-032)."""
-    if ev is None:
-        return False
-    d = ev.detail
-    if d.get("unrunnable") or d.get("outcome") == REVIEW_UNRUNNABLE:
-        return False
-    return not any(str(f).startswith(_LEGACY_UNRUN) for f in (d.get("findings") or []))
+    return verdict_recorded(ev)
 
 
 def _review_executions(ev: Evidence, story_id: str, sha: str) -> int:
@@ -2660,10 +3007,56 @@ def _review_executions(ev: Evidence, story_id: str, sha: str) -> int:
                if str(e.detail.get("candidate") or "") == sha)
 
 
+def _security_executions(ev: Evidence, story_id: str, sha: str) -> int:
+    """Security reviewer EXECUTIONS already spent on this candidate — a schema retry belongs to the execution that
+    asked for it, exactly as `Attempt.review_attempt` counts the reviewer's (one bound, in executions, per stage)."""
+    return sum(1 for e in ev.of(AGENT_RUN) if e.name == f"{story_id}-security"
+               and str(e.detail.get("candidate") or "") == sha)
+
+
 def _only_review_unrunnable(attempt: Attempt) -> bool:
     """The gate failed on the reviewer's absence and nothing else."""
     return bool(attempt.review_unrunnable) and attempt.gate is not None and (
         [c.name for c in attempt.gate.failures] == ["review"])
+
+
+def exit_status_of_error(error: str) -> str:
+    """Classify a stored attempt error the way `exit_status_of` classifies a live result (fatal attempts keep
+    only the text)."""
+    return exit_status_of(RunResult(ok=False, error=error))
+
+
+def _absent_stages(attempt: Attempt) -> list[str]:
+    """Stages the gate is blocked on ONLY because they said nothing (UNRUNNABLE): review, security, a tool that
+    could not run, stale evidence. Empty when any check FAILED — then something deterministic is wrong with the
+    work and the developer is the right next stage (with every finding as feedback). Never a developer when
+    only absences remain (SS-13, SS-14, SS-19, INV-G.1–G.3)."""
+    if attempt.gate is None or attempt.ok:
+        return []
+    failures = list(attempt.gate.failures)
+    if any(c.outcome is story_gate.Outcome.FAILED for c in failures):
+        return []
+    return [c.name for c in failures if c.outcome is story_gate.Outcome.UNRUNNABLE]
+
+
+def _verifier_budget_cap(attempt: Attempt) -> str:
+    """The budget cap reached inside a verifier session of this attempt ("" otherwise). A cap is a run-level
+    condition: no further session may be opened, whatever else the gate says (SS-12, INV-G.5). Lock contention
+    (`locked`) is an ordinary infra absence and is retried (SS-21)."""
+    # both verifiers are read: a review absent for another reason must not hide the security session's cap
+    # (differential seeds 1330–2574 after F2: `or` stopped at the review's text)
+    for why in (attempt.review_unrunnable or "", getattr(attempt.security, "unrunnable", "") or ""):
+        if "budget exceeded" in why and "locked" not in why:
+            return why
+    return ""
+
+
+def _stage_of(check_name: str) -> str:
+    if check_name == "review":
+        return "review"
+    if check_name == "security":
+        return "security"
+    return "tools"
 
 
 def _pending_review(root: Path, story_id: str, workdir: Path) -> str:
@@ -2675,11 +3068,11 @@ def _pending_review(root: Path, story_id: str, workdir: Path) -> str:
     if not sha:
         return ""
     ev = EvidenceStore(root).read(story_id)
-    verdict = next((e for e in reversed(list(ev.of(NOTE, "gate:verdict")))
-                    if str(e.detail.get("candidate") or "") == sha), None)
+    now = ident.current(story_id=story_id, candidate_sha=sha, workdir=workdir)
+    verdict = ev.last_fresh(NOTE, "gate:verdict", now)
     if verdict is None or list(verdict.detail.get("failures") or []) != ["review"]:
         return ""
-    return sha if not _review_complete(_at(ev, TOOL_RUN, "review", sha)) else ""
+    return sha if not _review_complete(_at(ev, TOOL_RUN, "review", now)) else ""
 
 
 def _noop_lien_tiep(attempts: list[Attempt]) -> int:
@@ -2711,9 +3104,12 @@ def nop_deadlock(attempts: list[Attempt]) -> str:
 
     def _ma(a: Attempt) -> set[str]:
         muc = next((c for c in a.gate.failures if c.name == "tests verify story"), None)
-        if muc is None or "still green without story code" not in muc.detail:
+        if muc is None:
             return set()
-        return set(_MA_TIEU_CHI.findall(muc.detail))
+        data = getattr(muc, "data", None) or {}
+        if "still_green" in data:                                  # SS-32: the producer's list, not its sentence
+            return set(_MA_TIEU_CHI.findall(" ".join(map(str, data["still_green"]))))
+        return set(_MA_TIEU_CHI.findall(muc.detail))               # legacy check without data: the criterion CODES only
 
     ma = _ma(cham[-1])
     if not ma:
@@ -2756,11 +3152,13 @@ def deadlock_reason(attempts: list[Attempt], write_scope: list[str] | None = Non
     matched, so the string-comparison detector stayed silent the whole time
     and the story burned its retry budget: $10.39.
     """
-    if len(attempts) < 2:
+    # Consecutive GRADED positions: an attempt whose reviewer said nothing (UNRUNNABLE, re-run by the review stage)
+    # is not a position and must not break the pair — the re-run's verdict is that candidate's position (SS-63,
+    # differential seed 2624: a reviewer mutation between two identical out-of-scope blocks hid the plan conflict).
+    graded = [a for a in attempts if not a.infra and not getattr(a, "review_unrunnable", "")]
+    if len(graded) < 2:
         return ""
-    last_attempt, prev_attempt = attempts[-1], attempts[-2]
-    if last_attempt.infra or prev_attempt.infra:
-        return ""
+    last_attempt, prev_attempt = graded[-1], graded[-2]
     if not last_attempt.review_findings or not prev_attempt.review_findings:
         return ""
     if not _same_complaint(last_attempt.review_findings, prev_attempt.review_findings):
@@ -2872,23 +3270,24 @@ def _tokens(finding: str) -> set[str]:
     }
 
 
-def _paths_outside(findings: list[str], scope: list[str]) -> list[str]:
-    """Files the blocking item mentions but the story is not allowed to write.
-
-    This is the concrete answer to "why is retrying pointless", and it is
-    read from existing data rather than guessed.
-    """
+def _paths_outside(findings: list, scope: list[str]) -> list[str]:
+    """Files the blocking items point at that the story is not allowed to write — the concrete answer to "why is
+    retrying pointless". The location is the finding's IDENTITY: a structured finding's `file`, or the leading
+    `path[:line]` token of the kernel's canonical line `[tag] path:line — why`. A technology name or a filename
+    mentioned in the prose is not a path (SS-25 / INV-F.2, INV-Q.1)."""
     import re as _re
-
     from ..harness.guardrails import _within
-
     out: list[str] = []
     for f in findings:
-        for m in _re.findall(r"[\w./-]+\.[a-z]{2,4}\b", f):
-            if m in out or "/" not in m and "." not in m:
-                continue
-            if not any(_within(m, s) for s in scope):
-                out.append(m)
+        if isinstance(f, dict):
+            loc = str(f.get("file") or "")
+        else:
+            m = _re.match(r"\s*\[[^\]]*\]\s*(\S+?)(?::\d+)?(?=\s|$)", str(f))
+            loc = m.group(1) if m else ""
+        if not loc or loc in out or ("/" not in loc and "." not in loc):
+            continue
+        if not any(_within(loc, s) for s in scope):
+            out.append(loc)
     return out[:3]
 
 
@@ -2908,10 +3307,13 @@ def _unfinished_review(root: Path, story_id: str, workdir: Path) -> str:
     against: reconciliation keeps the branch, but a tree rebuilt from the base
     has nothing those findings describe.
     """
-    last = EvidenceStore(root).read(story_id).last(NOTE, "review")
-    if last is None:
+    ev = EvidenceStore(root).read(story_id)
+    # the reviewer's verdict is recorded as `reviewer:verdict` (structured) — `NOTE review` was never written (SS-04)
+    last = ev.last(NOTE, "reviewer:verdict") or ev.last(NOTE, "review:verdict")
+    if last is None or str(last.detail.get("verdict") or "").lower() not in ("block", "stuck"):
         return ""
-    findings = [str(f) for f in (last.detail.get("findings") or [])]
+    findings = [_finding_line(f) for f in (last.detail.get("findings") or [])]
+    findings = [f for f in findings if f]
     sha = str(last.detail.get("candidate") or "")
     if not findings or not sha:
         return ""
@@ -2922,6 +3324,39 @@ def _unfinished_review(root: Path, story_id: str, workdir: Path) -> str:
     return ("The run was interrupted after the reviewer had already rejected "
             "this candidate. These items are still blocking:\n"
             + "\n".join(f"- {f}" for f in findings[:10]))
+
+
+def _record_head_moved(root: Path, story_id: str, workdir: Path) -> None:
+    """The story's tree stands on a commit that is not the candidate of record (a refresh merged main, a
+    wave-end commit of leftover work, a manual move): every verdict over that candidate is a historical
+    fact. One typed record says so and names them (SS-09 / SS-16, INV-E.1 / INV-K.2) — the freshness function
+    already refuses them; this makes the refusal visible before any session opens on the new tree."""
+    store = EvidenceStore(root)
+    ev = store.read(story_id)
+    frozen, head = ev.candidate, head_sha(workdir)
+    if not frozen or not head or head == frozen:
+        return
+    last = ev.last(NOTE, ident.INVALIDATED)
+    if last is not None and str(last.detail.get("head") or "") == head:
+        return                                  # already recorded for this move
+    names = ("gate:verdict", "gate:input", "review", "security", "test", "lint")
+    store.record(story_id, Event(kind=NOTE, name=ident.INVALIDATED, ok=True, detail={
+        "reason": "worktree:head-moved", "candidate": frozen, "head": head,
+        "invalidated": [e.seq for e in ev.events if str(e.detail.get("candidate") or "") == frozen and e.name in names][:200]}))
+    from ..harness.runlog import run_log
+    run_log(root, f"story={story_id} HEAD {head[:8]} is not the candidate of record {frozen[:8]}: "
+                  f"its verdicts are invalidated; the tree will be graded anew")
+
+
+def _finding_line(f) -> str:
+    """One reviewer finding as a line for the developer — a structured item or a legacy string."""
+    if isinstance(f, dict):
+        where = str(f.get("file") or "")
+        if f.get("line"):
+            where += f":{f.get('line')}"
+        why = str(f.get("why") or f.get("text") or "")
+        return f"[{f.get('tag') or 'block'}] {where} — {why}".strip(" —")
+    return str(f)
 
 
 def implement_story(
@@ -2966,21 +3401,44 @@ def implement_story(
         head = head_sha(project)
         base_ref = fork_point(str(workdir), head) if head else ""
 
+    _record_head_moved(root, story.id, workdir)
     run_baseline(story, workdir=workdir, artifact_root=root, config=cfg, base_ref=base_ref)
 
     def _review_stage(attempt: Attempt) -> Attempt:
-        """Retry the REVIEW stage on the same frozen candidate while the gate
-        fails only because the reviewer did not run — bounded — and end the
-        story as REVIEW_UNRUNNABLE when the budget is spent. Never a developer
-        session: nothing about the code has been said (D-032)."""
+        """Retry the stages that said NOTHING about the frozen candidate — the reviewer, the security reviewer,
+        a tool that could not run — while the gate is blocked only by such absences. Bounded per stage and per
+        candidate; the terminal names the stage (REVIEW_UNRUNNABLE / SECURITY_UNRUNNABLE / ENVIRONMENT_FAILURE)
+        and keeps the candidate. Never a developer session: nothing about the code has been said (D-032 for the
+        reviewer; SS-13, SS-14, SS-19 for the rest)."""
         sha = attempt.candidate
+        tool_retries = 0
         scope = effective_write_scope(story, project)
         changed = changed_files(str(workdir), base_ref=base_ref)
-        preservation = preservation_items(story, project=project, ledger=_ledger(root))
-        while _only_review_unrunnable(attempt) and attempt.review_attempt <= MAX_REVIEW_RETRIES:
-            _log(f"story={story.id}#{attempt.number} review UNRUNNABLE on candidate {sha[:8]} "
-                 f"— retrying the review stage ({attempt.review_attempt}/{1 + MAX_REVIEW_RETRIES} "
-                 f"executions spent): {attempt.review_unrunnable[:80]}")
+        # the list the attempt was written and first scored against, pinned in its gate:input (SS-20, INV-D.1);
+        # recomputed from the ledger only when no scoring of this candidate exists yet
+        pinned = next((e for e in reversed(EvidenceStore(root).read(story.id).of(NOTE, "gate:input"))
+                       if str(e.detail.get("candidate") or "") == attempt.candidate), None)
+        preservation = (list(pinned.detail.get("preservation") or []) if pinned is not None
+                        else preservation_items(story, project=project, ledger=_ledger(root)))
+        def _budget_left(absent: list[str]) -> bool:
+            stages = {_stage_of(n) for n in absent}
+            ev_now = EvidenceStore(root).read(story.id)
+            if "review" in stages and attempt.review_attempt > MAX_REVIEW_RETRIES:
+                return False
+            if "security" in stages and _security_executions(ev_now, story.id, sha) > MAX_REVIEW_RETRIES:
+                return False
+            if "tools" in stages and tool_retries > MAX_TOOL_RETRIES:
+                return False
+            return True
+
+
+        absent = _absent_stages(attempt)
+        while absent and _budget_left(absent) and not _verifier_budget_cap(attempt):
+            _log(f"story={story.id}#{attempt.number} {', '.join(absent)} UNRUNNABLE on candidate {sha[:8]} "
+                 f"— retrying the {'/'.join(sorted({_stage_of(n) for n in absent}))} stage(s), not the developer: "
+                 f"{(attempt.review_unrunnable or getattr(attempt.security, 'unrunnable', '') or absent[0])[:80]}")
+            if "tools" in {_stage_of(n) for n in absent}:
+                tool_retries += 1
             lai = Attempt(number=attempt.number, verify_only=True)
             lai.candidate = sha
             lai = verify_candidate(
@@ -2991,16 +3449,39 @@ def implement_story(
             )
             outcome.attempts.append(lai)
             attempt = lai
-        if _only_review_unrunnable(attempt):
-            outcome.blocked_reason = (
-                f"{REVIEW_UNRUNNABLE}: the reviewer did not produce a verdict on candidate "
-                f"{sha[:8]} in {attempt.review_attempt} executions — last: "
-                f"{attempt.review_unrunnable}. Deterministic checks passed and the candidate is "
-                f"kept; no developer change is needed. Re-run the review stage when the reviewer "
-                f"can run: `{aisef_command()} run --verify-only --story {story.id}`."
-            )
-            _log(f"story={story.id} {REVIEW_UNRUNNABLE} after {attempt.review_attempt} "
-                 f"review executions on {sha[:8]}")
+            absent = _absent_stages(attempt)
+        if (cap := _verifier_budget_cap(attempt)):
+            # The cap is a run-level condition (INV-G.5): it wins whether or not a stage is still absent. Phase 12 seed
+            # 34999: the retried review produced a BLOCK while the retried security session hit the cap; with `absent`
+            # empty the cap fell through to quality routing and a developer session was opened past the cap (SS-64).
+            outcome.block(StageOutcome.BUDGET, f"budget cap reached inside a verifier session on candidate {sha[:8]}: "
+                                               f"{cap}. The candidate is kept; raise the cap and re-run "
+                                               f"`{aisef_command()} run --verify-only --story {story.id}`.")
+            _log(f"story={story.id} BUDGET cap inside a verifier on {sha[:8]}")
+        elif absent:
+            stages = {_stage_of(n) for n in absent}
+            hint = f"`{aisef_command()} run --verify-only --story {story.id}`"
+            if "tools" not in stages and "review" in stages:
+                stages = {"review"}          # both verifiers absent: the reviewer's absence names the terminal
+            if stages == {"review"}:
+                outcome.block(StageOutcome.UNRUNNABLE, (
+                    f"{REVIEW_UNRUNNABLE}: the reviewer did not produce a verdict on candidate "
+                    f"{sha[:8]} in {attempt.review_attempt} executions — last: "
+                    f"{attempt.review_unrunnable}. Deterministic checks passed and the candidate is "
+                    f"kept; no developer change is needed. Re-run the review stage when the reviewer "
+                    f"can run: {hint}."))
+            elif stages == {"security"}:
+                outcome.block(StageOutcome.UNRUNNABLE, (
+                    f"{SECURITY_UNRUNNABLE}: the security reviewer did not produce a verdict on candidate "
+                    f"{sha[:8]} — last: {getattr(attempt.security, 'unrunnable', '')}. The candidate is kept; "
+                    f"no developer change is needed. Re-run when it can: {hint}."))
+            else:
+                names = ", ".join(absent)
+                outcome.block(StageOutcome.ENVIRONMENT_FAILURE, (
+                    f"ENVIRONMENT_FAILURE: {names} could not run on candidate {sha[:8]} after "
+                    f"{tool_retries} re-run(s) — the environment, not the work, is what failed. The candidate "
+                    f"is kept; fix the environment and re-run: {hint}."))
+            _log(f"story={story.id} {outcome.terminal} after retrying {'/'.join(sorted(stages))} on {sha[:8]}")
         return attempt
 
     # A resumed story whose worktree already carries a candidate that failed
@@ -3033,7 +3514,7 @@ def implement_story(
                                            scope=effective_write_scope(story, project),
                                            next_attempt=n, artifact_root=root)
             if hygiene is not None and not hygiene.ok:
-                outcome.blocked_reason = hygiene.detail["reason"]
+                outcome.block(StageOutcome.ENVIRONMENT_FAILURE, hygiene.detail["reason"])
                 _log(f"story={story.id} BLOCKED retry hygiene: {hygiene.detail['reason'][:160]}")
                 return outcome
         _log(f"story={story.id} attempt={n} START")
@@ -3053,9 +3534,15 @@ def implement_story(
         )
         outcome.attempts.append(attempt)
 
-        # The reviewer did not run on an otherwise-good candidate: retry the
-        # review stage, bounded, before anything else is decided (D-032).
-        if _only_review_unrunnable(attempt):
+        # A verifier or a tool did not run on an otherwise-good candidate: retry THAT stage, bounded, before
+        # anything else is decided (D-032; SS-13, SS-14, SS-19).
+        if (cap := _verifier_budget_cap(attempt)):
+            outcome.block(StageOutcome.BUDGET, f"budget cap reached inside a verifier session on candidate "
+                                               f"{attempt.candidate[:8]}: {cap}. The candidate is kept; raise the cap and "
+                                               f"re-run `{aisef_command()} run --verify-only --story {story.id}`.")
+            _log(f"story={story.id} BUDGET cap inside a verifier on {attempt.candidate[:8]}")
+            return outcome
+        if _absent_stages(attempt):
             attempt = _review_stage(attempt)
             if outcome.blocked_reason:
                 return outcome
@@ -3065,8 +3552,12 @@ def implement_story(
             return outcome
 
         if attempt.fatal:
-            outcome.blocked_reason = attempt.error
-            _log(f"story={story.id} attempt={n} FATAL ${attempt.cost_usd:.2f} err={attempt.error[:120]}")
+            kind = (StageOutcome(attempt.outcome) if attempt.outcome in StageOutcome._value2member_map_ else
+                    StageOutcome.AUTH_FAILURE if exit_status_of_error(attempt.error) == "auth" else
+                    StageOutcome.ISOLATION_BREACH if "isolation" in attempt.error.lower() else
+                    StageOutcome.ENVIRONMENT_FAILURE)
+            outcome.block(kind, attempt.error)
+            _log(f"story={story.id} attempt={n} FATAL {kind.value} ${attempt.cost_usd:.2f} err={attempt.error[:120]}")
             return outcome
 
         if attempt.infra:
@@ -3075,11 +3566,12 @@ def implement_story(
                 # Not a failure to retry: a decision, stated twice. Say which
                 # decision, and prefer the plan diagnosis when the last graded
                 # verdict explains it (lỗi 127).
-                outcome.blocked_reason = nop_deadlock(outcome.attempts) or (
+                plan = nop_deadlock(outcome.attempts)
+                outcome.block(StageOutcome.PLAN_CONFLICT if plan else StageOutcome.NOOP, plan or (
                     f"{lien} sessions in a row ran clean and wrote nothing: {attempt.error} "
                     f"Re-opening with the same context returns the same decision — "
                     f"read the last gate verdict and fix what it asks for, or the story."
-                )
+                ))
                 _log(f"story={story.id} BLOCKED {lien} no-op sessions in a row")
                 return outcome
             cho = attempt.retry_after
@@ -3087,11 +3579,13 @@ def implement_story(
                  f"err={attempt.error[:80]} budget={infra_budget}"
                  + (f" wait={cho:.0f}s" if cho else ""))
             if infra_budget <= 0:
-                outcome.blocked_reason = (
+                outcome.block(StageOutcome.NOOP if attempt.noop else
+                              StageOutcome(attempt.outcome) if attempt.outcome in StageOutcome._value2member_map_ else
+                              StageOutcome.INFRA_FAILURE, (
                     f"sessions kept producing nothing to grade: {attempt.error}"
                     if attempt.noop else
                     f"recurring infrastructure error: {attempt.error}"
-                )
+                ))
                 _log(f"story={story.id} BLOCKED "
                      + ("no-op sessions" if attempt.noop else "infra budget exhausted"))
                 return outcome
@@ -3101,19 +3595,19 @@ def implement_story(
 
         loi_ke_hoach = attempt.plan_findings
         if loi_ke_hoach:
-            outcome.blocked_reason = (
+            outcome.block(StageOutcome.PLAN_CONFLICT, (
                 "deadlock due to plan, reviewer verified: "
                 + "; ".join(loi_ke_hoach[:2])
                 + ". Fix the acceptance criteria or the story's write_scope, then "
                 "re-run — retrying will not resolve this."
-            )
+            ))
             _log(f"story={story.id} DEADLOCK plan: {'; '.join(loi_ke_hoach[:2])}")
             return outcome
 
         van = nop_deadlock(outcome.attempts) or deadlock_reason(
             outcome.attempts, effective_write_scope(story, project))
         if van:
-            outcome.blocked_reason = van
+            outcome.block(StageOutcome.PLAN_CONFLICT, van)
             _log(f"story={story.id} DEADLOCK {van[:120]}")
             return outcome
 
@@ -3125,12 +3619,12 @@ def implement_story(
             # are the story here, so say what they did.
             da_cham = [a for a in outcome.attempts if a.gate is not None]
             if da_cham:
-                outcome.blocked_reason = (
-                    f"tried {outcome.quality_attempts} attempts, still did not pass gate"
-                )
+                outcome.block(StageOutcome.QUALITY_BLOCK,
+                              f"tried {outcome.quality_attempts} attempts, still did not pass gate")
             else:
                 ket = sorted({a.error.split(":")[0].strip() for a in outcome.attempts if a.error})
                 n_s = outcome.quality_attempts
+                outcome.terminal = StageOutcome.QUALITY_BLOCK.value
                 outcome.blocked_reason = (
                     f"{n_s} session{'s' if n_s != 1 else ''} ended with nothing to grade "
                     f"— no gate verdict exists for this story"
@@ -3244,18 +3738,27 @@ def verify_only(
         },
     ))
     outcome.attempts.append(attempt)
-    if _only_review_unrunnable(attempt):
-        # The reviewer did not run again: name that, not a failed gate (D-032).
-        outcome.blocked_reason = (
-            f"{REVIEW_UNRUNNABLE}: the reviewer did not produce a verdict on candidate "
-            f"{attempt.candidate[:8]} (execution {attempt.review_attempt}) — "
-            f"{attempt.review_unrunnable}. Deterministic checks passed and the candidate is "
-            f"kept; re-run `{aisef_command()} run --verify-only --story {story.id}` when the "
-            f"reviewer can run."
-        )
+    absent = _absent_stages(attempt)
+    if (cap := _verifier_budget_cap(attempt)):
+        # SS-64 sibling: a cap reached inside a verifier during --verify-only is the run-level BUDGET stop, not a
+        # stage that "could not run" to be retried when it can (INV-G.5).
+        outcome.block(StageOutcome.BUDGET, f"budget cap reached inside a verifier session on candidate "
+                                           f"{attempt.candidate[:8]}: {cap}. The candidate is kept; raise the cap and re-run "
+                                           f"`{aisef_command()} run --verify-only --story {story.id}`.")
+    elif absent:
+        # A verifier or tool did not run again: name that, not a failed gate (D-032; SS-13/14).
+        stages = {_stage_of(n) for n in absent}
+        label = (REVIEW_UNRUNNABLE if "review" in stages and "tools" not in stages
+                 else SECURITY_UNRUNNABLE if stages == {"security"} else "ENVIRONMENT_FAILURE")
+        why = attempt.review_unrunnable or getattr(attempt.security, "unrunnable", "") or ", ".join(absent)
+        outcome.block(StageOutcome.UNRUNNABLE if label != "ENVIRONMENT_FAILURE" else StageOutcome.ENVIRONMENT_FAILURE, (
+            f"{label}: {', '.join(absent)} did not produce a verdict on candidate "
+            f"{attempt.candidate[:8]} — {why}. Deterministic checks passed and the candidate is "
+            f"kept; re-run `{aisef_command()} run --verify-only --story {story.id}` when it can run."
+        ))
     elif not attempt.ok:
-        outcome.blocked_reason = (
+        outcome.block(StageOutcome.QUALITY_BLOCK, (
             f"re-verify candidate {attempt.candidate[:7]} did not pass gate: "
             + "; ".join(c.name for c in attempt.gate.failures)
-        )
+        ))
     return outcome

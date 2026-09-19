@@ -1,0 +1,136 @@
+{
+ "traces": 2000,
+ "workers": 6,
+ "elapsed_s": 453.5,
+ "traces_per_s": 4.41,
+ "model_transitions": 14507,
+ "real_stage_events": 9719,
+ "matched": 2000,
+ "mismatched_attributed": {},
+ "unexplained_count": 0,
+ "unexplained": [],
+ "known_deviations": [],
+ "vocabulary": {
+  "developer": [
+   [
+    "CHANGED",
+    30
+   ],
+   [
+    "CHANGED_RED",
+    8
+   ],
+   [
+    "NOOP",
+    8
+   ],
+   [
+    "TIMEOUT",
+    4
+   ],
+   [
+    "CRASH",
+    4
+   ],
+   [
+    "RATE_LIMIT",
+    2
+   ],
+   [
+    "CONTEXT",
+    3
+   ],
+   [
+    "AUTH",
+    2
+   ],
+   [
+    "SCOPE_VIOLATION",
+    6
+   ],
+   [
+    "TRUNK_COMMIT",
+    1
+   ],
+   [
+    "ZERO_OUTPUT",
+    2
+   ],
+   [
+    "MAX_TURNS_WORK",
+    3
+   ],
+   [
+    "MAX_TURNS_UNTOUCHED",
+    3
+   ],
+   [
+    "BUDGET",
+    2
+   ]
+  ],
+  "review": [
+   [
+    "PASS",
+    30
+   ],
+   [
+    "BLOCK",
+    7
+   ],
+   [
+    "BLOCK_OUTSIDE",
+    4
+   ],
+   [
+    "STUCK",
+    2
+   ],
+   [
+    "MALFORMED",
+    4
+   ],
+   [
+    "UNRUNNABLE",
+    5
+   ],
+   [
+    "MUTATE",
+    2
+   ],
+   [
+    "COMMIT",
+    2
+   ],
+   [
+    "BUDGET",
+    1
+   ]
+  ],
+  "security": [
+   [
+    "PASS",
+    30
+   ],
+   [
+    "BLOCK",
+    6
+   ],
+   [
+    "UNRUNNABLE",
+    4
+   ],
+   [
+    "MALFORMED",
+    3
+   ],
+   [
+    "BUDGET",
+    1
+   ]
+  ]
+ },
+ "kernel": "hardening/systematic-v1 at the F2 closure commit (this commit)",
+ "seed_range": "1000-2999",
+ "run": "F2 closure, 2026-09-16 — after the verifier-cap fix, SS-63 and the model's reviewed-position pairing"
+}

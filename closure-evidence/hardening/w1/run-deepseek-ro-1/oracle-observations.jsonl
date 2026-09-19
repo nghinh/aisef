@@ -1,0 +1,1 @@
+{"kind": "AMB-4 §10 allow-list", "stdlib_modules_outside_the_list": ["collections", "threading"]}

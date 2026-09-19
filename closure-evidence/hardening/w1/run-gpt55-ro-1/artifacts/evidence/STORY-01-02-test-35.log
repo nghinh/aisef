@@ -1,0 +1,25 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 13 items
+
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_1_matches_json_dumps_contract PASSED [  7%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_2_equal_dicts_return_byte_identical_bytes PASSED [ 15%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_3_non_ascii_is_utf8_literal_and_stable PASSED [ 23%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_4_insertion_order_does_not_change_bytes PASSED [ 30%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_5_genesis_is_literal_string PASSED [ 38%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_6_json_round_trip_preserves_canonical_bytes PASSED [ 46%]
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_normalize_key_matches_unicodedata_nfc 
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_normalize_key_matches_unicodedata_nfc PASSED [ 53%]
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_2_nfc_and_nfd_e_acute_normalize_identically PASSED [ 61%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_3_package_import_prints_init_file_path PASSED [ 69%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_4_module_help_lists_required_subcommands PASSED [ 76%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_5_runtime_has_no_forbidden_imports PASSED [ 84%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_6_runtime_has_no_forbidden_process_or_socket_calls PASSED [ 92%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_7_package_exports_ledger_and_conflict_error PASSED [100%]
+
+==================== 13 passed, 6 subtests passed in 0.19s =====================

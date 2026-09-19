@@ -712,6 +712,12 @@ def _improve_owned(
             cost_cap=cost_cap, auto=auto, approvals=approvals,
             outside=[b for b in gaps if b not in queue],
         )
+        if auto and _epic_rows(led, epic_id) and approvals.status(Gate.IMPROVE) is not Status.APPROVED:
+            # SS-54: the owner's flag waives the gate for the next round — say so where the run is read, with the
+            # gate's status; the repair stories of this round are inside the improve digest, never outside every one
+            from ..harness.runlog import run_log
+            run_log(root, f"epic={epic_id} improve gate {approvals.status(Gate.IMPROVE).value} — waived by --auto "
+                          f"before round {len(_epic_rows(led, epic_id)) + 1}")
         # Whichever source gives the more specific stop wins; tie-breaker is
         # the unified verdict so the new rule has a single owner.  The
         # legacy qualification list still names concrete evidence reasons

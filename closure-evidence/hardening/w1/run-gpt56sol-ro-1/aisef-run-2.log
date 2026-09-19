@@ -1,0 +1,12 @@
+EPIC-01 · wave 1
+  ○ STORY-01-01: already done, skipped
+EPIC-01 · wave 2
+  ○ STORY-01-02: already done, skipped
+EPIC-01 · wave 3
+STORY-01-03: NOT DONE
+  [infra] APIError: [codex/gpt-5.6-sol] [400]: {"detail":"The 'gpt-5.6-sol' model is not supported when using Codex with a ChatGPT account."} (reset after 30s) (HTTP 503)
+  [infra] APIError: [codex/gpt-5.6-sol] [400]: {"detail":"The 'gpt-5.6-sol' model is not supported when using Codex with a ChatGPT account."} (reset after 30s) (HTTP 503)
+  [infra] APIError: [codex/gpt-5.6-sol] [400]: {"detail":"The 'gpt-5.6-sol' model is not supported when using Codex with a ChatGPT account."} (reset after 30s) (HTTP 503)
+  ✗ recurring infrastructure error: APIError: [codex/gpt-5.6-sol] [400]: {"detail":"The 'gpt-5.6-sol' model is not supported when using Codex with a ChatGPT account."} (reset after 30s) (HTTP 503)
+
+⏸ stopped at EPIC-01 · wave 3

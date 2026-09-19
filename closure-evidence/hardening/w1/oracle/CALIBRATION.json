@@ -1,0 +1,255 @@
+{
+ "generated": "2026-09-16T22:29:33Z",
+ "python": "3.14.7",
+ "interpreter": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/w1-oracle-venv/bin/python",
+ "oracle_sha256": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+ "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+ "reference_sha256": {
+  "ledgerlock/__init__.py": "f35c75821a1f23ab4661cec92111a06b74d523ad0ec6f0e77468eaa23755ae1c",
+  "ledgerlock/__main__.py": "e34737246c4338a78411d7cac39a3a03c13fae12bd7c5bfc01896677e9e0b5c2",
+  "ledgerlock/cli.py": "646b7d648898dbded605c22ac9480a4e29b59ff8635b643a7e3e9010098e7219",
+  "ledgerlock/ledger.py": "ff8377753cb2354458f7f797e9e527f9d4523303ee0f27291911ebc897197d61",
+  "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tests/test_reference.py": "6daa55998d1e16ab7f622298861b08595392a5be2f43ac315932a085e6c7549c"
+ },
+ "fixtures": {
+  "reference": {
+   "expected": "all 9 PASSED",
+   "results": {
+    "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "PASSED",
+    "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "PASSED",
+    "TestAcceptance::test_14_3_apply_batch_commits_atomically": "PASSED",
+    "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "PASSED",
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "PASSED",
+    "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "PASSED",
+    "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "PASSED",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "PASSED",
+    "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "PASSED"
+   },
+   "pass": true,
+   "tail": null
+  },
+  "M1": {
+   "removes": "§3.3 tamper evidence: the hash is no longer recomputed on verify",
+   "target": "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
+   "killed": true,
+   "results": {
+    "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "PASSED",
+    "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "PASSED",
+    "TestAcceptance::test_14_3_apply_batch_commits_atomically": "PASSED",
+    "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "PASSED",
+    "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "PASSED",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "PASSED",
+    "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "PASSED",
+    "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "FAILED",
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "FAILED"
+   },
+   "also_red": [
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+   ],
+   "tail": null
+  },
+  "M2": {
+   "removes": "§5 atomic batch: only the first op of a batch is committed",
+   "target": "TestAcceptance::test_14_3_apply_batch_commits_atomically",
+   "killed": true,
+   "results": {
+    "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "PASSED",
+    "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "PASSED",
+    "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "PASSED",
+    "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "PASSED",
+    "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "PASSED",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "PASSED",
+    "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "PASSED",
+    "TestAcceptance::test_14_3_apply_batch_commits_atomically": "FAILED",
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "FAILED"
+   },
+   "also_red": [
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+   ],
+   "tail": null
+  },
+  "M3": {
+   "removes": "§4.3 conflict: another rid on a key no longer conflicts",
+   "target": "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts",
+   "killed": true,
+   "results": {
+    "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "PASSED",
+    "TestAcceptance::test_14_3_apply_batch_commits_atomically": "PASSED",
+    "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "PASSED",
+    "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "PASSED",
+    "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "FAILED",
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "FAILED",
+    "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "FAILED",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "FAILED",
+    "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "FAILED"
+   },
+   "also_red": [
+    "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover",
+    "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value"
+   ],
+   "tail": null
+  },
+  "M4": {
+   "removes": "§3.1 NFC: keys are not normalised",
+   "target": "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+   "killed": true,
+   "results": {
+    "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "PASSED",
+    "TestAcceptance::test_14_3_apply_batch_commits_atomically": "PASSED",
+    "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "PASSED",
+    "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "PASSED",
+    "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "PASSED",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "PASSED",
+    "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "PASSED",
+    "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "FAILED",
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "FAILED"
+   },
+   "also_red": [
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+   ],
+   "tail": null
+  },
+  "M5": {
+   "removes": "§6 snapshot order: insertion order, not byte order",
+   "target": "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+   "killed": true,
+   "results": {
+    "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "PASSED",
+    "TestAcceptance::test_14_3_apply_batch_commits_atomically": "PASSED",
+    "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "PASSED",
+    "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "PASSED",
+    "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "PASSED",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "PASSED",
+    "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "PASSED",
+    "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "FAILED",
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "FAILED"
+   },
+   "also_red": [
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+   ],
+   "tail": null
+  },
+  "M6": {
+   "removes": "§7 repair-tail: mid-chain corruption is 'repaired' instead of refused",
+   "target": "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
+   "killed": true,
+   "results": {
+    "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "PASSED",
+    "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "PASSED",
+    "TestAcceptance::test_14_3_apply_batch_commits_atomically": "PASSED",
+    "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "PASSED",
+    "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "PASSED",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "PASSED",
+    "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "PASSED",
+    "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "FAILED",
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "FAILED"
+   },
+   "also_red": [
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+   ],
+   "tail": null
+  },
+  "M7": {
+   "removes": "§2 / §10 / §14.6: a third-party import (guarded, so only a static check sees it)",
+   "target": "TestAcceptance::test_14_6_no_third_party_imports_at_runtime",
+   "killed": true,
+   "results": {
+    "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "PASSED",
+    "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "PASSED",
+    "TestAcceptance::test_14_3_apply_batch_commits_atomically": "PASSED",
+    "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "PASSED",
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "PASSED",
+    "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "PASSED",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "PASSED",
+    "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "PASSED",
+    "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "FAILED"
+   },
+   "also_red": [],
+   "tail": null
+  },
+  "M8": {
+   "removes": "§4.2 idempotency: a replayed rid appends a duplicate line",
+   "target": "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts",
+   "killed": true,
+   "results": {
+    "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "PASSED",
+    "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "PASSED",
+    "TestAcceptance::test_14_3_apply_batch_commits_atomically": "PASSED",
+    "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "PASSED",
+    "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "PASSED",
+    "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "PASSED",
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "FAILED",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "FAILED",
+    "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "FAILED"
+   },
+   "also_red": [
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value"
+   ],
+   "tail": null
+  },
+  "M9": {
+   "removes": "§6 determinism: the snapshot carries a random nonce",
+   "target": "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+   "killed": true,
+   "results": {
+    "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "PASSED",
+    "TestAcceptance::test_14_3_apply_batch_commits_atomically": "PASSED",
+    "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "PASSED",
+    "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "PASSED",
+    "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "PASSED",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "PASSED",
+    "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "PASSED",
+    "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "FAILED",
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "FAILED"
+   },
+   "also_red": [
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+   ],
+   "tail": null
+  },
+  "M10": {
+   "removes": "§5 + §4.3: a conflicting batch commits its non-conflicting prefix",
+   "target": "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
+   "killed": true,
+   "results": {
+    "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "PASSED",
+    "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "PASSED",
+    "TestAcceptance::test_14_3_apply_batch_commits_atomically": "PASSED",
+    "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "PASSED",
+    "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "PASSED",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "PASSED",
+    "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "PASSED",
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "FAILED",
+    "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "FAILED"
+   },
+   "also_red": [
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+   ],
+   "tail": null
+  }
+ },
+ "observations": {
+  "reference": [
+   {
+    "kind": "AMB-1 snapshot bare form",
+    "exit": [
+     0,
+     0
+    ],
+    "stdout_equal": true,
+    "stdout_is_the_document": true
+   },
+   {
+    "kind": "AMB-4 §10 allow-list",
+    "stdlib_modules_outside_the_list": []
+   }
+  ]
+ },
+ "all_targets_killed": true,
+ "pass": true,
+ "elapsed_s": 35.9
+}

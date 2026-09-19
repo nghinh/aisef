@@ -638,7 +638,14 @@ def provisioned(
     # Requiring `verify.unit` on top means configuring twice for the same
     # thing, and it makes **every** story non-executable.
     if str(config.get("tools.test", "")).strip():
-        have.add("verify.unit")
+        # SS-48 / INV-N.1: provisioned means RUNNABLE — the probe, not the string, decides
+        from ..harness import verify_image
+        try:
+            checks = {tc.key: tc.ok for tc in verify_image.check_tools(project, config, build=False)}
+        except Exception:  # noqa: BLE001 — no probe possible: fall back to the declaration, stated as unmeasured
+            checks = {}
+        if checks.get("tools.test", None) is not False:
+            have.add("verify.unit")
 
     if str(config.get("review.impact_provider", "")).strip():
         have.add("code-intelligence")

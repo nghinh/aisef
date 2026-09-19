@@ -1,0 +1,90 @@
+{
+ "generated": "2026-09-17T06:21:49+0700",
+ "defect": "SS-64",
+ "severity": "P2",
+ "invariant": "INV-G.5",
+ "family": "F2",
+ "fix_commit": "f0cd772",
+ "requirements": {
+  "deterministic_seed_34999_reproducer_RED_before_fix": {
+   "ok": true,
+   "measured": "2 failed, 5 deselected in 2.72s",
+   "how": "the current tests/hardening overlaid on a git worktree at d956249 (pre-fix aisef tree e9fb9b92…)"
+  },
+  "10_of_10_deterministic_mismatch_before_fix": {
+   "ok": true,
+   "replays": 10,
+   "classification": "DETERMINISTIC_MISMATCH",
+   "record": "phase12/unexplained-34999-replays.json"
+  },
+  "GREEN_after_fix": {
+   "ok": true,
+   "measured": "2 passed, 5 deselected in 2.04s"
+  },
+  "review_stage_path_GREEN": {
+   "ok": true,
+   "test": "tests/hardening/test_differential.py::TestSeed34999ACapInsideARegradedVerifierStopsTheRun"
+  },
+  "verify_only_path_GREEN": {
+   "ok": true,
+   "test": "tests/hardening/test_differential.py::TestSS64SiblingVerifyOnlyCapIsABudgetStop"
+  },
+  "INV-G.5_PROVEN": {
+   "ok": true,
+   "registry_status": "PROVEN"
+  },
+  "F2_sibling_scan_clean": {
+   "ok": true,
+   "f2_entries": 0,
+   "f2_open": [],
+   "ss64": {
+    "id": "SS-64",
+    "status": null,
+    "family": "FAM-BUDGET",
+    "invariant": null
+   }
+  },
+  "fault_matrix_cell_GREEN": {
+   "ok": true,
+   "cell": {
+    "id": "FM-R-09",
+    "stage": "Review",
+    "invariants": "INV-G.5",
+    "test": "tests/hardening/test_differential.py::TestSeed34999ACapInsideARegradedVerifierStopsTheRun",
+    "status": "GREEN (P12)"
+   }
+  },
+  "Windows_CI_GREEN": {
+   "ok": true,
+   "run": "35155275218",
+   "sha": "f0cd77268ccbe9d4ed6e2307035ae17ce12e9379"
+  },
+  "Linux_CI_GREEN": {
+   "ok": true,
+   "run": "35155275218",
+   "jobs": {
+    "wheel": "success",
+    "lint": "success",
+    "unit (windows-latest, 3.11)": "success",
+    "unit (ubuntu-latest, 3.14)": "success",
+    "unit (ubuntu-latest, 3.12)": "success",
+    "unit (ubuntu-latest, 3.13)": "success",
+    "unit (ubuntu-latest, 3.11)": "success"
+   }
+  },
+  "no_new_conformance_deviation": {
+   "ok": true,
+   "deterministic_suite": "19 passed, 10 subtests passed in 1.62s",
+   "adapters_changed_since_d956249": "none",
+   "live_smoke": "P15 record on d956249 (OpenCode 1.18.31, 10/10 probes); the fix touches no adapter — no live model call made (owner rule)"
+  }
+ },
+ "defect_set_entry": {
+  "id": "SS-64",
+  "status": "FIXED",
+  "severity": "P2",
+  "family": "FAM-BUDGET",
+  "invariant": null
+ },
+ "all_met": true
+}

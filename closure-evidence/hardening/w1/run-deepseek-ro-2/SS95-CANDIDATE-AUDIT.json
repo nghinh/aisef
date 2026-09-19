@@ -1,0 +1,18 @@
+{
+ "run": "deepseek-ro-2",
+ "generated": "2026-09-19T20:09:06+0700",
+ "finding": "SS-95",
+ "finish_record_false_block_count": 0,
+ "false_block_count": 0,
+ "false_block": [],
+ "measured_at_candidate_for": [
+  "STORY-04-02"
+ ],
+ "candidates": {
+  "STORY-04-02": {
+   "sha": "96e5133ec0de3a4af73e59cb4d02ce84496ad725",
+   "parse_complete": true,
+   "note": null
+  }
+ }
+}

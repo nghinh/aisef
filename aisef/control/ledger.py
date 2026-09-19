@@ -78,6 +78,9 @@ UNTRACED = "untraced"    # the harness cannot link behaviour -> test: metadata f
 WHY_NO_TEST = "no test carries this code"
 WHY_UNREADABLE = "cannot read test names from runner output"
 WHY_TRACE_ABSENT = "declared trace not in this run"
+#: SS-88: the criterion's tests were collected but skipped or errored. Deliberately not UNTESTED/UNTRACED — a test
+#: that stopped executing can hide a real regression, so `gap_kind` leaves it on the expensive side (UNBUILT).
+WHY_NOT_EXECUTED = "its tests did not execute (skipped or errored)"
 WHY_UNLANDED = "green on unlanded candidate — attempt not yet gated/merged"
 
 #: Columns of the gap/regression table (R12) — Markdown and CSV use the same
@@ -641,6 +644,9 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
     det = e.detail
     ids = [str(t) for t in det.get("test_ids") or []]
     failed = {str(t) for t in det.get("failed_ids") or []}
+    # SS-88: a skipped or errored criterion test did not execute — it verifies nothing (proof.not_green)
+    from .proof import not_green
+    unexecuted = not_green(det) - failed
     readable = bool(det.get("test_format")) and bool(ids)
 
     def note(story_id: str, i: int, ok: bool, source: dict) -> None:
@@ -720,6 +726,12 @@ def _observe_tests(led: Ledger, e, sid: str, attempt: int, cand: str, at: float,
                     gap_whys.append(why)
                 continue
             red = [t for t in tests if t in failed]
+            if not red and all(t in unexecuted for t in tests):
+                # every test of this criterion was skipped or errored: observed, not verified
+                note(story_id, i, False, {"test_id": tests[0], "tests": len(tests), "why": WHY_NOT_EXECUTED})
+                judged.append(False)
+                gap_whys.append(WHY_NOT_EXECUTED)
+                continue
             # Source of a GAP must be a **red** test, not the first test in the
             # list: the reader of `aisef evidence` needs a name to open, not a
             # green name sitting next to the failure.

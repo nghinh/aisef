@@ -1,0 +1,11 @@
+Progress: 11/16 stories done (4 not started)
+Active epics: EPIC-04
+
+  done        11
+  failed      1
+
+Cost: $0.00
+Agent runs: ok 61 · max_turns 8
+
+✗ 1 stories not passing:
+    STORY-04-02      failed   tried 3 attempts, still did not pass gate

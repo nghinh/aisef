@@ -1,0 +1,14 @@
+{
+  "gate": "architecture",
+  "artifact": "architecture.md",
+  "artifact_sha256": "7aed3af2edc7befc06b592c7f51f8ef373f0b52beb15f7afc71ba64c721466fe",
+  "status": "approved",
+  "seq": 2,
+  "decided_by": "auto",
+  "decided_at": "2026-09-15T13:09:08+00:00",
+  "note": "auto-approved (--auto-approve)",
+  "machine_checks": {
+    "bmad_status": "complete"
+  },
+  "history": []
+}

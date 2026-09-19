@@ -1,0 +1,1973 @@
+{
+ "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
+ "phase": 9,
+ "frozen_at_sha": "259e587b77fb346934037e063b395c2628dca1c2",
+ "generated": "2026-09-16T10:12:06+00:00",
+ "rule": "No broad speculative sweep while fixing. A sibling found during implementation is classified, assigned to an already-frozen family where it belongs, and added here with explicit provenance (commit + finding source).",
+ "counts": {
+  "total": 103,
+  "by_severity": {
+   "P2": 56,
+   "P1": 26,
+   "P3": 21
+  },
+  "by_fix_family": {
+   "F1-IDENTITY-PROVENANCE-FRESHNESS": 17,
+   "F3-STRUCTURED-JUDGMENT-AUTHORITY": 14,
+   "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY": 15,
+   "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE": 12,
+   "F6-BENCH-RELEASE-APPROVAL": 7,
+   "F5-PROCESS-TOOL-ENVIRONMENT": 22,
+   "F6-QUALIFICATION-INFRASTRUCTURE": 7,
+   "F7-EXECUTION-EVIDENCE-VALIDITY": 9
+  },
+  "fixed": 16,
+  "by_status": {
+   "FIXED": 102,
+   "SUPERSEDED": 1
+  },
+  "counting_rule": "unique by id: AD-01/03/04/05 and SS-61/62/63 are listed both in their fix family and in additions_after_freeze (provenance) and count once; recounted from the entries on 2026-09-17 (the hand-maintained counts before this had by_severity summing to 72 of 75)"
+ },
+ "fix_families": {
+  "F1-IDENTITY-PROVENANCE-FRESHNESS": [
+   "FAM-IDENTITY",
+   "FAM-RECOVERY"
+  ],
+  "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY": [
+   "FAM-OUTCOME",
+   "FAM-RETRY"
+  ],
+  "F3-STRUCTURED-JUDGMENT-AUTHORITY": [
+   "FAM-PROSE",
+   "FAM-JUDGE"
+  ],
+  "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE": [
+   "FAM-OWNERSHIP",
+   "FAM-SCHEDULER"
+  ],
+  "F5-PROCESS-TOOL-ENVIRONMENT": [
+   "FAM-PROCESS",
+   "FAM-TOOL"
+  ],
+  "F6-BENCH-RELEASE-APPROVAL": [
+   "FAM-BENCH",
+   "FAM-RELEASE",
+   "FAM-APPROVAL"
+  ]
+ },
+ "defects_by_fix_family": {
+  "F1-IDENTITY-PROVENANCE-FRESHNESS": [
+   {
+    "id": "SS-02",
+    "family": "FAM-IDENTITY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P2",
+    "invariants": [
+     "INV-A.2",
+     "INV-D.1"
+    ],
+    "site": "aisef/control/gate.py:677-686 + aisef/harness/guardrails.py:1173",
+    "statement": "`guard ran` reads GUARD_SEEN, written once per story and never stamped; for_candidate keeps unstamped events, so attempt N's heartbeat proves attempt N+1's guard ran",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS02GuardHeartbeatIsBoundToTheGradedSession",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-03",
+    "family": "FAM-IDENTITY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P2",
+    "invariants": [
+     "INV-A.2",
+     "INV-D.1"
+    ],
+    "site": "aisef/control/gate.py:808-817",
+    "statement": "`criteria have tests` harvests test ids from any green qa:* run kept by for_candidate, including unstamped pre-freeze runs",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS03CriteriaProofBindsToTheCandidate",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-04",
+    "family": "FAM-RECOVERY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P2",
+    "invariants": [
+     "INV-E.3",
+     "INV-G.1"
+    ],
+    "site": "aisef/phases/implement.py::_unfinished_review",
+    "statement": "reads NOTE named `review`; verdicts are recorded as `reviewer:verdict` — the function always returns empty, the resume-feedback feature never worked",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS04ResumeFeedbackReaderIsAlive",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-18",
+    "family": "FAM-RECOVERY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P2",
+    "invariants": [
+     "INV-C.3",
+     "INV-N.1"
+    ],
+    "site": "aisef/phases/implement.py::run_baseline 1305-1327",
+    "statement": "an `unrunnable` baseline is never reused; once the worktree has commits, head != root records BASELINE_UNAVAILABLE on every run although root is known",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS18TransientBaselineFailureIsNotPermanent",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "D-035",
+    "family": "FAM-RECOVERY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P1",
+    "invariants": [
+     "INV-E.1",
+     "INV-H.2",
+     "INV-K.2"
+    ],
+    "site": "aisef/phases/implement.py::run_attempt (cham_roi)",
+    "statement": "no-op shortcut keyed on the candidate SHA having any verdict; recovery changed the evaluated tree without invalidating it",
+    "reproducer": "tests/hardening/test_verdict_freshness.py::TestInvariantEH",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-09",
+    "family": "FAM-RECOVERY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P2",
+    "invariants": [
+     "INV-E.1",
+     "INV-A.1"
+    ],
+    "site": "aisef/phases/implement.py::_pending_review vs run.py:616 refresh",
+    "statement": "the worktree refresh merges main before the resume looks for a pending review; HEAD moves, the frozen candidate is invalidated with no record, and a REVIEW_UNRUNNABLE story reopens a developer",
+    "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS09ResumeRefreshDoesNotSilentlyInvalidateTheCandidate::test_resume_after_main_advanced_retries_the_review_or_records_the_invalidation",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-16",
+    "family": "FAM-RECOVERY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P2",
+    "invariants": [
+     "INV-A.3",
+     "INV-E.1"
+    ],
+    "site": "aisef/phases/run.py:371-381 (wave-end commit_story + remove for failed stories)",
+    "statement": "leftover in-scope work is committed on top of the frozen candidate with no journal/evidence record; `--verify-only` then finds no evidence at the new HEAD; paths=declared scope loses harness-granted files",
+    "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS16WaveEndCommitOfAFailedStoryIsRecorded::test_leftover_work_committed_at_wave_end_is_named_by_a_record",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-20",
+    "family": "FAM-RECOVERY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P3",
+    "invariants": [
+     "INV-D.1"
+    ],
+    "site": "aisef/phases/implement.py::_review_stage / verify_only (preservation recomputed)",
+    "statement": "R4 pins the preservation list once per attempt; the review-stage retry and verify-only rebuild it from the ledger, so the re-review scores a different list than the candidate was written against",
+    "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS20ReviewRetryScoresThePinnedPreservationList::test_the_review_stage_retry_uses_the_list_the_attempt_was_pinned_to",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-22",
+    "family": "FAM-RECOVERY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P3",
+    "invariants": [
+     "INV-C.1",
+     "INV-D.1"
+    ],
+    "site": "aisef/phases/implement.py:2964-2969 + run_nop (base_ref recomputed per run)",
+    "statement": "fork_point is recomputed every implement_story call; the baseline is reused at its recorded root while nop level 2 and review_diff use the new base_ref",
+    "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS22NopParentMatchesTheBaselineRoot::test_the_nop_control_runs_at_the_baseline_root_or_records_the_mismatch",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-A10",
+    "family": "FAM-RECOVERY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P3",
+    "invariants": [
+     "INV-K.3"
+    ],
+    "site": "aisef/phases/implement.py:1793-1809 (`git reset --hard candidate` after a moved candidate)",
+    "statement": "the reset result is not checked or recorded; --hard also destroys out-of-scope dirt a write-scope:violation note still describes",
+    "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS10ResetAfterAMovedCandidateIsRecorded::test_dirt_destroyed_by_the_reset_is_preserved_or_named",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-A15",
+    "family": "FAM-IDENTITY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P3",
+    "invariants": [
+     "INV-A.2"
+    ],
+    "site": "aisef/phases/implement.py::freeze_candidate (GitError → returns HEAD without the work)",
+    "statement": "on a refused freeze the gate grades the worktree while stamping the parent SHA; run.py refuses the merge later, so no false merge, but a misleading gate result",
+    "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS15RefusedFreezeIsNotGradedUnderTheParent::test_a_refused_freeze_does_not_grade_the_tree_under_the_parent_sha",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-T1",
+    "family": "FAM-IDENTITY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P3",
+    "invariants": [
+     "INV-D.2"
+    ],
+    "site": "aisef/control/tdd.py:63-64 (`e.seq < last_green.seq`)",
+    "statement": "the last seq comparison in the codebase; read() re-sorts by (at, seq) so it is position-consistent today",
+    "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSST1TddVerdictFollowsPositionAndCandidateNotSeq::test_a_red_run_positioned_after_the_green_does_not_prove_tdd",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-X1",
+    "family": "FAM-IDENTITY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P3",
+    "invariants": [
+     "INV-P.2"
+    ],
+    "site": "aisef/cli/harness.py:429-443 (waiver bound to the last gate:input's candidate)",
+    "statement": "an operator waiver binds to the most recent gate:input, which may be a verify-only run at another SHA",
+    "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSSX1WaiverBindsToTheStorysCandidate::test_a_waiver_is_refused_or_bound_to_the_story_branch_tip_not_the_latest_scoring",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-C2",
+    "family": "FAM-IDENTITY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P3",
+    "invariants": [
+     "INV-D.1"
+    ],
+    "site": "aisef/harness/observe.py::Evidence.candidate (any detail['candidate'] of any NOTE)",
+    "statement": "the 'candidate of record' for closure G4.5 is whichever event was written last with a candidate key — gate:input and the new retry:recovery note both qualify",
+    "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSSC2CandidateOfRecordIsTheGradedCandidate::test_a_recovery_note_after_the_gate_does_not_change_the_candidate_of_record",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-60",
+    "family": "FAM-IDENTITY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P3",
+    "invariants": [
+     "INV-A.2",
+     "INV-D.1"
+    ],
+    "site": "aisef/phases/implement.py::freeze_candidate → gate `evidence matches candidate` NOT_APPLICABLE on an empty candidate",
+    "statement": "a failed freeze (cannot read HEAD) leaves candidate \"\"; the identity check is NOT_APPLICABLE and the story completes DONE bound to no candidate (merge refuses later — fail-closed downstream)",
+    "reproducer": "tests/hardening/scan8a/test_group_e.py::TestSS60ADoneStoryHasAFrozenCandidate::test_a_story_whose_freeze_failed_is_not_done",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-61",
+    "family": "FAM-RECOVERY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P1",
+    "invariants": [
+     "INV-E.1",
+     "INV-H.2",
+     "INV-K.2"
+    ],
+    "statement": "the gate PASSED and gate:verdict was written, the process died before verification.completed; the rerun reconciles the transaction to pending, the developer's identical write is a no-op 'returning the verdict it already returned' (a PASS!), and the story ends FAILED 'sessions kept producing nothing to grade' — a fully verified candidate needs manual intervention",
+    "reproducer": "tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate::test_the_rerun_converges_to_done_with_exactly_one_integration",
+    "provenance": "Phase 14 compound fault CF-05, commit after 259e587 (branch hardening/systematic-v1), 2026-09-16",
+    "status": "FIXED",
+    "belongs_to_frozen_family": true,
+    "site": "aisef/phases/implement.py::run_attempt (no-op shortcut) + control/journal reconcile (attempt.aborted → pending)",
+    "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-62",
+    "family": "FAM-RECOVERY",
+    "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+    "severity": "P2",
+    "invariants": [
+     "INV-A.1",
+     "INV-K.2"
+    ],
+    "site": "aisef/phases/implement.py::_with_schema (candidate moved on the schema retry)",
+    "statement": "a reviewer commit made during the SCHEMA-RETRY session was recorded (review:candidate) but not restored — F1 (SS-A10) restored a commit made in the first review session only; HEAD stayed off the frozen candidate, the gate failed on stale identity and a second developer session opened over a candidate that no longer existed",
+    "reproducer": "tests/hardening/test_differential.py::TestSeed232ReviewerCommitOnTheSchemaRetry",
+    "provenance": "found during F2 implementation by the 400-trace differential (seed 232, unexplained after KNOWN was emptied), 2026-09-16; reproducer RED at c384383 (F1 closure commit, run in a throwaway worktree), GREEN after the fix in this commit",
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `_with_schema` restores the candidate exactly as the first session does"
+   }
+  ],
+  "F3-STRUCTURED-JUDGMENT-AUTHORITY": [
+   {
+    "id": "SS-05",
+    "family": "FAM-JUDGE",
+    "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+    "severity": "P1",
+    "invariants": [
+     "INV-B.2",
+     "INV-T.1"
+    ],
+    "site": "aisef/phases/implement.py::_no_escalation",
+    "statement": "demotes today's block findings to advisory when the same (file, behavior_id) was advisory on ANY earlier candidate — across a contract change — and flips the verdict to pass",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS05EscalationDemotionStaysInsideTheEpoch",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F3 structured judgment authority (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-23",
+    "family": "FAM-PROSE",
+    "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+    "severity": "P2",
+    "invariants": [
+     "INV-F.3",
+     "INV-N.1"
+    ],
+    "site": "aisef/harness/tools.py:298 (`not found` in MISSING_TOOL) + unrunnable_reason",
+    "statement": "an all-red suite whose assertion messages contain `not found` is TOOL_UNRUNNABLE because the only escape is `.passed` non-empty; failed_ids already prove the runner ran",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS23RedTestsAreNotAMissingTool",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F3 structured judgment authority (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-24",
+    "family": "FAM-PROSE",
+    "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+    "severity": "P2",
+    "invariants": [
+     "INV-F.2"
+    ],
+    "site": "aisef/phases/implement.py::_reconcile (union of text items and JSON verdict)",
+    "statement": "a prose `[block] path` line blocks a candidate whose structured verdict is pass with no findings",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS24ProseNeverOverridesAStructuredVerdict",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F3 structured judgment authority (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-25",
+    "family": "FAM-PROSE",
+    "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+    "severity": "P2",
+    "invariants": [
+     "INV-F.2",
+     "INV-Q.1"
+    ],
+    "site": "aisef/phases/implement.py::_paths_outside",
+    "statement": "regexes `word.ext` tokens out of reviewer prose to decide a repeated complaint points outside the write scope, which is what makes deadlock_reason terminal",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS25ScopeVerdictComesFromFindingsNotProse",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F3 structured judgment authority (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-26",
+    "family": "FAM-PROSE",
+    "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+    "severity": "P1",
+    "invariants": [
+     "INV-F.3",
+     "INV-T.1"
+    ],
+    "site": "aisef/phases/implement.py::_vang_ma_cua_story",
+    "statement": "clears an environment failure when a changed file's stem appears anywhere in the traceback (a third-party ModuleNotFoundError raised while importing that file); nop then scores red-as-intended and TDD passes on a suite that never ran",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS26EnvironmentFailureIsNotErasedBySubstring",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F3 structured judgment authority (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-27",
+    "family": "FAM-PROSE",
+    "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+    "severity": "P1",
+    "invariants": [
+     "INV-F.2",
+     "INV-T.1"
+    ],
+    "site": "aisef/control/security.py::is_noise",
+    "statement": "drops a finding of any severity whose body mentions rate limiting/throttling/DoS; a critical auth-bypass finding worded with `no rate limit` stops blocking; JSON findings are re-parsed through the same filter",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS27NoiseFilterHasASeverityFloor",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F3 structured judgment authority (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-28",
+    "family": "FAM-PROSE",
+    "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+    "severity": "P2",
+    "invariants": [
+     "INV-F.4"
+    ],
+    "site": "aisef/clients/stream.py::exit_status_of (auth branch)",
+    "statement": "classifies `auth` (fatal) from substrings of the agent's final text (`raw['result']`), before the structured api_error_status branch",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS28ExitStatusReadsTheProviderNotTheAgentsProse",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F3 structured judgment authority (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-30",
+    "family": "FAM-PROSE",
+    "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+    "severity": "P2",
+    "invariants": [
+     "INV-F.2"
+    ],
+    "site": "aisef/control/machine_gate.py::_GIU_CHO",
+    "statement": "the stories machine gate rejects any criterion matching `\\bTODO\\b` (also stub, placeholder, no-op) — every to-do application, including this framework's dogfood corpora, fails plan approval",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS30PlaceholderRegexDoesNotBlockTodoApps",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F3 structured judgment authority (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-57",
+    "family": "FAM-PROSE",
+    "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+    "severity": "P1",
+    "invariants": [
+     "INV-F.2"
+    ],
+    "site": "aisef/phases/implement.py::_reconcile (verdict None → text-only fallback)",
+    "statement": "a reviewer that never produces a structured verdict (twice) is scored from prose: no blocking lines → the review PASSES; a PASS came from the absence of a verdict",
+    "reproducer": "tests/hardening/test_fault_matrix.py::TestReviewFaults::test_a_malformed_verdict_never_passes_the_review",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — a FAM-PROSE member fixed by F2's rule 'absence of a structured verdict is UNRUNNABLE, never PASS'; F3's family closure re-verifies it"
+   },
+   {
+    "id": "SS-29",
+    "family": "FAM-PROSE",
+    "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+    "severity": "P1",
+    "invariants": [
+     "INV-R.2",
+     "INV-F.2"
+    ],
+    "site": "aisef/control/closure.py:101 RESOLVED substring in G6.3",
+    "statement": "`not resolved`, `unresolved`, `will be fixed` contain a RESOLVED marker, so an open P0/P1 onboarding blocker counts as done in a release gate",
+    "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS29ResolvedIsAStatusNotASubstring::test_an_open_p1_blocker_worded_unresolved_does_not_pass_g6_3",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F3 structured judgment authority (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-31",
+    "family": "FAM-PROSE",
+    "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+    "severity": "P3",
+    "invariants": [
+     "INV-F.2"
+    ],
+    "site": "aisef/control/experience.py::_NO_SURFACE",
+    "statement": "one prose line in EXPERIENCE.md (`Screens: none … API only for now`) marks every UI verification kind NOT_APPLICABLE",
+    "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS31NoSurfaceIsAnchoredToTheStatement::test_a_line_that_announces_screens_is_not_headless",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F3 structured judgment authority (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-32",
+    "family": "FAM-PROSE",
+    "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+    "severity": "P3",
+    "invariants": [
+     "INV-F.2"
+    ],
+    "site": "aisef/phases/implement.py::nop_deadlock regexing gate.py:559's English sentence",
+    "statement": "the still-green criteria list is data at the producer and is re-derived from a sentence at the consumer; rewording disables the deadlock diagnosis silently",
+    "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS32DeadlockDiagnosisReadsDataNotProse::test_rewording_the_gate_sentence_does_not_silence_the_diagnosis",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F3 structured judgment authority (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "D-002",
+    "family": "FAM-JUDGE",
+    "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+    "severity": "P2",
+    "invariants": [],
+    "site": "review",
+    "statement": "A blocking gate decision can rest on the model reviewer alone",
+    "reproducer": "",
+    "provenance": "DEFECT-REGISTER (open before the program)",
+    "status": "SUPERSEDED",
+    "disposition_required": "FIXED / NOT_A_DEFECT with proof / SUPERSEDED",
+    "disposition": "SUPERSEDED by INV-F.2 + the binding rule (F3): a judge-only block must bind to a file, a behaviour id or a criterion code of THIS candidate (`Verdict.bound_blocking`); an unbound blocker is recorded as `review:unbound` and never scored, and a verdict whose blockers all bind to nothing is REVIEW_UNRUNNABLE after one reminder — never a PASS, never a developer session. Owner ruling 1's four properties (identifiable in evidence, distinguishable from deterministic blocking, human escape path, cannot masquerade as deterministic) keep holding; this adds the fifth, structural one. The judge-only block RATE stays a measured, published property of the framework, not a defect: G2.4b owns it. Evidence: tests/hardening/test_judgment.py; closure-evidence/hardening/judge-only-audit-f3.json (re-run on the same corpus).",
+    "fixed_by": "F3 structured judgment authority (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-63",
+    "family": "FAM-JUDGE",
+    "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+    "severity": "P2",
+    "invariants": [
+     "INV-Q.1"
+    ],
+    "site": "aisef/phases/implement.py::deadlock_reason (attempts[-1], attempts[-2])",
+    "statement": "the plan-conflict detector compared ADJACENT attempt records; when the reviewer's session on the second candidate had to be re-run (tree mutation → D-032 review-stage retry), the developer attempt in between carried no verdict and two identical out-of-scope blocks were never paired — the plan conflict was reported as `did not pass gate` and the developer budget burned",
+    "reproducer": "tests/hardening/test_differential.py::TestSeed2624PlanConflictSurvivesAVerifierRerun",
+    "provenance": "found during F2 implementation by the 2000-trace differential (seed 2624, unexplained with KNOWN empty), 2026-09-16; reproducer RED at c384383 (throwaway worktree), GREEN after `deadlock_reason` pairs graded positions (attempts whose reviewer produced a verdict)",
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `deadlock_reason` skips attempts whose review was UNRUNNABLE"
+   }
+  ],
+  "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY": [
+   {
+    "id": "SS-12",
+    "family": "FAM-RETRY",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P1",
+    "invariants": [
+     "INV-G.5",
+     "INV-F.1"
+    ],
+    "site": "aisef/phases/implement.py:1625 `from .mockup import RunResult`",
+    "statement": "BudgetExceeded inside a review or security session is handled by importing a class aisef.phases.mockup does not define",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS12BudgetRejectionInReviewDoesNotCrash",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-13",
+    "family": "FAM-RETRY",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P1",
+    "invariants": [
+     "INV-G.2",
+     "INV-F.3"
+    ],
+    "site": "aisef/control/gate.py:949-950 + aisef/phases/implement.py:1171-1174",
+    "statement": "a security SESSION failure (timeout, cut, tree modified) becomes Check('security', FAILED), is cached at the candidate (no _security_complete), and the loop reopens the developer",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS13SecurityExecutionFailureIsNotAVerdict",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-14",
+    "family": "FAM-RETRY",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P1",
+    "invariants": [
+     "INV-G.3",
+     "INV-N.1"
+    ],
+    "site": "aisef/phases/implement.py::implement_story (no branch for gate blocked only on UNRUNNABLE)",
+    "statement": "an UNRUNNABLE deterministic check (runner missing in the sandbox) blocks the gate; the only move is a new developer session charged to quality until max_retries",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS14ToolEnvironmentFailureIsNotADeveloperAttempt",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-15",
+    "family": "FAM-RETRY",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P2",
+    "invariants": [
+     "INV-G.4"
+    ],
+    "site": "aisef/phases/implement.py:711-768 + aisef/clients/stream.py:199",
+    "statement": "`context`, `permission`, `cost` exit statuses leave the tree untouched and are charged to the quality budget (D-006's shape); only `auth` was compensated",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS15EnvironmentExitStatusesAreNotQualityAttempts",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-58",
+    "family": "FAM-OUTCOME",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P2",
+    "invariants": [
+     "INV-F.3",
+     "INV-N.1"
+    ],
+    "site": "aisef/control/gate.py (lint branch has no unrunnable path)",
+    "statement": "the `test` check maps detail.unrunnable to UNRUNNABLE; the `lint` check maps a missing linter (ENOENT / exit 127) to FAILED — D-029's shape on the lint tool",
+    "reproducer": "tests/hardening/test_fault_matrix.py::TestToolFaults::test_missing_linter_is_unrunnable",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-01",
+    "family": "FAM-OUTCOME",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P3",
+    "invariants": [
+     "INV-T.1"
+    ],
+    "site": "aisef/control/gate.py:767-776 (`real tests` PASSED when no qa:fake-tests record)",
+    "statement": "absence of the fake-tests record scores PASSED. In the story path verify_candidate always records the scan; in qa.run_suite the record is written only when fakes are found — so absence is the encoded clean result there. The gap: 'scan did not run' is indistinguishable from 'clean'",
+    "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS01RealTestsNeedsARecordedScan::test_no_fake_tests_record_is_not_a_pass",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-19",
+    "family": "FAM-RETRY",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P2",
+    "invariants": [
+     "INV-G.1"
+    ],
+    "site": "aisef/phases/implement.py::_only_review_unrunnable",
+    "statement": "D-032 recovery requires review to be the SOLE failure; any co-blocking UNRUNNABLE (stale evidence, preservation unverifiable, flaky test) routes a reviewer absence back to the developer",
+    "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS19CoBlockingUnrunnableKeepsTheReviewerAbsenceAtTheReviewStage::test_two_unrunnable_checks_never_open_a_developer",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-21",
+    "family": "FAM-RETRY",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P2",
+    "invariants": [
+     "INV-G.5"
+    ],
+    "site": "aisef/phases/implement.py:648-654 + aisef/control/budget.py:171-177",
+    "statement": "a developer BudgetExceeded is charged to quality; a non-blocking lock failure on the budget ledger raises BudgetExceeded, so lock contention between parallel stories is reported as a cap",
+    "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS21BudgetLockContentionIsInfraNotACap::test_a_held_ledger_lock_is_an_environment_outcome",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-33",
+    "family": "FAM-OUTCOME",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P2",
+    "invariants": [
+     "INV-T.1"
+    ],
+    "site": "aisef/harness/testlog.py MAX_IDS + gate.py:397-400",
+    "statement": "test ids are truncated at 500; the baseline check disables lost/renamed under truncation but not newly_red, so a regression can be absent from both lists and pass vacuously; preservation has no guard",
+    "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS33TruncationNeverYieldsAVacuousPass::test_a_baseline_green_test_beyond_the_cut_turning_red_is_not_a_pass",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-59",
+    "family": "FAM-OUTCOME",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P2",
+    "invariants": [
+     "INV-F.1",
+     "INV-G.4"
+    ],
+    "site": "aisef/phases/implement.py::run_attempt (zero-output check reads changed_files(base_ref))",
+    "statement": "on a retry the zero-output check diffs against the base branch, sees the frozen candidate's files and never fires; the session is recorded as a no-op decision instead of a fatal environment failure",
+    "reproducer": "tests/hardening/test_fault_matrix.py::TestDeveloperFaults::test_zero_output_on_a_retry_is_still_fatal_not_a_noop_decision",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "AD-01",
+    "family": "FAM-OUTCOME",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P2",
+    "invariants": [
+     "INV-F.1",
+     "INV-F.4"
+    ],
+    "site": "aisef/clients/opencode.py::OpenCodeAdapter.run (empty stream + exit 0)",
+    "statement": "an OpenCode child that exits 0 having emitted zero events returns ok=True — a result with nothing in it; Claude's adapter returns infra 'stream ended without a result event'",
+    "reproducer": "tests/hardening/adapters/test_conformance.py::TestC03EmptyResponse::test_opencode",
+    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
+    "status": "FIXED",
+    "belongs_to_frozen_family": true,
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "AD-03",
+    "family": "FAM-OUTCOME",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P2",
+    "invariants": [
+     "INV-F.4",
+     "INV-G.4"
+    ],
+    "site": "aisef/clients/opencode.py::OpenCodeAdapter.run (child death / truncated stream)",
+    "statement": "an OpenCode child dying mid-line or with exit 3 and a stderr heap-limit message is classified `error` (quality, charged to the developer) while Claude's adapter classifies the same death `infra`",
+    "reproducer": "tests/hardening/adapters/test_conformance.py::TestC11PartialStream::test_opencode",
+    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
+    "status": "FIXED",
+    "belongs_to_frozen_family": true,
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "AD-04",
+    "family": "FAM-OUTCOME",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P3",
+    "invariants": [
+     "INV-F.4"
+    ],
+    "site": "aisef/clients/claude_code.py::ClaudeCodeAdapter.run (no result event)",
+    "statement": "when the Claude child dies without a result event the exit code and stderr are dropped (raw_result={}) — the operator cannot tell a heap crash from a cut",
+    "reproducer": "tests/hardening/adapters/test_conformance.py::TestC12ProcessDeath::test_claude",
+    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
+    "status": "FIXED",
+    "belongs_to_frozen_family": true,
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "AD-05",
+    "family": "FAM-OUTCOME",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P1",
+    "invariants": [
+     "INV-F.4",
+     "INV-L.1"
+    ],
+    "site": "aisef/clients/claude_code.py::ClaudeCodeAdapter.run (result event after the timeout kill)",
+    "statement": "a result event that arrives after the adapter decided timeout flips ok=True while error still says 'exceeded 1s' — a cut session is reported as a successful one",
+    "reproducer": "tests/hardening/adapters/test_conformance.py::TestC13LateOutputAfterTimeout::test_claude",
+    "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
+    "status": "FIXED",
+    "belongs_to_frozen_family": true,
+    "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-64",
+    "family": "FAM-BUDGET",
+    "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+    "severity": "P2",
+    "invariants": [
+     "INV-G.5"
+    ],
+    "site": "aisef/phases/implement.py::_review_stage (cap check gated on `absent`); run_verify_only path (cap typed UNRUNNABLE)",
+    "statement": "a budget cap reached inside a RETRIED verifier session is ignored when the retried review produced a verdict: `_absent_stages` is empty once a check FAILED, the review stage's cap check was gated on absences, and the cap fell through to quality routing — a developer session, a review and a security session were opened past the cap (one quality attempt charged). Sibling: during --verify-only the same cap was typed as a stage that 'could not run' (retry when it can) instead of the run-level BUDGET stop.",
+    "reproducer": "tests/hardening/test_differential.py::TestSeed34999ACapInsideARegradedVerifierStopsTheRun::test_the_model_and_the_kernel_agree_and_no_session_opens_past_the_cap",
+    "provenance": "Phase 12 differential, chunk 30000, seed 34999 (2026-09-17): frozen record closure-evidence/hardening/phase12/unexplained-34999.json, 10/10 deterministic replays; classification A (REAL KERNEL DEFECT): the model follows INV-G.5, the kernel did not",
+    "status": "FIXED",
+    "fixed_by": "Phase 12 (seed 34999) — cap precedence over absence in _review_stage and in the verify-only path, 2026-09-17",
+    "disposition_required": "FIXED / NOT_A_DEFECT with proof / SUPERSEDED",
+    "severity_note": "P2: no false PASS and no money past the cap in production (BudgetGuard refuses the paid call); the control flow deviated from INV-G.5 and one quality attempt was charged wrongly"
+   }
+  ],
+  "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE": [
+   {
+    "id": "SS-17",
+    "family": "FAM-OWNERSHIP",
+    "fix_family": "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE",
+    "severity": "P2",
+    "invariants": [
+     "INV-A.3",
+     "INV-I.2"
+    ],
+    "site": "aisef/control/worktree.py:492",
+    "statement": "merge_story refuses a passed candidate when raw `git status --porcelain` is non-empty — including `.coverage` left by the test tool and client config the harness copied",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS17MergeDirtCheckHonoursOwnership",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-35",
+    "family": "FAM-OWNERSHIP",
+    "fix_family": "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE",
+    "severity": "P2",
+    "invariants": [
+     "INV-I.1",
+     "INV-J.1"
+    ],
+    "site": "aisef/harness/guardrails.py:747-750 + aisef/phases/implement.py::_tree_snapshot",
+    "statement": "`git status --porcelain -z` emits a rename as two NUL fields; `entry[3:]` on the bare original path yields a phantom `/a.py` outside every scope",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS35RenamedPathsKeepTheirIdentity",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-36",
+    "family": "FAM-OWNERSHIP",
+    "fix_family": "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE",
+    "severity": "P2",
+    "invariants": [
+     "INV-I.1",
+     "INV-A.1"
+    ],
+    "site": "aisef/phases/implement.py::_tree_snapshot (no is_tool_artifact)",
+    "statement": "a reviewer that runs the suite and leaves `.coverage` is scored as having modified the tree: review discarded, REVIEW_UNRUNNABLE after the retry budget",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS36ToolArtifactsAreNotReviewerWrites",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-39",
+    "family": "FAM-OWNERSHIP",
+    "fix_family": "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE",
+    "severity": "P1",
+    "invariants": [
+     "INV-I.2",
+     "INV-K.1"
+    ],
+    "site": "aisef/phases/implement.py::_tree_snapshot vs aisef/harness/guardrails.py::changed_files (VENDOR_PATHS by segment)",
+    "statement": "the snapshot skips vendor paths only at the root; a nested node_modules the session installed is recorded as a violation and DELETED by retry hygiene, while the guard never counted it",
+    "reproducer": "tests/hardening/test_sibling_scan.py::TestSS39VendorPathsShareOneOwnershipRule",
+    "provenance": "Phase 3 sweep",
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-37",
+    "family": "FAM-OWNERSHIP",
+    "fix_family": "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE",
+    "severity": "P2",
+    "invariants": [
+     "INV-I.3"
+    ],
+    "site": "aisef/phases/implement.py:618-625 (no ENV_BASELINE_DIRTY for story sessions)",
+    "statement": "planning/mockup sessions declare pre-existing dirt to the guard; story sessions do not, so in --no-isolate an operator's dirty file blocks every tool call",
+    "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS37StorySessionDeclaresPreexistingDirt::test_operator_dirt_outside_scope_does_not_block_the_developers_first_tool_call",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-38",
+    "family": "FAM-OWNERSHIP",
+    "fix_family": "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE",
+    "severity": "P3",
+    "invariants": [
+     "INV-I.1"
+    ],
+    "site": "aisef/harness/guardrails.py HARNESS_OWNED (`.claude/settings.json` only)",
+    "statement": "Claude Code writes `.claude/settings.local.json`; it is not harness-owned and blocks the session as an out-of-scope write",
+    "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS38ClientLocalSettingsAreClientOwned::test_settings_local_json_is_not_a_story_change",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-40",
+    "family": "FAM-OWNERSHIP",
+    "fix_family": "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE",
+    "severity": "P3",
+    "invariants": [
+     "INV-J.1"
+    ],
+    "site": "aisef/cli/implement.py:371-379 (`aisef verify` without --write-scope in CI)",
+    "statement": "the generated CI step runs verify with no scope on a clean checkout: exits 0 forever",
+    "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS40VerifyWithoutScopeIsNotAPass::test_bare_verify_as_generated_for_ci_does_not_exit_ok",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-41",
+    "family": "FAM-OWNERSHIP",
+    "fix_family": "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE",
+    "severity": "P3",
+    "invariants": [
+     "INV-I.1"
+    ],
+    "site": "aisef/control/worktree.py::commit_paths (`git add -A -- <granted dirs>`)",
+    "statement": "anything under a granted directory (tests/) becomes the candidate — operator fixtures, verifier snapshots — unless named by is_tool_artifact",
+    "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS41PreexistingInScopeFileIsNotSweptIntoTheCandidate::test_an_untracked_operator_fixture_under_scope_is_not_committed_as_the_developers_work",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-42",
+    "family": "FAM-OWNERSHIP",
+    "fix_family": "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE",
+    "severity": "P2",
+    "invariants": [
+     "INV-J.1"
+    ],
+    "site": "aisef/phases/deploy.py:487-494 (devsecops session without scope env)",
+    "statement": "the devsecops session runs with no AISEF_WRITE_SCOPE; with compiled hooks the guard falls back to the planning scope and blocks writing Dockerfile at the root",
+    "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS42DevsecopsSessionCarriesAWriteScope::test_the_guard_env_handed_to_the_devsecops_client_allows_writing_the_dockerfile",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-43",
+    "family": "FAM-OWNERSHIP",
+    "fix_family": "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE",
+    "severity": "P2",
+    "invariants": [
+     "INV-P.1",
+     "INV-A.3"
+    ],
+    "site": "aisef/phases/deploy.py:316-324 vs :293 (pre-deploy mixes committed tree and working tree)",
+    "statement": "the suite runs on a clean worktree of HEAD while Dockerfile/CI/runbook are checked on the working tree; the signed report can bind uncommitted content",
+    "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS43PreDeployGradesOneTree::test_an_uncommitted_dockerfile_is_not_a_pass_bound_to_head",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "SS-53",
+    "family": "FAM-SCHEDULER",
+    "fix_family": "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE",
+    "severity": "P2",
+    "invariants": [
+     "INV-O.1",
+     "INV-J.1"
+    ],
+    "site": "aisef/phases/run.py:713-736 vs normalize.py::effective_write_scope",
+    "statement": "the scheduler partitions on declared scope + bootstrap grants; manifests, lockfiles and verification directories the guard grants to every story are invisible to scopes_conflict",
+    "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS53SchedulerReadsTheEffectiveScope::test_stories_sharing_a_granted_path_do_not_share_a_wave",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)"
+   },
+   {
+    "id": "D-011",
+    "family": "FAM-OWNERSHIP",
+    "fix_family": "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE",
+    "severity": "P2",
+    "invariants": [],
+    "site": "",
+    "statement": "a bench run writes artifacts into the framework repository root, outside its session workspaces",
+    "reproducer": "",
+    "provenance": "DEFECT-REGISTER (open before the program)",
+    "status": "FIXED",
+    "disposition_required": "FIXED / NOT_A_DEFECT with proof / SUPERSEDED",
+    "fixed_by": "F4 workspace ownership / merge / scope (branch hardening/systematic-v1, 2026-09-16)",
+    "disposition": "FIXED BY CONSTRUCTION: the leak's trigger (a real agent's `aisef …` call whose --project fell back to `.` inside the framework repository) is not reproducible without a paid session, as the register says; what is deterministic is that an IMPLICIT project must be an AISEF project — `_artifact_root` refuses to create `_bmad-output/` in a directory carrying no project marker when no --project was given (`aisef/cli/_common.py`, `parser.main` records `project_defaulted`). The framework root carries no marker, so the recorded call would have been refused. Test: tests/hardening/test_ownership.py::TestNoArtifactsOutsideAProject; the detector `ro_ri_ngoai_workspace` stays."
+   }
+  ],
+  "F6-BENCH-RELEASE-APPROVAL": [
+   {
+    "id": "SS-06",
+    "family": "FAM-RELEASE",
+    "fix_family": "F6-BENCH-RELEASE-APPROVAL",
+    "severity": "P2",
+    "invariants": [
+     "INV-R.2"
+    ],
+    "site": "aisef/control/closure.py:802 (`rev-parse --verify` in G4.5)",
+    "statement": "object existence stands in for ancestry: a candidate frozen on an unmerged story branch resolves in the shared object store and passes 'in the corpus history'",
+    "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry::test_a_candidate_on_an_unmerged_branch_is_not_in_the_corpus_history",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F6 bench / release / approval (branch hardening/systematic-v1, 2026-09-17)"
+   },
+   {
+    "id": "SS-07",
+    "family": "FAM-RELEASE",
+    "fix_family": "F6-BENCH-RELEASE-APPROVAL",
+    "severity": "P2",
+    "invariants": [
+     "INV-R.2",
+     "INV-F.3"
+    ],
+    "site": "aisef/control/closure.py:758-760 (G4.4)",
+    "statement": "any TOOL_RUN review/security record of any outcome (including unrunnable and D-032 execution-failure shapes) satisfies 'review and security recorded'",
+    "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict::test_an_unrunnable_review_record_does_not_count_as_review_recorded",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F6 bench / release / approval (branch hardening/systematic-v1, 2026-09-17)"
+   },
+   {
+    "id": "SS-54",
+    "family": "FAM-APPROVAL",
+    "fix_family": "F6-BENCH-RELEASE-APPROVAL",
+    "severity": "P3",
+    "invariants": [
+     "INV-P.1"
+    ],
+    "site": "aisef/control/approvals.py:151-170 (repair stories excluded from the stories/readiness digest)",
+    "statement": "repair stories execute under an approval whose digest excludes them; the improve gate compensates unless --auto",
+    "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS54RepairStoriesAreCoveredByAnApproval::test_under_auto_a_new_repair_story_is_covered_by_a_gate_digest",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F6 bench / release / approval (branch hardening/systematic-v1, 2026-09-17)"
+   },
+   {
+    "id": "SS-55",
+    "family": "FAM-APPROVAL",
+    "fix_family": "F6-BENCH-RELEASE-APPROVAL",
+    "severity": "P2",
+    "invariants": [
+     "INV-P.1"
+    ],
+    "site": "aisef/control/approvals.py:79-96 (no gate digest covers .ai/config.json)",
+    "statement": "verify.*, coverage.min, security.block_severities reinterpret the approved plan and are not bound by any approval",
+    "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS55GateConfigIsBoundByReadiness::test_weakening_coverage_min_after_readiness_approval_makes_it_stale",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F6 bench / release / approval (branch hardening/systematic-v1, 2026-09-17)"
+   },
+   {
+    "id": "SS-56",
+    "family": "FAM-APPROVAL",
+    "fix_family": "F6-BENCH-RELEASE-APPROVAL",
+    "severity": "P3",
+    "invariants": [
+     "INV-P.1"
+    ],
+    "site": "aisef/control/approvals.py:279-287 (_upstream_decided_after)",
+    "statement": "downstream gates report APPROVED after an upstream content edit until a new upstream decision; entry points use blocking(), programmatic callers do not",
+    "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream::test_editing_the_prd_makes_the_approved_architecture_stale",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F6 bench / release / approval (branch hardening/systematic-v1, 2026-09-17)"
+   },
+   {
+    "id": "D-003",
+    "family": "FAM-BENCH",
+    "fix_family": "F6-BENCH-RELEASE-APPROVAL",
+    "severity": "P2",
+    "invariants": [],
+    "site": "",
+    "statement": "`_analyze.cut_sessions` merges two bench cohorts on the three tasks they share",
+    "reproducer": "",
+    "provenance": "DEFECT-REGISTER (open before the program)",
+    "status": "FIXED",
+    "disposition_required": "FIXED / NOT_A_DEFECT with proof / SUPERSEDED",
+    "fixed_by": "F6 bench / release / approval (branch hardening/systematic-v1, 2026-09-17)",
+    "disposition": "FIXED: `tests/bench/_analyze.session_rows` defaults `bench_dir` to the cohort the report collects from (`R.KEEP_DIR`), so `cut_sessions()` at the report's own call site never merges another cohort's sessions into this cohort's (condition, task, attempt) rows; naming a cohort still counts it. Reproducer (RED before, GREEN after): tests/bench/test_bench.py::TestLenhAnalyzeCoThat::test_mot_con_so_bench_thuoc_ve_dung_mot_cohort."
+   }
+  ],
+  "F5-PROCESS-TOOL-ENVIRONMENT": [
+   {
+    "id": "SS-34",
+    "family": "FAM-TOOL",
+    "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+    "severity": "P1",
+    "invariants": [
+     "INV-N.1",
+     "INV-F.3"
+    ],
+    "site": "aisef/phases/qa.py:744-752 (qa:<kind> record lacks `unrunnable`)",
+    "statement": "run_suite computes result.unrunnable and drops it before recording; the story gate scores an unrunnable qa kind (missing playwright) as FAILED deterministic",
+    "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS34UnrunnableQaKindIsNotAFailedCheck::test_a_missing_runner_scores_the_qa_kind_unrunnable_not_failed",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
+   },
+   {
+    "id": "SS-45",
+    "family": "FAM-TOOL",
+    "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+    "severity": "P2",
+    "invariants": [
+     "INV-N.1"
+    ],
+    "site": "aisef/harness/verify_image.py:165-178 (doctor probes configured commands only)",
+    "statement": "auto-detected defaults (bandit, gosec, cargo audit, npm test) are never probed; doctor prints ready while `aisef tool sast` is unrunnable forever",
+    "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS45AutoDetectedToolsAreProbed::test_the_default_sast_command_of_a_python_project_is_probed",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
+   },
+   {
+    "id": "SS-46",
+    "family": "FAM-TOOL",
+    "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+    "severity": "P2",
+    "invariants": [
+     "INV-N.1"
+    ],
+    "site": "aisef/phases/run.py:921-935 (_missing_tools returns [] without sandbox.image)",
+    "statement": "the pre-flight tool probe is disabled for every project that did not run `aisef init --stack`; image_for still picks a stack image",
+    "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS46PreflightProbeRunsWithoutADeclaredImage::test_a_stack_image_is_probed_even_when_not_declared",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
+   },
+   {
+    "id": "SS-47",
+    "family": "FAM-TOOL",
+    "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+    "severity": "P3",
+    "invariants": [
+     "INV-N.1"
+    ],
+    "site": "aisef/harness/verify_image.py:244-246 (`probe is None → ok=True`)",
+    "statement": "a project-local runner that cannot be judged in the image is reported present",
+    "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS47UnjudgeableProbeIsNotPresent::test_a_tool_the_probe_cannot_build_is_not_reported_present",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
+   },
+   {
+    "id": "SS-48",
+    "family": "FAM-TOOL",
+    "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+    "severity": "P2",
+    "invariants": [
+     "INV-N.1"
+    ],
+    "site": "aisef/control/preflight.py:618-650 (`provisioned` = non-empty config string)",
+    "statement": "a non-empty tools.test string provisions verify.unit; a paid session starts on a command the sandbox cannot run",
+    "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS48ProvisionedMeansRunnable::test_a_test_command_the_probe_reports_missing_does_not_provision_verify_unit",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
+   },
+   {
+    "id": "SS-49",
+    "family": "FAM-PROCESS",
+    "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+    "severity": "P2",
+    "invariants": [
+     "INV-M.1"
+    ],
+    "site": "aisef/control/journal.py:298-311 (reconcile_story resets stale RUNNING without liveness)",
+    "statement": "reconciliation resets RUNNING claims to pending without asking claim_is_orphaned; on one host run.lock prevents a second run, so this is reachable only cross-host or via a symlinked path",
+    "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS49ReconcileDoesNotResetALiveClaim::test_a_running_claim_whose_owner_is_alive_is_left_alone",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
+   },
+   {
+    "id": "SS-50",
+    "family": "FAM-PROCESS",
+    "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+    "severity": "P2",
+    "invariants": [
+     "INV-M.1"
+    ],
+    "site": "aisef/control/state.py::claim (no lease term, never re-validated)",
+    "statement": "a claim has no expiry or heartbeat and transition() writes regardless of who holds it",
+    "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS50TransitionIsBoundToTheClaimHolder::test_a_non_owner_cannot_move_a_claimed_story",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
+   },
+   {
+    "id": "SS-51",
+    "family": "FAM-PROCESS",
+    "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+    "severity": "P2",
+    "invariants": [
+     "INV-M.1"
+    ],
+    "site": "aisef/harness/server_identity.py:183 (port lease keyed by run_id) + mockup_verify.py:99-107",
+    "statement": "two stories contending for one base_url lock two different files and both win; the identity check passes on 404",
+    "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS51OneBaseUrlOneLease::test_a_second_run_contending_for_the_same_base_url_is_refused",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
+   },
+   {
+    "id": "SS-52",
+    "family": "FAM-PROCESS",
+    "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+    "severity": "P2",
+    "invariants": [
+     "INV-M.1"
+    ],
+    "site": "aisef/control/budget.py:183-204 (reservations without owner/TTL)",
+    "statement": "a SIGKILLed run leaves reservations that count against the cap forever; doctor cannot explain it",
+    "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS52ReservationsOfADeadRunDoNotCountForever::test_a_killed_runs_reservation_does_not_block_the_next_run",
+    "provenance": "Phase 8A",
+    "status": "FIXED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)"
+   },
+   {
+    "id": "D-024",
+    "family": "FAM-PROCESS",
+    "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+    "severity": "P2",
+    "invariants": [],
+    "site": "",
+    "statement": "bench-qualification test helper: TemporaryDirectory cleanup races a writer inside a session's .git (twice: 3.13, 3.14)",
+    "reproducer": "",
+    "provenance": "DEFECT-REGISTER (open before the program)",
+    "status": "FIXED",
+    "disposition_required": "FIXED / NOT_A_DEFECT with proof / SUPERSEDED",
+    "fixed_by": "F5 process / tool / environment (branch hardening/systematic-v1, 2026-09-17)",
+    "disposition": "FIXED: the attempt owns its process tree (harness/process_owner.py): every session's process group is reaped on EVERY exit of the stream (POSIX group; Windows job object), every child an in-process client leaves is reaped and VERIFIED before the session is scored (_owned_run), and a survivor is typed ENVIRONMENT_FAILURE with the workspace kept — so a grandchild left by a cut session no longer races the workspace removal. Evidence: tests/hardening/test_process_owner.py, CF-11 green, three consecutive full runs of test_bench_qualification without the race."
+   }
+  ]
+ },
+ "additions_after_freeze": [
+  {
+   "id": "SS-61",
+   "family": "FAM-RECOVERY",
+   "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+   "severity": "P1",
+   "invariants": [
+    "INV-E.1",
+    "INV-H.2",
+    "INV-K.2"
+   ],
+   "statement": "the gate PASSED and gate:verdict was written, the process died before verification.completed; the rerun reconciles the transaction to pending, the developer's identical write is a no-op 'returning the verdict it already returned' (a PASS!), and the story ends FAILED 'sessions kept producing nothing to grade' — a fully verified candidate needs manual intervention",
+   "reproducer": "tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate::test_the_rerun_converges_to_done_with_exactly_one_integration",
+   "provenance": "Phase 14 compound fault CF-05, commit after 259e587 (branch hardening/systematic-v1), 2026-09-16",
+   "status": "FIXED",
+   "belongs_to_frozen_family": true,
+   "fixed_by": "F1 identity/provenance/freshness (branch hardening/systematic-v1, 2026-09-16)",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "recovery defect in the kernel (fixed by F1 in aisef/); its site field was left empty when registered"
+  },
+  {
+   "id": "AD-01",
+   "family": "FAM-OUTCOME",
+   "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+   "severity": "P2",
+   "invariants": [
+    "INV-F.1",
+    "INV-F.4"
+   ],
+   "site": "aisef/clients/opencode.py::OpenCodeAdapter.run (empty stream + exit 0)",
+   "statement": "an OpenCode child that exits 0 having emitted zero events returns ok=True — a result with nothing in it; Claude's adapter returns infra 'stream ended without a result event'",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC03EmptyResponse::test_opencode",
+   "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
+   "status": "FIXED",
+   "belongs_to_frozen_family": true,
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/clients/opencode.py"
+  },
+  {
+   "id": "AD-03",
+   "family": "FAM-OUTCOME",
+   "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+   "severity": "P2",
+   "invariants": [
+    "INV-F.4",
+    "INV-G.4"
+   ],
+   "site": "aisef/clients/opencode.py::OpenCodeAdapter.run (child death / truncated stream)",
+   "statement": "an OpenCode child dying mid-line or with exit 3 and a stderr heap-limit message is classified `error` (quality, charged to the developer) while Claude's adapter classifies the same death `infra`",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC11PartialStream::test_opencode",
+   "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
+   "status": "FIXED",
+   "belongs_to_frozen_family": true,
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/clients/opencode.py"
+  },
+  {
+   "id": "AD-04",
+   "family": "FAM-OUTCOME",
+   "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+   "severity": "P3",
+   "invariants": [
+    "INV-F.4"
+   ],
+   "site": "aisef/clients/claude_code.py::ClaudeCodeAdapter.run (no result event)",
+   "statement": "when the Claude child dies without a result event the exit code and stderr are dropped (raw_result={}) — the operator cannot tell a heap crash from a cut",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC12ProcessDeath::test_claude",
+   "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
+   "status": "FIXED",
+   "belongs_to_frozen_family": true,
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/clients/claude_code.py"
+  },
+  {
+   "id": "AD-05",
+   "family": "FAM-OUTCOME",
+   "fix_family": "F2-TYPED-OUTCOMES-STAGE-LOCAL-RETRY",
+   "severity": "P1",
+   "invariants": [
+    "INV-F.4",
+    "INV-L.1"
+   ],
+   "site": "aisef/clients/claude_code.py::ClaudeCodeAdapter.run (result event after the timeout kill)",
+   "statement": "a result event that arrives after the adapter decided timeout flips ok=True while error still says 'exceeded 1s' — a cut session is reported as a successful one",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC13LateOutputAfterTimeout::test_claude",
+   "provenance": "Phase 15 adapter conformance (recorded streams), branch hardening/systematic-v1, 2026-09-16",
+   "status": "FIXED",
+   "belongs_to_frozen_family": true,
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16)",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/clients/claude_code.py"
+  },
+  {
+   "id": "SS-62",
+   "family": "FAM-RECOVERY",
+   "fix_family": "F1-IDENTITY-PROVENANCE-FRESHNESS",
+   "severity": "P2",
+   "invariants": [
+    "INV-A.1",
+    "INV-K.2"
+   ],
+   "site": "aisef/phases/implement.py::_with_schema (candidate moved on the schema retry)",
+   "statement": "a reviewer commit made during the SCHEMA-RETRY session was recorded (review:candidate) but not restored — F1 (SS-A10) restored a commit made in the first review session only; HEAD stayed off the frozen candidate, the gate failed on stale identity and a second developer session opened over a candidate that no longer existed",
+   "reproducer": "tests/hardening/test_differential.py::TestSeed232ReviewerCommitOnTheSchemaRetry",
+   "provenance": "found during F2 implementation by the 400-trace differential (seed 232, unexplained after KNOWN was emptied), 2026-09-16; reproducer RED at c384383 (F1 closure commit, run in a throwaway worktree), GREEN after the fix in this commit",
+   "status": "FIXED",
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `_with_schema` restores the candidate exactly as the first session does",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/phases/implement.py"
+  },
+  {
+   "id": "SS-63",
+   "family": "FAM-JUDGE",
+   "fix_family": "F3-STRUCTURED-JUDGMENT-AUTHORITY",
+   "severity": "P2",
+   "invariants": [
+    "INV-Q.1"
+   ],
+   "site": "aisef/phases/implement.py::deadlock_reason (attempts[-1], attempts[-2])",
+   "statement": "the plan-conflict detector compared ADJACENT attempt records; when the reviewer's session on the second candidate had to be re-run (tree mutation → D-032 review-stage retry), the developer attempt in between carried no verdict and two identical out-of-scope blocks were never paired — the plan conflict was reported as `did not pass gate` and the developer budget burned",
+   "reproducer": "tests/hardening/test_differential.py::TestSeed2624PlanConflictSurvivesAVerifierRerun",
+   "provenance": "found during F2 implementation by the 2000-trace differential (seed 2624, unexplained with KNOWN empty), 2026-09-16; reproducer RED at c384383 (throwaway worktree), GREEN after `deadlock_reason` pairs graded positions (attempts whose reviewer produced a verdict)",
+   "status": "FIXED",
+   "fixed_by": "F2 typed outcomes / stage-local retry (branch hardening/systematic-v1, 2026-09-16) — `deadlock_reason` skips attempts whose review was UNRUNNABLE",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/phases/implement.py"
+  },
+  {
+   "id": "SS-65",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P1",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY",
+    "INV-N.1"
+   ],
+   "site": "aisef/harness/verify_image.py::RECIPES['python'] (packages) and aisef/harness/tools.py::STACK_IMAGES (go)",
+   "statement": "the harness declares a sast tool it then refuses to run: `command_for` auto-detects `bandit -q -r .` for any project with a pyproject.toml/setup.py (SS-45 made auto-detected commands part of `declared_tools`), but the python preset image the harness BUILDS ITSELF installs only pytest, pytest-cov and ruff — so `_missing_tools` reports `tools.sast … MISSING in aisef-verify-python:b2c7afff2aed: exit 127` and `aisef run` stops at `sprint ERROR` before any session. There is no configuration escape: an empty `tools.sast` means auto-detect, so the command cannot be withdrawn. Sibling: go.mod projects get `gosec ./...` against `golang:1.23-alpine`, which does not carry gosec (measured, exit 127). Rust and Ruby pass (their chosen images do carry `cargo audit` / `bundle`), Node is UNJUDGED by design (project-local runner, SS-47).",
+   "status": "FIXED",
+   "provenance": "found 2026-09-17 14:00 by W1 run 1 on the frozen candidate abad2a6: driver phases prepare/kernel-first/approve passed and `aisef run --client opencode` stopped after 5 s at the tools preflight, $0, no model call (closure-evidence/hardening/w1/run-1-aborted-sast-preflight/). Not reachable by the Phase 12 differential: the synthetic adapter never executes a real tool probe.",
+   "measured": {
+    "python_default_config": "image aisef-verify-python:b2c7afff2aed (the harness's own preset) — tools.sast `bandit -q -r .` exit 127",
+    "go_default_config": "image golang:1.23-alpine — tools.sast `gosec ./...` exit 127",
+    "rust_default_config": "image rust:1-alpine — all three present",
+    "ruby_default_config": "image ruby:3-alpine — all three present",
+    "node_default_config": "image node:22-alpine — `npm audit --omit=dev` UNJUDGED (project-local runner), never a stop",
+    "workaround_none": "tools.sast='' means auto-detect (aisef/harness/tools.py::command_for); no key withdraws a tool",
+    "affects_declared_and_undeclared_images": "measured with sandbox.image declared and removed: the same stop"
+   },
+   "regression_of": "b7733db (2026-09-15, D-028) states the rule 'the environment a preset declares contains every tool the preset declares' and built the python recipe for test and lint; the sast default was added to the probe set by SS-45 afterwards and the recipe was never extended, so the framework's own rule is violated by its own image.",
+   "why_no_test_caught_it": "tests/test_dogfood_ledgerlock.py proves the PREFLIGHT reports a missing tool (with a mocked sandbox and a fictional image `some/ci-image:1`); no test asserts the real invariant — that every tool `declared_tools` resolves for a stack is present in the image `image_for` picks for that stack. That test is part of the fix.",
+   "proposed_fix": "PROPOSAL, NOT IMPLEMENTED (a change under aisef/ voids PHASE12_KERNEL_DIGEST, the W0 record and the freeze; owner rule 3): add `bandit==1.9.4` to RECIPES['python'].packages — the recipe digest and image name become aisef-verify-python:<new>, so the reference project's pinned `sandbox.image` must be re-pinned too; for go, either build a managed go recipe carrying gosec or stop auto-detecting a tool the chosen image cannot run. Plus the missing invariant test. Measured viable: the base image with bandit 1.9.4 builds and all four tools run in it.",
+   "reproducer": "tests/hardening/test_ss65_reproducers.py::TestSS65PythonDefaultSastIsInThePythonImage",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — one registry drives selection, recipes, presets and probes; python image carries bandit==1.9.4, go image carries gosec v2.29.0; real-image qualification closure-evidence/hardening/tool-capability-matrix.json",
+   "siblings": [
+    "SS-67",
+    "SS-68",
+    "SS-69",
+    "SS-70",
+    "SS-71",
+    "SS-72",
+    "SS-73",
+    "SS-74",
+    "SS-75",
+    "SS-76"
+   ],
+   "reproducer_go": "tests/hardening/test_ss65_reproducers.py::TestSS65GoDefaultSastIsInTheGoImage",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/verify_image.py"
+  },
+  {
+   "id": "SS-66",
+   "family": "FAM-RELEASE",
+   "fix_family": "F6-BENCH-RELEASE-APPROVAL",
+   "severity": "P1",
+   "invariants": [
+    "INV-T.QUALIFICATION-REGISTER"
+   ],
+   "site": "validation/w0_qualification.py::criteria",
+   "statement": "the W0 builder read only `defects_by_fix_family`; every defect registered after the freeze was invisible to '0 P0/P1 open' — it printed QUALIFIED with SS-65 (P1) OPEN",
+   "reproducer": "tests/hardening/test_w0_gate.py::TestAPostFreezeP1RefusesQualification",
+   "provenance": "found 2026-09-17 while registering SS-65 (negative control run against abad2a6)",
+   "fixed_by": "e02c5a4 (post-freeze additions scanned) + this commit (scan cross-checked against the declared counts; permanent negative control)",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: validation/w0_qualification.py"
+  },
+  {
+   "id": "SS-67",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P1",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY",
+    "INV-N.1"
+   ],
+   "site": "aisef/harness/tools.py::STACK_IMAGES (rust:1-alpine) + aisef/harness/verify_image.py::probe_command",
+   "statement": "Rust's default lint (`cargo clippy`) and security scan (`cargo audit`) are absent from rust:1-alpine (no clippy component, no cargo-audit), and the first-word probe `command -v cargo` reported both present, so the preflight passed and every run failed after the session was paid",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestRegistryIsTheOnlySource",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — managed rust recipe (clippy, cargo-audit 0.22.2, pinned advisory-db) and capability probes per tool",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
+  },
+  {
+   "id": "SS-68",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P1",
+   "invariants": [
+    "INV-N.1"
+   ],
+   "site": "aisef/harness/tools.py::unrunnable_reason",
+   "statement": "a missing cargo subcommand (`no such command`), a tool refused network by the sandbox (`EAI_AGAIN`) and an unwritable Go build cache were scored as real results — TEST_FAILED / TOOL_FAILED, a behavioural RED for a missing capability",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestEnvironmentFailuresAreNeverBehaviouralRed",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — MISSING_TOOL += `no such command`; NO_NETWORK / NO_WRITABLE_CACHE typed ENVIRONMENT_FAILURE",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
+  },
+  {
+   "id": "SS-69",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P2",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY"
+   ],
+   "site": "aisef/harness/tools.py::_from_package_json (sast: npm audit --omit=dev)",
+   "statement": "Node's default security command `npm audit` is a dependency audit that needs the npm registry, and the security sandbox has no network: on any project with dependencies it can never run (measured: EAI_AGAIN)",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestPythonAndGoKeepTheirSecurityDefault",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — Node profile declares sast NONE with the reason; documented in docs/TOOL-CAPABILITIES.md",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
+  },
+  {
+   "id": "SS-70",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P2",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY"
+   ],
+   "site": "aisef/cli/harness.py::STACK_PRESETS['go']",
+   "statement": "`init --stack go` declared `golangci-lint run`, which golang:1.23-alpine never carried: the preflight refused every such project (typed, before spend) and the preset disagreed with the auto-detected `go vet`",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestRegistryIsTheOnlySource",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — presets take image and lint from the profile",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/cli/harness.py"
+  },
+  {
+   "id": "SS-71",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P1",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY",
+    "INV-N.1"
+   ],
+   "site": "aisef/harness/tools.py::STACK_IMAGES (golang:1.23-alpine) under the sandbox user 1000:1000",
+   "statement": "every Go command failed for the sandbox's non-root user without a home (`failed to initialize build cache at /.cache/go-build: permission denied`, measured on golang:1.23-alpine and on the first managed go image), and the kernel scored `go test` TEST_FAILED",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestEnvironmentFailuresAreNeverBehaviouralRed",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL'); confirmed pre-existing on the frozen candidate's image",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — managed go recipe sets GOCACHE=/tmp/go-build, probed",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
+  },
+  {
+   "id": "SS-72",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P2",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY"
+   ],
+   "site": "aisef/harness/tools.py::_STACK_COMMANDS (Gemfile)",
+   "statement": "Ruby's defaults `bundle exec rspec/rubocop/brakeman` run the project's own gems, absent from ruby:3-alpine and not installable offline; the first-word probe reported `bundle` present",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestRegistryIsTheOnlySource",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — Ruby profile selects nothing (NONE with reason)",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
+  },
+  {
+   "id": "SS-73",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P2",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY"
+   ],
+   "site": "aisef/harness/tools.py::_STACK_COMMANDS (composer.json)",
+   "statement": "PHP's defaults `composer test/lint` need composer, absent from php:8-cli-alpine: the preflight refused every PHP project (typed, before spend)",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestRegistryIsTheOnlySource",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — PHP profile selects nothing (NONE with reason)",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
+  },
+  {
+   "id": "SS-74",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P2",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY"
+   ],
+   "site": "aisef/harness/tools.py::_STACK_COMMANDS (pubspec.yaml) + image_for fallback",
+   "statement": "Flutter's defaults `flutter test/analyze` were selected while the project ran in alpine:latest, which has no flutter, and the run preflight does not probe the fallback image",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestRegistryIsTheOnlySource",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — Flutter profile selects nothing (NONE with reason)",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
+  },
+  {
+   "id": "SS-75",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P2",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY"
+   ],
+   "site": "aisef/phases/qa.py::_tool_present / _DEFAULTS",
+   "statement": "qa kind defaults (mutmut, syft, trivy) were selected when present on the HOST and then run in the sandbox image; the security kind also carried its own `bandit` default beside the tool registry",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestNegativeControls",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — presence judged where the kind runs; the security kind reads the registry only",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/phases/qa.py"
+  },
+  {
+   "id": "SS-76",
+   "family": "FAM-TOOL",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P3",
+   "invariants": [
+    "INV-N.DEFAULT-CAPABILITY"
+   ],
+   "site": "aisef/harness/tools.py::command_for (empty tools.* = auto-detect)",
+   "statement": "an empty `tools.<role>` meant auto-detect and there was no other way to switch a role off, so an optional tool could not be disabled with a typed record",
+   "reproducer": "tests/hardening/test_tool_capability.py::TestNegativeControls",
+   "provenance": "found by the SS-65 capability sweep on real images, 2026-09-17 (owner decision 'FIX SS-65 AT CAPABILITY-MODEL LEVEL')",
+   "fixed_by": "SS-65 capability-model family fix (aisef/harness/capabilities.py and its consumers), 2026-09-17 — `tools.disabled` (typed; required roles refused; contradiction refused); empty = AUTO only",
+   "status": "FIXED",
+   "severity_rule": "severity rule: P1 when a stack on the qualification ladder (docs/SCALE-QUALIFICATION.md: Python, Node/TypeScript, Go, Rust) is blocked or misclassified under default configuration, or a qualification gate passes falsely; P2 for a stack off the ladder or a typed stop before any spend; P3 for configuration semantics",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/harness/tools.py"
+  },
+  {
+   "id": "SS-77",
+   "family": "FAM-QUALIFICATION-MEASUREMENT",
+   "fix_family": "F6-QUALIFICATION-INFRASTRUCTURE",
+   "severity": "P1",
+   "invariants": [
+    "INV-T.QUALIFICATION-REGISTER"
+   ],
+   "site": "closure-evidence/hardening/w1/w1_driver.py::finish (the W1 false-pass exit criterion)",
+   "statement": "the W1 false-pass detector derived its set of DONE stories by parsing `aisef status`, which prints only the stories that are NOT passing; on any partial run that set was empty, so the rule `owners and all(o in done for o in owners)` could never fire and `false_pass = 0` was reported for a reason unrelated to whether a false pass had occurred. A red oracle test that no story covers was also dropped by the same `owners and …` shortcut.",
+   "reproducer": "closure-evidence/hardening/w1/run-1/SS-77-REPRODUCER.json — on run 1's own evidence the old derivation yields 0 done stories while the framework's state store holds 11",
+   "provenance": "found by reading the W1 run 1 result instead of accepting it, 2026-09-18; no W1 verdict had yet been claimed on it",
+   "fixed_by": "w1_driver.py reads the framework's structured state (_bmad-output/sprint-status.json); an empty state store now makes every red a false pass and fails the phase (`F['ok']`); unattributed red tests are reported as `unattributed_oracle_failures`, never swallowed",
+   "status": "FIXED",
+   "severity_rule": "P1: a qualification gate that cannot fail is a gate that passes falsely (docs/SCALE-QUALIFICATION.md W1 exit criteria)",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: closure-evidence/hardening/w1/w1_driver.py"
+  },
+  {
+   "id": "SS-78",
+   "family": "FAM-QUALIFICATION-MEASUREMENT",
+   "fix_family": "F6-QUALIFICATION-INFRASTRUCTURE",
+   "severity": "P2",
+   "invariants": [
+    "INV-T.QUALIFICATION-REGISTER"
+   ],
+   "site": "closure-evidence/hardening/w1/w1_driver.py::processes / survivors_after_kill (the W1 orphan-state exit criterion)",
+   "statement": "after SIGTERM to one process group the driver called every process whose command merely contains 'opencode' a survivor, so the operator's own OpenCode desktop app (11-17 days of etime, started long before the run) was recorded as orphan state — the criterion reported a problem that had not happened and would have buried a real orphan in the noise",
+   "reproducer": "run 1's own preserved listings: 13 'survivors' after each kill, 0 of them in the killed process group (closure-evidence/hardening/w1/run-1/driver.json, resumes[].kill)",
+   "provenance": "found while reading the W1 run 1 exit criteria, 2026-09-18, in the same pass as SS-77",
+   "fixed_by": "a survivor is a process still in the killed pgid; the broader listing is kept as `processes_after` (nothing measured is discarded). Run 1 recomputed from its preserved evidence: orphan_state 0",
+   "status": "FIXED",
+   "severity_rule": "P2: a false RED in a stop criterion — it cannot produce a false qualification, but it degrades a measurement the program relies on",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: closure-evidence/hardening/w1/w1_driver.py"
+  },
+  {
+   "id": "SS-79",
+   "family": "FAM-QUALIFICATION-MEASUREMENT",
+   "fix_family": "F6-QUALIFICATION-INFRASTRUCTURE",
+   "severity": "P1",
+   "invariants": [
+    "INV-T.QUALIFICATION-REGISTER"
+   ],
+   "site": "closure-evidence/hardening/w1/w1_driver.py::finish (hidden-oracle result parsing) and classify_oracle (SKIPPED handling)",
+   "statement": "the oracle's per-test outcomes were read from pytest's `-rA` short summary, where a skip line carries no test id ('SKIPPED [1] file.py:72: reason'): W1 run 2's nine skipped checks collapsed into ONE entry named '[1]' and eight outcomes were lost from the record. Compounding it, SKIPPED was treated like PASSED by the classifier, so on a DELIVERY_COMPLETE run an oracle that never executed would have read as an oracle that passed — the exact shape of a false qualification.",
+   "reproducer": "tests/hardening/test_w1_oracle_ownership.py::TestOracleResultParsing (nine verbose skip lines must yield nine named outcomes; a parse that loses outcomes is rejected) and ::TestSkippedIsNeverAPass",
+   "provenance": "found by reading W1 run 2's empty red_classes instead of accepting it, 2026-09-18; run 2 delivered nothing, so every oracle check skipped",
+   "fixed_by": "pytest runs with -v and parse_oracle() reconciles the recovered outcomes against pytest's own totals — a parse that does not account for every counted outcome fails the phase; SKIPPED/XFAIL are classified ORACLE_NOT_EXECUTED on a complete delivery (blocks qualification) and INCOMPLETE_DELIVERY_EXPECTED_SKIP otherwise; `oracle_passed_completely` requires a complete delivery with every check green",
+   "status": "FIXED",
+   "severity_rule": "P1: a check that did not execute reading as a check that passed is a qualification gate passing falsely",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: closure-evidence/hardening/w1/w1_driver.py"
+  },
+  {
+   "id": "SS-80",
+   "family": "FAM-QUALIFICATION-MEASUREMENT",
+   "fix_family": "F6-QUALIFICATION-INFRASTRUCTURE",
+   "severity": "P2",
+   "invariants": [
+    "INV-T.QUALIFICATION-REGISTER"
+   ],
+   "site": "closure-evidence/hardening/w1/w1_driver.py::run (forced-resume signal path)",
+   "statement": "the driver signalled the run's process group as soon as it read a wave marker, without checking whether the run had already ended. In W1 run 3 the sprint reached its own terminal state two seconds before the marker was read; os.killpg then raised PermissionError and killed the DRIVER, so a completed run lost its run-phase record (exit code, resumes) even though the run itself was unaffected.",
+   "reproducer": "W1 run 3, 2026-09-18 10:46:13 sprint DONE vs 10:46:15 SIGTERM — traceback in the run-3 task output; the repaired record carries `reconstructed_after_SS80` with what was measured and what is left null",
+   "provenance": "found when W1 run 3's driver exited with a traceback instead of a record, 2026-09-18",
+   "fixed_by": "the signal is conditional on the process still running (recorded as `process_alive_when_marker_seen`), and every killpg goes through _signal_group(), which records a refusal instead of propagating it. Run 3's record was repaired from the run's own log, with the unrecorded exit code left null rather than assumed.",
+   "status": "FIXED",
+   "severity_rule": "P2: the tooling failed loudly and lost a record; it never made an unqualified run look qualified",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: closure-evidence/hardening/w1/w1_driver.py"
+  },
+  {
+   "id": "SS-81",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P1",
+   "status": "FIXED",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/gate.py and the nop run in aisef/phases/implement.py",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/control/gate.py::_nop_check (the `unrunnable and not test_format` branch; 'red or absent' at level 2) + aisef/phases/implement.py::run_nop (pytest collection interruption)",
+   "statement": "the deterministic 'tests verify story' control — and TDD, which defers to it ('the nop control proves the same thing directly') — can PASS on tests that never executed at the parent SHA. (A) A nop run that failed because a third-party dependency is missing is recorded with `unrunnable` AND `test_format` (pytest printed its collection error); the gate's UNRUNNABLE branch requires `not test_format`, so it falls through and scores the absent tests as red: PASSED. The same record without test_format is UNRUNNABLE, as SS-26/INV-F.3 intend. (B) When one story test file fails to import at the parent (the legitimate red), pytest interrupts the whole session; the story's other test files never run, the kernel's parser reports no test ids, and 'red or absent' scores a tautological AC test (`assert True`) in another file as verified: PASSED.",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_A_unrunnable_nop_with_pytest_format.py (gate level, the suite's own fixtures; control case UNRUNNABLE, defect case PASSED) and repro_B_collection_interruption_masks_tests.py (real pytest 9.1.1 output at the parent run through the kernel's own parser and gate: PASSED with a tautology). Both deterministic, no model.",
+   "provenance": "found reading the gate record of PROFILE-W1-OC-GPT56SOL-T80 run 1 (STORY-01-01, seq 113 vs 129): the run log said the nop control was NOT performed while the gate scored it PASSED — 2026-09-18",
+   "impact_on_accepted_evidence": "measured: 14 stories across the 4 W1 run copies had 'tests verify story' PASS; 6 of the DONE ones rested on nothing having executed at the parent. Re-run at their real parent SHAs with --continue-on-collection-errors: 0 AC-coded tests green at the parent in all 6 (closure-evidence/hardening/w1/ss81/IMPACT-REMEASURE-accepted-runs.json). The defect did not produce a false pass in any accepted run; the W1 false-pass count stands. It weakens a guarantee, it did not break one here.",
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "not_fixed_because": "owner decision 'EXECUTION PROFILE NOT QUALIFIED' section 2: any product-tree change invalidates this program and requires owner approval",
+   "severity_rule": "P1: a deterministic qualification control passes without its evidence having executed (reachable; not observed as a false DONE)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::R01ThirdPartyMissingAtParent",
+    "tests/hardening/test_ss81_family.py::R02CollectionFailureDoesNotHideATautology",
+    "tests/hardening/test_ss81_family.py::R10PartialOutputCannotPass",
+    "tests/hardening/test_ss81_family.py::R11TestFormatDoesNotChangeTruth"
+   ],
+   "reproducer_green_after_fix": true
+  },
+  {
+   "id": "SS-82",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P3",
+   "status": "FIXED",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/phases/implement.py::_vang_ma_cua_story",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/phases/implement.py::_vang_ma_cua_story",
+   "statement": "the detector that recognises 'the missing module is the story's own code' matches a module name against changed file stems, but has no package rule: `No module named 'ledgerlock'` does not match `ledgerlock/__init__.py`. A greenfield story's legitimate red at the parent is logged as 'control NOT performed' while the gate (via SS-81's path) scores the same record as proof — two kernel records disagree about one piece of evidence.",
+   "reproducer": "W1 PROFILE-W1-OC-GPT56SOL-T80 run 1, STORY-01-01: changed files ledgerlock/__init__.py…, nop seq 113 says unrunnable (dependencies not installed), gate seq 129 says 'tests verify story -> passed'",
+   "provenance": "same reading as SS-81, 2026-09-18",
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "not_fixed_because": "owner approval required for any product-tree change",
+   "severity_rule": "P3: a misleading operator record; the verdict itself is decided elsewhere (SS-81)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::R07PackageRoot",
+    "tests/hardening/test_ss81_family.py::ReauditSubmoduleTheStoryAdds",
+    "tests/test_implement.py (nop summary through proof.bound)"
+   ],
+   "reproducer_green_after_fix": true,
+   "disposition": "FIXED in the family: a package root binds to its __init__.py; a missing symbol binds only to its module's own file the story changes or a submodule the story adds; the run-log summary calls the gate's own proof.bound, so the log cannot contradict the gate. Package matching alone binds nothing (owner section 6)."
+  },
+  {
+   "id": "SS-83",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P1",
+   "status": "FIXED",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/tdd.py",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/control/tdd.py::red_before_green (consumed by the TDD check in aisef/control/gate.py::evaluate)",
+   "statement": "TDD's 'red before green' accepts any non-ok test run as the red: a run that could not execute at all (unrunnable — tool/environment) and a run red only because an UNRELATED pre-existing test failed both make TDD PASS, although neither shows the story's tests failing without the story's code.",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py::S4_TddCountsUnrunnableAsRed (both cases PASSED on the frozen kernel)",
+   "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
+   "sibling_of": "SS-81",
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::SS83TddRed"
+   ],
+   "reproducer_green_after_fix": true
+  },
+  {
+   "id": "SS-84",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P2",
+   "status": "FIXED",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/gate.py",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/control/gate.py::_nop_check (the `acceptance <= 0` branch)",
+   "statement": "a story that declares no criteria passes 'tests verify story' whenever the parent run is red for ANY reason — environment, collection, unrelated failures. Plan-time machine gate blocks zero-criteria plans, which is why this is P2, not P1.",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py::S5_NoCriteriaAnyRedAtParent (PASSED)",
+   "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
+   "sibling_of": "SS-81",
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::SS84NoCriteria"
+   ],
+   "reproducer_green_after_fix": true
+  },
+  {
+   "id": "SS-85",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P2",
+   "status": "FIXED",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/gate.py",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/control/gate.py::_baseline_check (baseline unrunnable NO_SETUP branch; aborted collection)",
+   "statement": "'no baseline regression' passes vacuously when the baseline did not execute: a collection-aborted baseline yields no green ids, and a dependency-unrunnable baseline is read as 'no test was ever green there' — so an existing test the story deletes is never seen as lost.",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py::S6_BaselineAbortedCollection (PASSED)",
+   "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
+   "sibling_of": "SS-81",
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::SS85BaselineNotExecuted"
+   ],
+   "reproducer_green_after_fix": true
+  },
+  {
+   "id": "SS-86",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P1",
+   "status": "FIXED",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/gate.py",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/control/gate.py::_baseline_check (red = failed_ids only)",
+   "statement": "a test green at baseline and SKIPPED at the candidate is neither 'red' nor 'lost' to R9, so a story can silence an existing test with a skip marker and 'no baseline regression' passes.",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S8_S9_skipped_as_green.py::S8_BaselineSkippedAtCandidate (PASSED)",
+   "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
+   "sibling_of": "SS-81",
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::SS86BaselineSkipped"
+   ],
+   "reproducer_green_after_fix": true
+  },
+  {
+   "id": "SS-87",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P1",
+   "status": "FIXED",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/gate.py",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/control/gate.py::_preservation_check (red = failed_ids only)",
+   "statement": "a VERIFIED behaviour of another story whose test is SKIPPED at the candidate is reported 'still green' by preservation. Stories whose write scope includes tests/ can do this; the fake-test scan only looks for assertion-free tests, so no deterministic check catches it.",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S8_S9_skipped_as_green.py::S9_PreservationSkipped (PASSED: '1 behaviours of other stories still green')",
+   "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
+   "sibling_of": "SS-81",
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::SS87PreservationSkipped"
+   ],
+   "reproducer_green_after_fix": true
+  },
+  {
+   "id": "SS-88",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P2",
+   "status": "FIXED",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/ledger.py",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/control/ledger.py::_observe_tests (red = failed_ids only)",
+   "statement": "the behaviour ledger records an acceptance criterion whose only test was SKIPPED as VERIFIED, and rolls its requirement (FR) up to VERIFIED — a verification claim with no executed evidence. The ledger feeds preservation obligations and the repair queue, not the story gate directly (hence P2).",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py::S7_LedgerSkippedIsNotVerified (state printed: AC-S-01-1 verified, FR-1 verified)",
+   "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
+   "sibling_of": "SS-81",
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::SS88LedgerSkipped"
+   ],
+   "reproducer_green_after_fix": true
+  },
+  {
+   "id": "SS-89",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+   "severity": "P3",
+   "status": "FIXED",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/control/gate.py",
+   "invariants": [
+    "INV-TDD-NOP-PROOF",
+    "INV-T.EXECUTED-EVIDENCE"
+   ],
+   "site": "aisef/control/gate.py::_nop_check (`nop is None` branch)",
+   "statement": "when no nop record exists for the candidate, 'tests verify story' is NOT_APPLICABLE, which does not block, so the gate passes without the control having run. Latent: the kernel's own flow always records a nop.",
+   "reproducer": "closure-evidence/hardening/w1/ss81/repro_S10_no_nop_record.py (NOT_APPLICABLE, blocks=False)",
+   "provenance": "SS-81 family sibling sweep (owner decision 'FIX SS-81 FAMILY', section 7), 2026-09-18",
+   "sibling_of": "SS-81",
+   "fixed_by": "F7-EXECUTION-EVIDENCE-VALIDITY family fix, 2026-09-18 — one proof model (aisef/control/proof.py) read by the nop control, TDD, baseline regression, preservation and the behaviour ledger; per-test closed states; pytest control runs continue past collection errors (qualified on the real image: closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json); historical six-story re-audit 0 false PASS (closure-evidence/hardening/w1/ss81/HISTORICAL-REAUDIT-NEW-PROOF-MODEL.json)",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::SS89NoNopRecord"
+   ],
+   "reproducer_green_after_fix": true
+  },
+  {
+   "id": "SS-90",
+   "family": "FAM-EVIDENCE-SEMANTICS",
+   "fix_family": "F6-QUALIFICATION-INFRASTRUCTURE",
+   "severity": "P1",
+   "status": "FIXED",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: validation/w0_qualification.py, validation/mutate.py",
+   "invariants": [
+    "INV-T.QUALIFICATION-REGISTER"
+   ],
+   "site": "validation/w0_qualification.py::criteria (Phase 12 and mutation rows) + validation/mutate.py::main",
+   "statement": "the W0 builder read the Phase 12 summary and the mutation record without the kernel they measured: (a) the 100 000-trace row checked traces, mismatches, violations and manifest.pass but not that manifest.kernel_digests equals the candidate's aisef/ tree, so a dataset of another kernel satisfied it; (b) the mutation record carried no tree at all, and a partial --only run was indistinguishable from the full set; (c) survivors were read from mut['results'], a key mutate.py never writes, so no surviving mutant could ever refuse W0.",
+   "measured": "at 580be54 the old builder accepts a Phase 12 manifest of kernel 0000…, a mutation record of tree 0000… or of no tree, a record with a SURVIVED row, and a partial run (4 negative controls FAIL on the old builder, PASS on the fix). Historical exposure: the voided W0 at af94372 accepted the mutation record generated 2026-09-17T03:05 — before ec876ff changed aisef/ — without any binding; its Phase 12 row was bound in fact (manifest 02a34e0e == its tree).",
+   "provenance": "found 2026-09-18 while preparing the post-SS-81 W0: the owner requires a NEW Phase 12 for the new kernel, and reading the builder showed nothing would have refused the old one",
+   "reproducer": "tests/hardening/test_w0_gate.py::TestSS90EvidenceOfAnotherKernelRefuses",
+   "regression_tests": [
+    "tests/hardening/test_w0_gate.py::TestSS90EvidenceOfAnotherKernelRefuses"
+   ],
+   "fixed_by": "validation/w0_qualification.py: Phase 12 row requires manifest.kernel_digests == [candidate aisef tree]; mutation row requires the record's aisef_tree == candidate tree, no --only, the full target set, and reads survivors from `rows`; validation/mutate.py records aisef_tree (empty when aisef/ is dirty), aisef_dirty and only",
+   "note_on_stop_rule": "qualification infrastructure, not product kernel: the fix only adds refusals and cannot produce a PASS; continued under the precedent of SS-66/SS-77/SS-79 and reported at the checkpoint",
+   "owner_disposition": "OWNER DECISION — CONTINUE W1 PROFILE QUALIFICATION, KERNEL FROZEN (2026-09-19), section 3: accepted as a QUALIFICATION-INFRASTRUCTURE P1, not a product-kernel defect; fix accepted (strengthens refusal, no product-tree change, deterministic negative controls, W0 recomputed after it); both the flawed historical evidence (voided W0 AISEF-W0-QUALIFICATION.json, mutation record in git history) and the corrected result are preserved; no new Phase-12 run required for it"
+  },
+  {
+   "id": "SS-91",
+   "family": "FAM-PROCESS",
+   "fix_family": "F5-PROCESS-TOOL-ENVIRONMENT",
+   "severity": "P2",
+   "status": "FIXED",
+   "defect_class": "PRODUCT_KERNEL",
+   "defect_class_basis": "site in aisef/: aisef/memory.py",
+   "invariants": [],
+   "invariants_note": "no registry invariant covers the memory store; its containment rule is aisef/memory.py::safe_path's own",
+   "site": "aisef/memory.py::safe_path",
+   "statement": "on Windows, concurrent memory writers are intermittently refused with 'memory path escapes project': safe_path compares Path.resolve() of _bmad-output/memory/store.json with the resolved project root textually, and CPython's Windows realpath keeps the \\\\?\\ extended-length prefix when the file exists at its first lookup but not at its second — another writer atomically replacing the store between the two. Fail-closed: the write is refused, nothing is corrupted, no gate is affected.",
+   "measured": "CI run 35345117442 (e60cba2), windows-latest 3.11: tests/test_memory.py::BoundaryTests::test_process_concurrency — 2 of 8 concurrent writers exited 1 with MemoryError('memory path escapes project'); first occurrence in the last 30 Windows runs of this branch (scanned). aisef/memory.py is unchanged by e60cba2.",
+   "provenance": "found 2026-09-18 by Linux/Windows CI of the SS-81 family candidate",
+   "reproducer": "tests/hardening/test_ss81_family.py::KillMemoryResolveOnWindows",
+   "regression_tests": [
+    "tests/hardening/test_ss81_family.py::KillMemoryResolveOnWindows"
+   ],
+   "fixed_by": "aisef/memory.py::_resolved — Path.resolve() with a leading \\\\?\\ (or \\\\?\\UNC\\) stripped, used for both sides of safe_path's containment check"
+  },
+  {
+   "id": "SS-94",
+   "family": "FAM-QUALIFICATION",
+   "fix_family": "F6-QUALIFICATION-INFRASTRUCTURE",
+   "severity": "P2",
+   "status": "FIXED",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: closure-evidence/hardening/w1/w1_driver.py",
+   "invariants": [],
+   "site": "closure-evidence/hardening/w1/w1_driver.py::classify_run",
+   "statement": "the W1 driver labelled every run that neither delivered nor needed a human LEGITIMATE_MODEL_PROJECT_STOP, reading nothing about why it stopped: a provider outage the kernel ended as `recurring infrastructure error` was reported as the model's stop",
+   "measured": "PROFILE-W1-OC-GPT56SOL-T80-RO run 1 (2026-09-19): the provider refused gpt-5.6-sol for every session from 06:41; the kernel blocked STORY-01-03 on its infra budget; the driver's first finish said LEGITIMATE_MODEL_PROJECT_STOP",
+   "reproducer": "tests/hardening/test_w1_oracle_ownership.py::TestRunClassification::test_a_stop_on_the_kernels_infrastructure_terminal_is_not_a_model_project_stop",
+   "regression_tests": [
+    "tests/hardening/test_w1_oracle_ownership.py::TestRunClassification::test_a_stop_on_the_kernels_infrastructure_terminal_is_not_a_model_project_stop"
+   ],
+   "fixed_by": "classify_run returns ENVIRONMENT_OR_PROVIDER_STOP when a stopped story's reason carries the kernel's infrastructure / verifier-unrunnable prefix; finish re-run"
+  },
+  {
+   "id": "SS-95",
+   "family": "FAM-QUALIFICATION",
+   "fix_family": "F6-QUALIFICATION-INFRASTRUCTURE",
+   "severity": "P1",
+   "status": "FIXED",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: closure-evidence/hardening/w1/w1_driver.py",
+   "invariants": [],
+   "site": "closure-evidence/hardening/w1/w1_driver.py::run_metrics (false_block) + Driver.finish",
+   "statement": "the W1 exit criterion 'false BLOCK = 0' was measured only at trunk: a story is a false block when every oracle check covering its FRs is green there — but a blocked story's code never reaches trunk, so its covering checks are red at trunk whether the refused code was good or not. The metric could only see criteria the trunk already met, never the main class it exists for: good work the framework refused.",
+   "measured": "2026-09-19, PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO runs 1-2: STORY-04-02 was refused (review block; TDD/nop) and the finish record said false_block_count 0 without ever looking at the refused candidates. Measured by hand first: candidate 4c8dd82d exits 2 on a line mutated to valid JSON of the wrong type, 96e5133e exits 1/2 on corrupted lines — both violate FR-12, so both refusals were legitimate.",
+   "materiality": "none found — the fixed measurement re-run as `--phase candidate-audit` over every W1 run with a finish record (1, 2, 3, gpt56sol-1, gpt56sol-ro-1, gpt55-ro-1, deepseek-ro-1, deepseek-ro-2): 0 false blocks at the refused candidates (gpt55-ro-1 froze none); run-*/SS95-CANDIDATE-AUDIT.json. No earlier conclusion changes.",
+   "provenance": "found while checking the legitimacy of the deepseek-ro-2 stop before moving to the next profile",
+   "reproducer": "tests/hardening/test_w1_oracle_ownership.py::TestFalseBlock::test_ss95_good_work_refused_is_seen_at_the_storys_own_candidate",
+   "regression_tests": [
+    "tests/hardening/test_w1_oracle_ownership.py::TestFalseBlock::test_ss95_good_work_refused_is_seen_at_the_storys_own_candidate"
+   ],
+   "fixed_by": "run_metrics also judges each unfinished story at its own last frozen candidate (journal `candidate.frozen`), the oracle run on a `git archive` of that commit (Driver._candidate_oracle); `--phase candidate-audit` re-measures a finished run beside its records without rewriting them. The fix only adds detections — it cannot turn a result into a PASS.",
+   "note_on_stop_rule": "qualification infrastructure, not product kernel (owner section 11 D is 'material ... false assurance': the re-measurement shows none); continued under the SS-90 precedent and reported at the checkpoint"
+  }
+ ],
+ "updated": "2026-09-18: SS-81 family registered — SS-81 (P1), SS-82 (P3) and siblings SS-83..SS-89 from the section-7 sweep, all OPEN with deterministic reproducers; 2026-09-18: SS-81..SS-89 FIXED by the F7-EXECUTION-EVIDENCE-VALIDITY family fix (counts recounted unique by id); 2026-09-18: SS-90 (P1, QUALIFICATION_INFRASTRUCTURE) registered FIXED — W0 evidence rows bound to the candidate's kernel; 2026-09-18: SS-91 (P2, PRODUCT_KERNEL, Windows memory-store race) registered FIXED; 2026-09-19: SS-94 (P2, QUALIFICATION_INFRASTRUCTURE) FIXED — W1 run classification; SS-92/SS-93 recorded OPEN in w1/run-gpt56sol-ro-1/FINDINGS-DURING-RUN.json, registration deferred (invariant downgrade = aisef/ change); 2026-09-19: SS-95 (P1, qualification infrastructure) registered and FIXED — false BLOCK now measured at each refused candidate; retro-audit of all 8 W1 runs: 0",
+ "defect_classes": {
+  "PRODUCT_KERNEL": "a defect in aisef/ — invalidates evidence produced by the product (kernel qualification, W0)",
+  "QUALIFICATION_INFRASTRUCTURE": "a defect in the tooling that measures the product (W1 driver, oracle harness) — invalidates the measurements it produced, not the product; its fix never changes aisef/"
+ }
+}
