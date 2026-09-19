@@ -5,10 +5,10 @@
  "generated": "2026-09-16T10:12:06+00:00",
  "rule": "No broad speculative sweep while fixing. A sibling found during implementation is classified, assigned to an already-frozen family where it belongs, and added here with explicit provenance (commit + finding source).",
  "counts": {
-  "total": 102,
+  "total": 103,
   "by_severity": {
    "P2": 56,
-   "P1": 25,
+   "P1": 26,
    "P3": 21
   },
   "by_fix_family": {
@@ -18,12 +18,12 @@
    "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE": 12,
    "F6-BENCH-RELEASE-APPROVAL": 7,
    "F5-PROCESS-TOOL-ENVIRONMENT": 22,
-   "F6-QUALIFICATION-INFRASTRUCTURE": 6,
+   "F6-QUALIFICATION-INFRASTRUCTURE": 7,
    "F7-EXECUTION-EVIDENCE-VALIDITY": 9
   },
   "fixed": 16,
   "by_status": {
-   "FIXED": 101,
+   "FIXED": 102,
    "SUPERSEDED": 1
   },
   "counting_rule": "unique by id: AD-01/03/04/05 and SS-61/62/63 are listed both in their fix family and in additions_after_freeze (provenance) and count once; recounted from the entries on 2026-09-17 (the hand-maintained counts before this had by_severity summing to 72 of 75)"
@@ -1942,9 +1942,30 @@
     "tests/hardening/test_w1_oracle_ownership.py::TestRunClassification::test_a_stop_on_the_kernels_infrastructure_terminal_is_not_a_model_project_stop"
    ],
    "fixed_by": "classify_run returns ENVIRONMENT_OR_PROVIDER_STOP when a stopped story's reason carries the kernel's infrastructure / verifier-unrunnable prefix; finish re-run"
+  },
+  {
+   "id": "SS-95",
+   "family": "FAM-QUALIFICATION",
+   "fix_family": "F6-QUALIFICATION-INFRASTRUCTURE",
+   "severity": "P1",
+   "status": "FIXED",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: closure-evidence/hardening/w1/w1_driver.py",
+   "invariants": [],
+   "site": "closure-evidence/hardening/w1/w1_driver.py::run_metrics (false_block) + Driver.finish",
+   "statement": "the W1 exit criterion 'false BLOCK = 0' was measured only at trunk: a story is a false block when every oracle check covering its FRs is green there — but a blocked story's code never reaches trunk, so its covering checks are red at trunk whether the refused code was good or not. The metric could only see criteria the trunk already met, never the main class it exists for: good work the framework refused.",
+   "measured": "2026-09-19, PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO runs 1-2: STORY-04-02 was refused (review block; TDD/nop) and the finish record said false_block_count 0 without ever looking at the refused candidates. Measured by hand first: candidate 4c8dd82d exits 2 on a line mutated to valid JSON of the wrong type, 96e5133e exits 1/2 on corrupted lines — both violate FR-12, so both refusals were legitimate.",
+   "materiality": "none found — the fixed measurement re-run as `--phase candidate-audit` over every W1 run with a finish record (1, 2, 3, gpt56sol-1, gpt56sol-ro-1, gpt55-ro-1, deepseek-ro-1, deepseek-ro-2): 0 false blocks at the refused candidates (gpt55-ro-1 froze none); run-*/SS95-CANDIDATE-AUDIT.json. No earlier conclusion changes.",
+   "provenance": "found while checking the legitimacy of the deepseek-ro-2 stop before moving to the next profile",
+   "reproducer": "tests/hardening/test_w1_oracle_ownership.py::TestFalseBlock::test_ss95_good_work_refused_is_seen_at_the_storys_own_candidate",
+   "regression_tests": [
+    "tests/hardening/test_w1_oracle_ownership.py::TestFalseBlock::test_ss95_good_work_refused_is_seen_at_the_storys_own_candidate"
+   ],
+   "fixed_by": "run_metrics also judges each unfinished story at its own last frozen candidate (journal `candidate.frozen`), the oracle run on a `git archive` of that commit (Driver._candidate_oracle); `--phase candidate-audit` re-measures a finished run beside its records without rewriting them. The fix only adds detections — it cannot turn a result into a PASS.",
+   "note_on_stop_rule": "qualification infrastructure, not product kernel (owner section 11 D is 'material ... false assurance': the re-measurement shows none); continued under the SS-90 precedent and reported at the checkpoint"
   }
  ],
- "updated": "2026-09-18: SS-81 family registered — SS-81 (P1), SS-82 (P3) and siblings SS-83..SS-89 from the section-7 sweep, all OPEN with deterministic reproducers; 2026-09-18: SS-81..SS-89 FIXED by the F7-EXECUTION-EVIDENCE-VALIDITY family fix (counts recounted unique by id); 2026-09-18: SS-90 (P1, QUALIFICATION_INFRASTRUCTURE) registered FIXED — W0 evidence rows bound to the candidate's kernel; 2026-09-18: SS-91 (P2, PRODUCT_KERNEL, Windows memory-store race) registered FIXED; 2026-09-19: SS-94 (P2, QUALIFICATION_INFRASTRUCTURE) FIXED — W1 run classification; SS-92/SS-93 recorded OPEN in w1/run-gpt56sol-ro-1/FINDINGS-DURING-RUN.json, registration deferred (invariant downgrade = aisef/ change)",
+ "updated": "2026-09-18: SS-81 family registered — SS-81 (P1), SS-82 (P3) and siblings SS-83..SS-89 from the section-7 sweep, all OPEN with deterministic reproducers; 2026-09-18: SS-81..SS-89 FIXED by the F7-EXECUTION-EVIDENCE-VALIDITY family fix (counts recounted unique by id); 2026-09-18: SS-90 (P1, QUALIFICATION_INFRASTRUCTURE) registered FIXED — W0 evidence rows bound to the candidate's kernel; 2026-09-18: SS-91 (P2, PRODUCT_KERNEL, Windows memory-store race) registered FIXED; 2026-09-19: SS-94 (P2, QUALIFICATION_INFRASTRUCTURE) FIXED — W1 run classification; SS-92/SS-93 recorded OPEN in w1/run-gpt56sol-ro-1/FINDINGS-DURING-RUN.json, registration deferred (invariant downgrade = aisef/ change); 2026-09-19: SS-95 (P1, qualification infrastructure) registered and FIXED — false BLOCK now measured at each refused candidate; retro-audit of all 8 W1 runs: 0",
  "defect_classes": {
   "PRODUCT_KERNEL": "a defect in aisef/ — invalidates evidence produced by the product (kernel qualification, W0)",
   "QUALIFICATION_INFRASTRUCTURE": "a defect in the tooling that measures the product (W1 driver, oracle harness) — invalidates the measurements it produced, not the product; its fix never changes aisef/"

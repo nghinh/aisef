@@ -1,0 +1,121 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0 -- /Users/nghinh/Downloads/projects/aisef-freeze/oracle-venv/bin/python
+rootdir: /Users/nghinh/Downloads/projects/ai-sdlc
+configfile: pyproject.toml
+collecting ... collected 9 items
+
+oracle/test_oracle.py::TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger FAILED [ 11%]
+oracle/test_oracle.py::TestAcceptance::test_14_2_snapshot_is_byte_deterministic FAILED [ 22%]
+oracle/test_oracle.py::TestAcceptance::test_14_3_apply_batch_commits_atomically FAILED [ 33%]
+oracle/test_oracle.py::TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption FAILED [ 44%]
+oracle/test_oracle.py::TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover FAILED [ 55%]
+oracle/test_oracle.py::TestAcceptance::test_14_6_no_third_party_imports_at_runtime FAILED [ 66%]
+oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli FAILED [ 77%]
+oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value FAILED [ 88%]
+oracle/test_oracle.py::TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts FAILED [100%]
+
+=================================== FAILURES ===================================
+__________ TestAcceptance.test_14_1_verify_exits_0_on_a_fresh_ledger ___________
+oracle/test_oracle.py:75: in test_14_1_verify_exits_0_on_a_fresh_ledger
+    self.assertEqual(r.returncode, 0, f"§14.1 / §9: {r.stderr[-400:]}")
+E   AssertionError: 1 != 0 : §14.1 / §9: n__.py", line 5, in <module>
+E       raise SystemExit(main())
+E                        ~~~~^^
+E     File "/Users/nghinh/Downloads/projects/aisef-qualification-ws/tmpjit7u3gr/candidate/ledgerlock/cli.py", line 53, in main
+E       raise NotImplementedError(
+E           f"subcommand {args.command!r} is not yet implemented in this story"
+E       )
+E   NotImplementedError: subcommand 'verify' is not yet implemented in this story
+___________ TestAcceptance.test_14_2_snapshot_is_byte_deterministic ____________
+oracle/test_oracle.py:81: in test_14_2_snapshot_is_byte_deterministic
+    self.assertEqual(self._put(k, {"n": i}, f"r{i}").returncode, 0)
+E   AssertionError: 1 != 0
+___________ TestAcceptance.test_14_3_apply_batch_commits_atomically ____________
+oracle/test_oracle.py:97: in test_14_3_apply_batch_commits_atomically
+    self.assertEqual(self._put("k0", 0, "r0").returncode, 0)
+E   AssertionError: 1 != 0
+_ TestAcceptance.test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption _
+oracle/test_oracle.py:109: in test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption
+    self.assertEqual(self._put("k0", 0, "r0").returncode, 0)
+E   AssertionError: 1 != 0
+_ TestAcceptance.test_14_5_coverage_at_least_85_percent_with_unittest_discover _
+oracle/test_oracle.py:130: in test_14_5_coverage_at_least_85_percent_with_unittest_discover
+    self.assertEqual(run.returncode, 0, f"§11 / §14.5: `coverage run -m unittest discover` must pass: {(run.stderr or run.stdout)[-600:]}")
+E   AssertionError: 1 != 0 : §11 / §14.5: `coverage run -m unittest discover` must pass: .14/lib/python3.14/unittest/loader.py", line 374, in _get_module_from_name
+E       __import__(name)
+E       ~~~~~~~~~~^^^^^^
+E     File "/Users/nghinh/Downloads/projects/aisef-qualification-ws/tmpjit7u3gr/candidate/tests/test_format.py", line 7, in <module>
+E       from ledgerlock.format import GENESIS, canonical_bytes, line_hash
+E   ImportError: cannot import name 'line_hash' from 'ledgerlock.format' (/Users/nghinh/Downloads/projects/aisef-qualification-ws/tmpjit7u3gr/candidate/ledgerlock/format.py)
+E   
+E   
+E   ----------------------------------------------------------------------
+E   Ran 8 tests in 0.162s
+E   
+E   FAILED (errors=1)
+__________ TestAcceptance.test_14_6_no_third_party_imports_at_runtime __________
+oracle/test_oracle.py:149: in test_14_6_no_third_party_imports_at_runtime
+    self.assertEqual(sorted(imported - set(sys.stdlib_module_names)), [], "§2 / §10 / §14.6: a non-stdlib import")
+E   AssertionError: Lists differ: ['ledgerlock'] != []
+E   
+E   First list contains 1 additional elements.
+E   First extra element 0:
+E   'ledgerlock'
+E   
+E   - ['ledgerlock']
+E   + [] : §2 / §10 / §14.6: a non-stdlib import
+_ TestIdempotencyAndConflict.test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli _
+oracle/test_oracle.py:172: in setUp
+    self.L = importlib.import_module("ledgerlock.ledger")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1335: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ledgerlock.ledger'
+___ TestIdempotencyAndConflict.test_a_tombstone_conflicts_like_a_live_value ____
+oracle/test_oracle.py:172: in setUp
+    self.L = importlib.import_module("ledgerlock.ledger")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1335: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ledgerlock.ledger'
+_ TestIdempotencyAndConflict.test_replay_is_idempotent_and_a_different_rid_conflicts _
+oracle/test_oracle.py:172: in setUp
+    self.L = importlib.import_module("ledgerlock.ledger")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1335: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ledgerlock.ledger'
+=========================== short test summary info ============================
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_2_snapshot_is_byte_deterministic
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_3_apply_batch_commits_atomically
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_6_no_third_party_imports_at_runtime
+FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli
+FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value
+FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts
+============================== 9 failed in 0.79s ===============================
+
+--- stderr ---

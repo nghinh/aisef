@@ -79,7 +79,8 @@ def _signal_group(pgid: int, sig, record: dict, label: str) -> bool:
         return False
 
 
-def run_metrics(runlog: str, state: dict, covers: dict, fr_map: dict, oracle_results: dict) -> dict:
+def run_metrics(runlog: str, state: dict, covers: dict, fr_map: dict, oracle_results: dict,
+                candidate_results: dict | None = None) -> dict:
     """The per-run numbers the owner's report table asks for (section 10), measured from the run's own log and state.
 
     false BLOCK is the mirror of false pass: a story the framework did NOT complete although every hidden-oracle check
@@ -99,19 +100,30 @@ def run_metrics(runlog: str, state: dict, covers: dict, fr_map: dict, oracle_res
         "stories_failed": sorted(sid for sid, st in state.items() if st.get("status") == "failed"),
         "stories_never_started": max(len(covers) - len(state), 0),
     }
-    passed = {t.split("::")[-1] for t, v in oracle_results.items() if v == "PASSED"}
-    all_named = {t.split("::")[-1] for t in oracle_results}
+    def blocked_good(results: dict, sid: str) -> list[str]:
+        passed = {t.split("::")[-1] for t, v in results.items() if v == "PASSED"}
+        cov = [t for t in {t.split("::")[-1] for t in results} if any(fr in covers.get(sid, []) for fr in fr_map.get(t, []))]
+        return cov if cov and all(t in passed for t in cov) else []
+
+    # SS-95: at trunk a blocked story's code is absent, so its covering checks are red whether that code was good or
+    # not — trunk alone only sees criteria the trunk already met. The refused work is the story's own last frozen
+    # candidate: the oracle is run there too (`candidate_results`: story -> {"sha", "results"}).
     false_block = []
     for sid, st in state.items():
         if st.get("status") == "done":
             continue
-        cov = [t for t in all_named if any(fr in covers.get(sid, []) for fr in fr_map.get(t, []))]
-        if cov and all(t in passed for t in cov):
-            false_block.append({"story": sid, "status": st.get("status"), "oracle_checks_covering_it": cov})
+        cand = (candidate_results or {}).get(sid) or {}
+        for where, results in (("trunk", oracle_results), (f"candidate {(cand.get('sha') or '')[:12]}", cand.get("results") or {})):
+            cov = blocked_good(results, sid)
+            if cov:
+                false_block.append({"story": sid, "status": st.get("status"), "at": where, "oracle_checks_covering_it": cov})
+                break
+    all_named = {t.split("::")[-1] for t in oracle_results}
     metrics["false_block"] = false_block
     metrics["false_block_count"] = len(false_block)
     metrics["false_block_measurable_for"] = sorted(sid for sid in state
                                                    if any(any(fr in covers.get(sid, []) for fr in fr_map.get(t, [])) for t in all_named))
+    metrics["false_block_measured_at_candidate_for"] = sorted(sid for sid, c in (candidate_results or {}).items() if c.get("results"))
     return metrics
 
 
@@ -634,6 +646,67 @@ class Driver:
         self.save()
         return True
 
+    def _oracle(self, tree: Path, obs: Path, out: Path) -> tuple[subprocess.CompletedProcess, dict]:
+        """The hidden oracle on a checked-out tree (never the run's working tree)."""
+        env = dict(self.env(), AISEF_W1_PROJECT=str(tree), AISEF_W1_ORACLE_OBSERVATIONS=str(obs))
+        r = subprocess.run([self.a.oracle_python, "-m", "pytest", str(HERE / "oracle/test_oracle.py"), "-v", "-rA", "-p", "no:cacheprovider", "--tb=short"],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", env=env, cwd=str(HERE), timeout=1800)
+        out.write_text(r.stdout + "\n--- stderr ---\n" + r.stderr, encoding="utf-8")
+        return r, parse_oracle(r.stdout)
+
+    def _candidate_oracle(self, state: dict) -> dict:
+        """SS-95: the oracle at each unfinished story's last frozen candidate (the framework's journal names it)."""
+        out = {}
+        for sid, st in state.items():
+            jf = self.art / "journal" / f"{sid}.jsonl"
+            if st.get("status") == "done" or not jf.is_file():
+                continue
+            shas = [r["data"].get("sha") for r in map(json.loads, filter(str.strip, jf.read_text(encoding="utf-8").splitlines()))
+                    if r.get("step") == "candidate.frozen" and (r.get("data") or {}).get("sha")]
+            if not shas:
+                out[sid] = {"sha": None, "results": {}, "note": "no frozen candidate — nothing was refused"}
+                continue
+            with tempfile.TemporaryDirectory(dir=_ws()) as td:
+                tree = Path(td) / "candidate"
+                tree.mkdir()
+                arc = subprocess.run(["git", "-C", str(self.project), "archive", shas[-1]], capture_output=True, check=True).stdout
+                subprocess.run(["tar", "-x", "-C", str(tree)], input=arc, check=True)
+                _, parsed = self._oracle(tree, Path(td) / "obs.jsonl", self.run_dir / f"oracle-candidate-{sid}.txt")
+            out[sid] = {"sha": shas[-1], "results": parsed["results"], "parse_complete": parsed["complete"]}
+        return out
+
+    def _model(self) -> tuple[dict, dict, dict]:
+        """(oracle FR map, story -> FRs it covers, the framework's structured story state)."""
+        fr_map = json.loads((HERE / "oracle-fr-map.json").read_text(encoding="utf-8")) if (HERE / "oracle-fr-map.json").is_file() else {}
+        idx = json.loads((self.art / "stories.index.json").read_text(encoding="utf-8"))
+        stories = idx["stories"] if isinstance(idx, dict) and "stories" in idx else idx
+        covers = {s["id"]: s.get("covers", []) for s in (stories if isinstance(stories, list) else stories.values())}
+        # SS-77: `aisef status` prints only the stories that are NOT passing, so a set built from it holds no done
+        # story and the false-pass rule below can never fire. Read the framework's own structured state instead.
+        sprint = self.art / "sprint-status.json"
+        state = json.loads(sprint.read_text(encoding="utf-8")).get("stories", {}) if sprint.is_file() else {}
+        return fr_map, covers, state
+
+    def candidate_audit(self) -> bool:
+        """SS-95 re-measurement of a finished run: false BLOCK at each unfinished story's own candidate, written beside
+        the run's records — the finish record itself is never rewritten."""
+        fin = self.rec["phases"].get("finish") or {}
+        if not (fin.get("oracle") or {}).get("results"):
+            self.say("candidate-audit: the run has no finish record with oracle results")
+            return False
+        fr_map, covers, state = self._model()
+        runlog = (self.art / "run.log").read_text(encoding="utf-8") if (self.art / "run.log").is_file() else ""
+        cand = self._candidate_oracle(state)
+        m = run_metrics(runlog, state, covers, fr_map, fin["oracle"]["results"], cand)
+        out = {"run": self.a.run, "generated": now(), "finding": "SS-95",
+               "finish_record_false_block_count": (fin.get("run_metrics") or {}).get("false_block_count"),
+               "false_block_count": m["false_block_count"], "false_block": m["false_block"],
+               "measured_at_candidate_for": m["false_block_measured_at_candidate_for"],
+               "candidates": {sid: {k: c.get(k) for k in ("sha", "parse_complete", "note")} for sid, c in cand.items()}}
+        (self.run_dir / "SS95-CANDIDATE-AUDIT.json").write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        print(json.dumps({k: out[k] for k in ("run", "finish_record_false_block_count", "false_block_count", "measured_at_candidate_for")}))
+        return True
+
     def finish(self) -> bool:
         self.say("phase finish")
         F = {"at": now()}
@@ -674,24 +747,14 @@ class Driver:
             F["delivered"] = {"master_head": subprocess.run(["git", "-C", str(deliv), "rev-parse", "HEAD"], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip(),
                               "has_package": (deliv / "ledgerlock").is_dir(), "files": sorted(str(p.relative_to(deliv)) for p in deliv.rglob("*.py") if ".git" not in p.parts)[:80]}
             obs = self.run_dir / "oracle-observations.jsonl"
-            env = dict(self.env(), AISEF_W1_PROJECT=str(deliv), AISEF_W1_ORACLE_OBSERVATIONS=str(obs))
-            r = subprocess.run([self.a.oracle_python, "-m", "pytest", str(HERE / "oracle/test_oracle.py"), "-v", "-rA", "-p", "no:cacheprovider", "--tb=short"],
-                               capture_output=True, text=True, encoding="utf-8", errors="replace", env=env, cwd=str(HERE), timeout=1800)
-            (self.run_dir / "oracle.txt").write_text(r.stdout + "\n--- stderr ---\n" + r.stderr, encoding="utf-8")
-            parsed = parse_oracle(r.stdout)
+            r, parsed = self._oracle(deliv, obs, self.run_dir / "oracle.txt")
             res = parsed["results"]
             F["oracle"] = {"sha256": sha(HERE / "oracle/test_oracle.py"), "exit": r.returncode, "results": res,
                            "pytest_totals": parsed["pytest_totals"], "parse_complete": parsed["complete"], "parse_note": parsed["why"],
                            "observations": [json.loads(l) for l in obs.read_text(encoding="utf-8").splitlines()] if obs.is_file() else []}
         # exit criteria (SCALE-QUALIFICATION W1) — computed, not asserted
-        fr_map = json.loads((HERE / "oracle-fr-map.json").read_text(encoding="utf-8")) if (HERE / "oracle-fr-map.json").is_file() else {}
-        idx = json.loads((self.art / "stories.index.json").read_text(encoding="utf-8"))
-        stories = idx["stories"] if isinstance(idx, dict) and "stories" in idx else idx
-        covers = {s["id"]: s.get("covers", []) for s in (stories if isinstance(stories, list) else stories.values())}
-        # SS-77: `aisef status` prints only the stories that are NOT passing, so a set built from it holds no done
-        # story and the false-pass rule below can never fire. Read the framework's own structured state instead.
+        fr_map, covers, state = self._model()
         sprint = self.art / "sprint-status.json"
-        state = json.loads(sprint.read_text(encoding="utf-8")).get("stories", {}) if sprint.is_file() else {}
         for sid, st in state.items():
             F["stories"].setdefault(sid, {}).setdefault("status", st.get("status"))
             F["stories"][sid]["state_status"] = st.get("status")
@@ -727,7 +790,8 @@ class Driver:
             + ([] if F["oracle"]["parse_complete"] else [f"oracle_parse_incomplete: {F['oracle']['parse_note']}"]) \
             + ([f"oracle_not_executed={oc['oracle_not_executed_count']}"] if oc["oracle_not_executed"] else [])
         runlog_text = (self.art / "run.log").read_text(encoding="utf-8") if (self.art / "run.log").is_file() else ""
-        F["run_metrics"] = run_metrics(runlog_text, state, covers, fr_map, F["oracle"]["results"])
+        F["candidate_oracle"] = self._candidate_oracle(state)
+        F["run_metrics"] = run_metrics(runlog_text, state, covers, fr_map, F["oracle"]["results"], F["candidate_oracle"])
         F["exit_criteria"]["false_block_count"] = F["run_metrics"]["false_block_count"]
         F["exit_criteria"]["false_block"] = F["run_metrics"]["false_block"]
         F["run_classification"] = classify_run(state, len(covers), F["safety_violations"], human_markers)
@@ -760,16 +824,18 @@ def main() -> int:
     ap.add_argument("--oracle-python", required=True)
     ap.add_argument("--freeze", default="", help="P19 freeze record (JSON)")
     ap.add_argument("--profile", default="", help="execution profile (JSON); without it the copy must be PROFILE-W1-OC-MYCOMBO-T40")
-    ap.add_argument("--phase", default="all", choices=["all", "prepare", "kernel-first", "approve", "run", "finish"])
+    ap.add_argument("--phase", default="all", choices=["all", "prepare", "kernel-first", "approve", "run", "finish", "candidate-audit"])
     a = ap.parse_args()
     d = Driver(a)
     order = ["prepare", "kernel-first", "approve", "run", "finish"] if a.phase == "all" else [a.phase]
-    fn = {"prepare": d.prepare, "kernel-first": d.kernel_first, "approve": d.approve, "run": d.run, "finish": d.finish}
+    fn = {"prepare": d.prepare, "kernel-first": d.kernel_first, "approve": d.approve, "run": d.run, "finish": d.finish,
+          "candidate-audit": d.candidate_audit}
     for ph in order:
         if not fn[ph]():
             d.say(f"STOP at phase {ph} — see {d.rec_path}")
             return 1
-    d.say("W1 driver complete")
+    if a.phase != "candidate-audit":      # an audit of a finished run adds a record beside it, never to its log
+        d.say("W1 driver complete")
     return 0
 
 

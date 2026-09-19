@@ -1,0 +1,22 @@
+[2026-09-19T17:44:44+0700] phase prepare
+[2026-09-19T17:45:01+0700] prepare ok=True aisef=aisef 1.7.6 wheel=True oracle=True guard=True topology=True preflight=True failed=[] gates={'prd': 'approved', 'architecture': 'approved', 'ux-spec': 'approved', 'epics': 'approved', 'stories': 'approved', 'mockups': 'approved', 'readiness': 'stale', 'pre-deploy': 'pending'} doctor_red=[]
+[2026-09-19T17:45:01+0700] W1 driver complete
+[2026-09-19T17:45:01+0700] phase kernel-first: aisef run with NO re-approval, NO --force
+[2026-09-19T17:45:01+0700] kernel-first ok=True exit=2 kernel refused the STALE gate before any agent call (ARB-1 kernel path first)
+[2026-09-19T17:45:01+0700] W1 driver complete
+[2026-09-19T17:45:02+0700] phase approve: ARB-1 re-approval of readiness for byte-identical content
+[2026-09-19T17:45:08+0700] approve ok=True changed=['readiness'] gates={'prd': 'approved', 'architecture': 'approved', 'ux-spec': 'approved', 'epics': 'approved', 'stories': 'approved', 'mockups': 'approved', 'readiness': 'approved', 'pre-deploy': 'pending'}
+[2026-09-19T17:45:08+0700] W1 driver complete
+[2026-09-19T17:45:08+0700] phase run
+[2026-09-19T17:45:08+0700] aisef run #1 pid=84627 pgid=84627
+[2026-09-19T18:05:00+0700] SIGTERM process group 84627: {'marker': 'wave=EPIC-01/w3 DONE', 'at': '2026-09-19T18:05:00+0700', 'line': '[2026-09-19 18:04:57] wave=EPIC-01/w3 DONE 1/1 passed $0.00', 'kind': 'forced resume (P20 procedure 3)'}
+[2026-09-19T18:05:08+0700] aisef run #1 exit=-15 after 1199.1s killed=True
+[2026-09-19T18:05:08+0700] aisef run #2 pid=90832 pgid=90832
+[2026-09-19T18:57:48+0700] SIGTERM process group 90832: {'marker': 'wave=EPIC-03/w1 DONE', 'at': '2026-09-19T18:57:48+0700', 'line': '[2026-09-19 18:57:44] wave=EPIC-03/w1 DONE 1/1 passed $0.00', 'kind': 'forced resume (P20 procedure 3)'}
+[2026-09-19T18:57:55+0700] aisef run #2 exit=-15 after 3167.6s killed=True
+[2026-09-19T18:57:55+0700] aisef run #3 pid=3540 pgid=3540
+[2026-09-19T20:05:12+0700] aisef run #3 exit=2 after 4036.9s killed=False
+[2026-09-19T20:05:12+0700] W1 driver complete
+[2026-09-19T20:05:12+0700] phase finish
+[2026-09-19T20:05:16+0700] finish: progress={'done': 11, 'total': 16} class=LEGITIMATE_MODEL_PROJECT_STOP false_pass=0 mapping_errors=0 red_classes={'INCOMPLETE_DELIVERY_EXPECTED_RED': 9} safety=[] → W1-LEDGERLOCK-deepseek-ro-2.json
+[2026-09-19T20:05:16+0700] W1 driver complete

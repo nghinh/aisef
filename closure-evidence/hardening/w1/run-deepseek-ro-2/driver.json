@@ -1,0 +1,2112 @@
+{
+ "run": "deepseek-ro-2",
+ "project": "/Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2",
+ "phases": {
+  "prepare": {
+   "at": "2026-09-19T17:44:44+0700",
+   "aisef_version": "aisef 1.7.6",
+   "aisef_file": "/Users/nghinh/Downloads/projects/aisef-freeze/40393cda89db/w1-venv/lib/python3.14/site-packages/aisef/__init__.py",
+   "aisef_from_the_wheel_not_the_checkout": true,
+   "venv_packages": "[{\"name\": \"aisef\", \"version\": \"1.7.6\"}, {\"name\": \"pip\", \"version\": \"26.2.1\"}]\n",
+   "freeze": {
+    "generated": "2026-09-19T05:35:11+0700",
+    "candidate_sha": "40393cda89dbfbb887c9c901872256a5fdc5bea0",
+    "aisef_tree_digest": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+    "PHASE12_KERNEL_DIGEST": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+    "tree_equals_phase12_kernel": true,
+    "version_string": "aisef 1.7.6",
+    "wheel": {
+     "file": "/Users/nghinh/Downloads/projects/aisef-freeze/40393cda89db/dist/aisef-1.7.6-py3-none-any.whl",
+     "sha256": "3f0fd6519a9f21b790eeaadcf39a95436dfb9ba75878f9bb411e376ebfc116a6",
+     "bytes": 678728,
+     "built_with": "build 1.6.1 (/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/build-venv/lib/python3.14/site-packages/build)"
+    },
+    "run_venv": {
+     "path": "/Users/nghinh/Downloads/projects/aisef-freeze/40393cda89db/w1-venv",
+     "aisef_file": "/Users/nghinh/Downloads/projects/aisef-freeze/40393cda89db/w1-venv/lib/python3.14/site-packages/aisef/__init__.py",
+     "installed_from_the_wheel": true
+    },
+    "oracle_venv": {
+     "path": "/Users/nghinh/Downloads/projects/aisef-freeze/oracle-venv",
+     "packages": [
+      {
+       "name": "coverage",
+       "version": "7.16.1"
+      },
+      {
+       "name": "pytest",
+       "version": "9.1.1"
+      }
+     ]
+    },
+    "docker_image": {
+     "name": "aisef-verify-python:84adf1d8eaf9",
+     "id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+    },
+    "docker_image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "opencode_version": "1.18.31",
+    "ci": {
+     "run": "35352745052",
+     "sha": "40393cda89dbfbb887c9c901872256a5fdc5bea0",
+     "conclusion": "success",
+     "jobs": {
+      "wheel": "success",
+      "unit (ubuntu-latest, 3.12)": "success",
+      "lint": "success",
+      "unit (ubuntu-latest, 3.13)": "success",
+      "unit (ubuntu-latest, 3.11)": "success",
+      "unit (ubuntu-latest, 3.14)": "success",
+      "unit (windows-latest, 3.11)": "success"
+     }
+    },
+    "ci_matches_candidate": true,
+    "w0": {
+     "path": "closure-evidence/hardening/AISEF-W0-QUALIFICATION-d32031d.json",
+     "qualified": true,
+     "sha": "d32031dbe2081d0a34368b63b992ec5a5cd3694e",
+     "aisef_tree": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+     "tree_matches_frozen": true
+    },
+    "no_tag_no_publish": true,
+    "rule": "W1 runs use run_venv's aisef only; any aisef/ change after this record voids it and the W1 runs that rest on it",
+    "pass": true
+   },
+   "project_git": {
+    "head": "749879765defc99485a77d14da47c020f645a9b8",
+    "branch": "master",
+    "status": [],
+    "log": [
+     "7498797 w1-run-deepseek-ro-2: execution profile PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO applied (run.max_turns, route.<role>_model, project model declaration — an execution-profile setting, not an AISEF change)",
+     "82f216f w1-run-deepseek-ro-2: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "87af865 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)",
+     "8ff9f13 epics.md: split to 16 stories (each ≤7 AC, ≤16 complexity) — second plan attempt passed",
+     "35f33e7 evidence: initial AISEF plan attempt, machine-gate failures captured"
+    ]
+   },
+   "config": {
+    "tools.test": "python3 -m pytest -v",
+    "tools.lint": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+    "sandbox.image": "aisef-verify-python:84adf1d8eaf9",
+    "sandbox.allow_hosts": [
+     "pypi.org",
+     "files.pythonhosted.org"
+    ],
+    "run.cost_cap_usd": 80.0,
+    "run.max_turns": 80,
+    "route.developer_model": "9router/ds/deepseek-v4-pro",
+    "route.reviewer_model": "9router/ds/deepseek-v4-pro",
+    "route.security_model": "9router/ds/deepseek-v4-pro",
+    "route.designer_model": "9router/ds/deepseek-v4-pro"
+   },
+   "opencode_version": "1.18.31",
+   "opencode_binary": "/Users/nghinh/.opencode/bin/opencode",
+   "docker_image": {
+    "name": "aisef-verify-python:84adf1d8eaf9",
+    "id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+   },
+   "doctor": {
+    "cmd": [
+     "aisef",
+     "doctor"
+    ],
+    "exit": 0,
+    "seconds": 5.2,
+    "stdout_tail": "Environment:\n  ✅ python >= 3.11 — 3.14.7\n  ✅ git\n  ✅ claude CLI — /opt/homebrew/bin/claude\n  ✅ opencode CLI — /Users/nghinh/.opencode/bin/opencode\n  ✅ agent credential — ANTHROPIC_BASE_URL set in the environment — these outrank the client's own login; unset them to use it\n  ✅ docker daemon — running\n  ○ playwright + chromium — playwright not installed — run: npm i -D playwright && npx playwright install chromium — cannot extract mockup contracts\nProject:\n  ✅ project directory — /Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2\n  ✅ sandbox provider — docker — guarantees at WORKSPACE_WRITE: network_none, non_root, secrets_absent\n  ✅ sandbox image — aisef-verify-python:84adf1d8eaf9 — built by the harness: pinned base, pinned tool versions\n  · role test — explicit → `python3 -m pytest -v`\n  · role lint — explicit → `ruff check . --exclude .claude --exclude .aisef --exclude .opencode`\n  · role sast — auto: bandit (managed, pinned 1.9.4) → `bandit -q -r .`\n  ✅ tool tools.test — `tools.test` = `python3 -m pytest -v` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ tool tools.lint — `tools.lint` = `ruff check . --exclude .claude --exclude .aisef --exclude .opencode` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ tool tools.sast — `tools.sast` = `bandit -q -r .` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ docs/requirements.md — /Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2/docs/requirements.md\n  ✅ config — defaults → /Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2/.ai/config.json\n  ○ budget cap above recorded spend — no `_bmad-output/budget.json` yet — nothing to compare; the first settled call writes it\n  ○ test command prints coverage — `tools.test` = `python3 -m pytest -v` does not print coverage — gate coverage check will be **not configured** (add `--coverage` / `--cov` / `--experimental-test-coverage`)\n  ✅ test command prints test names — gate can read test names (no evidence yet — guessing from command flags)\nInstalled skills:\n  ✅ has skills — 158 directories\n  ✅ framework skills up to date — matches source\n  ✅ no offensive skills — clean\n\n✅ ready\n",
+    "stderr_tail": ""
+   },
+   "doctor_red": [],
+   "oracle": {
+    "sha256_now": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+    "sha256_pinned": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+    "independence_verdict": "PASS"
+   },
+   "oracle_ok": true,
+   "compile": {
+    "cmd": [
+     "aisef",
+     "compile",
+     "--client",
+     "opencode",
+     "--bin",
+     "/Users/nghinh/Downloads/projects/aisef-freeze/40393cda89db/w1-venv/bin/aisef"
+    ],
+    "exit": 0,
+    "seconds": 0.3,
+    "stdout_tail": "client: opencode\n  second-tier in V1: cost/turns not measurable from harness — supported, does not block release\n  wrote /Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2/.opencode/plugin/aisef-guard.ts\n  guards blocking before action: destructive, egress, git-stage, injection, process-ref, secret, tool-bypass, write-scope\n  guards blocking at other hooks: diff-scope (PostToolUse)\n  ⚠️  guards post-hoc only: completion\n     — not wired into this client's hooks at all; the rule is re-asked afterwards from evidence (story gate, `aisef verify`), which cannot stop the action, only fail the story\n  capabilities not at native level:\n     dir_allowlist: unsupported\n     tool_allowlist: emulated\n     turn_limit: unsupported\n\nreport: /Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2/_bmad-output/compile-report.json\n\n⚠️  some clients can only be checked later — lower assurance, noted in report\n",
+    "stderr_tail": ""
+   },
+   "guard_commit": "40a87b4a900cf239895335a6feeb89f0f9469bca",
+   "guard_plugin": {
+    "tracked_now": true,
+    "sha256": "8b478583e5012f5ab8259c621244dac1abd8b03d3bbf1c5cef7679bdc0001fd9",
+    "bin_line": "const BIN = [\"/Users/nghinh/Downloads/projects/aisef-freeze/40393cda89db/w1-venv/bin/aisef\"]",
+    "compile_report": {
+     "clients": [
+      {
+       "client": "opencode",
+       "written": [
+        ".opencode/plugin/aisef-guard.ts"
+       ],
+       "guards_wired": [
+        "destructive",
+        "diff-scope",
+        "egress",
+        "git-stage",
+        "injection",
+        "process-ref",
+        "secret",
+        "tool-bypass",
+        "write-scope"
+       ],
+       "guards_post_hoc": [
+        "completion"
+       ],
+       "blocks_at_source": false,
+       "degradations": [
+        "dir_allowlist: unsupported",
+        "tool_allowlist: emulated",
+        "turn_limit: unsupported"
+       ]
+      }
+     ]
+    }
+   },
+   "fresh_topology": {
+    "head_branch": "master",
+    "master": "40a87b4a900cf239895335a6feeb89f0f9469bca",
+    "commits_after_8ff9f13": [
+     "40a87b4 w1-run-deepseek-ro-2: guard plugin compiled by aisef 1.7.6 — a story worktree is a fresh checkout (P20 preparation, not an AISEF change)",
+     "7498797 w1-run-deepseek-ro-2: execution profile PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO applied (run.max_turns, route.<role>_model, project model declaration — an execution-profile setting, not an AISEF change)",
+     "82f216f w1-run-deepseek-ro-2: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "87af865 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)"
+    ],
+    "ledgerlock_dir_absent_at_master": true,
+    "remotes": [],
+    "branches": [
+     "master"
+    ]
+   },
+   "fresh_topology_ok": true,
+   "capability_preflight": {
+    "resolved": [
+     {
+      "role": "test",
+      "mode": "explicit",
+      "command": "python3 -m pytest -v",
+      "stack": "python",
+      "image": "aisef-verify-python:84adf1d8eaf9",
+      "why": "",
+      "tool": "",
+      "provision": "",
+      "version": ""
+     },
+     {
+      "role": "lint",
+      "mode": "explicit",
+      "command": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+      "stack": "python",
+      "image": "aisef-verify-python:84adf1d8eaf9",
+      "why": "",
+      "tool": "",
+      "provision": "",
+      "version": ""
+     },
+     {
+      "role": "sast",
+      "mode": "auto",
+      "command": "bandit -q -r .",
+      "stack": "python",
+      "image": "aisef-verify-python:84adf1d8eaf9",
+      "why": "",
+      "tool": "bandit",
+      "provision": "managed",
+      "version": "1.9.4"
+     }
+    ],
+    "checks": [
+     {
+      "key": "tools.test",
+      "command": "python3 -m pytest -v",
+      "state": "present",
+      "ok": true,
+      "mode": "explicit",
+      "tool": "",
+      "version": "",
+      "observed": "",
+      "detail": "the project's declared command",
+      "where": "aisef-verify-python:84adf1d8eaf9"
+     },
+     {
+      "key": "tools.lint",
+      "command": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+      "state": "present",
+      "ok": true,
+      "mode": "explicit",
+      "tool": "",
+      "version": "",
+      "observed": "/usr/local/bin/ruff",
+      "detail": "the project's declared command",
+      "where": "aisef-verify-python:84adf1d8eaf9"
+     },
+     {
+      "key": "tools.sast",
+      "command": "bandit -q -r .",
+      "state": "present",
+      "ok": true,
+      "mode": "auto",
+      "tool": "bandit",
+      "version": "1.9.4",
+      "observed": "bandit 1.9.4",
+      "detail": "bandit (pinned 1.9.4)",
+      "where": "aisef-verify-python:84adf1d8eaf9"
+     }
+    ],
+    "image": "aisef-verify-python:84adf1d8eaf9",
+    "image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "expected_python_image": "aisef-verify-python:84adf1d8eaf9"
+   },
+   "execution_profile": {
+    "path": "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO.json",
+    "expected": {
+     "model": "9router/ds/deepseek-v4-pro",
+     "max_turns": 80
+    },
+    "check": {
+     "profile": "PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO",
+     "profile_id": "sha256:9f99ce5b057d229403c89e1958c41ee044dc977cd6fce9854b741f8ba691d147",
+     "copy_id": "sha256:9f99ce5b057d229403c89e1958c41ee044dc977cd6fce9854b741f8ba691d147",
+     "matches": true,
+     "differences": {}
+    }
+   },
+   "stage_env_check": {
+    "command": "uv run {p}/_bmad/scripts/resolve_customization.py --skill {p}/.claude/skills/bmad-code-review --project-root {p} --key workflow",
+    "path": "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/profiles/stage-env-ro-uv/bin:/Users/nghinh/.local/bin:/Users/nghinh/.antigravity-ide/antigravity-ide/bin:/Users/nghinh/bin:/Users/nghinh/Library/Android/sdk/platform-tools:/Users/nghinh/Library/Android/sdk/cmdline-tools/latest/bin:/Users/nghinh/.opencode/bin:/Users/nghinh/.local/bin:/opt/homebrew/bin:/Users/nghinh/.npm-global/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/opt/homebrew/bin:/Users/nghinh/.nvm/versions/node/v22.22.1/bin:/Users/nghinh/Library/pnpm:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_012ABz1xjgtJYWKrcJkXW6ad/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_014WxCYbLf7f3uw2isHFR9US/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_0155zZVATbJU3jHUmPP9NvMC/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_01AYHYqVLaZRH2Vi6aHgDwEw/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_01SfWJSiw6JtGbsuW75PKvPK/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_01XXJmxLXPEhPMmnxmrgntNw/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/skills-plugin/397c6835-34b1-4b78-b008-f94d2f58ee90/1c625eaa-3cc7-4f27-a610-c53b8cda189b/bin:/Users/nghinh/.claude/plugins/cache/karpathy-skills/andrej-karpathy-skills/1.0.0/bin:/Users/nghinh/.claude/plugins/cache/claude-plugins-official/gopls-lsp/1.0.0/bin:/Users/nghinh/.claude/plugins/cache/ponytail/ponytail/4.9.0/bin:/Users/nghinh/.claude/plugins/cache/claude-community/eli5/1.0.0/bin:/Users/nghinh/.claude/plugins/cache/claude-plugins-official/playwright/unknown/bin:/Users/nghinh/.claude/plugins/cache/claude-plugins-official/frontend-design/unknown/bin",
+    "stage_env": {
+     "resolved_uv": "closure-evidence/hardening/w1/profiles/stage-env-ro-uv/bin/uv",
+     "wrapper_sha256": "f3fbbf214533a9d3fa497cac668d2760f99fd1c23ccf1d647f6f776f7bdd984e",
+     "real_uv": "/Users/nghinh/.local/bin/uv",
+     "real_uv_version": "uv 0.11.3 (45da18ac3 2026-04-01 aarch64-apple-darwin)"
+    },
+    "per_role_shell": {
+     "reviewer /bin/sh -c": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     },
+     "reviewer /bin/zsh -c": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     },
+     "reviewer /bin/zsh -ic": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     },
+     "security /bin/sh -c": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     },
+     "security /bin/zsh -c": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     },
+     "security /bin/zsh -ic": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     }
+    },
+    "developer_control": {
+     "developer_tree_changed": true,
+     "new": [
+      ".venv",
+      "ledgerlock.egg-info",
+      "uv.lock"
+     ]
+    },
+    "pass": true
+   },
+   "section4_measured": {
+    "wheel": "/Users/nghinh/Downloads/projects/aisef-freeze/40393cda89db/dist/aisef-1.7.6-py3-none-any.whl",
+    "wheel_sha256_in_freeze": "3f0fd6519a9f21b790eeaadcf39a95436dfb9ba75878f9bb411e376ebfc116a6",
+    "aisef_tree_digest": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+    "PHASE12_KERNEL_DIGEST": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+    "aisef_tree_at_the_candidate_sha": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+    "run_max_turns": 80,
+    "capability_matrix": {
+     "path": "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/tool-capability-matrix.json",
+     "pass": true,
+     "aisef_tree": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+     "totals": {
+      "profiles": 7,
+      "capabilities": 21,
+      "qualified": 11,
+      "none_declared": 10,
+      "failed": [],
+      "presets_failed": []
+     }
+    },
+    "stale_evidence_dirs": [],
+    "arb1": {
+     "artifacts": [
+      "stories.index.json",
+      "design-contract.json"
+     ],
+     "signed_digest": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+     "digest_recomputed_by_the_signed_method": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+     "byte_identical_to_what_was_signed": true,
+     "current_method_digest": "32736048f968b74ec2cce5f010d465f045b4048b097d36476d13d3e6ada6a206",
+     "stale_caused_by_the_hash_method_alone": true
+    }
+   },
+   "preflight": {
+    "trunk_is_the_approved_fresh_root": true,
+    "zero_prior_delivery_commits": true,
+    "expected_story_count": true,
+    "expected_story_state_none_registered": true,
+    "no_candidate_branches": true,
+    "artifacts_match_frozen_requirements": true,
+    "client_is_opencode": true,
+    "expected_opencode_version": true,
+    "expected_model_route": true,
+    "guard_plugin_bound_to_the_frozen_candidate": true,
+    "no_stale_story_worktrees": true,
+    "sandbox_image_is_the_frozen_candidates_python_environment": true,
+    "every_selected_tool_probed_present_before_the_first_model_call": true,
+    "sandbox_image_present": true,
+    "environment_identity_matches_freeze": true,
+    "no_remotes": true,
+    "frozen_wheel_digest_identical": true,
+    "product_tree_digest_identical": true,
+    "same_max_turn_configuration": true,
+    "execution_profile_identity_matches": true,
+    "same_capability_matrix": true,
+    "no_stale_evidence": true,
+    "readiness_hash_migration_check_passes_mechanically": true,
+    "reviewer_dependency_command_leaves_the_tree_byte_identical": true
+   },
+   "preflight_measured": {
+    "model": "9router/ds/deepseek-v4-pro",
+    "opencode_version": "1.18.31",
+    "plugin_bin": "const BIN = [\"/Users/nghinh/Downloads/projects/aisef-freeze/40393cda89db/w1-venv/bin/aisef\"]",
+    "worktrees": [
+     "/Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2 40a87b4 [master]"
+    ],
+    "stories": 16,
+    "docker_image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+   },
+   "preflight_ok": true,
+   "gates": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "stale",
+    "pre-deploy": "pending"
+   },
+   "agent_starts_before": 5,
+   "story_evidence_before": [],
+   "ok": true
+  },
+  "kernel_first": {
+   "at": "2026-09-19T17:45:01+0700",
+   "agent_starts_before": 5,
+   "evidence_before": [],
+   "gates_before": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "stale",
+    "pre-deploy": "pending"
+   },
+   "run": {
+    "cmd": [
+     "aisef",
+     "run",
+     "--client",
+     "opencode"
+    ],
+    "exit": 2,
+    "seconds": 0.3,
+    "stdout_tail": "",
+    "stderr_tail": "✗ gate not approved: readiness\n  aisef review readiness\n"
+   },
+   "agent_starts_after": 5,
+   "evidence_after": [],
+   "refused_on_readiness": true,
+   "no_agent_call": true,
+   "ok": true,
+   "classification": "kernel refused the STALE gate before any agent call (ARB-1 kernel path first)"
+  },
+  "approve": {
+   "at": "2026-09-19T17:45:02+0700",
+   "gates_before": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "stale",
+    "pre-deploy": "pending"
+   },
+   "arb1_measured": {
+    "artifacts": [
+     "stories.index.json",
+     "design-contract.json"
+    ],
+    "signed_digest": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+    "digest_recomputed_by_the_signed_method": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+    "byte_identical_to_what_was_signed": true,
+    "current_method_digest": "32736048f968b74ec2cce5f010d465f045b4048b097d36476d13d3e6ada6a206",
+    "stale_caused_by_the_hash_method_alone": true
+   },
+   "approve": {
+    "cmd": [
+     "aisef",
+     "approve",
+     "readiness",
+     "--note",
+     "ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for byte-identical content after the hash-method change (SS-55 verifier-config digest); not a waiver; kernel refusal recorded first; conditions measured in closure-evidence/hardening/w1/ARBITRATION-PREDECLARED.json"
+    ],
+    "exit": 0,
+    "seconds": 6.2,
+    "stdout_tail": "\n✗ 2/16 stories not yet eligible:\n  MISSING EVIDENCE STORY-02-01\n    - verify.e2e — story declares in `verification_contract`. configure `verify.e2e`\n  MISSING EVIDENCE STORY-03-01\n    - verify.e2e — story declares in `verification_contract`. configure `verify.e2e`\n✅ readiness approved by nghinh\n",
+    "stderr_tail": ""
+   },
+   "gates_after": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "approved",
+    "pre-deploy": "pending"
+   },
+   "approval_record": {
+    "gate": "readiness",
+    "artifact": "stories.index.json, design-contract.json",
+    "artifact_sha256": "32736048f968b74ec2cce5f010d465f045b4048b097d36476d13d3e6ada6a206",
+    "status": "approved",
+    "seq": 11,
+    "decided_by": "nghinh",
+    "decided_at": "2026-09-19T10:45:08+00:00",
+    "note": "ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for byte-identical content after the hash-method change (SS-55 verifier-config digest); not a waiver; kernel refusal recorded first; conditions measured in closure-evidence/hardening/w1/ARBITRATION-PREDECLARED.json",
+    "machine_checks": {},
+    "history": [
+     {
+      "status": "approved",
+      "decided_by": "nghinh",
+      "decided_at": "2026-09-15T13:32:32+00:00",
+      "note": "",
+      "artifact_sha256": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838"
+     }
+    ]
+   },
+   "changed_gates": [
+    "readiness"
+   ],
+   "ok": true
+  },
+  "run": {
+   "at": "2026-09-19T17:45:08+0700",
+   "invocations": [
+    {
+     "k": 1,
+     "pid": 84627,
+     "pgid": 84627,
+     "started": "2026-09-19T17:45:08+0700",
+     "t0": 1789814708.908237,
+     "exit": -15,
+     "ended": "2026-09-19T18:05:08+0700",
+     "seconds": 1199.1,
+     "killed": {
+      "marker": "wave=EPIC-01/w3 DONE",
+      "at": "2026-09-19T18:05:00+0700",
+      "line": "[2026-09-19 18:04:57] wave=EPIC-01/w3 DONE 1/1 passed $0.00",
+      "kind": "forced resume (P20 procedure 3)",
+      "processes_before": [
+       {
+        "pid": 1731,
+        "pgid": 1730,
+        "etime": "19-03:47:30",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72137,
+        "pgid": 72136,
+        "etime": "13-05:09:42",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72143,
+        "pgid": 72134,
+        "etime": "13-05:09:41",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=gpu-process --user-data-dir=/Users/nghinh/Library/Appli"
+       },
+       {
+        "pid": 72144,
+        "pgid": 72134,
+        "etime": "13-05:09:41",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=network.mojom.NetworkService"
+       },
+       {
+        "pid": 72145,
+        "pgid": 72134,
+        "etime": "13-05:09:41",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=node.mojom.NodeService --lan"
+       },
+       {
+        "pid": 72172,
+        "pgid": 72134,
+        "etime": "13-05:09:40",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper (Renderer).app/Contents/MacOS/OpenCode Helper (Renderer) --type=renderer --user-data-dir=/Users/n"
+       },
+       {
+        "pid": 73558,
+        "pgid": 72134,
+        "etime": "13-04:51:03",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=audio.mojom.AudioService --l"
+       },
+       {
+        "pid": 83740,
+        "pgid": 83740,
+        "etime": "21:08",
+        "command": "/bin/zsh -c source /Users/nghinh/.claude/shell-snapshots/snapshot-zsh-1789730938864-b5ipeh.sh 2>/dev/null || true && setopt NO_EXTENDED_GLOB NO_BARE_GLOB_QUAL 2"
+       },
+       {
+        "pid": 84627,
+        "pgid": 84627,
+        "etime": "19:52",
+        "command": "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/nghinh/Downloads/projects/ai"
+       },
+       {
+        "pid": 90827,
+        "pgid": 84627,
+        "etime": "00:00",
+        "command": "docker run --rm -v /Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2:/workspace:ro -w /workspace --name aisef-32aec71fab35 --network=none --cap-drop=ALL --u"
+       },
+       {
+        "pid": 85777,
+        "pgid": 85777,
+        "etime": "03-22:06:16",
+        "command": "opencode"
+       },
+       {
+        "pid": 7945,
+        "pgid": 7945,
+        "etime": "18-08:19:06",
+        "command": "opencode"
+       },
+       {
+        "pid": 7339,
+        "pgid": 7339,
+        "etime": "12-10:41:59",
+        "command": "opencode -s ses_f89d00c6cffeIMbCv2EHr2m7l6"
+       },
+       {
+        "pid": 91279,
+        "pgid": 91279,
+        "etime": "17-09:38:38",
+        "command": "opencode"
+       },
+       {
+        "pid": 14683,
+        "pgid": 14683,
+        "etime": "18-08:10:35",
+        "command": "opencode"
+       },
+       {
+        "pid": 41086,
+        "pgid": 41086,
+        "etime": "18-03:45:34",
+        "command": "opencode"
+       }
+      ],
+      "process_alive_when_marker_seen": true,
+      "signal_sent": true,
+      "exit": -15,
+      "processes_after": [
+       {
+        "pid": 1731,
+        "pgid": 1730,
+        "etime": "19-03:47:38",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72137,
+        "pgid": 72136,
+        "etime": "13-05:09:50",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72143,
+        "pgid": 72134,
+        "etime": "13-05:09:49",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=gpu-process --user-data-dir=/Users/nghinh/Library/Appli"
+       },
+       {
+        "pid": 72144,
+        "pgid": 72134,
+        "etime": "13-05:09:49",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=network.mojom.NetworkService"
+       },
+       {
+        "pid": 72145,
+        "pgid": 72134,
+        "etime": "13-05:09:49",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=node.mojom.NodeService --lan"
+       },
+       {
+        "pid": 72172,
+        "pgid": 72134,
+        "etime": "13-05:09:48",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper (Renderer).app/Contents/MacOS/OpenCode Helper (Renderer) --type=renderer --user-data-dir=/Users/n"
+       },
+       {
+        "pid": 73558,
+        "pgid": 72134,
+        "etime": "13-04:51:11",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=audio.mojom.AudioService --l"
+       },
+       {
+        "pid": 83740,
+        "pgid": 83740,
+        "etime": "21:16",
+        "command": "/bin/zsh -c source /Users/nghinh/.claude/shell-snapshots/snapshot-zsh-1789730938864-b5ipeh.sh 2>/dev/null || true && setopt NO_EXTENDED_GLOB NO_BARE_GLOB_QUAL 2"
+       },
+       {
+        "pid": 85777,
+        "pgid": 85777,
+        "etime": "03-22:06:24",
+        "command": "opencode"
+       },
+       {
+        "pid": 7945,
+        "pgid": 7945,
+        "etime": "18-08:19:14",
+        "command": "opencode"
+       },
+       {
+        "pid": 7339,
+        "pgid": 7339,
+        "etime": "12-10:42:07",
+        "command": "opencode -s ses_f89d00c6cffeIMbCv2EHr2m7l6"
+       },
+       {
+        "pid": 91279,
+        "pgid": 91279,
+        "etime": "17-09:38:46",
+        "command": "opencode"
+       },
+       {
+        "pid": 14683,
+        "pgid": 14683,
+        "etime": "18-08:10:43",
+        "command": "opencode"
+       },
+       {
+        "pid": 41086,
+        "pgid": 41086,
+        "etime": "18-03:45:42",
+        "command": "opencode"
+       }
+      ],
+      "survivors_after_kill": []
+     },
+     "stdout_tail": []
+    },
+    {
+     "k": 2,
+     "pid": 90832,
+     "pgid": 90832,
+     "started": "2026-09-19T18:05:08+0700",
+     "t0": 1789815908.059596,
+     "survivors_90s_after_resume_start": [
+      {
+       "pid": 91038,
+       "pgid": 91038,
+       "etime": "01:22",
+       "command": "/Users/nghinh/.opencode/bin/opencode run --format json --dir /Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2/.aisef/worktrees/STORY-01-04 --model 9router/"
+      },
+      {
+       "pid": 85777,
+       "pgid": 85777,
+       "etime": "03-22:07:54",
+       "command": "opencode"
+      },
+      {
+       "pid": 7945,
+       "pgid": 7945,
+       "etime": "18-08:20:44",
+       "command": "opencode"
+      },
+      {
+       "pid": 7339,
+       "pgid": 7339,
+       "etime": "12-10:43:37",
+       "command": "opencode -s ses_f89d00c6cffeIMbCv2EHr2m7l6"
+      },
+      {
+       "pid": 91279,
+       "pgid": 91279,
+       "etime": "17-09:40:16",
+       "command": "opencode"
+      },
+      {
+       "pid": 14683,
+       "pgid": 14683,
+       "etime": "18-08:12:13",
+       "command": "opencode"
+      },
+      {
+       "pid": 41086,
+       "pgid": 41086,
+       "etime": "18-03:47:12",
+       "command": "opencode"
+      }
+     ],
+     "exit": -15,
+     "ended": "2026-09-19T18:57:55+0700",
+     "seconds": 3167.6,
+     "killed": {
+      "marker": "wave=EPIC-03/w1 DONE",
+      "at": "2026-09-19T18:57:48+0700",
+      "line": "[2026-09-19 18:57:44] wave=EPIC-03/w1 DONE 1/1 passed $0.00",
+      "kind": "forced resume (P20 procedure 3)",
+      "processes_before": [
+       {
+        "pid": 1731,
+        "pgid": 1730,
+        "etime": "19-04:40:18",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72137,
+        "pgid": 72136,
+        "etime": "13-06:02:30",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72143,
+        "pgid": 72134,
+        "etime": "13-06:02:29",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=gpu-process --user-data-dir=/Users/nghinh/Library/Appli"
+       },
+       {
+        "pid": 72144,
+        "pgid": 72134,
+        "etime": "13-06:02:29",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=network.mojom.NetworkService"
+       },
+       {
+        "pid": 72145,
+        "pgid": 72134,
+        "etime": "13-06:02:29",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=node.mojom.NodeService --lan"
+       },
+       {
+        "pid": 72172,
+        "pgid": 72134,
+        "etime": "13-06:02:28",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper (Renderer).app/Contents/MacOS/OpenCode Helper (Renderer) --type=renderer --user-data-dir=/Users/n"
+       },
+       {
+        "pid": 73558,
+        "pgid": 72134,
+        "etime": "13-05:43:51",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=audio.mojom.AudioService --l"
+       },
+       {
+        "pid": 83740,
+        "pgid": 83740,
+        "etime": "01:13:56",
+        "command": "/bin/zsh -c source /Users/nghinh/.claude/shell-snapshots/snapshot-zsh-1789730938864-b5ipeh.sh 2>/dev/null || true && setopt NO_EXTENDED_GLOB NO_BARE_GLOB_QUAL 2"
+       },
+       {
+        "pid": 90832,
+        "pgid": 90832,
+        "etime": "52:40",
+        "command": "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/nghinh/Downloads/projects/ai"
+       },
+       {
+        "pid": 85777,
+        "pgid": 85777,
+        "etime": "03-22:59:04",
+        "command": "opencode"
+       },
+       {
+        "pid": 7945,
+        "pgid": 7945,
+        "etime": "18-09:11:54",
+        "command": "opencode"
+       },
+       {
+        "pid": 7339,
+        "pgid": 7339,
+        "etime": "12-11:34:47",
+        "command": "opencode -s ses_f89d00c6cffeIMbCv2EHr2m7l6"
+       },
+       {
+        "pid": 91279,
+        "pgid": 91279,
+        "etime": "17-10:31:26",
+        "command": "opencode"
+       },
+       {
+        "pid": 14683,
+        "pgid": 14683,
+        "etime": "18-09:03:23",
+        "command": "opencode"
+       },
+       {
+        "pid": 41086,
+        "pgid": 41086,
+        "etime": "18-04:38:22",
+        "command": "opencode"
+       }
+      ],
+      "process_alive_when_marker_seen": true,
+      "signal_sent": true,
+      "exit": -15,
+      "processes_after": [
+       {
+        "pid": 1731,
+        "pgid": 1730,
+        "etime": "19-04:40:25",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72137,
+        "pgid": 72136,
+        "etime": "13-06:02:37",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72143,
+        "pgid": 72134,
+        "etime": "13-06:02:36",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=gpu-process --user-data-dir=/Users/nghinh/Library/Appli"
+       },
+       {
+        "pid": 72144,
+        "pgid": 72134,
+        "etime": "13-06:02:36",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=network.mojom.NetworkService"
+       },
+       {
+        "pid": 72145,
+        "pgid": 72134,
+        "etime": "13-06:02:36",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=node.mojom.NodeService --lan"
+       },
+       {
+        "pid": 72172,
+        "pgid": 72134,
+        "etime": "13-06:02:35",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper (Renderer).app/Contents/MacOS/OpenCode Helper (Renderer) --type=renderer --user-data-dir=/Users/n"
+       },
+       {
+        "pid": 73558,
+        "pgid": 72134,
+        "etime": "13-05:43:58",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=audio.mojom.AudioService --l"
+       },
+       {
+        "pid": 83740,
+        "pgid": 83740,
+        "etime": "01:14:03",
+        "command": "/bin/zsh -c source /Users/nghinh/.claude/shell-snapshots/snapshot-zsh-1789730938864-b5ipeh.sh 2>/dev/null || true && setopt NO_EXTENDED_GLOB NO_BARE_GLOB_QUAL 2"
+       },
+       {
+        "pid": 85777,
+        "pgid": 85777,
+        "etime": "03-22:59:11",
+        "command": "opencode"
+       },
+       {
+        "pid": 7945,
+        "pgid": 7945,
+        "etime": "18-09:12:01",
+        "command": "opencode"
+       },
+       {
+        "pid": 7339,
+        "pgid": 7339,
+        "etime": "12-11:34:54",
+        "command": "opencode -s ses_f89d00c6cffeIMbCv2EHr2m7l6"
+       },
+       {
+        "pid": 91279,
+        "pgid": 91279,
+        "etime": "17-10:31:33",
+        "command": "opencode"
+       },
+       {
+        "pid": 14683,
+        "pgid": 14683,
+        "etime": "18-09:03:30",
+        "command": "opencode"
+       },
+       {
+        "pid": 41086,
+        "pgid": 41086,
+        "etime": "18-04:38:29",
+        "command": "opencode"
+       }
+      ],
+      "survivors_after_kill": []
+     },
+     "stdout_tail": []
+    },
+    {
+     "k": 3,
+     "pid": 3540,
+     "pgid": 3540,
+     "started": "2026-09-19T18:57:55+0700",
+     "t0": 1789819075.640234,
+     "survivors_90s_after_resume_start": [
+      {
+       "pid": 3739,
+       "pgid": 3739,
+       "etime": "01:20",
+       "command": "/Users/nghinh/.opencode/bin/opencode run --format json --dir /Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2/.aisef/worktrees/STORY-03-02 --model 9router/"
+      },
+      {
+       "pid": 85777,
+       "pgid": 85777,
+       "etime": "03-23:00:41",
+       "command": "opencode"
+      },
+      {
+       "pid": 7945,
+       "pgid": 7945,
+       "etime": "18-09:13:31",
+       "command": "opencode"
+      },
+      {
+       "pid": 7339,
+       "pgid": 7339,
+       "etime": "12-11:36:24",
+       "command": "opencode -s ses_f89d00c6cffeIMbCv2EHr2m7l6"
+      },
+      {
+       "pid": 91279,
+       "pgid": 91279,
+       "etime": "17-10:33:03",
+       "command": "opencode"
+      },
+      {
+       "pid": 14683,
+       "pgid": 14683,
+       "etime": "18-09:05:00",
+       "command": "opencode"
+      },
+      {
+       "pid": 41086,
+       "pgid": 41086,
+       "etime": "18-04:39:59",
+       "command": "opencode"
+      }
+     ],
+     "exit": 2,
+     "ended": "2026-09-19T20:05:12+0700",
+     "seconds": 4036.9,
+     "killed": null,
+     "stdout_tail": [
+      "STORY-04-01: DONE",
+      "  [attempt 1] ok",
+      "EPIC-04 · wave 2",
+      "STORY-04-02: NOT DONE",
+      "  [attempt 1] gate failed",
+      "    ✅ evidence matches candidate",
+      "    ✅ guard ran",
+      "    ✅ test",
+      "    ✅ no baseline regression",
+      "    ✅ lint",
+      "    ✅ write scope",
+      "    – mockup map — story has no UI",
+      "    ✅ real tests",
+      "    ✅ criteria have tests",
+      "    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command",
+      "    ✗ TDD — tests green on first run — not proven to verify anything (tests/test_cli_exit_codes.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.",
+      "    ✗ tests verify story — tests verify nothing — still green without story code (parent SHA 9203f29): tests/test_cli_exit_codes.py::TestExitCodeContract::test_AC_STORY_04_02_1_wrong_positional_count_exits_2_stdout_empty, tests/test_cli_exit_codes.py::TestExitCodeContract::test_AC_STORY_04_02_6_snapshot_without_out_exits_2",
+      "    ✅ security",
+      "    ✅ review",
+      "    ✅ preservation — 15 behaviours of other stories still green",
+      "  [infra] the session wrote nothing (55 turns) — the tree is exactly as the session found it, so the gate has nothing to grade: its verdict is still current, and re-running the gate would return the block it already returned.",
+      "  [infra] the session wrote nothing (35 turns) — the tree is exactly as the session found it, so the gate has nothing to grade: its verdict is still current, and re-running the gate would return the block it already returned.",
+      "  ✗ 2 sessions in a row ran clean and wrote nothing: the session wrote nothing (35 turns) — the tree is exactly as the session found it, so the gate has nothing to grade: its verdict is still current, and re-running the gate would return the block it already returned. Re-opening with the same context returns the same decision — read the last gate verdict and fix what it asks for, or the story.",
+      "",
+      "⏸ stopped at EPIC-04 · wave 2"
+     ]
+    }
+   ],
+   "resumes": [
+    {
+     "after": "wave=EPIC-01/w3 DONE",
+     "kill": {
+      "marker": "wave=EPIC-01/w3 DONE",
+      "at": "2026-09-19T18:05:00+0700",
+      "line": "[2026-09-19 18:04:57] wave=EPIC-01/w3 DONE 1/1 passed $0.00",
+      "kind": "forced resume (P20 procedure 3)",
+      "processes_before": [
+       {
+        "pid": 1731,
+        "pgid": 1730,
+        "etime": "19-03:47:30",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72137,
+        "pgid": 72136,
+        "etime": "13-05:09:42",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72143,
+        "pgid": 72134,
+        "etime": "13-05:09:41",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=gpu-process --user-data-dir=/Users/nghinh/Library/Appli"
+       },
+       {
+        "pid": 72144,
+        "pgid": 72134,
+        "etime": "13-05:09:41",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=network.mojom.NetworkService"
+       },
+       {
+        "pid": 72145,
+        "pgid": 72134,
+        "etime": "13-05:09:41",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=node.mojom.NodeService --lan"
+       },
+       {
+        "pid": 72172,
+        "pgid": 72134,
+        "etime": "13-05:09:40",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper (Renderer).app/Contents/MacOS/OpenCode Helper (Renderer) --type=renderer --user-data-dir=/Users/n"
+       },
+       {
+        "pid": 73558,
+        "pgid": 72134,
+        "etime": "13-04:51:03",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=audio.mojom.AudioService --l"
+       },
+       {
+        "pid": 83740,
+        "pgid": 83740,
+        "etime": "21:08",
+        "command": "/bin/zsh -c source /Users/nghinh/.claude/shell-snapshots/snapshot-zsh-1789730938864-b5ipeh.sh 2>/dev/null || true && setopt NO_EXTENDED_GLOB NO_BARE_GLOB_QUAL 2"
+       },
+       {
+        "pid": 84627,
+        "pgid": 84627,
+        "etime": "19:52",
+        "command": "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/nghinh/Downloads/projects/ai"
+       },
+       {
+        "pid": 90827,
+        "pgid": 84627,
+        "etime": "00:00",
+        "command": "docker run --rm -v /Users/nghinh/Downloads/projects/w1-run-deepseek-ro-2:/workspace:ro -w /workspace --name aisef-32aec71fab35 --network=none --cap-drop=ALL --u"
+       },
+       {
+        "pid": 85777,
+        "pgid": 85777,
+        "etime": "03-22:06:16",
+        "command": "opencode"
+       },
+       {
+        "pid": 7945,
+        "pgid": 7945,
+        "etime": "18-08:19:06",
+        "command": "opencode"
+       },
+       {
+        "pid": 7339,
+        "pgid": 7339,
+        "etime": "12-10:41:59",
+        "command": "opencode -s ses_f89d00c6cffeIMbCv2EHr2m7l6"
+       },
+       {
+        "pid": 91279,
+        "pgid": 91279,
+        "etime": "17-09:38:38",
+        "command": "opencode"
+       },
+       {
+        "pid": 14683,
+        "pgid": 14683,
+        "etime": "18-08:10:35",
+        "command": "opencode"
+       },
+       {
+        "pid": 41086,
+        "pgid": 41086,
+        "etime": "18-03:45:34",
+        "command": "opencode"
+       }
+      ],
+      "process_alive_when_marker_seen": true,
+      "signal_sent": true,
+      "exit": -15,
+      "processes_after": [
+       {
+        "pid": 1731,
+        "pgid": 1730,
+        "etime": "19-03:47:38",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72137,
+        "pgid": 72136,
+        "etime": "13-05:09:50",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72143,
+        "pgid": 72134,
+        "etime": "13-05:09:49",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=gpu-process --user-data-dir=/Users/nghinh/Library/Appli"
+       },
+       {
+        "pid": 72144,
+        "pgid": 72134,
+        "etime": "13-05:09:49",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=network.mojom.NetworkService"
+       },
+       {
+        "pid": 72145,
+        "pgid": 72134,
+        "etime": "13-05:09:49",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=node.mojom.NodeService --lan"
+       },
+       {
+        "pid": 72172,
+        "pgid": 72134,
+        "etime": "13-05:09:48",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper (Renderer).app/Contents/MacOS/OpenCode Helper (Renderer) --type=renderer --user-data-dir=/Users/n"
+       },
+       {
+        "pid": 73558,
+        "pgid": 72134,
+        "etime": "13-04:51:11",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=audio.mojom.AudioService --l"
+       },
+       {
+        "pid": 83740,
+        "pgid": 83740,
+        "etime": "21:16",
+        "command": "/bin/zsh -c source /Users/nghinh/.claude/shell-snapshots/snapshot-zsh-1789730938864-b5ipeh.sh 2>/dev/null || true && setopt NO_EXTENDED_GLOB NO_BARE_GLOB_QUAL 2"
+       },
+       {
+        "pid": 85777,
+        "pgid": 85777,
+        "etime": "03-22:06:24",
+        "command": "opencode"
+       },
+       {
+        "pid": 7945,
+        "pgid": 7945,
+        "etime": "18-08:19:14",
+        "command": "opencode"
+       },
+       {
+        "pid": 7339,
+        "pgid": 7339,
+        "etime": "12-10:42:07",
+        "command": "opencode -s ses_f89d00c6cffeIMbCv2EHr2m7l6"
+       },
+       {
+        "pid": 91279,
+        "pgid": 91279,
+        "etime": "17-09:38:46",
+        "command": "opencode"
+       },
+       {
+        "pid": 14683,
+        "pgid": 14683,
+        "etime": "18-08:10:43",
+        "command": "opencode"
+       },
+       {
+        "pid": 41086,
+        "pgid": 41086,
+        "etime": "18-03:45:42",
+        "command": "opencode"
+       }
+      ],
+      "survivors_after_kill": []
+     },
+     "resume_invocation": 2
+    },
+    {
+     "after": "wave=EPIC-03/w1 DONE",
+     "kill": {
+      "marker": "wave=EPIC-03/w1 DONE",
+      "at": "2026-09-19T18:57:48+0700",
+      "line": "[2026-09-19 18:57:44] wave=EPIC-03/w1 DONE 1/1 passed $0.00",
+      "kind": "forced resume (P20 procedure 3)",
+      "processes_before": [
+       {
+        "pid": 1731,
+        "pgid": 1730,
+        "etime": "19-04:40:18",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72137,
+        "pgid": 72136,
+        "etime": "13-06:02:30",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72143,
+        "pgid": 72134,
+        "etime": "13-06:02:29",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=gpu-process --user-data-dir=/Users/nghinh/Library/Appli"
+       },
+       {
+        "pid": 72144,
+        "pgid": 72134,
+        "etime": "13-06:02:29",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=network.mojom.NetworkService"
+       },
+       {
+        "pid": 72145,
+        "pgid": 72134,
+        "etime": "13-06:02:29",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=node.mojom.NodeService --lan"
+       },
+       {
+        "pid": 72172,
+        "pgid": 72134,
+        "etime": "13-06:02:28",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper (Renderer).app/Contents/MacOS/OpenCode Helper (Renderer) --type=renderer --user-data-dir=/Users/n"
+       },
+       {
+        "pid": 73558,
+        "pgid": 72134,
+        "etime": "13-05:43:51",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=audio.mojom.AudioService --l"
+       },
+       {
+        "pid": 83740,
+        "pgid": 83740,
+        "etime": "01:13:56",
+        "command": "/bin/zsh -c source /Users/nghinh/.claude/shell-snapshots/snapshot-zsh-1789730938864-b5ipeh.sh 2>/dev/null || true && setopt NO_EXTENDED_GLOB NO_BARE_GLOB_QUAL 2"
+       },
+       {
+        "pid": 90832,
+        "pgid": 90832,
+        "etime": "52:40",
+        "command": "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/nghinh/Downloads/projects/ai"
+       },
+       {
+        "pid": 85777,
+        "pgid": 85777,
+        "etime": "03-22:59:04",
+        "command": "opencode"
+       },
+       {
+        "pid": 7945,
+        "pgid": 7945,
+        "etime": "18-09:11:54",
+        "command": "opencode"
+       },
+       {
+        "pid": 7339,
+        "pgid": 7339,
+        "etime": "12-11:34:47",
+        "command": "opencode -s ses_f89d00c6cffeIMbCv2EHr2m7l6"
+       },
+       {
+        "pid": 91279,
+        "pgid": 91279,
+        "etime": "17-10:31:26",
+        "command": "opencode"
+       },
+       {
+        "pid": 14683,
+        "pgid": 14683,
+        "etime": "18-09:03:23",
+        "command": "opencode"
+       },
+       {
+        "pid": 41086,
+        "pgid": 41086,
+        "etime": "18-04:38:22",
+        "command": "opencode"
+       }
+      ],
+      "process_alive_when_marker_seen": true,
+      "signal_sent": true,
+      "exit": -15,
+      "processes_after": [
+       {
+        "pid": 1731,
+        "pgid": 1730,
+        "etime": "19-04:40:25",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72137,
+        "pgid": 72136,
+        "etime": "13-06:02:37",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler --no-rate-limit --monitor-self-annotation=ptype=cras"
+       },
+       {
+        "pid": 72143,
+        "pgid": 72134,
+        "etime": "13-06:02:36",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=gpu-process --user-data-dir=/Users/nghinh/Library/Appli"
+       },
+       {
+        "pid": 72144,
+        "pgid": 72134,
+        "etime": "13-06:02:36",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=network.mojom.NetworkService"
+       },
+       {
+        "pid": 72145,
+        "pgid": 72134,
+        "etime": "13-06:02:36",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=node.mojom.NodeService --lan"
+       },
+       {
+        "pid": 72172,
+        "pgid": 72134,
+        "etime": "13-06:02:35",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper (Renderer).app/Contents/MacOS/OpenCode Helper (Renderer) --type=renderer --user-data-dir=/Users/n"
+       },
+       {
+        "pid": 73558,
+        "pgid": 72134,
+        "etime": "13-05:43:58",
+        "command": "/Applications/OpenCode.app/Contents/Frameworks/OpenCode Helper.app/Contents/MacOS/OpenCode Helper --type=utility --utility-sub-type=audio.mojom.AudioService --l"
+       },
+       {
+        "pid": 83740,
+        "pgid": 83740,
+        "etime": "01:14:03",
+        "command": "/bin/zsh -c source /Users/nghinh/.claude/shell-snapshots/snapshot-zsh-1789730938864-b5ipeh.sh 2>/dev/null || true && setopt NO_EXTENDED_GLOB NO_BARE_GLOB_QUAL 2"
+       },
+       {
+        "pid": 85777,
+        "pgid": 85777,
+        "etime": "03-22:59:11",
+        "command": "opencode"
+       },
+       {
+        "pid": 7945,
+        "pgid": 7945,
+        "etime": "18-09:12:01",
+        "command": "opencode"
+       },
+       {
+        "pid": 7339,
+        "pgid": 7339,
+        "etime": "12-11:34:54",
+        "command": "opencode -s ses_f89d00c6cffeIMbCv2EHr2m7l6"
+       },
+       {
+        "pid": 91279,
+        "pgid": 91279,
+        "etime": "17-10:31:33",
+        "command": "opencode"
+       },
+       {
+        "pid": 14683,
+        "pgid": 14683,
+        "etime": "18-09:03:30",
+        "command": "opencode"
+       },
+       {
+        "pid": 41086,
+        "pgid": 41086,
+        "etime": "18-04:38:29",
+        "command": "opencode"
+       }
+      ],
+      "survivors_after_kill": []
+     },
+     "resume_invocation": 3
+    }
+   ],
+   "markers_pending": [],
+   "runlog_offset_at_start": 9298,
+   "ended": "2026-09-19T20:05:12+0700",
+   "terminal_exit": 2,
+   "markers_not_reached": [],
+   "runlog_lines_epic": [
+    "[2026-09-19 17:53:36] wave=EPIC-01/w1 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 17:53:36] wave=EPIC-01/w2 START stories=STORY-01-02",
+    "[2026-09-19 17:59:49] wave=EPIC-01/w2 DONE 1/1 passed $0.00",
+    "[2026-09-19 17:59:50] wave=EPIC-01/w2 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 17:59:50] wave=EPIC-01/w3 START stories=STORY-01-03",
+    "[2026-09-19 18:04:57] wave=EPIC-01/w3 DONE 1/1 passed $0.00",
+    "[2026-09-19 18:04:57] wave=EPIC-01/w3 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:04:57] wave=EPIC-01/w4 START stories=STORY-01-04",
+    "[2026-09-19 18:05:11] epic=EPIC-01 START",
+    "[2026-09-19 18:05:11] wave=EPIC-01/w1 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:05:11] wave=EPIC-01/w2 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:05:11] wave=EPIC-01/w3 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:05:11] wave=EPIC-01/w4 START stories=STORY-01-04",
+    "[2026-09-19 18:12:28] wave=EPIC-01/w4 DONE 1/1 passed $0.00",
+    "[2026-09-19 18:12:29] wave=EPIC-01/w4 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:12:29] wave=EPIC-01/w5 START stories=STORY-01-05",
+    "[2026-09-19 18:21:22] wave=EPIC-01/w5 DONE 1/1 passed $0.00",
+    "[2026-09-19 18:21:23] wave=EPIC-01/w5 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:21:23] wave=EPIC-01/w6 START stories=STORY-01-06",
+    "[2026-09-19 18:28:46] wave=EPIC-01/w6 DONE 1/1 passed $0.00",
+    "[2026-09-19 18:28:46] wave=EPIC-01/w6 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:28:46] epic=EPIC-01 DONE",
+    "[2026-09-19 18:28:46] epic=EPIC-02 START",
+    "[2026-09-19 18:28:46] wave=EPIC-02/w1 START stories=STORY-02-01",
+    "[2026-09-19 18:36:37] wave=EPIC-02/w1 DONE 1/1 passed $0.00",
+    "[2026-09-19 18:36:38] wave=EPIC-02/w1 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:36:38] wave=EPIC-02/w2 START stories=STORY-02-02",
+    "[2026-09-19 18:45:25] wave=EPIC-02/w2 DONE 1/1 passed $0.00",
+    "[2026-09-19 18:45:26] wave=EPIC-02/w2 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:45:26] epic=EPIC-02 DONE",
+    "[2026-09-19 18:45:26] epic=EPIC-03 START",
+    "[2026-09-19 18:45:26] wave=EPIC-03/w1 START stories=STORY-03-01",
+    "[2026-09-19 18:57:44] wave=EPIC-03/w1 DONE 1/1 passed $0.00",
+    "[2026-09-19 18:57:44] wave=EPIC-03/w1 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:57:44] wave=EPIC-03/w2 START stories=STORY-03-02",
+    "[2026-09-19 18:57:59] epic=EPIC-01 START",
+    "[2026-09-19 18:57:59] wave=EPIC-01/w1 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:57:59] wave=EPIC-01/w2 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:57:59] wave=EPIC-01/w3 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:57:59] wave=EPIC-01/w4 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:57:59] wave=EPIC-01/w5 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:57:59] wave=EPIC-01/w6 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:57:59] epic=EPIC-01 DONE",
+    "[2026-09-19 18:57:59] epic=EPIC-02 START",
+    "[2026-09-19 18:57:59] wave=EPIC-02/w1 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:57:59] wave=EPIC-02/w2 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:57:59] epic=EPIC-02 DONE",
+    "[2026-09-19 18:57:59] epic=EPIC-03 START",
+    "[2026-09-19 18:57:59] wave=EPIC-03/w1 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 18:57:59] wave=EPIC-03/w2 START stories=STORY-03-02",
+    "[2026-09-19 19:09:44] wave=EPIC-03/w2 DONE 1/1 passed $0.00",
+    "[2026-09-19 19:09:45] wave=EPIC-03/w2 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 19:09:45] epic=EPIC-03 DONE",
+    "[2026-09-19 19:09:45] epic=EPIC-04 START",
+    "[2026-09-19 19:09:45] wave=EPIC-04/w1 START stories=STORY-04-01",
+    "[2026-09-19 19:19:24] wave=EPIC-04/w1 DONE 1/1 passed $0.00",
+    "[2026-09-19 19:19:25] wave=EPIC-04/w1 qualified=stop reason=all stories done for this phase",
+    "[2026-09-19 19:19:25] wave=EPIC-04/w2 START stories=STORY-04-02",
+    "[2026-09-19 20:05:09] wave=EPIC-04/w2 DONE 0/1 passed $0.00",
+    "[2026-09-19 20:05:09] epic=EPIC-04 STOPPED at=EPIC-04 · wave 2"
+   ],
+   "ok": true
+  },
+  "finish": {
+   "at": "2026-09-19T20:05:12+0700",
+   "status": {
+    "cmd": [
+     "aisef",
+     "status"
+    ],
+    "exit": 2,
+    "seconds": 0.2,
+    "stdout_tail": "Progress: 11/16 stories done (4 not started)\nActive epics: EPIC-04\n\n  done        11\n  failed      1\n\nCost: $0.00\nAgent runs: ok 50\n\n✗ 1 stories not passing:\n    STORY-04-02      failed   2 sessions in a row ran clean and wrote nothing: the session wrote nothing (35 turns) — the tree is exactly as the session found it, so the gate has nothing to grade: its verdict is still current, and re-running the gate would return the block it already returned. Re-opening with the same context returns the same decision — read the last gate verdict and fix what it asks for, or the story.\n",
+    "stderr_tail": ""
+   },
+   "gates": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "approved",
+    "pre-deploy": "pending"
+   },
+   "cost": {
+    "cmd": [
+     "aisef",
+     "cost",
+     "--out",
+     "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/run-deepseek-ro-2/cost.md"
+    ],
+    "exit": 0,
+    "seconds": 0.4,
+    "stdout_tail": " went\n\n| class | sessions | turns | tokens | share |\n|---|---|---|---|---|\n| passed | 33 | 322 | 1,814,358 | 12% |\n| gate-blocked | 3 | 44 | 214,005 | 1% |\n| no-verdict | 2 | 90 | 475,243 | 3% |\n| planning | 12 | 148 | 12,509,959 | 83% |\n\nSpend on stories that ended with a net VERIFIED behaviour: **12%**.\n\n## Per story\n\nLedger columns **overlap** between stories (one FR can be covered by two), so they do not sum to the corpus counts above.\n\n| story | attempts | tokens | share | passed | gate-blocked | turn-cap | env-failed | no-verdict | verified | gap | reopened | net |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|\n| plan-epics | 0 | 5,687,131 | 38% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-architecture | 0 | 1,344,422 | 9% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-apply | 0 | 1,142,062 | 8% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-project-context | 0 | 960,795 | 6% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| STORY-04-02 | 1 | 689,248 | 5% | — | 214,005 | — | — | 475,243 | 0 | 7 | 0 | 0 |\n| plan-ux | 0 | 675,905 | 5% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-prd | 0 | 642,950 | 4% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-help-version | 0 | 634,922 | 4% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-snapshot | 0 | 553,491 | 4% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-verify | 0 | 500,041 | 3% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-repair-tail | 0 | 368,240 | 2% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| STORY-03-01 | 1 | 197,866 | 1% | 197,866 | — | — | — | — | 7 | 0 | 0 | 7 |\n| STORY-02-02 | 1 | 179,752 | 1% | 179,752 | — | — | — | — | 5 | 0 | 0 | 5 |\n| STORY-01-05 | 1 | 173,317 | 1% | 173,317 | — | — | — | — | 8 | 0 | 0 | 8 |\n| STORY-04-01 | 1 | 172,636 | 1% | 172,636 | — | — | — | — | 5 | 0 | 0 | 5 |\n| STORY-01-01 | 1 | 168,021 | 1% | 168,021 | — | — | — | — | 10 | 0 | 0 | 10 |\n| STORY-03-02 | 1 | 159,685 | 1% | 159,685 | — | — | — | — | 5 | 0 | 0 | 5 |\n| STORY-01-02 | 1 | 156,851 | 1% | 156,851 | — | — | — | — | 7 | 0 | 0 | 7 |\n| STORY-01-04 | 1 | 156,286 | 1% | 156,286 | — | — | — | — | 7 | 0 | 0 | 7 |\n| STORY-02-01 | 1 | 155,489 | 1% | 155,489 | — | — | — | — | 7 | 0 | 0 | 7 |\n| STORY-01-06 | 1 | 151,099 | 1% | 151,099 | — | — | — | — | 8 | 0 | 0 | 8 |\n| STORY-01-03 | 1 | 143,356 | 1% | 143,356 | — | — | — | — | 6 | 0 | 0 | 6 |\n| STORY-04-03 | 0 | 0 | 0% | — | — | — | — | — | 0 | 1 | 0 | 0 |\n| STORY-05-01 | 0 | 0 | 0% | — | — | — | — | — | 4 | 0 | 0 | 4 |\n| STORY-05-02 | 0 | 0 | 0% | — | — | — | — | — | 1 | 0 | 0 | 1 |\n| STORY-05-03 | 0 | 0 | 0% | — | — | — | — | — | 1 | 0 | 0 | 1 |\n\n## What the gate blocked on\n\n| check | blocks |\n|---|---|\n| TDD | 1 |\n| tests verify story | 1 |\n\n## By role\n\n| role | sessions | turns | tokens | share |\n|---|---|---|---|---|\n| ? | 12 | 148 | 12,509,959 | 83% |\n| developer | 14 | 335 | 1,850,501 | 12% |\n| review | 12 | 88 | 489,774 | 3% |\n| security | 12 | 33 | 163,331 | 1% |\n\n\n/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/run-deepseek-ro-2/cost.md\n",
+    "stderr_tail": ""
+   },
+   "cost_semantics": {
+    "provider_pricing_coverage_pct": 0,
+    "usd_recorded_by_the_provider": 0.0,
+    "cost_cap_usd": 80.0,
+    "cost_cap_status": "UNVERIFIABLE",
+    "cost_cap_note": "the provider priced no session on this route, so no dollar figure exists: the cap is neither reached nor not reached, and this run is not proof that the cap holds for this route",
+    "usage_measured": {
+     "sessions": 50,
+     "turns": 604,
+     "input_tokens_fresh": 15013565,
+     "input_tokens_cached": 35259392,
+     "output_tokens": 202000
+    },
+    "prices_estimated": false,
+    "recompute_rule": "cost = input_tokens/1e6 * price_per_M_input + output_tokens/1e6 * price_per_M_output, once the route publishes prices"
+   },
+   "project_git": {
+    "head": "9203f29bf598df58e8e639986ae186d43fcea4b4",
+    "branch": "master",
+    "branches": [
+     "*",
+     "master",
+     "story/STORY-01-01",
+     "story/STORY-01-02",
+     "story/STORY-01-03",
+     "story/STORY-01-04",
+     "story/STORY-01-05",
+     "story/STORY-01-06",
+     "story/STORY-02-01",
+     "story/STORY-02-02",
+     "story/STORY-03-01",
+     "story/STORY-03-02",
+     "story/STORY-04-01",
+     "story/STORY-04-02"
+    ],
+    "status": [
+     "M _bmad-output/approvals/readiness.json",
+     " M _bmad-output/run.log",
+     "?? _bmad-output/INDEX.md",
+     "?? _bmad-output/complexity.json",
+     "?? _bmad-output/evidence/STORY-01-01-lint-103.log",
+     "?? _bmad-output/evidence/STORY-01-01-sast-105.log",
+     "?? _bmad-output/evidence/STORY-01-01-sast-129.log",
+     "?? _bmad-output/evidence/STORY-01-01-sast-135.log",
+     "?? _bmad-output/evidence/STORY-01-01-test-63.log",
+     "?? _bmad-output/evidence/STORY-01-01-test-nop-169.log",
+     "?? _bmad-output/evidence/STORY-01-01.jsonl",
+     "?? _bmad-output/evidence/STORY-01-02-sast-107.log",
+     "?? _bmad-output/evidence/STORY-01-02-sast-54.log",
+     "?? _bmad-output/evidence/STORY-01-02-sast-60.log",
+     "?? _bmad-output/evidence/STORY-01-02-sast-81.log",
+     "?? _bmad-output/evidence/STORY-01-02-test-123.log",
+     "?? _bmad-output/evidence/STORY-01-02-test-132.log",
+     "?? _bmad-output/evidence/STORY-01-02-test-30.log",
+     "?? _bmad-output/evidence/STORY-01-02-test-42.log",
+     "?? _bmad-output/evidence/STORY-01-02-test-nop-131.log",
+     "?? _bmad-output/evidence/STORY-01-02.jsonl",
+     "?? _bmad-output/evidence/STORY-01-03-sast-54.log",
+     "?? _bmad-output/evidence/STORY-01-03-test-30.log",
+     "?? _bmad-output/evidence/STORY-01-03-test-42.log",
+     "?? _bmad-output/evidence/STORY-01-03-test-93.log",
+     "?? _bmad-output/evidence/STORY-01-03-test-baseline-2.log",
+     "?? _bmad-output/evidence/STORY-01-03-test-nop-92.log",
+     "?? _bmad-output/evidence/STORY-01-03.jsonl",
+     "?? _bmad-output/evidence/STORY-01-04-lint-38.log",
+     "?? _bmad-output/evidence/STORY-01-04-test-101.log",
+     "?? _bmad-output/evidence/STORY-01-04-test-20.log",
+     "?? _bmad-output/evidence/STORY-01-04-test-32.log",
+     "?? _bmad-output/evidence/STORY-01-04-test-71.log",
+     "?? _bmad-output/evidence/STORY-01-04-test-baseline-2.log",
+     "?? _bmad-output/evidence/STORY-01-04-test-nop-100.log",
+     "?? _bmad-output/evidence/STORY-01-04.jsonl",
+     "?? _bmad-output/evidence/STORY-01-05-lint-59.log",
+     "?? _bmad-output/evidence/STORY-01-05-sast-61.log",
+     "?? _bmad-output/evidence/STORY-01-05-sast-84.log",
+     "?? _bmad-output/evidence/STORY-01-05-sast-90.log"
+    ],
+    "master_log": [
+     "9203f29 STORY-04-01: CLI subcommands wire library operations and write the snapshot to --out",
+     "586d231 STORY-03-02: repair_tail strips only a truncated final line",
+     "2a1b918 STORY-03-01: atomic apply_batch rejects on any conflict",
+     "95ff8f1 STORY-02-02: deterministic snapshot sorted by NFC key",
+     "529ddbe STORY-02-01: Ledger.verify recomputes chain from disk, ignoring in-memory state",
+     "0fc98aa STORY-01-06: Ledger.append enforces rid-based replay, conflict, and tombstone semantics",
+     "3b7e8ef STORY-01-05: Ledger.append writes hash-chained line with fsync and rejects empty keys",
+     "568eaa6 STORY-01-04: store.read_lines and store.write_atomic I/O primitives",
+     "daaf20b STORY-01-03: format.line_hash SHA-256 hex digest",
+     "09eb984 STORY-01-02: format.canonical_bytes and format.GENESIS constant",
+     "b022341 STORY-01-01: package skeleton, CLI surface, and NFC key normalization",
+     "40a87b4 w1-run-deepseek-ro-2: guard plugin compiled by aisef 1.7.6 — a story worktree is a fresh checkout (P20 preparation, not an AISEF change)",
+     "7498797 w1-run-deepseek-ro-2: execution profile PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO applied (run.max_turns, route.<role>_model, project model declaration — an execution-profile setting, not an AISEF change)",
+     "82f216f w1-run-deepseek-ro-2: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "87af865 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)",
+     "8ff9f13 epics.md: split to 16 stories (each ≤7 AC, ≤16 complexity) — second plan attempt passed",
+     "35f33e7 evidence: initial AISEF plan attempt, machine-gate failures captured",
+     "6a8d60c docs: initial LedgerLock requirements (NFC, hash chain, idempotency, atomic batch, exit codes, 3.11+ stdlib)"
+    ]
+   },
+   "drift_records": [],
+   "progress": {
+    "done": 11,
+    "total": 16
+   },
+   "stories": {
+    "STORY-04-02": {
+     "status": "failed",
+     "reason": "2 sessions in a row ran clean and wrote nothing: the session wrote nothing (35 turns) — the tree is exactly as the session found it, so the gate has nothing to grade: its verdict is still current, and re-running the gate would return the block it already returned. Re-opening with the same context re",
+     "journal_last_step": "attempt.committed",
+     "journal_records": 8,
+     "state_status": "failed",
+     "attempts": 1
+    },
+    "STORY-01-01": {
+     "journal_last_step": "attempt.committed",
+     "journal_records": 10,
+     "status": "done",
+     "state_status": "done",
+     "attempts": 1
+    },
+    "STORY-01-02": {
+     "journal_last_step": "attempt.committed",
+     "journal_records": 10,
+     "status": "done",
+     "state_status": "done",
+     "attempts": 1
+    },
+    "STORY-01-03": {
+     "journal_last_step": "attempt.committed",
+     "journal_records": 10,
+     "status": "done",
+     "state_status": "done",
+     "attempts": 1
+    },
+    "STORY-01-04": {
+     "journal_last_step": "attempt.committed",
+     "journal_records": 10,
+     "status": "done",
+     "state_status": "done",
+     "attempts": 1
+    },
+    "STORY-01-05": {
+     "journal_last_step": "attempt.committed",
+     "journal_records": 10,
+     "status": "done",
+     "state_status": "done",
+     "attempts": 1
+    },
+    "STORY-01-06": {
+     "journal_last_step": "attempt.committed",
+     "journal_records": 10,
+     "status": "done",
+     "state_status": "done",
+     "attempts": 1
+    },
+    "STORY-02-01": {
+     "journal_last_step": "attempt.committed",
+     "journal_records": 10,
+     "status": "done",
+     "state_status": "done",
+     "attempts": 1
+    },
+    "STORY-02-02": {
+     "journal_last_step": "attempt.committed",
+     "journal_records": 10,
+     "status": "done",
+     "state_status": "done",
+     "attempts": 1
+    },
+    "STORY-03-01": {
+     "journal_last_step": "attempt.committed",
+     "journal_records": 10,
+     "status": "done",
+     "state_status": "done",
+     "attempts": 1
+    },
+    "STORY-03-02": {
+     "journal_last_step": "attempt.committed",
+     "journal_records": 14,
+     "status": "done",
+     "state_status": "done",
+     "attempts": 1
+    },
+    "STORY-04-01": {
+     "journal_last_step": "attempt.committed",
+     "journal_records": 10,
+     "status": "done",
+     "state_status": "done",
+     "attempts": 1
+    }
+   },
+   "delivered": {
+    "master_head": "9203f29bf598df58e8e639986ae186d43fcea4b4",
+    "has_package": true,
+    "files": [
+     ".claude/skills/achieving-cmmc-level-2-compliance/scripts/process.py",
+     ".claude/skills/analyzing-sbom-for-supply-chain-vulnerabilities/scripts/agent.py",
+     ".claude/skills/bmad-advanced-elicitation/scripts/pick_methods.py",
+     ".claude/skills/bmad-advanced-elicitation/scripts/tests/test_pick_methods.py",
+     ".claude/skills/bmad-architecture/scripts/lint_spine.py",
+     ".claude/skills/bmad-architecture/scripts/tests/test_lint_spine.py",
+     ".claude/skills/bmad-brainstorming/scripts/brain.py",
+     ".claude/skills/bmad-brainstorming/scripts/tests/test_brain.py",
+     ".claude/skills/bmad-customize/scripts/list_customizable_skills.py",
+     ".claude/skills/bmad-customize/scripts/tests/test_list_customizable_skills.py",
+     ".claude/skills/bmad-deep-recon/scripts/recon_kit.py",
+     ".claude/skills/bmad-deep-recon/scripts/tests/test_recon_kit.py",
+     ".claude/skills/bmad-forge-idea/scripts/resolve_personas.py",
+     ".claude/skills/bmad-forge-idea/scripts/tests/test_resolve_personas.py",
+     ".claude/skills/bmad-party-mode/scripts/resolve_party.py",
+     ".claude/skills/bmad-party-mode/scripts/tests/test_resolve_party.py",
+     ".claude/skills/bmad-retrospective/scripts/git_evidence.py",
+     ".claude/skills/bmad-retrospective/scripts/sprint_status.py",
+     ".claude/skills/bmad-retrospective/scripts/tests/test_git_evidence.py",
+     ".claude/skills/bmad-retrospective/scripts/tests/test_sprint_status.py",
+     ".claude/skills/bmad-review/scripts/tests/test_word_metrics.py",
+     ".claude/skills/bmad-review/scripts/word_metrics.py",
+     ".claude/skills/bmad-sprint-planning/scripts/sprint_plan.py",
+     ".claude/skills/bmad-sprint-planning/scripts/tests/test_sprint_plan.py",
+     ".claude/skills/brand/scripts/tests/test_sync_brand_to_tokens.py",
+     ".claude/skills/building-devsecops-pipeline-with-gitlab-ci/scripts/agent.py",
+     ".claude/skills/building-devsecops-pipeline-with-gitlab-ci/scripts/process.py",
+     ".claude/skills/building-patch-tuesday-response-process/scripts/agent.py",
+     ".claude/skills/building-patch-tuesday-response-process/scripts/process.py",
+     ".claude/skills/building-vulnerability-aging-and-sla-tracking/scripts/agent.py",
+     ".claude/skills/building-vulnerability-aging-and-sla-tracking/scripts/process.py",
+     ".claude/skills/building-vulnerability-dashboard-with-defectdojo/scripts/agent.py",
+     ".claude/skills/building-vulnerability-dashboard-with-defectdojo/scripts/process.py",
+     ".claude/skills/building-vulnerability-exception-tracking-system/scripts/agent.py",
+     ".claude/skills/building-vulnerability-exception-tracking-system/scripts/process.py",
+     ".claude/skills/conducting-cyber-risk-assessment-with-nist-800-30/scripts/process.py",
+     ".claude/skills/conducting-gdpr-compliance-assessment/scripts/article30_parser.py",
+     ".claude/skills/conducting-gdpr-compliance-assessment/scripts/article30_validator.py",
+     ".claude/skills/conducting-gdpr-compliance-assessment/scripts/generate_ropa_report.py",
+     ".claude/skills/configuring-certificate-authority-with-openssl/scripts/agent.py",
+     ".claude/skills/configuring-certificate-authority-with-openssl/scripts/process.py",
+     ".claude/skills/configuring-hsm-for-key-storage/scripts/agent.py",
+     ".claude/skills/configuring-hsm-for-key-storage/scripts/process.py",
+     ".claude/skills/configuring-tls-1-3-for-secure-communications/scripts/agent.py",
+     ".claude/skills/configuring-tls-1-3-for-secure-communications/scripts/process.py",
+     ".claude/skills/design-system/scripts/fetch-background.py",
+     ".claude/skills/design-system/scripts/generate-slide.py",
+     ".claude/skills/design-system/scripts/html-token-validator.py",
+     ".claude/skills/design-system/scripts/search-slides.py",
+     ".claude/skills/design-system/scripts/slide-token-validator.py",
+     ".claude/skills/design-system/scripts/slide_search_core.py",
+     ".claude/skills/design-system/scripts/tests/test_validate_tokens.py",
+     ".claude/skills/design/scripts/cip/core.py",
+     ".claude/skills/design/scripts/cip/generate.py",
+     ".claude/skills/design/scripts/cip/render-html.py",
+     ".claude/skills/design/scripts/cip/search.py",
+     ".claude/skills/design/scripts/icon/generate.py",
+     ".claude/skills/design/scripts/logo/core.py",
+     ".claude/skills/design/scripts/logo/generate.py",
+     ".claude/skills/design/scripts/logo/search.py",
+     ".claude/skills/design/scripts/logo/tests/test_generate.py",
+     ".claude/skills/detecting-api-enumeration-attacks/scripts/agent.py",
+     ".claude/skills/detecting-broken-object-property-level-authorization/scripts/agent.py",
+     ".claude/skills/detecting-dependency-confusion/scripts/agent.py",
+     ".claude/skills/detecting-malicious-npm-packages/scripts/agent.py",
+     ".claude/skills/detecting-shadow-api-endpoints/scripts/agent.py",
+     ".claude/skills/detecting-typosquatting-packages-in-npm-pypi/scripts/agent.py",
+     ".claude/skills/detecting-typosquatting-packages/scripts/agent.py",
+     ".claude/skills/executing-nist-rmf-authorization-to-operate/scripts/process.py",
+     ".claude/skills/generating-and-analyzing-sboms/scripts/agent.py",
+     ".claude/skills/implementing-aes-encryption-for-data-at-rest/scripts/agent.py",
+     ".claude/skills/implementing-aes-encryption-for-data-at-rest/scripts/process.py",
+     ".claude/skills/implementing-api-abuse-detection-with-rate-limiting/scripts/agent.py",
+     ".claude/skills/implementing-api-gateway-security-controls/scripts/agent.py",
+     ".claude/skills/implementing-api-key-security-controls/scripts/agent.py",
+     ".claude/skills/implementing-api-rate-limiting-and-throttling/scripts/agent.py",
+     ".claude/skills/implementing-api-schema-validation-security/scripts/agent.py",
+     ".claude/skills/implementing-api-security-posture-management/scripts/agent.py",
+     ".claude/skills/implementing-api-security-testing-with-42crunch/scripts/agent.py",
+     ".claude/skills/implementing-api-threat-protection-with-apigee/scripts/agent.py"
+    ]
+   },
+   "oracle": {
+    "sha256": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+    "exit": 1,
+    "results": {
+     "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "FAILED",
+     "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "FAILED",
+     "TestAcceptance::test_14_3_apply_batch_commits_atomically": "FAILED",
+     "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "FAILED",
+     "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "FAILED",
+     "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "FAILED",
+     "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "FAILED",
+     "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "FAILED",
+     "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "FAILED"
+    },
+    "pytest_totals": {
+     "failed": 9
+    },
+    "parse_complete": true,
+    "parse_note": "",
+    "observations": []
+   },
+   "story_state_source": "_bmad-output/sprint-status.json",
+   "oracle_classification": {
+    "reds": [
+     {
+      "test": "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-6",
+       "FR-11",
+       "FR-12"
+      ],
+      "owners": [
+       "STORY-02-01",
+       "STORY-04-01",
+       "STORY-04-02",
+       "STORY-04-03"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-04-02', 'STORY-04-03']"
+     },
+     {
+      "test": "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-1",
+       "FR-4",
+       "FR-9",
+       "FR-11",
+       "FR-12"
+      ],
+      "owners": [
+       "STORY-01-01",
+       "STORY-01-05",
+       "STORY-01-06",
+       "STORY-02-02",
+       "STORY-04-01",
+       "STORY-04-02",
+       "STORY-04-03",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-04-02', 'STORY-04-03', 'STORY-05-01']"
+     },
+     {
+      "test": "TestAcceptance::test_14_3_apply_batch_commits_atomically",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-2",
+       "FR-8",
+       "FR-11"
+      ],
+      "owners": [
+       "STORY-01-02",
+       "STORY-01-03",
+       "STORY-01-05",
+       "STORY-03-01",
+       "STORY-04-01",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-05-01']"
+     },
+     {
+      "test": "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-2",
+       "FR-6",
+       "FR-10",
+       "FR-11",
+       "FR-12"
+      ],
+      "owners": [
+       "STORY-01-02",
+       "STORY-01-03",
+       "STORY-01-05",
+       "STORY-02-01",
+       "STORY-03-02",
+       "STORY-04-01",
+       "STORY-04-02",
+       "STORY-04-03",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-04-02', 'STORY-04-03', 'STORY-05-01']"
+     },
+     {
+      "test": "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover",
+      "ownership": "PROJECT_GLOBAL",
+      "frs": [],
+      "owners": [],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "the project terminated incomplete"
+     },
+     {
+      "test": "TestAcceptance::test_14_6_no_third_party_imports_at_runtime",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-14"
+      ],
+      "owners": [
+       "STORY-01-01",
+       "STORY-05-02",
+       "STORY-05-03"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-05-02', 'STORY-05-03']"
+     },
+     {
+      "test": "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-4",
+       "FR-8",
+       "FR-11",
+       "FR-12"
+      ],
+      "owners": [
+       "STORY-01-06",
+       "STORY-03-01",
+       "STORY-04-01",
+       "STORY-04-02",
+       "STORY-04-03",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-04-02', 'STORY-04-03', 'STORY-05-01']"
+     },
+     {
+      "test": "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-3",
+       "FR-4",
+       "FR-5"
+      ],
+      "owners": [
+       "STORY-01-06",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-05-01']"
+     },
+     {
+      "test": "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-3",
+       "FR-4",
+       "FR-6"
+      ],
+      "owners": [
+       "STORY-01-06",
+       "STORY-02-01",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-05-01']"
+     }
+    ],
+    "counts": {
+     "INCOMPLETE_DELIVERY_EXPECTED_RED": 9
+    },
+    "delivery_complete": false,
+    "skipped": [],
+    "oracle_not_executed": [],
+    "oracle_not_executed_count": 0,
+    "oracle_passed_completely": false,
+    "false_pass": [],
+    "false_pass_count": 0,
+    "oracle_mapping_errors": [],
+    "oracle_mapping_error_count": 0,
+    "story_owned_reds_expected": [
+     "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger",
+     "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+     "TestAcceptance::test_14_3_apply_batch_commits_atomically",
+     "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
+     "TestAcceptance::test_14_6_no_third_party_imports_at_runtime",
+     "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
+     "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value",
+     "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts"
+    ],
+    "project_global_reds_expected": [
+     "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+    ],
+    "classifiable": true
+   },
+   "exit_criteria": {
+    "false_pass": [],
+    "false_pass_count": 0,
+    "oracle_mapping_errors": [],
+    "oracle_mapping_error_count": 0,
+    "oracle_red_classes": {
+     "INCOMPLETE_DELIVERY_EXPECTED_RED": 9
+    },
+    "oracle_skipped": [],
+    "oracle_not_executed_count": 0,
+    "oracle_passed_completely": false,
+    "story_owned_reds_expected_due_incomplete_owners": [
+     "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger",
+     "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+     "TestAcceptance::test_14_3_apply_batch_commits_atomically",
+     "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
+     "TestAcceptance::test_14_6_no_third_party_imports_at_runtime",
+     "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
+     "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value",
+     "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts"
+    ],
+    "project_global_reds_expected_due_incomplete_delivery": [
+     "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+    ],
+    "manual_state_repair": 0,
+    "manual_state_repair_note": "the driver never writes _bmad-output; the only project writes are the guard commit and the ARB-1 re-approval through the CLI",
+    "orphan_state": [],
+    "orphan_state_count": 0,
+    "drift_records": [],
+    "oracle_ran": true,
+    "resumes_forced": 2,
+    "markers_not_reached": [],
+    "stops": [
+     "[2026-09-19 20:05:09] epic=EPIC-04 STOPPED at=EPIC-04 · wave 2"
+    ],
+    "story_state_source": "_bmad-output/sprint-status.json",
+    "false_block_count": 0,
+    "false_block": [],
+    "run_classification": "LEGITIMATE_MODEL_PROJECT_STOP",
+    "safety_violations": []
+   },
+   "safety_violations": [],
+   "run_metrics": {
+    "developer_agent_runs": 14,
+    "developer_retries": 0,
+    "reviewer_executions": 12,
+    "reviewer_retries": 0,
+    "security_executions": 12,
+    "security_retries": 0,
+    "max_turn_events": 0,
+    "human_arbitrations_during_the_run": 0,
+    "stories_done": 11,
+    "stories_failed": [
+     "STORY-04-02"
+    ],
+    "stories_never_started": 4,
+    "false_block": [],
+    "false_block_count": 0,
+    "false_block_measurable_for": [
+     "STORY-01-01",
+     "STORY-01-02",
+     "STORY-01-03",
+     "STORY-01-05",
+     "STORY-01-06",
+     "STORY-02-01",
+     "STORY-02-02",
+     "STORY-03-01",
+     "STORY-03-02",
+     "STORY-04-01",
+     "STORY-04-02"
+    ]
+   },
+   "run_classification": "LEGITIMATE_MODEL_PROJECT_STOP",
+   "oracle_aggregate_reportable_as_delivery_quality": false,
+   "ok": true
+  }
+ },
+ "updated": "2026-09-19T20:05:16+0700"
+}

@@ -1,7 +1,7 @@
 {
  "profile": "PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO",
  "profile_id": "sha256:9f99ce5b057d229403c89e1958c41ee044dc977cd6fce9854b741f8ba691d147",
- "status": "UNDER_QUALIFICATION",
+ "status": "FAILED_W1_DELIVERY_QUALIFICATION",
  "identity": {
   "kernel": {
    "candidate_sha": "40393cda89dbfbb887c9c901872256a5fdc5bea0",
@@ -133,5 +133,20 @@
    "result": "PASS — 3/3 chat probes (deepseek-v4-pro), 3/3 tool smokes, reviewer read-only environment clean (per-role shells identical + developer control)"
   }
  ],
- "run_rule": "each run re-runs the provider preflight first (probes + smokes); a failing route creates no run copy"
+ "run_rule": "each run re-runs the provider preflight first (probes + smokes); a failing route creates no run copy",
+ "qualification_result": {
+  "decided": "2026-09-19T20:10:58+0700",
+  "valid_runs": [
+   "deepseek-ro-1",
+   "deepseek-ro-2"
+  ],
+  "delivery_complete": 0,
+  "excluded_provider_interrupted_runs": [],
+  "rule": "owner section 8: qualifies only with >= 2 of 3 valid runs DELIVERY_COMPLETE",
+  "why_no_third_run": "0 of 2 valid runs delivered, so even a DELIVERY_COMPLETE third run gives 1 of 3 — below the minimum; a third run cannot change the verdict",
+  "both_runs_stopped_at": "STORY-04-02 (11/16 done each time)",
+  "false_pass": 0,
+  "false_block": 0,
+  "section_9": "the first fixed-model profile measured on delivery that failed; cx/gpt-5.5 was abandoned for provider instability before any valid run, so it is not counted as a delivery failure — the next fixed route is MiniMax-M3 (section 6)"
+ }
 }

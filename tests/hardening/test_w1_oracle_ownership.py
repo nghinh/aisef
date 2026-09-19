@@ -191,6 +191,21 @@ class TestFalseBlock(unittest.TestCase):
         m = _mod.run_metrics("", {"STORY-A": {"status": "done", "attempts": 1}}, COVERS, self.FR_MAP, {"T::t_story": "PASSED"})
         self.assertEqual(m["false_block_count"], 0)
 
+    def test_ss95_good_work_refused_is_seen_at_the_storys_own_candidate(self):
+        """SS-95: trunk lacks a blocked story's code, so its checks are red there whatever that code was; the refused
+        candidate itself is what the oracle must judge."""
+        state = {"STORY-A": {"status": "failed", "attempts": 3}}
+        trunk_red = {"T::t_story": "FAILED"}
+        m = _mod.run_metrics("", state, COVERS, self.FR_MAP, trunk_red, {"STORY-A": {"sha": "c" * 40, "results": {"T::t_story": "PASSED"}}})
+        self.assertEqual(m["false_block_count"], 1)
+        self.assertEqual(m["false_block"][0]["at"], "candidate " + "c" * 12)
+        self.assertEqual(m["false_block_measured_at_candidate_for"], ["STORY-A"])
+        m = _mod.run_metrics("", state, COVERS, self.FR_MAP, trunk_red, {"STORY-A": {"sha": "c" * 40, "results": {"T::t_story": "FAILED"}}})
+        self.assertEqual(m["false_block_count"], 0, "a refused candidate the oracle also rejects is a legitimate block")
+        self.assertEqual(_mod.run_metrics("", state, COVERS, self.FR_MAP, trunk_red)["false_block_count"], 0)
+        no_candidate = {"STORY-A": {"sha": None, "results": {}, "note": "no frozen candidate"}}   # a session that never froze one
+        self.assertEqual(_mod.run_metrics("", state, COVERS, self.FR_MAP, trunk_red, no_candidate)["false_block_count"], 0)
+
     def test_a_story_no_oracle_check_covers_is_reported_as_not_measurable(self):
         m = _mod.run_metrics("", {"STORY-B": {"status": "failed", "attempts": 3}}, COVERS, self.FR_MAP, {"T::t_story": "PASSED"})
         self.assertEqual(m["false_block_count"], 0)
