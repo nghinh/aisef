@@ -213,7 +213,17 @@ def classify_run(state: dict, total_stories: int, safety_violations: list, human
         return "HUMAN_REQUIRED"
     if len(st) == total_stories and all(v == "done" for v in st.values()):
         return "DELIVERY_COMPLETE"
+    # SS-94: a run the kernel stopped on its infrastructure or verifier-did-not-run terminal is not a model's project
+    # stop. The kernel does not persist its typed terminal in the state store, only the constant it prefixes the
+    # reason with (implement.py: "recurring infrastructure error: ", REVIEW_UNRUNNABLE, SECURITY_UNRUNNABLE).
+    reasons = [str(v.get("blocked_reason") or "") for v in state.values() if (v.get("status") or "") not in ("done", "")]
+    if any(r.startswith(ENVIRONMENT_STOP_PREFIXES) for r in reasons):
+        return "ENVIRONMENT_OR_PROVIDER_STOP"
     return "LEGITIMATE_MODEL_PROJECT_STOP"
+
+
+#: reason prefixes the frozen kernel writes for a stop that is not the model's work (owner category F)
+ENVIRONMENT_STOP_PREFIXES = ("recurring infrastructure error", "REVIEW_UNRUNNABLE", "SECURITY_UNRUNNABLE")
 
 
 def now() -> str:

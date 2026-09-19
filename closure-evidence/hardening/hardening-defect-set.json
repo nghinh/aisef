@@ -5,9 +5,9 @@
  "generated": "2026-09-16T10:12:06+00:00",
  "rule": "No broad speculative sweep while fixing. A sibling found during implementation is classified, assigned to an already-frozen family where it belongs, and added here with explicit provenance (commit + finding source).",
  "counts": {
-  "total": 101,
+  "total": 102,
   "by_severity": {
-   "P2": 55,
+   "P2": 56,
    "P1": 25,
    "P3": 21
   },
@@ -18,12 +18,12 @@
    "F4-WORKSPACE-OWNERSHIP-MERGE-SCOPE": 12,
    "F6-BENCH-RELEASE-APPROVAL": 7,
    "F5-PROCESS-TOOL-ENVIRONMENT": 22,
-   "F6-QUALIFICATION-INFRASTRUCTURE": 5,
+   "F6-QUALIFICATION-INFRASTRUCTURE": 6,
    "F7-EXECUTION-EVIDENCE-VALIDITY": 9
   },
   "fixed": 16,
   "by_status": {
-   "FIXED": 100,
+   "FIXED": 101,
    "SUPERSEDED": 1
   },
   "counting_rule": "unique by id: AD-01/03/04/05 and SS-61/62/63 are listed both in their fix family and in additions_after_freeze (provenance) and count once; recounted from the entries on 2026-09-17 (the hand-maintained counts before this had by_severity summing to 72 of 75)"
@@ -1923,9 +1923,27 @@
     "tests/hardening/test_ss81_family.py::KillMemoryResolveOnWindows"
    ],
    "fixed_by": "aisef/memory.py::_resolved — Path.resolve() with a leading \\\\?\\ (or \\\\?\\UNC\\) stripped, used for both sides of safe_path's containment check"
+  },
+  {
+   "id": "SS-94",
+   "family": "FAM-QUALIFICATION",
+   "fix_family": "F6-QUALIFICATION-INFRASTRUCTURE",
+   "severity": "P2",
+   "status": "FIXED",
+   "defect_class": "QUALIFICATION_INFRASTRUCTURE",
+   "defect_class_basis": "site outside aisef/: closure-evidence/hardening/w1/w1_driver.py",
+   "invariants": [],
+   "site": "closure-evidence/hardening/w1/w1_driver.py::classify_run",
+   "statement": "the W1 driver labelled every run that neither delivered nor needed a human LEGITIMATE_MODEL_PROJECT_STOP, reading nothing about why it stopped: a provider outage the kernel ended as `recurring infrastructure error` was reported as the model's stop",
+   "measured": "PROFILE-W1-OC-GPT56SOL-T80-RO run 1 (2026-09-19): the provider refused gpt-5.6-sol for every session from 06:41; the kernel blocked STORY-01-03 on its infra budget; the driver's first finish said LEGITIMATE_MODEL_PROJECT_STOP",
+   "reproducer": "tests/hardening/test_w1_oracle_ownership.py::TestRunClassification::test_a_stop_on_the_kernels_infrastructure_terminal_is_not_a_model_project_stop",
+   "regression_tests": [
+    "tests/hardening/test_w1_oracle_ownership.py::TestRunClassification::test_a_stop_on_the_kernels_infrastructure_terminal_is_not_a_model_project_stop"
+   ],
+   "fixed_by": "classify_run returns ENVIRONMENT_OR_PROVIDER_STOP when a stopped story's reason carries the kernel's infrastructure / verifier-unrunnable prefix; finish re-run"
   }
  ],
- "updated": "2026-09-18: SS-81 family registered — SS-81 (P1), SS-82 (P3) and siblings SS-83..SS-89 from the section-7 sweep, all OPEN with deterministic reproducers; 2026-09-18: SS-81..SS-89 FIXED by the F7-EXECUTION-EVIDENCE-VALIDITY family fix (counts recounted unique by id); 2026-09-18: SS-90 (P1, QUALIFICATION_INFRASTRUCTURE) registered FIXED — W0 evidence rows bound to the candidate's kernel; 2026-09-18: SS-91 (P2, PRODUCT_KERNEL, Windows memory-store race) registered FIXED",
+ "updated": "2026-09-18: SS-81 family registered — SS-81 (P1), SS-82 (P3) and siblings SS-83..SS-89 from the section-7 sweep, all OPEN with deterministic reproducers; 2026-09-18: SS-81..SS-89 FIXED by the F7-EXECUTION-EVIDENCE-VALIDITY family fix (counts recounted unique by id); 2026-09-18: SS-90 (P1, QUALIFICATION_INFRASTRUCTURE) registered FIXED — W0 evidence rows bound to the candidate's kernel; 2026-09-18: SS-91 (P2, PRODUCT_KERNEL, Windows memory-store race) registered FIXED; 2026-09-19: SS-94 (P2, QUALIFICATION_INFRASTRUCTURE) FIXED — W1 run classification; SS-92/SS-93 recorded OPEN in w1/run-gpt56sol-ro-1/FINDINGS-DURING-RUN.json, registration deferred (invariant downgrade = aisef/ change)",
  "defect_classes": {
   "PRODUCT_KERNEL": "a defect in aisef/ — invalidates evidence produced by the product (kernel qualification, W0)",
   "QUALIFICATION_INFRASTRUCTURE": "a defect in the tooling that measures the product (W1 driver, oracle harness) — invalidates the measurements it produced, not the product; its fix never changes aisef/"

@@ -1,0 +1,55 @@
+{
+ "generated": "2026-09-19T06:47:02+0700",
+ "run": "PROFILE-W1-OC-GPT56SOL-T80-RO run 1 (in progress when recorded)",
+ "kernel": {
+  "candidate_sha": "40393cda89db",
+  "product_tree": "a2f6e76bf0ec"
+ },
+ "rule": "the kernel is frozen for this qualification: registering these against PROVEN invariants means downgrading them to PARTIAL in aisef/invariants.yaml, an aisef/ change that would void the kernel identity the run rests on — deferred to the owner checkpoint, stated here",
+ "new_defects": [
+  {
+   "id": "SS-92",
+   "severity": "P2",
+   "defect_class": "PRODUCT_KERNEL",
+   "family": "FAM-TYPED-OUTCOMES (sibling of SS-23)",
+   "invariants_it_would_downgrade": [
+    "INV-F.3",
+    "INV-N.1"
+   ],
+   "site": "aisef/harness/tools.py::unrunnable_reason",
+   "statement": "a lint or sast run that EXECUTED and reported findings is recorded TOOL_UNRUNNABLE ('tool not installed or cannot load (not found)') when its findings quote source text containing a MISSING_TOOL marker; SS-23 fixed the same shape for `test` only",
+   "measured": "run 1: bandit scanned 51 187 lines, 1039/31/26 low/medium/high issues, exit 1 — recorded TOOL_UNRUNNABLE because a quoted test line reads `assert \"not found: Ghost\" in err` (evidence/STORY-01-01-sast-62.log)",
+   "impact_in_this_run": "none on any gate: every story's contract is ['unit']; the sast runs were the developer's own `aisef tool sast` checks (implement prompt step 4) — the developer was told its scanner is missing",
+   "worst_case": "fail-closed misrouting: with a `security` contract or at pre-deploy, a finding-bearing scan (or a lint failure quoting such a line) is UNRUNNABLE instead of FAILED — the tool stage is retried as an environment problem, the developer never receives the findings; never a false PASS",
+   "reproducer": "closure-evidence/hardening/w1/run-gpt56sol-ro-1/repro_SS92_quoted_source_reads_as_missing_tool.py (2 FAIL on the frozen wheel, control OK)"
+  },
+  {
+   "id": "SS-93",
+   "severity": "P2",
+   "defect_class": "PRODUCT_KERNEL",
+   "family": "FAM-OWNERSHIP (bug 113's family)",
+   "invariants_it_would_downgrade": [
+    "INV-I.1"
+   ],
+   "site": "aisef/harness/capabilities.py (python SAST capability `bandit -q -r .`) vs aisef/phases/qa.py::_KHUNG",
+   "statement": "the default python sast command scans the framework directories the kernel itself declares are not the project's code (.claude/, .opencode/, .aisef/, _bmad-output/)",
+   "measured": "run 1: 1 093 of 1 096 bandit findings located under ./.claude (the workload's installed skills)",
+   "impact_in_this_run": "none on any gate (no `security` contract)",
+   "worst_case": "a story or pre-deploy with a `security` contract is FAILED on findings in files the developer does not own — fail-closed, delivery-blocking noise; never a false PASS",
+   "reproducer": "closure-evidence/hardening/w1/run-gpt56sol-ro-1/repro_SS93_default_sast_scans_framework_dirs.py (FAIL on the frozen wheel)"
+  }
+ ],
+ "not_a_kernel_defect": [
+  {
+   "what": "route refusal mid-run",
+   "measured": "from 2026-09-19 06:41 the router answers the verifier sessions `[codex/gpt-5.6-sol] [400]: The 'gpt-5.6-sol' model is not supported when using Codex with a ChatGPT account.` — the same route served developer and reviewer successfully 05:43-06:30",
+   "kernel_behaviour": "review/security UNRUNNABLE; the review/security stage is retried on the same candidate, the developer is not re-opened (SS-14 routing) — as designed",
+   "category": "execution profile / provider (owner section 9 category B/F), not category G"
+  }
+ ],
+ "incident": {
+  "what": "an unrelated script executed by accident",
+  "measured": "a `python -c 'import aisef'` run with cwd=/private/tmp imported /private/tmp/inspect.py (a 2026-09-16 diagnostic script of another project) in place of the stdlib module: it ran `df -h` (read-only) and four `sudo docker exec goe-worker-1 ...` calls, all refused for lack of a password — nothing changed",
+  "correction": "no Python process is started with /tmp as its working directory; the scratchpad is used"
+ }
+}

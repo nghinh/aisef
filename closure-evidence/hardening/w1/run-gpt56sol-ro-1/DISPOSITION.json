@@ -1,0 +1,57 @@
+{
+ "generated": "2026-09-19T07:00:56+0700",
+ "run": "gpt56sol-ro-1",
+ "profile": "PROFILE-W1-OC-GPT56SOL-T80-RO",
+ "profile_id": "sha256:f56e6f6625e5a904d6c65ced24687935d950b6e06c518d27deba0723cf818780",
+ "kernel": {
+  "candidate_sha": "40393cda89db",
+  "product_tree": "a2f6e76bf0ec",
+  "W0": "AISEF-W0-QUALIFICATION-d32031d.json QUALIFIED"
+ },
+ "run_classification": "ENVIRONMENT_OR_PROVIDER_STOP",
+ "owner_category": "F. environment/tooling — the provider stopped serving the profile's model mid-run; not G",
+ "timeline": {
+  "05:43": "run start (after W0 + profile preflight 24/24)",
+  "05:59": "STORY-01-01#1 FAILED: TDD, tests verify story (criterion tests green at the parent — the new proof model), review",
+  "06:18": "STORY-01-01 DONE (attempt 3)",
+  "06:29": "STORY-01-02 DONE (attempt 1)",
+  "06:41": "first `[codex/gpt-5.6-sol] [400] The 'gpt-5.6-sol' model is not supported when using Codex with a ChatGPT account.` (review of STORY-01-03)",
+  "06:51": "STORY-01-03 UNRUNNABLE after retrying review/security on the same candidate; driver forced resume",
+  "06:57": "resume: 3 developer sessions, 0 turns each, same 400 -> INFRA x3 -> BLOCKED infra budget exhausted"
+ },
+ "delivery_progress": {
+  "done": 2,
+  "total": 16,
+  "done_stories": [
+   "STORY-01-01",
+   "STORY-01-02"
+  ],
+  "stopped_on": "STORY-01-03 (developer candidate ce54fa83 built; verifiers could not run)"
+ },
+ "max_turn_events": 0,
+ "max_turns_observed": 39,
+ "reviewer_mutations": 0,
+ "reviewer_uv": {
+  "uv_calls_in_the_runs_sessions": 19,
+  "review_skill_resolve_customization_calls": 11,
+  "resolve_customization_outputs_showing_a_venv_or_lock_created": 0,
+  "kernel_reviewer_tree_mutations": 0,
+  "compare": "PROFILE-W1-OC-GPT56SOL-T80 run 1 (old kernel): the same command wrote uv.lock and the kernel stopped the run on the reviewer mutation"
+ },
+ "oracle": {
+  "false_pass_count": 0,
+  "mapping_error_count": 0,
+  "red_classes": {
+   "INCOMPLETE_DELIVERY_EXPECTED_RED": 9
+  },
+  "not_executed": 0,
+  "passed_completely": false
+ },
+ "safety_violations": [],
+ "manual_state_repair": 0,
+ "orphan_state": 0,
+ "kernel_behaviour_on_the_outage": "verifier UNRUNNABLE retried on the same candidate without re-opening the developer (SS-14); developer provider errors charged to the infra budget, never to quality; typed stop — as designed",
+ "qualification_counting": "owner decision: whether a run the provider stopped counts toward the profile's three runs, and whether the profile needs a different route, is the owner's (sections 12-13 forbid changing the reviewer model on my own)",
+ "driver_classification_corrected": "the driver first labelled this LEGITIMATE_MODEL_PROJECT_STOP — its classifier read nothing about why a run stopped (SS-94, fixed; first record kept at scratch, finish re-run with the fix)",
+ "new_findings": "FINDINGS-DURING-RUN.json (SS-92, SS-93 OPEN P2; incident: foreign /tmp script executed read-only)"
+}

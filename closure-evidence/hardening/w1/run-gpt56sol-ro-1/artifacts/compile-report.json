@@ -1,0 +1,30 @@
+{
+  "clients": [
+    {
+      "client": "opencode",
+      "written": [
+        ".opencode/plugin/aisef-guard.ts"
+      ],
+      "guards_wired": [
+        "destructive",
+        "diff-scope",
+        "egress",
+        "git-stage",
+        "injection",
+        "process-ref",
+        "secret",
+        "tool-bypass",
+        "write-scope"
+      ],
+      "guards_post_hoc": [
+        "completion"
+      ],
+      "blocks_at_source": false,
+      "degradations": [
+        "dir_allowlist: unsupported",
+        "tool_allowlist: emulated",
+        "turn_limit: unsupported"
+      ]
+    }
+  ]
+}

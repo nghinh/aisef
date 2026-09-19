@@ -1,0 +1,33 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 7 items
+
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_matches_unicodedata_nfc_byte_for_byte 
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_matches_unicodedata_nfc_byte_for_byte PASSED [ 14%]
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_2_nfc_and_nfd_forms_are_identical PASSED [ 28%]
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_3_package_import_reports_init_path PASSED [ 42%]
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_4_module_help_lists_all_subcommands 
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_4_module_help_lists_all_subcommands PASSED [ 57%]
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_5_runtime_has_no_forbidden_imports PASSED [ 71%]
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_6_runtime_has_no_forbidden_calls PASSED [ 85%]
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_7_public_api_exports_callable_ledger_and_error FAILED [100%]
+
+=================================== FAILURES ===================================
+_ PackageSkeletonTests.test_AC_STORY_01_01_7_public_api_exports_callable_ledger_and_error _
+
+self = <tests.test_skeleton.PackageSkeletonTests testMethod=test_AC_STORY_01_01_7_public_api_exports_callable_ledger_and_error>
+
+    def test_AC_STORY_01_01_7_public_api_exports_callable_ledger_and_error(self):
+        from ledgerlock import ConflictError, Ledger
+    
+>       self.assertIsInstance(Ledger, type)
+E       AssertionError: <function Ledger at 0xffff811087c0> is not an instance of <class 'type'>
+
+tests/test_skeleton.py:67: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_7_public_api_exports_callable_ledger_and_error
+=============== 1 failed, 6 passed, 10 subtests passed in 0.11s ================

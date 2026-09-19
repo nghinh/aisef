@@ -1,7 +1,7 @@
 {
  "profile": "PROFILE-W1-OC-GPT56SOL-T80-RO",
  "profile_id": "sha256:f56e6f6625e5a904d6c65ced24687935d950b6e06c518d27deba0723cf818780",
- "status": "UNDER_QUALIFICATION",
+ "status": "RUN 1 ENDED — ENVIRONMENT_OR_PROVIDER_STOP (provider refused the model from 06:41); 2/16 delivered; awaiting owner decision",
  "identity": {
   "kernel": {
    "candidate_sha": "40393cda89dbfbb887c9c901872256a5fdc5bea0",
@@ -85,25 +85,25 @@
    "developer": {
     "route_kind": "FIXED_MODEL",
     "resolved_model": "gpt-5.6-sol",
-    "evidence": "router lists cx/gpt-5.6-sol owned_by 'cx'; answered_by 'gpt-5.6-sol' on the probe; OpenCode tool-use smoke 2/2 (apply_patch + bash, file written) \u2014 profiles/ROUTE-RESOLUTION-2026-09-18.json",
+    "evidence": "router lists cx/gpt-5.6-sol owned_by 'cx'; answered_by 'gpt-5.6-sol' on the probe; OpenCode tool-use smoke 2/2 (apply_patch + bash, file written) — profiles/ROUTE-RESOLUTION-2026-09-18.json",
     "relisted": "2026-09-19: router /models lists cx/gpt-5.6-sol owned_by 'cx' (a GET, no inference); answered_by evidence from 2026-09-18 kept"
    },
    "reviewer": {
     "route_kind": "FIXED_MODEL",
     "resolved_model": "gpt-5.6-sol",
-    "evidence": "router lists cx/gpt-5.6-sol owned_by 'cx'; answered_by 'gpt-5.6-sol' on the probe; OpenCode tool-use smoke 2/2 (apply_patch + bash, file written) \u2014 profiles/ROUTE-RESOLUTION-2026-09-18.json",
+    "evidence": "router lists cx/gpt-5.6-sol owned_by 'cx'; answered_by 'gpt-5.6-sol' on the probe; OpenCode tool-use smoke 2/2 (apply_patch + bash, file written) — profiles/ROUTE-RESOLUTION-2026-09-18.json",
     "relisted": "2026-09-19: router /models lists cx/gpt-5.6-sol owned_by 'cx' (a GET, no inference); answered_by evidence from 2026-09-18 kept"
    },
    "security": {
     "route_kind": "FIXED_MODEL",
     "resolved_model": "gpt-5.6-sol",
-    "evidence": "router lists cx/gpt-5.6-sol owned_by 'cx'; answered_by 'gpt-5.6-sol' on the probe; OpenCode tool-use smoke 2/2 (apply_patch + bash, file written) \u2014 profiles/ROUTE-RESOLUTION-2026-09-18.json",
+    "evidence": "router lists cx/gpt-5.6-sol owned_by 'cx'; answered_by 'gpt-5.6-sol' on the probe; OpenCode tool-use smoke 2/2 (apply_patch + bash, file written) — profiles/ROUTE-RESOLUTION-2026-09-18.json",
     "relisted": "2026-09-19: router /models lists cx/gpt-5.6-sol owned_by 'cx' (a GET, no inference); answered_by evidence from 2026-09-18 kept"
    },
    "designer": {
     "route_kind": "FIXED_MODEL",
     "resolved_model": "gpt-5.6-sol",
-    "evidence": "router lists cx/gpt-5.6-sol owned_by 'cx'; answered_by 'gpt-5.6-sol' on the probe; OpenCode tool-use smoke 2/2 (apply_patch + bash, file written) \u2014 profiles/ROUTE-RESOLUTION-2026-09-18.json",
+    "evidence": "router lists cx/gpt-5.6-sol owned_by 'cx'; answered_by 'gpt-5.6-sol' on the probe; OpenCode tool-use smoke 2/2 (apply_patch + bash, file written) — profiles/ROUTE-RESOLUTION-2026-09-18.json",
     "relisted": "2026-09-19: router /models lists cx/gpt-5.6-sol owned_by 'cx' (a GET, no inference); answered_by evidence from 2026-09-18 kept"
    }
   }
@@ -117,7 +117,7 @@
   "stage_env (new)"
  ],
  "stage_env_mechanism": {
-  "what": "a `uv` wrapper first on PATH for `aisef run` (closure-evidence/hardening/w1/profiles/stage-env-ro-uv/bin/uv); in a reviewer or security session \u2014 the frozen kernel gives those, and only those, AISEF_DISALLOWED_TOOLS and no AISEF_STORY_ID \u2014 it runs the real uv with UV_FROZEN=1 UV_NO_SYNC=1 UV_PROJECT_ENVIRONMENT=<outside every worktree>; every other session gets the real uv unchanged",
+  "what": "a `uv` wrapper first on PATH for `aisef run` (closure-evidence/hardening/w1/profiles/stage-env-ro-uv/bin/uv); in a reviewer or security session — the frozen kernel gives those, and only those, AISEF_DISALLOWED_TOOLS and no AISEF_STORY_ID — it runs the real uv with UV_FROZEN=1 UV_NO_SYNC=1 UV_PROJECT_ENVIRONMENT=<outside every worktree>; every other session gets the real uv unchanged",
   "why_not_a_kernel_change": "the frozen kernel has no per-role environment (RunSpec env_allow is global); the owner requires the fix in the execution profile, not the kernel",
   "measured_mechanism_research": {
    "uv": "0.11.3",
@@ -126,10 +126,13 @@
    "UV_LOCKED": ".venv/",
    "UV_NO_SYNC": ".venv/",
    "UV_FROZEN+UV_NO_SYNC": ".venv/",
-   "UV_FROZEN+UV_NO_SYNC+UV_PROJECT_ENVIRONMENT(outside)": "nothing \u2014 byte-identical (chosen)",
-   "--no-project": "flag only in 0.11.3, no environment variable \u2014 cannot be imposed on a model-chosen command"
+   "UV_FROZEN+UV_NO_SYNC+UV_PROJECT_ENVIRONMENT(outside)": "nothing — byte-identical (chosen)",
+   "--no-project": "flag only in 0.11.3, no environment variable — cannot be imposed on a model-chosen command"
   },
   "reviewer_model_unchanged": "owner section 12: the reviewer stays on the same route and model"
  },
- "run_1_status_rule": "owner section 13: T80 run 1 of the previous profile is a PROFILE ATTEMPT \u2014 NOT QUALIFICATION EVIDENCE FOR THE NEW KERNEL; this profile's runs start at 1"
+ "run_1_status_rule": "owner section 13: T80 run 1 of the previous profile is a PROFILE ATTEMPT — NOT QUALIFICATION EVIDENCE FOR THE NEW KERNEL; this profile's runs start at 1",
+ "runs": {
+  "gpt56sol-ro-1": "closure-evidence/hardening/w1/run-gpt56sol-ro-1/DISPOSITION.json"
+ }
 }

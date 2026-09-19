@@ -112,6 +112,17 @@ class TestRunClassification(unittest.TestCase):
     def test_no_state_is_a_framework_failure_never_a_pass(self):
         self.assertEqual(classify_run({}, 2, [], []), "FRAMEWORK_FAILURE")
 
+    def test_a_stop_on_the_kernels_infrastructure_terminal_is_not_a_model_project_stop(self):
+        """SS-94 — W1 PROFILE-W1-OC-GPT56SOL-T80-RO run 1: the provider refused the model for every session; the kernel
+        ended the story `recurring infrastructure error: ...` and the driver still called it the model's stop."""
+        infra = {"STORY-A": {"status": "done"}, "STORY-B": {"status": "failed", "blocked_reason":
+                 "recurring infrastructure error: APIError: [codex/gpt-5.6-sol] [400]: not supported"}}
+        self.assertEqual(classify_run(infra, 3, [], []), "ENVIRONMENT_OR_PROVIDER_STOP")
+        verifier = {"STORY-A": {"status": "blocked", "blocked_reason": "REVIEW_UNRUNNABLE: reviewer did not run"}}
+        self.assertEqual(classify_run(verifier, 2, [], []), "ENVIRONMENT_OR_PROVIDER_STOP")
+        quality = {"STORY-A": {"status": "failed", "blocked_reason": "did not pass gate after 3 attempts: review"}}
+        self.assertEqual(classify_run(quality, 2, [], []), "LEGITIMATE_MODEL_PROJECT_STOP")
+
 
 
 class TestOracleResultParsing(unittest.TestCase):

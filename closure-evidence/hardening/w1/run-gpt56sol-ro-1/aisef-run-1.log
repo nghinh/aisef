@@ -1,0 +1,93 @@
+EPIC-01 · wave 1
+STORY-01-01: DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✗ TDD — tests green on first run — not proven to verify anything (tests/__init__.py, tests/test_nfc_normalization.py, tests/test_skeleton.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.
+    ✗ tests verify story — tests verify nothing — still green without story code (parent SHA cd2e40f): tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_5_runtime_has_no_forbidden_imports, tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_6_runtime_has_no_forbidden_calls
+    ✅ security
+    ✗ review — 1 blocking items: [block] tests/test_skeleton.py:62 — The AC-7 test checks only callability, so replacing Ledger with a function would remain green even though the criterion requires Ledger to be a class.
+    – preservation — story does not touch any VERIFIED behaviour of other stories
+  [attempt 2] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD — no red run recorded, but the nop control proves the same thing directly — 7 tests with criteria codes proven red at parent SHA cd2e40f: 7 executed red, 0 unable to import code this story introduces
+    ✅ tests verify story — 7 tests with criteria codes proven red at parent SHA cd2e40f: 7 executed red, 0 unable to import code this story introduces
+    ✅ security
+    ✗ review — 1 blocking items: [block] tests/test_nfc_normalization.py:8 — The AC-1 sample set cannot distinguish required NFC normalization from NFKC; replacing NFC with NFKC leaves both test suites green while changing valid keys
+    – preservation — story does not touch any VERIFIED behaviour of other stories
+  [attempt 3] ok
+EPIC-01 · wave 2
+STORY-01-02: DONE
+  [attempt 1] ok
+EPIC-01 · wave 3
+STORY-01-03: NOT DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD — no red run recorded, but the nop control proves the same thing directly — 5 tests with criteria codes proven red at parent SHA 607f076: 0 executed red, 5 unable to import code this story introduces
+    ✅ tests verify story — 5 tests with criteria codes proven red at parent SHA 607f076: 0 executed red, 5 unable to import code this story introduces
+    ⚠ security — security reviewer did not run (could not run: APIError: [codex/gpt-5.6-sol] [400]: {"detail":"The 'gpt-5.6-sol' model is not supported when using Codex with a ChatGPT account."} (reset after 30s) (HTTP 503)) — no verdict about the candidate
+    ⚠ review — reviewer did not run (APIError: [codex/gpt-5.6-sol] [400]: {"detail":"The 'gpt-5.6-sol' model is not supported when using Codex with a ChatGPT account."} (reset after 30s) (HTTP 503)) — no verdict about the candidate
+    ✅ preservation — 17 behaviours of other stories still green
+  [re-verify] gate failed
+  candidate ce54fa8: reran review, security · kept test:nop, test, lint, qa:fake-tests
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD — no red run recorded, but the nop control proves the same thing directly — 5 tests with criteria codes proven red at parent SHA 607f076: 0 executed red, 5 unable to import code this story introduces
+    ✅ tests verify story — 5 tests with criteria codes proven red at parent SHA 607f076: 0 executed red, 5 unable to import code this story introduces
+    ⚠ security — security reviewer did not run (could not run: APIError: [codex/gpt-5.6-sol] [400]: {"detail":"The 'gpt-5.6-sol' model is not supported when using Codex with a ChatGPT account."} (reset after 30s) (HTTP 503)) — no verdict about the candidate
+    ⚠ review — reviewer did not run (APIError: [codex/gpt-5.6-sol] [400]: {"detail":"The 'gpt-5.6-sol' model is not supported when using Codex with a ChatGPT account."} (reset after 30s) (HTTP 503)) — no verdict about the candidate
+    ✅ preservation — 17 behaviours of other stories still green
+  [re-verify] gate failed
+  candidate ce54fa8: reran review, security · kept test:nop, test, lint, qa:fake-tests
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD — no red run recorded, but the nop control proves the same thing directly — 5 tests with criteria codes proven red at parent SHA 607f076: 0 executed red, 5 unable to import code this story introduces
+    ✅ tests verify story — 5 tests with criteria codes proven red at parent SHA 607f076: 0 executed red, 5 unable to import code this story introduces
+    ⚠ security — security reviewer did not run (could not run: APIError: [codex/gpt-5.6-sol] [400]: {"detail":"The 'gpt-5.6-sol' model is not supported when using Codex with a ChatGPT account."} (reset after 30s) (HTTP 503)) — no verdict about the candidate
+    ⚠ review — reviewer did not run (APIError: [codex/gpt-5.6-sol] [400]: {"detail":"The 'gpt-5.6-sol' model is not supported when using Codex with a ChatGPT account."} (reset after 30s) (HTTP 503)) — no verdict about the candidate
+    ✅ preservation — 17 behaviours of other stories still green
+  ✗ REVIEW_UNRUNNABLE: the reviewer did not produce a verdict on candidate ce54fa83 in 3 executions — last: APIError: [codex/gpt-5.6-sol] [400]: {"detail":"The 'gpt-5.6-sol' model is not supported when using Codex with a ChatGPT account."} (reset after 30s) (HTTP 503). Deterministic checks passed and the candidate is kept; no developer change is needed. Re-run the review stage when the reviewer can run: `/Users/nghinh/Downloads/projects/aisef-freeze/40393cda89db/w1-venv/bin/python3.14 -m aisef.cli run --verify-only --story STORY-01-03`.
+
+⏸ stopped at EPIC-01 · wave 3
