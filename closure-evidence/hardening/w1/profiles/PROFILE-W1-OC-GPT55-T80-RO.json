@@ -141,6 +141,10 @@
   {
    "file": "PROVIDER-PREFLIGHT-GPT55-definition.json",
    "result": "PASS — 3/3 chat probes (gpt-5.5), 3/3 tool smokes, reviewer read-only environment 6/6 identical + developer control"
+  },
+  {
+   "file": "../run-gpt55-ro-2/PROVIDER-PREFLIGHT-try1-FAILED-429.json",
+   "result": "FAIL before attempt gpt55-ro-2 (13:59-14:09 +07): chat probes 0/3 — HTTP 503 wrapping `[codex/gpt-5.5] [429]: The usage limit has been reached (reset after 58s)`; tool smokes 0/2 timed out (OpenCode log: 429 `reset after 29m 1s` at 14:00:48). The usage-limit episode that stopped gpt55-ro-1 was still in force; no run copy was created (owner section 5). One bounded retry after the provider's reported reset."
   }
  ],
  "run_rule": "each run re-runs the provider preflight first (probes + smokes); a failing route creates no run copy"
