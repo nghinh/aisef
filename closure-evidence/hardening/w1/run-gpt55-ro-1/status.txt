@@ -1,0 +1,12 @@
+Progress: 7/16 stories done (8 not started)
+Active epics: EPIC-02
+
+  done        7
+  failed      1
+
+Cost: $0.00
+Agent runs: ok 48 · timeout 3
+Skill: bmad-code-review ×3 · bmad-review ×3 · test-driven-development ×1
+
+✗ 1 stories not passing:
+    STORY-02-02      failed   recurring infrastructure error: exceeded 1800s
