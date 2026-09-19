@@ -1,0 +1,137 @@
+{
+ "profile": "PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO",
+ "profile_id": "sha256:9f99ce5b057d229403c89e1958c41ee044dc977cd6fce9854b741f8ba691d147",
+ "status": "UNDER_QUALIFICATION",
+ "identity": {
+  "kernel": {
+   "candidate_sha": "40393cda89dbfbb887c9c901872256a5fdc5bea0",
+   "product_tree": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+   "wheel_sha256": "3f0fd6519a9f21b790eeaadcf39a95436dfb9ba75878f9bb411e376ebfc116a6"
+  },
+  "client": "opencode",
+  "client_version": "1.18.31",
+  "routes": {
+   "developer": "9router/ds/deepseek-v4-pro",
+   "reviewer": "9router/ds/deepseek-v4-pro",
+   "security": "9router/ds/deepseek-v4-pro",
+   "designer": "9router/ds/deepseek-v4-pro"
+  },
+  "max_turns": 80,
+  "max_retries": 2,
+  "max_infra_retries": -1,
+  "context_window": {
+   "developer": {
+    "context": 200000,
+    "output": 32768
+   },
+   "reviewer": {
+    "context": 200000,
+    "output": 32768
+   },
+   "security": {
+    "context": 200000,
+    "output": 32768
+   },
+   "designer": {
+    "context": 200000,
+    "output": 32768
+   }
+  },
+  "small_model": "9router/fast",
+  "sandbox_tool_profile": {
+   "sandbox.image": "aisef-verify-python:84adf1d8eaf9",
+   "tools": {
+    "tools.disabled": [],
+    "tools.lint": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+    "tools.sast": "",
+    "tools.test": "python3 -m pytest -v"
+   },
+   "capability_matrix_sha256": "53074dea8d5eebad3bae0d01e263d94bcfe26a092d1854413251d09b68f04bab"
+  },
+  "guard_digest": "3f9cc9b5f3024e9d61948ff3668812b09a85131359414b6531773c8d2d3801fc",
+  "prompt_catalog_digest": "c613e68adb58f368202b4f6f78b8b127ea0ff38dbc91fae9e7f27294c0065db2",
+  "client_config_digest": "67d21b343abfd8be0c39e4ca4b7d936a4e60f4e2a69ed933a836bd4a6c1cdab8",
+  "cost_cap_usd": 80.0,
+  "stage_env": {
+   "resolved_uv": "closure-evidence/hardening/w1/profiles/stage-env-ro-uv/bin/uv",
+   "wrapper_sha256": "f3fbbf214533a9d3fa497cac668d2760f99fd1c23ccf1d647f6f776f7bdd984e",
+   "real_uv": "/Users/nghinh/.local/bin/uv",
+   "real_uv_version": "uv 0.11.3 (45da18ac3 2026-04-01 aarch64-apple-darwin)"
+  },
+  "route_config": {
+   "developer": "9router/ds/deepseek-v4-pro",
+   "reviewer": "9router/ds/deepseek-v4-pro",
+   "security": "9router/ds/deepseek-v4-pro",
+   "designer": "9router/ds/deepseek-v4-pro"
+  },
+  "project_opencode": {
+   "$schema": "https://opencode.ai/config.json",
+   "model": "9router/ds/deepseek-v4-pro",
+   "provider": {
+    "9router": {
+     "models": {
+      "ds/deepseek-v4-pro": {
+       "name": "ds/deepseek-v4-pro",
+       "limit": {
+        "context": 200000,
+        "output": 32768
+       }
+      }
+     }
+    }
+   }
+  },
+  "route_resolution": {
+   "developer": {
+    "route_kind": "FIXED_MODEL",
+    "resolved_model": "deepseek-v4-pro",
+    "evidence": "profiles/PROVIDER-PREFLIGHT-DEEPSEEKV4PRO-definition.json: router /models lists ds/deepseek-v4-pro owned_by 'ds' (context_length 1000000, max_completion_tokens 384000); 3/3 chat probes answered_by 'deepseek-v4-pro'; OpenCode tool smokes 3/3"
+   },
+   "reviewer": {
+    "route_kind": "FIXED_MODEL",
+    "resolved_model": "deepseek-v4-pro",
+    "evidence": "profiles/PROVIDER-PREFLIGHT-DEEPSEEKV4PRO-definition.json: router /models lists ds/deepseek-v4-pro owned_by 'ds' (context_length 1000000, max_completion_tokens 384000); 3/3 chat probes answered_by 'deepseek-v4-pro'; OpenCode tool smokes 3/3"
+   },
+   "security": {
+    "route_kind": "FIXED_MODEL",
+    "resolved_model": "deepseek-v4-pro",
+    "evidence": "profiles/PROVIDER-PREFLIGHT-DEEPSEEKV4PRO-definition.json: router /models lists ds/deepseek-v4-pro owned_by 'ds' (context_length 1000000, max_completion_tokens 384000); 3/3 chat probes answered_by 'deepseek-v4-pro'; OpenCode tool smokes 3/3"
+   },
+   "designer": {
+    "route_kind": "FIXED_MODEL",
+    "resolved_model": "deepseek-v4-pro",
+    "evidence": "profiles/PROVIDER-PREFLIGHT-DEEPSEEKV4PRO-definition.json: router /models lists ds/deepseek-v4-pro owned_by 'ds' (context_length 1000000, max_completion_tokens 384000); 3/3 chat probes answered_by 'deepseek-v4-pro'; OpenCode tool smokes 3/3"
+   }
+  },
+  "provider_preflight": {
+   "route": "9router/ds/deepseek-v4-pro",
+   "route_kind": "FIXED_MODEL",
+   "resolved_model": "deepseek-v4-pro",
+   "chat_probes": "3/3",
+   "tool_smokes": "3/3",
+   "declared_limit": {
+    "context": 200000,
+    "output": 32768
+   }
+  }
+ },
+ "owner_decision": "CONTINUE W1 PROFILE QUALIFICATION, KERNEL FROZEN (2026-09-19), sections 6 and 9: the next fixed route after 9router/cx/gpt-5.5 was abandoned for provider instability",
+ "defined_from": "a rehearsal copy prepared exactly like a run copy (prepare_run_copy.sh + PROFILE, `aisef compile` with the frozen wheel) that never ran, measured with the profile's PATH",
+ "differs_from_PROFILE-W1-OC-GPT55-T80-RO_in": [
+  "routes",
+  "client_config_digest",
+  "route_config",
+  "project_opencode",
+  "route_resolution",
+  "provider_preflight"
+ ],
+ "same_as_PROFILE-W1-OC-GPT55-T80-RO": "kernel, client 1.18.31, max_turns 80, declared context window 200000/32768 (below the route's 1000000/384000, pinned so only the model changes), stage_env (the proven read-only uv wrapper, same digest), sandbox/tools/guard, cost cap, small_model, one model for every role",
+ "oracle": "independent oracle v2 (closure-evidence/hardening/w1/oracle/test_oracle.py)",
+ "provider_preflight_attempts": [
+  {
+   "file": "PROVIDER-PREFLIGHT-DEEPSEEKV4PRO-definition.json",
+   "result": "PASS — 3/3 chat probes (deepseek-v4-pro), 3/3 tool smokes, reviewer read-only environment clean (per-role shells identical + developer control)"
+  }
+ ],
+ "run_rule": "each run re-runs the provider preflight first (probes + smokes); a failing route creates no run copy"
+}

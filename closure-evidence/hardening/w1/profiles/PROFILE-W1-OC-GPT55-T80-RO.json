@@ -1,7 +1,7 @@
 {
  "profile": "PROFILE-W1-OC-GPT55-T80-RO",
  "profile_id": "sha256:90e26847497ee7eda49044f89f86c81f000bb9e919f69e6605cfe22c4c31f2e7",
- "status": "UNDER_QUALIFICATION",
+ "status": "ABANDONED_ROUTE_PROVIDER_UNSTABLE",
  "identity": {
   "kernel": {
    "candidate_sha": "40393cda89dbfbb887c9c901872256a5fdc5bea0",
@@ -145,7 +145,22 @@
   {
    "file": "../run-gpt55-ro-2/PROVIDER-PREFLIGHT-try1-FAILED-429.json",
    "result": "FAIL before attempt gpt55-ro-2 (13:59-14:09 +07): chat probes 0/3 — HTTP 503 wrapping `[codex/gpt-5.5] [429]: The usage limit has been reached (reset after 58s)`; tool smokes 0/2 timed out (OpenCode log: 429 `reset after 29m 1s` at 14:00:48). The usage-limit episode that stopped gpt55-ro-1 was still in force; no run copy was created (owner section 5). One bounded retry after the provider's reported reset."
+  },
+  {
+   "file": "../run-gpt55-ro-2/PROVIDER-PREFLIGHT-try2-FAILED-429.json",
+   "result": "FAIL on the one bounded retry (14:36-14:46 +07), after the provider's own announced reset (14:29:49): chat probes 0/3 — HTTP 503 wrapping `[codex/gpt-5.5] [429]: The usage limit has been reached (reset after 29m 59s)`; tool smokes 0/2 timed out. No run copy was created."
   }
  ],
- "run_rule": "each run re-runs the provider preflight first (probes + smokes); a failing route creates no run copy"
+ "run_rule": "each run re-runs the provider preflight first (probes + smokes); a failing route creates no run copy",
+ "route_disposition": {
+  "decided": "2026-09-19T14:48:43+0700",
+  "rule": "owner decision 2026-09-19 section 6: two provider interruptions on the same route during qualification -> abandon the route, move to the next fixed route (ds/deepseek-v4-pro)",
+  "interruption_1": "attempt gpt55-ro-1, mid-run: 429 usage limit from 12:00 (+07); STORY-02-02 blocked `recurring infrastructure error` at 13:55; ENVIRONMENT_OR_PROVIDER_STOP at 7/16, excluded from the denominator",
+  "interruption_2": "attempt gpt55-ro-2: the route stayed unavailable through a provider preflight at 13:59 and the single bounded retry at 14:36, which ran after the reset the provider itself announced — 429 again, with a fresh ~30 min horizon; no run copy was created (section 5)",
+  "why_counted_as_a_second_interruption_and_not_retried_further": "the route has been unavailable for 2 h 46 min across its own announced reset, and gpt55-ro-1 measured about one hour of W1 execution (7 of 16 stories) before the quota ran out, so even a fresh window cannot carry the 3-4 h a full run needs; 'Do NOT retry indefinitely' (section 6)",
+  "valid_runs_on_this_profile": 0,
+  "delivery_completions_on_this_profile": 0,
+  "counts_as_a_failed_delivery_profile_for_section_9": false,
+  "note": "abandoned for provider stability, not measured on delivery: it is not one of the 'two serious fixed-model profiles' that failed W1 delivery qualification (section 9)"
+ }
 }
