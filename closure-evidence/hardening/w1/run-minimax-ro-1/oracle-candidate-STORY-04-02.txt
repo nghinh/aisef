@@ -1,0 +1,84 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0 -- /Users/nghinh/Downloads/projects/aisef-freeze/oracle-venv/bin/python
+rootdir: /Users/nghinh/Downloads/projects/ai-sdlc
+configfile: pyproject.toml
+collecting ... collected 9 items
+
+oracle/test_oracle.py::TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger PASSED [ 11%]
+oracle/test_oracle.py::TestAcceptance::test_14_2_snapshot_is_byte_deterministic PASSED [ 22%]
+oracle/test_oracle.py::TestAcceptance::test_14_3_apply_batch_commits_atomically PASSED [ 33%]
+oracle/test_oracle.py::TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption FAILED [ 44%]
+oracle/test_oracle.py::TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover FAILED [ 55%]
+oracle/test_oracle.py::TestAcceptance::test_14_6_no_third_party_imports_at_runtime FAILED [ 66%]
+oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli PASSED [ 77%]
+oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value FAILED [ 88%]
+oracle/test_oracle.py::TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts FAILED [100%]
+
+=================================== FAILURES ===================================
+_ TestAcceptance.test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption _
+oracle/test_oracle.py:113: in test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption
+    self.assertEqual(_cli("verify", str(self.ledger), cwd=self.tmp).returncode, 5, "§3.3 / §9: a line that does not parse is corruption")
+E   AssertionError: 2 != 5 : §3.3 / §9: a line that does not parse is corruption
+_ TestAcceptance.test_14_5_coverage_at_least_85_percent_with_unittest_discover _
+oracle/test_oracle.py:136: in test_14_5_coverage_at_least_85_percent_with_unittest_discover
+    self.assertGreaterEqual(pct, 85.0, f"§11 / §14.5: coverage {pct}% < 85%")
+E   AssertionError: 68.0 not greater than or equal to 85.0 : §11 / §14.5: coverage 68.0% < 85%
+__________ TestAcceptance.test_14_6_no_third_party_imports_at_runtime __________
+oracle/test_oracle.py:149: in test_14_6_no_third_party_imports_at_runtime
+    self.assertEqual(sorted(imported - set(sys.stdlib_module_names)), [], "§2 / §10 / §14.6: a non-stdlib import")
+E   AssertionError: Lists differ: ['ledgerlock'] != []
+E   
+E   First list contains 1 additional elements.
+E   First extra element 0:
+E   'ledgerlock'
+E   
+E   - ['ledgerlock']
+E   + [] : §2 / §10 / §14.6: a non-stdlib import
+___ TestIdempotencyAndConflict.test_a_tombstone_conflicts_like_a_live_value ____
+oracle/test_oracle.py:201: in test_a_tombstone_conflicts_like_a_live_value
+    with self.assertRaises(self.L.ConflictError, msg="§4.4: another rid conflicts against the tombstone"):
+                           ^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ledgerlock.ledger' has no attribute 'ConflictError'
+_ TestIdempotencyAndConflict.test_replay_is_idempotent_and_a_different_rid_conflicts _
+oracle/test_oracle.py:186: in test_replay_is_idempotent_and_a_different_rid_conflicts
+    self.assertEqual(led.apply_batch([("put", "k", 1, "r1", 1)]), first, "§4.2: a replay returns the same result")
+E   AssertionError: Lists differ: [{'hash': '1eab6912bba1252d33f13e0005f24dd00[168 chars]lse}] != [{'op': 'put', 'key': 'k', 'rid': 'r1', 'ts'[168 chars]rue}]
+E   
+E   First differing element 0:
+E   {'hash': '1eab6912bba1252d33f13e0005f24dd00[167 chars]alse}
+E   {'op': 'put', 'key': 'k', 'rid': 'r1', 'ts'[167 chars]True}
+E   
+E     [{'batch_index': 0,
+E   -   'committed': False,
+E   ?                ^^^^
+E   
+E   +   'committed': True,
+E   ?                ^^^
+E   
+E       'hash': '1eab6912bba1252d33f13e0005f24dd0002ae2eed3786167110815203df8dcb4',
+E       'key': 'k',
+E       'op': 'put',
+E       'prev_hash': 'GENESIS',
+E   -   'replayed': True,
+E   ?               ^^^
+E   
+E   +   'replayed': False,
+E   ?               ^^^^
+E   
+E       'rid': 'r1',
+E       'ts': 1,
+E       'value': 1}] : §4.2: a replay returns the same result
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED oracle/test_oracle.py::TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger
+PASSED oracle/test_oracle.py::TestAcceptance::test_14_2_snapshot_is_byte_deterministic
+PASSED oracle/test_oracle.py::TestAcceptance::test_14_3_apply_batch_commits_atomically
+PASSED oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_6_no_third_party_imports_at_runtime
+FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value
+FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts
+========================= 5 failed, 4 passed in 3.85s ==========================
+
+--- stderr ---

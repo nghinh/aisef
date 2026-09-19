@@ -1,0 +1,309 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 62 items
+
+tests/test_conflict.py::AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict::test_AC_STORY_01_06_1_replay_does_not_change_chain_length FAILED [  1%]
+tests/test_conflict.py::AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict::test_AC_STORY_01_06_1_replay_does_not_rewrite_disk FAILED [  3%]
+tests/test_conflict.py::AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict::test_AC_STORY_01_06_1_replay_returns_original_line_dict FAILED [  4%]
+tests/test_conflict.py::AC_STORY_01_06_2_DifferentRidRaisesConflictError::test_AC_STORY_01_06_2_conflict_carries_key_field FAILED [  6%]
+tests/test_conflict.py::AC_STORY_01_06_2_DifferentRidRaisesConflictError::test_AC_STORY_01_06_2_conflict_keeps_chain_length FAILED [  8%]
+tests/test_conflict.py::AC_STORY_01_06_2_DifferentRidRaisesConflictError::test_AC_STORY_01_06_2_different_rid_raises_ConflictError FAILED [  9%]
+tests/test_conflict.py::AC_STORY_01_06_3_PutAfterDeleteWithDifferentRidRaisesConflict::test_AC_STORY_01_06_3_put_after_delete_different_rid_raises FAILED [ 11%]
+tests/test_conflict.py::AC_STORY_01_06_4_PutAfterDeleteSameRidIsReplay::test_AC_STORY_01_06_4_replay_after_delete_does_not_grow_chain FAILED [ 12%]
+tests/test_conflict.py::AC_STORY_01_06_4_PutAfterDeleteSameRidIsReplay::test_AC_STORY_01_06_4_replay_after_delete_returns_delete_line FAILED [ 14%]
+tests/test_conflict.py::AC_STORY_01_06_5_NfcKeyEquivalenceInReplay::test_AC_STORY_01_06_5_nfc_key_in_returned_dict_is_byte_exact FAILED [ 16%]
+tests/test_conflict.py::AC_STORY_01_06_5_NfcKeyEquivalenceInReplay::test_AC_STORY_01_06_5_nfd_form_replays_against_nfc_committed FAILED [ 17%]
+tests/test_format.py::AC_STORY_01_02_1_CanonicalBytesBaseline::test_AC_STORY_01_02_1_matches_documented_json_dumps PASSED [ 19%]
+tests/test_format.py::AC_STORY_01_02_2_DeterminismForEqualDicts::test_AC_STORY_01_02_2_two_equal_dicts_byte_identical PASSED [ 20%]
+tests/test_format.py::AC_STORY_01_02_3_NonAsciiUtf8::test_AC_STORY_01_02_3_byte_stable_across_invocations PASSED [ 22%]
+tests/test_format.py::AC_STORY_01_02_3_NonAsciiUtf8::test_AC_STORY_01_02_3_non_ascii_is_utf8_literal PASSED [ 24%]
+tests/test_format.py::AC_STORY_01_02_4_InsertionOrderIndependence::test_AC_STORY_01_02_4_insertion_order_independent PASSED [ 25%]
+tests/test_format.py::AC_STORY_01_02_5_GenesisConstant::test_AC_STORY_01_02_5_genesis_distinct_from_64_char_hex PASSED [ 27%]
+tests/test_format.py::AC_STORY_01_02_5_GenesisConstant::test_AC_STORY_01_02_5_genesis_is_literal_string PASSED [ 29%]
+tests/test_format.py::AC_STORY_01_02_6_RoundTripStability::test_AC_STORY_01_02_6_roundtrip_through_json_loads PASSED [ 30%]
+tests/test_format.py::AC_STORY_01_03_1_64LowercaseHexChars::test_AC_STORY_01_03_1_returns_64_lower_hex PASSED [ 32%]
+tests/test_format.py::AC_STORY_01_03_2_PrevHashChangesDigest::test_AC_STORY_01_03_2_distinct_prev_hash_distinct_digest PASSED [ 33%]
+tests/test_format.py::AC_STORY_01_03_3_IgnoresExistingHashFields::test_AC_STORY_01_03_3_does_not_mutate_input PASSED [ 35%]
+tests/test_format.py::AC_STORY_01_03_3_IgnoresExistingHashFields::test_AC_STORY_01_03_3_ignores_existing_hash_fields PASSED [ 37%]
+tests/test_format.py::AC_STORY_01_03_4_Determinism::test_AC_STORY_01_03_4_matches_documented_sha256_formula PASSED [ 38%]
+tests/test_format.py::AC_STORY_01_03_4_Determinism::test_AC_STORY_01_03_4_repeatable_across_invocations PASSED [ 40%]
+tests/test_format.py::AC_STORY_01_03_5_GenesisAccepted::test_AC_STORY_01_03_5_genesis_non_hex_accepted PASSED [ 41%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_file_exists_with_exactly_one_line PASSED [ 43%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_hash_matches_line_hash_formula PASSED [ 45%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_is_bytes_safe_json PASSED [ 46%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_line_fields_match_inputs PASSED [ 48%]
+tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsFromFirstHash::test_AC_STORY_01_05_2_first_line_hash_is_chained_at_GENESIS PASSED [ 50%]
+tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsFromFirstHash::test_AC_STORY_01_05_2_second_hash_equals_line_hash_formula PASSED [ 51%]
+tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsFromFirstHash::test_AC_STORY_01_05_2_second_prev_hash_equals_first_hash PASSED [ 53%]
+tests/test_ledger.py::AC_STORY_01_05_3_EmptyKeyRaisesValueError::test_AC_STORY_01_05_3_empty_key_raises_ValueError PASSED [ 54%]
+tests/test_ledger.py::AC_STORY_01_05_3_EmptyKeyRaisesValueError::test_AC_STORY_01_05_3_no_file_created_on_failure PASSED [ 56%]
+tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk::test_AC_STORY_01_05_4_empty_existing_file_chains_from_GENESIS PASSED [ 58%]
+tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk::test_AC_STORY_01_05_4_fresh_instance_chains_from_disk_tail PASSED [ 59%]
+tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk::test_AC_STORY_01_05_4_in_memory_state_does_not_leak PASSED [ 61%]
+tests/test_ledger.py::AC_STORY_01_05_5_OtherProcessSeesLineAfterAppendReturns::test_AC_STORY_01_05_5_other_process_finds_line PASSED [ 62%]
+tests/test_ledger.py::ACStory0105AppendFsyncIntegration::test_AC_STORY_01_05_fsync_called_on_append_mode_handle PASSED [ 64%]
+tests/test_nfc_normalization.py::NFCNormalizationTests::test_AC_STORY_01_01_1_already_nfc_is_unchanged PASSED [ 66%]
+tests/test_nfc_normalization.py::NFCNormalizationTests::test_AC_STORY_01_01_2_combining_marks_collapse PASSED [ 67%]
+tests/test_skeleton.py::AC_STORY_01_01_1_NfcIdentity::test_AC_STORY_01_01_1_byte_for_byte PASSED [ 69%]
+tests/test_skeleton.py::AC_STORY_01_01_1_NfcIdentity::test_AC_STORY_01_01_1_returns_nfc_of_input 
+tests/test_skeleton.py::AC_STORY_01_01_1_NfcIdentity::test_AC_STORY_01_01_1_returns_nfc_of_input PASSED [ 70%]
+tests/test_skeleton.py::AC_STORY_01_01_2_NfcNfdEquivalence::test_AC_STORY_01_01_2_nfc_and_nfd_are_byte_identical PASSED [ 72%]
+tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportable::test_AC_STORY_01_01_3_subprocess_import_resolves PASSED [ 74%]
+tests/test_skeleton.py::AC_STORY_01_01_4_CliHelpSurface::test_AC_STORY_01_01_4_help_lists_subcommands 
+tests/test_skeleton.py::AC_STORY_01_01_4_CliHelpSurface::test_AC_STORY_01_01_4_help_lists_subcommands PASSED [ 75%]
+tests/test_skeleton.py::AC_STORY_01_01_5_NoForbiddenImports::test_AC_STORY_01_01_5_grep_returns_no_matches PASSED [ 77%]
+tests/test_skeleton.py::AC_STORY_01_01_6_NoForbiddenCalls::test_AC_STORY_01_01_6_grep_returns_no_matches PASSED [ 79%]
+tests/test_skeleton.py::AC_STORY_01_01_7_PublicApi::test_AC_STORY_01_01_7_ledger_is_callable_class PASSED [ 80%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_each_element_is_bytes PASSED [ 82%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_preserves_inner_newlines_as_bytes PASSED [ 83%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_strips_only_trailing_newline PASSED [ 85%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_three_lines_returns_three_bytes PASSED [ 87%]
+tests/test_store.py::AC_STORY_01_04_2_MissingFileRaisesFileNotFoundError::test_AC_STORY_01_04_2_missing_path_raises PASSED [ 88%]
+tests/test_store.py::AC_STORY_01_04_3_EmptyFileReturnsEmptyList::test_AC_STORY_01_04_3_empty_file_returns_empty_list PASSED [ 90%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicProducesJoinedBytes::test_AC_STORY_01_04_4_empty_list_produces_empty_file PASSED [ 91%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicProducesJoinedBytes::test_AC_STORY_01_04_4_single_line PASSED [ 93%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicProducesJoinedBytes::test_AC_STORY_01_04_4_two_lines_byte_concat PASSED [ 95%]
+tests/test_store.py::AC_STORY_01_04_5_CrashBeforeReplaceLeavesOriginalIntact::test_AC_STORY_01_04_5_crash_leaves_original_intact PASSED [ 96%]
+tests/test_store.py::AC_STORY_01_04_5_CrashBeforeReplaceLeavesOriginalIntact::test_AC_STORY_01_04_5_no_stray_temp_files_after_crash PASSED [ 98%]
+tests/test_store.py::AC_STORY_01_04_6_TempFileLivesInSameDirectory::test_AC_STORY_01_04_6_tempfile_dir_is_target_parent PASSED [100%]
+
+=================================== FAILURES ===================================
+_ AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict.test_AC_STORY_01_06_1_replay_does_not_change_chain_length _
+
+self = <tests.test_conflict.AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict testMethod=test_AC_STORY_01_06_1_replay_does_not_change_chain_length>
+
+    def test_AC_STORY_01_06_1_replay_does_not_change_chain_length(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            ledger.append(("put", "k", "v1", "r1", 100))
+    
+            before = _lines_on_disk(target)
+            ledger.append(("put", "k", "v_different_value", "r1", 200))
+            ledger.append(("put", "k", "v_third", "r1", 300))
+            after = _lines_on_disk(target)
+    
+>           self.assertEqual(before, after)
+E           AssertionError: 1 != 3
+
+tests/test_conflict.py:65: AssertionError
+_ AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict.test_AC_STORY_01_06_1_replay_does_not_rewrite_disk _
+
+self = <tests.test_conflict.AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict testMethod=test_AC_STORY_01_06_1_replay_does_not_rewrite_disk>
+
+    def test_AC_STORY_01_06_1_replay_does_not_rewrite_disk(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            ledger.append(("put", "k", "v1", "r1", 100))
+            before = target.read_bytes()
+    
+            ledger.append(("put", "k", "v1_replay", "r1", 999))
+            after = target.read_bytes()
+    
+>           self.assertEqual(before, after)
+E           AssertionError: b'{"h[145 chars]1"}\n' != b'{"h[145 chars]1"}\n{"hash":"30b7a58e88ec6ce03757e0a327971aba[172 chars]"}\n'
+
+tests/test_conflict.py:80: AssertionError
+_ AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict.test_AC_STORY_01_06_1_replay_returns_original_line_dict _
+
+self = <tests.test_conflict.AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict testMethod=test_AC_STORY_01_06_1_replay_returns_original_line_dict>
+
+    def test_AC_STORY_01_06_1_replay_returns_original_line_dict(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            ledger.append(("put", "k", "v1", "r1", 100))
+    
+            before_bytes = target.read_bytes()
+            before_lines = _lines_on_disk(target)
+            original = _read_jsonl(target)[0]
+    
+            result = ledger.append(("put", "k", "anything", "r1", 999))
+    
+>           self.assertEqual(result, {**original, "replayed": True, "committed": False})
+E           AssertionError: None != {'hash': '118ebe99d9c12b36945ee5d93c6cd51[156 chars]alse}
+
+tests/test_conflict.py:46: AssertionError
+_ AC_STORY_01_06_2_DifferentRidRaisesConflictError.test_AC_STORY_01_06_2_conflict_carries_key_field _
+
+self = <tests.test_conflict.AC_STORY_01_06_2_DifferentRidRaisesConflictError testMethod=test_AC_STORY_01_06_2_conflict_carries_key_field>
+
+    def test_AC_STORY_01_06_2_conflict_carries_key_field(self) -> None:
+        from ledgerlock import ConflictError, Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            ledger.append(("put", "alpha", 1, "r1", 1))
+    
+>           with self.assertRaises(ConflictError) as ctx:
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: ConflictError not raised
+
+tests/test_conflict.py:130: AssertionError
+_ AC_STORY_01_06_2_DifferentRidRaisesConflictError.test_AC_STORY_01_06_2_conflict_keeps_chain_length _
+
+self = <tests.test_conflict.AC_STORY_01_06_2_DifferentRidRaisesConflictError testMethod=test_AC_STORY_01_06_2_conflict_keeps_chain_length>
+
+    def test_AC_STORY_01_06_2_conflict_keeps_chain_length(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            ledger.append(("put", "k", "v1", "r1", 100))
+            before = _lines_on_disk(target)
+    
+            try:
+                ledger.append(("put", "k", "v2", "r2", 200))
+            except Exception:
+                pass
+    
+>           self.assertEqual(_lines_on_disk(target), before)
+E           AssertionError: 2 != 1
+
+tests/test_conflict.py:120: AssertionError
+_ AC_STORY_01_06_2_DifferentRidRaisesConflictError.test_AC_STORY_01_06_2_different_rid_raises_ConflictError _
+
+self = <tests.test_conflict.AC_STORY_01_06_2_DifferentRidRaisesConflictError testMethod=test_AC_STORY_01_06_2_different_rid_raises_ConflictError>
+
+    def test_AC_STORY_01_06_2_different_rid_raises_ConflictError(self) -> None:
+        from ledgerlock import ConflictError, Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            ledger.append(("put", "k", "v1", "r1", 100))
+            before_bytes = target.read_bytes()
+    
+>           with self.assertRaises(ConflictError) as ctx:
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: ConflictError not raised
+
+tests/test_conflict.py:96: AssertionError
+_ AC_STORY_01_06_3_PutAfterDeleteWithDifferentRidRaisesConflict.test_AC_STORY_01_06_3_put_after_delete_different_rid_raises _
+
+self = <tests.test_conflict.AC_STORY_01_06_3_PutAfterDeleteWithDifferentRidRaisesConflict testMethod=test_AC_STORY_01_06_3_put_after_delete_different_rid_raises>
+
+    def test_AC_STORY_01_06_3_put_after_delete_different_rid_raises(self) -> None:
+        from ledgerlock import ConflictError, Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            ledger.append(("delete", "k", None, "r1", 100))
+            before_bytes = target.read_bytes()
+    
+>           with self.assertRaises(ConflictError) as ctx:
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: ConflictError not raised
+
+tests/test_conflict.py:148: AssertionError
+_ AC_STORY_01_06_4_PutAfterDeleteSameRidIsReplay.test_AC_STORY_01_06_4_replay_after_delete_does_not_grow_chain _
+
+self = <tests.test_conflict.AC_STORY_01_06_4_PutAfterDeleteSameRidIsReplay testMethod=test_AC_STORY_01_06_4_replay_after_delete_does_not_grow_chain>
+
+    def test_AC_STORY_01_06_4_replay_after_delete_does_not_grow_chain(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            ledger.append(("delete", "k", None, "r1", 100))
+            before = _lines_on_disk(target)
+    
+            ledger.append(("put", "k", "v", "r1", 200))
+            ledger.append(("put", "k", "v2", "r1", 300))
+    
+>           self.assertEqual(_lines_on_disk(target), before)
+E           AssertionError: 3 != 1
+
+tests/test_conflict.py:193: AssertionError
+_ AC_STORY_01_06_4_PutAfterDeleteSameRidIsReplay.test_AC_STORY_01_06_4_replay_after_delete_returns_delete_line _
+
+self = <tests.test_conflict.AC_STORY_01_06_4_PutAfterDeleteSameRidIsReplay testMethod=test_AC_STORY_01_06_4_replay_after_delete_returns_delete_line>
+
+    def test_AC_STORY_01_06_4_replay_after_delete_returns_delete_line(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            ledger.append(("delete", "k", None, "r1", 100))
+    
+            original = _read_jsonl(target)[0]
+            before_bytes = target.read_bytes()
+    
+            result = ledger.append(("put", "k", "v", "r1", 200))
+    
+>           self.assertEqual(result, {**original, "replayed": True, "committed": False})
+E           AssertionError: None != {'hash': '7d5760bb53f952b320362f9628c8308[159 chars]alse}
+
+tests/test_conflict.py:176: AssertionError
+_ AC_STORY_01_06_5_NfcKeyEquivalenceInReplay.test_AC_STORY_01_06_5_nfc_key_in_returned_dict_is_byte_exact _
+
+self = <tests.test_conflict.AC_STORY_01_06_5_NfcKeyEquivalenceInReplay testMethod=test_AC_STORY_01_06_5_nfc_key_in_returned_dict_is_byte_exact>
+
+    def test_AC_STORY_01_06_5_nfc_key_in_returned_dict_is_byte_exact(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            ledger.append(("put", "\u00e9", "v1", "r1", 100))
+    
+            result = ledger.append(("put", "e\u0301", "v2", "r1", 200))
+    
+>           key_value = result["key"]
+                        ^^^^^^^^^^^^^
+E           TypeError: 'NoneType' object is not subscriptable
+
+tests/test_conflict.py:231: TypeError
+_ AC_STORY_01_06_5_NfcKeyEquivalenceInReplay.test_AC_STORY_01_06_5_nfd_form_replays_against_nfc_committed _
+
+self = <tests.test_conflict.AC_STORY_01_06_5_NfcKeyEquivalenceInReplay testMethod=test_AC_STORY_01_06_5_nfd_form_replays_against_nfc_committed>
+
+    def test_AC_STORY_01_06_5_nfd_form_replays_against_nfc_committed(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            ledger.append(("put", "\u00e9", "v1", "r1", 100))
+    
+            before_bytes = target.read_bytes()
+            before_lines = _lines_on_disk(target)
+            original = _read_jsonl(target)[0]
+    
+            result = ledger.append(("put", "e\u0301", "v2", "r1", 200))
+    
+>           self.assertEqual(result.get("key"), "\u00e9")
+                             ^^^^^^^^^^
+E           AttributeError: 'NoneType' object has no attribute 'get'
+
+tests/test_conflict.py:214: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_conflict.py::AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict::test_AC_STORY_01_06_1_replay_does_not_change_chain_length
+FAILED tests/test_conflict.py::AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict::test_AC_STORY_01_06_1_replay_does_not_rewrite_disk
+FAILED tests/test_conflict.py::AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict::test_AC_STORY_01_06_1_replay_returns_original_line_dict
+FAILED tests/test_conflict.py::AC_STORY_01_06_2_DifferentRidRaisesConflictError::test_AC_STORY_01_06_2_conflict_carries_key_field
+FAILED tests/test_conflict.py::AC_STORY_01_06_2_DifferentRidRaisesConflictError::test_AC_STORY_01_06_2_conflict_keeps_chain_length
+FAILED tests/test_conflict.py::AC_STORY_01_06_2_DifferentRidRaisesConflictError::test_AC_STORY_01_06_2_different_rid_raises_ConflictError
+FAILED tests/test_conflict.py::AC_STORY_01_06_3_PutAfterDeleteWithDifferentRidRaisesConflict::test_AC_STORY_01_06_3_put_after_delete_different_rid_raises
+FAILED tests/test_conflict.py::AC_STORY_01_06_4_PutAfterDeleteSameRidIsReplay::test_AC_STORY_01_06_4_replay_after_delete_does_not_grow_chain
+FAILED tests/test_conflict.py::AC_STORY_01_06_4_PutAfterDeleteSameRidIsReplay::test_AC_STORY_01_06_4_replay_after_delete_returns_delete_line
+FAILED tests/test_conflict.py::AC_STORY_01_06_5_NfcKeyEquivalenceInReplay::test_AC_STORY_01_06_5_nfc_key_in_returned_dict_is_byte_exact
+FAILED tests/test_conflict.py::AC_STORY_01_06_5_NfcKeyEquivalenceInReplay::test_AC_STORY_01_06_5_nfd_form_replays_against_nfc_committed
+=============== 11 failed, 51 passed, 9 subtests passed in 0.63s ===============

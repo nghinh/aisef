@@ -1,0 +1,407 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 76 items
+
+tests/test_conflict.py::AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict::test_AC_STORY_01_06_1_replay_does_not_change_chain_length PASSED [  1%]
+tests/test_conflict.py::AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict::test_AC_STORY_01_06_1_replay_does_not_rewrite_disk PASSED [  2%]
+tests/test_conflict.py::AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict::test_AC_STORY_01_06_1_replay_returns_original_line_dict PASSED [  3%]
+tests/test_conflict.py::AC_STORY_01_06_2_DifferentRidRaisesConflictError::test_AC_STORY_01_06_2_conflict_carries_key_field PASSED [  5%]
+tests/test_conflict.py::AC_STORY_01_06_2_DifferentRidRaisesConflictError::test_AC_STORY_01_06_2_conflict_keeps_chain_length PASSED [  6%]
+tests/test_conflict.py::AC_STORY_01_06_2_DifferentRidRaisesConflictError::test_AC_STORY_01_06_2_different_rid_raises_ConflictError PASSED [  7%]
+tests/test_conflict.py::AC_STORY_01_06_3_PutAfterDeleteWithDifferentRidRaisesConflict::test_AC_STORY_01_06_3_put_after_delete_different_rid_raises PASSED [  9%]
+tests/test_conflict.py::AC_STORY_01_06_4_PutAfterDeleteSameRidIsReplay::test_AC_STORY_01_06_4_replay_after_delete_does_not_grow_chain PASSED [ 10%]
+tests/test_conflict.py::AC_STORY_01_06_4_PutAfterDeleteSameRidIsReplay::test_AC_STORY_01_06_4_replay_after_delete_returns_delete_line PASSED [ 11%]
+tests/test_conflict.py::AC_STORY_01_06_5_NfcKeyEquivalenceInReplay::test_AC_STORY_01_06_5_nfc_key_in_returned_dict_is_byte_exact PASSED [ 13%]
+tests/test_conflict.py::AC_STORY_01_06_5_NfcKeyEquivalenceInReplay::test_AC_STORY_01_06_5_nfd_form_replays_against_nfc_committed PASSED [ 14%]
+tests/test_format.py::AC_STORY_01_02_1_CanonicalBytesBaseline::test_AC_STORY_01_02_1_matches_documented_json_dumps PASSED [ 15%]
+tests/test_format.py::AC_STORY_01_02_2_DeterminismForEqualDicts::test_AC_STORY_01_02_2_two_equal_dicts_byte_identical PASSED [ 17%]
+tests/test_format.py::AC_STORY_01_02_3_NonAsciiUtf8::test_AC_STORY_01_02_3_byte_stable_across_invocations PASSED [ 18%]
+tests/test_format.py::AC_STORY_01_02_3_NonAsciiUtf8::test_AC_STORY_01_02_3_non_ascii_is_utf8_literal PASSED [ 19%]
+tests/test_format.py::AC_STORY_01_02_4_InsertionOrderIndependence::test_AC_STORY_01_02_4_insertion_order_independent PASSED [ 21%]
+tests/test_format.py::AC_STORY_01_02_5_GenesisConstant::test_AC_STORY_01_02_5_genesis_distinct_from_64_char_hex PASSED [ 22%]
+tests/test_format.py::AC_STORY_01_02_5_GenesisConstant::test_AC_STORY_01_02_5_genesis_is_literal_string PASSED [ 23%]
+tests/test_format.py::AC_STORY_01_02_6_RoundTripStability::test_AC_STORY_01_02_6_roundtrip_through_json_loads PASSED [ 25%]
+tests/test_format.py::AC_STORY_01_03_1_64LowercaseHexChars::test_AC_STORY_01_03_1_returns_64_lower_hex PASSED [ 26%]
+tests/test_format.py::AC_STORY_01_03_2_PrevHashChangesDigest::test_AC_STORY_01_03_2_distinct_prev_hash_distinct_digest PASSED [ 27%]
+tests/test_format.py::AC_STORY_01_03_3_IgnoresExistingHashFields::test_AC_STORY_01_03_3_does_not_mutate_input PASSED [ 28%]
+tests/test_format.py::AC_STORY_01_03_3_IgnoresExistingHashFields::test_AC_STORY_01_03_3_ignores_existing_hash_fields PASSED [ 30%]
+tests/test_format.py::AC_STORY_01_03_4_Determinism::test_AC_STORY_01_03_4_matches_documented_sha256_formula PASSED [ 31%]
+tests/test_format.py::AC_STORY_01_03_4_Determinism::test_AC_STORY_01_03_4_repeatable_across_invocations PASSED [ 32%]
+tests/test_format.py::AC_STORY_01_03_5_GenesisAccepted::test_AC_STORY_01_03_5_genesis_non_hex_accepted PASSED [ 34%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_file_exists_with_exactly_one_line PASSED [ 35%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_hash_matches_line_hash_formula PASSED [ 36%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_is_bytes_safe_json PASSED [ 38%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_line_fields_match_inputs PASSED [ 39%]
+tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsFromFirstHash::test_AC_STORY_01_05_2_first_line_hash_is_chained_at_GENESIS PASSED [ 40%]
+tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsFromFirstHash::test_AC_STORY_01_05_2_second_hash_equals_line_hash_formula PASSED [ 42%]
+tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsFromFirstHash::test_AC_STORY_01_05_2_second_prev_hash_equals_first_hash PASSED [ 43%]
+tests/test_ledger.py::AC_STORY_01_05_3_EmptyKeyRaisesValueError::test_AC_STORY_01_05_3_empty_key_raises_ValueError PASSED [ 44%]
+tests/test_ledger.py::AC_STORY_01_05_3_EmptyKeyRaisesValueError::test_AC_STORY_01_05_3_no_file_created_on_failure PASSED [ 46%]
+tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk::test_AC_STORY_01_05_4_empty_existing_file_chains_from_GENESIS PASSED [ 47%]
+tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk::test_AC_STORY_01_05_4_fresh_instance_chains_from_disk_tail PASSED [ 48%]
+tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk::test_AC_STORY_01_05_4_in_memory_state_does_not_leak PASSED [ 50%]
+tests/test_ledger.py::AC_STORY_01_05_5_OtherProcessSeesLineAfterAppendReturns::test_AC_STORY_01_05_5_other_process_finds_line PASSED [ 51%]
+tests/test_ledger.py::ACStory0105AppendFsyncIntegration::test_AC_STORY_01_05_fsync_called_on_append_mode_handle PASSED [ 52%]
+tests/test_nfc_normalization.py::NFCNormalizationTests::test_AC_STORY_01_01_1_already_nfc_is_unchanged PASSED [ 53%]
+tests/test_nfc_normalization.py::NFCNormalizationTests::test_AC_STORY_01_01_2_combining_marks_collapse PASSED [ 55%]
+tests/test_skeleton.py::AC_STORY_01_01_1_NfcIdentity::test_AC_STORY_01_01_1_byte_for_byte PASSED [ 56%]
+tests/test_skeleton.py::AC_STORY_01_01_1_NfcIdentity::test_AC_STORY_01_01_1_returns_nfc_of_input 
+tests/test_skeleton.py::AC_STORY_01_01_1_NfcIdentity::test_AC_STORY_01_01_1_returns_nfc_of_input PASSED [ 57%]
+tests/test_skeleton.py::AC_STORY_01_01_2_NfcNfdEquivalence::test_AC_STORY_01_01_2_nfc_and_nfd_are_byte_identical PASSED [ 59%]
+tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportable::test_AC_STORY_01_01_3_subprocess_import_resolves PASSED [ 60%]
+tests/test_skeleton.py::AC_STORY_01_01_4_CliHelpSurface::test_AC_STORY_01_01_4_help_lists_subcommands 
+tests/test_skeleton.py::AC_STORY_01_01_4_CliHelpSurface::test_AC_STORY_01_01_4_help_lists_subcommands PASSED [ 61%]
+tests/test_skeleton.py::AC_STORY_01_01_5_NoForbiddenImports::test_AC_STORY_01_01_5_grep_returns_no_matches PASSED [ 63%]
+tests/test_skeleton.py::AC_STORY_01_01_6_NoForbiddenCalls::test_AC_STORY_01_01_6_grep_returns_no_matches PASSED [ 64%]
+tests/test_skeleton.py::AC_STORY_01_01_7_PublicApi::test_AC_STORY_01_01_7_ledger_is_callable_class PASSED [ 65%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_each_element_is_bytes PASSED [ 67%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_preserves_inner_newlines_as_bytes PASSED [ 68%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_strips_only_trailing_newline PASSED [ 69%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_three_lines_returns_three_bytes PASSED [ 71%]
+tests/test_store.py::AC_STORY_01_04_2_MissingFileRaisesFileNotFoundError::test_AC_STORY_01_04_2_missing_path_raises PASSED [ 72%]
+tests/test_store.py::AC_STORY_01_04_3_EmptyFileReturnsEmptyList::test_AC_STORY_01_04_3_empty_file_returns_empty_list PASSED [ 73%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicProducesJoinedBytes::test_AC_STORY_01_04_4_empty_list_produces_empty_file PASSED [ 75%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicProducesJoinedBytes::test_AC_STORY_01_04_4_single_line PASSED [ 76%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicProducesJoinedBytes::test_AC_STORY_01_04_4_two_lines_byte_concat PASSED [ 77%]
+tests/test_store.py::AC_STORY_01_04_5_CrashBeforeReplaceLeavesOriginalIntact::test_AC_STORY_01_04_5_crash_leaves_original_intact PASSED [ 78%]
+tests/test_store.py::AC_STORY_01_04_5_CrashBeforeReplaceLeavesOriginalIntact::test_AC_STORY_01_04_5_no_stray_temp_files_after_crash PASSED [ 80%]
+tests/test_store.py::AC_STORY_01_04_6_TempFileLivesInSameDirectory::test_AC_STORY_01_04_6_tempfile_dir_is_target_parent PASSED [ 81%]
+tests/test_verify_independent.py::AC_STORY_02_01_1_NValidLinesReturnsOkTrue::test_AC_STORY_02_01_1_does_not_raise FAILED [ 82%]
+tests/test_verify_independent.py::AC_STORY_02_01_1_NValidLinesReturnsOkTrue::test_AC_STORY_02_01_1_fresh_instance_after_append_returns_ok_true FAILED [ 84%]
+tests/test_verify_independent.py::AC_STORY_02_01_1_NValidLinesReturnsOkTrue::test_AC_STORY_02_01_1_single_line_returns_ok_true FAILED [ 85%]
+tests/test_verify_independent.py::AC_STORY_02_01_1_NValidLinesReturnsOkTrue::test_AC_STORY_02_01_1_three_lines_returns_ok_true FAILED [ 86%]
+tests/test_verify_independent.py::AC_STORY_02_01_2_ZeroByteJsonlReturnsOkTrue::test_AC_STORY_02_01_2_empty_file_does_not_raise FAILED [ 88%]
+tests/test_verify_independent.py::AC_STORY_02_01_2_ZeroByteJsonlReturnsOkTrue::test_AC_STORY_02_01_2_empty_file_returns_ok_true FAILED [ 89%]
+tests/test_verify_independent.py::AC_STORY_02_01_3_MissingPathRaisesFileNotFoundError::test_AC_STORY_02_01_3_missing_path_raises_FileNotFoundError FAILED [ 90%]
+tests/test_verify_independent.py::AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex::test_AC_STORY_02_01_4_first_line_hash_overwritten_returns_index_zero FAILED [ 92%]
+tests/test_verify_independent.py::AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex::test_AC_STORY_02_01_4_fresh_instance_does_not_trust_cache FAILED [ 93%]
+tests/test_verify_independent.py::AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex::test_AC_STORY_02_01_4_middle_line_hash_overwritten_returns_that_index FAILED [ 94%]
+tests/test_verify_independent.py::AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex::test_AC_STORY_02_01_4_prev_hash_tamper_returns_first_affected_index FAILED [ 96%]
+tests/test_verify_independent.py::AC_STORY_02_01_5_ValueFieldMutatedReturnsBadIndex::test_AC_STORY_02_01_5_fresh_instance_after_append_detects_tamper FAILED [ 97%]
+tests/test_verify_independent.py::AC_STORY_02_01_5_ValueFieldMutatedReturnsBadIndex::test_AC_STORY_02_01_5_second_line_value_mutated_returns_index_one FAILED [ 98%]
+tests/test_verify_independent.py::AC_STORY_02_01_5_ValueFieldMutatedReturnsBadIndex::test_AC_STORY_02_01_5_value_mutated_returns_that_index FAILED [100%]
+
+=================================== FAILURES ===================================
+_ AC_STORY_02_01_1_NValidLinesReturnsOkTrue.test_AC_STORY_02_01_1_does_not_raise _
+
+self = <tests.test_verify_independent.AC_STORY_02_01_1_NValidLinesReturnsOkTrue testMethod=test_AC_STORY_02_01_1_does_not_raise>
+
+    def test_AC_STORY_02_01_1_does_not_raise(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            ledger.append(("put", "k", "v", "r", 1))
+    
+            try:
+>               verdict = ledger.verify()
+                          ^^^^^^^^^^^^^
+E               AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:89: AttributeError
+
+During handling of the above exception, another exception occurred:
+
+self = <tests.test_verify_independent.AC_STORY_02_01_1_NValidLinesReturnsOkTrue testMethod=test_AC_STORY_02_01_1_does_not_raise>
+
+    def test_AC_STORY_02_01_1_does_not_raise(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            ledger.append(("put", "k", "v", "r", 1))
+    
+            try:
+                verdict = ledger.verify()
+            except Exception as exc:
+>               self.fail(f"verify must not raise on a valid ledger; raised {exc!r}")
+E               AssertionError: verify must not raise on a valid ledger; raised AttributeError("'Ledger' object has no attribute 'verify'")
+
+tests/test_verify_independent.py:91: AssertionError
+_ AC_STORY_02_01_1_NValidLinesReturnsOkTrue.test_AC_STORY_02_01_1_fresh_instance_after_append_returns_ok_true _
+
+self = <tests.test_verify_independent.AC_STORY_02_01_1_NValidLinesReturnsOkTrue testMethod=test_AC_STORY_02_01_1_fresh_instance_after_append_returns_ok_true>
+
+    def test_AC_STORY_02_01_1_fresh_instance_after_append_returns_ok_true(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            Ledger(str(target)).append(("put", "alpha", 1, "r1", 1))
+            Ledger(str(target)).append(("put", "beta", 2, "r2", 2))
+    
+            fresh = Ledger(str(target))
+>           verdict = fresh.verify()
+                      ^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:77: AttributeError
+_ AC_STORY_02_01_1_NValidLinesReturnsOkTrue.test_AC_STORY_02_01_1_single_line_returns_ok_true _
+
+self = <tests.test_verify_independent.AC_STORY_02_01_1_NValidLinesReturnsOkTrue testMethod=test_AC_STORY_02_01_1_single_line_returns_ok_true>
+
+    def test_AC_STORY_02_01_1_single_line_returns_ok_true(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            ledger.append(("put", "k", {"v": 1}, "r1", 100))
+    
+>           verdict = ledger.verify()
+                      ^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:52: AttributeError
+_ AC_STORY_02_01_1_NValidLinesReturnsOkTrue.test_AC_STORY_02_01_1_three_lines_returns_ok_true _
+
+self = <tests.test_verify_independent.AC_STORY_02_01_1_NValidLinesReturnsOkTrue testMethod=test_AC_STORY_02_01_1_three_lines_returns_ok_true>
+
+    def test_AC_STORY_02_01_1_three_lines_returns_ok_true(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            ledger.append(("put", "alpha", 1, "r1", 1))
+            ledger.append(("put", "beta", 2, "r2", 2))
+            ledger.append(("put", "gamma", 3, "r3", 3))
+    
+>           verdict = ledger.verify()
+                      ^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:65: AttributeError
+_ AC_STORY_02_01_2_ZeroByteJsonlReturnsOkTrue.test_AC_STORY_02_01_2_empty_file_does_not_raise _
+
+self = <tests.test_verify_independent.AC_STORY_02_01_2_ZeroByteJsonlReturnsOkTrue testMethod=test_AC_STORY_02_01_2_empty_file_does_not_raise>
+
+    def test_AC_STORY_02_01_2_empty_file_does_not_raise(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            target.write_bytes(b"")
+    
+            try:
+>               verdict = Ledger(str(target)).verify()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:117: AttributeError
+
+During handling of the above exception, another exception occurred:
+
+self = <tests.test_verify_independent.AC_STORY_02_01_2_ZeroByteJsonlReturnsOkTrue testMethod=test_AC_STORY_02_01_2_empty_file_does_not_raise>
+
+    def test_AC_STORY_02_01_2_empty_file_does_not_raise(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            target.write_bytes(b"")
+    
+            try:
+                verdict = Ledger(str(target)).verify()
+            except Exception as exc:
+>               self.fail(f"verify must not raise on zero-byte file; raised {exc!r}")
+E               AssertionError: verify must not raise on zero-byte file; raised AttributeError("'Ledger' object has no attribute 'verify'")
+
+tests/test_verify_independent.py:119: AssertionError
+_ AC_STORY_02_01_2_ZeroByteJsonlReturnsOkTrue.test_AC_STORY_02_01_2_empty_file_returns_ok_true _
+
+self = <tests.test_verify_independent.AC_STORY_02_01_2_ZeroByteJsonlReturnsOkTrue testMethod=test_AC_STORY_02_01_2_empty_file_returns_ok_true>
+
+    def test_AC_STORY_02_01_2_empty_file_returns_ok_true(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            target.write_bytes(b"")
+    
+>           verdict = Ledger(str(target)).verify()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:106: AttributeError
+_ AC_STORY_02_01_3_MissingPathRaisesFileNotFoundError.test_AC_STORY_02_01_3_missing_path_raises_FileNotFoundError _
+
+self = <tests.test_verify_independent.AC_STORY_02_01_3_MissingPathRaisesFileNotFoundError testMethod=test_AC_STORY_02_01_3_missing_path_raises_FileNotFoundError>
+
+    def test_AC_STORY_02_01_3_missing_path_raises_FileNotFoundError(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            missing = Path(tmp) / "does-not-exist.jsonl"
+            self.assertFalse(missing.exists())
+    
+            with self.assertRaises(FileNotFoundError):
+>               Ledger(str(missing)).verify()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:136: AttributeError
+_ AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex.test_AC_STORY_02_01_4_first_line_hash_overwritten_returns_index_zero _
+
+self = <tests.test_verify_independent.AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex testMethod=test_AC_STORY_02_01_4_first_line_hash_overwritten_returns_index_zero>
+
+    def test_AC_STORY_02_01_4_first_line_hash_overwritten_returns_index_zero(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            Ledger(str(target)).append(("put", "alpha", 1, "r1", 1))
+            Ledger(str(target)).append(("put", "beta", 2, "r2", 2))
+    
+            _rewrite_line(target, 0, lambda r: r.__setitem__("hash", "0" * 64))
+    
+>           verdict = Ledger(str(target)).verify()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:155: AttributeError
+_ AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex.test_AC_STORY_02_01_4_fresh_instance_does_not_trust_cache _
+
+self = <tests.test_verify_independent.AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex testMethod=test_AC_STORY_02_01_4_fresh_instance_does_not_trust_cache>
+
+    def test_AC_STORY_02_01_4_fresh_instance_does_not_trust_cache(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            writer = Ledger(str(target))
+            writer.append(("put", "alpha", 1, "r1", 1))
+    
+            _rewrite_line(target, 0, lambda r: r.__setitem__("hash", "0" * 64))
+    
+>           verdict = Ledger(str(target)).verify()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:188: AttributeError
+_ AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex.test_AC_STORY_02_01_4_middle_line_hash_overwritten_returns_that_index _
+
+self = <tests.test_verify_independent.AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex testMethod=test_AC_STORY_02_01_4_middle_line_hash_overwritten_returns_that_index>
+
+    def test_AC_STORY_02_01_4_middle_line_hash_overwritten_returns_that_index(
+        self,
+    ) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            Ledger(str(target)).append(("put", "alpha", 1, "r1", 1))
+            Ledger(str(target)).append(("put", "beta", 2, "r2", 2))
+            Ledger(str(target)).append(("put", "gamma", 3, "r3", 3))
+    
+            _rewrite_line(target, 1, lambda r: r.__setitem__("hash", "0" * 64))
+    
+>           verdict = Ledger(str(target)).verify()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:173: AttributeError
+_ AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex.test_AC_STORY_02_01_4_prev_hash_tamper_returns_first_affected_index _
+
+self = <tests.test_verify_independent.AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex testMethod=test_AC_STORY_02_01_4_prev_hash_tamper_returns_first_affected_index>
+
+    def test_AC_STORY_02_01_4_prev_hash_tamper_returns_first_affected_index(
+        self,
+    ) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            Ledger(str(target)).append(("put", "alpha", 1, "r1", 1))
+            Ledger(str(target)).append(("put", "beta", 2, "r2", 2))
+            Ledger(str(target)).append(("put", "gamma", 3, "r3", 3))
+    
+            _rewrite_line(target, 1, lambda r: r.__setitem__("prev_hash", "0" * 64))
+    
+>           verdict = Ledger(str(target)).verify()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:206: AttributeError
+_ AC_STORY_02_01_5_ValueFieldMutatedReturnsBadIndex.test_AC_STORY_02_01_5_fresh_instance_after_append_detects_tamper _
+
+self = <tests.test_verify_independent.AC_STORY_02_01_5_ValueFieldMutatedReturnsBadIndex testMethod=test_AC_STORY_02_01_5_fresh_instance_after_append_detects_tamper>
+
+    def test_AC_STORY_02_01_5_fresh_instance_after_append_detects_tamper(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            Ledger(str(target)).append(("put", "alpha", "v1", "r1", 1))
+            Ledger(str(target)).append(("put", "beta", "v2", "r2", 2))
+    
+            _rewrite_line(target, 0, lambda r: r.__setitem__("value", "tampered"))
+    
+            fresh = Ledger(str(target))
+>           verdict = fresh.verify()
+                      ^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:259: AttributeError
+_ AC_STORY_02_01_5_ValueFieldMutatedReturnsBadIndex.test_AC_STORY_02_01_5_second_line_value_mutated_returns_index_one _
+
+self = <tests.test_verify_independent.AC_STORY_02_01_5_ValueFieldMutatedReturnsBadIndex testMethod=test_AC_STORY_02_01_5_second_line_value_mutated_returns_index_one>
+
+    def test_AC_STORY_02_01_5_second_line_value_mutated_returns_index_one(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            Ledger(str(target)).append(("put", "alpha", "v1", "r1", 1))
+            Ledger(str(target)).append(("put", "beta", "v2", "r2", 2))
+            Ledger(str(target)).append(("put", "gamma", "v3", "r3", 3))
+    
+            _rewrite_line(target, 1, lambda r: r.__setitem__("value", "MUTATED"))
+    
+>           verdict = Ledger(str(target)).verify()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:243: AttributeError
+_ AC_STORY_02_01_5_ValueFieldMutatedReturnsBadIndex.test_AC_STORY_02_01_5_value_mutated_returns_that_index _
+
+self = <tests.test_verify_independent.AC_STORY_02_01_5_ValueFieldMutatedReturnsBadIndex testMethod=test_AC_STORY_02_01_5_value_mutated_returns_that_index>
+
+    def test_AC_STORY_02_01_5_value_mutated_returns_that_index(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            Ledger(str(target)).append(("put", "alpha", "v1", "r1", 1))
+            Ledger(str(target)).append(("put", "beta", "v2", "r2", 2))
+    
+            _rewrite_line(target, 0, lambda r: r.__setitem__("value", "v2"))
+    
+>           verdict = Ledger(str(target)).verify()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:227: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_verify_independent.py::AC_STORY_02_01_1_NValidLinesReturnsOkTrue::test_AC_STORY_02_01_1_does_not_raise
+FAILED tests/test_verify_independent.py::AC_STORY_02_01_1_NValidLinesReturnsOkTrue::test_AC_STORY_02_01_1_fresh_instance_after_append_returns_ok_true
+FAILED tests/test_verify_independent.py::AC_STORY_02_01_1_NValidLinesReturnsOkTrue::test_AC_STORY_02_01_1_single_line_returns_ok_true
+FAILED tests/test_verify_independent.py::AC_STORY_02_01_1_NValidLinesReturnsOkTrue::test_AC_STORY_02_01_1_three_lines_returns_ok_true
+FAILED tests/test_verify_independent.py::AC_STORY_02_01_2_ZeroByteJsonlReturnsOkTrue::test_AC_STORY_02_01_2_empty_file_does_not_raise
+FAILED tests/test_verify_independent.py::AC_STORY_02_01_2_ZeroByteJsonlReturnsOkTrue::test_AC_STORY_02_01_2_empty_file_returns_ok_true
+FAILED tests/test_verify_independent.py::AC_STORY_02_01_3_MissingPathRaisesFileNotFoundError::test_AC_STORY_02_01_3_missing_path_raises_FileNotFoundError
+FAILED tests/test_verify_independent.py::AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex::test_AC_STORY_02_01_4_first_line_hash_overwritten_returns_index_zero
+FAILED tests/test_verify_independent.py::AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex::test_AC_STORY_02_01_4_fresh_instance_does_not_trust_cache
+FAILED tests/test_verify_independent.py::AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex::test_AC_STORY_02_01_4_middle_line_hash_overwritten_returns_that_index
+FAILED tests/test_verify_independent.py::AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex::test_AC_STORY_02_01_4_prev_hash_tamper_returns_first_affected_index
+FAILED tests/test_verify_independent.py::AC_STORY_02_01_5_ValueFieldMutatedReturnsBadIndex::test_AC_STORY_02_01_5_fresh_instance_after_append_detects_tamper
+FAILED tests/test_verify_independent.py::AC_STORY_02_01_5_ValueFieldMutatedReturnsBadIndex::test_AC_STORY_02_01_5_second_line_value_mutated_returns_index_one
+FAILED tests/test_verify_independent.py::AC_STORY_02_01_5_ValueFieldMutatedReturnsBadIndex::test_AC_STORY_02_01_5_value_mutated_returns_that_index
+=============== 14 failed, 62 passed, 9 subtests passed in 0.44s ===============

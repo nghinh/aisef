@@ -1,0 +1,379 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 51 items
+
+tests/test_format.py::AC_STORY_01_02_1_CanonicalBytesBaseline::test_AC_STORY_01_02_1_matches_documented_json_dumps PASSED [  1%]
+tests/test_format.py::AC_STORY_01_02_2_DeterminismForEqualDicts::test_AC_STORY_01_02_2_two_equal_dicts_byte_identical PASSED [  3%]
+tests/test_format.py::AC_STORY_01_02_3_NonAsciiUtf8::test_AC_STORY_01_02_3_byte_stable_across_invocations PASSED [  5%]
+tests/test_format.py::AC_STORY_01_02_3_NonAsciiUtf8::test_AC_STORY_01_02_3_non_ascii_is_utf8_literal PASSED [  7%]
+tests/test_format.py::AC_STORY_01_02_4_InsertionOrderIndependence::test_AC_STORY_01_02_4_insertion_order_independent PASSED [  9%]
+tests/test_format.py::AC_STORY_01_02_5_GenesisConstant::test_AC_STORY_01_02_5_genesis_distinct_from_64_char_hex PASSED [ 11%]
+tests/test_format.py::AC_STORY_01_02_5_GenesisConstant::test_AC_STORY_01_02_5_genesis_is_literal_string PASSED [ 13%]
+tests/test_format.py::AC_STORY_01_02_6_RoundTripStability::test_AC_STORY_01_02_6_roundtrip_through_json_loads PASSED [ 15%]
+tests/test_format.py::AC_STORY_01_03_1_64LowercaseHexChars::test_AC_STORY_01_03_1_returns_64_lower_hex PASSED [ 17%]
+tests/test_format.py::AC_STORY_01_03_2_PrevHashChangesDigest::test_AC_STORY_01_03_2_distinct_prev_hash_distinct_digest PASSED [ 19%]
+tests/test_format.py::AC_STORY_01_03_3_IgnoresExistingHashFields::test_AC_STORY_01_03_3_does_not_mutate_input PASSED [ 21%]
+tests/test_format.py::AC_STORY_01_03_3_IgnoresExistingHashFields::test_AC_STORY_01_03_3_ignores_existing_hash_fields PASSED [ 23%]
+tests/test_format.py::AC_STORY_01_03_4_Determinism::test_AC_STORY_01_03_4_matches_documented_sha256_formula PASSED [ 25%]
+tests/test_format.py::AC_STORY_01_03_4_Determinism::test_AC_STORY_01_03_4_repeatable_across_invocations PASSED [ 27%]
+tests/test_format.py::AC_STORY_01_03_5_GenesisAccepted::test_AC_STORY_01_03_5_genesis_non_hex_accepted PASSED [ 29%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_file_exists_with_exactly_one_line FAILED [ 31%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_hash_matches_line_hash_formula FAILED [ 33%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_is_bytes_safe_json FAILED [ 35%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_line_fields_match_inputs FAILED [ 37%]
+tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsFromFirstHash::test_AC_STORY_01_05_2_first_line_hash_is_chained_at_GENESIS FAILED [ 39%]
+tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsFromFirstHash::test_AC_STORY_01_05_2_second_hash_equals_line_hash_formula FAILED [ 41%]
+tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsFromFirstHash::test_AC_STORY_01_05_2_second_prev_hash_equals_first_hash FAILED [ 43%]
+tests/test_ledger.py::AC_STORY_01_05_3_EmptyKeyRaisesValueError::test_AC_STORY_01_05_3_empty_key_raises_ValueError FAILED [ 45%]
+tests/test_ledger.py::AC_STORY_01_05_3_EmptyKeyRaisesValueError::test_AC_STORY_01_05_3_no_file_created_on_failure FAILED [ 47%]
+tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk::test_AC_STORY_01_05_4_empty_existing_file_chains_from_GENESIS FAILED [ 49%]
+tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk::test_AC_STORY_01_05_4_fresh_instance_chains_from_disk_tail FAILED [ 50%]
+tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk::test_AC_STORY_01_05_4_in_memory_state_does_not_leak FAILED [ 52%]
+tests/test_ledger.py::AC_STORY_01_05_5_OtherProcessSeesLineAfterAppendReturns::test_AC_STORY_01_05_5_other_process_finds_line FAILED [ 54%]
+tests/test_ledger.py::ACStory0105AppendFsyncIntegration::test_AC_STORY_01_05_fsync_called_on_append_mode_handle FAILED [ 56%]
+tests/test_nfc_normalization.py::NFCNormalizationTests::test_AC_STORY_01_01_1_already_nfc_is_unchanged PASSED [ 58%]
+tests/test_nfc_normalization.py::NFCNormalizationTests::test_AC_STORY_01_01_2_combining_marks_collapse PASSED [ 60%]
+tests/test_skeleton.py::AC_STORY_01_01_1_NfcIdentity::test_AC_STORY_01_01_1_byte_for_byte PASSED [ 62%]
+tests/test_skeleton.py::AC_STORY_01_01_1_NfcIdentity::test_AC_STORY_01_01_1_returns_nfc_of_input 
+tests/test_skeleton.py::AC_STORY_01_01_1_NfcIdentity::test_AC_STORY_01_01_1_returns_nfc_of_input PASSED [ 64%]
+tests/test_skeleton.py::AC_STORY_01_01_2_NfcNfdEquivalence::test_AC_STORY_01_01_2_nfc_and_nfd_are_byte_identical PASSED [ 66%]
+tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportable::test_AC_STORY_01_01_3_subprocess_import_resolves PASSED [ 68%]
+tests/test_skeleton.py::AC_STORY_01_01_4_CliHelpSurface::test_AC_STORY_01_01_4_help_lists_subcommands 
+tests/test_skeleton.py::AC_STORY_01_01_4_CliHelpSurface::test_AC_STORY_01_01_4_help_lists_subcommands PASSED [ 70%]
+tests/test_skeleton.py::AC_STORY_01_01_5_NoForbiddenImports::test_AC_STORY_01_01_5_grep_returns_no_matches PASSED [ 72%]
+tests/test_skeleton.py::AC_STORY_01_01_6_NoForbiddenCalls::test_AC_STORY_01_01_6_grep_returns_no_matches PASSED [ 74%]
+tests/test_skeleton.py::AC_STORY_01_01_7_PublicApi::test_AC_STORY_01_01_7_ledger_is_callable_class PASSED [ 76%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_each_element_is_bytes PASSED [ 78%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_preserves_inner_newlines_as_bytes PASSED [ 80%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_strips_only_trailing_newline PASSED [ 82%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_three_lines_returns_three_bytes PASSED [ 84%]
+tests/test_store.py::AC_STORY_01_04_2_MissingFileRaisesFileNotFoundError::test_AC_STORY_01_04_2_missing_path_raises PASSED [ 86%]
+tests/test_store.py::AC_STORY_01_04_3_EmptyFileReturnsEmptyList::test_AC_STORY_01_04_3_empty_file_returns_empty_list PASSED [ 88%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicProducesJoinedBytes::test_AC_STORY_01_04_4_empty_list_produces_empty_file PASSED [ 90%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicProducesJoinedBytes::test_AC_STORY_01_04_4_single_line PASSED [ 92%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicProducesJoinedBytes::test_AC_STORY_01_04_4_two_lines_byte_concat PASSED [ 94%]
+tests/test_store.py::AC_STORY_01_04_5_CrashBeforeReplaceLeavesOriginalIntact::test_AC_STORY_01_04_5_crash_leaves_original_intact PASSED [ 96%]
+tests/test_store.py::AC_STORY_01_04_5_CrashBeforeReplaceLeavesOriginalIntact::test_AC_STORY_01_04_5_no_stray_temp_files_after_crash PASSED [ 98%]
+tests/test_store.py::AC_STORY_01_04_6_TempFileLivesInSameDirectory::test_AC_STORY_01_04_6_tempfile_dir_is_target_parent PASSED [100%]
+
+=================================== FAILURES ===================================
+_ AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash.test_AC_STORY_01_05_1_file_exists_with_exactly_one_line _
+
+self = <tests.test_ledger.AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash testMethod=test_AC_STORY_01_05_1_file_exists_with_exactly_one_line>
+
+    def test_AC_STORY_01_05_1_file_exists_with_exactly_one_line(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            self.assertFalse(target.exists())
+            ledger = Ledger(str(target))
+>           ledger.append(("put", "k", {"v": 1}, "r1", 100))
+            ^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'append'
+
+tests/test_ledger.py:33: AttributeError
+_ AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash.test_AC_STORY_01_05_1_hash_matches_line_hash_formula _
+
+self = <tests.test_ledger.AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash testMethod=test_AC_STORY_01_05_1_hash_matches_line_hash_formula>
+
+    def test_AC_STORY_01_05_1_hash_matches_line_hash_formula(self) -> None:
+        from ledgerlock import Ledger
+        from ledgerlock.format import GENESIS, canonical_bytes, line_hash
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+>           ledger.append(("put", "k", {"v": 1}, "r1", 100))
+            ^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'append'
+
+tests/test_ledger.py:68: AttributeError
+_ AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash.test_AC_STORY_01_05_1_is_bytes_safe_json _
+
+self = <tests.test_ledger.AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash testMethod=test_AC_STORY_01_05_1_is_bytes_safe_json>
+
+    def test_AC_STORY_01_05_1_is_bytes_safe_json(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+>           ledger.append(("put", "k", {"v": 1}, "r1", 100))
+            ^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'append'
+
+tests/test_ledger.py:86: AttributeError
+_ AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash.test_AC_STORY_01_05_1_line_fields_match_inputs _
+
+self = <tests.test_ledger.AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash testMethod=test_AC_STORY_01_05_1_line_fields_match_inputs>
+
+    def test_AC_STORY_01_05_1_line_fields_match_inputs(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+>           ledger.append(("put", "k", {"v": 1}, "r1", 100))
+            ^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'append'
+
+tests/test_ledger.py:50: AttributeError
+_ AC_STORY_01_05_2_SecondAppendChainsFromFirstHash.test_AC_STORY_01_05_2_first_line_hash_is_chained_at_GENESIS _
+
+self = <tests.test_ledger.AC_STORY_01_05_2_SecondAppendChainsFromFirstHash testMethod=test_AC_STORY_01_05_2_first_line_hash_is_chained_at_GENESIS>
+
+    def test_AC_STORY_01_05_2_first_line_hash_is_chained_at_GENESIS(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+>           ledger.append(("put", "k", {"v": 1}, "r1", 100))
+            ^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'append'
+
+tests/test_ledger.py:136: AttributeError
+_ AC_STORY_01_05_2_SecondAppendChainsFromFirstHash.test_AC_STORY_01_05_2_second_hash_equals_line_hash_formula _
+
+self = <tests.test_ledger.AC_STORY_01_05_2_SecondAppendChainsFromFirstHash testMethod=test_AC_STORY_01_05_2_second_hash_equals_line_hash_formula>
+
+    def test_AC_STORY_01_05_2_second_hash_equals_line_hash_formula(self) -> None:
+        from ledgerlock import Ledger
+        from ledgerlock.format import line_hash
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+>           ledger.append(("put", "k", {"v": 1}, "r1", 100))
+            ^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'append'
+
+tests/test_ledger.py:117: AttributeError
+_ AC_STORY_01_05_2_SecondAppendChainsFromFirstHash.test_AC_STORY_01_05_2_second_prev_hash_equals_first_hash _
+
+self = <tests.test_ledger.AC_STORY_01_05_2_SecondAppendChainsFromFirstHash testMethod=test_AC_STORY_01_05_2_second_prev_hash_equals_first_hash>
+
+    def test_AC_STORY_01_05_2_second_prev_hash_equals_first_hash(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+>           ledger.append(("put", "k", {"v": 1}, "r1", 100))
+            ^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'append'
+
+tests/test_ledger.py:103: AttributeError
+_ AC_STORY_01_05_3_EmptyKeyRaisesValueError.test_AC_STORY_01_05_3_empty_key_raises_ValueError _
+
+self = <tests.test_ledger.AC_STORY_01_05_3_EmptyKeyRaisesValueError testMethod=test_AC_STORY_01_05_3_empty_key_raises_ValueError>
+
+    def test_AC_STORY_01_05_3_empty_key_raises_ValueError(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            self.assertFalse(target.exists())
+            ledger = Ledger(str(target))
+            with self.assertRaises(ValueError):
+>               ledger.append(("put", "", "v", "r", 1))
+                ^^^^^^^^^^^^^
+E               AttributeError: 'Ledger' object has no attribute 'append'
+
+tests/test_ledger.py:153: AttributeError
+_ AC_STORY_01_05_3_EmptyKeyRaisesValueError.test_AC_STORY_01_05_3_no_file_created_on_failure _
+
+self = <tests.test_ledger.AC_STORY_01_05_3_EmptyKeyRaisesValueError testMethod=test_AC_STORY_01_05_3_no_file_created_on_failure>
+
+    def test_AC_STORY_01_05_3_no_file_created_on_failure(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(target))
+            try:
+>               ledger.append(("put", "", "v", "r", 1))
+                ^^^^^^^^^^^^^
+E               AttributeError: 'Ledger' object has no attribute 'append'
+
+tests/test_ledger.py:162: AttributeError
+_ AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk.test_AC_STORY_01_05_4_empty_existing_file_chains_from_GENESIS _
+
+self = <tests.test_ledger.AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk testMethod=test_AC_STORY_01_05_4_empty_existing_file_chains_from_GENESIS>
+
+    def test_AC_STORY_01_05_4_empty_existing_file_chains_from_GENESIS(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            target.write_bytes(b"")
+    
+            ledger = Ledger(str(target))
+>           ledger.append(("put", "k", 1, "r", 1))
+            ^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'append'
+
+tests/test_ledger.py:230: AttributeError
+_ AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk.test_AC_STORY_01_05_4_fresh_instance_chains_from_disk_tail _
+
+self = <tests.test_ledger.AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk testMethod=test_AC_STORY_01_05_4_fresh_instance_chains_from_disk_tail>
+
+    def test_AC_STORY_01_05_4_fresh_instance_chains_from_disk_tail(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            first = Ledger(str(target))
+>           first.append(("put", "alpha", 1, "r1", 1))
+            ^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'append'
+
+tests/test_ledger.py:181: AttributeError
+_ AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk.test_AC_STORY_01_05_4_in_memory_state_does_not_leak _
+
+self = <tests.test_ledger.AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk testMethod=test_AC_STORY_01_05_4_in_memory_state_does_not_leak>
+
+    def test_AC_STORY_01_05_4_in_memory_state_does_not_leak(self) -> None:
+        from ledgerlock import Ledger
+    
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            first = Ledger(str(target))
+>           first.append(("put", "alpha", 1, "r1", 1))
+            ^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'append'
+
+tests/test_ledger.py:213: AttributeError
+_ AC_STORY_01_05_5_OtherProcessSeesLineAfterAppendReturns.test_AC_STORY_01_05_5_other_process_finds_line _
+
+self = <tests.test_ledger.AC_STORY_01_05_5_OtherProcessSeesLineAfterAppendReturns testMethod=test_AC_STORY_01_05_5_other_process_finds_line>
+
+    def test_AC_STORY_01_05_5_other_process_finds_line(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "ledger.jsonl"
+            target_path = str(target)
+            driver = Path(tmp) / "driver.py"
+            driver.write_text(
+                "import sys\n"
+                f"sys.path.insert(0, {str(REPO_ROOT)!r})\n"
+                "from ledgerlock import Ledger\n"
+                f"Ledger({target_path!r}).append(('put', 'k', {{'v': 1}}, 'r1', 1))\n",
+                encoding="utf-8",
+            )
+    
+>           subprocess.run(
+                [sys.executable, str(driver)],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+
+tests/test_ledger.py:254: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['/usr/local/bin/python3', '/tmp/tmp337qfit4/driver.py'],)
+kwargs = {'text': True, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['/usr/local/bin/python3', '/tmp/tmp337qfit4/driver.py']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+_ ACStory0105AppendFsyncIntegration.test_AC_STORY_01_05_fsync_called_on_append_mode_handle _
+
+self = <tests.test_ledger.ACStory0105AppendFsyncIntegration testMethod=test_AC_STORY_01_05_fsync_called_on_append_mode_handle>
+
+    def test_AC_STORY_01_05_fsync_called_on_append_mode_handle(self) -> None:
+        from ledgerlock import Ledger
+>       from ledgerlock import ledger as ledger_module
+E       ImportError: cannot import name 'ledger' from 'ledgerlock' (/workspace/ledgerlock/__init__.py). Did you mean: 'Ledger'?
+
+tests/test_ledger.py:276: ImportError
+=========================== short test summary info ============================
+FAILED tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_file_exists_with_exactly_one_line
+FAILED tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_hash_matches_line_hash_formula
+FAILED tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_is_bytes_safe_json
+FAILED tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_line_fields_match_inputs
+FAILED tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsFromFirstHash::test_AC_STORY_01_05_2_first_line_hash_is_chained_at_GENESIS
+FAILED tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsFromFirstHash::test_AC_STORY_01_05_2_second_hash_equals_line_hash_formula
+FAILED tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsFromFirstHash::test_AC_STORY_01_05_2_second_prev_hash_equals_first_hash
+FAILED tests/test_ledger.py::AC_STORY_01_05_3_EmptyKeyRaisesValueError::test_AC_STORY_01_05_3_empty_key_raises_ValueError
+FAILED tests/test_ledger.py::AC_STORY_01_05_3_EmptyKeyRaisesValueError::test_AC_STORY_01_05_3_no_file_created_on_failure
+FAILED tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk::test_AC_STORY_01_05_4_empty_existing_file_chains_from_GENESIS
+FAILED tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk::test_AC_STORY_01_05_4_fresh_instance_chains_from_disk_tail
+FAILED tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk::test_AC_STORY_01_05_4_in_memory_state_does_not_leak
+FAILED tests/test_ledger.py::AC_STORY_01_05_5_OtherProcessSeesLineAfterAppendReturns::test_AC_STORY_01_05_5_other_process_finds_line
+FAILED tests/test_ledger.py::ACStory0105AppendFsyncIntegration::test_AC_STORY_01_05_fsync_called_on_append_mode_handle
+=============== 14 failed, 37 passed, 9 subtests passed in 0.47s ===============
