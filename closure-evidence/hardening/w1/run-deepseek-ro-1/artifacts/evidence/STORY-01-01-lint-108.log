@@ -1,0 +1,63 @@
+UP035 [*] Import from `collections.abc` instead: `Sequence`
+ --> ledgerlock/cli.py:6:1
+  |
+5 | import argparse
+6 | from typing import Sequence
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: Import from `collections.abc`
+  |
+5 | import argparse
+  - from typing import Sequence
+6 + from collections.abc import Sequence
+7 |
+  |
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:13:16
+   |
+11 | class SkeletonTests(unittest.TestCase):
+12 |     def test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path(self):
+13 |         proc = subprocess.run(
+   |                ^^^^^^^^^^^^^^
+14 |             [sys.executable, "-c", "import ledgerlock; print(ledgerlock.__file__)"],
+15 |             capture_output=True,
+   |
+help: Add explicit `check=False`
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:27:16
+   |
+26 |     def test_AC_STORY_01_01_4_module_help_lists_subcommands(self):
+27 |         proc = subprocess.run(
+   |                ^^^^^^^^^^^^^^
+28 |             [sys.executable, "-m", "ledgerlock", "--help"],
+29 |             capture_output=True,
+   |
+help: Add explicit `check=False`
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:42:16
+   |
+40 |             r"|multiprocessing|ctypes|http\.server|http\.client|socketserver)"
+41 |         )
+42 |         proc = subprocess.run(
+   |                ^^^^^^^^^^^^^^
+43 |             ["grep", "-RE", pattern, "ledgerlock"],
+44 |             capture_output=True,
+   |
+help: Add explicit `check=False`
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:52:16
+   |
+50 |     def test_AC_STORY_01_01_6_no_side_channel_calls(self):
+51 |         pattern = r"os\.system|subprocess\.|socket\."
+52 |         proc = subprocess.run(
+   |                ^^^^^^^^^^^^^^
+53 |             ["grep", "-RE", pattern, "ledgerlock"],
+54 |             capture_output=True,
+   |
+help: Add explicit `check=False`
+
+Found 5 errors.
+[*] 1 fixable with the `--fix` option.

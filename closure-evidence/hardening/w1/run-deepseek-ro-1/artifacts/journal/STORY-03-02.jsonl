@@ -1,0 +1,12 @@
+{"seq": 1, "step": "attempt.started", "at": 1789809183.671, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 2, "step": "attempt.reconciled", "at": 1789809193.027, "attempt": 1, "data": {"action": "undo", "from": "pending"}, "undo": {}}
+{"seq": 3, "step": "attempt.started", "at": 1789809199.489, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 4, "step": "worktree.created", "at": 1789809200.195, "attempt": 1, "data": {"path": "/Users/nghinh/Downloads/projects/w1-run-deepseek-ro-1/.aisef/worktrees/STORY-03-02"}, "undo": {"worktree.remove": "STORY-03-02"}}
+{"seq": 5, "step": "status.running", "at": 1789809200.197, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 6, "step": "changes.detected", "at": 1789809495.202, "attempt": 1, "data": {"luot": 1, "files": ["ledgerlock/ledger.py", "tests/test_repair_tail.py"], "preexisting_excluded": [], "count": 2}, "undo": {}}
+{"seq": 7, "step": "candidate.frozen", "at": 1789809495.202, "attempt": 1, "data": {"luot": 1, "sha": "187924f3cad92d3455139685bc776a0d9e4a22e5", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 8, "step": "verification.completed", "at": 1789810112.474, "attempt": 1, "data": {"ok": true, "attempts": 1, "cost_usd": 0.0, "candidate": "187924f3cad92d3455139685bc776a0d9e4a22e5"}, "undo": {}}
+{"seq": 9, "step": "review.completed", "at": 1789810112.475, "attempt": 1, "data": {"blocked": [], "outcome": "PASS", "review_executions": 1, "developer_attempts": 1}, "undo": {}}
+{"seq": 10, "step": "attempt.aborted", "at": 1789810112.481, "attempt": 1, "data": {"reason": "abnormal termination"}, "undo": {}}
+{"seq": 11, "step": "merge.completed", "at": 1789810112.555, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 12, "step": "attempt.committed", "at": 1789810112.958, "attempt": 1, "data": {}, "undo": {}}
