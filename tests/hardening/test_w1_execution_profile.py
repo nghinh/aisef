@@ -132,7 +132,7 @@ class TestStageEnv(unittest.TestCase):
 
             def run(**env):
                 return subprocess.run([str(WRAPPER), "run", "x.py"], env={**base, **env}, capture_output=True, text=True,
-                                      check=True).stdout.strip()
+                                      encoding="utf-8", check=True).stdout.strip()
             self.assertEqual(run(AISEF_DISALLOWED_TOOLS="Write,Edit"), "F=1 S=1 E=/outside A=run x.py")
             self.assertEqual(run(AISEF_DISALLOWED_TOOLS="Write,Edit", AISEF_STORY_ID="S-1"), "F= S= E= A=run x.py")
             self.assertEqual(run(AISEF_STORY_ID="S-1"), "F= S= E= A=run x.py")
