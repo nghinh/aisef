@@ -48,6 +48,18 @@
    "statement": "CI of 93ec460 (evidence-only commit), unit (ubuntu-latest, 3.14): test_run.TestDoneChiSauMerge.test_merge_dung_thi_verified_khong_phai_done errored in tearDown — `OSError: [Errno 39] Directory not empty: '/tmp/.../.git'` (something wrote into .git while it was being removed)",
    "measured": "first occurrence in the branch's CI history (5 earlier failed runs checked: none); the failed job re-run passed (run 35457412276 attempt 2); 0 failures in 40 local runs of the class on Python 3.14; the product's wave workers run inside `with ThreadPoolExecutor(...)` (aisef/phases/run.py:699), so no worker thread outlives run_sprint; remaining unmeasured candidate: a detached git housekeeping process (gc/maintenance --auto) on the runner",
    "action": "none in this cycle — kernel frozen; not a kernel defect on this evidence; watch for recurrence"
+  },
+  {
+   "id": "OBS-CI-2026-09-20-2",
+   "severity": "P3",
+   "defect_class": "TEST_INFRASTRUCTURE_OBSERVATION",
+   "status": "OBSERVED_NOT_REPRODUCED",
+   "site": "tests/bench/_runner.py::materialize (remove_tree then dest.mkdir) over aisef/kit/fetch.py::remove_tree",
+   "statement": "CI of ad04de8 (kernel(3)), unit (ubuntu-latest, 3.13): bench.test_bench.TestTuKiemDuongOng.test_selfcheck_dat_het_va_khong_goi_model failed with `FileExistsError: [Errno 17] File exists: '/tmp/tmpng30kdc7/bench/run/opencode/bug-a2-multi-2/a1'` — the directory survived remove_tree and the mkdir right after it (no exist_ok) reported the survival as the error",
+   "measured": "the failed job re-run passed (run 35485771466); reproduced locally: PASSED (1 passed, 73 deselected); mechanism candidate MEASURED: aisef/kit/fetch.py::remove_tree passes `_force`, which swallows OSError, to shutil.rmtree — a path it cannot remove leaves the tree behind and rmtree still returns normally, so the next mkdir raises FileExistsError instead of the real reason; candidates measured and INNOCENT: no concurrency inside the bench runner (0 ThreadPoolExecutor/Thread/multiprocessing/fork in tests/bench/*.py, the attempt loop at tests/bench/_runner.py:386 is sequential) and no second bench process (the dest is inside the test's own TemporaryDirectory, and the CLI already refuses a second run on the same AISEF_BENCH_DIR — tests/bench/test_bench.py::TestMotDotDoMotLuc); remaining unmeasured candidate: a runner-side writer or a transient EBUSY/ENOTEMPTY under /tmp on the hosted runner, the same family as OBS-CI-2026-09-20-1",
+   "impact_in_this_run": "none on any gate — bench is measurement infrastructure, not the product path, and the failure is fail-closed (a red test, never a false PASS)",
+   "action": "none in this cycle — the kernel is frozen for qualification and remove_tree is product code (aisef/kit/fetch.py, used by `aisef setup`); touching it would invalidate the mutation run and the capability matrix just recorded on tree 42a29853. Backlog: make remove_tree report what it could not remove instead of swallowing it, and let the caller's mkdir say so.",
+   "disposition": "P3 backlog — watch for recurrence with OBS-CI-2026-09-20-1"
   }
  ]
 }
