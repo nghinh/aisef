@@ -1,10 +1,10 @@
 {
  "artifact": "TDD-POLICY-V2-CONFORMANCE",
- "generated": "2026-09-20T11:28:29+0700",
- "git_sha": "4eaadb17efbb1c046a64a9e7fd95bc99812546c5",
+ "generated": "2026-09-20T13:13:29+0700",
+ "git_sha": "67bd0251c26edb5753dadf9efaa82eac2a7003b5",
  "aisef_tree": "42a29853a3a8a10e5c58b319c5a181f2898be1d5",
  "aisef_dirty": [],
- "elapsed_s": 22.0,
+ "elapsed_s": 13.2,
  "summary": {
   "scenarios": 14,
   "proof_modes_exercised": "3/3",
@@ -65,7 +65,7 @@
     "terminal": "done",
     "blocked_reason": "",
     "check": "PASS",
-    "check_detail": "1 criteria each showed what their obligation asks at parent SHA ec6877f (1 change required); 1 executed red, 0 unable to import code this story introduces",
+    "check_detail": "1 criteria each showed what their obligation asks at parent SHA 24abd12 (1 change required); 1 executed red, 0 unable to import code this story introduces",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -80,7 +80,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_new"
       ],
       "expected_transition": "RED -> GREEN",
       "actual_transition": "RED -> GREEN",
@@ -98,7 +98,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 1.48
+   "elapsed_s": 0.85
   },
   {
    "case": "B",
@@ -131,7 +131,7 @@
     "terminal": "PLAN_CONFLICT",
     "blocked_reason": "deadlock due to plan: AC-STORY-07-01-1 [CHANGE_REQUIRED] GREEN -> GREEN → PLAN_OVERLAP: declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code. The criterion cannot ",
     "check": "FAIL",
-    "check_detail": "at parent SHA 4c6c217: AC-STORY-07-01-1 [CHANGE_REQUIRED, FR-4] GREEN -> GREEN (parent GREEN_EXECUTED / candidate GREEN_EXECUTED), expected RED -> GREEN → PLAN_OVERLAP (PLAN): declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code [tests/test_ac_1.py::test_AC_STORY_07_01_1_already]",
+    "check_detail": "at parent SHA 704fbcc: AC-STORY-07-01-1 [CHANGE_REQUIRED, FR-4] GREEN -> GREEN (parent GREEN_EXECUTED / candidate GREEN_EXECUTED), expected RED -> GREEN → PLAN_OVERLAP (PLAN): declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code [tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_already]",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -146,7 +146,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_1.py::test_AC_STORY_07_01_1_already"
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_already"
       ],
       "expected_transition": "RED -> GREEN",
       "actual_transition": "GREEN -> GREEN",
@@ -171,7 +171,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 1.2
+   "elapsed_s": 0.84
   },
   {
    "case": "C",
@@ -214,7 +214,7 @@
     "terminal": "done",
     "blocked_reason": "",
     "check": "PASS",
-    "check_detail": "2 criteria each showed what their obligation asks at parent SHA 16a56db (1 change required, 1 preserve required); 1 executed red, 0 unable to import code this story introduces",
+    "check_detail": "2 criteria each showed what their obligation asks at parent SHA c0191f4 (1 change required, 1 preserve required); 1 executed red, 0 unable to import code this story introduces",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -229,7 +229,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_new"
       ],
       "expected_transition": "RED -> GREEN",
       "actual_transition": "RED -> GREEN",
@@ -250,7 +250,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_2.py::test_AC_STORY_07_01_2_keep"
+       "tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_keep"
       ],
       "expected_transition": "GREEN -> GREEN",
       "actual_transition": "GREEN -> GREEN",
@@ -268,7 +268,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 1.62
+   "elapsed_s": 0.85
   },
   {
    "case": "D",
@@ -313,7 +313,7 @@
     "terminal": "QUALITY_BLOCK",
     "blocked_reason": "tried 2 attempts, still did not pass gate",
     "check": "FAIL",
-    "check_detail": "at parent SHA f86248d: AC-STORY-07-01-2 [PRESERVE_REQUIRED, FR-2] GREEN -> RED (parent GREEN_EXECUTED / candidate RED_EXECUTED), expected GREEN -> GREEN → DEVELOPER_REGRESSION (DEVELOPER): this story broke behaviour it inherited [tests/test_ac_2.py::test_AC_STORY_07_01_2_break]",
+    "check_detail": "at parent SHA 1d8ff7a: AC-STORY-07-01-2 [PRESERVE_REQUIRED, FR-2] GREEN -> RED (parent GREEN_EXECUTED / candidate RED_EXECUTED), expected GREEN -> GREEN → DEVELOPER_REGRESSION (DEVELOPER): this story broke behaviour it inherited [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_break]",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -328,7 +328,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_new"
       ],
       "expected_transition": "RED -> GREEN",
       "actual_transition": "RED -> GREEN",
@@ -349,7 +349,7 @@
        "RED_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_2.py::test_AC_STORY_07_01_2_break"
+       "tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_break"
       ],
       "expected_transition": "GREEN -> GREEN",
       "actual_transition": "GREEN -> RED",
@@ -374,7 +374,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 2.44
+   "elapsed_s": 1.52
   },
   {
    "case": "E",
@@ -417,7 +417,7 @@
     "terminal": "done",
     "blocked_reason": "",
     "check": "PASS",
-    "check_detail": "2 criteria each showed what their obligation asks at parent SHA c893561 (1 change required, 1 negative invariant); 1 executed red, 0 unable to import code this story introduces",
+    "check_detail": "2 criteria each showed what their obligation asks at parent SHA 02cd576 (1 change required, 1 negative invariant); 1 executed red, 0 unable to import code this story introduces",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -432,7 +432,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_new"
       ],
       "expected_transition": "RED -> GREEN",
       "actual_transition": "RED -> GREEN",
@@ -453,7 +453,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_2.py::test_AC_STORY_07_01_2_absence"
+       "tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_absence"
       ],
       "expected_transition": "GREEN -> GREEN",
       "actual_transition": "GREEN -> GREEN",
@@ -471,7 +471,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 1.36
+   "elapsed_s": 0.86
   },
   {
    "case": "F",
@@ -516,7 +516,7 @@
     "terminal": "QUALITY_BLOCK",
     "blocked_reason": "tried 2 attempts, still did not pass gate",
     "check": "FAIL",
-    "check_detail": "at parent SHA fc7e53a: AC-STORY-07-01-2 [NEGATIVE_INVARIANT, FR-9] GREEN -> RED (parent GREEN_EXECUTED / candidate RED_EXECUTED), expected GREEN -> GREEN → DEVELOPER_REGRESSION (DEVELOPER): this story broke a prohibition that held at its parent [tests/test_ac_2.py::test_AC_STORY_07_01_2_absence_broken]",
+    "check_detail": "at parent SHA 9e85bf8: AC-STORY-07-01-2 [NEGATIVE_INVARIANT, FR-9] GREEN -> RED (parent GREEN_EXECUTED / candidate RED_EXECUTED), expected GREEN -> GREEN → DEVELOPER_REGRESSION (DEVELOPER): this story broke a prohibition that held at its parent [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_absence_broken]",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -531,7 +531,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_new"
       ],
       "expected_transition": "RED -> GREEN",
       "actual_transition": "RED -> GREEN",
@@ -552,7 +552,7 @@
        "RED_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_2.py::test_AC_STORY_07_01_2_absence_broken"
+       "tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_absence_broken"
       ],
       "expected_transition": "GREEN -> GREEN",
       "actual_transition": "GREEN -> RED",
@@ -577,7 +577,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 2.61
+   "elapsed_s": 1.52
   },
   {
    "case": "G",
@@ -622,7 +622,7 @@
     "terminal": "QUALITY_BLOCK",
     "blocked_reason": "tried 2 attempts, still did not pass gate",
     "check": "UNRUNNABLE",
-    "check_detail": "at parent SHA 4164166: AC-STORY-07-01-2 [CHANGE_REQUIRED, FR-2] NO_EVIDENCE -> GREEN (parent DEPENDENCY_UNRUNNABLE / candidate GREEN_EXECUTED), expected RED -> GREEN → NO_EVIDENCE (ENVIRONMENT): the parent run shows nothing about this criterion — no evidence is never proof [tests/test_ac_2.py::test_AC_STORY_07_01_2_parent_unrunnable]",
+    "check_detail": "at parent SHA 27d2ffa: AC-STORY-07-01-2 [CHANGE_REQUIRED, FR-2] NO_EVIDENCE -> GREEN (parent DEPENDENCY_UNRUNNABLE / candidate GREEN_EXECUTED), expected RED -> GREEN → NO_EVIDENCE (ENVIRONMENT): the parent run shows nothing about this criterion — no evidence is never proof [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_parent_unrunnable]",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -637,7 +637,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new_import"
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_new_import"
       ],
       "expected_transition": "RED -> GREEN",
       "actual_transition": "RED -> GREEN",
@@ -658,7 +658,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_2.py::test_AC_STORY_07_01_2_parent_unrunnable"
+       "tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_parent_unrunnable"
       ],
       "expected_transition": "RED -> GREEN",
       "actual_transition": "NO_EVIDENCE -> GREEN",
@@ -681,7 +681,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 2.58
+   "elapsed_s": 1.53
   },
   {
    "case": "H",
@@ -726,7 +726,7 @@
     "terminal": "QUALITY_BLOCK",
     "blocked_reason": "tried 2 attempts, still did not pass gate",
     "check": "UNRUNNABLE",
-    "check_detail": "at parent SHA 1e7fc65: AC-STORY-07-01-2 [CHANGE_REQUIRED, FR-2] NO_EVIDENCE -> GREEN (parent NOT_COLLECTED / candidate GREEN_EXECUTED), expected RED -> GREEN → NO_EVIDENCE (ENVIRONMENT): the parent run shows nothing about this criterion — no evidence is never proof [tests/test_ac_2.py::test_AC_STORY_07_01_2_parent_uncollected]",
+    "check_detail": "at parent SHA da7f477: AC-STORY-07-01-2 [CHANGE_REQUIRED, FR-2] NO_EVIDENCE -> GREEN (parent NOT_COLLECTED / candidate GREEN_EXECUTED), expected RED -> GREEN → NO_EVIDENCE (ENVIRONMENT): the parent run shows nothing about this criterion — no evidence is never proof [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_parent_uncollected]",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -741,7 +741,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new_import"
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_new_import"
       ],
       "expected_transition": "RED -> GREEN",
       "actual_transition": "RED -> GREEN",
@@ -762,7 +762,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_2.py::test_AC_STORY_07_01_2_parent_uncollected"
+       "tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_parent_uncollected"
       ],
       "expected_transition": "RED -> GREEN",
       "actual_transition": "NO_EVIDENCE -> GREEN",
@@ -785,7 +785,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 2.51
+   "elapsed_s": 1.53
   },
   {
    "case": "I",
@@ -852,7 +852,7 @@
     "terminal": "done",
     "blocked_reason": "",
     "check": "PASS",
-    "check_detail": "4 criteria each showed what their obligation asks at parent SHA 6bff4ce (2 change required, 1 negative invariant, 1 preserve required); 1 executed red, 1 unable to import code this story introduces",
+    "check_detail": "4 criteria each showed what their obligation asks at parent SHA 07e38ec (2 change required, 1 negative invariant, 1 preserve required); 1 executed red, 1 unable to import code this story introduces",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -867,7 +867,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_new"
       ],
       "expected_transition": "RED -> GREEN",
       "actual_transition": "RED -> GREEN",
@@ -888,7 +888,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_2.py::test_AC_STORY_07_01_2_new_import"
+       "tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_new_import"
       ],
       "expected_transition": "RED -> GREEN",
       "actual_transition": "RED -> GREEN",
@@ -909,7 +909,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_3.py::test_AC_STORY_07_01_3_keep"
+       "tests.test_ac_3.TestCriterion3.test_AC_STORY_07_01_3_keep"
       ],
       "expected_transition": "GREEN -> GREEN",
       "actual_transition": "GREEN -> GREEN",
@@ -930,7 +930,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_4.py::test_AC_STORY_07_01_4_absence"
+       "tests.test_ac_4.TestCriterion4.test_AC_STORY_07_01_4_absence"
       ],
       "expected_transition": "GREEN -> GREEN",
       "actual_transition": "GREEN -> GREEN",
@@ -948,7 +948,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 1.53
+   "elapsed_s": 0.91
   },
   {
    "case": "J",
@@ -993,7 +993,7 @@
     "terminal": "PLAN_CONFLICT",
     "blocked_reason": "deadlock due to plan: AC-STORY-07-01-2 [CHANGE_REQUIRED] GREEN -> GREEN → PLAN_OVERLAP: declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code. The criterion cannot ",
     "check": "FAIL",
-    "check_detail": "at parent SHA 0b0ba7b: AC-STORY-07-01-2 [CHANGE_REQUIRED, FR-2] GREEN -> GREEN (parent GREEN_EXECUTED / candidate GREEN_EXECUTED), expected RED -> GREEN → PLAN_OVERLAP (PLAN): declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code [tests/test_ac_2.py::test_AC_STORY_07_01_2_already]",
+    "check_detail": "at parent SHA 83634c6: AC-STORY-07-01-2 [CHANGE_REQUIRED, FR-2] GREEN -> GREEN (parent GREEN_EXECUTED / candidate GREEN_EXECUTED), expected RED -> GREEN → PLAN_OVERLAP (PLAN): declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_already]",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -1008,7 +1008,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_new"
       ],
       "expected_transition": "RED -> GREEN",
       "actual_transition": "RED -> GREEN",
@@ -1029,7 +1029,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_2.py::test_AC_STORY_07_01_2_already"
+       "tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_already"
       ],
       "expected_transition": "RED -> GREEN",
       "actual_transition": "GREEN -> GREEN",
@@ -1054,7 +1054,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 1.45
+   "elapsed_s": 0.88
   },
   {
    "case": "K",
@@ -1104,7 +1104,7 @@
     ]
    },
    "mismatches": [],
-   "elapsed_s": 0.13
+   "elapsed_s": 0.11
   },
   {
    "case": "L",
@@ -1138,7 +1138,7 @@
     "preflight_needs": []
    },
    "mismatches": [],
-   "elapsed_s": 0.13
+   "elapsed_s": 0.11
   },
   {
    "case": "M",
@@ -1177,7 +1177,7 @@
     ]
    },
    "mismatches": [],
-   "elapsed_s": 0.15
+   "elapsed_s": 0.11
   },
   {
    "case": "N",
@@ -1222,7 +1222,7 @@
     "terminal": "QUALITY_BLOCK",
     "blocked_reason": "tried 2 attempts, still did not pass gate",
     "check": "FAIL",
-    "check_detail": "at parent SHA 7df78f1: AC-STORY-07-01-2 [PRESERVE_REQUIRED, FR-2] GREEN -> RED (parent GREEN_EXECUTED / candidate RED_EXECUTED), expected GREEN -> GREEN → DEVELOPER_REGRESSION (DEVELOPER): this story broke behaviour it inherited [tests/test_ac_2.py::test_AC_STORY_07_01_2_break]",
+    "check_detail": "at parent SHA 2ad02cc: AC-STORY-07-01-2 [PRESERVE_REQUIRED, FR-2] GREEN -> RED (parent GREEN_EXECUTED / candidate RED_EXECUTED), expected GREEN -> GREEN → DEVELOPER_REGRESSION (DEVELOPER): this story broke behaviour it inherited [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_break]",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -1237,7 +1237,7 @@
        "GREEN_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_new"
       ],
       "expected_transition": "RED -> GREEN",
       "actual_transition": "RED -> GREEN",
@@ -1258,7 +1258,7 @@
        "RED_EXECUTED"
       ],
       "tests": [
-       "tests/test_ac_2.py::test_AC_STORY_07_01_2_break"
+       "tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_break"
       ],
       "expected_transition": "GREEN -> GREEN",
       "actual_transition": "GREEN -> RED",
@@ -1283,7 +1283,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 2.82
+   "elapsed_s": 1.54
   }
  ],
  "pass": true

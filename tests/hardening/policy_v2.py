@@ -3,7 +3,7 @@
 Phase 12's random traces compare terminal state and counters on scenarios whose fixtures set `tools.test = true`
 and never write a story test file: the nop control is NOT_APPLICABLE there, so the V2 proof obligations are never
 materially exercised. This module closes that gap with a small set of deterministic scenarios that drive the REAL
-kernel end to end — real git project, real pytest, real `run_nop` at the parent SHA, the real gate, the real retry
+kernel end to end — real git project, a real `unittest` run, real `run_nop` at the parent SHA, the real gate, the real retry
 and plan routing — and compares each one against a REFERENCE MODEL of the policy written from the owner decision,
 not from `aisef/control/obligation.py`.
 
@@ -71,7 +71,7 @@ def model_ac(mode: str, parent: str, candidate: str) -> tuple[bool, str | None, 
 
 
 # ------------------------------------------------------------------ scenario vocabulary
-# Each criterion kind builds one pytest function whose state at the PARENT (the project before the story) and at the
+# Each criterion kind builds one test method whose state at the PARENT (the project before the story) and at the
 # CANDIDATE (the project with the story's files) is what the scenario claims. `product` is what the story writes.
 
 @dataclass
@@ -142,24 +142,23 @@ NEW_MODULE = '''def rebuild():
 '''
 
 
-def _test_body(c: Crit, code: str, fn: str) -> str:
-    """One pytest function carrying `code`, built so its state is `c.parent_state` at the parent and green (or the
-    declared red) at the candidate. The only difference between the two sides is the story's own product files."""
+def _test_body(c: Crit, fn: str) -> str:
+    """One test method carrying the criterion's code, built so its state is `c.parent_state` at the parent and
+    green (or the declared red) at the candidate. The only difference between the two sides is the story's own
+    product files. `unittest` rather than pytest: the project under test must need nothing but the interpreter,
+    which is also what CI has (it runs `python -m unittest discover`)."""
     if c.kind == "new":
-        return f"def {fn}():\n    assert hasattr(cli, 'repair'), 'repair is not there yet'\n    assert cli.repair() == 0\n"
+        return (f"    def {fn}(self):\n        self.assertTrue(hasattr(cli, 'repair'), 'repair is not there yet')\n"
+                "        self.assertEqual(cli.repair(), 0)\n")
     if c.kind == "new_import":            # imported at module level: the parent cannot even collect the file
-        return f"def {fn}():\n    assert rebuild.rebuild() == 7\n"
-    if c.kind in ("already", "keep"):
-        return f"def {fn}():\n    assert cli.main() == 0\n"
+        return f"    def {fn}(self):\n        self.assertEqual(rebuild.rebuild(), 7)\n"
+    if c.kind in ("already", "keep", "parent_unrunnable", "parent_uncollected"):
+        return f"    def {fn}(self):\n        self.assertEqual(cli.main(), 0)\n"
     if c.kind == "break":
-        return f"def {fn}():\n    assert cli.report() == 'ledger'\n"
+        return f"    def {fn}(self):\n        self.assertEqual(cli.report(), 'ledger')\n"
     if c.kind in ("absence", "absence_broken"):        # a prohibition, not a behaviour: it must hold on both sides
-        return (f"def {fn}():\n    import inspect\n"
-                f"    assert 'eval(' not in inspect.getsource(cli), 'the CLI must not evaluate strings'\n")
-    if c.kind == "parent_unrunnable":
-        return f"def {fn}():\n    assert cli.main() == 0\n"
-    if c.kind == "parent_uncollected":
-        return f"def {fn}():\n    assert cli.main() == 0\n"
+        return (f"    def {fn}(self):\n        import inspect\n"
+                "        self.assertNotIn('eval(', inspect.getsource(cli), 'the CLI must not evaluate strings')\n")
     raise AssertionError(c.kind)
 
 
@@ -167,20 +166,21 @@ def _test_file(c: Crit, code: str, i: int) -> tuple[str, str]:
     """(path, source) of the test file for one criterion. Guards that make the PARENT side unrunnable/uncollected are
     written so they vanish the moment the story's module exists — the file itself is identical on both sides."""
     fn = "test_" + code.replace("-", "_") + f"_{c.kind}"
-    head = "import importlib.util\n\nfrom ledgerlock import cli\n"
+    head = "import unittest\n\nfrom ledgerlock import cli\n"
     if c.kind == "new_import":
-        head = "from ledgerlock import rebuild\n"
-    if c.kind == "parent_unrunnable":
-        head = ("import importlib.util\n\n"
+        head = "import unittest\n\nfrom ledgerlock import rebuild\n"
+    elif c.kind == "parent_unrunnable":
+        head = ("import importlib.util\nimport unittest\n\n"
                 "if importlib.util.find_spec('ledgerlock.rebuild') is None:\n"
                 "    import aisef_not_a_real_dependency_xyz  # noqa: F401\n"
                 "from ledgerlock import cli\n")
     elif c.kind == "parent_uncollected":
-        head = ("import importlib.util\n\n"
+        head = ("import importlib.util\nimport unittest\n\n"
                 "if importlib.util.find_spec('ledgerlock.rebuild') is None:\n"
                 "    raise RuntimeError('the parent tree cannot set this file up')\n"
                 "from ledgerlock import cli\n")
-    return f"tests/test_ac_{i}.py", head + "\n\n" + _test_body(c, code, fn)
+    body = f"\n\nclass TestCriterion{i}(unittest.TestCase):\n" + _test_body(c, fn)
+    return f"tests/test_ac_{i}.py", head + body
 
 
 @dataclass
@@ -281,8 +281,7 @@ class Project:
         (pkg / "__init__.py").write_text("", encoding="utf-8")
         (pkg / "cli.py").write_text(BASE_CLI, encoding="utf-8")
         (self.path / "tests").mkdir()
-        # a root conftest puts the project root on sys.path for both runs — the same file on both sides
-        (self.path / "conftest.py").write_text("", encoding="utf-8")
+        (self.path / "tests" / "__init__.py").write_text("", encoding="utf-8")
         (self.path / "pyproject.toml").write_text('[project]\nname = "ledgerlock"\nversion = "0"\n', encoding="utf-8")
         _git(self.path, "init", "-q")
         _git(self.path, "config", "user.email", "t@t")
@@ -329,7 +328,8 @@ def real_run(case: Case) -> dict:
         client = SyntheticClientAdapter(Script(
             developer=[Step.changed(files_for(case))], review=[Step.passes()], security=[Step.passes()]))
         cfg = Config({**DEFAULTS, "tools.lint": "true", "run.max_retries": 1,
-                      "tools.test": quote_command([sys.executable, "-m", "pytest", "-v", "-p", "no:cacheprovider"])})
+                      "tools.test": quote_command([sys.executable, "-m", "unittest", "discover",
+                                                   "-s", "tests", "-t", ".", "-v"])})
         out = implement_story(story_for(case), project=p.path, workdir=p.work, artifact_root=p.artifacts,
                               client=client, config=cfg)
         gate = out.attempts[-1].gate if out.attempts else None
