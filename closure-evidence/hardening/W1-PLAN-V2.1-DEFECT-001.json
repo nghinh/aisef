@@ -1,0 +1,28 @@
+{
+ "id": "PLAN-V2.1-DEFECT-001",
+ "recorded": "2026-09-21",
+ "status": "RECORDED, NOT FIXED — owner decision 2026-09-21 section 10 forbids a PLAN-V2.2 during this qualification cycle",
+ "plan": "W1-LEDGERLOCK-PLAN-V2.1 (136a68dc)",
+ "criteria": ["AC-STORY-01-01-4", "AC-STORY-01-01-5"],
+ "proof_mode": "NEGATIVE_INVARIANT",
+ "requirement": "FR-14",
+ "statement": "The two grep-guard prohibitions of STORY-01-01 are declared NEGATIVE_INVARIANT, which requires GREEN at the story's parent. Whether they are green there is decided by the DEVELOPER, not by the plan: the parent has no `ledgerlock` package, so a test that carries the criterion in a file importing `ledgerlock` cannot be collected at the parent (RED_COLLECTION_BOUND_TO_STORY), while the same criterion in a file that imports nothing of the story collects and passes vacuously. Both are correct implementations of the criterion as written; only one can satisfy its declared proof mode.",
+ "measured": {
+  "w1_v2_1_run_1": {
+   "outcome": "the criteria landed in tests/test_skeleton.py, which imports ledgerlock at module level; at parent SHA ad2aa2b both were RED_COLLECTION_BOUND_TO_STORY -> PLAN_PRECONDITION_MISSING (owner PLAN) -> plan deadlock on STORY-01-01",
+   "stories_done": 0,
+   "developer_agent_runs": 1,
+   "developer_retries": 0,
+   "elapsed_s": 385
+  },
+  "plan_v2_diagnostic_run_1": {
+   "outcome": "the same two criteria were GREEN at the parent — the nop control at parent 73e0ec26 executed 6 tests, 2 green and 4 red, the 2 green being exactly these prohibitions — and STORY-01-01 passed on attempt 1",
+   "stories_done": 10
+  },
+  "difference": "the plan text is identical in both runs; only the file the developer chose for the test differs"
+ },
+ "kernel_behaviour": "correct in both runs. The gate named the owner (PLAN), routed the story to a plan deadlock rather than to the developer, spent 0 developer retries, and recorded 0 false pass and 0 false block. This is the V2 policy doing exactly what it exists to do; the defect is in the plan, not the kernel.",
+ "was_this_foreseen": "Yes, and not acted on. The ownership audit of 2026-09-21 examined these two criteria, recorded that the prohibition holds only vacuously at a parent where the package does not exist, and judged them KEEP_CHANGE with a written rationale citing the diagnostic run's green measurement. That was the wrong call: a criterion whose proof mode depends on where a developer puts the test is not a stable obligation, and the audit had the evidence to say so. The conservative choice preserved a defect the same audit had already described.",
+ "what_a_correction_would_be": "Out of scope this cycle, recorded for the owner: either (a) STORY-01-01 drops the two prohibitions and STORY-05-03 — the dedicated guard story, whose parent has a real package — keeps them, since they are the same two greps declared twice; or (b) the criteria state explicitly that an absent package satisfies the prohibition, so every correct implementation is green at the parent. Both trace to requirements §12.",
+ "severity": "P1 for the workload plan; no kernel severity — no kernel defect is implicated"
+}
