@@ -1,0 +1,1290 @@
+{
+ "artifact": "TDD-POLICY-V2-CONFORMANCE",
+ "generated": "2026-09-20T11:28:29+0700",
+ "git_sha": "4eaadb17efbb1c046a64a9e7fd95bc99812546c5",
+ "aisef_tree": "42a29853a3a8a10e5c58b319c5a181f2898be1d5",
+ "aisef_dirty": [],
+ "elapsed_s": 22.0,
+ "summary": {
+  "scenarios": 14,
+  "proof_modes_exercised": "3/3",
+  "proof_state_transitions_exercised": [
+   "DEPENDENCY_UNRUNNABLE -> GREEN_EXECUTED",
+   "GREEN_EXECUTED -> GREEN_EXECUTED",
+   "GREEN_EXECUTED -> RED_EXECUTED",
+   "NOT_COLLECTED -> GREEN_EXECUTED",
+   "RED_COLLECTION_BOUND_TO_STORY -> GREEN_EXECUTED",
+   "RED_EXECUTED -> GREEN_EXECUTED"
+  ],
+  "per_ac_outcomes_exercised": {
+   "SATISFIED": 15,
+   "PLAN_OVERLAP": 2,
+   "DEVELOPER_REGRESSION": 3,
+   "NO_EVIDENCE": 2
+  },
+  "outcomes_by_owner": {
+   "PLAN": 2,
+   "DEVELOPER": 3,
+   "ENVIRONMENT": 2,
+   "VERIFIER": 0
+  },
+  "plan_owned_outcomes": 2,
+  "developer_owned_outcomes": 3,
+  "environment_owned_outcomes": 2,
+  "mixed_story_scenario": true,
+  "mismatches": 0,
+  "invariant_violations": 0
+ },
+ "results": [
+  {
+   "case": "A",
+   "title": "CHANGE_REQUIRED: parent RED_EXECUTED, candidate GREEN_EXECUTED => PASS",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "PASS",
+    "owners": [],
+    "terminal": "done",
+    "developer_sessions": 1,
+    "quality_attempts": 1
+   },
+   "real": {
+    "terminal": "done",
+    "blocked_reason": "",
+    "check": "PASS",
+    "check_detail": "1 criteria each showed what their obligation asks at parent SHA ec6877f (1 change required); 1 executed red, 0 unable to import code this story introduces",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "parent_states": [
+       "RED_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "RED -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "red at the parent, green at the candidate"
+     }
+    ],
+    "owners": [],
+    "still_green": [],
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "attempts": 1,
+    "failures": [],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 1.48
+  },
+  {
+   "case": "B",
+   "title": "CHANGE_REQUIRED already green at the parent => PLAN_OVERLAP before any developer quality retry",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "GREEN",
+      "candidate": "GREEN",
+      "satisfied": false,
+      "owner": "PLAN",
+      "plan_overlap": true,
+      "parent_state": "GREEN_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "FAIL",
+    "owners": [
+     "PLAN"
+    ],
+    "terminal": "PLAN_CONFLICT",
+    "developer_sessions": 1,
+    "quality_attempts": 1
+   },
+   "real": {
+    "terminal": "PLAN_CONFLICT",
+    "blocked_reason": "deadlock due to plan: AC-STORY-07-01-1 [CHANGE_REQUIRED] GREEN -> GREEN → PLAN_OVERLAP: declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code. The criterion cannot ",
+    "check": "FAIL",
+    "check_detail": "at parent SHA 4c6c217: AC-STORY-07-01-1 [CHANGE_REQUIRED, FR-4] GREEN -> GREEN (parent GREEN_EXECUTED / candidate GREEN_EXECUTED), expected RED -> GREEN → PLAN_OVERLAP (PLAN): declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code [tests/test_ac_1.py::test_AC_STORY_07_01_1_already]",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "GREEN",
+      "candidate": "GREEN",
+      "parent_states": [
+       "GREEN_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_1.py::test_AC_STORY_07_01_1_already"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "GREEN -> GREEN",
+      "outcome": "PLAN_OVERLAP",
+      "owner": "PLAN",
+      "why": "declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code"
+     }
+    ],
+    "owners": [
+     "PLAN"
+    ],
+    "still_green": [
+     "AC-STORY-07-01-1"
+    ],
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "attempts": 1,
+    "failures": [
+     "TDD",
+     "tests verify story"
+    ],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 1.2
+  },
+  {
+   "case": "C",
+   "title": "PRESERVE_REQUIRED: GREEN -> GREEN => PASS",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "proof_mode": "PRESERVE_REQUIRED",
+      "requirement": "FR-2",
+      "parent": "GREEN",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "GREEN_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "PASS",
+    "owners": [],
+    "terminal": "done",
+    "developer_sessions": 1,
+    "quality_attempts": 1
+   },
+   "real": {
+    "terminal": "done",
+    "blocked_reason": "",
+    "check": "PASS",
+    "check_detail": "2 criteria each showed what their obligation asks at parent SHA 16a56db (1 change required, 1 preserve required); 1 executed red, 0 unable to import code this story introduces",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "parent_states": [
+       "RED_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "RED -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "red at the parent, green at the candidate"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "requirement": "FR-2",
+      "proof_mode": "PRESERVE_REQUIRED",
+      "parent": "GREEN",
+      "candidate": "GREEN",
+      "parent_states": [
+       "GREEN_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_2.py::test_AC_STORY_07_01_2_keep"
+      ],
+      "expected_transition": "GREEN -> GREEN",
+      "actual_transition": "GREEN -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "green at the parent and still green at the candidate"
+     }
+    ],
+    "owners": [],
+    "still_green": [],
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "attempts": 1,
+    "failures": [],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 1.62
+  },
+  {
+   "case": "D",
+   "title": "PRESERVE_REQUIRED: GREEN -> RED => DEVELOPER regression block",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "proof_mode": "PRESERVE_REQUIRED",
+      "requirement": "FR-2",
+      "parent": "GREEN",
+      "candidate": "RED",
+      "satisfied": false,
+      "owner": "DEVELOPER",
+      "plan_overlap": false,
+      "parent_state": "GREEN_EXECUTED",
+      "candidate_state": "RED_EXECUTED"
+     }
+    ],
+    "check": "FAIL",
+    "owners": [
+     "DEVELOPER"
+    ],
+    "terminal": "QUALITY_BLOCK",
+    "developer_sessions": 2,
+    "quality_attempts": 2
+   },
+   "real": {
+    "terminal": "QUALITY_BLOCK",
+    "blocked_reason": "tried 2 attempts, still did not pass gate",
+    "check": "FAIL",
+    "check_detail": "at parent SHA f86248d: AC-STORY-07-01-2 [PRESERVE_REQUIRED, FR-2] GREEN -> RED (parent GREEN_EXECUTED / candidate RED_EXECUTED), expected GREEN -> GREEN → DEVELOPER_REGRESSION (DEVELOPER): this story broke behaviour it inherited [tests/test_ac_2.py::test_AC_STORY_07_01_2_break]",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "parent_states": [
+       "RED_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "RED -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "red at the parent, green at the candidate"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "requirement": "FR-2",
+      "proof_mode": "PRESERVE_REQUIRED",
+      "parent": "GREEN",
+      "candidate": "RED",
+      "parent_states": [
+       "GREEN_EXECUTED"
+      ],
+      "candidate_states": [
+       "RED_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_2.py::test_AC_STORY_07_01_2_break"
+      ],
+      "expected_transition": "GREEN -> GREEN",
+      "actual_transition": "GREEN -> RED",
+      "outcome": "DEVELOPER_REGRESSION",
+      "owner": "DEVELOPER",
+      "why": "this story broke behaviour it inherited"
+     }
+    ],
+    "owners": [
+     "DEVELOPER"
+    ],
+    "still_green": [],
+    "developer_sessions": 2,
+    "quality_attempts": 2,
+    "attempts": 2,
+    "failures": [
+     "test",
+     "criteria have tests",
+     "TDD",
+     "tests verify story"
+    ],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 2.44
+  },
+  {
+   "case": "E",
+   "title": "NEGATIVE_INVARIANT: GREEN -> GREEN => PASS",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "proof_mode": "NEGATIVE_INVARIANT",
+      "requirement": "FR-9",
+      "parent": "GREEN",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "GREEN_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "PASS",
+    "owners": [],
+    "terminal": "done",
+    "developer_sessions": 1,
+    "quality_attempts": 1
+   },
+   "real": {
+    "terminal": "done",
+    "blocked_reason": "",
+    "check": "PASS",
+    "check_detail": "2 criteria each showed what their obligation asks at parent SHA c893561 (1 change required, 1 negative invariant); 1 executed red, 0 unable to import code this story introduces",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "parent_states": [
+       "RED_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "RED -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "red at the parent, green at the candidate"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "requirement": "FR-9",
+      "proof_mode": "NEGATIVE_INVARIANT",
+      "parent": "GREEN",
+      "candidate": "GREEN",
+      "parent_states": [
+       "GREEN_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_2.py::test_AC_STORY_07_01_2_absence"
+      ],
+      "expected_transition": "GREEN -> GREEN",
+      "actual_transition": "GREEN -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "green at the parent and still green at the candidate"
+     }
+    ],
+    "owners": [],
+    "still_green": [],
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "attempts": 1,
+    "failures": [],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 1.36
+  },
+  {
+   "case": "F",
+   "title": "NEGATIVE_INVARIANT: GREEN -> RED => DEVELOPER regression block",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "proof_mode": "NEGATIVE_INVARIANT",
+      "requirement": "FR-9",
+      "parent": "GREEN",
+      "candidate": "RED",
+      "satisfied": false,
+      "owner": "DEVELOPER",
+      "plan_overlap": false,
+      "parent_state": "GREEN_EXECUTED",
+      "candidate_state": "RED_EXECUTED"
+     }
+    ],
+    "check": "FAIL",
+    "owners": [
+     "DEVELOPER"
+    ],
+    "terminal": "QUALITY_BLOCK",
+    "developer_sessions": 2,
+    "quality_attempts": 2
+   },
+   "real": {
+    "terminal": "QUALITY_BLOCK",
+    "blocked_reason": "tried 2 attempts, still did not pass gate",
+    "check": "FAIL",
+    "check_detail": "at parent SHA fc7e53a: AC-STORY-07-01-2 [NEGATIVE_INVARIANT, FR-9] GREEN -> RED (parent GREEN_EXECUTED / candidate RED_EXECUTED), expected GREEN -> GREEN → DEVELOPER_REGRESSION (DEVELOPER): this story broke a prohibition that held at its parent [tests/test_ac_2.py::test_AC_STORY_07_01_2_absence_broken]",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "parent_states": [
+       "RED_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "RED -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "red at the parent, green at the candidate"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "requirement": "FR-9",
+      "proof_mode": "NEGATIVE_INVARIANT",
+      "parent": "GREEN",
+      "candidate": "RED",
+      "parent_states": [
+       "GREEN_EXECUTED"
+      ],
+      "candidate_states": [
+       "RED_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_2.py::test_AC_STORY_07_01_2_absence_broken"
+      ],
+      "expected_transition": "GREEN -> GREEN",
+      "actual_transition": "GREEN -> RED",
+      "outcome": "DEVELOPER_REGRESSION",
+      "owner": "DEVELOPER",
+      "why": "this story broke a prohibition that held at its parent"
+     }
+    ],
+    "owners": [
+     "DEVELOPER"
+    ],
+    "still_green": [],
+    "developer_sessions": 2,
+    "quality_attempts": 2,
+    "attempts": 2,
+    "failures": [
+     "test",
+     "criteria have tests",
+     "TDD",
+     "tests verify story"
+    ],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 2.61
+  },
+  {
+   "case": "G",
+   "title": "UNRUNNABLE parent evidence never satisfies CHANGE_REQUIRED",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_COLLECTION_BOUND_TO_STORY",
+      "candidate_state": "GREEN_EXECUTED"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-2",
+      "parent": "NO_EVIDENCE",
+      "candidate": "GREEN",
+      "satisfied": false,
+      "owner": "ENVIRONMENT",
+      "plan_overlap": false,
+      "parent_state": "DEPENDENCY_UNRUNNABLE",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "UNRUNNABLE",
+    "owners": [
+     "ENVIRONMENT"
+    ],
+    "terminal": "QUALITY_BLOCK",
+    "developer_sessions": 2,
+    "quality_attempts": 2
+   },
+   "real": {
+    "terminal": "QUALITY_BLOCK",
+    "blocked_reason": "tried 2 attempts, still did not pass gate",
+    "check": "UNRUNNABLE",
+    "check_detail": "at parent SHA 4164166: AC-STORY-07-01-2 [CHANGE_REQUIRED, FR-2] NO_EVIDENCE -> GREEN (parent DEPENDENCY_UNRUNNABLE / candidate GREEN_EXECUTED), expected RED -> GREEN → NO_EVIDENCE (ENVIRONMENT): the parent run shows nothing about this criterion — no evidence is never proof [tests/test_ac_2.py::test_AC_STORY_07_01_2_parent_unrunnable]",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "parent_states": [
+       "RED_COLLECTION_BOUND_TO_STORY"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new_import"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "RED -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "red at the parent, green at the candidate"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "requirement": "FR-2",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "NO_EVIDENCE",
+      "candidate": "GREEN",
+      "parent_states": [
+       "DEPENDENCY_UNRUNNABLE"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_2.py::test_AC_STORY_07_01_2_parent_unrunnable"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "NO_EVIDENCE -> GREEN",
+      "outcome": "NO_EVIDENCE",
+      "owner": "ENVIRONMENT",
+      "why": "the parent run shows nothing about this criterion — no evidence is never proof"
+     }
+    ],
+    "owners": [
+     "ENVIRONMENT"
+    ],
+    "still_green": [],
+    "developer_sessions": 2,
+    "quality_attempts": 2,
+    "attempts": 2,
+    "failures": [
+     "TDD",
+     "tests verify story"
+    ],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 2.58
+  },
+  {
+   "case": "H",
+   "title": "NOT_COLLECTED parent evidence never satisfies CHANGE_REQUIRED",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_COLLECTION_BOUND_TO_STORY",
+      "candidate_state": "GREEN_EXECUTED"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-2",
+      "parent": "NO_EVIDENCE",
+      "candidate": "GREEN",
+      "satisfied": false,
+      "owner": "ENVIRONMENT",
+      "plan_overlap": false,
+      "parent_state": "NOT_COLLECTED",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "UNRUNNABLE",
+    "owners": [
+     "ENVIRONMENT"
+    ],
+    "terminal": "QUALITY_BLOCK",
+    "developer_sessions": 2,
+    "quality_attempts": 2
+   },
+   "real": {
+    "terminal": "QUALITY_BLOCK",
+    "blocked_reason": "tried 2 attempts, still did not pass gate",
+    "check": "UNRUNNABLE",
+    "check_detail": "at parent SHA 1e7fc65: AC-STORY-07-01-2 [CHANGE_REQUIRED, FR-2] NO_EVIDENCE -> GREEN (parent NOT_COLLECTED / candidate GREEN_EXECUTED), expected RED -> GREEN → NO_EVIDENCE (ENVIRONMENT): the parent run shows nothing about this criterion — no evidence is never proof [tests/test_ac_2.py::test_AC_STORY_07_01_2_parent_uncollected]",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "parent_states": [
+       "RED_COLLECTION_BOUND_TO_STORY"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new_import"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "RED -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "red at the parent, green at the candidate"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "requirement": "FR-2",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "NO_EVIDENCE",
+      "candidate": "GREEN",
+      "parent_states": [
+       "NOT_COLLECTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_2.py::test_AC_STORY_07_01_2_parent_uncollected"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "NO_EVIDENCE -> GREEN",
+      "outcome": "NO_EVIDENCE",
+      "owner": "ENVIRONMENT",
+      "why": "the parent run shows nothing about this criterion — no evidence is never proof"
+     }
+    ],
+    "owners": [
+     "ENVIRONMENT"
+    ],
+    "still_green": [],
+    "developer_sessions": 2,
+    "quality_attempts": 2,
+    "attempts": 2,
+    "failures": [
+     "TDD",
+     "tests verify story"
+    ],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 2.51
+  },
+  {
+   "case": "I",
+   "title": "a mixed story: every criterion judged by its own obligation",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-5",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_COLLECTION_BOUND_TO_STORY",
+      "candidate_state": "GREEN_EXECUTED"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-3",
+      "proof_mode": "PRESERVE_REQUIRED",
+      "requirement": "FR-2",
+      "parent": "GREEN",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "GREEN_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-4",
+      "proof_mode": "NEGATIVE_INVARIANT",
+      "requirement": "FR-9",
+      "parent": "GREEN",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "GREEN_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "PASS",
+    "owners": [],
+    "terminal": "done",
+    "developer_sessions": 1,
+    "quality_attempts": 1
+   },
+   "real": {
+    "terminal": "done",
+    "blocked_reason": "",
+    "check": "PASS",
+    "check_detail": "4 criteria each showed what their obligation asks at parent SHA 6bff4ce (2 change required, 1 negative invariant, 1 preserve required); 1 executed red, 1 unable to import code this story introduces",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "parent_states": [
+       "RED_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "RED -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "red at the parent, green at the candidate"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "requirement": "FR-5",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "parent_states": [
+       "RED_COLLECTION_BOUND_TO_STORY"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_2.py::test_AC_STORY_07_01_2_new_import"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "RED -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "red at the parent, green at the candidate"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-3",
+      "requirement": "FR-2",
+      "proof_mode": "PRESERVE_REQUIRED",
+      "parent": "GREEN",
+      "candidate": "GREEN",
+      "parent_states": [
+       "GREEN_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_3.py::test_AC_STORY_07_01_3_keep"
+      ],
+      "expected_transition": "GREEN -> GREEN",
+      "actual_transition": "GREEN -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "green at the parent and still green at the candidate"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-4",
+      "requirement": "FR-9",
+      "proof_mode": "NEGATIVE_INVARIANT",
+      "parent": "GREEN",
+      "candidate": "GREEN",
+      "parent_states": [
+       "GREEN_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_4.py::test_AC_STORY_07_01_4_absence"
+      ],
+      "expected_transition": "GREEN -> GREEN",
+      "actual_transition": "GREEN -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "green at the parent and still green at the candidate"
+     }
+    ],
+    "owners": [],
+    "still_green": [],
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "attempts": 1,
+    "failures": [],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 1.53
+  },
+  {
+   "case": "J",
+   "title": "CHANGE_REQUIRED green because an upstream story owns it => PLAN_OVERLAP, developer budget unchanged",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-2",
+      "parent": "GREEN",
+      "candidate": "GREEN",
+      "satisfied": false,
+      "owner": "PLAN",
+      "plan_overlap": true,
+      "parent_state": "GREEN_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "FAIL",
+    "owners": [
+     "PLAN"
+    ],
+    "terminal": "PLAN_CONFLICT",
+    "developer_sessions": 1,
+    "quality_attempts": 1
+   },
+   "real": {
+    "terminal": "PLAN_CONFLICT",
+    "blocked_reason": "deadlock due to plan: AC-STORY-07-01-2 [CHANGE_REQUIRED] GREEN -> GREEN → PLAN_OVERLAP: declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code. The criterion cannot ",
+    "check": "FAIL",
+    "check_detail": "at parent SHA 0b0ba7b: AC-STORY-07-01-2 [CHANGE_REQUIRED, FR-2] GREEN -> GREEN (parent GREEN_EXECUTED / candidate GREEN_EXECUTED), expected RED -> GREEN → PLAN_OVERLAP (PLAN): declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code [tests/test_ac_2.py::test_AC_STORY_07_01_2_already]",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "parent_states": [
+       "RED_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "RED -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "red at the parent, green at the candidate"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "requirement": "FR-2",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "GREEN",
+      "candidate": "GREEN",
+      "parent_states": [
+       "GREEN_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_2.py::test_AC_STORY_07_01_2_already"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "GREEN -> GREEN",
+      "outcome": "PLAN_OVERLAP",
+      "owner": "PLAN",
+      "why": "declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code"
+     }
+    ],
+    "owners": [
+     "PLAN"
+    ],
+    "still_green": [
+     "AC-STORY-07-01-2"
+    ],
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "attempts": 1,
+    "failures": [
+     "TDD",
+     "tests verify story"
+    ],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 1.45
+  },
+  {
+   "case": "K",
+   "title": "a normal story with zero CHANGE_REQUIRED is a plan defect, refused before the first model call",
+   "route": "PLAN_GATE",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "PRESERVE_REQUIRED",
+      "requirement": "FR-2",
+      "parent": "GREEN",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "GREEN_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "proof_mode": "NEGATIVE_INVARIANT",
+      "requirement": "FR-9",
+      "parent": "GREEN",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "GREEN_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "PASS",
+    "owners": [],
+    "terminal": "PLAN_GATE",
+    "developer_sessions": 1,
+    "quality_attempts": 1
+   },
+   "real": {
+    "machine_gate_defects": [
+     "STORY-07-01: AC-STORY-07-01-1 names FR-2, which this story does not cover (FR-4)",
+     "STORY-07-01: AC-STORY-07-01-2 names FR-9, which this story does not cover (FR-4)",
+     "STORY-07-01: every criterion is already satisfied at this story's entry (no CHANGE_REQUIRED obligation) — the story contributes no behaviour: correct the plan or declare it VERIFICATION_ONLY"
+    ],
+    "preflight_needs": [
+     "story"
+    ]
+   },
+   "mismatches": [],
+   "elapsed_s": 0.13
+  },
+  {
+   "case": "L",
+   "title": "a criterion whose requirement the story does not cover is a plan/readiness failure",
+   "route": "PLAN_GATE",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-77",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "PASS",
+    "owners": [],
+    "terminal": "PLAN_GATE",
+    "developer_sessions": 1,
+    "quality_attempts": 1
+   },
+   "real": {
+    "machine_gate_defects": [
+     "STORY-07-01: AC-STORY-07-01-1 names requirement FR-77, which the PRD does not carry"
+    ],
+    "preflight_needs": []
+   },
+   "mismatches": [],
+   "elapsed_s": 0.13
+  },
+  {
+   "case": "M",
+   "title": "a malformed proof mode is a plan/readiness failure",
+   "route": "PLAN_GATE",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "NO_SUCH_MODE",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": false,
+      "owner": "PLAN",
+      "plan_overlap": false,
+      "parent_state": "RED_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "FAIL",
+    "owners": [
+     "PLAN"
+    ],
+    "terminal": "PLAN_GATE",
+    "developer_sessions": 1,
+    "quality_attempts": 1
+   },
+   "real": {
+    "machine_gate_defects": [
+     "STORY-07-01: AC-STORY-07-01-1 declares proof mode 'NO_SUCH_MODE', which is not one of CHANGE_REQUIRED, PRESERVE_REQUIRED, NEGATIVE_INVARIANT",
+     "STORY-07-01: 1 of 1 criteria declare no valid proof obligation: AC-STORY-07-01-1"
+    ],
+    "preflight_needs": [
+     "story"
+    ]
+   },
+   "mismatches": [],
+   "elapsed_s": 0.15
+  },
+  {
+   "case": "N",
+   "title": "the gate reports every structured feedback field for each failing criterion",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "proof_mode": "PRESERVE_REQUIRED",
+      "requirement": "FR-2",
+      "parent": "GREEN",
+      "candidate": "RED",
+      "satisfied": false,
+      "owner": "DEVELOPER",
+      "plan_overlap": false,
+      "parent_state": "GREEN_EXECUTED",
+      "candidate_state": "RED_EXECUTED"
+     }
+    ],
+    "check": "FAIL",
+    "owners": [
+     "DEVELOPER"
+    ],
+    "terminal": "QUALITY_BLOCK",
+    "developer_sessions": 2,
+    "quality_attempts": 2
+   },
+   "real": {
+    "terminal": "QUALITY_BLOCK",
+    "blocked_reason": "tried 2 attempts, still did not pass gate",
+    "check": "FAIL",
+    "check_detail": "at parent SHA 7df78f1: AC-STORY-07-01-2 [PRESERVE_REQUIRED, FR-2] GREEN -> RED (parent GREEN_EXECUTED / candidate RED_EXECUTED), expected GREEN -> GREEN → DEVELOPER_REGRESSION (DEVELOPER): this story broke behaviour it inherited [tests/test_ac_2.py::test_AC_STORY_07_01_2_break]",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "parent_states": [
+       "RED_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_1.py::test_AC_STORY_07_01_1_new"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "RED -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "red at the parent, green at the candidate"
+     },
+     {
+      "ac_id": "AC-STORY-07-01-2",
+      "requirement": "FR-2",
+      "proof_mode": "PRESERVE_REQUIRED",
+      "parent": "GREEN",
+      "candidate": "RED",
+      "parent_states": [
+       "GREEN_EXECUTED"
+      ],
+      "candidate_states": [
+       "RED_EXECUTED"
+      ],
+      "tests": [
+       "tests/test_ac_2.py::test_AC_STORY_07_01_2_break"
+      ],
+      "expected_transition": "GREEN -> GREEN",
+      "actual_transition": "GREEN -> RED",
+      "outcome": "DEVELOPER_REGRESSION",
+      "owner": "DEVELOPER",
+      "why": "this story broke behaviour it inherited"
+     }
+    ],
+    "owners": [
+     "DEVELOPER"
+    ],
+    "still_green": [],
+    "developer_sessions": 2,
+    "quality_attempts": 2,
+    "attempts": 2,
+    "failures": [
+     "test",
+     "criteria have tests",
+     "TDD",
+     "tests verify story"
+    ],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 2.82
+  }
+ ],
+ "pass": true
+}

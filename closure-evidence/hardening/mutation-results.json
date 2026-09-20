@@ -13860,5 +13860,25 @@
    "seconds": 0.2,
    "last_line": "1 failed, 25 passed in 0.10s"
   }
- ]
+ ],
+ "equivalence_audit": {
+  "rule": "owner decision 2026-09-20 section 5: a message-only mutation may NOT be called equivalent if the message itself is part of the structured gate-feedback contract",
+  "audited": "the 9 EQUIVALENT rows, 2026-09-20",
+  "message_only_mutants": [
+   {
+    "id": "192e5a90e3",
+    "site": "aisef/control/state.py:456 (the lease-refusal TransitionError text)",
+    "in_gate_feedback_contract": false,
+    "measured": "the wording occurs only at its definition site (grep of aisef/ for 'may not move it'); no consumer reads the message — run.py catches TransitionError by type. The raise, its type and its condition are unchanged by the mutant and are asserted by tests/test_state.py::TestLeaseEdges"
+   },
+   {
+    "id": "5b479bdc93",
+    "site": "aisef/harness/tools.py:363 (the generic unrunnable reason text)",
+    "in_gate_feedback_contract": false,
+    "measured": "the wording occurs only at its definition site; callers (tools.py:219, qa.py:579) store it as res.unrunnable and control reads only that it is non-empty (TOOL_UNRUNNABLE)"
+   }
+  ],
+  "policy_v2_feedback_contract": "the structured feedback of the V2 gate (aisef/control/obligation.py::row and the failing lines built in gate.py::_nop_check) is a mutation target in this run and had 0 survivors and 0 equivalents; its fields are additionally asserted per scenario by TDD-POLICY-V2-CONFORMANCE (ac_id, requirement, proof_mode, expected and actual transition, parent and candidate proof states, owner)",
+  "conclusion": "no equivalent mutant is excused on a message that carries control meaning"
+ }
 }

@@ -60,6 +60,19 @@
    "impact_in_this_run": "none on any gate — bench is measurement infrastructure, not the product path, and the failure is fail-closed (a red test, never a false PASS)",
    "action": "none in this cycle — the kernel is frozen for qualification and remove_tree is product code (aisef/kit/fetch.py, used by `aisef setup`); touching it would invalidate the mutation run and the capability matrix just recorded on tree 42a29853. Backlog: make remove_tree report what it could not remove instead of swallowing it, and let the caller's mkdir say so.",
    "disposition": "P3 backlog — watch for recurrence with OBS-CI-2026-09-20-1"
+  },
+  {
+   "id": "SS-96",
+   "severity": "P2",
+   "defect_class": "RETRY_ROUTING",
+   "status": "OPEN",
+   "site": "aisef/control/gate.py::_nop_check (owners == {ENVIRONMENT} -> UNRUNNABLE) vs the attempt accounting in aisef/phases/implement.py",
+   "statement": "a criterion whose PARENT evidence proves nothing (DEPENDENCY_UNRUNNABLE, NOT_COLLECTED, COLLECTION_ABORTED, ABSENT) makes the nop check UNRUNNABLE with failure owner ENVIRONMENT — correct — but the attempt is still charged to the DEVELOPER's quality budget and the story terminates as QUALITY_BLOCK, as though the code had failed",
+   "measured": "TDD-POLICY-V2-CONFORMANCE.json scenarios G and H on tree 42a29853: check outcome UNRUNNABLE, every blocking row owner=ENVIRONMENT, developer sessions 2, quality attempts 2, terminal QUALITY_BLOCK. The PLAN owner IS routed correctly in the same suite (scenarios B and J: terminal PLAN_CONFLICT, 1 developer session, no retry spent)",
+   "impact_in_this_run": "none on correctness — fail-closed, 0 false PASS; costs one developer retry and mislabels the terminal",
+   "worst_case": "a story blocked by an environment that cannot answer is reported as a developer quality failure, and one retry of the model's budget is spent on a condition no code change can fix",
+   "why_not_fixed_now": "the owner decision of 2026-09-20 specifies retry routing for the PLAN owner only (section 12: 'Do not spend developer retry budget on a planning contradiction'). Routing the ENVIRONMENT owner is an extension of the approved semantics, not a defect against them, and the behaviour predates policy V2 — V2 only gave the condition a name. Section 22 asks for no scope creep; the kernel is frozen for qualification",
+   "disposition": "P2 backlog — owner decision needed on whether an ENVIRONMENT-owned criterion may consume a developer quality attempt"
   }
  ]
 }

@@ -76,6 +76,7 @@ def criteria(ci: dict, sha: str = "") -> list[dict]:
     # SS-90: traces and mutants measured on another kernel say nothing about this one — both must name the candidate's tree
     p12_digests = list((diff.get("manifest") or {}).get("kernel_digests") or [])
     p12_on_candidate = bool(tree) and p12_digests == [tree]
+    conf = _json(EV / "TDD-POLICY-V2-CONFORMANCE.json") if (EV / "TDD-POLICY-V2-CONFORMANCE.json").is_file() else {}
     spec = _json(ROOT / "validation" / "mutation-targets.json")
     mutation_targets = {f"{t['module']}::{t['function']}" for t in spec["targets"]}      # a partial (--only) run is not the set
     unclassified = [r["id"] for r in survivors if not r.get("classification")]
@@ -102,6 +103,16 @@ def criteria(ci: dict, sha: str = "") -> list[dict]:
          and set(mut.get("targets") or []) == mutation_targets,
          {"mutation": {k: mut.get(k) for k in ("mutations_generated", "killed", "survived", "equivalent", "aisef_tree")}, "unclassified_survivors": unclassified,
           "candidate_aisef_tree": tree}),
+        # Owner decision 2026-09-20 section 6: the 100 000 traces are BROAD kernel-regression evidence. They write no
+        # story test file, so the nop control is NOT_APPLICABLE in them and the V2 proof obligations are never
+        # exercised there. The semantic evidence for the policy is the targeted real-kernel conformance suite, and it
+        # must have run on THIS product tree.
+        ("TDD proof policy V2 exercised on this product tree (targeted real-kernel conformance)",
+         conf.get("pass") is True and bool(tree) and conf.get("aisef_tree") == tree and not conf.get("aisef_dirty")
+         and (conf.get("summary") or {}).get("proof_modes_exercised") == "3/3"
+         and (conf.get("summary") or {}).get("mismatches") == 0,
+         {"conformance": {k: conf.get(k) for k in ("generated", "aisef_tree", "pass")},
+          "summary": conf.get("summary"), "candidate_aisef_tree": tree}),
         ("Linux + Windows CI green on the candidate", ci.get("all_green") is True, {"ci": ci}),
     ]
     return [{"criterion": name, "holds": bool(ok), "measured": data} for name, ok, data in rows]
