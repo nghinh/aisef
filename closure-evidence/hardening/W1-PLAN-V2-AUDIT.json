@@ -1,9 +1,9 @@
 {
  "plan": "W1-LEDGERLOCK-PLAN-V2",
- "generated": "2026-09-20T07:19:04+0700",
+ "generated": "2026-09-21T00:40:12+0700",
  "owner_decision": "STOP PROFILE HUNTING, FIX W1 PLAN + TDD PROOF POLICY (2026-09-20), section 17",
  "source": {
-  "epics": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/epics-v2.md",
+  "epics": "/Users/nghinh/Downloads/projects/ledgerlock-aiseftest-run2/_bmad-output/epics.md",
   "prd": "/Users/nghinh/Downloads/projects/ledgerlock-aiseftest-run2/_bmad-output/prd.md",
   "requirements": "/Users/nghinh/Downloads/projects/ledgerlock-aiseftest-run2/docs/requirements.md",
   "requirements_unchanged": true
