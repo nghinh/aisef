@@ -56,6 +56,13 @@ ARB1_NOTE = ("ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for by
              "(SS-55 verifier-config digest); not a waiver; kernel refusal recorded first; conditions measured in "
              "closure-evidence/hardening/w1/ARBITRATION-PREDECLARED.json")
 
+#: W1-V2: readiness is stale because the run starts from the owner-approved plan, and the driver measured that the
+#: artifacts are byte-identical to that plan base — the difference from the old signature is the plan, nothing else.
+PLAN_V2_NOTE = ("W1-LEDGERLOCK-PLAN-V2 re-approval: `stories.index.json` and `design-contract.json` are byte-identical "
+                "to the approved plan base {base}, so the readiness signature of the previous plan is stale for that "
+                "reason alone; not a waiver; the kernel's refusal on the stale gate is recorded first "
+                "(closure-evidence/hardening/W1-PLAN-V2-AUDIT.json)")
+
 
 #: The only commits a fresh run copy may carry after 8ff9f13 — the named preparation steps, nothing else.
 PREPARATION_COMMITS = ("run.cost_cap_usd=80", "sandbox.image re-pinned to the frozen candidate", "guard plugin compiled by",
@@ -487,7 +494,9 @@ class Driver:
             "execution_profile_identity_matches": prof_check.get("matches") is True,
             "same_capability_matrix": cap_matrix_ok,
             "no_stale_evidence": not stale_evidence,
-            "readiness_hash_migration_check_passes_mechanically": bool(arb1.get("stale_caused_by_the_hash_method_alone")),
+            # SS-96 cycle: the V1 basis (hash method changed, content did not) is void under W1-PLAN-V2, which
+            # rewrote the stories on purpose. Either basis proves the staleness is not this copy's doing.
+            "readiness_staleness_has_a_measured_basis": bool(arb1.get("reapproval_basis")),
         }
         if self.path:
             P["preflight"]["reviewer_dependency_command_leaves_the_tree_byte_identical"] = P["stage_env_check"].get("pass") is True
@@ -520,6 +529,25 @@ class Driver:
         self.say(f"kernel-first ok={K['ok']} exit={K['run']['exit']} {K['classification']}")
         return K["ok"]
 
+    def plan_v2_basis(self) -> dict:
+        """Is the readiness gate stale ONLY because the run starts from the owner-approved plan?
+
+        The V1 basis (`arb1_measure`) covers one case: the hash method changed and the content did not. W1-V2 starts
+        from W1-LEDGERLOCK-PLAN-V2, which rewrote the stories — so `stories.index.json` and `design-contract.json`
+        legitimately differ from what was signed in September, and the V1 basis is correctly void. The honest
+        replacement is not a weaker check but a different measurement: those artifacts must be byte-identical to the
+        same files at the plan base commit this run is defined on, so the only difference from the signature is the
+        plan the owner approved, and nothing this copy did.
+        """
+        paths = ["_bmad-output/stories.index.json", "_bmad-output/design-contract.json"]
+        base = self.a.plan_base
+        drift = [p for p in paths if self.git("diff", "--name-only", base, "HEAD", "--", p)]
+        at_base = {p: self.git("rev-parse", f"{base}:{p}") for p in paths}
+        tracked = [p for p in paths if at_base.get(p)]
+        return {"plan_base": base, "artifacts": paths, "tracked_at_the_plan_base": tracked,
+                "blob_at_the_plan_base": at_base, "changed_since_the_plan_base": drift,
+                "content_is_exactly_the_approved_plan_base": len(tracked) == len(paths) and not drift}
+
     def arb1_measure(self) -> dict:
         """The owner's re-approval covers ONE case: the hash method changed, the content did not. It is void if any
         content difference is found, so the driver measures that here, on this copy, before it approves anything."""
@@ -539,20 +567,30 @@ class Driver:
         except (ValueError, IndexError):
             m = {"error": out[-400:], "byte_identical_to_what_was_signed": False}
         m["stale_caused_by_the_hash_method_alone"] = bool(m.get("byte_identical_to_what_was_signed")) and m.get("current_method_digest") != m.get("signed_digest")
+        m["plan_v2"] = self.plan_v2_basis()
+        # Exactly one basis may justify re-approving a stale readiness, and the record says which.
+        m["reapproval_basis"] = ("ARB1_HASH_METHOD_ONLY" if m["stale_caused_by_the_hash_method_alone"] else
+                                 ("APPROVED_PLAN_BASE" if m["plan_v2"]["content_is_exactly_the_approved_plan_base"]
+                                  else ""))
         return m
 
     def approve(self) -> bool:
         self.say("phase approve: ARB-1 re-approval of readiness for byte-identical content")
         A = {"at": now(), "gates_before": self.gates(), "arb1_measured": self.arb1_measure()}
-        if not A["arb1_measured"].get("stale_caused_by_the_hash_method_alone"):
+        A["reapproval_basis"] = A["arb1_measured"].get("reapproval_basis") or ""
+        if not A["reapproval_basis"]:
             A["ok"] = False
-            A["refused"] = ("OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL is void: the readiness content is not byte-identical "
-                            "to what was signed, so this is not the approved hash-migration case. STOP and report.")
+            A["refused"] = ("no measured basis for re-approving readiness: the content is neither byte-identical to "
+                            "what was signed (the approved hash-migration case) nor byte-identical to the approved "
+                            "plan base this run starts from. STOP and report.")
             self.rec["phases"]["approve"] = A
             self.save()
             self.say("approve REFUSED: " + A["refused"])
             return False
-        A["approve"] = self.cli("approve", "readiness", "--note", ARB1_NOTE, timeout=120, save_as="approve.txt")
+        note = ARB1_NOTE if A["reapproval_basis"] == "ARB1_HASH_METHOD_ONLY" else PLAN_V2_NOTE.format(
+            base=A["arb1_measured"]["plan_v2"]["plan_base"][:12])
+        A["approve"] = self.cli("approve", "readiness", "--note", note, timeout=120, save_as="approve.txt")
+        A["approval_note"] = note
         A["gates_after"] = self.gates()
         rec = self.art / "approvals" / "readiness.json"
         A["approval_record"] = json.loads(rec.read_text(encoding="utf-8")) if rec.is_file() else None
