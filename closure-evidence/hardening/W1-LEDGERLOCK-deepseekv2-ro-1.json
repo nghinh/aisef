@@ -1803,5 +1803,14 @@
  "progress": {
   "done": 10,
   "total": 16
+ },
+ "qualification_status": {
+  "label": "W1-LEDGERLOCK-PLAN-V2 / DIAGNOSTIC RUN 1",
+  "counts_toward_qualification": false,
+  "why": "Owner decision 2026-09-21 (\"FINAL PLAN CORRECTION, KERNEL REMAINS FROZEN\"): the run is accepted as diagnostic evidence. It found a plan defect (AC-STORY-04-01-2 declared CHANGE_REQUIRED for a behaviour already green at its parent), so the plan it ran is revised; a run of a revised plan cannot qualify that plan. Excluded from the V2.1 qualification denominator.",
+  "kernel": {
+   "product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "w0_candidate": "f52df75ff242a8565b4c995e82e25a94016e95d1"
+  }
  }
 }
