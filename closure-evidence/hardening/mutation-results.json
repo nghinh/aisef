@@ -1,7 +1,7 @@
 {
  "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
  "phase": 13,
- "generated": "2026-09-20T16:18:36",
+ "generated": "2026-09-20T17:06:41",
  "aisef_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
  "aisef_dirty": false,
  "only": "",
@@ -78,84 +78,11 @@
   "DROPCALL"
  ],
  "mutations_generated": 871,
- "killed": 858,
- "survived": 4,
+ "killed": 862,
+ "survived": 0,
  "equivalent": 9,
- "survivors": [
-  {
-   "id": "e959749e40",
-   "module": "aisef/control/gate.py",
-   "function": "_tdd_check",
-   "operator": "ANDOR",
-   "site": "line 741: and ↔ or",
-   "kills_expected_by": [
-    "tests/hardening/test_unrunnable_routing.py",
-    "tests/hardening/test_policy_v2_conformance.py",
-    "tests/hardening/test_ss81_family.py",
-    "tests/test_gate.py",
-    "tests/test_tdd.py"
-   ],
-   "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
-   "status": "SURVIVED",
-   "seconds": 34.1,
-   "last_line": ""
-  },
-  {
-   "id": "7b794897ed",
-   "module": "aisef/control/gate.py",
-   "function": "_tdd_check",
-   "operator": "ANDOR",
-   "site": "line 746: and ↔ or",
-   "kills_expected_by": [
-    "tests/hardening/test_unrunnable_routing.py",
-    "tests/hardening/test_policy_v2_conformance.py",
-    "tests/hardening/test_ss81_family.py",
-    "tests/test_gate.py",
-    "tests/test_tdd.py"
-   ],
-   "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
-   "status": "SURVIVED",
-   "seconds": 34.2,
-   "last_line": ""
-  },
-  {
-   "id": "81690cdad0",
-   "module": "aisef/control/gate.py",
-   "function": "_tdd_check",
-   "operator": "STR",
-   "site": "line 726: 'test' → 'lint'",
-   "kills_expected_by": [
-    "tests/hardening/test_unrunnable_routing.py",
-    "tests/hardening/test_policy_v2_conformance.py",
-    "tests/hardening/test_ss81_family.py",
-    "tests/test_gate.py",
-    "tests/test_tdd.py"
-   ],
-   "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
-   "status": "SURVIVED",
-   "seconds": 34.8,
-   "last_line": ""
-  },
-  {
-   "id": "cb105cd931",
-   "module": "aisef/control/gate.py",
-   "function": "_tdd_check",
-   "operator": "VERDICT",
-   "site": "line 731: .NOT_APPLICABLE → .PASSED",
-   "kills_expected_by": [
-    "tests/hardening/test_unrunnable_routing.py",
-    "tests/hardening/test_policy_v2_conformance.py",
-    "tests/hardening/test_ss81_family.py",
-    "tests/test_gate.py",
-    "tests/test_tdd.py"
-   ],
-   "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
-   "status": "SURVIVED",
-   "seconds": 34.6,
-   "last_line": ""
-  }
- ],
- "elapsed_s": 1366.1,
+ "survivors": [],
+ "elapsed_s": 1365.0,
  "workers": 4,
  "rows": [
   {
@@ -171,8 +98,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.8,
-   "last_line": "1 failed in 2.49s"
+   "seconds": 2.7,
+   "last_line": "1 failed in 2.45s"
   },
   {
    "id": "10380b9f12",
@@ -187,8 +114,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.8,
-   "last_line": "1 failed in 2.49s"
+   "seconds": 2.7,
+   "last_line": "1 failed in 2.45s"
   },
   {
    "id": "c25572146f",
@@ -203,8 +130,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.7,
-   "last_line": "1 failed, 1 passed in 3.49s"
+   "seconds": 3.6,
+   "last_line": "1 failed, 1 passed in 3.39s"
   },
   {
    "id": "fa35b0cfbd",
@@ -219,8 +146,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.8,
-   "last_line": "1 failed in 2.49s"
+   "seconds": 2.7,
+   "last_line": "1 failed in 2.45s"
   },
   {
    "id": "24c90b8e2b",
@@ -235,8 +162,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.5,
-   "last_line": "1 failed, 3 passed in 3.35s"
+   "seconds": 3.4,
+   "last_line": "1 failed, 3 passed in 3.24s"
   },
   {
    "id": "47bd4f4a36",
@@ -251,8 +178,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.5,
-   "last_line": "1 failed, 3 passed in 3.35s"
+   "seconds": 3.4,
+   "last_line": "1 failed, 3 passed in 3.24s"
   },
   {
    "id": "d683b516ed",
@@ -267,8 +194,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.5,
-   "last_line": "1 failed, 3 passed in 3.36s"
+   "seconds": 3.3,
+   "last_line": "1 failed, 3 passed in 3.15s"
   },
   {
    "id": "db523fd880",
@@ -283,8 +210,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.5,
-   "last_line": "1 failed, 2 passed in 3.35s"
+   "seconds": 3.4,
+   "last_line": "1 failed, 2 passed in 3.24s"
   },
   {
    "id": "52c2cab38f",
@@ -299,8 +226,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.5,
-   "last_line": "1 failed, 1 passed in 3.28s"
+   "seconds": 3.2,
+   "last_line": "1 failed, 1 passed in 3.08s"
   },
   {
    "id": "f0835eecc7",
@@ -315,8 +242,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.5,
-   "last_line": "1 failed in 2.34s"
+   "seconds": 2.3,
+   "last_line": "1 failed in 2.17s"
   },
   {
    "id": "72ca02833e",
@@ -331,8 +258,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.0,
-   "last_line": "1 failed in 1.83s"
+   "seconds": 1.9,
+   "last_line": "1 failed in 1.74s"
   },
   {
    "id": "75d3a7d769",
@@ -347,8 +274,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.5,
-   "last_line": "1 failed, 2 passed in 3.30s"
+   "seconds": 3.3,
+   "last_line": "1 failed, 2 passed in 3.12s"
   },
   {
    "id": "c89459e374",
@@ -363,8 +290,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.0,
-   "last_line": "1 failed in 1.86s"
+   "seconds": 1.9,
+   "last_line": "1 failed in 1.73s"
   },
   {
    "id": "33570e3fec",
@@ -379,8 +306,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.6,
-   "last_line": "1 failed, 1 passed in 3.43s"
+   "seconds": 3.4,
+   "last_line": "1 failed, 1 passed in 3.21s"
   },
   {
    "id": "ce14d44746",
@@ -395,8 +322,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.5,
-   "last_line": "1 failed, 39 passed in 3.36s"
+   "seconds": 3.3,
+   "last_line": "1 failed, 39 passed in 3.16s"
   },
   {
    "id": "bf1638e169",
@@ -411,8 +338,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.5,
-   "last_line": "1 failed, 39 passed in 3.37s"
+   "seconds": 3.3,
+   "last_line": "1 failed, 39 passed in 3.15s"
   },
   {
    "id": "9c6f9d12e3",
@@ -427,8 +354,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.5,
-   "last_line": "1 failed, 39 passed in 3.31s"
+   "seconds": 3.3,
+   "last_line": "1 failed, 39 passed in 3.17s"
   },
   {
    "id": "0394d55e0f",
@@ -443,8 +370,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.5,
-   "last_line": "1 failed, 40 passed in 3.30s"
+   "seconds": 3.4,
+   "last_line": "1 failed, 40 passed in 3.19s"
   },
   {
    "id": "bad47e9b63",
@@ -459,8 +386,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.6,
-   "last_line": "1 failed, 1 passed in 3.41s"
+   "seconds": 3.5,
+   "last_line": "1 failed, 1 passed in 3.28s"
   },
   {
    "id": "f038d5994f",
@@ -475,8 +402,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.4,
-   "last_line": "1 failed, 2 passed in 3.27s"
+   "seconds": 3.3,
+   "last_line": "1 failed, 2 passed in 3.14s"
   },
   {
    "id": "503f19b41a",
@@ -491,8 +418,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.6,
-   "last_line": "1 failed, 1 passed in 3.41s"
+   "seconds": 3.5,
+   "last_line": "1 failed, 1 passed in 3.32s"
   },
   {
    "id": "53ee81f53f",
@@ -507,8 +434,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.5,
-   "last_line": "1 failed, 39 passed in 3.27s"
+   "seconds": 3.4,
+   "last_line": "1 failed, 39 passed in 3.20s"
   },
   {
    "id": "f28bdbfb4d",
@@ -523,8 +450,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 3.4,
-   "last_line": "1 failed, 2 passed in 3.22s"
+   "seconds": 3.3,
+   "last_line": "1 failed, 2 passed in 3.14s"
   },
   {
    "id": "79ddfd39cc",
@@ -539,8 +466,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.6,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.38s"
+   "seconds": 2.5,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.33s"
   },
   {
    "id": "a55e65e0f8",
@@ -555,8 +482,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.6,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.45s"
+   "seconds": 2.5,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.32s"
   },
   {
    "id": "b9ac456f54",
@@ -571,8 +498,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.6,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.43s"
+   "seconds": 2.5,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.29s"
   },
   {
    "id": "068f6cf42e",
@@ -587,8 +514,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.6,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.46s"
+   "seconds": 2.5,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.33s"
   },
   {
    "id": "cc1fd55cb4",
@@ -603,8 +530,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.6,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.43s"
+   "seconds": 2.5,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.28s"
   },
   {
    "id": "6d0298057a",
@@ -620,7 +547,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed in 0.62s"
+   "last_line": "1 failed in 0.61s"
   },
   {
    "id": "8941a571cb",
@@ -635,8 +562,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.6,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.37s"
+   "seconds": 2.5,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.29s"
   },
   {
    "id": "022c5e7395",
@@ -652,7 +579,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed in 0.47s"
+   "last_line": "1 failed in 0.45s"
   },
   {
    "id": "f2c9c6c6aa",
@@ -668,7 +595,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.5,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.37s"
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.30s"
   },
   {
    "id": "aa3eb063c6",
@@ -683,8 +610,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.6,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.40s"
+   "seconds": 2.5,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.32s"
   },
   {
    "id": "c9cf87a50e",
@@ -699,7 +626,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed in 0.67s"
+   "last_line": "1 failed in 0.63s"
   },
   {
    "id": "e94b5c7be0",
@@ -713,8 +640,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.7,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.50s"
+   "seconds": 2.6,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.40s"
   },
   {
    "id": "d8623217d8",
@@ -729,7 +656,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.6,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.46s"
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.40s"
   },
   {
    "id": "df1bb5f303",
@@ -743,8 +670,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.9,
-   "last_line": "1 failed in 0.68s"
+   "seconds": 0.8,
+   "last_line": "1 failed in 0.65s"
   },
   {
    "id": "90cfb00cca",
@@ -758,8 +685,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.5,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.32s"
+   "seconds": 2.4,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.26s"
   },
   {
    "id": "db74573fd9",
@@ -774,7 +701,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.5,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.32s"
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.29s"
   },
   {
    "id": "51d75e45f1",
@@ -789,7 +716,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.5,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.38s"
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.35s"
   },
   {
    "id": "04215a2165",
@@ -804,7 +731,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.5,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.36s"
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.31s"
   },
   {
    "id": "1844eef554",
@@ -819,7 +746,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed in 0.58s"
+   "last_line": "1 failed in 0.59s"
   },
   {
    "id": "56561beeb5",
@@ -833,8 +760,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.6,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.42s"
+   "seconds": 2.5,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.32s"
   },
   {
    "id": "5951e211c2",
@@ -848,8 +775,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.8,
-   "last_line": "1 failed in 0.62s"
+   "seconds": 0.7,
+   "last_line": "1 failed in 0.56s"
   },
   {
    "id": "1c6d9a4e72",
@@ -863,8 +790,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.6,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.40s"
+   "seconds": 2.5,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.35s"
   },
   {
    "id": "ca2b7233f8",
@@ -878,8 +805,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.6,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.47s"
+   "seconds": 2.5,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.35s"
   },
   {
    "id": "4f229f766d",
@@ -893,8 +820,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.8,
-   "last_line": "1 failed in 0.59s"
+   "seconds": 0.7,
+   "last_line": "1 failed in 0.56s"
   },
   {
    "id": "ea32699dd5",
@@ -908,8 +835,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.8,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.58s"
+   "seconds": 2.5,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.38s"
   },
   {
    "id": "620f9a5c30",
@@ -923,8 +850,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.8,
-   "last_line": "1 failed in 0.60s"
+   "seconds": 0.7,
+   "last_line": "1 failed in 0.56s"
   },
   {
    "id": "a0471547e1",
@@ -939,7 +866,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed in 0.63s"
+   "last_line": "1 failed in 0.60s"
   },
   {
    "id": "f5a149a4b7",
@@ -954,7 +881,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed in 0.64s"
+   "last_line": "1 failed in 0.59s"
   },
   {
    "id": "f9c6db3969",
@@ -968,8 +895,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.9,
-   "last_line": "1 failed in 0.71s"
+   "seconds": 0.8,
+   "last_line": "1 failed in 0.58s"
   },
   {
    "id": "41acf76c1c",
@@ -984,7 +911,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed in 0.66s"
+   "last_line": "1 failed in 0.62s"
   },
   {
    "id": "1d6f05a3ab",
@@ -998,8 +925,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.9,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.71s"
+   "seconds": 2.6,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.44s"
   },
   {
    "id": "ddf33ba931",
@@ -1013,8 +940,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.9,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.72s"
+   "seconds": 2.6,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.45s"
   },
   {
    "id": "4a88f80c8b",
@@ -1029,7 +956,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.9,
-   "last_line": "1 failed in 0.69s"
+   "last_line": "1 failed in 0.67s"
   },
   {
    "id": "6860c8a1a5",
@@ -1043,8 +970,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.9,
-   "last_line": "1 failed in 0.72s"
+   "seconds": 0.8,
+   "last_line": "1 failed in 0.68s"
   },
   {
    "id": "5740ca5737",
@@ -1058,8 +985,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.7,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.56s"
+   "seconds": 2.6,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.47s"
   },
   {
    "id": "62c23f1868",
@@ -1074,7 +1001,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.7,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.52s"
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.50s"
   },
   {
    "id": "1dc06468c1",
@@ -1089,7 +1016,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.7,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.56s"
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.49s"
   },
   {
    "id": "3a2be6af10",
@@ -1103,8 +1030,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.9,
-   "last_line": "1 failed in 0.74s"
+   "seconds": 0.8,
+   "last_line": "1 failed in 0.65s"
   },
   {
    "id": "9944f5e807",
@@ -1118,8 +1045,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.9,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.69s"
+   "seconds": 2.7,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.53s"
   },
   {
    "id": "9835156290",
@@ -1133,8 +1060,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.9,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.72s"
+   "seconds": 2.7,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.51s"
   },
   {
    "id": "8d410f2d04",
@@ -1148,8 +1075,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.8,
-   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.65s"
+   "seconds": 2.7,
+   "last_line": "1 failed, 22 passed, 58 subtests passed in 2.51s"
   },
   {
    "id": "1707185810",
@@ -1163,8 +1090,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.9,
-   "last_line": "1 failed in 0.70s"
+   "seconds": 0.8,
+   "last_line": "1 failed in 0.67s"
   },
   {
    "id": "68f89f5f25",
@@ -1181,7 +1108,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed in 0.35s"
+   "last_line": "1 failed in 0.30s"
   },
   {
    "id": "5be82c3249",
@@ -1198,7 +1125,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed in 0.30s"
+   "last_line": "1 failed in 0.29s"
   },
   {
    "id": "edf8ecdf0f",
@@ -1215,7 +1142,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed in 0.35s"
+   "last_line": "1 failed in 0.30s"
   },
   {
    "id": "a2aa13d3a2",
@@ -1232,7 +1159,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed in 0.34s"
+   "last_line": "1 failed in 0.32s"
   },
   {
    "id": "bc8b3ada72",
@@ -1249,7 +1176,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed in 0.30s"
+   "last_line": "1 failed in 0.29s"
   },
   {
    "id": "d68c68b1c1",
@@ -1266,7 +1193,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed in 0.29s"
+   "last_line": "1 failed in 0.30s"
   },
   {
    "id": "cd48df0cd4",
@@ -1300,7 +1227,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed in 0.33s"
+   "last_line": "1 failed in 0.32s"
   },
   {
    "id": "229f7c25e5",
@@ -1317,7 +1244,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed, 3 passed in 0.65s"
+   "last_line": "1 failed, 3 passed in 0.60s"
   },
   {
    "id": "156cd58996",
@@ -1350,7 +1277,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 1 passed in 0.28s"
+   "last_line": "1 failed, 1 passed in 0.27s"
   },
   {
    "id": "8ba15c345d",
@@ -1381,8 +1308,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 1 passed in 0.29s"
+   "seconds": 0.4,
+   "last_line": "1 failed, 1 passed in 0.28s"
   },
   {
    "id": "c4e3d61a86",
@@ -1398,7 +1325,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 22 passed in 0.32s"
+   "last_line": "1 failed, 22 passed in 0.31s"
   },
   {
    "id": "ef7ef8b763",
@@ -1414,7 +1341,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 1 passed in 0.30s"
+   "last_line": "1 failed, 1 passed in 0.32s"
   },
   {
    "id": "6c0027f851",
@@ -1446,8 +1373,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed in 0.30s"
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.29s"
   },
   {
    "id": "accb243e9d",
@@ -1463,8 +1390,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed in 0.30s"
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.29s"
   },
   {
    "id": "535a33bc20",
@@ -1480,8 +1407,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed in 0.31s"
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.29s"
   },
   {
    "id": "9d973424ec",
@@ -1498,7 +1425,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 27 passed in 0.43s"
+   "last_line": "1 failed, 27 passed in 0.42s"
   },
   {
    "id": "0615046fa8",
@@ -1515,7 +1442,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 5 passed in 0.32s"
+   "last_line": "1 failed, 5 passed in 0.31s"
   },
   {
    "id": "545593fc69",
@@ -1531,8 +1458,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 1.2,
-   "last_line": "1 failed, 56 passed in 1.04s"
+   "seconds": 1.0,
+   "last_line": "1 failed, 56 passed in 0.74s"
   },
   {
    "id": "3305f61567",
@@ -1549,7 +1476,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 5 passed in 0.32s"
+   "last_line": "1 failed, 5 passed in 0.31s"
   },
   {
    "id": "d066049ccf",
@@ -1566,7 +1493,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 5 passed in 0.35s"
+   "last_line": "1 failed, 5 passed in 0.33s"
   },
   {
    "id": "b019ff5f22",
@@ -1582,8 +1509,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.9,
-   "last_line": "1 failed, 6 passed in 0.59s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 6 passed in 0.45s"
   },
   {
    "id": "40d7fe1e73",
@@ -1599,8 +1526,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 1.2,
-   "last_line": "1 failed, 57 passed in 0.95s"
+   "seconds": 1.0,
+   "last_line": "1 failed, 57 passed in 0.83s"
   },
   {
    "id": "c69eb99a2c",
@@ -1616,8 +1543,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 1.3,
-   "last_line": "1 failed, 61 passed in 1.15s"
+   "seconds": 1.0,
+   "last_line": "1 failed, 61 passed in 0.89s"
   },
   {
    "id": "1242ed0dd8",
@@ -1634,7 +1561,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 1.0,
-   "last_line": "1 failed, 58 passed in 0.84s"
+   "last_line": "1 failed, 58 passed in 0.82s"
   },
   {
    "id": "2dd23458d3",
@@ -1650,8 +1577,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 5 passed in 0.37s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 5 passed in 0.32s"
   },
   {
    "id": "2076572db9",
@@ -1666,8 +1593,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.9,
-   "last_line": "1 failed, 13 passed in 0.71s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 13 passed in 0.46s"
   },
   {
    "id": "1ddbdf333c",
@@ -1682,8 +1609,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 15 passed in 0.49s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 15 passed in 0.47s"
   },
   {
    "id": "ddb7286e43",
@@ -1698,8 +1625,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 13 passed in 0.47s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 13 passed in 0.46s"
   },
   {
    "id": "4251a1acd8",
@@ -1715,7 +1642,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 6 passed in 0.34s"
+   "last_line": "1 failed, 6 passed in 0.33s"
   },
   {
    "id": "ae96cedd46",
@@ -1730,8 +1657,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 1.0,
-   "last_line": "1 failed, 59 passed in 0.85s"
+   "seconds": 0.9,
+   "last_line": "1 failed, 59 passed in 0.69s"
   },
   {
    "id": "2ac62b01ab",
@@ -1746,8 +1673,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 1.2,
-   "last_line": "1 failed, 62 passed in 1.01s"
+   "seconds": 0.9,
+   "last_line": "1 failed, 62 passed in 0.71s"
   },
   {
    "id": "a59e1ec8ab",
@@ -1762,8 +1689,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 13 passed in 0.49s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 13 passed in 0.46s"
   },
   {
    "id": "c64e554c5a",
@@ -1778,8 +1705,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.9,
-   "last_line": "1 failed, 13 passed in 0.59s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 13 passed in 0.45s"
   },
   {
    "id": "f2bd31d156",
@@ -1795,7 +1722,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 6 passed in 0.34s"
+   "last_line": "1 failed, 6 passed in 0.39s"
   },
   {
    "id": "ea3c9070e4",
@@ -1810,8 +1737,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 1.1,
-   "last_line": "1 failed, 62 passed in 0.88s"
+   "seconds": 0.9,
+   "last_line": "1 failed, 62 passed in 0.79s"
   },
   {
    "id": "34a014a0f7",
@@ -1826,8 +1753,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 13 passed in 0.46s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 13 passed in 0.44s"
   },
   {
    "id": "896c9ab228",
@@ -1842,8 +1769,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 14 passed in 0.54s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 14 passed in 0.42s"
   },
   {
    "id": "4cb4f1b7a5",
@@ -1859,7 +1786,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 16 passed in 0.45s"
+   "last_line": "1 failed, 16 passed in 0.40s"
   },
   {
    "id": "059cc9d759",
@@ -1874,8 +1801,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 16 passed in 0.48s"
+   "seconds": 0.7,
+   "last_line": "1 failed, 16 passed in 0.50s"
   },
   {
    "id": "05b4cef4fd",
@@ -1891,7 +1818,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 1.0,
-   "last_line": "1 failed, 60 passed in 0.82s"
+   "last_line": "1 failed, 60 passed in 0.87s"
   },
   {
    "id": "8b805aaf81",
@@ -1906,8 +1833,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.9,
-   "last_line": "1 failed, 60 passed in 0.71s"
+   "seconds": 1.0,
+   "last_line": "1 failed, 60 passed in 0.73s"
   },
   {
    "id": "842c8d0b03",
@@ -1923,7 +1850,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 13 passed in 0.53s"
+   "last_line": "1 failed, 13 passed in 0.51s"
   },
   {
    "id": "a96962ce8a",
@@ -1939,7 +1866,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 1.0,
-   "last_line": "1 failed, 59 passed in 0.85s"
+   "last_line": "1 failed, 59 passed in 0.81s"
   },
   {
    "id": "9b9d894d1f",
@@ -1954,8 +1881,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 13 passed in 0.46s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 13 passed in 0.38s"
   },
   {
    "id": "192e5a90e3",
@@ -1985,8 +1912,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 1.0,
-   "last_line": "1 failed, 62 passed in 0.80s"
+   "seconds": 0.9,
+   "last_line": "1 failed, 62 passed in 0.75s"
   },
   {
    "id": "60061c7068",
@@ -2001,8 +1928,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 13 passed in 0.38s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 13 passed in 0.42s"
   },
   {
    "id": "e744f9af8d",
@@ -2018,7 +1945,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 16 passed in 0.38s"
+   "last_line": "1 failed, 16 passed in 0.37s"
   },
   {
    "id": "8a19a4fa3a",
@@ -2034,7 +1961,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 16 passed in 0.41s"
+   "last_line": "1 failed, 16 passed in 0.43s"
   },
   {
    "id": "7a680faec0",
@@ -2049,7 +1976,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 20 passed in 0.28s"
+   "last_line": "1 failed, 20 passed in 0.29s"
   },
   {
    "id": "540b6e188c",
@@ -2064,7 +1991,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 9 passed in 0.28s"
+   "last_line": "1 failed, 9 passed in 0.27s"
   },
   {
    "id": "db3471ec2c",
@@ -2078,8 +2005,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 20 passed in 0.31s"
+   "seconds": 0.4,
+   "last_line": "1 failed, 20 passed in 0.29s"
   },
   {
    "id": "6628bc02e4",
@@ -2093,8 +2020,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.8,
-   "last_line": "1 failed, 20 passed in 0.58s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 20 passed in 0.35s"
   },
   {
    "id": "f875a65630",
@@ -2109,7 +2036,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 9 passed in 0.28s"
+   "last_line": "1 failed, 9 passed in 0.27s"
   },
   {
    "id": "bb746a087b",
@@ -2123,8 +2050,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 9 passed in 0.29s"
+   "seconds": 0.4,
+   "last_line": "1 failed, 9 passed in 0.28s"
   },
   {
    "id": "00b0ae95cb",
@@ -2139,7 +2066,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 20 passed in 0.31s"
+   "last_line": "1 failed, 20 passed in 0.30s"
   },
   {
    "id": "d65baddba2",
@@ -2153,8 +2080,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 9 passed in 0.36s"
+   "seconds": 0.4,
+   "last_line": "1 failed, 9 passed in 0.28s"
   },
   {
    "id": "6cdbb276dd",
@@ -2170,7 +2097,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed in 0.28s"
+   "last_line": "1 failed in 0.26s"
   },
   {
    "id": "9e6d9fe260",
@@ -2186,7 +2113,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 4 passed in 0.27s"
+   "last_line": "1 failed, 4 passed in 0.28s"
   },
   {
    "id": "be2161c91b",
@@ -2202,7 +2129,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 21 passed in 0.29s"
+   "last_line": "1 failed, 21 passed in 0.30s"
   },
   {
    "id": "31a2eab978",
@@ -2217,8 +2144,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed in 0.38s"
+   "seconds": 0.5,
+   "last_line": "1 failed in 0.29s"
   },
   {
    "id": "c79a452b0e",
@@ -2281,8 +2208,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed in 0.41s"
+   "seconds": 0.5,
+   "last_line": "1 failed in 0.27s"
   },
   {
    "id": "4e9163fc58",
@@ -2314,7 +2241,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 9 passed in 0.27s"
+   "last_line": "1 failed, 9 passed in 0.26s"
   },
   {
    "id": "27599a6a93",
@@ -2330,7 +2257,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 10 passed in 0.26s"
+   "last_line": "1 failed, 10 passed in 0.27s"
   },
   {
    "id": "67c9cfc020",
@@ -2345,8 +2272,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed in 0.30s"
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.26s"
   },
   {
    "id": "84a105348a",
@@ -2360,7 +2287,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.18s"
+   "last_line": "1 failed in 0.17s"
   },
   {
    "id": "ed54b2ddec",
@@ -2401,8 +2328,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.3,
-   "last_line": "1 failed in 0.19s"
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.25s"
   },
   {
    "id": "ea28111d93",
@@ -2457,8 +2384,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed in 0.33s"
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.19s"
   },
   {
    "id": "3d49b928f9",
@@ -2486,7 +2413,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed, 1 passed in 0.18s"
+   "last_line": "1 failed, 1 passed in 0.17s"
   },
   {
    "id": "c49b94afcd",
@@ -2500,7 +2427,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed, 1 passed in 0.19s"
+   "last_line": "1 failed, 1 passed in 0.16s"
   },
   {
    "id": "63b39be592",
@@ -2513,8 +2440,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.3,
-   "last_line": "1 failed, 1 passed in 0.19s"
+   "seconds": 0.4,
+   "last_line": "1 failed, 1 passed in 0.28s"
   },
   {
    "id": "3067a4fe8c",
@@ -2542,7 +2469,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed, 1 passed in 0.17s"
+   "last_line": "1 failed, 1 passed in 0.16s"
   },
   {
    "id": "2095f624fe",
@@ -2556,7 +2483,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed, 1 passed in 0.17s"
+   "last_line": "1 failed, 1 passed in 0.16s"
   },
   {
    "id": "6597155f10",
@@ -2570,8 +2497,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 5.1,
-   "last_line": "1 failed, 5 passed in 4.98s"
+   "seconds": 5.0,
+   "last_line": "1 failed, 5 passed in 4.87s"
   },
   {
    "id": "bdb6f16992",
@@ -2585,8 +2512,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 5.6,
-   "last_line": "1 failed, 6 passed in 5.43s"
+   "seconds": 5.5,
+   "last_line": "1 failed, 6 passed in 5.39s"
   },
   {
    "id": "92b85ff130",
@@ -2601,7 +2528,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.19s"
+   "last_line": "1 failed in 0.20s"
   },
   {
    "id": "0f233ecf10",
@@ -2615,8 +2542,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 10.1,
-   "last_line": "1 failed, 6 passed in 9.95s"
+   "seconds": 10.0,
+   "last_line": "1 failed, 6 passed in 9.86s"
   },
   {
    "id": "1b2149d0b3",
@@ -2631,7 +2558,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 4.4,
-   "last_line": "1 failed in 4.29s"
+   "last_line": "1 failed in 4.26s"
   },
   {
    "id": "d4dbad2e20",
@@ -2645,7 +2572,7 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 900.0,
+   "seconds": 900.1,
    "last_line": "timeout (treated as killed: the mutant hung the suite)"
   },
   {
@@ -2660,7 +2587,7 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 900.0,
+   "seconds": 900.1,
    "last_line": "timeout (treated as killed: the mutant hung the suite)"
   },
   {
@@ -2704,8 +2631,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 10.1,
-   "last_line": "1 failed, 6 passed in 9.98s"
+   "seconds": 10.2,
+   "last_line": "1 failed, 6 passed in 10.05s"
   },
   {
    "id": "6365821dcd",
@@ -2734,7 +2661,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 4.4,
-   "last_line": "1 failed in 4.22s"
+   "last_line": "1 failed in 4.24s"
   },
   {
    "id": "3f5f5c7bbb",
@@ -2752,7 +2679,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.4,
-   "last_line": "1 failed, 8 passed in 2.17s"
+   "last_line": "1 failed, 8 passed in 2.19s"
   },
   {
    "id": "1332250396",
@@ -2769,8 +2696,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.5,
-   "last_line": "1 failed, 8 passed in 2.38s"
+   "seconds": 2.6,
+   "last_line": "1 failed, 8 passed in 2.40s"
   },
   {
    "id": "9d9964f021",
@@ -2788,7 +2715,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.4,
-   "last_line": "1 failed, 8 passed in 2.30s"
+   "last_line": "1 failed, 8 passed in 2.31s"
   },
   {
    "id": "84698abc3e",
@@ -2824,7 +2751,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.3,
-   "last_line": "1 failed, 8 passed in 2.14s"
+   "last_line": "1 failed, 8 passed in 2.15s"
   },
   {
    "id": "546f6a80b6",
@@ -2841,8 +2768,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.6,
-   "last_line": "1 failed, 8 passed in 2.44s"
+   "seconds": 2.5,
+   "last_line": "1 failed, 8 passed in 2.32s"
   },
   {
    "id": "76f145ab0f",
@@ -2876,8 +2803,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.5,
-   "last_line": "1 failed, 12 passed in 2.40s"
+   "seconds": 2.4,
+   "last_line": "1 failed, 12 passed in 2.32s"
   },
   {
    "id": "f3df5c5167",
@@ -2913,7 +2840,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.3,
-   "last_line": "1 failed, 9 passed in 2.21s"
+   "last_line": "1 failed, 9 passed in 2.15s"
   },
   {
    "id": "cbb4eee2e8",
@@ -2949,7 +2876,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.5,
-   "last_line": "1 failed, 9 passed in 2.38s"
+   "last_line": "1 failed, 9 passed in 2.37s"
   },
   {
    "id": "bb2de60b03",
@@ -2967,7 +2894,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.4,
-   "last_line": "1 failed, 9 passed in 2.25s"
+   "last_line": "1 failed, 9 passed in 2.24s"
   },
   {
    "id": "d6c4855fff",
@@ -2984,8 +2911,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.4,
-   "last_line": "1 failed, 9 passed in 2.23s"
+   "seconds": 2.3,
+   "last_line": "1 failed, 9 passed in 2.16s"
   },
   {
    "id": "c1a75443f6",
@@ -3003,7 +2930,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.5,
-   "last_line": "1 failed, 9 passed in 2.34s"
+   "last_line": "1 failed, 9 passed in 2.39s"
   },
   {
    "id": "1fd98c125d",
@@ -3020,8 +2947,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.6,
-   "last_line": "1 failed, 9 passed in 2.43s"
+   "seconds": 2.5,
+   "last_line": "1 failed, 9 passed in 2.30s"
   },
   {
    "id": "fed654c05c",
@@ -3056,7 +2983,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.4,
-   "last_line": "1 failed, 8 passed in 2.27s"
+   "last_line": "1 failed, 8 passed in 2.25s"
   },
   {
    "id": "f6301fa81c",
@@ -3074,7 +3001,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.4,
-   "last_line": "1 failed, 9 passed in 2.28s"
+   "last_line": "1 failed, 9 passed in 2.25s"
   },
   {
    "id": "9d7fb090a5",
@@ -3092,7 +3019,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.5,
-   "last_line": "1 failed, 9 passed in 2.39s"
+   "last_line": "1 failed, 9 passed in 2.34s"
   },
   {
    "id": "8d35245dd0",
@@ -3110,7 +3037,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.5,
-   "last_line": "1 failed, 9 passed in 2.33s"
+   "last_line": "1 failed, 9 passed in 2.32s"
   },
   {
    "id": "6ec1ba33e6",
@@ -3127,7 +3054,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.4,
-   "last_line": "1 failed, 8 passed in 2.28s"
+   "last_line": "1 failed, 8 passed in 2.30s"
   },
   {
    "id": "a0761e309f",
@@ -3144,7 +3071,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.4,
-   "last_line": "1 failed, 10 passed in 2.28s"
+   "last_line": "1 failed, 10 passed in 2.27s"
   },
   {
    "id": "c6c29aadbf",
@@ -3160,8 +3087,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.6,
-   "last_line": "1 failed, 10 passed in 2.42s"
+   "seconds": 2.7,
+   "last_line": "1 failed, 10 passed in 2.51s"
   },
   {
    "id": "beca5a756f",
@@ -3177,8 +3104,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 2.5,
-   "last_line": "1 failed, 8 passed in 2.40s"
+   "seconds": 2.6,
+   "last_line": "1 failed, 8 passed in 2.44s"
   },
   {
    "id": "27eee1bcd1",
@@ -3195,7 +3122,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.4,
-   "last_line": "1 failed, 8 passed in 2.25s"
+   "last_line": "1 failed, 8 passed in 2.26s"
   },
   {
    "id": "bcd2ac7062",
@@ -3229,7 +3156,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.5,
-   "last_line": "1 failed, 10 passed in 2.35s"
+   "last_line": "1 failed, 10 passed in 2.39s"
   },
   {
    "id": "c2a08aabcc",
@@ -3246,7 +3173,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.5,
-   "last_line": "1 failed, 10 passed in 2.39s"
+   "last_line": "1 failed, 10 passed in 2.40s"
   },
   {
    "id": "5098222703",
@@ -3263,7 +3190,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.4,
-   "last_line": "1 failed, 10 passed in 2.26s"
+   "last_line": "1 failed, 10 passed in 2.28s"
   },
   {
    "id": "419d724e54",
@@ -3280,7 +3207,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 2.4,
-   "last_line": "1 failed, 8 passed in 2.27s"
+   "last_line": "1 failed, 8 passed in 2.28s"
   },
   {
    "id": "2af07a8278",
@@ -3294,8 +3221,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.3,
-   "last_line": "1 failed in 0.20s"
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.21s"
   },
   {
    "id": "79e48be9e7",
@@ -3310,7 +3237,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed, 1 passed in 0.20s"
+   "last_line": "1 failed, 1 passed in 0.21s"
   },
   {
    "id": "34cf8717df",
@@ -3387,7 +3314,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 7.4,
-   "last_line": "1 failed, 1 passed in 7.28s"
+   "last_line": "1 failed, 1 passed in 7.27s"
   },
   {
    "id": "77ade90fd6",
@@ -3404,7 +3331,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 10.4,
-   "last_line": "1 failed, 3 passed in 10.31s"
+   "last_line": "1 failed, 3 passed in 10.30s"
   },
   {
    "id": "6c692f0558",
@@ -3420,8 +3347,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 8.0,
-   "last_line": "1 failed, 1 passed in 7.82s"
+   "seconds": 7.6,
+   "last_line": "1 failed, 1 passed in 7.48s"
   },
   {
    "id": "6b06220bd7",
@@ -3437,8 +3364,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 18.2,
-   "last_line": "1 failed, 13 passed in 18.10s"
+   "seconds": 17.7,
+   "last_line": "1 failed, 13 passed in 17.54s"
   },
   {
    "id": "a218501c76",
@@ -3455,7 +3382,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 10.4,
-   "last_line": "1 failed, 3 passed in 10.31s"
+   "last_line": "1 failed, 3 passed in 10.30s"
   },
   {
    "id": "8d604ca9fc",
@@ -3472,7 +3399,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 7.4,
-   "last_line": "1 failed, 1 passed in 7.27s"
+   "last_line": "1 failed, 1 passed in 7.28s"
   },
   {
    "id": "04c17646de",
@@ -3487,8 +3414,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 5.5,
-   "last_line": "1 failed, 1 passed in 5.33s"
+   "seconds": 5.3,
+   "last_line": "1 failed, 1 passed in 5.13s"
   },
   {
    "id": "cce42f220b",
@@ -3503,8 +3430,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 8.6,
-   "last_line": "1 failed, 1 passed in 8.42s"
+   "seconds": 8.3,
+   "last_line": "1 failed, 1 passed in 8.20s"
   },
   {
    "id": "6e20e13290",
@@ -3520,7 +3447,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 8.1,
-   "last_line": "1 failed, 1 passed in 7.98s"
+   "last_line": "1 failed, 1 passed in 8.01s"
   },
   {
    "id": "ef8f9427a6",
@@ -3535,8 +3462,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 5.2,
-   "last_line": "1 failed, 1 passed in 5.07s"
+   "seconds": 5.1,
+   "last_line": "1 failed, 1 passed in 5.01s"
   },
   {
    "id": "5fee977cc2",
@@ -3551,8 +3478,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 7.6,
-   "last_line": "1 failed, 1 passed in 7.45s"
+   "seconds": 7.5,
+   "last_line": "1 failed, 1 passed in 7.36s"
   },
   {
    "id": "ba4f8e4cb3",
@@ -3583,8 +3510,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 7.4,
-   "last_line": "1 failed, 1 passed in 7.24s"
+   "seconds": 7.3,
+   "last_line": "1 failed, 1 passed in 7.19s"
   },
   {
    "id": "9912b6955e",
@@ -3600,7 +3527,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 8.2,
-   "last_line": "1 failed, 1 passed in 8.04s"
+   "last_line": "1 failed, 1 passed in 8.03s"
   },
   {
    "id": "6456d5a0e4",
@@ -3618,7 +3545,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 17.9,
-   "last_line": "1 failed, 17 passed in 17.78s"
+   "last_line": "1 failed, 17 passed in 17.73s"
   },
   {
    "id": "4c24ed83a8",
@@ -3635,8 +3562,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 17.9,
-   "last_line": "1 failed, 17 passed in 17.78s"
+   "seconds": 17.7,
+   "last_line": "1 failed, 17 passed in 17.51s"
   },
   {
    "id": "1000dfa075",
@@ -3689,8 +3616,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 17.7,
-   "last_line": "1 failed, 17 passed in 17.56s"
+   "seconds": 17.6,
+   "last_line": "1 failed, 17 passed in 17.49s"
   },
   {
    "id": "d041cf14c0",
@@ -3707,8 +3634,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 17.6,
-   "last_line": "1 failed, 15 passed in 17.45s"
+   "seconds": 17.5,
+   "last_line": "1 failed, 15 passed in 17.39s"
   },
   {
    "id": "2d88620440",
@@ -3725,8 +3652,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 17.3,
-   "last_line": "1 failed, 15 passed in 17.12s"
+   "seconds": 17.2,
+   "last_line": "1 failed, 15 passed in 17.09s"
   },
   {
    "id": "9eda3d91c3",
@@ -3743,8 +3670,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 16.6,
-   "last_line": "1 failed, 12 passed in 16.46s"
+   "seconds": 16.5,
+   "last_line": "1 failed, 12 passed in 16.35s"
   },
   {
    "id": "43f71064de",
@@ -3762,7 +3689,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 4.9,
-   "last_line": "1 failed, 1 passed in 4.80s"
+   "last_line": "1 failed, 1 passed in 4.77s"
   },
   {
    "id": "49f78c931f",
@@ -3779,8 +3706,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 18.0,
-   "last_line": "1 failed, 15 passed in 17.90s"
+   "seconds": 17.2,
+   "last_line": "1 failed, 15 passed in 17.10s"
   },
   {
    "id": "80b8865f45",
@@ -3798,7 +3725,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 6.6,
-   "last_line": "1 failed, 1 passed in 6.45s"
+   "last_line": "1 failed, 1 passed in 6.50s"
   },
   {
    "id": "d3613c1a11",
@@ -3816,7 +3743,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 17.2,
-   "last_line": "1 failed, 15 passed in 17.04s"
+   "last_line": "1 failed, 15 passed in 17.03s"
   },
   {
    "id": "c72ac1c734",
@@ -3833,8 +3760,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 18.0,
-   "last_line": "1 failed, 15 passed in 17.84s"
+   "seconds": 17.3,
+   "last_line": "1 failed, 15 passed in 17.18s"
   },
   {
    "id": "d75dbd8a82",
@@ -3851,8 +3778,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 17.8,
-   "last_line": "1 failed, 18 passed in 17.70s"
+   "seconds": 17.0,
+   "last_line": "1 failed, 18 passed in 16.90s"
   },
   {
    "id": "7ad904c0b5",
@@ -3870,7 +3797,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 17.1,
-   "last_line": "1 failed, 24 passed in 17.00s"
+   "last_line": "1 failed, 24 passed in 16.99s"
   },
   {
    "id": "65112ae536",
@@ -3887,8 +3814,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 16.9,
-   "last_line": "1 failed, 15 passed in 16.81s"
+   "seconds": 17.1,
+   "last_line": "1 failed, 15 passed in 16.95s"
   },
   {
    "id": "cb7f47841d",
@@ -3905,7 +3832,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 1.7,
-   "last_line": "1 failed, 6 passed, 1 skipped in 1.53s"
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.52s"
   },
   {
    "id": "c0fdd2b244",
@@ -3921,8 +3848,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 1.9,
-   "last_line": "1 failed, 6 passed, 1 skipped in 1.78s"
+   "seconds": 2.1,
+   "last_line": "1 failed, 6 passed, 1 skipped in 2.00s"
   },
   {
    "id": "5ee58fa2d3",
@@ -3939,7 +3866,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 1.5,
-   "last_line": "1 failed, 6 passed, 1 skipped in 1.39s"
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.41s"
   },
   {
    "id": "32689ce01a",
@@ -3955,8 +3882,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 1.5,
-   "last_line": "1 failed, 6 passed, 1 skipped in 1.35s"
+   "seconds": 1.4,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.32s"
   },
   {
    "id": "d3453e0983",
@@ -3972,8 +3899,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 1.7,
-   "last_line": "1 failed, 6 passed, 1 skipped in 1.44s"
+   "seconds": 1.6,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.42s"
   },
   {
    "id": "a1cfb7319b",
@@ -3989,8 +3916,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 4.3,
-   "last_line": "1 failed, 18 passed, 1 skipped in 4.18s"
+   "seconds": 4.5,
+   "last_line": "1 failed, 18 passed, 1 skipped in 4.32s"
   },
   {
    "id": "51f7e9a204",
@@ -4007,7 +3934,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 4.2,
-   "last_line": "1 failed, 18 passed, 1 skipped in 4.07s"
+   "last_line": "1 failed, 18 passed, 1 skipped in 4.10s"
   },
   {
    "id": "3a2f07afc8",
@@ -4024,7 +3951,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 12.5,
-   "last_line": "1 failed, 104 passed, 1 skipped, 12 subtests passed in 12.37s"
+   "last_line": "1 failed, 104 passed, 1 skipped, 12 subtests passed in 12.41s"
   },
   {
    "id": "de1dd9ede1",
@@ -4041,7 +3968,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 1.4,
-   "last_line": "1 failed, 1 skipped in 1.27s"
+   "last_line": "1 failed, 1 skipped in 1.23s"
   },
   {
    "id": "f27f17eb6b",
@@ -4057,8 +3984,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 1.7,
-   "last_line": "1 failed, 6 passed, 1 skipped in 1.53s"
+   "seconds": 1.5,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.35s"
   },
   {
    "id": "553759bbeb",
@@ -4074,8 +4001,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 4.0,
-   "last_line": "1 failed, 12 passed, 1 skipped in 3.85s"
+   "seconds": 4.1,
+   "last_line": "1 failed, 12 passed, 1 skipped in 3.93s"
   },
   {
    "id": "a2ad19ee94",
@@ -4108,8 +4035,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 1.6,
-   "last_line": "1 failed, 6 passed, 1 skipped in 1.49s"
+   "seconds": 1.5,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.41s"
   },
   {
    "id": "dd6efdc0e7",
@@ -4126,7 +4053,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 1.5,
-   "last_line": "1 failed, 6 passed, 1 skipped in 1.41s"
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.40s"
   },
   {
    "id": "6977f84dc5",
@@ -4159,8 +4086,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 1.5,
-   "last_line": "1 failed, 6 passed, 1 skipped in 1.32s"
+   "seconds": 1.4,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.30s"
   },
   {
    "id": "49c858c21e",
@@ -4176,8 +4103,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 12.1,
-   "last_line": "1 failed, 108 passed, 1 skipped, 14 subtests passed in 11.94s"
+   "seconds": 12.4,
+   "last_line": "1 failed, 108 passed, 1 skipped, 14 subtests passed in 12.24s"
   },
   {
    "id": "43dd5b3d7a",
@@ -4193,8 +4120,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 4.2,
-   "last_line": "1 failed, 18 passed, 1 skipped in 4.09s"
+   "seconds": 4.3,
+   "last_line": "1 failed, 18 passed, 1 skipped in 4.15s"
   },
   {
    "id": "fc48f15838",
@@ -4210,8 +4137,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 1.6,
-   "last_line": "1 failed, 6 passed, 1 skipped in 1.51s"
+   "seconds": 1.5,
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.34s"
   },
   {
    "id": "c7a9b688b7",
@@ -4227,8 +4154,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 12.1,
-   "last_line": "1 failed, 104 passed, 1 skipped, 12 subtests passed in 11.97s"
+   "seconds": 12.2,
+   "last_line": "1 failed, 104 passed, 1 skipped, 12 subtests passed in 12.02s"
   },
   {
    "id": "e667245aba",
@@ -4244,8 +4171,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 4.6,
-   "last_line": "1 failed, 27 passed, 1 skipped in 4.42s"
+   "seconds": 5.1,
+   "last_line": "1 failed, 27 passed, 1 skipped in 4.96s"
   },
   {
    "id": "85472cd16f",
@@ -4261,8 +4188,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 12.4,
-   "last_line": "1 failed, 116 passed, 1 skipped, 14 subtests passed in 12.22s"
+   "seconds": 12.2,
+   "last_line": "1 failed, 116 passed, 1 skipped, 14 subtests passed in 12.08s"
   },
   {
    "id": "24bed6b5ae",
@@ -4279,7 +4206,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 1.7,
-   "last_line": "1 failed, 6 passed, 1 skipped in 1.59s"
+   "last_line": "1 failed, 6 passed, 1 skipped in 1.61s"
   },
   {
    "id": "8eedb86658",
@@ -4294,7 +4221,7 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.7,
+   "seconds": 0.6,
    "last_line": "1 failed, 44 passed, 2 skipped, 2 subtests passed in 0.49s"
   },
   {
@@ -4311,7 +4238,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 34 passed, 2 skipped in 0.39s"
+   "last_line": "1 failed, 34 passed, 2 skipped in 0.37s"
   },
   {
    "id": "2db8853978",
@@ -4358,8 +4285,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 34 passed, 2 skipped in 0.47s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 34 passed, 2 skipped in 0.39s"
   },
   {
    "id": "aa2200d696",
@@ -4391,7 +4318,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 55 passed, 2 skipped, 2 subtests passed in 0.49s"
+   "last_line": "1 failed, 55 passed, 2 skipped, 2 subtests passed in 0.48s"
   },
   {
    "id": "ed4fe697f0",
@@ -4422,8 +4349,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 22 passed in 0.43s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 22 passed in 0.36s"
   },
   {
    "id": "70eef46d96",
@@ -4486,8 +4413,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 34 passed, 2 skipped in 0.47s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 34 passed, 2 skipped in 0.40s"
   },
   {
    "id": "07ea4972a6",
@@ -4519,7 +4446,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 34 passed, 2 skipped in 0.40s"
+   "last_line": "1 failed, 34 passed, 2 skipped in 0.39s"
   },
   {
    "id": "1d3cb77da1",
@@ -4535,7 +4462,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 34 passed, 2 skipped in 0.38s"
+   "last_line": "1 failed, 34 passed, 2 skipped in 0.39s"
   },
   {
    "id": "9e3b3eabee",
@@ -4550,8 +4477,8 @@
    ],
    "decision": "",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 34 passed, 2 skipped in 0.46s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 34 passed, 2 skipped in 0.41s"
   },
   {
    "id": "8896e26e66",
@@ -4598,7 +4525,7 @@
    "decision": "",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 35 passed, 2 skipped in 0.43s"
+   "last_line": "1 failed, 35 passed, 2 skipped in 0.42s"
   },
   {
    "id": "e9d1ea7231",
@@ -4631,8 +4558,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed in 0.30s"
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.28s"
   },
   {
    "id": "e759a25422",
@@ -4649,7 +4576,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed in 0.28s"
+   "last_line": "1 failed in 0.26s"
   },
   {
    "id": "b93660b10c",
@@ -4717,7 +4644,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 4 passed in 0.38s"
+   "last_line": "1 failed, 4 passed in 0.39s"
   },
   {
    "id": "16d1a158ac",
@@ -4734,7 +4661,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 1 passed in 0.41s"
+   "last_line": "1 failed, 1 passed in 0.40s"
   },
   {
    "id": "f7fad739f6",
@@ -4768,7 +4695,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 46 passed, 12 subtests passed in 0.47s"
+   "last_line": "1 failed, 46 passed, 12 subtests passed in 0.46s"
   },
   {
    "id": "5af0784265",
@@ -4903,8 +4830,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 44 passed, 12 subtests passed in 0.54s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 44 passed, 12 subtests passed in 0.46s"
   },
   {
    "id": "3ccc2ce3f4",
@@ -4937,8 +4864,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed in 0.43s"
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.27s"
   },
   {
    "id": "c3761673fc",
@@ -4955,7 +4882,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 1 passed in 0.38s"
+   "last_line": "1 failed, 1 passed in 0.39s"
   },
   {
    "id": "e450cd8e0c",
@@ -4972,7 +4899,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed in 0.30s"
+   "last_line": "1 failed in 0.28s"
   },
   {
    "id": "6ffca8a775",
@@ -4989,7 +4916,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed in 0.28s"
+   "last_line": "1 failed in 0.26s"
   },
   {
    "id": "91cfb23f2b",
@@ -5005,8 +4932,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 3 passed in 0.55s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 3 passed in 0.41s"
   },
   {
    "id": "9d0896f705",
@@ -5039,7 +4966,7 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
+   "seconds": 0.6,
    "last_line": "1 failed, 11 passed, 4 subtests passed in 0.42s"
   },
   {
@@ -5057,7 +4984,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 11 passed, 4 subtests passed in 0.40s"
+   "last_line": "1 failed, 11 passed, 4 subtests passed in 0.39s"
   },
   {
    "id": "4f26dd8a62",
@@ -5125,7 +5052,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 4 passed in 0.39s"
+   "last_line": "1 failed, 4 passed in 0.38s"
   },
   {
    "id": "03299c51ff",
@@ -5159,7 +5086,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed in 0.29s"
+   "last_line": "1 failed in 0.28s"
   },
   {
    "id": "c285737fea",
@@ -5193,7 +5120,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 11 passed, 4 subtests passed in 0.41s"
+   "last_line": "1 failed, 11 passed, 4 subtests passed in 0.39s"
   },
   {
    "id": "a42abf7bb9",
@@ -5209,8 +5136,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 6 passed in 0.41s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 6 passed in 0.42s"
   },
   {
    "id": "50c3875c26",
@@ -5243,8 +5170,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 47 passed, 12 subtests passed in 0.54s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 47 passed, 12 subtests passed in 0.46s"
   },
   {
    "id": "054c34c01c",
@@ -5260,7 +5187,7 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.6,
+   "seconds": 0.5,
    "last_line": "1 failed, 47 passed, 12 subtests passed in 0.43s"
   },
   {
@@ -5278,7 +5205,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 47 passed, 12 subtests passed in 0.47s"
+   "last_line": "1 failed, 47 passed, 12 subtests passed in 0.46s"
   },
   {
    "id": "6ab1e810fe",
@@ -5294,8 +5221,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 46 passed, 12 subtests passed in 0.43s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 46 passed, 12 subtests passed in 0.42s"
   },
   {
    "id": "50484e0266",
@@ -5311,8 +5238,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 48 passed, 12 subtests passed in 0.55s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 48 passed, 12 subtests passed in 0.46s"
   },
   {
    "id": "b74784770e",
@@ -5328,8 +5255,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 48 passed, 12 subtests passed in 0.42s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 48 passed, 12 subtests passed in 0.43s"
   },
   {
    "id": "1a202d874a",
@@ -5376,7 +5303,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 15 passed, 12 subtests passed in 0.41s"
+   "last_line": "1 failed, 15 passed, 12 subtests passed in 0.40s"
   },
   {
    "id": "c6f32839b6",
@@ -5391,7 +5318,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 1 passed in 0.35s"
+   "last_line": "1 failed, 1 passed in 0.36s"
   },
   {
    "id": "85e1d27b97",
@@ -5405,8 +5332,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 1 passed in 0.38s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 1 passed in 0.46s"
   },
   {
    "id": "218c7eba1d",
@@ -5466,7 +5393,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 45 passed, 12 subtests passed in 0.42s"
+   "last_line": "1 failed, 45 passed, 12 subtests passed in 0.43s"
   },
   {
    "id": "47dd02932e",
@@ -5481,7 +5408,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 27 passed, 12 subtests passed in 0.40s"
+   "last_line": "1 failed, 27 passed, 12 subtests passed in 0.41s"
   },
   {
    "id": "0951d1d906",
@@ -5511,7 +5438,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 5 passed in 0.38s"
+   "last_line": "1 failed, 5 passed in 0.35s"
   },
   {
    "id": "33771ca9e5",
@@ -5540,8 +5467,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.4,
-   "last_line": "1 failed, 1 passed in 0.33s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 1 passed in 0.38s"
   },
   {
    "id": "94b1e0a983",
@@ -5555,8 +5482,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 45 passed, 12 subtests passed in 0.47s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 45 passed, 12 subtests passed in 0.41s"
   },
   {
    "id": "8fab81bb35",
@@ -5570,8 +5497,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.4,
-   "last_line": "1 failed in 0.25s"
+   "seconds": 0.3,
+   "last_line": "1 failed in 0.22s"
   },
   {
    "id": "a414112d1b",
@@ -5586,7 +5513,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 1 passed in 0.35s"
+   "last_line": "1 failed, 1 passed in 0.36s"
   },
   {
    "id": "bb370c9287",
@@ -5615,8 +5542,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 45 passed, 12 subtests passed in 0.44s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 45 passed, 12 subtests passed in 0.41s"
   },
   {
    "id": "89e9953bdd",
@@ -5630,8 +5557,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.4,
-   "last_line": "1 failed in 0.23s"
+   "seconds": 0.3,
+   "last_line": "1 failed in 0.21s"
   },
   {
    "id": "f4ee02cfde",
@@ -5646,7 +5573,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed in 0.26s"
+   "last_line": "1 failed in 0.25s"
   },
   {
    "id": "f7f414a511",
@@ -5661,7 +5588,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.40s"
+   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.39s"
   },
   {
    "id": "937ab93b73",
@@ -5690,7 +5617,7 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.4,
+   "seconds": 0.3,
    "last_line": "1 failed in 0.22s"
   },
   {
@@ -5723,7 +5650,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed in 0.30s"
+   "last_line": "1 failed in 0.31s"
   },
   {
    "id": "32a4c87501",
@@ -5752,8 +5679,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 1 passed in 0.40s"
+   "seconds": 0.4,
+   "last_line": "1 failed, 1 passed in 0.25s"
   },
   {
    "id": "a25ff8843b",
@@ -5812,7 +5739,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.27s"
+   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.26s"
   },
   {
    "id": "f4eebfd2b3",
@@ -5840,7 +5767,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.28s"
+   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.29s"
   },
   {
    "id": "912920f99f",
@@ -5854,7 +5781,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.30s"
+   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.29s"
   },
   {
    "id": "044d1a8de8",
@@ -5868,7 +5795,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.28s"
+   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.27s"
   },
   {
    "id": "b4428367a7",
@@ -5895,8 +5822,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.4,
-   "last_line": "1 failed, 1 passed in 0.24s"
+   "seconds": 0.3,
+   "last_line": "1 failed, 1 passed in 0.23s"
   },
   {
    "id": "e11da945c3",
@@ -5910,7 +5837,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 6 passed in 0.30s"
+   "last_line": "1 failed, 6 passed in 0.25s"
   },
   {
    "id": "a5b9cebed5",
@@ -5924,7 +5851,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 43 passed, 12 subtests passed in 0.29s"
+   "last_line": "1 failed, 43 passed, 12 subtests passed in 0.27s"
   },
   {
    "id": "766503e8a9",
@@ -5939,7 +5866,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 15 passed, 12 subtests passed in 0.27s"
+   "last_line": "1 failed, 15 passed, 12 subtests passed in 0.28s"
   },
   {
    "id": "26cb196743",
@@ -5957,7 +5884,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 115 passed, 14 subtests passed in 0.46s"
+   "last_line": "1 failed, 115 passed, 14 subtests passed in 0.47s"
   },
   {
    "id": "f44798c7a3",
@@ -5992,8 +5919,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 113 passed, 12 subtests passed in 0.50s"
+   "seconds": 0.7,
+   "last_line": "1 failed, 113 passed, 12 subtests passed in 0.48s"
   },
   {
    "id": "945d208cfd",
@@ -6065,7 +5992,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.18s"
+   "last_line": "1 failed in 0.17s"
   },
   {
    "id": "1716e0ec9f",
@@ -6083,7 +6010,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 81 passed, 12 subtests passed in 0.51s"
+   "last_line": "1 failed, 81 passed, 12 subtests passed in 0.49s"
   },
   {
    "id": "49af17b87c",
@@ -6137,7 +6064,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.18s"
+   "last_line": "1 failed in 0.17s"
   },
   {
    "id": "978712b2c4",
@@ -6154,8 +6081,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.8,
-   "last_line": "1 failed, 112 passed, 12 subtests passed in 0.63s"
+   "seconds": 0.7,
+   "last_line": "1 failed, 112 passed, 12 subtests passed in 0.52s"
   },
   {
    "id": "e35d6206b7",
@@ -6190,7 +6117,7 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.7,
+   "seconds": 0.6,
    "last_line": "2 failed, 115 passed, 12 subtests passed in 0.51s"
   },
   {
@@ -6209,7 +6136,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.18s"
+   "last_line": "1 failed in 0.17s"
   },
   {
    "id": "b65d8291eb",
@@ -6227,7 +6154,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.20s"
+   "last_line": "1 failed in 0.18s"
   },
   {
    "id": "7c7c334d01",
@@ -6245,7 +6172,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.17s"
+   "last_line": "1 failed in 0.16s"
   },
   {
    "id": "314f54a90e",
@@ -6263,7 +6190,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed, 226 passed, 21 subtests passed in 0.68s"
+   "last_line": "1 failed, 228 passed, 21 subtests passed in 0.68s"
   },
   {
    "id": "f4e68ffdc3",
@@ -6280,8 +6207,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.9,
-   "last_line": "1 failed, 226 passed, 21 subtests passed in 0.79s"
+   "seconds": 0.7,
+   "last_line": "1 failed, 228 passed, 21 subtests passed in 0.62s"
   },
   {
    "id": "ddae82dadb",
@@ -6352,8 +6279,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 81 passed, 12 subtests passed in 0.51s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 81 passed, 12 subtests passed in 0.43s"
   },
   {
    "id": "5102b28dcd",
@@ -6371,7 +6298,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed, 231 passed, 21 subtests passed in 0.68s"
+   "last_line": "1 failed, 233 passed, 21 subtests passed in 0.69s"
   },
   {
    "id": "14efb968af",
@@ -6407,7 +6334,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed, 217 passed, 21 subtests passed in 0.66s"
+   "last_line": "1 failed, 219 passed, 21 subtests passed in 0.66s"
   },
   {
    "id": "4fb078281a",
@@ -6424,8 +6351,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.8,
-   "last_line": "1 failed, 215 passed, 21 subtests passed in 0.63s"
+   "seconds": 0.7,
+   "last_line": "1 failed, 217 passed, 21 subtests passed in 0.62s"
   },
   {
    "id": "21b2cd9b60",
@@ -6497,7 +6424,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.19s"
+   "last_line": "1 failed in 0.17s"
   },
   {
    "id": "d361f5687b",
@@ -6515,7 +6442,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 119 passed, 14 subtests passed in 0.53s"
+   "last_line": "1 failed, 119 passed, 14 subtests passed in 0.52s"
   },
   {
    "id": "80051fa6c5",
@@ -6569,7 +6496,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 115 passed, 14 subtests passed in 0.51s"
+   "last_line": "1 failed, 115 passed, 14 subtests passed in 0.46s"
   },
   {
    "id": "be589a0ee5",
@@ -6586,8 +6513,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 113 passed, 12 subtests passed in 0.52s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 113 passed, 12 subtests passed in 0.50s"
   },
   {
    "id": "e4bb920bbd",
@@ -6605,7 +6532,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.16s"
+   "last_line": "1 failed in 0.17s"
   },
   {
    "id": "94d205e813",
@@ -6640,8 +6567,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.8,
-   "last_line": "1 failed, 115 passed, 14 subtests passed in 0.65s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 115 passed, 14 subtests passed in 0.46s"
   },
   {
    "id": "9f691dcf46",
@@ -6677,7 +6604,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.16s"
+   "last_line": "1 failed in 0.17s"
   },
   {
    "id": "1126aa2a33",
@@ -6785,7 +6712,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.19s"
+   "last_line": "1 failed in 0.17s"
   },
   {
    "id": "f55f8e583a",
@@ -6802,8 +6729,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.4,
-   "last_line": "1 failed in 0.22s"
+   "seconds": 0.3,
+   "last_line": "1 failed in 0.20s"
   },
   {
    "id": "d26af7bc6d",
@@ -6821,7 +6748,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed, 224 passed, 21 subtests passed in 0.62s"
+   "last_line": "1 failed, 226 passed, 21 subtests passed in 0.64s"
   },
   {
    "id": "4335d78c3a",
@@ -6857,7 +6784,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.20s"
+   "last_line": "1 failed in 0.19s"
   },
   {
    "id": "eaf222b6bf",
@@ -6874,8 +6801,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 74 passed, 4 subtests passed in 0.53s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 74 passed, 4 subtests passed in 0.48s"
   },
   {
    "id": "d2b3c8b726",
@@ -6929,7 +6856,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 118 passed, 14 subtests passed in 0.49s"
+   "last_line": "1 failed, 118 passed, 14 subtests passed in 0.47s"
   },
   {
    "id": "ad0f16b4a2",
@@ -6947,7 +6874,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.19s"
+   "last_line": "1 failed in 0.18s"
   },
   {
    "id": "6648cd945c",
@@ -7001,7 +6928,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed, 2 passed in 0.17s"
+   "last_line": "1 failed, 2 passed in 0.18s"
   },
   {
    "id": "a0512a8fb4",
@@ -7018,8 +6945,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.9,
-   "last_line": "1 failed, 115 passed, 14 subtests passed in 0.75s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 115 passed, 14 subtests passed in 0.50s"
   },
   {
    "id": "430816a507",
@@ -7073,7 +7000,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.20s"
+   "last_line": "1 failed in 0.17s"
   },
   {
    "id": "bea714f037",
@@ -7145,7 +7072,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.16s"
+   "last_line": "1 failed in 0.18s"
   },
   {
    "id": "ab63340450",
@@ -7162,8 +7089,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.8,
-   "last_line": "1 failed, 148 passed, 21 subtests passed in 0.62s"
+   "seconds": 0.7,
+   "last_line": "1 failed, 148 passed, 21 subtests passed in 0.59s"
   },
   {
    "id": "479439a5ea",
@@ -7181,7 +7108,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.17s"
+   "last_line": "1 failed in 0.16s"
   },
   {
    "id": "70c90bde1a",
@@ -7217,7 +7144,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 115 passed, 14 subtests passed in 0.47s"
+   "last_line": "1 failed, 115 passed, 14 subtests passed in 0.46s"
   },
   {
    "id": "712ec8b0c2",
@@ -7234,8 +7161,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 115 passed, 14 subtests passed in 0.55s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 115 passed, 14 subtests passed in 0.50s"
   },
   {
    "id": "43e0c77643",
@@ -7253,7 +7180,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 117 passed, 14 subtests passed in 0.46s"
+   "last_line": "1 failed, 117 passed, 14 subtests passed in 0.47s"
   },
   {
    "id": "6415b8874a",
@@ -7289,7 +7216,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 115 passed, 13 subtests passed in 0.46s"
+   "last_line": "1 failed, 115 passed, 13 subtests passed in 0.47s"
   },
   {
    "id": "89c3bb1ae8",
@@ -7306,8 +7233,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 115 passed, 13 subtests passed in 0.56s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 115 passed, 13 subtests passed in 0.50s"
   },
   {
    "id": "be6236480c",
@@ -7325,7 +7252,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed, 236 passed, 21 subtests passed in 0.64s"
+   "last_line": "1 failed, 238 passed, 21 subtests passed in 0.64s"
   },
   {
    "id": "83cb000b78",
@@ -7342,8 +7269,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 116 passed, 14 subtests passed in 0.51s"
+   "seconds": 0.7,
+   "last_line": "1 failed, 116 passed, 14 subtests passed in 0.55s"
   },
   {
    "id": "8d7558d3d2",
@@ -7361,7 +7288,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.18s"
+   "last_line": "1 failed in 0.17s"
   },
   {
    "id": "f363423daa",
@@ -7378,8 +7305,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 118 passed, 14 subtests passed in 0.55s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 118 passed, 14 subtests passed in 0.51s"
   },
   {
    "id": "7ea5f927ed",
@@ -7397,7 +7324,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 224 passed, 21 subtests passed in 0.61s"
+   "last_line": "1 failed, 226 passed, 21 subtests passed in 0.62s"
   },
   {
    "id": "33e7879bbf",
@@ -7433,7 +7360,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 24 passed in 0.29s"
+   "last_line": "1 failed, 24 passed in 0.30s"
   },
   {
    "id": "ef9e0664be",
@@ -7451,7 +7378,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.21s"
+   "last_line": "1 failed in 0.20s"
   },
   {
    "id": "b9c750ff54",
@@ -7469,7 +7396,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 196 passed, 21 subtests passed in 0.60s"
+   "last_line": "1 failed, 196 passed, 21 subtests passed in 0.59s"
   },
   {
    "id": "a039dc6acc",
@@ -7487,7 +7414,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed, 217 passed, 21 subtests passed in 0.70s"
+   "last_line": "1 failed, 219 passed, 21 subtests passed in 0.70s"
   },
   {
    "id": "7e8753efb9",
@@ -7505,7 +7432,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 118 passed, 14 subtests passed in 0.50s"
+   "last_line": "1 failed, 118 passed, 14 subtests passed in 0.51s"
   },
   {
    "id": "c616dd1af2",
@@ -7523,7 +7450,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.19s"
+   "last_line": "1 failed in 0.18s"
   },
   {
    "id": "ba857574bc",
@@ -7541,7 +7468,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 89 passed, 12 subtests passed in 0.44s"
+   "last_line": "1 failed, 89 passed, 12 subtests passed in 0.45s"
   },
   {
    "id": "09e9f1c42a",
@@ -7613,7 +7540,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 22 passed in 0.26s"
+   "last_line": "1 failed, 22 passed in 0.27s"
   },
   {
    "id": "526ab0037f",
@@ -7649,7 +7576,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 22 passed in 0.28s"
+   "last_line": "1 failed, 22 passed in 0.29s"
   },
   {
    "id": "3142ceed1b",
@@ -7666,8 +7593,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 21 passed in 0.31s"
+   "seconds": 0.4,
+   "last_line": "1 failed, 21 passed in 0.29s"
   },
   {
    "id": "4217503ffd",
@@ -7721,7 +7648,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 117 passed, 14 subtests passed in 0.49s"
+   "last_line": "1 failed, 117 passed, 14 subtests passed in 0.50s"
   },
   {
    "id": "16d088684b",
@@ -7739,7 +7666,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed, 215 passed, 21 subtests passed in 0.66s"
+   "last_line": "1 failed, 217 passed, 21 subtests passed in 0.66s"
   },
   {
    "id": "d5849062ce",
@@ -7756,8 +7683,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 222 passed, 21 subtests passed in 0.62s"
+   "seconds": 0.8,
+   "last_line": "1 failed, 224 passed, 21 subtests passed in 0.64s"
   },
   {
    "id": "d59b2a05ee",
@@ -7829,7 +7756,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.17s"
+   "last_line": "1 failed in 0.16s"
   },
   {
    "id": "9d45ad86b7",
@@ -7883,7 +7810,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 112 passed, 12 subtests passed in 0.50s"
+   "last_line": "1 failed, 112 passed, 12 subtests passed in 0.49s"
   },
   {
    "id": "4403436ce7",
@@ -7901,7 +7828,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 116 passed, 14 subtests passed in 0.48s"
+   "last_line": "1 failed, 116 passed, 14 subtests passed in 0.46s"
   },
   {
    "id": "a92fcdfe8c",
@@ -7954,8 +7881,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.9,
-   "last_line": "1 failed, 235 passed, 21 subtests passed in 0.72s"
+   "seconds": 0.8,
+   "last_line": "1 failed, 237 passed, 21 subtests passed in 0.70s"
   },
   {
    "id": "1ca2eabb64",
@@ -7973,7 +7900,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed, 231 passed, 21 subtests passed in 0.65s"
+   "last_line": "1 failed, 233 passed, 21 subtests passed in 0.67s"
   },
   {
    "id": "2797cd7c7b",
@@ -7991,7 +7918,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 82 passed, 12 subtests passed in 0.48s"
+   "last_line": "1 failed, 82 passed, 12 subtests passed in 0.47s"
   },
   {
    "id": "c471c9728c",
@@ -8045,7 +7972,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed, 3 passed in 0.21s"
+   "last_line": "1 failed, 3 passed in 0.18s"
   },
   {
    "id": "752168e2b5",
@@ -8063,7 +7990,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 115 passed, 14 subtests passed in 0.51s"
+   "last_line": "1 failed, 115 passed, 14 subtests passed in 0.50s"
   },
   {
    "id": "61d16dfa53",
@@ -8080,8 +8007,8 @@
    ],
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.8,
-   "last_line": "1 failed, 117 passed, 14 subtests passed in 0.66s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 117 passed, 14 subtests passed in 0.50s"
   },
   {
    "id": "6fad80922f",
@@ -8099,7 +8026,7 @@
    "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed, 226 passed, 21 subtests passed in 0.69s"
+   "last_line": "1 failed, 228 passed, 21 subtests passed in 0.68s"
   },
   {
    "id": "10c0fbd5ff",
@@ -8116,8 +8043,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 35.2,
-   "last_line": "1 failed, 31 passed, 32 subtests passed in 35.01s"
+   "seconds": 34.4,
+   "last_line": "1 failed, 31 passed, 32 subtests passed in 34.22s"
   },
   {
    "id": "911d7bb62a",
@@ -8135,7 +8062,7 @@
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
    "seconds": 1.4,
-   "last_line": "1 failed in 1.27s"
+   "last_line": "1 failed in 1.26s"
   },
   {
    "id": "414d216abb",
@@ -8152,8 +8079,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 5.6,
-   "last_line": "1 failed, 3 passed in 5.46s"
+   "seconds": 5.5,
+   "last_line": "1 failed, 3 passed in 5.34s"
   },
   {
    "id": "9e914be5d4",
@@ -8170,8 +8097,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 2.1,
-   "last_line": "1 failed in 1.91s"
+   "seconds": 2.0,
+   "last_line": "1 failed in 1.85s"
   },
   {
    "id": "4685f747b0",
@@ -8188,8 +8115,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 33.2,
-   "last_line": "1 failed, 31 passed, 32 subtests passed in 33.03s"
+   "seconds": 33.4,
+   "last_line": "1 failed, 31 passed, 32 subtests passed in 33.24s"
   },
   {
    "id": "48bb4c4783",
@@ -8206,8 +8133,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 33.3,
-   "last_line": "1 failed, 31 passed, 32 subtests passed in 33.18s"
+   "seconds": 33.6,
+   "last_line": "1 failed, 31 passed, 32 subtests passed in 33.41s"
   },
   {
    "id": "ef36aead06",
@@ -8224,8 +8151,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 1.5,
-   "last_line": "1 failed in 1.32s"
+   "seconds": 1.4,
+   "last_line": "1 failed in 1.28s"
   },
   {
    "id": "a029200ac5",
@@ -8242,8 +8169,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 5.8,
-   "last_line": "1 failed, 3 passed in 5.62s"
+   "seconds": 5.2,
+   "last_line": "1 failed, 3 passed in 5.08s"
   },
   {
    "id": "4d7e252f93",
@@ -8261,7 +8188,7 @@
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
    "seconds": 2.0,
-   "last_line": "1 failed in 1.84s"
+   "last_line": "1 failed in 1.83s"
   },
   {
    "id": "48a423addb",
@@ -8278,8 +8205,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 33.3,
-   "last_line": "1 failed, 31 passed, 32 subtests passed in 33.14s"
+   "seconds": 33.5,
+   "last_line": "1 failed, 31 passed, 32 subtests passed in 33.32s"
   },
   {
    "id": "af9a9b73ee",
@@ -8296,8 +8223,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 36.3,
-   "last_line": "1 failed, 31 passed, 32 subtests passed in 36.20s"
+   "seconds": 34.0,
+   "last_line": "1 failed, 31 passed, 32 subtests passed in 33.84s"
   },
   {
    "id": "b363660c6f",
@@ -8314,8 +8241,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 35.3,
-   "last_line": "1 failed, 31 passed, 32 subtests passed in 35.11s"
+   "seconds": 33.6,
+   "last_line": "1 failed, 31 passed, 32 subtests passed in 33.43s"
   },
   {
    "id": "e959749e40",
@@ -8331,9 +8258,9 @@
     "tests/test_tdd.py"
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
-   "status": "SURVIVED",
-   "seconds": 34.1,
-   "last_line": ""
+   "status": "KILLED",
+   "seconds": 33.7,
+   "last_line": "1 failed, 146 passed, 41 subtests passed in 33.60s"
   },
   {
    "id": "7b794897ed",
@@ -8349,9 +8276,9 @@
     "tests/test_tdd.py"
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
-   "status": "SURVIVED",
-   "seconds": 34.2,
-   "last_line": ""
+   "status": "KILLED",
+   "seconds": 36.2,
+   "last_line": "1 failed, 147 passed, 41 subtests passed in 36.08s"
   },
   {
    "id": "874ab41a30",
@@ -8368,8 +8295,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 34.9,
-   "last_line": "1 failed, 144 passed, 41 subtests passed in 34.75s"
+   "seconds": 34.0,
+   "last_line": "1 failed, 144 passed, 41 subtests passed in 33.86s"
   },
   {
    "id": "7cd4fd177e",
@@ -8386,8 +8313,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 5.3,
-   "last_line": "1 failed, 3 passed in 5.15s"
+   "seconds": 5.4,
+   "last_line": "1 failed, 3 passed in 5.29s"
   },
   {
    "id": "335d7cb3a7",
@@ -8404,8 +8331,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 33.7,
-   "last_line": "1 failed, 139 passed, 41 subtests passed in 33.52s"
+   "seconds": 36.7,
+   "last_line": "1 failed, 139 passed, 41 subtests passed in 36.51s"
   },
   {
    "id": "81690cdad0",
@@ -8421,9 +8348,9 @@
     "tests/test_tdd.py"
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
-   "status": "SURVIVED",
-   "seconds": 34.8,
-   "last_line": ""
+   "status": "KILLED",
+   "seconds": 37.0,
+   "last_line": "1 failed, 150 passed, 41 subtests passed in 36.83s"
   },
   {
    "id": "6d70284a9e",
@@ -8440,8 +8367,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 34.3,
-   "last_line": "1 failed, 143 passed, 41 subtests passed in 34.15s"
+   "seconds": 33.9,
+   "last_line": "1 failed, 143 passed, 41 subtests passed in 33.72s"
   },
   {
    "id": "cb105cd931",
@@ -8457,9 +8384,9 @@
     "tests/test_tdd.py"
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
-   "status": "SURVIVED",
-   "seconds": 34.6,
-   "last_line": ""
+   "status": "KILLED",
+   "seconds": 33.6,
+   "last_line": "1 failed, 149 passed, 41 subtests passed in 33.51s"
   },
   {
    "id": "2e4db41e78",
@@ -8476,8 +8403,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 5.2,
-   "last_line": "1 failed, 3 passed in 5.06s"
+   "seconds": 6.0,
+   "last_line": "1 failed, 3 passed in 5.85s"
   },
   {
    "id": "255e75ebff",
@@ -8495,7 +8422,7 @@
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
    "seconds": 2.0,
-   "last_line": "1 failed in 1.88s"
+   "last_line": "1 failed in 1.92s"
   },
   {
    "id": "037df029a3",
@@ -8512,8 +8439,8 @@
    ],
    "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)",
    "status": "KILLED",
-   "seconds": 2.1,
-   "last_line": "1 failed in 1.93s"
+   "seconds": 2.0,
+   "last_line": "1 failed in 1.90s"
   },
   {
    "id": "8f2eb652d9",
@@ -8544,8 +8471,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 49 passed, 12 subtests passed in 0.36s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 49 passed, 12 subtests passed in 0.42s"
   },
   {
    "id": "d7027536f3",
@@ -8577,7 +8504,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 62 passed, 14 subtests passed in 0.36s"
+   "last_line": "1 failed, 62 passed, 14 subtests passed in 0.37s"
   },
   {
    "id": "6a7ecb7f88",
@@ -8608,8 +8535,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.4,
-   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.32s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.37s"
   },
   {
    "id": "be11578574",
@@ -8641,7 +8568,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.31s"
+   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.32s"
   },
   {
    "id": "1b4f88ed03",
@@ -8656,8 +8583,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.33s"
+   "seconds": 0.4,
+   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.32s"
   },
   {
    "id": "e8cf865470",
@@ -8672,8 +8599,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 60 passed, 14 subtests passed in 0.36s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 60 passed, 14 subtests passed in 0.42s"
   },
   {
    "id": "e5558a3707",
@@ -8705,7 +8632,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 60 passed, 14 subtests passed in 0.36s"
+   "last_line": "1 failed, 60 passed, 14 subtests passed in 0.35s"
   },
   {
    "id": "71f9c9ba3f",
@@ -8736,8 +8663,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 60 passed, 14 subtests passed in 0.37s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 60 passed, 14 subtests passed in 0.42s"
   },
   {
    "id": "9c2ea721dd",
@@ -8753,7 +8680,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 142 passed, 21 subtests passed in 0.58s"
+   "last_line": "1 failed, 144 passed, 21 subtests passed in 0.58s"
   },
   {
    "id": "a1d917733c",
@@ -8769,7 +8696,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 142 passed, 21 subtests passed in 0.58s"
+   "last_line": "1 failed, 144 passed, 21 subtests passed in 0.58s"
   },
   {
    "id": "b685e23da6",
@@ -8785,7 +8712,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 142 passed, 21 subtests passed in 0.60s"
+   "last_line": "1 failed, 144 passed, 21 subtests passed in 0.59s"
   },
   {
    "id": "3a8c688564",
@@ -8801,7 +8728,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.32s"
+   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.37s"
   },
   {
    "id": "9e23b422f6",
@@ -8817,7 +8744,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 49 passed, 12 subtests passed in 0.35s"
+   "last_line": "1 failed, 49 passed, 12 subtests passed in 0.36s"
   },
   {
    "id": "24eaf2aea2",
@@ -8833,7 +8760,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 20 passed, 12 subtests passed in 0.32s"
+   "last_line": "1 failed, 20 passed, 12 subtests passed in 0.31s"
   },
   {
    "id": "f0955a989e",
@@ -8865,7 +8792,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.18s"
+   "last_line": "1 failed in 0.20s"
   },
   {
    "id": "09b386145d",
@@ -8912,7 +8839,7 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
+   "seconds": 0.4,
    "last_line": "1 failed, 22 passed, 12 subtests passed in 0.32s"
   },
   {
@@ -8929,7 +8856,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.32s"
+   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.37s"
   },
   {
    "id": "bf69e6f843",
@@ -8945,7 +8872,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed in 0.18s"
+   "last_line": "1 failed in 0.17s"
   },
   {
    "id": "637ddad5cd",
@@ -8976,8 +8903,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.41s"
+   "seconds": 0.4,
+   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.32s"
   },
   {
    "id": "048c131620",
@@ -8992,8 +8919,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 146 passed, 21 subtests passed in 0.59s"
+   "seconds": 0.9,
+   "last_line": "1 failed, 148 passed, 21 subtests passed in 0.69s"
   },
   {
    "id": "e493a10647",
@@ -9009,7 +8936,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.31s"
+   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.32s"
   },
   {
    "id": "a9c34f47c4",
@@ -9025,7 +8952,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 142 passed, 21 subtests passed in 0.57s"
+   "last_line": "1 failed, 144 passed, 21 subtests passed in 0.58s"
   },
   {
    "id": "bd07ab4850",
@@ -9040,8 +8967,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 60 passed, 14 subtests passed in 0.42s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 60 passed, 14 subtests passed in 0.36s"
   },
   {
    "id": "4cc712b9fd",
@@ -9056,8 +8983,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 60 passed, 14 subtests passed in 0.36s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 60 passed, 14 subtests passed in 0.42s"
   },
   {
    "id": "8a22791df8",
@@ -9073,7 +9000,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 60 passed, 14 subtests passed in 0.35s"
+   "last_line": "1 failed, 60 passed, 14 subtests passed in 0.36s"
   },
   {
    "id": "c4373dab19",
@@ -9089,7 +9016,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 60 passed, 14 subtests passed in 0.36s"
+   "last_line": "1 failed, 60 passed, 14 subtests passed in 0.35s"
   },
   {
    "id": "31b9b48365",
@@ -9105,7 +9032,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 155 passed, 21 subtests passed in 0.59s"
+   "last_line": "1 failed, 157 passed, 21 subtests passed in 0.60s"
   },
   {
    "id": "40ef07b256",
@@ -9120,8 +9047,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 62 passed, 14 subtests passed in 0.37s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 62 passed, 14 subtests passed in 0.43s"
   },
   {
    "id": "433ef85b8f",
@@ -9137,7 +9064,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 63 passed, 14 subtests passed in 0.36s"
+   "last_line": "1 failed, 63 passed, 14 subtests passed in 0.37s"
   },
   {
    "id": "ad72ac1734",
@@ -9169,7 +9096,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.32s"
+   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.31s"
   },
   {
    "id": "f7e1a3cd0b",
@@ -9184,8 +9111,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.4,
-   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.32s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.37s"
   },
   {
    "id": "f416752a34",
@@ -9201,7 +9128,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 63 passed, 14 subtests passed in 0.37s"
+   "last_line": "1 failed, 63 passed, 14 subtests passed in 0.36s"
   },
   {
    "id": "1b1cf88aab",
@@ -9232,7 +9159,7 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
+   "seconds": 0.4,
    "last_line": "1 failed, 22 passed, 12 subtests passed in 0.32s"
   },
   {
@@ -9248,8 +9175,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.3,
-   "last_line": "1 failed in 0.18s"
+   "seconds": 0.4,
+   "last_line": "1 failed in 0.21s"
   },
   {
    "id": "041e9c67c1",
@@ -9281,7 +9208,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 61 passed, 14 subtests passed in 0.37s"
+   "last_line": "1 failed, 61 passed, 14 subtests passed in 0.36s"
   },
   {
    "id": "d201b3b957",
@@ -9312,8 +9239,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 142 passed, 21 subtests passed in 0.59s"
+   "seconds": 0.8,
+   "last_line": "1 failed, 144 passed, 21 subtests passed in 0.68s"
   },
   {
    "id": "032bbd9fd1",
@@ -9329,7 +9256,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.31s"
+   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.32s"
   },
   {
    "id": "86df61f8d8",
@@ -9345,7 +9272,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 19 passed, 12 subtests passed in 0.33s"
+   "last_line": "1 failed, 19 passed, 12 subtests passed in 0.34s"
   },
   {
    "id": "07b37ad9e0",
@@ -9361,7 +9288,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 139 passed, 21 subtests passed in 0.57s"
+   "last_line": "1 failed, 141 passed, 21 subtests passed in 0.59s"
   },
   {
    "id": "f8b4caac28",
@@ -9376,8 +9303,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.4,
-   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.32s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 22 passed, 12 subtests passed in 0.35s"
   },
   {
    "id": "bb8fbeff57",
@@ -9393,7 +9320,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 142 passed, 21 subtests passed in 0.58s"
+   "last_line": "1 failed, 144 passed, 21 subtests passed in 0.58s"
   },
   {
    "id": "521549a3a7",
@@ -9409,7 +9336,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 141 passed, 21 subtests passed in 0.58s"
+   "last_line": "1 failed, 143 passed, 21 subtests passed in 0.57s"
   },
   {
    "id": "1ab8cd09e7",
@@ -9441,7 +9368,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 138 passed, 21 subtests passed in 0.58s"
+   "last_line": "1 failed, 140 passed, 21 subtests passed in 0.59s"
   },
   {
    "id": "7d8cf902b7",
@@ -9473,7 +9400,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 143 passed, 21 subtests passed in 0.57s"
+   "last_line": "1 failed, 145 passed, 21 subtests passed in 0.58s"
   },
   {
    "id": "877ff1d2d2",
@@ -9489,7 +9416,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 148 passed, 21 subtests passed in 0.58s"
+   "last_line": "1 failed, 150 passed, 21 subtests passed in 0.59s"
   },
   {
    "id": "a85e44ff53",
@@ -9521,7 +9448,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 137 passed, 21 subtests passed in 0.57s"
+   "last_line": "1 failed, 139 passed, 21 subtests passed in 0.57s"
   },
   {
    "id": "0abbe82e51",
@@ -9553,7 +9480,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 59 passed, 14 subtests passed in 0.35s"
+   "last_line": "1 failed, 59 passed, 14 subtests passed in 0.36s"
   },
   {
    "id": "e8cf9d4918",
@@ -9569,7 +9496,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 61 passed, 14 subtests passed in 0.36s"
+   "last_line": "1 failed, 61 passed, 14 subtests passed in 0.37s"
   },
   {
    "id": "4bd95cb5a1",
@@ -9585,7 +9512,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed, 192 passed, 21 subtests passed in 0.64s"
+   "last_line": "1 failed, 194 passed, 21 subtests passed in 0.64s"
   },
   {
    "id": "4cf3b5c2e3",
@@ -9601,7 +9528,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 146 passed, 21 subtests passed in 0.58s"
+   "last_line": "1 failed, 148 passed, 21 subtests passed in 0.58s"
   },
   {
    "id": "8d5b5fcdb7",
@@ -9633,7 +9560,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 142 passed, 21 subtests passed in 0.59s"
+   "last_line": "1 failed, 144 passed, 21 subtests passed in 0.59s"
   },
   {
    "id": "7b86c3c2b1",
@@ -9666,8 +9593,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 5.1,
-   "last_line": "1 failed, 240 passed, 21 subtests passed in 4.93s"
+   "seconds": 5.0,
+   "last_line": "1 failed, 242 passed, 21 subtests passed in 4.85s"
   },
   {
    "id": "635c27d793",
@@ -9684,7 +9611,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.46s"
+   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.45s"
   },
   {
    "id": "848817a197",
@@ -9701,7 +9628,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 79 passed, 21 subtests passed in 0.56s"
+   "last_line": "1 failed, 79 passed, 21 subtests passed in 0.57s"
   },
   {
    "id": "5beadd18bf",
@@ -9718,7 +9645,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.46s"
+   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.45s"
   },
   {
    "id": "00d1670ced",
@@ -9735,7 +9662,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.46s"
+   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.45s"
   },
   {
    "id": "22e2546ceb",
@@ -9803,7 +9730,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 64 passed, 14 subtests passed in 0.51s"
+   "last_line": "1 failed, 64 passed, 14 subtests passed in 0.50s"
   },
   {
    "id": "a34726639f",
@@ -9837,7 +9764,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 84 passed, 21 subtests passed in 0.57s"
+   "last_line": "1 failed, 84 passed, 21 subtests passed in 0.61s"
   },
   {
    "id": "fdecfc8bb6",
@@ -9854,7 +9781,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.46s"
+   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.45s"
   },
   {
    "id": "f6b941d22e",
@@ -9871,7 +9798,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.45s"
+   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.46s"
   },
   {
    "id": "9d21652ecd",
@@ -9922,7 +9849,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.45s"
+   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.46s"
   },
   {
    "id": "f15f9ddddb",
@@ -9956,7 +9883,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.45s"
+   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.46s"
   },
   {
    "id": "baabbee5c8",
@@ -9973,7 +9900,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 64 passed, 14 subtests passed in 0.51s"
+   "last_line": "1 failed, 64 passed, 14 subtests passed in 0.52s"
   },
   {
    "id": "a0d9a9aaf9",
@@ -10006,8 +9933,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.7,
-   "last_line": "1 failed, 64 passed, 14 subtests passed in 0.53s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 64 passed, 14 subtests passed in 0.51s"
   },
   {
    "id": "c982d68b03",
@@ -10024,7 +9951,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 64 passed, 14 subtests passed in 0.51s"
+   "last_line": "1 failed, 64 passed, 14 subtests passed in 0.50s"
   },
   {
    "id": "53c37cfd0c",
@@ -10058,7 +9985,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 66 passed, 16 subtests passed in 0.50s"
+   "last_line": "1 failed, 66 passed, 16 subtests passed in 0.51s"
   },
   {
    "id": "6c7aeb25fa",
@@ -10075,7 +10002,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 84 passed, 21 subtests passed in 0.53s"
+   "last_line": "1 failed, 84 passed, 21 subtests passed in 0.52s"
   },
   {
    "id": "58770adf56",
@@ -10211,7 +10138,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 79 passed, 21 subtests passed in 0.56s"
+   "last_line": "1 failed, 79 passed, 21 subtests passed in 0.57s"
   },
   {
    "id": "b6631a5c6c",
@@ -10228,7 +10155,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 79 passed, 21 subtests passed in 0.56s"
+   "last_line": "1 failed, 79 passed, 21 subtests passed in 0.55s"
   },
   {
    "id": "3a5ca43bae",
@@ -10261,7 +10188,7 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.6,
+   "seconds": 0.7,
    "last_line": "1 failed, 80 passed, 21 subtests passed in 0.52s"
   },
   {
@@ -10279,7 +10206,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.46s"
+   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.45s"
   },
   {
    "id": "130406c339",
@@ -10346,7 +10273,7 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.6,
+   "seconds": 0.7,
    "last_line": "1 failed, 66 passed, 16 subtests passed in 0.51s"
   },
   {
@@ -10364,7 +10291,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 66 passed, 16 subtests passed in 0.51s"
+   "last_line": "1 failed, 66 passed, 16 subtests passed in 0.50s"
   },
   {
    "id": "1cb5c5cf61",
@@ -10398,7 +10325,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 81 passed, 21 subtests passed in 0.54s"
+   "last_line": "1 failed, 81 passed, 21 subtests passed in 0.53s"
   },
   {
    "id": "9987db47b1",
@@ -10415,7 +10342,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.46s"
+   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.45s"
   },
   {
    "id": "9c50fae6c3",
@@ -10432,7 +10359,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 83 passed, 21 subtests passed in 0.54s"
+   "last_line": "1 failed, 83 passed, 21 subtests passed in 0.53s"
   },
   {
    "id": "a7fc57ec33",
@@ -10466,7 +10393,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.48s"
+   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.47s"
   },
   {
    "id": "34e7d7904e",
@@ -10482,8 +10409,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 5.1,
-   "last_line": "1 failed, 240 passed, 21 subtests passed in 4.91s"
+   "seconds": 5.0,
+   "last_line": "1 failed, 242 passed, 21 subtests passed in 4.84s"
   },
   {
    "id": "0fcad013b0",
@@ -10517,7 +10444,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 64 passed, 14 subtests passed in 0.51s"
+   "last_line": "1 failed, 64 passed, 14 subtests passed in 0.52s"
   },
   {
    "id": "b83069c79b",
@@ -10533,8 +10460,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 66 passed, 16 subtests passed in 0.51s"
+   "seconds": 0.7,
+   "last_line": "1 failed, 66 passed, 16 subtests passed in 0.52s"
   },
   {
    "id": "6788195641",
@@ -10551,7 +10478,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 84 passed, 21 subtests passed in 0.53s"
+   "last_line": "1 failed, 84 passed, 21 subtests passed in 0.52s"
   },
   {
    "id": "c0b7d1f81e",
@@ -10585,7 +10512,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 79 passed, 21 subtests passed in 0.54s"
+   "last_line": "1 failed, 79 passed, 21 subtests passed in 0.53s"
   },
   {
    "id": "1fb4e363e0",
@@ -10601,8 +10528,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.8,
-   "last_line": "1 failed, 80 passed, 21 subtests passed in 0.66s"
+   "seconds": 0.7,
+   "last_line": "1 failed, 80 passed, 21 subtests passed in 0.54s"
   },
   {
    "id": "73bc74f96b",
@@ -10619,7 +10546,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.45s"
+   "last_line": "1 failed, 23 passed, 12 subtests passed in 0.46s"
   },
   {
    "id": "3075537701",
@@ -10666,8 +10593,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 67 passed, 17 subtests passed in 0.44s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 67 passed, 17 subtests passed in 0.38s"
   },
   {
    "id": "04e2297e55",
@@ -10699,7 +10626,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.7,
-   "last_line": "1 failed, 67 passed, 17 subtests passed in 0.58s"
+   "last_line": "1 failed, 67 passed, 17 subtests passed in 0.57s"
   },
   {
    "id": "7e2ed0a710",
@@ -10731,7 +10658,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed, 67 passed, 17 subtests passed in 0.70s"
+   "last_line": "1 failed, 67 passed, 17 subtests passed in 0.62s"
   },
   {
    "id": "8a991efcb8",
@@ -10748,7 +10675,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 67 passed, 17 subtests passed in 0.40s"
+   "last_line": "1 failed, 67 passed, 17 subtests passed in 0.38s"
   },
   {
    "id": "ce7f1612bb",
@@ -10782,7 +10709,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 1.4,
-   "last_line": "1 failed, 226 passed, 21 subtests passed in 1.21s"
+   "last_line": "1 failed, 228 passed, 21 subtests passed in 1.22s"
   },
   {
    "id": "6e4c817a7c",
@@ -10799,7 +10726,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 69 passed, 17 subtests passed in 0.50s"
+   "last_line": "1 failed, 69 passed, 17 subtests passed in 0.45s"
   },
   {
    "id": "8a8fd78e91",
@@ -10816,7 +10743,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 69 passed, 17 subtests passed in 0.39s"
+   "last_line": "1 failed, 69 passed, 17 subtests passed in 0.38s"
   },
   {
    "id": "6de4f9dd46",
@@ -10833,7 +10760,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 69 passed, 17 subtests passed in 0.39s"
+   "last_line": "1 failed, 69 passed, 17 subtests passed in 0.40s"
   },
   {
    "id": "0b45fe534c",
@@ -10866,8 +10793,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 67 passed, 17 subtests passed in 0.47s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 67 passed, 17 subtests passed in 0.40s"
   },
   {
    "id": "0349a1b710",
@@ -10884,7 +10811,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 67 passed, 17 subtests passed in 0.39s"
+   "last_line": "1 failed, 67 passed, 17 subtests passed in 0.38s"
   },
   {
    "id": "ded93766b2",
@@ -10901,7 +10828,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 69 passed, 17 subtests passed in 0.39s"
+   "last_line": "1 failed, 69 passed, 17 subtests passed in 0.40s"
   },
   {
    "id": "0e08e60819",
@@ -10918,7 +10845,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 69 passed, 17 subtests passed in 0.40s"
+   "last_line": "1 failed, 69 passed, 17 subtests passed in 0.39s"
   },
   {
    "id": "35b20c0ad5",
@@ -10934,7 +10861,7 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.7,
+   "seconds": 0.5,
    "last_line": "1 failed, 69 passed, 17 subtests passed in 0.40s"
   },
   {
@@ -10952,7 +10879,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 69 passed, 17 subtests passed in 0.39s"
+   "last_line": "1 failed, 69 passed, 17 subtests passed in 0.38s"
   },
   {
    "id": "17ae4ae30a",
@@ -10967,7 +10894,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.32s"
+   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.30s"
   },
   {
    "id": "1b3b909473",
@@ -10982,7 +10909,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 82 passed, 21 subtests passed in 0.39s"
+   "last_line": "1 failed, 82 passed, 21 subtests passed in 0.38s"
   },
   {
    "id": "fbeb1980a8",
@@ -10996,8 +10923,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 82 passed, 21 subtests passed in 0.38s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 82 passed, 21 subtests passed in 0.41s"
   },
   {
    "id": "ae05bd72fc",
@@ -11012,7 +10939,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.8,
-   "last_line": "1 failed, 115 passed, 21 subtests passed in 0.71s"
+   "last_line": "1 failed, 115 passed, 21 subtests passed in 0.70s"
   },
   {
    "id": "9407e46eae",
@@ -11042,7 +10969,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.31s"
+   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.29s"
   },
   {
    "id": "1ea2fd7a06",
@@ -11056,8 +10983,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "2 failed, 74 passed, 19 subtests passed in 0.39s"
+   "seconds": 0.7,
+   "last_line": "2 failed, 74 passed, 19 subtests passed in 0.58s"
   },
   {
    "id": "61f58e2d53",
@@ -11102,7 +11029,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.29s"
+   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.30s"
   },
   {
    "id": "e8c4e1baf9",
@@ -11116,8 +11043,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 82 passed, 21 subtests passed in 0.44s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 82 passed, 21 subtests passed in 0.41s"
   },
   {
    "id": "48fcb578ec",
@@ -11177,7 +11104,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 1.0,
-   "last_line": "1 failed, 115 passed, 21 subtests passed in 0.82s"
+   "last_line": "1 failed, 115 passed, 21 subtests passed in 0.88s"
   },
   {
    "id": "fccb9479c8",
@@ -11237,7 +11164,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "2 failed, 74 passed, 19 subtests passed in 0.47s"
+   "last_line": "2 failed, 74 passed, 19 subtests passed in 0.45s"
   },
   {
    "id": "543a488377",
@@ -11252,7 +11179,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 1.0,
-   "last_line": "1 failed, 130 passed, 21 subtests passed in 0.89s"
+   "last_line": "1 failed, 130 passed, 21 subtests passed in 0.87s"
   },
   {
    "id": "d3a38d76b3",
@@ -11267,7 +11194,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.30s"
+   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.29s"
   },
   {
    "id": "568aa15b5c",
@@ -11296,8 +11223,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "2 failed, 72 passed, 17 subtests passed in 0.46s"
+   "seconds": 0.5,
+   "last_line": "2 failed, 72 passed, 17 subtests passed in 0.39s"
   },
   {
    "id": "359328cf21",
@@ -11312,7 +11239,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "2 failed, 74 passed, 19 subtests passed in 0.36s"
+   "last_line": "2 failed, 74 passed, 19 subtests passed in 0.37s"
   },
   {
    "id": "7ac4ffdd55",
@@ -11342,7 +11269,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 72 passed, 19 subtests passed in 0.35s"
+   "last_line": "1 failed, 72 passed, 19 subtests passed in 0.36s"
   },
   {
    "id": "e31b74b149",
@@ -11356,8 +11283,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 82 passed, 21 subtests passed in 0.42s"
+   "seconds": 0.7,
+   "last_line": "1 failed, 82 passed, 21 subtests passed in 0.49s"
   },
   {
    "id": "1096e5f96b",
@@ -11371,8 +11298,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 80 passed, 21 subtests passed in 0.40s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 80 passed, 21 subtests passed in 0.44s"
   },
   {
    "id": "ee4cd94c02",
@@ -11417,7 +11344,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 74 passed, 20 subtests passed in 0.47s"
+   "last_line": "1 failed, 74 passed, 20 subtests passed in 0.45s"
   },
   {
    "id": "c9bf243148",
@@ -11432,7 +11359,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 70 passed, 17 subtests passed in 0.41s"
+   "last_line": "1 failed, 70 passed, 17 subtests passed in 0.39s"
   },
   {
    "id": "7798edd91b",
@@ -11462,7 +11389,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.29s"
+   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.30s"
   },
   {
    "id": "f29b76ed7a",
@@ -11477,7 +11404,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.34s"
+   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.37s"
   },
   {
    "id": "7c0ea0c857",
@@ -11491,8 +11418,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 82 passed, 21 subtests passed in 0.40s"
+   "seconds": 0.6,
+   "last_line": "1 failed, 82 passed, 21 subtests passed in 0.48s"
   },
   {
    "id": "a3955bede3",
@@ -11507,7 +11434,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "2 failed, 72 passed, 17 subtests passed in 0.36s"
+   "last_line": "2 failed, 72 passed, 17 subtests passed in 0.37s"
   },
   {
    "id": "98ed31b7a6",
@@ -11551,7 +11478,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 80 passed, 21 subtests passed in 0.41s"
+   "last_line": "1 failed, 80 passed, 21 subtests passed in 0.40s"
   },
   {
    "id": "b830184db5",
@@ -11565,8 +11492,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.6,
-   "last_line": "1 failed, 80 passed, 21 subtests passed in 0.44s"
+   "seconds": 0.5,
+   "last_line": "1 failed, 80 passed, 21 subtests passed in 0.41s"
   },
   {
    "id": "580abc95f8",
@@ -11581,7 +11508,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 1.0,
-   "last_line": "1 failed, 130 passed, 21 subtests passed in 0.89s"
+   "last_line": "1 failed, 130 passed, 21 subtests passed in 0.88s"
   },
   {
    "id": "6ae63f3940",
@@ -11596,7 +11523,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.29s"
+   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.30s"
   },
   {
    "id": "a7155aef4a",
@@ -11611,7 +11538,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.31s"
+   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.32s"
   },
   {
    "id": "065298043d",
@@ -11626,7 +11553,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 70 passed, 17 subtests passed in 0.40s"
+   "last_line": "1 failed, 70 passed, 17 subtests passed in 0.41s"
   },
   {
    "id": "0536a2685c",
@@ -11640,8 +11567,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.8,
-   "last_line": "1 failed, 115 passed, 21 subtests passed in 0.71s"
+   "seconds": 0.9,
+   "last_line": "1 failed, 115 passed, 21 subtests passed in 0.74s"
   },
   {
    "id": "e1c27b613f",
@@ -11656,7 +11583,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 79 passed, 21 subtests passed in 0.37s"
+   "last_line": "1 failed, 79 passed, 21 subtests passed in 0.38s"
   },
   {
    "id": "6d78933ca0",
@@ -11671,7 +11598,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 74 passed, 21 subtests passed in 0.36s"
+   "last_line": "1 failed, 74 passed, 21 subtests passed in 0.40s"
   },
   {
    "id": "680ab71fff",
@@ -11685,8 +11612,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 1.2,
-   "last_line": "1 failed, 130 passed, 21 subtests passed in 1.05s"
+   "seconds": 1.1,
+   "last_line": "1 failed, 130 passed, 21 subtests passed in 0.97s"
   },
   {
    "id": "ab853a3e4a",
@@ -11701,7 +11628,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.31s"
+   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.30s"
   },
   {
    "id": "27927b276d",
@@ -11716,7 +11643,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.30s"
+   "last_line": "1 failed, 24 passed, 12 subtests passed in 0.29s"
   },
   {
    "id": "8ec4c4b272",
@@ -11746,7 +11673,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 37 passed, 12 subtests passed in 0.36s"
+   "last_line": "1 failed, 37 passed, 12 subtests passed in 0.33s"
   },
   {
    "id": "61026c11f1",
@@ -11805,8 +11732,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.4,
-   "last_line": "1 failed, 1 passed in 0.16s"
+   "seconds": 0.3,
+   "last_line": "1 failed, 1 passed in 0.14s"
   },
   {
    "id": "0c27850b16",
@@ -11821,7 +11748,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 37 passed, 12 subtests passed in 0.32s"
+   "last_line": "1 failed, 37 passed, 12 subtests passed in 0.31s"
   },
   {
    "id": "20859cb743",
@@ -11866,7 +11793,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 37 passed, 12 subtests passed in 0.35s"
+   "last_line": "1 failed, 37 passed, 12 subtests passed in 0.34s"
   },
   {
    "id": "cd1095539a",
@@ -11910,7 +11837,7 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.4,
+   "seconds": 0.3,
    "last_line": "1 failed, 1 passed in 0.24s"
   },
   {
@@ -11926,7 +11853,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 1 passed in 0.25s"
+   "last_line": "1 failed, 1 passed in 0.28s"
   },
   {
    "id": "650d63c97d",
@@ -11956,7 +11883,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 39 passed, 12 subtests passed in 0.30s"
+   "last_line": "1 failed, 39 passed, 12 subtests passed in 0.29s"
   },
   {
    "id": "436e0189b5",
@@ -11986,7 +11913,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 40 passed, 12 subtests passed in 0.31s"
+   "last_line": "1 failed, 40 passed, 12 subtests passed in 0.32s"
   },
   {
    "id": "8e712be967",
@@ -12046,7 +11973,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 1 passed in 0.29s"
+   "last_line": "1 failed, 1 passed in 0.27s"
   },
   {
    "id": "c6bc391c3a",
@@ -12061,7 +11988,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 40 passed, 12 subtests passed in 0.31s"
+   "last_line": "1 failed, 40 passed, 12 subtests passed in 0.30s"
   },
   {
    "id": "e4fcf1ead2",
@@ -12076,7 +12003,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 86 passed, 21 subtests passed in 0.35s"
+   "last_line": "1 failed, 86 passed, 21 subtests passed in 0.36s"
   },
   {
    "id": "d86c32c477",
@@ -12106,7 +12033,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 40 passed, 12 subtests passed in 0.33s"
+   "last_line": "1 failed, 40 passed, 12 subtests passed in 0.36s"
   },
   {
    "id": "cad83c61e1",
@@ -12121,7 +12048,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 12 passed, 4 subtests passed in 0.27s"
+   "last_line": "1 failed, 12 passed, 4 subtests passed in 0.26s"
   },
   {
    "id": "233c56bdd9",
@@ -12136,7 +12063,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 1 passed in 0.25s"
+   "last_line": "1 failed, 1 passed in 0.26s"
   },
   {
    "id": "5c85e81dfe",
@@ -12151,7 +12078,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 42 passed, 12 subtests passed in 0.29s"
+   "last_line": "1 failed, 42 passed, 12 subtests passed in 0.28s"
   },
   {
    "id": "26c486ea00",
@@ -12226,7 +12153,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.6,
-   "last_line": "1 failed, 86 passed, 21 subtests passed in 0.47s"
+   "last_line": "1 failed, 86 passed, 21 subtests passed in 0.44s"
   },
   {
    "id": "8c6aa34970",
@@ -12286,7 +12213,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 1 passed in 0.25s"
+   "last_line": "1 failed, 1 passed in 0.26s"
   },
   {
    "id": "de18c452b6",
@@ -12330,7 +12257,7 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.3,
+   "seconds": 0.4,
    "last_line": "1 failed, 1 passed in 0.24s"
   },
   {
@@ -12346,7 +12273,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 1 passed in 0.27s"
+   "last_line": "1 failed, 1 passed in 0.25s"
   },
   {
    "id": "0c9f671dce",
@@ -12361,7 +12288,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 1 passed in 0.25s"
+   "last_line": "1 failed, 1 passed in 0.26s"
   },
   {
    "id": "a882bfdb3d",
@@ -12391,7 +12318,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 38 passed, 12 subtests passed in 0.27s"
+   "last_line": "1 failed, 38 passed, 12 subtests passed in 0.28s"
   },
   {
    "id": "b406e498ac",
@@ -12406,7 +12333,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 29 passed, 12 subtests passed in 0.37s"
+   "last_line": "1 failed, 29 passed, 12 subtests passed in 0.31s"
   },
   {
    "id": "5189d95a4d",
@@ -12466,7 +12393,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 29 passed, 12 subtests passed in 0.30s"
+   "last_line": "1 failed, 29 passed, 12 subtests passed in 0.31s"
   },
   {
    "id": "7f4d29b479",
@@ -12525,8 +12452,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 30 passed, 12 subtests passed in 0.34s"
+   "seconds": 0.4,
+   "last_line": "1 failed, 30 passed, 12 subtests passed in 0.29s"
   },
   {
    "id": "7041b3541f",
@@ -12541,7 +12468,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 29 passed, 12 subtests passed in 0.30s"
+   "last_line": "1 failed, 29 passed, 12 subtests passed in 0.31s"
   },
   {
    "id": "ef314a2629",
@@ -12586,7 +12513,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.5,
-   "last_line": "1 failed, 30 passed, 12 subtests passed in 0.37s"
+   "last_line": "1 failed, 30 passed, 12 subtests passed in 0.32s"
   },
   {
    "id": "0476edc23e",
@@ -12616,7 +12543,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 30 passed, 12 subtests passed in 0.28s"
+   "last_line": "1 failed, 30 passed, 12 subtests passed in 0.30s"
   },
   {
    "id": "22aecae40a",
@@ -12645,8 +12572,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 32 passed, 12 subtests passed in 0.37s"
+   "seconds": 0.4,
+   "last_line": "1 failed, 32 passed, 12 subtests passed in 0.30s"
   },
   {
    "id": "656d78bf2d",
@@ -12661,7 +12588,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 31 passed, 12 subtests passed in 0.31s"
+   "last_line": "1 failed, 31 passed, 12 subtests passed in 0.30s"
   },
   {
    "id": "204158e9d1",
@@ -12676,7 +12603,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.30s"
+   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.29s"
   },
   {
    "id": "04d4124859",
@@ -12691,7 +12618,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 34 passed, 12 subtests passed in 0.28s"
+   "last_line": "1 failed, 34 passed, 12 subtests passed in 0.27s"
   },
   {
    "id": "48f89707c9",
@@ -12705,8 +12632,8 @@
    ],
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
-   "seconds": 0.5,
-   "last_line": "1 failed, 34 passed, 12 subtests passed in 0.34s"
+   "seconds": 0.4,
+   "last_line": "1 failed, 34 passed, 12 subtests passed in 0.30s"
   },
   {
    "id": "fa64b22a56",
@@ -12721,7 +12648,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.30s"
+   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.29s"
   },
   {
    "id": "a6d90d6443",
@@ -12736,7 +12663,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.30s"
+   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.29s"
   },
   {
    "id": "2aa7aa254f",
@@ -12780,7 +12707,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 34 passed, 12 subtests passed in 0.30s"
+   "last_line": "1 failed, 34 passed, 12 subtests passed in 0.28s"
   },
   {
    "id": "77ae39ea80",
@@ -12795,7 +12722,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 34 passed, 12 subtests passed in 0.30s"
+   "last_line": "1 failed, 34 passed, 12 subtests passed in 0.29s"
   },
   {
    "id": "17fe27b5ac",
@@ -12810,7 +12737,7 @@
    "decision": "F7 proof model (SS-81 family)",
    "status": "KILLED",
    "seconds": 0.4,
-   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.31s"
+   "last_line": "1 failed, 33 passed, 12 subtests passed in 0.30s"
   },
   {
    "id": "34094eb928",
@@ -12842,7 +12769,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 1 passed in 0.12s"
+   "last_line": "1 failed, 1 passed in 0.11s"
   },
   {
    "id": "4ba7cc4c3a",
@@ -12858,7 +12785,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 1 passed in 0.12s"
+   "last_line": "1 failed, 1 passed in 0.11s"
   },
   {
    "id": "fc4eaec85c",
@@ -12874,7 +12801,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 1 passed in 0.12s"
+   "last_line": "1 failed, 1 passed in 0.11s"
   },
   {
    "id": "e8e2944bd6",
@@ -12922,7 +12849,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 5 passed in 0.12s"
+   "last_line": "1 failed, 5 passed in 0.11s"
   },
   {
    "id": "579368a2b5",
@@ -12970,7 +12897,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 5 passed in 0.12s"
+   "last_line": "1 failed, 5 passed in 0.11s"
   },
   {
    "id": "d8091c73c8",
@@ -12986,7 +12913,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 6 passed in 0.11s"
+   "last_line": "1 failed, 6 passed in 0.12s"
   },
   {
    "id": "bb892d29b5",
@@ -13002,7 +12929,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 10 passed in 0.12s"
+   "last_line": "1 failed, 10 passed in 0.11s"
   },
   {
    "id": "e2d7996396",
@@ -13034,7 +12961,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 1 passed in 0.12s"
+   "last_line": "1 failed, 1 passed in 0.11s"
   },
   {
    "id": "e524a600fb",
@@ -13050,7 +12977,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 1 passed in 0.12s"
+   "last_line": "1 failed, 1 passed in 0.11s"
   },
   {
    "id": "9c09cb7677",
@@ -13097,7 +13024,7 @@
    ],
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.3,
+   "seconds": 0.2,
    "last_line": "1 failed, 1 passed in 0.11s"
   },
   {
@@ -13114,7 +13041,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 5 passed in 0.11s"
+   "last_line": "1 failed, 5 passed in 0.12s"
   },
   {
    "id": "1661b4bfb0",
@@ -13130,7 +13057,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 5 passed in 0.11s"
+   "last_line": "1 failed, 5 passed in 0.12s"
   },
   {
    "id": "7ec29fd385",
@@ -13161,7 +13088,7 @@
    ],
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.3,
+   "seconds": 0.2,
    "last_line": "1 failed, 6 passed in 0.11s"
   },
   {
@@ -13194,7 +13121,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed in 0.12s"
+   "last_line": "1 failed in 0.11s"
   },
   {
    "id": "73b6d1d357",
@@ -13242,7 +13169,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed in 0.12s"
+   "last_line": "1 failed in 0.11s"
   },
   {
    "id": "97cb750455",
@@ -13386,7 +13313,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 8 passed in 0.12s"
+   "last_line": "1 failed, 8 passed in 0.11s"
   },
   {
    "id": "3c3d679ee7",
@@ -13434,7 +13361,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 8 passed in 0.12s"
+   "last_line": "1 failed, 8 passed in 0.11s"
   },
   {
    "id": "f5edeffa84",
@@ -13529,7 +13456,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 8 passed in 0.12s"
+   "last_line": "1 failed, 8 passed in 0.11s"
   },
   {
    "id": "910fd51945",
@@ -13737,7 +13664,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed in 0.08s"
+   "last_line": "1 failed in 0.07s"
   },
   {
    "id": "4927486b89",
@@ -13801,7 +13728,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed in 0.08s"
+   "last_line": "1 failed in 0.07s"
   },
   {
    "id": "c9468a169e",
@@ -13944,8 +13871,8 @@
    ],
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.2,
-   "last_line": "1 failed in 0.08s"
+   "seconds": 0.3,
+   "last_line": "1 failed in 0.15s"
   },
   {
    "id": "e3d6553f58",
@@ -14025,7 +13952,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 13 passed in 0.09s"
+   "last_line": "1 failed, 13 passed in 0.08s"
   },
   {
    "id": "07861a93fa",
@@ -14151,7 +14078,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.3,
-   "last_line": "1 failed, 8 passed in 0.14s"
+   "last_line": "1 failed, 8 passed in 0.13s"
   },
   {
    "id": "c1646beff0",
@@ -14165,8 +14092,8 @@
    ],
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.3,
-   "last_line": "1 failed, 9 passed in 0.14s"
+   "seconds": 0.2,
+   "last_line": "1 failed, 9 passed in 0.13s"
   },
   {
    "id": "2885e95cd0",
@@ -14270,8 +14197,8 @@
    ],
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
-   "seconds": 0.3,
-   "last_line": "1 failed, 13 passed in 0.22s"
+   "seconds": 0.4,
+   "last_line": "1 failed, 13 passed in 0.23s"
   },
   {
    "id": "10e0daa460",
@@ -14331,7 +14258,7 @@
    "decision": "F8 AC proof obligation (TDD proof policy V2)",
    "status": "KILLED",
    "seconds": 0.2,
-   "last_line": "1 failed, 24 passed in 0.10s"
+   "last_line": "1 failed, 24 passed in 0.09s"
   },
   {
    "id": "0946c0475c",
@@ -14348,5 +14275,25 @@
    "seconds": 0.2,
    "last_line": "1 failed, 25 passed in 0.10s"
   }
- ]
+ ],
+ "equivalence_audit": {
+  "rule": "owner decision 2026-09-20 section 5: a message-only mutation may NOT be called equivalent if the message itself is part of the structured gate-feedback contract",
+  "audited": "the 9 EQUIVALENT rows, re-checked on the SS-96 kernel 4359f347 — the same 9 ids as on 42a29853",
+  "message_only_mutants": [
+   {
+    "id": "192e5a90e3",
+    "site": "aisef/control/state.py:456 (the lease-refusal TransitionError text)",
+    "in_gate_feedback_contract": false,
+    "measured": "the wording occurs only at its definition site (grep of aisef/ for 'may not move it'); no consumer reads the message — run.py catches TransitionError by type. The raise, its type and its condition are unchanged by the mutant and are asserted by tests/test_state.py::TestLeaseEdges"
+   },
+   {
+    "id": "5b479bdc93",
+    "site": "aisef/harness/tools.py:363 (the generic unrunnable reason text)",
+    "in_gate_feedback_contract": false,
+    "measured": "the wording occurs only at its definition site; callers (tools.py:219, qa.py:579) store it as res.unrunnable and control reads only that it is non-empty (TOOL_UNRUNNABLE)"
+   }
+  ],
+  "policy_v2_feedback_contract": "the structured feedback of the V2 gate (aisef/control/obligation.py::row and the failing lines built in gate.py::_nop_check) is a mutation target in this run and had 0 survivors and 0 equivalents; its fields are additionally asserted per scenario by TDD-POLICY-V2-CONFORMANCE (ac_id, requirement, proof_mode, expected and actual transition, parent and candidate proof states, owner); the SS-96 check aisef/control/gate.py::_tdd_check is a target of its own in this run: 23 mutants, 23 killed, 0 survived, 0 equivalent",
+  "conclusion": "no equivalent mutant is excused on a message that carries control meaning"
+ }
 }

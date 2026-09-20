@@ -1,12 +1,12 @@
 {
  "artifact": "TDD-POLICY-V2-CONFORMANCE",
- "generated": "2026-09-20T13:13:29+0700",
- "git_sha": "67bd0251c26edb5753dadf9efaa82eac2a7003b5",
- "aisef_tree": "42a29853a3a8a10e5c58b319c5a181f2898be1d5",
+ "generated": "2026-09-20T17:07:45+0700",
+ "git_sha": "2f2be734f5a87f4a1d0faefdcdbd579bf7d5e92f",
+ "aisef_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
  "aisef_dirty": [],
- "elapsed_s": 13.2,
+ "elapsed_s": 19.2,
  "summary": {
-  "scenarios": 14,
+  "scenarios": 20,
   "proof_modes_exercised": "3/3",
   "proof_state_transitions_exercised": [
    "DEPENDENCY_UNRUNNABLE -> GREEN_EXECUTED",
@@ -14,23 +14,25 @@
    "GREEN_EXECUTED -> RED_EXECUTED",
    "NOT_COLLECTED -> GREEN_EXECUTED",
    "RED_COLLECTION_BOUND_TO_STORY -> GREEN_EXECUTED",
-   "RED_EXECUTED -> GREEN_EXECUTED"
+   "RED_EXECUTED -> GREEN_EXECUTED",
+   "RED_EXECUTED -> RED_EXECUTED"
   ],
   "per_ac_outcomes_exercised": {
-   "SATISFIED": 15,
+   "SATISFIED": 18,
    "PLAN_OVERLAP": 2,
    "DEVELOPER_REGRESSION": 3,
-   "NO_EVIDENCE": 2
+   "NO_EVIDENCE": 3,
+   "DEVELOPER_QUALITY_BLOCK": 1
   },
   "outcomes_by_owner": {
    "PLAN": 2,
-   "DEVELOPER": 3,
-   "ENVIRONMENT": 2,
+   "DEVELOPER": 4,
+   "ENVIRONMENT": 3,
    "VERIFIER": 0
   },
   "plan_owned_outcomes": 2,
-  "developer_owned_outcomes": 3,
-  "environment_owned_outcomes": 2,
+  "developer_owned_outcomes": 4,
+  "environment_owned_outcomes": 3,
   "mixed_story_scenario": true,
   "mismatches": 0,
   "invariant_violations": 0
@@ -57,15 +59,17 @@
     ],
     "check": "PASS",
     "owners": [],
+    "ruling_owner": null,
     "terminal": "done",
     "developer_sessions": 1,
-    "quality_attempts": 1
+    "quality_attempts": 1,
+    "min_stage_retries": 0
    },
    "real": {
     "terminal": "done",
     "blocked_reason": "",
     "check": "PASS",
-    "check_detail": "1 criteria each showed what their obligation asks at parent SHA 24abd12 (1 change required); 1 executed red, 0 unable to import code this story introduces",
+    "check_detail": "1 criteria each showed what their obligation asks at parent SHA f73925c (1 change required); 1 executed red, 0 unable to import code this story introduces",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -94,11 +98,17 @@
     "developer_sessions": 1,
     "quality_attempts": 1,
     "attempts": 1,
+    "verify_only_attempts": 0,
+    "infra_attempts": 0,
+    "review_executions": 1,
+    "security_executions": 1,
+    "checks_failed": [],
+    "checks_unrunnable": [],
     "failures": [],
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 0.85
+   "elapsed_s": 0.87
   },
   {
    "case": "B",
@@ -123,15 +133,17 @@
     "owners": [
      "PLAN"
     ],
+    "ruling_owner": "PLAN",
     "terminal": "PLAN_CONFLICT",
     "developer_sessions": 1,
-    "quality_attempts": 1
+    "quality_attempts": 1,
+    "min_stage_retries": 0
    },
    "real": {
     "terminal": "PLAN_CONFLICT",
     "blocked_reason": "deadlock due to plan: AC-STORY-07-01-1 [CHANGE_REQUIRED] GREEN -> GREEN → PLAN_OVERLAP: declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code. The criterion cannot ",
     "check": "FAIL",
-    "check_detail": "at parent SHA 704fbcc: AC-STORY-07-01-1 [CHANGE_REQUIRED, FR-4] GREEN -> GREEN (parent GREEN_EXECUTED / candidate GREEN_EXECUTED), expected RED -> GREEN → PLAN_OVERLAP (PLAN): declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code [tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_already]",
+    "check_detail": "at parent SHA f73925c: AC-STORY-07-01-1 [CHANGE_REQUIRED, FR-4] GREEN -> GREEN (parent GREEN_EXECUTED / candidate GREEN_EXECUTED), expected RED -> GREEN → PLAN_OVERLAP (PLAN): declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code [tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_already]",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -164,6 +176,15 @@
     "developer_sessions": 1,
     "quality_attempts": 1,
     "attempts": 1,
+    "verify_only_attempts": 0,
+    "infra_attempts": 0,
+    "review_executions": 1,
+    "security_executions": 1,
+    "checks_failed": [
+     "TDD",
+     "tests verify story"
+    ],
+    "checks_unrunnable": [],
     "failures": [
      "TDD",
      "tests verify story"
@@ -171,7 +192,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 0.84
+   "elapsed_s": 0.85
   },
   {
    "case": "C",
@@ -206,15 +227,17 @@
     ],
     "check": "PASS",
     "owners": [],
+    "ruling_owner": null,
     "terminal": "done",
     "developer_sessions": 1,
-    "quality_attempts": 1
+    "quality_attempts": 1,
+    "min_stage_retries": 0
    },
    "real": {
     "terminal": "done",
     "blocked_reason": "",
     "check": "PASS",
-    "check_detail": "2 criteria each showed what their obligation asks at parent SHA c0191f4 (1 change required, 1 preserve required); 1 executed red, 0 unable to import code this story introduces",
+    "check_detail": "2 criteria each showed what their obligation asks at parent SHA f32e3d4 (1 change required, 1 preserve required); 1 executed red, 0 unable to import code this story introduces",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -264,11 +287,17 @@
     "developer_sessions": 1,
     "quality_attempts": 1,
     "attempts": 1,
+    "verify_only_attempts": 0,
+    "infra_attempts": 0,
+    "review_executions": 1,
+    "security_executions": 1,
+    "checks_failed": [],
+    "checks_unrunnable": [],
     "failures": [],
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 0.85
+   "elapsed_s": 0.88
   },
   {
    "case": "D",
@@ -305,15 +334,17 @@
     "owners": [
      "DEVELOPER"
     ],
+    "ruling_owner": "DEVELOPER",
     "terminal": "QUALITY_BLOCK",
     "developer_sessions": 2,
-    "quality_attempts": 2
+    "quality_attempts": 2,
+    "min_stage_retries": 0
    },
    "real": {
     "terminal": "QUALITY_BLOCK",
     "blocked_reason": "tried 2 attempts, still did not pass gate",
     "check": "FAIL",
-    "check_detail": "at parent SHA 1d8ff7a: AC-STORY-07-01-2 [PRESERVE_REQUIRED, FR-2] GREEN -> RED (parent GREEN_EXECUTED / candidate RED_EXECUTED), expected GREEN -> GREEN → DEVELOPER_REGRESSION (DEVELOPER): this story broke behaviour it inherited [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_break]",
+    "check_detail": "at parent SHA 454897f: AC-STORY-07-01-2 [PRESERVE_REQUIRED, FR-2] GREEN -> RED (parent GREEN_EXECUTED / candidate RED_EXECUTED), expected GREEN -> GREEN → DEVELOPER_REGRESSION (DEVELOPER): this story broke behaviour it inherited [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_break]",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -365,6 +396,17 @@
     "developer_sessions": 2,
     "quality_attempts": 2,
     "attempts": 2,
+    "verify_only_attempts": 0,
+    "infra_attempts": 0,
+    "review_executions": 2,
+    "security_executions": 2,
+    "checks_failed": [
+     "TDD",
+     "criteria have tests",
+     "test",
+     "tests verify story"
+    ],
+    "checks_unrunnable": [],
     "failures": [
      "test",
      "criteria have tests",
@@ -374,7 +416,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 1.52
+   "elapsed_s": 1.6
   },
   {
    "case": "E",
@@ -409,15 +451,17 @@
     ],
     "check": "PASS",
     "owners": [],
+    "ruling_owner": null,
     "terminal": "done",
     "developer_sessions": 1,
-    "quality_attempts": 1
+    "quality_attempts": 1,
+    "min_stage_retries": 0
    },
    "real": {
     "terminal": "done",
     "blocked_reason": "",
     "check": "PASS",
-    "check_detail": "2 criteria each showed what their obligation asks at parent SHA 02cd576 (1 change required, 1 negative invariant); 1 executed red, 0 unable to import code this story introduces",
+    "check_detail": "2 criteria each showed what their obligation asks at parent SHA b06ea46 (1 change required, 1 negative invariant); 1 executed red, 0 unable to import code this story introduces",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -467,11 +511,17 @@
     "developer_sessions": 1,
     "quality_attempts": 1,
     "attempts": 1,
+    "verify_only_attempts": 0,
+    "infra_attempts": 0,
+    "review_executions": 1,
+    "security_executions": 1,
+    "checks_failed": [],
+    "checks_unrunnable": [],
     "failures": [],
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 0.86
+   "elapsed_s": 0.89
   },
   {
    "case": "F",
@@ -508,15 +558,17 @@
     "owners": [
      "DEVELOPER"
     ],
+    "ruling_owner": "DEVELOPER",
     "terminal": "QUALITY_BLOCK",
     "developer_sessions": 2,
-    "quality_attempts": 2
+    "quality_attempts": 2,
+    "min_stage_retries": 0
    },
    "real": {
     "terminal": "QUALITY_BLOCK",
     "blocked_reason": "tried 2 attempts, still did not pass gate",
     "check": "FAIL",
-    "check_detail": "at parent SHA 9e85bf8: AC-STORY-07-01-2 [NEGATIVE_INVARIANT, FR-9] GREEN -> RED (parent GREEN_EXECUTED / candidate RED_EXECUTED), expected GREEN -> GREEN → DEVELOPER_REGRESSION (DEVELOPER): this story broke a prohibition that held at its parent [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_absence_broken]",
+    "check_detail": "at parent SHA 8521ac0: AC-STORY-07-01-2 [NEGATIVE_INVARIANT, FR-9] GREEN -> RED (parent GREEN_EXECUTED / candidate RED_EXECUTED), expected GREEN -> GREEN → DEVELOPER_REGRESSION (DEVELOPER): this story broke a prohibition that held at its parent [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_absence_broken]",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -568,6 +620,17 @@
     "developer_sessions": 2,
     "quality_attempts": 2,
     "attempts": 2,
+    "verify_only_attempts": 0,
+    "infra_attempts": 0,
+    "review_executions": 2,
+    "security_executions": 2,
+    "checks_failed": [
+     "TDD",
+     "criteria have tests",
+     "test",
+     "tests verify story"
+    ],
+    "checks_unrunnable": [],
     "failures": [
      "test",
      "criteria have tests",
@@ -577,7 +640,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 1.52
+   "elapsed_s": 1.56
   },
   {
    "case": "G",
@@ -614,15 +677,17 @@
     "owners": [
      "ENVIRONMENT"
     ],
-    "terminal": "QUALITY_BLOCK",
-    "developer_sessions": 2,
-    "quality_attempts": 2
+    "ruling_owner": "ENVIRONMENT",
+    "terminal": "ENVIRONMENT_FAILURE",
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "min_stage_retries": 1
    },
    "real": {
-    "terminal": "QUALITY_BLOCK",
-    "blocked_reason": "tried 2 attempts, still did not pass gate",
+    "terminal": "ENVIRONMENT_FAILURE",
+    "blocked_reason": "ENVIRONMENT_FAILURE: TDD, tests verify story could not run on candidate c88c8093 after 3 re-run(s) — the environment, not the work, is what failed. The candidate is kept; fix the environment and re-run: `/Users/nghinh/Downloads/projects/ai-sdlc/bin/aisef run --verify-only --story STORY-07-01`.",
     "check": "UNRUNNABLE",
-    "check_detail": "at parent SHA 27d2ffa: AC-STORY-07-01-2 [CHANGE_REQUIRED, FR-2] NO_EVIDENCE -> GREEN (parent DEPENDENCY_UNRUNNABLE / candidate GREEN_EXECUTED), expected RED -> GREEN → NO_EVIDENCE (ENVIRONMENT): the parent run shows nothing about this criterion — no evidence is never proof [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_parent_unrunnable]",
+    "check_detail": "at parent SHA 7b59c38: AC-STORY-07-01-2 [CHANGE_REQUIRED, FR-2] NO_EVIDENCE -> GREEN (parent DEPENDENCY_UNRUNNABLE / candidate GREEN_EXECUTED), expected RED -> GREEN → NO_EVIDENCE (ENVIRONMENT): the parent run shows nothing about this criterion — no evidence is never proof [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_parent_unrunnable]",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -671,9 +736,18 @@
      "ENVIRONMENT"
     ],
     "still_green": [],
-    "developer_sessions": 2,
-    "quality_attempts": 2,
-    "attempts": 2,
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "attempts": 4,
+    "verify_only_attempts": 3,
+    "infra_attempts": 0,
+    "review_executions": 1,
+    "security_executions": 1,
+    "checks_failed": [],
+    "checks_unrunnable": [
+     "TDD",
+     "tests verify story"
+    ],
     "failures": [
      "TDD",
      "tests verify story"
@@ -681,7 +755,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 1.53
+   "elapsed_s": 0.99
   },
   {
    "case": "H",
@@ -718,15 +792,17 @@
     "owners": [
      "ENVIRONMENT"
     ],
-    "terminal": "QUALITY_BLOCK",
-    "developer_sessions": 2,
-    "quality_attempts": 2
+    "ruling_owner": "ENVIRONMENT",
+    "terminal": "ENVIRONMENT_FAILURE",
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "min_stage_retries": 1
    },
    "real": {
-    "terminal": "QUALITY_BLOCK",
-    "blocked_reason": "tried 2 attempts, still did not pass gate",
+    "terminal": "ENVIRONMENT_FAILURE",
+    "blocked_reason": "ENVIRONMENT_FAILURE: TDD, tests verify story could not run on candidate 8b11bae4 after 3 re-run(s) — the environment, not the work, is what failed. The candidate is kept; fix the environment and re-run: `/Users/nghinh/Downloads/projects/ai-sdlc/bin/aisef run --verify-only --story STORY-07-01`.",
     "check": "UNRUNNABLE",
-    "check_detail": "at parent SHA da7f477: AC-STORY-07-01-2 [CHANGE_REQUIRED, FR-2] NO_EVIDENCE -> GREEN (parent NOT_COLLECTED / candidate GREEN_EXECUTED), expected RED -> GREEN → NO_EVIDENCE (ENVIRONMENT): the parent run shows nothing about this criterion — no evidence is never proof [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_parent_uncollected]",
+    "check_detail": "at parent SHA d44974a: AC-STORY-07-01-2 [CHANGE_REQUIRED, FR-2] NO_EVIDENCE -> GREEN (parent NOT_COLLECTED / candidate GREEN_EXECUTED), expected RED -> GREEN → NO_EVIDENCE (ENVIRONMENT): the parent run shows nothing about this criterion — no evidence is never proof [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_parent_uncollected]",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -775,9 +851,18 @@
      "ENVIRONMENT"
     ],
     "still_green": [],
-    "developer_sessions": 2,
-    "quality_attempts": 2,
-    "attempts": 2,
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "attempts": 4,
+    "verify_only_attempts": 3,
+    "infra_attempts": 0,
+    "review_executions": 1,
+    "security_executions": 1,
+    "checks_failed": [],
+    "checks_unrunnable": [
+     "TDD",
+     "tests verify story"
+    ],
     "failures": [
      "TDD",
      "tests verify story"
@@ -785,7 +870,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 1.53
+   "elapsed_s": 0.99
   },
   {
    "case": "I",
@@ -844,15 +929,17 @@
     ],
     "check": "PASS",
     "owners": [],
+    "ruling_owner": null,
     "terminal": "done",
     "developer_sessions": 1,
-    "quality_attempts": 1
+    "quality_attempts": 1,
+    "min_stage_retries": 0
    },
    "real": {
     "terminal": "done",
     "blocked_reason": "",
     "check": "PASS",
-    "check_detail": "4 criteria each showed what their obligation asks at parent SHA 07e38ec (2 change required, 1 negative invariant, 1 preserve required); 1 executed red, 1 unable to import code this story introduces",
+    "check_detail": "4 criteria each showed what their obligation asks at parent SHA 5908a41 (2 change required, 1 negative invariant, 1 preserve required); 1 executed red, 1 unable to import code this story introduces",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -944,11 +1031,17 @@
     "developer_sessions": 1,
     "quality_attempts": 1,
     "attempts": 1,
+    "verify_only_attempts": 0,
+    "infra_attempts": 0,
+    "review_executions": 1,
+    "security_executions": 1,
+    "checks_failed": [],
+    "checks_unrunnable": [],
     "failures": [],
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 0.91
+   "elapsed_s": 0.92
   },
   {
    "case": "J",
@@ -985,15 +1078,17 @@
     "owners": [
      "PLAN"
     ],
+    "ruling_owner": "PLAN",
     "terminal": "PLAN_CONFLICT",
     "developer_sessions": 1,
-    "quality_attempts": 1
+    "quality_attempts": 1,
+    "min_stage_retries": 0
    },
    "real": {
     "terminal": "PLAN_CONFLICT",
     "blocked_reason": "deadlock due to plan: AC-STORY-07-01-2 [CHANGE_REQUIRED] GREEN -> GREEN → PLAN_OVERLAP: declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code. The criterion cannot ",
     "check": "FAIL",
-    "check_detail": "at parent SHA 83634c6: AC-STORY-07-01-2 [CHANGE_REQUIRED, FR-2] GREEN -> GREEN (parent GREEN_EXECUTED / candidate GREEN_EXECUTED), expected RED -> GREEN → PLAN_OVERLAP (PLAN): declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_already]",
+    "check_detail": "at parent SHA 6a89c03: AC-STORY-07-01-2 [CHANGE_REQUIRED, FR-2] GREEN -> GREEN (parent GREEN_EXECUTED / candidate GREEN_EXECUTED), expected RED -> GREEN → PLAN_OVERLAP (PLAN): declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_already]",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -1047,6 +1142,15 @@
     "developer_sessions": 1,
     "quality_attempts": 1,
     "attempts": 1,
+    "verify_only_attempts": 0,
+    "infra_attempts": 0,
+    "review_executions": 1,
+    "security_executions": 1,
+    "checks_failed": [
+     "TDD",
+     "tests verify story"
+    ],
+    "checks_unrunnable": [],
     "failures": [
      "TDD",
      "tests verify story"
@@ -1054,7 +1158,7 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 0.88
+   "elapsed_s": 0.89
   },
   {
    "case": "K",
@@ -1089,9 +1193,11 @@
     ],
     "check": "PASS",
     "owners": [],
-    "terminal": "PLAN_GATE",
+    "ruling_owner": null,
+    "terminal": "done",
     "developer_sessions": 1,
-    "quality_attempts": 1
+    "quality_attempts": 1,
+    "min_stage_retries": 0
    },
    "real": {
     "machine_gate_defects": [
@@ -1104,7 +1210,7 @@
     ]
    },
    "mismatches": [],
-   "elapsed_s": 0.11
+   "elapsed_s": 0.12
   },
   {
    "case": "L",
@@ -1127,9 +1233,11 @@
     ],
     "check": "PASS",
     "owners": [],
-    "terminal": "PLAN_GATE",
+    "ruling_owner": null,
+    "terminal": "done",
     "developer_sessions": 1,
-    "quality_attempts": 1
+    "quality_attempts": 1,
+    "min_stage_retries": 0
    },
    "real": {
     "machine_gate_defects": [
@@ -1163,9 +1271,11 @@
     "owners": [
      "PLAN"
     ],
-    "terminal": "PLAN_GATE",
+    "ruling_owner": "PLAN",
+    "terminal": "PLAN_CONFLICT",
     "developer_sessions": 1,
-    "quality_attempts": 1
+    "quality_attempts": 1,
+    "min_stage_retries": 0
    },
    "real": {
     "machine_gate_defects": [
@@ -1214,15 +1324,17 @@
     "owners": [
      "DEVELOPER"
     ],
+    "ruling_owner": "DEVELOPER",
     "terminal": "QUALITY_BLOCK",
     "developer_sessions": 2,
-    "quality_attempts": 2
+    "quality_attempts": 2,
+    "min_stage_retries": 0
    },
    "real": {
     "terminal": "QUALITY_BLOCK",
     "blocked_reason": "tried 2 attempts, still did not pass gate",
     "check": "FAIL",
-    "check_detail": "at parent SHA 2ad02cc: AC-STORY-07-01-2 [PRESERVE_REQUIRED, FR-2] GREEN -> RED (parent GREEN_EXECUTED / candidate RED_EXECUTED), expected GREEN -> GREEN → DEVELOPER_REGRESSION (DEVELOPER): this story broke behaviour it inherited [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_break]",
+    "check_detail": "at parent SHA 2606b50: AC-STORY-07-01-2 [PRESERVE_REQUIRED, FR-2] GREEN -> RED (parent GREEN_EXECUTED / candidate RED_EXECUTED), expected GREEN -> GREEN → DEVELOPER_REGRESSION (DEVELOPER): this story broke behaviour it inherited [tests.test_ac_2.TestCriterion2.test_AC_STORY_07_01_2_break]",
     "rows": [
      {
       "ac_id": "AC-STORY-07-01-1",
@@ -1274,6 +1386,17 @@
     "developer_sessions": 2,
     "quality_attempts": 2,
     "attempts": 2,
+    "verify_only_attempts": 0,
+    "infra_attempts": 0,
+    "review_executions": 2,
+    "security_executions": 2,
+    "checks_failed": [
+     "TDD",
+     "criteria have tests",
+     "test",
+     "tests verify story"
+    ],
+    "checks_unrunnable": [],
     "failures": [
      "test",
      "criteria have tests",
@@ -1283,7 +1406,465 @@
     "candidate_bound": true
    },
    "mismatches": [],
-   "elapsed_s": 1.54
+   "elapsed_s": 1.57
+  },
+  {
+   "case": "O",
+   "title": "repeated NOP environment UNRUNNABLE ends on the environment, never as a quality block",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "NO_EVIDENCE",
+      "candidate": "GREEN",
+      "satisfied": false,
+      "owner": "ENVIRONMENT",
+      "plan_overlap": false,
+      "parent_state": "DEPENDENCY_UNRUNNABLE",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "UNRUNNABLE",
+    "owners": [
+     "ENVIRONMENT"
+    ],
+    "ruling_owner": "ENVIRONMENT",
+    "terminal": "ENVIRONMENT_FAILURE",
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "min_stage_retries": 1
+   },
+   "real": {
+    "terminal": "ENVIRONMENT_FAILURE",
+    "blocked_reason": "ENVIRONMENT_FAILURE: TDD, tests verify story could not run on candidate 48ef9baf after 3 re-run(s) — the environment, not the work, is what failed. The candidate is kept; fix the environment and re-run: `/Users/nghinh/Downloads/projects/ai-sdlc/bin/aisef run --verify-only --story STORY-07-01`.",
+    "check": "UNRUNNABLE",
+    "check_detail": "at parent SHA edba8e6: AC-STORY-07-01-1 [CHANGE_REQUIRED, FR-4] NO_EVIDENCE -> GREEN (parent DEPENDENCY_UNRUNNABLE / candidate GREEN_EXECUTED), expected RED -> GREEN → NO_EVIDENCE (ENVIRONMENT): the parent run shows nothing about this criterion — no evidence is never proof [tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_parent_unrunnable]",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "NO_EVIDENCE",
+      "candidate": "GREEN",
+      "parent_states": [
+       "DEPENDENCY_UNRUNNABLE"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_parent_unrunnable"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "NO_EVIDENCE -> GREEN",
+      "outcome": "NO_EVIDENCE",
+      "owner": "ENVIRONMENT",
+      "why": "the parent run shows nothing about this criterion — no evidence is never proof"
+     }
+    ],
+    "owners": [
+     "ENVIRONMENT"
+    ],
+    "still_green": [],
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "attempts": 4,
+    "verify_only_attempts": 3,
+    "infra_attempts": 0,
+    "review_executions": 1,
+    "security_executions": 1,
+    "checks_failed": [],
+    "checks_unrunnable": [
+     "TDD",
+     "tests verify story"
+    ],
+    "failures": [
+     "TDD",
+     "tests verify story"
+    ],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 0.96
+  },
+  {
+   "case": "P",
+   "title": "the test tool itself cannot run => no developer quality charge",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "PASS",
+    "owners": [],
+    "ruling_owner": "ENVIRONMENT",
+    "terminal": "ENVIRONMENT_FAILURE",
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "min_stage_retries": 1
+   },
+   "real": {
+    "terminal": "ENVIRONMENT_FAILURE",
+    "blocked_reason": "ENVIRONMENT_FAILURE: test, no baseline regression, criteria have tests, TDD, tests verify story could not run on candidate ae9804bf after 3 re-run(s) — the environment, not the work, is what failed. The candidate is kept; fix the environment and re-run: `/Users/nghinh/Downloads/projects/ai-sdlc/bin/",
+    "check": "UNRUNNABLE",
+    "check_detail": "nop at parent SHA unrunnable (tool not installed or cannot load (no such file or directory) — set up the environment or fix the command and retry) — the control did not execute, so it proves nothing",
+    "rows": [],
+    "owners": [],
+    "still_green": [],
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "attempts": 4,
+    "verify_only_attempts": 3,
+    "infra_attempts": 0,
+    "review_executions": 1,
+    "security_executions": 1,
+    "checks_failed": [],
+    "checks_unrunnable": [
+     "TDD",
+     "criteria have tests",
+     "no baseline regression",
+     "test",
+     "tests verify story"
+    ],
+    "failures": [
+     "test",
+     "no baseline regression",
+     "criteria have tests",
+     "TDD",
+     "tests verify story"
+    ],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 1.18
+  },
+  {
+   "case": "Q",
+   "title": "lint cannot run => no developer quality charge",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "PASS",
+    "owners": [],
+    "ruling_owner": "ENVIRONMENT",
+    "terminal": "ENVIRONMENT_FAILURE",
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "min_stage_retries": 1
+   },
+   "real": {
+    "terminal": "ENVIRONMENT_FAILURE",
+    "blocked_reason": "ENVIRONMENT_FAILURE: lint could not run on candidate b5b568e6 after 3 re-run(s) — the environment, not the work, is what failed. The candidate is kept; fix the environment and re-run: `/Users/nghinh/Downloads/projects/ai-sdlc/bin/aisef run --verify-only --story STORY-07-01`.",
+    "check": "PASS",
+    "check_detail": "1 criteria each showed what their obligation asks at parent SHA 19b69e3 (1 change required); 1 executed red, 0 unable to import code this story introduces",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "parent_states": [
+       "RED_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_new"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "RED -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "red at the parent, green at the candidate"
+     }
+    ],
+    "owners": [],
+    "still_green": [],
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "attempts": 4,
+    "verify_only_attempts": 3,
+    "infra_attempts": 0,
+    "review_executions": 1,
+    "security_executions": 1,
+    "checks_failed": [],
+    "checks_unrunnable": [
+     "lint"
+    ],
+    "failures": [
+     "lint"
+    ],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 0.99
+  },
+  {
+   "case": "R",
+   "title": "the reviewer did not answer => the review stage is retried, not the developer",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "PASS",
+    "owners": [],
+    "ruling_owner": "ENVIRONMENT",
+    "terminal": "UNRUNNABLE",
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "min_stage_retries": 1
+   },
+   "real": {
+    "terminal": "UNRUNNABLE",
+    "blocked_reason": "REVIEW_UNRUNNABLE: the reviewer did not produce a verdict on candidate 77ce10d5 in 3 executions — last: exceeded 1800s. Deterministic checks passed and the candidate is kept; no developer change is needed. Re-run the review stage when the reviewer can run: `/Users/nghinh/Downloads/projects/ai-sdlc/b",
+    "check": "PASS",
+    "check_detail": "1 criteria each showed what their obligation asks at parent SHA a29d650 (1 change required); 1 executed red, 0 unable to import code this story introduces",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "parent_states": [
+       "RED_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_new"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "RED -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "red at the parent, green at the candidate"
+     }
+    ],
+    "owners": [],
+    "still_green": [],
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "attempts": 3,
+    "verify_only_attempts": 2,
+    "infra_attempts": 0,
+    "review_executions": 3,
+    "security_executions": 1,
+    "checks_failed": [],
+    "checks_unrunnable": [
+     "review"
+    ],
+    "failures": [
+     "review"
+    ],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 1.12
+  },
+  {
+   "case": "S",
+   "title": "the security reviewer did not answer => the security stage is retried, not the developer",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "satisfied": true,
+      "owner": null,
+      "plan_overlap": false,
+      "parent_state": "RED_EXECUTED",
+      "candidate_state": "GREEN_EXECUTED"
+     }
+    ],
+    "check": "PASS",
+    "owners": [],
+    "ruling_owner": "ENVIRONMENT",
+    "terminal": "UNRUNNABLE",
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "min_stage_retries": 1
+   },
+   "real": {
+    "terminal": "UNRUNNABLE",
+    "blocked_reason": "SECURITY_UNRUNNABLE: the security reviewer did not produce a verdict on candidate 2fdfea88 — last: could not run: exceeded 1800s. The candidate is kept; no developer change is needed. Re-run when it can: `/Users/nghinh/Downloads/projects/ai-sdlc/bin/aisef run --verify-only --story STORY-07-01`.",
+    "check": "PASS",
+    "check_detail": "1 criteria each showed what their obligation asks at parent SHA c7fa69d (1 change required); 1 executed red, 0 unable to import code this story introduces",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "RED",
+      "candidate": "GREEN",
+      "parent_states": [
+       "RED_EXECUTED"
+      ],
+      "candidate_states": [
+       "GREEN_EXECUTED"
+      ],
+      "tests": [
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_new"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "RED -> GREEN",
+      "outcome": "SATISFIED",
+      "owner": null,
+      "why": "red at the parent, green at the candidate"
+     }
+    ],
+    "owners": [],
+    "still_green": [],
+    "developer_sessions": 1,
+    "quality_attempts": 1,
+    "attempts": 3,
+    "verify_only_attempts": 2,
+    "infra_attempts": 0,
+    "review_executions": 1,
+    "security_executions": 3,
+    "checks_failed": [],
+    "checks_unrunnable": [
+     "security"
+    ],
+    "failures": [
+     "security"
+    ],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 1.1
+  },
+  {
+   "case": "T",
+   "title": "a genuine behavioural failure at the candidate DOES charge the developer's quality budget",
+   "route": "REAL_KERNEL",
+   "model": {
+    "acs": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "proof_mode": "CHANGE_REQUIRED",
+      "requirement": "FR-4",
+      "parent": "RED",
+      "candidate": "RED",
+      "satisfied": false,
+      "owner": "DEVELOPER",
+      "plan_overlap": false,
+      "parent_state": "RED_EXECUTED",
+      "candidate_state": "RED_EXECUTED"
+     }
+    ],
+    "check": "FAIL",
+    "owners": [
+     "DEVELOPER"
+    ],
+    "ruling_owner": "DEVELOPER",
+    "terminal": "QUALITY_BLOCK",
+    "developer_sessions": 2,
+    "quality_attempts": 2,
+    "min_stage_retries": 0
+   },
+   "real": {
+    "terminal": "QUALITY_BLOCK",
+    "blocked_reason": "tried 2 attempts, still did not pass gate",
+    "check": "FAIL",
+    "check_detail": "at parent SHA eb77ea0: AC-STORY-07-01-1 [CHANGE_REQUIRED, FR-4] RED -> RED (parent RED_EXECUTED / candidate RED_EXECUTED), expected RED -> GREEN → DEVELOPER_QUALITY_BLOCK (DEVELOPER): still red at the candidate [tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_unimplemented]",
+    "rows": [
+     {
+      "ac_id": "AC-STORY-07-01-1",
+      "requirement": "FR-4",
+      "proof_mode": "CHANGE_REQUIRED",
+      "parent": "RED",
+      "candidate": "RED",
+      "parent_states": [
+       "RED_EXECUTED"
+      ],
+      "candidate_states": [
+       "RED_EXECUTED"
+      ],
+      "tests": [
+       "tests.test_ac_1.TestCriterion1.test_AC_STORY_07_01_1_unimplemented"
+      ],
+      "expected_transition": "RED -> GREEN",
+      "actual_transition": "RED -> RED",
+      "outcome": "DEVELOPER_QUALITY_BLOCK",
+      "owner": "DEVELOPER",
+      "why": "still red at the candidate"
+     }
+    ],
+    "owners": [
+     "DEVELOPER"
+    ],
+    "still_green": [],
+    "developer_sessions": 2,
+    "quality_attempts": 2,
+    "attempts": 2,
+    "verify_only_attempts": 0,
+    "infra_attempts": 0,
+    "review_executions": 2,
+    "security_executions": 2,
+    "checks_failed": [
+     "TDD",
+     "criteria have tests",
+     "test",
+     "tests verify story"
+    ],
+    "checks_unrunnable": [],
+    "failures": [
+     "test",
+     "criteria have tests",
+     "TDD",
+     "tests verify story"
+    ],
+    "candidate_bound": true
+   },
+   "mismatches": [],
+   "elapsed_s": 1.51
   }
  ],
  "pass": true
