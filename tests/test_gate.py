@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT))
 from aisef.control.outcome import Outcome
 from tests import obligations  # noqa: E402
 from aisef.control.gate import evaluate  # noqa: E402
-from aisef.harness.observe import MOCKUP_MAP, NOTE, EvidenceStore, Event  # noqa: E402
+from aisef.harness.observe import MOCKUP_MAP, NOTE, TOOL_RUN, EvidenceStore, Event  # noqa: E402
 
 
 class GateTestCase(unittest.TestCase):
@@ -565,6 +565,32 @@ class TestTDDVaNopControl(GateTestCase):
         self.assertIs(tdd.outcome, Outcome.PASSED, tdd.detail)
         self.assertIn("nop control", tdd.detail)
         self.assertTrue(tdd.evidence, "phải trỏ vào bằng chứng nop, không để trống")
+        self.assertIn(nop.detail, tdd.detail,
+                      "TDD đạt nhờ nop thì phải chở **lý do của nop**, không phải câu mặc định")
+
+    def test_tdd_tro_vao_dung_cac_luot_chay_test(self):
+        """Bằng chứng của một verdict là thứ người đọc lần theo. TDD đọc thứ tự
+        đỏ-trước-xanh trên **các lượt chạy test**, nên nó phải trỏ vào đúng các
+        lượt ấy — trỏ sang lint là trỏ vào một câu hỏi khác."""
+        self.dung_canh([self.AC, "t1"])
+        ev = self.store.read("S-01")
+        runs = {e.seq for e in ev.of(TOOL_RUN, "test")}
+        g = self.gate(candidate="aaa", acceptance=1, added_tests=["tests/test_a.py"],
+                      ac_proof=obligations("S-01", 1))
+        tdd = next(c for c in g.checks if c.name == "TDD")
+        self.assertTrue(runs, "phép kiểm này vô nghĩa nếu không có lượt chạy test nào")
+        self.assertEqual(set(tdd.evidence) & runs, runs)
+
+    def test_story_khong_co_tieu_chi_nao_can_thay_doi_thi_tdd_khong_ap_dung(self):
+        """KHÔNG PHẢI `PASSED`: story chỉ bảo toàn hành vi sẵn có thì không có gì
+        để thấy đỏ trước, nên TDD **không chứng minh được gì** — ghi là đã đạt
+        tức là khẳng định một bằng chứng chưa từng tồn tại."""
+        self.dung_canh(["t1"])
+        g = self.gate(candidate="aaa", acceptance=1, added_tests=["tests/test_a.py"],
+                      ac_proof=obligations("S-01", 1, mode="PRESERVE_REQUIRED"))
+        tdd = next(c for c in g.checks if c.name == "TDD")
+        self.assertIs(tdd.outcome, Outcome.NOT_APPLICABLE, tdd.detail)
+        self.assertIsNot(tdd.outcome, Outcome.PASSED)
 
     def test_nop_truot_thi_tdd_van_truot(self):
         g = self.dung_canh([self.AC, "t1"])           # xanh ở SHA cha: không kiểm được gì
@@ -599,10 +625,13 @@ class TestTDDVaNopControl(GateTestCase):
         })
         g = self.gate(candidate="aaa", acceptance=1, added_tests=["tests/test_a.py"])
         tdd = next(c for c in g.checks if c.name == "TDD")
+        nop = next(c for c in g.checks if c.name == "tests verify story")
         self.assertIs(tdd.outcome, Outcome.UNRUNNABLE)
         self.assertTrue(tdd.outcome.blocks, "an absence still blocks — it just is not the developer's failure")
         self.assertIn("TDD", [c.name for c in g.failures])
         self.assertNotIn("green on first run", tdd.detail)
+        self.assertIn(nop.detail, tdd.detail,
+                      "phải nói **vì sao** phép đo không chạy được, lấy nguyên văn lý do của nop")
 
     def test_do_truoc_xanh_van_du_mot_minh_khi_khong_co_nop(self):
         self.green_story()
