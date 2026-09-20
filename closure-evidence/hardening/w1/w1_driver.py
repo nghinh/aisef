@@ -58,9 +58,9 @@ ARB1_NOTE = ("ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for by
 
 #: W1-V2: readiness is stale because the run starts from the owner-approved plan, and the driver measured that the
 #: artifacts are byte-identical to that plan base — the difference from the old signature is the plan, nothing else.
-PLAN_V2_NOTE = ("W1-LEDGERLOCK-PLAN-V2 re-approval: `stories.index.json` and `design-contract.json` are byte-identical "
-                "to the approved plan base {base}, so the readiness signature of the previous plan is stale for that "
-                "reason alone; not a waiver; the kernel's refusal on the stale gate is recorded first "
+PLAN_V2_NOTE = ("W1-LEDGERLOCK-PLAN-V2 re-approval of `{gate}`: the artifacts this gate signs are byte-identical to "
+                "the approved plan base {base}, so the previous plan's signature is stale for that reason alone; not "
+                "a waiver; the kernel's refusal on the stale gate is recorded first "
                 "(closure-evidence/hardening/W1-PLAN-V2-AUDIT.json)")
 
 
@@ -465,6 +465,13 @@ class Driver:
                                 for x in (self.art / d).rglob("*") if x.is_file()
                                 and (x.name.startswith("STORY-") or self.git("ls-files", "--error-unmatch", str(x.relative_to(self.project))).strip() == ""))
         arb1 = self.arb1_measure()
+        # Which gates are stale is measured on this copy. Under W1-PLAN-V2 the approved plan rewrote the stories, so
+        # `readiness` and `mockups` — the two gates whose signatures cover stories.index.json and design-contract.json
+        # — are both stale, and for the same reason. Each one must carry its own measured basis.
+        gates = self.gates()
+        stale_gates = sorted(g for g, v in gates.items() if v == "stale")
+        bases = {g: (bool(arb1.get("reapproval_basis")) if g == "readiness"
+                     else self.plan_v2_basis(g)["content_is_exactly_the_approved_plan_base"]) for g in stale_gates}
         P["section4_measured"] = {"wheel": str(wheel), "wheel_sha256_in_freeze": fr.get("wheel", {}).get("sha256"),
                                   "aisef_tree_digest": fr.get("aisef_tree_digest"), "PHASE12_KERNEL_DIGEST": fr.get("PHASE12_KERNEL_DIGEST"),
                                   "aisef_tree_at_the_candidate_sha": tree_at_candidate, "run_max_turns": max_turns,
@@ -496,19 +503,24 @@ class Driver:
             "no_stale_evidence": not stale_evidence,
             # SS-96 cycle: the V1 basis (hash method changed, content did not) is void under W1-PLAN-V2, which
             # rewrote the stories on purpose. Either basis proves the staleness is not this copy's doing.
-            "readiness_staleness_has_a_measured_basis": bool(arb1.get("reapproval_basis")),
+            "every_stale_gate_has_a_measured_basis": bool(stale_gates) and all(bases.values()),
         }
         if self.path:
             P["preflight"]["reviewer_dependency_command_leaves_the_tree_byte_identical"] = P["stage_env_check"].get("pass") is True
+        P["stale_gate_bases"] = {g: self.plan_v2_basis(g) for g in stale_gates}
         P["preflight_measured"] = {"model": model, "opencode_version": P["opencode_version"], "plugin_bin": plugin_bin, "worktrees": self.git("worktree", "list").splitlines(),
                                    "stories": len(stories), "docker_image_id": img_id}
         P["preflight_ok"] = all(v is True or v == "no freeze record given — not compared" for v in P["preflight"].values())
-        P["gates"] = self.gates()
+        P["gates"] = gates
         P["agent_starts_before"] = self.agent_starts()
         P["story_evidence_before"] = self.story_evidence()
-        P["ok"] = P["aisef_from_the_wheel_not_the_checkout"] and P["oracle_ok"] and P["guard_plugin"]["tracked_now"] and P["gates"].get("readiness") == "stale" \
-            and P["fresh_topology_ok"] and P["preflight_ok"] \
-            and all(v == "approved" for g, v in P["gates"].items() if g not in ("readiness", "pre-deploy")) and not P["story_evidence_before"]
+        # A stale gate is what `kernel-first` proves the kernel refuses on, so at least one must be stale; every other
+        # gate must be approved; and every stale one must have a measured basis (a plan the owner approved, or the
+        # hash migration). "Which gates" is measured from this copy, never assumed to be readiness alone.
+        P["ok"] = P["aisef_from_the_wheel_not_the_checkout"] and P["oracle_ok"] and P["guard_plugin"]["tracked_now"] \
+            and P["fresh_topology_ok"] and P["preflight_ok"] and bool(stale_gates) \
+            and all(v == "approved" for g, v in P["gates"].items() if g not in stale_gates and g != "pre-deploy") \
+            and not P["story_evidence_before"]
         self.rec["phases"]["prepare"] = P
         self.save()
         self.say(f"prepare ok={P['ok']} aisef={P['aisef_version']} wheel={P['aisef_from_the_wheel_not_the_checkout']} oracle={P['oracle_ok']} guard={P['guard_plugin']['tracked_now']} topology={P['fresh_topology_ok']} preflight={P['preflight_ok']} failed={[k for k, v in P['preflight'].items() if v is not True and not isinstance(v, str)]} gates={P['gates']} doctor_red={P['doctor_red']}")
@@ -520,17 +532,33 @@ class Driver:
         K["run"] = self.cli("run", "--client", "opencode", timeout=900, save_as="kernel-first-run.txt")
         K["agent_starts_after"] = self.agent_starts()
         K["evidence_after"] = self.story_evidence()
-        K["refused_on_readiness"] = K["run"]["exit"] != 0 and "readiness" in (K["run"]["stdout_tail"] + K["run"]["stderr_tail"])
+        # The kernel must refuse, and its refusal must name a gate that IS stale on this copy — not the word
+        # "readiness" assumed in advance (under W1-PLAN-V2 both readiness and mockups are stale).
+        stale_now = sorted(g for g, v in K["gates_before"].items() if v == "stale")
+        tail = K["run"]["stdout_tail"] + K["run"]["stderr_tail"]
+        K["stale_gates"] = stale_now
+        K["named_in_the_refusal"] = [g for g in stale_now if g in tail]
+        K["refused_on_readiness"] = K["run"]["exit"] != 0 and bool(K["named_in_the_refusal"])
         K["no_agent_call"] = K["agent_starts_after"] == K["agent_starts_before"] and K["evidence_after"] == K["evidence_before"]
         K["ok"] = K["refused_on_readiness"] and K["no_agent_call"]
-        K["classification"] = "kernel refused the STALE gate before any agent call (ARB-1 kernel path first)" if K["ok"] else "P0: the kernel proceeded past a STALE readiness without --force — STOP W1"
+        K["classification"] = ("kernel refused the STALE gate before any agent call (kernel path first)" if K["ok"]
+                               else "P0: the kernel proceeded past a STALE gate without --force — STOP W1")
         self.rec["phases"]["kernel_first"] = K
         self.save()
         self.say(f"kernel-first ok={K['ok']} exit={K['run']['exit']} {K['classification']}")
         return K["ok"]
 
-    def plan_v2_basis(self) -> dict:
-        """Is the readiness gate stale ONLY because the run starts from the owner-approved plan?
+    def gate_artifacts(self, gate: str) -> list[str]:
+        """The artifact paths one gate's signature covers, read from the gate's own approval record."""
+        rec = self.art / "approvals" / f"{gate}.json"
+        if not rec.is_file():
+            return []
+        d = json.loads(rec.read_text(encoding="utf-8"))
+        named = str(((d.get("history") or [d])[0]).get("artifact") or "")
+        return [f"_bmad-output/{n.strip()}" for n in named.split(",") if n.strip()]
+
+    def plan_v2_basis(self, gate: str = "readiness") -> dict:
+        """Is this gate stale ONLY because the run starts from the owner-approved plan?
 
         The V1 basis (`arb1_measure`) covers one case: the hash method changed and the content did not. W1-V2 starts
         from W1-LEDGERLOCK-PLAN-V2, which rewrote the stories — so `stories.index.json` and `design-contract.json`
@@ -539,14 +567,14 @@ class Driver:
         same files at the plan base commit this run is defined on, so the only difference from the signature is the
         plan the owner approved, and nothing this copy did.
         """
-        paths = ["_bmad-output/stories.index.json", "_bmad-output/design-contract.json"]
+        paths = self.gate_artifacts(gate)
         base = self.a.plan_base
         drift = [p for p in paths if self.git("diff", "--name-only", base, "HEAD", "--", p)]
         at_base = {p: self.git("rev-parse", f"{base}:{p}") for p in paths}
         tracked = [p for p in paths if at_base.get(p)]
-        return {"plan_base": base, "artifacts": paths, "tracked_at_the_plan_base": tracked,
+        return {"gate": gate, "plan_base": base, "artifacts": paths, "tracked_at_the_plan_base": tracked,
                 "blob_at_the_plan_base": at_base, "changed_since_the_plan_base": drift,
-                "content_is_exactly_the_approved_plan_base": len(tracked) == len(paths) and not drift}
+                "content_is_exactly_the_approved_plan_base": bool(paths) and len(tracked) == len(paths) and not drift}
 
     def arb1_measure(self) -> dict:
         """The owner's re-approval covers ONE case: the hash method changed, the content did not. It is void if any
@@ -575,28 +603,44 @@ class Driver:
         return m
 
     def approve(self) -> bool:
-        self.say("phase approve: ARB-1 re-approval of readiness for byte-identical content")
+        self.say("phase approve: re-approval of every stale gate, each on its own measured basis")
         A = {"at": now(), "gates_before": self.gates(), "arb1_measured": self.arb1_measure()}
-        A["reapproval_basis"] = A["arb1_measured"].get("reapproval_basis") or ""
-        if not A["reapproval_basis"]:
+        stale = sorted(g for g, v in A["gates_before"].items() if v == "stale")
+        A["stale_gates"] = stale
+        A["bases"] = {}
+        for g in stale:
+            if g == "readiness" and A["arb1_measured"].get("reapproval_basis") == "ARB1_HASH_METHOD_ONLY":
+                A["bases"][g] = {"basis": "ARB1_HASH_METHOD_ONLY", "measured": A["arb1_measured"]}
+                continue
+            m = self.plan_v2_basis(g)
+            A["bases"][g] = {"basis": "APPROVED_PLAN_BASE" if m["content_is_exactly_the_approved_plan_base"] else "",
+                             "measured": m}
+        without = [g for g in stale if not A["bases"][g]["basis"]]
+        if not stale or without:
             A["ok"] = False
-            A["refused"] = ("no measured basis for re-approving readiness: the content is neither byte-identical to "
-                            "what was signed (the approved hash-migration case) nor byte-identical to the approved "
-                            "plan base this run starts from. STOP and report.")
+            A["refused"] = ("no measured basis for re-approving " + (", ".join(without) or "anything") +
+                            ": the content is neither byte-identical to what was signed (the approved "
+                            "hash-migration case) nor byte-identical to the approved plan base this run starts "
+                            "from. STOP and report." if without else
+                            "no gate is stale — there is nothing this phase may approve.")
             self.rec["phases"]["approve"] = A
             self.save()
             self.say("approve REFUSED: " + A["refused"])
             return False
-        note = ARB1_NOTE if A["reapproval_basis"] == "ARB1_HASH_METHOD_ONLY" else PLAN_V2_NOTE.format(
-            base=A["arb1_measured"]["plan_v2"]["plan_base"][:12])
-        A["approve"] = self.cli("approve", "readiness", "--note", note, timeout=120, save_as="approve.txt")
-        A["approval_note"] = note
+        A["approvals"] = {}
+        for g in stale:
+            note = (ARB1_NOTE if A["bases"][g]["basis"] == "ARB1_HASH_METHOD_ONLY"
+                    else PLAN_V2_NOTE.format(gate=g, base=self.a.plan_base[:12]))
+            A["approvals"][g] = {"note": note, "cli": self.cli("approve", g, "--note", note, timeout=120,
+                                                               save_as=f"approve-{g}.txt")}
         A["gates_after"] = self.gates()
-        rec = self.art / "approvals" / "readiness.json"
-        A["approval_record"] = json.loads(rec.read_text(encoding="utf-8")) if rec.is_file() else None
+        A["approval_records"] = {g: (json.loads((self.art / "approvals" / f"{g}.json").read_text(encoding="utf-8"))
+                                     if (self.art / "approvals" / f"{g}.json").is_file() else None) for g in stale}
         changed = {g for g in set(A["gates_before"]) | set(A["gates_after"]) if A["gates_before"].get(g) != A["gates_after"].get(g)}
         A["changed_gates"] = sorted(changed)
-        A["ok"] = A["approve"]["exit"] == 0 and A["gates_after"].get("readiness") == "approved" and changed == {"readiness"}
+        A["ok"] = (all(a["cli"]["exit"] == 0 for a in A["approvals"].values())
+                   and all(A["gates_after"].get(g) == "approved" for g in stale)
+                   and changed == set(stale))
         self.rec["phases"]["approve"] = A
         self.save()
         self.say(f"approve ok={A['ok']} changed={A['changed_gates']} gates={A['gates_after']}")
@@ -845,7 +889,7 @@ class Driver:
         rec = {"run": self.a.run, "generated": now(), "candidate": self.rec["phases"].get("prepare", {}).get("freeze"),
                "aisef": {k: self.rec["phases"].get("prepare", {}).get(k) for k in ("aisef_version", "aisef_file", "opencode_version", "docker_image")},
                "arbitrations": [{"id": "ARB-1", "kernel_first": self.rec["phases"].get("kernel_first", {}).get("classification"),
-                                 "approval": self.rec["phases"].get("approve", {}).get("approval_record")}],
+                                 "approval": self.rec["phases"].get("approve", {}).get("approval_records")}],
                "phases": self.rec["phases"], "exit_criteria": F["exit_criteria"], "oracle": F["oracle"], "stories": F["stories"], "progress": F["progress"]}
         (HERE.parent / f"W1-LEDGERLOCK-{self.a.run}.json").write_text(json.dumps(rec, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
         self.say(f"finish: progress={F['progress']} class={F['run_classification']} "
