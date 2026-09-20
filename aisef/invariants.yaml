@@ -1125,3 +1125,23 @@ invariants:
       - SS-87
       - SS-88
     status: PROVEN
+  - invariant_id: INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE
+    domain: routing
+    statement: "No gate check may report FAILED for evidence that did not execute. When a stage's evidence is absent the checks that read it are UNRUNNABLE, the failure owner is ENVIRONMENT, the responsible stage is re-run inside its own bounded budget, and the story ends as ENVIRONMENT_FAILURE (a tool or its evidence) or UNRUNNABLE (a verifier) — never as QUALITY_BLOCK, and never by opening another developer session. Only a check that FAILED on evidence that did execute may charge the developer's quality budget."
+    why: "SS-96 — 'tests verify story' correctly reported UNRUNNABLE when the parent's evidence could not run, while TDD, reading the SAME evidence, reported FAILED (\"tests green on first run\"). `_absent_stages` stops at any FAILED check, so the environment was routed to the developer: measured on a story whose candidate was correct, max_retries=2 gave 3 developer sessions, 3 quality attempts and terminal QUALITY_BLOCK. The test tool being absent produced the same outcome. lint, review and security were already routed correctly, which is what made the single converting check visible."
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/control/gate.py::evaluate
+      - aisef/phases/implement.py::_absent_stages
+      - aisef/phases/implement.py::_stage_of
+    deterministic_tests:
+      - tests/hardening/test_unrunnable_routing.py::TestAbsenceIsNeverADeveloperFailure
+      - tests/hardening/test_unrunnable_routing.py::TestTheStageThatCouldNotRunIsTheStageRetried
+      - tests/hardening/test_unrunnable_routing.py::TestAGenuineFailureStillChargesTheDeveloper
+    model_tests:
+      - tests/hardening/test_policy_v2_conformance.py::TestPolicyV2Conformance
+    fault_injection_tests:
+      - tests/hardening/test_unrunnable_routing.py::TestAbsenceIsNeverADeveloperFailure
+    linked_defects:
+      - SS-96
+    status: PROVEN

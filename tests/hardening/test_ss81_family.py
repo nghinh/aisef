@@ -250,12 +250,20 @@ class SS83TddRed(GateCase):
         self.assertIn("nop control", m.detail, "TDD may pass only through the proven nop, not the environment failure")
 
     def test_an_unrelated_red_is_not_tdds_red(self):
+        """A red run of somebody else's test is not this story's red — so TDD does not pass on it.
+
+        With no nop control recorded for this candidate, the check that would decide the question directly never
+        ran either, so TDD says UNRUNNABLE and not FAILED (SS-96): it still blocks, and it charges nobody. What
+        SS-83 protects is untouched — the unrelated red buys the story nothing.
+        """
         s = EvidenceStore(self._tmp.name, candidate="aaa")
         s.tool_run(SID, "test", ok=False, detail={"test_format": "pytest", "test_ids": ["tests/test_old.py::t"],
                                                   "failed_ids": ["tests/test_old.py::t"]})
         self.candidate([AC1, "tests/test_old.py::t"])
         m = self.check("TDD", acceptance=1, added_tests=["tests/test_a.py"])
-        self.assertIs(m.outcome, Outcome.FAILED, m.detail)
+        self.assertIsNot(m.outcome, True, m.detail)
+        self.assertTrue(m.outcome.blocks, m.detail)
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE, m.detail)
 
 
 class SS84NoCriteria(GateCase):

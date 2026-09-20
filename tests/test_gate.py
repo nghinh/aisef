@@ -573,10 +573,15 @@ class TestTDDVaNopControl(GateTestCase):
             {"TDD", "tests verify story"},
         )
 
-    def test_nop_khong_chay_duoc_thi_tdd_dung_mot_minh(self):
-        """UNRUNNABLE/NOT_APPLICABLE nghĩa là phép đo trực tiếp **chưa trả lời**
-        — không phải đã thông. Đây đúng là ca STORY-01-01: nop không chạy được
-        ở SHA cha vì worktree không có node_modules."""
+    def test_nop_khong_chay_duoc_thi_tdd_cung_khong_tra_loi_duoc(self):
+        """UNRUNNABLE nghĩa là phép đo trực tiếp **chưa trả lời** — không phải đã
+        thông, và cũng không phải developer làm sai. Đây đúng là ca STORY-01-01:
+        nop không chạy được ở SHA cha vì worktree không có node_modules.
+
+        SS-96: trước đây chỗ này trả FAILED. Hai cổng đọc **cùng một** bằng chứng,
+        mà `_absent_stages` dừng ngay khi có bất kỳ cổng nào FAILED — nên một môi
+        trường không trả lời được bị tính vào ngân sách chất lượng của developer và
+        story kết thúc QUALITY_BLOCK. Vắng mặt thì chặn, nhưng chặn với đúng kiểu."""
         self.store.tool_run("S-01", "test:baseline", ok=True, detail={
             "baseline": True, "test_format": "pytest", "test_ids": ["t1"],
             "failed_ids": [], "skipped_ids": [],
@@ -593,7 +598,11 @@ class TestTDDVaNopControl(GateTestCase):
             "unrunnable": "no runnable setup in this tree",
         })
         g = self.gate(candidate="aaa", acceptance=1, added_tests=["tests/test_a.py"])
-        self.assertIs(next(c for c in g.checks if c.name == "TDD").outcome, Outcome.FAILED)
+        tdd = next(c for c in g.checks if c.name == "TDD")
+        self.assertIs(tdd.outcome, Outcome.UNRUNNABLE)
+        self.assertTrue(tdd.outcome.blocks, "an absence still blocks — it just is not the developer's failure")
+        self.assertIn("TDD", [c.name for c in g.failures])
+        self.assertNotIn("green on first run", tdd.detail)
 
     def test_do_truoc_xanh_van_du_mot_minh_khi_khong_co_nop(self):
         self.green_story()

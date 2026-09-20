@@ -41,6 +41,24 @@ from aisef.phases.implement import implement_story  # noqa: E402
 
 SID = "STORY-07-01"
 CHECK = "tests verify story"
+#: the project under test needs nothing but the interpreter — CI runs `python -m unittest discover`
+TEST_COMMAND = quote_command([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-t", ".", "-v"])
+#: a command that does not exist: the stage cannot run at all
+MISSING_TOOL = "aisef-no-such-tool-xyz"
+#: a tool that is absent for a whole first attempt (its baseline, candidate and nop runs) and works afterwards —
+#: an environment that fails and then recovers, so the first attempt blocks on absence ALONE
+FLAKY_TOOL = "FLAKY"
+FLAKY_MISSING_RUNS = 3
+_FLAKY_RUNNER = """import pathlib, subprocess, sys
+
+count = pathlib.Path(__file__).with_name(".flaky_count")
+n = int(count.read_text(encoding="utf-8")) if count.exists() else 0
+count.write_text(str(n + 1), encoding="utf-8")
+if n < 3:
+    sys.stderr.write("aisef-flaky: command not found\\n")
+    raise SystemExit(127)
+raise SystemExit(subprocess.call([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-t", ".", "-v"]))
+"""
 
 # ------------------------------------------------------------------ the reference model (written from the decision)
 # Section 4-7 of the owner decision, as a table. Nothing here imports aisef.control.obligation: this is the second
@@ -107,6 +125,8 @@ def _crit(kind: str, mode: str, **kw) -> Crit:
         "parent_unrunnable": (NONE, GREEN, "DEPENDENCY_UNRUNNABLE", "GREEN_EXECUTED"),
         # the parent could not collect this test's file, for a reason not bound to the story
         "parent_uncollected": (NONE, GREEN, "NOT_COLLECTED", "GREEN_EXECUTED"),
+        # the behaviour the story owes: red at the parent and still red at the candidate (the developer's failure)
+        "unimplemented": (RED, RED, "RED_EXECUTED", "RED_EXECUTED"),
     }[kind]
     c = Crit(kind, mode, parent=spec[0], candidate=spec[1], parent_state=spec[2], candidate_state=spec[3])
     for k, v in kw.items():
@@ -147,7 +167,7 @@ def _test_body(c: Crit, fn: str) -> str:
     green (or the declared red) at the candidate. The only difference between the two sides is the story's own
     product files. `unittest` rather than pytest: the project under test must need nothing but the interpreter,
     which is also what CI has (it runs `python -m unittest discover`)."""
-    if c.kind == "new":
+    if c.kind in ("new", "unimplemented"):
         return (f"    def {fn}(self):\n        self.assertTrue(hasattr(cli, 'repair'), 'repair is not there yet')\n"
                 "        self.assertEqual(cli.repair(), 0)\n")
     if c.kind == "new_import":            # imported at module level: the parent cannot even collect the file
@@ -191,11 +211,22 @@ class Case:
     story_type: str = "NORMAL"
     #: developer writes broken product code (the regression cases)
     broken: bool = False
-    #: what the model expects of the whole story
-    expect_check: str = ""          # PASS | FAIL | UNRUNNABLE
-    expect_terminal: str = ""       # done | the StageOutcome value
+    #: for a lifecycle case: which stage's evidence cannot be obtained ("tools" | "review" | "security")
+    stage: str = "tools"
+    #: for a lifecycle case with no AC rows to judge: the owner the approved policy assigns
+    owner: str = ""
     #: for a plan-gate case: which deterministic gate(s) must name the defect before any model call
     plan_gates: tuple[str, ...] = ()
+    #: environment knobs — a stage whose evidence cannot be obtained (the SS-96 family)
+    test_tool: str = ""            # "" = the real unittest run; otherwise the command to use, or FLAKY_TOOL
+    lint_tool: str = "true"
+    sast_tool: str = ""
+    contract: tuple[str, ...] = ()
+    review_step: str = "PASS"
+    security_step: str = "PASS"
+    retries: int = 1
+    #: the developer writes code that does NOT satisfy the criterion (a genuine quality failure)
+    unimplemented: bool = False
     covers: list[str] = field(default_factory=lambda: ["FR-4"])
 
 
@@ -207,48 +238,59 @@ def obligations_of(case: Case) -> dict:
 # ------------------------------------------------------------------ the scenarios (owner section 2, A-N)
 SCENARIOS: list[Case] = [
     Case("A", "CHANGE_REQUIRED: parent RED_EXECUTED, candidate GREEN_EXECUTED => PASS",
-         [_crit("new", "CHANGE_REQUIRED")], expect_check="PASS", expect_terminal="done"),
+         [_crit("new", "CHANGE_REQUIRED")]),
     Case("B", "CHANGE_REQUIRED already green at the parent => PLAN_OVERLAP before any developer quality retry",
-         [_crit("already", "CHANGE_REQUIRED")], expect_check="FAIL", expect_terminal=StageOutcome.PLAN_CONFLICT.value),
+         [_crit("already", "CHANGE_REQUIRED")]),
     Case("C", "PRESERVE_REQUIRED: GREEN -> GREEN => PASS",
-         [_crit("new", "CHANGE_REQUIRED"), _crit("keep", "PRESERVE_REQUIRED", requirement="FR-2")],
-         expect_check="PASS", expect_terminal="done"),
+         [_crit("new", "CHANGE_REQUIRED"), _crit("keep", "PRESERVE_REQUIRED", requirement="FR-2")]),
     Case("D", "PRESERVE_REQUIRED: GREEN -> RED => DEVELOPER regression block",
          [_crit("new", "CHANGE_REQUIRED"), _crit("break", "PRESERVE_REQUIRED", requirement="FR-2")],
-         broken=True, expect_check="FAIL", expect_terminal=StageOutcome.QUALITY_BLOCK.value),
+         broken=True),
     Case("E", "NEGATIVE_INVARIANT: GREEN -> GREEN => PASS",
-         [_crit("new", "CHANGE_REQUIRED"), _crit("absence", "NEGATIVE_INVARIANT", requirement="FR-9")],
-         expect_check="PASS", expect_terminal="done"),
+         [_crit("new", "CHANGE_REQUIRED"), _crit("absence", "NEGATIVE_INVARIANT", requirement="FR-9")]),
     Case("F", "NEGATIVE_INVARIANT: GREEN -> RED => DEVELOPER regression block",
          [_crit("new", "CHANGE_REQUIRED"), _crit("absence_broken", "NEGATIVE_INVARIANT", requirement="FR-9")],
-         broken=True, expect_check="FAIL", expect_terminal=StageOutcome.QUALITY_BLOCK.value),
+         broken=True),
     Case("G", "UNRUNNABLE parent evidence never satisfies CHANGE_REQUIRED",
-         [_crit("new_import", "CHANGE_REQUIRED"), _crit("parent_unrunnable", "CHANGE_REQUIRED", requirement="FR-2")],
-         expect_check="FAIL", expect_terminal=StageOutcome.QUALITY_BLOCK.value),
+         [_crit("new_import", "CHANGE_REQUIRED"), _crit("parent_unrunnable", "CHANGE_REQUIRED", requirement="FR-2")]),
     Case("H", "NOT_COLLECTED parent evidence never satisfies CHANGE_REQUIRED",
-         [_crit("new_import", "CHANGE_REQUIRED"), _crit("parent_uncollected", "CHANGE_REQUIRED", requirement="FR-2")],
-         expect_check="FAIL", expect_terminal=StageOutcome.QUALITY_BLOCK.value),
+         [_crit("new_import", "CHANGE_REQUIRED"), _crit("parent_uncollected", "CHANGE_REQUIRED", requirement="FR-2")]),
     Case("I", "a mixed story: every criterion judged by its own obligation",
          [_crit("new", "CHANGE_REQUIRED"), _crit("new_import", "CHANGE_REQUIRED", requirement="FR-5"),
           _crit("keep", "PRESERVE_REQUIRED", requirement="FR-2"),
-          _crit("absence", "NEGATIVE_INVARIANT", requirement="FR-9")],
-         expect_check="PASS", expect_terminal="done"),
+          _crit("absence", "NEGATIVE_INVARIANT", requirement="FR-9")]),
     Case("J", "CHANGE_REQUIRED green because an upstream story owns it => PLAN_OVERLAP, developer budget unchanged",
-         [_crit("new", "CHANGE_REQUIRED"), _crit("already", "CHANGE_REQUIRED", requirement="FR-2")],
-         expect_check="FAIL", expect_terminal=StageOutcome.PLAN_CONFLICT.value),
+         [_crit("new", "CHANGE_REQUIRED"), _crit("already", "CHANGE_REQUIRED", requirement="FR-2")]),
     Case("K", "a normal story with zero CHANGE_REQUIRED is a plan defect, refused before the first model call",
          [_crit("keep", "PRESERVE_REQUIRED", requirement="FR-2"),
           _crit("absence", "NEGATIVE_INVARIANT", requirement="FR-9")],
-         expect_check="PLAN_GATE", expect_terminal="PLAN_GATE", plan_gates=("machine_gate", "preflight")),
+         plan_gates=("machine_gate", "preflight")),
     Case("L", "a criterion whose requirement the story does not cover is a plan/readiness failure",
          [_crit("new", "CHANGE_REQUIRED", requirement="FR-77")],
-         expect_check="PLAN_GATE", expect_terminal="PLAN_GATE", plan_gates=("machine_gate",)),
+         plan_gates=("machine_gate",)),
     Case("M", "a malformed proof mode is a plan/readiness failure",
-         [_crit("new", "NO_SUCH_MODE")], expect_check="PLAN_GATE", expect_terminal="PLAN_GATE",
+         [_crit("new", "NO_SUCH_MODE")],
          plan_gates=("machine_gate", "preflight")),
     Case("N", "the gate reports every structured feedback field for each failing criterion",
          [_crit("new", "CHANGE_REQUIRED"), _crit("break", "PRESERVE_REQUIRED", requirement="FR-2")],
-         broken=True, expect_check="FAIL", expect_terminal=StageOutcome.QUALITY_BLOCK.value),
+         broken=True),
+]
+
+# ---- the stage-lifecycle scenarios (owner decision section 7, A-I): an absence at EVERY stage that produces
+# evidence, and the two controls that must still charge the developer.
+SCENARIOS += [
+    Case("O", "repeated NOP environment UNRUNNABLE ends on the environment, never as a quality block",
+         [_crit("parent_unrunnable", "CHANGE_REQUIRED")], owner=ENVIRONMENT, stage="tools", retries=2),
+    Case("P", "the test tool itself cannot run => no developer quality charge",
+         [_crit("new", "CHANGE_REQUIRED")], owner=ENVIRONMENT, stage="tools", test_tool=MISSING_TOOL),
+    Case("Q", "lint cannot run => no developer quality charge",
+         [_crit("new", "CHANGE_REQUIRED")], owner=ENVIRONMENT, stage="tools", lint_tool=MISSING_TOOL),
+    Case("R", "the reviewer did not answer => the review stage is retried, not the developer",
+         [_crit("new", "CHANGE_REQUIRED")], owner=ENVIRONMENT, stage="review", review_step="UNRUNNABLE"),
+    Case("S", "the security reviewer did not answer => the security stage is retried, not the developer",
+         [_crit("new", "CHANGE_REQUIRED")], owner=ENVIRONMENT, stage="security", security_step="UNRUNNABLE"),
+    Case("T", "a genuine behavioural failure at the candidate DOES charge the developer's quality budget",
+         [_crit("unimplemented", "CHANGE_REQUIRED")], unimplemented=True, retries=1),
 ]
 
 #: The cases whose verdict the PLAN gate must reach from planning data alone — no developer session at all (§8, §12).
@@ -300,7 +342,8 @@ class Project:
 
 def files_for(case: Case) -> dict[str, str]:
     """Everything the developer session writes: the product change and one test file per criterion."""
-    out: dict[str, str] = {"ledgerlock/cli.py": BROKEN_CLI if case.broken else STORY_CLI}
+    out: dict[str, str] = {"ledgerlock/cli.py": BASE_CLI if case.unimplemented else
+                           (BROKEN_CLI if case.broken else STORY_CLI)}
     if any(c.kind in ("new_import", "parent_unrunnable", "parent_uncollected") for c in case.crits):
         out["ledgerlock/rebuild.py"] = NEW_MODULE
     for i, c in enumerate(case.crits, 1):
@@ -326,11 +369,21 @@ def real_run(case: Case) -> dict:
         # One developer step that repeats: a retry writes the same files again, so a scenario that must block
         # blocks on its own evidence instead of drifting into "the session wrote nothing".
         client = SyntheticClientAdapter(Script(
-            developer=[Step.changed(files_for(case))], review=[Step.passes()], security=[Step.passes()]))
-        cfg = Config({**DEFAULTS, "tools.lint": "true", "run.max_retries": 1,
-                      "tools.test": quote_command([sys.executable, "-m", "unittest", "discover",
-                                                   "-s", "tests", "-t", ".", "-v"])})
-        out = implement_story(story_for(case), project=p.path, workdir=p.work, artifact_root=p.artifacts,
+            developer=[Step.changed(files_for(case))],
+            review=[Step(case.review_step)], security=[Step(case.security_step)]))
+        test_cmd = TEST_COMMAND
+        if case.test_tool == FLAKY_TOOL:
+            runner = p.artifacts / "flaky_runner.py"
+            runner.write_text(_FLAKY_RUNNER, encoding="utf-8")
+            test_cmd = quote_command([sys.executable, str(runner)])
+        elif case.test_tool:
+            test_cmd = case.test_tool
+        cfg = Config({**DEFAULTS, "tools.lint": case.lint_tool, "run.max_retries": case.retries,
+                      "tools.test": test_cmd, "tools.sast": case.sast_tool})
+        story = story_for(case)
+        if case.contract:
+            story.verification_contract = list(case.contract)
+        out = implement_story(story, project=p.path, workdir=p.work, artifact_root=p.artifacts,
                               client=client, config=cfg)
         gate = out.attempts[-1].gate if out.attempts else None
         check = next((c for c in (gate.checks if gate else []) if c.name == CHECK), None)
@@ -345,6 +398,16 @@ def real_run(case: Case) -> dict:
                 "developer_sessions": len([c for c in client.calls if c.role == "developer"]),
                 "quality_attempts": out.quality_attempts,
                 "attempts": len(out.attempts),
+                # the environment/stage budget: a re-verify attempt re-runs the responsible stage and is never
+                # charged to the developer (StoryOutcome.quality_attempts skips `verify_only`)
+                "verify_only_attempts": len([a for a in out.attempts if a.verify_only]),
+                "infra_attempts": len([a for a in out.attempts if a.infra]),
+                "review_executions": len([c for c in client.calls if c.role == "review"]),
+                "security_executions": len([c for c in client.calls if c.role == "security"]),
+                "checks_failed": sorted({c.name for a in out.attempts for c in (a.gate.checks if a.gate else [])
+                                         if _outcome_name(c.outcome) == "FAIL"}),
+                "checks_unrunnable": sorted({c.name for a in out.attempts for c in (a.gate.checks if a.gate else [])
+                                             if _outcome_name(c.outcome) == "UNRUNNABLE"}),
                 "failures": [c.name for c in (gate.failures if gate else [])],
                 "candidate_bound": bool(out.attempts and out.attempts[-1].identity.get("candidate_sha")),
                 }
@@ -373,28 +436,57 @@ def plan_gate(case: Case) -> dict:
 
 # ------------------------------------------------------------------ model vs real
 
+def lifecycle_for(owner: str | None, case: Case) -> dict:
+    """The whole lifecycle the APPROVED policy requires for one failure owner (owner decision section 6).
+
+    This is the part a model must not take from the kernel. Each owner names who can fix the failure, and that
+    answer decides which budget pays for the next step and how the story ends:
+
+        satisfied      the story is done on the session that produced it
+        PLAN           a planning contradiction no code change can resolve: PLAN_CONFLICT, and the developer's
+                       quality budget is not charged for it
+        ENVIRONMENT    the evidence could not be obtained: the RESPONSIBLE STAGE is retried (a re-verify attempt,
+                       which is not a developer session and not a quality attempt), and the story ends on the
+                       environment, never as a quality block
+        DEVELOPER      the only owner a developer session can satisfy: the quality budget is charged and
+                       `run.max_retries` bounds it
+    """
+    if owner is None:
+        return {"terminal": "done", "developer_sessions": 1, "quality_attempts": 1, "min_stage_retries": 0}
+    if owner == PLAN:
+        return {"terminal": StageOutcome.PLAN_CONFLICT.value, "developer_sessions": 1, "quality_attempts": 1,
+                "min_stage_retries": 0}
+    if owner == ENVIRONMENT:
+        # a verifier that did not answer names its own terminal; a tool or its evidence names the environment
+        term = (StageOutcome.UNRUNNABLE if case.stage in ("review", "security")
+                else StageOutcome.ENVIRONMENT_FAILURE).value
+        return {"terminal": term, "developer_sessions": 1, "quality_attempts": 1, "min_stage_retries": 1}
+    return {"terminal": StageOutcome.QUALITY_BLOCK.value, "developer_sessions": 1 + case.retries,
+            "quality_attempts": 1 + case.retries, "min_stage_retries": 0}
+
+
 def model_expect(case: Case) -> dict:
     """What the reference model says the kernel must do — computed from the scenario's declared obligations and
-    intended proof states, never from the product's own tables."""
+    intended proof states through the approved policy, never from the product's own tables or observed runs."""
     acs = []
     for i, c in enumerate(case.crits, 1):
         sat, owner, overlap = model_ac(c.mode, c.parent, c.candidate)
         acs.append({"ac_id": f"AC-{SID}-{i}", "proof_mode": c.mode, "requirement": c.requirement,
                     "parent": c.parent, "candidate": c.candidate, "satisfied": sat, "owner": owner,
                     "plan_overlap": overlap, "parent_state": c.parent_state, "candidate_state": c.candidate_state})
+    # The criteria decide the CHECK; a stage that could not run decides the LIFECYCLE. They are different
+    # questions: lint or the reviewer being absent says nothing about whether a criterion showed its obligation.
     all_sat = all(a["satisfied"] for a in acs)
     owners = sorted({a["owner"] for a in acs if a["owner"]})
     # A criterion nobody could answer for is not the developer's failure: when EVERY blocking criterion is owned by
     # the environment the check itself could not run (F2 typed outcomes — absence is never a FAIL).
     check = "PASS" if all_sat else ("UNRUNNABLE" if owners == [ENVIRONMENT] else "FAIL")
-    # §12, budget: only a DEVELOPER-owned failure may buy a second developer session. A planning contradiction is
-    # routed to the plan on the evidence of the session that revealed it, and an environment answer proves nothing
-    # a retry could fix either.
-    # §12, budget: a planning contradiction is routed to the plan on the evidence of the session that revealed it
-    # and buys no second developer session. Everything else blocking does.
-    spends = bool(not all_sat and owners != [PLAN])
-    return {"acs": acs, "check": check, "owners": owners, "terminal": case.expect_terminal,
-            "developer_sessions": 2 if spends else 1, "quality_attempts": 2 if spends else 1}
+    # The owner that decides the lifecycle is the most demanding one present: a developer failure still has to be
+    # fixed by a developer even when another criterion is owned elsewhere.
+    every = owners + ([case.owner] if case.owner else [])
+    ruling = (DEVELOPER if DEVELOPER in every else (PLAN if PLAN in every else (ENVIRONMENT if ENVIRONMENT in every
+              else None)))
+    return {"acs": acs, "check": check, "owners": owners, "ruling_owner": ruling, **lifecycle_for(ruling, case)}
 
 
 def compare(case: Case) -> dict:
@@ -414,7 +506,9 @@ def compare(case: Case) -> dict:
     real = real_run(case)
     bad: list[str] = []
     by_id = {r["ac_id"]: r for r in real["rows"]}
-    for a in model["acs"]:
+    # A scenario whose declared failure is a STAGE that could not run is judged on its lifecycle: with the evidence
+    # missing there is nothing for the criteria to be judged from, and demanding rows would only re-assert that.
+    for a in ([] if case.owner else model["acs"]):
         r = by_id.get(a["ac_id"])
         if r is None:
             bad.append(f"{a['ac_id']}: the gate reported no row for it")
@@ -436,9 +530,9 @@ def compare(case: Case) -> dict:
         for f in ("requirement", "proof_mode", "expected_transition", "actual_transition"):
             if not str(r.get(f) or ""):
                 bad.append(f"{a['ac_id']}: the gate's feedback carries no {f}")
-    if real["check"] != model["check"]:
+    if not case.owner and real["check"] != model["check"]:
         bad.append(f"check outcome real={real['check']!r} model={model['check']!r}")
-    if real["owners"] != model["owners"]:
+    if not case.owner and real["owners"] != model["owners"]:
         bad.append(f"owners real={real['owners']} model={model['owners']}")
     if real["terminal"] != model["terminal"]:
         bad.append(f"terminal real={real['terminal']!r} model={model['terminal']!r}")
@@ -446,10 +540,22 @@ def compare(case: Case) -> dict:
         bad.append(f"developer quality budget real={real['quality_attempts']} model={model['quality_attempts']}")
     if real["developer_sessions"] != model["developer_sessions"]:
         bad.append(f"developer sessions real={real['developer_sessions']} model={model['developer_sessions']}")
+    # the environment budget and the retry TARGET: an absence must buy a re-verify of the responsible stage, never
+    # another developer session (owner decision sections 6 and 7)
+    if real["verify_only_attempts"] < model["min_stage_retries"]:
+        bad.append(f"stage retries real={real['verify_only_attempts']} model>={model['min_stage_retries']} "
+                   f"— the responsible stage was not re-run")
+    if model["ruling_owner"] == ENVIRONMENT and real["checks_failed"]:
+        bad.append(f"an absence was reported as a FAILED check: {real['checks_failed']} — a check must never "
+                   f"turn evidence that did not run into a verdict against the developer")
+    if case.stage == "review" and model["ruling_owner"] == ENVIRONMENT and real["review_executions"] < 2:
+        bad.append(f"review executions real={real['review_executions']} — the review stage was not retried")
+    if case.stage == "security" and model["ruling_owner"] == ENVIRONMENT and real["security_executions"] < 2:
+        bad.append(f"security executions real={real['security_executions']} — the security stage was not retried")
     if not real["candidate_bound"]:
         bad.append("the verdict was not bound to a frozen candidate (evidence freshness)")
     # §11: what the reader is told must be the structured row, never "tests green on first run"
-    if real["check"] != "PASS":
+    if real["check"] == "FAIL":
         first = next((a for a in model["acs"] if not a["satisfied"]), None)
         for token in ([first["ac_id"], first["proof_mode"], first["requirement"]] if first else []):
             if token not in real["check_detail"]:

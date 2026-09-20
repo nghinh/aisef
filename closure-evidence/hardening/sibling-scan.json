@@ -4,11 +4,10 @@
  "generated": "2026-09-17T21:44:31+0700",
  "method": "five read-only sweeps over aisef/ (recency-as-identity; prose-to-control-state; retry locality and recovery; ownership, tools, leases, scope; plus a test-inventory map), every candidate then verified in code by hand; CONFIRMED requires a deterministic RED reproducer that failed on the invariant assertion (tests/hardening/test_sibling_scan.py, run 2026-09-16 on the 1.7.6 baseline: 21 expected failures, 0 unexpected successes)",
  "counts": {
-  "CONFIRMED": 92,
-  "NEEDS_TEST": 0,
+  "CONFIRMED": 93,
   "NOT_A_DEFECT": 6,
-  "entries": 98,
-  "confirmed": 92
+  "entries": 99,
+  "confirmed": 93
  },
  "entries": [
   {
@@ -1359,6 +1358,20 @@
    "severity_proposed": "P2",
    "reproducer": "tests/hardening/test_w1_oracle_ownership.py::TestRunClassification::test_a_stop_on_the_kernels_infrastructure_terminal_is_not_a_model_project_stop",
    "notes": "PROFILE-W1-OC-GPT56SOL-T80-RO run 1 (2026-09-19): the provider refused gpt-5.6-sol for every session from 06:41; the kernel blocked STORY-01-03 on its infra budget; the driver's first finish said LEGITIMATE_MODEL_PROJECT_STOP"
+  },
+  {
+   "id": "SS-96",
+   "site": "aisef/control/gate.py::evaluate (the TDD check) vs aisef/phases/implement.py::_absent_stages",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE",
+    "INV-F"
+   ],
+   "semantic_context": "two checks read the SAME evidence and disagreed on its type: with the nop control UNRUNNABLE at the parent, `tests verify story` said UNRUNNABLE (owner ENVIRONMENT) while TDD said FAILED. `_absent_stages` returns nothing as soon as any check FAILED, so an environment that could not answer was routed to the developer — quality budget charged, no stage re-run, terminal QUALITY_BLOCK on a story whose candidate was correct",
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "tests/hardening/test_unrunnable_routing.py::TestAbsenceIsNeverADeveloperFailure",
+   "notes": "found by the targeted policy-V2 conformance suite only after its reference model was corrected to the approved policy (it had mirrored the kernel on the budget rule and the terminal). Sibling sweep over every stage that produces evidence: lint, review and security were already routed correctly; the nop/parent evidence and the test tool were not. Measured before and after in closure-evidence/hardening/ss96/"
   }
  ]
 }

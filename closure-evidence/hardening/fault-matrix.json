@@ -1142,13 +1142,120 @@
    "invariants": "INV-AC-PROOF-OBLIGATION",
    "test": "tests/hardening/test_ac_proof_gate.py::TestGateJudgesEachCriterionByItsObligation::test_a_negative_invariant_green_on_both_sides_passes_without_a_manufactured_red",
    "status": "GREEN (F8)"
+  },
+  {
+   "id": "FM-U-01",
+   "stage": "Test",
+   "fault": "ENVIRONMENT",
+   "scenario": "the parent's evidence for a criterion cannot run (a dependency outside the story)",
+   "expected_state": "every check that reads it is UNRUNNABLE — TDD included; no check FAILS on evidence that did not execute",
+   "expected_evidence": "gate checks TDD and `tests verify story` both UNRUNNABLE, failure owner ENVIRONMENT",
+   "expected_recovery": "the tools stage is re-run inside its own bounded budget; the developer's quality budget is untouched",
+   "invariants": "INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE, INV-TDD-NOP-PROOF",
+   "test": "tests/hardening/test_unrunnable_routing.py::TestAbsenceIsNeverADeveloperFailure::test_A_the_parent_evidence_cannot_run",
+   "status": "GREEN (SS-96)"
+  },
+  {
+   "id": "FM-U-02",
+   "stage": "Test",
+   "fault": "ENVIRONMENT",
+   "scenario": "the same absence survives every stage re-run",
+   "expected_state": "the story ends as ENVIRONMENT_FAILURE, never as QUALITY_BLOCK, whatever run.max_retries allows",
+   "expected_evidence": "StoryOutcome.terminal ENVIRONMENT_FAILURE, quality_attempts 1",
+   "expected_recovery": "the candidate is kept; the operator fixes the environment and re-runs the verify-only path",
+   "invariants": "INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE",
+   "test": "tests/hardening/test_unrunnable_routing.py::TestAbsenceIsNeverADeveloperFailure::test_B_repeated_absence_ends_on_the_environment_and_never_as_a_quality_block",
+   "status": "GREEN (SS-96)"
+  },
+  {
+   "id": "FM-U-03",
+   "stage": "Test",
+   "fault": "ENVIRONMENT",
+   "scenario": "the declared test tool is not installed",
+   "expected_state": "no developer quality attempt is charged for a tool that never ran",
+   "expected_evidence": "gate checks test / criteria have tests / TDD / `tests verify story` UNRUNNABLE, 0 FAILED",
+   "expected_recovery": "bounded tool re-runs, then ENVIRONMENT_FAILURE",
+   "invariants": "INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE, INV-N.1",
+   "test": "tests/hardening/test_unrunnable_routing.py::TestAbsenceIsNeverADeveloperFailure::test_C_the_test_tool_itself_cannot_run",
+   "status": "GREEN (SS-96)"
+  },
+  {
+   "id": "FM-U-04",
+   "stage": "Lint",
+   "fault": "ENVIRONMENT",
+   "scenario": "the declared lint tool is not installed",
+   "expected_state": "no developer quality attempt is charged",
+   "expected_evidence": "gate check lint UNRUNNABLE, 0 FAILED",
+   "expected_recovery": "bounded tool re-runs, then ENVIRONMENT_FAILURE",
+   "invariants": "INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE",
+   "test": "tests/hardening/test_unrunnable_routing.py::TestAbsenceIsNeverADeveloperFailure::test_D_lint_cannot_run",
+   "status": "GREEN (SS-96)"
+  },
+  {
+   "id": "FM-U-05",
+   "stage": "Security",
+   "fault": "ENVIRONMENT",
+   "scenario": "the declared SAST tool is not installed",
+   "expected_state": "no developer quality attempt is charged",
+   "expected_evidence": "0 FAILED checks",
+   "expected_recovery": "the security stage is re-run, not the developer",
+   "invariants": "INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE",
+   "test": "tests/hardening/test_unrunnable_routing.py::TestAbsenceIsNeverADeveloperFailure::test_D_sast_cannot_run",
+   "status": "GREEN (SS-96)"
+  },
+  {
+   "id": "FM-U-06",
+   "stage": "Review",
+   "fault": "ENVIRONMENT",
+   "scenario": "the reviewer produces no verdict on the candidate",
+   "expected_state": "the review stage is re-executed; the developer is not opened again",
+   "expected_evidence": "review executions > 1, developer sessions 1",
+   "expected_recovery": "terminal UNRUNNABLE naming the reviewer",
+   "invariants": "INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE, INV-G.1",
+   "test": "tests/hardening/test_unrunnable_routing.py::TestTheStageThatCouldNotRunIsTheStageRetried::test_E_review_unrunnable_retries_the_review_stage_only",
+   "status": "GREEN (SS-96)"
+  },
+  {
+   "id": "FM-U-07",
+   "stage": "Security",
+   "fault": "ENVIRONMENT",
+   "scenario": "the security reviewer produces no verdict on the candidate",
+   "expected_state": "the security stage is re-executed; the developer is not opened again",
+   "expected_evidence": "security executions > 1, developer sessions 1",
+   "expected_recovery": "terminal UNRUNNABLE naming the security reviewer",
+   "invariants": "INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE, INV-G.2",
+   "test": "tests/hardening/test_unrunnable_routing.py::TestTheStageThatCouldNotRunIsTheStageRetried::test_F_security_unrunnable_retries_the_security_stage_only",
+   "status": "GREEN (SS-96)"
+  },
+  {
+   "id": "FM-U-08",
+   "stage": "Test",
+   "fault": "QUALITY",
+   "scenario": "the candidate does not implement the criterion it owes",
+   "expected_state": "the developer IS the owner: the quality budget is charged and run.max_retries bounds it",
+   "expected_evidence": "gate check `tests verify story` FAILED with outcome DEVELOPER_QUALITY_BLOCK",
+   "expected_recovery": "a developer retry, then QUALITY_BLOCK — the fix must not make the gate toothless",
+   "invariants": "INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE",
+   "test": "tests/hardening/test_unrunnable_routing.py::TestAGenuineFailureStillChargesTheDeveloper::test_G_a_candidate_that_does_not_implement_the_criterion_is_charged",
+   "status": "GREEN (SS-96)"
+  },
+  {
+   "id": "FM-U-09",
+   "stage": "Test",
+   "fault": "ENVIRONMENT",
+   "scenario": "the tool is absent for a whole attempt, recovers, and the candidate is then seen to be wrong",
+   "expected_state": "the absence buys a stage re-verify; only the graded attempts are charged to the developer",
+   "expected_evidence": "1 verify-only attempt, 2 developer sessions, quality_attempts 2",
+   "expected_recovery": "QUALITY_BLOCK once the evidence exists and shows the work is wrong",
+   "invariants": "INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE",
+   "test": "tests/hardening/test_unrunnable_routing.py::TestAGenuineFailureStillChargesTheDeveloper::test_I_only_the_genuine_quality_failure_increments_the_quality_budget",
+   "status": "GREEN (SS-96)"
   }
  ],
  "status_count": {
-  "GREEN": 93,
-  "RED": 0,
-  "NEEDS_TEST": 0
+  "GREEN": 102
  },
  "updated_2026-09-18": "SS-81 family (F7-EXECUTION-EVIDENCE-VALIDITY): FM-T-08..FM-T-16 added, each GREEN on the fixed kernel",
- "updated_2026-09-20": "F8 (TDD proof policy V2): FM-P-06..08 and FM-T-17..18 — plan-owned criteria, missing obligations, preserved behaviour and absence criteria"
+ "updated_2026-09-20": "F8 (TDD proof policy V2): FM-P-06..08 and FM-T-17..18 — plan-owned criteria, missing obligations, preserved behaviour and absence criteria",
+ "updated_2026-09-20-ss96": "FM-U-01..09 — SS-96: evidence that did not execute is never a failure against the developer. Every stage that produces evidence, plus the two controls that must still charge the developer."
 }

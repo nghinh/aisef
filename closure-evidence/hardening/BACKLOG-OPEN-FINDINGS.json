@@ -63,16 +63,75 @@
   },
   {
    "id": "SS-96",
-   "severity": "P2",
-   "defect_class": "RETRY_ROUTING",
-   "status": "OPEN",
-   "site": "aisef/control/gate.py::_nop_check (owners == {ENVIRONMENT} -> UNRUNNABLE) vs the attempt accounting in aisef/phases/implement.py",
-   "statement": "a criterion whose PARENT evidence proves nothing (DEPENDENCY_UNRUNNABLE, NOT_COLLECTED, COLLECTION_ABORTED, ABSENT) makes the nop check UNRUNNABLE with failure owner ENVIRONMENT — correct — but the attempt is still charged to the DEVELOPER's quality budget and the story terminates as QUALITY_BLOCK, as though the code had failed",
+   "severity": "P1",
+   "defect_class": "OUTCOME_MISCLASSIFICATION / RETRY_ROUTING (FAM-OUTCOME, FAM-RETRY)",
+   "status": "FIXED",
+   "site": "aisef/control/gate.py::evaluate — the TDD check's final branch",
+   "statement": "Two checks read the SAME evidence. When the nop control could not run, `tests verify story` correctly reported UNRUNNABLE (owner ENVIRONMENT) while `TDD` reported FAILED (\"tests green on first run — not proven to verify anything\"). `_absent_stages` returns nothing as soon as any check FAILED, so the attempt was routed to the developer: the quality budget was charged, no stage was re-run, and the story terminated as QUALITY_BLOCK.",
    "measured": "TDD-POLICY-V2-CONFORMANCE.json scenarios G and H on tree 42a29853: check outcome UNRUNNABLE, every blocking row owner=ENVIRONMENT, developer sessions 2, quality attempts 2, terminal QUALITY_BLOCK. The PLAN owner IS routed correctly in the same suite (scenarios B and J: terminal PLAN_CONFLICT, 1 developer session, no retry spent)",
    "impact_in_this_run": "none on correctness — fail-closed, 0 false PASS; costs one developer retry and mislabels the terminal",
    "worst_case": "a story blocked by an environment that cannot answer is reported as a developer quality failure, and one retry of the model's budget is spent on a condition no code change can fix",
    "why_not_fixed_now": "the owner decision of 2026-09-20 specifies retry routing for the PLAN owner only (section 12: 'Do not spend developer retry budget on a planning contradiction'). Routing the ENVIRONMENT owner is an extension of the approved semantics, not a defect against them, and the behaviour predates policy V2 — V2 only gave the condition a name. Section 22 asks for no scope creep; the kernel is frozen for qualification",
-   "disposition": "P2 backlog — owner decision needed on whether an ENVIRONMENT-owned criterion may consume a developer quality attempt"
+   "disposition": "FIXED in this cycle; the product tree changes, so mutation, fault matrix, suite, ruff, CI and the full 100 000-trace Phase 12 all re-run on the new kernel",
+   "severity_history": "opened P2 on 2026-09-20 on the reasoning that the decision's section 12 named only the PLAN owner and that the behaviour predated policy V2. The owner rejected both: the approved routing contract requires UNRUNNABLE evidence to retry the stage and never to consume developer quality retries, and age is irrelevant to severity. Re-measured as a lifecycle defect and raised to P1.",
+   "measured_before": {
+    "reproducer": "closure-evidence/hardening/ss96/ — a story whose candidate is correct, whose parent evidence is DEPENDENCY_UNRUNNABLE for a reason outside the story",
+    "max_retries_2": {
+     "developer_sessions": 3,
+     "quality_attempts": 3,
+     "stage_retries": 0,
+     "terminal": "QUALITY_BLOCK",
+     "checks_FAILED": [
+      "TDD"
+     ],
+     "checks_UNRUNNABLE": [
+      "tests verify story"
+     ]
+    },
+    "test_tool_absent": {
+     "developer_sessions": 2,
+     "quality_attempts": 2,
+     "stage_retries": 0,
+     "terminal": "QUALITY_BLOCK",
+     "checks_FAILED": [
+      "TDD"
+     ]
+    },
+    "siblings_already_correct": {
+     "lint": "ENVIRONMENT_FAILURE, 3 stage retries, 1 quality attempt",
+     "review": "UNRUNNABLE, 2 stage retries, 1 quality attempt",
+     "security": "UNRUNNABLE, 2 stage retries, 1 quality attempt"
+    }
+   },
+   "measured_after": {
+    "max_retries_2": {
+     "developer_sessions": 1,
+     "quality_attempts": 1,
+     "stage_retries": 3,
+     "terminal": "ENVIRONMENT_FAILURE",
+     "checks_FAILED": [],
+     "checks_UNRUNNABLE": [
+      "TDD",
+      "tests verify story"
+     ]
+    },
+    "test_tool_absent": {
+     "developer_sessions": 1,
+     "quality_attempts": 1,
+     "stage_retries": 3,
+     "terminal": "ENVIRONMENT_FAILURE",
+     "checks_FAILED": []
+    },
+    "controls_unchanged": {
+     "genuine candidate failure": "QUALITY_BLOCK, 2 quality attempts (charged)",
+     "plan overlap": "PLAN_CONFLICT, 1 quality attempt",
+     "environment then recovery then a genuine failure": "1 stage re-verify, then QUALITY_BLOCK charged for the 2 graded attempts"
+    }
+   },
+   "fix": "aisef/control/gate.py::evaluate — when no red run was recorded AND the nop control is UNRUNNABLE, the TDD check is UNRUNNABLE with the control's own reason instead of FAILED. One branch; the kernel's existing stage routing (_absent_stages -> _stage_of -> bounded re-verify -> ENVIRONMENT_FAILURE) then applies, which is why lint, review and security never had the defect.",
+   "invariant": "INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE (new, P1): no gate check may report FAILED for evidence that did not execute; only a check that FAILED on evidence that did execute may charge the developer's quality budget.",
+   "regression_tests": "tests/hardening/test_unrunnable_routing.py (owner section 7, cases A-I) and conformance scenarios O, P, Q, R, S, T",
+   "why_the_conformance_suite_missed_it": "the reference model mirrored the kernel on the two fields that would have caught it: the budget rule was written as 'anything blocking that is not PLAN-owned spends a developer session' after observing the kernel do exactly that, and each scenario's terminal was hand-written from its observed run. The model now derives both from the failure owner, and two fields that were never compared — the environment/stage budget and the retry target — are compared as well."
   }
  ]
 }

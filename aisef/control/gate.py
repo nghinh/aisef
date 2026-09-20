@@ -708,6 +708,48 @@ def judge_only(gate: StoryGate) -> bool:
         c.outcome is not Outcome.UNRUNNABLE for c in gate.failures)
 
 
+def _tdd_check(evidence: Evidence, story_id: str, *, acceptance: int, added_tests: list[str],
+               changed: list[str] | None, ac_proof: dict | None, nop: Check) -> Check:
+    """Check "TDD" (G8) — the story's tests must have been red before they were green.
+
+    A proxy for the question the nop control answers directly, so it defers to the control both ways. SS-83: "red"
+    is read through the one proof model, so a run that could not execute, or one red only because of an unrelated
+    test, shows nothing about this story's tests. V2 narrows the question to the criteria this story must CHANGE:
+    a criterion it only preserves, and a prohibition, cannot be red at the parent.
+
+    SS-96: `nop` and this check read the SAME evidence, so when the control could not run, "no red run was
+    recorded" is an absence, not a finding against the developer. The distinction decides the routing —
+    `implement._absent_stages` stops at any FAILED check — so a FAILED verdict here charged an environment that
+    could not answer to the developer's quality budget and ended the story as QUALITY_BLOCK (the measurement is in
+    `closure-evidence/hardening/ss96/`). Absence is never a pass and never a failure.
+    """
+    runs = [e.seq for e in evidence.of(TOOL_RUN, "test")]        # red/green order is read across the full sequence
+    if not added_tests:
+        return Check("TDD", Outcome.NOT_APPLICABLE, "story did not add tests")
+    change_codes = [c for c, decl in (ac_proof or {}).items() if (decl or {}).get("proof_mode") == "CHANGE_REQUIRED"]
+    if ac_proof and not change_codes:
+        return Check("TDD", Outcome.NOT_APPLICABLE,
+                     "no criterion of this story is CHANGE_REQUIRED — there is no new behaviour to see fail first; "
+                     "each criterion is judged by its own obligation (tests verify story)")
+    red_run = proven_red_before_green(evidence, story_id, acceptance=acceptance, added_tests=added_tests,
+                                      changed=changed, codes=change_codes)
+    if red_run is not None:
+        return Check("TDD", True, f"red before green: run #{red_run.seq} shows the story's tests red for a reason "
+                                  f"the story's code decides", evidence=runs)
+    if nop.outcome is Outcome.PASSED:
+        return Check("TDD", True, f"no red run recorded, but the nop control proves the same thing directly — "
+                                  f"{nop.detail or 'story tests are red without the story code'}",
+                     evidence=list(nop.evidence))
+    if nop.outcome is Outcome.UNRUNNABLE:
+        return Check("TDD", Outcome.UNRUNNABLE,
+                     f"no red run was recorded, and the control that decides the same question could not run — "
+                     f"{nop.detail or 'the nop control did not execute'}", evidence=list(nop.evidence))
+    return Check("TDD", False,
+                 f"tests green on first run — not proven to verify anything ({', '.join(added_tests[:3])}). "
+                 f"Write tests first, run them through the recorded tool, see them fail, then write code — a run "
+                 f"the harness did not record cannot prove anything.", evidence=runs)
+
+
 def review_waiver(evidence: Evidence, candidate: str) -> Event | None:
     """The human override in force for **this** candidate, or None (G2.4b-iii).
 
@@ -1055,38 +1097,8 @@ def evaluate(
     # proof model as the nop control — a run that could not execute, or that is red only because of an unrelated test,
     # shows nothing about the story's tests.
     if added_tests is not None:
-        change_codes = [c for c, decl in ((ac_proof or {}).items()) if (decl or {}).get("proof_mode") == "CHANGE_REQUIRED"]
-        red_run = proven_red_before_green(evidence, story_id, acceptance=acceptance, added_tests=added_tests,
-                                          changed=changed, codes=change_codes) if added_tests else None
-        if not added_tests:
-            gate.checks.append(Check("TDD", Outcome.NOT_APPLICABLE, "story did not add tests"))
-        elif ac_proof and not change_codes:
-            gate.checks.append(Check(
-                "TDD", Outcome.NOT_APPLICABLE,
-                "no criterion of this story is CHANGE_REQUIRED — there is no new behaviour to see fail first; "
-                "each criterion is judged by its own obligation (tests verify story)"))
-        elif red_run is not None:
-            gate.checks.append(Check(
-                "TDD", True, f"red before green: run #{red_run.seq} shows the story's tests red for a reason the "
-                             f"story's code decides",
-                evidence=[e.seq for e in evidence.of(TOOL_RUN, "test")],   # red/green order read across full sequence
-            ))
-        elif nop.outcome is Outcome.PASSED:
-            gate.checks.append(Check(
-                "TDD", True,
-                f"no red run recorded, but the nop control proves the same thing "
-                f"directly — {nop.detail or 'story tests are red without the story code'}",
-                evidence=list(nop.evidence),
-            ))
-        else:
-            gate.checks.append(Check(
-                "TDD", False,
-                f"tests green on first run — not proven to verify anything "
-                f"({', '.join(added_tests[:3])}). Write tests first, run them through "
-                f"the recorded tool, see them fail, then write code — a run the harness "
-                f"did not record cannot prove anything.",
-                evidence=[e.seq for e in evidence.of(TOOL_RUN, "test")],
-            ))
+        gate.checks.append(_tdd_check(evidence, story_id, acceptance=acceptance, added_tests=added_tests,
+                                      changed=changed, ac_proof=ac_proof, nop=nop))
     gate.checks.append(nop)
 
     # Story verification contract. Unconfigured kinds are recorded as

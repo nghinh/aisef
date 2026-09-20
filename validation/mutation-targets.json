@@ -351,6 +351,11 @@
   },
   {
    "module": "aisef/control/gate.py",
+   "function": "_tdd_check",
+   "why": "SS-96 — the proxy check that reads the nop control's evidence: it must defer to the control both ways, and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)"
+  },
+  {
+   "module": "aisef/control/gate.py",
    "function": "_baseline_check",
    "tests": [
     "tests/hardening/test_ss81_family.py",
