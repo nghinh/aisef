@@ -1,0 +1,52 @@
+{
+ "id": "ARCH-LESSON-001",
+ "recorded": "2026-09-21",
+ "owner_decision": "RUN 2 IS THE FINAL DIAGNOSTIC RUN (2026-09-21), sections 4 and 5",
+ "scope": "next architecture cycle — NOT implemented in V1",
+ "invariant": "PROOF OBLIGATION SEMANTICS MUST BE INDEPENDENT OF DEVELOPER-CHOSEN TEST FILE PLACEMENT.",
+ "statement": "A developer may organise tests as they see fit. That choice must not change whether the parent side of an acceptance criterion is classified RED, GREEN, PLAN_OVERLAP or PLAN_PRECONDITION_MISSING. Two correct implementations of the same criterion, differing only in which file carries the test, must reach the same proof decision.",
+ "evidence": {
+  "defect": "PLAN-V2.1-DEFECT-001",
+  "measurement": "One frozen NEGATIVE_INVARIANT criterion, two runs of the same plan text. Placed in a file that imports nothing of the story, it collected at the parent and passed vacuously: GREEN, story delivered. Placed in a file importing `ledgerlock` — the package the story creates — it could not be collected at the parent: RED_COLLECTION_BOUND_TO_STORY, PLAN_PRECONDITION_MISSING, plan deadlock, 0 of 16 stories delivered.",
+  "why_it_happens": "The proof model reads a criterion's parent state from the criterion's TESTS, and a test's collectability at the parent is a property of its FILE, not of the criterion. `proof.classify` binds a collection failure to the story through the test's own file (SS-82), which is correct for a CHANGE_REQUIRED criterion — the story's module is missing, so the test cannot run, and that is proof of red. For a NEGATIVE_INVARIANT the same binding is fatal: the prohibition is about the absence of something, and an absent package satisfies it, but a test that cannot import that package reports red rather than green.",
+  "generality": "The exposure is not limited to NEGATIVE_INVARIANT. Any criterion whose subject is not the story's own new module inherits the collectability of whatever file the developer chose, and a PRESERVE_REQUIRED criterion placed in a story-importing file at a parent that lacks the module would fail the same way."
+ },
+ "next_cycle_design_options": [
+  {
+   "option": "harness-owned criterion probes",
+   "idea": "The harness, not the developer, owns one probe per criterion and runs it on both sides. Placement is then a property of the harness and identical across runs.",
+   "cost": "the harness must be able to express every criterion; a probe language or a per-project probe module appears, and the developer's own tests stop being the evidence the gate reads",
+   "risk": "the probe becomes a second test suite that can disagree with the project's own — the 'one proof engine' rule of the V2 policy would have to be restated over probes instead of over runs"
+  },
+  {
+   "option": "plan-generated canonical AC tests",
+   "idea": "The plan emits a canonical test file per criterion at planning time, frozen before any developer session; the developer may add tests but may not move the canonical ones.",
+   "cost": "the plan must be able to write executable tests, which makes planning a code-generation step and moves a class of defects from the developer to the planner",
+   "risk": "a canonical test written before the code exists tends to encode an implementation, not a behaviour"
+  },
+  {
+   "option": "evidence collection isolated per AC",
+   "idea": "Each criterion's tests run in their own collection, so one file's import failure cannot decide another criterion's state.",
+   "cost": "N collections per side instead of one; slower, and the runner must support selecting by criterion code",
+   "note": "this narrows blast radius but does NOT fix the defect: the criterion's own file still decides its own state"
+  },
+  {
+   "option": "negative-invariant probes that do not import the product",
+   "idea": "A prohibition is evaluated over the source tree, not by importing it — the plan declares the invariant as a source-level predicate the harness evaluates directly.",
+   "cost": "a second evaluation mechanism beside test execution",
+   "note": "this is the narrowest fix that addresses the measured defect, and it matches what a prohibition actually asserts"
+  },
+  {
+   "option": "separating developer tests from proof-of-obligation tests",
+   "idea": "Two suites with two purposes: the developer's tests, and the obligation tests the gate reads. Only the second decides proof states.",
+   "cost": "duplication, and a rule for keeping them honest with each other"
+  },
+  {
+   "option": "canonical baseline probes frozen before developer execution",
+   "idea": "The parent side of every criterion is measured once, before the story runs, from a frozen probe set; the developer's session cannot change what the parent showed.",
+   "cost": "the probe set must exist before the code does",
+   "note": "this also removes a subtler coupling: today the parent measurement depends on test files the developer wrote after the parent existed"
+  }
+ ],
+ "requirement_for_the_next_design": "Equivalent developer test layouts must produce the same proof decision. A design that cannot demonstrate this on the PLAN-V2.1-DEFECT-001 scenario — the same criterion in two different files — does not satisfy the invariant."
+}
