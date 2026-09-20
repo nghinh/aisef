@@ -1,0 +1,35 @@
+{
+ "framework_version": "1.7.6",
+ "client": "OpenCodeAdapter",
+ "client_version": "1.18.31",
+ "model": "",
+ "route": "api.anthropic.com",
+ "config_digest": "95648c35d747177ce4d45f0eb3e9ba36a66337820c78e1975e346e05e89fcade",
+ "requirements_digest": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+ "story_contract_digests": {
+  "STORY-01-01": "0a74694e0fc54235",
+  "STORY-01-02": "02298a1e8b301506",
+  "STORY-01-03": "6fc932133c8cf705",
+  "STORY-01-04": "64ef2c968cf29e7d",
+  "STORY-01-05": "d6bf863af9fe356c",
+  "STORY-01-06": "b4683df29651b267",
+  "STORY-02-01": "76db400daea218e8",
+  "STORY-02-02": "5b78edf407561053",
+  "STORY-03-01": "35e74c471b568827",
+  "STORY-03-02": "c4d85e26e412748d",
+  "STORY-04-01": "0de7ca969d4f68fe",
+  "STORY-04-02": "db7fd839a49d6d88",
+  "STORY-04-03": "48fd69da5301cc1e",
+  "STORY-05-01": "45e3a2143e3c027a",
+  "STORY-05-02": "0e60cb7b0cd03406",
+  "STORY-05-03": "38a1da9e07fb9296"
+ },
+ "environment_digest": "0de94bbcc0a07e98",
+ "sandbox_digests": {
+  "aisef-verify-python:84adf1d8eaf9": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+ },
+ "baseline_identities": {},
+ "source_run": "run-20260920T181903Z-66008",
+ "host": "MacBookPro",
+ "accepted_drift": []
+}

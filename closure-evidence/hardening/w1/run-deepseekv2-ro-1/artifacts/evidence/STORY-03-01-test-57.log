@@ -1,0 +1,175 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 17 items / 6 errors
+
+==================================== ERRORS ====================================
+_________________ ERROR collecting tests/test_atomic_batch.py __________________
+/usr/local/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule
+    mod = import_path(
+/usr/local/lib/python3.12/site-packages/_pytest/pathlib.py:596: in import_path
+    importlib.import_module(module_name)
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+/usr/local/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    exec(co, module.__dict__)
+tests/test_atomic_batch.py:9: in <module>
+    from ledgerlock import ConflictError, Ledger, store
+ledgerlock/__init__.py:6: in <module>
+    from .ledger import Ledger
+E     File "/workspace/ledgerlock/ledger.py", line 40
+E       result = dict(committed)
+E       ^^^^^^
+E   IndentationError: expected an indented block after 'if' statement on line 39
+___________________ ERROR collecting tests/test_conflict.py ____________________
+/usr/local/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule
+    mod = import_path(
+/usr/local/lib/python3.12/site-packages/_pytest/pathlib.py:596: in import_path
+    importlib.import_module(module_name)
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+/usr/local/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    exec(co, module.__dict__)
+tests/test_conflict.py:8: in <module>
+    from ledgerlock import ConflictError, Ledger, store
+ledgerlock/__init__.py:6: in <module>
+    from .ledger import Ledger
+E     File "/workspace/ledgerlock/ledger.py", line 40
+E       result = dict(committed)
+E       ^^^^^^
+E   IndentationError: expected an indented block after 'if' statement on line 39
+____________________ ERROR collecting tests/test_ledger.py _____________________
+/usr/local/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule
+    mod = import_path(
+/usr/local/lib/python3.12/site-packages/_pytest/pathlib.py:596: in import_path
+    importlib.import_module(module_name)
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+/usr/local/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    exec(co, module.__dict__)
+tests/test_ledger.py:9: in <module>
+    from ledgerlock import Ledger, format, store
+ledgerlock/__init__.py:6: in <module>
+    from .ledger import Ledger
+E     File "/workspace/ledgerlock/ledger.py", line 40
+E       result = dict(committed)
+E       ^^^^^^
+E   IndentationError: expected an indented block after 'if' statement on line 39
+_____________ ERROR collecting tests/test_snapshot_determinism.py ______________
+/usr/local/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule
+    mod = import_path(
+/usr/local/lib/python3.12/site-packages/_pytest/pathlib.py:596: in import_path
+    importlib.import_module(module_name)
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+/usr/local/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    exec(co, module.__dict__)
+tests/test_snapshot_determinism.py:8: in <module>
+    from ledgerlock import ConflictError, Ledger
+ledgerlock/__init__.py:6: in <module>
+    from .ledger import Ledger
+E     File "/workspace/ledgerlock/ledger.py", line 40
+E       result = dict(committed)
+E       ^^^^^^
+E   IndentationError: expected an indented block after 'if' statement on line 39
+_____________________ ERROR collecting tests/test_store.py _____________________
+/usr/local/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule
+    mod = import_path(
+/usr/local/lib/python3.12/site-packages/_pytest/pathlib.py:596: in import_path
+    importlib.import_module(module_name)
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+/usr/local/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    exec(co, module.__dict__)
+tests/test_store.py:9: in <module>
+    from ledgerlock import store
+ledgerlock/__init__.py:6: in <module>
+    from .ledger import Ledger
+E     File "/workspace/ledgerlock/ledger.py", line 40
+E       result = dict(committed)
+E       ^^^^^^
+E   IndentationError: expected an indented block after 'if' statement on line 39
+______________ ERROR collecting tests/test_verify_independent.py _______________
+/usr/local/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule
+    mod = import_path(
+/usr/local/lib/python3.12/site-packages/_pytest/pathlib.py:596: in import_path
+    importlib.import_module(module_name)
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+/usr/local/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    exec(co, module.__dict__)
+tests/test_verify_independent.py:8: in <module>
+    from ledgerlock import Ledger, format, store
+ledgerlock/__init__.py:6: in <module>
+    from .ledger import Ledger
+E     File "/workspace/ledgerlock/ledger.py", line 40
+E       result = dict(committed)
+E       ^^^^^^
+E   IndentationError: expected an indented block after 'if' statement on line 39
+=========================== short test summary info ============================
+ERROR tests/test_atomic_batch.py
+ERROR tests/test_conflict.py
+ERROR tests/test_ledger.py
+ERROR tests/test_snapshot_determinism.py
+ERROR tests/test_store.py
+ERROR tests/test_verify_independent.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 6 errors during collection !!!!!!!!!!!!!!!!!!!!
+============================== 6 errors in 0.42s ===============================
