@@ -352,7 +352,14 @@
   {
    "module": "aisef/control/gate.py",
    "function": "_tdd_check",
-   "why": "SS-96 — the proxy check that reads the nop control's evidence: it must defer to the control both ways, and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)"
+   "tests": [
+    "tests/hardening/test_unrunnable_routing.py",
+    "tests/hardening/test_policy_v2_conformance.py",
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_gate.py",
+    "tests/test_tdd.py"
+   ],
+   "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)"
   },
   {
    "module": "aisef/control/gate.py",
