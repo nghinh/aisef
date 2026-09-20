@@ -70,12 +70,17 @@ def runs_before_last_green(evidence: Evidence) -> list:
     return [e for e in runs[:last_green_at] if (not e.ok) and not e.detail.get("skipped")]
 
 
-def tdd_subjects(detail: dict, story_id: str, acceptance: int, added_tests: list[str]) -> list[str]:
+def tdd_subjects(detail: dict, story_id: str, acceptance: int, added_tests: list[str],
+                 codes: list[str] | None = None) -> list[str]:
     """The tests TDD is about: the story's criterion tests green in the last green run; failing codes, the green
     tests declared in the files the story added."""
     green = [t for t in (detail.get("test_ids") or []) if t in proof.executed_green(detail)]
     if acceptance > 0:
-        ac = [t for ts in coverage(story_id, acceptance, green).values() for t in ts]
+        # V2: only criteria the plan declares CHANGE_REQUIRED have a red-before-green obligation (`codes`); with no
+        # declaration the subject is every criterion, as it was under policy V1.
+        want = {c for c in (codes or [])}
+        ac = [t for i, ts in coverage(story_id, acceptance, green).items() for t in ts
+              if not want or f"AC-{story_id}-{i}" in want]
         if ac:
             return list(dict.fromkeys(ac))
     added = set(added_tests or [])
@@ -83,7 +88,7 @@ def tdd_subjects(detail: dict, story_id: str, acceptance: int, added_tests: list
 
 
 def proven_red_before_green(evidence: Evidence, story_id: str, *, acceptance: int, added_tests: list[str],
-                            changed: list[str]):
+                            changed: list[str], codes: list[str] | None = None):
     """The earliest run before the last green that PROVES the story's tests red (SS-83), or None.
 
     The old rule took any non-ok run: a run that never executed (tool or environment failure) and a run red only
@@ -93,7 +98,7 @@ def proven_red_before_green(evidence: Evidence, story_id: str, *, acceptance: in
     greens = [e for e in runs if e.ok]
     if not greens:
         return None
-    subjects = tdd_subjects(greens[-1].detail, story_id, acceptance, added_tests)
+    subjects = tdd_subjects(greens[-1].detail, story_id, acceptance, added_tests, codes)
     if not subjects:
         return None
     story_files = [f for f in (changed or []) if not is_test_path(f)]

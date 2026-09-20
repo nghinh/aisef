@@ -1008,10 +1008,53 @@ invariants:
       - SS-66
       - SS-90
     status: PROVEN
+  - invariant_id: INV-AC-PROOF-OBLIGATION
+    domain: pass safety
+    statement: Every acceptance criterion is judged by the proof obligation its PLAN declares — CHANGE_REQUIRED (parent proven RED, candidate GREEN), PRESERVE_REQUIRED and NEGATIVE_INVARIANT (parent GREEN, candidate GREEN). The obligation is machine-readable planning data validated before any model call; the kernel never infers it from the criterion's wording, an absent or unknown obligation is a plan failure and never a default, both sides are read through the one SS-81 proof model, and evidence that did not execute satisfies no obligation.
+    why: "W1 workload V1 (2026-09-19/20): the universal 'every criterion test must be red at the parent' rule refused 8 attempts across three model profiles for criteria that an upstream story had legitimately delivered or that were prohibitions holding on an empty tree — none of them a false block, all of them planning facts a developer cannot fix by writing code (W1-DELIVERY-FAILURE-DECOMPOSITION.json)."
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/control/obligation.py::evaluate
+      - aisef/control/obligation.py::judge
+      - aisef/control/gate.py::_nop_check
+      - aisef/control/tdd.py::tdd_subjects
+      - aisef/control/machine_gate.py::ac_proof_defects
+      - aisef/control/normalize.py::ac_proof
+    deterministic_tests:
+      - tests/hardening/test_ac_proof_policy.py::TestChangeRequired
+      - tests/hardening/test_ac_proof_policy.py::TestPreserveRequired
+      - tests/hardening/test_ac_proof_policy.py::TestNegativeInvariant
+      - tests/hardening/test_ac_proof_policy.py::TestNoEvidenceNeverSatisfies
+      - tests/hardening/test_ac_proof_policy.py::TestMissingMetadata
+      - tests/hardening/test_ac_proof_policy.py::TestMixedStory
+      - tests/hardening/test_ac_proof_gate.py::TestGateJudgesEachCriterionByItsObligation
+    model_tests: []
+    fault_injection_tests:
+      - tests/hardening/test_ac_proof_policy.py::TestNoEvidenceNeverSatisfies
+    linked_defects: []
+    status: PROVEN
+  - invariant_id: INV-PLAN-STORY-CONTRIBUTION
+    domain: plan safety
+    statement: A normal implementation story must declare at least one CHANGE_REQUIRED criterion; a story whose whole contract is already satisfied at its entry is refused before the first developer call, and a criterion failure the PLAN owns (already satisfied, nothing to preserve, no declared obligation) ends the story as a plan conflict instead of spending a developer attempt.
+    why: "W1 workload V1: STORY-04-02's criteria were delivered by STORY-04-01's argparse parser, and three profiles each spent their whole attempt budget — two of them writing nothing at all — on a plan defect the framework reported as the developer's failure."
+    severity_if_violated: P1
+    enforcement_points:
+      - aisef/control/obligation.py::story_contribution
+      - aisef/control/preflight.py::ac_proof_defect
+      - aisef/control/machine_gate.py::ac_proof_defects
+      - aisef/phases/implement.py::plan_owned_criteria
+    deterministic_tests:
+      - tests/hardening/test_ac_proof_policy.py::TestStoryContribution
+      - tests/hardening/test_ac_proof_gate.py::TestPlanOwnedFailureNeverSpendsADeveloperAttempt
+      - tests/hardening/test_ac_proof_gate.py::TestStoryThatContributesNothingNeverReachesAModel
+    model_tests: []
+    fault_injection_tests: []
+    linked_defects: []
+    status: PROVEN
   - invariant_id: INV-TDD-NOP-PROOF
     domain: pass safety
-    statement: "'Tests verify story' and TDD pass only on positive, criterion-specific evidence that the story's tests do not pass at the story-entry parent — each test RED_EXECUTED, or RED_COLLECTION_BOUND_TO_STORY because the test's own file cannot import a module the story adds or a symbol the story's diff to that module supplies. Absence of execution is never proof: NOT_COLLECTED, COLLECTION_ABORTED, DEPENDENCY_UNRUNNABLE, ENVIRONMENT_UNRUNNABLE, MALFORMED_EVIDENCE, SKIPPED and ABSENT never equal red, one file's collection failure never hides another file's tests, and package matching alone never binds a failure to the story."
-    why: SS-81 — the control scored tests that never ran at the parent as red (a missing third-party package; a pytest session stopped at the first collection error while a tautological criterion test sat in another file), and TDD deferred to it; W0 at 02a34e0e was voided for it (2026-09-18).
+    statement: "For a criterion whose declared proof obligation is CHANGE_REQUIRED, 'tests verify story' and TDD pass only on positive, criterion-specific evidence that its tests do not pass at the story-entry parent — each test RED_EXECUTED, or RED_COLLECTION_BOUND_TO_STORY because the test's own file cannot import a module the story adds or a symbol the story's diff to that module supplies. Absence of execution is never proof: NOT_COLLECTED, COLLECTION_ABORTED, DEPENDENCY_UNRUNNABLE, ENVIRONMENT_UNRUNNABLE, MALFORMED_EVIDENCE, SKIPPED and ABSENT never equal red, one file's collection failure never hides another file's tests, and package matching alone never binds a failure to the story."
+    why: SS-81 — the control scored tests that never ran at the parent as red. Scope narrowed to CHANGE_REQUIRED criteria by the TDD proof policy V2 (owner decision 2026-09-20): a criterion an upstream story already delivers, one this story must only preserve, and a prohibition cannot be red at the parent, and demanding it sent developers to rewrite correct code (a missing third-party package; a pytest session stopped at the first collection error while a tautological criterion test sat in another file), and TDD deferred to it; W0 at 02a34e0e was voided for it (2026-09-18).
     severity_if_violated: P1
     enforcement_points:
       - aisef/control/proof.py::classify

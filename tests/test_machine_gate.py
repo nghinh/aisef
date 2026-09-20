@@ -13,6 +13,7 @@ from aisef.config import DEFAULTS, Config  # noqa: E402
 from aisef.control.machine_gate import check_all, check_prd, check_stories  # noqa: E402
 from aisef.control.normalize import PRD, OpenQuestion, Requirement, parse_prd_file  # noqa: E402
 from aisef.control.scheduler import Story  # noqa: E402
+from tests import obligations  # noqa: E402
 
 PRD_FIXTURE = ROOT / "tests" / "fixtures" / "bmad" / "prd.md"
 
@@ -110,7 +111,8 @@ class TestStoryGate(unittest.TestCase):
         về 0 tiêu chí, cổng máy báo `errors: []`, trong khi thẻ story in đúng
         dòng "(none — machine gate will block)"."""
         r = check_stories([story("S-1"), story("S-2")],
-                          story_ac_count={"S-1": 0, "S-2": 3})
+                          story_ac_count={"S-1": 0, "S-2": 3},
+                          story_ac_proof={"S-2": obligations("S-2", 3)})
         self.assertFalse(r.passed)
         loi = " ".join(r.errors)
         self.assertIn("S-1", loi)
@@ -183,12 +185,14 @@ class TestStoryGate(unittest.TestCase):
         r = check_stories(
             [story("S-1")],
             story_ac_text={"S-1": ["Given a, Then b", "Given c, Then d"]},
+            story_ac_count={"S-1": 2}, story_ac_proof={"S-1": obligations("S-1", 2)},
         )
         self.assertTrue(r.passed, " ".join(r.errors))
 
     def test_ac_limit_respects_config(self):
         cfg = Config({**DEFAULTS, "story.max_acceptance_criteria": 30})
-        r = check_stories([story("S-1")], config=cfg, story_ac_count={"S-1": 20})
+        r = check_stories([story("S-1")], config=cfg, story_ac_count={"S-1": 20},
+                          story_ac_proof={"S-1": obligations("S-1", 20)})
         self.assertTrue(r.passed)
 
     def test_pham_vi_ghi_ngoai_du_an_bi_chan(self):

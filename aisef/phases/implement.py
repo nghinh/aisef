@@ -1394,6 +1394,7 @@ def _verify_candidate_under(now: ident.EvidenceIdentity, story: Story, *, projec
         block_severities=config["security.block_severities"],
         guard_expected=guard_expected(project, getattr(client, "id", "")),
         acceptance=len(story.acceptance_criteria),
+        ac_proof=dict(getattr(story, "ac_proof", None) or {}),
         coverage_min=float(config["coverage.min"]),
         added_tests=tdd.added_tests(workdir, base_ref=base_ref, changed=changed, story_id=sid),
         candidate=sha,
@@ -3085,6 +3086,22 @@ def _noop_lien_tiep(attempts: list[Attempt]) -> int:
     return n
 
 
+def plan_owned_criteria(attempt: Attempt) -> list[str]:
+    """Criteria whose failure the PLAN owns, from the gate's own structured rows (TDD proof policy V2).
+
+    A criterion declared CHANGE_REQUIRED that is already satisfied at the story's entry, one with nothing to
+    preserve, one with no declared obligation at all: no session can fix any of them, so the story stops here
+    instead of spending developer attempts on a planning fact (owner decision 2026-09-20, sections 5, 8, 12).
+    Under a plan that declares no obligations this returns nothing and `nop_deadlock` remains the reader."""
+    if attempt.gate is None:
+        return []
+    muc = next((c for c in attempt.gate.failures if c.name == "tests verify story"), None)
+    rows = (muc.data or {}).get("rows") if muc is not None else None
+    return [f"{r['ac_id']} [{r.get('proof_mode') or 'no obligation'}] {r.get('actual_transition', '')}"
+            f" → {r['outcome']}: {r.get('why', '')}"
+            for r in (rows or []) if r.get("owner") == "PLAN"]
+
+
 def nop_deadlock(attempts: list[Attempt]) -> str:
     """The story's criteria are already satisfied without the story.
 
@@ -3592,6 +3609,15 @@ def implement_story(
             if cho:
                 time.sleep(cho)
             continue
+
+        ke_hoach = plan_owned_criteria(attempt)
+        if ke_hoach:
+            outcome.block(StageOutcome.PLAN_CONFLICT, (
+                "deadlock due to plan: " + "; ".join(ke_hoach[:2])
+                + ". The criterion cannot be satisfied by writing code — correct the plan "
+                "(its proof obligation, its owning story, or the criterion itself), then re-run."))
+            _log(f"story={story.id} DEADLOCK plan obligation: {'; '.join(ke_hoach[:2])[:200]}")
+            return outcome
 
         loi_ke_hoach = attempt.plan_findings
         if loi_ke_hoach:

@@ -94,6 +94,9 @@ def load_plan(artifact_root: Path | str) -> Plan:
             write_scope=raw.get("write_scope", []),
             depends_on=raw.get("depends_on", []),
             screens=raw.get("screens", []),
+            # TDD proof policy V2: the obligations travel with the story, keyed by criterion code
+            ac_proof={r["ac_id"]: r for r in raw.get("ac_proof", []) if isinstance(r, dict) and r.get("ac_id")},
+            story_type=raw.get("story_type", "NORMAL"),
         )
     plan.epic_order = [e["id"] for e in data.get("epics", [])]
     if not plan.waves:

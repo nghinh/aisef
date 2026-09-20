@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 import tests  # noqa: E402,F401 — HostProvider vào chỗ docker, không mở container (tests/__init__.py)
+from tests import obligations  # noqa: E402
 
 from aisef.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
 from aisef.clients.stream import RunResult, ToolUse  # noqa: E402
@@ -144,6 +145,8 @@ class ImplementTestCase(unittest.TestCase):
             acceptance_criteria=["ghi chú mới xuất hiện trong danh sách"],
             covers=["FR-1"],
             write_scope=["src"],
+            # every plan declares what each criterion must show (TDD proof policy V2); this one adds behaviour
+            ac_proof=obligations("STORY-01-01", 1),
         )
 
     def tearDown(self):
@@ -1682,11 +1685,24 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
     def evidence(self):
         return EvidenceStore(self.artifacts).read(self.story.id)
 
+    def test_a_criterion_the_plan_owns_ends_the_story_without_a_second_attempt(self):
+        """TDD proof policy V2, owner section 12: the criterion is declared CHANGE_REQUIRED but its test passes at
+        the story's parent — a planning fact. The story stops as a plan conflict on the first attempt; no developer
+        retry is spent on work no session can do."""
+        out = self.chay(self.GIA, **{"run.max_retries": 2})
+        self.assertFalse(out.done, out.summary())
+        self.assertEqual(len(out.attempts), 1, "a plan defect must not open a second developer session")
+        self.assertEqual(out.quality_attempts, 1)
+        self.assertIn("deadlock due to plan", out.blocked_reason)
+        self.assertIn("PLAN_OVERLAP", out.blocked_reason)
+        self.assertIn("AC-STORY-01-01-1", out.blocked_reason)
+
     def test_test_that_do_o_sha_cha_thi_dat_va_don_worktree(self):
         out = self.chay(self.THAT)
         m = self.muc(out)
         self.assertIs(m.outcome, Outcome.PASSED, out.summary())
-        self.assertIn("proven red at parent SHA", m.detail)
+        self.assertIn("each showed what their obligation asks at parent SHA", m.detail)
+        self.assertIn("1 executed red", m.detail)
         self.assertEqual(m.data["proof"]["AC-STORY-01-01-1"]["tests"][self.AC]["state"], "RED_EXECUTED")
         nop = self.evidence().last(TOOL_RUN, "test:nop")
         self.assertEqual(nop.detail["proof_schema"], 2)
@@ -1704,7 +1720,7 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         out = self.chay(self.GIA)
         m = self.muc(out)
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("still green without story code", m.detail)
+        self.assertIn("PLAN_OVERLAP", m.detail)        # V2: already satisfied at the story's entry
         self.assertIn(self.AC, m.detail)
         self.assertFalse(out.done)
 

@@ -33,3 +33,12 @@ needs_docker = unittest.skipUnless(
 
 if not DOCKER:
     sandbox.PROVIDERS["docker"] = sandbox.HostProvider()
+
+
+def obligations(story_id: str, n: int, mode: str = "CHANGE_REQUIRED", requirement: str = "FR-1") -> dict:
+    """Declared proof obligations for a fixture's criteria.
+
+    Every plan declares what each criterion must SHOW (TDD proof policy V2, owner decision 2026-09-20); a fixture
+    whose subject is another check declares the ordinary case so the plan is valid, exactly as a real plan must."""
+    return {f"AC-{story_id}-{i}": {"ac_id": f"AC-{story_id}-{i}", "proof_mode": mode, "requirement": requirement}
+            for i in range(1, n + 1)}

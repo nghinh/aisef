@@ -354,6 +354,11 @@ def repair_story(
         covers=list(owner.covers), write_scope=scope, depends_on=[],
         screens=screens, verification_contract=kinds,
     )
+    # A repair story exists because the behaviour is NOT there now: its criterion must go red -> green, which is
+    # exactly CHANGE_REQUIRED (TDD proof policy V2). The obligation is declared here, where the story is planned —
+    # the gate never infers it at runtime.
+    story.ac_proof = {f"AC-{sid}-1": {"ac_id": f"AC-{sid}-1", "proof_mode": "CHANGE_REQUIRED",
+                                      "requirement": (owner.covers or [""])[0] or b.id}}
     preservation = complexity.verified_touched(
         story, led.as_dict(), complexity.read_scopes(project))
     return register_story(

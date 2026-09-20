@@ -32,6 +32,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisef.control.gate import CHECK_KIND, CHECK_NAMES, CONTROLS, evaluate, qualification_table  # noqa: E402
+from tests import obligations  # noqa: E402
 from aisef.control.outcome import CHECK_KINDS, Outcome  # noqa: E402
 from aisef.control.security import Finding, SecurityReport  # noqa: E402
 from aisef.harness.observe import GUARD_SEEN, MOCKUP_MAP, TOOL_RUN, Event, EvidenceStore  # noqa: E402
@@ -69,6 +70,9 @@ class Muc(unittest.TestCase):
     def gate(self, **kw):
         p = {"changed": ["src/a.py"], "write_scope": ["src"], "screens": [], "review_blocking": []}
         p.update(kw)
+        # Every plan declares what each criterion must show (TDD proof policy V2). These cases ask policy V1's
+        # question, so they declare V1's implicit obligation and must get V1's answer.
+        p.setdefault("ac_proof", obligations("S-01", int(p.get("acceptance") or 0)))
         return evaluate("S-01", self.store.read("S-01"), **p)
 
     def muc(self, g, ten: str | None = None):
@@ -574,7 +578,7 @@ class TestTestCoKiemDuocStory(Muc):
         self.nop([self.AC, "t1"])
         m = self.muc(self.gate(candidate="aaa", acceptance=1))
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("still green without story code", m.detail)
+        self.assertIn("PLAN_OVERLAP", m.detail)        # V2: already satisfied at the story's entry
         self.assertIn(self.AC, m.detail)
         # cấp 1: mã gắn vào test đã xanh ở baseline — ✗ dù nop đỏ
         self.baseline([self.AC, "t1"])

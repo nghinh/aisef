@@ -16,6 +16,7 @@ import unittest
 from pathlib import Path
 
 from aisef.control import gate, ledger as L, proof, tdd
+from tests import obligations  # noqa: E402
 from aisef.control.outcome import Outcome
 from aisef.control.proof import Proof, classify, story_file_for
 from aisef.harness.observe import NOTE, Event, Evidence, EvidenceStore
@@ -56,6 +57,7 @@ class GateCase(unittest.TestCase):
         EvidenceStore(self._tmp.name, candidate="aaa").tool_run(SID, "test:nop", ok=not d.get("failed_ids") and not d.get("unrunnable"), detail=d)
 
     def check(self, name="tests verify story", acceptance=2, **kw):
+        kw.setdefault("ac_proof", obligations(SID, acceptance))    # V1's question, declared as V1's obligation
         g = gate.evaluate(SID, self.store.read(SID), changed=["src/a.py", "tests/test_a.py", "tests/test_b.py"],
                           write_scope=["src", "tests"], screens=[], review_blocking=[], candidate="aaa",
                           acceptance=acceptance, **kw)
@@ -97,7 +99,8 @@ class R02CollectionFailureDoesNotHideATautology(GateCase):
                                         "collection_errors", "collection_aborted", "failure_imports", "output_complete")})
         m = self.check()
         self.assertIs(m.outcome, Outcome.FAILED, m.detail)
-        self.assertIn(AC2, m.data["still_green"])
+        self.assertIn("AC-S-01-2", m.data["still_green"])      # V2 names the criterion
+        self.assertIn(AC2, [t for r in m.data["rows"] for t in r["tests"]])
         self.assertEqual(m.data["proof"]["AC-S-01-1"]["tests"][AC1]["state"], "RED_COLLECTION_BOUND_TO_STORY")
 
     def test_the_committed_real_output_with_the_strategy_shows_the_tautology_green(self):
@@ -150,7 +153,8 @@ class R06OneGreenOthersRed(GateCase):
         self.nop(test_ids=[AC1, AC2], failed_ids=[AC1], output_complete=True)
         m = self.check()
         self.assertIs(m.outcome, Outcome.FAILED, m.detail)
-        self.assertEqual(m.data["still_green"], [AC2])
+        self.assertEqual(m.data["still_green"], ["AC-S-01-2"])
+        self.assertEqual([r["tests"] for r in m.data["rows"] if r["ac_id"] == "AC-S-01-2"], [[AC2]])
 
 
 class R07PackageRoot(unittest.TestCase):

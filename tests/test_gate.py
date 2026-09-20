@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisef.control.outcome import Outcome
+from tests import obligations  # noqa: E402
 from aisef.control.gate import evaluate  # noqa: E402
 from aisef.harness.observe import MOCKUP_MAP, NOTE, EvidenceStore, Event  # noqa: E402
 
@@ -553,7 +554,8 @@ class TestTDDVaNopControl(GateTestCase):
                 {"file": "tests/test_a.py", "error": "module_not_found", "missing_module": "src.a", "missing_name": ""}],
             "absent_at_parent": ["src/a.py"],
         })
-        return self.gate(candidate="aaa", acceptance=1, added_tests=["tests/test_a.py"])
+        return self.gate(candidate="aaa", acceptance=1, added_tests=["tests/test_a.py"],
+                         ac_proof=obligations("S-01", 1))
 
     def test_nop_dat_thi_tdd_dat_theo(self):
         g = self.dung_canh(["t1"])                    # test của story vắng ở SHA cha
@@ -889,6 +891,10 @@ class TestTestCoKiemDuocStory(GateTestCase):
         return next(c for c in g.checks if c.name == self.TEN)
 
     def cham(self, **kw):
+        # Policy V2: the plan declares what each criterion must show. These cases are policy V1's questions, so
+        # they declare the obligation V1 assumed for every criterion — CHANGE_REQUIRED — and must answer identically.
+        n = int(kw.get("acceptance", 1))
+        kw.setdefault("ac_proof", obligations("S-01", n))
         return self.muc(self.gate(candidate="aaa", acceptance=1, **kw))
 
     # ---- cấp 1
@@ -944,10 +950,13 @@ class TestTestCoKiemDuocStory(GateTestCase):
         self.baseline(["t1"])
         self.ung_vien([self.AC, "t1"])
         self.nop([self.AC, "t1"])
-        g = self.gate(candidate="aaa", acceptance=1)
+        g = self.gate(candidate="aaa", acceptance=1, ac_proof=obligations("S-01", 1))
         m = self.muc(g)
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("still green without story code", m.detail)
+        # V2 says the same thing with the owner named: the criterion the plan calls CHANGE_REQUIRED is already
+        # satisfied at the story's entry, so no code the developer writes can make its test red there.
+        self.assertIn("PLAN_OVERLAP", m.detail)
+        self.assertIn("GREEN -> GREEN", m.detail)
         self.assertIn(self.AC, m.detail)
         self.assertIn("cha0000"[:7], m.detail)
         self.assertIn(self.AC, g.feedback(), "tên test phải vào feedback lượt sau")
@@ -958,7 +967,7 @@ class TestTestCoKiemDuocStory(GateTestCase):
         self.nop(["t1"], **self.BOUND)              # lỗi import ở SHA cha, do chính mã của story vắng
         m = self.cham()
         self.assertIs(m.outcome, Outcome.PASSED)
-        self.assertIn("proven red at parent SHA", m.detail)
+        self.assertIn("each showed what their obligation asks at parent SHA", m.detail)
         self.assertEqual(m.data["proof"]["AC-S-01-1"]["tests"][self.AC]["state"], "RED_COLLECTION_BOUND_TO_STORY")
         self.nop([self.AC, "t1"], failed=[self.AC])   # có mặt nhưng đỏ
         self.assertIs(self.cham().outcome, Outcome.PASSED)
@@ -990,7 +999,8 @@ class TestTestCoKiemDuocStory(GateTestCase):
         self.nop(["t1", "t2"])
         m = self.cham()
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("criteria have tests", m.detail)
+        self.assertIn("no test at the candidate carries this criterion's code", m.detail)
+        self.assertIn("DEVELOPER", m.detail)
 
     def test_khong_chay_duoc_la_moi_truong_khong_phai_story(self):
         self.baseline(["t1"])

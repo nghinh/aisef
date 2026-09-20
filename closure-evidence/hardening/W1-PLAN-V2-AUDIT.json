@@ -1,0 +1,943 @@
+{
+ "plan": "W1-LEDGERLOCK-PLAN-V2",
+ "generated": "2026-09-20T07:19:04+0700",
+ "owner_decision": "STOP PROFILE HUNTING, FIX W1 PLAN + TDD PROOF POLICY (2026-09-20), section 17",
+ "source": {
+  "epics": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/epics-v2.md",
+  "prd": "/Users/nghinh/Downloads/projects/ledgerlock-aiseftest-run2/_bmad-output/prd.md",
+  "requirements": "/Users/nghinh/Downloads/projects/ledgerlock-aiseftest-run2/docs/requirements.md",
+  "requirements_unchanged": true
+ },
+ "stories": 16,
+ "criteria": 76,
+ "obligation_counts": {
+  "CHANGE_REQUIRED": 66,
+  "PRESERVE_REQUIRED": 6,
+  "NEGATIVE_INVARIANT": 4
+ },
+ "verification_only_stories": [
+  "STORY-05-01",
+  "STORY-05-03"
+ ],
+ "requirements_covered": [
+  "FR-1",
+  "FR-10",
+  "FR-11",
+  "FR-12",
+  "FR-13",
+  "FR-14",
+  "FR-2",
+  "FR-3",
+  "FR-4",
+  "FR-5",
+  "FR-6",
+  "FR-7",
+  "FR-8",
+  "FR-9"
+ ],
+ "requirements_uncovered": [],
+ "duplicate_change_ownership": {
+  "FR-1": {
+   "stories": [
+    "STORY-01-01",
+    "STORY-01-05"
+   ],
+   "reason": "NFC normalization is delivered as a function (01-01) and then enforced on append's key (01-05)"
+  },
+  "FR-12": {
+   "stories": [
+    "STORY-04-01",
+    "STORY-04-02",
+    "STORY-04-03"
+   ],
+   "reason": "STORY-04-02 delivers the exit codes themselves; STORY-04-03 delivers the stderr status shapes of the success paths — different observable behaviour under the same requirement"
+  },
+  "FR-13": {
+   "stories": [
+    "STORY-01-04",
+    "STORY-01-05",
+    "STORY-03-01"
+   ],
+   "reason": "durability appears twice: the atomic write primitive (01-04), the fsync-before-return of append (01-05) and the batch's atomic replace (03-01)"
+  },
+  "FR-14": {
+   "stories": [
+    "STORY-01-01",
+    "STORY-05-02"
+   ],
+   "reason": "the runtime prohibitions are established with the package (01-01) and the coverage/parity gate is a separate, later contract (05-02)"
+  },
+  "FR-2": {
+   "stories": [
+    "STORY-01-02",
+    "STORY-01-03",
+    "STORY-01-05"
+   ],
+   "reason": "the hash chain is built in layers: canonical bytes (01-02), the digest over them (01-03), and the chained line append that uses both (01-05)"
+  }
+ },
+ "criteria_already_satisfiable_at_entry": {
+  "computed": false,
+  "why": "the story-entry parent is the previous stories' delivered code, which no deterministic reference skeleton in this workload can produce; the plan mitigates it by moving the CLI surface criterion to the story that owns FR-11 (PLAN-V2-03), by scoping the skeleton away from the CLI module (PLAN-V2-05), by naming the error-path ownership in STORY-04-01 (PLAN-V2-06), and by declaring the argparse usage errors PRESERVE_REQUIRED where an earlier story delivers them",
+  "runtime_detection": "a CHANGE_REQUIRED criterion already satisfied at entry is reported as PLAN_OVERLAP and ends the story without spending a developer attempt (INV-PLAN-STORY-CONTRIBUTION)"
+ },
+ "rows": [
+  {
+   "ac_id": "AC-STORY-01-01-1",
+   "story": "STORY-01-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-1",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [],
+   "criterion": "Given any string `s`, `from ledgerlock.format import normalize_key; normalize_key(s)` returns `unicodedata.normalize(\"NFC\", s)` byte-for-byte."
+  },
+  {
+   "ac_id": "AC-STORY-01-01-2",
+   "story": "STORY-01-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-1",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [],
+   "criterion": "Given the NFC string `\"\\u00e9\"` (U+00E9) and its NFD decomposition `\"e\\u0301\"`, calling `normalize_key` on each returns byte-identical results equal to `\"\\u00e9\"`."
+  },
+  {
+   "ac_id": "AC-STORY-01-01-3",
+   "story": "STORY-01-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-14",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [],
+   "criterion": "Given a fresh `pyproject.toml` declaring `name = \"ledgerlock\"` and `requires-python = \">=3.11\"`, an empty `ledgerlock/` package, and an empty `tests/` directory, `python -c \"import ledgerlock; print(ledgerlock.__file__)\"` prints a path ending in `ledgerlock/__init__.py` with no exception."
+  },
+  {
+   "ac_id": "AC-STORY-01-01-4",
+   "story": "STORY-01-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-14",
+   "proof_mode": "NEGATIVE_INVARIANT",
+   "depends_on": [],
+   "criterion": "Given the `ledgerlock/` package source tree, `grep -RE \"^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)\" ledgerlock/` exits `1` (zero matches)."
+  },
+  {
+   "ac_id": "AC-STORY-01-01-5",
+   "story": "STORY-01-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-14",
+   "proof_mode": "NEGATIVE_INVARIANT",
+   "depends_on": [],
+   "criterion": "Given the `ledgerlock/` package source tree, `grep -RE \"os\\.system|subprocess\\.|socket\\.\" ledgerlock/` exits `1` (zero matches)."
+  },
+  {
+   "ac_id": "AC-STORY-01-01-6",
+   "story": "STORY-01-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-14",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [],
+   "criterion": "Given an `__init__.py`, `from ledgerlock import Ledger, ConflictError` returns both names without exception and `Ledger` is a callable class."
+  },
+  {
+   "ac_id": "AC-STORY-01-02-1",
+   "story": "STORY-01-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-01"
+   ],
+   "criterion": "Given a dict `line` whose `hash` and `prev_hash` are unset, `canonical_bytes(line)` returns exactly `json.dumps(line, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False).encode(\"utf-8\")`."
+  },
+  {
+   "ac_id": "AC-STORY-01-02-2",
+   "story": "STORY-01-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-01"
+   ],
+   "criterion": "Given a second dict element-equal to the first, `canonical_bytes` on it returns bytes byte-identical to the first call's bytes."
+  },
+  {
+   "ac_id": "AC-STORY-01-02-3",
+   "story": "STORY-01-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-01"
+   ],
+   "criterion": "Given a dict whose value includes a non-ASCII string (e.g. `\"é\"` U+00E9), `canonical_bytes` encodes it as UTF-8 literal (`\\xc3\\xa9`, not `\\u00e9`) and is byte-stable across two invocations."
+  },
+  {
+   "ac_id": "AC-STORY-01-02-4",
+   "story": "STORY-01-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-01"
+   ],
+   "criterion": "Given two dicts whose keys differ only in insertion order, `canonical_bytes` returns byte-identical bytes."
+  },
+  {
+   "ac_id": "AC-STORY-01-02-5",
+   "story": "STORY-01-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-01"
+   ],
+   "criterion": "Given `from ledgerlock.format import GENESIS`, `GENESIS == \"GENESIS\"` (literal seven-character string, distinct from any 64-char hex string)."
+  },
+  {
+   "ac_id": "AC-STORY-01-02-6",
+   "story": "STORY-01-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-01"
+   ],
+   "criterion": "Given `canonical_bytes` called twice on the same dict after round-tripping through `json.loads`, the returned bytes equal the original bytes."
+  },
+  {
+   "ac_id": "AC-STORY-01-03-1",
+   "story": "STORY-01-03",
+   "story_type": "NORMAL",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-02"
+   ],
+   "criterion": "Given a `prev_hash` string and a line dict with hash fields emptied, `line_hash(prev_hash, line)` returns exactly 64 lowercase hex characters."
+  },
+  {
+   "ac_id": "AC-STORY-01-03-2",
+   "story": "STORY-01-03",
+   "story_type": "NORMAL",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-02"
+   ],
+   "criterion": "Given two distinct `prev_hash` values against the same line, `line_hash` on each returns different results."
+  },
+  {
+   "ac_id": "AC-STORY-01-03-3",
+   "story": "STORY-01-03",
+   "story_type": "NORMAL",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-02"
+   ],
+   "criterion": "Given a line dict whose `hash` and `prev_hash` are already set, `line_hash` ignores them (it operates on a copy with those fields emptied)."
+  },
+  {
+   "ac_id": "AC-STORY-01-03-4",
+   "story": "STORY-01-03",
+   "story_type": "NORMAL",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-02"
+   ],
+   "criterion": "Given the same `(prev_hash, line)` pair, `line_hash` returns the same digest across two invocations."
+  },
+  {
+   "ac_id": "AC-STORY-01-03-5",
+   "story": "STORY-01-03",
+   "story_type": "NORMAL",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-02"
+   ],
+   "criterion": "Given a `prev_hash` of literal `\"GENESIS\"`, `line_hash` accepts the non-hex seven-character string without raising."
+  },
+  {
+   "ac_id": "AC-STORY-01-04-1",
+   "story": "STORY-01-04",
+   "story_type": "NORMAL",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-03"
+   ],
+   "criterion": "Given a JSONL with N lines, `store.read_lines(path)` returns a list of N `bytes` objects, each line's trailing `\\n` stripped."
+  },
+  {
+   "ac_id": "AC-STORY-01-04-2",
+   "story": "STORY-01-04",
+   "story_type": "NORMAL",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-03"
+   ],
+   "criterion": "Given a missing file path, `store.read_lines(path)` raises `FileNotFoundError`."
+  },
+  {
+   "ac_id": "AC-STORY-01-04-3",
+   "story": "STORY-01-04",
+   "story_type": "NORMAL",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-03"
+   ],
+   "criterion": "Given an empty file (zero bytes), `store.read_lines(path)` returns an empty list."
+  },
+  {
+   "ac_id": "AC-STORY-01-04-4",
+   "story": "STORY-01-04",
+   "story_type": "NORMAL",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-03"
+   ],
+   "criterion": "Given `store.write_atomic(path, [b\"{...}\\n\", b\"{...}\\n\"])`, the path's bytes equal the concatenation and a separate `read_lines` call returns the two lines."
+  },
+  {
+   "ac_id": "AC-STORY-01-04-5",
+   "story": "STORY-01-04",
+   "story_type": "NORMAL",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-03"
+   ],
+   "criterion": "Given `store.write_atomic` called with a non-empty existing path, a simulated crash between temp-write and `os.replace` (e.g. patching `os.replace` to raise) leaves the original path byte-identical."
+  },
+  {
+   "ac_id": "AC-STORY-01-04-6",
+   "story": "STORY-01-04",
+   "story_type": "NORMAL",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-03"
+   ],
+   "criterion": "Given a call to `store.write_atomic`, the temp file used is created in the same directory as the target path (so `os.replace` is atomic on POSIX)."
+  },
+  {
+   "ac_id": "AC-STORY-01-05-1",
+   "story": "STORY-01-05",
+   "story_type": "NORMAL",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-04"
+   ],
+   "criterion": "Given a fresh `Ledger(path)` whose JSONL does not yet exist, `append((\"put\", \"k\", {\"v\": 1}, \"r1\", 100))` creates the file with exactly one line terminated by `\\n` whose `op == \"put\"`, `key == \"k\"`, `id == \"r1\"`, `ts == 100`, `value == {\"v\": 1}`, `prev_hash == \"GENESIS\"`, and `hash == format.line_hash(\"GENESIS\", line_with_hash_fields_emptied)`."
+  },
+  {
+   "ac_id": "AC-STORY-01-05-2",
+   "story": "STORY-01-05",
+   "story_type": "NORMAL",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-04"
+   ],
+   "criterion": "Given a second `append` after the first, the new line's `prev_hash` equals the first line's stored `hash` and its own `hash` equals `line_hash(first_hash, new_line_emptied)`."
+  },
+  {
+   "ac_id": "AC-STORY-01-05-3",
+   "story": "STORY-01-05",
+   "story_type": "NORMAL",
+   "requirement": "FR-1",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-04"
+   ],
+   "criterion": "Given `append((\"put\", \"\", \"v\", \"r\", 1))` against an empty ledger, `ValueError` is raised and no file is created."
+  },
+  {
+   "ac_id": "AC-STORY-01-05-4",
+   "story": "STORY-01-05",
+   "story_type": "NORMAL",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-04"
+   ],
+   "criterion": "Given an existing JSONL written by a previous `Ledger` instance, a fresh `Ledger` opened on the same path computes its first `append`'s `prev_hash` from the tail of the file (the new instance reads the tail from disk, not from any in-memory state)."
+  },
+  {
+   "ac_id": "AC-STORY-01-05-5",
+   "story": "STORY-01-05",
+   "story_type": "NORMAL",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-04"
+   ],
+   "criterion": "Given `append` returns successfully on an empty path, a separate process opening the same path finds the new line present and the file terminated by `\\n`."
+  },
+  {
+   "ac_id": "AC-STORY-01-06-1",
+   "story": "STORY-01-06",
+   "story_type": "NORMAL",
+   "requirement": "FR-3",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-05"
+   ],
+   "criterion": "Given a committed `put(\"k\", \"v1\", \"r1\", 100)`, `append((\"put\", \"k\", \"anything\", \"r1\", 999))` (same `rid`, different value and ts) returns the original line dict byte-for-byte with `replayed is True`, `committed is False`, and the chain length is unchanged."
+  },
+  {
+   "ac_id": "AC-STORY-01-06-2",
+   "story": "STORY-01-06",
+   "story_type": "NORMAL",
+   "requirement": "FR-4",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-05"
+   ],
+   "criterion": "Given the same committed line, `append((\"put\", \"k\", \"v2\", \"r2\", 200))` (different `rid`) raises `ConflictError` with `key == \"k\"`, `incoming_rid == \"r2\"`, `committed_rid == \"r1\"`, `batch_index is None`, and the JSONL is byte-identical to its pre-call state."
+  },
+  {
+   "ac_id": "AC-STORY-01-06-3",
+   "story": "STORY-01-06",
+   "story_type": "NORMAL",
+   "requirement": "FR-5",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-05"
+   ],
+   "criterion": "Given a committed `delete(\"k\", \"r1\", 100)`, `append((\"put\", \"k\", \"v\", \"r2\", 200))` (different `rid`) raises `ConflictError`."
+  },
+  {
+   "ac_id": "AC-STORY-01-06-4",
+   "story": "STORY-01-06",
+   "story_type": "NORMAL",
+   "requirement": "FR-5",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-05"
+   ],
+   "criterion": "Given the same committed `delete(\"k\", \"r1\", 100)`, `append((\"put\", \"k\", \"v\", \"r1\", 200))` (same `rid`) returns the delete line dict byte-for-byte with `replayed is True`, `committed is False`."
+  },
+  {
+   "ac_id": "AC-STORY-01-06-5",
+   "story": "STORY-01-06",
+   "story_type": "NORMAL",
+   "requirement": "FR-3",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-05"
+   ],
+   "criterion": "Given a key committed with NFC form `\"\\u00e9\"` (U+00E9) and `rid == \"r1\"`, `append((\"put\", \"e\\u0301\", \"v2\", \"r1\", 200))` (NFD form, same `rid`) is a replay: the returned line dict's `key` equals `\"\\u00e9\"` byte-exact, `replayed is True`, and the chain length is unchanged."
+  },
+  {
+   "ac_id": "AC-STORY-02-01-1",
+   "story": "STORY-02-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-6",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-06"
+   ],
+   "criterion": "Given a JSONL with N valid lines written through `Ledger.append`, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` without raising."
+  },
+  {
+   "ac_id": "AC-STORY-02-01-2",
+   "story": "STORY-02-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-6",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-06"
+   ],
+   "criterion": "Given a zero-byte JSONL, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` without raising."
+  },
+  {
+   "ac_id": "AC-STORY-02-01-3",
+   "story": "STORY-02-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-6",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-06"
+   ],
+   "criterion": "Given a missing JSONL file path, `verify()` raises `FileNotFoundError`."
+  },
+  {
+   "ac_id": "AC-STORY-02-01-4",
+   "story": "STORY-02-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-7",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-06"
+   ],
+   "criterion": "Given a JSONL whose line at index `i` has had its `hash` field overwritten with `\"0\" * 64` out-of-band after `append` returned, `verify()` from a fresh `Ledger` instance returns `{\"ok\": False, \"first_bad_index\": i}` (or the earlier index whose chain is now broken)."
+  },
+  {
+   "ac_id": "AC-STORY-02-01-5",
+   "story": "STORY-02-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-7",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-01-06"
+   ],
+   "criterion": "Given a JSONL whose `value` field on line `i` is mutated out-of-band after `append` (e.g. `\"v1\"` → `\"v2\"`), `verify()` from a fresh `Ledger` instance returns `{\"ok\": False, \"first_bad_index\": i}`."
+  },
+  {
+   "ac_id": "AC-STORY-02-02-1",
+   "story": "STORY-02-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-9",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given `put(\"a\", 1, r, t)`, `put(\"c\", 3, r, t)`, `put(\"b\", 2, r, t)` written in that order, two calls to `snapshot()` with no intervening mutations return equal dicts and `json.dumps(result, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False)` lists keys in `a, b, c` order."
+  },
+  {
+   "ac_id": "AC-STORY-02-02-2",
+   "story": "STORY-02-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-9",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given a committed `put(\"k\", \"v\", \"r1\", t1)`, `delete(\"k\", \"r2\", t2)` raises `ConflictError` (requirements §4.5: a different `rid` mutating the same key MUST conflict) and a following `snapshot()` still returns `{\"k\": \"v\"}` — the refused delete changed nothing."
+  },
+  {
+   "ac_id": "AC-STORY-02-02-3",
+   "story": "STORY-02-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-9",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given `delete(\"k2\", \"r3\", t3)` on a key with no committed mutation (a tombstone, requirements §4.4), `snapshot()` returns a dict with no key `\"k2\"`."
+  },
+  {
+   "ac_id": "AC-STORY-02-02-4",
+   "story": "STORY-02-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-9",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given `put(\"e\\u0301\", \"v\", r, t)` (NFD form) and a follow-up `put(\"\\u00e9\", \"v2\", r, t)` with the same `rid` (idempotent replay), `snapshot()` returns a dict with the NFC key `\"\\u00e9\"` and value `\"v\"`."
+  },
+  {
+   "ac_id": "AC-STORY-02-02-5",
+   "story": "STORY-02-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-9",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given two `Ledger` instances opened in succession over the same on-disk chain, each `snapshot()` returns equal dicts."
+  },
+  {
+   "ac_id": "AC-STORY-03-01-1",
+   "story": "STORY-03-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-8",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given an empty ledger and a batch of 3 conflict-free `put` elements, `apply_batch(ops)` produces a JSONL with exactly 3 new lines whose chain verifies end-to-end and whose first batch line's `prev_hash` equals `\"GENESIS\"`."
+  },
+  {
+   "ac_id": "AC-STORY-03-01-2",
+   "story": "STORY-03-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-8",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given a ledger with one committed `put(\"k\", \"v1\", \"r1\", 100)` and a batch `[(\"put\", \"k\", \"v2\", \"r1\", 200), (\"put\", \"k2\", 2, \"r2\", 201)]`, the first element is an idempotent replay against the pre-batch state and the batch appends exactly one new line (for `k2`); the JSONL gains exactly one line."
+  },
+  {
+   "ac_id": "AC-STORY-03-01-3",
+   "story": "STORY-03-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-8",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given an empty ledger and a batch `[(\"put\", \"k\", \"v1\", \"r1\", 100), (\"put\", \"k\", \"v2\", \"r2\", 200)]`, `apply_batch` raises `ConflictError` with `key == \"k\"`, `incoming_rid == \"r2\"`, `committed_rid == \"r1\"`, `batch_index == 1`, and the JSONL on disk is byte-identical to its pre-batch state."
+  },
+  {
+   "ac_id": "AC-STORY-03-01-4",
+   "story": "STORY-03-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-8",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given a ledger whose most recent committed mutation on `k` has `rid == \"r1\"` and a batch whose element 0 targets `k` with `rid == \"r2\"`, `apply_batch` raises `ConflictError` with `batch_index == 0` and the JSONL is unchanged."
+  },
+  {
+   "ac_id": "AC-STORY-03-01-5",
+   "story": "STORY-03-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given a simulated crash between temp-file write and `os.replace` (e.g. by patching `os.replace` to raise), `apply_batch` against a non-empty ledger leaves the JSONL byte-identical to its pre-batch state and `verify()` returns `{\"ok\": True, \"first_bad_index\": None}`."
+  },
+  {
+   "ac_id": "AC-STORY-03-02-1",
+   "story": "STORY-03-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-10",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-03-01"
+   ],
+   "criterion": "Given a JSONL whose last line is truncated (last byte is not `\\n` OR the last line does not parse) and whose preceding lines form a valid chain, `repair_tail()` rewrites the JSONL with the truncated final line removed: every preserved line's bytes are unchanged and a subsequent `verify()` returns `{\"ok\": True, \"first_bad_index\": None}`; the new final byte is `\\n`."
+  },
+  {
+   "ac_id": "AC-STORY-03-02-2",
+   "story": "STORY-03-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-10",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-03-01"
+   ],
+   "criterion": "Given a clean JSONL whose every line parses and verifies, `repair_tail()` returns without raising and the file is byte-identical before and after."
+  },
+  {
+   "ac_id": "AC-STORY-03-02-3",
+   "story": "STORY-03-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-10",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-03-01"
+   ],
+   "criterion": "Given a JSONL with a truncated final line AND a mid-chain corruption at an earlier index `i < len(lines) - 1`, `repair_tail()` does NOT modify the file (byte-identical before and after) and the verify verdict reports the earlier corruption."
+  },
+  {
+   "ac_id": "AC-STORY-03-02-4",
+   "story": "STORY-03-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-10",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-03-01"
+   ],
+   "criterion": "Given a JSONL whose last line parses but whose own `hash` is broken (a tail tampering, not a truncation), `repair_tail()` does not modify the file and reports the corruption via the verdict."
+  },
+  {
+   "ac_id": "AC-STORY-04-01-1",
+   "story": "STORY-04-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-11",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-03-02"
+   ],
+   "criterion": "Given `snapshot` invoked without `--out`, the CLI exits `2`."
+  },
+  {
+   "ac_id": "AC-STORY-04-01-2",
+   "story": "STORY-04-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-11",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-03-02"
+   ],
+   "criterion": "Given any subcommand invoked with the wrong number of positional arguments, the CLI exits with code `2` and writes nothing to stdout."
+  },
+  {
+   "ac_id": "AC-STORY-04-01-3",
+   "story": "STORY-04-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-11",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-03-02"
+   ],
+   "criterion": "Given the same checkout, `python -m ledgerlock --help` in a subprocess exits `0` and the stdout argparse usage line contains each of the literal strings `verify`, `snapshot`, `apply`, and `repair-tail`."
+  },
+  {
+   "ac_id": "AC-STORY-04-01-4",
+   "story": "STORY-04-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-11",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-03-02"
+   ],
+   "criterion": "Given a fresh JSONL written via `Ledger.append`, `python -m ledgerlock verify <ledger>` in a subprocess exits `0`, stdout is empty, and stderr contains exactly one line whose first word is `verify` and which contains the substring `ok`."
+  },
+  {
+   "ac_id": "AC-STORY-04-01-5",
+   "story": "STORY-04-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-11",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-03-02"
+   ],
+   "criterion": "Given the same fresh JSONL, `python -m ledgerlock snapshot <ledger> --out <snap>` exits `0`, stdout is empty, and the contents of `<snap>` equal `json.dumps(Ledger.snapshot(), sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False).encode(\"utf-8\") + b\"\\n\"` byte-for-byte."
+  },
+  {
+   "ac_id": "AC-STORY-04-01-6",
+   "story": "STORY-04-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-03-02"
+   ],
+   "criterion": "Given a `batch.json` containing three conflict-free `put` elements and a fresh ledger, `python -m ledgerlock apply --batch <batch.json> <ledger>` exits `0`, stdout is empty, and the JSONL contains exactly the lines from the batch (verified by `verify()`)."
+  },
+  {
+   "ac_id": "AC-STORY-04-01-7",
+   "story": "STORY-04-01",
+   "story_type": "NORMAL",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-03-02"
+   ],
+   "criterion": "Given a clean JSONL, `python -m ledgerlock repair-tail <ledger>` exits `0`, stdout is empty, and the JSONL is byte-identical before and after."
+  },
+  {
+   "ac_id": "AC-STORY-04-02-1",
+   "story": "STORY-04-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-04-01"
+   ],
+   "criterion": "Given `apply --batch` invoked with a missing batch file, the CLI exits `3` and writes nothing to stdout."
+  },
+  {
+   "ac_id": "AC-STORY-04-02-2",
+   "story": "STORY-04-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-04-01"
+   ],
+   "criterion": "Given a JSONL with one committed `put(\"k\", \"v1\", \"r1\", 100)` and a batch file whose element 0 is `(\"put\", \"k\", \"v2\", \"r2\", 200)`, `apply --batch <b.json> <ledger>` exits `4`, writes nothing to stdout, and leaves the JSONL byte-identical to its pre-call state."
+  },
+  {
+   "ac_id": "AC-STORY-04-02-3",
+   "story": "STORY-04-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-04-01"
+   ],
+   "criterion": "Given a JSONL whose line 17 has been mutated out-of-band on disk, `verify` exits `5` and writes nothing to stdout."
+  },
+  {
+   "ac_id": "AC-STORY-04-02-4",
+   "story": "STORY-04-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-04-01"
+   ],
+   "criterion": "Given a JSONL with mid-chain corruption at line 17, `repair-tail` exits `5` and writes nothing to stdout."
+  },
+  {
+   "ac_id": "AC-STORY-04-03-1",
+   "story": "STORY-04-03",
+   "story_type": "NORMAL",
+   "requirement": "FR-12",
+   "proof_mode": "PRESERVE_REQUIRED",
+   "depends_on": [
+    "STORY-04-02"
+   ],
+   "criterion": "Given every success path for `verify ok`, the CLI writes nothing to stdout and a single line beginning with `verify` to stderr.",
+   "preserves_work_of": [
+    "STORY-04-01",
+    "STORY-04-02"
+   ]
+  },
+  {
+   "ac_id": "AC-STORY-04-03-2",
+   "story": "STORY-04-03",
+   "story_type": "NORMAL",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-04-02"
+   ],
+   "criterion": "Given every success path for `apply` (atomic batch committed), the CLI writes nothing to stdout and a single line beginning with `apply` to stderr that mentions the count of appended lines."
+  },
+  {
+   "ac_id": "AC-STORY-04-03-3",
+   "story": "STORY-04-03",
+   "story_type": "NORMAL",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-04-02"
+   ],
+   "criterion": "Given every success path for `snapshot`, the CLI writes nothing to stdout and a single line beginning with `snapshot` to stderr that mentions the destination path."
+  },
+  {
+   "ac_id": "AC-STORY-04-03-4",
+   "story": "STORY-04-03",
+   "story_type": "NORMAL",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-04-02"
+   ],
+   "criterion": "Given every success path for `repair-tail` (clean chain or successful repair), the CLI writes nothing to stdout and a single line beginning with `repair-tail` to stderr."
+  },
+  {
+   "ac_id": "AC-STORY-04-03-5",
+   "story": "STORY-04-03",
+   "story_type": "NORMAL",
+   "requirement": "FR-12",
+   "proof_mode": "PRESERVE_REQUIRED",
+   "depends_on": [
+    "STORY-04-02"
+   ],
+   "criterion": "Given any success path, the captured stdout via `subprocess.PIPE` equals `b\"\"`.",
+   "preserves_work_of": [
+    "STORY-04-01",
+    "STORY-04-02"
+   ]
+  },
+  {
+   "ac_id": "AC-STORY-05-01-1",
+   "story": "STORY-05-01",
+   "story_type": "VERIFICATION_ONLY",
+   "requirement": "FR-2",
+   "proof_mode": "PRESERVE_REQUIRED",
+   "depends_on": [
+    "STORY-03-01"
+   ],
+   "criterion": "Given the library at this point in the epic chain, when the property test runs 50 random mutation sequences against a temp JSONL (each sequence a list of `(op, key, value, rid, ts)` tuples; seeded with a fixed seed for reproducibility), then for every sequence that did not raise `ConflictError`, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` AND two calls to `snapshot()` return equal dicts.",
+   "preserves_work_of": [
+    "STORY-01-02",
+    "STORY-01-03",
+    "STORY-01-05"
+   ]
+  },
+  {
+   "ac_id": "AC-STORY-05-01-2",
+   "story": "STORY-05-01",
+   "story_type": "VERIFICATION_ONLY",
+   "requirement": "FR-8",
+   "proof_mode": "PRESERVE_REQUIRED",
+   "depends_on": [
+    "STORY-03-01"
+   ],
+   "criterion": "Given the same property test, when a sequence raises `ConflictError`, the JSONL on disk after the sequence is byte-identical to its pre-sequence state for any prefix up to (and including) the offending element, and the chain length did not grow past that prefix.",
+   "preserves_work_of": [
+    "STORY-03-01"
+   ]
+  },
+  {
+   "ac_id": "AC-STORY-05-01-3",
+   "story": "STORY-05-01",
+   "story_type": "VERIFICATION_ONLY",
+   "requirement": "FR-14",
+   "proof_mode": "PRESERVE_REQUIRED",
+   "depends_on": [
+    "STORY-03-01"
+   ],
+   "criterion": "Given the same property test, when it is executed under `python -m unittest discover` and again under `pytest`, both runs report the same total passed/failed counts for the property-test module.",
+   "preserves_work_of": [
+    "STORY-01-01"
+   ]
+  },
+  {
+   "ac_id": "AC-STORY-05-02-1",
+   "story": "STORY-05-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-14",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-05-01"
+   ],
+   "criterion": "Given the full test suite at this point in the epic chain, `coverage run -m unittest discover && coverage report --include=ledgerlock/*` shows a `ledgerlock/` total line coverage ≥85%."
+  },
+  {
+   "ac_id": "AC-STORY-05-02-2",
+   "story": "STORY-05-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-14",
+   "proof_mode": "PRESERVE_REQUIRED",
+   "depends_on": [
+    "STORY-05-01"
+   ],
+   "criterion": "Given the same full test suite, `pytest` discovers and runs the same suite and reports the same total passed/failed counts as `python -m unittest discover`.",
+   "preserves_work_of": [
+    "STORY-01-01"
+   ]
+  },
+  {
+   "ac_id": "AC-STORY-05-02-3",
+   "story": "STORY-05-02",
+   "story_type": "NORMAL",
+   "requirement": "FR-14",
+   "proof_mode": "CHANGE_REQUIRED",
+   "depends_on": [
+    "STORY-05-01"
+   ],
+   "criterion": "Given the full test suite at this point, the `tests/` source itself is excluded from the coverage measurement."
+  },
+  {
+   "ac_id": "AC-STORY-05-03-1",
+   "story": "STORY-05-03",
+   "story_type": "VERIFICATION_ONLY",
+   "requirement": "FR-14",
+   "proof_mode": "NEGATIVE_INVARIANT",
+   "depends_on": [
+    "STORY-05-01"
+   ],
+   "criterion": "Given the `ledgerlock/` source tree, `grep -RE \"^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)\" ledgerlock/` returns no matches and the test passes."
+  },
+  {
+   "ac_id": "AC-STORY-05-03-2",
+   "story": "STORY-05-03",
+   "story_type": "VERIFICATION_ONLY",
+   "requirement": "FR-14",
+   "proof_mode": "NEGATIVE_INVARIANT",
+   "depends_on": [
+    "STORY-05-01"
+   ],
+   "criterion": "Given the `ledgerlock/` source tree, `grep -RE \"os\\.system|subprocess\\.|socket\\.\" ledgerlock/` returns no matches and the test passes."
+  }
+ ],
+ "errors": [],
+ "warnings": [
+  "machine gate: FR-1 is CHANGE_REQUIRED in 2 stories (STORY-01-01, STORY-01-05) — say why each story changes it, or move the later ones to PRESERVE_REQUIRED",
+  "machine gate: FR-12 is CHANGE_REQUIRED in 3 stories (STORY-04-01, STORY-04-02, STORY-04-03) — say why each story changes it, or move the later ones to PRESERVE_REQUIRED",
+  "machine gate: FR-13 is CHANGE_REQUIRED in 3 stories (STORY-01-04, STORY-01-05, STORY-03-01) — say why each story changes it, or move the later ones to PRESERVE_REQUIRED",
+  "machine gate: FR-14 is CHANGE_REQUIRED in 2 stories (STORY-01-01, STORY-05-02) — say why each story changes it, or move the later ones to PRESERVE_REQUIRED",
+  "machine gate: FR-2 is CHANGE_REQUIRED in 3 stories (STORY-01-02, STORY-01-03, STORY-01-05) — say why each story changes it, or move the later ones to PRESERVE_REQUIRED",
+  "machine gate: epics are fully serialized, no stories can run in parallel: EPIC-01 (6 story) — review `depends_on`, only declare when a story truly needs the **output** of an earlier one",
+  "machine gate: stories in the same epic write exactly the same files: STORY-01-02, STORY-01-03 → ledgerlock/format.py, tests/test_format.py; STORY-04-02, STORY-04-03 → ledgerlock/cli.py, tests/test_cli_exit_codes.py — check that each one adds behaviour the others do not. A story whose criteria the earlier story already satisfies cannot pass: its tests are green at the branch point, and that is not something the developer can fix from inside the story"
+ ],
+ "pass": true
+}

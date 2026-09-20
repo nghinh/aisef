@@ -78,6 +78,9 @@ def apply(project: Path, requirement: str, description: str, *, today: date | No
     story = Story(id=sid, epic_id=EPIC_ID, title=description.strip().split("\n")[0][:80],
                   acceptance_criteria=[description.strip()], covers=[requirement],
                   verification_contract=["unit"])
+    # A change story asks for behaviour the product does not have yet: red -> green (TDD proof policy V2).
+    story.ac_proof = {f"AC-{sid}-1": {"ac_id": f"AC-{sid}-1", "proof_mode": "CHANGE_REQUIRED",
+                                      "requirement": requirement}}
     body = _brownfield_note(project)
     path = register_story(root, story, epic_title=EPIC_TITLE, body=body)
 

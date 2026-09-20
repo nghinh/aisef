@@ -42,6 +42,9 @@ INDEX = {
     "stories": [{
         "id": "STORY-01-01", "epic_id": "EPIC-01", "title": "nền",
         "acceptance_criteria": ["đọc được a", "đọc được b"], "covers": [],
+        # every plan declares what each criterion must show (TDD proof policy V2)
+        "ac_proof": [{"ac_id": "AC-STORY-01-01-1", "proof_mode": "CHANGE_REQUIRED", "requirement": "FR-1"},
+                     {"ac_id": "AC-STORY-01-01-2", "proof_mode": "CHANGE_REQUIRED", "requirement": "FR-1"}],
         "write_scope": ["src/core"], "depends_on": [], "screens": [],
         "verification_contract": ["unit"], "file": "stories/EPIC-01/STORY-01-01.md",
     }],

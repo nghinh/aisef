@@ -36,11 +36,12 @@ by `qualification_table()` (ADR-005 V9).
 from __future__ import annotations
 
 import ast
+from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 
 from ..harness.guardrails import check_completion, check_diff_scope
-from .acceptance import (ac_code, coverage as ac_coverage, missing as ac_missing,
+from .acceptance import (ac_code, codes as ac_code_list, coverage as ac_coverage, missing as ac_missing,
                          overloaded as ac_overloaded,
                          orphans as ac_orphans)
 from .outcome import Check, Outcome
@@ -51,7 +52,7 @@ from .identity import CONTROL_FIELDS, SESSION_FIELDS, EvidenceIdentity, fresh  #
 from ..harness.observe import FILE_CHANGE, GUARD_BLOCK, GUARD_SEEN, MOCKUP_MAP, NOTE, TOOL_RUN, Event, Evidence
 from ..harness.testlog import MAX_IDS
 from ..harness.tools import BASELINE_RUN, NO_MANIFEST, NO_SETUP, NOP_RUN
-from . import proof
+from . import obligation, proof
 
 #: Story gate check names — **closed** list (ADR-005 V9). Every `Check(...)` in
 #: this file must use a name from here (test meta grep AST), and each name has
@@ -489,7 +490,7 @@ def _baseline_check(evidence: Evidence, candidate: str) -> Check:
 
 
 def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate: str,
-               changed: list[str] | None = None) -> Check:
+               changed: list[str] | None = None, ac_proof: dict | None = None) -> Check:
     """Check "tests verify story" — nop control (ADR-005 V3).
 
     The question from Terminal-Bench (nop < 1), BERBench (`base_fail`) and
@@ -550,12 +551,19 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
     def check_result(outcome, detail: str = "", data: dict | None = None) -> Check:
         return Check(name, outcome, detail, evidence=seqs, data=data or {})
 
-    # Tests with criteria codes **green** at candidate — subject of both levels.
+    obligations = {c: (ac_proof or {}).get(c) or {} for c in ac_code_list(story_id, acceptance)}
+    change_codes = {c for c, decl in obligations.items() if decl.get("proof_mode") == obligation.Mode.CHANGE_REQUIRED.value}
+    # Criterion tests at the candidate, by criterion. Level 1 (tagged/renamed existing tests) is about criteria this
+    # story must CHANGE: a PRESERVE_REQUIRED or NEGATIVE_INVARIANT criterion is green at the baseline by obligation.
+    by_code: dict[str, list[str]] = {}
     ac: list[str] = []
     if latest is not None and latest.detail.get("test_format") and acceptance > 0:
-        new_green = [t for t in latest.detail.get("test_ids") or [] if t in proof.executed_green(latest.detail)]
-        for tests in ac_coverage(story_id, acceptance, new_green).values():
-            ac.extend(t for t in tests if t not in ac)
+        ids = list(latest.detail.get("test_ids") or [])
+        for i, tests in ac_coverage(story_id, acceptance, ids).items():
+            by_code[ac_code(story_id, i)] = list(tests)
+        green = proof.executed_green(latest.detail)
+        for c in change_codes:
+            ac.extend(t for t in by_code.get(c, []) if t in green and t not in ac)
 
     # ---- level 1
     detail_note = ""
@@ -630,32 +638,55 @@ def _nop_check(evidence: Evidence, story_id: str, *, acceptance: int, candidate:
         return check_result(Outcome.UNCONFIGURED,
                             "cannot read test names at the candidate — the control needs the criterion tests by name; use a "
                             "reporter that prints names (`node --test`, `vitest --reporter=verbose`, `pytest -v`)")
-    if not ac:
-        return check_result(False, "no tests with criteria codes green at candidate — nothing "
-                                 "to verify at parent SHA (see criteria have tests check)")
+    if acceptance > 0 and not any(d.get("proof_mode") for d in obligations.values()):
+        rows = obligation.judge({}, {}, {}, list(obligations))
+        return check_result(False, "no criterion declares what it must show (proof obligation). The plan must say it — "
+                                   "the kernel does not read it out of the criterion's wording",
+                            data={"rows": rows, "owners": sorted(obligation.owners(rows)), "parent": parent})
     story_files = [f for f in (changed or []) if not is_test_path(f)]
-    states = proof.classify(d, ac, story_files, added=d.get("absent_at_parent"),
-                            files=proof.files_of(ac, story_id, acceptance, d.get("ac_code_files")))
-    per_ac = proof.summarize(states, story_id, acceptance)
-    data = {"parent": parent, "proof": per_ac, "strategy": d.get("collection_strategy") or ""}
-    still_green = [t for t, (p, _) in states.items() if p is proof.Proof.GREEN_EXECUTED]
-    if still_green:
-        return check_result(False, f"tests verify nothing — still green without story code "
-                                   f"(parent SHA {parent}): {_head(still_green)}",
-                            data={**data, "still_green": list(still_green)})   # SS-32: data, not a sentence
-    if d.get("output_complete") is False:
-        return check_result(Outcome.UNRUNNABLE, f"the nop output at parent SHA {parent} is incomplete — its own totals do "
-                                                "not match the tests read, so nothing it omits can count as red", data=data)
-    unproven = {t: st for t, st in states.items() if st[0] not in proof.PROVES_RED}
-    if unproven:
-        head = "; ".join(f"{t} — {p.value}: {why}" for t, (p, why) in list(unproven.items())[:3])
-        return check_result(Outcome.UNRUNNABLE,
-                            f"no proof at parent SHA {parent} for {len(unproven)} of {len(ac)} criterion tests: {head}"
-                            + ("…" if len(unproven) > 3 else ""), data=data)
-    ran = sum(1 for p, _ in states.values() if p is proof.Proof.RED_EXECUTED)
-    return check_result(True, f"{len(ac)} tests with criteria codes proven red at parent SHA {parent}: {ran} executed red, "
-                              f"{len(ac) - ran} unable to import code this story introduces"
-                              + (f"; {detail_note}" if detail_note else ""), data=data)
+    tests_of = {c: list(by_code.get(c) or []) for c in obligations}
+    every = [t for ts in tests_of.values() for t in ts]
+    files = proof.files_of(every, story_id, acceptance, d.get("ac_code_files"))
+    at_parent = proof.classify(d, every, story_files, added=d.get("absent_at_parent"), files=files)
+    at_candidate = proof.classify(latest.detail, every, story_files, files=files)
+    rows = obligation.judge(obligations,
+                            {c: {t: at_parent[t] for t in ts} for c, ts in tests_of.items()},
+                            {c: {t: at_candidate[t] for t in ts} for c, ts in tests_of.items()},
+                            list(obligations))
+    modes = {c: obligations[c].get("proof_mode") for c in obligations}
+    data = {"parent": parent, "rows": rows, "strategy": d.get("collection_strategy") or "",
+            "proof": proof.summarize({t: at_parent[t] for t in every}, story_id, acceptance),
+            # SS-32 and the V1 deadlock reader: the criteria a correct implementation cannot make red here
+            "still_green": [r["ac_id"] for r in rows if r["outcome"] == obligation.Outcome.PLAN_OVERLAP.value]}
+    bad = obligation.blocking(rows)
+    if not bad:
+        if d.get("output_complete") is False:
+            return check_result(Outcome.UNRUNNABLE, f"the nop output at parent SHA {parent} is incomplete — its own "
+                                                    "totals do not match the tests read", data=data)
+        counts = ", ".join(f"{n} {m.lower().replace('_', ' ')}" for m, n in sorted(Counter(modes.values()).items()))
+        red = Counter(at_parent[t][0] for c in tests_of if modes.get(c) == obligation.Mode.CHANGE_REQUIRED.value
+                      for t in tests_of[c])
+        how = (f"; {red[proof.Proof.RED_EXECUTED]} executed red, "
+               f"{red[proof.Proof.RED_COLLECTION_BOUND_TO_STORY]} unable to import code this story introduces"
+               if sum(red.values()) else "")
+        return check_result(True, f"{len(rows)} criteria each showed what their obligation asks at parent SHA {parent} "
+                                  f"({counts}){how}" + (f"; {detail_note}" if detail_note else ""), data=data)
+    owners = obligation.owners(bad)
+    data["owners"] = sorted(owners)
+    def _states(r: dict) -> str:
+        at = ", ".join(r.get("parent_states") or []) or "none"
+        to = ", ".join(r.get("candidate_states") or []) or "none"
+        return f"parent {at} / candidate {to}"
+
+    lines = [f"{r['ac_id']} [{r['proof_mode'] or 'no obligation'}, {r['requirement'] or 'no requirement'}] "
+             f"{r['actual_transition']} ({_states(r)}), expected "
+             f"{r['expected_transition'] or 'a declared transition'} → {r['outcome']} ({r['owner']}): {r['why']}"
+             + (f" [{_head(r['tests'], 2)}]" if r.get("tests") else "")
+             for r in bad[:3]]
+    detail_text = f"at parent SHA {parent}: " + "; ".join(lines) + ("…" if len(bad) > 3 else "")
+    if owners == {obligation.Owner.ENVIRONMENT.value}:
+        return check_result(Outcome.UNRUNNABLE, detail_text, data=data)
+    return check_result(False, detail_text, data=data)
 
 
 def judge_only(gate: StoryGate) -> bool:
@@ -708,6 +739,8 @@ def evaluate(
     block_severities=None,
     guard_expected: bool = False,
     acceptance: int = 0,
+    #: criterion code -> its declared proof obligation (planning data; TDD proof policy V2)
+    ac_proof: dict | None = None,
     coverage_min: float | None = None,
     added_tests: list[str] | None = None,
     candidate: str = "",
@@ -1015,16 +1048,23 @@ def evaluate(
     # at parent SHA") while `TDD` failed, and the story was blocked by the
     # weaker of the two. Only `PASSED` counts — NOT_APPLICABLE, UNRUNNABLE and
     # UNCONFIGURED mean the control did not answer, so `TDD` stands alone.
-    nop = _nop_check(evidence, story_id, acceptance=acceptance, candidate=candidate, changed=changed)
+    nop = _nop_check(evidence, story_id, acceptance=acceptance, candidate=candidate, changed=changed,
+                     ac_proof=ac_proof)
 
     # TDD (G8): story added tests must have a red run before the last green. SS-83: "red" is read through the same
     # proof model as the nop control — a run that could not execute, or that is red only because of an unrelated test,
     # shows nothing about the story's tests.
     if added_tests is not None:
+        change_codes = [c for c, decl in ((ac_proof or {}).items()) if (decl or {}).get("proof_mode") == "CHANGE_REQUIRED"]
         red_run = proven_red_before_green(evidence, story_id, acceptance=acceptance, added_tests=added_tests,
-                                          changed=changed) if added_tests else None
+                                          changed=changed, codes=change_codes) if added_tests else None
         if not added_tests:
             gate.checks.append(Check("TDD", Outcome.NOT_APPLICABLE, "story did not add tests"))
+        elif ac_proof and not change_codes:
+            gate.checks.append(Check(
+                "TDD", Outcome.NOT_APPLICABLE,
+                "no criterion of this story is CHANGE_REQUIRED — there is no new behaviour to see fail first; "
+                "each criterion is judged by its own obligation (tests verify story)"))
         elif red_run is not None:
             gate.checks.append(Check(
                 "TDD", True, f"red before green: run #{red_run.seq} shows the story's tests red for a reason the "
