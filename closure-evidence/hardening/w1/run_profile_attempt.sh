@@ -14,9 +14,11 @@ ROUTE=$(python3 -P -c "import json,sys; print(json.load(open(sys.argv[1]))['iden
 RD=$A/closure-evidence/hardening/w1/run-$TAG; mkdir -p $RD
 echo "[$(date '+%F %T')] attempt $TAG profile=$(basename $PROFILE) route=$ROUTE"
 python3 closure-evidence/hardening/w1/provider_preflight.py $ROUTE --probes 3 --smokes 2 --out $RD/PROVIDER-PREFLIGHT.json || { echo "PROVIDER PREFLIGHT FAILED — no run created"; exit 3; }
-PROFILE=$PROFILE closure-evidence/hardening/w1/prepare_run_copy.sh $TAG || { echo "PREPARE FAILED"; exit 4; }
+PLAN_BASE=${PLAN_BASE:-8ff9f13}
+PROFILE=$PROFILE PLAN_BASE=$PLAN_BASE closure-evidence/hardening/w1/prepare_run_copy.sh $TAG || { echo "PREPARE FAILED"; exit 4; }
 for ph in prepare kernel-first approve run finish; do
   python3 closure-evidence/hardening/w1/w1_driver.py --run $TAG --project ~/Downloads/projects/w1-run-$TAG --aisef $V/bin/aisef \
-    --python $V/bin/python --oracle-python $O/bin/python --freeze $F --profile $PROFILE --phase $ph || { echo "STOP at phase $ph"; exit 5; }
+    --python $V/bin/python --oracle-python $O/bin/python --freeze $F --profile $PROFILE --plan-base $PLAN_BASE \
+    --phase $ph || { echo "STOP at phase $ph"; exit 5; }
 done
 echo "[$(date '+%F %T')] attempt $TAG complete"

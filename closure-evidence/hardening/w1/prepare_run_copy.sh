@@ -11,7 +11,11 @@ COSTCAP_SRC=$P/w1-run-1-aborted-sast; [ -d "$COSTCAP_SRC" ] || COSTCAP_SRC=$P/w1
 git clone -q --no-hardlinks "$REF" "$DST"
 cd "$DST"
 git config user.name "AISEF W1 operator"; git config user.email "w1-operator@aisef.local"     # the same local identity as w1-run-1 (a fresh clone has none)
-git checkout -q -B master 8ff9f13
+# PLAN_BASE: the approved plan commit the copy starts from. 8ff9f13 is W1_WORKLOAD_V1; W1-LEDGERLOCK-PLAN-V2 is
+# 1621a2bc (closure-evidence/hardening/w1/plan-v2/PLAN-V2-APPLIED.json), where every criterion carries its proof
+# obligation. The run copy always starts at an approved plan with no story work.
+PLAN_BASE=${PLAN_BASE:-8ff9f13}
+git checkout -q -B master $PLAN_BASE
 git remote remove origin
 git fetch -q "$COSTCAP_SRC" master        # brings the objects; fd4c644 (the cost-cap commit) is then cherry-picked by SHA
 git cherry-pick --no-edit fd4c644 >/dev/null
@@ -40,6 +44,6 @@ if [ -n "$PROFILE" ]; then
 fi
 git for-each-ref --format='%(refname)' | grep -v '^refs/heads/master$' | while read r; do git update-ref -d "$r"; done
 echo "w1-run-$n: HEAD=$(git rev-parse --short HEAD) branch=$(git rev-parse --abbrev-ref HEAD) refs=[$(git for-each-ref --format='%(refname:short)' | tr '\n' ' ')] remotes=[$(git remote | tr '\n' ' ')]"
-echo "commits after 8ff9f13: $(git log --oneline 8ff9f13..master | tr '\n' ';')"
+echo "commits after $PLAN_BASE: $(git log --oneline $PLAN_BASE..master | tr '\n' ';')"
 echo "ledgerlock dir at master: $(git ls-tree --name-only master | grep -c '^ledgerlock$') (0 = absent) | config: $(python3 -c "import json; print(json.load(open('.ai/config.json')).get('run.cost_cap_usd'))")"
 git status --short | head -3; echo "(clean)"

@@ -1,0 +1,51 @@
+{
+ "record": "W1-LEDGERLOCK-PLAN-V2 applied",
+ "generated": "2026-09-20T07:32:30+0700",
+ "project": "/Users/nghinh/Downloads/projects/ledgerlock-aiseftest-run2",
+ "branch": "plan-v2",
+ "base_commit": "8ff9f133c4579fbeeb2a9d2ed22852cbe5370a19",
+ "plan_v2_commit": "1621a2bce231d158c08a3b60e6c9b4f4b96ec8d0",
+ "epics_changed": true,
+ "stories": 16,
+ "story_files": 16,
+ "machine_gate": {
+  "passed": true,
+  "errors": [],
+  "warnings": [
+   "FR-1 is CHANGE_REQUIRED in 2 stories (STORY-01-01, STORY-01-05) — say why each story changes it, or move the later ones to PRESERVE_REQUIRED",
+   "FR-12 is CHANGE_REQUIRED in 3 stories (STORY-04-01, STORY-04-02, STORY-04-03) — say why each story changes it, or move the later ones to PRESERVE_REQUIRED",
+   "FR-13 is CHANGE_REQUIRED in 3 stories (STORY-01-04, STORY-01-05, STORY-03-01) — say why each story changes it, or move the later ones to PRESERVE_REQUIRED",
+   "FR-14 is CHANGE_REQUIRED in 2 stories (STORY-01-01, STORY-05-02) — say why each story changes it, or move the later ones to PRESERVE_REQUIRED",
+   "FR-2 is CHANGE_REQUIRED in 3 stories (STORY-01-02, STORY-01-03, STORY-01-05) — say why each story changes it, or move the later ones to PRESERVE_REQUIRED",
+   "epics are fully serialized, no stories can run in parallel: EPIC-01 (6 story) — review `depends_on`, only declare when a story truly needs the **output** of an earlier one",
+   "stories in the same epic write exactly the same files: STORY-01-02, STORY-01-03 → ledgerlock/format.py, tests/test_format.py; STORY-04-02, STORY-04-03 → ledgerlock/cli.py, tests/test_cli_exit_codes.py — check that each one adds behaviour the others do not. A story whose criteria the earlier story already satisfies cannot pass: its tests are green at the branch point, and that is not something the developer can fix from inside the story",
+   "STORY-01-01 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit` — these keys live in `.ai/config.json`",
+   "STORY-01-02 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit` — these keys live in `.ai/config.json`",
+   "STORY-01-03 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit` — these keys live in `.ai/config.json`",
+   "STORY-01-04 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit` — these keys live in `.ai/config.json`",
+   "STORY-01-05 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit` — these keys live in `.ai/config.json`",
+   "STORY-01-06 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit` — these keys live in `.ai/config.json`",
+   "STORY-02-01 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit`; verify.e2e — story declares in `verification_contract`. configure `verify.e2e` — these keys live in `.ai/config.json`",
+   "STORY-02-02 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit` — these keys live in `.ai/config.json`",
+   "STORY-03-01 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit`; verify.e2e — story declares in `verification_contract`. configure `verify.e2e` — these keys live in `.ai/config.json`",
+   "STORY-03-02 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit` — these keys live in `.ai/config.json`",
+   "STORY-04-01 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit` — these keys live in `.ai/config.json`",
+   "STORY-04-02 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit` — these keys live in `.ai/config.json`",
+   "STORY-04-03 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit` — these keys live in `.ai/config.json`",
+   "STORY-05-01 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit` — these keys live in `.ai/config.json`",
+   "STORY-05-02 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit` — these keys live in `.ai/config.json`",
+   "STORY-05-03 missing prerequisites to run: verify.unit — story declares in `verification_contract`. configure `verify.unit` — these keys live in `.ai/config.json`"
+  ]
+ },
+ "reapproved_gates": [
+  {
+   "gate": "epics",
+   "by": "nghinh"
+  },
+  {
+   "gate": "stories",
+   "by": "nghinh"
+  }
+ ],
+ "requirements_untouched": true
+}

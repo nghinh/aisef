@@ -1082,12 +1082,73 @@
    "invariants": "INV-T.EXECUTED-EVIDENCE",
    "test": "tests/hardening/test_ss81_family.py::SS85BaselineNotExecuted",
    "status": "GREEN (F7)"
+  },
+  {
+   "id": "FM-P-06",
+   "stage": "Plan",
+   "fault": "QUALITY",
+   "scenario": "a criterion declared CHANGE_REQUIRED is already satisfied at the story's entry (an upstream story delivers it)",
+   "expected_state": "tests verify story FAILED with PLAN_OVERLAP owned by PLAN; the story ends as a plan conflict on that attempt, no further developer attempt is spent",
+   "expected_evidence": "gate data.rows: proof_mode CHANGE_REQUIRED, parent GREEN_EXECUTED, expected RED -> GREEN, outcome PLAN_OVERLAP, owner PLAN",
+   "expected_recovery": "correct the plan (move the criterion, or declare it PRESERVE_REQUIRED); retrying cannot resolve it",
+   "invariants": "INV-AC-PROOF-OBLIGATION, INV-PLAN-STORY-CONTRIBUTION",
+   "test": "tests/hardening/test_ac_proof_gate.py::TestGateJudgesEachCriterionByItsObligation::test_k_a_criterion_an_upstream_story_delivers_passes_as_preserve_required",
+   "status": "GREEN (F8)"
+  },
+  {
+   "id": "FM-P-07",
+   "stage": "Plan",
+   "fault": "QUALITY",
+   "scenario": "a story's criteria carry no declared proof obligation",
+   "expected_state": "machine gate refuses the plan; the story is not executable at preflight; at the gate the criterion is PLAN_METADATA_MISSING, never a guess from its wording",
+   "expected_evidence": "machine gate errors; Preflight need `ac-proof-obligation`; gate data.rows outcome PLAN_METADATA_MISSING",
+   "expected_recovery": "declare `ac_proof` in epics.md and re-run `aisef plan`",
+   "invariants": "INV-AC-PROOF-OBLIGATION",
+   "test": "tests/hardening/test_ac_proof_gate.py::TestGateJudgesEachCriterionByItsObligation::test_l_a_plan_with_no_declared_obligation_is_refused_by_the_plan_not_the_developer",
+   "status": "GREEN (F8)"
+  },
+  {
+   "id": "FM-P-08",
+   "stage": "Plan",
+   "fault": "QUALITY",
+   "scenario": "a normal story whose every criterion is already satisfied at entry (no CHANGE_REQUIRED obligation)",
+   "expected_state": "refused before the first developer call (STORY_NOT_EXECUTABLE), so no session is spent on a story with nothing to deliver",
+   "expected_evidence": "Preflight need `ac-proof-obligation` with the story's own counts",
+   "expected_recovery": "correct the plan or declare the story VERIFICATION_ONLY",
+   "invariants": "INV-PLAN-STORY-CONTRIBUTION",
+   "test": "tests/hardening/test_ac_proof_gate.py::TestStoryThatContributesNothingNeverReachesAModel",
+   "status": "GREEN (F8)"
+  },
+  {
+   "id": "FM-T-17",
+   "stage": "Test",
+   "fault": "QUALITY",
+   "scenario": "a behaviour the story must only preserve is broken by the story (PRESERVE_REQUIRED green at the parent, red at the candidate)",
+   "expected_state": "tests verify story FAILED with DEVELOPER_REGRESSION owned by DEVELOPER — a quality attempt, not a plan conflict",
+   "expected_evidence": "gate data.rows: parent GREEN_EXECUTED, candidate RED_EXECUTED, expected GREEN -> GREEN",
+   "expected_recovery": "developer retry with the structured row as feedback",
+   "invariants": "INV-AC-PROOF-OBLIGATION",
+   "test": "tests/hardening/test_ac_proof_gate.py::TestGateJudgesEachCriterionByItsObligation::test_a_preserved_behaviour_broken_by_this_story_is_a_developer_regression",
+   "status": "GREEN (F8)"
+  },
+  {
+   "id": "FM-T-18",
+   "stage": "Test",
+   "fault": "QUALITY",
+   "scenario": "an absence criterion (NEGATIVE_INVARIANT) that holds on an empty tree",
+   "expected_state": "tests verify story PASSED on GREEN -> GREEN; TDD NOT_APPLICABLE when the story has no CHANGE_REQUIRED criterion — no red state is manufactured to satisfy TDD",
+   "expected_evidence": "gate data.rows expected_transition GREEN -> GREEN",
+   "expected_recovery": "none — this is the correct outcome",
+   "invariants": "INV-AC-PROOF-OBLIGATION",
+   "test": "tests/hardening/test_ac_proof_gate.py::TestGateJudgesEachCriterionByItsObligation::test_a_negative_invariant_green_on_both_sides_passes_without_a_manufactured_red",
+   "status": "GREEN (F8)"
   }
  ],
  "status_count": {
-  "GREEN": 88,
+  "GREEN": 93,
   "RED": 0,
   "NEEDS_TEST": 0
  },
- "updated_2026-09-18": "SS-81 family (F7-EXECUTION-EVIDENCE-VALIDITY): FM-T-08..FM-T-16 added, each GREEN on the fixed kernel"
+ "updated_2026-09-18": "SS-81 family (F7-EXECUTION-EVIDENCE-VALIDITY): FM-T-08..FM-T-16 added, each GREEN on the fixed kernel",
+ "updated_2026-09-20": "F8 (TDD proof policy V2): FM-P-06..08 and FM-T-17..18 — plan-owned criteria, missing obligations, preserved behaviour and absence criteria"
 }

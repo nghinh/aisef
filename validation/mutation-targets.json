@@ -1,6 +1,6 @@
 {
  "phase": 13,
- "note": "decision-critical kernel functions; every mutant must be killed by the named tests or justified as equivalent; 2026-09-18: F7 proof model targets added (SS-81 family)",
+ "note": "decision-critical kernel functions; every mutant must be killed by the named tests or justified as equivalent; 2026-09-18: F7 proof model targets added (SS-81 family) 2026-09-20: F8 targets added for the AC proof obligation model (TDD proof policy V2).",
  "targets": [
   {
    "module": "aisef/control/identity.py",
@@ -460,6 +460,78 @@
     "tests/test_testlog.py"
    ],
    "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/obligation.py",
+   "function": "evaluate",
+   "tests": [
+    "tests/hardening/test_ac_proof_policy.py",
+    "tests/hardening/test_ac_proof_gate.py"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
+  },
+  {
+   "module": "aisef/control/obligation.py",
+   "function": "side",
+   "tests": [
+    "tests/hardening/test_ac_proof_policy.py",
+    "tests/hardening/test_ac_proof_gate.py"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
+  },
+  {
+   "module": "aisef/control/obligation.py",
+   "function": "story_contribution",
+   "tests": [
+    "tests/hardening/test_ac_proof_policy.py",
+    "tests/hardening/test_ac_proof_gate.py"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
+  },
+  {
+   "module": "aisef/control/obligation.py",
+   "function": "judge",
+   "tests": [
+    "tests/hardening/test_ac_proof_policy.py",
+    "tests/hardening/test_ac_proof_gate.py"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
+  },
+  {
+   "module": "aisef/control/machine_gate.py",
+   "function": "ac_proof_defects",
+   "tests": [
+    "tests/hardening/test_ac_proof_policy.py",
+    "tests/test_machine_gate.py"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
+  },
+  {
+   "module": "aisef/control/preflight.py",
+   "function": "ac_proof_defect",
+   "tests": [
+    "tests/hardening/test_ac_proof_gate.py",
+    "tests/test_preflight.py"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "plan_owned_criteria",
+   "tests": [
+    "tests/hardening/test_ac_proof_gate.py",
+    "tests/test_implement.py::TestTestCoKiemDuocStory"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
+  },
+  {
+   "module": "aisef/control/normalize.py",
+   "function": "ac_proof",
+   "tests": [
+    "tests/hardening/test_ac_proof_policy.py",
+    "tests/test_story_split.py"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
   }
  ],
  "equivalent": [

@@ -375,9 +375,10 @@ class Driver:
                              "compile_report": json.loads((self.art / "compile-report.json").read_text(encoding="utf-8")) if (self.art / "compile-report.json").is_file() else None}
         # fresh-trunk topology (rehearsal finding): the run copy's trunk must be the FRESH plan state — 8ff9f13 plus the
         # named preparation commits only — with no run-2 delivery on it and no remote to fetch one from
-        after = [ln for ln in self.git("log", "--oneline", "8ff9f13..master").splitlines() if ln.strip()]
+        base = self.a.plan_base
+        after = [ln for ln in self.git("log", "--oneline", f"{base}..master").splitlines() if ln.strip()]
         P["fresh_topology"] = {"head_branch": self.git("rev-parse", "--abbrev-ref", "HEAD"), "master": self.git("rev-parse", "master"),
-                               "commits_after_8ff9f13": after, "ledgerlock_dir_absent_at_master": "ledgerlock" not in self.git("ls-tree", "--name-only", "master").split(),
+                               "plan_base": base, "commits_after_plan_base": after, "ledgerlock_dir_absent_at_master": "ledgerlock" not in self.git("ls-tree", "--name-only", "master").split(),
                                "remotes": self.git("remote").split(), "branches": self.git("branch", "--list").replace("*", "").split()}
         t = P["fresh_topology"]
         # cost cap + image re-pin + guard plugin, and exactly one execution-profile commit when a profile is in force
@@ -463,7 +464,7 @@ class Driver:
                                   "capability_matrix": {"path": str(qualified_matrix), "pass": qm.get("pass"), "aisef_tree": qm.get("aisef_tree"), "totals": qm.get("totals")},
                                   "stale_evidence_dirs": stale_evidence, "arb1": arb1}
         P["preflight"] = {
-            "trunk_is_the_approved_fresh_root": t["head_branch"] == "master" and self.git("merge-base", "--is-ancestor", EXPECTED["fresh_root"], "master") == "" and t["ledgerlock_dir_absent_at_master"],
+            "trunk_is_the_approved_fresh_root": t["head_branch"] == "master" and self.git("merge-base", "--is-ancestor", self.a.plan_base, "master") == "" and t["ledgerlock_dir_absent_at_master"],
             "zero_prior_delivery_commits": all(_is_preparation_commit(ln) for ln in after),
             "expected_story_count": len(stories) == EXPECTED["stories"],
             "expected_story_state_none_registered": "No stories registered" in status_text,
@@ -824,6 +825,9 @@ def main() -> int:
     ap.add_argument("--oracle-python", required=True)
     ap.add_argument("--freeze", default="", help="P19 freeze record (JSON)")
     ap.add_argument("--profile", default="", help="execution profile (JSON); without it the copy must be PROFILE-W1-OC-MYCOMBO-T40")
+    ap.add_argument("--plan-base", default=EXPECTED["fresh_root"],
+                    help="the approved plan commit the run copy starts from (W1_WORKLOAD_V1: 8ff9f13; "
+                         "W1-LEDGERLOCK-PLAN-V2: 1621a2bc)")
     ap.add_argument("--phase", default="all", choices=["all", "prepare", "kernel-first", "approve", "run", "finish", "candidate-audit"])
     a = ap.parse_args()
     d = Driver(a)
