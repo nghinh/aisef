@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-20T07:38:20+0700",
+ "generated": "2026-09-20T10:51:41+0700",
  "invariant": "INV-N.DEFAULT-CAPABILITY",
  "rule": "AUTO_SELECTED(tool, stack, profile) => AVAILABLE(tool, resolved_environment); for every capability declared == selected == provisioned == probed_successfully == executed (real images, production path, no mocks)",
- "git_sha": "ff3115b1cb5ad49ee123571865dfc9d0444a51a2",
- "aisef_tree": "4f0c124113b7a53470bb5778c102a803fac42d2e",
+ "git_sha": "75532839cf94e05d53251d3c0fa330e1928681be",
+ "aisef_tree": "42a29853a3a8a10e5c58b319c5a181f2898be1d5",
  "aisef_dirty": [],
  "registry_sha256": "08ac5be228bea89b548850c59aae315cd48b4f01f4e18dc399e34836987ad9a8",
  "docker": "29.8.0 arm64",
@@ -69,7 +69,7 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 8.3,
+      "seconds": 6.8,
       "tail": ""
      },
      "executed": true,
@@ -98,7 +98,7 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 7.4,
+      "seconds": 7.9,
       "tail": ""
      },
      "executed": true,
@@ -142,7 +142,7 @@
    "recipe_digest": "84adf1d8eaf9772af6abee78ae305905afeae0da489b6900f957e04c7b128361",
    "dockerfile": "FROM python:3.12-slim@sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea\nRUN pip install --no-cache-dir --disable-pip-version-check pytest==9.1.1 pytest-cov==7.1.0 ruff==0.16.7 bandit==1.9.4\n",
    "environment_error": "",
-   "environment_seconds": 0.2,
+   "environment_seconds": 0.1,
    "runtime": [],
    "roles": {
     "test": {
@@ -168,7 +168,7 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 1.4,
+      "seconds": 1.3,
       "tail": ".                                                                        [100%]\n1 passed in 0.01s"
      },
      "executed": true,
@@ -197,7 +197,7 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 1.7,
+      "seconds": 0.8,
       "tail": "All checks passed!"
      },
      "executed": true,
@@ -226,7 +226,7 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 1.0,
+      "seconds": 1.1,
       "tail": ""
      },
      "executed": true,
@@ -247,7 +247,7 @@
    "recipe_digest": "6a26aba68eaa027435cc725d4c7d1b233a821391cdaefdd064ff9da8b8db75ae",
    "dockerfile": "FROM golang:1.26-alpine@sha256:ce864e7223ac17b1775e6fd0b4c0db580c2eb50e7953a427916379e4b92a1628\nRUN CGO_ENABLED=0 GOBIN=/usr/local/bin GOFLAGS=-trimpath go install github.com/securego/gosec/v2/cmd/gosec@v2.29.0\nENV GOCACHE=/tmp/go-build\n",
    "environment_error": "",
-   "environment_seconds": 0.1,
+   "environment_seconds": 0.2,
    "runtime": [],
    "roles": {
     "test": {
@@ -273,8 +273,8 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 14.0,
-      "tail": "ok  \texample.com/calc\t0.003s"
+      "seconds": 14.3,
+      "tail": "ok  \texample.com/calc\t0.004s"
      },
      "executed": true,
      "status": "QUALIFIED"
@@ -302,7 +302,7 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 13.0,
+      "seconds": 9.9,
       "tail": ""
      },
      "executed": true,
@@ -331,8 +331,8 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 7.4,
-      "tail": "[gosec] 2026/09/20 00:37:50 Excluding rules: default\n[gosec] 2026/09/20 00:37:50 Including analyzers: default\n[gosec] 2026/09/20 00:37:50 Excluding analyzers: default\n[gosec] 2026/09/20 00:37:50 Import directory: /workspace\n[gosec] 2026/09/20 00:37:50 Checking package: calc\n[gosec] 2026/09/20 00:37:50 Checking file: /workspace/calc.go"
+      "seconds": 2.2,
+      "tail": "[gosec] 2026/09/20 03:51:21 Excluding rules: default\n[gosec] 2026/09/20 03:51:21 Including analyzers: default\n[gosec] 2026/09/20 03:51:21 Excluding analyzers: default\n[gosec] 2026/09/20 03:51:21 Import directory: /workspace\n[gosec] 2026/09/20 03:51:22 Checking package: calc\n[gosec] 2026/09/20 03:51:22 Checking file: /workspace/calc.go"
      },
      "executed": true,
      "status": "QUALIFIED"
@@ -352,7 +352,7 @@
    "recipe_digest": "33cd9daabc1313fa6acca47154a2d1a03a3a24fa5d76998a21b4734fc310a124",
    "dockerfile": "FROM rust:1-alpine@sha256:1716b3aa042d735f4566d14dc54e8037de9d69556e2d5dd58131d93a613d173d\nRUN rustup component add clippy\nRUN cargo install cargo-audit --locked --version 0.22.2 --root /usr/local\nRUN mkdir -p /usr/local/share/advisory-db && wget -qO- https://github.com/rustsec/advisory-db/archive/f58ccfe51a5954186716998f01360d1079a8a3a5.tar.gz | tar -xz --strip-components=1 -C /usr/local/share/advisory-db\n",
    "environment_error": "",
-   "environment_seconds": 0.1,
+   "environment_seconds": 0.2,
    "runtime": [],
    "roles": {
     "test": {
@@ -378,8 +378,8 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 3.4,
-      "tail": "\n\n   Compiling calc v0.1.0 (/workspace)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.98s\n     Running unittests src/lib.rs (target/debug/deps/calc-61168daa189953a8)\n   Doc-tests calc"
+      "seconds": 3.1,
+      "tail": "\n\n   Compiling calc v0.1.0 (/workspace)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.82s\n     Running unittests src/lib.rs (target/debug/deps/calc-61168daa189953a8)\n   Doc-tests calc"
      },
      "executed": true,
      "status": "QUALIFIED"
@@ -407,8 +407,8 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 1.7,
-      "tail": "Checking calc v0.1.0 (/workspace)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.30s"
+      "seconds": 1.1,
+      "tail": "Checking calc v0.1.0 (/workspace)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.37s"
      },
      "executed": true,
      "status": "QUALIFIED"
@@ -436,7 +436,7 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 2.8,
+      "seconds": 1.7,
       "tail": "Loaded 1247 security advisories (from /usr/local/share/advisory-db)\n    Scanning Cargo.lock for vulnerabilities (1 crate dependencies)"
      },
      "executed": true,
@@ -855,6 +855,6 @@
   "failed": [],
   "presets_failed": []
  },
- "elapsed_s": 104.5,
+ "elapsed_s": 90.4,
  "pass": true
 }
