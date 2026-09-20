@@ -81,7 +81,9 @@ def tdd_subjects(detail: dict, story_id: str, acceptance: int, added_tests: list
         want = {c for c in (codes or [])}
         ac = [t for i, ts in coverage(story_id, acceptance, green).items() for t in ts
               if not want or f"AC-{story_id}-{i}" in want]
-        if ac:
+        if ac or want:
+            # With declared obligations the subject list is exactly those criteria's tests — empty means there is
+            # nothing for TDD to have seen fail, not "fall back to every test the story added" (policy V2).
             return list(dict.fromkeys(ac))
     added = set(added_tests or [])
     return [t for t in green if "::" in t and t.split("::", 1)[0] in added]

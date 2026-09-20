@@ -86,7 +86,8 @@
   "closure-evidence/hardening/W1-DELIVERY-FAILURE-DECOMPOSITION.json",
   "closure-evidence/hardening/w1/run-*/SS95-CANDIDATE-AUDIT.json",
   "closure-evidence/hardening/AISEF-W0-QUALIFICATION-d32031d.json (W0 of the V1-policy kernel)",
-  "closure-evidence/hardening/differential-p12-summary.json (100 000 traces on tree a2f6e76b)"
+  "closure-evidence/hardening/differential-p12-summary.json (100 000 traces on tree a2f6e76b)",
+  "closure-evidence/hardening/phase12/history-kernel-a2f6e76b/ (the V1 kernel's 100 000-trace dataset, archived when the new kernel's dataset was run)"
  ],
  "hashes_at_marking": {
   "W1-LEDGERLOCK-1.json": "8dc02fe214acf0248dd2181cadfe8995c58a9017d877d239062b43f249b84a4f",
@@ -99,5 +100,6 @@
   "W1-LEDGERLOCK-deepseek-ro-2.json": "397c767548c7ed2416b0fbfba80fc49307452f637da223cb1092f027bdcdcdb7",
   "W1-LEDGERLOCK-minimax-ro-1.json": "75699cbdcc47905646f40f1122b4444d659ad5f7918bae31199c3046efa5e85c",
   "W1-LEDGERLOCK-minimax-ro-2.json": "1a1b7fb20d79b1707015022fd6ee6322a78e4678015365ab914ecc6d3e56671b"
- }
+ },
+ "frozen_kernel_record": "closure-evidence/hardening/freeze/P19-FREEZE-40393cd.json (moved unchanged when the policy change produced a new kernel; the live P19-FREEZE.json is always the current candidate)"
 }

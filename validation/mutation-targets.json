@@ -341,11 +341,13 @@
    "module": "aisef/control/gate.py",
    "function": "_nop_check",
    "tests": [
+    "tests/hardening/test_ac_proof_gate.py",
+    "tests/hardening/test_ac_proof_policy.py",
     "tests/hardening/test_ss81_family.py",
     "tests/test_gate.py",
     "tests/test_gate_qualification.py"
    ],
-   "decision": "F7 proof model (SS-81 family)"
+   "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)"
   },
   {
    "module": "aisef/control/gate.py",
@@ -394,7 +396,8 @@
    "tests": [
     "tests/hardening/test_ss81_family.py",
     "tests/test_tdd.py",
-    "tests/test_gate.py"
+    "tests/test_gate.py",
+    "tests/hardening/test_ac_proof_policy.py"
    ],
    "decision": "F7 proof model (SS-81 family)"
   },
@@ -466,7 +469,8 @@
    "function": "evaluate",
    "tests": [
     "tests/hardening/test_ac_proof_policy.py",
-    "tests/hardening/test_ac_proof_gate.py"
+    "tests/hardening/test_ac_proof_gate.py",
+    "tests/hardening/test_ac_proof_machine_gate.py"
    ],
    "decision": "F8 AC proof obligation (TDD proof policy V2)"
   },
@@ -475,7 +479,8 @@
    "function": "side",
    "tests": [
     "tests/hardening/test_ac_proof_policy.py",
-    "tests/hardening/test_ac_proof_gate.py"
+    "tests/hardening/test_ac_proof_gate.py",
+    "tests/hardening/test_ac_proof_machine_gate.py"
    ],
    "decision": "F8 AC proof obligation (TDD proof policy V2)"
   },
@@ -484,7 +489,8 @@
    "function": "story_contribution",
    "tests": [
     "tests/hardening/test_ac_proof_policy.py",
-    "tests/hardening/test_ac_proof_gate.py"
+    "tests/hardening/test_ac_proof_gate.py",
+    "tests/hardening/test_ac_proof_machine_gate.py"
    ],
    "decision": "F8 AC proof obligation (TDD proof policy V2)"
   },
@@ -493,7 +499,8 @@
    "function": "judge",
    "tests": [
     "tests/hardening/test_ac_proof_policy.py",
-    "tests/hardening/test_ac_proof_gate.py"
+    "tests/hardening/test_ac_proof_gate.py",
+    "tests/hardening/test_ac_proof_machine_gate.py"
    ],
    "decision": "F8 AC proof obligation (TDD proof policy V2)"
   },
@@ -501,6 +508,7 @@
    "module": "aisef/control/machine_gate.py",
    "function": "ac_proof_defects",
    "tests": [
+    "tests/hardening/test_ac_proof_machine_gate.py",
     "tests/hardening/test_ac_proof_policy.py",
     "tests/test_machine_gate.py"
    ],
@@ -576,6 +584,13 @@
    "function": "_js_import_errors",
    "site": "line 443: and ↔ or",
    "why": "aisef/harness/testlog.py::_js_import_errors `importer.endswith(f) and f != importer` -> `or`: `f` is either a failed file the importer ends with, or the importer itself, so `importer.endswith(f)` is always True; when f == importer the original gives \"\" and the mutant gives importer[:-len(importer)] == \"\" — identical in every reachable state."
+  },
+  {
+   "id": "c8447deeb9",
+   "module": "aisef/control/obligation.py",
+   "function": "story_contribution",
+   "site": "line 182: True → False",
+   "why": "the mutated flag is `strict=True` in `zip(codes, declared, strict=True)`; `declared` is built by a comprehension over `codes`, so the two are always the same length and strict=False cannot change any observable behaviour."
   }
  ],
  "not_significant": [

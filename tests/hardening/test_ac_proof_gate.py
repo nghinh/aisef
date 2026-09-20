@@ -128,7 +128,8 @@ class TestGateJudgesEachCriterionByItsObligation(GateCase):
         self.nop([AC1, "t1"], failed=[AC1])
         m = self.check(1, {})
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("proof obligation", m.detail)
+        # one sentence for the whole plan defect, not one row per criterion: the story declares nothing at all
+        self.assertTrue(m.detail.startswith("no criterion declares what it must show (proof obligation)"), m.detail)
         self.assertEqual(m.data["owners"], ["PLAN"])
         self.assertEqual(self.rows(m)[f"AC-{SID}-1"]["outcome"], "PLAN_METADATA_MISSING")
 
@@ -229,6 +230,113 @@ class TestPlanOwnedFailureNeverSpendsADeveloperAttempt(GateCase):
         from aisef.phases.implement import Attempt, plan_owned_criteria
 
         self.assertEqual(plan_owned_criteria(Attempt(number=1)), [])
+
+
+class TestRoutingReadsTheRowsNotTheWording(GateCase):
+    """Mutation qualification of `plan_owned_criteria`: it reads the check's structured rows, and only the rows
+    whose owner is the PLAN."""
+
+    def attempt_with(self, rows, name=CHECK, failed=True):
+        from aisef.control.outcome import Check
+        from aisef.phases.implement import Attempt
+
+        class _Gate:
+            def __init__(self, checks):
+                self.checks = checks
+
+            @property
+            def failures(self):
+                return [c for c in self.checks if c.outcome is Outcome.FAILED]
+
+        a = Attempt(number=1)
+        a.gate = _Gate([Check(name, Outcome.FAILED if failed else Outcome.PASSED, "d", data={"rows": rows})])
+        return a
+
+    ROW_PLAN = {"ac_id": "AC-S-01-1", "proof_mode": "CHANGE_REQUIRED", "actual_transition": "GREEN -> GREEN",
+                "outcome": "PLAN_OVERLAP", "owner": "PLAN", "why": "already there"}
+    ROW_DEV = {"ac_id": "AC-S-01-2", "proof_mode": "CHANGE_REQUIRED", "actual_transition": "RED -> RED",
+               "outcome": "DEVELOPER_QUALITY_BLOCK", "owner": "DEVELOPER", "why": "still red"}
+
+    def test_only_plan_owned_rows_are_returned(self):
+        from aisef.phases.implement import plan_owned_criteria
+
+        got = plan_owned_criteria(self.attempt_with([self.ROW_DEV, self.ROW_PLAN]))
+        self.assertEqual(len(got), 1)
+        self.assertIn("AC-S-01-1", got[0])
+
+    def test_rows_of_another_check_are_not_read(self):
+        from aisef.phases.implement import plan_owned_criteria
+
+        self.assertEqual(plan_owned_criteria(self.attempt_with([self.ROW_PLAN], name="review")), [])
+
+    def test_a_check_that_did_not_fail_is_not_read(self):
+        from aisef.phases.implement import plan_owned_criteria
+
+        self.assertEqual(plan_owned_criteria(self.attempt_with([self.ROW_PLAN], failed=False)), [])
+
+    def test_a_failing_check_without_rows_routes_nothing(self):
+        from aisef.phases.implement import plan_owned_criteria
+
+        self.assertEqual(plan_owned_criteria(self.attempt_with([])), [])
+
+    def test_a_row_without_an_obligation_still_names_the_criterion(self):
+        from aisef.phases.implement import plan_owned_criteria
+
+        row = {"ac_id": "AC-S-01-3", "proof_mode": None, "outcome": "PLAN_METADATA_MISSING", "owner": "PLAN"}
+        got = plan_owned_criteria(self.attempt_with([row]))
+        self.assertEqual(len(got), 1)
+        self.assertIn("no obligation", got[0])
+
+
+class TestTheGateKeepsItsOtherRefusals(GateCase):
+    """The obligation model replaced the verdict, not the guards around it: a nop whose own totals do not match the
+    tests it read still proves nothing, whatever the obligations say."""
+
+    def test_an_incomplete_nop_output_is_unrunnable_even_when_every_row_is_satisfied(self):
+        self.baseline(["t1"])
+        self.candidate([AC1, "t1"])
+        self.nop([AC1, "t1"], failed=[AC1], output_complete=False)
+        m = self.check(1, decl("CHANGE_REQUIRED"))
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE, m.detail)
+        self.assertIn("incomplete", m.detail)
+
+    def test_a_complete_nop_output_passes(self):
+        self.baseline(["t1"])
+        self.candidate([AC1, "t1"])
+        self.nop([AC1, "t1"], failed=[AC1], output_complete=True)
+        self.assertIs(self.check(1, decl("CHANGE_REQUIRED")).outcome, Outcome.PASSED)
+
+    def test_a_criterion_left_out_of_the_declaration_is_reported_with_its_gaps_named(self):
+        """One criterion declared, one forgotten: the story is not refused wholesale, and the forgotten one's line
+        says what is missing rather than printing empty fields."""
+        self.baseline(["t1"])
+        self.candidate([AC1, AC2, "t1"])
+        self.nop([AC1, AC2, "t1"], failed=[AC1, AC2])
+        m = self.check(2, decl("CHANGE_REQUIRED"))          # AC-S-01-2 has no obligation at all
+        self.assertIs(m.outcome, Outcome.FAILED, m.detail)
+        row = self.rows(m)[f"AC-{SID}-2"]
+        self.assertEqual((row["outcome"], row["owner"]), ("PLAN_METADATA_MISSING", "PLAN"))
+        self.assertIn("no obligation", m.detail)
+        self.assertIn("no requirement", m.detail)
+        self.assertIn("expected a declared transition", m.detail)
+
+    def test_a_row_with_no_observed_state_on_a_side_says_none(self):
+        """The failing line prints what each side actually showed; a side with no test states says `none`."""
+        self.baseline(["t1"])
+        self.candidate(["t1"])                               # no test carries the criterion's code
+        self.nop(["t1"])
+        m = self.check(1, decl("CHANGE_REQUIRED"))
+        self.assertIs(m.outcome, Outcome.FAILED, m.detail)
+        self.assertIn("parent none / candidate none", m.detail)
+
+    def test_the_failing_line_names_the_parent_sha_the_obligation_and_the_owner(self):
+        self.baseline(["t1"])
+        self.candidate([AC1, "t1"])
+        self.nop([AC1, "t1"])
+        m = self.check(1, decl("CHANGE_REQUIRED"))
+        for part in ("at parent SHA cha0000", "CHANGE_REQUIRED", "FR-1", "expected RED -> GREEN", "PLAN_OVERLAP",
+                     "(PLAN)", "parent GREEN_EXECUTED / candidate GREEN_EXECUTED", AC1):
+            self.assertIn(part, m.detail)
 
 
 if __name__ == "__main__":

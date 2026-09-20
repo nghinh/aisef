@@ -108,11 +108,13 @@ def ac_proof_defects(ac_count: dict[str, int], ac_proof: dict[str, dict], story_
     guess it from the criterion's wording. A criterion with no obligation, an unknown mode, an obligation for a
     criterion that no longer exists, a requirement the PRD does not carry, or a normal story that contributes no new
     behaviour at all: each is a plan defect a model cannot fix by writing code."""
-    from .obligation import Mode, STORY_TYPES, VERIFICATION_ONLY, story_contribution
+    from .obligation import Mode, STORY_TYPES, story_contribution
 
     known_req = {r.id for r in (prd.requirements if prd else [])}
     out: list[str] = []
     for sid, n in sorted(ac_count.items()):
+        if not n:
+            continue                      # "no acceptance criteria" is its own error, reported above
         declared = ac_proof.get(sid) or {}
         codes = [f"AC-{sid}-{i}" for i in range(1, int(n or 0) + 1)]
         kind = (story_type.get(sid) or "NORMAL").upper()
@@ -144,7 +146,7 @@ def ac_proof_defects(ac_count: dict[str, int], ac_proof: dict[str, dict], story_
                 out.append(f"{sid}: {code} names {req}, which this story does not cover ({', '.join(fr_map[sid])})")
         ok, why = story_contribution(declared, codes, kind)
         if not ok and not any(o.startswith(f"{sid}: no proof obligation") for o in out):
-            out.append(f"{sid}: {why}" if kind != VERIFICATION_ONLY else f"{sid}: {why}")
+            out.append(f"{sid}: {why}")
     return out
 
 

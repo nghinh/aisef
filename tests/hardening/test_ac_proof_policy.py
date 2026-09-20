@@ -78,9 +78,11 @@ class TestPreserveRequired(unittest.TestCase):
         self.assertEqual(ob.OWNER_OF[out], ob.Owner.DEVELOPER)
 
     def test_nothing_to_preserve_at_the_parent_is_a_plan_defect(self):
-        out = verdict(ob.Mode.PRESERVE_REQUIRED, RED, GREEN)
+        out, why = ob.evaluate(ob.Mode.PRESERVE_REQUIRED, ob.side(RED), ob.side(GREEN))
         self.assertEqual(out, ob.Outcome.PLAN_PRECONDITION_MISSING)
         self.assertEqual(ob.OWNER_OF[out], ob.Owner.PLAN)
+        self.assertIn("must preserve is not present", why)
+        self.assertNotIn("prohibition", why, "each mode says what ITS missing precondition means")
 
     def test_preserving_gives_no_contribution_credit(self):
         ok, why = ob.story_contribution({"AC-S-1": {"proof_mode": "PRESERVE_REQUIRED"}}, ["AC-S-1"])
@@ -101,7 +103,10 @@ class TestNegativeInvariant(unittest.TestCase):
     def test_no_red_state_is_manufactured_at_the_parent(self):
         """An absence criterion holds on an empty tree; that is not a TDD failure (owner section 7)."""
         self.assertEqual(verdict(ob.Mode.NEGATIVE_INVARIANT, GREEN, GREEN), ob.Outcome.SATISFIED)
-        self.assertEqual(verdict(ob.Mode.NEGATIVE_INVARIANT, RED, GREEN), ob.Outcome.PLAN_PRECONDITION_MISSING)
+        out, why = ob.evaluate(ob.Mode.NEGATIVE_INVARIANT, ob.side(RED), ob.side(GREEN))
+        self.assertEqual(out, ob.Outcome.PLAN_PRECONDITION_MISSING)
+        self.assertIn("prohibition is already violated", why)
+        self.assertNotIn("must preserve", why)
 
 
 class TestNoEvidenceNeverSatisfies(unittest.TestCase):
@@ -227,6 +232,78 @@ class TestPlanningDataParsing(unittest.TestCase):
     def test_a_story_without_the_declaration_carries_no_obligation_at_all(self):
         story = parse_epics(self.EPICS.replace("- ac_proof: 1=CHANGE_REQUIRED/FR-1, 2=NEGATIVE_INVARIANT/NFR-2\n", "")).stories()[0]
         self.assertEqual(story.ac_proof, {}, "absence must be visible to the gate, never defaulted to a mode")
+
+
+class TestSideEdges(unittest.TestCase):
+    """A criterion is RED only when EVERY test proves red, GREEN only when every test passed, MIXED only when the
+    tests are red and green and nothing else — one unrunnable test makes the whole criterion no evidence."""
+
+    def test_red_beside_evidence_that_did_not_execute_is_no_evidence(self):
+        self.assertEqual(ob.side({"a": RED["t"], "b": SKIPPED["t"]}), ob.Side.NO_EVIDENCE)
+        self.assertEqual(ob.side({"a": RED["t"], "b": UNRUNNABLE["t"]}), ob.Side.NO_EVIDENCE)
+
+    def test_green_beside_evidence_that_did_not_execute_is_no_evidence(self):
+        self.assertEqual(ob.side({"a": GREEN["t"], "b": ABSENT["t"]}), ob.Side.NO_EVIDENCE)
+
+    def test_red_and_green_together_is_mixed(self):
+        self.assertEqual(ob.side({"a": GREEN["t"], "b": BOUND["t"]}), ob.Side.MIXED)
+
+    def test_a_partly_green_candidate_does_not_satisfy_a_preserved_criterion(self):
+        self.assertEqual(verdict(ob.Mode.PRESERVE_REQUIRED, GREEN, MIXED), ob.Outcome.DEVELOPER_REGRESSION)
+        self.assertEqual(verdict(ob.Mode.NEGATIVE_INVARIANT, GREEN, MIXED), ob.Outcome.DEVELOPER_REGRESSION)
+
+    def test_a_partly_green_candidate_does_not_satisfy_a_changed_criterion(self):
+        self.assertEqual(verdict(ob.Mode.CHANGE_REQUIRED, RED, MIXED), ob.Outcome.DEVELOPER_QUALITY_BLOCK)
+
+
+class TestContributionMessages(unittest.TestCase):
+    def test_at_most_three_undeclared_criteria_are_named_then_an_ellipsis(self):
+        codes = [f"AC-S-{i}" for i in range(1, 6)]
+        ok, why = ob.story_contribution({codes[0]: {"proof_mode": "CHANGE_REQUIRED"}}, codes)
+        self.assertFalse(ok)
+        self.assertIn("4 of 5 criteria", why)
+        self.assertTrue(why.endswith("…"), why)
+        self.assertEqual(why.count("AC-S-"), 3)
+
+    def test_exactly_three_undeclared_criteria_need_no_ellipsis(self):
+        codes = [f"AC-S-{i}" for i in range(1, 5)]
+        ok, why = ob.story_contribution({codes[0]: {"proof_mode": "CHANGE_REQUIRED"}}, codes)
+        self.assertFalse(ok)
+        self.assertFalse(why.endswith("…"), why)
+
+    def test_a_verification_only_story_still_needs_valid_obligations(self):
+        ok, why = ob.story_contribution({"AC-S-1": {"proof_mode": "WHATEVER"}}, ["AC-S-1"],
+                                        story_type=ob.VERIFICATION_ONLY)
+        self.assertFalse(ok, why)
+
+    def test_the_count_of_change_required_criteria_is_reported(self):
+        obs = {"AC-S-1": {"proof_mode": "CHANGE_REQUIRED"}, "AC-S-2": {"proof_mode": "PRESERVE_REQUIRED"}}
+        ok, why = ob.story_contribution(obs, list(obs))
+        self.assertTrue(ok)
+        self.assertIn("1 of 2 criteria are CHANGE_REQUIRED", why)
+
+
+class TestTddSubjectsFollowTheObligation(unittest.TestCase):
+    """Red-before-green is asked only of the criteria the plan says this story must change."""
+
+    DETAIL = {"test_format": "pytest", "failed_ids": [],
+              "test_ids": ["tests/t.py::test_AC_S_01_1_a", "tests/t.py::test_AC_S_01_2_b"]}
+
+    def test_only_the_declared_change_required_criteria_are_subjects(self):
+        from aisef.control.tdd import tdd_subjects
+
+        got = tdd_subjects(self.DETAIL, "S-01", 2, ["tests/t.py"], ["AC-S-01-2"])
+        self.assertEqual(got, ["tests/t.py::test_AC_S_01_2_b"])
+
+    def test_without_a_declaration_every_criterion_is_a_subject(self):
+        from aisef.control.tdd import tdd_subjects
+
+        self.assertEqual(len(tdd_subjects(self.DETAIL, "S-01", 2, ["tests/t.py"], [])), 2)
+
+    def test_a_criterion_that_is_not_change_required_is_never_a_subject(self):
+        from aisef.control.tdd import tdd_subjects
+
+        self.assertEqual(tdd_subjects(self.DETAIL, "S-01", 2, ["tests/t.py"], ["AC-S-01-9"]), [])
 
 
 if __name__ == "__main__":

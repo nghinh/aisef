@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-18T20:17:09+0700",
+ "generated": "2026-09-20T07:38:20+0700",
  "invariant": "INV-N.DEFAULT-CAPABILITY",
  "rule": "AUTO_SELECTED(tool, stack, profile) => AVAILABLE(tool, resolved_environment); for every capability declared == selected == provisioned == probed_successfully == executed (real images, production path, no mocks)",
- "git_sha": "d32031dbe2081d0a34368b63b992ec5a5cd3694e",
- "aisef_tree": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+ "git_sha": "ff3115b1cb5ad49ee123571865dfc9d0444a51a2",
+ "aisef_tree": "4f0c124113b7a53470bb5778c102a803fac42d2e",
  "aisef_dirty": [],
  "registry_sha256": "08ac5be228bea89b548850c59aae315cd48b4f01f4e18dc399e34836987ad9a8",
  "docker": "29.8.0 arm64",
@@ -20,7 +20,7 @@
    "recipe_digest": "",
    "dockerfile": "",
    "environment_error": "",
-   "environment_seconds": 0.7,
+   "environment_seconds": 0.3,
    "runtime": [
     {
      "argv": [
@@ -69,7 +69,7 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 5.7,
+      "seconds": 8.3,
       "tail": ""
      },
      "executed": true,
@@ -98,7 +98,7 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 5.7,
+      "seconds": 7.4,
       "tail": ""
      },
      "executed": true,
@@ -142,7 +142,7 @@
    "recipe_digest": "84adf1d8eaf9772af6abee78ae305905afeae0da489b6900f957e04c7b128361",
    "dockerfile": "FROM python:3.12-slim@sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea\nRUN pip install --no-cache-dir --disable-pip-version-check pytest==9.1.1 pytest-cov==7.1.0 ruff==0.16.7 bandit==1.9.4\n",
    "environment_error": "",
-   "environment_seconds": 0.1,
+   "environment_seconds": 0.2,
    "runtime": [],
    "roles": {
     "test": {
@@ -168,7 +168,7 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 0.6,
+      "seconds": 1.4,
       "tail": ".                                                                        [100%]\n1 passed in 0.01s"
      },
      "executed": true,
@@ -197,7 +197,7 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 0.4,
+      "seconds": 1.7,
       "tail": "All checks passed!"
      },
      "executed": true,
@@ -226,7 +226,7 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 0.5,
+      "seconds": 1.0,
       "tail": ""
      },
      "executed": true,
@@ -273,8 +273,8 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 4.9,
-      "tail": "ok  \texample.com/calc\t0.002s"
+      "seconds": 14.0,
+      "tail": "ok  \texample.com/calc\t0.003s"
      },
      "executed": true,
      "status": "QUALIFIED"
@@ -302,7 +302,7 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 3.9,
+      "seconds": 13.0,
       "tail": ""
      },
      "executed": true,
@@ -331,8 +331,8 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 0.6,
-      "tail": "[gosec] 2026/09/18 13:16:59 Excluding rules: default\n[gosec] 2026/09/18 13:16:59 Including analyzers: default\n[gosec] 2026/09/18 13:16:59 Excluding analyzers: default\n[gosec] 2026/09/18 13:16:59 Import directory: /workspace\n[gosec] 2026/09/18 13:16:59 Checking package: calc\n[gosec] 2026/09/18 13:16:59 Checking file: /workspace/calc.go"
+      "seconds": 7.4,
+      "tail": "[gosec] 2026/09/20 00:37:50 Excluding rules: default\n[gosec] 2026/09/20 00:37:50 Including analyzers: default\n[gosec] 2026/09/20 00:37:50 Excluding analyzers: default\n[gosec] 2026/09/20 00:37:50 Import directory: /workspace\n[gosec] 2026/09/20 00:37:50 Checking package: calc\n[gosec] 2026/09/20 00:37:50 Checking file: /workspace/calc.go"
      },
      "executed": true,
      "status": "QUALIFIED"
@@ -378,8 +378,8 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 1.0,
-      "tail": "\n\n   Compiling calc v0.1.0 (/workspace)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.55s\n     Running unittests src/lib.rs (target/debug/deps/calc-61168daa189953a8)\n   Doc-tests calc"
+      "seconds": 3.4,
+      "tail": "\n\n   Compiling calc v0.1.0 (/workspace)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.98s\n     Running unittests src/lib.rs (target/debug/deps/calc-61168daa189953a8)\n   Doc-tests calc"
      },
      "executed": true,
      "status": "QUALIFIED"
@@ -407,8 +407,8 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 0.6,
-      "tail": "Checking calc v0.1.0 (/workspace)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.11s"
+      "seconds": 1.7,
+      "tail": "Checking calc v0.1.0 (/workspace)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.30s"
      },
      "executed": true,
      "status": "QUALIFIED"
@@ -436,7 +436,7 @@
       "unrunnable": "",
       "skipped": "",
       "outcome": "",
-      "seconds": 0.5,
+      "seconds": 2.8,
       "tail": "Loaded 1247 security advisories (from /usr/local/share/advisory-db)\n    Scanning Cargo.lock for vulnerabilities (1 crate dependencies)"
      },
      "executed": true,
@@ -457,7 +457,7 @@
    "recipe_digest": "",
    "dockerfile": "",
    "environment_error": "",
-   "environment_seconds": 0.1,
+   "environment_seconds": 0.2,
    "runtime": [
     {
      "argv": [
@@ -855,6 +855,6 @@
   "failed": [],
   "presets_failed": []
  },
- "elapsed_s": 42.3,
+ "elapsed_s": 104.5,
  "pass": true
 }
