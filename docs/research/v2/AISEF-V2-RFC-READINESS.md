@@ -7,15 +7,96 @@ the StaticPlanAdmission normalization).
 
 ## Verdict
 
-# READY_FOR_RFC
+# READY_FOR_OWNER_FREEZE
 
-All five blockers are resolved by owner decision. **No new architectural contradiction was found** while
-applying them — the check performed is recorded in §2 below, including the one place the decisions interact and
-how that interaction resolves.
+The five RFC blockers were resolved by owner decisions B1–B5 (§1). The owner approval review then found **four
+blocking semantic / implementability defects**, all four are corrected in the RFC (§0), and the three required
+reviews — consistency, implementability, simplification — pass with no unresolved contradiction and no circular
+prerequisite.
 
-The final RFC is at [`docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md`](../../architecture/AISEF-V2-ARCHITECTURE-RFC.md)
-and supersedes this and the other proposal documents for implementation decisions. They are retained as design
-history.
+The normative document is [`docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md`](../../architecture/AISEF-V2-ARCHITECTURE-RFC.md).
+It supersedes this and the other proposal documents for implementation decisions; they are design history.
+
+---
+
+## 0. Owner approval review — four defects corrected
+
+All four were real. Two of them (A, C) were **polarity or absence errors of exactly the kind this architecture
+exists to eliminate, reintroduced by me one layer down.**
+
+### A · Contract satisfaction distinct from raw behaviour verdict
+
+`StoryAdmission` routed directly on `BehaviorVerdict`, which is **inverted for every `MUST_NOT_HOLD`
+contract**: `candidate_expectation` is `REFUTED` for a prohibition, so "`SATISFIED` at parent ⇒ `PRE_SATISFIED`"
+was backwards. A prohibition that is *being violated* at the parent would have been recorded as already
+satisfied.
+
+Corrected: `ContractSatisfaction` = `SATISFIED` / `UNSATISFIED` / `INDETERMINATE`, **derived** as
+`behavior_verdict == candidate_expectation` and never stored separately. Every planning decision routes on it.
+`ParentExpectation` renamed to `UNSATISFIED_AT_PARENT` / `SATISFIED_AT_PARENT` / `UNCONSTRAINED`. Regression
+case **NEG-1**.
+
+### A2 · Negative-invariant absence was a blanket rule
+
+"Every `MUST_NOT_HOLD` probe requires its subject to exist" is correct for *"the CLI MUST NOT write to stdout"*
+and **wrong** for *"a forbidden file MUST NOT exist"*, where absence is the entire point.
+
+Corrected: `SubjectAbsence` = `REQUIRES_SUBJECT` / `ABSENCE_IS_DECIDABLE`, declared per contract, bound into
+`contract_hash` and `semantic_hash`, and **never inferred from polarity**. It applies to positive contracts too
+(*"file X MUST exist"*). No new architecture plane. Regression cases **NEG-2**, **NEG-3**.
+
+### B · Probe calibration was polarity-wrong and circular
+
+Two defects. "Every spec must show `REFUTED`" would have **passed** a `MUST_NOT_HOLD` probe that always returns
+`REFUTED` — a probe that can never fail a prohibition. And `StaticPlanAdmission` required every spec's
+calibration before plan freeze while the RFC also said most such records come from `StoryAdmission`, which runs
+only after plan freeze.
+
+Corrected: calibration must demonstrate **contrast** to `candidate_expectation`, and it splits into
+`ProbeCapabilityCalibration` (probe digest × observation class, committed positive **and** negative fixtures,
+exists before any plan — required by `StaticPlanAdmission`) and `SpecFalsifiabilityEvidence` (per spec, produced
+by Q2, **never** a plan-freeze prerequisite, required before a spec backs Q6 product evidence). Regression cases
+**CAL-1**, **CAL-2**.
+
+### C · Engineering test execution was boolean — this re-created SS-96
+
+The draft mapped "tests do not execute" to `INADEQUATE` with owner `DEVELOPER`. That is the SS-96 shape exactly:
+absence charged as a developer failure. It is the defect the whole architecture removes, reintroduced inside my
+own adequacy gate.
+
+Corrected with the same two-axis discipline used for probes: `TestExecutionStatus` (`EXECUTED` / `UNRUNNABLE`),
+with `TestOutcome` and `TestSelection` defined only when `EXECUTED`. A missing runner is `ENVIRONMENT` with
+environment retry — never `DEVELOPER`, never `INADEQUATE`, and never `INCOMPLETE`, because an `UNRUNNABLE`
+mandatory execution is an environment outcome rather than a non-blocking quality result. A developer-authored
+selection or collection defect is classified through `TestSelection`, not by prose; a collection failure whose
+cause cannot be determined is owner `INTEGRATION`. **No "did not run ⇒ developer" path exists anywhere.**
+Regression cases **TEST-1**, **TEST-2**.
+
+### D · RunScope lifetime order
+
+The draft made the `JournalWriter` the outermost boundary, so the run lease was released **before** the writer
+closed — a second run could acquire ownership while the first was still writing.
+
+Corrected: the **run lease** is the outer boundary. Begin: lease → `OPEN` sentinel (fsync) → `JournalWriter` →
+`RunSpec` → execution. Shutdown: all StoryScopes disposed → `run/dispose-begin` → `run/end` → **writer closes
+successfully** → sentinel `CLEAN` → **lease released last**. A failed writer close or an unrecordable `CLEAN`
+leaves the sentinel `OPEN`, so the next run conservatively reports `TORN`. Regression cases **RUN-1**,
+**RUN-2**.
+
+### Freeze table
+
+**No F12.** Five existing items adjusted mechanically: **F2** gains the `ContractSatisfaction` derivation;
+**F4** gains `SubjectAbsence`; **F5** gains the two corrected calibration contracts; **F6** expresses
+`ParentExpectation` as a contract-satisfaction expectation; **F8** gains the lease / sentinel / journal lifetime
+order.
+
+### Reviews
+
+**Consistency** — no polarity inversion at any routing site, no circular prerequisite, and the three sites where
+absence could be charged to a developer were each checked. **Implementability** — every prerequisite exists
+before the operation requiring it, verified as a table; one classification rule (15.0.4) may be unavailable for
+non-Python targets and falls back safely to owner `INTEGRATION`. **Simplification** — four types added, each
+required by a named defect; defect D added none; nothing else added.
 
 ---
 

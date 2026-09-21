@@ -204,6 +204,14 @@ class Subject:
     kind: Literal["python_callable", "cli_invocation", "http_route", "file_artifact", "process_effect"]
     locator: str        # resolves against a revision; names the product, never a test
 
+class SubjectAbsence(Enum):
+    """Whether the contract is decidable when its subject does not exist.
+
+    MUST be declared explicitly. MUST NOT be inferred from polarity.
+    """
+    REQUIRES_SUBJECT     = "REQUIRES_SUBJECT"      # the subject must exist for the contract to be decidable
+    ABSENCE_IS_DECIDABLE = "ABSENCE_IS_DECIDABLE"  # subject absence is itself a valid observation
+
 @dataclass(frozen=True)
 class BehaviorContract:
     id: str
@@ -212,6 +220,7 @@ class BehaviorContract:
     stimulus: Mapping[str, Any]
     observable: Mapping[str, Any]
     polarity: Polarity
+    subject_absence: SubjectAbsence
     rationale: str      # prose, for human review; MUST NOT be read by control
     contract_hash: str
 ```
@@ -219,6 +228,11 @@ class BehaviorContract:
 - A contract **MUST NOT** name a test file, test function, directory layout, or any developer-chosen artefact.
 - **A story MUST NOT change the locator of a contract it implements.** Moving a subject is a contract change and
   requires re-approval and re-admission. Without this rule, `Subject.locator` re-introduces file placement.
+- `subject_absence` **MUST** be declared by the contract author and **MUST** be bound into `contract_hash` and,
+  through it, into `semantic_hash`. It **MUST NOT** be inferred from `polarity`: both
+  *"the CLI exists but MUST NOT write to stdout"* (`REQUIRES_SUBJECT`) and *"a forbidden module MUST NOT exist"*
+  (`ABSENCE_IS_DECIDABLE`) are `MUST_NOT_HOLD`, and they need opposite handling when the subject is absent. The
+  same applies to positive contracts: *"file X MUST exist"* is `MUST_HOLD` with `ABSENCE_IS_DECIDABLE`.
 
 ---
 
@@ -272,11 +286,59 @@ budget.**
   than degrade silently.
 - Probes are harness-owned. The probe API **MUST NOT** accept a developer-authored path (invariant IX).
 
-### 9.1 Probe calibration
+### 9.1 Calibration — two levels
 
-- For every `ProductProofSpec`, a calibration record **MUST** exist showing its probe producing `REFUTED` at a
-  known revision. A probe never observed refuting **MUST** render its specs inadmissible in Q0.
-- Most calibration records are produced as a by-product of `StoryAdmission` on `INTRODUCE` obligations.
+Calibration must demonstrate **contrast to the candidate expectation**, not a fixed verdict. A probe for a
+`MUST_NOT_HOLD` contract has `candidate_expectation = REFUTED`, so "must be observed producing `REFUTED`" would
+*pass* a probe that always returns `REFUTED` — the exact failure calibration exists to catch (case **CAL-1**).
+
+**General rule.** A calibration demonstration **MUST** produce the verdict that **contrasts** with the spec's
+`candidate_expectation`:
+
+| `candidate_expectation` | the counterexample MUST produce |
+|---|---|
+| `SATISFIED` | `REFUTED` |
+| `REFUTED` | `SATISFIED` |
+
+#### 9.1.1 `ProbeCapabilityCalibration` — qualifies an implementation
+
+```python
+@dataclass(frozen=True)
+class ProbeCapabilityCalibration:
+    probe_id: str
+    probe_digest: str
+    observation_class: str                  # the class of observation this record qualifies
+    positive_fixture: str                   # committed fixture where the observable IS present  -> SATISFIED
+    negative_fixture: str                   # committed fixture where the observable is ABSENT   -> REFUTED
+    demonstrated_at: float
+```
+
+- Qualifies a **probe implementation at a given digest** against committed positive **and** negative fixtures
+  for each observation class it supports. A probe that cannot produce **both** verdicts on those fixtures is not
+  qualified for that class.
+- These records exist **before any project plan is written**, because they belong to the probe, not to a
+  project. `StaticPlanAdmission` **MAY** therefore require them (§12, check 9).
+
+#### 9.1.2 `SpecFalsifiabilityEvidence` — qualifies one spec
+
+```python
+@dataclass(frozen=True)
+class SpecFalsifiabilityEvidence:
+    spec_id: str
+    semantic_hash: str
+    mechanism: Literal["controlled_product_mutation", "fixture_construction", "other_qualified"]
+    counterexample_ref: str                 # journal or fixture locator
+    observed: BehaviorVerdict               # MUST contrast with candidate_expectation
+```
+
+- Project- and spec-specific evidence that **this** `ProductProofSpec` can reject a controlled counterexample.
+- It **MUST NOT** be a prerequisite for plan freeze.
+- It **MUST** be required by Q2 before that spec may back Q6-qualified product evidence (§27, §36).
+
+**Why the split.** The previous draft required every spec's calibration record in `StaticPlanAdmission` *before
+plan freeze*, while also stating that most such records are produced by `StoryAdmission`, which only runs
+*after* plan freeze. That was circular and impossible (case **CAL-2**). Probe-level calibration is available
+before a plan exists; spec-level falsifiability belongs to qualification, not to admission.
 
 ---
 
@@ -312,15 +374,55 @@ SS-96 and SS-92 unexpressible in both directions.
 
 **`UNRESOLVABLE` is deleted.** A missing module is a completed observation that the behaviour is absent.
 
-### 10.1 The vacuity rule for negative invariants
+### 10.1 ContractSatisfaction — the derived semantic that planning routes on
 
-Subject existence **MUST** be an explicit precondition of every `MUST_NOT_HOLD` probe. When the precondition
-fails, the probe **MUST** return `EXECUTED` + `INDETERMINATE(PRECONDITION_ABSENT)`. It **MUST NOT** return a
-vacuous `SATISFIED`.
+`BehaviorVerdict` is a statement about **the observable named in the contract**. It is *not* a statement about
+whether the contract is met, because `candidate_expectation` is `SATISFIED` for `MUST_HOLD` and `REFUTED` for
+`MUST_NOT_HOLD`. Routing planning decisions on the raw verdict is therefore **polarity-inverted for every
+negative contract**.
 
-V1's defect record states the trap exactly: *"the prohibition is satisfied by an absent package, but a test that
-imports that package cannot be collected and is read as red."* This one rule answers it without reference to any
-file.
+```python
+class ContractSatisfaction(Enum):
+    SATISFIED     = "SATISFIED"
+    UNSATISFIED   = "UNSATISFIED"
+    INDETERMINATE = "INDETERMINATE"     # typed and reason-bearing
+
+def contract_satisfaction(result: ProbeResult, spec: ProductProofSpec) -> ContractSatisfaction:
+    if result.status is not ProbeExecutionStatus.EXECUTED:
+        raise InvariantError("contract satisfaction is undefined for a probe that did not execute")
+    if result.behavior_verdict is BehaviorVerdict.INDETERMINATE:
+        return ContractSatisfaction.INDETERMINATE          # reason preserved
+    return (ContractSatisfaction.SATISFIED
+            if result.behavior_verdict == spec.candidate_expectation
+            else ContractSatisfaction.UNSATISFIED)
+```
+
+- `ContractSatisfaction` **MUST** be **derived**, never separately recorded, so it cannot drift from the raw
+  verdict and the spec it was computed against. The journal records `ProbeResult` and the `spec_id`; the
+  satisfaction is recomputed.
+- **`StoryAdmission` and every planning decision MUST route on `ContractSatisfaction`, never on raw
+  `BehaviorVerdict`.**
+- The derivation function is frozen under **F2**, because re-deriving old evidence under a changed mapping would
+  silently re-interpret it.
+
+### 10.2 Subject absence
+
+Whether a contract is decidable with its subject absent is declared by `BehaviorContract.subject_absence` (§7)
+and **MUST NOT** be inferred from polarity.
+
+- **`REQUIRES_SUBJECT`** — subject absence means the contract cannot be decided. The probe **MUST** return
+  `EXECUTED` + `INDETERMINATE(PRECONDITION_ABSENT)`. It **MUST NOT** return a vacuous verdict.
+- **`ABSENCE_IS_DECIDABLE`** — subject absence is a valid observation. The probe **MUST** report the verdict the
+  observation implies, and `ContractSatisfaction` follows §10.1 normally.
+
+This replaces the previous blanket rule that *every* `MUST_NOT_HOLD` probe requires its subject to exist. That
+rule was correct for *"the CLI exists but MUST NOT write to stdout"* and wrong for *"a forbidden file MUST NOT
+exist"*, where absence is the whole point (cases **NEG-2**, **NEG-3**).
+
+V1's defect record states the trap the `REQUIRES_SUBJECT` branch closes: *"the prohibition is satisfied by an
+absent package, but a test that imports that package cannot be collected and is read as red."* AISEF's own
+`AC-STORY-01-01-4/-5` were `REQUIRES_SUBJECT` prohibitions over a subject the story was to create, so they
+resolve to `INDETERMINATE(PRECONDITION_ABSENT)` — decided by the contract's declaration, not by any file.
 
 ---
 
@@ -333,9 +435,10 @@ class ObligationRole(Enum):
     VERIFY    = "VERIFY"
 
 class ParentExpectation(Enum):
-    REFUTED_AT_PARENT   = "REFUTED_AT_PARENT"
-    SATISFIED_AT_PARENT = "SATISFIED_AT_PARENT"
-    UNCONSTRAINED       = "UNCONSTRAINED"
+    """Expected ContractSatisfaction at the parent. MUST NOT encode a raw BehaviorVerdict."""
+    UNSATISFIED_AT_PARENT = "UNSATISFIED_AT_PARENT"
+    SATISFIED_AT_PARENT   = "SATISFIED_AT_PARENT"
+    UNCONSTRAINED         = "UNCONSTRAINED"
 
 @dataclass(frozen=True)
 class PlanObligation:
@@ -393,7 +496,12 @@ The engine **MUST** execute no probes and **MUST NOT** invent a future story's p
 6. **proof-capability availability** — every `probe_id` resolves and its `probe_digest` matches;
 7. schema and traceability — every criterion reaches a `Requirement` through an approved contract;
 8. plan structure — an explicit order or DAG; no orphan obligations;
-9. probe calibration records exist for every referenced spec (§9.1).
+9. **`ProbeCapabilityCalibration`** exists and is valid for every referenced probe digest, for the observation
+   class each spec uses (§9.1.1).
+
+`SpecFalsifiabilityEvidence` (§9.1.2) **MUST NOT** be a plan-freeze prerequisite. It is produced by
+qualification, not by admission, and requiring it here would demand an artefact that `StoryAdmission` — which
+runs only after plan freeze — would have to supply (case **CAL-2**).
 
 A plan **MUST NOT** freeze unless `admitted` is true.
 
@@ -414,16 +522,23 @@ class StoryAdmissionDisposition(Enum):
     PROBE_INVALID       = "PROBE_INVALID"
 ```
 
-| role | expected | measured | disposition |
+**Routing is on `ContractSatisfaction` (§10.1), never on raw `BehaviorVerdict`.**
+
+| role | expected | measured `ContractSatisfaction` | disposition |
 |---|---|---|---|
-| INTRODUCE | REFUTED_AT_PARENT | `EXECUTED/REFUTED` | READY |
-| INTRODUCE | REFUTED_AT_PARENT | `EXECUTED/SATISFIED` | **PRE_SATISFIED** (§14) |
-| INTRODUCE | REFUTED_AT_PARENT | `EXECUTED/INDETERMINATE(PRECONDITION_ABSENT)` | READY — the subject not existing is the expected pre-state |
-| PRESERVE | SATISFIED_AT_PARENT | `EXECUTED/SATISFIED` | READY |
-| PRESERVE | SATISFIED_AT_PARENT | `EXECUTED/REFUTED` | PRECONDITION_BROKEN |
-| VERIFY | UNCONSTRAINED | any `EXECUTED/*` | READY |
-| any | — | `UNRUNNABLE` | PROBE_UNRUNNABLE — owner ENVIRONMENT |
-| any | — | `INVALID_SPEC` | PROBE_INVALID — owner PLAN / INTEGRATION |
+| INTRODUCE | UNSATISFIED_AT_PARENT | `UNSATISFIED` | READY |
+| INTRODUCE | UNSATISFIED_AT_PARENT | `SATISFIED` | **PRE_SATISFIED** (§14) |
+| PRESERVE | SATISFIED_AT_PARENT | `SATISFIED` | READY |
+| PRESERVE | SATISFIED_AT_PARENT | `UNSATISFIED` | PRECONDITION_BROKEN |
+| VERIFY | UNCONSTRAINED | determinate (`SATISFIED` or `UNSATISFIED`) | READY |
+| INTRODUCE | — | `INDETERMINATE(PRECONDITION_ABSENT)` | READY — for a `REQUIRES_SUBJECT` contract the subject not existing is the expected pre-state |
+| PRESERVE / VERIFY | — | `INDETERMINATE(PRECONDITION_ABSENT)` | PRECONDITION_BROKEN — a behaviour cannot be preserved over a subject that is gone |
+| any | — | `INDETERMINATE(other reason)` | PLAN_CONTRADICTION or PROBE_INVALID, by reason |
+| any | — | probe `UNRUNNABLE` | PROBE_UNRUNNABLE — owner ENVIRONMENT |
+| any | — | probe `INVALID_SPEC` | PROBE_INVALID — owner PLAN / INTEGRATION |
+
+Typed `INDETERMINATE` reasons retain explicit routing; a bare `INDETERMINATE` with no declared routing **MUST**
+be treated as `PROBE_INVALID`, never as a developer outcome.
 
 `PLAN_CONTRADICTION` **MUST** be raised when the measured parent state cannot be reconciled with the plan's own
 record — for example a `PRESERVE` measured `REFUTED` whose introducing story already reported `COMMIT`.
@@ -435,7 +550,8 @@ begin until the disposition is `READY`, or `PRE_SATISFIED` with remaining work.
 
 ## 14. PRE_SATISFIED and PLAN_DRIFT semantics
 
-An `INTRODUCE` obligation measured `SATISFIED` at the actual parent **MUST**:
+An `INTRODUCE` obligation whose **`ContractSatisfaction` at the actual parent is `SATISFIED`** (§10.1 — not the
+raw `BehaviorVerdict`) **MUST**:
 
 - be recorded `PRE_SATISFIED`;
 - emit `story/plan-drift` attributed through the dependency DAG to the completed story that introduced the
@@ -483,14 +599,67 @@ class AdequacyOutcome(Enum):
 
 @dataclass(frozen=True)
 class EngineeringTestAdequacy:
-    tests_execute_at_candidate: bool
-    tests_pass: bool
-    vacuity: Vacuity
-    relevance: Relevance
-    regressions_green: bool
-    sensitivity: SensitivityResult | None      # deferred from cycle 1
-    outcome: AdequacyOutcome
+    execution: TestExecution                   # §15.0 — the execution axis
+    vacuity: Vacuity                           # defined only when execution is EXECUTED
+    relevance: Relevance                       # defined only when execution is EXECUTED
+    regressions: TestExecution                 # same typed rules as the story's own tests
+    sensitivity: SensitivityResult | None       # deferred from cycle 1
+    outcome: AdequacyOutcome | None             # defined ONLY when execution is EXECUTED
 ```
+
+### 15.0 Test execution is typed, not boolean
+
+The previous draft used booleans `tests_execute_at_candidate` and `tests_pass`, and mapped "tests do not
+execute" to `INADEQUATE` with owner `DEVELOPER`. **That re-created SS-96 inside the adequacy gate** — the exact
+defect this architecture exists to remove, reintroduced one layer down. It is corrected here with the same
+two-axis discipline §10 applies to probes.
+
+```python
+class TestExecutionStatus(Enum):
+    EXECUTED   = "EXECUTED"      # the runner ran to completion and reported a result set
+    UNRUNNABLE = "UNRUNNABLE"    # the runner, tool or environment could not execute
+
+class TestOutcome(Enum):         # defined ONLY when EXECUTED
+    PASSED = "PASSED"
+    FAILED = "FAILED"
+
+class TestSelection(Enum):       # defined ONLY when EXECUTED
+    STORY_TESTS_RAN             = "STORY_TESTS_RAN"
+    NO_STORY_TESTS_MATCHED      = "NO_STORY_TESTS_MATCHED"       # developer selector/definition defect
+    STORY_TESTS_NOT_COLLECTABLE = "STORY_TESTS_NOT_COLLECTABLE"  # see the classification rule below
+
+@dataclass(frozen=True)
+class TestExecution:
+    status: TestExecutionStatus
+    outcome: TestOutcome | None          # None unless EXECUTED
+    selection: TestSelection | None      # None unless EXECUTED
+    owner_on_failure: Owner | None
+    reason: str | None
+```
+
+**Normative rules.**
+
+1. Runner, tool or environment cannot execute (interpreter absent, test framework missing, sandbox
+   unavailable, runner crash before reporting) ⇒ `UNRUNNABLE`, owner **`ENVIRONMENT`**, environment retry
+   policy. It **MUST NOT** be owner `DEVELOPER` and **MUST NOT** be `INADEQUATE` merely because it did not run.
+2. The command executes and the story's tests fail ⇒ `EXECUTED` + `FAILED`, an engineering-quality failure that
+   **MAY** be `INADEQUATE` with owner `DEVELOPER`.
+3. The command executes but the intended story tests do not actually run ⇒ classified through
+   `TestSelection`, **never by prose**. `NO_STORY_TESTS_MATCHED` is a developer-authored selector or definition
+   defect, owner `DEVELOPER`.
+4. `STORY_TESTS_NOT_COLLECTABLE` **MUST** be classified by the cause of the collection failure, which the runner
+   reports: an unresolvable import that resolves to a **declared environment dependency** is `UNRUNNABLE` /
+   `ENVIRONMENT` (this is SS-81(A)'s shape); one that resolves to the **project's own source tree** is owner
+   `DEVELOPER`; if the cause cannot be determined, the result is owner **`INTEGRATION`** and **MUST NOT** be
+   charged to the developer.
+5. **Regression execution MUST follow the same rules.** A regression suite that cannot run is `ENVIRONMENT`,
+   never a quality failure.
+6. **No "did not run ⇒ developer" path may exist anywhere in the adequacy gate.** This is
+   `INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE` applied to developer tests, and it is armed as an invariant.
+
+`AdequacyOutcome` is **defined only when `execution.status is EXECUTED`**. An `UNRUNNABLE` mandatory test
+execution is an **environment outcome**, not a non-blocking quality result, and **MUST NOT** be reported as
+`INCOMPLETE`.
 
 ### 15.1 Vacuity — the candidate-side control
 
@@ -503,6 +672,9 @@ developer's test files intact, run the story-owned tests.
 2. the developer test harness **executes**;
 3. the intended story-owned tests **actually execute**;
 4. the failure is an assertion or behavioural failure **attributable to removal of the story's product changes**.
+
+Conditions 2 and 3 are **the typed values of §15.0**, not a separate prose judgement: they hold exactly when
+the neutralised run reports `TestExecutionStatus.EXECUTED` and `TestSelection.STORY_TESTS_RAN`.
 
 Collection failure, import failure, invalid reconstruction, tool failure and environment failure **MUST** yield
 `INDETERMINATE` and **MUST NOT** be treated as proof that tests are non-vacuous.
@@ -528,11 +700,18 @@ least one **executable changed line** of the story diff.
 
 ### 15.3 Outcome
 
-- `INADEQUATE` — tests do not execute, tests fail, `VACUOUS`, `IRRELEVANT`, or regressions red. **MAY** block
-  under policy; owner `DEVELOPER`.
-- `INCOMPLETE` — `INDETERMINATE` vacuity or `UNMEASURABLE` relevance. **MUST NOT** block. **MUST NOT** be
-  charged to the developer. Recorded and reported as reduced engineering-quality coverage.
+Evaluated **only** when `execution.status is EXECUTED` (and likewise for `regressions`).
+
+- `INADEQUATE` — `EXECUTED` + `FAILED`, `NO_STORY_TESTS_MATCHED`, a developer-caused
+  `STORY_TESTS_NOT_COLLECTABLE`, `VACUOUS`, `IRRELEVANT`, or regressions `EXECUTED` + `FAILED`. **MAY** block
+  under project policy; owner `DEVELOPER`.
+- `INCOMPLETE` — `INDETERMINATE` vacuity or `UNMEASURABLE` relevance, i.e. **optional or secondary
+  measurements** only. **MUST NOT** block. **MUST NOT** be charged to the developer. Recorded and reported as
+  reduced engineering-quality coverage.
 - `ADEQUATE` — otherwise.
+
+When `execution.status is UNRUNNABLE` the gate produces **no** `AdequacyOutcome`: it emits an environment
+failure with owner `ENVIRONMENT` and defers to the environment retry policy (§22).
 
 `process/tdd-chronology` (V1's RED→GREEN check) is **recorded evidence only**. It **MUST NOT** block. An
 organisation **MAY** enforce it as policy; AISEF's product verdict **MUST NOT** consult it.
@@ -618,13 +797,40 @@ Required ordering: **processes reaped and the range proved empty → sandbox →
 | **StoryScope** | worktree, sandbox, process ranges, provider/agent sessions, tool grants, scratch, reviewer/security scopes |
 
 - A `StoryScope` **MUST NOT** own a journal writer. It **MUST** emit through the `RunScope` journal.
-- The `JournalWriter` **MUST** be acquired first in `RunScope` and released last.
 - `RunScope` disposal **MUST NOT** begin until every `StoryScope` has reported a terminal disposal outcome; a
   `StoryScope` that cannot report one **MUST** be recorded as a typed residual and `RunScope` disposal proceeds.
-- The run lease **MUST** be acquired **before** any read that a later write depends on.
 
-This removes the circularity in the earlier draft, where the writer recording a scope's teardown was owned by
-that scope.
+### 18.1 Lifetime order — the run lease is the outer boundary
+
+**The run lease, not the `JournalWriter`, is the outermost ownership boundary and is released last.** A lease
+released before the writer closes would let a second run acquire ownership while the first is still writing
+(case **RUN-2**).
+
+**Begin order (normative):**
+
+1. acquire the **run lease**;
+2. create and **fsync** an `OPEN` `RunTerminationSentinel`;
+3. open the `JournalWriter`;
+4. resolve and freeze `RunSpec`;
+5. normal run execution.
+
+The lease **MUST** be acquired before **every** state read whose later write depends on ownership.
+
+**Successful shutdown order (normative):**
+
+1. every `StoryScope` disposed;
+2. append and fsync `run/dispose-begin` as appropriate;
+3. append and fsync `run/end`;
+4. **close the `JournalWriter` successfully**;
+5. mark and fsync the sentinel `CLEAN`;
+6. **release the run lease LAST**.
+
+**Failure behaviour.** If the `JournalWriter` close fails, the sentinel **MUST** remain `OPEN`. If `CLEAN`
+cannot be durably recorded, the sentinel **MUST** remain `OPEN`. In both cases the next run's preflight
+conservatively reports **TORN** (case **RUN-1**).
+
+This ordering also removes the circularity of the original draft, where the writer recording a scope's teardown
+was owned by that scope.
 
 ---
 
@@ -634,12 +840,21 @@ A small, durable record **outside** the journal. It is **not evidence** and **no
 
 **Protocol.**
 
-1. At run begin, create and **fsync** an `OPEN` sentinel **before** normal execution proceeds.
-2. At successful termination, in this order: (a) all `StoryScope`s have disposed; (b) the journal's `run/end` is
-   durably written and fsync'd; (c) **only then** append or atomically mark the sentinel `CLEAN`.
-3. A best-effort `FAILED{stage, error}` record **MAY** be written. **No correctness property may depend on
+1. At run begin, **after the run lease is held** (§18.1), create and **fsync** an `OPEN` sentinel **before** the
+   `JournalWriter` is opened and before normal execution proceeds.
+2. At successful termination, in this order: (a) all `StoryScope`s have disposed; (b) `run/dispose-begin` and
+   `run/end` are durably written and fsync'd; (c) the `JournalWriter` **closes successfully**; (d) **only then**
+   mark and fsync the sentinel `CLEAN`; (e) the run lease is released **last**.
+3. If the `JournalWriter` close fails, or `CLEAN` cannot be durably recorded, the sentinel **MUST** remain
+   `OPEN`.
+4. A best-effort `FAILED{stage, error}` record **MAY** be written. **No correctness property may depend on
    successfully writing a failure record after a failure has already occurred.**
-4. Next-run preflight: `OPEN` without `CLEAN` **MUST** be reported as a **TORN** run.
+5. Next-run preflight: `OPEN` without `CLEAN` **MUST** be reported as a **TORN** run.
+
+**TORN is conservative, and MUST be read as such.** It states that clean termination was not durably observed
+*outside* the journal. It does **not** state that the journal is incomplete: a run may have a durable `run/end`
+and still be `TORN` because the process died before `CLEAN` (case **RUN-1**). The journal remains the authority
+for what the run did; the sentinel only reports whether termination was observed.
 
 **Constraints.**
 
@@ -842,7 +1057,7 @@ A rung **MUST NOT** be attempted while a lower rung is failing. A rung that cann
 |---|---|---|---|
 | **Q0 Static integrity** | schemas; provenance; catalogs (fail-closed **both** directions); static traceability; ownership graph incl. unique `INTRODUCE`; no-prose-control walker; `time`-not-read check; **checker calibration fixtures**; the `StaticPlanAdmissionEngine` **rules** | **no** | none |
 | **Q1 Semantic conformance** | `ProductProofSpec` semantics; the **`StaticPlanAdmissionEngine`** and **`StoryAdmission` engine**; independent policy model (barred from importing kernel decision modules); adversarial micro-workloads; **test-layout invariance**; **reference models for the six control-critical projections** | yes, on fixtures | none |
-| **Q2 Adequacy** | product mutation with audited equivalents; **probe calibration**; engineering-test sensitivity | yes | none |
+| **Q2 Adequacy** | product mutation with audited equivalents; **`ProbeCapabilityCalibration`** for every probe digest and observation class; **`SpecFalsifiabilityEvidence`** for every spec that will back Q6 product evidence; engineering-test sensitivity | yes | none |
 | **Q3 Fault injection** | named provider faults from a local fault server; tool/sandbox/environment faults; interruption and repair idempotence; disposal failures asserted against the OS | yes | none |
 | **Q4 Differential at scale** | 100 000 generated traces vs the reference model; 0 unexplained, 0 invariant violations, 0 exceptions, 0 silent skips, one kernel digest | model-level | none |
 | **Q5 Real-execution reproduction** | only the model stream replayed; **tools re-executed and diffed, never replayed**; final workspace state compared; request-header class pinning with a bounded drift budget; `assertConsumed`; determinism by normalization, not a faked clock | yes | none |
@@ -1059,8 +1274,9 @@ Implementation of cycle 1 is complete when **all** hold:
 1. Q0 green, with every checker calibrated against a committed known-bad fixture.
 2. Q1 green, including the **test-layout invariance** suite and reference models for all six control-critical
    projections.
-3. Q2: product mutation with **zero unaudited survivors**; every referenced `ProductProofSpec` has a calibration
-   record.
+3. Q2: product mutation with **zero unaudited survivors**; a valid `ProbeCapabilityCalibration` for every probe
+   digest and observation class in use; and `SpecFalsifiabilityEvidence` for every `ProductProofSpec` that will
+   back Q6-qualified product evidence. Neither is a plan-freeze prerequisite.
 4. Q3: the fault matrix green, including interruption idempotence and OS-asserted disposal.
 5. Q4: a fresh 100 000-trace differential with 0 unexplained divergences and 0 invariant violations, on the
    exact candidate.
@@ -1088,81 +1304,172 @@ implementation begins. Items marked *(adjusted)* changed mechanically as a conse
 | # | Frozen item | Why evidence compatibility requires it |
 |---|---|---|
 | **F1** | `Event` envelope, the event vocabulary, **and the typed enumerations carried in event payloads** *(adjusted)* | Every journal is written under them; a payload enum change re-interprets existing events |
-| **F2** | `ProbeExecutionStatus` × `BehaviorVerdict`, its six legal states, and the owner routing table | Everything routes on it; `UNRESOLVABLE` is deleted |
+| **F2** | `ProbeExecutionStatus` × `BehaviorVerdict`, its six legal states, the owner routing table, **and the `ContractSatisfaction` derivation** *(adjusted)* | Everything routes on it; `UNRESOLVABLE` is deleted. Re-deriving old evidence under a changed satisfaction mapping would silently re-interpret it |
 | **F3** | The `Owner` set — capped; a new member requires a cited measured defect | Budgets and retries derive from it |
-| **F4** | `BehaviorContract` → `ProductProofSpec` compiler contract and the inputs to `semantic_hash` | It is what `--check` compares against and what makes product evidence survive re-planning |
-| **F5** | `Probe` protocol: observation-harness / subject split, `enforcement()`, `ProbeResult` fields | The split keeps product absence out of the environment budget |
-| **F6** | `PlanObligation` shape, `ObligationRole`, `ParentExpectation` | The planning plane's vocabulary |
+| **F4** | `BehaviorContract` → `ProductProofSpec` compiler contract and the inputs to `semantic_hash`, **including `SubjectAbsence`** *(adjusted)* | It is what `--check` compares against and what makes product evidence survive re-planning. Absence semantics change what a spec means when the subject is missing |
+| **F5** | `Probe` protocol: observation-harness / subject split, `enforcement()`, `ProbeResult` fields, **and the two calibration contracts — `ProbeCapabilityCalibration` and `SpecFalsifiabilityEvidence`, each demonstrating contrast to `candidate_expectation`** *(adjusted)* | The split keeps product absence out of the environment budget; a changed calibration contract re-interprets whether existing probes were ever qualified |
+| **F6** | `PlanObligation` shape, `ObligationRole`, and `ParentExpectation` **expressed as a contract-satisfaction expectation, never a raw verdict** *(adjusted)* | The planning plane's vocabulary. Raw-verdict expectations are polarity-inverted for every negative contract |
 | **F7** | `StoryAdmissionDisposition` set | Gate ordering and budget routing depend on it |
-| **F8** | `RunScope` / `StoryScope` ownership split, the disposal ordering contract, **and the `RunTerminationSentinel` protocol** *(adjusted)* | Re-parenting resources later invalidates every disposal record; sentinel ordering defines what TORN means |
+| **F8** | `RunScope` / `StoryScope` ownership split, the disposal ordering contract, and the **run lease / sentinel / journal lifetime order — lease acquired first and released last** *(adjusted)* | Re-parenting resources later invalidates every disposal record; the lifetime order defines both what TORN means and when a second run may acquire ownership |
 | **F9** | The four cited identities, **including per-capability identity tuples, `IdentityGrade` and the aggregate minimum** *(adjusted)* | Comparability of every verdict |
 | **F10** | Invariants **I–IX**, each with its named enforcement mechanism | An invariant without a mechanism is a documented intention |
 | **F11** | The six control-critical projections, as a **closed** list | Only these may be cited by a gate |
 
 ---
 
-## Self-review A — consistency
+## Adversarial regression cases
 
-Checked for contradictory definitions across sections. Four were found and resolved in the text above; they are
-recorded rather than silently fixed.
+Deterministic worked examples. Each **MUST** be implemented as a conformance case in Q1.
 
-1. **`INDETERMINATE` is used on two axes.** `BehaviorVerdict.INDETERMINATE` (§10) and `Vacuity.INDETERMINATE`
-   (§15) are different types with different owners: the first may be `PLAN`/`INTEGRATION`, the second is never
-   chargeable to anyone. Resolved by keeping them as separate enums rather than a shared one, and by never
-   routing on the bare name.
-2. **"Blocking" for `EngineeringTestAdequacy`.** §15 says `INADEQUATE` **MAY** block *under policy*, while §27's
-   Q6 preconditions require the ladder green. Resolved: adequacy is a **story gate under project policy**, not a
-   ladder rung; a project that does not block on `INADEQUATE` still qualifies, and its engineering-quality
-   coverage is simply lower. No contradiction.
-3. **Probe digests and `semantic_hash`.** §8 includes `probe_digest` in the spec, and §35 says a probe change
-   bumps every dependent `semantic_hash`. That is intended and is stated in §35 with its cost acknowledged as an
-   open implementation question.
-4. **`STORY_ALREADY_SATISFIED` and commit conditions.** §17 requires `VerifiedProof` for commit; §14 skips the
-   developer call. Resolved explicitly in §14 and §16: verification is **not** skipped, only the developer call
-   is.
+### Polarity
+
+**NEG-1 · `MUST_NOT_HOLD`, forbidden behaviour PRESENT at parent.**
+Contract: *"the CLI MUST NOT write to stdout"*, `polarity = MUST_NOT_HOLD`, so
+`candidate_expectation = REFUTED`. At the parent the CLI does write to stdout, so the observable is present:
+`BehaviorVerdict = SATISFIED`. Satisfaction = `SATISFIED != REFUTED` ⇒ **`UNSATISFIED`**.
+Role `INTRODUCE`, expected `UNSATISFIED_AT_PARENT` ⇒ **`READY`**.
+**Never `PRE_SATISFIED`.** Routing on the raw verdict would have produced `PRE_SATISFIED` here — the inversion
+this correction removes.
+
+**NEG-2 · `MUST_NOT_HOLD`, forbidden behaviour ABSENT at parent, `ABSENCE_IS_DECIDABLE`.**
+Contract: *"a forbidden module MUST NOT exist"*. `candidate_expectation = REFUTED`. The module is absent, which
+is a valid observation for this contract: `BehaviorVerdict = REFUTED`. Satisfaction = `REFUTED == REFUTED` ⇒
+**`SATISFIED`**. Role `INTRODUCE` ⇒ **`PRE_SATISFIED`** + `PLAN_DRIFT`, no developer budget consumed. Correct:
+the prohibition already holds and the story has nothing to introduce.
+
+**NEG-3 · `MUST_NOT_HOLD` over an existing subject, `REQUIRES_SUBJECT`, subject absent.**
+Contract: *"the CLI MUST NOT write to stdout"*, but the CLI does not exist at the parent. The probe executes and
+its declared precondition fails ⇒ `EXECUTED` + **`INDETERMINATE(PRECONDITION_ABSENT)`**, so satisfaction is
+`INDETERMINATE`. Role `INTRODUCE` ⇒ **`READY`** (the subject not existing is the expected pre-state). Role
+`PRESERVE` or `VERIFY` ⇒ `PRECONDITION_BROKEN`. **No vacuous verdict is produced in any case.** This is AISEF's
+own `AC-STORY-01-01-4/-5`.
+
+### Calibration
+
+**CAL-1 · a `MUST_NOT_HOLD` probe that always returns `REFUTED`.**
+Such a probe always reports satisfaction `SATISFIED` — it can never fail a prohibition.
+`ProbeCapabilityCalibration` requires the probe to produce the **contrast** to `candidate_expectation`, i.e.
+`SATISFIED`, on a committed negative fixture where the forbidden behaviour **is** present. The always-`REFUTED`
+probe cannot, so it is **not qualified** for that observation class and `StaticPlanAdmission` check 9 rejects
+every plan referencing it. The previous rule — "must be observed producing `REFUTED`" — would have **passed**
+this probe.
+
+**CAL-2 · no plan may require a `StoryAdmission`-produced artefact to freeze.**
+`StaticPlanAdmission` requires only `ProbeCapabilityCalibration`, which belongs to the probe and exists before
+any project plan is written. `SpecFalsifiabilityEvidence` is produced by Q2 and is required only before a spec
+backs Q6-qualified product evidence. There is therefore **no path** on which plan freeze depends on an artefact
+that only exists after plan freeze.
+
+### Engineering tests
+
+**TEST-1 · the test runner is missing.**
+`pytest` (or the configured runner) is not installed. ⇒ `TestExecutionStatus.UNRUNNABLE`, owner
+**`ENVIRONMENT`**, environment retry policy. `AdequacyOutcome` is **not defined**. The result is
+**never `DEVELOPER`**, **never `INADEQUATE`**, and **never `INCOMPLETE`** — an `UNRUNNABLE` mandatory execution
+is an environment outcome, not a non-blocking quality result.
+
+**TEST-2 · tests execute and assertions fail.**
+⇒ `EXECUTED` + `FAILED` + `STORY_TESTS_RAN`. `AdequacyOutcome = INADEQUATE`, owner **`DEVELOPER`**, chargeable
+to the developer quality budget, and **MAY** block under project policy.
+
+*(Companion case, from rule 15.0.4:* the runner executes but the story's tests fail to collect because they
+import a module that does not exist. If that module resolves to a declared environment dependency ⇒
+`UNRUNNABLE` / `ENVIRONMENT`. If it resolves to the project's own source tree ⇒ `DEVELOPER`. If the cause cannot
+be determined ⇒ owner `INTEGRATION`, never `DEVELOPER`.)*
+
+### Run lifetime
+
+**RUN-1 · crash after a durable `run/end` but before `CLEAN`.**
+The journal is complete and authoritative. The sentinel is still `OPEN`, so the next run's preflight reports the
+run **TORN**. This is deliberately conservative: `TORN` says clean termination was not observed outside the
+journal, **not** that the journal is incomplete.
+
+**RUN-2 · a second run attempts to start while the first still holds its lease.**
+The lease is released **last**, after `CLEAN` (§18.1). A `run/end` in the journal is therefore **not** sufficient
+for a second run to acquire ownership: the second run blocks on the lease until the first has closed its writer,
+marked the sentinel and released. Under the previous ordering — writer outermost, lease inner — the second run
+could have started while the first was still writing.
+
+---
+
+## Review 1 — CONSISTENCY
+
+*No circular prerequisite or polarity inversion.*
+
+**Polarity.** Every planning decision now routes on `ContractSatisfaction` (§10.1), a derived value defined as
+`behavior_verdict == candidate_expectation`. Checked at each routing site: `StoryAdmission` (§13),
+`PRE_SATISFIED` (§14), commit conditions (§17), post-merge (§26). No site reads a raw `BehaviorVerdict` to make
+a planning decision. `ParentExpectation` no longer encodes a raw verdict (§11).
+
+**Circularity.** The one circular prerequisite — spec calibration required before plan freeze, produced after
+plan freeze — is removed by the two-level split (§9.1). `StaticPlanAdmission` check 9 now requires only
+`ProbeCapabilityCalibration`, whose inputs are committed fixtures belonging to the probe.
+
+**Absence handling.** `SubjectAbsence` is declared per contract and bound into `contract_hash` and
+`semantic_hash`. No rule infers it from polarity. The `REQUIRES_SUBJECT` branch preserves the
+`PLAN-V2.1-DEFECT-001` closure; the `ABSENCE_IS_DECIDABLE` branch stops the previous rule from over-blocking
+legitimate absence contracts.
+
+**Absence never charged to the developer.** Three sites were checked for the SS-96 shape: probe execution
+(§10 — only `UNRUNNABLE` routes to `ENVIRONMENT`, and `REFUTED` requires `EXECUTED`); test execution (§15.0 —
+corrected; the previous draft had "did not execute ⇒ `INADEQUATE`/`DEVELOPER`", which was the defect); and
+relevance measurement (§15.2 — capability absence is `UNMEASURABLE`, never `IRRELEVANT`).
+
+**Terminology.** `INDETERMINATE` appears on three types — `BehaviorVerdict`, `ContractSatisfaction` and
+`Vacuity`. They remain **separate enums** with different owners and are never routed on by bare name. This was
+noted in the previous pass and is unchanged.
 
 No unresolved contradiction remains.
 
-## Self-review B — defect traceability
+## Review 2 — IMPLEMENTABILITY
 
-Every cycle-1 change maps to a measured V1 defect family. Verified against
-[`V1-DEFECT-FAMILY-REGISTER.md`](../research/v2/V1-DEFECT-FAMILY-REGISTER.md):
+*Every prerequisite exists before the operation that requires it.*
 
-| change | families | measured instance |
+| operation | prerequisite | exists because |
 |---|---|---|
-| 1 contracts/specs/probes/two-axis | `FAM-PROOF-PLACEMENT`, `FAM-OUTCOME`, `FAM-TYPED-OUTCOMES` | `PLAN-V2.1-DEFECT-001`; SS-92; SS-96 |
-| 2 admission | `FAM-PLAN-OWNERSHIP` | `AC-STORY-04-01-2`; `AC-STORY-01-01-4/-5` |
-| 3 journal/projections | `FAM-BUDGET`, `FAM-QUALIFICATION-MEASUREMENT`, `FAM-EVIDENCE-SEMANTICS` | SS-64; SS-77; SS-81 |
-| 4 transaction/sentinel/identity | `FAM-PROCESS`, `FAM-OWNERSHIP`, `FAM-IDENTITY` | D-024/025/027; SS-65 |
-| 5 invariants armed | `FAM-OUTCOME` and the declared-but-unenforced class | SS-96 |
-| 6 Q0/Q1/Q3 | `FAM-PROOF-PLACEMENT`, `FAM-PROVIDER`, `FAM-QUALIFICATION` | `PLAN-V2.1-DEFECT-001`; the abandoned W1 profiles; SS-94 |
-| §15 adequacy | `FAM-EVIDENCE-SEMANTICS` | SS-81 |
-| §6 ContractApproval | — | **No measured defect.** Justified instead as the only control for residual 34.1, which the board explicitly required. Recorded as the one exception, not hidden. |
+| compile `ProductProofSpec` | approved `BehaviorContract` incl. `SubjectAbsence` | §6 approval precedes §8 compile |
+| `StaticPlanAdmission` check 6 | probe resolves, `probe_digest` matches | probes are harness artefacts, committed |
+| `StaticPlanAdmission` check 9 | `ProbeCapabilityCalibration` | belongs to the probe, committed with its fixtures, exists before any plan |
+| plan freeze | `StaticPlanAdmissionResult` | produced by the project at plan time (§12) |
+| `StoryAdmission` | frozen plan, exact `parent_sha`, probes | §13 runs after §12 and after the story's parent is frozen (S7) |
+| `ContractSatisfaction` | `ProbeResult` + `spec.candidate_expectation` | both present at every routing site |
+| Q6 product evidence | `SpecFalsifiabilityEvidence` | produced in Q2, which precedes Q6 in the ladder |
+| open `JournalWriter` | run lease held, sentinel `OPEN` fsync'd | §18.1 begin order |
+| mark sentinel `CLEAN` | all StoryScopes disposed, `run/end` durable, writer closed | §18.1 shutdown order |
+| release run lease | sentinel `CLEAN` | released last, §18.1 |
+| next-run preflight `TORN` | sentinel readable | created and fsync'd at begin, before anything else can fail |
 
-## Self-review C — simplification
+**No operation depends on an artefact produced later.** The one instance that did — CAL-2 — is corrected.
 
-For each component: *if removed, which measured defect becomes expressible again?*
+**One implementability note, not a blocker.** Rule 15.0.4 classifies a collection failure by whether the
+unresolvable import resolves to a declared environment dependency or to the project's own source tree. That
+requires the runner's structured collection-error output and a resolvable dependency manifest. Both exist for
+Python; for other target languages the classification may be unavailable, in which case the rule's own fallback
+applies — owner `INTEGRATION`, never `DEVELOPER`. The fallback is safe, so this is an implementation question
+(§36), not an architectural gap.
 
-| component | if removed | keep? |
+## Review 3 — SIMPLIFICATION
+
+*No new component unless required by the corrections above.*
+
+Four types were added by these corrections. Each is required by a named defect family and none introduces a
+plane, a service or a new architectural layer:
+
+| added | required by | if removed |
 |---|---|---|
-| Plane split (product vs plan) | every re-plan invalidates product evidence; `PLAN_OVERLAP` returns as a hard stop | **keep** |
-| Two-axis outcomes | SS-92 and SS-96 both become expressible | **keep** |
-| `MUST_NOT_HOLD` precondition rule | the vacuous-green half of `PLAN-V2.1-DEFECT-001` returns | **keep** |
-| `StaticPlanAdmission` | `AC-STORY-01-01-4/-5` is discovered 0/16 into a paid run instead of at plan time | **keep** |
-| `StoryAdmission` | parent state must come from somewhere; the only alternative is developer tests — the original defect | **keep** |
-| `PRE_SATISFIED`/`PLAN_DRIFT` | `AC-STORY-04-01-2` stops a run at 10/16 again | **keep** |
-| Candidate-side vacuity | no measured *product* defect returns (SS-81's product half is structurally closed); engineering-quality coverage drops | **keep — but it is the weakest-justified component.** It survives because it is cheap and because §15.3 makes it non-blocking when `INDETERMINATE`. If cycle 1 runs long, this is the first thing to cut. |
-| `RunTerminationSentinel` | a torn run is indistinguishable from a run still in progress | **keep** |
-| Reference models for six projections | SS-64 and SS-77 remain detectable only if the error differs between incremental and full folds | **keep** |
-| Ordered disposal + measured emptiness | D-024 returns | **keep** |
-| Invariants armed everywhere | the declared-but-unenforced class returns wholesale | **keep** |
-| `ContractApproval` | no measured defect returns | **keep on board instruction**, as the only control for residual 34.1 — and recorded in review B as the single component without defect traceability |
-| Third identity grade `OPAQUE` | a dynamic combo route could back a Q6 claim | **keep** |
-| `PlanQualityPolicy` | plan quality becomes unfalsifiable while delivery passes | **keep** |
-| Behaviour-aware scheduling | nothing — no measured defect | **removed / deferred** (§33) |
-| Engineering-test sensitivity in cycle 1 | nothing measured that relevance + vacuity do not cover | **deferred** (§33) |
-| Toolchain identity in cycle 1 | nothing measured; SS-65 is covered by image digest | **deferred** (§33) |
+| `ContractSatisfaction` (derived function, not stored) | defect A | every negative contract routes backwards; NEG-1 fails |
+| `SubjectAbsence` (one contract field) | defect A2 | legitimate "MUST NOT exist" contracts become undecidable; NEG-2 fails |
+| `ProbeCapabilityCalibration` / `SpecFalsifiabilityEvidence` (split of one existing concept) | defect B | plan freeze depends on a post-freeze artefact; CAL-1 and CAL-2 fail |
+| `TestExecution` / `TestOutcome` / `TestSelection` (types replacing two booleans) | defect C | "did not run ⇒ developer" returns, i.e. SS-96 inside the adequacy gate; TEST-1 fails |
 
-Two components were removed or deferred by this review in the previous pass and remain so. One component
-(`ContractApproval`) is retained without defect traceability, by board instruction, and that exception is
-recorded rather than papered over.
+Defect D added **no** type — it reorders existing acquisitions.
+
+**Nothing else was added.** No new freeze item (F12 was not created); five existing items were adjusted
+mechanically. The cycle-1 scope (§32) is unchanged in count and content; corrections A–D change how three of its
+six changes behave, not what they are.
+
+**Carried forward from the previous pass, unchanged.** `ContractApproval` remains the one component with **no
+measured V1 defect behind it**, retained on board instruction as the only control for residual §34.1. Recorded
+here rather than hidden. The candidate-side vacuity control remains the weakest-justified component and is still
+the first thing to cut if cycle 1 runs long — correction C strengthens that judgement, since vacuity is now
+explicitly a secondary measurement whose `INDETERMINATE` never blocks.
