@@ -222,11 +222,78 @@ def outcome_polarity() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- WP-1.4
+
+def routing_table() -> dict:
+    import itertools
+    from aisef2.arch.enums import BehaviorVerdict as V, Owner, ProbeExecutionStatus
+    from aisef2.control.owner import TAXONOMY, FailureCode, classify
+    from aisef2.control.routing import Site, UnroutableOutcome, route
+    from aisef2.errors import InvariantError
+    from aisef2.product.outcome import Executed, IndeterminateReason, InvalidSpec, Unrunnable, contract_satisfaction
+    from aisef2.product.spec import ProductProofSpec
+    fc = _module("aisef_v2_freeze_conformance", "validation/v2/freeze_conformance.py")
+    ks = _module("aisef_v2_kernel_static_checks", "validation/v2/kernel_static_checks.py")
+    specs = {p.stem: ProductProofSpec.from_json(json.loads(p.read_text(encoding="utf-8")))
+             for p in sorted((ROOT / "tests/v2/fixtures/p1/corpus/specs").glob("*.json"))}
+    results = [None, Unrunnable("x"), InvalidSpec("x"), Executed(V.SATISFIED), Executed(V.REFUTED),
+               Executed(V.INDETERMINATE, IndeterminateReason.PRECONDITION_ABSENT)]
+    rows = []
+    for site, result, (cid, spec) in itertools.product(Site, results, specs.items()):
+        r = route(result, spec, site)
+        executed = isinstance(result, Executed)
+        rows.append({"site": site.value, "spec": cid, "candidate_expectation": spec.candidate_expectation.value,
+                     "status": result.status.value if result else None,
+                     "verdict": result.behavior_verdict.value if executed else None,
+                     "reason": result.reason.value if executed and result.reason else None,
+                     "satisfaction": contract_satisfaction(result, spec).value if executed else None,
+                     "code": r.failure.code.value if r.failure else None,
+                     "owner": r.failure.owner.value if r.failure else None,
+                     "retryable": r.failure.retryable if r.failure else None,
+                     "budget": r.failure.budget.value if r.failure and r.failure.budget else None,
+                     "decided_by": r.decided_by})
+    by_key = {}
+    for row in rows:
+        if row["satisfaction"]:
+            by_key.setdefault((row["site"], row["satisfaction"], row["reason"]), set()).add(
+                (row["code"], row["decided_by"]))
+    oracle = fc._routing_matches_rfc(_rfc())
+    return {
+        "record": "AISEF V2 — P1 ROUTING TABLE", "work_package": "WP-1.4", "rfc_sections": ["22", "10"],
+        "taxonomy": {c.value: {"owner": TAXONOMY[c].owner.value, "retryable": TAXONOMY[c].retryable,
+                               "budget": TAXONOMY[c].budget.value if TAXONOMY[c].budget else None,
+                               "rule": TAXONOMY[c].rule} for c in FailureCode},
+        "routing": rows,
+        "rfc_table_comparison": {"state": oracle["state"], "detail": oracle["detail"]},
+        "properties": {
+            "routing_total_over_legal_space": len(rows) == len(Site) * len(results) * len(specs),
+            "routing_equals_rfc_table": oracle["state"] == "PASS",
+            "refuted_never_environment": all(r["owner"] != "ENVIRONMENT" for r in rows if r["verdict"] == "REFUTED"),
+            "only_unrunnable_routes_to_environment": all((r["owner"] == "ENVIRONMENT") == (r["status"] == "UNRUNNABLE")
+                                                         for r in rows),
+            "unrunnable_never_developer": all(r["owner"] != "DEVELOPER" for r in rows if r["status"] == "UNRUNNABLE"),
+            "no_did_not_run_to_developer_edge": all(r["owner"] != "DEVELOPER" for r in rows
+                                                    if r["status"] != ProbeExecutionStatus.EXECUTED.value),
+            "routes_on_satisfaction_never_raw_verdict": all(len(v) == 1 for v in by_key.values()),
+            "unmapped_outcome_fails_closed": _raises(lambda: route(object(), specs["BC-VERSION"], Site.CANDIDATE),
+                                                     UnroutableOutcome)
+                                             and _raises(lambda: classify("DEVELOPER"), InvariantError),
+            "invalid_credential_not_retryable": TAXONOMY[FailureCode.INVALID_CREDENTIAL].retryable is False,
+            "credentials_split": TAXONOMY[FailureCode.MISSING_CREDENTIAL] != TAXONOMY[FailureCode.INVALID_CREDENTIAL],
+            "owner_set_exactly_F3": [o.value for o in Owner] == _rfc().enums.get("Owner"),
+            "every_taxonomy_owner_in_F3": all(isinstance(TAXONOMY[c].owner, Owner) for c in FailureCode),
+            "retryable_only_in_taxonomy": ks.check(ROOT, ("RETRYABLE_ONLY_IN_TAXONOMY",)) == [],
+            "no_raw_verdict_routing": ks.check(ROOT, ("NO_RAW_VERDICT_ROUTING",)) == [],
+        },
+    }
+
+
 #: package -> (record path, builder, module that must exist before the record is built)
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-1.1": ("closure-evidence/v2/P1-CONTRACT-SHAPES.json", contract_shapes, "aisef2/product/contract.py"),
     "WP-1.2": ("closure-evidence/v2/P1-SPEC-COMPILER.json", spec_compiler, "aisef2/product/compiler.py"),
     "WP-1.3": ("closure-evidence/v2/P1-OUTCOME-POLARITY.json", outcome_polarity, "aisef2/product/outcome.py"),
+    "WP-1.4": ("closure-evidence/v2/P1-ROUTING-TABLE.json", routing_table, "aisef2/control/routing.py"),
 }
 
 

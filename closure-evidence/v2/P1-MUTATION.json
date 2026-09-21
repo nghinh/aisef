@@ -3,6 +3,850 @@
  "tool": "validation/v2/mutation.py",
  "targets": [
   {
+   "target": "aisef2/control/owner.py::TAXONOMY",
+   "kill_tests": [
+    "tests/v2/p1/test_routing.py"
+   ],
+   "source_sha256": "3a2040bb2b1c9588d79ff54c030c597391d7581503f9241a4a262a9b0b9333bb",
+   "mutants": 105,
+   "killed": 105,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L46 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 element 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 element 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 element 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 element 6 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L47 FailureCode.PROBE_UNRUNNABLE->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L47 FailureCode.PROBE_UNRUNNABLE->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L47 FailureCode.PROBE_UNRUNNABLE->PRECONDITION_ABSENT",
+     "killed": true
+    },
+    {
+     "mutant": "L47 FailureCode.PROBE_UNRUNNABLE->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L47 FailureCode.PROBE_UNRUNNABLE->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L47 FailureCode.PROBE_UNRUNNABLE->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L47 Owner.ENVIRONMENT->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L47 Owner.ENVIRONMENT->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L47 Owner.ENVIRONMENT->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L47 Owner.ENVIRONMENT->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L47 Owner.ENVIRONMENT->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L47 Owner.ENVIRONMENT->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L49 FailureCode.PROBE_INVALID_SPEC->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L49 FailureCode.PROBE_INVALID_SPEC->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L49 FailureCode.PROBE_INVALID_SPEC->PRECONDITION_ABSENT",
+     "killed": true
+    },
+    {
+     "mutant": "L49 FailureCode.PROBE_INVALID_SPEC->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L49 FailureCode.PROBE_INVALID_SPEC->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L49 FailureCode.PROBE_INVALID_SPEC->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L49 Owner.INTEGRATION->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L49 Owner.INTEGRATION->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L49 Owner.INTEGRATION->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L49 Owner.INTEGRATION->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L49 Owner.INTEGRATION->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L49 Owner.INTEGRATION->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L53 FailureCode.CONTRACT_UNSATISFIED->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L53 FailureCode.CONTRACT_UNSATISFIED->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L53 FailureCode.CONTRACT_UNSATISFIED->PRECONDITION_ABSENT",
+     "killed": true
+    },
+    {
+     "mutant": "L53 FailureCode.CONTRACT_UNSATISFIED->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L53 FailureCode.CONTRACT_UNSATISFIED->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L53 FailureCode.CONTRACT_UNSATISFIED->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L53 Owner.DEVELOPER->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L53 Owner.DEVELOPER->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L53 Owner.DEVELOPER->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L53 Owner.DEVELOPER->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L53 Owner.DEVELOPER->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L53 Owner.DEVELOPER->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L56 FailureCode.PRECONDITION_ABSENT->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L56 FailureCode.PRECONDITION_ABSENT->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L56 FailureCode.PRECONDITION_ABSENT->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L56 FailureCode.PRECONDITION_ABSENT->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L56 FailureCode.PRECONDITION_ABSENT->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L56 FailureCode.PRECONDITION_ABSENT->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L56 Owner.PLAN->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L56 Owner.PLAN->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L56 Owner.PLAN->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L56 Owner.PLAN->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L56 Owner.PLAN->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L56 Owner.PLAN->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L60 FailureCode.MISSING_CREDENTIAL->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L60 FailureCode.MISSING_CREDENTIAL->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L60 FailureCode.MISSING_CREDENTIAL->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L60 FailureCode.MISSING_CREDENTIAL->PRECONDITION_ABSENT",
+     "killed": true
+    },
+    {
+     "mutant": "L60 FailureCode.MISSING_CREDENTIAL->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L60 FailureCode.MISSING_CREDENTIAL->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Owner.ENVIRONMENT->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Owner.ENVIRONMENT->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Owner.ENVIRONMENT->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Owner.ENVIRONMENT->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Owner.ENVIRONMENT->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Owner.ENVIRONMENT->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L63 FailureCode.INVALID_CREDENTIAL->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L63 FailureCode.INVALID_CREDENTIAL->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L63 FailureCode.INVALID_CREDENTIAL->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L63 FailureCode.INVALID_CREDENTIAL->PRECONDITION_ABSENT",
+     "killed": true
+    },
+    {
+     "mutant": "L63 FailureCode.INVALID_CREDENTIAL->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L63 FailureCode.INVALID_CREDENTIAL->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Owner.PROVIDER->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Owner.PROVIDER->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Owner.PROVIDER->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Owner.PROVIDER->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Owner.PROVIDER->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Owner.PROVIDER->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L65 FailureCode.UNKNOWN->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L65 FailureCode.UNKNOWN->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L65 FailureCode.UNKNOWN->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L65 FailureCode.UNKNOWN->PRECONDITION_ABSENT",
+     "killed": true
+    },
+    {
+     "mutant": "L65 FailureCode.UNKNOWN->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L65 FailureCode.UNKNOWN->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L65 Owner.INTEGRATION->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L65 Owner.INTEGRATION->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L65 Owner.INTEGRATION->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L65 Owner.INTEGRATION->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L65 Owner.INTEGRATION->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L65 Owner.INTEGRATION->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L47 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L48 string '§10: UNRUNNABLE -> ENVIRONMENT (the only row that may); environment retry policy (§15 TEST-1)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L49 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L50 string '§10: INVALID_SPEC -> PLAN / INTEGRATION. INTEGRATION: §12 checks 2, 6 and 9 establish contract->spec integrity and probe availability before plan freeze, so a spec that reaches a probe unevaluable is a harness integration fault; §14: PROBE_INVALID is a hard blocker' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L53 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L54 string '§10: failure at the candidate -> DEVELOPER; §10.1: failure means ContractSatisfaction UNSATISFIED, never a raw verdict' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L56 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L57 string '§10: INDETERMINATE -> PLAN or INTEGRATION, by reason. PLAN: §13 routes PRECONDITION_ABSENT to PRECONDITION_BROKEN, a hard plan blocker (§14); §10.2 forbids a vacuous verdict, so the missing subject is a plan fact, never a developer failure' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L60 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L61 string '§22: distinct from INVALID_CREDENTIAL because the fix differs — provide the credential in the environment' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L63 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string '§22: MUST NOT be retryable (D-006: credential rejection charged to quality attempts)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L65 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L66 string '§22: a non-AISEF error flattens to UNKNOWN; §15: cause undetermined -> INTEGRATION, never DEVELOPER' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/control/owner.py::classify",
+   "kill_tests": [
+    "tests/v2/p1/test_routing.py"
+   ],
+   "source_sha256": "3a2040bb2b1c9588d79ff54c030c597391d7581503f9241a4a262a9b0b9333bb",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L73 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L75 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L73 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L73 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L73 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L74 string ' is not a typed failure code; flatten it to UNKNOWN first' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/control/owner.py::flatten",
+   "kill_tests": [
+    "tests/v2/p1/test_routing.py"
+   ],
+   "source_sha256": "3a2040bb2b1c9588d79ff54c030c597391d7581503f9241a4a262a9b0b9333bb",
+   "mutants": 12,
+   "killed": 12,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L80 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L80 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L80 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L80 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L80 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L80 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L80 FailureCode.UNKNOWN->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L80 FailureCode.UNKNOWN->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L80 FailureCode.UNKNOWN->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L80 FailureCode.UNKNOWN->PRECONDITION_ABSENT",
+     "killed": true
+    },
+    {
+     "mutant": "L80 FailureCode.UNKNOWN->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L80 FailureCode.UNKNOWN->INVALID_CREDENTIAL",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/control/routing.py::_CANDIDATE",
+   "kill_tests": [
+    "tests/v2/p1/test_routing.py"
+   ],
+   "source_sha256": "60a1a5ca18272670551ad4e82644f5681a5ddf9c56ed97a617192bfa001d8b87",
+   "mutants": 24,
+   "killed": 24,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L53 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L53 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L54 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L54 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L55 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L55 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L54 FailureCode.CONTRACT_UNSATISFIED->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L54 FailureCode.CONTRACT_UNSATISFIED->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L54 FailureCode.CONTRACT_UNSATISFIED->PRECONDITION_ABSENT",
+     "killed": true
+    },
+    {
+     "mutant": "L54 FailureCode.CONTRACT_UNSATISFIED->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L54 FailureCode.CONTRACT_UNSATISFIED->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L54 FailureCode.CONTRACT_UNSATISFIED->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L55 FailureCode.PRECONDITION_ABSENT->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L55 FailureCode.PRECONDITION_ABSENT->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L55 FailureCode.PRECONDITION_ABSENT->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L55 FailureCode.PRECONDITION_ABSENT->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L55 FailureCode.PRECONDITION_ABSENT->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L55 FailureCode.PRECONDITION_ABSENT->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L53 ContractSatisfaction.SATISFIED->UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L53 ContractSatisfaction.SATISFIED->INDETERMINATE",
+     "killed": true
+    },
+    {
+     "mutant": "L54 ContractSatisfaction.UNSATISFIED->SATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L54 ContractSatisfaction.UNSATISFIED->INDETERMINATE",
+     "killed": true
+    },
+    {
+     "mutant": "L55 ContractSatisfaction.INDETERMINATE->SATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L55 ContractSatisfaction.INDETERMINATE->UNSATISFIED",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/control/routing.py::route",
+   "kill_tests": [
+    "tests/v2/p1/test_routing.py"
+   ],
+   "source_sha256": "60a1a5ca18272670551ad4e82644f5681a5ddf9c56ed97a617192bfa001d8b87",
+   "mutants": 49,
+   "killed": 49,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L60 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L62 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L64 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L66 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L68 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L71 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L74 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L77 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L60 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L62 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L63 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L64 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L66 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L67 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L68 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L69 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L71 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L72 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L73 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L73 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L74 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L66 ProbeExecutionStatus.UNRUNNABLE->EXECUTED",
+     "killed": true
+    },
+    {
+     "mutant": "L66 ProbeExecutionStatus.UNRUNNABLE->INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L68 ProbeExecutionStatus.INVALID_SPEC->EXECUTED",
+     "killed": true
+    },
+    {
+     "mutant": "L68 ProbeExecutionStatus.INVALID_SPEC->UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L71 Site.PARENT->CANDIDATE",
+     "killed": true
+    },
+    {
+     "mutant": "L77 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L77 string '§10 at the candidate, on ContractSatisfaction' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L63 string '§10: not attempted — chargeable to no one' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L67 string '§10: could not look' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L69 string '§10: not evaluable by this probe' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L72 string '§10: a plan disposition at the parent; §13 decides it' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L77 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L61 string 'unknown routing site ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L65 string ' is not a typed probe result' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L67 FailureCode.PROBE_UNRUNNABLE->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L67 FailureCode.PROBE_UNRUNNABLE->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L67 FailureCode.PROBE_UNRUNNABLE->PRECONDITION_ABSENT",
+     "killed": true
+    },
+    {
+     "mutant": "L67 FailureCode.PROBE_UNRUNNABLE->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L67 FailureCode.PROBE_UNRUNNABLE->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L67 FailureCode.PROBE_UNRUNNABLE->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L69 FailureCode.PROBE_INVALID_SPEC->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L69 FailureCode.PROBE_INVALID_SPEC->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L69 FailureCode.PROBE_INVALID_SPEC->PRECONDITION_ABSENT",
+     "killed": true
+    },
+    {
+     "mutant": "L69 FailureCode.PROBE_INVALID_SPEC->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L69 FailureCode.PROBE_INVALID_SPEC->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L69 FailureCode.PROBE_INVALID_SPEC->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L75 string 'no routing row for ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L75 string ' with reason ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
    "target": "aisef2/product/compiler.py::compile_spec",
    "kill_tests": [
     "tests/v2/p1/test_spec_compiler.py"

@@ -51,6 +51,12 @@ TARGETS: dict[str, list[str]] = {
     "aisef2/product/outcome.py::contract_satisfaction": ["tests/v2/p1/test_outcome.py"],
     "aisef2/product/outcome.py::on_subject_absent": ["tests/v2/p1/test_outcome.py"],
     "aisef2/product/outcome.py::__post_init__": ["tests/v2/p1/test_outcome.py"],
+    # WP-1.4: the taxonomy and the routing table are data; both are mutated like functions
+    "aisef2/control/owner.py::TAXONOMY": ["tests/v2/p1/test_routing.py"],
+    "aisef2/control/owner.py::classify": ["tests/v2/p1/test_routing.py"],
+    "aisef2/control/owner.py::flatten": ["tests/v2/p1/test_routing.py"],
+    "aisef2/control/routing.py::_CANDIDATE": ["tests/v2/p1/test_routing.py"],
+    "aisef2/control/routing.py::route": ["tests/v2/p1/test_routing.py"],
 }
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
@@ -95,26 +101,43 @@ def _inert(func: ast.AST, doc: ast.AST | None) -> set[int]:
     return {id(n) for root in inert for n in ast.walk(root)}
 
 
+def _root(tree: ast.Module, name: str) -> tuple[ast.AST, set[int]] | None:
+    """A function named `name` (minus its docstring and annotations), or the value of a module-level assignment
+    to `name` — so a routing table or a taxonomy held as data is a mutation target like a function is."""
+    for n in ast.walk(tree):
+        if isinstance(n, ast.FunctionDef | ast.AsyncFunctionDef) and n.name == name:
+            doc = n.body[0] if n.body and isinstance(n.body[0], ast.Expr) and isinstance(n.body[0].value, ast.Constant) \
+                and isinstance(n.body[0].value.value, str) else None
+            return n, _inert(n, doc)
+    for n in tree.body:
+        if isinstance(n, ast.Assign):
+            names = [getattr(x, "id", None) for x in n.targets]
+        elif isinstance(n, ast.AnnAssign) and n.value is not None:
+            names = [getattr(n.target, "id", None)]
+        else:
+            continue
+        if name in names:
+            return n.value, set()
+    return None
+
+
 def mutants(module_src: str, func: str, enums: dict[str, list[str]]) -> list[tuple[str, str]]:
-    """(description, mutated module source) for every mutation site inside `func`."""
+    """(description, mutated module source) for every mutation site inside the function or table `func`."""
     tree = ast.parse(module_src)
-    target = next((n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef | ast.AsyncFunctionDef)
-                   and n.name == func), None)
-    if target is None:
-        raise SystemExit(f"function {func} not found")
-    doc = target.body[0] if target.body and isinstance(target.body[0], ast.Expr) \
-        and isinstance(target.body[0].value, ast.Constant) and isinstance(target.body[0].value.value, str) else None
-    skip = _inert(target, doc)
+    found = _root(tree, func)
+    if found is None:
+        raise SystemExit(f"function or module-level table {func} not found")
+    target, skip = found
     sites = [n for n in ast.walk(target) if n is not target and id(n) not in skip]
     out = []
 
     def emit(desc: str, node: ast.AST, apply) -> None:
         t2 = copy.deepcopy(tree)
-        f2 = next(n for n in ast.walk(t2) if isinstance(n, ast.FunctionDef | ast.AsyncFunctionDef) and n.name == func)
-        skip2 = _inert(f2, f2.body[0] if doc is not None else None)
+        f2, skip2 = _root(t2, func)
         twin = [n for n in ast.walk(f2) if n is not f2 and id(n) not in skip2][sites.index(node)]
         if apply(twin, f2) is not False:
-            out.append((f"L{getattr(node, 'lineno', target.lineno)} {desc}", ast.unparse(ast.fix_missing_locations(t2))))
+            out.append((f"L{getattr(node, 'lineno', getattr(target, 'lineno', 0))} {desc}",
+                        ast.unparse(ast.fix_missing_locations(t2))))
 
     for node in sites:
         if isinstance(node, ast.Compare):

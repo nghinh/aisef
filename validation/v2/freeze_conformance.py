@@ -35,7 +35,7 @@ FROZEN_IDS = [f"F{i}" for i in range(1, 12)]
 #: The phase the Cycle-1 implementation has reached. Every sub-check owned by a package in this phase or an earlier
 #: one must PASS. Advanced by one reviewed line at each phase boundary.
 # ponytail: a constant, not a progress database; move it into a progress record if phases start overlapping.
-CURRENT_PHASE = "P0"
+CURRENT_PHASE = "P1"
 
 PASS, FAIL, PENDING = "PASS", "FAIL", "PENDING"
 
@@ -260,6 +260,68 @@ def _satisfaction_matches_rfc(rfc: RFC) -> dict:
             "table": table}
 
 
+def _routing_matches_rfc(rfc: RFC) -> dict:
+    """F2 freezes the owner routing table. The reference is the RFC §10 table, parsed row by row ("owner on
+    failure"), its two normative sentences, and §10.1's rule that routing is on ContractSatisfaction. Checked on the
+    implementation for both sites: MUST_HOLD rows directly; MUST_NOT_HOLD by polarity symmetry."""
+    s = rfc.section("## 10. Two-axis proof outcomes", "### 10.1")
+    rows = re.findall(r"^\| (EXECUTED|UNRUNNABLE|INVALID_SPEC|\*\(absent\)\*) \| (SATISFIED|REFUTED|INDETERMINATE|—) "
+                      r"\| [^|]+ \| ([^|]+) \|$", s, re.M)
+    rules = ("Only `UNRUNNABLE` **MAY** route to `ENVIRONMENT`", "`UNRUNNABLE` **MUST NOT** route to `DEVELOPER`")
+    admission = rfc.section("## 13. StoryAdmission", "## 14.")
+    parent_by_admission = all(tok in admission for tok in ("`UNSATISFIED`", "`SATISFIED`",
+                                                            "`INDETERMINATE(PRECONDITION_ABSENT)`"))
+    if len(rows) != 6 or not all(r in s for r in rules) or not parent_by_admission:
+        return {"state": FAIL, "detail": "RFC reference (§10 table, its routing rules, §13 table) could not be extracted"}
+    if not symbol_present("aisef2.control.routing", "route"):
+        return {"state": None, "detail": "aisef2.control.routing.route not implemented"}
+    from types import SimpleNamespace
+    from aisef2.arch.enums import BehaviorVerdict as V, Owner
+    from aisef2.control import routing as RT
+    from aisef2.product import outcome as O
+    names = {o.value for o in Owner}
+
+    def allowed(cell: str, site: str):
+        part = next((p for p in cell.split(";") if f"at {site}" in p), cell) if ";" in cell else cell
+        if "plan disposition" in part:
+            return RT.STORY_ADMISSION
+        found = {n for n in names if re.search(rf"\b{n}\b", part)}
+        return found or None
+
+    make = {("EXECUTED", "SATISFIED"): O.Executed(V.SATISFIED), ("EXECUTED", "REFUTED"): O.Executed(V.REFUTED),
+            ("EXECUTED", "INDETERMINATE"): O.Executed(V.INDETERMINATE, O.IndeterminateReason.PRECONDITION_ABSENT),
+            ("UNRUNNABLE", "—"): O.Unrunnable("x"), ("INVALID_SPEC", "—"): O.InvalidSpec("x"), ("*(absent)*", "—"): None}
+    hold, hold_not = SimpleNamespace(candidate_expectation=V.SATISFIED), SimpleNamespace(candidate_expectation=V.REFUTED)
+    problems, table = [], []
+    for status, verdict, cell in rows:
+        result = make[(status, verdict)]
+        for site in RT.Site:
+            want = allowed(cell.strip(), site.value.lower())
+            if status == "EXECUTED" and site is RT.Site.PARENT:
+                want = RT.STORY_ADMISSION  # §13: every parent-side satisfaction is a StoryAdmission disposition
+            got = RT.route(result, hold, site)
+            owner = got.failure.owner.value if got.failure else None
+            table.append([site.value, status, verdict, cell.strip(), owner, got.decided_by])
+            ok = (got.failure is None and got.decided_by == RT.STORY_ADMISSION) if want == RT.STORY_ADMISSION else \
+                 (got.failure is None and got.decided_by is None) if want is None else (owner in want)
+            if not ok:
+                problems.append(f"{site.value} {status}/{verdict}: RFC '{cell.strip()}', implemented {owner or got.decided_by}")
+    flip = {V.SATISFIED: V.REFUTED, V.REFUTED: V.SATISFIED}
+    for site in RT.Site:
+        for v in (V.SATISFIED, V.REFUTED):
+            if RT.route(O.Executed(v), hold_not, site) != RT.route(O.Executed(flip[v]), hold, site):
+                problems.append(f"{site.value}: MUST_NOT_HOLD {v.value} routes differently from MUST_HOLD {flip[v].value}")
+    env = {r[1] for r in table if r[4] == "ENVIRONMENT"}
+    if env - {"UNRUNNABLE"}:
+        problems.append(f"only UNRUNNABLE may route to ENVIRONMENT; also {sorted(env - {'UNRUNNABLE'})}")
+    if any(r[1] == "UNRUNNABLE" and r[4] == "DEVELOPER" for r in table):
+        problems.append("UNRUNNABLE routes to DEVELOPER")
+    if problems:
+        return {"state": FAIL, "detail": "routing differs from the RFC §10 table", "problems": problems, "table": table}
+    return {"state": PASS, "detail": f"equals the RFC §10 table on {len(table)} (site, state) rows, polarity-symmetric",
+            "table": table}
+
+
 def subchecks(rfc: RFC, code) -> list[dict]:
     e = rfc.enums
     V = _vocab
@@ -275,8 +337,7 @@ def subchecks(rfc: RFC, code) -> list[dict]:
     for n in ("ProbeExecutionStatus", "BehaviorVerdict", "ContractSatisfaction"):
         add("F2", f"F2.enum.{n}", "WP-0.2", V(n, e.get(n, []), code))
     add("F2", "F2.contract_satisfaction_derivation", "WP-1.3", _satisfaction_matches_rfc(rfc))
-    add("F2", "F2.owner_routing_table", "WP-1.4",
-        _shape("aisef2.control.routing", "route", ["six legal (status, verdict) states -> owner"]))
+    add("F2", "F2.owner_routing_table", "WP-1.4", _routing_matches_rfc(rfc))
     add("F3", "F3.owner_set", "WP-0.2", V("Owner", e.get("Owner", []), code))
     for n in ("Polarity", "SubjectAbsence"):
         add("F4", f"F4.enum.{n}", "WP-0.2", V(n, e.get(n, []), code))

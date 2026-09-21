@@ -1,7 +1,7 @@
 {
  "record": "AISEF V2 — F1–F11 CONFORMANCE",
  "work_package": "WP-0.3",
- "current_phase": "P0",
+ "current_phase": "P1",
  "reference": "extracted from the RFC normative body; never transcribed",
  "items": [
   {
@@ -23,7 +23,7 @@
   },
   {
    "id": "F2",
-   "state": "PENDING",
+   "state": "PASS",
    "subchecks": [
     "F2.enum.ProbeExecutionStatus",
     "F2.enum.BehaviorVerdict",
@@ -31,9 +31,7 @@
     "F2.contract_satisfaction_derivation",
     "F2.owner_routing_table"
    ],
-   "pending_on": [
-    "WP-1.4"
-   ]
+   "pending_on": []
   },
   {
    "id": "F3",
@@ -300,18 +298,113 @@
      "InvariantError"
     ]
    ],
-   "required_now": false
+   "required_now": true
   },
   {
    "item": "F2",
    "id": "F2.owner_routing_table",
    "implemented_by": "WP-1.4",
-   "state": "PENDING",
-   "detail": "aisef2.control.routing.route not implemented",
-   "rfc_reference": [
-    "six legal (status, verdict) states -> owner"
+   "state": "PASS",
+   "detail": "equals the RFC §10 table on 12 (site, state) rows, polarity-symmetric",
+   "table": [
+    [
+     "PARENT",
+     "EXECUTED",
+     "SATISFIED",
+     "—",
+     null,
+     "STORY_ADMISSION"
+    ],
+    [
+     "CANDIDATE",
+     "EXECUTED",
+     "SATISFIED",
+     "—",
+     null,
+     null
+    ],
+    [
+     "PARENT",
+     "EXECUTED",
+     "REFUTED",
+     "DEVELOPER at candidate; a plan disposition at parent",
+     null,
+     "STORY_ADMISSION"
+    ],
+    [
+     "CANDIDATE",
+     "EXECUTED",
+     "REFUTED",
+     "DEVELOPER at candidate; a plan disposition at parent",
+     "DEVELOPER",
+     null
+    ],
+    [
+     "PARENT",
+     "EXECUTED",
+     "INDETERMINATE",
+     "PLAN or INTEGRATION, by reason",
+     null,
+     "STORY_ADMISSION"
+    ],
+    [
+     "CANDIDATE",
+     "EXECUTED",
+     "INDETERMINATE",
+     "PLAN or INTEGRATION, by reason",
+     "PLAN",
+     null
+    ],
+    [
+     "PARENT",
+     "UNRUNNABLE",
+     "—",
+     "**ENVIRONMENT**",
+     "ENVIRONMENT",
+     null
+    ],
+    [
+     "CANDIDATE",
+     "UNRUNNABLE",
+     "—",
+     "**ENVIRONMENT**",
+     "ENVIRONMENT",
+     null
+    ],
+    [
+     "PARENT",
+     "INVALID_SPEC",
+     "—",
+     "PLAN / INTEGRATION",
+     "INTEGRATION",
+     null
+    ],
+    [
+     "CANDIDATE",
+     "INVALID_SPEC",
+     "—",
+     "PLAN / INTEGRATION",
+     "INTEGRATION",
+     null
+    ],
+    [
+     "PARENT",
+     "*(absent)*",
+     "—",
+     "chargeable to no one",
+     null,
+     null
+    ],
+    [
+     "CANDIDATE",
+     "*(absent)*",
+     "—",
+     "chargeable to no one",
+     null,
+     null
+    ]
    ],
-   "required_now": false
+   "required_now": true
   },
   {
    "item": "F3",
@@ -351,7 +444,7 @@
    "implemented_by": "WP-1.1",
    "state": "PASS",
    "detail": "Subject fields equal the RFC in order (2)",
-   "required_now": false
+   "required_now": true
   },
   {
    "item": "F4",
@@ -359,7 +452,7 @@
    "implemented_by": "WP-1.1",
    "state": "PASS",
    "detail": "BehaviorContract fields equal the RFC in order (9)",
-   "required_now": false
+   "required_now": true
   },
   {
    "item": "F4",
@@ -367,7 +460,7 @@
    "implemented_by": "WP-1.2",
    "state": "PASS",
    "detail": "ProductProofSpec fields equal the RFC in order (9)",
-   "required_now": false
+   "required_now": true
   },
   {
    "item": "F4",
@@ -375,7 +468,7 @@
    "implemented_by": "WP-1.2",
    "state": "PASS",
    "detail": "semantic_hash differs for REQUIRES_SUBJECT and ABSENCE_IS_DECIDABLE",
-   "required_now": false
+   "required_now": true
   },
   {
    "item": "F5",
@@ -582,8 +675,8 @@
   }
  ],
  "summary": {
-  "PASS": 3,
-  "PENDING": 8,
+  "PASS": 4,
+  "PENDING": 7,
   "FAIL": 0
  },
  "ratchet_violations": []
