@@ -61,7 +61,11 @@
    "other_qualified"
   ],
   "plan_freeze_prerequisite": false,
-  "planning_modules_scanned": []
+  "planning_modules_scanned": [
+   "aisef2/plan/__init__.py",
+   "aisef2/plan/obligation.py",
+   "aisef2/plan/static_admission.py"
+  ]
  },
  "f5_conformance": {
   "state": "PASS",

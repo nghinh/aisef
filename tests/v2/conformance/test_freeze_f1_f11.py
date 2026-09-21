@@ -105,10 +105,18 @@ class Conformance(unittest.TestCase):
         self.assertIn("could not be extracted", self._sub(r, "F3.owner_set")["detail"])
 
     def test_advancing_the_phase_turns_pending_into_ratchet_failures(self):
-        with mock.patch.object(fc, "CURRENT_PHASE", "P2"):
+        with mock.patch.object(fc, "CURRENT_PHASE", "P3"):
             r = fc.evaluate(self.rfc, self.code, self.manifest)
-        self.assertEqual(self._sub(r, "F6.plan_obligation_shape")["state"], fc.FAIL)
-        self.assertIn("F6.plan_obligation_shape", r["ratchet_violations"])
+        self.assertEqual(self._sub(r, "F11.projections_implemented")["state"], fc.FAIL)
+        self.assertIn("F11.projections_implemented", r["ratchet_violations"])
+
+    def test_F6_plan_obligation_is_compared_field_by_field(self):
+        self.assertEqual(self._sub(self.result, "F6.plan_obligation_shape")["state"], fc.PASS)
+        broken = self.rfc.replace("    expected_parent: ParentExpectation\n", "    expected_parent: BehaviorVerdict\n"
+                                  "    parent_verdict: BehaviorVerdict\n", 1)
+        self.assertNotEqual(broken, self.rfc, "fixture edit did not apply")
+        self.assertEqual(self._sub(fc.evaluate(broken, self.code, self.manifest), "F6.plan_obligation_shape")["state"],
+                         fc.FAIL)
 
     def test_V2_001_the_old_candidate_routing_fails_F2(self):
         """ARCHITECTURE-EXCEPTION-V2-001 reproducer: PRECONDITION_ABSENT at the candidate charged to PLAN."""

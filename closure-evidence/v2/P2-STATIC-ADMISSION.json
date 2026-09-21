@@ -1,0 +1,100 @@
+{
+ "record": "AISEF V2 — P2 STATIC ADMISSION",
+ "work_package": "WP-2.3",
+ "rfc_sections": [
+  "11",
+  "12"
+ ],
+ "frozen_items": [
+  "F6"
+ ],
+ "engine": {
+  "digest": "eb9df71edd3e0d606c8790eea0b61832c17cb835062b1e056a5fea1a203215fa",
+  "sources": [
+   "plan/static_admission.py",
+   "plan/obligation.py"
+  ],
+  "checks": [
+   "requirement_coverage",
+   "contract_spec_integrity",
+   "ownership",
+   "dependency_dag",
+   "contradictions",
+   "proof_capability",
+   "traceability",
+   "plan_structure",
+   "probe_calibration"
+  ]
+ },
+ "well_formed_plan": {
+  "admitted": true,
+  "result_digest": "249d62b87d2194455a39f622f66742096309a10315c2809ed657817f7419b2fd",
+  "checks_passed": [
+   "requirement_coverage",
+   "contract_spec_integrity",
+   "ownership",
+   "dependency_dag",
+   "contradictions",
+   "proof_capability",
+   "traceability",
+   "plan_structure",
+   "probe_calibration"
+  ]
+ },
+ "adversarial": {
+  "1 an approved requirement with no contract": [
+   "requirement_coverage"
+  ],
+  "2 a committed spec that is not the derivation": [
+   "contract_spec_integrity"
+  ],
+  "3 duplicate INTRODUCE ownership for one spec": [
+   "contradictions",
+   "ownership"
+  ],
+  "4 a cyclic dependency DAG": [
+   "dependency_dag",
+   "plan_structure"
+  ],
+  "5 a PRESERVE ordered before its INTRODUCE": [
+   "contradictions"
+  ],
+  "5 a role/expectation pair with no §13 row": [
+   "contradictions"
+  ],
+  "6 a probe digest that does not match (scenario D, statically)": [
+   "contract_spec_integrity",
+   "proof_capability"
+  ],
+  "7 a contract without approval": [
+   "contract_spec_integrity",
+   "traceability"
+  ],
+  "8 an orphan obligation": [
+   "plan_structure"
+  ],
+  "9 a missing probe calibration": [
+   "probe_calibration"
+  ]
+ },
+ "implementation_notes": {
+  "depends_on": "criterion ids that must complete first (board resolution §1); the story order is induced from them",
+  "role_expectation_pairs": "a pair outside RFC §13's table (e.g. INTRODUCE with SATISFIED_AT_PARENT) has no StoryAdmission row; check 5 rejects it — fail closed, no meaning derived",
+  "freeze": "require_admitted re-derives admission at freeze time; a stored result is never taken on trust"
+ },
+ "f6_conformance": {
+  "state": "PASS",
+  "detail": "PlanObligation fields equal the RFC in order (7)"
+ },
+ "properties": {
+  "nine_checks_implemented_in_rfc_order": true,
+  "well_formed_plan_admitted": true,
+  "each_check_rejects_its_case": true,
+  "result_digest_stable": true,
+  "no_probe_executes_in_the_engine": true,
+  "no_future_parent_sha_invented": true,
+  "CAL_2_no_plan_freeze_path_needs_spec_falsifiability": true,
+  "planning_code_never_names_the_raw_verdict": true,
+  "f6_plan_obligation_equals_rfc": true
+ }
+}

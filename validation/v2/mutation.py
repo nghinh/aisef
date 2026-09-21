@@ -63,6 +63,7 @@ P1_TARGETS: dict[str, list[str]] = {
     "aisef2/control/routing.py::route": ["tests/v2/p1/test_routing.py"],
 }
 _PROTOCOL_TESTS = ["tests/v2/p2/test_probe_protocol.py"]
+_ADMISSION_TESTS = ["tests/v2/p2/test_static_admission.py"]
 P2_TARGETS: dict[str, list[str]] = {
     # WP-2.1: the only mapping from an observation to a ProbeResult, and the entry point that binds enforcement
     "aisef2/probe/protocol.py::classify_failure": _PROTOCOL_TESTS,
@@ -70,6 +71,20 @@ P2_TARGETS: dict[str, list[str]] = {
     # WP-2.2: contrast to the candidate expectation, and the only way a calibration record is issued
     "aisef2/probe/calibration.py::demonstrates_contrast": ["tests/v2/p2/test_calibration.py"],
     "aisef2/probe/calibration.py::calibrate": ["tests/v2/p2/test_calibration.py"],
+    # WP-2.3: the engine and each of its nine checks, with the graph helpers they rely on
+    "aisef2/plan/static_admission.py::admit": _ADMISSION_TESTS,
+    "aisef2/plan/static_admission.py::check_requirement_coverage": _ADMISSION_TESTS,
+    "aisef2/plan/static_admission.py::check_contract_spec_integrity": _ADMISSION_TESTS,
+    "aisef2/plan/static_admission.py::check_ownership": _ADMISSION_TESTS,
+    "aisef2/plan/static_admission.py::check_dependency_dag": _ADMISSION_TESTS,
+    "aisef2/plan/static_admission.py::check_contradictions": _ADMISSION_TESTS,
+    "aisef2/plan/static_admission.py::check_proof_capability": _ADMISSION_TESTS,
+    "aisef2/plan/static_admission.py::check_traceability": _ADMISSION_TESTS,
+    "aisef2/plan/static_admission.py::check_plan_structure": _ADMISSION_TESTS,
+    "aisef2/plan/static_admission.py::check_probe_calibration": _ADMISSION_TESTS,
+    "aisef2/plan/static_admission.py::_cycle": _ADMISSION_TESTS,
+    "aisef2/plan/static_admission.py::story_graph": _ADMISSION_TESTS,
+    "aisef2/plan/static_admission.py::depends_on_story": _ADMISSION_TESTS,
 }
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}

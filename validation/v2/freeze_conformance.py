@@ -430,7 +430,7 @@ def subchecks(rfc: RFC, code) -> list[dict]:
     for n in ("ObligationRole", "ParentExpectation"):
         add("F6", f"F6.enum.{n}", "WP-0.2", V(n, e.get(n, []), code))
     add("F6", "F6.plan_obligation_shape", "WP-2.3",
-        _shape("aisef2.plan.obligation", "PlanObligation", rfc.dataclasses.get("PlanObligation")))
+        _fields("aisef2.plan.obligation", "PlanObligation", rfc.dataclasses.get("PlanObligation")))
     add("F7", "F7.dispositions", "WP-0.2",
         V("StoryAdmissionDisposition", e.get("StoryAdmissionDisposition", []), code))
     order = rfc.lifetime_order()

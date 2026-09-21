@@ -68,15 +68,13 @@
   },
   {
    "id": "F6",
-   "state": "PENDING",
+   "state": "PASS",
    "subchecks": [
     "F6.enum.ObligationRole",
     "F6.enum.ParentExpectation",
     "F6.plan_obligation_shape"
    ],
-   "pending_on": [
-    "WP-2.3"
-   ]
+   "pending_on": []
   },
   {
    "id": "F7",
@@ -775,17 +773,8 @@
    "item": "F6",
    "id": "F6.plan_obligation_shape",
    "implemented_by": "WP-2.3",
-   "state": "PENDING",
-   "detail": "aisef2.plan.obligation.PlanObligation not implemented",
-   "rfc_reference": [
-    "criterion_id",
-    "product_proof_spec_id",
-    "story_id",
-    "role",
-    "expected_parent",
-    "depends_on",
-    "ownership_rationale"
-   ],
+   "state": "PASS",
+   "detail": "PlanObligation fields equal the RFC in order (7)",
    "required_now": false
   },
   {
@@ -912,8 +901,8 @@
   }
  ],
  "summary": {
-  "PASS": 5,
-  "PENDING": 6,
+  "PASS": 6,
+  "PENDING": 5,
   "FAIL": 0
  },
  "ratchet_violations": []

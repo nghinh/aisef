@@ -343,9 +343,103 @@ def calibration() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- WP-2.3
+
+def static_admission() -> dict:
+    import dataclasses
+    import re
+    from aisef2.arch.enums import ObligationRole as Role, ParentExpectation as PE, SubjectKind
+    from aisef2.plan import static_admission as sa
+    from aisef2.probe.python_callable import PythonCallableProbe
+    fc = _module("aisef_v2_freeze_conformance", "validation/v2/freeze_conformance.py")
+    ks = _module("aisef_v2_kernel_static_checks", "validation/v2/kernel_static_checks.py")
+    w = _module("aisef_v2_p2_admission_world", "tests/v2/p2/test_static_admission.py")  # the Q0/Q1 fixture world
+    engine, inputs, plan, ob, good = sa.StaticPlanAdmissionEngine(), w.INPUTS, w.plan, w.ob, w.GOOD
+
+    def failed(p, i=inputs):
+        return sorted(c.name for c in engine.admit(p, i).checks if not c.passed)
+
+    class Moved(PythonCallableProbe):
+        digest = "d" * 64
+    cases = {
+        "1 an approved requirement with no contract": failed(plan(), w.world(extra_requirement=True)[0]),
+        "2 a committed spec that is not the derivation": failed(
+            plan(good[1:2]), dataclasses.replace(inputs, specs={k: v for k, v in inputs.specs.items()
+                                                                if v.contract_id != "BC-ADD"})),
+        "3 duplicate INTRODUCE ownership for one spec": failed(plan(good + (ob("C5", "BC-ADD", "S3", Role.INTRODUCE,
+                                                                               deps=("C3",)),))),
+        "4 a cyclic dependency DAG": failed(plan((ob("C1", "BC-ADD", "S1", Role.INTRODUCE, deps=("C3",)),) + good[1:])),
+        "5 a PRESERVE ordered before its INTRODUCE": failed(plan(good[:2] + (
+            ob("C3", "BC-ADD", "S2", Role.PRESERVE), ob("C4", "BC-NO-TEL", "S2", Role.INTRODUCE)))),
+        "5 a role/expectation pair with no §13 row": failed(plan(
+            (ob("C1", "BC-ADD", "S1", Role.INTRODUCE, expected=PE.SATISFIED_AT_PARENT),) + good[1:])),
+        "6 a probe digest that does not match (scenario D, statically)": failed(
+            plan(), dataclasses.replace(inputs, catalogue={SubjectKind.PYTHON_CALLABLE: Moved()})),
+        "7 a contract without approval": failed(plan(), w.world(drop_approval_for="BC-NO-TEL")[0]),
+        "8 an orphan obligation": failed(plan(good + (ob("C5", "PPS-nowhere", "S3", Role.VERIFY),))),
+        "9 a missing probe calibration": failed(plan(), w.world(calibrated=("exists",))[0]),
+    }
+    want = {"1 an approved requirement with no contract": ["requirement_coverage"],
+            "2 a committed spec that is not the derivation": ["contract_spec_integrity"],
+            "3 duplicate INTRODUCE ownership for one spec": ["contradictions", "ownership"],
+            "4 a cyclic dependency DAG": ["dependency_dag", "plan_structure"],
+            "5 a PRESERVE ordered before its INTRODUCE": ["contradictions"],
+            "5 a role/expectation pair with no §13 row": ["contradictions"],
+            "6 a probe digest that does not match (scenario D, statically)": ["contract_spec_integrity",
+                                                                              "proof_capability"],
+            "7 a contract without approval": ["contract_spec_integrity", "traceability"],
+            "8 an orphan obligation": ["plan_structure"],
+            "9 a missing probe calibration": ["probe_calibration"]}
+    good_result = engine.admit(plan(), inputs)
+    calls = []
+    with mock.patch.object(PythonCallableProbe, "observe", side_effect=lambda *a: calls.append("observe")), \
+            mock.patch("subprocess.run", side_effect=lambda *a, **k: calls.append("subprocess")):
+        engine.admit(plan(), inputs)
+    shas = set(re.findall(r"\b[0-9a-f]{40}\b", repr(good_result))) - {w.BASELINE}
+    plan_names = sorted({n for p in sorted((ROOT / "aisef2" / "plan").rglob("*.py"))
+                         for n, _ in ks._names(ks.ast.parse(p.read_text(encoding="utf-8")))})
+    conformance = fc.evaluate(*fc.load_inputs())
+    f6 = next(x for x in conformance["subchecks"] if x["id"] == "F6.plan_obligation_shape")
+    rfc_checks = re.findall(r"^\d\. ", _rfc_text().split("## 12. StaticPlanAdmission")[1].split("## 13.")[0], re.M)
+    return {
+        "record": "AISEF V2 — P2 STATIC ADMISSION", "work_package": "WP-2.3", "rfc_sections": ["11", "12"],
+        "frozen_items": ["F6"],
+        "engine": {"digest": sa.StaticPlanAdmissionEngine.digest, "sources": list(sa.ENGINE_SOURCES),
+                   "checks": [n for n, _ in sa.CHECKS]},
+        "well_formed_plan": {"admitted": good_result.admitted, "result_digest": good_result.result_digest,
+                             "checks_passed": [c.name for c in good_result.checks if c.passed]},
+        "adversarial": cases,
+        "implementation_notes": {
+            "depends_on": "criterion ids that must complete first (board resolution §1); the story order is induced "
+                          "from them",
+            "role_expectation_pairs": "a pair outside RFC §13's table (e.g. INTRODUCE with SATISFIED_AT_PARENT) has no "
+                                      "StoryAdmission row; check 5 rejects it — fail closed, no meaning derived",
+            "freeze": "require_admitted re-derives admission at freeze time; a stored result is never taken on trust",
+        },
+        "f6_conformance": {"state": f6["state"], "detail": f6["detail"]},
+        "properties": {
+            "nine_checks_implemented_in_rfc_order": len(sa.CHECKS) == 9 == len(rfc_checks)
+                and [c.number for c in good_result.checks] == list(range(1, 10)),
+            "well_formed_plan_admitted": good_result.admitted,
+            "each_check_rejects_its_case": cases == want,
+            "result_digest_stable": engine.admit(plan(), inputs).result_digest == good_result.result_digest,
+            "no_probe_executes_in_the_engine": calls == [],
+            "no_future_parent_sha_invented": shas == set(),
+            "CAL_2_no_plan_freeze_path_needs_spec_falsifiability":
+                sa.require_admitted(plan(), inputs).admitted
+                and not {"SpecFalsifiabilityEvidence", "falsifiability_problems"} & set(plan_names)
+                and [f.name for f in dataclasses.fields(sa.AdmissionInputs)] ==
+                ["requirements", "contracts", "approvals", "specs", "catalogue", "calibrations"],
+            "planning_code_never_names_the_raw_verdict": ks.check(ROOT, ("NO_RAW_VERDICT_ROUTING",)) == [],
+            "f6_plan_obligation_equals_rfc": f6["state"] == "PASS",
+        },
+    }
+
+
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-2.1": ("closure-evidence/v2/P2-PROBE-PROTOCOL.json", probe_protocol, "aisef2/probe/protocol.py"),
     "WP-2.2": (CALIBRATION_REL, calibration, "aisef2/probe/calibration.py"),
+    "WP-2.3": ("closure-evidence/v2/P2-STATIC-ADMISSION.json", static_admission, "aisef2/plan/static_admission.py"),
 }
 
 

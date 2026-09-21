@@ -3,6 +3,926 @@
  "tool": "validation/v2/mutation.py",
  "targets": [
   {
+   "target": "aisef2/plan/static_admission.py::_cycle",
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py"
+   ],
+   "source_sha256": "f165c1ad9a87c2950972233c18b6aa35f137e5a71a8e0cc570c4f7514c48c84e",
+   "mutants": 21,
+   "killed": 21,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L133 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L134 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L136 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L136 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L136 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L136 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L141 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L139 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L139 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L141 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L145 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L136 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L136 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L146 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L147 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L147 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L136 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L149 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L149 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L149 sorted() -> list()",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/plan/static_admission.py::admit",
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py"
+   ],
+   "source_sha256": "f165c1ad9a87c2950972233c18b6aa35f137e5a71a8e0cc570c4f7514c48c84e",
+   "mutants": 21,
+   "killed": 21,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L289 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L295 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L289 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L291 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L294 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L294 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L294 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L294 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L289 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L289 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L294 string 'plan_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L294 string 'engine_digest' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L294 string 'checks' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L294 string 'admitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L290 string 'the engine admits a Plan against AdmissionInputs' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L291 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L291 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L292 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L292 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L292 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L292 element 1 dropped",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/plan/static_admission.py::check_contract_spec_integrity",
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py"
+   ],
+   "source_sha256": "f165c1ad9a87c2950972233c18b6aa35f137e5a71a8e0cc570c4f7514c48c84e",
+   "mutants": 13,
+   "killed": 13,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L114 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L103 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L111 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L111 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L101 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L101 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L104 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L112 string 'contract ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L112 string ': committed specs ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L112 string ' differ from its derivation ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L109 string 'contract ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L109 string ' does not compile: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L112 sorted() -> list()",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/plan/static_admission.py::check_contradictions",
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py"
+   ],
+   "source_sha256": "f165c1ad9a87c2950972233c18b6aa35f137e5a71a8e0cc570c4f7514c48c84e",
+   "mutants": 32,
+   "killed": 32,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L205 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L191 string 'criterion ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L191 string ': role ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L191 string ' with expected ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L191 string ' has no §13 routing row' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L192 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L196 string 'story ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L196 string ' asserts incompatible parent expectations ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L196 string ' for spec ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L197 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L197 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L197 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L197 Gt->LtE",
+     "killed": true
+    },
+    {
+     "mutant": "L199 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L200 string 'story ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L200 string ' PRESERVEs spec ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L200 string ' without being ordered after story ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L201 string ', which INTRODUCEs it' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L202 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L195 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L195 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L196 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L197 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L197 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L199 ObligationRole.INTRODUCE->PRESERVE",
+     "killed": true
+    },
+    {
+     "mutant": "L199 ObligationRole.INTRODUCE->VERIFY",
+     "killed": true
+    },
+    {
+     "mutant": "L202 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L203 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L203 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L204 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L202 ObligationRole.PRESERVE->INTRODUCE",
+     "killed": true
+    },
+    {
+     "mutant": "L202 ObligationRole.PRESERVE->VERIFY",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/plan/static_admission.py::check_dependency_dag",
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py"
+   ],
+   "source_sha256": "f165c1ad9a87c2950972233c18b6aa35f137e5a71a8e0cc570c4f7514c48c84e",
+   "mutants": 9,
+   "killed": 9,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L162 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L162 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L156 string 'criterion ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L156 string ' depends on ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L156 string ', which does not resolve' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L157 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L162 string 'criterion dependencies form a cycle: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L160 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L162 string ' -> ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/plan/static_admission.py::check_ownership",
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py"
+   ],
+   "source_sha256": "f165c1ad9a87c2950972233c18b6aa35f137e5a71a8e0cc570c4f7514c48c84e",
+   "mutants": 20,
+   "killed": 20,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L125 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L123 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L123 ObligationRole.INTRODUCE->PRESERVE",
+     "killed": true
+    },
+    {
+     "mutant": "L123 ObligationRole.INTRODUCE->VERIFY",
+     "killed": true
+    },
+    {
+     "mutant": "L125 string 'criterion ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L125 string ' belongs to ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L125 string ' stories ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L125 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L125 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L125 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L125 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L126 string 'spec ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L126 string ' has ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L126 string ' INTRODUCE owners' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L126 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L126 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L126 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L126 Gt->LtE",
+     "killed": true
+    },
+    {
+     "mutant": "L125 sorted() -> list()",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/plan/static_admission.py::check_plan_structure",
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py"
+   ],
+   "source_sha256": "f165c1ad9a87c2950972233c18b6aa35f137e5a71a8e0cc570c4f7514c48c84e",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L248 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L248 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L245 string 'criterion ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L245 string ' is an orphan: spec ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L245 string ' is not in the committed derivation' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L246 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L248 string 'stories form a cycle: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L248 string ' -> ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/plan/static_admission.py::check_probe_calibration",
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py"
+   ],
+   "source_sha256": "f165c1ad9a87c2950972233c18b6aa35f137e5a71a8e0cc570c4f7514c48c84e",
+   "mutants": 18,
+   "killed": 18,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L266 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L256 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L259 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L262 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L258 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L259 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L262 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L264 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L259 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L259 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L264 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L263 string 'spec ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L263 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L263 string ' does not support the observation it asks for' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L265 string 'spec ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L265 string ': no ProbeCapabilityCalibration for ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L265 string '@' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L265 string ' class ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/plan/static_admission.py::check_proof_capability",
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py"
+   ],
+   "source_sha256": "f165c1ad9a87c2950972233c18b6aa35f137e5a71a8e0cc570c4f7514c48c84e",
+   "mutants": 16,
+   "killed": 16,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L222 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L212 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L214 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L217 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L214 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L217 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L219 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L219 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L218 string 'spec ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L218 string ': probe ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L218 string ' does not resolve in the harness catalogue' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L220 string 'spec ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L220 string ': bound to ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L220 string '@' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L220 string ', the harness has @' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L221 string ' (scenario D)' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/plan/static_admission.py::check_requirement_coverage",
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py"
+   ],
+   "source_sha256": "f165c1ad9a87c2950972233c18b6aa35f137e5a71a8e0cc570c4f7514c48c84e",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L95 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L95 string 'requirement ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L95 string ' maps to no BehaviorContract' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L95 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L96 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L96 In->NotIn",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/plan/static_admission.py::check_traceability",
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py"
+   ],
+   "source_sha256": "f165c1ad9a87c2950972233c18b6aa35f137e5a71a8e0cc570c4f7514c48c84e",
+   "mutants": 11,
+   "killed": 11,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L240 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L230 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L233 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L230 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L233 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L234 string 'criterion ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L234 string ': spec ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L234 string ' comes from no known contract' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L239 string 'criterion ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L239 string ': contract ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L239 string ' is not approved: ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/plan/static_admission.py::depends_on_story",
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py"
+   ],
+   "source_sha256": "f165c1ad9a87c2950972233c18b6aa35f137e5a71a8e0cc570c4f7514c48c84e",
+   "mutants": 12,
+   "killed": 12,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L185 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L177 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L177 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L177 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L177 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L185 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L180 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L182 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L180 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L181 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L182 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L181 True->False",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/plan/static_admission.py::story_graph",
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py"
+   ],
+   "source_sha256": "f165c1ad9a87c2950972233c18b6aa35f137e5a71a8e0cc570c4f7514c48c84e",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L172 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L171 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L171 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L171 NotEq->Eq",
+     "killed": true
+    }
+   ]
+  },
+  {
    "target": "aisef2/probe/calibration.py::calibrate",
    "kill_tests": [
     "tests/v2/p2/test_calibration.py"
