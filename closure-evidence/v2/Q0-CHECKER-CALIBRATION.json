@@ -1,0 +1,150 @@
+{
+ "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
+ "work_package": "WP-0.5",
+ "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
+ "checker_count": 9,
+ "uncovered_checker_modules": [],
+ "calibrated_count": 9,
+ "always_pass_mutants_rejected": 9,
+ "checkers": [
+  {
+   "checker": "freeze_manifest",
+   "package": "WP-0.1",
+   "fixture": "tests/v2/fixtures/known_bad/freeze_manifest.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "RFC normative body differs from the approved content",
+   "observed": [
+    "RFC normative body differs from the approved content",
+    "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json is stale: regenerate it"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "v1_evidence_guard",
+   "package": "WP-0.4",
+   "fixture": "tests/v2/fixtures/known_bad/v1_evidence_guard.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "committed mutation of protected evidence",
+   "observed": [
+    "committed mutation of protected evidence: closure-evidence/hardening/a.json"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "arch_catalog",
+   "package": "WP-0.2",
+   "fixture": "tests/v2/fixtures/known_bad/arch_catalog.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "in catalog, absent from code: Owner.AUDITOR",
+   "observed": [
+    "in catalog, absent from code: Owner.AUDITOR"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "f_conformance",
+   "package": "WP-0.3",
+   "fixture": "tests/v2/fixtures/known_bad/f_conformance.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "F3 FAIL",
+   "observed": [
+    "F3 FAIL",
+    "F3.owner_set: Owner differs from the RFC"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "plan_validate",
+   "package": "plan correction",
+   "fixture": "tests/v2/fixtures/known_bad/plan_validate.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "D: WP-6.2 does not explicitly require WP-2.5",
+   "observed": [
+    "D: WP-6.2 does not explicitly require WP-2.5"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "plan_docs_check",
+   "package": "plan correction",
+   "fixture": "tests/v2/fixtures/known_bad/plan_docs_check.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "AISEF-V2-CYCLE1-DEPENDENCY-GRAPH.md: generated content differs",
+   "observed": [
+    "AISEF-V2-CYCLE1-DEPENDENCY-GRAPH.md: generated content differs"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "state_model_prover",
+   "package": "WP-0.4",
+   "fixture": "tests/v2/fixtures/known_bad/state_model_prover.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "normalised_trees_identical",
+   "observed": [
+    "normalised_trees_identical",
+    "assertions_identical"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "v2_encoding_scanner",
+   "package": "WP-0.4",
+   "fixture": "tests/v2/fixtures/known_bad/v2_encoding_scanner.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "line 2",
+   "observed": [
+    "line 2"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "packaging_check",
+   "package": "WP-0.2",
+   "fixture": "tests/v2/fixtures/known_bad/packaging_check.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "aisef2 would ship in the aisef wheel",
+   "observed": [
+    "aisef2 would ship in the aisef wheel",
+    "aisef2.arch would ship in the aisef wheel"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  }
+ ]
+}

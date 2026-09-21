@@ -1,0 +1,5 @@
+{"checker": "plan_docs_check", "package": "plan correction", "kind": "doc_edit",
+"file": "AISEF-V2-CYCLE1-DEPENDENCY-GRAPH.md",
+"find": "| `WP-6.2` | P6 | 27 | `WP-6.1`, `WP-4.6`, `WP-5.5`, `WP-2.5` |",
+"replace": "| `WP-6.2` | P6 | 27 | `WP-6.1`, `WP-4.6`, `WP-5.5` |",
+"expect": "AISEF-V2-CYCLE1-DEPENDENCY-GRAPH.md: generated content differs"}

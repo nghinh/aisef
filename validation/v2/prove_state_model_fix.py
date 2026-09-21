@@ -58,14 +58,24 @@ def _tests(tree: ast.AST) -> list[str]:
 def prove(base: str) -> dict:
     old_src = subprocess.run(["git", "show", f"{base}:{TARGET}"], cwd=ROOT, capture_output=True, encoding="utf-8",
                              check=True).stdout
-    new_src = (ROOT / TARGET).read_text(encoding="utf-8")
+    base_rev = subprocess.run(["git", "rev-parse", base], cwd=ROOT, capture_output=True, encoding="utf-8",
+                              check=True).stdout.strip()
+    return prove_sources(old_src, (ROOT / TARGET).read_text(encoding="utf-8"), base_rev)
+
+
+def holds(result: dict) -> bool:
+    return bool(result["normalised_trees_identical"] and result["assertions_identical"]
+                and result["test_methods_identical"] and not result["writes_into_closure_evidence"]
+                and "value bound to RESULTS" in result["normalised_from_working_tree"])
+
+
+def prove_sources(old_src: str, new_src: str, base_rev: str = "") -> dict:
     old, new = ast.parse(old_src), ast.parse(new_src)
     old_n, old_removed = _normalise(ast.parse(old_src))
     new_n, new_removed = _normalise(ast.parse(new_src))
     return {
         "target": TARGET,
-        "base_revision": subprocess.run(["git", "rev-parse", base], cwd=ROOT, capture_output=True, encoding="utf-8",
-                                        check=True).stdout.strip(),
+        "base_revision": base_rev,
         "permitted_differences": ["module docstring", "import tempfile", "value bound to RESULTS"],
         "normalised_from_base": old_removed,
         "normalised_from_working_tree": new_removed,
@@ -84,9 +94,7 @@ def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     result = prove(argv[0] if argv else "HEAD")
     print(json.dumps(result, indent=1))
-    ok = (result["normalised_trees_identical"] and result["assertions_identical"]
-          and result["test_methods_identical"] and not result["writes_into_closure_evidence"]
-          and "value bound to RESULTS" in result["normalised_from_working_tree"])
+    ok = holds(result)
     print("PROOF:", "HOLDS" if ok else "DOES NOT HOLD")
     return 0 if ok else 1
 
