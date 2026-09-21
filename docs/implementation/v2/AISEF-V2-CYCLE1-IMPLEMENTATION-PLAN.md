@@ -3,12 +3,14 @@
 **Status: plan only. P0 has not started.** No V2 code exists. No file under `aisef/` or `closure-evidence/`
 (other than the new `closure-evidence/v2/` approval record) is modified.
 
+<!-- GENERATED:architecture-baseline BEGIN — from cycle1-manifest.json; do not hand-edit -->
+
 **Architecture baseline — frozen.**
-[`docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md`](../../architecture/AISEF-V2-ARCHITECTURE-RFC.md),
-approved at commit `2fe672c`. Approval record
-[`closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json`](../../../closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json),
-content-addressed `c23191bd71bc299d…`. RFC normative digest `8f0d522d9db0322c…`; freeze-table digest
-`c4d9895f921b707c…`. **F1–F11 frozen.**
+[`docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md`](../../architecture/AISEF-V2-ARCHITECTURE-RFC.md), approved at commit `2fe672c`. Approval record
+[`closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json`](../../../closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json), content-addressed `c23191bd71bc299d…`, amended by [`AISEF-V2-RFC-AMENDMENT-V2-001.json`](../../../closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json) (`eaeb3130e2eefe9a…`, changes F2).
+Current RFC normative digest `564057137d0f5cd3…`; freeze-table digest `6ea7e312e15acc02…` (originally `8f0d522d9db0322c…` / `c4d9895f921b707c…`). **F1–F11 frozen.**
+
+<!-- GENERATED:architecture-baseline END -->
 
 This document compiles the approved RFC into work packages. **It introduces no architecture concept, no control
 semantic and no scope beyond RFC §32.**

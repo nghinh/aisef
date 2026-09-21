@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 16,
+ "checker_count": 18,
  "uncovered_checker_modules": [],
- "calibrated_count": 16,
- "always_pass_mutants_rejected": 16,
+ "calibrated_count": 18,
+ "always_pass_mutants_rejected": 18,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -250,6 +250,36 @@
    "expected": "spec for BC-NO-TELEMETRY differs from its fresh derivation",
    "observed": [
     "spec for BC-NO-TELEMETRY differs from its fresh derivation"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "plan_semantics",
+   "package": "P2 plan correction",
+   "fixture": "tests/v2/fixtures/known_bad/plan_semantics.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "asserts a global missing-subject => REFUTED",
+   "observed": [
+    "PLANSEM: manifest asserts a global missing-subject => REFUTED: missing subject -> EXECUTED + REFUTED (observation), never UNRUNNABLE"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "plan_baseline",
+   "package": "P2 plan correction",
+   "fixture": "tests/v2/fixtures/known_bad/plan_baseline.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "BASELINE: plan cites rfc_normative_digest",
+   "observed": [
+    "BASELINE: plan cites rfc_normative_digest 8f0d522d9db0322c…, the approved lineage ends at 564057137d0f5cd3…"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

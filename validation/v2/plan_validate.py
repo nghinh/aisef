@@ -26,6 +26,7 @@ import copy
 import itertools
 import json
 import pathlib
+import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -220,12 +221,96 @@ def check_e_qualification_chain(m: dict) -> list[str]:
     return out
 
 
+# --------------------------------------------------------------------------------------- F · G
+
+#: A clause asserting that an absent/missing subject yields REFUTED — a global missing-path rule the RFC does not
+#: have (§10.2: REQUIRES_SUBJECT -> INDETERMINATE(PRECONDITION_ABSENT); ABSENCE_IS_DECIDABLE -> the verdict the
+#: spec's observable implies). A clause may state it only for one spec, marked "scoped to ProductProofSpec <id>".
+_ABSENCE_REFUTED = re.compile(r"(missing|absent|absence)[^;|\n]*?(⇒|->|=>|→)[^;|\n]*?\bREFUTED\b", re.I)
+_SCOPED = "scoped to ProductProofSpec"
+#: The WP-2.1 acceptance cases and what each must expect (owner decision before P2 authorization).
+PROBE_ABS = {
+    "PROBE-ABS-1": {("expect", "status"): "UNRUNNABLE", ("expect", "owner"): "ENVIRONMENT"},
+    "PROBE-ABS-2": {("subject_absence",): "REQUIRES_SUBJECT", ("expect", "status"): "EXECUTED",
+                    ("expect", "behavior_verdict"): "INDETERMINATE", ("expect", "reason"): "PRECONDITION_ABSENT"},
+    "PROBE-ABS-3": {("subject_absence",): "ABSENCE_IS_DECIDABLE", ("expect", "status"): "EXECUTED",
+                    ("expect", "contract_satisfaction"): "UNSATISFIED"},
+    "PROBE-ABS-4": {("subject_absence",): "ABSENCE_IS_DECIDABLE", ("expect", "status"): "EXECUTED",
+                    ("expect", "contract_satisfaction"): "SATISFIED"},
+    "PROBE-ABS-5": {},
+}
+
+
+def _strings(obj):
+    if isinstance(obj, str):
+        yield obj
+    elif isinstance(obj, dict):
+        for v in obj.values():
+            yield from _strings(v)
+    elif isinstance(obj, list):
+        for v in obj:
+            yield from _strings(v)
+
+
+def _absence_refuted(text: str) -> list[str]:
+    return [c.strip() for c in re.split(r"[;|\n]", text) if _ABSENCE_REFUTED.search(c) and _SCOPED not in c]
+
+
+def check_f_probe_absence_semantics(m: dict, docs: pathlib.Path | None = None) -> list[str]:
+    """PLANSEM: the plan states subject absence exactly as the RFC does — never as a global 'missing -> REFUTED'."""
+    docs = docs or DOCS
+    out = [f"PLANSEM: manifest asserts a global missing-subject => REFUTED: {c[:100]}"
+           for s in _strings(m) for c in _absence_refuted(s)]
+    out += [f"PLANSEM: {d.name} asserts a global missing-subject => REFUTED: {c[:100]}"
+            for d in sorted(docs.glob("*.md")) for c in _absence_refuted(d.read_text(encoding="utf-8"))]
+    wp = next((p for p in m["work_packages"] if p["id"] == "WP-2.1"), None)
+    cases = {c.get("id"): c for c in (wp or {}).get("acceptance_cases", [])}
+    for cid, want in PROBE_ABS.items():
+        case = cases.get(cid)
+        if case is None:
+            out.append(f"PLANSEM: WP-2.1 lacks acceptance case {cid}")
+            continue
+        for path, value in want.items():
+            got = case
+            for key in path:
+                got = got.get(key) if isinstance(got, dict) else None
+            if got != value:
+                out.append(f"PLANSEM: {cid} {'.'.join(path)} must be {value}, is {got}")
+    if not {"REQUIRES_SUBJECT", "ABSENCE_IS_DECIDABLE"} <= {c.get("subject_absence") for c in cases.values()}:
+        out.append("PLANSEM: WP-2.1 acceptance cases do not distinguish REQUIRES_SUBJECT from ABSENCE_IS_DECIDABLE")
+    out += [f"PLANSEM: {cid} expects a raw REFUTED for an absent subject — the verdict is the spec's, not global"
+            for cid, c in cases.items() if (c.get("expect") or {}).get("behavior_verdict") == "REFUTED"]
+    return out
+
+
+def check_g_baseline(m: dict) -> list[str]:
+    """BASELINE: the plan cites the current approved architecture — the original approval plus every amendment,
+    exactly as validation/v2/freeze_manifest.py verifies the lineage."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("aisef_v2_fm_for_plan", ROOT / "validation" / "v2" / "freeze_manifest.py")
+    fm = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(fm)
+    eff, links, broken = fm.lineage(ROOT)
+    ab = m["architecture_baseline"]
+    out = [f"BASELINE: freeze lineage broken: {b}" for b in broken]
+    for key in ("rfc_normative_digest", "freeze_table_digest"):
+        if ab.get(key) != eff[key]:
+            out.append(f"BASELINE: plan cites {key} {str(ab.get(key))[:16]}…, the approved lineage ends at {eff[key][:16]}…")
+    if ab.get("approval_record_sha256") != links[0]["sha256"]:
+        out.append("BASELINE: plan cites a different original approval record")
+    if [(a.get("record"), a.get("sha256")) for a in ab.get("amendments", [])] != [(l["record"], l["sha256"]) for l in links[1:]]:
+        out.append("BASELINE: plan amendments differ from the approval lineage")
+    return out
+
+
 CHECKS = [
     ("A dependency_direction", check_a_direction),
     ("B phase_barrier_completeness", check_b_barriers),
     ("C guard_ancestry", check_c_guard_ancestry),
     ("D orchestration_semantics", check_d_orchestration),
     ("E qualification_chain", check_e_qualification_chain),
+    ("F probe_absence_semantics", check_f_probe_absence_semantics),
+    ("G architecture_baseline", check_g_baseline),
 ]
 
 
@@ -266,6 +351,11 @@ def apply_fixture(m: dict, name: str) -> dict:
         for ph in m["phases"]:
             if ph["id"] == "P8":
                 ph["barrier"] = "P6"
+    elif name == "PLANSEM-1":  # the manifest back to: missing subject => EXECUTED + REFUTED
+        by["WP-2.1"]["adversarial_tests"].insert(1, "missing subject -> EXECUTED + REFUTED (observation), never UNRUNNABLE")
+    elif name == "PLANSEM-2":  # drop the REQUIRES_SUBJECT / ABSENCE_IS_DECIDABLE distinction from the P2 cases
+        for c in by["WP-2.1"]["acceptance_cases"]:
+            c["subject_absence"] = "any"
     else:
         raise PlanError(f"unknown fixture {name}")
     return m
@@ -278,6 +368,24 @@ def _table(rows: list[tuple[str, ...]], head: tuple[str, ...]) -> list[str]:
     out = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
     out += ["| " + " | ".join(r) + " |" for r in rows]
     return out
+
+
+def gen_evidence_table(m: dict, phases: tuple[str, ...]) -> str:
+    return "\n".join(_table([(p["evidence_label"], p["evidence_asserts"]) for p in m["work_packages"]
+                              if p["phase"] in phases], ("artefact", "asserts")))
+
+
+def gen_baseline(m: dict) -> str:
+    ab = m["architecture_baseline"]
+    amend = "; ".join(f"[`{a['record'].rsplit('/', 1)[-1]}`](../../../{a['record']}) (`{a['sha256'][:16]}…`, "
+                      f"changes {', '.join(a['frozen_items_changed'])})" for a in ab.get("amendments", []))
+    return (f"**Architecture baseline — frozen.**\n"
+            f"[`{ab['rfc']}`](../../architecture/{ab['rfc'].rsplit('/', 1)[-1]}), approved at commit `2fe672c`. "
+            f"Approval record\n[`{ab['approval_record']}`](../../../{ab['approval_record']}), content-addressed "
+            f"`{ab['approval_record_sha256'][:16]}…`, amended by {amend or 'nothing'}.\n"
+            f"Current RFC normative digest `{ab['rfc_normative_digest'][:16]}…`; freeze-table digest "
+            f"`{ab['freeze_table_digest'][:16]}…` (originally `{ab['original_rfc_normative_digest'][:16]}…` / "
+            f"`{ab['original_freeze_table_digest'][:16]}…`). **F1–F11 frozen.**")
 
 
 def gen_phase_table(m: dict) -> str:
@@ -378,7 +486,8 @@ def gen_traceability_doc(m: dict) -> str:
         "Do not hand-edit: `--check` fails on drift.",
         "",
         f"Architecture baseline: RFC normative digest `{ab['rfc_normative_digest'][:16]}…`, freeze-table digest",
-        f"`{ab['freeze_table_digest'][:16]}…`, approval record `{ab['approval_record_sha256'][:16]}…`.",
+        f"`{ab['freeze_table_digest'][:16]}…`, approval record `{ab['approval_record_sha256'][:16]}…` amended by "
+        + (", ".join(f"`{a['record'].rsplit('/', 1)[-1]}`" for a in ab.get("amendments", [])) or "nothing") + ".",
         "",
         f"**{m['counts']['implementation_packages']} implementation + {m['counts']['qualification_packages']} "
         f"qualification = {m['counts']['total']} packages. F1–F11 coverage: 11/11.**",
@@ -421,6 +530,7 @@ GENERATED_FILES = {
 
 GENERATED_BLOCKS = {
     "AISEF-V2-CYCLE1-IMPLEMENTATION-PLAN.md": {
+        "architecture-baseline": gen_baseline,
         "phase-table": gen_phase_table,
         "parallel-sets": gen_parallel_sets,
         "critical-path": gen_critical_path,
@@ -429,6 +539,9 @@ GENERATED_BLOCKS = {
         "phase-exit-checks": lambda m: "\n".join(
             _table([(ph["id"], "; ".join(ph.get("exit_checks", []))) for ph in m["phases"]],
                    ("phase", "exit checks — all must be green before the next phase may start"))),
+        **{f"evidence-{name}": (lambda m, ph=phases: gen_evidence_table(m, ph)) for name, phases in (
+            ("P0", ("P0",)), ("P1", ("P1",)), ("P2", ("P2",)), ("P3", ("P3",)), ("P4", ("P4",)), ("P5", ("P5",)),
+            ("P6", ("P6",)), ("P7-P10", ("P7", "P8", "P9", "P10")))},
     },
 }
 

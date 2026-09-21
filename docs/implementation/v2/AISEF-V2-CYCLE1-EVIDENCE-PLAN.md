@@ -18,7 +18,7 @@ the manifest by `--check`.
 |---|---|
 | P0 | freeze manifest digests equal the approval record; V1 evidence guard rejects every V1 mutation; enum catalog --check green in both directions; F1-F11 conformance reports 11 definite states; every Q0 checker calibrated against a known-bad fixture |
 | P1 | NEG-1, NEG-2, NEG-3 green; no planning module imports BehaviorVerdict for routing; compiler --check round-trip byte-identical; semantic_hash stable across processes; satisfaction-mapping mutants fully killed; routing table total; no did-not-run -> developer edge |
-| P2 | CAL-1 and CAL-2 green; missing subject vs missing harness separated; probe UNRUNNABLE -> ENVIRONMENT; INVALID_SPEC -> PLAN/INTEGRATION; no provider/request before story admission; scenarios A and K green; test-layout invariance: product verdicts identical across layouts |
+| P2 | CAL-1 and CAL-2 green; PROBE-ABS-1..5 green: missing harness vs missing subject separated; absence decided per spec; probe UNRUNNABLE -> ENVIRONMENT; INVALID_SPEC -> PLAN/INTEGRATION; no provider/request before story admission; scenarios A and K green; test-layout invariance: product verdicts identical across layouts |
 | P3 | unknown required event refuses reconstruction; ignorable skipped; no projection reads time; incremental == full fold on every generated journal; 6/6 reference models agree and are calibrated; every control-critical projection mutation-tested; stale cache never treated as authority |
 | P4 | RUN-1 and RUN-2 green; acquisition during dispose rejected; D-024 reproducer red-before/green-after; writer-close failure and CLEAN failure each leave the sentinel OPEN; SS-64 and D-006 reproducers green; range emptiness OS-asserted on Linux and Windows CI |
 | P5 | TEST-1 and TEST-2 green; four collection-cause cases green; vacuity NON_VACUOUS / VACUOUS / INDETERMINATE; no developer artefact executed at the parent; an invariant violation demonstrated escaping try/except |
@@ -36,6 +36,8 @@ the manifest by `--check`.
 
 ### P0 — the baseline is identifiable and protected
 
+<!-- GENERATED:evidence-P0 BEGIN — from cycle1-manifest.json; do not hand-edit -->
+
 | artefact | asserts |
 |---|---|
 | `AISEF-V2-FREEZE-MANIFEST.json` | the RFC normative digest and freeze-table digest at HEAD equal the approval record; 11 items enumerated |
@@ -44,9 +46,13 @@ the manifest by `--check`.
 | `V1-EVIDENCE-BASELINE.json` | sha256 of every V1 evidence file; any mutation is rejected |
 | `Q0-CHECKER-CALIBRATION.json` | every Q0 checker has a committed fixture it demonstrably rejects |
 
+<!-- GENERATED:evidence-P0 END -->
+
 **Gate to P1:** a one-byte edit inside the RFC normative body fails CI; a status-header edit does not.
 
 ### P1 — the semantics are correct, including polarity
+
+<!-- GENERATED:evidence-P1 BEGIN — from cycle1-manifest.json; do not hand-edit -->
 
 | artefact | asserts |
 |---|---|
@@ -55,21 +61,29 @@ the manifest by `--check`.
 | `P1-OUTCOME-POLARITY.json` | **NEG-1, NEG-2, NEG-3**; a verdict is unconstructible outside `EXECUTED`; satisfaction mutation fully killed |
 | `P1-ROUTING-TABLE.json` | routing total over the legal state space; `REFUTED`↛`ENVIRONMENT`; `UNRUNNABLE`↛`DEVELOPER`; unmapped outcomes fail closed |
 
+<!-- GENERATED:evidence-P1 END -->
+
 **Gate to P2:** a static check proves no planning module imports `BehaviorVerdict` for routing.
 
 ### P2 — probes and admission, with calibration that can say no
 
+<!-- GENERATED:evidence-P2 BEGIN — from cycle1-manifest.json; do not hand-edit -->
+
 | artefact | asserts |
 |---|---|
-| `P2-PROBE-PROTOCOL.json` | missing subject ⇒ `EXECUTED`+`REFUTED`; missing harness ⇒ `UNRUNNABLE`; enforcement bound into every result; developer paths rejected |
+| `P2-PROBE-PROTOCOL.json` | **PROBE-ABS-1..5**: harness failure ⇒ `UNRUNNABLE` / ENVIRONMENT; `REQUIRES_SUBJECT` + subject absent ⇒ `EXECUTED` + `INDETERMINATE(PRECONDITION_ABSENT)`; `ABSENCE_IS_DECIDABLE` + subject absent ⇒ `EXECUTED` + the verdict the spec's observable implies — no global absence rule; enforcement bound into every result; developer paths rejected |
 | `P2-CALIBRATION.json` | **CAL-1** an always-`REFUTED` prohibition probe is rejected; contrast rule proven for both polarities |
 | `P2-STATIC-ADMISSION.json` | 9/9 static checks; no probe executes in the engine; **CAL-2** asserted — no plan-freeze path needs spec falsifiability |
 | `P2-STORY-ADMISSION.json` | disposition table total; abbreviated parent SHA refused; no `provider/request` before admission |
 | `P2-PLAN-DRIFT.json` | scenario **A** (early upstream implementation) and **K** (fully pre-satisfied story); zero developer budget on any `PRE_SATISFIED` path |
 
+<!-- GENERATED:evidence-P2 END -->
+
 **Gate to P3:** test-layout invariance — permuted developer-test layouts give byte-identical product verdicts.
 
 ### P3 — the record is the authority
+
+<!-- GENERATED:evidence-P3 BEGIN — from cycle1-manifest.json; do not hand-edit -->
 
 | artefact | asserts |
 |---|---|
@@ -79,9 +93,13 @@ the manifest by `--check`.
 | `P3-CONTROL-PROJECTIONS.json` | 6/6 implemented; a seventh cannot be cited by a gate; mutation fully killed |
 | `P3-REFERENCE-MODELS.json` | 6/6 reference models, each calibrated; AST no-import constraint enforced |
 
+<!-- GENERATED:evidence-P3 END -->
+
 **Gate to P4:** an injected projection defect is caught by its reference model.
 
 ### P4 — resources and runs are owned and provably released
+
+<!-- GENERATED:evidence-P4 BEGIN — from cycle1-manifest.json; do not hand-edit -->
 
 | artefact | asserts |
 |---|---|
@@ -92,7 +110,11 @@ the manifest by `--check`.
 | `P4-BUDGETS.json` | SS-64 and D-006 reproducers; no side retry counter exists anywhere |
 | `P4-INTERRUPTION.json` | repairing the same journal twice is byte-identical; no interruption leaves a gap; abandonment recorded |
 
+<!-- GENERATED:evidence-P4 END -->
+
 ### P5 — engineering quality, with no absence charged to a developer
+
+<!-- GENERATED:evidence-P5 BEGIN — from cycle1-manifest.json; do not hand-edit -->
 
 | artefact | asserts |
 |---|---|
@@ -102,7 +124,11 @@ the manifest by `--check`.
 | `P5-ADEQUACY.json` | `UNRUNNABLE` produces no `AdequacyOutcome`; `INCOMPLETE` never blocks; tdd-chronology cannot block under any policy |
 | `P5-INVARIANTS.json` | I–IX armed in every tier; **an invariant violation demonstrated escaping a `try/except`** |
 
+<!-- GENERATED:evidence-P5 END -->
+
 ### P6 — one authoritative path
+
+<!-- GENERATED:evidence-P6 BEGIN — from cycle1-manifest.json; do not hand-edit -->
 
 | artefact | asserts |
 |---|---|
@@ -110,11 +136,15 @@ the manifest by `--check`.
 | `P6-ORCHESTRATION.json` | end-to-end story through the real path; scenario **L**; confinement derived from scope, not omittable |
 | `P6-OLD-PATH-REMOVAL.json` | six removal proofs; the audit fails closed on any authority it cannot enumerate |
 
+<!-- GENERATED:evidence-P6 END -->
+
 The six removal proofs are the cycle's real acceptance test: no old gate authoritative · no developer test
 determines `ProductProof` · no parent-side developer test execution · no latest-evidence selection · no side
 retry counters · every control decision journal-backed.
 
 ### P7–P10 — qualification
+
+<!-- GENERATED:evidence-P7-P10 BEGIN — from cycle1-manifest.json; do not hand-edit -->
 
 | artefact | asserts |
 |---|---|
@@ -122,6 +152,8 @@ retry counters · every control decision journal-backed.
 | `Q4/DIFFERENTIAL.json` | 100 000/100 000 matched; 0 unexplained, 0 invariant violations, 0 exceptions, 0 silent skips; one kernel digest |
 | `Q5/REPRODUCTION.json` | only the model stream replayed; tools re-executed and diffed; final workspace state compared; `assertConsumed` |
 | `P10/LEDGERLOCK-REGRESSION.json` | `delivery_verdict` and `plan_quality_verdict` recorded **separately**; `plan_quality_verdict = NOT_CLAIMED` absent preregistered thresholds; no generalization claim; no cohort sealed |
+
+<!-- GENERATED:evidence-P7-P10 END -->
 
 ---
 

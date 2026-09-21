@@ -241,13 +241,31 @@ def _gen_specs() -> Checker:
     return Checker("gen_specs", "WP-1.2", lambda: gs.check(), bad, ("validation/v2/gen_specs.py",))
 
 
+def _plan_semantics() -> Checker:
+    pv = _load("aisef_v2_plan_validate", V2 / "plan_validate.py")
+    return Checker("plan_semantics", "P2 plan correction", lambda: pv.check_f_probe_absence_semantics(pv.load()),
+                   lambda fx: pv.check_f_probe_absence_semantics(pv.apply_fixture(pv.load(), fx["fixture"])),
+                   ("validation/v2/plan_validate.py",))
+
+
+def _plan_baseline() -> Checker:
+    pv = _load("aisef_v2_plan_validate", V2 / "plan_validate.py")
+
+    def bad(fx):
+        m = pv.load()
+        m["architecture_baseline"].update(fx["set"])
+        return pv.check_g_baseline(m)
+    return Checker("plan_baseline", "P2 plan correction", lambda: pv.check_g_baseline(pv.load()), bad,
+                   ("validation/v2/plan_validate.py",))
+
+
 REGISTRY: list[Callable[[], Checker]] = [
     _freeze_manifest, _v1_evidence_guard, _arch_catalog, _f_conformance, _plan_validate, _plan_docs_check,
     _state_model_prover, _v2_encoding_scanner, _packaging_check, _run_history,
     _kernel_rule("no_prose_control", "NO_PROSE_CONTROL", "WP-1.1"),
     _kernel_rule("no_raw_verdict_routing", "NO_RAW_VERDICT_ROUTING", "WP-1.3"),
     _kernel_rule("retryable_only_in_taxonomy", "RETRYABLE_ONLY_IN_TAXONOMY", "WP-1.4"),
-    _mutation, _p1_evidence, _gen_specs,
+    _mutation, _p1_evidence, _gen_specs, _plan_semantics, _plan_baseline,
 ]
 
 

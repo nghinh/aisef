@@ -3,8 +3,8 @@
 **Generated from [`cycle1-manifest.json`](cycle1-manifest.json) by `validation/v2/plan_validate.py`.**
 Do not hand-edit: `--check` fails on drift.
 
-Architecture baseline: RFC normative digest `8f0d522d9db0322c…`, freeze-table digest
-`c4d9895f921b707c…`, approval record `c23191bd71bc299d…`.
+Architecture baseline: RFC normative digest `564057137d0f5cd3…`, freeze-table digest
+`6ea7e312e15acc02…`, approval record `c23191bd71bc299d…` amended by `AISEF-V2-RFC-AMENDMENT-V2-001.json`.
 
 **33 implementation + 4 qualification = 37 packages. F1–F11 coverage: 11/11.**
 
@@ -80,7 +80,7 @@ Architecture baseline: RFC normative digest `8f0d522d9db0322c…`, freeze-table 
 | `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json` |
 | `WP-0.3` | Normative freeze table | a renamed enum member fails its F check; an added Owner member fails F3 | `closure-evidence/v2/F-CONFORMANCE.json` |
 | `WP-0.5` | 27 (Q0), 9.1 | a checker that always passes is rejected by its calibration | `closure-evidence/v2/Q0-CHECKER-CALIBRATION.json` |
-| `WP-2.1` | 9, 24 | missing interpreter/tool -> UNRUNNABLE (harness failure); missing subject -> EXECUTED + REFUTED (observation), never UNRUNNABLE | `closure-evidence/v2/P2-PROBE-PROTOCOL.json` |
+| `WP-2.1` | 9, 24 | PROBE-ABS-1 observation harness unavailable (interpreter or tool missing, sandbox cannot execute, cannot inspect) -> UNRUNNABLE / ENVIRONMENT, no BehaviorVerdict; PROBE-ABS-2 REQUIRES_SUBJECT, subject absent -> EXECUTED + INDETERMINATE(PRECONDITION_ABSENT); never UNRUNNABLE, never a blanket verdict | `closure-evidence/v2/P2-PROBE-PROTOCOL.json` |
 | `WP-2.2` | 9.1, 9.1.1, 9.1.2, 27 (Q2) | CAL-1 a MUST_NOT_HOLD probe that always returns REFUTED is REJECTED; a probe that always returns SATISFIED is rejected for MUST_HOLD classes | `closure-evidence/v2/P2-CALIBRATION.json` |
 | `QP-7` | 27 | a rung that cannot run reports UNRUNNABLE, never FAILED; test-layout invariance: permuted test layouts give identical product verdicts | `closure-evidence/v2/Q0-Q3/SUMMARY.json` |
 

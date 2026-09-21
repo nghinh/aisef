@@ -33,7 +33,7 @@ and all of its exit checks are green.
 
 **P1** — NEG-1, NEG-2, NEG-3 green; no planning module imports BehaviorVerdict for routing; compiler --check round-trip byte-identical; semantic_hash stable across processes; satisfaction-mapping mutants fully killed; routing table total; no did-not-run -> developer edge
 
-**P2** — CAL-1 and CAL-2 green; missing subject vs missing harness separated; probe UNRUNNABLE -> ENVIRONMENT; INVALID_SPEC -> PLAN/INTEGRATION; no provider/request before story admission; scenarios A and K green; test-layout invariance: product verdicts identical across layouts
+**P2** — CAL-1 and CAL-2 green; PROBE-ABS-1..5 green: missing harness vs missing subject separated; absence decided per spec; probe UNRUNNABLE -> ENVIRONMENT; INVALID_SPEC -> PLAN/INTEGRATION; no provider/request before story admission; scenarios A and K green; test-layout invariance: product verdicts identical across layouts
 
 **P3** — unknown required event refuses reconstruction; ignorable skipped; no projection reads time; incremental == full fold on every generated journal; 6/6 reference models agree and are calibrated; every control-critical projection mutation-tested; stale cache never treated as authority
 
@@ -136,5 +136,7 @@ never permitted across a phase barrier. `WP-3.5` carries an extra authorship-ind
 | C guard_ancestry | **PASS** |
 | D orchestration_semantics | **PASS** |
 | E qualification_chain | **PASS** |
+| F probe_absence_semantics | **PASS** |
+| G architecture_baseline | **PASS** |
 | F1–F11 coverage | **11/11** |
 | total problems | **0** |

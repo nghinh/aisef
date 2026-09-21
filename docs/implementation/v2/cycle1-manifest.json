@@ -5,8 +5,20 @@
   "rfc": "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md",
   "approval_record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
   "approval_record_sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
-  "rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
-  "freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",
+  "amendments": [
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "sha256": "eaeb3130e2eefe9aa294bd0d88115aa5715d4313504351fc8988af7e00820b73",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
+    "frozen_items_changed": [
+     "F2"
+    ]
+   }
+  ],
+  "rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
+  "freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a",
+  "original_rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+  "original_freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",
   "frozen_items": [
    "F1",
    "F2",
@@ -56,7 +68,7 @@
    "barrier": "P1",
    "exit_checks": [
     "CAL-1 and CAL-2 green",
-    "missing subject vs missing harness separated",
+    "PROBE-ABS-1..5 green: missing harness vs missing subject separated; absence decided per spec",
     "probe UNRUNNABLE -> ENVIRONMENT; INVALID_SPEC -> PLAN/INTEGRATION",
     "no provider/request before story admission",
     "scenarios A and K green",
@@ -216,7 +228,9 @@
     "CI fails on normative drift",
     "CI passes on non-normative preamble edits"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`AISEF-V2-FREEZE-MANIFEST.json`",
+   "evidence_asserts": "the RFC normative digest and freeze-table digest at HEAD equal the approval record; 11 items enumerated"
   },
   {
    "id": "WP-0.2",
@@ -268,7 +282,9 @@
     "--check green",
     "bidirectional failure demonstrated in tests"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`arch-catalog.md` + `--check`",
+   "evidence_asserts": "every frozen enum and member, fail-closed in **both** directions"
   },
   {
    "id": "WP-0.3",
@@ -316,7 +332,9 @@
     "11/11 items report a definite state",
     "no check can pass by absence"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`F-CONFORMANCE.json`",
+   "evidence_asserts": "11/11 frozen items report a definite state; none can pass by absence"
   },
   {
    "id": "WP-0.4",
@@ -378,7 +396,9 @@
      "grade": "opt-in per clone (git config core.hooksPath .githooks); adds no guarantee — the enforcement grade stays DETECTIVE, enforced in CI",
      "classification": "plan wording error about an existing file; not an architecture exception"
     }
-   ]
+   ],
+   "evidence_label": "`V1-EVIDENCE-BASELINE.json`",
+   "evidence_asserts": "sha256 of every V1 evidence file; any mutation is rejected"
   },
   {
    "id": "WP-0.5",
@@ -421,7 +441,9 @@
     "100% of Q0 checkers calibrated",
     "calibration drift fails CI"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`Q0-CHECKER-CALIBRATION.json`",
+   "evidence_asserts": "every Q0 checker has a committed fixture it demonstrably rejects"
   },
   {
    "id": "WP-1.1",
@@ -469,7 +491,9 @@
     "hashes stable and total",
     "no-prose-control static check green"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P1-CONTRACT-SHAPES.json`",
+   "evidence_asserts": "`contract_hash` binds `subject_absence`; unapproved contracts cannot compile; no control path reads prose fields"
   },
   {
    "id": "WP-1.2",
@@ -521,7 +545,9 @@
     "hash stability proven across processes",
     "plane separation type-enforced"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P1-SPEC-COMPILER.json`",
+   "evidence_asserts": "compile is deterministic across processes; `--check` byte-identical; a spec cannot hold a story or plan field"
   },
   {
    "id": "WP-1.3",
@@ -573,7 +599,9 @@
     "mutation of the satisfaction mapping fully killed",
     "static check: no planning module imports BehaviorVerdict for routing"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P1-OUTCOME-POLARITY.json`",
+   "evidence_asserts": "**NEG-1, NEG-2, NEG-3**; a verdict is unconstructible outside `EXECUTED`; satisfaction mutation fully killed"
   },
   {
    "id": "WP-1.4",
@@ -636,7 +664,9 @@
      ],
      "classification": "approved architecture exception (F2); no phase, dependency or scope change"
     }
-   ]
+   ],
+   "evidence_label": "`P1-ROUTING-TABLE.json`",
+   "evidence_asserts": "routing total over the legal state space; `REFUTED`↛`ENVIRONMENT`; `UNRUNNABLE`↛`DEVELOPER`; unmapped outcomes fail closed"
   },
   {
    "id": "WP-2.1",
@@ -664,15 +694,20 @@
     "Probe protocol with id, digest, enforcement(), harness_preconditions(), evaluate().",
     "Observation-harness vs subject split enforced by the API shape.",
     "One reference probe kind (python_callable) to exercise the protocol.",
-    "Refuse rather than degrade when enforcement is insufficient."
+    "Refuse rather than degrade when enforcement is insufficient.",
+    "Subject absence follows the spec, never a global missing-path rule (RFC §10.2): REQUIRES_SUBJECT -> EXECUTED + INDETERMINATE(PRECONDITION_ABSENT); ABSENCE_IS_DECIDABLE -> EXECUTED + the verdict the spec's observable implies.",
+    "Narrow the P1 helper aisef2.product.outcome.on_subject_absent: its ABSENCE_IS_DECIDABLE branch returns REFUTED for every spec, which holds for existence observables only; the verdict must come from the spec's observable (PROBE-ABS-5)."
    ],
    "positive_tests": [
     "probe digest stable and bound into the spec",
     "enforcement level recorded on every result"
    ],
    "adversarial_tests": [
-    "missing interpreter/tool -> UNRUNNABLE (harness failure)",
-    "missing subject -> EXECUTED + REFUTED (observation), never UNRUNNABLE",
+    "PROBE-ABS-1 observation harness unavailable (interpreter or tool missing, sandbox cannot execute, cannot inspect) -> UNRUNNABLE / ENVIRONMENT, no BehaviorVerdict",
+    "PROBE-ABS-2 REQUIRES_SUBJECT, subject absent -> EXECUTED + INDETERMINATE(PRECONDITION_ABSENT); never UNRUNNABLE, never a blanket verdict",
+    "PROBE-ABS-3 ABSENCE_IS_DECIDABLE, positive existence contract, subject absent -> EXECUTED; ContractSatisfaction UNSATISFIED",
+    "PROBE-ABS-4 ABSENCE_IS_DECIDABLE, negative existence contract, forbidden subject absent -> EXECUTED; ContractSatisfaction SATISFIED",
+    "PROBE-ABS-5 one physical absence under different contract semantics is not forced to one ContractSatisfaction",
     "a probe asked for an unsupported observation class refuses, never degrades",
     "probe API rejects a developer-authored path"
    ],
@@ -687,10 +722,81 @@
    ],
    "evidence_artifact": "closure-evidence/v2/P2-PROBE-PROTOCOL.json",
    "exit_criteria": [
-    "missing-subject vs missing-harness separation proven",
+    "PROBE-ABS-1..5 green: harness failure vs subject absence separated, and absence decided per spec (SubjectAbsence + observable), never by a global rule",
     "enforcement bound into the result"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P2-PROBE-PROTOCOL.json`",
+   "evidence_asserts": "**PROBE-ABS-1..5**: harness failure ⇒ `UNRUNNABLE` / ENVIRONMENT; `REQUIRES_SUBJECT` + subject absent ⇒ `EXECUTED` + `INDETERMINATE(PRECONDITION_ABSENT)`; `ABSENCE_IS_DECIDABLE` + subject absent ⇒ `EXECUTED` + the verdict the spec's observable implies — no global absence rule; enforcement bound into every result; developer paths rejected",
+   "acceptance_cases": [
+    {
+     "id": "PROBE-ABS-1",
+     "rfc": "§9",
+     "subject_absence": "any",
+     "given": "the observation harness is unavailable: interpreter missing, required probe tool missing, sandbox cannot execute, or the probe cannot inspect at all",
+     "expect": {
+      "status": "UNRUNNABLE",
+      "owner": "ENVIRONMENT",
+      "behavior_verdict": "none"
+     }
+    },
+    {
+     "id": "PROBE-ABS-2",
+     "rfc": "§10.2",
+     "subject_absence": "REQUIRES_SUBJECT",
+     "given": "the observation harness ran; the subject the contract requires is absent",
+     "expect": {
+      "status": "EXECUTED",
+      "behavior_verdict": "INDETERMINATE",
+      "reason": "PRECONDITION_ABSENT",
+      "never": [
+       "UNRUNNABLE",
+       "a blanket REFUTED"
+      ]
+     }
+    },
+    {
+     "id": "PROBE-ABS-3",
+     "rfc": "§10.2, §10.1",
+     "subject_absence": "ABSENCE_IS_DECIDABLE",
+     "given": "the observation harness ran; a positive existence contract; the subject is absent",
+     "expect": {
+      "status": "EXECUTED",
+      "behavior_verdict": "the verdict the spec's observable implies",
+      "contract_satisfaction": "UNSATISFIED"
+     }
+    },
+    {
+     "id": "PROBE-ABS-4",
+     "rfc": "§10.2, §10.1",
+     "subject_absence": "ABSENCE_IS_DECIDABLE",
+     "given": "the observation harness ran; a negative existence contract; the forbidden subject is absent",
+     "expect": {
+      "status": "EXECUTED",
+      "behavior_verdict": "the verdict the spec's observable implies",
+      "contract_satisfaction": "SATISFIED"
+     }
+    },
+    {
+     "id": "PROBE-ABS-5",
+     "rfc": "§7, §10.2",
+     "subject_absence": "per contract",
+     "given": "the same physical absence of one subject, evaluated under different contract semantics",
+     "expect": {
+      "contract_satisfaction": "not forced to one value: each spec's SubjectAbsence, observable and polarity decide it",
+      "proves": "absence handling is contract/spec-driven, never a global missing-path rule"
+     }
+    }
+   ],
+   "discovered_findings": [
+    {
+     "id": "PLAN-FINDING-004",
+     "found": "2026-09-21, owner review before P2 authorization",
+     "what": "the plan equated every missing subject with an executed REFUTED observation, collapsing the RFC's REQUIRES_SUBJECT / ABSENCE_IS_DECIDABLE distinction (manifest adversarial test, traceability, hand-written evidence-plan row)",
+     "resolution": "replaced by PROBE-ABS-1..5 using the existing RFC semantics; evidence-plan rows now generated from the manifest; plan_validate check F (PLANSEM-1..2) fails on the simplification",
+     "classification": "plan defect against the frozen RFC; no RFC change, no architecture exception, no scheduling change"
+    }
+   ]
   },
   {
    "id": "WP-2.2",
@@ -738,7 +844,9 @@
     "CAL-1 and CAL-2 green",
     "contrast rule proven for both polarities"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P2-CALIBRATION.json`",
+   "evidence_asserts": "**CAL-1** an always-`REFUTED` prohibition probe is rejected; contrast rule proven for both polarities"
   },
   {
    "id": "WP-2.3",
@@ -790,7 +898,9 @@
     "no probe executes in the engine",
     "CAL-2 asserted by test"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P2-STATIC-ADMISSION.json`",
+   "evidence_asserts": "9/9 static checks; no probe executes in the engine; **CAL-2** asserted — no plan-freeze path needs spec falsifiability"
   },
   {
    "id": "WP-2.4",
@@ -840,7 +950,9 @@
     "disposition table total",
     "ordering assertion green against the in-memory sink"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P2-STORY-ADMISSION.json`",
+   "evidence_asserts": "disposition table total; abbreviated parent SHA refused; no `provider/request` before admission"
   },
   {
    "id": "WP-2.5",
@@ -885,7 +997,9 @@
     "scenarios A and K green",
     "no developer budget consumed on any PRE_SATISFIED path"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P2-PLAN-DRIFT.json`",
+   "evidence_asserts": "scenario **A** (early upstream implementation) and **K** (fully pre-satisfied story); zero developer budget on any `PRE_SATISFIED` path"
   },
   {
    "id": "WP-3.1",
@@ -938,7 +1052,9 @@
     "four-layer seq enforcement proven",
     "no mutation verb exists"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P3-JOURNAL-WRITER.json`",
+   "evidence_asserts": "`seq == index` at four layers; append-site validation; no update/delete verb exists"
   },
   {
    "id": "WP-3.2",
@@ -982,7 +1098,9 @@
     "refusal proven for unknown-required",
     "skip proven for ignorable"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P3-FORMAT-COMPAT.json`",
+   "evidence_asserts": "unknown **required** event ⇒ refuse to reconstruct; unknown `ignorable` ⇒ skip"
   },
   {
    "id": "WP-3.3",
@@ -1028,7 +1146,9 @@
     "incremental == full on every generated journal",
     "time-not-read check green"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P3-FOLD-ORACLE.json`",
+   "evidence_asserts": "incremental state == `fold(prefix)` on every generated journal; no projection reads `time`"
   },
   {
    "id": "WP-3.4",
@@ -1074,7 +1194,9 @@
     "closed-list enforcement proven",
     "mutation fully killed"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P3-CONTROL-PROJECTIONS.json`",
+   "evidence_asserts": "6/6 implemented; a seventh cannot be cited by a gate; mutation fully killed"
   },
   {
    "id": "WP-3.5",
@@ -1120,7 +1242,9 @@
     "6/6 reference models, all calibrated",
     "no-import constraint mechanically enforced"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P3-REFERENCE-MODELS.json`",
+   "evidence_asserts": "6/6 reference models, each calibrated; AST no-import constraint enforced"
   },
   {
    "id": "WP-4.1",
@@ -1171,7 +1295,9 @@
     "ordering deterministic",
     "no swallowed disposal failure"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P4-STORY-SCOPE.json`",
+   "evidence_asserts": "acquisition during dispose rejected; disposal failure recorded, never swallowed; deterministic sibling order"
   },
   {
    "id": "WP-4.2",
@@ -1234,7 +1360,9 @@
      "authority": "owner decision 'AISEF V2 — OWNER ACCEPTS P0 / AUTHORIZE P1 SEMANTIC CORE' §2",
      "note": "added as future acceptance obligations only; not implemented before WP-4.2 (P4)"
     }
-   ]
+   ],
+   "evidence_label": "`P4-RANGE-EMPTINESS.json`",
+   "evidence_asserts": "D-024 reproducer red-before / green-after; OS-asserted emptiness on **Linux and Windows CI**; escaped children reported as residuals"
   },
   {
    "id": "WP-4.3",
@@ -1290,7 +1418,9 @@
     "RUN-1 and RUN-2 green",
     "lease released last proven by ordering assertion"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P4-RUN-LIFETIME.json`",
+   "evidence_asserts": "**RUN-1** and **RUN-2**; writer-close failure leaves `OPEN`; `CLEAN` failure leaves `OPEN`; lease released last"
   },
   {
    "id": "WP-4.4",
@@ -1338,7 +1468,9 @@
     "grades implemented and bound",
     "OPAQUE Q6 bar enforced mechanically"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P4-RUNSPEC-IDENTITY.json`",
+   "evidence_asserts": "scenario **H**; `OPAQUE` bars Q6; enforcement level changes break comparability"
   },
   {
    "id": "WP-4.5",
@@ -1390,7 +1522,9 @@
     "no side counter exists",
     "SS-64 and D-006 reproducers green"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P4-BUDGETS.json`",
+   "evidence_asserts": "SS-64 and D-006 reproducers; no side retry counter exists anywhere"
   },
   {
    "id": "WP-4.6",
@@ -1443,7 +1577,9 @@
     "repair idempotent byte-for-byte",
     "no interruption leaves an unexplained gap"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P4-INTERRUPTION.json`",
+   "evidence_asserts": "repairing the same journal twice is byte-identical; no interruption leaves a gap; abandonment recorded"
   },
   {
    "id": "WP-5.1",
@@ -1496,7 +1632,9 @@
     "TEST-1 and TEST-2 green",
     "no did-not-run -> developer edge exists anywhere"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P5-TEST-EXECUTION.json`",
+   "evidence_asserts": "**TEST-1**, **TEST-2**; four collection-cause cases; **no \"did not run ⇒ developer\" edge exists anywhere**"
   },
   {
    "id": "WP-5.2",
@@ -1542,7 +1680,9 @@
     "UNMEASURABLE never collapses to IRRELEVANT",
     "branch coverage not required universally"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P5-RELEVANCE.json`",
+   "evidence_asserts": "capability absence ⇒ `UNMEASURABLE`, never `IRRELEVANT`; branch coverage not required universally"
   },
   {
    "id": "WP-5.3",
@@ -1588,7 +1728,9 @@
     "three-valued result proven",
     "IX assertion green"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P5-VACUITY.json`",
+   "evidence_asserts": "three-valued result; no parent revision is ever checked out (invariant IX)"
   },
   {
    "id": "WP-5.4",
@@ -1636,7 +1778,9 @@
     "outcome undefined when UNRUNNABLE",
     "tdd-chronology non-blocking proven"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P5-ADEQUACY.json`",
+   "evidence_asserts": "`UNRUNNABLE` produces no `AdequacyOutcome`; `INCOMPLETE` never blocks; tdd-chronology cannot block under any policy"
   },
   {
    "id": "WP-5.5",
@@ -1685,7 +1829,9 @@
     "9/9 armed in every tier",
     "escape-through-except demonstrated by test"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P5-INVARIANTS.json`",
+   "evidence_asserts": "I–IX armed in every tier; **an invariant violation demonstrated escaping a `try/except`**"
   },
   {
    "id": "WP-6.1",
@@ -1730,7 +1876,9 @@
     "--check green",
     "zero silently-defaulted rows"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P6-MIGRATION-TABLE.json`",
+   "evidence_asserts": "generated, `--check` green, zero silently-defaulted rows, `SubjectAbsence` never inferred"
   },
   {
    "id": "WP-6.2",
@@ -1792,7 +1940,9 @@
     "end-to-end path green",
     "no confinement parameter can be omitted"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P6-ORCHESTRATION.json`",
+   "evidence_asserts": "end-to-end story through the real path; scenario **L**; confinement derived from scope, not omittable"
   },
   {
    "id": "WP-6.3",
@@ -1843,7 +1993,9 @@
     "6/6 removal proofs green",
     "audit fails closed on any unenumerated authority"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P6-OLD-PATH-REMOVAL.json`",
+   "evidence_asserts": "six removal proofs; the audit fails closed on any authority it cannot enumerate"
   },
   {
    "id": "QP-7",
@@ -1893,7 +2045,9 @@
     "zero unaudited mutation survivors",
     "every probe digest calibrated"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`Q0-Q3/SUMMARY.json`",
+   "evidence_asserts": "four rungs green on the exact candidate; zero unaudited mutation survivors; every probe digest calibrated; a rung that cannot run reports `UNRUNNABLE`, never `FAILED`"
   },
   {
    "id": "QP-8",
@@ -1931,7 +2085,9 @@
     "exit criteria met exactly",
     "any kernel change invalidates and requires a fresh run"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`Q4/DIFFERENTIAL.json`",
+   "evidence_asserts": "100 000/100 000 matched; 0 unexplained, 0 invariant violations, 0 exceptions, 0 silent skips; one kernel digest"
   },
   {
    "id": "QP-9",
@@ -1970,7 +2126,9 @@
     "Q5 green",
     "no recorded tool result is replayed"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`Q5/REPRODUCTION.json`",
+   "evidence_asserts": "only the model stream replayed; tools re-executed and diffed; final workspace state compared; `assertConsumed`"
   },
   {
    "id": "QP-10",
@@ -2009,7 +2167,9 @@
     "no generalization claim recorded",
     "no cohort sealed"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "evidence_label": "`P10/LEDGERLOCK-REGRESSION.json`",
+   "evidence_asserts": "`delivery_verdict` and `plan_quality_verdict` recorded **separately**; `plan_quality_verdict = NOT_CLAIMED` absent preregistered thresholds; no generalization claim; no cohort sealed"
   }
  ],
  "counts": {

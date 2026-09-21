@@ -1,0 +1,9 @@
+{
+ "checker": "plan_baseline",
+ "package": "P2 plan correction",
+ "kind": "manifest_edit",
+ "set": {
+  "rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f"
+ },
+ "expect": "BASELINE: plan cites rfc_normative_digest"
+}
