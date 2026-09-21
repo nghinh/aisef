@@ -64,7 +64,8 @@
   "planning_modules_scanned": [
    "aisef2/plan/__init__.py",
    "aisef2/plan/obligation.py",
-   "aisef2/plan/static_admission.py"
+   "aisef2/plan/static_admission.py",
+   "aisef2/plan/story_admission.py"
   ]
  },
  "f5_conformance": {

@@ -436,10 +436,130 @@ def static_admission() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- WP-2.4
+
+def story_admission() -> dict:
+    import itertools
+    from aisef2.arch.enums import (BehaviorVerdict as V, EventType, MeasurementPoint, ObligationRole as Role,
+                                   StoryAdmissionDisposition as D)
+    from aisef2.control import routing
+    from aisef2.errors import InvariantError
+    from aisef2.plan import story_admission as sa
+    from aisef2.plan.obligation import EXPECTED_AT_PARENT
+    from aisef2.probe.protocol import RevisionRef
+    from aisef2.product.outcome import Executed, IndeterminateReason, InvalidSpec, Unrunnable
+    fc = _module("aisef_v2_freeze_conformance", "validation/v2/freeze_conformance.py")
+    ks = _module("aisef_v2_kernel_static_checks", "validation/v2/kernel_static_checks.py")
+    t = _module("aisef_v2_p2_story_world", "tests/v2/p2/test_story_admission.py")
+    rp = _module("aisef_v2_p2_story_probes", "tests/v2/p2/test_story_admission_probes.py")
+    pa = IndeterminateReason.PRECONDITION_ABSENT
+
+    def row(role, result, expectation=V.SATISFIED, committed=False):
+        d = t.decide(role, result, expectation, committed=committed)
+        return {"disposition": d.disposition.value, "owner": d.failure.owner.value if d.failure else None,
+                "satisfaction": d.satisfaction.value if d.satisfaction else None}
+    rfc_rows = {
+        "INTRODUCE expecting UNSATISFIED_AT_PARENT, measured UNSATISFIED": row(Role.INTRODUCE, Executed(V.REFUTED)),
+        "INTRODUCE expecting UNSATISFIED_AT_PARENT, measured SATISFIED": row(Role.INTRODUCE, Executed(V.SATISFIED)),
+        "PRESERVE expecting SATISFIED_AT_PARENT, measured SATISFIED": row(Role.PRESERVE, Executed(V.SATISFIED)),
+        "PRESERVE expecting SATISFIED_AT_PARENT, measured UNSATISFIED": row(Role.PRESERVE, Executed(V.REFUTED)),
+        "VERIFY, measured SATISFIED": row(Role.VERIFY, Executed(V.SATISFIED)),
+        "VERIFY, measured UNSATISFIED": row(Role.VERIFY, Executed(V.REFUTED)),
+        "INTRODUCE, INDETERMINATE(PRECONDITION_ABSENT)": row(Role.INTRODUCE, Executed(V.INDETERMINATE, pa)),
+        "PRESERVE, INDETERMINATE(PRECONDITION_ABSENT)": row(Role.PRESERVE, Executed(V.INDETERMINATE, pa)),
+        "VERIFY, INDETERMINATE(PRECONDITION_ABSENT)": row(Role.VERIFY, Executed(V.INDETERMINATE, pa)),
+        "any, probe UNRUNNABLE": row(Role.INTRODUCE, Unrunnable("x")),
+        "any, probe INVALID_SPEC": row(Role.PRESERVE, InvalidSpec("x")),
+        "PRESERVE measured UNSATISFIED, introducing story committed": row(Role.PRESERVE, Executed(V.REFUTED),
+                                                                          committed=True),
+    }
+    key = (MeasurementPoint.PARENT, sa.ContractSatisfaction.INDETERMINATE, pa, Role.INTRODUCE)
+    with mock.patch.dict(routing._EXECUTED, {k: v for k, v in routing._EXECUTED.items() if k != key}, clear=True):
+        bare = row(Role.INTRODUCE, Executed(V.INDETERMINATE, pa))
+    neg = {"NEG-1 forbidden behaviour present, INTRODUCE": row(Role.INTRODUCE, Executed(V.SATISFIED), V.REFUTED),
+           "NEG-2 forbidden behaviour absent (decidable), INTRODUCE": row(Role.INTRODUCE, Executed(V.REFUTED), V.REFUTED),
+           "NEG-3 required subject absent, INTRODUCE": row(Role.INTRODUCE, Executed(V.INDETERMINATE, pa), V.REFUTED),
+           "NEG-3 required subject absent, PRESERVE": row(Role.PRESERVE, Executed(V.INDETERMINATE, pa), V.REFUTED),
+           "NEG-3 required subject absent, VERIFY": row(Role.VERIFY, Executed(V.INDETERMINATE, pa), V.REFUTED)}
+    results = [Executed(V.SATISFIED), Executed(V.REFUTED), Executed(V.INDETERMINATE, pa), Unrunnable("x"),
+               InvalidSpec("y")]
+    total = [t.decide(r, x, e).disposition in set(D) for r, e, x in itertools.product(Role, (V.SATISFIED, V.REFUTED),
+                                                                                      results)]
+    real = {
+        "INTRODUCE, required subject absent": [d.value for d in rp.dispositions(rp.admit(
+            [rp.ob("C1", rp.ADD, Role.INTRODUCE)], rp.EMPTY))],
+        "INTRODUCE, already implemented": [d.value for d in rp.dispositions(rp.admit(
+            [rp.ob("C1", rp.ADD, Role.INTRODUCE)], rp.IMPLEMENTED))],
+        "PRESERVE, regressed": [d.value for d in rp.dispositions(rp.admit(
+            [rp.ob("C1", rp.ADD, Role.PRESERVE)], rp.REGRESSED))],
+        "INTRODUCE forbidden module, present": [d.value for d in rp.dispositions(rp.admit(
+            [rp.ob("C1", rp.NO_TEL, Role.INTRODUCE)], rp.TELEMETRY))],
+        "INTRODUCE forbidden module, absent": [d.value for d in rp.dispositions(rp.admit(
+            [rp.ob("C1", rp.NO_TEL, Role.INTRODUCE)], rp.EMPTY))],
+    }
+    with tempfile.TemporaryDirectory() as gone:
+        faults = {name: [d.value for d in rp.dispositions(rp.admit([rp.ob("C1", rp.ADD, Role.INTRODUCE)],
+                                                                   rp.IMPLEMENTED, **kw))]
+                  for name, kw in (("parent checkout failure", {"root": os.path.join(gone, "missing")}),
+                                   ("probe unrunnable", {"interpreter": os.path.join(gone, "python")}))}
+    sink = sa.MemorySink()
+    refused_before = _raises_invariant(lambda: sa.request_developer(sink, "S1"), InvariantError)
+    early = sa.ordering_problems([(EventType.PROVIDER_REQUEST, {"story_id": "S1"}),
+                                  (EventType.STORY_ADMITTED, {"story_id": "S1", "developer_call_permitted": True})])
+    abbreviated = _raises_invariant(lambda: RevisionRef("0f1e2d3c4b5a", os.path.abspath("x")), InvariantError)
+    conformance = fc.evaluate(*fc.load_inputs())
+    f7 = next(x for x in conformance["subchecks"] if x["id"] == "F7.dispositions")
+    return {
+        "record": "AISEF V2 — P2 STORY ADMISSION", "work_package": "WP-2.4", "rfc_sections": ["13"],
+        "frozen_items": ["F7"],
+        "rfc_rows": rfc_rows, "bare_indeterminate": bare, "neg_cases": neg, "real_parent": real,
+        "fault_injection": faults,
+        "open_items": ["§22 names no failure code for PLAN_CONTRADICTION: it blocks the story and charges no owner; an "
+                       "owner, if any, is the owner's decision"],
+        "f7_conformance": {"state": f7["state"], "detail": f7["detail"]},
+        "properties": {
+            "every_rfc_row_reproduced": [v["disposition"] for v in rfc_rows.values()] == [
+                "READY", "PRE_SATISFIED", "READY", "PRECONDITION_BROKEN", "READY", "READY", "READY",
+                "PRECONDITION_BROKEN", "PRECONDITION_BROKEN", "PROBE_UNRUNNABLE", "PROBE_INVALID", "PLAN_CONTRADICTION"],
+            "disposition_table_total": all(total) and len(total) == 30,
+            "unadmissible_role_expectation_pairs_fail_closed": all(
+                _raises_invariant(lambda r=r, e=e: t.decide(r, Executed(V.SATISFIED), expected=e), InvariantError)
+                for r in Role for e in sa.ParentExpectation if EXPECTED_AT_PARENT[r] is not e),
+            "probe_unrunnable_is_environment": rfc_rows["any, probe UNRUNNABLE"]["owner"] == "ENVIRONMENT"
+                and all(v == ["PROBE_UNRUNNABLE"] for v in faults.values()),
+            "invalid_spec_is_probe_invalid_integration": rfc_rows["any, probe INVALID_SPEC"] ==
+                {"disposition": "PROBE_INVALID", "owner": "INTEGRATION", "satisfaction": None},
+            "preserve_unsatisfied_is_precondition_broken": rfc_rows[
+                "PRESERVE expecting SATISFIED_AT_PARENT, measured UNSATISFIED"]["disposition"] == "PRECONDITION_BROKEN",
+            "bare_indeterminate_is_probe_invalid_never_developer": bare["disposition"] == "PROBE_INVALID"
+                and bare["owner"] != "DEVELOPER",
+            "neg_1_2_3": [v["disposition"] for v in neg.values()] == ["READY", "PRE_SATISFIED", "READY",
+                                                                     "PRECONDITION_BROKEN", "PRECONDITION_BROKEN"],
+            "real_probe_at_the_parent": real == {
+                "INTRODUCE, required subject absent": ["READY"], "INTRODUCE, already implemented": ["PRE_SATISFIED"],
+                "PRESERVE, regressed": ["PRECONDITION_BROKEN"], "INTRODUCE forbidden module, present": ["READY"],
+                "INTRODUCE forbidden module, absent": ["PRE_SATISFIED"]},
+            "abbreviated_parent_sha_refused": abbreviated,
+            "no_provider_request_before_admission": refused_before and early != [] and sink.events == (),
+            "routes_on_satisfaction_never_the_raw_verdict": ks.check(ROOT, ("NO_RAW_VERDICT_ROUTING",)) == [],
+            "f7_dispositions_equal_rfc": f7["state"] == "PASS",
+        },
+    }
+
+
+def _raises_invariant(fn, exc) -> bool:
+    try:
+        fn()
+    except exc:
+        return True
+    return False
+
+
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-2.1": ("closure-evidence/v2/P2-PROBE-PROTOCOL.json", probe_protocol, "aisef2/probe/protocol.py"),
     "WP-2.2": (CALIBRATION_REL, calibration, "aisef2/probe/calibration.py"),
     "WP-2.3": ("closure-evidence/v2/P2-STATIC-ADMISSION.json", static_admission, "aisef2/plan/static_admission.py"),
+    "WP-2.4": ("closure-evidence/v2/P2-STORY-ADMISSION.json", story_admission, "aisef2/plan/story_admission.py"),
 }
 
 

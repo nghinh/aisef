@@ -85,6 +85,11 @@ P2_TARGETS: dict[str, list[str]] = {
     "aisef2/plan/static_admission.py::_cycle": _ADMISSION_TESTS,
     "aisef2/plan/static_admission.py::story_graph": _ADMISSION_TESTS,
     "aisef2/plan/static_admission.py::depends_on_story": _ADMISSION_TESTS,
+    # WP-2.4: the §13 disposition table, the story gate and the ordering rule
+    "aisef2/plan/story_admission.py::classify": ["tests/v2/p2/test_story_admission.py"],
+    "aisef2/plan/story_admission.py::admit_story": ["tests/v2/p2/test_story_admission.py"],
+    "aisef2/plan/story_admission.py::ordering_problems": ["tests/v2/p2/test_story_admission.py"],
+    "aisef2/plan/story_admission.py::request_developer": ["tests/v2/p2/test_story_admission.py"],
 }
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
