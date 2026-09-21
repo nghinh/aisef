@@ -90,6 +90,11 @@ P2_TARGETS: dict[str, list[str]] = {
     "aisef2/plan/story_admission.py::admit_story": ["tests/v2/p2/test_story_admission.py"],
     "aisef2/plan/story_admission.py::ordering_problems": ["tests/v2/p2/test_story_admission.py"],
     "aisef2/plan/story_admission.py::request_developer": ["tests/v2/p2/test_story_admission.py"],
+    # WP-2.5: attribution through the DAG, the continuation after admission, the budget rule, plan quality
+    "aisef2/plan/drift.py::attribute": ["tests/v2/p2/test_drift.py"],
+    "aisef2/plan/drift.py::continue_story": ["tests/v2/p2/test_drift.py"],
+    "aisef2/plan/drift.py::budget_problems": ["tests/v2/p2/test_drift.py"],
+    "aisef2/plan/drift.py::plan_quality": ["tests/v2/p2/test_drift.py"],
 }
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}

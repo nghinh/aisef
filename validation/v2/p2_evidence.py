@@ -547,6 +547,86 @@ def story_admission() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- WP-2.5
+
+def plan_drift() -> dict:
+    from aisef2.arch.enums import ContractSatisfaction as CS, EventType
+    from aisef2.plan import drift as dr
+    from aisef2.plan import story_admission as sa
+    from aisef2.plan.obligation import PlanQualityPolicy
+    sc = _module("aisef_v2_p2_drift_scenarios", "tests/v2/p2/test_drift_scenarios.py")
+    t = _module("aisef_v2_p2_drift_world", "tests/v2/p2/test_drift.py")
+    from aisef2.probe.protocol import RevisionRef
+
+    def run(plan, completed):
+        sink = sa.MemorySink()
+        adm = sa.admit_story(plan, "S2", RevisionRef(sc.REV1, sc.AFTER_S1), specs=sc.SPECS, probes={sc.P.id: sc.P},
+                             env=sc.ENV, committed_stories=frozenset({"S1"}), sink=sink)
+        cont = dr.continue_story(plan, adm, completed, sink)
+        refused = False
+        if adm.developer_call_permitted:
+            sa.request_developer(sink, "S2", {"criteria": list(cont.developer_work)})
+        else:
+            refused = _raises_invariant(lambda: sa.request_developer(sink, "S2"), Exception)
+        return {"dispositions": {o.criterion_id: o.decision.disposition.value for o in adm.obligations},
+                "developer_call_permitted": adm.developer_call_permitted,
+                "already_satisfied": cont.already_satisfied, "developer_work": list(cont.developer_work),
+                "verify_at_candidate": list(cont.verify_at_candidate),
+                "drift": [{"criterion_id": d.criterion_id, "attributed_to": d.attributed_to,
+                           "candidates": list(d.candidates)} for d in cont.drift],
+                "developer_request_refused": refused,
+                "provider_requests": sum(1 for e, _ in sink.events if e is EventType.PROVIDER_REQUEST),
+                "budget_problems": dr.budget_problems(sink.events),
+                "ordering_problems": sa.ordering_problems(sink.events)}
+    mul_s1 = sc.completed_s1(sc.MUL)
+    a = run(sc.ScenarioA.PLAN, {sc.MUL.id: mul_s1})
+    k = run(sc.ScenarioK.PLAN, {sc.MUL.id: mul_s1})
+    flips = {"S1 flips the spec": dr.attribute(t.PLAN, "S3", t.B.id, [t.flip("S1")])[0],
+             "a non-upstream story flips it": dr.attribute(t.PLAN, "S3", t.B.id, [t.flip("S0")])[0],
+             "two upstream stories flip it": dr.attribute(t.PLAN, "S3", t.B.id, [t.flip("S1"), t.flip("S2")])[0],
+             "nothing measured": dr.attribute(t.PLAN, "S3", t.B.id, [dr.CompletedStory("S2", None, CS.SATISFIED)])[0]}
+    q = t.Quality()
+    q.setUp()
+    quality = {"not preregistered": q.q(t.NOT_PREREGISTERED).verdict,
+               "ratio 0.5 preregistered at 0.5": q.q(PlanQualityPolicy(0.5, None, None)).verdict,
+               "ratio 0.5 preregistered at 0.4": q.q(PlanQualityPolicy(0.4, None, None)).verdict}
+    return {
+        "record": "AISEF V2 — P2 PLAN DRIFT", "work_package": "WP-2.5", "rfc_sections": ["14", "29"],
+        "frozen_items": ["F7"],
+        "scenario_A_early_upstream_implementation": a,
+        "scenario_K_fully_pre_satisfied_story": k,
+        "attribution_cases": flips,
+        "plan_quality_verdicts": quality,
+        "implementation_decisions": [
+            "attribution: the introducer is the completed upstream (DAG) story measured not SATISFIED at its parent "
+            "and SATISFIED at its merge; none or several such stories -> UNATTRIBUTED with the candidates kept "
+            "(RFC §36 leaves tie-breaks to the implementation; a tie never blames one story)",
+            "the measurements are inputs; running probes at completed stories' revisions belongs to orchestration (P5)",
+            "developer budget is charged by provider/request events, each naming the criteria it works on; "
+            "budget_problems rejects any that names a criterion not admitted READY",
+        ],
+        "properties": {
+            "scenario_A_pre_satisfied_and_attributed_upstream": a["dispositions"] == {"C2": "PRE_SATISFIED",
+                                                                                     "C3": "READY"}
+                and a["drift"] == [{"criterion_id": "C2", "attributed_to": "S1", "candidates": ["S1"]}],
+            "scenario_A_continues_on_the_remainder": a["developer_work"] == ["C3"] and not a["already_satisfied"]
+                and a["verify_at_candidate"] == ["C2", "C3"],
+            "scenario_K_story_already_satisfied_developer_skipped": k["already_satisfied"]
+                and not k["developer_call_permitted"] and k["developer_request_refused"] and k["provider_requests"] == 0,
+            "scenario_K_every_obligation_still_verified": k["verify_at_candidate"] == ["C2"],
+            "pre_satisfied_charges_no_developer_budget": a["budget_problems"] == [] == k["budget_problems"]
+                and "C2" not in a["developer_work"],
+            "no_provider_request_before_admission": a["ordering_problems"] == [] == k["ordering_problems"],
+            "unattributed_when_none_or_ambiguous": flips == {
+                "S1 flips the spec": "S1", "a non-upstream story flips it": "UNATTRIBUTED",
+                "two upstream stories flip it": "UNATTRIBUTED", "nothing measured": "UNATTRIBUTED"},
+            "plan_quality_not_claimed_without_preregistered_thresholds": quality == {
+                "not preregistered": "NOT_CLAIMED", "ratio 0.5 preregistered at 0.5": "PASS",
+                "ratio 0.5 preregistered at 0.4": "FAIL"},
+        },
+    }
+
+
 def _raises_invariant(fn, exc) -> bool:
     try:
         fn()
@@ -560,6 +640,7 @@ BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-2.2": (CALIBRATION_REL, calibration, "aisef2/probe/calibration.py"),
     "WP-2.3": ("closure-evidence/v2/P2-STATIC-ADMISSION.json", static_admission, "aisef2/plan/static_admission.py"),
     "WP-2.4": ("closure-evidence/v2/P2-STORY-ADMISSION.json", story_admission, "aisef2/plan/story_admission.py"),
+    "WP-2.5": ("closure-evidence/v2/P2-PLAN-DRIFT.json", plan_drift, "aisef2/plan/drift.py"),
 }
 
 

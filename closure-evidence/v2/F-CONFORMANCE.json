@@ -1,7 +1,7 @@
 {
  "record": "AISEF V2 — F1–F11 CONFORMANCE",
  "work_package": "WP-0.3",
- "current_phase": "P1",
+ "current_phase": "P2",
  "reference": "extracted from the RFC normative body; never transcribed",
  "items": [
   {
@@ -743,7 +743,7 @@
    "implemented_by": "WP-2.1",
    "state": "PASS",
    "detail": "Probe equals the RFC: 5 members, signatures included",
-   "required_now": false
+   "required_now": true
   },
   {
    "item": "F5",
@@ -751,7 +751,7 @@
    "implemented_by": "WP-2.2",
    "state": "PASS",
    "detail": "both calibration contracts and the mechanism literal equal the RFC",
-   "required_now": false
+   "required_now": true
   },
   {
    "item": "F6",
@@ -775,7 +775,7 @@
    "implemented_by": "WP-2.3",
    "state": "PASS",
    "detail": "PlanObligation fields equal the RFC in order (7)",
-   "required_now": false
+   "required_now": true
   },
   {
    "item": "F7",
