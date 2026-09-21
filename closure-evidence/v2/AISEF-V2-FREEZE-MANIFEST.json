@@ -1,0 +1,85 @@
+{
+ "manifest": "AISEF V2 — ARCHITECTURE FREEZE MANIFEST",
+ "work_package": "WP-0.1",
+ "rfc": "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md",
+ "approval_record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
+ "approval_record_sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
+ "rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+ "freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",
+ "approved_rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+ "approved_freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",
+ "reviewed_commit": "2fe672c7ecdefa349e08353fa9bd67d627077d6e",
+ "frozen_items": [
+  {
+   "id": "F1",
+   "row_sha256": "b0b1b6d6914cda85c16ebc9538a8408e7360752dbdf880ca54987460329eb24b",
+   "item": "`Event` envelope, the event vocabulary, **and the typed enumerations carried in event payloads** *(adjusted)*",
+   "why": "Every journal is written under them; a payload enum change re-interprets existing events"
+  },
+  {
+   "id": "F2",
+   "row_sha256": "19617306f2cdf837755a023dab40e6f706aaf007a0133d05fbbc0f09d81ea3e9",
+   "item": "`ProbeExecutionStatus` × `BehaviorVerdict`, its six legal states, the owner routing table, **and the `ContractSatisfaction` derivation** *(adjusted)*",
+   "why": "Everything routes on it; `UNRESOLVABLE` is deleted. Re-deriving old evidence under a changed satisfaction mapping would silently re-interpret it"
+  },
+  {
+   "id": "F3",
+   "row_sha256": "a0b7f7a27f0a50b53b4efc16170f01116b07d93248771c07d33b1581cd6e5b12",
+   "item": "The `Owner` set — capped; a new member requires a cited measured defect",
+   "why": "Budgets and retries derive from it"
+  },
+  {
+   "id": "F4",
+   "row_sha256": "fc637720bc589d6fd68939186e0003e3d97829119bff76b0f908055884d8e53e",
+   "item": "`BehaviorContract` → `ProductProofSpec` compiler contract and the inputs to `semantic_hash`, **including `SubjectAbsence`** *(adjusted)*",
+   "why": "It is what `--check` compares against and what makes product evidence survive re-planning. Absence semantics change what a spec means when the subject is missing"
+  },
+  {
+   "id": "F5",
+   "row_sha256": "9e67f78a1529d4b437fad27806e545799f3e552985c0163d52ee5846f13d7bac",
+   "item": "`Probe` protocol: observation-harness / subject split, `enforcement()`, `ProbeResult` fields, **and the two calibration contracts — `ProbeCapabilityCalibration` and `SpecFalsifiabilityEvidence`, each demonstrating contrast to `candidate_expectation`** *(adjusted)*",
+   "why": "The split keeps product absence out of the environment budget; a changed calibration contract re-interprets whether existing probes were ever qualified"
+  },
+  {
+   "id": "F6",
+   "row_sha256": "fb5010a330f858f439ea35b8a1f0e733f653cdc2d5aca43e16abd7640b8edab4",
+   "item": "`PlanObligation` shape, `ObligationRole`, and `ParentExpectation` **expressed as a contract-satisfaction expectation, never a raw verdict** *(adjusted)*",
+   "why": "The planning plane's vocabulary. Raw-verdict expectations are polarity-inverted for every negative contract"
+  },
+  {
+   "id": "F7",
+   "row_sha256": "36dedf49f90886248be8e692974433619eb051ac34f8082194a88db3f93a61fa",
+   "item": "`StoryAdmissionDisposition` set",
+   "why": "Gate ordering and budget routing depend on it"
+  },
+  {
+   "id": "F8",
+   "row_sha256": "0bc2a40b492b8d7b674d91d9e6d084295b843a15ce04e1865d72a90cebbeb91f",
+   "item": "`RunScope` / `StoryScope` ownership split, the disposal ordering contract, and the **run lease / sentinel / journal lifetime order — lease acquired first and released last** *(adjusted)*",
+   "why": "Re-parenting resources later invalidates every disposal record; the lifetime order defines both what TORN means and when a second run may acquire ownership"
+  },
+  {
+   "id": "F9",
+   "row_sha256": "eab873cc50552e1aa1b7497edff78be3e95ea4cf7314645c24703e60dbc2c6ad",
+   "item": "The four cited identities, **including per-capability identity tuples, `IdentityGrade` and the aggregate minimum** *(adjusted)*",
+   "why": "Comparability of every verdict"
+  },
+  {
+   "id": "F10",
+   "row_sha256": "6046ef16c4c1c43e6bf2769f6bbba600d1c3abfc65a8c19d96b4882854da7f2e",
+   "item": "Invariants **I–IX**, each with its named enforcement mechanism",
+   "why": "An invariant without a mechanism is a documented intention"
+  },
+  {
+   "id": "F11",
+   "row_sha256": "51f57a2579541c96d54cb96655cc02a459c2674ece9ba461ab1ec92f5e2f5b37",
+   "item": "The six control-critical projections, as a **closed** list",
+   "why": "Only these may be cited by a gate"
+  }
+ ],
+ "rules": {
+  "normative_body": "sha256 from '## 1. Executive architecture decision' to EOF",
+  "freeze_table": "sha256 from '## Normative freeze table' up to '## Adversarial regression cases'",
+  "non_normative": "everything above the normative mark is status metadata and is not digested"
+ }
+}
