@@ -526,11 +526,19 @@
       },
       {
         "class": "ASSURANCE_AFFECTING",
+        "match": "aisef2/*"
+      },
+      {
+        "class": "ASSURANCE_AFFECTING",
         "match": "framework/*"
       },
       {
         "class": "ASSURANCE_AFFECTING",
         "match": ".github/*"
+      },
+      {
+        "class": "ASSURANCE_AFFECTING",
+        "match": ".githooks/*"
       },
       {
         "class": "ASSURANCE_AFFECTING",
