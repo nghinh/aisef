@@ -33,6 +33,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: python -m unittest discover -s tests -q
+      # WP-0.4 — V1 closure evidence is frozen. The suite arms an in-process guard at discovery; this step is
+      # the detective layer and runs AFTER the suite, on every OS, so a test that rewrote V1 evidence by any
+      # route (including a subprocess) fails the build. Compares git objects, so Windows autocrlf is safe.
+      - run: python -P validation/v2/v1_evidence_guard.py --check
 
   # Cổng lint — bật 2026-09-12. Tập rule ở `[tool.ruff.lint]` của pyproject là
   # cổng chứ không phải sở thích: F (pyflakes), B (bugbear), E9. Lượt bật đã bắt

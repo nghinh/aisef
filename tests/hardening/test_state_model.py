@@ -3,7 +3,8 @@
 Part 1 (`TestKernelModel`): the reference kernel model (`model.py`) is driven with N seeded random
 traces (default 10,000; `AISEF_MODEL_TRACES` overrides) and the ten owner properties are asserted
 after EVERY transition. A violation is a specification bug and a hard failure. Coverage of terminal
-classes and transitions is recorded in `closure-evidence/hardening/state-model-results.json`.
+classes and transitions is written to a test-owned scratch file (`RESULTS`). The committed
+`closure-evidence/hardening/state-model-results.json` is frozen V1 evidence and a test run never rewrites it.
 
 Part 2 (`TestConformance`): the real `implement_story` is driven through the synthetic client on
 scripted scenarios and its terminal class is compared with the model's. A deviation that is not a
@@ -15,6 +16,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
@@ -27,7 +29,10 @@ import tests  # noqa: E402,F401
 from tests.hardening import model as M  # noqa: E402
 
 TRACES = int(os.environ.get("AISEF_MODEL_TRACES", "10000"))
-RESULTS = ROOT / "closure-evidence/hardening/state-model-results.json"
+#: Runtime coverage output — a test-owned scratch file, never closure-evidence/. The committed file of the same
+#: name is frozen V1 evidence (PLAN-FINDING-001). It sits directly in the temp directory, which always exists:
+#: TestConformance sorts first and writes without creating a parent, exactly as it did with the old path.
+RESULTS = Path(tempfile.gettempdir()) / "aisef-state-model-results.json"
 
 
 class TestKernelModel(unittest.TestCase):
