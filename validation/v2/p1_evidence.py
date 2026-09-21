@@ -168,10 +168,65 @@ def spec_compiler() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- WP-1.3
+
+def outcome_polarity() -> dict:
+    from aisef2.arch.enums import BehaviorVerdict as V, ContractSatisfaction as CS, ProbeExecutionStatus
+    from aisef2.errors import InvariantError
+    from aisef2.product.outcome import (Executed, IndeterminateReason, InvalidSpec, Unrunnable,
+                                        contract_satisfaction, on_subject_absent)
+    from aisef2.product.spec import ProductProofSpec
+    fc = _module("aisef_v2_freeze_conformance", "validation/v2/freeze_conformance.py")
+    ks = _module("aisef_v2_kernel_static_checks", "validation/v2/kernel_static_checks.py")
+    corpus = ROOT / "tests/v2/fixtures/p1/corpus/specs"
+
+    def spec(cid):
+        return ProductProofSpec.from_json(json.loads((corpus / f"{cid}.json").read_text(encoding="utf-8")))
+
+    def neg(case, cid, observed):
+        s = spec(cid)
+        sat = contract_satisfaction(observed, s)
+        return {"case": case, "contract": cid, "candidate_expectation": s.candidate_expectation.value,
+                "subject_absence": s.probe_input["subject_absence"], "observed_verdict": observed.behavior_verdict.value,
+                "reason": observed.reason and observed.reason.value, "contract_satisfaction": sat.value}
+    cases = [neg("NEG-1", "BC-QUIET-STDOUT", Executed(V.SATISFIED)),
+             neg("NEG-2", "BC-NO-TELEMETRY", on_subject_absent(spec("BC-NO-TELEMETRY"))),
+             neg("NEG-3", "BC-QUIET-STDOUT", on_subject_absent(spec("BC-QUIET-STDOUT")))]
+    oracle = fc._satisfaction_matches_rfc(_rfc())
+    return {
+        "record": "AISEF V2 — P1 OUTCOME POLARITY", "work_package": "WP-1.3", "rfc_sections": ["10", "10.1", "10.2"],
+        "neg_cases": cases,
+        "note": "NEG dispositions (READY / PRE_SATISFIED / PRECONDITION_BROKEN) are StoryAdmission's (WP-2.4); "
+                "this record proves the satisfaction each disposition is routed on",
+        "rfc_oracle": {"state": oracle["state"], "detail": oracle["detail"], "table": oracle.get("table")},
+        "properties": {
+            "NEG_1_unsatisfied_never_satisfied": cases[0]["contract_satisfaction"] == CS.UNSATISFIED.value,
+            "NEG_2_satisfied": cases[1]["contract_satisfaction"] == CS.SATISFIED.value,
+            "NEG_3_indeterminate_precondition_absent": cases[2]["contract_satisfaction"] == CS.INDETERMINATE.value
+                                                       and cases[2]["reason"] == "PRECONDITION_ABSENT",
+            "verdict_only_inside_executed": not hasattr(Unrunnable("x"), "behavior_verdict")
+                                            and not hasattr(InvalidSpec("x"), "behavior_verdict"),
+            "indeterminate_requires_typed_reason": _raises(lambda: Executed(V.INDETERMINATE), InvariantError),
+            "satisfaction_undefined_without_execution": all(_raises(lambda r=r: contract_satisfaction(r, spec("BC-LICENSE")),
+                                                                    InvariantError)
+                                                            for r in (Unrunnable("x"), InvalidSpec("x"))),
+            "satisfaction_equals_rfc_function": oracle["state"] == "PASS",
+            "absence_is_an_observation_never_unrunnable": all(
+                on_subject_absent(spec(c)).status is ProbeExecutionStatus.EXECUTED
+                for c in ("BC-QUIET-STDOUT", "BC-NO-TELEMETRY", "BC-VERSION", "BC-LICENSE")),
+            "absence_follows_declaration_not_polarity": on_subject_absent(spec("BC-LICENSE")) == Executed(V.REFUTED)
+                and on_subject_absent(spec("BC-VERSION")) == Executed(V.INDETERMINATE,
+                                                                       IndeterminateReason.PRECONDITION_ABSENT),
+            "no_planning_module_routes_on_raw_verdict": ks.check(ROOT, ("NO_RAW_VERDICT_ROUTING",)) == [],
+        },
+    }
+
+
 #: package -> (record path, builder, module that must exist before the record is built)
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-1.1": ("closure-evidence/v2/P1-CONTRACT-SHAPES.json", contract_shapes, "aisef2/product/contract.py"),
     "WP-1.2": ("closure-evidence/v2/P1-SPEC-COMPILER.json", spec_compiler, "aisef2/product/compiler.py"),
+    "WP-1.3": ("closure-evidence/v2/P1-OUTCOME-POLARITY.json", outcome_polarity, "aisef2/product/outcome.py"),
 }
 
 

@@ -47,9 +47,13 @@ TARGETS: dict[str, list[str]] = {
     "aisef2/product/compiler.py::expectation_for": ["tests/v2/p1/test_spec_compiler.py"],
     "aisef2/product/spec.py::semantic_hash": ["tests/v2/p1/test_spec_compiler.py"],
     "aisef2/product/spec.py::spec_id": ["tests/v2/p1/test_spec_compiler.py"],
+    # WP-1.3: the F2 satisfaction derivation (no audits accepted), subject absence, the EXECUTED invariants
+    "aisef2/product/outcome.py::contract_satisfaction": ["tests/v2/p1/test_outcome.py"],
+    "aisef2/product/outcome.py::on_subject_absent": ["tests/v2/p1/test_outcome.py"],
+    "aisef2/product/outcome.py::__post_init__": ["tests/v2/p1/test_outcome.py"],
 }
 #: Targets whose survivors may not be audited away.
-NO_AUDIT: set[str] = set()
+NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
 #: (target, mutant description) -> why the mutant is equivalent. Empty until a survivor is examined by hand.
 AUDITED: dict[tuple[str, str], str] = {}
 #: What a run copies into its scratch tree.

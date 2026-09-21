@@ -32,7 +32,6 @@
     "F2.owner_routing_table"
    ],
    "pending_on": [
-    "WP-1.3",
     "WP-1.4"
    ]
   },
@@ -237,10 +236,69 @@
    "item": "F2",
    "id": "F2.contract_satisfaction_derivation",
    "implemented_by": "WP-1.3",
-   "state": "PENDING",
-   "detail": "aisef2.product.outcome.contract_satisfaction not implemented",
-   "rfc_reference": [
-    "behavior_verdict == candidate_expectation"
+   "state": "PASS",
+   "detail": "equals the RFC §10.1 function on all 10 (result, expectation) pairs",
+   "table": [
+    [
+     "EXECUTED",
+     "SATISFIED",
+     "SATISFIED",
+     "SATISFIED"
+    ],
+    [
+     "EXECUTED",
+     "SATISFIED",
+     "REFUTED",
+     "UNSATISFIED"
+    ],
+    [
+     "EXECUTED",
+     "REFUTED",
+     "SATISFIED",
+     "UNSATISFIED"
+    ],
+    [
+     "EXECUTED",
+     "REFUTED",
+     "REFUTED",
+     "SATISFIED"
+    ],
+    [
+     "EXECUTED",
+     "INDETERMINATE",
+     "SATISFIED",
+     "INDETERMINATE"
+    ],
+    [
+     "EXECUTED",
+     "INDETERMINATE",
+     "REFUTED",
+     "INDETERMINATE"
+    ],
+    [
+     "UNRUNNABLE",
+     null,
+     "SATISFIED",
+     "InvariantError"
+    ],
+    [
+     "UNRUNNABLE",
+     null,
+     "REFUTED",
+     "InvariantError"
+    ],
+    [
+     "INVALID_SPEC",
+     null,
+     "SATISFIED",
+     "InvariantError"
+    ],
+    [
+     "INVALID_SPEC",
+     null,
+     "REFUTED",
+     "InvariantError"
+    ]
    ],
    "required_now": false
   },

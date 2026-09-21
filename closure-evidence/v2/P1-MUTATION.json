@@ -419,6 +419,218 @@
    ]
   },
   {
+   "target": "aisef2/product/outcome.py::__post_init__",
+   "kill_tests": [
+    "tests/v2/p1/test_outcome.py"
+   ],
+   "source_sha256": "58d6988de125ccbef4841b427d005fe1e59634c5a42b6312bd999da9206eaddb",
+   "mutants": 13,
+   "killed": 13,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L39 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L41 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L39 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L41 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L42 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L44 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L41 BehaviorVerdict.INDETERMINATE->SATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L41 BehaviorVerdict.INDETERMINATE->REFUTED",
+     "killed": true
+    },
+    {
+     "mutant": "L42 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L44 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L40 string 'an executed probe reports a BehaviorVerdict' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L43 string 'INDETERMINATE requires a typed IndeterminateReason' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L45 string 'only INDETERMINATE carries a reason' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/product/outcome.py::contract_satisfaction",
+   "kill_tests": [
+    "tests/v2/p1/test_outcome.py"
+   ],
+   "source_sha256": "58d6988de125ccbef4841b427d005fe1e59634c5a42b6312bd999da9206eaddb",
+   "mutants": 21,
+   "killed": 21,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L68 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L70 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L72 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L68 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L71 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L72 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L68 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L68 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L70 BehaviorVerdict.INDETERMINATE->SATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L70 BehaviorVerdict.INDETERMINATE->REFUTED",
+     "killed": true
+    },
+    {
+     "mutant": "L71 ContractSatisfaction.INDETERMINATE->SATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L71 ContractSatisfaction.INDETERMINATE->UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L73 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L72 ContractSatisfaction.SATISFIED->UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L72 ContractSatisfaction.SATISFIED->INDETERMINATE",
+     "killed": true
+    },
+    {
+     "mutant": "L74 ContractSatisfaction.UNSATISFIED->SATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L74 ContractSatisfaction.UNSATISFIED->INDETERMINATE",
+     "killed": true
+    },
+    {
+     "mutant": "L68 ProbeExecutionStatus.EXECUTED->UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L68 ProbeExecutionStatus.EXECUTED->INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L69 string 'contract satisfaction is undefined for a probe that did not execute' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/product/outcome.py::on_subject_absent",
+   "kill_tests": [
+    "tests/v2/p1/test_outcome.py"
+   ],
+   "source_sha256": "58d6988de125ccbef4841b427d005fe1e59634c5a42b6312bd999da9206eaddb",
+   "mutants": 10,
+   "killed": 10,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L83 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L83 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L83 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L84 SubjectAbsence.REQUIRES_SUBJECT->ABSENCE_IS_DECIDABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L85 SubjectAbsence.ABSENCE_IS_DECIDABLE->REQUIRES_SUBJECT",
+     "killed": true
+    },
+    {
+     "mutant": "L84 BehaviorVerdict.INDETERMINATE->SATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L84 BehaviorVerdict.INDETERMINATE->REFUTED",
+     "killed": true
+    },
+    {
+     "mutant": "L85 BehaviorVerdict.REFUTED->SATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L85 BehaviorVerdict.REFUTED->INDETERMINATE",
+     "killed": true
+    },
+    {
+     "mutant": "L86 string 'subject_absence' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
    "target": "aisef2/product/spec.py::semantic_hash",
    "kill_tests": [
     "tests/v2/p1/test_spec_compiler.py"

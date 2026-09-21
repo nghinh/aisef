@@ -215,6 +215,51 @@ def _semantic_hash_binds_subject_absence(rfc: RFC) -> dict:
     return {"state": PASS, "detail": "semantic_hash differs for REQUIRES_SUBJECT and ABSENCE_IS_DECIDABLE"}
 
 
+def _satisfaction_matches_rfc(rfc: RFC) -> dict:
+    """F2 freezes the ContractSatisfaction derivation. The reference is the RFC's own §10.1 function, executed as
+    written against the implementation's enums, and compared with `aisef2.product.outcome.contract_satisfaction`
+    over every legal probe result and both candidate expectations. (The executed text is this repository's approved
+    RFC; nothing external runs.)"""
+    block = next((b for b in re.findall(r"```python\n(.*?)```", rfc.section("### 10.1", "### 10.2"), re.S)
+                  if "def contract_satisfaction" in b), None)
+    if block is None:
+        return {"state": FAIL, "detail": "RFC reference (§10.1 contract_satisfaction) could not be extracted"}
+    if not symbol_present("aisef2.product.outcome", "contract_satisfaction"):
+        return {"state": None, "detail": "aisef2.product.outcome.contract_satisfaction not implemented"}
+    from enum import Enum
+    from types import SimpleNamespace
+    from aisef2.arch.enums import BehaviorVerdict as V, ContractSatisfaction, ProbeExecutionStatus
+    from aisef2.product import outcome as O
+
+    class RFCInvariantError(Exception):
+        pass
+    ns = {"Enum": Enum, "ProbeExecutionStatus": ProbeExecutionStatus, "BehaviorVerdict": V,
+          "InvariantError": RFCInvariantError, "ProbeResult": object, "ProductProofSpec": object}
+    exec(compile(block, "RFC §10.1", "exec"), ns)  # noqa: S102 — the approved RFC's normative function
+    reference = ns["contract_satisfaction"]
+
+    def outcome(fn, result, spec):
+        try:
+            return fn(result, spec).value
+        except (RFCInvariantError, O.InvariantError):
+            return "InvariantError"
+    results = [O.Executed(V.SATISFIED), O.Executed(V.REFUTED),
+               O.Executed(V.INDETERMINATE, O.IndeterminateReason.PRECONDITION_ABSENT),
+               O.Unrunnable("x"), O.InvalidSpec("x")]
+    table, diffs = [], []
+    for r in results:
+        for e in (V.SATISFIED, V.REFUTED):
+            spec = SimpleNamespace(candidate_expectation=e)
+            want, got = outcome(reference, r, spec), outcome(O.contract_satisfaction, r, spec)
+            table.append([r.status.value, getattr(r, "behavior_verdict", None) and r.behavior_verdict.value, e.value, want])
+            if want != got:
+                diffs.append({"result": repr(r), "expectation": e.value, "rfc": want, "implemented": got})
+    if diffs or {c.value for c in ContractSatisfaction} != {row[3] for row in table} - {"InvariantError"}:
+        return {"state": FAIL, "detail": "contract_satisfaction differs from the RFC §10.1 function", "diffs": diffs}
+    return {"state": PASS, "detail": f"equals the RFC §10.1 function on all {len(table)} (result, expectation) pairs",
+            "table": table}
+
+
 def subchecks(rfc: RFC, code) -> list[dict]:
     e = rfc.enums
     V = _vocab
@@ -229,8 +274,7 @@ def subchecks(rfc: RFC, code) -> list[dict]:
     add("F1", "F1.event_envelope", "WP-3.1", _shape("aisef2.journal.event", "Event", rfc.dataclasses.get("Event")))
     for n in ("ProbeExecutionStatus", "BehaviorVerdict", "ContractSatisfaction"):
         add("F2", f"F2.enum.{n}", "WP-0.2", V(n, e.get(n, []), code))
-    add("F2", "F2.contract_satisfaction_derivation", "WP-1.3",
-        _shape("aisef2.product.outcome", "contract_satisfaction", ["behavior_verdict == candidate_expectation"]))
+    add("F2", "F2.contract_satisfaction_derivation", "WP-1.3", _satisfaction_matches_rfc(rfc))
     add("F2", "F2.owner_routing_table", "WP-1.4",
         _shape("aisef2.control.routing", "route", ["six legal (status, verdict) states -> owner"]))
     add("F3", "F3.owner_set", "WP-0.2", V("Owner", e.get("Owner", []), code))
