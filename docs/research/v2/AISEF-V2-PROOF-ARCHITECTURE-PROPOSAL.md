@@ -7,6 +7,21 @@ Implementation → Candidate Proof → Independent Verification.**
 This document proposes concrete interfaces for each link and states what each one is *for*. It is a design
 proposal, not an implementation; nothing here has been built.
 
+> ## ⚠ Corrected by the architecture board
+>
+> [`AISEF-V2-ARCHITECTURE-BOARD-RESOLUTION.md`](AISEF-V2-ARCHITECTURE-BOARD-RESOLUTION.md) **supersedes this
+> document** on five points. The original text is kept below so the correction is auditable, but where they
+> differ, the resolution governs.
+>
+> | § here | What changed | See |
+> |---|---|---|
+> | §3 `ProofSpec` | **Split into two planes.** `ProductProofSpec` holds no story ownership and no baseline expectation; those move to `PlanObligation` with an `ObligationRole` (INTRODUCE / PRESERVE / VERIFY). | resolution §1 |
+> | §3 `Verdict` | **Replaced by two axes.** `ProbeExecutionStatus` (EXECUTED / UNRUNNABLE / INVALID_SPEC) × `BehaviorVerdict` (SATISFIED / REFUTED / INDETERMINATE). **`UNRESOLVABLE` is deleted** — a missing subject is a completed observation yielding REFUTED, never an environment failure. | resolution §4 |
+> | §4 developer tests | The TDD RED→GREEN chronology ceases to be a universal blocker; `EngineeringTestAdequacy` replaces it, and a candidate-side vacuity control replaces RED-at-parent. | resolution §5 |
+> | §5 plan admission | **Split into two stages.** `StaticPlanAdmission` (no probes, before any agent call) and `StoryAdmission` (probes, at each story's exact frozen parent SHA). The single-stage form was unimplementable: it required parent SHAs that do not exist yet. | resolution §2 |
+> | §5 `PLAN_OVERLAP` | A behaviour already true at the parent is **`PRE_SATISFIED` + `PLAN_DRIFT`**, not a blocker. No developer budget is consumed and correct code is never made wrong. | resolution §3 |
+> | §8 residuals | The "contract faithful to a wrong requirement" residual now has a named control: a **human semantic gate** binding requirement and contract hashes. | resolution §11 |
+
 ---
 
 ## 0. The defect this architecture exists to make unexpressible
@@ -104,6 +119,9 @@ is a description of a test.
 The ProofSpec is **generated deterministically from the contract**. It is the only object the kernel consults
 when deciding whether a criterion holds.
 
+> **Superseded — resolution §1.** `required_at_baseline` is a plan fact and may not live in a product object.
+> Split into `ProductProofSpec` (product plane) and `PlanObligation` (planning plane).
+
 ```python
 @dataclass(frozen=True)
 class ProofSpec:
@@ -129,6 +147,10 @@ Three properties, each deliberate:
    the spec hash it was produced under, so no verdict can be reused across a changed obligation.
 
 ### Verdict is a typed lattice, not a boolean
+
+> **Superseded — resolution §4.** This single lattice conflates *whether the probe ran* with *what it observed*.
+> The measured V1 instance is SS-92: a bandit scan that executed, scanned 51 187 lines and exited 1 was recorded
+> `TOOL_UNRUNNABLE`. The corrected model is two axes, and `UNRESOLVABLE` is deleted.
 
 ```python
 class Verdict(Enum):

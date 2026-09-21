@@ -3,6 +3,18 @@
 Owner decisions §13 (the Q0–Q6 ladder) and §14 (LedgerLock's classification). A design proposal; nothing here
 has been built.
 
+> ## ⚠ Corrected by the architecture board
+>
+> [`AISEF-V2-ARCHITECTURE-BOARD-RESOLUTION.md`](AISEF-V2-ARCHITECTURE-BOARD-RESOLUTION.md) **supersedes this
+> document** on the ladder's composition and the holdout model.
+>
+> | § here | What changed | See |
+> |---|---|---|
+> | Q0 | **Plan admission is removed from Q0.** Q0 executes nothing. It was a category error to call a rung "no execution" while it ran probes. Q0 keeps the static checks and gains the StaticPlanAdmission *rules*; `StoryAdmission` is a **runtime gate**, not a rung, and its engine is qualified in Q1. | resolution §6 |
+> | Q1 | Gains the StoryAdmission engine, adversarial micro-workloads, **test-layout invariance** (ARCH-LESSON-001 made executable), and **reference models for the six control-critical projections**. | resolution §6, §9 |
+> | §3 holdout | **Consumed-once is replaced by the sealed evaluation cohort**: `SEALED → EVALUATING → EXPOSED → DEVELOPMENT`, with a preregistered run count and threshold. Running the preregistered repetitions does **not** demote. Demotion is triggered mechanically by a change to a frozen input *after* results were read. | resolution §7 |
+> | §3 `WorkloadRole` | Superseded by `EvaluationCohort`. LedgerLock remains `DEVELOPMENT` permanently, unchanged. | resolution §7 |
+
 The governing rule is the owner's: **do not put expensive qualification before semantic correctness has been
 proven.** V1's own history is the argument. Run 1 of PLAN-V2 spent a developer session and six minutes of a
 paid run to discover `AC-STORY-04-01-2` was `PLAN_OVERLAP`. V2.1 run 1 spent 0/16 of a full run discovering

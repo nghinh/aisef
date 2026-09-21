@@ -3,6 +3,17 @@
 Owner decisions §11 (event-sourced control review) and §12 (Story Transaction lifecycle). A design proposal;
 nothing here has been built.
 
+> ## ⚠ Corrected by the architecture board
+>
+> [`AISEF-V2-ARCHITECTURE-BOARD-RESOLUTION.md`](AISEF-V2-ARCHITECTURE-BOARD-RESOLUTION.md) **supersedes this
+> document** on scope ownership. Part 1 (the event model) stands as written.
+>
+> | § here | What changed | See |
+> |---|---|---|
+> | Part 2 · scope ownership | **The `JournalWriter` is owned by `RunScope`, not by `StoryScope`.** The draft had the writer owned by the very scope whose teardown it must record — circular, and it would have failed at implementation. `StoryScope` owns worktree, sandbox, process ranges, sessions, grants, scratch and reviewer scopes, and **emits through the RunScope journal**. | resolution §8 |
+> | Part 2 · §2.5 residuals | `RunScope`'s own teardown failure is recorded by a `run/dispose-begin` marker plus a **terminal sink** — a tiny append-only fsync'd file sharing no code with the journal — plus a next-run preflight obligation to report `TORN` runs. The sink is **not evidence** and may never be cited by a gate. | resolution §8 |
+> | §1.3 vocabulary | Add `plan/static-admitted`, `story/admitted` (carrying the disposition), `story/plan-drift`, `run/dispose-begin`. `plan/admitted` is renamed `plan/static-admitted` and no longer carries measured baselines — those now belong to `story/admitted`. | resolution §2, §3 |
+
 ---
 
 # Part 1 — The event model (§11)

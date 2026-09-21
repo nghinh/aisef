@@ -13,6 +13,20 @@ are defined in the defects-vs-patterns document §1.
 This is a recommendation. Nothing here has been implemented, and §21 of the owner decision applies: no RFC, no
 V2 code.
 
+> ## ⚠ Corrected by the architecture board
+>
+> [`AISEF-V2-ARCHITECTURE-BOARD-RESOLUTION.md`](AISEF-V2-ARCHITECTURE-BOARD-RESOLUTION.md) **supersedes this
+> document** where they differ. The §6 concept evaluations, §8, §9 and the §17 A–G answers stand as written.
+>
+> | § here | What changed | See |
+> |---|---|---|
+> | §17 H · cycle-1 | The six changes are **restated**, not expanded: plane split, two-stage admission with `PRE_SATISFIED`, two-axis outcomes, RunScope-owned journal + terminal sink, projection reference models, image + probe digests. Two small additions (candidate-side vacuity control, `ContractApproval`). Sensitivity testing, sealed-cohort machinery and toolchain identity are **deferred**. | resolution §12 |
+> | §17 L · freeze list | Grows from 6 items to **11** (F1–F11), including the two-axis outcome product, the `Owner` set as a capped enum, `PlanObligation`/`ObligationRole`, the `StoryAdmission` disposition set, and the closed list of six control-critical projections. | readiness doc |
+> | §18 · invariants | **Invariant IX added** — *no developer artefact is executed at the parent revision.* Invariant I gains the human semantic gate as its mechanism; invariant V gains content-addressed capability identity with `VERIFIED` / `ATTESTED` grading. | resolution §5, §10, §11 |
+> | §20 · residuals | Two of the recorded residuals now have named controls: the wrong-contract residual gets the human semantic gate, and the projection residual gets independent reference models for the six control-critical projections. Both remain residuals, but bounded ones. | resolution §9, §11 |
+> | concept 13 | Unchanged — still **DEFER**. | — |
+> | P04 in the matrix | "Add versioning" is superseded by **content-addressed identity**: a version label is metadata, not proof of identity (SS-65). | resolution §10 |
+
 ---
 
 # §6 — The 20 proposed V2 concepts
@@ -458,6 +472,15 @@ harness*. Introspection output, session-history search results and prior-run sum
 harness's own records are evidence.
 *Mechanism:* evidence fields accept only harness-produced typed records; any agent-sourced text entering an
 evidence field is an `invariant/violated`.
+
+**IX · NO DEVELOPER ARTEFACT IS EXECUTED AT THE PARENT REVISION.** *(Added by the architecture board pass.)*
+Parent state is observed only by harness-owned probes. No verdict, product or process, may depend on whether a
+developer-authored file exists, imports, or collects at the parent revision.
+*Mechanism:* the probe API accepts no developer-authored path; the TDD RED-at-parent gate is replaced by a
+candidate-side vacuity control; Q1 carries a **test-layout invariance** suite that permutes where a fixture
+story's tests live and asserts every product verdict is identical.
+*Why it exists:* this is the clean statement of what corrections §1, §2 and §5 achieve together, and it is what
+makes PLAN-V2.1-DEFECT-001 — the defect that ended V1's delivery qualification — unrepeatable.
 
 ---
 
