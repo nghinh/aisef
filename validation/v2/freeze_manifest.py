@@ -73,7 +73,8 @@ def freeze_items(text: str) -> list[dict]:
 
 def build(root: pathlib.Path = ROOT) -> dict:
     text = (root / RFC_REL).read_text(encoding="utf-8")
-    approval_bytes = (root / APPROVAL_REL).read_bytes()
+    # The committed (LF) bytes: a Windows autocrlf checkout of the same record must give the same identity.
+    approval_bytes = (root / APPROVAL_REL).read_bytes().replace(b"\r\n", b"\n")
     approval = json.loads(approval_bytes)
     items = freeze_items(text)
     return {

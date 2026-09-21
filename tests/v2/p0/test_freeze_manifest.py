@@ -43,6 +43,17 @@ class FreezeManifest(unittest.TestCase):
     def test_committed_manifest_is_current(self):
         self.assertEqual(fm.check(ROOT), [])
 
+    def test_a_crlf_checkout_is_the_same_baseline(self):
+        """Windows CI checks out with autocrlf: every file arrives with CRLF. That is the same committed content,
+        so it must identify the same baseline (it once read as a stale manifest: the approval hash was of raw bytes)."""
+        with tempfile.TemporaryDirectory() as t:
+            root = _copy_tree(pathlib.Path(t))
+            for rel in (fm.RFC_REL, fm.APPROVAL_REL, fm.MANIFEST_REL):
+                f = root / rel
+                f.write_bytes(f.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"))  # already CRLF on Windows
+            self.assertEqual(fm.check(root), [])
+            self.assertEqual(fm.build(root)["approval_record_sha256"], fm.build(ROOT)["approval_record_sha256"])
+
     def test_one_byte_normative_edit_fails(self):
         with tempfile.TemporaryDirectory() as t:
             root = _copy_tree(pathlib.Path(t))
