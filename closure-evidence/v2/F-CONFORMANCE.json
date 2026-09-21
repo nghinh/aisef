@@ -51,11 +51,11 @@
     "F4.enum.Polarity",
     "F4.enum.SubjectAbsence",
     "F4.subject_kinds",
+    "F4.subject_shape",
     "F4.behavior_contract_shape",
     "F4.product_proof_spec_shape"
    ],
    "pending_on": [
-    "WP-1.1",
     "WP-1.2"
    ]
   },
@@ -290,21 +290,18 @@
   },
   {
    "item": "F4",
+   "id": "F4.subject_shape",
+   "implemented_by": "WP-1.1",
+   "state": "PASS",
+   "detail": "Subject fields equal the RFC in order (2)",
+   "required_now": false
+  },
+  {
+   "item": "F4",
    "id": "F4.behavior_contract_shape",
    "implemented_by": "WP-1.1",
-   "state": "PENDING",
-   "detail": "aisef2.product.contract.BehaviorContract not implemented",
-   "rfc_reference": [
-    "id",
-    "requirement_ids",
-    "subject",
-    "stimulus",
-    "observable",
-    "polarity",
-    "subject_absence",
-    "rationale",
-    "contract_hash"
-   ],
+   "state": "PASS",
+   "detail": "BehaviorContract fields equal the RFC in order (9)",
    "required_now": false
   },
   {

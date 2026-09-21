@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 10,
+ "checker_count": 15,
  "uncovered_checker_modules": [],
- "calibrated_count": 10,
- "always_pass_mutants_rejected": 10,
+ "calibrated_count": 15,
+ "always_pass_mutants_rejected": 15,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -157,6 +157,84 @@
    "expected": "does not extend",
    "observed": [
     "history version 2 does not extend version 1: attempts removed or rewritten [1]"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "no_prose_control",
+   "package": "WP-1.1",
+   "fixture": "tests/v2/fixtures/known_bad/no_prose_control.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "NO_PROSE_CONTROL aisef2/plan/bad.py:2",
+   "observed": [
+    "NO_PROSE_CONTROL aisef2/plan/bad.py:2 reads prose field 'rationale'"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "no_raw_verdict_routing",
+   "package": "WP-1.3",
+   "fixture": "tests/v2/fixtures/known_bad/no_raw_verdict_routing.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "NO_RAW_VERDICT_ROUTING aisef2/plan/bad.py:5",
+   "observed": [
+    "NO_RAW_VERDICT_ROUTING aisef2/plan/bad.py:1 planning/control code names 'BehaviorVerdict'",
+    "NO_RAW_VERDICT_ROUTING aisef2/plan/bad.py:5 planning/control code names 'BehaviorVerdict'",
+    "NO_RAW_VERDICT_ROUTING aisef2/plan/bad.py:5 planning/control code names 'behavior_verdict'"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "retryable_only_in_taxonomy",
+   "package": "WP-1.4",
+   "fixture": "tests/v2/fixtures/known_bad/retryable_only_in_taxonomy.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "RETRYABLE_ONLY_IN_TAXONOMY aisef2/plan/bad.py:2",
+   "observed": [
+    "RETRYABLE_ONLY_IN_TAXONOMY aisef2/plan/bad.py:2 decides retryability outside the taxonomy"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "mutation",
+   "package": "WP-1.1",
+   "fixture": "tests/v2/fixtures/known_bad/mutation.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "unaudited survivor",
+   "observed": [
+    "aisef2/cal/m.py::positive: unaudited survivor 'L2 returns None'",
+    "aisef2/cal/m.py::positive: unaudited survivor 'L2 Gt->LtE'"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "p1_evidence",
+   "package": "WP-1.1",
+   "fixture": "tests/v2/fixtures/known_bad/p1_evidence.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "property contract_hash_binds_subject_absence is false",
+   "observed": [
+    "WP-1.1: property contract_hash_binds_subject_absence is false"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

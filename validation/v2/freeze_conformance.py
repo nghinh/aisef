@@ -18,6 +18,7 @@ An item is PASS only if every sub-check is PASS; FAIL if any is FAIL; otherwise 
 from __future__ import annotations
 
 import ast
+import dataclasses
 import importlib
 import json
 import pathlib
@@ -171,6 +172,22 @@ def _shape(module: str, attr: str | None, reference) -> dict:
                       "it — presence without evaluation is never a pass"}
 
 
+def _fields(module: str, attr: str, reference: list[str] | None) -> dict:
+    """A dataclass shape: its field names, in order, against the RFC's own class block."""
+    if not reference:
+        return {"state": FAIL, "detail": "RFC reference for this shape could not be extracted"}
+    if not symbol_present(module, attr):
+        return {"state": None, "detail": f"{module}.{attr} not implemented", "rfc_reference": reference}
+    cls = getattr(importlib.import_module(module), attr)
+    if not dataclasses.is_dataclass(cls):
+        return {"state": FAIL, "detail": f"{module}.{attr} is not a dataclass", "rfc_reference": reference}
+    got = [f.name for f in dataclasses.fields(cls)]
+    if got != reference:
+        return {"state": FAIL, "detail": f"{attr} fields differ from the RFC", "rfc_reference": reference,
+                "implemented": got}
+    return {"state": PASS, "detail": f"{attr} fields equal the RFC in order ({len(got)})"}
+
+
 def subchecks(rfc: RFC, code) -> list[dict]:
     e = rfc.enums
     V = _vocab
@@ -193,10 +210,12 @@ def subchecks(rfc: RFC, code) -> list[dict]:
     for n in ("Polarity", "SubjectAbsence"):
         add("F4", f"F4.enum.{n}", "WP-0.2", V(n, e.get(n, []), code))
     add("F4", "F4.subject_kinds", "WP-0.2", V("SubjectKind", rfc.subject_kinds(), code, by_value=True))
+    add("F4", "F4.subject_shape", "WP-1.1",
+        _fields("aisef2.product.contract", "Subject", rfc.dataclasses.get("Subject")))
     add("F4", "F4.behavior_contract_shape", "WP-1.1",
-        _shape("aisef2.product.contract", "BehaviorContract", rfc.dataclasses.get("BehaviorContract")))
+        _fields("aisef2.product.contract", "BehaviorContract", rfc.dataclasses.get("BehaviorContract")))
     add("F4", "F4.product_proof_spec_shape", "WP-1.2",
-        _shape("aisef2.product.spec", "ProductProofSpec", rfc.dataclasses.get("ProductProofSpec")))
+        _fields("aisef2.product.spec", "ProductProofSpec", rfc.dataclasses.get("ProductProofSpec")))
     add("F5", "F5.enum.Enforcement", "WP-0.2", V("Enforcement", e.get("Enforcement", []), code))
     add("F5", "F5.probe_protocol", "WP-2.1", _shape("aisef2.probe.protocol", "Probe", rfc.protocols.get("Probe")))
     add("F5", "F5.calibration_contracts", "WP-2.2",

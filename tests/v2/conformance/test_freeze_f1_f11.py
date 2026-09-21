@@ -105,10 +105,17 @@ class Conformance(unittest.TestCase):
         self.assertIn("could not be extracted", self._sub(r, "F3.owner_set")["detail"])
 
     def test_advancing_the_phase_turns_pending_into_ratchet_failures(self):
-        with mock.patch.object(fc, "CURRENT_PHASE", "P1"):
+        with mock.patch.object(fc, "CURRENT_PHASE", "P2"):
             r = fc.evaluate(self.rfc, self.code, self.manifest)
-        self.assertEqual(self._sub(r, "F4.behavior_contract_shape")["state"], fc.FAIL)
-        self.assertIn("F4.behavior_contract_shape", r["ratchet_violations"])
+        self.assertEqual(self._sub(r, "F6.plan_obligation_shape")["state"], fc.FAIL)
+        self.assertIn("F6.plan_obligation_shape", r["ratchet_violations"])
+
+    def test_a_present_shape_is_compared_field_by_field(self):
+        broken = self.rfc.replace("    rationale: str      # prose", "    reasoning: str      # prose", 1)
+        self.assertNotEqual(broken, self.rfc, "fixture edit did not apply")
+        sub = self._sub(fc.evaluate(broken, self.code, self.manifest), "F4.behavior_contract_shape")
+        self.assertEqual(sub["state"], fc.FAIL)
+        self.assertIn("rationale", sub["implemented"])
 
     # ------------------------------------------------------------------ references really come from the RFC
 

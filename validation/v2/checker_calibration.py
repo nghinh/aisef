@@ -193,9 +193,48 @@ def _run_history() -> Checker:
                    ("validation/v2/run_history.py",))
 
 
+def _kernel_rule(name: str, rule: str, package: str) -> Callable[[], Checker]:
+    def make() -> Checker:
+        ks = _load("aisef_v2_kernel_static_checks", V2 / "kernel_static_checks.py")
+        return Checker(name, package, lambda: ks.check(ROOT, (rule,)),
+                       lambda fx: ks.violations(fx["path"], fx["source"], (fx["rule"],)),
+                       ("validation/v2/kernel_static_checks.py",))
+    return make
+
+
+def _mutation() -> Checker:
+    mu = _load("aisef_v2_mutation", V2 / "mutation.py")
+
+    def clean():
+        rec = ROOT / mu.OUT_REL
+        return mu.problems_of(json.loads(rec.read_text(encoding="utf-8"))) if rec.exists() else [f"{mu.OUT_REL} missing"]
+
+    def bad(fx):
+        with tempfile.TemporaryDirectory() as t:
+            root = pathlib.Path(t)
+            rel = fx["target"].split("::")[0]
+            for path, text in ((rel, fx["module"]), ("aisef2/__init__.py", ""), ("aisef2/cal/__init__.py", ""),
+                               ("tests/v2/__init__.py", ""), ("tests/v2/p1/__init__.py", ""),
+                               ("tests/v2/p1/test_m.py", fx["test"])):
+                (root / path).parent.mkdir(parents=True, exist_ok=True)
+                (root / path).write_text(text, encoding="utf-8")
+            return mu.target_problems(mu.run_target(root, fx["target"], ["tests/v2/p1/test_m.py"]), root)
+    return Checker("mutation", "WP-1.1", clean, bad, ("validation/v2/mutation.py",))
+
+
+def _p1_evidence() -> Checker:
+    ev = _load("aisef_v2_p1_evidence", V2 / "p1_evidence.py")
+    return Checker("p1_evidence", "WP-1.1", lambda: ev.check(ROOT), lambda fx: ev.problems_of(fx["record"]),
+                   ("validation/v2/p1_evidence.py",))
+
+
 REGISTRY: list[Callable[[], Checker]] = [
     _freeze_manifest, _v1_evidence_guard, _arch_catalog, _f_conformance, _plan_validate, _plan_docs_check,
     _state_model_prover, _v2_encoding_scanner, _packaging_check, _run_history,
+    _kernel_rule("no_prose_control", "NO_PROSE_CONTROL", "WP-1.1"),
+    _kernel_rule("no_raw_verdict_routing", "NO_RAW_VERDICT_ROUTING", "WP-1.3"),
+    _kernel_rule("retryable_only_in_taxonomy", "RETRYABLE_ONLY_IN_TAXONOMY", "WP-1.4"),
+    _mutation, _p1_evidence,
 ]
 
 

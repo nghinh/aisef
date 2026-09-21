@@ -1,0 +1,282 @@
+{
+ "record": "AISEF V2 — P1 MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "aisef2/product/contract.py::canonical",
+   "kill_tests": [
+    "tests/v2/p1/test_contract.py"
+   ],
+   "source_sha256": "900c9f9ce819d561beef0815790a5d4b202311ccade95f9f695ffdcf30ba3d97",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L61 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L61 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L61 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L61 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L61 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L61 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L61 string ',' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L61 string ':' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/product/contract.py::content_of",
+   "kill_tests": [
+    "tests/v2/p1/test_contract.py"
+   ],
+   "source_sha256": "900c9f9ce819d561beef0815790a5d4b202311ccade95f9f695ffdcf30ba3d97",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L70 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L70 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L70 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L70 NotEq->Eq",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/product/contract.py::contract_hash",
+   "kill_tests": [
+    "tests/v2/p1/test_contract.py"
+   ],
+   "source_sha256": "900c9f9ce819d561beef0815790a5d4b202311ccade95f9f695ffdcf30ba3d97",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L181 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L181 string 'contract_hash' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/product/contract.py::digest",
+   "kill_tests": [
+    "tests/v2/p1/test_contract.py"
+   ],
+   "source_sha256": "900c9f9ce819d561beef0815790a5d4b202311ccade95f9f695ffdcf30ba3d97",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L65 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L65 string 'utf-8' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/product/contract.py::freeze",
+   "kill_tests": [
+    "tests/v2/p1/test_contract.py"
+   ],
+   "source_sha256": "900c9f9ce819d561beef0815790a5d4b202311ccade95f9f695ffdcf30ba3d97",
+   "mutants": 23,
+   "killed": 23,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L34 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L38 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L40 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L42 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L35 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L37 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L39 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L40 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L42 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L35 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L38 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L38 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L39 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L40 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L42 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L41 string 'non-finite numbers have no canonical form' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L42 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L42 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L42 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L44 string ' is not JSON-shaped data' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L36 string 'mapping keys must be strings' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L37 sorted() -> list()",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/product/contract.py::plain",
+   "kill_tests": [
+    "tests/v2/p1/test_contract.py"
+   ],
+   "source_sha256": "900c9f9ce819d561beef0815790a5d4b202311ccade95f9f695ffdcf30ba3d97",
+   "mutants": 12,
+   "killed": 12,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L49 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L51 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L53 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L55 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L57 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L50 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L52 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L54 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L56 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L51 string '__dataclass_fields__' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L54 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L54 element 1 dropped",
+     "killed": true
+    }
+   ]
+  }
+ ]
+}
