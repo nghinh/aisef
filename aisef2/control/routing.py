@@ -1,38 +1,39 @@
-"""RFC §10 — the owner routing table (F2) over the legal probe-outcome space.
+"""RFC §10, §10.3 — the owner routing table (F2, amended by ARCHITECTURE-EXCEPTION-V2-001).
 
-Routing is on **`ContractSatisfaction`** (§10.1), never on the raw `BehaviorVerdict`: this module does not name the
-raw verdict at all (static check NO_RAW_VERDICT_ROUTING), so a MUST_NOT_HOLD contract routes exactly like a
-MUST_HOLD one with the same satisfaction.
+Routing is keyed on the typed **measurement point** (§10.3, §26) and **`ContractSatisfaction`** (§10.1) — never on the
+raw `BehaviorVerdict`, which this module does not name (static check NO_RAW_VERDICT_ROUTING), and never on an
+INDETERMINATE reason alone. At the parent the obligation role (§11, F6) decides a PRECONDITION_ABSENT row.
 
-| site | outcome | route |
-|---|---|---|
-| any | not attempted | nothing to charge (§10) |
-| any | UNRUNNABLE | PROBE_UNRUNNABLE — ENVIRONMENT (§10: the only row that may route there) |
-| any | INVALID_SPEC | PROBE_INVALID_SPEC — see `owner.TAXONOMY` |
-| PARENT | EXECUTED, any satisfaction | a plan disposition decided by StoryAdmission (§10, §13), not an owner row |
-| CANDIDATE | SATISFIED | nothing to charge |
-| CANDIDATE | UNSATISFIED | CONTRACT_UNSATISFIED — DEVELOPER |
-| CANDIDATE | INDETERMINATE(PRECONDITION_ABSENT) | PRECONDITION_ABSENT — PLAN |
+| point | outcome | role | route |
+|---|---|---|---|
+| any | not attempted | — | nothing to charge (§10) |
+| any | UNRUNNABLE | — | PROBE_UNRUNNABLE — ENVIRONMENT |
+| any | INVALID_SPEC | — | PROBE_INVALID_SPEC — see `owner.TAXONOMY` |
+| PARENT | SATISFIED / UNSATISFIED | any | a StoryAdmission disposition (§13), not an owner row |
+| PARENT | INDETERMINATE(PRECONDITION_ABSENT) | INTRODUCE | READY — expected pre-state, no failure owner |
+| PARENT | INDETERMINATE(PRECONDITION_ABSENT) | PRESERVE, VERIFY | PRECONDITION_BROKEN — PLAN |
+| CANDIDATE | SATISFIED | any | nothing to charge |
+| CANDIDATE | UNSATISFIED | any | CONTRACT_UNSATISFIED — DEVELOPER |
+| CANDIDATE | INDETERMINATE(PRECONDITION_ABSENT) | any | SUBJECT_ABSENT_AT_CANDIDATE — DEVELOPER |
+| POST_MERGE | SATISFIED | any | nothing to charge |
+| POST_MERGE | UNSATISFIED | any | POST_MERGE_REGRESSION — INTEGRATION |
+| POST_MERGE | INDETERMINATE(PRECONDITION_ABSENT) | any | POST_MERGE_SUBJECT_LOST — INTEGRATION |
 
-Anything outside these rows — an untyped result, an unknown site, an INDETERMINATE reason with no row — **fails
-closed** with `UnroutableOutcome`: it is never defaulted to an owner, and never to DEVELOPER.
+Anything outside these rows — an untyped result, point or role, a parent PRECONDITION_ABSENT without a role, an
+INDETERMINATE reason with no row — **fails closed** with `UnroutableOutcome`: never defaulted, never DEVELOPER.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
 
-from aisef2.arch.enums import ContractSatisfaction, ProbeExecutionStatus
+from aisef2.arch.enums import (
+    ContractSatisfaction, MeasurementPoint, ObligationRole, ProbeExecutionStatus, StoryAdmissionDisposition,
+)
 from aisef2.control.owner import Classification, FailureCode, classify
 from aisef2.errors import InvariantError
 from aisef2.product.outcome import RESULT_TYPES, IndeterminateReason, ProbeResult, contract_satisfaction
 from aisef2.product.spec import ProductProofSpec
-
-
-class Site(Enum):
-    PARENT = "PARENT"
-    CANDIDATE = "CANDIDATE"
 
 
 class UnroutableOutcome(InvariantError):
@@ -46,32 +47,58 @@ STORY_ADMISSION = "STORY_ADMISSION"
 class Route:
     failure: Classification | None
     decided_by: str | None
+    disposition: StoryAdmissionDisposition | None
     rule: str
 
 
-_CANDIDATE: dict[tuple[ContractSatisfaction, IndeterminateReason | None], FailureCode | None] = {
-    (ContractSatisfaction.SATISFIED, None): None,
-    (ContractSatisfaction.UNSATISFIED, None): FailureCode.CONTRACT_UNSATISFIED,
-    (ContractSatisfaction.INDETERMINATE, IndeterminateReason.PRECONDITION_ABSENT): FailureCode.PRECONDITION_ABSENT,
+_P, _C, _M = MeasurementPoint.PARENT, MeasurementPoint.CANDIDATE, MeasurementPoint.POST_MERGE
+_S, _U, _I = ContractSatisfaction.SATISFIED, ContractSatisfaction.UNSATISFIED, ContractSatisfaction.INDETERMINATE
+_PA = IndeterminateReason.PRECONDITION_ABSENT
+_ADMISSION = STORY_ADMISSION
+
+#: (point, satisfaction, reason, role or None for any role) -> (failure code, disposition, decided_by, rule)
+_EXECUTED: dict[tuple, tuple[FailureCode | None, StoryAdmissionDisposition | None, str | None, str]] = {
+    (_P, _S, None, None): (None, None, _ADMISSION, "§10.3, §13: at the parent a StoryAdmission disposition"),
+    (_P, _U, None, None): (None, None, _ADMISSION, "§10.3, §13: at the parent a StoryAdmission disposition"),
+    (_P, _I, _PA, ObligationRole.INTRODUCE): (None, StoryAdmissionDisposition.READY, _ADMISSION,
+                                              "§10.3: INTRODUCE over an absent required subject is the expected "
+                                              "pre-state — READY"),
+    (_P, _I, _PA, ObligationRole.PRESERVE): (FailureCode.PRECONDITION_BROKEN,
+                                             StoryAdmissionDisposition.PRECONDITION_BROKEN, _ADMISSION,
+                                             "§10.3, §13: a behaviour cannot be preserved over a subject that is gone"),
+    (_P, _I, _PA, ObligationRole.VERIFY): (FailureCode.PRECONDITION_BROKEN,
+                                           StoryAdmissionDisposition.PRECONDITION_BROKEN, _ADMISSION,
+                                           "§10.3, §13: a behaviour cannot be verified over a subject that is gone"),
+    (_C, _S, None, None): (None, None, None, "§10.3: SATISFIED at the candidate is not a failure"),
+    (_C, _U, None, None): (FailureCode.CONTRACT_UNSATISFIED, None, None, "§10.3: UNSATISFIED at the candidate"),
+    (_C, _I, _PA, None): (FailureCode.SUBJECT_ABSENT_AT_CANDIDATE, None, None,
+                          "§10.3 (V2-001): the admitted implementation did not establish the subject"),
+    (_M, _S, None, None): (None, None, None, "§10.3: SATISFIED after merge is not a failure"),
+    (_M, _U, None, None): (FailureCode.POST_MERGE_REGRESSION, None, None, "§10.3, §26: a regression after merge"),
+    (_M, _I, _PA, None): (FailureCode.POST_MERGE_SUBJECT_LOST, None, None,
+                          "§10.3 (V2-001): a subject verified at the candidate is gone after merge"),
 }
 
 
-def route(result: ProbeResult | None, spec: ProductProofSpec, site: Site) -> Route:
-    if not isinstance(site, Site):
-        raise UnroutableOutcome(f"unknown routing site {site!r}")
+def route(result: ProbeResult | None, spec: ProductProofSpec, point: MeasurementPoint,
+          role: ObligationRole | None = None) -> Route:
+    if not isinstance(point, MeasurementPoint):
+        raise UnroutableOutcome(f"unknown measurement point {point!r}")
+    if role is not None and not isinstance(role, ObligationRole):
+        raise UnroutableOutcome(f"unknown obligation role {role!r}")
     if result is None:
-        return Route(None, None, "§10: not attempted — chargeable to no one")
+        return Route(None, None, None, "§10: not attempted — chargeable to no one")
     if not isinstance(result, RESULT_TYPES):
         raise UnroutableOutcome(f"{type(result).__name__} is not a typed probe result")
     if result.status is ProbeExecutionStatus.UNRUNNABLE:
-        return Route(classify(FailureCode.PROBE_UNRUNNABLE), None, "§10: could not look")
+        return Route(classify(FailureCode.PROBE_UNRUNNABLE), None, None, "§10.3: the observation harness cannot run")
     if result.status is ProbeExecutionStatus.INVALID_SPEC:
-        return Route(classify(FailureCode.PROBE_INVALID_SPEC), None, "§10: not evaluable by this probe")
+        return Route(classify(FailureCode.PROBE_INVALID_SPEC), None, None, "§10: not evaluable by this probe")
     satisfaction = contract_satisfaction(result, spec)
-    if site is Site.PARENT:
-        return Route(None, STORY_ADMISSION, "§10: a plan disposition at the parent; §13 decides it")
-    key = (satisfaction, result.reason)
-    if key not in _CANDIDATE:
-        raise UnroutableOutcome(f"no routing row for {satisfaction.value} with reason {result.reason!r}")
-    code = _CANDIDATE[key]
-    return Route(None if code is None else classify(code), None, "§10 at the candidate, on ContractSatisfaction")
+    row = _EXECUTED.get((point, satisfaction, result.reason, role)) or \
+        _EXECUTED.get((point, satisfaction, result.reason, None))
+    if row is None:
+        raise UnroutableOutcome(f"no routing row for {point.value} {satisfaction.value} with reason "
+                                f"{result.reason!r} and role {role!r}")
+    code, disposition, decided_by, rule = row
+    return Route(None if code is None else classify(code), decided_by, disposition, rule)

@@ -226,11 +226,13 @@ def outcome_polarity() -> dict:
 
 def routing_table() -> dict:
     import itertools
-    from aisef2.arch.enums import BehaviorVerdict as V, Owner, ProbeExecutionStatus
-    from aisef2.control.owner import TAXONOMY, FailureCode, classify
-    from aisef2.control.routing import Site, UnroutableOutcome, route
+    from aisef2.arch.enums import (BehaviorVerdict as V, MeasurementPoint as MP, ObligationRole, Owner,
+                                   ProbeExecutionStatus, StoryAdmissionDisposition)
+    from aisef2.control.owner import TAXONOMY, FailureCode, Retryability, classify
+    from aisef2.control.routing import UnroutableOutcome, route
     from aisef2.errors import InvariantError
-    from aisef2.product.outcome import Executed, IndeterminateReason, InvalidSpec, Unrunnable, contract_satisfaction
+    from aisef2.product.outcome import (Executed, IndeterminateReason, InvalidSpec, Unrunnable, contract_satisfaction,
+                                        on_subject_absent)
     from aisef2.product.spec import ProductProofSpec
     fc = _module("aisef_v2_freeze_conformance", "validation/v2/freeze_conformance.py")
     ks = _module("aisef_v2_kernel_static_checks", "validation/v2/kernel_static_checks.py")
@@ -239,35 +241,67 @@ def routing_table() -> dict:
     results = [None, Unrunnable("x"), InvalidSpec("x"), Executed(V.SATISFIED), Executed(V.REFUTED),
                Executed(V.INDETERMINATE, IndeterminateReason.PRECONDITION_ABSENT)]
     rows = []
-    for site, result, (cid, spec) in itertools.product(Site, results, specs.items()):
-        r = route(result, spec, site)
+    for point, result, (cid, spec), role in itertools.product(MP, results, specs.items(), ObligationRole):
+        r = route(result, spec, point, role)
         executed = isinstance(result, Executed)
-        rows.append({"site": site.value, "spec": cid, "candidate_expectation": spec.candidate_expectation.value,
+        rows.append({"point": point.value, "role": role.value, "spec": cid,
+                     "candidate_expectation": spec.candidate_expectation.value,
                      "status": result.status.value if result else None,
                      "verdict": result.behavior_verdict.value if executed else None,
                      "reason": result.reason.value if executed and result.reason else None,
                      "satisfaction": contract_satisfaction(result, spec).value if executed else None,
                      "code": r.failure.code.value if r.failure else None,
                      "owner": r.failure.owner.value if r.failure else None,
-                     "retryable": r.failure.retryable if r.failure else None,
+                     "retryability": r.failure.retryability.value if r.failure else None,
                      "budget": r.failure.budget.value if r.failure and r.failure.budget else None,
+                     "disposition": r.disposition.value if r.disposition else None,
                      "decided_by": r.decided_by})
     by_key = {}
     for row in rows:
         if row["satisfaction"]:
-            by_key.setdefault((row["site"], row["satisfaction"], row["reason"]), set()).add(
-                (row["code"], row["decided_by"]))
+            by_key.setdefault((row["point"], row["role"], row["satisfaction"], row["reason"]), set()).add(
+                (row["code"], row["disposition"], row["decided_by"]))
+    absent = on_subject_absent(specs["BC-QUIET-STDOUT"])  # a REQUIRES_SUBJECT contract, subject absent
+
+    def at(point, role, result=absent):
+        return route(result, specs["BC-QUIET-STDOUT"], point, role)
+    mp1, mp2 = at(MP.PARENT, ObligationRole.INTRODUCE), at(MP.CANDIDATE, ObligationRole.INTRODUCE)
+    mp3 = at(MP.POST_MERGE, ObligationRole.INTRODUCE)
+    mp4 = [at(p, r, Unrunnable("x")) for p, r in itertools.product(MP, ObligationRole)]
+    missing, invalid = classify(FailureCode.MISSING_CREDENTIAL), classify(FailureCode.INVALID_CREDENTIAL)
+    outage = classify(FailureCode.PROVIDER_UNAVAILABLE)
     oracle = fc._routing_matches_rfc(_rfc())
     return {
-        "record": "AISEF V2 — P1 ROUTING TABLE", "work_package": "WP-1.4", "rfc_sections": ["22", "10"],
-        "taxonomy": {c.value: {"owner": TAXONOMY[c].owner.value, "retryable": TAXONOMY[c].retryable,
+        "record": "AISEF V2 — P1 ROUTING TABLE", "work_package": "WP-1.4", "rfc_sections": ["22", "10", "10.3"],
+        "amended_by": "ARCHITECTURE-EXCEPTION-V2-001",
+        "taxonomy": {c.value: {"owner": TAXONOMY[c].owner.value, "retryability": TAXONOMY[c].retryability.value,
                                "budget": TAXONOMY[c].budget.value if TAXONOMY[c].budget else None,
                                "rule": TAXONOMY[c].rule} for c in FailureCode},
+        "retry_count": "not in the taxonomy — the resolved execution policy (RunSpec / project / evaluation "
+                       "configuration) supplies it",
+        "owner_mp": {"OWNER-MP-1": {"owner": None if not mp1.failure else mp1.failure.owner.value,
+                                    "disposition": mp1.disposition and mp1.disposition.value},
+                     "OWNER-MP-2": mp2.failure.owner.value, "OWNER-MP-3": mp3.failure.owner.value,
+                     "OWNER-MP-4": sorted({r.failure.owner.value for r in mp4})},
         "routing": rows,
         "rfc_table_comparison": {"state": oracle["state"], "detail": oracle["detail"]},
         "properties": {
-            "routing_total_over_legal_space": len(rows) == len(Site) * len(results) * len(specs),
-            "routing_equals_rfc_table": oracle["state"] == "PASS",
+            "routing_total_over_legal_space": len(rows) == len(MP) * len(results) * len(specs) * len(ObligationRole),
+            "routing_equals_rfc_tables": oracle["state"] == "PASS",
+            "OWNER_MP_1_parent_introduce_ready_no_owner": mp1.failure is None
+                                                          and mp1.disposition is StoryAdmissionDisposition.READY,
+            "OWNER_MP_2_candidate_subject_absent_developer": mp2.failure.owner is Owner.DEVELOPER,
+            "OWNER_MP_3_post_merge_subject_lost_integration": mp3.failure.owner is Owner.INTEGRATION,
+            "OWNER_MP_4_unrunnable_environment_everywhere": all(r.failure.owner is Owner.ENVIRONMENT for r in mp4),
+            "parent_preserve_verify_precondition_broken_plan": all(
+                at(MP.PARENT, role).failure.owner is Owner.PLAN for role in (ObligationRole.PRESERVE, ObligationRole.VERIFY)),
+            "reason_alone_never_decides_owner": len({r["owner"] for r in rows if r["reason"]}) > 1,
+            "CRED_1_missing_never_developer_budget": missing.owner is Owner.ENVIRONMENT and missing.budget is not Owner.DEVELOPER,
+            "CRED_2_invalid_never_developer_or_provider_budget": invalid.owner is Owner.ENVIRONMENT
+                                                                 and invalid.budget not in (Owner.DEVELOPER, Owner.PROVIDER),
+            "CRED_3_invalid_not_retryable": invalid.retryability is Retryability.NOT_RETRYABLE,
+            "CRED_4_provider_outage_distinct": outage.owner is Owner.PROVIDER and invalid.owner is not Owner.PROVIDER
+                                               and outage.code is not invalid.code,
             "refuted_never_environment": all(r["owner"] != "ENVIRONMENT" for r in rows if r["verdict"] == "REFUTED"),
             "only_unrunnable_routes_to_environment": all((r["owner"] == "ENVIRONMENT") == (r["status"] == "UNRUNNABLE")
                                                          for r in rows),
@@ -275,11 +309,11 @@ def routing_table() -> dict:
             "no_did_not_run_to_developer_edge": all(r["owner"] != "DEVELOPER" for r in rows
                                                     if r["status"] != ProbeExecutionStatus.EXECUTED.value),
             "routes_on_satisfaction_never_raw_verdict": all(len(v) == 1 for v in by_key.values()),
-            "unmapped_outcome_fails_closed": _raises(lambda: route(object(), specs["BC-VERSION"], Site.CANDIDATE),
+            "unmapped_outcome_fails_closed": _raises(lambda: route(object(), specs["BC-VERSION"], MP.CANDIDATE),
                                                      UnroutableOutcome)
+                                             and _raises(lambda: route(absent, specs["BC-QUIET-STDOUT"], MP.PARENT),
+                                                         UnroutableOutcome)
                                              and _raises(lambda: classify("DEVELOPER"), InvariantError),
-            "invalid_credential_not_retryable": TAXONOMY[FailureCode.INVALID_CREDENTIAL].retryable is False,
-            "credentials_split": TAXONOMY[FailureCode.MISSING_CREDENTIAL] != TAXONOMY[FailureCode.INVALID_CREDENTIAL],
             "owner_set_exactly_F3": [o.value for o in Owner] == _rfc().enums.get("Owner"),
             "every_taxonomy_owner_in_F3": all(isinstance(TAXONOMY[c].owner, Owner) for c in FailureCode),
             "retryable_only_in_taxonomy": ks.check(ROOT, ("RETRYABLE_ONLY_IN_TAXONOMY",)) == [],

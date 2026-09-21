@@ -110,6 +110,28 @@ class Conformance(unittest.TestCase):
         self.assertEqual(self._sub(r, "F6.plan_obligation_shape")["state"], fc.FAIL)
         self.assertIn("F6.plan_obligation_shape", r["ratchet_violations"])
 
+    def test_V2_001_the_old_candidate_routing_fails_F2(self):
+        """ARCHITECTURE-EXCEPTION-V2-001 reproducer: PRECONDITION_ABSENT at the candidate charged to PLAN."""
+        from aisef2.arch.enums import ContractSatisfaction, MeasurementPoint, StoryAdmissionDisposition
+        from aisef2.control import routing
+        from aisef2.control.owner import FailureCode
+        from aisef2.product.outcome import IndeterminateReason
+        key = (MeasurementPoint.CANDIDATE, ContractSatisfaction.INDETERMINATE, IndeterminateReason.PRECONDITION_ABSENT,
+               None)
+        old = (FailureCode.PRECONDITION_BROKEN, StoryAdmissionDisposition.PRECONDITION_BROKEN, None, "§10 old row")
+        with mock.patch.dict(routing._EXECUTED, {key: old}):
+            sub = self._sub(fc.evaluate(self.rfc, self.code, self.manifest), "F2.owner_routing_table")
+        self.assertEqual(sub["state"], fc.FAIL)
+        self.assertTrue(any("CANDIDATE" in p and "DEVELOPER" in p for p in sub["problems"]), sub["problems"])
+
+    def test_F2_reference_is_read_from_the_rfc_10_3_table(self):
+        row = "| CANDIDATE | `INDETERMINATE(PRECONDITION_ABSENT)` | any admitted | the implementation did not establish " \
+              "the subject the contract requires | DEVELOPER |"
+        self.assertIn(row, self.rfc)
+        sub = self._sub(fc.evaluate(self.rfc.replace(row, row.replace("| DEVELOPER |", "| PLAN |")), self.code,
+                                    self.manifest), "F2.owner_routing_table")
+        self.assertEqual(sub["state"], fc.FAIL)
+
     def test_a_present_shape_is_compared_field_by_field(self):
         broken = self.rfc.replace("    rationale: str      # prose", "    reasoning: str      # prose", 1)
         self.assertNotEqual(broken, self.rfc, "fixture edit did not apply")

@@ -6,6 +6,11 @@ The immutable approval record is
 [`closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json`](../../closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json),
 content-addressed by its `.sha256` sidecar.
 
+**Amended by `ARCHITECTURE-EXCEPTION-V2-001`** (owner decision *AISEF V2 — P1 OWNER REVIEW CORRECTION*,
+2026-09-21): F2 owner routing is keyed by measurement point (§10.3). The original approval record is unchanged; the
+approval lineage is
+[`closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json`](../../closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json).
+
 **Supersedes** the proposal documents under [`docs/research/v2/`](../research/v2/) for all implementation
 decisions; those are retained as design history and are linked throughout.
 
@@ -378,8 +383,8 @@ exist otherwise — the verdict lives inside the `EXECUTED` variant. Six legal s
 | status | verdict | meaning | owner on failure |
 |---|---|---|---|
 | EXECUTED | SATISFIED | observed present | — |
-| EXECUTED | REFUTED | observed absent | DEVELOPER at candidate; a plan disposition at parent |
-| EXECUTED | INDETERMINATE | ran; cannot decide; reason required | PLAN or INTEGRATION, by reason |
+| EXECUTED | REFUTED | observed absent | DEVELOPER at candidate; a plan disposition at parent; INTEGRATION after merge (§10.3) |
+| EXECUTED | INDETERMINATE | ran; cannot decide; reason required | by measurement point and, at the parent, obligation role (§10.3) — never by reason alone |
 | UNRUNNABLE | — | could not look | **ENVIRONMENT** |
 | INVALID_SPEC | — | not evaluable by this probe | PLAN / INTEGRATION |
 | *(absent)* | — | not attempted | chargeable to no one |
@@ -439,6 +444,38 @@ V1's defect record states the trap the `REQUIRES_SUBJECT` branch closes: *"the p
 absent package, but a test that imports that package cannot be collected and is read as red."* AISEF's own
 `AC-STORY-01-01-4/-5` were `REQUIRES_SUBJECT` prohibitions over a subject the story was to create, so they
 resolve to `INDETERMINATE(PRECONDITION_ABSENT)` — decided by the contract's declaration, not by any file.
+
+### 10.3 Owner routing by measurement point *(amended — ARCHITECTURE-EXCEPTION-V2-001)*
+
+The same observation means different things depending on where it is measured (§26). Owner routing **MUST** be
+keyed on the typed measurement point and, at the parent, on the obligation role (§11). It **MUST NOT** be inferred
+from an `INDETERMINATE` reason alone.
+
+```python
+class MeasurementPoint(Enum):
+    PARENT     = "PARENT"       # StoryAdmission at the story's frozen parent (§13)
+    CANDIDATE  = "CANDIDATE"    # candidate proof (§16)
+    POST_MERGE = "POST_MERGE"   # post-merge proof (§26)
+```
+
+| measurement point | outcome | role | meaning | owner |
+|---|---|---|---|---|
+| PARENT | `INDETERMINATE(PRECONDITION_ABSENT)` | INTRODUCE | READY — the expected pre-state | — |
+| PARENT | `INDETERMINATE(PRECONDITION_ABSENT)` | PRESERVE, VERIFY | PRECONDITION_BROKEN | PLAN |
+| PARENT | `SATISFIED`, `UNSATISFIED` | any | a StoryAdmission disposition (§13) | — |
+| CANDIDATE | `UNSATISFIED` | any admitted | the implementation does not meet the contract | DEVELOPER |
+| CANDIDATE | `INDETERMINATE(PRECONDITION_ABSENT)` | any admitted | the implementation did not establish the subject the contract requires | DEVELOPER |
+| POST_MERGE | `UNSATISFIED` | any | a regression after merge (§26) | INTEGRATION |
+| POST_MERGE | `INDETERMINATE(PRECONDITION_ABSENT)` | any | a subject verified at the candidate is gone after merge | INTEGRATION |
+| any | probe `UNRUNNABLE` | any | the observation harness cannot run | ENVIRONMENT |
+
+- `SATISFIED` at the candidate or after merge is not a failure.
+- An `INDETERMINATE` with any other reason has no row here and **MUST** fail closed — never `DEVELOPER` by default.
+  StoryAdmission's `PLAN_CONTRADICTION` / `PROBE_INVALID` routing (§13) is unchanged.
+- **Why V2-001.** The previous row routed `INDETERMINATE` to "PLAN or INTEGRATION, by reason". For an `INTRODUCE`
+  obligation over a `REQUIRES_SUBJECT` contract, StoryAdmission correctly returns `READY` at the parent; if the
+  developer never creates the subject, the candidate probe returns `INDETERMINATE(PRECONDITION_ABSENT)` and was
+  charged to `PLAN` — the admitted implementation's failure charged to the plan.
 
 ---
 
@@ -1315,12 +1352,12 @@ relative to the product tree and how a probe change is re-proved affordably.
 
 Frozen means: changing it later invalidates evidence written under it. Each **MUST** have owner sign-off before
 implementation begins. Items marked *(adjusted)* changed mechanically as a consequence of owner decisions B1–B5;
-**no new freeze item was added**.
+**no new freeze item was added**. Items marked *(amended — V2-001)* changed through `ARCHITECTURE-EXCEPTION-V2-001`.
 
 | # | Frozen item | Why evidence compatibility requires it |
 |---|---|---|
 | **F1** | `Event` envelope, the event vocabulary, **and the typed enumerations carried in event payloads** *(adjusted)* | Every journal is written under them; a payload enum change re-interprets existing events |
-| **F2** | `ProbeExecutionStatus` × `BehaviorVerdict`, its six legal states, the owner routing table, **and the `ContractSatisfaction` derivation** *(adjusted)* | Everything routes on it; `UNRESOLVABLE` is deleted. Re-deriving old evidence under a changed satisfaction mapping would silently re-interpret it |
+| **F2** | `ProbeExecutionStatus` × `BehaviorVerdict`, its six legal states, the owner routing table **keyed by `MeasurementPoint` (§10.3)** *(amended — V2-001)*, **and the `ContractSatisfaction` derivation** *(adjusted)* | Everything routes on it; `UNRESOLVABLE` is deleted. Re-deriving old evidence under a changed satisfaction mapping would silently re-interpret it |
 | **F3** | The `Owner` set — capped; a new member requires a cited measured defect | Budgets and retries derive from it |
 | **F4** | `BehaviorContract` → `ProductProofSpec` compiler contract and the inputs to `semantic_hash`, **including `SubjectAbsence`** *(adjusted)* | It is what `--check` compares against and what makes product evidence survive re-planning. Absence semantics change what a spec means when the subject is missing |
 | **F5** | `Probe` protocol: observation-harness / subject split, `enforcement()`, `ProbeResult` fields, **and the two calibration contracts — `ProbeCapabilityCalibration` and `SpecFalsifiabilityEvidence`, each demonstrating contrast to `candidate_expectation`** *(adjusted)* | The split keeps product absence out of the environment budget; a changed calibration contract re-interprets whether existing probes were ever qualified |
@@ -1359,6 +1396,22 @@ its declared precondition fails ⇒ `EXECUTED` + **`INDETERMINATE(PRECONDITION_A
 `INDETERMINATE`. Role `INTRODUCE` ⇒ **`READY`** (the subject not existing is the expected pre-state). Role
 `PRESERVE` or `VERIFY` ⇒ `PRECONDITION_BROKEN`. **No vacuous verdict is produced in any case.** This is AISEF's
 own `AC-STORY-01-01-4/-5`.
+
+### Owner routing by measurement point *(amended — V2-001)*
+
+Contract: a `REQUIRES_SUBJECT` contract whose subject does not exist; its probe returns
+`EXECUTED` + `INDETERMINATE(PRECONDITION_ABSENT)` wherever the subject is absent.
+
+**OWNER-MP-1 · parent, `INTRODUCE`, subject absent.** ⇒ **`READY`**, no failure owner, no developer failure: the
+subject not existing is the expected pre-state.
+
+**OWNER-MP-2 · candidate, after an admitted `INTRODUCE`, subject still absent.** ⇒ **`DEVELOPER`**: the admitted
+implementation failed to establish the subject the proof requires. Never `PLAN`.
+
+**OWNER-MP-3 · post-merge, a subject verified at the candidate disappears.** ⇒ **`INTEGRATION`**.
+
+**OWNER-MP-4 · the probe's observation harness cannot inspect the subject.** ⇒ `UNRUNNABLE`, **`ENVIRONMENT`**, at
+every measurement point.
 
 ### Calibration
 

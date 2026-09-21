@@ -70,7 +70,7 @@ def _freeze_manifest() -> Checker:
     def bad(fx):
         with tempfile.TemporaryDirectory() as t:
             root = pathlib.Path(t)
-            for rel in (fm.RFC_REL, fm.APPROVAL_REL, fm.MANIFEST_REL):
+            for rel in fm.BASELINE_FILES:
                 (root / rel).parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy(ROOT / rel, root / rel)
             rfc = root / fm.RFC_REL

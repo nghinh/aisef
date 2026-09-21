@@ -7,7 +7,7 @@
   `aisef2/orchestrate`) never names `BehaviorVerdict` or reads `.behavior_verdict`: it routes on the derived
   `ContractSatisfaction`, because the raw verdict is polarity-inverted for every negative contract.
 * **RETRYABLE_ONLY_IN_TAXONOMY** (RFC §22, WP-1.4) — retryability is fixed once in `aisef2/control/owner.py`; no
-  other kernel module assigns, passes or keys a `retryable`.
+  other kernel module assigns, passes or keys a `retryable` or `retryability`.
 
     python -P validation/v2/kernel_static_checks.py            # all rules; exit 1 on any violation
 """
@@ -24,6 +24,7 @@ PROSE = {"text", "rationale", "ownership_rationale"}
 ROUTING_PACKAGES = ("aisef2/plan/", "aisef2/control/", "aisef2/orchestrate/")
 RAW_VERDICT = {"BehaviorVerdict", "behavior_verdict"}
 TAXONOMY_MODULE = "aisef2/control/owner.py"
+_RETRY_NAMES = {"retryable", "retryability"}
 RULES = ("NO_PROSE_CONTROL", "NO_RAW_VERDICT_ROUTING", "RETRYABLE_ONLY_IN_TAXONOMY")
 
 
@@ -70,11 +71,11 @@ def violations(rel: str, source: str, rules: tuple[str, ...] = RULES) -> list[st
         for n in ast.walk(tree):
             line = getattr(n, "lineno", 0)
             decided = (
-                isinstance(n, ast.keyword) and n.arg == "retryable"
+                isinstance(n, ast.keyword) and n.arg in _RETRY_NAMES
                 or isinstance(n, (ast.Assign, ast.AugAssign, ast.AnnAssign)) and any(
-                    getattr(t, "id", getattr(t, "attr", None)) == "retryable"
+                    getattr(t, "id", getattr(t, "attr", None)) in _RETRY_NAMES
                     for t in (n.targets if isinstance(n, ast.Assign) else [n.target]))
-                or isinstance(n, ast.Dict) and any(isinstance(k, ast.Constant) and k.value == "retryable" for k in n.keys)
+                or isinstance(n, ast.Dict) and any(isinstance(k, ast.Constant) and k.value in _RETRY_NAMES for k in n.keys)
             )
             if decided:
                 out.append(f"RETRYABLE_ONLY_IN_TAXONOMY {rel}:{line or '?'} decides retryability outside the taxonomy")

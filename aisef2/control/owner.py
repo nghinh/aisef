@@ -1,14 +1,17 @@
 """RFC §22 — the typed failure taxonomy. Every failure code has exactly one owner and one retryability, fixed here.
 
 * The `Owner` set is frozen (F3, `aisef2.arch.enums`) and capped; this module uses it and never extends it.
-* **Retryability is a property of the typed code**, decided once in `TAXONOMY`. No other kernel module assigns,
-  passes or keys a `retryable` (static check RETRYABLE_ONLY_IN_TAXONOMY). The retry budget a retryable failure
-  charges is its owner's; owners never consume each other's budgets (invariant IV).
-* `MISSING_CREDENTIAL` and `INVALID_CREDENTIAL` are distinct because the fix differs; the latter is never
-  retryable (§22, D-006).
+* **Retryability is a property of the typed code**, decided once in `TAXONOMY`; no other kernel module assigns,
+  passes or keys it (static check RETRYABLE_ONLY_IN_TAXONOMY). A retry charges its owner's own budget (invariant IV).
+* **The retry count is never here.** How many retries a path allows comes from the resolved execution policy
+  (RunSpec, project or evaluation configuration). `RESOLVED_BY_POLICY` marks a code whose retryability itself is
+  that policy's decision.
+* Credentials are execution configuration (owner decision, P1 review): `MISSING_CREDENTIAL` and
+  `INVALID_CREDENTIAL` are both ENVIRONMENT, and an invalid credential is never retryable (§22, D-006). A provider
+  owns a failure only through a provider-side code (`PROVIDER_UNAVAILABLE`).
+* Probe-outcome codes follow §10.3 (ARCHITECTURE-EXCEPTION-V2-001): the owner depends on the measurement point.
 * A value from outside the taxonomy never becomes a control code: `flatten` maps it to `UNKNOWN` and keeps the
-  original as data. `UNKNOWN` is owned by INTEGRATION and not retryable — "cause cannot be determined => INTEGRATION,
-  never DEVELOPER" (§15, TEST-2 companion).
+  original as data. `UNKNOWN` is INTEGRATION and not retryable — never DEVELOPER (§15, TEST-2 companion).
 """
 
 from __future__ import annotations
@@ -20,13 +23,23 @@ from aisef2.arch.enums import Owner
 from aisef2.errors import InvariantError
 
 
+class Retryability(Enum):
+    RETRYABLE = "RETRYABLE"
+    NOT_RETRYABLE = "NOT_RETRYABLE"
+    RESOLVED_BY_POLICY = "RESOLVED_BY_POLICY"
+
+
 class FailureCode(Enum):
     PROBE_UNRUNNABLE = "PROBE_UNRUNNABLE"
     PROBE_INVALID_SPEC = "PROBE_INVALID_SPEC"
     CONTRACT_UNSATISFIED = "CONTRACT_UNSATISFIED"
-    PRECONDITION_ABSENT = "PRECONDITION_ABSENT"
+    SUBJECT_ABSENT_AT_CANDIDATE = "SUBJECT_ABSENT_AT_CANDIDATE"
+    PRECONDITION_BROKEN = "PRECONDITION_BROKEN"
+    POST_MERGE_REGRESSION = "POST_MERGE_REGRESSION"
+    POST_MERGE_SUBJECT_LOST = "POST_MERGE_SUBJECT_LOST"
     MISSING_CREDENTIAL = "MISSING_CREDENTIAL"
     INVALID_CREDENTIAL = "INVALID_CREDENTIAL"
+    PROVIDER_UNAVAILABLE = "PROVIDER_UNAVAILABLE"
     UNKNOWN = "UNKNOWN"
 
 
@@ -34,35 +47,47 @@ class FailureCode(Enum):
 class Classification:
     code: FailureCode
     owner: Owner
-    retryable: bool
+    retryability: Retryability
     rule: str
 
     @property
     def budget(self) -> Owner | None:
-        """The budget a retry charges: the owner's own, and only when the code is retryable."""
-        return self.owner if self.retryable else None
+        """The budget a retry would charge — the owner's own — unless the code is never retryable."""
+        return None if self.retryability is Retryability.NOT_RETRYABLE else self.owner
 
 
+R, N, P = Retryability.RETRYABLE, Retryability.NOT_RETRYABLE, Retryability.RESOLVED_BY_POLICY
 TAXONOMY: dict[FailureCode, Classification] = {c.code: c for c in (
-    Classification(FailureCode.PROBE_UNRUNNABLE, Owner.ENVIRONMENT, retryable=True,
-                   rule="§10: UNRUNNABLE -> ENVIRONMENT (the only row that may); environment retry policy (§15 TEST-1)"),
-    Classification(FailureCode.PROBE_INVALID_SPEC, Owner.INTEGRATION, retryable=False,
+    Classification(FailureCode.PROBE_UNRUNNABLE, Owner.ENVIRONMENT, retryability=R,
+                   rule="§10, §10.3: the observation harness cannot run -> ENVIRONMENT (the only probe outcome that "
+                        "may route there)"),
+    Classification(FailureCode.PROBE_INVALID_SPEC, Owner.INTEGRATION, retryability=N,
                    rule="§10: INVALID_SPEC -> PLAN / INTEGRATION. INTEGRATION: §12 checks 2, 6 and 9 establish "
                         "contract->spec integrity and probe availability before plan freeze, so a spec that reaches "
                         "a probe unevaluable is a harness integration fault; §14: PROBE_INVALID is a hard blocker"),
-    Classification(FailureCode.CONTRACT_UNSATISFIED, Owner.DEVELOPER, retryable=True,
-                   rule="§10: failure at the candidate -> DEVELOPER; §10.1: failure means ContractSatisfaction "
+    Classification(FailureCode.CONTRACT_UNSATISFIED, Owner.DEVELOPER, retryability=R,
+                   rule="§10.3: CANDIDATE, UNSATISFIED -> DEVELOPER; §10.1: failure is ContractSatisfaction "
                         "UNSATISFIED, never a raw verdict"),
-    Classification(FailureCode.PRECONDITION_ABSENT, Owner.PLAN, retryable=False,
-                   rule="§10: INDETERMINATE -> PLAN or INTEGRATION, by reason. PLAN: §13 routes PRECONDITION_ABSENT to "
-                        "PRECONDITION_BROKEN, a hard plan blocker (§14); §10.2 forbids a vacuous verdict, so the "
-                        "missing subject is a plan fact, never a developer failure"),
-    Classification(FailureCode.MISSING_CREDENTIAL, Owner.ENVIRONMENT, retryable=True,
-                   rule="§22: distinct from INVALID_CREDENTIAL because the fix differs — provide the credential in "
-                        "the environment"),
-    Classification(FailureCode.INVALID_CREDENTIAL, Owner.PROVIDER, retryable=False,
-                   rule="§22: MUST NOT be retryable (D-006: credential rejection charged to quality attempts)"),
-    Classification(FailureCode.UNKNOWN, Owner.INTEGRATION, retryable=False,
+    Classification(FailureCode.SUBJECT_ABSENT_AT_CANDIDATE, Owner.DEVELOPER, retryability=R,
+                   rule="§10.3 (V2-001): CANDIDATE, admitted obligation, required subject absent -> DEVELOPER: the "
+                        "admitted implementation did not establish the subject the proof requires"),
+    Classification(FailureCode.PRECONDITION_BROKEN, Owner.PLAN, retryability=N,
+                   rule="§10.3, §13: PARENT, PRESERVE or VERIFY over a required subject that is absent -> "
+                        "PRECONDITION_BROKEN, PLAN; §14: a hard plan blocker"),
+    Classification(FailureCode.POST_MERGE_REGRESSION, Owner.INTEGRATION, retryability=N,
+                   rule="§26, §10.3: POST_MERGE, UNSATISFIED -> a regression after merge, INTEGRATION"),
+    Classification(FailureCode.POST_MERGE_SUBJECT_LOST, Owner.INTEGRATION, retryability=N,
+                   rule="§10.3 (V2-001): POST_MERGE, a subject verified at the candidate is gone -> INTEGRATION"),
+    Classification(FailureCode.MISSING_CREDENTIAL, Owner.ENVIRONMENT, retryability=P,
+                   rule="§22 + owner decision (P1 review): a missing credential is execution configuration -> "
+                        "ENVIRONMENT; whether it is retried is the resolved execution policy's decision"),
+    Classification(FailureCode.INVALID_CREDENTIAL, Owner.ENVIRONMENT, retryability=N,
+                   rule="§22: MUST NOT be retryable (D-006); owner decision (P1 review): a rejected, revoked or wrong "
+                        "credential is execution configuration, not provider failure -> ENVIRONMENT"),
+    Classification(FailureCode.PROVIDER_UNAVAILABLE, Owner.PROVIDER, retryability=R,
+                   rule="§22 + owner decision (P1 review): a provider owns a failure only through a provider-side "
+                        "code — the provider is unavailable"),
+    Classification(FailureCode.UNKNOWN, Owner.INTEGRATION, retryability=N,
                    rule="§22: a non-AISEF error flattens to UNKNOWN; §15: cause undetermined -> INTEGRATION, "
                         "never DEVELOPER"),
 )}

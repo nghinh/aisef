@@ -28,6 +28,7 @@
     "F2.enum.ProbeExecutionStatus",
     "F2.enum.BehaviorVerdict",
     "F2.enum.ContractSatisfaction",
+    "F2.enum.MeasurementPoint",
     "F2.contract_satisfaction_derivation",
     "F2.owner_routing_table"
    ],
@@ -232,6 +233,14 @@
   },
   {
    "item": "F2",
+   "id": "F2.enum.MeasurementPoint",
+   "implemented_by": "WP-1.4",
+   "state": "PASS",
+   "detail": "MeasurementPoint equals the RFC (3 members)",
+   "required_now": true
+  },
+  {
+   "item": "F2",
    "id": "F2.contract_satisfaction_derivation",
    "implemented_by": "WP-1.3",
    "state": "PASS",
@@ -305,101 +314,356 @@
    "id": "F2.owner_routing_table",
    "implemented_by": "WP-1.4",
    "state": "PASS",
-   "detail": "equals the RFC §10 table on 12 (site, state) rows, polarity-symmetric",
+   "detail": "equals the RFC §10 and §10.3 tables on 39 (point, outcome, role) rows, polarity-symmetric",
    "table": [
     [
+     "§10.3",
      "PARENT",
-     "EXECUTED",
-     "SATISFIED",
-     "—",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "INTRODUCE",
      null,
-     "STORY_ADMISSION"
+     "STORY_ADMISSION",
+     "READY"
     ],
     [
-     "CANDIDATE",
-     "EXECUTED",
-     "SATISFIED",
-     "—",
-     null,
-     null
-    ],
-    [
+     "§10.3",
      "PARENT",
-     "EXECUTED",
-     "REFUTED",
-     "DEVELOPER at candidate; a plan disposition at parent",
-     null,
-     "STORY_ADMISSION"
-    ],
-    [
-     "CANDIDATE",
-     "EXECUTED",
-     "REFUTED",
-     "DEVELOPER at candidate; a plan disposition at parent",
-     "DEVELOPER",
-     null
-    ],
-    [
-     "PARENT",
-     "EXECUTED",
-     "INDETERMINATE",
-     "PLAN or INTEGRATION, by reason",
-     null,
-     "STORY_ADMISSION"
-    ],
-    [
-     "CANDIDATE",
-     "EXECUTED",
-     "INDETERMINATE",
-     "PLAN or INTEGRATION, by reason",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "PRESERVE",
      "PLAN",
-     null
+     "STORY_ADMISSION",
+     "PRECONDITION_BROKEN"
     ],
     [
+     "§10.3",
      "PARENT",
-     "UNRUNNABLE",
-     "—",
-     "**ENVIRONMENT**",
-     "ENVIRONMENT",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "VERIFY",
+     "PLAN",
+     "STORY_ADMISSION",
+     "PRECONDITION_BROKEN"
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`SATISFIED`, `UNSATISFIED`",
+     "INTRODUCE",
+     null,
+     "STORY_ADMISSION",
      null
     ],
     [
+     "§10.3",
+     "PARENT",
+     "`SATISFIED`, `UNSATISFIED`",
+     "PRESERVE",
+     null,
+     "STORY_ADMISSION",
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`SATISFIED`, `UNSATISFIED`",
+     "VERIFY",
+     null,
+     "STORY_ADMISSION",
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`SATISFIED`, `UNSATISFIED`",
+     "INTRODUCE",
+     null,
+     "STORY_ADMISSION",
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`SATISFIED`, `UNSATISFIED`",
+     "PRESERVE",
+     null,
+     "STORY_ADMISSION",
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`SATISFIED`, `UNSATISFIED`",
+     "VERIFY",
+     null,
+     "STORY_ADMISSION",
+     null
+    ],
+    [
+     "§10.3",
      "CANDIDATE",
-     "UNRUNNABLE",
-     "—",
-     "**ENVIRONMENT**",
-     "ENVIRONMENT",
-     null
-    ],
-    [
-     "PARENT",
-     "INVALID_SPEC",
-     "—",
-     "PLAN / INTEGRATION",
-     "INTEGRATION",
-     null
-    ],
-    [
-     "CANDIDATE",
-     "INVALID_SPEC",
-     "—",
-     "PLAN / INTEGRATION",
-     "INTEGRATION",
-     null
-    ],
-    [
-     "PARENT",
-     "*(absent)*",
-     "—",
-     "chargeable to no one",
+     "`UNSATISFIED`",
+     "INTRODUCE",
+     "DEVELOPER",
      null,
      null
     ],
     [
+     "§10.3",
+     "CANDIDATE",
+     "`UNSATISFIED`",
+     "PRESERVE",
+     "DEVELOPER",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`UNSATISFIED`",
+     "VERIFY",
+     "DEVELOPER",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "INTRODUCE",
+     "DEVELOPER",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "PRESERVE",
+     "DEVELOPER",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "VERIFY",
+     "DEVELOPER",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`UNSATISFIED`",
+     "INTRODUCE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`UNSATISFIED`",
+     "PRESERVE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`UNSATISFIED`",
+     "VERIFY",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "INTRODUCE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "PRESERVE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "VERIFY",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "probe `UNRUNNABLE`",
+     "INTRODUCE",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "probe `UNRUNNABLE`",
+     "PRESERVE",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "probe `UNRUNNABLE`",
+     "VERIFY",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "probe `UNRUNNABLE`",
+     "INTRODUCE",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "probe `UNRUNNABLE`",
+     "PRESERVE",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "probe `UNRUNNABLE`",
+     "VERIFY",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "probe `UNRUNNABLE`",
+     "INTRODUCE",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "probe `UNRUNNABLE`",
+     "PRESERVE",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "probe `UNRUNNABLE`",
+     "VERIFY",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10",
+     "PARENT",
+     "UNRUNNABLE",
+     null,
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10",
+     "CANDIDATE",
+     "UNRUNNABLE",
+     null,
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10",
+     "POST_MERGE",
+     "UNRUNNABLE",
+     null,
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10",
+     "PARENT",
+     "INVALID_SPEC",
+     null,
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10",
+     "CANDIDATE",
+     "INVALID_SPEC",
+     null,
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10",
+     "POST_MERGE",
+     "INVALID_SPEC",
+     null,
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10",
+     "PARENT",
+     "*(absent)*",
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "§10",
      "CANDIDATE",
      "*(absent)*",
-     "—",
-     "chargeable to no one",
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "§10",
+     "POST_MERGE",
+     "*(absent)*",
+     null,
+     null,
      null,
      null
     ]

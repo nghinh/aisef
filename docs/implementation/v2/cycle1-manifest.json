@@ -623,7 +623,20 @@
     "routing total over the legal state space",
     "no did-not-run -> developer edge exists"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "discovered_findings": [
+    {
+     "id": "ARCHITECTURE-EXCEPTION-V2-001",
+     "found": "2026-09-21, P1 owner review",
+     "what": "the frozen F2 row routed EXECUTED + INDETERMINATE by reason alone ('PLAN or INTEGRATION'); candidate PRECONDITION_ABSENT after an admitted INTRODUCE is the implementation's failure and must be DEVELOPER",
+     "resolution": "owner-approved exception: routing keyed by MeasurementPoint (PARENT / CANDIDATE / POST_MERGE) and, at the parent, ObligationRole (RFC §10.3); implementation_tasks' '(status, verdict, reason)' reads as '(measurement point, status, ContractSatisfaction, reason, parent role)'",
+     "records": [
+      "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
+      "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json"
+     ],
+     "classification": "approved architecture exception (F2); no phase, dependency or scope change"
+    }
+   ]
   },
   {
    "id": "WP-2.1",

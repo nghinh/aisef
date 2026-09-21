@@ -261,65 +261,94 @@ def _satisfaction_matches_rfc(rfc: RFC) -> dict:
 
 
 def _routing_matches_rfc(rfc: RFC) -> dict:
-    """F2 freezes the owner routing table. The reference is the RFC §10 table, parsed row by row ("owner on
-    failure"), its two normative sentences, and §10.1's rule that routing is on ContractSatisfaction. Checked on the
-    implementation for both sites: MUST_HOLD rows directly; MUST_NOT_HOLD by polarity symmetry."""
-    s = rfc.section("## 10. Two-axis proof outcomes", "### 10.1")
-    rows = re.findall(r"^\| (EXECUTED|UNRUNNABLE|INVALID_SPEC|\*\(absent\)\*) \| (SATISFIED|REFUTED|INDETERMINATE|—) "
-                      r"\| [^|]+ \| ([^|]+) \|$", s, re.M)
-    rules = ("Only `UNRUNNABLE` **MAY** route to `ENVIRONMENT`", "`UNRUNNABLE` **MUST NOT** route to `DEVELOPER`")
-    admission = rfc.section("## 13. StoryAdmission", "## 14.")
-    parent_by_admission = all(tok in admission for tok in ("`UNSATISFIED`", "`SATISFIED`",
-                                                            "`INDETERMINATE(PRECONDITION_ABSENT)`"))
-    if len(rows) != 6 or not all(r in s for r in rules) or not parent_by_admission:
-        return {"state": FAIL, "detail": "RFC reference (§10 table, its routing rules, §13 table) could not be extracted"}
+    """F2 freezes the owner routing table, keyed by measurement point since ARCHITECTURE-EXCEPTION-V2-001.
+
+    References, all parsed from the RFC: the §10 table ("owner on failure"), its two normative routing sentences,
+    and the §10.3 table (measurement point x outcome x role -> owner). Checked on the implementation at every
+    measurement point and role: MUST_HOLD rows directly, MUST_NOT_HOLD by polarity symmetry (§10.1)."""
+    s10 = rfc.section("## 10. Two-axis proof outcomes", "### 10.1")
+    s103 = rfc.section("### 10.3 Owner routing by measurement point", "## 11.")
+    rows10 = re.findall(r"^\| (EXECUTED|UNRUNNABLE|INVALID_SPEC|\*\(absent\)\*) \| (SATISFIED|REFUTED|INDETERMINATE|—) "
+                        r"\| [^|]+ \| ([^|]+) \|$", s10, re.M)
+    rows103 = re.findall(r"^\| (PARENT|CANDIDATE|POST_MERGE|any) \| ([^|]+) \| ([^|]+) \| ([^|]+) \| ([^|]+) \|$",
+                         s103, re.M)
+    rules = ("Only `UNRUNNABLE` **MAY** route to `ENVIRONMENT`", "`UNRUNNABLE` **MUST NOT** route to `DEVELOPER`",
+             "**MUST NOT** be inferred\nfrom an `INDETERMINATE` reason alone")
+    if len(rows10) != 6 or len(rows103) < 8 or not all(r in s10 + s103 for r in rules) \
+            or "SATISFIED` at the candidate or after merge is not a failure" not in s103:
+        return {"state": FAIL, "detail": "RFC reference (§10 table and rules, §10.3 table) could not be extracted"}
     if not symbol_present("aisef2.control.routing", "route"):
         return {"state": None, "detail": "aisef2.control.routing.route not implemented"}
+    from itertools import product
     from types import SimpleNamespace
-    from aisef2.arch.enums import BehaviorVerdict as V, Owner
+    from aisef2.arch.enums import BehaviorVerdict as V, MeasurementPoint as MP, ObligationRole, Owner
     from aisef2.control import routing as RT
     from aisef2.product import outcome as O
-    names = {o.value for o in Owner}
-
-    def allowed(cell: str, site: str):
-        part = next((p for p in cell.split(";") if f"at {site}" in p), cell) if ";" in cell else cell
-        if "plan disposition" in part:
-            return RT.STORY_ADMISSION
-        found = {n for n in names if re.search(rf"\b{n}\b", part)}
-        return found or None
-
-    make = {("EXECUTED", "SATISFIED"): O.Executed(V.SATISFIED), ("EXECUTED", "REFUTED"): O.Executed(V.REFUTED),
-            ("EXECUTED", "INDETERMINATE"): O.Executed(V.INDETERMINATE, O.IndeterminateReason.PRECONDITION_ABSENT),
-            ("UNRUNNABLE", "—"): O.Unrunnable("x"), ("INVALID_SPEC", "—"): O.InvalidSpec("x"), ("*(absent)*", "—"): None}
+    owners = {o.value for o in Owner}
     hold, hold_not = SimpleNamespace(candidate_expectation=V.SATISFIED), SimpleNamespace(candidate_expectation=V.REFUTED)
+    pa = O.Executed(V.INDETERMINATE, O.IndeterminateReason.PRECONDITION_ABSENT)
+    outcome_of = {"`INDETERMINATE(PRECONDITION_ABSENT)`": [pa], "`UNSATISFIED`": [O.Executed(V.REFUTED)],
+                  "`SATISFIED`, `UNSATISFIED`": [O.Executed(V.SATISFIED), O.Executed(V.REFUTED)],
+                  "probe `UNRUNNABLE`": [O.Unrunnable("x")]}
+    roles_of = {"INTRODUCE": [ObligationRole.INTRODUCE],
+                "PRESERVE, VERIFY": [ObligationRole.PRESERVE, ObligationRole.VERIFY],
+                "any admitted": list(ObligationRole), "any": list(ObligationRole)}
     problems, table = [], []
-    for status, verdict, cell in rows:
-        result = make[(status, verdict)]
-        for site in RT.Site:
-            want = allowed(cell.strip(), site.value.lower())
-            if status == "EXECUTED" and site is RT.Site.PARENT:
-                want = RT.STORY_ADMISSION  # §13: every parent-side satisfaction is a StoryAdmission disposition
-            got = RT.route(result, hold, site)
-            owner = got.failure.owner.value if got.failure else None
-            table.append([site.value, status, verdict, cell.strip(), owner, got.decided_by])
-            ok = (got.failure is None and got.decided_by == RT.STORY_ADMISSION) if want == RT.STORY_ADMISSION else \
-                 (got.failure is None and got.decided_by is None) if want is None else (owner in want)
+
+    def got(result, point, role):
+        r = RT.route(result, hold, point, role)
+        return (r.failure.owner.value if r.failure else None), r
+
+    # §10.3, row by row
+    for point, outcome, role, meaning, owner_cell in rows103:
+        points = list(MP) if point == "any" else [MP(point)]
+        want = next((n for n in owners if re.search(rf"\b{n}\b", owner_cell)), None)
+        for p_, result, role_ in product(points, outcome_of.get(outcome.strip(), []), roles_of.get(role.strip(), [])):
+            owner, r = got(result, p_, role_)
+            table.append(["§10.3", p_.value, outcome.strip(), role_.value, owner, r.decided_by,
+                          r.disposition and r.disposition.value])
+            if "StoryAdmission disposition" in meaning:
+                ok = r.failure is None and r.decided_by == RT.STORY_ADMISSION
+            elif meaning.strip().startswith(("READY", "PRECONDITION_BROKEN")):
+                ok = owner == want and r.disposition is not None and r.disposition.value == meaning.split()[0]
+            else:
+                ok = owner == want
             if not ok:
-                problems.append(f"{site.value} {status}/{verdict}: RFC '{cell.strip()}', implemented {owner or got.decided_by}")
+                problems.append(f"§10.3 {p_.value} {outcome.strip()} {role_.value}: RFC {want or meaning.strip()}, "
+                                f"implemented {owner}")
+        if not outcome_of.get(outcome.strip()) or not roles_of.get(role.strip()):
+            problems.append(f"§10.3 row not understood: {point} | {outcome} | {role}")
+    # §10.3: SATISFIED at the candidate or after merge is not a failure
+    for p_ in (MP.CANDIDATE, MP.POST_MERGE):
+        if got(O.Executed(V.SATISFIED), p_, None)[0] is not None:
+            problems.append(f"{p_.value}: SATISFIED is charged to an owner")
+    # §10 table: the rows §10.3 does not refine
+    make = {("UNRUNNABLE", "—"): O.Unrunnable("x"), ("INVALID_SPEC", "—"): O.InvalidSpec("x"), ("*(absent)*", "—"): None}
+    for status, verdict, cell in rows10:
+        if (status, verdict) not in make:
+            continue
+        allowed = {n for n in owners if re.search(rf"\b{n}\b", cell)} or None
+        for p_ in MP:
+            owner, r = got(make[(status, verdict)], p_, None)
+            table.append(["§10", p_.value, status, None, owner, r.decided_by, None])
+            if (allowed is None and (r.failure is not None or r.decided_by is not None)) or \
+                    (allowed is not None and owner not in allowed):
+                problems.append(f"§10 {p_.value} {status}: RFC '{cell.strip()}', implemented {owner}")
+    # §10.1: polarity symmetry at every point and role
     flip = {V.SATISFIED: V.REFUTED, V.REFUTED: V.SATISFIED}
-    for site in RT.Site:
-        for v in (V.SATISFIED, V.REFUTED):
-            if RT.route(O.Executed(v), hold_not, site) != RT.route(O.Executed(flip[v]), hold, site):
-                problems.append(f"{site.value}: MUST_NOT_HOLD {v.value} routes differently from MUST_HOLD {flip[v].value}")
-    env = {r[1] for r in table if r[4] == "ENVIRONMENT"}
-    if env - {"UNRUNNABLE"}:
-        problems.append(f"only UNRUNNABLE may route to ENVIRONMENT; also {sorted(env - {'UNRUNNABLE'})}")
-    if any(r[1] == "UNRUNNABLE" and r[4] == "DEVELOPER" for r in table):
+    for p_, role_, v in product(MP, ObligationRole, (V.SATISFIED, V.REFUTED)):
+        if RT.route(O.Executed(v), hold_not, p_, role_) != RT.route(O.Executed(flip[v]), hold, p_, role_):
+            problems.append(f"{p_.value}/{role_.value}: MUST_NOT_HOLD {v.value} routes unlike MUST_HOLD {flip[v].value}")
+    # §10 normative sentences, over everything routed above
+    if {row[2] for row in table if row[4] == "ENVIRONMENT"} - {"UNRUNNABLE", "probe `UNRUNNABLE`"}:
+        problems.append("a probe outcome other than UNRUNNABLE routes to ENVIRONMENT")
+    if any(row[2] in ("UNRUNNABLE", "probe `UNRUNNABLE`") and row[4] == "DEVELOPER" for row in table):
         problems.append("UNRUNNABLE routes to DEVELOPER")
     if problems:
-        return {"state": FAIL, "detail": "routing differs from the RFC §10 table", "problems": problems, "table": table}
-    return {"state": PASS, "detail": f"equals the RFC §10 table on {len(table)} (site, state) rows, polarity-symmetric",
-            "table": table}
+        return {"state": FAIL, "detail": "routing differs from the RFC §10 / §10.3 tables", "problems": problems,
+                "table": table}
+    return {"state": PASS, "detail": f"equals the RFC §10 and §10.3 tables on {len(table)} (point, outcome, role) "
+                                     "rows, polarity-symmetric", "table": table}
 
 
 def subchecks(rfc: RFC, code) -> list[dict]:
@@ -336,6 +365,7 @@ def subchecks(rfc: RFC, code) -> list[dict]:
     add("F1", "F1.event_envelope", "WP-3.1", _shape("aisef2.journal.event", "Event", rfc.dataclasses.get("Event")))
     for n in ("ProbeExecutionStatus", "BehaviorVerdict", "ContractSatisfaction"):
         add("F2", f"F2.enum.{n}", "WP-0.2", V(n, e.get(n, []), code))
+    add("F2", "F2.enum.MeasurementPoint", "WP-1.4", V("MeasurementPoint", e.get("MeasurementPoint", []), code))
     add("F2", "F2.contract_satisfaction_derivation", "WP-1.3", _satisfaction_matches_rfc(rfc))
     add("F2", "F2.owner_routing_table", "WP-1.4", _routing_matches_rfc(rfc))
     add("F3", "F3.owner_set", "WP-0.2", V("Owner", e.get("Owner", []), code))

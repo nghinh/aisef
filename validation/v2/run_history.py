@@ -5,8 +5,9 @@ Owner decision "OWNER ACCEPTS P0 / AUTHORIZE P1" §3 and §5, as mechanism rathe
 * **append-only** — every committed version of the history must extend the previous one entry for entry, so a
   failed attempt cannot be dropped by editing the file, whether in the working tree or in a later commit;
 * **a rerun never erases a failure** — a retry may satisfy a gate only when the failure it retries was classified
-  into a class the preregistered policy marks retryable (ENVIRONMENT, PROVIDER); any other class makes the rerun
-  diagnostic only, and a later green attempt does not convert the failure;
+  into a class the preregistered policy marks retryable (ENVIRONMENT, PROVIDER) **and** the execution path has an
+  approved retry count (resolved execution policy; `null` = none approved, never a default); any other case makes
+  the rerun diagnostic only, and a later green attempt does not convert the failure;
 * **V1-PF-001 stops the gate** — an attempt attributed to it must carry gate_effect STOP.
 
     python -P validation/v2/run_history.py record <field=value> ...   # append one attempt
@@ -78,10 +79,19 @@ def entry_problems(entries: list[dict], policy: dict) -> list[str]:
         if e.get("retry_of") is not None and e.get("gate_effect") == "COUNTS":
             key = (e.get("commit"), e.get("where"), e.get("job"))
             counted[key] = counted.get(key, 0) + 1
-            if counted[key] > policy["max_gate_retries_per_attempt_chain"]:
-                out.append(f"entry {e.get('seq')}: more gate-counting retries than the preregistered "
-                           f"{policy['max_gate_retries_per_attempt_chain']} for {key[0][:12]} {key[1]}")
+            approved = approved_retry_count(policy, e.get("where"))
+            if approved is None:
+                out.append(f"entry {e.get('seq')}: no approved retry count for phase-gate:{e.get('where')} — "
+                           "the retry is diagnostic only")
+            elif counted[key] > approved:
+                out.append(f"entry {e.get('seq')}: more gate-counting retries than the approved {approved} "
+                           f"for {key[0][:12]} {key[1]}")
     return out
+
+
+def approved_retry_count(policy: dict, where: str | None) -> int | None:
+    """The approved retry count for a phase-gate path, or None when none is approved (never a default)."""
+    return policy["retry_count"]["approved_counts_by_execution_path"].get(f"phase-gate:{where}")
 
 
 def append_only_problems(versions: list[list[dict]]) -> list[str]:
@@ -94,12 +104,18 @@ def append_only_problems(versions: list[list[dict]]) -> list[str]:
     return out
 
 
-def gate_green(entries: list[dict], commit: str, where: str, job: str | None = None) -> bool:
-    """Green only if the latest attempt passed and every earlier failure on it permitted a retry."""
+def gate_green(entries: list[dict], commit: str, where: str, job: str | None = None, policy: dict | None = None) -> bool:
+    """Green only if the latest attempt passed and, when it follows failures, every failure permitted a retry and
+    the path has an approved retry count the retries stayed within."""
+    policy = policy or _load(ROOT / POLICY_REL)
     mine = [e for e in entries if (e["commit"], e["where"], e.get("job")) == (commit, where, job)]
     if not mine or mine[-1]["result"] != "PASS":
         return False
-    return all(e["retry_permitted"] for e in mine[:-1] if e["result"] == "FAIL")
+    failures = [e for e in mine[:-1] if e["result"] == "FAIL"]
+    if not failures:
+        return True
+    approved = approved_retry_count(policy, where)
+    return approved is not None and len(failures) <= approved and all(e["retry_permitted"] for e in failures)
 
 
 def committed_versions(root: pathlib.Path = ROOT) -> list[list[dict]]:

@@ -5,7 +5,7 @@
  "preregistered": true,
  "rules": [
   "A rerun MUST NOT erase a previous failure. Every attempt is preserved (closure-evidence/v2/P1-RUN-HISTORY.json, append-only).",
-  "A retry may satisfy a gate only when the first outcome is deterministically classified as a preregistered retryable class and this policy permits it.",
+  "A retry may satisfy a gate only when the first outcome is deterministically classified as a preregistered retryable class, and the execution path has an approved retry count that the retry stays within.",
   "For every other class a rerun is diagnostic only. A later green attempt does not convert the original failure into an environmental flake.",
   "A classification must cite its evidence (a log signature, an exit reason); a class chosen because a rerun passed is not a classification."
  ],
@@ -20,7 +20,6 @@
   "HARNESS",
   "UNKNOWN"
  ],
- "max_gate_retries_per_attempt_chain": 1,
  "stop_on_recurrence": [
   "V1-PF-001"
  ],
@@ -33,5 +32,28 @@
    "signature": "MemoryError raised inside aisef/clients/base.py::_kill_tree_win32"
   }
  },
- "vocabulary_note": "These are CI-attempt classes, not the frozen F3 Owner set; HARNESS here means the CI/test harness, not an AISEF owner."
+ "vocabulary_note": "These are CI-attempt classes, not the frozen F3 Owner set; HARNESS here means the CI/test harness, not an AISEF owner.",
+ "retry_count": {
+  "source": "the resolved execution policy — RunSpec, project or evaluation configuration; never this file and never the failure taxonomy",
+  "rule": "the taxonomy decides whether an outcome is retryable; how many retries a path allows is resolved per execution path",
+  "approved_counts_by_execution_path": {
+   "phase-gate:local": null,
+   "phase-gate:ci": null
+  },
+  "when_no_approved_count": "stated explicitly (null above): a retry on that path cannot satisfy a gate and is diagnostic only; no default count is introduced"
+ },
+ "revisions": [
+  {
+   "revision": 1,
+   "commit": "9e82537",
+   "authority": "OWNER ACCEPTS P0 / AUTHORIZE P1 §3",
+   "note": "also declared max_gate_retries_per_attempt_chain = 1 as a universal V2 policy — that count was NOT approved by the owner"
+  },
+  {
+   "revision": 2,
+   "authority": "AISEF V2 — P1 OWNER REVIEW CORRECTION §4",
+   "change": "removed the unapproved global cap; retry counts come from the resolved execution policy; no approved count exists for the phase-gate paths and that is recorded as null, not defaulted",
+   "effect_on_recorded_history": "P1 recorded zero retries; no recorded attempt is rewritten or reinterpreted"
+  }
+ ]
 }

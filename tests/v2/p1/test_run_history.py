@@ -32,16 +32,32 @@ class RunHistory(unittest.TestCase):
         self.assertTrue(any("diagnostic only" in p for p in rh.entry_problems(runs, POLICY)))
         diag = [runs[0], {**runs[1], "gate_effect": "DIAGNOSTIC_ONLY"}]
         self.assertEqual(rh.entry_problems(diag, POLICY), [])
-        self.assertFalse(rh.gate_green(diag, C, "ci", "unit (windows-latest, 3.11)"))
+        self.assertFalse(rh.gate_green(diag, C, "ci", "unit (windows-latest, 3.11)", POLICY))
 
-    def test_a_preregistered_retryable_failure_may_be_retried_once(self):
+    def test_no_approved_retry_count_means_a_retry_never_satisfies_a_gate(self):
+        """Owner correction (P1 review): no global cap; with no approved count a retry is diagnostic only."""
+        self.assertNotIn("max_gate_retries_per_attempt_chain", POLICY)
+        self.assertIsNone(rh.approved_retry_count(POLICY, "ci"))
+        self.assertIsNone(rh.approved_retry_count(POLICY, "local"))
+        env = attempt(1, "FAIL", classification="ENVIRONMENT", retry_permitted=True)
+        counting = [env, attempt(2, "PASS", retry_of=1)]
+        self.assertTrue(any("no approved retry count" in p for p in rh.entry_problems(counting, POLICY)))
+        diagnostic = [env, attempt(2, "PASS", retry_of=1, gate_effect="DIAGNOSTIC_ONLY")]
+        self.assertEqual(rh.entry_problems(diagnostic, POLICY), [])
+        self.assertFalse(rh.gate_green(diagnostic, C, "ci", "unit (windows-latest, 3.11)", POLICY))
+
+    def test_an_approved_count_comes_from_the_resolved_policy_and_bounds_retries(self):
+        resolved = json.loads(json.dumps(POLICY))
+        resolved["retry_count"]["approved_counts_by_execution_path"]["phase-gate:ci"] = 1
         env = attempt(1, "FAIL", classification="ENVIRONMENT", retry_permitted=True)
         runs = [env, attempt(2, "PASS", retry_of=1)]
-        self.assertEqual(rh.entry_problems(runs, POLICY), [])
-        self.assertTrue(rh.gate_green(runs, C, "ci", "unit (windows-latest, 3.11)"))
+        self.assertEqual(rh.entry_problems(runs, resolved), [])
+        self.assertTrue(rh.gate_green(runs, C, "ci", "unit (windows-latest, 3.11)", resolved))
         env2 = attempt(2, "FAIL", classification="ENVIRONMENT", retry_permitted=True, retry_of=1)
         third = [env, env2, attempt(3, "PASS", retry_of=2)]
-        self.assertTrue(any("preregistered" in p for p in rh.entry_problems(third, POLICY)))
+        self.assertTrue(any("more gate-counting retries than the approved 1" in p
+                            for p in rh.entry_problems(third, resolved)))
+        self.assertFalse(rh.gate_green(third, C, "ci", "unit (windows-latest, 3.11)", resolved))
 
     def test_retry_permission_is_read_from_the_class_never_asserted(self):
         self.assertTrue(rh.entry_problems([attempt(1, "FAIL", retry_permitted=True)], POLICY))

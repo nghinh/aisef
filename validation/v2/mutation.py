@@ -55,7 +55,7 @@ TARGETS: dict[str, list[str]] = {
     "aisef2/control/owner.py::TAXONOMY": ["tests/v2/p1/test_routing.py"],
     "aisef2/control/owner.py::classify": ["tests/v2/p1/test_routing.py"],
     "aisef2/control/owner.py::flatten": ["tests/v2/p1/test_routing.py"],
-    "aisef2/control/routing.py::_CANDIDATE": ["tests/v2/p1/test_routing.py"],
+    "aisef2/control/routing.py::_EXECUTED": ["tests/v2/p1/test_routing.py"],
     "aisef2/control/routing.py::route": ["tests/v2/p1/test_routing.py"],
 }
 #: Targets whose survivors may not be audited away.

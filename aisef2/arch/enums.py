@@ -53,6 +53,12 @@ class ContractSatisfaction(Enum):  # RFC §10.1 · F2
     INDETERMINATE = "INDETERMINATE"
 
 
+class MeasurementPoint(Enum):  # RFC §10.3 · F2 (amended — ARCHITECTURE-EXCEPTION-V2-001)
+    PARENT = "PARENT"
+    CANDIDATE = "CANDIDATE"
+    POST_MERGE = "POST_MERGE"
+
+
 class ObligationRole(Enum):  # RFC §11 · F6
     INTRODUCE = "INTRODUCE"
     PRESERVE = "PRESERVE"
@@ -200,6 +206,7 @@ VOCABULARIES = {
     "ProbeExecutionStatus": (ProbeExecutionStatus, "F2", "§10"),
     "BehaviorVerdict": (BehaviorVerdict, "F2", "§10"),
     "ContractSatisfaction": (ContractSatisfaction, "F2", "§10.1"),
+    "MeasurementPoint": (MeasurementPoint, "F2", "§10.3"),
     "ObligationRole": (ObligationRole, "F6", "§11"),
     "ParentExpectation": (ParentExpectation, "F6", "§11"),
     "StoryAdmissionDisposition": (StoryAdmissionDisposition, "F7", "§13"),

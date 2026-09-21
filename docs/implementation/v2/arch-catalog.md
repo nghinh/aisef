@@ -13,6 +13,7 @@ requires the code to agree with the frozen RFC.
 | `ProbeExecutionStatus` | F2 | §10 | `EXECUTED`, `UNRUNNABLE`, `INVALID_SPEC` |
 | `BehaviorVerdict` | F2 | §10 | `SATISFIED`, `REFUTED`, `INDETERMINATE` |
 | `ContractSatisfaction` | F2 | §10.1 | `SATISFIED`, `UNSATISFIED`, `INDETERMINATE` |
+| `MeasurementPoint` | F2 | §10.3 | `PARENT`, `CANDIDATE`, `POST_MERGE` |
 | `ObligationRole` | F6 | §11 | `INTRODUCE`, `PRESERVE`, `VERIFY` |
 | `ParentExpectation` | F6 | §11 | `UNSATISFIED_AT_PARENT`, `SATISFIED_AT_PARENT`, `UNCONSTRAINED` |
 | `StoryAdmissionDisposition` | F7 | §13 | `READY`, `PRE_SATISFIED`, `PRECONDITION_BROKEN`, `PLAN_CONTRADICTION`, `PROBE_UNRUNNABLE`, `PROBE_INVALID` |
@@ -28,4 +29,4 @@ requires the code to agree with the frozen RFC.
 | `InvariantId` | F10 | §4 | `I`, `II`, `III`, `IV`, `V`, `VI`, `VII`, `VIII`, `IX` |
 | `ControlProjection` | F11 | §21 | `story_state`, `failure_owner`, `budgets`, `retry_target`, `terminal_state`, `qualification_counters` |
 
-21 vocabularies, 103 members.
+22 vocabularies, 106 members.

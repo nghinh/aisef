@@ -4,10 +4,28 @@
  "rfc": "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md",
  "approval_record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
  "approval_record_sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
- "rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
- "freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",
- "approved_rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
- "approved_freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",
+ "rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
+ "freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a",
+ "approved_rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
+ "approved_freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a",
+ "approval_lineage": [
+  {
+   "record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
+   "sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
+   "rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+   "freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a"
+  },
+  {
+   "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
+   "sha256": "eaeb3130e2eefe9aa294bd0d88115aa5715d4313504351fc8988af7e00820b73",
+   "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
+   "frozen_items_changed": [
+    "F2"
+   ],
+   "rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
+   "freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a"
+  }
+ ],
  "reviewed_commit": "2fe672c7ecdefa349e08353fa9bd67d627077d6e",
  "frozen_items": [
   {
@@ -18,8 +36,8 @@
   },
   {
    "id": "F2",
-   "row_sha256": "19617306f2cdf837755a023dab40e6f706aaf007a0133d05fbbc0f09d81ea3e9",
-   "item": "`ProbeExecutionStatus` × `BehaviorVerdict`, its six legal states, the owner routing table, **and the `ContractSatisfaction` derivation** *(adjusted)*",
+   "row_sha256": "e33271cd13c7752c6f2fe154cb827f9ee46586ac27d38257f9577470ab4188ca",
+   "item": "`ProbeExecutionStatus` × `BehaviorVerdict`, its six legal states, the owner routing table **keyed by `MeasurementPoint` (§10.3)** *(amended — V2-001)*, **and the `ContractSatisfaction` derivation** *(adjusted)*",
    "why": "Everything routes on it; `UNRESOLVABLE` is deleted. Re-deriving old evidence under a changed satisfaction mapping would silently re-interpret it"
   },
   {

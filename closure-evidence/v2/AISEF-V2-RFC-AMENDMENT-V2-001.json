@@ -1,0 +1,29 @@
+{
+ "record": "AISEF V2 — RFC AMENDMENT (approval lineage)",
+ "id": "AISEF-V2-RFC-AMENDMENT-V2-001",
+ "amends": {
+  "path": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
+  "sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a"
+ },
+ "exception": {
+  "path": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
+  "sha256": "2de596432375ba874ab17cfd34b507b9606e5af3fa6c88e48184fe7ab87d6d8c"
+ },
+ "frozen_items_changed": [
+  "F2"
+ ],
+ "rfc_normative_digest": {
+  "before": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+  "after": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708"
+ },
+ "freeze_table_digest": {
+  "before": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",
+  "after": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a"
+ },
+ "owner_approval": {
+  "approver": "owner",
+  "decision": "AISEF V2 — P1 OWNER REVIEW CORRECTION / ARCHITECTURE EXCEPTION V2-001",
+  "date": "2026-09-21"
+ },
+ "rule": "The original approval record is unchanged. The effective approved digests are the 'after' digests of the last amendment in the lineage; validation/v2/freeze_manifest.py verifies every link (amended record sha256, exception sha256, before == previous after)."
+}
