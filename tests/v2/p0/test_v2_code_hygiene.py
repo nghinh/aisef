@@ -33,3 +33,24 @@ class V2SubprocessEncoding(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class V2IsNotShippedInTheAisefWheel(unittest.TestCase):
+    """`include = ["aisef*"]` also matches `aisef2`; the exclude keeps V2 scaffolding out of the aisef wheel.
+
+    The one-time proof with the real discovery function is closure-evidence/v2/P0-PACKAGING-EXCLUDE.json; this test
+    guards the configuration with the same fnmatchcase filter setuptools applies, and needs no setuptools."""
+
+    def test_aisef2_excluded_and_aisef_kept(self):
+        import fnmatch
+        import tomllib
+        cfg = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["tool"]["setuptools"]["packages"]["find"]
+        inc, exc = cfg["include"], cfg.get("exclude", [])
+
+        def shipped(name):
+            return any(fnmatch.fnmatchcase(name, p) for p in inc) and not any(fnmatch.fnmatchcase(name, p) for p in exc)
+
+        for name in ("aisef", "aisef.control", "aisef.harness"):
+            self.assertTrue(shipped(name), name)
+        for name in ("aisef2", "aisef2.arch"):
+            self.assertFalse(shipped(name), name)
