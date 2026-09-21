@@ -71,6 +71,13 @@ jobs:
         run: |
           python -m venv /tmp/venv
           /tmp/venv/bin/pip install --no-index dist/*.whl
+      # P0 (V2): `include = ["aisef*"]` also matches `aisef2`, the V2 scaffolding kept out by pyproject's exclude.
+      # `python -m build` builds this wheel FROM the sdist, so this is the rebuilt-from-sdist case.
+      - name: V2 scaffolding (aisef2) is not in the wheel and cannot be imported from it
+        run: |
+          set -eu
+          python -c "import sys,zipfile,glob; n=[m for m in zipfile.ZipFile(glob.glob('dist/*.whl')[0]).namelist() if m.startswith('aisef2')]; sys.exit(f'aisef2 shipped in the wheel: {n}' if n else 0)"
+          cd /tmp && /tmp/venv/bin/python -I -c "import importlib.util,sys; sys.exit('aisef2 importable from the installed wheel' if importlib.util.find_spec('aisef2') else 0)"
       - name: the command runs and reports the packaged version
         run: |
           set -eu

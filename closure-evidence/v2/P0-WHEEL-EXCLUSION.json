@@ -1,0 +1,67 @@
+{
+ "record": "AISEF V2 — P0 WHEEL EXCLUSION PROOF",
+ "owner_requirement": "Prove current HEAD wheel excludes aisef2. Prove clean wheel install cannot import aisef2. Prove wheel rebuilt from current sdist also cannot import aisef2.",
+ "source_commit": "ebad09f3ba46534090aade7309808707725fb4a9",
+ "source_tree": "git archive of the source commit (no untracked or ignored files, no stale build/ or *.egg-info)",
+ "tooling": {
+  "frontend": "build 1.6.0 on Python 3.13.12 (.venv)",
+  "backend": "setuptools 84.0.0 (pyproject requires setuptools>=68)",
+  "offline": "PIP_NO_INDEX=1, setuptools taken from the local pip cache; nothing was downloaded",
+  "install_interpreter": "Python 3.14.7, fresh `python -m venv`, `pip install --no-index --no-deps <wheel>`",
+  "import_probe": "venv python -I (isolated: no cwd, PYTHONPATH or user site on sys.path), cwd outside the repository"
+ },
+ "wheel_from_head_source": {
+  "sha256": "2b41cdee2141f9dae345322033b926fd62aeeca0e4618fbd84cd42da0c0ed375",
+  "members": 124,
+  "aisef2_members": [],
+  "top_level": [
+   "aisef",
+   "aisef-1.7.6.dist-info"
+  ],
+  "clean_install": {
+   "import aisef": "OK (site-packages)",
+   "aisef --version": "aisef 1.7.6",
+   "importlib.util.find_spec('aisef2')": null,
+   "import aisef2": "ModuleNotFoundError: No module named 'aisef2'"
+  }
+ },
+ "sdist": {
+  "members": 252,
+  "aisef2_members": []
+ },
+ "wheel_rebuilt_from_sdist": {
+  "sha256": "f9e71113afa2098a9a25e11c40e6d8121b528c837c965895e4c0509cb803bdf1",
+  "members": 124,
+  "aisef2_members": [],
+  "top_level": [
+   "aisef",
+   "aisef-1.7.6.dist-info"
+  ],
+  "member_bytes_identical_to_wheel_from_head": true,
+  "clean_install": {
+   "import aisef": "OK (site-packages)",
+   "aisef --version": "aisef 1.7.6",
+   "importlib.util.find_spec('aisef2')": null,
+   "import aisef2": "ModuleNotFoundError: No module named 'aisef2'"
+  }
+ },
+ "comparison_with_frozen_candidate_wheel": {
+  "candidate_wheel": "aisef-freeze/f52df75ff242/dist/aisef-1.7.6-py3-none-any.whl",
+  "candidate_wheel_sha256": "8cae5c7e8d9aea1ecceb7d5d48d360cf2285b4f6db7560ff71aae99b9b182eac",
+  "same_member_set_and_order": true,
+  "members_with_different_bytes": [],
+  "archive_sha256_differs_because": "zip entry date_time only (124/124 entries); CRC, size, compression and attributes identical in every entry"
+ },
+ "negative_control": {
+  "change": "the same source with only the line `exclude = [\"aisef2*\"]` removed from pyproject.toml",
+  "aisef2_members_in_wheel": [
+   "aisef2/__init__.py",
+   "aisef2/arch/__init__.py",
+   "aisef2/arch/enums.py"
+  ],
+  "import aisef2 after clean install": "SUCCEEDS",
+  "meaning": "the proof can say NO: absence of aisef2 above is caused by the exclude, not by the probe being blind"
+ },
+ "recurring_check": ".github/workflows/tests.yml wheel job: the CI wheel (built by `python -m build`, i.e. rebuilt from the sdist) must contain no aisef2 member and its clean install must not find aisef2",
+ "verdict": "PROVEN — HEAD wheel and the wheel rebuilt from the sdist exclude aisef2; neither clean install can import it"
+}
