@@ -1,0 +1,36 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 24 items
+
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_1_canonical_bytes_matches_json_dumps PASSED [  4%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_2_element_equal_dicts_byte_identical PASSED [  8%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_3_non_ascii_utf8_literal PASSED [ 12%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_4_insertion_order_byte_identical PASSED [ 16%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_5_genesis_constant PASSED [ 20%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_6_roundtrip_json_loads PASSED [ 25%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_1_line_hash_returns_64_lowercase_hex PASSED [ 29%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_2_distinct_prev_hash_different_results PASSED [ 33%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_3_ignores_preset_hash_and_prev_hash PASSED [ 37%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_4_same_pair_same_digest PASSED [ 41%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_5_accepts_genesis_nonhex PASSED [ 45%]
+tests/test_nfc_normalization.py::TestNfcNormalization::test_AC_STORY_01_01_1_normalize_key_matches_unicodedata 
+tests/test_nfc_normalization.py::TestNfcNormalization::test_AC_STORY_01_01_1_normalize_key_matches_unicodedata PASSED [ 50%]
+tests/test_nfc_normalization.py::TestNfcNormalization::test_AC_STORY_01_01_2_nfc_nfd_byte_identical PASSED [ 54%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_3_import_prints_package_path PASSED [ 58%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_4_no_forbidden_imports PASSED [ 62%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_5_no_forbidden_calls PASSED [ 66%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_6_public_names_importable PASSED [ 70%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_7_verify_usage_error_exit_2 PASSED [ 75%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_1_read_lines_strips_trailing_newline PASSED [ 79%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_2_missing_file_raises_file_not_found PASSED [ 83%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_3_empty_file_returns_empty_list PASSED [ 87%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_write_atomic_concatenates_and_read_lines_roundtrip PASSED [ 91%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_5_crash_before_replace_leaves_original_byte_identical PASSED [ 95%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_6_temp_file_created_in_same_directory PASSED [100%]
+
+==================== 24 passed, 9 subtests passed in 0.23s =====================

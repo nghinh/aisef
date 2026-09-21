@@ -1,0 +1,59 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0 -- /Users/nghinh/Downloads/projects/aisef-freeze/oracle-venv/bin/python
+rootdir: /Users/nghinh/Downloads/projects/ai-sdlc
+configfile: pyproject.toml
+collecting ... collected 9 items
+
+oracle/test_oracle.py::TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger FAILED [ 11%]
+oracle/test_oracle.py::TestAcceptance::test_14_2_snapshot_is_byte_deterministic FAILED [ 22%]
+oracle/test_oracle.py::TestAcceptance::test_14_3_apply_batch_commits_atomically FAILED [ 33%]
+oracle/test_oracle.py::TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption FAILED [ 44%]
+oracle/test_oracle.py::TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover PASSED [ 55%]
+oracle/test_oracle.py::TestAcceptance::test_14_6_no_third_party_imports_at_runtime PASSED [ 66%]
+oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli FAILED [ 77%]
+oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value FAILED [ 88%]
+oracle/test_oracle.py::TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts PASSED [100%]
+
+=================================== FAILURES ===================================
+__________ TestAcceptance.test_14_1_verify_exits_0_on_a_fresh_ledger ___________
+oracle/test_oracle.py:77: in test_14_1_verify_exits_0_on_a_fresh_ledger
+    self.assertEqual(r.returncode, 3, f"§9: file not found is an I/O error, exit 3: {r.stderr[-400:]}")
+E   AssertionError: 0 != 3 : §9: file not found is an I/O error, exit 3:
+___________ TestAcceptance.test_14_2_snapshot_is_byte_deterministic ____________
+oracle/test_oracle.py:81: in test_14_2_snapshot_is_byte_deterministic
+    self.assertEqual(self._put(k, {"n": i}, f"r{i}").returncode, 0)
+E   AssertionError: 2 != 0
+___________ TestAcceptance.test_14_3_apply_batch_commits_atomically ____________
+oracle/test_oracle.py:97: in test_14_3_apply_batch_commits_atomically
+    self.assertEqual(self._put("k0", 0, "r0").returncode, 0)
+E   AssertionError: 2 != 0
+_ TestAcceptance.test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption _
+oracle/test_oracle.py:109: in test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption
+    self.assertEqual(self._put("k0", 0, "r0").returncode, 0)
+E   AssertionError: 2 != 0
+_ TestIdempotencyAndConflict.test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli _
+oracle/test_oracle.py:214: in test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli
+    self.assertEqual(r.returncode, 4, f"§9: a conflict exits 4: {r.stderr[-200:]}")
+E   AssertionError: 2 != 4 : §9: a conflict exits 4: usage: ledgerlock [-h] {verify} ...
+E   ledgerlock: error: argument command: invalid choice: 'apply' (choose from 'verify')
+___ TestIdempotencyAndConflict.test_a_tombstone_conflicts_like_a_live_value ____
+oracle/test_oracle.py:204: in test_a_tombstone_conflicts_like_a_live_value
+    led.apply_batch([("put", "t", 3, "d1", 3)])  # §4.4: same rid as the tombstone → an idempotent replay
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../aisef-qualification-ws/tmpwnicb7cp/delivered/ledgerlock/ledger.py:101: in apply_batch
+    raise ConflictError(
+E   ledgerlock.ledger.ConflictError: conflict for key 't': incoming rid 'd1' does not match committed rid None
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED oracle/test_oracle.py::TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover
+PASSED oracle/test_oracle.py::TestAcceptance::test_14_6_no_third_party_imports_at_runtime
+PASSED oracle/test_oracle.py::TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_2_snapshot_is_byte_deterministic
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_3_apply_batch_commits_atomically
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption
+FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli
+FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value
+========================= 6 failed, 3 passed in 0.86s ==========================
+
+--- stderr ---

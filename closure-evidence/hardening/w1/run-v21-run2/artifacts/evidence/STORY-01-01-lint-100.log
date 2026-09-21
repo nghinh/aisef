@@ -1,0 +1,24 @@
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:25:18
+   |
+23 | class TestSkeleton(unittest.TestCase):
+24 |     def test_AC_STORY_01_01_3_import_prints_package_path(self):
+25 |         result = subprocess.run(
+   |                  ^^^^^^^^^^^^^^
+26 |             [sys.executable, "-c", "import ledgerlock; print(ledgerlock.__file__)"],
+27 |             capture_output=True,
+   |
+help: Add explicit `check=False`
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:58:18
+   |
+57 |     def test_AC_STORY_01_01_7_verify_usage_error_exit_2(self):
+58 |         result = subprocess.run(
+   |                  ^^^^^^^^^^^^^^
+59 |             [sys.executable, "-m", "ledgerlock", "verify", "ledger.jsonl", "extra"],
+60 |             capture_output=True,
+   |
+help: Add explicit `check=False`
+
+Found 2 errors.

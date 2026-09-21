@@ -1,0 +1,31 @@
+F401 [*] `os` imported but unused
+ --> tests/test_atomic_batch.py:2:8
+  |
+1 | import json
+2 | import os
+  |        ^^
+3 | import tempfile
+4 | import unittest
+  |
+help: Remove unused import: `os`
+  |
+1 | import json
+  - import os
+2 | import tempfile
+  |
+
+SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+   --> tests/test_atomic_batch.py:104:13
+    |
+102 |                   raise OSError("simulated crash before replace")
+103 |
+104 | /             with mock.patch("os.replace", side_effect=boom):
+105 | |                 with self.assertRaises(OSError):
+    | |________________________________________________^
+106 |                       ledger.apply_batch([("put", "k2", "v2", "r2", 200)])
+107 |               self.assertEqual(path.read_bytes(), before)
+    |
+help: Combine `with` statements
+
+Found 2 errors.
+[*] 1 fixable with the `--fix` option.
