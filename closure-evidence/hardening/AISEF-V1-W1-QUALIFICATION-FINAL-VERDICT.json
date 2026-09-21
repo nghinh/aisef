@@ -1,0 +1,90 @@
+{
+ "artifact": "AISEF V1 — W1 QUALIFICATION FINAL VERDICT",
+ "generated": "2026-09-21",
+ "owner_decision": "RUN 2 IS THE FINAL DIAGNOSTIC RUN (2026-09-21)",
+ "verdict": {
+  "assurance_kernel": "QUALIFIED",
+  "w1_delivery_qualification": "NOT REACHED — and not reachable from this workload",
+  "why": "W1-V2.1 cannot produce a clean qualification verdict because one of its frozen proof obligations is not independent of where the developer places the criterion's test. Two runs of the identical plan reached opposite parent proof states for the same criterion. A later delivery-complete run would only mean the model chose a favourable test topology."
+ },
+
+ "A_assurance_kernel": {
+  "w0": {"status": "QUALIFIED", "candidate_sha": "f52df75ff242a8565b4c995e82e25a94016e95d1",
+         "criteria": "12 of 12 hold", "record": "closure-evidence/hardening/AISEF-W0-QUALIFICATION-f52df75.json"},
+  "frozen_kernel": {"product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+                    "wheel_sha256": "8cae5c7e8d9aea1ecceb7d5d48d360cf2285b4f6db7560ff71aae99b9b182eac",
+                    "freeze": "closure-evidence/hardening/P19-FREEZE.json",
+                    "tree_equals_phase12_kernel": true, "ci_matches_candidate": true},
+  "phase12": {"traces": 100000, "matched": 100000, "unexplained": 0, "invariant_violations": 0, "exceptions": 0,
+              "silent_skips": 0, "kernel_digests": 1, "seed_ranges": "0-99 999, ten chunks of 10 000, no overlap, none missing",
+              "coverage": "26/26 reachable states, 28/28 fault kinds, 378/378 compound pairs, 10 outcomes",
+              "elapsed": "2026-09-20 17:39 to 2026-09-21 00:04"},
+  "mutation": {"generated": 871, "killed": 862, "survived": 0, "equivalent": 9,
+               "equivalents_audited": "every one carries a justification; the two message-only mutants were checked against the structured gate-feedback contract and belong to neither",
+               "targets": 59, "new_policy_target": "aisef/control/gate.py::_tdd_check — 23 mutants, 23 killed"},
+  "policy_v2_conformance": {"scenarios": 20, "mismatches": 0, "invariant_violations": 0, "proof_modes": "3/3",
+                            "compared": ["per-AC decision", "failure owner", "typed outcome", "retry target",
+                                         "developer quality budget", "environment/stage budget", "terminal class",
+                                         "evidence freshness", "the structured feedback fields"]},
+  "fault_matrix": "102 of 102 GREEN",
+  "ci": "Linux 3.11, 3.12, 3.13, 3.14 + Windows + lint + wheel, green on the candidate itself",
+  "full_suite": "3702 passed, 20 skipped, 1528 subtests",
+  "kernel_p0_p1": {"open": 0,
+                   "fixed_this_cycle": "SS-96 (P1) — a check reported FAILED for evidence that did not execute, which routed an environment failure to the developer's quality budget and ended correct stories as QUALITY_BLOCK"}
+ },
+
+ "B_delivery_and_planning_architecture": {
+  "runs": [
+   {"run": "W1-LEDGERLOCK-PLAN-V2 / DIAGNOSTIC RUN 1", "delivered": "10/16", "stop_owner": "PLAN",
+    "stop": "AC-STORY-04-01-2 declared CHANGE_REQUIRED for a behaviour already green at the story's parent — PLAN_OVERLAP",
+    "counts_toward_qualification": false},
+   {"run": "W1-V2.1 run 1", "delivered": "0/16", "stop_owner": "PLAN",
+    "stop": "AC-STORY-01-01-4 and -5, NEGATIVE_INVARIANT, RED_COLLECTION_BOUND_TO_STORY at the parent — PLAN_PRECONDITION_MISSING",
+    "counts_toward_qualification": true, "delivery_complete": false},
+   {"run": "W1-V2.1 run 2", "delivered": "10/16", "stop_owner": "DEVELOPER",
+    "stop": "STORY-04-01 exhausted three attempts on security findings that were real",
+    "counts_toward_qualification": true, "delivery_complete": false}
+  ],
+  "delivery_complete_ratio": "0 of 2 valid V2.1 runs",
+  "run_3": "not run — owner decision, section 2",
+  "defect": "PLAN-V2.1-DEFECT-001",
+  "why_test_placement_changes_proof_semantics":
+   "A criterion's parent state is read from the criterion's TESTS, and whether a test can be collected at the parent is a property of its FILE, not of the criterion. `proof.classify` binds a collection failure to the story through the test's own file (SS-82). For CHANGE_REQUIRED that is right: the story's module is missing, the test cannot run, and that is proof of red. For NEGATIVE_INVARIANT it inverts the answer: the prohibition is satisfied by an absent package, but a test that imports that package cannot be collected and is read as red. So the same frozen criterion is GREEN at the parent when its test file does not import the product, and RED_COLLECTION_BOUND_TO_STORY when it does — measured in both directions, on the same plan text, five hours apart.",
+  "why_this_prevents_a_clean_verdict":
+   "Qualification asks whether the framework delivers a plan reliably. That question is only answerable if the plan means the same thing on every run. Here it does not: the first story either passes or deadlocks the whole run depending on a developer's file organisation, which the plan does not constrain and should not have to. A 2-of-3 threshold measured over such a workload would record the model's luck in choosing a test topology, not the framework's reliability."
+ },
+
+ "C_model_quality": {
+  "model": "ds/deepseek-v4-pro, fixed route, max_turns 80",
+  "delivered": "10 of 16 in both runs that got past the first story",
+  "first_attempt_rate": "run 2: 8 of the first 8 stories on attempt 1; V2 diagnostic: all 10 on attempt 1",
+  "genuine_quality_retries": {
+   "STORY-03-01": "delivered on attempt 3 (atomic batch)",
+   "STORY-04-01": "exhausted 3 attempts; the security reviewer found a lock the batch path takes and the append path does not, leaving a race between read and write, and then verify crashing on a corrupted line that is valid JSON but not an object"
+  },
+  "max_turn_events": 0,
+  "not_attributable_to_the_model": "PLAN-V2.1-DEFECT-001 is a planning defect. The model's test organisation was legitimate in both runs; the plan made one of two legitimate organisations fatal. Neither run's stop at STORY-01-01 says anything about DeepSeek's ability."
+ },
+
+ "D_provider_reliability": {
+  "route": "9router/ds/deepseek-v4-pro",
+  "incidents": 3,
+  "shape": "chat probes answered in 1-3 s (3/3) while every OpenCode tool smoke timed out at the 300 s cap (0/2). Each incident cleared within about five minutes and the re-measured preflight passed 2/2.",
+  "effect_on_the_record": "none — a failed provider preflight creates no run copy, so no partial run entered the evidence. The incidents are recorded beside the runs they preceded.",
+  "separate_from": "the model's delivery quality and the plan's defects"
+ },
+
+ "E_remaining_backlog": [
+  {"id": "SS-92", "severity": "P2", "status": "OPEN"},
+  {"id": "SS-93", "severity": "P2", "status": "OPEN"},
+  {"id": "OBS-CI-2026-09-20-1", "severity": "P3", "status": "OBSERVED_NOT_REPRODUCED"},
+  {"id": "OBS-CI-2026-09-20-2", "severity": "P3", "status": "OBSERVED_NOT_REPRODUCED"},
+  {"id": "PLAN-V2.1-DEFECT-001", "severity": "P1 for the workload plan, no kernel severity", "status": "RECORDED, NOT FIXED"},
+  {"id": "TDD wording when owner=PLAN", "severity": "P3", "status": "RECORDED — routing and terminal classification were correct; not reopening the kernel for wording"}
+ ],
+
+ "F_architecture_lesson": "ARCH-LESSON-001 — proof obligation semantics must be independent of developer-chosen test file placement. See closure-evidence/hardening/ARCH-LESSON-PROOF-PLACEMENT.json for the six design options analysed for the next cycle.",
+
+ "cycle_closed": {"plan_v2_2": "not created", "kernel": "unchanged at 4359f347", "other_models": "not tried",
+                  "max_turns": "unchanged at 80", "w2": "not started", "g6": "not started", "tag_or_release": "none"}
+}
